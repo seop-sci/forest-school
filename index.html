@@ -722,6 +722,14 @@ html.ait .app{padding-top:calc(10px + var(--ait-top, 0px));padding-bottom:var(--
 .boost.trip.ready{animation:tripPulse 1.6s ease-in-out infinite}
 @keyframes tripPulse{50%{box-shadow:0 3px 0 var(--wood-dark),0 0 0 4px color-mix(in srgb, var(--accent) 55%, transparent)}}
 @media (prefers-reduced-motion: reduce){.boost.trip.ready{animation:none}}
+.band.b{fill:#3F78C2} .band.w{fill:#FFFFFF;stroke:#C9CDD2;stroke-width:.5}
+.bus-sign{font-family:var(--font-display);font-size:6.5px;fill:#6E4A2E}
+.bus{pointer-events:none}
+.sportsbar{position:absolute;z-index:3;left:50%;bottom:14px;transform:translateX(-50%);display:flex;align-items:center;gap:12px;padding:6px 14px;border:2px solid var(--wood);border-radius:999px;background:var(--board);color:var(--chalk);font-family:var(--font-display);font-size:14px;box-shadow:0 3px 0 var(--wood-dark);pointer-events:none;white-space:nowrap}
+.sportsbar b{font-family:var(--font-chalk);font-weight:700;font-size:20px;font-variant-numeric:tabular-nums}
+.sportsbar .sb-b b{color:#7FB2F0} .sportsbar .sb-t b{color:var(--accent)}
+.sr-score{margin:0 0 6px;font-family:var(--font-chalk);font-weight:700;font-size:22px}
+.sp-wait{color:var(--chip-ink)}
 .trip-modal{text-align:left;max-height:calc(100dvh - 32px);overflow-y:auto;overscroll-behavior:contain}
 .trip-modal .tr-row, .trip-modal .tr-row *{text-align:left}
 .tr-got{margin:0 0 10px;padding:10px 12px;border-radius:12px;background:var(--chip-bg);color:var(--chip-ink);font-size:13.5px;line-height:1.5;text-align:center}
@@ -1214,10 +1222,12 @@ html.ait .app{padding-top:calc(10px + var(--ait-top, 0px));padding-bottom:var(--
         <g id="guide"></g>
       </svg>
       <div class="fallfx" id="fallFx" hidden aria-hidden="true"></div>
+      <div class="sportsbar" id="sportsBar" hidden role="status" aria-live="off"><span class="sb-b">청팀 <b id="spBlue">0</b></span><span class="sb-t"><b id="spTime">40</b>초</span><span class="sb-w"><b id="spWhite">0</b> 백팀</span></div>
       <div class="map-left">
         <button class="shopbtn" id="btnShop" type="button" hidden aria-label="황금 도토리 상점"><svg viewBox="-8 -11 16 20" aria-hidden="true"><path d="M-4.6 -1 Q-4.9 5.4 0 7.4 Q4.9 5.4 4.6 -1 Z" class="c-gnut"/><ellipse cx="-1.8" cy="2" rx="0.9" ry="2.1" class="c-gshine"/><path d="M-5.8 -0.8 Q-5.8 -6.2 0 -6.6 Q5.8 -6.2 5.8 -0.8 Q0 0.8 -5.8 -0.8 Z" class="c-gcap"/><path d="M-4 -3.2 H4 M-2.8 -5 H2.8" class="s-gline"/><path d="M0 -6.6 L0.9 -9.2" class="s-gstem"/></svg><b id="goldN">0</b>상점</button>
         <button class="boost" id="btnBoost" type="button" hidden aria-label="부엉이 선생님 보충수업"><span class="b-av" id="boostIc" aria-hidden="true"></span>보충수업 <span class="b-n" id="boostN">5</span></button>
         <button class="boost trip" id="btnTrip" type="button" hidden aria-label="현장체험학습"><span class="b-av" id="tripIc" aria-hidden="true"></span>체험학습 <span class="b-n" id="tripN">출발 전</span></button>
+        <button class="boost trip sports" id="btnSports" type="button" hidden aria-label="숲속 운동회"><span class="b-av" id="sportsIc" aria-hidden="true"></span>운동회 <span class="b-n" id="sportsN">열기</span></button>
         <div class="feast" id="feastChip" hidden>특식 데이 <b id="feastTime">5:00</b></div>
         <div class="feast" id="autoChip" hidden>자동 줍기 <b id="autoTime">60:00</b></div>
       </div>
@@ -1459,6 +1469,31 @@ html.ait .app{padding-top:calc(10px + var(--ait-top, 0px));padding-bottom:var(--
     <h2 id="tripTitle">현장체험학습</h2>
     <div id="tripBody"></div>
     <button class="btn-sub tr-close" type="button" id="tripClose">닫기</button>
+  </section>
+</div>
+
+<div class="overlay center" id="mSports" hidden>
+  <div class="backdrop" data-close-sports></div>
+  <section class="modal" role="dialog" aria-modal="true" aria-labelledby="spTitle">
+    <div class="mart" id="spArt"></div>
+    <h2 id="spTitle">숲속 운동회</h2>
+    <p id="spLead"></p>
+    <div class="amount"><span data-acorn></span><b id="spPrize">0</b></div>
+    <p class="fine">이기면 받는 상품이에요. 지면 절반을 받아요. 운동회는 2시간마다 열 수 있어요.</p>
+    <p class="fine sp-wait" id="spWait" hidden></p>
+    <div class="btn-row"><button class="btn-sub" type="button" id="spNo">닫기</button><button class="cta" type="button" id="spGo">운동회 시작!</button></div>
+  </section>
+</div>
+
+<div class="overlay center" id="mSportsEnd" hidden>
+  <div class="backdrop"></div>
+  <section class="modal" role="dialog" aria-modal="true" aria-labelledby="srTitle">
+    <div class="mart" id="srArt"></div>
+    <h2 id="srTitle">청팀 승리!</h2>
+    <p class="sr-score" id="srScore"></p>
+    <p id="srText"></p>
+    <div class="amount"><span data-acorn></span><b id="srPrize">0</b></div>
+    <div class="btn-row"><button class="btn-sub" type="button" id="srGet">받기</button><button class="cta" type="button" id="srDbl">광고 보고 2배로 받기</button></div>
   </section>
 </div>
 
@@ -1794,7 +1829,7 @@ html.ait .app{padding-top:calc(10px + var(--ait-top, 0px));padding-bottom:var(--
   // 메인 퀘스트: 교감 선생님이 장마다 하나씩 기능을 알려 주는 튜토리얼. 마지막 퀘스트가 그 장의 상장(학교 등급)이다
   const CHAPTERS = ['첫 출근', '선생님을 모셔요', '소문난 학교', '대도시를 향해', '유치원 졸업', '숲속 초등학교', '2학년 새 친구들', '3학년 현장체험학습', '4학년 숲속 운동회', '5학년 학예회', '6학년 졸업 여행'];
   // 다음 장이 열리는 때 (장 순서대로)
-  const CH_NEXT = ['마을 학교가 되면', '읍내 학교가 되면', '도시 학교가 되면', '대도시 학교가 되면', '초등학교에 입학하면', '1학년 종업식을 마치면', '중학교가 열리면'];
+  const CH_NEXT = ['마을 학교가 되면', '읍내 학교가 되면', '도시 학교가 되면', '대도시 학교가 되면', '초등학교에 입학하면', '1학년 종업식을 마치면', '2학년 종업식을 마치면', '3학년 종업식을 마치면', '4학년 종업식을 마치면', '5학년 종업식을 마치면', '중학교가 열리면'];
   // id는 저장에 쓰여요. 순서를 바꾸거나 퀘스트를 빼도 하던 퀘스트를 그대로 찾아요
   const MAIN = [
     { id: 'q0', ch: 0, t: 'fac', k: 'classroom', n: 2, r: 30, title: '교실 넓히기', how: '교실을 눌러서 Lv.2로 넓혀요',
@@ -1917,8 +1952,8 @@ html.ait .app{padding-top:calc(10px + var(--ait-top, 0px));padding-bottom:var(--
     { id: 'e24', ch: 7, ye: 3, t: 'tgrads', n: 3, r: 7, rk: 'dip', title: '3학년 종업식', how: '졸업 탭에서 종업식을 열어요',
       say: '3학년을 마쳤어요! 4학년에는 숲속 운동회가 열려요.' },
 
-    { id: 'e25', ch: 8, t: 'picks', n: 30, rm: 3, title: '운동회 도토리 줍기', how: '참나무를 누르면 도토리가 떨어져요',
-      say: '숲속 운동회 첫 경기는 도토리 줍기예요! 운동장에 떨어진 도토리를 30개 주워요.' },
+    { id: 'e25', ch: 8, t: 'sports', n: 1, rm: 3, title: '숲속 운동회 열기', how: '지도 왼쪽의 운동회 버튼을 눌러요',
+      say: '4학년이 되면 숲속 운동회를 열 수 있어요! 청팀과 백팀으로 나뉘어 달리는 동안, 굴러오는 공을 주워서 청팀을 이기게 해 줘요.' },
     { id: 'e26', ch: 8, t: 'fac', k: 'playground', n: 14, rm: 4, title: '운동장 Lv.14', how: '운동장을 Lv.14까지 넓혀요',
       say: '이어달리기를 하려면 운동장이 더 넓어야 해요. 운동장을 Lv.14까지 넓혀요.' },
     { id: 'e27', ch: 8, t: 'trips', n: 3, rm: 4, title: '체험학습 세 번', how: '체험학습을 세 번 다녀와요',
@@ -1977,8 +2012,8 @@ html.ait .app{padding-top:calc(10px + var(--ait-top, 0px));padding-bottom:var(--
     { who: 'chick', t: 'earned', n: () => nice(rate() * 120), say: n => `도토리 ${fmt(n)}개를 모아서 숲속 잔치를 열어요!` },
     { who: 'rabbit', t: 'claims', n: () => 1, say: () => '학교 문을 닫았다가 다시 와 주세요. 그동안 수업이 잘 이어지는지 볼게요.' }
   ];
-  const COUNT_TYPES = new Set(['picks', 'ups', 'trains', 'claims', 'earned', 'trips']);
-  const Q_TYPES = ['fac', 'tea', 'teaAll', 'students', 'grade', 'ygrade', 'rate', 'picks', 'ups', 'trains', 'claims', 'earned', 'grads', 'perks', 'tier', 'tgrads', 'fperks', 'trips', 'souv', 'tripat'];
+  const COUNT_TYPES = new Set(['picks', 'ups', 'trains', 'claims', 'earned', 'trips', 'sports']);
+  const Q_TYPES = ['fac', 'tea', 'teaAll', 'students', 'grade', 'ygrade', 'rate', 'picks', 'ups', 'trains', 'claims', 'earned', 'grads', 'perks', 'tier', 'tgrads', 'fperks', 'trips', 'souv', 'tripat', 'sports'];
 
   /* ---------- 상태 ---------- */
   let S = null;
@@ -2006,7 +2041,7 @@ html.ait .app{padding-top:calc(10px + var(--ait-top, 0px));padding-bottom:var(--
 
   // q.m: 지금 메인 퀘스트 번호, q.mb: 그 퀘스트를 시작할 때의 기준값, q.subs: 받아 둔 학생 부탁들
   // mid: 지금 메인 퀘스트의 id. 퀘스트 목록이 바뀌어도 이어서 할 수 있게 저장해요
-  const freshQ = () => ({ init: false, m: 0, mb: 0, mid: '', lat: '', subs: [], done: [], gen: 0, subDone: 0, seen: -1 });
+  const freshQ = () => ({ init: false, m: 0, mb: 0, mid: '', lat: '', subs: [], done: [], gen: 0, subDone: 0, seen: -1, qv: 2, reset: false });
   // p: 종업식으로 남는 것(수료증, 전학생 수, 명예 교장실), best: 가장 높았던 등급, yearEarned: 올해 번 도토리
   // tier: 학교급(0 유치원, 1 초등학교), tg: 이 학교급에서 연 종업식, tdip: 이 학교급에서 모은 수료증, fund와 fp: 장학재단 기금과 강화
   const fresh = () => ({
@@ -2018,13 +2053,14 @@ html.ait .app{padding-top:calc(10px + var(--ait-top, 0px));padding-bottom:var(--
     tier: 0, tg: 0, tdip: 0, fund: 0, fp: { schol: 0, rep: 0, dip: 0 },
     hd: { day: '', n: 0, feastUntil: 0, album: false, seen: false },
     oak: OAK.max,
-    st: { picks: 0, ups: 0, trains: 0, claims: 0, grads: 0, perks: 0, fperks: 0, shakes: 0, dips: 0, play: 0, sess: 0, ads: 0, gold: 0, gspent: 0, trips: 0 },
+    st: { picks: 0, ups: 0, trains: 0, claims: 0, grads: 0, perks: 0, fperks: 0, shakes: 0, dips: 0, play: 0, sess: 0, ads: 0, gold: 0, gspent: 0, trips: 0, sports: 0 },
     p: { dip: 0, species: 0, perk: { schol: 0, rep: 0, start: 0, drop: 0, night: 0 } },
     att: { last: '', n: 0 },
     ad: { day: '', n: 0 },
     u: { boost: false, dev: false },
     units: 'ko',
-    trip: { open: false, cur: '', start: 0, end: 0, souv: [], been: {} },
+    trip: { open: false, cur: '', start: 0, end: 0, souv: [], been: {}, kids: 0 },
+    sports: { next: 0 },
     gold: 5, gd: { day: '', n: 0, shop: 0 }, cos: { own: [], hat: '', neck: '', th: { bg: '', classroom: '', cafeteria: '', library: '', science: '', playground: '' } }, autoUntil: 0,
     rank: { name: '', joined: false, sent: -1, by: '', ren: 0, asked: false },
     q: freshQ()
@@ -2094,9 +2130,11 @@ html.ait .app{padding-top:calc(10px + var(--ait-top, 0px));padding-bottom:var(--
       for (const [slot] of TH_SLOTS) { const v = th[slot]; s.cos.th[slot] = typeof v === 'string' && s.cos.own.includes(`th:${v}:${slot}`) ? v : ''; }
     }
     s.autoUntil = Math.min(num(d.autoUntil, 0, 0), Date.now() + 3 * 3600000);
+    if (d.sports && typeof d.sports === 'object') s.sports.next = Math.min(num(d.sports.next, 0, 0), Date.now() + 2 * 3600000);
     if (d.trip && typeof d.trip === 'object') {
       const t = d.trip;
       s.trip.open = !!t.open;
+      s.trip.kids = Math.min(6, Math.floor(num(t.kids, 0, 0)));
       s.trip.souv = Array.isArray(t.souv) ? [...new Set(t.souv.filter(k => typeof k === 'string' && SOUV_IDS.has(k)))] : [];
       if (t.been && typeof t.been === 'object') for (const k of Object.keys(TRIP)) if (t.been[k]) s.trip.been[k] = Math.floor(num(t.been[k], 0, 0));
       if (typeof t.cur === 'string' && TRIP[t.cur]) {
@@ -2120,7 +2158,14 @@ html.ait .app{padding-top:calc(10px + var(--ait-top, 0px));padding-bottom:var(--
       s.st.dips = Math.floor(s.tdip + (s.tier > 0 ? Math.max(0, fundEver - s.tier) * FUND_PER : 0));
     }
     const q = sanitizeQ(d.q, num);
-    if (q) s.q = q;   // 퀘스트가 없던 예전 저장이면 init이 false로 남아 시작할 때 진행도에 맞춰 건너뛴다
+    if (q) s.q = q;
+    // 예전에는 2~6학년 퀘스트가 한 장(7장)에 몰려 있었어요. 그때 저장이면 지금 학년의 장 첫 퀘스트부터 다시 시작해요
+    if (q && d.q.qv !== 2 && s.tier === 1 && ['e13', 'e14', 'q26', 'e15', 'e6'].includes(String(d.q.mid || '').replace(/^end:/, ''))) {
+      const ch = Math.max(6, Math.min(10, s.tg + 5));
+      s.q.m = MAIN.findIndex(m => m.ch === ch);
+      s.q.lat = ''; s.q.seen = Math.min(s.q.seen, s.q.m - 1); s.q.reset = true;
+    }
+    s.q.qv = 2;   // 퀘스트가 없던 예전 저장이면 init이 false로 남아 시작할 때 진행도에 맞춰 건너뛴다
     // 아직 유치원인데 초등학교 장의 퀘스트에 와 있으면 유치원 졸업식 퀘스트로 되돌려요 (0.4에서는 전학생 퀘스트가 5장에 있었어요)
     const k1 = MAIN.findIndex(m => m.id === 'k1');
     if (s.tier === 0 && MAIN[s.q.m] && MAIN[s.q.m].ch > MAIN[k1].ch) { s.q.m = k1; s.q.mb = 0; }
@@ -2712,7 +2757,7 @@ html.ait .app{padding-top:calc(10px + var(--ait-top, 0px));padding-bottom:var(--
     rt.kids.push(k);
   }
   function syncKids(initial) {
-    const want = Math.min(CFG.maxKids, Math.floor(S.students));
+    const want = Math.max(0, Math.min(CFG.maxKids, Math.floor(S.students)) - (S.trip.kids || 0));
     while (rt.kids.length < want) addKid(!initial);
     while (rt.kids.length > want) { const k = rt.kids.pop(); k.g.remove(); }
   }
@@ -2722,7 +2767,7 @@ html.ait .app{padding-top:calc(10px + var(--ait-top, 0px));padding-bottom:var(--
       if (k.wait > 0) { k.wait -= dt; k.moving = false; }
       else {
         const dx = k.tx - k.x, dy = k.ty - k.y, d = Math.hypot(dx, dy);
-        if (d < 0.8) { k.wait = rand(1, 4.5); pickTarget(k); k.moving = false; }
+        if (d < 0.8) { k.moving = false; if (!k.board && k.ang === undefined) { k.wait = rand(1, 4.5); pickTarget(k); } }
         else { const st = Math.min(d, k.speed * dt); k.x += dx / d * st; k.y += dy / d * st; k.moving = true; }
       }
       placeKid(k, k.moving ? -Math.abs(Math.sin(now / 110 + k.phase)) * 1.6 : 0);
@@ -2813,6 +2858,7 @@ html.ait .app{padding-top:calc(10px + var(--ait-top, 0px));padding-bottom:var(--
     const v = dropValue();
     S.budget += v; earn(v);
     S.st.picks += 1;
+    if (rt.sports) { rt.sports.blue += 1; renderSportsBar(); }
     floatText(d.x, d.y - 12, '+' + fmt(v), 'gold');
     sfx('coin'); buzz(12);
     removeDrop(d);
@@ -2934,6 +2980,7 @@ html.ait .app{padding-top:calc(10px + var(--ait-top, 0px));padding-bottom:var(--
     updateQuestDot();
     renderBoostBtn();
     renderTripBtn();
+    renderSportsBtn();
     $('#btnAtt').hidden = !attUnlocked();
     $('#attDot').hidden = !attUnlocked() || !canStamp();
     $('#gDot').hidden = rt.tab === 'grad' || !(canGraduate() || canPromote() || Object.keys(PERKS).some(k => !perkMaxed(k) && S.p.dip >= perkCost(k)) || Object.keys(FPERKS).some(k => S.fund >= fpCost(k)));
@@ -4628,7 +4675,10 @@ html.ait .app{padding-top:calc(10px + var(--ait-top, 0px));padding-bottom:var(--
     S.trip.cur = id; S.trip.start = now; S.trip.end = now + D.min * 60000;
     sfx('buy'); buzz(10);
     toast(`${D.name}에 출발했어요! ${minText(D.min)} 뒤에 돌아와요`);
-    rt.tripTxt = ''; save(); renderTrip(); renderTripBtn();
+    S.trip.kids = Math.max(0, Math.min(5, rt.kids.length - 2));
+    rt.tripTxt = ''; save(); renderTripBtn();
+    const n = S.trip.kids;
+    closeModal($('#mTrip'), () => { setTab('school'); busScene('go', n, () => syncKids(false)); });
   }
   function tripAd() {
     if (!S.trip.cur || tripBack()) return;
@@ -4664,7 +4714,168 @@ html.ait .app{padding-top:calc(10px + var(--ait-top, 0px));padding-bottom:var(--
     rt.tripGot = msg;
     rt.tripTxt = '';
     save(); renderHUD(); renderAffordance(); renderTripBtn(); renderGradPanel(true);
-    if (rt.modalOpen === $('#mTrip')) renderTrip();
+    const n = S.trip.kids, arrive = () => { setTab('school'); if (n > 0) busScene('back', n, () => { S.trip.kids = 0; syncKids(false); save(); }); };
+    if (rt.reduced) { S.trip.kids = 0; syncKids(false); }
+    if (rt.modalOpen === $('#mTrip')) closeModal($('#mTrip'), arrive); else arrive();
+  }
+
+  /* ---------- 지도 위 장면: 체험학습 버스, 숲속 운동회 ---------- */
+  // 버스: 아래 교문으로 들어와 멈췄다가 다시 나가요. 떠날 때는 학생 몇 명이 걸어가서 타고, 돌아올 때는 내려서 흩어져요
+  const BUS_STOP = [196, 398];
+  const BUS_MAP = '<g class="bus-body"><rect x="-21" y="-14" width="42" height="22" rx="5" fill="#F3C04B"/><rect x="-21" y="2" width="42" height="3" fill="#D9A23A"/>' +
+    '<rect x="-17" y="-10" width="8" height="7" rx="1.5" fill="#BFE3F2"/><rect x="-6" y="-10" width="8" height="7" rx="1.5" fill="#BFE3F2"/><rect x="5" y="-10" width="7" height="7" rx="1.5" fill="#BFE3F2"/>' +
+    '<rect x="14" y="-10" width="5" height="15" rx="1" fill="#E9B23C" stroke="#B9852C" stroke-width=".8"/><circle cx="-12" cy="9" r="4" fill="#3B3B2D"/><circle cx="12" cy="9" r="4" fill="#3B3B2D"/>' +
+    '<circle cx="-12" cy="9" r="1.6" fill="#B9B9A8"/><circle cx="12" cy="9" r="1.6" fill="#B9B9A8"/><text x="-3" y="-15.5" text-anchor="middle" class="bus-sign">체험학습</text></g>';
+  function busScene(mode, n, then) {
+    if (rt.reduced || !layerFx.animate) { if (then) then(); return; }
+    if (rt.bus) rt.bus.remove();
+    const g = document.createElementNS(NS, 'g');
+    g.setAttribute('class', 'bus');
+    g.setAttribute('aria-hidden', 'true');
+    g.innerHTML = BUS_MAP;
+    layerFx.appendChild(g);
+    rt.bus = g;
+    const [bx, by] = BUS_STOP;
+    const at = y => `translate(${bx}px, ${y}px)`;
+    const drive = (from, to, ms) => g.animate([{ transform: at(from) }, { transform: at(to) }], { duration: ms, easing: from > to ? 'cubic-bezier(.2,.7,.3,1)' : 'cubic-bezier(.6,0,.8,.4)', fill: 'forwards' });
+    const leave = () => { sfx('leaf'); drive(by, 470, 1300).onfinish = () => { g.remove(); if (rt.bus === g) rt.bus = null; if (then) then(); }; };
+    drive(470, by, 1300).onfinish = () => {
+      if (mode === 'go') {
+        // 학생 n명이 버스 문으로 걸어가요. 다 타면(아무리 늦어도 5초) 떠나요
+        const riders = rt.kids.filter(k => !k.board).slice(-n);
+        riders.forEach(k => { k.board = true; k.wait = 0; k.tx = bx + 16; k.ty = by + 4; k.speed = 34; });
+        const t0 = performance.now();
+        const check = () => {
+          for (const k of riders) if (!k.gone && Math.hypot(k.x - k.tx, k.y - k.ty) < 3) { k.gone = true; k.g.style.opacity = '0'; }
+          if (riders.every(k => k.gone) || performance.now() - t0 > 5000) {
+            riders.forEach(k => { k.g.remove(); const i = rt.kids.indexOf(k); if (i >= 0) rt.kids.splice(i, 1); });
+            setTimeout(leave, 400);
+          } else requestAnimationFrame(check);
+        };
+        requestAnimationFrame(check);
+      } else {
+        // 돌아오면 학생들이 한 명씩 내려요
+        let i = 0;
+        const off = () => {
+          if (i >= n) { setTimeout(leave, 500); return; }
+          i++;
+          S.trip.kids = Math.max(0, S.trip.kids - 1);
+          const before = rt.kids.length;
+          syncKids(true);
+          for (const k of rt.kids.slice(before)) { k.x = bx + 16; k.y = by + 4; k.wait = 0; placeKid(k, 0); }
+          sfx('tap');
+          setTimeout(off, 260);
+        };
+        setTimeout(off, 300);
+      }
+    };
+  }
+
+  // 숲속 운동회: 4학년부터 2시간마다 열 수 있어요(광고를 보면 바로 다시). 40초 동안 학생들이 청팀과 백팀으로 나뉘어 운동장 트랙을 달리고,
+  // 운동장에 굴러오는 공(도토리)을 주울 때마다 청팀이 1점. 백팀은 저절로 점수를 내요. 이기면 상품이 2배
+  const SPORTS = { sec: 40, gap: 2 * 3600000, every: 0.65, ground: 6, cx: 165, cy: 336, rx: 100, ry: 33 };
+  const sportsOpen = () => !!S && (S.tier >= 2 || (S.tier >= 1 && S.tg >= 3)) && S.f.playground >= 1;
+  const sportsWait = () => Math.max(0, S.sports.next - Date.now());
+  const sportsPrize = win => Math.max(10, nice(rate() * 180 * (win ? 2 : 1)));
+  function renderSportsBtn() {
+    const b = $('#btnSports'), on = sportsOpen() && !rt.sports;
+    b.hidden = !on;
+    if (!on) return;
+    const w = sportsWait(), txt = w > 0 ? hms(w) : '열기';
+    if (rt.sportsTxt !== txt) { rt.sportsTxt = txt; $('#sportsN').textContent = txt; b.classList.toggle('ready', w <= 0); }
+    if (rt.modalOpen === $('#mSports') && rt.sportsView !== (w > 0 ? 'wait' : 'ready')) renderSportsModal();
+    else if (rt.modalOpen === $('#mSports') && w > 0) $('#spWait').textContent = `다음 운동회까지 ${hms(w)}`;
+  }
+  function openSports() {
+    if (rt.paused) return;
+    if (!sportsOpen()) { toast(S.f.playground < 1 ? `${eul(FAC.playground.name)} 먼저 지어야 해요` : '숲속 운동회는 초등학교 4학년부터 열 수 있어요'); return; }
+    if (rt.sports) return;
+    if (rt.modalOpen && rt.modalOpen !== $('#mSports')) return;
+    sfx('tap');
+    renderSportsModal();
+    if (rt.modalOpen !== $('#mSports')) openModal($('#mSports'));
+  }
+  function renderSportsModal() {
+    const w = sportsWait();
+    rt.sportsView = w > 0 ? 'wait' : 'ready';
+    $('#spLead').textContent = `학생들이 청팀과 백팀으로 나뉘어 ${SPORTS.sec}초 동안 겨뤄요. 운동장에 굴러오는 공을 눌러 주울 때마다 청팀이 1점! 이기면 상품이 2배예요.`;
+    $('#spPrize').textContent = fmt(sportsPrize(true));
+    $('#spWait').hidden = w <= 0;
+    $('#spWait').textContent = `다음 운동회까지 ${hms(w)}`;
+    $('#spGo').textContent = w > 0 ? '광고 보고 바로 열기' : '운동회 시작!';
+  }
+  function startSports(viaAd) {
+    if (rt.sports || !sportsOpen()) return;
+    if (!viaAd && sportsWait() > 0) {
+      closeModal($('#mSports'), () => showAd(() => startSports(true), () => {}));
+      return;
+    }
+    const go = () => {
+      setTab('school'); closeSheet();
+      $('#scroller').scrollTo({ top: $('#scroller').scrollHeight, behavior: rt.reduced ? 'auto' : 'smooth' });
+      rt.sports = { t: SPORTS.sec, blue: 0, white: 0, spawn: 0, foe: 1.2 };
+      S.sports.next = Date.now() + SPORTS.gap;
+      rt.kids.forEach((k, i) => {
+        k.team = i % 2 ? 'w' : 'b'; k.ang = (i / Math.max(1, rt.kids.length)) * Math.PI * 2; k.spd = rand(0.55, 0.85);
+        k.g.insertAdjacentHTML('beforeend', `<rect class="band ${k.team}" x="-6.4" y="-4.6" width="12.8" height="2.4" rx="1.2"/>`);
+      });
+      $('#sportsBar').hidden = false;
+      renderSportsBar();
+      sfx('bell'); buzz(20);
+      toast('숲속 운동회 시작! 굴러오는 공을 주워서 청팀을 응원해요');
+      save(); renderSportsBtn();
+    };
+    if (rt.modalOpen === $('#mSports')) closeModal($('#mSports'), go); else go();
+  }
+  function renderSportsBar() {
+    const R = rt.sports;
+    if (!R) return;
+    $('#spBlue').textContent = R.blue; $('#spWhite').textContent = R.white;
+    $('#spTime').textContent = Math.ceil(R.t);
+  }
+  // 놀이 루프에서 불러요: 학생들은 트랙을 돌고, 공이 굴러오고, 백팀 점수가 올라가요
+  function updateSports(dt) {
+    const R = rt.sports;
+    if (!R) return;
+    R.t -= dt;
+    R.spawn += dt;
+    if (R.spawn >= SPORTS.every) { R.spawn = 0; if (rt.drops.length < SPORTS.ground) spawnDrop(false); }
+    R.foe -= dt;
+    if (R.foe <= 0) { R.foe = rand(1.1, 2.1); R.white += 1; }
+    for (const k of rt.kids) {
+      if (k.board || k.ang === undefined) continue;
+      k.ang += dt * k.spd;
+      k.tx = SPORTS.cx + Math.cos(k.ang) * SPORTS.rx * (k.team === 'b' ? 1 : 0.86);
+      k.ty = SPORTS.cy + Math.sin(k.ang) * SPORTS.ry * (k.team === 'b' ? 1 : 0.8);
+      k.wait = 0; k.speed = 80;
+    }
+    renderSportsBar();
+    if (R.t <= 0) endSports();
+  }
+  function endSports() {
+    const R = rt.sports;
+    rt.sports = null;
+    rt.kids.forEach(k => { delete k.ang; delete k.team; k.speed = rand(14, 22); pickTarget(k); const b = k.g.querySelector('.band'); if (b) b.remove(); });
+    $('#sportsBar').hidden = true;
+    S.st.sports += 1;
+    const win = R.blue > R.white, tie = R.blue === R.white;
+    rt.sportsWin = win;
+    $('#srTitle').textContent = win ? '청팀 승리!' : tie ? '무승부!' : '백팀 승리!';
+    $('#srScore').textContent = `청팀 ${R.blue} : ${R.white} 백팀`;
+    $('#srText').textContent = win ? `공을 ${R.blue}개나 주웠어요! 이긴 상품으로 수업료 6분치를 받아요.` : `다음에는 공을 더 빨리 주워 봐요. 그래도 수업료 3분치를 받아요.`;
+    $('#srPrize').textContent = fmt(sportsPrize(win));
+    $('#srArt').innerHTML = `<svg viewBox="-26 -19 52 38" aria-hidden="true">` + ['rabbit', 'fox', 'chick'].map((sp, i) => `<g transform="translate(${(i - 1) * 15} ${i === 1 ? -3 : 1})">${kidSVG(sp, i)}<rect class="band ${win ? 'b' : 'w'}" x="-6.4" y="-4.6" width="12.8" height="2.4" rx="1.2"/></g>`).join('') + '</svg>';
+    sfx(win ? 'quest' : 'done'); buzz(20);
+    save(); renderSportsBtn(); checkQuests(); renderAffordance();
+    queueModal(() => { openModal($('#mSportsEnd')); return true; });
+  }
+  function claimSports(x) {
+    const v = sportsPrize(rt.sportsWin) * x;
+    S.budget += v; earn(v);
+    if (rt.sportsWin) addGold(1);
+    floatText(165, 300, '+' + fmt(v), 'gold');
+    toast(`운동회 상품 도토리 +${fmt(v)}${rt.sportsWin ? ', 황금 도토리 +1' : ''}`);
+    sfx('coin'); save(); renderHUD();
   }
 
   /* ---------- 출석부 ---------- */
@@ -5017,6 +5228,7 @@ html.ait .app{padding-top:calc(10px + var(--ait-top, 0px));padding-bottom:var(--
       case 'fperks': return `장학재단 ${q.n}번 고치기`;
       case 'trips': return q.n === 1 ? '현장체험학습 다녀오기' : `현장체험학습 ${q.n}번 다녀오기`;
       case 'souv': return `기념품 ${q.n}종 모으기`;
+      case 'sports': return q.n === 1 ? '숲속 운동회 열기' : `숲속 운동회 ${q.n}번 열기`;
       case 'tripat': return `${TRIP[q.k].name} 다녀오기`;
     }
     return '';
@@ -5411,6 +5623,7 @@ html.ait .app{padding-top:calc(10px + var(--ait-top, 0px));padding-bottom:var(--
       case 'tier': return goGrad('tier');
       case 'fperks': return goGrad('fund');
       case 'trips': case 'souv': case 'tripat': return openTrip();
+      case 'sports': return openSports();
     }
   }
 
@@ -5538,6 +5751,7 @@ html.ait .app{padding-top:calc(10px + var(--ait-top, 0px));padding-bottom:var(--
       updateKids(dt, now);
       updateDrops(now);
       updateDeal(dt);
+      updateSports(dt);
       if (S.oak < OAK.max) { S.oak = Math.min(OAK.max, S.oak + dt / OAK.regen); renderOak(); }
       rt.uiT += dt; if (rt.uiT >= 0.1) { rt.uiT = 0; renderHUD(); }
       rt.affT += dt; if (rt.affT >= 0.25) { rt.affT = 0; renderAffordance(); }
@@ -5557,6 +5771,15 @@ html.ait .app{padding-top:calc(10px + var(--ait-top, 0px));padding-bottom:var(--
     // 테스트 광고, 보충수업, 출석부
     $('#btnBoost').addEventListener('click', openBoost);
     $('#tripIc').innerHTML = BUS;
+    const SPORTS_IC = '<svg viewBox="-12 -12 24 24" aria-hidden="true"><path d="M-8 9 L-8 -9" stroke="#8A5D3B" stroke-width="1.6" stroke-linecap="round"/><path d="M-7.5 -9 H6 L3 -5 L6 -1 H-7.5 Z" fill="#3F78C2"/><circle cx="4" cy="6" r="4.2" fill="#FFFFFF" stroke="#D9534A" stroke-width="1.2"/></svg>';
+    $('#sportsIc').innerHTML = SPORTS_IC;
+    $('#spArt').innerHTML = `<svg viewBox="-26 -19 52 38" aria-hidden="true">${['rabbit', 'fox', 'chick'].map((sp, i) => `<g transform="translate(${(i - 1) * 15} ${i === 1 ? -3 : 1})">${kidSVG(sp, i)}<rect class="band ${i === 1 ? 'w' : 'b'}" x="-6.4" y="-4.6" width="12.8" height="2.4" rx="1.2"/></g>`).join('')}</svg>`;
+    $('#btnSports').addEventListener('click', () => { if (!rt.modalOpen) openSports(); });
+    $('#spNo').addEventListener('click', () => closeModal($('#mSports')));
+    $('[data-close-sports]').addEventListener('click', () => closeModal($('#mSports')));
+    $('#spGo').addEventListener('click', () => startSports(false));
+    $('#srGet').addEventListener('click', () => closeModal($('#mSportsEnd'), () => claimSports(1)));
+    $('#srDbl').addEventListener('click', () => closeModal($('#mSportsEnd'), () => showAd(() => claimSports(2), () => claimSports(1))));
     $('#btnTrip').addEventListener('click', () => { if (!rt.modalOpen) openTrip(); });
     $('#tripClose').addEventListener('click', () => closeModal($('#mTrip')));
     $('[data-close-trip]').addEventListener('click', () => closeModal($('#mTrip')));
@@ -5566,7 +5789,7 @@ html.ait .app{padding-top:calc(10px + var(--ait-top, 0px));padding-bottom:var(--
       const id = e.target.closest('button') && e.target.closest('button').id;
       if (id === 'tripAd') tripAd();
       else if (id === 'tripGet') claimTrip(1);
-      else if (id === 'tripDbl') closeModal($('#mTrip'), () => showAd(() => { claimTrip(2); openTrip(true); }, () => openTrip()));
+      else if (id === 'tripDbl') closeModal($('#mTrip'), () => showAd(() => claimTrip(2), () => openTrip()));
     });
     $('#boostGo').addEventListener('click', startBoost);
     $('#boostNo').addEventListener('click', () => closeModal($('#mBoost')));
@@ -5817,6 +6040,7 @@ html.ait .app{padding-top:calc(10px + var(--ait-top, 0px));padding-bottom:var(--
       else if (rt.modalOpen === $('#mMove') && !rt.moveIn) closeModal($('#mMove'));
       else if (rt.modalOpen === $('#mStats')) closeModal($('#mStats'));
       else if (rt.modalOpen === $('#mTrip')) closeModal($('#mTrip'));
+      else if (rt.modalOpen === $('#mSports')) closeModal($('#mSports'));
       else if (rt.sheetKey && !rt.modalOpen) closeSheet();
     });
     document.addEventListener('visibilitychange', () => {
@@ -5856,6 +6080,7 @@ html.ait .app{padding-top:calc(10px + var(--ait-top, 0px));padding-bottom:var(--
     S = fromHot ? sanitize(data.save) : (load() || fresh());
     S.st.sess += 1;
     if (!S.q.init) { if (hadSave) fastForwardMain(); else startMain(); S.q.init = true; }
+    if (S.q.reset) { S.q.reset = false; startMain(); }
     fillSubs();
     checkQuests(true);
     buildForest();
@@ -5892,7 +6117,7 @@ html.ait .app{padding-top:calc(10px + var(--ait-top, 0px));padding-bottom:var(--
 
   // 시험용 손잡이: 자동 시험(window.__FOREST_TEST)에서만 게임 속 함수를 꺼내 써요
   if (window.__FOREST_TEST) window.__forest = { get S() { return S; }, rt, buyFacility, teacherAct, facCost, teaCost, facKeys, rate, rep, capacity, canGraduate, canPromote,
-    graduate, promote, buyPerk, perkCost, perkMaxed, buyFundPerk, fpCost, claimMain, mainReady, curMain, qNo, earn, CFG, TEA, teaMaxed, PERKS, FPERKS, MAIN, finalYear, startTrip, claimTrip, TRIPS, yearLocked };
+    graduate, promote, buyPerk, perkCost, perkMaxed, buyFundPerk, fpCost, claimMain, mainReady, curMain, qNo, earn, CFG, TEA, teaMaxed, PERKS, FPERKS, MAIN, finalYear, startTrip, claimTrip, TRIPS, yearLocked, startSports, endSports, rtSports: () => rt.sports };
   if (window.claude && window.claude.hot && window.claude.hot.snapshot) {
     try { window.claude.hot.snapshot(() => { if (S) syncMid(); return { save: S }; }); } catch (e) { /* 무시 */ }
   }
