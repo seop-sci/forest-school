@@ -2,7 +2,7 @@
 import { SocialLogin } from '@capgo/capacitor-social-login';
 
 // Firebase 콘솔 > Authentication > 로그인 방법 > Google > 웹 SDK 구성의 '웹 클라이언트 ID'
-const WEB_CLIENT_ID = '';
+const WEB_CLIENT_ID = '371851641750-c206d9dtea31k8rdq6ctcd3jru0pkvsh.apps.googleusercontent.com';
 
 if (WEB_CLIENT_ID) {
   let ready = null;
