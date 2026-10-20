@@ -47,11 +47,11 @@ jobs:
           chmod +x gradlew
           if [ -n "$ANDROID_KEYSTORE_PATH" ]; then T="bundleRelease assembleRelease"; else T="assembleDebug"; fi
           set -o pipefail
-          ./gradlew --no-daemon $T 2>&1 | tee "$RUNNER_TEMP/build.log"
+          ./gradlew --no-daemon --stacktrace $T 2>&1 | tee "$RUNNER_TEMP/build.log"
       - name: 실패하면 까닭 보여 주기
         if: failure()
         run: |
-          grep -E "error|Error|FAILURE|What went wrong|SDK|>" "$RUNNER_TEMP/build.log" | tail -25 | while IFS= read -r l; do echo "::error::$l"; done || true
+          grep -n -A14 "What went wrong" "$RUNNER_TEMP/build.log" | head -40 | while IFS= read -r l; do echo "::error::$l"; done || true
       - uses: actions/upload-artifact@v4
         with:
           name: forest-school-android-${{ github.run_number }}
