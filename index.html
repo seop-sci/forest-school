@@ -2691,6 +2691,10 @@ html.ait .app{padding-top:calc(10px + var(--ait-top, 0px));padding-bottom:var(--
   // 진짜 미니앱에서는 앱인토스 SDK의 보상형 광고로 바꿔요. 보상은 userEarnedReward 신호를 받았을 때만 줘요
   function showAd(onReward, onSkip) {
     if (rt.adOpen) return;
+    if (window.FOREST_NOAD) {   // 안드로이드 스토어 판: 광고 없이 바로 보상을 줘요
+      rt.adOk = onReward; rt.adNo = onSkip || null; rt.adEarned = true; closeAd();
+      return;
+    }
     if (AIT && AIT.ads) {
       // 토스 리워드 광고: 끝까지 봤다는 신호(userEarnedReward)가 왔을 때만 보상을 줘요
       if (!AIT.adReady()) { AIT.preload(); rt.adNoGold = false; toast('광고를 준비하고 있어요. 잠시 뒤에 다시 눌러 주세요'); return; }
