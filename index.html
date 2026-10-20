@@ -509,6 +509,8 @@ label.srow,button.srow{cursor:pointer}
 .th-card{margin:0 0 10px;padding:10px 10px 10px;border-radius:16px;background:color-mix(in srgb, var(--card) 55%, var(--bg))}
 .th-card.done{box-shadow:inset 0 0 0 2px var(--accent)}
 .th-top{display:flex;align-items:center;justify-content:space-between;gap:8px;margin:0 2px 2px}
+.th-play{margin-right:auto;min-height:30px;padding:0 10px;border:1.5px solid var(--line);border-radius:999px;background:var(--card);color:var(--chip-ink);font:inherit;font-size:12.5px;cursor:pointer}
+.th-play.on{border-color:var(--accent);background:color-mix(in srgb, var(--accent) 18%, var(--card))}
 .th-top b{font-family:var(--font-display);font-weight:400;font-size:16px;color:var(--ink)}
 .th-prog{padding:2px 9px;border-radius:999px;background:var(--chip-bg);color:var(--chip-ink);font-size:12.5px;font-variant-numeric:tabular-nums}
 .th-card.done .th-prog{background:var(--accent);color:var(--accent-ink)}
@@ -1246,7 +1248,8 @@ html.ait .app{padding-top:calc(10px + var(--ait-top, 0px));padding-bottom:var(--
     <section class="panel" id="panelSettings" hidden aria-labelledby="ttlSettings">
       <h2 id="ttlSettings">설정</h2>
       <div class="slist">
-        <label class="srow" for="optSound"><span class="txt"><b>소리</b><small>효과음과 학교 종소리</small></span><input type="checkbox" class="switch" id="optSound"></label>
+        <label class="srow" for="optBgm"><span class="txt"><b>배경음악</b><small>탭과 배경 테마마다 곡이 바뀌어요</small></span><input type="checkbox" class="switch" id="optBgm"></label>
+        <label class="srow" for="optSound"><span class="txt"><b>효과음</b><small>도토리 줍는 소리와 학교 종소리</small></span><input type="checkbox" class="switch" id="optSound"></label>
         <label class="srow" for="optVibe"><span class="txt"><b>진동</b><small>도토리를 주울 때 살짝 떨려요</small></span><input type="checkbox" class="switch" id="optVibe"></label>
         <div class="srow"><span class="txt"><b>숫자 단위</b><small>큰 숫자를 줄여 쓰는 방법이에요</small></span><div class="seg" id="optUnits" role="radiogroup" aria-label="숫자 단위"><button type="button" role="radio" data-units="ko" aria-checked="true">1.2만</button><button type="button" role="radio" data-units="en" aria-checked="false">12K</button></div></div>
       </div>
@@ -1897,7 +1900,7 @@ html.ait .app{padding-top:calc(10px + var(--ait-top, 0px));padding-bottom:var(--
     v: 4, pid: randCode(8), born: Date.now(), budget: 20, students: 4,
     f: { classroom: 1, cafeteria: 0, library: 0, playground: 0, science: 0 },
     t: { squirrel: 1, owl: 0, bear: 0 },
-    grade: 0, best: 0, sound: true, vibrate: true, savedAt: Date.now(),
+    grade: 0, best: 0, sound: true, bgm: true, vibrate: true, savedAt: Date.now(),
     pending: 0, pendingSec: 0, certNo: 0, earned: 0, yearEarned: 0,
     tier: 0, tg: 0, tdip: 0, fund: 0, fp: { schol: 0, rep: 0, dip: 0 },
     hd: { day: '', n: 0, feastUntil: 0, album: false, seen: false },
@@ -1925,7 +1928,7 @@ html.ait .app{padding-top:calc(10px + var(--ait-top, 0px));padding-bottom:var(--
     for (const k in s.t) s.t[k] = Math.floor(num(d.t && d.t[k], k === 'squirrel' ? 1 : 0, s.t[k]));
     s.t.owl = Math.min(s.t.owl, TEA.owl.max);
     s.grade = Math.min(Math.floor(num(d.grade, 0, 0)), CFG.grades.length - 1);
-    s.sound = d.sound !== false; s.vibrate = d.vibrate !== false;
+    s.sound = d.sound !== false; s.bgm = d.bgm !== false; s.vibrate = d.vibrate !== false;
     s.savedAt = num(d.savedAt, 0, Date.now());
     s.pending = num(d.pending, 0, 0); s.pendingSec = num(d.pendingSec, 0, 0);
     s.certNo = Math.floor(num(d.certNo, 0, 0)); s.earned = num(d.earned, 0, 0);
@@ -2144,14 +2147,15 @@ html.ait .app{padding-top:calc(10px + var(--ait-top, 0px));padding-bottom:var(--
 
   /* ---------- 소리와 진동 ---------- */
   let actx = null, master = null;
-  function ensureAudio() {
-    if (!S || !S.sound) return;
+  function ensureAudio(force) {
+    if (!S || !(S.sound || S.bgm || force)) return;
     if (!actx) {
       const AC = window.AudioContext || window.webkitAudioContext;
       if (!AC) return;
       try { actx = new AC(); master = actx.createGain(); master.gain.value = 0.5; master.connect(actx.destination); } catch (e) { actx = null; return; }
     }
     if (actx.state === 'suspended' && !document.hidden && !rt.paused) actx.resume().catch(() => {});
+    musicSync();
   }
   function note(freq, at, dur, type, vol, partial) {
     const t0 = actx.currentTime + at;
@@ -2193,6 +2197,210 @@ html.ait .app{padding-top:calc(10px + var(--ait-top, 0px));padding-bottom:var(--
   function buzz(ms) {
     if (!S || !S.vibrate) return;
     try { if (navigator.vibrate) navigator.vibrate(ms); } catch (e) { /* 진동을 못 쓰는 환경 */ }
+  }
+
+  /* ---------- 배경음악 ----------
+     음악 파일 없이 Web Audio로 직접 연주해요. 곡은 모두 이 게임을 위해 새로 쓴 곡이에요.
+     학교 탭은 배경 테마마다 곡이 바뀌고(테마가 없으면 기본 곡), 다른 탭은 탭마다 고유한 곡이 나와요.
+     악보: 한 칸은 8분음표예요. 음 이름(C5, F#4, Bb4), 쉼표 '.', 앞 음 늘이기 '-'. 마디는 '|'로 나눠요(읽기 편하려고만).
+     반주와 베이스는 마디마다 적은 화음(chords)으로 정해진 모양(style)에 맞춰 저절로 만들어요 */
+  const SONGS = {
+    school: { name: '숲속 학교', bpm: 104, chords: 'F C Dm Bb F C Bb C',
+      mel: { i: 'mar', v: 0.16, n: 'A4 - C5 - F5 - E5 D5|C5 - G4 - E4 - G4 .|D5 - F5 - A5 - G5 F5|D5 - - - Bb4 - C5 -|A4 C5 F5 C5 A4 - G4 F4|E4 - G4 - C5 - E5 -|D5 - C5 Bb4 A4 - G4 -|E4 - G4 - C5 - . .' },
+      acc: [{ i: 'pluck', v: 0.05, style: 'bounce' }], bass: { i: 'bass', v: 0.13, style: 'walk' }, dr: { s: 'x.x.x.x.', k: 'x...x...' }, dv: 0.5 },
+    spring: { name: '봄 벚꽃', bpm: 92, chords: 'G Em C D G Em Am D',
+      mel: { i: 'box', v: 0.14, n: 'B4 - D5 - G5 - - -|E5 - D5 - B4 - G4 -|C5 - E5 - G5 - E5 -|F#5 - - - A5 - - -|G5 - F#5 G5 D5 - B4 -|B4 C5 D5 - E5 - G4 -|A4 - C5 - E5 - D5 C5|B4 - A4 - F#4 - - -' },
+      acc: [{ i: 'harp', v: 0.05, style: 'arp' }], bass: { i: 'bass', v: 0.08, style: 'pedal' } },
+    summer: { name: '여름 바다', bpm: 124, chords: 'C Am F G F G C C',
+      mel: { i: 'mar', v: 0.15, n: 'E5 . G5 . E5 D5 C5 .|A4 - C5 - E5 - . .|F5 E5 D5 C5 A4 - C5 -|B4 - D5 - G5 - . .|A5 . A5 G5 F5 - E5 -|D5 . D5 E5 F5 - G5 -|E5 D5 C5 D5 E5 - G4 -|C5 - . . . . G4 .' },
+      acc: [{ i: 'pluck', v: 0.055, style: 'bounce' }], bass: { i: 'bass', v: 0.12, style: 'root' }, dr: { k: 'x...x...', s: 'xxxxxxxx', h: '..x...x.' }, dv: 0.6 },
+    autumn: { name: '가을 단풍', bpm: 84, chords: 'Dm Bb C F Gm A7 Dm Dm',
+      mel: { i: 'flute', v: 0.1, n: 'A4 - - D5 F5 - E5 D5|D5 - - - Bb4 - - -|C5 - E5 - G5 - F5 E5|F5 - - - . . A4 -|Bb4 - D5 - G5 - F5 E5|E5 - C#5 - A4 - G4 -|F4 - A4 - D5 - E5 F5|D5 - - - - - . .' },
+      acc: [{ i: 'pluck', v: 0.06, style: 'broken' }], bass: { i: 'bass', v: 0.1, style: 'root' } },
+    winter: { name: '겨울 눈꽃', bpm: 96, spb: 6, chords: 'Am F C G Am F E E',
+      mel: { i: 'bell', v: 0.1, n: 'A4 - C5 - E5 -|F5 - - - E5 D5|E5 - G5 - C5 -|D5 - - - B4 -|C5 - E5 - A5 -|A5 - G5 - F5 -|E5 - G#5 - B5 -|E5 - - - - -' },
+      acc: [{ i: 'box', v: 0.045, style: 'waltz' }, { i: 'pad', v: 0.03, style: 'pad' }], bass: { i: 'bass', v: 0.09, style: 'waltz' }, echo: 0.25 },
+    xmas: { name: '크리스마스', bpm: 132, chords: 'C F G C Am F G7 C',
+      mel: { i: 'bell', v: 0.12, n: 'G4 - C5 - E5 - G5 -|A5 - G5 - F5 - C5 -|D5 - G5 - F5 E5 D5 -|E5 - C5 - G4 - . .|A4 - C5 E5 A5 - G5 -|F5 - A5 - C6 - A5 -|G5 F5 E5 D5 B4 - D5 -|C5 - - - . . . .' },
+      acc: [{ i: 'mar', v: 0.05, style: 'bounce' }], bass: { i: 'bass', v: 0.12, style: 'walk' }, dr: { j: 'x.x.x.x.', k: 'x...x...' }, dv: 0.5 },
+    space: { name: '우주 탐험', bpm: 72, chords: 'Em C G D Em C Am Bm',
+      mel: { i: 'glass', v: 0.1, n: 'B5 - - - - - G5 -|E5 - - - - - G5 -|D5 - - - B4 - D5 -|F#5 - - - - - . .|G5 - - - F#5 - E5 -|G5 - - - - - E5 -|C6 - - - B5 - A5 -|F#5 - - - - - - -' },
+      acc: [{ i: 'pad', v: 0.045, style: 'pad' }, { i: 'glass', v: 0.025, style: 'arp', oct: 1 }], bass: { i: 'bass', v: 0.09, style: 'pedal' }, echo: 0.4 },
+    retro: { name: '레트로 70', bpm: 144, chords: 'C Am F G Em F G G',
+      mel: { i: 'sq', v: 0.05, n: 'E5 - G5 - C6 - G5 -|A5 - E5 - C5 - E5 -|F5 G5 A5 - C6 - A5 -|G5 - D5 - B4 - D5 -|E5 G5 B5 - G5 - E5 -|F5 A5 C6 - A5 - F5 -|G5 - A5 - B5 - D6 -|G5 - - - . . . .' },
+      acc: [{ i: 'sq', v: 0.018, style: 'bounce' }], bass: { i: 'tri', v: 0.12, style: 'oct8' }, dr: { k: 'x...x...', n: '..x...x.', h: 'xxxxxxxx' }, dv: 0.55 },
+    quests: { name: '퀘스트', bpm: 112, chords: 'D G A D Bm G A D',
+      mel: { i: 'pluck', v: 0.17, n: 'F#5 . A5 . F#5 . D5 .|G5 . B5 . G5 . D5 .|E5 . A5 . C#6 - A5 .|F#5 - D5 - A4 - . .|B4 . D5 . F#5 . B5 .|G5 . F#5 . E5 . D5 .|C#5 . E5 . A5 - G5 .|F#5 - - - D5 - . .' },
+      acc: [{ i: 'mar', v: 0.065, style: 'bounce' }], bass: { i: 'bass', v: 0.12, style: 'root' }, dr: { h: '..x...x.' }, dv: 0.5 },
+    teachers: { name: '선생님', bpm: 86, chords: 'Bb Gm Eb F Bb Gm Eb F',
+      mel: { i: 'flute', v: 0.1, n: 'D5 - - - F5 - D5 -|Bb4 - - - G4 - Bb4 -|G5 - - - Eb5 - G5 -|F5 - - - - - . .|F5 - D5 - Bb4 - D5 -|G5 - F5 - D5 - Bb4 -|C5 - Eb5 - G5 - Eb5 -|F5 - - - A4 - C5 -' },
+      acc: [{ i: 'mar', v: 0.05, style: 'broken' }], bass: { i: 'bass', v: 0.1, style: 'root' } },
+    grad: { name: '졸업', bpm: 76, chords: 'C G Am F F G C C',
+      mel: { i: 'bell', v: 0.11, n: 'E5 - - - G5 - - -|D5 - - - B4 - - -|C5 - - - E5 - A5 -|A5 - - - - - G5 F5|A5 - - - C6 - A5 -|G5 - - - D5 - F5 -|E5 - - - C5 - - -|C5 - - - - - - -' },
+      acc: [{ i: 'pad', v: 0.04, style: 'pad' }, { i: 'box', v: 0.035, style: 'arp' }], bass: { i: 'bass', v: 0.09, style: 'pedal' }, echo: 0.2 },
+    shop: { name: '상점', bpm: 116, swing: 0.16, chords: 'FM7 Dm7 Gm7 C7 FM7 Dm7 Gm7 C7',
+      mel: { i: 'mar', v: 0.15, n: 'A4 C5 E5 - D5 C5 A4 -|F4 A4 C5 - D5 - . .|Bb4 D5 F5 - E5 D5 Bb4 -|G4 Bb4 C5 - E5 - . .|A5 . G5 . F5 . E5 C5|D5 - F5 - A5 - . .|G5 F5 D5 Bb4 A4 - G4 -|E4 G4 Bb4 - C5 - . .' },
+      acc: [{ i: 'pluck', v: 0.045, style: 'bounce' }], bass: { i: 'bass', v: 0.12, style: 'walk' }, dr: { k: 'x...x...', h: '..x...x.' }, dv: 0.45 },
+    rank: { name: '랭킹', bpm: 128, chords: 'Am F C G Am F E E',
+      mel: { i: 'sq', v: 0.045, n: 'A4 . C5 E5 A5 - G5 E5|F5 - E5 C5 A4 - C5 -|G5 . E5 G5 C6 - B5 G5|B5 - A5 G5 D5 - . .|A5 . E5 A5 C6 - B5 A5|A5 - G5 F5 C5 - F5 -|G#5 - B5 - E5 - G#5 -|B5 - - - E5 - . .' },
+      acc: [{ i: 'pluck', v: 0.045, style: 'arp' }], bass: { i: 'tri', v: 0.11, style: 'oct8' }, dr: { k: 'x...x...', n: '....x...', h: 'x.x.x.x.' }, dv: 0.5 },
+    settings: { name: '설정', bpm: 66, chords: 'C Am F G',
+      mel: { i: 'box', v: 0.1, n: 'E5 - - - G5 - - -|A5 - - - E5 - - -|F5 - - - C5 - A4 -|B4 - - - D5 - - -' },
+      acc: [{ i: 'pad', v: 0.035, style: 'pad' }], echo: 0.3 }
+  };
+  const PC = { C: 0, D: 2, E: 4, F: 5, G: 7, A: 9, B: 11 };
+  function midiOf(n) {
+    const m = /^([A-G])([#b]?)(-?\d)$/.exec(n);
+    return m ? 12 * (+m[3] + 1) + PC[m[1]] + (m[2] === '#' ? 1 : m[2] === 'b' ? -1 : 0) : null;
+  }
+  const hz = m => 440 * Math.pow(2, (m - 69) / 12);
+  // 화음 이름 → 음 높이들 (oct 옥타브의 근음부터)
+  function chordTones(c, oct) {
+    const m = /^([A-G])([#b]?)(.*)$/.exec(c);
+    const root = 12 * (oct + 1) + PC[m[1]] + (m[2] === '#' ? 1 : m[2] === 'b' ? -1 : 0), q = m[3];
+    const iv = q === 'm' ? [0, 3, 7] : q === 'm7' ? [0, 3, 7, 10] : q === '7' ? [0, 4, 7, 10] : q === 'M7' ? [0, 4, 7, 11] : [0, 4, 7];
+    return iv.map(x => root + x);
+  }
+  // 곡을 칸마다 칠 음 목록으로 바꿔 둬요
+  function compileSong(id) {
+    const T = SONGS[id];
+    if (T.steps) return T;
+    const spb = T.spb || 8, chords = T.chords.split(' '), len = chords.length * spb;
+    const steps = Array.from({ length: len }, () => []);
+    const toks = T.mel.n.replace(/\|/g, ' ').split(/\s+/).filter(Boolean);
+    toks.forEach((tk, i) => {
+      const m = midiOf(tk);
+      if (m === null || i >= len) return;
+      let d = 1; while (toks[i + d] === '-') d++;
+      steps[i].push({ i: T.mel.i, f: hz(m), d, v: T.mel.v });
+    });
+    chords.forEach((c, b) => {
+      for (let s = 0; s < spb; s++) {
+        const at = steps[b * spb + s];
+        for (const A of T.acc || []) {
+          const t = chordTones(c, 4 + (A.oct || 0)), r = [t[0], t[1], t[2], t[0] + 12];
+          if (A.style === 'arp') { const k = (spb === 6 ? [0, 1, 2, 3, 2, 1] : [0, 1, 2, 3, 2, 1, 2, 1])[s]; at.push({ i: A.i, f: hz(r[k]), d: 2, v: A.v }); }
+          else if (A.style === 'bounce' && s % 4 === 2) t.slice(0, 3).forEach(x => at.push({ i: A.i, f: hz(x), d: 1, v: A.v }));
+          else if (A.style === 'broken' && s % 2 === 0) at.push({ i: A.i, f: hz(r[[0, 1, 2, 1][(s / 2) % 4]]), d: 2, v: A.v });
+          else if (A.style === 'pad' && s === 0) t.forEach(x => at.push({ i: A.i, f: hz(x), d: spb, v: A.v }));
+          else if (A.style === 'waltz' && (s === 2 || s === 4)) t.slice(0, 3).forEach(x => at.push({ i: A.i, f: hz(x), d: 1.5, v: A.v }));
+        }
+        const B = T.bass;
+        if (B) {
+          const r = chordTones(c, 2)[0], f5 = r + 7;
+          if (B.style === 'root' && s % (spb / 2) === 0) at.push({ i: B.i, f: hz(r), d: spb / 2, v: B.v });
+          else if (B.style === 'walk' && s % 2 === 0) at.push({ i: B.i, f: hz([r, f5, r + 12, f5][(s / 2) % 4]), d: 2, v: B.v });
+          else if (B.style === 'pedal' && s === 0) at.push({ i: B.i, f: hz(r), d: spb, v: B.v });
+          else if (B.style === 'waltz' && s === 0) at.push({ i: B.i, f: hz(r), d: 2, v: B.v });
+          else if (B.style === 'oct8') at.push({ i: B.i, f: hz(s % 2 ? r + 12 : r), d: 1, v: B.v });
+        }
+        for (const [k, p] of Object.entries(T.dr || {})) if (p[s % p.length] === 'x') at.push({ dr: k, v: T.dv || 0.5 });
+      }
+    });
+    T.steps = steps; T.len = len;
+    return T;
+  }
+  const Music = { cur: '', track: null, bus: null, out: null, step: 0, next: 0, timer: 0, preview: '', noise: null };
+  function musicWant() {
+    if (!S || rt.paused) return '';
+    if (Music.preview && rt.tab === 'shop') return Music.preview;
+    if (!S.bgm) return '';
+    if (rt.tab === 'school') return SONGS[S.cos.th.bg] ? S.cos.th.bg : 'school';
+    return SONGS[rt.tab] ? rt.tab : 'school';
+  }
+  // 곡을 바꿀 때는 지금 곡을 살짝 줄이고 새 곡을 키워요
+  function musicSync() {
+    if (!actx) return;
+    const w = musicWant();
+    if (w === Music.cur) return;
+    Music.cur = w;
+    const now = actx.currentTime;
+    if (Music.bus) { const old = Music.bus; old.gain.cancelScheduledValues(now); old.gain.setTargetAtTime(0, now, 0.18); setTimeout(() => { try { old.disconnect(); } catch (e) { /* 이미 끊김 */ } }, 1500); Music.bus = null; }
+    clearInterval(Music.timer); Music.timer = 0;
+    if (!w) { Music.track = null; return; }
+    if (!Music.out) { Music.out = actx.createGain(); Music.out.gain.value = 0.55; Music.out.connect(actx.destination); }
+    const T = compileSong(w), bus = actx.createGain();
+    bus.gain.setValueAtTime(0, now); bus.gain.setTargetAtTime(1, now + 0.25, 0.25);
+    bus.connect(Music.out);
+    if (T.echo) {   // 메아리: 우주나 겨울처럼 넓은 느낌이 나는 곡
+      const dl = actx.createDelay(1), fb = actx.createGain(), wet = actx.createGain();
+      dl.delayTime.value = 60 / T.bpm * 0.75; fb.gain.value = 0.32; wet.gain.value = T.echo;
+      bus.connect(dl); dl.connect(fb); fb.connect(dl); dl.connect(wet); wet.connect(Music.out);
+    }
+    Music.bus = bus; Music.track = T; Music.step = 0; Music.next = now + 0.3;
+    Music.timer = setInterval(musicTick, 60);
+    musicTick();
+  }
+  function musicTick() {
+    const T = Music.track;
+    if (!T || !actx || actx.state !== 'running') return;
+    const now = actx.currentTime, eighth = 60 / T.bpm / 2, sw = T.swing || 0;
+    if (Music.next < now - 0.5) Music.next = now + 0.05;   // 오래 멈췄다 돌아오면 박자를 새로 맞춰요
+    while (Music.next < now + 0.3) {
+      const s = Music.step, dur = eighth * (sw ? (s % 2 ? 1 - sw : 1 + sw) : 1);
+      for (const e of T.steps[s]) { try { e.dr ? drum(e.dr, Music.next, e.v) : voice(e.i, e.f, Music.next, e.d * eighth, e.v); } catch (err) { /* 한 음 실패는 넘어가요 */ } }
+      Music.step = (s + 1) % T.len;
+      Music.next += dur;
+    }
+  }
+  // 악기: 모두 사인파, 세모파, 네모파, 톱니파를 섞어서 만들어요
+  function env(g, t, a, peak, hold, rel) {
+    g.gain.setValueAtTime(0.0001, t);
+    g.gain.exponentialRampToValueAtTime(peak, t + a);
+    if (hold > a) g.gain.setValueAtTime(peak, t + hold);
+    g.gain.exponentialRampToValueAtTime(0.0001, t + Math.max(hold, a) + rel);
+  }
+  function osc(type, f, t, end, g) {
+    const o = actx.createOscillator();
+    o.type = type; o.frequency.setValueAtTime(f, t);
+    o.connect(g); o.start(t); o.stop(end + 0.05);
+    return o;
+  }
+  function voice(kind, f, t, d, v) {
+    const g = actx.createGain(); g.connect(Music.bus);
+    const part = (ratio, pv, dec, type) => { const g2 = actx.createGain(); g2.connect(Music.bus); env(g2, t, 0.005, v * pv, 0, dec); osc(type || 'sine', f * ratio, t, t + dec, g2); };
+    if (kind === 'box') { env(g, t, 0.004, v, 0, 1.4); osc('sine', f, t, t + 1.4, g); part(3, 0.25, 0.25); part(5.04, 0.08, 0.12); }
+    else if (kind === 'bell') { env(g, t, 0.004, v, 0, 2.2); osc('sine', f, t, t + 2.2, g); part(2.76, 0.4, 0.9); part(5.4, 0.15, 0.4); }
+    else if (kind === 'glass') { env(g, t, 0.02, v, 0, Math.max(1.2, d)); osc('sine', f, t, t + Math.max(1.2, d) + 0.1, g); part(2, 0.3, 0.6); }
+    else if (kind === 'mar') { env(g, t, 0.003, v, 0, 0.55); osc('sine', f, t, t + 0.6, g); part(4, 0.18, 0.08); }
+    else if (kind === 'harp') { env(g, t, 0.004, v, 0, 1.1); osc('triangle', f, t, t + 1.1, g); part(2, 0.2, 0.3); }
+    else if (kind === 'pluck') { env(g, t, 0.003, v, 0, 0.32); osc('triangle', f, t, t + 0.35, g); part(2, 0.3, 0.08); }
+    else if (kind === 'bass') { env(g, t, 0.006, v, 0, Math.min(0.9, d + 0.2)); osc('sine', f, t, t + 1, g); part(2, 0.15, 0.15, 'triangle'); }
+    else if (kind === 'flute') {
+      env(g, t, 0.07, v, d * 0.85, 0.18);
+      const o = osc('sine', f, t, t + d + 0.25, g), lfo = actx.createOscillator(), lg = actx.createGain();
+      lfo.frequency.value = 5; lg.gain.value = f * 0.006; lfo.connect(lg); lg.connect(o.frequency); lfo.start(t); lfo.stop(t + d + 0.3);
+      part(2, 0.12, d * 0.8);
+    }
+    else if (kind === 'sq') { env(g, t, 0.004, v, d * 0.8, 0.05); osc('square', f, t, t + d, g); }
+    else if (kind === 'tri') { env(g, t, 0.004, v, d * 0.75, 0.05); osc('triangle', f, t, t + d, g); }
+    else if (kind === 'pad') {
+      const lp = actx.createBiquadFilter(); lp.type = 'lowpass'; lp.frequency.value = 1100; lp.connect(g);
+      env(g, t, 0.45, v, d * 0.8, 0.9);
+      [-6, 6].forEach(c => { const o = osc('sawtooth', f, t, t + d + 1, lp); o.detune.value = c; });
+    }
+  }
+  function noiseBuf() {
+    if (Music.noise) return Music.noise;
+    const b = actx.createBuffer(1, actx.sampleRate, actx.sampleRate), d = b.getChannelData(0);
+    for (let i = 0; i < d.length; i++) d[i] = Math.random() * 2 - 1;
+    return (Music.noise = b);
+  }
+  function drum(k, t, v) {
+    if (k === 'k') {
+      const g = actx.createGain(), o = actx.createOscillator(); g.connect(Music.bus);
+      o.frequency.setValueAtTime(140, t); o.frequency.exponentialRampToValueAtTime(48, t + 0.12);
+      env(g, t, 0.003, 0.32 * v, 0, 0.16); o.connect(g); o.start(t); o.stop(t + 0.2);
+      return;
+    }
+    const src = actx.createBufferSource(), f = actx.createBiquadFilter(), g = actx.createGain();
+    src.buffer = noiseBuf(); src.connect(f); f.connect(g); g.connect(Music.bus);
+    const P = { h: ['highpass', 7000, 0.06, 0.04], n: ['bandpass', 1800, 0.16, 0.12], s: ['bandpass', 5200, 0.05, 0.05], j: ['highpass', 7500, 0.09, 0.13] }[k];
+    if (!P) return;
+    f.type = P[0]; f.frequency.value = P[1];
+    env(g, t, 0.002, P[2] * v, 0, P[3]);
+    src.start(t, Math.random() * 0.5); src.stop(t + P[3] + 0.05);
+    if (k === 'j') [2637, 3520].forEach(fr => { const g2 = actx.createGain(); g2.connect(Music.bus); env(g2, t, 0.002, 0.012 * v, 0, 0.09); osc('sine', fr, t, t + 0.1, g2); });
   }
 
   /* ---------- 지도 만들기 ---------- */
@@ -3939,8 +4147,9 @@ html.ait .app{padding-top:calc(10px + var(--ait-top, 0px));padding-bottom:var(--
     let h = `<h3 class="shop-h">테마 세트 <small>여섯 개를 모두 모으면 수업료가 올라요</small></h3>`;
     for (const t of THEMES) {
       const n = thCount(t.id), done = n === TH_SLOTS.length;
-      h += `<div class="th-card${done ? ' done' : ''}"><div class="th-top"><b>${t.name}</b><span class="th-prog">${done ? '세트 완성' : n + '/' + TH_SLOTS.length}</span></div>` +
-        `<p class="th-bonus">${done ? `세트 효과 수업료 +${t.bonus}% 받는 중` : `모두 모으면 수업료 +${t.bonus}%`}. 배경을 사면 바깥 색과 칠판 색도 바뀌어요</p><div class="shop-grid">`;
+      const playing = Music.preview === t.id;
+      h += `<div class="th-card${done ? ' done' : ''}"><div class="th-top"><b>${t.name}</b><button class="th-play${playing ? ' on' : ''}" type="button" data-play="${t.id}" aria-pressed="${playing}">${playing ? '♪ 듣는 중' : '♪ 테마 곡 듣기'}</button><span class="th-prog">${done ? '세트 완성' : n + '/' + TH_SLOTS.length}</span></div>` +
+        `<p class="th-bonus">${done ? `세트 효과 수업료 +${t.bonus}% 받는 중` : `모두 모으면 수업료 +${t.bonus}%`}. 배경을 사면 바깥 색, 칠판 색, 학교 배경음악도 바뀌어요</p><div class="shop-grid">`;
       for (const [slot, sname] of TH_SLOTS) {
         const own = thOwn(t.id, slot), on = S.cos.th[slot] === t.id, price = thPrice(t, slot), poor = !own && S.gold < price;
         const pr = on ? '쓰는 중' : own ? '쓰기' : `${coin}${price}`;
@@ -4006,6 +4215,7 @@ html.ait .app{padding-top:calc(10px + var(--ait-top, 0px));padding-bottom:var(--
       }
     }
     fx.hidden = !kind;
+    musicSync();   // 배경 테마가 바뀌면 학교 곡도 바뀌어요
   }
   function cosArt(cat, it) {
     if (cat === 'hat' || cat === 'neck') {
@@ -4939,9 +5149,11 @@ html.ait .app{padding-top:calc(10px + var(--ait-top, 0px));padding-bottom:var(--
     $('#gDot').hidden = $('#gDot').hidden || t === 'grad';
     if (t !== 'settings') { $('#resetConfirm').hidden = true; }
     renderQuestBar(); renderSubBar(); renderGuide(); renderTeacherGuide(); updateQuestDot();
+    if (t !== 'shop') Music.preview = '';
+    musicSync();
   }
   function syncSettingsUI() {
-    $('#optSound').checked = S.sound; $('#optVibe').checked = S.vibrate;
+    $('#optSound').checked = S.sound; $('#optBgm').checked = S.bgm; $('#optVibe').checked = S.vibrate;
     $$('#optUnits [data-units]').forEach(b => b.setAttribute('aria-checked', b.dataset.units === S.units ? 'true' : 'false'));
   }
   // 숫자 단위를 바꾸면 화면에 적힌 숫자를 모두 다시 그려요
@@ -4956,6 +5168,7 @@ html.ait .app{padding-top:calc(10px + var(--ait-top, 0px));padding-bottom:var(--
     rt.paused = true;
     rt.closedAt = Date.now();
     save(rt.closedAt);
+    musicSync();
     if (actx && actx.state === 'running') actx.suspend().catch(() => {});
     $('#sClosed').hidden = false;
     $('#reopen').focus({ preventScroll: true });
@@ -5084,7 +5297,16 @@ html.ait .app{padding-top:calc(10px + var(--ait-top, 0px));padding-bottom:var(--
     });
     // 황금 도토리 상점
     $('#btnShop').addEventListener('click', () => { if (!rt.paused && !rt.modalOpen) { sfx('tap'); openShop(); } });
-    $('#shopList').addEventListener('click', e => { const b = e.target.closest('[data-buy]'); if (b) pickShop(b.dataset.buy); });
+    $('#shopList').addEventListener('click', e => {
+      const p = e.target.closest('[data-play]');
+      if (p) {
+        Music.preview = Music.preview === p.dataset.play ? '' : p.dataset.play;
+        ensureAudio(true); musicSync(); renderShop();
+        if (Music.preview && !S.bgm) toast('미리 듣기만 나와요. 배경음악은 설정에서 켤 수 있어요');
+        return;
+      }
+      const b = e.target.closest('[data-buy]'); if (b) pickShop(b.dataset.buy);
+    });
     $('#shopNo').addEventListener('click', () => { rt.shopPick = ''; renderShop(); });
     $('#shopYes').addEventListener('click', buyShop);
     $('#shopAd').addEventListener('click', shopAd);
@@ -5203,6 +5425,11 @@ html.ait .app{padding-top:calc(10px + var(--ait-top, 0px));padding-bottom:var(--
       goTo(ref === 'main' ? curMain() : S.q.subs.find(s => s.id === ref));
     });
 
+    $('#optBgm').addEventListener('change', e => {
+      S.bgm = e.target.checked;
+      if (S.bgm) ensureAudio(); else musicSync();
+      save();
+    });
     $('#optSound').addEventListener('change', e => {
       S.sound = e.target.checked;
       if (S.sound) { ensureAudio(); sfx('tap'); }
