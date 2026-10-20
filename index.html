@@ -1154,6 +1154,7 @@ html.ait .app{padding-top:calc(10px + var(--ait-top, 0px));padding-bottom:var(--
       </div>
       <h3 class="panel-sub">학교 기록</h3>
       <div class="slist">
+        <button class="srow" type="button" id="optAcct" hidden><span class="txt"><b id="acctTitle">구글 계정 연결</b><small id="acctSub">연결해 두면 휴대폰을 바꿔도 같은 학교를 이어 해요</small></span><svg viewBox="0 0 24 24" width="20" height="20" aria-hidden="true"><path d="M9 6l6 6-6 6" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"/></svg></button>
         <button class="srow" type="button" id="optMove" hidden><span class="txt"><b>다른 기기에서 이어하기</b><small>코드로 이 학교를 다른 휴대폰이나 브라우저로 옮겨요</small></span><svg viewBox="0 0 24 24" width="20" height="20" aria-hidden="true"><path d="M9 6l6 6-6 6" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"/></svg></button>
         <div class="srow" id="resetRow"><span class="txt"><b>처음부터 다시</b><small>수료증과 전학 온 친구들까지 모두 지워요</small></span><button class="btn-danger" type="button" id="optReset">초기화</button></div>
         <div class="confirm" id="resetConfirm" hidden>
@@ -1371,6 +1372,16 @@ html.ait .app{padding-top:calc(10px + var(--ait-top, 0px));padding-bottom:var(--
       <div class="btn-row"><button class="btn-sub" type="button" id="moveNo">취소</button><button class="cta" type="button" id="moveYes">바꾸기</button></div>
     </div>
     <button class="btn-sub btn-close" type="button" id="moveClose">닫기</button>
+  </section>
+</div>
+
+<div class="overlay center" id="mAcct" hidden>
+  <div class="backdrop"></div>
+  <section class="modal" role="alertdialog" aria-modal="true" aria-labelledby="acctAskTitle">
+    <h2 id="acctAskTitle">이 구글 계정에 학교가 있어요</h2>
+    <div class="move-from"><b id="acctFrom"></b><span id="acctInfo"></span></div>
+    <p>어느 학교로 이어 할까요? 고르지 않은 학교는 지워져요.</p>
+    <div class="btn-row"><button class="btn-sub" type="button" id="acctKeep">이 폰 학교</button><button class="cta" type="button" id="acctLoad">계정 학교</button></div>
   </section>
 </div>
 
@@ -3116,6 +3127,7 @@ html.ait .app{padding-top:calc(10px + var(--ait-top, 0px));padding-bottom:var(--
     const dd = $('#infoSave');
     if (dd.textContent !== t) dd.textContent = t;
     $('#optMove').hidden = !cloudOn();
+    renderAcct();
     $('#devStats').hidden = !hasCloudBuild();
     $('#pidRow').hidden = !hasCloudBuild();
     $('#infoPid').textContent = '#' + S.pid.slice(0, 4);
@@ -3172,10 +3184,65 @@ html.ait .app{padding-top:calc(10px + var(--ait-top, 0px));padding-bottom:var(--
     sfx('quest');
   }
   async function copyMove() {
-    const link = location.origin + location.pathname + '?move=' + Cloud.moveCode;
+    const link = window.FOREST_STORE ? moveShow(Cloud.moveCode) : location.origin + location.pathname + '?move=' + Cloud.moveCode;   // 앱에서는 코드만 복사해요
     let ok = false;
     try { await navigator.clipboard.writeText(link); ok = true; } catch (e) { ok = false; }
-    toast(ok ? '링크를 복사했어요. 다른 기기에서 열어 주세요' : '복사하지 못했어요. 코드를 직접 적어 주세요');
+    toast(ok ? (window.FOREST_STORE ? '코드를 복사했어요' : '링크를 복사했어요. 다른 기기에서 열어 주세요') : '복사하지 못했어요. 코드를 직접 적어 주세요');
+  }
+
+  /* 구글 계정 연결 (안드로이드 판에만 window.FOREST_GOOGLE이 있어요)
+     지금 익명 id에 구글 계정을 이어 붙여요. id가 그대로라서 서버 저장도 그대로 이어져요.
+     그 구글 계정에 이미 다른 학교가 있으면(새 휴대폰) 어느 학교로 이어 할지 물어봐요 */
+  const hasGoogle = () => !!window.FOREST_GOOGLE;
+  function googleUser() {
+    try { const u = Cloud.fb.auth().currentUser; return (u && (u.providerData || []).find(p => p.providerId === 'google.com')) || null; } catch (e) { return null; }
+  }
+  function renderAcct() {
+    const row = $('#optAcct');
+    row.hidden = !(hasGoogle() && cloudOn());
+    if (row.hidden) return;
+    const g = googleUser();
+    $('#acctTitle').textContent = g ? '구글 계정 연결됨' : '구글 계정 연결';
+    $('#acctSub').textContent = g ? `${g.email || '구글'} 계정에 학교가 저장돼요` : '연결해 두면 휴대폰을 바꿔도 같은 학교를 이어 해요';
+  }
+  async function linkGoogle() {
+    if (!cloudOn() || rt.acctBusy) return;
+    if (googleUser()) { toast('이미 구글 계정에 연결돼 있어요'); return; }
+    rt.acctBusy = true;
+    try {
+      const g = await window.FOREST_GOOGLE.login();
+      const auth = Cloud.fb.auth(), cred = Cloud.fb.auth.GoogleAuthProvider.credential(g.idToken);
+      try {
+        await auth.currentUser.linkWithCredential(cred);
+        toast('구글 계정을 연결했어요'); sfx('quest');
+        renderAcct(); cloudPush(true);
+      } catch (e) {
+        if (!/credential-already-in-use|email-already-in-use|account-exists/.test(String(e && e.code))) throw e;
+        // 이 구글 계정은 이미 다른 학교를 갖고 있어요. 지금 학교의 랭킹과 테스트 기록은 정리하고 그 계정으로 들어가요
+        save();
+        const local = JSON.stringify(S), old = Cloud.uid;
+        try { await Cloud.db.ref('forest/rank/' + old).remove(); await Cloud.db.ref('forest/stats/' + old).remove(); } catch (er) { /* 무시 */ }
+        const u = (await auth.signInWithCredential(cred)).user;
+        Cloud.gen += 1; rt.adopting = true;   // 예전 id로 하던 저장은 멈추고, 고른 학교로 다시 열어요
+        const srv = (await waitFor(Cloud.db.ref('forest/saves/' + u.uid).once('value'), CLOUD_WAIT)).val();
+        if (srv && typeof srv.d === 'string') askAcct(srv.d, local);
+        else adoptSave(local, '구글 계정을 연결했어요');
+      }
+    } catch (e) {
+      if (!/cancel/i.test(String(e && (e.code || e.message)))) toast('구글 계정을 연결하지 못했어요. 잠시 뒤에 다시 해 보세요');
+    }
+    rt.acctBusy = false;
+  }
+  function askAcct(d, local) {
+    let inc = null;
+    try { inc = sanitize(JSON.parse(d)); } catch (e) { inc = null; }
+    if (!inc) { adoptSave(local, '구글 계정을 연결했어요'); return; }
+    const T = TIERS[inc.tier], y = Math.min(inc.tg + 1, T.years);
+    $('#acctFrom').textContent = inc.rank.name ? `${inc.rank.name}의 학교` : '계정에 있는 학교';
+    $('#acctInfo').textContent = `${T.school} ${y}${T.unit}, ${CFG.grades[inc.grade].name} 학교, 학교 점수 ${fmt(Math.floor(inc.st.dips))}`;
+    rt.acctPick = { d, local };
+    if (rt.modalOpen) closeModal(rt.modalOpen);
+    setTimeout(() => openModal($('#mAcct')), 200);
   }
   async function loadMove(raw) {
     const code = moveClean(raw);
@@ -4644,6 +4711,9 @@ html.ait .app{padding-top:calc(10px + var(--ait-top, 0px));padding-bottom:var(--
     $('#shopAd').addEventListener('click', shopAd);
     // 서버 저장: 다른 기기에서 이어하기, 테스트 현황
     $('#optMove').addEventListener('click', () => { sfx('tap'); openMove(); });
+    $('#optAcct').addEventListener('click', () => { sfx('tap'); linkGoogle(); });
+    $('#acctLoad').addEventListener('click', () => { const a = rt.acctPick; if (a) adoptSave(a.d, '구글 계정의 학교를 불러왔어요'); });
+    $('#acctKeep').addEventListener('click', () => { const a = rt.acctPick; if (a) adoptSave(a.local, '이 폰의 학교를 구글 계정에 저장했어요'); });
     $('#moveMake').addEventListener('click', () => { if (moveLive()) copyMove(); else makeMove(); });
     $('#moveForm').addEventListener('submit', e => { e.preventDefault(); loadMove($('#moveInput').value); });
     $('#moveYes').addEventListener('click', confirmMove);
@@ -4694,7 +4764,7 @@ html.ait .app{padding-top:calc(10px + var(--ait-top, 0px));padding-bottom:var(--
       const now = Date.now();
       verTaps = now - verAt < 1500 ? verTaps + 1 : 1;
       verAt = now;
-      if (AIT) return;   // 토스 판에는 개발자 메뉴를 열지 않아요
+      if (AIT || window.FOREST_STORE) return;   // 토스 판과 구글 플레이 판에는 개발자 메뉴를 열지 않아요
       if (verTaps >= 5 && $('#devBox').hidden) { $('#devBox').hidden = false; toast('개발자 테스트 메뉴가 열렸어요'); }
     });
     $('#devCash').addEventListener('click', () => {
