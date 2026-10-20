@@ -728,6 +728,14 @@ html.ait .app{padding-top:calc(10px + var(--ait-top, 0px));padding-bottom:var(--
 .sportsbar{position:absolute;z-index:3;left:50%;bottom:14px;transform:translateX(-50%);display:flex;align-items:center;gap:12px;padding:6px 14px;border:2px solid var(--wood);border-radius:999px;background:var(--board);color:var(--chalk);font-family:var(--font-display);font-size:14px;box-shadow:0 3px 0 var(--wood-dark);pointer-events:none;white-space:nowrap}
 .sportsbar b{font-family:var(--font-chalk);font-weight:700;font-size:20px;font-variant-numeric:tabular-nums}
 .sportsbar .sb-b b{color:#7FB2F0} .sportsbar .sb-t b{color:var(--accent)}
+.festbar{gap:10px}
+.festbar #fbName{font-size:14px}
+.fest-item{cursor:pointer}
+.fe-row .btn-sub.small{flex:none;display:flex;flex-direction:column;align-items:center;justify-content:center;min-height:44px;padding:2px 10px;border-radius:12px;font-size:12.5px;line-height:1.2}
+.fe-row .btn-sub.small small{font-size:11px;color:var(--chip-ink);font-variant-numeric:tabular-nums}
+.fe-lock{flex:none;font-size:12px;color:var(--muted)}
+.flash{position:absolute;inset:0;z-index:5;border-radius:15px;background:#FFFFFF;pointer-events:none;animation:flash .7s ease-out forwards}
+@keyframes flash{from{opacity:.95}to{opacity:0}}
 .sr-score{margin:0 0 6px;font-family:var(--font-chalk);font-weight:700;font-size:22px}
 .sp-wait{color:var(--chip-ink)}
 .trip-modal{text-align:left;max-height:calc(100dvh - 32px);overflow-y:auto;overscroll-behavior:contain}
@@ -1222,12 +1230,13 @@ html.ait .app{padding-top:calc(10px + var(--ait-top, 0px));padding-bottom:var(--
         <g id="guide"></g>
       </svg>
       <div class="fallfx" id="fallFx" hidden aria-hidden="true"></div>
+      <div class="sportsbar festbar" id="festBar" hidden role="status" aria-live="off"><span id="fbName">행사</span><span class="sb-t"><b id="fbN">0/0</b></span><span class="sb-t"><b id="fbT">30</b>초</span></div>
       <div class="sportsbar" id="sportsBar" hidden role="status" aria-live="off"><span class="sb-b">청팀 <b id="spBlue">0</b></span><span class="sb-t"><b id="spTime">40</b>초</span><span class="sb-w"><b id="spWhite">0</b> 백팀</span></div>
       <div class="map-left">
         <button class="shopbtn" id="btnShop" type="button" hidden aria-label="황금 도토리 상점"><svg viewBox="-8 -11 16 20" aria-hidden="true"><path d="M-4.6 -1 Q-4.9 5.4 0 7.4 Q4.9 5.4 4.6 -1 Z" class="c-gnut"/><ellipse cx="-1.8" cy="2" rx="0.9" ry="2.1" class="c-gshine"/><path d="M-5.8 -0.8 Q-5.8 -6.2 0 -6.6 Q5.8 -6.2 5.8 -0.8 Q0 0.8 -5.8 -0.8 Z" class="c-gcap"/><path d="M-4 -3.2 H4 M-2.8 -5 H2.8" class="s-gline"/><path d="M0 -6.6 L0.9 -9.2" class="s-gstem"/></svg><b id="goldN">0</b>상점</button>
         <button class="boost" id="btnBoost" type="button" hidden aria-label="부엉이 선생님 보충수업"><span class="b-av" id="boostIc" aria-hidden="true"></span>보충수업 <span class="b-n" id="boostN">5</span></button>
         <button class="boost trip" id="btnTrip" type="button" hidden aria-label="현장체험학습"><span class="b-av" id="tripIc" aria-hidden="true"></span>체험학습 <span class="b-n" id="tripN">출발 전</span></button>
-        <button class="boost trip sports" id="btnSports" type="button" hidden aria-label="숲속 운동회"><span class="b-av" id="sportsIc" aria-hidden="true"></span>운동회 <span class="b-n" id="sportsN">열기</span></button>
+        <button class="boost trip sports" id="btnSports" type="button" hidden aria-label="학교 행사"><span class="b-av" id="sportsIc" aria-hidden="true"></span>학교 행사 <span class="b-n" id="sportsN">열기</span></button>
         <div class="feast" id="feastChip" hidden>특식 데이 <b id="feastTime">5:00</b></div>
         <div class="feast" id="autoChip" hidden>자동 줍기 <b id="autoTime">60:00</b></div>
       </div>
@@ -1482,6 +1491,16 @@ html.ait .app{padding-top:calc(10px + var(--ait-top, 0px));padding-bottom:var(--
     <p class="fine">이기면 받는 상품이에요. 지면 절반을 받아요. 운동회는 2시간마다 열 수 있어요.</p>
     <p class="fine sp-wait" id="spWait" hidden></p>
     <div class="btn-row"><button class="btn-sub" type="button" id="spNo">닫기</button><button class="cta" type="button" id="spGo">운동회 시작!</button></div>
+  </section>
+</div>
+
+<div class="overlay center" id="mFest" hidden>
+  <div class="backdrop" data-close-fest></div>
+  <section class="modal wide trip-modal" role="dialog" aria-modal="true" aria-labelledby="festTitle">
+    <h2 id="festTitle">학교 행사</h2>
+    <p class="tr-lead">학년이 올라갈 때마다 새 행사가 열려요. 행사마다 2시간에 한 번 열 수 있고, 광고를 보면 바로 다시 열 수 있어요.</p>
+    <div class="tr-list" id="festList"></div>
+    <button class="btn-sub tr-close" type="button" id="festClose">닫기</button>
   </section>
 </div>
 
@@ -1924,6 +1943,8 @@ html.ait .app{padding-top:calc(10px + var(--ait-top, 0px));padding-bottom:var(--
       say: '숲속 과학 경시대회가 열려요. 과학실을 Lv.8까지 키우면 대도시가 눈앞이에요.' },
     { id: 'e5', ch: 5, t: 'grade', n: 4, r: 5, rk: 'dip', title: '초등학교 대도시 되기', how: '대도시가 되면 1학년 종업식을 열어요',
       say: '초등학교도 대도시 학교로 만들어 봐요! 그러면 1학년을 마치는 종업식을 열 수 있어요.' },
+    { id: 'e40', ch: 5, t: 'fest', k: 'picnic', n: 1, rm: 3, title: '봄 소풍 보물찾기', how: '지도 왼쪽의 학교 행사 버튼을 눌러요',
+      say: '1학년 첫 행사는 뒷산 봄 소풍이에요! 지도 왼쪽의 학교 행사 버튼을 눌러 보물찾기를 해 봐요.' },
     { id: 'e12', ch: 5, t: 'tgrads', n: 1, r: 5, rk: 'dip', title: '1학년 종업식', how: '졸업 탭에서 종업식을 열어요',
       say: '1학년을 무사히 마쳤어요! 종업식을 열고 2학년으로 올라가요. 받은 수료증으로 명예 교장실도 다시 고쳐 봐요.' },
 
@@ -1934,6 +1955,8 @@ html.ait .app{padding-top:calc(10px + var(--ait-top, 0px));padding-bottom:var(--
       say: '전학 온 친구들 소문을 듣고 학생들이 더 오고 싶어 해요. 교실을 넓혀서 70명을 맞이해요.' },
     { id: 'e18', ch: 6, t: 'fac', k: 'science', n: 9, rm: 4, title: '과학실 Lv.9', how: '과학실을 Lv.9까지 키워요',
       say: '2학년은 강낭콩 키우기 관찰 일기를 써요. 과학실을 Lv.9까지 키워서 돋보기를 마련해 줘요.' },
+    { id: 'e41', ch: 6, t: 'fest', k: 'welcome', n: 1, rm: 3, title: '새 친구 환영회', how: '지도 왼쪽의 학교 행사 버튼을 눌러요',
+      say: '전학 온 친구들을 위해 환영회를 열어요. 광장에 둥글게 모여 풍선을 날려 볼까요?' },
     { id: 'e13', ch: 6, t: 'ygrade', n: 4, rm: 4, title: '2학년 대도시 되기', how: '평판을 모아서 대도시가 되어요',
       say: '이제 대도시 학교가 될 차례예요. 대도시가 되면 2학년을 마치는 종업식을 열 수 있어요.' },
     { id: 'e19', ch: 6, ye: 2, t: 'tgrads', n: 2, r: 6, rk: 'dip', title: '2학년 종업식', how: '졸업 탭에서 종업식을 열어요',
@@ -1952,7 +1975,7 @@ html.ait .app{padding-top:calc(10px + var(--ait-top, 0px));padding-bottom:var(--
     { id: 'e24', ch: 7, ye: 3, t: 'tgrads', n: 3, r: 7, rk: 'dip', title: '3학년 종업식', how: '졸업 탭에서 종업식을 열어요',
       say: '3학년을 마쳤어요! 4학년에는 숲속 운동회가 열려요.' },
 
-    { id: 'e25', ch: 8, t: 'sports', n: 1, rm: 3, title: '숲속 운동회 열기', how: '지도 왼쪽의 운동회 버튼을 눌러요',
+    { id: 'e25', ch: 8, t: 'sports', n: 1, rm: 3, title: '숲속 운동회 열기', how: '지도 왼쪽의 학교 행사 버튼을 눌러요',
       say: '4학년이 되면 숲속 운동회를 열 수 있어요! 청팀과 백팀으로 나뉘어 달리는 동안, 굴러오는 공을 주워서 청팀을 이기게 해 줘요.' },
     { id: 'e26', ch: 8, t: 'fac', k: 'playground', n: 14, rm: 4, title: '운동장 Lv.14', how: '운동장을 Lv.14까지 넓혀요',
       say: '이어달리기를 하려면 운동장이 더 넓어야 해요. 운동장을 Lv.14까지 넓혀요.' },
@@ -1969,6 +1992,8 @@ html.ait .app{padding-top:calc(10px + var(--ait-top, 0px));padding-bottom:var(--
       say: '학예회에 체험학습 기념품도 전시해요. 서로 다른 기념품을 6종 모아 볼까요?' },
     { id: 'e32', ch: 9, t: 'fac', k: 'cafeteria', n: 14, rm: 4, title: '학예회 잔치 급식', how: '급식실을 Lv.14까지 키워요',
       say: '학예회 날엔 부모님도 오셔요. 급식실을 Lv.14까지 키워서 잔치 급식을 준비해요.' },
+    { id: 'e42', ch: 9, t: 'fest', k: 'show', n: 1, rm: 4, title: '학예회 공연', how: '지도 왼쪽의 학교 행사 버튼을 눌러요',
+      say: '드디어 학예회 날이에요! 광장 무대에서 친구들이 공연하면 음표를 눌러 박수를 보내 줘요.' },
     { id: 'e33', ch: 9, t: 'ygrade', n: 4, rm: 5, title: '5학년 대도시 되기', how: '평판을 모아서 대도시가 되어요',
       say: '학예회가 대성공이에요! 5학년도 대도시 학교로 만들어요.' },
     { id: 'e34', ch: 9, ye: 5, t: 'tgrads', n: 5, r: 10, rk: 'dip', title: '5학년 종업식', how: '졸업 탭에서 종업식을 열어요',
@@ -1982,6 +2007,8 @@ html.ait .app{padding-top:calc(10px + var(--ait-top, 0px));padding-bottom:var(--
       say: '졸업 앨범에 체험학습 추억을 담아요. 서로 다른 기념품을 10종 모아요.' },
     { id: 'e37', ch: 10, t: 'tripat', k: 'star', n: 1, rm: 6, title: '졸업 여행: 별빛 천문대', how: '체험학습에서 별빛 천문대를 골라요',
       say: '6학년 졸업 여행은 별빛 천문대로 가요! 밤하늘의 별을 보며 초등학교 시절을 마무리해요.' },
+    { id: 'e43', ch: 10, t: 'fest', k: 'photo', n: 1, rm: 5, title: '졸업 사진 찍기', how: '지도 왼쪽의 학교 행사 버튼을 눌러요',
+      say: '졸업 앨범에 들어갈 단체 사진을 찍어요. 모두 활짝 웃게 웃음 별을 눌러 줘요!' },
     { id: 'e38', ch: 10, t: 'ygrade', n: 4, r: 15, rk: 'dip', title: '6학년 대도시 되기', how: '평판을 모아서 대도시가 되어요',
       say: '초등학교의 마지막 해예요. 6학년도 대도시 학교로 만들면 졸업 준비 끝! 중학교는 곧 열릴 거예요.' }
   ];
@@ -2012,8 +2039,8 @@ html.ait .app{padding-top:calc(10px + var(--ait-top, 0px));padding-bottom:var(--
     { who: 'chick', t: 'earned', n: () => nice(rate() * 120), say: n => `도토리 ${fmt(n)}개를 모아서 숲속 잔치를 열어요!` },
     { who: 'rabbit', t: 'claims', n: () => 1, say: () => '학교 문을 닫았다가 다시 와 주세요. 그동안 수업이 잘 이어지는지 볼게요.' }
   ];
-  const COUNT_TYPES = new Set(['picks', 'ups', 'trains', 'claims', 'earned', 'trips', 'sports']);
-  const Q_TYPES = ['fac', 'tea', 'teaAll', 'students', 'grade', 'ygrade', 'rate', 'picks', 'ups', 'trains', 'claims', 'earned', 'grads', 'perks', 'tier', 'tgrads', 'fperks', 'trips', 'souv', 'tripat', 'sports'];
+  const COUNT_TYPES = new Set(['picks', 'ups', 'trains', 'claims', 'earned', 'trips', 'sports', 'fest']);
+  const Q_TYPES = ['fac', 'tea', 'teaAll', 'students', 'grade', 'ygrade', 'rate', 'picks', 'ups', 'trains', 'claims', 'earned', 'grads', 'perks', 'tier', 'tgrads', 'fperks', 'trips', 'souv', 'tripat', 'sports', 'fest'];
 
   /* ---------- 상태 ---------- */
   let S = null;
@@ -2061,6 +2088,7 @@ html.ait .app{padding-top:calc(10px + var(--ait-top, 0px));padding-bottom:var(--
     units: 'ko',
     trip: { open: false, cur: '', start: 0, end: 0, souv: [], been: {}, kids: 0 },
     sports: { next: 0 },
+    fest: { next: {}, n: {} },
     gold: 5, gd: { day: '', n: 0, shop: 0 }, cos: { own: [], hat: '', neck: '', th: { bg: '', classroom: '', cafeteria: '', library: '', science: '', playground: '' } }, autoUntil: 0,
     rank: { name: '', joined: false, sent: -1, by: '', ren: 0, asked: false },
     q: freshQ()
@@ -2130,6 +2158,10 @@ html.ait .app{padding-top:calc(10px + var(--ait-top, 0px));padding-bottom:var(--
       for (const [slot] of TH_SLOTS) { const v = th[slot]; s.cos.th[slot] = typeof v === 'string' && s.cos.own.includes(`th:${v}:${slot}`) ? v : ''; }
     }
     s.autoUntil = Math.min(num(d.autoUntil, 0, 0), Date.now() + 3 * 3600000);
+    if (d.fest && typeof d.fest === 'object') for (const id of FEST_IDS) {
+      if (d.fest.next && d.fest.next[id]) s.fest.next[id] = Math.min(num(d.fest.next[id], 0, 0), Date.now() + 2 * 3600000);
+      if (d.fest.n && d.fest.n[id]) s.fest.n[id] = Math.floor(num(d.fest.n[id], 0, 0));
+    }
     if (d.sports && typeof d.sports === 'object') s.sports.next = Math.min(num(d.sports.next, 0, 0), Date.now() + 2 * 3600000);
     if (d.trip && typeof d.trip === 'object') {
       const t = d.trip;
@@ -2485,6 +2517,8 @@ html.ait .app{padding-top:calc(10px + var(--ait-top, 0px));padding-bottom:var(--
     if (!S || rt.paused) return '';
     if (Music.preview && rt.tab === 'shop') return Music.preview;
     if (!S.bgm) return '';
+    if (rt.fest) return FEST[rt.fest.id].song;
+    if (rt.sports) return 'rank';
     if (rt.tab === 'school') return SONGS[S.cos.th.bg] ? S.cos.th.bg : 'school';
     return SONGS[rt.tab] ? rt.tab : 'school';
   }
@@ -2767,10 +2801,10 @@ html.ait .app{padding-top:calc(10px + var(--ait-top, 0px));padding-bottom:var(--
       if (k.wait > 0) { k.wait -= dt; k.moving = false; }
       else {
         const dx = k.tx - k.x, dy = k.ty - k.y, d = Math.hypot(dx, dy);
-        if (d < 0.8) { k.moving = false; if (!k.board && k.ang === undefined) { k.wait = rand(1, 4.5); pickTarget(k); } }
+        if (d < 0.8) { k.moving = false; if (!k.board && !k.hold && k.ang === undefined) { k.wait = rand(1, 4.5); pickTarget(k); } }
         else { const st = Math.min(d, k.speed * dt); k.x += dx / d * st; k.y += dy / d * st; k.moving = true; }
       }
-      placeKid(k, k.moving ? -Math.abs(Math.sin(now / 110 + k.phase)) * 1.6 : 0);
+      placeKid(k, k.moving ? -Math.abs(Math.sin(now / 110 + k.phase)) * 1.6 : k.hold ? -Math.abs(Math.sin(now / 260 + k.cheer)) * 2.4 : 0);
     }
     rt.sortT += dt;
     if (rt.sortT > 0.5) {
@@ -4366,7 +4400,7 @@ html.ait .app{padding-top:calc(10px + var(--ait-top, 0px));padding-bottom:var(--
   // 학생 부탁은 처음 한 번만 오는 이야기 부탁(s로 시작)만 쳐요. 반복 부탁은 끝없이 와서 넣지 않아요
   const hardQ = (q, sub) => !!q && (!sub || String(q.id)[0] === 's') && (q.t === 'teaAll' || q.t === 'rate' ||
     (q.t === 'students' && q.n >= 50) || (q.t === 'fac' && q.n >= 10) || (q.t === 'picks' && q.n >= 15) ||
-    (q.t === 'trips' && q.n >= 3) || q.t === 'souv' || q.t === 'tripat');
+    (q.t === 'trips' && q.n >= 3) || q.t === 'souv' || q.t === 'tripat' || q.t === 'sports' || q.t === 'fest');
   const autoOn = () => !!S && Date.now() < S.autoUntil;
   function goldDay() { const t = todayStr(); if (S.gd.day !== t) { S.gd.day = t; S.gd.n = 0; S.gd.shop = 0; } }
   function addGold(n) {
@@ -4777,7 +4811,8 @@ html.ait .app{padding-top:calc(10px + var(--ait-top, 0px));padding-bottom:var(--
   const sportsOpen = () => !!S && (S.tier >= 2 || (S.tier >= 1 && S.tg >= 3)) && S.f.playground >= 1;
   const sportsWait = () => Math.max(0, S.sports.next - Date.now());
   const sportsPrize = win => Math.max(10, nice(rate() * 180 * (win ? 2 : 1)));
-  function renderSportsBtn() {
+  function renderSportsBtn() { renderFestBtn(); }
+  function renderSportsBtnOld() {
     const b = $('#btnSports'), on = sportsOpen() && !rt.sports;
     b.hidden = !on;
     if (!on) return;
@@ -4821,7 +4856,7 @@ html.ait .app{padding-top:calc(10px + var(--ait-top, 0px));padding-bottom:var(--
       });
       $('#sportsBar').hidden = false;
       renderSportsBar();
-      sfx('bell'); buzz(20);
+      musicSync(); sfx('bell'); buzz(20);
       toast('숲속 운동회 시작! 굴러오는 공을 주워서 청팀을 응원해요');
       save(); renderSportsBtn();
     };
@@ -4866,7 +4901,7 @@ html.ait .app{padding-top:calc(10px + var(--ait-top, 0px));padding-bottom:var(--
     $('#srPrize').textContent = fmt(sportsPrize(win));
     $('#srArt').innerHTML = `<svg viewBox="-26 -19 52 38" aria-hidden="true">` + ['rabbit', 'fox', 'chick'].map((sp, i) => `<g transform="translate(${(i - 1) * 15} ${i === 1 ? -3 : 1})">${kidSVG(sp, i)}<rect class="band ${win ? 'b' : 'w'}" x="-6.4" y="-4.6" width="12.8" height="2.4" rx="1.2"/></g>`).join('') + '</svg>';
     sfx(win ? 'quest' : 'done'); buzz(20);
-    save(); renderSportsBtn(); checkQuests(); renderAffordance();
+    musicSync(); save(); renderSportsBtn(); checkQuests(); renderAffordance();
     queueModal(() => { openModal($('#mSportsEnd')); return true; });
   }
   function claimSports(x) {
@@ -4876,6 +4911,218 @@ html.ait .app{padding-top:calc(10px + var(--ait-top, 0px));padding-bottom:var(--
     floatText(165, 300, '+' + fmt(v), 'gold');
     toast(`운동회 상품 도토리 +${fmt(v)}${rt.sportsWin ? ', 황금 도토리 +1' : ''}`);
     sfx('coin'); save(); renderHUD();
+  }
+
+  /* ---------- 학년별 학교 행사 ----------
+     1학년 봄 소풍 보물찾기, 2학년 새 친구 환영회, 4학년 숲속 운동회, 5학년 학예회, 6학년 졸업 사진. (3학년은 현장체험학습)
+     지도 왼쪽 '학교 행사' 버튼에서 열어요. 행사마다 2시간에 한 번, 광고를 보면 바로 다시 열 수 있어요.
+     학생들이 행사 모양으로 모이고(둥글게, 관객석, 두 줄), 지도에 나타나는 것(쪽지, 풍선, 음표, 웃음 별)을 시간 안에 목표만큼 누르면 성공이에요 */
+  const FEST = {
+    picnic: { name: '봄 소풍 보물찾기', tg: 0, sec: 30, goal: 12, song: 'spring', form: 'free', item: 'paper', how: 'pop',
+      lead: '뒷산으로 봄 소풍을 가요! 나무 사이에 숨은 보물 쪽지를 30초 안에 12장 찾으면 성공이에요.', win: '보물 쪽지를 다 찾았어요!', unit: '장' },
+    welcome: { name: '새 친구 환영회', tg: 1, sec: 30, goal: 15, song: 'quests', form: 'ring', item: 'balloon', how: 'rise',
+      lead: '광장에 둥글게 모여 새 친구를 환영해요. 하늘로 날아오르는 풍선을 눌러 터뜨려요. 30초 안에 15개면 성공!', win: '풍선이 펑펑! 새 친구들이 활짝 웃어요.', unit: '개' },
+    sports: { name: '숲속 운동회', tg: 3, sec: SPORTS.sec, song: 'rank', sports: true,
+      lead: '청팀과 백팀으로 나뉘어 트랙을 달려요. 굴러오는 공을 주울 때마다 청팀이 1점! 백팀보다 많이 주우면 이겨요.' },
+    show: { name: '학예회', tg: 4, sec: 35, goal: 18, song: 'grad', form: 'stage', item: 'note', how: 'rise',
+      lead: '광장 무대에서 친구들이 차례로 공연해요. 무대에서 떠오르는 음표를 눌러 박수를 보내요. 35초 안에 18개면 대성공!', win: '앙코르! 박수가 쏟아졌어요.', unit: '개' },
+    photo: { name: '졸업 사진 찍기', tg: 5, sec: 30, goal: 14, song: 'settings', form: 'rows', item: 'smile', how: 'pop',
+      lead: '교실 앞에 두 줄로 서서 졸업 사진을 찍어요. 친구들 머리 위에 반짝이는 웃음 별을 눌러 모두 웃게 해요. 14개면 찰칵!', win: '찰칵! 모두 활짝 웃은 졸업 사진이 나왔어요.', unit: '개' }
+  };
+  const FEST_IDS = Object.keys(FEST);
+  const FEST_ITEM = {
+    paper: '<g transform="rotate(-8)"><rect x="-6" y="-7" width="12" height="14" rx="1.5" fill="#FFF6DA" stroke="#C9A25B" stroke-width="1"/><path d="M-3.5 -3 h7 M-3.5 0 h7 M-3.5 3 h4" stroke="#C9A25B" stroke-width=".9"/><circle cx="4" cy="-5" r="2.2" fill="#E04848"/></g>',
+    balloon: '<path d="M0 8 Q-1.5 12 1 16" fill="none" stroke="#8A8A7A" stroke-width=".8"/><ellipse cx="0" cy="0" rx="6.5" ry="8" fill="var(--bc)"/><ellipse cx="-2.2" cy="-3" rx="1.6" ry="2.6" fill="#FFFFFF" opacity=".55"/><path d="M-1.4 7.6 L1.4 7.6 L0 9.4 Z" fill="var(--bc)"/>',
+    note: '<path d="M-1 -8 V5" stroke="var(--bc)" stroke-width="1.8"/><path d="M-1 -8 Q5 -6 6 -1" fill="none" stroke="var(--bc)" stroke-width="1.8"/><ellipse cx="-4" cy="5" rx="3.6" ry="2.7" transform="rotate(-20 -4 5)" fill="var(--bc)"/>',
+    smile: '<path d="M0 -9 L2.6 -2.8 L9 -2.6 L4 1.6 L5.8 8 L0 4.4 L-5.8 8 L-4 1.6 L-9 -2.6 L-2.6 -2.8 Z" fill="#F3C04B" stroke="#D99A1E" stroke-width=".8"/><path d="M-2.4 1.2 Q0 3.4 2.4 1.2" fill="none" stroke="#7A4A10" stroke-width="1"/><circle cx="-1.8" cy="-1.2" r=".8" fill="#7A4A10"/><circle cx="1.8" cy="-1.2" r=".8" fill="#7A4A10"/>'
+  };
+  const FEST_COLORS = ['#E04848', '#3F78C2', '#F3C04B', '#3FA45B', '#B05FC2', '#F08A3C'];
+  const FEST_ICON = {
+    picnic: '<rect x="-7" y="-6" width="14" height="13" rx="1.5" fill="#FFF6DA" stroke="#C9A25B"/><path d="M-4 -2 h8 M-4 1 h8 M-4 4 h5" stroke="#C9A25B"/><circle cx="5" cy="-5" r="2.6" fill="#E04848"/>',
+    welcome: '<ellipse cx="-3" cy="-3" rx="5" ry="6" fill="#E04848"/><ellipse cx="4" cy="-1" rx="4.6" ry="5.6" fill="#3F78C2"/><path d="M-3 3 Q-2 7 0 10 M4 4.6 Q3 8 0 10" fill="none" stroke="#8A8A7A" stroke-width=".9"/>',
+    sports: '<path d="M-8 9 L-8 -9" stroke="#8A5D3B" stroke-width="1.6" stroke-linecap="round"/><path d="M-7.5 -9 H6 L3 -5 L6 -1 H-7.5 Z" fill="#3F78C2"/><circle cx="4" cy="6" r="4.2" fill="#FFFFFF" stroke="#D9534A" stroke-width="1.2"/>',
+    show: '<path d="M-9 -8 Q0 -3 9 -8 V8 H-9 Z" fill="#B8322F"/><path d="M-3 -4 V4" stroke="#F3C04B" stroke-width="1.6"/><ellipse cx="-5" cy="4" rx="2.6" ry="2" fill="#F3C04B"/><path d="M-3 -4 Q2 -3 3 0" fill="none" stroke="#F3C04B" stroke-width="1.6"/>',
+    photo: '<rect x="-9" y="-5" width="18" height="12" rx="2.5" fill="#3B3B2D"/><rect x="-4" y="-8" width="7" height="4" rx="1" fill="#3B3B2D"/><circle cx="0" cy="1" r="4" fill="#BFE3F2" stroke="#7A8A96" stroke-width="1.2"/><circle cx="6" cy="-2.5" r="1.2" fill="#F3C04B"/>'
+  };
+  const festIcon = id => `<svg viewBox="-11 -11 22 22" aria-hidden="true">${FEST_ICON[id]}</svg>`;
+  const festOpen = id => !!S && S.f.playground >= 1 && (S.tier >= 2 || (S.tier === 1 && S.tg >= FEST[id].tg));
+  const festWait = id => id === 'sports' ? sportsWait() : Math.max(0, (S.fest.next[id] || 0) - Date.now());
+  const festPrize = win => Math.max(10, nice(rate() * 180 * (win ? 2 : 1)));
+  const festBusy = () => !!(rt.fest || rt.sports);
+  // 지도 왼쪽 '학교 행사' 버튼: 열 수 있는 행사 수나, 가장 빨리 열리는 행사까지 남은 시간
+  function renderFestBtn() {
+    const b = $('#btnSports'), open = FEST_IDS.filter(festOpen), on = open.length > 0 && !festBusy();
+    b.hidden = !on;
+    if (!on) return;
+    const ready = open.filter(id => festWait(id) <= 0).length;
+    const txt = ready ? `${ready}개 열림` : hms(Math.min(...open.map(festWait)));
+    if (rt.festTxt !== txt) { rt.festTxt = txt; $('#sportsN').textContent = txt; b.classList.toggle('ready', ready > 0); }
+    if (rt.modalOpen === $('#mFest')) {
+      const key = FEST_IDS.map(id => festOpen(id) ? (festWait(id) > 0 ? hms(festWait(id)) : 'r') : 'x').join('|');
+      if (rt.festKey !== key) renderFestList();
+    }
+  }
+  function openFest() {
+    if (rt.paused || festBusy()) return;
+    if (!FEST_IDS.some(festOpen)) { toast(S.f.playground < 1 ? `${eul(FAC.playground.name)} 먼저 지어야 해요` : '학교 행사는 초등학교에 입학하면 열 수 있어요'); return; }
+    if (rt.modalOpen && rt.modalOpen !== $('#mFest')) return;
+    sfx('tap');
+    renderFestList();
+    if (rt.modalOpen !== $('#mFest')) openModal($('#mFest'));
+  }
+  function renderFestList() {
+    rt.festKey = FEST_IDS.map(id => festOpen(id) ? (festWait(id) > 0 ? hms(festWait(id)) : 'r') : 'x').join('|');
+    const ac = acornIcon();
+    $('#festList').innerHTML = FEST_IDS.map(id => {
+      const F = FEST[id], open = festOpen(id), w = open ? festWait(id) : 0;
+      const btn = !open ? `<span class="fe-lock">${F.tg + 1}학년부터</span>`
+        : w > 0 ? `<button class="btn-sub small" type="button" data-fest="${id}" data-ad="1"><span>광고 보고 바로</span><small>${hms(w)}</small></button>`
+        : `<button class="cta small" type="button" data-fest="${id}">열기</button>`;
+      return `<div class="tr-row fe-row${open ? '' : ' lock'}"><span class="tr-ic" style="--tc:#F3C04B">${festIcon(id)}</span>` +
+        `<div class="tr-tx"><b>${F.name} <small>${F.sec}초</small></b><span>${open ? F.lead : '학년이 올라가면 열려요'}</span>` +
+        (open ? `<span class="tr-meta"><span class="tr-rw">${ac}<b>${fmt(festPrize(true))}</b></span><span class="tr-sv">성공 상품, 황금 도토리 +1</span></span>` : '') + `</div>${btn}</div>`;
+    }).join('');
+  }
+  function startFest(id, viaAd) {
+    if (festBusy() || !festOpen(id)) return;
+    if (!viaAd && festWait(id) > 0) { closeModal($('#mFest'), () => showAd(() => startFest(id, true), () => openFest())); return; }
+    if (id === 'sports') { if (rt.modalOpen === $('#mFest')) closeModal($('#mFest'), () => startSports(true)); else startSports(true); return; }
+    const go = () => {
+      const F = FEST[id];
+      setTab('school'); closeSheet();
+      const sc = $('#scroller'), top = F.form === 'free' ? 0 : $('#map').getBoundingClientRect().top - sc.getBoundingClientRect().top + sc.scrollTop - 60;
+      sc.scrollTo({ top: Math.max(0, top), behavior: rt.reduced ? 'auto' : 'smooth' });
+      rt.fest = { id, t: F.sec, n: 0, spawn: 0.6, items: [], perf: 0 };
+      S.fest.next[id] = Date.now() + SPORTS.gap;
+      festForm(F.form);
+      if (F.form === 'stage') festStage(true);
+      if (F.form === 'rows') festCamera(true);
+      $('#festBar').hidden = false;
+      renderFestBar();
+      musicSync(); sfx('bell'); buzz(20);
+      toast(`${F.name} 시작!`);
+      save(); renderFestBtn();
+    };
+    if (rt.modalOpen === $('#mFest')) closeModal($('#mFest'), go); else go();
+  }
+  // 학생들을 행사 자리에 세워요
+  function festForm(form) {
+    const ks = rt.kids.filter(k => !k.board), n = ks.length;
+    ks.forEach((k, i) => {
+      let x, y;
+      if (form === 'ring') { const a = i / Math.max(1, n) * Math.PI * 2; x = 180 + Math.cos(a) * 56; y = 212 + Math.sin(a) * 24; }
+      else if (form === 'stage') { const row = i % 2, col = Math.floor(i / 2), cols = Math.ceil(n / 2); x = 180 + (col - (cols - 1) / 2) * 15 + row * 7; y = 238 + row * 13; }
+      else if (form === 'rows') { const row = i % 2, col = Math.floor(i / 2), cols = Math.ceil(n / 2); x = 180 + (col - (cols - 1) / 2) * 14 + row * 7; y = 218 + row * 12; }
+      else return;
+      k.hold = true; k.wait = 0; k.tx = x; k.ty = y; k.speed = 40; k.cheer = rand(0, 6);
+    });
+  }
+  function festStage(on) {
+    const old = $('#festStage'); if (old) old.remove();
+    if (!on) return;
+    const g = document.createElementNS(NS, 'g');
+    g.id = 'festStage'; g.setAttribute('aria-hidden', 'true');
+    g.innerHTML = '<rect x="140" y="186" width="80" height="22" rx="3" fill="#8A5D3B"/><rect x="140" y="186" width="80" height="4" fill="#A8743C"/>' +
+      '<path d="M136 150 H224 V156 Q212 164 200 156 Q188 164 180 156 Q172 164 160 156 Q148 164 136 156 Z" fill="#B8322F"/>' +
+      '<rect x="136" y="150" width="6" height="40" fill="#B8322F"/><rect x="218" y="150" width="6" height="40" fill="#B8322F"/>';
+    layerKids.insertBefore(g, layerKids.firstChild);
+  }
+  function festCamera(on) {
+    const old = $('#festCam'); if (old) old.remove();
+    if (!on) return;
+    const g = document.createElementNS(NS, 'g');
+    g.id = 'festCam'; g.setAttribute('aria-hidden', 'true');
+    g.innerHTML = '<path d="M180 270 L172 292 M180 270 L188 292 M180 270 V292" stroke="#6E4A2E" stroke-width="1.6"/><g transform="translate(180 264) scale(.9)">' + FEST_ICON.photo + '</g>';
+    layerFx.appendChild(g);
+  }
+  function renderFestBar() {
+    const R = rt.fest; if (!R) return;
+    const F = FEST[R.id];
+    $('#fbName').textContent = F.name;
+    $('#fbN').textContent = `${R.n}/${F.goal}`;
+    $('#fbT').textContent = Math.ceil(R.t);
+  }
+  function festSpawn(F) {
+    let x, y;
+    if (F.item === 'paper') { const P = [[34, 176], [58, 300], [322, 240], [312, 372], [94, 398], [336, 150], [26, 248], [262, 404], [104, 86], [252, 92], [44, 360], [330, 300]]; [x, y] = P[Math.floor(Math.random() * P.length)]; x += rand(-8, 8); y += rand(-6, 6); }
+    else if (F.item === 'smile') { const ks = rt.kids.filter(k => k.hold); if (!ks.length) return; const k = ks[Math.floor(Math.random() * ks.length)]; x = k.x; y = k.y - 20; }
+    else if (F.form === 'stage') { x = 180 + rand(-34, 34); y = 182; }
+    else { x = 180 + rand(-60, 60); y = 214 + rand(-10, 16); }
+    const g = document.createElementNS(NS, 'g');
+    g.setAttribute('class', 'fest-item');
+    g.setAttribute('role', 'button');
+    g.setAttribute('aria-label', F.item === 'paper' ? '보물 쪽지' : F.item === 'balloon' ? '풍선' : F.item === 'note' ? '음표' : '웃음 별');
+    g.style.setProperty('--bc', FEST_COLORS[Math.floor(Math.random() * FEST_COLORS.length)]);
+    g.innerHTML = `<circle r="15" class="drop-hit"/><g class="fi-in">${FEST_ITEM[F.item]}</g>`;
+    g.setAttribute('transform', `translate(${x.toFixed(1)} ${y.toFixed(1)})`);
+    layerFx.appendChild(g);
+    const it = { g, x, y, born: performance.now(), life: F.how === 'rise' ? 3800 : 1900, dead: false, rise: F.how === 'rise' };
+    const hit = e => { e.preventDefault(); e.stopPropagation(); festHit(it); };
+    g.addEventListener('pointerdown', hit);
+    rt.fest.items.push(it);
+    if (!rt.reduced && g.animate && !it.rise) g.querySelector('.fi-in').animate([{ transform: 'scale(.2)', opacity: 0 }, { transform: 'scale(1.15)', opacity: 1, offset: 0.25 }, { transform: 'scale(1)', opacity: 1 }], { duration: 320 });
+  }
+  function festHit(it) {
+    const R = rt.fest;
+    if (!R || it.dead) return;
+    it.dead = true; R.n += 1;
+    const v = Math.max(1, nice(rate() * 3));
+    S.budget += v; earn(v);
+    floatText(it.x, it.y - 10, '+' + fmt(v), 'gold');
+    sfx('coin'); buzz(10);
+    if (!rt.reduced && it.g.animate) it.g.animate([{ transform: `translate(${it.x}px, ${it.y}px) scale(1)`, opacity: 1 }, { transform: `translate(${it.x}px, ${it.y}px) scale(1.8)`, opacity: 0 }], { duration: 220 }).onfinish = () => it.g.remove();
+    else it.g.remove();
+    renderFestBar();
+  }
+  function updateFest(dt, now) {
+    const R = rt.fest;
+    if (!R) return;
+    const F = FEST[R.id];
+    R.t -= dt; R.spawn -= dt;
+    if (R.spawn <= 0) { R.spawn = F.sec / (F.goal * 2); if (R.items.filter(i => !i.dead).length < 7) festSpawn(F); }
+    for (const it of R.items) {
+      if (it.dead) continue;
+      const age = now - it.born;
+      if (it.rise) { it.y -= dt * 30; it.x += Math.sin(age / 400) * 0.25; it.g.setAttribute('transform', `translate(${it.x.toFixed(1)} ${it.y.toFixed(1)})`); }
+      if (age > it.life) { it.dead = true; if (!rt.reduced && it.g.animate) it.g.animate([{ opacity: 1 }, { opacity: 0 }], { duration: 200 }).onfinish = () => it.g.remove(); else it.g.remove(); }
+    }
+    R.items = R.items.filter(i => !i.dead || i.g.isConnected);
+    // 학예회: 4초마다 다른 친구가 무대에 올라가요
+    if (F.form === 'stage') {
+      R.perf -= dt;
+      if (R.perf <= 0) {
+        R.perf = 4;
+        const ks = rt.kids.filter(k => k.hold);
+        if (R.star) { R.star.tx = R.star.homeX; R.star.ty = R.star.homeY; }
+        const k = ks[Math.floor(Math.random() * ks.length)];
+        if (k) { k.homeX = k.tx; k.homeY = k.ty; k.tx = 180 + rand(-10, 10); k.ty = 194; R.star = k; }
+      }
+    }
+    renderFestBar();
+    if (R.t <= 0) endFest();
+  }
+  function endFest() {
+    const R = rt.fest, F = FEST[R.id];
+    rt.fest = null;
+    R.items.forEach(i => i.g.remove());
+    festStage(false);
+    rt.kids.forEach(k => { if (k.hold) { k.hold = false; k.speed = rand(14, 22); pickTarget(k); } });
+    $('#festBar').hidden = true;
+    if (F.form === 'rows' && !rt.reduced) {   // 찰칵! 하얗게 번쩍해요
+      const fl = document.createElement('div'); fl.className = 'flash'; $('.stage').appendChild(fl); setTimeout(() => fl.remove(), 700);
+    }
+    festCamera(false);
+    S.fest.n[R.id] = (S.fest.n[R.id] || 0) + 1;
+    const win = R.n >= F.goal;
+    rt.sportsWin = win;
+    $('#srTitle').textContent = win ? `${F.name} 성공!` : `${F.name} 끝!`;
+    $('#srScore').textContent = `${R.n}/${F.goal}${F.unit}`;
+    $('#srText').textContent = win ? `${F.win} 상품으로 수업료 6분치와 황금 도토리 1개를 받아요.` : `아깝게 ${F.goal - R.n}${F.unit} 모자랐어요. 그래도 수업료 3분치를 받아요.`;
+    $('#srPrize').textContent = fmt(festPrize(win));
+    $('#srArt').innerHTML = `<svg viewBox="-11 -11 22 22" aria-hidden="true">${FEST_ICON[R.id]}</svg>`;
+    sfx(win ? 'quest' : 'done'); buzz(20);
+    musicSync(); save(); renderFestBtn(); checkQuests(); renderAffordance();
+    queueModal(() => { openModal($('#mSportsEnd')); return true; });
   }
 
   /* ---------- 출석부 ---------- */
@@ -5168,6 +5415,7 @@ html.ait .app{padding-top:calc(10px + var(--ait-top, 0px));padding-bottom:var(--
       case 'tgrads': return S.tg;
       case 'souv': return S.trip.souv.length;
       case 'tripat': return S.trip.been[q.k] || 0;
+      case 'fest': return S.fest.n[q.k] || 0;
       default: return S.st[q.t] || 0;   // picks, ups, trains, claims, grads, perks, fperks
     }
   }
@@ -5229,6 +5477,7 @@ html.ait .app{padding-top:calc(10px + var(--ait-top, 0px));padding-bottom:var(--
       case 'trips': return q.n === 1 ? '현장체험학습 다녀오기' : `현장체험학습 ${q.n}번 다녀오기`;
       case 'souv': return `기념품 ${q.n}종 모으기`;
       case 'sports': return q.n === 1 ? '숲속 운동회 열기' : `숲속 운동회 ${q.n}번 열기`;
+      case 'fest': return `${FEST[q.k].name} 열기`;
       case 'tripat': return `${TRIP[q.k].name} 다녀오기`;
     }
     return '';
@@ -5623,7 +5872,7 @@ html.ait .app{padding-top:calc(10px + var(--ait-top, 0px));padding-bottom:var(--
       case 'tier': return goGrad('tier');
       case 'fperks': return goGrad('fund');
       case 'trips': case 'souv': case 'tripat': return openTrip();
-      case 'sports': return openSports();
+      case 'sports': case 'fest': return openFest();
     }
   }
 
@@ -5752,6 +6001,7 @@ html.ait .app{padding-top:calc(10px + var(--ait-top, 0px));padding-bottom:var(--
       updateDrops(now);
       updateDeal(dt);
       updateSports(dt);
+      updateFest(dt, now);
       if (S.oak < OAK.max) { S.oak = Math.min(OAK.max, S.oak + dt / OAK.regen); renderOak(); }
       rt.uiT += dt; if (rt.uiT >= 0.1) { rt.uiT = 0; renderHUD(); }
       rt.affT += dt; if (rt.affT >= 0.25) { rt.affT = 0; renderAffordance(); }
@@ -5772,9 +6022,12 @@ html.ait .app{padding-top:calc(10px + var(--ait-top, 0px));padding-bottom:var(--
     $('#btnBoost').addEventListener('click', openBoost);
     $('#tripIc').innerHTML = BUS;
     const SPORTS_IC = '<svg viewBox="-12 -12 24 24" aria-hidden="true"><path d="M-8 9 L-8 -9" stroke="#8A5D3B" stroke-width="1.6" stroke-linecap="round"/><path d="M-7.5 -9 H6 L3 -5 L6 -1 H-7.5 Z" fill="#3F78C2"/><circle cx="4" cy="6" r="4.2" fill="#FFFFFF" stroke="#D9534A" stroke-width="1.2"/></svg>';
-    $('#sportsIc').innerHTML = SPORTS_IC;
+    $('#sportsIc').innerHTML = `<svg viewBox="-11 -11 22 22" aria-hidden="true">${FEST_ICON.welcome}</svg>`;
     $('#spArt').innerHTML = `<svg viewBox="-26 -19 52 38" aria-hidden="true">${['rabbit', 'fox', 'chick'].map((sp, i) => `<g transform="translate(${(i - 1) * 15} ${i === 1 ? -3 : 1})">${kidSVG(sp, i)}<rect class="band ${i === 1 ? 'w' : 'b'}" x="-6.4" y="-4.6" width="12.8" height="2.4" rx="1.2"/></g>`).join('')}</svg>`;
-    $('#btnSports').addEventListener('click', () => { if (!rt.modalOpen) openSports(); });
+    $('#btnSports').addEventListener('click', () => { if (!rt.modalOpen) openFest(); });
+    $('#festClose').addEventListener('click', () => closeModal($('#mFest')));
+    $('[data-close-fest]').addEventListener('click', () => closeModal($('#mFest')));
+    $('#festList').addEventListener('click', e => { const b = e.target.closest('[data-fest]'); if (b) startFest(b.dataset.fest, false); });
     $('#spNo').addEventListener('click', () => closeModal($('#mSports')));
     $('[data-close-sports]').addEventListener('click', () => closeModal($('#mSports')));
     $('#spGo').addEventListener('click', () => startSports(false));
@@ -6041,6 +6294,7 @@ html.ait .app{padding-top:calc(10px + var(--ait-top, 0px));padding-bottom:var(--
       else if (rt.modalOpen === $('#mStats')) closeModal($('#mStats'));
       else if (rt.modalOpen === $('#mTrip')) closeModal($('#mTrip'));
       else if (rt.modalOpen === $('#mSports')) closeModal($('#mSports'));
+      else if (rt.modalOpen === $('#mFest')) closeModal($('#mFest'));
       else if (rt.sheetKey && !rt.modalOpen) closeSheet();
     });
     document.addEventListener('visibilitychange', () => {
@@ -6117,7 +6371,7 @@ html.ait .app{padding-top:calc(10px + var(--ait-top, 0px));padding-bottom:var(--
 
   // 시험용 손잡이: 자동 시험(window.__FOREST_TEST)에서만 게임 속 함수를 꺼내 써요
   if (window.__FOREST_TEST) window.__forest = { get S() { return S; }, rt, buyFacility, teacherAct, facCost, teaCost, facKeys, rate, rep, capacity, canGraduate, canPromote,
-    graduate, promote, buyPerk, perkCost, perkMaxed, buyFundPerk, fpCost, claimMain, mainReady, curMain, qNo, earn, CFG, TEA, teaMaxed, PERKS, FPERKS, MAIN, finalYear, startTrip, claimTrip, TRIPS, yearLocked, startSports, endSports, rtSports: () => rt.sports };
+    graduate, promote, buyPerk, perkCost, perkMaxed, buyFundPerk, fpCost, claimMain, mainReady, curMain, qNo, earn, CFG, TEA, teaMaxed, PERKS, FPERKS, MAIN, finalYear, startTrip, claimTrip, TRIPS, yearLocked, startSports, endSports, rtSports: () => rt.sports, startFest, rtFest: () => rt.fest };
   if (window.claude && window.claude.hot && window.claude.hot.snapshot) {
     try { window.claude.hot.snapshot(() => { if (S) syncMid(); return { save: S }; }); } catch (e) { /* 무시 */ }
   }
