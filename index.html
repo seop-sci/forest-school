@@ -514,6 +514,14 @@ label.srow,button.srow{cursor:pointer}
 .th-top b{font-family:var(--font-display);font-weight:400;font-size:16px;color:var(--ink)}
 .th-prog{padding:2px 9px;border-radius:999px;background:var(--chip-bg);color:var(--chip-ink);font-size:12.5px;font-variant-numeric:tabular-nums}
 .th-card.done .th-prog{background:var(--accent);color:var(--accent-ink)}
+.th-all{display:flex;align-items:center;justify-content:space-between;gap:8px;width:100%;min-height:44px;margin:6px 0 6px;padding:0 12px;border:0;border-radius:12px;background:var(--accent);color:var(--accent-ink);font:inherit;font-family:var(--font-display);font-size:14.5px;box-shadow:0 3px 0 var(--accent-shadow);cursor:pointer;text-align:left}
+.th-all span{min-width:0}
+.th-all small{display:inline-block;white-space:nowrap;margin-left:4px;padding:1px 6px;border-radius:999px;background:var(--accent-ink);color:var(--accent);font-size:11px}
+.th-all b{flex:none;white-space:nowrap;display:flex;align-items:center;gap:3px;font-family:var(--font-chalk);font-weight:700;font-size:17px}
+.th-all b s{margin-right:4px;font-size:13px;opacity:.6}
+.th-all b svg{width:15px;height:15px}
+.th-all.poor{background:var(--line);color:var(--muted);box-shadow:0 3px 0 var(--line-shadow)}
+.th-all.poor small{background:var(--muted);color:var(--line)}
 .th-bonus{margin:0 2px 8px;font-size:12.5px;color:var(--muted)}
 @media (prefers-reduced-motion: reduce){.fallfx i{animation:none;top:var(--y)}.th-bulb,.th-twinkle{animation:none}}
 .shop-panel{text-align:center}
@@ -1911,7 +1919,7 @@ html.ait .app{padding-top:calc(10px + var(--ait-top, 0px));padding-bottom:var(--
     ad: { day: '', n: 0 },
     u: { boost: false, dev: false },
     units: 'ko',
-    gold: 5, gd: { day: '', n: 0, shop: 0 }, cos: { own: [], hat: '', neck: '', roof: '', th: { bg: '', classroom: '', cafeteria: '', library: '', science: '', playground: '' } }, autoUntil: 0,
+    gold: 5, gd: { day: '', n: 0, shop: 0 }, cos: { own: [], hat: '', neck: '', th: { bg: '', classroom: '', cafeteria: '', library: '', science: '', playground: '' } }, autoUntil: 0,
     rank: { name: '', joined: false, sent: -1, by: '', ren: 0, asked: false },
     q: freshQ()
   });
@@ -1971,7 +1979,9 @@ html.ait .app{padding-top:calc(10px + var(--ait-top, 0px));padding-bottom:var(--
     if (d.gd && typeof d.gd === 'object') { s.gd.day = typeof d.gd.day === 'string' ? d.gd.day.slice(0, 10) : ''; s.gd.n = Math.floor(num(d.gd.n, 0, 0)); s.gd.shop = Math.floor(num(d.gd.shop, 0, 0)); }
     if (d.cos && typeof d.cos === 'object') {
       // 칠판 색은 이제 배경 테마를 따라가요. 예전에 산 칠판은 값(10개씩)을 돌려줘요
-      if (Array.isArray(d.cos.own)) s.gold += 10 * new Set(d.cos.own.filter(id => typeof id === 'string' && /^board:(navy|plum|wood)$/.test(id))).size;
+      // 지붕도 이제 테마 세트가 맡아요. 예전에 산 지붕도 값(파란 지붕 15개, 벚꽃과 눈 오는 학교 25개)을 돌려줘요
+      const OLD = { 'board:navy': 10, 'board:plum': 10, 'board:wood': 10, 'roof:blue': 15, 'roof:sakura': 25, 'roof:snow': 25 };
+      if (Array.isArray(d.cos.own)) s.gold += [...new Set(d.cos.own)].reduce((a, id) => a + (OLD[id] || 0), 0);
       s.cos.own = Array.isArray(d.cos.own) ? [...new Set(d.cos.own.filter(id => typeof id === 'string' && COS_IDS.has(id)))] : [];
       for (const k of Object.keys(COS)) { const v = d.cos[k]; s.cos[k] = typeof v === 'string' && s.cos.own.includes(k + ':' + v) ? v : ''; }
       const th = d.cos.th && typeof d.cos.th === 'object' ? d.cos.th : {};
@@ -3999,10 +4009,7 @@ html.ait .app{padding-top:calc(10px + var(--ait-top, 0px));padding-bottom:var(--
       { id: 'cap', name: '파란 야구모자', price: 8 }, { id: 'beanie', name: '빨간 털모자', price: 10 },
       { id: 'straw', name: '밀짚모자', price: 10 }, { id: 'flower', name: '꽃 머리띠', price: 12 }] },
     neck: { name: '학생 목 장식', items: [
-      { id: 'scarf', name: '빨간 목도리', price: 8 }, { id: 'bow', name: '나비넥타이', price: 8 }] },
-    roof: { name: '학교 지붕', items: [
-      { id: 'blue', name: '파란 지붕', price: 15, c: '#4A78B0' }, { id: 'sakura', name: '벚꽃 학교', price: 25, c: '#E796AE' },
-      { id: 'snow', name: '눈 오는 학교', price: 25, c: '#EEF3F7' }] }
+      { id: 'scarf', name: '빨간 목도리', price: 8 }, { id: 'bow', name: '나비넥타이', price: 8 }] }
   };
   const COS_IDS = new Set(Object.keys(COS).flatMap(k => COS[k].items.map(it => k + ':' + it.id)));
   /* 테마 세트: 테마마다 배경, 교실, 급식실, 도서관, 과학실, 운동장을 따로 사서 꾸며요.
@@ -4049,6 +4056,12 @@ html.ait .app{padding-top:calc(10px + var(--ait-top, 0px));padding-bottom:var(--
   const thPrice = (t, slot) => slot === 'bg' ? t.bgPrice : t.price;
   const thOwn = (t, slot) => S.cos.own.includes(`th:${t}:${slot}`);
   const thCount = t => TH_SLOTS.filter(([s]) => thOwn(t, s)).length;
+  const TH_SET_SALE = 0.1;
+  function thRest(t) {
+    const T = THEME[t], left = TH_SLOTS.filter(([sl]) => !thOwn(t, sl));
+    const full = left.reduce((a, [sl]) => a + thPrice(T, sl), 0);
+    return { left, full, price: left.length >= 2 ? Math.floor(full * (1 - TH_SET_SALE)) : full };
+  }
   function thSetsDone() { return THEMES.filter(t => thCount(t.id) === TH_SLOTS.length).reduce((a, t) => a + t.bonus, 0); }
   const setBonusMult = () => 1 + (rt.thBonus || 0) / 100;
   // 처마 장식
@@ -4149,6 +4162,8 @@ html.ait .app{padding-top:calc(10px + var(--ait-top, 0px));padding-bottom:var(--
       const n = thCount(t.id), done = n === TH_SLOTS.length;
       const playing = Music.preview === t.id;
       h += `<div class="th-card${done ? ' done' : ''}"><div class="th-top"><b>${t.name}</b><button class="th-play${playing ? ' on' : ''}" type="button" data-play="${t.id}" aria-pressed="${playing}">${playing ? '♪ 듣는 중' : '♪ 테마 곡 듣기'}</button><span class="th-prog">${done ? '세트 완성' : n + '/' + TH_SLOTS.length}</span></div>` +
+        (done ? '' : (() => { const R = thRest(t.id), poor = S.gold < R.price;
+          return `<button class="th-all${poor ? ' poor' : ''}" type="button" data-buy="s:${t.id}"><span>${R.left.length === TH_SLOTS.length ? '세트 한 번에 사기' : `남은 ${R.left.length}개 한 번에`}${R.left.length >= 2 ? ` <small>${Math.round(TH_SET_SALE * 100)}% 할인</small>` : ''}</span><b>${R.left.length >= 2 ? `<s>${R.full}</s>` : ''}${coin}${R.price}</b></button>`; })()) +
         `<p class="th-bonus">${done ? `세트 효과 수업료 +${t.bonus}% 받는 중` : `모두 모으면 수업료 +${t.bonus}%`}. 배경을 사면 바깥 색, 칠판 색, 학교 배경음악도 바뀌어요</p><div class="shop-grid">`;
       for (const [slot, sname] of TH_SLOTS) {
         const own = thOwn(t.id, slot), on = S.cos.th[slot] === t.id, price = thPrice(t, slot), poor = !own && S.gold < price;
@@ -4196,10 +4211,9 @@ html.ait .app{padding-top:calc(10px + var(--ait-top, 0px));padding-bottom:var(--
   function applyCos() {
     rt.kids.forEach(k => { k.g.innerHTML = kidSVG(k.sp, k.bag); });
     const map = $('#map');
-    ['blue', 'sakura', 'snow'].forEach(r => map.classList.toggle('rs-' + r, S.cos.roof === r));
     applyThemes();
     const bgT = THEME[S.cos.th.bg];
-    const fx = $('#fallFx'), kind = bgT ? bgT.fx : S.cos.roof === 'sakura' ? 'petal' : S.cos.roof === 'snow' ? 'snow' : '';
+    const fx = $('#fallFx'), kind = bgT ? bgT.fx : '';
     if (fx.dataset.kind !== kind) {
       fx.dataset.kind = kind;
       fx.textContent = '';
@@ -4221,11 +4235,6 @@ html.ait .app{padding-top:calc(10px + var(--ait-top, 0px));padding-bottom:var(--
     if (cat === 'hat' || cat === 'neck') {
       const look = { hat: cat === 'hat' ? it.id : '', neck: cat === 'neck' ? it.id : '' };
       return `<svg viewBox="-11 -13.5 22 27" aria-hidden="true">${kidSVG('bear', 0, look)}</svg>`;
-    }
-    if (cat === 'roof') {
-      const dots = it.id === 'sakura' ? '<circle cx="8" cy="9" r="1.3" fill="#F5B3C6"/><circle cx="30" cy="6" r="1.2" fill="#F5B3C6"/><circle cx="33" cy="16" r="1.1" fill="#F5B3C6"/>'
-        : it.id === 'snow' ? '<circle cx="8" cy="8" r="1.2" fill="#fff"/><circle cx="31" cy="6" r="1.1" fill="#fff"/><circle cx="34" cy="15" r="1" fill="#fff"/><circle cx="6" cy="16" r="1" fill="#fff"/>' : '';
-      return `<svg viewBox="0 0 40 40" aria-hidden="true"><rect x="10" y="19" width="20" height="15" class="c-wall"/><rect x="17.5" y="25" width="5" height="9" rx="1" class="c-door"/><path d="M6 21 L20 9 L34 21 Z" fill="${it.c}"/>${dots}</svg>`;
     }
     return `<svg viewBox="0 0 40 40" aria-hidden="true"><rect x="5" y="9" width="30" height="21" rx="3" fill="${it.c}" stroke="#7A522D" stroke-width="2.5"/><path d="M10 16 h12 M10 21 h17 M10 26 h8" stroke="#F3F2E8" stroke-width="1.6" stroke-linecap="round"/></svg>`;
   }
@@ -4277,6 +4286,10 @@ html.ait .app{padding-top:calc(10px + var(--ait-top, 0px));padding-bottom:var(--
     if (!pick) return null;
     const [t, a, b] = pick.split(':');
     if (t === 'b' && BOOSTERS[a]) return { kind: 'b', k: a, name: BOOSTERS[a].name, ga: eulOf(BOOSTERS[a].name), price: BOOSTERS[a].price };
+    if (t === 's' && THEME[a] && thCount(a) < TH_SLOTS.length) {
+      const R = thRest(a), nm = `${THEME[a].name} ${R.left.length === TH_SLOTS.length ? '세트' : `남은 ${R.left.length}개`}`;
+      return { kind: 's', th: a, name: nm, ga: eulOf(nm), price: R.price };
+    }
     if (t === 't' && THEME[a] && TH_SLOTS.some(([x]) => x === b)) {
       const nm = `${THEME[a].name} ${TH_SLOTS.find(([x]) => x === b)[1]}`;
       return { kind: 't', th: a, slot: b, name: nm, ga: eulOf(nm), price: thPrice(THEME[a], b) };
@@ -4317,6 +4330,11 @@ html.ait .app{padding-top:calc(10px + var(--ait-top, 0px));padding-bottom:var(--
       S.cos[it.cat] = it.id;
       applyCos();
       toast(`${it.name}${it.ga} 샀어요! ${it.cat === 'hat' || it.cat === 'neck' ? '바로 입혀 뒀어요' : '바로 바꿔 뒀어요'}`);
+    } else if (it.kind === 's') {
+      for (const [sl] of thRest(it.th).left) S.cos.own.push(`th:${it.th}:${sl}`);
+      for (const [sl] of TH_SLOTS) S.cos.th[sl] = it.th;
+      applyCos();
+      toast(`${THEME[it.th].name} 세트 완성! 학교 전체를 꾸몄고 수업료가 ${THEME[it.th].bonus}% 올랐어요`);
     } else if (it.kind === 't') {
       S.cos.own.push(`th:${it.th}:${it.slot}`);
       S.cos.th[it.slot] = it.th;
