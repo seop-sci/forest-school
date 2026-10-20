@@ -4,6 +4,7 @@
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
 <meta name="description" content="도토리를 모아 숲속 학교를 키우는 방치형 게임 테스트판이에요.">
+<!-- github-only -->
 <meta property="og:type" content="website">
 <meta property="og:title" content="숲속 동물 학교">
 <meta property="og:description" content="도토리를 모아 숲속 학교를 키워요. 테스트판이에요.">
@@ -37,6 +38,7 @@
   };
   window.FOREST_FB = window.FOREST_FIREBASE ? window.FOREST_LOAD() : Promise.resolve(null);
 </script>
+<!-- /github-only -->
 <title>숲속 동물 학교</title>
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
@@ -430,6 +432,68 @@ label.srow,button.srow{cursor:pointer}
 .st-top .rk-tag.me{background:var(--accent);color:var(--accent-ink)}
 .st-top .ago{flex:none;margin-left:auto;font-size:12px}
 .st-mid{font-size:13px;color:var(--ink)}
+/* 황금 도토리와 꾸미기 상점 */
+.c-gnut{fill:#F2C230} .c-gcap{fill:#A97A16} .c-gshine{fill:#FFF4C8} .s-gline{fill:none;stroke:#7E5A0E;stroke-width:.7} .s-gstem{fill:none;stroke:#7E5A0E;stroke-width:1.2;stroke-linecap:round}
+.shopbtn{position:relative;display:flex;align-items:center;gap:5px;padding:3px 11px 3px 5px;border:2px solid var(--wood);border-radius:999px;background:var(--board);color:var(--chalk);font-family:var(--font-display);font-size:14px;box-shadow:0 3px 0 var(--wood-dark);cursor:pointer;pointer-events:auto}
+.shopbtn svg{width:24px;height:24px}
+.shopbtn b{font-family:var(--font-chalk);font-weight:700;font-size:17px;line-height:1;color:var(--accent);font-variant-numeric:tabular-nums}
+.gpop{position:absolute;left:50%;top:-4px;font-family:var(--font-chalk);font-weight:700;font-size:17px;color:var(--accent);text-shadow:0 1px 0 var(--wood-dark);pointer-events:none;animation:gpop 1.3s ease-out forwards}
+@keyframes gpop{from{opacity:1;transform:translate(-50%,0)}to{opacity:0;transform:translate(-50%,-26px)}}
+.fallfx{position:absolute;inset:0;z-index:1;overflow:hidden;pointer-events:none;border-radius:15px}
+.fallfx i{position:absolute;top:-4%;width:7px;height:5px;border-radius:70% 0 70% 0;background:#F5B3C6;opacity:.9;animation:leafFall linear infinite}
+.fallfx.snow i{width:5px;height:5px;border-radius:50%;background:#FFFFFF;opacity:.9;box-shadow:0 0 2px rgba(120,140,160,.5)}
+@keyframes leafFall{0%{top:-4%;transform:translateX(0) rotate(0)}50%{transform:translateX(var(--dx)) rotate(160deg)}100%{top:104%;transform:translateX(0) rotate(320deg)}}
+@media (prefers-reduced-motion: reduce){.fallfx i{animation:none;top:var(--y)}}
+.modal.shop{padding-bottom:16px}
+.shop-have{display:flex;align-items:center;justify-content:center;gap:6px;margin:0 0 8px;font-family:var(--font-chalk);font-weight:700;font-size:32px;line-height:1.1;font-variant-numeric:tabular-nums}
+.shop-have svg{width:28px;height:28px}
+.modal .shop-adleft{margin:6px 0 2px;font-size:12.5px}
+.shop-scroll{flex:1 1 auto;min-height:0;overflow-y:auto;overscroll-behavior:contain;margin:6px -4px 0;padding:0 4px 4px;text-align:left}
+.shop-h{margin:14px 2px 6px;font-family:var(--font-display);font-weight:400;font-size:15px;color:var(--muted)}
+.shop-grid{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:8px}
+.si{display:flex;flex-direction:column;align-items:center;gap:3px;min-width:0;padding:8px 4px 9px;border:2px solid transparent;border-radius:14px;background:var(--card);color:var(--ink);font:inherit;text-align:center;cursor:pointer}
+.si.on{border-color:var(--accent);background:color-mix(in srgb, var(--accent) 14%, var(--card))}
+.si .pv{width:56px;height:56px;border-radius:12px;display:grid;place-items:center;overflow:hidden;background:var(--grass)}
+.si .pv svg{width:52px;height:52px}
+.si .nm{font-family:var(--font-display);font-size:13.5px;line-height:1.25}
+.si .pr{display:flex;align-items:center;gap:3px;font-size:12px;color:var(--muted)}
+.si .pr svg{width:13px;height:13px}
+.si.own .pr{color:var(--chip-ink)}
+.si.poor .pr{color:var(--danger)}
+.sb{display:flex;align-items:center;gap:10px;padding:9px 10px 9px 12px;border-radius:14px;background:var(--card)}
+.sb + .sb{margin-top:6px}
+.sb .pv{flex:none;width:42px;height:42px;border-radius:12px;display:grid;place-items:center;background:var(--grass)}
+.sb .pv svg{width:34px;height:34px}
+.sb .tx{flex:1;min-width:0;display:flex;flex-direction:column;gap:1px}
+.sb .tx b{font-family:var(--font-display);font-weight:400;font-size:15px;color:var(--ink)}
+.sb .tx span{font-size:12.5px;line-height:1.4;color:var(--muted)}
+.sb .buy{flex:none;display:flex;align-items:center;gap:4px;min-height:38px;padding:0 12px;border:0;border-radius:11px;background:var(--accent);color:var(--accent-ink);font-family:var(--font-chalk);font-weight:700;font-size:17px;box-shadow:0 3px 0 var(--accent-shadow);cursor:pointer}
+.sb .buy svg{width:15px;height:15px}
+.sb .buy.poor{background:var(--line);color:var(--muted);box-shadow:0 3px 0 var(--line-shadow)}
+.shop-ask{margin:10px 0 0;padding:10px 12px;border-radius:14px;background:var(--chip-bg);color:var(--chip-ink);text-align:center}
+.modal .shop-ask p{margin:0 0 8px;color:var(--chip-ink);font-size:14px}
+.modal .shop-ask .btn-row{margin-top:0}
+.shop-note{margin:14px 2px 0;font-size:12.5px;line-height:1.55;color:var(--muted)}
+/* 꾸미기: 학생 소품, 지붕, 칠판 */
+.h-cap{fill:#3F78C2} .h-cap2{fill:#2C5A97} .h-bean{fill:#D9534A} .h-bean2{fill:#F4ECDD} .h-straw{fill:#E8C77B} .s-hband{fill:none;stroke:#C0504A;stroke-width:1}
+.s-band{fill:none;stroke:#6E9446;stroke-width:1.2;stroke-linecap:round} .h-fl{fill:#F49AB6} .h-fl2{fill:#FFD95E}
+.n-scarf{fill:#D9534A} .n-scarf2{fill:#B13F38} .n-bow{fill:#3F78C2} .n-bow2{fill:#2C5A97}
+#map.rs-blue{--roof:#4A78B0;--roof-edge:#335C8E}
+#map.rs-sakura{--roof:#E796AE;--roof-edge:#C7758D}
+#map.rs-snow{--roof:#EEF3F7;--roof-edge:#B5C3CF}
+@media (prefers-color-scheme: dark){
+  :root:not([data-theme="light"]) #map.rs-blue{--roof:#34588A;--roof-edge:#26436A}
+  :root:not([data-theme="light"]) #map.rs-sakura{--roof:#A8667B;--roof-edge:#87505F}
+  :root:not([data-theme="light"]) #map.rs-snow{--roof:#BAC5CE;--roof-edge:#8F9CA7}
+}
+:root[data-theme="dark"] #map.rs-blue{--roof:#34588A;--roof-edge:#26436A}
+:root[data-theme="dark"] #map.rs-sakura{--roof:#A8667B;--roof-edge:#87505F}
+:root[data-theme="dark"] #map.rs-snow{--roof:#BAC5CE;--roof-edge:#8F9CA7}
+.board.bt-navy{--board:#22364D;--board-line:#30506C}
+.board.bt-plum{--board:#44304C;--board-line:#5B4165}
+.board.bt-wood{--board:#4A3526;--board-line:#614631}
+/* 토스 미니앱 판: 노치와 아래 홈 표시줄을 피해요 */
+html.ait .app{padding-top:calc(10px + var(--ait-top, 0px));padding-bottom:var(--ait-bottom, 0px)}
 .confirm{padding:12px 14px 14px;border-top:1px solid var(--line)}
 .confirm p{margin:0 0 10px;font-size:14px}
 .info{margin:0;padding:2px 14px;border-radius:16px;background:var(--card)}
@@ -1005,9 +1069,12 @@ label.srow,button.srow{cursor:pointer}
         <g id="fx"></g>
         <g id="guide"></g>
       </svg>
+      <div class="fallfx" id="fallFx" hidden aria-hidden="true"></div>
       <div class="map-left">
+        <button class="shopbtn" id="btnShop" type="button" aria-label="황금 도토리 상점"><svg viewBox="-8 -11 16 20" aria-hidden="true"><path d="M-4.6 -1 Q-4.9 5.4 0 7.4 Q4.9 5.4 4.6 -1 Z" class="c-gnut"/><ellipse cx="-1.8" cy="2" rx="0.9" ry="2.1" class="c-gshine"/><path d="M-5.8 -0.8 Q-5.8 -6.2 0 -6.6 Q5.8 -6.2 5.8 -0.8 Q0 0.8 -5.8 -0.8 Z" class="c-gcap"/><path d="M-4 -3.2 H4 M-2.8 -5 H2.8" class="s-gline"/><path d="M0 -6.6 L0.9 -9.2" class="s-gstem"/></svg><b id="goldN">0</b>상점</button>
         <button class="boost" id="btnBoost" type="button" hidden aria-label="부엉이 선생님 보충수업"><span class="b-av" id="boostIc" aria-hidden="true"></span>보충수업 <span class="b-n" id="boostN">5</span></button>
         <div class="feast" id="feastChip" hidden>특식 데이 <b id="feastTime">5:00</b></div>
+        <div class="feast" id="autoChip" hidden>자동 줍기 <b id="autoTime">60:00</b></div>
       </div>
       <!-- 까치 핫딜은 엄지가 닿기 쉬운 오른쪽 아래. 건물과 떨어진 도토리를 가리지 않아요 -->
       <button class="deal" id="btnDeal" type="button" hidden><span class="d-av" id="dealIc" aria-hidden="true"></span><span class="d-txt">까치 핫딜<span class="d-time" id="dealTime">2:00</span></span></button>
@@ -1099,7 +1166,7 @@ label.srow,button.srow{cursor:pointer}
         <div id="verRow"><dt>버전</dt><dd>시제품 1.0</dd></div>
         <div><dt>저장 위치</dt><dd id="infoSave">이 기기의 브라우저</dd></div>
         <div id="pidRow" hidden><dt>학교 번호</dt><dd id="infoPid"></dd></div>
-        <div><dt>광고</dt><dd>테스트용 가짜 광고예요</dd></div>
+        <div><dt>광고</dt><dd id="infoAd">테스트용 가짜 광고예요</dd></div>
         <div><dt>그림</dt><dd>코드로 직접 그렸어요 (AI 생성 이미지 없음)</dd></div>
       </dl>
       <div id="devBox" hidden>
@@ -1269,6 +1336,22 @@ label.srow,button.srow{cursor:pointer}
   </section>
 </div>
 
+<div class="overlay center" id="mShop" hidden>
+  <div class="backdrop" data-close-shop></div>
+  <section class="modal wide shop" role="dialog" aria-modal="true" aria-labelledby="shopTitle">
+    <h2 id="shopTitle">황금 도토리 상점</h2>
+    <div class="shop-have" id="shopHave"></div>
+    <button class="cta small" type="button" id="shopAd">광고 보고 황금 도토리 2개 받기</button>
+    <p class="fine shop-adleft" id="shopAdLeft"></p>
+    <div class="shop-scroll" id="shopList"></div>
+    <div class="shop-ask" id="shopAsk" hidden>
+      <p id="shopAskText"></p>
+      <div class="btn-row"><button class="btn-sub" type="button" id="shopNo">취소</button><button class="cta" type="button" id="shopYes">사기</button></div>
+    </div>
+    <button class="btn-sub btn-close" type="button" id="shopClose">닫기</button>
+  </section>
+</div>
+
 <div class="overlay center" id="mMove" hidden>
   <div class="backdrop" data-close-move></div>
   <section class="modal" role="dialog" aria-modal="true" aria-labelledby="moveTitle">
@@ -1339,6 +1422,8 @@ label.srow,button.srow{cursor:pointer}
   const $ = (s, r = document) => r.querySelector(s);
   const $$ = (s, r = document) => Array.from(r.querySelectorAll(s));
   const SAVE_KEY = 'forest-school-v1';
+  // 토스 미니앱 판이면 toss/src/bridge.js가 window.AIT에 광고, 저장소, 게임센터 기능을 담아 둬요
+  const AIT = window.AIT || null;
   const motionMQ = window.matchMedia ? window.matchMedia('(prefers-reduced-motion: reduce)') : null;
 
   /* ---------- 게임 수치 ---------- */
@@ -1678,7 +1763,7 @@ label.srow,button.srow{cursor:pointer}
     qr: {}, qKey: '', guideKey: null,
     adOpen: false, adTimer: 0, adOk: null, adNo: null, adEarned: false, gKey: '', townStage: -1, townTier: -1,
     deal: null, dealT: DEAL.first, fitKey: '', fitGen: 0, yearKey: '', oakN: -1, oakHintAt: 0, rankEdit: false,
-    adopting: false, moveParam: '', moveIn: null, moveBusy: false
+    adopting: false, moveParam: '', moveIn: null, moveBusy: false, adNoGold: false, shopPick: ''
   };
   if (motionMQ && motionMQ.addEventListener) motionMQ.addEventListener('change', e => { rt.reduced = e.matches; });
   // 헷갈리는 0, O, 1, I, L을 뺀 글자로 학교 번호와 이어하기 코드를 만들어요
@@ -1707,12 +1792,13 @@ label.srow,button.srow{cursor:pointer}
     tier: 0, tg: 0, tdip: 0, fund: 0, fp: { schol: 0, rep: 0, dip: 0 },
     hd: { day: '', n: 0, feastUntil: 0, album: false, seen: false },
     oak: OAK.max,
-    st: { picks: 0, ups: 0, trains: 0, claims: 0, grads: 0, perks: 0, fperks: 0, shakes: 0, dips: 0, play: 0, sess: 0, ads: 0 },
+    st: { picks: 0, ups: 0, trains: 0, claims: 0, grads: 0, perks: 0, fperks: 0, shakes: 0, dips: 0, play: 0, sess: 0, ads: 0, gold: 0, gspent: 0 },
     p: { dip: 0, species: 0, perk: { schol: 0, rep: 0, start: 0, drop: 0, night: 0 } },
     att: { last: '', n: 0 },
     ad: { day: '', n: 0 },
     u: { boost: false, dev: false },
     units: 'ko',
+    gold: 5, gd: { day: '', n: 0, shop: 0 }, cos: { own: [], hat: '', neck: '', roof: '', board: '' }, autoUntil: 0,
     rank: { name: '', joined: false, sent: -1, by: '' },
     q: freshQ()
   });
@@ -1754,7 +1840,7 @@ label.srow,button.srow{cursor:pointer}
     if (d.hd && typeof d.hd === 'object') {
       s.hd.day = typeof d.hd.day === 'string' ? d.hd.day.slice(0, 10) : '';
       s.hd.n = Math.floor(num(d.hd.n, 0, 0));
-      s.hd.feastUntil = Math.min(num(d.hd.feastUntil, 0, 0), Date.now() + DEAL.feastMin * 60000 * 3);
+      s.hd.feastUntil = Math.min(num(d.hd.feastUntil, 0, 0), Date.now() + 3 * 3600000);
       s.hd.album = !!d.hd.album; s.hd.seen = !!d.hd.seen;
     }
     // 예전 저장에는 '이번 학교급에서 모은 수료증'이 없어서, 가진 수료증과 명예 교장실에 쓴 수료증을 더해 채워요
@@ -1767,6 +1853,15 @@ label.srow,button.srow{cursor:pointer}
     // 학교 번호는 기기를 옮겨도 그대로예요. 예전 저장에는 없어서 새로 만들고, 처음 연 날은 마지막 저장 때로 어림해요
     if (typeof d.pid === 'string' && /^[0-9A-Z]{6,16}$/.test(d.pid)) s.pid = d.pid;
     s.born = Math.min(num(d.born, 0, s.savedAt), Date.now());
+    // 황금 도토리: 예전 저장에도 처음 선물 5개를 줘요. 꾸미기는 산 것만 입을 수 있어요
+    s.gold = Math.floor(num(d.gold, 0, s.gold));
+    if (d.gd && typeof d.gd === 'object') { s.gd.day = typeof d.gd.day === 'string' ? d.gd.day.slice(0, 10) : ''; s.gd.n = Math.floor(num(d.gd.n, 0, 0)); s.gd.shop = Math.floor(num(d.gd.shop, 0, 0)); }
+    if (d.cos && typeof d.cos === 'object') {
+      s.cos.own = Array.isArray(d.cos.own) ? [...new Set(d.cos.own.filter(id => typeof id === 'string' && COS_IDS.has(id)))] : [];
+      for (const k of Object.keys(COS)) { const v = d.cos[k]; s.cos[k] = typeof v === 'string' && s.cos.own.includes(k + ':' + v) ? v : ''; }
+    }
+    s.autoUntil = Math.min(num(d.autoUntil, 0, 0), Date.now() + 3 * 3600000);
+    if (typeof d.tk === 'string') s.tk = d.tk.slice(0, 200);
     if (d.rank && typeof d.rank === 'object') {
       s.rank.name = cleanName(d.rank.name);
       s.rank.joined = !!d.rank.joined && !!s.rank.name;
@@ -1828,7 +1923,9 @@ label.srow,button.srow{cursor:pointer}
     if (!S || rt.adopting) return;   // 다른 학교로 바꾸며 다시 여는 중에는 지금 학교를 저장하지 않아요
     S.savedAt = at || (rt.paused ? rt.closedAt : Date.now());
     syncMid();
-    try { localStorage.setItem(SAVE_KEY, JSON.stringify(S)); } catch (e) { /* 저장소가 막혀 있어도 게임은 계속 */ }
+    const json = JSON.stringify(S);
+    try { localStorage.setItem(SAVE_KEY, json); } catch (e) { /* 저장소가 막혀 있어도 게임은 계속 */ }
+    if (AIT) AIT.storage.setItem(SAVE_KEY, json).catch(() => {});   // 토스 앱 저장소 (앱을 지워도 남는 건 아니에요)
     Cloud.dirty = true;   // 서버에는 조금씩 모았다가 올려요
   }
 
@@ -2113,17 +2210,18 @@ label.srow,button.srow{cursor:pointer}
     otter: '<circle cx="-4.6" cy="-4" r="1.6" class="f-otter"/><circle cx="4.6" cy="-4" r="1.6" class="f-otter"/><circle r="6" class="f-otter"/><ellipse cx="0" cy="2" rx="3.6" ry="2.6" class="f-otter-light"/><ellipse cx="0" cy="1" rx="1" ry="0.7" class="f-eye"/><path d="M-2.4 2.2 h-3.4 M-2.4 3 l-3 0.8 M2.4 2.2 h3.4 M2.4 3 l3 0.8" class="s-whisker"/>'
   };
   // 학생 옷차림은 학교급마다 달라요. 유치원은 노란 모자와 이름표, 초등학교는 책가방과 실내화 주머니
-  function kidSVG(sp, bag) {
+  function kidSVG(sp, bag, look) {
     const eyeCls = EYE_LIGHT.has(sp) ? 'f-eye-light' : 'f-eye';
     const kinder = !(S && S.tier >= 1);
+    const hat = look ? look.hat : (S ? S.cos.hat : ''), neck = look ? look.neck : (S ? S.cos.neck : '');
     return `<ellipse cx="0" cy="12.4" rx="5.6" ry="1.6" class="c-shadow"/>` +
       (kinder ? '' : `<rect x="-6.6" y="7.4" width="3.2" height="3.6" rx="0.8" class="f-bag${(bag + 1) % 3}"/>`) +
       `<rect x="-3.6" y="4.2" width="7.2" height="7.6" rx="3.4" class="${BODY[sp]}"/>` +
       (sp === 'penguin' ? '<ellipse cx="-0.6" cy="8.4" rx="2.2" ry="2.9" class="f-peng-light"/>' : '') +
       (kinder ? '<rect x="-2.9" y="5.6" width="3.6" height="2.6" rx="0.6" class="c-dip"/>'
         : `<rect x="1.6" y="4.6" width="4.2" height="5.6" rx="1.4" class="f-bag${bag}"/>`) +
-      HEAD[sp] +
-      (kinder ? '<path d="M-6.3 -3.2 Q-6.6 -9.8 0 -10 Q6.6 -9.8 6.3 -3.2 Z" class="f-hat"/><ellipse cx="0" cy="-3.3" rx="7.4" ry="1.5" class="f-hat"/><path d="M-6 -4.4 Q0 -3.4 6 -4.4" class="s-hatband"/>' : '') +
+      HEAD[sp] + (neck ? NECKS[neck] : '') +
+      (hat ? HATS[hat] : kinder ? '<path d="M-6.3 -3.2 Q-6.6 -9.8 0 -10 Q6.6 -9.8 6.3 -3.2 Z" class="f-hat"/><ellipse cx="0" cy="-3.3" rx="7.4" ry="1.5" class="f-hat"/><path d="M-6 -4.4 Q0 -3.4 6 -4.4" class="s-hatband"/>' : '') +
       `<circle cx="-2.3" cy="-0.6" r="0.95" class="${eyeCls}"/><circle cx="2.3" cy="-0.6" r="0.95" class="${eyeCls}"/>` +
       (sp === 'chick' ? '' : '<ellipse cx="-3.7" cy="1.8" rx="1.2" ry="0.8" class="f-cheek"/><ellipse cx="3.7" cy="1.8" rx="1.2" ry="0.8" class="f-cheek"/>');
   }
@@ -2147,7 +2245,7 @@ label.srow,button.srow{cursor:pointer}
     g.setAttribute('class', 'kid');
     g.innerHTML = kidSVG(sp, bag);
     layerKids.appendChild(g);
-    const k = { g, x: 0, y: 0, tx: 0, ty: 0, spot: -1, wait: rand(0, 2), speed: rand(14, 22), phase: rand(0, 6), moving: false };
+    const k = { g, sp, bag, x: 0, y: 0, tx: 0, ty: 0, spot: -1, wait: rand(0, 2), speed: rand(14, 22), phase: rand(0, 6), moving: false };
     pickTarget(k);
     if (fromGate && !rt.reduced) { k.x = 180 + rand(-8, 8); k.y = 436; k.wait = 0; }
     else { k.x = k.tx; k.y = k.ty; pickTarget(k); }
@@ -2264,6 +2362,7 @@ label.srow,button.srow{cursor:pointer}
   function updateDrops(now) {
     for (const d of rt.drops.slice()) {
       const age = now - d.born;
+      if (autoOn() && age > 700) { collect(d); continue; }   // 자동 줍기 부스터
       if (age > CFG.dropLife) removeDrop(d);
       else if (age > CFG.dropLife - 3000 && !d.g.classList.contains('blink')) d.g.classList.add('blink');
     }
@@ -2592,6 +2691,14 @@ label.srow,button.srow{cursor:pointer}
   // 진짜 미니앱에서는 앱인토스 SDK의 보상형 광고로 바꿔요. 보상은 userEarnedReward 신호를 받았을 때만 줘요
   function showAd(onReward, onSkip) {
     if (rt.adOpen) return;
+    if (AIT && AIT.ads) {
+      // 토스 리워드 광고: 끝까지 봤다는 신호(userEarnedReward)가 왔을 때만 보상을 줘요
+      if (!AIT.adReady()) { AIT.preload(); rt.adNoGold = false; toast('광고를 준비하고 있어요. 잠시 뒤에 다시 눌러 주세요'); return; }
+      rt.adOpen = true;
+      if (actx && actx.state === 'running') actx.suspend().catch(() => {});   // 광고 중에는 게임 소리를 멈춰요
+      AIT.showAd(r => { rt.adOk = onReward; rt.adNo = onSkip || null; rt.adEarned = !!r.earned; closeAd(); });
+      return;
+    }
     rt.adOpen = true; rt.adOk = onReward; rt.adNo = onSkip || null; rt.adEarned = false;
     let left = BOOST.adSec;
     $('#adCount').textContent = left;
@@ -2620,9 +2727,9 @@ label.srow,button.srow{cursor:pointer}
     $('#mAd').hidden = true;
     rt.adOpen = false;
     ensureAudio();
-    const ok = rt.adOk, no = rt.adNo, earned = rt.adEarned;
-    rt.adOk = rt.adNo = null;
-    if (earned) { S.st.ads += 1; if (ok) ok(); }
+    const ok = rt.adOk, no = rt.adNo, earned = rt.adEarned, noGold = rt.adNoGold;
+    rt.adOk = rt.adNo = null; rt.adNoGold = false;
+    if (earned) { S.st.ads += 1; if (!noGold) adGold(); if (ok) ok(); }
     else if (no) no();
     else toast('광고를 끝까지 보지 않아서 보상이 없어요');
   }
@@ -2725,6 +2832,9 @@ label.srow,button.srow{cursor:pointer}
     const on = feastOn();
     $('#feastChip').hidden = !on;
     if (on) $('#feastTime').textContent = clock(Math.ceil((S.hd.feastUntil - Date.now()) / 1000));
+    const au = autoOn();
+    $('#autoChip').hidden = !au;
+    if (au) $('#autoTime').textContent = clock(Math.ceil((S.autoUntil - Date.now()) / 1000));
   }
   function openDeal() {
     if (rt.paused || rt.modalOpen || !rt.deal) return;
@@ -2976,6 +3086,7 @@ label.srow,button.srow{cursor:pointer}
       seen: Cloud.fb.database.ServerValue.TIMESTAMP, born: Math.floor(S.born), pid: S.pid, name: S.rank.name || '',
       tier: S.tier, year: yearNo(), town: S.grade, q: cm ? qNo(S.q.m) : '끝', qt: cm ? cm.title : '',
       play: Math.floor(S.st.play), sess: S.st.sess, days: S.att.n, ads: S.st.ads, score: rankScore(),
+      gold: S.gold, gearn: S.st.gold, gspent: S.st.gspent, cos: S.cos.own.length,
       dev: !!S.u.dev, v: VERSION, env: /KAKAOTALK/i.test(ua) ? 'kakao' : (navigator.maxTouchPoints > 0 ? 'mobile' : 'pc')
     };
   }
@@ -2989,7 +3100,8 @@ label.srow,button.srow{cursor:pointer}
   }
   function renderCloudInfo() {
     if (!S) return;
-    let t = '이 기기의 브라우저';
+    let t = AIT ? '이 기기의 토스 앱' : '이 기기의 브라우저';
+    if (AIT) $('#infoAd').textContent = AIT.ads ? (AIT.testAd ? '토스 리워드 광고 (테스트 광고)' : '토스 리워드 광고') : '이 토스 앱에서는 광고가 안 나와요';
     if (hasCloudBuild()) {
       if (Cloud.state === 'on') t = !Cloud.online ? '서버 (인터넷이 끊겼어요. 다시 이어지면 저장해요)' : Cloud.lastPush ? `서버 (${agoText(Cloud.lastPush)} 저장)` : '서버';
       else if (Cloud.state === 'idle' || Cloud.state === 'wait') t = '서버에 연결하는 중이에요';
@@ -3124,7 +3236,7 @@ label.srow,button.srow{cursor:pointer}
       town: Math.min(CFG.grades.length - 1, Math.floor(n(d.town, 9))),
       q: typeof d.q === 'string' ? d.q.slice(0, 8) : '', qt: typeof d.qt === 'string' ? d.qt.slice(0, 30) : '',
       play: n(d.play, 1e9), sess: Math.floor(n(d.sess, 1e6)), days: Math.floor(n(d.days, 1e5)), ads: Math.floor(n(d.ads, 1e6)),
-      score: Math.floor(n(d.score, 1e12)), dev: !!d.dev, v: typeof d.v === 'string' ? d.v.slice(0, 10) : '', env: ENV_NAME[d.env] || ''
+      score: Math.floor(n(d.score, 1e12)), gearn: Math.floor(n(d.gearn, 1e9)), gspent: Math.floor(n(d.gspent, 1e9)), cos: Math.floor(n(d.cos, 999)), dev: !!d.dev, v: typeof d.v === 'string' ? d.v.slice(0, 10) : '', env: ENV_NAME[d.env] || ''
     };
   }
   async function loadStats() {
@@ -3167,7 +3279,7 @@ label.srow,button.srow{cursor:pointer}
       mid.className = 'st-mid';
       mid.textContent = `${T.school} ${r.year}${T.unit}, ${CFG.grades[r.town].name}, 퀘스트 ${r.q}${r.qt ? ' ' + r.qt : ''}`;
       const bot = document.createElement('div');
-      bot.textContent = [`플레이 ${playText(r.play)}`, `접속 ${r.sess}번`, `출석 ${r.days}일`, `광고 ${r.ads}번`, `학교 점수 ${fmt(r.score)}`,
+      bot.textContent = [`플레이 ${playText(r.play)}`, `접속 ${r.sess}번`, `출석 ${r.days}일`, `광고 ${r.ads}번`, `학교 점수 ${fmt(r.score)}`, `황금 도토리 ${r.gearn}개 받고 ${r.gspent}개 씀`, r.cos ? `꾸미기 ${r.cos}개` : '',
         r.born ? `처음 ${agoText(r.born)}` : '', r.env, r.v && r.v !== VERSION ? `버전 ${r.v}` : ''].filter(Boolean).join(', ');
       li.append(top, mid, bot);
       list.appendChild(li);
@@ -3193,6 +3305,8 @@ label.srow,button.srow{cursor:pointer}
   // 랭킹을 둘 곳: GitHub 판은 서버, Claude 화면은 공유 저장소, 둘 다 없으면 내 학교 점수만 보여요.
   // 어느 쪽이든 listen(받기), put(올리기), remove(빼기) 세 가지로 똑같이 써요
   async function rankBackend() {
+    if (AIT) return { uid: 'me', readOnly: false, toss: true, listen: ok => { ok([]); return () => {}; },
+      put: doc => Promise.resolve(AIT.setScore(doc.score)), remove: () => Promise.resolve() };
     if (hasCloudBuild()) {
       await cloudSettled();
       return cloudOn() ? fbRank() : null;
@@ -3279,13 +3393,14 @@ label.srow,button.srow{cursor:pointer}
     return [...best.values()].sort((a, b) => b.score - a.score || a.at - b.at).slice(0, RANK_MAX);
   }
   // 점수가 바뀌면 잠깐 모았다가 한 번만 올려요
+  const tossRank = () => !!(Rank.be && Rank.be.toss);
   function rankDirty() {
-    if (!S || !S.rank.joined || Rank.state !== 'on') return;
+    if (!S || !(S.rank.joined || tossRank()) || Rank.state !== 'on') return;
     clearTimeout(Rank.timer);
     Rank.timer = setTimeout(() => submitRank(), 2000);
   }
   async function submitRank(force) {
-    if (Rank.state !== 'on' || Rank.readOnly || !Rank.uid || !S.rank.joined || Rank.writing) return;
+    if (Rank.state !== 'on' || Rank.readOnly || !Rank.uid || !(S.rank.joined || tossRank()) || Rank.writing) return;
     const score = rankScore();
     // 다른 기기에서 옮겨 온 학교는 이 기기 id로 처음 올리는 거라서 점수가 같아도 올려요
     if (!force && score === S.rank.sent && S.rank.by === Rank.uid) return;
@@ -3339,6 +3454,7 @@ label.srow,button.srow{cursor:pointer}
     if (join.dataset.key !== key) {
       join.dataset.key = key;
       if (Rank.state === 'idle' || Rank.state === 'loading') join.innerHTML = '<p>랭킹을 불러오는 중이에요.</p>';
+      else if (tossRank()) join.innerHTML = '<p>학교 점수는 토스 게임센터 랭킹에 올라가요. 토스 친구들과 순위를 겨뤄 보세요.</p><button class="cta small" type="button" data-rank="toss">토스 랭킹 보기</button>';
       else if (Rank.state === 'off') {
         join.innerHTML = '<p></p>' + (hasCloudBuild() && Cloud.state === 'error' ? '<button class="btn-link" type="button" data-rank="retry">다시 연결하기</button>' : '');
         $('p', join).textContent = rankOffText();
@@ -3387,8 +3503,217 @@ label.srow,button.srow{cursor:pointer}
       });
     }
     const empty = $('#rankEmpty');
-    empty.hidden = !(Rank.state === 'on' && rows.length === 0);
+    empty.hidden = tossRank() || !(Rank.state === 'on' && rows.length === 0);
     if (!empty.hidden) empty.textContent = '아직 랭킹에 이름을 올린 교장 선생님이 없어요. 첫 번째가 되어 보세요!';
+  }
+
+  /* ---------- 황금 도토리와 꾸미기 상점 ----------
+     황금 도토리는 돈으로 사지 않고 모으기만 해요: 광고를 볼 때마다 1개(하루 10개까지), 상점 광고 2개(하루 5번),
+     출석 도장 1개(7일째 5개), 메인 퀘스트 한 장 3개, 종업식 2개, 졸업식 10개.
+     쓰는 곳은 꾸미기(계속 남아요)와 부스터(한 번 쓰면 끝나요). 뽑기 없이 정해진 값으로만 팔아요.
+     토스 미니앱에서는 광고 그룹의 보상 이름을 '황금 도토리', 수량을 1로 맞춰 두면 광고 화면에도 똑같이 보여요. */
+  const GOLD = { adDay: 10, shopAd: 5, shopAdN: 2, att: 1, att7: 5, chapter: 3, grad: 2, promote: 10 };
+  const HATS = {
+    cap: '<path d="M-6.2 -3.2 Q-6.4 -9.6 0 -9.8 Q6.4 -9.6 6.2 -3.2 Z" class="h-cap"/><path d="M-2 -3.6 Q4.6 -5.2 9.6 -3 Q4.8 -1.9 -2 -2.5 Z" class="h-cap2"/><circle cx="0" cy="-9.6" r="0.9" class="h-cap2"/>',
+    beanie: '<path d="M-6.4 -2.6 Q-6.6 -10.2 0 -10.4 Q6.6 -10.2 6.4 -2.6 Z" class="h-bean"/><rect x="-6.9" y="-4.4" width="13.8" height="2.8" rx="1.3" class="h-bean2"/><circle cx="0" cy="-10.8" r="2" class="h-bean2"/>',
+    straw: '<ellipse cx="0" cy="-4.2" rx="9.4" ry="2.1" class="h-straw"/><path d="M-4.9 -4.2 Q-5.1 -9.6 0 -9.8 Q5.1 -9.6 4.9 -4.2 Z" class="h-straw"/><path d="M-4.9 -5.4 Q0 -4.4 4.9 -5.4" class="s-hband"/>',
+    flower: '<path d="M-5.8 -2.8 Q0 -9 5.8 -2.8" class="s-band"/><circle cx="-3.4" cy="-6.3" r="1.7" class="h-fl"/><circle cx="0" cy="-7.4" r="1.9" class="h-fl"/><circle cx="3.4" cy="-6.3" r="1.7" class="h-fl"/><circle cx="0" cy="-7.4" r="0.8" class="h-fl2"/>'
+  };
+  const NECKS = {
+    scarf: '<path d="M-4.8 5 Q0 7.2 4.8 5 L4.8 7 Q0 9.2 -4.8 7 Z" class="n-scarf"/><rect x="1.6" y="6.6" width="2.4" height="4.6" rx="1" class="n-scarf2"/>',
+    bow: '<path d="M0 6.6 L-3.4 4.8 L-3.4 8.4 Z M0 6.6 L3.4 4.8 L3.4 8.4 Z" class="n-bow"/><circle cx="0" cy="6.6" r="1.1" class="n-bow2"/>'
+  };
+  const COS = {
+    hat: { name: '학생 모자', items: [
+      { id: 'cap', name: '파란 야구모자', price: 8 }, { id: 'beanie', name: '빨간 털모자', price: 10 },
+      { id: 'straw', name: '밀짚모자', price: 10 }, { id: 'flower', name: '꽃 머리띠', price: 12 }] },
+    neck: { name: '학생 목 장식', items: [
+      { id: 'scarf', name: '빨간 목도리', price: 8 }, { id: 'bow', name: '나비넥타이', price: 8 }] },
+    roof: { name: '학교 지붕', items: [
+      { id: 'blue', name: '파란 지붕', price: 15, c: '#4A78B0' }, { id: 'sakura', name: '벚꽃 학교', price: 25, c: '#E796AE' },
+      { id: 'snow', name: '눈 오는 학교', price: 25, c: '#EEF3F7' }] },
+    board: { name: '칠판 색', items: [
+      { id: 'navy', name: '밤하늘 칠판', price: 10, c: '#22364D' }, { id: 'plum', name: '포도 칠판', price: 10, c: '#44304C' },
+      { id: 'wood', name: '나무 칠판', price: 10, c: '#4A3526' }] }
+  };
+  const COS_IDS = new Set(Object.keys(COS).flatMap(k => COS[k].items.map(it => k + ':' + it.id)));
+  const BOOSTERS = {
+    feast: { name: '특식 데이 30분', desc: '30분 동안 수업료가 2배예요', price: 3 },
+    skip: { name: '2시간 건너뛰기', desc: '수업료 2시간치를 바로 받아요', price: 5 },
+    auto: { name: '도토리 자동 줍기 1시간', desc: '떨어진 도토리를 알아서 주워요', price: 3 }
+  };
+  const BOOST_ART = {
+    feast: '<svg viewBox="-12 -12 24 24" aria-hidden="true"><path d="M-9 -1 H9 Q8.4 8 0 8.6 Q-8.4 8 -9 -1 Z" class="c-wall"/><path d="M-9 -1 H9" class="s-hatband"/><path d="M-6 -2 Q-6 -7 -2 -6.4 Q0 -9.4 3 -7 Q7 -7.6 6.4 -2 Z" class="c-dip"/><path d="M4 -10 L8 -3" stroke="#8A5D3B" stroke-width="1.2" stroke-linecap="round"/></svg>',
+    skip: '<svg viewBox="-12 -12 24 24" aria-hidden="true"><circle r="9" class="c-clock"/><path d="M0 -5.6 V0 L4 2.6" fill="none" stroke="#6D4828" stroke-width="1.8" stroke-linecap="round"/></svg>',
+    auto: '<svg viewBox="-12 -13 24 24" aria-hidden="true"><g transform="scale(1.25)">' + ACORN + '</g><path d="M6 -10 l1.2 2.6 2.6 1.2 -2.6 1.2 -1.2 2.6 -1.2 -2.6 -2.6 -1.2 2.6 -1.2 Z" class="c-gnut"/></svg>'
+  };
+  const GOLD_ICON = '<svg viewBox="-8 -11 16 20" aria-hidden="true"><path d="M-4.6 -1 Q-4.9 5.4 0 7.4 Q4.9 5.4 4.6 -1 Z" class="c-gnut"/><ellipse cx="-1.8" cy="2" rx="0.9" ry="2.1" class="c-gshine"/><path d="M-5.8 -0.8 Q-5.8 -6.2 0 -6.6 Q5.8 -6.2 5.8 -0.8 Q0 0.8 -5.8 -0.8 Z" class="c-gcap"/><path d="M-4 -3.2 H4 M-2.8 -5 H2.8" class="s-gline"/><path d="M0 -6.6 L0.9 -9.2" class="s-gstem"/></svg>';
+  const autoOn = () => !!S && Date.now() < S.autoUntil;
+  function goldDay() { const t = todayStr(); if (S.gd.day !== t) { S.gd.day = t; S.gd.n = 0; S.gd.shop = 0; } }
+  function addGold(n) {
+    if (!(n > 0)) return;
+    S.gold += n; S.st.gold += n;
+    renderShopBtn();
+    const b = $('#btnShop');
+    if (!b.hidden) { const sp = document.createElement('span'); sp.className = 'gpop'; sp.textContent = '+' + n; b.appendChild(sp); setTimeout(() => sp.remove(), 1400); }
+    if (rt.modalOpen === $('#mShop')) renderShop();
+  }
+  // 광고를 끝까지 보면 덤으로 1개 (하루 10개까지)
+  function adGold() { goldDay(); if (S.gd.n >= GOLD.adDay) return; S.gd.n += 1; addGold(1); }
+  function renderShopBtn() {
+    $('#goldN').textContent = fmt(S.gold);
+    $('#btnShop').setAttribute('aria-label', `황금 도토리 상점, 황금 도토리 ${fmt(S.gold)}개`);
+  }
+  // 꾸민 모습을 학교에 입혀요: 학생 소품은 학생을 다시 그리고, 지붕과 칠판은 색 이름표를 바꿔요
+  function applyCos() {
+    rt.kids.forEach(k => { k.g.innerHTML = kidSVG(k.sp, k.bag); });
+    const map = $('#map');
+    ['blue', 'sakura', 'snow'].forEach(r => map.classList.toggle('rs-' + r, S.cos.roof === r));
+    ['navy', 'plum', 'wood'].forEach(b => $('.board').classList.toggle('bt-' + b, S.cos.board === b));
+    const fx = $('#fallFx'), kind = S.cos.roof === 'sakura' ? 'petal' : S.cos.roof === 'snow' ? 'snow' : '';
+    if (fx.dataset.kind !== kind) {
+      fx.dataset.kind = kind;
+      fx.textContent = '';
+      fx.className = 'fallfx' + (kind === 'snow' ? ' snow' : '');
+      for (let i = 0; kind && i < 16; i++) {
+        const e = document.createElement('i');
+        e.style.left = (Math.random() * 100).toFixed(1) + '%';
+        e.style.setProperty('--dx', (Math.random() * 40 - 20).toFixed(0) + 'px');
+        e.style.setProperty('--y', (Math.random() * 96).toFixed(1) + '%');
+        e.style.animationDuration = (7 + Math.random() * 6).toFixed(1) + 's';
+        e.style.animationDelay = (-Math.random() * 12).toFixed(1) + 's';
+        fx.appendChild(e);
+      }
+    }
+    fx.hidden = !kind;
+  }
+  function cosArt(cat, it) {
+    if (cat === 'hat' || cat === 'neck') {
+      const look = { hat: cat === 'hat' ? it.id : '', neck: cat === 'neck' ? it.id : '' };
+      return `<svg viewBox="-11 -13.5 22 27" aria-hidden="true">${kidSVG('bear', 0, look)}</svg>`;
+    }
+    if (cat === 'roof') {
+      const dots = it.id === 'sakura' ? '<circle cx="8" cy="9" r="1.3" fill="#F5B3C6"/><circle cx="30" cy="6" r="1.2" fill="#F5B3C6"/><circle cx="33" cy="16" r="1.1" fill="#F5B3C6"/>'
+        : it.id === 'snow' ? '<circle cx="8" cy="8" r="1.2" fill="#fff"/><circle cx="31" cy="6" r="1.1" fill="#fff"/><circle cx="34" cy="15" r="1" fill="#fff"/><circle cx="6" cy="16" r="1" fill="#fff"/>' : '';
+      return `<svg viewBox="0 0 40 40" aria-hidden="true"><rect x="10" y="19" width="20" height="15" class="c-wall"/><rect x="17.5" y="25" width="5" height="9" rx="1" class="c-door"/><path d="M6 21 L20 9 L34 21 Z" fill="${it.c}"/>${dots}</svg>`;
+    }
+    return `<svg viewBox="0 0 40 40" aria-hidden="true"><rect x="5" y="9" width="30" height="21" rx="3" fill="${it.c}" stroke="#7A522D" stroke-width="2.5"/><path d="M10 16 h12 M10 21 h17 M10 26 h8" stroke="#F3F2E8" stroke-width="1.6" stroke-linecap="round"/></svg>`;
+  }
+  function openShop() {
+    rt.shopPick = '';
+    renderShop();
+    openModal($('#mShop'));
+    $('#shopList').scrollTop = 0;
+  }
+  function renderShop() {
+    goldDay();
+    $('#shopHave').innerHTML = GOLD_ICON + '<span></span>';
+    $('#shopHave span').textContent = fmt(S.gold);
+    const left = GOLD.shopAd - S.gd.shop;
+    $('#shopAd').setAttribute('aria-disabled', left > 0 ? 'false' : 'true');
+    $('#shopAdLeft').textContent = left > 0 ? `오늘 ${left}번 더 받을 수 있어요` : '오늘 상점 광고를 모두 봤어요. 내일 다시 열려요';
+    const coin = `<svg viewBox="-8 -11 16 20" aria-hidden="true">${GOLD_ICON.slice(GOLD_ICON.indexOf('>') + 1, -6)}</svg>`;
+    let h = '<h3 class="shop-h">부스터 <small>한 번 쓰면 끝나요</small></h3>';
+    for (const k of Object.keys(BOOSTERS)) {
+      const B = BOOSTERS[k], poor = S.gold < B.price;
+      h += `<div class="sb"><span class="pv">${BOOST_ART[k]}</span><span class="tx"><b>${B.name}</b><span>${B.desc}</span></span>` +
+        `<button class="buy${poor ? ' poor' : ''}" type="button" data-buy="b:${k}" aria-label="${B.name}, 황금 도토리 ${B.price}개">${coin}${B.price}</button></div>`;
+    }
+    for (const cat of Object.keys(COS)) {
+      h += `<h3 class="shop-h">${COS[cat].name}</h3><div class="shop-grid">`;
+      for (const it of COS[cat].items) {
+        const key = cat + ':' + it.id, own = S.cos.own.includes(key), on = S.cos[cat] === it.id, poor = !own && S.gold < it.price;
+        const wear = cat === 'hat' || cat === 'neck';
+        const pr = on ? (wear ? '입는 중' : '쓰는 중') : own ? (wear ? '입기' : '쓰기') : `${coin}${it.price}`;
+        h += `<button class="si${own ? ' own' : ''}${on ? ' on' : ''}${poor ? ' poor' : ''}" type="button" data-buy="c:${key}" aria-pressed="${on}">` +
+          `<span class="pv">${cosArt(cat, it)}</span><span class="nm">${it.name}</span><span class="pr">${pr}</span></button>`;
+      }
+      h += '</div>';
+    }
+    h += `<p class="shop-note">황금 도토리 모으는 곳: 광고를 끝까지 보면 1개(하루 ${GOLD.adDay}개까지), 출석 도장 1개(7일째 ${GOLD.att7}개), 메인 퀘스트 한 장 ${GOLD.chapter}개, 종업식 ${GOLD.grad}개, 졸업식 ${GOLD.promote}개. 쓰고 있는 꾸미기를 한 번 더 누르면 원래대로 돌아가요.</p>`;
+    const list = $('#shopList'), top = list.scrollTop;
+    list.innerHTML = h;
+    list.scrollTop = top;
+    // 사기 전에 한 번 더 물어봐요
+    const ask = $('#shopAsk'), it = shopItem(rt.shopPick);
+    ask.hidden = !it;
+    $('#shopClose').hidden = !!it;
+    if (it) {
+      const enough = S.gold >= it.price;
+      $('#shopAskText').textContent = enough ? `${it.name}${it.ga} 황금 도토리 ${it.price}개로 살까요?` : `황금 도토리가 ${it.price - S.gold}개 모자라요.`;
+      $('#shopYes').textContent = enough ? '사기' : '광고 보고 모으기';
+    }
+  }
+  // '파란 야구모자를', '밀짚모자를'처럼 받침에 맞는 조사
+  const eulOf = w => { const c = w.charCodeAt(w.length - 1) - 0xAC00; return c >= 0 && c <= 11171 && c % 28 ? '을' : '를'; };
+  function shopItem(pick) {
+    if (!pick) return null;
+    const [t, a, b] = pick.split(':');
+    if (t === 'b' && BOOSTERS[a]) return { kind: 'b', k: a, name: BOOSTERS[a].name, ga: eulOf(BOOSTERS[a].name), price: BOOSTERS[a].price };
+    const it = t === 'c' && COS[a] && COS[a].items.find(x => x.id === b);
+    return it ? { kind: 'c', cat: a, id: b, name: it.name, ga: eulOf(it.name), price: it.price } : null;
+  }
+  function pickShop(pick) {
+    const it = shopItem(pick);
+    if (!it) return;
+    sfx('tap');
+    if (it.kind === 'c' && S.cos.own.includes(it.cat + ':' + it.id)) {   // 산 꾸미기는 바로 입고 벗어요
+      S.cos[it.cat] = S.cos[it.cat] === it.id ? '' : it.id;
+      rt.shopPick = '';
+      applyCos(); save(); renderShop();
+      const wear = it.cat === 'hat' || it.cat === 'neck';
+      toast(S.cos[it.cat] ? `${it.name}${it.ga} ${wear ? '입혔어요' : '골랐어요'}` : wear ? `${it.name}${it.ga} 벗었어요` : '원래 모습으로 돌렸어요');
+      return;
+    }
+    rt.shopPick = pick;
+    renderShop();
+  }
+  function buyShop() {
+    const it = shopItem(rt.shopPick);
+    if (!it) return;
+    if (S.gold < it.price) { rt.shopPick = ''; shopAd(); return; }
+    S.gold -= it.price; S.st.gspent += it.price;
+    rt.shopPick = '';
+    if (it.kind === 'c') {
+      S.cos.own.push(it.cat + ':' + it.id);
+      S.cos[it.cat] = it.id;
+      applyCos();
+      toast(`${it.name}${it.ga} 샀어요! ${it.cat === 'hat' || it.cat === 'neck' ? '바로 입혀 뒀어요' : '바로 바꿔 뒀어요'}`);
+    } else useBooster(it.k);
+    sfx('quest'); buzz(15);
+    save(); renderShopBtn(); renderShop(); renderHUD(); renderAffordance(); renderDeal();
+  }
+  function useBooster(k) {
+    if (k === 'feast') { S.hd.feastUntil = Math.max(Date.now(), S.hd.feastUntil) + 30 * 60000; toast('특식 데이! 30분 동안 수업료가 2배예요'); }
+    else if (k === 'skip') {
+      const v = rate() * 7200;
+      S.budget += v; earn(v);
+      S.students = Math.min(capacity(), S.students + CFG.enroll * 7200);
+      floatText(180, 40, '+' + fmt(v), 'gold');
+      toast(`2시간을 건너뛰었어요! 도토리 +${fmt(v)}`);
+    } else if (k === 'auto') {
+      S.autoUntil = Math.max(Date.now(), S.autoUntil) + 3600000;
+      toast(S.f.playground >= 1 ? '1시간 동안 떨어진 도토리를 알아서 주워요' : '1시간 동안 떨어진 도토리를 알아서 주워요. 운동장을 지으면 도토리가 떨어져요');
+    }
+  }
+  // 상점 광고: 끝까지 보면 2개 (이때는 광고 덤 1개를 따로 주지 않아요)
+  function shopAd() {
+    goldDay();
+    if (S.gd.shop >= GOLD.shopAd) { shake($('#shopAd')); return; }
+    closeModal($('#mShop'), () => {
+      rt.adNoGold = true;
+      showAd(() => {
+        goldDay(); S.gd.shop += 1;
+        addGold(GOLD.shopAdN);
+        sfx('quest');
+        toast(`황금 도토리 +${GOLD.shopAdN}개를 받았어요`);
+        save();
+        queueModal(() => { openShop(); return true; });
+      }, () => {
+        toast('광고를 끝까지 보지 않아서 황금 도토리가 없어요');
+        queueModal(() => { openShop(); return true; });
+      });
+    });
   }
 
   /* ---------- 출석부 ---------- */
@@ -3424,10 +3749,11 @@ label.srow,button.srow{cursor:pointer}
   }
   function stampAtt() {
     if (!canStamp()) { shake($('#attGo')); return; }
-    const i = S.att.n % 7, r = attValue(i);
+    const i = S.att.n % 7, r = attValue(i), g = i === 6 ? GOLD.att7 : GOLD.att;
     S.att.n += 1; S.att.last = todayStr();
-    if (r.kind === 'dip') { addDip(r.v); toast(`출석 도장 쾅! 수료증 +${r.v}장`); }
-    else { S.budget += r.v; earn(r.v); toast(`출석 도장 쾅! 도토리 +${fmt(r.v)}`); }
+    if (r.kind === 'dip') { addDip(r.v); toast(`출석 도장 쾅! 수료증 +${r.v}장, 황금 도토리 +${g}`); }
+    else { S.budget += r.v; earn(r.v); toast(`출석 도장 쾅! 도토리 +${fmt(r.v)}, 황금 도토리 +${g}`); }
+    addGold(g);
     sfx('quest'); buzz(20);
     renderAtt(i);
     save(); renderHUD(); renderAffordance();
@@ -3577,6 +3903,7 @@ label.srow,button.srow{cursor:pointer}
     S.hd.album = false;
     S.st.grads += 1; S.tg += 1;
     cloudSoon();
+    addGold(GOLD.grad);
     let newcomer = null;
     if (S.p.species < NEWCOMERS.length) { newcomer = NEWCOMERS[S.p.species]; S.p.species += 1; }
     newYear();
@@ -3603,6 +3930,7 @@ label.srow,button.srow{cursor:pointer}
     $('#gradNew').textContent = newcomer
       ? `새 친구 ${newcomer.name}${newcomer.ga} 전학 왔어요! 앞으로 수업료 +5%`
       : '전학 올 친구를 모두 만났어요. 수료증으로 명예 교장실을 고쳐 보세요.';
+    $('#gradNew').textContent += ` 황금 도토리 +${GOLD.grad}개도 받았어요.`;
     openModal($('#mGrad'));
     sfx('bell'); setTimeout(() => sfx('quest'), 900);
     return true;
@@ -3626,6 +3954,7 @@ label.srow,button.srow{cursor:pointer}
     S.hd.album = false;
     S.st.grads += 1;   // 졸업식도 종업식과 함께 행사 횟수로 쳐요
     cloudSoon();
+    addGold(GOLD.promote);
     let newcomer = null;
     if (S.p.species < NEWCOMERS.length) { newcomer = NEWCOMERS[S.p.species]; S.p.species += 1; }
     S.tier += 1; S.tg = 0; S.tdip = 0; S.best = 0;
@@ -3649,7 +3978,7 @@ label.srow,button.srow{cursor:pointer}
     $('#tierArt').innerHTML = `<svg viewBox="-26 -19 52 38" aria-hidden="true">` +
       crew.map((sp, i) => `<g transform="translate(${(i - 1) * 15} ${i === 1 ? -2 : 1}) scale(${i === 1 ? 1.1 : 0.95})">${kidSVG(sp, i)}</g>`).join('') + '</svg>';
     $('#tierFine').textContent = (newcomer ? `새 친구 ${newcomer.name}${newcomer.ga} 함께 왔어요. ` : '') +
-      '새로 생긴 과학실을 지어 보세요. 기금은 졸업 탭의 장학재단에서 써요.';
+      `새로 생긴 과학실을 지어 보세요. 기금은 졸업 탭의 장학재단에서 써요. 졸업 선물로 황금 도토리 +${GOLD.promote}개를 받았어요.`;
     $('#tierOk').textContent = `${T.name} 입학하기`;
     openModal($('#mTier'));
     sfx('bell'); setTimeout(() => sfx('quest'), 900);
@@ -3808,6 +4137,7 @@ label.srow,button.srow{cursor:pointer}
     grant(qReward(q), fromEl, q.rk);
     S.q.m += 1;
     startMain();
+    if (!curMain() || curMain().ch !== q.ch) addGold(GOLD.chapter);   // 한 장을 마치면 황금 도토리
     const unlocked = S.q.m === SUB_UNLOCK;
     const added = fillSubs();
     const nx = curMain();
@@ -4206,7 +4536,7 @@ label.srow,button.srow{cursor:pointer}
     rt.kids.forEach(k => k.g.remove()); rt.kids = [];
     clearDrops(); rt.dropT = 0; rt.floatAcc = 0; rt.floatT = 0; rt.modalQueue = [];
     rt.deal = null; rt.dealT = DEAL.first; rt.yearKey = ''; rt.oakN = -1;
-    syncSettingsUI(); syncKids(true);
+    syncSettingsUI(); applyCos(); renderShopBtn(); syncKids(true);
     renderMap(); renderHUD(); renderAffordance();
     save();
     $('#resetConfirm').hidden = true;
@@ -4291,6 +4621,7 @@ label.srow,button.srow{cursor:pointer}
       if (b.dataset.rank === 'edit') { rt.rankEdit = true; renderRankPanel(); const i = $('#rankName'); if (i) i.focus(); }
       else if (b.dataset.rank === 'leave') leaveRank();
       else if (b.dataset.rank === 'retry') retryCloud();
+      else if (b.dataset.rank === 'toss' && AIT) AIT.openBoard();
     });
     $('#rankJoin').addEventListener('submit', e => {
       e.preventDefault();
@@ -4298,6 +4629,14 @@ label.srow,button.srow{cursor:pointer}
       rt.rankEdit = false;
       joinRank(i ? i.value : '');
     });
+    // 황금 도토리 상점
+    $('#btnShop').addEventListener('click', () => { if (!rt.paused && !rt.modalOpen) { sfx('tap'); openShop(); } });
+    $('#shopClose').addEventListener('click', () => closeModal($('#mShop')));
+    $('[data-close-shop]').addEventListener('click', () => closeModal($('#mShop')));
+    $('#shopList').addEventListener('click', e => { const b = e.target.closest('[data-buy]'); if (b) pickShop(b.dataset.buy); });
+    $('#shopNo').addEventListener('click', () => { rt.shopPick = ''; renderShop(); });
+    $('#shopYes').addEventListener('click', buyShop);
+    $('#shopAd').addEventListener('click', shopAd);
     // 서버 저장: 다른 기기에서 이어하기, 테스트 현황
     $('#optMove').addEventListener('click', () => { sfx('tap'); openMove(); });
     $('#moveMake').addEventListener('click', () => { if (moveLive()) copyMove(); else makeMove(); });
@@ -4423,7 +4762,7 @@ label.srow,button.srow{cursor:pointer}
     $('#btnExit').addEventListener('click', () => { if (!rt.modalOpen) { sfx('tap'); openModal($('#mExit')); } });
     $('#exitNo').addEventListener('click', () => closeModal($('#mExit')));
     $('[data-close-exit]').addEventListener('click', () => closeModal($('#mExit')));
-    $('#exitYes').addEventListener('click', () => closeModal($('#mExit'), closeSchool));
+    $('#exitYes').addEventListener('click', () => closeModal($('#mExit'), () => { if (AIT) { save(); AIT.close(); } else closeSchool(); }));
     $('#reopen').addEventListener('click', reopenSchool);
 
     document.addEventListener('pointerdown', ensureAudio, { capture: true });
@@ -4436,6 +4775,7 @@ label.srow,button.srow{cursor:pointer}
       else if (rt.modalOpen === $('#mDeal')) closeModal($('#mDeal'));
       else if (rt.modalOpen === $('#mMove') && !rt.moveIn) closeModal($('#mMove'));
       else if (rt.modalOpen === $('#mStats')) closeModal($('#mStats'));
+      else if (rt.modalOpen === $('#mShop')) closeModal($('#mShop'));
       else if (rt.sheetKey && !rt.modalOpen) closeSheet();
     });
     document.addEventListener('visibilitychange', () => {
@@ -4486,6 +4826,7 @@ label.srow,button.srow{cursor:pointer}
     renderMap(); renderHUD(); renderAffordance();
     checkGrade();
     renderCloudInfo();
+    applyCos(); renderShopBtn();
     // GitHub 테스트판: 서버에 연결해서 저장을 맞춰요. 이어하기 링크(?move=코드)로 열었으면 연결된 뒤 코드 창을 띄워요
     if (hasCloudBuild()) {
       Cloud.state = 'idle';
@@ -4498,7 +4839,7 @@ label.srow,button.srow{cursor:pointer}
       initCloud();
     }
     if (adopted !== null) setTimeout(() => toast(adopted || '학교를 불러왔어요'), 500);
-    if (S.rank.joined) initRank();   // 랭킹에 참여한 학교는 점수가 오르면 바로 올라가게 미리 연결해요
+    if (S.rank.joined || AIT) initRank();   // 랭킹에 참여한 학교는 점수가 오르면 바로 올라가게 미리 연결해요
     if (!fromHot) {
       if (S.pending > 0) queueModal(showOffline);
       else if (hadSave) applyAway((Date.now() - S.savedAt) / 1000);
@@ -4511,7 +4852,19 @@ label.srow,button.srow{cursor:pointer}
   if (window.claude && window.claude.hot && window.claude.hot.snapshot) {
     try { window.claude.hot.snapshot(() => { if (S) syncMid(); return { save: S }; }); } catch (e) { /* 무시 */ }
   }
-  window.claude?.hot?.ready ? window.claude.hot.ready(start) : start(window.claude?.hot?.data ?? {});
+  if (AIT) {
+    document.documentElement.classList.add('ait');
+    const inset = a => { if (!a) return; const r = document.documentElement.style; r.setProperty('--ait-top', (a.top || 0) + 'px'); r.setProperty('--ait-bottom', (a.bottom || 0) + 'px'); };
+    inset(AIT.safeArea()); AIT.subscribeSafe(inset);
+    AIT.preload();
+    (async () => {
+      try {
+        if (!localStorage.getItem(SAVE_KEY)) { const v = await AIT.storage.getItem(SAVE_KEY); if (v) localStorage.setItem(SAVE_KEY, v); }
+      } catch (e) { /* 없으면 새로 시작해요 */ }
+      start({});
+      AIT.userKey().then(k => { if (k && S) { S.tk = k; save(); } });   // 토스 사용자 키(미니앱마다 고유)를 저장해 둬요
+    })();
+  } else window.claude?.hot?.ready ? window.claude.hot.ready(start) : start(window.claude?.hot?.data ?? {});
 })();
 </script>
 </body>

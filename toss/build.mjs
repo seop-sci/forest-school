@@ -1,0 +1,16 @@
+// 토스 판 만들기: 저장소 맨 위의 index.html(GitHub 판 게임)에서 GitHub 전용 부분(서버 저장 설정, 링크 미리보기)을 빼고,
+// 토스 기능을 이어 주는 bridge.js를 붙여 dist 폴더에 담아요. 그다음 `ait build`가 dist를 .ait 파일로 묶어요.
+import { build } from 'esbuild';
+import fs from 'node:fs';
+
+let html = fs.readFileSync('../index.html', 'utf8');
+const before = html.length;
+html = html.replace(/<!-- github-only -->[\s\S]*?<!-- \/github-only -->\n?/g, '');
+if (html.length === before) throw new Error('index.html에서 GitHub 전용 부분을 찾지 못했어요');
+html = html.replace('<title>', '<script src="bridge.js"></script>\n<title>');
+
+fs.rmSync('dist', { recursive: true, force: true });
+fs.mkdirSync('dist');
+fs.writeFileSync('dist/index.html', html);
+await build({ entryPoints: ['src/bridge.js'], bundle: true, format: 'iife', target: 'es2019', minify: true, outfile: 'dist/bridge.js', logLevel: 'warning' });
+console.log('dist 준비 완료');
