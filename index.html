@@ -490,7 +490,22 @@ label.srow,button.srow{cursor:pointer}
 .fallfx i{position:absolute;top:-4%;width:7px;height:5px;border-radius:70% 0 70% 0;background:#F5B3C6;opacity:.9;animation:leafFall linear infinite}
 .fallfx.snow i{width:5px;height:5px;border-radius:50%;background:#FFFFFF;opacity:.9;box-shadow:0 0 2px rgba(120,140,160,.5)}
 @keyframes leafFall{0%{top:-4%;transform:translateX(0) rotate(0)}50%{transform:translateX(var(--dx)) rotate(160deg)}100%{top:104%;transform:translateX(0) rotate(320deg)}}
-@media (prefers-reduced-motion: reduce){.fallfx i{animation:none;top:var(--y)}}
+.fallfx.leaf i{width:7px;height:6px;border-radius:60% 10% 60% 10%;background:#E3873A}
+.fallfx.leaf i:nth-child(3n){background:#C8452F} .fallfx.leaf i:nth-child(3n+1){background:#F0B04A}
+.fallfx.star i{top:var(--y);width:3px;height:3px;border-radius:50%;background:#FFE38A;box-shadow:0 0 4px #FFE38A;animation:twinkle ease-in-out infinite alternate}
+.fallfx.star i:nth-child(2n){background:#FFFFFF;box-shadow:0 0 4px #9FE7FF}
+@keyframes twinkle{from{opacity:.15}to{opacity:1}}
+.th-bulb,.th-twinkle{animation:twinkle 1.4s ease-in-out infinite alternate}
+.th-bulb.d1,.th-twinkle.d1{animation-delay:-.5s} .th-bulb.d2,.th-twinkle.d2{animation-delay:-1s}
+.th-deco{pointer-events:none}
+.th-card{margin:0 0 10px;padding:10px 10px 10px;border-radius:16px;background:color-mix(in srgb, var(--card) 55%, var(--bg))}
+.th-card.done{box-shadow:inset 0 0 0 2px var(--accent)}
+.th-top{display:flex;align-items:center;justify-content:space-between;gap:8px;margin:0 2px 2px}
+.th-top b{font-family:var(--font-display);font-weight:400;font-size:16px;color:var(--ink)}
+.th-prog{padding:2px 9px;border-radius:999px;background:var(--chip-bg);color:var(--chip-ink);font-size:12.5px;font-variant-numeric:tabular-nums}
+.th-card.done .th-prog{background:var(--accent);color:var(--accent-ink)}
+.th-bonus{margin:0 2px 8px;font-size:12.5px;color:var(--muted)}
+@media (prefers-reduced-motion: reduce){.fallfx i{animation:none;top:var(--y)}.th-bulb,.th-twinkle{animation:none}}
 .shop-panel{text-align:center}
 .shop-panel h2{text-align:left}
 .shop-panel .shop-scroll{overflow:visible}
@@ -1869,7 +1884,7 @@ html.ait .app{padding-top:calc(10px + var(--ait-top, 0px));padding-bottom:var(--
     ad: { day: '', n: 0 },
     u: { boost: false, dev: false },
     units: 'ko',
-    gold: 5, gd: { day: '', n: 0, shop: 0 }, cos: { own: [], hat: '', neck: '', roof: '', board: '' }, autoUntil: 0,
+    gold: 5, gd: { day: '', n: 0, shop: 0 }, cos: { own: [], hat: '', neck: '', roof: '', board: '', th: { bg: '', classroom: '', cafeteria: '', library: '', science: '', playground: '' } }, autoUntil: 0,
     rank: { name: '', joined: false, sent: -1, by: '' },
     q: freshQ()
   });
@@ -1930,6 +1945,8 @@ html.ait .app{padding-top:calc(10px + var(--ait-top, 0px));padding-bottom:var(--
     if (d.cos && typeof d.cos === 'object') {
       s.cos.own = Array.isArray(d.cos.own) ? [...new Set(d.cos.own.filter(id => typeof id === 'string' && COS_IDS.has(id)))] : [];
       for (const k of Object.keys(COS)) { const v = d.cos[k]; s.cos[k] = typeof v === 'string' && s.cos.own.includes(k + ':' + v) ? v : ''; }
+      const th = d.cos.th && typeof d.cos.th === 'object' ? d.cos.th : {};
+      for (const [slot] of TH_SLOTS) { const v = th[slot]; s.cos.th[slot] = typeof v === 'string' && s.cos.own.includes(`th:${v}:${slot}`) ? v : ''; }
     }
     s.autoUntil = Math.min(num(d.autoUntil, 0, 0), Date.now() + 3 * 3600000);
     if (typeof d.tk === 'string') s.tk = d.tk.slice(0, 200);
@@ -2006,7 +2023,7 @@ html.ait .app{padding-top:calc(10px + var(--ait-top, 0px));padding-bottom:var(--
   const rep = () => repOf(S);
   // 종업식으로 남는 배수: 장학금은 레벨마다 1.3배씩 곱해지고, 전학생은 한 명마다 +5%
   const legacyMult = () => Math.pow(1.3, S.p.perk.schol) * (1 + 0.05 * S.p.species) * Math.pow(2, S.fp.schol);
-  const tuitionMult = () => (1 + 0.2 * S.f.cafeteria) * (1 + 0.15 * S.t.squirrel) * legacyMult();
+  const tuitionMult = () => (1 + 0.2 * S.f.cafeteria) * (1 + 0.15 * S.t.squirrel) * legacyMult() * setBonusMult();
   const feastOn = () => Date.now() < S.hd.feastUntil;
   const rate = () => Math.min(S.students, capacity()) * CFG.base * tuitionMult() * Math.pow(CFG.gradeMult, S.grade) * incomeScale() * (feastOn() ? 2 : 1);
   const offlineEff = () => Math.min(1, 0.3 + 0.15 * S.t.owl);
@@ -3669,7 +3686,7 @@ html.ait .app{padding-top:calc(10px + var(--ait-top, 0px));padding-bottom:var(--
   /* ---------- 황금 도토리와 꾸미기 상점 ----------
      황금 도토리는 돈으로 사지 않고 모으기만 해요: 광고를 볼 때마다 1개(하루 10개까지), 상점 광고 2개(하루 5번),
      출석 도장 1개(7일째 5개), 메인 퀘스트 한 장 3개, 종업식 2개, 졸업식 10개.
-     쓰는 곳은 꾸미기(계속 남아요)와 부스터(한 번 쓰면 끝나요). 뽑기 없이 정해진 값으로만 팔아요.
+     쓰는 곳은 꾸미기와 테마 세트(계속 남아요), 부스터(1회 사용 가능). 뽑기 없이 정해진 값으로만 팔아요.
      토스 미니앱에서는 광고 그룹의 보상 이름을 '황금 도토리', 수량을 1로 맞춰 두면 광고 화면에도 똑같이 보여요. */
   const GOLD = { adDay: 10, shopAd: 5, shopAdN: 2, att: 1, att7: 5, chapter: 3, grad: 2, promote: 10 };
   const HATS = {
@@ -3696,6 +3713,154 @@ html.ait .app{padding-top:calc(10px + var(--ait-top, 0px));padding-bottom:var(--
       { id: 'wood', name: '나무 칠판', price: 10, c: '#4A3526' }] }
   };
   const COS_IDS = new Set(Object.keys(COS).flatMap(k => COS[k].items.map(it => k + ':' + it.id)));
+  /* 테마 세트: 테마마다 배경, 교실, 급식실, 도서관, 과학실, 운동장을 따로 사서 꾸며요.
+     여섯 개를 모두 모으면 세트 효과로 수업료가 5% 올라요 (세트마다 더해져요).
+     색은 건물 그룹에 CSS 변수로 덮어쓰고, 처마에는 테마 장식(가랜드, 전구, 고드름...)을 달아요 */
+  const TH_SLOTS = [['bg', '배경'], ['classroom', '교실'], ['cafeteria', '급식실'], ['library', '도서관'], ['science', '과학실'], ['playground', '운동장']];
+  const TH_SET_BONUS = 0.05;
+  const THEMES = [
+    { id: 'spring', name: '봄 벚꽃', price: 10, bgPrice: 15, fx: 'petal', motif: 'flowers', deco: ['#F5B3C6', '#FFFFFF', '#E796AE'],
+      bg: { '--grass': '#D3E6B2', '--grass-deep': '#C1DA9A', '--leaf-1': '#F2B8C9', '--leaf-2': '#E89BB3', '--leaf-3': '#F7D3DE', '--path': '#F2E4CC' },
+      bld: { '--roof': '#E796AE', '--roof-edge': '#C7758D', '--roof-2': '#F0A9BF', '--roof-k': '#E796AE', '--wall': '#FFF5F7', '--wall-2': '#F5DCE3', '--awning': '#F7C2D1', '--awning-2': '#FFFFFF' },
+      lib: { '--leaf-1': '#F2B8C9', '--leaf-2': '#E594AD', '--leaf-3': '#F9D7E1' }, play: { '--field': '#CBE3A4', '--track': '#E8A6B9' } },
+    { id: 'summer', name: '여름 바다', price: 10, bgPrice: 15, fx: '', motif: 'bunting', deco: ['#3E8FC2', '#FFFFFF', '#F3C04B'],
+      bg: { '--grass': '#BFE3C0', '--grass-deep': '#A9D7B0', '--leaf-1': '#5FB07A', '--leaf-2': '#3F9667', '--leaf-3': '#86C98F', '--path': '#F4E3B5' },
+      bld: { '--roof': '#3E8FC2', '--roof-edge': '#2C6F9A', '--roof-2': '#5BB3D9', '--roof-k': '#3E8FC2', '--wall': '#FFFFFF', '--wall-2': '#E3F1F7', '--awning': '#5BB3D9', '--awning-2': '#FFFFFF', '--window': '#BDEBFA' },
+      lib: { '--leaf-1': '#4FB37E', '--leaf-2': '#2F8F62', '--leaf-3': '#7FCC92', '--trunk': '#9A7048' }, play: { '--field': '#F2DFA6', '--track': '#4FB6C9' } },
+    { id: 'autumn', name: '가을 단풍', price: 10, bgPrice: 15, fx: 'leaf', motif: 'leaves', deco: ['#E3873A', '#C8452F', '#F3C04B'],
+      bg: { '--grass': '#E2D8A4', '--grass-deep': '#D6C686', '--leaf-1': '#E3873A', '--leaf-2': '#C8452F', '--leaf-3': '#F0B04A', '--path': '#EBD3A6' },
+      bld: { '--roof': '#C8642F', '--roof-edge': '#9C4A20', '--roof-2': '#D98A3D', '--roof-k': '#C8642F', '--wall': '#FBEBD3', '--wall-2': '#F1D6AE', '--awning': '#E3873A', '--awning-2': '#FBEBD3' },
+      lib: { '--leaf-1': '#E3873A', '--leaf-2': '#C8452F', '--leaf-3': '#F0B04A' }, play: { '--field': '#D9CF8E', '--track': '#C8642F' } },
+    { id: 'winter', name: '겨울 눈꽃', price: 12, bgPrice: 18, fx: 'snow', motif: 'icicles', deco: ['#FFFFFF', '#DDEEFB', '#B9D7EE'],
+      bg: { '--grass': '#E9F0F4', '--grass-deep': '#D8E4EC', '--leaf-1': '#B9D3CF', '--leaf-2': '#8FB5B0', '--leaf-3': '#E4EEF0', '--path': '#F7FAFC' },
+      bld: { '--roof': '#EEF3F7', '--roof-edge': '#B5C3CF', '--roof-2': '#DCE7EF', '--roof-k': '#EEF3F7', '--wall': '#F6F1E8', '--wall-2': '#E5DCCB', '--awning': '#9DC3E3', '--awning-2': '#FFFFFF' },
+      lib: { '--leaf-1': '#E9F1F2', '--leaf-2': '#B6CFCB', '--leaf-3': '#FFFFFF' }, play: { '--field': '#F2F6F9', '--track': '#A9C6DD' } },
+    { id: 'xmas', name: '크리스마스', price: 14, bgPrice: 20, fx: 'snow', motif: 'lights', deco: ['#E04848', '#F3C04B', '#3FA45B'],
+      bg: { '--grass': '#E4EEE6', '--grass-deep': '#CFE0D3', '--leaf-1': '#2F7D4A', '--leaf-2': '#1F6038', '--leaf-3': '#3E9459', '--path': '#F8F3EA' },
+      bld: { '--roof': '#B8322F', '--roof-edge': '#8E2321', '--roof-2': '#2F7D4A', '--roof-k': '#B8322F', '--wall': '#FBF3E6', '--wall-2': '#EEDDC2', '--awning': '#C93A35', '--awning-2': '#FFFFFF' },
+      lib: { '--leaf-1': '#2F7D4A', '--leaf-2': '#1F6038', '--leaf-3': '#3E9459' }, play: { '--field': '#F4F7F5', '--track': '#C93A35' } },
+    { id: 'space', name: '우주 탐험', price: 16, bgPrice: 24, fx: 'star', motif: 'stars', deco: ['#FFE38A', '#9FE7FF', '#C9B6FF'],
+      bg: { '--grass': '#26305A', '--grass-deep': '#1D2549', '--leaf-1': '#5C4FA8', '--leaf-2': '#3E3486', '--leaf-3': '#7E70C9', '--path': '#4A5385' },
+      bld: { '--roof': '#5B4FA8', '--roof-edge': '#3E3486', '--roof-2': '#7E70C9', '--roof-k': '#5B4FA8', '--wall': '#DCE2F2', '--wall-2': '#B9C2DE', '--awning': '#7E70C9', '--awning-2': '#DCE2F2', '--window': '#9FE7FF' },
+      lib: { '--leaf-1': '#5C4FA8', '--leaf-2': '#3E3486', '--leaf-3': '#8E80D9', '--trunk': '#6D6A8C' }, play: { '--field': '#3A4677', '--track': '#8C7BD6' } },
+    { id: 'retro', name: '레트로 70', price: 14, bgPrice: 20, fx: '', motif: 'bunting', deco: ['#D9813B', '#2E8B88', '#F3C04B'],
+      bg: { '--grass': '#D9D6A2', '--grass-deep': '#C9C484', '--leaf-1': '#8DA34A', '--leaf-2': '#6E8636', '--leaf-3': '#B0BF63', '--path': '#EBD7AE' },
+      bld: { '--roof': '#D9813B', '--roof-edge': '#A85E26', '--roof-2': '#2E8B88', '--roof-k': '#D9813B', '--wall': '#F3E0B5', '--wall-2': '#E2C88E', '--awning': '#2E8B88', '--awning-2': '#F3C04B', '--window': '#BFE3D0' },
+      lib: { '--leaf-1': '#8DA34A', '--leaf-2': '#6E8636', '--leaf-3': '#C9A93E' }, play: { '--field': '#C9C27A', '--track': '#D9813B' } }
+  ];
+  const THEME = Object.fromEntries(THEMES.map(t => [t.id, t]));
+  const TH_IDS = THEMES.flatMap(t => TH_SLOTS.map(([s]) => `th:${t.id}:${s}`));
+  // 처마 자리 (건물마다 장식을 다는 선): x1, x2, y
+  const TH_EAVES = { classroom: [118, 242, 66], cafeteria: [246, 324, 180], science: [266, 332, 45], playground: [70, 260, 292] };
+  const thPrice = (t, slot) => slot === 'bg' ? t.bgPrice : t.price;
+  const thOwn = (t, slot) => S.cos.own.includes(`th:${t}:${slot}`);
+  const thCount = t => TH_SLOTS.filter(([s]) => thOwn(t, s)).length;
+  function thSetsDone() { return THEMES.filter(t => thCount(t.id) === TH_SLOTS.length).length; }
+  const setBonusMult = () => 1 + TH_SET_BONUS * (rt.thSets || 0);
+  // 처마 장식
+  function thMotif(t, x1, x2, y) {
+    const [a, b, c] = t.deco, n = Math.max(4, Math.round((x2 - x1) / 13)), step = (x2 - x1) / n;
+    let h = '';
+    if (t.motif === 'bunting' || t.motif === 'flowers' || t.motif === 'leaves') {
+      h += `<path d="M${x1} ${y} Q${(x1 + x2) / 2} ${y + 6} ${x2} ${y}" fill="none" stroke="#6E4A2E" stroke-width="0.8" opacity=".7"/>`;
+      for (let i = 0; i < n; i++) {
+        const x = x1 + step * (i + 0.5), yy = y + 6 * (1 - Math.pow((x - (x1 + x2) / 2) / ((x2 - x1) / 2), 2)) * 0.95;
+        const col = [a, b, c][i % 3];
+        if (t.motif === 'bunting') h += `<path d="M${(x - 3.6).toFixed(1)} ${yy.toFixed(1)} h7.2 l-3.6 6.4 z" fill="${col}"/>`;
+        else if (t.motif === 'flowers') h += `<g transform="translate(${x.toFixed(1)} ${(yy + 2.4).toFixed(1)})" fill="${col}"><circle cx="0" cy="-1.7" r="1.5"/><circle cx="1.6" cy="-0.5" r="1.5"/><circle cx="1" cy="1.4" r="1.5"/><circle cx="-1" cy="1.4" r="1.5"/><circle cx="-1.6" cy="-0.5" r="1.5"/><circle r="0.9" fill="#F3C04B"/></g>`;
+        else h += `<path transform="translate(${x.toFixed(1)} ${(yy + 3).toFixed(1)}) rotate(${(i * 37) % 60 - 30})" d="M0 -3.2 L1 -1 L3 -1.6 L2 0.4 L3.2 2 L0.8 1.6 L0 3.4 L-0.8 1.6 L-3.2 2 L-2 0.4 L-3 -1.6 L-1 -1 Z" fill="${col}"/>`;
+      }
+    } else if (t.motif === 'lights') {
+      h += `<path d="M${x1} ${y} Q${(x1 + x2) / 2} ${y + 6} ${x2} ${y}" fill="none" stroke="#2F3A2A" stroke-width="0.9"/>`;
+      for (let i = 0; i < n; i++) {
+        const x = x1 + step * (i + 0.5), yy = y + 6 * (1 - Math.pow((x - (x1 + x2) / 2) / ((x2 - x1) / 2), 2)) * 0.95;
+        h += `<ellipse class="th-bulb d${i % 3}" cx="${x.toFixed(1)}" cy="${(yy + 2.6).toFixed(1)}" rx="1.7" ry="2.4" fill="${[a, b, c][i % 3]}"/>`;
+      }
+    } else if (t.motif === 'icicles') {
+      h += `<path d="M${x1} ${y} H${x2}" stroke="#FFFFFF" stroke-width="3" stroke-linecap="round"/>`;
+      for (let i = 0; i < n; i++) {
+        const x = x1 + step * (i + 0.5), len = 3 + (i % 3) * 1.6;
+        h += `<path d="M${(x - 1.6).toFixed(1)} ${y + 1} L${x.toFixed(1)} ${(y + 1 + len).toFixed(1)} L${(x + 1.6).toFixed(1)} ${y + 1} Z" fill="${i % 2 ? b : a}" opacity=".95"/>`;
+      }
+    } else if (t.motif === 'stars') {
+      for (let i = 0; i < n; i++) {
+        const x = x1 + step * (i + 0.5), yy = y + 2 + (i % 2) * 4;
+        h += `<path class="th-twinkle d${i % 3}" transform="translate(${x.toFixed(1)} ${yy})" d="M0 -3 L0.8 -0.8 L3 0 L0.8 0.8 L0 3 L-0.8 0.8 L-3 0 L-0.8 -0.8 Z" fill="${[a, b, c][i % 3]}"/>`;
+      }
+    }
+    return h;
+  }
+  // 도서관 나무에는 장식을 열매처럼 달아요
+  function thTree(t) {
+    const pts = [[52, 150], [72, 124], [96, 146], [62, 172], [88, 168], [76, 142], [104, 160], [46, 166]];
+    const [a, b, c] = t.deco;
+    return pts.map(([x, y], i) => {
+      const col = [a, b, c][i % 3];
+      if (t.motif === 'lights') return `<circle class="th-bulb d${i % 3}" cx="${x}" cy="${y}" r="2.2" fill="${col}"/>`;
+      if (t.motif === 'stars') return `<path class="th-twinkle d${i % 3}" transform="translate(${x} ${y})" d="M0 -3 L0.8 -0.8 L3 0 L0.8 0.8 L0 3 L-0.8 0.8 L-3 0 L-0.8 -0.8 Z" fill="${col}"/>`;
+      if (t.motif === 'icicles') return `<circle cx="${x}" cy="${y}" r="2.4" fill="#FFFFFF" opacity=".9"/>`;
+      if (t.motif === 'bunting') return `<circle cx="${x}" cy="${y}" r="2" fill="${col}"/>`;
+      return `<circle cx="${x}" cy="${y}" r="2.3" fill="${col}"/>`;
+    }).join('');
+  }
+  function applyThemes() {
+    const map = $('#map');
+    const bgT = THEME[S.cos.th.bg];
+    map.removeAttribute('style');
+    if (bgT) for (const [k, v] of Object.entries(bgT.bg)) map.style.setProperty(k, v);
+    for (const [slot] of TH_SLOTS) {
+      if (slot === 'bg') continue;
+      const g = $('#b-' + slot), t = THEME[S.cos.th[slot]];
+      g.removeAttribute('style');
+      let deco = g.querySelector('.th-deco');
+      if (!deco) {
+        deco = document.createElementNS(NS, 'g');
+        deco.setAttribute('class', 'th-deco');
+        deco.setAttribute('aria-hidden', 'true');
+        g.querySelector('.built').appendChild(deco);
+      }
+      deco.innerHTML = '';
+      if (!t) continue;
+      const vars = slot === 'library' ? t.lib : slot === 'playground' ? Object.assign({}, t.bld, t.play) : t.bld;
+      for (const [k, v] of Object.entries(vars)) g.style.setProperty(k, v);
+      deco.innerHTML = slot === 'library' ? thTree(t) : thMotif(t, ...TH_EAVES[slot]);
+    }
+    rt.thSets = thSetsDone();
+  }
+  // 상점 그림: 칸마다 작은 건물 모양을 그 테마 색으로 그려요
+  function thArt(t, slot) {
+    const B = t.bld, BG = t.bg, P = t.play, L = t.lib;
+    const ground = `<rect x="0" y="0" width="40" height="40" fill="${BG['--grass']}"/>`;
+    if (slot === 'bg') {
+      const dots = t.fx === 'star' ? '<circle cx="8" cy="7" r="1" fill="#FFE38A"/><circle cx="30" cy="10" r="1.2" fill="#fff"/><circle cx="20" cy="5" r=".8" fill="#9FE7FF"/>'
+        : t.fx === 'snow' ? '<circle cx="8" cy="8" r="1.3" fill="#fff"/><circle cx="31" cy="6" r="1.2" fill="#fff"/><circle cx="22" cy="12" r="1" fill="#fff"/>'
+        : t.fx === 'petal' ? '<circle cx="8" cy="9" r="1.3" fill="#F5B3C6"/><circle cx="30" cy="7" r="1.2" fill="#F5B3C6"/>'
+        : t.fx === 'leaf' ? '<circle cx="9" cy="8" r="1.4" fill="#E3873A"/><circle cx="29" cy="9" r="1.3" fill="#C8452F"/>' : '';
+      return `<svg viewBox="0 0 40 40" aria-hidden="true">${ground}<ellipse cx="12" cy="31" rx="10" ry="4" fill="${BG['--grass-deep']}"/><path d="M20 40 Q22 28 30 22" stroke="${BG['--path']}" stroke-width="4" fill="none"/><circle cx="31" cy="25" r="6" fill="${BG['--leaf-2']}"/><circle cx="28" cy="22" r="4" fill="${BG['--leaf-1']}"/><circle cx="9" cy="20" r="5" fill="${BG['--leaf-3']}"/>${dots}</svg>`;
+    }
+    if (slot === 'library') return `<svg viewBox="0 0 40 40" aria-hidden="true">${ground}<rect x="16" y="22" width="8" height="13" rx="2" fill="${L['--trunk'] || '#8A5D3B'}"/><circle cx="20" cy="17" r="11" fill="${L['--leaf-2']}"/><circle cx="14" cy="20" r="6" fill="${L['--leaf-1']}"/><circle cx="25" cy="13" r="5" fill="${L['--leaf-3']}"/><circle cx="16" cy="12" r="1.4" fill="${t.deco[0]}"/><circle cx="25" cy="20" r="1.4" fill="${t.deco[2]}"/></svg>`;
+    if (slot === 'playground') return `<svg viewBox="0 0 40 40" aria-hidden="true">${ground}<ellipse cx="20" cy="24" rx="16" ry="10" fill="${P['--track']}"/><ellipse cx="20" cy="24" rx="12" ry="7" fill="${P['--field']}"/><path d="M8 11 H32" stroke="#6E4A2E" stroke-width=".7"/><path d="M10 11 h3 l-1.5 3z M16 11 h3 l-1.5 3z M22 11 h3 l-1.5 3z M28 11 h3 l-1.5 3z" fill="${t.deco[0]}"/></svg>`;
+    if (slot === 'cafeteria') return `<svg viewBox="0 0 40 40" aria-hidden="true">${ground}<rect x="9" y="17" width="22" height="17" fill="${B['--wall']}"/><path d="M6 18 H34 L31 11 H9 Z" fill="${B['--roof-2']}"/><rect x="9" y="21" width="22" height="3" fill="${B['--awning']}"/><path d="M11 21h2v3h-2zM16 21h2v3h-2zM21 21h2v3h-2zM26 21h2v3h-2z" fill="${B['--awning-2']}"/><rect x="18" y="27" width="5" height="7" fill="#8A5D3B"/></svg>`;
+    if (slot === 'science') return `<svg viewBox="0 0 40 40" aria-hidden="true">${ground}<path d="M12 19 Q12 9 20 9 Q28 9 28 19 Z" fill="${B['--roof-2']}"/><rect x="10" y="19" width="20" height="15" rx="1.5" fill="${B['--wall']}"/><rect x="9" y="18" width="22" height="2.4" rx="1" fill="${B['--roof-edge']}"/><circle cx="20" cy="25" r="3" fill="${B['--window'] || '#BEE0EA'}"/><path d="M28 11 l5 -4" stroke="#6E4A2E" stroke-width="1"/></svg>`;
+    return `<svg viewBox="0 0 40 40" aria-hidden="true">${ground}<rect x="9" y="19" width="22" height="15" fill="${B['--wall']}"/><path d="M5 21 L20 8 L35 21 Z" fill="${B['--roof']}"/><rect x="6" y="20" width="28" height="2" fill="${B['--roof-edge']}"/><rect x="12" y="24" width="5" height="4" rx="1" fill="${B['--window'] || '#BEE0EA'}"/><rect x="23" y="24" width="5" height="4" rx="1" fill="${B['--window'] || '#BEE0EA'}"/><rect x="18" y="27" width="4" height="7" fill="#8A5D3B"/><path d="M9 21 Q20 25 31 21" stroke="${t.deco[0]}" stroke-width="1.4" fill="none"/></svg>`;
+  }
+  function renderThemes(coin) {
+    let h = `<h3 class="shop-h">테마 세트 <small>여섯 개를 모두 모으면 수업료 +${Math.round(TH_SET_BONUS * 100)}%</small></h3>`;
+    for (const t of THEMES) {
+      const n = thCount(t.id), done = n === TH_SLOTS.length;
+      h += `<div class="th-card${done ? ' done' : ''}"><div class="th-top"><b>${t.name}</b><span class="th-prog">${done ? '세트 완성' : n + '/' + TH_SLOTS.length}</span></div>` +
+        `<p class="th-bonus">${done ? `세트 효과: 수업료 +${Math.round(TH_SET_BONUS * 100)}% 적용 중` : `모두 모으면 수업료 +${Math.round(TH_SET_BONUS * 100)}%`}</p><div class="shop-grid">`;
+      for (const [slot, sname] of TH_SLOTS) {
+        const own = thOwn(t.id, slot), on = S.cos.th[slot] === t.id, price = thPrice(t, slot), poor = !own && S.gold < price;
+        const pr = on ? '쓰는 중' : own ? '쓰기' : `${coin}${price}`;
+        h += `<button class="si${own ? ' own' : ''}${on ? ' on' : ''}${poor ? ' poor' : ''}" type="button" data-buy="t:${t.id}:${slot}" aria-pressed="${on}" aria-label="${t.name} ${sname}">` +
+          `<span class="pv">${thArt(t, slot)}</span><span class="nm">${sname}</span><span class="pr">${pr}</span></button>`;
+      }
+      h += '</div></div>';
+    }
+    return h;
+  }
+  TH_IDS.forEach(id => COS_IDS.add(id));
   const BOOSTERS = {
     feast: { name: '특식 데이 30분', desc: '30분 동안 수업료가 2배예요', price: 3 },
     skip: { name: '2시간 건너뛰기', desc: '수업료 2시간치를 바로 받아요', price: 5 },
@@ -3729,17 +3894,19 @@ html.ait .app{padding-top:calc(10px + var(--ait-top, 0px));padding-bottom:var(--
     const map = $('#map');
     ['blue', 'sakura', 'snow'].forEach(r => map.classList.toggle('rs-' + r, S.cos.roof === r));
     ['navy', 'plum', 'wood'].forEach(b => $('.board').classList.toggle('bt-' + b, S.cos.board === b));
-    const fx = $('#fallFx'), kind = S.cos.roof === 'sakura' ? 'petal' : S.cos.roof === 'snow' ? 'snow' : '';
+    applyThemes();
+    const bgT = THEME[S.cos.th.bg];
+    const fx = $('#fallFx'), kind = bgT ? bgT.fx : S.cos.roof === 'sakura' ? 'petal' : S.cos.roof === 'snow' ? 'snow' : '';
     if (fx.dataset.kind !== kind) {
       fx.dataset.kind = kind;
       fx.textContent = '';
-      fx.className = 'fallfx' + (kind === 'snow' ? ' snow' : '');
+      fx.className = 'fallfx' + (kind && kind !== 'petal' ? ' ' + kind : '');
       for (let i = 0; kind && i < 16; i++) {
         const e = document.createElement('i');
         e.style.left = (Math.random() * 100).toFixed(1) + '%';
         e.style.setProperty('--dx', (Math.random() * 40 - 20).toFixed(0) + 'px');
         e.style.setProperty('--y', (Math.random() * 96).toFixed(1) + '%');
-        e.style.animationDuration = (7 + Math.random() * 6).toFixed(1) + 's';
+        e.style.animationDuration = kind === 'star' ? (1.2 + Math.random() * 2).toFixed(1) + 's' : (7 + Math.random() * 6).toFixed(1) + 's';
         e.style.animationDelay = (-Math.random() * 12).toFixed(1) + 's';
         fx.appendChild(e);
       }
@@ -3770,12 +3937,13 @@ html.ait .app{padding-top:calc(10px + var(--ait-top, 0px));padding-bottom:var(--
     $('#shopAd').setAttribute('aria-disabled', left > 0 ? 'false' : 'true');
     $('#shopAdLeft').textContent = left > 0 ? `오늘 ${left}번 더 받을 수 있어요` : '오늘 상점 광고를 모두 봤어요. 내일 다시 열려요';
     const coin = `<svg viewBox="-8 -11 16 20" aria-hidden="true">${GOLD_ICON.slice(GOLD_ICON.indexOf('>') + 1, -6)}</svg>`;
-    let h = '<h3 class="shop-h">부스터 <small>한 번 쓰면 끝나요</small></h3>';
+    let h = '<h3 class="shop-h">부스터 <small>(1회 사용 가능)</small></h3>';
     for (const k of Object.keys(BOOSTERS)) {
       const B = BOOSTERS[k], poor = S.gold < B.price;
       h += `<div class="sb"><span class="pv">${BOOST_ART[k]}</span><span class="tx"><b>${B.name}</b><span>${B.desc}</span></span>` +
         `<button class="buy${poor ? ' poor' : ''}" type="button" data-buy="b:${k}" aria-label="${B.name}, 황금 도토리 ${B.price}개">${coin}${B.price}</button></div>`;
     }
+    h += renderThemes(coin);
     for (const cat of Object.keys(COS)) {
       h += `<h3 class="shop-h">${COS[cat].name}</h3><div class="shop-grid">`;
       for (const it of COS[cat].items) {
@@ -3787,7 +3955,6 @@ html.ait .app{padding-top:calc(10px + var(--ait-top, 0px));padding-bottom:var(--
       }
       h += '</div>';
     }
-    h += `<p class="shop-note">황금 도토리 모으는 곳: 광고를 끝까지 보면 1개(하루 ${GOLD.adDay}개까지), 출석 도장 1개(7일째 ${GOLD.att7}개), 메인 퀘스트 한 장 ${GOLD.chapter}개, 종업식 ${GOLD.grad}개, 졸업식 ${GOLD.promote}개. 쓰고 있는 꾸미기를 한 번 더 누르면 원래대로 돌아가요.</p>`;
     const list = $('#shopList'), top = list.scrollTop;
     list.innerHTML = h;
     list.scrollTop = top;
@@ -3806,6 +3973,10 @@ html.ait .app{padding-top:calc(10px + var(--ait-top, 0px));padding-bottom:var(--
     if (!pick) return null;
     const [t, a, b] = pick.split(':');
     if (t === 'b' && BOOSTERS[a]) return { kind: 'b', k: a, name: BOOSTERS[a].name, ga: eulOf(BOOSTERS[a].name), price: BOOSTERS[a].price };
+    if (t === 't' && THEME[a] && TH_SLOTS.some(([x]) => x === b)) {
+      const nm = `${THEME[a].name} ${TH_SLOTS.find(([x]) => x === b)[1]}`;
+      return { kind: 't', th: a, slot: b, name: nm, ga: eulOf(nm), price: thPrice(THEME[a], b) };
+    }
     const it = t === 'c' && COS[a] && COS[a].items.find(x => x.id === b);
     return it ? { kind: 'c', cat: a, id: b, name: it.name, ga: eulOf(it.name), price: it.price } : null;
   }
@@ -3813,6 +3984,13 @@ html.ait .app{padding-top:calc(10px + var(--ait-top, 0px));padding-bottom:var(--
     const it = shopItem(pick);
     if (!it) return;
     sfx('tap');
+    if (it.kind === 't' && thOwn(it.th, it.slot)) {   // 산 테마는 칸마다 바로 바꾸고 되돌려요
+      S.cos.th[it.slot] = S.cos.th[it.slot] === it.th ? '' : it.th;
+      rt.shopPick = '';
+      applyCos(); save(); renderShop();
+      toast(S.cos.th[it.slot] ? `${it.name}${it.ga} 골랐어요` : '원래 모습으로 돌렸어요');
+      return;
+    }
     if (it.kind === 'c' && S.cos.own.includes(it.cat + ':' + it.id)) {   // 산 꾸미기는 바로 입고 벗어요
       S.cos[it.cat] = S.cos[it.cat] === it.id ? '' : it.id;
       rt.shopPick = '';
@@ -3835,6 +4013,13 @@ html.ait .app{padding-top:calc(10px + var(--ait-top, 0px));padding-bottom:var(--
       S.cos[it.cat] = it.id;
       applyCos();
       toast(`${it.name}${it.ga} 샀어요! ${it.cat === 'hat' || it.cat === 'neck' ? '바로 입혀 뒀어요' : '바로 바꿔 뒀어요'}`);
+    } else if (it.kind === 't') {
+      S.cos.own.push(`th:${it.th}:${it.slot}`);
+      S.cos.th[it.slot] = it.th;
+      applyCos();
+      const T = THEME[it.th];
+      if (thCount(it.th) === TH_SLOTS.length) toast(`${T.name} 세트 완성! 수업료가 ${Math.round(TH_SET_BONUS * 100)}% 올랐어요`);
+      else toast(`${it.name}${it.ga} 샀어요! ${T.name} 세트 ${thCount(it.th)}/${TH_SLOTS.length}`);
     } else useBooster(it.k);
     sfx('quest'); buzz(15);
     save(); renderShopBtn(); renderShop(); renderHUD(); renderAffordance(); renderDeal();
