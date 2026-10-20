@@ -23,6 +23,7 @@ jobs:
         with:
           distribution: temurin
           java-version: 21
+      - uses: android-actions/setup-android@v3
       - name: 웹 게임을 앱 안에 넣기
         working-directory: app
         run: |
@@ -45,11 +46,13 @@ jobs:
           ANDROID_KEYSTORE_PASSWORD: ${{ secrets.ANDROID_KEYSTORE_PASSWORD }}
         run: |
           chmod +x gradlew
-          if [ -n "$ANDROID_KEYSTORE_PATH" ]; then
-            ./gradlew --no-daemon bundleRelease assembleRelease
-          else
-            ./gradlew --no-daemon assembleDebug
-          fi
+          if [ -n "$ANDROID_KEYSTORE_PATH" ]; then T="bundleRelease assembleRelease"; else T="assembleDebug"; fi
+          set -o pipefail
+          ./gradlew --no-daemon $T 2>&1 | tee "$RUNNER_TEMP/build.log"
+      - name: 실패하면 까닭 보여 주기
+        if: failure()
+        run: |
+          grep -E "error|Error|FAILURE|What went wrong|SDK|>" "$RUNNER_TEMP/build.log" | tail -25 | while IFS= read -r l; do echo "::error::$l"; done || true
       - uses: actions/upload-artifact@v4
         with:
           name: forest-school-android-${{ github.run_number }}
