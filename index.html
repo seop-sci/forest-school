@@ -2695,12 +2695,13 @@ html.ait .app{padding-top:calc(10px + var(--ait-top, 0px));padding-bottom:var(--
       rt.adOk = onReward; rt.adNo = onSkip || null; rt.adEarned = true; closeAd();
       return;
     }
-    if (AIT && AIT.ads) {
+    const EXT = AIT && AIT.ads ? AIT : (window.FOREST_ADS || null);   // 토스 광고나 안드로이드 애드몹 광고
+    if (EXT) {
       // 토스 리워드 광고: 끝까지 봤다는 신호(userEarnedReward)가 왔을 때만 보상을 줘요
-      if (!AIT.adReady()) { AIT.preload(); rt.adNoGold = false; toast('광고를 준비하고 있어요. 잠시 뒤에 다시 눌러 주세요'); return; }
+      if (!EXT.adReady()) { EXT.preload(); rt.adNoGold = false; toast('광고를 준비하고 있어요. 잠시 뒤에 다시 눌러 주세요'); return; }
       rt.adOpen = true;
       if (actx && actx.state === 'running') actx.suspend().catch(() => {});   // 광고 중에는 게임 소리를 멈춰요
-      AIT.showAd(r => { rt.adOk = onReward; rt.adNo = onSkip || null; rt.adEarned = !!r.earned; closeAd(); });
+      EXT.showAd(r => { rt.adOk = onReward; rt.adNo = onSkip || null; rt.adEarned = !!r.earned; closeAd(); });
       return;
     }
     rt.adOpen = true; rt.adOk = onReward; rt.adNo = onSkip || null; rt.adEarned = false;

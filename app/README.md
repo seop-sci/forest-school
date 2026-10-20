@@ -1,7 +1,9 @@
 # 숲속 동물 학교 안드로이드 판 (구글 플레이)
 
-저장소 맨 위 `index.html`을 안드로이드 앱(Capacitor)으로 감싼 폴더예요. 구글 플레이 판에는 광고가 없어서,
-광고 버튼 자리는 바로 보상을 주는 버튼으로 바뀌어요. 저장은 휴대폰 안에만 해요.
+저장소 맨 위 `index.html`을 안드로이드 앱(Capacitor)으로 감싼 폴더예요. 광고는 구글 애드몹 보상형 광고(`src/ads.js`)를 써요.
+업로드 키가 없는 시험 빌드에는 구글 테스트 광고가, 업로드 키로 서명한 빌드에는 진짜 광고가 나와요. 저장은 휴대폰 안에만 해요.
+- 애드몹 앱 ID: `android/app/src/main/res/values/strings.xml`의 `admob_app_id`
+- 보상형 광고 단위: `src/ads.js`의 `AD_UNIT`
 
 - 앱 ID: `io.github.seopsci.forestschool` (구글 플레이에 한 번 올리면 바꿀 수 없어요)
 - 빌드: `index.html`이나 `app` 폴더가 바뀌면 깃허브 Actions가 자동으로 만들어요. 결과는 Actions > 실행 기록 > Artifacts에서 내려받아요.

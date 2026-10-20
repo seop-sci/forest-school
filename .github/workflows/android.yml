@@ -23,12 +23,6 @@ jobs:
         with:
           distribution: temurin
           java-version: 21
-      - name: 웹 게임을 앱 안에 넣기
-        working-directory: app
-        run: |
-          npm ci
-          node build-www.mjs
-          npx cap sync android
       - name: 업로드 키 꺼내기
         env:
           KS: ${{ secrets.ANDROID_KEYSTORE_BASE64 }}
@@ -36,9 +30,17 @@ jobs:
           if [ -n "$KS" ]; then
             echo "$KS" | base64 -d > "$RUNNER_TEMP/upload.jks"
             echo "ANDROID_KEYSTORE_PATH=$RUNNER_TEMP/upload.jks" >> "$GITHUB_ENV"
+            echo "ADMOB_TEST=0" >> "$GITHUB_ENV"
           else
+            echo "ADMOB_TEST=1" >> "$GITHUB_ENV"
             echo "::warning::비밀값이 없어서 시험용 디버그 APK만 만들어요"
           fi
+      - name: 웹 게임을 앱 안에 넣기
+        working-directory: app
+        run: |
+          npm ci
+          node build-www.mjs
+          npx cap sync android
       - name: 빌드
         working-directory: app/android
         env:
