@@ -491,7 +491,12 @@ label.srow,button.srow{cursor:pointer}
 .fallfx.snow i{width:5px;height:5px;border-radius:50%;background:#FFFFFF;opacity:.9;box-shadow:0 0 2px rgba(120,140,160,.5)}
 @keyframes leafFall{0%{top:-4%;transform:translateX(0) rotate(0)}50%{transform:translateX(var(--dx)) rotate(160deg)}100%{top:104%;transform:translateX(0) rotate(320deg)}}
 @media (prefers-reduced-motion: reduce){.fallfx i{animation:none;top:var(--y)}}
-.modal.shop{padding-bottom:16px}
+.shop-panel{text-align:center}
+.shop-panel h2{text-align:left}
+.shop-panel .shop-scroll{overflow:visible}
+.shop-panel .shop-adleft{margin:6px 0 2px;font-size:12.5px}
+.shop-panel .shop-ask p{margin:0 0 8px;color:var(--chip-ink);font-size:14px}
+.shop-panel .shop-ask{position:sticky;bottom:-28px;box-shadow:0 -4px 12px var(--shadow)}
 .shop-have{display:flex;align-items:center;justify-content:center;gap:6px;margin:0 0 8px;font-family:var(--font-chalk);font-weight:700;font-size:32px;line-height:1.1;font-variant-numeric:tabular-nums}
 .shop-have svg{width:28px;height:28px}
 .modal .shop-adleft{margin:6px 0 2px;font-size:12.5px}
@@ -549,9 +554,14 @@ html.ait .app{padding-top:calc(10px + var(--ait-top, 0px));padding-bottom:var(--
 .info dt{color:var(--muted)} .dev-info{margin-bottom:10px} .info dd{margin:0;text-align:right}
 
 /* 탭 */
-.tabs{flex:none;display:grid;grid-template-columns:repeat(6,1fr);gap:2px;padding-block:8px}
-.tab{position:relative;display:flex;flex-direction:column;align-items:center;gap:2px;padding:6px 0;border:0;border-radius:12px;background:none;color:var(--muted);font-family:var(--font-display);font-size:14px;cursor:pointer}
-.tab svg{width:24px;height:24px}
+.tabs{flex:none;display:grid;grid-template-columns:repeat(7,1fr);gap:1px;padding-block:8px}
+/* 학교 탭은 위아래로 넘겨 보고, 지도는 화면 너비에 맞춰 크게 그려요 */
+.scroller{flex:1;min-height:0;display:flex;flex-direction:column;overflow-y:auto;overscroll-behavior:contain;scrollbar-width:none}
+.scroller::-webkit-scrollbar{display:none}
+.app.on-school .stage{flex:1 0 auto;min-height:calc((min(100vw, 480px) - 32px) * 1.16)}
+.app:not(.on-school) .scroller{overflow:hidden}
+.tab{position:relative;display:flex;flex-direction:column;align-items:center;gap:2px;padding:6px 0;border:0;border-radius:12px;background:none;color:var(--muted);font-family:var(--font-display);font-size:13px;white-space:nowrap;cursor:pointer}
+.tab svg{width:23px;height:23px}
 .tab[aria-selected="true"]{color:var(--ink);background:color-mix(in srgb, var(--paper) 72%, transparent)}
 .tab .dot{position:absolute;top:5px;left:calc(50% + 10px);width:8px;height:8px;border-radius:50%;background:var(--seal)}
 
@@ -820,7 +830,8 @@ html.ait .app{padding-top:calc(10px + var(--ait-top, 0px));padding-bottom:var(--
 </style>
 </head>
 <body>
-<div class="app" id="app">
+<div class="app on-school" id="app">
+<div class="scroller" id="scroller">
   <header class="board">
     <div class="board-top">
       <div class="school">
@@ -1118,7 +1129,7 @@ html.ait .app{padding-top:calc(10px + var(--ait-top, 0px));padding-bottom:var(--
       </svg>
       <div class="fallfx" id="fallFx" hidden aria-hidden="true"></div>
       <div class="map-left">
-        <button class="shopbtn" id="btnShop" type="button" aria-label="황금 도토리 상점"><svg viewBox="-8 -11 16 20" aria-hidden="true"><path d="M-4.6 -1 Q-4.9 5.4 0 7.4 Q4.9 5.4 4.6 -1 Z" class="c-gnut"/><ellipse cx="-1.8" cy="2" rx="0.9" ry="2.1" class="c-gshine"/><path d="M-5.8 -0.8 Q-5.8 -6.2 0 -6.6 Q5.8 -6.2 5.8 -0.8 Q0 0.8 -5.8 -0.8 Z" class="c-gcap"/><path d="M-4 -3.2 H4 M-2.8 -5 H2.8" class="s-gline"/><path d="M0 -6.6 L0.9 -9.2" class="s-gstem"/></svg><b id="goldN">0</b>상점</button>
+        <button class="shopbtn" id="btnShop" type="button" hidden aria-label="황금 도토리 상점"><svg viewBox="-8 -11 16 20" aria-hidden="true"><path d="M-4.6 -1 Q-4.9 5.4 0 7.4 Q4.9 5.4 4.6 -1 Z" class="c-gnut"/><ellipse cx="-1.8" cy="2" rx="0.9" ry="2.1" class="c-gshine"/><path d="M-5.8 -0.8 Q-5.8 -6.2 0 -6.6 Q5.8 -6.2 5.8 -0.8 Q0 0.8 -5.8 -0.8 Z" class="c-gcap"/><path d="M-4 -3.2 H4 M-2.8 -5 H2.8" class="s-gline"/><path d="M0 -6.6 L0.9 -9.2" class="s-gstem"/></svg><b id="goldN">0</b>상점</button>
         <button class="boost" id="btnBoost" type="button" hidden aria-label="부엉이 선생님 보충수업"><span class="b-av" id="boostIc" aria-hidden="true"></span>보충수업 <span class="b-n" id="boostN">5</span></button>
         <div class="feast" id="feastChip" hidden>특식 데이 <b id="feastTime">5:00</b></div>
         <div class="feast" id="autoChip" hidden>자동 줍기 <b id="autoTime">60:00</b></div>
@@ -1179,6 +1190,18 @@ html.ait .app{padding-top:calc(10px + var(--ait-top, 0px));padding-bottom:var(--
       <div class="friends" id="friendList"></div>
     </section>
 
+    <section class="panel shop-panel" id="panelShop" hidden aria-labelledby="shopTitle">
+    <h2 id="shopTitle">황금 도토리 상점</h2>
+    <div class="shop-have" id="shopHave"></div>
+    <button class="cta small" type="button" id="shopAd">광고 보고 황금 도토리 2개 받기</button>
+    <p class="fine shop-adleft" id="shopAdLeft"></p>
+    <div class="shop-scroll" id="shopList"></div>
+    <div class="shop-ask" id="shopAsk" hidden>
+      <p id="shopAskText"></p>
+      <div class="btn-row"><button class="btn-sub" type="button" id="shopNo">취소</button><button class="cta" type="button" id="shopYes">사기</button></div>
+    </div>
+    </section>
+
     <section class="panel" id="panelRank" hidden aria-labelledby="ttlRank">
       <h2 id="ttlRank">랭킹</h2>
       <p class="lead">종업식과 졸업식에서 받은 수료증을 모두 더한 학교 점수로 순위를 매겨요.</p>
@@ -1234,6 +1257,7 @@ html.ait .app{padding-top:calc(10px + var(--ait-top, 0px));padding-bottom:var(--
     <div class="toast" id="toast" role="status" aria-live="polite" hidden></div>
   </main>
 
+</div>
   <nav class="tabs" role="tablist" aria-label="화면 이동">
     <button class="tab" type="button" role="tab" data-tab="school" aria-selected="true">
       <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M4 11 12 4.5 20 11v9H4z M10 20v-5h4v5" fill="none" stroke="currentColor" stroke-width="2" stroke-linejoin="round"/></svg>학교
@@ -1251,6 +1275,9 @@ html.ait .app{padding-top:calc(10px + var(--ait-top, 0px));padding-bottom:var(--
       <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M2.5 9.5 12 5l9.5 4.5L12 14z" fill="none" stroke="currentColor" stroke-width="2" stroke-linejoin="round"/><path d="M6.5 11.6v4.2c0 1.5 2.5 3 5.5 3s5.5-1.5 5.5-3v-4.2M21.5 9.5v5" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/></svg>졸업
       <span class="dot" id="gDot" hidden></span>
       <span class="tguide" aria-hidden="true"><svg viewBox="-10 -22 20 22"><path d="M0 -1 L-8.5 -11 L-3.8 -11 L-3.8 -21 L3.8 -21 L3.8 -11 L8.5 -11 Z"/></svg></span>
+    </button>
+    <button class="tab" type="button" role="tab" data-tab="shop" aria-selected="false">
+      <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M6.4 11.2 Q6.1 18.6 12 20.6 Q17.9 18.6 17.6 11.2 Z" fill="none" stroke="currentColor" stroke-width="2" stroke-linejoin="round"/><path d="M4.6 11.4 Q4.6 5.8 12 5.4 Q19.4 5.8 19.4 11.4 Q12 13 4.6 11.4 Z" fill="currentColor"/><path d="M12 5.4 L13.2 2.6" stroke="currentColor" stroke-width="2" stroke-linecap="round"/></svg>상점
     </button>
     <button class="tab" type="button" role="tab" data-tab="rank" aria-selected="false">
       <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M7.5 4.5h9v4.2a4.5 4.5 0 0 1-9 0z M7.5 6.2H4.6c0 2.6 1.3 4 3.3 4.3 M16.5 6.2h2.9c0 2.6-1.3 4-3.3 4.3 M12 13.2v3.6 M8.2 20h7.6 M9.6 16.8h4.8V20H9.6z" fill="none" stroke="currentColor" stroke-width="1.9" stroke-linejoin="round" stroke-linecap="round"/></svg>랭킹
@@ -1385,21 +1412,6 @@ html.ait .app{padding-top:calc(10px + var(--ait-top, 0px));padding-bottom:var(--
   </section>
 </div>
 
-<div class="overlay center" id="mShop" hidden>
-  <div class="backdrop" data-close-shop></div>
-  <section class="modal wide shop" role="dialog" aria-modal="true" aria-labelledby="shopTitle">
-    <h2 id="shopTitle">황금 도토리 상점</h2>
-    <div class="shop-have" id="shopHave"></div>
-    <button class="cta small" type="button" id="shopAd">광고 보고 황금 도토리 2개 받기</button>
-    <p class="fine shop-adleft" id="shopAdLeft"></p>
-    <div class="shop-scroll" id="shopList"></div>
-    <div class="shop-ask" id="shopAsk" hidden>
-      <p id="shopAskText"></p>
-      <div class="btn-row"><button class="btn-sub" type="button" id="shopNo">취소</button><button class="cta" type="button" id="shopYes">사기</button></div>
-    </div>
-    <button class="btn-sub btn-close" type="button" id="shopClose">닫기</button>
-  </section>
-</div>
 
 <div class="overlay center" id="mMove" hidden>
   <div class="backdrop" data-close-move></div>
@@ -1921,6 +1933,7 @@ html.ait .app{padding-top:calc(10px + var(--ait-top, 0px));padding-bottom:var(--
     }
     s.autoUntil = Math.min(num(d.autoUntil, 0, 0), Date.now() + 3 * 3600000);
     if (typeof d.tk === 'string') s.tk = d.tk.slice(0, 200);
+    s.acctGift = !!d.acctGift;
     if (d.rank && typeof d.rank === 'object') {
       s.rank.name = cleanName(d.rank.name);
       s.rank.joined = !!d.rank.joined && !!s.rank.name;
@@ -3242,6 +3255,14 @@ html.ait .app{padding-top:calc(10px + var(--ait-top, 0px));padding-bottom:var(--
      지금 익명 id에 구글 계정을 이어 붙여요. id가 그대로라서 서버 저장도 그대로 이어져요.
      그 구글 계정에 이미 다른 학교가 있으면(새 휴대폰) 어느 학교로 이어 할지 물어봐요 */
   const hasGoogle = () => !!window.FOREST_GOOGLE;
+  const ACCT_GIFT = { dip: 15, fund: 3, gold: 30 };   // 구글 계정을 처음 연결하면 한 번 주는 선물
+  function giveAcctGift() {
+    if (S.acctGift) return '';
+    S.acctGift = true;
+    addDip(ACCT_GIFT.dip); S.fund += ACCT_GIFT.fund; addGold(ACCT_GIFT.gold);
+    save(); renderHUD(); renderGradPanel(true);
+    return ` 선물로 수료증 +${ACCT_GIFT.dip}장, 기금 +${ACCT_GIFT.fund}, 황금 도토리 +${ACCT_GIFT.gold}개를 받았어요!`;
+  }
   function googleUser() {
     try { const u = Cloud.fb.auth().currentUser; return (u && (u.providerData || []).find(p => p.providerId === 'google.com')) || null; } catch (e) { return null; }
   }
@@ -3251,7 +3272,8 @@ html.ait .app{padding-top:calc(10px + var(--ait-top, 0px));padding-bottom:var(--
     if (row.hidden) return;
     const g = googleUser();
     $('#acctTitle').textContent = g ? '구글 계정 연결됨' : '구글 계정 연결';
-    $('#acctSub').textContent = g ? `${g.email || '구글'} 계정에 학교가 저장돼요` : '연결해 두면 휴대폰을 바꿔도 같은 학교를 이어 해요';
+    $('#acctSub').textContent = g ? `${g.email || '구글'} 계정에 학교가 저장돼요` :
+      (S.acctGift ? '연결해 두면 휴대폰을 바꿔도 같은 학교를 이어 해요' : `연결하면 수료증 ${ACCT_GIFT.dip}장, 기금 ${ACCT_GIFT.fund}, 황금 도토리 ${ACCT_GIFT.gold}개를 선물로 줘요`);
   }
   async function linkGoogle() {
     if (!cloudOn() || rt.acctBusy) return;
@@ -3273,7 +3295,8 @@ html.ait .app{padding-top:calc(10px + var(--ait-top, 0px));padding-bottom:var(--
           cred = Cloud.fb.auth.GoogleAuthProvider.credential(g.idToken);
           await auth.currentUser.linkWithCredential(cred);
         }
-        toast('구글 계정을 연결했어요'); sfx('quest');
+        const gift = giveAcctGift();
+        toast('구글 계정을 연결했어요.' + gift); sfx('quest');
         renderAcct(); cloudPush(true);
       } catch (e) {
         if (!/credential-already-in-use|email-already-in-use|account-exists/.test(String(e && e.code))) throw e;
@@ -3287,7 +3310,7 @@ html.ait .app{padding-top:calc(10px + var(--ait-top, 0px));padding-bottom:var(--
         Cloud.gen += 1; rt.adopting = true;   // 예전 id로 하던 저장은 멈추고, 고른 학교로 다시 열어요
         const srv = (await waitFor(Cloud.db.ref('forest/saves/' + u.uid).once('value'), CLOUD_WAIT)).val();
         if (srv && typeof srv.d === 'string') askAcct(srv.d, local);
-        else adoptSave(local, '구글 계정을 연결했어요');
+        else { if (!S.acctGift) { rt.adopting = false; giveAcctGift(); rt.adopting = true; } adoptSave(JSON.stringify(S), '구글 계정을 연결했어요'); }
       }
     } catch (e) {
       const c = String(e && (e.code || e.message));
@@ -3692,7 +3715,7 @@ html.ait .app{padding-top:calc(10px + var(--ait-top, 0px));padding-bottom:var(--
     renderShopBtn();
     const b = $('#btnShop');
     if (!b.hidden) { const sp = document.createElement('span'); sp.className = 'gpop'; sp.textContent = '+' + n; b.appendChild(sp); setTimeout(() => sp.remove(), 1400); }
-    if (rt.modalOpen === $('#mShop')) renderShop();
+    if (rt.tab === 'shop') renderShop();
   }
   // 광고를 끝까지 보면 덤으로 1개 (하루 10개까지)
   function adGold() { goldDay(); if (S.gd.n >= GOLD.adDay) return; S.gd.n += 1; addGold(1); }
@@ -3736,10 +3759,8 @@ html.ait .app{padding-top:calc(10px + var(--ait-top, 0px));padding-bottom:var(--
     return `<svg viewBox="0 0 40 40" aria-hidden="true"><rect x="5" y="9" width="30" height="21" rx="3" fill="${it.c}" stroke="#7A522D" stroke-width="2.5"/><path d="M10 16 h12 M10 21 h17 M10 26 h8" stroke="#F3F2E8" stroke-width="1.6" stroke-linecap="round"/></svg>`;
   }
   function openShop() {
-    rt.shopPick = '';
-    renderShop();
-    openModal($('#mShop'));
-    $('#shopList').scrollTop = 0;
+    if (rt.modalOpen) closeModal(rt.modalOpen);
+    setTab('shop');
   }
   function renderShop() {
     goldDay();
@@ -3773,7 +3794,6 @@ html.ait .app{padding-top:calc(10px + var(--ait-top, 0px));padding-bottom:var(--
     // 사기 전에 한 번 더 물어봐요
     const ask = $('#shopAsk'), it = shopItem(rt.shopPick);
     ask.hidden = !it;
-    $('#shopClose').hidden = !!it;
     if (it) {
       const enough = S.gold >= it.price;
       $('#shopAskText').textContent = enough ? `${it.name}${it.ga} 황금 도토리 ${it.price}개로 살까요?` : `황금 도토리가 ${it.price - S.gold}개 모자라요.`;
@@ -3836,19 +3856,16 @@ html.ait .app{padding-top:calc(10px + var(--ait-top, 0px));padding-bottom:var(--
   function shopAd() {
     goldDay();
     if (S.gd.shop >= GOLD.shopAd) { shake($('#shopAd')); return; }
-    closeModal($('#mShop'), () => {
-      rt.adNoGold = true;
-      showAd(() => {
-        goldDay(); S.gd.shop += 1;
-        addGold(GOLD.shopAdN);
-        sfx('quest');
-        toast(`황금 도토리 +${GOLD.shopAdN}개를 받았어요`);
-        save();
-        queueModal(() => { openShop(); return true; });
-      }, () => {
-        toast('광고를 끝까지 보지 않아서 황금 도토리가 없어요');
-        queueModal(() => { openShop(); return true; });
-      });
+    rt.adNoGold = true;
+    showAd(() => {
+      goldDay(); S.gd.shop += 1;
+      addGold(GOLD.shopAdN);
+      sfx('quest');
+      toast(`황금 도토리 +${GOLD.shopAdN}개를 받았어요`);
+      save();
+      if (rt.tab === 'shop') renderShop();
+    }, () => {
+      toast('광고를 끝까지 보지 않아서 황금 도토리가 없어요');
     });
   }
 
@@ -4625,6 +4642,10 @@ html.ait .app{padding-top:calc(10px + var(--ait-top, 0px));padding-bottom:var(--
     $('#panelGrad').hidden = t !== 'grad';
     $('#panelSettings').hidden = t !== 'settings';
     $('#panelRank').hidden = t !== 'rank';
+    $('#panelShop').hidden = t !== 'shop';
+    $('#app').classList.toggle('on-school', t === 'school');
+    if (t !== 'school') $('#scroller').scrollTop = 0;
+    if (t === 'shop') { rt.shopPick = ''; renderShop(); $('#panelShop').scrollTop = 0; }
     if (t === 'rank') { rt.rankEdit = false; initRank(); renderRankPanel(); submitRank(); }
     if (t === 'settings') renderCloudInfo();
     if (prev === 'quests' && t !== 'quests') markQuestsSeen();
@@ -4768,8 +4789,6 @@ html.ait .app{padding-top:calc(10px + var(--ait-top, 0px));padding-bottom:var(--
     });
     // 황금 도토리 상점
     $('#btnShop').addEventListener('click', () => { if (!rt.paused && !rt.modalOpen) { sfx('tap'); openShop(); } });
-    $('#shopClose').addEventListener('click', () => closeModal($('#mShop')));
-    $('[data-close-shop]').addEventListener('click', () => closeModal($('#mShop')));
     $('#shopList').addEventListener('click', e => { const b = e.target.closest('[data-buy]'); if (b) pickShop(b.dataset.buy); });
     $('#shopNo').addEventListener('click', () => { rt.shopPick = ''; renderShop(); });
     $('#shopYes').addEventListener('click', buyShop);
@@ -4916,7 +4935,6 @@ html.ait .app{padding-top:calc(10px + var(--ait-top, 0px));padding-bottom:var(--
       else if (rt.modalOpen === $('#mDeal')) closeModal($('#mDeal'));
       else if (rt.modalOpen === $('#mMove') && !rt.moveIn) closeModal($('#mMove'));
       else if (rt.modalOpen === $('#mStats')) closeModal($('#mStats'));
-      else if (rt.modalOpen === $('#mShop')) closeModal($('#mShop'));
       else if (rt.sheetKey && !rt.modalOpen) closeSheet();
     });
     document.addEventListener('visibilitychange', () => {
