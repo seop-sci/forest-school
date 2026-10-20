@@ -37,8 +37,53 @@
     return p;
   };
   window.FOREST_FB = window.FOREST_FIREBASE ? window.FOREST_LOAD() : Promise.resolve(null);
-  // GitHub 테스트판 구글 계정 연결: 브라우저 팝업으로 Firebase에 바로 연결해요
-  if (window.FOREST_FIREBASE) window.FOREST_GOOGLE = { popup: true };
+  // GitHub 테스트판 구글 계정 연결: 구글 로그인(Google Identity Services)의 작은 계정 선택 창으로 토큰을 받아요.
+  // 크롬은 화면 아래에 작게 뜨고, 그 밖의 브라우저는 '구글로 계속하기' 버튼 창을 보여 줘요
+  if (window.FOREST_FIREBASE) window.FOREST_GOOGLE = (function () {
+    var CLIENT = '371851641750-c206d9dtea31k8rdq6ctcd3jru0pkvsh.apps.googleusercontent.com';
+    var lib = null, pending = null;
+    function load() {
+      return lib || (lib = new Promise(function (ok, no) {
+        var s = document.createElement('script');
+        s.src = 'https://accounts.google.com/gsi/client';
+        s.onload = ok; s.onerror = function () { lib = null; no({ code: 'network' }); };
+        document.head.appendChild(s);
+      }));
+    }
+    function finish(r) {
+      var p = pending; pending = null;
+      var box = document.getElementById('gsiBox'); if (box) box.remove();
+      try { google.accounts.id.cancel(); } catch (e) { /* 무시 */ }
+      if (p) { if (r && r.credential) p.ok({ idToken: r.credential }); else p.no({ code: 'cancel' }); }
+    }
+    function card() {
+      var box = document.createElement('div');
+      box.id = 'gsiBox';
+      box.style.cssText = 'position:fixed;inset:0;z-index:60;display:flex;align-items:center;justify-content:center;padding:16px;background:rgba(28,40,20,.45)';
+      box.innerHTML = '<div style="width:100%;max-width:320px;padding:22px 18px 16px;border-radius:20px;background:#F8FAF1;color:#26301E;text-align:center;font-family:inherit">' +
+        '<b style="display:block;font-size:19px;margin-bottom:6px">구글 계정 연결</b>' +
+        '<p style="margin:0 0 14px;font-size:14px;line-height:1.5;color:#5F6B55">연결할 구글 계정을 골라 주세요</p>' +
+        '<div id="gsiBtn" style="display:flex;justify-content:center;min-height:44px"></div>' +
+        '<button type="button" id="gsiNo" style="margin-top:12px;width:100%;min-height:44px;border:0;border-radius:12px;background:#EEF3E2;color:#26301E;font:inherit;font-size:15px">닫기</button></div>';
+      document.body.appendChild(box);
+      box.querySelector('#gsiNo').onclick = function () { finish(null); };
+      return box.querySelector('#gsiBtn');
+    }
+    return {
+      web: true,
+      login: function () {
+        return load().then(function () {
+          return new Promise(function (ok, no) {
+            if (pending) finish(null);
+            pending = { ok: ok, no: no };
+            google.accounts.id.initialize({ client_id: CLIENT, callback: finish, use_fedcm_for_prompt: true, use_fedcm_for_button: true, context: 'use', locale: 'ko' });
+            google.accounts.id.renderButton(card(), { theme: 'outline', size: 'large', text: 'continue_with', shape: 'pill', locale: 'ko', width: 260 });
+            google.accounts.id.prompt();
+          });
+        });
+      }
+    };
+  })();
 </script>
 <!-- /github-only -->
 <title>숲속 동물 학교</title>
@@ -3213,7 +3258,7 @@ html.ait .app{padding-top:calc(10px + var(--ait-top, 0px));padding-bottom:var(--
     if (googleUser()) { toast('이미 구글 계정에 연결돼 있어요'); return; }
     const G = window.FOREST_GOOGLE;
     // 카카오톡 같은 앱 안 브라우저에서는 구글이 로그인을 막아요
-    if (G.popup && /KAKAOTALK|NAVER|Instagram|FBAN|FBAV|Line\//i.test(navigator.userAgent || '')) {
+    if ((G.popup || G.web) && /KAKAOTALK|NAVER|Instagram|FBAN|FBAV|Line\//i.test(navigator.userAgent || '')) {
       toast('이 앱 안에서는 구글 로그인이 안 돼요. 메뉴의 \'다른 브라우저로 열기\'로 열어 주세요');
       return;
     }
@@ -4039,6 +4084,7 @@ html.ait .app{padding-top:calc(10px + var(--ait-top, 0px));padding-bottom:var(--
   function promote() {
     if (!canPromote() || rt.paused) return;
     const fund = previewFund(), leaving = Math.floor(S.students), from = tierInfo();
+    const dipsIn = Math.floor(S.tdip + previewDip());   // 이번 학교급에서 모은 수료증 (기금으로 바뀌어요)
     S.fund += fund;
     S.st.dips += previewDip();   // 마지막 해 수료증은 기금이 되지만 학교 점수에는 더해요
     rankDirty();
@@ -4054,13 +4100,13 @@ html.ait .app{padding-top:calc(10px + var(--ait-top, 0px));padding-bottom:var(--
     newYear();
     if (newcomer) rt.kidSeq = BASE_SPECIES.length + S.p.species - 1;
     $('#tierConfirm').hidden = true;
-    queueModal(() => showEntrance(fund, leaving, from, newcomer));
+    queueModal(() => showEntrance(fund, leaving, from, newcomer, dipsIn));
     checkGrade();
     syncKids(false);
     renderMap(); renderHUD(); renderAffordance(); renderGradPanel(true);
     save();
   }
-  function showEntrance(fund, leaving, from, newcomer) {
+  function showEntrance(fund, leaving, from, newcomer, dipsIn) {
     const T = tierInfo();
     $('#tierTitle').textContent = `${from.school} 졸업식`;
     $('#tierText').textContent = `${eul(from.name)} 마친 친구들 ${leaving}명이 졸업장을 받았어요. 이제 책가방을 메고 ${T.school}에 입학해요!`;
@@ -4068,7 +4114,7 @@ html.ait .app{padding-top:calc(10px + var(--ait-top, 0px));padding-bottom:var(--
     const crew = ['rabbit', newcomer ? newcomer.k : 'fox', 'chick'];
     $('#tierArt').innerHTML = `<svg viewBox="-26 -19 52 38" aria-hidden="true">` +
       crew.map((sp, i) => `<g transform="translate(${(i - 1) * 15} ${i === 1 ? -2 : 1}) scale(${i === 1 ? 1.1 : 0.95})">${kidSVG(sp, i)}</g>`).join('') + '</svg>';
-    $('#tierFine').textContent = (newcomer ? `새 친구 ${newcomer.name}${newcomer.ga} 함께 왔어요. ` : '') +
+    $('#tierFine').textContent = `${from.name}에서 모은 수료증 ${fmt(dipsIn || 0)}장이 장학재단 기금이 됐어요. ` + (newcomer ? `새 친구 ${newcomer.name}${newcomer.ga} 함께 왔어요. ` : '') +
       `새로 생긴 과학실을 지어 보세요. 기금은 졸업 탭의 장학재단에서 써요. 졸업 선물로 황금 도토리 +${GOLD.promote}개를 받았어요.`;
     $('#tierOk').textContent = `${T.name} 입학하기`;
     openModal($('#mTier'));
