@@ -37,6 +37,8 @@
     return p;
   };
   window.FOREST_FB = window.FOREST_FIREBASE ? window.FOREST_LOAD() : Promise.resolve(null);
+  // GitHub 테스트판 구글 계정 연결: 브라우저 팝업으로 Firebase에 바로 연결해요
+  if (window.FOREST_FIREBASE) window.FOREST_GOOGLE = { popup: true };
 </script>
 <!-- /github-only -->
 <title>숲속 동물 학교</title>
@@ -499,7 +501,7 @@ html.ait .app{padding-top:calc(10px + var(--ait-top, 0px));padding-bottom:var(--
 .info{margin:0;padding:2px 14px;border-radius:16px;background:var(--card)}
 .info div{display:flex;justify-content:space-between;gap:12px;padding:10px 0;border-bottom:1px solid var(--line);font-size:14px}
 .info div:last-child{border-bottom:0}
-.info dt{color:var(--muted)} .info dd{margin:0;text-align:right}
+.info dt{color:var(--muted)} .dev-info{margin-bottom:10px} .info dd{margin:0;text-align:right}
 
 /* 탭 */
 .tabs{flex:none;display:grid;grid-template-columns:repeat(6,1fr);gap:2px;padding-block:8px}
@@ -1164,14 +1166,15 @@ html.ait .app{padding-top:calc(10px + var(--ait-top, 0px));padding-bottom:var(--
       </div>
       <h3 class="panel-sub">정보</h3>
       <dl class="info">
-        <div id="verRow"><dt>버전</dt><dd>시제품 1.0</dd></div>
-        <div><dt>저장 위치</dt><dd id="infoSave">이 기기의 브라우저</dd></div>
+        <div id="verRow"><dt>버전</dt><dd>v1.0.0</dd></div>
         <div id="pidRow" hidden><dt>학교 번호</dt><dd id="infoPid"></dd></div>
-        <div><dt>광고</dt><dd id="infoAd">테스트용 가짜 광고예요</dd></div>
-        <div><dt>그림</dt><dd>코드로 직접 그렸어요 (AI 생성 이미지 없음)</dd></div>
       </dl>
       <div id="devBox" hidden>
         <h3 class="panel-sub">개발자 테스트</h3>
+        <dl class="info dev-info">
+          <div><dt>저장 위치</dt><dd id="infoSave">이 기기의 브라우저</dd></div>
+          <div><dt>광고</dt><dd id="infoAd">테스트용 가짜 광고예요</dd></div>
+        </dl>
         <div class="slist">
           <button class="srow" type="button" id="optSkip"><span class="txt"><b>3시간 지난 것처럼 하기</b><small>자리 비운 보상과 2배 받기를 바로 확인해요</small></span><svg viewBox="0 0 24 24" width="20" height="20" aria-hidden="true"><path d="M9 6l6 6-6 6" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"/></svg></button>
           <button class="srow" type="button" id="devCash"><span class="txt"><b>도토리 1시간치 받기</b><small>종업식까지 빨리 가 볼 때 써요</small></span><svg viewBox="0 0 24 24" width="20" height="20" aria-hidden="true"><path d="M9 6l6 6-6 6" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"/></svg></button>
@@ -2945,7 +2948,7 @@ html.ait .app{padding-top:calc(10px + var(--ait-top, 0px));padding-bottom:var(--
        forest/stats/<내 id>  테스트 현황 (어디까지 했는지, 얼마나 했는지)
        forest/moves/<코드>   다른 기기로 옮길 때 30분 동안 맡겨 두는 학교
      <내 id>는 Firebase 익명 로그인이 기기(브라우저)마다 만들어 줘요. */
-  const VERSION = '1.0';
+  const VERSION = '1.0.0';
   const CLOUD_PUSH = 20000;   // 바뀐 게 있으면 20초마다 올려요
   const STATS_PUSH = 60000;   // 테스트 현황은 1분마다
   const CLOUD_WAIT = 15000;   // 서버가 이만큼 답이 없으면 이 기기에만 저장해요
@@ -3126,7 +3129,7 @@ html.ait .app{padding-top:calc(10px + var(--ait-top, 0px));padding-bottom:var(--
     }
     const dd = $('#infoSave');
     if (dd.textContent !== t) dd.textContent = t;
-    $('#optMove').hidden = !cloudOn();
+    $('#optMove').hidden = !cloudOn() || !!window.FOREST_STORE;   // 구글 플레이 판은 구글 계정 연결로 옮겨요
     renderAcct();
     $('#devStats').hidden = !hasCloudBuild();
     $('#pidRow').hidden = !hasCloudBuild();
@@ -3208,16 +3211,29 @@ html.ait .app{padding-top:calc(10px + var(--ait-top, 0px));padding-bottom:var(--
   async function linkGoogle() {
     if (!cloudOn() || rt.acctBusy) return;
     if (googleUser()) { toast('이미 구글 계정에 연결돼 있어요'); return; }
+    const G = window.FOREST_GOOGLE;
+    // 카카오톡 같은 앱 안 브라우저에서는 구글이 로그인을 막아요
+    if (G.popup && /KAKAOTALK|NAVER|Instagram|FBAN|FBAV|Line\//i.test(navigator.userAgent || '')) {
+      toast('이 앱 안에서는 구글 로그인이 안 돼요. 메뉴의 \'다른 브라우저로 열기\'로 열어 주세요');
+      return;
+    }
     rt.acctBusy = true;
+    const auth = Cloud.fb.auth();
+    let cred = null;
     try {
-      const g = await window.FOREST_GOOGLE.login();
-      const auth = Cloud.fb.auth(), cred = Cloud.fb.auth.GoogleAuthProvider.credential(g.idToken);
       try {
-        await auth.currentUser.linkWithCredential(cred);
+        if (G.popup) await auth.currentUser.linkWithPopup(new Cloud.fb.auth.GoogleAuthProvider());
+        else {
+          const g = await G.login();
+          cred = Cloud.fb.auth.GoogleAuthProvider.credential(g.idToken);
+          await auth.currentUser.linkWithCredential(cred);
+        }
         toast('구글 계정을 연결했어요'); sfx('quest');
         renderAcct(); cloudPush(true);
       } catch (e) {
         if (!/credential-already-in-use|email-already-in-use|account-exists/.test(String(e && e.code))) throw e;
+        cred = cred || (e && e.credential);
+        if (!cred) throw e;
         // 이 구글 계정은 이미 다른 학교를 갖고 있어요. 지금 학교의 랭킹과 테스트 기록은 정리하고 그 계정으로 들어가요
         save();
         const local = JSON.stringify(S), old = Cloud.uid;
@@ -3229,7 +3245,10 @@ html.ait .app{padding-top:calc(10px + var(--ait-top, 0px));padding-bottom:var(--
         else adoptSave(local, '구글 계정을 연결했어요');
       }
     } catch (e) {
-      if (!/cancel/i.test(String(e && (e.code || e.message)))) toast('구글 계정을 연결하지 못했어요. 잠시 뒤에 다시 해 보세요');
+      const c = String(e && (e.code || e.message));
+      if (/popup-blocked/.test(c)) toast('팝업이 막혔어요. 브라우저에서 팝업을 허용해 주세요');
+      else if (/unauthorized-domain/.test(c)) toast('Firebase 승인된 도메인에 이 주소를 넣어야 해요');
+      else if (!/cancel|popup-closed/i.test(c)) toast('구글 계정을 연결하지 못했어요. 잠시 뒤에 다시 해 보세요');
     }
     rt.acctBusy = false;
   }
