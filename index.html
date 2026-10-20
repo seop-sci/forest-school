@@ -1337,6 +1337,7 @@ html.ait .app{padding-top:calc(10px + var(--ait-top, 0px));padding-bottom:var(--
           <button class="srow" type="button" id="devTier"><span class="txt"><b>졸업 조건 채우기</b><small>마지막 해와 대도시를 채워서 졸업식을 바로 열어 봐요</small></span><svg viewBox="0 0 24 24" width="20" height="20" aria-hidden="true"><path d="M9 6l6 6-6 6" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"/></svg></button>
           <button class="srow" type="button" id="devDeal"><span class="txt"><b>까치 핫딜 바로 부르기</b><small>다음 핫딜을 기다리지 않고 바로 불러요</small></span><svg viewBox="0 0 24 24" width="20" height="20" aria-hidden="true"><path d="M9 6l6 6-6 6" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"/></svg></button>
           <button class="srow" type="button" id="devGold"><span class="txt"><b>황금 도토리 100개 받기</b><small>상점과 테마 세트를 시험해 볼 때 써요</small></span><svg viewBox="0 0 24 24" width="20" height="20" aria-hidden="true"><path d="M9 6l6 6-6 6" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"/></svg></button>
+          <button class="srow" type="button" id="devTrip"><span class="txt"><b>체험학습 바로 돌아오기</b><small>3학년 전이면 체험학습을 먼저 열어 줘요</small></span><svg viewBox="0 0 24 24" width="20" height="20" aria-hidden="true"><path d="M9 6l6 6-6 6" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"/></svg></button>
           <button class="srow" type="button" id="devDay"><span class="txt"><b>다음 날로 넘기기</b><small>출석 도장, 보충수업, 핫딜 횟수가 다시 열려요</small></span><svg viewBox="0 0 24 24" width="20" height="20" aria-hidden="true"><path d="M9 6l6 6-6 6" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"/></svg></button>
           <button class="srow" type="button" id="devStats" hidden><span class="txt"><b>테스트 현황 보기</b><small>테스터마다 어디까지 했는지 서버 기록을 봐요</small></span><svg viewBox="0 0 24 24" width="20" height="20" aria-hidden="true"><path d="M9 6l6 6-6 6" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"/></svg></button>
         </div>
@@ -5710,6 +5711,13 @@ html.ait .app{padding-top:calc(10px + var(--ait-top, 0px));padding-bottom:var(--
       S.budget += v; earn(v);
       toast(`도토리 +${fmt(v)} (테스트)`);
       renderHUD(); renderAffordance(); save();
+    });
+    $('#devTrip').addEventListener('click', () => {
+      S.u.dev = true;
+      if (!tripOpen()) { S.trip.open = true; toast('체험학습을 열었어요 (테스트). 지도 왼쪽 버스를 눌러 보세요'); }
+      else if (S.trip.cur) { S.trip.end = Date.now(); toast('체험학습에서 바로 돌아왔어요 (테스트)'); }
+      else toast('지금 다녀오는 체험학습이 없어요. 먼저 출발해 보세요');
+      rt.tripTxt = ''; renderTripBtn(); save();
     });
     $('#devGold').addEventListener('click', () => {
       S.u.dev = true;
