@@ -31,6 +31,7 @@ BOT = r"""(maxH) => {
         } else if (t >= W.tripEnd) { s.trip.end = Date.now() - 1; F.claimTrip(1); W.trips++; }
       } }
     for (let i = 0; i < 5 && F.mainReady(); i++) F.claimMain(null);
+    { const q = F.curMain(); const ch = q ? q.ch : -1; if (W.ch === undefined) W.ch = ch; if (ch !== W.ch) { W.ch = ch; const y = yearT; snap('ch' + ch); yearT = y; } }
     if (S().tier === 1 && S().tg >= 5) { if (!F.curMain()) { snap('final'); W.done = true; break; } }
     else if (F.canGraduate()) { snap('grad'); perks(); F.graduate(); buy(); }
     else if (F.canPromote()) {

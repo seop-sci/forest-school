@@ -27,8 +27,7 @@ async def ctxpage(b, w, h, scheme, save):
 
 BOARD = """(() => { const q = s => document.querySelector(s);
   const over = [...document.querySelectorAll('.stat')].filter(e => !e.hidden).map(e => e.scrollWidth > e.clientWidth + 1);
-  return { cols: getComputedStyle(q('#stats')).gridTemplateColumns, dipShown: !q('#statDip').hidden, dip: q('#vDip').textContent,
-    fund: q('#vFundRow').hidden ? null : q('#vFund').textContent, budget: q('#vBudget').textContent, rate: q('#vRate').textContent,
+  return { cols: getComputedStyle(q('#stats')).gridTemplateColumns, power: q('#vPower').textContent, rep: q('#vRep').textContent, budget: q('#vBudget').textContent, rate: q('#vRate').textContent,
     next: q('#vNext').textContent, quest: q('#qbTitle').textContent, over, pageOver: document.documentElement.scrollWidth > document.documentElement.clientWidth }; })()"""
 GRAD = """(() => { const q = s => document.querySelector(s);
   return { lead: q('#gLead').textContent, card: !q('#gCard').hidden, year: q('#gYear').textContent, gbtn: q('#gBtn').textContent,
@@ -64,7 +63,7 @@ async def main():
             await page.tap('#questBar'); await page.wait_for_timeout(600)
             r['q_after_claim'] = await page.evaluate("[document.querySelector('#qbTitle').textContent, document.querySelector('#qbHow').textContent]")
             # 칠판 졸업장 칸을 누르면 졸업 탭 명예 교장실로
-            await page.tap('#statDip'); await page.wait_for_timeout(700)
+            await page.tap('.tab[data-tab="grad"]'); await page.wait_for_timeout(700)
             r['statTap'] = await page.evaluate("[document.querySelector('.tab[aria-selected=true]').dataset.tab, Math.round(document.querySelector('#perkList').getBoundingClientRect().top)]")
             await page.screenshot(path='s4_k2_perks.png')
             btn = await page.query_selector('#perkList button[data-perk="schol"]')
