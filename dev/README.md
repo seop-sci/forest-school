@@ -10,6 +10,7 @@
 | `wrap.py` | 시험용 `test.html` 만들기 |
 | `s*test.py`, `fbtest/` | Playwright 자동 시험 (가짜 Firebase 서버 포함) |
 | `bot.py` | 자동 플레이로 학년마다 걸리는 시간 재기 |
+| `qbot.py` | 퀘스트를 따라 하는 자동 플레이로 퀘스트마다 걸리는 시간 재기 (막히는 곳 찾기) |
 
 순서: `forest-school.html` 고치기 → `python3 wrap.py` → 시험 → `python3 build_gh.py ..` → `cd ../toss && npm run build` → 커밋하고 올리기 (안드로이드는 GitHub Actions가 알아서 만들어요).
 

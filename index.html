@@ -683,6 +683,22 @@ html.ait .app{padding-top:calc(10px + var(--ait-top, 0px));padding-bottom:var(--
 .tab.guide .tguide{display:block}
 .tab.guide{color:var(--ink)}
 .qchip{display:none;background:var(--accent);color:var(--accent-ink)}
+/* 추천: 지금 올리면 가장 좋은 것 하나에만 붙어요 */
+.rchip{display:none;background:var(--seal);color:#FFFFFF}
+.tcard.is-rec .rchip{display:inline}
+.tcard.is-rec{box-shadow:inset 0 0 0 2px var(--seal)}
+.plaque .rec{display:none;pointer-events:none}
+.plaque.is-rec .rec{display:inline}
+.c-rec{fill:var(--seal);stroke:#FFFFFF;stroke-width:1.2}
+.t-rec{fill:#FFFFFF;font-family:var(--font-display);font-size:9px}
+.plaque.is-rec .rec{animation:recBob 1.6s ease-in-out infinite}
+@keyframes recBob{0%,100%{transform:translate(0px,-17px)}50%{transform:translate(0px,-19.5px)}}
+.fr-rec{display:inline-block;margin-left:6px;padding:0 6px;border-radius:999px;background:var(--seal);color:#FFFFFF;font-family:var(--font-body);font-size:11px;line-height:1.6;font-style:normal;vertical-align:2px}
+.fur-tagg.rec .fur-tag{fill:#D9534A}
+.fur-tagg.rec .fur-tag-t{fill:#FFFFFF}
+#sheetBuy.is-rec{position:relative}
+#sheetBuy.is-rec::after{content:"추천";position:absolute;left:12px;top:-9px;padding:0 7px;border-radius:999px;background:var(--seal);color:#FFFFFF;font-family:var(--font-body);font-size:11.5px;line-height:1.6}
+@media (prefers-reduced-motion: reduce){.plaque.is-rec .rec{animation:none;transform:translate(0px,-17px)}}
 .tcard.is-quest .qchip{display:inline}
 .tcard.guide-pulse .cta{animation:btnGlow 1.4s ease-in-out infinite}
 @keyframes btnGlow{0%,100%{box-shadow:0 4px 0 var(--accent-shadow),0 0 0 0 transparent}50%{box-shadow:0 4px 0 var(--accent-shadow),0 0 0 5px color-mix(in srgb, var(--accent) 45%, transparent)}}
@@ -1112,7 +1128,7 @@ html.ait .app{padding-top:calc(10px + var(--ait-top, 0px));padding-bottom:var(--
     <p class="boot-step" id="bootStep">학교 문을 여는 중...</p>
     <p class="boot-tip" id="bootTip">학교 문을 여는 중이에요</p>
   </div>
-  <span class="boot-ver" id="bootVer">v1.1.0</span>
+  <span class="boot-ver" id="bootVer">v1.2.0</span>
 </div>
 
 <div class="app on-school" id="app">
@@ -1530,7 +1546,7 @@ html.ait .app{padding-top:calc(10px + var(--ait-top, 0px));padding-bottom:var(--
       </div>
       <h3 class="panel-sub">정보</h3>
       <dl class="info">
-        <div id="verRow"><dt>버전</dt><dd>v1.1.0</dd></div>
+        <div id="verRow"><dt>버전</dt><dd>v1.2.0</dd></div>
         <div id="pidRow" hidden><dt>학교 번호</dt><dd id="infoPid"></dd></div>
       </dl>
       <div id="devBox" hidden>
@@ -2093,20 +2109,28 @@ html.ait .app{padding-top:calc(10px + var(--ait-top, 0px));padding-bottom:var(--
       say: '학생이 늘어서 급식이 모자라요. 급식실을 Lv.3까지 키워 주세요.' },
     { id: 'q10', ch: 1, t: 'fac', k: 'playground', n: 3, r: 300, title: '놀이터 넓히기', how: '놀이터가 넓을수록 도토리가 자주 떨어져요',
       say: '놀이터가 넓어지면 참나무가 더 자주 흔들려요. 떨어지는 도토리를 놓치지 마세요!' },
+    { id: 'f3', ch: 1, t: 'furAll', k: 'library', n: 1, r: 300, title: '도서관 가구 갖추기', how: '도서관을 눌러서 가구를 모두 올려요',
+      say: '도서관에 책장만 덩그러니 있으면 쓸쓸하지요. 열람 책상과 독서 소파, 스탠드까지 갖춰 주세요.' },
     { id: 'q11', ch: 1, t: 'grade', n: 2, r: 600, title: '읍내 학교 되기', how: '평판 ★40을 모으면 가게가 늘어선 읍내가 돼요',
       say: '다음 목표는 읍내예요. 평판 ★40을 모으면 마을에 가게가 하나둘 늘어나고, 두 번째 상장을 받아요.' },
 
     { id: 'q12', ch: 2, t: 'tea', k: 'bear', n: 1, r: 800, title: '곰 선생님 모시기', how: '주운 도토리가 15%씩 늘어나요',
       say: '체육 시간이 필요해요! 힘센 곰 선생님이 참나무를 흔들면 떨어지는 도토리가 더 커져요.' },
+    { id: 'p2', ch: 2, t: 'picks', n: 8, r: 600, title: '참나무 도토리 줍기', how: '참나무를 눌러서 떨어진 도토리를 주워요',
+      say: '곰 선생님이 오시니 참나무도 신이 났나 봐요. 떨어진 도토리를 주워서 학교 살림에 보태요.' },
     { id: 'q13', ch: 2, t: 'fac', k: 'library', n: 5, r: 1000, title: '도서관 키우기', how: '도서관을 키우면 평판이 쑥쑥 올라요',
       say: '읍내 곳곳에서 책을 빌리러 와요. 도서관을 Lv.5까지 키우면 도시가 눈앞이에요.' },
     { id: 'q14', ch: 2, t: 'tea', k: 'owl', n: 3, r: 1000, title: '부엉이 선생님 연수', how: '자리 비운 동안 수업료의 75%가 쌓여요',
       say: '부엉이 선생님이 연수를 다녀오면 밤 수업이 더 알차져요. 학교를 비운 동안 쌓이는 도토리가 늘어나요.' },
+    { id: 'f4', ch: 2, t: 'furAll', k: 'playground', n: 3, r: 1500, title: '놀이터 가구 Lv.3', how: '미끄럼틀, 그네, 철봉, 벤치를 Lv.3까지',
+      say: '놀이터가 넓어졌으니 놀이 기구도 튼튼하게 고쳐 줘야지요. 모두 Lv.3까지 올려 주세요.' },
     { id: 'q15', ch: 2, t: 'grade', n: 3, r: 2500, title: '도시 학교 되기', how: '평판 ★85를 모으면 나무 아파트가 들어서요',
       say: '이제 학교 둘레가 도시가 될 차례예요. 평판 ★85를 모으면 나무 아파트가 들어서고 세 번째 상장을 받아요!' },
 
     { id: 'q16', ch: 3, t: 'students', n: 60, r: 4000, title: '학생 60명 맞이하기', how: '교실을 Lv.14까지 넓혀요',
       say: '도시 곳곳에서 입학하러 와요. 학생 60명이 함께 공부하는 학교를 만들어 봐요.' },
+    { id: 'f5', ch: 3, t: 'furAll', k: 'classroom', n: 8, r: 4500, title: '교실 가구 Lv.8', how: '교실 가구를 모두 Lv.8까지 올려요',
+      say: '학생이 많아지니 책상과 의자도 더 튼튼해야 해요. 교실 가구를 모두 Lv.8까지 올려 주세요.' },
     { id: 'q17', ch: 3, t: 'teaAll', n: 5, r: 5000, title: '선생님 모두 Lv.5', how: '세 선생님을 모두 Lv.5까지 연수 보내요',
       say: '실력 있는 선생님이 좋은 학교를 만들어요. 다람쥐, 부엉이, 곰 선생님을 모두 Lv.5까지 키워 주세요.' },
     { id: 'q18', ch: 3, t: 'rate', n: 300, r: 8000, title: '초당 도토리 300', how: '급식실과 다람쥐 선생님이 수업료를 올려 줘요',
@@ -3316,6 +3340,7 @@ html.ait .app{padding-top:calc(10px + var(--ait-top, 0px));padding-bottom:var(--
     let any = false;
     for (const k of Object.keys(TEA)) if (!teaMaxed(k) && S.budget >= teaCost(k)) any = true;
     $('#tabDot').hidden = !any;
+    renderRec();
     if (rt.sheetKey) renderSheet();
     if (rt.tab === 'teachers') renderTeachers();
     checkQuests(false);
@@ -3385,6 +3410,7 @@ html.ait .app{padding-top:calc(10px + var(--ait-top, 0px));padding-bottom:var(--
     if (furReady(k)) toast(S.f[k] >= facCap() ? `가구를 다 채웠어요! ${eun(FAC[k].name)} 올해 최고 레벨이에요` : `가구를 다 채웠어요! 이제 ${eul(FAC[k].name)} Lv.${S.f[k] + 1}로 키울 수 있어요`);
     else if (up.length) toast(`${iga(FUR[k][up[0][0]].name)} ${FUR_STAGE[furStage(S.fu[k][up[0][0]])]} 모습으로 바뀌었어요!`);
     sfx('buy'); buzz(10);
+    rt.recAt = 0;
     renderHUD(); renderAffordance();
     save();
     const sc = $('#furScene');
@@ -3601,9 +3627,10 @@ html.ait .app{padding-top:calc(10px + var(--ait-top, 0px));padding-bottom:var(--
     // 가구 종류마다 첫 자리 위에 레벨 표를 붙여요
     rt.furTag = {};
     const tagSvg = tags.map(([o, n, done, can]) => {
-      const tx = Math.max(20, Math.min(300, o.x + FUR_TAGDX[FUR[k][o.i].id])), ty = Math.min(220, Math.max(14, o.top ? o.y + 14 : o.y + 10));
+      const tx = Math.max(20, Math.min(300, o.x + FUR_TAGDX[FUR[k][o.i].id])), ty = Math.min(220, Math.max(14, o.top ? o.y + 14 : o.y + (FUR[k][o.i].id === 'chair' ? 19 : 10)));
       rt.furTag[o.i] = [tx, ty];
-      return `<g class="fur-tagg${done ? ' done' : can ? ' can' : ''}" data-fur="${o.i}"><rect x="${tx - 19}" y="${ty - 8}" width="38" height="15" rx="7.5" class="fur-tag"/><text x="${tx}" y="${ty + 3.2}" text-anchor="middle" class="fur-tag-t">${n ? 'Lv.' + n : '없음'}</text></g>`;
+      const isRec = rt.rec && rt.rec.kind === 'fur' && rt.rec.k === k && rt.rec.i === o.i;
+      return `<g class="fur-tagg${isRec ? ' rec' : done ? ' done' : can ? ' can' : ''}" data-fur="${o.i}"><rect x="${tx - 19}" y="${ty - 8}" width="38" height="15" rx="7.5" class="fur-tag"/><text x="${tx}" y="${ty + 3.2}" text-anchor="middle" class="fur-tag-t">${n ? 'Lv.' + n : '없음'}</text></g>`;
     }).join('');
     return roomBg(k) + body + tagSvg;
   }
@@ -3614,7 +3641,8 @@ html.ait .app{padding-top:calc(10px + var(--ait-top, 0px));padding-bottom:var(--
     if (!k || S.f[k] < 1) { box.hidden = true; rt.furKey = ''; return; }
     box.hidden = false;
     const L = S.f[k];
-    const key = [k, L, new Date().getDay(), S.fu[k].join(','), FUR[k].map((_, i) => S.budget >= furCost(k, i) ? 1 : 0).join('')].join('|');
+    const rec = rt.rec && rt.rec.kind === 'fur' && rt.rec.k === k ? rt.rec.i : -1;
+    const key = [k, L, rec, new Date().getDay(), S.fu[k].join(','), FUR[k].map((_, i) => S.budget >= furCost(k, i) ? 1 : 0).join('')].join('|');
     if (key === rt.furKey) return;
     rt.furKey = key;
     $('#furScene').innerHTML = renderFurScene(k);
@@ -3623,7 +3651,7 @@ html.ait .app{padding-top:calc(10px + var(--ait-top, 0px));padding-bottom:var(--
       const n = S.fu[k][i], done = n >= L, c = furCost(k, i), ok = !done && S.budget >= c, st = furStage(n);
       const next = st < 4 ? FUR_NEXT[st] : 0;
       return `<button class="fur-row${done ? ' done' : ''}" type="button" data-fur="${i}" aria-disabled="${ok ? 'false' : 'true'}">` +
-        `<span class="fr-tx"><b>${furName(k, i)}</b><small>${n ? `Lv.${n} / ${L}` : '아직 없어요'}${n && next > n ? ` <i>Lv.${next}에 새 모습</i>` : ''}</small></span>` +
+        `<span class="fr-tx"><b>${furName(k, i)}${i === rec ? '<i class="fr-rec">추천</i>' : ''}</b><small>${n ? `Lv.${n} / ${L}` : '아직 없어요'}${n && next > n ? ` <i>Lv.${next}에 새 모습</i>` : ''}</small></span>` +
         (done ? '<span class="fr-done">완료</span>' : `<span class="fr-cost">${acornIcon()}<b>${fmt(c)}</b></span>`) + '</button>';
     }).join('');
     const all = furAllCost(k), ab = $('#furAll');
@@ -3637,6 +3665,107 @@ html.ait .app{padding-top:calc(10px + var(--ait-top, 0px));padding-bottom:var(--
     const i = +el.dataset.fur;
     if (furDone(k, i)) { toast(`${eun(FUR[k][i].name)} 건물 레벨까지 다 올렸어요`); return; }
     if (!buyFur(k, i)) shake(el.tagName === 'BUTTON' ? el : $('#furList').children[i]);
+  }
+
+  /* ---------- 지금 무엇을 올리면 좋을까 (추천) ----------
+     메인 퀘스트가 살 것을 원하면 그것을 먼저 추천해요. 아니면 같은 도토리로 학교가 가장 크게 자라는 것을 골라요.
+     가치 = 학생이 정원까지 찼을 때의 초당 도토리 증가 + 다음 동네까지 평판을 채워 주는 몫(동네가 자라면 수업료 ×1.3).
+     가구는 효과가 없어서 '남은 가구 + 건물 한 단계'를 한 묶음으로 보고, 묶음이 뽑히면 그중 가장 싼 가구부터 추천해요 */
+  function withTry(mut, fn) {
+    const f = { ...S.f }, t = { ...S.t }, st = S.students;
+    try { mut(); return fn(); } finally { S.f = f; S.t = t; S.students = st; }
+  }
+  const potRate = () => withTry(() => { S.students = capacity(); }, () => rate());
+  function repWorth(dRep, base) {
+    const G = CFG.grades;
+    if (S.grade >= G.length - 1 || dRep <= 0) return 0;
+    const need = Math.max(1, townRep(S.grade + 1) - rep());
+    return base * (CFG.gradeMult - 1) * Math.min(1, dRep / need);
+  }
+  const furLeftCost = k => S.f[k] < 1 ? 0 : FUR[k].reduce((a, _, i) => {
+    let c = 0; for (let n = S.fu[k][i]; n < S.f[k]; n++) c += Math.ceil(softCost(FAC[k].cost, n + 1, SOFT.fac) * FUR_SHARE[i] * costScale());
+    return a + c;
+  }, 0);
+  const cheapestFur = k => FUR[k].map((_, i) => i).filter(i => !furDone(k, i)).sort((a, b) => furCost(k, a) - furCost(k, b))[0];
+  const facPick = k => furReady(k) ? { kind: 'fac', k } : { kind: 'fur', k, i: cheapestFur(k) };
+  function valuePick() {
+    const base = potRate(), r0 = rep(), opts = [];
+    for (const k of facKeys()) {
+      if (facMaxed(k)) continue;
+      const cost = furLeftCost(k) + facCost(k);
+      const [pr, rp] = withTry(() => { S.f[k] += 1; S.students = capacity(); }, () => [rate(), rep()]);
+      opts.push({ v: (pr - base + repWorth(rp - r0, base)) / Math.max(1, cost), pick: facPick(k) });
+    }
+    for (const k of Object.keys(TEA)) {
+      if (teaMaxed(k)) continue;
+      const cost = teaCost(k);
+      const [pr, rp] = withTry(() => { S.t[k] += 1; S.students = capacity(); }, () => [rate(), rep()]);
+      opts.push({ v: (pr - base + repWorth(rp - r0, base)) / Math.max(1, cost), pick: { kind: 'tea', k } });
+    }
+    opts.sort((a, b) => b.v - a.v);
+    return opts.length && opts[0].v > 0 ? opts[0].pick : null;
+  }
+  function questPick(qq) {
+    const q = qq || curMain();
+    if (!q || (!qq && mainReady())) return null;
+    if (q.t === 'fac' && facKeys().includes(q.k) && !facMaxed(q.k)) return facPick(q.k);
+    if (q.t === 'fur' && !furDone(q.k, q.i)) return { kind: 'fur', k: q.k, i: q.i };
+    if (q.t === 'furAll' && !furReady(q.k)) return { kind: 'fur', k: q.k, i: cheapestFur(q.k) };
+    if (q.t === 'tea' && !teaMaxed(q.k)) return { kind: 'tea', k: q.k };
+    if (q.t === 'teaAll') { const k = Object.keys(TEA).filter(x => S.t[x] < q.n && !teaMaxed(x)).sort((a, b) => teaCost(a) - teaCost(b))[0]; if (k) return { kind: 'tea', k }; }
+    if (q.t === 'students' && capacity() < q.n && !facMaxed('classroom')) return facPick('classroom');
+    return null;
+  }
+  function recommend() { return questPick() || valuePick(); }
+  // 추천은 1초에 한 번만 다시 계산해요
+  function renderRec(force) {
+    const now = performance.now();
+    if (!force && rt.recAt && now - rt.recAt < 1000) return;
+    rt.recAt = now;
+    const r = recommend(), key = r ? `${r.kind}|${r.k}|${r.i ?? ''}` : '';
+    if (key === rt.recKey) return;
+    rt.recKey = key; rt.rec = r;
+    for (const k of Object.keys(FAC)) { const pq = $('#pq-' + k); if (pq) pq.classList.toggle('is-rec', !!r && r.kind !== 'tea' && r.k === k); }
+    $$('.tcard').forEach(c => c.classList.toggle('is-rec', !!r && r.kind === 'tea' && r.k === c.dataset.k));
+    rt.furKey = '';
+    if (rt.sheetKey) renderSheet();
+  }
+
+  /* 초반 준비물: 초등학교 1학년까지는 메인 퀘스트를 받을 때 교감 선생님이 다음 퀘스트에 드는 도토리가 모자라면 채워 줘요.
+     그래서 켜 놓고 퀘스트를 따라가면 막히지 않고, 초등학교 2학년부터 처음으로 끄고 쉬었다 와야 하는 때가 와요.
+     다음 퀘스트에 드는 도토리는 추천과 같은 방법으로 사 가며 어림해요(가상으로만 사고 원래대로 돌려놓아요) */
+  const prepPhase = () => S.tier === 0 || (S.tier === 1 && S.tg < 1);
+  const PREP_TYPES = new Set(['fac', 'fur', 'furAll', 'tea', 'teaAll', 'students', 'grade', 'ygrade', 'rate']);
+  function needCost(q) {
+    if (!q || !PREP_TYPES.has(q.t)) return 0;
+    const keep = { f: { ...S.f }, t: { ...S.t }, fu: JSON.parse(JSON.stringify(S.fu)), st: S.students };
+    const reached = () => {
+      if (q.t === 'grade' || q.t === 'ygrade') return rep() >= townRep(q.n);
+      if (q.t === 'rate') return rate() >= q.n;
+      if (q.t === 'students') return capacity() >= q.n;
+      return qMeasure(q) >= q.n;
+    };
+    let total = 0;
+    try {
+      S.students = capacity();
+      for (let i = 0; i < 600 && !reached(); i++) {
+        const p = questPick(q) || valuePick();
+        if (!p) break;
+        if (p.kind === 'tea') { total += teaCost(p.k); S.t[p.k] += 1; }
+        else if (p.kind === 'fur') { total += furCost(p.k, p.i); S.fu[p.k][p.i] += 1; }
+        else { total += facCost(p.k); S.f[p.k] += 1; }
+        S.students = capacity();
+      }
+    } finally { S.f = keep.f; S.t = keep.t; S.fu = keep.fu; S.students = keep.st; }
+    return total;
+  }
+  function prepTopUp() {
+    if (!prepPhase()) return;
+    const need = Math.ceil(needCost(curMain()) * 1.05 - S.budget);
+    if (need <= 0) return;
+    const mag = Math.pow(10, Math.max(0, Math.floor(Math.log10(need)) - 1)), v = Math.ceil(need / mag) * mag;
+    S.budget += v;
+    setTimeout(() => toast(`교감 선생님이 다음 준비물로 도토리 ${fmt(v)}개를 보태 주셨어요`), 1600);
   }
 
   /* ---------- 시설 시트 ---------- */
@@ -3675,6 +3804,7 @@ html.ait .app{padding-top:calc(10px + var(--ait-top, 0px));padding-bottom:var(--
     $('#sheetBuyLabel').textContent = maxed ? '올해 최고 레벨' : L >= 1 ? '업그레이드' : '짓기';
     $('#sheetCost').textContent = maxed ? '-' : fmt(c);
     $('#sheetBuy').setAttribute('aria-disabled', ok ? 'false' : 'true');
+    $('#sheetBuy').classList.toggle('is-rec', !!rt.rec && rt.rec.kind === 'fac' && rt.rec.k === k && !maxed);
     // 이 시설이 지금 퀘스트 목표라면 시트 안에서도 알려 줘요
     const mq = curMain();
     let qtxt = '';
@@ -3719,7 +3849,7 @@ html.ait .app{padding-top:calc(10px + var(--ait-top, 0px));padding-bottom:var(--
       <article class="tcard" data-k="${k}">
         <div class="tav"><svg viewBox="-24 -24 48 48" aria-hidden="true">${AV[k]}</svg></div>
         <div>
-          <div class="thead"><h3>${TEA[k].name}</h3><span class="chip">${TEA[k].subject}</span><span class="chip qchip">퀘스트</span><span class="tlv"></span></div>
+          <div class="thead"><h3>${TEA[k].name}</h3><span class="chip">${TEA[k].subject}</span><span class="chip qchip">퀘스트</span><span class="chip rchip">추천</span><span class="tlv"></span></div>
           <p class="tdesc">${TEA[k].desc}</p>
           <div class="teff"><span class="k">지금</span><span class="v now"></span><span class="k k-next">연수 후</span><span class="v next"></span></div>
           <p class="tnote" hidden></p>
@@ -3765,6 +3895,7 @@ html.ait .app{padding-top:calc(10px + var(--ait-top, 0px));padding-bottom:var(--
 
   /* ---------- 구매 뒤 처리와 학교 등급 ---------- */
   function afterPurchase() {
+    rt.recAt = 0;
     sfx('buy'); buzz(10);
     checkGrade();
     renderMap(); renderHUD(); renderAffordance();
@@ -4109,7 +4240,7 @@ html.ait .app{padding-top:calc(10px + var(--ait-top, 0px));padding-bottom:var(--
        forest/stats/<내 id>  테스트 현황 (어디까지 했는지, 얼마나 했는지)
        forest/moves/<코드>   다른 기기로 옮길 때 30분 동안 맡겨 두는 학교
      <내 id>는 Firebase 익명 로그인이 기기(브라우저)마다 만들어 줘요. */
-  const VERSION = '1.1.0';
+  const VERSION = '1.2.0';
   const CLOUD_PUSH = 20000;   // 바뀐 게 있으면 20초마다 올려요
   const STATS_PUSH = 60000;   // 테스트 현황은 1분마다
   const CLOUD_WAIT = 15000;   // 서버가 이만큼 답이 없으면 이 기기에만 저장해요
@@ -6336,6 +6467,7 @@ html.ait .app{padding-top:calc(10px + var(--ait-top, 0px));padding-bottom:var(--
       if (mq && !COUNT_TYPES.has(mq.t)) startMain();
       clearDrops(); rt.dropT = 0; rt.guideKey = null;
       rt.deal = null;
+      prepTopUp();
       return;
     }
     S.budget = startBudget(S.p.perk.start) * costScale();
@@ -6352,6 +6484,7 @@ html.ait .app{padding-top:calc(10px + var(--ait-top, 0px));padding-bottom:var(--
     rt.kids.forEach(k => k.g.remove()); rt.kids = [];
     clearDrops(); rt.dropT = 0; rt.guideKey = null;
     rt.deal = null;   // 학교가 새로 시작하면 까치도 새 소식을 찾아와요
+    prepTopUp();
   }
   function graduate() {
     if (!canGraduate() || rt.paused) return;
@@ -6614,6 +6747,7 @@ html.ait .app{padding-top:calc(10px + var(--ait-top, 0px));padding-bottom:var(--
     addLeague(LP.quest);
     S.q.m += 1;
     startMain();
+    prepTopUp();
     if (!curMain() || curMain().ch !== q.ch) addGold(GOLD.chapter);   // 한 장을 마치면 황금 도토리
     const unlocked = S.q.m === SUB_UNLOCK;
     const added = fillSubs();
@@ -7094,6 +7228,7 @@ html.ait .app{padding-top:calc(10px + var(--ait-top, 0px));padding-bottom:var(--
 
   /* ---------- 이벤트 ---------- */
   function wire() {
+    $$('.plaque').forEach(pq => pq.insertAdjacentHTML('beforeend', '<g class="rec" transform="translate(0 -17)"><rect x="-15" y="-7" width="30" height="13" rx="6.5" class="c-rec"/><text y="3" text-anchor="middle" class="t-rec">추천</text></g>'));
     $$('[data-acorn]').forEach(el => { el.outerHTML = acornIcon(); });
     $$('[data-dip]').forEach(el => { el.outerHTML = dipIcon(); });
     $$('[data-fund]').forEach(el => { el.outerHTML = fundIcon(); });
@@ -7502,7 +7637,7 @@ html.ait .app{padding-top:calc(10px + var(--ait-top, 0px));padding-bottom:var(--
   }
 
   // 시험용 손잡이: 자동 시험(window.__FOREST_TEST)에서만 게임 속 함수를 꺼내 써요
-  if (window.__FOREST_TEST) window.__forest = { get S() { return S; }, rt, rankScore, pwOf, previewDip, dipMult, costScale, buyFacility, buyFur, buyFurAll, furCost, furReady, furDone, FUR, startTalk, endTalk, teacherAct, facCost, teaCost, facKeys, rate, rep, capacity, canGraduate, canPromote,
+  if (window.__FOREST_TEST) window.__forest = { get S() { return S; }, rt, recommend, needCost, prepPhase, rankScore, pwOf, previewDip, dipMult, costScale, buyFacility, buyFur, buyFurAll, furCost, furReady, furDone, FUR, startTalk, endTalk, teacherAct, facCost, teaCost, facKeys, rate, rep, capacity, canGraduate, canPromote,
     graduate, promote, buyPerk, perkCost, perkMaxed, buyFundPerk, fpCost, claimMain, mainReady, curMain, qNo, earn, CFG, TEA, teaMaxed, PERKS, FPERKS, MAIN, finalYear, startTrip, claimTrip, TRIPS, yearLocked, startSports, endSports, rtSports: () => rt.sports, startFest, rtFest: () => rt.fest, facCap, addLeague, weekIdx, addMP, tutStart };
   if (window.claude && window.claude.hot && window.claude.hot.snapshot) {
     try { window.claude.hot.snapshot(() => { if (S) syncMid(); return { save: S }; }); } catch (e) { /* 무시 */ }
