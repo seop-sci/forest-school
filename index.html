@@ -1538,6 +1538,7 @@ html.ait .app{padding-top:calc(10px + var(--ait-top, 0px));padding-bottom:var(--
     <p id="gradText"></p>
     <div class="amount"><span data-dip></span><b id="gradDip">+0</b></div>
     <p class="fine" id="gradNew"></p>
+    <p class="fine grad-rec" id="gradRec"></p>
     <button class="cta" type="button" id="gradOk">새 학기 시작하기</button>
   </section>
 </div>
@@ -1700,7 +1701,7 @@ html.ait .app{padding-top:calc(10px + var(--ait-top, 0px));padding-bottom:var(--
   // '2년째가', '3학년이'처럼 뒤에 붙는 조사까지
   const yearSubj = (n, T) => `${n}${T.unit}${T.unit === '년째' ? '가' : '이'}`;
   // 동네 평판 기준도 학교급마다 20%씩 높아져요
-  const townRep = g => Math.round(CFG.grades[g].rep * (1 + 0.2 * S.tier));
+  const townRep = g => Math.round(CFG.grades[g].rep * (1 + 0.2 * S.tier) * (1 + 0.2 * S.tg));
   // 숫자 뒤 조사: 끝자리가 0, 1, 3, 6, 7, 8이면 받침이 있어요 (십, 일, 삼, 육, 칠, 팔)
   const numEul = n => '013678'.includes(String(n).slice(-1)) ? '을' : '를';
   /* ---------- 오래 하는 구조: 종업식과 졸업식, 명예 교장실, 전학생, 출석부, 보충수업 ---------- */
@@ -1717,8 +1718,8 @@ html.ait .app{padding-top:calc(10px + var(--ait-top, 0px));padding-bottom:var(--
     rep: { name: '소문난 졸업생', desc: '졸업생들이 학교 자랑을 해서 평판이 늘 높아요.',
       cost: L => Math.ceil(3 * Math.pow(1.5, L)), eff: L => `평판 +${5 * L}`,
       icon: '<svg viewBox="0 0 24 24" aria-hidden="true"><path d="M12 3l2.6 5.6 6.1.7-4.5 4.2 1.2 6L12 16.6 6.6 19.5l1.2-6L3.3 9.3l6.1-.7z" class="c-can"/></svg>' },
-    start: { name: '새 학기 준비물', desc: '새 학기를 도토리를 더 들고 시작해요.',
-      cost: L => Math.ceil(3 * Math.pow(2, L)), eff: L => `시작 도토리 ${fmt(startBudget(L) * costScale())}개`,
+    start: { name: '새 학기 준비물', desc: '종업식을 열 때마다 새 학기 준비물로 도토리를 선물받아요.',
+      cost: L => Math.ceil(3 * Math.pow(2, L)), eff: L => L < 1 ? '선물 없음' : `종업식마다 수업료 ${30 * L}분치`,
       icon: '<svg viewBox="0 0 24 24" aria-hidden="true"><rect x="5" y="7" width="14" height="14" rx="4" class="f-bag1"/><path d="M9 7.5V6a3 3 0 0 1 6 0v1.5" class="s-frame"/><rect x="8" y="12" width="8" height="5" rx="1.5" class="f-bag0"/></svg>' },
     drop: { name: '참나무 거름', desc: '참나무가 튼튼해져서 떨어지는 도토리가 커져요.',
       cost: L => Math.ceil(2 * Math.pow(1.6, L)), eff: L => `주운 도토리 +${50 * L}%`,
@@ -1914,14 +1915,14 @@ html.ait .app{padding-top:calc(10px + var(--ait-top, 0px));padding-bottom:var(--
       say: '새해에는 선생님들도 새로 오세요. 다람쥐, 부엉이, 곰 선생님을 모두 모시고 Lv.3까지 연수를 보내 주세요.' },
     { id: 'k4', ch: 4, t: 'ygrade', n: 3, rm: 1.5, title: '2년째 도시 되기', how: '평판을 모아서 도시가 되어요',
       say: '벌써 읍내가 되었네요. 나무 아파트가 들어선 도시까지 쭉쭉 키워 봐요!' },
-    { id: 'k5', ch: 4, t: 'students', n: 50, rm: 1.5, title: '학생 50명 맞이하기', how: '교실을 Lv.11까지 넓혀요',
-      say: '도시 학교라는 소문을 듣고 입학하려는 친구들이 줄을 섰어요. 교실을 넓혀서 50명을 맞이해요.' },
+    { id: 'k5', ch: 4, t: 'students', n: 80, rm: 1.5, title: '학생 80명 맞이하기', how: '교실을 Lv.19까지 넓혀요',
+      say: '도시 학교라는 소문을 듣고 입학하려는 친구들이 줄을 섰어요. 교실을 넓혀서 80명을 맞이해요.' },
     { id: 'k6', ch: 4, t: 'picks', n: 15, rm: 2, title: '도토리 15개 줍기', how: '참나무를 누르면 도토리가 떨어져요',
       say: '졸업식 잔치에 쓸 도토리를 모아요. 참나무를 흔들어서 떨어진 도토리를 15개 주워 주세요!' },
-    { id: 'k7', ch: 4, t: 'fac', k: 'cafeteria', n: 10, rm: 2, title: '졸업 잔치 급식', how: '급식실을 Lv.10까지 키워요',
-      say: '졸업식 날에는 맛있는 잔치 급식이 빠질 수 없지요. 급식실을 Lv.10까지 키워 주세요.' },
-    { id: 'k8', ch: 4, t: 'fac', k: 'library', n: 10, rm: 2, title: '그림책 잔치', how: '도서관을 Lv.10까지 키워요',
-      say: '도서관에서 그림책 잔치를 열어요. 도서관을 Lv.10까지 키우면 대도시가 코앞이에요.' },
+    { id: 'k7', ch: 4, t: 'fac', k: 'cafeteria', n: 14, rm: 2, title: '졸업 잔치 급식', how: '급식실을 Lv.14까지 키워요',
+      say: '졸업식 날에는 맛있는 잔치 급식이 빠질 수 없지요. 급식실을 Lv.14까지 키워 주세요.' },
+    { id: 'k8', ch: 4, t: 'fac', k: 'library', n: 13, rm: 2, title: '그림책 잔치', how: '도서관을 Lv.13까지 키워요',
+      say: '도서관에서 그림책 잔치를 열어요. 도서관을 Lv.13까지 키우면 대도시가 코앞이에요.' },
     { id: 'k1', ch: 4, t: 'tier', n: 1, r: 5, rk: 'dip', title: '유치원 졸업식', how: '2년째에 대도시가 되면 졸업식을 열어요',
       say: '유치원 친구들이 많이 자랐어요! 2년째에 다시 대도시 학교가 되면 졸업식을 열고 숲속 초등학교에 입학해요. 졸업 탭에서 졸업식을 열어 보세요.' },
 
@@ -1954,10 +1955,10 @@ html.ait .app{padding-top:calc(10px + var(--ait-top, 0px));padding-bottom:var(--
     // 7장~11장: 초등학교 2학년부터 6학년까지 한 학년에 한 장. 학년마다 행사가 있고, 이 장의 퀘스트를 다 마쳐야 그 학년 종업식을 열 수 있어요 (ye: 몇 학년을 마치는 퀘스트인지)
     { id: 'e16', ch: 6, t: 'ygrade', n: 2, rm: 3, title: '2학년 읍내 되기', how: '명예 교장실 덕분에 2학년은 더 빨라요',
       say: '2학년이 되었어요! 새 친구들이 늘어서 학교가 북적북적해요. 먼저 읍내 학교가 되어 볼까요?' },
-    { id: 'e17', ch: 6, t: 'students', n: 70, rm: 3, title: '학생 70명 맞이하기', how: '교실을 Lv.16까지 넓혀요',
-      say: '전학 온 친구들 소문을 듣고 학생들이 더 오고 싶어 해요. 교실을 넓혀서 70명을 맞이해요.' },
-    { id: 'e18', ch: 6, t: 'fac', k: 'science', n: 9, rm: 4, title: '과학실 Lv.9', how: '과학실을 Lv.9까지 키워요',
-      say: '2학년은 강낭콩 키우기 관찰 일기를 써요. 과학실을 Lv.9까지 키워서 돋보기를 마련해 줘요.' },
+    { id: 'e17', ch: 6, t: 'students', n: 90, rm: 3, title: '학생 90명 맞이하기', how: '교실을 Lv.21까지 넓혀요',
+      say: '전학 온 친구들 소문을 듣고 학생들이 더 오고 싶어 해요. 교실을 넓혀서 90명을 맞이해요.' },
+    { id: 'e18', ch: 6, t: 'fac', k: 'science', n: 10, rm: 4, title: '과학실 Lv.10', how: '과학실을 Lv.10까지 키워요',
+      say: '2학년은 강낭콩 키우기 관찰 일기를 써요. 과학실을 Lv.10까지 키워서 돋보기를 마련해 줘요.' },
     { id: 'e41', ch: 6, t: 'fest', k: 'welcome', n: 1, rm: 3, title: '새 친구 환영회', how: '지도 왼쪽의 학교 행사 버튼을 눌러요',
       say: '전학 온 친구들을 위해 환영회를 열어요. 광장에 둥글게 모여 풍선을 날려 볼까요?' },
     { id: 'e13', ch: 6, t: 'ygrade', n: 4, rm: 4, title: '2학년 대도시 되기', how: '평판을 모아서 대도시가 되어요',
@@ -1967,12 +1968,12 @@ html.ait .app{padding-top:calc(10px + var(--ait-top, 0px));padding-bottom:var(--
 
     { id: 'e20', ch: 7, t: 'trips', n: 1, rm: 3, title: '첫 현장체험학습', how: '지도 왼쪽의 체험학습 버스를 눌러요',
       say: '3학년은 학교 밖으로 배우러 가요! 지도 왼쪽의 버스를 눌러 뒷산이나 시냇가로 체험학습을 떠나 봐요. 다녀오는 동안에도 학교는 그대로 돌아가요.' },
-    { id: 'e21', ch: 7, t: 'tea', k: 'bear', n: 10, rm: 3, title: '곰 선생님 Lv.10', how: '선생님 탭에서 곰 선생님을 연수 보내요',
-      say: '체험학습에서는 곰 선생님이 앞장서요. 곰 선생님을 Lv.10까지 연수 보내 주세요.' },
-    { id: 'e22', ch: 7, t: 'fac', k: 'library', n: 12, rm: 4, title: '체험학습 보고서', how: '도서관을 Lv.12까지 키워요',
-      say: '다녀온 이야기를 보고서로 써서 도서관에 꽂아 둬요. 도서관을 Lv.12까지 키워요.' },
-    { id: 'e14', ch: 7, t: 'fac', k: 'science', n: 10, rm: 4, title: '과학실 Lv.10', how: '과학실을 Lv.10까지 키워요',
-      say: '시냇가에서 주운 조약돌을 현미경으로 들여다봐요. 과학실을 Lv.10까지 키워 볼까요?' },
+    { id: 'e21', ch: 7, t: 'tea', k: 'bear', n: 15, rm: 3, title: '곰 선생님 Lv.15', how: '선생님 탭에서 곰 선생님을 연수 보내요',
+      say: '체험학습에서는 곰 선생님이 앞장서요. 곰 선생님을 Lv.15까지 연수 보내 주세요.' },
+    { id: 'e22', ch: 7, t: 'fac', k: 'library', n: 17, rm: 4, title: '체험학습 보고서', how: '도서관을 Lv.17까지 키워요',
+      say: '다녀온 이야기를 보고서로 써서 도서관에 꽂아 둬요. 도서관을 Lv.17까지 키워요.' },
+    { id: 'e14', ch: 7, t: 'fac', k: 'science', n: 12, rm: 4, title: '과학실 Lv.12', how: '과학실을 Lv.12까지 키워요',
+      say: '시냇가에서 주운 조약돌을 현미경으로 들여다봐요. 과학실을 Lv.12까지 키워 볼까요?' },
     { id: 'e23', ch: 7, t: 'ygrade', n: 4, rm: 4, title: '3학년 대도시 되기', how: '평판을 모아서 대도시가 되어요',
       say: '3학년도 대도시 학교로 만들어요. 대도시가 되면 종업식을 열 수 있어요.' },
     { id: 'e24', ch: 7, ye: 3, t: 'tgrads', n: 3, r: 7, rk: 'dip', title: '3학년 종업식', how: '졸업 탭에서 종업식을 열어요',
@@ -1980,8 +1981,8 @@ html.ait .app{padding-top:calc(10px + var(--ait-top, 0px));padding-bottom:var(--
 
     { id: 'e25', ch: 8, t: 'sports', n: 1, rm: 3, title: '숲속 운동회 열기', how: '지도 왼쪽의 학교 행사 버튼을 눌러요',
       say: '4학년이 되면 숲속 운동회를 열 수 있어요! 청팀과 백팀으로 나뉘어 달리는 동안, 굴러오는 공을 주워서 청팀을 이기게 해 줘요.' },
-    { id: 'e26', ch: 8, t: 'fac', k: 'playground', n: 14, rm: 4, title: '운동장 Lv.14', how: '운동장을 Lv.14까지 넓혀요',
-      say: '이어달리기를 하려면 운동장이 더 넓어야 해요. 운동장을 Lv.14까지 넓혀요.' },
+    { id: 'e26', ch: 8, t: 'fac', k: 'playground', n: 28, rm: 4, title: '운동장 Lv.28', how: '운동장을 Lv.28까지 넓혀요',
+      say: '이어달리기를 하려면 운동장이 더 넓어야 해요. 운동장을 Lv.28까지 넓혀요.' },
     { id: 'e27', ch: 8, t: 'trips', n: 3, rm: 4, title: '체험학습 세 번', how: '체험학습을 세 번 다녀와요',
       say: '운동회 연습 사이사이 체험학습도 다녀와요. 세 번 다녀와요. 많이 다녀올수록 더 먼 곳이 열려요.' },
     { id: 'e28', ch: 8, t: 'ygrade', n: 4, rm: 4, title: '4학년 대도시 되기', how: '평판을 모아서 대도시가 되어요',
@@ -1989,12 +1990,12 @@ html.ait .app{padding-top:calc(10px + var(--ait-top, 0px));padding-bottom:var(--
     { id: 'q26', ch: 8, ye: 4, t: 'grads', n: 6, r: 8, rk: 'dip', title: '전학생 모두 만나기', how: '4학년 종업식에서 마지막 친구가 와요',
       say: '종업식을 열 때마다 새 친구가 전학 왔지요? 4학년 종업식을 열면 마지막 여섯 번째 친구가 와요!' },
 
-    { id: 'e30', ch: 9, t: 'fac', k: 'library', n: 13, rm: 4, title: '학예회 그림 전시', how: '도서관을 Lv.13까지 키워요',
-      say: '5학년은 학예회를 열어요! 도서관을 Lv.13까지 키워서 그림을 걸 자리를 만들어요.' },
+    { id: 'e30', ch: 9, t: 'fac', k: 'library', n: 32, rm: 4, title: '학예회 그림 전시', how: '도서관을 Lv.32까지 키워요',
+      say: '5학년은 학예회를 열어요! 도서관을 Lv.32까지 키워서 그림을 걸 자리를 만들어요.' },
     { id: 'e31', ch: 9, t: 'souv', n: 6, rm: 4, title: '기념품 6종 모으기', how: '체험학습에서 기념품을 가져와요',
       say: '학예회에 체험학습 기념품도 전시해요. 서로 다른 기념품을 6종 모아 볼까요?' },
-    { id: 'e32', ch: 9, t: 'fac', k: 'cafeteria', n: 14, rm: 4, title: '학예회 잔치 급식', how: '급식실을 Lv.14까지 키워요',
-      say: '학예회 날엔 부모님도 오셔요. 급식실을 Lv.14까지 키워서 잔치 급식을 준비해요.' },
+    { id: 'e32', ch: 9, t: 'fac', k: 'cafeteria', n: 33, rm: 4, title: '학예회 잔치 급식', how: '급식실을 Lv.33까지 키워요',
+      say: '학예회 날엔 부모님도 오셔요. 급식실을 Lv.33까지 키워서 잔치 급식을 준비해요.' },
     { id: 'e42', ch: 9, t: 'fest', k: 'show', n: 1, rm: 4, title: '학예회 공연', how: '지도 왼쪽의 학교 행사 버튼을 눌러요',
       say: '드디어 학예회 날이에요! 광장 무대에서 친구들이 공연하면 음표를 눌러 박수를 보내 줘요.' },
     { id: 'e33', ch: 9, t: 'ygrade', n: 4, rm: 5, title: '5학년 대도시 되기', how: '평판을 모아서 대도시가 되어요',
@@ -2002,10 +2003,10 @@ html.ait .app{padding-top:calc(10px + var(--ait-top, 0px));padding-bottom:var(--
     { id: 'e34', ch: 9, ye: 5, t: 'tgrads', n: 5, r: 10, rk: 'dip', title: '5학년 종업식', how: '졸업 탭에서 종업식을 열어요',
       say: '5학년을 마쳤어요! 드디어 초등학교 마지막 학년인 6학년이에요.' },
 
-    { id: 'e15', ch: 10, t: 'students', n: 90, rm: 5, title: '학생 90명 맞이하기', how: '교실을 Lv.21까지 넓혀요',
-      say: '숲속 초등학교가 숲에서 제일 큰 학교가 되어 가요. 교실을 넓혀서 90명을 맞이해요.' },
-    { id: 'e35', ch: 10, t: 'fac', k: 'science', n: 12, rm: 5, title: '졸업 과학 전시회', how: '과학실을 Lv.12까지 키워요',
-      say: '6학년은 졸업 전에 과학 전시회를 열어요. 과학실을 Lv.12까지 키워요.' },
+    { id: 'e15', ch: 10, t: 'students', n: 170, rm: 5, title: '학생 170명 맞이하기', how: '교실을 Lv.41까지 넓혀요',
+      say: '숲속 초등학교가 숲에서 제일 큰 학교가 되어 가요. 교실을 넓혀서 170명을 맞이해요.' },
+    { id: 'e35', ch: 10, t: 'fac', k: 'science', n: 35, rm: 5, title: '졸업 과학 전시회', how: '과학실을 Lv.35까지 키워요',
+      say: '6학년은 졸업 전에 과학 전시회를 열어요. 과학실을 Lv.35까지 키워요.' },
     { id: 'e36', ch: 10, t: 'souv', n: 10, rm: 5, title: '기념품 10종 모으기', how: '체험학습에서 기념품을 가져와요',
       say: '졸업 앨범에 체험학습 추억을 담아요. 서로 다른 기념품을 10종 모아요.' },
     { id: 'e37', ch: 10, t: 'tripat', k: 'star', n: 1, rm: 6, title: '졸업 여행: 별빛 천문대', how: '체험학습에서 별빛 천문대를 골라요',
@@ -2303,8 +2304,16 @@ html.ait .app{padding-top:calc(10px + var(--ait-top, 0px));padding-bottom:var(--
   const dealLeft = () => DEAL.perDay - (S.hd.day === todayStr() ? S.hd.n : 0);
   // 출석부는 1장(튜토리얼)을 마친 뒤에 열어서 첫 몇 분이 너무 쉬워지지 않게 해요
   const attUnlocked = () => S.q.m >= 7 || S.st.grads > 0 || S.att.n > 0;
-  const facCost = k => Math.ceil(FAC[k].cost(S.f[k]) * costScale());
-  const teaCost = k => Math.ceil(TEA[k].cost(S.t[k]) * costScale());
+  /* 레벨 확장: 종업식을 열어도 시설과 선생님, 도토리는 그대로 남아요. 대신 학년(해)마다 시설의 최고 레벨이 5씩 늘어나요.
+     유치원은 Lv.16부터, 초등학교는 Lv.18부터. 동네(마을 → 대도시)는 해마다 다시 키우고, 필요한 평판은 해마다 20%씩 높아져요 */
+  const CAP_STEP = 5;
+  const facCap = () => (S.tier >= 1 ? 18 : 16) + CAP_STEP * S.tg;
+  const facMaxed = k => S.f[k] >= facCap();
+  // 학교가 계속 자라니까 높은 레벨은 값이 덜 가파르게 올라요: 시설은 Lv.15부터, 선생님은 Lv.12부터 한 레벨에 1.35배씩
+  const SOFT = { fac: 15, tea: 12, g: 1.35 };
+  const softCost = (fn, L, from) => fn(Math.min(L, from)) * Math.pow(SOFT.g, Math.max(0, L - from));
+  const facCost = k => facMaxed(k) ? Infinity : Math.ceil(softCost(FAC[k].cost, S.f[k], SOFT.fac) * costScale());
+  const teaCost = k => Math.ceil(softCost(TEA[k].cost, S.t[k], SOFT.tea) * costScale());
   const teaMaxed = k => !!TEA[k].max && S.t[k] >= TEA[k].max;
 
   // 큰 숫자 줄여 쓰기: 기본은 토스처럼 만, 억, 조. 설정에서 K, M, B로 바꿀 수 있어요
@@ -3045,16 +3054,16 @@ html.ait .app{padding-top:calc(10px + var(--ait-top, 0px));padding-bottom:var(--
   }
   function renderSheet() {
     const k = rt.sheetKey; if (!k) return;
-    const F = FAC[k], L = S.f[k], c = facCost(k), ok = S.budget >= c;
+    const F = FAC[k], L = S.f[k], c = facCost(k), ok = S.budget >= c, cap = facCap(), maxed = facMaxed(k);
     $('#sheetTitle').textContent = F.name;
-    $('#sheetSub').textContent = L >= 1 ? `Lv.${L}` : '아직 짓지 않았어요';
+    $('#sheetSub').textContent = L >= 1 ? `Lv.${L} / 올해 최고 Lv.${cap}` : '아직 짓지 않았어요';
     $('#sheetDesc').textContent = F.desc;
     $('#effNow').textContent = F.eff(L);
-    $('#effNextLabel').textContent = L >= 1 ? '다음 레벨' : '지으면';
-    $('#effNext').textContent = F.eff(L + 1);
+    $('#effNextLabel').textContent = maxed ? '다음 학년' : L >= 1 ? '다음 레벨' : '지으면';
+    $('#effNext').textContent = maxed ? `Lv.${cap + CAP_STEP}까지 열려요` : F.eff(L + 1);
     $('#sheetRep').textContent = k === 'library' ? '도서관은 평판을 가장 많이 올려요. 평판이 쌓이면 학교 등급이 올라가요.' : `레벨이 오를 때마다 평판도 ★${F.rep} 올라요.`;
-    $('#sheetBuyLabel').textContent = L >= 1 ? '업그레이드' : '짓기';
-    $('#sheetCost').textContent = fmt(c);
+    $('#sheetBuyLabel').textContent = maxed ? '올해 최고 레벨' : L >= 1 ? '업그레이드' : '짓기';
+    $('#sheetCost').textContent = maxed ? '-' : fmt(c);
     $('#sheetBuy').setAttribute('aria-disabled', ok ? 'false' : 'true');
     // 이 시설이 지금 퀘스트 목표라면 시트 안에서도 알려 줘요
     const mq = curMain();
@@ -3068,7 +3077,7 @@ html.ait .app{padding-top:calc(10px + var(--ait-top, 0px));padding-bottom:var(--
     const qn = $('#sheetQuest');
     qn.hidden = !qtxt;
     qn.textContent = qtxt;
-    $('#sheetNeed').textContent = ok ? ' ' : `도토리 ${fmt(Math.ceil(c - S.budget))}개가 더 필요해요`;
+    $('#sheetNeed').textContent = maxed ? `종업식을 열면 Lv.${cap + CAP_STEP}까지 더 키울 수 있어요` : ok ? ' ' : `도토리 ${fmt(Math.ceil(c - S.budget))}개가 더 필요해요`;
   }
   function buyFacility(k, price) {
     const c = price || facCost(k);
@@ -3341,7 +3350,7 @@ html.ait .app{padding-top:calc(10px + var(--ait-top, 0px));padding-bottom:var(--
   // 소식이 나온 뒤에 이미 최고 레벨이 되었거나 종업식을 열었으면 그 핫딜은 쓸 수 없어요
   function dealValid(d) {
     if (!d) return false;
-    if (d.type === 'fac') return facKeys().includes(d.k);
+    if (d.type === 'fac') return facKeys().includes(d.k) && !facMaxed(d.k);
     if (d.type === 'tea') return !teaMaxed(d.k) && teaCost(d.k) > 0;
     if (d.type === 'album') return canGraduate() && !S.hd.album;
     return true;
@@ -5181,7 +5190,7 @@ html.ait .app{padding-top:calc(10px + var(--ait-top, 0px));padding-bottom:var(--
     $('#gCard').hidden = last;
     $('#gLead').textContent = last
       ? `${T.name}${T.unit === '년째' ? `은 ${T.years}년째가 마지막 해예요` : `는 ${T.years}학년이 마지막 학년이에요`}. 대도시 학교가 되면 종업식 대신 졸업식을 열고 ${N.school}에 입학해요. 수료증은 명예 교장실에서 써요.`
-      : `대도시 학교가 되면 종업식을 열 수 있어요. 학교와 동네는 처음으로 돌아가지만, 수료증으로 명예 교장실을 고치면 ${T.unit === '년째' ? '다음 해는' : '다음 학년은'} 더 빨리 자라요.`;
+      : `대도시 학교가 되면 종업식을 열 수 있어요. 학교는 그대로 남고 ${T.unit === '년째' ? '다음 해에는' : '다음 학년에는'} 시설을 Lv.${facCap() + CAP_STEP}까지 키울 수 있어요. 동네는 다시 키워야 해요.`;
     $('#gHave').textContent = fmt(S.p.dip);
     $('#gPreview').textContent = `${fmt(d)}장`;
     const lo = dipAt(d), hi = dipAt(d + 1);
@@ -5288,14 +5297,26 @@ html.ait .app{padding-top:calc(10px + var(--ait-top, 0px));padding-bottom:var(--
     const d = previewDip();
     const T = tierInfo(), n = S.tg + 2;
     const begins = n > T.years ? '새 학기가' : `${T.name} ${yearSubj(n, T)}`;
-    let txt = `종업식을 열면 ${begins} 시작돼요. 도토리, 시설, 선생님, 동네는 처음으로 돌아가고 수료증 ${fmt(d)}장을 받아요. 명예 교장실과 전학 온 친구들, 퀘스트 기록은 그대로 남아요.`;
+    let txt = `종업식을 열면 ${begins} 시작돼요. 수료증 ${fmt(d)}장을 받고, 학교(시설, 선생님, 도토리)는 그대로 남아요. 시설은 Lv.${facCap() + CAP_STEP}까지 더 키울 수 있고, 동네는 다시 키워요.`;
     if (mainReady()) txt += ' 받지 않은 메인 퀘스트 보상이 있으니 먼저 받아 주세요.';
     $('#gConfirmText').textContent = txt;
     $('#gConfirm').hidden = false;
     $('#gNo').focus({ preventScroll: true });
   }
   // 새 학기: 학교는 처음으로 돌아가고 종업식과 졸업식으로 얻은 것만 남아요
-  function newYear() {
+  function newYear(full) {
+    if (!full) {
+      // 종업식: 학교는 그대로, 동네만 다시 키워요. 새 학기 준비물이 있으면 수업료 몇 분치를 선물로 받아요
+      const gift = S.p.perk.start > 0 ? nice(rate() * 60 * 30 * S.p.perk.start) : 0;
+      if (gift) { S.budget += gift; rt.yearGift = gift; } else rt.yearGift = 0;
+      S.grade = 0; S.pending = 0; S.pendingSec = 0; S.yearEarned = 0;
+      fillSubs();
+      const mq = curMain();
+      if (mq && !COUNT_TYPES.has(mq.t)) startMain();
+      clearDrops(); rt.dropT = 0; rt.guideKey = null;
+      rt.deal = null;
+      return;
+    }
     S.budget = startBudget(S.p.perk.start) * costScale();
     S.students = 4;
     S.f = { classroom: 1, cafeteria: 0, library: 0, playground: 0, science: 0 };
@@ -5314,12 +5335,13 @@ html.ait .app{padding-top:calc(10px + var(--ait-top, 0px));padding-bottom:var(--
     const dip = previewDip(), leaving = Math.floor(S.students);
     addDip(dip);
     S.hd.album = false;
+    rt.yearRec = facKeys().filter(k => S.f[k] > 0).map(k => `${FAC[k].name} Lv.${S.f[k]}`).join(', ') + `, 학생 ${Math.floor(S.students)}명`;
     S.st.grads += 1; S.tg += 1;
     cloudSoon();
     addGold(GOLD.grad);
     let newcomer = null;
     if (S.p.species < NEWCOMERS.length) { newcomer = NEWCOMERS[S.p.species]; S.p.species += 1; }
-    newYear();
+    newYear(false);
     if (newcomer) rt.kidSeq = BASE_SPECIES.length + S.p.species - 1;   // 새 친구가 맨 먼저 교문으로 들어와요
     $('#gConfirm').hidden = true;
     checkGrade();
@@ -5341,9 +5363,11 @@ html.ait .app{padding-top:calc(10px + var(--ait-top, 0px));padding-bottom:var(--
       ? `<svg viewBox="-10 -15.5 20 27" aria-hidden="true">${kidSVG(newcomer.k, 0)}</svg>`
       : `<svg viewBox="-10 -10 20 20" aria-hidden="true">${DIP}</svg>`;
     $('#gradNew').textContent = newcomer
-      ? `새 친구 ${newcomer.name}${newcomer.ga} 전학 왔어요! 앞으로 수업료 +5%`
+      ? `새 친구 ${newcomer.name}${newcomer.ga} 전학 왔어요! 앞으로 수업료 +5%.`
       : '전학 올 친구를 모두 만났어요. 수료증으로 명예 교장실을 고쳐 보세요.';
-    $('#gradNew').textContent += ` 황금 도토리 +${GOLD.grad}개도 받았어요.`;
+    $('#gradNew').textContent += ` 황금 도토리 +${GOLD.grad}개도 받았어요. 이제 시설을 Lv.${facCap()}까지 키울 수 있어요.` + (rt.yearGift ? ` 새 학기 준비물로 도토리 +${fmt(rt.yearGift)}!` : '');
+    $('#gradRec').textContent = rt.yearRec ? `올해 기록: ${rt.yearRec}` : '';
+    $('#gradRec').hidden = !rt.yearRec;
     openModal($('#mGrad'));
     sfx('bell'); setTimeout(() => sfx('quest'), 900);
     return true;
@@ -5374,7 +5398,7 @@ html.ait .app{padding-top:calc(10px + var(--ait-top, 0px));padding-bottom:var(--
     S.tier += 1; S.tg = 0; S.tdip = 0; S.best = 0;
     S.p.dip = 0;
     for (const k in S.p.perk) S.p.perk[k] = 0;
-    newYear();
+    newYear(true);
     if (newcomer) rt.kidSeq = BASE_SPECIES.length + S.p.species - 1;
     $('#tierConfirm').hidden = true;
     queueModal(() => showEntrance(fund, leaving, from, newcomer, dipsIn));
@@ -5840,7 +5864,6 @@ html.ait .app{padding-top:calc(10px + var(--ait-top, 0px));padding-bottom:var(--
       card.classList.remove('flash'); void card.offsetWidth; card.classList.add('flash');
     }
     // 종업식을 열면 선생님도 쉬러 가셔서 새 학년에 다시 모셔 와야 해요
-    if (!msg && S.t[k] < 1 && (S.tg > 0 || S.tier > 0)) msg = `종업식 때 ${TEA[k].name}도 쉬러 가셨어요. 다시 모셔 와요`;
     if (msg) toast(msg);
   }
   function bestPick(kind) {
@@ -6380,7 +6403,7 @@ html.ait .app{padding-top:calc(10px + var(--ait-top, 0px));padding-bottom:var(--
 
   // 시험용 손잡이: 자동 시험(window.__FOREST_TEST)에서만 게임 속 함수를 꺼내 써요
   if (window.__FOREST_TEST) window.__forest = { get S() { return S; }, rt, buyFacility, teacherAct, facCost, teaCost, facKeys, rate, rep, capacity, canGraduate, canPromote,
-    graduate, promote, buyPerk, perkCost, perkMaxed, buyFundPerk, fpCost, claimMain, mainReady, curMain, qNo, earn, CFG, TEA, teaMaxed, PERKS, FPERKS, MAIN, finalYear, startTrip, claimTrip, TRIPS, yearLocked, startSports, endSports, rtSports: () => rt.sports, startFest, rtFest: () => rt.fest };
+    graduate, promote, buyPerk, perkCost, perkMaxed, buyFundPerk, fpCost, claimMain, mainReady, curMain, qNo, earn, CFG, TEA, teaMaxed, PERKS, FPERKS, MAIN, finalYear, startTrip, claimTrip, TRIPS, yearLocked, startSports, endSports, rtSports: () => rt.sports, startFest, rtFest: () => rt.fest, facCap };
   if (window.claude && window.claude.hot && window.claude.hot.snapshot) {
     try { window.claude.hot.snapshot(() => { if (S) syncMid(); return { save: S }; }); } catch (e) { /* 무시 */ }
   }
