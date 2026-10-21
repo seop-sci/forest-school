@@ -8,7 +8,7 @@ BOT = r"""(maxH) => {
   const step = () => { const s = S(); const cap = F.capacity(); if (s.students < cap) s.students = Math.min(cap, s.students + F.CFG.enroll * dt); const g = F.rate() * dt; s.budget += g; F.earn(g); t += dt; yearT += dt; };
   const buy = () => { for (let i = 0; i < 60; i++) {
       const c = [];
-      for (const k of F.facKeys()) c.push([F.facCost(k), () => F.buyFacility(k)]);
+      for (const k of F.facKeys()) { if (F.furReady(k)) c.push([F.facCost(k), () => F.buyFacility(k)]); else F.FUR[k].forEach((_, i) => { if (!F.furDone(k, i)) c.push([F.furCost(k, i), () => F.buyFur(k, i, true)]); }); }
       for (const k of Object.keys(F.TEA)) if (!F.teaMaxed(k)) c.push([F.teaCost(k), () => F.teacherAct(k)]);
       c.sort((a, b) => a[0] - b[0]);
       if (!c.length || c[0][0] > S().budget) return; c[0][1]();
