@@ -1,0 +1,69 @@
+// database.rules.json을 targaryen으로 시험해요: 누가 어디를 읽고 쓸 수 있는지
+const targaryen = require('targaryen');
+const rules = require(process.argv[2]);
+const SAVE = { d: '{"v":4}', at: 1, v: '1.0' };
+const RANK = { name: '지섭 교장', score: 120, at: 1, tier: 1, year: 2, test: false, pid: 'K7QM2XPA' };
+const STAT = { seen: 1, pid: 'K7QM2XPA', name: '', tier: 0 };
+const base = { forest: { saves: { A: SAVE }, rank: { A: RANK }, stats: { A: STAT }, moves: { K7QM2XPA: { d: 'x', at: 1, from: 'A', v: '1.0' } } } };
+const fresh = () => targaryen.database(rules, base);   // 처음 상태는 로그인 안 한 사람
+const as = uid => uid ? fresh().as({ uid, provider: 'anonymous' }) : fresh();
+let pass = 0, fail = 0;
+function t(name, got, want) {
+  if (got === want) pass++;
+  else { fail++; console.log('FAIL', name, 'got', got, 'want', want); }
+}
+const R = (uid, path) => as(uid).read(path).allowed;
+const W = (uid, path, v) => as(uid).write(path, v).allowed;
+
+// 게임 저장: 나만
+t('save read own', R('A', '/forest/saves/A'), true);
+t('save read other', R('B', '/forest/saves/A'), false);
+t('save read anon', R(null, '/forest/saves/A'), false);
+t('save list', R('A', '/forest/saves'), false);
+t('save write own', W('A', '/forest/saves/A', SAVE), true);
+t('save write other', W('B', '/forest/saves/A', SAVE), false);
+t('save write anon', W(null, '/forest/saves/A', SAVE), false);
+t('save bad shape', W('A', '/forest/saves/A', { d: 1, at: 1, v: '1.0' }), false);
+t('save missing v', W('A', '/forest/saves/A', { d: 'x', at: 1 }), false);
+t('save too big', W('A', '/forest/saves/A', { d: 'x'.repeat(200000), at: 1, v: '1.0' }), false);
+t('save delete own', W('A', '/forest/saves/A', null), true);
+// 랭킹: 로그인한 사람은 모두 읽고, 내 칸만 써요
+t('rank read', R('B', '/forest/rank'), true);
+t('rank read anon', R(null, '/forest/rank'), false);
+t('rank write own', W('B', '/forest/rank/B', RANK), true);
+t('rank write other', W('B', '/forest/rank/A', RANK), false);
+t('rank server time', W('B', '/forest/rank/B', Object.assign({}, RANK, { at: { '.sv': 'timestamp' } })), true);
+t('rank name 10', W('B', '/forest/rank/B', Object.assign({}, RANK, { name: '가나다라마바사아자차' })), true);
+t('rank name 11', W('B', '/forest/rank/B', Object.assign({}, RANK, { name: '가나다라마바사아자차카' })), false);
+t('rank name empty', W('B', '/forest/rank/B', Object.assign({}, RANK, { name: '' })), false);
+t('rank score neg', W('B', '/forest/rank/B', Object.assign({}, RANK, { score: -1 })), false);
+t('rank score str', W('B', '/forest/rank/B', Object.assign({}, RANK, { score: '9' })), false);
+t('rank score huge', W('B', '/forest/rank/B', Object.assign({}, RANK, { score: 1e12 })), false);
+t('rank delete own', W('A', '/forest/rank/A', null), true);
+t('rank delete other', W('B', '/forest/rank/A', null), false);
+// 테스트 현황
+t('stats read', R('B', '/forest/stats'), true);
+t('stats read anon', R(null, '/forest/stats'), false);
+t('stats write own', W('B', '/forest/stats/B', Object.assign({}, STAT, { seen: { '.sv': 'timestamp' } })), true);
+t('stats write other', W('B', '/forest/stats/A', STAT), false);
+t('stats no pid', W('B', '/forest/stats/B', { seen: 1 }), false);
+// 이어하기 코드: 코드를 아는 사람만 읽고, 새로 만들거나 지울 수만 있어요
+const MV = { d: 'y', at: { '.sv': 'timestamp' }, from: 'B', v: '1.0' };
+t('move read by code', R('B', '/forest/moves/K7QM2XPA'), true);
+t('move read anon', R(null, '/forest/moves/K7QM2XPA'), false);
+t('move list', R('B', '/forest/moves'), false);
+t('move create', W('B', '/forest/moves/ABCD2345', MV), true);
+t('move overwrite', W('B', '/forest/moves/K7QM2XPA', MV), false);
+t('move overwrite own', W('A', '/forest/moves/K7QM2XPA', Object.assign({}, MV, { from: 'A' })), false);
+t('move from other', W('B', '/forest/moves/ABCD2345', Object.assign({}, MV, { from: 'A' })), false);
+t('move future at', W('B', '/forest/moves/ABCD2345', Object.assign({}, MV, { at: Date.now() + 3600e3 })), false);
+t('move bad code 0', W('B', '/forest/moves/ABCD0345', MV), false);
+t('move bad code len', W('B', '/forest/moves/ABCD234', MV), false);
+t('move delete by redeemer', W('B', '/forest/moves/K7QM2XPA', null), true);
+t('move delete anon', W(null, '/forest/moves/K7QM2XPA', null), false);
+// 나머지는 막혀요
+t('root read', R('A', '/'), false);
+t('root write', W('A', '/hack', 1), false);
+t('forest write', W('A', '/forest', {}), false);
+console.log(`rules: ${pass} passed, ${fail} failed`);
+process.exit(fail ? 1 : 0);

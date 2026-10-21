@@ -739,6 +739,20 @@ html.ait .app{padding-top:calc(10px + var(--ait-top, 0px));padding-bottom:var(--
 .fe-lock{flex:none;font-size:12px;color:var(--muted)}
 .camflash{position:absolute;inset:0;z-index:5;border-radius:15px;background:#FFFFFF;pointer-events:none;animation:camflash .7s ease-out forwards}
 @keyframes camflash{from{opacity:.95}to{opacity:0}}
+.dms{display:flex;flex-direction:column;gap:6px}
+.dm{display:flex;align-items:center;gap:10px;padding:10px 12px;border-radius:14px;background:var(--card)}
+.dm.done{opacity:.6}
+.dm.bonus{background:color-mix(in srgb, var(--accent) 14%, var(--card))}
+.dm-tx{flex:1;min-width:0;display:flex;flex-direction:column;gap:5px}
+.dm-tx b{font-family:var(--font-display);font-weight:400;font-size:14.5px;color:var(--ink)}
+.dm-tx span{display:inline-flex;align-items:center;gap:3px;font-size:12.5px;color:var(--muted)}
+.dm-tx span svg{width:13px;height:15px}
+.dm .qbar{margin:0}
+.dm-n{flex:none;font-size:13px;color:var(--chip-ink);font-variant-numeric:tabular-nums}
+.dm-ok{flex:none;width:22px;height:22px;color:var(--accent-shadow)}
+.dm .cta.small{flex:none;width:auto;min-height:38px;padding:0 14px}
+.rank-seg{display:flex;width:100%;margin:0 0 10px}
+.rank-seg button{flex:1}
 .sr-score{margin:0 0 6px;font-family:var(--font-chalk);font-weight:700;font-size:22px}
 .sp-wait{color:var(--chip-ink)}
 .trip-modal{text-align:left;max-height:calc(100dvh - 32px);overflow-y:auto;overscroll-behavior:contain}
@@ -1250,7 +1264,9 @@ html.ait .app{padding-top:calc(10px + var(--ait-top, 0px));padding-bottom:var(--
     <section class="panel" id="panelQuests" hidden aria-labelledby="ttlQuests">
       <h2 id="ttlQuests">퀘스트</h2>
       <p class="lead">교감 선생님의 메인 퀘스트를 따라가면 학교 운영을 차근차근 익힐 수 있어요. 학생들의 부탁을 들어주면 도토리를 더 받아요.</p>
-      <h3 class="qsec">메인 퀘스트 <small>교감 선생님의 안내</small></h3>
+      <h3 class="qsec">오늘의 미션 <small>자정에 바뀌어요. 하나에 황금 도토리 1개</small></h3>
+      <div class="dms" id="qDaily"></div>
+      <h3 class="qsec second">메인 퀘스트 <small>교감 선생님의 안내</small></h3>
       <div id="qMain"></div>
       <h3 class="qsec second">학생들의 부탁 <small>들어주면 도토리로 고마움을 전해요</small></h3>
       <div class="reqs" id="qSubs"></div>
@@ -1313,9 +1329,10 @@ html.ait .app{padding-top:calc(10px + var(--ait-top, 0px));padding-bottom:var(--
 
     <section class="panel" id="panelRank" hidden aria-labelledby="ttlRank">
       <h2 id="ttlRank">랭킹</h2>
-      <p class="lead">종업식과 졸업식에서 받은 수료증을 모두 더한 학교 점수로 순위를 매겨요.</p>
+      <div class="seg rank-seg" id="rankView" role="radiogroup" aria-label="랭킹 보기"><button type="button" role="radio" data-rv="week" aria-checked="true">주간 리그</button><button type="button" role="radio" data-rv="all" aria-checked="false">전체 순위</button></div>
+      <p class="lead" id="rankLead">종업식과 졸업식에서 받은 수료증을 모두 더한 학교 점수로 순위를 매겨요.</p>
       <div class="rank-me" id="rankMe">
-        <div><span class="lab">내 학교 점수</span><b id="rankScore">0</b></div>
+        <div><span class="lab" id="rankScoreLab">내 학교 점수</span><b id="rankScore">0</b></div>
         <div class="pos"><span class="lab">순위</span><b id="rankPos">-</b></div>
         <div class="rank-sub" id="rankSub"></div>
       </div>
@@ -2093,6 +2110,8 @@ html.ait .app{padding-top:calc(10px + var(--ait-top, 0px));padding-bottom:var(--
     trip: { open: false, cur: '', start: 0, end: 0, souv: [], been: {}, kids: 0 },
     sports: { next: 0 },
     fest: { next: {}, n: {} },
+    dm: { day: '', list: [], bonus: false },
+    lg: { week: -1, pts: 0, pos: 0, paid: false, last: null },
     gold: 5, gd: { day: '', n: 0, shop: 0 }, cos: { own: [], hat: '', neck: '', th: { bg: '', classroom: '', cafeteria: '', library: '', science: '', playground: '' } }, autoUntil: 0,
     rank: { name: '', joined: false, sent: -1, by: '', ren: 0, asked: false },
     q: freshQ()
@@ -2165,6 +2184,14 @@ html.ait .app{padding-top:calc(10px + var(--ait-top, 0px));padding-bottom:var(--
     if (d.fest && typeof d.fest === 'object') for (const id of FEST_IDS) {
       if (d.fest.next && d.fest.next[id]) s.fest.next[id] = Math.min(num(d.fest.next[id], 0, 0), Date.now() + 2 * 3600000);
       if (d.fest.n && d.fest.n[id]) s.fest.n[id] = Math.floor(num(d.fest.n[id], 0, 0));
+    }
+    if (d.dm && typeof d.dm === 'object' && typeof d.dm.day === 'string') {
+      s.dm.day = d.dm.day.slice(0, 10); s.dm.bonus = !!d.dm.bonus;
+      s.dm.list = (Array.isArray(d.dm.list) ? d.dm.list : []).filter(m => m && MISSIONS[m.id]).slice(0, 3).map(m => ({ id: m.id, b: num(m.b, 0, 0), done: !!m.done }));
+    }
+    if (d.lg && typeof d.lg === 'object') {
+      s.lg.week = Math.floor(num(d.lg.week, -1, -1)); s.lg.pts = Math.floor(num(d.lg.pts, 0, 0)); s.lg.pos = Math.floor(num(d.lg.pos, 0, 0)); s.lg.paid = !!d.lg.paid;
+      if (d.lg.last && typeof d.lg.last === 'object') s.lg.last = { week: num(d.lg.last.week, 0, 0), pts: num(d.lg.last.pts, 0, 0), pos: num(d.lg.last.pos, 0, 0), gold: num(d.lg.last.gold, 0, 0) };
     }
     if (d.sports && typeof d.sports === 'object') s.sports.next = Math.min(num(d.sports.next, 0, 0), Date.now() + 2 * 3600000);
     if (d.trip && typeof d.trip === 'object') {
@@ -3027,6 +3054,7 @@ html.ait .app{padding-top:calc(10px + var(--ait-top, 0px));padding-bottom:var(--
     renderBoostBtn();
     renderTripBtn();
     renderSportsBtn();
+    if (rt.tab === 'quests') renderMissions();
     $('#btnAtt').hidden = !attUnlocked();
     $('#attDot').hidden = !attUnlocked() || !canStamp();
     $('#gDot').hidden = rt.tab === 'grad' || !(canGraduate() || canPromote() || Object.keys(PERKS).some(k => !perkMaxed(k) && S.p.dip >= perkCost(k)) || Object.keys(FPERKS).some(k => S.fund >= fpCost(k)));
@@ -3932,7 +3960,7 @@ html.ait .app{padding-top:calc(10px + var(--ait-top, 0px));padding-bottom:var(--
      토스 미니앱: 랭킹은 토스 게임 센터가 맡아요. 점수가 오를 때 submitGameCenterLeaderBoardScore({ score: String(rankScore()) })를 보내고,
      랭킹 버튼에서는 openGameCenterLeaderboard()로 토스 랭킹 화면을 열면 돼요. 미니앱마다 랭킹은 하나라서 학교 점수 하나만 보내요. */
   const RANK_MAX = 50;
-  const Rank = { state: 'idle', gen: 0, be: null, uid: null, rows: [], readOnly: false, writing: false, timer: 0, unsub: null };
+  const Rank = { state: 'idle', gen: 0, be: null, uid: null, rows: [], wrows: [], readOnly: false, writing: false, timer: 0, unsub: null, unsubW: null };
   // 학교 점수 = 지금까지 받은 수료증 (종업식, 졸업식, 출석, 퀘스트). 학교급이 달라도 비슷한 크기라서 순위를 매기기 좋아요
   const rankScore = () => Math.floor(S.st.dips);
   // 이름: 앞뒤 빈칸을 지우고 빈칸은 하나로, 10자까지
@@ -3960,6 +3988,7 @@ html.ait .app{padding-top:calc(10px + var(--ait-top, 0px));padding-bottom:var(--
     return {
       uid, readOnly,
       listen: (ok, no) => col.orderBy('score', 'desc').limit(RANK_MAX).onSnapshot(snap => ok(snap.docs.map(d => [d.id, d.data()])), no),
+      listenWeek: (ok, no) => col.orderBy('ws', 'desc').limit(RANK_MAX).onSnapshot(snap => ok(snap.docs.map(d => [d.id, d.data()])), no),
       put: doc => col.doc(uid).set(doc),
       remove: () => col.doc(uid).delete()
     };
@@ -3971,6 +4000,12 @@ html.ait .app{padding-top:calc(10px + var(--ait-top, 0px));padding-bottom:var(--
       // 점수 순으로 위에서부터 받아요. 기기를 옮긴 학교가 겹칠 수 있어서 조금 넉넉히 받아요
       listen: (ok, no) => {
         const q = ref.orderByChild('score').limitToLast(RANK_MAX + 10);
+        const cb = snap => { const out = []; snap.forEach(ch => { out.push([ch.key, ch.val()]); }); ok(out.reverse()); };
+        q.on('value', cb, no);
+        return () => q.off('value', cb);
+      },
+      listenWeek: (ok, no) => {
+        const q = ref.orderByChild('ws').limitToLast(RANK_MAX + 10);
         const cb = snap => { const out = []; snap.forEach(ch => { out.push([ch.key, ch.val()]); }); ok(out.reverse()); };
         q.on('value', cb, no);
         return () => q.off('value', cb);
@@ -3997,6 +4032,12 @@ html.ait .app{padding-top:calc(10px + var(--ait-top, 0px));padding-bottom:var(--
         Rank.rows = rankRows(pairs);
         renderRankPanel();
       }, () => { if (g === Rank.gen) { Rank.state = 'off'; renderRankPanel(); } });
+      if (be.listenWeek) Rank.unsubW = be.listenWeek(pairs => {
+        if (g !== Rank.gen) return;
+        const w = weekIdx();
+        Rank.wrows = rankRows(pairs).filter(r => r.week === w && r.lp > 0).sort((a, b) => b.lp - a.lp || a.at - b.at);
+        renderRankPanel();
+      }, () => {});
     } catch (e) { Rank.state = 'off'; }
     renderRankPanel();
     submitRank();
@@ -4006,8 +4047,9 @@ html.ait .app{padding-top:calc(10px + var(--ait-top, 0px));padding-bottom:var(--
   function resetRank() {
     Rank.gen += 1;
     if (Rank.unsub) { try { Rank.unsub(); } catch (e) { /* 무시 */ } }
+    if (Rank.unsubW) { try { Rank.unsubW(); } catch (e) { /* 무시 */ } }
     clearTimeout(Rank.timer);
-    Object.assign(Rank, { state: 'idle', be: null, uid: null, rows: [], readOnly: false, writing: false, unsub: null });
+    Object.assign(Rank, { state: 'idle', be: null, uid: null, rows: [], wrows: [], readOnly: false, writing: false, unsub: null, unsubW: null });
   }
   function rankAfterCloud() {
     if (Rank.state === 'loading') return;   // 이미 서버 연결을 기다리는 중이면 알아서 이어져요
@@ -4021,7 +4063,7 @@ html.ait .app{padding-top:calc(10px + var(--ait-top, 0px));padding-bottom:var(--
     if (!isFinite(score) || score < 0 || !name) return null;
     const at = typeof d.at === 'number' ? d.at : (Date.parse(d.at) || 0);
     return { id, name, score: Math.floor(score), tier: Number(d.tier) | 0, year: Number(d.year) | 0, test: !!d.test, at,
-      pid: typeof d.pid === 'string' ? d.pid.slice(0, 16) : '' };
+      pid: typeof d.pid === 'string' ? d.pid.slice(0, 16) : '', week: Number(d.week) | 0, lp: Math.max(0, Math.floor(Number(d.lp) || 0)) };
   }
   // 같은 학교(학교 번호)가 기기를 옮겨서 두 번 있으면 내 것이나 가장 최근 것 하나만 남겨요
   function rankRows(pairs) {
@@ -4045,12 +4087,14 @@ html.ait .app{padding-top:calc(10px + var(--ait-top, 0px));padding-bottom:var(--
     if (Rank.state !== 'on' || Rank.readOnly || !Rank.uid || !(S.rank.joined || tossRank()) || Rank.writing) return;
     const score = rankScore();
     // 다른 기기에서 옮겨 온 학교는 이 기기 id로 처음 올리는 거라서 점수가 같아도 올려요
-    if (!force && score === S.rank.sent && S.rank.by === Rank.uid) return;
+    if (!force && score === S.rank.sent && S.rank.by === Rank.uid && lgKey() === S.rank.sws) return;
     const g = Rank.gen, be = Rank.be;
     Rank.writing = true;
     try {
-      await be.put({ name: S.rank.name, score, tier: S.tier, year: yearNo(), test: !!S.u.dev, pid: S.pid, at: Date.now() });
-      if (g === Rank.gen) { S.rank.sent = score; S.rank.by = Rank.uid; save(); }
+      lgWeek();
+      const ws = lgKey();
+      await be.put({ name: S.rank.name, score, tier: S.tier, year: yearNo(), test: !!S.u.dev, pid: S.pid, at: Date.now(), ws, lp: S.lg.pts, week: S.lg.week });
+      if (g === Rank.gen) { S.rank.sent = score; S.rank.by = Rank.uid; S.rank.sws = ws; save(); }
     } catch (e) {
       const c = String((e && (e.code || e.message)) || '');
       if (g === Rank.gen && /invalid_argument|not_granted|revoked|permission/i.test(c)) Rank.readOnly = true;
@@ -4058,7 +4102,7 @@ html.ait .app{padding-top:calc(10px + var(--ait-top, 0px));padding-bottom:var(--
     }
     if (g !== Rank.gen) return;
     Rank.writing = false;
-    if (S.rank.joined && !Rank.readOnly && (rankScore() !== S.rank.sent || S.rank.by !== Rank.uid)) rankDirty();
+    if (S.rank.joined && !Rank.readOnly && (rankScore() !== S.rank.sent || S.rank.by !== Rank.uid || lgKey() !== S.rank.sws)) rankDirty();
     renderRankPanel();
   }
   /* 교장 선생님 이름: 처음 한 번은 무료, 그다음부터는 바꿀 때마다 황금 도토리 50개, 60개, 70개...
@@ -4137,10 +4181,20 @@ html.ait .app{padding-top:calc(10px + var(--ait-top, 0px));padding-bottom:var(--
   }
   function renderRankPanel() {
     if (!S || rt.tab !== 'rank') return;
-    const score = rankScore(), mine = Rank.rows.findIndex(r => r.id === Rank.uid);
+    lgWeek();
+    const wk = rt.rankView !== 'all' && !tossRank();
+    $('#rankView').hidden = tossRank();
+    $$('#rankView [data-rv]').forEach(b => b.setAttribute('aria-checked', String((b.dataset.rv === 'week') === wk)));
+    const R = wk ? Rank.wrows : Rank.rows, score = wk ? S.lg.pts : rankScore(), mine = R.findIndex(r => r.id === Rank.uid);
+    if (wk && mine >= 0 && S.lg.pos !== mine + 1) { S.lg.pos = mine + 1; }
+    $('#rankScoreLab').textContent = wk ? '이번 주 리그 점수' : '내 학교 점수';
     $('#rankScore').textContent = fmt(score);
     $('#rankPos').textContent = mine >= 0 ? `${mine + 1}위` : '-';
-    $('#rankSub').textContent = rankSchool(S.tier, yearNo()) + (Rank.state === 'on' && Rank.rows.length ? `, 랭킹에 ${Rank.rows.length}명` : '');
+    const left = 7 - ((new Date().getDay() + 6) % 7);
+    $('#rankSub').textContent = wk ? `월요일에 새 리그가 시작돼요 (${left}일 남음). 1위 황금 도토리 30개, 2~3위 20개, 10위 안 10개, 참여만 해도 3개`
+      : rankSchool(S.tier, yearNo()) + (Rank.state === 'on' && Rank.rows.length ? `, 랭킹에 ${Rank.rows.length}명` : '');
+    $('#rankLead').textContent = wk ? '이번 주에 한 일로 겨뤄요. 오늘의 미션 10점, 미션 보너스 20점, 학교 행사 성공 15점, 체험학습 10점(1시간마다 +5), 종업식 20점, 퀘스트 3점이에요. 학교가 작아도 똑같이 겨룰 수 있어요.'
+      : '종업식과 졸업식에서 받은 수료증을 모두 더한 학교 점수로 순위를 매겨요.';
     // 참여하기와 이름 바꾸기
     const join = $('#rankJoin'), key = `${Rank.state}|${Rank.readOnly}|${S.rank.joined}|${S.rank.name}|${rt.rankEdit ? 1 : 0}|${Cloud.state}|${Cloud.err}|${nickPrice()}|${S.gold >= nickPrice()}`;
     if (join.dataset.key !== key) {
@@ -4170,8 +4224,8 @@ html.ait .app{padding-top:calc(10px + var(--ait-top, 0px));padding-bottom:var(--
       }
     }
     // 순위표: 이름은 다른 사람이 적은 글이라 textContent로만 넣어요
-    const list = $('#rankList'), rows = Rank.state === 'on' ? Rank.rows : [];
-    const lkey = rows.map(r => `${r.id}:${r.score}:${r.name}:${r.tier}:${r.year}:${r.test ? 1 : 0}`).join('|') + `|${Rank.uid}|${S.units}`;
+    const list = $('#rankList'), rows = Rank.state === 'on' ? R : [];
+    const lkey = (wk ? 'w' : 'a') + rows.map(r => `${r.id}:${r.score}:${r.lp}:${r.name}:${r.tier}:${r.year}:${r.test ? 1 : 0}`).join('|') + `|${Rank.uid}|${S.units}`;
     if (list.dataset.key !== lkey) {
       list.dataset.key = lkey;
       list.textContent = '';
@@ -4196,9 +4250,9 @@ html.ait .app{padding-top:calc(10px + var(--ait-top, 0px));padding-bottom:var(--
         txt.append(nm, sc);
         const b = document.createElement('b');
         b.className = 'rk-score';
-        b.textContent = fmt(r.score);
+        b.textContent = fmt(wk ? r.lp : r.score);
         li.append(no, txt, b);
-        li.setAttribute('aria-label', `${i + 1}위 ${r.name}, ${rankSchool(r.tier, r.year)}, 학교 점수 ${fmt(r.score)}`);
+        li.setAttribute('aria-label', `${i + 1}위 ${r.name}, ${rankSchool(r.tier, r.year)}, ${wk ? '리그 점수' : '학교 점수'} ${fmt(wk ? r.lp : r.score)}`);
         list.appendChild(li);
       });
     }
@@ -4754,6 +4808,7 @@ html.ait .app{padding-top:calc(10px + var(--ait-top, 0px));padding-bottom:var(--
     } else { addGold(1); msg += ', 기념품이 겹쳐서 황금 도토리 +1'; }
     S.trip.been[D.id] = (S.trip.been[D.id] || 0) + 1;
     S.st.trips += 1;
+    addLeague(LP.trip + LP.tripHour * Math.floor(D.min / 60));
     S.trip.cur = ''; S.trip.start = 0; S.trip.end = 0;
     sfx('quest'); buzz(15);
     toast(msg);
@@ -4906,6 +4961,7 @@ html.ait .app{padding-top:calc(10px + var(--ait-top, 0px));padding-bottom:var(--
     $('#sportsBar').hidden = true;
     S.st.sports += 1;
     const win = R.blue > R.white, tie = R.blue === R.white;
+    addLeague(win ? LP.festWin : LP.festLose);
     rt.sportsWin = win;
     $('#srTitle').textContent = win ? '청팀 승리!' : tie ? '무승부!' : '백팀 승리!';
     $('#srScore').textContent = `청팀 ${R.blue} : ${R.white} 백팀`;
@@ -5126,6 +5182,7 @@ html.ait .app{padding-top:calc(10px + var(--ait-top, 0px));padding-bottom:var(--
     festCamera(false);
     S.fest.n[R.id] = (S.fest.n[R.id] || 0) + 1;
     const win = R.n >= F.goal;
+    addLeague(win ? LP.festWin : LP.festLose);
     rt.sportsWin = win;
     $('#srTitle').textContent = win ? `${F.name} 성공!` : `${F.name} 끝!`;
     $('#srScore').textContent = `${R.n}/${F.goal}${F.unit}`;
@@ -5136,6 +5193,100 @@ html.ait .app{padding-top:calc(10px + var(--ait-top, 0px));padding-bottom:var(--
     musicSync(); save(); renderFestBtn(); checkQuests(); renderAffordance();
     queueModal(() => { openModal($('#mSportsEnd')); return true; });
   }
+
+  /* ---------- 오늘의 미션과 주간 리그 ----------
+     오늘의 미션: 하루에 3개, 자정에 바뀌어요. 하나에 황금 도토리 1개와 수업료 5분치, 셋 다 하면 보너스 상자(황금 도토리 3개, 수료증 1장).
+     주간 리그: 월요일마다 새로 시작해요. 이번 주에 한 일로 리그 점수를 모아 겨뤄요(오래 한 학교만 이기지 않게, 학교 크기와 상관없는 점수).
+     미션 하나 10점, 보너스 상자 20점, 학교 행사 성공 15점(실패 5점), 체험학습 10점 + 1시간마다 5점, 종업식 20점, 퀘스트 하나 3점.
+     지난주 리그가 끝나면 마지막으로 본 순위로 보상을 받아요: 1위 30개, 2~3위 20개, 10위 안 10개, 참여만 해도 3개 */
+  const MISSIONS = {
+    picks: { n: 15, name: n => `떨어진 도토리 ${n}개 줍기`, v: () => S.st.picks },
+    shakes: { n: 20, name: n => `참나무 ${n}번 흔들기`, v: () => S.st.shakes },
+    ups: { n: 10, name: n => `시설 ${n}번 고치기`, v: () => S.st.ups },
+    trains: { n: 3, name: n => `선생님 연수 ${n}번 보내기`, v: () => S.st.trains },
+    ads: { n: 2, name: n => `광고 ${n}편 끝까지 보기`, v: () => S.st.ads },
+    subs: { n: 2, name: n => `학생 부탁 ${n}개 들어주기`, v: () => S.q.subDone, ok: () => S.q.m >= SUB_UNLOCK },
+    fest: { n: 1, name: () => '학교 행사 한 번 열기', v: () => S.st.sports + Object.values(S.fest.n).reduce((a, b) => a + b, 0), ok: () => FEST_IDS.some(festOpen) },
+    trip: { n: 1, name: () => '현장체험학습 다녀오기', v: () => S.st.trips, ok: () => tripOpen() }
+  };
+  const DM = { gold: 1, min: 5, bonusGold: 3, bonusDip: 1 };
+  const LP = { mission: 10, bonus: 20, festWin: 15, festLose: 5, trip: 10, tripHour: 5, grad: 20, quest: 3 };
+  const LG_PRIZE = r => r === 1 ? 30 : r <= 3 ? 20 : r <= 10 ? 10 : 3;
+  // 주는 월요일에 시작해요. 2026년 1월 5일(월)부터 몇 번째 주인지
+  const weekIdx = (d = new Date()) => { const m = new Date(d.getFullYear(), d.getMonth(), d.getDate() - ((d.getDay() + 6) % 7)); return Math.round((m - new Date(2026, 0, 5)) / 604800000); };
+  function dayHash(str) { let h = 2166136261; for (let i = 0; i < str.length; i++) { h ^= str.charCodeAt(i); h = Math.imul(h, 16777619); } return h >>> 0; }
+  // 날이 바뀌면 오늘의 미션 3개를 새로 골라요 (열려 있는 것 가운데에서, 날짜와 학교 번호로 섞어요)
+  function dmDay() {
+    const t = todayStr();
+    if (S.dm.day === t) return;
+    const ids = Object.keys(MISSIONS).filter(id => !MISSIONS[id].ok || MISSIONS[id].ok());
+    let h = dayHash(t + S.pid);
+    const pick = [];
+    while (pick.length < 3 && ids.length) { const i = h % ids.length; pick.push(ids.splice(i, 1)[0]); h = Math.imul(h ^ (h >>> 13), 1103515245) >>> 0; }
+    S.dm = { day: t, list: pick.map(id => ({ id, b: MISSIONS[id].v(), done: false })), bonus: false };
+  }
+  const dmProg = m => Math.max(0, Math.min(MISSIONS[m.id].n, MISSIONS[m.id].v() - m.b));
+  const dmReady = m => !m.done && dmProg(m) >= MISSIONS[m.id].n;
+  const dmAllDone = () => S.dm.list.length > 0 && S.dm.list.every(m => m.done);
+  const dmClaimable = () => S.dm.list.some(dmReady) || (dmAllDone() && !S.dm.bonus);
+  function claimMission(i) {
+    const m = S.dm.list[i];
+    if (!m || !dmReady(m)) return;
+    m.done = true;
+    const v = Math.max(10, nice(rate() * 60 * DM.min));
+    S.budget += v; earn(v);
+    addGold(DM.gold);
+    addLeague(LP.mission);
+    sfx('quest'); buzz(12);
+    toast(`미션 완료! 도토리 +${fmt(v)}, 황금 도토리 +${DM.gold}`);
+    save(); renderMissions(); renderHUD(); updateQuestDot();
+  }
+  function claimBonus() {
+    if (!dmAllDone() || S.dm.bonus) return;
+    S.dm.bonus = true;
+    addGold(DM.bonusGold); addDip(DM.bonusDip);
+    addLeague(LP.bonus);
+    sfx('quest'); buzz(20);
+    toast(`오늘의 미션을 모두 마쳤어요! 보너스 상자: 황금 도토리 +${DM.bonusGold}, 수료증 +${DM.bonusDip}장`);
+    save(); renderMissions(); renderHUD(); updateQuestDot();
+  }
+  function renderMissions() {
+    const box = $('#qDaily');
+    if (!box || !S) return;
+    dmDay();
+    const gi = `<svg viewBox="-8 -11 16 20" aria-hidden="true">${GOLD_ICON.slice(GOLD_ICON.indexOf('>') + 1, -6)}</svg>`;
+    const key = S.dm.day + '|' + S.dm.list.map(m => `${m.id}:${dmProg(m)}:${m.done ? 1 : 0}`).join(',') + '|' + S.dm.bonus;
+    if (box.dataset.key === key) return;
+    box.dataset.key = key;
+    const all = dmAllDone();
+    box.innerHTML = S.dm.list.map((m, i) => {
+      const M = MISSIONS[m.id], p = dmProg(m), ready = dmReady(m);
+      return `<div class="dm${m.done ? ' done' : ''}"><div class="dm-tx"><b>${M.name(M.n)}</b><div class="qbar"><i style="width:${(p / M.n * 100).toFixed(0)}%"></i></div></div>` +
+        (m.done ? `<span class="dm-ok">${CHECK}</span>` : ready ? `<button class="cta small" type="button" data-dm="${i}">받기</button>` : `<span class="dm-n">${p}/${M.n}</span>`) + '</div>';
+    }).join('') +
+      `<div class="dm bonus${S.dm.bonus ? ' done' : ''}"><div class="dm-tx"><b>보너스 상자</b><span>셋 다 하면 ${gi}${DM.bonusGold}, 수료증 ${DM.bonusDip}장</span></div>` +
+      (S.dm.bonus ? `<span class="dm-ok">${CHECK}</span>` : all ? '<button class="cta small" type="button" data-dm="bonus">열기</button>' : `<span class="dm-n">${S.dm.list.filter(m => m.done).length}/3</span>`) + '</div>';
+  }
+
+  // 주간 리그
+  function lgWeek() {
+    const w = weekIdx();
+    if (S.lg.week === w) return;
+    // 지난주가 끝났어요: 참여했으면 마지막으로 본 순위로 보상
+    if (S.lg.week >= 0 && S.lg.pts > 0 && !S.lg.paid) {
+      const r = S.lg.pos || 99, g = LG_PRIZE(r);
+      S.lg.last = { week: S.lg.week, pts: S.lg.pts, pos: S.lg.pos || 0, gold: g };
+      setTimeout(() => { addGold(g); toast(`지난주 리그 ${S.lg.pos ? S.lg.pos + '위' : '참여'} 보상! 황금 도토리 +${g}`); save(); }, 1500);
+    }
+    S.lg = { week: w, pts: 0, pos: 0, paid: false, last: S.lg.last || null };
+  }
+  function addLeague(p) {
+    if (!(p > 0)) return;
+    lgWeek();
+    S.lg.pts += Math.round(p);
+    rankDirty();
+  }
+  const lgKey = () => weekIdx() * 1e6 + Math.min(999999, S.lg.pts);
 
   /* ---------- 출석부 ---------- */
   function attState() {
@@ -5337,6 +5488,7 @@ html.ait .app{padding-top:calc(10px + var(--ait-top, 0px));padding-bottom:var(--
     S.hd.album = false;
     rt.yearRec = facKeys().filter(k => S.f[k] > 0).map(k => `${FAC[k].name} Lv.${S.f[k]}`).join(', ') + `, 학생 ${Math.floor(S.students)}명`;
     S.st.grads += 1; S.tg += 1;
+    addLeague(LP.grad);
     cloudSoon();
     addGold(GOLD.grad);
     let newcomer = null;
@@ -5583,6 +5735,7 @@ html.ait .app{padding-top:calc(10px + var(--ait-top, 0px));padding-bottom:var(--
     if (!q || !mainReady() || rt.paused) return;
     grant(qReward(q), fromEl, q.rk);
     if (hardQ(q)) addGold(GOLD.hard);
+    addLeague(LP.quest);
     S.q.m += 1;
     startMain();
     if (!curMain() || curMain().ch !== q.ch) addGold(GOLD.chapter);   // 한 장을 마치면 황금 도토리
@@ -5603,6 +5756,7 @@ html.ait .app{padding-top:calc(10px + var(--ait-top, 0px));padding-bottom:var(--
     if (!subReady(s)) return;
     grant(s.r, fromEl);
     if (hardQ(s, true)) addGold(GOLD.hard);
+    addLeague(LP.quest);
     S.q.subs.splice(i, 1);
     if (s.id[0] === 's') S.q.done.push(s.id);
     S.q.subDone += 1;
@@ -5737,6 +5891,8 @@ html.ait .app{padding-top:calc(10px + var(--ait-top, 0px));padding-bottom:var(--
   const questKey = () => `${S.q.m}|${mainReady() ? 1 : 0}|${S.q.subs.map(s => s.id + (subReady(s) ? '!' : '')).join(',')}`;
   function renderQuestPanel(force) {
     if (rt.tab !== 'quests') return;
+    if (force) $('#qDaily').dataset.key = '';
+    renderMissions();
     const key = questKey();
     if (force || key !== rt.qKey) { rt.qKey = key; buildQuestPanel(); }
     else updateQuestProgress();
@@ -5791,7 +5947,8 @@ html.ait .app{padding-top:calc(10px + var(--ait-top, 0px));padding-bottom:var(--
     });
   }
   function updateQuestDot() {
-    const on = rt.tab !== 'quests' && (mainReady() || S.q.subs.some(s => s.nw || subReady(s)));
+    dmDay(); lgWeek();
+    const on = rt.tab !== 'quests' && (mainReady() || S.q.subs.some(s => s.nw || subReady(s)) || dmClaimable());
     $('#qDot').hidden = !on;
   }
   function markQuestsSeen() { S.q.seen = S.q.m; S.q.subs.forEach(s => { s.nw = false; }); }
@@ -6107,6 +6264,7 @@ html.ait .app{padding-top:calc(10px + var(--ait-top, 0px));padding-bottom:var(--
       S.units = b.dataset.units; save(); syncSettingsUI(); refreshNumbers();
       toast(S.units === 'en' ? '큰 숫자를 K, M, B로 줄여 써요' : '큰 숫자를 만, 억, 조로 줄여 써요');
     });
+    $('#rankView').addEventListener('click', e => { const b = e.target.closest('[data-rv]'); if (!b) return; rt.rankView = b.dataset.rv; sfx('tap'); renderRankPanel(); });
     $('#rankJoin').addEventListener('click', e => {
       const b = e.target.closest('[data-rank]');
       if (!b || b.tagName === 'FORM') return;
@@ -6123,6 +6281,7 @@ html.ait .app{padding-top:calc(10px + var(--ait-top, 0px));padding-bottom:var(--
       joinRank(i ? i.value : '');
     });
     $('#nickDice').addEventListener('click', () => rollNick($('#nickName')));
+    $('#qDaily').addEventListener('click', e => { const b = e.target.closest('[data-dm]'); if (!b) return; if (b.dataset.dm === 'bonus') claimBonus(); else claimMission(+b.dataset.dm); });
     $('#nickForm').addEventListener('submit', async e => {
       e.preventDefault();
       const btn = $('#nickOk');
@@ -6403,7 +6562,7 @@ html.ait .app{padding-top:calc(10px + var(--ait-top, 0px));padding-bottom:var(--
 
   // 시험용 손잡이: 자동 시험(window.__FOREST_TEST)에서만 게임 속 함수를 꺼내 써요
   if (window.__FOREST_TEST) window.__forest = { get S() { return S; }, rt, buyFacility, teacherAct, facCost, teaCost, facKeys, rate, rep, capacity, canGraduate, canPromote,
-    graduate, promote, buyPerk, perkCost, perkMaxed, buyFundPerk, fpCost, claimMain, mainReady, curMain, qNo, earn, CFG, TEA, teaMaxed, PERKS, FPERKS, MAIN, finalYear, startTrip, claimTrip, TRIPS, yearLocked, startSports, endSports, rtSports: () => rt.sports, startFest, rtFest: () => rt.fest, facCap };
+    graduate, promote, buyPerk, perkCost, perkMaxed, buyFundPerk, fpCost, claimMain, mainReady, curMain, qNo, earn, CFG, TEA, teaMaxed, PERKS, FPERKS, MAIN, finalYear, startTrip, claimTrip, TRIPS, yearLocked, startSports, endSports, rtSports: () => rt.sports, startFest, rtFest: () => rt.fest, facCap, addLeague, weekIdx };
   if (window.claude && window.claude.hot && window.claude.hot.snapshot) {
     try { window.claude.hot.snapshot(() => { if (S) syncMid(); return { save: S }; }); } catch (e) { /* 무시 */ }
   }
