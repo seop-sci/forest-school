@@ -891,17 +891,18 @@ html.ait .app{padding-top:calc(10px + var(--ait-top, 0px));padding-bottom:var(--
 :root[data-theme="dark"] .fur-scene{filter:brightness(.88)}
 .fur-it{cursor:pointer;outline:none}
 .fur-hit{fill:transparent}
-.fur-it:focus-visible .fur-hit{stroke:var(--accent);stroke-width:2.5}
+.fur-it:focus-visible .fur-art{outline:2px solid var(--accent)}
 .fur-art{transform-box:fill-box;transform-origin:50% 100%}
 .fur-ghost{opacity:.28;filter:grayscale(1)}
 .fur-tag{fill:#FFFDF5;stroke:#4E3D2C;stroke-width:1.1}
-.fur-it.can .fur-tag{fill:#F3B92E}
-.fur-it.done .fur-tag{fill:#DCEAC4}
-.fur-tag-t{font-family:var(--font-display);font-size:11px;fill:#3A2E22;pointer-events:none}
+.fur-tagg{cursor:pointer}
+.fur-tagg.can .fur-tag{fill:#F3B92E}
+.fur-tagg.done .fur-tag{fill:#DCEAC4}
+.fur-tag-t{font-family:var(--font-display);font-size:10px;fill:#3A2E22;pointer-events:none}
 .fur-pop{font-family:var(--font-display);font-size:15px;fill:#F3B92E;stroke:#4E3D2C;stroke-width:3;paint-order:stroke;pointer-events:none}
-.fur-chalk{font-family:var(--font-chalk);font-weight:700;font-size:17px;fill:#EDEFE4}
-.fur-menu-h{font-family:var(--font-display);font-size:12px;fill:#C2533D}
-.fur-menu{font-family:var(--font-chalk);font-weight:700;font-size:12.5px;fill:#4E3D2C}
+.fur-chalk{font-family:var(--font-chalk);font-weight:700;font-size:16px;fill:#EDEFE4}
+.fur-menu-h{font-family:var(--font-display);font-size:11px;fill:#C2533D}
+.fur-menu{font-family:var(--font-chalk);font-weight:700;font-size:11.5px;fill:#4E3D2C}
 .fur-spin{animation:furSpin 1.2s linear infinite}
 @keyframes furSpin{to{transform:rotate(360deg)}}
 .fur-twinkle{transform-box:fill-box;transform-origin:center;animation:furTw 1.6s ease-in-out infinite}
@@ -1502,7 +1503,7 @@ html.ait .app{padding-top:calc(10px + var(--ait-top, 0px));padding-bottom:var(--
     <p class="sheet-quest" id="sheetQuest" hidden></p>
     <div class="fur" id="furBox" hidden>
       <p class="fur-h">가구를 모두 건물 레벨까지 올리면 건물을 키울 수 있어요</p>
-      <svg class="fur-scene" id="furScene" viewBox="0 0 320 196" role="group" aria-label="시설 안"></svg>
+      <svg class="fur-scene" id="furScene" viewBox="0 0 320 230" role="group" aria-label="시설 안"></svg>
       <div class="fur-list" id="furList"></div>
       <button class="fur-all" type="button" id="furAll"><span>가구 모두 한 레벨씩 올리기</span><span class="cost"><span data-acorn></span><b id="furAllCost">0</b></span></button>
     </div>
@@ -1884,7 +1885,7 @@ html.ait .app{padding-top:calc(10px + var(--ait-top, 0px));padding-bottom:var(--
     science: { name: '과학실', rep: 1, tier: 1, view: '256 4 88 116',
       desc: '실험 발표회를 열면 학교 소문이 나고 수료증이 늘어요.',
       cost: L => 500 * Math.pow(2, L),
-      eff: L => L < 1 ? '아직 없어요' : `수료증 +${5 * L}%, 평판 +${L}` }
+      eff: L => L < 1 ? '아직 없어요' : `수료증 +${3 * L}%, 평판 +${L}` }
   };
   // 지금 학교급에서 쓸 수 있는 시설
   const facKeys = () => Object.keys(FAC).filter(k => (FAC[k].tier || 0) <= S.tier);
@@ -2038,7 +2039,7 @@ html.ait .app{padding-top:calc(10px + var(--ait-top, 0px));padding-bottom:var(--
     { id: 'e7', ch: 5, t: 'grade', n: 3, rm: 3, title: '초등학교 도시 되기', how: '나무 아파트가 들어선 도시를 만들어요',
       say: '초등학교 둘레에도 나무 아파트가 들어서고 있어요. 평판을 모아서 도시 학교가 되어 볼까요?' },
     { id: 'e4', ch: 5, t: 'fac', k: 'science', n: 5, rm: 20, title: '과학 발표회', how: '과학실을 Lv.5까지 키워요',
-      say: '과학실을 Lv.5까지 키우면 숲속 과학 발표회를 열 수 있어요. 수료증이 25%나 늘어나요.' },
+      say: '과학실을 Lv.5까지 키우면 숲속 과학 발표회를 열 수 있어요. 수료증이 15%나 늘어나요.' },
     { id: 'e8', ch: 5, t: 'students', n: 60, rm: 3, title: '학생 60명 맞이하기', how: '교실을 Lv.14까지 넓혀요',
       say: '초등학교는 한 반에 친구가 많아요. 교실을 넓혀서 60명을 맞이해요.' },
     { id: 'e9', ch: 5, t: 'picks', n: 20, rm: 3, title: '운동회 도토리 줍기', how: '참나무를 누르면 도토리가 떨어져요',
@@ -2400,10 +2401,11 @@ html.ait .app{padding-top:calc(10px + var(--ait-top, 0px));padding-bottom:var(--
   const offlineCapH = () => CFG.offlineCapH + 4 * S.p.perk.night;
   const dropValue = () => rate() * 4 * (1 + 0.15 * S.t.bear) * (1 + 0.5 * S.p.perk.drop);
   function earn(v) { S.earned += v; S.yearEarned += v; }
-  // 수료증 = 10 × √(올해 번 도토리 ÷ 100만) × 수료증 배수. 학교급이 오르면 공사비 배수로 나눠서 비슷한 장수가 나와요
-  const dipMult = () => (1 + 0.25 * S.fp.dip) * (1 + 0.05 * S.f.science) * (S.hd.album ? 1.5 : 1);
-  const previewDip = () => Math.floor(10 * Math.sqrt(S.yearEarned / (1e6 * costScale())) * dipMult() + 1e-9);
-  const dipAt = d => Math.pow(d / (10 * dipMult()), 2) * 1e6 * costScale();
+  // 수료증 = 10 × (올해 번 도토리 ÷ 100만)의 세제곱근 × 수료증 배수. 학교급이 오르면 공사비 배수로 나눠서 비슷한 장수가 나와요
+  // (예전에는 제곱근이라 수업료가 크게 뛰는 고학년에서 수료증이 너무 많이 쌓였어요. 첫해 장수는 그대로예요)
+  const dipMult = () => (1 + 0.25 * S.fp.dip) * (1 + 0.03 * S.f.science) * (S.hd.album ? 1.5 : 1);
+  const previewDip = () => Math.floor(10 * Math.cbrt(S.yearEarned / (1e6 * costScale())) * dipMult() + 1e-9);
+  const dipAt = d => Math.pow(d / (10 * dipMult()), 3) * 1e6 * costScale();
   // 졸업: 마지막 해(유치원 2년째)에 대도시 학교가 되면 졸업식을 열어요. 다음 학교급이 열려 있어야 해요
   const nextTierOpen = () => S.tier + 1 < TIER_OPEN;
   const finalYear = () => nextTierOpen() && S.tg >= tierInfo().grads;
@@ -3234,7 +3236,7 @@ html.ait .app{padding-top:calc(10px + var(--ait-top, 0px));padding-bottom:var(--
 
   /* ---------- 시설 안 가구 ---------- */
   // 시설마다 가구가 네 개 있어요. 가구는 건물 레벨까지 올릴 수 있고, 네 개가 모두 건물 레벨에 닿아야 건물을 한 단계 키울 수 있어요.
-  // 가구값은 건물값과 따로 내요 (네 개를 합치면 다음 건물값의 60%). 가구 모습은 Lv.5, 10, 15에서 바뀌어요. 가구는 따로 효과가 없어요
+  // 가구값은 건물값과 따로 내요 (네 개를 합치면 다음 건물값의 60%). 가구 모습은 Lv.5, 10, 15에서 바뀌고, 레벨이 오를수록 방 안 가구 수가 늘어요. 가구는 따로 효과가 없어요
   const FUR_SHARE = [0.12, 0.14, 0.16, 0.18];
   const FUR_STAGE = ['', '낡은', '튼튼한', '산뜻한', '반짝이는'];
   const FUR_NEXT = [1, 5, 10, 15];
@@ -3287,170 +3289,221 @@ html.ait .app{padding-top:calc(10px + var(--ait-top, 0px));padding-bottom:var(--
     const sc = $('#furScene');
     if (!sc || rt.reduced) return;
     for (const [i] of ch) {
-      const x = FUR_X[i];
+      const [x, ty] = (rt.furTag && rt.furTag[i]) || [160, 120];
       const t = document.createElementNS(NS, 'text');
-      t.setAttribute('x', x); t.setAttribute('y', 92); t.setAttribute('text-anchor', 'middle'); t.setAttribute('class', 'fur-pop');
+      t.setAttribute('x', x); t.setAttribute('y', ty - 12); t.setAttribute('text-anchor', 'middle'); t.setAttribute('class', 'fur-pop');
       t.textContent = 'Lv.' + S.fu[k][i];
       sc.appendChild(t);
       if (t.animate) t.animate([{ transform: 'translateY(0)', opacity: 1 }, { transform: 'translateY(-26px)', opacity: 0 }], { duration: 900, easing: 'ease-out' }).onfinish = () => t.remove();
       else setTimeout(() => t.remove(), 900);
-      const it = sc.querySelector(`[data-fur="${i}"] .fur-art`);
-      if (it && it.animate) it.animate([{ transform: 'scale(1)' }, { transform: 'scale(1.1)' }, { transform: 'scale(1)' }], { duration: 300, easing: 'ease-out' });
+      sc.querySelectorAll(`.fur-it[data-fur="${i}"] .fur-art`).forEach(it => { if (it.animate) it.animate([{ transform: 'scale(1)' }, { transform: 'scale(1.08)' }, { transform: 'scale(1)' }], { duration: 300, easing: 'ease-out' }); });
     }
   }
 
-  /* 가구 그림: 단계(1 낡은, 2 튼튼한, 3 산뜻한, 4 반짝이는)마다 색과 꾸밈이 달라져요. 가구 바닥 가운데가 (0, 0)이에요 */
+  /* 시설 방: 위에서 비스듬히 내려다본 진짜 교실처럼 그려요. 위쪽은 뒷벽, 아래는 바닥이에요.
+     가구는 레벨이 오를수록 수가 늘어나고(책상은 Lv.21에 12개), 모습은 단계(1 낡은, 2 튼튼한, 3 산뜻한, 4 반짝이는)마다 달라져요 */
   const OL = '#4E3D2C';
   const FUR_PAL = [null,
     { w: '#A88664', wd: '#7D6247', m: '#A7ADB1', md: '#7A8186', c: '#B3A68E', c2: '#9C8F7A', old: true },
     { w: '#D6A46A', wd: '#A9773F', m: '#C5CDD3', md: '#8D99A1', c: '#6FA8D6', c2: '#E8833A' },
     { w: '#EDC58C', wd: '#C48F50', m: '#E4EBEF', md: '#A6B4BD', c: '#6CC29E', c2: '#F07C7C' },
     { w: '#F5D8A6', wd: '#CFA35E', m: '#F5F7F9', md: '#BFC9D0', c: '#9C8BE3', c2: '#F3B92E', g: true }];
-  const fR = (x, y, w, h, f, rx = 1.5) => `<rect x="${x}" y="${y}" width="${w}" height="${h}" rx="${rx}" fill="${f}" stroke="${OL}" stroke-width="1.2"/>`;
-  const fC = (x, y, r, f) => `<circle cx="${x}" cy="${y}" r="${r}" fill="${f}" stroke="${OL}" stroke-width="1.2"/>`;
-  const fE = (x, y, rx, ry, f) => `<ellipse cx="${x}" cy="${y}" rx="${rx}" ry="${ry}" fill="${f}" stroke="${OL}" stroke-width="1.2"/>`;
-  const fP = (d, f) => `<path d="${d}" fill="${f}" stroke="${OL}" stroke-width="1.2" stroke-linejoin="round"/>`;
-  const fL = (d, c = OL, w = 1.2) => `<path d="${d}" fill="none" stroke="${c}" stroke-width="${w}" stroke-linecap="round" stroke-linejoin="round"/>`;
+  const fR = (x, y, w, h, f, rx = 1.2) => `<rect x="${+x.toFixed(1)}" y="${+y.toFixed(1)}" width="${+w.toFixed(1)}" height="${+h.toFixed(1)}" rx="${rx}" fill="${f}" stroke="${OL}" stroke-width="1"/>`;
+  const fC = (x, y, r, f) => `<circle cx="${+x.toFixed(1)}" cy="${+y.toFixed(1)}" r="${r}" fill="${f}" stroke="${OL}" stroke-width="1"/>`;
+  const fE = (x, y, rx, ry, f) => `<ellipse cx="${+x.toFixed(1)}" cy="${+y.toFixed(1)}" rx="${rx}" ry="${ry}" fill="${f}" stroke="${OL}" stroke-width="1"/>`;
+  const fP = (d, f) => `<path d="${d}" fill="${f}" stroke="${OL}" stroke-width="1" stroke-linejoin="round"/>`;
+  const fL = (d, c = OL, w = 1) => `<path d="${d}" fill="none" stroke="${c}" stroke-width="${w}" stroke-linecap="round" stroke-linejoin="round"/>`;
   const FGOLD = '#E9B92F';
-  const sparkle = (x, y, s = 1) => `<path d="M${x} ${y - 5 * s} Q${x + 1 * s} ${y - 1 * s} ${x + 5 * s} ${y} Q${x + 1 * s} ${y + 1 * s} ${x} ${y + 5 * s} Q${x - 1 * s} ${y + 1 * s} ${x - 5 * s} ${y} Q${x - 1 * s} ${y - 1 * s} ${x} ${y - 5 * s} Z" fill="#FFE27A" stroke="#C99A1E" stroke-width=".8" class="fur-twinkle"/>`;
-  const scuff = d => fL(d, '#5E4834', 0.9);
-  const FUR_ART = {
-    // 교실
-    desk: (p, s) => fR(-24, -30, 4, 30, p.wd, 1) + fR(20, -30, 4, 30, p.wd, 1) +
-      (s >= 2 ? fR(-20, -30, 22, 11, p.w) + fC(-9, -24.5, 1.4, p.wd) : '') +
-      fR(-28, -37, 56, 7, p.w, 2) + (p.old ? scuff('M-12 -34 l7 1.2 M8 -33 l5 -0.8') : '') +
-      (s >= 3 ? fR(4, -43, 16, 6, p.c, 1) + fR(6, -46, 12, 3, p.c2, 1) + fL('M-16 -40 l12 -3', '#E8833A', 2.2) : '') +
-      (p.g ? fL('M-26.5 -36 H26.5', FGOLD, 2) + sparkle(22, -52) : ''),
-    chair: (p, s) => fR(-13, -60, 3.6, 60, p.wd, 1) + fR(9.4, -60, 3.6, 60, p.wd, 1) + fR(-14, -60, 28, 15, p.w, 4) +
-      fR(-16, -28, 32, 6, p.w, 2) + fR(-13, -22, 3.6, 22, p.wd, 1) + fR(9.4, -22, 3.6, 22, p.wd, 1) +
-      (p.old ? scuff('M-6 -55 l5 4 M4 -26 l4 0.5') : '') + (s >= 3 ? fR(-14, -33, 28, 6, p.c, 3) : '') +
-      (s >= 2 ? fL('M-8 -53 H8', p.wd, 1) : '') + (p.g ? sparkle(0, -52, 1.1) + fL('M-13 -60.5 H13', FGOLD, 2) : ''),
-    fan: (p, s) => fE(0, -2, 15, 3.5, p.md) + fR(-2.2, -50, 4.4, 47, p.md, 1) +
-      `<g class="${s >= 2 ? 'fur-spin' : ''}" style="transform-origin:0px -60px">` +
-      [0, 120, 240].map(a => `<ellipse cx="0" cy="-71" rx="5.5" ry="10" fill="${s >= 2 ? p.c : p.m}" stroke="${OL}" stroke-width="1" transform="rotate(${a} 0 -60)"/>`).join('') + '</g>' +
-      `<circle cx="0" cy="-60" r="16" fill="none" stroke="${p.g ? FGOLD : p.md}" stroke-width="${s >= 2 ? 1.6 : 1}"/>` +
-      (s >= 2 ? fL('M-16 -60 H16 M0 -76 V-44', p.md, 0.7) : '') + fC(0, -60, 4, s >= 3 ? p.c2 : p.md) +
-      (p.old ? fL('M-11 -48 l-3 4', '#5E4834', 1) : '') + (p.g ? sparkle(16, -80) : ''),
-    locker: (p, s) => fR(-19, -74, 38, 74, s >= 3 ? p.c : p.m, 2) + fL('M0 -73 V-2', OL, 1.1) +
-      fL('M-14 -66 h9 M-14 -62 h9 M-14 -58 h9 M5 -66 h9 M5 -62 h9 M5 -58 h9', p.md, 1) +
-      fR(-5, -40, 3, 9, p.g ? FGOLD : p.md, 1) + fR(2, -40, 3, 9, p.g ? FGOLD : p.md, 1) +
-      fL('M12 -74 L17 -88', '#B07F45', 2.4) + fP('M14 -86 l7 -4 l3 6 l-7 3 Z', '#E7C46A') +
-      (p.old ? fC(-10, -18, 2.6, '#B98A5A') + scuff('M6 -26 l6 3') : '') +
-      (s >= 2 ? fL('M-14 -8 h10 M4 -8 h10', p.md, 1) : '') + (p.g ? sparkle(-12, -82) : ''),
-    // 급식실
-    table: (p, s) => fR(-26, -26, 4, 26, p.wd, 1) + fR(22, -26, 4, 26, p.wd, 1) +
-      (s >= 3 ? fP('M-30 -32 H30 L27 -20 H-27 Z', p.c) : '') + fR(-31, -33, 62, 6, p.w, 2) +
-      (s >= 2 ? fR(-22, -39, 18, 6, '#E6E9EC', 1.5) + fE(-13, -40, 4, 2, '#F3D27A') + fR(4, -39, 18, 6, '#E6E9EC', 1.5) + fE(13, -40, 4, 2, '#E58B6A') : '') +
-      (p.old ? scuff('M-20 -30 l8 1 M10 -29 l6 -1') : '') +
-      (p.g ? fR(-3, -50, 6, 11, '#BEE0EA', 2) + fC(-3, -53, 3, '#F07C7C') + fC(3, -54, 3, '#F3B92E') + sparkle(24, -46) : ''),
-    counter: (p, s) => fR(-30, -34, 60, 34, p.m, 2) + fR(-32, -39, 64, 6, p.md, 2) +
-      (s >= 3 ? fR(-30, -24, 60, 6, p.c, 0) : '') +
-      fR(-24, -52, 18, 13, p.old ? '#8E969B' : '#C5CDD3', 3) + fR(-26, -55, 22, 4, p.md, 2) +
-      (s >= 2 ? fR(4, -50, 20, 11, '#C5CDD3', 3) + fR(2, -53, 24, 4, p.md, 2) + fL('M-18 -60 q3 -5 0 -9 M-11 -60 q3 -5 0 -9 M12 -58 q3 -5 0 -9', '#FFFFFF', 1.6) : '') +
-      (p.old ? scuff('M-20 -47 l5 2') : '') + (p.g ? fL('M-31 -38 H31', FGOLD, 2) + sparkle(26, -60) : ''),
-    water: (p, s) => fR(-13, -56, 26, 56, s >= 3 ? p.c : p.m, 3) + fR(-8, -42, 16, 12, p.md, 2) +
-      fR(-6, -36, 4, 5, '#3F8AD8', 1) + fR(2, -36, 4, 5, '#D9534A', 1) + fR(-9, -12, 18, 4, p.md, 1) +
-      fP('M-9 -56 V-72 Q-9 -78 0 -78 Q9 -78 9 -72 V-56 Z', p.old ? '#C9D4D6' : '#BEE0EA') +
-      (s >= 2 ? fL('M-5 -70 v8', '#FFFFFF', 1.6) : '') + (p.old ? scuff('M7 -24 l3 3') : '') +
-      (p.g ? fL('M-13 -50 H13', FGOLD, 2) + sparkle(14, -80) : ''),
-    rack: (p, s) => fR(-25, -66, 5, 66, p.wd, 1) + fR(20, -66, 5, 66, p.wd, 1) +
-      [-50, -32, -14].map(y => fR(-22, y, 44, 3, p.w, 1)).join('') +
-      [['-50', s >= 2 ? 4 : 2], ['-32', s >= 3 ? 4 : 2], ['-14', 3]].map(([y, n]) =>
-        Array.from({ length: n }, (_, j) => fR(-18 + j * 9, +y - 4 - j * 0.6, 9, 4, j % 2 ? (s >= 2 ? p.c : p.m) : (s >= 3 ? p.c2 : p.md), 1)).join('')).join('') +
-      (p.old ? scuff('M-16 -30 l6 1') : '') + (p.g ? sparkle(0, -72) : ''),
-    // 도서관
-    shelf: (p, s) => fR(-25, -76, 50, 76, p.w, 2) + fR(-21, -72, 42, 22, p.wd, 0) + fR(-21, -46, 42, 22, p.wd, 0) + fR(-21, -20, 42, 16, p.wd, 0) +
-      [-72, -46, -20].map((y, row) => {
-        const n = Math.min(7, 2 + s + (row === 1 ? 1 : 0)), cols = p.old ? ['#8E7458', '#9C8F7A', '#7D6247'] : ['#D9534A', '#3F8AD8', '#F3B92E', '#6CC29E', '#9C8BE3', '#E8833A'];
-        return Array.from({ length: n }, (_, j) => fR(-20 + j * 5.8, y + (row === 2 ? 3 : 5), 5, row === 2 ? 13 : 17, cols[(j + row * 2) % cols.length], 0.8)).join('');
-      }).join('') + (p.old ? scuff('M-22 -60 l4 6') : '') + (p.g ? fL('M-25 -76 H25', FGOLD, 2.4) + sparkle(20, -84) : ''),
-    rdesk: (p, s) => fR(-24, -30, 4, 30, p.wd, 1) + fR(20, -30, 4, 30, p.wd, 1) + fR(-28, -36, 56, 7, p.w, 2) +
-      fP('M-14 -37 Q-7 -42 0 -38 Q7 -42 14 -37 L14 -36 H-14 Z', '#FFFDF5') + fL('M0 -38 V-36', OL, 0.8) +
-      (s >= 2 ? fL('M18 -37 V-52 L10 -58', p.md, 1.6) + fP('M6 -60 L14 -56 L11 -52 L4 -56 Z', p.c) : '') +
-      (s >= 3 ? fR(-26, -44, 7, 7, '#C98A5A', 1) + fC(-22.5, -48, 4.5, '#6CC29E') : '') +
-      (p.old ? scuff('M-18 -33 l6 1') : '') + (p.g ? fL('M-27 -35 H27', FGOLD, 2) + sparkle(22, -64) : ''),
-    sofa: (p, s) => fR(-26, -6, 3, 6, p.wd, 1) + fR(23, -6, 3, 6, p.wd, 1) +
-      fR(-27, -42, 54, 22, p.c, 8) + fR(-29, -24, 58, 18, p.c, 5) + fR(-33, -34, 10, 28, p.c, 5) + fR(23, -34, 10, 28, p.c, 5) +
-      (p.old ? fR(-8, -38, 10, 8, '#8E7458', 1) + scuff('M-6 -36 l6 4 M-6 -32 l6 -4') : '') +
-      (s >= 2 ? fL('M0 -40 V-26', OL, 0.8) : '') + (s >= 3 ? fR(-20, -36, 13, 11, p.c2, 4) + fR(7, -36, 13, 11, p.w, 4) : '') +
-      (p.g ? fL('M-27 -42 H27', FGOLD, 2) + sparkle(26, -48) : ''),
-    lamp: (p, s) => (s >= 2 ? `<circle cx="0" cy="-60" r="${12 + s * 3}" fill="#FFE27A" opacity=".35"/>` : '') +
-      fE(0, -2, 12, 3, p.md) + fL('M0 -3 V-58', p.g ? FGOLD : p.md, 3) +
-      fP('M-12 -58 L-7 -76 H7 L12 -58 Z', p.c) + (s >= 3 ? fL('M-11 -61 H11', p.c2, 2) : '') +
-      (p.old ? scuff('M-6 -70 l3 5') : '') + (p.g ? sparkle(12, -80) : ''),
-    // 놀이터, 운동장
-    slide: (p, s) => fL('M-26 0 V-62 M-14 0 V-62', p.md, 3) + fL('M-26 -12 H-14 M-26 -24 H-14 M-26 -36 H-14 M-26 -48 H-14', p.md, 2) +
-      fR(-28, -64, 24, 5, p.w, 1) + (s >= 3 ? fP('M-28 -64 V-74 H-4 V-64', p.c2) : '') +
-      fP('M-6 -62 Q4 -60 14 -26 Q20 -6 30 -4 V2 Q18 2 10 -22 Q2 -50 -6 -54 Z', p.old ? '#A7ADB1' : p.c) +
-      (p.old ? fC(6, -40, 2.4, '#B98A5A') : '') + (p.g ? sparkle(-16, -82) : ''),
-    swing: (p, s) => fL('M-28 0 L-20 -66 L-12 0 M28 0 L20 -66 L12 0', p.g ? FGOLD : p.md, 3) + fL('M-22 -66 H22', p.g ? FGOLD : p.md, 3.4) +
-      fL('M-8 -66 V-18 M8 -66 V-18', p.old ? '#8E7458' : '#7A5A3C', 1.3) + fR(-11, -19, 22, 5, s >= 2 ? p.c : p.w, 1.5) +
-      (s >= 3 ? fL('M14 -66 V-26 M24 -66 V-26', '#7A5A3C', 1.1) + fR(12, -27, 14, 4, p.c2, 1.5) : '') +
-      (p.old ? scuff('M-24 -40 l3 2') : '') + (p.g ? sparkle(0, -76) : ''),
-    bars: (p, s) => fR(-29, -34, 5, 34, s >= 3 ? p.c : p.md, 1) + fR(-3, -46, 5, 46, s >= 3 ? p.c2 : p.md, 1) + fR(23, -58, 5, 58, s >= 3 ? p.c : p.md, 1) +
-      fL('M-26 -32 H0 M0 -44 H25', p.g ? FGOLD : p.m, 2.6) + (s >= 2 ? fL('M25 -56 H28', p.m, 2) : '') +
-      (p.old ? fC(-1, -20, 2, '#B98A5A') + fC(25, -30, 1.8, '#B98A5A') : '') + (p.g ? sparkle(-14, -48) : ''),
-    bench: (p, s) => fR(-26, -16, 4, 16, p.md, 1) + fR(22, -16, 4, 16, p.md, 1) +
-      fR(-30, -20, 60, 5, p.w, 1.5) + fR(-30, -36, 60, 5, p.w, 1.5) + fR(-30, -28, 60, 5, p.w, 1.5) + fL('M-24 -36 V-16 M24 -36 V-16', p.md, 2) +
-      (p.old ? scuff('M-14 -34 l6 1 M8 -18 l5 0') : '') + (s >= 3 ? fC(-36, -6, 6, '#6CC29E') + fR(-38, -6, 4, 6, '#C98A5A', 1) : '') +
-      (p.g ? fL('M-31 -36 H31', FGOLD, 2) + sparkle(26, -44) : ''),
-    // 과학실
-    lab: (p, s) => fR(-30, -32, 60, 32, p.w, 2) + fL('M-10 -30 V-2 M10 -30 V-2', OL, 1) + fC(-13, -16, 1.4, p.wd) + fC(13, -16, 1.4, p.wd) +
-      fR(-32, -37, 64, 6, p.old ? '#6B6B6B' : '#3E4A52', 1.5) +
-      fP('M-20 -54 V-48 L-26 -38 H-14 L-20 -48', '#E8F3F6') + fP('M-24 -41 L-16 -41 L-14 -38 H-26 Z', p.c) +
-      (s >= 2 ? fR(-4, -52, 8, 15, '#E8F3F6', 1) + fR(-4, -44, 8, 7, p.c2, 0) : '') +
-      (s >= 3 ? fC(16, -44, 7, '#E8F3F6') + fR(14, -56, 4, 6, '#E8F3F6', 0) + fC(16, -42, 4.5, '#6CC29E') + `<circle cx="14" cy="-52" r="1.6" fill="#FFFFFF" class="fur-bub"/>` : '') +
-      (p.old ? scuff('M-6 -34 l8 0') : '') + (p.g ? fL('M-31 -36 H31', FGOLD, 2) + sparkle(26, -62) : ''),
-    scope: (p, s) => fR(-14, -6, 28, 6, p.md, 2) + fP('M6 -6 V-34 Q6 -44 -2 -48 L-6 -44 Q0 -40 0 -32 V-6 Z', s >= 3 ? p.c : p.m) +
-      fR(-12, -24, 18, 3, p.md, 1) + `<g transform="rotate(-20 -6 -50)">${fR(-10, -66, 9, 26, p.g ? FGOLD : p.md, 2)}${fR(-11, -70, 11, 5, OL, 1.5)}</g>` +
-      (s >= 2 ? fC(4, -22, 3, p.c2) : '') + (p.old ? scuff('M-8 -4 l4 0') : '') + (p.g ? sparkle(12, -60) : ''),
-    chem: (p, s) => fR(-22, -74, 44, 74, p.w, 2) + fR(-18, -70, 17, 40, '#DDEFF5', 1) + fR(1, -70, 17, 40, '#DDEFF5', 1) +
-      fL('M-18 -50 H-1 M1 -50 H18', OL, 1) + fR(-18, -26, 36, 22, p.wd, 1) + fC(0, -15, 1.6, p.g ? FGOLD : OL) +
-      Array.from({ length: Math.min(6, 1 + s) }, (_, j) => {
-        const x = -16 + (j % 3) * 5 + (j >= 3 ? 0 : 0) + (j % 2 ? 17 : 0), y = j < 3 ? -58 : -38, cs = ['#D9534A', '#3F8AD8', '#6CC29E', '#F3B92E', '#9C8BE3', '#E8833A'];
-        return fR(x, y - 4, 4, 8, p.old ? '#9C8F7A' : cs[j], 1);
-      }).join('') + (p.old ? scuff('M-14 -64 l5 6') : '') + (p.g ? fL('M-22 -74 H22', FGOLD, 2.4) + sparkle(18, -82) : ''),
-    globe: (p, s) => fE(0, -2, 13, 3.5, p.md) + fL('M0 -4 V-14', p.md, 3) +
-      fL('M-18 -42 A20 20 0 0 0 10 -20', p.g ? FGOLD : p.md, 2.6) + fC(-4, -40, 17, p.old ? '#A9C4CC' : '#7FC1E0') +
-      fP('M-14 -48 q6 -6 12 -2 q2 6 -4 8 q-6 2 -8 -6 Z', p.old ? '#A8B48F' : '#7CC07A') + fP('M2 -34 q8 -4 10 4 q-4 6 -10 2 Z', p.old ? '#A8B48F' : '#7CC07A') +
-      (s >= 3 ? fL('M-21 -40 H13', '#FFFFFF', 0.8) : '') + (p.old ? scuff('M4 -48 l4 3') : '') + (p.g ? sparkle(14, -60) : '')
+  const sparkle = (x, y, s = 1) => `<path d="M${x} ${y - 4 * s} Q${x + s} ${y - s} ${x + 4 * s} ${y} Q${x + s} ${y + s} ${x} ${y + 4 * s} Q${x - s} ${y + s} ${x - 4 * s} ${y} Q${x - s} ${y - s} ${x} ${y - 4 * s} Z" fill="#FFE27A" stroke="#C99A1E" stroke-width=".7" class="fur-twinkle"/>`;
+  const scuff = d => fL(d, '#5E4834', 0.8);
+  // 상자 하나: (x, y)는 앞면 아래 왼쪽 모서리. w 너비, d 깊이(윗면 높이), h 높이(앞면)
+  const box = (x, y, w, d, h, top, front, rx = 1.2) => fR(x, y - h - d, w, d, top, rx) + fR(x, y - h, w, h, front, rx);
+  const legs2 = (x, y, w, h, c) => fR(x + 1.5, y - h, 2.4, h, c, 0.5) + fR(x + w - 3.9, y - h, 2.4, h, c, 0.5);
+  const shadow = (cx, y, rx) => `<ellipse cx="${cx}" cy="${y}" rx="${rx}" ry="${rx * 0.18}" fill="rgba(60,40,20,.16)"/>`;
+
+  // 가구 그림. 모두 (x, y)가 바닥에 닿는 앞 왼쪽 모서리예요
+  const ART = {
+    desk: (x, y, p, s) => shadow(x + 14, y, 15) + legs2(x, y, 28, 10, p.wd) + box(x, y - 10, 28, 12, 4, p.w, p.wd) +
+      (s >= 2 ? fR(x + 8, y - 13.2, 12, 2.4, p.w, 0.5) : '') + (p.old ? scuff(`M${x + 6} ${y - 22} l6 1`) : '') +
+      (s >= 3 ? fR(x + 4, y - 23, 9, 6, p.c, 1) + fL(`M${x + 16} ${y - 18} l8 -3`, '#E8833A', 1.8) : '') +
+      (p.g ? fL(`M${x + 0.5} ${y - 14} H${x + 27.5}`, FGOLD, 1.6) + sparkle(x + 25, y - 28) : ''),
+    chair: (x, y, p, s) => legs2(x, y, 14, 8, p.wd) + box(x, y - 8, 14, 7, 2, p.w, p.wd) +
+      fR(x, y - 21, 14, 9, s >= 3 ? p.c : p.w, 2) + (s >= 2 ? fL(`M${x + 3} ${y - 17} H${x + 11}`, p.wd, 0.8) : '') +
+      (p.old ? scuff(`M${x + 3} ${y - 19} l4 3`) : '') + (p.g ? fL(`M${x + 1} ${y - 20.5} H${x + 13}`, FGOLD, 1.4) : ''),
+    fan: (x, y, p, s) => fL(`M${x} 0 V${y - 5}`, '#7A8186', 1.4) + fC(x, y - 4, 3.6, p.g ? FGOLD : p.md) +
+      `<g transform="translate(${x} ${y}) scale(1 .38)"><g class="${s >= 2 ? 'fur-spin' : ''}" style="transform-origin:0 0">` +
+      [0, 120, 240].map(a => `<ellipse cx="0" cy="-12" rx="4.4" ry="12" fill="${s >= 2 ? p.c : p.m}" stroke="${OL}" stroke-width="1.4" transform="rotate(${a})"/>`).join('') +
+      `</g></g>` + fC(x, y, 3, s >= 3 ? p.c2 : p.md) + (p.g ? sparkle(x + 16, y - 6) : ''),
+    locker: (x, y, p, s) => shadow(x + 12, y, 13) + box(x, y, 24, 7, 40, p.md, s >= 3 ? p.c : p.m) + fL(`M${x + 12} ${y - 39} V${y - 1}`, OL, 0.9) +
+      fL(`M${x + 3} ${y - 35} h6 M${x + 3} ${y - 32} h6 M${x + 15} ${y - 35} h6 M${x + 15} ${y - 32} h6`, p.md, 0.9) +
+      fR(x + 8.5, y - 22, 2, 6, p.g ? FGOLD : p.md, 0.5) + fR(x + 13.5, y - 22, 2, 6, p.g ? FGOLD : p.md, 0.5) +
+      fL(`M${x + 19} ${y - 47} l4 -8`, '#B07F45', 2) + fP(`M${x + 21} ${y - 54} l6 -3 l2 5 l-6 2 Z`, '#E7C46A') +
+      (p.old ? fC(x + 5, y - 9, 2, '#B98A5A') : '') + (p.g ? sparkle(x + 4, y - 50) : ''),
+    table: (x, y, p, s) => box(x + 4, y - 30, 56, 5, 3, p.wd, p.wd) + shadow(x + 32, y + 9, 34) + legs2(x, y, 64, 8, p.wd) +
+      box(x, y - 8, 64, 16, 4, s >= 3 ? p.c : p.w, p.wd) +
+      (s >= 2 ? [10, 34].map(dx => fR(x + dx, y - 25, 18, 9, '#E6E9EC', 1.5) + fE(x + dx + 6, y - 21, 3, 2, '#F3D27A') + fE(x + dx + 13, y - 21, 2.6, 2, '#E58B6A')).join('') : '') +
+      (p.old ? scuff(`M${x + 20} ${y - 22} l8 1`) : '') + (p.g ? fR(x + 29, y - 32, 6, 9, '#BEE0EA', 2) + fC(x + 30, y - 33, 2.6, '#F07C7C') + fC(x + 34, y - 34, 2.6, '#F3B92E') : '') +
+      legs2(x + 4, y + 10, 56, 6, p.wd) + box(x + 4, y + 4, 56, 5, 3, p.w, p.wd),
+    counter: (x, y, p, s, w) => shadow(x + w / 2, y, w / 2) + box(x, y, w, 14, 18, p.md, s >= 3 ? p.c : p.m) +
+      Array.from({ length: Math.max(1, Math.floor(w / 30)) }, (_, j) => {
+        const cx = x + 10 + j * 30;
+        return fR(cx, y - 38, 16, 10, p.old ? '#8E969B' : '#C5CDD3', 3) + fE(cx + 8, y - 38, 8, 2.4, p.md) +
+          (s >= 2 ? fL(`M${cx + 5} ${y - 42} q3 -5 0 -9 M${cx + 11} ${y - 42} q3 -5 0 -9`, '#FFFFFF', 1.4) : '');
+      }).join('') + (p.g ? fL(`M${x + 1} ${y - 18} H${x + w - 1}`, FGOLD, 1.6) + sparkle(x + w - 6, y - 44) : ''),
+    water: (x, y, p, s) => shadow(x + 8, y, 9) + box(x, y, 16, 7, 26, p.md, s >= 3 ? p.c : p.m) + fR(x + 3, y - 18, 10, 7, p.md, 1) +
+      fR(x + 4, y - 15, 3, 3, '#3F8AD8', 0.5) + fR(x + 9, y - 15, 3, 3, '#D9534A', 0.5) +
+      fP(`M${x + 3} ${y - 33} V${y - 44} Q${x + 3} ${y - 48} ${x + 8} ${y - 48} Q${x + 13} ${y - 48} ${x + 13} ${y - 44} V${y - 33} Z`, p.old ? '#C9D4D6' : '#BEE0EA') +
+      (p.g ? sparkle(x + 15, y - 50) : ''),
+    rack: (x, y, p, s) => shadow(x + 13, y, 14) + fR(x, y - 40, 3, 40, p.wd, 0.5) + fR(x + 23, y - 40, 3, 40, p.wd, 0.5) +
+      [32, 20, 8].map((dy, r) => fR(x + 1, y - dy, 24, 2.4, p.w, 0.5) +
+        Array.from({ length: r === 2 || s >= 2 + r ? 3 : 1 }, (_, j) => fR(x + 3 + j * 7, y - dy - 3.4, 6, 3, j % 2 ? (s >= 2 ? p.c : p.m) : (s >= 3 ? p.c2 : p.md), 0.5)).join('')).join('') +
+      (p.g ? sparkle(x + 13, y - 46) : ''),
+    shelf: (x, y, p, s) => box(x, y, 34, 7, 56, p.wd, p.w) + fR(x + 3, y - 53, 28, 15, p.wd, 0) + fR(x + 3, y - 35, 28, 15, p.wd, 0) + fR(x + 3, y - 17, 28, 13, p.wd, 0) +
+      [-53, -35, -17].map((dy, r) => {
+        const n = Math.min(6, 2 + s + (r === 1 ? 1 : 0)), cols = p.old ? ['#8E7458', '#9C8F7A', '#7D6247'] : ['#D9534A', '#3F8AD8', '#F3B92E', '#6CC29E', '#9C8BE3', '#E8833A'];
+        return Array.from({ length: n }, (_, j) => fR(x + 4 + j * 4.4, y + dy + (r === 2 ? 2 : 3), 3.8, r === 2 ? 11 : 12, cols[(j + r * 2) % cols.length], 0.5)).join('');
+      }).join('') + (p.g ? fL(`M${x} ${y - 63} H${x + 34}`, FGOLD, 2) + sparkle(x + 30, y - 66) : ''),
+    rdesk: (x, y, p, s) => shadow(x + 22, y, 23) + legs2(x, y, 44, 10, p.wd) + box(x, y - 10, 44, 16, 4, p.w, p.wd) +
+      fP(`M${x + 12} ${y - 22} Q${x + 17} ${y - 27} ${x + 22} ${y - 23} Q${x + 27} ${y - 27} ${x + 32} ${y - 22} Z`, '#FFFDF5') +
+      (s >= 2 ? fL(`M${x + 38} ${y - 20} V${y - 32} l-5 -3`, p.md, 1.3) + fP(`M${x + 30} ${y - 37} l7 3 l-2 4 l-7 -3 Z`, p.c) : '') +
+      (s >= 3 ? fR(x + 3, y - 26, 6, 6, '#C98A5A', 1) + fC(x + 6, y - 29, 3.6, '#6CC29E') : '') +
+      (p.old ? scuff(`M${x + 6} ${y - 20} l6 1`) : '') + (p.g ? fL(`M${x + 0.5} ${y - 14} H${x + 43.5}`, FGOLD, 1.6) + sparkle(x + 40, y - 40) : ''),
+    sofa: (x, y, p, s) => shadow(x + 28, y, 30) + fR(x + 4, y - 36, 48, 16, p.c, 6) + box(x + 2, y - 4, 52, 12, 10, p.c, p.c, 4) +
+      fR(x - 2, y - 26, 9, 24, p.c, 4) + fR(x + 49, y - 26, 9, 24, p.c, 4) + fR(x + 4, y - 4, 3, 4, p.wd, 0.5) + fR(x + 49, y - 4, 3, 4, p.wd, 0.5) +
+      (p.old ? fR(x + 22, y - 33, 9, 7, '#8E7458', 1) : '') + (s >= 3 ? fR(x + 9, y - 30, 12, 10, p.c2, 3) + fR(x + 35, y - 30, 12, 10, p.w, 3) : '') +
+      (p.g ? fL(`M${x + 6} ${y - 35.5} H${x + 50}`, FGOLD, 1.6) + sparkle(x + 52, y - 40) : ''),
+    lamp: (x, y, p, s) => (s >= 2 ? `<circle cx="${x}" cy="${y - 44}" r="${10 + s * 3}" fill="#FFE27A" opacity=".33"/>` : '') +
+      fE(x, y - 1, 7, 2, p.md) + fL(`M${x} ${y - 2} V${y - 42}`, p.g ? FGOLD : p.md, 2.2) +
+      fP(`M${x - 8} ${y - 41} L${x - 5} ${y - 54} H${x + 5} L${x + 8} ${y - 41} Z`, p.c) + (s >= 3 ? fL(`M${x - 7} ${y - 43} H${x + 7}`, p.c2, 1.6) : '') +
+      (p.g ? sparkle(x + 9, y - 56) : ''),
+    slide: (x, y, p, s) => shadow(x + 34, y, 38) + fL(`M${x} ${y} V${y - 52} M${x + 12} ${y} V${y - 52}`, p.md, 2.6) +
+      fL(`M${x} ${y - 10} H${x + 12} M${x} ${y - 20} H${x + 12} M${x} ${y - 30} H${x + 12} M${x} ${y - 40} H${x + 12}`, p.md, 1.8) +
+      box(x - 2, y - 52, 18, 8, 3, p.w, p.wd) + (s >= 3 ? fP(`M${x - 2} ${y - 63} V${y - 73} L${x + 7} ${y - 79} L${x + 16} ${y - 73} V${y - 63}`, p.c2) : '') +
+      fP(`M${x + 14} ${y - 60} Q${x + 30} ${y - 56} ${x + 44} ${y - 20} Q${x + 52} ${y - 4} ${x + 70} ${y - 2} V${y + 4} Q${x + 48} ${y + 4} ${x + 38} ${y - 18} Q${x + 28} ${y - 46} ${x + 14} ${y - 50} Z`, p.old ? '#A7ADB1' : p.c) +
+      (p.old ? fC(x + 33, y - 35, 2, '#B98A5A') : '') + (p.g ? sparkle(x + 6, y - 84) : ''),
+    swing: (x, y, p, s) => shadow(x + 36, y, 40) + fL(`M${x} ${y} L${x + 8} ${y - 58} L${x + 16} ${y} M${x + 56} ${y} L${x + 64} ${y - 58} L${x + 72} ${y}`, p.g ? FGOLD : p.md, 2.8) +
+      fL(`M${x + 6} ${y - 58} H${x + 66}`, p.g ? FGOLD : p.md, 3.2) +
+      [s >= 3 ? [18, 42] : [27]].flat().map((dx, j) => fL(`M${x + dx} ${y - 58} V${y - 16} M${x + dx + 12} ${y - 58} V${y - 16}`, p.old ? '#8E7458' : '#7A5A3C', 1.1) +
+        box(x + dx - 2, y - 12, 16, 4, 2, j ? p.c2 : (s >= 2 ? p.c : p.w), p.wd)).join('') +
+      (p.g ? sparkle(x + 36, y - 66) : ''),
+    bars: (x, y, p, s) => shadow(x + 28, y, 30) + fR(x, y - 26, 4, 26, s >= 3 ? p.c : p.md, 0.8) + fR(x + 24, y - 36, 4, 36, s >= 3 ? p.c2 : p.md, 0.8) + fR(x + 48, y - 46, 4, 46, s >= 3 ? p.c : p.md, 0.8) +
+      fL(`M${x + 2} ${y - 24} H${x + 26} M${x + 26} ${y - 34} H${x + 50}`, p.g ? FGOLD : p.m, 2.4) +
+      (p.old ? fC(x + 26, y - 14, 1.8, '#B98A5A') : '') + (p.g ? sparkle(x + 14, y - 34) : ''),
+    bench: (x, y, p, s) => shadow(x + 20, y, 22) + legs2(x, y, 40, 6, p.md) + box(x, y - 6, 40, 8, 3, p.w, p.wd) + fR(x, y - 22, 40, 7, p.w, 1.5) +
+      fL(`M${x + 4} ${y - 15} V${y - 9} M${x + 36} ${y - 15} V${y - 9}`, p.md, 1.6) +
+      (p.old ? scuff(`M${x + 8} ${y - 19} l6 1`) : '') + (p.g ? fL(`M${x + 1} ${y - 21} H${x + 39}`, FGOLD, 1.4) + sparkle(x + 38, y - 26) : ''),
+    lab: (x, y, p, s) => shadow(x + 36, y, 38) + box(x, y, 72, 18, 14, p.old ? '#6B6B6B' : '#3E4A52', p.w) + fL(`M${x + 24} ${y - 13} V${y - 1} M${x + 48} ${y - 13} V${y - 1}`, OL, 0.8) +
+      fP(`M${x + 12} ${y - 34} V${y - 30} L${x + 7} ${y - 22} H${x + 17} L${x + 12} ${y - 30}`, '#E8F3F6') + fP(`M${x + 9} ${y - 25} H${x + 15} L${x + 17} ${y - 22} H${x + 7} Z`, p.c) +
+      (s >= 2 ? fR(x + 26, y - 33, 6, 11, '#E8F3F6', 1) + fR(x + 26, y - 27, 6, 5, p.c2, 0) : '') +
+      (s >= 3 ? fC(x + 56, y - 26, 5, '#E8F3F6') + fR(x + 54.5, y - 35, 3, 5, '#E8F3F6', 0) + fC(x + 56, y - 25, 3.2, '#6CC29E') + `<circle cx="${x + 55}" cy="${y - 33}" r="1.2" fill="#FFFFFF" class="fur-bub"/>` : '') +
+      (p.old ? scuff(`M${x + 36} ${y - 24} l8 0`) : '') + (p.g ? fL(`M${x + 0.5} ${y - 14} H${x + 71.5}`, FGOLD, 1.6) + sparkle(x + 68, y - 38) : ''),
+    scope: (x, y, p, s) => fR(x, y - 4, 16, 4, p.md, 1) + fP(`M${x + 11} ${y - 4} V${y - 20} Q${x + 11} ${y - 26} ${x + 6} ${y - 28} L${x + 4} ${y - 25} Q${x + 7} ${y - 23} ${x + 7} ${y - 18} V${y - 4} Z`, s >= 3 ? p.c : p.m) +
+      fR(x + 1, y - 13, 10, 2, p.md, 0.5) + `<g transform="rotate(-20 ${x + 5} ${y - 30})">${fR(x + 2, y - 40, 6, 15, p.g ? FGOLD : p.md, 1.5)}${fR(x + 1.5, y - 42, 7, 3, OL, 1)}</g>` +
+      (s >= 2 ? fC(x + 12, y - 12, 2, p.c2) : '') + (p.g ? sparkle(x + 16, y - 36) : ''),
+    chem: (x, y, p, s) => shadow(x + 13, y, 14) + box(x, y, 26, 7, 48, p.wd, p.w) + fR(x + 2.5, y - 45, 10, 26, '#DDEFF5', 0.8) + fR(x + 13.5, y - 45, 10, 26, '#DDEFF5', 0.8) +
+      fL(`M${x + 2.5} ${y - 32} H${x + 23.5}`, OL, 0.8) + fR(x + 2.5, y - 16, 21, 13, p.wd, 0.8) +
+      Array.from({ length: Math.min(6, 1 + s) }, (_, j) => fR(x + 4 + (j % 3) * 3 + (j % 2 ? 11 : 0), y - (j < 3 ? 38 : 25) - 4, 2.6, 6, p.old ? '#9C8F7A' : ['#D9534A', '#3F8AD8', '#6CC29E', '#F3B92E', '#9C8BE3', '#E8833A'][j], 0.5)).join('') +
+      (p.g ? fL(`M${x} ${y - 55} H${x + 26}`, FGOLD, 1.8) + sparkle(x + 24, y - 58) : ''),
+    globe: (x, y, p, s) => fE(x + 10, y - 1, 8, 2.2, p.md) + fL(`M${x + 10} ${y - 2} V${y - 8}`, p.md, 2.4) +
+      fL(`M${x - 2} ${y - 26} A13 13 0 0 0 ${x + 17} ${y - 10}`, p.g ? FGOLD : p.md, 2) + fC(x + 8, y - 24, 11, p.old ? '#A9C4CC' : '#7FC1E0') +
+      fP(`M${x + 1} ${y - 29} q4 -4 8 -1 q1 4 -3 5 q-4 1 -5 -4 Z`, p.old ? '#A8B48F' : '#7CC07A') + fP(`M${x + 10} ${y - 20} q5 -3 7 3 q-3 4 -7 1 Z`, p.old ? '#A8B48F' : '#7CC07A') +
+      (p.g ? sparkle(x + 20, y - 34) : '')
   };
-  const FUR_X = [44, 122, 198, 276];
-  // 방 배경: 바닥 위 164가 가구가 서는 줄이에요
+  const furCnt = (n, base, step, max) => n < 1 ? 0 : Math.min(max, base + Math.floor((n - 1) / step));
+  // 방마다 가구를 놓을 자리. 앞에 있는 자리부터 채워요. top: 천장에 다는 가구
+  const FUR_SPOTS = {
+    classroom: {
+      desk: { cnt: n => furCnt(n, 2, 2, 12), at: Array.from({ length: 12 }, (_, j) => [44 + (j % 4) * 64, 120 + Math.floor(j / 4) * 42]) },
+      chair: { cnt: n => furCnt(n, 2, 2, 12), at: Array.from({ length: 12 }, (_, j) => [51 + (j % 4) * 64, 136 + Math.floor(j / 4) * 42]) },
+      fan: { top: true, cnt: n => furCnt(n, 1, 9, 2), at: [[236, 78]], cnt2: n => n >= 10 ? [[86, 78], [236, 78]] : null },
+      locker: { cnt: n => furCnt(n, 1, 9, 2), at: [[8, 116], [8, 164]] }
+    },
+    cafeteria: {
+      counter: { cnt: n => furCnt(n, 1, 6, 3), at: [[30, 92]] },
+      table: { cnt: n => furCnt(n, 1, 4, 6), at: Array.from({ length: 6 }, (_, j) => [50 + (j % 3) * 78, 142 + Math.floor(j / 3) * 58]) },
+      water: { cnt: n => furCnt(n, 1, 9, 2), at: [[290, 120], [290, 170]] },
+      rack: { cnt: n => furCnt(n, 1, 9, 2), at: [[10, 140], [10, 196]] }
+    },
+    library: {
+      shelf: { cnt: n => furCnt(n, 1, 5, 4), at: [[12, 96], [50, 96], [236, 96], [274, 96]] },
+      rdesk: { cnt: n => furCnt(n, 1, 4, 6), at: Array.from({ length: 6 }, (_, j) => [58 + (j % 3) * 76, 140 + Math.floor(j / 3) * 44]) },
+      sofa: { cnt: n => furCnt(n, 1, 12, 2), at: [[40, 226], [212, 226]] },
+      lamp: { cnt: n => furCnt(n, 1, 6, 4), at: [[118, 226], [290, 226], [16, 172], [304, 172]] }
+    },
+    playground: {
+      slide: { cnt: n => furCnt(n, 1, 99, 1), at: [[24, 150]] },
+      swing: { cnt: n => furCnt(n, 1, 99, 1), at: [[128, 128]] },
+      bars: { cnt: n => furCnt(n, 1, 99, 1), at: [[226, 150]] },
+      bench: { cnt: n => furCnt(n, 1, 5, 4), at: [[30, 222], [102, 226], [174, 222], [246, 226]] }
+    },
+    science: {
+      lab: { cnt: n => furCnt(n, 1, 4, 6), at: Array.from({ length: 6 }, (_, j) => [52 + (j % 2) * 112, 136 + Math.floor(j / 2) * 44]) },
+      scope: { cnt: n => furCnt(n, 1, 6, 4), at: [[112, 90], [134, 90], [156, 90], [178, 90]] },
+      chem: { cnt: n => furCnt(n, 1, 9, 2), at: [[262, 100], [290, 100]] },
+      globe: { cnt: n => furCnt(n, 1, 99, 1), at: [[208, 90]] }
+    }
+  };
+  // 방 배경. 0~64는 뒷벽, 그 아래는 바닥이에요
   const FUR_ROOM = {
-    classroom: '<rect width="320" height="196" fill="#F3E8CF"/><rect y="150" width="320" height="46" fill="#C99B6B"/><path d="M0 150 H320" stroke="#8C6440" stroke-width="2"/><path d="M60 150 L40 196 M140 150 L130 196 M220 150 L230 196 M290 150 L310 196" stroke="#B4885A" stroke-width="1.2"/>' +
-      '<rect x="96" y="20" width="128" height="60" rx="3" fill="#2F5D4A" stroke="#8C6440" stroke-width="4"/><text x="160" y="56" text-anchor="middle" class="fur-chalk">오늘도 즐겁게!</text><rect x="120" y="81" width="80" height="3" fill="#8C6440"/>' +
-      '<rect x="14" y="26" width="58" height="48" rx="3" fill="#BEE0EA" stroke="#8C6440" stroke-width="3"/><path d="M43 26 V74 M14 50 H72" stroke="#8C6440" stroke-width="2"/>' +
-      '<circle cx="276" cy="44" r="15" fill="#FFFDF4" stroke="#8C6440" stroke-width="3"/><path d="M276 44 V35 M276 44 L283 47" stroke="#4E3D2C" stroke-width="2" stroke-linecap="round"/>',
-    cafeteria: '<rect width="320" height="196" fill="#F6E3D3"/><rect y="150" width="320" height="46" fill="#E8D7C2"/>' +
-      Array.from({ length: 9 }, (_, i) => `<path d="M${i * 40} 150 V196" stroke="#D2BFA6" stroke-width="1"/>`).join('') + '<path d="M0 172 H320" stroke="#D2BFA6"/><path d="M0 150 H320" stroke="#B89B7A" stroke-width="2"/>' +
-      '<rect x="110" y="16" width="100" height="62" rx="6" fill="#FFFDF5" stroke="#C2533D" stroke-width="3"/><text x="160" y="36" text-anchor="middle" class="fur-menu-h">오늘의 급식</text><text x="160" y="54" text-anchor="middle" class="fur-menu">도토리밥 버섯국</text><text x="160" y="68" text-anchor="middle" class="fur-menu">산딸기 푸딩</text>' +
-      '<rect x="16" y="24" width="64" height="44" rx="3" fill="#BEE0EA" stroke="#B89B7A" stroke-width="3"/><path d="M16 34 H80" stroke="#F3B92E" stroke-width="6"/><rect x="240" y="24" width="64" height="44" rx="3" fill="#BEE0EA" stroke="#B89B7A" stroke-width="3"/><path d="M240 34 H304" stroke="#F3B92E" stroke-width="6"/>',
-    library: '<rect width="320" height="196" fill="#EAD9BF"/><rect y="150" width="320" height="46" fill="#A97C55"/><path d="M0 150 H320" stroke="#7A5A3C" stroke-width="2"/><path d="M0 170 H320 M0 186 H320" stroke="#966B47" stroke-width="1"/>' +
-      '<path d="M128 84 V42 Q160 8 192 42 V84 Z" fill="#BEE0EA" stroke="#7A5A3C" stroke-width="4"/><path d="M160 20 V84 M128 58 H192" stroke="#7A5A3C" stroke-width="2"/>' +
-      '<path d="M0 0 H320 V12 H0 Z" fill="#7A5A3C"/><path d="M20 12 q10 18 0 30 M300 12 q-10 18 0 30" stroke="#5E8C4A" stroke-width="3" fill="none"/><circle cx="20" cy="42" r="5" fill="#7CC07A"/><circle cx="300" cy="42" r="5" fill="#7CC07A"/>',
-    playground: '<rect width="320" height="196" fill="#CDE9F2"/><circle cx="276" cy="30" r="14" fill="#FFE27A"/><path d="M0 120 Q40 96 80 116 Q120 92 170 118 Q220 96 260 116 Q290 100 320 112 V150 H0 Z" fill="#9DC37A"/>' +
-      '<rect y="146" width="320" height="50" fill="#D9C08A"/><path d="M0 146 H320" stroke="#B49B66" stroke-width="2"/><ellipse cx="60" cy="40" rx="20" ry="7" fill="#FFFFFF"/><ellipse cx="190" cy="28" rx="24" ry="8" fill="#FFFFFF"/>',
-    science: '<rect width="320" height="196" fill="#E2ECEB"/><rect y="150" width="320" height="46" fill="#B9C3C3"/>' +
-      Array.from({ length: 9 }, (_, i) => `<path d="M${i * 40} 150 V196" stroke="#A3AEAE" stroke-width="1"/>`).join('') + '<path d="M0 172 H320" stroke="#A3AEAE"/><path d="M0 150 H320" stroke="#8C9898" stroke-width="2"/>' +
-      '<rect x="118" y="16" width="84" height="64" rx="4" fill="#FFFDF5" stroke="#3E7E79" stroke-width="3"/><circle cx="160" cy="48" r="5" fill="#D9534A"/><ellipse cx="160" cy="48" rx="24" ry="9" fill="none" stroke="#3F8AD8" stroke-width="1.6"/><ellipse cx="160" cy="48" rx="24" ry="9" fill="none" stroke="#3F8AD8" stroke-width="1.6" transform="rotate(60 160 48)"/><ellipse cx="160" cy="48" rx="24" ry="9" fill="none" stroke="#3F8AD8" stroke-width="1.6" transform="rotate(-60 160 48)"/>' +
-      '<rect x="18" y="26" width="58" height="46" rx="3" fill="#BEE0EA" stroke="#8C9898" stroke-width="3"/><path d="M47 26 V72" stroke="#8C9898" stroke-width="2"/><rect x="246" y="30" width="54" height="40" rx="3" fill="#FFFDF5" stroke="#8C9898" stroke-width="2"/><path d="M254 62 L262 48 L270 56 L280 40 L292 50" fill="none" stroke="#6CC29E" stroke-width="2"/>'
+    classroom: '<rect width="320" height="230" fill="#C99B6B"/>' + Array.from({ length: 8 }, (_, i) => `<path d="M0 ${84 + i * 20} H320" stroke="#B4885A" stroke-width="1"/>`).join('') +
+      '<rect width="320" height="64" fill="#F3E8CF"/><rect y="60" width="320" height="5" fill="#8C6440"/>' +
+      '<rect x="96" y="8" width="128" height="44" rx="3" fill="#2F5D4A" stroke="#8C6440" stroke-width="3"/><text x="160" y="36" text-anchor="middle" class="fur-chalk">오늘도 즐겁게!</text><rect x="122" y="52" width="76" height="3" fill="#8C6440"/>' +
+      '<rect x="14" y="10" width="62" height="40" rx="2" fill="#BEE0EA" stroke="#8C6440" stroke-width="2.5"/><path d="M45 10 V50 M14 30 H76" stroke="#8C6440" stroke-width="1.6"/>' +
+      '<rect x="242" y="12" width="64" height="38" rx="2" fill="#D9B98A" stroke="#8C6440" stroke-width="2"/><rect x="248" y="17" width="16" height="12" fill="#FFFDF5"/><rect x="268" y="16" width="14" height="16" fill="#F7C9D2"/><rect x="286" y="18" width="14" height="11" fill="#CDE9F2"/><rect x="254" y="33" width="20" height="12" fill="#FFF1B8"/><rect x="280" y="33" width="18" height="12" fill="#D8EBC4"/>' +
+      '<circle cx="230" cy="20" r="0" />' +
+      // 교탁
+      '<rect x="138" y="70" width="44" height="10" rx="1.2" fill="#B07F45" stroke="#4E3D2C"/><rect x="138" y="80" width="44" height="12" rx="1.2" fill="#8C6440" stroke="#4E3D2C"/>',
+    cafeteria: '<rect width="320" height="230" fill="#E8D7C2"/>' + Array.from({ length: 9 }, (_, i) => `<path d="M${i * 40} 64 V230" stroke="#D2BFA6"/>`).join('') + Array.from({ length: 5 }, (_, i) => `<path d="M0 ${96 + i * 34} H320" stroke="#D2BFA6"/>`).join('') +
+      '<rect width="320" height="64" fill="#F6E3D3"/><rect y="60" width="320" height="5" fill="#B89B7A"/>' +
+      '<rect x="112" y="6" width="96" height="48" rx="5" fill="#FFFDF5" stroke="#C2533D" stroke-width="2.5"/><text x="160" y="22" text-anchor="middle" class="fur-menu-h">오늘의 급식</text><text x="160" y="37" text-anchor="middle" class="fur-menu">도토리밥 버섯국</text><text x="160" y="49" text-anchor="middle" class="fur-menu">산딸기 푸딩</text>' +
+      '<rect x="20" y="10" width="62" height="36" rx="2" fill="#BEE0EA" stroke="#B89B7A" stroke-width="2.5"/><path d="M20 18 H82" stroke="#F3B92E" stroke-width="5"/><rect x="238" y="10" width="62" height="36" rx="2" fill="#BEE0EA" stroke="#B89B7A" stroke-width="2.5"/><path d="M238 18 H300" stroke="#F3B92E" stroke-width="5"/>',
+    library: '<rect width="320" height="230" fill="#A97C55"/><rect x="40" y="186" width="240" height="40" rx="6" fill="#C2533D" opacity=".55"/>' + Array.from({ length: 8 }, (_, i) => `<path d="M0 ${84 + i * 20} H320" stroke="#966B47"/>`).join('') +
+      '<rect width="320" height="64" fill="#EAD9BF"/><rect y="60" width="320" height="5" fill="#7A5A3C"/>' +
+      '<path d="M130 58 V28 Q160 0 190 28 V58 Z" fill="#BEE0EA" stroke="#7A5A3C" stroke-width="3"/><path d="M160 8 V58 M130 38 H190" stroke="#7A5A3C" stroke-width="1.6"/>' +
+      '<rect x="100" y="20" width="20" height="30" rx="2" fill="#F7E7C6" stroke="#7A5A3C"/><rect x="200" y="20" width="20" height="30" rx="2" fill="#F7E7C6" stroke="#7A5A3C"/>',
+    playground: '<rect width="320" height="230" fill="#D9C08A"/><rect width="320" height="44" fill="#CDE9F2"/><circle cx="284" cy="18" r="11" fill="#FFE27A"/><ellipse cx="64" cy="16" rx="18" ry="6" fill="#FFFFFF"/><ellipse cx="180" cy="12" rx="22" ry="7" fill="#FFFFFF"/>' +
+      '<path d="M0 44 Q30 30 60 42 Q100 26 140 42 Q180 28 220 42 Q260 30 320 40 V64 H0 Z" fill="#7DA857"/><rect y="60" width="320" height="4" fill="#9DC37A"/>' +
+      Array.from({ length: 17 }, (_, i) => `<path d="M${6 + i * 19} 66 V50 M${2 + i * 19} 54 H${12 + i * 19}" stroke="#A3713F" stroke-width="2"/>`).join('') +
+      '<ellipse cx="80" cy="200" rx="40" ry="6" fill="#C9AE76"/><ellipse cx="230" cy="190" rx="30" ry="5" fill="#C9AE76"/>',
+    science: '<rect width="320" height="230" fill="#B9C3C3"/>' + Array.from({ length: 9 }, (_, i) => `<path d="M${i * 40} 64 V230" stroke="#A3AEAE"/>`).join('') + Array.from({ length: 5 }, (_, i) => `<path d="M0 ${96 + i * 34} H320" stroke="#A3AEAE"/>`).join('') +
+      '<rect width="320" height="64" fill="#E2ECEB"/><rect y="60" width="320" height="5" fill="#8C9898"/>' +
+      '<rect x="118" y="6" width="84" height="48" rx="3" fill="#FFFDF5" stroke="#3E7E79" stroke-width="2.5"/><circle cx="160" cy="30" r="4" fill="#D9534A"/><ellipse cx="160" cy="30" rx="20" ry="7" fill="none" stroke="#3F8AD8" stroke-width="1.4"/><ellipse cx="160" cy="30" rx="20" ry="7" fill="none" stroke="#3F8AD8" stroke-width="1.4" transform="rotate(60 160 30)"/><ellipse cx="160" cy="30" rx="20" ry="7" fill="none" stroke="#3F8AD8" stroke-width="1.4" transform="rotate(-60 160 30)"/>' +
+      '<rect x="16" y="10" width="60" height="38" rx="2" fill="#BEE0EA" stroke="#8C9898" stroke-width="2.5"/><path d="M46 10 V48" stroke="#8C9898" stroke-width="1.6"/>' +
+      '<rect x="224" y="12" width="30" height="34" fill="#FFFDF5" stroke="#8C9898"/>' + Array.from({ length: 12 }, (_, i) => `<rect x="${227 + (i % 4) * 6}" y="${15 + Math.floor(i / 4) * 9}" width="5" height="7" fill="${['#F7C9D2', '#CDE9F2', '#FFF1B8', '#D8EBC4'][i % 4]}"/>`).join('') +
+      // 시범 실험대
+      '<rect x="104" y="70" width="112" height="9" rx="1.2" fill="#3E4A52" stroke="#4E3D2C"/><rect x="104" y="79" width="112" height="12" rx="1.2" fill="#D6A46A" stroke="#4E3D2C"/>'
   };
-  function furItemSVG(k, i) {
-    const n = S.fu[k][i], st = furStage(n), id = FUR[k][i].id;
-    return st ? FUR_ART[id](FUR_PAL[st], st) : `<g class="fur-ghost">${FUR_ART[id](FUR_PAL[1], 1)}</g>`;
+  // 방 안 가구를 모두 그려요. 앞(아래)에 있는 것이 위에 그려지게 깊이 순서로 놓고, 천장 가구는 맨 마지막에 그려요
+  function furInstances(k) {
+    const out = [];
+    FUR[k].forEach((F, i) => {
+      const sp = FUR_SPOTS[k][F.id], n = S.fu[k][i], st = furStage(n);
+      let at = sp.at.slice(0, Math.max(1, sp.cnt(n)));
+      if (sp.cnt2 && sp.cnt2(n)) at = sp.cnt2(n);
+      if (F.id === 'counter') at = [[30, 100, 70 + 60 * (Math.max(1, sp.cnt(n)) - 1)]];
+      at.forEach(([x, y, w], j) => out.push({ i, j, x, y, top: !!sp.top, ghost: n < 1, svg: ART[F.id](x, y, FUR_PAL[st || 1], st || 1, w) }));
+    });
+    out.sort((a, b) => (a.top - b.top) || (a.y - b.y));
+    return out;
   }
   function renderFurScene(k) {
-    const L = S.f[k];
-    return FUR_ROOM[k] + FUR[k].map((F, i) => {
-      const n = S.fu[k][i], done = n >= L, can = !done && S.budget >= furCost(k, i), x = FUR_X[i];
-      const lab = `${furName(k, i)} Lv.${n}${done ? ', 다 올렸어요' : `, 눌러서 올리기 도토리 ${fmt(furCost(k, i))}개`}`;
-      return `<g class="fur-it${done ? ' done' : can ? ' can' : ''}" data-fur="${i}" role="button" tabindex="0" aria-label="${lab}">` +
-        `<rect x="${x - 38}" y="60" width="76" height="132" class="fur-hit"/>` +
-        `<g transform="translate(${x} 164)"><g class="fur-art">${furItemSVG(k, i)}</g></g>` +
-        `<rect x="${x - 21}" y="171" width="42" height="17" rx="8.5" class="fur-tag"/><text x="${x}" y="183.5" text-anchor="middle" class="fur-tag-t">${n ? 'Lv.' + n : '없음'}</text></g>`;
+    const L = S.f[k], tags = [];
+    const body = furInstances(k).map(o => {
+      const n = S.fu[k][o.i], done = n >= L, can = !done && S.budget >= furCost(k, o.i);
+      if (o.j === 0) tags.push([o, n, done, can]);
+      return `<g class="fur-it${o.ghost ? ' fur-ghost' : ''}" data-fur="${o.i}"${o.j === 0 ? ` role="button" tabindex="0" aria-label="${furName(k, o.i)} Lv.${n}${done ? ', 다 올렸어요' : `, 눌러서 올리기 도토리 ${fmt(furCost(k, o.i))}개`}"` : ''}><g class="fur-art">${o.svg}</g></g>`;
     }).join('');
+    // 가구 종류마다 첫 자리 위에 레벨 표를 붙여요
+    rt.furTag = {};
+    const tagSvg = tags.map(([o, n, done, can]) => {
+      const tx = Math.max(20, Math.min(300, o.x + FUR_TAGDX[FUR[k][o.i].id])), ty = Math.min(220, Math.max(14, o.top ? o.y + 14 : o.y + 10));
+      rt.furTag[o.i] = [tx, ty];
+      return `<g class="fur-tagg${done ? ' done' : can ? ' can' : ''}" data-fur="${o.i}"><rect x="${tx - 19}" y="${ty - 8}" width="38" height="15" rx="7.5" class="fur-tag"/><text x="${tx}" y="${ty + 3.2}" text-anchor="middle" class="fur-tag-t">${n ? 'Lv.' + n : '없음'}</text></g>`;
+    }).join('');
+    return FUR_ROOM[k] + body + tagSvg;
   }
+  // 레벨 표를 가구 가운데 아래쪽에 맞추는 거리
+  const FUR_TAGDX = { desk: 14, chair: 7, fan: 0, locker: 12, counter: 35, table: 32, water: 8, rack: 13, shelf: 17, rdesk: 22, sofa: 28, lamp: 0, slide: 34, swing: 36, bars: 26, bench: 20, lab: 36, scope: 8, chem: 13, globe: 8 };
   function renderFur() {
     const k = rt.sheetKey, box = $('#furBox');
     if (!k || S.f[k] < 1) { box.hidden = true; rt.furKey = ''; return; }
@@ -3548,7 +3601,7 @@ html.ait .app{padding-top:calc(10px + var(--ait-top, 0px));padding-bottom:var(--
     if (k === 'classroom') toast(`교실 Lv.${L}! 정원이 ${capacity()}명으로 늘었어요`);
     else if (was === 0 && k === 'cafeteria') toast('급식실을 지었어요! 수업료 +20%');
     else if (was === 0 && k === 'library') toast('도서관을 지었어요! 평판 ★3');
-    else if (was === 0 && k === 'science') toast('과학실을 지었어요! 수료증 +5%, 평판 ★1');
+    else if (was === 0 && k === 'science') toast('과학실을 지었어요! 수료증 +3%, 평판 ★1');
     else if (was === 0 && k === 'playground') { toast(`${eul(FAC.playground.name)} 지었어요! 옆 참나무를 누르면 도토리가 떨어져요`); rt.dropT = dropIntervalFor(1) - 3; }
     else toast(`${n} Lv.${L}! ${FAC[k].eff(L)}`);
     afterPurchase();
@@ -7257,7 +7310,7 @@ html.ait .app{padding-top:calc(10px + var(--ait-top, 0px));padding-bottom:var(--
   }
 
   // 시험용 손잡이: 자동 시험(window.__FOREST_TEST)에서만 게임 속 함수를 꺼내 써요
-  if (window.__FOREST_TEST) window.__forest = { get S() { return S; }, rt, buyFacility, buyFur, buyFurAll, furCost, furReady, furDone, FUR, startTalk, endTalk, teacherAct, facCost, teaCost, facKeys, rate, rep, capacity, canGraduate, canPromote,
+  if (window.__FOREST_TEST) window.__forest = { get S() { return S; }, rt, previewDip, dipMult, costScale, buyFacility, buyFur, buyFurAll, furCost, furReady, furDone, FUR, startTalk, endTalk, teacherAct, facCost, teaCost, facKeys, rate, rep, capacity, canGraduate, canPromote,
     graduate, promote, buyPerk, perkCost, perkMaxed, buyFundPerk, fpCost, claimMain, mainReady, curMain, qNo, earn, CFG, TEA, teaMaxed, PERKS, FPERKS, MAIN, finalYear, startTrip, claimTrip, TRIPS, yearLocked, startSports, endSports, rtSports: () => rt.sports, startFest, rtFest: () => rt.fest, facCap, addLeague, weekIdx, addMP, tutStart };
   if (window.claude && window.claude.hot && window.claude.hot.snapshot) {
     try { window.claude.hot.snapshot(() => { if (S) syncMid(); return { save: S }; }); } catch (e) { /* 무시 */ }

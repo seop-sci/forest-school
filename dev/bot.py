@@ -15,7 +15,7 @@ BOT = r"""(maxH) => {
   } };
   const perks = () => { for (let i = 0; i < 40; i++) { const ks = Object.keys(F.PERKS).filter(k => !F.perkMaxed(k)).sort((a, b) => F.perkCost(a) - F.perkCost(b)); if (!ks.length || F.perkCost(ks[0]) > S().p.dip) return; F.buyPerk(ks[0], document.body); } };
   const fperks = () => { for (let i = 0; i < 40; i++) { const ks = Object.keys(F.FPERKS).sort((a, b) => F.fpCost(a) - F.fpCost(b)); if (F.fpCost(ks[0]) > S().fund) return; F.buyFundPerk(ks[0], document.body); } };
-  const snap = (what) => { const s = S(); out.push({ what, cap: F.facCap(), trips: s.st.trips, souv: s.trip.souv.length, tier: s.tier, tg: s.tg, min: Math.round(yearT / 60), totalH: +(t / 3600).toFixed(2), f: Object.assign({}, s.f), t: Object.assign({}, s.t), st: Math.floor(s.students), q: s.q.m, qid: (F.curMain() || {}).id }); yearT = 0; };
+  const snap = (what) => { const s = S(); out.push({ what, cap: F.facCap(), trips: s.st.trips, souv: s.trip.souv.length, tier: s.tier, tg: s.tg, min: Math.round(yearT / 60), totalH: +(t / 3600).toFixed(2), f: Object.assign({}, s.f), t: Object.assign({}, s.t), st: Math.floor(s.students), dips: Math.round(s.st.dips), pv: F.previewDip(), dm: +F.dipMult().toFixed(2), ye: +(s.yearEarned / F.costScale()).toExponential(2), pdip: Math.round(s.p.dip), perk: Object.assign({}, s.p.perk), q: s.q.m, qid: (F.curMain() || {}).id }); yearT = 0; };
   while (t < end && performance.now() - t0 < 20000) {
     step(); buy(); perks();
     { const q = F.curMain(); if (q && q.t === 'fest') { const s = S(); s.fest.n[q.k] = (s.fest.n[q.k] || 0) + 1; } if (q && q.t === 'sports') S().st.sports += 1; }
