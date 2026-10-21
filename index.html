@@ -307,7 +307,7 @@ button{font:inherit;color:inherit}
 .f-mag{fill:var(--mag)} .f-magb{fill:var(--mag-wing)} .f-magw{fill:var(--mag-white)} .f-magbeak{fill:var(--mag-beak)}
 .s-magw{fill:none;stroke:var(--mag-white);stroke-width:1.6;stroke-linecap:round} .s-tagline{fill:none;stroke:var(--deal-ink);stroke-width:.9;stroke-linecap:round} .s-magleg{fill:none;stroke:var(--mag-beak);stroke-width:1.3;stroke-linecap:round}
 /* 지도 오른쪽 위: 까치 핫딜과 특식 데이 */
-.map-left{position:absolute;z-index:2;top:10px;left:10px;display:flex;flex-direction:column;align-items:flex-start;gap:6px;pointer-events:none}
+.map-left{position:absolute;z-index:2;top:10px;left:8px;display:flex;flex-direction:column;align-items:flex-start;gap:8px;pointer-events:none}
 .map-left > .boost{pointer-events:auto}
 .deal{position:absolute;z-index:2;right:10px;bottom:10px;display:flex;align-items:center;gap:6px;padding:3px 12px 3px 3px;border:2px solid var(--wood);border-radius:999px;background:var(--seal);color:var(--deal-ink);font-family:var(--font-display);font-size:14px;line-height:1.15;text-align:left;box-shadow:0 3px 0 var(--wood-dark);cursor:pointer;animation:dealIn .5s cubic-bezier(.3,1.6,.5,1), dealWiggle 2.6s ease-in-out .6s infinite;transform-origin:85% 50%}
 .deal .d-av{width:32px;height:32px;border-radius:50%;display:grid;place-items:center;overflow:hidden;background:var(--deal-ink)}
@@ -715,13 +715,16 @@ html.ait .app{padding-top:calc(10px + var(--ait-top, 0px));padding-bottom:var(--
 .board .icon-btn{position:relative}
 .board .dot{position:absolute;top:4px;right:4px;width:8px;height:8px;border-radius:50%;background:var(--seal)}
 .frame{z-index:0}
-.boost{display:flex;align-items:center;gap:6px;padding:4px 12px 4px 4px;border:2px solid var(--wood);border-radius:999px;background:var(--board);color:var(--chalk);font-family:var(--font-display);font-size:14px;box-shadow:0 3px 0 var(--wood-dark);cursor:pointer}
-.boost .b-av{width:30px;height:30px;border-radius:50%;overflow:hidden;display:grid;place-items:center;background:color-mix(in srgb, var(--chalk) 14%, transparent)}
-.boost .b-av svg{width:28px;height:28px}
-.boost.trip .b-n{font-size:14px}
-.boost.trip.ready{animation:tripPulse 1.6s ease-in-out infinite}
+/* 지도 왼쪽 동그라미 아이콘 버튼: 아이콘 + 숫자 배지 + 이름표 */
+.boost{display:flex;flex-direction:column;align-items:center;gap:0;width:62px;padding:0;border:0;background:none;color:var(--chalk);font-family:var(--font-display);cursor:pointer;-webkit-tap-highlight-color:transparent}
+.boost .b-ring{position:relative;width:50px;height:50px;box-sizing:border-box;border-radius:50%;border:2.5px solid var(--wood);background:var(--board);box-shadow:0 3px 0 var(--wood-dark);display:grid;place-items:center}
+.boost:active .b-ring{transform:translateY(2px);box-shadow:0 1px 0 var(--wood-dark)}
+.boost .b-av{width:42px;height:42px;border-radius:50%;overflow:hidden;display:grid;place-items:center}
+.boost .b-av svg{width:38px;height:38px}
+.boost .b-lb{margin-top:10px;padding:1px 7px;border-radius:8px;background:var(--board);font-size:12px;line-height:1.35;white-space:nowrap}
+.boost.trip.ready .b-ring{animation:tripPulse 1.6s ease-in-out infinite}
 @keyframes tripPulse{50%{box-shadow:0 3px 0 var(--wood-dark),0 0 0 4px color-mix(in srgb, var(--accent) 55%, transparent)}}
-@media (prefers-reduced-motion: reduce){.boost.trip.ready{animation:none}}
+@media (prefers-reduced-motion: reduce){.boost.trip.ready .b-ring{animation:none}}
 .band.b{fill:#3F78C2} .band.w{fill:#FFFFFF;stroke:#C9CDD2;stroke-width:.5}
 .bus-sign{font-family:var(--font-display);font-size:6.5px;fill:#6E4A2E}
 .bus{pointer-events:none}
@@ -780,8 +783,8 @@ html.ait .app{padding-top:calc(10px + var(--ait-top, 0px));padding-bottom:var(--
 .sv.own small{color:var(--ink)}
 .tr-fine{margin-top:8px}
 .tr-close{width:100%;margin-top:12px}
-.boost .b-n{font-family:var(--font-chalk);font-weight:700;font-size:17px;line-height:1;color:var(--accent);font-variant-numeric:tabular-nums}
-.boost.used .b-n{color:var(--chalk-dim)}
+.boost .b-n{position:absolute;left:50%;bottom:-10px;transform:translateX(-50%);min-width:20px;box-sizing:border-box;padding:2px 6px;border-radius:999px;background:var(--accent);color:var(--accent-ink);font-family:var(--font-chalk);font-weight:700;font-size:13px;line-height:1.1;text-align:center;white-space:nowrap;font-variant-numeric:tabular-nums;box-shadow:0 0 0 2px var(--wood)}
+.boost.used .b-n{background:var(--board);color:var(--chalk-dim)}
 
 /* 테스트 광고 화면 */
 .adscreen{position:fixed;inset:0;z-index:50;display:flex;flex-direction:column;gap:12px;padding:calc(14px + env(safe-area-inset-top, 0px)) 16px calc(16px + env(safe-area-inset-bottom, 0px));background:var(--ad-bg);color:var(--ad-ink)}
@@ -1234,9 +1237,9 @@ html.ait .app{padding-top:calc(10px + var(--ait-top, 0px));padding-bottom:var(--
       <div class="sportsbar" id="sportsBar" hidden role="status" aria-live="off"><span class="sb-b">청팀 <b id="spBlue">0</b></span><span class="sb-t"><b id="spTime">40</b>초</span><span class="sb-w"><b id="spWhite">0</b> 백팀</span></div>
       <div class="map-left">
         <button class="shopbtn" id="btnShop" type="button" hidden aria-label="황금 도토리 상점"><svg viewBox="-8 -11 16 20" aria-hidden="true"><path d="M-4.6 -1 Q-4.9 5.4 0 7.4 Q4.9 5.4 4.6 -1 Z" class="c-gnut"/><ellipse cx="-1.8" cy="2" rx="0.9" ry="2.1" class="c-gshine"/><path d="M-5.8 -0.8 Q-5.8 -6.2 0 -6.6 Q5.8 -6.2 5.8 -0.8 Q0 0.8 -5.8 -0.8 Z" class="c-gcap"/><path d="M-4 -3.2 H4 M-2.8 -5 H2.8" class="s-gline"/><path d="M0 -6.6 L0.9 -9.2" class="s-gstem"/></svg><b id="goldN">0</b>상점</button>
-        <button class="boost" id="btnBoost" type="button" hidden aria-label="부엉이 선생님 보충수업"><span class="b-av" id="boostIc" aria-hidden="true"></span>보충수업 <span class="b-n" id="boostN">5</span></button>
-        <button class="boost trip" id="btnTrip" type="button" hidden aria-label="현장체험학습"><span class="b-av" id="tripIc" aria-hidden="true"></span>체험학습 <span class="b-n" id="tripN">출발 전</span></button>
-        <button class="boost trip sports" id="btnSports" type="button" hidden aria-label="학교 행사"><span class="b-av" id="sportsIc" aria-hidden="true"></span>학교 행사 <span class="b-n" id="sportsN">열기</span></button>
+        <button class="boost" id="btnBoost" type="button" hidden aria-label="부엉이 선생님 보충수업"><span class="b-ring"><span class="b-av" id="boostIc" aria-hidden="true"></span><span class="b-n" id="boostN">5</span></span><span class="b-lb">보충수업</span></button>
+        <button class="boost trip" id="btnTrip" type="button" hidden aria-label="현장체험학습"><span class="b-ring"><span class="b-av" id="tripIc" aria-hidden="true"></span><span class="b-n" id="tripN">출발</span></span><span class="b-lb">체험학습</span></button>
+        <button class="boost trip sports" id="btnSports" type="button" hidden aria-label="학교 행사"><span class="b-ring"><span class="b-av" id="sportsIc" aria-hidden="true"></span><span class="b-n" id="sportsN">열기</span></span><span class="b-lb">학교 행사</span></button>
         <div class="feast" id="feastChip" hidden>특식 데이 <b id="feastTime">5:00</b></div>
         <div class="feast" id="autoChip" hidden>자동 줍기 <b id="autoTime">60:00</b></div>
       </div>
@@ -4638,7 +4641,7 @@ html.ait .app{padding-top:calc(10px + var(--ait-top, 0px));padding-bottom:var(--
       setTimeout(() => toast('현장체험학습이 열렸어요! 지도 왼쪽의 버스를 눌러 보세요'), 600);
     }
     const back = tripBack(), cur = S.trip.cur;
-    const txt = !cur ? '출발 전' : back ? '도착!' : hms(tripLeft());
+    const txt = !cur ? '출발' : back ? '도착!' : hms(tripLeft());
     if (rt.tripTxt !== txt) {
       rt.tripTxt = txt;
       $('#tripN').textContent = txt;
@@ -4955,8 +4958,8 @@ html.ait .app{padding-top:calc(10px + var(--ait-top, 0px));padding-bottom:var(--
     b.hidden = !on;
     if (!on) return;
     const ready = open.filter(id => festWait(id) <= 0).length;
-    const txt = ready ? `${ready}개 열림` : hms(Math.min(...open.map(festWait)));
-    if (rt.festTxt !== txt) { rt.festTxt = txt; $('#sportsN').textContent = txt; b.classList.toggle('ready', ready > 0); }
+    const txt = ready ? `${ready}` : hms(Math.min(...open.map(festWait)));
+    if (rt.festTxt !== txt) { rt.festTxt = txt; $('#sportsN').textContent = txt; b.classList.toggle('ready', ready > 0); b.setAttribute('aria-label', ready ? `학교 행사, ${ready}개 열렸어요` : `학교 행사, 다음 행사까지 ${txt}`); }
     if (rt.modalOpen === $('#mFest')) {
       const key = FEST_IDS.map(id => festOpen(id) ? (festWait(id) > 0 ? hms(festWait(id)) : 'r') : 'x').join('|');
       if (rt.festKey !== key) renderFestList();
