@@ -70,6 +70,7 @@
     const u = { uid, get providerData() { const t = localStorage.getItem('__mockG_' + uid); return t ? [{ providerId: 'google.com', email: t + '@gmail.com' }] : []; } };
     u.linkWithCredential = async c => { await call({ op: 'glink', token: c.token, uid }); localStorage.setItem('__mockG_' + uid, c.token); return { user: u }; };
     u.linkWithPopup = async () => { const t = localStorage.getItem('__gacct') || 'acctA'; try { return await u.linkWithCredential({ token: t }); } catch (e) { e.credential = { token: t }; throw e; } };
+    u.delete = async () => { localStorage.removeItem('__mockUid'); if (st.user === u) st.user = null; };
     return u;
   }
   const auth = {

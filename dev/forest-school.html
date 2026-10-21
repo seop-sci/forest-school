@@ -1265,6 +1265,11 @@ html.ait .app{padding-top:calc(10px + var(--ait-top, 0px));padding-bottom:var(--
         <button class="srow" type="button" id="optAcct" hidden><span class="txt"><b id="acctTitle">구글 계정 연결</b><small id="acctSub">연결해 두면 휴대폰을 바꿔도 같은 학교를 이어 해요</small></span><svg viewBox="0 0 24 24" width="20" height="20" aria-hidden="true"><path d="M9 6l6 6-6 6" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"/></svg></button>
         <button class="srow" type="button" id="optMove" hidden><span class="txt"><b>다른 기기에서 이어하기</b><small>코드로 이 학교를 다른 휴대폰이나 브라우저로 옮겨요</small></span><svg viewBox="0 0 24 24" width="20" height="20" aria-hidden="true"><path d="M9 6l6 6-6 6" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"/></svg></button>
         <div class="srow" id="resetRow"><span class="txt"><b>처음부터 다시</b><small>수료증과 전학 온 친구들까지 모두 지워요</small></span><button class="btn-danger" type="button" id="optReset">초기화</button></div>
+        <div class="srow" id="delRow" hidden><span class="txt"><b>계정과 서버 기록 지우기</b><small>서버에 저장된 학교, 랭킹, 구글 계정 연결을 모두 지워요</small></span><button class="btn-danger" type="button" id="optDel">지우기</button></div>
+        <div class="confirm" id="delConfirm" hidden>
+          <p>서버의 학교 기록과 랭킹, 계정을 지울까요? 이 기기의 학교도 함께 지워지고 되돌릴 수 없어요.</p>
+          <div class="btn-row"><button class="btn-sub" type="button" id="delNo">취소</button><button class="btn-danger solid" type="button" id="delYes">모두 지우기</button></div>
+        </div>
         <div class="confirm" id="resetConfirm" hidden>
           <p>저장된 학교를 지울까요? 되돌릴 수 없어요.</p>
           <div class="btn-row"><button class="btn-sub" type="button" id="resetNo">취소</button><button class="btn-danger solid" type="button" id="resetYes">지우기</button></div>
@@ -3609,6 +3614,7 @@ html.ait .app{padding-top:calc(10px + var(--ait-top, 0px));padding-bottom:var(--
     if (dd.textContent !== t) dd.textContent = t;
     $('#optMove').hidden = !cloudOn() || !!window.FOREST_STORE;   // 구글 플레이 판은 구글 계정 연결로 옮겨요
     renderAcct();
+    $('#delRow').hidden = !cloudOn() || !!AIT;
     $('#devStats').hidden = !hasCloudBuild();
     $('#pidRow').hidden = !hasCloudBuild() || !!window.FOREST_STORE;   // 학교 번호는 테스트판에서만 보여요
     $('#infoPid').textContent = '#' + S.pid.slice(0, 4);
@@ -6062,6 +6068,20 @@ html.ait .app{padding-top:calc(10px + var(--ait-top, 0px));padding-bottom:var(--
     renderHUD(); renderAffordance();
     nextModal();
   }
+  // 계정 지우기: 서버의 저장, 랭킹, 테스트 기록을 지우고 Firebase 계정(익명, 구글 연결)도 지운 뒤 새 학교로 다시 열어요
+  async function deleteAccount() {
+    if (!cloudOn() || rt.deleting) return;
+    rt.deleting = true;
+    const btn = $('#delYes'); btn.disabled = true; btn.textContent = '지우는 중';
+    const uid = Cloud.uid;
+    rt.adopting = true;   // 지우는 동안 다시 저장하지 않아요
+    try { await Promise.all(['saves', 'rank', 'stats'].map(k => Cloud.db.ref(`forest/${k}/${uid}`).remove())); }
+    catch (e) { rt.deleting = false; rt.adopting = false; btn.disabled = false; btn.textContent = '모두 지우기'; toast('서버 기록을 지우지 못했어요. 인터넷을 확인하고 다시 해 주세요'); return; }
+    let gone = true;
+    try { const u = Cloud.fb.auth().currentUser; if (u && typeof u.delete === 'function') await u.delete(); } catch (e) { gone = false; }
+    try { localStorage.removeItem(SAVE_KEY); sessionStorage.setItem('forest-adopt', gone ? '계정과 서버 기록을 모두 지웠어요. 새 학교로 시작해요' : '서버 기록을 지웠어요. 계정은 다음에 열 때 정리돼요'); } catch (e) { /* 무시 */ }
+    location.reload();
+  }
   function resetGame() {
     try { localStorage.removeItem(SAVE_KEY); } catch (e) { /* 무시 */ }
     S = fresh();
@@ -6366,6 +6386,9 @@ html.ait .app{padding-top:calc(10px + var(--ait-top, 0px));padding-bottom:var(--
     $('#optReset').addEventListener('click', () => { $('#resetConfirm').hidden = false; $('#resetNo').focus(); });
     $('#resetNo').addEventListener('click', () => { $('#resetConfirm').hidden = true; });
     $('#resetYes').addEventListener('click', resetGame);
+    $('#optDel').addEventListener('click', () => { $('#delConfirm').hidden = false; $('#delNo').focus(); });
+    $('#delNo').addEventListener('click', () => { $('#delConfirm').hidden = true; });
+    $('#delYes').addEventListener('click', deleteAccount);
 
     $('#offClaim').addEventListener('click', claimOffline);
     $('#certOk').addEventListener('click', () => { sfx('tap'); closeModal($('#mGrade')); });
