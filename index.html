@@ -991,9 +991,43 @@ html.ait .app{padding-top:calc(10px + var(--ait-top, 0px));padding-bottom:var(--
 @media (prefers-reduced-motion: reduce){
   *,*::before,*::after{animation-duration:.01ms!important;animation-iteration-count:1!important;transition-duration:.01ms!important}
 }
+/* 처음 켤 때 로딩 화면 */
+.boot{position:fixed;inset:0;z-index:100;display:flex;align-items:center;justify-content:center;padding:24px;background:radial-gradient(120% 80% at 50% 30%, #DDEBC4 0%, #BFD99A 60%, #9DC37A 100%);color:#2C4A3D;transition:opacity .45s ease}
+.boot.out{opacity:0;pointer-events:none}
+.boot-in{display:flex;flex-direction:column;align-items:center;gap:12px;width:100%;max-width:300px;text-align:center}
+.boot-art{width:150px;height:auto}
+.boot-nut{transform-origin:96px 30px;animation:bootNut 1s ease-in-out infinite}
+@keyframes bootNut{0%,100%{transform:translateY(0) rotate(-6deg)}50%{transform:translateY(-8px) rotate(6deg)}}
+.boot-title{margin:0;font-family:var(--font-display);font-weight:400;font-size:30px;letter-spacing:.02em;color:#2C4A3D;text-shadow:0 1px 0 rgba(255,255,255,.35)}
+.boot-bar{width:100%;height:12px;border-radius:999px;background:rgba(44,74,61,.18);overflow:hidden;box-shadow:inset 0 1px 2px rgba(0,0,0,.12)}
+.boot-bar i{display:block;width:0;height:100%;border-radius:inherit;background:linear-gradient(90deg,#E9B23C,#F3C04B);animation:bootFill 1.4s cubic-bezier(.3,.7,.4,1) forwards}
+.boot.done .boot-bar i{width:100% !important;animation:none;transition:width .25s}
+@keyframes bootFill{to{width:88%}}
+.boot-tip{margin:0;min-height:2.9em;font-size:14px;line-height:1.45;color:#3F5E4F}
+.boot-ver{position:absolute;right:calc(14px + env(safe-area-inset-right, 0px));bottom:calc(12px + env(safe-area-inset-bottom, 0px));font-size:12px;color:rgba(44,74,61,.7);font-variant-numeric:tabular-nums}
+@media (prefers-reduced-motion: reduce){.boot-nut,.boot-bar i{animation:none}.boot-bar i{width:88%}}
 </style>
 </head>
 <body>
+<div class="boot" id="boot" role="status" aria-label="숲속 동물 학교를 여는 중이에요">
+  <div class="boot-in">
+    <svg class="boot-art" viewBox="0 0 120 100" aria-hidden="true">
+      <ellipse cx="60" cy="92" rx="54" ry="6" fill="rgba(44,74,61,.18)"/>
+      <rect x="22" y="46" width="76" height="44" rx="3" fill="#FBF3E6"/>
+      <path d="M14 50 L60 16 L106 50 Z" fill="#C8452F"/><rect x="12" y="48" width="96" height="5" rx="2" fill="#9C3424"/>
+      <rect x="54" y="6" width="12" height="12" rx="2" fill="#FBF3E6"/><path d="M52 8 L60 0 L68 8 Z" fill="#C8452F"/><circle cx="60" cy="13" r="2.6" fill="#F3C04B"/>
+      <circle cx="60" cy="36" r="6.5" fill="#FFFFFF" stroke="#6E4A2E" stroke-width="1.4"/><path d="M60 32 V36 L63 38" fill="none" stroke="#6E4A2E" stroke-width="1.3" stroke-linecap="round"/>
+      <rect x="30" y="58" width="14" height="11" rx="2" fill="#BEE0EA" stroke="#6E4A2E" stroke-width="1.2"/><rect x="76" y="58" width="14" height="11" rx="2" fill="#BEE0EA" stroke="#6E4A2E" stroke-width="1.2"/>
+      <rect x="52" y="64" width="16" height="26" rx="2" fill="#8A5D3B"/><circle cx="64" cy="77" r="1.4" fill="#F3C04B"/>
+      <g class="boot-nut"><path d="M90 30 Q89.6 38 96 40.6 Q102.4 38 102 30 Z" fill="#B87A3C"/><path d="M88.4 30.4 Q88.4 23.6 96 23 Q103.6 23.6 103.6 30.4 Q96 32.4 88.4 30.4 Z" fill="#6E4A2E"/><path d="M96 23 L97.2 19.6" stroke="#6E4A2E" stroke-width="1.6" stroke-linecap="round"/></g>
+    </svg>
+    <h1 class="boot-title">숲속 동물 학교</h1>
+    <div class="boot-bar"><i id="bootBar"></i></div>
+    <p class="boot-tip" id="bootTip">학교 문을 여는 중이에요</p>
+  </div>
+  <span class="boot-ver" id="bootVer">v1.0.0</span>
+</div>
+
 <div class="app on-school" id="app">
 <div class="scroller" id="scroller">
   <header class="board">
@@ -6773,6 +6807,26 @@ html.ait .app{padding-top:calc(10px + var(--ait-top, 0px));padding-bottom:var(--
     if (!hadSave) save();
     rt.lastT = performance.now();
     requestAnimationFrame(loop);
+    bootDone();
+  }
+  // 로딩 화면: 적어도 1.2초는 보여 주고, 막대를 끝까지 채운 뒤 사르르 사라져요
+  const BOOT_TIPS = ['참나무를 누르면 도토리가 떨어져요', '체험학습을 보내 두면 기다리는 동안에도 학교가 자라요', '오늘의 미션으로 미션 포인트를 모아 주간 상자를 열어요',
+    '종업식을 열어도 학교는 그대로 남고, 시설을 더 높이 키울 수 있어요', '학교 행사는 2시간마다 열려요. 광고를 보면 바로 다시 열 수 있어요', '테마 세트를 모두 모으면 수업료가 올라요'];
+  (() => {
+    const v = document.getElementById('bootVer'), t = document.getElementById('bootTip');
+    if (v) v.textContent = 'v' + VERSION;
+    if (t) t.textContent = BOOT_TIPS[Math.floor(Math.random() * BOOT_TIPS.length)];
+    setTimeout(() => bootDone(), 8000);   // 무슨 일이 있어도 8초 뒤에는 걷어요
+  })();
+  function bootDone() {
+    const b = document.getElementById('boot');
+    if (!b || b.dataset.done) return;
+    b.dataset.done = '1';
+    const wait = Math.max(0, 1200 - performance.now());
+    setTimeout(() => {
+      b.classList.add('done');
+      setTimeout(() => { b.classList.add('out'); setTimeout(() => b.remove(), 500); }, 280);
+    }, wait);
   }
 
   // 시험용 손잡이: 자동 시험(window.__FOREST_TEST)에서만 게임 속 함수를 꺼내 써요
