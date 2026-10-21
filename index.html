@@ -737,8 +737,8 @@ html.ait .app{padding-top:calc(10px + var(--ait-top, 0px));padding-bottom:var(--
 .fe-row .btn-sub.small{flex:none;display:flex;flex-direction:column;align-items:center;justify-content:center;min-height:44px;padding:2px 10px;border-radius:12px;font-size:12.5px;line-height:1.2}
 .fe-row .btn-sub.small small{font-size:11px;color:var(--chip-ink);font-variant-numeric:tabular-nums}
 .fe-lock{flex:none;font-size:12px;color:var(--muted)}
-.flash{position:absolute;inset:0;z-index:5;border-radius:15px;background:#FFFFFF;pointer-events:none;animation:flash .7s ease-out forwards}
-@keyframes flash{from{opacity:.95}to{opacity:0}}
+.camflash{position:absolute;inset:0;z-index:5;border-radius:15px;background:#FFFFFF;pointer-events:none;animation:camflash .7s ease-out forwards}
+@keyframes camflash{from{opacity:.95}to{opacity:0}}
 .sr-score{margin:0 0 6px;font-family:var(--font-chalk);font-weight:700;font-size:22px}
 .sp-wait{color:var(--chip-ink)}
 .trip-modal{text-align:left;max-height:calc(100dvh - 32px);overflow-y:auto;overscroll-behavior:contain}
@@ -5112,7 +5112,7 @@ html.ait .app{padding-top:calc(10px + var(--ait-top, 0px));padding-bottom:var(--
     rt.kids.forEach(k => { if (k.hold) { k.hold = false; k.speed = rand(14, 22); pickTarget(k); } });
     $('#festBar').hidden = true;
     if (F.form === 'rows' && !rt.reduced) {   // 찰칵! 하얗게 번쩍해요
-      const fl = document.createElement('div'); fl.className = 'flash'; $('.stage').appendChild(fl); setTimeout(() => fl.remove(), 700);
+      const fl = document.createElement('div'); fl.className = 'camflash'; $('.stage').appendChild(fl); setTimeout(() => fl.remove(), 700);
     }
     festCamera(false);
     S.fest.n[R.id] = (S.fest.n[R.id] || 0) + 1;
@@ -5832,9 +5832,15 @@ html.ait .app{padding-top:calc(10px + var(--ait-top, 0px));padding-bottom:var(--
     setTab('teachers');
     const card = $(`.tcard[data-k="${k}"]`);
     if (card) {
-      card.scrollIntoView({ block: 'center', behavior: rt.reduced ? 'auto' : 'smooth' });
+      // 선생님 탭은 탭 안에서 따로 스크롤돼요. 탭을 연 다음 그 칸으로 직접 내려가요
+      requestAnimationFrame(() => {
+        const box = card.closest('.panel'), a = card.getBoundingClientRect(), p = box.getBoundingClientRect();
+        box.scrollTo({ top: Math.max(0, box.scrollTop + a.top - p.top - (p.height - a.height) / 2), behavior: rt.reduced ? 'auto' : 'smooth' });
+      });
       card.classList.remove('flash'); void card.offsetWidth; card.classList.add('flash');
     }
+    // 종업식을 열면 선생님도 쉬러 가셔서 새 학년에 다시 모셔 와야 해요
+    if (!msg && S.t[k] < 1 && (S.tg > 0 || S.tier > 0)) msg = `종업식 때 ${TEA[k].name}도 쉬러 가셨어요. 다시 모셔 와요`;
     if (msg) toast(msg);
   }
   function bestPick(kind) {
