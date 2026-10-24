@@ -9,6 +9,10 @@ src = (HERE / 'forest-school.html').read_text(encoding='utf-8')
 cut = src.index('</style>') + len('</style>')
 head, body = src[:cut], src[cut:]
 assert head.startswith('<title>'), head[:40]
+# 안드로이드 판 업데이트 알림이 웹 판 첫머리에서 새 버전을 읽어요(큰 업데이트인지 가릴 때). 게임의 VERSION을 그대로 적어요
+import re
+VERSION = re.search(r"const VERSION = '([\d.]+)'", src).group(1)
+VERMETA = f'<meta name="forest-version" content="{VERSION}">\n'
 
 ICON = ("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 64 64'%3E"
         "%3Cpath d='M32 5v9' stroke='%236E4A2E' stroke-width='6' stroke-linecap='round'/%3E"
@@ -90,7 +94,7 @@ DOC = f"""<!doctype html>
 <html lang="ko">
 <head>
 <meta charset="utf-8">
-<meta name="viewport" content="width=device-width, initial-scale=1">
+{VERMETA}<meta name="viewport" content="width=device-width, initial-scale=1">
 <meta name="description" content="도토리를 모아 숲속 학교를 키우는 방치형 게임 테스트판이에요.">
 <style>html,body{{margin:0}}</style>
 <!-- github-only -->

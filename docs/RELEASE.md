@@ -12,7 +12,7 @@ dev/forest-school.html ──build_gh.py──▶ index.html ──┬─▶ Git
 
 | 곳 | 무엇 |
 | --- | --- |
-| `dev/forest-school.html` | `const VERSION = 'x.y.z'`, 로딩 화면 `bootVer`의 `vx.y.z`, 설정 정보 `verRow`의 `vx.y.z` (세 군데) |
+| `dev/forest-school.html` | `const VERSION = 'x.y.z'`, 로딩 화면 `bootVer`의 `vx.y.z`, 설정 정보 `verRow`의 `vx.y.z` (세 군데. `build_gh.py`가 VERSION을 읽어 `index.html` 첫머리에 `<meta name="forest-version">`을 저절로 넣어요. 안드로이드 판 업데이트 알림이 큰 업데이트인지 가릴 때 읽어요) |
 | `app/android/app/build.gradle` | `versionName "x.y.z"` (`versionCode`는 Actions 실행 번호로 저절로 올라가요) |
 | `app/package.json` | `"version": "x.y.z"` |
 | `toss/package.json` | `"version": "x.y.z"` |
