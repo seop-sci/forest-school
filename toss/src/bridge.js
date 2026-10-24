@@ -1,8 +1,11 @@
 // 토스 미니앱 다리: 게임(index.html)이 window.AIT로 토스 기능을 써요.
 // 리워드 광고, 토스 앱 저장소, 게임센터 리더보드, 게임 로그인(사용자 키), 닫기, 안전 영역.
 import {
-  loadFullScreenAd, showFullScreenAd, Storage, Game, getUserKeyForGame, closeView, SafeArea,
+  loadFullScreenAd, showFullScreenAd, Storage, Game, getUserKeyForGame, closeView, SafeArea, graniteEvent,
 } from '@apps-in-toss/web-framework';
+
+// 토스 시스템 뒤로 가기: 바로 닫지 않고 게임의 닫기 확인 창(window.FOREST_BACK)으로 보내요
+safe(() => graniteEvent.addEventListener('backEvent', { onEvent: () => { if (typeof window.FOREST_BACK === 'function') window.FOREST_BACK(); else closeView(); }, onError: () => {} }), null);
 
 // 콘솔 > 인앱 광고에서 만든 리워드 광고 그룹 ID로 바꿔요.
 // 개발과 QR 테스트 중에는 테스트 ID를 써야 해요 (진짜 ID로 테스트하면 제재를 받을 수 있어요)

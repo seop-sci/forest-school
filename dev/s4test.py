@@ -61,6 +61,8 @@ async def main():
             await page.screenshot(path='s4_k2_board.png')
             # 퀘스트: 첫 졸업식 받기 → 명예 교장실 → 진학 퀘스트
             await page.tap('#questBar'); await page.wait_for_timeout(600)
+            r['reward_after_claim'] = await page.evaluate("!document.querySelector('#mReward').hidden && document.querySelector('#rwTitle').textContent")
+            await page.evaluate("if (!document.querySelector('#mReward').hidden) document.querySelector('#rwOk').click()"); await page.wait_for_timeout(400)
             r['q_after_claim'] = await page.evaluate("[document.querySelector('#qbTitle').textContent, document.querySelector('#qbHow').textContent]")
             # 칠판 졸업장 칸을 누르면 졸업 탭 명예 교장실로
             await page.tap('.tab[data-tab="grad"]'); await page.wait_for_timeout(700)
