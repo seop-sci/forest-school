@@ -1,0 +1,64 @@
+name: 작업 요청
+description: ChatGPT가 쓴 개발 작업 명세. Claude가 이 Issue를 보고 구현해요.
+title: "[작업] "
+labels: ["작업 요청"]
+body:
+  - type: markdown
+    attributes:
+      value: |
+        한 Issue에 한 가지 목적만 담아요. 공통 규칙은 저장소의 `AGENTS.md`(ChatGPT)와 `CLAUDE.md`(Claude)에 있어요.
+        사용자(지섭)가 이 작업을 하기로 정한 뒤에 Claude가 구현해요.
+  - type: dropdown
+    id: kind
+    attributes:
+      label: 종류
+      options: [버그 수정, 새 기능, 화면 디자인, 밸런스 조정, 문서나 개발 도구]
+    validations: { required: true }
+  - type: textarea
+    id: goal
+    attributes:
+      label: 목적
+      description: 왜 바꾸는지, 사용자가 무엇을 겪는지
+    validations: { required: true }
+  - type: textarea
+    id: spec
+    attributes:
+      label: 바꿀 것
+      description: 화면, 동작, 수치를 구체적으로. 수치는 바꾸기 전과 뒤 값을 함께. 원본 위치는 dev/forest-school.html의 함수나 상수 이름으로.
+      placeholder: |
+        1. ...
+        2. ...
+    validations: { required: true }
+  - type: textarea
+    id: keep
+    attributes:
+      label: 바꾸지 않을 것
+      description: 건드리면 안 되는 기능, 화면, 수치
+  - type: checkboxes
+    id: impact
+    attributes:
+      label: 영향 (해당하는 것 모두)
+      options:
+        - label: 재화 계산 (도토리, 황금 도토리, 수료증, 기금, 쪽지)
+        - label: 퀘스트 보상이나 진행 조건
+        - label: 저장 데이터 (새 필드, 옛 저장 바로잡기)
+        - label: Firebase 경로나 규칙 (사용자가 콘솔에서 할 일 생김)
+        - label: 기존 UI 기능
+        - label: 교감 선생님 지원 (needCost, prepTopUp, rate)
+  - type: textarea
+    id: check
+    attributes:
+      label: 확인 방법
+      description: 어떤 시험(docs/TESTING.md)이나 화면으로 확인할지, 통과 기준
+    validations: { required: true }
+  - type: dropdown
+    id: version
+    attributes:
+      label: 버전
+      options: [올리지 않음 (게임 변화 없음), 끝자리 (사소한 수정), 가운데 (꽤 중요한 수정), 앞자리 (아주 큰 변화)]
+    validations: { required: true }
+  - type: textarea
+    id: notes
+    attributes:
+      label: 패치노트 줄 (초안)
+      description: 번호 붙인 짧은 한 줄. 예) 1. 교감 선생님 지원량 오류 수정
