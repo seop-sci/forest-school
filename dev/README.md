@@ -1,5 +1,7 @@
 # 개발용 폴더
 
+협업 규칙은 저장소 맨 위 `CLAUDE.md`(Claude)와 `AGENTS.md`(ChatGPT), 빌드와 버전 절차는 `docs/RELEASE.md`, 시험 목록은 `docs/TESTING.md`에 있어요.
+
 게임을 고칠 때 쓰는 원본과 도구예요. 저장소 맨 위 `index.html`은 여기 `forest-school.html`로 만든 결과물이에요.
 
 | 파일 | 하는 일 |
@@ -11,6 +13,9 @@
 | `s*test.py`, `fbtest/` | Playwright 자동 시험 (가짜 Firebase 서버 포함) |
 | `bot.py` | 자동 플레이로 학년마다 걸리는 시간 재기 |
 | `qbot.py` | 퀘스트를 따라 하는 자동 플레이로 퀘스트마다 걸리는 시간 재기 (막히는 곳 찾기) |
+| `s37test.py` | 교감 선생님 도토리 지원 회귀 시험 (`needCost`, `prepTopUp`, `rate`, 유치원 진행) |
+| `check_rules.py` | `CLAUDE.md`와 `AGENTS.md`의 공통 규칙이 똑같은지 확인 |
+| `memo.md` | 사용자가 말한 수정 메모 (모았다가 한 번에 반영) |
 
 순서: `forest-school.html` 고치기 → `python3 wrap.py` → 시험 → `python3 build_gh.py ..` → `cd ../toss && npm run build` → 커밋하고 올리기 (안드로이드는 GitHub Actions가 알아서 만들어요).
 

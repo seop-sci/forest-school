@@ -176,3 +176,6 @@ Firebase 무료 요금제(Spark)로 충분해요. 테스터 몇 명이면 저장
 
 ## 토스 미니앱 판
 `toss` 폴더에 앱인토스용 빌드와 콘솔 등록 안내가 있어요. 자세한 내용은 `toss/README.md`를 봐요.
+
+## 개발 협업
+ChatGPT(기획, 검토, 작업 명세)와 Claude(구현, 시험, 빌드, PR)가 이 저장소로 함께 작업해요. 규칙은 `CLAUDE.md`와 `AGENTS.md`, 빌드와 버전은 `docs/RELEASE.md`, 시험은 `docs/TESTING.md`. 작업은 GitHub Issue의 '작업 요청' 템플릿으로 올리고, PR로 반영해요.
