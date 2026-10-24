@@ -29,7 +29,9 @@ CHECK = r"""() => {
   const r0 = F.rate();
   if (!(isFinite(r0) && r0 > 0)) bad.push('rate()가 유한한 양수가 아니에요: ' + r0);
   const before = snap();
-  // prepTopUp 상한 (1.3.0): 수업료 30분치 + 200만. 주는 값은 앞 두 자리로 올림하므로 그만큼(최대 10%) 넘을 수 있어요
+  // prepTopUp 상한 (1.3.0): 수업료 30분치 + 200만.
+  // 알려진 제한(Issue #2): 게임이 상한으로 자른 뒤 앞 두 자리로 올림해서 최대 10% 넘을 수 있어요. 지금은 그 올림까지 허용하고,
+  // Issue #2를 고칠 때 아래 cap을 capRaw로 바꿔 엄격하게 검사해요 (docs/TESTING.md '알려진 제한')
   const capRaw = r0 * 60 * 30 + 2e6, mag = Math.pow(10, Math.max(0, Math.floor(Math.log10(capRaw)) - 1)), cap = Math.ceil(capRaw / mag) * mag;
   const rows = [];
   for (const q of F.MAIN) {

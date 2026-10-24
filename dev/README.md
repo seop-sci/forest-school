@@ -15,6 +15,7 @@
 | `qbot.py` | 퀘스트를 따라 하는 자동 플레이로 퀘스트마다 걸리는 시간 재기 (막히는 곳 찾기) |
 | `s37test.py` | 교감 선생님 도토리 지원 회귀 시험 (`needCost`, `prepTopUp`, `rate`, 유치원 진행) |
 | `check_rules.py` | `CLAUDE.md`와 `AGENTS.md`의 공통 규칙이 똑같은지 확인 |
+| `check_templates.py` | Issue 양식이 GitHub 규칙에 맞는지, 양식이 쓰는 라벨이 저장소에 있는지 확인 |
 | `memo.md` | 사용자가 말한 수정 메모 (모았다가 한 번에 반영) |
 
 순서: `forest-school.html` 고치기 → `python3 wrap.py` → 시험 → `python3 build_gh.py ..` → `cd ../toss && npm run build` → 커밋하고 올리기 (안드로이드는 GitHub Actions가 알아서 만들어요).
