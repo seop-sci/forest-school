@@ -15,3 +15,5 @@
 순서: `forest-school.html` 고치기 → `python3 wrap.py` → 시험 → `python3 build_gh.py ..` → `cd ../toss && npm run build` → 커밋하고 올리기 (안드로이드는 GitHub Actions가 알아서 만들어요).
 
 반영할 때마다: 저장소 맨 위 `CHANGELOG.md`에 패치노트를 적고 버전을 올려요(사소하면 끝자리, 꽤 중요하면 가운데, 새 학교급이면 앞자리). 버전은 `forest-school.html`의 `VERSION`, `app/android/app/build.gradle`의 `versionName`, `toss/package.json`과 `app/package.json`의 `version`을 함께 바꿔요.
+
+반영이 끝나면 패치노트(CHANGELOG.md)를 GitHub에 적는 것과 함께 Claude 채팅창에도 파일로 보내고, 그 버전 내용을 답에 그대로 보여 줘요.
