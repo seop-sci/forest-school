@@ -4,14 +4,19 @@ import firebase from 'firebase/compat/app';
 import 'firebase/compat/database';
 import {
   initializeAuth, indexedDBLocalPersistence, browserLocalPersistence, onAuthStateChanged,
-  signInAnonymously, signInWithCredential, linkWithCredential, GoogleAuthProvider,
+  signInAnonymously, signInWithCredential, linkWithCredential, reauthenticateWithCredential, GoogleAuthProvider,
 } from 'firebase/auth';
 
 const cfg = window.FOREST_FIREBASE;
 if (cfg) {
   const app = firebase.initializeApp(cfg);
   const auth = initializeAuth(app._delegate || app, { persistence: [indexedDBLocalPersistence, browserLocalPersistence] });
-  const wrap = (u) => { if (u && !u.linkWithCredential) u.linkWithCredential = (c) => linkWithCredential(u, c); return u; };
+  // 게임은 예전 모양(user.linkWithCredential(c))으로 불러요. 1.5.4: 계정 지우기 전에 다시 로그인하는 reauthenticateWithCredential도 붙여요
+  const wrap = (u) => {
+    if (u && !u.linkWithCredential) u.linkWithCredential = (c) => linkWithCredential(u, c);
+    if (u && !u.reauthenticateWithCredential) u.reauthenticateWithCredential = (c) => reauthenticateWithCredential(u, c);
+    return u;
+  };
   const facade = {
     get currentUser() { return wrap(auth.currentUser); },
     onAuthStateChanged: (next, err) => onAuthStateChanged(auth, (u) => next(wrap(u)), err),

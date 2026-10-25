@@ -11,23 +11,58 @@
       "rank": {
         ".read": "auth != null",
         ".indexOn": [
-          "score"
+          "score",
+          "ws"
         ],
         "$uid": {
           ".write": "auth != null && auth.uid === $uid",
-          ".validate": "newData.hasChildren(['name', 'score', 'at']) && newData.child('name').isString() && newData.child('name').val().length >= 1 && newData.child('name').val().length <= 10 && newData.child('score').isNumber() && newData.child('score').val() >= 0 && newData.child('score').val() < 1000000000 && newData.child('at').isNumber()"
+          ".validate": "newData.hasChildren(['name', 'score', 'at']) && newData.child('at').val() <= now + 60000",
+          "name": {
+            ".validate": "newData.isString() && newData.val().length >= 1 && newData.val().length <= 10"
+          },
+          "score": {
+            ".validate": "newData.isNumber() && newData.val() >= 0 && newData.val() < 1000000000"
+          },
+          "at": {
+            ".validate": "newData.isNumber()"
+          },
+          "tier": {
+            ".validate": "newData.isNumber() && newData.val() >= 0 && newData.val() <= 9"
+          },
+          "year": {
+            ".validate": "newData.isNumber() && newData.val() >= 0 && newData.val() <= 99"
+          },
+          "test": {
+            ".validate": "newData.isBoolean()"
+          },
+          "pid": {
+            ".validate": "newData.isString() && newData.val().matches(/^[0-9A-Z]{6,16}$/)"
+          },
+          "week": {
+            ".validate": "newData.isNumber() && newData.val() >= -1 && newData.val() <= 9999"
+          },
+          "lp": {
+            ".validate": "newData.isNumber() && newData.val() >= 0 && newData.val() <= 999999"
+          },
+          "ws": {
+            ".validate": "newData.isNumber() && newData.val() >= 0 && newData.parent().child('week').isNumber() && newData.parent().child('lp').isNumber() && newData.val() === newData.parent().child('week').val() * 1000000 + newData.parent().child('lp').val()"
+          },
+          "$other": {
+            ".validate": false
+          }
         }
       },
       "stats": {
-        ".read": "auth != null",
+        ".read": "auth != null && root.child('forest/admins').child(auth.uid).exists()",
         "$uid": {
           ".write": "auth != null && (auth.uid === $uid || (!newData.exists() && root.child('forest/admins').child(auth.uid).exists()))",
-          ".validate": "newData.hasChildren(['seen', 'pid']) && newData.child('seen').isNumber() && newData.child('pid').isString() && newData.child('pid').val().length <= 16"
+          ".validate": "newData.hasChildren(['seen', 'pid']) && newData.child('seen').isNumber() && newData.child('pid').isString() && newData.child('pid').val().length <= 16",
+          ".read": "auth != null && auth.uid === $uid"
         }
       },
       "moves": {
         "$code": {
-          ".read": "auth != null",
+          ".read": "auth != null && (!data.exists() || (data.child('at').isNumber() && data.child('at').val() + 1800000 > now))",
           ".write": "auth != null && (!data.exists() || !newData.exists())",
           ".validate": "$code.length === 8 && $code.matches(/^[2-9A-HJKMNP-Z]+$/) && newData.hasChildren(['d', 'at', 'from']) && newData.child('d').isString() && newData.child('d').val().length < 200000 && newData.child('from').val() === auth.uid && newData.child('at').isNumber() && newData.child('at').val() <= now"
         }

@@ -4,6 +4,9 @@ import {
   loadFullScreenAd, showFullScreenAd, Storage, Game, getUserKeyForGame, closeView, SafeArea, graniteEvent,
 } from '@apps-in-toss/web-framework';
 
+// 실패해도 멈추지 않게 감싸요. 아래에서 쓰기 전에 먼저 만들어 둬야 해요 (1.5.4: 순서가 거꾸로라 시작할 때 멈췄어요)
+const safe = (f, fb) => { try { return f(); } catch (e) { return fb; } };
+
 // 토스 시스템 뒤로 가기: 바로 닫지 않고 게임의 닫기 확인 창(window.FOREST_BACK)으로 보내요
 safe(() => graniteEvent.addEventListener('backEvent', { onEvent: () => { if (typeof window.FOREST_BACK === 'function') window.FOREST_BACK(); else closeView(); }, onError: () => {} }), null);
 
@@ -11,7 +14,6 @@ safe(() => graniteEvent.addEventListener('backEvent', { onEvent: () => { if (typ
 // 개발과 QR 테스트 중에는 테스트 ID를 써야 해요 (진짜 ID로 테스트하면 제재를 받을 수 있어요)
 const AD_GROUP_ID = 'ait-ad-test-rewarded-id';
 
-const safe = (f, fb) => { try { return f(); } catch (e) { return fb; } };
 const ads = safe(() => loadFullScreenAd.isSupported(), false);
 let ready = false, loading = false;
 

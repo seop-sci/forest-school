@@ -2,9 +2,11 @@
 const targaryen = require('targaryen');
 const rules = require(process.argv[2]);
 const SAVE = { d: '{"v":4}', at: 1, v: '1.0' };
-const RANK = { name: '지섭 교장', score: 120, at: 1, tier: 1, year: 2, test: false, pid: 'K7QM2XPA' };
+const RANK = { name: '지섭 교장', score: 120, at: 1, tier: 1, year: 2, test: false, pid: 'K7QM2XPA', week: 42, lp: 310, ws: 42000310 };
 const STAT = { seen: 1, pid: 'K7QM2XPA', name: '', tier: 0 };
-const base = { forest: { saves: { A: SAVE }, rank: { A: RANK }, stats: { A: STAT }, moves: { K7QM2XPA: { d: 'x', at: 1, from: 'A', v: '1.0' } } } };
+const NOW = Date.now();
+const base = { forest: { saves: { A: SAVE }, rank: { A: RANK }, stats: { A: STAT }, admins: { Z: 'key' }, adminKey: 'key',
+  moves: { K7QM2XPA: { d: 'x', at: NOW - 60000, from: 'A', v: '1.0' }, OLDC2345: { d: 'x', at: NOW - 31 * 60000, from: 'A', v: '1.0' } } } };
 const fresh = () => targaryen.database(rules, base);   // 처음 상태는 로그인 안 한 사람
 const as = uid => uid ? fresh().as({ uid, provider: 'anonymous' }) : fresh();
 let pass = 0, fail = 0;
@@ -12,7 +14,7 @@ function t(name, got, want) {
   if (got === want) pass++;
   else { fail++; console.log('FAIL', name, 'got', got, 'want', want); }
 }
-const R = (uid, path) => as(uid).read(path).allowed;
+const R = (uid, path) => as(uid).read(path, { now: Date.now() }).allowed;   // 읽기 규칙의 now를 넣어 줘요
 const W = (uid, path, v) => as(uid).write(path, v).allowed;
 
 // 게임 저장: 나만
@@ -40,9 +42,24 @@ t('rank score neg', W('B', '/forest/rank/B', Object.assign({}, RANK, { score: -1
 t('rank score str', W('B', '/forest/rank/B', Object.assign({}, RANK, { score: '9' })), false);
 t('rank score huge', W('B', '/forest/rank/B', Object.assign({}, RANK, { score: 1e12 })), false);
 t('rank delete own', W('A', '/forest/rank/A', null), true);
+// 1.5.4: 랭킹 문서 모양과 범위 (점수 자체는 여전히 기기가 정해요. 범위 검사만으로 조작을 다 막지는 못해요)
+const RK = o => Object.assign({}, RANK, o);
+t('rank extra field', W('B', '/forest/rank/B', RK({ hack: 1 })), false);
+t('rank lp huge', W('B', '/forest/rank/B', RK({ lp: 1e30, ws: 42 * 1e6 + 1e30 })), false);
+t('rank ws huge', W('B', '/forest/rank/B', RK({ ws: 1e30 })), false);
+t('rank ws mismatch', W('B', '/forest/rank/B', RK({ ws: 42000999 })), false);
+t('rank bad pid', W('B', '/forest/rank/B', RK({ pid: 'abc' })), false);
+t('rank tier big', W('B', '/forest/rank/B', RK({ tier: 99 })), false);
+t('rank test str', W('B', '/forest/rank/B', RK({ test: 'yes' })), false);
+t('rank future at', W('B', '/forest/rank/B', RK({ at: NOW + 3600e3 })), false);
+t('rank score max', W('B', '/forest/rank/B', RK({ score: 999999999 })), true);
+t('rank no week', W('B', '/forest/rank/B', { name: '다람쥐', score: 5, at: 1 }), true);
 t('rank delete other', W('B', '/forest/rank/A', null), false);
 // 테스트 현황
-t('stats read', R('B', '/forest/stats'), true);
+t('stats read all (not admin)', R('B', '/forest/stats'), false);
+t('stats read all (admin)', R('Z', '/forest/stats'), true);
+t('stats read own', R('A', '/forest/stats/A'), true);
+t('stats read other', R('B', '/forest/stats/A'), false);
 t('stats read anon', R(null, '/forest/stats'), false);
 t('stats write own', W('B', '/forest/stats/B', Object.assign({}, STAT, { seen: { '.sv': 'timestamp' } })), true);
 t('stats write other', W('B', '/forest/stats/A', STAT), false);
@@ -50,6 +67,9 @@ t('stats no pid', W('B', '/forest/stats/B', { seen: 1 }), false);
 // 이어하기 코드: 코드를 아는 사람만 읽고, 새로 만들거나 지울 수만 있어요
 const MV = { d: 'y', at: { '.sv': 'timestamp' }, from: 'B', v: '1.0' };
 t('move read by code', R('B', '/forest/moves/K7QM2XPA'), true);
+t('move read expired', R('B', '/forest/moves/OLDC2345'), false);
+t('move read missing', R('B', '/forest/moves/NONE2345'), true);
+t('move delete expired', W('B', '/forest/moves/OLDC2345', null), true);
 t('move read anon', R(null, '/forest/moves/K7QM2XPA'), false);
 t('move list', R('B', '/forest/moves'), false);
 t('move create', W('B', '/forest/moves/ABCD2345', MV), true);

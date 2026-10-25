@@ -70,7 +70,9 @@
     const u = { uid, get providerData() { const t = localStorage.getItem('__mockG_' + uid); return t ? [{ providerId: 'google.com', email: t + '@gmail.com' }] : []; } };
     u.linkWithCredential = async c => { await call({ op: 'glink', token: c.token, uid }); localStorage.setItem('__mockG_' + uid, c.token); return { user: u }; };
     u.linkWithPopup = async () => { const t = localStorage.getItem('__gacct') || 'acctA'; try { return await u.linkWithCredential({ token: t }); } catch (e) { e.credential = { token: t }; throw e; } };
-    u.delete = async () => { localStorage.removeItem('__mockUid'); if (st.user === u) st.user = null; };
+    // __delFail이 있으면 진짜 Firebase처럼 '최근에 로그인해야 해요'로 거절해요 (1.5.4 계정 지우기 다시 하기 시험)
+    u.delete = async () => { if (localStorage.getItem('__delFail')) { const e = new Error('auth/requires-recent-login'); e.code = 'auth/requires-recent-login'; throw e; }
+      localStorage.removeItem('__mockUid'); if (st.user === u) st.user = null; };
     return u;
   }
   const auth = {
