@@ -41,7 +41,8 @@ Playwright(Python)로 `dev/test.html`을 열어 시험해요. 먼저 `cd dev && 
 - `s46test.py` (1.6.0): 블록 퍼즐. 조각 모양, 놓기와 줄 지우기, 문양 줄 3배, 콤보, 학생 부탁, 선생님 도움 셋, 하루 10판과 광고 +3, 보상 상한, 하던 판 이어하기, 예전 저장과 깨진 저장 읽기, 끌어 놓기 화면과 넘침. 밝은 화면 360px, 어두운 화면 390px. 마지막 줄 PASS면 통과
 - `s44test.py` (1.5.4, 가짜 Firebase): 구글 계정 바꾸기가 끊겼을 때 이 기기 저장이 이어지고 계정 학교를 덮어쓰지 않는지, 다시 시도하면 학교를 고르는 창, 계정 지우기가 거절됐을 때 다음에 열면 다시 지우고 그동안 올리지 않는지. `python3 build_gh.py gh` 뒤에 돌려요. 마지막 줄 PASS면 통과
 - `s45test.py` (1.5.4): 가구 모습은 학교급마다 한 단계(같은 학교급에서는 개수만), 학교급이 오른 뒤 첫 가구 알림, 까치 특식 데이 20분과 반값 핫딜 조건, 미니게임 탭에 버전 번호 없음. 마지막 줄 PASS면 통과
-- `fbtest/rules_test.js` (1.5.4 보강): `NODE_PATH=<targaryen 폴더> node fbtest/rules_test.js $PWD/gh_database.rules.json`. 랭킹 문서 모양과 범위, 테스트 현황은 관리자만, 없앤 이어하기 코드 자리(moves)는 읽기와 쓰기가 막히는지 봐요
+- `node dev/minify_game.mjs dev/test.html dev/test.html toss/node_modules` (1.6.0): 토스와 안드로이드 판처럼 압축한 게임으로 시험하고 싶을 때 test.html을 압축해요. 시험이 끝나면 `python3 wrap.py`로 되돌려요
+- `fbtest/rules_test.js` (1.5.4 보강): `NODE_PATH=<targaryen 폴더> node fbtest/rules_test.js $PWD/gh_database.rules.json`. 랭킹 문서 모양과 범위, 1.6.0 랭킹 점수와 리그 점수가 오를 수 있는 한도, 테스트 현황은 지금 관리자 키를 가진 관리자만, 없앤 이어하기 코드 자리(moves)는 읽기와 쓰기가 막히는지 봐요
 - `toss/check_bridge.cjs` (1.5.4): `cd toss && node build.mjs && node check_bridge.cjs dist/bridge.js`. 만든 토스 다리가 시작할 때 멈추지 않고 window.AIT를 만드는지 봐요
 - `dev/check_ads.mjs` (1.5.4): `node dev/check_ads.mjs` (저장소 맨 위에서, toss의 esbuild를 써요). 가짜 애드몹으로 동의가 광고를 허락할 때만 광고를 준비하는지 봐요
 - `s43test.py` (1.5.3): 지도 연하게, 도토리 테두리, 평판 아래 학생 수, 이름표 층(캐릭터 위, 눌러서 건물 열기, 유치원 과학실 이름표 숨김), 선생님이 이름표에 가려지지 않는지, 평판 퀘스트 첫 안내(한 번만). 어두운 화면 360px, 밝은 화면 390px. 마지막 줄 PASS면 통과
