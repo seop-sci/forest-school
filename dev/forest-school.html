@@ -1204,7 +1204,12 @@ body{background:radial-gradient(120% 60% at 50% 0%, color-mix(in srgb, var(--pap
 .pz-askn{flex:none;font-family:var(--font-display);font-size:16px;color:#4F6A3A}
 .pz-mid{flex:1 1 auto;min-height:0;display:flex;align-items:center;justify-content:center}
 .pz-board{position:relative;width:min(100%, 100vh - 330px);max-width:420px;aspect-ratio:1;background:var(--pz-board) center/100% 100% no-repeat;filter:drop-shadow(0 6px 10px rgba(0,0,0,.28))}
-.pz-grid{position:absolute;left:10.7%;top:10.2%;width:82%;height:82%;display:grid;grid-template-columns:repeat(8,1fr);grid-template-rows:repeat(8,1fr)}
+.pz-grid{position:absolute;left:11.8%;top:11.5%;width:77%;height:78.4%;display:grid;grid-template-columns:repeat(8,1fr);grid-template-rows:repeat(8,1fr)}
+.pz-board.shake{animation:pzShake .32s ease}
+@keyframes pzShake{20%{transform:translate(-3px,2px) rotate(-.4deg)}45%{transform:translate(3px,-2px) rotate(.4deg)}70%{transform:translate(-2px,1px)}}
+/* 선생님 블록: 블록 위에 선생님 얼굴 (Codex 그림이 오면 블록 그림으로 바꿔요) */
+.pz-cell.tea::after,.pz-piece i.tea::after,.pz-drag i.tea::after{content:"";position:absolute;inset:14% 12% 18%;background:var(--tea) center/contain no-repeat;filter:drop-shadow(0 1px 1px rgba(0,0,0,.45))}
+.pz-piece i,.pz-drag i{position:relative}
 .pz-cell{position:relative;background:center/100% 100% no-repeat;transition:transform .12s}
 .pz-cell.ghost{background-image:var(--pz-ghost);opacity:.9}
 .pz-cell.will{filter:brightness(1.2) saturate(1.15)}
@@ -1215,8 +1220,8 @@ body{background:radial-gradient(120% 60% at 50% 0%, color-mix(in srgb, var(--pap
 @keyframes pzMono{30%{transform:scale(1.2) rotate(8deg);filter:brightness(2) saturate(1.4)}100%{transform:scale(.1) rotate(-30deg);opacity:0}}
 .pz-cell.sq{animation:pzSq .3s ease forwards}
 @keyframes pzSq{50%{transform:translateY(-14%) scale(.9)}100%{transform:translateY(40%) scale(.3);opacity:0}}
-.pz-cell.land{animation:pzLand .22s ease}
-@keyframes pzLand{0%{transform:scale(1.12)}}
+.pz-cell.land{animation:pzLand .3s cubic-bezier(.3,1.6,.5,1)}
+@keyframes pzLand{0%{transform:scale(1.28)}60%{transform:scale(.94)}}
 .pz-pop{position:absolute;inset:0;pointer-events:none;overflow:visible}
 .pz-fx{position:absolute;left:0;top:0;font-family:var(--font-display);font-size:24px;color:#FFF7E6;text-shadow:0 2px 0 #2C4A3D, 0 0 10px rgba(0,0,0,.4);white-space:nowrap;transform:translate(-50%,-50%);animation:pzFx 1s ease-out forwards}
 .pz-fx.big{font-size:32px;color:#FFE27A}
@@ -1231,17 +1236,22 @@ body{background:radial-gradient(120% 60% at 50% 0%, color-mix(in srgb, var(--pap
 .pz-slot.empty{background:none}
 .pz-slot.lift .pz-piece{opacity:.25}
 .pz-slot.stuck .pz-piece{opacity:.42;filter:grayscale(.5)}
-.pz-slot.rotpick{outline:3px dashed #FFE27A;outline-offset:-3px}
+.pz-slot.rotpick{outline:3px dashed #FFE27A;outline-offset:-3px;animation:pzReady 1.2s ease-in-out infinite}
+.pz-slot.back .pz-piece{animation:pzBack .25s ease}
+@keyframes pzBack{0%{transform:scale(1.25);opacity:.4}}
 .pz-piece{display:grid;gap:1px;pointer-events:none}
 .pz-piece i{display:block;background:center/100% 100% no-repeat}
 .pz-foot{flex:none;display:flex;gap:8px}
-.pz-helpbtn{position:relative;flex:1 1 auto;min-height:46px;border:0;border-radius:14px;background:rgba(44,74,61,.86);color:#FFF7E6;font-family:var(--font-display);font-size:16px;cursor:pointer;overflow:hidden;box-shadow:0 3px 0 rgba(0,0,0,.3)}
-.pz-helpfill{position:absolute;left:0;top:0;bottom:0;width:0;background:#5F8C44;transition:width .3s}
-.pz-helptxt{position:relative}
-.pz-helpbtn.ready{background:var(--accent);color:var(--accent-ink);animation:pzReady 1.2s ease-in-out infinite}
-.pz-helpbtn.ready .pz-helpfill{display:none}
+.pz-helps{flex:1 1 auto;display:flex;gap:8px}
+.pz-tea{position:relative;flex:1 1 0;min-height:50px;border:0;border-radius:14px;background:rgba(44,74,61,.86);display:grid;place-items:center;cursor:pointer;box-shadow:0 3px 0 rgba(0,0,0,.3)}
+.pz-tea .pz-teapic{width:38px;height:38px;filter:grayscale(1) opacity(.45)}
+.pz-tea .pz-tean{position:absolute;right:-4px;top:-6px;min-width:20px;height:20px;padding:0 6px;border-radius:10px;background:var(--accent);color:var(--accent-ink);font-family:var(--font-display);font-size:13px;line-height:20px;display:none}
+.pz-tea.has{background:rgba(255,247,230,.94);animation:pzReady 1.6s ease-in-out infinite}
+.pz-tea.has .pz-teapic{filter:none}
+.pz-tea.has .pz-tean{display:block}
+.pz-tea.on{outline:3px solid #FFE27A;outline-offset:-3px}
 @keyframes pzReady{50%{transform:scale(1.03);box-shadow:0 3px 0 rgba(0,0,0,.3), 0 0 16px rgba(255,226,122,.7)}}
-.pz-quit{flex:none;min-height:46px;padding:0 16px;border:0;border-radius:14px;background:rgba(255,247,230,.9);color:var(--ink);font-family:var(--font-display);font-size:15px;cursor:pointer;box-shadow:0 3px 0 rgba(0,0,0,.25)}
+.pz-quit{flex:none;min-height:46px;padding:0 16px;border:0;border-radius:14px;background:rgba(255,247,230,.9);color:#26301E;font-family:var(--font-display);font-size:15px;cursor:pointer;box-shadow:0 3px 0 rgba(0,0,0,.25)}
 .pz-hint{position:absolute;left:50%;bottom:calc(176px + env(safe-area-inset-bottom,0px));transform:translateX(-50%);margin:0;padding:8px 16px;border-radius:999px;background:rgba(44,74,61,.94);color:#FFF7E6;font-family:var(--font-display);font-size:15px;white-space:nowrap;box-shadow:0 3px 0 rgba(0,0,0,.3);pointer-events:none}
 .pz-sheet{position:absolute;left:12px;right:12px;bottom:calc(14px + env(safe-area-inset-bottom,0px));z-index:3;padding:16px 16px 14px;border-radius:20px;background:var(--paper);color:var(--ink);text-align:center;border:2px solid var(--line);box-shadow:0 5px 0 var(--line-shadow), 0 16px 40px rgba(0,0,0,.35);animation:pzSheet .22s ease}
 @keyframes pzSheet{from{transform:translateY(16px);opacity:0}}
@@ -1266,8 +1276,11 @@ body{background:radial-gradient(120% 60% at 50% 0%, color-mix(in srgb, var(--pap
 .pz-endlist [data-acorn] svg{width:26px;height:26px}
 .pz-endlist b{margin-left:auto;font-family:var(--font-display);font-weight:400;font-size:17px}
 .pz-end .fine{margin:0 0 10px;font-size:12.5px;color:var(--muted)}
-.pz-drag{position:fixed;left:0;top:0;z-index:4;pointer-events:none;display:grid;gap:1px;filter:drop-shadow(0 10px 8px rgba(0,0,0,.35))}
+.pz-drag{position:fixed;left:0;top:0;z-index:4;pointer-events:none;will-change:transform}
+.pz-dragin{display:grid;gap:1px;filter:drop-shadow(0 12px 10px rgba(0,0,0,.38));transition:transform .09s ease-out;animation:pzLift .16s cubic-bezier(.3,1.5,.5,1)}
+@keyframes pzLift{0%{transform:scale(.55);filter:none}}
 .pz-drag i{display:block;background:center/100% 100% no-repeat}
+.pz-drag.fly{transition:transform .22s cubic-bezier(.4,0,.6,1)}
 @media (max-height:640px){.pz-tray{height:88px}.pz-board{width:min(100%, 100vh - 300px)}}
 @media (prefers-reduced-motion:reduce){.pz-cell,.pz-ask,.pz-helpbtn,.pz-sheet{animation:none!important;transition:none!important}}
 
@@ -1853,19 +1866,14 @@ body{background:radial-gradient(120% 60% at 50% 0%, color-mix(in srgb, var(--pap
   </div>
   <div class="pz-tray" id="pzTray" aria-label="놓을 조각"></div>
   <div class="pz-foot">
-    <button class="pz-helpbtn" type="button" id="pzHelp" aria-live="polite"><span class="pz-helpfill" id="pzHelpFill"></span><span class="pz-helptxt" id="pzHelpTxt">선생님 도움 0/6</span></button>
+    <div class="pz-helps" id="pzHelps" aria-label="선생님 도움">
+      <button class="pz-tea" type="button" data-help="squirrel" aria-label="다람쥐 선생님 도움: 고른 칸 둘레 3×3 치우기"><span class="pz-teapic" data-tea="tea_squirrel"></span><b class="pz-tean">0</b></button>
+      <button class="pz-tea" type="button" data-help="owl" aria-label="부엉이 선생님 도움: 조각 3개 새로 바꾸기"><span class="pz-teapic" data-tea="tea_owl"></span><b class="pz-tean">0</b></button>
+      <button class="pz-tea" type="button" data-help="bear" aria-label="곰 선생님 도움: 고른 조각 돌리기"><span class="pz-teapic" data-tea="tea_bear"></span><b class="pz-tean">0</b></button>
+    </div>
     <button class="pz-quit" type="button" id="pzQuit">그만하기</button>
   </div>
   <p class="pz-hint" id="pzHint" hidden></p>
-  <div class="pz-sheet" id="pzPick" hidden>
-    <h3>어느 선생님께 부탁할까요?</h3>
-    <div class="pz-teas">
-      <button type="button" data-help="squirrel"><span class="pz-teapic" data-tea="tea_squirrel"></span><b>다람쥐 선생님</b><small>고른 칸 둘레 3×3을 치워요</small></button>
-      <button type="button" data-help="owl"><span class="pz-teapic" data-tea="tea_owl"></span><b>부엉이 선생님</b><small>조각 3개를 새로 바꿔요</small></button>
-      <button type="button" data-help="bear"><span class="pz-teapic" data-tea="tea_bear"></span><b>곰 선생님</b><small>고른 조각을 90도 돌려요</small></button>
-    </div>
-    <button class="btn-sub" type="button" id="pzPickNo">다음에 할게요</button>
-  </div>
   <div class="pz-sheet" id="pzQuitAsk" hidden>
     <h3>여기서 그만할까요?</h3>
     <p>지금까지 점수로 보상을 받고 판을 끝내요.</p>
@@ -3153,6 +3161,7 @@ body{background:radial-gradient(120% 60% at 50% 0%, color-mix(in srgb, var(--pap
     if (!actx) return;
     try {
       if (name === 'tap') note(740, 0, 0.07, 'triangle', 0.07);
+      else if (name.startsWith('pz')) { const L = +name.slice(2) || 0; if (!L) { note(620, 0, 0.06, 'triangle', 0.07); note(880, 0.04, 0.08, 'triangle', 0.06); } else { const f = 740 * Math.pow(1.122, L); note(f, 0, 0.1, 'triangle', 0.12); note(f * 1.5, 0.07, 0.16, 'triangle', 0.11); if (L >= 3) note(f * 2, 0.14, 0.22, 'triangle', 0.1); } }
       else if (name === 'coin') { note(988, 0, 0.1, 'triangle', 0.13); note(1319, 0.07, 0.18, 'triangle', 0.13); }
       else if (name === 'buy') { note(523.25, 0, 0.14, 'triangle', 0.12); note(659.25, 0.08, 0.14, 'triangle', 0.12); note(783.99, 0.16, 0.26, 'triangle', 0.12); }
       else if (name === 'deny') note(196, 0, 0.16, 'square', 0.04);
@@ -3167,7 +3176,7 @@ body{background:radial-gradient(120% 60% at 50% 0%, color-mix(in srgb, var(--pap
       }
     } catch (e) { /* 소리 실패는 무시 */ }
   }
-  function buzz(ms) {
+  function buzz(ms) {   // 숫자 하나나 [켜짐, 꺼짐, 켜짐] 패턴
     if (!S || !S.vibrate) return;
     try { if (navigator.vibrate) navigator.vibrate(ms); } catch (e) { /* 진동을 못 쓰는 환경 */ }
   }
@@ -6591,13 +6600,14 @@ body{background:radial-gradient(120% 60% at 50% 0%, color-mix(in srgb, var(--pap
      8×8 판에 조각 3개를 끌어다 놓고 가로세로 줄을 지워요.
      - 문양 줄: 한 줄을 같은 문양으로만 채워 지우면 그 줄은 3배
      - 학생 부탁: 학생이 "꽃 블록 12개 지워 줘" 같은 부탁을 하고, 들어주면 숲의 정수를 바로 줘요
-     - 선생님 도움: 줄을 지우면 게이지가 차고, 가득 차면 다람쥐(3×3 치우기), 부엉이(조각 바꾸기), 곰(조각 돌리기)
+     - 선생님 도움: 조각에 가끔 선생님 블록이 끼어 나와요. 그 블록이 든 줄을 지우면 다람쥐(3×3 치우기), 부엉이(조각 바꾸기), 곰(조각 돌리기) 도움을 받아요
      하루에 10판까지 보상을 주고, 광고를 보면 3판 더 받아요. 그 뒤에도 연습으로는 계속 할 수 있어요. 하던 판은 저장돼요 */
   const PZ = {
     N: 8, perDay: 10, adMore: 3, adMax: 1,
     pats: ['acorn', 'leaf', 'flower', 'mushroom', 'berry', 'water'],
     patName: { acorn: '도토리', leaf: '잎', flower: '꽃', mushroom: '버섯', berry: '산딸기', water: '물방울' },
-    meter: 6,                       // 줄 6개를 지우면 선생님 도움 1번
+    teas: ['squirrel', 'owl', 'bear'], teaName: { squirrel: '다람쥐', owl: '부엉이', bear: '곰' },
+    teaRate: 1 / 8, teaMax: 1, teaBonus: 15,   // 조각 8개 중 1개꼴로 선생님 블록. 선생님마다 1개 보관, 이미 있으면 점수 15점
     essPer: 150, essMax: 25,        // 점수 150점마다 숲의 정수 1개, 한 판에 25개까지
     minPer: 200, minMax: 30,        // 점수 200점마다 수업료 1분치, 한 판에 30분치까지
     askN: [8, 12, 16, 20, 24], askEss: [2, 3, 4, 5, 5],
@@ -6624,7 +6634,14 @@ body{background:radial-gradient(120% 60% at 50% 0%, color-mix(in srgb, var(--pap
   function pzNewPiece(cur) {
     const ask = cur && cur.ask ? cur.ask.k : 0;
     const k = ask && Math.random() < 0.28 ? ask : 1 + Math.floor(Math.random() * PZ.pats.length);
-    return { c: pzChoice(PZ_SHAPES).map(x => x.slice()), k };
+    const c = pzChoice(PZ_SHAPES).map(x => x.slice());
+    const piece = { c, k };
+    // 가끔 선생님 블록이 조각 한 칸에 끼어 나와요. 보관함이 빈 선생님이 먼저, 다 차 있으면 아무나
+    if (Math.random() < PZ.teaRate) {
+      const free = cur && cur.helps ? PZ.teas.filter(t => cur.helps[t] < PZ.teaMax) : PZ.teas;
+      piece.t = pzChoice(free.length ? free : PZ.teas); piece.ti = Math.floor(Math.random() * c.length);
+    }
+    return piece;
   }
   function pzNewAsk(cur) {
     const i = cur.askI || 0;
@@ -6636,7 +6653,7 @@ body{background:radial-gradient(120% 60% at 50% 0%, color-mix(in srgb, var(--pap
     cur.ask = { k, n, got: 0, who: who[0], name: who[1] };
   }
   const pzFreshGame = rw => {
-    const cur = { b: pzEmpty(), tray: [null, null, null], score: 0, combo: 0, lines: 0, meter: 0, askI: 0, ask: null, ess: 0, rw: !!rw, mode: '' };
+    const cur = { b: pzEmpty(), tb: new Array(PZ.N * PZ.N).fill(''), tray: [null, null, null], score: 0, combo: 0, lines: 0, helps: { squirrel: 0, owl: 0, bear: 0 }, askI: 0, ask: null, ess: 0, rw: !!rw, mode: '' };
     pzNewAsk(cur);
     cur.tray = cur.tray.map(() => pzNewPiece(cur));
     return cur;
@@ -6649,12 +6666,19 @@ body{background:radial-gradient(120% 60% at 50% 0%, color-mix(in srgb, var(--pap
       if (!p || typeof p !== 'object' || !Array.isArray(p.c) || !p.c.length || p.c.length > 9) return null;
       const c = p.c.filter(x => Array.isArray(x) && x.length === 2 && Number.isInteger(x[0]) && Number.isInteger(x[1]) && x[0] >= 0 && x[0] < PZ.N && x[1] >= 0 && x[1] < PZ.N).map(x => [x[0], x[1]]);
       const k = cell(p.k);
-      return c.length === p.c.length && k ? { c: pzNorm(c), k } : null;
+      if (c.length !== p.c.length || !k) return null;
+      const out = { c: pzNorm(c), k };
+      if (PZ.teas.includes(p.t) && Number.isInteger(p.ti) && p.ti >= 0 && p.ti < c.length) { out.t = p.t; out.ti = p.ti; }
+      return out;
     };
     const tray = Array.isArray(d.tray) ? d.tray.slice(0, 3).map(piece) : [];
     while (tray.length < 3) tray.push(null);
-    const cur = { b: d.b.map(cell), tray, score: Math.min(1e9, Math.floor(num(d.score, 0, 0))), combo: Math.floor(num(d.combo, 0, 0)), lines: Math.floor(num(d.lines, 0, 0)),
-      meter: Math.min(PZ.meter, Math.floor(num(d.meter, 0, 0))), askI: Math.floor(num(d.askI, 0, 0)), ask: null, ess: Math.floor(num(d.ess, 0, 0)), rw: d.rw !== false, mode: '' };
+    const b = d.b.map(cell);
+    const tb = Array.isArray(d.tb) && d.tb.length === b.length ? d.tb.map((t, i) => b[i] && PZ.teas.includes(t) ? t : '') : new Array(b.length).fill('');
+    const helps = { squirrel: 0, owl: 0, bear: 0 };
+    if (d.helps && typeof d.helps === 'object') for (const t of PZ.teas) helps[t] = Math.min(PZ.teaMax, Math.floor(num(d.helps[t], 0, 0)));
+    const cur = { b, tb, tray, score: Math.min(1e9, Math.floor(num(d.score, 0, 0))), combo: Math.floor(num(d.combo, 0, 0)), lines: Math.floor(num(d.lines, 0, 0)),
+      helps, askI: Math.floor(num(d.askI, 0, 0)), ask: null, ess: Math.floor(num(d.ess, 0, 0)), rw: d.rw !== false, mode: '' };
     if (d.ask && typeof d.ask === 'object' && cell(d.ask.k)) {
       const who = PZ.askers.find(a => a[0] === d.ask.who) || PZ.askers[0];
       cur.ask = { k: cell(d.ask.k), n: Math.max(1, Math.floor(num(d.ask.n, 1, 8))), got: Math.floor(num(d.ask.got, 0, 0)), who: who[0], name: who[1] };
@@ -6698,20 +6722,27 @@ body{background:radial-gradient(120% 60% at 50% 0%, color-mix(in srgb, var(--pap
   function pzPlace(cur, slot, r, c) {
     const p = cur.tray[slot];
     if (!p || !pzFits(cur.b, p.c, r, c)) return null;
-    for (const [dr, dc] of p.c) cur.b[(r + dr) * PZ.N + c + dc] = p.k;
+    p.c.forEach(([dr, dc], i) => { const at = (r + dr) * PZ.N + c + dc; cur.b[at] = p.k; cur.tb[at] = p.t && p.ti === i ? p.t : ''; });
     cur.tray[slot] = null;
-    const filled = cur.b.slice();   // 지우기 전 모습 (터지는 효과에 써요)
+    const filled = cur.b.slice(), filledT = cur.tb.slice();   // 지우기 전 모습 (터지는 효과에 써요)
     const L = pzFullLines(cur.b);
     const n = L.rows.length + L.cols.length;
-    const cleared = [], pats = {};
-    const take = (rr, cc) => { const i = rr * PZ.N + cc, v = cur.b[i]; if (v) { pats[v] = (pats[v] || 0) + 1; cur.b[i] = 0; cleared.push(i); } };
+    const cleared = [], pats = {}, teas = [];
+    const take = (rr, cc) => {
+      const i = rr * PZ.N + cc, v = cur.b[i];
+      if (!v) return;
+      pats[v] = (pats[v] || 0) + 1; cur.b[i] = 0; cleared.push(i);
+      // 선생님 블록이 든 줄을 지우면 그 선생님 도움 1개. 벌써 갖고 있으면 점수로 대신 줘요
+      const t = cur.tb[i]; cur.tb[i] = '';
+      if (t) { const got = cur.helps[t] < PZ.teaMax; if (got) cur.helps[t] += 1; teas.push({ t, i, got }); }
+    };
     L.rows.forEach(rr => { for (let j = 0; j < PZ.N; j++) take(rr, j); });
     L.cols.forEach(cc => { for (let j = 0; j < PZ.N; j++) take(j, cc); });
     let gain = p.c.length;
     if (n > 0) {
-      cur.combo += 1; cur.lines += n; cur.meter = Math.min(PZ.meter, cur.meter + n);
+      cur.combo += 1; cur.lines += n;
       const mult = Math.min(4, 1 + 0.5 * (cur.combo - 1));
-      gain += Math.round((10 * n + 5 * n * (n - 1) + 20 * L.mono.length) * mult);
+      gain += Math.round((10 * n + 5 * n * (n - 1) + 20 * L.mono.length) * mult) + PZ.teaBonus * teas.filter(x => !x.got).length;
     } else cur.combo = 0;
     cur.score += gain;
     // 학생 부탁 진행
@@ -6727,20 +6758,30 @@ body{background:radial-gradient(120% 60% at 50% 0%, color-mix(in srgb, var(--pap
       }
     }
     if (cur.tray.every(x => !x)) cur.tray = cur.tray.map(() => pzNewPiece(cur));
-    return { placed: p.c.map(([dr, dc]) => (r + dr) * PZ.N + c + dc), lines: L, n, cleared, gain, pats, asks, filled, over: pzStuck(cur) };
+    return { placed: p.c.map(([dr, dc]) => (r + dr) * PZ.N + c + dc), lines: L, n, cleared, gain, pats, asks, teas, filled, filledT, over: pzStuck(cur) };
   }
   // 선생님 도움
+  const pzHasHelp = (cur, t) => cur.helps && cur.helps[t] > 0;
   function pzHelpSquirrel(cur, r, c) {
+    if (!pzHasHelp(cur, 'squirrel')) return [];
     const out = [];
     for (let dr = -1; dr <= 1; dr++) for (let dc = -1; dc <= 1; dc++) {
       const rr = r + dr, cc = c + dc;
       if (rr < 0 || cc < 0 || rr >= PZ.N || cc >= PZ.N) continue;
-      const i = rr * PZ.N + cc; if (cur.b[i]) { cur.b[i] = 0; out.push(i); }
+      const i = rr * PZ.N + cc; if (cur.b[i]) { cur.b[i] = 0; cur.tb[i] = ''; out.push(i); }
     }
-    cur.meter = 0; return out;
+    cur.helps.squirrel -= 1; return out;
   }
-  function pzHelpOwl(cur) { cur.tray = cur.tray.map(() => pzNewPiece(cur)); cur.meter = 0; }
-  function pzHelpBear(cur, slot) { const p = cur.tray[slot]; if (!p) return false; p.c = pzRot(p.c); cur.meter = 0; return true; }
+  function pzHelpOwl(cur) { if (!pzHasHelp(cur, 'owl')) return false; cur.tray = cur.tray.map(() => pzNewPiece(cur)); cur.helps.owl -= 1; return true; }
+  function pzHelpBear(cur, slot) {
+    const p = cur.tray[slot]; if (!p || !pzHasHelp(cur, 'bear')) return false;
+    // 돌리면 칸 순서가 바뀌니 선생님 블록이 어느 칸인지 따라가요
+    const before = p.ti != null ? p.c[p.ti] : null;
+    const h = Math.max(...p.c.map(x => x[0]));
+    p.c = pzRot(p.c);
+    if (before) { const [r0, c0] = before; p.ti = Math.max(0, p.c.findIndex(([r, c]) => r === c0 && c === h - r0)); }
+    cur.helps.bear -= 1; return true;
+  }
   // 보상: 숲의 정수는 점수로, 도토리는 수업료 몇 분치로(학교급이 올라가도 알맞은 양)
   const pzEssOf = score => Math.min(PZ.essMax, Math.floor(score / PZ.essPer));
   const pzMinOf = score => Math.min(PZ.minMax, Math.floor(score / PZ.minPer));
@@ -6771,7 +6812,7 @@ body{background:radial-gradient(120% 60% at 50% 0%, color-mix(in srgb, var(--pap
   }
 
   /* 블록 퍼즐 화면 */
-  const pzUI = { open: false, cell: 0, drag: null, mode: '', rotSlot: -1, img: {} };
+  const pzUI = { open: false, drag: null, mode: '', art: false, cells: [] };
   const pzImg = k => `url('${IMG(k)}')`;   // 작은따옴표: style 속성 안에 그대로 넣어요
   function pzInitArt() {
     if (pzUI.art) return;
@@ -6780,20 +6821,20 @@ body{background:radial-gradient(120% 60% at 50% 0%, color-mix(in srgb, var(--pap
     sc.style.setProperty('--pz-bg', pzImg('pz_bg'));
     sc.style.setProperty('--pz-board', pzImg('pz_board'));
     sc.style.setProperty('--pz-ghost', pzImg('pz_block_ghost'));
-    document.documentElement.style.setProperty('--pz-thumb', pzImg('pz_block_flower'));
-    $$('#pzPick .pz-teapic').forEach(el => { el.style.backgroundImage = pzImg(el.dataset.tea); });
+    $$('#pzHelps .pz-teapic').forEach(el => { el.style.backgroundImage = pzImg(el.dataset.tea); });
     const grid = $('#pzGrid');
     grid.innerHTML = Array.from({ length: PZ.N * PZ.N }, (_, i) => `<div class="pz-cell" data-i="${i}"></div>`).join('');
     pzUI.cells = $$('#pzGrid .pz-cell');
   }
   const pzBlockImg = k => k ? pzImg('pz_block_' + PZ.pats[k - 1]) : '';
+  const pzTeaStyle = t => t ? `--tea:${pzImg('tea_' + t)}` : '';
   function pzOpen() {
     pzInitArt();
     pzDay();
     if (!S.pz.cur) pzStart();
-    pzUI.open = true; pzUI.mode = ''; pzUI.rotSlot = -1;
+    pzUI.open = true; pzUI.mode = '';
     $('#pzScene').hidden = false;
-    $('#pzEnd').hidden = true; $('#pzPick').hidden = true; $('#pzQuitAsk').hidden = true; $('#pzHint').hidden = true;
+    $('#pzEnd').hidden = true; $('#pzQuitAsk').hidden = true; $('#pzHint').hidden = true;
     pzRenderAll();
     if (pzStuck(S.pz.cur)) pzGameOver();
     musicSync();
@@ -6807,19 +6848,27 @@ body{background:radial-gradient(120% 60% at 50% 0%, color-mix(in srgb, var(--pap
     musicSync();
   }
   function pzRenderAll() { pzRenderBoard(); pzRenderTray(); pzRenderTop(); pzRenderAsk(); pzRenderHelp(); }
+  // 판 칸: 문양과 선생님 블록이 바뀐 칸만 다시 그려요
   function pzRenderBoard() {
     const cur = S.pz.cur; if (!cur) return;
     pzUI.cells.forEach((el, i) => {
-      const v = cur.b[i];
-      if (el.dataset.v !== String(v)) { el.dataset.v = v; el.style.backgroundImage = pzBlockImg(v); el.className = 'pz-cell'; }
+      const v = cur.b[i], t = cur.tb[i] || '', key = v + ':' + t;
+      if (el.dataset.v !== key) {
+        el.dataset.v = key; el.style.backgroundImage = pzBlockImg(v); el.className = 'pz-cell' + (t ? ' tea' : '');
+        el.style.setProperty('--tea', t ? pzImg('tea_' + t) : 'none');
+      }
     });
   }
   const pzDims = p => ({ h: Math.max(...p.c.map(x => x[0])) + 1, w: Math.max(...p.c.map(x => x[1])) + 1 });
   function pzCellsHTML(p) {
     const { w, h } = pzDims(p);
-    const on = new Set(p.c.map(([r, c]) => r * w + c)), img = pzBlockImg(p.k);
+    const on = new Map(p.c.map(([r, c], i) => [r * w + c, i])), img = pzBlockImg(p.k);
     let s = '';
-    for (let i = 0; i < w * h; i++) s += `<i style="${on.has(i) ? `background-image:${img}` : ''}"></i>`;
+    for (let i = 0; i < w * h; i++) {
+      if (!on.has(i)) { s += '<i></i>'; continue; }
+      const tea = p.t && on.get(i) === p.ti;
+      s += `<i class="${tea ? 'tea' : ''}" style="background-image:${img};${tea ? pzTeaStyle(p.t) : ''}"></i>`;
+    }
     return s;
   }
   function pzPieceHTML(p, size) {
@@ -6853,13 +6902,14 @@ body{background:radial-gradient(120% 60% at 50% 0%, color-mix(in srgb, var(--pap
     $('#pzAskN').textContent = `${Math.min(a.got, a.n)}/${a.n}`;
     $('#pzAskFill').style.width = Math.min(100, a.got / a.n * 100) + '%';
   }
+  // 선생님 도움 단추: 갖고 있으면 밝게, 쓰는 중이면 테두리
   function pzRenderHelp() {
     const cur = S.pz.cur; if (!cur) return;
-    const ready = cur.meter >= PZ.meter;
-    const b = $('#pzHelp');
-    b.classList.toggle('ready', ready);
-    $('#pzHelpFill').style.width = (cur.meter / PZ.meter * 100) + '%';
-    $('#pzHelpTxt').textContent = pzUI.mode === 'squirrel' ? '치울 칸을 골라요' : pzUI.mode === 'bear' ? '돌릴 조각을 골라요' : ready ? '선생님 도움!' : `선생님 도움 ${cur.meter}/${PZ.meter}`;
+    $$('#pzHelps .pz-tea').forEach(b => {
+      const t = b.dataset.help, n = cur.helps[t] || 0;
+      b.classList.toggle('has', n > 0); b.classList.toggle('on', pzUI.mode === t);
+      b.querySelector('.pz-tean').textContent = n;
+    });
   }
   function pzHint(msg, ms) {
     const h = $('#pzHint'); h.textContent = msg; h.hidden = false;
@@ -6895,36 +6945,51 @@ body{background:radial-gradient(120% 60% at 50% 0%, color-mix(in srgb, var(--pap
     const b = $('#pzBoard').getBoundingClientRect(), g = $('#pzGrid').getBoundingClientRect();
     return { ox: g.left - b.left, oy: g.top - b.top, cell: g.width / PZ.N, w: b.width, h: b.height, gl: g.left, gt: g.top };
   }
-  // 조각 끌기: 손가락보다 위에 보이게 띄우고, 조각의 왼쪽 위 칸이 가장 가까운 칸에 붙어요
+  /* 조각 끌기 손맛
+     - 집으면 조각이 판 크기로 커지며 튀어 오르고, 손가락 바로 위(한 칸쯤)에 따라와요
+     - 놓을 수 있는 자리에 가까우면 자석처럼 그 자리에 붙어 보이고, 놓이면 통통 눌리며 짧게 떨려요
+     - 놓을 수 없는 곳에서 손을 떼면 조각이 쟁반으로 날아 돌아가요 */
   function pzDragStart(e, slot) {
     const cur = S.pz.cur; if (!cur || pzUI.drag || !pzUI.open) return;
-    if (pzUI.mode === 'bear') { if (pzHelpBear(cur, slot)) { pzUI.mode = ''; sfx('leaf'); pzHint('곰 선생님이 조각을 돌려 줬어요'); save(); pzRenderTray(); pzRenderHelp(); if (pzStuck(cur)) pzGameOver(); } return; }
+    if (pzUI.mode === 'bear') {
+      if (pzHelpBear(cur, slot)) { pzUI.mode = ''; sfx('leaf'); buzz(12); pzHint('곰 선생님이 조각을 돌려 줬어요'); save(); pzRenderTray(); pzRenderHelp(); if (pzStuck(cur)) pzGameOver(); }
+      return;
+    }
     if (pzUI.mode) return;
     const p = cur.tray[slot]; if (!p) return;
     const rect = pzGridRect(), cell = rect.cell;
     const { w, h } = pzDims(p);
     const d = $('#pzDrag');
-    d.style.gridTemplateColumns = `repeat(${w},${cell - 1}px)`; d.style.gridTemplateRows = `repeat(${h},${cell - 1}px)`;
-    d.innerHTML = pzCellsHTML(p); d.hidden = false;
-    // 손가락은 조각 아래쪽 가운데를 잡은 것으로 보고, 조각을 손가락보다 70px 위에 띄워요
-    pzUI.drag = { slot, p, w, h, cell, offX: w * cell / 2, offY: h * cell + 70, pid: e.pointerId, at: -1 };
+    d.classList.remove('fly'); d.style.transition = 'none';
+    d.innerHTML = `<div class="pz-dragin" style="grid-template-columns:repeat(${w},${cell - 1}px);grid-template-rows:repeat(${h},${cell - 1}px)">${pzCellsHTML(p)}</div>`;
+    d.hidden = false;
+    const inner = d.firstChild;
+    inner.style.transformOrigin = `${w * cell / 2}px ${h * cell}px`;
+    // 손가락은 조각 아래쪽 가운데를 잡은 것으로 보고, 조각을 손가락보다 한 칸 남짓 위에 띄워요
+    pzUI.drag = { slot, p, w, h, cell, offX: w * cell / 2, offY: h * cell + cell * 0.9, pid: e.pointerId, at: -1, inner, x: 0, y: 0 };
     $$('#pzTray .pz-slot')[slot].classList.add('lift');
     try { e.target.setPointerCapture && e.target.setPointerCapture(e.pointerId); } catch (x) { /* 무시 */ }
+    sfx('tap'); buzz(8);
     pzDragMove(e);
   }
   function pzDragMove(e) {
     const dg = pzUI.drag; if (!dg) return;
     const x = e.clientX - dg.offX, y = e.clientY - dg.offY;
+    dg.x = x; dg.y = y;
     $('#pzDrag').style.transform = `translate(${x}px, ${y}px)`;
     const rect = pzGridRect();
     const c = Math.round((x - rect.gl) / rect.cell), r = Math.round((y - rect.gt) / rect.cell);
     const cur = S.pz.cur;
     const ok = pzFits(cur.b, dg.p.c, r, c);
     const at = ok ? r * PZ.N + c : -1;
+    // 자석: 놓을 수 있으면 조각이 그 칸에 딱 붙어 보여요
+    if (ok) { const sx = rect.gl + c * rect.cell - x, sy = rect.gt + r * rect.cell - y; dg.inner.style.transform = `translate(${sx}px, ${sy}px)`; }
+    else dg.inner.style.transform = '';
     if (at === dg.at) return;
     dg.at = at;
     pzUI.cells.forEach(el => { el.classList.remove('ghost', 'will'); });
     if (!ok) return;
+    buzz(4);
     // 놓을 자리와, 놓으면 지워질 줄을 미리 보여 줘요
     const trial = cur.b.slice();
     for (const [dr, dc] of dg.p.c) { const i = (r + dr) * PZ.N + c + dc; trial[i] = dg.p.k; pzUI.cells[i].classList.add('ghost'); }
@@ -6935,10 +7000,23 @@ body{background:radial-gradient(120% 60% at 50% 0%, color-mix(in srgb, var(--pap
   function pzDragEnd(cancel) {
     const dg = pzUI.drag; if (!dg) return;
     pzUI.drag = null;
-    $('#pzDrag').hidden = true;
+    const d = $('#pzDrag');
     pzUI.cells.forEach(el => el.classList.remove('ghost', 'will'));
     const cur = S.pz.cur;
-    if (cancel || dg.at < 0 || !cur) { pzRenderTray(); return; }
+    if (cancel || dg.at < 0 || !cur) {
+      // 못 놓는 자리: 쟁반 자리로 날아 돌아가요
+      const slotEl = $$('#pzTray .pz-slot')[dg.slot];
+      if (!cancel && slotEl && !rt.reduced) {
+        const sr = slotEl.getBoundingClientRect();
+        d.classList.add('fly'); d.style.transition = '';
+        dg.inner.style.transition = 'transform .22s'; dg.inner.style.transform = 'scale(.5)';
+        d.style.transform = `translate(${sr.left + sr.width / 2 - dg.offX}px, ${sr.top + sr.height / 2 - dg.h * dg.cell / 2}px)`;
+        setTimeout(() => { d.hidden = true; d.classList.remove('fly'); pzRenderTray(); const s2 = $$('#pzTray .pz-slot')[dg.slot]; if (s2) s2.classList.add('back'); }, 220);
+        sfx('deny');
+      } else { d.hidden = true; pzRenderTray(); }
+      return;
+    }
+    d.hidden = true;
     const r = Math.floor(dg.at / PZ.N), c = dg.at % PZ.N;
     const res = pzPlace(cur, dg.slot, r, c);
     if (!res) { pzRenderTray(); return; }
@@ -6948,20 +7026,35 @@ body{background:radial-gradient(120% 60% at 50% 0%, color-mix(in srgb, var(--pap
     const cur = S.pz.cur;
     pzRenderBoard();
     res.placed.forEach(i => pzUI.cells[i].classList.add('land'));
-    setTimeout(() => res.placed.forEach(i => pzUI.cells[i].classList.remove('land')), 260);
+    setTimeout(() => res.placed.forEach(i => pzUI.cells[i].classList.remove('land')), 320);
+    buzz(res.n > 0 ? [18, 30, 24] : 12);
     if (res.n > 0) {
-      // 지운 칸은 잠깐 다시 보여 주고 터지는 효과를 줘요. 문양 줄은 더 크게 반짝여요
+      // 지운 칸은 놓은 자리에서 가까운 순서로 차례차례 터져요. 문양 줄은 더 크게 반짝여요
       const monoSet = new Set();
       res.lines.mono.forEach(m => { const i = +m.slice(1); for (let j = 0; j < PZ.N; j++) monoSet.add(m[0] === 'r' ? i * PZ.N + j : j * PZ.N + i); });
-      res.cleared.forEach(i => { const el = pzUI.cells[i]; el.style.backgroundImage = pzBlockImg(res.filled[i]); el.dataset.v = '-1'; el.classList.add(monoSet.has(i) ? 'mono' : 'pop'); });
-      setTimeout(() => pzRenderBoard(), rt.reduced ? 0 : 420);
+      const p0 = res.placed[Math.floor(res.placed.length / 2)], pr = Math.floor(p0 / PZ.N), pc = p0 % PZ.N;
+      res.cleared.forEach(i => {
+        const el = pzUI.cells[i], t = res.filledT[i];
+        el.style.backgroundImage = pzBlockImg(res.filled[i]); el.dataset.v = '-1';
+        if (t) { el.classList.add('tea'); el.style.setProperty('--tea', pzImg('tea_' + t)); }
+        const dist = Math.abs(Math.floor(i / PZ.N) - pr) + Math.abs(i % PZ.N - pc);
+        el.style.animationDelay = rt.reduced ? '0s' : (dist * 28) + 'ms';
+        el.classList.add(monoSet.has(i) ? 'mono' : 'pop');
+      });
+      setTimeout(() => { res.cleared.forEach(i => { pzUI.cells[i].style.animationDelay = ''; }); pzRenderBoard(); }, rt.reduced ? 0 : 420 + 28 * 8);
       pzLeaves(res.cleared, res.lines.mono.length ? 'mono' : '');
+      if (res.n >= 2 && !rt.reduced) { const b = $('#pzBoard'); b.classList.remove('shake'); void b.offsetWidth; b.classList.add('shake'); }
       const mid = res.cleared[Math.floor(res.cleared.length / 2)];
       pzFx('+' + res.gain, res.lines.mono.length || res.n >= 2 ? 'big' : '', mid);
       if (cur.combo >= 2) setTimeout(() => pzFx(`콤보 ×${Math.min(4, 1 + 0.5 * (cur.combo - 1)).toFixed(1).replace('.0', '')}`, 'big'), 250);
       if (res.lines.mono.length) setTimeout(() => pzFx('문양 줄!', 'big'), 450);
-      sfx(res.lines.mono.length ? 'quest' : res.n >= 2 ? 'done' : 'coin'); buzz(res.n >= 2 ? 30 : 15);
-    } else { sfx('tap'); pzFx('+' + res.gain, '', res.placed[0]); }
+      sfx(res.lines.mono.length ? 'quest' : 'pz' + Math.min(6, cur.combo + (res.n >= 2 ? 1 : 0)));
+    } else { sfx('pz0'); pzFx('+' + res.gain, '', res.placed[0]); }
+    // 선생님 블록이 든 줄을 지웠으면 도움을 받아요
+    res.teas.forEach((x, i) => setTimeout(() => {
+      pzFx(x.got ? `${PZ.teaName[x.t]} 선생님 도움!` : `${PZ.teaName[x.t]} 선생님 +${PZ.teaBonus}`, 'ess', x.i);
+      if (x.got) sfx('done');
+    }, 300 + i * 350));
     // 학생 부탁을 들어줬으면 숲의 정수를 바로 줘요
     res.asks.forEach((a, i) => {
       addEss(a.ess);
@@ -6969,14 +7062,15 @@ body{background:radial-gradient(120% 60% at 50% 0%, color-mix(in srgb, var(--pap
         $('#pzAsk').classList.remove('done'); void $('#pzAsk').offsetWidth; $('#pzAsk').classList.add('done');
         pzFx(a.ess ? `${a.name} 고마워! 정수 +${a.ess}` : `${a.name} 고마워!`, 'ess');
         sfx('buy');
-      }, 600 + i * 500);
+      }, 700 + i * 500);
     });
     pzRenderTray(); pzRenderTop(); pzRenderAsk(); pzRenderHelp();
     save();
-    if (res.over) setTimeout(pzGameOver, rt.reduced ? 200 : 700);
+    if (res.over) setTimeout(pzGameOver, rt.reduced ? 200 : 800);
   }
   function pzGameOver() {
     const cur = S.pz.cur; if (!cur) return;
+    pzUI.mode = '';
     const r = pzFinish(cur);
     $('#pzEndTitle').textContent = r.rw ? '판이 끝났어요' : '연습이 끝났어요';
     $('#pzEndScore').textContent = fmt(r.score);
@@ -6986,18 +7080,22 @@ body{background:radial-gradient(120% 60% at 50% 0%, color-mix(in srgb, var(--pap
     if (r.askEss > 0) items.push(`<li><span class="tic" style="background-image:${pzImg('ic_essence')}"></span>학생 부탁 보상<b>+${r.askEss}</b></li>`);
     if (r.acorns > 0) items.push(`<li><span data-acorn>${acornIcon()}</span>도토리 (수업료 ${r.mins}분치)<b>+${fmt(r.acorns)}</b></li>`);
     $('#pzEndList').innerHTML = items.join('');
-    $('#pzEndNote').textContent = !r.rw ? '연습 판이라 보상은 없어요. 내일 다시 10판을 받아요' : items.length ? '' : `${PZ.essPer}점부터 숲의 정수를, ${PZ.minPer}점부터 도토리를 받아요`;
     const left = pzLeft();
+    let note = !r.rw ? '연습 판이라 보상은 없어요. 내일 다시 10판을 받아요' : items.length ? '' : `${PZ.essPer}점부터 숲의 정수를, ${PZ.minPer}점부터 도토리를 받아요`;
+    if (left > 0 && r.rw) note = (note + ` 오늘 보상 판이 ${left}번 남았어요`).trim();
+    $('#pzEndNote').textContent = note;
     $('#pzEndAgain').textContent = left > 0 ? '다시 하기' : '연습으로 다시 하기';
-    if (left > 0 && r.rw) $('#pzEndNote').textContent = ($('#pzEndNote').textContent + ` 오늘 보상 판이 ${left}번 남았어요`).trim();
     $('#pzEnd').hidden = false;
     sfx(r.newBest ? 'quest' : 'done');
     renderMini(); renderEss();
   }
+  // 선생님 단추: 부엉이는 바로, 다람쥐와 곰은 칸이나 조각을 고르는 모드로
   function pzUseHelp(kind) {
-    const cur = S.pz.cur; if (!cur || cur.meter < PZ.meter) return;
-    $('#pzPick').hidden = true;
-    if (kind === 'owl') { pzHelpOwl(cur); sfx('leaf'); pzHint('부엉이 선생님이 조각을 바꿔 줬어요'); save(); pzRenderTray(); pzRenderHelp(); if (pzStuck(cur)) pzGameOver(); return; }
+    const cur = S.pz.cur; if (!cur) return;
+    if (pzUI.mode === kind) { pzUI.mode = ''; pzRenderTray(); pzRenderHelp(); pzHint('도움을 다음으로 미뤘어요'); return; }
+    if (!pzHasHelp(cur, kind)) { pzHint(`${PZ.teaName[kind]} 선생님 블록이 든 줄을 지우면 받아요`); return; }
+    sfx('tap');
+    if (kind === 'owl') { pzHelpOwl(cur); sfx('leaf'); buzz(12); pzHint('부엉이 선생님이 조각을 바꿔 줬어요'); save(); pzRenderTray(); pzRenderHelp(); if (pzStuck(cur)) pzGameOver(); return; }
     pzUI.mode = kind;
     pzHint(kind === 'squirrel' ? '치울 칸을 눌러 주세요 (둘레 3×3)' : '돌릴 조각을 눌러 주세요', 2500);
     pzRenderTray(); pzRenderHelp();
@@ -7017,19 +7115,12 @@ body{background:radial-gradient(120% 60% at 50% 0%, color-mix(in srgb, var(--pap
       showAd(() => { pzDay(); S.pz.adN += 1; save(); renderMini(); toast(`오늘 보상 판 ${PZ.adMore}번을 더 받았어요`); });
     });
     $('#pzBack').addEventListener('click', () => { sfx('tap'); pzClose(); });
-    $('#pzQuit').addEventListener('click', () => { if (!S.pz.cur || !$('#pzEnd').hidden) return; sfx('tap'); $('#pzPick').hidden = true; $('#pzQuitAsk').hidden = false; });
+    $('#pzQuit').addEventListener('click', () => { if (!S.pz.cur || !$('#pzEnd').hidden) return; sfx('tap'); $('#pzQuitAsk').hidden = false; });
     $('#pzQuitNo').addEventListener('click', () => { $('#pzQuitAsk').hidden = true; });
     $('#pzQuitYes').addEventListener('click', () => { $('#pzQuitAsk').hidden = true; pzGameOver(); });
     $('#pzEndAgain').addEventListener('click', () => { sfx('tap'); $('#pzEnd').hidden = true; pzStart(); pzUI.mode = ''; pzRenderAll(); });
     $('#pzEndOut').addEventListener('click', () => { sfx('tap'); $('#pzEnd').hidden = true; pzClose(); });
-    $('#pzHelp').addEventListener('click', () => {
-      const cur = S.pz.cur; if (!cur) return;
-      if (pzUI.mode) { pzUI.mode = ''; pzRenderTray(); pzRenderHelp(); pzHint('도움을 다음으로 미뤘어요'); return; }
-      if (cur.meter < PZ.meter) { pzHint(`줄을 ${PZ.meter - cur.meter}개 더 지우면 선생님을 부를 수 있어요`); return; }
-      sfx('tap'); $('#pzQuitAsk').hidden = true; $('#pzPick').hidden = false;
-    });
-    $('#pzPickNo').addEventListener('click', () => { $('#pzPick').hidden = true; });
-    $$('#pzPick [data-help]').forEach(b => b.addEventListener('click', () => { sfx('tap'); pzUseHelp(b.dataset.help); }));
+    $$('#pzHelps [data-help]').forEach(b => b.addEventListener('click', () => pzUseHelp(b.dataset.help)));
     $('#pzGrid').addEventListener('click', e => { const c = e.target.closest('.pz-cell'); if (c) pzCellTap(+c.dataset.i); });
     const tray = $('#pzTray');
     tray.addEventListener('pointerdown', e => { const s = e.target.closest('.pz-slot'); if (!s || s.classList.contains('empty')) return; e.preventDefault(); pzDragStart(e, +s.dataset.slot); });
@@ -9104,7 +9195,7 @@ body{background:radial-gradient(120% 60% at 50% 0%, color-mix(in srgb, var(--pap
       if (rt.modalOpen || rt.sheetKey || rt.adOpen) { document.dispatchEvent(new KeyboardEvent('keydown', { key: 'Escape' })); return; }
       // 블록 퍼즐 안에서 뒤로 가기: 열린 작은 창부터 닫고, 없으면 미니게임 탭으로 (하던 판은 저장돼요)
       if (pzUI.open) {
-        for (const id of ['#pzPick', '#pzQuitAsk']) { const el = $(id); if (!el.hidden) { el.hidden = true; return; } }
+        for (const id of ['#pzQuitAsk']) { const el = $(id); if (!el.hidden) { el.hidden = true; return; } }
         if (!$('#pzEnd').hidden) { $('#pzEnd').hidden = true; pzClose(); return; }
         if (pzUI.mode) { pzUI.mode = ''; pzRenderTray(); pzRenderHelp(); return; }
         pzClose(); return;
@@ -9234,7 +9325,7 @@ body{background:radial-gradient(120% 60% at 50% 0%, color-mix(in srgb, var(--pap
   // 시험용 손잡이: 자동 시험(window.__FOREST_TEST)에서만 게임 속 함수를 꺼내 써요
   if (window.__FOREST_TEST) window.__forest = { get S() { return S; }, get Cloud() { return Cloud; }, rt, makeDeal, furStage, DEAL, navInfo, navRoute, spawnDrop, repTipCheck, linkGoogle, retryCloud, sanitize, acctPending, renderMap, renderHUD, renderAffordance, syncKids, layoutMap, geo, startTrial, hitTrial, endTrial, startVisit, endVisit, showReward, recommend, needCost, prepTopUp, qReward, prepPhase, rankScore, pwOf, previewDip, dipMult, costScale, buyFacility, buyFur, buyFurAll, furCost, furReady, furDone, FUR, startTalk, endTalk, teacherAct, facCost, teaCost, facKeys, rate, rep, capacity, canGraduate, canPromote,
     graduate, promote, buyPerk, perkCost, perkMaxed, buyFundPerk, fpCost, claimMain, mainReady, curMain, qNo, earn, CFG, TEA, teaMaxed, PERKS, FPERKS, MAIN, finalYear, startTrip, claimTrip, TRIPS, yearLocked, startSports, endSports, rtSports: () => rt.sports, startFest, rtFest: () => rt.fest, facCap, addLeague, weekIdx, addMP, tutStart, endFest, claimSports, claimBox, musicWant, askBox, festWait, setTab, openSheet, closeSheet,
-    PZ, PZ_SHAPES, pzFits, pzAnyFit, pzStuck, pzFullLines, pzPlace, pzFreshGame, pzStart, pzFinish, pzLeft, pzCanAd, pzEssOf, pzMinOf, pzHelpSquirrel, pzHelpOwl, pzHelpBear, pzRot, pzOpen, pzClose, pzGameOver, pzRenderAll, renderMini, addEss };
+    PZ, PZ_SHAPES, pzFits, pzAnyFit, pzStuck, pzFullLines, pzPlace, pzFreshGame, pzStart, pzFinish, pzLeft, pzCanAd, pzEssOf, pzMinOf, pzHelpSquirrel, pzHelpOwl, pzHelpBear, pzHasHelp, pzRot, pzNewPiece, pzOpen, pzClose, pzGameOver, pzRenderAll, renderMini, addEss };
   if (window.claude && window.claude.hot && window.claude.hot.snapshot) {
     try { window.claude.hot.snapshot(() => { if (S) syncMid(); return { save: S }; }); } catch (e) { /* 무시 */ }
   }
