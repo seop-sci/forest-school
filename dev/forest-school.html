@@ -8751,15 +8751,18 @@ body{background:radial-gradient(120% 60% at 50% 0%, color-mix(in srgb, var(--pap
   // 미션은 기존 횟수 통계(S.st)의 "이벤트 시작 때와의 차이"로 재요. 놀이 코드에는 손대지 않아요
   const EV_MEASURE = {
     // ok가 거짓이면 아직 못 하는 미션이라 EV_FALLBACK으로 바꿔요.
-    // 고치기(가구와 시설), 자리 비운 도토리 받기(30초 넘게 닫았다 열기), 연수(다람쥐 선생님은 처음부터 Lv.1이고 최고 레벨이 없어요)는 새 학교도 늘 할 수 있어요.
+    // 자리 비운 도토리 받기(30초 넘게 닫았다 열기)와 연수(다람쥐 선생님은 처음부터 Lv.1이고 최고 레벨이 없어요)는 늘 할 수 있어요.
+    // 고치기는 그 학년의 시설이 모두 최고 레벨(facMaxed)이고 가구도 모두 끝났으면(furDone) 종업식 전까지 못 해요.
     // 줍기와 흔들기는 놀이터가 있어야 해요(없으면 참나무를 눌러도 안내만 나와요). 오늘의 미션도 줍기와 흔들기가 섞여 나와서 놀이터가 있어야 목표를 채울 수 있어요
-    picks: { name: n => `떨어진 도토리 ${n}개 줍기`, ok: () => S.f.playground >= 1 }, shakes: { name: n => `참나무 ${n}번 흔들기`, ok: () => S.f.playground >= 1 }, ups: { name: n => `시설이나 가구 ${n}번 고치기` },
+    picks: { name: n => `떨어진 도토리 ${n}개 줍기`, ok: () => S.f.playground >= 1 }, shakes: { name: n => `참나무 ${n}번 흔들기`, ok: () => S.f.playground >= 1 },
+    ups: { name: n => `시설이나 가구 ${n}번 고치기`, ok: () => facKeys().some(k => !facMaxed(k) || FUR[k].some((_, i) => !furDone(k, i))) },
     trains: { name: n => `선생님 연수 ${n}번 보내기`, ok: () => DEX_TEACHERS.some(k => S.t[k] >= 1 && !teaMaxed(k)) }, claims: { name: n => `자리 비운 도토리 ${n}번 받기` }, dmDone: { name: n => `오늘의 미션 ${n}개 끝내기`, ok: () => S.f.playground >= 1 },
     sports: { name: n => `숲속 운동회 ${n}번 열기`, ok: () => festOpen('sports') }, trips: { name: n => `체험학습 ${n}번 다녀오기`, ok: () => tripOpen() }
   };
   const evOk = t => !!EV_MEASURE[t] && (!EV_MEASURE[t].ok || EV_MEASURE[t].ok());
   // 아직 못 하는 미션 대신 넣어요(앞에서부터, 할 수 있고 겹치지 않는 것만). 흔들기와 줍기가 안 되면 고치기가 먼저 나와요.
-  // 뒤의 고치기, 자리 비운 도토리 받기, 연수는 늘 할 수 있어서 미션 3개가 언제나 채워져요
+  // 놀이터가 없으면 고치기가 늘 되고(놀이터를 지을 수 있어요), 시설과 가구가 모두 끝났으면 놀이터가 있어 흔들기와 줍기가 돼요.
+  // 자리 비운 도토리 받기와 연수는 늘 되니 미션 3개가 언제나 채워져요. 그래도 못 찾으면 자리 비운 도토리 받기를 넣어요
   const EV_FALLBACK = [['shakes', 60], ['picks', 80], ['ups', 40], ['claims', 3], ['trains', 3]];
   const pad2 = n => String(n).padStart(2, '0');
   const dayAdd = (day, n) => { const [y, m, d] = day.split('-').map(Number); return new Date(Date.UTC(y, m - 1, d + n)).toISOString().slice(0, 10); };
@@ -8807,7 +8810,7 @@ body{background:radial-gradient(120% 60% at 50% 0%, color-mix(in srgb, var(--pap
     const used = new Set(), out = [];
     for (const [t0, n0] of row.ms) {
       let t = t0, n = n0;
-      if (!evOk(t) || used.has(t)) { const alt = EV_FALLBACK.find(f => evOk(f[0]) && !used.has(f[0])) || ['ups', 40]; t = alt[0]; n = alt[1]; }
+      if (!evOk(t) || used.has(t)) { const alt = EV_FALLBACK.find(f => evOk(f[0]) && !used.has(f[0])) || ['claims', 3]; t = alt[0]; n = alt[1]; }
       used.add(t);
       out.push({ t, n, b: Math.floor(S.st[t] || 0), m: row.m, g: row.g, done: false });
     }

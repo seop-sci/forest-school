@@ -1,6 +1,6 @@
 # 1.7.0 시험: 동물 도감(등록, 옛 저장 자동 채우기, 도감 선물 한 번만), 이벤트(달력 규칙, 출석 도장 하루 한 번과 5개째 큰 보상, 미션과 기념 상자,
 #   달이 바뀌면 새 회차, 특별 이벤트 표, 특별 이벤트와 겹치는 달의 반복 이벤트 건너뛰기와 쉬는 안내 한 줄, 못 하는 미션 대신 넣기,
-#   새 저장(놀이터 없음)에서 모든 달의 미션이 이룰 수 있는 종류인지), 분치 보정, 밝은 화면 390px과 어두운 화면 360px에서 넘침 없음
+#   새 저장(놀이터 없음)과 시설과 가구를 모두 최고로 올린 학교에서 모든 달의 미션이 이룰 수 있는 종류인지), 분치 보정, 밝은 화면 390px과 어두운 화면 360px에서 넘침 없음
 # 쓰는 법: python3 wrap.py && python3 s48test.py   (마지막 줄이 PASS면 통과)
 import asyncio, json, sys
 from playwright.async_api import async_playwright
@@ -95,6 +95,18 @@ async def main():
         # 흔들기: 놀이터 0에서는 참나무를 눌러도 횟수가 그대로라 미션으로 나오면 안 돼요(위에서 확인). 놀이터를 지으면 다시 나와요
         built = await pn.evaluate(f"(()=>{{ const F={F}, S=F.S; S.f.playground=1; return Object.keys(F.EV_MEASURE).filter(t => F.evOk(t)).sort(); }})()")
         if not all(t in built for t in ('picks', 'shakes', 'dmDone')): fails.append(f'놀이터를 지어도 줍기, 흔들기, 오늘의 미션이 안 열려요 {built}')
+        # 시설과 가구를 모두 최고로 올린 학교: 고치기는 빠지고, 모든 달의 미션이 이룰 수 있는 종류이고 겹치지 않아요
+        mx = await pn.evaluate(f"""(()=>{{ const F={F}, S=F.S; const cap=F.facCap(); for (const k of F.facKeys()) {{ S.f[k]=cap; S.fu[k]=S.fu[k].map(()=>cap); }}
+          const out={{ ups: F.evOk('ups'), ok: Object.keys(F.EV_MEASURE).filter(t => F.evOk(t)).sort(), bad: [] }};
+          const rows = [];
+          for (let mo = 1; mo <= 12; mo++) for (const e of F.EV_MONTHLY) rows.push({{ def: e, start: `2026-${{String(mo).padStart(2,'0')}}-01` }});
+          for (const e of F.EV_SPECIAL) rows.push({{ def: e, start: '2026-12-24' }});
+          for (const r of rows) {{ const ts = F.evMissions(r).map(m=>m.t); if (ts.length !== 3 || new Set(ts).size !== 3 || ts.some(t => !F.evOk(t))) out.bad.push(r.def.id + r.start.slice(5,7) + ':' + ts.join(',')); }}
+          S.fu.classroom[0] = cap - 1; out.upsAgain = F.evOk('ups');   // 가구 하나만 덜 끝나도 다시 고치기가 돼요
+          return out; }})()""")
+        if mx['ups'] is not False or 'ups' in mx['ok']: fails.append(f'모두 최고 레벨인데 고치기가 할 수 있는 미션으로 나와요 {mx}')
+        if mx['bad']: fails.append(f"모두 최고 레벨인 학교에서 이룰 수 없는 미션이 나와요 {mx['bad'][:6]}")
+        if mx['upsAgain'] is not True: fails.append('가구가 덜 끝났는데 고치기가 안 돼요')
         if errsn: fails.append(f'새 저장 페이지 오류 {errsn}')
         await ctx2.close()
         # 4) 이벤트: 11월 3일(도토리 수확 축제 1~7일)
