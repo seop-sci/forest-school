@@ -32,9 +32,10 @@ Playwright(Python)로 `dev/test.html`을 열어 시험해요. 먼저 `cd dev && 
 
 ## 기능별 시험
 
-- `s44test.py` (1.5.4, 가짜 Firebase): 구글 계정 바꾸기가 끊겼을 때 이 기기 저장이 이어지고 계정 학교를 덮어쓰지 않는지, 다시 시도하면 학교를 고르는 창, 계정 지우기가 거절됐을 때 다음에 열면 다시 지우고 그동안 올리지 않는지, 이어하기 코드 정리. `python3 build_gh.py gh` 뒤에 돌려요. 마지막 줄 PASS면 통과
+- `s47test.py` (1.5.6): 이어하기 코드 화면이 없는지, 행사 카운트다운 알림판이 행사 자리(광장, 운동장) 아래에 떠서 학생과 아래 탭을 가리지 않는지(환영회, 학예회, 졸업 사진, 운동회), 위쪽 줄 도토리 칸 두 단위 표시(fmt2)와 넘침. 밝은 화면 344px, 390px, 어두운 화면 360px. 마지막 줄 PASS면 통과
+- `s44test.py` (1.5.4, 가짜 Firebase): 구글 계정 바꾸기가 끊겼을 때 이 기기 저장이 이어지고 계정 학교를 덮어쓰지 않는지, 다시 시도하면 학교를 고르는 창, 계정 지우기가 거절됐을 때 다음에 열면 다시 지우고 그동안 올리지 않는지. `python3 build_gh.py gh` 뒤에 돌려요. 마지막 줄 PASS면 통과
 - `s45test.py` (1.5.4): 가구 모습은 학교급마다 한 단계(같은 학교급에서는 개수만), 학교급이 오른 뒤 첫 가구 알림, 까치 특식 데이 20분과 반값 핫딜 조건, 미니게임 탭에 버전 번호 없음. 마지막 줄 PASS면 통과
-- `fbtest/rules_test.js` (1.5.4 보강): `NODE_PATH=<targaryen 폴더> node fbtest/rules_test.js $PWD/gh_database.rules.json`. 랭킹 문서 모양과 범위, 테스트 현황은 관리자만, 30분 지난 이어하기 코드 읽기 막기를 봐요
+- `fbtest/rules_test.js` (1.5.4 보강): `NODE_PATH=<targaryen 폴더> node fbtest/rules_test.js $PWD/gh_database.rules.json`. 랭킹 문서 모양과 범위, 테스트 현황은 관리자만, 없앤 이어하기 코드 자리(moves)는 읽기와 쓰기가 막히는지 봐요
 - `toss/check_bridge.cjs` (1.5.4): `cd toss && node build.mjs && node check_bridge.cjs dist/bridge.js`. 만든 토스 다리가 시작할 때 멈추지 않고 window.AIT를 만드는지 봐요
 - `dev/check_ads.mjs` (1.5.4): `node dev/check_ads.mjs` (저장소 맨 위에서, toss의 esbuild를 써요). 가짜 애드몹으로 동의가 광고를 허락할 때만 광고를 준비하는지 봐요
 - `s43test.py` (1.5.3): 지도 연하게, 도토리 테두리, 평판 아래 학생 수, 이름표 층(캐릭터 위, 눌러서 건물 열기, 유치원 과학실 이름표 숨김), 선생님이 이름표에 가려지지 않는지, 평판 퀘스트 첫 안내(한 번만). 어두운 화면 360px, 밝은 화면 390px. 마지막 줄 PASS면 통과
@@ -44,13 +45,13 @@ Playwright(Python)로 `dev/test.html`을 열어 시험해요. 먼저 `cd dev && 
 
 | 시험 | 무엇을 보나 |
 | --- | --- |
-| `s7test.py` | 웹 판 서버 저장, 복원, 이어하기 코드, 랭킹, 테스트 현황 (가짜 Firebase) |
+| `s7test.py` | 웹 판 서버 저장, 복원, 랭킹, 테스트 현황 (가짜 Firebase) |
 | `s18test.py` | 랭킹 이름 정하기와 바꾸기 (가짜 Firebase) |
 | `s21test.py` | 체험학습 고르기, 출발, 돌아오기, 테마 한 번에 바꾸기 |
 | `s22test.py` | 체험학습 버스, 숲속 운동회 |
 | `s23test.py` | 학교 행사 (소풍, 환영회, 졸업 사진, 학예회) |
 | `s25test.py` | 시설 창과 졸업 탭 문구 |
-| `s26test.py` | 오늘의 미션, 주간 리그 (가짜 Firebase) |
+| `s26test.py` | 오늘의 미션, 주간 리그 (가짜 Firebase). 1.5.6부터 홈 지도 오른쪽 퀘스트 단추로 열어요 |
 | `s27test.py` | 기록 지우기 (가짜 Firebase) |
 | `s28test.py` | 미션 횟수 세기 |
 | `s30test.py` | 튜토리얼 |

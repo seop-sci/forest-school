@@ -60,13 +60,6 @@
           ".read": "auth != null && auth.uid === $uid"
         }
       },
-      "moves": {
-        "$code": {
-          ".read": "auth != null && (!data.exists() || (data.child('at').isNumber() && data.child('at').val() + 1800000 > now))",
-          ".write": "auth != null && (!data.exists() || !newData.exists())",
-          ".validate": "$code.length === 8 && $code.matches(/^[2-9A-HJKMNP-Z]+$/) && newData.hasChildren(['d', 'at', 'from']) && newData.child('d').isString() && newData.child('d').val().length < 200000 && newData.child('from').val() === auth.uid && newData.child('at').isNumber() && newData.child('at').val() <= now"
-        }
-      },
       "admins": {
         "$uid": {
           ".read": "auth != null && auth.uid === $uid",

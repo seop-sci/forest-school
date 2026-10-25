@@ -2,7 +2,7 @@
 <html lang="ko">
 <head>
 <meta charset="utf-8">
-<meta name="forest-version" content="1.5.5">
+<meta name="forest-version" content="1.5.6">
 <meta name="viewport" content="width=device-width, initial-scale=1">
 <meta name="description" content="도토리를 모아 숲속 학교를 키우는 방치형 게임 테스트판이에요.">
 <style>html,body{margin:0}</style>
@@ -501,12 +501,7 @@ label.srow,button.srow{cursor:pointer}
 .rk-school{font-size:12.5px;color:var(--muted);overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
 .rk-score{font-family:var(--font-chalk);font-weight:700;font-size:20px;font-variant-numeric:tabular-nums}
 .rank-empty{margin:12px 4px 0;font-size:13.5px;line-height:1.55;color:var(--muted)}
-/* 다른 기기에서 이어하기, 테스트 현황 */
-.move-code{margin:4px 0 6px;padding:12px;border-radius:14px;background:var(--board);color:var(--chalk);font-family:ui-monospace,"SF Mono",Menlo,Consolas,"Roboto Mono",monospace;font-weight:700;font-size:28px;line-height:1.2;letter-spacing:.1em;-webkit-user-select:all;user-select:all}
-.move-or{display:flex;align-items:center;gap:10px;margin:16px 0 10px;font-size:13px;color:var(--muted)}
-.move-or::before,.move-or::after{content:"";flex:1;height:1px;background:var(--line)}
-.modal .move-msg{min-height:1.4em;margin:8px 0 0;font-size:13px}
-.modal .move-msg.bad{color:var(--danger)}
+/* 계정 학교 고르기, 테스트 현황 */
 .move-from{margin:4px 0 12px;padding:12px 14px;border-radius:14px;background:var(--card);display:flex;flex-direction:column;gap:2px}
 .move-from b{font-family:var(--font-display);font-weight:400;font-size:18px;color:var(--ink)}
 .move-from span{font-size:13px;line-height:1.5;color:var(--muted)}
@@ -1427,7 +1422,7 @@ body{background:radial-gradient(120% 60% at 50% 0%, color-mix(in srgb, var(--pap
     <p class="boot-step" id="bootStep">학교 문을 여는 중...</p>
     <p class="boot-tip" id="bootTip">학교 문을 여는 중이에요</p>
   </div>
-  <span class="boot-ver" id="bootVer">v1.5.5</span>
+  <span class="boot-ver" id="bootVer">v1.5.6</span>
 </div>
 
 <div class="app on-school" id="app">
@@ -1728,7 +1723,6 @@ body{background:radial-gradient(120% 60% at 50% 0%, color-mix(in srgb, var(--pap
       <h3 class="panel-sub">학교 기록</h3>
       <div class="slist">
         <button class="srow" type="button" id="optAcct" hidden><span class="txt"><b id="acctTitle">구글 계정 연결</b><small id="acctSub">연결해 두면 휴대폰을 바꿔도 같은 학교를 이어 해요</small></span><svg viewBox="0 0 24 24" width="20" height="20" aria-hidden="true"><path d="M9 6l6 6-6 6" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"/></svg></button>
-        <button class="srow" type="button" id="optMove" hidden><span class="txt"><b>다른 기기에서 이어하기</b><small>코드로 이 학교를 다른 휴대폰이나 브라우저로 옮겨요</small></span><svg viewBox="0 0 24 24" width="20" height="20" aria-hidden="true"><path d="M9 6l6 6-6 6" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"/></svg></button>
         <button class="srow" type="button" id="optTut"><span class="txt"><b>튜토리얼</b><small id="tutSub">학교를 꾸려 가는 방법을 다시 봐요</small></span><svg viewBox="0 0 24 24" width="20" height="20" aria-hidden="true"><path d="M9 6l6 6-6 6" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"/></svg></button>
         <div class="srow" id="resetRow"><span class="txt"><b>처음부터 다시</b><small>수료증과 전학 온 친구들까지 모두 지워요</small></span><button class="btn-danger" type="button" id="optReset">초기화</button></div>
         <div class="srow" id="delRow" hidden><span class="txt"><b>계정과 서버 기록 지우기</b><small>서버에 저장된 학교, 랭킹, 구글 계정 연결을 모두 지워요</small></span><button class="btn-danger" type="button" id="optDel">지우기</button></div>
@@ -1743,7 +1737,7 @@ body{background:radial-gradient(120% 60% at 50% 0%, color-mix(in srgb, var(--pap
       </div>
       <h3 class="panel-sub">정보</h3>
       <dl class="info">
-        <div id="verRow"><dt>버전</dt><dd>v1.5.5</dd></div>
+        <div id="verRow"><dt>버전</dt><dd>v1.5.6</dd></div>
         <div id="pidRow" hidden><dt>학교 번호</dt><dd id="infoPid"></dd></div>
       </dl>
       <div id="devBox" hidden>
@@ -1993,27 +1987,6 @@ body{background:radial-gradient(120% 60% at 50% 0%, color-mix(in srgb, var(--pap
 </div>
 
 
-<div class="overlay center" id="mMove" hidden>
-  <div class="backdrop" data-close-move></div>
-  <section class="modal" role="dialog" aria-modal="true" aria-labelledby="moveTitle">
-    <h2 id="moveTitle">다른 기기에서 이어하기</h2>
-    <div id="moveMain">
-      <p>코드를 만들어 다른 기기에서 넣으면 이 학교를 그대로 이어서 할 수 있어요.</p>
-      <div class="move-code" id="moveCode" hidden></div>
-      <p class="fine" id="moveFine" hidden>다른 기기에서 30분 안에 넣어 주세요. 지금 모습 그대로 옮겨 가요.</p>
-      <button class="cta small" type="button" id="moveMake">코드 만들기</button>
-      <div class="move-or">다른 기기에서 만든 코드가 있다면</div>
-      <form class="rank-form" id="moveForm"><input id="moveInput" maxlength="12" autocomplete="off" autocapitalize="characters" spellcheck="false" enterkeyhint="go" placeholder="예: K7QM-2XPA" aria-label="이어하기 코드"><button class="cta" type="submit">불러오기</button></form>
-      <p class="move-msg" id="moveMsg" role="status"></p>
-    </div>
-    <div id="moveAsk" hidden>
-      <div class="move-from"><b id="moveFromName"></b><span id="moveFromInfo"></span></div>
-      <p>이 기기의 지금 학교 대신 이 학교로 바꿀까요? 지금 학교는 지워져요.</p>
-      <div class="btn-row"><button class="btn-sub" type="button" id="moveNo">취소</button><button class="cta" type="button" id="moveYes">바꾸기</button></div>
-    </div>
-    <button class="btn-sub btn-close" type="button" id="moveClose">닫기</button>
-  </section>
-</div>
 
 <div class="overlay center" id="mNick" hidden>
   <div class="backdrop"></div>
@@ -2672,10 +2645,10 @@ body{background:radial-gradient(120% 60% at 50% 0%, color-mix(in srgb, var(--pap
     qr: {}, qKey: '', guideKey: null,
     adOpen: false, adTimer: 0, adOk: null, adNo: null, adEarned: false, gKey: '', townStage: -1, townTier: -1,
     deal: null, dealT: DEAL.first, boostUntil: 0, boostT: BOOSTW.first, fitKey: '', fitGen: 0, yearKey: '', oakN: -1, oakHintAt: 0, rankEdit: false,
-    adopting: false, moveParam: '', moveIn: null, moveBusy: false, adNoGold: false, shopPick: ''
+    adopting: false, adNoGold: false, shopPick: ''
   };
   if (motionMQ && motionMQ.addEventListener) motionMQ.addEventListener('change', e => { rt.reduced = e.matches; });
-  // 헷갈리는 0, O, 1, I, L을 뺀 글자로 학교 번호와 이어하기 코드를 만들어요
+  // 헷갈리는 0, O, 1, I, L을 뺀 글자로 학교 번호를 만들어요
   const ID_ABC = '23456789ABCDEFGHJKMNPQRSTUVWXYZ';
   function randCode(n) {
     const a = new Uint32Array(n);
@@ -2685,7 +2658,7 @@ body{background:radial-gradient(120% 60% at 50% 0%, color-mix(in srgb, var(--pap
   }
   // 서버 저장 상태. GitHub 테스트판에서만 켜져요 (아래 '서버 저장'에 자세히 적었어요)
   const Cloud = { state: 'off', gen: 0, fb: null, db: null, uid: null, dirty: false, pushing: false, lastPush: 0, lastStats: 0, timer: 0,
-    offset: 0, online: true, err: '', bootHadSave: false, skipRestore: false, listening: false, moveCode: '', moveAt: 0 };
+    offset: 0, online: true, err: '', bootHadSave: false, skipRestore: false, listening: false };
 
   // q.m: 지금 메인 퀘스트 번호, q.mb: 그 퀘스트를 시작할 때의 기준값, q.subs: 받아 둔 학생 부탁들
   // mid: 지금 메인 퀘스트의 id. 퀘스트 목록이 바뀌어도 이어서 할 수 있게 저장해요
@@ -2998,6 +2971,19 @@ body{background:radial-gradient(120% 60% at 50% 0%, color-mix(in srgb, var(--pap
       }
     }
     return String(n);
+  }
+  // 1.5.6: 위쪽 줄 도토리 칸은 두 단위까지 보여 줘요 (2억 5438만, 3조 3402억). 다른 곳은 fmt처럼 짧게
+  function fmt2(n) {
+    n = Math.floor(n + 1e-9);
+    if (!isFinite(n) || n < 0) return fmt(n);
+    if (S && S.units === 'en') return n < 1e6 ? n.toLocaleString('en-US') : fmtEn(n);
+    if (n < 10000) return n.toLocaleString('ko-KR');
+    const U = [['양', 1e28], ['자', 1e24], ['해', 1e20], ['경', 1e16], ['조', 1e12], ['억', 1e8], ['만', 1e4]];
+    const [u, v] = U.find(([, x]) => n >= x);
+    const hi = Math.floor(n / v), lo = Math.max(0, Math.floor(n / (v / 1e4)) - hi * 1e4);
+    const i = U.findIndex(([x]) => x === u), u2 = i + 1 < U.length ? U[i + 1][0] : '';
+    const head = (hi >= 1e4 ? hi.toLocaleString('ko-KR') : String(hi)) + u;
+    return lo > 0 ? `${head} ${Math.min(9999, lo)}${u2}` : head;
   }
   // K, M, B, T 다음은 방치형 게임에서 흔한 aa, ab, ac ... (1000배씩)
   const EN_UNITS = ['', 'K', 'M', 'B', 'T'];
@@ -3927,7 +3913,7 @@ body{background:radial-gradient(120% 60% at 50% 0%, color-mix(in srgb, var(--pap
 
   /* ---------- 화면 그리기 ---------- */
   function renderHUD() {
-    $('#vBudget').textContent = fmt(S.budget);
+    $('#vBudget').textContent = fmt2(S.budget);
     $('#vRate').textContent = `초당 +${fmtRate(rate())}${feastOn() ? ' ×2' : ''}`;
     renderDeal();
     $('#vStudents').textContent = `${Math.floor(S.students)}/${capacity()}`;
@@ -5039,13 +5025,11 @@ body{background:radial-gradient(120% 60% at 50% 0%, color-mix(in srgb, var(--pap
        forest/saves/<내 id>  게임 저장. 나만 읽고 써요
        forest/rank/<내 id>   랭킹 이름과 학교 점수
        forest/stats/<내 id>  테스트 현황 (어디까지 했는지, 얼마나 했는지)
-       forest/moves/<코드>   다른 기기로 옮길 때 30분 동안 맡겨 두는 학교
      <내 id>는 Firebase 익명 로그인이 기기(브라우저)마다 만들어 줘요. */
-  const VERSION = '1.5.5';
+  const VERSION = '1.5.6';
   const CLOUD_PUSH = 20000;   // 바뀐 게 있으면 20초마다 올려요
   const STATS_PUSH = 60000;   // 테스트 현황은 1분마다
   const CLOUD_WAIT = 15000;   // 서버가 이만큼 답이 없으면 이 기기에만 저장해요
-  const MOVE_MIN = 30;        // 이어하기 코드는 30분 동안 써요
   const hasCloudBuild = () => typeof window.FOREST_FB !== 'undefined';
   const cloudOn = () => Cloud.state === 'on';
   const waitFor = (p, ms) => Promise.race([p, new Promise((_, no) => setTimeout(() => no({ code: 'timeout' }), ms))]);
@@ -5140,7 +5124,6 @@ body{background:radial-gradient(120% 60% at 50% 0%, color-mix(in srgb, var(--pap
       renderCloudInfo();
       cloudPush(true);
       rankAfterCloud();
-      if (rt.moveParam) { const c = rt.moveParam; rt.moveParam = ''; queueModal(() => openMove(c)); }
     } catch (e) {
       if (g !== Cloud.gen) return;
       Cloud.state = 'error'; Cloud.err = cloudErrKey(e);
@@ -5259,70 +5242,11 @@ body{background:radial-gradient(120% 60% at 50% 0%, color-mix(in srgb, var(--pap
     }
     const dd = $('#infoSave');
     if (dd.textContent !== t) dd.textContent = t;
-    $('#optMove').hidden = !cloudOn() || !!window.FOREST_STORE;   // 구글 플레이 판은 구글 계정 연결로 옮겨요
     renderAcct();
     $('#delRow').hidden = !cloudOn() || !!AIT;
     $('#devStats').hidden = !hasCloudBuild();
     $('#pidRow').hidden = !hasCloudBuild() || !!window.FOREST_STORE;   // 학교 번호는 테스트판에서만 보여요
     $('#infoPid').textContent = '#' + S.pid.slice(0, 4);
-  }
-
-  /* 다른 기기에서 이어하기: 이 기기에서 코드를 만들면 지금 학교를 forest/moves/<코드>에 30분 동안 맡겨 두고,
-     다른 기기에서 그 코드를 넣으면 학교를 받아 와요. 코드는 한 번 쓰면 지워져요 */
-  const moveShow = c => c.slice(0, 4) + '-' + c.slice(4);
-  const moveClean = v => String(v || '').toUpperCase().replace(/[^0-9A-Z]/g, '');
-  const moveLive = () => !!Cloud.moveCode && Date.now() - Cloud.moveAt < MOVE_MIN * 60000;
-  function moveMsg(t, bad) {
-    const el = $('#moveMsg');
-    el.textContent = t;
-    el.classList.toggle('bad', !!bad);
-  }
-  function renderMove() {
-    const live = moveLive();
-    $('#moveCode').hidden = !live; $('#moveFine').hidden = !live;
-    if (live) $('#moveCode').textContent = moveShow(Cloud.moveCode);
-    $('#moveMake').textContent = live ? '이어하기 링크 복사' : '코드 만들기';
-  }
-  function openMove(prefill) {
-    if (!cloudOn()) { toast('서버에 연결되면 쓸 수 있어요'); return false; }
-    rt.moveIn = null;
-    $('#moveMain').hidden = false; $('#moveAsk').hidden = true; $('#moveClose').hidden = false;
-    $('#moveYes').removeAttribute('aria-disabled');
-    $('#moveInput').value = prefill ? moveShow(moveClean(prefill)) : '';
-    moveMsg('');
-    renderMove();
-    openModal($('#mMove'));
-    if (prefill) loadMove(prefill);
-    return true;
-  }
-  async function makeMove() {
-    if (!cloudOn() || rt.moveBusy) return;
-    rt.moveBusy = true;
-    moveMsg('코드를 만드는 중이에요');
-    save();
-    const ref = Cloud.db.ref('forest/moves');
-    if (Cloud.moveCode) { ref.child(Cloud.moveCode).remove().catch(() => {}); Cloud.moveCode = ''; }   // 예전 코드는 지워요
-    let code = '';
-    for (let i = 0; i < 3 && !code; i++) {
-      const c = randCode(8);
-      try {
-        await waitFor(ref.child(c).set({ d: JSON.stringify(S), at: Cloud.fb.database.ServerValue.TIMESTAMP, from: Cloud.uid, v: VERSION }), CLOUD_WAIT);
-        code = c;
-      } catch (e) { if (cloudErrKey(e) === 'net') break; }   // 같은 코드가 이미 있으면 다른 코드로 다시 해요
-    }
-    rt.moveBusy = false;
-    if (!code) { moveMsg('코드를 만들지 못했어요. 인터넷 연결을 확인하고 다시 해 보세요', true); return; }
-    Cloud.moveCode = code; Cloud.moveAt = Date.now();
-    try { localStorage.setItem('forest-move-code', code); } catch (e) { /* 무시 */ }
-    moveMsg('');
-    renderMove();
-    sfx('quest');
-  }
-  async function copyMove() {
-    const link = window.FOREST_STORE ? moveShow(Cloud.moveCode) : location.origin + location.pathname + '?move=' + Cloud.moveCode;   // 앱에서는 코드만 복사해요
-    let ok = false;
-    try { await navigator.clipboard.writeText(link); ok = true; } catch (e) { ok = false; }
-    toast(ok ? (window.FOREST_STORE ? '코드를 복사했어요' : '링크를 복사했어요. 다른 기기에서 열어 주세요') : '복사하지 못했어요. 코드를 직접 적어 주세요');
   }
 
   /* 구글 계정 연결 (안드로이드 판에만 window.FOREST_GOOGLE이 있어요)
@@ -5409,55 +5333,6 @@ body{background:radial-gradient(120% 60% at 50% 0%, color-mix(in srgb, var(--pap
     if (rt.modalOpen) closeModal(rt.modalOpen);
     setTimeout(() => openModal($('#mAcct')), 200);
   }
-  async function loadMove(raw) {
-    const code = moveClean(raw);
-    if (!cloudOn() || rt.moveBusy) return;
-    if (code.length !== 8) { moveMsg('코드 8자리를 넣어 주세요', true); return; }
-    if (code === Cloud.moveCode) { moveMsg('이 기기에서 만든 코드예요. 다른 기기에서 넣어 주세요', true); return; }
-    rt.moveBusy = true;
-    moveMsg('학교를 찾는 중이에요');
-    let v = null;
-    try { v = (await waitFor(Cloud.db.ref('forest/moves/' + code).once('value'), CLOUD_WAIT)).val(); }
-    catch (e) {
-      rt.moveBusy = false;
-      // 1.5.4: 30분이 지난 코드는 서버 규칙이 읽기를 막아요. 지난 코드는 지워 둬요 (누구나 지울 수 있어요)
-      if (cloudErrKey(e) === 'rules') { Cloud.db.ref('forest/moves/' + code).remove().catch(() => {}); moveMsg('코드를 만든 지 30분이 지났어요. 새 코드를 만들어 주세요', true); return; }
-      moveMsg('학교를 찾지 못했어요. 인터넷 연결을 확인해 주세요', true); return;
-    }
-    rt.moveBusy = false;
-    if (!v || typeof v.d !== 'string') { moveMsg('그런 코드가 없어요. 이미 썼거나 잘못 적었는지 확인해 주세요', true); return; }
-    if (v.from === Cloud.uid) { moveMsg('이 기기에서 만든 코드예요. 다른 기기에서 넣어 주세요', true); return; }
-    if (!(Date.now() + Cloud.offset - Number(v.at) < MOVE_MIN * 60000)) {
-      Cloud.db.ref('forest/moves/' + code).remove().catch(() => {});
-      moveMsg('코드를 만든 지 30분이 지났어요. 새 코드를 만들어 주세요', true);
-      return;
-    }
-    let inc = null;
-    try { inc = sanitize(JSON.parse(v.d)); } catch (e) { inc = null; }
-    if (!inc) { moveMsg('학교 기록을 읽지 못했어요', true); return; }
-    rt.moveIn = { code, d: v.d };
-    moveMsg('');
-    const T = TIERS[inc.tier], y = Math.min(inc.tg + 1, T.years);
-    $('#moveFromName').textContent = inc.rank.name ? `${inc.rank.name}의 학교` : '옮겨 올 학교';
-    $('#moveFromInfo').textContent = `${T.school} ${y}${T.unit}, ${CFG.grades[inc.grade].name} 학교, 학교 파워 ${fmt(pwOf(inc))}`;
-    $('#moveMain').hidden = true; $('#moveAsk').hidden = false; $('#moveClose').hidden = true;
-    $('#moveYes').focus({ preventScroll: true });
-  }
-  async function confirmMove() {
-    const m = rt.moveIn;
-    if (!m || !cloudOn() || $('#moveYes').getAttribute('aria-disabled') === 'true') return;
-    $('#moveYes').setAttribute('aria-disabled', 'true');
-    // 코드는 한 번만 쓰게 지우고, 이 기기의 지금 학교가 랭킹에 있었다면 빼요
-    try { await waitFor(Cloud.db.ref('forest/moves/' + m.code).remove(), CLOUD_WAIT); } catch (e) { /* 못 지워도 30분이 지나면 못 써요 */ }
-    if (S.rank.joined) { try { await waitFor(Cloud.db.ref('forest/rank/' + Cloud.uid).remove(), CLOUD_WAIT); } catch (e) { /* 무시 */ } }
-    const r = adoptSave(m.d, '다른 기기의 학교를 옮겨 왔어요');
-    if (r === 'ok') return;
-    rt.moveIn = null;
-    $('#moveYes').removeAttribute('aria-disabled');
-    $('#moveAsk').hidden = true; $('#moveMain').hidden = false; $('#moveClose').hidden = false;
-    moveMsg(r === 'storage' ? CLOUD_ERR.storage : '학교 기록을 읽지 못했어요', true);
-  }
-
   /* 테스트 현황 (개발자 메뉴): forest/stats를 읽어 테스터마다 어디까지 했는지 보여요.
      같은 학교가 기기를 옮겼으면 가장 최근 기록 하나만 보여요 */
   const ENV_NAME = { kakao: '카카오톡', mobile: '휴대폰', pc: '컴퓨터' };
@@ -7111,10 +6986,38 @@ body{background:radial-gradient(120% 60% at 50% 0%, color-mix(in srgb, var(--pap
     $('#feverFx').hidden = !on || rt.reduced;
   }
   let feverTimer = 0;
+  // 1.5.6: 카운트다운 알림판이 행사 자리(광장, 운동장)를 가리지 않게 행사 자리 아래에 띄워요. 아래에 자리가 없으면 위에 띄워요
+  function banSpot() {
+    let top, bot;
+    if (rt.sports) { top = SPORTS.cy - SPORTS.ry - 24; bot = SPORTS.cy + SPORTS.ry + 8; }
+    else if (rt.fest) {
+      const form = FEST[rt.fest.id].form;
+      if (form === 'free') return null;   // 보물찾기는 지도 곳곳에서 해요
+      top = pzy() - 84; bot = pzy() + (form === 'stage' ? 58 : 50);
+    } else return null;
+    const m = layerKids.getScreenCTM && layerKids.getScreenCTM();
+    if (!m) return null;
+    const a = new DOMPoint(pzx(), top).matrixTransform(m), z = new DOMPoint(pzx(), bot).matrixTransform(m);
+    return [a.y, z.y];
+  }
+  function placeBanner(b) {
+    b.style.top = '';
+    const sp = banSpot();
+    if (!sp) return;
+    const h = b.offsetHeight, gap = 14;
+    const tabs = $('.tabs'), low = (tabs && tabs.getBoundingClientRect().top) || innerHeight;
+    const hud = $('#festBar:not([hidden]), #sportsBar:not([hidden])'), high = hud ? hud.getBoundingClientRect().bottom : 0;
+    let c = sp[1] + gap + h / 2;
+    if (c + h / 2 > low - 8) {
+      const up = sp[0] - gap - h / 2;
+      c = up - h / 2 >= high + 8 ? up : low - 8 - h / 2;
+    }
+    b.style.top = Math.round(c) + 'px';
+  }
   function feverBanner(big, small, ms) {
     const b = $('#feverBan');
     $('#fvBig').textContent = big; $('#fvSmall').textContent = small || '';
-    b.hidden = false; b.classList.remove('pop'); void b.offsetWidth; b.classList.add('pop');
+    b.hidden = false; placeBanner(b); b.classList.remove('pop'); void b.offsetWidth; b.classList.add('pop');
     clearTimeout(feverTimer);
     if (ms) feverTimer = setTimeout(() => { b.hidden = true; }, ms);
   }
@@ -8146,7 +8049,7 @@ body{background:radial-gradient(120% 60% at 50% 0%, color-mix(in srgb, var(--pap
       } catch (er) { return false; }
     }
   }
-  // 계정 지우기: 서버의 저장, 랭킹, 테스트 기록, 이어하기 코드를 지우고 Firebase 계정(익명, 구글 연결)도 지운 뒤 새 학교로 다시 열어요.
+  // 계정 지우기: 서버의 저장, 랭킹, 테스트 기록을 지우고 Firebase 계정(익명, 구글 연결)도 지운 뒤 새 학교로 다시 열어요.
   // 계정만 못 지웠으면 표시를 남겨 두고, 다음에 열 때 서버에 새로 올리기 전에 다시 지워요
   async function deleteAccount() {
     if (!cloudOn() || rt.deleting) return;
@@ -8154,14 +8057,9 @@ body{background:radial-gradient(120% 60% at 50% 0%, color-mix(in srgb, var(--pap
     const btn = $('#delYes'); btn.disabled = true; btn.textContent = '지우는 중';
     const uid = Cloud.uid;
     rt.adopting = true;   // 지우는 동안 다시 저장하지 않아요
-    // 1.5.4: 이어하기 코드에 맡겨 둔 학교 복사본도 함께 지워요
-    let mc = Cloud.moveCode;
-    try { mc = mc || localStorage.getItem('forest-move-code') || ''; } catch (e) { /* 무시 */ }
     const refs = ['saves', 'rank', 'stats'].map(k => Cloud.db.ref(`forest/${k}/${uid}`));
     try { await Promise.all(refs.map(r => r.remove())); }
     catch (e) { rt.deleting = false; rt.adopting = false; btn.disabled = false; btn.textContent = '모두 지우기'; toast('서버 기록을 지우지 못했어요. 인터넷을 확인하고 다시 해 주세요'); return; }
-    if (mc) { try { await waitFor(Cloud.db.ref('forest/moves/' + mc).remove(), CLOUD_WAIT); } catch (e) { /* 30분이 지나면 서버 규칙이 읽기를 막아요 */ } }
-    try { localStorage.removeItem('forest-move-code'); } catch (e) { /* 무시 */ }
     const gone = await deleteAuthUser(true);
     if (!gone) delPending(true);
     try { localStorage.removeItem(SAVE_KEY); sessionStorage.setItem('forest-adopt', gone ? '계정과 서버 기록을 모두 지웠어요. 새 학교로 시작해요' : '서버 기록은 지웠어요. 계정은 아직 남아 있어서 다음에 열 때 다시 지워요'); } catch (e) { /* 무시 */ }
@@ -8336,17 +8234,10 @@ body{background:radial-gradient(120% 60% at 50% 0%, color-mix(in srgb, var(--pap
     $('#shopNo').addEventListener('click', () => { rt.shopPick = ''; renderShop(); });
     $('#shopYes').addEventListener('click', buyShop);
     $('#shopAd').addEventListener('click', shopAd);
-    // 서버 저장: 다른 기기에서 이어하기, 테스트 현황
-    $('#optMove').addEventListener('click', () => { sfx('tap'); openMove(); });
+    // 서버 저장: 구글 계정 연결, 테스트 현황
     $('#optAcct').addEventListener('click', () => { sfx('tap'); linkGoogle(); });
     $('#acctLoad').addEventListener('click', () => { const a = rt.acctPick; if (a) adoptSave(a.d, '구글 계정의 학교를 불러왔어요'); });
     $('#acctKeep').addEventListener('click', () => { const a = rt.acctPick; if (a) adoptSave(a.local, '이 폰의 학교를 구글 계정에 저장했어요'); });
-    $('#moveMake').addEventListener('click', () => { if (moveLive()) copyMove(); else makeMove(); });
-    $('#moveForm').addEventListener('submit', e => { e.preventDefault(); loadMove($('#moveInput').value); });
-    $('#moveYes').addEventListener('click', confirmMove);
-    $('#moveNo').addEventListener('click', () => { rt.moveIn = null; $('#moveAsk').hidden = true; $('#moveMain').hidden = false; $('#moveClose').hidden = false; moveMsg(''); });
-    $('#moveClose').addEventListener('click', () => closeModal($('#mMove')));
-    $('[data-close-move]').addEventListener('click', () => { if (!rt.moveIn) closeModal($('#mMove')); });
     $('#devStats').addEventListener('click', openStats);
     $('#statsReload').addEventListener('click', loadStats);
     $('#stKeyForm').addEventListener('submit', submitAdminKey);
@@ -8564,7 +8455,6 @@ body{background:radial-gradient(120% 60% at 50% 0%, color-mix(in srgb, var(--pap
       else if (rt.modalOpen === $('#mBoost')) closeModal($('#mBoost'));
       else if (rt.modalOpen === $('#mAtt')) closeModal($('#mAtt'));
       else if (rt.modalOpen === $('#mDeal')) closeModal($('#mDeal'));
-      else if (rt.modalOpen === $('#mMove') && !rt.moveIn) closeModal($('#mMove'));
       else if (rt.modalOpen === $('#mStats')) closeModal($('#mStats'));
       else if (rt.modalOpen === $('#mTrip')) closeModal($('#mTrip'));
       else if (rt.modalOpen === $('#mSports')) closeModal($('#mSports'));
@@ -8622,14 +8512,15 @@ body{background:radial-gradient(120% 60% at 50% 0%, color-mix(in srgb, var(--pap
     checkGrade();
     renderCloudInfo();
     applyCos(); renderShopBtn();
-    // GitHub 테스트판: 서버에 연결해서 저장을 맞춰요. 이어하기 링크(?move=코드)로 열었으면 연결된 뒤 코드 창을 띄워요
+    // GitHub 테스트판: 서버에 연결해서 저장을 맞춰요
     if (hasCloudBuild()) {
       Cloud.state = 'idle';
       Cloud.bootHadSave = hadSave;
       Cloud.skipRestore = adopted !== null;
+      // 1.5.6: 이어하기 코드 기능을 뺐어요. 예전 링크(?move=)는 주소에서만 지우고, 남은 코드 기록도 지워요
       try {
-        const m = new URLSearchParams(location.search).get('move');
-        if (m) { rt.moveParam = m; history.replaceState(null, '', location.pathname + location.hash); }
+        if (new URLSearchParams(location.search).has('move')) history.replaceState(null, '', location.pathname + location.hash);
+        localStorage.removeItem('forest-move-code');
       } catch (e) { /* 무시 */ }
       initCloud();
     }
@@ -8674,7 +8565,7 @@ body{background:radial-gradient(120% 60% at 50% 0%, color-mix(in srgb, var(--pap
 
   // 시험용 손잡이: 자동 시험(window.__FOREST_TEST)에서만 게임 속 함수를 꺼내 써요
   if (window.__FOREST_TEST) window.__forest = { get S() { return S; }, get Cloud() { return Cloud; }, rt, makeDeal, furStage, DEAL, navInfo, navRoute, spawnDrop, repTipCheck, linkGoogle, retryCloud, sanitize, acctPending, renderMap, renderHUD, renderAffordance, syncKids, layoutMap, geo, startTrial, hitTrial, endTrial, startVisit, endVisit, showReward, recommend, needCost, prepTopUp, qReward, prepPhase, rankScore, pwOf, previewDip, dipMult, costScale, buyFacility, buyFur, buyFurAll, furCost, furReady, furDone, FUR, startTalk, endTalk, teacherAct, facCost, teaCost, facKeys, rate, rep, capacity, canGraduate, canPromote,
-    graduate, promote, buyPerk, perkCost, perkMaxed, buyFundPerk, fpCost, claimMain, mainReady, curMain, qNo, earn, CFG, TEA, teaMaxed, PERKS, FPERKS, MAIN, finalYear, startTrip, claimTrip, TRIPS, yearLocked, startSports, endSports, rtSports: () => rt.sports, startFest, rtFest: () => rt.fest, facCap, addLeague, weekIdx, addMP, tutStart, endFest, claimSports, claimBox, musicWant, askBox, festWait, setTab, openSheet, closeSheet };
+    fmt, fmt2, graduate, promote, buyPerk, perkCost, perkMaxed, buyFundPerk, fpCost, claimMain, mainReady, curMain, qNo, earn, CFG, TEA, teaMaxed, PERKS, FPERKS, MAIN, finalYear, startTrip, claimTrip, TRIPS, yearLocked, startSports, endSports, rtSports: () => rt.sports, startFest, rtFest: () => rt.fest, facCap, addLeague, weekIdx, addMP, tutStart, endFest, claimSports, claimBox, musicWant, askBox, festWait, setTab, openSheet, closeSheet };
   if (window.claude && window.claude.hot && window.claude.hot.snapshot) {
     try { window.claude.hot.snapshot(() => { if (S) syncMid(); return { save: S }; }); } catch (e) { /* 무시 */ }
   }
