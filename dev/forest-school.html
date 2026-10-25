@@ -1147,7 +1147,9 @@ body{background:radial-gradient(120% 60% at 50% 0%, color-mix(in srgb, var(--pap
 .sidebtn .sb-ring{width:44px;height:44px;box-sizing:border-box;border-radius:14px;border:2px solid var(--wood);background:color-mix(in srgb, var(--paper) 94%, transparent);box-shadow:0 3px 0 var(--wood-dark);display:grid;place-items:center}
 .sidebtn:active .sb-ring{transform:translateY(2px);box-shadow:0 1px 0 var(--wood-dark)}
 .sidebtn .tic{width:32px;height:32px}
-.sidebtn .sb-svg svg{width:26px;height:26px;color:var(--wood-dark)}
+.sidebtn .sb-svg svg{width:26px;height:26px;color:#41683A}
+@media (prefers-color-scheme: dark){:root:not([data-theme="light"]) .sidebtn .sb-svg svg{color:#BFE0A8}}
+:root[data-theme="dark"] .sidebtn .sb-svg svg{color:#BFE0A8}
 .map-right .tab.sidebtn .dot{top:-2px;left:auto;right:4px}
 .sidebtn .sb-lb{margin-top:3px;padding:1px 6px;border-radius:8px;background:var(--board);line-height:1.35;white-space:nowrap}
 .sidebtn.soon .sb-ring{opacity:.92}
@@ -1193,8 +1195,8 @@ body{background:radial-gradient(120% 60% at 50% 0%, color-mix(in srgb, var(--pap
 .pw-pop{top:-14px}
 /* 홈: 지도를 앱 전체에 깔아요 */
 .app.on-school .scroller{overflow:visible}
-.app.on-school .stage{position:absolute;inset:0;z-index:0;min-height:0}
-.app.on-school .frame{border:0;border-radius:0;box-shadow:none;background:linear-gradient(#86C3E8 0, #BFE0EE 14%, #6F9A57 24%, #3E6B3A 60%)}
+.app.on-school .stage{position:absolute;inset:0;z-index:auto;min-height:0}
+.app.on-school .frame{z-index:auto;border:0;border-radius:0;box-shadow:none;background:linear-gradient(#86C3E8 0, #BFE0EE 14%, #6F9A57 24%, #3E6B3A 60%)}
 .app.on-school #map{position:absolute;left:0;top:0;touch-action:none;transform-origin:0 0}
 .app.on-school .frame.panning{cursor:grabbing}
 .app.on-school .fallfx,.app.on-school .fever-fx{border-radius:0}
@@ -1205,7 +1207,6 @@ body{background:radial-gradient(120% 60% at 50% 0%, color-mix(in srgb, var(--pap
 .app.on-school .map-left{top:calc(var(--left-h, 150px) + 8px)}
 .app.on-school .map-right{top:calc(var(--hud-h, 100px) + 8px)}
 .app.on-school .deal{bottom:calc(var(--bot-h, 70px) + 10px)}
-.app.on-school .sportsbar:not(.festbar){bottom:calc(var(--bot-h, 70px) + 12px)}
 .app.on-school .tabs{position:relative;z-index:3;margin:0 -6px 8px;border:2px solid var(--line);border-radius:22px;box-shadow:0 4px 14px rgba(20,40,20,.28)}
 /* 퀘스트 칸 접기 */
 .qrow{position:relative}
@@ -1295,6 +1296,10 @@ body{background:radial-gradient(120% 60% at 50% 0%, color-mix(in srgb, var(--pap
   .tcard .tav svg{width:46px;height:46px}
   .tcard .cta{white-space:nowrap;padding-inline:12px}
 }
+
+/* 홈에서는 알림과 행사 점수판을 위쪽 카드 아래, 지도 위에 띄워요 */
+.app.on-school .toast{top:calc(var(--left-h, 150px) + 10px);border:2px solid color-mix(in srgb, #8FBF7C 55%, transparent);box-shadow:0 6px 16px rgba(10,25,15,.35)}
+.app.on-school .sportsbar{top:calc(var(--left-h, 150px) + 10px) !important}
 </style>
 
 <div class="boot" id="boot" role="status" aria-label="숲속 동물 학교를 여는 중이에요">
@@ -3152,7 +3157,7 @@ body{background:radial-gradient(120% 60% at 50% 0%, color-mix(in srgb, var(--pap
     { map: 'map_kinder',
       b: { science: pct(51, 25, 36), classroom: pct(27, 42, 34), cafeteria: pct(75, 42, 34), library: pct(29, 64, 34), playground: pct(77, 65, 34) },
       next: { at: pct(51, 25, 36), img: 'bld_classroom_lock', tag: '초등학교에서 열려요', name: '과학실' },
-      oak: [306, 398], plaza: [180, 221], gate: [180, 492], bus: [204, 424], drop: [180, 300, 26, 40],
+      oak: [306, 382], plaza: [180, 221], gate: [180, 492], bus: [204, 424], drop: [180, 300, 26, 40],
       spots: [[136, 221], [224, 221], [150, 248], [210, 248], [180, 256], [180, 186], [150, 196], [210, 196], [180, 286], [176, 322], [184, 356], [180, 392], [118, 214], [244, 214], [124, 338], [250, 326], [272, 312], [296, 306]],
       tea: { hedgehog: [62, 214, 0.6], squirrel: [140, 214, 0.63], bear: [318, 336, 0.72], owl: [150, 330, 0.72], owlAway: [36, 300, 0.63] },
       deco: [[64, 110], [300, 104], [22, 236], [340, 258], [66, 424], [306, 432], [140, 384], [228, 388]],
@@ -3160,7 +3165,7 @@ body{background:radial-gradient(120% 60% at 50% 0%, color-mix(in srgb, var(--pap
     { map: 'map_elem',
       b: { science: pct(50, 24, 36), classroom: pct(24, 36, 31), cafeteria: pct(80, 35, 30), library: pct(23, 59, 30), playground: pct(77, 62, 40) },
       next: { at: pct(49, 66, 28), img: 'bld_cafeteria_lock', tag: '중학교에서 열려요', name: '매점' },
-      oak: [302, 388], plaza: [179, 196], gate: [180, 492], bus: [204, 430], drop: [180, 238, 40, 14],
+      oak: [302, 376], plaza: [179, 196], gate: [180, 492], bus: [204, 430], drop: [180, 238, 40, 14],
       spots: [[134, 196], [224, 196], [152, 226], [206, 226], [179, 236], [179, 158], [146, 170], [212, 170], [122, 200], [240, 186], [180, 360], [178, 396], [182, 432], [120, 236], [226, 250], [150, 250], [206, 252], [180, 270]],
       tea: { hedgehog: [52, 178, 0.57], squirrel: [122, 180, 0.6], bear: [338, 300, 0.72], owl: [126, 300, 0.69], owlAway: [30, 290, 0.63] },
       deco: [[56, 66], [312, 70], [22, 312], [338, 196], [60, 420], [302, 424], [128, 380], [236, 392]],
@@ -3425,6 +3430,9 @@ body{background:radial-gradient(120% 60% at 50% 0%, color-mix(in srgb, var(--pap
       if (d > bestD) { bestD = d; best = [x, y]; }
       if (d >= 26) break;
     }
+    // 위쪽 UI와 아래 탭 막대에 가려지지 않는 곳으로 옮겨요
+    const v = visMap();
+    if (v) { best[0] = Math.min(v[2] - 14, Math.max(v[0] + 14, best[0])); best[1] = Math.min(v[3] - 14, Math.max(v[1] + 14, best[1])); }
     return best;
   }
   function spawnDrop(near) {
@@ -3792,12 +3800,18 @@ body{background:radial-gradient(120% 60% at 50% 0%, color-mix(in srgb, var(--pap
     app.style.setProperty('--bot-h', Math.max(0, Math.round(bot)) + 'px');
     rt.hudTop = left; rt.hudBot = bot;
   }
+  // 지금 화면에 보이는 지도 범위(지도 좌표): [왼쪽, 위, 오른쪽, 아래]. 위쪽 UI와 아래 탭 막대에 가린 곳은 빼요
+  function visMap() {
+    const fr = $('.frame'); if (!fr || !rt.mapS || rt.tab !== 'school') return null;
+    const sc = rt.mapS, W = fr.clientWidth, H = fr.clientHeight;
+    return [-(rt.panX || 0) / sc, ((rt.hudTop || 0) - (rt.panY || 0)) / sc - 60, (W - (rt.panX || 0)) / sc, (H - (rt.hudBot || 0) - (rt.panY || 0)) / sc - 60];
+  }
   function panTo(x, y) {
     const fr = $('.frame'), W = fr.clientWidth, H = fr.clientHeight;
     // 지도가 화면보다 작은 쪽은 그 안에서만, 큰 쪽은 빈틈이 보이지 않는 데까지만 움직여요
     const cl = (v, room) => Math.min(Math.max(0, room), Math.max(Math.min(0, room), v));
     rt.panX = cl(x, W - rt.mapW);
-    rt.panY = cl(y, H - rt.mapH);
+    rt.panY = rt.mapH < H ? Math.min(0, Math.max(H - (rt.hudBot || 0) - rt.mapH, y)) : cl(y, H - rt.mapH);
     map.style.transform = `translate(${rt.panX.toFixed(1)}px, ${rt.panY.toFixed(1)}px)`;
   }
   function fitMap(reset) {
@@ -3831,6 +3845,8 @@ body{background:radial-gradient(120% 60% at 50% 0%, color-mix(in srgb, var(--pap
     });
     const end = e => { if (!st || e.pointerId !== st.id) return; if (st.moved) { rt.panMoved = performance.now(); fr.classList.remove('panning'); } st = null; };
     fr.addEventListener('pointerup', end); fr.addEventListener('pointercancel', end);
+    // 지도 판은 스크롤하지 않아요 (키보드로 건물을 옮겨 다닐 때 브라우저가 밀어 두는 것도 되돌려요)
+    fr.addEventListener('scroll', () => { if (fr.scrollLeft || fr.scrollTop) { fr.scrollLeft = 0; fr.scrollTop = 0; } });
     // 지도를 밀고 난 손가락이 떨어질 때 건물이나 도토리가 눌리지 않게 해요
     fr.addEventListener('click', e => { if (rt.panMoved && performance.now() - rt.panMoved < 350) { e.stopPropagation(); e.preventDefault(); } }, true);
     const ro = window.ResizeObserver ? new ResizeObserver(() => fitMap(false)) : null;
@@ -6914,7 +6930,8 @@ body{background:radial-gradient(120% 60% at 50% 0%, color-mix(in srgb, var(--pap
       box.style.top = (below + h < window.innerHeight - 8 ? below : Math.max(8, above)) + 'px';
     };
     if (el && T.scroll) {
-      el.scrollIntoView({ block: 'center', behavior: 'auto' });
+      if (el.closest('#map') && rt.mapS) { const fr = $('.frame').getBoundingClientRect(), q = el.getBoundingClientRect(); panTo((rt.panX || 0) + (fr.left + fr.width / 2) - (q.left + q.width / 2), (rt.panY || 0) + (fr.top + fr.height / 2) - (q.top + q.height / 2)); }
+      else el.scrollIntoView({ block: 'center', behavior: 'auto' });
       requestAnimationFrame(place);
     } else place();
     rt.tutPlace = place;
@@ -7792,6 +7809,7 @@ body{background:radial-gradient(120% 60% at 50% 0%, color-mix(in srgb, var(--pap
     if (t !== 'settings') { $('#resetConfirm').hidden = true; }
     renderQuestBar(); renderSubBar(); renderGuide(); renderTeacherGuide(); updateQuestDot();
     if (t === 'school') requestAnimationFrame(() => fitMap(prev !== 'school' && rt.panX == null));
+    { const bd = $('.board'), scd = $('#schoolCard'); if (bd && bd.classList.contains('open')) { bd.classList.remove('open'); if (scd) scd.setAttribute('aria-expanded', 'false'); } }
     if (t !== 'shop') Music.preview = '';
     musicSync();
   }
@@ -8030,7 +8048,9 @@ body{background:radial-gradient(120% 60% at 50% 0%, color-mix(in srgb, var(--pap
     window.addEventListener('online', () => { if (Cloud.state === 'error' && (Cloud.err === 'net' || Cloud.err === 'load')) retryCloud(); });
     window.addEventListener('resize', refit);
     if (document.fonts && document.fonts.ready) document.fonts.ready.then(() => { rt.fitGen += 1; refit(); }).catch(() => {});
-    $('#b-next').addEventListener('click', () => { const G = geo().next; toast(`${eun(G.name)} ${G.tag}`); sfx('tap'); });
+    const nextTap = () => { const G = geo().next; toast(`${eun(G.name)} ${G.tag}`); sfx('tap'); };
+    $('#b-next').addEventListener('click', nextTap);
+    $('#b-next').addEventListener('keydown', e => { if (e.key === 'Enter' || e.key === ' ') { e.preventDefault(); nextTap(); } });
     $('#oak').addEventListener('click', tapOak);
     $('#oak').addEventListener('keydown', e => { if (e.key === 'Enter' || e.key === ' ') { e.preventDefault(); tapOak(); } });
     $('#subBar').addEventListener('click', e => { const b = e.target.closest('[data-sub]'); if (b) tapSub(b.dataset.sub, b); });
