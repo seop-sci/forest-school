@@ -7612,7 +7612,8 @@ body{background:radial-gradient(120% 60% at 50% 0%, color-mix(in srgb, var(--pap
   const LP = { mission: 10, bonus: 20, festWin: 15, festLose: 5, trip: 10, tripHour: 5, grad: 20, quest: 3 };
   const LG_PRIZE = r => 1;   // 1.1.0: 광고가 아닌 보상은 모두 1개
   // 주는 월요일에 시작해요. 2026년 1월 5일(월)부터 몇 번째 주인지
-  const weekIdx = (d = new Date()) => { const m = new Date(d.getFullYear(), d.getMonth(), d.getDate() - ((d.getDay() + 6) % 7)); return Math.round((m - new Date(2026, 0, 5)) / 604800000); };
+  // 주 번호: 게임 시계의 gameWeek()(한국 시간 월요일 0시 시작, 2026-01-05이 0). 1.6.0 전에는 기기 시간대의 월요일이었는데 번호 체계는 같아요
+  const weekIdx = () => gameWeek();
   function dayHash(str) { let h = 2166136261; for (let i = 0; i < str.length; i++) { h ^= str.charCodeAt(i); h = Math.imul(h, 16777619); } return h >>> 0; }
   // 날이 바뀌면 오늘의 미션 3개를 새로 골라요 (열려 있는 것 가운데에서, 날짜와 학교 번호로 섞어요)
   function dmDay() {
@@ -7675,6 +7676,7 @@ body{background:radial-gradient(120% 60% at 50% 0%, color-mix(in srgb, var(--pap
   function lgWeek() {
     const w = weekIdx();
     if (S.lg.week === w) return;
+    if (w < S.lg.week) return;   // 주 번호가 뒤로 가면(시간대 바꿈, 업데이트 순간) 아무것도 안 해요. 같은 주 번호로 보상을 두 번 주지 않아요
     // 지난주가 끝났어요: 참여했으면 마지막으로 본 순위로 보상
     if (S.lg.week >= 0 && S.lg.pts > 0 && !S.lg.paid) {
       const r = S.lg.pos || 99, g = LG_PRIZE(r);
@@ -7715,6 +7717,7 @@ body{background:radial-gradient(120% 60% at 50% 0%, color-mix(in srgb, var(--pap
   function wkWeek() {
     const w = weekIdx();
     if (S.wk.week === w) return;
+    if (w < S.wk.week) return;   // 주 번호가 뒤로 가면 이번 주 미션과 상자를 다시 열지 않아요
     const ids = Object.keys(WMISSIONS).filter(id => !WMISSIONS[id].ok || WMISSIONS[id].ok());
     let h = dayHash('w' + w + S.pid);
     const pick = [];
@@ -9354,7 +9357,7 @@ body{background:radial-gradient(120% 60% at 50% 0%, color-mix(in srgb, var(--pap
   // 시험용 손잡이: 자동 시험(window.__FOREST_TEST)에서만 게임 속 함수를 꺼내 써요
   if (window.__FOREST_TEST) window.__forest = { get S() { return S; }, get Cloud() { return Cloud; }, rt, makeDeal, furStage, DEAL, navInfo, navRoute, spawnDrop, repTipCheck, linkGoogle, retryCloud, sanitize, acctPending, renderMap, renderHUD, renderAffordance, syncKids, layoutMap, geo, startTrial, hitTrial, endTrial, startVisit, endVisit, showReward, recommend, needCost, prepTopUp, qReward, prepPhase, rankScore, pwOf, previewDip, dipMult, costScale, buyFacility, buyFur, buyFurAll, furCost, furReady, furDone, FUR, startTalk, endTalk, teacherAct, facCost, teaCost, facKeys, rate, rep, capacity, canGraduate, canPromote,
     graduate, promote, buyPerk, perkCost, perkMaxed, buyFundPerk, fpCost, claimMain, mainReady, curMain, qNo, earn, CFG, TEA, teaMaxed, PERKS, FPERKS, MAIN, finalYear, startTrip, claimTrip, TRIPS, yearLocked, startSports, endSports, rtSports: () => rt.sports, startFest, rtFest: () => rt.fest, facCap, addLeague, weekIdx, addMP, tutStart, endFest, claimSports, claimBox, musicWant, askBox, festWait, setTab, openSheet, closeSheet,
-    PZ, PZ_SHAPES, pzFits, pzAnyFit, pzStuck, pzFullLines, pzPlace, pzFreshGame, pzStart, pzFinish, pzLeft, pzCanAd, pzEssOf, pzMinOf, pzHelpSquirrel, pzHelpOwl, pzHelpBear, pzHasHelp, pzRot, pzNewPiece, pzOpen, pzClose, pzGameOver, pzRenderAll, renderMini, addEss, gameNow, gameToday, gameWeek, kstDay, setServerTime, SVR, dmDay, weekIdx, pzDay, goldDay, boostLeft, dealLeft, canStamp };
+    PZ, PZ_SHAPES, pzFits, pzAnyFit, pzStuck, pzFullLines, pzPlace, pzFreshGame, pzStart, pzFinish, pzLeft, pzCanAd, pzEssOf, pzMinOf, pzHelpSquirrel, pzHelpOwl, pzHelpBear, pzHasHelp, pzRot, pzNewPiece, pzOpen, pzClose, pzGameOver, pzRenderAll, renderMini, addEss, gameNow, gameToday, gameWeek, kstDay, setServerTime, SVR, dmDay, weekIdx, lgWeek, wkWeek, lgKey, pzDay, goldDay, boostLeft, dealLeft, canStamp };
   if (window.claude && window.claude.hot && window.claude.hot.snapshot) {
     try { window.claude.hot.snapshot(() => { if (S) syncMid(); return { save: S }; }); } catch (e) { /* 무시 */ }
   }

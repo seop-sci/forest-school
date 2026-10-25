@@ -45,8 +45,24 @@ CHECK = r"""() => {
   rt.fakeNow = T + DAY; eq(used(), [10, 0, 5, F.DEAL.perDay, true, false], '진짜 다음 날: 다시 열림');
   eq([S.dm.day, S.dm.list.every(m => !m.done)], [F.kstDay(T + DAY), true], '오늘의 미션이 한국 시간 새 날에 바뀜');
   void dm0;
-  rt.fakeNow = 0;
-  return bad;
+  // 주간 리그와 이번 주 미션: 주 번호는 gameWeek()와 같고(서버에 올리는 week도 S.lg.week), 번호가 뒤로 가도 보상을 두 번 주지 않아요
+  off(); S.clk.last = 0;
+  const MON = Date.UTC(2026, 10, 1, 15, 0);   // 2026-11-02(월) 0:00 KST
+  rt.fakeNow = MON + DAY; F.lgWeek(); F.wkWeek();
+  const W = F.gameWeek();
+  eq([F.weekIdx(), S.lg.week, S.wk.week, Math.floor(F.lgKey() / 1e6)], [W, W, W, W], '주 번호가 gameWeek와 같음');
+  S.lg.pts = 50; S.lg.pos = 3; const gold0 = S.gold;
+  // (1) 번호가 뒤로 가는 순간(업데이트 때 동쪽 시간대): 보상 없음, 포인트 그대로
+  S.clk.last = 0; rt.fakeNow = MON - 3600000; F.lgWeek(); F.wkWeek();
+  eq([S.lg.week, S.lg.pts, S.wk.week], [W, 50, W], '주 번호가 뒤로 가면 그대로');
+  // (2) 진짜 다음 주: 지난주 보상 한 번(1.5초 뒤 지급), 새 주로
+  rt.fakeNow = MON + 7 * DAY + 3600000; F.lgWeek();
+  eq([S.lg.week, S.lg.pts, S.lg.last && S.lg.last.week, S.lg.last && S.lg.last.pts], [W + 1, 0, W, 50], '다음 주: 지난주 기록 남김');
+  // (3) 같은 주 번호로 다시 불러도 또 주지 않아요. 시계를 뒤로 돌려도 멈춰 있어요
+  F.lgWeek(); rt.fakeNow = MON + DAY; F.lgWeek();
+  eq([S.lg.week, S.lg.last.week], [W + 1, W], '같은 주 번호로는 한 번만');
+  rt.fakeNow = 0; S.clk.last = 0;
+  return [bad, gold0];
 }"""
 
 async def run(b, tz, w):
@@ -55,7 +71,14 @@ async def run(b, tz, w):
     pg = await ctx.new_page(); errs = []; pg.on('pageerror', lambda e: errs.append(str(e)))
     await pg.goto(URL); await pg.wait_for_timeout(800); await pg.evaluate("localStorage.clear()")
     await pg.reload(); await pg.wait_for_timeout(2600); await pg.evaluate(SKIPTUT)
-    bad = await pg.evaluate(CHECK)
+    bad, gold0 = await pg.evaluate(CHECK)
+    await pg.wait_for_timeout(1800)
+    paid = await pg.evaluate(f"{F}.S.gold") - gold0
+    if paid <= 0: bad.append('지난주 리그 보상이 한 번 지급돼야 해요: ' + str(paid))
+    else:
+        # 보상이 두 번 들어가지 않았는지: 1.5초 지급이 한 번뿐
+        await pg.wait_for_timeout(1600)
+        if await pg.evaluate(f"{F}.S.gold") - gold0 != paid: bad.append('지난주 리그 보상이 두 번 들어갔어요')
     # 시간대를 바꿔도 같은 시각이면 같은 날 (UTC 15:30 = 한국 0:30 다음 날, 로스앤젤레스는 전날 오전)
     day = await pg.evaluate(f"(() => {{ {F}.rt.fakeNow = Date.UTC(2026, 10, 1, 15, 30); {F}.S.clk.last = 0; const d = {F}.gameToday(); {F}.rt.fakeNow = 0; return [d, new Date(Date.UTC(2026, 10, 1, 15, 30)).getDate()]; }})()")
     # 저장: clk.last가 남고, 망가진 값은 기기 시간 + 1년까지만
