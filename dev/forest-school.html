@@ -728,6 +728,8 @@ html.ait .app{padding-top:calc(10px + var(--ait-top, 0px));padding-bottom:var(--
 .rank-seg{display:flex;width:100%;margin:0 0 10px}
 .rank-seg button{flex:1}
 .stage.fever .frame{border-color:#F3C04B;animation:feverGlow .8s ease-in-out infinite alternate}
+/* 1.6.0: 행사 중에는 건물을 눌러도 창이 안 열리게 해서, 건물 위에 떨어진 공과 아이템을 바로 누를 수 있어요 */
+.stage.fever .bld .hit{pointer-events:none}
 @keyframes feverGlow{from{box-shadow:0 3px 0 var(--wood-dark),0 0 0 3px rgba(243,192,75,.35),0 0 18px rgba(243,192,75,.45)}to{box-shadow:0 3px 0 var(--wood-dark),0 0 0 6px rgba(243,192,75,.65),0 0 34px rgba(243,192,75,.85)}}
 .fever-fx{position:absolute;inset:0;z-index:2;border-radius:15px;pointer-events:none;overflow:hidden;background:radial-gradient(120% 90% at 50% 50%, transparent 55%, rgba(243,192,75,.35) 100%)}
 .fever-fx i{position:absolute;top:-6%;width:6px;height:10px;border-radius:2px;opacity:.85;animation:confetti 3.2s linear infinite}
@@ -4189,6 +4191,21 @@ body{background:radial-gradient(120% 60% at 50% 0%, color-mix(in srgb, var(--pap
     rt.panY = Math.min(down, Math.max(Math.min(lo, down), y));
     map.style.transform = `translate(${rt.panX.toFixed(1)}px, ${rt.panY.toFixed(1)}px)`;
   }
+  // 1.6.0 학교 행사: 행사 자리(지도 y 범위)가 위쪽 칸과 아래 탭 사이에 다 보이게 지도를 옮겨요. 범위가 더 크면 위쪽을 맞춰요
+  function festFocus(top, bot) {
+    const fr = $('.frame'); if (!fr || !rt.mapS || rt.tab !== 'school') return;
+    const H = fr.clientHeight, sc = rt.mapS, a = (rt.hudTop || 0) + 8, z = H - (rt.hudBot || 0) - 8;
+    const h = (bot - top) * sc, want = h <= z - a ? (a + z) / 2 - ((top + bot) / 2 + 60) * sc : a - (top + 60) * sc;
+    panTo(rt.panX == null ? (fr.clientWidth - rt.mapW) / 2 : rt.panX, want);
+  }
+  // 행사마다 아이템이 나오고 움직이는 자리 (지도 y)
+  function festRange() {
+    if (rt.sports) return [SPORTS.cy - SPORTS.ry - 22, SPORTS.cy + SPORTS.ry + 18];
+    if (!rt.fest) return null;
+    const form = FEST[rt.fest.id].form, y = pzy();
+    return form === 'stage' ? [y - 150, y + 64] : form === 'ring' ? [y - 124, y + 50] : form === 'rows' ? [y - 44, y + 40] : [78, 412];
+  }
+  function festFocusNow() { const r = festRange(); if (!r) return; requestAnimationFrame(() => requestAnimationFrame(() => { hudVars(); festFocus(r[0], r[1]); })); }
   function fitMap(reset) {
     const fr = $('.frame'); if (!fr) return;
     const W = fr.clientWidth, H = fr.clientHeight;
@@ -4965,7 +4982,7 @@ body{background:radial-gradient(120% 60% at 50% 0%, color-mix(in srgb, var(--pap
   function claimOfflineDouble() {
     closeModal($('#mOffline'), () => showAd(
       () => { grantOffline(2); toast('2배로 받았어요!'); },
-      () => { grantOffline(1); toast('광고를 끝까지 보지 않아서 기본 보상만 받았어요'); }
+      r => { grantOffline(1); toast(r === 'noad' ? '광고를 불러오지 못해서 기본 보상만 받았어요' : '광고를 끝까지 보지 않아서 기본 보상만 받았어요'); }
     ));
   }
 
@@ -4980,7 +4997,8 @@ body{background:radial-gradient(120% 60% at 50% 0%, color-mix(in srgb, var(--pap
     const EXT = AIT && AIT.ads ? AIT : (window.FOREST_ADS || null);   // 토스 광고나 안드로이드 애드몹 광고
     if (EXT) {
       // 토스 리워드 광고: 끝까지 봤다는 신호(userEarnedReward)가 왔을 때만 보상을 줘요
-      if (!EXT.adReady()) { EXT.preload(); rt.adNoGold = false; toast('광고를 준비하고 있어요. 잠시 뒤에 다시 눌러 주세요'); return; }
+      // 1.6.0: 광고가 아직 없으면 알려 주고, 광고를 못 봤을 때의 처리(onSkip)를 '광고 없음'으로 불러요. 기본 보상이나 버튼이 사라지지 않게요
+      if (!EXT.adReady()) { EXT.preload(); rt.adNoGold = false; toast('광고를 불러오지 못했어요. 잠시 뒤에 다시 눌러 주세요'); if (onSkip) onSkip('noad'); return; }
       rt.adOpen = true;
       if (actx && actx.state === 'running') actx.suspend().catch(() => {});   // 광고 중에는 게임 소리를 멈춰요
       EXT.showAd(r => { rt.adOk = onReward; rt.adNo = onSkip || null; rt.adEarned = !!r.earned; closeAd(); });
@@ -5052,6 +5070,7 @@ body{background:radial-gradient(120% 60% at 50% 0%, color-mix(in srgb, var(--pap
   }
   function startBoost() {
     if (boostLeft() <= 0) { shake($('#boostGo')); return; }
+    const keep = rt.boostUntil;
     rt.boostUntil = 0;   // 한 번 들으면 버튼이 들어가고 다음에 다시 나타나요
     closeModal($('#mBoost'), () => showAd(() => {
       const v = boostAmount();   // 광고를 다 본 순간의 수업료로 계산해요
@@ -5063,6 +5082,9 @@ body{background:radial-gradient(120% 60% at 50% 0%, color-mix(in srgb, var(--pap
       sfx('quest'); buzz(15);
       toast(`보충수업 끝! 도토리 +${fmt(v)}`);
       save(); renderHUD(); renderAffordance();
+    }, r => {
+      if (r === 'noad') { rt.boostUntil = keep; renderBoostBtn(); }   // 1.6.0: 광고가 없었으면 부엉이 버튼을 그대로 둬요
+      else toast('광고를 끝까지 보지 않아서 보상이 없어요');
     }));
   }
 
@@ -5183,9 +5205,10 @@ body{background:radial-gradient(120% 60% at 50% 0%, color-mix(in srgb, var(--pap
       if (S.budget < half) { shake($('#dealGo')); $('#dealFine').textContent = `반값이어도 도토리 ${fmt(Math.ceil(half - S.budget))}개가 모자라요.`; return; }
     }
     d.taken = true;   // 광고를 보는 동안에는 까치가 날아가지 않아요
-    closeModal($('#mDeal'), () => showAd(() => applyDeal(d), () => {
+    closeModal($('#mDeal'), () => showAd(() => applyDeal(d), r => {
       d.taken = false;
-      toast('광고를 끝까지 보지 않아서 핫딜을 못 받았어요');
+      if (r !== 'noad') toast('광고를 끝까지 보지 않아서 핫딜을 못 받았어요');
+      renderDeal();
     }));
   }
   // 광고를 끝까지 봤을 때만 불려요 (진짜 미니앱에서는 userEarnedReward 신호)
@@ -6481,8 +6504,8 @@ body{background:radial-gradient(120% 60% at 50% 0%, color-mix(in srgb, var(--pap
       toast(`황금 도토리 +${GOLD.shopAdN}개를 받았어요`);
       save();
       if (rt.tab === 'shop') renderShop();
-    }, () => {
-      toast('광고를 끝까지 보지 않아서 황금 도토리가 없어요');
+    }, r => {
+      if (r !== 'noad') toast('광고를 끝까지 보지 않아서 황금 도토리가 없어요');
     });
   }
 
@@ -7203,7 +7226,7 @@ body{background:radial-gradient(120% 60% at 50% 0%, color-mix(in srgb, var(--pap
     $('#pzOpen').addEventListener('click', () => { sfx('tap'); pzOpen(); });
     $('#pzAdBtn').addEventListener('click', () => {
       if (!pzCanAd()) return;
-      showAd(() => { pzDay(); S.pz.adN += 1; save(); renderMini(); toast(`오늘 보상 판 ${PZ.adMore}번을 더 받았어요`); });
+      showAd(() => { pzDay(); S.pz.adN += 1; save(); renderMini(); toast(`오늘 보상 판 ${PZ.adMore}번을 더 받았어요`); }, r => { if (r !== 'noad') toast('광고를 끝까지 보지 않아서 보상이 없어요'); });
     });
     $('#pzBack').addEventListener('click', () => { sfx('tap'); pzClose(); });
     $('#pzQuit').addEventListener('click', () => { if (!S.pz.cur || !$('#pzEnd').hidden) return; sfx('tap'); $('#pzQuitAsk').hidden = false; });
@@ -7358,7 +7381,7 @@ body{background:radial-gradient(120% 60% at 50% 0%, color-mix(in srgb, var(--pap
   function startSports(viaAd) {
     if (rt.sports || !sportsOpen()) return;
     if (!viaAd && sportsWait() > 0) {
-      closeModal($('#mSports'), () => askAd('다음 운동회까지 기다리지 않고 광고를 보면 바로 열 수 있어요.', () => showAd(() => startSports(true), () => {})));
+      closeModal($('#mSports'), () => askAd('다음 운동회까지 기다리지 않고 광고를 보면 바로 열 수 있어요.', () => showAd(() => startSports(true), r => { if (r !== 'noad') toast('광고를 끝까지 보지 않아서 운동회를 바로 열지 못했어요'); })));
       return;
     }
     const go = () => {
@@ -7372,6 +7395,7 @@ body{background:radial-gradient(120% 60% at 50% 0%, color-mix(in srgb, var(--pap
         k.g.insertAdjacentHTML('beforeend', `<rect class="band ${k.team}" x="-6.4" y="-4.6" width="12.8" height="2.4" rx="1.2"/>`);
       });
       $('#sportsBar').hidden = false;
+      festFocusNow();
       renderSportsBar();
       musicSync(); sfx('bell'); buzz(20);
       save(); renderSportsBtn();
@@ -7520,6 +7544,7 @@ body{background:radial-gradient(120% 60% at 50% 0%, color-mix(in srgb, var(--pap
       if (F.form === 'stage') festStage(true);
       if (F.form === 'rows') festCamera(true);
       $('#festBar').hidden = false;
+      festFocusNow();
       renderFestBar();
       musicSync(); sfx('bell'); buzz(20);
       save(); renderFestBtn();
@@ -7569,10 +7594,12 @@ body{background:radial-gradient(120% 60% at 50% 0%, color-mix(in srgb, var(--pap
   }
   function festSpawn(F) {
     let x, y;
-    if (F.item === 'paper') { const P = [[34, 176], [58, 300], [322, 240], [312, 372], [94, 398], [336, 150], [26, 248], [262, 404], [104, 86], [252, 92], [44, 360], [330, 300]]; [x, y] = P[Math.floor(Math.random() * P.length)]; x += rand(-8, 8); y += rand(-6, 6); }
+    if (F.item === 'paper') { const P0 = [[34, 176], [58, 300], [322, 240], [312, 372], [94, 398], [336, 150], [26, 248], [262, 404], [104, 86], [252, 92], [44, 360], [330, 300]], v0 = visMap(), P = v0 ? P0.filter(([px, py]) => px > v0[0] + 16 && px < v0[2] - 16 && py > v0[1] + 16 && py < v0[3] - 16) : P0; const PP = P.length >= 4 ? P : P0; [x, y] = PP[Math.floor(Math.random() * PP.length)]; x += rand(-8, 8); y += rand(-6, 6); }
     else if (F.item === 'smile') { const ks = rt.kids.filter(k => k.hold); if (!ks.length) return; const k = ks[Math.floor(Math.random() * ks.length)]; x = k.x; y = k.y - 20; }
     else if (F.form === 'stage') { x = pzx() + rand(-34, 34); y = pzy() - 30; }
     else { x = pzx() + rand(-60, 60); y = pzy() + 2 + rand(-10, 16); }
+    // 1.6.0: 위쪽 칸과 아래 탭에 가려진 곳에는 내지 않아요
+    const vv = visMap(); if (vv) { x = Math.min(vv[2] - 14, Math.max(vv[0] + 14, x)); y = Math.min(vv[3] - 14, Math.max(vv[1] + 18, y)); }
     const g = document.createElementNS(NS, 'g');
     g.setAttribute('class', 'fest-item');
     g.setAttribute('role', 'button');
@@ -7613,7 +7640,8 @@ body{background:radial-gradient(120% 60% at 50% 0%, color-mix(in srgb, var(--pap
       if (it.dead) continue;
       const age = now - it.born;
       if (it.rise) { it.y -= dt * 30; it.x += Math.sin(age / 400) * 0.25; it.g.setAttribute('transform', `translate(${it.x.toFixed(1)} ${it.y.toFixed(1)})`); }
-      if (age > it.life) { it.dead = true; if (!rt.reduced && it.g.animate) it.g.animate([{ opacity: 1 }, { opacity: 0 }], { duration: 200 }).onfinish = () => it.g.remove(); else it.g.remove(); }
+      const vt = it.rise && visMap();   // 1.6.0: 떠오르는 음표와 풍선은 위쪽 칸에 닿기 전에 사라져요(가려져서 못 누르는 일이 없게)
+      if (age > it.life || (vt && it.y < vt[1] + 12)) { it.dead = true; if (!rt.reduced && it.g.animate) it.g.animate([{ opacity: 1 }, { opacity: 0 }], { duration: 200 }).onfinish = () => it.g.remove(); else it.g.remove(); }
     }
     R.items = R.items.filter(i => !i.dead || i.g.isConnected);
     // 학예회: 4초마다 다른 친구가 무대에 올라가요
@@ -9441,7 +9469,7 @@ body{background:radial-gradient(120% 60% at 50% 0%, color-mix(in srgb, var(--pap
   // 시험용 손잡이: 자동 시험(window.__FOREST_TEST)에서만 게임 속 함수를 꺼내 써요
   if (window.__FOREST_TEST) window.__forest = { get S() { return S; }, get Cloud() { return Cloud; }, rt, makeDeal, furStage, DEAL, navInfo, navRoute, spawnDrop, repTipCheck, linkGoogle, retryCloud, sanitize, acctPending, renderMap, renderHUD, renderAffordance, syncKids, layoutMap, geo, startTrial, hitTrial, endTrial, startVisit, endVisit, showReward, recommend, needCost, prepTopUp, qReward, prepPhase, rankScore, pwOf, previewDip, dipMult, costScale, buyFacility, buyFur, buyFurAll, furCost, furReady, furDone, FUR, startTalk, endTalk, teacherAct, facCost, teaCost, facKeys, rate, rep, capacity, canGraduate, canPromote,
     fmt, fmt2, graduate, promote, buyPerk, perkCost, perkMaxed, buyFundPerk, fpCost, claimMain, mainReady, curMain, qNo, earn, CFG, TEA, teaMaxed, PERKS, FPERKS, MAIN, finalYear, startTrip, claimTrip, TRIPS, yearLocked, startSports, endSports, rtSports: () => rt.sports, startFest, rtFest: () => rt.fest, facCap, addLeague, weekIdx, addMP, tutStart, endFest, claimSports, claimBox, musicWant, askBox, festWait, setTab, openSheet, closeSheet,
-    PZ, PZ_SHAPES, pzFits, pzAnyFit, pzStuck, pzFullLines, pzPlace, pzFreshGame, pzStart, pzFinish, pzLeft, pzCanAd, pzEssOf, pzMinOf, pzHelpSquirrel, pzHelpOwl, pzHelpBear, fillSubs, mapRoofTop, renderMissions, pzHasHelp, pzRot, pzNewPiece, pzOpen, pzClose, pzGameOver, pzRenderAll, renderMini, addEss, ESHOP, SP_FUR, applyCos, essItem, pickEss, buyEss, renderEssShop, esAcornLeft, esGoldLeft, esAcornAmt, hatSVG, spFurImg, gameNow, gameToday, gameWeek, kstDay, setServerTime, SVR, dmDay, weekIdx, lgWeek, wkWeek, lgKey, pzDay, goldDay, boostLeft, dealLeft, canStamp };
+    PZ, PZ_SHAPES, pzFits, pzAnyFit, pzStuck, pzFullLines, pzPlace, pzFreshGame, pzStart, pzFinish, pzLeft, pzCanAd, pzEssOf, pzMinOf, pzHelpSquirrel, pzHelpOwl, pzHelpBear, fillSubs, mapRoofTop, showAd, claimOfflineDouble, startBoost, tripAd, festFocus, festRange, visMap, renderMissions, pzHasHelp, pzRot, pzNewPiece, pzOpen, pzClose, pzGameOver, pzRenderAll, renderMini, addEss, ESHOP, SP_FUR, applyCos, essItem, pickEss, buyEss, renderEssShop, esAcornLeft, esGoldLeft, esAcornAmt, hatSVG, spFurImg, gameNow, gameToday, gameWeek, kstDay, setServerTime, SVR, dmDay, weekIdx, lgWeek, wkWeek, lgKey, pzDay, goldDay, boostLeft, dealLeft, canStamp };
   if (window.claude && window.claude.hot && window.claude.hot.snapshot) {
     try { window.claude.hot.snapshot(() => { if (S) syncMid(); return { save: S }; }); } catch (e) { /* 무시 */ }
   }
