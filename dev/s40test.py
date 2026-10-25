@@ -10,9 +10,10 @@ SKIPTUT = "const t=document.querySelector('#tut'); if(t && !t.hidden){ window.__
 async def run(b, dark, w, h, fails):
     tag = ('d' if dark else 'l') + str(w)
     ctx = await b.new_context(viewport={'width': w, 'height': h}, device_scale_factor=2, is_mobile=True, has_touch=True, color_scheme='dark' if dark else 'light')
-    await ctx.add_init_script("window.__FOREST_TEST = true; localStorage.clear();")
+    # 1.5.4: 로딩 화면을 실제처럼 3초 보여 주고(__FOREST_BOOT), 문서가 준비되자마자 확인해요. 페이지 load가 늦으면(글꼴 차단 등) 1.2초짜리 시험용 로딩 화면은 이미 사라져 있었어요
+    await ctx.add_init_script("window.__FOREST_TEST = true; window.__FOREST_BOOT = true; localStorage.clear();")
     pg = await ctx.new_page(); errs = []; pg.on('pageerror', lambda e: errs.append(str(e)))
-    await pg.goto(URL); await pg.wait_for_timeout(900)
+    await pg.goto(URL, wait_until='domcontentloaded'); await pg.wait_for_selector('#boot .boot-pic', timeout=5000); await pg.wait_for_timeout(500)
     # 로딩 화면: 그림과 진짜 진행 막대
     boot = await pg.evaluate("(()=>{const b=document.querySelector('#boot'), p=b.querySelector('.boot-pic'), r=p.getBoundingClientRect(), bar=document.querySelector('.boot-bar').getBoundingClientRect(); return [getComputedStyle(p).backgroundImage.startsWith('url(\"data:image/webp'), Math.round(r.height), Math.round(bar.bottom), innerHeight, document.querySelector('#bootVer').textContent, document.documentElement.scrollWidth<=innerWidth]})()")
     await pg.screenshot(path=f's40_boot_{tag}.png')
@@ -23,7 +24,7 @@ async def run(b, dark, w, h, fails):
     want = 'v' + re.search(r"const VERSION = '([\d.]+)'", (pathlib.Path(__file__).parent / 'forest-school.html').read_text(encoding='utf-8')).group(1)
     if boot[4] != want: fails.append(f'[{tag}] 로딩 버전 {boot[4]} (원본 {want})')
     if not boot[5]: fails.append(f'[{tag}] 로딩 화면이 옆으로 넘쳐요')
-    await pg.wait_for_timeout(2600); await pg.evaluate(SKIPTUT); await pg.evaluate(CLEAN)
+    await pg.wait_for_function("!document.querySelector('#boot')", timeout=15000); await pg.wait_for_timeout(600); await pg.evaluate(SKIPTUT); await pg.evaluate(CLEAN)
     # 배경음악: 홈, 다른 탭, 행사
     mus = []
     mus.append(await pg.evaluate(f"(()=>{{ {F}.S.bgm = true; {F}.setTab('school'); return {F}.musicWant(); }})()"))

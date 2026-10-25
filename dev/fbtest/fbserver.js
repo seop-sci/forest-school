@@ -37,7 +37,7 @@ function handle(b) {
   if (MODE.denyAll) return deny;
   const d = db(b.uid);
   if (b.op === 'get' || b.op === 'query') {
-    if (!d.read(norm(b.path)).allowed) return deny;
+    if (!d.read(norm(b.path), { now: Date.now() }).allowed) return deny;   // 읽기 규칙의 now (이어하기 코드 30분)
     const v = get(b.path);
     if (b.op === 'get') return { ok: true, val: v };
     let pairs = v && typeof v === 'object' ? Object.keys(v).map(k => [k, v[k]]) : [];

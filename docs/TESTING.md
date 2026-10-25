@@ -32,6 +32,11 @@ Playwright(Python)로 `dev/test.html`을 열어 시험해요. 먼저 `cd dev && 
 
 ## 기능별 시험
 
+- `s44test.py` (1.5.4, 가짜 Firebase): 구글 계정 바꾸기가 끊겼을 때 이 기기 저장이 이어지고 계정 학교를 덮어쓰지 않는지, 다시 시도하면 학교를 고르는 창, 계정 지우기가 거절됐을 때 다음에 열면 다시 지우고 그동안 올리지 않는지, 이어하기 코드 정리. `python3 build_gh.py gh` 뒤에 돌려요. 마지막 줄 PASS면 통과
+- `s45test.py` (1.5.4): 가구 모습은 학교급마다 한 단계(같은 학교급에서는 개수만), 학교급이 오른 뒤 첫 가구 알림, 까치 특식 데이 20분과 반값 핫딜 조건, 미니게임 탭에 버전 번호 없음. 마지막 줄 PASS면 통과
+- `fbtest/rules_test.js` (1.5.4 보강): `NODE_PATH=<targaryen 폴더> node fbtest/rules_test.js $PWD/gh_database.rules.json`. 랭킹 문서 모양과 범위, 테스트 현황은 관리자만, 30분 지난 이어하기 코드 읽기 막기를 봐요
+- `toss/check_bridge.cjs` (1.5.4): `cd toss && node build.mjs && node check_bridge.cjs dist/bridge.js`. 만든 토스 다리가 시작할 때 멈추지 않고 window.AIT를 만드는지 봐요
+- `dev/check_ads.mjs` (1.5.4): `node dev/check_ads.mjs` (저장소 맨 위에서, toss의 esbuild를 써요). 가짜 애드몹으로 동의가 광고를 허락할 때만 광고를 준비하는지 봐요
 - `s43test.py` (1.5.3): 지도 연하게, 도토리 테두리, 평판 아래 학생 수, 이름표 층(캐릭터 위, 눌러서 건물 열기, 유치원 과학실 이름표 숨김), 선생님이 이름표에 가려지지 않는지, 평판 퀘스트 첫 안내(한 번만). 어두운 화면 360px, 밝은 화면 390px. 마지막 줄 PASS면 통과
 - `s42test.py` (1.5.2): 운동장 트랙 색칠 조각이 그림 아래쪽까지 덮는지, 위쪽 줄 평판 배지(숫자, 넘침, 학년 한 줄). 어두운 화면 360px, 밝은 화면 390px. 마지막 줄 PASS면 통과
 - `s41test.py` (1.5.1): 학생 길 찾기. 유치원과 초등학교 지도에서 걷는 자리가 건물, 공사 자리, 분수 밖에 있는지, 모두 이어지는지, 학생 40명이 18초 걷는 동안 막힌 곳에 들어가지 않는지. 지도 그림 `s41_map_0.png`, `s41_map_1.png`. 마지막 줄 PASS면 통과
