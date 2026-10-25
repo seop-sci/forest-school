@@ -79,25 +79,13 @@ toast = lambda page: page.evaluate("(JSON.parse(sessionStorage.getItem('__toasts
 RANK = """(() => { const q = s => document.querySelector(s);
   return { pos: q('#rankPos').textContent, sub: q('#rankSub').textContent, join: q('#rankJoin').innerText.replace(/\\s+/g,' ').trim(),
     rows: [...document.querySelectorAll('#rankList .rk')].map(li => li.innerText.replace(/\\s+/g,' ').trim() + (li.classList.contains('me') ? ' [me]' : '')) }; })()"""
-MOVE = """(() => { const q = s => document.querySelector(s);
-  return { open: !q('#mMove').hidden, main: !q('#moveMain').hidden, ask: !q('#moveAsk').hidden, code: q('#moveCode').hidden ? '' : q('#moveCode').textContent,
-    make: q('#moveMake').textContent, msg: q('#moveMsg').textContent, bad: q('#moveMsg').classList.contains('bad'),
-    from: q('#moveFromName').textContent + ' / ' + q('#moveFromInfo').textContent, input: q('#moveInput').value, close: !q('#moveClose').hidden }; })()"""
 SETTINGS = """(() => { const q = s => document.querySelector(s);
-  return { save: q('#infoSave').textContent, pid: q('#pidRow').hidden ? null : q('#infoPid').textContent, move: !q('#optMove').hidden,
+  return { save: q('#infoSave').textContent, pid: q('#pidRow').hidden ? null : q('#infoPid').textContent, move: !!q('#optMove') || !!q('#mMove'),
     devStats: !q('#devStats').hidden, ver: q('#verRow dd').textContent,
     pageOver: document.documentElement.scrollWidth > document.documentElement.clientWidth }; })()"""
 
 async def open_settings(page):
     await page.tap('.tab[data-tab="settings"]'); await page.wait_for_timeout(300)
-async def open_move(page):
-    await open_settings(page)
-    await page.evaluate("document.querySelector('#optMove').click()"); await page.wait_for_timeout(400)
-async def redeem(page, code):
-    await page.fill('#moveInput', code); await page.evaluate("document.querySelector('#moveForm .cta').click()")
-    await page.wait_for_timeout(900)
-    return await page.evaluate(MOVE)
-
 async def main():
     srv = subprocess.Popen(['node', str(HERE / 'fbtest' / 'fbserver.js'), str(HERE / 'gh'), str(PORT), str(HERE / 'gh_database.rules.json')],
                            cwd=str(HERE / 'fbtest'), stdout=subprocess.PIPE, stderr=subprocess.STDOUT)
@@ -120,7 +108,7 @@ async def main():
                 res['demo'] = r; await ctx.close()
             mode(config='set', authOff=False, denyAll=False)
             api('/__seed', {'reset': True})
-            # 1) 기기 A: 서버에 붙고, 저장과 테스트 현황이 올라가요. 랭킹에 이름을 올리고 이어하기 코드를 만들어요
+            # 1) 기기 A: 서버에 붙고, 저장과 테스트 현황이 올라가요. 랭킹에 이름을 올려요
             A = {}
             if want('flow'):
                 ctx, page, errs, navs = await device(b, seed=elem())
@@ -138,21 +126,6 @@ async def main():
                 r['rank'] = await page.evaluate(RANK)
                 r['rankServer'] = dump()['forest'].get('rank')
                 await page.screenshot(path='s7_rank_on.png')
-                # 코드 만들기
-                await open_move(page)
-                r['move0'] = await page.evaluate(MOVE)
-                await page.screenshot(path='s7_move0.png')
-                await page.evaluate("document.querySelector('#moveMake').click()"); await page.wait_for_timeout(900)
-                r['move1'] = await page.evaluate(MOVE)
-                await page.screenshot(path='s7_move_code.png')
-                code = r['move1']['code'].replace('-', ''); A['code'] = code
-                mv = dump()['forest']['moves'][code]
-                r['moveServer'] = {'from': mv['from'] == uidA, 'atNum': isinstance(mv['at'], (int, float)), 'len': len(mv['d'])}
-                await page.evaluate("document.querySelector('#moveMake').click()"); await page.wait_for_timeout(400)
-                r['copied'] = await page.evaluate("navigator.clipboard.readText()")
-                r['copyToast'] = await toast(page)
-                r['ownCode'] = (await redeem(page, code))['msg']
-                await page.evaluate("document.querySelector('#moveClose').click()"); await page.wait_for_timeout(300)
                 # 2) 이 기기 저장이 지워져도 서버 학교를 다시 불러와요
                 await page.tap('.tab[data-tab="school"]'); await page.wait_for_timeout(200)
                 await push_now(page)
@@ -171,46 +144,14 @@ async def main():
                 A['pid'] = after['pid']
                 r['errors'] = errs; res['flow'] = r
                 A['ctx'], A['page'] = ctx, page
-            # 3) 기기 B: 자기 학교로 랭킹에 있다가 A의 코드로 학교를 옮겨 와요
+            # 3) 1.5.6: 이어하기 코드를 뺐어요. 예전 이어하기 링크(?move=코드)로 열어도 그냥 게임이 열리고 주소에서 코드만 지워요
             if want('flow'):
-                kb = kinder(rank={'name': 'B 교장', 'joined': True, 'sent': -1})
-                ctx, page, errs, navs = await device(b, 360, 640, 'dark', seed=kb)
-                r = {'info': await wait_cloud(page)}
-                await page.wait_for_timeout(1200)
-                uidB = await uid_of(page)
-                r['rankB0'] = dump()['forest']['rank'].get(uidB, {}).get('name')
-                await open_move(page)
-                r['short'] = (await redeem(page, 'K7QM'))['msg']
-                r['none'] = (await redeem(page, 'ZZZZ-2222'))['msg']
-                api('/__seed', {'path': '/forest/moves/XPDC2345', 'value': {'d': json.dumps(elem()), 'at': int(time.time() * 1000) - 31 * 60000, 'from': 'uX', 'v': '1.0'}})
-                r['old'] = (await redeem(page, 'xpdc-2345'))
-                r['oldGone'] = 'XPDC2345' not in dump()['forest'].get('moves', {})
-                r['ask'] = await redeem(page, A['code'].lower())
-                await page.screenshot(path='s7_move_ask_dark.png')
-                n0 = len(navs)
-                await page.evaluate("document.querySelector('#moveYes').click()"); await page.wait_for_timeout(2600)
-                after = await local(page)
-                r['moved'] = {'navs': len(navs) - n0, 'pid': after['pid'] == A['pid'], 'tier': after['tier'], 'rank': after['rank'], 'toast': await toast(page),
-                              'info': await wait_cloud(page)}
-                await page.wait_for_timeout(2500)
-                d = dump()['forest']
-                r['server'] = {'codeGone': A['code'] not in d.get('moves', {}), 'rankB': d['rank'].get(uidB), 'saveB': json.loads(d['saves'][uidB]['d'])['pid'] == A['pid']}
-                await page.tap('.tab[data-tab="school"]'); await page.tap('.tab[data-tab="rank"]')  # 1.5.0: 랭킹은 홈 지도 오른쪽 단추; await page.wait_for_timeout(900)
-                r['rank'] = await page.evaluate(RANK)
-                await page.screenshot(path='s7_rank_moved_dark.png')
-                r['errors'] = errs; r['navsLater'] = len(navs) - n0
-                res['move'] = r
-                B = (ctx, page)
-            # 4) 링크로 열기 (?move=코드): 기기 C
-            if want('flow'):
-                api('/__seed', {'path': '/forest/moves/MNKC2345', 'value': {'d': json.dumps(kinder(budget=777777)), 'at': int(time.time() * 1000), 'from': 'uX', 'v': '1.0'}})
                 ctx, page, errs, navs = await device(b, seed=None, path='/?move=MNKC2345')
                 await wait_cloud(page); await page.wait_for_timeout(1500)
-                r = {'url': page.url, 'move': await page.evaluate(MOVE)}
+                r = {'url': page.url, 'modal': await page.evaluate("[...document.querySelectorAll('.overlay.center')].filter(o => !o.hidden).map(o => o.id)"),
+                     'moveUi': await page.evaluate("!!document.querySelector('#mMove, #optMove')"), 'moves': 'moves' in dump()['forest'],
+                     'oldKey': await page.evaluate("localStorage.getItem('forest-move-code')"), 'errors': errs}
                 await page.screenshot(path='s7_link.png')
-                await page.evaluate("document.querySelector('#moveYes').click()"); await page.wait_for_timeout(2500)
-                r['budget'] = (await local(page))['budget']
-                r['toast'] = await toast(page); r['errors'] = errs
                 res['link'] = r; await ctx.close()
             # 5) 테스트 현황 (A 기기 개발자 메뉴)
             if want('flow'):
@@ -225,7 +166,7 @@ async def main():
                   over: document.querySelector('.modal.wide').scrollWidth > document.querySelector('.modal.wide').clientWidth }))()""")
                 await page.screenshot(path='s7_stats.png')
                 res['stats'] = r
-                await A['ctx'].close(); await B[0].close()
+                await A['ctx'].close()
             # 5b) 이 기기 저장보다 서버 저장이 더 나중이면 서버 학교를 이어 해요
             if want('newer'):
                 ctx, page, errs, navs = await device(b, seed=kinder())
