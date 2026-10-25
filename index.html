@@ -1095,6 +1095,7 @@ html.ait .app{padding-top:calc(10px + var(--ait-top, 0px));padding-bottom:var(--
 .sheet.is-room .fr-tx small i{display:none}
 .sheet.is-room .fr-cost{font-size:15px}
 .sheet.is-room .fur-all{min-height:40px;font-size:14px}
+.sheet .fur-all{margin:0 0 8px}
 .sheet.is-room .effect{margin:0 0 6px}
 .sheet.is-room .ebox{padding:6px 10px;flex-direction:row;align-items:baseline;gap:6px}
 .sheet.is-room .ebox strong{font-size:14px}
@@ -1942,7 +1943,6 @@ body{background:radial-gradient(120% 60% at 50% 0%, color-mix(in srgb, var(--pap
       <p class="fur-h">가구를 모두 건물 레벨까지 올리면 건물을 키울 수 있어요</p>
       <svg class="fur-scene" id="furScene" viewBox="0 0 320 230" role="group" aria-label="시설 안"></svg>
       <div class="fur-list" id="furList"></div>
-      <button class="fur-all" type="button" id="furAll"><span>가구 모두 한 레벨씩 올리기</span><span class="cost"><span data-acorn></span><b id="furAllCost">0</b></span></button>
     </div>
     <div class="effect">
       <div class="ebox"><span>지금</span><strong id="effNow"></strong></div>
@@ -1950,6 +1950,8 @@ body{background:radial-gradient(120% 60% at 50% 0%, color-mix(in srgb, var(--pap
       <div class="ebox next"><span id="effNextLabel">다음 레벨</span><strong id="effNext"></strong></div>
     </div>
     <p class="rep-note" id="sheetRep"></p>
+    <!-- 1.6.0: 가구 일괄 레벨업은 업그레이드 버튼 바로 위에 -->
+    <button class="fur-all" type="button" id="furAll" hidden><span>가구 일괄 레벨업</span><span class="cost"><span data-acorn></span><b id="furAllCost">0</b></span></button>
     <button class="cta split" type="button" id="sheetBuy" aria-disabled="false"><span id="sheetBuyLabel">업그레이드</span><span class="cost"><span data-acorn></span><b id="sheetCost">20</b></span></button>
     <p class="need" id="sheetNeed">&nbsp;</p>
   </section>
@@ -4713,7 +4715,7 @@ body{background:radial-gradient(120% 60% at 50% 0%, color-mix(in srgb, var(--pap
   const FUR_TAGDX = { desk: 14, chair: 7, fan: 0, locker: 12, counter: 35, table: 32, water: 8, rack: 13, shelf: 17, rdesk: 22, sofa: 28, lamp: 0, slide: 34, swing: 36, bars: 26, bench: 20, lab: 36, scope: 8, chem: 13, globe: 8 };
   function renderFur() {
     const k = rt.sheetKey, box = $('#furBox');
-    if (!k || S.f[k] < 1) { box.hidden = true; rt.furKey = ''; return; }
+    if (!k || S.f[k] < 1) { box.hidden = true; $('#furAll').hidden = true; rt.furKey = ''; return; }
     box.hidden = false;
     const L = S.f[k];
     const rec = rt.rec && rt.rec.kind === 'fur' && rt.rec.k === k ? rt.rec.i : -1;
@@ -6257,6 +6259,8 @@ body{background:radial-gradient(120% 60% at 50% 0%, color-mix(in srgb, var(--pap
       const roof = $('.roofimg', g);
       if (roof) roof.style.display = t ? '' : 'none';
       if (!t) continue;
+      // 1.6.0: 겨울 테마 운동장은 트랙을 하늘색으로 칠하거나 고드름을 달지 않아요(얼음판처럼 보여 어색해요). 사도 운동장은 원래 모습이에요
+      if (slot === 'playground' && t.id === 'winter') { if (roof) roof.style.display = 'none'; continue; }
       if (roof) $(`#rt-${slot} feFlood`).setAttribute('flood-color', slot === 'playground' && S.tier >= 1 ? t.play['--track'] : t.bld['--roof']);
       const vars = slot === 'library' ? t.lib : slot === 'playground' ? Object.assign({}, t.bld, t.play) : t.bld;
       for (const [k, v] of Object.entries(vars)) g.style.setProperty(k, v);
