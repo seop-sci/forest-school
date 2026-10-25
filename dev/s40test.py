@@ -51,7 +51,8 @@ async def run(b, dark, w, h, fails):
     # 보물찾기 끝: 알림 문구는 행사 이름, 2배 버튼 없음
     await pg.evaluate(f"(()=>{{ {F}.S.fest.next.picnic = 0; {F}.startFest('picnic', true); }})()"); await pg.wait_for_timeout(4500)
     await pg.evaluate(f"(()=>{{ const R={F}.rtFest(); if (R) {{ R.n = 99; }} {F}.endFest(); }})()"); await pg.wait_for_timeout(1200)
-    end = await pg.evaluate("[!document.querySelector('#mSportsEnd').hidden, !!document.querySelector('#srDbl'), document.querySelector('#srGet').className]")
+    end = await pg.evaluate("[!document.querySelector('#mSportsEnd').hidden, !!document.querySelector('#srDbl'), document.querySelector('#srGet').className, Math.round(document.querySelector('#srGet').getBoundingClientRect().width), Math.round(document.querySelector('#srGet').parentElement.getBoundingClientRect().width)]")
+    if abs(end[3] - end[4]) > 2: fails.append(f'[{tag}] 받기 버튼이 줄을 꽉 채우지 않아요 {end[3]}/{end[4]}')
     await pg.screenshot(path=f's40_festend_{tag}.png')
     await pg.evaluate("document.querySelector('#srGet').click()"); await pg.wait_for_timeout(700)
     toast = await pg.evaluate("document.querySelector('#toast').textContent")
