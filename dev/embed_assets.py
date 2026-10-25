@@ -19,7 +19,7 @@ RULES = [
     ('chr_', 220, 82),
     ('tea_', 260, 82),
     ('room_', 900, 72),
-    ('fur_', 280, 80),
+    ('fur_', 200, 78),
     ('roof_', 400, 80),
 ]
 SKIP = {'building_positions'}
