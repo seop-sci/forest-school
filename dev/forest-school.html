@@ -1260,6 +1260,16 @@ body{background:radial-gradient(120% 60% at 50% 0%, color-mix(in srgb, var(--pap
 .rep-pill b{font-family:var(--font-chalk);font-weight:700;font-size:15px;line-height:1;font-variant-numeric:tabular-nums;white-space:nowrap}
 .board .school-year b{white-space:nowrap}
 @media (max-width:380px){.rep-pill{padding:3px 6px 3px 4px;column-gap:1px}.rep-pill small{font-size:10px}.rep-pill svg{width:13px;height:13px}.rep-pill b{font-size:14px}.board-top{gap:4px}.board .ydots i{width:5px;height:5px}.board .ydots{gap:2px}}
+/* 1.5.5 위쪽 줄 두 칸: 윗줄은 학교 정보와 출석, 설정, 닫기. 아랫줄은 도토리, 평판, 학생 수. 학교 정보가 잘리지 않아요 */
+.board-top{display:grid;grid-template-columns:minmax(0,1fr) auto auto auto;column-gap:6px;row-gap:7px;align-items:center}
+.board-top .school{grid-column:1;grid-row:1;min-width:0}
+.board-top .hud-res{grid-column:1 / -1;grid-row:2;display:flex;align-items:stretch;gap:6px;min-width:0}
+.hud-res .stat-main{flex:1 1 auto;min-width:0}
+.hud-res .rep-pill{flex:0 0 auto;padding:3px 9px 3px 6px;column-gap:4px}
+.hud-res .rep-pill small{font-size:10.5px}
+.board #vNext{display:inline}
+.board .progress .bar{min-width:40px}
+@media (max-width:380px){.hud-res{gap:5px}.hud-res .rep-pill{padding:3px 7px 3px 5px;column-gap:3px}.board #vNext{display:inline}}
 .board .icon-btn,.board .tab.xgear{width:32px;height:32px;border-radius:10px}
 .board .tab.xgear .tic{width:24px;height:24px}
 .board .stats{display:none;position:absolute;left:0;right:0;top:100%;margin-top:6px;z-index:5}
@@ -1341,12 +1351,15 @@ body{background:radial-gradient(120% 60% at 50% 0%, color-mix(in srgb, var(--pap
       <span id="vNext">마을까지 ★12</span>
         </div>
       </div>
+      <div class="hud-res">
       <div class="stat stat-main">
         <span class="lab"><span data-acorn></span>도토리</span>
         <b id="vBudget">20</b>
         <small id="vRate">초당 +1.2</small>
       </div>
-      <div class="rep-pill" id="repPill" role="img" aria-label="평판 3"><svg viewBox="0 0 24 24" aria-hidden="true"><path fill="currentColor" d="M12 3l2.6 5.6 6.1.7-4.5 4.2 1.2 6L12 16.6 6.6 19.5l1.2-6L3.3 9.3l6.1-.7z"/></svg><b id="vRepTop">3</b><small id="vKidsTop">0명</small></div>
+      <div class="rep-pill" id="repPill" role="img" aria-label="평판 3"><svg viewBox="0 0 24 24" aria-hidden="true"><path fill="currentColor" d="M12 3l2.6 5.6 6.1.7-4.5 4.2 1.2 6L12 16.6 6.6 19.5l1.2-6L3.3 9.3l6.1-.7z"/></svg><b id="vRepTop">3</b><small>평판</small></div>
+      <div class="rep-pill kids-pill" id="kidsPill" role="img" aria-label="학생 0명"><svg viewBox="0 0 24 24" aria-hidden="true"><circle cx="9" cy="8" r="3.2" fill="currentColor"/><path d="M3.5 19c0-3.4 2.5-5.6 5.5-5.6s5.5 2.2 5.5 5.6z" fill="currentColor"/><circle cx="16.5" cy="9" r="2.6" fill="currentColor" opacity=".7"/><path d="M14.6 13.9c.6-.2 1.2-.3 1.9-.3 2.5 0 4.5 1.9 4.5 4.9h-5" fill="currentColor" opacity=".7"/></svg><b id="vKidsTop">0명</b><small>학생</small></div>
+      </div>
       <button class="icon-btn" id="btnAtt" type="button" aria-label="출석부">
         <svg viewBox="0 0 24 24" width="20" height="20" aria-hidden="true"><rect x="4" y="5.5" width="16" height="14.5" rx="2.5" fill="none" stroke="currentColor" stroke-width="2"/><path d="M8 3.5v4M16 3.5v4M4 10h16" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"/><circle cx="12" cy="15" r="2.6" fill="currentColor"/></svg>
         <span class="dot" id="attDot" hidden></span>
@@ -3826,7 +3839,7 @@ body{background:radial-gradient(120% 60% at 50% 0%, color-mix(in srgb, var(--pap
     $('#vRep').textContent = r;
     const kn = Math.floor(S.students);
     $('#vRepTop').textContent = fmt(r); $('#vKidsTop').textContent = `${fmt(kn)}명`;
-    $('#repPill').setAttribute('aria-label', `평판 ${fmt(r)}, 학생 ${fmt(kn)}명`);
+    $('#repPill').setAttribute('aria-label', `평판 ${fmt(r)}`); $('#kidsPill').setAttribute('aria-label', `학생 ${fmt(kn)}명`);
     renderPower();
     fitText($('#vBudget'), 17); fitText($('#vRate'), 11); fitText($('#vStudents'), 15); fitText($('#vPower'), 15);
     const G = CFG.grades, g = S.grade;
