@@ -1,4 +1,4 @@
-# 1.5.0 그림 넣기: PNG 원본 폴더를 받아 webp로 줄이고, forest-school.html 안의 그림 묶음(window.FS_IMG)을 새로 써요.
+# 1.5.0, 1.6.0 그림 넣기: PNG 원본 폴더를 받아 webp로 줄이고, forest-school.html 안의 그림 묶음(window.FS_IMG)을 새로 써요.
 # 쓰는 법: python3 embed_assets.py <원본 폴더> [<원본 폴더2> ...]
 #   폴더 안의 파일 이름(확장자 뺀 것)이 그대로 열쇠가 돼요. 예: map_kinder, bld_classroom_on, ic_home
 # 원본 PNG는 저장소에 넣지 않아요(1차 에셋 zip, art/v150-assets 브랜치). 게임은 한 파일로 돌아가야 해서 그림을 글자로 바꿔 넣어요.
@@ -22,6 +22,12 @@ RULES = [
     ('fur_', 200, 78),
     ('roof_', 400, 80),
     ('oak', 300, 80),
+    # 1.6.0 블록 퍼즐
+    ('pz_bg', 720, 70),
+    ('pz_board', 640, 80),
+    ('pz_', 96, 84),
+    ('fx_', 96, 84),
+    ('essence_', 240, 82),
 ]
 SKIP = {'building_positions'}
 
