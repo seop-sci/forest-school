@@ -1376,6 +1376,7 @@ body{background:radial-gradient(120% 60% at 50% 0%, color-mix(in srgb, var(--pap
 .ev-wait .wpic img,.ev-wait .wpic .p7{position:absolute;inset:0;width:100%;height:100%;object-fit:contain}
 .ev-wait b{font-family:var(--font-display);font-weight:400;font-size:17px}
 .ev-wait p{margin:0;font-size:13.5px;line-height:1.5;color:var(--muted);word-break:keep-all}
+.ev-skip{margin:0 0 10px;padding:9px 12px;border-radius:12px;background:var(--chip-bg);color:var(--chip-ink);font-size:13px;line-height:1.45;word-break:keep-all}
 .ev-up{margin:0;padding:0;list-style:none;display:flex;flex-direction:column;gap:6px}
 .ev-up li{display:flex;justify-content:space-between;gap:8px;padding:9px 12px;border-radius:12px;background:var(--card);font-size:13px}
 .ev-up li span:last-child{color:var(--muted);white-space:nowrap}
@@ -8749,13 +8750,17 @@ body{background:radial-gradient(120% 60% at 50% 0%, color-mix(in srgb, var(--pap
   const EV_BOX = { g: 2, dip: 1 };   // 미션 3개를 다 하면 받는 기념 상자
   // 미션은 기존 횟수 통계(S.st)의 "이벤트 시작 때와의 차이"로 재요. 놀이 코드에는 손대지 않아요
   const EV_MEASURE = {
-    // ok가 거짓이면 아직 못 하는 미션이라 EV_FALLBACK으로 바꿔요. 흔들기, 고치기, 오늘의 미션, 자리 비운 도토리 받기는 늘 할 수 있어요
-    picks: { name: n => `떨어진 도토리 ${n}개 줍기`, ok: () => S.f.playground >= 1 }, shakes: { name: n => `참나무 ${n}번 흔들기` }, ups: { name: n => `시설이나 가구 ${n}번 고치기` },
-    trains: { name: n => `선생님 연수 ${n}번 보내기`, ok: () => DEX_TEACHERS.some(k => S.t[k] >= 1 && !teaMaxed(k)) }, claims: { name: n => `자리 비운 도토리 ${n}번 받기` }, dmDone: { name: n => `오늘의 미션 ${n}개 끝내기` },
+    // ok가 거짓이면 아직 못 하는 미션이라 EV_FALLBACK으로 바꿔요.
+    // 고치기(가구와 시설), 자리 비운 도토리 받기(30초 넘게 닫았다 열기), 연수(다람쥐 선생님은 처음부터 Lv.1이고 최고 레벨이 없어요)는 새 학교도 늘 할 수 있어요.
+    // 줍기와 흔들기는 놀이터가 있어야 해요(없으면 참나무를 눌러도 안내만 나와요). 오늘의 미션도 줍기와 흔들기가 섞여 나와서 놀이터가 있어야 목표를 채울 수 있어요
+    picks: { name: n => `떨어진 도토리 ${n}개 줍기`, ok: () => S.f.playground >= 1 }, shakes: { name: n => `참나무 ${n}번 흔들기`, ok: () => S.f.playground >= 1 }, ups: { name: n => `시설이나 가구 ${n}번 고치기` },
+    trains: { name: n => `선생님 연수 ${n}번 보내기`, ok: () => DEX_TEACHERS.some(k => S.t[k] >= 1 && !teaMaxed(k)) }, claims: { name: n => `자리 비운 도토리 ${n}번 받기` }, dmDone: { name: n => `오늘의 미션 ${n}개 끝내기`, ok: () => S.f.playground >= 1 },
     sports: { name: n => `숲속 운동회 ${n}번 열기`, ok: () => festOpen('sports') }, trips: { name: n => `체험학습 ${n}번 다녀오기`, ok: () => tripOpen() }
   };
   const evOk = t => !!EV_MEASURE[t] && (!EV_MEASURE[t].ok || EV_MEASURE[t].ok());
-  const EV_FALLBACK = [['shakes', 60], ['ups', 40], ['picks', 80]];   // 아직 못 하는 미션 대신 넣어요(앞에서부터, 할 수 있는 것만)
+  // 아직 못 하는 미션 대신 넣어요(앞에서부터, 할 수 있고 겹치지 않는 것만). 흔들기와 줍기가 안 되면 고치기가 먼저 나와요.
+  // 뒤의 고치기, 자리 비운 도토리 받기, 연수는 늘 할 수 있어서 미션 3개가 언제나 채워져요
+  const EV_FALLBACK = [['shakes', 60], ['picks', 80], ['ups', 40], ['claims', 3], ['trains', 3]];
   const pad2 = n => String(n).padStart(2, '0');
   const dayAdd = (day, n) => { const [y, m, d] = day.split('-').map(Number); return new Date(Date.UTC(y, m - 1, d + n)).toISOString().slice(0, 10); };
   const dayDiff = (a, b) => Math.round((Date.parse(b + 'T00:00:00Z') - Date.parse(a + 'T00:00:00Z')) / 86400000);
@@ -8776,6 +8781,19 @@ body{background:radial-gradient(120% 60% at 50% 0%, color-mix(in srgb, var(--pap
     }
     return null;
   }
+  // 그날이 특별 이벤트 때문에 쉬는 반복 이벤트 기간이면 { def: 반복 이벤트, sp: 그 특별 이벤트 }
+  function evSkipped(day) {
+    day = day || trustedDay();
+    const [y, m, d] = day.split('-').map(Number);
+    for (const e of EV_MONTHLY) {
+      if (d < e.days[0] || d > e.days[1]) continue;
+      const start = `${y}-${pad2(m)}-${pad2(e.days[0])}`, end = `${y}-${pad2(m)}-${pad2(e.days[1])}`;
+      const sp = EV_SPECIAL.find(x => x.start && x.end && x.start <= end && x.end >= start);
+      if (sp) return { def: e, sp };
+    }
+    return null;
+  }
+  const evSkipLine = day => { const k = evSkipped(day); return k ? `<p class="ev-skip">이번 달은 ${esc(k.sp.name)} 때문에 ${esc(eun(k.def.name))} 쉬어요</p>` : ''; };
   // 다음 이벤트(60일 안)
   function evNext(day) {
     day = day || trustedDay();
@@ -8789,7 +8807,7 @@ body{background:radial-gradient(120% 60% at 50% 0%, color-mix(in srgb, var(--pap
     const used = new Set(), out = [];
     for (const [t0, n0] of row.ms) {
       let t = t0, n = n0;
-      if (!evOk(t) || used.has(t)) { const alt = EV_FALLBACK.find(f => evOk(f[0]) && !used.has(f[0])) || EV_FALLBACK[0]; t = alt[0]; n = alt[1]; }
+      if (!evOk(t) || used.has(t)) { const alt = EV_FALLBACK.find(f => evOk(f[0]) && !used.has(f[0])) || ['ups', 40]; t = alt[0]; n = alt[1]; }
       used.add(t);
       out.push({ t, n, b: Math.floor(S.st[t] || 0), m: row.m, g: row.g, done: false });
     }
@@ -8855,7 +8873,7 @@ body{background:radial-gradient(120% 60% at 50% 0%, color-mix(in srgb, var(--pap
     const upcoming = specials.length ? `<h4 class="dex-h">특별 이벤트 예정</h4><ul class="ev-up">${specials.map(e => `<li><span>${esc(e.name)}</span><span>${dayText(e.start)} ~ ${dayText(e.end)}</span></li>`).join('')}</ul>` : '';
     if (!cur || S.ev.cur !== cur.key) {
       const nx = evNext(day);
-      body.innerHTML = `<div class="ev-wait"><span class="wpic">${pic7('ev_wait', 'oak')}</span><b>지금은 이벤트가 없어요</b>` +
+      body.innerHTML = evSkipLine(day) + `<div class="ev-wait"><span class="wpic">${pic7('ev_wait', 'oak')}</span><b>지금은 이벤트가 없어요</b>` +
         (nx ? `<p>다음 이벤트는 <b>${esc(nx.def.name)}</b>${batchim(nx.def.name) ? '이에요' : '예요'}. ${dayText(nx.start)}에 열려요 (${dayDiff(day, nx.start)}일 뒤)</p>` : '<p>다음 이벤트를 준비하고 있어요</p>') + '</div>' + upcoming;
       return;
     }
@@ -8878,7 +8896,7 @@ body{background:radial-gradient(120% 60% at 50% 0%, color-mix(in srgb, var(--pap
     const u = IMG7(cur.def.banner);
     body.innerHTML = `<div class="ev-banner ${cur.def.id}">${u ? `<img src="${u}" alt="">` : ''}<b>${esc(cur.def.name)}</b></div>` +
       `<div class="ev-period"><span>${dayText(cur.start)} ~ ${dayText(cur.end)}</span><span>${left > 0 ? `${left}일 남음` : '오늘까지'}</span></div>` +
-      `<p class="lead">${esc(cur.def.lead)}</p>` +
+      `<p class="lead">${esc(cur.def.lead)}</p>` + evSkipLine(day) +
       `<h4 class="dex-h">출석 도장 <small>날마다 하나, 5개째에 큰 선물</small></h4><div class="ev-stamps">${stamps}</div>${stampBtn}` +
       `<h4 class="dex-h">이벤트 미션 <small>미션마다 황금 도토리와 도토리</small></h4><div class="dms">${missions}${box}</div>` + upcoming;
   }
@@ -9021,7 +9039,7 @@ body{background:radial-gradient(120% 60% at 50% 0%, color-mix(in srgb, var(--pap
   // 시험용 손잡이: 자동 시험(window.__FOREST_TEST)에서만 게임 속 함수를 꺼내 써요
   if (window.__FOREST_TEST) window.__forest = { get S() { return S; }, get Cloud() { return Cloud; }, rt, makeDeal, furStage, DEAL, navInfo, navRoute, spawnDrop, repTipCheck, linkGoogle, retryCloud, sanitize, acctPending, renderMap, renderHUD, renderAffordance, syncKids, layoutMap, geo, startTrial, hitTrial, endTrial, startVisit, endVisit, showReward, recommend, needCost, prepTopUp, qReward, prepPhase, rankScore, pwOf, previewDip, dipMult, costScale, buyFacility, buyFur, buyFurAll, furCost, furReady, furDone, FUR, startTalk, endTalk, teacherAct, facCost, teaCost, facKeys, rate, rep, capacity, canGraduate, canPromote,
     graduate, promote, buyPerk, perkCost, perkMaxed, buyFundPerk, fpCost, claimMain, mainReady, curMain, qNo, earn, CFG, TEA, teaMaxed, PERKS, FPERKS, MAIN, finalYear, startTrip, claimTrip, TRIPS, yearLocked, startSports, endSports, rtSports: () => rt.sports, startFest, rtFest: () => rt.fest, facCap, addLeague, weekIdx, addMP, tutStart, endFest, claimSports, claimBox, musicWant, askBox, festWait, setTab, openSheet, closeSheet,
-    dexMeet, dexSync, dexPending, dexGift, renderDex, evCurrent, evNext, evSync, claimStamp, claimEvMission, claimEvBox, renderEvent, trustedNow, trustedDay, tierMinutes, minAcorns, sanitize170, EV_STAMPS, EV_SPECIAL, EV_MONTHLY, EV_BOX, DEX_KEYS, DEX_REWARD };   // 1.7.0 도감, 이벤트
+    dexMeet, dexSync, dexPending, dexGift, renderDex, evCurrent, evNext, evSync, claimStamp, claimEvMission, claimEvBox, renderEvent, evMissions, evOk, evSkipped, EV_MONTHS, EV_MEASURE, trustedNow, trustedDay, tierMinutes, minAcorns, sanitize170, EV_STAMPS, EV_SPECIAL, EV_MONTHLY, EV_BOX, DEX_KEYS, DEX_REWARD };   // 1.7.0 도감, 이벤트
   if (window.claude && window.claude.hot && window.claude.hot.snapshot) {
     try { window.claude.hot.snapshot(() => { if (S) syncMid(); return { save: S }; }); } catch (e) { /* 무시 */ }
   }

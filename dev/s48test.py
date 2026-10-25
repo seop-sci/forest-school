@@ -1,5 +1,6 @@
 # 1.7.0 시험: 동물 도감(등록, 옛 저장 자동 채우기, 도감 선물 한 번만), 이벤트(달력 규칙, 출석 도장 하루 한 번과 5개째 큰 보상, 미션과 기념 상자,
-#   달이 바뀌면 새 회차, 특별 이벤트 표, 특별 이벤트와 겹치는 달의 반복 이벤트 건너뛰기, 못 하는 미션 대신 넣기), 분치 보정, 밝은 화면 390px과 어두운 화면 360px에서 넘침 없음
+#   달이 바뀌면 새 회차, 특별 이벤트 표, 특별 이벤트와 겹치는 달의 반복 이벤트 건너뛰기와 쉬는 안내 한 줄, 못 하는 미션 대신 넣기,
+#   새 저장(놀이터 없음)에서 모든 달의 미션이 이룰 수 있는 종류인지), 분치 보정, 밝은 화면 390px과 어두운 화면 360px에서 넘침 없음
 # 쓰는 법: python3 wrap.py && python3 s48test.py   (마지막 줄이 PASS면 통과)
 import asyncio, json, sys
 from playwright.async_api import async_playwright
@@ -72,6 +73,30 @@ async def main():
         r3 = await pg3.evaluate(f"(()=>{{ const F={F}, S=F.S; const g0=S.gold; F.setTab('dex'); return {{ dg: S.gold-g0, open: !document.querySelector('#mReward').hidden, pend: F.dexPending().length }}; }})()")
         if r3['dg'] != 0 or r3['open'] or r3['pend'] != 0: fails.append(f'다시 불러오니 선물을 또 줘요 {r3}')
         await pg2.close(); await pg3.close()
+        # 새 저장(놀이터 없음)으로 이벤트를 열면 미션 3개가 모두 이룰 수 있는 종류이고 겹치지 않아요
+        ctx2 = await b.new_context(viewport={'width': 390, 'height': 844})
+        await ctx2.add_init_script("window.__FOREST_TEST = true; localStorage.clear(); " + FAKE)
+        pn, errsn = await boot(ctx2)
+        await set_day(pn, 2026, 11, 3)
+        nw = await pn.evaluate(f"""(()=>{{ const F={F}, S=F.S; const out={{ pg: S.f.playground, cur: S.ev.cur, list: S.ev.list.map(m=>m.t), bad: [] }};
+          const doable = ['ups', 'claims', 'trains'];   // 놀이터 없는 새 학교가 할 수 있는 종류
+          const rows = [];
+          for (let mo = 1; mo <= 12; mo++) for (const e of F.EV_MONTHLY) rows.push({{ def: e, start: `2026-${{String(mo).padStart(2,'0')}}-01` }});
+          for (const e of F.EV_SPECIAL) rows.push({{ def: e, start: '2026-12-24' }});
+          for (const r of rows) {{ const ts = F.evMissions(r).map(m=>m.t);
+            if (ts.length !== 3 || new Set(ts).size !== 3 || ts.some(t => !F.evOk(t) || !doable.includes(t))) out.bad.push(r.def.id + r.start.slice(5,7) + ':' + ts.join(','));
+            if (ts.some(t => S.st[t] === undefined)) out.bad.push('st없음:' + ts.join(',')); }}
+          out.ok = Object.keys(F.EV_MEASURE).filter(t => F.evOk(t));
+          return out; }})()""")
+        if nw['pg'] != 0 or nw['cur'] != 'harvest:2026-11': fails.append(f'새 저장 이벤트 준비가 이상해요 {nw}')
+        if len(nw['list']) != 3 or len(set(nw['list'])) != 3 or any(t not in ('ups', 'claims', 'trains') for t in nw['list']): fails.append(f"새 저장 이벤트 미션에 못 하는 종류가 있어요 {nw['list']}")
+        if nw['bad']: fails.append(f"놀이터 없는 학교에서 이룰 수 없는 미션이 나와요 {nw['bad'][:6]}")
+        if sorted(nw['ok']) != ['claims', 'trains', 'ups']: fails.append(f"놀이터 없을 때 할 수 있는 종류가 달라요 {nw['ok']}")
+        # 흔들기: 놀이터 0에서는 참나무를 눌러도 횟수가 그대로라 미션으로 나오면 안 돼요(위에서 확인). 놀이터를 지으면 다시 나와요
+        built = await pn.evaluate(f"(()=>{{ const F={F}, S=F.S; S.f.playground=1; return Object.keys(F.EV_MEASURE).filter(t => F.evOk(t)).sort(); }})()")
+        if not all(t in built for t in ('picks', 'shakes', 'dmDone')): fails.append(f'놀이터를 지어도 줍기, 흔들기, 오늘의 미션이 안 열려요 {built}')
+        if errsn: fails.append(f'새 저장 페이지 오류 {errsn}')
+        await ctx2.close()
         # 4) 이벤트: 11월 3일(도토리 수확 축제 1~7일)
         await set_day(pg, 2026, 11, 3)
         e = await pg.evaluate(f"""(()=>{{ const F={F}, S=F.S; F.setTab('event'); const txt=document.querySelector('#evBody').textContent;
@@ -112,14 +137,17 @@ async def main():
         if ov['d2'] is not None or ov['d6'] != 'xmas:2026-12-05' or ov['d8'] is not None or ov['nx'] != 'xmas:2026-12-05' or ov['nx2'] != 'friends:2026-12' or ov['friends'] != 'friends:2026-12':
             fails.append(f'특별 이벤트와 겹치는 달의 반복 이벤트 건너뛰기가 틀려요 {ov}')
         await pg.wait_for_timeout(1300)   # 표를 바꿨으니 1초 갱신이 회차를 닫아요(12월 2일이 더는 이벤트 날이 아니에요)
-        skip = await pg.evaluate(f"(()=>{{ const F={F}, S=F.S; F.setTab('school'); F.setTab('event'); return {{ cur: S.ev.cur, stamp: F.claimStamp(), txt: document.querySelector('#evBody').textContent.slice(0,120) }}; }})()")
+        skip = await pg.evaluate(f"(()=>{{ const F={F}, S=F.S; F.setTab('school'); F.setTab('event'); return {{ cur: S.ev.cur, stamp: F.claimStamp(), txt: document.querySelector('#evBody').textContent }}; }})()")
         if skip['cur'] != '' or skip['stamp'] is not False or '크리스마스 파티' not in skip['txt'] or '12월 5일' not in skip['txt']: fails.append(f'겹치는 달에 도장을 또 받거나 안내가 틀려요 {skip}')
+        if '이번 달은 크리스마스 파티 때문에 도토리 수확 축제는 쉬어요' not in skip['txt'] or not skip['txt'].startswith('이번 달은'): fails.append(f"건너뛴 달 안내 문구가 없어요(12월 2일) {skip['txt'][:80]}")
         await set_day(pg, 2026, 12, 6)
-        x6 = await pg.evaluate(f"(()=>{{ const F={F}, S=F.S; const a=F.claimStamp(); {CLEAN}; return {{ cur: S.ev.cur, a, n: S.ev.stamp.n }}; }})()")
+        x6 = await pg.evaluate(f"(()=>{{ const F={F}, S=F.S; const a=F.claimStamp(); {CLEAN}; F.setTab('school'); F.setTab('event'); return {{ cur: S.ev.cur, a, n: S.ev.stamp.n, txt: document.querySelector('#evBody').textContent }}; }})()")
         if x6['cur'] != 'xmas:2026-12-05' or x6['a'] is not True or x6['n'] != 1: fails.append(f'겹치는 달의 특별 이벤트 도장이 틀려요 {x6}')
+        if '이번 달은 크리스마스 파티 때문에 도토리 수확 축제는 쉬어요' not in x6['txt']: fails.append('특별 이벤트 중에 건너뛴 달 안내 문구가 없어요(12월 6일)')
         await set_day(pg, 2026, 12, 8)
         x8 = await pg.evaluate(f"(()=>{{ const F={F}, S=F.S; F.setTab('school'); F.setTab('event'); return {{ cur: S.ev.cur, stamp: F.claimStamp(), txt: document.querySelector('#evBody').textContent.slice(0,140) }}; }})()")
         if x8['cur'] != '' or x8['stamp'] is not False or '숲속 친구 주간' not in x8['txt']: fails.append(f'특별 이벤트가 끝난 뒤 수확 축제가 다시 열려요 {x8}')
+        if '쉬어요' in x8['txt']: fails.append('수확 축제 기간이 아닌데 쉬는 안내가 나와요(12월 8일)')
         # 특별 이벤트 표: 날짜를 적으면 예정 목록에 보이고, 그날이 되면 반복 이벤트보다 먼저 열려요
         sp = await pg.evaluate(f"""(()=>{{ const F={F}, S=F.S; const x=F.EV_SPECIAL.find(e=>e.id==='xmas'); x.start='2026-12-24'; x.end='2026-12-26';
           F.setTab('school'); F.setTab('event'); const up=document.querySelector('#evBody').textContent.includes('크리스마스 파티');
