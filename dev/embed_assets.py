@@ -21,6 +21,7 @@ RULES = [
     ('room_', 900, 72),
     ('fur_', 200, 78),
     ('roof_', 400, 80),
+    ('oak', 300, 80),
 ]
 SKIP = {'building_positions'}
 
