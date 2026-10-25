@@ -113,7 +113,7 @@ async def main():
                 await page.wait_for_timeout(600)
                 await open_settings(page)
                 r = {'settings': await page.evaluate(SETTINGS)}
-                await page.tap('.tab[data-tab="rank"]'); await page.wait_for_timeout(500)
+                await page.tap('.tab[data-tab="school"]'); await page.tap('.tab[data-tab="rank"]')  # 1.5.0: 랭킹은 홈 지도 오른쪽 단추; await page.wait_for_timeout(500)
                 r['rank'] = await page.evaluate(RANK)
                 r['server'] = dump(); r['errors'] = errs
                 await page.screenshot(path='s7_demo_rank.png')
@@ -133,7 +133,7 @@ async def main():
                 r['settings'] = await page.evaluate(SETTINGS)
                 await page.screenshot(path='s7_settings_on.png')
                 # 랭킹
-                await page.tap('.tab[data-tab="rank"]'); await page.wait_for_timeout(700)
+                await page.tap('.tab[data-tab="school"]'); await page.tap('.tab[data-tab="rank"]')  # 1.5.0: 랭킹은 홈 지도 오른쪽 단추; await page.wait_for_timeout(700)
                 await page.fill('#rankName', 'A 교장'); await page.evaluate("document.querySelector('#rankJoin .cta').click()"); await page.wait_for_timeout(1200)
                 r['rank'] = await page.evaluate(RANK)
                 r['rankServer'] = dump()['forest'].get('rank')
@@ -195,7 +195,7 @@ async def main():
                 await page.wait_for_timeout(2500)
                 d = dump()['forest']
                 r['server'] = {'codeGone': A['code'] not in d.get('moves', {}), 'rankB': d['rank'].get(uidB), 'saveB': json.loads(d['saves'][uidB]['d'])['pid'] == A['pid']}
-                await page.tap('.tab[data-tab="rank"]'); await page.wait_for_timeout(900)
+                await page.tap('.tab[data-tab="school"]'); await page.tap('.tab[data-tab="rank"]')  # 1.5.0: 랭킹은 홈 지도 오른쪽 단추; await page.wait_for_timeout(900)
                 r['rank'] = await page.evaluate(RANK)
                 await page.screenshot(path='s7_rank_moved_dark.png')
                 r['errors'] = errs; r['navsLater'] = len(navs) - n0
@@ -249,7 +249,7 @@ async def main():
                 ctx, page, errs, navs = await device(b, seed=elem())
                 await page.wait_for_timeout(1500)
                 r = {'info': await page.evaluate(INFO)}
-                await page.tap('.tab[data-tab="rank"]'); await page.wait_for_timeout(500)
+                await page.tap('.tab[data-tab="school"]'); await page.tap('.tab[data-tab="rank"]')  # 1.5.0: 랭킹은 홈 지도 오른쪽 단추; await page.wait_for_timeout(500)
                 r['rank'] = await page.evaluate(RANK)
                 await page.screenshot(path='s7_err_rank.png')
                 mode(authOff=False)
