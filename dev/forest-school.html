@@ -2766,7 +2766,7 @@ body{background:radial-gradient(120% 60% at 50% 0%, color-mix(in srgb, var(--pap
   }
   // 서버 저장 상태. GitHub 테스트판에서만 켜져요 (아래 '서버 저장'에 자세히 적었어요)
   const Cloud = { state: 'off', gen: 0, fb: null, db: null, uid: null, dirty: false, pushing: false, lastPush: 0, lastStats: 0, timer: 0,
-    offset: 0, online: true, err: '', bootHadSave: false, skipRestore: false, listening: false, moveCode: '', moveAt: 0 };
+    offset: 0, offsetOk: false, online: true, err: '', bootHadSave: false, skipRestore: false, listening: false, moveCode: '', moveAt: 0 };
 
   // q.m: 지금 메인 퀘스트 번호, q.mb: 그 퀘스트를 시작할 때의 기준값, q.subs: 받아 둔 학생 부탁들
   // mid: 지금 메인 퀘스트의 id. 퀘스트 목록이 바뀌어도 이어서 할 수 있게 저장해요
@@ -2800,6 +2800,7 @@ body{background:radial-gradient(120% 60% at 50% 0%, color-mix(in srgb, var(--pap
     rank: { name: '', joined: false, sent: -1, by: '', ren: 0, asked: false },
     // 1.6.0 숲의 정수(미니게임에서만 얻어요)와 블록 퍼즐: 오늘 보상 판 수, 광고로 더한 횟수, 최고 점수, 하던 판
     ess: 0, pz: { day: '', n: 0, adN: 0, best: 0, cur: null },
+    clk: { last: 0 },   // 게임 시계: 지금까지 본 가장 늦은 시각 (gameNow)
     q: freshQ()
   });
   const repOf = s => s.f.classroom + s.f.cafeteria + s.f.playground + 3 * s.f.library + s.f.science + 2 * (s.t.squirrel + s.t.owl + s.t.bear) + 5 * s.p.perk.rep + 10 * s.fp.rep;
@@ -2951,6 +2952,8 @@ body{background:radial-gradient(120% 60% at 50% 0%, color-mix(in srgb, var(--pap
       s.pz.best = Math.min(1e9, Math.floor(num(d.pz.best, 0, 0)));
       s.pz.cur = pzSanitize(d.pz.cur, num);
     }
+    // 게임 시계: 망가진 값으로 영영 멈추지 않게 기기 시간 + 1년까지만 받아요
+    s.clk.last = Math.min(num(d.clk && d.clk.last, 0, 0), Date.now() + 366 * 86400000);
     return s;
   }
   function sanitizeQ(q, num) {
@@ -3052,12 +3055,31 @@ body{background:radial-gradient(120% 60% at 50% 0%, color-mix(in srgb, var(--pap
     d = d || new Date();
     return `${d.getFullYear()}-${String(d.getMonth() + 1).padStart(2, '0')}-${String(d.getDate()).padStart(2, '0')}`;
   }
-  const boostLeft = () => BOOST.perDay - (S.ad.day === todayStr() ? S.ad.n : 0);
+  /* ---------- 게임 시계 (1.6.0) ----------
+     하루 제한과 주간 제한은 기기 시계 대신 이 시계를 써요. 쓰는 법은 dev/memo.md "게임 시계".
+     gameNow(): 지금 시각(ms, Date.now()와 같은 단위). 서버 시간을 받았으면(웹, 구글 플레이) 서버 시간을 믿고 S.clk.last도 그 값으로 바로잡아요.
+                서버가 없으면(토스, 오프라인) 기기 시간을 쓰되, 지금까지 본 가장 늦은 시각(S.clk.last)보다 뒤로 가면 그 시각에 멈춰요. 그래서 시계를 뒤로 돌려도 새 날이 오지 않아요.
+     gameToday(): gameNow()의 날짜를 한국 시간(UTC+9) 기준 'YYYY-MM-DD'로. 기기 시간대를 바꿔도 같은 날이에요.
+     gameWeek(): 한국 시간 월요일 0시에 시작하는 주의 번호(정수). 2026-01-05(월)이 0이에요. */
+  const KST_MS = 9 * 3600000;
+  const kstDay = ms => { const d = new Date(ms + KST_MS); return `${d.getUTCFullYear()}-${String(d.getUTCMonth() + 1).padStart(2, '0')}-${String(d.getUTCDate()).padStart(2, '0')}`; };
+  const serverTimeOk = () => Cloud.offsetOk && cloudOn();
+  function gameNow() {
+    const dev = (window.__FOREST_TEST && rt.fakeNow) || Date.now();   // 자동 시험은 기기 시계를 꾸며 넣을 수 있어요
+    if (!S) return dev;
+    if (!S.clk) S.clk = { last: 0 };
+    if (serverTimeOk()) { const t = dev + (Cloud.offset || 0); S.clk.last = t; return t; }
+    if (dev >= S.clk.last) { S.clk.last = dev; return dev; }
+    return S.clk.last;
+  }
+  const gameToday = () => kstDay(gameNow());
+  const gameWeek = () => Math.floor((gameNow() + KST_MS - Date.UTC(2026, 0, 5)) / 604800000);
+  const boostLeft = () => BOOST.perDay - (S.ad.day === gameToday() ? S.ad.n : 0);
   const boostAmount = () => Math.max(100, nice(rate() * 60 * BOOST.min));
-  const canStamp = () => S.att.last !== todayStr();
+  const canStamp = () => S.att.last !== gameToday();
   const CH1 = () => MAIN.findIndex(q => q.ch === 1);   // 1장(튜토리얼)이 끝나는 퀘스트 번호
   const dealUnlocked = () => S.q.m >= CH1() || S.st.grads > 0 || S.tier > 0;
-  const dealLeft = () => DEAL.perDay - (S.hd.day === todayStr() ? S.hd.n : 0);
+  const dealLeft = () => DEAL.perDay - (S.hd.day === gameToday() ? S.hd.n : 0);
   // 출석부는 1장(튜토리얼)을 마친 뒤에 열어서 첫 몇 분이 너무 쉬워지지 않게 해요
   const attUnlocked = () => S.q.m >= CH1() || S.st.grads > 0 || S.att.n > 0;
   /* 레벨 확장: 종업식을 열어도 시설과 선생님, 도토리는 그대로 남아요. 대신 학년(해)마다 시설의 최고 레벨이 5씩 늘어나요.
@@ -4962,7 +4984,7 @@ body{background:radial-gradient(120% 60% at 50% 0%, color-mix(in srgb, var(--pap
     rt.boostUntil = 0;   // 한 번 들으면 버튼이 들어가고 다음에 다시 나타나요
     closeModal($('#mBoost'), () => showAd(() => {
       const v = boostAmount();   // 광고를 다 본 순간의 수업료로 계산해요
-      const today = todayStr();
+      const today = gameToday();
       if (S.ad.day !== today) { S.ad.day = today; S.ad.n = 0; }
       S.ad.n += 1;
       S.budget += v; earn(v);
@@ -5099,7 +5121,7 @@ body{background:radial-gradient(120% 60% at 50% 0%, color-mix(in srgb, var(--pap
   function applyDeal(d) {
     if (rt.deal === d) rt.deal = null;
     if (!dealValid(d)) { renderDeal(); toast('까치가 다른 소식을 찾으러 갔어요'); return; }
-    const today = todayStr();
+    const today = gameToday();
     if (S.hd.day !== today) { S.hd.day = today; S.hd.n = 0; }
     S.hd.n += 1;
     if (d.type === 'fac' || d.type === 'tea') {
@@ -5206,7 +5228,7 @@ body{background:radial-gradient(120% 60% at 50% 0%, color-mix(in srgb, var(--pap
       }
       if (!Cloud.listening) {
         Cloud.listening = true;
-        db.ref('.info/serverTimeOffset').on('value', snap => { Cloud.offset = Number(snap.val()) || 0; });
+        db.ref('.info/serverTimeOffset').on('value', snap => { Cloud.offset = Number(snap.val()) || 0; Cloud.offsetOk = true; });
         db.ref('.info/connected').on('value', snap => {
           Cloud.online = !!snap.val();
           renderCloudInfo();
@@ -6218,7 +6240,7 @@ body{background:radial-gradient(120% 60% at 50% 0%, color-mix(in srgb, var(--pap
     (q.t === 'students' && q.n >= 50) || (q.t === 'fac' && q.n >= 10) || (q.t === 'picks' && q.n >= 15) ||
     (q.t === 'trips' && q.n >= 3) || q.t === 'souv' || q.t === 'tripat' || q.t === 'sports' || q.t === 'fest');
   const autoOn = () => !!S && Date.now() < S.autoUntil;
-  function goldDay() { const t = todayStr(); if (S.gd.day !== t) { S.gd.day = t; S.gd.n = 0; S.gd.shop = 0; } }
+  function goldDay() { const t = gameToday(); if (S.gd.day !== t) { S.gd.day = t; S.gd.n = 0; S.gd.shop = 0; } }
   function addGold(n) {
     if (!(n > 0)) return;
     S.gold += n; S.st.gold += n;
@@ -6687,7 +6709,7 @@ body{background:radial-gradient(120% 60% at 50% 0%, color-mix(in srgb, var(--pap
     return cur;
   }
   // 오늘 남은 보상 판. 날이 바뀌면 다시 10판
-  function pzDay() { const t = todayStr(); if (S.pz.day !== t) { S.pz.day = t; S.pz.n = 0; S.pz.adN = 0; } }
+  function pzDay() { const t = gameToday(); if (S.pz.day !== t) { S.pz.day = t; S.pz.n = 0; S.pz.adN = 0; } }
   const pzQuota = () => PZ.perDay + S.pz.adN * PZ.adMore;
   const pzLeft = () => { pzDay(); return Math.max(0, pzQuota() - S.pz.n); };
   const pzCanAd = () => { pzDay(); return pzLeft() <= 0 && S.pz.adN < PZ.adMax; };
@@ -7907,7 +7929,7 @@ body{background:radial-gradient(120% 60% at 50% 0%, color-mix(in srgb, var(--pap
   function stampAtt() {
     if (!canStamp()) { shake($('#attGo')); return; }
     const i = S.att.n % 7, r = attValue(i), g = i === 6 ? GOLD.att7 : GOLD.att;
-    S.att.n += 1; S.att.last = todayStr();
+    S.att.n += 1; S.att.last = gameToday();
     if (r.kind === 'dip') { addDip(r.v); toast(`출석 도장 쾅! 수료증 +${r.v}장, 황금 도토리 +${g}`); }
     else { S.budget += r.v; earn(r.v); toast(`출석 도장 쾅! 도토리 +${fmt(r.v)}, 황금 도토리 +${g}`); }
     addGold(g);
@@ -9325,7 +9347,7 @@ body{background:radial-gradient(120% 60% at 50% 0%, color-mix(in srgb, var(--pap
   // 시험용 손잡이: 자동 시험(window.__FOREST_TEST)에서만 게임 속 함수를 꺼내 써요
   if (window.__FOREST_TEST) window.__forest = { get S() { return S; }, get Cloud() { return Cloud; }, rt, makeDeal, furStage, DEAL, navInfo, navRoute, spawnDrop, repTipCheck, linkGoogle, retryCloud, sanitize, acctPending, renderMap, renderHUD, renderAffordance, syncKids, layoutMap, geo, startTrial, hitTrial, endTrial, startVisit, endVisit, showReward, recommend, needCost, prepTopUp, qReward, prepPhase, rankScore, pwOf, previewDip, dipMult, costScale, buyFacility, buyFur, buyFurAll, furCost, furReady, furDone, FUR, startTalk, endTalk, teacherAct, facCost, teaCost, facKeys, rate, rep, capacity, canGraduate, canPromote,
     graduate, promote, buyPerk, perkCost, perkMaxed, buyFundPerk, fpCost, claimMain, mainReady, curMain, qNo, earn, CFG, TEA, teaMaxed, PERKS, FPERKS, MAIN, finalYear, startTrip, claimTrip, TRIPS, yearLocked, startSports, endSports, rtSports: () => rt.sports, startFest, rtFest: () => rt.fest, facCap, addLeague, weekIdx, addMP, tutStart, endFest, claimSports, claimBox, musicWant, askBox, festWait, setTab, openSheet, closeSheet,
-    PZ, PZ_SHAPES, pzFits, pzAnyFit, pzStuck, pzFullLines, pzPlace, pzFreshGame, pzStart, pzFinish, pzLeft, pzCanAd, pzEssOf, pzMinOf, pzHelpSquirrel, pzHelpOwl, pzHelpBear, pzHasHelp, pzRot, pzNewPiece, pzOpen, pzClose, pzGameOver, pzRenderAll, renderMini, addEss };
+    PZ, PZ_SHAPES, pzFits, pzAnyFit, pzStuck, pzFullLines, pzPlace, pzFreshGame, pzStart, pzFinish, pzLeft, pzCanAd, pzEssOf, pzMinOf, pzHelpSquirrel, pzHelpOwl, pzHelpBear, pzHasHelp, pzRot, pzNewPiece, pzOpen, pzClose, pzGameOver, pzRenderAll, renderMini, addEss, gameNow, gameToday, gameWeek, kstDay, pzDay, goldDay, boostLeft, dealLeft, canStamp };
   if (window.claude && window.claude.hot && window.claude.hot.snapshot) {
     try { window.claude.hot.snapshot(() => { if (S) syncMid(); return { save: S }; }); } catch (e) { /* 무시 */ }
   }
