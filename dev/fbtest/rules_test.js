@@ -64,23 +64,12 @@ t('stats read anon', R(null, '/forest/stats'), false);
 t('stats write own', W('B', '/forest/stats/B', Object.assign({}, STAT, { seen: { '.sv': 'timestamp' } })), true);
 t('stats write other', W('B', '/forest/stats/A', STAT), false);
 t('stats no pid', W('B', '/forest/stats/B', { seen: 1 }), false);
-// 이어하기 코드: 코드를 아는 사람만 읽고, 새로 만들거나 지울 수만 있어요
+// 1.5.6: 이어하기 코드 자리(moves)는 없앴어요. 남은 기록도 아무도 읽거나 쓰지 못해요
 const MV = { d: 'y', at: { '.sv': 'timestamp' }, from: 'B', v: '1.0' };
-t('move read by code', R('B', '/forest/moves/K7QM2XPA'), true);
-t('move read expired', R('B', '/forest/moves/OLDC2345'), false);
-t('move read missing', R('B', '/forest/moves/NONE2345'), true);
-t('move delete expired', W('B', '/forest/moves/OLDC2345', null), true);
-t('move read anon', R(null, '/forest/moves/K7QM2XPA'), false);
-t('move list', R('B', '/forest/moves'), false);
-t('move create', W('B', '/forest/moves/ABCD2345', MV), true);
-t('move overwrite', W('B', '/forest/moves/K7QM2XPA', MV), false);
-t('move overwrite own', W('A', '/forest/moves/K7QM2XPA', Object.assign({}, MV, { from: 'A' })), false);
-t('move from other', W('B', '/forest/moves/ABCD2345', Object.assign({}, MV, { from: 'A' })), false);
-t('move future at', W('B', '/forest/moves/ABCD2345', Object.assign({}, MV, { at: Date.now() + 3600e3 })), false);
-t('move bad code 0', W('B', '/forest/moves/ABCD0345', MV), false);
-t('move bad code len', W('B', '/forest/moves/ABCD234', MV), false);
-t('move delete by redeemer', W('B', '/forest/moves/K7QM2XPA', null), true);
-t('move delete anon', W(null, '/forest/moves/K7QM2XPA', null), false);
+t('move read gone', R('B', '/forest/moves/K7QM2XPA'), false);
+t('move list gone', R('B', '/forest/moves'), false);
+t('move create gone', W('B', '/forest/moves/ABCD2345', MV), false);
+t('move delete gone', W('B', '/forest/moves/K7QM2XPA', null), false);
 // 나머지는 막혀요
 t('root read', R('A', '/'), false);
 t('root write', W('A', '/hack', 1), false);
