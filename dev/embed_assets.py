@@ -28,6 +28,7 @@ RULES = [
     ('pz_', 96, 84),
     ('fx_', 96, 84),
     ('essence_', 240, 82),
+    ('cos_', 160, 84),   # 1.6.0 정수 상점 한정 모자 (fur_sp_ 특별 가구는 fur_ 규칙)
 ]
 SKIP = {'building_positions'}
 

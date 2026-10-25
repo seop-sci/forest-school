@@ -9,9 +9,9 @@
 ## 남은 일 (1.6.0, feat/v160-puzzle, 2026-10-26부터 본부 대화가 맡아요)
 
 1. 브랜치 옮기기: 끝 (2026-10-26 본부 대화, 1.5.6이 합쳐진 main을 이 브랜치에 합침. 게임 시계 시험은 s47이 1.5.6과 겹쳐 s49로 바꿈). 1.5.6은 이어하기 코드 삭제, 행사 팝업 위치, #vBudget 두 단위 표시, s26test를 고쳐요. 겹칠 수 있는 곳은 Firebase 연결 코드의 `.info/serverTimeOffset` 한 줄(1.6.0이 `setServerTime` 호출을 더함)과 `dev/forest-school.html`의 시험 손잡이(`window.__forest`) 목록이에요. 옮긴 뒤 s37, s46, s47, s41(길 찾기)를 다시 돌려요.
-2. Codex 작업지시서 2의 3단계 그림(fx_leaf_1~3, fx_sparkle, essence_big, essence_pile)이 art/v160-assets에 오면 `python3 dev/embed_assets.py <폴더>`로 넣고(fx_, essence_ 규칙은 이미 있어요), 퍼즐의 잎 조각 효과(.pz-leaf)와 판 끝 보상 창의 정수 그림을 바꿔 끼워요.
+2. Codex 그림 넣기: 끝 (2026-10-26 본부 대화). 작업지시서 2의 3단계(fx_leaf_1~3, fx_sparkle, essence_big, essence_pile)와 작업지시서 3(cos_hat_* 5, fur_sp_* 5, pz_tea_* 3)을 FS_IMG에 넣음(embed_assets.py에 cos_ 규칙 추가). 퍼즐: 줄이 지워질 때 그림 잎과 꽃잎, 문양 줄은 반짝이 / 선생님 블록은 pz_tea 그림이 블록이 되고 모퉁이에 원래 문양을 작게 / 판 끝 창에 정수 무더기 그림. essence_big은 정수 상점에서 써요. 모자와 특별 가구는 정수 상점을 만들 때 연결해요.
 3. Codex 작업지시서 3: 끝 (2026-10-26 본부 대화). 기준 그림은 브랜치 art/v160-assets-3의 art/v160/ref3/, 지시서는 claude.ai 프로젝트 문서 "Codex 작업지시서 3 (1.6.0)". 겹치는 모자 셋은 마법사 모자, 버섯 모자, 월계관으로 바꿔 제안(지섭 확인 대기). 파일: art/v160/cosmetics/cos_hat_{grad,santa,wizard,mushroom,laurel}.png(512), art/v160/furniture/fur_sp_{aquarium,cake,globelamp,dino,carousel}.png(1024), art/v160/puzzle/pz_tea_{squirrel,owl,bear}.png(256). 오면 넣어요.
-4. 메인 퀘스트 균형(1.5.x에서 넘어옴): 9-2가 너무 오래 걸려요. MAIN, qReward, rate, costScale, incomeScale을 살펴 도토리 보상이나 초당 수업료 조절이 필요한지 파악하고, 정수 상점 도토리 묶음 값과 함께 지섭에게 먼저 제안해요(고치기 전에 답 기다리기).
+4. 균형: 끝 (2026-10-26 균형 제안서, 지섭 확정). 메인 퀘스트 목표 e26 운동장 Lv.28→27, e30 도서관 32→24, e32 급식실 33→24, e35 과학실 35→18. 퍼즐 수업료 100점마다 1분치, 판당 15분치까지. 정수 상점 값: 한정 모자 120, 특별 가구 200, 도토리 묶음(수업료 30분치) 20 하루 3번, 황금 도토리 3개 60 일주일 2번. (1.7.0) 교감 고슴도치 행사 보상 레벨마다 +10%, 최고 Lv.10. 5, 6학년 대도시 퀘스트는 이 숫자로 다시 재 봐요.
 5. 정수 상점 만들기: 홈 오른쪽 "정수 상점" 단추(지금 hidden, data-soon)를 열어요. 꾸미기(3차 그림)가 위, 도토리 묶음("수업료 몇 분치", 하루 구매 제한 gameToday)과 황금 도토리(조금만, 비싸게, 일주일 제한 gameWeek, 번호가 작아지면 무시)는 아래 칸. 값은 `SHOP` 한곳에 임시값으로 모아 두고 4번 제안 뒤 지섭이 정해요. 저장은 새 칸만 더해요(fresh, sanitize). 숲의 정수를 얻는 길은 미니게임뿐이에요(addEss).
 6. 보안 점검 나머지: 랭킹 점수 조작 막기(서버 규칙), 토스와 안드로이드 판 코드 압축, Firebase 콘솔 앱 체크와 API 키 제한 확인(지섭이 콘솔에서), 공개 출시 직전 저장소 비공개 전환과 웹 테스트판 옮기기.
 7. 1.6.0 내기: 버전 네 곳과 CHANGELOG(docs/RELEASE.md), PR 열기. 지섭이 "업데이트하자"라고 하면 main에 합치고 토스 .ait를 보내요.

@@ -98,8 +98,8 @@ RULES = r"""() => {
   g.tray = [{ c: [[0, 0], [0, 1]], k: 1 }, { c: [[0, 0], [1, 0]], k: 2 }, null];
   ok(F.pzStuck(g), '막힘을 알아채야 해요');
   g.tray[2] = { c: [[0, 0]], k: 1 }; ok(!F.pzStuck(g), '1칸 조각이 있으면 안 막혀요');
-  // 보상 상한: 점수 150점마다 정수 1(25개까지), 200점마다 수업료 1분치(30분치까지)
-  eq([F.pzEssOf(149), F.pzEssOf(150), F.pzEssOf(1e9), F.pzMinOf(199), F.pzMinOf(200), F.pzMinOf(1e9)], [0, 1, 25, 0, 1, 30], '보상 상한');
+  // 보상 상한: 점수 150점마다 정수 1(25개까지), 100점마다 수업료 1분치(15분치까지, 2026-10-26 균형 제안서)
+  eq([F.pzEssOf(149), F.pzEssOf(150), F.pzEssOf(1e9), F.pzMinOf(99), F.pzMinOf(100), F.pzMinOf(1e9)], [0, 1, 25, 0, 1, 15], '보상 상한');
   // 하루 10판 + 광고 3판
   S.pz = { day: '', n: 0, adN: 0, best: 0, cur: null };
   const rws = [];
