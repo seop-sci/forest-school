@@ -2,6 +2,13 @@ import asyncio, json, subprocess, time
 from playwright.async_api import async_playwright
 import s7test as T
 from s7test import device, api, dump, HERE, PORT
+# 1.5.6: 숨은 퀘스트 탭 대신 홈 지도 오른쪽의 퀘스트 단추로 열어요 (1.6.0 브랜치처럼 숨은 탭이 없어도 돌아요)
+def side(tab, label):
+    return f"""(()=>{{ const F=window.__forest; if (F && F.setTab) F.setTab('school');
+  const b=document.querySelector('[aria-label="{label}"]')||document.querySelector('.map-right [data-tab={tab}]')||document.querySelector('.tab[data-tab={tab}]');
+  if (b) {{ b.click(); return 'btn'; }} F.setTab('{tab}'); return 'set'; }})()"""
+OPEN_Q = side('quests', '퀘스트 전체 보기')
+OPEN_RANK = side('rank', '랭킹')
 async def main():
     srv = subprocess.Popen(['node', str(HERE/'fbtest'/'fbserver.js'), str(HERE/'gh'), str(PORT), str(HERE/'gh_database.rules.json')], stdout=subprocess.PIPE)
     time.sleep(1); out = {}
@@ -13,7 +20,7 @@ async def main():
             ctx, pg, errs, _ = await device(b, seed=sv)
             await pg.wait_for_timeout(2500)
             await pg.evaluate("document.querySelectorAll('.overlay.center').forEach(o=>{o.hidden=true;o.classList.remove('open')})")
-            await pg.evaluate("document.querySelector('.tab[data-tab=quests]').click()"); await pg.wait_for_timeout(500)
+            await pg.evaluate(OPEN_Q); await pg.wait_for_timeout(500)
             r = {'missions': await pg.evaluate("document.querySelector('#qDaily').innerText.replace(/\\n+/g,' | ')")}
             await pg.screenshot(path='s26_missions.png')
             # 미션 하나 채우기: 도토리 줍기/시설 고치기 같은 카운터를 직접 올려요
@@ -27,14 +34,14 @@ async def main():
             pg = await ctx.new_page(); errs = []; pg.on('pageerror', lambda e: errs.append(str(e)))
             await pg.goto(T.ORIGIN + '/'); await pg.wait_for_timeout(2500)
             await pg.evaluate("document.querySelectorAll('.overlay.center').forEach(o=>{o.hidden=true;o.classList.remove('open')}); window.__forest.rt.modalOpen=null; window.__forest.rt.modalQueue.length=0")
-            await pg.evaluate("document.querySelector('.tab[data-tab=quests]').click()"); await pg.wait_for_timeout(300)
+            await pg.evaluate(OPEN_Q); await pg.wait_for_timeout(300)
             await pg.evaluate("(()=>{const S=window.__forest.S; S.st.picks+=99; S.st.shakes+=99; S.st.ups+=99; S.st.trains+=99; S.st.ads+=99; S.q.subDone+=99; S.st.trips+=9; S.st.sports+=9;})()"); await pg.wait_for_timeout(500)
             for i in range(3):
                 await pg.evaluate("document.querySelector('[data-dm]') && document.querySelector('[data-dm]').click()"); await pg.wait_for_timeout(250)
             await pg.evaluate("document.querySelector('[data-dm=bonus]') && document.querySelector('[data-dm=bonus]').click()"); await pg.wait_for_timeout(400)
             r['after'] = await pg.evaluate("[document.querySelector('#qDaily').innerText.replace(/\\n+/g,' | '), window.__forest.S.gold, window.__forest.S.lg.pts]")
             await pg.screenshot(path='s26_missions_done.png')
-            await pg.evaluate("document.querySelector('.tab[data-tab=rank]').click()"); await pg.wait_for_timeout(3500)
+            await pg.evaluate(OPEN_RANK); await pg.wait_for_timeout(3500)
             r['rank'] = await pg.evaluate("[document.querySelector('#rankScoreLab').textContent, document.querySelector('#rankScore').textContent, document.querySelector('#rankPos').textContent, document.querySelector('#rankList').innerText.replace(/\\n+/g,' | ')]")
             await pg.screenshot(path='s26_league.png')
             await pg.evaluate("document.querySelector('[data-rv=all]').click()"); await pg.wait_for_timeout(500)

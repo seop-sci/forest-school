@@ -1,4 +1,4 @@
-# 1.5.4 시험 (가짜 Firebase): 구글 계정 바꾸기가 끊겼을 때, 계정 지우기가 거절됐을 때, 이어하기 코드 정리
+# 1.5.4 시험 (가짜 Firebase): 구글 계정 바꾸기가 끊겼을 때, 계정 지우기가 거절됐을 때
 # 쓰는 법: python3 build_gh.py gh && NODE_PATH=<targaryen 폴더> python3 s44test.py   (마지막 줄이 PASS면 통과)
 import asyncio, json, sys, subprocess, time
 from playwright.async_api import async_playwright
@@ -56,19 +56,15 @@ async def delete_retry(b):
     await page.reload(); await page.wait_for_timeout(800)
     await wait_cloud(page)
     uid = await uid_of(page)
-    # 이어하기 코드를 만들어 둬요 (계정을 지우면 함께 지워져야 해요)
-    await page.evaluate("document.querySelector('.tab[data-tab=settings]').click()"); await page.wait_for_timeout(300)
-    await page.evaluate("document.querySelector('#optMove').click()"); await page.wait_for_timeout(300)
-    await page.evaluate("document.querySelector('#moveMake').click()"); await page.wait_for_timeout(1200)
-    code = await page.evaluate(f"{F}.Cloud.moveCode")
-    check('이어하기 코드를 만들었어요', bool(code), str(code))
+    # 1.5.6: 이어하기 코드 기능은 없어요 (설정에 단추도, 창도 없어요)
+    check('이어하기 화면 없음', not await page.evaluate("!!document.querySelector('#optMove, #mMove')"))
     # Firebase가 '최근에 로그인해야 해요'로 계정 지우기를 거절해요
     await page.evaluate("localStorage.setItem('__delFail', '1')")
     await page.evaluate("document.querySelectorAll('.overlay').forEach(o=>{o.hidden=true;o.classList.remove('open')})")
     await page.evaluate("document.querySelector('#delYes').click()"); await page.wait_for_timeout(2500)
     d = dump().get('forest', {})
     check('서버 저장 지움', uid not in d.get('saves', {}))
-    check('이어하기 코드 지움', code not in d.get('moves', {}), str(list(d.get('moves', {}).keys())))
+    check('이어하기 자리 없음', 'moves' not in d, str(list(d.keys())))
     pend = await page.evaluate("localStorage.getItem('forest-del-pending')")
     check('계정을 못 지운 표시', pend == '1', str(pend))
     t = await toast(page)
