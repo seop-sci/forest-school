@@ -19,7 +19,9 @@ async def run(b, dark, w, h, fails):
     if not boot[0]: fails.append(f'[{tag}] 로딩 그림이 없어요')
     if boot[1] < h * 0.5: fails.append(f'[{tag}] 로딩 그림이 너무 작아요 {boot[1]}')
     if boot[2] > h: fails.append(f'[{tag}] 진행 막대가 화면 밖이에요')
-    if boot[4] != 'v1.4.0': fails.append(f'[{tag}] 로딩 버전 {boot[4]}')
+    import re, pathlib
+    want = 'v' + re.search(r"const VERSION = '([\d.]+)'", (pathlib.Path(__file__).parent / 'forest-school.html').read_text(encoding='utf-8')).group(1)
+    if boot[4] != want: fails.append(f'[{tag}] 로딩 버전 {boot[4]} (원본 {want})')
     if not boot[5]: fails.append(f'[{tag}] 로딩 화면이 옆으로 넘쳐요')
     await pg.wait_for_timeout(2600); await pg.evaluate(SKIPTUT); await pg.evaluate(CLEAN)
     # 배경음악: 홈, 다른 탭, 행사
@@ -49,7 +51,8 @@ async def run(b, dark, w, h, fails):
     # 보물찾기 끝: 알림 문구는 행사 이름, 2배 버튼 없음
     await pg.evaluate(f"(()=>{{ {F}.S.fest.next.picnic = 0; {F}.startFest('picnic', true); }})()"); await pg.wait_for_timeout(4500)
     await pg.evaluate(f"(()=>{{ const R={F}.rtFest(); if (R) {{ R.n = 99; }} {F}.endFest(); }})()"); await pg.wait_for_timeout(1200)
-    end = await pg.evaluate("[!document.querySelector('#mSportsEnd').hidden, !!document.querySelector('#srDbl'), document.querySelector('#srGet').className]")
+    end = await pg.evaluate("[!document.querySelector('#mSportsEnd').hidden, !!document.querySelector('#srDbl'), document.querySelector('#srGet').className, Math.round(document.querySelector('#srGet').getBoundingClientRect().width), Math.round(document.querySelector('#srGet').parentElement.getBoundingClientRect().width)]")
+    if abs(end[3] - end[4]) > 2: fails.append(f'[{tag}] 받기 버튼이 줄을 꽉 채우지 않아요 {end[3]}/{end[4]}')
     await pg.screenshot(path=f's40_festend_{tag}.png')
     await pg.evaluate("document.querySelector('#srGet').click()"); await pg.wait_for_timeout(700)
     toast = await pg.evaluate("document.querySelector('#toast').textContent")

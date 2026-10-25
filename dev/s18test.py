@@ -24,7 +24,7 @@ async def main():
             await pg.wait_for_timeout(1500)
             d = dump()['forest']['rank']
             r['server'] = {k: v['name'] for k, v in d.items()}
-            await pg.tap('.tab[data-tab="rank"]'); await pg.wait_for_timeout(600)
+            await pg.tap('.tab[data-tab="school"]'); await pg.tap('.tab[data-tab="rank"]')  # 1.5.0: 랭킹은 홈 지도 오른쪽 단추; await pg.wait_for_timeout(600)
             await pg.evaluate("document.querySelector('[data-rank=edit]').click()"); await pg.wait_for_timeout(200)
             r['edit'] = await pg.evaluate("document.querySelector('#rankJoin').innerText")
             await pg.screenshot(path='s18_rank_edit.png')
