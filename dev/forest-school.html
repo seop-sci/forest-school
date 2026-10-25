@@ -1225,6 +1225,35 @@ body{background:radial-gradient(120% 60% at 50% 0%, color-mix(in srgb, var(--pap
 .stats .rep-row{font-size:0}
 .stats .rep-row span{font-size:11px}
 .stats .stat-pw{flex:0 1 auto}
+
+/* 얇은 위쪽 줄: 학교 카드, 도토리 알약, 단추. 학생, 평판, 학교 파워는 학교 카드를 누르면 펼쳐져요 */
+.board-top{gap:6px;padding:5px 6px 6px 10px}
+.board .school{cursor:pointer;-webkit-tap-highlight-color:transparent}
+.board .school-row{flex-wrap:nowrap;align-items:center;gap:5px}
+.board .school-name{font-size:15px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;min-width:0}
+.board .grade-pill{font-size:11.5px;line-height:1.3;padding:0 6px}
+.sc-chev{flex:none;width:14px;height:14px;color:var(--chalk-dim);transition:transform .15s}
+.board.open .sc-chev{transform:rotate(180deg)}
+.board .school-year{font-size:10.5px;gap:4px}
+.board .school-year b{font-size:12px}
+.board .ydots i{width:6px;height:6px}
+.board .progress{margin-top:2px;gap:6px}
+.board .bar{height:5px}
+.board .progress span{font-size:10px}
+.board .progress .grade-pill{flex:none;font-size:11px;line-height:1.25;padding:0 6px}
+@media (max-width:380px){.board #vNext{display:none}}
+.board-top .stat-main{flex:none;display:grid;grid-template-columns:auto auto;grid-template-rows:auto auto;column-gap:5px;align-items:center;padding:3px 9px 3px 6px;border-radius:999px;background:color-mix(in srgb, #000 18%, transparent);border:1.5px solid color-mix(in srgb, #8FBF7C 40%, transparent)}
+.board-top .stat-main .lab{grid-row:1 / 3;font-size:0;gap:0}
+.board-top .stat-main .lab svg,.board-top .stat-main [data-acorn] svg{width:18px;height:18px}
+.board-top .stat-main b{font-size:17px;line-height:1.05}
+.board-top .stat-main small{font-size:10.5px;line-height:1.05}
+.board .icon-btn,.board .tab.xgear{width:32px;height:32px;border-radius:10px}
+.board .tab.xgear .tic{width:24px;height:24px}
+.board .stats{display:none;position:absolute;left:0;right:0;top:100%;margin-top:6px;z-index:5}
+.board.open .stats{display:flex}
+.board.open{z-index:8}
+.board.open .stats{padding:7px;border-radius:16px;background:var(--board);border:2px solid color-mix(in srgb, #8FBF7C 55%, var(--board));box-shadow:0 6px 16px rgba(10,25,15,.35)}
+.board.open .stats .stat{background:color-mix(in srgb, #000 16%, transparent);box-shadow:none}
 </style>
 
 <div class="boot" id="boot" role="status" aria-label="숲속 동물 학교를 여는 중이에요">
@@ -1243,16 +1272,22 @@ body{background:radial-gradient(120% 60% at 50% 0%, color-mix(in srgb, var(--pap
 <div class="scroller" id="scroller">
   <header class="board">
     <div class="board-top">
-      <div class="school">
+      <div class="school" id="schoolCard" role="button" tabindex="0" aria-expanded="false" aria-controls="stats" aria-label="학교 현황 펼치기">
         <div class="school-row">
           <h1 class="school-name" id="schoolName">숲속 유치원</h1>
-          <span class="grade-pill" id="gradePill">분교</span>
+          <svg class="sc-chev" viewBox="0 0 24 24" aria-hidden="true"><path d="M6 9l6 6 6-6" fill="none" stroke="currentColor" stroke-width="2.6" stroke-linecap="round" stroke-linejoin="round"/></svg>
         </div>
         <div class="school-year" id="schoolYear"><b id="yearNow">1년째</b><span class="ydots" id="yearDots" aria-hidden="true"></span><span class="ynote" id="yearNote"></span></div>
         <div class="progress">
+          <span class="grade-pill" id="gradePill">분교</span>
       <div class="bar" id="gradeBar" role="progressbar" aria-label="다음 동네까지" aria-valuemin="0" aria-valuemax="100" aria-valuenow="0"><i id="barFill"></i></div>
       <span id="vNext">마을까지 ★12</span>
         </div>
+      </div>
+      <div class="stat stat-main">
+        <span class="lab"><span data-acorn></span>도토리</span>
+        <b id="vBudget">20</b>
+        <small id="vRate">초당 +1.2</small>
       </div>
       <button class="icon-btn" id="btnAtt" type="button" aria-label="출석부">
         <svg viewBox="0 0 24 24" width="20" height="20" aria-hidden="true"><rect x="4" y="5.5" width="16" height="14.5" rx="2.5" fill="none" stroke="currentColor" stroke-width="2"/><path d="M8 3.5v4M16 3.5v4M4 10h16" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"/><circle cx="12" cy="15" r="2.6" fill="currentColor"/></svg>
@@ -1264,11 +1299,6 @@ body{background:radial-gradient(120% 60% at 50% 0%, color-mix(in srgb, var(--pap
       </button>
     </div>
     <div class="stats" id="stats">
-      <div class="stat stat-main">
-        <span class="lab"><span data-acorn></span>도토리</span>
-        <b id="vBudget">20</b>
-        <small id="vRate">초당 +1.2</small>
-      </div>
       <div class="stat">
         <span class="lab"><svg viewBox="0 0 24 24" aria-hidden="true"><g fill="currentColor"><ellipse cx="12" cy="15.5" rx="5" ry="4.2"/><circle cx="6.4" cy="10" r="2.2"/><circle cx="10" cy="6.4" r="2.2"/><circle cx="14" cy="6.4" r="2.2"/><circle cx="17.6" cy="10" r="2.2"/></g></svg>학생</span>
         <b id="vStudents">4/10</b>
@@ -6650,7 +6680,7 @@ body{background:radial-gradient(120% 60% at 50% 0%, color-mix(in srgb, var(--pap
   const TUT_GOLD = 1;
   const TUT = [
     { sel: null, t: '숲속 동물 학교에 온 걸 환영해요!', d: '저는 교감 선생님 고슴도치예요. 학교를 어떻게 꾸려 가는지 짧게 알려 드릴게요. 끝까지 보면 황금 도토리를 드려요.' },
-    { sel: '#stats', t: '우리 학교 현황', d: '도토리는 수업료로 저절로 쌓여요. 학생이 많고 평판이 높을수록 학교가 커져요. 오른쪽 학교 파워는 지금까지 쌓아 온 모든 것을 더한 힘이에요. 학교 이름 아래 막대는 다음 동네 단계까지 남은 평판이에요.' },
+    { sel: '.board-top', t: '우리 학교 현황', d: '도토리는 수업료로 저절로 쌓여요. 학교 카드를 누르면 학생 수, 평판, 학교 파워가 펼쳐져요. 학생이 많고 평판이 높을수록 학교가 커지고, 학교 파워는 지금까지 쌓아 온 모든 것을 더한 힘이에요. 학교 이름 아래 막대는 다음 동네 단계까지 남은 평판이에요.' },
     { sel: '#questBar', t: '메인 퀘스트', d: '제가 할 일을 하나씩 알려 드려요. 다 하면 여기를 눌러 보상을 받아요. 막히면 눌러서 바로 가 보세요.' },
     { sel: '#b-classroom', t: '건물 키우기', d: '건물을 누르면 안이 보여요. 가구 네 개를 모두 건물 레벨까지 올리면 건물을 키울 수 있어요. 교실을 넓히면 학생이 더 들어오고, 급식실은 수업료, 도서관은 평판을 올려 줘요. 지도는 손가락으로 밀어 볼 수 있어요.', scroll: true },
     { sel: '#oak', t: '참나무 흔들기', d: '놀이터를 지으면 옆 참나무를 눌러 도토리를 떨어뜨릴 수 있어요. 떨어진 도토리를 눌러 주우면 도토리를 듬뿍 받아요.', scroll: true },
@@ -7907,6 +7937,13 @@ body{background:radial-gradient(120% 60% at 50% 0%, color-mix(in srgb, var(--pap
     $$('[data-ic]').forEach(el => { const u = IMG(el.dataset.ic); if (u) el.style.backgroundImage = `url("${u}")`; });
     $$('.panel-x').forEach(b => b.addEventListener('click', () => { setTab('school'); sfx('tap'); }));
     setupPan(); requestAnimationFrame(() => fitMap(true));
+    // 학교 카드를 누르면 학생, 평판, 학교 파워가 펼쳐져요
+    const sc = $('#schoolCard'), board = $('.board');
+    const scToggle = on => { board.classList.toggle('open', on); sc.setAttribute('aria-expanded', on ? 'true' : 'false'); sc.setAttribute('aria-label', on ? '학교 현황 접기' : '학교 현황 펼치기'); };
+    sc.addEventListener('click', () => { scToggle(!board.classList.contains('open')); sfx('tap'); });
+    sc.addEventListener('keydown', e => { if (e.key === 'Enter' || e.key === ' ') { e.preventDefault(); sc.click(); } });
+    document.addEventListener('pointerdown', e => { if (board.classList.contains('open') && !e.target.closest('.board')) scToggle(false); });
+
     $$('[data-soon]').forEach(b => b.addEventListener('click', () => { toast(b.dataset.soon); sfx('tap'); }));
 
     // 퀘스트 쪽지: 완료했으면 보상 받기, 아니면 해야 할 곳으로 바로 가기
