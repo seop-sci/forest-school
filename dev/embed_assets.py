@@ -28,7 +28,6 @@ RULES = [
     # 1.7.0 도감, 이벤트
     ('dex_', 720, 78),
     ('ev_', 720, 75),
-    ('fx_', 200, 80),
 ]
 SKIP = {'building_positions'}
 

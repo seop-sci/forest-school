@@ -8839,21 +8839,31 @@ body{background:radial-gradient(120% 60% at 50% 0%, color-mix(in srgb, var(--pap
   const EV_BOX = { g: 2, dip: 1 };   // 미션 3개를 다 하면 받는 기념 상자
   // 미션은 기존 횟수 통계(S.st)의 "이벤트 시작 때와의 차이"로 재요. 놀이 코드에는 손대지 않아요
   const EV_MEASURE = {
-    picks: { name: n => `떨어진 도토리 ${n}개 줍기` }, shakes: { name: n => `참나무 ${n}번 흔들기` }, ups: { name: n => `시설이나 가구 ${n}번 고치기` },
-    trains: { name: n => `선생님 연수 ${n}번 보내기` }, claims: { name: n => `자리 비운 도토리 ${n}번 받기` }, dmDone: { name: n => `오늘의 미션 ${n}개 끝내기` },
+    // ok가 거짓이면 아직 못 하는 미션이라 EV_FALLBACK으로 바꿔요. 흔들기, 고치기, 오늘의 미션, 자리 비운 도토리 받기는 늘 할 수 있어요
+    picks: { name: n => `떨어진 도토리 ${n}개 줍기`, ok: () => S.f.playground >= 1 }, shakes: { name: n => `참나무 ${n}번 흔들기` }, ups: { name: n => `시설이나 가구 ${n}번 고치기` },
+    trains: { name: n => `선생님 연수 ${n}번 보내기`, ok: () => DEX_TEACHERS.some(k => S.t[k] >= 1 && !teaMaxed(k)) }, claims: { name: n => `자리 비운 도토리 ${n}번 받기` }, dmDone: { name: n => `오늘의 미션 ${n}개 끝내기` },
     sports: { name: n => `숲속 운동회 ${n}번 열기`, ok: () => festOpen('sports') }, trips: { name: n => `체험학습 ${n}번 다녀오기`, ok: () => tripOpen() }
   };
-  const EV_FALLBACK = [['picks', 80], ['shakes', 60], ['ups', 40]];   // 아직 못 하는 미션(운동회, 체험학습) 대신 넣어요
+  const evOk = t => !!EV_MEASURE[t] && (!EV_MEASURE[t].ok || EV_MEASURE[t].ok());
+  const EV_FALLBACK = [['shakes', 60], ['ups', 40], ['picks', 80]];   // 아직 못 하는 미션 대신 넣어요(앞에서부터, 할 수 있는 것만)
   const pad2 = n => String(n).padStart(2, '0');
   const dayAdd = (day, n) => { const [y, m, d] = day.split('-').map(Number); return new Date(Date.UTC(y, m - 1, d + n)).toISOString().slice(0, 10); };
   const dayDiff = (a, b) => Math.round((Date.parse(b + 'T00:00:00Z') - Date.parse(a + 'T00:00:00Z')) / 86400000);
   const dayText = day => { const [, m, d] = day.split('-').map(Number); return `${m}월 ${d}일`; };
-  // 그날 열려 있는 이벤트. key는 회차마다 다른 글자라서(예: harvest:2026-10) 달이 바뀌면 새 회차로 봐요
+  // 특별 이벤트가 어느 기간과 하루라도 겹치는지
+  const evSpecialHits = (start, end) => EV_SPECIAL.some(e => e.start && e.end && e.start <= end && e.end >= start);
+  // 그날 열려 있는 이벤트. key는 회차마다 다른 글자라서(예: harvest:2026-10) 달이 바뀌면 새 회차로 봐요.
+  // 특별 이벤트가 그달 반복 이벤트 기간과 하루라도 겹치면 그달 그 반복 이벤트는 아예 건너뛰어요(도장과 미션이 끊기거나 두 번 열리지 않게)
   function evCurrent(day) {
     day = day || trustedDay();
     for (const e of EV_SPECIAL) if (e.start && e.end && day >= e.start && day <= e.end) return { def: e, key: `${e.id}:${e.start}`, start: e.start, end: e.end };
     const [y, m, d] = day.split('-').map(Number);
-    for (const e of EV_MONTHLY) if (d >= e.days[0] && d <= e.days[1]) return { def: e, key: `${e.id}:${y}-${pad2(m)}`, start: `${y}-${pad2(m)}-${pad2(e.days[0])}`, end: `${y}-${pad2(m)}-${pad2(e.days[1])}` };
+    for (const e of EV_MONTHLY) {
+      if (d < e.days[0] || d > e.days[1]) continue;
+      const start = `${y}-${pad2(m)}-${pad2(e.days[0])}`, end = `${y}-${pad2(m)}-${pad2(e.days[1])}`;
+      if (evSpecialHits(start, end)) continue;
+      return { def: e, key: `${e.id}:${y}-${pad2(m)}`, start, end };
+    }
     return null;
   }
   // 다음 이벤트(60일 안)
@@ -8869,8 +8879,7 @@ body{background:radial-gradient(120% 60% at 50% 0%, color-mix(in srgb, var(--pap
     const used = new Set(), out = [];
     for (const [t0, n0] of row.ms) {
       let t = t0, n = n0;
-      if (!EV_MEASURE[t] || (EV_MEASURE[t].ok && !EV_MEASURE[t].ok())) { const alt = EV_FALLBACK.find(f => !used.has(f[0])) || EV_FALLBACK[0]; t = alt[0]; n = alt[1]; }
-      if (used.has(t)) { const alt = EV_FALLBACK.find(f => !used.has(f[0])); if (alt) { t = alt[0]; n = alt[1]; } }
+      if (!evOk(t) || used.has(t)) { const alt = EV_FALLBACK.find(f => evOk(f[0]) && !used.has(f[0])) || EV_FALLBACK[0]; t = alt[0]; n = alt[1]; }
       used.add(t);
       out.push({ t, n, b: Math.floor(S.st[t] || 0), m: row.m, g: row.g, done: false });
     }

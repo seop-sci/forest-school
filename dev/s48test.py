@@ -1,12 +1,13 @@
 # 1.7.0 시험: 동물 도감(등록, 옛 저장 자동 채우기, 도감 선물 한 번만), 이벤트(달력 규칙, 출석 도장 하루 한 번과 5개째 큰 보상, 미션과 기념 상자,
-#   달이 바뀌면 새 회차, 특별 이벤트 표, 못 하는 미션 대신 넣기), 분치 보정, 밝은 화면 390px과 어두운 화면 360px에서 넘침 없음
-# 쓰는 법: python3 wrap.py && python3 s46test.py   (마지막 줄이 PASS면 통과)
+#   달이 바뀌면 새 회차, 특별 이벤트 표, 특별 이벤트와 겹치는 달의 반복 이벤트 건너뛰기, 못 하는 미션 대신 넣기), 분치 보정, 밝은 화면 390px과 어두운 화면 360px에서 넘침 없음
+# 쓰는 법: python3 wrap.py && python3 s48test.py   (마지막 줄이 PASS면 통과)
 import asyncio, json, sys
 from playwright.async_api import async_playwright
 from s4test import URL
 F = 'window.__forest'
 CLEAN = "document.querySelectorAll('.overlay.center').forEach(o=>{o.hidden=true;o.classList.remove('open')}); window.__forest.rt.modalOpen=null; window.__forest.rt.modalQueue.length=0"
-# 기기 시간을 흉내 내요: Date.now만 바꿔요(1.7.0의 임시 trustedNow는 기기 시간을 돌려줘요)
+# 기기 시간을 흉내 내요: Date.now만 바꿔요(1.7.0의 임시 trustedNow는 기기 시간을 돌려줘요).
+# 날짜는 앞으로만 돌려요. 1.6.0 공용 시계(gameNow, gameToday)는 시간이 뒤로 가면 막기 때문이에요
 FAKE = "(()=>{ const real = Date.now; window.__off = 0; Date.now = () => real() + window.__off; })()"
 
 def kst_noon(y, m, d):
@@ -104,6 +105,21 @@ async def main():
         await set_day(pg, 2026, 12, 2)
         dec = await pg.evaluate(f"(()=>{{ const F={F}, S=F.S; return {{ cur: S.ev.cur, n: S.ev.stamp.n, box: S.ev.box }}; }})()")
         if dec['cur'] != 'harvest:2026-12' or dec['n'] != 0 or dec['box']: fails.append(f'12월 새 회차가 틀려요 {dec}')
+        # 특별 이벤트가 그달 반복 이벤트 기간과 하루라도 겹치면(12월 5~7일과 수확 축제 1~7일), 그달 수확 축제는 건너뛰어요
+        ov = await pg.evaluate(f"""(()=>{{ const F={F}, S=F.S; const x=F.EV_SPECIAL.find(e=>e.id==='xmas'); x.start='2026-12-05'; x.end='2026-12-07';
+          const nx=F.evNext('2026-12-02'); const nx2=F.evNext('2026-12-08');
+          return {{ d2: F.evCurrent('2026-12-02'), d6: F.evCurrent('2026-12-06').key, d8: F.evCurrent('2026-12-08'), nx: nx && nx.key, nx2: nx2 && nx2.key, friends: F.evCurrent('2026-12-16').key }}; }})()""")
+        if ov['d2'] is not None or ov['d6'] != 'xmas:2026-12-05' or ov['d8'] is not None or ov['nx'] != 'xmas:2026-12-05' or ov['nx2'] != 'friends:2026-12' or ov['friends'] != 'friends:2026-12':
+            fails.append(f'특별 이벤트와 겹치는 달의 반복 이벤트 건너뛰기가 틀려요 {ov}')
+        await pg.wait_for_timeout(1300)   # 표를 바꿨으니 1초 갱신이 회차를 닫아요(12월 2일이 더는 이벤트 날이 아니에요)
+        skip = await pg.evaluate(f"(()=>{{ const F={F}, S=F.S; F.setTab('school'); F.setTab('event'); return {{ cur: S.ev.cur, stamp: F.claimStamp(), txt: document.querySelector('#evBody').textContent.slice(0,120) }}; }})()")
+        if skip['cur'] != '' or skip['stamp'] is not False or '크리스마스 파티' not in skip['txt'] or '12월 5일' not in skip['txt']: fails.append(f'겹치는 달에 도장을 또 받거나 안내가 틀려요 {skip}')
+        await set_day(pg, 2026, 12, 6)
+        x6 = await pg.evaluate(f"(()=>{{ const F={F}, S=F.S; const a=F.claimStamp(); {CLEAN}; return {{ cur: S.ev.cur, a, n: S.ev.stamp.n }}; }})()")
+        if x6['cur'] != 'xmas:2026-12-05' or x6['a'] is not True or x6['n'] != 1: fails.append(f'겹치는 달의 특별 이벤트 도장이 틀려요 {x6}')
+        await set_day(pg, 2026, 12, 8)
+        x8 = await pg.evaluate(f"(()=>{{ const F={F}, S=F.S; F.setTab('school'); F.setTab('event'); return {{ cur: S.ev.cur, stamp: F.claimStamp(), txt: document.querySelector('#evBody').textContent.slice(0,140) }}; }})()")
+        if x8['cur'] != '' or x8['stamp'] is not False or '숲속 친구 주간' not in x8['txt']: fails.append(f'특별 이벤트가 끝난 뒤 수확 축제가 다시 열려요 {x8}')
         # 특별 이벤트 표: 날짜를 적으면 예정 목록에 보이고, 그날이 되면 반복 이벤트보다 먼저 열려요
         sp = await pg.evaluate(f"""(()=>{{ const F={F}, S=F.S; const x=F.EV_SPECIAL.find(e=>e.id==='xmas'); x.start='2026-12-24'; x.end='2026-12-26';
           F.setTab('school'); F.setTab('event'); const up=document.querySelector('#evBody').textContent.includes('크리스마스 파티');
@@ -116,7 +132,7 @@ async def main():
         tm = await pg.evaluate(f"(()=>{{ const F={F}, S=F.S; const t=S.tier; const out=[0,1,2].map(i=>{{ S.tier=i; return F.tierMinutes(10); }}); S.tier=t; return out; }})()")
         if tm != [10, 20, 40]: fails.append(f'분치 보정이 틀려요 {tm}')
         # 6) 화면: 밝은 390px과 어두운 360px에서 도감과 이벤트 패널이 넘치지 않아요
-        for theme, w_, name in [('light', 390, 's46_light'), ('dark', 360, 's46_dark')]:
+        for theme, w_, name in [('light', 390, 's48_light'), ('dark', 360, 's48_dark')]:
             await pg.set_viewport_size({'width': w_, 'height': 844})
             await pg.evaluate(f"document.documentElement.setAttribute('data-theme','{theme}')")
             for tab in ['dex', 'event']:
