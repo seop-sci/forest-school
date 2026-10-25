@@ -1,7 +1,7 @@
 // 토스 미니앱 다리: 게임(index.html)이 window.AIT로 토스 기능을 써요.
 // 리워드 광고, 토스 앱 저장소, 게임센터 리더보드, 게임 로그인(사용자 키), 닫기, 안전 영역.
 import {
-  loadFullScreenAd, showFullScreenAd, Storage, Game, getUserKeyForGame, closeView, SafeArea, graniteEvent,
+  loadFullScreenAd, showFullScreenAd, Storage, Game, getUserKeyForGame, closeView, SafeArea, graniteEvent, Environment,
 } from '@apps-in-toss/web-framework';
 
 // 실패해도 멈추지 않게 감싸요. 아래에서 쓰기 전에 먼저 만들어 둬야 해요 (1.5.4: 순서가 거꾸로라 시작할 때 멈췄어요)
@@ -71,5 +71,13 @@ window.AIT = {
   subscribeSafe: (fn) => safe(() => SafeArea.subscribe({ onEvent: fn }), () => {}),
   userKey: async () => {
     try { const r = await getUserKeyForGame(); return r && r !== 'ERROR' && r.type === 'HASH' ? r.hash : ''; } catch (e) { return ''; }
+  },
+  // 토스 서버 시간(ms). 게임 시계(gameNow)가 하루 제한에 써요. 토스앱 5.245.0 미만이거나 실패하면 null
+  serverTime: async () => {
+    try {
+      if (!safe(() => Environment.getServerTime.isSupported(), false)) return null;
+      const t = await Environment.getServerTime();
+      return typeof t === 'number' && isFinite(t) && t > 0 ? t : null;
+    } catch (e) { return null; }
   },
 };
