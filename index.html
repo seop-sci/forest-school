@@ -4211,12 +4211,18 @@ body{background:radial-gradient(120% 60% at 50% 0%, color-mix(in srgb, var(--pap
     const sc = rt.mapS, W = fr.clientWidth, H = fr.clientHeight;
     return [-(rt.panX || 0) / sc, ((rt.hudTop || 0) - (rt.panY || 0)) / sc - 60, (W - (rt.panX || 0)) / sc, (H - (rt.hudBot || 0) - (rt.panY || 0)) / sc - 60];
   }
+  // 지도에서 가장 위에 있는 건물(공사 자리 포함)의 지붕 꼭대기 y (지도 좌표)
+  const mapRoofTop = () => { const G = geo(); return Math.min(...Object.values(G.b).concat([G.next.at]).map(([, cy, w]) => cy - w * 0.46)); };
   function panTo(x, y) {
     const fr = $('.frame'), W = fr.clientWidth, H = fr.clientHeight;
     // 지도가 화면보다 작은 쪽은 그 안에서만, 큰 쪽은 빈틈이 보이지 않는 데까지만 움직여요
     const cl = (v, room) => Math.min(Math.max(0, room), Math.max(Math.min(0, room), v));
     rt.panX = cl(x, W - rt.mapW);
-    rt.panY = rt.mapH < H ? Math.min(0, Math.max(H - (rt.hudBot || 0) - rt.mapH, y)) : cl(y, H - rt.mapH);
+    // 1.6.0: 긴 휴대폰에서도 가장 위 건물(초등학교 과학실)이 위쪽 칸에 가려지지 않게, 그 지붕이 위쪽 칸 바로 아래 올 때까지 지도를 내릴 수 있어요.
+    // 지도 위 끝은 위쪽 칸 뒤에 머물러서 빈 곳이 보이지 않아요(그 뒤는 .frame의 하늘색)
+    const down = Math.max(0, (rt.hudTop || 0) + 4 - (mapRoofTop() + 60) * rt.mapS);
+    const lo = rt.mapH < H ? H - (rt.hudBot || 0) - rt.mapH : H - rt.mapH;
+    rt.panY = Math.min(down, Math.max(Math.min(lo, down), y));
     map.style.transform = `translate(${rt.panX.toFixed(1)}px, ${rt.panY.toFixed(1)}px)`;
   }
   function fitMap(reset) {
@@ -7565,8 +7571,9 @@ body{background:radial-gradient(120% 60% at 50% 0%, color-mix(in srgb, var(--pap
      미션 하나 10점, 보너스 상자 20점, 학교 행사 성공 15점(실패 5점), 체험학습 10점 + 1시간마다 5점, 종업식 20점, 퀘스트 하나 3점.
      지난주 리그가 끝나면 마지막으로 본 순위로 보상을 받아요: 1위 30개, 2~3위 20개, 10위 안 10개, 참여만 해도 3개 */
   const MISSIONS = {
-    picks: { n: 15, name: n => `떨어진 도토리 ${n}개 줍기`, v: () => S.st.picks },
-    shakes: { n: 20, name: n => `참나무 ${n}번 흔들기`, v: () => S.st.shakes },
+    // 1.6.0: 줍기와 흔들기는 놀이터(참나무)가 있어야 해요. 놀이터를 짓기 전에는 고르지 않아요
+    picks: { n: 15, name: n => `떨어진 도토리 ${n}개 줍기`, v: () => S.st.picks, ok: () => S.f.playground >= 1 },
+    shakes: { n: 20, name: n => `참나무 ${n}번 흔들기`, v: () => S.st.shakes, ok: () => S.f.playground >= 1 },
     ups: { n: 30, name: n => `시설이나 가구 ${n}번 고치기`, v: () => S.st.ups },
     trains: { n: 3, name: n => `선생님 연수 ${n}번 보내기`, v: () => S.st.trains },
     subs: { n: 2, name: n => `학생 부탁 ${n}개 들어주기`, v: () => S.q.subDone, ok: () => S.q.m >= SUB_UNLOCK },
@@ -7632,8 +7639,8 @@ body{background:radial-gradient(120% 60% at 50% 0%, color-mix(in srgb, var(--pap
       return `<div class="dm${m.done ? ' done' : ''}"><div class="dm-tx"><b>${M.name(M.n)} <em>+${MP.daily}점</em></b><div class="qbar"><i style="width:${(p / M.n * 100).toFixed(0)}%"></i></div></div>` +
         (m.done ? `<span class="dm-ok">${CHECK}</span>` : ready ? `<button class="cta small" type="button" data-dm="${i}">받기</button>` : `<span class="dm-n">${p}/${M.n}</span>`) + '</div>';
     }).join('') +
-      `<div class="dm bonus${S.dm.bonus ? ' done' : ''}"><div class="dm-tx"><b>보너스 상자 <em>+${MP.bonus}점</em></b><span>셋 다 하면 ${gi}${DM.bonusGold}, 수료증 ${DM.bonusDip}장</span></div>` +
-      (S.dm.bonus ? `<span class="dm-ok">${CHECK}</span>` : all ? '<button class="cta small" type="button" data-dm="bonus">열기</button>' : `<span class="dm-n">${S.dm.list.filter(m => m.done).length}/3</span>`) + '</div>' +
+      `<div class="dm bonus${S.dm.bonus ? ' done' : ''}"><div class="dm-tx"><b>보너스 상자 <em>+${MP.bonus}점</em></b><span>${S.dm.list.length === 3 ? '셋 다' : '모두'} 하면 ${gi}${DM.bonusGold}, 수료증 ${DM.bonusDip}장</span></div>` +
+      (S.dm.bonus ? `<span class="dm-ok">${CHECK}</span>` : all ? '<button class="cta small" type="button" data-dm="bonus">열기</button>' : `<span class="dm-n">${S.dm.list.filter(m => m.done).length}/${S.dm.list.length}</span>`) + '</div>' +
       '<h4 class="dm-h">이번 주 미션 <small>월요일에 바뀌어요. 하나에 황금 도토리 1개</small></h4>' + renderWeekList();
   }
 
@@ -7663,7 +7670,7 @@ body{background:radial-gradient(120% 60% at 50% 0%, color-mix(in srgb, var(--pap
      미션 포인트: 오늘의 미션 20점, 보너스 상자 40점, 이번 주 미션 50점. 일주일 동안 모아서 상자 5개를 차례로 열어요.
      마지막 상자(850점)는 처음 한 번 금빛 왕관(주간 보상으로만 받는 모자)을 줘요. 한 주에 많이 모으면 900점이라 하루 이틀 빠져도 거의 다 열 수 있어요 */
   const WMISSIONS = {
-    picks: { n: 150, name: n => `떨어진 도토리 ${n}개 줍기`, v: () => S.st.picks },
+    picks: { n: 150, name: n => `떨어진 도토리 ${n}개 줍기`, v: () => S.st.picks, ok: () => S.f.playground >= 1 },   // 1.6.0: 놀이터가 있어야 해요
     ups: { n: 240, name: n => `시설이나 가구 ${n}번 고치기`, v: () => S.st.ups },
     trains: { n: 20, name: n => `선생님 연수 ${n}번 보내기`, v: () => S.st.trains },
     daily: { n: 15, name: n => `오늘의 미션 ${n}개 마치기`, v: () => S.st.dmDone },
@@ -9338,7 +9345,7 @@ body{background:radial-gradient(120% 60% at 50% 0%, color-mix(in srgb, var(--pap
   // 시험용 손잡이: 자동 시험(window.__FOREST_TEST)에서만 게임 속 함수를 꺼내 써요
   if (window.__FOREST_TEST) window.__forest = { get S() { return S; }, get Cloud() { return Cloud; }, rt, makeDeal, furStage, DEAL, navInfo, navRoute, spawnDrop, repTipCheck, linkGoogle, retryCloud, sanitize, acctPending, renderMap, renderHUD, renderAffordance, syncKids, layoutMap, geo, startTrial, hitTrial, endTrial, startVisit, endVisit, showReward, recommend, needCost, prepTopUp, qReward, prepPhase, rankScore, pwOf, previewDip, dipMult, costScale, buyFacility, buyFur, buyFurAll, furCost, furReady, furDone, FUR, startTalk, endTalk, teacherAct, facCost, teaCost, facKeys, rate, rep, capacity, canGraduate, canPromote,
     fmt, fmt2, graduate, promote, buyPerk, perkCost, perkMaxed, buyFundPerk, fpCost, claimMain, mainReady, curMain, qNo, earn, CFG, TEA, teaMaxed, PERKS, FPERKS, MAIN, finalYear, startTrip, claimTrip, TRIPS, yearLocked, startSports, endSports, rtSports: () => rt.sports, startFest, rtFest: () => rt.fest, facCap, addLeague, weekIdx, addMP, tutStart, endFest, claimSports, claimBox, musicWant, askBox, festWait, setTab, openSheet, closeSheet,
-    PZ, PZ_SHAPES, pzFits, pzAnyFit, pzStuck, pzFullLines, pzPlace, pzFreshGame, pzStart, pzFinish, pzLeft, pzCanAd, pzEssOf, pzMinOf, pzHelpSquirrel, pzHelpOwl, pzHelpBear, pzHasHelp, pzRot, pzNewPiece, pzOpen, pzClose, pzGameOver, pzRenderAll, renderMini, addEss, gameNow, gameToday, gameWeek, kstDay, setServerTime, SVR, dmDay, weekIdx, lgWeek, wkWeek, lgKey, pzDay, goldDay, boostLeft, dealLeft, canStamp };
+    PZ, PZ_SHAPES, pzFits, pzAnyFit, pzStuck, pzFullLines, pzPlace, pzFreshGame, pzStart, pzFinish, pzLeft, pzCanAd, pzEssOf, pzMinOf, pzHelpSquirrel, pzHelpOwl, pzHelpBear, fillSubs, mapRoofTop, renderMissions, pzHasHelp, pzRot, pzNewPiece, pzOpen, pzClose, pzGameOver, pzRenderAll, renderMini, addEss, gameNow, gameToday, gameWeek, kstDay, setServerTime, SVR, dmDay, weekIdx, lgWeek, wkWeek, lgKey, pzDay, goldDay, boostLeft, dealLeft, canStamp };
   if (window.claude && window.claude.hot && window.claude.hot.snapshot) {
     try { window.claude.hot.snapshot(() => { if (S) syncMid(); return { save: S }; }); } catch (e) { /* 무시 */ }
   }
