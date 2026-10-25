@@ -497,6 +497,15 @@ label.srow,button.srow{cursor:pointer}
 .si.poor .pr{color:var(--danger)}
 .sb{display:flex;align-items:center;gap:10px;padding:9px 10px 9px 12px;border-radius:14px;background:var(--card)}
 .sb + .sb{margin-top:6px}
+/* 1.6.0 정수 상점 */
+.ess-have{gap:8px}
+.ess-have .tic{width:30px;height:30px}
+.ess-have .ess-big{width:64px;height:64px;background:center/contain no-repeat;filter:drop-shadow(0 3px 5px rgba(0,0,0,.25))}
+.si .pv img{width:52px;height:52px;object-fit:contain}
+.si .pv.fur img{width:56px;height:56px}
+.sb .pv img{width:38px;height:38px;object-fit:contain}
+.sb .tx small{display:block;color:var(--muted);font-size:12px}
+.sb .buy.off{opacity:.45;pointer-events:none}
 .sb .pv{flex:none;width:42px;height:42px;border-radius:12px;display:grid;place-items:center;background:var(--grass)}
 .sb .pv svg{width:34px;height:34px}
 .sb .tx{flex:1;min-width:0;display:flex;flex-direction:column;gap:1px}
@@ -1637,7 +1646,7 @@ body{background:radial-gradient(120% 60% at 50% 0%, color-mix(in srgb, var(--pap
         <button class="tab sidebtn" type="button" data-tab="rank" aria-selected="false" aria-label="랭킹"><span class="sb-ring"><span class="tic" data-ic="ic_rank" aria-hidden="true"></span></span><span class="sb-lb">랭킹</span></button>
         <button class="sidebtn soon" type="button" hidden data-soon="동물 도감은 숲속 교육부에서 열심히 준비 중이에요" aria-label="동물 도감, 준비 중"><span class="sb-ring"><span class="tic" data-ic="ic_book" aria-hidden="true"></span></span><span class="sb-lb">도감</span></button>
         <button class="sidebtn soon" type="button" hidden data-soon="이벤트는 숲속 교육부에서 열심히 준비 중이에요" aria-label="이벤트, 준비 중"><span class="sb-ring"><span class="tic" data-ic="ic_event" aria-hidden="true"></span></span><span class="sb-lb">이벤트</span></button>
-        <button class="sidebtn soon" type="button" hidden data-soon="정수 상점은 숲속 교육부에서 미니게임과 함께 열심히 준비 중이에요" aria-label="정수 상점, 준비 중"><span class="sb-ring"><span class="tic" data-ic="ic_essence_shop" aria-hidden="true"></span></span><span class="sb-lb">정수 상점</span></button>
+        <button class="tab sidebtn" type="button" data-tab="ess" aria-selected="false" aria-label="정수 상점"><span class="sb-ring"><span class="tic" data-ic="ic_essence_shop" aria-hidden="true"></span></span><span class="sb-lb">정수 상점</span></button>
       </div>
       <!-- 까치 핫딜은 엄지가 닿기 쉬운 오른쪽 아래. 건물과 떨어진 도토리를 가리지 않아요 -->
       <button class="deal" id="btnDeal" type="button" hidden><span class="d-av" id="dealIc" aria-hidden="true"></span><span class="d-txt">까치 핫딜<span class="d-time" id="dealTime">2:00</span></span></button>
@@ -1708,6 +1717,18 @@ body{background:radial-gradient(120% 60% at 50% 0%, color-mix(in srgb, var(--pap
     <div class="shop-ask" id="shopAsk" hidden>
       <p id="shopAskText"></p>
       <div class="btn-row"><button class="btn-sub" type="button" id="shopNo">취소</button><button class="cta" type="button" id="shopYes">사기</button></div>
+    </div>
+    </section>
+
+    <!-- 1.6.0 정수 상점: 숲의 정수(미니게임에서만 얻어요)로 한정 모자, 특별 가구, 도토리 묶음, 황금 도토리를 사요. 값은 ESHOP 한곳에 -->
+    <section class="panel shop-panel" id="panelEss" hidden aria-labelledby="essTitle">
+    <h2 id="essTitle" class="ph"><span class="tic" data-ic="ic_essence_shop" aria-hidden="true"></span><span>정수 상점</span></h2>
+    <div class="shop-have ess-have" id="essHaveBox"><span class="ess-big" id="essBig" aria-hidden="true"></span><span class="tic" data-ic="ic_essence" aria-hidden="true"></span><span id="essHave2">0</span></div>
+    <p class="fine shop-adleft">숲의 정수는 미니게임에서만 모을 수 있어요</p>
+    <div class="shop-scroll" id="essList"></div>
+    <div class="shop-ask" id="essAsk" hidden>
+      <p id="essAskText"></p>
+      <div class="btn-row"><button class="btn-sub" type="button" id="essNo">취소</button><button class="cta" type="button" id="essYes">사기</button></div>
     </div>
     </section>
 
@@ -2793,11 +2814,12 @@ body{background:radial-gradient(120% 60% at 50% 0%, color-mix(in srgb, var(--pap
     tut: { st: '', step: 0, paid: false, nop: false }, tips: { rep: false },
     wk: { week: -1, pts: 0, got: [false, false, false, false, false], list: [] },
     lg: { week: -1, pts: 0, pos: 0, paid: false, last: null },
-    gold: 5, gd: { day: '', n: 0, shop: 0 }, cos: { own: [], hat: '', neck: '', th: { bg: '', classroom: '', cafeteria: '', library: '', science: '', playground: '' } }, autoUntil: 0,
+    gold: 5, gd: { day: '', n: 0, shop: 0 }, cos: { own: [], hat: '', neck: '', th: { bg: '', classroom: '', cafeteria: '', library: '', science: '', playground: '' }, sp: { classroom: '', cafeteria: '', library: '', science: '', playground: '' } }, autoUntil: 0,
     rank: { name: '', joined: false, sent: -1, by: '', ren: 0, asked: false },
     // 1.6.0 숲의 정수(미니게임에서만 얻어요)와 블록 퍼즐: 오늘 보상 판 수, 광고로 더한 횟수, 최고 점수, 하던 판
     ess: 0, pz: { day: '', n: 0, adN: 0, best: 0, cur: null },
     clk: { last: 0 },   // 게임 시계: 지금까지 본 가장 늦은 시각 (gameNow)
+    es: { day: '', n: 0, week: -1, g: 0 },   // 1.6.0 정수 상점: 오늘 산 도토리 묶음 수, 이번 주 산 황금 도토리 묶음 수
     q: freshQ()
   });
   const repOf = s => s.f.classroom + s.f.cafeteria + s.f.playground + 3 * s.f.library + s.f.science + 2 * (s.t.squirrel + s.t.owl + s.t.bear) + 5 * s.p.perk.rep + 10 * s.fp.rep;
@@ -2870,10 +2892,18 @@ body{background:radial-gradient(120% 60% at 50% 0%, color-mix(in srgb, var(--pap
       // 지붕도 이제 테마 세트가 맡아요. 예전에 산 지붕도 값(파란 지붕 15개, 벚꽃과 눈 오는 학교 25개)을 돌려줘요
       const OLD = { 'board:navy': 10, 'board:plum': 10, 'board:wood': 10, 'roof:blue': 15, 'roof:sakura': 25, 'roof:snow': 25 };
       if (Array.isArray(d.cos.own)) s.gold += [...new Set(d.cos.own)].reduce((a, id) => a + (OLD[id] || 0), 0);
-      s.cos.own = Array.isArray(d.cos.own) ? [...new Set(d.cos.own.filter(id => typeof id === 'string' && COS_IDS.has(id)))] : [];
+      s.cos.own = Array.isArray(d.cos.own) ? [...new Set(d.cos.own.filter(id => typeof id === 'string' && (COS_IDS.has(id) || SP_IDS.has(id))))] : [];
       for (const k of Object.keys(COS)) { const v = d.cos[k]; s.cos[k] = typeof v === 'string' && s.cos.own.includes(k + ':' + v) ? v : ''; }
       const th = d.cos.th && typeof d.cos.th === 'object' ? d.cos.th : {};
       for (const [slot] of TH_SLOTS) { const v = th[slot]; s.cos.th[slot] = typeof v === 'string' && s.cos.own.includes(`th:${v}:${slot}`) ? v : ''; }
+      // 1.6.0 특별 가구: 산 것만 방에 놓여요 (sp 칸이 없는 옛 저장은 산 가구를 바로 놓아요)
+      const sp = d.cos.sp && typeof d.cos.sp === 'object' ? d.cos.sp : null;
+      for (const k of Object.keys(SP_FUR)) { const own = s.cos.own.includes('sp:' + SP_FUR[k].id); s.cos.sp[k] = own && (!sp || sp[k] === SP_FUR[k].id) ? SP_FUR[k].id : ''; }
+    }
+    // 1.6.0 정수 상점 구매 횟수
+    if (d.es && typeof d.es === 'object') {
+      s.es.day = typeof d.es.day === 'string' ? d.es.day.slice(0, 10) : ''; s.es.n = Math.floor(num(d.es.n, 0, 0));
+      s.es.week = Math.floor(num(d.es.week, -1, -1)); s.es.g = Math.floor(num(d.es.g, 0, 0));
     }
     s.autoUntil = Math.min(num(d.autoUntil, 0, 0), Date.now() + 3 * 3600000);
     if (d.fest && typeof d.fest === 'object') for (const id of FEST_IDS) {
@@ -3623,7 +3653,7 @@ body{background:radial-gradient(120% 60% at 50% 0%, color-mix(in srgb, var(--pap
     const hy = top + h * (HEAD_Y[sp] || 0.33), r = h * 0.2;
     return `<ellipse cx="0" cy="11.6" rx="${(w * 0.32).toFixed(1)}" ry="1.6" class="c-shadow"/>` +
       `<image href="${FSI('chr_' + sp)}" x="${(-w / 2).toFixed(2)}" y="${top.toFixed(2)}" width="${w.toFixed(2)}" height="${h.toFixed(2)}"/>` +
-      (hat || neck ? `<g transform="translate(0 ${hy.toFixed(2)}) scale(${(r / 6).toFixed(3)})">${neck ? NECKS[neck] : ''}${hat ? HATS[hat] : ''}</g>` : '') +
+      (hat || neck ? `<g transform="translate(0 ${hy.toFixed(2)}) scale(${(r / 6).toFixed(3)})">${neck ? NECKS[neck] : ''}${hat ? hatSVG(hat) : ''}</g>` : '') +
       `<g transform="translate(0 ${(top + 4).toFixed(1)})">${nlBadge(sp)}</g>`;
   }
   // 친구 성장 쪽지로 키운 전학생: 머리 옆에 별, Lv.5부터 금빛 별
@@ -4511,6 +4541,22 @@ body{background:radial-gradient(120% 60% at 50% 0%, color-mix(in srgb, var(--pap
     }
   };
   const FUR_SUF = ['', '_old', '', '_fresh', '_shiny'];
+  // 1.6.0 특별 가구(정수 상점): 방마다 하나, 사면 그 방에 놓여요. [가운데 x, 바닥 y], 너비, 그림 세로 비율
+  const SP_FUR = {
+    classroom: { id: 'aquarium', name: '교실 어항', at: [300, 182], w: 42, ar: 1.46 },
+    cafeteria: { id: 'cake', name: '케이크 진열장', at: [42, 126], w: 54, ar: 1.01 },
+    library: { id: 'globelamp', name: '지구의 독서등', at: [160, 128], w: 36, ar: 1.64 },
+    science: { id: 'dino', name: '공룡 뼈 모형', at: [86, 130], w: 74, ar: 0.78 },
+    playground: { id: 'carousel', name: '회전목마', at: [294, 130], w: 68, ar: 1.17 }
+  };
+  const SP_BY_ID = Object.fromEntries(Object.entries(SP_FUR).map(([k, v]) => [v.id, Object.assign({ k }, v)]));
+  function spFurImg(k) {
+    const F = SP_FUR[k]; if (!F || S.cos.sp[k] !== F.id || !IMG('fur_sp_' + F.id)) return '';
+    const [x, y] = F.at, s = furDepth(y), ww = F.w * s, hh = ww * F.ar;
+    return `<g class="fur-it fur-sp"><ellipse cx="${x}" cy="${(y - 1).toFixed(1)}" rx="${(ww * 0.42).toFixed(1)}" ry="${(2 + ww * 0.04).toFixed(1)}" class="fur-shadow"/>` +
+      `<image href="${IMG('fur_sp_' + F.id)}" x="${(x - ww / 2).toFixed(1)}" y="${(y - hh).toFixed(1)}" width="${ww.toFixed(1)}" height="${hh.toFixed(1)}"/>` +
+      `<g class="fur-spark">${sparkle(x + ww * 0.3, y - hh * 0.9, 0.9)}</g></g>`;
+  }
   const furDepth = y => 0.8 + 0.2 * Math.max(0, Math.min(1, (y - 92) / 138));
   function furImg(id, x, y, w, st) {
     const s = furDepth(y), ww = w * s, hh = ww * FUR_AR[id];
@@ -4532,12 +4578,14 @@ body{background:radial-gradient(120% 60% at 50% 0%, color-mix(in srgb, var(--pap
       const at = lay.at.slice(0, Math.max(1, Math.min(lay.at.length, sp.cnt(n))));
       at.forEach(([x, y], j) => out.push({ i, j, x, y, top: false, ghost: n < 1, svg: furImg(F.id, x, y, lay.w, st) }));
     });
+    if (SP_FUR[k]) { const sv = spFurImg(k); if (sv) out.push({ sp: true, y: SP_FUR[k].at[1], svg: sv }); }   // 1.6.0 특별 가구도 깊이 순서에 끼워요
     out.sort((a, b) => a.y - b.y);
     return out;
   }
   function renderFurScene(k) {
     const L = S.f[k], tags = [];
     const body = furInstances(k).map(o => {
+      if (o.sp) return o.svg;
       const n = S.fu[k][o.i], done = n >= L, can = !done && S.budget >= furCost(k, o.i);
       if (o.j === 0) tags.push([o, n, done, can]);
       return `<g class="fur-it${o.ghost ? ' fur-ghost' : ''}" data-fur="${o.i}"${o.j === 0 ? ` role="button" tabindex="0" aria-label="${furName(k, o.i)} Lv.${n}${done ? ', 다 올렸어요' : `, 눌러서 올리기 도토리 ${fmt(furCost(k, o.i))}개`}"` : ''}><g class="fur-art">${o.svg}</g></g>`;
@@ -5944,6 +5992,8 @@ body{background:radial-gradient(120% 60% at 50% 0%, color-mix(in srgb, var(--pap
     straw: '<ellipse cx="0" cy="-4.2" rx="9.4" ry="2.1" class="h-straw"/><path d="M-4.9 -4.2 Q-5.1 -9.6 0 -9.8 Q5.1 -9.6 4.9 -4.2 Z" class="h-straw"/><path d="M-4.9 -5.4 Q0 -4.4 4.9 -5.4" class="s-hband"/>',
     flower: '<path d="M-5.8 -2.8 Q0 -9 5.8 -2.8" class="s-band"/><circle cx="-3.4" cy="-6.3" r="1.7" class="h-fl"/><circle cx="0" cy="-7.4" r="1.9" class="h-fl"/><circle cx="3.4" cy="-6.3" r="1.7" class="h-fl"/><circle cx="0" cy="-7.4" r="0.8" class="h-fl2"/>'
   };
+  // 1.6.0 그림 모자(cos_hat_*): 작업지시서 3의 자리 안내(512칸, 아랫단 가운데가 y 360)에 맞춰 머리 위에 올려요
+  const hatSVG = id => HATS[id] || (IMG('cos_hat_' + id) ? `<image href="${IMG('cos_hat_' + id)}" x="-11.2" y="-18.75" width="22.4" height="22.4"/>` : '');
   const NECKS = {
     scarf: '<path d="M-4.8 5 Q0 7.2 4.8 5 L4.8 7 Q0 9.2 -4.8 7 Z" class="n-scarf"/><rect x="1.6" y="6.6" width="2.4" height="4.6" rx="1" class="n-scarf2"/>',
     bow: '<path d="M0 6.6 L-3.4 4.8 L-3.4 8.4 Z M0 6.6 L3.4 4.8 L3.4 8.4 Z" class="n-bow"/><circle cx="0" cy="6.6" r="1.1" class="n-bow2"/>'
@@ -5952,11 +6002,16 @@ body{background:radial-gradient(120% 60% at 50% 0%, color-mix(in srgb, var(--pap
     hat: { name: '학생 모자', items: [
       { id: 'cap', name: '파란 야구모자', price: 8 }, { id: 'beanie', name: '빨간 털모자', price: 10 },
       { id: 'straw', name: '밀짚모자', price: 10 }, { id: 'flower', name: '꽃 머리띠', price: 12 },
-      { id: 'crown', name: '금빛 왕관', price: 0, ex: true }] },
+      { id: 'crown', name: '금빛 왕관', price: 0, ex: true },
+      // 1.6.0 한정 모자: 정수 상점에서 숲의 정수로만 사요(ess). 그림(cos_hat_*)으로 그려요
+      { id: 'grad', name: '졸업모', price: 0, ess: 1, img: 1 }, { id: 'santa', name: '산타 모자', price: 0, ess: 1, img: 1 },
+      { id: 'wizard', name: '마법사 모자', price: 0, ess: 1, img: 1 }, { id: 'mushroom', name: '버섯 모자', price: 0, ess: 1, img: 1 },
+      { id: 'laurel', name: '월계관', price: 0, ess: 1, img: 1 }] },
     neck: { name: '학생 목 장식', items: [
       { id: 'scarf', name: '빨간 목도리', price: 8 }, { id: 'bow', name: '나비넥타이', price: 8 }] }
   };
   const COS_IDS = new Set(Object.keys(COS).flatMap(k => COS[k].items.map(it => k + ':' + it.id)));
+  const SP_IDS = new Set(['aquarium', 'cake', 'globelamp', 'dino', 'carousel'].map(id => 'sp:' + id));   // 1.6.0 특별 가구(정수 상점) 소유 열쇠
   /* 테마 세트: 테마마다 배경, 교실, 급식실, 도서관, 과학실, 운동장을 따로 사서 꾸며요.
      여섯 개를 모두 모으면 세트 효과로 수업료가 올라요. 비싼 세트일수록 효과가 커서 가장 비싼 세트가 +30%예요 (세트마다 더해져요).
      색은 건물 그룹에 CSS 변수로 덮어쓰고, 처마에는 테마 장식(가랜드, 전구, 고드름...)을 달아요 */
@@ -6222,6 +6277,7 @@ body{background:radial-gradient(120% 60% at 50% 0%, color-mix(in srgb, var(--pap
       for (const it of COS[cat].items) {
         const key = cat + ':' + it.id, own = S.cos.own.includes(key), on = S.cos[cat] === it.id, poor = !own && S.gold < it.price;
         if (it.ex && !own) continue;   // 주간 상자로만 받는 꾸미기는 받은 뒤에만 보여요
+        if (it.ess && !own) continue;   // 1.6.0 한정 모자는 정수 상점에서 사요. 산 뒤에는 여기서도 입고 벗을 수 있어요
         const wear = cat === 'hat' || cat === 'neck';
         const pr = on ? (wear ? '입는 중' : '쓰는 중') : own ? (wear ? '입기' : '쓰기') : `${coin}${it.price}`;
         h += `<button class="si${own ? ' own' : ''}${on ? ' on' : ''}${poor ? ' poor' : ''}" type="button" data-buy="c:${key}" aria-pressed="${on}">` +
@@ -6306,6 +6362,99 @@ body{background:radial-gradient(120% 60% at 50% 0%, color-mix(in srgb, var(--pap
     } else useBooster(it.k);
     sfx('quest'); buzz(15);
     save(); renderShopBtn(); renderShop(); renderHUD(); renderAffordance(); renderDeal();
+  }
+  /* ---------- 1.6.0 정수 상점 ----------
+     값은 여기 한곳에서만 바꿔요 (2026-10-26 균형 제안서, 지섭 확정).
+     꾸미기가 중심이고, 도토리 묶음은 하루 3번(수업료 30분치), 황금 도토리는 일주일 2번(3개, 광고가 더 이득이게 비싸게) */
+  const ESHOP = {
+    hat: 120, fur: 200,
+    acorn: { ess: 20, min: 30, perDay: 3 },
+    gold: { ess: 60, n: 3, perWeek: 2 }
+  };
+  const ESS_ICON = () => `<span class="tic" style="background-image:${pzImg('ic_essence')}"></span>`;
+  function esDay() {
+    const t = gameToday(), w = gameWeek();
+    if (S.es.day !== t) { S.es.day = t; S.es.n = 0; }
+    if (w > S.es.week) { S.es.week = w; S.es.g = 0; }
+  }
+  const esAcornLeft = () => { esDay(); return Math.max(0, ESHOP.acorn.perDay - S.es.n); };
+  const esGoldLeft = () => { esDay(); return Math.max(0, ESHOP.gold.perWeek - S.es.g); };
+  const esAcornAmt = () => Math.max(10, nice(rate() * 60 * ESHOP.acorn.min));
+  function essItem(pick) {
+    if (!pick) return null;
+    const [t, id] = pick.split(':');
+    if (t === 'hat') { const it = COS.hat.items.find(x => x.id === id && x.ess); return it ? { kind: 'hat', id, name: it.name, ga: eulOf(it.name), price: ESHOP.hat } : null; }
+    if (t === 'sp' && SP_BY_ID[id]) return { kind: 'sp', id, k: SP_BY_ID[id].k, name: SP_BY_ID[id].name, ga: eulOf(SP_BY_ID[id].name), price: ESHOP.fur };
+    if (t === 'acorn') { const nm = `도토리 묶음 (수업료 ${ESHOP.acorn.min}분치)`; return { kind: 'acorn', name: nm, ga: eulOf(nm), price: ESHOP.acorn.ess }; }
+    if (t === 'gold') { const nm = `황금 도토리 ${ESHOP.gold.n}개`; return { kind: 'gold', name: nm, ga: eulOf(nm), price: ESHOP.gold.ess }; }
+    return null;
+  }
+  function renderEssShop() {
+    esDay();
+    $('#essHave2').textContent = fmt(S.ess);
+    const eb = $('#essBig'); if (IMG('essence_big')) eb.style.backgroundImage = pzImg('essence_big');
+    const ic = ESS_ICON();
+    let h = '<h3 class="shop-h">한정 모자 <small>(학생들이 써요)</small></h3><div class="shop-grid">';
+    for (const it of COS.hat.items) {
+      if (!it.ess) continue;
+      const key = 'hat:' + it.id, own = S.cos.own.includes(key), on = S.cos.hat === it.id, poor = !own && S.ess < ESHOP.hat;
+      const pr = on ? '입는 중' : own ? '입기' : `${ic}${ESHOP.hat}`;
+      h += `<button class="si${own ? ' own' : ''}${on ? ' on' : ''}${poor ? ' poor' : ''}" type="button" data-ebuy="${key}" aria-pressed="${on}" aria-label="${it.name}${own ? '' : `, 숲의 정수 ${ESHOP.hat}개`}">` +
+        `<span class="pv"><img src="${IMG('cos_hat_' + it.id)}" alt="" draggable="false"></span><span class="nm">${it.name}</span><span class="pr">${pr}</span></button>`;
+    }
+    h += '</div><h3 class="shop-h">특별 가구 <small>(방마다 하나씩 놓여요)</small></h3><div class="shop-grid">';
+    for (const k of Object.keys(SP_FUR)) {
+      const F = SP_FUR[k], key = 'sp:' + F.id, own = S.cos.own.includes(key), on = S.cos.sp[k] === F.id, poor = !own && S.ess < ESHOP.fur;
+      const pr = on ? '놓는 중' : own ? '놓기' : `${ic}${ESHOP.fur}`;
+      h += `<button class="si${own ? ' own' : ''}${on ? ' on' : ''}${poor ? ' poor' : ''}" type="button" data-ebuy="${key}" aria-pressed="${on}" aria-label="${F.name}${own ? '' : `, 숲의 정수 ${ESHOP.fur}개`}">` +
+        `<span class="pv fur"><img src="${IMG('fur_sp_' + F.id)}" alt="" draggable="false"></span><span class="nm">${F.name}</span><span class="pr">${pr}</span></button>`;
+    }
+    h += '</div><h3 class="shop-h">도토리와 황금 도토리 <small>(횟수 제한)</small></h3>';
+    const al = esAcornLeft(), gl = esGoldLeft();
+    h += `<div class="sb"><span class="pv"><span data-acorn>${acornIcon()}</span></span><span class="tx"><b>도토리 묶음</b><span>수업료 ${ESHOP.acorn.min}분치 (+${fmt(esAcornAmt())})</span><small>${al > 0 ? `오늘 ${al}번 더 살 수 있어요` : '오늘은 다 샀어요. 내일 다시 열려요'}</small></span>` +
+      `<button class="buy${S.ess < ESHOP.acorn.ess ? ' poor' : ''}${al > 0 ? '' : ' off'}" type="button" data-ebuy="acorn" aria-label="도토리 묶음, 숲의 정수 ${ESHOP.acorn.ess}개">${ic}${ESHOP.acorn.ess}</button></div>`;
+    h += `<div class="sb"><span class="pv">${GOLD_ICON}</span><span class="tx"><b>황금 도토리 ${ESHOP.gold.n}개</b><span>광고를 보면 공짜로 3개를 받을 수 있어요</span><small>${gl > 0 ? `이번 주 ${gl}번 더 살 수 있어요` : '이번 주는 다 샀어요. 월요일에 다시 열려요'}</small></span>` +
+      `<button class="buy${S.ess < ESHOP.gold.ess ? ' poor' : ''}${gl > 0 ? '' : ' off'}" type="button" data-ebuy="gold" aria-label="황금 도토리 ${ESHOP.gold.n}개, 숲의 정수 ${ESHOP.gold.ess}개">${ic}${ESHOP.gold.ess}</button></div>`;
+    const list = $('#essList'), top = list.scrollTop;
+    list.innerHTML = h; list.scrollTop = top;
+    const ask = $('#essAsk'), it = essItem(rt.essPick);
+    ask.hidden = !it;
+    if (it) {
+      const enough = S.ess >= it.price;
+      $('#essAskText').textContent = enough ? `${it.name}${it.ga} 숲의 정수 ${it.price}개로 살까요?` : `숲의 정수가 ${it.price - S.ess}개 모자라요. 미니게임에서 모을 수 있어요.`;
+      $('#essYes').textContent = enough ? '사기' : '미니게임 가기';
+    }
+  }
+  function pickEss(pick) {
+    const it = essItem(pick); if (!it) return;
+    sfx('tap');
+    if (it.kind === 'hat' && S.cos.own.includes('hat:' + it.id)) {   // 산 모자는 바로 입고 벗어요
+      S.cos.hat = S.cos.hat === it.id ? '' : it.id; rt.essPick = '';
+      applyCos(); save(); renderEssShop();
+      toast(S.cos.hat === it.id ? `${it.name}${it.ga} 입혔어요` : `${it.name}${it.ga} 벗었어요`); return;
+    }
+    if (it.kind === 'sp' && S.cos.own.includes('sp:' + it.id)) {   // 산 가구는 바로 놓고 치워요
+      S.cos.sp[it.k] = S.cos.sp[it.k] === it.id ? '' : it.id; rt.essPick = '';
+      save(); renderEssShop(); if (rt.sheetKey) renderSheet();
+      toast(S.cos.sp[it.k] ? `${it.name}${it.ga} ${FAC[it.k].name}에 놓았어요` : `${it.name}${it.ga} 치웠어요`); return;
+    }
+    if (it.kind === 'acorn' && esAcornLeft() <= 0) { toast('도토리 묶음은 하루 3번까지예요. 내일 다시 살 수 있어요'); return; }
+    if (it.kind === 'gold' && esGoldLeft() <= 0) { toast('황금 도토리는 일주일에 2번까지예요. 월요일에 다시 살 수 있어요'); return; }
+    rt.essPick = pick; renderEssShop();
+  }
+  function buyEss() {
+    const it = essItem(rt.essPick); if (!it) return;
+    if (S.ess < it.price) { rt.essPick = ''; setTab('mini'); return; }
+    if (it.kind === 'acorn' && esAcornLeft() <= 0) { rt.essPick = ''; renderEssShop(); return; }
+    if (it.kind === 'gold' && esGoldLeft() <= 0) { rt.essPick = ''; renderEssShop(); return; }
+    S.ess -= it.price; S.st.esSpent = (S.st.esSpent || 0) + it.price;
+    rt.essPick = '';
+    if (it.kind === 'hat') { S.cos.own.push('hat:' + it.id); S.cos.hat = it.id; applyCos(); toast(`${it.name}${it.ga} 샀어요! 바로 입혀 뒀어요`); }
+    else if (it.kind === 'sp') { S.cos.own.push('sp:' + it.id); S.cos.sp[it.k] = it.id; if (rt.sheetKey) renderSheet(); toast(`${it.name}${it.ga} 샀어요! ${FAC[it.k].name}에 놓았어요`); }
+    else if (it.kind === 'acorn') { const v = esAcornAmt(); S.budget += v; earn(v); S.es.n += 1; floatText(180, 40, '+' + fmt(v), 'gold'); toast(`도토리 묶음을 샀어요! 도토리 +${fmt(v)}`); }
+    else if (it.kind === 'gold') { addGold(ESHOP.gold.n); S.es.g += 1; toast(`황금 도토리 ${ESHOP.gold.n}개를 샀어요!`); }
+    sfx('quest'); buzz(15);
+    save(); renderEss(); renderEssShop(); renderShopBtn(); renderHUD(); renderAffordance(); renderDeal();
   }
   function useBooster(k) {
     if (k === 'feast') { S.hd.feastUntil = Math.max(Date.now(), S.hd.feastUntil) + 10 * 60000; toast('특식 데이! 10분 동안 수업료가 2배예요'); }
@@ -6720,7 +6869,7 @@ body{background:radial-gradient(120% 60% at 50% 0%, color-mix(in srgb, var(--pap
   const pzEssOf = score => Math.min(PZ.essMax, Math.floor(score / PZ.essPer));
   const pzMinOf = score => Math.min(PZ.minMax, Math.floor(score / PZ.minPer));
   function addEss(n) { if (!(n > 0)) return; S.ess = Math.min(1e9, S.ess + Math.floor(n)); renderEss(); }
-  function renderEss() { const e = $('#essHave'); if (e) e.textContent = fmt(S.ess); }
+  function renderEss() { const e = $('#essHave'); if (e) e.textContent = fmt(S.ess); const e2 = $('#essHave2'); if (e2) e2.textContent = fmt(S.ess); }
   // 판 끝내기(다 막혔거나 그만하기). 정수와 도토리를 주고 최고 점수를 남겨요
   function pzFinish(cur) {
     const rw = cur.rw, score = cur.score;
@@ -8687,6 +8836,8 @@ body{background:radial-gradient(120% 60% at 50% 0%, color-mix(in srgb, var(--pap
     $('#panelRank').hidden = t !== 'rank';
     $('#panelShop').hidden = t !== 'shop';
     $('#panelMini').hidden = t !== 'mini';
+    $('#panelEss').hidden = t !== 'ess';
+    if (t === 'ess') { rt.essPick = ''; renderEssShop(); $('#panelEss').scrollTop = 0; }
     $('#app').classList.toggle('on-school', t === 'school');
     if (t !== 'school') $('#scroller').scrollTop = 0;
     if (t === 'shop') { rt.shopPick = ''; renderShop(); $('#panelShop').scrollTop = 0; }
@@ -8945,6 +9096,9 @@ body{background:radial-gradient(120% 60% at 50% 0%, color-mix(in srgb, var(--pap
       const b = e.target.closest('[data-buy]'); if (b) pickShop(b.dataset.buy);
     });
     $('#shopNo').addEventListener('click', () => { rt.shopPick = ''; renderShop(); });
+    $('#essList').addEventListener('click', e => { const b = e.target.closest('[data-ebuy]'); if (b) pickEss(b.dataset.ebuy); });
+    $('#essNo').addEventListener('click', () => { rt.essPick = ''; renderEssShop(); });
+    $('#essYes').addEventListener('click', buyEss);
     $('#shopYes').addEventListener('click', buyShop);
     $('#shopAd').addEventListener('click', shopAd);
     // 서버 저장: 구글 계정 연결, 테스트 현황
@@ -9287,7 +9441,7 @@ body{background:radial-gradient(120% 60% at 50% 0%, color-mix(in srgb, var(--pap
   // 시험용 손잡이: 자동 시험(window.__FOREST_TEST)에서만 게임 속 함수를 꺼내 써요
   if (window.__FOREST_TEST) window.__forest = { get S() { return S; }, get Cloud() { return Cloud; }, rt, makeDeal, furStage, DEAL, navInfo, navRoute, spawnDrop, repTipCheck, linkGoogle, retryCloud, sanitize, acctPending, renderMap, renderHUD, renderAffordance, syncKids, layoutMap, geo, startTrial, hitTrial, endTrial, startVisit, endVisit, showReward, recommend, needCost, prepTopUp, qReward, prepPhase, rankScore, pwOf, previewDip, dipMult, costScale, buyFacility, buyFur, buyFurAll, furCost, furReady, furDone, FUR, startTalk, endTalk, teacherAct, facCost, teaCost, facKeys, rate, rep, capacity, canGraduate, canPromote,
     fmt, fmt2, graduate, promote, buyPerk, perkCost, perkMaxed, buyFundPerk, fpCost, claimMain, mainReady, curMain, qNo, earn, CFG, TEA, teaMaxed, PERKS, FPERKS, MAIN, finalYear, startTrip, claimTrip, TRIPS, yearLocked, startSports, endSports, rtSports: () => rt.sports, startFest, rtFest: () => rt.fest, facCap, addLeague, weekIdx, addMP, tutStart, endFest, claimSports, claimBox, musicWant, askBox, festWait, setTab, openSheet, closeSheet,
-    PZ, PZ_SHAPES, pzFits, pzAnyFit, pzStuck, pzFullLines, pzPlace, pzFreshGame, pzStart, pzFinish, pzLeft, pzCanAd, pzEssOf, pzMinOf, pzHelpSquirrel, pzHelpOwl, pzHelpBear, fillSubs, mapRoofTop, renderMissions, pzHasHelp, pzRot, pzNewPiece, pzOpen, pzClose, pzGameOver, pzRenderAll, renderMini, addEss, gameNow, gameToday, gameWeek, kstDay, setServerTime, SVR, dmDay, weekIdx, lgWeek, wkWeek, lgKey, pzDay, goldDay, boostLeft, dealLeft, canStamp };
+    PZ, PZ_SHAPES, pzFits, pzAnyFit, pzStuck, pzFullLines, pzPlace, pzFreshGame, pzStart, pzFinish, pzLeft, pzCanAd, pzEssOf, pzMinOf, pzHelpSquirrel, pzHelpOwl, pzHelpBear, fillSubs, mapRoofTop, renderMissions, pzHasHelp, pzRot, pzNewPiece, pzOpen, pzClose, pzGameOver, pzRenderAll, renderMini, addEss, ESHOP, SP_FUR, applyCos, essItem, pickEss, buyEss, renderEssShop, esAcornLeft, esGoldLeft, esAcornAmt, hatSVG, spFurImg, gameNow, gameToday, gameWeek, kstDay, setServerTime, SVR, dmDay, weekIdx, lgWeek, wkWeek, lgKey, pzDay, goldDay, boostLeft, dealLeft, canStamp };
   if (window.claude && window.claude.hot && window.claude.hot.snapshot) {
     try { window.claude.hot.snapshot(() => { if (S) syncMid(); return { save: S }; }); } catch (e) { /* 무시 */ }
   }
