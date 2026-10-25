@@ -17,7 +17,8 @@
 | `check_rules.py` | `CLAUDE.md`와 `AGENTS.md`의 공통 규칙이 똑같은지 확인 |
 | `check_templates.py` | Issue 양식이 GitHub 규칙에 맞는지, 양식이 쓰는 라벨이 저장소에 있는지 확인 |
 | `memo.md` | 사용자가 말한 수정 메모 (모았다가 한 번에 반영) |
-| `embed_assets.py` | 1.5.0 그림 넣기. PNG 원본 폴더를 webp로 줄여 `forest-school.html`의 그림 묶음(`window.FS_IMG`)에 넣어요. 원본 PNG는 저장소에 넣지 않아요 |
+| `embed_assets.py` | 1.5.0 그림 넣기. PNG 원본 폴더를 webp로 줄여 `forest-school.html`의 그림 묶음(`window.FS_IMG`)에 넣어요. 원본 PNG는 저장소에 넣지 않아요. 1.7.0 도감, 이벤트 그림은 `--block 170`으로 따로 둔 묶음(`window.FS_IMG170`)에 넣어요 |
+| `v170-notes.md` | 1.7.0 도감, 이벤트에서 정한 것, 기존 코드에 넣은 줄 목록, 그림 목록, 남은 일 |
 | `make_roofs.py` | 건물 그림에서 지붕만 오려 내요(건물 테마 색을 입힐 때 써요). 결과 폴더를 `embed_assets.py`로 넣어요 |
 
 순서: `forest-school.html` 고치기 → `python3 wrap.py` → 시험 → `python3 build_gh.py ..` → `cd ../toss && npm run build` → 커밋하고 올리기 (안드로이드는 GitHub Actions가 알아서 만들어요).
