@@ -1165,6 +1165,66 @@ body{background:radial-gradient(120% 60% at 50% 0%, color-mix(in srgb, var(--pap
 .mini-card b{font-family:var(--font-display);font-weight:400;font-size:18px}
 .mini-card small{color:var(--muted);font-size:13px}
 .mini-soon{flex:none;padding:3px 10px;border-radius:999px;background:var(--chip-bg);color:var(--chip-ink);font-size:12.5px}
+
+/* ===== 1.5.0 홈: 화면 가득 지도와 떠 있는 UI ===== */
+.app{position:relative}
+/* 위쪽 학교 카드와 재화 알약 (모든 탭 공통) */
+.board{margin-bottom:6px;padding:0;border:0;border-radius:0;background:none;box-shadow:none;position:relative;z-index:3}
+.board-top{padding:6px 8px 7px 12px;border-radius:16px;background:color-mix(in srgb, var(--board) 94%, transparent);border:2px solid color-mix(in srgb, #8FBF7C 55%, var(--board));box-shadow:0 3px 0 rgba(20,40,20,.28)}
+.board .school-name{font-size:17px}
+.board .grade-pill{font-size:13px;padding:0 7px}
+.board .school-year{font-size:11px}
+.board .school-year b{font-size:13px}
+.board .progress{margin-top:3px;gap:8px}
+.board .bar{height:6px}
+.board .progress span{font-size:11px}
+.stats{display:flex;gap:6px;margin-top:6px}
+.stats .stat{flex:1 1 auto;flex-direction:row;align-items:center;gap:6px;min-width:0;padding:3px 10px 3px 7px;border-radius:999px;background:color-mix(in srgb, var(--board) 92%, transparent);border:1.5px solid color-mix(in srgb, #8FBF7C 45%, var(--board));box-shadow:0 2px 0 rgba(20,40,20,.25)}
+.stats .stat-main{flex:1.6 1 auto}
+.stats .lab{font-size:0;gap:0}
+.stats .lab svg,.stats .lab [data-acorn] svg{width:17px;height:17px}
+.stats .stat b{font-size:19px;line-height:1.15}
+.stats .stat-main b{font-size:21px}
+.stats .stat small{font-size:12px}
+.stats .rep-row{font-size:12px}
+.stats .rep-row svg{width:11px;height:11px}
+.stats .stat-pw b{font-size:17px}
+.pw-pop{top:-14px}
+/* 홈: 지도를 앱 전체에 깔아요 */
+.app.on-school .scroller{overflow:visible}
+.app.on-school .stage{position:absolute;inset:0;z-index:0;min-height:0}
+.app.on-school .frame{border:0;border-radius:0;box-shadow:none;background:linear-gradient(#86C3E8 0, #BFE0EE 14%, #6F9A57 24%, #3E6B3A 60%)}
+.app.on-school #map{position:absolute;left:0;top:0;touch-action:none;transform-origin:0 0}
+.app.on-school .frame.panning{cursor:grabbing}
+.app.on-school .fallfx,.app.on-school .fever-fx{border-radius:0}
+.app.on-school .qrow,.app.on-school .subbar{position:relative;z-index:3}
+.app.on-school .qrow{width:min(80%, 320px);margin-bottom:6px}
+.app.on-school .subbar{width:min(80%, 320px);margin-top:0}
+.app.on-school .quest{background:color-mix(in srgb, var(--paper) 94%, transparent)}
+.app.on-school .map-left{top:calc(var(--left-h, 150px) + 8px)}
+.app.on-school .map-right{top:calc(var(--hud-h, 100px) + 8px)}
+.app.on-school .deal{bottom:calc(var(--bot-h, 70px) + 10px)}
+.app.on-school .sportsbar:not(.festbar){bottom:calc(var(--bot-h, 70px) + 12px)}
+.app.on-school .tabs{position:relative;z-index:3;margin:0 -6px 8px;border:2px solid var(--line);border-radius:22px;box-shadow:0 4px 14px rgba(20,40,20,.28)}
+/* 퀘스트 칸 접기 */
+.qrow{position:relative}
+.q-fold{display:none}
+.app.on-school .q-fold{display:grid;place-items:center;position:absolute;z-index:2;right:-11px;top:50%;width:22px;height:34px;margin-top:-17px;padding:0;border:2px solid var(--line);border-radius:11px;background:var(--paper);color:var(--muted);cursor:pointer}
+.q-fold svg{width:14px;height:14px}
+.app.on-school .qrow.folded{width:fit-content}
+.app.on-school .qrow.folded .quest{grid-template-columns:38px;padding:5px;width:54px}
+.app.on-school .qrow.folded .q-txt,.app.on-school .qrow.folded .q-act{display:none}
+.app.on-school .qrow.folded .q-fold svg{transform:rotate(180deg)}
+.app.on-school .qrow.folded + .subbar{display:none}
+
+/* 재화 알약: 큰 숫자 아래에 작은 줄(초당, 평판) */
+.stats .stat-main,.stats .stat:not(.stat-pw){display:grid;grid-template-columns:auto minmax(0,1fr);grid-template-rows:auto auto;column-gap:6px;align-items:center;padding-block:2px 3px}
+.stats .stat-main .lab,.stats .stat:not(.stat-pw) .lab{grid-row:1 / 3}
+.stats .stat b{font-size:18px;line-height:1.1}
+.stats .stat small{font-size:11px;line-height:1.1;overflow:hidden;text-overflow:ellipsis}
+.stats .rep-row{font-size:0}
+.stats .rep-row span{font-size:11px}
+.stats .stat-pw{flex:0 1 auto}
 </style>
 
 <div class="boot" id="boot" role="status" aria-label="숲속 동물 학교를 여는 중이에요">
@@ -1189,6 +1249,10 @@ body{background:radial-gradient(120% 60% at 50% 0%, color-mix(in srgb, var(--pap
           <span class="grade-pill" id="gradePill">분교</span>
         </div>
         <div class="school-year" id="schoolYear"><b id="yearNow">1년째</b><span class="ydots" id="yearDots" aria-hidden="true"></span><span class="ynote" id="yearNote"></span></div>
+        <div class="progress">
+      <div class="bar" id="gradeBar" role="progressbar" aria-label="다음 동네까지" aria-valuemin="0" aria-valuemax="100" aria-valuenow="0"><i id="barFill"></i></div>
+      <span id="vNext">마을까지 ★12</span>
+        </div>
       </div>
       <button class="icon-btn" id="btnAtt" type="button" aria-label="출석부">
         <svg viewBox="0 0 24 24" width="20" height="20" aria-hidden="true"><rect x="4" y="5.5" width="16" height="14.5" rx="2.5" fill="none" stroke="currentColor" stroke-width="2"/><path d="M8 3.5v4M16 3.5v4M4 10h16" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"/><circle cx="12" cy="15" r="2.6" fill="currentColor"/></svg>
@@ -1215,13 +1279,10 @@ body{background:radial-gradient(120% 60% at 50% 0%, color-mix(in srgb, var(--pap
         <b id="vPower">0</b>
       </div>
     </div>
-    <div class="progress">
-      <div class="bar" id="gradeBar" role="progressbar" aria-label="다음 동네까지" aria-valuemin="0" aria-valuemax="100" aria-valuenow="0"><i id="barFill"></i></div>
-      <span id="vNext">마을까지 ★12</span>
-    </div>
   </header>
 
-  <div class="qrow">
+  <div class="qrow" id="qRow">
+  <button class="q-fold" id="qFold" type="button" aria-label="퀘스트 칸 접기" aria-expanded="true"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M15 6l-6 6 6 6" fill="none" stroke="currentColor" stroke-width="2.6" stroke-linecap="round" stroke-linejoin="round"/></svg></button>
   <button class="quest" id="questBar" type="button">
     <span class="q-av" id="qbAv" aria-hidden="true"></span>
     <span class="q-txt">
@@ -1237,7 +1298,7 @@ body{background:radial-gradient(120% 60% at 50% 0%, color-mix(in srgb, var(--pap
 
   <main class="stage">
     <div class="frame">
-      <svg id="map" viewBox="0 0 360 420" preserveAspectRatio="xMidYMid meet" role="group" aria-label="숲속 동물 학교 지도">
+      <svg id="map" viewBox="0 -60 360 540" preserveAspectRatio="xMidYMid meet" role="group" aria-label="숲속 동물 학교 지도">
         <defs>
           <!-- 건물 테마: 지붕 조각에 테마 색을 곱해서 입혀요 -->
           <filter id="rt-classroom" color-interpolation-filters="sRGB"><feFlood flood-color="#C2533D" result="c"/><feBlend in="c" in2="SourceGraphic" mode="multiply" result="m"/><feComposite in="m" in2="SourceAlpha" operator="in"/></filter>
@@ -3545,6 +3606,70 @@ body{background:radial-gradient(120% 60% at 50% 0%, color-mix(in srgb, var(--pap
     renderTeachersOnMap();
     renderOak();
   }
+
+  /* 1.5.0 홈: 지도를 화면 가득 깔고 UI를 띄워요. 지도 그림은 화면보다 크게 그리고(가로세로 비율 유지), 손가락으로 밀어 볼 수 있어요 */
+  function hudVars() {
+    const app = $('#app'), fr = $('.frame');
+    if (!app || !fr || rt.tab !== 'school') return;
+    const f = fr.getBoundingClientRect(), b = $('.board').getBoundingClientRect(), q = $('#qRow').getBoundingClientRect(), sb = $('#subBar');
+    const left = Math.max(q.bottom, sb && !sb.hidden ? sb.getBoundingClientRect().bottom : 0) - f.top;
+    const bot = f.bottom - $('.tabs').getBoundingClientRect().top;
+    app.style.setProperty('--hud-h', Math.round(b.bottom - f.top) + 'px');
+    app.style.setProperty('--left-h', Math.round(left) + 'px');
+    app.style.setProperty('--bot-h', Math.max(0, Math.round(bot)) + 'px');
+    rt.hudTop = left; rt.hudBot = bot;
+  }
+  function panTo(x, y) {
+    const fr = $('.frame'), W = fr.clientWidth, H = fr.clientHeight;
+    // 지도가 화면보다 작은 쪽은 그 안에서만, 큰 쪽은 빈틈이 보이지 않는 데까지만 움직여요
+    const cl = (v, room) => Math.min(Math.max(0, room), Math.max(Math.min(0, room), v));
+    rt.panX = cl(x, W - rt.mapW);
+    rt.panY = cl(y, H - rt.mapH);
+    map.style.transform = `translate(${rt.panX.toFixed(1)}px, ${rt.panY.toFixed(1)}px)`;
+  }
+  function fitMap(reset) {
+    const fr = $('.frame'); if (!fr) return;
+    const W = fr.clientWidth, H = fr.clientHeight;
+    if (!W || !H || rt.tab !== 'school') return;
+    hudVars();
+    // 화면을 가득 채우되, 건물 자리(지도 가로 300칸)는 늘 다 보이게 해요. 긴 휴대폰에서는 위아래 끝이 UI 뒤로 조금 비어요
+    const sc = Math.min(Math.max(W / 360, H / 540), W / 300), old = rt.mapS;
+    rt.mapS = sc; rt.mapW = 360 * sc; rt.mapH = 540 * sc;
+    map.style.width = rt.mapW + 'px'; map.style.height = rt.mapH + 'px';
+    if (reset || rt.panX == null || !old) {
+      // 건물들 가운데(지도 y 215)가 위쪽 UI와 아래 탭 사이 한가운데에 오게
+      const mid = ((rt.hudTop || 0) + H - (rt.hudBot || 0)) / 2;
+      panTo((W - rt.mapW) / 2, mid - (215 + 60) * sc);
+    } else panTo(rt.panX * sc / old, rt.panY * sc / old);
+  }
+  function setupPan() {
+    const fr = $('.frame');
+    let st = null;
+    fr.addEventListener('pointerdown', e => {
+      if (rt.tab !== 'school' || e.target.closest('button, .panel') || (e.pointerType === 'mouse' && e.button !== 0)) return;
+      st = { id: e.pointerId, x: e.clientX, y: e.clientY, px: rt.panX || 0, py: rt.panY || 0, moved: false };
+    });
+    fr.addEventListener('pointermove', e => {
+      if (!st || e.pointerId !== st.id) return;
+      const dx = e.clientX - st.x, dy = e.clientY - st.y;
+      if (!st.moved && Math.hypot(dx, dy) < 8) return;
+      if (!st.moved) { st.moved = true; try { fr.setPointerCapture(e.pointerId); } catch (er) { /* 무시 */ } fr.classList.add('panning'); }
+      panTo(st.px + dx, st.py + dy);
+    });
+    const end = e => { if (!st || e.pointerId !== st.id) return; if (st.moved) { rt.panMoved = performance.now(); fr.classList.remove('panning'); } st = null; };
+    fr.addEventListener('pointerup', end); fr.addEventListener('pointercancel', end);
+    // 지도를 밀고 난 손가락이 떨어질 때 건물이나 도토리가 눌리지 않게 해요
+    fr.addEventListener('click', e => { if (rt.panMoved && performance.now() - rt.panMoved < 350) { e.stopPropagation(); e.preventDefault(); } }, true);
+    const ro = window.ResizeObserver ? new ResizeObserver(() => fitMap(false)) : null;
+    if (ro) [fr, $('.board'), $('#qRow'), $('#subBar'), $('.tabs')].forEach(el => el && ro.observe(el));
+    window.addEventListener('resize', () => fitMap(false));
+    $('#qFold').addEventListener('click', () => {
+      const r = $('#qRow'), f = !r.classList.contains('folded');
+      r.classList.toggle('folded', f); $('#qFold').setAttribute('aria-expanded', f ? 'false' : 'true');
+      $('#qFold').setAttribute('aria-label', f ? '퀘스트 칸 펼치기' : '퀘스트 칸 접기');
+      sfx('tap'); requestAnimationFrame(hudVars);
+    });
+  }
   function renderAffordance() {
     for (const k of facKeys()) $('#pq-' + k).classList.toggle('can-buy', S.budget >= facNextCost(k));
     let any = false;
@@ -5411,7 +5536,9 @@ body{background:radial-gradient(120% 60% at 50% 0%, color-mix(in srgb, var(--pap
   function applyThemes() {
     const map = $('#map'), board = $('.board');
     const bgT = THEME[S.cos.th.bg];
-    map.removeAttribute('style'); board.removeAttribute('style');
+    // 지도 크기와 위치(fitMap)는 그대로 두고 테마 색만 지워요
+    for (const T of THEMES) for (const k of Object.keys(T.bg)) map.style.removeProperty(k);
+    board.removeAttribute('style');
     document.body.classList.toggle('th-bg', !!bgT);
     document.body.style.setProperty('--th-bg', bgT ? bgT.page : '');
     const dz = $('#thDeco');
@@ -6523,12 +6650,12 @@ body{background:radial-gradient(120% 60% at 50% 0%, color-mix(in srgb, var(--pap
   const TUT_GOLD = 1;
   const TUT = [
     { sel: null, t: '숲속 동물 학교에 온 걸 환영해요!', d: '저는 교감 선생님 고슴도치예요. 학교를 어떻게 꾸려 가는지 짧게 알려 드릴게요. 끝까지 보면 황금 도토리를 드려요.' },
-    { sel: '#stats', t: '칠판: 우리 학교 현황', d: '도토리는 수업료로 저절로 쌓여요. 학생이 많고 평판이 높을수록 학교가 커져요. 오른쪽 학교 파워는 지금까지 쌓아 온 모든 것을 더한 힘이에요. 아래 막대는 다음 동네 단계까지 남은 평판이에요.' },
+    { sel: '#stats', t: '우리 학교 현황', d: '도토리는 수업료로 저절로 쌓여요. 학생이 많고 평판이 높을수록 학교가 커져요. 오른쪽 학교 파워는 지금까지 쌓아 온 모든 것을 더한 힘이에요. 학교 이름 아래 막대는 다음 동네 단계까지 남은 평판이에요.' },
     { sel: '#questBar', t: '메인 퀘스트', d: '제가 할 일을 하나씩 알려 드려요. 다 하면 여기를 눌러 보상을 받아요. 막히면 눌러서 바로 가 보세요.' },
-    { sel: '#b-classroom', t: '건물 키우기', d: '건물을 누르면 안이 보여요. 가구 네 개를 모두 건물 레벨까지 올리면 건물을 키울 수 있어요. 교실을 넓히면 학생이 더 들어오고, 급식실은 수업료, 도서관은 평판을 올려 줘요.', scroll: true },
+    { sel: '#b-classroom', t: '건물 키우기', d: '건물을 누르면 안이 보여요. 가구 네 개를 모두 건물 레벨까지 올리면 건물을 키울 수 있어요. 교실을 넓히면 학생이 더 들어오고, 급식실은 수업료, 도서관은 평판을 올려 줘요. 지도는 손가락으로 밀어 볼 수 있어요.', scroll: true },
     { sel: '#oak', t: '참나무 흔들기', d: '놀이터를 지으면 옆 참나무를 눌러 도토리를 떨어뜨릴 수 있어요. 떨어진 도토리를 눌러 주우면 도토리를 듬뿍 받아요.', scroll: true },
     { sel: '.map-left', t: '지도 왼쪽 버튼', d: '가끔 부엉이 선생님의 보충수업(광고 보고 도토리)이 잠깐 나타나요. 체험학습, 학교 행사도 여기에 생겨요. 학년이 올라가면 하나씩 열려요.', scroll: true },
-    { sel: '.tabs', t: '아래 탭', d: '퀘스트 탭에는 매일, 매주 미션이 있고, 선생님, 졸업(종업식), 황금 도토리 상점, 랭킹도 여기서 열어요.' },
+    { sel: '.tabs', t: '아래 탭', d: '선생님, 미니게임, 졸업(종업식), 황금 도토리 상점은 아래 탭에서 열어요. 매일, 매주 미션이 있는 퀘스트 목록과 랭킹은 지도 오른쪽 단추, 설정은 오른쪽 위 톱니바퀴예요.' },
     { sel: null, t: '준비 끝!', d: '이제 교실부터 키워 볼까요? 자리를 비워도 도토리는 계속 쌓여요. 약속한 황금 도토리를 드릴게요.' }
   ];
   function tutAuto() {
@@ -7441,6 +7568,7 @@ body{background:radial-gradient(120% 60% at 50% 0%, color-mix(in srgb, var(--pap
     $('#gDot').hidden = $('#gDot').hidden || t === 'grad';
     if (t !== 'settings') { $('#resetConfirm').hidden = true; }
     renderQuestBar(); renderSubBar(); renderGuide(); renderTeacherGuide(); updateQuestDot();
+    if (t === 'school') requestAnimationFrame(() => fitMap(prev !== 'school' && rt.panX == null));
     if (t !== 'shop') Music.preview = '';
     musicSync();
   }
@@ -7778,6 +7906,7 @@ body{background:radial-gradient(120% 60% at 50% 0%, color-mix(in srgb, var(--pap
     // 1.5.0: 그림 아이콘을 채우고, 아직 열리지 않은 버튼은 알려만 줘요
     $$('[data-ic]').forEach(el => { const u = IMG(el.dataset.ic); if (u) el.style.backgroundImage = `url("${u}")`; });
     $$('.panel-x').forEach(b => b.addEventListener('click', () => { setTab('school'); sfx('tap'); }));
+    setupPan(); requestAnimationFrame(() => fitMap(true));
     $$('[data-soon]').forEach(b => b.addEventListener('click', () => { toast(b.dataset.soon); sfx('tap'); }));
 
     // 퀘스트 쪽지: 완료했으면 보상 받기, 아니면 해야 할 곳으로 바로 가기
