@@ -156,6 +156,7 @@ async def run(b, dark, w, h):
     if not await pg.evaluate(f"!!{F}.S.pz.cur"): bad.append('봇이 놓은 뒤 판이 사라졌어요'); return tag, bad
     await pg.screenshot(path=f's46_board_{tag}.png')
     # 선생님 도움 창과 그만하기 창
+    if not await pg.evaluate(f"!!{F}.S.pz.cur"): bad.append('도움 창 전에 판이 사라졌어요'); return tag, bad
     await pg.evaluate(f"{F}.S.pz.cur.meter = 6; {F}.pzRenderAll(); document.querySelector('#pzHelp').click()"); await pg.wait_for_timeout(300)
     hp = await pg.evaluate("[!document.querySelector('#pzPick').hidden, document.querySelector('#pzHelp').classList.contains('ready')]")
     if hp != [True, True]: bad.append('도움 창: ' + json.dumps(hp))
