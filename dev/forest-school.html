@@ -4702,45 +4702,51 @@ body{background:radial-gradient(120% 60% at 50% 0%, color-mix(in srgb, var(--pap
   /* 1.5.0 시설 안: 방 배경 그림 위에 가구 그림을 올려요. 바닥은 위에서 40%(y 92)부터예요.
      자리는 [가운데 x, 바닥에 닿는 y], 너비는 지도 단위. 뒤쪽(y가 작은 곳)일수록 조금 작게 그려요 */
   const FUR_AR = { desk: 0.75, chair: 1.56, fan: 1.84, locker: 2.27, table: 0.53, counter: 0.43, water: 2.29, rack: 0.96, shelf: 1.28, rdesk: 0.39, sofa: 0.66, lamp: 2.40, lab: 0.87, scope: 1.72, chem: 0.91, globe: 1.41, slide: 1.00, swing: 0.70, bars: 0.46, bench: 0.57 };
+  // 1.7.0 방 배치 다시 짜기(실제 모습처럼): 뒤쪽은 좁고 작게, 앞쪽은 넓고 크게 보이는 원근에 맞춰 놓아요.
+  // furP(u, y): 바닥 y에서 가로 위치 u(-1 왼쪽 벽 ~ 1 오른쪽 벽)를 지도 단위 x로 바꿔요. 자리는 [x, 바닥에 닿는 y]이고 앞(위쪽 자리)부터 채워요.
+  // on: 다른 가구 위에 올려요(현미경은 실험대 위, 지구본은 약품장 위). dx는 받침 가구 너비에 대한 가로 비율, dy는 받침 가구 높이에 대한 높이 비율
+  const furPersp = y => 0.62 + 0.38 * Math.max(0, Math.min(1, (y - 92) / 138));
+  const furP = (u, y) => [+(160 + u * 165 * furPersp(y)).toFixed(1), y];
+  const furGrid = (us, ys) => ys.flatMap(y => us.map(u => furP(u, y)));
   const FUR_LAY = {
-    classroom: {
-      desk: { w: 42, at: [[130, 214], [190, 214], [70, 214], [250, 214], [130, 178], [190, 178], [70, 178], [250, 178], [130, 142], [190, 142], [70, 142], [250, 142]] },
-      chair: { w: 17, at: [[130, 226], [190, 226], [70, 226], [250, 226], [130, 190], [190, 190], [70, 190], [250, 190], [130, 154], [190, 154], [70, 154], [250, 154]] },
-      fan: { w: 20, at: [[24, 214], [296, 214]] },
-      locker: { w: 22, at: [[22, 140], [298, 140]] }
+    classroom: {   // 칠판을 바라보고 네 줄로 앉아요. 의자는 책상 바로 뒤, 청소도구함은 창가 뒤쪽 구석, 선풍기는 앞 구석
+      desk: { w: 46, at: furGrid([-0.2, 0.2, -0.6, 0.6], [150, 183, 216]) },
+      chair: { w: 19, at: furGrid([-0.2, 0.2, -0.6, 0.6], [160, 193, 226]) },
+      fan: { w: 22, at: [furP(-0.9, 222), furP(0.9, 222)] },
+      locker: { w: 26, at: [[26, 118], [50, 118]] }
     },
-    cafeteria: {
-      counter: { w: 64, at: [[160, 124], [94, 124], [226, 124]] },
-      table: { w: 58, at: [[160, 214], [80, 214], [240, 214], [160, 168], [80, 168], [240, 168]] },
-      water: { w: 18, at: [[300, 150], [300, 206]] },
-      rack: { w: 36, at: [[22, 156], [22, 212]] }
+    cafeteria: {   // 배식대는 배식 창 아래 뒷벽에 나란히, 식탁은 두 줄, 식판 선반은 배식대 옆 왼쪽 벽, 정수기는 오른쪽 벽
+      counter: { w: 68, at: [furP(0, 116), furP(-0.5, 116), furP(0.5, 116)] },
+      table: { w: 64, at: furGrid([-0.42, 0.42], [160, 192, 224]) },
+      water: { w: 20, at: [[298, 142], [302, 186]] },
+      rack: { w: 40, at: [[34, 132], [30, 178]] }
     },
-    library: {
-      shelf: { w: 40, at: [[64, 122], [104, 122], [216, 122], [256, 122]] },
-      rdesk: { w: 54, at: [[160, 210], [94, 210], [226, 210], [160, 166], [94, 166], [226, 166]] },
-      sofa: { w: 48, at: [[30, 192], [290, 192]] },
-      lamp: { w: 12, at: [[22, 150], [298, 150], [140, 124], [180, 124]] }
+    library: {   // 책장은 뒷벽에 나란히, 열람 책상은 가운데 두 줄, 소파와 스탠드는 앞 구석
+      shelf: { w: 46, at: [furP(-0.36, 112), furP(0.36, 112), furP(-0.78, 112), furP(0.78, 112)] },
+      rdesk: { w: 60, at: furGrid([-0.4, 0.4], [162, 194, 226]) },
+      sofa: { w: 54, at: [furP(-0.78, 212), furP(0.78, 212)] },
+      lamp: { w: 14, at: [furP(0.98, 200), furP(-0.98, 200), furP(-0.14, 114), furP(0.14, 114)] }
     },
     playground: {
-      slide: { w: 84, at: [[72, 180]] },
-      swing: { w: 84, at: [[166, 150]] },
-      bars: { w: 70, at: [[262, 176]] },
-      bench: { w: 46, at: [[60, 226], [130, 228], [196, 228], [266, 226]] }
+      slide: { w: 90, at: [[68, 178]] },
+      swing: { w: 90, at: [[166, 148]] },
+      bars: { w: 74, at: [[262, 174]] },
+      bench: { w: 50, at: [[38, 226], [114, 228], [206, 228], [282, 226]] }
     },
-    science: {
-      lab: { w: 56, at: [[160, 214], [80, 214], [240, 214], [160, 168], [80, 168], [240, 168]] },
-      scope: { w: 16, at: [[128, 126], [148, 126], [168, 126], [188, 126]] },
-      chem: { w: 44, at: [[30, 130], [290, 130]] },
-      globe: { w: 20, at: [[222, 126]] }
+    science: {   // 실험대는 가운데 두 줄, 현미경은 실험대 위, 약품장은 뒷벽 오른쪽, 지구본은 약품장 위
+      lab: { w: 62, at: furGrid([-0.42, 0.42], [160, 192, 224]) },
+      scope: { w: 18, on: 'lab', dx: 0.3, dy: 0.5 },
+      chem: { w: 46, at: [furP(0.42, 116), furP(0.8, 116)] },
+      globe: { w: 20, on: 'chem', dx: 0, dy: 0.98 }
     }
   };
   const FUR_SUF = ['', '_old', '', '_fresh', '_shiny'];
   // 1.6.0 특별 가구(정수 상점): 방마다 하나, 사면 그 방에 놓여요. [가운데 x, 바닥 y], 너비, 그림 세로 비율
   const SP_FUR = {
     classroom: { id: 'aquarium', name: '교실 어항', at: [300, 182], w: 42, ar: 1.46 },
-    cafeteria: { id: 'cake', name: '케이크 진열장', at: [42, 126], w: 54, ar: 1.01 },
+    cafeteria: { id: 'cake', name: '케이크 진열장', at: [270, 118], w: 54, ar: 1.01 },
     library: { id: 'globelamp', name: '지구의 독서등', at: [160, 128], w: 36, ar: 1.64 },
-    science: { id: 'dino', name: '공룡 뼈 모형', at: [86, 130], w: 74, ar: 0.78 },
+    science: { id: 'dino', name: '공룡 뼈 모형', at: [52, 118], w: 74, ar: 0.78 },
     playground: { id: 'carousel', name: '회전목마', at: [294, 130], w: 68, ar: 1.17 }
   };
   const SP_BY_ID = Object.fromEntries(Object.entries(SP_FUR).map(([k, v]) => [v.id, Object.assign({ k }, v)]));
@@ -4751,7 +4757,7 @@ body{background:radial-gradient(120% 60% at 50% 0%, color-mix(in srgb, var(--pap
       `<image href="${IMG('fur_sp_' + F.id)}" x="${(x - ww / 2).toFixed(1)}" y="${(y - hh).toFixed(1)}" width="${ww.toFixed(1)}" height="${hh.toFixed(1)}"/>` +
       `<g class="fur-spark">${sparkle(x + ww * 0.3, y - hh * 0.9, 0.9)}</g></g>`;
   }
-  const furDepth = y => 0.8 + 0.2 * Math.max(0, Math.min(1, (y - 92) / 138));
+  const furDepth = y => 0.72 + 0.32 * Math.max(0, Math.min(1, (y - 92) / 138));   // 1.7.0: 원근을 조금 더 세게(뒤 0.72배, 앞 1.04배)
   function furImg(id, x, y, w, st) {
     const s = furDepth(y), ww = w * s, hh = ww * FUR_AR[id];
     return `<ellipse cx="${x}" cy="${(y - 1).toFixed(1)}" rx="${(ww * 0.42).toFixed(1)}" ry="${(2 + ww * 0.04).toFixed(1)}" class="fur-shadow"/>` +
@@ -4767,13 +4773,25 @@ body{background:radial-gradient(120% 60% at 50% 0%, color-mix(in srgb, var(--pap
   // 방 안 가구를 모두 그려요. 앞(아래)에 있는 것이 위에 그려지게 깊이 순서로 놓아요
   function furInstances(k) {
     const out = [];
+    // 받침 가구(실험대, 약품장)의 자리를 먼저 알아야 그 위에 올리는 가구를 놓을 수 있어요
+    const base = {};
+    FUR[k].forEach((F, i) => { const lay = FUR_LAY[k][F.id]; if (!lay.on) base[F.id] = lay.at.slice(0, Math.max(1, Math.min(lay.at.length, FUR_SPOTS[k][F.id].cnt(S.fu[k][i])))).map(([x, y]) => ({ x, y, w: lay.w, ar: FUR_AR[F.id] })); });
     FUR[k].forEach((F, i) => {
       const sp = FUR_SPOTS[k][F.id], lay = FUR_LAY[k][F.id], n = S.fu[k][i], st = furStage(n);
+      if (lay.on) {
+        // 받침 가구 위에 올려요. 받침 가구 하나에 하나씩, 받침 가구보다 나중에(위에) 그려요
+        const under = base[lay.on] || [];
+        under.slice(0, Math.max(1, Math.min(under.length, sp.cnt(n)))).forEach((b, j) => {
+          const d = furDepth(b.y), bw = b.w * d, bh = bw * b.ar, x = +(b.x + bw * lay.dx).toFixed(1), y = +(b.y - bh * lay.dy).toFixed(1);
+          out.push({ i, j, x, y, z: b.y + 0.5, top: false, ghost: n < 1, svg: furImg(F.id, x, y, lay.w * d / furDepth(y), st) });
+        });
+        return;
+      }
       const at = lay.at.slice(0, Math.max(1, Math.min(lay.at.length, sp.cnt(n))));
       at.forEach(([x, y], j) => out.push({ i, j, x, y, top: false, ghost: n < 1, svg: furImg(F.id, x, y, lay.w, st) }));
     });
     if (SP_FUR[k]) { const sv = spFurImg(k); if (sv) out.push({ sp: true, y: SP_FUR[k].at[1], svg: sv }); }   // 1.6.0 특별 가구도 깊이 순서에 끼워요
-    out.sort((a, b) => a.y - b.y);
+    out.sort((a, b) => (a.z || a.y) - (b.z || b.y));
     return out;
   }
   function renderFurScene(k) {
@@ -4788,7 +4806,7 @@ body{background:radial-gradient(120% 60% at 50% 0%, color-mix(in srgb, var(--pap
     rt.furTag = {};
     const tagSvg = tags.map(([o, n, done, can]) => {
       // 책상 이름표는 책상 위에 달아서, 바로 앞 의자 이름표와 겹치지 않게 해요
-      const id = FUR[k][o.i].id, up = id === 'desk' ? FUR_LAY[k].desk.w * furDepth(o.y) * FUR_AR.desk + 10 : 0;
+      const id = FUR[k][o.i].id, lay = FUR_LAY[k][id], up = (id === 'desk' || lay.on) ? lay.w * furDepth(o.y) * FUR_AR[id] + 10 : 0;   // 1.7.0: 다른 가구 위에 올린 것도 이름표를 위에
       const tx = Math.max(20, Math.min(300, o.x)), ty = Math.min(221, Math.max(14, o.y + 6 - up));
       rt.furTag[o.i] = [tx, ty];
       const isRec = rt.rec && rt.rec.kind === 'fur' && rt.rec.k === k && rt.rec.i === o.i;
