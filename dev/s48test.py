@@ -186,7 +186,7 @@ async def main():
             await pg.evaluate(f"{F}.setTab('school')"); await pg.wait_for_timeout(200)
             await pg.screenshot(path=f'{name}_home.png')
             bt = await pg.evaluate("(()=>{ const r=[...document.querySelectorAll('.map-right .sidebtn')].filter(b=>!b.hidden).map(b=>b.getBoundingClientRect()); return { n: r.length, ok: r.every(x=>x.right<=innerWidth && x.bottom<=innerHeight && x.left>=0) }; })()")
-            if bt['n'] != 5 or not bt['ok']:   # 퀘스트, 랭킹, 도감, 이벤트, 정수 상점
+            if bt['n'] != 4 or not bt['ok']:   # 퀘스트, 랭킹, 도감, 이벤트 (1.7.2: 정수 상점은 아래 상점 탭의 상점 거리로 옮김)
                 fails.append(f'{theme} 홈 오른쪽 버튼이 화면 밖이에요 {bt}')
         if errs or errs2 or errs3: fails.append(f'페이지 오류 {errs + errs2 + errs3}')
         await b.close()
