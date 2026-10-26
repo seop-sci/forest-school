@@ -20,6 +20,9 @@
 - 그림: 전용 묶음 `window.FS_IMG180`(FS_IMG170 뒤 표시 사이, 지금은 비어 있음). `IMG180(열쇠)`가 없으면 색 조각과 그림 문자로 보여요. 열쇠: 조각 `mg_a_01`~`mg_v_10`, 생산기 `mg_gen_A`(대문자), 화면 `mg_board`, `mg_ic_energy/piece/up`, `mg_order_light/dark`(주문 쪽지 틀), `mg_card`, `mg_help_1~3`. 배경은 블록 퍼즐 `pz_bg`를 같이 써요. 넣는 법: `cd dev && python3 embed_assets.py --block 180 ../art/v180/items ../art/v180/ui`.
 - 시험 손잡이(`window.__forest`): `MG`, `mgCells`, `mgSetCells`, `mgTick`, `mgAddEnergy`, `mgAddUp`, `mgTapGen`, `mgDrop`, `mgSell`, `mgUpgrade`, `mgClaimOrder`, `mgSwapOrder`, `mgOrderOk`, `mgFillOrders`, `mgOpen`, `mgClose`, `mgRenderAll`, `mgSpawnLevel`, `mgNearestEmpty`, `mgEmptyBoard`, `mgOrderReward`, `mgUI`, `sanitize180`, `mgWatchAd`. 시험은 `dev/s57test.py`. 퀘스트 봇(`qbot.py`)은 `mgBest`, `mgOrders` 퀘스트를 통계로 바로 채워요.
 
+- 손맛: 생산기를 누르면 조각이 생산기에서 빈칸으로 포물선을 그리며 날아가 내려앉아요(`mgFly`, `.mg-fly`, 도착 칸은 `.hide`였다가 `.land`). 생산기는 눌리는 모양(`.press`), 합치면 조각 색 가루가 터지고(`mgDust`) 판이 살짝 울리고(`.thump`) "n단계!" 글자가 떠요. 에너지, 조각 숫자는 바뀔 때 튀어요(`.bump`). 움직임 줄이기(`rt.reduced`)면 모두 건너뛰어요.
+- 숲속 퍼즐(옛 이름 블록 퍼즐)도 같이 손봤어요: 콤보는 줄을 못 지운 놓기가 4번(`PZ.comboGrace`) 이어져야 끊겨요(`cur.miss`, 저장에 포함). 점수 칸 아래에 "콤보 ×1.5 (3번 안에 지우기)" 표시. 빈칸은 파인 느낌, 블록은 밝은 테두리와 그림자(`.pz-cell.on`). 미니게임 탭 이름은 "숲속 퍼즐", "숲속 대결"(준비 중).
+
 ## 아직 안 한 것
 
 - 그림 94장(작업지시서 13, 5묶음)이 오면 `embed_assets.py --block 180`으로 넣고 `s57test.py`와 화면을 다시 봐요.

@@ -48,7 +48,9 @@ RULES = r"""() => {
   const r1 = F.pzPlace(g, 0, 0, 0), r2 = F.pzPlace(g, 1, 1, 0);
   eq([r1.gain, r2.gain, g.combo], [11, 1 + Math.round(10 * 1.5), 2], '콤보 배수');
   const r3 = F.pzPlace(g, 2, 5, 5);
-  eq([r3.n, g.combo], [0, 0], '콤보 끊김');
+  eq([r3.n, g.combo, g.miss], [0, 2, 1], '콤보 유지 (1.8.0: 못 지워도 4번까지)');
+  for (let j = 0; j < 3; j++) { g.tray[2] = { c: [[0, 0]], k: 5 }; F.pzPlace(g, 2, 6, j); }
+  eq([g.combo, g.miss], [0, 0], '콤보 끊김 (4번 연달아 못 지우면)');
   // 학생 부탁: 부탁 문양을 n개 지우면 정수를 주고 다음 학생이 와요
   g = F.pzFreshGame(true);
   const k = g.ask.k, who = g.ask.who; g.ask.n = 8;

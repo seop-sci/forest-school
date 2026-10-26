@@ -1219,6 +1219,12 @@ body{background:radial-gradient(120% 60% at 50% 0%, color-mix(in srgb, var(--pap
 .pz-cell.tea.ti::after,.pz-piece i.tea.ti::after,.pz-drag i.tea.ti::after{inset:auto 2% 2% auto;width:40%;height:40%;filter:drop-shadow(0 1px 1px rgba(0,0,0,.35))}
 .pz-piece i,.pz-drag i{position:relative}
 .pz-cell{position:relative;background:center/100% 100% no-repeat;transition:transform .12s}
+/* 1.8.0: 빈칸은 안으로 파인 느낌, 블록은 밝은 테두리와 그림자로 띄워서 칸과 블록이 한눈에 구별돼요 */
+.pz-cell:not(.on):not(.ghost)::before{content:"";position:absolute;inset:7%;border-radius:20%;background:rgba(70,40,12,.26);box-shadow:inset 0 2px 3px rgba(0,0,0,.32), inset 0 -1px 0 rgba(255,235,190,.35)}
+.pz-cell.on{filter:drop-shadow(0 2px 2px rgba(0,0,0,.38)) saturate(1.08)}
+.pz-cell.on::before{content:"";position:absolute;inset:3%;border-radius:22%;box-shadow:inset 0 0 0 2px rgba(255,250,235,.55);pointer-events:none}
+.pz-sc .pz-combo{display:block;font-style:normal;font-size:10px;line-height:1.1;color:#FFE27A;margin-top:1px}
+.pz-sc .pz-combo[hidden]{display:none}
 .pz-cell.ghost{background-image:var(--pz-ghost);opacity:.9}
 .pz-cell.will{filter:brightness(1.2) saturate(1.15)}
 .pz-cell.will::after{content:"";position:absolute;inset:12%;border-radius:22%;background:rgba(255,245,200,.45)}
@@ -1592,6 +1598,19 @@ body{background:radial-gradient(120% 60% at 50% 0%, color-mix(in srgb, var(--pap
 .mg-up tr.now td{background:#FFF0C2;font-weight:700}
 .mini-card .mg-thumb{flex:none;width:52px;height:52px;border-radius:12px;display:grid;place-items:center;font-size:26px;background:#DCEAC4 var(--mg-card, none) center/cover no-repeat;box-shadow:inset 0 0 0 2px rgba(0,0,0,.08)}
 .mini-card .mg-thumb.has-img{font-size:0}
+/* 손맛 */
+.mg-cell.hide .mg-tile{opacity:0}
+.mg-cell.land .mg-tile{animation:mgLand .36s cubic-bezier(.3,1.5,.5,1)}
+@keyframes mgLand{0%{transform:scale(1.25,.75) translateY(-6%)}45%{transform:scale(.9,1.1)}100%{transform:scale(1)}}
+.mg-cell.press .mg-tile{animation:mgPress .26s ease}
+@keyframes mgPress{35%{transform:scale(.86,.8) translateY(8%)}70%{transform:scale(1.08,1.06)}}
+.mg-fly{position:absolute;z-index:4;pointer-events:none;filter:drop-shadow(0 4px 4px rgba(0,0,0,.35))}
+.mg-fly .mg-tile{position:absolute;inset:4%}
+.mg-dust{position:absolute;z-index:3;width:7px;height:7px;border-radius:50%;background:#FFE9A8;pointer-events:none;box-shadow:0 0 0 1px rgba(0,0,0,.08)}
+.mg-board.thump{animation:mgThump .28s ease}
+@keyframes mgThump{30%{transform:scale(1.015)}60%{transform:scale(.995)}}
+.mg-stat b.bump{animation:mgBump .4s cubic-bezier(.3,1.6,.5,1)}
+@keyframes mgBump{30%{transform:scale(1.35);color:#FFF}}
 @media (max-height:700px){.mg-board{max-width:360px}}
 :root[data-theme="dark"] .mg-order{background-image:var(--mg-order-dark, none)}
 /* ===== 1.8.0 숲속 합치기 END ===== */
@@ -1887,13 +1906,13 @@ body{background:radial-gradient(120% 60% at 50% 0%, color-mix(in srgb, var(--pap
       <p class="lead">미니게임을 하면 숲의 정수와 도토리를 받아요. 숲의 정수로는 한정 의상, 특별 가구 같은 꾸미기를 살 수 있어요.</p>
       <div class="mini-have"><span class="tic" data-ic="ic_essence" aria-hidden="true"></span><span>숲의 정수</span><b id="essHave">0</b></div>
       <div class="mini-list">
-        <button class="mini-card mini-go" type="button" id="pzOpen"><span class="pz-thumb" aria-hidden="true"></span><span class="mc-txt"><b>블록 퍼즐</b><small id="pzCardSub">조각을 끌어다 놓고 줄을 지워요</small></span><span class="mini-soon mini-play" id="pzCardTag">하기</span></button>
+        <button class="mini-card mini-go" type="button" id="pzOpen"><span class="pz-thumb" aria-hidden="true"></span><span class="mc-txt"><b>숲속 퍼즐</b><small id="pzCardSub">조각을 끌어다 놓고 줄을 지워요</small></span><span class="mini-soon mini-play" id="pzCardTag">하기</span></button>
         <div class="mini-pzrow">
           <span id="pzLeftTxt">오늘 보상 판 10번 남음</span>
           <button class="btn-sub small" type="button" id="pzAdBtn" hidden>광고 보고 3판 더</button>
         </div>
         <button class="mini-card mini-go" type="button" id="mgOpen"><span class="mg-thumb" aria-hidden="true">🌰</span><span class="mc-txt"><b>숲속 합치기</b><small id="mgCardSub">에너지 100/100</small></span><span class="mini-play" id="mgCardTag">하기</span></button>
-        <div class="mini-card"><span class="tic" data-ic="ic_rank" aria-hidden="true"></span><span class="mc-txt"><b>동물 대결</b><small>숲속 교육부에서 열심히 준비 중이에요</small></span><span class="mini-soon">준비 중</span></div>
+        <div class="mini-card"><span class="tic" data-ic="ic_rank" aria-hidden="true"></span><span class="mc-txt"><b>숲속 대결</b><small>숲속 교육부에서 열심히 준비 중이에요</small></span><span class="mini-soon">준비 중</span></div>
       </div>
     </section>
 
@@ -2065,11 +2084,11 @@ body{background:radial-gradient(120% 60% at 50% 0%, color-mix(in srgb, var(--pap
 <!-- ===== 1.8.0 숲속 합치기 END ===== -->
 
 <!-- 1.6.0 미니게임 1: 블록 퍼즐. 창이 아니라 화면 전체를 덮는 장면이에요. 보상 창(z-index 30)은 이 위에 떠요 -->
-<div class="pz" id="pzScene" hidden role="dialog" aria-modal="true" aria-label="블록 퍼즐">
+<div class="pz" id="pzScene" hidden role="dialog" aria-modal="true" aria-label="숲속 퍼즐">
   <div class="pz-bg" aria-hidden="true"></div>
   <div class="pz-top">
     <button class="pz-x" type="button" id="pzBack" aria-label="미니게임으로 돌아가기"><svg viewBox="0 0 24 24" width="20" height="20" aria-hidden="true"><path d="M15 5l-7 7 7 7" fill="none" stroke="currentColor" stroke-width="2.6" stroke-linecap="round" stroke-linejoin="round"/></svg></button>
-    <div class="pz-sc"><small>점수</small><b id="pzScore">0</b></div>
+    <div class="pz-sc"><small>점수</small><b id="pzScore">0</b><em class="pz-combo" id="pzCombo" hidden></em></div>
     <div class="pz-sc pz-sc2"><small>최고</small><b id="pzBest">0</b></div>
     <div class="pz-sc pz-sc2"><small>이번 판 정수</small><b id="pzEssNow">0</b></div>
   </div>
@@ -7106,7 +7125,7 @@ body{background:radial-gradient(120% 60% at 50% 0%, color-mix(in srgb, var(--pap
      - 선생님 도움: 조각에 가끔 선생님 블록이 끼어 나와요. 그 블록이 든 줄을 지우면 다람쥐(3×3 치우기), 부엉이(조각 바꾸기), 곰(조각 돌리기) 도움을 받아요
      하루에 10판까지 보상을 주고, 광고를 보면 3판 더 받아요. 그 뒤에도 연습으로는 계속 할 수 있어요. 하던 판은 저장돼요 */
   const PZ = {
-    N: 8, perDay: 10, adMore: 3, adMax: 1,
+    N: 8, perDay: 10, adMore: 3, adMax: 1, comboGrace: 4,   // 1.8.0: 줄을 못 지운 놓기가 이만큼 이어져야 콤보가 끊겨요
     pats: ['acorn', 'leaf', 'flower', 'mushroom', 'berry', 'water'],
     patName: { acorn: '도토리', leaf: '잎', flower: '꽃', mushroom: '버섯', berry: '산딸기', water: '물방울' },
     teas: ['squirrel', 'owl', 'bear'], teaName: { squirrel: '다람쥐', owl: '부엉이', bear: '곰' },
@@ -7156,7 +7175,7 @@ body{background:radial-gradient(120% 60% at 50% 0%, color-mix(in srgb, var(--pap
     cur.ask = { k, n, got: 0, who: who[0], name: who[1] };
   }
   const pzFreshGame = rw => {
-    const cur = { b: pzEmpty(), tb: new Array(PZ.N * PZ.N).fill(''), tray: [null, null, null], score: 0, combo: 0, lines: 0, helps: { squirrel: 0, owl: 0, bear: 0 }, askI: 0, ask: null, ess: 0, rw: !!rw, mode: '' };
+    const cur = { b: pzEmpty(), tb: new Array(PZ.N * PZ.N).fill(''), tray: [null, null, null], score: 0, combo: 0, miss: 0, lines: 0, helps: { squirrel: 0, owl: 0, bear: 0 }, askI: 0, ask: null, ess: 0, rw: !!rw, mode: '' };
     pzNewAsk(cur);
     cur.tray = cur.tray.map(() => pzNewPiece(cur));
     return cur;
@@ -7180,7 +7199,7 @@ body{background:radial-gradient(120% 60% at 50% 0%, color-mix(in srgb, var(--pap
     const tb = Array.isArray(d.tb) && d.tb.length === b.length ? d.tb.map((t, i) => b[i] && PZ.teas.includes(t) ? t : '') : new Array(b.length).fill('');
     const helps = { squirrel: 0, owl: 0, bear: 0 };
     if (d.helps && typeof d.helps === 'object') for (const t of PZ.teas) helps[t] = Math.min(PZ.teaMax, Math.floor(num(d.helps[t], 0, 0)));
-    const cur = { b, tb, tray, score: Math.min(1e9, Math.floor(num(d.score, 0, 0))), combo: Math.floor(num(d.combo, 0, 0)), lines: Math.floor(num(d.lines, 0, 0)),
+    const cur = { b, tb, tray, score: Math.min(1e9, Math.floor(num(d.score, 0, 0))), combo: Math.floor(num(d.combo, 0, 0)), miss: Math.floor(num(d.miss, 0, 0)), lines: Math.floor(num(d.lines, 0, 0)),
       helps, askI: Math.floor(num(d.askI, 0, 0)), ask: null, ess: Math.floor(num(d.ess, 0, 0)), rw: d.rw !== false, mode: '' };
     if (d.ask && typeof d.ask === 'object' && cell(d.ask.k)) {
       const who = PZ.askers.find(a => a[0] === d.ask.who) || PZ.askers[0];
@@ -7243,10 +7262,10 @@ body{background:radial-gradient(120% 60% at 50% 0%, color-mix(in srgb, var(--pap
     L.cols.forEach(cc => { for (let j = 0; j < PZ.N; j++) take(j, cc); });
     let gain = p.c.length;
     if (n > 0) {
-      cur.combo += 1; cur.lines += n;
+      cur.combo += 1; cur.miss = 0; cur.lines += n;
       const mult = Math.min(4, 1 + 0.5 * (cur.combo - 1));
       gain += Math.round((10 * n + 5 * n * (n - 1) + 20 * L.mono.length) * mult) + PZ.teaBonus * teas.filter(x => !x.got).length;
-    } else cur.combo = 0;
+    } else { cur.miss = (cur.miss || 0) + 1; if (cur.miss >= PZ.comboGrace) { cur.combo = 0; cur.miss = 0; } }   // 1.8.0: 네 번 연달아 못 지우면 끊겨요
     cur.score += gain;
     // 학생 부탁 진행
     const asks = [];
@@ -7361,7 +7380,7 @@ body{background:radial-gradient(120% 60% at 50% 0%, color-mix(in srgb, var(--pap
     pzUI.cells.forEach((el, i) => {
       const v = cur.b[i], t = cur.tb[i] || '', key = v + ':' + t;
       if (el.dataset.v !== key) {
-        el.dataset.v = key; el.style.backgroundImage = pzCellImg(v, t); el.className = 'pz-cell' + (t ? ' tea' + (pzTeaArt(t) ? ' ti' : '') : '');
+        el.dataset.v = key; el.style.backgroundImage = pzCellImg(v, t); el.className = 'pz-cell' + (v ? ' on' : '') + (t ? ' tea' + (pzTeaArt(t) ? ' ti' : '') : '');
         el.style.setProperty('--tea', t ? pzTeaStyle(t, v).slice(6) : 'none');
       }
     });
@@ -7399,6 +7418,7 @@ body{background:radial-gradient(120% 60% at 50% 0%, color-mix(in srgb, var(--pap
     $('#pzScore').textContent = fmt(cur.score);
     $('#pzBest').textContent = fmt(Math.max(S.pz.best, cur.score));
     $('#pzEssNow').textContent = cur.rw ? fmt(pzEssOf(cur.score) + cur.ess) : '연습';
+    const cb = $('#pzCombo'); if (cb) { const on = cur.combo >= 1; cb.hidden = !on; if (on) cb.textContent = `콤보 ×${Math.min(4, 1 + 0.5 * cur.combo).toFixed(1).replace('.0', '')} (${PZ.comboGrace - (cur.miss || 0)}번 안에 지우기)`; }
   }
   function pzRenderAsk() {
     const cur = S.pz.cur; if (!cur || !cur.ask) return;
@@ -10324,9 +10344,10 @@ body{background:radial-gradient(120% 60% at 50% 0%, color-mix(in srgb, var(--pap
     mgSetCells(cells);
     S.mg.st.taps += 1;
     mgNoteBest(k, n);
-    mgUI.pop = to;
+    const gen = mgUI.cells[i]; if (gen && !rt.reduced) { gen.classList.remove('press'); void gen.offsetWidth; gen.classList.add('press'); setTimeout(() => gen.classList.remove('press'), 260); }
+    mgFly(i, to, cells[to]);
     sfx('tap'); buzz(6);
-    mgRenderBoard(); mgRenderTop(); mgRenderOrders(); mgSelect(i);
+    mgRenderBoard(); mgRenderTop(); mgBump('#mgE'); mgRenderOrders(); mgSelect(i);
     save();
     return true;
   }
@@ -10337,7 +10358,7 @@ body{background:radial-gradient(120% 60% at 50% 0%, color-mix(in srgb, var(--pap
     if (from === to || from < 0 || to < 0) return false;
     const cells = mgCells(), a = cells[from], b = cells[to];
     if (a === '..') return false;
-    if (b === '..') { cells[to] = a; cells[from] = '..'; mgSetCells(cells); mgUI.sel = to; sfx('tap'); return 'move'; }
+    if (b === '..') { cells[to] = a; cells[from] = '..'; mgSetCells(cells); mgUI.sel = to; mgUI.land = to; sfx('tap'); return 'move'; }
     if (mgIsItem(a) && a === b && mgLvOf(a[1]) < 10) {
       const k = a[0], n = mgLvOf(a[1]) + 1;
       // 5개 보너스: 놓는 칸 둘레(상하좌우)에 같은 조각이 3개 더 있으면 다섯을 한 번에 합쳐 다음 단계 2개 + 1단계 1개
@@ -10352,11 +10373,12 @@ body{background:radial-gradient(120% 60% at 50% 0%, color-mix(in srgb, var(--pap
       mgSetCells(cells);
       mgNoteBest(k, n);
       mgUI.sel = to;
+      if (mgUI.cells.length) mgFloat(to, n >= 10 ? '최고!' : `${n}단계!`);
       sfx(n >= 8 ? 'quest' : 'coin'); buzz(n >= 5 ? 14 : 8);
       if (n >= 10) toast(`${MG.kinds[k].st[9]}을 만들었어요! 10단계 최고 조각이에요`);
       return 'merge';
     }
-    cells[to] = a; cells[from] = b; mgSetCells(cells); mgUI.sel = to; sfx('tap');
+    cells[to] = a; cells[from] = b; mgSetCells(cells); mgUI.sel = to; mgUI.land = to; sfx('tap');
     return 'swap';
   }
   function mgSell(i) {
@@ -10434,6 +10456,7 @@ body{background:radial-gradient(120% 60% at 50% 0%, color-mix(in srgb, var(--pap
     S.budget += r.a; earn(r.a);
     S.mg.pieces = Math.min(MG.PCAP, S.mg.pieces + r.pc);
     if (r.up) mgAddUp(r.up);
+    if (r.pc) mgBump('#mgPc'); if (r.up) mgBump('#mgUp');
     S.mg.st.orders += 1;
     S.mg.orders.splice(i, 1); mgFillOrders();
     mgUI.sel = -1;
@@ -10455,7 +10478,38 @@ body{background:radial-gradient(120% 60% at 50% 0%, color-mix(in srgb, var(--pap
     return true;
   }
   /* ---- 화면 ---- */
-  const mgUI = { open: false, cells: [], sel: -1, pop: -1, merged: null, drag: null, dragEl: null };
+  const mgUI = { open: false, cells: [], sel: -1, pop: -1, merged: null, drag: null, dragEl: null, fly: null, land: -1 };
+  /* ---- 손맛: 생산기에서 조각이 날아 나오고, 합치면 터지고, 숫자가 튀어요 ---- */
+  const mgCenter = i => { const el = mgUI.cells[i], g = $('#mgGrid'); if (!el || !g) return null; const r = el.getBoundingClientRect(), gr = g.getBoundingClientRect(); return { x: r.left - gr.left + r.width / 2, y: r.top - gr.top + r.height / 2, w: r.width }; };
+  // 생산기(from)에서 새 조각이 to 칸으로 포물선을 그리며 날아가요. 도착하면 칸에 '툭' 내려앉아요
+  function mgFly(from, to, code) {
+    const g = $('#mgGrid'), a = mgCenter(from), b = mgCenter(to); if (!g || !a || !b || rt.reduced) { mgUI.pop = to; return; }
+    const d = document.createElement('div'); d.className = 'mg-fly'; d.innerHTML = mgTileHtml(code);
+    d.style.width = d.style.height = a.w + 'px'; d.style.left = (a.x - a.w / 2) + 'px'; d.style.top = (a.y - a.w / 2) + 'px';
+    g.appendChild(d);
+    const cell = mgUI.cells[to]; cell.classList.add('hide');
+    const dx = b.x - a.x, dy = b.y - a.y, up = Math.max(28, Math.hypot(dx, dy) * 0.35);
+    const an = d.animate([
+      { transform: 'translate(0,0) scale(.5)', opacity: .6 },
+      { transform: `translate(${dx * 0.5}px,${dy * 0.5 - up}px) scale(1.15)`, opacity: 1, offset: .55 },
+      { transform: `translate(${dx}px,${dy}px) scale(1)`, opacity: 1 }], { duration: 300 + Math.min(260, Math.hypot(dx, dy) * 0.8), easing: 'cubic-bezier(.25,.6,.4,1)' });
+    const done = () => { d.remove(); cell.classList.remove('hide'); void cell.offsetWidth; cell.classList.add('land'); mgDust(to, 5); setTimeout(() => cell.classList.remove('land'), 400); };
+    an.onfinish = done; an.oncancel = done;
+    mgUI.pop = -1;
+  }
+  // 조각이 내려앉거나 합쳐질 때 흩어지는 작은 가루
+  function mgDust(i, n, color) {
+    const g = $('#mgGrid'), c = mgCenter(i); if (!g || !c || rt.reduced) return;
+    for (let k = 0; k < n; k++) {
+      const d = document.createElement('i'); d.className = 'mg-dust'; if (color) d.style.background = color;
+      d.style.left = c.x + 'px'; d.style.top = c.y + 'px'; g.appendChild(d);
+      const ang = Math.random() * Math.PI * 2, dist = c.w * (0.5 + Math.random() * 0.7), sz = 0.6 + Math.random() * 0.8;
+      d.animate([{ transform: 'translate(-50%,-50%) scale(1)', opacity: 1 }, { transform: `translate(calc(-50% + ${Math.cos(ang) * dist}px), calc(-50% + ${Math.sin(ang) * dist + c.w * 0.3}px)) scale(${sz * 0.3})`, opacity: 0 }],
+        { duration: 380 + Math.random() * 240, easing: 'cubic-bezier(.2,.7,.4,1)' }).onfinish = () => d.remove();
+    }
+  }
+  function mgBump(sel) { const el = $(sel); if (!el || rt.reduced) return; el.classList.remove('bump'); void el.offsetWidth; el.classList.add('bump'); }
+  function mgThump() { const b = $('#mgBoard'); if (!b || rt.reduced) return; b.classList.remove('thump'); void b.offsetWidth; b.classList.add('thump'); setTimeout(() => b.classList.remove('thump'), 300); }
   const mgTileHtml = code => {
     if (code === '..') return '';
     if (mgIsGen(code)) {
@@ -10486,9 +10540,11 @@ body{background:radial-gradient(120% 60% at 50% 0%, color-mix(in srgb, var(--pap
       el.classList.toggle('sel', i === mgUI.sel);
       el.classList.remove('new', 'merge', 'over');
       if (i === mgUI.pop) { void el.offsetWidth; el.classList.add('new'); }
-      if (mgUI.merged && mgUI.merged.includes(i)) { void el.offsetWidth; el.classList.add('merge'); }
+      if (mgUI.merged && mgUI.merged.includes(i)) { void el.offsetWidth; el.classList.add('merge'); const K = MG.kinds[code[0]]; mgDust(i, mgLvOf(code[1]) >= 5 ? 14 : 8, K ? K.c : ''); }
+      if (i === mgUI.land) { void el.offsetWidth; el.classList.add('land'); setTimeout(() => el.classList.remove('land'), 400); }
     });
-    mgUI.pop = -1; mgUI.merged = null;
+    if (mgUI.merged && mgUI.merged.length) mgThump();
+    mgUI.pop = -1; mgUI.merged = null; mgUI.land = -1;
   }
   function mgRenderTop() {
     mgTick();
