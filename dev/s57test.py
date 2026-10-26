@@ -141,6 +141,18 @@ async def main():
         if r['mixHalf'] or not r['mixOk'] or not r['mixClaim'] or r['mixLeft'] != '..,..,m2': fails.append(f'섞인 주문 건네기 {r}')
         if not r['sw1'] or r['sw2'] or not r['sw3']: fails.append(f'주문 바꾸기 30분 {r}')
         if r['legacy'] != 'f3x2 g4x1+v2x1': fails.append(f'옛 모양 주문 읽기 {r}')
+        # ---- (4b) 가만히 있을 때 힌트: 건넬 주문 → 합칠 짝(주문에 맞는 것 먼저) → 주문 종류 생산기
+        r = await pg.evaluate(f"""(()=>{{ const F={F}, S=F.S, out={{}};
+          S.mg.orders = [{{ it: [{{ k: 'a', n: 3, c: 1 }}], who: 'fox' }}, {{ it: [{{ k: 's', n: 2, c: 2 }}], who: 'rabbit' }}, {{ it: [{{ k: 'g', n: 4, c: 1 }}], who: 'bear' }}]; S.mg.e = 50;
+          let c = F.mgEmptyBoard(); F.mgSetCells(c); F.mgRenderAll(); out.gen = F.mgHintPick();
+          c[20] = 'm1'; c[33] = 'm1'; c[40] = 'a2'; c[41] = 'a2'; F.mgSetCells(c); F.mgRenderAll(); out.merge = F.mgHintPick();
+          c[50] = 'a3'; F.mgSetCells(c); F.mgRenderAll(); out.order = F.mgHintPick();
+          F.mgSetCells(F.mgEmptyBoard()); S.mg.e = 0; out.none = F.mgHintPick();
+          S.mg.e = 50; F.mgShowHint(); out.shown = [document.querySelectorAll('.mg-cell.hint').length, document.querySelectorAll('.mg-finger').length];
+          F.mgTouch(); out.cleared = [document.querySelectorAll('.mg-cell.hint').length, document.querySelectorAll('.mg-finger').length];
+          return out; }})()""")
+        if r['gen'] != {'t': 'gen', 'i': 0} or r['merge'] != {'t': 'merge', 'a': 40, 'b': 41} or r['order'] != {'t': 'order', 'i': 0} or r['none'] is not None: fails.append(f'힌트 고르기 {r}')
+        if r['shown'] != [1, 1] or r['cleared'] != [0, 0]: fails.append(f'힌트 보이기와 지우기 {r}')
         # ---- (5) 보상 연결
         r = await pg.evaluate(f"""(()=>{{ const F={F}, S=F.S, out={{}}; const e = () => S.mg.e;
           S.mg.e = 0; S.mg.up = 0;

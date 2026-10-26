@@ -1565,6 +1565,11 @@ body{background:radial-gradient(120% 60% at 50% 0%, color-mix(in srgb, var(--pap
 .mg-cell{position:relative;border-radius:18%;background:rgba(255,255,255,.28)}
 .mg-cell.over{background:rgba(255,233,168,.9);box-shadow:inset 0 0 0 2px #F3B92E}
 .mg-cell.sel .mg-tile{box-shadow:0 0 0 2px #FFF7E6, 0 0 0 4px #F3B92E}
+.mg-cell.hint .mg-tile{animation:mgHint .9s ease-in-out 3}
+@keyframes mgHint{50%{transform:scale(1.14);filter:brightness(1.2)}}
+.mg-order.hint{animation:mgHintCard .9s ease-in-out 3}
+@keyframes mgHintCard{50%{transform:scale(1.06);box-shadow:0 0 0 3px #FFE27A, 0 3px 0 rgba(0,0,0,.25)}}
+.mg-finger{position:absolute;z-index:6;font-size:28px;line-height:1;pointer-events:none;transform:translate(-50%,-30%);filter:drop-shadow(0 2px 2px rgba(0,0,0,.4))}
 .mg-cell.want .mg-tile::after{content:"";position:absolute;inset:-2px;border-radius:24%;box-shadow:0 0 0 2px #F3B92E, 0 0 7px 2px rgba(255,210,80,.75);animation:mgWant 1.3s ease-in-out infinite;pointer-events:none}
 .mg-cell.want .mg-tile::before{content:"📜";position:absolute;left:-4px;top:-5px;font-size:10px;line-height:1;filter:drop-shadow(0 1px 1px rgba(0,0,0,.4))}
 @keyframes mgWant{50%{box-shadow:0 0 0 2px #FFE27A, 0 0 12px 4px rgba(255,210,80,.9)}}
@@ -10287,7 +10292,7 @@ body{background:radial-gradient(120% 60% at 50% 0%, color-mix(in srgb, var(--pap
      설계: 프로젝트 문서 "머지 게임 설계안 (1.8.0)". 그림은 FS_IMG180 묶음(아직 없으면 색 조각과 그림 문자) */
   const MG = {
     W: 8, H: 10, EMAX: 100, REGEN: 60000, ECAP: 999, UPCAP: 99, PCAP: 9999,
-    SELL: 0.1, ORDER: 0.2, MIXED: 0.5,                           // 에너지 1당 수업료 분치 (팔기, 주문)
+    SELL: 0.1, ORDER: 0.2, MIXED: 0.5, HINT_AFTER: 7000, HINT_SHOW: 3000,                           // 에너지 1당 수업료 분치 (팔기, 주문)
     PIECES: [[10, 3], [8, 2], [6, 1]], UPAT: 8,        // 주문 단계별 장식 조각, 강화 조각이 나오는 단계
     SWAP: 30 * 60000, AD: { n: 2, e: 50 },           // 주문 바꾸기 간격, 광고 하루 2번 +50
     E: { dm: 15, bonus: 20, wk: 30, stamp: 10, stamp5: 30, box: 50 },
@@ -10548,7 +10553,7 @@ body{background:radial-gradient(120% 60% at 50% 0%, color-mix(in srgb, var(--pap
     return true;
   }
   /* ---- 화면 ---- */
-  const mgUI = { open: false, cells: [], sel: -1, pop: -1, merged: null, drag: null, dragEl: null, fly: null, land: -1, got: { a: 0, pc: 0, up: 0 } };   // got: 이번에 들어와서 번 것
+  const mgUI = { open: false, cells: [], sel: -1, pop: -1, merged: null, drag: null, dragEl: null, fly: null, land: -1, got: { a: 0, pc: 0, up: 0 }, idleAt: 0, hintT: 0 };   // got: 이번에 들어와서 번 것
   /* ---- 손맛: 생산기에서 조각이 날아 나오고, 합치면 터지고, 숫자가 튀어요 ---- */
   const mgCenter = i => { const el = mgUI.cells[i], g = $('#mgGrid'); if (!el || !g) return null; const r = el.getBoundingClientRect(), gr = g.getBoundingClientRect(); return { x: r.left - gr.left + r.width / 2, y: r.top - gr.top + r.height / 2, w: r.width }; };
   // 생산기(from)에서 새 조각이 to 칸으로 포물선을 그리며 날아가요. 도착하면 칸에 '툭' 내려앉아요
@@ -10671,6 +10676,7 @@ body{background:radial-gradient(120% 60% at 50% 0%, color-mix(in srgb, var(--pap
   }
   /* 끌기: 조각(생산기 포함)을 누른 채 움직이면 따라오는 그림자가 생기고, 놓은 칸에 mgDrop. 움직이지 않고 떼면 고르기(생산기는 누르기) */
   function mgPointerDown(e) {
+    mgTouch();
     const cell = e.target.closest('.mg-cell'); if (!cell || mgUI.drag) return;
     const i = +cell.dataset.i, code = mgCells()[i];
     if (code === '..') { mgSelect(-1); return; }
@@ -10715,7 +10721,7 @@ body{background:radial-gradient(120% 60% at 50% 0%, color-mix(in srgb, var(--pap
     mgTick();
     if (!S.mg.board || S.mg.board.length !== MG_N * 2) mgSetCells(mgEmptyBoard());
     mgFillOrders();
-    mgUI.open = true; mgUI.sel = -1; mgUI.got = { a: 0, pc: 0, up: 0 };
+    mgUI.open = true; mgUI.sel = -1; mgUI.got = { a: 0, pc: 0, up: 0 }; mgUI.idleAt = Date.now();
     $('#mgScene').hidden = false;
     $('#mgUpSheet').hidden = true;
     $('#mgHelp').hidden = !!S.mg.seen;
@@ -10723,7 +10729,7 @@ body{background:radial-gradient(120% 60% at 50% 0%, color-mix(in srgb, var(--pap
     musicSync();
   }
   function mgClose() {
-    mgUI.open = false; mgDragEnd(true);
+    mgUI.open = false; mgDragEnd(true); mgClearHint();
     $('#mgScene').hidden = true;
     save(); renderMini(); musicSync();
   }
@@ -10750,8 +10756,57 @@ body{background:radial-gradient(120% 60% at 50% 0%, color-mix(in srgb, var(--pap
     sub.textContent = `에너지 ${S.mg.e}/${MG.EMAX}${ok ? `, 건넬 수 있는 주문 ${ok}개` : ''}`;
     const th = $('.mg-thumb'); if (th) { const u = IMG180('mg_card'); if (u) { th.style.setProperty('--mg-card', `url('${u}')`); th.classList.add('has-img'); } }
   }
-  function tick180() { if (mgUI.open && !mgUI.drag) { const e0 = S.mg.e; mgTick(); mgRenderTop(); if (S.mg.e !== e0) mgRenderOrders(); } }
+  function tick180() {
+    if (!mgUI.open || mgUI.drag) return;
+    const e0 = S.mg.e; mgTick(); mgRenderTop(); if (S.mg.e !== e0) mgRenderOrders();
+    if (Date.now() - mgUI.idleAt > MG.HINT_AFTER && $('#mgHelp').hidden && $('#mgUpSheet').hidden && !(rt.modalOpen && !rt.modalOpen.hidden)) { mgUI.idleAt = Date.now(); mgShowHint(); }
+  }
+  /* ---- 가만히 있으면 힌트: 건넬 수 있는 주문 → 합칠 수 있는 짝 → 주문에 맞는 생산기 순서로 손가락이 알려 줘요 ---- */
+  function mgTouch() { mgUI.idleAt = Date.now(); mgClearHint(); }
+  function mgClearHint() {
+    clearTimeout(mgUI.hintT);
+    $$('.mg-cell.hint', $('#mgGrid')).forEach(el => el.classList.remove('hint'));
+    $$('.mg-order.hint', $('#mgOrders')).forEach(el => el.classList.remove('hint'));
+    $$('.mg-finger', $('#mgScene')).forEach(el => el.remove());
+  }
+  function mgFinger(at, to) {   // at 칸에 손가락. to가 있으면 그쪽으로 끌어가는 흉내를 두 번
+    const g = $('#mgGrid'), a = mgCenter(at); if (!g || !a) return;
+    const f = document.createElement('div'); f.className = 'mg-finger'; f.textContent = '👆';
+    f.style.left = a.x + 'px'; f.style.top = (a.y + a.w * 0.3) + 'px'; g.appendChild(f);
+    if (rt.reduced) return;
+    const b = to >= 0 ? mgCenter(to) : null;
+    if (b) f.animate([{ transform: 'translate(-50%,-30%) scale(1)', opacity: 0 }, { transform: 'translate(-50%,-30%) scale(.85)', opacity: 1, offset: .15 }, { transform: `translate(calc(-50% + ${b.x - a.x}px), calc(-30% + ${b.y - a.y}px)) scale(.85)`, opacity: 1, offset: .75 }, { transform: `translate(calc(-50% + ${b.x - a.x}px), calc(-30% + ${b.y - a.y}px)) scale(1)`, opacity: 0 }], { duration: 1300, iterations: 2, easing: 'ease-in-out' });
+    else f.animate([{ transform: 'translate(-50%,-30%) scale(1)' }, { transform: 'translate(-50%,-30%) scale(.8) translateY(-8px)' }, { transform: 'translate(-50%,-30%) scale(1)' }], { duration: 700, iterations: 4, easing: 'ease-in-out' });
+  }
+  function mgHintPick() {
+    const cells = mgCells(), want = new Set(S.mg.orders.flatMap(o => o.it.map(x => x.k + mgLvCh(x.n))));
+    // 1. 건넬 수 있는 주문
+    const ok = S.mg.orders.findIndex(mgOrderOk); if (ok >= 0) return { t: 'order', i: ok };
+    // 2. 합칠 수 있는 짝. 주문 조각의 바로 아래 단계면 먼저, 그다음은 높은 단계부터
+    const pos = {}; cells.forEach((c, i) => { if (mgIsItem(c) && mgLvOf(c[1]) < 10) (pos[c] = pos[c] || []).push(i); });
+    const pairs = Object.keys(pos).filter(c => pos[c].length >= 2);
+    if (pairs.length) {
+      const up = c => c[0] + mgLvCh(mgLvOf(c[1]) + 1);
+      pairs.sort((x, y) => (want.has(up(y)) - want.has(up(x))) || (mgLvOf(y[1]) - mgLvOf(x[1])));
+      const [a, b] = pos[pairs[0]]; return { t: 'merge', a, b };
+    }
+    // 3. 주문 종류가 나오는 생산기 (없으면 아무 생산기), 에너지와 빈칸이 있을 때
+    if (S.mg.e < 1 || !cells.includes('..')) return null;
+    const wantK = new Set(S.mg.orders.flatMap(o => o.it.map(x => x.k)));
+    const gens = cells.map((c, i) => mgIsGen(c) ? i : -1).filter(i => i >= 0);
+    const g = gens.find(i => MG.gens[cells[i][0]].kinds.some(k => wantK.has(k)));
+    return gens.length ? { t: 'gen', i: g >= 0 ? g : gens[0] } : null;
+  }
+  function mgShowHint() {
+    mgClearHint();
+    const h = mgHintPick(); if (!h) return;
+    if (h.t === 'order') { const el = $(`#mgOrders [data-order="${h.i}"]`); if (el) el.classList.add('hint'); }
+    else if (h.t === 'merge') { mgUI.cells[h.a].classList.add('hint'); mgUI.cells[h.b].classList.add('hint'); mgFinger(h.a, h.b); }
+    else { mgUI.cells[h.i].classList.add('hint'); mgFinger(h.i, -1); }
+    mgUI.hintT = setTimeout(mgClearHint, MG.HINT_SHOW);
+  }
   function bind180() {
+    $('#mgScene').addEventListener('pointerdown', mgTouch, true);
     $('#mgOpen').addEventListener('click', () => { sfx('tap'); mgOpen(); });
     $('#mgBack').addEventListener('click', () => { sfx('tap'); mgClose(); });
     $('#mgHelpOk').addEventListener('click', () => { S.mg.seen = true; $('#mgHelp').hidden = true; save(); });
@@ -10850,7 +10905,7 @@ body{background:radial-gradient(120% 60% at 50% 0%, color-mix(in srgb, var(--pap
   // 시험용 손잡이: 자동 시험(window.__FOREST_TEST)에서만 게임 속 함수를 꺼내 써요
   if (window.__FOREST_TEST) window.__forest = { get S() { return S; }, get Cloud() { return Cloud; }, rt, makeDeal, furStage, DEAL, navInfo, navRoute, spawnDrop, repTipCheck, linkGoogle, retryCloud, sanitize, acctPending, renderMap, renderHUD, renderAffordance, syncKids, layoutMap, geo, startTrial, hitTrial, endTrial, startVisit, endVisit, showReward, recommend, needCost, prepTopUp, qReward, prepPhase, rankScore, pwOf, previewDip, dipMult, costScale, buyFacility, buyFur, buyFurAll, furCost, furReady, furDone, FUR, startTalk, endTalk, teacherAct, facCost, teaCost, facKeys, rate, rep, capacity, canGraduate, canPromote,
     fmt, fmt2, graduate, promote, buyPerk, perkCost, perkMaxed, buyFundPerk, fpCost, claimMain, mainReady, curMain, qNo, earn, CFG, TEA, teaMaxed, PERKS, FPERKS, MAIN, finalYear, startTrip, claimTrip, TRIPS, yearLocked, startSports, endSports, rtSports: () => rt.sports, startFest, rtFest: () => rt.fest, facCap, addLeague, weekIdx, addMP, tutStart, endFest, claimSports, claimBox, musicWant, askBox, festWait, setTab, openSheet, closeSheet,
-    dexMeet, dexSync, dexPending, dexGift, renderDex, evCurrent, evNext, evSync, claimStamp, claimEvMission, claimEvBox, renderEvent, evMissions, evOk, evSkipped, EV_MONTHS, EV_MEASURE, tierMinutes, minAcorns, sanitize170, EV_STAMPS, EV_SPECIAL, EV_MONTHLY, EV_BOX, DEX_KEYS, DEX_REWARD, DEX_GUEST_KEYS, MG, mgCells, mgSetCells, mgTick, mgAddEnergy, mgAddUp, mgTapGen, mgDrop, mgSell, mgUpgrade, mgClaimOrder, mgSwapOrder, mgOrderOk, mgFillOrders, mgOpen, mgClose, mgRenderAll, mgSpawnLevel, mgNearestEmpty, mgEmptyBoard, mgOrderReward, mgUI, sanitize180, mgWatchAd, mgNewOrder, nice, claimMission, claimBonus, claimWeekMission, MP_BOX, seasonKey, roofArtKey, oakKey, setSeasonArt, VP, vpLv, vpCost, vpMult, vpAct, renderVpCard, sportsPrize, festPrize, renderTeachers, buildTeacherCards, bldImg, roofKey, bldStage, mapKey, setMapArt, applyThemes, buyFacility, startTrial, endTrial: () => rt.trial && (rt.trial.left = 0), spawnDeal, startVisit, IMG170,   // 1.7.0 도감, 이벤트
+    dexMeet, dexSync, dexPending, dexGift, renderDex, evCurrent, evNext, evSync, claimStamp, claimEvMission, claimEvBox, renderEvent, evMissions, evOk, evSkipped, EV_MONTHS, EV_MEASURE, tierMinutes, minAcorns, sanitize170, EV_STAMPS, EV_SPECIAL, EV_MONTHLY, EV_BOX, DEX_KEYS, DEX_REWARD, DEX_GUEST_KEYS, MG, mgCells, mgSetCells, mgTick, mgAddEnergy, mgAddUp, mgTapGen, mgDrop, mgSell, mgUpgrade, mgClaimOrder, mgSwapOrder, mgOrderOk, mgFillOrders, mgOpen, mgClose, mgRenderAll, mgSpawnLevel, mgNearestEmpty, mgEmptyBoard, mgOrderReward, mgUI, sanitize180, mgWatchAd, mgNewOrder, mgHintPick, mgShowHint, mgClearHint, mgTouch, nice, claimMission, claimBonus, claimWeekMission, MP_BOX, seasonKey, roofArtKey, oakKey, setSeasonArt, VP, vpLv, vpCost, vpMult, vpAct, renderVpCard, sportsPrize, festPrize, renderTeachers, buildTeacherCards, bldImg, roofKey, bldStage, mapKey, setMapArt, applyThemes, buyFacility, startTrial, endTrial: () => rt.trial && (rt.trial.left = 0), spawnDeal, startVisit, IMG170,   // 1.7.0 도감, 이벤트
     PZ, PZ_SHAPES, pzFits, pzAnyFit, pzStuck, pzFullLines, pzPlace, pzFreshGame, pzStart, pzFinish, pzLeft, pzCanAd, pzEssOf, pzMinOf, pzHelpSquirrel, pzHelpOwl, pzHelpBear, fillSubs, mapRoofTop, showAd, claimOfflineDouble, startBoost, tripAd, festFocus, festRange, visMap, renderMissions, pzHasHelp, pzRot, pzNewPiece, pzOpen, pzClose, pzGameOver, pzRenderAll, renderMini, addEss, ESHOP, SP_FUR, applyCos, essItem, pickEss, buyEss, renderEssShop, esAcornLeft, esGoldLeft, esAcornAmt, hatSVG, spFurImg, gameNow, gameToday, gameWeek, kstDay, setServerTime, SVR, dmDay, weekIdx, lgWeek, wkWeek, lgKey, pzDay, goldDay, boostLeft, dealLeft, canStamp };
   if (window.claude && window.claude.hot && window.claude.hot.snapshot) {
     try { window.claude.hot.snapshot(() => { if (S) syncMid(); return { save: S }; }); } catch (e) { /* 무시 */ }
