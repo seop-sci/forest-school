@@ -1736,6 +1736,12 @@ body{background:radial-gradient(120% 60% at 50% 0%, color-mix(in srgb, var(--pap
 .shopfront .dot{position:absolute;top:10px;right:10px;width:10px;height:10px;border-radius:50%;background:var(--seal)}
 .street-back{display:inline-flex;align-items:center;gap:4px;min-height:36px;margin:-6px 0 6px;padding:0 12px 0 8px;border:1px solid var(--line);border-radius:999px;background:var(--card);color:var(--ink);font:inherit;font-size:13.5px;cursor:pointer}
 .street-back::before{content:"";width:8px;height:8px;border-left:2px solid currentColor;border-bottom:2px solid currentColor;transform:rotate(45deg);margin-right:2px}
+/* 1.7.2: 학교 상세(펼침)에는 위쪽에 없는 정원과 학교 파워만 보여요. 평판은 위쪽 재화 줄에 늘 있어요 */
+.app .board .stats .rep-row{display:none}
+/* 1.7.2: 퀘스트 목록에서 이벤트 미션으로 가는 줄 */
+.dm-ev{display:flex;align-items:center;justify-content:space-between;gap:10px;width:100%;margin:0 0 10px;padding:10px 12px;border:2px solid var(--accent);border-radius:14px;background:color-mix(in srgb, var(--accent) 14%, var(--card));color:var(--ink);font:inherit;text-align:left;cursor:pointer}
+.dm-ev b{font-family:var(--font-display);font-weight:400;font-size:15px}
+.dm-ev small{display:block;font-size:12px;color:var(--muted)}
 /* ===== 홈 UI 정리 END ===== */
 </style>
 
@@ -1788,7 +1794,7 @@ body{background:radial-gradient(120% 60% at 50% 0%, color-mix(in srgb, var(--pap
     </div>
     <div class="stats" id="stats">
       <div class="stat">
-        <span class="lab"><svg viewBox="0 0 24 24" aria-hidden="true"><g fill="currentColor"><ellipse cx="12" cy="15.5" rx="5" ry="4.2"/><circle cx="6.4" cy="10" r="2.2"/><circle cx="10" cy="6.4" r="2.2"/><circle cx="14" cy="6.4" r="2.2"/><circle cx="17.6" cy="10" r="2.2"/></g></svg>학생</span>
+        <span class="lab"><svg viewBox="0 0 24 24" aria-hidden="true"><g fill="currentColor"><ellipse cx="12" cy="15.5" rx="5" ry="4.2"/><circle cx="6.4" cy="10" r="2.2"/><circle cx="10" cy="6.4" r="2.2"/><circle cx="14" cy="6.4" r="2.2"/><circle cx="17.6" cy="10" r="2.2"/></g></svg>학생 정원</span>
         <b id="vStudents">4/10</b>
         <small class="rep-row"><svg viewBox="0 0 24 24" aria-hidden="true"><path fill="currentColor" d="M12 3l2.6 5.6 6.1.7-4.5 4.2 1.2 6L12 16.6 6.6 19.5l1.2-6L3.3 9.3l6.1-.7z"/></svg>평판 <span id="vRep">3</span></small>
       </div>
@@ -8627,11 +8633,13 @@ body{background:radial-gradient(120% 60% at 50% 0%, color-mix(in srgb, var(--pap
     dmDay();
     const gi = `<svg viewBox="-8 -11 16 20" aria-hidden="true">${GOLD_ICON.slice(GOLD_ICON.indexOf('>') + 1, -6)}</svg>`;
     wkWeek();
-    const key = S.dm.day + '|' + S.dm.list.map(m => `${m.id}:${dmProg(m)}:${m.done ? 1 : 0}`).join(',') + '|' + S.dm.bonus + '|' + S.wk.week + ':' + S.wk.pts + ':' + S.wk.got.join('') + ':' + S.wk.list.map(m => `${m.id}:${wkProg(m)}:${m.done ? 1 : 0}`).join(',');
+    let evK = 0; try { evK = evClaimable() ? 1 : 0; } catch (e) { /* 무시 */ }
+    const key = evK + '|' + S.dm.day + '|' + S.dm.list.map(m => `${m.id}:${dmProg(m)}:${m.done ? 1 : 0}`).join(',') + '|' + S.dm.bonus + '|' + S.wk.week + ':' + S.wk.pts + ':' + S.wk.got.join('') + ':' + S.wk.list.map(m => `${m.id}:${wkProg(m)}:${m.done ? 1 : 0}`).join(',');
     if (box.dataset.key === key) return;
     box.dataset.key = key;
     const all = dmAllDone();
-    box.innerHTML = renderWeek() + '<h4 class="dm-h">오늘의 미션 <small>자정에 바뀌어요</small></h4>' + S.dm.list.map((m, i) => {
+    let evOn = false; try { evOn = evClaimable(); } catch (e) { /* 무시 */ }
+    box.innerHTML = (evOn ? '<button class="dm-ev" type="button" data-go="event"><span><b>이벤트에서 받을 선물이 있어요</b><small>이벤트 미션, 이벤트 도장, 기념 상자</small></span><span aria-hidden="true">›</span></button>' : '') + renderWeek() + '<h4 class="dm-h">오늘의 미션 <small>자정에 바뀌어요</small></h4>' + S.dm.list.map((m, i) => {
       const M = MISSIONS[m.id], p = dmProg(m), ready = dmReady(m);
       return `<div class="dm${m.done ? ' done' : ''}"><div class="dm-tx"><b>${M.name(M.n)} <em>+${MP.daily}점</em></b><div class="qbar"><i style="width:${(p / M.n * 100).toFixed(0)}%"></i></div></div>` +
         (m.done ? `<span class="dm-ok">${CHECK}</span>` : ready ? `<button class="cta small" type="button" data-dm="${i}">받기</button>` : `<span class="dm-n">${p}/${M.n}</span>`) + '</div>';
@@ -9584,7 +9592,8 @@ body{background:radial-gradient(120% 60% at 50% 0%, color-mix(in srgb, var(--pap
   }
   function updateQuestDot() {
     dmDay(); lgWeek(); wkWeek();
-    const on = rt.tab !== 'quests' && (mainReady() || S.q.subs.some(s => s.nw || subReady(s)) || dmClaimable() || wkClaimable());
+    let ev = false; try { ev = evClaimable(); } catch (e) { /* 1.7.0 이벤트 코드가 아직 준비되지 않았을 때 */ }
+    const on = rt.tab !== 'quests' && (mainReady() || S.q.subs.some(s => s.nw || subReady(s)) || dmClaimable() || wkClaimable() || ev);   // 1.7.2: 이벤트에서 받을 것이 있어도 점
     $('#qDot').hidden = !on;
   }
   function markQuestsSeen() { S.q.seen = S.q.m; S.q.subs.forEach(s => { s.nw = false; }); }
@@ -10134,7 +10143,7 @@ body{background:radial-gradient(120% 60% at 50% 0%, color-mix(in srgb, var(--pap
       if (b) { const k = b.getAttribute('data-k'); if (k === 'vp') vpAct(b); else if (XT[k]) xtAct(k, b); else teacherAct(k, b); }
     });
     $$('.tab').forEach(b => b.addEventListener('click', () => { setTab(b.dataset.tab); sfx('tap'); }));
-    $$('[data-go]').forEach(b => b.addEventListener('click', () => { setTab(b.dataset.go); sfx('tap'); }));
+    document.addEventListener('click', e => { const b = e.target.closest && e.target.closest('[data-go]'); if (b) { setTab(b.dataset.go); sfx('tap'); } });   // 1.7.2 상점 거리와 이벤트 바로 가기(나중에 그린 단추도)
     // 1.5.0: 그림 아이콘을 채우고, 아직 열리지 않은 버튼은 알려만 줘요
     $$('[data-ic]').forEach(el => { const u = IMG(el.dataset.ic); if (u) el.style.backgroundImage = `url("${u}")`; });
     $$('.panel-x').forEach(b => b.addEventListener('click', () => { setTab('school'); sfx('tap'); }));

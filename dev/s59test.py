@@ -107,6 +107,13 @@ async def main():
             v = await pg.evaluate(f"[{F}.rt.tab, !document.querySelector('#panelShop').hidden]")
             if v != ['shop', True]: bad.append(f'[{tag}] 황금 도토리 상점 들어가기: ' + json.dumps(v))
 
+            # 5) 이벤트에서 받을 것이 있으면 퀘스트 점과 퀘스트 목록의 이벤트 줄, 학교 상세에는 평판 줄이 없어요
+            await pg.evaluate(f"(() => {{ const F = {F}; F.setServerTime(Date.parse('2026-11-02T03:00:00Z')); F.evSync(); F.S.ev.stamp = {{ n: 0, last: '' }}; F.setTab('grad'); F.setTab('school'); }})()"); await pg.wait_for_timeout(1300)
+            v = await pg.evaluate("[!document.querySelector('#qDot').hidden, getComputedStyle(document.querySelector('#stats .rep-row')).display]")
+            if v != [True, 'none']: bad.append(f'[{tag}] 이벤트 점, 학교 상세: ' + json.dumps(v))
+            await pg.evaluate(f"{F}.setTab('quests')"); await pg.wait_for_timeout(400)
+            await pg.evaluate("document.querySelector('#qDaily .dm-ev') && document.querySelector('#qDaily .dm-ev').click()"); await pg.wait_for_timeout(300)
+            if await pg.evaluate(f"{F}.rt.tab") != 'event': bad.append(f'[{tag}] 퀘스트 목록의 이벤트 줄')
             # 4) 메뉴 화면 현황판과 칭호
             await pg.evaluate(f"(() => {{ const S = {F}.S; S.ach.hit.building = 5; S.ach.title = 'building'; {F}.setTab('dex'); }})()"); await pg.wait_for_timeout(1300)
             v = await pg.evaluate("""(() => { const W = innerWidth, t = document.querySelector('#hudTitle'); const r = t.getBoundingClientRect();
