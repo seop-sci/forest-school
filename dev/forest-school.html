@@ -1565,6 +1565,9 @@ body{background:radial-gradient(120% 60% at 50% 0%, color-mix(in srgb, var(--pap
 .mg-cell{position:relative;border-radius:18%;background:rgba(255,255,255,.28)}
 .mg-cell.over{background:rgba(255,233,168,.9);box-shadow:inset 0 0 0 2px #F3B92E}
 .mg-cell.sel .mg-tile{box-shadow:0 0 0 2px #FFF7E6, 0 0 0 4px #F3B92E}
+.mg-cell.want .mg-tile::after{content:"";position:absolute;inset:-2px;border-radius:24%;box-shadow:0 0 0 2px #F3B92E, 0 0 7px 2px rgba(255,210,80,.75);animation:mgWant 1.3s ease-in-out infinite;pointer-events:none}
+.mg-cell.want .mg-tile::before{content:"📜";position:absolute;left:-4px;top:-5px;font-size:10px;line-height:1;filter:drop-shadow(0 1px 1px rgba(0,0,0,.4))}
+@keyframes mgWant{50%{box-shadow:0 0 0 2px #FFE27A, 0 0 12px 4px rgba(255,210,80,.9)}}
 .mg-cell.new .mg-tile{animation:mgPop .32s cubic-bezier(.3,1.6,.5,1)}
 .mg-cell.merge .mg-tile{animation:mgMerge .42s ease}
 @keyframes mgPop{from{transform:scale(.3)}}
@@ -10479,7 +10482,7 @@ body{background:radial-gradient(120% 60% at 50% 0%, color-mix(in srgb, var(--pap
     S.mg.swapAt = gameNow();
     S.mg.orders[i] = mgNewOrder(S.mg.orders.flatMap(mgOrderKinds));   // 지금 주문의 종류도 피해서 다른 것이 나오게
     sfx('tap');
-    mgRenderOrders(); save();
+    mgRenderOrders(); mgRenderBoard(); save();
     return true;
   }
   /* ---- 화면 ---- */
@@ -10488,7 +10491,7 @@ body{background:radial-gradient(120% 60% at 50% 0%, color-mix(in srgb, var(--pap
   const mgCenter = i => { const el = mgUI.cells[i], g = $('#mgGrid'); if (!el || !g) return null; const r = el.getBoundingClientRect(), gr = g.getBoundingClientRect(); return { x: r.left - gr.left + r.width / 2, y: r.top - gr.top + r.height / 2, w: r.width }; };
   // 생산기(from)에서 새 조각이 to 칸으로 포물선을 그리며 날아가요. 도착하면 칸에 '툭' 내려앉아요
   function mgFly(from, to, code) {
-    const g = $('#mgGrid'), a = mgCenter(from), b = mgCenter(to); if (!g || !a || !b || rt.reduced) { mgUI.pop = to; return; }
+    const g = $('#mgGrid'), a = mgCenter(from), b = mgCenter(to); if (!g || !a || !b || !('animate' in Element.prototype)) { mgUI.pop = to; return; }
     const d = document.createElement('div'); d.className = 'mg-fly'; d.innerHTML = mgTileHtml(code);
     d.style.width = d.style.height = a.w + 'px'; d.style.left = (a.x - a.w / 2) + 'px'; d.style.top = (a.y - a.w / 2) + 'px';
     g.appendChild(d);
@@ -10497,8 +10500,10 @@ body{background:radial-gradient(120% 60% at 50% 0%, color-mix(in srgb, var(--pap
     const an = d.animate([
       { transform: 'translate(0,0) scale(.5)', opacity: .6 },
       { transform: `translate(${dx * 0.5}px,${dy * 0.5 - up}px) scale(1.15)`, opacity: 1, offset: .55 },
-      { transform: `translate(${dx}px,${dy}px) scale(1)`, opacity: 1 }], { duration: 300 + Math.min(260, Math.hypot(dx, dy) * 0.8), easing: 'cubic-bezier(.25,.6,.4,1)' });
-    const done = () => { d.remove(); cell.classList.remove('hide'); void cell.offsetWidth; cell.classList.add('land'); mgDust(to, 5); setTimeout(() => cell.classList.remove('land'), 400); };
+      { transform: `translate(${dx}px,${dy}px) scale(1)`, opacity: 1 }], { duration: rt.reduced ? 180 : 300 + Math.min(260, Math.hypot(dx, dy) * 0.8), easing: 'cubic-bezier(.25,.6,.4,1)' });
+    let fin = false;
+    const done = () => { if (fin) return; fin = true; d.remove(); cell.classList.remove('hide'); void cell.offsetWidth; cell.classList.add('land'); mgDust(to, 5); setTimeout(() => cell.classList.remove('land'), 400); };
+    setTimeout(done, 900);   // 혹시 애니메이션 끝 신호가 안 오면 그래도 조각이 보이게
     an.onfinish = done; an.oncancel = done;
     mgUI.pop = -1;
   }
@@ -10539,10 +10544,12 @@ body{background:radial-gradient(120% 60% at 50% 0%, color-mix(in srgb, var(--pap
   }
   function mgRenderBoard() {
     const cells = mgCells();
+    const want = new Set(S.mg.orders.flatMap(o => o.it.map(x => x.k + mgLvCh(x.n))));   // 학생 주문에 필요한 조각은 테두리를 반짝여요
     mgUI.cells.forEach((el, i) => {
       const code = cells[i];
       if (el.dataset.v !== code) { el.dataset.v = code; el.innerHTML = mgTileHtml(code); }
       el.classList.toggle('sel', i === mgUI.sel);
+      el.classList.toggle('want', want.has(code));
       el.classList.remove('new', 'merge', 'over');
       if (i === mgUI.pop) { void el.offsetWidth; el.classList.add('new'); }
       if (mgUI.merged && mgUI.merged.includes(i)) { void el.offsetWidth; el.classList.add('merge'); const K = MG.kinds[code[0]]; mgDust(i, mgLvOf(code[1]) >= 5 ? 14 : 8, K ? K.c : ''); }
