@@ -1538,6 +1538,10 @@ body{background:radial-gradient(120% 60% at 50% 0%, color-mix(in srgb, var(--pap
 .ach-medal{position:relative;width:52px;height:52px}
 .ach-medal img{position:absolute;inset:0;width:100%;height:100%}
 .ach-medal img.am-ic{inset:0;width:100%;height:100%}
+.ach-medal img.tint-plat{filter:saturate(.2) hue-rotate(170deg) brightness(1.25) contrast(1.05)}
+.ach-medal img.tint-rainbow{filter:hue-rotate(0deg) saturate(1.6);animation:achRainbow 4s linear infinite}
+@keyframes achRainbow{to{filter:hue-rotate(360deg) saturate(1.6)}}
+@media (prefers-reduced-motion: reduce){.ach-medal img.tint-rainbow{animation:none}}
 .ach-medal img.am-ic.dim{filter:grayscale(1) opacity(.45)}
 .ach-medal .am-em{position:absolute;inset:0;display:grid;place-items:center;font-size:24px}
 .ach-tx{min-width:0;display:flex;flex-direction:column;gap:2px}
@@ -1547,7 +1551,10 @@ body{background:radial-gradient(120% 60% at 50% 0%, color-mix(in srgb, var(--pap
 .ach-bar i{display:block;height:100%;border-radius:3px;background:#F3B92E}
 .ach-tiers{display:flex;gap:3px;margin-top:2px}
 .ach-tiers i{width:14px;height:5px;border-radius:3px;background:var(--line)}
-.ach-tiers i.t1{background:#C98A4B}.ach-tiers i.t2{background:#B8C2CC}.ach-tiers i.t3{background:#F3B92E}
+.ach-tiers i{width:12px}
+.ach-tiers i.t1{background:#C98A4B}.ach-tiers i.t2{background:#B8C2CC}.ach-tiers i.t3{background:#F3B92E}.ach-tiers i.t4{background:#9FD6E8}.ach-tiers i.t5{background:linear-gradient(90deg,#F07A7A,#F3C04B,#7CC97A,#6FA8E8,#B58AE0)}
+.hud-title{flex:none;margin-left:auto;max-width:46%;overflow:hidden;text-overflow:ellipsis;padding:1px 14px;border:0;border-radius:999px;background:#FFF4D6 var(--ribbon-light, none) center/100% 100% no-repeat;color:#5A3E16;font-family:var(--font-display);font-size:11.5px;line-height:1.5;white-space:nowrap;cursor:pointer}
+.hud-title[hidden]{display:none}
 .ach-btn{flex:none;min-width:56px;min-height:36px;padding:0 12px;border:0;border-radius:11px;background:#F3B92E;color:#3A2905;font-family:var(--font-display);font-size:14px;box-shadow:0 3px 0 #C68F14;cursor:pointer}
 .ach-done{flex:none;font-size:12px;color:var(--muted);white-space:nowrap}
 .rk-name .rk-title{flex:none;padding:0 8px;border-radius:999px;font-family:var(--font-display);font-size:11px;line-height:1.7;background:#FFF0C2;color:#5A3E16}
@@ -1563,7 +1570,7 @@ body{background:radial-gradient(120% 60% at 50% 0%, color-mix(in srgb, var(--pap
     <p class="boot-step" id="bootStep">학교 문을 여는 중...</p>
     <p class="boot-tip" id="bootTip">학교 문을 여는 중이에요</p>
   </div>
-  <span class="boot-ver" id="bootVer">v1.7.0</span>
+  <span class="boot-ver" id="bootVer">v1.7.1</span>
 </div>
 
 <div class="app on-school" id="app">
@@ -1575,7 +1582,7 @@ body{background:radial-gradient(120% 60% at 50% 0%, color-mix(in srgb, var(--pap
           <h1 class="school-name" id="schoolName">숲속 유치원</h1>
           <svg class="sc-chev" viewBox="0 0 24 24" aria-hidden="true"><path d="M6 9l6 6 6-6" fill="none" stroke="currentColor" stroke-width="2.6" stroke-linecap="round" stroke-linejoin="round"/></svg>
         </div>
-        <div class="school-year" id="schoolYear"><b id="yearNow">1년째</b><span class="ydots" id="yearDots" aria-hidden="true"></span><span class="ynote" id="yearNote"></span></div>
+        <div class="school-year" id="schoolYear"><b id="yearNow">1년째</b><span class="ydots" id="yearDots" aria-hidden="true"></span><span class="ynote" id="yearNote"></span><button class="hud-title" type="button" id="hudTitle" hidden aria-label="내 칭호, 눌러서 업적 보기"></button></div>
         <div class="progress">
           <span class="grade-pill" id="gradePill">분교</span>
       <div class="bar" id="gradeBar" role="progressbar" aria-label="다음 동네까지" aria-valuemin="0" aria-valuemax="100" aria-valuenow="0"><i id="barFill"></i></div>
@@ -1881,7 +1888,7 @@ body{background:radial-gradient(120% 60% at 50% 0%, color-mix(in srgb, var(--pap
       </div>
       <!-- 1.7.1 업적과 칭호. 안쪽은 renderAch()가 그려요 -->
       <div id="achPane" hidden>
-        <p class="lead">학교를 키우며 이룬 일을 모아요. 이루면 황금 도토리를 받고, 금 업적을 이루면 랭킹 이름 옆에 다는 칭호를 받아요.</p>
+        <p class="lead">학교를 키우며 이룬 일을 모아요. 단계마다 황금 도토리를 받고, 5단계(무지개)까지 이루면 이름 옆에 다는 칭호를 받아요. 칭호는 홈 위쪽과 랭킹에 보여요.</p>
         <div class="ach-title" id="achTitle"></div>
         <div class="ach-list" id="achList"></div>
       </div>
@@ -1918,7 +1925,7 @@ body{background:radial-gradient(120% 60% at 50% 0%, color-mix(in srgb, var(--pap
       </div>
       <h3 class="panel-sub">정보</h3>
       <dl class="info">
-        <div id="verRow"><dt>버전</dt><dd>v1.7.0</dd></div>
+        <div id="verRow"><dt>버전</dt><dd>v1.7.1</dd></div>
         <div id="pidRow" hidden><dt>학교 번호</dt><dd id="infoPid"></dd></div>
       </dl>
       <div id="devBox" hidden>
@@ -5767,7 +5774,7 @@ body{background:radial-gradient(120% 60% at 50% 0%, color-mix(in srgb, var(--pap
        forest/rank/<내 id>   랭킹 이름과 학교 점수
        forest/stats/<내 id>  테스트 현황 (어디까지 했는지, 얼마나 했는지)
      <내 id>는 Firebase 익명 로그인이 기기(브라우저)마다 만들어 줘요. */
-  const VERSION = '1.7.0';
+  const VERSION = '1.7.1';
   const CLOUD_PUSH = 20000;   // 바뀐 게 있으면 20초마다 올려요
   const STATS_PUSH = 60000;   // 테스트 현황은 1분마다
   const CLOUD_WAIT = 15000;   // 서버가 이만큼 답이 없으면 이 기기에만 저장해요
@@ -10352,33 +10359,34 @@ body{background:radial-gradient(120% 60% at 50% 0%, color-mix(in srgb, var(--pap
   });
   /* ===== 1.7.0 도감, 이벤트 END ===== */
   /* ===== 1.7.1 업적과 칭호 BEGIN =====
-     업적은 종류 12개 × 등급 3개(동, 은, 금). 이미 있는 누적 기록(v)으로 재요. 숫자와 칭호는 ACH 한곳에서 바꿔요.
+     업적은 종류 12개 × 등급 5개(동, 은, 금, 백금, 무지개). 칭호는 5단계를 이루면 받아요. 이미 있는 누적 기록(v)으로 재요. 숫자와 칭호는 ACH 한곳에서 바꿔요.
      이룬 등급(hit)은 1초마다 기록해 두고(학생 수처럼 줄어드는 값도 한 번 이루면 남아요), 받기 버튼으로 보상(got)을 받아요.
      1.8.0 머지 게임 업적은 ACH에 한 줄 더하면 돼요 */
-  const ACH_GOLD = [1, 2, 3];   // 동, 은, 금 보상 황금 도토리
-  const ACH_TIER = ['동', '은', '금'];
+  const ACH_GOLD = [1, 2, 3, 4, 5];   // 단계마다 보상 황금 도토리
+  const ACH_TIER = ['동', '은', '금', '백금', '무지개'];
+  const ACH_N = ACH_TIER.length;
   const ACH = [
-    { id: 'students', name: '학생 모으기', goals: [10, 50, 150], title: '인기 만점 학교', t: n => `학생 ${fmt(n)}명 모으기`, v: () => Math.floor(S.students) },
-    { id: 'grad', name: '종업식과 졸업식', goals: [1, 5, 20], title: '졸업식 단골', t: n => `종업식이나 졸업식 ${n}번 열기`, v: () => S.st.grads },
-    { id: 'building', name: '건물 키우기', goals: [10, 20, 30], title: '숲속 건축왕', t: n => `건물 하나를 Lv.${n}까지 올리기`, v: () => Math.max(0, ...Object.values(S.f)) },
-    { id: 'teacher', name: '선생님 연수', goals: [10, 50, 200], title: '연수 대장', t: n => `선생님 연수 ${n}번 보내기`, v: () => S.st.trains },
-    { id: 'quest', name: '메인 퀘스트', goals: [10, 30, 60], title: '숲의 길잡이', t: n => `메인 퀘스트 ${n}개 끝내기`, v: () => S.q.m },
-    { id: 'puzzle', name: '숲속 퍼즐', goals: [1000, 3000, 10000], title: '퍼즐 박사', t: n => `숲속 퍼즐 ${fmt(n)}점 넘기`, v: () => S.pz ? S.pz.best : 0 },
-    { id: 'dex', name: '동물 도감', goals: [5, 10, 0], title: '동물 박사', t: n => n >= DEX_KEYS.length ? '동물 도감 모두 모으기' : `동물 도감 ${n}칸 채우기`, v: () => dexCount('all') },
-    { id: 'fest', name: '학교 행사', goals: [5, 30, 100], title: '축제 대장', t: n => `학교 행사 ${n}번 열기`, v: () => S.st.sports + Object.values(S.fest.n).reduce((a, b) => a + b, 0) },
-    { id: 'attend', name: '출석', goals: [7, 30, 100], title: '개근상', t: n => `출석 도장 ${n}일 찍기`, v: () => S.att.n },
-    { id: 'trip', name: '체험학습', goals: [3, 15, 50], title: '여행 대장', t: n => `체험학습 ${n}번 다녀오기`, v: () => S.st.trips },
-    { id: 'gold', name: '황금 도토리', goals: [30, 150, 500], title: '황금 부자', t: n => `황금 도토리 모두 ${n}개 모으기`, v: () => S.st.gold },
-    { id: 'rank', name: '학교 파워', goals: [2000, 5000, 15000], title: '숲의 교장', t: n => `학교 파워 ${fmt(n)} 넘기`, v: () => schoolPower() }
+    { id: 'students', name: '학생 모으기', goals: [10, 50, 150, 400, 1000], title: '인기 만점 학교', t: n => `학생 ${fmt(n)}명 모으기`, v: () => Math.floor(S.students) },
+    { id: 'grad', name: '종업식과 졸업식', goals: [1, 5, 20, 50, 100], title: '졸업식 단골', t: n => `종업식이나 졸업식 ${n}번 열기`, v: () => S.st.grads },
+    { id: 'building', name: '건물 키우기', goals: [10, 20, 30, 40, 50], title: '숲속 건축왕', t: n => `건물 하나를 Lv.${n}까지 올리기`, v: () => Math.max(0, ...Object.values(S.f)) },
+    { id: 'teacher', name: '선생님 연수', goals: [10, 50, 200, 500, 1000], title: '연수 대장', t: n => `선생님 연수 ${n}번 보내기`, v: () => S.st.trains },
+    { id: 'quest', name: '메인 퀘스트', goals: [10, 20, 40, 60, 80], title: '숲의 길잡이', t: n => `메인 퀘스트 ${n}개 끝내기`, v: () => S.q.m },
+    { id: 'puzzle', name: '숲속 퍼즐', goals: [1000, 3000, 10000, 20000, 40000], title: '퍼즐 박사', t: n => `숲속 퍼즐 ${fmt(n)}점 넘기`, v: () => S.pz ? S.pz.best : 0 },
+    { id: 'dex', name: '동물 도감', goals: [3, 6, 10, 14, 0], title: '동물 박사', t: n => n >= DEX_KEYS.length ? '동물 도감 모두 모으기' : `동물 도감 ${n}칸 채우기`, v: () => dexCount('all') },
+    { id: 'fest', name: '학교 행사', goals: [5, 30, 100, 250, 500], title: '축제 대장', t: n => `학교 행사 ${n}번 열기`, v: () => S.st.sports + Object.values(S.fest.n).reduce((a, b) => a + b, 0) },
+    { id: 'attend', name: '출석', goals: [7, 30, 100, 200, 365], title: '개근상', t: n => `출석 도장 ${n}일 찍기`, v: () => S.att.n },
+    { id: 'trip', name: '체험학습', goals: [3, 15, 50, 100, 200], title: '여행 대장', t: n => `체험학습 ${n}번 다녀오기`, v: () => S.st.trips },
+    { id: 'gold', name: '황금 도토리', goals: [30, 150, 500, 1000, 2000], title: '황금 부자', t: n => `황금 도토리 모두 ${n}개 모으기`, v: () => S.st.gold },
+    { id: 'rank', name: '학교 파워', goals: [2000, 5000, 15000, 30000, 60000], title: '숲의 교장', t: n => `학교 파워 ${fmt(n)} 넘기`, v: () => schoolPower() }
   ];
   const ACH_EM = { students: '🐰', grad: '🎓', building: '🏫', teacher: '🦔', quest: '📝', puzzle: '🧩', dex: '📖', fest: '🎈', attend: '📅', trip: '🚌', gold: '🌰', rank: '🏆' };
-  const ACH_RANK_TITLE = false;   // 랭킹 서버에 칭호를 올릴지. 서버 규칙(database.rules.json)에 title 칸을 더하고 콘솔에 게시한 뒤 true로 바꿔요
+  const ACH_RANK_TITLE = true;   // 랭킹 서버에 칭호를 올려요. 서버 규칙(database.rules.json)의 title 칸을 Firebase 콘솔에 게시해야 해요(1.7.1)
   const achById = id => ACH.find(a => a.id === id);
-  const achGoal = (a, i) => a.id === 'dex' && i === 2 ? DEX_KEYS.length : a.goals[i];
+  const achGoal = (a, i) => a.id === 'dex' && i === ACH_N - 1 ? DEX_KEYS.length : a.goals[i];
   const achHit = id => (S && S.ach && S.ach.hit[id]) || 0;
   const achGot = id => (S && S.ach && S.ach.got[id]) || 0;
   const achClaimable = () => !!S && !!S.ach && ACH.some(a => achGot(a.id) < achHit(a.id));
-  const achTitles = () => ACH.filter(a => achGot(a.id) >= 3);
+  const achTitles = () => ACH.filter(a => achGot(a.id) >= ACH_N);
   const achTitleName = id => { const a = achById(id); return a ? a.title : ''; };
   const achVal = a => { try { return Number(a.v()) || 0; } catch (e) { return 0; } };
   // 1초마다 이룬 등급을 기록해요. 새로 이루면 알려 줘요(보상은 업적 화면에서 받아요)
@@ -10387,7 +10395,7 @@ body{background:radial-gradient(120% 60% at 50% 0%, color-mix(in srgb, var(--pap
     for (const a of ACH) {
       const v = achVal(a);
       let h = achHit(a.id);
-      while (h < 3 && v >= achGoal(a, h)) h += 1;
+      while (h < ACH_N && v >= achGoal(a, h)) h += 1;
       if (h > achHit(a.id)) {
         S.ach.hit[a.id] = h;
         if (!quiet) toast(`업적 달성! ${a.t(achGoal(a, h - 1))}. 도감의 업적에서 받아요`);
@@ -10401,25 +10409,28 @@ body{background:radial-gradient(120% 60% at 50% 0%, color-mix(in srgb, var(--pap
     let g = 0; for (let i = from; i < to; i++) g += ACH_GOLD[i];
     S.ach.got[id] = to;
     addGold(g);
-    const newTitle = to >= 3 && from < 3;
+    const newTitle = to >= ACH_N && from < ACH_N;
     if (newTitle && !S.ach.title) { S.ach.title = id; rankDirty(); }
     const art = IMG('ach_popup') ? `<img src="${IMG('ach_popup')}" alt="">` : '';
-    showReward({ title: '업적 달성!', sub: a.t(achGoal(a, to - 1)), art, big: `${a.name} ${ACH_TIER[to - 1]} 메달`,
+    showReward({ title: '업적 달성!', sub: a.t(achGoal(a, to - 1)), art, big: `${a.name} ${to}단계 ${ACH_TIER[to - 1]} 메달`,
       items: [{ ic: 'gold', t: `황금 도토리 +${g}` }, newTitle ? { ic: '🎖️', t: `칭호 "${a.title}"${S.ach.title === id ? '를 달았어요' : '를 받았어요'}` } : null] });
     save(); renderAch(true);
     return true;
   }
   function setTitle(id) {
-    if (id && achGot(id) < 3) return false;
+    if (id && achGot(id) < ACH_N) return false;
     S.ach.title = S.ach.title === id ? '' : id;
     toast(S.ach.title ? `칭호 "${achTitleName(S.ach.title)}"를 달았어요` : '칭호를 뗐어요');
-    rankDirty(); save(); renderAch(true);
+    rankDirty(); save(); renderAch(true); renderHudTitle();
     return true;
   }
   function achMedal(a) {
-    const g = achGot(a.id), frame = IMG(g >= 3 ? 'ach_frame_gold' : g === 2 ? 'ach_frame_silver' : g === 1 ? 'ach_frame_bronze' : 'ach_frame_locked'), ic = IMG('ach_ic_' + a.id);
+    // 백금과 무지개는 금 테두리에 색을 입혀요(전용 그림이 오면 ach_frame_platinum, ach_frame_rainbow로 바꿔요)
+    const g = achGot(a.id);
+    const fk = g >= 5 ? 'ach_frame_rainbow' : g === 4 ? 'ach_frame_platinum' : g === 3 ? 'ach_frame_gold' : g === 2 ? 'ach_frame_silver' : g === 1 ? 'ach_frame_bronze' : 'ach_frame_locked';
+    const frame = IMG(fk) || (g >= 4 ? IMG('ach_frame_gold') : ''), tint = !IMG(fk) && g >= 4 ? (g >= 5 ? ' tint-rainbow' : ' tint-plat') : '', ic = IMG('ach_ic_' + a.id);
     if (!frame || !ic) return `<span class="am-em">${ACH_EM[a.id]}</span>`;
-    return `<img src="${frame}" alt=""><img class="am-ic${g ? '' : ' dim'}" src="${ic}" alt="">`;
+    return `<img class="am-fr${tint}" src="${frame}" alt=""><img class="am-ic${g ? '' : ' dim'}" src="${ic}" alt="">`;
   }
   function renderAch(force) {
     const box = $('#achList'); if (!box || !S || !S.ach) return;
@@ -10427,18 +10438,18 @@ body{background:radial-gradient(120% 60% at 50% 0%, color-mix(in srgb, var(--pap
     const key = ACH.map((a, i) => `${achHit(a.id)}${achGot(a.id)}:${Math.floor(vals[i])}`).join('|') + '|' + S.ach.title;
     if (!force && box.dataset.key === key) return; box.dataset.key = key;
     const ts = achTitles();
-    $('#achTitle').innerHTML = `<span class="at-lab">내 칭호</span><span class="at-chips">${ts.length ? ts.map(a => `<button class="title-chip${S.ach.title === a.id ? ' on' : ' off'}" type="button" data-title="${a.id}" aria-pressed="${S.ach.title === a.id}">${esc(a.title)}</button>`).join('') : '<span class="at-none">금 업적을 이루면 칭호를 받아요</span>'}</span>`;
+    $('#achTitle').innerHTML = `<span class="at-lab">내 칭호</span><span class="at-chips">${ts.length ? ts.map(a => `<button class="title-chip${S.ach.title === a.id ? ' on' : ' off'}" type="button" data-title="${a.id}" aria-pressed="${S.ach.title === a.id}">${esc(a.title)}</button>`).join('') : '<span class="at-none">업적을 5단계까지 이루면 칭호를 받아요</span>'}</span>`;
     box.innerHTML = ACH.map((a, i) => {
-      const h = achHit(a.id), g = achGot(a.id), next = Math.min(2, h), goal = achGoal(a, next), v = vals[i];
+      const h = achHit(a.id), g = achGot(a.id), next = Math.min(ACH_N - 1, h), goal = achGoal(a, next), v = vals[i];
       const can = h > g;
-      const pct = can || h >= 3 ? 100 : Math.max(0, Math.min(100, v / goal * 100));
+      const pct = can || h >= ACH_N ? 100 : Math.max(0, Math.min(100, v / goal * 100));
       // 받을 것이 있으면 이룬 업적(가장 높은 등급)을 보여 주고, 아니면 다음 목표를 보여 줘요
-      const head = can ? a.t(achGoal(a, h - 1)) : h >= 3 ? a.name : a.t(goal);
-      const sub = can ? `${ACH_TIER[h - 1]} 메달을 이뤘어요! 황금 도토리 +${ACH_GOLD.slice(g, h).reduce((x, y) => x + y, 0)}` : h >= 3 ? `모두 이뤘어요. 칭호 "${a.title}"` : `${fmt(Math.min(v, goal))} / ${fmt(goal)}`;
+      const head = can ? a.t(achGoal(a, h - 1)) : h >= ACH_N ? a.name : a.t(goal);
+      const sub = can ? `${ACH_TIER[h - 1]} 메달을 이뤘어요! 황금 도토리 +${ACH_GOLD.slice(g, h).reduce((x, y) => x + y, 0)}` : h >= ACH_N ? `모두 이뤘어요. 칭호 "${a.title}"` : `${fmt(Math.min(v, goal))} / ${fmt(goal)}`;
       return `<div class="ach-row${can ? ' can' : ''}"><span class="ach-medal">${achMedal(a)}</span>` +
         `<span class="ach-tx"><b>${esc(head)}</b><small>${esc(sub)}</small><span class="ach-bar"><i style="width:${pct.toFixed(0)}%"></i></span>` +
-        `<span class="ach-tiers" aria-label="받은 메달 ${g}개">${[0, 1, 2].map(j => `<i class="${j < g ? 't' + (j + 1) : ''}"></i>`).join('')}</span></span>` +
-        (can ? `<button class="ach-btn" type="button" data-ach="${a.id}">받기</button>` : `<span class="ach-done">${g >= 3 ? '완료' : ACH_TIER[next] + ' 메달'}</span>`) + '</div>';
+        `<span class="ach-tiers" aria-label="받은 메달 ${g}개">${ACH_TIER.map((_, j) => `<i class="${j < g ? 't' + (j + 1) : ''}"></i>`).join('')}</span></span>` +
+        (can ? `<button class="ach-btn" type="button" data-ach="${a.id}">받기</button>` : `<span class="ach-done">${g >= ACH_N ? '완료' : ACH_TIER[next] + ' 메달'}</span>`) + '</div>';
     }).join('');
   }
   function setDexSeg(v) {
@@ -10448,8 +10459,14 @@ body{background:radial-gradient(120% 60% at 50% 0%, color-mix(in srgb, var(--pap
     if (rt.dexSeg === 'ach') renderAch(true); else renderDex();
   }
   // tick170에서 1초마다 불러요
+  // 메인 화면 위쪽 학교 카드에 단 칭호를 보여 줘요. 누르면 업적 화면이 열려요
+  function renderHudTitle() {
+    const el = $('#hudTitle'); if (!el || !S || !S.ach) return;
+    const t = achTitleName(S.ach.title);
+    el.hidden = !t; if (t && el.textContent !== t) el.textContent = t;
+  }
   function tick171ach() {
-    achSync(false);
+    achSync(false); renderHudTitle();
     const ad = $('#achDot'); if (ad) ad.hidden = !achClaimable();
     if (rt.tab === 'dex' && rt.dexSeg === 'ach') renderAch();
   }
@@ -10457,14 +10474,15 @@ body{background:radial-gradient(120% 60% at 50% 0%, color-mix(in srgb, var(--pap
   function sanitize171(d, s) {
     const a = d.ach && typeof d.ach === 'object' ? d.ach : {};
     for (const x of ACH) {
-      const h = Math.min(3, Math.max(0, Math.floor(Number(a.hit && a.hit[x.id]) || 0)));
+      const h = Math.min(ACH_N, Math.max(0, Math.floor(Number(a.hit && a.hit[x.id]) || 0)));
       const g = Math.min(h, Math.max(0, Math.floor(Number(a.got && a.got[x.id]) || 0)));
       if (h) s.ach.hit[x.id] = h;
       if (g) s.ach.got[x.id] = g;
     }
-    s.ach.title = typeof a.title === 'string' && (s.ach.got[a.title] || 0) >= 3 ? a.title : '';
+    s.ach.title = typeof a.title === 'string' && (s.ach.got[a.title] || 0) >= ACH_N ? a.title : '';
   }
   ['light', 'dark'].forEach(t => { const u = IMG('title_ribbon_' + t); if (u) document.documentElement.style.setProperty('--ribbon-' + t, `url("${u}")`); });
+  $('#hudTitle').addEventListener('click', () => { sfx('tap'); setTab('dex'); setDexSeg('ach'); });
   $('#panelDex').addEventListener('click', e => {
     const sg = e.target.closest('[data-dseg]'); if (sg) { sfx('tap'); setDexSeg(sg.dataset.dseg); return; }
     const b = e.target.closest('[data-ach]'); if (b) { claimAch(b.dataset.ach); return; }

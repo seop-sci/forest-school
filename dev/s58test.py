@@ -4,7 +4,7 @@
 # (3) 걷는 친구들: 그 방 선생님을 모셨을 때만 선생님, 학생 두 명, 시간이 지나면 자리가 바뀌는지
 # (4) 행사 그림: 쪽지, 풍선, 음표, 별이 그림으로, 무대, 사진기, 줄 장식, 운동회 공, 행사 아이콘, 뱀과 매와 까치 그림
 # (5) 오류 코드: 광고 3, 동의, 구글 로그인 10
-# (6) 업적: 기록으로 이루기, 받기(황금 1, 2, 3), 금 업적 칭호(처음 받은 칭호는 바로 달기), 칭호 바꾸기와 떼기, 줄어도 이룬 것은 남기, 예전 저장과 망가진 저장, 받을 것이 있으면 도감 버튼 점
+# (6) 업적: 기록으로 이루기, 받기(황금 1~5), 5단계 칭호(처음 받은 칭호는 바로 달기), 칭호 바꾸기와 떼기, 줄어도 이룬 것은 남기, 예전 저장과 망가진 저장, 받을 것이 있으면 도감 버튼 점
 # (7) 화면: 업적 화면(밝은 390px, 어두운 360px) 넘침, 선생님 탭 새 카드
 # 쓰는 법: python3 wrap.py && python3 s58test.py   (마지막 줄이 PASS면 통과)
 import asyncio, sys, json
@@ -93,21 +93,21 @@ async def main():
           F.achSync(true); out.hit = S.ach.hit.students; out.claimable = F.achClaimable();
           const g0 = S.gold; F.claimAch('students'); {CLEAN}; out.gain = S.gold - g0; out.got = S.ach.got.students; out.again = F.claimAch('students');
           S.students = 3; F.achSync(true); out.keep = S.ach.hit.students;   // 줄어도 남아요
-          S.f.classroom = 30; F.achSync(true); const g1 = S.gold; F.claimAch('building'); {CLEAN}; out.gold3 = S.gold - g1; out.title = S.ach.title;
-          S.pz.best = 12000; F.achSync(true); F.claimAch('puzzle'); {CLEAN}; out.title2 = S.ach.title;   // 이미 단 칭호는 그대로
+          S.f.classroom = 50; F.achSync(true); const g1 = S.gold; F.claimAch('building'); {CLEAN}; out.gold3 = S.gold - g1; out.title = S.ach.title;
+          S.pz.best = 45000; F.achSync(true); F.claimAch('puzzle'); {CLEAN}; out.title2 = S.ach.title;   // 이미 단 칭호는 그대로
           out.set = [F.setTitle('puzzle'), S.ach.title, F.setTitle('puzzle'), S.ach.title, F.setTitle('grad'), S.ach.title];
           F.setTitle('building'); {CLEAN};
-          out.total = F.ACH.length * 3;
+          out.total = F.ACH.filter(a => a.goals.length === 5).length * 5;
           const d = JSON.parse(JSON.stringify(S));
           let s = F.sanitize(d); out.san = [s.ach.got.building, s.ach.title];
-          d.ach = {{ hit: {{ students: 9, grad: 'x', zzz: 3 }}, got: {{ students: 5, building: 3 }}, title: 'building' }}; s = F.sanitize(d);
+          d.ach = {{ hit: {{ students: 9, grad: 'x', zzz: 3 }}, got: {{ students: 7, building: 5 }}, title: 'building' }}; s = F.sanitize(d);
           out.bad = [s.ach.hit.students, s.ach.hit.grad || 0, s.ach.hit.zzz || 0, s.ach.got.students, s.ach.got.building || 0, s.ach.title];
           delete d.ach; s = F.sanitize(d); out.old = [Object.keys(s.ach.hit).length, s.ach.title];
           return out; }})()""")
         if r['hit'] != 2 or not r['claimable'] or r['gain'] != 3 or r['got'] != 2 or r['again'] is not False or r['keep'] != 2: fails.append(f'업적 받기 {r}')
-        if r['gold3'] != 6 or r['title'] != 'building' or r['title2'] != 'building': fails.append(f'금 업적과 칭호 {r}')
-        if r['set'] != [True, 'puzzle', True, '', False, ''] or r['total'] != 36: fails.append(f'칭호 바꾸기 {r}')
-        if r['san'] != [3, 'building'] or r['bad'] != [3, 0, 0, 3, 0, ''] or r['old'] != [0, '']: fails.append(f'업적 저장 {r}')
+        if r['gold3'] != 15 or r['title'] != 'building' or r['title2'] != 'building': fails.append(f'금 업적과 칭호 {r}')
+        if r['set'] != [True, 'puzzle', True, '', False, ''] or r['total'] != 60: fails.append(f'칭호 바꾸기 {r}')
+        if r['san'] != [5, 'building'] or r['bad'] != [5, 0, 0, 5, 0, ''] or r['old'] != [0, '']: fails.append(f'업적 저장 {r}')
         # 도감 버튼 점
         r = await pg.evaluate(f"""(async()=>{{ const F={F}, S=F.S; S.st.trains = 60; await new Promise(r => setTimeout(r, 1500)); {CLEAN}; return [F.achClaimable(), !document.querySelector('#dexDot').hidden, !document.querySelector('#achDot').hidden]; }})()""")
         if r != [True, True, True]: fails.append(f'받을 업적 점 {r}')
@@ -128,6 +128,15 @@ async def main():
         await pg.evaluate(f"{F}.setDexSeg('dex')"); await pg.wait_for_timeout(200)
         r = await pg.evaluate("[document.querySelector('#dexPane').hidden, document.querySelector('#achPane').hidden, document.querySelectorAll('.dex-card').length]")
         if r[0] or not r[1] or r[2] < 17: fails.append(f'도감으로 돌아가기 {r}')
+        # 홈 위쪽 칭호
+        await pg.evaluate(f"{F}.setTab('school')"); await pg.wait_for_timeout(1300)
+        r = await pg.evaluate("(()=>{ const el=document.querySelector('#hudTitle'); const r=el.getBoundingClientRect(), p=el.parentElement.getBoundingClientRect(); return [el.hidden, el.textContent, r.right <= p.right + 1, r.width > 30]; })()")
+        if r != [False, '숲속 건축왕', True, True]: fails.append(f'홈 위쪽 칭호 {r}')
+        await pg.click('#hudTitle'); await pg.wait_for_timeout(400)
+        r = await pg.evaluate(f"[{F}.rt.tab, document.querySelector('#achPane').hidden]")
+        if r != ['dex', False]: fails.append(f'칭호 눌러 업적 열기 {r}')
+        await pg.evaluate(f"{F}.setTitle('building')"); await pg.wait_for_timeout(1300)
+        if not await pg.evaluate("document.querySelector('#hudTitle').hidden"): fails.append('칭호를 떼면 홈에서 사라져야 해요')
         if errs: fails.append(f'페이지 오류 {errs[:3]}')
         await b.close()
     for f in fails: print('FAIL', f)
