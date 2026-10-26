@@ -11,7 +11,8 @@ HERE = pathlib.Path(__file__).resolve().parent
 SRC = HERE / 'forest-school.html'
 BEGIN, END, VAR = '<!-- FS_IMG:BEGIN -->', '<!-- FS_IMG:END -->', 'FS_IMG'
 # 1.7.0 묶음(--block 170): 1.6.0 퍼즐 그림과 같은 묶음을 고치지 않게 따로 둬요
-BLOCKS = {'170': ('<!-- FS_IMG170:BEGIN -->', '<!-- FS_IMG170:END -->', 'FS_IMG170')}
+BLOCKS = {'170': ('<!-- FS_IMG170:BEGIN -->', '<!-- FS_IMG170:END -->', 'FS_IMG170'),
+          '171': ('<!-- FS_IMG171:BEGIN -->', '<!-- FS_IMG171:END -->', 'FS_IMG171')}   # 1.7.1 업적, 방 꾸밈 소품, 새 선생님, 행사 그림
 
 # 열쇠 앞부분마다 줄일 크기(긴 변 픽셀)와 화질
 RULES = [
@@ -43,7 +44,18 @@ RULES = [
     ('pz_', 96, 84),
     ('fx_', 96, 84),
     ('essence_', 240, 82),
-    ('cos_', 160, 84),   # 1.6.0 정수 상점 한정 모자 (fur_sp_ 특별 가구는 fur_ 규칙)
+    ('cos_', 160, 84),
+    # 1.7.1 (python3 embed_assets.py --block 171 <폴더>, 그림 둘레 투명 여백은 미리 잘라서 넣어요)
+    ('prop_', 220, 80),
+    ('ach_popup', 320, 82),
+    ('ach_', 128, 84),
+    ('title_ribbon', 384, 82),
+    ('ic_trophy', 112, 86),
+    ('fest_stage', 560, 78),
+    ('fest_garland', 480, 80),
+    ('fest_camera', 220, 82),
+    ('fest_ic_', 112, 86),
+    ('fest_', 96, 86),   # 1.6.0 정수 상점 한정 모자 (fur_sp_ 특별 가구는 fur_ 규칙)
 ]
 SKIP = {'building_positions'}
 
@@ -93,7 +105,7 @@ def main(dirs, block=''):
     old = {}
     if BEGIN in src:
         block = src[src.index(BEGIN):src.index(END)]
-        for k, v in re.findall(r'"([a-z0-9_]+)":"(data:image/webp;base64,[^"]+)"', block):
+        for k, v in re.findall(r'"([A-Za-z0-9_]+)":"(data:image/webp;base64,[^"]+)"', block):
             old[k] = v
     old.update(imgs)   # 이번에 준 폴더의 그림만 바꾸고, 전에 넣은 그림은 그대로 둬요
     body = ',\n'.join(f'"{k}":"{v}"' for k, v in sorted(old.items()))
