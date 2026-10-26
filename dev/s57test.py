@@ -159,9 +159,10 @@ async def main():
           S.mg.orders = [{{ it: [{{ k: 'f', n: 3, c: 1 }}, {{ k: 'g', n: 2, c: 1 }}], who: 'fox' }}, {{ it: [{{ k: 's', n: 2, c: 1 }}], who: 'rabbit' }}, {{ it: [{{ k: 'a', n: 2, c: 1 }}], who: 'bear' }}];
           F.mgRenderAll(); const e0 = S.mg.e;
           document.querySelector('#mgOrders [data-order="0"]').click();
+          const tx = document.querySelector('#toast').textContent;   // 누른 바로 그때 읽어요(이벤트 알림이 곧 덮을 수 있어요)
           await new Promise(r => setTimeout(r, 100));
           const hint = [...document.querySelectorAll('.mg-cell.hint')].map(el => F.mgCells()[+el.dataset.i]).sort().join(',');
-          return {{ hint, finger: document.querySelectorAll('.mg-finger').length, toast: document.querySelector('#toast').textContent, e: S.mg.e === e0, card: !!document.querySelector('.mg-order.hint') }}; }})()""")
+          return {{ hint, finger: document.querySelectorAll('.mg-finger').length, toast: tx, e: S.mg.e === e0, card: !!document.querySelector('.mg-order.hint') }}; }})()""")
         if r['hint'] != 'F1,G1' or r['finger'] != 1 or '급식 냄비' not in r['toast'] or '화분' not in r['toast'] or not r['e'] or not r['card']: fails.append(f'주문 눌러 생산기 알려 주기 {r}')
         await pg.evaluate(f"{F}.mgClearHint()")
         # ---- (4d) 합치기 도감: best까지 모은 것으로, 종류 10단계 보상 한 번, 모두 모으면 큰 보상 한 번, 저장
