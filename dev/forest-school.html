@@ -1711,6 +1711,20 @@ body{background:radial-gradient(120% 60% at 50% 0%, color-mix(in srgb, var(--pap
 /* 1.7.2: 지도 위쪽 빈 곳은 지금 지도 그림을 흐리게 깔아서 채워요(테마마다 하늘색이 어색하지 않게). 그림이 없으면 예전 하늘과 숲 색 */
 .app.on-school #map{-webkit-mask-image:linear-gradient(to bottom, transparent 0, #000 56px);mask-image:linear-gradient(to bottom, transparent 0, #000 56px)}
 .app.on-school .frame::before{content:"";position:absolute;inset:-40px;background:var(--map-bg, none) center top/cover no-repeat;filter:blur(16px) saturate(.62) brightness(1.08) contrast(.86);pointer-events:none}
+/* 1.7.2 상점 거리 */
+.street-list{display:grid;gap:12px}
+.shopfront{position:relative;display:grid;grid-template-columns:minmax(0,1fr);overflow:hidden;width:100%;padding:0;border:1px solid var(--line);border-radius:18px;background:var(--card);color:var(--ink);text-align:left;cursor:pointer;box-shadow:0 3px 0 var(--line-shadow)}
+.shopfront:active{transform:translateY(1px)}
+.shopfront .sf-pic{display:block;aspect-ratio:2/1;background:center/cover no-repeat;background-color:color-mix(in srgb, var(--accent) 22%, var(--card))}
+.shopfront .sf-pic.fb{background-size:auto 70%;background-color:color-mix(in srgb, var(--accent) 16%, var(--card))}
+.shopfront .sf-tx{display:grid;grid-template-columns:minmax(0,1fr) auto;grid-template-areas:"b have" "s have";align-items:center;column-gap:10px;padding:10px 14px 12px}
+.shopfront .sf-tx b{grid-area:b;font-family:var(--font-display);font-weight:400;font-size:19px}
+.shopfront .sf-tx small{grid-area:s;font-size:12.5px;color:var(--muted)}
+.shopfront .sf-have{grid-area:have;display:flex;align-items:center;gap:4px;padding:3px 10px;border-radius:999px;background:color-mix(in srgb, var(--accent) 22%, transparent);font-family:var(--font-display);font-size:16px;font-variant-numeric:tabular-nums}
+.shopfront .sf-have .tic{width:22px;height:22px}
+.shopfront .dot{position:absolute;top:10px;right:10px;width:10px;height:10px;border-radius:50%;background:var(--seal)}
+.street-back{display:inline-flex;align-items:center;gap:4px;min-height:36px;margin:-6px 0 6px;padding:0 12px 0 8px;border:1px solid var(--line);border-radius:999px;background:var(--card);color:var(--ink);font:inherit;font-size:13.5px;cursor:pointer}
+.street-back::before{content:"";width:8px;height:8px;border-left:2px solid currentColor;border-bottom:2px solid currentColor;transform:rotate(45deg);margin-right:2px}
 /* ===== 홈 UI 정리 END ===== */
 </style>
 
@@ -1916,7 +1930,6 @@ body{background:radial-gradient(120% 60% at 50% 0%, color-mix(in srgb, var(--pap
         <button class="tab sidebtn" type="button" data-tab="rank" aria-selected="false" aria-label="랭킹"><span class="sb-ring"><span class="tic" data-ic="ic_rank" aria-hidden="true"></span></span><span class="sb-lb">랭킹</span></button>
         <button class="tab sidebtn" type="button" data-tab="dex" aria-selected="false" aria-label="동물 도감"><span class="sb-ring"><span class="tic" data-ic="ic_book" aria-hidden="true"></span></span><span class="sb-lb">도감</span><span class="dot" id="dexDot" hidden></span></button><!-- 1.7.0 -->
         <button class="tab sidebtn" type="button" data-tab="event" aria-selected="false" aria-label="이벤트"><span class="sb-ring"><span class="tic" data-ic="ic_event" aria-hidden="true"></span></span><span class="sb-lb">이벤트</span><span class="dot" id="evDot" hidden></span></button><!-- 1.7.0 -->
-        <button class="tab sidebtn" type="button" data-tab="ess" aria-selected="false" aria-label="정수 상점"><span class="sb-ring"><span class="tic" data-ic="ic_essence_shop" aria-hidden="true"></span></span><span class="sb-lb">정수 상점</span></button>
       </div>
       <!-- 까치 핫딜은 엄지가 닿기 쉬운 오른쪽 아래. 건물과 떨어진 도토리를 가리지 않아요 -->
       <button class="deal" id="btnDeal" type="button" hidden><span class="d-av" id="dealIc" aria-hidden="true"></span><span class="d-txt">까치 핫딜<span class="d-time" id="dealTime">2:00</span></span></button>
@@ -1978,7 +1991,18 @@ body{background:radial-gradient(120% 60% at 50% 0%, color-mix(in srgb, var(--pap
       <div class="friends" id="friendList"></div>
     </section>
 
+    <!-- 1.7.2 상점 거리: 아래 탭 '상점'을 누르면 가게 그림을 골라 들어가요. 가게 그림은 shop_front_gold, shop_front_ess(없으면 아이콘) -->
+    <section class="panel street-panel" id="panelStreet" hidden aria-labelledby="streetTitle">
+    <h2 id="streetTitle" class="ph"><span class="tic" data-ic="ic_shop" aria-hidden="true"></span><span>상점 거리</span></h2>
+    <p class="lead">어느 가게에 들어갈까요?</p>
+    <div class="street-list">
+      <button class="shopfront" type="button" data-go="shop" id="sfGold"><span class="sf-pic" data-front="shop_front_gold" data-fb="ic_gold_acorn" aria-hidden="true"></span><span class="sf-tx"><b>황금 도토리 상점</b><small>모자, 소품, 지붕, 칠판 같은 꾸미기</small><span class="sf-have"><span class="tic" data-ic="ic_gold_acorn" aria-hidden="true"></span><span id="sfGoldN">0</span></span></span><span class="dot" id="sfGoldDot" hidden></span></button>
+      <button class="shopfront" type="button" data-go="ess" id="sfEss"><span class="sf-pic" data-front="shop_front_ess" data-fb="ic_essence_shop" aria-hidden="true"></span><span class="sf-tx"><b>정수 상점</b><small>한정 모자, 특별 가구, 도토리 묶음</small><span class="sf-have"><span class="tic" data-ic="ic_essence" aria-hidden="true"></span><span id="sfEssN">0</span></span></span></button>
+    </div>
+    </section>
+
     <section class="panel shop-panel" id="panelShop" hidden aria-labelledby="shopTitle">
+    <button class="street-back" type="button" data-go="street">상점 거리로</button>
     <h2 id="shopTitle" class="ph"><span class="tic" data-ic="ic_gold_acorn" aria-hidden="true"></span><span>황금 도토리 상점</span></h2>
     <div class="shop-have" id="shopHave"></div>
     <button class="cta small" type="button" id="shopAd">광고 보고 황금 도토리 3개 받기</button>
@@ -1992,6 +2016,7 @@ body{background:radial-gradient(120% 60% at 50% 0%, color-mix(in srgb, var(--pap
 
     <!-- 1.6.0 정수 상점: 숲의 정수(미니게임에서만 얻어요)로 한정 모자, 특별 가구, 도토리 묶음, 황금 도토리를 사요. 값은 ESHOP 한곳에 -->
     <section class="panel shop-panel" id="panelEss" hidden aria-labelledby="essTitle">
+    <button class="street-back" type="button" data-go="street">상점 거리로</button>
     <h2 id="essTitle" class="ph"><span class="tic" data-ic="ic_essence_shop" aria-hidden="true"></span><span>정수 상점</span></h2>
     <div class="shop-have ess-have" id="essHaveBox"><span class="ess-big" id="essBig" aria-hidden="true"></span><span class="tic" data-ic="ic_essence" aria-hidden="true"></span><span id="essHave2">0</span></div>
     <p class="fine shop-adleft">숲의 정수는 미니게임에서만 모을 수 있어요</p>
@@ -2118,7 +2143,7 @@ body{background:radial-gradient(120% 60% at 50% 0%, color-mix(in srgb, var(--pap
       <span class="dot" id="gDot" hidden></span>
       <span class="tguide" aria-hidden="true"><svg viewBox="-10 -22 20 22"><path d="M0 -1 L-8.5 -11 L-3.8 -11 L-3.8 -21 L3.8 -21 L3.8 -11 L8.5 -11 Z"/></svg></span>
     </button>
-    <button class="tab" type="button" role="tab" data-tab="shop" aria-selected="false"><span class="tic" data-ic="ic_shop" aria-hidden="true"></span>상점</button>
+    <button class="tab" type="button" role="tab" data-tab="street" aria-selected="false"><span class="tic" data-ic="ic_shop" aria-hidden="true"></span>상점</button>
   </nav>
 </div>
 
@@ -6955,6 +6980,7 @@ body{background:radial-gradient(120% 60% at 50% 0%, color-mix(in srgb, var(--pap
     const b = $('#btnShop');
     if (!b.hidden) { const sp = document.createElement('span'); sp.className = 'gpop'; sp.textContent = '+' + n; b.appendChild(sp); setTimeout(() => sp.remove(), 1400); }
     if (rt.tab === 'shop') renderShop();
+    if (rt.tab === 'street') renderStreet();
   }
   // 광고를 끝까지 보면 덤으로 3개 (하루 10번까지)
   function adGold() { goldDay(); if (S.gd.n >= GOLD.adDay) return; S.gd.n += 1; addGold(GOLD.ad); }
@@ -6992,6 +7018,16 @@ body{background:radial-gradient(120% 60% at 50% 0%, color-mix(in srgb, var(--pap
       return `<svg viewBox="-11 -13.5 22 27" aria-hidden="true">${kidSVG('bear', 0, look)}</svg>`;
     }
     return `<svg viewBox="0 0 40 40" aria-hidden="true"><rect x="5" y="9" width="30" height="21" rx="3" fill="${it.c}" stroke="#7A522D" stroke-width="2.5"/><path d="M10 16 h12 M10 21 h17 M10 26 h8" stroke="#F3F2E8" stroke-width="1.6" stroke-linecap="round"/></svg>`;
+  }
+  // 1.7.2 상점 거리: 가게 카드에 가진 재화를 보여 주고, 누르면 그 가게로 들어가요
+  function renderStreet() {
+    $('#sfGoldN').textContent = fmt(S.gold || 0);
+    $('#sfEssN').textContent = fmt(S.ess || 0);
+    $$('#panelStreet .sf-pic').forEach(el => {
+      const u = IMG(el.dataset.front) || IMG(el.dataset.fb);
+      el.classList.toggle('fb', !IMG(el.dataset.front));
+      if (u) el.style.backgroundImage = `url("${u}")`;
+    });
   }
   function openShop() {
     if (rt.modalOpen) closeModal(rt.modalOpen);
@@ -7221,6 +7257,7 @@ body{background:radial-gradient(120% 60% at 50% 0%, color-mix(in srgb, var(--pap
       toast(`황금 도토리 +${GOLD.shopAdN}개를 받았어요`);
       save();
       if (rt.tab === 'shop') renderShop();
+    if (rt.tab === 'street') renderStreet();
     }, r => {
       if (r !== 'noad') toast('광고를 끝까지 보지 않아서 황금 도토리가 없어요');
     });
@@ -9596,7 +9633,10 @@ body{background:radial-gradient(120% 60% at 50% 0%, color-mix(in srgb, var(--pap
   function setTab(t) {
     const prev = rt.tab;
     rt.tab = t;
-    $$('.tab').forEach(b => b.setAttribute('aria-selected', b.dataset.tab === t ? 'true' : 'false'));
+    const tabOn = t === 'shop' || t === 'ess' ? 'street' : t;   // 1.7.2: 가게 안에 있어도 아래 '상점' 탭이 켜져 있어요
+    $$('.tab').forEach(b => b.setAttribute('aria-selected', b.dataset.tab === tabOn ? 'true' : 'false'));
+    $('#panelStreet').hidden = t !== 'street';
+    if (t === 'street') { renderStreet(); $('#panelStreet').scrollTop = 0; }
     $('#panelQuests').hidden = t !== 'quests';
     $('#panelTeachers').hidden = t !== 'teachers';
     $('#panelGrad').hidden = t !== 'grad';
@@ -9993,6 +10033,7 @@ body{background:radial-gradient(120% 60% at 50% 0%, color-mix(in srgb, var(--pap
       if (b) { const k = b.getAttribute('data-k'); if (k === 'vp') vpAct(b); else if (XT[k]) xtAct(k, b); else teacherAct(k, b); }
     });
     $$('.tab').forEach(b => b.addEventListener('click', () => { setTab(b.dataset.tab); sfx('tap'); }));
+    $$('[data-go]').forEach(b => b.addEventListener('click', () => { setTab(b.dataset.go); sfx('tap'); }));
     // 1.5.0: 그림 아이콘을 채우고, 아직 열리지 않은 버튼은 알려만 줘요
     $$('[data-ic]').forEach(el => { const u = IMG(el.dataset.ic); if (u) el.style.backgroundImage = `url("${u}")`; });
     $$('.panel-x').forEach(b => b.addEventListener('click', () => { setTab('school'); sfx('tap'); }));
