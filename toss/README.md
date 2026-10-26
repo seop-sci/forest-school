@@ -19,7 +19,7 @@ GitHub 전용 부분(Firebase 서버 저장, 링크 미리보기)은 빼고, `sr
    - 카테고리: 게임
    - 아이콘: `assets/icon-600.png`
    - 가로 썸네일: `assets/thumbnail-1932x828.png`
-   - 세로 스크린샷: `assets/01-school.png`, `02-shop.png`, `03-dressed.png` (636 x 1048)
+   - 세로 스크린샷: `assets/01-school.png`, `02-puzzle.png`, `03-room.png`, `04-ess.png` (636 x 1048, 1.6.0 화면)
 3. 번들을 올려요: 앱 출시 메뉴에서 `forest-school.ait`를 올리고 '토스앱 테스트' QR로 열어 봐요.
    - QR 테스트는 토스에 로그인한 만 19세 이상 워크스페이스 멤버만 할 수 있어요.
 4. 광고 그룹을 만들어요: 인앱 광고 > 리워드, 보상 이름 `황금 도토리`, 수량 `1`.
