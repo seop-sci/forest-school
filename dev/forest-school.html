@@ -2923,6 +2923,7 @@ body{background:radial-gradient(120% 60% at 50% 0%, color-mix(in srgb, var(--pap
     f: { classroom: 1, cafeteria: 0, library: 0, playground: 0, science: 0 },
     fu: freshFu(),
     t: { squirrel: 1, owl: 0, bear: 0 },
+    vp: 0,   // 1.7.0 고슴도치 교감 선생님 연수 레벨 (0~10)
     grade: 0, best: 0, sound: true, bgm: true, vibrate: true, savedAt: Date.now(),
     pending: 0, pendingSec: 0, certNo: 0, earned: 0, yearEarned: 0, pwBank: 0,
     tier: 0, tg: 0, tdip: 0, fund: 0, fp: { schol: 0, rep: 0, dip: 0 },
@@ -3101,6 +3102,7 @@ body{background:radial-gradient(120% 60% at 50% 0%, color-mix(in srgb, var(--pap
     if (s.st.grads < yearsDone) s.st.grads = yearsDone;
     if (s.p.species < Math.min(NEWCOMERS.length, yearsDone)) s.p.species = Math.min(NEWCOMERS.length, yearsDone);
     sanitize170(d, s);   // 1.7.0 도감, 이벤트
+    s.vp = Math.min(VP.max, Math.floor(num(d.vp, 0, 0)));   // 1.7.0 교감 선생님
     // 1.7.0 학교급별 건물 외관: 예전 저장은 지금 보이는 모습 그대로(유치원 모습, 과학실과 운동장은 초등학교 모습) 시작해서 다음 업그레이드 때 바뀌어요
     if (d.bs && typeof d.bs === 'object') { for (const k of Object.keys(s.bs)) s.bs[k] = Math.min(s.tier, Math.floor(num(d.bs[k], 0, 0))); }
     else { s.bs.science = Math.min(1, s.tier); s.bs.playground = Math.min(1, s.tier); }
@@ -3260,6 +3262,15 @@ body{background:radial-gradient(120% 60% at 50% 0%, color-mix(in srgb, var(--pap
   const facCost = k => facMaxed(k) ? Infinity : Math.ceil(softCost(FAC[k].cost, S.f[k], SOFT.fac) * costScale());
   const teaCost = k => Math.ceil(softCost(TEA[k].cost, S.t[k], SOFT.tea) * costScale());
   const teaMaxed = k => !!TEA[k].max && S.t[k] >= TEA[k].max;
+  // 1.7.0 고슴도치 교감 선생님: 처음부터 계셔요(Lv.0). 연수를 보내면 학교 행사 상품 도토리가 레벨마다 +10%, 최고 Lv.10(+100%).
+  // 올리는 값은 곰 선생님 연수 곡선(400부터 1.85배)과 같아요. 수업료 계산(rate)과 선생님 추천(TEA)에는 들어가지 않아요
+  const VP = { name: '고슴도치 교감 선생님', subject: '교감', max: 10, per: 10,
+    desc: '학교를 안내하는 교감 선생님이에요. 연수를 보내면 학교 행사 상품 도토리가 늘어요.',
+    eff: L => L < 1 ? '학교 행사 보너스 없음' : `학교 행사 상품 +${VP.per * L}%` };
+  const vpLv = () => (S && S.vp) || 0;
+  const vpMaxed = () => vpLv() >= VP.max;
+  const vpCost = () => Math.ceil(softCost(TEA.bear.cost, vpLv() + 1, SOFT.tea) * costScale());
+  const vpMult = () => 1 + VP.per / 100 * vpLv();
 
   // 큰 숫자 줄여 쓰기: 기본은 토스처럼 만, 억, 조. 설정에서 K, M, B로 바꿀 수 있어요
   function fmt(n) {
@@ -5023,7 +5034,39 @@ body{background:radial-gradient(120% 60% at 50% 0%, color-mix(in srgb, var(--pap
           <p class="tnote" hidden></p>
           <button class="cta split small" type="button" data-k="${k}"><span class="lbl"></span><span class="cost">${acornIcon()}<b></b></span></button>
         </div>
-      </article>`).join('');
+      </article>`).join('') + `
+      <article class="tcard vp" data-k="vp">
+        <div class="tav"><svg viewBox="-24 -24 48 48" aria-hidden="true">${AV.hedgehog}</svg></div>
+        <div>
+          <div class="thead"><h3>${VP.name}</h3><span class="chip">${VP.subject}</span><span class="tlv"></span></div>
+          <p class="tdesc">${VP.desc}</p>
+          <div class="teff"><span class="k">지금</span><span class="v now"></span><span class="k k-next">연수 후</span><span class="v next"></span></div>
+          <button class="cta split small" type="button" data-k="vp"><span class="lbl"></span><span class="cost">${acornIcon()}<b></b></span></button>
+        </div>
+      </article>`;   // 1.7.0 고슴도치 교감 선생님은 기존 선생님 밑에
+  }
+  function renderVpCard() {
+    const card = $('.tcard[data-k="vp"]'); if (!card) return;
+    const L = vpLv(), maxed = vpMaxed(), c = vpCost();
+    $('.tlv', card).textContent = `Lv.${L}`;
+    $('.now', card).textContent = VP.eff(L);
+    $('.next', card).textContent = maxed ? '최고 레벨이에요' : VP.eff(L + 1);
+    const btn = $('button', card);
+    $('.lbl', btn).textContent = maxed ? '최고 레벨' : '연수 보내기';
+    $('.cost', btn).hidden = maxed;
+    $('.cost b', btn).textContent = fmt(c);
+    btn.setAttribute('aria-disabled', (maxed || S.budget < c) ? 'true' : 'false');
+  }
+  function vpAct(btn) {
+    if (rt.paused || vpMaxed()) return false;
+    const c = vpCost();
+    if (S.budget < c) { if (btn) shake(btn); return false; }
+    S.budget -= c;
+    S.vp = vpLv() + 1;
+    S.st.trains += 1;
+    toast(`${VP.name} 연수 끝! Lv.${S.vp}, 학교 행사 상품 +${VP.per * S.vp}%`);
+    afterPurchase();
+    return true;
   }
   function renderTeachers() {
     for (const k of Object.keys(TEA)) {
@@ -5043,6 +5086,7 @@ body{background:radial-gradient(120% 60% at 50% 0%, color-mix(in srgb, var(--pap
       $('.cost b', btn).textContent = fmt(c);
       btn.setAttribute('aria-disabled', (maxed || S.budget < c) ? 'true' : 'false');
     }
+    renderVpCard();
   }
   function teacherAct(k, btn, price) {
     if (rt.paused || teaMaxed(k)) return false;
@@ -7502,7 +7546,7 @@ body{background:radial-gradient(120% 60% at 50% 0%, color-mix(in srgb, var(--pap
   const SPORTS = { sec: 40, gap: 2 * 3600000, every: 0.65, ground: 6, cx: 165, cy: 336, rx: 100, ry: 33 };
   const sportsOpen = () => !!S && (S.tier >= 2 || (S.tier >= 1 && S.tg >= 3)) && S.f.playground >= 1;
   const sportsWait = () => Math.max(0, S.sports.next - Date.now());
-  const sportsPrize = win => Math.max(10, nice(rate() * 180 * (win ? 2 : 1)));
+  const sportsPrize = win => Math.max(10, nice(rate() * 180 * (win ? 2 : 1) * vpMult()));   // 1.7.0: 교감 선생님 레벨만큼 더
   function renderSportsBtn() { renderFestBtn(); }
   function renderSportsBtnOld() {
     const b = $('#btnSports'), on = sportsOpen() && !rt.sports;
@@ -7612,7 +7656,7 @@ body{background:radial-gradient(120% 60% at 50% 0%, color-mix(in srgb, var(--pap
     rt.sportsWin = win; rt.prizeName = '운동회';
     $('#srTitle').textContent = win ? '청팀 승리!' : tie ? '무승부!' : '백팀 승리!';
     $('#srScore').textContent = `청팀 ${R.blue} : ${R.white} 백팀`;
-    $('#srText').textContent = win ? `공을 ${R.blue}개나 주웠어요! 이긴 상품으로 수업료 6분치를 받아요.` : `다음에는 공을 더 빨리 주워 봐요. 그래도 수업료 3분치를 받아요.`;
+    $('#srText').textContent = (win ? `공을 ${R.blue}개나 주웠어요! 이긴 상품으로 수업료 6분치를 받아요.` : `다음에는 공을 더 빨리 주워 봐요. 그래도 수업료 3분치를 받아요.`) + `${vpLv() ? ` 교감 선생님 덕분에 +${VP.per * vpLv()}%예요.` : ''}`;
     $('#srPrize').textContent = fmt(sportsPrize(win));
     $('#srArt').innerHTML = `<svg viewBox="-26 -19 52 38" aria-hidden="true">` + ['rabbit', 'fox', 'chick'].map((sp, i) => `<g transform="translate(${(i - 1) * 15} ${i === 1 ? -3 : 1})">${kidSVG(sp, i)}<rect class="band ${win ? 'b' : 'w'}" x="-6.4" y="-4.6" width="12.8" height="2.4" rx="1.2"/></g>`).join('') + '</svg>';
     sfx(win ? 'quest' : 'done'); buzz(20);
@@ -7662,7 +7706,7 @@ body{background:radial-gradient(120% 60% at 50% 0%, color-mix(in srgb, var(--pap
   const festIcon = id => `<svg viewBox="-11 -11 22 22" aria-hidden="true">${FEST_ICON[id]}</svg>`;
   const festOpen = id => !!S && S.f.playground >= 1 && (S.tier >= 2 || (S.tier === 1 && S.tg >= FEST[id].tg));
   const festWait = id => id === 'sports' ? sportsWait() : Math.max(0, (S.fest.next[id] || 0) - Date.now());
-  const festPrize = win => Math.max(10, nice(rate() * 180 * (win ? 2 : 1)));
+  const festPrize = win => Math.max(10, nice(rate() * 180 * (win ? 2 : 1) * vpMult()));
   const festBusy = () => !!(rt.fest || rt.sports);
   // 지도 왼쪽 '학교 행사' 버튼: 열 수 있는 행사 수나, 가장 빨리 열리는 행사까지 남은 시간
   function renderFestBtn() {
@@ -7846,7 +7890,7 @@ body{background:radial-gradient(120% 60% at 50% 0%, color-mix(in srgb, var(--pap
     rt.sportsWin = win; rt.prizeName = F.name;
     $('#srTitle').textContent = win ? `${F.name} 성공!` : `${F.name} 끝!`;
     $('#srScore').textContent = `${R.n}/${F.goal}${F.unit}`;
-    $('#srText').textContent = win ? `${F.win} 상품으로 수업료 6분치와 황금 도토리 1개를 받아요.` : `아깝게 ${F.goal - R.n}${F.unit} 모자랐어요. 그래도 수업료 3분치를 받아요.`;
+    $('#srText').textContent = (win ? `${F.win} 상품으로 수업료 6분치와 황금 도토리 1개를 받아요.` : `아깝게 ${F.goal - R.n}${F.unit} 모자랐어요. 그래도 수업료 3분치를 받아요.`) + `${vpLv() ? ` 교감 선생님 덕분에 +${VP.per * vpLv()}%예요.` : ''}`;
     $('#srPrize').textContent = fmt(festPrize(win));
     $('#srArt').innerHTML = `<svg viewBox="-11 -11 22 22" aria-hidden="true">${FEST_ICON[R.id]}</svg>`;
     sfx(win ? 'quest' : 'done'); buzz(20);
@@ -9419,7 +9463,7 @@ body{background:radial-gradient(120% 60% at 50% 0%, color-mix(in srgb, var(--pap
     $('#furAll').addEventListener('click', () => { const k = rt.sheetKey; if (k && !buyFurAll(k)) shake($('#furAll')); });
     $('#teacherList').addEventListener('click', e => {
       const b = e.target.closest('button[data-k]');
-      if (b) teacherAct(b.getAttribute('data-k'), b);
+      if (b) { const k = b.getAttribute('data-k'); if (k === 'vp') vpAct(b); else teacherAct(k, b); }
     });
     $$('.tab').forEach(b => b.addEventListener('click', () => { setTab(b.dataset.tab); sfx('tap'); }));
     // 1.5.0: 그림 아이콘을 채우고, 아직 열리지 않은 버튼은 알려만 줘요
@@ -9597,7 +9641,8 @@ body{background:radial-gradient(120% 60% at 50% 0%, color-mix(in srgb, var(--pap
   // 학생 11종(기본 5 + 전학생 6)과 선생님 3명. 선생님 열쇠는 학생과 겹치지 않게 tea_를 붙여요(아기곰 학생과 곰 선생님)
   const DEX_TEACHERS = ['squirrel', 'owl', 'bear'];
   const DEX_STUDENTS = BASE_SPECIES.concat(NEWCOMERS.map(n => n.k));
-  const DEX_KEYS = DEX_STUDENTS.concat(DEX_TEACHERS.map(k => 'tea_' + k));
+  const DEX_TEA = DEX_TEACHERS.concat(['hedgehog']);   // 1.7.0: 고슴도치 교감 선생님은 처음부터 등록돼요
+  const DEX_KEYS = DEX_STUDENTS.concat(DEX_TEA.map(k => 'tea_' + k));
   const DEX_NAMES = { rabbit: '토끼', fox: '여우', raccoon: '너구리', chick: '병아리', bear: '아기곰' };
   const DEX_LINES = {
     rabbit: '귀가 길어 숲속 소식을 가장 먼저 들어요. 당근 샐러드를 좋아해요.',
@@ -9613,6 +9658,7 @@ body{background:radial-gradient(120% 60% at 50% 0%, color-mix(in srgb, var(--pap
     otter: '물장구치며 노는 걸 제일 좋아해요. 조개껍데기로 악기를 만들어요.',
     tea_squirrel: '도토리 셈이 숲에서 가장 빠른 수학 선생님이에요. 수업료를 올려 줘요.',
     tea_owl: '밤에도 눈이 반짝이는 과학 선생님이에요. 자리를 비운 동안에도 수업을 이어 줘요.',
+    tea_hedgehog: '교장 선생님 곁에서 학교 일을 하나하나 알려 주는 교감 선생님이에요. 학교 행사를 가장 좋아해요.',
     tea_bear: '숲에서 가장 든든한 체육 선생님이에요. 뱀이나 매가 와도 학생들을 지켜 줘요.'
   };
   // 특별 손님(뱀, 매, 까치, 졸업생): 지도에 나타나면 등록돼요(시련, 까치 핫딜, 졸업생 방문). 앞으로 올 친구 자리는 ??? 잠금 칸이에요
@@ -9624,12 +9670,13 @@ body{background:radial-gradient(120% 60% at 50% 0%, color-mix(in srgb, var(--pap
   const DEX_GUEST_KEYS = DEX_GUESTS.map(g => 'g_' + g.k);
   const dexGuest = k => DEX_GUESTS.find(g => 'g_' + g.k === k);
   const DEX_FUTURE = 3;
-  // 등록 1종마다 황금 도토리 1개. 모으기 보상: 학생 5종 수업료 30분치, 학생 11종 황금 3개, 14종 모두 황금 5개와 기념 그림
-  const DEX_REWARD = { each: 1, goals: [{ key: 's5', who: 'students', need: 5, m: 30, t: '기본 친구 5종 모으기' }, { key: 's11', who: 'students', need: 11, g: 3, t: '학생 11종 모으기' }, { key: 's14', who: 'all', need: 14, g: 5, t: '도감 완성' }] };
+  // 등록 1종마다 황금 도토리 1개. 모으기 보상: 학생 5종 수업료 30분치, 학생 11종 황금 3개, 모두(15종, 열쇠 이름은 예전 그대로 s14) 황금 5개와 기념 그림
+  const DEX_REWARD = { each: 1, goals: [{ key: 's5', who: 'students', need: 5, m: 30, t: '기본 친구 5종 모으기' }, { key: 's11', who: 'students', need: 11, g: 3, t: '학생 11종 모으기' }, { key: 's14', who: 'all', need: DEX_KEYS.length, g: 5, t: '도감 완성' }] };
   const DEX_PAY_KEYS = new Set(DEX_KEYS.concat(DEX_REWARD.goals.map(x => x.key)));
-  const dexName = k => k.startsWith('g_') ? (dexGuest(k) || {}).name || k : k.startsWith('tea_') ? TEA[k.slice(4)].name : (DEX_NAMES[k] || (NEWCOMERS.find(n => n.k === k) || {}).name || k);
+  const dexName = k => k === 'tea_hedgehog' ? VP.name : k.startsWith('g_') ? (dexGuest(k) || {}).name || k : k.startsWith('tea_') ? TEA[k.slice(4)].name : (DEX_NAMES[k] || (NEWCOMERS.find(n => n.k === k) || {}).name || k);
   const dexPicKey = k => k.startsWith('tea_') ? k : 'chr_' + (k.startsWith('g_') ? k.slice(2) : k);
   const dexHow = k => {
+    if (k === 'tea_hedgehog') return '처음부터 학교에 계셔요';
     if (k.startsWith('g_')) return (dexGuest(k) || {}).hint || '';
     if (k.startsWith('tea_')) return `${TEA[k.slice(4)].name}을 모시면 등록돼요`;
     const i = NEWCOMERS.findIndex(n => n.k === k);
@@ -9647,6 +9694,7 @@ body{background:radial-gradient(120% 60% at 50% 0%, color-mix(in srgb, var(--pap
     if (S.st.grads > 0) BASE_SPECIES.forEach(dexMeet);
     NEWCOMERS.slice(0, S.p.species).forEach(n => dexMeet(n.k));
     DEX_TEACHERS.forEach(k => { if (S.t[k] > 0) dexMeet('tea_' + k); });
+    dexMeet('tea_hedgehog');
   }
   // 아직 받지 않은 선물 목록(등록 보상과 모으기 보상)
   function dexPending() {
@@ -9667,7 +9715,7 @@ body{background:radial-gradient(120% 60% at 50% 0%, color-mix(in srgb, var(--pap
     const names = items.map(it => it.t);
     showReward({
       title: big ? '도감을 완성했어요!' : '도감 선물', sub: names.length <= 2 ? names.join(', ') : `${names.slice(0, 2).join(', ')} 등 ${names.length}가지`,
-      art: big ? pic7('dex_complete', 'orn_laurel') : '', big: big ? '14종 모두 모았어요' : '',
+      art: big ? pic7('dex_complete', 'orn_laurel') : '', big: big ? `${DEX_KEYS.length}종 모두 모았어요` : '',
       items: [a > 0 ? { ic: 'acorn', t: `도토리 +${fmt(a)}` } : null, g > 0 ? { ic: 'gold', t: `황금 도토리 +${g}` } : null]
     });
     return true;
@@ -9692,7 +9740,7 @@ body{background:radial-gradient(120% 60% at 50% 0%, color-mix(in srgb, var(--pap
       `<p>${got ? esc(DEX_LINES[pk] || (dexGuest(pk) || {}).line || '') : '아직 만나지 못했어요.'}</p><small>${got ? dexDate(got) : esc(dexHow(pk))}</small></div></div>` : '';
     body.innerHTML = detail +
       `<h4 class="dex-h">학생 <small>${dexCount('students')} / ${DEX_STUDENTS.length}</small></h4><div class="dex-grid">${DEX_STUDENTS.map(dexCard).join('')}</div>` +
-      `<h4 class="dex-h">선생님 <small>${DEX_TEACHERS.filter(k => S.dex.got['tea_' + k]).length} / ${DEX_TEACHERS.length}</small></h4><div class="dex-grid">${DEX_TEACHERS.map(k => dexCard('tea_' + k)).join('')}</div>` +
+      `<h4 class="dex-h">선생님 <small>${DEX_TEA.filter(k => S.dex.got['tea_' + k]).length} / ${DEX_TEA.length}</small></h4><div class="dex-grid">${DEX_TEA.map(k => dexCard('tea_' + k)).join('')}</div>` +
       `<h4 class="dex-h">특별 손님 <small>${DEX_GUEST_KEYS.filter(k => S.dex.got[k]).length} / ${DEX_GUESTS.length}</small></h4><div class="dex-grid">${DEX_GUEST_KEYS.map(dexCard).join('')}</div>` +
       `<h4 class="dex-h">앞으로 올 친구</h4><div class="dex-grid">${Array.from({ length: DEX_FUTURE }, (_, i) => dexLock('숲속 교육부에서 준비 중')).join('')}</div>`;
   }
@@ -9737,7 +9785,7 @@ body{background:radial-gradient(120% 60% at 50% 0%, color-mix(in srgb, var(--pap
     // 줍기와 흔들기는 놀이터가 있어야 해요(없으면 참나무를 눌러도 안내만 나와요). 오늘의 미션도 줍기와 흔들기가 섞여 나와서 놀이터가 있어야 목표를 채울 수 있어요
     picks: { name: n => `떨어진 도토리 ${n}개 줍기`, ok: () => S.f.playground >= 1 }, shakes: { name: n => `참나무 ${n}번 흔들기`, ok: () => S.f.playground >= 1 },
     ups: { name: n => `시설이나 가구 ${n}번 고치기`, ok: () => facKeys().some(k => !facMaxed(k) || FUR[k].some((_, i) => !furDone(k, i))) },
-    trains: { name: n => `선생님 연수 ${n}번 보내기`, ok: () => DEX_TEACHERS.some(k => S.t[k] >= 1 && !teaMaxed(k)) }, claims: { name: n => `자리 비운 도토리 ${n}번 받기` }, dmDone: { name: n => `오늘의 미션 ${n}개 끝내기` },
+    trains: { name: n => `선생님 연수 ${n}번 보내기`, ok: () => DEX_TEACHERS.some(k => S.t[k] >= 1 && !teaMaxed(k)) || !vpMaxed() }, claims: { name: n => `자리 비운 도토리 ${n}번 받기` }, dmDone: { name: n => `오늘의 미션 ${n}개 끝내기` },
     sports: { name: n => `숲속 운동회 ${n}번 열기`, ok: () => festOpen('sports') }, trips: { name: n => `체험학습 ${n}번 다녀오기`, ok: () => tripOpen() }
   };
   const evOk = t => !!EV_MEASURE[t] && (!EV_MEASURE[t].ok || EV_MEASURE[t].ok());
@@ -9917,6 +9965,7 @@ body{background:radial-gradient(120% 60% at 50% 0%, color-mix(in srgb, var(--pap
       BASE_SPECIES.forEach(k => { s.dex.got[k] = s.savedAt; });
       NEWCOMERS.slice(0, s.p.species).forEach(n => { s.dex.got[n.k] = s.savedAt; });
       DEX_TEACHERS.forEach(k => { if (s.t[k] > 0) s.dex.got['tea_' + k] = s.savedAt; });
+      s.dex.got.tea_hedgehog = s.savedAt;
     }
     if (d.ev && typeof d.ev === 'object') {
       s.ev.cur = typeof d.ev.cur === 'string' ? d.ev.cur.slice(0, 40) : '';
@@ -10024,7 +10073,7 @@ body{background:radial-gradient(120% 60% at 50% 0%, color-mix(in srgb, var(--pap
   // 시험용 손잡이: 자동 시험(window.__FOREST_TEST)에서만 게임 속 함수를 꺼내 써요
   if (window.__FOREST_TEST) window.__forest = { get S() { return S; }, get Cloud() { return Cloud; }, rt, makeDeal, furStage, DEAL, navInfo, navRoute, spawnDrop, repTipCheck, linkGoogle, retryCloud, sanitize, acctPending, renderMap, renderHUD, renderAffordance, syncKids, layoutMap, geo, startTrial, hitTrial, endTrial, startVisit, endVisit, showReward, recommend, needCost, prepTopUp, qReward, prepPhase, rankScore, pwOf, previewDip, dipMult, costScale, buyFacility, buyFur, buyFurAll, furCost, furReady, furDone, FUR, startTalk, endTalk, teacherAct, facCost, teaCost, facKeys, rate, rep, capacity, canGraduate, canPromote,
     fmt, fmt2, graduate, promote, buyPerk, perkCost, perkMaxed, buyFundPerk, fpCost, claimMain, mainReady, curMain, qNo, earn, CFG, TEA, teaMaxed, PERKS, FPERKS, MAIN, finalYear, startTrip, claimTrip, TRIPS, yearLocked, startSports, endSports, rtSports: () => rt.sports, startFest, rtFest: () => rt.fest, facCap, addLeague, weekIdx, addMP, tutStart, endFest, claimSports, claimBox, musicWant, askBox, festWait, setTab, openSheet, closeSheet,
-    dexMeet, dexSync, dexPending, dexGift, renderDex, evCurrent, evNext, evSync, claimStamp, claimEvMission, claimEvBox, renderEvent, evMissions, evOk, evSkipped, EV_MONTHS, EV_MEASURE, tierMinutes, minAcorns, sanitize170, EV_STAMPS, EV_SPECIAL, EV_MONTHLY, EV_BOX, DEX_KEYS, DEX_REWARD, DEX_GUEST_KEYS, bldImg, roofKey, bldStage, mapKey, setMapArt, applyThemes, buyFacility, startTrial, endTrial: () => rt.trial && (rt.trial.left = 0), spawnDeal, startVisit, IMG170,   // 1.7.0 도감, 이벤트
+    dexMeet, dexSync, dexPending, dexGift, renderDex, evCurrent, evNext, evSync, claimStamp, claimEvMission, claimEvBox, renderEvent, evMissions, evOk, evSkipped, EV_MONTHS, EV_MEASURE, tierMinutes, minAcorns, sanitize170, EV_STAMPS, EV_SPECIAL, EV_MONTHLY, EV_BOX, DEX_KEYS, DEX_REWARD, DEX_GUEST_KEYS, VP, vpLv, vpCost, vpMult, vpAct, renderVpCard, sportsPrize, festPrize, renderTeachers, buildTeacherCards, bldImg, roofKey, bldStage, mapKey, setMapArt, applyThemes, buyFacility, startTrial, endTrial: () => rt.trial && (rt.trial.left = 0), spawnDeal, startVisit, IMG170,   // 1.7.0 도감, 이벤트
     PZ, PZ_SHAPES, pzFits, pzAnyFit, pzStuck, pzFullLines, pzPlace, pzFreshGame, pzStart, pzFinish, pzLeft, pzCanAd, pzEssOf, pzMinOf, pzHelpSquirrel, pzHelpOwl, pzHelpBear, fillSubs, mapRoofTop, showAd, claimOfflineDouble, startBoost, tripAd, festFocus, festRange, visMap, renderMissions, pzHasHelp, pzRot, pzNewPiece, pzOpen, pzClose, pzGameOver, pzRenderAll, renderMini, addEss, ESHOP, SP_FUR, applyCos, essItem, pickEss, buyEss, renderEssShop, esAcornLeft, esGoldLeft, esAcornAmt, hatSVG, spFurImg, gameNow, gameToday, gameWeek, kstDay, setServerTime, SVR, dmDay, weekIdx, lgWeek, wkWeek, lgKey, pzDay, goldDay, boostLeft, dealLeft, canStamp };
   if (window.claude && window.claude.hot && window.claude.hot.snapshot) {
     try { window.claude.hot.snapshot(() => { if (S) syncMid(); return { save: S }; }); } catch (e) { /* 무시 */ }
