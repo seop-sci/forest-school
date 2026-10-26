@@ -1,5 +1,7 @@
 # 1.5.0, 1.6.0 그림 넣기: PNG 원본 폴더를 받아 webp로 줄이고, forest-school.html 안의 그림 묶음(window.FS_IMG)을 새로 써요.
 # 쓰는 법: python3 embed_assets.py <원본 폴더> [<원본 폴더2> ...]
+#   1.7.0 그림은 따로 둔 묶음(window.FS_IMG170)에 넣어요: python3 embed_assets.py --block 170 <도감> <이벤트> <특별 손님> <테마 지도> <2단계 건물> <2단계 지붕>
+#   (특별 손님 chr_은 chr_ 규칙, 테마 지도 map_kinder_spring 등은 map_ 규칙, 학교급별 건물 bld_*_s2와 지붕 roof_*_s2는 bld_, roof_ 규칙)
 #   폴더 안의 파일 이름(확장자 뺀 것)이 그대로 열쇠가 돼요. 예: map_kinder, bld_classroom_on, ic_home
 # 원본 PNG는 저장소에 넣지 않아요(1차 에셋 zip, art/v150-assets 브랜치). 게임은 한 파일로 돌아가야 해서 그림을 글자로 바꿔 넣어요.
 import base64, io, pathlib, re, sys
@@ -7,10 +9,14 @@ from PIL import Image
 
 HERE = pathlib.Path(__file__).resolve().parent
 SRC = HERE / 'forest-school.html'
-BEGIN, END = '<!-- FS_IMG:BEGIN -->', '<!-- FS_IMG:END -->'
+BEGIN, END, VAR = '<!-- FS_IMG:BEGIN -->', '<!-- FS_IMG:END -->', 'FS_IMG'
+# 1.7.0 묶음(--block 170): 1.6.0 퍼즐 그림과 같은 묶음을 고치지 않게 따로 둬요
+BLOCKS = {'170': ('<!-- FS_IMG170:BEGIN -->', '<!-- FS_IMG170:END -->', 'FS_IMG170')}
 
 # 열쇠 앞부분마다 줄일 크기(긴 변 픽셀)와 화질
 RULES = [
+    ('map_kinder_', 720, 55),   # 1.7.0 테마 지도 10장: 파일이 너무 커지지 않게 기본 지도보다 화질을 낮춰요
+    ('map_elem_', 720, 55),
     ('map_', 720, 70),
     ('bld_', 400, 80),
     ('ic_', 112, 86),
@@ -22,6 +28,15 @@ RULES = [
     ('fur_', 200, 78),
     ('roof_', 400, 80),
     ('oak', 300, 80),
+    # 1.7.0 도감, 이벤트 (자세한 것을 먼저 적어요)
+    ('dex_unknown', 220, 80),
+    ('dex_card', 400, 80),
+    ('dex_complete', 400, 80),
+    ('dex_', 720, 78),
+    ('ev_stamp', 112, 84),
+    ('ev_box', 220, 82),
+    ('ev_wait', 400, 80),
+    ('ev_', 720, 75),
     # 1.6.0 블록 퍼즐
     ('pz_bg', 720, 70),
     ('pz_board', 640, 80),
@@ -64,7 +79,8 @@ def encode(path):
     return key, 'data:image/webp;base64,' + base64.b64encode(buf.getvalue()).decode()
 
 
-def main(dirs):
+def main(dirs, block=''):
+    BEGIN, END, VAR = BLOCKS.get(block, ('<!-- FS_IMG:BEGIN -->', '<!-- FS_IMG:END -->', 'FS_IMG'))
     imgs = {}
     for d in dirs:
         for p in sorted(pathlib.Path(d).glob('*.png')):
@@ -81,9 +97,11 @@ def main(dirs):
             old[k] = v
     old.update(imgs)   # 이번에 준 폴더의 그림만 바꾸고, 전에 넣은 그림은 그대로 둬요
     body = ',\n'.join(f'"{k}":"{v}"' for k, v in sorted(old.items()))
-    new = f'{BEGIN}\n<script>window.FS_IMG={{\n{body}\n}};</script>\n{END}'
+    new = f'{BEGIN}\n<script>window.{VAR}={{\n{body}\n}};</script>\n{END}'
     if BEGIN in src:
         src = src[:src.index(BEGIN)] + new + src[src.index(END) + len(END):]
+    elif block:
+        sys.exit(f'{BEGIN} 표시가 없어요')
     else:
         at = src.index('\n<script>\n') + 1
         src = src[:at] + new + '\n' + src[at:]
@@ -93,6 +111,12 @@ def main(dirs):
 
 
 if __name__ == '__main__':
-    if len(sys.argv) < 2:
+    args = sys.argv[1:]
+    block = ''
+    if args[:1] == ['--block'] and len(args) >= 2:
+        block = args[1]; args = args[2:]
+        if block not in BLOCKS:
+            sys.exit('아는 묶음은 ' + ', '.join(BLOCKS) + '뿐이에요')
+    if not args:
         sys.exit('원본 폴더를 적어 주세요')
-    main(sys.argv[1:])
+    main(args, block)
