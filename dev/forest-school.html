@@ -1520,6 +1520,77 @@ body{background:radial-gradient(120% 60% at 50% 0%, color-mix(in srgb, var(--pap
 .ev-up li span:last-child{color:var(--muted);white-space:nowrap}
 .rw-art img,.rw-art .p7{width:88px;height:88px;object-fit:contain}
 /* ===== 1.7.0 도감, 이벤트 END ===== */
+/* ===== 1.8.0 숲속 합치기 BEGIN ===== (블록 퍼즐 장면(.pz)의 틀을 같이 써요. 그림이 오기 전에는 색 조각과 그림 문자로 보여요) */
+.mg .pz-bg{background:#86A866 var(--mg-bg, none) center/cover no-repeat}
+.mg-top{display:flex;align-items:stretch;gap:6px;flex:none}
+.mg-stat{flex:1 1 0;min-width:0;overflow:hidden;display:flex;align-items:center;justify-content:center;gap:4px;padding:5px 5px;border-radius:14px;background:rgba(44,74,61,.86);box-shadow:0 3px 0 rgba(0,0,0,.3);color:#FFF7E6;font-family:var(--font-display);font-size:15px;line-height:1.1;white-space:nowrap}
+#mgEnergy{flex:1.9 1 0}
+.mg-stat b{font-size:19px;color:#FFE9A8}
+.mg-stat small{font-family:var(--font-body);font-size:11px;color:#CFE0C8}
+.mg-stat .mg-ic{width:20px;height:20px;flex:none;display:inline-grid;place-items:center;font-size:16px;background:var(--mg-ic) center/contain no-repeat}
+.mg-stat .mg-ic.has-img{font-size:0}
+.mg-ad{flex:none;border:0;border-radius:14px;padding:0 8px;background:#F3B92E;color:#3A2905;font-family:var(--font-display);font-size:13px;line-height:1.1;box-shadow:0 3px 0 #C68F14;cursor:pointer;white-space:nowrap;display:flex;flex-direction:column;align-items:center;justify-content:center}
+.mg-ad small{font-family:var(--font-body);font-size:10px;opacity:.8}
+@media (max-width:380px){.mg-stat{font-size:14px;gap:3px;padding:4px 4px}.mg-stat b{font-size:17px}.mg-stat small{font-size:10px}.mg-ad{font-size:12px;padding:0 6px}}
+.mg-ad[aria-disabled="true"]{background:#B9BFAE;color:#5F6B55;box-shadow:0 3px 0 #8F968A}
+.mg-orders{flex:none;display:grid;grid-template-columns:repeat(3,1fr);gap:6px}
+.mg-order{display:flex;flex-direction:column;align-items:center;gap:3px;padding:6px 4px 5px;border:0;border-radius:14px;background:rgba(255,247,230,.94) var(--mg-order-light, none) center/100% 100% no-repeat;color:#26301E;font:inherit;cursor:pointer;box-shadow:0 3px 0 rgba(0,0,0,.25);text-align:center;position:relative}
+.mg-order.ok{background:#FFF0C2;box-shadow:0 0 0 2px #F3B92E, 0 3px 0 rgba(0,0,0,.25)}
+.mg-order .mo-who{width:28px;height:28px;border-radius:50%;background:#E9F0DA var(--mo-img) center/80% no-repeat}
+.mg-order .mo-it{display:flex;align-items:center;gap:3px;font-size:12px;line-height:1.2}
+.mg-order .mo-it .mg-tile{width:26px;height:26px;border-radius:7px;font-size:14px}
+.mg-order .mo-it .mg-tile b{font-size:8px;padding:0 3px}
+.mg-order .mo-n{font-family:var(--font-display);font-size:14px;color:#4F6A3A}
+.mg-order .mo-rw{font-size:11px;color:#5F6B55;display:flex;align-items:center;gap:2px}
+.mg-order .mo-rw svg{width:11px;height:11px}
+.mg-order .mo-swap{position:absolute;top:-6px;right:-4px;width:20px;height:20px;border-radius:50%;border:0;background:#4F6A3A;color:#FFF7E6;font-size:12px;line-height:20px;cursor:pointer;display:grid;place-items:center}
+.mg-order .mo-swap[hidden]{display:none}
+.mg-mid{flex:1 1 auto;min-height:0;display:flex;align-items:flex-start;justify-content:center;overflow-y:auto;overscroll-behavior:contain;scrollbar-width:none}
+.mg-mid::-webkit-scrollbar{display:none}
+.mg-board{position:relative;width:100%;max-width:400px;aspect-ratio:8/10;padding:3.5%;border-radius:16px;background:#C9A26A var(--mg-board, none) center/100% 100% no-repeat;box-shadow:inset 0 0 0 4px #8F6A3D, 0 6px 10px rgba(0,0,0,.28);touch-action:none}
+.mg-grid{position:relative;width:100%;height:100%;display:grid;grid-template-columns:repeat(8,1fr);grid-template-rows:repeat(10,1fr);gap:2px;background:rgba(255,246,220,.55);border-radius:10px;padding:2px}
+.mg-cell{position:relative;border-radius:18%;background:rgba(255,255,255,.28)}
+.mg-cell.over{background:rgba(255,233,168,.9);box-shadow:inset 0 0 0 2px #F3B92E}
+.mg-cell.sel .mg-tile{box-shadow:0 0 0 2px #FFF7E6, 0 0 0 4px #F3B92E}
+.mg-cell.new .mg-tile{animation:mgPop .32s cubic-bezier(.3,1.6,.5,1)}
+.mg-cell.merge .mg-tile{animation:mgMerge .42s ease}
+@keyframes mgPop{from{transform:scale(.3)}}
+@keyframes mgMerge{0%{transform:scale(.7)}55%{transform:scale(1.22)}100%{transform:scale(1)}}
+.mg-tile{position:absolute;inset:4%;border-radius:20%;display:grid;place-items:center;font-size:clamp(14px, 5.2vw, 24px);line-height:1;user-select:none;-webkit-user-select:none;background:var(--mg-c, #FFF4D6) var(--mg-img, none) center/86% no-repeat;box-shadow:inset 0 -3px 0 rgba(0,0,0,.14), 0 1px 2px rgba(0,0,0,.25)}
+.mg-tile.has-img{font-size:0;background-color:transparent;box-shadow:none}
+.mg-tile b{position:absolute;right:-2px;bottom:-2px;min-width:14px;padding:0 4px;border-radius:8px;background:#2C4A3D;color:#FFF7E6;font-family:var(--font-display);font-weight:400;font-size:10px;line-height:15px;text-align:center}
+.mg-tile.lv10 b{background:#C68F14;color:#2B1E03}
+.mg-tile.gen{background-color:#8F6A3D;box-shadow:inset 0 0 0 2px #FFE9A8, 0 2px 3px rgba(0,0,0,.35)}
+.mg-tile.gen .mg-stars{position:absolute;left:0;right:0;top:-3px;text-align:center;font-size:9px;line-height:1;color:#FFE27A;letter-spacing:-1px;text-shadow:0 1px 0 rgba(0,0,0,.5)}
+.mg-tile.gen.tired{filter:saturate(.5) brightness(.8)}
+.mg-drag{position:fixed;z-index:30;width:52px;height:52px;pointer-events:none;transform:translate(-50%,-50%) scale(1.15);filter:drop-shadow(0 6px 8px rgba(0,0,0,.4))}
+.mg-drag .mg-tile{position:absolute;inset:0}
+.mg-foot{flex:none;min-height:54px;display:flex;align-items:center;gap:10px;padding:6px 10px;border-radius:16px;background:rgba(255,247,230,.94);color:#26301E;box-shadow:0 3px 0 rgba(0,0,0,.25)}
+.mg-foot .mg-tile{position:relative;inset:auto;width:40px;height:40px;flex:none}
+.mg-foot .mf-tx{flex:1;min-width:0;display:flex;flex-direction:column;gap:1px;font-size:12.5px;line-height:1.25;color:#5F6B55}
+.mg-foot .mf-tx b{font-family:var(--font-display);font-weight:400;font-size:15px;color:#26301E}
+.mg-foot .mf-btn{flex:none;min-height:36px;padding:0 12px;border:0;border-radius:11px;background:#F3B92E;color:#3A2905;font-family:var(--font-display);font-size:14px;box-shadow:0 3px 0 #C68F14;cursor:pointer;white-space:nowrap}
+.mg-foot .mf-btn.sub{background:#DCEAC4;color:#2F4A22;box-shadow:0 3px 0 #B9CBA2}
+.mg-foot .mf-btn[aria-disabled="true"]{background:#D6DEC6;color:#8A9480;box-shadow:0 3px 0 #B8C2A9}
+.mg-float{position:absolute;z-index:3;pointer-events:none;font-family:var(--font-display);font-size:14px;color:#FFF7E6;text-shadow:0 1px 0 #2C4A3D, 0 0 4px rgba(0,0,0,.6);animation:mgFloat 1s ease-out forwards}
+@keyframes mgFloat{to{transform:translateY(-28px);opacity:0}}
+.mg-help{display:grid;gap:10px}
+.mg-help .mh{display:flex;align-items:center;gap:10px;text-align:left;font-size:14px;line-height:1.4}
+.mg-help .mh .mh-pic{flex:none;width:64px;height:48px;border-radius:12px;background:#E9F0DA var(--mh-img, none) center/contain no-repeat;display:grid;place-items:center;font-size:22px}
+.mg-help .mh .mh-pic.has-img{font-size:0}
+.mg-help .mh b{display:block;font-family:var(--font-display);font-weight:400;font-size:15px;color:#4F6A3A}
+.mg-up{text-align:center}
+.mg-up .mu-row{display:flex;align-items:center;justify-content:center;gap:8px;margin:6px 0 10px;font-size:14px}
+.mg-up .mu-row .mg-tile{position:relative;inset:auto;width:44px;height:44px}
+.mg-up table{width:100%;border-collapse:collapse;font-size:12.5px;margin:0 0 10px}
+.mg-up td,.mg-up th{padding:3px 4px;border-bottom:1px solid #D6DEC6;text-align:center}
+.mg-up th{font-weight:400;color:#5F6B55}
+.mg-up tr.now td{background:#FFF0C2;font-weight:700}
+.mini-card .mg-thumb{flex:none;width:52px;height:52px;border-radius:12px;display:grid;place-items:center;font-size:26px;background:#DCEAC4 var(--mg-card, none) center/cover no-repeat;box-shadow:inset 0 0 0 2px rgba(0,0,0,.08)}
+.mini-card .mg-thumb.has-img{font-size:0}
+@media (max-height:700px){.mg-board{max-width:360px}}
+:root[data-theme="dark"] .mg-order{background-image:var(--mg-order-dark, none)}
+/* ===== 1.8.0 숲속 합치기 END ===== */
 </style>
 
 <div class="boot" id="boot" role="status" aria-label="숲속 동물 학교를 여는 중이에요">
@@ -1817,7 +1888,7 @@ body{background:radial-gradient(120% 60% at 50% 0%, color-mix(in srgb, var(--pap
           <span id="pzLeftTxt">오늘 보상 판 10번 남음</span>
           <button class="btn-sub small" type="button" id="pzAdBtn" hidden>광고 보고 3판 더</button>
         </div>
-        <div class="mini-card"><span class="tic" data-ic="ic_essence" aria-hidden="true"></span><span class="mc-txt"><b>머지 게임</b><small>숲속 교육부에서 열심히 준비 중이에요</small></span><span class="mini-soon">준비 중</span></div>
+        <button class="mini-card mini-go" type="button" id="mgOpen"><span class="mg-thumb" aria-hidden="true">🌰</span><span class="mc-txt"><b>숲속 합치기</b><small id="mgCardSub">에너지 100/100</small></span><span class="mini-play" id="mgCardTag">하기</span></button>
         <div class="mini-card"><span class="tic" data-ic="ic_rank" aria-hidden="true"></span><span class="mc-txt"><b>동물 대결</b><small>숲속 교육부에서 열심히 준비 중이에요</small></span><span class="mini-soon">준비 중</span></div>
       </div>
     </section>
@@ -1952,6 +2023,42 @@ body{background:radial-gradient(120% 60% at 50% 0%, color-mix(in srgb, var(--pap
     <p class="need" id="sheetNeed">&nbsp;</p>
   </section>
 </div>
+
+<!-- ===== 1.8.0 숲속 합치기 BEGIN ===== 미니게임 2. 블록 퍼즐처럼 화면 전체를 덮는 장면이에요. 안쪽은 mgRenderAll()이 그려요 -->
+<div class="pz mg" id="mgScene" hidden role="dialog" aria-modal="true" aria-label="숲속 합치기">
+  <div class="pz-bg" aria-hidden="true"></div>
+  <div class="mg-top">
+    <button class="pz-x" type="button" id="mgBack" aria-label="미니게임으로 돌아가기"><svg viewBox="0 0 24 24" width="20" height="20" aria-hidden="true"><path d="M15 5l-7 7 7 7" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"/></svg></button>
+    <div class="mg-stat" id="mgEnergy" aria-live="polite"><span class="mg-ic" data-mg="mg_ic_energy">⚡</span><b id="mgE">100</b><small id="mgEMax">/100</small><small id="mgETimer"></small></div>
+    <div class="mg-stat" id="mgPieces" title="장식 조각"><span class="mg-ic" data-mg="mg_ic_piece">💎</span><b id="mgPc">0</b></div>
+    <div class="mg-stat" id="mgUps" title="생산기 강화 조각"><span class="mg-ic" data-mg="mg_ic_up">🔑</span><b id="mgUp">0</b></div>
+    <button class="mg-ad" type="button" id="mgAdBtn">광고 +50</button>
+  </div>
+  <div class="mg-orders" id="mgOrders" aria-label="학생 주문"></div>
+  <div class="mg-mid">
+    <div class="mg-board" id="mgBoard">
+      <div class="mg-grid" id="mgGrid"></div>
+    </div>
+  </div>
+  <div class="mg-foot" id="mgFoot"><div class="mf-tx"><b>숲속 합치기</b><span>생산기를 눌러 조각을 만들고, 같은 조각 둘을 겹쳐요</span></div></div>
+  <div class="pz-sheet" id="mgHelp" hidden>
+    <h3>숲속 합치기</h3>
+    <div class="mg-help">
+      <div class="mh"><span class="mh-pic" data-mg="mg_help_1">👆</span><span><b>1. 생산기를 눌러요</b>에너지 1을 쓰고 조각이 하나 나와요. 에너지는 1분에 1씩 차요</span></div>
+      <div class="mh"><span class="mh-pic" data-mg="mg_help_2">🌰🌰</span><span><b>2. 같은 조각 둘을 겹쳐요</b>끌어다 놓으면 다음 단계가 돼요. 종류마다 10단계까지</span></div>
+      <div class="mh"><span class="mh-pic" data-mg="mg_help_3">📜</span><span><b>3. 학생 주문을 채워요</b>위쪽 주문 쪽지를 누르면 도토리와 장식 조각을 받아요</span></div>
+    </div>
+    <button class="cta" type="button" id="mgHelpOk">시작하기</button>
+  </div>
+  <div class="pz-sheet mg-up" id="mgUpSheet" hidden>
+    <h3 id="mgUpTitle">생산기 강화</h3>
+    <div class="mu-row" id="mgUpRow"></div>
+    <table id="mgUpTable"></table>
+    <p class="pz-endsub" id="mgUpNote"></p>
+    <div class="btn-row"><button class="btn-sub" type="button" id="mgUpNo">닫기</button><button class="cta" type="button" id="mgUpYes">강화하기</button></div>
+  </div>
+</div>
+<!-- ===== 1.8.0 숲속 합치기 END ===== -->
 
 <!-- 1.6.0 미니게임 1: 블록 퍼즐. 창이 아니라 화면 전체를 덮는 장면이에요. 보상 창(z-index 30)은 이 위에 떠요 -->
 <div class="pz" id="pzScene" hidden role="dialog" aria-modal="true" aria-label="블록 퍼즐">
@@ -2498,6 +2605,8 @@ body{background:radial-gradient(120% 60% at 50% 0%, color-mix(in srgb, var(--pap
 "roof_science_winter":"data:image/webp;base64,UklGRhJOAABXRUJQVlA4WAoAAAAQAAAAjwEAjwEAQUxQSH0pAAAB0H//v+S0keZ/QQgs02kns+9aQAIkCyQ5Do7Hjsk+c2jhJYvBWdz7np59Ju1xn9kng0znON1xmTY4PQ4exx1jGy0WwgEBkojjdLezn8aASrtUdfVTnVP3e2/dKlWBZ3keIoIabb1h2wZS1UZzYse2SODDhw/0fm75b8e26b9t+m+b/tum/7bpv236b5v+212lme0ej93034j/5gty0SjXt/W/B/9q7+eiiRQviivnH7nr3k32LisYEq3ArB6v1xccnedFJOFt9a57N+0/PXnS99jpSHjYLpszFI7H5e8HZ+7Od9vry4XpF84tC6XIg64d/iM3SgiBM/Tdcjdt7slC9ea/LSEJzb7wWiSeyJQl5W11Ithuuos+DEdTv/qwLEn1W/+WrlTS/3arzrDn5++q79EaeDEt4Fe78EFZEm588x2BwSR0d3yPZnyX8va5w2lJtvKHBUnixw+O81S7q/7xjn5uctgmm53jsb1/8n2pnj78ewOp+t35bgvNrq1NuvGNr9Vkq98cxnZw+84Ekpj3lrtbf+7y2trciFO2zrEc/vrdd8vyF1xnII4k5r3P+Pdj7bKbNjB/bpIb2NXt9XY/dPxD/PUrqYokCRH/TnaTVk7b1oHn6vT+jWu3drX/3pNnovHpG+9VZLt14qdJXixNqbLaVbfRzRMuLL9u28D+o+WR8ysiiQLkLxw+yEXDwy4VX4jrwGvgT4i1sGcDM/vpFeqrHN99r0MGM5u7GU3kUzHjj1HNwRSqRTYy80QEmtXTQy4zfjReBkP4DBfsMf4c7hzlpSxn36CM4RWvF5MhG5vlU4koPmNeB4b1YFKsp4LmDfGAxNzt7NplN8PVKokrE0Gfx25eD7xdU99EXhJiPRscxI9vKfKpRPTsd85eGQYHO8dTbxHj+izrhbfr5FYk/PUGlwKLxuPxKBf0eRz3OiCKtsUcTNVJ9HKCbbLyTGFv15DnkISS/eYNLkXs8Xq98iio6M0iCrpvYYw+akb0di2PyOckftS50SI41Buu4ewXeyZzymhmag9OrEmSlD7YsnFbfuIRi5pM/7DNYGf7uPm8JFvmcOtGa5RvRMmgRR0TxnBnV4ihe6LPtDEzK0RxmXOqAnUNeFYnUOq6AIo3zt2Lyp40k3vdZ9Hgl9UbtdVs7wFnSRMaC9Os36C4CfCFmUBdHJN6PVaVv2w4IgdFuqJnxlJ5OmQU967j089UXmfhiTcuYswmHgm1qUPiS8Ly63b9/AvTMyV5ox/WcysWJt36c/cQqsz2m1U+uNpUj47+pQDhIYRTDev5F1NTwzZdop7ZUadKnzB/YcAHotuGcvohdRnRz/CpRDy6vqclrZiarUtDyWCrKp+wlPn7c1GI/njxBt4SWnsOXJROXSZAilE8Z1LT9hv7vSjg/+DCo/wqFDK+xwp8Qi785olMBaKjcbwRbwmlje2ZMNsBpZ+LpXiRQl2mIXjt5nXbu7Yq/OBtrlBYvid9ZWnwnYWHbQreXDwOH4nJ8ccvTRVgJgeBjXhL0DfwINnKjgClX2Tkya7bVHL78GXaU+wMTXKHnk+Wi2GP7rJmqDjpVvDmECoRWFrH2VUmoqviVgp7lK5GUHYESQQbCY/c2tW5N7ZKPsUm55FkiU8vlSWU8OvNQAJE4SEBF5gK8/DpTF5S3BjiFxP9aqSzaTaKOgtn6Mr48ZtlIlRr2s8tYro8HrFSwWY9ZTGrn1Xxb2JWMBqE4pkqifz86MHDF/IqDQAQqq5G8sGsrdsEWatvKFnK3c4ViYOLWxbx3IH3LNdmtnp2NPg+bSQL5tMLH1SLkR6lEBWwJslJLMr1t7e0BueROiPyosyPi08lEgARyE2s139sw5FMGU/xUXDa6pMrrATwbPIiKk52u4bDePZudN4cWOVWEt9SCcK5Q2EVm10BnwNftO5z7H8Rg6onLLD/C3vVPhkxEyqzQcv6zQOuYrbQUZ8VXhyJGwns4IKJITzs6r68VpSZEo0FeAfSMIH8i+MPd1sZIE7y6rH7ApCw5Hv5QxXGc3ZsFYopxjj97WaAKEfCGBVazw8oESCulNz7Lz/kxQFgsx3/bLOtQQfGBHLh0p9uJ30yj5Xw55vocIQd38tIqiTmbheYjJj2bKFkntmNMxOAKhFKr9enj6brIvE93ngtN9apEI6C03r55rXzj1pg5UqU4a3lvry6eqXX5e7Ycy27Nj/+0sUVlqmJdDQdGMNXdMfFlQ2kbDWQEEXiEEjUilfcugNrvHFEu3ScFsfJOV4sRXoIZAAiMpa24anwqYOnrpz97tmrXL/rNx/hcAk9dSPgYUqOixcVwtUNRYnCEy5WUkcDXq83cDSVlWmOCmCm3pCBee7JvlgFj3gDFogMQETmkd/qDOzsPZosrrwJuZQWz6HRaJzcYIhDg4dNWICCDudgaGxjKdH9DEAiiUx2cbCdGLUUnIeGn6YiWZe+n0FEKp1ABpAorEwceOD+3qcuYgajn3Qrur2UDUAAIOtJRcs0gDvX9dukqgQQEvFt2aKjA52gRzm5tFQmUunkWwTVpXxqZjqRylMyiG2hyyHnRq5W1DsDL51y8qRNf2C/neMV5vyb/3ETyVa64oYueOXWwq2KVBcrFURxFVqDs9mwZ8vGvbUegKFJPT3YrsfI6mpNom+3/uFKFr/jQvZtIET9+JU/e+VjSSrh6xVMaL9u7xm4kKvFvRu3QFDPAIFVyeeokLVeD1Ih9mpkrZg84mxuwxAOOJRRJfnCi+DNyJ87fCqaykmVDftg6SM5IOVMVIm3qNPTkpR9+8/GroScNIgTicVM9KRnVwQ7FZX0v6YrdSmXDNk2XiNjOgGAlmhhyKfTaNqvWBEvTj/cJc+KNKtXkkM+m9k+HEnMzr9358MyiJAcG7WswBwvCLkPypjn0GGEujo4Ox68lxhBs8R4AH04q3fP0W//+y9qUCNqA5cVSMXGX05VyrP9zbp9r1HqTmkJfFCXYu6frSBUSdLGg45TM8kMX9NE/mZDkxUI+ly+kbCekVhT3/k1xZ0o9m0LReLxyMmOpi2E7QjzqZfHr23Y8lAEtGsmyUX63VrkYhymYniS2GL/vJ3El/2RtdjeTrcc6W+wm0GL1SQVzFG7PDg88psOzw5fkJscthM0m7vb3cmB2zAzq32RwsrFl85GMSTZY4VUAplmc3ergtoHpT3YzOQcStelwu2ciIpTu5oxQuYbSq5NujeusH99GHJa+gheEFI2E+bR0PIyPkBxzBTWOPvGVRQ9GXJqUKVrgLyqyU4RaqYbYKlQiKxvyd80nUjxAmDhb1gzxnIRBxbqcJooIIAaRsgc8HupDEf3ZIkSnz79SKwEGE655EjbRiV62Z9EzIAYSTCcwDNKKdJjHBXOniDxxqMgEwT/Gs3s3ZNABP3aoUNSOuG8rwOaOgAwnvIw3z4BMUxjCb2YqQMzQasAOs719LFjGFouL57ps+jproi8HpCxsK4bAYcQ8bDfnsao0jp8tersfeEfSlbEIky9LL3oBX/a9HRX7smCkAWsfsO7txN5ss5Y6RVsAtzbfOMq+2zD+otLnKFopijWJWzHHrDD3KQu7orirAhCuSQTCo2vIKdch28bBgnxDg5zbxtY+eq+/Ollt94uY6tPPokQAjjziM/lG7iQle9KZ9I7xj/0xADCXp0LWmiv4PLsYCAwtIAY4nTtD/p7mE6MauLBol5K/u14LJUXUsFmvUnvWA2fjgcZwfL8SBs90SJzinAbBAbT/DS4HcH3AbwrrS5jq4eNGkTtJTOxUsum07yIHb3eLTrHWI0nqnMhD8kR9Di0fRBzitgY6w3JEYzc/zjgwwFeYosWVV8EtI8LGkxq4rBrY3+3IEiQXe7Y6gCFxhsCIMDN59nIEb6YwMpYb0QO7c7C9y9hPAzydvtMzBGH4z4HPE2mvkReVUWhye52BUYBWFDOxLgn9lzRDSfQ6jHqKTr+AWJQezN9HrefXmFlrDckx/yrD2j89xXOyTgZhSPwNaelholQ06eG1Gjej4nBdakuLJ8NvtrYA0vVqoHVLsmhxtYMqkTVpAklqVFCk+2DKcolzizx1H4kWcEKHAwkMKDdAUbMNsZBHgI6gli81uvSy2nPVAnhOlaDy5KhxP1m+W4nP7vsVkgTMn2tmb+sZsjNTzB0ULCdTJYlSQh7KAe5xo1etCvycz/0OqHPxQjohIft+rowspzd4CbEHnTBdJ+NjhbMVRUtfbBZU3+ZPupRtzWG23jCFSUfpfWJ8Xfey9P1AiqJ51+LgJjEzgQY7NDTRNMxxgO42uC2MhZ8NRwB6T7q1jaSzDOYduGnMkoqSWpu408geNETgYfXt++5b554+525+VsVUIJL9L3CDHI5Yd9l1TExYYt979+lFqJGLp8LJGRbPf/E3kixcLWHhX23pvyF+p9NxpMM+V+l2yjzkYGP0tIMA/P4dGL2nbdPfPub33nlw8J7N2bSeUkqf1QGnszN4+OyhLA+iTu4mtE+HFlMDPqshswOgmsgcDSNcBuvz3eH87KiFZv+qnZhD/nzIN7CAswp3cZCK0x0wMBLiPm2OF5fptRR5d+blw+F2yce2/PUhRVBqBGc/g9wrbcui5x4ub7U3XtlNRumBBxNWml66gokSmSKxQWZP0XozKmnmqC4VwOcTBvGyhqR6Y2GQ52u0Bx4k6yOdTb7FTwOAI8V3n5m9wMHzsRm52+VEflu9MI+ZfqaLkRJ5OdOfUHBW+/gDKV56+TwNSCh9JDTROgwsmZklEwD4Esjxko+lcCZXrEy+1TfNfCHv/rSvvuPppnaIqajr/b27H/u2/+WXszgXJiwzHU7odOjq0MJiQJ/heatW3FWYUHUe+cLpskdJQKqu3HUFWAzDYFhlackiaCv5N56aSyJO0xf/N4bsZlMWWLaKsmje58+904m8eKRc4nEdPT0Y75QJLW2dtnTrCKItxKa3DD5o030CZ1G+gNJZMpG8rjtXJZEwtSDzgrChvrg2CkNmYcP4A7sT+6fKrIrb5QzN1K8UIr17R4c3Ht/wNXqxbIHsyFnOxHEM7+uOMno9GqUJ7PSgiqKPguqS1XZ4zZWGwoQcql/vyj0MtILx47esaf3njZfoHO7ZzynSpkGITF7/qkfhX+82+trb7EPT0VkqKDFc5kXRLYg3j1ZFEUk8KnoqWenPtMST1MwUeDnRtqMda+Sul4CNEgRir9o18tIs1MUmsqBez7XGQj4cAM4NVvl5+9mTnxrIZd6Wf5ZdjMgPABMLlsF/ih0LOgZRlgmU7o+eEpOjjYGPgPwkMMwFAX5XutqYEWFaDQUTfEiFldqdC8jC0tLUFqLMdgATpV9fHJ4aelmGf+sPPU6dPRzV0/vN8vDnJJjYSIT3Gh6j6sxDmBzu3Fqs00AaUpkytp1f7TixxnFYVrD059RZmGZTJpQx1J5eL+MJKWRnbga7SYgrJPKyj6xAgFk4EJOQvEeLcSgTQxIj9XT3mygcAdQ3LTtjmq264EPRQjLaL9plWtwX14rlQUFmhSkWGARQya/s4kQS6dGgIpSkQYiiNsAZGtQUTZHcGK18Qa4gCrcZJvyEB+eYnh5iQBTEJZPO2gvBSrR3zA9kdWwx0D+HBUu2WrA1pRIY6t+VlVUS2bNUVlZ+A9kLl8Rt/AAQv4CkurFqT/uAOONNyoohXTm4GI54TeQP0fPSBlt29rHLZa1tU8vfpJfAmgASBuPAqV/zWU5FA4hb1c/F8uUcRGeLE6E5+MdD80gYPTYQkwfaDWGtQ+m67SMrRFpAs4jC0jjQyH94mFIwgCuDMMCUtiaZqhAha1d7d4fzmEyTO7CwK7gmyvYXz13/GYdmKIeujG0mW0hnAE0dheajlFe41PizJ77HB4GZSATqf4OmsoodCRRiwp7wxVSDb1nqoYfAigfx2q59CC0jrXLjdCs1H2lZIhz6oE4Ldw4xQ6vjGUXoF4IhtLb6B1J6Khw2MOc+OOcgCrC6i7ahqOZMhl4k5wy/RaXa3tOv/oP2m7l+ZM2tnY6tCwyP+oJhEvYT6N6FQAVFhMBpl8bjkmAKgL9zOqnRRBOKakiAmCKc1H8Q/0Wlxu+Z5Y3rrUpS9WYWNrpJA/tn8YdSXplCID0uomaiMF2kmNposmz1NMDFkgVgfsn4wleKEy6mWCshSOuFiJ+0nFxuT7PMZIb7GZNrbyU4ZEWZgJcL0W6zU9fmBGk3JtPnZInKoIqhMSaBHSi2tshBNZnIeSLqHPUVriXEqfevh4etjGFI+VFrMGdUy3G3nB9Xb2fM4MpnosCGFBDq6dfOPyTTIVJNXkOSAdRKUgMjxtlvv92vv7hP3xrIRumKDAXgHuQn/T5LvMCEoleFv4YEeMo7LnIn+3dYWWcUESsUa/vCih/Aun1HF27MpFaK5Wr2bkRJ7teDcNrObN7e0BBW5m8LpTeTH42/mz+8j/cQpX3b5ZrpEK5KCs/pioiPycfQskS2esFwrcYA1Da18a9JoaS7yqfTueZGbo6S1Gj9IB+z20ltF0FPp3OSdXkkF+ZS2/nssx4/31dxBo4MrzI+t1WgIczPeibryxViUQd0cqPe/z+kTAeGSDrEtUlkQeVAkR9Jn2H81OTcsn3Ve7AoYlVWo8xHZtwfZd+tU9IJGbtwpHBS1mplEkALr0qFhgNNfqT/RE81yx9+cgogFqVs9gAPs6UWSe9OYweEIk6E8BdYVUoUaoCOsDUEaKIrSvu5UVZFYcCdhJRrL15G+FpSKg0pRtj6zD4pk5XAkD1XPMXn3rwkT+7xksSwaXXJEO5dvHP3sqDArjeHrJ1Sym8QynbyO4T/vzEsTdmZhNn9jOz9nHMCsY8QqJWcScWL0QpSaM/KAwe6LqY0TaMVaWv6SnlxvQS19PHnhkN//TPLpH1kHbFDCXr/rMfLNVxoPNDJ3ZG/ICH5FTExJktd/7xp7/61cFuswrvpl1GtZUS44rfsAp3TzibPNJOH/ijei/2tbo798WKWdld0i9XRhJvfOmndwrXH382XSfo+NpwKtDSP1wrUB3rZrun29ftsSrdBes/Ueb4mzOJU061qPYqkRhn2dcouzdeK1LUICmDrt6DkvsTgsiT7IJGAxGMLkL+Z8czCKWeeXQGsaWunMzYWeH62U8k4AaTs8f2J87I2BfdaRxlBaZxAlksMQaLCmNedZlzsj2iiTy5e8KlGm+Eyl4l5yjFp6PDDoudqA6066LIjK54efP423kyPCTHJk2+RSp+UoVGpKyaHj5/J6cQr5tdQ2l23K0uz/Xqnc5rNBRaeaiA+z2O4bAR6oCUnSM+ddTnuLfvdBTA5+4HI8WiDvwWMiBHqDTzzXcEEB7+DMpJACoQ47cwAwEE5dV++g66c9qmSQGfJEH/mUFvQ8FXszjcdpOKGRfsj/6mQ6OyCZ1RMiUB+6+O08sgQpl7bfB6icEaMojasATs3Nxs9NTRdxD40d/PIKK7EgN8p8Ly8qxBHNyTuTsE04NewMdqSy8GrJS3Oq0GlfTVXNvsXQrzD0PciSR2qVQK9qZXHBFMDbRhrRIfPMUMnGqt1m+2e/cc/drXntvXtWcalBfNvHDuTm11YqDHygDfMf5AUp0GXkmwRRIoBNbGLcwcvoc2PuAa1P0m4k281R/JJp8/pJJp3AIa4gMEi4HsCmlgOu2rS7z6QsQDny6cBBKn96go+tO0m4W1y2HZ0nEqMTP+xPZukG2qRPY+OXZ9/MntKiYKiQWXoZXyMrPLLQOs/5nH7eW6KMrNIsD9naFweGTXUylUXkoty0+f6oJziPAqkV0xAdM7VYJ9p/W7UIPXbXA4wVq+xbCXOr6zDOkhTQ7ENfT5HpAAcTlDc3yVnzvZ/lsDX3luX3sTK62f2niKisuYGpa5ESI+FyauQPAY8CQ6/UPJciUFpk/EpyJqn75WXBgIMEVK2AtrJkMu31SpDior9VpvEj1NjiEu3wj+LoXxHUD0Jko/Kq9Xzbyq3A7viX3TCNeFtLTJhEX5Dd3c9mpiNiaPWKy//lm58ZSIFNDMB7Sk5jBoVuz04cIXkFxB5YzMkxiLZcrYBS9IBD6jmgI6Ml8Gp5TChhLuI4jJoXrFakyAC8LoJXimwPgeBUM08R1yaK5hKc3KuWNzCE6KZjxrEwUdy6+3mRlGvCb513fIjafowkUgQ6WNgjarBcAB8LayyaFemSchwBGVVtChlnHRfmQBgVP0cEB+2hxmGyaHGrAc3hOplpbSBCBILD+gGPZo6J+gJbzQSCHiUW56G+gKsa7zweLAfFJyh6OUNugco3VjJQUK9mXuuVoUsdi9BsCwpY9UrXRxK/B3p4zlFIfErLYtn87T+pQh2hOuCXGvlv5i+aMS6ONFToLN3cCuP/LUbFGOyFkkfBwWKKRDL/rVCr1mMi89zoF+AJ6Yq+QiQlQ1jSBUK5vAW2yFc1HGciDeYmxFNAqsTa4aR8sDCDkzMcoYe5lYF1th8i8u5QBixbDKI4Cu90RItg3EtbTn81EvPIZmjC7fq/Nl4oJXw2eGbRvaYCofZ2GcJs0xM31nkcsZDGvTVo2jnRGzNZygQGjv84dLYu2js1EeojVKhSEwB9CEW8aR36DBaopoXcYrSOTTYFDP3c6Jarxg52C6rmZCpDR0reMmugTIXFpcP3oE+BMIv5YBj5VW+a21wgSYrckDJjFMp5Y/LtIuHJoPWydyAKCUYmJN4S+N5NCi3IEDXDSOl7UFXR811Fw0s0ul2451a3PypUvs60j/UG8cMWSKtLXceCddBY1ATQXCs/KzpBhrV92KFfZZzcRZcDTQDPr2Ou51gNBAzTOiggdBOuUzM5lSXZ7aiDSM4ZYroMFSVxpoHx5/yKt4IbfsnkEU6iH1ZcQipbTRzRKcRzpcAKMJOPuBBGLhQSiQtpeO7dl9NFnG1C9iN9hyHrRYCk4DrfLeDRx9s1EfwGvBMNSd3t9ECsjk9LeaIgvmQgR75d8bvLtURLX1pWO7u3f/CMc1CpljY5zUzVKJ1PC5cEUNA/WB9YprD+wMdG7bAu2+7/5SdeSjDXRnVcjVT6xU+dSNTJnx3UUHPVOxnwwd2tdtpWaO15cVbzTOKh+VgViBYlZBkhivOLMrsHNnoJuoJGk/Cw71lPYcKMbyNljKCAQp2fUJ6Q+Qr/GLYxhvpe/GOqlTvBqLMVWVzJ9AijG/cugTj4dHfK4uV++1Yl2SGrLWQcXyNuU3YB1LXavr72319h5LC5K4ev5hk9IOT+7X066mVb1O8eri9PM/ni8Jca9yd8nKRxUWTMzJARXqUim3IBezv/qFV0E9d0PXzdR6AJa3mewAkBCJbGUMs1LsTWoe7zbvC+98WAXDBgO3QkL6XdwRsZQDvS/x3es+slAiXgu7mey+Wr/1yq06lQpNQwlLmcR0YvFXt3P5a70uskl3I/vI5kQo3jU57PIR0WXqxd5OUPHWrBjB0dkyczf/61MwrSpyK/RMiARgCCvxQ19ObbPZe25lcaBVfi1kmN+5zQsEMYV3cB5fiHgU/VvcZNTv9Q/OFqrLpzFI4goEXOZGlo/nsevY0YXrf3yukwCeKfzsmV5f+30OQqeAPRFV/qwKAi7lVJ0OFwemMGIZYOFhZrv3oeO/XJt4IsAtV/l57rHAmTtIkrLnDv1nTvmnuicLtWWuA9xvODr2RGsjjIGiByHTpCjGu1s6nl/CcdiZSzGAGyRSPDNC7gkLrICEk1tGOj2QBRcGMNtwBMttrIwNTQt4yB/t7T/3bqmSPNj5Z7+sUSNzIqUTIYIea/e+g/t83sZ+4Y1SKU5gSN7+dEaSyjdv5kSIq4FnXZXULmVxe0q0vyo4red0vd5/4FQJ8ie+NgfuYPboo8f+dWnx9J7+t/JCwq8iwtr2xFhsOp5IZYUG3cTa1fnQDBl1fVAAJP3ff2wiL6Glf16o0BMBKq6QfBqL9DDVbFzV7eLA/ARYYQyRA5T8FlhvfT41k0i+u/SvX37+wprK96D9NHDxKiKQb2wIE3oc1EqL/NKtch32Gvuzi2ugO/uP5sukMc/azQfToqxG+ABthFaUZdHvfwErLtJ/Ho3Ki8y//QO8Zq/yrflMnga/sE8dpQxY9U41NdjeCBFMnH0sZ2KjL5wgKokKmKGBksFf7yB4lLAtF7PVPjzx6M52g/V64XhlloKO6xyI7y0vfPmrS3CAUq9g5JkqlpNDAbBsss8aQDD3J4iMj79z9xskOi2Sa6B7AI6goC81O5BJwH2GMvfVGmDx6L64uoXAN5ZOvBmLjv8loKmqVjCi0zWa7b7B2eXL7gYMOQRPgrLaJtBAtDLb30xm9pYSr+0wq9MCoOnjmMn10OpfToioIdfnplQ3I0mFqZf2BYITa6o/hwALucbsGdFeYsnO8aSX4OCy1F6VuCd5E8h8o8WvvzC4x8t6sEGh23rqQCuh/UFZL7DdrOuoHXOgKmGPEaRqYpmStHoWqPhq97EQqCQzr1tzMMkXE4j4nbbEh2Twt/AyykmWMf/GU6enp+WRUAWPQpSwUorrPhdenSS5nmZ9cyhMWN1IpJNUdP0LJsuFKx4a8r8i/9EMSYqEnJrmI8j+xjCp46Cgpiuck+5p1tPPPBIriSq6V1j6oNTQ/Ph3x6mFRrgRje7y92xCIkbYnEDXAi4vR9Mn0z1ZxNpyGubrcFLEvJ9bLIpIwj6rpZVgFOcnHm5SYK3PPPpMqq4qAW2yA2EOJAesyEgfiaQJNCs2TDKN4F0R3ae0m1trsmkX8dbkpIg7MLosFLEscDEauJdAHtH8gc8rkFbQ7HPnsqoJGv6YYJQPfKHMfXPrltynSpxay7k1IiPf2pko8PPnXs4g+V57g9zkSf8TRDEL/5Odri4rldSF5r4aKwqgQk5dKCwio33gi/WtlT9tpWTqwnHF/HMRlGmgmd0tMojvCoyukLI2u2jOoWPgUkGcO3YmMX1GJeBieXxMUSddv6sjVhAp9kytNnKV2obqKX2Vca5j4mdQorlWspJlZfSBQ9Terb/3Z7drS984plyDzQCR7Rl4cNeLS6yr0tPfaIWTDrDXjDfcWDPGet8coDVYlUKE02KqKSdDNlqx8Nr5J3f9ZG2V9BmaHrlYkMpLycQpp2oGzKsd9x3OsK5qUl/WFopgBbfSrBwKdLV7T6r4QtvZZcTn0uFNqQ3WJYl5DTqMFYxILoumFHrlJx7/owPJ4ly/mQLlkWwbdTJIE3dyV7o7OJ7pj36Sh/SWjnXQUeLslZPe9i6rDhAGoZJ6eVy3VRieMDl35NQAaLRLjujZCBdDBaP733tsIrs2Sg18yKtLnQxSrp7lOnzKBUZIXwod1OKiOqoDKKkQ9uoDyyeq/qc8Ok7dgMSUBmoAv/2920TPRnMbcY0KsV1ebqVK+RsHw8qzD4OqGhKrGGT7XHccKaoM61GhoycmEH07hKrQgJeOqYzcG0d6nF+ViXvkam8ZO6daiZ7Irl1v5Ml6qx3EJbVyZufBuRpe3LKSKQShJmKFNbDUHA8BqUQk1EYnRQGVYYCc6THfghaGeoMAnNMey6aVkdO4OoE4WKma/pJqSoTiIvgAHFaWzqm0Vf7hEp8Mkggo0E8s5QF/T7Ym/61kIAilzrxXwQprPJ17YyU8hYClF5swrED5NCT0xgW6+xqvGbLZFQj4GsZS8EyBNZJGwXMXGIzP30gRynk6Ds7wIuAV1CZKYW8zgMqIELQqIBz0EKoFAM0HpLlHfi84V8W1XYomPxS61GAVrLBGfifdWMhgF6uVTu1HxKch0Wu+pSrdfuk3ZRqor+u3uwI+e+Om9joSwHOXmI8P9g5MrOlSWZK53N0TLhNFomFMvABvS6JAG4DBDlhPBl4+p6WdW81O9NEfdUU5uPdFa3XMrRCE3PvTzx+WQxCckrSQxDtqN2u9HgoXH93uCl0d+86YZr4YY1tbiah/qsQDW7Y9MpFrGETdmF97vizbrl0RUIKBh22iQLsOkiXQma6XoIKBe3JtNmhR8NtBENVCYysPLvI3cX6/joR8ONBqd9tbWrCUMEFMHSULFXWcr1+beOp5sGreBhHxoPBh+dYC5ChUsFRc6+E0XBGxcbTuRQANQ+qilVKgzRcjPQSHrJyUaw2Jkt42xbiWskItUAE2upBNf/sfPqyXM2SThm2uL5BSwqv6X1J3TwRroGeWYDQhNurFc/94cenf8ToHCdW4Lfc03BqQ6YLUDGptYpOdoDrSyvOZpS22dfo7LfSmT0iY++KbOTF9NADcRbOTskJ+pOfyOAUNdLLKv3Exrvf5f116dwE0FV44+kC31y9TdKsRj7FIIOUPCnVAcldEA7WQPrL7dvocZkpQXse4/1ev1wgN82a4Qn4DfCJHJQ30Rse4tlDiVhkhiKH3/ukZLOXQ8N7kjWFK5C4wFIFoWHDa7yBn8TpCpetDY8sgJm8Gt0CkT2KQIhMzrhssZxoa43qmKIsoSh3aeWZZRDCQMJb2P1wxfyMwat/QXAVo0dgI3Qs8W4V8j3FXTwVcCp9XoDoXbDVCzVtzC1bWA6XTdnOjoZkCDsIf2BkRDNiXwRMRwG/aqPU5IQlEq4QuzJAfz1YtHXsPDY3GqCvcwj0ndR02kPH8gQNYeVKI+Ru2kB/K8HLz+KUVoRT2+8MVA/ZlsOHIUSk/qMHTaLb34Kuuln///QoAlRQ0fZu7Dp9bJBa3RfRg0lnPSbaFZ3vCJaCcgCQpN9bWqKwkOf2Wi7G+J7lIeBjLsOdBdaHRlil2Fapr09QR1LbDM1Fu//HJkx8DUIl449Dk1BHZm4zowaRn1xovzHwrvYPB7e/9Fo7AjiSzjVg5FtkIxbGV7Fs/sVKI9Bgug0xHClqwDlAbc5KVukRoooPlzytghQvKKo20NacDFqTOvSBMx9juo1n+0gG/PGkulpD2aBfNj1WQRTJ28r9JfhWLcvDPakxL6IafaQouzoHMoFG6NrSbjUHZllahRpwEciRCbXURs9YRwLvX/0XndXArEhY52WbHX6jtQEpXx2kLgcU5kBlm2E3BbIAn2UM4XmND10sIIZBDBB9lgZTgXec/5QhoSIUA3aTNzHgTxiXYo2TwD4KzJTgsBohI8A7nYv9NlcZkZ8MzexhxzEeePYUTFJERn2sH+ZvzWIJ3fV+/aRg0pKLKq2hmUv6tP38rB92GafjIK5nR/dpo4K0Uk0faG/1kgQ/WF6KvJCaQQGCYBks7Wce1QNy47z2i0LE07phc+MVqDaS5yBbWH74cUPczqDSM8vyIs8FPM/HB+siNyKPW00O4BHwdsLZQo7RyYN97oU6hK2rcMVlYWbyhwLPLjXVok7eqYcggqb/FH7vGchICLTY9hv6LBBPBoo0aSQoTkbiils5reYQqhE5xqHsVmiyVrqidwakeYL2Y0V3Zlu/lD+XDi4cbJ5aqP6aNEPE204VD1CzkhHHdRlH1APBWBSF0HPbjO6J+SmYApWlhlicvFWTPOFvU2+LybCPpilQv4hbNJePzVN1XSmTeF9MjaC/vpDzTaqLtYraziNCpEkIH/VZJ/5q0ciamVWMiR9/ffyjc+sG5qCxWTTRs1Q+7rfABLEqPGMnU1KWJ8Z3+qZIAvX5rD/j8S/noc69FGqPtoq5zBbHgCDOtZy+xGHC7WSOfLPZeBS0d6+32WPX1QQA8UwXwUQzWhQ+zRwA9Yb9sNXAfNiACLkn5K8dTlcZqu7B0LiRuT741RrNglRDVZa5Du+sHtEz8rz+5l1gQM5al1s26kR7fdZZfLz7soeXhM5FTHrd8j2ce24afXZjW+eTs9YLUYL4MS+dCegM7c/9cLXfh8AGs9dCk+afaHOiRXWXis5foBvo3Ww6l64Qwu/F/SPeRwT3dXq+329ftpeg6Vj8pSnrikxFaU4qKmTIPphloPWhsYBUD3zmLixsRzRqPP7YcTNfFhH+dWFfuqeuRk074P8JBqbUkgezplgNHedo1NwkQxcQGT/sM856dy64fHy3QPYl7y8AFglQQmY2CYbvekD2lQy3ubYBR4ictZerUttShK13p7KMF6uANSiygRUAiDxc+VdV3B05zv/Yfi4MoTUaARUnUKO83Nf6gpHRlWmc+jp7VQ7QEhwsDu6rjDpwNWRIu5RPaQCV0So1yw0/r4mOIGqRlPtE7RufvPm1TKPRPMOS410GKqfy3Y9v03zb9t03/bdN/2/TfNv23Tf9t03/b9N82/bdN/23Tf9v03zb9t/8fj20BAFZQOCBuJAAAMKIAnQEqkAGQAT5tNJVIpCKiISP2OhiADYlpbvxf8wQzZkD+O4wF4Ad4P5R/APxG/YC/yW/l+q+Df5T+KP7K+o78t/t/9o/ZPzh/Fvm/8V/bf3T9hLHP0yaz3y/70/x/L//s+Bvxz1Avy3+bf730G/kP2V7rrXv9N6Avsr9U/6Xhramvhn2Af51/dv+/67/9zwN/xP+69gD+i/4n9nPdI/sf/d/r/Ob+if5r/6/5z4Bf51/bvTc/9/uR/ev//+61+6RCUsY9+gJTV2RTwrHv0BKauyKeFY9+gJTV2RTwrHv0BKauyKeFY9+gJTV2RTwrHv0BKauyKeFY90oC/yYnGi9Mun2VNldNXZFPCse/QEohEP7GY8qP6MPM0ijaqPQ7qo/V9jFTUDOHp8Jipz1n93kppbEvqse/QAQM9mDW0S9jRz1PK+ejI3HFDyMCYkm5QPHKxdJpSSAZZT+4fIfSK7E6dTEIKE81LPIhpLx5YYdcovbsR7dPyzuRwhWsvEaX7xQPrpq6CRLZAkKB0ZoppQX7V9rce4HYreEkGJLuTTiTlaagGSVnH42OHfE+4k3z+iegqoZUOgyvN1htE9nTJcB/aXp4TVWXvw3D29t0WaABgmPzPht1rEphAdrrBldeHPH5NWpHWhML9uXxCtZ9kEnV3ELmtruxD1FmqGiOHFPzgLVQjwxatC7t4d9i/keqVbuTEmmajE0MeZyFWG+zySrFhGdciAeFewBzsW37xP/YGQVQzIVfrZvhzMUDFb3bOs5YO/nsQf76f/lcoLvi6LOgxCrkNJ/uy69XAz+fyaKDA3kDG1HZchpo8dI2foTOggxKM/6ulGBkYtdbS9+gA7OSINUKA/76j8/0S7hk5p9LDa/Z0/O/IVQ1+IeNSzBH92w274zEgeKUojcDzWLI2YH5qK9nIv2PVql3YOpq1i3Rk9m5+vERMM5Mbcl8Pqu5qRBwGeQwFnFvNJeHRW6fyxiCSzam8h2l+ejhpQQOFKxTPyxgmOUGt2ccyCmyjmYScOesNqzwZhM8WABGvX3aHpuDUMAtOi4lMNBDnv/lU6Po5DqNNH9C/rEXI2ZpD/J2M0xnzRgPtaMFXk8Ejp3zJz8/Fysvs36H/BN0mLtif3Z3OShdisMI5pzHr7egHcoyFooOQZvPBkZHLut/NGQtjWpXQa2H3EVWP5APZQcYp0U+S6rF/oBJbImWU5uIMLAfaYps6vcg+PkwYH6lT3VwGAaZODDM7Xza2yGowTv1tRWylvaWjCak0E67LtNQz7ENGsYksCATTJCLC8zwW8x78jLwY9N3mNjm2o6fRr5WO8wIJDW+Tf+TwiooXBeanDiuBU+phQHc8OEHXqBH+9aTTkeXaUTu8LKaup/X4U/V3cCoYSLlhDxbB2QSOlkjJ5dOv3RBHDVLmLSvcruvugM2ww1tOTnvH9UMDyNw1qSMroK//1G1E1IO+cAZZFT+EEb5+ftyHAdafS9kpQPSHychPuuY+3YCmWYX2CLexFlN7IZpX/+sAClV3OYHX+bXNH/CO0N7QWKS7qxcFC48UyeAlfz933g4dh2NVF7dBYdjSn+oCzkbc+8lmrsinhWPfoCU1dkU8Kx79ASmrsinhWPfoCU1dkU8Kx79ASmrsinhWPfoCU1dkU8Kx79ASmrsinhWPfoCU1dkU8Kx79ASmrsinhWPfoCU1dkU8Kx79ASmrsinhWPfoCU1dkU8Kx79ASmrsinhWPfoCU1dAAD+4W8AAAAoLyOSmEmrktehjkv7Eo2CNf5W6nMaK/QYdDvJ5e5LhmyuxLx1lLgZHgEeG20mevuNFPUcwU6d7W0EVmOMZ2g38OwlTVM94gnL9KZIJryp56rlt3BmM9nnbSBxuZqppNE23gkygdxhCkYZbTKKG3e6y0I4hcn9XP5ybL1VNSp8Rdxh9Lr2O5e4HaZfNJgBfvuz6atas2ziCD/rSJXJLsjHSaPKgaAhllCrfExu2GfhqSm3RmH0vsS2g4/qb6Xm9QKa9yefV9Cd7kTgIEkoOD5BXy1E9Qb5O/tmePsIoubAUrtV758bqV+/I0WfviuLy3rWj09vZ3Gh4ITLYkav2dbli3J0H8jbnHaOFuQYANMyU1kuybdc7+PSKjpOcvGWvGli9XcEjqcU2JavayFLP3VXnVaIjx+w0+aBujm8a/cCrm7QtCU/G9Hv0egMj4KV051X2YTmhH13jzkqJdw1RIRs/v/lQvm0NXVZfQ0nnWFHrzquoPhRfMS5tk9MPxbe20qVpg+po6KSrliGUs3D3n6Bu8UJCD/5iJ9Gt+G8tO6N40DuRe3TE9sjf752IU65jOz1LM3zHlhEwXHOk59aPe8V7NJ/i2U9JqVV6CT+FPIpZHBn51ontBVB04vtsZ5ecYpv8XRpwFfVFkQV6Mu3fWR6pY5JMJxZPVWU92jqZgzez4FPuWlnVTCgGEapabOM2gmETqOWnn87qCNCH1Oxulp9sAP11HyWyTIvRSipVUW0eK9XbFzqZuJ/OfXz2Su5XGVCXaSoMDeJ5m/V0fojVVIVJ8S6juDy0GEBG9+HNwZBTh28cykrY2QJJBJH2hqBL33ZUzqTTamdpxtpSEyCgptm1oewuanxdQ18q43ZR5DQ71QCcKeb0McjO+NmCsQzN4h/2eVIoyVF/Gn6qVOXH9jGDZ23NMyrdPGB0z7nxVwmfTSnG4F1Okff6SbiZwcyvWtGaRIMo8ZPPbmQJA6qbJrzT0Gat6q/IsefybAr5gisntTdVCDOOH+Iy0Zjh5P4PELJPRS8QtnyTsMvlj09qKjAzIfNs9hdZcdPiyk+6/kAk/+rAW0+9n/pYa/Sl+O1BnoYMhe4i8P99rnFa4OL/ejEy0sB4Y2yMSJjfAnRQTa8A7BWOuikZfxk4K0gLMHSPwnzN87z4D1EvNnTfSZQlbbFEhVuzL/B/TC3M7OyFeiqCH7YFy/sIghgA8YygWsQYtpuB3XCyUjkjV45SRkmuXjBKQuzXzIeOzN/ieLfnRNISsQqWFSgHp05FFM6D53N5+zqpuTD4+e/A9EhFQ8RoF98/6R9dfL6W73bW/MswRxmJLumyZC7cDMAgpWOfpxrMl2styrsSZbV/HjMsWFneIlO4jH7vioDJrGqyn8o72O6t0zdEW9JS771wluCGAV80Ybdl/kM23GtGNTcsu5XLrgPPcLta2Eme17Erh/Dw0mUz02+HrZyrQgGpYQbqImPvgiinTJNoaqcwXotgBgBgtyqMtpWp6AdeJGfwsb2NRLApUO7h3YkfCntFAd+2bZMjKaBKpscQ9QRbG4Bb5bwJsHhJg8NNmC5qcb926AcTDw3yIptW5HCxbsBqhxCdNUEARfkJRIu4hyOsg7Lxyn7/rm9mketFsPsGFMH4j1M94PoYRnbExdBwZJTuKeCU4fgaBEWbP7xmEVw0N+8JXwED8JUjLVDSndzFje2QP3SyvjaRwgtJlPnC5t3IPvZoUUbg1OeBJiyfeuDk5qOxDo28K3yWntYI1m2yMznw+2tmi4jqedpe4ZQrUY1oEFsmSYv7VmimNILt/YhDGYz/chXDA5iWwnsITHhTOXB30abd1mFfmF97MQqGyDSSZlvYMMsBLT1kPHWeRkxnGjgAVdKb7+ox4phvwqUiCGW+R2JkFLhbf5n4w9VupuwMcv65nd4jr114VmALRoZ9lz62K0x1VqoJnfy3uOhIPTkZAChs1CosiWx9m1/N+BPo81j3t16IzMJjqjKcqoB0eG8PXRPK5YQbrUUmuQ0oNtSac0+gIU/kksrWBz4sp3SXYXnwomjz7g/Je6C+gh/JyGp9u1OiaTRzWsDOQrlarbMLBXPGLwO4NGoyjVM4Te4qTIEAwH8dVafqzmvS1HZSHwBllt3PBMWH00B3MNmSkjY50C0nYV9ChIFH3a/Q4RozS73Y4YhPudwEDHjfeAfXvlDmYS3SkEPLFU5/2Obwt+MJoOOcFvQbK5RQ1WK4d+9iECPGxodoisd7+lIdZdZ8fbLaevpr77/PHVFOQtE79ZlByd7jdR7Lq4GqrA3XIOKMfryJtkY+Wj6EaAmWeUwZn0G810FVkn5iRaiIaMZSswY0c2U64eiu43TtM2sY/ha5ncooFEqzzDwvze/2cRa6haS0i3aH5mr9JenEuSgArYdJSTrLCV2G8ZtC0WMZuIYhxqtOKrHRj5wHI0+S6x78/vnIF6PILHPoQlKRJyuoONquMYEpS07WnSXjxtf/tyAYDSNqITySUsy73m0GtCHprLw5Ab4ZwR8i/JADOyuCw9GkX0XpUPvvLlXmfIenju6Vp4XJccpYOt+1IeJqDtayyR/0/c3eKa0tDiCWCxVqqXHnhIKaFDh2roCNm5vHiPuN5kxBp2bm1RlxPBqysOW1kUBDKdH2XEf7aQ3lcgyDCpIW7ehQUY4V1ZDBXUOXjJCC0EPG4EWA0s2dmBjTsiYmLcsZHlPvubz7mFMJGdt33I8PXACCodjuQX1UavCigOK+g7G1Jsu9YQh7YwCpye2l/mX0peKMLnW2Far3nlIHACFWo/FlR4YUAHeiGtjv9gRW4Q2VV9fwUoIkb3SBLbpsSmiDaYR/0/h4itXHrbnb+Kzk+bagKpynxkG5UcG9/c5/qNGADFluc+OjEGdn94ZZvPyckzYapvVfW7OcRC5vz+sMBxiIRNFNFW7G5CRrzZEb3rZroJ7ZgRB+VBXNHjt4iHo2hciU+dnJqB9vhkpLlWfEvC/pOqwlthqjHQl7hCtYiApl92/HL+vTrYz2kFdTsr1N0AxaduvyvumfqIAdq9vAadVfC4p3NmjCUagSZOlNHajFiX1rfhaDmiB0n3+c6cZBFqR4wL4tF6MkXTPOOmfbb63Kwy9UlO//t7+TD1z/7+c+EvmC7dbEMsmg72helQUORddEXKFHecwGmDPJJEzT8ERMYPjm5rL4SAgu/E3ffQ6QtmwvDTpVv+ZlWphkDwEZ8rHUkTryBHr65FlCsULl8zBY5UnjEVNwQng8W7zZ+vnOzc3Ze573ydl9Ku5riFnQ1VlzXKxZ3IQSlj7ft2dN8OLOv0tqtpwUghy8wM+e6YSbnvXgTBbfm/wXN5MDNP6iUf2+GC1t5+g5NTuUIJXb0FGxa6lbIY0zHveH6IjvznADBUeIkK+biPjG4PXhVzPNAKeA0D0WaYlAKnP6A+MENIj5ENObbCF3K9h3oVLf4pHU/rnIhQY0IjSsDpXo6MHiIubaQQ14F0g1gxT0TiZHyDditgGkYgFubkJv4HooDxuOM3ZBc9jgkwhMkNy2rBrELKOpUfoXHHDW/F4UphepaA0T4QcZ41sZmsG6lpHPKytZxEcOX58kKmVikmRRUn0RKfOpEii8CiVwmmwhGVB0OJHUB04F8W2j6Zvaj09ZRQaREcA0b8sHwx0nrVI31nUh05AHyyDKywXv7h0WT0O+uI3BfRe0us23VHSmAJZ5jwY4H044QAbFCU03UIhN4TibwfPqzXobe6m5LW8ASybkbuJS93zDYtHaQKcQxmymWJp+5r0E1tRI93iYE6MFNkLYfpx1iUcXVsEGU3gYgYuMkRdk1PpOHkKL2kG+tK5Gb4qC27lhP9X/Z8CW55prq+0QeMx8RafX9II+4hIjyifsbEIcLTNnGHPmq/KLZ3RdEGNo/RYfjo4VICJAlcXNIATblYfsPV2Z8nxzBTcsd/VEHOBHtjlbrd/LfCJgXpn++kYKKmCgoWyILMG5bu2esUv56g9esTEcTjTj6fJqMkDiBqKoxHXtUv0/q34E6J9GQ2nZZTT/YoHvVJ8kKcTYZQRpLIccWuHVypmC0+9jQBCrwT/dx5sFNcb5NtCCb2MsRaDTTPaWRaTi/ZISgCO/R8Mh/+Cbpu/S0jbGdIfPiZwbcTj/xYlBWQpYeUZaUSNWd8DvEJPwnHN0h8rGrty/xYcGxIixB8eRnuaNm86ZAy+s3SfWdiJQKP1FYGwATYXyzp6K+Fkj8cskDz1+/Dj6HJyvqqdjMVCiq1GXSvtX7LE5XGfOOJvXEZr0nL6GZsquG2KrUt8LxE2QwAgR0CYdeLUC9dps71BDNEzbifWx6lzkPbbk9XHLUGDWKJCpGIqvI3lcB9Tl2aXlodYiHzdrOSGlJT4oqbXhyCB6PyX5JyWpGz1YzmSlRsTIEGlfHPZz8lUkUEgnPjUnkxp+r2Fy7w/LtccQc2neBRAmCpMAWD0rkAqb/VoTKDGSQpDnMFUty8yb2xV5p3vM+SHKgR8/bmwy/BhBd8DQpsMulPDhWYhcOJQPx2rtfnfi7QuaqNrA4eFAZDYs6u7210vC6EiE9+eYpiH6GlNovyg4YIAVUfF+V4mjt4bTkuzxb3YBpQX+kcPtpZis46d1AMtM/Uqvgo5xz+GJsHK8CmT0zc+UeOjIq4zT8CRKialVCQR33OsUxSbq+HRHGR4x5otfGpqgdiW8OvHhG5bIZfQHgHVuvjLFVcsv9qww1WTvwmNXrwyAd/LhN1kzOfHPOhiQLkgH83qjSFCPlFbnV5XqsrW/tPFE2jJ5escb7Fce6rE6YZVxmzvZagbhI/2NkF/fVk7stY84n00GZmAqW2Jxw7o/pmaesMdIDC7ynw9JhntoWzYnIG9Yb+5qJo1DosytCahkQ+yaEJwXpZ97w4BBq+jmUQJuLO3bRP0vEo7il6FLx23tyl13HnkMQtHUe3TGEF8DIOcbmyVJWgT+taXwO0sDTtcHYZm0djBKTYw+W3mlA9w8tuP3gHpnSk2mK9KQPg+VajzIRJE4UsNhZcMPtHxzGvkWsKhhod3FgUb1V0oO5e6oTQmKuKX9TNwfqu7GdsE6z8fPGuNap4WE6EF7cKaFCpTDVleQcv9cOmfz5C1Arh3NcA95n+hVTE0GDx+KdylXRq7PhMvE5vxYdLWspT2upTGkBsiowpU+roQVjRM2omxh+aPID/35grmgMpef/9M9Q/kix2LE7T5r6yMMNbwzZI1CJCHYhnY60gf8qLabz7Jju3V1Fefjr++x0CSEjTXP802TSz8bHI5FiKG4YCRSl2fyaTIMJPImZ+VZSoAmqOV5phXdECRxs46JQei5HWic/10HBmFhPJdyMgPRfq8M3DlSofL7l0kRRBJbSVcnSswVz6mQVbVts+XC0HvqCfpAOf83aZa/rmF27aWl+NYGz5HjJ7iVIsgEcJZfyaDNaBlnDcWsvSsis6pUPg+/46UIoi3oiJQ3IUFZN+vpJgnjSYIflp9CNkzpYSfiQMV1goObVcFISGmIurp4D8vw9AvTwAq+QyQkxyHYfuyUVHJfTIVPno0ib76tE9O2jXMThnviXqaRsMZqBVBX+JzjMLwtLwQ6rH7yHa//sUCdino43S+BXBXEogghOlEcvYWKd/2AUu3xgNhOJUkjEAl6O0z670Tr527usfXnrQvwDHaF5f6sdgRFBaysQKKhPKhh5+5RZX4BI4r7dpy5SF4P/n+Q6T35H9aUiLkbE0ky96uw9rJSoX6BBfIDwipe8pF/na5yk/Yc3iNJCScfhEgQcpj3lCUi5f3JPyMh0KQB8pMbLQb/z9Nm88X643S/7eRrnpY5b/NIqQIYUhjFjLU3El2KHyBY5Yinz+CKqCm63V0srYinJhA2ivHDDkcD5jGBd/zgGBgWuh4+c9dg19JxtU9kbuhNs++VE5AJjsAuXVJin1t3U9k89JT8kH/tp7Ad7IEUw0b+0tgvbmq1Fc39f6ulFsEl1iI9j2bf/YnfVnnXiXvcSs6YhnzscUrqZ4BE5vJEO1W2WmOyAm15DX8FmpjZSN5EYHgr57222h/qQ8BQMT3UFHgjQYNNtmNxqXBhgZI6dXRyaL6lwLfltmB5GAeTdfuP6I+wUKZKlwoyztrNWJUXHLZ4/cfA2DdJY7cHYaRW2y4VtGj8mcyOi1Wsx2stCJ9Zx/5czI2azWahL2RMYHIYjhjHwpH5a8iqOSE1jhmIC+Avum3196+mt7lUbMpIBEWFyNf1/MZ6zhZU227jiqz1kbXr3NPH+pNtLvxxZdvtTmJ1xQk6jcuAQwhx5N5d+25ct8sK+H6AtrVHvFzUcuNy1/5Fd4a/JEmcnezk9jMMr7zB9Q9MvD7lLldYpiisxUbMjytjPCqFd2sewQqubgstHgXbjuR6LAR42YH3wP4YYMRnKv+STm+vAni+0amhwKEjovoq3FgniD19MERFNXE4yYBidtsL2DFAquQ1w8mPiHCRnjv+mSND1fR1WiNKdwid+MBPneTz4P0FcmXLy0F6sThn6qKvIhIh+9gO3H1Ug/vBmKMNkMtK63NYl//sKpjjoZrTw01P1E0nq/zhN8243aR+XU06NxdlxoirRJD5SZAw2xiyxwZL4ZK1CkaDdophFqZ3FQh79L0mxqa/B+y/VmUvmq2Cu2mY3MWZJWQOVruW+Lydm0zqlcBfibMCcKjXv8RvL7Ka7DVshlvuU52csFH80L5r2Une981v0ZHqFJJpfel8Lan8Mc4+fszKnXkqZCdbkM8HOvFMKYY6tknrTnbXiYpkJb5n6iPtR5bEa1ftnh1VXJ1CG3j/qIVLD40TNPJjpFq8HRRF3TP3F0Uaaih7pOCWuWg2ZexFnoz9CmKXyh/0Byf/+58kEQaEX5TD/ZTIaeWJN9XcwRLp++hoCca4fgDhd9UZQif4scRd7H343oEJ9P8eXaYEtjQCcw+0rA+fHHdbpu4q3OmOf3eUO0I+BrbBsYIe9CQo0LTyDM/a8qNIw71LGGstZuCN7791ZfCBy2Lp4wveFLDtwG/zg/jP5ZLJ4iUlg4wtF/5d0WjHEqJq2RcWlyfhcxQmwOoMHpYmqUOu2tr3HgU8OiHa4tuolqw1aFvBTYiK74T+JMT9agR4QQ2x1mo5sOnN+pUeQ+unb7bpG/bNCUoc/GWiJzQBxDx+Z98bOZqIke6+ldOXjGR1Vl75hc8hKrKSRMQ2l4xN/n4PoQf97E9ww+7anZ3WT3iPOYqGa8ktJZMpiWpjPydwKXxn8KYVDAiu4ELi7bVnQvgT8m9TZ0y+DsYJwlFbT0GZbGpf/dt5ra3TYZaxQfp8ShPNAs+XGj54+IJ5Az538GWFMergvb8tI0VBpaSQBKUp10tNSS6Y4FmPcmwXqJSH07n0Z/cNgYDuGdMH517IbDeDgoeuIIBbq3E7beJ6xGhR8bfc9BbZSAAYA38SYp9MLo//eNE4i9aOzGAaIizN2x4w2ynPZjyLRk29Zx6DrpUuUx+r2NvgbCoAAd2AgukzH3pkjRNrPsow8tJOWlkbTwI/ADWUIYgq0aRsCWDdigyfl4N7TJKiGlH8l2+6JNEos1hasaMNibcDo9iD1zstzxEXPKYy3IN6SolfWwmdqou1sMiyE3WQWo0YvxgfLJ4fPKfN+34K/kU8jwpgse+TTKH3CEASH9EwDpt8evOr1BhHIx606BJT/wp4INtQeSAIwTSIbn3KZiPmkEAv26yTGtKbwtANcxlh7Z3vl9SRooW6i8G25JgvaIrKwKT2mO2jsSSKTyXKSc+ezteIroQ5iPsirb8g8mCHA1nge7VYrrPYHwam8UrSSvV6iHj9jBJvf4JtP/h+ChCI3lpwURk5GrjROVOQOM8gt9ZbKM0JjfYh2YjlDiGID0dC4KlXxJs4JZlPKZTvu+7KnlgLFdRm0bXueieDv2BqJ6TnHpVnPXUqKiDATFFLMiOMY+Dn9U3nstKSycwt6LtHRlb1VbVKOyqk7S20VZndgRKVGWjv3M9fAHRt9VHePW5U4Fv5moLUWGGf/1zmgjEmGawOAw2IHgMkLcRwpOfACHvqZ8L+LKenPXHdaw4dT6zieRmGHWrS0BgRzQ3Rh+rxCoJSoYLMjtSy2Ezlq3F4iaL4R0hGqsJVsud7s1y3Tt7SZHFnIcZgXerj90yGO86fAaXXkshWmEzVeylgI1kRC1K8vxcJLcDMbUO0qPaJ2kGUFR9u3YKj9E2C/zj6Ca2O9fqa+3ujAThebXcrHwSePjoXasmrY5WI6er78315mlINtX0X9nG5Vez+m+IvANz1bPezil1L69XEksKi+5KTYkyc9vSWX8bVpwme2mBPAxQ1QZsbtigtlyxH0HnRa9pCvP4Xysa/tu+AmW8KXuEwmEq591IC4bh8kf/M+MdPi3C8d9RPbzBYTFQZLeon6n9dfYNyPxz4LaDXt6zBUNTCP99r+Gl8j+sxlolWy/e3g+YGUPx47Hj+b9Mgv+K3xqpe/L5wy+7u+XQvsdoJuNpBngHqVxSFBj62vWmy4/x62zq5iPUSsczZmVp2QmUoG2gy1IndKiEtxD5+2I5VtbGRj9NCiiNQltYstiwogx2ASKubgB5UihjQMbf1kSsYZGFTeRL8SLxphto4ZN/W5XcCyoxHDddqzIC9GN3VOOWhO4Mlcd9TnCmV9H3kinEUhCJUpY9f0DC9GSnJrq0HTNdojX5GnC9ZGmy1e45tceiNr73rcjuP7aSsoumCTTgO6TX+mlMgqcAKSkFA5k0Nc8K5/X1wPGZ6utqP2z1e90raNCJbpAtCKPwmAl1Bg9/+uAWRuGDe0H2Ff2Jj6dO0mk4H6PZsFECVHMFC/ANIV2UdsFFZIuS0QncrxfX962IAXZ7hW7MxQp+ZPTB9VtOCKT1VIz8bLyqnPOtteQje2N58Gc54rnB14eiKAHp6sVq+GNy4WIsVHpWBiLi3qL4jiuilaP89DMKajkY5tKxcbdPd6Suy4t5U//noP0/RHcdS4Arfp1K/375eFFPlHJKSJLkVOGfMvmP3+ReE6mAi9hxXtgZLWlqE3mm4TS5vDPXwtOwgnlMRJZU4D4E6nxncxL2kku2i2z0DkR4JwDnoP4Jhgsqa64q517mRVGfJfFVTD4/oH8TUpZsO/7P7FQEh0J8TtY1bvnhM/vIgKy4aD+i2xpuv222Lu6KOuNBPOZhLcs6rORYvYpY0ne+BL7pHPME5ujtUgL6S3lQ8k0ENohclMWEyhdD1H9rmzQewOLcL06CVQGieuJw1/Ng/MX6zBLRt3oDKZEGFfGSOoDVWmx6cMBBJWHw7pxN/gNE+Za9taecT2ktcPh/eGxWuTQ2dxwa6XxyRxzYlud/V0lqfSCc4NuAB8ly/OTNjnteJQ2Tsd2HByfDExG8aOyYCavsLi53xtPIUaDTeLI74uSCtNnYPL5uv3nQIPkGhhm+BV6laktWPZA3433862M5LHl06Ru/9Pvm9D58q5N4vVShbA9huyTXM71MEvJ+hZBq9/PSVnwc1Ka6GM+jQeoOE9OGavEdDiUYWwjIZZHCuL7g8RvcYzfW2LZ1fC845SEEuyTSI+0RhhxZ2B1R7s5Jb/fedxhMyddNxPgkMN9vVPftNmLl/ZE5Tkpi8WRDAiXz5up5hFR5TTpgaz9qQv3YqZWdz6BNTxX1vTyfeNh+94//apAS2OlEBqKFygd3reV4r5jS3FbRL76X7CHTvp0dZn0iNBqrJLhBnBdnp/IMVI9t3MrklonpQ5rVsIB+NcCXzFRkdlIdNhn1iif8dpyowQPgfWXoZBYs2Ru+3XfkZBSJYPXktqwfo0a3D+xkvjBXLUGz5xj9/G6n61knVj9oaNIbGGHJld62Hz8ja3akiZG+ElH2JFpD10LSiwJDKn9JAyn+ehrx8EMalcR3O7E6NbHu4d847KswOIjRSqf5lqlM2ATL0mHLjf+l6HWYmO3WQ8a5CWAmNalG5IEFjihaKNaoGBGoGgTOj9yK/dYIX8mP8Gww4SIKHW/AtohoHysCKo8Du4FmLxxgS4Qr7SxnRjpqMerH4fb5W47pF9gJJG2M6NqUKvYP61SBmbsfTXOgrb7SjKpmsVGJxMEi5GWTmn4ZRU4Ih08CLVRGDPoUifStCeDABnL8hrP4ejPW52AA/hD1VwwbZtyPjKbDAY5DFPb9D8SArE/smiDSFUbLno/Mv+L9BRskOKZp5u2GUekomgW06R0zX6NRbCafz8F12RSJqrZ4Q46nRExuv/r4rQve4jtZNzrfw17W9vEf7kf4Adlsj8EWl1bYXuAaYpUXhrtddPbYed1ZgEtlSxWhOP7V2SA8n2ncsACUJ7Pj0WG2VIOF1Cln5/OWfvySouf5oxyR1+yIxXoL0XdMeh53fTCQ5sXmk0MjqpzdxqhJrNlYWSS0FUT/a/SSN/iKbfJPcZanXZlQHEguPEhA27edVhARnPUrEaZtGDGp1Xr1gluk3L4RDrfyBxSB2QkLhR79oz7naL70wo81L2TdZ4MHxtcc3PGkhW0bmVSWejgeacnfQOmpZXnHFocf99HJTG2h92y5QAYtm5HLZ6n26hnX2N+t54mIvYVdZtdei4++fKf1ciZAZamun7n5pML0m9WsUUegXvWrXmptlCIZ0q8KHYVYWR9HXytZVKXhvwxv8ToWZj5QbjJvPyyILcuDVBfNkMONw5O82+ym3SDQ13/c479AAAAAAAAAAAAAAAA="
 };</script>
 <!-- FS_IMG170:END -->
+<!-- FS_IMG180:BEGIN -->
+<!-- FS_IMG180:END -->
 <script>
 (() => {
   'use strict';
@@ -2751,6 +2860,10 @@ body{background:radial-gradient(120% 60% at 50% 0%, color-mix(in srgb, var(--pap
       say: '체육 시간이 필요해요! 힘센 곰 선생님이 참나무를 흔들면 떨어지는 도토리가 더 커져요.' },
     { id: 'p2', ch: 2, t: 'picks', n: 8, r: 600, title: '참나무 도토리 줍기', how: '참나무를 눌러서 떨어진 도토리를 주워요',
       say: '곰 선생님이 오시니 참나무도 신이 났나 봐요. 떨어진 도토리를 주워서 학교 살림에 보태요.' },
+    { id: 'm1', ch: 2, t: 'mgBest', n: 3, r: 700, title: '숲속 합치기 3단계 만들기', how: '미니게임 > 숲속 합치기에서 같은 조각 둘을 겹쳐요',
+      say: '미니게임 탭에 숲속 합치기가 열렸어요. 생산기를 눌러 조각을 만들고, 같은 조각 둘을 겹치면 다음 단계가 돼요. 3단계까지 만들어 볼까요?' },
+    { id: 'm2', ch: 2, t: 'mgOrders', n: 3, r: 800, title: '학생 주문 3개 채우기', how: '숲속 합치기 위쪽 주문 쪽지를 눌러 조각을 건네요',
+      say: '학생들이 합치기 조각을 갖고 싶어 해요. 주문 쪽지에 적힌 조각을 만들어 건네면 도토리를 받아요.' },
     { id: 'q13', ch: 2, t: 'fac', k: 'library', n: 5, r: 1000, title: '도서관 키우기', how: '도서관을 키우면 평판이 쑥쑥 올라요',
       say: '읍내 곳곳에서 책을 빌리러 와요. 도서관을 Lv.5까지 키우면 도시가 눈앞이에요.' },
     { id: 'q14', ch: 2, t: 'tea', k: 'owl', n: 3, r: 1000, title: '부엉이 선생님 연수', how: '자리 비운 동안 수업료의 75%가 쌓여요',
@@ -2974,6 +3087,7 @@ body{background:radial-gradient(120% 60% at 50% 0%, color-mix(in srgb, var(--pap
     gold: 5, gd: { day: '', n: 0, shop: 0 }, cos: { own: [], hat: '', neck: '', th: { bg: '', classroom: '', cafeteria: '', library: '', science: '', playground: '' }, sp: { classroom: '', cafeteria: '', library: '', science: '', playground: '' } }, autoUntil: 0,
     rank: { name: '', joined: false, sent: -1, by: '', ren: 0, asked: false },
     bs: { classroom: 0, cafeteria: 0, library: 0, science: 0, playground: 0 },   // 1.7.0 건물마다 지금 보이는 모습의 학교급
+    mg: mgFresh(),   // 1.8.0 숲속 합치기
     dex: { got: {}, paid: [] }, ev: { cur: '', start: 0, stamp: { n: 0, last: '' }, list: [], box: false },   // 1.7.0 도감, 이벤트
     // 1.6.0 숲의 정수(미니게임에서만 얻어요)와 블록 퍼즐: 오늘 보상 판 수, 광고로 더한 횟수, 최고 점수, 하던 판
     ess: 0, pz: { day: '', n: 0, adN: 0, best: 0, cur: null },
@@ -3131,6 +3245,7 @@ body{background:radial-gradient(120% 60% at 50% 0%, color-mix(in srgb, var(--pap
     if (s.st.grads < yearsDone) s.st.grads = yearsDone;
     if (s.p.species < Math.min(NEWCOMERS.length, yearsDone)) s.p.species = Math.min(NEWCOMERS.length, yearsDone);
     sanitize170(d, s);   // 1.7.0 도감, 이벤트
+    sanitize180(d, s);   // 1.8.0 숲속 합치기
     s.vp = Math.min(VP.max, Math.floor(num(d.vp, 0, 0)));   // 1.7.0 교감 선생님
     // 1.7.0 학교급별 건물 외관: 예전 저장은 지금 보이는 모습 그대로(유치원 모습, 과학실과 운동장은 초등학교 모습) 시작해서 다음 업그레이드 때 바뀌어요
     if (d.bs && typeof d.bs === 'object') { for (const k of Object.keys(s.bs)) s.bs[k] = Math.min(s.tier, Math.floor(num(d.bs[k], 0, 0))); }
@@ -7502,6 +7617,7 @@ body{background:radial-gradient(120% 60% at 50% 0%, color-mix(in srgb, var(--pap
   }
   function pzWire() {
     $('#pzOpen').addEventListener('click', () => { sfx('tap'); pzOpen(); });
+    bind180();   // 1.8.0 숲속 합치기
     $('#pzAdBtn').addEventListener('click', () => {
       if (!pzCanAd()) return;
       showAd(() => { pzDay(); S.pz.adN += 1; save(); renderMini(); toast(`오늘 보상 판 ${PZ.adMore}번을 더 받았어요`); }, r => { if (r !== 'noad') toast('광고를 끝까지 보지 않아서 보상이 없어요'); });
@@ -7534,6 +7650,7 @@ body{background:radial-gradient(120% 60% at 50% 0%, color-mix(in srgb, var(--pap
     $('#pzCardTag').textContent = S.pz.cur ? '이어서' : '하기';
     $('#pzLeftTxt').textContent = left > 0 ? `오늘 보상 판 ${left}번 남음` : '오늘 보상 판을 다 썼어요 (연습은 계속 할 수 있어요)';
     $('#pzAdBtn').hidden = !pzCanAd();
+    renderMiniMg();   // 1.8.0
   }
 
   /* ---------- 보상 창: 받은 것을 한 창에 크게 보여 줘요 ----------
@@ -8003,22 +8120,24 @@ body{background:radial-gradient(120% 60% at 50% 0%, color-mix(in srgb, var(--pap
     if (!m || !dmReady(m)) return;
     m.done = true;
     S.st.dmDone += 1; addMP(MP.daily);
+    mgAddEnergy(MG.E.dm);   // 1.8.0 숲속 합치기 에너지
     const v = Math.max(10, nice(rate() * 60 * DM.min));
     S.budget += v; earn(v);
     addGold(DM.gold);
     addLeague(LP.mission);
     sfx('quest'); buzz(12);
-    showReward({ title: '미션 완료!', sub: MISSIONS[m.id].name(MISSIONS[m.id].n), items: [{ ic: 'acorn', t: `도토리 +${fmt(v)}` }, { ic: 'gold', t: `황금 도토리 +${DM.gold}` }, { ic: '★', t: `미션 포인트 +${MP.daily}` }] });
+    showReward({ title: '미션 완료!', sub: MISSIONS[m.id].name(MISSIONS[m.id].n), items: [{ ic: 'acorn', t: `도토리 +${fmt(v)}` }, { ic: 'gold', t: `황금 도토리 +${DM.gold}` }, { ic: '⚡', t: `합치기 에너지 +${MG.E.dm}` }, { ic: '★', t: `미션 포인트 +${MP.daily}` }] });
     save(); renderMissions(); renderHUD(); updateQuestDot();
   }
   function claimBonus() {
     if (!dmAllDone() || S.dm.bonus) return;
     S.dm.bonus = true;
     addMP(MP.bonus);
+    mgAddEnergy(MG.E.bonus);   // 1.8.0
     addGold(DM.bonusGold); addDip(DM.bonusDip);
     addLeague(LP.bonus);
     sfx('quest'); buzz(20);
-    showReward({ title: '보너스 상자를 열었어요!', sub: '오늘의 미션을 모두 마쳤어요', items: [{ ic: 'gold', t: `황금 도토리 +${DM.bonusGold}` }, { ic: 'dip', t: `수료증 +${DM.bonusDip}장` }, { ic: '★', t: `미션 포인트 +${MP.bonus}` }] });
+    showReward({ title: '보너스 상자를 열었어요!', sub: '오늘의 미션을 모두 마쳤어요', items: [{ ic: 'gold', t: `황금 도토리 +${DM.bonusGold}` }, { ic: '⚡', t: `합치기 에너지 +${MG.E.bonus}` }, { ic: 'dip', t: `수료증 +${DM.bonusDip}장` }, { ic: '★', t: `미션 포인트 +${MP.bonus}` }] });
     save(); renderMissions(); renderHUD(); updateQuestDot();
   }
   function renderMissions() {
@@ -8103,8 +8222,9 @@ body{background:radial-gradient(120% 60% at 50% 0%, color-mix(in srgb, var(--pap
     if (!m || !wkReady(m)) return;
     m.done = true;
     addGold(MP.weekGold); addMP(MP.week); addLeague(LP.mission * 2);
+    mgAddEnergy(MG.E.wk);   // 1.8.0
     sfx('quest'); buzz(15);
-    toast(`이번 주 미션 완료! 황금 도토리 +${MP.weekGold}, 미션 포인트 +${MP.week}`);
+    toast(`이번 주 미션 완료! 황금 도토리 +${MP.weekGold}, 미션 포인트 +${MP.week}, 합치기 에너지 +${MG.E.wk}`);
     save(); renderMissions(); updateQuestDot();
   }
   function claimBox(i) {
@@ -8117,6 +8237,7 @@ body{background:radial-gradient(120% 60% at 50% 0%, color-mix(in srgb, var(--pap
     if (B.gold) { addGold(B.gold); got.push(`황금 도토리 +${B.gold}`); }
     if (B.dip) { addDip(B.dip); got.push(`수료증 +${B.dip}장`); }
     if (B.feast) { useBooster('feast'); got.push('특식 데이 10분'); }
+    if (i === MP_BOX.length - 1) { mgAddUp(1); got.push('생산기 강화 조각 +1'); }   // 1.8.0: 마지막 주간 상자
     if (B.crown) {
       if (!S.cos.own.includes('hat:crown')) { S.cos.own.push('hat:crown'); S.cos.hat = 'crown'; applyCos(); got.push('금빛 왕관 (학생들이 바로 썼어요!)'); }
       else { addGold(1); got.push('황금 도토리 +1 더'); }
@@ -8623,6 +8744,8 @@ body{background:radial-gradient(120% 60% at 50% 0%, color-mix(in srgb, var(--pap
       case 'souv': return S.trip.souv.length;
       case 'tripat': return S.trip.been[q.k] || 0;
       case 'fest': return S.fest.n[q.k] || 0;
+      case 'mgBest': return Math.max(0, ...Object.values(S.mg.best));   // 1.8.0 숲속 합치기에서 만든 가장 높은 단계
+      case 'mgOrders': return S.mg.st.orders;
       default: return S.st[q.t] || 0;   // picks, ups, trains, claims, grads, perks, fperks
     }
   }
@@ -9280,6 +9403,7 @@ body{background:radial-gradient(120% 60% at 50% 0%, color-mix(in srgb, var(--pap
       updateSports(dt);
       updateFest(dt, now);
       tick170(dt);   // 1.7.0 도감, 이벤트
+      tick180(dt);   // 1.8.0 숲속 합치기
       if (S.oak < OAK.max) { S.oak = Math.min(OAK.max, S.oak + dt / OAK.regen); renderOak(); }
       rt.uiT += dt; if (rt.uiT >= 0.1) { rt.uiT = 0; renderHUD(); }
       rt.affT += dt; if (rt.affT >= 0.25) { rt.affT = 0; renderAffordance(); repTipCheck(); }
@@ -9933,9 +10057,11 @@ body{background:radial-gradient(120% 60% at 50% 0%, color-mix(in srgb, var(--pap
     const a = r.m ? minAcorns(r.m) : 0;
     if (a > 0) { S.budget += a; earn(a); }
     if (r.g) addGold(r.g);
+    const me = i + 1 === 5 ? MG.E.stamp5 : MG.E.stamp; mgAddEnergy(me);   // 1.8.0 합치기 에너지, 도장 7개를 다 모으면 강화 조각
+    const mu = i + 1 === EV_STAMPS.length ? 1 : 0; if (mu) mgAddUp(mu);
     sfx('quest'); buzz(12);
     showReward({ title: `출석 도장 ${i + 1}개째!`, sub: i + 1 === 5 ? '도장 다섯 개를 모아 큰 선물을 받았어요' : i + 1 < 5 ? `${5 - i - 1}개 더 모으면 큰 선물이 있어요` : '끝까지 함께해 줘서 고마워요',
-      items: [a > 0 ? { ic: 'acorn', t: `도토리 +${fmt(a)}` } : null, r.g ? { ic: 'gold', t: `황금 도토리 +${r.g}` } : null] });
+      items: [a > 0 ? { ic: 'acorn', t: `도토리 +${fmt(a)}` } : null, r.g ? { ic: 'gold', t: `황금 도토리 +${r.g}` } : null, { ic: '⚡', t: `합치기 에너지 +${me}` }, mu ? { ic: '🔑', t: '생산기 강화 조각 +1' } : null] });
     save(); renderEvent(); renderHUD();
     return true;
   }
@@ -9955,8 +10081,9 @@ body{background:radial-gradient(120% 60% at 50% 0%, color-mix(in srgb, var(--pap
     if (!evAllDone() || S.ev.box) return false;
     S.ev.box = true;
     addGold(EV_BOX.g); addDip(EV_BOX.dip);
+    mgAddEnergy(MG.E.box); mgAddUp(1);   // 1.8.0
     sfx('quest'); buzz(12);
-    showReward({ title: '기념 상자를 열었어요!', sub: '이벤트 미션을 모두 마쳤어요', art: pic7('ev_box', 'ic_fund'), items: [{ ic: 'gold', t: `황금 도토리 +${EV_BOX.g}` }, { ic: 'dip', t: `수료증 +${EV_BOX.dip}장` }] });
+    showReward({ title: '기념 상자를 열었어요!', sub: '이벤트 미션을 모두 마쳤어요', art: pic7('ev_box', 'ic_fund'), items: [{ ic: 'gold', t: `황금 도토리 +${EV_BOX.g}` }, { ic: '⚡', t: `합치기 에너지 +${MG.E.box}` }, { ic: '🔑', t: '생산기 강화 조각 +1' }, { ic: 'dip', t: `수료증 +${EV_BOX.dip}장` }] });
     save(); renderEvent(); renderHUD();
     return true;
   }
@@ -10059,6 +10186,432 @@ body{background:radial-gradient(120% 60% at 50% 0%, color-mix(in srgb, var(--pap
     else if (v[0] === 'm') claimEvMission(Number(v.slice(1)));
   });
   /* ===== 1.7.0 도감, 이벤트 END ===== */
+  /* ===== 1.8.0 숲속 합치기 BEGIN =====
+     미니게임 2. 판 하나(8×10)에 생산기 4개가 있고, 생산기를 누르면 에너지 1을 쓰고 조각이 나와요. 같은 조각 둘을 겹치면 다음 단계(10단계까지).
+     생산기는 짝이 되는 종류 둘을 번갈아 내고(참나무: 도토리와 버섯 …), 움직일 수 있고, 강화 조각으로 Lv.5까지 올라요(높은 단계가 바로 나와요).
+     에너지는 최고 100, 1분에 1 회복(게임 시계). 오늘의 미션, 보너스 상자, 이번 주 미션, 이벤트 도장과 기념 상자, 광고로 더 받아요.
+     학생 주문을 채우면 도토리(수업료 분치, 조각에 든 에너지 × 0.2분)와 장식 조각(6단계 이상), 강화 조각(8단계 이상). 숲의 정수는 주지 않아요.
+     설계: 프로젝트 문서 "머지 게임 설계안 (1.8.0)". 그림은 FS_IMG180 묶음(아직 없으면 색 조각과 그림 문자) */
+  const MG = {
+    W: 8, H: 10, EMAX: 100, REGEN: 60000, ECAP: 999, UPCAP: 99, PCAP: 9999,
+    SELL: 0.1, ORDER: 0.2,                           // 에너지 1당 수업료 분치 (팔기, 주문)
+    PIECES: [[10, 3], [8, 2], [6, 1]], UPAT: 8,        // 주문 단계별 장식 조각, 강화 조각이 나오는 단계
+    SWAP: 30 * 60000, AD: { n: 2, e: 50 },           // 주문 바꾸기 간격, 광고 하루 2번 +50
+    E: { dm: 15, bonus: 20, wk: 30, stamp: 10, stamp5: 30, box: 50 },
+    LV: [[100], [95, 5], [90, 8, 2], [85, 11, 3.5, 0.5], [80, 14, 5, 1]],   // 생산기 레벨마다 1~4단계가 나올 확률(%)
+    UPCOST: [0, 1, 1, 2, 2],                         // Lv.n+1로 올릴 때 드는 강화 조각 (index = 지금 레벨)
+    kinds: {
+      a: { name: '도토리', em: '🌰', c: '#E8D3A8', st: ['도토리', '도토리 한 줌', '도토리 바구니', '도토리 자루', '도토리 수레', '도토리 창고', '참나무 묘목', '참나무', '큰 참나무', '황금 참나무'] },
+      m: { name: '버섯', em: '🍄', c: '#F6D2C8', st: ['작은 버섯', '버섯 한 쌍', '버섯 바구니', '큰 버섯', '버섯 우산', '버섯 램프', '버섯 집', '버섯 마을', '반딧불 버섯 숲', '황금 버섯 왕국'] },
+      f: { name: '급식', em: '🍪', c: '#FFE0B8', st: ['도토리 쿠키', '산딸기 잼', '버섯 수프', '도토리 빵', '꿀 호떡', '열매 샐러드', '도토리 케이크', '소풍 도시락', '잔치 상', '숲속 뷔페'] },
+      d: { name: '음료', em: '🧃', c: '#F8D7E6', st: ['도토리 차', '산딸기 주스', '꿀물', '우유 한 잔', '코코아', '과일 펀치', '찻주전자 세트', '주스 분수', '숲속 찻집', '무지개 음료 탑'] },
+      s: { name: '학용품', em: '✏️', c: '#FFF1B8', st: ['몽당연필', '연필', '지우개와 연필', '필통', '공책', '그림책', '책가방', '책상 세트', '작은 서재', '숲속 도서관 모형'] },
+      c: { name: '미술용품', em: '🎨', c: '#E3D4F5', st: ['크레파스', '물감 통', '붓', '팔레트', '스케치북', '그림', '액자 그림', '이젤', '작은 미술실', '숲속 미술관'] },
+      g: { name: '꽃', em: '🌸', c: '#FBD5DE', st: ['씨앗', '새싹', '꽃봉오리', '들꽃', '꽃다발', '꽃 화분', '꽃밭', '꽃 아치', '작은 정원', '무지개 정원'] },
+      v: { name: '채소', em: '🥕', c: '#D8EBC0', st: ['당근', '토마토', '호박', '채소 바구니', '텃밭 상자', '허수아비 텃밭', '작은 온실', '채소 수레', '숲속 농장', '황금 호박 농장'] }
+    },
+    gens: { A: { name: '참나무', em: '🌳', kinds: ['a', 'm'] }, F: { name: '급식 냄비', em: '🍲', kinds: ['f', 'd'] }, S: { name: '문구함', em: '🧰', kinds: ['s', 'c'] }, G: { name: '화분', em: '🪴', kinds: ['g', 'v'] } },
+    genAt: [0, 2, 5, 7]                               // 처음 생산기 자리(맨 위 줄)
+  };
+  const MG_KINDS = Object.keys(MG.kinds), MG_GENS = Object.keys(MG.gens), MG_N = MG.W * MG.H;
+  const mgFresh = () => ({ e: MG.EMAX, eAt: 0, board: '', last: {}, orders: [], swapAt: 0, best: {}, pieces: 0, up: 0, ad: { day: '', n: 0 }, seen: false, st: { merges: 0, orders: 0, made10: 0, ups: 0, taps: 0 } });
+  // 칸 글자: 조각은 종류 소문자 + 단계(1~9, 10은 x), 생산기는 대문자 + 레벨(1~5), 빈칸은 '..'
+  const mgLvCh = n => n >= 10 ? 'x' : String(n);
+  const mgLvOf = ch => ch === 'x' ? 10 : (Number(ch) || 0);
+  const mgCells = () => { const b = S.mg.board, out = []; for (let i = 0; i < MG_N; i++) out.push(b.slice(i * 2, i * 2 + 2) || '..'); return out; };
+  const mgSetCells = cells => { S.mg.board = cells.join(''); };
+  const mgIsGen = code => !!MG.gens[code[0]];
+  const mgIsItem = code => !!MG.kinds[code[0]];
+  const mgEmptyBoard = () => { const c = Array(MG_N).fill('..'); MG_GENS.forEach((G, i) => { c[MG.genAt[i]] = G + '1'; }); return c; };
+  const IMG180 = k => (window.FS_IMG180 && window.FS_IMG180[k]) || '';
+  const mgItemKey = (k, n) => `mg_${k}_${String(n).padStart(2, '0')}`;
+  const mgName = code => mgIsGen(code) ? `${MG.gens[code[0]].name} Lv.${mgLvOf(code[1])}` : `${MG.kinds[code[0]].st[mgLvOf(code[1]) - 1]} (${mgLvOf(code[1])}단계)`;
+  // 조각 하나에 든 에너지: 단계 n = 2^(n-1). 보상은 이 값에 비례해요
+  const mgEnergyOf = n => Math.pow(2, n - 1);
+  const mgSellMin = n => mgEnergyOf(n) * MG.SELL;
+  const mgOrderMin = (n, c) => mgEnergyOf(n) * c * MG.ORDER;
+  // 저장 읽기: sanitize()에서 불러요. 판 글자가 이상하거나 생산기가 빠졌으면 바로잡아요
+  function sanitize180(d, s) {
+    const num = (v, min, fb) => (typeof v === 'number' && isFinite(v) && v >= min) ? v : fb;
+    s.mg = mgFresh();
+    const m = d.mg && typeof d.mg === 'object' ? d.mg : null;
+    if (!m) { s.mg.board = mgEmptyBoard().join(''); return; }
+    s.mg.e = Math.min(MG.ECAP, Math.floor(num(m.e, 0, MG.EMAX)));
+    s.mg.eAt = Math.min(num(m.eAt, 0, 0), Date.now() + 366 * 86400000);
+    let cells = null;
+    if (typeof m.board === 'string' && m.board.length === MG_N * 2) { cells = []; for (let i = 0; i < MG_N; i++) cells.push(m.board.slice(i * 2, i * 2 + 2)); }
+    if (cells) {
+      cells = cells.map(c => (mgIsItem(c) && mgLvOf(c[1]) >= 1) ? c : (mgIsGen(c) && mgLvOf(c[1]) >= 1 && mgLvOf(c[1]) <= 5) ? c : '..');
+      for (const G of MG_GENS) {   // 생산기는 종류마다 꼭 하나: 둘이면 뒤의 것을 빈칸으로, 없으면 빈칸에 Lv.1로
+        let seen = false;
+        cells = cells.map(c => { if (c[0] !== G) return c; if (seen) return '..'; seen = true; return c; });
+        if (!seen) { const j = cells.indexOf('..'); if (j >= 0) cells[j] = G + '1'; }
+      }
+      if (MG_GENS.some(G => !cells.some(c => c[0] === G))) cells = mgEmptyBoard();
+    } else cells = mgEmptyBoard();
+    s.mg.board = cells.join('');
+    if (m.last && typeof m.last === 'object') for (const G of MG_GENS) if (MG.gens[G].kinds.includes(m.last[G])) s.mg.last[G] = m.last[G];
+    if (Array.isArray(m.orders)) s.mg.orders = m.orders.filter(o => o && MG.kinds[o.k] && num(o.n, 2, 0) >= 2 && num(o.n, 0, 0) <= 10).slice(0, 3)
+      .map(o => ({ k: o.k, n: Math.floor(o.n), c: Math.min(3, Math.max(1, Math.floor(num(o.c, 1, 1)))), who: typeof o.who === 'string' ? o.who.slice(0, 12) : 'rabbit' }));
+    s.mg.swapAt = num(m.swapAt, 0, 0);
+    if (m.best && typeof m.best === 'object') for (const k of MG_KINDS) s.mg.best[k] = Math.min(10, Math.floor(num(m.best[k], 0, 0)));
+    s.mg.pieces = Math.min(MG.PCAP, Math.floor(num(m.pieces, 0, 0)));
+    s.mg.up = Math.min(MG.UPCAP, Math.floor(num(m.up, 0, 0)));
+    if (m.ad && typeof m.ad === 'object') s.mg.ad = { day: typeof m.ad.day === 'string' ? m.ad.day.slice(0, 10) : '', n: Math.floor(num(m.ad.n, 0, 0)) };
+    s.mg.seen = !!m.seen;
+    if (m.st && typeof m.st === 'object') for (const k of Object.keys(s.mg.st)) s.mg.st[k] = Math.floor(num(m.st[k], 0, 0));
+  }
+  /* ---- 에너지 ---- */
+  function mgTick() {
+    const m = S.mg, now = gameNow();
+    if (!m.eAt || m.eAt > now) { m.eAt = now; return; }
+    if (m.e >= MG.EMAX) { m.eAt = now; return; }
+    const got = Math.floor((now - m.eAt) / MG.REGEN);
+    if (got <= 0) return;
+    m.e = Math.min(MG.EMAX, m.e + got);
+    m.eAt = m.e >= MG.EMAX ? now : m.eAt + got * MG.REGEN;
+  }
+  // 보상으로 받는 에너지는 100을 넘어도 돼요(회복만 100에서 멈춰요)
+  function mgAddEnergy(n) { mgTick(); S.mg.e = Math.min(MG.ECAP, S.mg.e + n); if (S.mg.e >= MG.EMAX) S.mg.eAt = gameNow(); }
+  function mgAddUp(n) { S.mg.up = Math.min(MG.UPCAP, S.mg.up + n); }
+  const mgEnergyIn = () => { mgTick(); const m = S.mg; if (m.e >= MG.EMAX) return 0; return Math.max(1, Math.ceil((MG.REGEN - (gameNow() - m.eAt)) / 1000)); };
+  const mgAdLeft = () => { if (S.mg.ad.day !== gameToday()) S.mg.ad = { day: gameToday(), n: 0 }; return Math.max(0, MG.AD.n - S.mg.ad.n); };
+  /* ---- 생산기 ---- */
+  function mgSpawnLevel(lv) {
+    const row = MG.LV[Math.max(0, Math.min(4, lv - 1))], r = Math.random() * 100;
+    let acc = 0;
+    for (let i = 0; i < row.length; i++) { acc += row[i]; if (r < acc) return i + 1; }
+    return 1;
+  }
+  function mgSpawnKind(G) {
+    const ks = MG.gens[G].kinds, last = S.mg.last[G];
+    const cnt = S.mg.lastN && S.mg.lastN[G] || 0;
+    let k = Math.random() < 0.5 ? ks[0] : ks[1];
+    if (last && k === last && cnt >= 2) k = ks[0] === last ? ks[1] : ks[0];   // 같은 종류가 세 번 연달아 나오지 않게
+    S.mg.lastN = S.mg.lastN || {};
+    S.mg.lastN[G] = k === last ? cnt + 1 : 1;
+    S.mg.last[G] = k;
+    return k;
+  }
+  // 생산기에서 가장 가까운 빈칸(줄과 칸 거리의 합이 가장 작은 곳)
+  function mgNearestEmpty(cells, from) {
+    const fr = Math.floor(from / MG.W), fc = from % MG.W;
+    let best = -1, bd = 1e9;
+    cells.forEach((c, i) => { if (c !== '..') return; const d = Math.abs(Math.floor(i / MG.W) - fr) + Math.abs(i % MG.W - fc); if (d < bd) { bd = d; best = i; } });
+    return best;
+  }
+  function mgTapGen(i) {
+    const cells = mgCells(), code = cells[i];
+    if (!mgIsGen(code)) return false;
+    mgTick();
+    const to = mgNearestEmpty(cells, i);
+    if (to < 0) { mgShake(i); toast('판이 가득 찼어요. 조각을 합치거나 팔아서 자리를 비워요'); return false; }
+    if (S.mg.e < 1) { mgShake(i); toast(`에너지가 부족해요. ${mgEnergyIn()}초 뒤에 1 차요`); return false; }
+    if (S.mg.e >= MG.EMAX) S.mg.eAt = gameNow();   // 가득 찬 상태에서 처음 쓰면 이때부터 회복을 재요
+    S.mg.e -= 1;
+    const k = mgSpawnKind(code[0]), n = mgSpawnLevel(mgLvOf(code[1]));
+    cells[to] = k + mgLvCh(n);
+    mgSetCells(cells);
+    S.mg.st.taps += 1;
+    mgNoteBest(k, n);
+    mgUI.pop = to;
+    sfx('tap'); buzz(6);
+    mgRenderBoard(); mgRenderTop(); mgRenderOrders(); mgSelect(i);
+    save();
+    return true;
+  }
+  function mgNoteBest(k, n) { if ((S.mg.best[k] || 0) < n) { S.mg.best[k] = n; if (n >= 10) S.mg.st.made10 += 1; } }
+  /* ---- 합치기, 옮기기, 팔기 ---- */
+  // from 조각을 to 칸에 놓아요. 같은 조각이면 합치고, 빈칸이면 옮기고, 다른 조각이면 자리를 바꿔요
+  function mgDrop(from, to) {
+    if (from === to || from < 0 || to < 0) return false;
+    const cells = mgCells(), a = cells[from], b = cells[to];
+    if (a === '..') return false;
+    if (b === '..') { cells[to] = a; cells[from] = '..'; mgSetCells(cells); mgUI.sel = to; sfx('tap'); return 'move'; }
+    if (mgIsItem(a) && a === b && mgLvOf(a[1]) < 10) {
+      const k = a[0], n = mgLvOf(a[1]) + 1;
+      // 5개 보너스: 놓는 칸 둘레(상하좌우)에 같은 조각이 3개 더 있으면 다섯을 한 번에 합쳐 다음 단계 2개 + 1단계 1개
+      const nb = [to - MG.W, to + MG.W, to % MG.W > 0 ? to - 1 : -1, to % MG.W < MG.W - 1 ? to + 1 : -1].filter(j => j >= 0 && j < MG_N && j !== from && cells[j] === a);
+      cells[from] = '..';
+      if (nb.length >= 3) {
+        const three = nb.slice(0, 3);
+        cells[to] = k + mgLvCh(n); cells[three[0]] = k + mgLvCh(n); cells[three[1]] = k + '1'; cells[three[2]] = '..';
+        S.mg.st.merges += 4; mgUI.merged = [to, three[0], three[1]];
+        toast('다섯 개를 한 번에 합쳤어요! 보너스로 하나 더');
+      } else { cells[to] = k + mgLvCh(n); S.mg.st.merges += 1; mgUI.merged = [to]; }
+      mgSetCells(cells);
+      mgNoteBest(k, n);
+      mgUI.sel = to;
+      sfx(n >= 8 ? 'quest' : 'coin'); buzz(n >= 5 ? 14 : 8);
+      if (n >= 10) toast(`${MG.kinds[k].st[9]}을 만들었어요! 10단계 최고 조각이에요`);
+      return 'merge';
+    }
+    cells[to] = a; cells[from] = b; mgSetCells(cells); mgUI.sel = to; sfx('tap');
+    return 'swap';
+  }
+  function mgSell(i) {
+    const cells = mgCells(), code = cells[i];
+    if (!mgIsItem(code)) return false;
+    const n = mgLvOf(code[1]), v = minAcorns(mgSellMin(n));
+    cells[i] = '..'; mgSetCells(cells);
+    S.budget += v; earn(v);
+    mgUI.sel = -1;
+    mgFloat(i, `+${fmt(v)}`);
+    sfx('coin');
+    toast(`${mgName(code)}을 팔아 도토리 ${fmt(v)}개를 받았어요`);
+    mgRenderBoard(); mgRenderOrders(); mgRenderFoot(); renderHUD(); save();
+    return true;
+  }
+  /* ---- 생산기 강화 ---- */
+  const mgUpCost = lv => lv >= 5 ? 0 : MG.UPCOST[lv];
+  function mgUpgrade(i) {
+    const cells = mgCells(), code = cells[i];
+    if (!mgIsGen(code)) return false;
+    const lv = mgLvOf(code[1]), cost = mgUpCost(lv);
+    if (lv >= 5) { toast('이미 최고 레벨이에요'); return false; }
+    if (S.mg.up < cost) { toast(`강화 조각이 ${cost - S.mg.up}개 더 있어야 해요`); return false; }
+    S.mg.up -= cost;
+    cells[i] = code[0] + String(lv + 1); mgSetCells(cells);
+    S.mg.st.ups += 1;
+    mgUI.merged = [i];
+    sfx('quest'); buzz(16);
+    toast(`${MG.gens[code[0]].name} Lv.${lv + 1}! 높은 단계가 더 자주 나와요`);
+    mgRenderBoard(); mgRenderTop(); mgSelect(i); save();
+    return true;
+  }
+  /* ---- 학생 주문 ---- */
+  const MG_WHO = () => (typeof speciesList === 'function' ? speciesList() : ['rabbit', 'fox', 'raccoon', 'chick', 'bear']);
+  function mgNewOrder(avoid) {
+    const pool = MG_KINDS.filter(k => !avoid.includes(k));
+    const k = (pool.length ? pool : MG_KINDS)[Math.floor(Math.random() * (pool.length ? pool.length : MG_KINDS.length))];
+    const best = Math.max(2, S.mg.best[k] || 0);
+    const n = Math.max(2, best - Math.floor(Math.random() * 3));
+    const c = n <= 3 && Math.random() < 0.4 ? 2 : 1;
+    const who = MG_WHO(); return { k, n, c, who: who[Math.floor(Math.random() * who.length)] };
+  }
+  function mgFillOrders() {
+    while (S.mg.orders.length < 3) S.mg.orders.push(mgNewOrder(S.mg.orders.map(o => o.k)));
+  }
+  const mgCount = (cells, k, n) => cells.filter(c => c === k + mgLvCh(n)).length;
+  const mgOrderOk = o => mgCount(mgCells(), o.k, o.n) >= o.c;
+  function mgOrderReward(o) {
+    const m = mgOrderMin(o.n, o.c), a = minAcorns(m);
+    const pc = (MG.PIECES.find(([lv]) => o.n >= lv) || [0, 0])[1] * o.c;
+    const up = o.n >= MG.UPAT ? o.c : 0;
+    return { a, pc, up };
+  }
+  function mgClaimOrder(i) {
+    const o = S.mg.orders[i];
+    if (!o || !mgOrderOk(o)) return false;
+    const cells = mgCells(); let left = o.c;
+    for (let j = 0; j < cells.length && left > 0; j++) if (cells[j] === o.k + mgLvCh(o.n)) { cells[j] = '..'; left -= 1; }
+    mgSetCells(cells);
+    const r = mgOrderReward(o);
+    S.budget += r.a; earn(r.a);
+    S.mg.pieces = Math.min(MG.PCAP, S.mg.pieces + r.pc);
+    if (r.up) mgAddUp(r.up);
+    S.mg.st.orders += 1;
+    S.mg.orders.splice(i, 1); mgFillOrders();
+    mgUI.sel = -1;
+    sfx('quest'); buzz(14);
+    const who = (typeof DEX_NAMES === 'object' && DEX_NAMES[o.who]) || (NEWCOMERS.find(x => x.k === o.who) || {}).name || '학생';
+    showReward({ title: '주문을 채웠어요!', sub: `${who}에게 ${MG.kinds[o.k].st[o.n - 1]} ${o.c}개를 줬어요`,
+      items: [{ ic: 'acorn', t: `도토리 +${fmt(r.a)}` }, r.pc ? { ic: '💎', t: `장식 조각 +${r.pc}` } : null, r.up ? { ic: '🔑', t: `생산기 강화 조각 +${r.up}` } : null] });
+    mgRenderAll(); renderHUD(); checkQuests(); save();
+    return true;
+  }
+  const mgSwapLeft = () => Math.max(0, MG.SWAP - (gameNow() - S.mg.swapAt));
+  function mgSwapOrder(i) {
+    if (!S.mg.orders[i]) return false;
+    if (mgSwapLeft() > 0) { toast(`${Math.ceil(mgSwapLeft() / 60000)}분 뒤에 바꿀 수 있어요`); return false; }
+    S.mg.swapAt = gameNow();
+    S.mg.orders[i] = mgNewOrder(S.mg.orders.filter((_, j) => j !== i).map(o => o.k).concat([S.mg.orders[i].k]));
+    sfx('tap');
+    mgRenderOrders(); save();
+    return true;
+  }
+  /* ---- 화면 ---- */
+  const mgUI = { open: false, cells: [], sel: -1, pop: -1, merged: null, drag: null, dragEl: null };
+  const mgTileHtml = code => {
+    if (code === '..') return '';
+    if (mgIsGen(code)) {
+      const G = MG.gens[code[0]], lv = mgLvOf(code[1]), img = IMG180('mg_gen_' + code[0]);
+      return `<div class="mg-tile gen${img ? ' has-img' : ''}" style="${img ? `--mg-img:url('${img}')` : ''}"><span class="mg-stars" aria-hidden="true">${lv > 1 ? '★'.repeat(lv - 1) : ''}</span>${G.em}<b>Lv.${lv}</b></div>`;
+    }
+    const K = MG.kinds[code[0]], n = mgLvOf(code[1]), img = IMG180(mgItemKey(code[0], n));
+    return `<div class="mg-tile${n >= 10 ? ' lv10' : ''}${img ? ' has-img' : ''}" style="--mg-c:${K.c};${img ? `--mg-img:url('${img}')` : ''}">${K.em}<b>${n}</b></div>`;
+  };
+  function mgBuildGrid() {
+    const g = $('#mgGrid'); if (!g || mgUI.cells.length) return;
+    g.innerHTML = Array.from({ length: MG_N }, (_, i) => `<div class="mg-cell" data-i="${i}"></div>`).join('');
+    mgUI.cells = [...g.querySelectorAll('.mg-cell')];
+    g.addEventListener('pointerdown', mgPointerDown);
+    g.addEventListener('pointermove', mgPointerMove);
+    g.addEventListener('pointerup', mgPointerUp);
+    g.addEventListener('pointercancel', () => mgDragEnd(true));
+    $$('[data-mg]', $('#mgScene')).forEach(el => { const u = IMG180(el.dataset.mg); if (u) { el.style.setProperty(el.classList.contains('mh-pic') ? '--mh-img' : '--mg-ic', `url('${u}')`); el.classList.add('has-img'); } });
+    const bd = IMG180('mg_board'); if (bd) $('#mgBoard').style.setProperty('--mg-board', `url('${bd}')`);
+    const bg = IMG('pz_bg'); if (bg) $('#mgScene').style.setProperty('--mg-bg', `url('${bg}')`);
+    ['light', 'dark'].forEach(t => { const u = IMG180('mg_order_' + t); if (u) $('#mgScene').style.setProperty('--mg-order-' + t, `url('${u}')`); });   // 주문 쪽지 틀(밝은 판, 어두운 판)
+  }
+  function mgRenderBoard() {
+    const cells = mgCells();
+    mgUI.cells.forEach((el, i) => {
+      const code = cells[i];
+      if (el.dataset.v !== code) { el.dataset.v = code; el.innerHTML = mgTileHtml(code); }
+      el.classList.toggle('sel', i === mgUI.sel);
+      el.classList.remove('new', 'merge', 'over');
+      if (i === mgUI.pop) { void el.offsetWidth; el.classList.add('new'); }
+      if (mgUI.merged && mgUI.merged.includes(i)) { void el.offsetWidth; el.classList.add('merge'); }
+    });
+    mgUI.pop = -1; mgUI.merged = null;
+  }
+  function mgRenderTop() {
+    mgTick();
+    const m = S.mg;
+    $('#mgE').textContent = m.e; $('#mgEMax').textContent = `/${MG.EMAX}`;
+    const sec = mgEnergyIn();
+    $('#mgETimer').textContent = sec ? ` ${sec}초` : '';   // 다음 1이 차기까지 남은 시간. 가득 차면 비워요
+    $('#mgPc').textContent = m.pieces; $('#mgUp').textContent = m.up;
+    const ad = $('#mgAdBtn'), left = mgAdLeft();
+    ad.innerHTML = `광고 +${MG.AD.e}<small>${left}/${MG.AD.n}</small>`;
+    ad.setAttribute('aria-disabled', left > 0 ? 'false' : 'true');
+  }
+  function mgRenderOrders() {
+    mgFillOrders();
+    const cells = mgCells(), can = mgSwapLeft() <= 0;
+    $('#mgOrders').innerHTML = S.mg.orders.map((o, i) => {
+      const ok = mgCount(cells, o.k, o.n) >= o.c, r = mgOrderReward(o), img = IMG('chr_' + o.who);
+      return `<button class="mg-order${ok ? ' ok' : ''}" type="button" data-order="${i}" aria-label="${MG.kinds[o.k].st[o.n - 1]} ${o.c}개 주문${ok ? ', 눌러서 건네기' : ''}">` +
+        `<span class="mo-who" style="${img ? `--mo-img:url('${img}')` : ''}"></span><span class="mo-it">${mgTileHtml(o.k + mgLvCh(o.n))}<span>×${o.c}</span></span>` +
+        `<span class="mo-n">${ok ? '건네기' : `${mgCount(cells, o.k, o.n)}/${o.c}`}</span><span class="mo-rw">${acornIcon()}${fmt(r.a)}${r.pc ? ` 💎${r.pc}` : ''}${r.up ? ' 🔑' : ''}</span>` +
+        `<span class="mo-swap" data-swap="${i}" title="다른 주문으로" ${can ? '' : 'hidden'} role="button" aria-label="다른 주문으로 바꾸기">↻</span></button>`;
+    }).join('');
+  }
+  function mgRenderFoot() {
+    const f = $('#mgFoot'), i = mgUI.sel, cells = mgCells(), code = i >= 0 ? cells[i] : '..';
+    if (code === '..') { f.innerHTML = '<div class="mf-tx"><b>숲속 합치기</b><span>생산기를 눌러 조각을 만들고, 같은 조각 둘을 겹쳐요</span></div>'; return; }
+    if (mgIsGen(code)) {
+      const G = MG.gens[code[0]], lv = mgLvOf(code[1]), cost = mgUpCost(lv);
+      f.innerHTML = `${mgTileHtml(code)}<div class="mf-tx"><b>${G.name} Lv.${lv}</b><span>${G.kinds.map(k => MG.kinds[k].name).join('과 ')}이 나와요. 끌어서 옮길 수 있어요</span></div>` +
+        `<button class="mf-btn${lv >= 5 ? ' sub' : ''}" type="button" data-mgup="${i}" aria-disabled="${lv >= 5 ? 'true' : 'false'}">${lv >= 5 ? '최고 레벨' : `강화 🔑${cost}`}</button>`;
+      return;
+    }
+    const n = mgLvOf(code[1]);
+    f.innerHTML = `${mgTileHtml(code)}<div class="mf-tx"><b>${MG.kinds[code[0]].st[n - 1]}</b><span>${MG.kinds[code[0]].name} ${n}단계${n < 10 ? ', 같은 것과 겹치면 ' + MG.kinds[code[0]].st[n] : ', 최고 단계예요'}</span></div>` +
+      `<button class="mf-btn sub" type="button" data-mgsell="${i}">팔기 ${fmt(minAcorns(mgSellMin(n)))}</button>`;
+  }
+  function mgRenderAll() { mgBuildGrid(); mgRenderBoard(); mgRenderTop(); mgRenderOrders(); mgRenderFoot(); }
+  function mgSelect(i) { mgUI.sel = i; mgUI.cells.forEach((el, j) => el.classList.toggle('sel', j === i)); mgRenderFoot(); }
+  function mgShake(i) { const el = mgUI.cells[i]; if (!el) return; el.classList.remove('merge'); $('#mgBoard').classList.remove('shake'); void el.offsetWidth; $('#mgBoard').classList.add('shake'); setTimeout(() => $('#mgBoard').classList.remove('shake'), 350); }
+  function mgFloat(i, txt) {
+    const el = mgUI.cells[i], g = $('#mgGrid'); if (!el || !g) return;
+    const r = el.getBoundingClientRect(), gr = g.getBoundingClientRect();
+    const d = document.createElement('div'); d.className = 'mg-float'; d.textContent = txt;
+    d.style.left = (r.left - gr.left + r.width / 2 - 14) + 'px'; d.style.top = (r.top - gr.top) + 'px';
+    g.appendChild(d); setTimeout(() => d.remove(), 1000);
+  }
+  /* 끌기: 조각(생산기 포함)을 누른 채 움직이면 따라오는 그림자가 생기고, 놓은 칸에 mgDrop. 움직이지 않고 떼면 고르기(생산기는 누르기) */
+  function mgPointerDown(e) {
+    const cell = e.target.closest('.mg-cell'); if (!cell || mgUI.drag) return;
+    const i = +cell.dataset.i, code = mgCells()[i];
+    if (code === '..') { mgSelect(-1); return; }
+    e.preventDefault();
+    mgUI.drag = { i, x0: e.clientX, y0: e.clientY, moved: false, id: e.pointerId, over: -1 };
+    try { $('#mgGrid').setPointerCapture(e.pointerId); } catch (x) { /* 무시 */ }
+  }
+  function mgPointerMove(e) {
+    const d = mgUI.drag; if (!d || e.pointerId !== d.id) return;
+    const dx = e.clientX - d.x0, dy = e.clientY - d.y0;
+    if (!d.moved) {
+      if (dx * dx + dy * dy < 36) return;
+      d.moved = true;
+      const g = document.createElement('div'); g.className = 'mg-drag'; g.innerHTML = mgTileHtml(mgCells()[d.i]);
+      document.body.appendChild(g); mgUI.dragEl = g;
+      mgUI.cells[d.i].style.opacity = '.35';
+    }
+    mgUI.dragEl.style.left = e.clientX + 'px'; mgUI.dragEl.style.top = e.clientY + 'px';
+    const t = document.elementFromPoint(e.clientX, e.clientY), c = t && t.closest('.mg-cell');
+    const over = c ? +c.dataset.i : -1;
+    if (over !== d.over) { if (d.over >= 0) mgUI.cells[d.over].classList.remove('over'); d.over = over; if (over >= 0 && over !== d.i) mgUI.cells[over].classList.add('over'); }
+  }
+  function mgPointerUp(e) {
+    const d = mgUI.drag; if (!d || e.pointerId !== d.id) return;
+    const i = d.i, moved = d.moved, over = d.over;
+    mgDragEnd(false);
+    if (!moved) { if (mgIsGen(mgCells()[i])) mgTapGen(i); else mgSelect(mgUI.sel === i ? -1 : i); return; }
+    if (over >= 0 && over !== i) {
+      const r = mgDrop(i, over);
+      if (r) { mgRenderBoard(); mgRenderOrders(); mgRenderFoot(); if (r === 'merge') checkQuests(); save(); }
+    }
+  }
+  function mgDragEnd(cancel) {
+    const d = mgUI.drag; if (!d) return;
+    if (mgUI.dragEl) { mgUI.dragEl.remove(); mgUI.dragEl = null; }
+    if (mgUI.cells[d.i]) mgUI.cells[d.i].style.opacity = '';
+    if (d.over >= 0 && mgUI.cells[d.over]) mgUI.cells[d.over].classList.remove('over');
+    try { $('#mgGrid').releasePointerCapture(d.id); } catch (x) { /* 무시 */ }
+    mgUI.drag = null;
+  }
+  function mgOpen() {
+    mgTick();
+    if (!S.mg.board || S.mg.board.length !== MG_N * 2) mgSetCells(mgEmptyBoard());
+    mgFillOrders();
+    mgUI.open = true; mgUI.sel = -1;
+    $('#mgScene').hidden = false;
+    $('#mgUpSheet').hidden = true;
+    $('#mgHelp').hidden = !!S.mg.seen;
+    mgRenderAll();
+    musicSync();
+  }
+  function mgClose() {
+    mgUI.open = false; mgDragEnd(true);
+    $('#mgScene').hidden = true;
+    save(); renderMini(); musicSync();
+  }
+  function mgOpenUp(i) {
+    const code = mgCells()[i]; if (!mgIsGen(code)) return;
+    const G = MG.gens[code[0]], lv = mgLvOf(code[1]), cost = mgUpCost(lv);
+    mgUI.upAt = i;
+    $('#mgUpTitle').textContent = `${G.name} 강화`;
+    $('#mgUpRow').innerHTML = `${mgTileHtml(code)}<span>Lv.${lv}${lv < 5 ? ` → Lv.${lv + 1}` : ' (최고)'}</span><span>🔑 ${S.mg.up}${lv < 5 ? ` / ${cost}` : ''}</span>`;
+    $('#mgUpTable').innerHTML = '<tr><th>레벨</th><th>1단계</th><th>2단계</th><th>3단계</th><th>4단계</th></tr>' + MG.LV.map((row, j) => `<tr class="${j + 1 === lv ? 'now' : ''}"><td>Lv.${j + 1}</td>${[0, 1, 2, 3].map(c => `<td>${row[c] != null ? row[c] + '%' : '-'}</td>`).join('')}</tr>`).join('');
+    $('#mgUpNote').textContent = lv >= 5 ? '최고 레벨이에요. 높은 단계가 가장 자주 나와요' : S.mg.up >= cost ? `강화 조각 ${cost}개를 써서 Lv.${lv + 1}로 올려요` : `강화 조각이 ${cost - S.mg.up}개 더 있어야 해요. 이벤트 기념 상자, 주간 상자, 출석 도장 7개, 8단계 이상 주문에서 받아요`;
+    $('#mgUpYes').hidden = lv >= 5;
+    $('#mgUpYes').setAttribute('aria-disabled', S.mg.up >= cost ? 'false' : 'true');
+    $('#mgUpSheet').hidden = false;
+  }
+  function mgWatchAd() {
+    if (mgAdLeft() <= 0) { toast('오늘 광고 에너지는 다 받았어요'); return; }
+    showAd(() => { mgAdLeft(); S.mg.ad.n += 1; mgAddEnergy(MG.AD.e); save(); mgRenderTop(); toast(`에너지 +${MG.AD.e}`); }, r => { if (r !== 'noad') toast('광고를 끝까지 보지 않아서 에너지가 없어요'); });
+  }
+  function renderMiniMg() {
+    const sub = $('#mgCardSub'); if (!sub || !S) return;
+    mgTick();
+    const ok = S.mg.orders.filter(mgOrderOk).length;
+    sub.textContent = `에너지 ${S.mg.e}/${MG.EMAX}${ok ? `, 건넬 수 있는 주문 ${ok}개` : ''}`;
+    const th = $('.mg-thumb'); if (th) { const u = IMG180('mg_card'); if (u) { th.style.setProperty('--mg-card', `url('${u}')`); th.classList.add('has-img'); } }
+  }
+  function tick180() { if (mgUI.open && !mgUI.drag) { const e0 = S.mg.e; mgTick(); mgRenderTop(); if (S.mg.e !== e0) mgRenderOrders(); } }
+  function bind180() {
+    $('#mgOpen').addEventListener('click', () => { sfx('tap'); mgOpen(); });
+    $('#mgBack').addEventListener('click', () => { sfx('tap'); mgClose(); });
+    $('#mgHelpOk').addEventListener('click', () => { S.mg.seen = true; $('#mgHelp').hidden = true; save(); });
+    $('#mgAdBtn').addEventListener('click', () => { sfx('tap'); mgWatchAd(); });
+    $('#mgOrders').addEventListener('click', e => {
+      const sw = e.target.closest('[data-swap]'); if (sw) { e.stopPropagation(); mgSwapOrder(+sw.dataset.swap); return; }
+      const b = e.target.closest('[data-order]'); if (!b) return;
+      const i = +b.dataset.order;
+      if (!mgClaimOrder(i)) { const o = S.mg.orders[i]; if (o) toast(`${MG.kinds[o.k].st[o.n - 1]} ${o.c}개가 있어야 해요`); }
+    });
+    $('#mgFoot').addEventListener('click', e => {
+      const s = e.target.closest('[data-mgsell]'); if (s) { mgSell(+s.dataset.mgsell); return; }
+      const u = e.target.closest('[data-mgup]'); if (u) { sfx('tap'); mgOpenUp(+u.dataset.mgup); }
+    });
+    $('#mgUpNo').addEventListener('click', () => { $('#mgUpSheet').hidden = true; });
+    $('#mgUpYes').addEventListener('click', () => { if (mgUpgrade(mgUI.upAt)) $('#mgUpSheet').hidden = true; });
+  }
+  /* ===== 1.8.0 숲속 합치기 END ===== */
 
   /* ---------- 시작 ---------- */
   function start(data) {
@@ -10139,7 +10692,7 @@ body{background:radial-gradient(120% 60% at 50% 0%, color-mix(in srgb, var(--pap
   // 시험용 손잡이: 자동 시험(window.__FOREST_TEST)에서만 게임 속 함수를 꺼내 써요
   if (window.__FOREST_TEST) window.__forest = { get S() { return S; }, get Cloud() { return Cloud; }, rt, makeDeal, furStage, DEAL, navInfo, navRoute, spawnDrop, repTipCheck, linkGoogle, retryCloud, sanitize, acctPending, renderMap, renderHUD, renderAffordance, syncKids, layoutMap, geo, startTrial, hitTrial, endTrial, startVisit, endVisit, showReward, recommend, needCost, prepTopUp, qReward, prepPhase, rankScore, pwOf, previewDip, dipMult, costScale, buyFacility, buyFur, buyFurAll, furCost, furReady, furDone, FUR, startTalk, endTalk, teacherAct, facCost, teaCost, facKeys, rate, rep, capacity, canGraduate, canPromote,
     fmt, fmt2, graduate, promote, buyPerk, perkCost, perkMaxed, buyFundPerk, fpCost, claimMain, mainReady, curMain, qNo, earn, CFG, TEA, teaMaxed, PERKS, FPERKS, MAIN, finalYear, startTrip, claimTrip, TRIPS, yearLocked, startSports, endSports, rtSports: () => rt.sports, startFest, rtFest: () => rt.fest, facCap, addLeague, weekIdx, addMP, tutStart, endFest, claimSports, claimBox, musicWant, askBox, festWait, setTab, openSheet, closeSheet,
-    dexMeet, dexSync, dexPending, dexGift, renderDex, evCurrent, evNext, evSync, claimStamp, claimEvMission, claimEvBox, renderEvent, evMissions, evOk, evSkipped, EV_MONTHS, EV_MEASURE, tierMinutes, minAcorns, sanitize170, EV_STAMPS, EV_SPECIAL, EV_MONTHLY, EV_BOX, DEX_KEYS, DEX_REWARD, DEX_GUEST_KEYS, seasonKey, roofArtKey, oakKey, setSeasonArt, VP, vpLv, vpCost, vpMult, vpAct, renderVpCard, sportsPrize, festPrize, renderTeachers, buildTeacherCards, bldImg, roofKey, bldStage, mapKey, setMapArt, applyThemes, buyFacility, startTrial, endTrial: () => rt.trial && (rt.trial.left = 0), spawnDeal, startVisit, IMG170,   // 1.7.0 도감, 이벤트
+    dexMeet, dexSync, dexPending, dexGift, renderDex, evCurrent, evNext, evSync, claimStamp, claimEvMission, claimEvBox, renderEvent, evMissions, evOk, evSkipped, EV_MONTHS, EV_MEASURE, tierMinutes, minAcorns, sanitize170, EV_STAMPS, EV_SPECIAL, EV_MONTHLY, EV_BOX, DEX_KEYS, DEX_REWARD, DEX_GUEST_KEYS, MG, mgCells, mgSetCells, mgTick, mgAddEnergy, mgAddUp, mgTapGen, mgDrop, mgSell, mgUpgrade, mgClaimOrder, mgSwapOrder, mgOrderOk, mgFillOrders, mgOpen, mgClose, mgRenderAll, mgSpawnLevel, mgNearestEmpty, mgEmptyBoard, mgOrderReward, mgUI, sanitize180, mgWatchAd, nice, claimMission, claimBonus, claimWeekMission, MP_BOX, seasonKey, roofArtKey, oakKey, setSeasonArt, VP, vpLv, vpCost, vpMult, vpAct, renderVpCard, sportsPrize, festPrize, renderTeachers, buildTeacherCards, bldImg, roofKey, bldStage, mapKey, setMapArt, applyThemes, buyFacility, startTrial, endTrial: () => rt.trial && (rt.trial.left = 0), spawnDeal, startVisit, IMG170,   // 1.7.0 도감, 이벤트
     PZ, PZ_SHAPES, pzFits, pzAnyFit, pzStuck, pzFullLines, pzPlace, pzFreshGame, pzStart, pzFinish, pzLeft, pzCanAd, pzEssOf, pzMinOf, pzHelpSquirrel, pzHelpOwl, pzHelpBear, fillSubs, mapRoofTop, showAd, claimOfflineDouble, startBoost, tripAd, festFocus, festRange, visMap, renderMissions, pzHasHelp, pzRot, pzNewPiece, pzOpen, pzClose, pzGameOver, pzRenderAll, renderMini, addEss, ESHOP, SP_FUR, applyCos, essItem, pickEss, buyEss, renderEssShop, esAcornLeft, esGoldLeft, esAcornAmt, hatSVG, spFurImg, gameNow, gameToday, gameWeek, kstDay, setServerTime, SVR, dmDay, weekIdx, lgWeek, wkWeek, lgKey, pzDay, goldDay, boostLeft, dealLeft, canStamp };
   if (window.claude && window.claude.hot && window.claude.hot.snapshot) {
     try { window.claude.hot.snapshot(() => { if (S) syncMid(); return { save: S }; }); } catch (e) { /* 무시 */ }

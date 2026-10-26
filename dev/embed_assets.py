@@ -11,7 +11,8 @@ HERE = pathlib.Path(__file__).resolve().parent
 SRC = HERE / 'forest-school.html'
 BEGIN, END, VAR = '<!-- FS_IMG:BEGIN -->', '<!-- FS_IMG:END -->', 'FS_IMG'
 # 1.7.0 묶음(--block 170): 1.6.0 퍼즐 그림과 같은 묶음을 고치지 않게 따로 둬요
-BLOCKS = {'170': ('<!-- FS_IMG170:BEGIN -->', '<!-- FS_IMG170:END -->', 'FS_IMG170')}
+BLOCKS = {'170': ('<!-- FS_IMG170:BEGIN -->', '<!-- FS_IMG170:END -->', 'FS_IMG170'),
+          '180': ('<!-- FS_IMG180:BEGIN -->', '<!-- FS_IMG180:END -->', 'FS_IMG180')}   # 1.8.0 숲속 합치기 (작업지시서 13)
 
 # 열쇠 앞부분마다 줄일 크기(긴 변 픽셀)와 화질
 RULES = [
@@ -44,6 +45,14 @@ RULES = [
     ('fx_', 96, 84),
     ('essence_', 240, 82),
     ('cos_', 160, 84),   # 1.6.0 정수 상점 한정 모자 (fur_sp_ 특별 가구는 fur_ 규칙)
+    # 1.8.0 숲속 합치기 (python3 embed_assets.py --block 180 <폴더>)
+    ('mg_bg', 720, 70),
+    ('mg_board', 640, 80),
+    ('mg_card', 240, 82),
+    ('mg_help_', 320, 80),
+    ('mg_ic_', 96, 84),
+    ('mg_gen_', 160, 84),
+    ('mg_', 128, 84),   # 조각 mg_a_01 … mg_v_10
 ]
 SKIP = {'building_positions'}
 
@@ -93,7 +102,7 @@ def main(dirs, block=''):
     old = {}
     if BEGIN in src:
         block = src[src.index(BEGIN):src.index(END)]
-        for k, v in re.findall(r'"([a-z0-9_]+)":"(data:image/webp;base64,[^"]+)"', block):
+        for k, v in re.findall(r'"([A-Za-z0-9_]+)":"(data:image/webp;base64,[^"]+)"', block):
             old[k] = v
     old.update(imgs)   # 이번에 준 폴더의 그림만 바꾸고, 전에 넣은 그림은 그대로 둬요
     body = ',\n'.join(f'"{k}":"{v}"' for k, v in sorted(old.items()))

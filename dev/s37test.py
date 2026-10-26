@@ -74,6 +74,9 @@ FLOW = r"""() => {
     for (let i = 0; i < 3 && F.mainReady(); i++) F.claimMain(null);
     if (F.canGraduate()) F.graduate(); else if (F.canPromote()) F.promote();
     if (q && q.t === 'picks') { pick += dt; if (pick >= 4) { pick = 0; s.st.picks += 1; } }
+    // 1.8.0 숲속 합치기 안내 퀘스트: 사람이 2초에 한 번 생산기를 누르고 합치는 셈으로 쳐요 (에너지는 1분에 1 차요)
+    if (q && q.t === 'mgBest') { pick += dt; if (pick >= 2) { pick = 0; s.mg.best.a = Math.min(10, (s.mg.best.a || 0) + 1); } }
+    if (q && q.t === 'mgOrders') { pick += dt; if (pick >= 30) { pick = 0; s.mg.st.orders += 1; } }
     if (q && q.t === 'perks') { const k = Object.keys(F.PERKS).filter(x => !F.perkMaxed(x)).sort((a, b) => F.perkCost(a) - F.perkCost(b))[0]; if (k && F.perkCost(k) <= s.p.dip) F.buyPerk(k, document.body); }
     for (let i = 0; i < 20; i++) if (!buy()) break;
     maxB = Math.max(maxB, S().budget);
