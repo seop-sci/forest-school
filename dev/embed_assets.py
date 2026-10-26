@@ -54,7 +54,7 @@ RULES = [
     ('mg_gen_', 160, 84),
     ('mg_', 128, 84),   # 조각 mg_a_01 … mg_v_10
 ]
-SKIP = {'building_positions'}
+SKIP = {'building_positions', 'mg_order_light', 'mg_order_dark'}   # 주문 쪽지 틀은 가로 그림이라 세로 카드에 안 맞아요
 
 
 def rule(key):
