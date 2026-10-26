@@ -1653,6 +1653,21 @@ body{background:radial-gradient(120% 60% at 50% 0%, color-mix(in srgb, var(--pap
   .app.on-school .board .board-top{padding-top:6px}
   .app.on-school .home-qcard .subbar{padding:5px 8px 6px;gap:5px}
 }
+/* 시안처럼: 바깥 틀은 숲 초록, 학교 줄만 크림색 카드로 띄우고, 동네 막대는 초록 바탕 위에 따로 놓아요 (기존 그림 orn_vine, orn_flower를 꾸밈으로 써요) */
+.app.on-school .board .board-top{background:var(--home-forest);border-color:var(--home-forest-deep);padding:6px 6px 0;column-gap:6px;grid-template-columns:auto minmax(0,1fr) auto auto auto}
+.app.on-school .board .board-top::before{content:"";grid-area:1 / 1 / 2 / -1;align-self:stretch;margin:0 0 0 0;background:var(--home-paper);border:1px solid var(--home-paper-edge);border-radius:14px;pointer-events:none}
+.app.on-school .board .school-crest,.app.on-school .board .school,.app.on-school .board #btnAtt,.app.on-school .board .xgear,.app.on-school .board #btnExit{position:relative;z-index:1;margin-top:4px;margin-bottom:4px}
+.app.on-school .board .school-crest{margin-left:6px}
+.app.on-school .board #btnExit{margin-right:4px}
+.app.on-school .board .board-top .icon-btn{width:40px;height:40px}
+.app.on-school .board .progress{position:relative;z-index:1;margin:6px 4px 6px;padding:0 46px 0 2px;color:var(--home-on-forest)}
+.app.on-school .board .progress::after{content:"";position:absolute;right:-6px;top:-10px;width:52px;height:34px;background:var(--home-orn-flower, none) center/contain no-repeat;pointer-events:none}
+.app.on-school .board .board-top::after{content:"";position:absolute;left:-14px;bottom:62px;width:70px;height:36px;background:var(--home-orn-vine, none) center/contain no-repeat;opacity:.9;pointer-events:none}
+.app.on-school .board .progress .grade-pill{background:color-mix(in srgb, var(--home-on-forest) 18%, transparent);color:var(--home-on-forest)}
+.app.on-school .board .progress .bar{background:color-mix(in srgb, var(--home-on-forest) 22%, transparent)}
+.app.on-school .board #vNext{color:var(--home-on-forest)}
+.app.on-school .board .hud-res{margin:0 -6px;border-top:1px dashed color-mix(in srgb, var(--home-on-forest) 30%, transparent)}
+@media (max-width:380px){.app.on-school .board .board-top{padding:5px 5px 0}.app.on-school .board .hud-res{margin:0 -5px}}
 /* ===== 홈 UI 정리 END ===== */
 </style>
 
@@ -9676,6 +9691,8 @@ body{background:radial-gradient(120% 60% at 50% 0%, color-mix(in srgb, var(--pap
     $$('.tab').forEach(b => b.addEventListener('click', () => { setTab(b.dataset.tab); sfx('tap'); }));
     // 1.5.0: 그림 아이콘을 채우고, 아직 열리지 않은 버튼은 알려만 줘요
     $$('[data-ic]').forEach(el => { const u = IMG(el.dataset.ic); if (u) el.style.backgroundImage = `url("${u}")`; });
+    // 홈 현황판 꾸밈(동네 줄 오른쪽 꽃): 기존 그림 orn_flower를 CSS 변수로 넘겨요. 그림이 없으면 아무것도 안 나와요
+    { const f = IMG('orn_flower'), v = IMG('orn_vine'); if (f) document.documentElement.style.setProperty('--home-orn-flower', `url("${f}")`); if (v) document.documentElement.style.setProperty('--home-orn-vine', `url("${v}")`); }
     $$('.panel-x').forEach(b => b.addEventListener('click', () => { setTab('school'); sfx('tap'); }));
     setupPan(); requestAnimationFrame(() => fitMap(true));
     // 학교 카드를 누르면 학생, 평판, 학교 파워가 펼쳐져요
