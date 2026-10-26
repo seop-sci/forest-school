@@ -139,6 +139,12 @@ ev:  { cur: 'harvest:2026-11', start: 0,               // 지금 회차와 시�
 - 가구 개수(FUR_SPOTS.cnt), 값, 레벨, 저장은 그대로.
 - 꾸밈 소품 25장은 Codex 작업지시서 8(브랜치 art/room-props)로 받아서 1.7.1에 넣어요(건물 Lv.1, 5, 10, 15, 20마다 하나씩, 사지 않는 꾸밈).
 
+## 겨울 건물과 계절 참나무 (2026-10-26, Codex 작업지시서 7, 브랜치 art/winter-polish)
+
+- FS_IMG170에 bld_*_winter 12장, oak_spring, oak_autumn, oak_winter, oak_xmas, 겨울 지붕 조각 roof_*_winter 9장(make_roofs.py, 급식실은 진한 색과 가장 큰 덩어리만). 묶음 약 3.3MB.
+- 겨울 눈꽃과 크리스마스 테마면 seasonKey()가 건물, 공사 자리, 다음 학교급 자리를 _winter 그림으로, roofArtKey()가 지붕 조각을 roof_*_winter로. 참나무는 oakKey()(봄, 가을, 겨울, 크리스마스). applyThemes()에서 setSeasonArt()를 불러요. bldImg()와 roofKey()는 그대로(단계만 골라요).
+- 시험 s54(2-1).
+
 ## 남은 일
 
 - [ ] PR #13 검토와 승인(지섭). 승인 전까지 `main`에 합치지 않아요

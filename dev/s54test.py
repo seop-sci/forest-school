@@ -1,6 +1,7 @@
 # 1.7.0 시험: 그림 연결. (1) 테마 지도: 배경 테마 봄, 여름, 가을, 겨울, 크리스마스를 고르면 유치원과 초등학교 지도가 그 테마 그림으로 바뀌고, 다른 테마나 테마 없음은 기본 지도.
 # (2) 학교급별 건물 외관: 초등학교에서 교실, 급식실, 도서관을 처음 키우면 2단계 그림과 2단계 지붕 조각으로 바뀌고 알림이 떠요. 과학실과 운동장은 원래 그림 그대로.
 #     예전 저장(bs 칸 없음)은 지금 보이는 모습 그대로 시작해요. 유치원에서는 바뀌지 않아요.
+# (2-1) 겨울 그림: 겨울 눈꽃과 크리스마스 테마의 건물, 공사 자리, 지붕 조각, 계절 참나무(작업지시서 7).
 # (3) 도감 특별 손님: 뱀, 매(시련), 까치(핫딜), 졸업생(방문)이 나타나면 등록되고 그림과 이름이 보여요. 선물 목록과 '만난 친구 n/15'에는 넣지 않아요.
 # 쓰는 법: python3 wrap.py && python3 s54test.py   (마지막 줄이 PASS면 통과)
 import asyncio, sys
@@ -61,6 +62,23 @@ async def main():
         # 겨울 테마 지도 화면
         await pg.evaluate(f"(()=>{{ const F={F}; F.S.cos.th.bg='winter'; F.applyThemes(); {CLEAN}; }})()"); await pg.wait_for_timeout(400)
         await pg.screenshot(path='s54_winter.png')
+        await pg.evaluate(f"(()=>{{ const F={F}; F.S.cos.th.bg=''; F.applyThemes(); }})()")
+        # 2-1) 겨울 그림: 겨울 눈꽃과 크리스마스 테마면 건물, 공사 자리, 지붕 조각이 겨울 그림, 참나무는 계절 그림
+        r = await pg.evaluate(f"""(()=>{{ const F={F}, S=F.S, I=window.FS_IMG170, out={{}};
+          for (const th of ['winter', 'xmas', 'spring', 'autumn', 'summer', '']) {{ S.cos.th.bg = th; F.applyThemes();
+            const g = document.querySelector('#b-classroom'), lib = document.querySelector('#b-library');
+            out[th || 'none'] = {{ bld: g.querySelector('.built .bimg').getAttribute('href') === I[F.bldImg('classroom') + '_winter'],
+              roof: g.querySelector('.roofimg').getAttribute('href') === I[F.roofKey('classroom') + '_winter'],
+              oak: document.querySelector('.oak-img').getAttribute('href') === (I['oak_' + th] || window.FS_IMG.oak), key: F.seasonKey(F.bldImg('classroom')), oakKey: F.oakKey() }}; }}
+          S.cos.th.bg = ''; F.applyThemes(); return out; }})()""")
+        for th in ['winter', 'xmas']:
+            if not (r[th]['bld'] and r[th]['roof'] and r[th]['oak']): fails.append(f'{th} 겨울 건물, 지붕, 참나무 {r[th]}')
+        for th in ['spring', 'autumn']:
+            if r[th]['bld'] or not r[th]['oak'] or r[th]['oakKey'] != 'oak_' + th: fails.append(f'{th} 건물은 원래 그림, 참나무는 계절 그림 {r[th]}')
+        for th in ['summer', 'none']:
+            if r[th]['bld'] or r[th]['oakKey'] != 'oak': fails.append(f'{th} 원래 그림 {r[th]}')
+        await pg.evaluate(f"(()=>{{ const F={F}; F.S.cos.th.bg='xmas'; F.applyThemes(); {CLEAN}; F.setTab('school'); }})()"); await pg.wait_for_timeout(400)
+        await pg.screenshot(path='s54_xmas.png')
         await pg.evaluate(f"(()=>{{ const F={F}; F.S.cos.th.bg=''; F.applyThemes(); }})()")
         # 3) 특별 손님
         r = await pg.evaluate(f"""(()=>{{ const F={F}, S=F.S; const n0 = F.dexPending().length;

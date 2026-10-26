@@ -21,6 +21,10 @@ for _n in (2, 3, 4):
 for _n in (3, 4):
     SPEC[f'roof_science_s{_n}'] = (f'bld_science_s{_n}', SPEC['roof_science'][1])
     SPEC[f'roof_field_s{_n}'] = (f'bld_field_s{_n}',) + tuple(SPEC['roof_field'][1:])
+# 1.7.0 겨울 그림(겨울 눈꽃, 크리스마스 테마): 같은 색 범위로 bld_*_winter에서 지붕을 오려요(roof_*_winter)
+for _k in [k for k in SPEC if not k.endswith('_winter')]:
+    SPEC[_k + '_winter'] = (SPEC[_k][0] + '_winter',) + tuple(SPEC[_k][1:])
+SPEC['roof_cafeteria_winter'] = ('bld_cafeteria_on_winter', SPEC['roof_cafeteria'][1], 0.62, True, 0.62)   # 벽 그늘이 섞이지 않게
 SIZE = 400
 
 
