@@ -10398,7 +10398,7 @@ body{background:radial-gradient(120% 60% at 50% 0%, color-mix(in srgb, var(--pap
       while (h < ACH_N && v >= achGoal(a, h)) h += 1;
       if (h > achHit(a.id)) {
         S.ach.hit[a.id] = h;
-        if (!quiet) toast(`업적 달성! ${a.t(achGoal(a, h - 1))}. 도감의 업적에서 받아요`);
+        if (!quiet) (rt.achNote = rt.achNote || []).push(`업적 달성! ${a.t(achGoal(a, h - 1))}. 도감의 업적에서 받아요`);
       }
     }
   }
@@ -10467,6 +10467,8 @@ body{background:radial-gradient(120% 60% at 50% 0%, color-mix(in srgb, var(--pap
   }
   function tick171ach() {
     achSync(false); renderHudTitle();
+    // 업적 알림은 다른 알림(보상, 안내)을 덮지 않게, 알림 칸이 비어 있고 창이 열려 있지 않을 때 하나씩 띄워요
+    if (rt.achNote && rt.achNote.length && $('#toast').hidden && !rt.modalOpen) toast(rt.achNote.shift());
     const ad = $('#achDot'); if (ad) ad.hidden = !achClaimable();
     if (rt.tab === 'dex' && rt.dexSeg === 'ach') renderAch();
   }

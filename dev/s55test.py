@@ -1,5 +1,5 @@
 # 1.7.0 시험: 고슴도치 교감 선생님. 선생님 탭 맨 아래 카드, 연수 값은 곰 선생님 연수 곡선, 레벨마다 학교 행사 상품 +10%, 최고 Lv.10,
-# 연수 횟수(S.st.trains)에 더해지고 수업료(rate)는 그대로. 도감 선생님 칸에 처음부터 등록되고 도감은 15종(완성 목표도 15종). 예전 저장(vp 없음)은 Lv.0.
+# 연수 횟수(S.st.trains)에 더해지고 수업료(rate)는 그대로. 도감 선생님 칸에 처음부터 등록되고 도감은 17종(1.7.1부터, 완성 목표도 17종). 예전 저장(vp 없음)은 Lv.0.
 # 밝은 화면 390px과 어두운 화면 360px에서 카드가 넘치지 않는지 봐요.
 # 쓰는 법: python3 wrap.py && python3 s55test.py   (마지막 줄이 PASS면 통과)
 import asyncio, sys
@@ -30,7 +30,8 @@ async def main():
           return out; }})()""")
         if r['lv0'] != 0 or r['mult0'] != 1: fails.append(f"처음 교감 레벨 {r['lv0']} {r['mult0']}")
         if r['vpCost'] != r['bearCost']: fails.append(f"교감 연수 값이 곰 곡선과 달라요 {r['vpCost']} {r['bearCost']}")
-        if r['cards'][-1] != 'vp' or len(r['cards']) != 4: fails.append(f"선생님 카드 순서 {r['cards']}")
+        if r['cards'] != ['squirrel', 'owl', 'bear', 'vp', 'diet', 'lib']:   # 1.7.1: 교감 선생님 밑에 영양, 사서 선생님
+            fails.append(f"선생님 카드 순서 {r['cards']}")
         if r['lv1'] != 1 or r['tr1'] != r['tr0'] + 1 or abs(r['mult1'] - 1.1) > 1e-9: fails.append(f"연수 1번 {r}")
         if r['lvMax'] != 10 or abs(r['multMax'] - 2) > 1e-9 or r['btn'] != '최고 레벨': fails.append(f"최고 레벨 {r['lvMax']} {r['multMax']} {r['btn']}")
         rr = r['rateMax'] / r['rate0'] if r['rate0'] else 0
@@ -49,7 +50,7 @@ async def main():
           const card = document.querySelector('#dexBody .dex-card[data-dex="tea_hedgehog"]');
           const goal = F.DEX_REWARD.goals.find(g => g.key === 's14');
           return {{ n: F.DEX_KEYS.length, got: !!S.dex.got.tea_hedgehog, on: card && card.classList.contains('on'), head, need: goal.need }}; }})()""")
-        if r['n'] != 15 or not r['got'] or not r['on'] or r['need'] != 15 or '/ 15종' not in r['head']: fails.append(f"도감 교감 선생님 {r}")
+        if r['n'] != 17 or not r['got'] or not r['on'] or r['need'] != 17 or '/ 17종' not in r['head']: fails.append(f"도감 교감 선생님 {r}")
         # 예전 저장
         r = await pg.evaluate(f"(()=>{{ const F={F}; const d = JSON.parse(JSON.stringify(F.S)); delete d.vp; const a = F.sanitize(d).vp; d.vp = 99; const b = F.sanitize(d).vp; d.vp = -3; const c = F.sanitize(d).vp; return [a, b, c]; }})()")
         if r != [0, 10, 0]: fails.append(f'예전 저장 교감 레벨 {r}')
