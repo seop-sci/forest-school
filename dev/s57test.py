@@ -164,6 +164,19 @@ async def main():
           return {{ hint, finger: document.querySelectorAll('.mg-finger').length, toast: document.querySelector('#toast').textContent, e: S.mg.e === e0, card: !!document.querySelector('.mg-order.hint') }}; }})()""")
         if r['hint'] != 'F1,G1' or r['finger'] != 1 or '급식 냄비' not in r['toast'] or '화분' not in r['toast'] or not r['e'] or not r['card']: fails.append(f'주문 눌러 생산기 알려 주기 {r}')
         await pg.evaluate(f"{F}.mgClearHint()")
+        # ---- (4d) 합치기 도감: best까지 모은 것으로, 종류 10단계 보상 한 번, 모두 모으면 큰 보상 한 번, 저장
+        r = await pg.evaluate(f"""(()=>{{ const F={F}, S=F.S, out={{}};
+          S.mg.best = {{ a: 10, m: 3 }}; S.mg.dexPaid = [];
+          out.n = F.mgDexN(); out.can = [F.mgDexCan('a'), F.mgDexCan('m'), F.mgDexCan('all')];
+          const e0 = S.ess, p0 = S.mg.pieces; out.claim = F.mgDexClaim('a'); {CLEAN}; out.got = [S.ess - e0, S.mg.pieces - p0]; out.again = F.mgDexClaim('a');
+          for (const k of Object.keys(F.MG.kinds)) S.mg.best[k] = 10;
+          const g0 = S.gold, e1 = S.ess; out.all = F.mgDexClaim('all'); {CLEAN}; out.allGot = [S.ess - e1, S.gold - g0];
+          const d = JSON.parse(JSON.stringify(S)); d.mg.dexPaid = ['a', 'zz', 'all', 'a']; const s2 = F.sanitize(d); out.san = s2.mg.dexPaid.slice().sort().join(',');
+          delete d.mg.dexPaid; out.old = F.sanitize(d).mg.dexPaid.length;
+          S.mg.best = {{}}; S.mg.dexPaid = [];
+          return out; }})()""")
+        if r['n'] != 13 or r['can'] != [True, False, False] or not r['claim'] or r['got'] != [30, 5] or r['again'] is not False: fails.append(f'합치기 도감 종류 보상 {r}')
+        if not r['all'] or r['allGot'] != [100, 10] or r['san'] != 'a,all' or r['old'] != 0: fails.append(f'합치기 도감 완성과 저장 {r}')
         # ---- (5) 보상 연결
         r = await pg.evaluate(f"""(()=>{{ const F={F}, S=F.S, out={{}}; const e = () => S.mg.e;
           S.mg.e = 0; S.mg.up = 0;
