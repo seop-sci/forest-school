@@ -21,7 +21,7 @@ async def boot(ctx, save=None):
     if save is not None:
         await pg.add_init_script(f"localStorage.setItem('forest-school-v1', {json.dumps(json.dumps(save))});")
     await pg.goto(URL); await pg.wait_for_timeout(2500)
-    await pg.evaluate(f"(()=>{{ const t=document.querySelector('#tut'); if(t) t.hidden=true; {F}.S.tut.st='skip'; {F}.rt.tut=null; {CLEAN}; }})()")
+    await pg.evaluate(f"(()=>{{ const t=document.querySelector('#tut'); if(t) t.hidden=true; {F}.S.tut.st='skip'; {F}.rt.tut=null; {CLEAN}; {F}.EV_SPECIAL.forEach(e => {{ e.start = ''; e.end = ''; }}); }})()")   # 실제 날짜 표는 s56에서 봐요. 여기서는 비우고 규칙만 봐요
     return pg, errs
 
 async def set_day(pg, y, m, d):
@@ -57,7 +57,7 @@ async def main():
         old = dict(saved); old.pop('dex', None); old.pop('ev', None)
         old['p'] = dict(old['p'], species=2); old['t'] = dict(old['t'], owl=1); old['st'] = dict(old['st'], grads=1); old['gold'] = 0
         san = await pg.evaluate(f"(()=>{{ const s={F}.sanitize({json.dumps(old)}); return {{ got: Object.keys(s.dex.got).sort(), paid: s.dex.paid, cur: s.ev.cur }}; }})()")
-        want = sorted(['rabbit', 'fox', 'raccoon', 'chick', 'bear', 'cat', 'dog', 'tea_squirrel', 'tea_owl'])
+        want = sorted(['rabbit', 'fox', 'raccoon', 'chick', 'bear', 'cat', 'dog', 'tea_squirrel', 'tea_owl', 'tea_hedgehog'])   # 1.7.0: 교감 선생님은 처음부터 등록
         if san['got'] != want or san['paid'] != [] or san['cur'] != '': fails.append(f'옛 저장 자동 등록이 틀려요 {san}')
         bad = await pg.evaluate(f"(()=>{{ const s={F}.sanitize({{born:1, savedAt:5, dex:{{got:{{rabbit:'x', bogus:3, fox:7}}, paid:['rabbit','zzz']}}, ev:{{cur:5, stamp:{{n:99, last:7}}, list:[{{t:'nope', n:3}}, {{t:'picks', n:5, b:1, done:true}}]}}}}); return {{ got: s.dex.got, paid: s.dex.paid, ev: s.ev }}; }})()")
         if set(bad['got']) != {'rabbit', 'fox'} or bad['got']['fox'] != 7 or bad['paid'] != ['rabbit']: fails.append(f'이상한 도감 저장을 걸러 내지 못했어요 {bad}')
@@ -66,7 +66,7 @@ async def main():
         r = await pg2.evaluate(f"""(()=>{{ const F={F}, S=F.S; const g0=S.gold, n=F.dexPending().length; F.setTab('dex');
           const t=document.querySelector('#rwTitle').textContent, sub=document.querySelector('#rwSub').textContent; const dg=S.gold-g0; {CLEAN};
           F.setTab('school'); F.setTab('dex'); return {{ n, dg, title: t, sub, paid: S.dex.paid.length, again: S.gold-g0-dg, bud: S.budget }}; }})()""")
-        if r['n'] != 10 or r['dg'] != 9 or r['paid'] != 10 or r['again'] != 0: fails.append(f'옛 저장 도감 선물(등록 9개와 5종 보상)이 틀려요 {r}')
+        if r['n'] != 11 or r['dg'] != 10 or r['paid'] != 11 or r['again'] != 0: fails.append(f'옛 저장 도감 선물(등록 10개와 5종 보상)이 틀려요 {r}')
         if '등' not in r['sub']: fails.append(f'선물 창 설명이 묶여 있지 않아요 {r}')
         saved2 = await pg2.evaluate("JSON.parse(localStorage.getItem('forest-school-v1'))")
         pg3, errs3 = await boot(ctx, saved2)

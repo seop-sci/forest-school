@@ -1,7 +1,7 @@
 # 1.7.0 시험: 그림 연결. (1) 테마 지도: 배경 테마 봄, 여름, 가을, 겨울, 크리스마스를 고르면 유치원과 초등학교 지도가 그 테마 그림으로 바뀌고, 다른 테마나 테마 없음은 기본 지도.
 # (2) 학교급별 건물 외관: 초등학교에서 교실, 급식실, 도서관을 처음 키우면 2단계 그림과 2단계 지붕 조각으로 바뀌고 알림이 떠요. 과학실과 운동장은 원래 그림 그대로.
 #     예전 저장(bs 칸 없음)은 지금 보이는 모습 그대로 시작해요. 유치원에서는 바뀌지 않아요.
-# (3) 도감 특별 손님: 뱀, 매(시련), 까치(핫딜), 졸업생(방문)이 나타나면 등록되고 그림과 이름이 보여요. 선물 목록과 '만난 친구 n/14'에는 넣지 않아요.
+# (3) 도감 특별 손님: 뱀, 매(시련), 까치(핫딜), 졸업생(방문)이 나타나면 등록되고 그림과 이름이 보여요. 선물 목록과 '만난 친구 n/15'에는 넣지 않아요.
 # 쓰는 법: python3 wrap.py && python3 s54test.py   (마지막 줄이 PASS면 통과)
 import asyncio, sys
 from playwright.async_api import async_playwright
@@ -74,7 +74,7 @@ async def main():
         on = [c for c in r['cards'] if c[1]]
         if not on or not all(c[2] for c in on): fails.append(f"만난 특별 손님 그림 {r['cards']}")
         if r['pend']: fails.append(f"특별 손님이 선물 목록에 들어갔어요 {r['pend']}")
-        if f"/ {r['keys']}종" not in r['head'] or r['keys'] != 14: fails.append(f"만난 친구 수가 바뀌었어요 {r['head']}")
+        if f"/ {r['keys']}종" not in r['head'] or r['keys'] != 15: fails.append(f"만난 친구 수가 바뀌었어요 {r['head']}")
         await pg.evaluate(f"{CLEAN}"); await pg.wait_for_timeout(300)
         await pg.evaluate("document.querySelector('#panelDex').scrollTop = 99999"); await pg.wait_for_timeout(200)
         await pg.screenshot(path='s54_dex_guests.png')
