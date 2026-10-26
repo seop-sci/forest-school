@@ -20,6 +20,7 @@
 | `embed_assets.py` | 1.5.0 그림 넣기. PNG 원본 폴더를 webp로 줄여 `forest-school.html`의 그림 묶음(`window.FS_IMG`)에 넣어요. 원본 PNG는 저장소에 넣지 않아요. 1.7.0 도감, 이벤트 그림은 `--block 170`으로 따로 둔 묶음(`window.FS_IMG170`)에 넣어요 |
 | `v170-notes.md` | 1.7.0 도감, 이벤트에서 정한 것, 기존 코드에 넣은 줄 목록, 그림 목록, 남은 일 |
 | `v170-art-buildings.md` | 1.7.0 그림 작업지시서: 학교급별 건물 외관 13장 (Codex용) |
+| `embed_audio.py` | 1.7.3 배경음악 넣기. 반복 구간으로 잘라 둔 `bgm_*.m4a`(AAC 80kbps)를 `window.FS_AUD`에 넣어요. 열쇠: `bgm_home`(홈), `bgm_room`(그 밖의 화면), `bgm_festival`(학교 행사), `bgm_play`(미니게임). 곡 원본은 지섭이 Suno 유료 플랜으로 만든 mp3예요. m4a는 `bgm_loop.py`로 만들어요. 반복 구간은 박자에 맞춰 비슷한 곳 두 군데(16박 배수, 60초 이상)를 찾아 자르고, 끝 한 박자를 처음 바로 앞 소리와 겹쳐 이어요(이음매 없이 되풀이). 소리 크기는 -18 LUFS로 맞춰요. 파일이 없으면 게임은 코드 곡으로 돌아가요 |
 | `make_roofs.py` | 건물 그림에서 지붕만 오려 내요(건물 테마 색을 입힐 때 써요). 결과 폴더를 `embed_assets.py`로 넣어요 |
 
 순서: `forest-school.html` 고치기 → `python3 wrap.py` → 시험 → `python3 build_gh.py ..` → `cd ../toss && npm run build` → 커밋하고 올리기 (안드로이드는 GitHub Actions가 알아서 만들어요).
