@@ -97,7 +97,7 @@ async def main():
             rail = await pg.evaluate("[...document.querySelectorAll('.map-right .sidebtn')].map(e => e.dataset.tab)")
             if 'ess' in rail: bad.append(f'[{tag}] 오른쪽 메뉴에 정수 상점이 남아 있어요: {rail}')
             await pg.tap('.tabs .tab[data-tab="street"]'); await pg.wait_for_timeout(300)
-            v = await pg.evaluate("[!document.querySelector('#panelStreet').hidden, document.querySelectorAll('#panelStreet .shopfront').length, document.querySelector('.tabs .tab[data-tab=street]').getAttribute('aria-selected')]")
+            v = await pg.evaluate("[!document.querySelector('#panelStreet').hidden, document.querySelectorAll('#panelStreet button.shopfront').length, document.querySelector('.tabs .tab[data-tab=street]').getAttribute('aria-selected')]")
             if v != [True, 2, 'true']: bad.append(f'[{tag}] 상점 거리 열기: ' + json.dumps(v))
             await pg.tap('#sfEss'); await pg.wait_for_timeout(300)
             v = await pg.evaluate(f"[{F}.rt.tab, !document.querySelector('#panelEss').hidden, document.querySelector('.tabs .tab[data-tab=street]').getAttribute('aria-selected')]")
@@ -114,6 +114,11 @@ async def main():
             await pg.evaluate(f"{F}.setTab('quests')"); await pg.wait_for_timeout(400)
             await pg.evaluate("document.querySelector('#qDaily .dm-ev') && document.querySelector('#qDaily .dm-ev').click()"); await pg.wait_for_timeout(300)
             if await pg.evaluate(f"{F}.rt.tab") != 'event': bad.append(f'[{tag}] 퀘스트 목록의 이벤트 줄')
+            # 6) 뱀이 나타나면 빨간 테두리, 쫓아내면 사라져요
+            await pg.evaluate(f"{F}.setTab('school')"); await pg.wait_for_timeout(200)
+            v = await pg.evaluate(f"(() => {{ const F = {F}; F.startTrial('snake'); const on = document.querySelector('.stage').classList.contains('danger') && getComputedStyle(document.querySelector('.danger-fx')).display === 'block'; F.rt.trial.hp = 1; F.hitTrial(); const off = !document.querySelector('.stage').classList.contains('danger'); {CLEAN.replace('{', '{{').replace('}', '}}') if False else ''} return [on, off]; }})()")
+            if v != [True, True]: bad.append(f'[{tag}] 위기 빨간 테두리: ' + json.dumps(v))
+            await pg.evaluate(CLEAN)
             # 4) 메뉴 화면 현황판과 칭호
             await pg.evaluate(f"(() => {{ const S = {F}.S; S.ach.hit.building = 5; S.ach.title = 'building'; {F}.setTab('dex'); }})()"); await pg.wait_for_timeout(1300)
             v = await pg.evaluate("""(() => { const W = innerWidth, t = document.querySelector('#hudTitle'); const r = t.getBoundingClientRect();

@@ -26,7 +26,12 @@ async function checkConsent() {
     let c = await AdMob.requestConsentInfo();
     if (c && c.isConsentFormAvailable && c.status === AdmobConsentStatus.REQUIRED) c = (await AdMob.showConsentForm()) || c;
     canAds = !!(c && c.canRequestAds);
-  } catch (e) { canAds = false; lastErr = 'consent:' + String((e && (e.code ?? e.message)) || '').slice(0, 40); }
+  } catch (e) {
+    // 1.7.2: 동의 정보를 못 받아도(애드몹 '개인 정보 보호 및 메시지'를 아직 안 만들었거나 일시 오류) 광고는 불러 봐요.
+    // 동의가 필요한 지역이면 애드몹이 알아서 맞춤형이 아닌 광고만 줘요. 한국은 동의 창이 필요 없어요
+    lastErr = 'consent:' + String((e && (e.code ?? e.message)) || '').slice(0, 40);
+    canAds = true;
+  }
   asking = false;
   return canAds;
 }
