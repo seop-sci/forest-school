@@ -1537,8 +1537,12 @@ body{background:radial-gradient(120% 60% at 50% 0%, color-mix(in srgb, var(--pap
 .mg-order{display:flex;flex-direction:column;align-items:center;gap:3px;padding:6px 4px 5px;border:0;border-radius:14px;background:rgba(255,247,230,.94) var(--mg-order-light, none) center/100% 100% no-repeat;color:#26301E;font:inherit;cursor:pointer;box-shadow:0 3px 0 rgba(0,0,0,.25);text-align:center;position:relative}
 .mg-order.ok{background:#FFF0C2;box-shadow:0 0 0 2px #F3B92E, 0 3px 0 rgba(0,0,0,.25)}
 .mg-order .mo-who{width:28px;height:28px;border-radius:50%;background:#E9F0DA var(--mo-img) center/80% no-repeat}
-.mg-order .mo-it{display:flex;align-items:center;gap:3px;font-size:12px;line-height:1.2}
-.mg-order .mo-it .mg-tile{width:26px;height:26px;border-radius:7px;font-size:14px}
+.mg-order .mo-it{display:flex;align-items:flex-start;justify-content:center;gap:2px;font-size:12px;line-height:1.2}
+.mg-order .mo-one{display:flex;flex-direction:column;align-items:center;gap:2px}
+.mg-order .mo-one small{font-size:11px;color:#5F6B55}
+.mg-order .mo-one.got small{color:#4F6A3A;font-weight:700}
+.mg-order .mo-plus{font-style:normal;font-family:var(--font-display);font-size:13px;color:#8A9480;line-height:28px}
+.mg-order .mo-it .mg-tile{position:relative;inset:auto;width:28px;height:28px;border-radius:8px;font-size:15px}
 .mg-order .mo-it .mg-tile b{font-size:8px;padding:0 3px}
 .mg-order .mo-n{font-family:var(--font-display);font-size:14px;color:#4F6A3A}
 .mg-order .mo-rw{font-size:11px;color:#5F6B55;display:flex;align-items:center;gap:2px}
@@ -10194,7 +10198,7 @@ body{background:radial-gradient(120% 60% at 50% 0%, color-mix(in srgb, var(--pap
      설계: 프로젝트 문서 "머지 게임 설계안 (1.8.0)". 그림은 FS_IMG180 묶음(아직 없으면 색 조각과 그림 문자) */
   const MG = {
     W: 8, H: 10, EMAX: 100, REGEN: 60000, ECAP: 999, UPCAP: 99, PCAP: 9999,
-    SELL: 0.1, ORDER: 0.2,                           // 에너지 1당 수업료 분치 (팔기, 주문)
+    SELL: 0.1, ORDER: 0.2, MIXED: 0.5,                           // 에너지 1당 수업료 분치 (팔기, 주문)
     PIECES: [[10, 3], [8, 2], [6, 1]], UPAT: 8,        // 주문 단계별 장식 조각, 강화 조각이 나오는 단계
     SWAP: 30 * 60000, AD: { n: 2, e: 50 },           // 주문 바꾸기 간격, 광고 하루 2번 +50
     E: { dm: 15, bonus: 20, wk: 30, stamp: 10, stamp5: 30, box: 50 },
@@ -10251,8 +10255,14 @@ body{background:radial-gradient(120% 60% at 50% 0%, color-mix(in srgb, var(--pap
     } else cells = mgEmptyBoard();
     s.mg.board = cells.join('');
     if (m.last && typeof m.last === 'object') for (const G of MG_GENS) if (MG.gens[G].kinds.includes(m.last[G])) s.mg.last[G] = m.last[G];
-    if (Array.isArray(m.orders)) s.mg.orders = m.orders.filter(o => o && MG.kinds[o.k] && num(o.n, 2, 0) >= 2 && num(o.n, 0, 0) <= 10).slice(0, 3)
-      .map(o => ({ k: o.k, n: Math.floor(o.n), c: Math.min(3, Math.max(1, Math.floor(num(o.c, 1, 1)))), who: typeof o.who === 'string' ? o.who.slice(0, 12) : 'rabbit' }));
+    if (Array.isArray(m.orders)) s.mg.orders = m.orders.map(o => {   // 주문: it = [{k, n, c}] 1~2개 (옛 모양 {k, n, c}도 받아요)
+      if (!o || typeof o !== 'object') return null;
+      const raw = Array.isArray(o.it) ? o.it : [o];
+      const it = raw.filter(x => x && MG.kinds[x.k] && num(x.n, 2, 0) >= 2 && num(x.n, 0, 0) <= 10).slice(0, 2)
+        .map(x => ({ k: x.k, n: Math.floor(x.n), c: Math.min(3, Math.max(1, Math.floor(num(x.c, 1, 1)))) }));
+      if (!it.length || (it.length === 2 && it[0].k === it[1].k)) return null;
+      return { it, who: typeof o.who === 'string' ? o.who.slice(0, 12) : 'rabbit' };
+    }).filter(Boolean).slice(0, 3);
     s.mg.swapAt = num(m.swapAt, 0, 0);
     if (m.best && typeof m.best === 'object') for (const k of MG_KINDS) s.mg.best[k] = Math.min(10, Math.floor(num(m.best[k], 0, 0)));
     s.mg.pieces = Math.min(MG.PCAP, Math.floor(num(m.pieces, 0, 0)));
@@ -10381,30 +10391,44 @@ body{background:radial-gradient(120% 60% at 50% 0%, color-mix(in srgb, var(--pap
   }
   /* ---- 학생 주문 ---- */
   const MG_WHO = () => (typeof speciesList === 'function' ? speciesList() : ['rabbit', 'fox', 'raccoon', 'chick', 'bear']);
-  function mgNewOrder(avoid) {
+  const mgOrderKinds = o => o.it.map(x => x.k);
+  function mgPickKind(avoid) {
     const pool = MG_KINDS.filter(k => !avoid.includes(k));
-    const k = (pool.length ? pool : MG_KINDS)[Math.floor(Math.random() * (pool.length ? pool.length : MG_KINDS.length))];
+    return (pool.length ? pool : MG_KINDS)[Math.floor(Math.random() * (pool.length ? pool.length : MG_KINDS.length))];
+  }
+  function mgOrderItem(k, mixed) {
     const best = Math.max(2, S.mg.best[k] || 0);
     const n = Math.max(2, best - Math.floor(Math.random() * 3));
-    const c = n <= 3 && Math.random() < 0.4 ? 2 : 1;
-    const who = MG_WHO(); return { k, n, c, who: who[Math.floor(Math.random() * who.length)] };
+    const c = !mixed && n <= 3 && Math.random() < 0.4 ? 2 : 1;   // 섞인 주문은 종류마다 1개씩
+    return { k, n, c };
+  }
+  // 주문 하나: 한 종류(1~2개) 또는 두 종류를 섞어서(각 1개, 절반 확률). 다른 주문에 있는 종류는 되도록 피해요
+  function mgNewOrder(avoid) {
+    const mixed = Math.random() < MG.MIXED;
+    const k1 = mgPickKind(avoid), it = [mgOrderItem(k1, mixed)];
+    if (mixed) it.push(mgOrderItem(mgPickKind(avoid.concat([k1])), true));
+    const who = MG_WHO(); return { it, who: who[Math.floor(Math.random() * who.length)] };
   }
   function mgFillOrders() {
-    while (S.mg.orders.length < 3) S.mg.orders.push(mgNewOrder(S.mg.orders.map(o => o.k)));
+    while (S.mg.orders.length < 3) S.mg.orders.push(mgNewOrder(S.mg.orders.flatMap(mgOrderKinds)));
   }
   const mgCount = (cells, k, n) => cells.filter(c => c === k + mgLvCh(n)).length;
-  const mgOrderOk = o => mgCount(mgCells(), o.k, o.n) >= o.c;
+  const mgOrderOk = o => { const cells = mgCells(); return o.it.every(x => mgCount(cells, x.k, x.n) >= x.c); };
+  const mgOrderText = o => o.it.map(x => `${MG.kinds[x.k].st[x.n - 1]} ${x.c}개`).join('와 ');
   function mgOrderReward(o) {
-    const m = mgOrderMin(o.n, o.c), a = minAcorns(m);
-    const pc = (MG.PIECES.find(([lv]) => o.n >= lv) || [0, 0])[1] * o.c;
-    const up = o.n >= MG.UPAT ? o.c : 0;
-    return { a, pc, up };
+    let m = 0, pc = 0, up = 0;
+    for (const x of o.it) {
+      m += mgOrderMin(x.n, x.c);
+      pc += (MG.PIECES.find(([lv]) => x.n >= lv) || [0, 0])[1] * x.c;
+      up += x.n >= MG.UPAT ? x.c : 0;
+    }
+    return { a: minAcorns(m), pc, up };
   }
   function mgClaimOrder(i) {
     const o = S.mg.orders[i];
     if (!o || !mgOrderOk(o)) return false;
-    const cells = mgCells(); let left = o.c;
-    for (let j = 0; j < cells.length && left > 0; j++) if (cells[j] === o.k + mgLvCh(o.n)) { cells[j] = '..'; left -= 1; }
+    const cells = mgCells();
+    for (const x of o.it) { let left = x.c; for (let j = 0; j < cells.length && left > 0; j++) if (cells[j] === x.k + mgLvCh(x.n)) { cells[j] = '..'; left -= 1; } }
     mgSetCells(cells);
     const r = mgOrderReward(o);
     S.budget += r.a; earn(r.a);
@@ -10415,7 +10439,7 @@ body{background:radial-gradient(120% 60% at 50% 0%, color-mix(in srgb, var(--pap
     mgUI.sel = -1;
     sfx('quest'); buzz(14);
     const who = (typeof DEX_NAMES === 'object' && DEX_NAMES[o.who]) || (NEWCOMERS.find(x => x.k === o.who) || {}).name || '학생';
-    showReward({ title: '주문을 채웠어요!', sub: `${who}에게 ${MG.kinds[o.k].st[o.n - 1]} ${o.c}개를 줬어요`,
+    showReward({ title: '주문을 채웠어요!', sub: `${who}에게 ${mgOrderText(o)}를 줬어요`,
       items: [{ ic: 'acorn', t: `도토리 +${fmt(r.a)}` }, r.pc ? { ic: '💎', t: `장식 조각 +${r.pc}` } : null, r.up ? { ic: '🔑', t: `생산기 강화 조각 +${r.up}` } : null] });
     mgRenderAll(); renderHUD(); checkQuests(); save();
     return true;
@@ -10425,7 +10449,7 @@ body{background:radial-gradient(120% 60% at 50% 0%, color-mix(in srgb, var(--pap
     if (!S.mg.orders[i]) return false;
     if (mgSwapLeft() > 0) { toast(`${Math.ceil(mgSwapLeft() / 60000)}분 뒤에 바꿀 수 있어요`); return false; }
     S.mg.swapAt = gameNow();
-    S.mg.orders[i] = mgNewOrder(S.mg.orders.filter((_, j) => j !== i).map(o => o.k).concat([S.mg.orders[i].k]));
+    S.mg.orders[i] = mgNewOrder(S.mg.orders.flatMap(mgOrderKinds));   // 지금 주문의 종류도 피해서 다른 것이 나오게
     sfx('tap');
     mgRenderOrders(); save();
     return true;
@@ -10481,10 +10505,11 @@ body{background:radial-gradient(120% 60% at 50% 0%, color-mix(in srgb, var(--pap
     mgFillOrders();
     const cells = mgCells(), can = mgSwapLeft() <= 0;
     $('#mgOrders').innerHTML = S.mg.orders.map((o, i) => {
-      const ok = mgCount(cells, o.k, o.n) >= o.c, r = mgOrderReward(o), img = IMG('chr_' + o.who);
-      return `<button class="mg-order${ok ? ' ok' : ''}" type="button" data-order="${i}" aria-label="${MG.kinds[o.k].st[o.n - 1]} ${o.c}개 주문${ok ? ', 눌러서 건네기' : ''}">` +
-        `<span class="mo-who" style="${img ? `--mo-img:url('${img}')` : ''}"></span><span class="mo-it">${mgTileHtml(o.k + mgLvCh(o.n))}<span>×${o.c}</span></span>` +
-        `<span class="mo-n">${ok ? '건네기' : `${mgCount(cells, o.k, o.n)}/${o.c}`}</span><span class="mo-rw">${acornIcon()}${fmt(r.a)}${r.pc ? ` 💎${r.pc}` : ''}${r.up ? ' 🔑' : ''}</span>` +
+      const ok = mgOrderOk(o), r = mgOrderReward(o), img = IMG('chr_' + o.who);
+      const its = o.it.map(x => { const h = Math.min(x.c, mgCount(cells, x.k, x.n)); return `<span class="mo-one${h >= x.c ? ' got' : ''}">${mgTileHtml(x.k + mgLvCh(x.n))}<small>${h}/${x.c}</small></span>`; }).join('<i class="mo-plus">+</i>');
+      return `<button class="mg-order${ok ? ' ok' : ''}${o.it.length > 1 ? ' two' : ''}" type="button" data-order="${i}" aria-label="${mgOrderText(o)} 주문${ok ? ', 눌러서 건네기' : ''}">` +
+        `<span class="mo-who" style="${img ? `--mo-img:url('${img}')` : ''}"></span><span class="mo-it">${its}</span>` +
+        `<span class="mo-n">${ok ? '건네기' : '주문'}</span><span class="mo-rw">${acornIcon()}${fmt(r.a)}${r.pc ? ` 💎${r.pc}` : ''}${r.up ? ' 🔑' : ''}</span>` +
         `<span class="mo-swap" data-swap="${i}" title="다른 주문으로" ${can ? '' : 'hidden'} role="button" aria-label="다른 주문으로 바꾸기">↻</span></button>`;
     }).join('');
   }
@@ -10602,7 +10627,7 @@ body{background:radial-gradient(120% 60% at 50% 0%, color-mix(in srgb, var(--pap
       const sw = e.target.closest('[data-swap]'); if (sw) { e.stopPropagation(); mgSwapOrder(+sw.dataset.swap); return; }
       const b = e.target.closest('[data-order]'); if (!b) return;
       const i = +b.dataset.order;
-      if (!mgClaimOrder(i)) { const o = S.mg.orders[i]; if (o) toast(`${MG.kinds[o.k].st[o.n - 1]} ${o.c}개가 있어야 해요`); }
+      if (!mgClaimOrder(i)) { const o = S.mg.orders[i]; if (o) toast(`${mgOrderText(o)}가 있어야 해요`); }
     });
     $('#mgFoot').addEventListener('click', e => {
       const s = e.target.closest('[data-mgsell]'); if (s) { mgSell(+s.dataset.mgsell); return; }
@@ -10692,7 +10717,7 @@ body{background:radial-gradient(120% 60% at 50% 0%, color-mix(in srgb, var(--pap
   // 시험용 손잡이: 자동 시험(window.__FOREST_TEST)에서만 게임 속 함수를 꺼내 써요
   if (window.__FOREST_TEST) window.__forest = { get S() { return S; }, get Cloud() { return Cloud; }, rt, makeDeal, furStage, DEAL, navInfo, navRoute, spawnDrop, repTipCheck, linkGoogle, retryCloud, sanitize, acctPending, renderMap, renderHUD, renderAffordance, syncKids, layoutMap, geo, startTrial, hitTrial, endTrial, startVisit, endVisit, showReward, recommend, needCost, prepTopUp, qReward, prepPhase, rankScore, pwOf, previewDip, dipMult, costScale, buyFacility, buyFur, buyFurAll, furCost, furReady, furDone, FUR, startTalk, endTalk, teacherAct, facCost, teaCost, facKeys, rate, rep, capacity, canGraduate, canPromote,
     fmt, fmt2, graduate, promote, buyPerk, perkCost, perkMaxed, buyFundPerk, fpCost, claimMain, mainReady, curMain, qNo, earn, CFG, TEA, teaMaxed, PERKS, FPERKS, MAIN, finalYear, startTrip, claimTrip, TRIPS, yearLocked, startSports, endSports, rtSports: () => rt.sports, startFest, rtFest: () => rt.fest, facCap, addLeague, weekIdx, addMP, tutStart, endFest, claimSports, claimBox, musicWant, askBox, festWait, setTab, openSheet, closeSheet,
-    dexMeet, dexSync, dexPending, dexGift, renderDex, evCurrent, evNext, evSync, claimStamp, claimEvMission, claimEvBox, renderEvent, evMissions, evOk, evSkipped, EV_MONTHS, EV_MEASURE, tierMinutes, minAcorns, sanitize170, EV_STAMPS, EV_SPECIAL, EV_MONTHLY, EV_BOX, DEX_KEYS, DEX_REWARD, DEX_GUEST_KEYS, MG, mgCells, mgSetCells, mgTick, mgAddEnergy, mgAddUp, mgTapGen, mgDrop, mgSell, mgUpgrade, mgClaimOrder, mgSwapOrder, mgOrderOk, mgFillOrders, mgOpen, mgClose, mgRenderAll, mgSpawnLevel, mgNearestEmpty, mgEmptyBoard, mgOrderReward, mgUI, sanitize180, mgWatchAd, nice, claimMission, claimBonus, claimWeekMission, MP_BOX, seasonKey, roofArtKey, oakKey, setSeasonArt, VP, vpLv, vpCost, vpMult, vpAct, renderVpCard, sportsPrize, festPrize, renderTeachers, buildTeacherCards, bldImg, roofKey, bldStage, mapKey, setMapArt, applyThemes, buyFacility, startTrial, endTrial: () => rt.trial && (rt.trial.left = 0), spawnDeal, startVisit, IMG170,   // 1.7.0 도감, 이벤트
+    dexMeet, dexSync, dexPending, dexGift, renderDex, evCurrent, evNext, evSync, claimStamp, claimEvMission, claimEvBox, renderEvent, evMissions, evOk, evSkipped, EV_MONTHS, EV_MEASURE, tierMinutes, minAcorns, sanitize170, EV_STAMPS, EV_SPECIAL, EV_MONTHLY, EV_BOX, DEX_KEYS, DEX_REWARD, DEX_GUEST_KEYS, MG, mgCells, mgSetCells, mgTick, mgAddEnergy, mgAddUp, mgTapGen, mgDrop, mgSell, mgUpgrade, mgClaimOrder, mgSwapOrder, mgOrderOk, mgFillOrders, mgOpen, mgClose, mgRenderAll, mgSpawnLevel, mgNearestEmpty, mgEmptyBoard, mgOrderReward, mgUI, sanitize180, mgWatchAd, mgNewOrder, nice, claimMission, claimBonus, claimWeekMission, MP_BOX, seasonKey, roofArtKey, oakKey, setSeasonArt, VP, vpLv, vpCost, vpMult, vpAct, renderVpCard, sportsPrize, festPrize, renderTeachers, buildTeacherCards, bldImg, roofKey, bldStage, mapKey, setMapArt, applyThemes, buyFacility, startTrial, endTrial: () => rt.trial && (rt.trial.left = 0), spawnDeal, startVisit, IMG170,   // 1.7.0 도감, 이벤트
     PZ, PZ_SHAPES, pzFits, pzAnyFit, pzStuck, pzFullLines, pzPlace, pzFreshGame, pzStart, pzFinish, pzLeft, pzCanAd, pzEssOf, pzMinOf, pzHelpSquirrel, pzHelpOwl, pzHelpBear, fillSubs, mapRoofTop, showAd, claimOfflineDouble, startBoost, tripAd, festFocus, festRange, visMap, renderMissions, pzHasHelp, pzRot, pzNewPiece, pzOpen, pzClose, pzGameOver, pzRenderAll, renderMini, addEss, ESHOP, SP_FUR, applyCos, essItem, pickEss, buyEss, renderEssShop, esAcornLeft, esGoldLeft, esAcornAmt, hatSVG, spFurImg, gameNow, gameToday, gameWeek, kstDay, setServerTime, SVR, dmDay, weekIdx, lgWeek, wkWeek, lgKey, pzDay, goldDay, boostLeft, dealLeft, canStamp };
   if (window.claude && window.claude.hot && window.claude.hot.snapshot) {
     try { window.claude.hot.snapshot(() => { if (S) syncMid(); return { save: S }; }); } catch (e) { /* 무시 */ }

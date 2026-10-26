@@ -2,7 +2,7 @@
 # (1) 에너지: 1분에 1 회복, 100에서 멈춤, 보상으로 100 넘기, 생산기 한 번에 1, 광고 하루 2번(가짜 광고), 시계를 되돌려도 안 늘어남
 # (2) 합치기: 같은 것 2개 겹치면 다음 단계, 10단계 상한, 다른 종류는 자리 바꾸기, 빈칸은 옮기기, 판 가득 참, 팔기 값(에너지 × 0.1분치), 5개 보너스
 # (3) 생산기: 옮기기와 자리 바꾸기, 합쳐지지 않음, 두 종류가 번갈아(세 번 연달아 안 나옴), 레벨표대로(많이 눌러 통계), 강화 조각 값과 Lv.5 상한
-# (4) 주문: 2~10단계와 best 범위, 보상(에너지 × 0.2분치, tierMinutes), 장식 조각(6단계 1, 8단계 2, 10단계 3), 강화 조각(8단계부터), 30분 바꾸기
+# (4) 주문: 한 종류 또는 두 종류 섞어서, 2~10단계와 best 범위, 보상(에너지 × 0.2분치, tierMinutes), 장식 조각(6단계 1, 8단계 2, 10단계 3), 강화 조각(8단계부터), 30분 바꾸기
 # (5) 보상 연결: 오늘의 미션 +15, 보너스 상자 +20, 이번 주 미션 +30, 이벤트 도장 +10(5개째 +30, 7개째 강화 조각), 기념 상자 +50과 강화 조각, 마지막 주간 상자 강화 조각
 # (6) 저장: 예전 저장(mg 없음)은 에너지 100과 빈 판, 망가진 판은 빈 판, 생산기가 빠진 저장은 다시 놓기, 메인 퀘스트 m1, m2
 # (7) 화면: 밝은 390px과 어두운 360px, 지섭 폰 393×762에서 판과 주문이 넘치지 않는지. 끌어서 합치기
@@ -103,28 +103,44 @@ async def main():
         if not (0.11 <= lv5.get('2', 0) / n5 <= 0.17) or not (0.003 <= lv5.get('4', 0) / n5 <= 0.022) or lv5.get('5'): fails.append(f'Lv.5 레벨표 {lv5}')
         if r['lv1'].get('2') or r['lv1'].get('3'): fails.append(f"Lv.1은 1단계만 {r['lv1']}")
         if r['up0'] or r['ups'] != 'A2:5 A3:4 A4:2 A5:0 A5:0 A5:0': fails.append(f'강화 {r}')
-        # ---- (4) 주문
+        # ---- (4) 주문 (한 종류 1~2개, 또는 두 종류를 섞어서 각 1개)
         r = await pg.evaluate(f"""(()=>{{ const F={F}, S=F.S, out={{}};
           S.mg.best = {{ a: 6, m: 1, f: 1, d: 1, s: 1, c: 1, g: 1, v: 1 }}; S.mg.orders = []; F.mgFillOrders();
-          out.n = S.mg.orders.length; out.lv = S.mg.orders.map(o => o.n); out.kindsDiff = new Set(S.mg.orders.map(o => o.k)).size;
-          // 주문을 하나 고정해서 보상 확인: 6단계 1개 (에너지 32 × 0.2 = 6.4분치, 장식 조각 1)
-          S.mg.orders[0] = {{ k: 'a', n: 6, c: 1, who: 'rabbit' }}; const r6 = F.mgOrderReward(S.mg.orders[0]);
+          out.n = S.mg.orders.length; out.lv = S.mg.orders.flatMap(o => o.it.map(x => x.n)); out.kindsDiff = new Set(S.mg.orders.flatMap(o => o.it.map(x => x.k))).size;
+          out.items = S.mg.orders.map(o => o.it.length);
+          // 많이 뽑아 보면 섞인 주문(두 종류, 각 1개, 종류가 다름)이 반쯤 나와요
+          let two = 0, bad = 0; for (let i = 0; i < 400; i++) {{ const o = F.mgNewOrder([]); if (o.it.length === 2) {{ two += 1; if (o.it[0].k === o.it[1].k || o.it[0].c !== 1 || o.it[1].c !== 1) bad += 1; }} else if (o.it.length !== 1) bad += 1; }}
+          out.two = two; out.bad = bad;
+          // 주문을 고정해서 보상 확인: 6단계 1개 (에너지 32 × 0.2 = 6.4분치, 장식 조각 1)
+          S.mg.orders[0] = {{ it: [{{ k: 'a', n: 6, c: 1 }}], who: 'rabbit' }}; const r6 = F.mgOrderReward(S.mg.orders[0]);
           out.r6 = [r6.a, r6.pc, r6.up]; out.r6want = F.minAcorns(6.4);
-          out.r8 = (() => {{ const x = F.mgOrderReward({{ k: 'a', n: 8, c: 1 }}); return [x.pc, x.up]; }})();
-          out.r10 = (() => {{ const x = F.mgOrderReward({{ k: 'a', n: 10, c: 2 }}); return [x.pc, x.up]; }})();
+          out.r8 = (() => {{ const x = F.mgOrderReward({{ it: [{{ k: 'a', n: 8, c: 1 }}] }}); return [x.pc, x.up]; }})();
+          out.r10 = (() => {{ const x = F.mgOrderReward({{ it: [{{ k: 'a', n: 10, c: 2 }}] }}); return [x.pc, x.up]; }})();
+          // 섞인 주문: 도토리 6단계 1 + 버섯 2단계 1 → 분치 6.4 + 0.4, 조각 1
+          const mix = {{ it: [{{ k: 'a', n: 6, c: 1 }}, {{ k: 'm', n: 2, c: 1 }}], who: 'fox' }}; const rm = F.mgOrderReward(mix); out.rmix = [rm.a === F.minAcorns(6.8), rm.pc, rm.up];
           out.ok0 = F.mgOrderOk(S.mg.orders[0]);
           const c = F.mgEmptyBoard(); c[20] = 'a6'; F.mgSetCells(c); out.ok1 = F.mgOrderOk(S.mg.orders[0]);
           const b0 = S.budget, p0 = S.mg.pieces; out.claim = F.mgClaimOrder(0); {CLEAN};
           out.gain = S.budget - b0; out.pc = S.mg.pieces - p0; out.gone = F.mgCells()[20]; out.orders = S.mg.orders.length; out.cnt = S.mg.st.orders;
+          // 섞인 주문 건네기: 하나만 있으면 안 되고, 둘 다 있으면 둘 다 가져가요
+          S.mg.orders[0] = mix; const d = F.mgEmptyBoard(); d[20] = 'a6'; F.mgSetCells(d); out.mixHalf = F.mgOrderOk(mix);
+          d[21] = 'm2'; d[22] = 'm2'; F.mgSetCells(d); out.mixOk = F.mgOrderOk(mix); out.mixClaim = F.mgClaimOrder(0); {CLEAN};
+          const e = F.mgCells(); out.mixLeft = [e[20], e[21], e[22]].join(',');
           // 바꾸기: 30분에 한 번
-          S.mg.swapAt = 0; const k0 = S.mg.orders[1].k + S.mg.orders[1].n; out.sw1 = F.mgSwapOrder(1); out.sw2 = F.mgSwapOrder(1);
+          S.mg.swapAt = 0; out.sw1 = F.mgSwapOrder(1); out.sw2 = F.mgSwapOrder(1);
           {setnow(NOON + 200 * 60000 + 31 * 60000)} out.sw3 = F.mgSwapOrder(1);
+          // 옛 모양 주문 {{k, n, c}}도 읽어요
+          const dd = JSON.parse(JSON.stringify(S)); dd.mg.orders = [{{ k: 'f', n: 3, c: 2, who: 'bear' }}, {{ it: [{{ k: 'a', n: 2, c: 1 }}, {{ k: 'a', n: 3, c: 1 }}] }}, {{ it: [{{ k: 'g', n: 4, c: 1 }}, {{ k: 'v', n: 2, c: 1 }}] }}];
+          const ss = F.sanitize(dd); out.legacy = ss.mg.orders.map(o => o.it.map(x => x.k + x.n + 'x' + x.c).join('+')).join(' ');
           return out; }})()""")
-        if r['n'] != 3 or any(not (2 <= n <= 6) for n in r['lv']): fails.append(f'주문 단계 범위 {r}')
+        if r['n'] != 3 or any(not (2 <= n <= 6) for n in r['lv']) or any(k not in (1, 2) for k in r['items']): fails.append(f'주문 단계 범위 {r}')
+        if not (120 <= r['two'] <= 280) or r['bad']: fails.append(f'섞인 주문 비율과 모양 {r}')
         if r['r6'][0] != r['r6want'] or r['r6'][1] != 1 or r['r6'][2] != 0: fails.append(f'6단계 주문 보상 {r}')
-        if r['r8'] != [2, 1] or r['r10'] != [6, 2]: fails.append(f'8단계, 10단계 주문 조각 {r}')
+        if r['r8'] != [2, 1] or r['r10'] != [6, 2] or r['rmix'] != [True, 1, 0]: fails.append(f'8단계, 10단계, 섞인 주문 조각 {r}')
         if r['ok0'] or not r['ok1'] or not r['claim'] or r['gain'] != r['r6'][0] or r['pc'] != 1 or r['gone'] != '..' or r['orders'] != 3 or r['cnt'] != 1: fails.append(f'주문 건네기 {r}')
+        if r['mixHalf'] or not r['mixOk'] or not r['mixClaim'] or r['mixLeft'] != '..,..,m2': fails.append(f'섞인 주문 건네기 {r}')
         if not r['sw1'] or r['sw2'] or not r['sw3']: fails.append(f'주문 바꾸기 30분 {r}')
+        if r['legacy'] != 'f3x2 g4x1+v2x1': fails.append(f'옛 모양 주문 읽기 {r}')
         # ---- (5) 보상 연결
         r = await pg.evaluate(f"""(()=>{{ const F={F}, S=F.S, out={{}}; const e = () => S.mg.e;
           S.mg.e = 0; S.mg.up = 0;
