@@ -1764,7 +1764,7 @@ body{background:radial-gradient(120% 60% at 50% 0%, color-mix(in srgb, var(--pap
     <p class="boot-step" id="bootStep">학교 문을 여는 중...</p>
     <p class="boot-tip" id="bootTip">학교 문을 여는 중이에요</p>
   </div>
-  <span class="boot-ver" id="bootVer">v1.7.2</span>
+  <span class="boot-ver" id="bootVer">v1.7.3</span>
 </div>
 
 <div class="app on-school" id="app">
@@ -2134,7 +2134,7 @@ body{background:radial-gradient(120% 60% at 50% 0%, color-mix(in srgb, var(--pap
       </div>
       <h3 class="panel-sub">정보</h3>
       <dl class="info">
-        <div id="verRow"><dt>버전</dt><dd>v1.7.2</dd></div>
+        <div id="verRow"><dt>버전</dt><dd>v1.7.3</dd></div>
         <div id="pidRow" hidden><dt>학교 번호</dt><dd id="infoPid"></dd></div>
       </dl>
       <div id="devBox" hidden>
@@ -4705,7 +4705,7 @@ body{background:radial-gradient(120% 60% at 50% 0%, color-mix(in srgb, var(--pap
     $('#vRepTop').textContent = fmt(r); $('#vKidsTop').textContent = `${fmt(kn)}명`;
     $('#repPill').setAttribute('aria-label', `평판 ${fmt(r)}`); $('#kidsPill').setAttribute('aria-label', `학생 ${fmt(kn)}명`);
     renderPower();
-    fitText($('#vBudget'), 17); fitText($('#vRate'), 11); fitText($('#vStudents'), 15); fitText($('#vPower'), 15);
+    fitText($('#vBudget'), 14, budgetTpl(S.budget)); fitText($('#vRate'), 11, $('#vRate').textContent.replace(/[0-9]/g, '8')); fitText($('#vStudents'), 15); fitText($('#vPower'), 15);
     const G = CFG.grades, g = S.grade;
     $('#schoolName').textContent = tierInfo().school;
     renderYear();
@@ -4721,13 +4721,25 @@ body{background:radial-gradient(120% 60% at 50% 0%, color-mix(in srgb, var(--pap
     $('#vNext').textContent = txt;
   }
   // 칠판 숫자가 칸보다 길면 글자를 줄여서 한 칸에 맞춰요. 글자 수나 칸 너비가 바뀔 때만 다시 재요
-  function fitText(el, min) {
-    const key = el.textContent.length + '|' + rt.fitKey;
+  // tpl: 크기를 정할 때 쓸 가장 긴 글자(예: '8888억 8888만'). 주면 그 글자로 크기를 정해서, 숫자가 '4167억'처럼 잠깐 짧아져도 글자가 커졌다 작아졌다 하지 않아요(1.7.3)
+  function fitText(el, min, tpl) {
+    const key = (tpl || el.textContent).length + '|' + (tpl || '') + '|' + rt.fitKey;
     if (el.dataset.fit === key) return;
     el.dataset.fit = key;
+    const real = el.textContent;
+    if (tpl) el.textContent = tpl;
     el.style.fontSize = '';
     let size = parseFloat(getComputedStyle(el).fontSize);
     while (el.scrollWidth > el.clientWidth + 0.5 && size > min) { size -= 1; el.style.fontSize = size + 'px'; }
+    if (tpl) el.textContent = real;
+  }
+  // 도토리 칸 크기 정하기용 글자: 지금 단위에서 가장 길게 나올 모양(숫자는 8로, 아래 단위까지)
+  function budgetTpl(n) {
+    const t = fmt2(n);
+    if (!/[만억조경해자양]/.test(t)) return t.replace(/[0-9]/g, '8');
+    const m = t.match(/^([0-9,]+)([만억조경해자양])/); if (!m) return t;
+    const U = ['양', '자', '해', '경', '조', '억', '만'], i = U.indexOf(m[2]), u2 = i + 1 < U.length ? U[i + 1] : '';
+    return m[1].replace(/[0-9]/g, '8') + m[2] + (u2 ? ' 8888' + u2 : '');
   }
   const refit = () => { rt.fitKey = `${window.innerWidth}x${window.innerHeight}|3|${rt.fitGen}`; };
   // 칠판 제목 아래: 올해가 몇 년째(몇 학년)인지, 이 학교에서 몇 번째 해인지 점으로 보여 줘요
@@ -6024,7 +6036,7 @@ body{background:radial-gradient(120% 60% at 50% 0%, color-mix(in srgb, var(--pap
        forest/rank/<내 id>   랭킹 이름과 학교 점수
        forest/stats/<내 id>  테스트 현황 (어디까지 했는지, 얼마나 했는지)
      <내 id>는 Firebase 익명 로그인이 기기(브라우저)마다 만들어 줘요. */
-  const VERSION = '1.7.2';
+  const VERSION = '1.7.3';
   const CLOUD_PUSH = 20000;   // 바뀐 게 있으면 20초마다 올려요
   const STATS_PUSH = 60000;   // 테스트 현황은 1분마다
   const CLOUD_WAIT = 15000;   // 서버가 이만큼 답이 없으면 이 기기에만 저장해요
