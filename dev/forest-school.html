@@ -1708,6 +1708,9 @@ body{background:radial-gradient(120% 60% at 50% 0%, color-mix(in srgb, var(--pap
 /* 1.7.1 칭호 리본: 학교 카드 안에서 학년 줄 아래 자기 줄에 놓아요(옆에 끼우면 좁은 화면에서 잘려요) */
 .app .board .school-year{flex-wrap:wrap;row-gap:3px}
 .app .board .school-year .hud-title{flex:0 1 auto;margin-left:0;max-width:100%;flex-basis:100%;width:fit-content}
+/* 1.7.2: 지도 위쪽 빈 곳은 지금 지도 그림을 흐리게 깔아서 채워요(테마마다 하늘색이 어색하지 않게). 그림이 없으면 예전 하늘과 숲 색 */
+.app.on-school #map{-webkit-mask-image:linear-gradient(to bottom, transparent 0, #000 56px);mask-image:linear-gradient(to bottom, transparent 0, #000 56px)}
+.app.on-school .frame::before{content:"";position:absolute;inset:-40px;background:var(--map-bg, none) center top/cover no-repeat;filter:blur(16px) saturate(.62) brightness(1.08) contrast(.86);pointer-events:none}
 /* ===== 홈 UI 정리 END ===== */
 </style>
 
@@ -3988,11 +3991,19 @@ body{background:radial-gradient(120% 60% at 50% 0%, color-mix(in srgb, var(--pap
   function setMapArt() {
     $('#mapImg0').setAttribute('href', IMG170(mapKey('map_kinder')));
     $('#mapImg1').setAttribute('href', IMG170(mapKey('map_elem')));
+    mapBackdrop();
+  }
+  // 1.7.2: 지도를 아래로 끌어내리면 지도 위쪽에 빈 곳이 보여요. 하늘색 고정 배경 대신 지금 지도 그림(테마 지도 포함)을 흐리게 깔아서 어느 테마에서도 이어져 보이게 해요
+  function mapBackdrop() {
+    const fr = $('.frame'); if (!fr || !S) return;
+    const u = IMG170(mapKey(S.tier >= 1 ? 'map_elem' : 'map_kinder'));
+    fr.style.setProperty('--map-bg', u ? `url("${u}")` : 'none');
   }
   const bpos = k => geo().b[k];
   const setA = (el, o) => { for (const [k, v] of Object.entries(o)) el.setAttribute(k, typeof v === 'number' ? +v.toFixed(1) : v); };
   function layoutMap() {
     const G = geo(), key = S.tier >= 1 ? 1 : 0;
+    mapBackdrop();
     if (rt.mapLaid === key) return;
     rt.mapLaid = key;
     setMapArt();
