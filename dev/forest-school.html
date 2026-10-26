@@ -3999,8 +3999,10 @@ body{background:radial-gradient(120% 60% at 50% 0%, color-mix(in srgb, var(--pap
   const pct = (x, y, w) => [x / 100 * MAP_W, y / 100 * MAP_H + MAP_Y, w / 100 * MAP_W];
   const GEO = [
     { map: 'map_kinder',
-      b: { science: pct(51, 25, 36), classroom: pct(27, 42, 34), cafeteria: pct(75, 42, 34), library: pct(29, 64, 34), playground: pct(77, 65, 34) },
-      next: { at: pct(51, 25, 36), img: 'bld_classroom_lock', tag: '초등학교에서 열려요', name: '과학실' },
+      // 1.7.3: 건물 자리는 지도 그림의 울타리 빈터(가로, 세로 중심 %, 울타리 안 너비 %)로 적고, 건물 그림의 바닥 섬이 그 빈터에 맞게 놓아요(lotRect)
+      lot: { science: [50, 24.5, 38], classroom: [27, 42.5, 30], cafeteria: [75, 42.5, 32], library: [27.5, 66, 29], playground: [74, 64.5, 32] },
+      nextLot: [50, 24.5, 38], nextKey: 'bld_classroom_lock',
+      next: { img: 'bld_classroom_lock', tag: '초등학교에서 열려요', name: '과학실' },
       oak: [306, 382], plaza: [180, 221], gate: [180, 492], bus: [204, 424], drop: [180, 300, 26, 40],
       spots: [[136, 221], [224, 221], [158, 248], [210, 248], [180, 256], [180, 186], [160, 194], [210, 196], [180, 286], [176, 322], [184, 356], [180, 392], [118, 214], [244, 214], [124, 338], [204, 300], [166, 300], [208, 340]],
       fount: [180, 219, 28, 19],
@@ -4008,8 +4010,9 @@ body{background:radial-gradient(120% 60% at 50% 0%, color-mix(in srgb, var(--pap
       deco: [[64, 110], [300, 104], [22, 236], [340, 258], [66, 424], [306, 432], [140, 384], [228, 388]],
       sports: [277, 300, 44, 26], eaves: { classroom: 0.05, cafeteria: 0.02, library: 0.02, science: 0.02, playground: -0.08 } },
     { map: 'map_elem',
-      b: { science: pct(50, 24, 36), classroom: pct(24, 36, 31), cafeteria: pct(80, 35, 30), library: pct(23, 59, 30), playground: pct(77, 62, 40) },
-      next: { at: pct(49, 66, 28), img: 'bld_cafeteria_lock', tag: '중학교에서 열려요', name: '매점' },
+      lot: { science: [50, 23.8, 40], classroom: [23, 36, 26], cafeteria: [79.5, 35.5, 25], library: [22.5, 58.5, 27], playground: [78, 60.5, 38] },
+      nextLot: [48.5, 65.5, 23], nextKey: 'bld_cafeteria_lock',
+      next: { img: 'bld_cafeteria_lock', tag: '중학교에서 열려요', name: '매점' },
       oak: [302, 376], plaza: [179, 196], gate: [180, 492], bus: [204, 430], drop: [180, 238, 40, 14],
       spots: [[134, 196], [224, 196], [152, 226], [206, 226], [179, 236], [179, 158], [146, 170], [212, 170], [122, 200], [240, 186], [140, 232], [208, 240], [150, 246], [196, 246], [104, 182], [254, 196]],
       fount: [180, 187, 28, 19],
@@ -4017,6 +4020,21 @@ body{background:radial-gradient(120% 60% at 50% 0%, color-mix(in srgb, var(--pap
       deco: [[56, 66], [312, 70], [22, 312], [338, 196], [60, 420], [302, 424], [128, 380], [236, 392]],
       sports: [277, 270, 50, 22], eaves: { classroom: 0.02, cafeteria: 0.0, library: 0.0, science: -0.06, playground: -0.14 } }
   ];
+  // 1.7.3 건물 그림마다 바닥 섬(가장 넓은 줄)의 자리: [가로 중심 - 0.5, 세로 중심 - 0.5, 너비] (그림 한 변 기준, dev에서 그림을 재서 적었어요)
+  const BLD_ISL = {bld_cafeteria_lock:[0.004,0.098,0.952],bld_cafeteria_lock_winter:[0.005,0.096,0.955],bld_cafeteria_on:[0.007,0.123,0.935],bld_cafeteria_on_winter:[0.007,0.125,0.935],bld_cafeteria_s2:[0.008,0.101,0.939],bld_cafeteria_s2_winter:[0.007,0.104,0.935],bld_classroom_lock:[0.005,0.05,0.95],bld_classroom_lock_winter:[0.004,0.049,0.948],bld_classroom_on:[0.011,0.104,0.939],bld_classroom_on_winter:[0.01,0.104,0.94],bld_classroom_s2:[0.01,0.106,0.938],bld_classroom_s2_winter:[0.01,0.109,0.94],bld_field_on:[0.006,0.021,0.948],bld_field_on_winter:[0.006,0.021,0.954],bld_library_on:[0.007,0.132,0.94],bld_library_on_winter:[0.007,0.13,0.935],bld_library_s2:[0.011,0.11,0.938],bld_library_s2_winter:[0.014,0.113,0.942],bld_playground_lock:[0.006,0.051,0.948],bld_playground_lock_winter:[0.009,0.05,0.952],bld_playground_on:[0.0,0.041,0.915],bld_playground_on_winter:[0.0,0.05,0.92],bld_science_on:[0.011,0.119,0.884],bld_science_on_winter:[0.012,0.12,0.895]};
+  const LOT_FIT = 0.98;   // 바닥 섬이 울타리 안쪽에 살짝 들어가게(울타리가 둘레에 보여요)
+  // 빈터 [x%, y%, w%]와 그림 열쇠로 그림 네모 [가운데 x, 가운데 y, 한 변](지도 칸)을 구해요
+  function lotRect(L, key) {
+    const I = BLD_ISL[key] || [0, 0.1, 0.94], w = L[2] / 100 * MAP_W * LOT_FIT / I[2];
+    return [L[0] / 100 * MAP_W - I[0] * w, L[1] / 100 * MAP_H + MAP_Y - I[1] * w, w];
+  }
+  // 길 찾기, 누르는 자리, 이름표는 학교급마다 대표 그림 기준 자리(b)를 써요. 실제 그림은 그 그림의 바닥 섬에 맞춰 조금씩 옮겨요
+  const BASE_KEY = [{ science: 'bld_science_on', classroom: 'bld_classroom_on', cafeteria: 'bld_cafeteria_on', library: 'bld_library_on', playground: 'bld_playground_on' },
+    { science: 'bld_science_on', classroom: 'bld_classroom_on', cafeteria: 'bld_cafeteria_on', library: 'bld_library_on', playground: 'bld_field_on' }];
+  GEO.forEach((G, i) => {
+    G.b = {}; for (const k of Object.keys(G.lot)) G.b[k] = lotRect(G.lot[k], BASE_KEY[i][k]);
+    G.next.at = lotRect(G.nextLot, G.nextKey);
+  });
   const geo = () => GEO[S && S.tier >= 1 ? 1 : 0];
   const IMG = k => (window.FS_IMG && window.FS_IMG[k]) || (window.FS_IMG171 && window.FS_IMG171[k]) || '';   // 1.7.1 묶음도 찾아요
   const BLD_IMG = { classroom: 'bld_classroom_on', cafeteria: 'bld_cafeteria_on', library: 'bld_library_on', science: 'bld_science_on' };
@@ -4052,7 +4070,9 @@ body{background:radial-gradient(120% 60% at 50% 0%, color-mix(in srgb, var(--pap
   const oakKey = () => { const id = S && S.cos && S.cos.th && S.cos.th.bg; return id && has170('oak_' + id) ? 'oak_' + id : 'oak'; };
   function setBldArt(k) {
     const g = $('#b-' + k); if (!g) return;
-    $('.built .bimg', g).setAttribute('href', IMG170(seasonKey(bldImg(k))));
+    const key = seasonKey(bldImg(k)), G = geo(), [bx, by, bw] = lotRect(G.lot[k], key);
+    $$('.built .bimg, .built .roofimg', g).forEach(im => setA(im, { x: bx - bw / 2, y: by - bw / 2, width: bw, height: bw }));
+    $('.built .bimg', g).setAttribute('href', IMG170(key));
     const rk = roofArtKey(k);
     setA($('.roofimg', g), { href: rk ? IMG170(rk) : '', filter: `url(#rt-${k})` });
   }
@@ -4087,9 +4107,9 @@ body{background:radial-gradient(120% 60% at 50% 0%, color-mix(in srgb, var(--pap
     for (const k of Object.keys(FAC)) {
       const g = $('#b-' + k); if (!g) continue;
       const [cx, cy, w] = G.b[k];
-      $$('.bimg, .roofimg', g).forEach(im => setA(im, { x: cx - w / 2, y: cy - w / 2, width: w, height: w }));
       setBldArt(k);
-      $('.site .bimg', g).setAttribute('href', IMG170(seasonKey(SITE_IMG[k])));
+      const sk = seasonKey(SITE_IMG[k]), [sx, sy, sw] = lotRect(G.lot[k], sk);
+      setA($('.site .bimg', g), { x: sx - sw / 2, y: sy - sw / 2, width: sw, height: sw, href: IMG170(sk) });
       const box = { x: cx - w * 0.42, y: cy - w * 0.4, width: w * 0.84, height: w * 0.74 };
       setA($('.hit', g), box); setA($('.focus-ring', g), box);
       $('#pq-' + k).setAttribute('transform', `translate(${cx.toFixed(1)} ${(cy + w * 0.36).toFixed(1)})`);
