@@ -1,4 +1,4 @@
-# 1.5.0 그림 넣기: PNG 원본 폴더를 받아 webp로 줄이고, forest-school.html 안의 그림 묶음(window.FS_IMG)을 새로 써요.
+# 1.5.0, 1.6.0 그림 넣기: PNG 원본 폴더를 받아 webp로 줄이고, forest-school.html 안의 그림 묶음(window.FS_IMG)을 새로 써요.
 # 쓰는 법: python3 embed_assets.py <원본 폴더> [<원본 폴더2> ...]
 #   1.7.0 도감, 이벤트 그림은 따로 둔 묶음(window.FS_IMG170)에 넣어요: python3 embed_assets.py --block 170 ../art/v170/dex ../art/v170/event
 #   폴더 안의 파일 이름(확장자 뺀 것)이 그대로 열쇠가 돼요. 예: map_kinder, bld_classroom_on, ic_home
@@ -28,6 +28,13 @@ RULES = [
     # 1.7.0 도감, 이벤트
     ('dex_', 720, 78),
     ('ev_', 720, 75),
+    # 1.6.0 블록 퍼즐
+    ('pz_bg', 720, 70),
+    ('pz_board', 640, 80),
+    ('pz_', 96, 84),
+    ('fx_', 96, 84),
+    ('essence_', 240, 82),
+    ('cos_', 160, 84),   # 1.6.0 정수 상점 한정 모자 (fur_sp_ 특별 가구는 fur_ 규칙)
 ]
 SKIP = {'building_positions'}
 

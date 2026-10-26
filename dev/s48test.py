@@ -7,7 +7,7 @@ from playwright.async_api import async_playwright
 from s4test import URL
 F = 'window.__forest'
 CLEAN = "document.querySelectorAll('.overlay.center').forEach(o=>{o.hidden=true;o.classList.remove('open')}); window.__forest.rt.modalOpen=null; window.__forest.rt.modalQueue.length=0"
-# 기기 시간을 흉내 내요: Date.now만 바꿔요(1.7.0의 임시 trustedNow는 기기 시간을 돌려줘요).
+# 기기 시간을 흉내 내요: Date.now만 바꿔요(게임 시계 gameNow는 서버 시간이 없으면 기기 시간을 써요).
 # 날짜는 앞으로만 돌려요. 1.6.0 공용 시계(gameNow, gameToday)는 시간이 뒤로 가면 막기 때문이에요
 FAKE = "(()=>{ const real = Date.now; window.__off = 0; Date.now = () => real() + window.__off; })()"
 
@@ -79,7 +79,7 @@ async def main():
         pn, errsn = await boot(ctx2)
         await set_day(pn, 2026, 11, 3)
         nw = await pn.evaluate(f"""(()=>{{ const F={F}, S=F.S; const out={{ pg: S.f.playground, cur: S.ev.cur, list: S.ev.list.map(m=>m.t), bad: [] }};
-          const doable = ['ups', 'claims', 'trains'];   // 놀이터 없는 새 학교가 할 수 있는 종류
+          const doable = ['ups', 'claims', 'trains', 'dmDone'];   // 놀이터 없는 새 학교가 할 수 있는 종류 (1.6.0부터 오늘의 미션은 놀이터 없이도 고치기와 연수가 나와요)
           const rows = [];
           for (let mo = 1; mo <= 12; mo++) for (const e of F.EV_MONTHLY) rows.push({{ def: e, start: `2026-${{String(mo).padStart(2,'0')}}-01` }});
           for (const e of F.EV_SPECIAL) rows.push({{ def: e, start: '2026-12-24' }});
@@ -89,9 +89,9 @@ async def main():
           out.ok = Object.keys(F.EV_MEASURE).filter(t => F.evOk(t));
           return out; }})()""")
         if nw['pg'] != 0 or nw['cur'] != 'harvest:2026-11': fails.append(f'새 저장 이벤트 준비가 이상해요 {nw}')
-        if len(nw['list']) != 3 or len(set(nw['list'])) != 3 or any(t not in ('ups', 'claims', 'trains') for t in nw['list']): fails.append(f"새 저장 이벤트 미션에 못 하는 종류가 있어요 {nw['list']}")
+        if len(nw['list']) != 3 or len(set(nw['list'])) != 3 or any(t not in ('ups', 'claims', 'trains', 'dmDone') for t in nw['list']): fails.append(f"새 저장 이벤트 미션에 못 하는 종류가 있어요 {nw['list']}")
         if nw['bad']: fails.append(f"놀이터 없는 학교에서 이룰 수 없는 미션이 나와요 {nw['bad'][:6]}")
-        if sorted(nw['ok']) != ['claims', 'trains', 'ups']: fails.append(f"놀이터 없을 때 할 수 있는 종류가 달라요 {nw['ok']}")
+        if sorted(nw['ok']) != ['claims', 'dmDone', 'trains', 'ups']: fails.append(f"놀이터 없을 때 할 수 있는 종류가 달라요 {nw['ok']}")
         # 흔들기: 놀이터 0에서는 참나무를 눌러도 횟수가 그대로라 미션으로 나오면 안 돼요(위에서 확인). 놀이터를 지으면 다시 나와요
         built = await pn.evaluate(f"(()=>{{ const F={F}, S=F.S; S.f.playground=1; return Object.keys(F.EV_MEASURE).filter(t => F.evOk(t)).sort(); }})()")
         if not all(t in built for t in ('picks', 'shakes', 'dmDone')): fails.append(f'놀이터를 지어도 줍기, 흔들기, 오늘의 미션이 안 열려요 {built}')
@@ -112,7 +112,7 @@ async def main():
         # 4) 이벤트: 11월 3일(도토리 수확 축제 1~7일)
         await set_day(pg, 2026, 11, 3)
         e = await pg.evaluate(f"""(()=>{{ const F={F}, S=F.S; F.setTab('event'); const txt=document.querySelector('#evBody').textContent;
-          return {{ cur: S.ev.cur, list: S.ev.list.map(m=>m.t), n: S.ev.list.length, txt: txt.slice(0,200), btn: !!document.querySelector('[data-ev="stamp"]'), day: F.trustedDay(), dot: !document.querySelector('#evDot').hidden }}; }})()""")
+          return {{ cur: S.ev.cur, list: S.ev.list.map(m=>m.t), n: S.ev.list.length, txt: txt.slice(0,200), btn: !!document.querySelector('[data-ev="stamp"]'), day: F.gameToday(), dot: !document.querySelector('#evDot').hidden }}; }})()""")
         if e['cur'] != 'harvest:2026-11' or e['n'] != 3 or e['day'] != '2026-11-03': fails.append(f'11월 3일 이벤트 회차가 틀려요 {e}')
         if '도토리 수확 축제' not in e['txt'] or not e['btn'] or not e['dot']: fails.append(f'이벤트 화면이나 도장 버튼이 안 보여요 {e}')
         # 출석 도장: 하루 한 번, 날이 바뀌면 또, 5개째 큰 보상(황금 도토리 3개)
@@ -186,7 +186,8 @@ async def main():
             await pg.evaluate(f"{F}.setTab('school')"); await pg.wait_for_timeout(200)
             await pg.screenshot(path=f'{name}_home.png')
             bt = await pg.evaluate("(()=>{ const r=[...document.querySelectorAll('.map-right .sidebtn')].filter(b=>!b.hidden).map(b=>b.getBoundingClientRect()); return { n: r.length, ok: r.every(x=>x.right<=innerWidth && x.bottom<=innerHeight && x.left>=0) }; })()")
-            if bt['n'] != 4 or not bt['ok']: fails.append(f'{theme} 홈 오른쪽 버튼이 화면 밖이에요 {bt}')
+            if bt['n'] != 5 or not bt['ok']:   # 퀘스트, 랭킹, 도감, 이벤트, 정수 상점
+                fails.append(f'{theme} 홈 오른쪽 버튼이 화면 밖이에요 {bt}')
         if errs or errs2 or errs3: fails.append(f'페이지 오류 {errs + errs2 + errs3}')
         await b.close()
     for f in fails: print('FAIL:', f)
