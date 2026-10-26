@@ -153,6 +153,17 @@ async def main():
           return out; }})()""")
         if r['gen'] != {'t': 'gen', 'i': 0} or r['merge'] != {'t': 'merge', 'a': 40, 'b': 41} or r['order'] != {'t': 'order', 'i': 0} or r['none'] is not None: fails.append(f'힌트 고르기 {r}')
         if r['shown'] != [1, 1] or r['cleared'] != [0, 0]: fails.append(f'힌트 보이기와 지우기 {r}')
+        # ---- (4c) 덜 채운 주문을 누르면 그 조각이 나오는 생산기를 가리켜요 (에너지는 그대로)
+        r = await pg.evaluate(f"""(async()=>{{ const F={F}, S=F.S;
+          F.mgSetCells(F.mgEmptyBoard()); F.mgRenderAll();
+          S.mg.orders = [{{ it: [{{ k: 'f', n: 3, c: 1 }}, {{ k: 'g', n: 2, c: 1 }}], who: 'fox' }}, {{ it: [{{ k: 's', n: 2, c: 1 }}], who: 'rabbit' }}, {{ it: [{{ k: 'a', n: 2, c: 1 }}], who: 'bear' }}];
+          F.mgRenderAll(); const e0 = S.mg.e;
+          document.querySelector('#mgOrders [data-order="0"]').click();
+          await new Promise(r => setTimeout(r, 100));
+          const hint = [...document.querySelectorAll('.mg-cell.hint')].map(el => F.mgCells()[+el.dataset.i]).sort().join(',');
+          return {{ hint, finger: document.querySelectorAll('.mg-finger').length, toast: document.querySelector('#toast').textContent, e: S.mg.e === e0, card: !!document.querySelector('.mg-order.hint') }}; }})()""")
+        if r['hint'] != 'F1,G1' or r['finger'] != 1 or '급식 냄비' not in r['toast'] or '화분' not in r['toast'] or not r['e'] or not r['card']: fails.append(f'주문 눌러 생산기 알려 주기 {r}')
+        await pg.evaluate(f"{F}.mgClearHint()")
         # ---- (5) 보상 연결
         r = await pg.evaluate(f"""(()=>{{ const F={F}, S=F.S, out={{}}; const e = () => S.mg.e;
           S.mg.e = 0; S.mg.up = 0;

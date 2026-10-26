@@ -10834,6 +10834,26 @@ body{background:radial-gradient(120% 60% at 50% 0%, color-mix(in srgb, var(--pap
     const g = gens.find(i => MG.gens[cells[i][0]].kinds.some(k => wantK.has(k)));
     return gens.length ? { t: 'gen', i: g >= 0 ? g : gens[0] } : null;
   }
+  // 덜 채운 주문을 누르면 모자란 조각이 나오는 생산기를 반짝이고 손가락으로 가리켜요(생산기를 눌러 보지 않아도 알 수 있게)
+  function mgOrderGuide(i) {
+    const o = S.mg.orders[i]; if (!o) return false;
+    mgClearHint(); mgUI.idleAt = Date.now();
+    const cells = mgCells(), lack = o.it.filter(x => mgCount(cells, x.k, x.n) < x.c);
+    const gens = [], said = [];
+    for (const x of lack) {
+      const G = MG_GENS.find(g => MG.gens[g].kinds.includes(x.k)); if (!G) continue;
+      const at = cells.findIndex(c => mgIsGen(c) && c[0] === G);
+      if (at >= 0 && !gens.includes(at)) gens.push(at);
+      said.push(`${eun(MG.kinds[x.k].st[x.n - 1])} ${MG.gens[G].name}에서 나와요`);
+    }
+    gens.forEach(j => mgUI.cells[j] && mgUI.cells[j].classList.add('hint'));
+    if (gens.length) mgFinger(gens[0], -1);
+    const el = $(`#mgOrders [data-order="${i}"]`); if (el) el.classList.add('hint');
+    toast(said.join(', ') + (lack.some(x => x.n > 1) ? '. 같은 조각 둘을 합쳐 단계를 올려요' : ''));
+    sfx('tap');
+    mgUI.hintT = setTimeout(mgClearHint, MG.HINT_SHOW);
+    return gens;
+  }
   function mgShowHint() {
     mgClearHint();
     const h = mgHintPick(); if (!h) return;
@@ -10852,7 +10872,7 @@ body{background:radial-gradient(120% 60% at 50% 0%, color-mix(in srgb, var(--pap
       const sw = e.target.closest('[data-swap]'); if (sw) { e.stopPropagation(); mgSwapOrder(+sw.dataset.swap); return; }
       const b = e.target.closest('[data-order]'); if (!b) return;
       const i = +b.dataset.order;
-      if (!mgClaimOrder(i)) { const o = S.mg.orders[i]; if (o) toast(`${mgOrderText(o)}가 있어야 해요`); }
+      if (!mgClaimOrder(i)) mgOrderGuide(i);
     });
     $('#mgFoot').addEventListener('click', e => {
       const s = e.target.closest('[data-mgsell]'); if (s) { mgSell(+s.dataset.mgsell); return; }
@@ -10942,7 +10962,7 @@ body{background:radial-gradient(120% 60% at 50% 0%, color-mix(in srgb, var(--pap
   // 시험용 손잡이: 자동 시험(window.__FOREST_TEST)에서만 게임 속 함수를 꺼내 써요
   if (window.__FOREST_TEST) window.__forest = { get S() { return S; }, get Cloud() { return Cloud; }, rt, makeDeal, furStage, DEAL, navInfo, navRoute, spawnDrop, repTipCheck, linkGoogle, retryCloud, sanitize, acctPending, renderMap, renderHUD, renderAffordance, syncKids, layoutMap, geo, startTrial, hitTrial, endTrial, startVisit, endVisit, showReward, recommend, needCost, prepTopUp, qReward, prepPhase, rankScore, pwOf, previewDip, dipMult, costScale, buyFacility, buyFur, buyFurAll, furCost, furReady, furDone, FUR, startTalk, endTalk, teacherAct, facCost, teaCost, facKeys, rate, rep, capacity, canGraduate, canPromote,
     fmt, fmt2, graduate, promote, buyPerk, perkCost, perkMaxed, buyFundPerk, fpCost, claimMain, mainReady, curMain, qNo, earn, CFG, TEA, teaMaxed, PERKS, FPERKS, MAIN, finalYear, startTrip, claimTrip, TRIPS, yearLocked, startSports, endSports, rtSports: () => rt.sports, startFest, rtFest: () => rt.fest, facCap, addLeague, weekIdx, addMP, tutStart, endFest, claimSports, claimBox, musicWant, askBox, festWait, setTab, openSheet, closeSheet,
-    dexMeet, dexSync, dexPending, dexGift, renderDex, evCurrent, evNext, evSync, claimStamp, claimEvMission, claimEvBox, renderEvent, evMissions, evOk, evSkipped, EV_MONTHS, EV_MEASURE, tierMinutes, minAcorns, sanitize170, EV_STAMPS, EV_SPECIAL, EV_MONTHLY, EV_BOX, DEX_KEYS, DEX_REWARD, DEX_GUEST_KEYS, MG, mgCells, mgSetCells, mgTick, mgAddEnergy, mgAddUp, mgTapGen, mgDrop, mgSell, mgUpgrade, mgClaimOrder, mgSwapOrder, mgOrderOk, mgFillOrders, mgOpen, mgClose, mgRenderAll, mgSpawnLevel, mgNearestEmpty, mgEmptyBoard, mgOrderReward, mgUI, sanitize180, mgWatchAd, mgNewOrder, mgHintPick, mgShowHint, mgClearHint, mgTouch, nice, claimMission, claimBonus, claimWeekMission, MP_BOX, seasonKey, roofArtKey, oakKey, setSeasonArt, VP, vpLv, vpCost, vpMult, vpAct, renderVpCard, sportsPrize, festPrize, renderTeachers, buildTeacherCards, bldImg, roofKey, bldStage, mapKey, setMapArt, applyThemes, buyFacility, startTrial, endTrial: () => rt.trial && (rt.trial.left = 0), spawnDeal, startVisit, IMG170,   // 1.7.0 도감, 이벤트
+    dexMeet, dexSync, dexPending, dexGift, renderDex, evCurrent, evNext, evSync, claimStamp, claimEvMission, claimEvBox, renderEvent, evMissions, evOk, evSkipped, EV_MONTHS, EV_MEASURE, tierMinutes, minAcorns, sanitize170, EV_STAMPS, EV_SPECIAL, EV_MONTHLY, EV_BOX, DEX_KEYS, DEX_REWARD, DEX_GUEST_KEYS, MG, mgCells, mgSetCells, mgTick, mgAddEnergy, mgAddUp, mgTapGen, mgDrop, mgSell, mgUpgrade, mgClaimOrder, mgSwapOrder, mgOrderOk, mgFillOrders, mgOpen, mgClose, mgRenderAll, mgSpawnLevel, mgNearestEmpty, mgEmptyBoard, mgOrderReward, mgUI, sanitize180, mgWatchAd, mgNewOrder, mgHintPick, mgShowHint, mgClearHint, mgTouch, mgOrderGuide, nice, claimMission, claimBonus, claimWeekMission, MP_BOX, seasonKey, roofArtKey, oakKey, setSeasonArt, VP, vpLv, vpCost, vpMult, vpAct, renderVpCard, sportsPrize, festPrize, renderTeachers, buildTeacherCards, bldImg, roofKey, bldStage, mapKey, setMapArt, applyThemes, buyFacility, startTrial, endTrial: () => rt.trial && (rt.trial.left = 0), spawnDeal, startVisit, IMG170,   // 1.7.0 도감, 이벤트
     PZ, PZ_SHAPES, pzFits, pzAnyFit, pzStuck, pzFullLines, pzPlace, pzFreshGame, pzStart, pzFinish, pzLeft, pzCanAd, pzEssOf, pzMinOf, pzHelpSquirrel, pzHelpOwl, pzHelpBear, fillSubs, mapRoofTop, showAd, claimOfflineDouble, startBoost, tripAd, festFocus, festRange, visMap, renderMissions, pzHasHelp, pzRot, pzNewPiece, pzOpen, pzClose, pzGameOver, pzRenderAll, renderMini, addEss, ESHOP, SP_FUR, applyCos, essItem, pickEss, buyEss, renderEssShop, esAcornLeft, esGoldLeft, esAcornAmt, hatSVG, spFurImg, gameNow, gameToday, gameWeek, kstDay, setServerTime, SVR, dmDay, weekIdx, lgWeek, wkWeek, lgKey, pzDay, goldDay, boostLeft, dealLeft, canStamp };
   if (window.claude && window.claude.hot && window.claude.hot.snapshot) {
     try { window.claude.hot.snapshot(() => { if (S) syncMid(); return { save: S }; }); } catch (e) { /* 무시 */ }
