@@ -11,7 +11,7 @@ from s4test import URL
 F = 'window.__forest'
 CLEAN = "document.querySelectorAll('.overlay.center').forEach(o=>{o.hidden=true;o.classList.remove('open')}); window.__forest.rt.modalOpen=null; window.__forest.rt.modalQueue.length=0"
 SKIP = f"(()=>{{ const t=document.querySelector('#tut'); if(t) t.hidden=true; {F}.S.tut.st='skip'; {F}.rt.tut=null; {CLEAN}; }})()"
-LEN = {'bgm_home': 86.1, 'bgm_room': 93.81, 'bgm_festival': 60.46, 'bgm_play': 87.24}
+LEN = {'bgm_home': 79.5, 'bgm_room': 93.81, 'bgm_festival': 60.46, 'bgm_play': 74.15}
 
 async def main():
     bad = []

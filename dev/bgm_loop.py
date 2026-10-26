@@ -1,5 +1,6 @@
 # 1.7.3 배경음악 반복 구간 만들기: Suno mp3를 받아 이음매 없이 되풀이되는 bgm_*.m4a를 만들어요(결과는 embed_audio.py로 넣어요)
-# 쓰는 법: python3 bgm_loop.py <열쇠>=<mp3> [<열쇠>=<mp3> ...] --out <폴더>
+# 쓰는 법: python3 bgm_loop.py <열쇠>=<mp3>[@시작-끝] [...] --out <폴더> [--xfade <박자 수>]
+#   @시작-끝(초)을 적으면 그 구간을 써요(귀로 듣고 고른 구간). 안 적으면 아래 1)처럼 찾아요. --xfade는 이음매를 겹치는 길이(기본 1박자)
 #   예: python3 bgm_loop.py bgm_home=1.mp3 bgm_room=2.mp3 bgm_festival=3.mp3 bgm_play=4.mp3 --out /tmp/bgm
 # 필요한 것: ffmpeg, pip install librosa soundfile
 # 하는 일
@@ -25,8 +26,9 @@ def find_loop(path):
             if best is None or score > best[0]: best = (score, s, bt[i], bt[j])
     return best[2], best[3], float(np.median(np.diff(bt))), best[1]
 
-def bake(key, path, out):
+def bake(key, path, out, ab=None, xf=1):
     a_t, b_t, beat, sim = find_loop(path)
+    if ab: a_t, b_t = ab
     wav = out / f'{key}_src.wav'
     subprocess.run(['ffmpeg', '-v', 'error', '-y', '-i', str(path), '-ar', '44100', '-ac', '2', str(wav)], check=True)
     y, sr = sf.read(wav); m = y.mean(1); a, b = int(a_t * sr), int(b_t * sr)
@@ -34,7 +36,7 @@ def bake(key, path, out):
     for l in range(-lag, lag + 1):
         seg = m[b + l:b + l + win]; c = float(np.dot(ref, seg) / (np.linalg.norm(ref) * np.linalg.norm(seg) + 1e-9))
         if c > best[0]: best = (c, l)
-    b += best[1]; X = int(beat * sr)
+    b += best[1]; X = int(beat * sr * xf)
     loop = y[a:b].copy(); t = np.linspace(0, 1, X)[:, None]
     loop[-X:] = y[b - X:b] * np.cos(t * np.pi / 2) + y[a - X:a] * np.sin(t * np.pi / 2)
     sf.write(out / f'{key}_loop.wav', loop, sr)
@@ -45,5 +47,8 @@ if __name__ == '__main__':
     args = sys.argv[1:]
     if '--out' not in args: sys.exit('--out <폴더>를 적어 주세요')
     out = pathlib.Path(args[args.index('--out') + 1]); out.mkdir(parents=True, exist_ok=True)
+    xf = float(args[args.index('--xfade') + 1]) if '--xfade' in args else 1
     for kv in args[:args.index('--out')]:
-        k, p = kv.split('=', 1); bake(k, pathlib.Path(p), out)
+        k, p = kv.split('=', 1); ab = None
+        if '@' in p: p, r = p.rsplit('@', 1); ab = tuple(float(x) for x in r.split('-'))
+        bake(k, pathlib.Path(p), out, ab, xf)
