@@ -8,6 +8,7 @@ const CONSENT_RETRY = 60000;                                 // 동의 정보를
 let ready = false, loading = false, started = false;
 let canAds = false, consentAt = 0, asking = false;           // 1.5.4: 동의 상태가 광고를 허락할 때만 광고를 준비해요
 let onDone = null, earned = false;
+let lastErr = '';                                            // 1.7.1: 광고를 못 불러온 까닭(애드몹 오류 코드)을 게임 알림에 보여 줘요
 
 function finish() {
   const cb = onDone; onDone = null;
@@ -25,7 +26,7 @@ async function checkConsent() {
     let c = await AdMob.requestConsentInfo();
     if (c && c.isConsentFormAvailable && c.status === AdmobConsentStatus.REQUIRED) c = (await AdMob.showConsentForm()) || c;
     canAds = !!(c && c.canRequestAds);
-  } catch (e) { canAds = false; }
+  } catch (e) { canAds = false; lastErr = 'consent:' + String((e && (e.code ?? e.message)) || '').slice(0, 40); }
   asking = false;
   return canAds;
 }
@@ -33,8 +34,8 @@ async function preload() {
   if (!started || ready || loading) return;
   if (!(await checkConsent())) { setTimeout(preload, CONSENT_RETRY); return; }
   loading = true;
-  try { await AdMob.prepareRewardVideoAd({ adId: AD_UNIT, isTesting: TESTING }); ready = true; }
-  catch (e) { setTimeout(preload, 20000); }
+  try { await AdMob.prepareRewardVideoAd({ adId: AD_UNIT, isTesting: TESTING }); ready = true; lastErr = ''; }
+  catch (e) { lastErr = String((e && (e.code ?? e.message)) || 'unknown').slice(0, 60); setTimeout(preload, 20000); }
   loading = false;
 }
 async function start() {
@@ -52,6 +53,8 @@ window.FOREST_ADS = {
   // 광고를 쓸 수 없는 까닭: 'consent'(동의가 없어요), 'loading'(준비 중), ''(준비됨)
   adState: () => (ready ? '' : (started && !canAds && consentAt ? 'consent' : 'loading')),
   preload,
+  // 1.7.1 마지막으로 광고를 못 불러온 까닭. 애드몹 코드 0 내부 오류, 1 잘못된 요청, 2 인터넷, 3 줄 광고 없음
+  adError: () => lastErr,
   // done({ earned }): 끝까지 봐서 보상 신호가 왔을 때만 earned가 true예요
   showAd(done) {
     if (!ready) { preload(); done({ earned: false }); return; }

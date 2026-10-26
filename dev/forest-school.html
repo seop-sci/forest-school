@@ -5453,7 +5453,7 @@ body{background:radial-gradient(120% 60% at 50% 0%, color-mix(in srgb, var(--pap
     if (EXT) {
       // 토스 리워드 광고: 끝까지 봤다는 신호(userEarnedReward)가 왔을 때만 보상을 줘요
       // 1.6.0: 광고가 아직 없으면 알려 주고, 광고를 못 봤을 때의 처리(onSkip)를 '광고 없음'으로 불러요. 기본 보상이나 버튼이 사라지지 않게요
-      if (!EXT.adReady()) { EXT.preload(); rt.adNoGold = false; toast('광고를 불러오지 못했어요. 잠시 뒤에 다시 눌러 주세요'); if (onSkip) onSkip('noad'); return; }
+      if (!EXT.adReady()) { EXT.preload(); rt.adNoGold = false; toast('광고를 불러오지 못했어요. 잠시 뒤에 다시 눌러 주세요' + adErrText(EXT)); if (onSkip) onSkip('noad'); return; }
       rt.adOpen = true;
       if (actx && actx.state === 'running') actx.suspend().catch(() => {});   // 광고 중에는 게임 소리를 멈춰요
       EXT.showAd(r => { rt.adOk = onReward; rt.adNo = onSkip || null; rt.adEarned = !!r.earned; closeAd(); });
@@ -5951,6 +5951,18 @@ body{background:radial-gradient(120% 60% at 50% 0%, color-mix(in srgb, var(--pap
     $('#acctSub').textContent = g ? `${g.email || '구글'} 계정에 학교가 저장돼요` :
       (S.acctGift ? '연결해 두면 휴대폰을 바꿔도 같은 학교를 이어 해요' : `연결하면 수료증 ${ACCT_GIFT.dip}장, 기금 ${ACCT_GIFT.fund}, 황금 도토리 ${ACCT_GIFT.gold}개를 선물로 줘요`);
   }
+  // 1.7.1 광고와 구글 로그인이 실패한 까닭을 짧게 덧붙여요(문의할 때 알려 주면 원인을 찾기 쉬워요)
+  const AD_ERR = { 0: '애드몹 내부 오류', 1: '광고 요청 오류', 2: '인터넷 연결', 3: '지금 줄 광고가 없어요' };
+  function adErrText(EXT) {
+    const e = EXT && EXT.adError ? String(EXT.adError() || '') : ''; if (!e) return '';
+    const m = e.match(/-?\d+/), why = /^consent/.test(e) ? '광고 동의 정보를 못 받았어요' : m && AD_ERR[m[0]] ? AD_ERR[m[0]] : '';
+    return ` (오류 ${e.replace(/^consent:/, '')}${why ? ', ' + why : ''})`;
+  }
+  function googleErrText(c) {
+    if (/\b10\b|DEVELOPER_ERROR/i.test(c)) return ' (오류 10: 앱 서명 키 SHA-1을 Firebase에 등록해야 해요)';
+    if (/\b7\b|network/i.test(c)) return ' (인터넷 연결을 확인해 주세요)';
+    return c && c !== 'undefined' ? ` (오류 ${c.slice(0, 40)})` : '';
+  }
   async function linkGoogle() {
     if (!cloudOn() || rt.acctBusy) return;
     if (googleUser()) { toast('이미 구글 계정에 연결돼 있어요'); return; }
@@ -5996,7 +6008,7 @@ body{background:radial-gradient(120% 60% at 50% 0%, color-mix(in srgb, var(--pap
       if (e && e.acctFail) { acctFail(); toast('계정을 바꾸는 중에 연결이 끊겼어요. 이 기기 학교는 그대로 저장돼요. 인터넷이 되면 다시 시도해 주세요'); }
       else if (/popup-blocked/.test(c)) toast('팝업이 막혔어요. 브라우저에서 팝업을 허용해 주세요');
       else if (/unauthorized-domain/.test(c)) toast('Firebase 승인된 도메인에 이 주소를 넣어야 해요');
-      else if (!/cancel|popup-closed/i.test(c)) toast('구글 계정을 연결하지 못했어요. 잠시 뒤에 다시 해 보세요');
+      else if (!/cancel|popup-closed/i.test(c)) toast('구글 계정을 연결하지 못했어요. 잠시 뒤에 다시 해 보세요' + googleErrText(c));
     }
     rt.acctBusy = false;
   }
