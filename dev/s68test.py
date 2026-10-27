@@ -30,7 +30,8 @@ async def main():
           const dot0 = !document.querySelector('#ntDot').hidden; document.querySelector('#optNotice').click(); await new Promise(r=>setTimeout(r,300));
           const m = document.querySelector('#mNotice'); const out = {{ dot0, open: !m.hidden, li: m.querySelectorAll('.nt-item[open] li').length, hide: !document.querySelector('#ntHide').hidden, seen: S.nt.seen === F.NOTICES[0].id, dot1: !document.querySelector('#ntDot').hidden }};
           document.querySelector('#ntClose').click(); await new Promise(r=>setTimeout(r,300)); out.closed = m.hidden; F.setTab('school'); return out; }})()""")
-        if r != {'dot0': True, 'open': True, 'li': 7, 'hide': False, 'seen': True, 'dot1': False, 'closed': True}: fails.append(f'설정에서 열기 {r}')
+        n_lines = await pg.evaluate(f"{F}.NOTICES[0].lines.length")   # 맨 위 공지의 줄 수(공지가 바뀌어도 시험이 따라가요)
+        if r != {'dot0': True, 'open': True, 'li': n_lines, 'hide': False, 'seen': True, 'dot1': False, 'closed': True}: fails.append(f'설정에서 열기 {r}')
         # (2)(3)
         r = await pg.evaluate(f"""(async()=>{{ const F={F}, S=F.S, out={{}}; window.__NOTICE_AUTO = true; S.tut.st = 'done'; S.q.m = 10;
           S.nt = {{ seen: F.NOTICES[0].id, ver: '1.7.4', hide: 0 }};

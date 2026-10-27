@@ -41,7 +41,7 @@ async def main():
         await pg.screenshot(path='s28_sports.png')
         await pg.evaluate("window.__forest.rtSports().t = 0.2"); await pg.wait_for_timeout(2200)
         r['sportsEnd'] = await pg.evaluate("[!document.querySelector('#mSportsEnd').hidden, document.querySelector('#srTitle').textContent]")
-        await pg.evaluate("document.querySelector('.tab[data-tab=shop]').click()"); await pg.wait_for_timeout(300)
+        await pg.evaluate("window.__forest.setTab('shop')"); await pg.wait_for_timeout(300)
         r['crownShop'] = await pg.evaluate("!!document.querySelector('[data-buy=\"c:hat:crown\"]')")
         r['errors'] = errs; await b.close(); print(json.dumps(r, ensure_ascii=False, indent=1))
 asyncio.run(main())
