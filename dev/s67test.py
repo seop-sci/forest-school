@@ -5,6 +5,7 @@
 # (4) 저장: 옛 저장(bst 없음)은 기본값, 망가진 값은 바로잡기, 저장 후 다시 읽어도 행운 남은 횟수 그대로
 # (6) 개발자 메뉴: 정수 500, 합치기 에너지와 조각, 수료증 기금 쪽지, 다음 날로 넘기기(퍼즐 판과 부스터)
 # (7) 짓기와 업그레이드 효과(작업지시서 22 그림: 비계, 망치, 흙먼지, 반짝이, 완공 리본, 업그레이드 배지)
+# (8) 합치기 도감 칸마다 정수와 모은 개수 보상, (9) 판 두근거림은 새 단계만
 # (5) 화면: 미니게임 탭 퍼즐 카드 '보상 잔여 10/10', 360px 어두운 화면, 390px 밝은 화면에서 부스터 창과 아래 칸이 넘치지 않는지
 # 쓰는 법: python3 wrap.py && python3 s67test.py   (마지막 줄이 PASS면 통과)
 import asyncio, json, calendar
@@ -76,6 +77,24 @@ async def main():
           F.closeSheet(); await new Promise(r=>setTimeout(r,300)); out.after = !!document.querySelector('#b-classroom .bfx .badge');
           return out; }})()""")
         if not (r['fx'] and r['rise'] and r['site'] and r['dust'] == 12 and r['art'] and r['scaf'] and r['rib'] and r['gone'] and r['wait'] and r['after']): fails.append(f'짓기 효과 {r}')
+        # (8) 합치기 도감: 칸마다 정수 1(전에 만든 칸도), 모은 개수 10칸마다 보상, 저장
+        r = await pg.evaluate(f"""(()=>{{ const F={F}, S=F.S, out={{}};
+          S.mg.best = {{ a: 3, m: 10 }}; S.mg.dexE = {{}}; S.mg.dexMs = 0; S.ess = 0;
+          out.n = F.mgDexEssN(); out.c1 = F.mgDexEss('a', 1); out.c1b = F.mgDexEss('a', 1); out.c4 = F.mgDexEss('a', 4); out.ess = S.ess; out.n2 = F.mgDexEssN();
+          out.ms = F.mgDexMsCan(); out.mc = F.mgDexMsClaim(); out.mc2 = F.mgDexMsClaim(); out.ess2 = S.ess; out.dexMs = S.mg.dexMs;
+          const d = JSON.parse(JSON.stringify(S)); const a = F.sanitize(d).mg; delete d.mg.dexE; delete d.mg.dexMs; const b = F.sanitize(d).mg;
+          d.mg.dexE = {{ a: 'x', m: 99999 }}; d.mg.dexMs = 99; const c = F.sanitize(d).mg;
+          out.sv = [a.dexE.a, a.dexMs, JSON.stringify(b.dexE), b.dexMs, c.dexE.a || 0, c.dexE.m, c.dexMs];
+          return out; }})()""")
+        if not (r['n'] == 13 and r['c1'] and not r['c1b'] and not r['c4'] and r['ess'] == 1 and r['n2'] == 12 and r['ms'] and r['mc'] and not r['mc2'] and r['ess2'] == 6 and r['dexMs'] == 1): fails.append(f'합치기 도감 정수 {r}')
+        if r['sv'] != [1, 1, '{}', 0, 0, 99999 & 1023, 8]: fails.append(f'합치기 도감 저장 {r["sv"]}')
+        # (9) 판 두근거림: 처음 만든 단계일 때만
+        r = await pg.evaluate(f"""(async()=>{{ const F={F}, S=F.S; F.mgOpen(); await new Promise(r=>setTimeout(r,200)); const b = document.querySelector('#mgBoard');
+          S.mg.best = {{ a: 5 }}; const c = F.mgEmptyBoard(); c[20] = 'a1'; c[21] = 'a1'; c[30] = 'a5'; c[31] = 'a5'; F.mgSetCells(c); F.mgRenderAll();
+          F.mgDrop(20, 21); F.mgRenderAll(); const old = b.classList.contains('thump');
+          await new Promise(r=>setTimeout(r,400)); F.mgDrop(30, 31); F.mgRenderAll(); const neu = b.classList.contains('thump');
+          F.mgClose(); return [old, neu]; }})()""")
+        if r != [False, True]: fails.append(f'판 두근거림 {r}')
         if errs: fails.append(f'오류 {errs}')
         # 화면
         for w, dark in ((360, True), (390, False)):
@@ -91,6 +110,12 @@ async def main():
             r = await pg2.evaluate("""(()=>{ const f = document.querySelector('#mgFoot'), fr = f.getBoundingClientRect(); const over = [...f.querySelectorAll('*')].filter(el => { const r = el.getBoundingClientRect(); return r.width && (r.right > fr.right + 1 || r.left < fr.left - 1); }).map(el => el.className || el.tagName); return { over, sw: document.documentElement.scrollWidth }; })()""")
             await pg2.screenshot(path=f's67_foot_{w}.png')
             if r['over'] or r['sw'] > w: fails.append(f'{w}px 아래 칸 넘침 {r}')
+            await pg2.evaluate(f"(()=>{{ const S={F}.S; S.mg.best = {{ a: 10, m: 4, f: 2 }}; S.mg.dexE = {{}}; S.mg.dexMs = 0; {F}.mgOpenDex(); }})()")
+            await pg2.wait_for_timeout(300)
+            r = await pg2.evaluate("""(()=>{ const s = document.querySelector('#mgDexSheet'), sr = s.getBoundingClientRect(); const over = [...s.querySelectorAll('*')].filter(el => { const r = el.getBoundingClientRect(); return r.width && (r.right > sr.right + 1 || r.left < sr.left - 1); }).map(el => el.className || el.tagName); return { over, ess: s.querySelectorAll('.md-t.ess').length, ms: !!s.querySelector('[data-mgms]') }; })()""")
+            await pg2.screenshot(path=f's67_dex_{w}.png')
+            if r['over'] or r['ess'] != 16 or not r['ms']: fails.append(f'{w}px 합치기 도감 {r}')
+            await pg2.evaluate("document.querySelector('#mgDexSheet').hidden = true")
             await pg2.evaluate(f"{F}.mgOpenBoost()")
             await pg2.wait_for_timeout(300)
             r = await pg2.evaluate("""(()=>{ const s = document.querySelector('#mgBoostSheet'), sr = s.getBoundingClientRect(); const over = [...s.querySelectorAll('*')].filter(el => { const r = el.getBoundingClientRect(); return r.width && (r.right > sr.right + 1 || r.left < sr.left - 1); }).map(el => el.className || el.tagName); return { over, top: sr.top }; })()""")
