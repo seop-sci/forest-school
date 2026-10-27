@@ -103,3 +103,7 @@ python3 dev/check_rules.py               # CLAUDE.md와 AGENTS.md 공통 규칙 
 python3 dev/check_templates.py --labels  # Issue 양식이 GitHub 규칙에 맞는지, 쓰는 라벨이 저장소에 있는지 (gh 로그인 필요, --labels 빼면 양식만)
 ```
 Issue 양식은 기본 브랜치(`main`)에 있어야 GitHub의 새 Issue 화면에 나타나요. 작업 브랜치에서는 `check_templates.py`로만 확인할 수 있어요.
+| `s71test.py` | 2.0.0 보안 점검: 1-1 두 기기 클라우드 복원(가짜 Firebase로 실제 initCloud), 1-3 자리 비움 상한, 2-5 기기 시계(서버 시간 기준, 오프라인이면 다음에), 2-3 랭킹 계정 묶기 |
+| `fbtest/rules_sec.js` | 2.0.0 보안 점검 규칙: `NODE_PATH=<targaryen> node dev/fbtest/rules_sec.js database.rules.json`. adminKey, 랭킹 점수와 리그 점수 10초 간격, 주 번호, test 거부, stats 칸 |
+
+가짜 Firebase 시험(s7, s18, s26, s27, s34, s44)은 `python3 build_gh.py gh`로 웹판을 먼저 만들어요. 2026-10-28 기준 s4, s7, s18, s40은 옛 화면(아래 설정 탭, `#gBtn`)이나 배경음악 기대값 때문에 고치기 전부터 멈춰요.
