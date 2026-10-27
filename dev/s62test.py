@@ -65,7 +65,7 @@ async def main():
                 if r['nm'] != '도토리b 유치원' or r['sign'] != ['도토리b', '유치원'] or not r['crest']: bad.append(f'이름/마크 {r["nm"]} {r["sign"]} {r["crest"]}')
                 if r['back'][0] != '도토리b' or r['back'][1] != [1, 5, 4, 2]: bad.append(f'저장 {r["back"]}')
                 o = r['old']
-                if o['nm'] != '' or o['mk'] is not None or o['own'] != {} or any(any(x) for x in o['lay']) or [len(x) for x in o['lay']] != [11, 11]: bad.append(f'옛 저장 {o}')
+                if o['nm'] != '' or o['mk'] is not None or o['own'] != {} or any(any(x) for x in o['lay']) or [len(x) for x in o['lay']] != [11, 11, 11]: bad.append(f'옛 저장 {o}')
                 b2 = r['b2']
                 if b2['own'] != {'bench': 11, 'owl': 1} or b2['lay'][0][:4] != ['bench', 'bench', '', 'owl'] or b2['nm'] != '' or b2['mk'] is not None: bad.append(f'망가진 저장 {b2}')
             # 화면: 상점 거리 → 꾸미기 가게

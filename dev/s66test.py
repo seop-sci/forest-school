@@ -72,7 +72,7 @@ async def main():
                 await pg.wait_for_timeout(400)
                 if not await pg.evaluate("document.querySelector('#mTalk').hidden"): bad.append('전학 대화가 닫히지 않아요')
                 # 새 전학생 6종: 그림이 없으면 그림 문자, 대사가 모두 있어요
-                r = await pg.evaluate(f"""(() => {{ const F = {F}; return {{ n: F.NEWCOMERS.length, ks: F.NEWCOMERS.slice(6).map(n => n.k), emoji: F.NEWCOMERS.slice(6).map(n => F.kidSVG(n.k, 0).includes('<text')),
+                r = await pg.evaluate(f"""(() => {{ const F = {F}; return {{ n: F.NEWCOMERS.length, ks: F.NEWCOMERS.slice(6).map(n => n.k), emoji: F.NEWCOMERS.slice(6).map(n => F.kidArt(n.k, 0).includes('<text')),
                   lines: F.NEWCOMERS.map(n => F.showNewTalk && n.k), dex: F.DEX_KEYS.length }}; }})()""")
                 if r['n'] != 12 or r['ks'] != ['hamster', 'duck', 'turtle', 'mole', 'frog', 'waterdeer']: bad.append(f'새 전학생 {r}')
                 if not all(r['emoji']): bad.append(f'그림 문자 {r["emoji"]}')
