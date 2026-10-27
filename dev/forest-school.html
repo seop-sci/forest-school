@@ -3631,9 +3631,11 @@ body{background:radial-gradient(120% 60% at 50% 0%, color-mix(in srgb, var(--pap
 
   /* ---------- 퀘스트 목록 ---------- */
   // 메인 퀘스트: 교감 선생님이 장마다 하나씩 기능을 알려 주는 튜토리얼. 마지막 퀘스트가 그 장의 상장(학교 등급)이다
-  const CHAPTERS = ['첫 출근', '선생님을 모셔요', '소문난 학교', '대도시를 향해', '유치원 졸업', '숲속 초등학교', '2학년 새 친구들', '3학년 현장체험학습', '4학년 숲속 운동회', '5학년 학예회', '6학년 졸업 여행'];
+  const CHAPTERS = ['첫 출근', '선생님을 모셔요', '소문난 학교', '대도시를 향해', '유치원 졸업', '숲속 초등학교', '2학년 새 친구들', '3학년 현장체험학습', '4학년 숲속 운동회', '5학년 학예회', '6학년 졸업 여행',
+    '숲속 중학교', '1학년 동아리 발표회', '2학년 숲속 체육대회', '3학년 졸업 준비'];   // 2.0.0 중학교 4장
   // 다음 장이 열리는 때 (장 순서대로)
-  const CH_NEXT = ['마을 학교가 되면', '읍내 학교가 되면', '도시 학교가 되면', '대도시 학교가 되면', '초등학교에 입학하면', '1학년 종업식을 마치면', '2학년 종업식을 마치면', '3학년 종업식을 마치면', '4학년 종업식을 마치면', '5학년 종업식을 마치면', '중학교가 열리면'];
+  const CH_NEXT = ['마을 학교가 되면', '읍내 학교가 되면', '도시 학교가 되면', '대도시 학교가 되면', '초등학교에 입학하면', '1학년 종업식을 마치면', '2학년 종업식을 마치면', '3학년 종업식을 마치면', '4학년 종업식을 마치면', '5학년 종업식을 마치면', '중학교에 입학하면',
+    '중학교 마을 학교가 되면', '중학교 1학년 종업식을 마치면', '중학교 2학년 종업식을 마치면', '고등학교가 열리면'];
   // id는 저장에 쓰여요. 순서를 바꾸거나 퀘스트를 빼도 하던 퀘스트를 그대로 찾아요
   const MAIN = [
     { id: 'f0', ch: 0, t: 'fur', k: 'classroom', i: 0, n: 1, r: 15, title: '책상 고치기', how: '교실을 눌러서 책상을 올려요',
@@ -3745,6 +3747,10 @@ body{background:radial-gradient(120% 60% at 50% 0%, color-mix(in srgb, var(--pap
       say: '운동회 날이에요! 운동장 옆 참나무를 흔들어서 떨어진 도토리를 20개 주워 주세요.' },
     { id: 'e10', ch: 5, t: 'fac', k: 'cafeteria', n: 11, rm: 4, title: '급식실 Lv.11', how: '급식실을 Lv.11까지 키워요',
       say: '한창 클 나이라 급식을 많이 먹어요. 급식실을 Lv.11까지 키워 주세요.' },
+    { id: 'e44', ch: 5, t: 'furAll', k: 'science', n: 3, rm: 3, title: '과학실 가구 갖추기', how: '과학실 가구를 모두 Lv.3까지 올려요',
+      say: '경시대회를 준비하려면 실험대와 현미경이 튼튼해야 해요. 과학실 가구를 모두 Lv.3까지 올려 주세요.' },
+    { id: 'e45', ch: 5, t: 'fac', k: 'playground', n: 8, rm: 3, title: '운동장 넓히기', how: '운동장을 Lv.8까지 넓혀요',
+      say: '초등학생은 운동장에서 공을 차며 놀아요. 운동장을 Lv.8까지 넓혀 주세요.' },
     { id: 'e11', ch: 5, t: 'fac', k: 'science', n: 8, rm: 4, title: '과학 경시대회', how: '과학실을 Lv.8까지 키워요',
       say: '숲속 과학 경시대회가 열려요. 과학실을 Lv.8까지 키우면 대도시가 눈앞이에요.' },
     { id: 'e5', ch: 5, t: 'grade', n: 4, r: 5, rk: 'dip', title: '초등학교 대도시 되기', how: '대도시가 되면 1학년 종업식을 열어요',
@@ -3763,6 +3769,10 @@ body{background:radial-gradient(120% 60% at 50% 0%, color-mix(in srgb, var(--pap
       say: '2학년은 강낭콩 키우기 관찰 일기를 써요. 과학실을 Lv.10까지 키워서 돋보기를 마련해 줘요.' },
     { id: 'e41', ch: 6, t: 'fest', k: 'welcome', n: 1, rm: 3, title: '환영회 열기', how: '학교 행사 > 새 친구 환영회',
       say: '전학 온 친구들을 위해 환영회를 열어요. 광장에 둥글게 모여 풍선을 날려 볼까요?' },
+    { id: 'e46', ch: 6, t: 'tea', k: 'squirrel', n: 15, rm: 3, title: '다람쥐 선생님 Lv.15', how: '선생님 탭에서 다람쥐 선생님을 연수 보내요',
+      say: '2학년은 구구단을 배워요. 셈이 빠른 다람쥐 선생님을 Lv.15까지 연수 보내 주세요.' },
+    { id: 'e47', ch: 6, t: 'furAll', k: 'classroom', n: 15, rm: 4, title: '교실 가구 Lv.15', how: '교실 가구를 모두 Lv.15까지 올려요',
+      say: '새 친구들이 앉을 책상과 의자가 모자라요. 교실 가구를 모두 Lv.15까지 올려 주세요.' },
     { id: 'e13', ch: 6, t: 'ygrade', n: 4, rm: 4, title: '2학년 대도시 되기', how: '평판을 모아서 대도시가 되어요',
       say: '이제 대도시 학교가 될 차례예요. 대도시가 되면 2학년을 마치는 종업식을 열 수 있어요.' },
     { id: 'e19', ch: 6, ye: 2, t: 'tgrads', n: 2, r: 6, rk: 'dip', title: '2학년 종업식', how: '졸업 탭에서 종업식을 열어요',
@@ -3776,6 +3786,10 @@ body{background:radial-gradient(120% 60% at 50% 0%, color-mix(in srgb, var(--pap
       say: '다녀온 이야기를 보고서로 써서 도서관에 꽂아 둬요. 도서관을 Lv.17까지 키워요.' },
     { id: 'e14', ch: 7, t: 'fac', k: 'science', n: 12, rm: 4, title: '과학실 Lv.12', how: '과학실을 Lv.12까지 키워요',
       say: '시냇가에서 주운 조약돌을 현미경으로 들여다봐요. 과학실을 Lv.12까지 키워 볼까요?' },
+    { id: 'e48', ch: 7, t: 'fac', k: 'cafeteria', n: 18, rm: 4, title: '체험학습 도시락', how: '급식실을 Lv.18까지 키워요',
+      say: '체험학습 날에는 급식실에서 도시락을 싸 줘요. 급식실을 Lv.18까지 키워 주세요.' },
+    { id: 'e49', ch: 7, t: 'picks', n: 20, rm: 3, title: '도토리 20개 줍기', how: '참나무를 누르면 도토리가 떨어져요',
+      say: '시냇가에서 돌아오는 길에 참나무 아래 도토리를 주워요. 20개를 주워 주세요!' },
     { id: 'e23', ch: 7, t: 'ygrade', n: 4, rm: 4, title: '3학년 대도시 되기', how: '평판을 모아서 대도시가 되어요',
       say: '3학년도 대도시 학교로 만들어요. 대도시가 되면 종업식을 열 수 있어요.' },
     { id: 'e24', ch: 7, ye: 3, t: 'tgrads', n: 3, r: 7, rk: 'dip', title: '3학년 종업식', how: '졸업 탭에서 종업식을 열어요',
@@ -3787,10 +3801,14 @@ body{background:radial-gradient(120% 60% at 50% 0%, color-mix(in srgb, var(--pap
       say: '이어달리기를 하려면 운동장이 더 넓어야 해요. 운동장을 Lv.24까지 넓혀요.' },
     { id: 'e27', ch: 8, t: 'trips', n: 3, rm: 4, title: '체험학습 세 번', how: '체험학습을 세 번 다녀와요',
       say: '운동회 연습 사이사이 체험학습도 다녀와요. 세 번 다녀와요. 많이 다녀올수록 더 먼 곳이 열려요.' },
+    { id: 'e50', ch: 8, t: 'tea', k: 'bear', n: 20, rm: 4, title: '곰 선생님 Lv.20', how: '선생님 탭에서 곰 선생님을 연수 보내요',
+      say: '운동회 날 곰 선생님이 심판을 봐요. 곰 선생님을 Lv.20까지 연수 보내 주세요.' },
+    { id: 'e51', ch: 8, t: 'furAll', k: 'playground', n: 18, rm: 4, title: '운동장 가구 Lv.18', how: '운동장 가구를 모두 Lv.18까지 올려요',
+      say: '운동회 전에 철봉과 벤치를 튼튼하게 고쳐요. 운동장 가구를 모두 Lv.18까지 올려 주세요.' },
     { id: 'e28', ch: 8, t: 'ygrade', n: 4, rm: 4, title: '4학년 대도시 되기', how: '평판을 모아서 대도시가 되어요',
       say: '운동회 소문이 숲에 쫙 퍼졌어요. 4학년도 대도시 학교가 되어 볼까요?' },
-    { id: 'q26', ch: 8, ye: 4, t: 'tgrads', n: 4, r: 8, rk: 'dip', title: '마지막 전학생 맞이하기', how: '4학년 종업식을 열면 마지막 친구가 와요',
-      say: '종업식을 열 때마다 새 친구가 전학 왔지요? 4학년 종업식을 열면 마지막 여섯 번째 친구가 와요!' },
+    { id: 'q26', ch: 8, ye: 4, t: 'tgrads', n: 4, r: 8, rk: 'dip', title: '여섯 번째 전학생 맞이하기', how: '4학년 종업식을 열면 여섯 번째 친구가 와요',
+      say: '종업식을 열 때마다 새 친구가 전학 왔지요? 4학년 종업식을 열면 여섯 번째 친구가 와요! 앞으로도 해마다 새 친구가 찾아올 거예요.' },
 
     { id: 'e30', ch: 9, t: 'fac', k: 'library', n: 24, rm: 4, title: '학예회 그림 전시', how: '도서관을 Lv.24까지 키워요',
       say: '5학년은 학예회를 열어요! 도서관을 Lv.24까지 키워서 그림을 걸 자리를 만들어요.' },
@@ -3800,6 +3818,10 @@ body{background:radial-gradient(120% 60% at 50% 0%, color-mix(in srgb, var(--pap
       say: '학예회 날엔 부모님도 오셔요. 급식실을 Lv.24까지 키워서 잔치 급식을 준비해요.' },
     { id: 'e42', ch: 9, t: 'fest', k: 'show', n: 1, rm: 4, title: '학예회 열기', how: '학교 행사 > 학예회',
       say: '드디어 학예회 날이에요! 광장 무대에서 친구들이 공연하면 음표를 눌러 박수를 보내 줘요.' },
+    { id: 'e52', ch: 9, t: 'students', n: 130, rm: 4, title: '학생 130명 맞이하기', how: '교실을 Lv.31까지 넓혀요',
+      say: '학예회를 보러 왔던 친구들이 입학하고 싶대요. 교실을 넓혀서 130명을 맞이해요.' },
+    { id: 'e53', ch: 9, t: 'sports', n: 1, rm: 4, title: '5학년 운동회', how: '학교 행사 > 숲속 운동회',
+      say: '학예회 다음은 운동회예요! 5학년이 청팀 대표로 달려요. 굴러오는 공을 주워 청팀을 이기게 해 줘요.' },
     { id: 'e33', ch: 9, t: 'ygrade', n: 4, rm: 5, title: '5학년 대도시 되기', how: '평판을 모아서 대도시가 되어요',
       say: '학예회가 대성공이에요! 5학년도 대도시 학교로 만들어요.' },
     { id: 'e34', ch: 9, ye: 5, t: 'tgrads', n: 5, r: 10, rk: 'dip', title: '5학년 종업식', how: '졸업 탭에서 종업식을 열어요',
@@ -3815,8 +3837,75 @@ body{background:radial-gradient(120% 60% at 50% 0%, color-mix(in srgb, var(--pap
       say: '6학년 졸업 여행은 별빛 천문대로 가요! 밤하늘의 별을 보며 초등학교 시절을 마무리해요.' },
     { id: 'e43', ch: 10, t: 'fest', k: 'photo', n: 1, rm: 5, title: '졸업 사진 찍기', how: '학교 행사 > 졸업 사진 찍기',
       say: '졸업 앨범에 들어갈 단체 사진을 찍어요. 모두 활짝 웃게 웃음 별을 눌러 줘요!' },
+    { id: 'e54', ch: 10, t: 'tea', k: 'squirrel', n: 25, rm: 5, title: '다람쥐 선생님 Lv.25', how: '선생님 탭에서 다람쥐 선생님을 연수 보내요',
+      say: '중학교 수학을 미리 배워 두면 좋겠지요? 다람쥐 선생님을 Lv.25까지 연수 보내 주세요.' },
     { id: 'e38', ch: 10, t: 'ygrade', n: 4, r: 15, rk: 'dip', title: '6학년 대도시 되기', how: '평판을 모아서 대도시가 되어요',
-      say: '초등학교의 마지막 해예요. 6학년도 대도시 학교로 만들면 졸업 준비 끝! 중학교는 곧 열릴 거예요.' }
+      say: '초등학교의 마지막 해예요. 6학년도 대도시 학교로 만들면 졸업 준비 끝! 졸업 탭에서 졸업식을 열 수 있어요.' },
+    { id: 'e39', ch: 10, t: 'tier', n: 2, r: 20, rk: 'dip', title: '초등학교 졸업식', how: '졸업 탭에서 졸업식을 열고 중학교에 입학해요',
+      say: '6학년 친구들이 의젓하게 자랐어요! 졸업식을 열면 숲속 중학교에 입학해요. 새 건물 매점과 동아리가 기다리고 있어요.' },
+
+    // 12장~15장 (2.0.0): 숲속 중학교. 입학 장 + 1, 2, 3학년. 목표 숫자는 균형 제안서(2.0.0)의 자동 플레이로 정해요. yt: 2는 중학교 학년 장이라는 뜻
+    { id: 'm1', ch: 11, t: 'tier', n: 2, rm: 10, title: '중학교 입학식', how: '숲속 중학교에 입학했어요. 받기를 눌러요',
+      say: '숲속 중학교 입학을 축하해요! 중학교는 수업료도 공사비도 훨씬 커요. 새로 생긴 매점과 동아리가 학교를 더 신나게 만들어 줄 거예요.' },
+    { id: 'm2', ch: 11, t: 'fac', k: 'store', n: 1, rm: 10, title: '매점 짓기', how: '지도 가운데 아래 공사 자리를 눌러요',
+      say: '쉬는 시간에 간식을 사 먹을 매점이 있어야지요. 매점을 지으면 학교가 즐거워져서 수업료가 올라요.' },
+    { id: 'm3', ch: 11, t: 'furAll', k: 'store', n: 1, rm: 10, title: '매점 가구 갖추기', how: '매점을 눌러서 가구를 모두 올려요',
+      say: '매점에 진열대도 냉장고도 비어 있어요. 간식 진열대, 음료 냉장고, 계산대, 간식 탁자를 갖춰 주세요.' },
+    { id: 'm4', ch: 11, t: 'club', n: 12, rm: 10, title: '첫 동아리 나누기', how: '복도 > 동아리실에서 자동 추천을 눌러도 돼요',
+      say: '중학교에는 동아리가 있어요! 지도 왼쪽 복도 단추를 눌러 동아리실로 가 보세요. 대표 학생 12명을 과학부, 운동부, 독서부, 미술부에 셋씩 나눠요. 능력치가 맞을수록 보너스가 커져요.' },
+    { id: 'h2', ch: 11, t: 'trials', n: 1, rm: 10, title: '침입자 쫓아내기', how: '매나 뱀이 나타나면 여러 번 눌러서 쫓아내요',
+      say: '큰 학교가 되니 매와 뱀이 또 기웃거려요. 나타나면 빨간 테두리가 생겨요. 20초 안에 여러 번 톡톡 눌러서 쫓아내 주세요!' },
+    { id: 'm5', ch: 11, t: 'students', n: 30, rm: 8, title: '학생 30명 맞이하기', how: '교실을 Lv.6까지 넓혀요',
+      say: '중학교에 입학하려는 친구들이 몰려와요. 교실을 넓혀서 학생 30명을 맞이해요.' },
+    { id: 'm6', ch: 11, t: 'grade', n: 1, rm: 8, title: '중학교 마을 되기', how: '평판을 ★{REP}까지 모으면 마을이 생겨요',
+      say: '중학교 둘레에도 버섯집 마을이 생길 차례예요. 평판을 ★{REP}까지 모아 봐요. 중학교는 평판 기준이 조금 더 높아요.' },
+
+    { id: 'm7', ch: 12, t: 'shows', n: 1, rm: 5, title: '첫 발표회 열기', how: '동아리실에서 발표회 열기를 눌러요',
+      say: '동아리가 생겼으니 첫 발표회를 열어 봐요! 무대에 선 동아리 친구들은 능력치가 쑥 오르고 도토리도 받아요. 발표회는 일주일에 한 번 열 수 있어요.' },
+    { id: 'm8', ch: 12, t: 'fac', k: 'science', n: 5, rm: 4, title: '과학실 키우기', how: '과학실을 Lv.5까지 키워요',
+      say: '과학부 친구들이 실험할 자리가 모자라요. 과학실을 Lv.5까지 키우면 과학부 친구들의 과학 능력치도 올라요.' },
+    { id: 'm9', ch: 12, t: 'fac', k: 'store', n: 5, rm: 4, title: '매점 넓히기', how: '매점을 Lv.5까지 키워요',
+      say: '매점 앞에 줄이 길어요! 매점을 Lv.5까지 키우면 수업료가 더 올라요.' },
+    { id: 'm10', ch: 12, t: 'students', n: 60, rm: 4, title: '학생 60명 맞이하기', how: '교실을 Lv.14까지 넓혀요',
+      say: '동아리 소문이 퍼져서 입학 문의가 많아요. 교실을 넓혀서 60명을 맞이해요.' },
+    { id: 'm11', ch: 12, t: 'clubSum', n: 60, rm: 4, title: '동아리 보너스 60%', how: '능력치가 맞는 학생을 동아리에 넣어요',
+      say: '동아리 보너스는 부원의 능력치 별만큼 커져요. 동아리 네 곳의 보너스를 더해서 60%를 넘겨 봐요.' },
+    { id: 'm12', ch: 12, t: 'grade', n: 3, rm: 4, title: '중학교 도시 되기', how: '평판을 모아서 도시가 되어요',
+      say: '중학교 둘레에 나무 아파트가 들어서요. 평판을 모아서 도시 학교가 되어 봐요.' },
+    { id: 'm13', ch: 12, t: 'fac', k: 'cafeteria', n: 12, rm: 4, title: '급식실 Lv.12', how: '급식실을 Lv.12까지 키워요',
+      say: '중학생은 한창 자라서 급식을 두 번씩 먹어요. 급식실을 Lv.12까지 키워 주세요.' },
+    { id: 'm14', ch: 12, t: 'grade', n: 4, r: 6, rk: 'dip', title: '중학교 대도시 되기', how: '대도시가 되면 1학년 종업식을 열어요',
+      say: '중학교도 대도시 학교로 만들어 봐요! 그러면 1학년을 마치는 종업식을 열 수 있어요.' },
+    { id: 'm15', ch: 12, ye: 1, yt: 2, t: 'tgrads', n: 1, r: 6, rk: 'dip', title: '중학교 1학년 종업식', how: '졸업 탭에서 종업식을 열어요',
+      say: '중학교 1학년을 무사히 마쳤어요! 종업식을 열고 2학년으로 올라가요. 2학년에는 숲속 체육대회가 기다려요.' },
+
+    { id: 'm16', ch: 13, t: 'ygrade', n: 2, rm: 4, title: '2학년 읍내 되기', how: '명예 교장실 덕분에 2학년은 더 빨라요',
+      say: '2학년이 되었어요! 명예 교장실을 다시 고치면 작년보다 빨리 자라요. 먼저 읍내 학교가 되어 볼까요?' },
+    { id: 'm17', ch: 13, t: 'fac', k: 'playground', n: 15, rm: 4, title: '체육대회 운동장', how: '운동장을 Lv.15까지 넓혀요',
+      say: '숲속 체육대회를 열려면 운동장이 넓어야 해요. 운동장을 Lv.15까지 넓히면 운동부 친구들의 운동 능력치도 올라요.' },
+    { id: 'm18', ch: 13, t: 'sports', n: 2, rm: 4, title: '숲속 운동회 두 번', how: '학교 행사 > 숲속 운동회',
+      say: '체육대회 예선전이에요! 숲속 운동회를 두 번 열어서 청팀을 응원해 줘요.' },
+    { id: 'm19', ch: 13, t: 'star', n: 4, rm: 4, title: '능력치 별 4개 학생', how: '동아리 건물을 키우고 발표회를 열면 능력치가 올라요',
+      say: '동아리 활동을 열심히 한 친구들이 쑥쑥 자라요. 능력치 하나라도 별 4개가 된 학생을 만들어 봐요.' },
+    { id: 'm20', ch: 13, t: 'tea', k: 'squirrel', n: 15, rm: 4, title: '다람쥐 선생님 연수', how: '선생님 탭에서 다람쥐 선생님을 Lv.15까지',
+      say: '중학교 수학은 어려워요. 다람쥐 선생님을 Lv.15까지 연수 보내 주세요.' },
+    { id: 'm21', ch: 13, t: 'ygrade', n: 4, rm: 5, title: '2학년 대도시 되기', how: '평판을 모아서 대도시가 되어요',
+      say: '체육대회가 대성공이에요! 2학년도 대도시 학교로 만들면 종업식을 열 수 있어요.' },
+    { id: 'm22', ch: 13, ye: 2, yt: 2, t: 'tgrads', n: 2, r: 7, rk: 'dip', title: '중학교 2학년 종업식', how: '졸업 탭에서 종업식을 열어요',
+      say: '2학년을 마쳤어요! 이제 중학교 마지막 학년이에요. 3학년은 졸업 준비로 바빠요.' },
+
+    { id: 'm23', ch: 14, t: 'ygrade', n: 2, rm: 5, title: '3학년 읍내 되기', how: '평판을 모아서 읍내가 되어요',
+      say: '중학교 3학년이 되었어요! 졸업 준비를 하려면 먼저 학교를 다시 키워야 해요. 읍내 학교가 되어 볼까요?' },
+    { id: 'm24', ch: 14, t: 'fac', k: 'library', n: 18, rm: 5, title: '졸업 문집 만들기', how: '도서관을 Lv.18까지 키워요',
+      say: '3학년은 졸업 문집을 만들어요. 도서관을 Lv.18까지 키워서 문집을 꽂을 자리를 마련해요.' },
+    { id: 'm25', ch: 14, t: 'clubShown', n: 4, rm: 5, title: '동아리 네 곳 모두 발표회', how: '동아리마다 한 번씩 무대에 올라요',
+      say: '졸업 전에 동아리 네 곳이 모두 무대에 서 봐요. 과학부, 운동부, 독서부, 미술부가 한 번씩 발표회를 열면 돼요.' },
+    { id: 'm26', ch: 14, t: 'fest', k: 'photo', n: 1, rm: 5, title: '졸업 사진 찍기', how: '학교 행사 > 졸업 사진 찍기',
+      say: '중학교 졸업 앨범에 들어갈 단체 사진을 찍어요. 모두 활짝 웃게 웃음 별을 눌러 줘요!' },
+    { id: 'm27', ch: 14, t: 'fac', k: 'store', n: 15, rm: 5, title: '졸업 잔치 매점', how: '매점을 Lv.15까지 키워요',
+      say: '졸업식 날 매점에서 간식 잔치를 열어요. 매점을 Lv.15까지 키워 주세요.' },
+    { id: 'm28', ch: 14, t: 'ygrade', n: 4, r: 15, rk: 'dip', title: '3학년 대도시 되기', how: '평판을 모아서 대도시가 되어요',
+      say: '중학교의 마지막 해예요. 3학년도 대도시 학교로 만들면 졸업 준비 끝! 고등학교는 곧 열릴 거예요.' }
   ];
   // v3 저장은 메인 퀘스트를 번호로 기억했어요. 그때 순서의 id 목록 (q25 별빛숲, q27 무지개숲은 동네 5단계로 바뀌며, q24 졸업식 세 번은 유치원이 2년으로 줄며 빠졌어요)
   const LEGACY_IDS = Array.from({ length: 28 }, (_, i) => 'q' + i);
@@ -3845,7 +3934,7 @@ body{background:radial-gradient(120% 60% at 50% 0%, color-mix(in srgb, var(--pap
     { who: 'chick', t: 'earned', n: () => nice(rate() * 120), say: n => `도토리 ${fmt(n)}개를 모아서 숲속 잔치를 열어요!` },
     { who: 'rabbit', t: 'claims', n: () => 1, say: () => '학교 문을 닫았다가 다시 와 주세요. 그동안 수업이 잘 이어지는지 볼게요.' }
   ];
-  const COUNT_TYPES = new Set(['picks', 'ups', 'trains', 'claims', 'earned', 'trips', 'sports', 'fest', 'trials']);
+  const COUNT_TYPES = new Set(['picks', 'ups', 'trains', 'claims', 'earned', 'trips', 'sports', 'fest', 'trials', 'shows']);
   const Q_TYPES = ['fac', 'tea', 'teaAll', 'students', 'grade', 'ygrade', 'rate', 'picks', 'ups', 'trains', 'claims', 'earned', 'grads', 'perks', 'tier', 'tgrads', 'fperks', 'trips', 'souv', 'tripat', 'sports', 'fest'];
 
   /* ---------- 상태 ---------- */
@@ -4068,6 +4157,9 @@ body{background:radial-gradient(120% 60% at 50% 0%, color-mix(in srgb, var(--pap
     // 아직 유치원인데 초등학교 장의 퀘스트에 와 있으면 유치원 졸업식 퀘스트로 되돌려요 (0.4에서는 전학생 퀘스트가 5장에 있었어요)
     const k1 = MAIN.findIndex(m => m.id === 'k1');
     if (s.tier === 0 && MAIN[s.q.m] && MAIN[s.q.m].ch > MAIN[k1].ch) { s.q.m = k1; s.q.mb = 0; }
+    // 2.0.0: 초등학교 퀘스트를 다 마친 저장(end:e38)은 새 '초등학교 졸업식'(e39)에서 이어가요. 아직 초등학교면 중학교 장으로 넘어가지 않아요
+    const e39 = MAIN.findIndex(m => m.id === 'e39');
+    if (s.tier === 1 && (s.q.m >= MAIN.length || (MAIN[s.q.m] && MAIN[s.q.m].ch > MAIN[e39].ch))) { s.q.m = e39; s.q.mb = 0; }
     // 1.3.0: 개발자 '졸업 조건 채우기'로 건너뛴 해가 종업식 횟수와 전학생에 빠져 있으면 학년에 맞춰 채워요
     const yearsDone = s.tier === 0 ? s.tg : TIERS[0].grads + 1 + s.tg;
     if (s.st.grads < yearsDone) s.st.grads = yearsDone;
@@ -8357,8 +8449,7 @@ body{background:radial-gradient(120% 60% at 50% 0%, color-mix(in srgb, var(--pap
   function rosterEnsure(must) {
     if (!rosterOn() || S.roster.list.length) return false;
     S.roster.list = rosterMake(must); S.roster.gen += 1; S.roster.wk = gameWeek();
-    clubAuto(true);   // 처음에는 자동 추천으로 나눠 둬요(언제든 바꿀 수 있어요)
-    return true;
+    return true;   // 동아리는 비어 있어요. 메인 퀘스트 '첫 동아리 나누기'에서 나눠요(자동 추천 단추)
   }
   const clubMembers = c => S.roster.list.filter(s => s.c === c);
   const clubStars = c => clubMembers(c).reduce((n, s) => n + star(s.a[CLUBS[c].ab]), 0);
@@ -10628,6 +10719,11 @@ body{background:radial-gradient(120% 60% at 50% 0%, color-mix(in srgb, var(--pap
       case 'fest': return S.fest.n[q.k] || 0;
       case 'mgBest': return Math.max(0, ...Object.values(S.mg.best));   // 1.8.0 숲속 합치기에서 만든 가장 높은 단계
       case 'mgOrders': return S.mg.st.orders;
+      // 2.0.0 동아리 퀘스트
+      case 'club': return rosterOn() ? Math.min(ROSTER_N, S.roster.list.filter(s => s.c >= 0).length) : 0;
+      case 'clubSum': return clubSum();
+      case 'star': return rosterOn() && S.roster.list.length ? Math.max(...S.roster.list.map(s => Math.max(...s.a.map(star)))) : 0;
+      case 'clubShown': return S.club.shown.reduce((a, b) => a + b, 0);
       default: return S.st[q.t] || 0;   // picks, ups, trains, claims, grads, perks, fperks
     }
   }
@@ -10664,6 +10760,10 @@ body{background:radial-gradient(120% 60% at 50% 0%, color-mix(in srgb, var(--pap
       else if (q.t === 'students') text = `${shown}/${need}명`;
       else if (q.t === 'grads' || q.t === 'perks' || q.t === 'tgrads' || q.t === 'fperks' || q.t === 'tripat') text = `${shown}/${need}번`;
       else if (q.t === 'souv') text = `${shown}/${need}종`;
+      else if (q.t === 'club') text = `${shown}/${need}자리`;
+      else if (q.t === 'clubSum') text = `${shown}/${need}%`;
+      else if (q.t === 'star') text = `★${shown}/${need}`;
+      else if (q.t === 'clubShown') text = `${shown}/${need}곳`;
       else text = `Lv.${shown}/${need}`;
     }
     return { done, frac: done ? 1 : Math.max(0, Math.min(1, frac)), text };
@@ -10694,6 +10794,11 @@ body{background:radial-gradient(120% 60% at 50% 0%, color-mix(in srgb, var(--pap
       case 'sports': return q.n === 1 ? '숲속 운동회 열기' : `숲속 운동회 ${q.n}번 열기`;
       case 'fest': return `${FEST[q.k].name} 열기`;
       case 'tripat': return `${TRIP[q.k].name} 다녀오기`;
+      case 'club': return `동아리 ${q.n}자리 채우기`;
+      case 'shows': return q.n === 1 ? '동아리 발표회 열기' : `동아리 발표회 ${q.n}번 열기`;
+      case 'clubSum': return `동아리 보너스 합 ${q.n}% 넘기`;
+      case 'star': return `능력치 별 ${q.n}개 학생 만들기`;
+      case 'clubShown': return `동아리 ${q.n}곳 발표회 열기`;
     }
     return '';
   }
@@ -11109,6 +11214,7 @@ body{background:radial-gradient(120% 60% at 50% 0%, color-mix(in srgb, var(--pap
       case 'fperks': return goGrad('fund');
       case 'trips': case 'souv': case 'tripat': return openTrip();
       case 'sports': case 'fest': return openFest();
+      case 'club': case 'shows': case 'clubSum': case 'star': case 'clubShown': return setTab('club');   // 2.0.0
     }
   }
 
