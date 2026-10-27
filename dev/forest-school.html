@@ -1760,6 +1760,14 @@ body{background:radial-gradient(120% 60% at 50% 0%, color-mix(in srgb, var(--pap
 :root[data-theme="dark"] #map .mc-s0,:root[data-theme="dark"] #map .mc-s1{stop-color:#10281F}
 @media (prefers-color-scheme: dark){:root:not([data-theme="light"]) #map .mc-s0,:root:not([data-theme="light"]) #map .mc-s1{stop-color:#10281F}}
 .map-calm{pointer-events:none}
+/* ===== 1.7.3 UI 한 단계 작게 (지섭 결정) =====
+   위쪽 현황판, 퀘스트 카드, 양쪽 메뉴, 아래 탭, 탭 화면, 창을 CSS zoom으로 같은 비율만큼 줄여요(글자와 그림, 여백 모두).
+   지도(.frame)와 퍼즐 장면은 줄이지 않아요(손가락 좌표 계산이 그대로 맞게). 지도 크기는 fitMap의 330칸 → 360칸으로 따로 줄여요 */
+:root{--uiz:.9}
+.app .board,.app.on-school .home-qcard,.app .map-right,.app .map-left,.app .tabs,.app .panel,.overlay > .modal,.overlay > .sheet,.overlay > .cert{zoom:var(--uiz)}
+/* 줄인 칸 안에서는 위치 값도 같이 줄어들어서, 화면에서 잰 높이(--left-h 등)로 놓는 칸은 그만큼 나눠 줘요 */
+.app.on-school .map-left{top:calc((var(--left-h, 150px) + 8px) / var(--uiz));max-height:calc((100% - var(--left-h, 150px) - var(--bot-h, 70px) - 16px) / var(--uiz))}
+.app.on-school .map-right{top:calc((var(--hud-h, 100px) + 8px) / var(--uiz))}
 /* 1.7.1 칭호 리본: 학교 카드 안에서 학년 줄 아래 자기 줄에 놓아요(옆에 끼우면 좁은 화면에서 잘려요) */
 .app .board .school-year{flex-wrap:wrap;row-gap:3px}
 .app .board .school-year .hud-title{flex:0 1 auto;margin-left:0;max-width:100%;flex-basis:100%;width:fit-content}
@@ -4955,9 +4963,9 @@ body{background:radial-gradient(120% 60% at 50% 0%, color-mix(in srgb, var(--pap
     const W = fr.clientWidth, H = fr.clientHeight;
     if (!W || !H || rt.tab !== 'school') return;
     hudVars();
-    // 화면을 가득 채우되, 건물 자리(지도 가로 330칸)는 늘 다 보이게 해요. 긴 휴대폰에서는 위아래 끝이 UI 뒤로 조금 비어요
-    // 1.7.3: 지도가 차분해져서 학교 전체가 더 잘 보이게 300칸 → 330칸(약 10% 축소, 지섭 결정). rt.viewW는 시험용
-    const sc = Math.min(Math.max(W / 360, H / 540), W / (rt.viewW || 330)), old = rt.mapS;
+    // 화면을 가득 채우되, 지도 가로 360칸이 다 보이게 해요. 긴 휴대폰에서는 위아래 끝이 UI 뒤로 조금 비어요
+    // 1.7.3: 지도가 차분해져서 학교 전체가 더 잘 보이게 300칸 → 360칸(지도 가로 전체, 지섭 결정). rt.viewW는 시험용
+    const sc = Math.min(Math.max(W / 360, H / 540), W / (rt.viewW || 360)), old = rt.mapS;
     rt.mapS = sc; rt.mapW = 360 * sc; rt.mapH = 540 * sc;
     map.style.width = rt.mapW + 'px'; map.style.height = rt.mapH + 'px';
     if (reset || rt.panX == null || !old) {
@@ -9815,8 +9823,9 @@ body{background:radial-gradient(120% 60% at 50% 0%, color-mix(in srgb, var(--pap
     if (card) {
       // 선생님 탭은 탭 안에서 따로 스크롤돼요. 탭을 연 다음 그 칸으로 직접 내려가요
       requestAnimationFrame(() => {
-        const box = card.closest('.panel'), a = card.getBoundingClientRect(), p = box.getBoundingClientRect();
-        box.scrollTo({ top: Math.max(0, box.scrollTop + a.top - p.top - (p.height - a.height) / 2), behavior: rt.reduced ? 'auto' : 'smooth' });
+        // 1.7.3: 탭 화면을 CSS zoom으로 줄여서, 화면에서 잰 길이를 탭 안 길이로 바꿔요(z)
+        const box = card.closest('.panel'), a = card.getBoundingClientRect(), p = box.getBoundingClientRect(), z = (p.height / box.offsetHeight) || 1;
+        box.scrollTo({ top: Math.max(0, box.scrollTop + (a.top - p.top - (p.height - a.height) / 2) / z), behavior: rt.reduced ? 'auto' : 'smooth' });
       });
       card.classList.remove('flash'); void card.offsetWidth; card.classList.add('flash');
     }
