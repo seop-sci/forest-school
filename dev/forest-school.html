@@ -3393,7 +3393,7 @@ body{background:radial-gradient(120% 60% at 50% 0%, color-mix(in srgb, var(--pap
     ess: 0, pz: { day: '', n: 0, adN: 0, best: 0, cur: null },
     clk: { last: 0 },   // 게임 시계: 지금까지 본 가장 늦은 시각 (gameNow)
     fg: { day: '', got: [] },   // 1.7.2 학교 행사 황금 도토리: 행사마다 하루 한 번(got에 오늘 받은 행사 id)
-    es: { day: '', n: 0, week: -1, g: 0 },   // 1.6.0 정수 상점: 오늘 산 도토리 묶음 수, 이번 주 산 황금 도토리 묶음 수
+    es: { day: '', n: 0, week: -1, g: 0, x: 0 },   // 1.6.0 정수 상점: 오늘 산 도토리 묶음 수, 이번 주 산 황금 도토리 묶음 수
     q: freshQ()
   });
   const repOf = s => s.f.classroom + s.f.cafeteria + s.f.playground + 3 * s.f.library + s.f.science + 2 * (s.t.squirrel + s.t.owl + s.t.bear) + 5 * s.p.perk.rep + 10 * s.fp.rep;
@@ -3483,6 +3483,7 @@ body{background:radial-gradient(120% 60% at 50% 0%, color-mix(in srgb, var(--pap
     if (d.es && typeof d.es === 'object') {
       s.es.day = typeof d.es.day === 'string' ? d.es.day.slice(0, 10) : ''; s.es.n = Math.floor(num(d.es.n, 0, 0));
       s.es.week = Math.floor(num(d.es.week, -1, -1)); s.es.g = Math.floor(num(d.es.g, 0, 0));
+      s.es.x = Math.floor(num(d.es.x, 0, 0));   // 1.7.4 도토리로 정수 바꾸기(오늘 바꾼 횟수)
     }
     s.autoUntil = Math.min(num(d.autoUntil, 0, 0), Date.now() + 3 * 3600000);
     if (d.fest && typeof d.fest === 'object') for (const id of FEST_IDS) {
@@ -7353,16 +7354,19 @@ body{background:radial-gradient(120% 60% at 50% 0%, color-mix(in srgb, var(--pap
   const ESHOP = {
     hat: 120, fur: 200,
     acorn: { ess: 20, min: 30, perDay: 3 },
-    gold: { ess: 60, n: 3, perWeek: 2 }
+    gold: { ess: 60, n: 3, perWeek: 2 },
+    ex: { n: 10, min: 60, perDay: 5 }   // 1.7.4 도토리 수업료 60분치로 숲의 정수 10개, 하루 5번(지섭 결정: 넘치는 도토리 쓸 곳). 거꾸로 바꿔도 남는 게 없어요(정수 20개 → 30분치)
   };
   const ESS_ICON = () => `<span class="tic" style="background-image:${pzImg('ic_essence')}"></span>`;
   function esDay() {
     const t = gameToday(), w = gameWeek();
-    if (S.es.day !== t) { S.es.day = t; S.es.n = 0; }
+    if (S.es.day !== t) { S.es.day = t; S.es.n = 0; S.es.x = 0; }
     if (w > S.es.week) { S.es.week = w; S.es.g = 0; }
   }
   const esAcornLeft = () => { esDay(); return Math.max(0, ESHOP.acorn.perDay - S.es.n); };
   const esGoldLeft = () => { esDay(); return Math.max(0, ESHOP.gold.perWeek - S.es.g); };
+  const esExLeft = () => { esDay(); return Math.max(0, ESHOP.ex.perDay - S.es.x); };
+  const esExCost = () => Math.max(10, nice(rate() * 60 * ESHOP.ex.min));
   const esAcornAmt = () => Math.max(10, nice(rate() * 60 * ESHOP.acorn.min));
   function essItem(pick) {
     if (!pick) return null;
@@ -7371,6 +7375,7 @@ body{background:radial-gradient(120% 60% at 50% 0%, color-mix(in srgb, var(--pap
     if (t === 'sp' && SP_BY_ID[id]) return { kind: 'sp', id, k: SP_BY_ID[id].k, name: SP_BY_ID[id].name, ga: eulOf(SP_BY_ID[id].name), price: ESHOP.fur };
     if (t === 'acorn') { const nm = `도토리 묶음 (수업료 ${ESHOP.acorn.min}분치)`; return { kind: 'acorn', name: nm, ga: eulOf(nm), price: ESHOP.acorn.ess }; }
     if (t === 'gold') { const nm = `황금 도토리 ${ESHOP.gold.n}개`; return { kind: 'gold', name: nm, ga: eulOf(nm), price: ESHOP.gold.ess }; }
+    if (t === 'ex') { const nm = `숲의 정수 ${ESHOP.ex.n}개`; return { kind: 'ex', name: nm, ga: eulOf(nm), price: esExCost(), acorn: true }; }   // 값이 도토리예요
     return null;
   }
   function renderEssShop() {
@@ -7393,7 +7398,10 @@ body{background:radial-gradient(120% 60% at 50% 0%, color-mix(in srgb, var(--pap
       h += `<button class="si${own ? ' own' : ''}${on ? ' on' : ''}${poor ? ' poor' : ''}" type="button" data-ebuy="${key}" aria-pressed="${on}" aria-label="${F.name}${own ? '' : `, 숲의 정수 ${ESHOP.fur}개`}">` +
         `<span class="pv fur"><img src="${IMG('fur_sp_' + F.id)}" alt="" draggable="false"></span><span class="nm">${F.name}</span><span class="pr">${pr}</span></button>`;
     }
-    h += '</div><h3 class="shop-h">도토리와 황금 도토리 <small>(횟수 제한)</small></h3>';
+    h += '</div><h3 class="shop-h">바꾸기 <small>(횟수 제한)</small></h3>';
+    { const xl = esExLeft(), xc = esExCost();
+      h += `<div class="sb"><span class="pv">${ic}</span><span class="tx"><b>숲의 정수 ${ESHOP.ex.n}개</b><span>도토리로 바꿔요 (수업료 ${ESHOP.ex.min}분치)</span><small>${xl > 0 ? `오늘 ${xl}번 더 바꿀 수 있어요` : '오늘은 다 바꿨어요. 내일 다시 열려요'}</small></span>` +
+        `<button class="buy${S.budget < xc ? ' poor' : ''}${xl > 0 ? '' : ' off'}" type="button" data-ebuy="ex" aria-label="숲의 정수 ${ESHOP.ex.n}개, 도토리 ${fmt(xc)}"><span data-acorn>${acornIcon()}</span>${fmt(xc)}</button></div>`; }
     const al = esAcornLeft(), gl = esGoldLeft();
     h += `<div class="sb"><span class="pv"><span data-acorn>${acornIcon()}</span></span><span class="tx"><b>도토리 묶음</b><span>수업료 ${ESHOP.acorn.min}분치 (+${fmt(esAcornAmt())})</span><small>${al > 0 ? `오늘 ${al}번 더 살 수 있어요` : '오늘은 다 샀어요. 내일 다시 열려요'}</small></span>` +
       `<button class="buy${S.ess < ESHOP.acorn.ess ? ' poor' : ''}${al > 0 ? '' : ' off'}" type="button" data-ebuy="acorn" aria-label="도토리 묶음, 숲의 정수 ${ESHOP.acorn.ess}개">${ic}${ESHOP.acorn.ess}</button></div>`;
@@ -7404,9 +7412,10 @@ body{background:radial-gradient(120% 60% at 50% 0%, color-mix(in srgb, var(--pap
     const ask = $('#essAsk'), it = essItem(rt.essPick);
     ask.hidden = !it;
     if (it) {
-      const enough = S.ess >= it.price;
-      $('#essAskText').textContent = enough ? `${it.name}${it.ga} 숲의 정수 ${it.price}개로 살까요?` : `숲의 정수가 ${it.price - S.ess}개 모자라요. 미니게임에서 모을 수 있어요.`;
-      $('#essYes').textContent = enough ? '사기' : '미니게임 가기';
+      const enough = it.acorn ? S.budget >= it.price : S.ess >= it.price;
+      $('#essAskText').textContent = it.acorn ? (enough ? `도토리 ${fmt(it.price)}로 ${it.name}${it.ga} 바꿀까요?` : `도토리가 ${fmt(it.price - S.budget)} 모자라요.`)
+        : enough ? `${it.name}${it.ga} 숲의 정수 ${it.price}개로 살까요?` : `숲의 정수가 ${it.price - S.ess}개 모자라요. 미니게임에서 모을 수 있어요.`;
+      $('#essYes').textContent = it.acorn ? (enough ? '바꾸기' : '닫기') : enough ? '사기' : '미니게임 가기';
     }
   }
   function pickEss(pick) {
@@ -7424,10 +7433,18 @@ body{background:radial-gradient(120% 60% at 50% 0%, color-mix(in srgb, var(--pap
     }
     if (it.kind === 'acorn' && esAcornLeft() <= 0) { toast('도토리 묶음은 하루 3번까지예요. 내일 다시 살 수 있어요'); return; }
     if (it.kind === 'gold' && esGoldLeft() <= 0) { toast('황금 도토리는 일주일에 2번까지예요. 월요일에 다시 살 수 있어요'); return; }
+    if (it.kind === 'ex' && esExLeft() <= 0) { toast(`숲의 정수 바꾸기는 하루 ${ESHOP.ex.perDay}번까지예요. 내일 다시 바꿀 수 있어요`); return; }
     rt.essPick = pick; renderEssShop();
   }
   function buyEss() {
     const it = essItem(rt.essPick); if (!it) return;
+    if (it.kind === 'ex') {   // 1.7.4 도토리 → 숲의 정수
+      rt.essPick = '';
+      if (S.budget < it.price || esExLeft() <= 0) { renderEssShop(); return; }
+      S.budget -= it.price; S.es.x += 1; addEss(ESHOP.ex.n);
+      toast(`도토리 ${fmt(it.price)}로 숲의 정수 ${ESHOP.ex.n}개를 받았어요!`); sfx('quest'); buzz(15);
+      save(); renderEss(); renderEssShop(); renderHUD(); renderAffordance(); return;
+    }
     if (S.ess < it.price) { rt.essPick = ''; setTab('mini'); return; }
     if (it.kind === 'acorn' && esAcornLeft() <= 0) { rt.essPick = ''; renderEssShop(); return; }
     if (it.kind === 'gold' && esGoldLeft() <= 0) { rt.essPick = ''; renderEssShop(); return; }
@@ -11063,7 +11080,7 @@ body{background:radial-gradient(120% 60% at 50% 0%, color-mix(in srgb, var(--pap
   }
 
   // 시험용 손잡이: 자동 시험(window.__FOREST_TEST)에서만 게임 속 함수를 꺼내 써요
-  if (window.__FOREST_TEST) window.__forest = { get S() { return S; }, get Cloud() { return Cloud; }, get actx() { return actx; }, Music, musicWant, musicSync, ensureAudio, bgmLoad, pzUI, rt, makeDeal, furStage, DEAL, navInfo, navRoute, spawnDrop, repTipCheck, linkGoogle, retryCloud, sanitize, acctPending, renderMap, renderHUD, renderAffordance, syncKids, layoutMap, geo, startTrial, hitTrial, endTrial, startVisit, endVisit, showReward, recommend, needCost, prepTopUp, qReward, prepPhase, rankScore, pwOf, previewDip, dipMult, costScale, buyFacility, buyFur, buyFurAll, furCost, furReady, furDone, FUR, startTalk, endTalk, teacherAct, facCost, teaCost, facKeys, rate, rep, capacity, canGraduate, canPromote,
+  if (window.__FOREST_TEST) window.__forest = { get S() { return S; }, esExLeft, esExCost, essItem, pickEss, buyEss, ESHOP, get Cloud() { return Cloud; }, get actx() { return actx; }, Music, musicWant, musicSync, ensureAudio, bgmLoad, pzUI, rt, makeDeal, furStage, DEAL, navInfo, navRoute, spawnDrop, repTipCheck, linkGoogle, retryCloud, sanitize, acctPending, renderMap, renderHUD, renderAffordance, syncKids, layoutMap, geo, startTrial, hitTrial, endTrial, startVisit, endVisit, showReward, recommend, needCost, prepTopUp, qReward, prepPhase, rankScore, pwOf, previewDip, dipMult, costScale, buyFacility, buyFur, buyFurAll, furCost, furReady, furDone, FUR, startTalk, endTalk, teacherAct, facCost, teaCost, facKeys, rate, rep, capacity, canGraduate, canPromote,
     fmt, fmt2, graduate, promote, buyPerk, perkCost, perkMaxed, buyFundPerk, fpCost, claimMain, mainReady, curMain, qNo, earn, CFG, TEA, teaMaxed, PERKS, FPERKS, MAIN, finalYear, startTrip, claimTrip, TRIPS, yearLocked, startSports, endSports, rtSports: () => rt.sports, startFest, rtFest: () => rt.fest, facCap, addLeague, weekIdx, addMP, tutStart, endFest, claimSports, claimBox, musicWant, askBox, festWait, setTab, openSheet, closeSheet,
     dexMeet, dexSync, dexPending, dexGift, renderDex, evCurrent, evNext, evSync, claimStamp, claimEvMission, claimEvBox, renderEvent, evMissions, evOk, evSkipped, EV_MONTHS, EV_MEASURE, tierMinutes, minAcorns, IMG, sanitize171, ACH, achSync, claimAch, setTitle, renderAch, setDexSeg, achClaimable, XT, xtAct, xtCost, xtLv, feastMins, libMult, propInstances, walkBuild, festItemSvg, guestArt, adErrText, googleErrText, openSheet, closeSheet, startFest, startSports, sanitize170, EV_STAMPS, EV_SPECIAL, EV_MONTHLY, EV_BOX, DEX_KEYS, DEX_REWARD, DEX_GUEST_KEYS, seasonKey, roofArtKey, oakKey, setSeasonArt, VP, vpLv, vpCost, vpMult, vpAct, renderVpCard, sportsPrize, festPrize, renderTeachers, buildTeacherCards, bldImg, roofKey, bldStage, mapKey, setMapArt, applyThemes, buyFacility, startTrial, endTrial: () => rt.trial && (rt.trial.left = 0), spawnDeal, startVisit, IMG170,   // 1.7.0 도감, 이벤트
     PZ, PZ_SHAPES, pzFits, pzAnyFit, pzStuck, pzFullLines, pzPlace, pzFreshGame, pzStart, PZB, pzbCost, pzApplyBoost, pzBoostOpen, pzBoostGo, festGoldLeft, festGoldTake, claimSports, renderStreet, pzFinish, pzLeft, pzCanAd, pzEssOf, pzMinOf, pzHelpSquirrel, pzHelpOwl, pzHelpBear, fillSubs, mapRoofTop, showAd, claimOfflineDouble, startBoost, tripAd, festFocus, festRange, visMap, renderMissions, pzHasHelp, pzRot, pzNewPiece, pzOpen, pzClose, pzGameOver, pzRenderAll, renderMini, addEss, ESHOP, SP_FUR, applyCos, essItem, pickEss, buyEss, renderEssShop, esAcornLeft, esGoldLeft, esAcornAmt, hatSVG, spFurImg, gameNow, gameToday, gameWeek, kstDay, setServerTime, SVR, dmDay, weekIdx, lgWeek, wkWeek, lgKey, pzDay, goldDay, boostLeft, dealLeft, canStamp };
