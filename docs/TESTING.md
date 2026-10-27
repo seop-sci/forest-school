@@ -95,3 +95,5 @@ python3 dev/check_rules.py               # CLAUDE.md와 AGENTS.md 공통 규칙 
 python3 dev/check_templates.py --labels  # Issue 양식이 GitHub 규칙에 맞는지, 쓰는 라벨이 저장소에 있는지 (gh 로그인 필요, --labels 빼면 양식만)
 ```
 Issue 양식은 기본 브랜치(`main`)에 있어야 GitHub의 새 Issue 화면에 나타나요. 작업 브랜치에서는 `check_templates.py`로만 확인할 수 있어요.
+| `s71test.py` | 보안 점검 검증(2026-10-28): 1-1 두 기기 클라우드 복원, 1-3 자리 비운 보상 상한, 2-5 기기 시계. 고친 뒤 바른 동작을 기대값으로 적어서, 고치기 전에는 FAIL이 정상이에요 |
+| `fbtest/rules_sec.js` | 보안 점검 검증: 규칙 시뮬레이터(targaryen)로 2-1, 2-2, 2-3, 2-4, 2-11. `NODE_PATH=<node_modules> node dev/fbtest/rules_sec.js database.rules.json`. 규칙을 고치기 전에는 FAIL이 정상이에요 |
