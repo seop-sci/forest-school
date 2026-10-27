@@ -130,4 +130,6 @@ if OUT.resolve() != HERE.parent.resolve():
     (OUT / 'audio').mkdir(exist_ok=True)
     for f in sorted(AUD.glob('bgm_*.mp4')):
         shutil.copyfile(f, OUT / 'audio' / f.name)
+    # 2.0.0 고화질 지도(img/maps)도 함께
+    shutil.copytree(HERE.parent / 'img', OUT / 'img', dirs_exist_ok=True)
 print('built', OUT, len(DOC))

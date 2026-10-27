@@ -20,6 +20,8 @@ fs.writeFileSync('www/index.html', html);
 fs.copyFileSync('../config.js', 'www/config.js');
 // 1.8.0 배경음악 파일(audio 폴더)도 함께 담아요
 fs.cpSync('../audio', 'www/audio', { recursive: true });
+// 2.0.0 고화질 지도 그림(img/maps)도 함께 담아요
+fs.cpSync('../img', 'www/img', { recursive: true });
 const test = process.env.ADMOB_TEST === '1';
 for (const f of ['fb', 'google', 'app', 'update']) await build({ entryPoints: [`src/${f}.js`], bundle: true, format: 'iife', target: 'es2019', minify: true, outfile: `www/${f}.js`, logLevel: 'warning' });
 await build({ entryPoints: ['src/ads.js'], bundle: true, format: 'iife', target: 'es2019', minify: true, outfile: 'www/ads.js',
