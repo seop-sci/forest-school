@@ -12366,20 +12366,28 @@ body{background:radial-gradient(120% 60% at 50% 0%, color-mix(in srgb, var(--pap
   }
 
   /* ---------- 이벤트 ---------- */
-  // 달력 규칙으로 매달 되풀이해요(앱 안에 고정이라 업데이트 없이 돌아가요). days는 [시작일, 끝일]이고 끝나는 날을 포함해요
-  const EV_MONTHLY = [
-    { id: 'harvest', name: '도토리 수확 축제', days: [1, 7], banner: 'ev_banner_harvest', lead: '숲에 도토리가 가장 많이 떨어지는 때예요. 도장을 찍고 미션을 채워 축제 선물을 받아요.' },
-    { id: 'friends', name: '숲속 친구 주간', days: [15, 21], banner: 'ev_banner_friends', lead: '친구들과 함께 노는 주간이에요. 학교 행사와 체험학습, 오늘의 미션으로 선물을 받아요.' }
+  // 달력 규칙으로 되풀이해요(앱 안에 고정이라 업데이트 없이 돌아가요)
+  // 2.0.0 매주 이벤트 (2026-10-27 지섭 결정): 한국 시간 월요일 0시부터 일요일 23:59까지 이벤트가 열려요. 4가지가 4주마다 돌아가요.
+  // EV_ANCHOR가 든 주가 0번째(도토리 수확 축제)예요. 특별 이벤트가 있는 주는 그 주 이벤트가 쉬어요(돌아가는 순서는 그대로 이어져요)
+  const EV_WEEKLY = [
+    { id: 'harvest', name: '도토리 수확 축제', banner: 'ev_banner_harvest', lead: '숲에 도토리가 가장 많이 떨어지는 때예요. 도장을 찍고 미션을 채워 축제 선물을 받아요.' },
+    { id: 'friends', name: '숲속 친구 주간', banner: 'ev_banner_friends', lead: '친구들과 함께 노는 주간이에요. 학교 행사와 체험학습, 오늘의 미션으로 선물을 받아요.' },
+    { id: 'books', name: '책 읽는 주간', banner: 'ev_banner_books', fb: 'ev_banner_friends', lead: '숲속 도서관에 새 그림책이 왔어요. 숲속 퍼즐과 선생님 연수로 책 읽는 주간 선물을 받아요.' },
+    { id: 'lunch', name: '맛있는 급식 주간', banner: 'ev_banner_lunch', fb: 'ev_banner_harvest', lead: '급식실에서 특별 메뉴가 나와요. 도토리를 줍고 시설을 고쳐 맛있는 선물을 받아요.' }
   ];
+  const EV_MONTHLY = EV_WEEKLY;   // 1.7.0 이름(시험과 옛 코드가 써요)
+  const EV_ANCHOR = '2026-11-02';
+  // 이벤트가 매주 열려서 한 번 보상은 1.x의 약 3분의 2예요(2026-10-27 지섭 결정, 한 달 합은 약 1.3~1.5배). 미션 도토리는 표의 m에 곱해요
+  const EV_SCALE = 2 / 3;
   // 특별 이벤트 표: start와 end('YYYY-MM-DD', 끝나는 날 포함)를 적으면 열려요. 비어 있으면 아직 열지 않아요. 반복 이벤트와 겹치면 특별 이벤트가 먼저예요.
   // ms는 미션 3개 [종류, 목표], m은 미션 하나의 수업료 분치, g는 황금 도토리. 내용과 날짜는 나중에 채워요
   const EV_SPECIAL = [
-    // 2026-10-26 날짜 확정: 수능(2026-11-19 목) 앞 일주일, 크리스마스 앞 일주일, 설날(2027-02-07), 어린이날, 추석(2027-09-15) 둘레 일주일
-    { id: 'exam', name: '수능 응원', start: '2026-11-13', end: '2026-11-19', banner: 'ev_banner_exam', lead: '숲속 선배들이 큰 시험을 봐요. 도장을 찍고 미션을 채워 응원 선물을 받아요. 모두 힘내요!', ms: [['trains', 3], ['ups', 30], ['dmDone', 4]], m: 20, g: 1 },
-    { id: 'xmas', name: '크리스마스 파티', start: '2026-12-19', end: '2026-12-25', banner: 'ev_banner_xmas', lead: '숲속 학교에 눈이 내려요. 파티 선물을 받아 가요.', ms: [['picks', 60], ['ups', 30], ['dmDone', 4]], m: 20, g: 1 },
-    { id: 'seollal', name: '설날 잔치', start: '2027-02-04', end: '2027-02-10', banner: 'ev_banner_seollal', lead: '새해 복 많이 받아요! 설날 잔치 선물을 준비했어요.', ms: [['picks', 60], ['shakes', 40], ['ups', 30]], m: 20, g: 1 },
-    { id: 'children', name: '어린이날 큰잔치', start: '2027-05-01', end: '2027-05-07', banner: 'ev_banner_children', lead: '어린이날을 맞아 큰잔치를 열어요. 친구들과 신나게 놀아요.', ms: [['picks', 60], ['sports', 2], ['dmDone', 4]], m: 20, g: 1 },
-    { id: 'chuseok', name: '추석 달맞이', start: '2027-09-11', end: '2027-09-17', banner: 'ev_banner_chuseok', lead: '둥근 달을 보며 소원을 빌어요. 달맞이 선물이 기다려요.', ms: [['shakes', 40], ['ups', 30], ['trips', 1]], m: 20, g: 1 }
+    // 2026-10-26 날짜 확정, 2026-10-27 매주 이벤트에 맞춰 기념일이 든 주의 월~일로 옮김: 수능(2026-11-19 목), 크리스마스(12-25 금), 설날(2027-02-07 일), 어린이날(05-05 수), 추석(09-15 수)
+    { id: 'exam', name: '수능 응원', start: '2026-11-16', end: '2026-11-22', banner: 'ev_banner_exam', lead: '숲속 선배들이 큰 시험을 봐요. 도장을 찍고 미션을 채워 응원 선물을 받아요. 모두 힘내요!', ms: [['trains', 3], ['ups', 30], ['dmDone', 4]], m: 20, g: 1 },
+    { id: 'xmas', name: '크리스마스 파티', start: '2026-12-21', end: '2026-12-27', banner: 'ev_banner_xmas', lead: '숲속 학교에 눈이 내려요. 파티 선물을 받아 가요.', ms: [['picks', 60], ['ups', 30], ['dmDone', 4]], m: 20, g: 1 },
+    { id: 'seollal', name: '설날 잔치', start: '2027-02-01', end: '2027-02-07', banner: 'ev_banner_seollal', lead: '새해 복 많이 받아요! 설날 잔치 선물을 준비했어요.', ms: [['picks', 60], ['shakes', 40], ['ups', 30]], m: 20, g: 1 },
+    { id: 'children', name: '어린이날 큰잔치', start: '2027-05-03', end: '2027-05-09', banner: 'ev_banner_children', lead: '어린이날을 맞아 큰잔치를 열어요. 친구들과 신나게 놀아요.', ms: [['picks', 60], ['sports', 2], ['dmDone', 4]], m: 20, g: 1 },
+    { id: 'chuseok', name: '추석 달맞이', start: '2027-09-13', end: '2027-09-19', banner: 'ev_banner_chuseok', lead: '둥근 달을 보며 소원을 빌어요. 달맞이 선물이 기다려요.', ms: [['shakes', 40], ['ups', 30], ['trips', 1]], m: 20, g: 1 }
   ];
   // 달마다 바뀌는 미션과 보상 표: 반복 이벤트마다 미션 3개 [종류, 목표], m은 미션 하나의 수업료 분치(분치 보정 적용), g는 황금 도토리
   const EV_MONTHS = {
@@ -12396,9 +12404,11 @@ body{background:radial-gradient(120% 60% at 50% 0%, color-mix(in srgb, var(--pap
     11: { harvest: { ms: [['picks', 150], ['ups', 80], ['claims', 3]], m: 15, g: 1 }, friends: { ms: [['dmDone', 9], ['picks', 80], ['shakes', 60]], m: 15, g: 1 } },
     12: { harvest: { ms: [['picks', 120], ['shakes', 100], ['ups', 50]], m: 15, g: 1 }, friends: { ms: [['sports', 3], ['dmDone', 6], ['trips', 1]], m: 20, g: 1 } }
   };
+  // 2.0.0 새 매주 이벤트 미션(달마다 같아요). pz는 숲속 퍼즐 판 수
+  const EV_WEEK_BASE = { books: { ms: [['pz', 3], ['trains', 3], ['dmDone', 6]], m: 15, g: 1 }, lunch: { ms: [['picks', 100], ['shakes', 60], ['ups', 40]], m: 15, g: 1 } };
   // 출석 도장 7개: 날마다 하나(한국 시간 날짜 기준). 5개째가 큰 보상이라 7일 가운데 이틀 빠져도 완성이에요. m은 수업료 분치, g는 황금 도토리
-  const EV_STAMPS = [{ m: 10 }, { m: 10 }, { m: 10, g: 1 }, { m: 10 }, { m: 60, g: 3 }, { m: 10 }, { m: 10 }];
-  const EV_BOX = { g: 2, dip: 1 };   // 미션 3개를 다 하면 받는 기념 상자
+  const EV_STAMPS = [{ m: 7 }, { m: 7 }, { m: 7, g: 1 }, { m: 7 }, { m: 40, g: 1 }, { m: 7 }, { m: 7 }];   // 2.0.0 매주라서 줄임(1.x: 10분치, 5개째 60분치와 황금 3)
+  const EV_BOX = { g: 1, dip: 1 };   // 2.0.0 매주라서 황금 2 → 1   // 미션 3개를 다 하면 받는 기념 상자
   // 미션은 기존 횟수 통계(S.st)의 "이벤트 시작 때와의 차이"로 재요. 놀이 코드에는 손대지 않아요
   const EV_MEASURE = {
     // ok가 거짓이면 아직 못 하는 미션이라 EV_FALLBACK으로 바꿔요.
@@ -12408,7 +12418,8 @@ body{background:radial-gradient(120% 60% at 50% 0%, color-mix(in srgb, var(--pap
     picks: { name: n => `떨어진 도토리 ${n}개 줍기`, ok: () => S.f.playground >= 1 }, shakes: { name: n => `참나무 ${n}번 흔들기`, ok: () => S.f.playground >= 1 },
     ups: { name: n => `시설이나 가구 ${n}번 고치기`, ok: () => facKeys().some(k => !facMaxed(k) || FUR[k].some((_, i) => !furDone(k, i))) },
     trains: { name: n => `선생님 연수 ${n}번 보내기`, ok: () => DEX_TEACHERS.some(k => S.t[k] >= 1 && !teaMaxed(k)) || !vpMaxed() }, claims: { name: n => `자리 비운 도토리 ${n}번 받기` }, dmDone: { name: n => `오늘의 미션 ${n}개 끝내기` },
-    sports: { name: n => `숲속 운동회 ${n}번 열기`, ok: () => festOpen('sports') }, trips: { name: n => `체험학습 ${n}번 다녀오기`, ok: () => tripOpen() }
+    sports: { name: n => `숲속 운동회 ${n}번 열기`, ok: () => festOpen('sports') }, trips: { name: n => `체험학습 ${n}번 다녀오기`, ok: () => tripOpen() },
+    pz: { name: n => `숲속 퍼즐 ${n}판 끝내기` }   // 2.0.0 책 읽는 주간
   };
   const evOk = t => !!EV_MEASURE[t] && (!EV_MEASURE[t].ok || EV_MEASURE[t].ok());
   // 아직 못 하는 미션 대신 넣어요(앞에서부터, 할 수 있고 겹치지 않는 것만). 흔들기와 줍기가 안 되면 고치기가 먼저 나와요.
@@ -12423,31 +12434,25 @@ body{background:radial-gradient(120% 60% at 50% 0%, color-mix(in srgb, var(--pap
   const evSpecialHits = (start, end) => EV_SPECIAL.some(e => e.start && e.end && e.start <= end && e.end >= start);
   // 그날 열려 있는 이벤트. key는 회차마다 다른 글자라서(예: harvest:2026-10) 달이 바뀌면 새 회차로 봐요.
   // 특별 이벤트가 그달 반복 이벤트 기간과 하루라도 겹치면 그달 그 반복 이벤트는 아예 건너뛰어요(도장과 미션이 끊기거나 두 번 열리지 않게)
+  const weekMon = day => { const wd = (new Date(Date.parse(day + 'T00:00:00Z')).getUTCDay() + 6) % 7; return dayAdd(day, -wd); };   // 그 날이 든 주의 월요일
+  const evWeekDef = mon => EV_WEEKLY[(((Math.round(dayDiff(EV_ANCHOR, mon) / 7)) % EV_WEEKLY.length) + EV_WEEKLY.length) % EV_WEEKLY.length];
   function evCurrent(day) {
     day = day || gameToday();
     for (const e of EV_SPECIAL) if (e.start && e.end && day >= e.start && day <= e.end) return { def: e, key: `${e.id}:${e.start}`, start: e.start, end: e.end };
-    const [y, m, d] = day.split('-').map(Number);
-    for (const e of EV_MONTHLY) {
-      if (d < e.days[0] || d > e.days[1]) continue;
-      const start = `${y}-${pad2(m)}-${pad2(e.days[0])}`, end = `${y}-${pad2(m)}-${pad2(e.days[1])}`;
-      if (evSpecialHits(start, end)) continue;
-      return { def: e, key: `${e.id}:${y}-${pad2(m)}`, start, end };
-    }
-    return null;
+    const start = weekMon(day), end = dayAdd(start, 6);
+    if (evSpecialHits(start, end)) return null;   // 특별 이벤트가 있는 주는 매주 이벤트가 쉬어요
+    const e = evWeekDef(start);
+    return { def: e, key: `${e.id}:${start}`, start, end };
   }
-  // 그날이 특별 이벤트 때문에 쉬는 반복 이벤트 기간이면 { def: 반복 이벤트, sp: 그 특별 이벤트 }
+  // 그날이 특별 이벤트 때문에 쉬는 매주 이벤트 날이면 { def: 매주 이벤트, sp: 그 특별 이벤트 } (특별 이벤트를 월~일로 맞춰서 보통은 없어요)
   function evSkipped(day) {
     day = day || gameToday();
-    const [y, m, d] = day.split('-').map(Number);
-    for (const e of EV_MONTHLY) {
-      if (d < e.days[0] || d > e.days[1]) continue;
-      const start = `${y}-${pad2(m)}-${pad2(e.days[0])}`, end = `${y}-${pad2(m)}-${pad2(e.days[1])}`;
-      const sp = EV_SPECIAL.find(x => x.start && x.end && x.start <= end && x.end >= start);
-      if (sp) return { def: e, sp };
-    }
-    return null;
+    const start = weekMon(day), end = dayAdd(start, 6);
+    const sp = EV_SPECIAL.find(x => x.start && x.end && x.start <= end && x.end >= start);
+    if (!sp || (day >= sp.start && day <= sp.end)) return null;
+    return { def: evWeekDef(start), sp };
   }
-  const evSkipLine = day => { const k = evSkipped(day); return k ? `<p class="ev-skip">이번 달은 ${esc(k.sp.name)} 때문에 ${esc(eun(k.def.name))} 쉬어요</p>` : ''; };
+  const evSkipLine = day => { const k = evSkipped(day); return k ? `<p class="ev-skip">이번 주는 ${esc(k.sp.name)} 때문에 ${esc(eun(k.def.name))} 쉬어요</p>` : ''; };
   // 다음 이벤트(60일 안)
   function evNext(day) {
     day = day || gameToday();
@@ -12457,13 +12462,13 @@ body{background:radial-gradient(120% 60% at 50% 0%, color-mix(in srgb, var(--pap
   }
   // 이벤트 미션 3개를 정해요. 아직 못 하는 종류는 대신 미션으로 바꿔요
   function evMissions(cur) {
-    const row = cur.def.ms ? cur.def : (EV_MONTHS[Number(cur.start.slice(5, 7))] || EV_MONTHS[1])[cur.def.id];
+    const row = cur.def.ms ? cur.def : ((EV_MONTHS[Number(cur.start.slice(5, 7))] || EV_MONTHS[1])[cur.def.id] || EV_WEEK_BASE[cur.def.id]);
     const used = new Set(), out = [];
     for (const [t0, n0] of row.ms) {
       let t = t0, n = n0;
       if (!evOk(t) || used.has(t)) { const alt = EV_FALLBACK.find(f => evOk(f[0]) && !used.has(f[0])) || ['claims', 3]; t = alt[0]; n = alt[1]; }
       used.add(t);
-      out.push({ t, n, b: Math.floor(S.st[t] || 0), m: row.m, g: row.g, done: false });
+      out.push({ t, n, b: Math.floor(S.st[t] || 0), m: Math.max(1, Math.round(row.m * EV_SCALE)), g: row.g, done: false });   // 2.0.0 매주라서 3분의 2
     }
     return out;
   }
@@ -12550,7 +12555,7 @@ body{background:radial-gradient(120% 60% at 50% 0%, color-mix(in srgb, var(--pap
     const all = evAllDone();
     const box = `<div class="dm ev-box${S.ev.box ? ' done' : ''}"><span class="dex-pic">${pic7('ev_box', 'ic_fund')}</span><div class="dm-tx"><b>기념 상자</b><small>미션 3개를 다 하면 황금 도토리 ${EV_BOX.g}개와 수료증 ${EV_BOX.dip}장</small></div>` +
       (S.ev.box ? `<span class="dm-ok">${CHECK}</span>` : all ? '<button class="cta small" type="button" data-ev="box">열기</button>' : `<span class="dm-n">${S.ev.list.filter(m => m.done).length}/3</span>`) + '</div>';
-    const u = IMG7(cur.def.banner);
+    const u = IMG7(cur.def.banner) || (cur.def.fb ? IMG7(cur.def.fb) : '');   // 2.0.0 새 배너 그림이 오기 전에는 비슷한 배너를 빌려 써요
     body.innerHTML = `<div class="ev-banner ${cur.def.id}${u ? ' has-img' : ''}">${u ? `<img src="${u}" alt="">` : ''}<b>${esc(cur.def.name)}</b></div>` +
       `<div class="ev-period"><span>${dayText(cur.start)} ~ ${dayText(cur.end)}</span><span>${left > 0 ? `${left}일 남음` : '오늘까지'}</span></div>` +
       `<p class="lead">${esc(cur.def.lead)}</p>` + evSkipLine(day) +
@@ -12767,7 +12772,7 @@ body{background:radial-gradient(120% 60% at 50% 0%, color-mix(in srgb, var(--pap
     SELL: 0.1, ORDER: 0.2, MIXED: 0.5, HINT_AFTER: 7000, HINT_SHOW: 3000,                           // 에너지 1당 수업료 분치 (팔기, 주문)
     PIECES: [[10, 3], [8, 2], [6, 1]], UPAT: 8,        // 주문 단계별 장식 조각, 강화 조각이 나오는 단계
     SWAP: 30 * 60000, AD: { n: 2, e: 50 },           // 주문 바꾸기 간격, 광고 하루 2번 +50
-    E: { dm: 15, bonus: 20, wk: 30, stamp: 10, stamp5: 30, box: 50 },
+    E: { dm: 15, bonus: 20, wk: 30, stamp: 7, stamp5: 20, box: 35 },   // 2.0.0 이벤트가 매주라서 도장과 상자 에너지를 줄임(1.8.0: 10, 30, 50)
     LV: [[100], [95, 5], [90, 8, 2], [85, 11, 3.5, 0.5], [80, 14, 5, 1]],   // 생산기 레벨마다 1~4단계가 나올 확률(%)
     UPCOST: [0, 1, 1, 2, 2],                         // Lv.n+1로 올릴 때 드는 강화 조각 (index = 지금 레벨)
     kinds: {
@@ -13513,7 +13518,7 @@ body{background:radial-gradient(120% 60% at 50% 0%, color-mix(in srgb, var(--pap
     rosterEnsure, rosterMake, rosterAdd, clubAuto, clubSet, clubPct, clubShow, clubSum, clubStars, clubMembers, clubShowGo, showReady, showWait, showDay, clubWeekTick, clubFacUp, CLUBS, CLUB, star, clubTuitionMult, clubFestMult, clubDecoOff, renderClub, renderHall, openSeatPick, openClubPick,
     TIER_SCALE, legacyMult, tuitionMult, snapTake, snapOf, tierViewOpen, tierViewClose, renderTierView, renderTierDots, viewMap, showNewTalk, talkNext, NEWCOMERS, TIERS, GEO, geoIdx, decoCost0, qMeasure, qDone, qGoal, kidArt: kidSVG, newYear, checkGrade, gradeOf, townRep, FAC, sanitize200, mainReady, trialHunt, updateTrial, TRIAL, zoomAt, fitMap, ZOOM_MAX, DECO, DECO_SLOTS, DECO_SIGN, decoCost, decoSoldOut, pickDeco, buyDeco, decoPut, decoEditStart, decoEditEnd, openDecoPick, renderDeco, renderDecoShop, setSchoolNm, setMark, schoolTitle, markHTML, decoPlacedAll, achSync, esExLeft, esExCost, essItem, pickEss, buyEss, ESHOP, get Cloud() { return Cloud; }, get actx() { return actx; }, Music, musicWant, musicSync, ensureAudio, bgmLoad, pzUI, rt, makeDeal, furStage, DEAL, navInfo, navRoute, spawnDrop, repTipCheck, linkGoogle, retryCloud, sanitize, acctPending, renderMap, renderHUD, renderAffordance, syncKids, layoutMap, geo, startTrial, hitTrial, endTrial, startVisit, endVisit, showReward, recommend, needCost, prepTopUp, qReward, prepPhase, rankScore, pwOf, previewDip, dipMult, costScale, buyFacility, buyFur, buyFurAll, furCost, furReady, furDone, FUR, startTalk, endTalk, teacherAct, facCost, teaCost, facKeys, rate, rep, capacity, canGraduate, canPromote,
     fmt, fmt2, graduate, promote, buyPerk, perkCost, perkMaxed, buyFundPerk, fpCost, claimMain, mainReady, curMain, qNo, earn, CFG, TEA, teaMaxed, PERKS, FPERKS, MAIN, finalYear, startTrip, claimTrip, TRIPS, yearLocked, startSports, endSports, rtSports: () => rt.sports, startFest, rtFest: () => rt.fest, facCap, addLeague, weekIdx, addMP, tutStart, endFest, claimSports, claimBox, musicWant, askBox, festWait, setTab, openSheet, closeSheet,
-    dexMeet, dexSync, dexPending, dexGift, renderDex, evCurrent, evNext, evSync, claimStamp, claimEvMission, claimEvBox, renderEvent, evMissions, evOk, evSkipped, EV_MONTHS, EV_MEASURE, tierMinutes, minAcorns, IMG, sanitize171, ACH, achSync, claimAch, setTitle, renderAch, setDexSeg, achClaimable, XT, xtAct, xtCost, xtLv, feastMins, libMult, propInstances, walkBuild, festItemSvg, guestArt, adErrText, googleErrText, openSheet, closeSheet, startFest, startSports, sanitize170, EV_STAMPS, EV_SPECIAL, EV_MONTHLY, EV_BOX, DEX_KEYS, DEX_REWARD, DEX_GUEST_KEYS, seasonKey, roofArtKey, oakKey, setSeasonArt, VP, vpLv, vpCost, vpMult, vpAct, renderVpCard, sportsPrize, festPrize, renderTeachers, buildTeacherCards, bldImg, roofKey, bldStage, mapKey, setMapArt, applyThemes, buyFacility, bldFx, setBldFx, mapHi, NOTICES, openNotice, noticeAuto, noticeWant, ntUnread, startTrial, endTrial: () => rt.trial && (rt.trial.left = 0), spawnDeal, startVisit, IMG170, MG, mgCells, mgSetCells, mgTick, mgAddEnergy, mgAddUp, mgTapGen, mgDrop, mgSell, mgUpgrade, mgClaimOrder, mgSwapOrder, mgOrderOk, mgFillOrders, mgOpen, mgClose, mgRenderAll, mgSpawnLevel, mgNearestEmpty, mgEmptyBoard, mgOrderReward, mgUI, sanitize180, mgWatchAd, mgNewOrder, mgHintPick, mgShowHint, mgClearHint, mgTouch, mgOrderGuide, mgDexN, mgDexCan, mgDexClaim, mgOpenDex, MG_DEX, MG_DEX_MS, mgDexEss, mgDexEssCan, mgDexEssN, mgDexMsCan, mgDexMsClaim, MGB, mgBuyBoost, mgBstLeft, mgOpenBoost, nice, claimMission, claimBonus, claimWeekMission, MP_BOX,   // 1.7.0 도감, 이벤트
+    dexMeet, dexSync, dexPending, dexGift, renderDex, evCurrent, evNext, evSync, EV_WEEKLY, EV_WEEK_BASE, weekMon, evSkipped, claimStamp, claimEvMission, claimEvBox, renderEvent, evMissions, evOk, evSkipped, EV_MONTHS, EV_MEASURE, tierMinutes, minAcorns, IMG, sanitize171, ACH, achSync, claimAch, setTitle, renderAch, setDexSeg, achClaimable, XT, xtAct, xtCost, xtLv, feastMins, libMult, propInstances, walkBuild, festItemSvg, guestArt, adErrText, googleErrText, openSheet, closeSheet, startFest, startSports, sanitize170, EV_STAMPS, EV_SPECIAL, EV_MONTHLY, EV_BOX, DEX_KEYS, DEX_REWARD, DEX_GUEST_KEYS, seasonKey, roofArtKey, oakKey, setSeasonArt, VP, vpLv, vpCost, vpMult, vpAct, renderVpCard, sportsPrize, festPrize, renderTeachers, buildTeacherCards, bldImg, roofKey, bldStage, mapKey, setMapArt, applyThemes, buyFacility, bldFx, setBldFx, mapHi, NOTICES, openNotice, noticeAuto, noticeWant, ntUnread, startTrial, endTrial: () => rt.trial && (rt.trial.left = 0), spawnDeal, startVisit, IMG170, MG, mgCells, mgSetCells, mgTick, mgAddEnergy, mgAddUp, mgTapGen, mgDrop, mgSell, mgUpgrade, mgClaimOrder, mgSwapOrder, mgOrderOk, mgFillOrders, mgOpen, mgClose, mgRenderAll, mgSpawnLevel, mgNearestEmpty, mgEmptyBoard, mgOrderReward, mgUI, sanitize180, mgWatchAd, mgNewOrder, mgHintPick, mgShowHint, mgClearHint, mgTouch, mgOrderGuide, mgDexN, mgDexCan, mgDexClaim, mgOpenDex, MG_DEX, MG_DEX_MS, mgDexEss, mgDexEssCan, mgDexEssN, mgDexMsCan, mgDexMsClaim, MGB, mgBuyBoost, mgBstLeft, mgOpenBoost, nice, claimMission, claimBonus, claimWeekMission, MP_BOX,   // 1.7.0 도감, 이벤트
     PZ, PZ_SHAPES, pzFits, pzAnyFit, pzStuck, pzFullLines, pzPlace, pzFreshGame, pzStart, PZB, pzbCost, pzApplyBoost, pzBoostOpen, pzBoostGo, festGoldLeft, festGoldTake, claimSports, renderStreet, pzFinish, pzLeft, pzCanAd, pzEssOf, pzMinOf, pzHelpSquirrel, pzHelpOwl, pzHelpBear, fillSubs, mapRoofTop, showAd, claimOfflineDouble, startBoost, tripAd, festFocus, festRange, visMap, renderMissions, pzHasHelp, pzRot, pzNewPiece, pzOpen, pzClose, pzGameOver, pzRenderAll, renderMini, addEss, ESHOP, SP_FUR, applyCos, essItem, pickEss, buyEss, renderEssShop, esAcornLeft, esGoldLeft, esAcornAmt, hatSVG, spFurImg, gameNow, gameToday, gameWeek, kstDay, setServerTime, SVR, dmDay, weekIdx, lgWeek, wkWeek, lgKey, pzDay, goldDay, boostLeft, dealLeft, canStamp };
   if (window.claude && window.claude.hot && window.claude.hot.snapshot) {
     try { window.claude.hot.snapshot(() => { if (S) syncMid(); return { save: S }; }); } catch (e) { /* 무시 */ }
