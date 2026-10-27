@@ -21,10 +21,11 @@ async def main():
             await pg.evaluate(f"(()=>{{ const t=document.querySelector('#tut'); if(t) t.hidden=true; {F}.S.tut.st='skip'; {F}.rt.tut=null; {CLEAN}; }})()")
             # 준비: 학교를 조금 키우고 정수를 넉넉히
             await pg.evaluate(f"(()=>{{ const F={F}, S=F.S; S.tier=1; S.budget=1e6; for (const k of ['classroom','cafeteria','library','playground','science']) S.f[k]=Math.max(3,S.f[k]||0); S.students=20; S.ess=1000; F.rt.mapLaid=-1; F.layoutMap(); F.renderMap(); F.renderHUD(); F.renderAffordance(); }})()")
-            # 1) 정수 상점 단추가 보이고 눌리는지
-            vis = await pg.evaluate("(()=>{ const b=document.querySelector('.sidebtn[data-tab=ess]'); return b && !b.hidden && b.getBoundingClientRect().width>0; })()")
-            if not vis: fails.append(f'[{tag}] 정수 상점 단추가 안 보여요')
-            await pg.evaluate("document.querySelector('.sidebtn[data-tab=ess]').click()"); await pg.wait_for_timeout(400)
+            # 1) 정수 상점으로 가는 길이 보이고 눌리는지 (1.7.2: 아래 상점 탭 → 상점 거리 → 정수 상점)
+            await pg.evaluate("document.querySelector('.tabs .tab[data-tab=street]').click()"); await pg.wait_for_timeout(300)
+            vis = await pg.evaluate("(()=>{ const b=document.querySelector('#sfEss'); return b && !b.hidden && b.getBoundingClientRect().width>0; })()")
+            if not vis: fails.append(f'[{tag}] 상점 거리의 정수 상점 가게가 안 보여요')
+            await pg.evaluate("document.querySelector('#sfEss').click()"); await pg.wait_for_timeout(400)
             r = await pg.evaluate(f"(()=>{{ const p=document.querySelector('#panelEss'); return [!p.hidden, document.querySelector('#essHave2').textContent, document.querySelectorAll('#essList .si').length, document.querySelectorAll('#essList .sb').length, p.scrollWidth<=p.clientWidth+1]; }})()")
             if not r[0]: fails.append(f'[{tag}] 정수 상점 패널이 안 열려요')
             if r[1] != '1,000': fails.append(f'[{tag}] 정수 표시 {r[1]}')

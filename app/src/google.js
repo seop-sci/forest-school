@@ -10,7 +10,9 @@ if (WEB_CLIENT_ID) {
   window.FOREST_GOOGLE = {
     async login() {
       await init();
-      const r = await SocialLogin.login({ provider: 'google', options: { scopes: ['email', 'profile'] } });
+      // 1.7.2: scopes를 넘기면 플러그인이 MainActivity를 고치라며 늘 거절해요("You CANNOT use scopes without modifying the main activity").
+      // 이메일과 프로필은 기본으로 받으니 넘기지 않아요
+      const r = await SocialLogin.login({ provider: 'google', options: {} });
       const res = r && r.result;
       if (!res || !res.idToken) throw { code: 'no-id-token' };
       return { idToken: res.idToken, email: res.profile && res.profile.email };

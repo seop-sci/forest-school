@@ -150,7 +150,7 @@ async def run(b, dark, w, h):
     txt = await pg.evaluate("[document.querySelector('#essHave').textContent, document.querySelector('#pzLeftTxt').textContent, document.querySelector('#pzAdBtn').hidden]")
     if txt != ['12', '오늘 보상 판 10번 남음', True]: bad.append('미니게임 탭 글: ' + json.dumps(txt, ensure_ascii=False))
     await pg.screenshot(path=f's46_mini_{tag}.png')
-    await pg.evaluate("document.querySelector('#pzOpen').click()"); await pg.wait_for_timeout(500)
+    await pg.evaluate("document.querySelector('#pzOpen').click(); const pb=document.querySelector('#pzBoost'); if (pb && !pb.hidden) document.querySelector('#pzbSkip').click()"); await pg.wait_for_timeout(500)
     st = await pg.evaluate(f"[!document.querySelector('#pzScene').hidden, document.querySelectorAll('#pzGrid .pz-cell').length, document.querySelectorAll('#pzTray .pz-slot .pz-piece').length, {F}.S.pz.n, {F}.S.pz.cur.rw]")
     if st != [True, 64, 3, 1, True]: bad.append('퍼즐 열기: ' + json.dumps(st))
     # 첫 조각을 (0,0)에 끌어다 놓기
@@ -200,18 +200,18 @@ async def run(b, dark, w, h):
     sub = await pg.evaluate("[document.querySelector('#pzCardTag').textContent, document.querySelector('#pzCardSub').textContent]")
     if sub[0] != '이어서': bad.append('이어서 카드: ' + json.dumps(sub, ensure_ascii=False))
     # 그만하기 → 보상 창
-    await pg.evaluate("document.querySelector('#pzOpen').click()"); await pg.wait_for_timeout(400)
+    await pg.evaluate("document.querySelector('#pzOpen').click(); const pb=document.querySelector('#pzBoost'); if (pb && !pb.hidden) document.querySelector('#pzbSkip').click()"); await pg.wait_for_timeout(400)
     await pg.evaluate(f"{F}.S.pz.cur.score = 900; {F}.pzRenderAll(); document.querySelector('#pzQuit').click()"); await pg.wait_for_timeout(200)
     await pg.evaluate("document.querySelector('#pzQuitYes').click()"); await pg.wait_for_timeout(400)
     end = await pg.evaluate(f"[!document.querySelector('#pzEnd').hidden, document.querySelector('#pzEndScore').textContent, document.querySelectorAll('#pzEndList li').length, {F}.S.ess, {F}.S.pz.best, {F}.S.pz.cur]")
     if end[:2] != [True, '900'] or end[2] not in (2, 3) or end[3] != 18 or end[4] != 900 or end[5] is not None: bad.append('그만하기 보상: ' + json.dumps(end, ensure_ascii=False))
     await pg.screenshot(path=f's46_end_{tag}.png')
-    await pg.evaluate("document.querySelector('#pzEndAgain').click()"); await pg.wait_for_timeout(300)
+    await pg.evaluate("document.querySelector('#pzEndAgain').click(); const pb=document.querySelector('#pzBoost'); if (pb && !pb.hidden) document.querySelector('#pzbSkip').click()"); await pg.wait_for_timeout(300)
     again = await pg.evaluate(f"[document.querySelector('#pzEnd').hidden, {F}.S.pz.cur && {F}.S.pz.cur.score, {F}.S.pz.n]")
     if again != [True, 0, 2]: bad.append('다시 하기: ' + json.dumps(again))
     await pg.evaluate("document.querySelector('#pzBack').click()"); await pg.wait_for_timeout(200)
     # 넘침 검사: 퍼즐 장면 안 요소가 화면을 벗어나지 않아요
-    await pg.evaluate("document.querySelector('#pzOpen').click()"); await pg.wait_for_timeout(300)
+    await pg.evaluate("document.querySelector('#pzOpen').click(); const pb=document.querySelector('#pzBoost'); if (pb && !pb.hidden) document.querySelector('#pzbSkip').click()"); await pg.wait_for_timeout(300)
     over = await pg.evaluate("(() => { const W = innerWidth, H = innerHeight; return [...document.querySelectorAll('#pzScene .pz-top, #pzScene .pz-ask, #pzScene .pz-board, #pzScene .pz-tray, #pzScene .pz-foot')].map(e => { const r = e.getBoundingClientRect(); return [e.className, Math.round(r.left), Math.round(r.right), Math.round(r.bottom)]; }).filter(x => x[1] < 0 || x[2] > W + 1 || x[3] > H + 1); })()")
     if over: bad.append('퍼즐 화면 넘침: ' + json.dumps(over))
     # 저장 호환: pz가 없는 예전 저장, 깨진 판. 새로고침은 떠나면서 저장을 다시 쓰니, 새 창에서 시작하기 전에 저장을 바꿔 넣어요
