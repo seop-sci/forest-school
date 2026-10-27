@@ -79,6 +79,12 @@ FLOW = r"""() => {
     if (q && q.t === 'mgOrders') { pick += dt; if (pick >= 30) { pick = 0; s.mg.st.orders += 1; } }
     // 1.7.4 침입자 쫓아내기: 퀘스트가 되면 3초 뒤 매나 뱀이 오고 20초 안에 쫓아내요(놓쳐도 40초 안에 다시 와요). 8초에 한 번 쫓아낸 것으로 쳐요
     if (q && q.t === 'trials') { tri += dt; if (tri >= 8) { tri = 0; s.st.trials = (s.st.trials || 0) + 1; } }
+    // 1.8.0 보강 퀘스트: 퍼즐 한 판은 1분에 한 번(정수 15), 영양 사서 교감 연수는 살 수 있으면 바로, 장식은 퍼즐로 정수를 모아 벤치를 사서 놓기, 업적은 받을 수 있으면 받기
+    if (q && (q.t === 'pz' || q.t === 'deco')) { pick += dt; if (pick >= 60) { pick = 0; s.st.pz = (s.st.pz || 0) + 1; s.ess += 15; } }
+    if (q && q.t === 'deco' && s.ess >= 60) { F.rt.decoPick = 'bench'; if (F.buyDeco()) for (let i = 0; i < 11; i++) if (F.decoPut(i, 'bench')) break; }
+    if (q && q.t === 'xt' && s.budget >= F.xtCost(q.k)) F.xtAct(q.k);
+    if (q && q.t === 'vp' && s.budget >= F.vpCost()) F.vpAct();
+    if (q && q.t === 'ach') { F.achSync(); const a = F.ACH.find(x => (s.ach.got[x.id] || 0) < (s.ach.hit[x.id] || 0)); if (a) F.claimAch(a.id); }
     if (q && q.t === 'perks') { const k = Object.keys(F.PERKS).filter(x => !F.perkMaxed(x)).sort((a, b) => F.perkCost(a) - F.perkCost(b))[0]; if (k && F.perkCost(k) <= s.p.dip) F.buyPerk(k, document.body); }
     for (let i = 0; i < 20; i++) if (!buy()) break;
     maxB = Math.max(maxB, S().budget);
