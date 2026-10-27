@@ -50,7 +50,7 @@ async def main():
           const card = document.querySelector('#dexBody .dex-card[data-dex="tea_hedgehog"]');
           const goal = F.DEX_REWARD.goals.find(g => g.key === 's14');
           return {{ n: F.DEX_KEYS.length, got: !!S.dex.got.tea_hedgehog, on: card && card.classList.contains('on'), head, need: goal.need }}; }})()""")
-        if r['n'] != 17 or not r['got'] or not r['on'] or r['need'] != 17 or '/ 17종' not in r['head']: fails.append(f"도감 교감 선생님 {r}")
+        if r['n'] != 23 or not r['got'] or not r['on'] or r['need'] != 23 or '/ 23종' not in r['head']: fails.append(f"도감 교감 선생님 {r}")
         # 예전 저장
         r = await pg.evaluate(f"(()=>{{ const F={F}; const d = JSON.parse(JSON.stringify(F.S)); delete d.vp; const a = F.sanitize(d).vp; d.vp = 99; const b = F.sanitize(d).vp; d.vp = -3; const c = F.sanitize(d).vp; return [a, b, c]; }})()")
         if r != [0, 10, 0]: fails.append(f'예전 저장 교감 레벨 {r}')
