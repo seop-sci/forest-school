@@ -222,6 +222,7 @@ button{font:inherit;color:inherit}
 .look{display:none}
 #map.tier-0 .look-0,#map.tier-1 .look-1{display:inline}
 #map.tier-0 #b-science,#map.tier-0 #pq-science{display:none}
+#map:not(.tier-2) #b-store,#map:not(.tier-2) #pq-store{display:none}
 .plaque{cursor:pointer;outline:none}
 .plaque:focus-visible .c-plaque{stroke:var(--accent);stroke-width:2.4}
 /* 까치 */
@@ -1092,7 +1093,7 @@ html.ait .app{padding-top:calc(10px + var(--ait-top, 0px));padding-bottom:var(--
 
 /* ===== 1.5.0 그림 지도 ===== */
 .c-mapedge{fill:#3E6B3A}
-#map.tier-0 .mi-1,#map.tier-1 .mi-0{display:none}
+.mapimg{display:none}#map.g-0 .mi-0,#map.g-1 .mi-1,#map.g-2 .mi-2{display:inline}
 .map-dim{fill:#0B1A12;opacity:0;pointer-events:none}
 /* 1.5.3 지도 그림만 연하게: 건물, 학생, 도토리가 또렷하게 보여요 */
 .mapimg{filter:saturate(.85) brightness(1.03) contrast(.95)}   /* 1.7.3: 차분한 지도(calm2)로 바꾸면서 덜 흐리게(예전 .62, 1.1, .86) */
@@ -1837,6 +1838,72 @@ body{background:radial-gradient(120% 60% at 50% 0%, color-mix(in srgb, var(--pap
 .shopfront .sf-have .tic{width:16px;height:16px}
 .shopfront.soon{cursor:default;opacity:.92}
 .shopfront.soon .sf-tag{padding-right:12px;background:#EFE6CF;color:#5F604C}
+/* ===== 2.0.0 학교 복도, 동아리, 학교급 모습 보기, 전학 대화 ===== */
+.hall-scene.fb{background:linear-gradient(#F3E2C2 0 46%,#C99B6B 46% 100%)}
+.shopfront.door .sf-pic.fb{background:none;display:grid;place-items:center}
+.shopfront.door .sf-pic.fb::before{content:attr(data-em);display:grid;place-items:center;width:62%;aspect-ratio:3/4;margin:4% auto 0;border:4px solid #8C6440;border-radius:14px 14px 4px 4px;background:#B9895A;font-size:34px;box-shadow:inset 0 0 0 3px #D7A876}
+.shopfront.door.soon .sf-pic.fb::before{filter:grayscale(.6);opacity:.75}
+.boost.hall .b-av{display:grid;place-items:center;font-size:20px;background:center/80% no-repeat}
+.boost.hall.glow .b-ring{box-shadow:0 0 0 3px #F4C144}
+.club-head{position:relative;min-height:96px;margin:6px 0 10px;border-radius:16px;background:#E8D2A8 left center/cover no-repeat;overflow:hidden}
+.club-head.fb{background:linear-gradient(120deg,#9FCB8A,#E8D2A8 60%)}
+.club-head-tx{position:absolute;right:0;top:0;bottom:0;width:58%;padding:12px 12px 10px;display:flex;flex-direction:column;justify-content:center;gap:4px;background:linear-gradient(90deg,rgba(255,249,233,0),rgba(255,249,233,.92) 22%);color:#183C2E}
+.club-head-tx b{font-family:var(--font-display);font-weight:400;font-size:18px}
+.club-head-tx small{font-size:12.5px;line-height:1.35}
+.club-tools{display:flex;align-items:center;justify-content:space-between;gap:8px;margin:0 2px 10px;font-size:13px;color:var(--chip-ink)}
+.club-card{margin:0 0 10px;padding:10px;border-radius:16px;background:var(--card)}
+.club-top{display:flex;align-items:center;gap:8px}
+.club-badge{width:40px;height:40px;flex:none;object-fit:contain}
+.club-badge.em{display:grid;place-items:center;border-radius:50%;font-size:22px;background:#E8F0DA}
+.club-badge.em.c1{background:#FBE3CC}.club-badge.em.c2{background:#DCE8F7}.club-badge.em.c3{background:#F9DDE8}
+.club-nm{flex:1;min-width:0;display:flex;flex-direction:column}
+.club-nm b{font-size:15px}.club-nm small{font-size:12px;color:var(--chip-ink)}
+.club-eff{flex:none;padding:3px 8px;border-radius:999px;background:#F4C144;color:#3C2B06;font-size:12.5px;font-weight:700;white-space:nowrap}
+.club-seats{display:grid;grid-template-columns:repeat(3,1fr);gap:6px;margin:8px 0}
+.club-seat{display:flex;flex-direction:column;align-items:center;gap:1px;min-width:0;padding:6px 2px;border:1.5px solid rgba(110,154,94,.45);border-radius:12px;background:var(--paper);color:var(--ink);cursor:pointer}
+.club-seat b{font-size:12.5px;max-width:100%;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+.club-seat.empty{border-style:dashed;color:var(--chip-ink);min-height:74px;justify-content:center}
+.club-seat.empty b{font-size:20px}
+.stars{color:#D99A16;font-size:11px;letter-spacing:-1px;white-space:nowrap}
+.rs-av{display:inline-grid;place-items:center;width:34px;height:42px;flex:none}
+.rs-av svg{width:30px;height:40px}
+.club-show{width:100%}
+.roster{display:flex;flex-direction:column;gap:6px;margin-bottom:12px}
+.rs-row{display:flex;align-items:center;gap:8px;width:100%;padding:6px 8px;border:0;border-radius:14px;background:var(--card);color:var(--ink);text-align:left;cursor:pointer}
+.rs-row.pick{outline:2px solid var(--accent)}
+.rs-nm{flex:0 0 78px;min-width:0;display:flex;flex-direction:column}
+.rs-nm b{font-size:14px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}.rs-nm small{font-size:11.5px;color:var(--chip-ink)}
+.rs-ab{flex:1;min-width:0;display:grid;grid-template-columns:1fr 1fr;gap:1px 6px}
+.rs-ab i{font-style:normal;display:flex;justify-content:space-between;gap:2px;color:#D99A16;font-size:10.5px;letter-spacing:-1px;white-space:nowrap}
+.rs-ab i em{font-style:normal;color:var(--chip-ink);letter-spacing:0}
+.rs-ab i.on em{color:var(--ink);font-weight:700}
+.rs-one{margin-left:auto;font-size:12px;color:var(--chip-ink);white-space:nowrap}.rs-one b{color:#D99A16;letter-spacing:-1px}
+.seat-modal{max-width:360px;text-align:left}
+.seat-modal h2{text-align:center}
+.seat-list{display:flex;flex-direction:column;gap:6px;max-height:52vh;overflow:auto;margin:8px 0}
+.seat-list .note{font-size:12px;color:var(--chip-ink);margin:4px 2px 0}
+.seat-list .club-pickc{display:flex;align-items:center;gap:8px;width:100%;padding:8px;border:0;border-radius:14px;background:var(--card);color:var(--ink);text-align:left;cursor:pointer}
+.seat-list .club-pickc.pick{outline:2px solid var(--accent)}
+.tier-dots{position:absolute;left:10px;bottom:calc(var(--bot-h, 70px) + 10px);z-index:6;display:flex;gap:5px;padding:3px 6px;border-radius:999px;background:rgba(255,249,233,.82);box-shadow:0 1px 3px rgba(20,40,20,.25)}
+.tier-dots .td{display:grid;place-items:center;width:24px;height:24px;padding:0;border:1.5px solid #8FB07E;border-radius:50%;background:#FFF9E9;color:#183C2E;font-family:var(--font-display);font-size:12px;cursor:pointer}
+.tier-dots .td.cur{border-color:#3E7E4A;box-shadow:0 0 0 2px #3E7E4A inset}
+.tier-dots .td.on{background:#3E7E4A;color:#FFF9E9}
+.tier-dots .td.lock{opacity:.55;cursor:default}
+.tier-dots .td svg{width:13px;height:13px}
+.tier-view{position:absolute;inset:0;z-index:5;background:#3E6B3A var(--map-bg,none) center/cover no-repeat}
+.tier-view::before{content:"";position:absolute;inset:0;backdrop-filter:blur(8px);-webkit-backdrop-filter:blur(8px);background:rgba(20,40,20,.25)}
+.tier-view svg{position:absolute;inset:0;width:100%;height:100%}
+.tier-view .tv-lv rect{fill:#FFF9E9;stroke:#6E9A5E;stroke-width:1}.tier-view .tv-lv text{font-size:9px;fill:#183C2E}
+.tv-bar{position:absolute;left:10px;right:10px;top:calc(var(--left-h, 150px) + 8px);z-index:2;display:flex;align-items:center;gap:6px;padding:8px 8px 8px 12px;border-radius:16px;background:var(--paper);color:var(--ink);box-shadow:0 2px 6px rgba(20,40,20,.25)}
+.tv-tx{flex:1;min-width:0;display:flex;flex-direction:column}.tv-tx b{font-size:14px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}.tv-tx small{font-size:11.5px;color:var(--chip-ink)}
+.overlay.talk{z-index:31}
+.talk-box{position:relative;display:flex;gap:10px;width:100%;max-width:440px;margin:0 10px calc(14px + env(safe-area-inset-bottom,0px));padding:14px;border-radius:20px;background:var(--paper);color:var(--ink);box-shadow:0 4px 16px rgba(0,0,0,.25);opacity:0;transform:translateY(20px);transition:transform .2s,opacity .2s;cursor:pointer}
+.overlay.open .talk-box{opacity:1;transform:none}
+.talk-av{flex:none;display:grid;place-items:center;width:60px;height:60px;border-radius:50%;background:#E8F0DA}
+.talk-av svg{width:52px;height:52px}.talk-av.kid svg{width:40px;height:54px}
+.talk-tx{flex:1;min-width:0}.talk-tx b{font-size:13px;color:#3E7E4A}
+.talk-tx p{margin:4px 0 8px;font-size:15px;line-height:1.45}
+.talk-foot{display:flex;align-items:center;justify-content:space-between}.talk-foot small{color:var(--chip-ink)}
 .street-back{display:inline-flex;align-items:center;gap:4px;min-height:36px;margin:-6px 0 6px;padding:0 12px 0 8px;border:1px solid var(--line);border-radius:999px;background:var(--card);color:var(--ink);font:inherit;font-size:13.5px;cursor:pointer}
 .street-back::before{content:"";width:8px;height:8px;border-left:2px solid currentColor;border-bottom:2px solid currentColor;transform:rotate(45deg);margin-right:2px}
 /* 1.7.2: 학교 상세(펼침)에는 위쪽에 없는 정원과 학교 파워만 보여요. 평판은 위쪽 재화 줄에 늘 있어요 */
@@ -2066,11 +2133,13 @@ body{background:radial-gradient(120% 60% at 50% 0%, color-mix(in srgb, var(--pap
           <filter id="rt-library" color-interpolation-filters="sRGB"><feFlood flood-color="#C2533D" result="c"/><feBlend in="c" in2="SourceGraphic" mode="multiply" result="m"/><feComposite in="m" in2="SourceAlpha" operator="in"/></filter>
           <filter id="rt-science" color-interpolation-filters="sRGB"><feFlood flood-color="#C2533D" result="c"/><feBlend in="c" in2="SourceGraphic" mode="multiply" result="m"/><feComposite in="m" in2="SourceAlpha" operator="in"/></filter>
           <filter id="rt-playground" color-interpolation-filters="sRGB"><feFlood flood-color="#C2533D" result="c"/><feBlend in="c" in2="SourceGraphic" mode="multiply" result="m"/><feComposite in="m" in2="SourceAlpha" operator="in"/></filter>
+          <filter id="rt-store" color-interpolation-filters="sRGB"><feFlood flood-color="#C2533D" result="c"/><feBlend in="c" in2="SourceGraphic" mode="multiply" result="m"/><feComposite in="m" in2="SourceAlpha" operator="in"/></filter>
         </defs>
         <g id="ground">
           <rect x="-300" y="-300" width="960" height="1020" class="c-mapedge"/>
           <image id="mapImg0" class="mapimg mi-0" x="0" y="-60" width="360" height="540" preserveAspectRatio="none"/>
           <image id="mapImg1" class="mapimg mi-1" x="0" y="-60" width="360" height="540" preserveAspectRatio="none"/>
+          <image id="mapImg2" class="mapimg mi-2" x="0" y="-60" width="360" height="540" preserveAspectRatio="none"/>
           <g id="thDeco" aria-hidden="true"></g>
           <rect class="map-dim" x="-300" y="-300" width="960" height="1020"/>
           <!-- 1.7.3 지도 가운데 차분하게: 배경 그림 위, 건물 아래에 엷은 막(가운데만, 가장자리는 0) -->
@@ -2157,6 +2226,18 @@ body{background:radial-gradient(120% 60% at 50% 0%, color-mix(in srgb, var(--pap
             <g class="can" transform="translate(42 -10)"><circle r="7.5" class="c-can"/><path d="M-3.2 1.6 L0 -2.4 L3.2 1.6" class="s-can"/></g>
           </g>
         </g>
+        <g id="b-store" class="bld" data-k="store" tabindex="0" role="button" aria-label="매점">
+          <rect class="hit" rx="14"/>
+          <rect class="focus-ring" rx="14"/>
+          <g class="site"><image class="bimg"/></g>
+          <g class="built"><image class="bimg"/><image class="roofimg" style="display:none"/></g>
+          <g class="plaque" id="pq-store">
+            <rect x="-40" y="-11" width="80" height="22" rx="11" class="c-plaque"/>
+            <circle cx="-29" cy="0" r="9" class="c-plaque-ic"/><image class="pq-ic" x="-38" y="-9" width="18" height="18"/>
+            <text class="t-plaque" x="6" y="4" text-anchor="middle" id="pl-store">매점 짓기</text>
+            <g class="can" transform="translate(42 -10)"><circle r="7.5" class="c-can"/><path d="M-3.2 1.6 L0 -2.4 L3.2 1.6" class="s-can"/></g>
+          </g>
+        </g>
 
         <g id="fireflies">
           <circle class="firefly" cx="40" cy="150" r="1.8"/><circle class="firefly" cx="130" cy="112" r="1.8"/><circle class="firefly" cx="306" cy="108" r="1.8"/><circle class="firefly" cx="30" cy="250" r="1.8"/><circle class="firefly" cx="334" cy="236" r="1.8"/><circle class="firefly" cx="112" cy="392" r="1.8"/><circle class="firefly" cx="262" cy="396" r="1.8"/><circle class="firefly" cx="64" cy="344" r="1.8"/>
@@ -2172,12 +2253,19 @@ body{background:radial-gradient(120% 60% at 50% 0%, color-mix(in srgb, var(--pap
       <div class="fever-fx" id="feverFx" hidden aria-hidden="true"><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i></div>
       <div class="sportsbar festbar" id="festBar" hidden role="status" aria-live="off"><span id="fbName">행사</span><span class="sb-t"><b id="fbN">0/0</b></span><span class="sb-t"><b id="fbT">30</b>초</span></div>
       <div class="sportsbar" id="sportsBar" hidden role="status" aria-live="off"><span class="sb-b">청팀 <b id="spBlue">0</b></span><span class="sb-t"><b id="spTime">40</b>초</span><span class="sb-w"><b id="spWhite">0</b> 백팀</span></div>
+      <!-- 2.0.0 학교급 모습 보기: 동그라미 6개와 지난 학교급 지도 -->
+      <div class="tier-view" id="tierView" hidden>
+        <svg id="tvMap" viewBox="0 -60 360 540" preserveAspectRatio="xMidYMid meet" role="img" aria-label="지난 학교급 지도"></svg>
+        <div class="tv-bar"><span class="tv-tx"><b id="tvTitle"></b><small id="tvSub"></small></span><button class="btn-sub small" id="tvEdit" type="button">꾸미기</button><button class="cta small" id="tvBack" type="button">돌아가기</button></div>
+      </div>
+      <div class="tier-dots" id="tierDots" hidden role="group" aria-label="학교급 모습 보기"></div>
       <div class="deco-bar" id="decoBar" hidden><span><b>꾸미기 중</b><small>빈 자리를 누르면 장식을 놓아요</small></span><button class="cta small" type="button" id="decoDone">다 했어요</button></div>
       <div class="map-left">
         <button class="shopbtn" id="btnShop" type="button" hidden aria-label="황금 도토리 상점"><svg viewBox="-8 -11 16 20" aria-hidden="true"><path d="M-4.6 -1 Q-4.9 5.4 0 7.4 Q4.9 5.4 4.6 -1 Z" class="c-gnut"/><ellipse cx="-1.8" cy="2" rx="0.9" ry="2.1" class="c-gshine"/><path d="M-5.8 -0.8 Q-5.8 -6.2 0 -6.6 Q5.8 -6.2 5.8 -0.8 Q0 0.8 -5.8 -0.8 Z" class="c-gcap"/><path d="M-4 -3.2 H4 M-2.8 -5 H2.8" class="s-gline"/><path d="M0 -6.6 L0.9 -9.2" class="s-gstem"/></svg><b id="goldN">0</b>상점</button>
         <button class="boost" id="btnBoost" type="button" hidden aria-label="부엉이 선생님 보충수업"><span class="b-ring"><span class="b-av" id="boostIc" aria-hidden="true"></span><span class="b-n" id="boostN">5</span></span><span class="b-lb">보충수업</span></button>
         <button class="boost trip" id="btnTrip" type="button" hidden aria-label="현장체험학습"><span class="b-ring"><span class="b-av" id="tripIc" aria-hidden="true"></span><span class="b-n" id="tripN">출발</span></span><span class="b-lb">체험학습</span></button>
         <button class="boost trip sports" id="btnSports" type="button" hidden aria-label="학교 행사"><span class="b-ring"><span class="b-av" id="sportsIc" aria-hidden="true"></span><span class="b-n" id="sportsN">열기</span></span><span class="b-lb">학교 행사</span></button>
+        <button class="boost trip hall" id="btnHall" type="button" data-go="hall" hidden aria-label="학교 복도"><span class="b-ring"><span class="b-av" id="hallIc" aria-hidden="true"></span><span class="b-n" id="hallN">열기</span></span><span class="b-lb">복도</span></button>
         <div class="feast" id="feastChip" hidden>특식 데이 <b id="feastTime">5:00</b></div>
         <div class="feast" id="autoChip" hidden>자동 줍기 <b id="autoTime">60:00</b></div>
       </div>
@@ -2352,6 +2440,25 @@ body{background:radial-gradient(120% 60% at 50% 0%, color-mix(in srgb, var(--pap
         <div class="ach-title" id="achTitle"></div>
         <div class="ach-list" id="achList"></div>
       </div>
+    </section>
+    <!-- 2.0.0 학교 복도: 상점 거리처럼 복도 배경 위에 방문(그림은 작업지시서 20, 자리는 그림이 오면 맞춰요) -->
+    <section class="panel street-panel hall-panel" id="panelHall" hidden aria-labelledby="hallTitle">
+    <button class="panel-x" type="button" aria-label="홈으로"><svg viewBox="0 0 24 24" width="18" height="18" aria-hidden="true"><path d="M6 6l12 12M18 6L6 18" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round"/></svg></button>
+    <h2 id="hallTitle" class="street-title">학교 복도</h2>
+    <div class="street-scene hall-scene" id="hallScene">
+      <button class="shopfront door" type="button" data-go="club" id="hdClub" style="left:1.5%;top:9%;width:48%" aria-label="동아리실"><span class="sf-pic" data-front="hall_club" data-em="🏅" aria-hidden="true"></span><span class="sf-tag"><b>동아리실</b><span class="sf-have" id="hallClubN">0%</span></span></button>
+      <button class="shopfront door soon" type="button" aria-disabled="true" style="left:50.5%;top:23%;width:48%" aria-label="학생회실, 준비 중"><span class="sf-pic" data-front="hall_council" data-em="🗳️" aria-hidden="true"></span><span class="sf-tag"><b>학생회실</b></span></button>
+      <button class="shopfront door soon" type="button" aria-disabled="true" style="left:1.5%;top:37%;width:48%" aria-label="칭찬 게시판, 준비 중"><span class="sf-pic" data-front="hall_sticker" data-em="⭐" aria-hidden="true"></span><span class="sf-tag"><b>칭찬 게시판</b></span></button>
+      <button class="shopfront door soon" type="button" aria-disabled="true" style="left:50.5%;top:51%;width:48%" aria-label="교무실, 준비 중"><span class="sf-pic" data-front="hall_exam" data-em="📝" aria-hidden="true"></span><span class="sf-tag"><b>교무실</b></span></button>
+      <button class="shopfront door soon" type="button" aria-disabled="true" style="left:1.5%;top:65%;width:48%" aria-label="상담실, 준비 중"><span class="sf-pic" data-front="hall_counsel" data-em="🛋️" aria-hidden="true"></span><span class="sf-tag"><b>상담실</b></span></button>
+    </div>
+    </section>
+    <section class="panel" id="panelClub" hidden aria-labelledby="clubTitle">
+    <button class="street-back" type="button" data-go="hall">복도로</button>
+    <h2 id="clubTitle" class="ph"><span>동아리실</span></h2>
+    <div class="club-head" id="clubHead"><div class="club-head-tx"><b>동아리</b><small>부원 셋의 맞는 능력치 별 하나마다 2%, 가장 크면 30%예요. 바꾸기는 언제든 공짜예요.</small></div></div>
+    <div class="club-tools"><span id="clubShowNote"></span><button class="btn-sub small" id="clubAutoBtn" type="button">자동 추천</button></div>
+    <div id="clubBody"></div>
     </section>
     <section class="panel" id="panelEvent" hidden aria-labelledby="ttlEvent">
       <button class="panel-x" type="button" aria-label="홈으로"><svg viewBox="0 0 24 24" width="18" height="18" aria-hidden="true"><path d="M6 6l12 12M18 6L6 18" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round"/></svg></button>
@@ -2732,6 +2839,23 @@ body{background:radial-gradient(120% 60% at 50% 0%, color-mix(in srgb, var(--pap
 </div>
 
 
+
+<div class="overlay center" id="mSeat" hidden>
+  <div class="backdrop"></div>
+  <section class="modal seat-modal" role="dialog" aria-modal="true" aria-labelledby="seatTitle">
+    <h2 id="seatTitle">동아리</h2>
+    <div class="seat-list" id="seatList"></div>
+    <div class="btn-row"><button class="btn-sub" type="button" id="seatOut" hidden>동아리에서 빼기</button><button class="btn-sub" type="button" id="seatClose">닫기</button></div>
+  </section>
+</div>
+<div class="overlay talk" id="mTalk" hidden>
+  <div class="backdrop"></div>
+  <section class="talk-box" role="dialog" aria-modal="true" aria-labelledby="talkWho">
+    <span class="talk-av" id="talkAv"></span>
+    <div class="talk-tx"><b id="talkWho"></b><p id="talkText" aria-live="polite"></p>
+      <div class="talk-foot"><small id="talkStep"></small><button class="cta small" id="talkNext" type="button" data-autofocus>다음</button></div></div>
+  </section>
+</div>
 
 <div class="overlay center" id="mDecoPick" hidden>
   <div class="backdrop"></div>
@@ -3314,15 +3438,16 @@ body{background:radial-gradient(120% 60% at 50% 0%, color-mix(in srgb, var(--pap
       { name: '대도시', title: '대도시 학교', rep: 130, line: '나무 빌딩이 숲을 이룬 대도시가 되었기에' }
     ]
   };
-  // 학교급: 유치원에서 시작해서 졸업할 때마다 한 칸씩 올라가요. 지금은 초등학교까지 열려 있어요
+  // 학교급: 유치원에서 시작해서 졸업할 때마다 한 칸씩 올라가요. 2.0.0부터 중학교까지 열려 있어요
   // years는 다니는 햇수, grads는 졸업 전에 여는 종업식 수예요. 해마다 끝에는 종업식, 마지막 해 끝에는 졸업식을 열어요
   // 유치원은 '1년째, 2년째', 초등학교부터는 '1학년, 2학년'으로 불러요
   const TIERS = [
     { name: '유치원', school: '숲속 유치원', years: 2, grads: 1, unit: '년째' },
-    { name: '초등학교', school: '숲속 초등학교', years: 6, grads: 5, unit: '학년' },
-    { name: '중학교', school: '숲속 중학교', years: 3, grads: 2, unit: '학년' }
+    { name: '초등학교', school: '숲속 초등학교', years: 6, grads: 5, unit: '학년', newb: '과학실' },
+    { name: '중학교', school: '숲속 중학교', years: 3, grads: 2, unit: '학년', newb: '매점' },
+    { name: '고등학교', school: '숲속 고등학교', years: 3, grads: 2, unit: '학년', newb: '기숙사' }   // 아직 열리지 않았어요(TIER_OPEN)
   ];
-  const TIER_OPEN = 2;
+  const TIER_OPEN = 3;   // 2.0.0: 중학교까지 열려요
   // 학교급이 오르면 수업료는 1000배, 공사비는 2000배라서 숫자 단위가 껑충 커져요
   const incomeScale = () => Math.pow(1000, S.tier);
   const costScale = () => Math.pow(2000, S.tier);
@@ -3341,8 +3466,12 @@ body{background:radial-gradient(120% 60% at 50% 0%, color-mix(in srgb, var(--pap
   const startBudget = L => L < 1 ? 20 : 300 * Math.pow(5, L - 1);
   const NEWCOMERS = [
     { k: 'cat', name: '고양이', ga: '가' }, { k: 'dog', name: '강아지', ga: '가' }, { k: 'penguin', name: '펭귄', ga: '이' },
-    { k: 'panda', name: '판다', ga: '가' }, { k: 'koala', name: '코알라', ga: '가' }, { k: 'otter', name: '수달', ga: '이' }
+    { k: 'panda', name: '판다', ga: '가' }, { k: 'koala', name: '코알라', ga: '가' }, { k: 'otter', name: '수달', ga: '이' },
+    // 2.0.0 새 전학생 6종(지섭 결정): 중학교와 고등학교에서도 해마다 새 친구가 와요
+    { k: 'hamster', name: '햄스터', ga: '가' }, { k: 'duck', name: '오리', ga: '가' }, { k: 'turtle', name: '거북', ga: '이' },
+    { k: 'mole', name: '두더지', ga: '가' }, { k: 'frog', name: '개구리', ga: '가' }, { k: 'waterdeer', name: '고라니', ga: '가' }
   ];
+  const NEWCOMERS_OLD = 6;   // 2.0.0 전의 전학생 수. 옛 저장의 전학생 채우기는 여기까지만 해요(이미 다 만난 학교는 다음 식부터 새 친구가 와요)
   const PERKS = {
     schol: { name: '동문회 장학금', desc: '졸업생들이 보내 주는 장학금으로 수업료가 올라요.',
       cost: L => Math.ceil(2 * Math.pow(1.45, L)), eff: L => `수업료 ×${Math.pow(1.3, L).toFixed(2)}`,
@@ -3389,6 +3518,7 @@ body{background:radial-gradient(120% 60% at 50% 0%, color-mix(in srgb, var(--pap
     library: '헌책방에서 그림책을 한 아름 싸게 판대요!',
     playground: '장터에 놀이 기구 반짝 세일이 열렸대요!',
     science: '장터에 실험 도구 반짝 세일이 열렸대요!',
+    store: '도매 시장에서 과자 상자를 반값에 넘긴대요!',
     teaNew: '숲속 일자리 센터가 소개비를 반만 받는대요!',
     teaUp: '연수원 얼리버드 할인이 열렸대요!'
   };
@@ -3421,7 +3551,12 @@ body{background:radial-gradient(120% 60% at 50% 0%, color-mix(in srgb, var(--pap
     science: { name: '과학실', rep: 1, tier: 1, view: '256 4 88 116',
       desc: '실험 발표회를 열면 학교 소문이 나고 수료증이 늘어요.',
       cost: L => 500 * Math.pow(2, L),
-      eff: L => L < 1 ? '아직 없어요' : `수료증 +${3 * L}%, 평판 +${L}` }
+      eff: L => L < 1 ? '아직 없어요' : `수료증 +${3 * L}%, 평판 +${L}` },
+    // 2.0.0 중학교부터 생기는 새 시설. 값과 효과는 균형 제안서(2.0.0)에서 정해요
+    store: { name: '매점', rep: 1, tier: 2, per: 15, view: '0 0 100 100',
+      desc: '간식과 음료를 파는 매점이에요. 쉬는 시간이 즐거워서 수업료가 올라요.',
+      cost: L => 300 * Math.pow(1.8, L),
+      eff: L => L < 1 ? '아직 없어요' : `수업료 +${FAC.store.per * L}%` }
   };
   // 지금 학교급에서 쓸 수 있는 시설
   const facKeys = () => Object.keys(FAC).filter(k => (FAC[k].tier || 0) <= S.tier);
@@ -3744,7 +3879,7 @@ body{background:radial-gradient(120% 60% at 50% 0%, color-mix(in srgb, var(--pap
   // tier: 학교급(0 유치원, 1 초등학교), tg: 이 학교급에서 연 종업식, tdip: 이 학교급에서 모은 수료증, fund와 fp: 장학재단 기금과 강화
   const fresh = () => ({
     v: 4, pid: randCode(8), born: Date.now(), budget: 20, students: 4,
-    f: { classroom: 1, cafeteria: 0, library: 0, playground: 0, science: 0 },
+    f: { classroom: 1, cafeteria: 0, library: 0, playground: 0, science: 0, store: 0 },
     fu: freshFu(),
     t: { squirrel: 1, owl: 0, bear: 0 },
     vp: 0,   // 1.7.0 고슴도치 교감 선생님 연수 레벨 (0~10)
@@ -3755,8 +3890,8 @@ body{background:radial-gradient(120% 60% at 50% 0%, color-mix(in srgb, var(--pap
     tier: 0, tg: 0, tdip: 0, fund: 0, fp: { schol: 0, rep: 0, dip: 0 },
     hd: { day: '', n: 0, feastUntil: 0, album: false, seen: false, furNew: true },
     oak: OAK.max,
-    st: { picks: 0, ups: 0, trains: 0, claims: 0, grads: 0, perks: 0, fperks: 0, shakes: 0, dips: 0, play: 0, sess: 0, ads: 0, gold: 0, gspent: 0, trips: 0, sports: 0, dmDone: 0, pz: 0 },
-    p: { dip: 0, species: 0, ticket: 0, nl: [0, 0, 0, 0, 0, 0], perk: { schol: 0, rep: 0, start: 0, drop: 0, night: 0 } },
+    st: { picks: 0, ups: 0, trains: 0, claims: 0, grads: 0, perks: 0, fperks: 0, shakes: 0, dips: 0, play: 0, sess: 0, ads: 0, gold: 0, gspent: 0, trips: 0, sports: 0, dmDone: 0, pz: 0, trials: 0, shows: 0 },   // 2.0.0: trials(1.7.4 침입자)가 저장에서 빠지던 것을 고치고 shows(동아리 발표회)를 더해요
+    p: { dip: 0, species: 0, ticket: 0, nl: NEWCOMERS.map(() => 0), perk: { schol: 0, rep: 0, start: 0, drop: 0, night: 0 } },
     att: { last: '', n: 0 },
     ad: { day: '', n: 0 },
     u: { boost: false, dev: false },
@@ -3770,7 +3905,7 @@ body{background:radial-gradient(120% 60% at 50% 0%, color-mix(in srgb, var(--pap
     lg: { week: -1, pts: 0, pos: 0, paid: false, last: null },
     gold: 5, gd: { day: '', n: 0, shop: 0 }, cos: { own: [], hat: '', neck: '', th: { bg: '', classroom: '', cafeteria: '', library: '', science: '', playground: '' }, sp: { classroom: '', cafeteria: '', library: '', science: '', playground: '' } }, autoUntil: 0,
     rank: { name: '', joined: false, sent: -1, by: '', ren: 0, asked: false },
-    bs: { classroom: 0, cafeteria: 0, library: 0, science: 0, playground: 0 },   // 1.7.0 건물마다 지금 보이는 모습의 학교급
+    bs: { classroom: 0, cafeteria: 0, library: 0, science: 0, playground: 0, store: 0 },   // 1.7.0 건물마다 지금 보이는 모습의 학교급
     mg: mgFresh(),   // 1.8.0 숲속 합치기
     dex: { got: {}, paid: [] }, ev: { cur: '', start: 0, stamp: { n: 0, last: '' }, list: [], box: false },   // 1.7.0 도감, 이벤트
     // 1.6.0 숲의 정수(미니게임에서만 얻어요)와 블록 퍼즐: 오늘 보상 판 수, 광고로 더한 횟수, 최고 점수, 하던 판
@@ -3779,6 +3914,7 @@ body{background:radial-gradient(120% 60% at 50% 0%, color-mix(in srgb, var(--pap
     fg: { day: '', got: [] },   // 1.7.2 학교 행사 황금 도토리: 행사마다 하루 한 번(got에 오늘 받은 행사 id)
     es: { day: '', n: 0, week: -1, g: 0, x: 0 },
     deco: freshDeco(),   // 1.7.4 꾸미기: own 가진 장식 수, lay 지도별 자리(유치원, 초등학교)마다 놓인 장식 id, nm 학교 이름 앞부분('' = 숲속), mk 학교 마크 [모양, 문양, 바탕 색, 문양 색] 또는 null   // 1.6.0 정수 상점: 오늘 산 도토리 묶음 수, 이번 주 산 황금 도토리 묶음 수
+    roster: freshRoster(), club: freshClub(), snap: {},   // 2.0.0 학생 명부, 동아리, 학교급 사진(졸업식 때 남긴 모습)
     q: freshQ()
   });
   const repOf = s => s.f.classroom + s.f.cafeteria + s.f.playground + 3 * s.f.library + s.f.science + 2 * (s.t.squirrel + s.t.owl + s.t.bear) + 5 * s.p.perk.rep + 10 * s.fp.rep;
@@ -3935,13 +4071,14 @@ body{background:radial-gradient(120% 60% at 50% 0%, color-mix(in srgb, var(--pap
     // 1.3.0: 개발자 '졸업 조건 채우기'로 건너뛴 해가 종업식 횟수와 전학생에 빠져 있으면 학년에 맞춰 채워요
     const yearsDone = s.tier === 0 ? s.tg : TIERS[0].grads + 1 + s.tg;
     if (s.st.grads < yearsDone) s.st.grads = yearsDone;
-    if (s.p.species < Math.min(NEWCOMERS.length, yearsDone)) s.p.species = Math.min(NEWCOMERS.length, yearsDone);
+    if (s.p.species < Math.min(NEWCOMERS_OLD, yearsDone)) s.p.species = Math.min(NEWCOMERS_OLD, yearsDone);
     sanitize170(d, s);   // 1.7.0 도감, 이벤트
     sanitize180(d, s);   // 1.8.0 숲속 합치기
     s.vp = Math.min(VP.max, Math.floor(num(d.vp, 0, 0)));   // 1.7.0 교감 선생님
     for (const k of Object.keys(XT)) s.xt[k] = Math.min(XT[k].max, Math.floor(num(d.xt && d.xt[k], 0, 0)));   // 1.7.1 새 선생님
     sanitize171(d, s);   // 1.7.1 업적
     sanitize174(d, s);   // 1.7.4 꾸미기
+    sanitize200(d, s);   // 2.0.0 명부, 동아리, 학교급 사진
     // 1.7.0 학교급별 건물 외관: 예전 저장은 지금 보이는 모습 그대로(유치원 모습, 과학실과 운동장은 초등학교 모습) 시작해서 다음 업그레이드 때 바뀌어요
     if (d.bs && typeof d.bs === 'object') { for (const k of Object.keys(s.bs)) s.bs[k] = Math.min(s.tier, Math.floor(num(d.bs[k], 0, 0))); }
     else { s.bs.science = Math.min(1, s.tier); s.bs.playground = Math.min(1, s.tier); }
@@ -4021,8 +4158,10 @@ body{background:radial-gradient(120% 60% at 50% 0%, color-mix(in srgb, var(--pap
   // 종업식으로 남는 배수: 장학금은 레벨마다 1.3배씩 곱해지고, 전학생은 한 명마다 +5%
   // 전학 온 친구: 한 명마다 +5%, 다 온 뒤에는 친구 성장 쪽지로 키운 레벨마다 +2%
   const nlSum = () => (S.p.nl || []).reduce((a, b) => a + b, 0);
+  // 친구 성장 쪽지 고르기: 전학생을 다 만났거나, 이미 쪽지를 받아 키우기 시작한 학교(2.0.0에 전학생이 12종으로 늘기 전에 6종을 다 만난 학교)
+  const growOn = () => S.p.species >= NEWCOMERS.length || (S.p.ticket || 0) > 0 || nlSum() > 0;
   const legacyMult = () => Math.pow(1.3, S.p.perk.schol) * (1 + 0.05 * S.p.species + 0.02 * nlSum()) * Math.pow(2, S.fp.schol);
-  const tuitionMult = () => (1 + 0.2 * S.f.cafeteria) * (1 + 0.15 * S.t.squirrel) * legacyMult() * setBonusMult() * tripMult();
+  const tuitionMult = () => (1 + 0.2 * S.f.cafeteria) * (1 + 0.15 * S.t.squirrel) * (1 + FAC.store.per / 100 * (S.f.store || 0)) * legacyMult() * setBonusMult() * tripMult() * clubTuitionMult();
   const feastOn = () => Date.now() < S.hd.feastUntil;
   const rate = () => Math.min(S.students, capacity()) * CFG.base * CFG.pace * tuitionMult() * Math.pow(CFG.gradeMult, S.grade) * incomeScale() * (feastOn() ? 2 : 1);
   const offlineEff = () => Math.min(1, 0.3 + 0.15 * S.t.owl);
@@ -4039,7 +4178,8 @@ body{background:radial-gradient(120% 60% at 50% 0%, color-mix(in srgb, var(--pap
   const finalYear = () => nextTierOpen() && S.tg >= tierInfo().grads;
   // 마지막 해에는 종업식 대신 졸업식을 열어요. 다음 학교급이 아직 안 열렸으면 종업식을 계속 열 수 있어요
   // 초등학교는 학년마다 메인 퀘스트 한 장이 있어서, 그 장을 마쳐야(그 학년 종업식 퀘스트까지 와야) 종업식을 열 수 있어요
-  const yearGateIdx = () => S.tier === 1 ? MAIN.findIndex(q => q.ye === S.tg + 1) : -1;
+  // 2.0.0: 중학교 학년 장도 같은 규칙(yt는 그 퀘스트의 학교급, 없으면 초등학교)
+  const yearGateIdx = () => S.tier >= 1 ? MAIN.findIndex(q => q.ye === S.tg + 1 && (q.yt || 1) === S.tier) : -1;
   // 예전 장(1~6장)에 머물러 있는 학교는 막지 않아요. 수료증이 있어야 하는 퀘스트가 종업식에 막혀 멈추지 않게요
   const yearLocked = () => { const i = yearGateIdx(), q = MAIN[S.q.m]; return i >= 0 && S.q.m < i && !!q && q.ch >= 6; };
   const yearLeft = () => Math.max(0, yearGateIdx() - S.q.m);
@@ -4521,7 +4661,19 @@ body{background:radial-gradient(120% 60% at 50% 0%, color-mix(in srgb, var(--pap
       fount: [180, 187, 28, 19],
       tea: { hedgehog: [34, 200, 0.57], squirrel: [110, 208, 0.6], bear: [338, 300, 0.72], owl: [100, 332, 0.69], owlAway: [30, 290, 0.63] },
       deco: [[56, 66], [312, 70], [22, 312], [338, 196], [60, 420], [302, 424], [128, 380], [236, 392]],
-      sports: [277, 270, 50, 22], eaves: { classroom: 0.02, cafeteria: 0.0, library: 0.0, science: -0.06, playground: -0.14 } }
+      sports: [277, 270, 50, 22], eaves: { classroom: 0.02, cafeteria: 0.0, library: 0.0, science: -0.06, playground: -0.14 } },
+    // 2.0.0 중학교: 지도 그림(작업지시서 19 다시 그리는 중)이 오기 전에는 초등학교 지도와 자리를 쓰고, 매점은 초등학교의 매점 공사 자리에 지어요.
+    // 기숙사 공사 자리는 임시로 교문 왼쪽 아래. 지도가 오면 lots_middle.md로 모두 바꿔요
+    { map: 'map_middle', fb: 'map_elem',
+      lot: { science: [50, 24.3, 34], classroom: [23, 36, 26], cafeteria: [79.5, 35.5, 25], library: [22.5, 58.5, 27], playground: [78, 60.5, 38], store: [48.5, 65.5, 23] },
+      nextLot: [24, 78, 18], nextKey: 'bld_classroom_lock',
+      next: { img: 'bld_dorm_lock', fb: 'bld_classroom_lock', tag: '고등학교에서 열려요', name: '기숙사' },
+      oak: [302, 376], plaza: [179, 196], gate: [180, 492], bus: [204, 430], drop: [180, 238, 40, 14],
+      spots: [[134, 196], [224, 196], [152, 226], [206, 226], [179, 236], [179, 158], [146, 170], [212, 170], [122, 200], [240, 186], [140, 232], [208, 240], [150, 246], [196, 246], [104, 182], [254, 196]],
+      fount: [180, 187, 28, 19],
+      tea: { hedgehog: [34, 200, 0.57], squirrel: [110, 208, 0.6], bear: [338, 300, 0.72], owl: [100, 332, 0.69], owlAway: [30, 290, 0.63] },
+      deco: [[56, 66], [312, 70], [22, 312], [338, 196], [60, 420], [302, 424], [128, 380], [236, 392]],
+      sports: [277, 270, 50, 22], eaves: { classroom: 0.02, cafeteria: 0.0, library: 0.0, science: -0.06, playground: -0.14, store: 0 } }
   ];
   // 1.7.3 건물 그림마다 바닥 섬(가장 넓은 줄)의 자리: [가로 중심 - 0.5, 세로 중심 - 0.5, 너비] (그림 한 변 기준, dev에서 그림을 재서 적었어요)
   const BLD_ISL = {bld_cafeteria_lock:[0.004,0.098,0.952],bld_cafeteria_lock_winter:[0.005,0.096,0.955],bld_cafeteria_on:[0.007,0.123,0.935],bld_cafeteria_on_winter:[0.007,0.125,0.935],bld_cafeteria_s2:[0.008,0.101,0.939],bld_cafeteria_s2_winter:[0.007,0.104,0.935],bld_classroom_lock:[0.005,0.05,0.95],bld_classroom_lock_winter:[0.004,0.049,0.948],bld_classroom_on:[0.011,0.104,0.939],bld_classroom_on_winter:[0.01,0.104,0.94],bld_classroom_s2:[0.01,0.106,0.938],bld_classroom_s2_winter:[0.01,0.109,0.94],bld_field_on:[0.006,0.021,0.948],bld_field_on_winter:[0.006,0.021,0.954],bld_library_on:[0.007,0.132,0.94],bld_library_on_winter:[0.007,0.13,0.935],bld_library_s2:[0.011,0.11,0.938],bld_library_s2_winter:[0.014,0.113,0.942],bld_playground_lock:[0.006,0.051,0.948],bld_playground_lock_winter:[0.009,0.05,0.952],bld_playground_on:[0.0,0.041,0.915],bld_playground_on_winter:[0.0,0.05,0.92],bld_science_on:[0.011,0.119,0.884],bld_science_on_winter:[0.012,0.12,0.895]};
@@ -4533,19 +4685,24 @@ body{background:radial-gradient(120% 60% at 50% 0%, color-mix(in srgb, var(--pap
   }
   // 길 찾기, 누르는 자리, 이름표는 학교급마다 대표 그림 기준 자리(b)를 써요. 실제 그림은 그 그림의 바닥 섬에 맞춰 조금씩 옮겨요
   const BASE_KEY = [{ science: 'bld_science_on', classroom: 'bld_classroom_on', cafeteria: 'bld_cafeteria_on', library: 'bld_library_on', playground: 'bld_playground_on' },
-    { science: 'bld_science_on', classroom: 'bld_classroom_on', cafeteria: 'bld_cafeteria_on', library: 'bld_library_on', playground: 'bld_field_on' }];
+    { science: 'bld_science_on', classroom: 'bld_classroom_on', cafeteria: 'bld_cafeteria_on', library: 'bld_library_on', playground: 'bld_field_on' },
+    { science: 'bld_science_on', classroom: 'bld_classroom_on', cafeteria: 'bld_cafeteria_on', library: 'bld_library_on', playground: 'bld_field_on', store: 'bld_store_on' }];
   GEO.forEach((G, i) => {
     G.b = {}; for (const k of Object.keys(G.lot)) G.b[k] = lotRect(G.lot[k], BASE_KEY[i][k]);
     G.next.at = lotRect(G.nextLot, G.nextKey);
   });
-  const geo = () => GEO[S && S.tier >= 1 ? 1 : 0];
+  // 학교급마다 지도 한 장. 지도가 아직 없는 학교급은 마지막 지도를 써요
+  const geoIdx = t => Math.min(GEO.length - 1, Math.max(0, t === undefined ? (S ? S.tier : 0) : t));
+  const geo = t => GEO[geoIdx(t)];
   const IMG = k => (window.FS_IMG && window.FS_IMG[k]) || (window.FS_IMG171 && window.FS_IMG171[k]) || (window.FS_IMG174 && window.FS_IMG174[k]) || '';   // 1.7.1, 1.7.4 묶음도 찾아요
-  const BLD_IMG = { classroom: 'bld_classroom_on', cafeteria: 'bld_cafeteria_on', library: 'bld_library_on', science: 'bld_science_on' };
-  const SITE_IMG = { classroom: 'bld_classroom_lock', science: 'bld_classroom_lock', library: 'bld_classroom_lock', cafeteria: 'bld_cafeteria_lock', playground: 'bld_playground_lock' };
+  const BLD_IMG = { classroom: 'bld_classroom_on', cafeteria: 'bld_cafeteria_on', library: 'bld_library_on', science: 'bld_science_on', store: 'bld_store_on' };
+  const SITE_IMG = { classroom: 'bld_classroom_lock', science: 'bld_classroom_lock', library: 'bld_classroom_lock', cafeteria: 'bld_cafeteria_lock', playground: 'bld_playground_lock', store: 'bld_store_lock' };
+  // 2.0.0 그림이 아직 없을 때 대신 쓸 그림(매점 그림은 작업지시서 19). 그림을 넣으면 저절로 진짜 그림이 나와요
+  const ART_FB = { bld_store_on: 'bld_cafeteria_on', bld_store_lock: 'bld_cafeteria_lock', bld_dorm_lock: 'bld_classroom_lock', map_middle: 'map_elem' };
   // 1.7.0 학교급별 건물 외관: 학교급이 오른 뒤 그 건물을 처음 키우면 그 학교급 모습으로 바뀌어요(가구와 같은 규칙).
   // S.bs[k]는 지금 보이는 모습의 학교급이고, 단계는 학교급 + 1(최대 4)이에요. 그림이 없는 단계는 바로 아래 단계 그림을 써요.
   // 1단계는 원래 그림(과학실과 운동장은 원래 그림이 2단계), 2~4단계는 1.7.0 묶음의 bld_{k}_s{n}이에요
-  const IMG170 = k => (window.FS_IMG170 && window.FS_IMG170[k]) || IMG(k);
+  const IMG170 = k => (window.FS_IMG170 && window.FS_IMG170[k]) || IMG(k) || (ART_FB[k] ? IMG170(ART_FB[k]) : '');
   const has170 = k => !!(window.FS_IMG170 && window.FS_IMG170[k]);
   const bldStage = k => Math.min(4, ((S.bs && S.bs[k]) || 0) + 1);
   const stageKey = (pre, n, min) => { for (let i = n; i >= min; i--) if (has170(`${pre}_s${i}`)) return `${pre}_s${i}`; return ''; };
@@ -4572,7 +4729,7 @@ body{background:radial-gradient(120% 60% at 50% 0%, color-mix(in srgb, var(--pap
   };
   const oakKey = () => { const id = S && S.cos && S.cos.th && S.cos.th.bg; return id && has170('oak_' + id) ? 'oak_' + id : 'oak'; };
   function setBldArt(k) {
-    const g = $('#b-' + k); if (!g) return;
+    const g = $('#b-' + k); if (!g || !geo().lot[k]) return;
     const key = seasonKey(bldImg(k)), G = geo(), [bx, by, bw] = lotRect(G.lot[k], key);
     $$('.built .bimg, .built .roofimg', g).forEach(im => setA(im, { x: bx - bw / 2, y: by - bw / 2, width: bw, height: bw }));
     $('.built .bimg', g).setAttribute('href', IMG170(key));
@@ -4582,33 +4739,32 @@ body{background:radial-gradient(120% 60% at 50% 0%, color-mix(in srgb, var(--pap
   // 테마를 바꾸면 건물, 공사 자리, 다음 학교급 자리, 참나무 그림을 다시 골라요
   function setSeasonArt() {
     if (!S || !$('#map')) return;
-    for (const k of Object.keys(FAC)) { const g = $('#b-' + k); if (!g) continue; setBldArt(k); $('.site .bimg', g).setAttribute('href', IMG170(seasonKey(SITE_IMG[k]))); }
+    for (const k of Object.keys(FAC)) { const g = $('#b-' + k); if (!g || !geo().lot[k]) continue; setBldArt(k); $('.site .bimg', g).setAttribute('href', IMG170(seasonKey(SITE_IMG[k]))); }
     const nx = $('#b-next'), G = geo(); if (nx && G.next) $('.bimg', nx).setAttribute('href', IMG170(seasonKey(G.next.img)));
     const oak = $('.oak-img'); if (oak) oak.setAttribute('href', IMG170(oakKey()) || IMG('deco_autumn_1'));
   }
   // 1.7.0 테마 지도: 배경 테마(봄, 여름, 가을, 겨울, 크리스마스)를 고르면 지도 그림도 그 계절 모습으로 바꿔요. 그림이 없는 테마는 기본 지도
-  const mapKey = base => { const id = S && S.cos && S.cos.th && S.cos.th.bg; return id && has170(`${base}_${id}`) ? `${base}_${id}` : base; };
+  const mapKey = base => { const id = S && S.cos && S.cos.th && S.cos.th.bg; if (ART_FB[base] && !has170(base) && !IMG(base)) base = ART_FB[base]; return id && has170(`${base}_${id}`) ? `${base}_${id}` : base; };
   function setMapArt() {
-    $('#mapImg0').setAttribute('href', IMG170(mapKey('map_kinder')));
-    $('#mapImg1').setAttribute('href', IMG170(mapKey('map_elem')));
+    GEO.forEach((G, i) => { const el = $('#mapImg' + i); if (el) el.setAttribute('href', IMG170(mapKey(G.map))); });
     mapBackdrop();
   }
   // 1.7.2: 지도를 아래로 끌어내리면 지도 위쪽에 빈 곳이 보여요. 하늘색 고정 배경 대신 지금 지도 그림(테마 지도 포함)을 흐리게 깔아서 어느 테마에서도 이어져 보이게 해요
   function mapBackdrop() {
     const fr = $('.frame'); if (!fr || !S) return;
-    const u = IMG170(mapKey(S.tier >= 1 ? 'map_elem' : 'map_kinder'));
+    const u = IMG170(mapKey(geo().map));
     fr.style.setProperty('--map-bg', u ? `url("${u}")` : 'none');
   }
   const bpos = k => geo().b[k];
   const setA = (el, o) => { for (const [k, v] of Object.entries(o)) el.setAttribute(k, typeof v === 'number' ? +v.toFixed(1) : v); };
   function layoutMap() {
-    const G = geo(), key = S.tier >= 1 ? 1 : 0;
+    const G = geo(), key = geoIdx();
     mapBackdrop();
     if (rt.mapLaid === key) return;
     rt.mapLaid = key;
     setMapArt();
     for (const k of Object.keys(FAC)) {
-      const g = $('#b-' + k); if (!g) continue;
+      const g = $('#b-' + k); if (!g || !G.b[k]) continue;
       const [cx, cy, w] = G.b[k];
       setBldArt(k);
       const sk = seasonKey(SITE_IMG[k]), [sx, sy, sw] = lotRect(G.lot[k], sk);
@@ -4768,12 +4924,15 @@ body{background:radial-gradient(120% 60% at 50% 0%, color-mix(in srgb, var(--pap
   // 학생 옷차림은 학교급마다 달라요. 유치원은 노란 모자와 이름표, 초등학교는 책가방과 실내화 주머니
   // 1.5.0: 학생은 그림(PNG). 발은 y 11.5에 닿고, 모자와 목도리 꾸미기는 머리 자리에 겹쳐 그려요
   const HEAD_Y = { rabbit: 0.5, fox: 0.36, raccoon: 0.33, chick: 0.34, bear: 0.31, cat: 0.35, dog: 0.32, penguin: 0.3, panda: 0.31, koala: 0.33, otter: 0.33 };
+  // 2.0.0 새 전학생 그림(작업지시서 20)이 오기 전에는 그림 문자로 보여 줘요
+  const KID_EMOJI = { hamster: '🐹', duck: '🦆', turtle: '🐢', mole: '🐭', frog: '🐸', waterdeer: '🦌' };
   function kidSVG(sp, bag, look) {
     const hat = look ? look.hat : (S ? S.cos.hat : ''), neck = look ? look.neck : (S ? S.cos.neck : '');
     const ar = CHR_AR['chr_' + sp] || 0.75, h = Math.min(24, 21 / ar), w = h * ar, top = 11.5 - h;
-    const hy = top + h * (HEAD_Y[sp] || 0.33), r = h * 0.2;
+    const hy = top + h * (HEAD_Y[sp] || 0.33), r = h * 0.2, pic = FSI('chr_' + sp);
     return `<ellipse cx="0" cy="11.6" rx="${(w * 0.32).toFixed(1)}" ry="1.6" class="c-shadow"/>` +
-      `<image href="${FSI('chr_' + sp)}" x="${(-w / 2).toFixed(2)}" y="${top.toFixed(2)}" width="${w.toFixed(2)}" height="${h.toFixed(2)}"/>` +
+      (pic || !KID_EMOJI[sp] ? `<image href="${pic}" x="${(-w / 2).toFixed(2)}" y="${top.toFixed(2)}" width="${w.toFixed(2)}" height="${h.toFixed(2)}"/>`
+        : `<text x="0" y="9.5" text-anchor="middle" font-size="15">${KID_EMOJI[sp]}</text>`) +
       (hat || neck ? `<g transform="translate(0 ${hy.toFixed(2)}) scale(${(r / 6).toFixed(3)})">${neck ? NECKS[neck] : ''}${hat ? hatSVG(hat) : ''}</g>` : '') +
       `<g transform="translate(0 ${(top + 4).toFixed(1)})">${nlBadge(sp)}</g>`;
   }
@@ -5297,6 +5456,8 @@ body{background:radial-gradient(120% 60% at 50% 0%, color-mix(in srgb, var(--pap
   function renderMap() {
     map.classList.toggle('tier-0', !(S.tier >= 1));
     map.classList.toggle('tier-1', S.tier >= 1);
+    map.classList.toggle('tier-2', S.tier >= 2);   // 2.0.0 중학교부터 매점
+    for (let i = 0; i < GEO.length; i++) map.classList.toggle('g-' + i, geoIdx() === i);
     layoutMap();
     renderTown(false);
     for (const k of facKeys()) {
@@ -5468,7 +5629,7 @@ body{background:radial-gradient(120% 60% at 50% 0%, color-mix(in srgb, var(--pap
     if (rt.tab === 'quests') renderMissions();
     $('#btnAtt').hidden = !attUnlocked();
     $('#attDot').hidden = !attUnlocked() || !canStamp();
-    $('#gDot').hidden = rt.tab === 'grad' || !(canGraduate() || canPromote() || (S.p.ticket > 0 && S.p.species >= NEWCOMERS.length) || Object.keys(PERKS).some(k => !perkMaxed(k) && S.p.dip >= perkCost(k)) || Object.keys(FPERKS).some(k => S.fund >= fpCost(k)));
+    $('#gDot').hidden = rt.tab === 'grad' || !(canGraduate() || canPromote() || (S.p.ticket > 0 && growOn()) || Object.keys(PERKS).some(k => !perkMaxed(k) && S.p.dip >= perkCost(k)) || Object.keys(FPERKS).some(k => S.fund >= fpCost(k)));
     renderGradPanel(false);
   }
 
@@ -5484,7 +5645,8 @@ body{background:radial-gradient(120% 60% at 50% 0%, color-mix(in srgb, var(--pap
     cafeteria: [{ id: 'table', name: '식탁' }, { id: 'counter', name: '배식대' }, { id: 'water', name: '정수기' }, { id: 'rack', name: '식판 선반' }],
     library: [{ id: 'shelf', name: '책장' }, { id: 'rdesk', name: '열람 책상' }, { id: 'sofa', name: '독서 소파' }, { id: 'lamp', name: '스탠드' }],
     playground: [{ id: 'slide', name: '미끄럼틀' }, { id: 'swing', name: '그네' }, { id: 'bars', name: '철봉' }, { id: 'bench', name: '벤치' }],
-    science: [{ id: 'lab', name: '실험대' }, { id: 'scope', name: '현미경' }, { id: 'chem', name: '약품장' }, { id: 'globe', name: '지구본' }]
+    science: [{ id: 'lab', name: '실험대' }, { id: 'scope', name: '현미경' }, { id: 'chem', name: '약품장' }, { id: 'globe', name: '지구본' }],
+    store: [{ id: 'snackrack', name: '간식 진열대' }, { id: 'fridge', name: '음료 냉장고' }, { id: 'register', name: '계산대' }, { id: 'snacktable', name: '간식 탁자' }]   // 2.0.0
   };
   const batchim = w => { const c = w.charCodeAt(w.length - 1); return c >= 0xAC00 && c <= 0xD7A3 && (c - 0xAC00) % 28 > 0; };
   const iga = w => w + (batchim(w) ? '이' : '가'), eun = w => w + (batchim(w) ? '은' : '는');
@@ -5681,6 +5843,12 @@ body{background:radial-gradient(120% 60% at 50% 0%, color-mix(in srgb, var(--pap
       scope: { cnt: n => furCnt(n, 1, 6, 4), at: [[112, 90], [134, 90], [156, 90], [178, 90]] },
       chem: { cnt: n => furCnt(n, 1, 9, 2), at: [[262, 100], [290, 100]] },
       globe: { cnt: n => furCnt(n, 1, 99, 1), at: [[208, 90]] }
+    },
+    store: {   // 2.0.0 매점: 진열대는 뒷벽, 냉장고는 오른쪽 벽, 계산대는 앞 왼쪽, 간식 탁자는 가운데
+      snackrack: { cnt: n => furCnt(n, 1, 6, 3) },
+      fridge: { cnt: n => furCnt(n, 1, 9, 2) },
+      register: { cnt: n => furCnt(n, 1, 99, 1) },
+      snacktable: { cnt: n => furCnt(n, 1, 5, 4) }
     }
   };
   // 방 배경. 0~64는 뒷벽, 그 아래는 바닥이에요
@@ -5713,6 +5881,11 @@ body{background:radial-gradient(120% 60% at 50% 0%, color-mix(in srgb, var(--pap
       // 시범 실험대
       '<rect x="104" y="70" width="112" height="9" rx="1.2" fill="#3E4A52" stroke="#4E3D2C"/><rect x="104" y="79" width="112" height="12" rx="1.2" fill="#D6A46A" stroke="#4E3D2C"/>'
   };
+  // 2.0.0 매점 방(그림 room_store가 오기 전 임시)
+  FUR_ROOM.store = '<rect x="-12.5" width="345" height="230" fill="#E7D3B4"/>' + Array.from({ length: 8 }, (_, i) => `<path d="M-12 ${84 + i * 20} H332" stroke="#D4BC98"/>`).join('') +
+    '<rect x="-12.5" width="345" height="64" fill="#F4E6CC"/><rect x="-12.5" y="60" width="345" height="5" fill="#A9845C"/>' +
+    '<path d="M60 8 h200 l-10 16 h-180 z" fill="#E9806E"/><path d="M80 8 v16 M100 8 v16 M120 8 v16 M140 8 v16 M160 8 v16 M180 8 v16 M200 8 v16 M220 8 v16 M240 8 v16" stroke="#FFF6E6" stroke-width="5"/>' +
+    '<rect x="20" y="22" width="56" height="34" rx="2" fill="#BEE0EA" stroke="#A9845C" stroke-width="2.5"/><rect x="244" y="22" width="56" height="34" rx="2" fill="#BEE0EA" stroke="#A9845C" stroke-width="2.5"/>';
   // 급식실 칠판의 오늘의 급식: 실제 요일(일 0 ~ 토 6)에 따라 바뀌어요
   const MENU = [['오늘은 급식이 없어요', '월요일에 만나요'], ['도토리밥 버섯국', '산딸기 푸딩'], ['당근 볶음밥', '클로버 샐러드'], ['밤 카레라이스', '꿀 호떡'],
     ['연어 주먹밥', '블루베리 요거트'], ['호박 수프', '솔방울 쿠키'], ['오늘은 급식이 없어요', '월요일에 만나요']];
@@ -5720,7 +5893,7 @@ body{background:radial-gradient(120% 60% at 50% 0%, color-mix(in srgb, var(--pap
 
   /* 1.5.0 시설 안: 방 배경 그림 위에 가구 그림을 올려요. 바닥은 위에서 40%(y 92)부터예요.
      자리는 [가운데 x, 바닥에 닿는 y], 너비는 지도 단위. 뒤쪽(y가 작은 곳)일수록 조금 작게 그려요 */
-  const FUR_AR = { desk: 0.75, chair: 1.56, fan: 1.84, locker: 2.27, table: 0.53, counter: 0.43, water: 2.29, rack: 0.96, shelf: 1.28, rdesk: 0.39, sofa: 0.66, lamp: 2.40, lab: 0.87, scope: 1.72, chem: 0.91, globe: 1.41, slide: 1.00, swing: 0.70, bars: 0.46, bench: 0.57 };
+  const FUR_AR = { desk: 0.75, chair: 1.56, fan: 1.84, locker: 2.27, table: 0.53, counter: 0.43, water: 2.29, rack: 0.96, shelf: 1.28, rdesk: 0.39, sofa: 0.66, lamp: 2.40, lab: 0.87, scope: 1.72, chem: 0.91, globe: 1.41, slide: 1.00, swing: 0.70, bars: 0.46, bench: 0.57, snackrack: 1, fridge: 1.8, register: 0.75, snacktable: 0.8 };
   // 1.7.0 방 배치 다시 짜기(실제 모습처럼): 뒤쪽은 좁고 작게, 앞쪽은 넓고 크게 보이는 원근에 맞춰 놓아요.
   // furP(u, y): 바닥 y에서 가로 위치 u(-1 왼쪽 벽 ~ 1 오른쪽 벽)를 지도 단위 x로 바꿔요. 자리는 [x, 바닥에 닿는 y]이고 앞(위쪽 자리)부터 채워요.
   // on: 다른 가구 위에 올려요(현미경은 실험대 위, 지구본은 약품장 위). dx는 받침 가구 너비에 대한 가로 비율, dy는 받침 가구 높이에 대한 높이 비율
@@ -5751,6 +5924,12 @@ body{background:radial-gradient(120% 60% at 50% 0%, color-mix(in srgb, var(--pap
       swing: { w: 90, at: [[166, 148]] },
       bars: { w: 74, at: [[262, 174]] },
       bench: { w: 50, at: [[38, 226], [114, 228], [206, 228], [282, 226]] }
+    },
+    store: {   // 2.0.0 매점(가구 그림이 오면 자리를 다시 맞춰요)
+      snackrack: { w: 58, at: [furP(-0.3, 114), furP(0.3, 114), furP(-0.78, 114)] },
+      fridge: { w: 30, at: [[296, 150], [300, 192]] },
+      register: { w: 56, at: [furP(-0.62, 226)] },
+      snacktable: { w: 50, at: furGrid([-0.1, 0.5], [164, 204]) }
     },
     science: {   // 실험대는 가운데 두 줄, 현미경은 실험대 위, 약품장은 뒷벽 오른쪽, 지구본은 약품장 위
       lab: { w: 62, at: furGrid([-0.42, 0.42], [160, 192, 224]) },
@@ -5858,7 +6037,7 @@ body{background:radial-gradient(120% 60% at 50% 0%, color-mix(in srgb, var(--pap
     cafeteria: () => { const m = MENU[new Date().getDay()]; return '<g class="room-menu"><rect x="10" y="14" width="88" height="48" rx="4" class="room-menu-bg"/><text x="54" y="28" text-anchor="middle" class="fur-menu-h">오늘의 급식</text>' +
       `<text x="54" y="42" text-anchor="middle" class="fur-menu">${m[0]}</text><text x="54" y="54" text-anchor="middle" class="fur-menu">${m[1]}</text></g>`; }
   };
-  const roomImg = k => `<image href="${IMG('room_' + k)}" x="-12.5" y="0" width="345" height="230" preserveAspectRatio="none"/>` + (ROOM_TXT[k] ? ROOM_TXT[k]() : '');
+  const roomImg = k => (IMG('room_' + k) || !FUR_ROOM[k] ? `<image href="${IMG('room_' + k)}" x="-12.5" y="0" width="345" height="230" preserveAspectRatio="none"/>` : FUR_ROOM[k]) + (ROOM_TXT[k] ? ROOM_TXT[k]() : '');
   // 방 안 가구를 모두 그려요. 앞(아래)에 있는 것이 위에 그려지게 깊이 순서로 놓아요
   function furInstances(k) {
     const out = [];
@@ -5905,7 +6084,7 @@ body{background:radial-gradient(120% 60% at 50% 0%, color-mix(in srgb, var(--pap
     return roomImg(k) + body + '<g id="roomWalk" class="room-walk" aria-hidden="true"></g>' + tagSvg;   // 1.7.1 방 안을 걷는 선생님과 학생은 가구 위, 이름표 아래
   }
   // 레벨 표를 가구 가운데 아래쪽에 맞추는 거리
-  const FUR_TAGDX = { desk: 14, chair: 7, fan: 0, locker: 12, counter: 35, table: 32, water: 8, rack: 13, shelf: 17, rdesk: 22, sofa: 28, lamp: 0, slide: 34, swing: 36, bars: 26, bench: 20, lab: 36, scope: 8, chem: 13, globe: 8 };
+  const FUR_TAGDX = { desk: 14, chair: 7, fan: 0, locker: 12, counter: 35, table: 32, water: 8, rack: 13, shelf: 17, rdesk: 22, sofa: 28, lamp: 0, slide: 34, swing: 36, bars: 26, bench: 20, lab: 36, scope: 8, chem: 13, globe: 8, snackrack: 20, fridge: 10, register: 20, snacktable: 18 };
   function renderFur() {
     const k = rt.sheetKey, box = $('#furBox');
     if (!k || S.f[k] < 1) { box.hidden = true; $('#furAll').hidden = true; rt.furKey = ''; return; }
@@ -6115,6 +6294,7 @@ body{background:radial-gradient(120% 60% at 50% 0%, color-mix(in srgb, var(--pap
     S.budget -= c;
     S.f[k] = was + 1;
     S.st.ups += 1;
+    clubFacUp(k);   // 2.0.0
     // 1.7.0: 학교급이 오른 뒤 처음 키우면 건물 모습이 그 학교급으로 바뀌어요
     let newLook = false;
     if (S.bs && (S.bs[k] || 0) < S.tier) { const before = bldImg(k); S.bs[k] = S.tier; if (bldImg(k) !== before) { newLook = true; setBldArt(k); } }
@@ -6128,6 +6308,7 @@ body{background:radial-gradient(120% 60% at 50% 0%, color-mix(in srgb, var(--pap
     else if (was === 0 && k === 'cafeteria') toast('급식실을 지었어요! 수업료 +20%');
     else if (was === 0 && k === 'library') toast('도서관을 지었어요! 평판 ★3');
     else if (was === 0 && k === 'science') toast('과학실을 지었어요! 수료증 +3%, 평판 ★1');
+    else if (was === 0 && k === 'store') toast(`매점을 지었어요! 수업료 +${FAC.store.per}%`);
     else if (was === 0 && k === 'playground') { toast(`${eul(FAC.playground.name)} 지었어요! 옆 참나무를 누르면 도토리가 떨어져요`); rt.dropT = dropIntervalFor(1) - 3; }
     else toast(`${n} Lv.${L}! ${FAC[k].eff(L)}`);
     if (newLook) setTimeout(() => toast(`${n} 모습이 ${tierInfo().name}답게 새로 바뀌었어요!`), 1600);
@@ -7918,19 +8099,23 @@ body{background:radial-gradient(120% 60% at 50% 0%, color-mix(in srgb, var(--pap
   const pctXY = ([x, y]) => [Math.round(x * MAP_W / 100), Math.round(y * MAP_H / 100 + MAP_Y)];
   const DECO_SLOTS = [
     [[22, 18], [31, 13], [74, 18], [73, 28], [20, 56], [63, 58], [10, 80], [48, 66], [42, 86], [62, 90], [91, 52]].map(pctXY),
-    [[25, 24], [76, 22], [28, 50], [79, 50], [12, 73], [63, 78], [12, 30], [22, 82], [70, 82], [57, 90], [36, 90]].map(pctXY)
+    [[25, 24], [76, 22], [28, 50], [79, 50], [12, 73], [63, 78], [12, 30], [22, 82], [70, 82], [57, 90], [36, 90]].map(pctXY),
+    // 2.0.0 중학교: 지도 그림이 오면 lots_middle.md의 빈 풀밭 11곳으로 바꿔요. 지금은 초등학교 지도 자리(기숙사 임시 자리와 겹치는 [22, 82]는 [8, 50]으로)
+    [[25, 24], [76, 22], [28, 50], [79, 50], [12, 73], [63, 78], [12, 30], [8, 50], [70, 82], [57, 90], [36, 90]].map(pctXY)
   ];
-  const DECO_SIGN = [pctXY([31, 79]), pctXY([37, 80])];
+  const DECO_SIGN = [pctXY([31, 79]), pctXY([37, 80]), pctXY([37, 80])];
   const MARK_BASE = ['shield', 'circle', 'flag'], MARK_SYM = ['acorn', 'leaf', 'star', 'book', 'sun', 'owl'];
   const MARK_COL = ['#D9534A', '#E8913A', '#F2C230', '#4E9A4A', '#3E78C2', '#8A5BC2', '#E77FA8', '#9A6A43'];
   const MARK_COL_NM = ['빨강', '주황', '노랑', '초록', '파랑', '보라', '분홍', '갈색'];
   const freshDeco = () => ({ own: {}, lay: DECO_SLOTS.map(L => L.map(() => '')), nm: '', mk: null });
-  const decoMap = () => S.tier >= 1 ? 1 : 0;
+  const decoMap = () => geoIdx();
   const decoOwn = id => (S.deco.own[id] || 0);
   const decoUsed = (m, id, skip) => S.deco.lay[m].filter((x, i) => x === id && i !== skip).length;
   const decoPlaced = m => S.deco.lay[m].filter(Boolean).length;
   const decoPlacedAll = () => S.deco.lay.reduce((a, L) => a + L.filter(Boolean).length, 0);
-  const decoCost = id => { const d = DECO_BY[id]; if (!d) return Infinity; return d.rare ? d.ess : Math.ceil(d.ess * Math.pow(DECO_GROW, Math.min(DECO_MAX, decoOwn(id))) / 5) * 5; };
+  const decoCost0 = id => { const d = DECO_BY[id]; if (!d) return Infinity; return d.rare ? d.ess : Math.ceil(d.ess * Math.pow(DECO_GROW, Math.min(DECO_MAX, decoOwn(id))) / 5) * 5; };
+  // 2.0.0 미술부 할인(최대 15%). 5 단위로 맞춰요
+  const decoCost = id => { const c = decoCost0(id); if (!isFinite(c)) return c; const off = typeof clubDecoOff === 'function' ? clubDecoOff() : 0; return off > 0 ? Math.max(5, Math.ceil(c * (1 - off / 100) / 5) * 5) : c; };
   const decoSoldOut = id => { const d = DECO_BY[id]; return !d || decoOwn(id) >= (d.rare ? 1 : DECO_MAX); };
   const cleanSchoolNm = v => typeof v === 'string' ? v.replace(/[\s<>&"'`\\]/g, '').slice(0, 6) : '';
   const schoolTitle = () => `${S.deco.nm || '숲속'} ${tierInfo().name}`;
@@ -8003,7 +8188,7 @@ body{background:radial-gradient(120% 60% at 50% 0%, color-mix(in srgb, var(--pap
   }
   function decoEditEnd() { if (!rt.decoEdit) return; rt.decoEdit = false; renderDeco(true); save(); }
   function openDecoPick(i) {
-    const m = decoMap(); if (!DECO_SLOTS[m][i]) return;
+    const m = viewMap(); if (!DECO_SLOTS[m][i]) return;
     rt.decoSlot = i; sfx('tap');
     const cur = S.deco.lay[m][i];
     const own = DECO.filter(d => decoOwn(d.id) > 0);
@@ -8016,10 +8201,10 @@ body{background:radial-gradient(120% 60% at 50% 0%, color-mix(in srgb, var(--pap
     openModal($('#mDecoPick'));
   }
   function decoPut(i, id) {
-    const m = decoMap(); if (!DECO_SLOTS[m][i]) return false;
+    const m = viewMap(); if (!DECO_SLOTS[m][i]) return false;
     if (id) { if (!DECO_BY[id] || decoOwn(id) - decoUsed(m, id, i) <= 0) return false; }
     S.deco.lay[m][i] = id || '';
-    renderDeco(true); save();
+    renderDeco(true); if (rt.viewTier != null) renderTierView(true); save();
     return true;
   }
   // 꾸미기 가게
@@ -8122,6 +8307,381 @@ body{background:radial-gradient(120% 60% at 50% 0%, color-mix(in srgb, var(--pap
     });
   }
 
+  /* ---------- 2.0.0 학생 명부와 동아리 ----------
+     학생 수(수업료 계산)는 그대로 두고, 그 가운데 얼굴이 되는 대표 학생 12명을 명부에 따로 적어요(S.roster).
+     중학교부터 명부가 생기고 동아리 네 곳에 3명씩 나눠요. 졸업식(학교급 올리기) 때 명부 학생은 졸업 사진(S.snap)에 남고 새 친구들이 입학해요.
+     능력치는 과학, 운동, 독서, 미술(속으로 1~100, 화면에는 별 1~5개). 동아리 보너스는 부원 셋의 맞는 능력치 별 하나에 2%(최대 30%), 미술부 할인은 절반.
+     능력치가 자라는 법: 그 동아리 건물을 한 레벨 올릴 때마다 부원 +1, 한 주(게임 시계) 내내 같은 동아리였으면 +5와 건물 레벨 10마다 +1, 발표회 +5 */
+  const ROSTER_N = 12, ROSTER_MAX = 16, ROSTER_TIER = 2;   // 처음 12명, 중학교에서 전학 온 친구가 더해지면 16명까지(동아리 자리는 12개)
+  const ABIL = ['과학', '운동', '독서', '미술'];
+  const CLUBS = [
+    { id: 'sci', name: '과학부', ab: 0, fac: 'science', img: 'club_science', em: '🔬', eff: p => `수업료 +${p}%` },
+    { id: 'spo', name: '운동부', ab: 1, fac: 'playground', img: 'club_sports', em: '⚽', eff: p => `학교 행사 보상 +${p}%` },
+    { id: 'rea', name: '독서부', ab: 2, fac: 'library', img: 'club_reading', em: '📚', eff: p => `수업료 +${p}%` },
+    { id: 'art', name: '미술부', ab: 3, fac: 'classroom', img: 'club_art', em: '🎨', eff: p => `장식 값 -${p}%` }
+  ];
+  const CLUB = { seats: 3, per: 2, max: 30, grow: 5, growLv: 10, up: 1, show: 5, showMin: 30, showDays: 7 };
+  // 동물마다 잘하는 능력(0 과학, 1 운동, 2 독서, 3 미술)
+  const SP_ABIL = { rabbit: 1, fox: 0, raccoon: 0, chick: 3, bear: 1, cat: 2, dog: 1, penguin: 0, panda: 2, koala: 2, otter: 3,
+    hamster: 1, duck: 3, turtle: 2, mole: 0, frog: 1, waterdeer: 3 };
+  const KID_NAMES = ['도토리', '밤송이', '솔방울', '이슬', '새싹', '단풍', '보리', '콩알', '버찌', '다래', '머루', '호두', '달래', '나리', '송이', '들꽃',
+    '구름', '바람', '햇살', '별님', '조약돌', '방울', '보라', '감자', '고구마', '앵두', '모과', '자두', '토실', '꼬물', '동글', '말랑'];
+  const star = v => Math.max(1, Math.min(5, Math.ceil(v / 20)));
+  const starTxt = n => '★'.repeat(n) + '☆'.repeat(5 - n);
+  const rosterOn = () => !!S && S.tier >= ROSTER_TIER;
+  const freshRoster = () => ({ list: [], wk: -1, gen: 0 });
+  const freshClub = () => ({ day: '', n: 0, shown: [0, 0, 0, 0], last: -1 });
+  // 새 명부: 만난 친구들 가운데서 겹치지 않게 12명(모자라면 겹쳐요). 잘하는 능력 하나가 도드라지고, 가끔 둘째도 조금
+  function rosterKid(sp, taken) {
+    const a = [0, 1, 2, 3].map(() => 8 + Math.floor(Math.random() * 20));
+    const main = SP_ABIL[sp] !== undefined ? SP_ABIL[sp] : Math.floor(Math.random() * 4);
+    a[main] += 20 + Math.floor(Math.random() * 14);
+    if (Math.random() < 0.4) { const o = (main + 1 + Math.floor(Math.random() * 3)) % 4; a[o] += 10; }
+    const free = KID_NAMES.filter(n => !taken.includes(n)), nm = (free.length ? free : KID_NAMES)[Math.floor(Math.random() * (free.length || KID_NAMES.length))];
+    taken.push(nm);
+    return { sp, nm, a: a.map(v => Math.min(100, v)), c: -1, cw: gameWeek() };
+  }
+  // must: 꼭 넣을 친구(방금 전학 온 친구)
+  function rosterMake(must) {
+    const met = speciesList().filter(k => k !== must), pick = must ? [must] : [];
+    for (let i = met.length - 1; i > 0; i--) { const j = Math.floor(Math.random() * (i + 1)); [met[i], met[j]] = [met[j], met[i]]; }
+    for (let i = 0; pick.length < ROSTER_N; i++) pick.push(met[i % met.length]);
+    const taken = [];
+    return pick.map(sp => rosterKid(sp, taken));
+  }
+  // 학년 중간에 전학 온 친구는 명부 끝에 더해요(동아리 밖에서 시작)
+  function rosterAdd(sp) {
+    if (!rosterOn() || !S.roster.list.length || S.roster.list.length >= ROSTER_MAX) return null;
+    const s = rosterKid(sp, S.roster.list.map(x => x.nm)); S.roster.list.push(s); return s;
+  }
+  function rosterEnsure(must) {
+    if (!rosterOn() || S.roster.list.length) return false;
+    S.roster.list = rosterMake(must); S.roster.gen += 1; S.roster.wk = gameWeek();
+    clubAuto(true);   // 처음에는 자동 추천으로 나눠 둬요(언제든 바꿀 수 있어요)
+    return true;
+  }
+  const clubMembers = c => S.roster.list.filter(s => s.c === c);
+  const clubStars = c => clubMembers(c).reduce((n, s) => n + star(s.a[CLUBS[c].ab]), 0);
+  const clubPct = c => rosterOn() ? Math.min(CLUB.max, CLUB.per * clubStars(c)) : 0;
+  const clubShow = c => c === 3 ? Math.floor(clubPct(3) / 2) : clubPct(c);   // 화면에 보이는 효과 숫자(미술부는 할인이라 절반)
+  const clubSum = () => [0, 1, 2, 3].reduce((n, c) => n + clubShow(c), 0);
+  const clubTuitionMult = () => 1 + (clubPct(0) + clubPct(2)) / 100;
+  const clubFestMult = () => 1 + clubPct(1) / 100;
+  const clubDecoOff = () => clubShow(3);
+  // 자동 추천: 동아리마다 3명씩, 맞는 능력치 별의 합이 가장 크게(12명이라 모든 경우를 셈으로 따져요)
+  function clubAuto(quiet) {
+    const L = S.roster.list, n = L.length; if (!n) return false;
+    const seats = CLUBS.map(() => Math.min(CLUB.seats, Math.ceil(n / CLUBS.length)));
+    const memo = new Map();
+    const key = (i, cnt) => i + ':' + cnt.join(',');
+    const best = (i, cnt) => {
+      if (i >= n) return 0;
+      const k = key(i, cnt); if (memo.has(k)) return memo.get(k);
+      let v = -1;
+      if (n - i > cnt.reduce((a, x, c) => a + seats[c] - x, 0)) v = best(i + 1, cnt);   // 자리가 모자라면 동아리 밖
+      for (let c = 0; c < CLUBS.length; c++) if (cnt[c] < seats[c]) { cnt[c]++; v = Math.max(v, star(L[i].a[CLUBS[c].ab]) * 100 + L[i].a[CLUBS[c].ab] / 100 + best(i + 1, cnt)); cnt[c]--; }
+      memo.set(k, v); return v;
+    };
+    const cnt = CLUBS.map(() => 0), out = [];
+    best(0, cnt);
+    for (let i = 0; i < n; i++) {
+      let pickC = -1, pv = -Infinity;
+      const here = best(i, cnt);
+      for (let c = 0; c < CLUBS.length; c++) if (cnt[c] < seats[c]) {
+        cnt[c]++; const v = star(L[i].a[CLUBS[c].ab]) * 100 + L[i].a[CLUBS[c].ab] / 100 + best(i + 1, cnt); cnt[c]--;
+        if (v > pv + 1e-9) { pv = v; pickC = c; }
+      }
+      if (pickC >= 0 && Math.abs(pv - here) < 1e-6) { cnt[pickC]++; out.push(pickC); } else out.push(-1);
+    }
+    const wk = gameWeek();
+    L.forEach((s, i) => { if (s.c !== out[i]) { s.c = out[i]; s.cw = wk; } });
+    if (!quiet) { save(); renderClub(); }
+    return true;
+  }
+  // 동아리 바꾸기: 언제든 공짜. 바꾼 학생은 이번 주 능력치 오름을 처음부터 다시 세요
+  function clubSet(i, c) {
+    const s = S.roster.list[i]; if (!s) return false;
+    c = c >= 0 && c < CLUBS.length ? c : -1;
+    if (s.c === c) return true;
+    if (c >= 0 && clubMembers(c).length >= CLUB.seats) {   // 자리가 차 있으면 가장 별이 적은 부원과 자리를 바꿔요
+      const out = clubMembers(c).sort((x, y) => x.a[CLUBS[c].ab] - y.a[CLUBS[c].ab])[0];
+      out.c = s.c; out.cw = gameWeek();
+    }
+    s.c = c; s.cw = gameWeek();
+    save();
+    return true;
+  }
+  const abUp = (s, ab, v) => { s.a[ab] = Math.min(100, s.a[ab] + v); };
+  // 건물을 한 레벨 올리면 그 건물 동아리 부원의 능력치 +1
+  function clubFacUp(k) {
+    if (!rosterOn()) return;
+    CLUBS.forEach((C, c) => { if (C.fac === k) clubMembers(c).forEach(s => abUp(s, C.ab, CLUB.up)); });
+  }
+  // 한 주가 지나면(게임 시계) 그 주 내내 같은 동아리였던 부원이 자라요. 여러 주가 지났어도 8주까지만 쳐요
+  function clubWeekTick() {
+    if (!rosterOn() || !S.roster.list.length) return false;
+    const now = gameWeek(); if (S.roster.wk < 0) S.roster.wk = now;
+    if (now <= S.roster.wk) return false;
+    for (let w = Math.max(S.roster.wk, now - 8); w < now; w++) {
+      for (const s of S.roster.list) if (s.c >= 0 && s.cw < w) { const C = CLUBS[s.c]; abUp(s, C.ab, CLUB.grow + Math.floor((S.f[C.fac] || 0) / CLUB.growLv)); }
+    }
+    S.roster.wk = now;
+    save();
+    return true;
+  }
+  // 발표회: 게임 시계 기준 CLUB.showDays일에 한 번. 무대에 선 동아리 부원 능력치 +5, 수업료 30분치
+  const showDay = () => Math.floor((gameNow() + KST_MS) / 86400000);
+  const showWait = () => S.club.last < 0 ? 0 : Math.max(0, S.club.last + CLUB.showDays - showDay());
+  const showReady = () => rosterOn() && showWait() <= 0;
+  const showPrize = () => Math.max(10, nice(rate() * 60 * CLUB.showMin));
+  function clubShowGo(c) {
+    if (!showReady() || !CLUBS[c]) return false;
+    const mem = clubMembers(c); if (!mem.length) { toast(`${eun(CLUBS[c].name)} 아직 부원이 없어요`); return false; }
+    const C = CLUBS[c], v = showPrize();
+    mem.forEach(s => abUp(s, C.ab, CLUB.show));
+    S.club.last = showDay(); S.club.n += 1; S.club.shown[c] = 1; S.st.shows = (S.st.shows || 0) + 1;
+    S.budget += v; earn(v);
+    addLeague(LP.festWin);
+    save();
+    showReward({ title: `${C.name} 발표회를 열었어요!`, sub: mem.map(s => s.nm).join(', ') + `의 ${ABIL[C.ab]} 능력치 +${CLUB.show}`, art: clubBadge(c, 72), items: [{ ic: 'acorn', t: `도토리 +${fmt(v)}` }] });
+    renderClub(); questChanged();
+    return true;
+  }
+  function sanitize200(d, s) {
+    const r = d.roster && typeof d.roster === 'object' ? d.roster : {}, num = v => typeof v === 'number' && isFinite(v) ? v : NaN;
+    s.roster.wk = Math.floor(num(r.wk)) >= -1 ? Math.floor(num(r.wk)) : -1;
+    s.roster.gen = Math.max(0, Math.floor(num(r.gen)) || 0);
+    s.roster.list = (Array.isArray(r.list) ? r.list : []).slice(0, ROSTER_MAX).filter(x => x && typeof x.sp === 'string' && (BASE_SPECIES.includes(x.sp) || NEWCOMERS.some(n => n.k === x.sp)))
+      .map(x => ({ sp: x.sp, nm: typeof x.nm === 'string' ? x.nm.replace(/[<>&"'`\\]/g, '').slice(0, 8) : '친구',
+        a: [0, 1, 2, 3].map(i => Math.max(1, Math.min(100, Math.floor(Array.isArray(x.a) ? num(x.a[i]) || 1 : 1)))),
+        c: Number.isInteger(x.c) && x.c >= 0 && x.c < CLUBS.length ? x.c : -1, cw: Math.floor(num(x.cw)) || 0 }));
+    // 한 동아리에 3명보다 많으면 넘치는 학생은 동아리 밖으로
+    CLUBS.forEach((_, c) => s.roster.list.filter(x => x.c === c).slice(CLUB.seats).forEach(x => { x.c = -1; }));
+    const k = d.club && typeof d.club === 'object' ? d.club : {};
+    s.club.last = Math.floor(num(k.last)) >= 0 ? Math.floor(num(k.last)) : -1;
+    s.club.n = Math.max(0, Math.floor(num(k.n)) || 0);
+    s.club.shown = [0, 1, 2, 3].map(i => Array.isArray(k.shown) && k.shown[i] ? 1 : 0);
+    // 학교급 사진(졸업식 때 남긴 모습)
+    s.snap = {};
+    if (d.snap && typeof d.snap === 'object') for (let t = 0; t < TIERS.length; t++) {
+      const x = d.snap[t]; if (!x || typeof x !== 'object' || t >= s.tier) continue;
+      const f = {}, bs = {};
+      for (const kk of Object.keys(FAC)) { f[kk] = Math.max(0, Math.min(SAVE_CAP.lv, Math.floor(num(x.f && x.f[kk]) || 0))); bs[kk] = Math.max(0, Math.min(t, Math.floor(num(x.bs && x.bs[kk]) || 0))); }
+      s.snap[t] = { f, bs, st: Math.max(0, Math.min(SAVE_CAP.count, Math.floor(num(x.st)) || 0)), at: Math.max(0, num(x.at) || 0),
+        roster: (Array.isArray(x.roster) ? x.roster : []).slice(0, ROSTER_MAX).filter(o => o && typeof o.sp === 'string').map(o => ({ sp: String(o.sp).slice(0, 12), nm: typeof o.nm === 'string' ? o.nm.replace(/[<>&"'`\\]/g, '').slice(0, 8) : '' })) };
+    }
+  }
+  // 동아리 배지: 그림(작업지시서 19)이 있으면 그림, 없으면 그림 문자
+  const clubBadge = (c, px) => IMG(CLUBS[c].img) ? `<img class="club-badge" src="${IMG(CLUBS[c].img)}" alt="" draggable="false"${px ? ` style="width:${px}px;height:${px}px"` : ''}>`
+    : `<span class="club-badge em c${c}"${px ? ` style="width:${px}px;height:${px}px;font-size:${Math.round(px * 0.55)}px"` : ''}>${CLUBS[c].em}</span>`;
+  const kidFace = sp => `<span class="rs-av">${kidAvatar(sp)}</span>`;
+  function clubSeatHTML(c) {
+    const mem = clubMembers(c), C = CLUBS[c];
+    return Array.from({ length: CLUB.seats }, (_, j) => {
+      const s = mem[j];
+      if (!s) return `<button class="club-seat empty" type="button" data-seat="${c}" aria-label="${C.name} 빈자리, 눌러서 학생 넣기"><b>+</b><small>빈자리</small></button>`;
+      const i = S.roster.list.indexOf(s);
+      return `<button class="club-seat" type="button" data-seat="${c}" data-ri="${i}" aria-label="${C.name} ${s.nm}, ${ABIL[C.ab]} 별 ${star(s.a[C.ab])}개">${kidFace(s.sp)}<b>${esc(s.nm)}</b><small class="stars">${starTxt(star(s.a[C.ab]))}</small></button>`;
+    }).join('');
+  }
+  function renderClub() {
+    const box = $('#clubBody'); if (!box || !S) return;
+    if (!rosterOn()) { box.innerHTML = `<p class="lead">동아리는 ${TIERS[ROSTER_TIER].name}부터 열려요.</p>`; return; }
+    rosterEnsure();
+    const bg = IMG('club_bg'); $('#clubHead').style.backgroundImage = bg ? `url("${bg}")` : '';
+    $('#clubHead').classList.toggle('fb', !bg);
+    const wait = showWait();
+    $('#clubShowNote').textContent = wait > 0 ? `다음 발표회까지 ${wait}일` : '오늘 발표회를 열 수 있어요';
+    box.innerHTML = CLUBS.map((C, c) => `<div class="club-card c${c}"><div class="club-top">${clubBadge(c, 40)}<span class="club-nm"><b>${C.name}</b><small>${ABIL[C.ab]} 별 ${clubStars(c)}개</small></span>` +
+      `<span class="club-eff">${C.eff(clubShow(c))}</span></div><div class="club-seats">${clubSeatHTML(c)}</div>` +
+      `<button class="cta small club-show" type="button" data-show="${c}" aria-disabled="${showReady() && clubMembers(c).length ? 'false' : 'true'}">${S.club.shown[c] ? '발표회 또 열기' : '발표회 열기'}</button></div>`).join('') +
+      `<h3 class="qsec">학생 명부 <small>${yearLabel()} 대표 학생 ${S.roster.list.length}명</small></h3>` +
+      `<div class="roster">${S.roster.list.map((s, i) => `<button class="rs-row${rt.clubPick === i ? ' pick' : ''}" type="button" data-ri="${i}">${kidFace(s.sp)}` +
+        `<span class="rs-nm"><b>${esc(s.nm)}</b><small>${s.c >= 0 ? CLUBS[s.c].name : '동아리 없음'}</small></span>` +
+        `<span class="rs-ab">${ABIL.map((n, j) => `<i class="${s.c >= 0 && CLUBS[s.c].ab === j ? 'on' : ''}"><em>${n}</em>${starTxt(star(s.a[j]))}</i>`).join('')}</span></button>`).join('')}</div>`;
+  }
+  // 동아리 자리 고르기: 자리를 누르면 명부에서 학생을 골라요(그 동아리에 맞는 능력치 순서)
+  function openSeatPick(c) {
+    rt.seatClub = c; rt.seatStudent = null; $('#seatOut').hidden = true;
+    const C = CLUBS[c], L = S.roster.list.map((s, i) => [s, i]).sort((x, y) => y[0].a[C.ab] - x[0].a[C.ab]);
+    $('#seatTitle').textContent = `${C.name}에 넣을 학생`;
+    $('#seatList').innerHTML = L.map(([s, i]) => `<button class="rs-row${s.c === c ? ' pick' : ''}" type="button" data-pick="${i}">${kidFace(s.sp)}<span class="rs-nm"><b>${esc(s.nm)}</b><small>${s.c >= 0 ? CLUBS[s.c].name : '동아리 없음'}</small></span>` +
+      `<span class="rs-one">${ABIL[C.ab]} <b>${starTxt(star(s.a[C.ab]))}</b></span></button>`).join('') +
+      `<p class="note">이미 다른 동아리에 있는 학생을 고르면 이 동아리로 옮겨요. 자리가 차 있으면 별이 가장 적은 부원과 바꿔요. 바꾼 학생은 이번 주 능력치 오름을 처음부터 다시 세요.</p>`;
+    openModal($('#mSeat'));
+  }
+  // 학교 복도(2.0.0): 상점 거리처럼 복도 배경 위에 방문. 동아리실이 먼저 열리고 나머지 방은 앞으로 들어와요
+  const hallOpen = () => rosterOn();
+  function renderHall() {
+    const bg = IMG('hall_bg'); $('#hallScene').style.backgroundImage = bg ? `url("${bg}")` : '';
+    $('#hallScene').classList.toggle('fb', !bg);
+    $$('#panelHall .sf-pic').forEach(el => {
+      const u = IMG(el.dataset.front);
+      el.classList.toggle('fb', !u); el.style.backgroundImage = u ? `url("${u}")` : '';
+    });
+    $('#hallClubN').textContent = showReady() ? '발표회!' : `${clubSum()}%`;
+  }
+  function renderHallBtn() {
+    const b = $('#btnHall'); if (!b) return;
+    b.hidden = !hallOpen();
+    if (b.hidden) return;
+    $('#hallN').textContent = showReady() ? '!' : '열기'; b.classList.toggle('glow', showReady());
+    const ic = $('#hallIc'), u = IMG('hall_sign');
+    if (ic.dataset.u !== (u ? 'img' : 'em')) { ic.dataset.u = u ? 'img' : 'em'; ic.style.backgroundImage = u ? `url("${u}")` : ''; ic.textContent = u ? '' : '🚪'; }
+  }
+  // 1초마다: 발표회 남은 날만 고쳐요(창 전체를 다시 그리지 않아요)
+  function renderClubLite() {
+    const n = $('#clubShowNote'); if (!n || !rosterOn()) return;
+    const w = showWait(), t = w > 0 ? `다음 발표회까지 ${w}일` : '오늘 발표회를 열 수 있어요';
+    if (n.textContent !== t) renderClub();
+  }
+  // 명부에서 학생을 누르면 동아리를 골라요
+  function openClubPick(i) {
+    const s = S.roster.list[i]; if (!s) return;
+    rt.seatStudent = i; rt.seatClub = null;
+    $('#seatTitle').textContent = `${s.nm}의 동아리`;
+    $('#seatList').innerHTML = CLUBS.map((C, c) => `<button class="club-pickc${s.c === c ? ' pick' : ''}" type="button" data-pickc="${c}">${clubBadge(c, 32)}<span class="rs-nm"><b>${C.name}</b><small>${clubMembers(c).length}/${CLUB.seats}명</small></span>` +
+      `<span class="rs-one">${ABIL[C.ab]} <b>${starTxt(star(s.a[C.ab]))}</b></span></button>`).join('') +
+      `<p class="note">자리가 차 있으면 그 동아리에서 별이 가장 적은 부원과 자리를 바꿔요. 바꾼 학생은 이번 주 능력치 오름을 처음부터 다시 세요.</p>`;
+    $('#seatOut').hidden = s.c < 0;
+    openModal($('#mSeat'));
+  }
+  /* ---------- 2.0.0 학교급 모습 보기와 졸업식 사진 ----------
+     졸업식(학교급 올리기) 때 그 학교급의 건물 레벨과 모습, 학생 수, 명부 학생을 S.snap[학교급]에 남겨요.
+     홈 지도 아래 작은 동그라미(유, 초, 중, 고, 대, 원)를 누르면 지난 학교급 지도를 보기 전용으로 보여 줘요. 사진이 없는 학교급(2.0.0 전에 지난 학교급)은
+     건물을 모두 지어진 모습으로 보여 줘요. 지난 지도도 꾸밀 수 있어요(장식 자리는 지도마다 따로). 2.1.3 다른 학교 구경도 이 보기를 써요 */
+  const TIER_SHORT = ['유', '초', '중', '고', '대', '원'];
+  const TIER_ALL = ['유치원', '초등학교', '중학교', '고등학교', '대학교', '대학원'];
+  function snapTake() {
+    S.snap[S.tier] = { f: Object.assign({}, S.f), bs: Object.assign({}, S.bs), st: Math.floor(S.students), at: Date.now(),
+      roster: (S.roster.list || []).map(s => ({ sp: s.sp, nm: s.nm })) };
+  }
+  // 그 학교급의 모습: 사진이 있으면 사진, 없으면 그 학교급 건물을 모두 지어진 모습으로
+  function snapOf(t) {
+    const x = S.snap && S.snap[t];
+    if (x) return x;
+    const f = {}, bs = {};
+    for (const k of Object.keys(FAC)) { f[k] = (FAC[k].tier || 0) <= t ? 1 : 0; bs[k] = t; }
+    return { f, bs, st: 0, at: 0, roster: [], all: true };
+  }
+  // 지난 학교급 건물 그림(그 학교급 모습). bldImg와 같은 규칙을 그 학교급 기준으로
+  function viewBldKey(k, t, bsv) {
+    const n = Math.min(4, (bsv || 0) + 1);
+    if (k === 'playground') return t >= 1 ? (stageKey('bld_field', n, 3) || 'bld_field_on') : 'bld_playground_on';
+    if (k === 'science') return stageKey('bld_science', n, 3) || BLD_IMG[k];
+    return stageKey('bld_' + k, n, 2) || BLD_IMG[k];
+  }
+  const viewMap = () => rt.viewTier == null ? decoMap() : geoIdx(rt.viewTier);
+  function renderTierDots() {
+    const box = $('#tierDots'); if (!box || !S) return;
+    box.hidden = S.tier < 1 || rt.tab !== 'school' || !!rt.decoEdit;
+    const key = [S.tier, rt.viewTier].join('|');
+    if (box.dataset.key === key) return; box.dataset.key = key;
+    box.innerHTML = TIER_SHORT.map((c, t) => {
+      const cur = t === S.tier, past = t < S.tier, on = rt.viewTier === t || (rt.viewTier == null && cur);
+      return `<button type="button" class="td${cur ? ' cur' : ''}${past ? ' past' : ''}${on ? ' on' : ''}${t > S.tier ? ' lock' : ''}" data-td="${t}" aria-label="${TIER_ALL[t]}${cur ? ', 지금 학교' : past ? ', 그때 모습 보기' : ', 아직 못 가요'}"${t > S.tier ? ' aria-disabled="true"' : ''}>` +
+        (t > S.tier ? '<svg viewBox="0 0 16 16" aria-hidden="true"><path d="M5 7V5.6a3 3 0 0 1 6 0V7M4.4 7h7.2v6H4.4z" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linejoin="round"/></svg>' : c) + '</button>';
+    }).join('');
+  }
+  function tierViewOpen(t) {
+    if (t === S.tier || t == null) { tierViewClose(); return; }
+    if (!(t >= 0 && t < S.tier)) { toast(`${TIER_ALL[t] || '그 학교급'}은 아직 갈 수 없어요`); return; }
+    if (rt.decoEdit) decoEditEnd();
+    rt.viewTier = t; rt.viewEdit = false; sfx('tap');
+    renderTierView(true); renderTierDots();
+  }
+  function tierViewClose() {
+    if (rt.viewTier == null) return;
+    rt.viewTier = null; rt.viewEdit = false;
+    $('#tierView').hidden = true; renderTierDots();
+  }
+  function renderTierView(force) {
+    const box = $('#tierView'); if (!box) return;
+    const t = rt.viewTier; if (t == null) { box.hidden = true; return; }
+    const gi = geoIdx(t), G = GEO[gi], x = snapOf(t), L = S.deco.lay[gi], edit = !!rt.viewEdit;
+    const key = [t, gi, L.join(), S.deco.nm, edit, JSON.stringify(x.f)].join('|');
+    box.hidden = false;
+    $('#tvTitle').textContent = `${S.deco.nm || '숲속'} ${TIER_ALL[t]} 시절 모습`;
+    $('#tvSub').textContent = x.all ? '그때는 사진을 남기지 않아서 모두 지어진 모습으로 보여요' : `${x.at ? kstDay(x.at) + ' 졸업식, ' : ''}학생 ${fmt(x.st)}명`;
+    $('#tvEdit').textContent = edit ? '다 했어요' : '꾸미기';
+    if (!force && box.dataset.key === key) return; box.dataset.key = key;
+    const mapU = IMG170(mapKey(G.map));
+    box.style.setProperty('--map-bg', mapU ? `url("${mapU}")` : 'none');
+    let h = `<image x="0" y="-60" width="360" height="540" preserveAspectRatio="none" href="${mapU}"/>`;
+    // 건물: 앞(아래)에 있는 것이 위에 그려지게
+    const keys = Object.keys(FAC).filter(k => (FAC[k].tier || 0) <= t && G.lot[k]).sort((a, b) => G.lot[a][1] - G.lot[b][1]);
+    const items = [];
+    for (const k of keys) {
+      const built = (x.f[k] || 0) >= 1, im = seasonKey(built ? viewBldKey(k, t, x.bs[k]) : SITE_IMG[k]), [cx, cy, w] = lotRect(G.lot[k], im);
+      items.push({ y: cy, s: `<image href="${IMG170(im)}" x="${(cx - w / 2).toFixed(1)}" y="${(cy - w / 2).toFixed(1)}" width="${w.toFixed(1)}" height="${w.toFixed(1)}"/>` +
+        (built && x.f[k] > 1 && !x.all ? `<g class="tv-lv" transform="translate(${cx.toFixed(1)} ${(cy + w * 0.36).toFixed(1)})"><rect x="-30" y="-9" width="60" height="18" rx="9"/><text y="4" text-anchor="middle">${k === 'playground' ? (t >= 1 ? '운동장' : '놀이터') : FAC[k].name} Lv.${x.f[k]}</text></g>` : '') });
+    }
+    { const [ncx, ncy, nw] = lotRect(G.nextLot, G.nextKey); items.push({ y: ncy, s: `<image href="${IMG170(seasonKey(G.next.img))}" x="${(ncx - nw / 2).toFixed(1)}" y="${(ncy - nw / 2).toFixed(1)}" width="${nw.toFixed(1)}" height="${nw.toFixed(1)}" opacity=".85"/>` }); }
+    { const [ox, oy] = G.oak; items.push({ y: oy + 20, s: `<image href="${IMG170(oakKey()) || IMG('deco_autumn_1')}" x="${ox - 34}" y="${oy - 41}" width="68" height="65"/>` }); }
+    // 장식과 간판
+    const [sx, sy] = DECO_SIGN[gi], sw = 84, sh = 42, nm = S.deco.nm || '숲속', tn = TIER_ALL[t];
+    if (IMG('sign_board')) items.push({ y: sy, s: `<g class="deco-sign"><image x="${sx - sw / 2}" y="${sy - sh * 0.97}" width="${sw}" height="${sh}" href="${IMG('sign_board')}"/>` +
+      `<text class="deco-sign-t" x="${sx}" y="${sy - sh * 0.6}" style="font-size:${Math.min(10, 52 / Math.max(1, nm.length)).toFixed(1)}px">${esc(nm)}</text><text class="deco-sign-t" x="${sx}" y="${sy - sh * 0.36}" style="font-size:${Math.min(9, 52 / tn.length).toFixed(1)}px">${tn}</text></g>` });
+    DECO_SLOTS[gi].forEach(([dx, dy], i) => {
+      const d = DECO_BY[L[i]];
+      let s = '';
+      if (d && IMG(d.img)) { const w = d.sm ? 36 : 46; s += `<image x="${dx - w / 2}" y="${dy - w * 0.975}" width="${w}" height="${w}" href="${IMG(d.img)}"/>`; }
+      if (edit) s += (d ? `<ellipse class="deco-ring" cx="${dx}" cy="${dy - 4}" rx="22" ry="8"/>` : `<image x="${dx - 14}" y="${dy - 20}" width="28" height="28" href="${IMG('deco_slot')}"/>`) +
+        `<rect class="deco-hit" data-tvslot="${i}" x="${dx - 22}" y="${dy - 40}" width="44" height="46"/>`;
+      if (s) items.push({ y: dy, s });
+    });
+    // 그때 명부 학생(사진에 남은 친구들)
+    (x.roster || []).slice(0, Math.min(8, G.spots.length)).forEach((r, i) => { const [kx, ky] = G.spots[i]; items.push({ y: ky + 11, s: `<g transform="translate(${kx} ${ky})">${kidSVG(r.sp, i)}</g>` }); });
+    items.sort((a, b) => a.y - b.y);
+    $('#tvMap').innerHTML = h + items.map(o => o.s).join('');
+  }
+  /* ---------- 2.0.0 전학 대화 ----------
+     종업식이나 졸업식 창을 닫으면 화면 아래 대화 창이 떠요. 교감 고슴도치가 소개하고, 새 친구가 자기소개를 두 줄 해요.
+     누르면 다음 말로 넘어가고, 마지막에 수업료 +5%와 도감 등록을 알려요. 대사는 지섭이 다듬어요 */
+  const NEW_TALK = {
+    cat: ['안녕하세요! 저는 고양이예요. 햇볕 좋은 창가 자리를 제일 좋아해요.', '낮잠은 조금만 자고 공부도 열심히 할게요. 잘 부탁해요!'],
+    dog: ['멍! 반가워요, 저는 강아지예요. 친구를 보면 꼬리가 저절로 흔들려요.', '달리기 시합은 언제든 자신 있어요. 운동장에서 같이 뛰어요!'],
+    penguin: ['안녕하세요, 저는 먼 남쪽 바다에서 온 펭귄이에요.', '여기는 조금 덥지만, 미끄럼틀을 배로 타면 정말 빨라요!'],
+    panda: ['안녕하세요... 저는 판다예요. 대나무 간식을 넉넉히 챙겨 왔어요.', '느긋해 보여도 공부는 자신 있어요. 같이 숙제해요!'],
+    koala: ['음... 안녕하세요. 저는 코알라예요. 나무 위가 제일 편해요.', '조용한 도서관에서 책 읽는 걸 좋아해요. 재미있는 책 알려 주세요.'],
+    otter: ['안녕하세요! 저는 수달이에요. 물장구치는 게 제일 신나요.', '조개껍데기로 만든 악기를 가져왔어요. 다음에 같이 연주해요!'],
+    hamster: ['안녕하세요! 저는 햄스터예요. 해바라기 씨 모으는 게 취미예요!', '볼 주머니에 간식을 넣어 왔어요. 친구들이랑 나눠 먹을래요.'],
+    duck: ['꽥! 안녕하세요, 연못 학교에서 전학 온 오리예요.', '비 오는 날을 제일 좋아해요. 노래를 부르면 기분이 좋아져요!'],
+    turtle: ['안녕하세요. 저는... 거북이에요. 말이 조금 느려도 기다려 주세요.', '한 번 시작한 일은 끝까지 해요. 느려도 꾸준히요!'],
+    mole: ['안녕하세요! 저는 두더지예요. 땅속 지름길은 제가 다 알아요.', '눈이 조금 나빠서 안경을 썼어요. 별자리 책 읽는 걸 좋아해요.'],
+    frog: ['개굴! 안녕하세요, 저는 개구리예요. 높이뛰기는 제가 일등이에요!', '친구들이랑 개굴개굴 합창을 하고 싶어요. 같이 해요!'],
+    waterdeer: ['안, 안녕하세요... 저는 고라니예요. 수줍음이 조금 많아요.', '그림 그리는 걸 좋아해요. 우리 학교 풍경도 그려 볼게요!']
+  };
+  function newTalkLines(n) {
+    const self = NEW_TALK[n.k] || [`안녕하세요! 저는 ${n.name}예요. 잘 부탁해요!`];
+    return [{ who: 'hedgehog', t: `교장 선생님, 오늘 우리 학교에 새 친구가 왔어요! ${n.name}${n.ga} 전학 왔답니다. 다 같이 반갑게 맞아 줘요.` }]
+      .concat(self.map(t => ({ who: n.k, t })))
+      .concat([{ who: 'hedgehog', t: `${n.name} 친구가 오면서 학교가 더 북적여요. 수업료가 5% 올랐고, 동물 도감에도 등록했어요!`, last: true }]);
+  }
+  function showNewTalk(n) {
+    const m = $('#mTalk'); if (!m || !n) return false;
+    rt.talkSeq = { n, lines: newTalkLines(n), i: 0 };
+    talkLine();
+    openModal(m);
+    return true;
+  }
+  function talkLine() {
+    const T = rt.talkSeq; if (!T) return;
+    const L = T.lines[T.i], hh = L.who === 'hedgehog';
+    $('#talkAv').innerHTML = hh ? hedgehogAvatar() : kidAvatar(L.who);
+    $('#talkAv').classList.toggle('kid', !hh);
+    $('#talkWho').textContent = hh ? '교감 고슴도치' : `새 친구 ${T.n.name}`;
+    $('#talkText').textContent = L.t;
+    $('#talkNext').textContent = T.i >= T.lines.length - 1 ? '반가워요!' : '다음';
+    $('#talkStep').textContent = `${T.i + 1} / ${T.lines.length}`;
+  }
+  function talkNext() {
+    const T = rt.talkSeq; if (!T) { closeModal($('#mTalk')); return; }
+    sfx('tap');
+    if (T.i < T.lines.length - 1) { T.i += 1; talkLine(); return; }
+    rt.talkSeq = null;
+    closeModal($('#mTalk'));
+  }
   /* ---------- 현장체험학습 ----------
      3학년부터 열려요. 한 번에 한 곳씩, 실제 시간으로 30분에서 8시간 다녀와요. 다녀오는 동안에도 학교는 그대로 돌아가요.
      돌아오면 도토리(수업료 반만큼), 수료증, 먼 곳은 황금 도토리, 그리고 그곳 기념품 하나를 가져와요.
@@ -9011,7 +9571,7 @@ body{background:radial-gradient(120% 60% at 50% 0%, color-mix(in srgb, var(--pap
   const SPORTS = { sec: 40, gap: 2 * 3600000, every: 0.65, ground: 6, cx: 165, cy: 336, rx: 100, ry: 33 };
   const sportsOpen = () => !!S && (S.tier >= 2 || (S.tier >= 1 && S.tg >= 3)) && S.f.playground >= 1;
   const sportsWait = () => Math.max(0, S.sports.next - Date.now());
-  const sportsPrize = win => Math.max(10, nice(rate() * 180 * (win ? 2 : 1) * vpMult()));   // 1.7.0: 교감 선생님 레벨만큼 더
+  const sportsPrize = win => Math.max(10, nice(rate() * 180 * (win ? 2 : 1) * vpMult() * clubFestMult()));   // 2.0.0 운동부 보너스   // 1.7.0: 교감 선생님 레벨만큼 더
   function renderSportsBtn() { renderFestBtn(); }
   function renderSportsBtnOld() {
     const b = $('#btnSports'), on = sportsOpen() && !rt.sports;
@@ -9191,7 +9751,7 @@ body{background:radial-gradient(120% 60% at 50% 0%, color-mix(in srgb, var(--pap
   }
   const festOpen = id => !!S && S.f.playground >= 1 && (S.tier >= 2 || (S.tier === 1 && S.tg >= FEST[id].tg));
   const festWait = id => id === 'sports' ? sportsWait() : Math.max(0, (S.fest.next[id] || 0) - Date.now());
-  const festPrize = win => Math.max(10, nice(rate() * 180 * (win ? 2 : 1) * vpMult()));
+  const festPrize = win => Math.max(10, nice(rate() * 180 * (win ? 2 : 1) * vpMult() * clubFestMult()));
   const festBusy = () => !!(rt.fest || rt.sports);
   // 지도 왼쪽 '학교 행사' 버튼: 열 수 있는 행사 수나, 가장 빨리 열리는 행사까지 남은 시간
   function renderFestBtn() {
@@ -9835,7 +10395,7 @@ body{background:radial-gradient(120% 60% at 50% 0%, color-mix(in srgb, var(--pap
           `<span class="p-eff">${P.eff(L)} → ${P.eff(L + 1)}</span></div>` +
           `<button class="btn-perk" type="button" data-fperk="${k}" aria-disabled="${S.fund >= c ? 'false' : 'true'}" aria-label="${P.name} 고치기, 기금 ${c}"><span class="fic">${fundIcon()}</span>${c}</button></div>`;
       }).join('');
-      const all = S.p.species >= NEWCOMERS.length, tk = S.p.ticket || 0;
+      const all = growOn(), tk = S.p.ticket || 0;
       $('#friendNote').hidden = !all;
       $('#friendNote').innerHTML = all ? `<span class="tk-ic">${TICKET_SVG}</span><span>친구 성장 쪽지 <b>${tk}</b>장. 종업식과 졸업식마다 1장씩 받아요. 키울 친구를 골라 주세요 (레벨마다 수업료 +2%)</span>` : '';
       $('#friendList').innerHTML = NEWCOMERS.map((n, i) => {
@@ -9928,7 +10488,7 @@ body{background:radial-gradient(120% 60% at 50% 0%, color-mix(in srgb, var(--pap
     S.budget = startBudget(S.p.perk.start) * costScale();
     S.students = 4;
     S.pwBank = (S.pwBank || 0) + pwLive(S);   // 졸업해서 시설이 처음으로 돌아가도 학교 파워는 줄지 않게 넣어 둬요
-    S.f = { classroom: 1, cafeteria: 0, library: 0, playground: 0, science: 0 };
+    S.f = { classroom: 1, cafeteria: 0, library: 0, playground: 0, science: 0, store: 0 };
     S.fu = freshFu();
     S.t = { squirrel: 1, owl: 0, bear: 0 };
     S.grade = 0; S.pending = 0; S.pendingSec = 0; S.yearEarned = 0;
@@ -9955,13 +10515,14 @@ body{background:radial-gradient(120% 60% at 50% 0%, color-mix(in srgb, var(--pap
     if (S.p.species < NEWCOMERS.length) { newcomer = NEWCOMERS[S.p.species]; S.p.species += 1; }
     else { S.p.ticket = (S.p.ticket || 0) + 1; rt.tkReward = { title: '친구 성장 쪽지를 받았어요!', sub: '졸업 탭의 전학 온 친구들에서 키울 친구를 골라요', items: [{ ic: 'ticket', t: `친구 성장 쪽지 +1 (지금 ${S.p.ticket}장)` }] }; }   // 여섯 친구가 다 온 뒤에는 친구 성장 쪽지
     newYear(false);
-    if (newcomer) rt.kidSeq = BASE_SPECIES.length + S.p.species - 1;   // 새 친구가 맨 먼저 교문으로 들어와요
+    if (newcomer) { rt.kidSeq = BASE_SPECIES.length + S.p.species - 1; rosterAdd(newcomer.k); }   // 새 친구가 맨 먼저 교문으로 들어와요. 2.0.0 명부에도
     $('#gConfirm').hidden = true;
     checkGrade();
     syncKids(false);
     renderMap(); renderHUD(); renderAffordance(); renderGradPanel(true);
     save();
     queueModal(() => showCeremony(dip, leaving, newcomer));
+    if (newcomer) queueModal(() => showNewTalk(newcomer));   // 2.0.0 전학 대화(식 창 다음에)
     if (rt.tkReward) { showReward(rt.tkReward); rt.tkReward = null; }   // 친구 성장 쪽지는 식이 끝난 뒤에 알려 줘요
   }
   function showCeremony(dip, leaving, newcomer) {
@@ -10010,13 +10571,17 @@ body{background:radial-gradient(120% 60% at 50% 0%, color-mix(in srgb, var(--pap
     let newcomer = null;
     if (S.p.species < NEWCOMERS.length) { newcomer = NEWCOMERS[S.p.species]; S.p.species += 1; }
     else { S.p.ticket = (S.p.ticket || 0) + 1; rt.tkReward = { title: '친구 성장 쪽지를 받았어요!', sub: '졸업 탭의 전학 온 친구들에서 키울 친구를 골라요', items: [{ ic: 'ticket', t: `친구 성장 쪽지 +1 (지금 ${S.p.ticket}장)` }] }; }
+    snapTake();   // 2.0.0 졸업식 사진: 이 학교급의 마지막 모습
+    S.roster = freshRoster(); S.club = freshClub();
     S.tier += 1; S.tg = 0; S.tdip = 0; S.best = 0; S.hd.furNew = false;
     S.p.dip = 0;
     for (const k in S.p.perk) S.p.perk[k] = 0;
     newYear(true);
+    rosterEnsure(newcomer && newcomer.k);   // 2.0.0 중학교부터 새 명부(방금 전학 온 친구도 함께)
     if (newcomer) rt.kidSeq = BASE_SPECIES.length + S.p.species - 1;
     $('#tierConfirm').hidden = true;
     queueModal(() => showEntrance(fund, leaving, from, newcomer, dipsIn));
+    if (newcomer) queueModal(() => showNewTalk(newcomer));   // 2.0.0 전학 대화
     if (rt.tkReward) { showReward(rt.tkReward); rt.tkReward = null; }   // 친구 성장 쪽지는 식이 끝난 뒤에 알려 줘요
     checkGrade();
     syncKids(false);
@@ -10032,7 +10597,7 @@ body{background:radial-gradient(120% 60% at 50% 0%, color-mix(in srgb, var(--pap
     $('#tierArt').innerHTML = `<svg viewBox="-26 -19 52 38" aria-hidden="true">` +
       crew.map((sp, i) => `<g transform="translate(${(i - 1) * 15} ${i === 1 ? -2 : 1}) scale(${i === 1 ? 1.1 : 0.95})">${kidSVG(sp, i)}</g>`).join('') + '</svg>';
     $('#tierFine').textContent = `${from.name}에서 모은 수료증 ${fmt(dipsIn || 0)}장이 장학재단 기금이 됐어요. ` + (newcomer ? `새 친구 ${newcomer.name}${newcomer.ga} 함께 왔어요. ` : '') +
-      `새로 생긴 과학실을 지어 보세요. 기금은 졸업 탭의 장학재단에서 써요. 졸업 선물로 황금 도토리 +${GOLD.promote}개를 받았어요.`;
+      `새로 생긴 ${eul(T.newb || '건물')} 지어 보세요. 기금은 졸업 탭의 장학재단에서 써요. 졸업 선물로 황금 도토리 +${GOLD.promote}개를 받았어요.`;
     $('#tierOk').textContent = `${T.name} 입학하기`;
     openModal($('#mTier'));
     sfx('bell'); setTimeout(() => sfx('quest'), 900);
@@ -10593,6 +11158,9 @@ body{background:radial-gradient(120% 60% at 50% 0%, color-mix(in srgb, var(--pap
     $('#panelMini').hidden = t !== 'mini';
     $('#panelDex').hidden = t !== 'dex'; $('#panelEvent').hidden = t !== 'event'; if (t === 'dex' || t === 'event') open170(t);   // 1.7.0 도감, 이벤트
     $('#panelEss').hidden = t !== 'ess';
+    $('#panelHall').hidden = t !== 'hall'; if (t === 'hall') { renderHall(); $('#panelHall').scrollTop = 0; }   // 2.0.0 학교 복도
+    $('#panelClub').hidden = t !== 'club'; if (t === 'club') { rt.clubPick = -1; renderClub(); $('#panelClub').scrollTop = 0; }
+    if (t !== 'school') tierViewClose();
     $('#panelDeco').hidden = t !== 'deco';   // 1.7.4 꾸미기 가게
     if (t === 'deco') { rt.decoPick = ''; rt.mkDraft = null; renderDecoShop(); $('#panelDeco').scrollTop = 0; }
     if (t !== 'school' && rt.decoEdit) decoEditEnd();
@@ -10853,6 +11421,29 @@ body{background:radial-gradient(120% 60% at 50% 0%, color-mix(in srgb, var(--pap
     $('#decoPickList').addEventListener('click', e => { const b = e.target.closest('[data-dput]'); if (!b) return; if (decoPut(rt.decoSlot, b.dataset.dput)) { sfx('quest'); achSync(); closeModal($('#mDecoPick')); } });
     $('#decoPickClear').addEventListener('click', () => { decoPut(rt.decoSlot, ''); sfx('tap'); closeModal($('#mDecoPick')); });
     $('#decoPickClose').addEventListener('click', () => closeModal($('#mDecoPick')));
+    // 2.0.0 동아리, 학교급 모습 보기, 전학 대화
+    $('#clubAutoBtn').addEventListener('click', () => { if (clubAuto()) { sfx('quest'); toast('능력치에 맞게 동아리를 나눴어요'); questChanged(); } });
+    $('#clubBody').addEventListener('click', e => {
+      const seat = e.target.closest('[data-seat]'), show = e.target.closest('[data-show]'), row = e.target.closest('.rs-row[data-ri]');
+      if (show) { const c = +show.dataset.show; if (show.getAttribute('aria-disabled') === 'true') { shake(show); toast(!showReady() ? `발표회는 ${CLUB.showDays}일에 한 번 열 수 있어요. ${showWait()}일 남았어요` : '부원이 있어야 발표회를 열 수 있어요'); return; } clubShowGo(c); return; }
+      if (seat) { openSeatPick(+seat.dataset.seat); sfx('tap'); return; }
+      if (row) { openClubPick(+row.dataset.ri); sfx('tap'); }
+    });
+    $('#seatList').addEventListener('click', e => {
+      const p = e.target.closest('[data-pick]'), pc = e.target.closest('[data-pickc]');
+      if (p && rt.seatClub != null) clubSet(+p.dataset.pick, rt.seatClub);
+      else if (pc && rt.seatStudent != null) clubSet(rt.seatStudent, +pc.dataset.pickc);
+      else return;
+      sfx('buy'); closeModal($('#mSeat')); renderClub(); questChanged();
+    });
+    $('#seatOut').addEventListener('click', () => { if (rt.seatStudent != null) clubSet(rt.seatStudent, -1); closeModal($('#mSeat')); renderClub(); questChanged(); });
+    $('#seatClose').addEventListener('click', () => closeModal($('#mSeat')));
+    $('#mSeat .backdrop').addEventListener('click', () => closeModal($('#mSeat')));
+    $('#tierDots').addEventListener('click', e => { const b = e.target.closest('[data-td]'); if (!b) return; const t = +b.dataset.td; if (t > S.tier) { shake(b); toast(`${TIER_ALL[t]}는 아직 갈 수 없어요`); return; } if (t === S.tier) tierViewClose(); else tierViewOpen(t); });
+    $('#tvBack').addEventListener('click', () => { sfx('tap'); tierViewClose(); });
+    $('#tvEdit').addEventListener('click', () => { sfx('tap'); rt.viewEdit = !rt.viewEdit; renderTierView(true); if (!rt.viewEdit) save(); });
+    $('#tvMap').addEventListener('click', e => { const h = e.target.closest('[data-tvslot]'); if (h && rt.viewEdit) openDecoPick(+h.dataset.tvslot); });
+    $('#mTalk').addEventListener('click', () => talkNext());
     $('#mDecoPick .backdrop').addEventListener('click', () => closeModal($('#mDecoPick')));
     $('#btnShop').addEventListener('click', () => { if (!rt.paused && !rt.modalOpen) { sfx('tap'); openShop(); } });
     $('#shopList').addEventListener('click', e => {
@@ -11163,6 +11754,8 @@ body{background:radial-gradient(120% 60% at 50% 0%, color-mix(in srgb, var(--pap
     ev_stamp_on: '<svg viewBox="0 0 40 40" aria-hidden="true"><circle cx="20" cy="20" r="17" fill="#C2453A"/><circle cx="20" cy="20" r="12" fill="none" stroke="#FFF6DC" stroke-width="2"/><path d="M13 20l5 5 9-10" fill="none" stroke="#FFF6DC" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"/></svg>',
     ev_stamp_off: '<svg viewBox="0 0 40 40" aria-hidden="true"><circle cx="20" cy="20" r="17" fill="none" stroke="#8A8A7A" stroke-width="2" stroke-dasharray="4 3"/></svg>'
   };
+  // 2.0.0 새 전학생 6종: 그림(작업지시서 20)이 오기 전에는 그림 문자
+  for (const k of Object.keys(KID_EMOJI)) PLACE170['chr_' + k] = `<svg viewBox="0 0 64 64" aria-hidden="true"><text x="32" y="46" text-anchor="middle" font-size="40">${KID_EMOJI[k]}</text></svg>`;
   // 그림이 있으면 <img>, 없으면 임시 도형이나 기존 그림을 그려요. fb는 대신 쓸 기존 그림 열쇠
   const pic7 = (k, fb) => {
     const u = IMG7(k) || (fb ? IMG(fb) : '');
@@ -11191,6 +11784,12 @@ body{background:radial-gradient(120% 60% at 50% 0%, color-mix(in srgb, var(--pap
     panda: '하루에 열두 번 간식을 먹어요. 느긋해 보여도 시험은 늘 만점이에요.',
     koala: '나무 위에서 수업을 들어도 다 알아들어요. 조용한 도서관을 좋아해요.',
     otter: '물장구치며 노는 걸 제일 좋아해요. 조개껍데기로 악기를 만들어요.',
+    hamster: '볼 주머니에 해바라기 씨를 가득 모아요. 쳇바퀴 달리기는 지칠 줄 몰라요.',
+    duck: '연못에서 전학 왔어요. 비 오는 날이면 신이 나서 노래를 불러요.',
+    turtle: '느릿느릿 걸어도 한 번 시작한 일은 끝까지 해요. 등딱지에 스티커를 붙여요.',
+    mole: '땅속 길을 누구보다 잘 알아요. 작은 안경 너머로 별자리 책을 읽어요.',
+    frog: '높이뛰기 선수예요. 개굴개굴 합창 동아리를 만들고 싶어 해요.',
+    waterdeer: '숲속 들판을 가볍게 뛰어다녀요. 수줍지만 그림 솜씨가 좋아요.',
     tea_squirrel: '도토리 셈이 숲에서 가장 빠른 수학 선생님이에요. 수업료를 올려 줘요.',
     tea_owl: '밤에도 눈이 반짝이는 과학 선생님이에요. 자리를 비운 동안에도 수업을 이어 줘요.',
     tea_dietitian: '급식실 식단을 짜는 영양 선생님이에요. 편식하는 친구에게는 사과를 하나 더 얹어 줘요.',
@@ -11486,6 +12085,8 @@ body{background:radial-gradient(120% 60% at 50% 0%, color-mix(in srgb, var(--pap
     rt.t170 = 0;
     if (!S.dex || !S.ev) return;
     dexSync(); evSync();
+    rosterEnsure(); clubWeekTick(); renderHallBtn(); renderTierDots();   // 2.0.0
+    if (rt.tab === 'club') renderClubLite();
     const dd = $('#dexDot'), ed = $('#evDot');
     if (dd) dd.hidden = !dexPending().length && !achClaimable();   // 1.7.1 받을 업적도 점으로
     tick171ach();
@@ -12347,7 +12948,9 @@ body{background:radial-gradient(120% 60% at 50% 0%, color-mix(in srgb, var(--pap
   }
 
   // 시험용 손잡이: 자동 시험(window.__FOREST_TEST)에서만 게임 속 함수를 꺼내 써요
-  if (window.__FOREST_TEST) window.__forest = { get S() { return S; }, goTo, mainReady, trialHunt, updateTrial, TRIAL, zoomAt, fitMap, ZOOM_MAX, DECO, DECO_SLOTS, DECO_SIGN, decoCost, decoSoldOut, pickDeco, buyDeco, decoPut, decoEditStart, decoEditEnd, openDecoPick, renderDeco, renderDecoShop, setSchoolNm, setMark, schoolTitle, markHTML, decoPlacedAll, achSync, esExLeft, esExCost, essItem, pickEss, buyEss, ESHOP, get Cloud() { return Cloud; }, get actx() { return actx; }, Music, musicWant, musicSync, ensureAudio, bgmLoad, pzUI, rt, makeDeal, furStage, DEAL, navInfo, navRoute, spawnDrop, repTipCheck, linkGoogle, retryCloud, sanitize, acctPending, renderMap, renderHUD, renderAffordance, syncKids, layoutMap, geo, startTrial, hitTrial, endTrial, startVisit, endVisit, showReward, recommend, needCost, prepTopUp, qReward, prepPhase, rankScore, pwOf, previewDip, dipMult, costScale, buyFacility, buyFur, buyFurAll, furCost, furReady, furDone, FUR, startTalk, endTalk, teacherAct, facCost, teaCost, facKeys, rate, rep, capacity, canGraduate, canPromote,
+  if (window.__FOREST_TEST) window.__forest = { get S() { return S; }, goTo,
+    rosterEnsure, rosterMake, rosterAdd, clubAuto, clubSet, clubPct, clubShow, clubSum, clubStars, clubMembers, clubShowGo, showReady, showWait, showDay, clubWeekTick, clubFacUp, CLUBS, CLUB, star, clubTuitionMult, clubFestMult, clubDecoOff, renderClub, renderHall, openSeatPick, openClubPick,
+    snapTake, snapOf, tierViewOpen, tierViewClose, renderTierView, renderTierDots, viewMap, showNewTalk, talkNext, NEWCOMERS, TIERS, GEO, geoIdx, decoCost0, qMeasure, qDone, qGoal, kidSVG, newYear, checkGrade, gradeOf, townRep, FAC, sanitize200, mainReady, trialHunt, updateTrial, TRIAL, zoomAt, fitMap, ZOOM_MAX, DECO, DECO_SLOTS, DECO_SIGN, decoCost, decoSoldOut, pickDeco, buyDeco, decoPut, decoEditStart, decoEditEnd, openDecoPick, renderDeco, renderDecoShop, setSchoolNm, setMark, schoolTitle, markHTML, decoPlacedAll, achSync, esExLeft, esExCost, essItem, pickEss, buyEss, ESHOP, get Cloud() { return Cloud; }, get actx() { return actx; }, Music, musicWant, musicSync, ensureAudio, bgmLoad, pzUI, rt, makeDeal, furStage, DEAL, navInfo, navRoute, spawnDrop, repTipCheck, linkGoogle, retryCloud, sanitize, acctPending, renderMap, renderHUD, renderAffordance, syncKids, layoutMap, geo, startTrial, hitTrial, endTrial, startVisit, endVisit, showReward, recommend, needCost, prepTopUp, qReward, prepPhase, rankScore, pwOf, previewDip, dipMult, costScale, buyFacility, buyFur, buyFurAll, furCost, furReady, furDone, FUR, startTalk, endTalk, teacherAct, facCost, teaCost, facKeys, rate, rep, capacity, canGraduate, canPromote,
     fmt, fmt2, graduate, promote, buyPerk, perkCost, perkMaxed, buyFundPerk, fpCost, claimMain, mainReady, curMain, qNo, earn, CFG, TEA, teaMaxed, PERKS, FPERKS, MAIN, finalYear, startTrip, claimTrip, TRIPS, yearLocked, startSports, endSports, rtSports: () => rt.sports, startFest, rtFest: () => rt.fest, facCap, addLeague, weekIdx, addMP, tutStart, endFest, claimSports, claimBox, musicWant, askBox, festWait, setTab, openSheet, closeSheet,
     dexMeet, dexSync, dexPending, dexGift, renderDex, evCurrent, evNext, evSync, claimStamp, claimEvMission, claimEvBox, renderEvent, evMissions, evOk, evSkipped, EV_MONTHS, EV_MEASURE, tierMinutes, minAcorns, IMG, sanitize171, ACH, achSync, claimAch, setTitle, renderAch, setDexSeg, achClaimable, XT, xtAct, xtCost, xtLv, feastMins, libMult, propInstances, walkBuild, festItemSvg, guestArt, adErrText, googleErrText, openSheet, closeSheet, startFest, startSports, sanitize170, EV_STAMPS, EV_SPECIAL, EV_MONTHLY, EV_BOX, DEX_KEYS, DEX_REWARD, DEX_GUEST_KEYS, seasonKey, roofArtKey, oakKey, setSeasonArt, VP, vpLv, vpCost, vpMult, vpAct, renderVpCard, sportsPrize, festPrize, renderTeachers, buildTeacherCards, bldImg, roofKey, bldStage, mapKey, setMapArt, applyThemes, buyFacility, startTrial, endTrial: () => rt.trial && (rt.trial.left = 0), spawnDeal, startVisit, IMG170, MG, mgCells, mgSetCells, mgTick, mgAddEnergy, mgAddUp, mgTapGen, mgDrop, mgSell, mgUpgrade, mgClaimOrder, mgSwapOrder, mgOrderOk, mgFillOrders, mgOpen, mgClose, mgRenderAll, mgSpawnLevel, mgNearestEmpty, mgEmptyBoard, mgOrderReward, mgUI, sanitize180, mgWatchAd, mgNewOrder, mgHintPick, mgShowHint, mgClearHint, mgTouch, mgOrderGuide, mgDexN, mgDexCan, mgDexClaim, mgOpenDex, MG_DEX, nice, claimMission, claimBonus, claimWeekMission, MP_BOX,   // 1.7.0 도감, 이벤트
     PZ, PZ_SHAPES, pzFits, pzAnyFit, pzStuck, pzFullLines, pzPlace, pzFreshGame, pzStart, PZB, pzbCost, pzApplyBoost, pzBoostOpen, pzBoostGo, festGoldLeft, festGoldTake, claimSports, renderStreet, pzFinish, pzLeft, pzCanAd, pzEssOf, pzMinOf, pzHelpSquirrel, pzHelpOwl, pzHelpBear, fillSubs, mapRoofTop, showAd, claimOfflineDouble, startBoost, tripAd, festFocus, festRange, visMap, renderMissions, pzHasHelp, pzRot, pzNewPiece, pzOpen, pzClose, pzGameOver, pzRenderAll, renderMini, addEss, ESHOP, SP_FUR, applyCos, essItem, pickEss, buyEss, renderEssShop, esAcornLeft, esGoldLeft, esAcornAmt, hatSVG, spFurImg, gameNow, gameToday, gameWeek, kstDay, setServerTime, SVR, dmDay, weekIdx, lgWeek, wkWeek, lgKey, pzDay, goldDay, boostLeft, dealLeft, canStamp };
