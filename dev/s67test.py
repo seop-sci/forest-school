@@ -4,7 +4,7 @@
 # (3) 정수가 모자라면 안 사져요, 다음 날 횟수가 다시 차요
 # (4) 저장: 옛 저장(bst 없음)은 기본값, 망가진 값은 바로잡기, 저장 후 다시 읽어도 행운 남은 횟수 그대로
 # (5) 화면: 360px 어두운 화면, 390px 밝은 화면에서 부스터 창과 아래 칸이 넘치지 않는지
-# 쓰는 법: python3 wrap.py && python3 s66test.py   (마지막 줄이 PASS면 통과)
+# 쓰는 법: python3 wrap.py && python3 s67test.py   (마지막 줄이 PASS면 통과)
 import asyncio, json, calendar
 from playwright.async_api import async_playwright
 from s4test import URL
@@ -66,12 +66,12 @@ async def main():
             await pg2.evaluate(f"(()=>{{ const F={F}, S=F.S; S.ess = 30; F.mgOpen(); S.mg.bst.luck = 12; F.mgRenderAll(); }})()")
             await pg2.wait_for_timeout(300)
             r = await pg2.evaluate("""(()=>{ const f = document.querySelector('#mgFoot'), fr = f.getBoundingClientRect(); const over = [...f.querySelectorAll('*')].filter(el => { const r = el.getBoundingClientRect(); return r.width && (r.right > fr.right + 1 || r.left < fr.left - 1); }).map(el => el.className || el.tagName); return { over, sw: document.documentElement.scrollWidth }; })()""")
-            await pg2.screenshot(path=f's66_foot_{w}.png')
+            await pg2.screenshot(path=f's67_foot_{w}.png')
             if r['over'] or r['sw'] > w: fails.append(f'{w}px 아래 칸 넘침 {r}')
             await pg2.evaluate(f"{F}.mgOpenBoost()")
             await pg2.wait_for_timeout(300)
             r = await pg2.evaluate("""(()=>{ const s = document.querySelector('#mgBoostSheet'), sr = s.getBoundingClientRect(); const over = [...s.querySelectorAll('*')].filter(el => { const r = el.getBoundingClientRect(); return r.width && (r.right > sr.right + 1 || r.left < sr.left - 1); }).map(el => el.className || el.tagName); return { over, top: sr.top }; })()""")
-            await pg2.screenshot(path=f's66_sheet_{w}.png')
+            await pg2.screenshot(path=f's67_sheet_{w}.png')
             if r['over'] or r['top'] < 0: fails.append(f'{w}px 부스터 창 넘침 {r}')
             if e2: fails.append(f'{w}px 오류 {e2}')
             await c2.close()
