@@ -3,7 +3,7 @@
 #  1) 휠로 키우면 커지고(최대 ZOOM_MAX), 줄이기는 처음 크기까지만. 휠 자리는 그대로 남아요
 #  2) 손가락 두 개를 벌리면 커지고 모으면 줄어요(처음 크기까지). 손가락을 뗀 뒤 건물이 눌리지 않아요
 #  3) 키운 채로 지도를 밀어도 빈 곳이 보이지 않아요(지도 끝이 화면 안으로 들어오지 않아요)
-#  4) 선생님 탭은 홈 곡(home), 졸업 탭은 쉬는 시간 곡(room)
+#  4) 홈에서 여는 탭(선생님, 퀘스트, 랭킹, 도감, 이벤트)은 홈 곡(home), 졸업 탭은 쉬는 시간 곡(room)
 #  5) 페이지 오류 없음
 # 쓰는 법: python3 wrap.py && python3 s63test.py   (마지막 줄이 PASS면 통과)
 import asyncio, json
@@ -51,9 +51,9 @@ async def main():
         print('끝', e, e2)
         if abs(e[0]) > 0.5 or abs(e2[0]) > 0.5 or e2[1] < -0.5: bad.append(f'지도 끝이 화면 안으로 들어와요 {e} {e2}')
         # 배경음악
-        m = await pg.evaluate(f"(() => {{ const F = {F}; F.S.bgm = true; const out = []; F.setTab('teachers'); out.push(F.musicWant()); F.setTab('grad'); out.push(F.musicWant()); F.setTab('school'); out.push(F.musicWant()); return out; }})()")
+        m = await pg.evaluate(f"(() => {{ const F = {F}; F.S.bgm = true; const out = []; F.setTab('teachers'); out.push(F.musicWant()); F.setTab('grad'); out.push(F.musicWant()); for (const t of ['quests', 'rank', 'dex', 'event']) {{ F.setTab(t); out.push(F.musicWant()); }} F.setTab('school'); out.push(F.musicWant()); return out; }})()")
         print('곡', m)
-        if m != ['home', 'room', 'home']: bad.append(f'배경음악 {m}')
+        if m != ['home', 'room', 'home', 'home', 'home', 'home', 'home']: bad.append(f'배경음악 {m}')
         if errs: bad.append(f'페이지 오류 {errs[:3]}')
         await ctx.close()
         # 휴대폰: 손가락 두 개 (CDP 터치)
