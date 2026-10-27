@@ -2167,7 +2167,7 @@ body{background:radial-gradient(120% 60% at 50% 0%, color-mix(in srgb, var(--pap
       <button class="panel-x" type="button" aria-label="홈으로"><svg viewBox="0 0 24 24" width="18" height="18" aria-hidden="true"><path d="M6 6l12 12M18 6L6 18" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round"/></svg></button>
       <h2 id="ttlSettings" class="ph"><span class="tic" data-ic="ic_settings" aria-hidden="true"></span><span>설정</span></h2>
       <div class="slist">
-        <label class="srow" for="optBgm"><span class="txt"><b>배경음악</b><small>탭과 배경 테마마다 곡이 바뀌어요</small></span><input type="checkbox" class="switch" id="optBgm"></label>
+        <label class="srow" for="optBgm"><span class="txt"><b>배경음악</b><small>홈, 탭 화면, 학교 행사, 미니게임마다 곡이 바뀌어요</small></span><input type="checkbox" class="switch" id="optBgm"></label>
         <label class="srow" for="optSound"><span class="txt"><b>효과음</b><small>도토리 줍는 소리와 학교 종소리</small></span><input type="checkbox" class="switch" id="optSound"></label>
         <label class="srow" for="optVibe"><span class="txt"><b>진동</b><small>도토리를 주울 때 살짝 떨려요</small></span><input type="checkbox" class="switch" id="optVibe"></label>
         <div class="srow"><span class="txt"><b>숫자 단위</b><small>큰 숫자를 줄여 쓰는 방법이에요</small></span><div class="seg" id="optUnits" role="radiogroup" aria-label="숫자 단위"><button type="button" role="radio" data-units="ko" aria-checked="true">1.2만</button><button type="button" role="radio" data-units="en" aria-checked="false">12K</button></div></div>
@@ -3956,6 +3956,8 @@ body{background:radial-gradient(120% 60% at 50% 0%, color-mix(in srgb, var(--pap
   // 파일이 없거나 풀기에 실패하면 예전처럼 코드로 연주하는 곡(SONGS)으로 돌아가요. 'play'(미니게임)는 코드 곡이 없어서 'room' 곡으로 돌아가요
   const FILE_SONG = { home: 'bgm_home', room: 'bgm_room', festival: 'bgm_festival', play: 'bgm_play' };
   const FILE_GAIN = 0.6;   // 파일 곡은 코드 곡보다 커서 조금 줄여요
+  // 1.7.3: 테마 곡은 Suno 곡이 올 때(1.8.0)까지 쉬어요. 테마를 골라도 홈에서는 새 홈 곡이 나오고, 상점의 '테마 곡 듣기'도 숨겨요(지섭 결정). 1.8.0에서 true로
+  const THEME_MUSIC = false;
   const bgmBuf = new Map();   // 풀어 둔 곡. 한 곡이 30MB쯤 메모리를 써서 두 곡까지만 들고 있어요
   function bgmLoad(key) {
     if (bgmBuf.has(key)) { const p = bgmBuf.get(key); bgmBuf.delete(key); bgmBuf.set(key, p); return p; }
@@ -3976,7 +3978,7 @@ body{background:radial-gradient(120% 60% at 50% 0%, color-mix(in srgb, var(--pap
     if (Music.preview && rt.tab === 'shop') return Music.preview;
     if (!S.bgm) return '';
     if (rt.fest || rt.sports) return 'festival';
-    if (rt.tab === 'school') return SONGS[S.cos.th.bg] ? S.cos.th.bg : 'home';
+    if (rt.tab === 'school') return THEME_MUSIC && SONGS[S.cos.th.bg] ? S.cos.th.bg : 'home';
     let play = false; try { play = !!(pzUI && pzUI.open); } catch (e) { /* 퍼즐이 아직 준비 전 */ }
     if (play) return 'play';
     return 'room';
@@ -4940,7 +4942,9 @@ body{background:radial-gradient(120% 60% at 50% 0%, color-mix(in srgb, var(--pap
     // 지도 위 끝은 위쪽 칸 뒤에 머물러서 빈 곳이 보이지 않아요(그 뒤는 .frame의 하늘색)
     const down = Math.max(0, (rt.hudTop || 0) + 4 - (mapRoofTop() + 60) * rt.mapS);
     const lo = rt.mapH < H ? H - (rt.hudBot || 0) - rt.mapH : H - rt.mapH;
-    rt.panY = Math.min(down, Math.max(Math.min(lo, down), y));
+    // 1.7.3: 지도를 360칸으로 줄이면 긴 휴대폰에서는 지도 전체가 위쪽 칸과 아래 탭 사이에 다 들어가요(lo > down).
+    // 그때는 지도 아래 끝을 아래 탭 위에 맞춰 두고(위아래로 움직이지 않아요), 지도 위쪽 빈 곳은 흐린 배경(.frame::before)이 채워요
+    rt.panY = lo > down ? lo : Math.min(down, Math.max(lo, y));
     map.style.transform = `translate(${rt.panX.toFixed(1)}px, ${rt.panY.toFixed(1)}px)`;
   }
   // 1.6.0 학교 행사: 행사 자리(지도 y 범위)가 위쪽 칸과 아래 탭 사이에 다 보이게 지도를 옮겨요. 범위가 더 크면 위쪽을 맞춰요
@@ -7139,7 +7143,7 @@ body{background:radial-gradient(120% 60% at 50% 0%, color-mix(in srgb, var(--pap
     for (const t of THEMES) {
       const n = thCount(t.id), done = n === TH_SLOTS.length;
       const playing = Music.preview === t.id;
-      h += `<div class="th-card${done ? ' done' : ''}"><div class="th-top"><b>${t.name}</b><button class="th-play${playing ? ' on' : ''}" type="button" data-play="${t.id}" aria-pressed="${playing}">${playing ? '♪ 듣는 중' : '♪ 테마 곡 듣기'}</button><span class="th-prog">${done ? '세트 완성' : n + '/' + TH_SLOTS.length}</span></div>` +
+      h += `<div class="th-card${done ? ' done' : ''}"><div class="th-top"><b>${t.name}</b><button${THEME_MUSIC ? '' : ' hidden'} class="th-play${playing ? ' on' : ''}" type="button" data-play="${t.id}" aria-pressed="${playing}">${playing ? '♪ 듣는 중' : '♪ 테마 곡 듣기'}</button><span class="th-prog">${done ? '세트 완성' : n + '/' + TH_SLOTS.length}</span></div>` +
         (done ? '' : (() => { const R = thRest(t.id), poor = S.gold < R.price;
           return `<button class="th-all${poor ? ' poor' : ''}" type="button" data-buy="s:${t.id}"><span>${R.left.length === TH_SLOTS.length ? '세트 한 번에 사기' : `남은 ${R.left.length}개 한 번에`}${R.left.length >= 2 ? ` <small>${Math.round(TH_SET_SALE * 100)}% 할인</small>` : ''}</span><b>${R.left.length >= 2 ? `<s>${R.full}</s>` : ''}${coin}${R.price}</b></button>`; })()) +
         (() => { const own = TH_SLOTS.filter(([sl]) => thOwn(t.id, sl)), on = own.every(([sl]) => S.cos.th[sl] === t.id);
