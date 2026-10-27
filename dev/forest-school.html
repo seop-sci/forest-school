@@ -3252,6 +3252,9 @@ body{background:radial-gradient(120% 60% at 50% 0%, color-mix(in srgb, var(--pap
 
     { id: 'q7', ch: 1, t: 'tea', k: 'owl', n: 1, r: 200, title: '부엉이 선생님 모시기', how: '학교를 비운 동안에도 도토리가 더 쌓여요',
       say: '마을이 생긴 걸 축하해요! 이번엔 밤에도 수업해 줄 부엉이 선생님을 모셔요. 학교를 비운 동안 쌓이는 도토리가 늘어나요.' },
+    // 1.7.4 지섭 결정: 매와 뱀 쫓아내기. 이 퀘스트를 하는 동안에는 매나 뱀이 바로, 자주 와요(updateTrial)
+    { id: 'h1', ch: 1, t: 'trials', n: 1, r: 200, title: '침입자 쫓아내기', how: '매나 뱀이 나타나면 여러 번 눌러서 쫓아내요',
+      say: '큰일이에요! 학교 소문을 듣고 매와 뱀이 기웃거려요. 나타나면 빨간 테두리가 생겨요. 20초 안에 여러 번 톡톡 눌러서 쫓아내 주세요!' },
     { id: 'q8', ch: 1, t: 'students', n: 30, r: 250, title: '학생 30명 맞이하기', how: '교실을 Lv.6까지 넓히면 30명이 들어와요',
       say: '마을에서 입학 문의가 밀려와요. 교실을 넓혀서 학생 30명을 맞이해 볼까요?' },
     { id: 'q9', ch: 1, t: 'fac', k: 'cafeteria', n: 3, r: 250, title: '급식실 키우기', how: '급식실 Lv.3이면 수업료가 60% 올라요',
@@ -3431,7 +3434,7 @@ body{background:radial-gradient(120% 60% at 50% 0%, color-mix(in srgb, var(--pap
     { who: 'chick', t: 'earned', n: () => nice(rate() * 120), say: n => `도토리 ${fmt(n)}개를 모아서 숲속 잔치를 열어요!` },
     { who: 'rabbit', t: 'claims', n: () => 1, say: () => '학교 문을 닫았다가 다시 와 주세요. 그동안 수업이 잘 이어지는지 볼게요.' }
   ];
-  const COUNT_TYPES = new Set(['picks', 'ups', 'trains', 'claims', 'earned', 'trips', 'sports', 'fest']);
+  const COUNT_TYPES = new Set(['picks', 'ups', 'trains', 'claims', 'earned', 'trips', 'sports', 'fest', 'trials']);
   const Q_TYPES = ['fac', 'tea', 'teaAll', 'students', 'grade', 'ygrade', 'rate', 'picks', 'ups', 'trains', 'claims', 'earned', 'grads', 'perks', 'tier', 'tgrads', 'fperks', 'trips', 'souv', 'tripat', 'sports', 'fest'];
 
   /* ---------- 상태 ---------- */
@@ -4730,7 +4733,9 @@ body{background:radial-gradient(120% 60% at 50% 0%, color-mix(in srgb, var(--pap
   /* ---------- 시련: 뱀이나 매가 학교에 와요 ----------
      1장을 마친 뒤 가끔(12~25분마다) 나타나요. 20초 안에 여러 번 눌러서 쫓아내면 상품, 못 쫓아내면 도토리를 조금 물고 가요.
      곰 선생님이 함께 막아 줘서 곰 선생님 레벨이 높을수록 덜 눌러도 돼요 */
-  const TRIAL = { every: [720, 1500], first: 360, time: 20, win: 8, lose: 5 };
+  const TRIAL = { every: [720, 1500], first: 360, time: 20, win: 8, lose: 5, hunt: [20, 40], huntFirst: 3 };
+  // 1.7.4 메인 퀘스트 '침입자 쫓아내기'를 하는 동안: 퀘스트가 나오면 3초 뒤 바로, 그 뒤로도 20~40초마다 와요
+  const trialHunt = () => { const q = curMain(); return !!q && q.t === 'trials' && !mainReady(); };
   // 1.7.1 지도에 오는 뱀, 매, 까치도 도감 그림으로 그려요(그림이 없으면 예전 도형)
   const guestArt = kind => { const u = IMG170('chr_' + kind); if (!u) return kind === 'snake' ? SNAKE : kind === 'hawk' ? HAWK : MAGPIE;
     const w = kind === 'magpie' ? 40 : 38; return `<g class="tr-body"><image href="${u}" x="${-w / 2}" y="${-w / 2}" width="${w}" height="${w}"/></g>`; };
@@ -4753,10 +4758,14 @@ body{background:radial-gradient(120% 60% at 50% 0%, color-mix(in srgb, var(--pap
       return;
     }
     if (!trialOpen() || rt.tab !== 'school' || rt.modalOpen || festBusy() || rt.paused) return;
-    if (rt.trialT === undefined) rt.trialT = TRIAL.first;
+    const hunt = trialHunt();
+    if (rt.trialT === undefined) rt.trialT = hunt ? TRIAL.huntFirst : TRIAL.first;
+    if (hunt && rt.trialT > TRIAL.hunt[1]) rt.trialT = TRIAL.huntFirst;
+    if (!hunt && rt.trialWasHunt) rt.trialT = rand(TRIAL.every[0], TRIAL.every[1]);   // 퀘스트를 마치면 다시 드문드문
+    rt.trialWasHunt = hunt;
     rt.trialT -= dt;
     if (rt.trialT > 0) return;
-    rt.trialT = rand(TRIAL.every[0], TRIAL.every[1]);
+    rt.trialT = hunt ? rand(TRIAL.hunt[0], TRIAL.hunt[1]) : rand(TRIAL.every[0], TRIAL.every[1]);
     startTrial(Math.random() < 0.5 ? 'snake' : 'hawk');
   }
   function startTrial(kind) {
@@ -9817,6 +9826,7 @@ body{background:radial-gradient(120% 60% at 50% 0%, color-mix(in srgb, var(--pap
       case 'grade': case 'ygrade': return `${CFG.grades[q.n].title} 되기`;
       case 'rate': return `초당 도토리 ${fmt(q.n)}개 벌기`;
       case 'picks': return `떨어진 도토리 ${q.n}개 줍기`;
+      case 'trials': return q.n === 1 ? '매나 뱀 쫓아내기' : `매나 뱀 ${q.n}번 쫓아내기`;
       case 'ups': return `시설 ${q.n}번 고치기`;
       case 'trains': return `선생님 연수 ${q.n}번 보내기`;
       case 'claims': return `자리 비운 보상 ${q.n}번 받기`;
@@ -10225,6 +10235,9 @@ body{background:radial-gradient(120% 60% at 50% 0%, color-mix(in srgb, var(--pap
       case 'students':
         if (capacity() < q.n) return goFac('classroom', '교실을 넓혀야 학생이 더 들어올 수 있어요');
         setTab('school'); return toast('학생들이 오고 있어요. 조금만 기다려 주세요');
+      case 'trials':   // 1.7.4 곧 매나 뱀이 와요
+        setTab('school'); if (!rt.trial) rt.trialT = Math.min(rt.trialT === undefined ? 2 : rt.trialT, 2);
+        return toast('곧 매나 뱀이 나타나요. 나타나면 여러 번 눌러서 쫓아내요');
       case 'picks':
         if (S.f.playground < 1) return goFac('playground', `${eul(FAC.playground.name)} 먼저 지어야 해요`);
         setTab('school'); return toast(`참나무를 누르면 도토리가 떨어져요. ${FAC.playground.name}에 떨어진 도토리를 눌러서 주워요`);
@@ -11447,7 +11460,7 @@ body{background:radial-gradient(120% 60% at 50% 0%, color-mix(in srgb, var(--pap
   }
 
   // 시험용 손잡이: 자동 시험(window.__FOREST_TEST)에서만 게임 속 함수를 꺼내 써요
-  if (window.__FOREST_TEST) window.__forest = { get S() { return S; }, zoomAt, fitMap, ZOOM_MAX, DECO, DECO_SLOTS, DECO_SIGN, decoCost, decoSoldOut, pickDeco, buyDeco, decoPut, decoEditStart, decoEditEnd, openDecoPick, renderDeco, renderDecoShop, setSchoolNm, setMark, schoolTitle, markHTML, decoPlacedAll, achSync, esExLeft, esExCost, essItem, pickEss, buyEss, ESHOP, get Cloud() { return Cloud; }, get actx() { return actx; }, Music, musicWant, musicSync, ensureAudio, bgmLoad, pzUI, rt, makeDeal, furStage, DEAL, navInfo, navRoute, spawnDrop, repTipCheck, linkGoogle, retryCloud, sanitize, acctPending, renderMap, renderHUD, renderAffordance, syncKids, layoutMap, geo, startTrial, hitTrial, endTrial, startVisit, endVisit, showReward, recommend, needCost, prepTopUp, qReward, prepPhase, rankScore, pwOf, previewDip, dipMult, costScale, buyFacility, buyFur, buyFurAll, furCost, furReady, furDone, FUR, startTalk, endTalk, teacherAct, facCost, teaCost, facKeys, rate, rep, capacity, canGraduate, canPromote,
+  if (window.__FOREST_TEST) window.__forest = { get S() { return S; }, goTo, mainReady, trialHunt, updateTrial, TRIAL, zoomAt, fitMap, ZOOM_MAX, DECO, DECO_SLOTS, DECO_SIGN, decoCost, decoSoldOut, pickDeco, buyDeco, decoPut, decoEditStart, decoEditEnd, openDecoPick, renderDeco, renderDecoShop, setSchoolNm, setMark, schoolTitle, markHTML, decoPlacedAll, achSync, esExLeft, esExCost, essItem, pickEss, buyEss, ESHOP, get Cloud() { return Cloud; }, get actx() { return actx; }, Music, musicWant, musicSync, ensureAudio, bgmLoad, pzUI, rt, makeDeal, furStage, DEAL, navInfo, navRoute, spawnDrop, repTipCheck, linkGoogle, retryCloud, sanitize, acctPending, renderMap, renderHUD, renderAffordance, syncKids, layoutMap, geo, startTrial, hitTrial, endTrial, startVisit, endVisit, showReward, recommend, needCost, prepTopUp, qReward, prepPhase, rankScore, pwOf, previewDip, dipMult, costScale, buyFacility, buyFur, buyFurAll, furCost, furReady, furDone, FUR, startTalk, endTalk, teacherAct, facCost, teaCost, facKeys, rate, rep, capacity, canGraduate, canPromote,
     fmt, fmt2, graduate, promote, buyPerk, perkCost, perkMaxed, buyFundPerk, fpCost, claimMain, mainReady, curMain, qNo, earn, CFG, TEA, teaMaxed, PERKS, FPERKS, MAIN, finalYear, startTrip, claimTrip, TRIPS, yearLocked, startSports, endSports, rtSports: () => rt.sports, startFest, rtFest: () => rt.fest, facCap, addLeague, weekIdx, addMP, tutStart, endFest, claimSports, claimBox, musicWant, askBox, festWait, setTab, openSheet, closeSheet,
     dexMeet, dexSync, dexPending, dexGift, renderDex, evCurrent, evNext, evSync, claimStamp, claimEvMission, claimEvBox, renderEvent, evMissions, evOk, evSkipped, EV_MONTHS, EV_MEASURE, tierMinutes, minAcorns, IMG, sanitize171, ACH, achSync, claimAch, setTitle, renderAch, setDexSeg, achClaimable, XT, xtAct, xtCost, xtLv, feastMins, libMult, propInstances, walkBuild, festItemSvg, guestArt, adErrText, googleErrText, openSheet, closeSheet, startFest, startSports, sanitize170, EV_STAMPS, EV_SPECIAL, EV_MONTHLY, EV_BOX, DEX_KEYS, DEX_REWARD, DEX_GUEST_KEYS, seasonKey, roofArtKey, oakKey, setSeasonArt, VP, vpLv, vpCost, vpMult, vpAct, renderVpCard, sportsPrize, festPrize, renderTeachers, buildTeacherCards, bldImg, roofKey, bldStage, mapKey, setMapArt, applyThemes, buyFacility, startTrial, endTrial: () => rt.trial && (rt.trial.left = 0), spawnDeal, startVisit, IMG170,   // 1.7.0 도감, 이벤트
     PZ, PZ_SHAPES, pzFits, pzAnyFit, pzStuck, pzFullLines, pzPlace, pzFreshGame, pzStart, PZB, pzbCost, pzApplyBoost, pzBoostOpen, pzBoostGo, festGoldLeft, festGoldTake, claimSports, renderStreet, pzFinish, pzLeft, pzCanAd, pzEssOf, pzMinOf, pzHelpSquirrel, pzHelpOwl, pzHelpBear, fillSubs, mapRoofTop, showAd, claimOfflineDouble, startBoost, tripAd, festFocus, festRange, visMap, renderMissions, pzHasHelp, pzRot, pzNewPiece, pzOpen, pzClose, pzGameOver, pzRenderAll, renderMini, addEss, ESHOP, SP_FUR, applyCos, essItem, pickEss, buyEss, renderEssShop, esAcornLeft, esGoldLeft, esAcornAmt, hatSVG, spFurImg, gameNow, gameToday, gameWeek, kstDay, setServerTime, SVR, dmDay, weekIdx, lgWeek, wkWeek, lgKey, pzDay, goldDay, boostLeft, dealLeft, canStamp };

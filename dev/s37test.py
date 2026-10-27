@@ -61,7 +61,7 @@ CHECK = r"""() => {
 FOCUS = r"""() => { const F = window.__forest; return ['q18', 'k5'].map(id => [id, F.needCost(F.MAIN.find(q => q.id === id))]); }"""
 # 퀘스트를 따라 하는 사람처럼 유치원을 끝까지 해 보며 도토리가 폭발하지 않는지, 오래 막히지 않는지 봐요
 FLOW = r"""() => {
-  const F = window.__forest, S = () => F.S; let t = 0, maxB = 0, maxWait = 0, qid = '', qt = 0, pick = 0; const dt = 2;
+  const F = window.__forest, S = () => F.S; let t = 0, maxB = 0, maxWait = 0, qid = '', qt = 0, pick = 0, tri = 0; const dt = 2;
   const buy = () => { const r = F.recommend(); if (!r) return false;
     if (r.kind === 'tea') return S().budget >= F.teaCost(r.k) && F.teacherAct(r.k);
     if (r.kind === 'fur') return S().budget >= F.furCost(r.k, r.i) && F.buyFur(r.k, r.i, true);
@@ -74,6 +74,8 @@ FLOW = r"""() => {
     for (let i = 0; i < 3 && F.mainReady(); i++) F.claimMain(null);
     if (F.canGraduate()) F.graduate(); else if (F.canPromote()) F.promote();
     if (q && q.t === 'picks') { pick += dt; if (pick >= 4) { pick = 0; s.st.picks += 1; } }
+    // 1.7.4 침입자 쫓아내기: 퀘스트가 되면 3초 뒤 매나 뱀이 오고 20초 안에 쫓아내요(놓쳐도 40초 안에 다시 와요). 8초에 한 번 쫓아낸 것으로 쳐요
+    if (q && q.t === 'trials') { tri += dt; if (tri >= 8) { tri = 0; s.st.trials = (s.st.trials || 0) + 1; } }
     if (q && q.t === 'perks') { const k = Object.keys(F.PERKS).filter(x => !F.perkMaxed(x)).sort((a, b) => F.perkCost(a) - F.perkCost(b))[0]; if (k && F.perkCost(k) <= s.p.dip) F.buyPerk(k, document.body); }
     for (let i = 0; i < 20; i++) if (!buy()) break;
     maxB = Math.max(maxB, S().budget);
