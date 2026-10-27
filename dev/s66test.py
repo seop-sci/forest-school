@@ -2,7 +2,7 @@
 # 보는 것
 #  1) 유치원에서는 학교급 동그라미가 안 보이고, 초등학교부터 6개(지난 학교급은 누를 수 있고, 못 간 곳은 자물쇠)가 탭 막대 위에 보여요
 #  2) 지난 학교급 보기: 사진이 없으면 모두 지어진 모습, 사진이 있으면 그때 레벨. 꾸미기 모드에서 그 지도 장식 자리에 놓고(지금 지도와 따로), 돌아가기
-#  3) 종업식과 졸업식에 새 친구가 오면 식 창 다음에 전학 대화(교감 소개, 자기소개 두 줄, 마지막 안내)가 떠요. 전학생은 12종이고 그림이 없으면 그림 문자
+#  3) 종업식과 졸업식에 새 친구가 오면 식 창 다음에 전학 대화(교감 소개, 자기소개 두 줄, 마지막 안내)가 떠요. 전학생은 12종이고 모두 그림
 #  4) 옛 저장: 전학생 6종을 다 만난 학교는 6종 그대로(불러오며 7번째를 채우지 않아요), 친구 성장 쪽지를 계속 쓸 수 있어요. 초등학교 퀘스트를 다 마친 저장은 e39(초등학교 졸업식)에서 이어가요
 #  5) q26 이름과 대사, 초등학교 졸업식은 6학년 장을 마쳐야 열려요
 #  6) 화면이 넘치지 않아요(390 밝은, 360 어두운). 페이지 오류 없음
@@ -71,11 +71,11 @@ async def main():
                 if lines[1][0] != '새 친구 펭귄' or lines[3][2] != '반가워요!' or '5%' not in lines[3][1]: bad.append(f'전학 대사 {lines}')
                 await pg.wait_for_timeout(400)
                 if not await pg.evaluate("document.querySelector('#mTalk').hidden"): bad.append('전학 대화가 닫히지 않아요')
-                # 새 전학생 6종: 그림이 없으면 그림 문자, 대사가 모두 있어요
-                r = await pg.evaluate(f"""(() => {{ const F = {F}; return {{ n: F.NEWCOMERS.length, ks: F.NEWCOMERS.slice(6).map(n => n.k), emoji: F.NEWCOMERS.slice(6).map(n => F.kidArt(n.k, 0).includes('<text')),
+                # 새 전학생 6종: 그림(작업지시서 20, 2.0.0에 넣음)으로 나오고 대사가 모두 있어요
+                r = await pg.evaluate(f"""(() => {{ const F = {F}; return {{ n: F.NEWCOMERS.length, ks: F.NEWCOMERS.slice(6).map(n => n.k), emoji: F.NEWCOMERS.slice(6).map(n => F.kidArt(n.k, 0).includes('<image') && !F.kidArt(n.k, 0).includes('<text')),
                   lines: F.NEWCOMERS.map(n => F.showNewTalk && n.k), dex: F.DEX_KEYS.length }}; }})()""")
                 if r['n'] != 12 or r['ks'] != ['hamster', 'duck', 'turtle', 'mole', 'frog', 'waterdeer']: bad.append(f'새 전학생 {r}')
-                if not all(r['emoji']): bad.append(f'그림 문자 {r["emoji"]}')
+                if not all(r['emoji']): bad.append(f'새 전학생 그림이 없어요 {r["emoji"]}')
                 await pg.evaluate(CLEAN)
                 # 옛 저장: 전학생 6종을 다 만난 초등학교 6학년(퀘스트 다 마침, 쪽지 2장)
                 r = await pg.evaluate(f"""(() => {{ const F = {F}, S = F.S; const d = JSON.parse(JSON.stringify(S));
