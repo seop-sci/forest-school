@@ -199,6 +199,12 @@ async def run(b, dark, w, h):
     await pg.evaluate("document.querySelector('.tab[data-tab=mini]').click()"); await pg.wait_for_timeout(300)
     sub = await pg.evaluate("[document.querySelector('#pzCardTag').textContent, document.querySelector('#pzCardSub').textContent]")
     if sub[0] != '이어하기': bad.append('이어하기 카드: ' + json.dumps(sub, ensure_ascii=False))
+    # 1.8.0 잠시 나가기: 나가기 → 잠시 나가기면 판이 끝나지 않고 그대로 남아요
+    await pg.evaluate("document.querySelector('#pzOpen').click(); const pb=document.querySelector('#pzBoost'); if (pb && !pb.hidden) document.querySelector('#pzbSkip').click()"); await pg.wait_for_timeout(400)
+    await pg.evaluate("document.querySelector('#pzQuit').click()"); await pg.wait_for_timeout(200)
+    await pg.evaluate("document.querySelector('#pzQuitPause').click()"); await pg.wait_for_timeout(400)
+    pa = await pg.evaluate(f"[document.querySelector('#pzScene').hidden, !!{F}.S.pz.cur, {F}.S.pz.cur && {F}.S.pz.cur.score, document.querySelector('#pzCardTag').textContent]")
+    if pa != [True, True, score0, '이어하기']: bad.append('잠시 나가기: ' + json.dumps(pa, ensure_ascii=False))
     # 그만하기 → 보상 창
     await pg.evaluate("document.querySelector('#pzOpen').click(); const pb=document.querySelector('#pzBoost'); if (pb && !pb.hidden) document.querySelector('#pzbSkip').click()"); await pg.wait_for_timeout(400)
     await pg.evaluate(f"{F}.S.pz.cur.score = 900; {F}.pzRenderAll(); document.querySelector('#pzQuit').click()"); await pg.wait_for_timeout(200)

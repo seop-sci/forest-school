@@ -1271,6 +1271,7 @@ body{background:radial-gradient(120% 60% at 50% 0%, color-mix(in srgb, var(--pap
 .pz-tea.has .pz-tean{display:block}
 .pz-tea.on{outline:3px solid #FFE27A;outline-offset:-3px}
 @keyframes pzReady{50%{transform:scale(1.03);box-shadow:0 3px 0 rgba(0,0,0,.3), 0 0 16px rgba(255,226,122,.7)}}
+.pz-pause{display:block;width:100%;margin:0 0 8px}
 .pz-quit{flex:none;min-height:46px;padding:0 16px;border:0;border-radius:14px;background:rgba(255,247,230,.9);color:#26301E;font-family:var(--font-display);font-size:15px;cursor:pointer;box-shadow:0 3px 0 rgba(0,0,0,.25)}
 .pz-hint{position:absolute;left:50%;bottom:calc(176px + env(safe-area-inset-bottom,0px));transform:translateX(-50%);margin:0;padding:8px 16px;border-radius:999px;background:rgba(44,74,61,.94);color:#FFF7E6;font-family:var(--font-display);font-size:15px;white-space:nowrap;box-shadow:0 3px 0 rgba(0,0,0,.3);pointer-events:none}
 .pz-sheet{position:absolute;left:12px;right:12px;bottom:calc(14px + env(safe-area-inset-bottom,0px));z-index:3;padding:16px 16px 14px;border-radius:20px;background:var(--paper);color:var(--ink);text-align:center;border:2px solid var(--line);box-shadow:0 5px 0 var(--line-shadow), 0 16px 40px rgba(0,0,0,.35);animation:pzSheet .22s ease}
@@ -2468,13 +2469,14 @@ body{background:radial-gradient(120% 60% at 50% 0%, color-mix(in srgb, var(--pap
       <button class="pz-tea" type="button" data-help="owl" aria-label="부엉이 선생님 도움: 조각 3개 새로 바꾸기"><span class="pz-teapic" data-tea="tea_owl"></span><small class="pz-tead">조각 바꾸기</small><b class="pz-tean">0</b></button>
       <button class="pz-tea" type="button" data-help="bear" aria-label="곰 선생님 도움: 고른 조각 돌리기"><span class="pz-teapic" data-tea="tea_bear"></span><small class="pz-tead">조각 돌리기</small><b class="pz-tean">0</b></button>
     </div>
-    <button class="pz-quit" type="button" id="pzQuit">그만하기</button>
+    <button class="pz-quit" type="button" id="pzQuit">나가기</button>
   </div>
   <p class="pz-hint" id="pzHint" hidden></p>
   <div class="pz-sheet" id="pzQuitAsk" hidden>
-    <h3>여기서 그만할까요?</h3>
-    <p>지금까지 점수로 보상을 받고 판을 끝내요.</p>
-    <div class="btn-row"><button class="btn-sub" type="button" id="pzQuitNo">계속하기</button><button class="cta" type="button" id="pzQuitYes">그만하기</button></div>
+    <h3>어떻게 할까요?</h3>
+    <p>잠시 나가면 이 판이 그대로 남아서 나중에 이어서 할 수 있어요. 그만하면 지금까지 점수로 보상을 받고 판을 끝내요.</p>
+    <button class="cta pz-pause" type="button" id="pzQuitPause">잠시 나가기</button>
+    <div class="btn-row"><button class="btn-sub" type="button" id="pzQuitNo">계속하기</button><button class="btn-sub" type="button" id="pzQuitYes">그만하기</button></div>
   </div>
   <!-- 1.7.2 부스터: 보상 판을 새로 시작할 때 도토리로 사서 들고 시작해요. 그 판 한 번만 -->
   <div class="pz-sheet pz-boost" id="pzBoost" hidden>
@@ -8522,6 +8524,8 @@ body{background:radial-gradient(120% 60% at 50% 0%, color-mix(in srgb, var(--pap
     $('#pzBack').addEventListener('click', () => { sfx('tap'); pzClose(); });
     $('#pzQuit').addEventListener('click', () => { if (!S.pz.cur || !$('#pzEnd').hidden || !$('#pzBoost').hidden) return; sfx('tap'); $('#pzQuitAsk').hidden = false; });
     $('#pzQuitNo').addEventListener('click', () => { $('#pzQuitAsk').hidden = true; });
+    // 1.8.0 잠시 나가기: 판을 끝내지 않고 닫아요(하던 판은 S.pz.cur에 남아요). 미니게임 탭에서 '이어하기'로 돌아와요
+    $('#pzQuitPause').addEventListener('click', () => { $('#pzQuitAsk').hidden = true; sfx('tap'); pzClose(); toast('하던 판은 그대로 남아요. 미니게임에서 이어하기를 누르세요'); });
     $('#pzQuitYes').addEventListener('click', () => { $('#pzQuitAsk').hidden = true; pzGameOver(); });
     $('#pzEndAgain').addEventListener('click', () => { sfx('tap'); $('#pzEnd').hidden = true; pzStart(); pzUI.mode = ''; pzRenderAll(); pzBoostOpen(); });
     $('#pzbList').addEventListener('click', e => {
