@@ -4,7 +4,7 @@
 # (3) 정수가 모자라면 안 사져요, 다음 날 횟수가 다시 차요
 # (4) 저장: 옛 저장(bst 없음)은 기본값, 망가진 값은 바로잡기, 저장 후 다시 읽어도 행운 남은 횟수 그대로
 # (6) 개발자 메뉴: 정수 500, 합치기 에너지와 조각, 수료증 기금 쪽지, 다음 날로 넘기기(퍼즐 판과 부스터)
-# (7) 짓기와 업그레이드 효과(1.8.0에서는 꺼 두고 시험에서만 켜요. 작업지시서 22 그림이 오면 켜요)
+# (7) 짓기와 업그레이드 효과(작업지시서 22 그림: 비계, 망치, 흙먼지, 반짝이, 완공 리본, 업그레이드 배지)
 # (5) 화면: 미니게임 탭 퍼즐 카드 '보상 잔여 10/10', 360px 어두운 화면, 390px 밝은 화면에서 부스터 창과 아래 칸이 넘치지 않는지
 # 쓰는 법: python3 wrap.py && python3 s67test.py   (마지막 줄이 PASS면 통과)
 import asyncio, json, calendar
@@ -69,13 +69,13 @@ async def main():
         if r != {'ess': 500, 'e': 100, 'up': 10, 'pc': 10, 'dip': 100, 'fund': 100, 'tk': 3, 'pzLeft': 10, 'en': 3, 'dev': True}: fails.append(f'개발자 메뉴 {r}')
         # (7) 짓기와 업그레이드 효과: 효과가 붙었다가 저절로 사라지는지, 건물 창이 열려 있으면 닫을 때 보여 주는지
         r = await pg.evaluate(f"""(async()=>{{ const F={F}, S=F.S; document.querySelector('.tab[data-tab=school]').click(); await new Promise(r=>setTimeout(r,300));
-          S.budget = 1e9; const k = ['cafeteria','library','playground'].find(k => !S.f[k]); F.setBldFx(true); F.buyFacility(k);
-          const g = document.querySelector('#b-' + k), out = {{ k, fx: !!g.querySelector('.bfx'), rise: g.querySelector('.built').classList.contains('fx-rise'), site: g.classList.contains('fx-site'), dust: g.querySelectorAll('.bfx .dust').length }};
-          await new Promise(r=>setTimeout(r,3000)); out.gone = !g.querySelector('.bfx') && !g.classList.contains('fx-site');
+          S.budget = 1e9; const k = ['cafeteria','library','playground'].find(k => !S.f[k]); F.buyFacility(k);
+          const g = document.querySelector('#b-' + k), out = {{ k, fx: !!g.querySelector('.bfx'), rise: g.querySelector('.built').classList.contains('fx-rise'), site: g.classList.contains('fx-site'), dust: g.querySelectorAll('.bfx .dust').length, art: [...g.querySelectorAll('.bfx image')].every(i => (i.getAttribute('href') || '').startsWith('data:image')), scaf: !!g.querySelector('.bfx .scaf'), rib: !!g.querySelector('.bfx .rib-g') }};
+          await new Promise(r=>setTimeout(r,3600)); out.gone = !g.querySelector('.bfx') && !g.classList.contains('fx-site');
           F.rt.sheetKey = 'classroom'; S.f.classroom += 1; F.bldFx('classroom', 'up'); out.wait = !!F.rt.bldFxWait && !document.querySelector('#b-classroom .bfx');
-          F.closeSheet(); await new Promise(r=>setTimeout(r,300)); out.after = !!document.querySelector('#b-classroom .bfx');
+          F.closeSheet(); await new Promise(r=>setTimeout(r,300)); out.after = !!document.querySelector('#b-classroom .bfx .badge');
           return out; }})()""")
-        if not (r['fx'] and r['rise'] and r['site'] and r['dust'] == 16 and r['gone'] and r['wait'] and r['after']): fails.append(f'짓기 효과 {r}')
+        if not (r['fx'] and r['rise'] and r['site'] and r['dust'] == 12 and r['art'] and r['scaf'] and r['rib'] and r['gone'] and r['wait'] and r['after']): fails.append(f'짓기 효과 {r}')
         if errs: fails.append(f'오류 {errs}')
         # 화면
         for w, dark in ((360, True), (390, False)):
