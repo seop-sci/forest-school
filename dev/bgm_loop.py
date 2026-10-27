@@ -7,7 +7,7 @@
 #  1) 박자를 찾고(librosa), 비트마다 화음(chroma)과 음색(MFCC)을 재요
 #  2) 앞쪽 절반의 비트 a와 뒤쪽 비트 b 가운데 앞뒤 8박이 가장 비슷한 곳을 골라요(b-a는 16박 배수, 60초 이상, 끝 5초 전)
 #  3) b를 파형이 가장 잘 맞게 ±40ms 안에서 다듬고, [a, b)를 잘라 끝 한 박자를 a 바로 앞 한 박자와 겹쳐요(되풀이할 때 a로 자연스럽게 넘어가요)
-#  4) -18 LUFS로 소리 크기를 맞추고 AAC 80kbps m4a로 줄여요
+#  4) -18 LUFS로 소리 크기를 맞추고 AAC 128kbps로 줄여요(1.8.0에서 80 → 128, 곡이 게임 파일 밖으로 나와서)
 import subprocess, sys, pathlib, numpy as np, librosa, soundfile as sf
 
 MIN_LOOP = 60   # 되풀이 구간의 가장 짧은 길이(초). 짧은 곡은 --min으로 줄여요(1.8.0 크리스마스, 여름 곡은 1분 남짓)
@@ -42,7 +42,7 @@ def bake(key, path, out, ab=None, xf=1):
     loop = y[a:b].copy(); t = np.linspace(0, 1, X)[:, None]
     loop[-X:] = y[b - X:b] * np.cos(t * np.pi / 2) + y[a - X:a] * np.sin(t * np.pi / 2)
     sf.write(out / f'{key}_loop.wav', loop, sr)
-    subprocess.run(['ffmpeg', '-v', 'error', '-y', '-i', str(out / f'{key}_loop.wav'), '-af', 'loudnorm=I=-18:TP=-1.5:LRA=11', '-ar', '44100', '-c:a', 'aac', '-b:a', '80k', str(out / f'{key}.m4a')], check=True)
+    subprocess.run(['ffmpeg', '-v', 'error', '-y', '-i', str(out / f'{key}_loop.wav'), '-af', 'loudnorm=I=-18:TP=-1.5:LRA=11', '-ar', '44100', '-c:a', 'aac', '-b:a', '128k', str(out / f'{key}.m4a')], check=True)
     print(f'{key}: {a / sr:.2f}초 ~ {b / sr:.2f}초 ({(b - a) / sr:.2f}초), 비슷함 {sim:.2f}')
 
 if __name__ == '__main__':
