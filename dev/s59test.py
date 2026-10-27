@@ -1,7 +1,7 @@
 # 1.7.2 시험: 숲속 퍼즐 부스터, 학교 행사 황금 도토리 하루 한 번, 상점 거리, 메뉴 화면 현황판
 # 보는 것
-#  1) 부스터: 보상 판을 새로 열면 부스터 창이 떠요. 값은 수업료 5, 3, 10분치. 사면 도토리가 줄고, 선생님 도움 +1, 첫 조각이 작은 조각(3칸 이하),
-#     콤보 부스터는 첫 줄부터 ×1.5. 도토리가 모자라면 못 골라요. 그냥 시작하면 아무것도 안 줄어요. 연습 판(보상 판이 없을 때)에는 창이 안 떠요.
+#  1) 부스터: 보상 판을 새로 열면 부스터 창이 떠요. 값은 숲의 정수 4, 3, 6(1.8.0, 1.7.2에는 수업료 5, 3, 10분치). 사면 정수가 줄고, 선생님 도움 +1, 첫 조각이 작은 조각(3칸 이하),
+#     콤보 부스터는 첫 줄부터 ×1.5. 정수가 모자라면 못 골라요. 그냥 시작하면 아무것도 안 줄어요. 연습 판(보상 판이 없을 때)에는 창이 안 떠요.
 #     저장했다가 불러와도 콤보 부스터가 남아요. 보상 상한(정수 25, 도토리 15분치)은 그대로예요.
 #  2) 행사 황금 도토리: 같은 행사는 하루 한 번만 +1, 다른 행사는 따로, 날이 바뀌면 다시
 #  3) 상점 거리: 아래 상점 탭 → 상점 거리, 가게를 누르면 그 가게, 돌아가기, 오른쪽 메뉴에 정수 상점이 없어요
@@ -27,7 +27,7 @@ async def main():
 
             # 1) 부스터 규칙
             r = await pg.evaluate(f"""(() => {{ const F = {F}, S = F.S; S.budget = 1e12; S.pz = {{ day: '', n: 0, adN: 0, best: 0, cur: null }};
-              const costs = F.PZB && Object.keys(F.PZB).map(id => [id, F.pzbCost(id), Math.round(F.pzbCost(id) / (F.rate() * 60))]);
+              const costs = F.PZB && Object.keys(F.PZB).map(id => [id, F.pzbCost(id), F.pzbCost(id)]);
               const cur = F.pzStart(); const b0 = S.budget;
               F.pzApplyBoost(cur, ['teacher', 'small', 'combo']);
               const helps = Object.values(cur.helps).reduce((a, x) => a + x, 0), small = cur.tray.every(p => p && p.c.length <= 3);
@@ -39,24 +39,24 @@ async def main():
               // 상한은 그대로
               const fin = F.pzFinish(Object.assign(F.pzStart(), {{ score: 1e6, bst: {{ combo: true }} }}));
               return {{ costs, helps, small, gainBoost: res.gain, gainPlain: res2.gain, budgetSame: S.budget === b0, essCap: fin.ess <= 25 * 1.3 + 1, minCap: fin.mins <= 15 }}; }})()""")
-            if not r['costs'] or [c[2] for c in r['costs']] != [5, 3, 10]: bad.append(f'[{tag}] 부스터 값(분치): ' + json.dumps(r['costs']))
+            if not r['costs'] or [c[2] for c in r['costs']] != [4, 3, 6]: bad.append(f'[{tag}] 부스터 값(숲의 정수, 1.8.0): ' + json.dumps(r['costs']))
             if r['helps'] != 1 or not r['small']: bad.append(f'[{tag}] 선생님 도움, 작은 조각: ' + json.dumps(r))
             if not (r['gainBoost'] > r['gainPlain']): bad.append(f'[{tag}] 콤보 부스터 점수가 더 높지 않아요: {r["gainBoost"]} vs {r["gainPlain"]}')
             if not (r['essCap'] and r['minCap']): bad.append(f'[{tag}] 보상 상한: ' + json.dumps(r))
 
-            # 1-2) 화면: 퍼즐을 열면 부스터 창, 두 개 고르고 시작하면 도토리가 줄어요
-            await pg.evaluate(f"{F}.S.pz = {{ day: '', n: 0, adN: 0, best: 0, cur: null }}; {F}.S.budget = 1e12; document.querySelector('.tab[data-tab=mini]').click()"); await pg.wait_for_timeout(300)
+            # 1-2) 화면: 퍼즐을 열면 부스터 창, 두 개 고르고 시작하면 숲의 정수가 줄어요(1.8.0부터 정수 4, 3, 6)
+            await pg.evaluate(f"{F}.S.pz = {{ day: '', n: 0, adN: 0, best: 0, cur: null }}; {F}.S.ess = 1000; document.querySelector('.tab[data-tab=mini]').click()"); await pg.wait_for_timeout(300)
             await pg.evaluate("document.querySelector('#pzOpen').click()"); await pg.wait_for_timeout(500)
             v = await pg.evaluate("[!document.querySelector('#pzBoost').hidden, document.querySelectorAll('#pzbList .pzb').length, [...document.querySelectorAll('#pzbList .pzb-ic')].every(e => getComputedStyle(e).backgroundImage.startsWith('url'))]")
             if v != [True, 3, True]: bad.append(f'[{tag}] 부스터 창: ' + json.dumps(v))
             await pg.screenshot(path=f's59_boost_{tag}.png')
             await pg.evaluate("document.querySelector('[data-pzb=teacher]').click(); document.querySelector('[data-pzb=combo]').click()"); await pg.wait_for_timeout(100)
-            b0 = await pg.evaluate(f"{F}.S.budget")
+            b0 = await pg.evaluate(f"{F}.S.ess")
             cost = await pg.evaluate(f"{F}.pzbCost('teacher') + {F}.pzbCost('combo')")
             await pg.evaluate("document.querySelector('#pzbGo').click()"); await pg.wait_for_timeout(300)
             v = await pg.evaluate(f"[document.querySelector('#pzBoost').hidden, {F}.S.pz.cur.bst, Object.values({F}.S.pz.cur.helps).reduce((a,x)=>a+x,0)]")
-            b1 = await pg.evaluate(f"{F}.S.budget")
-            if not v[0] or not v[1] or not v[1].get('combo') or not v[1].get('teacher') or v[2] != 1 or abs((b0 - b1) - cost) > 1: bad.append(f'[{tag}] 부스터 사고 시작: ' + json.dumps([v, b0 - b1, cost]))
+            b1 = await pg.evaluate(f"{F}.S.ess")
+            if not v[0] or not v[1] or not v[1].get('combo') or not v[1].get('teacher') or v[2] != 1 or abs((b0 - b1) - cost) > 0: bad.append(f'[{tag}] 부스터 사고 시작: ' + json.dumps([v, b0 - b1, cost]))
             # 저장 뒤에도 콤보 부스터가 남아요
             await pg.evaluate(f"{F}.pzClose()")
             v = await pg.evaluate(f"(() => {{ const s = {F}.sanitize(JSON.parse(JSON.stringify({F}.S))); return s && s.pz && s.pz.cur && s.pz.cur.bst; }})()")
@@ -65,18 +65,18 @@ async def main():
             await pg.evaluate("document.querySelector('.tab[data-tab=mini]').click()"); await pg.wait_for_timeout(200)
             await pg.evaluate("document.querySelector('#pzOpen').click()"); await pg.wait_for_timeout(400)
             if not await pg.evaluate("document.querySelector('#pzBoost').hidden"): bad.append(f'[{tag}] 쓴 판에 부스터 창이 또 떠요')
-            # 그냥 시작은 도토리가 그대로
-            await pg.evaluate(f"{F}.pzClose(); {F}.S.pz.cur = null; {F}.S.budget = 5e11"); await pg.wait_for_timeout(100)
+            # 그냥 시작은 정수가 그대로
+            await pg.evaluate(f"{F}.pzClose(); {F}.S.pz.cur = null; {F}.S.ess = 500"); await pg.wait_for_timeout(100)
             await pg.evaluate("document.querySelector('#pzOpen').click()"); await pg.wait_for_timeout(400)
-            b0 = await pg.evaluate(f"{F}.S.budget")
+            b0 = await pg.evaluate(f"{F}.S.ess")
             await pg.evaluate("document.querySelector('#pzbSkip').click()"); await pg.wait_for_timeout(200)
-            b1 = await pg.evaluate(f"{F}.S.budget")
-            if abs(b1 - b0) > 1e6 or b1 < b0 - 1 or not await pg.evaluate("document.querySelector('#pzBoost').hidden"): bad.append(f'[{tag}] 그냥 시작: {b0} → {b1}')
-            # 도토리가 모자라면 못 골라요
-            await pg.evaluate(f"{F}.pzClose(); {F}.S.pz.cur = null; {F}.S.budget = 1"); await pg.wait_for_timeout(100)
+            b1 = await pg.evaluate(f"{F}.S.ess")
+            if b1 != b0 or not await pg.evaluate("document.querySelector('#pzBoost').hidden"): bad.append(f'[{tag}] 그냥 시작: {b0} → {b1}')
+            # 정수가 모자라면 못 골라요
+            await pg.evaluate(f"{F}.pzClose(); {F}.S.pz.cur = null; {F}.S.ess = 1"); await pg.wait_for_timeout(100)
             await pg.evaluate("document.querySelector('#pzOpen').click()"); await pg.wait_for_timeout(400)
             await pg.evaluate("document.querySelector('[data-pzb=small]').click()"); await pg.wait_for_timeout(100)
-            if await pg.evaluate("document.querySelectorAll('#pzbList .pzb.on').length"): bad.append(f'[{tag}] 도토리가 모자란데 골라져요')
+            if await pg.evaluate("document.querySelectorAll('#pzbList .pzb.on').length"): bad.append(f'[{tag}] 정수가 모자란데 골라져요')
             await pg.evaluate("document.querySelector('#pzbSkip').click()")
             # 연습 판에는 창이 안 떠요
             await pg.evaluate(f"{F}.pzClose(); {F}.S.pz.cur = null; {F}.S.pz.n = 99; {F}.S.budget = 1e12"); await pg.wait_for_timeout(100)

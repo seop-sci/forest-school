@@ -8523,12 +8523,13 @@ body{background:radial-gradient(120% 60% at 50% 0%, color-mix(in srgb, var(--pap
   }
   // 1.7.2 숲속 퍼즐 부스터 (2026-10-26 지섭 결정). 값은 수업료 몇 분치라 학교급이 올라가도 알맞아요. 보상 상한(정수 25, 도토리 15분치)은 그대로
   const PZB = {
-    teacher: { m: 5, ic: 'boost_pz_teacher', name: '선생님 도움', d: '선생님 도움 하나를 들고 시작' },
-    small: { m: 3, ic: 'boost_pz_small', name: '작은 조각', d: '처음 조각 3개를 작은 조각으로' },
-    combo: { m: 10, ic: 'boost_pz_combo', name: '콤보 ×1.5', d: '첫 줄부터 콤보 ×1.5로 시작' },
+    teacher: { m: 5, e: 4, ic: 'boost_pz_teacher', name: '선생님 도움', d: '선생님 도움 하나를 들고 시작' },
+    small: { m: 3, e: 3, ic: 'boost_pz_small', name: '작은 조각', d: '처음 조각 3개를 작은 조각으로' },
+    combo: { m: 10, e: 6, ic: 'boost_pz_combo', name: '콤보 ×1.5', d: '첫 줄부터 콤보 ×1.5로 시작' },
   };
   const PZB_IDS = Object.keys(PZB);
-  const pzbCost = id => nice(rate() * 60 * PZB[id].m);
+  // 1.8.0 재화 원칙(2026-10-27 지섭 결정): 부스터는 숲의 정수로 값을 고정해요(e). m은 1.7.x 도토리 값(수업료 분치) 기록
+  const pzbCost = id => PZB[id].e;
   // 아직 아무것도 놓지 않은 보상 판에만 부스터를 쓸 수 있어요
   const pzFresh = cur => !!(cur && cur.rw && !cur.score && !cur.lines && !cur.bst && cur.b.every(v => !v));
   function pzApplyBoost(cur, ids) {
@@ -8583,24 +8584,24 @@ body{background:radial-gradient(120% 60% at 50% 0%, color-mix(in srgb, var(--pap
     const pick = pzUI.pick || new Set();
     let sum = 0; for (const id of pick) sum += pzbCost(id);
     $('#pzbList').innerHTML = PZB_IDS.map(id => {
-      const B = PZB[id], c = pzbCost(id), on = pick.has(id), poor = !on && S.budget < sum + c;
+      const B = PZB[id], c = pzbCost(id), on = pick.has(id), poor = !on && S.ess < sum + c;
       return `<button class="pzb${on ? ' on' : ''}${poor ? ' poor' : ''}" type="button" data-pzb="${id}" aria-pressed="${on}"><span class="pzb-ic" style="background-image:${pzImg(IMG(B.ic) ? B.ic : 'tea_squirrel')}" aria-hidden="true"></span>` +
-        `<span class="pzb-tx"><b>${B.name}</b><small>${B.d}</small></span><span class="pzb-pr"><span data-acorn>${acornIcon()}</span>${fmt(c)}</span></button>`;
+        `<span class="pzb-tx"><b>${B.name}</b><small>${B.d}</small></span><span class="pzb-pr">${ESS_ICON()}${fmt(c)}</span></button>`;
     }).join('');
-    $('#pzbGo').textContent = sum > 0 ? `${fmt(sum)} 쓰고 시작하기` : '시작하기';
+    $('#pzbGo').textContent = sum > 0 ? `정수 ${fmt(sum)} 쓰고 시작하기` : '시작하기';
   }
   function pzBoostGo(skip) {
     const cur = S.pz.cur, pick = skip ? [] : [...(pzUI.pick || [])];
     $('#pzBoost').hidden = true;
     if (!pick.length || !pzFresh(cur)) { pzRenderAll(); return; }
     const sum = pick.reduce((a, id) => a + pzbCost(id), 0);
-    if (S.budget < sum) { pzHint('도토리가 모자라요'); return; }
-    S.budget -= sum;
+    if (S.ess < sum) { pzHint('숲의 정수가 모자라요'); return; }
+    S.ess -= sum; S.st.esSpent = (S.st.esSpent || 0) + sum;
     pzApplyBoost(cur, pick);
     S.st.pzb = (S.st.pzb || 0) + pick.length;
     sfx('coin'); buzz(12);
     pzHint(pick.map(id => PZB[id].name).join(', ') + ' 부스터를 들고 시작해요');
-    save(); renderHUD(); pzRenderAll();
+    save(); renderHUD(); renderEss(); pzRenderAll();
   }
   function pzOpen() {
     pzInitArt();
@@ -8905,7 +8906,7 @@ body{background:radial-gradient(120% 60% at 50% 0%, color-mix(in srgb, var(--pap
       const b = e.target.closest('[data-pzb]'); if (!b) return;
       const id = b.dataset.pzb, pick = pzUI.pick || (pzUI.pick = new Set());
       if (pick.has(id)) pick.delete(id);
-      else { const sum = [...pick].reduce((a, k) => a + pzbCost(k), 0) + pzbCost(id); if (S.budget < sum) { pzHint('도토리가 모자라요'); return; } pick.add(id); }
+      else { const sum = [...pick].reduce((a, k) => a + pzbCost(k), 0) + pzbCost(id); if (S.ess < sum) { pzHint('숲의 정수가 모자라요'); return; } pick.add(id); }
       sfx('tap'); pzBoostRender();
     });
     $('#pzbSkip').addEventListener('click', () => { sfx('tap'); pzBoostGo(true); });
