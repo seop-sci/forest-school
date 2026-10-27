@@ -1186,6 +1186,11 @@ body{background:radial-gradient(120% 60% at 50% 0%, color-mix(in srgb, var(--pap
 .mini-go:active{transform:translateY(2px);box-shadow:0 1px 0 var(--line-shadow)}
 .mini-play{flex:none;padding:6px 14px;border-radius:999px;background:var(--accent);color:var(--accent-ink);font-family:var(--font-display);font-size:14px;line-height:1.2;white-space:nowrap;box-shadow:0 2px 0 var(--accent-shadow)}   /* 1.8.0: 퍼즐과 합치기 단추 모양 하나로 */
 .pz-thumb{flex:none;width:52px;height:52px;border-radius:12px;background:var(--pz-thumb) center/cover no-repeat;box-shadow:inset 0 0 0 2px rgba(0,0,0,.08)}
+#pzOpen .mc-txt b{display:flex;flex-wrap:wrap;align-items:center;gap:2px 6px}
+.mini-card .mc-left{display:inline-block;padding:1px 7px;border-radius:999px;background:var(--chip-bg);color:var(--chip-ink);font-family:var(--font-body);font-size:12px;font-weight:700;white-space:nowrap;font-variant-numeric:tabular-nums}
+.mini-card .mc-left.none{opacity:.6}
+@media (max-width:380px){#pzOpen{gap:8px}#pzOpen .mc-txt b{gap:2px 4px}.mini-card .mc-left{font-size:11px;padding:1px 5px}}
+.mini-pzrow[hidden]{display:none}
 .mini-pzrow{display:flex;align-items:center;justify-content:space-between;gap:10px;margin:-2px 0 4px;padding:0 4px;color:var(--muted);font-size:13px}
 .mini-pzrow .btn-sub.small{min-height:36px;padding:0 12px;font-size:14px;background:var(--chip-bg);color:var(--chip-ink)}
 
@@ -2314,9 +2319,9 @@ body{background:radial-gradient(120% 60% at 50% 0%, color-mix(in srgb, var(--pap
       <p class="lead">미니게임을 하면 숲의 정수와 도토리를 받아요. 숲의 정수로는 한정 의상, 특별 가구 같은 꾸미기를 살 수 있어요.</p>
       <div class="mini-have"><span class="tic" data-ic="ic_essence" aria-hidden="true"></span><span>숲의 정수</span><b id="essHave">0</b></div>
       <div class="mini-list">
-        <button class="mini-card mini-go" type="button" id="pzOpen"><span class="pz-thumb" aria-hidden="true"></span><span class="mc-txt"><b>숲속 퍼즐</b><small id="pzCardSub">조각을 끌어다 놓고 줄을 지워요</small></span><span class="mini-play" id="pzCardTag">시작하기</span></button>
-        <div class="mini-pzrow">
-          <span id="pzLeftTxt">오늘 보상 판 10번 남음</span>
+        <button class="mini-card mini-go" type="button" id="pzOpen"><span class="pz-thumb" aria-hidden="true"></span><span class="mc-txt"><b>숲속 퍼즐<span class="mc-left" id="pzLeftTxt">보상 10/10</span></b><small id="pzCardSub">조각을 끌어다 놓고 줄을 지워요</small></span><span class="mini-play" id="pzCardTag">시작하기</span></button>
+        <div class="mini-pzrow" id="pzAdRow" hidden>
+          <span>오늘 보상 판을 다 썼어요</span>
           <button class="btn-sub small" type="button" id="pzAdBtn" hidden>광고 보고 3판 더</button>
         </div>
         <button class="mini-card mini-go" type="button" id="mgOpen"><span class="mg-thumb" aria-hidden="true">🌰</span><span class="mc-txt"><b>숲속 합치기</b><small id="mgCardSub">에너지 100/100</small></span><span class="mini-play" id="mgCardTag">시작하기</span></button>
@@ -2403,6 +2408,9 @@ body{background:radial-gradient(120% 60% at 50% 0%, color-mix(in srgb, var(--pap
           <button class="srow" type="button" id="devTier"><span class="txt"><b>졸업 조건 채우기</b><small>마지막 해와 대도시를 채워서 졸업식을 바로 열어 봐요</small></span><svg viewBox="0 0 24 24" width="20" height="20" aria-hidden="true"><path d="M9 6l6 6-6 6" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"/></svg></button>
           <button class="srow" type="button" id="devDeal"><span class="txt"><b>까치 핫딜 바로 부르기</b><small>다음 핫딜을 기다리지 않고 바로 불러요</small></span><svg viewBox="0 0 24 24" width="20" height="20" aria-hidden="true"><path d="M9 6l6 6-6 6" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"/></svg></button>
           <button class="srow" type="button" id="devGold"><span class="txt"><b>황금 도토리 100개 받기</b><small>상점과 테마 세트를 시험해 볼 때 써요</small></span><svg viewBox="0 0 24 24" width="20" height="20" aria-hidden="true"><path d="M9 6l6 6-6 6" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"/></svg></button>
+          <button class="srow" type="button" id="devEss"><span class="txt"><b>숲의 정수 500개 받기</b><small>꾸미기 가게, 부스터, 정수 상점을 시험해 볼 때 써요</small></span><svg viewBox="0 0 24 24" width="20" height="20" aria-hidden="true"><path d="M9 6l6 6-6 6" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"/></svg></button>
+          <button class="srow" type="button" id="devMg"><span class="txt"><b>합치기 에너지와 조각 받기</b><small>에너지 +100, 강화 조각 10개, 장식 조각 10개</small></span><svg viewBox="0 0 24 24" width="20" height="20" aria-hidden="true"><path d="M9 6l6 6-6 6" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"/></svg></button>
+          <button class="srow" type="button" id="devDip"><span class="txt"><b>수료증, 기금, 쪽지 받기</b><small>수료증 100개, 기금 100, 친구 성장 쪽지 3장</small></span><svg viewBox="0 0 24 24" width="20" height="20" aria-hidden="true"><path d="M9 6l6 6-6 6" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"/></svg></button>
           <button class="srow" type="button" id="devTrip"><span class="txt"><b>체험학습 바로 돌아오기</b><small>3학년 전이면 체험학습을 먼저 열어 줘요</small></span><svg viewBox="0 0 24 24" width="20" height="20" aria-hidden="true"><path d="M9 6l6 6-6 6" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"/></svg></button>
           <button class="srow" type="button" id="devDay"><span class="txt"><b>다음 날로 넘기기</b><small>출석 도장, 보충수업, 핫딜 횟수가 다시 열려요</small></span><svg viewBox="0 0 24 24" width="20" height="20" aria-hidden="true"><path d="M9 6l6 6-6 6" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"/></svg></button>
           <button class="srow" type="button" id="devStats" hidden><span class="txt"><b>테스트 현황 보기</b><small>테스터마다 어디까지 했는지 서버 기록을 봐요</small></span><svg viewBox="0 0 24 24" width="20" height="20" aria-hidden="true"><path d="M9 6l6 6-6 6" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"/></svg></button>
@@ -8957,8 +8965,8 @@ body{background:radial-gradient(120% 60% at 50% 0%, color-mix(in srgb, var(--pap
     $('.pz-thumb').style.backgroundImage = pzImg('pz_block_acorn');
     $('#pzCardSub').textContent = S.pz.cur ? `하던 판 이어서 하기 (${fmt(S.pz.cur.score)}점)` : S.pz.best > 0 ? `최고 ${fmt(S.pz.best)}점` : '조각을 끌어다 놓고 줄을 지워요';
     $('#pzCardTag').textContent = S.pz.cur ? '이어하기' : '시작하기';
-    $('#pzLeftTxt').textContent = left > 0 ? `오늘 보상 판 ${left}번 남음` : '오늘 보상 판을 다 썼어요 (연습은 계속 할 수 있어요)';
-    $('#pzAdBtn').hidden = !pzCanAd();
+    const lt = $('#pzLeftTxt'); lt.textContent = `보상 ${left}/${pzQuota()}`; lt.classList.toggle('none', left <= 0);   // 오늘 남은 보상 판 / 오늘 받을 수 있는 판
+    $('#pzAdBtn').hidden = !pzCanAd(); $('#pzAdRow').hidden = $('#pzAdBtn').hidden;
     renderMiniMg();   // 1.8.0
   }
 
@@ -10984,10 +10992,24 @@ body{background:radial-gradient(120% 60% at 50% 0%, color-mix(in srgb, var(--pap
       renderShopBtn(); save();
       toast(`황금 도토리 +100개 (테스트) 지금 ${fmt(S.gold)}개`);
     });
+    $('#devEss').addEventListener('click', () => {
+      S.u.dev = true; addEss(500); save();
+      toast(`숲의 정수 +500 (테스트) 지금 ${fmt(S.ess)}`);
+    });
+    $('#devMg').addEventListener('click', () => {
+      S.u.dev = true; mgAddEnergy(100); mgAddUp(10); S.mg.pieces = Math.min(MG.PCAP, S.mg.pieces + 10); save();
+      if (typeof renderMiniMg === 'function') renderMiniMg();
+      toast(`합치기 에너지 +100, 강화 조각 +10, 장식 조각 +10 (테스트)`);
+    });
+    $('#devDip').addEventListener('click', () => {
+      S.u.dev = true; addDip(100); S.fund += 100; S.p.ticket += 3; save(); renderAffordance();
+      toast('수료증 +100, 기금 +100, 친구 성장 쪽지 +3 (테스트)');
+    });
     $('#devDay').addEventListener('click', () => {
       S.u.dev = true;
       S.att.last = ''; S.ad.day = ''; S.ad.n = 0; S.hd.day = ''; S.hd.n = 0;
-      toast('다음 날이 된 것처럼 바꿨어요. 출석 도장, 보충수업, 핫딜이 다시 열려요');
+      S.pz.day = ''; S.mg.ad.day = ''; S.mg.bst.day = '';   // 숲속 퍼즐 보상 판, 합치기 광고와 부스터 횟수도
+      toast('다음 날이 된 것처럼 바꿨어요. 출석 도장, 보충수업, 핫딜, 퍼즐 보상 판, 합치기 부스터가 다시 열려요');
       renderAffordance(); save();
     });
     $('#offArt').innerHTML = `<svg viewBox="-30 -30 60 60" aria-hidden="true"><circle cx="14" cy="-15" r="8" class="c-moon"/><circle cx="18" cy="-18" r="7" class="c-boardfill"/><circle cx="-18" cy="-12" r="1" class="c-moon"/><circle cx="-10" cy="-20" r="0.8" class="c-moon"/><g transform="translate(-3 6) scale(.62)">${AV.owl}</g></svg>`;
