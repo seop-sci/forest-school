@@ -3,7 +3,8 @@
 # (2) 행운의 생산기: 정수 8, 하루 1번, 다음 30번은 한 단계 높게(Lv.1 생산기면 모두 2단계), 31번째부터 원래대로
 # (3) 정수가 모자라면 안 사져요, 다음 날 횟수가 다시 차요
 # (4) 저장: 옛 저장(bst 없음)은 기본값, 망가진 값은 바로잡기, 저장 후 다시 읽어도 행운 남은 횟수 그대로
-# (5) 화면: 360px 어두운 화면, 390px 밝은 화면에서 부스터 창과 아래 칸이 넘치지 않는지
+# (6) 개발자 메뉴: 정수 500, 합치기 에너지와 조각, 수료증 기금 쪽지, 다음 날로 넘기기(퍼즐 판과 부스터)
+# (5) 화면: 미니게임 탭 퍼즐 카드 '보상 잔여 10/10', 360px 어두운 화면, 390px 밝은 화면에서 부스터 창과 아래 칸이 넘치지 않는지
 # 쓰는 법: python3 wrap.py && python3 s67test.py   (마지막 줄이 PASS면 통과)
 import asyncio, json, calendar
 from playwright.async_api import async_playwright
@@ -57,12 +58,24 @@ async def main():
         if r['a']['luck'] != 30: fails.append(f'저장 다시 읽기 {r}')
         if r['b'] != {'day': '', 'lucky': 0, 'energy': 0, 'luck': 0}: fails.append(f'옛 저장 {r}')
         if r['c'] != {'day': '', 'lucky': 0, 'energy': 0, 'luck': 30}: fails.append(f'망가진 저장 {r}')
+        # (6) 개발자 메뉴: 정수, 합치기 재화, 수료증 기금 쪽지, 다음 날(퍼즐 보상 판, 합치기 부스터)
+        r = await pg.evaluate(f"""(()=>{{ const F={F}, S=F.S; document.querySelector('#devBox').hidden = false;
+          S.ess = 0; S.mg.e = 0; S.mg.up = 0; S.mg.pieces = 0; const d0 = S.p.dip, f0 = S.fund, t0 = S.p.ticket;
+          ['#devEss', '#devMg', '#devDip'].forEach(q => document.querySelector(q).click());
+          const out = {{ ess: S.ess, e: S.mg.e, up: S.mg.up, pc: S.mg.pieces, dip: S.p.dip - d0, fund: S.fund - f0, tk: S.p.ticket - t0 }};
+          S.pz.n = 10; S.mg.bst.energy = 3; document.querySelector('#devDay').click();
+          out.pzLeft = F.pzLeft(); out.en = F.mgBstLeft('energy'); out.dev = S.u.dev; return out; }})()""")
+        if r != {'ess': 500, 'e': 100, 'up': 10, 'pc': 10, 'dip': 100, 'fund': 100, 'tk': 3, 'pzLeft': 10, 'en': 3, 'dev': True}: fails.append(f'개발자 메뉴 {r}')
         if errs: fails.append(f'오류 {errs}')
         # 화면
         for w, dark in ((360, True), (390, False)):
             c2 = await b.new_context(viewport={'width': w, 'height': 760}, device_scale_factor=2, is_mobile=True, has_touch=True, color_scheme='dark' if dark else 'light')
             await c2.add_init_script("window.__FOREST_TEST = true; localStorage.clear();")
             pg2, e2 = await boot(c2)
+            await pg2.evaluate("document.querySelector('.tab[data-tab=mini]').click()"); await pg2.wait_for_timeout(400)
+            r = await pg2.evaluate("""(()=>{ const t = document.querySelector('#pzLeftTxt'), c = document.querySelector('#pzOpen'), tr = t.getBoundingClientRect(), cr = c.getBoundingClientRect(); return { txt: t.textContent, inside: tr.right <= cr.right && tr.top >= cr.top, same: Math.abs((tr.top+tr.bottom)/2 - (()=>{ const b = document.querySelector('#pzOpen .mc-txt b').firstChild; const rg = document.createRange(); rg.selectNodeContents(b); const q = rg.getBoundingClientRect(); return (q.top+q.bottom)/2; })()) < 6, row: document.querySelector('#pzAdRow').hidden }; })()""")
+            await pg2.screenshot(path=f's67_mini_{w}.png')
+            if r != {'txt': '보상 10/10', 'inside': True, 'same': True, 'row': True}: fails.append(f'{w}px 퍼즐 카드 보상 잔여 {r}')
             await pg2.evaluate(f"(()=>{{ const F={F}, S=F.S; S.ess = 30; F.mgOpen(); S.mg.bst.luck = 12; F.mgRenderAll(); }})()")
             await pg2.wait_for_timeout(300)
             r = await pg2.evaluate("""(()=>{ const f = document.querySelector('#mgFoot'), fr = f.getBoundingClientRect(); const over = [...f.querySelectorAll('*')].filter(el => { const r = el.getBoundingClientRect(); return r.width && (r.right > fr.right + 1 || r.left < fr.left - 1); }).map(el => el.className || el.tagName); return { over, sw: document.documentElement.scrollWidth }; })()""")

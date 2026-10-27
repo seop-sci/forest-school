@@ -148,7 +148,7 @@ async def run(b, dark, w, h):
     # 화면: 미니게임 탭 → 퍼즐 열기 → 끌어 놓기
     await pg.evaluate(f"{F}.S.pz = {{ day: '', n: 0, adN: 0, best: 0, cur: null }}; {F}.S.ess = 12; document.querySelector('.tab[data-tab=mini]').click()"); await pg.wait_for_timeout(400)
     txt = await pg.evaluate("[document.querySelector('#essHave').textContent, document.querySelector('#pzLeftTxt').textContent, document.querySelector('#pzAdBtn').hidden]")
-    if txt != ['12', '오늘 보상 판 10번 남음', True]: bad.append('미니게임 탭 글: ' + json.dumps(txt, ensure_ascii=False))
+    if txt != ['12', '보상 10/10', True]: bad.append('미니게임 탭 글: ' + json.dumps(txt, ensure_ascii=False))
     await pg.screenshot(path=f's46_mini_{tag}.png')
     await pg.evaluate("document.querySelector('#pzOpen').click(); const pb=document.querySelector('#pzBoost'); if (pb && !pb.hidden) document.querySelector('#pzbSkip').click()"); await pg.wait_for_timeout(500)
     st = await pg.evaluate(f"[!document.querySelector('#pzScene').hidden, document.querySelectorAll('#pzGrid .pz-cell').length, document.querySelectorAll('#pzTray .pz-slot .pz-piece').length, {F}.S.pz.n, {F}.S.pz.cur.rw]")
