@@ -36,22 +36,25 @@ async def main():
         if r['again'] or not r['ch'] or r['t'][0] == 'ups' or len(set(r['t'])) != 3 or not r['ok'] or r['b'] != r['st']: fails.append(f'미션 바꾸기 {r}')
 
         # (2) 정수와 한정 장식
-        r = await pg.evaluate(f"""(()=>{{ const F={F}, S=F.S; window.FS_IMG200 = window.FS_IMG200 || {{}}; window.FS_IMG200.evd_harvest = window.FS_IMG170.ev_box;
+        r = await pg.evaluate(f"""(()=>{{ const F={F}, S=F.S; const real = !!(window.FS_IMG200 && window.FS_IMG200.evd_harvest && window.FS_IMG200.evd_friends);   // 작업지시서 26 그림 23장이 들어 있어요
           S.ess = 0; S.ev.stamp = {{ n: 4, last: '' }}; F.claimStamp(); {CLEAN}; const e5 = S.ess;
           S.ev.list.forEach(m => m.done = true); S.ev.box = false; const g0 = S.ess; F.claimEvBox(); {CLEAN};
           const own1 = F.decoOwn('ev_harvest'), e10 = S.ess - g0;
           // 4주 뒤 다시 수확 축제: 장식은 그대로 하나, 정수만
           F.rt.fakeNow={kst(2026, 12, 1)}; S.clk.last=0; F.evSync(); S.ev.list.forEach(m => m.done = true); S.ev.box = false; const g1 = S.ess; F.claimEvBox(); {CLEAN};
           const own2 = F.decoOwn('ev_harvest'), e10b = S.ess - g1;
-          // 그림이 없는 이벤트(친구 주간) 상자에서는 장식이 안 나와요
+          // 그림이 없는 이벤트(친구 주간 그림을 일부러 뺐어요) 상자에서는 장식이 안 나와요
+          const keep = window.FS_IMG200.evd_friends; delete window.FS_IMG200.evd_friends;
           F.rt.fakeNow={kst(2026, 11, 10)}; S.clk.last=0; F.evSync(); S.ev.list.forEach(m => m.done = true); S.ev.box = false; F.claimEvBox(); {CLEAN};
           const fr = F.decoOwn('ev_friends');
+          // 그림을 되돌리면 같은 이벤트 상자에서 장식이 나와요
+          window.FS_IMG200.evd_friends = keep; S.ev.box = false; S.ev.list.forEach(m => m.done = true); F.claimEvBox(); {CLEAN}; const fr2 = F.decoOwn('ev_friends');
           // 가게: 이벤트 한정 장식 칸이 보이고, 살 수 없어요
           F.rt.decoPick = 'ev_lunch'; const bought = F.buyDeco(); F.renderDecoShop();
           const sec = document.querySelector('#decoList').textContent.includes('이벤트 한정 장식');
-          return {{ e5, e10, own1, own2, e10b, fr, bought, sec, lunch: F.decoOwn('ev_lunch'), n: F.EV_DECO.length }}; }})()""")
+          return {{ real, e5, e10, own1, own2, e10b, fr, fr2, bought, sec, lunch: F.decoOwn('ev_lunch'), n: F.EV_DECO.length }}; }})()""")
         if r['e5'] != 5 or r['e10'] != 10 or r['e10b'] != 10: fails.append(f'이벤트 정수 {r}')
-        if r['own1'] != 1 or r['own2'] != 1 or r['fr'] != 0 or r['bought'] is not False or r['lunch'] != 0 or not r['sec'] or r['n'] != 23: fails.append(f'이벤트 한정 장식 {r}')
+        if r['own1'] != 1 or r['own2'] != 1 or r['fr'] != 0 or r['fr2'] != 1 or not r['real'] or r['bought'] is not False or r['lunch'] != 0 or not r['sec'] or r['n'] != 23: fails.append(f'이벤트 한정 장식 {r}')
 
         # (1-2) 이벤트 미션 표에는 고치기와 연수가 없고(2026-10-27 지섭: 어려워서 빼요), 합치기 주문 미션은 S.mg.st.orders로 세요
         r = await pg.evaluate(f"""(()=>{{ const F={F}, S=F.S; const rows = [];
