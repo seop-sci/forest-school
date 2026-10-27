@@ -1,4 +1,4 @@
-# 배경음악 파일 넣기: 반복 구간으로 잘라 둔 m4a(AAC) 파일을 저장소 맨 위 audio 폴더에 넣어요.
+# 배경음악 파일 넣기: 반복 구간으로 잘라 둔 m4a(AAC) 파일을 저장소 맨 위 audio 폴더에 bgm_*.mp4 이름으로 넣어요.
 # 1.8.0부터 곡은 게임 파일(forest-school.html) 밖의 따로 된 파일이에요(게임 파일이 너무 커지지 않게, 지섭 결정).
 #   웹(GitHub Pages)은 index.html 옆 audio 폴더, 안드로이드는 app/build-www.mjs가 www/audio로, 토스는 toss/build.mjs가 dist/audio로 복사해요.
 #   자동 시험판(dev/test.html)만 dev/wrap.py가 곡을 글자로 넣어요(file:// 주소에서는 파일을 받을 수 없어서).
@@ -17,7 +17,7 @@ def main(d):
         sys.exit('bgm_*.m4a 파일이 없어요')
     AUD.mkdir(exist_ok=True)
     for p in files:
-        shutil.copyfile(p, AUD / p.name)
+        shutil.copyfile(p, AUD / (p.stem + '.mp4'))   # AAC 소리만 든 mp4(m4a와 같은 파일). Claude 화면 게임이 .m4a 이름을 못 실어서 .mp4로
     print(f'곡 {len(files)}개를 audio 폴더에 넣었어요 ({sum(p.stat().st_size for p in files) / 1024:.0f} KB)')
 
 if __name__ == '__main__':

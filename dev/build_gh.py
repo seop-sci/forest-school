@@ -128,6 +128,6 @@ import shutil
 AUD = HERE.parent / 'audio'
 if OUT.resolve() != HERE.parent.resolve():
     (OUT / 'audio').mkdir(exist_ok=True)
-    for f in sorted(AUD.glob('bgm_*.m4a')):
+    for f in sorted(AUD.glob('bgm_*.mp4')):
         shutil.copyfile(f, OUT / 'audio' / f.name)
 print('built', OUT, len(DOC))
