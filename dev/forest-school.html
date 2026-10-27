@@ -4363,6 +4363,7 @@ body{background:radial-gradient(120% 60% at 50% 0%, color-mix(in srgb, var(--pap
     while (bgmBuf.size > 2) bgmBuf.delete(bgmBuf.keys().next().value);
     return p;
   }
+  const HOME_MUSIC_TABS = new Set(['school', 'teachers', 'quests', 'rank', 'dex', 'event']);
   function musicWant() {
     if (!S || rt.paused) return '';
     if (Music.preview && rt.tab === 'shop') return Music.preview;
@@ -4370,8 +4371,8 @@ body{background:radial-gradient(120% 60% at 50% 0%, color-mix(in srgb, var(--pap
     if (rt.fest || rt.sports) return 'festival';
     let play = false; try { play = !!((pzUI && pzUI.open) || (mgUI && mgUI.open)); } catch (e) { /* 퍼즐과 합치기가 아직 준비 전 */ }   // 1.8.0: 숲속 합치기도 미니게임 곡
     if (play) return 'play';
-    // 1.7.4 지섭 결정: 퀘스트 하며 홈과 선생님 탭을 자주 오가니 선생님 탭도 홈 곡 그대로
-    if (rt.tab === 'school' || rt.tab === 'teachers') return THEME_MUSIC && SONGS[S.cos.th.bg] ? S.cos.th.bg : 'home';
+    // 1.7.4 지섭 결정: 곡이 자주 바뀌지 않게 홈에서 여는 탭(선생님, 퀘스트, 랭킹, 도감, 이벤트)도 홈 곡 그대로
+    if (HOME_MUSIC_TABS.has(rt.tab)) return THEME_MUSIC && SONGS[S.cos.th.bg] ? S.cos.th.bg : 'home';
     return 'room';
   }
   // 곡을 바꿀 때는 지금 곡을 살짝 줄이고 새 곡을 키워요
