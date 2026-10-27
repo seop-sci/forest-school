@@ -1,0 +1,39 @@
+# 2.0.0 보안 점검(4절): 웹판(GitHub Pages)에 게임 파일만 올려요. dev 폴더, 메모, CLAUDE.md, 그림 원본(art)은 올리지 않아요.
+# 쓰려면 저장소 Settings > Pages > Build and deployment > Source를 'GitHub Actions'로 바꿔야 해요(그 전에는 이 일이 실패하고 예전처럼 저장소 전체가 올라가요).
+name: Pages
+
+on:
+  push:
+    branches: [main]
+  workflow_dispatch:
+
+permissions:
+  contents: read
+  pages: write
+  id-token: write
+
+concurrency:
+  group: pages
+  cancel-in-progress: false
+
+jobs:
+  deploy:
+    runs-on: ubuntu-24.04
+    environment:
+      name: github-pages
+      url: ${{ steps.deploy.outputs.page_url }}
+    steps:
+      - uses: actions/checkout@11d5960a326750d5838078e36cf38b85af677262   # v4
+      - name: 게임 파일만 모으기
+        run: |
+          mkdir _site
+          cp index.html config.js live.json og.png privacy.html _site/
+          cp -r audio img _site/
+          touch _site/.nojekyll
+          ls -la _site
+      - uses: actions/configure-pages@983d7736d9b0ae728b81ab479565c72886d7745b   # v5
+      - uses: actions/upload-pages-artifact@56afc609e74202658d3ffba0e8f6dda462b719fa   # v3
+        with:
+          path: _site
+      - id: deploy
+        uses: actions/deploy-pages@d6db90164ac5ed86f2b6aed7e0febac5b3c0c03e   # v4

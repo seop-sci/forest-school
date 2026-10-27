@@ -3625,6 +3625,7 @@ body{background:radial-gradient(120% 60% at 50% 0%, color-mix(in srgb, var(--pap
   const SAVE_KEY = 'forest-school-v1';
   // 토스 미니앱 판이면 toss/src/bridge.js가 window.AIT에 광고, 저장소, 게임센터 기능을 담아 둬요
   const AIT = window.AIT || null;
+  const NOAD = !!window.FOREST_NOAD, ADS_EXT = window.FOREST_ADS || null;   // 2.0.0 보안 점검(2-8): 켤 때 한 번만 읽어요(나중에 바꿔 넣어도 소용없게)
   const motionMQ = window.matchMedia ? window.matchMedia('(prefers-reduced-motion: reduce)') : null;
 
   /* ---------- 게임 수치 ---------- */
@@ -4196,11 +4197,11 @@ body{background:radial-gradient(120% 60% at 50% 0%, color-mix(in srgb, var(--pap
   }
   // 서버 저장 상태. GitHub 테스트판에서만 켜져요 (아래 '서버 저장'에 자세히 적었어요)
   const Cloud = { state: 'off', gen: 0, fb: null, db: null, uid: null, dirty: false, pushing: false, lastPush: 0, lastStats: 0, timer: 0,
-    offset: 0, online: true, err: '', bootHadSave: false, skipRestore: false, listening: false };
+    offset: 0, online: true, err: '', bootHadSave: false, bootSavedAt: 0, skipRestore: false, listening: false };
 
   // q.m: 지금 메인 퀘스트 번호, q.mb: 그 퀘스트를 시작할 때의 기준값, q.subs: 받아 둔 학생 부탁들
   // mid: 지금 메인 퀘스트의 id. 퀘스트 목록이 바뀌어도 이어서 할 수 있게 저장해요
-  const freshQ = () => ({ init: false, m: 0, mb: 0, mid: '', lat: '', subs: [], done: [], gen: 0, subDone: 0, seen: -1, qv: 2, reset: false });
+  const freshQ = () => ({ init: false, m: 0, md: 0, mb: 0, mid: '', lat: '', subs: [], done: [], gen: 0, subDone: 0, seen: -1, qv: 2, reset: false });
   // p: 종업식으로 남는 것(수료증, 전학생 수, 명예 교장실), best: 가장 높았던 등급, yearEarned: 올해 번 도토리
   // tier: 학교급(0 유치원, 1 초등학교), tg: 이 학교급에서 연 종업식, tdip: 이 학교급에서 모은 수료증, fund와 fp: 장학재단 기금과 강화
   const fresh = () => ({
@@ -4212,11 +4213,11 @@ body{background:radial-gradient(120% 60% at 50% 0%, color-mix(in srgb, var(--pap
     ach: { hit: {}, got: {}, title: '' },   // 1.7.1 업적: hit 이룬 등급(0~3), got 받은 등급, title 단 칭호(업적 종류 id)
     xt: { diet: 0, lib: 0 },   // 1.7.1 양 영양 선생님, 사슴 사서 선생님 연수 레벨 (0~10, 그 건물을 지으면 오셔요)
     grade: 0, best: 0, sound: true, bgm: true, vibrate: true, savedAt: Date.now(),
-    pending: 0, pendingSec: 0, certNo: 0, earned: 0, yearEarned: 0, pwBank: 0,
+    pending: 0, pendingSec: 0, away: { from: 0, skip: 0 }, certNo: 0, earned: 0, yearEarned: 0, pwBank: 0,
     tier: 0, tg: 0, tdip: 0, fund: 0, fp: { schol: 0, rep: 0, dip: 0 },
     hd: { day: '', n: 0, feastUntil: 0, album: false, seen: false, furNew: true },
     oak: OAK.max,
-    st: { picks: 0, ups: 0, trains: 0, claims: 0, grads: 0, perks: 0, fperks: 0, shakes: 0, dips: 0, play: 0, sess: 0, ads: 0, gold: 0, gspent: 0, trips: 0, sports: 0, dmDone: 0, pz: 0, trials: 0, shows: 0 },   // 2.0.0: trials(1.7.4 침입자)가 저장에서 빠지던 것을 고치고 shows(동아리 발표회)를 더해요
+    st: { picks: 0, ups: 0, trains: 0, claims: 0, grads: 0, perks: 0, fperks: 0, shakes: 0, dips: 0, play: 0, sess: 0, ads: 0, gold: 0, gspent: 0, trips: 0, sports: 0, dmDone: 0, pz: 0, trials: 0, shows: 0, visits: 0, esSpent: 0, pzb: 0 },   // 2.0.0: trials(1.7.4 침입자)가 저장에서 빠지던 것을 고치고 shows(동아리 발표회)를 더해요
     p: { dip: 0, species: 0, ticket: 0, nl: NEWCOMERS.map(() => 0), perk: { schol: 0, rep: 0, start: 0, drop: 0, night: 0 } },
     att: { last: '', n: 0 },
     ad: { day: '', n: 0 },
@@ -4291,7 +4292,7 @@ body{background:radial-gradient(120% 60% at 50% 0%, color-mix(in srgb, var(--pap
     if (d.hd && typeof d.hd === 'object') {
       s.hd.day = typeof d.hd.day === 'string' ? d.hd.day.slice(0, 10) : '';
       s.hd.n = Math.floor(num(d.hd.n, 0, 0));
-      s.hd.feastUntil = Math.min(num(d.hd.feastUntil, 0, 0), Date.now() + 3 * 3600000);
+      s.hd.feastUntil = Math.min(num(d.hd.feastUntil, 0, 0), Date.now() + 27 * 3600000);   // 2.0.0: 게임 시계 기준이라 하루 여유
       s.hd.furNew = d.hd.furNew !== false;
       s.hd.album = !!d.hd.album; s.hd.seen = !!d.hd.seen;
     }
@@ -4332,7 +4333,7 @@ body{background:radial-gradient(120% 60% at 50% 0%, color-mix(in srgb, var(--pap
       s.es.week = Math.floor(num(d.es.week, -1, -1)); s.es.g = Math.floor(num(d.es.g, 0, 0));
       s.es.x = Math.floor(num(d.es.x, 0, 0));   // 1.7.4 도토리로 정수 바꾸기(오늘 바꾼 횟수)
     }
-    s.autoUntil = Math.min(num(d.autoUntil, 0, 0), Date.now() + 3 * 3600000);
+    s.autoUntil = Math.min(num(d.autoUntil, 0, 0), Date.now() + 27 * 3600000);
     if (d.fest && typeof d.fest === 'object') for (const id of FEST_IDS) {
       if (d.fest.next && d.fest.next[id]) s.fest.next[id] = Math.min(num(d.fest.next[id], 0, 0), Date.now() + 2 * 3600000);
       if (d.fest.n && d.fest.n[id]) s.fest.n[id] = Math.floor(num(d.fest.n[id], 0, 0));
@@ -4365,7 +4366,7 @@ body{background:radial-gradient(120% 60% at 50% 0%, color-mix(in srgb, var(--pap
       if (t.been && typeof t.been === 'object') for (const k of Object.keys(TRIP)) if (t.been[k]) s.trip.been[k] = Math.floor(num(t.been[k], 0, 0));
       if (typeof t.cur === 'string' && TRIP[t.cur]) {
         const len = TRIP[t.cur].min * 60000, end = num(t.end, 0, 0), start = num(t.start, 0, 0);
-        if (end > 0 && end - Date.now() <= len) { s.trip.cur = t.cur; s.trip.end = end; s.trip.start = Math.min(start || end - len, end - 1); }
+        if (end > 0 && end - Date.now() <= len + 86400000) { s.trip.cur = t.cur; s.trip.end = end; s.trip.start = Math.min(start || end - len, end - 1); }   // 2.0.0: 끝나는 시각은 게임 시계라 기기 시계와 어긋날 수 있어 하루 여유
       }
     }
     if (typeof d.tk === 'string') s.tk = d.tk.slice(0, 200);
@@ -4423,6 +4424,8 @@ body{background:radial-gradient(120% 60% at 50% 0%, color-mix(in srgb, var(--pap
     }
     // 게임 시계: 망가진 값으로 영영 멈추지 않게 기기 시간 + 1년까지만 받아요
     s.clk.last = Math.min(num(d.clk && d.clk.last, 0, 0), Date.now() + 366 * 86400000);
+    // 2.0.0 보안 점검: 서버 시간을 기다리던 자리 비움(from은 저장 시각보다 늦을 수 없어요, skip은 하루까지)
+    if (d.away && typeof d.away === 'object') { s.away.from = Math.min(num(d.away.from, 0, 0), s.savedAt || 0); s.away.skip = Math.min(num(d.away.skip, 0, 0), 86400000); }
     return s;
   }
   function sanitizeQ(q, num) {
@@ -4431,6 +4434,7 @@ body{background:radial-gradient(120% 60% at 50% 0%, color-mix(in srgb, var(--pap
     out.init = true;
     out.m = mainIndexFromSave(q, num);
     out.mb = num(q.mb, 0, 0);
+    out.md = Math.floor(num(q.md, 0, out.m));   // 2.0.0 보안 점검(1-7): 끝낸 메인 퀘스트 수. 옛 저장은 지금 번호로 시작해요
     out.lat = typeof q.lat === 'string' ? q.lat.slice(0, 12) : '';
     out.seen = Math.min(out.m, Math.floor(typeof q.seen === 'number' && isFinite(q.seen) ? q.seen : -1));
     out.gen = Math.floor(num(q.gen, 0, 0));
@@ -4475,7 +4479,8 @@ body{background:radial-gradient(120% 60% at 50% 0%, color-mix(in srgb, var(--pap
   }
   function save(at) {
     if (!S || rt.adopting) return;   // 다른 학교로 바꾸며 다시 여는 중에는 지금 학교를 저장하지 않아요
-    S.savedAt = at || (rt.paused ? rt.closedAt : Date.now());
+    S.savedAt = at || (rt.paused ? rt.closedAt : gameNow());   // 2.0.0 보안 점검(2-5): 기기 시계 대신 게임 시계
+    if (rt.awayWait) S.away = { from: rt.awayWait.from, skip: rt.awayWait.skip + (performance.now() - rt.awayWait.perf) };   // 서버 시간을 아직 못 받았으면 다음에 이어서 계산해요
     syncMid();
     const json = JSON.stringify(S);
     try { localStorage.setItem(SAVE_KEY, json); } catch (e) { /* 저장소가 막혀 있어도 게임은 계속 */ }
@@ -4493,7 +4498,7 @@ body{background:radial-gradient(120% 60% at 50% 0%, color-mix(in srgb, var(--pap
   const growOn = () => S.p.species >= NEWCOMERS.length || (S.p.ticket || 0) > 0 || nlSum() > 0;
   const legacyMult = () => Math.pow(1.3, S.p.perk.schol) * (1 + 0.05 * S.p.species + 0.02 * nlSum()) * Math.pow(2, S.fp.schol);
   const tuitionMult = () => (1 + 0.2 * S.f.cafeteria) * (1 + 0.15 * S.t.squirrel) * (1 + FAC.store.per / 100 * (S.f.store || 0)) * legacyMult() * setBonusMult() * tripMult() * clubTuitionMult();
-  const feastOn = () => Date.now() < S.hd.feastUntil;
+  const feastOn = () => gameNow() < S.hd.feastUntil;   // 2.0.0 보안 점검(2-5): 게임 시계
   const rate = () => Math.min(S.students, capacity()) * CFG.base * CFG.pace * tuitionMult() * Math.pow(CFG.gradeMult, S.grade) * incomeScale() * (feastOn() ? 2 : 1);
   const offlineEff = () => Math.min(1, 0.3 + 0.15 * S.t.owl);
   const offlineCapH = () => CFG.offlineCapH + 4 * S.p.perk.night;
@@ -4562,7 +4567,12 @@ body{background:radial-gradient(120% 60% at 50% 0%, color-mix(in srgb, var(--pap
   function setServerTime(serverMs) {
     if (!(typeof serverMs === 'number' && isFinite(serverMs) && serverMs > 0)) return;
     SVR.offset = serverMs - devNow(); SVR.ok = true;
-    if (S) gameNow();   // S.clk.last를 서버 시간으로 바로잡아요
+    if (S) {
+      const t = gameNow();   // S.clk.last를 서버 시간으로 바로잡아요
+      // 2.0.0 보안 점검(2-10): 미래로 고친 저장 시각은 서버 시간으로 되돌려요(다른 기기가 옛 학교로 되돌아가지 않게)
+      if (S.savedAt > t + 60000) S.savedAt = t;
+      awaySettle();   // 서버 시간을 기다리던 자리 비운 보상을 이제 계산해요
+    }
   }
   const kstDay = ms => { const d = new Date(ms + KST_MS); return `${d.getUTCFullYear()}-${String(d.getUTCMonth() + 1).padStart(2, '0')}-${String(d.getUTCDate()).padStart(2, '0')}`; };
   const serverTimeOk = () => SVR.ok;
@@ -4571,9 +4581,14 @@ body{background:radial-gradient(120% 60% at 50% 0%, color-mix(in srgb, var(--pap
     if (!S) return dev;
     if (!S.clk) S.clk = { last: 0 };
     if (serverTimeOk()) { const t = dev + SVR.offset; S.clk.last = t; return t; }
+    // 2.0.0 보안 점검(2-6): 서버 시간을 받을 수 있는 판은 서버 시간이 오기 전까지 기기 시계를 믿지 않아요.
+    // 마지막으로 믿은 시각(켤 때의 S.clk.last)에 이번에 켠 뒤 흐른 시간만 더해요. 그래서 오프라인에서 시계를 앞으로 돌려도 새 날이 오지 않아요
+    if (timeSrc() && rt.clk0 && rt.clk0.last > 0) { const t = Math.max(S.clk.last, rt.clk0.last + (performance.now() - rt.clk0.perf)); S.clk.last = t; return t; }
     if (dev >= S.clk.last) { S.clk.last = dev; return dev; }
     return S.clk.last;
   }
+  // 서버 시간을 받을 수 있는 판인지(웹과 구글 플레이는 Firebase, 토스는 Environment.getServerTime). Claude 화면과 옛 토스앱은 기기 시계를 써요
+  const timeSrc = () => hasCloudBuild() || !!(AIT && AIT.serverTime);
   const gameToday = () => kstDay(gameNow());
   const gameWeek = () => Math.floor((gameNow() + KST_MS - Date.UTC(2026, 0, 5)) / 604800000);
   const boostLeft = () => BOOST.perDay - (S.ad.day === gameToday() ? S.ad.n : 0);
@@ -4623,6 +4638,7 @@ body{background:radial-gradient(120% 60% at 50% 0%, color-mix(in srgb, var(--pap
   // 큰 숫자 줄여 쓰기: 기본은 토스처럼 만, 억, 조. 설정에서 K, M, B로 바꿀 수 있어요
   function fmt(n) {
     n = Math.floor(n + 1e-9);
+    if (!isFinite(n)) return '0';   // 2.0.0 보안 점검(1-9): NaN, 무한대는 0으로 보여 줘요
     if (S && S.units === 'en') return fmtEn(n);
     if (n < 10000) return n.toLocaleString('ko-KR');
     const U = [['양', 1e28], ['자', 1e24], ['해', 1e20], ['경', 1e16], ['조', 1e12], ['억', 1e8], ['만', 1e4]];
@@ -6912,12 +6928,31 @@ body{background:radial-gradient(120% 60% at 50% 0%, color-mix(in srgb, var(--pap
   }
 
   /* ---------- 자리 비운 동안 ---------- */
+  /* 2.0.0 보안 점검(1-8, 2-5): 켤 때의 자리 비운 시간은 서버 시간으로 재요.
+     서버 시간을 받을 수 있는 판은 서버 시간이 올 때까지 기다렸다가 계산하고(못 받고 끄면 S.away에 남겨 다음에 이어요),
+     켠 뒤 놀던 시간(skip)은 빼요. 받지 않은 보상이 있어도 그 뒤 흐른 시간을 버리지 않아요 */
+  function awayStart() {
+    const from = S.away && S.away.from > 0 ? S.away.from : S.savedAt;
+    if (!timeSrc()) { awayApply((gameNow() - from) / 1000); return; }
+    rt.awayWait = { from, skip: (S.away && S.away.skip) || 0, perf: performance.now() };
+    if (serverTimeOk()) awaySettle();
+  }
+  function awaySettle() {
+    const w = rt.awayWait;
+    if (!w || !S || !serverTimeOk()) return;
+    rt.awayWait = null; S.away = { from: 0, skip: 0 };
+    awayApply((gameNow() - w.from - w.skip - (performance.now() - w.perf)) / 1000);
+  }
+  function awayApply(sec) {
+    applyAway(sec);
+    if (S.pending > 0 && !(sec >= CFG.awayModalSec)) queueModal(showOffline);   // 짧게 비웠어도 받지 않은 보상은 보여 줘요
+  }
   function applyAway(sec) {
     if (!(sec > 0)) return;
     S.oak = Math.min(OAK.max, S.oak + sec / OAK.regen);
     S.students = Math.min(capacity(), S.students + CFG.enroll * sec);
     if (sec < CFG.awayModalSec) { const g = rate() * sec; S.budget += g; earn(g); return; }
-    const used = Math.min(sec, offlineCapH() * 3600);
+    const used = Math.min(sec, Math.max(0, offlineCapH() * 3600 - S.pendingSec));   // 2.0.0 보안 점검(1-3): 받지 않은 보상과 합쳐 상한까지만
     S.pending += rate() * offlineEff() * used;
     S.pendingSec += sec;
     save();
@@ -6963,11 +6998,11 @@ body{background:radial-gradient(120% 60% at 50% 0%, color-mix(in srgb, var(--pap
   // 진짜 미니앱에서는 앱인토스 SDK의 보상형 광고로 바꿔요. 보상은 userEarnedReward 신호를 받았을 때만 줘요
   function showAd(onReward, onSkip) {
     if (rt.adOpen) return;
-    if (window.FOREST_NOAD) {   // 안드로이드 스토어 판: 광고 없이 바로 보상을 줘요
+    if (NOAD) {   // 안드로이드 스토어 판: 광고 없이 바로 보상을 줘요
       rt.adOk = onReward; rt.adNo = onSkip || null; rt.adEarned = true; closeAd();
       return;
     }
-    const EXT = AIT && AIT.ads ? AIT : (window.FOREST_ADS || null);   // 토스 광고나 안드로이드 애드몹 광고
+    const EXT = AIT && AIT.ads ? AIT : ADS_EXT;   // 토스 광고나 안드로이드 애드몹 광고
     if (EXT) {
       // 토스 리워드 광고: 끝까지 봤다는 신호(userEarnedReward)가 왔을 때만 보상을 줘요
       // 1.6.0: 광고가 아직 없으면 알려 주고, 광고를 못 봤을 때의 처리(onSkip)를 '광고 없음'으로 불러요. 기본 보상이나 버튼이 사라지지 않게요
@@ -7124,10 +7159,10 @@ body{background:radial-gradient(120% 60% at 50% 0%, color-mix(in srgb, var(--pap
     }
     const on = feastOn();
     $('#feastChip').hidden = !on;
-    if (on) $('#feastTime').textContent = clock(Math.ceil((S.hd.feastUntil - Date.now()) / 1000));
+    if (on) $('#feastTime').textContent = clock(Math.ceil((S.hd.feastUntil - gameNow()) / 1000));
     const au = autoOn();
     $('#autoChip').hidden = !au;
-    if (au) $('#autoTime').textContent = clock(Math.ceil((S.autoUntil - Date.now()) / 1000));
+    if (au) $('#autoTime').textContent = clock(Math.ceil((S.autoUntil - gameNow()) / 1000));
   }
   function openDeal() {
     if (rt.paused || rt.modalOpen || !rt.deal) return;
@@ -7202,7 +7237,7 @@ body{background:radial-gradient(120% 60% at 50% 0%, color-mix(in srgb, var(--pap
       const tp = isFac ? [bpos(d.k)[0], bpos(d.k)[1] - bpos(d.k)[2] * 0.3] : [tq[0], tq[1] - 20];
       setTimeout(() => floatText(tp[0], tp[1], `반값! ${fmt(full - half)} 아낌`, 'gold'), 250);
     } else if (d.type === 'feast') {
-      S.hd.feastUntil = Math.max(Date.now(), S.hd.feastUntil) + feastMins() * 60000;
+      S.hd.feastUntil = Math.max(gameNow(), S.hd.feastUntil) + feastMins() * 60000;
       toast(`특식 데이 시작! ${feastMins()}분 동안 수업료가 2배예요`);
       sfx('quest'); buzz(15);
     } else {
@@ -7379,7 +7414,7 @@ body{background:radial-gradient(120% 60% at 50% 0%, color-mix(in srgb, var(--pap
   function cloudShouldRestore(srv) {
     const at = Number(srv.at) || 0;
     if (!Cloud.bootHadSave) return performance.now() < 10 * 60000;
-    return at > S.savedAt + 5000;
+    return at > (Cloud.bootSavedAt || 0) + 5000;   // 2.0.0 보안 점검(1-1): 켠 뒤 이 기기에서 저장한 시각이 아니라 켤 때 저장 시각과 비교해요
   }
   // 구글 계정 바꾸기가 끝나지 않았다는 표시 (다시 열어도 남아요). 인자 없이 부르면 읽고, false면 지워요
   const ACCT_PENDING = 'forest-acct-pending';
@@ -7560,7 +7595,7 @@ body{background:radial-gradient(120% 60% at 50% 0%, color-mix(in srgb, var(--pap
         // 이 구글 계정은 이미 다른 학교를 갖고 있어요. 지금 학교의 랭킹과 테스트 기록은 정리하고 그 계정으로 들어가요
         save();
         const local = JSON.stringify(S), old = Cloud.uid;
-        try { await Cloud.db.ref('forest/rank/' + old).remove(); await Cloud.db.ref('forest/stats/' + old).remove(); } catch (er) { /* 무시 */ }
+        try { await Cloud.db.ref('forest/rank/' + old).remove(); await Cloud.db.ref('forest/stats/' + old).remove(); await Cloud.db.ref('forest/saves/' + old).remove(); } catch (er) { /* 무시 */ }   // 2.0.0 보안 점검(2-12): 다시 못 쓰는 옛 익명 계정의 저장도 지워요(이 학교는 local로 가져가요)
         const u = (await auth.signInWithCredential(cred)).user;
         Cloud.gen += 1; rt.adopting = true;   // 예전 id로 하던 저장은 멈추고, 고른 학교로 다시 열어요
         acctPending(true);
@@ -7848,7 +7883,7 @@ body{background:radial-gradient(120% 60% at 50% 0%, color-mix(in srgb, var(--pap
     pairs.forEach(([id, d]) => {
       const r = readRow(id, d);
       if (!r) return;
-      const k = r.pid || 'id:' + r.id, old = best.get(k);
+      const k = 'id:' + r.id, old = best.get(k);   // 2.0.0 보안 점검(2-3): 남의 학교 번호(pid)를 흉내 내 가리지 못하게 계정으로만 묶어요
       if (!old || (old.id !== Rank.uid && (r.id === Rank.uid || r.at > old.at))) best.set(k, r);
     });
     return [...best.values()].filter(keep || (() => true)).sort(order || ((a, b) => b.score - a.score || a.at - b.at)).slice(0, RANK_MAX);
@@ -7858,13 +7893,21 @@ body{background:radial-gradient(120% 60% at 50% 0%, color-mix(in srgb, var(--pap
   function rankDirty() {
     if (!S || !(S.rank.joined || tossRank()) || Rank.state !== 'on') return;
     clearTimeout(Rank.timer);
-    Rank.timer = setTimeout(() => submitRank(), 2000);
+    // 2.0.0 보안 점검(2-2): 서버 규칙이 지난 쓰기에서 10초가 지나야 크게 오르는 것을 받아 줘서, 10초보다 자주 올리지 않아요
+    Rank.timer = setTimeout(() => submitRank(), Math.max(2000, RANK_GAP - (Date.now() - (Rank.lastPut || 0))));
   }
+  const RANK_GAP = 10500;
+  const be0 = () => !!(Rank.be && Rank.be.remove);
   async function submitRank(force) {
     if (Rank.state !== 'on' || Rank.readOnly || !Rank.uid || !(S.rank.joined || tossRank()) || Rank.writing) return;
+    if (S.u.dev) {   // 2.0.0 보안 점검(2-7): 개발자 메뉴로 재화를 받은 학교는 랭킹에 올리지 않아요
+      if (S.rank.sent && be0()) { try { await Rank.be.remove(); } catch (e) { /* 다음에 다시 */ } S.rank.sent = 0; save(); }
+      return;
+    }
     const score = rankScore();
     // 다른 기기에서 옮겨 온 학교는 이 기기 id로 처음 올리는 거라서 점수가 같아도 올려요
     if (!force && score === S.rank.sent && S.rank.by === Rank.uid && lgKey() === S.rank.sws) return;
+    if (!force && Date.now() - (Rank.lastPut || 0) < RANK_GAP) { rankDirty(); return; }   // 10초 간격(2-2)
     const g = Rank.gen, be = Rank.be;
     Rank.writing = true;
     try {
@@ -7873,10 +7916,13 @@ body{background:radial-gradient(120% 60% at 50% 0%, color-mix(in srgb, var(--pap
       const doc = { name: S.rank.name, score, tier: S.tier, year: yearNo(), test: !!S.u.dev, pid: S.pid, at: Date.now(), ws, lp: S.lg.pts, week: S.lg.week };
       if (ACH_RANK_TITLE && S.ach && S.ach.title) doc.title = S.ach.title;   // 1.7.1 칭호(서버 규칙을 게시한 뒤에 켜요)
       await be.put(doc);
+      Rank.lastPut = Date.now(); Rank.denied = 0;
       if (g === Rank.gen) { S.rank.sent = score; S.rank.by = Rank.uid; S.rank.sws = ws; save(); }
     } catch (e) {
       const c = String((e && (e.code || e.message)) || '');
-      if (g === Rank.gen && /invalid_argument|not_granted|revoked|permission/i.test(c)) Rank.readOnly = true;
+      // 2.0.0: 규칙의 간격이나 오름 폭에 걸렸을 수 있어서 한 번은 15초 뒤 다시 해 보고, 또 막히면 읽기만 해요
+      if (g === Rank.gen && /permission/i.test(c) && !Rank.denied) { Rank.denied = 1; Rank.lastPut = Date.now() + 4500; }
+      else if (g === Rank.gen && /invalid_argument|not_granted|revoked|permission/i.test(c)) Rank.readOnly = true;
       else if (/quota_exceeded/.test(c)) toast('랭킹 자리가 꽉 찼어요. 나중에 다시 해 보세요');
     }
     if (g !== Rank.gen) return;
@@ -7969,7 +8015,7 @@ body{background:radial-gradient(120% 60% at 50% 0%, color-mix(in srgb, var(--pap
     $('#rankScoreLab').textContent = wk ? '이번 주 리그 점수' : '내 학교 파워';
     $('#rankScore').textContent = fmt(score);
     $('#rankPos').textContent = mine >= 0 ? `${mine + 1}위` : '-';
-    const left = 7 - ((new Date().getDay() + 6) % 7);
+    const left = 7 - ((new Date(gameNow() + KST_MS).getUTCDay() + 6) % 7);   // 2.0.0 보안 점검(1-5): 한국 시간 요일
     $('#rankSub').textContent = wk ? `월요일에 새 리그가 시작돼요 (${left}일 남음). 리그에 참여하면 순위와 상관없이 황금 도토리 1개`
       : rankSchool(S.tier, yearNo()) + (Rank.state === 'on' && Rank.rows.length ? `, 랭킹에 ${Rank.rows.length}명` : '');
     $('#rankLead').textContent = wk ? '이번 주에 한 일로 겨뤄요. 오늘의 미션 10점, 미션 보너스 20점, 학교 행사 성공 15점, 체험학습 10점(1시간마다 +5), 종업식 20점, 퀘스트 3점이에요. 학교가 작아도 똑같이 겨룰 수 있어요.'
@@ -8281,7 +8327,7 @@ body{background:radial-gradient(120% 60% at 50% 0%, color-mix(in srgb, var(--pap
   const hardQ = (q, sub) => !!q && (!sub || String(q.id)[0] === 's') && (q.t === 'teaAll' || q.t === 'rate' ||
     (q.t === 'students' && q.n >= 50) || (q.t === 'fac' && q.n >= 10) || (q.t === 'picks' && q.n >= 15) ||
     (q.t === 'trips' && q.n >= 3) || q.t === 'souv' || q.t === 'tripat' || q.t === 'sports' || q.t === 'fest');
-  const autoOn = () => !!S && Date.now() < S.autoUntil;
+  const autoOn = () => !!S && gameNow() < S.autoUntil;
   function goldDay() { const t = gameToday(); if (S.gd.day !== t) { S.gd.day = t; S.gd.n = 0; S.gd.shop = 0; } }
   function addGold(n) {
     if (!(n > 0)) return;
@@ -8798,7 +8844,7 @@ body{background:radial-gradient(120% 60% at 50% 0%, color-mix(in srgb, var(--pap
     renderCrest(); save(); renderDecoShop();
   }
   function useBooster(k) {
-    if (k === 'feast') { S.hd.feastUntil = Math.max(Date.now(), S.hd.feastUntil) + 10 * 60000; toast('특식 데이! 10분 동안 수업료가 2배예요'); }
+    if (k === 'feast') { S.hd.feastUntil = Math.max(gameNow(), S.hd.feastUntil) + 10 * 60000; toast('특식 데이! 10분 동안 수업료가 2배예요'); }
     else if (k === 'skip') {
       const v = rate() * 1800;
       S.budget += v; earn(v);
@@ -8806,7 +8852,7 @@ body{background:radial-gradient(120% 60% at 50% 0%, color-mix(in srgb, var(--pap
       floatText(180, 40, '+' + fmt(v), 'gold');
       toast(`30분을 건너뛰었어요! 도토리 +${fmt(v)}`);
     } else if (k === 'auto') {
-      S.autoUntil = Math.max(Date.now(), S.autoUntil) + 600000;
+      S.autoUntil = Math.max(gameNow(), S.autoUntil) + 600000;
       toast(S.f.playground >= 1 ? '10분 동안 떨어진 도토리를 알아서 주워요' : '10분 동안 떨어진 도토리를 알아서 주워요. 운동장을 지으면 도토리가 떨어져요');
     }
   }
@@ -9255,7 +9301,7 @@ body{background:radial-gradient(120% 60% at 50% 0%, color-mix(in srgb, var(--pap
   const souvN = () => S.trip.souv.length;
   const tripSetsDone = () => TRIPS.filter(t => t.souv.every((_, i) => S.trip.souv.includes(`${t.id}:${i}`))).length;
   const tripMult = () => 1 + 0.02 * souvN() + 0.1 * tripSetsDone();
-  const tripLeft = () => Math.max(0, S.trip.end - Date.now());
+  const tripLeft = () => Math.max(0, S.trip.end - gameNow());   // 2.0.0 보안 점검(1-6): 게임 시계
   const tripBack = () => !!S.trip.cur && tripLeft() <= 0;
   const tripCut = T => Math.max(15, Math.round(T.min / 4));   // 광고 한 편에 줄어드는 분
   function tripReward(T) {
@@ -9341,7 +9387,7 @@ body{background:radial-gradient(120% 60% at 50% 0%, color-mix(in srgb, var(--pap
   function startTrip(id) {
     const D = TRIP[id];
     if (!D || S.trip.cur || S.st.trips < D.need) return;
-    const now = Date.now();
+    const now = gameNow();
     rt.tripGot = '';
     S.trip.cur = id; S.trip.start = now; S.trip.end = now + D.min * 60000;
     sfx('buy'); buzz(10);
@@ -9356,7 +9402,7 @@ body{background:radial-gradient(120% 60% at 50% 0%, color-mix(in srgb, var(--pap
     const D = TRIP[S.trip.cur];
     closeModal($('#mTrip'), () => showAd(() => {
       const cut = tripCut(D) * 60000;
-      S.trip.end = Math.max(Date.now(), S.trip.end - cut);
+      S.trip.end = Math.max(gameNow(), S.trip.end - cut);
       S.trip.start = Math.min(S.trip.start, S.trip.end - 1);
       rt.tripTxt = ''; save(); renderTripBtn();
       toast(tripBack() ? `${D.name}에서 돌아왔어요!` : `${minText(tripCut(D))} 일찍 돌아와요`);
@@ -10587,7 +10633,9 @@ body{background:radial-gradient(120% 60% at 50% 0%, color-mix(in srgb, var(--pap
     if (S.lg.week >= 0 && S.lg.pts > 0 && !S.lg.paid) {
       const r = S.lg.pos || 99, g = LG_PRIZE(r);
       S.lg.last = { week: S.lg.week, pts: S.lg.pts, pos: S.lg.pos || 0, gold: g };
-      setTimeout(() => { addGold(g); toast(`지난주 리그 ${S.lg.pos ? S.lg.pos + '위' : '참여'} 보상! 황금 도토리 +${g}`); save(); }, 1500);
+      const pos = S.lg.pos || 0;
+      addGold(g);   // 2.0.0 보안 점검(1-4): 보상은 바로 주고 안내만 늦게(창을 닫아도 사라지지 않게)
+      setTimeout(() => toast(`지난주 리그 ${pos ? pos + '위' : '참여'} 보상! 황금 도토리 +${g}`), 1500);
     }
     S.lg = { week: w, pts: 0, pos: 0, paid: false, last: S.lg.last || null };
   }
@@ -10667,7 +10715,7 @@ body{background:radial-gradient(120% 60% at 50% 0%, color-mix(in srgb, var(--pap
   function renderWeek() {
     wkWeek();
     const top = MP_BOX[MP_BOX.length - 1].at, pct = Math.min(1, S.wk.pts / top) * 100;
-    const left = 7 - ((new Date().getDay() + 6) % 7);
+    const left = 7 - ((new Date(gameNow() + KST_MS).getUTCDay() + 6) % 7);   // 2.0.0 보안 점검(1-5): 한국 시간 요일
     const box = (i) => {
       const B = MP_BOX[i], got = S.wk.got[i], ready = boxReady(i);
       const ic = `<svg viewBox="-11 -11 22 22" aria-hidden="true"><rect x="-8" y="-3" width="16" height="10" rx="2" class="${got ? 'mb-open' : 'mb-b'}"/><path d="M-9 -7 H9 V-2 H-9 Z" class="${got ? 'mb-open' : 'mb-l'}"/><rect x="-1.6" y="-7" width="3.2" height="14" class="mb-r"/></svg>`;
@@ -11300,7 +11348,7 @@ body{background:radial-gradient(120% 60% at 50% 0%, color-mix(in srgb, var(--pap
       const q = MAIN[S.q.m];
       const ok = q.t === 'picks' ? S.f.playground >= 1 : (COUNT_TYPES.has(q.t) ? false : qDone(q, 0));
       if (!ok) break;
-      S.q.m += 1;
+      S.q.m += 1; S.q.md += 1;
     }
     startMain();
   }
@@ -11355,7 +11403,7 @@ body{background:radial-gradient(120% 60% at 50% 0%, color-mix(in srgb, var(--pap
     const items = [q.rk === 'dip' ? { ic: 'dip', t: `수료증 +${fmt(rv)}장` } : { ic: 'acorn', t: `도토리 +${fmt(rv)}` }];
     if (hardQ(q)) { addGold(GOLD.hard); items.push({ ic: 'gold', t: `황금 도토리 +${GOLD.hard} (조금 어려운 퀘스트)` }); }
     addLeague(LP.quest);
-    S.q.m += 1;
+    S.q.m += 1; S.q.md += 1;
     startMain();
     const prep = prepTopUp(true);
     if (prep) items.push({ ic: 'acorn', t: `교감 선생님 준비물 +${fmt(prep)}` });
@@ -11788,7 +11836,7 @@ body{background:radial-gradient(120% 60% at 50% 0%, color-mix(in srgb, var(--pap
   function closeSchool() {
     closeSheet();
     rt.paused = true;
-    rt.closedAt = Date.now();
+    rt.closedAt = gameNow();
     save(rt.closedAt);
     musicSync();
     if (actx && actx.state === 'running') actx.suspend().catch(() => {});
@@ -11800,7 +11848,7 @@ body{background:radial-gradient(120% 60% at 50% 0%, color-mix(in srgb, var(--pap
     rt.paused = false;
     rt.lastT = performance.now();
     ensureAudio();
-    applyAway((Date.now() - rt.closedAt) / 1000);
+    if (!rt.awayWait) applyAway((gameNow() - rt.closedAt) / 1000);   // 서버 시간을 기다리는 중이면 그때 한꺼번에 계산해요
     syncKids(false);
     renderHUD(); renderAffordance();
     nextModal();
@@ -11837,7 +11885,7 @@ body{background:radial-gradient(120% 60% at 50% 0%, color-mix(in srgb, var(--pap
     const btn = $('#delYes'); btn.disabled = true; btn.textContent = '지우는 중';
     const uid = Cloud.uid;
     rt.adopting = true;   // 지우는 동안 다시 저장하지 않아요
-    const refs = ['saves', 'rank', 'stats'].map(k => Cloud.db.ref(`forest/${k}/${uid}`));
+    const refs = ['saves', 'rank', 'stats', 'admins'].map(k => Cloud.db.ref(`forest/${k}/${uid}`));   // 2.0.0 보안 점검(2-12): 관리자 표시도 지워요
     try { await Promise.all(refs.map(r => r.remove())); }
     catch (e) { rt.deleting = false; rt.adopting = false; btn.disabled = false; btn.textContent = '모두 지우기'; toast('서버 기록을 지우지 못했어요. 인터넷을 확인하고 다시 해 주세요'); return; }
     const gone = await deleteAuthUser(true);
@@ -12084,6 +12132,7 @@ body{background:radial-gradient(120% 60% at 50% 0%, color-mix(in srgb, var(--pap
     $('#dealNo').addEventListener('click', () => closeModal($('#mDeal')));
     $('[data-close-deal]').addEventListener('click', () => closeModal($('#mDeal')));
     $('#devDeal').addEventListener('click', () => {
+      S.u.dev = true;   // 2.0.0 보안 점검: 개발자 메뉴로 부른 것도 표시해요
       if (!dealUnlocked()) { toast('까치 핫딜은 1장 퀘스트를 마치면 열려요'); return; }
       if (dealLeft() <= 0) { S.hd.day = ''; S.hd.n = 0; }
       rt.deal = null;
@@ -12129,7 +12178,7 @@ body{background:radial-gradient(120% 60% at 50% 0%, color-mix(in srgb, var(--pap
     $('#devTrip').addEventListener('click', () => {
       S.u.dev = true;
       if (!tripOpen()) { S.trip.open = true; toast('체험학습을 열었어요 (테스트). 지도 왼쪽 버스를 눌러 보세요'); }
-      else if (S.trip.cur) { S.trip.end = Date.now(); toast('체험학습에서 바로 돌아왔어요 (테스트)'); }
+      else if (S.trip.cur) { S.trip.end = gameNow(); toast('체험학습에서 바로 돌아왔어요 (테스트)'); }
       else toast('지금 다녀오는 체험학습이 없어요. 먼저 출발해 보세요');
       rt.tripTxt = ''; renderTripBtn(); save();
     });
@@ -12318,12 +12367,12 @@ body{background:radial-gradient(120% 60% at 50% 0%, color-mix(in srgb, var(--pap
     document.addEventListener('visibilitychange', () => {
       if (!S) return;
       if (document.hidden) {
-        rt.hiddenAt = Date.now();
+        rt.hiddenAt = gameNow();
         if (!rt.paused) save(rt.hiddenAt);
         cloudPush();   // 앱을 내리면 서버에도 바로 올려요
         if (actx && actx.state === 'running') actx.suspend().catch(() => {});
       } else {
-        const away = rt.hiddenAt ? (Date.now() - rt.hiddenAt) / 1000 : 0;
+        const away = rt.hiddenAt && !rt.awayWait ? (gameNow() - rt.hiddenAt) / 1000 : 0;
         rt.hiddenAt = 0;
         rt.lastT = performance.now();
         if (Cloud.state === 'error' && Cloud.err === 'net') retryCloud();
@@ -12809,7 +12858,7 @@ body{background:radial-gradient(120% 60% at 50% 0%, color-mix(in srgb, var(--pap
     { id: 'grad', name: '종업식과 졸업식', goals: [1, 5, 20, 50, 100], title: '졸업식 단골', t: n => `종업식이나 졸업식 ${n}번 열기`, v: () => S.st.grads },
     { id: 'building', name: '건물 키우기', goals: [10, 20, 30, 40, 50], title: '숲속 건축왕', t: n => `건물 하나를 Lv.${n}까지 올리기`, v: () => Math.max(0, ...Object.values(S.f)) },
     { id: 'teacher', name: '선생님 연수', goals: [10, 50, 200, 500, 1000], title: '연수 대장', t: n => `선생님 연수 ${n}번 보내기`, v: () => S.st.trains },
-    { id: 'quest', name: '메인 퀘스트', goals: [10, 20, 40, 60, 80], title: '숲의 길잡이', t: n => `메인 퀘스트 ${n}개 끝내기`, v: () => S.q.m },
+    { id: 'quest', name: '메인 퀘스트', goals: [10, 20, 40, 60, 80], title: '숲의 길잡이', t: n => `메인 퀘스트 ${n}개 끝내기`, v: () => S.q.md },   // 2.0.0 보안 점검(1-7): 번호 대신 끝낸 수
     { id: 'puzzle', name: '숲속 퍼즐', goals: [1000, 3000, 10000, 20000, 40000], title: '퍼즐 박사', t: n => `숲속 퍼즐 ${fmt(n)}점 넘기`, v: () => S.pz ? S.pz.best : 0 },
     { id: 'dex', name: '동물 도감', goals: [3, 6, 10, 14, 0], title: '동물 박사', t: n => n >= DEX_KEYS.length ? '동물 도감 모두 모으기' : `동물 도감 ${n}칸 채우기`, v: () => dexCount('all') },
     { id: 'fest', name: '학교 행사', goals: [5, 30, 100, 250, 500], title: '축제 대장', t: n => `학교 행사 ${n}번 열기`, v: () => S.st.sports + Object.values(S.fest.n).reduce((a, b) => a + b, 0) },
@@ -13667,6 +13716,7 @@ body{background:radial-gradient(120% 60% at 50% 0%, color-mix(in srgb, var(--pap
     try { adopted = sessionStorage.getItem('forest-adopt'); if (adopted !== null) sessionStorage.removeItem('forest-adopt'); } catch (e) { adopted = null; }
     S = fromHot ? sanitize(data.save) : (load() || fresh());
     S.st.sess += 1;
+    rt.clk0 = { last: (S.clk && S.clk.last) || 0, perf: performance.now() };   // 2.0.0 보안 점검(2-6): 서버 시간 전까지 쓰는 게임 시계 기준
     if (!S.q.init) { if (hadSave) fastForwardMain(); else startMain(); S.q.init = true; }
     if (S.q.reset) { S.q.reset = false; startMain(); }
     fillSubs();
@@ -13685,6 +13735,7 @@ body{background:radial-gradient(120% 60% at 50% 0%, color-mix(in srgb, var(--pap
     if (hasCloudBuild()) {
       Cloud.state = 'idle';
       Cloud.bootHadSave = hadSave;
+      Cloud.bootSavedAt = S.savedAt;   // 2.0.0 보안 점검(1-1): 서버 학교와 비교할 이 기기 저장 시각은 켤 때 값으로(그 뒤 저장하면 바뀌어요)
       Cloud.skipRestore = adopted !== null;
       // 1.5.6: 이어하기 코드 기능을 뺐어요. 예전 링크(?move=)는 주소에서만 지우고, 남은 코드 기록도 지워요
       try {
@@ -13697,8 +13748,8 @@ body{background:radial-gradient(120% 60% at 50% 0%, color-mix(in srgb, var(--pap
     if (rt.brokenSave) setTimeout(() => toast('저장된 학교를 읽지 못해서 새 학교로 시작했어요. 읽지 못한 기록은 이 기기에 따로 남겨 뒀어요'), bootLeft() + 900);
     if (S.rank.joined || AIT) initRank();   // 랭킹에 참여한 학교는 점수가 오르면 바로 올라가게 미리 연결해요
     if (!fromHot) {
-      if (S.pending > 0) queueModal(showOffline);
-      else if (hadSave) applyAway((Date.now() - S.savedAt) / 1000);
+      if (hadSave) awayStart();
+      else if (S.pending > 0) queueModal(showOffline);
     }
     if (!hadSave) save();
     rt.lastT = performance.now();
@@ -13734,11 +13785,11 @@ body{background:radial-gradient(120% 60% at 50% 0%, color-mix(in srgb, var(--pap
   }
 
   // 시험용 손잡이: 자동 시험(window.__FOREST_TEST)에서만 게임 속 함수를 꺼내 써요
-  if (window.__FOREST_TEST) window.__forest = { get S() { return S; }, goTo,
+  if (window.__FOREST_TEST) window.__forest = { get S() { return S; }, goTo, rankRows, awayStart, awaySettle, timeSrc, save,   // 2.0.0 보안 점검 시험(s71)
     rosterEnsure, rosterMake, rosterAdd, clubAuto, clubSet, clubPct, clubShow, clubSum, clubStars, clubMembers, clubShowGo, showReady, showWait, showDay, clubWeekTick, clubFacUp, CLUBS, CLUB, star, clubTuitionMult, clubFestMult, clubDecoOff, renderClub, renderHall, openSeatPick, openClubPick,
-    TIER_SCALE, legacyMult, tuitionMult, snapTake, snapOf, tierViewOpen, tierViewClose, renderTierView, renderTierDots, viewMap, showNewTalk, talkNext, NEWCOMERS, TIERS, GEO, geoIdx, decoCost0, qMeasure, qDone, qGoal, kidArt: kidSVG, newYear, checkGrade, gradeOf, townRep, FAC, sanitize200, mainReady, trialHunt, updateTrial, TRIAL, zoomAt, fitMap, ZOOM_MAX, DECO, DECO_SLOTS, DECO_SIGN, decoCost, decoSoldOut, pickDeco, buyDeco, decoPut, decoEditStart, decoEditEnd, openDecoPick, renderDeco, renderDecoShop, setSchoolNm, setMark, schoolTitle, markHTML, decoPlacedAll, achSync, esExLeft, esExCost, essItem, pickEss, buyEss, ESHOP, get Cloud() { return Cloud; }, get actx() { return actx; }, Music, musicWant, musicSync, ensureAudio, bgmLoad, pzUI, rt, makeDeal, furStage, DEAL, navInfo, navRoute, spawnDrop, repTipCheck, linkGoogle, retryCloud, sanitize, acctPending, renderMap, renderHUD, renderAffordance, syncKids, layoutMap, geo, startTrial, hitTrial, endTrial, startVisit, endVisit, showReward, recommend, needCost, prepTopUp, qReward, prepPhase, rankScore, pwOf, previewDip, dipMult, costScale, buyFacility, buyFur, buyFurAll, furCost, furReady, furDone, FUR, startTalk, endTalk, teacherAct, facCost, teaCost, facKeys, rate, rep, capacity, canGraduate, canPromote,
-    fmt, fmt2, graduate, promote, buyPerk, perkCost, perkMaxed, buyFundPerk, fpCost, claimMain, mainReady, curMain, qNo, earn, CFG, TEA, teaMaxed, PERKS, FPERKS, MAIN, finalYear, startTrip, claimTrip, TRIPS, yearLocked, startSports, endSports, rtSports: () => rt.sports, startFest, rtFest: () => rt.fest, facCap, addLeague, weekIdx, addMP, tutStart, endFest, claimSports, claimBox, musicWant, askBox, festWait, setTab, openSheet, closeSheet,
-    dexMeet, dexSync, dexPending, dexGift, renderDex, evCurrent, evNext, evSync, evFix, evVal, EV_FALLBACK, EV_DECO, EV_HAT, COS, DECO_BY, decoOwn, perkRec, fpRec, BOOST_ALL, buyShop, pickShop, showNote, showOkOn, showWd, renderGradPanel, renderShop, renderEssShop, renderDecoShop, EV_WEEKLY, EV_WEEK_BASE, weekMon, evSkipped, claimStamp, claimEvMission, claimEvBox, renderEvent, evMissions, evOk, evSkipped, EV_MONTHS, EV_MEASURE, tierMinutes, minAcorns, IMG, sanitize171, ACH, achSync, claimAch, setTitle, renderAch, setDexSeg, achClaimable, XT, xtAct, xtCost, xtLv, feastMins, libMult, propInstances, walkBuild, festItemSvg, guestArt, adErrText, googleErrText, openSheet, closeSheet, startFest, startSports, sanitize170, EV_STAMPS, EV_SPECIAL, EV_MONTHLY, EV_BOX, DEX_KEYS, DEX_REWARD, DEX_GUEST_KEYS, seasonKey, roofArtKey, oakKey, setSeasonArt, VP, vpLv, vpCost, vpMult, vpAct, renderVpCard, sportsPrize, festPrize, renderTeachers, buildTeacherCards, bldImg, roofKey, bldStage, mapKey, setMapArt, applyThemes, buyFacility, bldFx, setBldFx, mapHi, Live, liveApply, liveLoad, liveOff, LIVE_KEYS, EVC, NOTICES, openNotice, noticeAuto, noticeWant, ntUnread, startTrial, endTrial: () => rt.trial && (rt.trial.left = 0), spawnDeal, startVisit, IMG170, MG, mgCells, mgSetCells, mgTick, mgAddEnergy, mgAddUp, mgTapGen, mgDrop, mgSell, mgUpgrade, mgClaimOrder, mgSwapOrder, mgOrderOk, mgFillOrders, mgOpen, mgClose, mgRenderAll, mgSpawnLevel, mgNearestEmpty, mgEmptyBoard, mgOrderReward, mgUI, sanitize180, mgWatchAd, mgNewOrder, mgHintPick, mgShowHint, mgClearHint, mgTouch, mgOrderGuide, mgDexN, mgDexCan, mgDexClaim, mgOpenDex, MG_DEX, MG_DEX_MS, mgDexEss, mgDexEssCan, mgDexEssN, mgDexMsCan, mgDexMsClaim, MGB, mgBuyBoost, mgBstLeft, mgOpenBoost, nice, claimMission, claimBonus, claimWeekMission, MP_BOX,   // 1.7.0 도감, 이벤트
+    TIER_SCALE, legacyMult, tuitionMult, snapTake, snapOf, tierViewOpen, tierViewClose, renderTierView, renderTierDots, viewMap, showNewTalk, talkNext, NEWCOMERS, TIERS, GEO, geoIdx, decoCost0, qMeasure, qDone, qGoal, kidArt: kidSVG, newYear, checkGrade, gradeOf, townRep, FAC, sanitize200, trialHunt, updateTrial, TRIAL, zoomAt, fitMap, ZOOM_MAX, DECO, DECO_SLOTS, DECO_SIGN, decoCost, decoSoldOut, pickDeco, buyDeco, decoPut, decoEditStart, decoEditEnd, openDecoPick, renderDeco, setSchoolNm, setMark, schoolTitle, markHTML, decoPlacedAll, esExLeft, esExCost, get Cloud() { return Cloud; }, get actx() { return actx; }, Music, musicSync, ensureAudio, bgmLoad, pzUI, rt, makeDeal, furStage, DEAL, navInfo, navRoute, spawnDrop, repTipCheck, linkGoogle, retryCloud, sanitize, acctPending, renderMap, renderHUD, renderAffordance, syncKids, layoutMap, geo, hitTrial, endVisit, showReward, recommend, needCost, prepTopUp, qReward, prepPhase, rankScore, pwOf, previewDip, dipMult, costScale, buyFur, buyFurAll, furCost, furReady, furDone, FUR, startTalk, endTalk, teacherAct, facCost, teaCost, facKeys, rate, rep, capacity, canGraduate, canPromote,
+    fmt, fmt2, graduate, promote, buyPerk, perkCost, perkMaxed, buyFundPerk, fpCost, claimMain, mainReady, curMain, qNo, earn, CFG, TEA, teaMaxed, PERKS, FPERKS, MAIN, finalYear, startTrip, claimTrip, TRIPS, yearLocked, endSports, rtSports: () => rt.sports, rtFest: () => rt.fest, facCap, addLeague, addMP, tutStart, endFest, claimBox, musicWant, askBox, festWait, setTab,
+    dexMeet, dexSync, dexPending, dexGift, renderDex, evCurrent, evNext, evSync, evFix, evVal, EV_FALLBACK, EV_DECO, EV_HAT, COS, DECO_BY, decoOwn, perkRec, fpRec, BOOST_ALL, buyShop, pickShop, showNote, showOkOn, showWd, renderGradPanel, renderShop, renderDecoShop, EV_WEEKLY, EV_WEEK_BASE, weekMon, claimStamp, claimEvMission, claimEvBox, renderEvent, evMissions, evOk, evSkipped, EV_MONTHS, EV_MEASURE, tierMinutes, minAcorns, IMG, sanitize171, ACH, achSync, claimAch, setTitle, renderAch, setDexSeg, achClaimable, XT, xtAct, xtCost, xtLv, feastMins, libMult, propInstances, walkBuild, festItemSvg, guestArt, adErrText, googleErrText, openSheet, closeSheet, startFest, startSports, sanitize170, EV_STAMPS, EV_SPECIAL, EV_MONTHLY, EV_BOX, DEX_KEYS, DEX_REWARD, DEX_GUEST_KEYS, seasonKey, roofArtKey, oakKey, setSeasonArt, VP, vpLv, vpCost, vpMult, vpAct, renderVpCard, sportsPrize, festPrize, renderTeachers, buildTeacherCards, bldImg, roofKey, bldStage, mapKey, setMapArt, applyThemes, buyFacility, bldFx, setBldFx, mapHi, Live, liveApply, liveLoad, liveOff, LIVE_KEYS, EVC, NOTICES, openNotice, noticeAuto, noticeWant, ntUnread, startTrial, endTrial: () => rt.trial && (rt.trial.left = 0), spawnDeal, startVisit, IMG170, MG, mgCells, mgSetCells, mgTick, mgAddEnergy, mgAddUp, mgTapGen, mgDrop, mgSell, mgUpgrade, mgClaimOrder, mgSwapOrder, mgOrderOk, mgFillOrders, mgOpen, mgClose, mgRenderAll, mgSpawnLevel, mgNearestEmpty, mgEmptyBoard, mgOrderReward, mgUI, sanitize180, mgWatchAd, mgNewOrder, mgHintPick, mgShowHint, mgClearHint, mgTouch, mgOrderGuide, mgDexN, mgDexCan, mgDexClaim, mgOpenDex, MG_DEX, MG_DEX_MS, mgDexEss, mgDexEssCan, mgDexEssN, mgDexMsCan, mgDexMsClaim, MGB, mgBuyBoost, mgBstLeft, mgOpenBoost, nice, claimMission, claimBonus, claimWeekMission, MP_BOX,   // 1.7.0 도감, 이벤트
     PZ, PZ_SHAPES, pzFits, pzAnyFit, pzStuck, pzFullLines, pzPlace, pzFreshGame, pzStart, PZB, pzbCost, pzApplyBoost, pzBoostOpen, pzBoostGo, festGoldLeft, festGoldTake, claimSports, renderStreet, pzFinish, pzLeft, pzCanAd, pzEssOf, pzMinOf, pzHelpSquirrel, pzHelpOwl, pzHelpBear, fillSubs, mapRoofTop, showAd, claimOfflineDouble, startBoost, tripAd, festFocus, festRange, visMap, renderMissions, pzHasHelp, pzRot, pzNewPiece, pzOpen, pzClose, pzGameOver, pzRenderAll, renderMini, addEss, ESHOP, SP_FUR, applyCos, essItem, pickEss, buyEss, renderEssShop, esAcornLeft, esGoldLeft, esAcornAmt, hatSVG, spFurImg, gameNow, gameToday, gameWeek, kstDay, setServerTime, SVR, dmDay, weekIdx, lgWeek, wkWeek, lgKey, pzDay, goldDay, boostLeft, dealLeft, canStamp };
   if (window.claude && window.claude.hot && window.claude.hot.snapshot) {
     try { window.claude.hot.snapshot(() => { if (S) syncMid(); return { save: S }; }); } catch (e) { /* 무시 */ }
