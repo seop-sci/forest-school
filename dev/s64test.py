@@ -25,7 +25,7 @@ async def main():
           S.q.m = i; S.q.mb = S.st.trials || 0; S.q.lat = ''; F.rt.trialT = 999; F.rt.trial && F.endTrial(true); F.setTab('school');
           return {{ i, prev: ids[i - 1], next: ids[i + 1], ch: F.MAIN[i].ch, hunt: F.trialHunt() }}; }})()""")
         print('자리', r)
-        if r['prev'] != 'q7' or r['next'] != 'q8' or r['ch'] != 1 or not r['hunt']: bad.append(f'자리 {r}')
+        if r['prev'] != 'q7' or r['next'] != 'z1' or r['ch'] != 1 or not r['hunt']: bad.append(f'자리 {r}')
         txt = await pg.evaluate("document.querySelector('#questBar') ? document.querySelector('#questBar').textContent : ''")
         if '매나 뱀' not in txt and '침입자' not in txt: bad.append(f'퀘스트 칸 글 {txt[:80]}')
         await pg.wait_for_timeout(4500)

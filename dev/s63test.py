@@ -4,7 +4,7 @@
 #  2) 손가락 두 개를 벌리면 커지고 모으면 줄어요(처음 크기까지). 손가락을 뗀 뒤 건물이 눌리지 않아요
 #  3) 키운 채로 지도를 밀어도 빈 곳이 보이지 않아요(지도 끝이 화면 안으로 들어오지 않아요)
 #  4) 홈에서 여는 탭(선생님, 퀘스트, 랭킹, 도감, 이벤트, 설정)은 홈 곡(home), 졸업 탭은 쉬는 시간 곡(room)
-#  5) 2.0.0 고화질 지도: img/maps 파일이 있으면 1024×1536 그림으로 바꿔 끼워요(없으면 게임 안 그림)
+#  5) 1.8.0 고화질 지도: img/maps 파일이 있으면 1024×1536 그림으로 바꿔 끼워요(없으면 게임 안 그림)
 #  5) 페이지 오류 없음
 # 쓰는 법: python3 wrap.py && python3 s63test.py   (마지막 줄이 PASS면 통과)
 import asyncio, json
@@ -55,7 +55,7 @@ async def main():
         m = await pg.evaluate(f"(() => {{ const F = {F}; F.S.bgm = true; const out = []; F.setTab('teachers'); out.push(F.musicWant()); F.setTab('grad'); out.push(F.musicWant()); for (const t of ['quests', 'rank', 'dex', 'event', 'settings']) {{ F.setTab(t); out.push(F.musicWant()); }} F.setTab('school'); out.push(F.musicWant()); return out; }})()")
         print('곡', m)
         if m != ['home', 'room', 'home', 'home', 'home', 'home', 'home', 'home']: bad.append(f'배경음악 {m}')
-        # 2.0.0 고화질 지도: 게임 옆 img/maps 파일이 있으면 받아서 바꿔 끼우고, 없으면 게임 안 그림 그대로
+        # 1.8.0 고화질 지도: 게임 옆 img/maps 파일이 있으면 받아서 바꿔 끼우고, 없으면 게임 안 그림 그대로
         h = await pg.evaluate("""(async () => { const F = window.__forest, el = document.querySelector('#mapImg0'); const a = el.getAttribute('href').slice(0, 15);
           window.FS_IMG_BASE = '../img/'; for (const k in F.mapHi) delete F.mapHi[k]; F.setMapArt(); await new Promise(r => setTimeout(r, 1500));
           const b = el.getAttribute('href'); const im = new Image(); im.src = b; await im.decode().catch(() => {});
