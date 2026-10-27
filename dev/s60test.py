@@ -40,7 +40,8 @@ async def main():
         # 2) 상황마다 곡
         cases = [
             ('홈', "F.setTab('school')", 'home', LEN['bgm_home']),
-            ('선생님 탭', "F.setTab('teachers')", 'room', LEN['bgm_room']),
+            ('선생님 탭(1.7.4부터 홈 곡)', "F.setTab('teachers')", 'home', LEN['bgm_home']),
+            ('졸업 탭', "F.setTab('grad')", 'room', LEN['bgm_room']),
             ('퍼즐', "F.pzUI.open = true", 'play', LEN['bgm_play']),
             ('행사', "F.pzUI.open = false; F.setTab('school'); F.rt.fest = { id: 'picnic', t: 30, n: 0, spawn: 0.6, items: [], perf: 0, intro: 3 }", 'festival', LEN['bgm_festival']),
         ]
