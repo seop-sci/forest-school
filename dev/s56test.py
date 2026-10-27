@@ -42,7 +42,7 @@ async def main():
           L.forEach((e,i)=>{{ if (F.weekMon(e.start)!==e.start) bad.push(e.id+' 월요일 아님 '+e.start);
             if ((Date.parse(e.end)-Date.parse(e.start))/864e5!==6) bad.push(e.id+' 7일 아님 '+e.start);
             if (i && L[i-1].end>=e.start) bad.push(L[i-1].id+'와 '+e.id+' 겹침');
-            const im=window.FS_IMG170||{{}}; if (!im[e.banner] && !im[e.fb]) bad.push(e.id+' 배너 그림 없음'); }});
+            const im=window.FS_IMG170||{{}}; if (!im[e.banner]) bad.push(e.id+' 배너 그림 없음'); }});
           return {{ bad, n: L.length }}; }})()""")
         if tb['bad'] or tb['n'] < 22: fails.append(f'특별 이벤트 표가 이상해요 {tb}')
         # 다음 이벤트 안내: 11월 12일에는 수능 응원이 다음이에요
