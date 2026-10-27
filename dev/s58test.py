@@ -106,7 +106,7 @@ async def main():
           return out; }})()""")
         if r['hit'] != 2 or not r['claimable'] or r['gain'] != 3 or r['got'] != 2 or r['again'] is not False or r['keep'] != 2: fails.append(f'업적 받기 {r}')
         if r['gold3'] != 15 or r['title'] != 'building' or r['title2'] != 'building': fails.append(f'금 업적과 칭호 {r}')
-        if r['set'] != [True, 'puzzle', True, '', False, ''] or r['total'] != 60: fails.append(f'칭호 바꾸기 {r}')
+        if r['set'] != [True, 'puzzle', True, '', False, ''] or r['total'] != 65: fails.append(f'칭호 바꾸기 {r}')
         if r['san'] != [5, 'building'] or r['bad'] != [5, 0, 0, 5, 0, ''] or r['old'] != [0, '']: fails.append(f'업적 저장 {r}')
         # 도감 버튼 점
         r = await pg.evaluate(f"""(async()=>{{ const F={F}, S=F.S; S.st.trains = 60; await new Promise(r => setTimeout(r, 1500)); {CLEAN}; return [F.achClaimable(), !document.querySelector('#dexDot').hidden, !document.querySelector('#achDot').hidden]; }})()""")
@@ -117,7 +117,7 @@ async def main():
             await pg.evaluate(f"document.documentElement.setAttribute('data-theme','{theme}'); {F}.setTab('dex'); {CLEAN}; {F}.setDexSeg('ach')")
             await pg.wait_for_timeout(400)
             ov = await pg.evaluate("(()=>{ const rows=[...document.querySelectorAll('.ach-row')]; return { doc: document.documentElement.scrollWidth - innerWidth, n: rows.length, over: rows.filter(r => r.scrollWidth > r.clientWidth + 1).length, btn: document.querySelectorAll('.ach-btn').length, chip: document.querySelectorAll('.title-chip').length }; })()")
-            if ov['doc'] > 0 or ov['n'] != 12 or ov['over'] or ov['btn'] < 1 or ov['chip'] != 2: fails.append(f'{theme} {w}px 업적 화면 {ov}')
+            if ov['doc'] > 0 or ov['n'] != 13 or ov['over'] or ov['btn'] < 1 or ov['chip'] != 2: fails.append(f'{theme} {w}px 업적 화면 {ov}')
             await pg.screenshot(path=f's58_{theme}_{w}.png')
             # 버튼으로 받기
             await pg.click('.ach-btn'); await pg.wait_for_timeout(500)
