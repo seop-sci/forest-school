@@ -3449,8 +3449,11 @@ body{background:radial-gradient(120% 60% at 50% 0%, color-mix(in srgb, var(--pap
   ];
   const TIER_OPEN = 3;   // 2.0.0: 중학교까지 열려요
   // 학교급이 오르면 수업료는 1000배, 공사비는 2000배라서 숫자 단위가 껑충 커져요
-  const incomeScale = () => Math.pow(1000, S.tier);
-  const costScale = () => Math.pow(2000, S.tier);
+  // 2.0.0: 학교급마다 수업료와 공사비 배수를 표로 적어요(균형 제안서에서 고르는 값). 표에 없는 학교급은 예전 규칙(1000배, 2000배)
+  // 중학교 공사비는 균형 제안서(2.0.0) 제안값 4억 배(예전 규칙이면 400만 배). 지섭 확정 전이에요
+  const TIER_SCALE = { inc: [1, 1e3, 1e6], cost: [1, 2e3, 4e8] };
+  const incomeScale = () => TIER_SCALE.inc[S.tier] !== undefined ? TIER_SCALE.inc[S.tier] : Math.pow(1000, S.tier);
+  const costScale = () => TIER_SCALE.cost[S.tier] !== undefined ? TIER_SCALE.cost[S.tier] : Math.pow(2000, S.tier);
   const tierInfo = () => TIERS[S.tier];
   // 올해가 몇 년째(몇 학년)인지. 다음 학교급이 아직 안 열려서 마지막 해를 되풀이하면 마지막 해로 보여요
   const yearNo = () => Math.min(S.tg + 1, tierInfo().years);
@@ -3555,7 +3558,7 @@ body{background:radial-gradient(120% 60% at 50% 0%, color-mix(in srgb, var(--pap
     // 2.0.0 중학교부터 생기는 새 시설. 값과 효과는 균형 제안서(2.0.0)에서 정해요
     store: { name: '매점', rep: 1, tier: 2, per: 15, view: '0 0 100 100',
       desc: '간식과 음료를 파는 매점이에요. 쉬는 시간이 즐거워서 수업료가 올라요.',
-      cost: L => 300 * Math.pow(1.8, L),
+      cost: L => 60 * Math.pow(1.8, L),   // 균형 제안서(2.0.0) 제안값: 처음 짓기가 입학 뒤 30분쯤
       eff: L => L < 1 ? '아직 없어요' : `수업료 +${FAC.store.per * L}%` }
   };
   // 지금 학교급에서 쓸 수 있는 시설
@@ -3845,66 +3848,66 @@ body{background:radial-gradient(120% 60% at 50% 0%, color-mix(in srgb, var(--pap
       say: '6학년 친구들이 의젓하게 자랐어요! 졸업식을 열면 숲속 중학교에 입학해요. 새 건물 매점과 동아리가 기다리고 있어요.' },
 
     // 12장~15장 (2.0.0): 숲속 중학교. 입학 장 + 1, 2, 3학년. 목표 숫자는 균형 제안서(2.0.0)의 자동 플레이로 정해요. yt: 2는 중학교 학년 장이라는 뜻
-    { id: 'm1', ch: 11, t: 'tier', n: 2, rm: 10, title: '중학교 입학식', how: '숲속 중학교에 입학했어요. 받기를 눌러요',
+    { id: 'j1', ch: 11, t: 'tier', n: 2, rm: 10, title: '중학교 입학식', how: '숲속 중학교에 입학했어요. 받기를 눌러요',
       say: '숲속 중학교 입학을 축하해요! 중학교는 수업료도 공사비도 훨씬 커요. 새로 생긴 매점과 동아리가 학교를 더 신나게 만들어 줄 거예요.' },
-    { id: 'm2', ch: 11, t: 'fac', k: 'store', n: 1, rm: 10, title: '매점 짓기', how: '지도 가운데 아래 공사 자리를 눌러요',
+    { id: 'j2', ch: 11, t: 'fac', k: 'store', n: 1, rm: 10, title: '매점 짓기', how: '지도 가운데 아래 공사 자리를 눌러요',
       say: '쉬는 시간에 간식을 사 먹을 매점이 있어야지요. 매점을 지으면 학교가 즐거워져서 수업료가 올라요.' },
-    { id: 'm3', ch: 11, t: 'furAll', k: 'store', n: 1, rm: 10, title: '매점 가구 갖추기', how: '매점을 눌러서 가구를 모두 올려요',
+    { id: 'j3', ch: 11, t: 'furAll', k: 'store', n: 1, rm: 10, title: '매점 가구 갖추기', how: '매점을 눌러서 가구를 모두 올려요',
       say: '매점에 진열대도 냉장고도 비어 있어요. 간식 진열대, 음료 냉장고, 계산대, 간식 탁자를 갖춰 주세요.' },
-    { id: 'm4', ch: 11, t: 'club', n: 12, rm: 10, title: '첫 동아리 나누기', how: '복도 > 동아리실에서 자동 추천을 눌러도 돼요',
+    { id: 'j4', ch: 11, t: 'club', n: 12, rm: 10, title: '첫 동아리 나누기', how: '복도 > 동아리실에서 자동 추천을 눌러도 돼요',
       say: '중학교에는 동아리가 있어요! 지도 왼쪽 복도 단추를 눌러 동아리실로 가 보세요. 대표 학생 12명을 과학부, 운동부, 독서부, 미술부에 셋씩 나눠요. 능력치가 맞을수록 보너스가 커져요.' },
     { id: 'h2', ch: 11, t: 'trials', n: 1, rm: 10, title: '침입자 쫓아내기', how: '매나 뱀이 나타나면 여러 번 눌러서 쫓아내요',
       say: '큰 학교가 되니 매와 뱀이 또 기웃거려요. 나타나면 빨간 테두리가 생겨요. 20초 안에 여러 번 톡톡 눌러서 쫓아내 주세요!' },
-    { id: 'm5', ch: 11, t: 'students', n: 30, rm: 8, title: '학생 30명 맞이하기', how: '교실을 Lv.6까지 넓혀요',
+    { id: 'j5', ch: 11, t: 'students', n: 30, rm: 8, title: '학생 30명 맞이하기', how: '교실을 Lv.6까지 넓혀요',
       say: '중학교에 입학하려는 친구들이 몰려와요. 교실을 넓혀서 학생 30명을 맞이해요.' },
-    { id: 'm6', ch: 11, t: 'grade', n: 1, rm: 8, title: '중학교 마을 되기', how: '평판을 ★{REP}까지 모으면 마을이 생겨요',
+    { id: 'j6', ch: 11, t: 'grade', n: 1, rm: 8, title: '중학교 마을 되기', how: '평판을 ★{REP}까지 모으면 마을이 생겨요',
       say: '중학교 둘레에도 버섯집 마을이 생길 차례예요. 평판을 ★{REP}까지 모아 봐요. 중학교는 평판 기준이 조금 더 높아요.' },
 
-    { id: 'm7', ch: 12, t: 'shows', n: 1, rm: 5, title: '첫 발표회 열기', how: '동아리실에서 발표회 열기를 눌러요',
-      say: '동아리가 생겼으니 첫 발표회를 열어 봐요! 무대에 선 동아리 친구들은 능력치가 쑥 오르고 도토리도 받아요. 발표회는 일주일에 한 번 열 수 있어요.' },
-    { id: 'm8', ch: 12, t: 'fac', k: 'science', n: 5, rm: 4, title: '과학실 키우기', how: '과학실을 Lv.5까지 키워요',
-      say: '과학부 친구들이 실험할 자리가 모자라요. 과학실을 Lv.5까지 키우면 과학부 친구들의 과학 능력치도 올라요.' },
-    { id: 'm9', ch: 12, t: 'fac', k: 'store', n: 5, rm: 4, title: '매점 넓히기', how: '매점을 Lv.5까지 키워요',
+    { id: 'j7', ch: 12, t: 'shows', n: 1, rm: 5, title: '첫 발표회 열기', how: '동아리실에서 발표회 열기를 눌러요',
+      say: '동아리가 생겼으니 첫 발표회를 열어 봐요! 무대에 선 동아리 친구들은 능력치가 쑥 오르고 도토리도 받아요. 발표회는 하루에 한 번 열 수 있어요.' },
+    { id: 'j8', ch: 12, t: 'fac', k: 'science', n: 3, rm: 4, title: '과학실 키우기', how: '과학실을 Lv.3까지 키워요',
+      say: '과학부 친구들이 실험할 자리가 모자라요. 과학실을 Lv.3까지 키우면 과학부 친구들의 과학 능력치도 올라요.' },
+    { id: 'j9', ch: 12, t: 'fac', k: 'store', n: 5, rm: 4, title: '매점 넓히기', how: '매점을 Lv.5까지 키워요',
       say: '매점 앞에 줄이 길어요! 매점을 Lv.5까지 키우면 수업료가 더 올라요.' },
-    { id: 'm10', ch: 12, t: 'students', n: 60, rm: 4, title: '학생 60명 맞이하기', how: '교실을 Lv.14까지 넓혀요',
-      say: '동아리 소문이 퍼져서 입학 문의가 많아요. 교실을 넓혀서 60명을 맞이해요.' },
-    { id: 'm11', ch: 12, t: 'clubSum', n: 60, rm: 4, title: '동아리 보너스 60%', how: '능력치가 맞는 학생을 동아리에 넣어요',
+    { id: 'j10', ch: 12, t: 'students', n: 50, rm: 4, title: '학생 50명 맞이하기', how: '교실을 Lv.11까지 넓혀요',
+      say: '동아리 소문이 퍼져서 입학 문의가 많아요. 교실을 넓혀서 50명을 맞이해요.' },
+    { id: 'j11', ch: 12, t: 'clubSum', n: 60, rm: 4, title: '동아리 보너스 60%', how: '능력치가 맞는 학생을 동아리에 넣어요',
       say: '동아리 보너스는 부원의 능력치 별만큼 커져요. 동아리 네 곳의 보너스를 더해서 60%를 넘겨 봐요.' },
-    { id: 'm12', ch: 12, t: 'grade', n: 3, rm: 4, title: '중학교 도시 되기', how: '평판을 모아서 도시가 되어요',
+    { id: 'j12', ch: 12, t: 'grade', n: 3, rm: 4, title: '중학교 도시 되기', how: '평판을 모아서 도시가 되어요',
       say: '중학교 둘레에 나무 아파트가 들어서요. 평판을 모아서 도시 학교가 되어 봐요.' },
-    { id: 'm13', ch: 12, t: 'fac', k: 'cafeteria', n: 12, rm: 4, title: '급식실 Lv.12', how: '급식실을 Lv.12까지 키워요',
-      say: '중학생은 한창 자라서 급식을 두 번씩 먹어요. 급식실을 Lv.12까지 키워 주세요.' },
-    { id: 'm14', ch: 12, t: 'grade', n: 4, r: 6, rk: 'dip', title: '중학교 대도시 되기', how: '대도시가 되면 1학년 종업식을 열어요',
+    { id: 'j13', ch: 12, t: 'fac', k: 'cafeteria', n: 10, rm: 4, title: '급식실 Lv.10', how: '급식실을 Lv.10까지 키워요',
+      say: '중학생은 한창 자라서 급식을 두 번씩 먹어요. 급식실을 Lv.10까지 키워 주세요.' },
+    { id: 'j14', ch: 12, t: 'grade', n: 4, r: 6, rk: 'dip', title: '중학교 대도시 되기', how: '대도시가 되면 1학년 종업식을 열어요',
       say: '중학교도 대도시 학교로 만들어 봐요! 그러면 1학년을 마치는 종업식을 열 수 있어요.' },
-    { id: 'm15', ch: 12, ye: 1, yt: 2, t: 'tgrads', n: 1, r: 6, rk: 'dip', title: '중학교 1학년 종업식', how: '졸업 탭에서 종업식을 열어요',
+    { id: 'j15', ch: 12, ye: 1, yt: 2, t: 'tgrads', n: 1, r: 6, rk: 'dip', title: '중학교 1학년 종업식', how: '졸업 탭에서 종업식을 열어요',
       say: '중학교 1학년을 무사히 마쳤어요! 종업식을 열고 2학년으로 올라가요. 2학년에는 숲속 체육대회가 기다려요.' },
 
-    { id: 'm16', ch: 13, t: 'ygrade', n: 2, rm: 4, title: '2학년 읍내 되기', how: '명예 교장실 덕분에 2학년은 더 빨라요',
+    { id: 'j16', ch: 13, t: 'ygrade', n: 2, rm: 4, title: '2학년 읍내 되기', how: '명예 교장실 덕분에 2학년은 더 빨라요',
       say: '2학년이 되었어요! 명예 교장실을 다시 고치면 작년보다 빨리 자라요. 먼저 읍내 학교가 되어 볼까요?' },
-    { id: 'm17', ch: 13, t: 'fac', k: 'playground', n: 15, rm: 4, title: '체육대회 운동장', how: '운동장을 Lv.15까지 넓혀요',
-      say: '숲속 체육대회를 열려면 운동장이 넓어야 해요. 운동장을 Lv.15까지 넓히면 운동부 친구들의 운동 능력치도 올라요.' },
-    { id: 'm18', ch: 13, t: 'sports', n: 2, rm: 4, title: '숲속 운동회 두 번', how: '학교 행사 > 숲속 운동회',
+    { id: 'j17', ch: 13, t: 'fac', k: 'playground', n: 16, rm: 4, title: '체육대회 운동장', how: '운동장을 Lv.16까지 넓혀요',
+      say: '숲속 체육대회를 열려면 운동장이 넓어야 해요. 운동장을 Lv.16까지 넓히면 운동부 친구들의 운동 능력치도 올라요.' },
+    { id: 'j18', ch: 13, t: 'sports', n: 2, rm: 4, title: '숲속 운동회 두 번', how: '학교 행사 > 숲속 운동회',
       say: '체육대회 예선전이에요! 숲속 운동회를 두 번 열어서 청팀을 응원해 줘요.' },
-    { id: 'm19', ch: 13, t: 'star', n: 4, rm: 4, title: '능력치 별 4개 학생', how: '동아리 건물을 키우고 발표회를 열면 능력치가 올라요',
+    { id: 'j19', ch: 13, t: 'star', n: 4, rm: 4, title: '능력치 별 4개 학생', how: '동아리 건물을 키우고 발표회를 열면 능력치가 올라요',
       say: '동아리 활동을 열심히 한 친구들이 쑥쑥 자라요. 능력치 하나라도 별 4개가 된 학생을 만들어 봐요.' },
-    { id: 'm20', ch: 13, t: 'tea', k: 'squirrel', n: 15, rm: 4, title: '다람쥐 선생님 연수', how: '선생님 탭에서 다람쥐 선생님을 Lv.15까지',
+    { id: 'j20', ch: 13, t: 'tea', k: 'squirrel', n: 15, rm: 4, title: '다람쥐 선생님 연수', how: '선생님 탭에서 다람쥐 선생님을 Lv.15까지',
       say: '중학교 수학은 어려워요. 다람쥐 선생님을 Lv.15까지 연수 보내 주세요.' },
-    { id: 'm21', ch: 13, t: 'ygrade', n: 4, rm: 5, title: '2학년 대도시 되기', how: '평판을 모아서 대도시가 되어요',
+    { id: 'j21', ch: 13, t: 'ygrade', n: 4, rm: 5, title: '2학년 대도시 되기', how: '평판을 모아서 대도시가 되어요',
       say: '체육대회가 대성공이에요! 2학년도 대도시 학교로 만들면 종업식을 열 수 있어요.' },
-    { id: 'm22', ch: 13, ye: 2, yt: 2, t: 'tgrads', n: 2, r: 7, rk: 'dip', title: '중학교 2학년 종업식', how: '졸업 탭에서 종업식을 열어요',
+    { id: 'j22', ch: 13, ye: 2, yt: 2, t: 'tgrads', n: 2, r: 7, rk: 'dip', title: '중학교 2학년 종업식', how: '졸업 탭에서 종업식을 열어요',
       say: '2학년을 마쳤어요! 이제 중학교 마지막 학년이에요. 3학년은 졸업 준비로 바빠요.' },
 
-    { id: 'm23', ch: 14, t: 'ygrade', n: 2, rm: 5, title: '3학년 읍내 되기', how: '평판을 모아서 읍내가 되어요',
+    { id: 'j23', ch: 14, t: 'ygrade', n: 2, rm: 5, title: '3학년 읍내 되기', how: '평판을 모아서 읍내가 되어요',
       say: '중학교 3학년이 되었어요! 졸업 준비를 하려면 먼저 학교를 다시 키워야 해요. 읍내 학교가 되어 볼까요?' },
-    { id: 'm24', ch: 14, t: 'fac', k: 'library', n: 18, rm: 5, title: '졸업 문집 만들기', how: '도서관을 Lv.18까지 키워요',
+    { id: 'j24', ch: 14, t: 'fac', k: 'library', n: 18, rm: 5, title: '졸업 문집 만들기', how: '도서관을 Lv.18까지 키워요',
       say: '3학년은 졸업 문집을 만들어요. 도서관을 Lv.18까지 키워서 문집을 꽂을 자리를 마련해요.' },
-    { id: 'm25', ch: 14, t: 'clubShown', n: 4, rm: 5, title: '동아리 네 곳 모두 발표회', how: '동아리마다 한 번씩 무대에 올라요',
-      say: '졸업 전에 동아리 네 곳이 모두 무대에 서 봐요. 과학부, 운동부, 독서부, 미술부가 한 번씩 발표회를 열면 돼요.' },
-    { id: 'm26', ch: 14, t: 'fest', k: 'photo', n: 1, rm: 5, title: '졸업 사진 찍기', how: '학교 행사 > 졸업 사진 찍기',
+    { id: 'j25', ch: 14, t: 'clubShown', n: 2, rm: 5, title: '동아리 두 곳 발표회', how: '서로 다른 동아리 두 곳이 무대에 올라요',
+      say: '졸업 전에 여러 동아리가 무대에 서 봐요. 지금까지 무대에 서지 않은 동아리를 골라 발표회를 열면 돼요. 서로 다른 두 곳이 서면 끝이에요.' },
+    { id: 'j26', ch: 14, t: 'fest', k: 'photo', n: 1, rm: 5, title: '졸업 사진 찍기', how: '학교 행사 > 졸업 사진 찍기',
       say: '중학교 졸업 앨범에 들어갈 단체 사진을 찍어요. 모두 활짝 웃게 웃음 별을 눌러 줘요!' },
-    { id: 'm27', ch: 14, t: 'fac', k: 'store', n: 15, rm: 5, title: '졸업 잔치 매점', how: '매점을 Lv.15까지 키워요',
+    { id: 'j27', ch: 14, t: 'fac', k: 'store', n: 15, rm: 5, title: '졸업 잔치 매점', how: '매점을 Lv.15까지 키워요',
       say: '졸업식 날 매점에서 간식 잔치를 열어요. 매점을 Lv.15까지 키워 주세요.' },
-    { id: 'm28', ch: 14, t: 'ygrade', n: 4, r: 15, rk: 'dip', title: '3학년 대도시 되기', how: '평판을 모아서 대도시가 되어요',
+    { id: 'j28', ch: 14, ye: 3, yt: 2, t: 'ygrade', n: 4, r: 15, rk: 'dip', title: '3학년 대도시 되기', how: '평판을 모아서 대도시가 되어요',
       say: '중학교의 마지막 해예요. 3학년도 대도시 학교로 만들면 졸업 준비 끝! 고등학교는 곧 열릴 거예요.' }
   ];
   // v3 저장은 메인 퀘스트를 번호로 기억했어요. 그때 순서의 id 목록 (q25 별빛숲, q27 무지개숲은 동네 5단계로 바뀌며, q24 졸업식 세 번은 유치원이 2년으로 줄며 빠졌어요)
@@ -3934,7 +3937,7 @@ body{background:radial-gradient(120% 60% at 50% 0%, color-mix(in srgb, var(--pap
     { who: 'chick', t: 'earned', n: () => nice(rate() * 120), say: n => `도토리 ${fmt(n)}개를 모아서 숲속 잔치를 열어요!` },
     { who: 'rabbit', t: 'claims', n: () => 1, say: () => '학교 문을 닫았다가 다시 와 주세요. 그동안 수업이 잘 이어지는지 볼게요.' }
   ];
-  const COUNT_TYPES = new Set(['picks', 'ups', 'trains', 'claims', 'earned', 'trips', 'sports', 'fest', 'trials', 'shows']);
+  const COUNT_TYPES = new Set(['picks', 'ups', 'trains', 'claims', 'earned', 'trips', 'sports', 'fest', 'trials']);   // 2.0.0 동아리 발표회(shows)는 일주일에 한 번이라 지금까지 연 횟수로 재요(퀘스트 전에 열었어도 쳐요)
   const Q_TYPES = ['fac', 'tea', 'teaAll', 'students', 'grade', 'ygrade', 'rate', 'picks', 'ups', 'trains', 'claims', 'earned', 'grads', 'perks', 'tier', 'tgrads', 'fperks', 'trips', 'souv', 'tripat', 'sports', 'fest'];
 
   /* ---------- 상태 ---------- */
@@ -4273,10 +4276,16 @@ body{background:radial-gradient(120% 60% at 50% 0%, color-mix(in srgb, var(--pap
   // 2.0.0: 중학교 학년 장도 같은 규칙(yt는 그 퀘스트의 학교급, 없으면 초등학교)
   const yearGateIdx = () => S.tier >= 1 ? MAIN.findIndex(q => q.ye === S.tg + 1 && (q.yt || 1) === S.tier) : -1;
   // 예전 장(1~6장)에 머물러 있는 학교는 막지 않아요. 수료증이 있어야 하는 퀘스트가 종업식에 막혀 멈추지 않게요
-  const yearLocked = () => { const i = yearGateIdx(), q = MAIN[S.q.m]; return i >= 0 && S.q.m < i && !!q && q.ch >= 6; };
+  // 2.0.0: 장마다 어느 학교급의 장인지(0~4장 유치원, 5~10장 초등학교, 11~14장 중학교). 다른 학교급의 장에 머물러 있으면 막지 않아요
+  const chTier = ch => ch <= 4 ? 0 : ch <= 10 ? 1 : 2;
+  const yearLocked = () => { const i = yearGateIdx(), q = MAIN[S.q.m]; return i >= 0 && S.q.m < i && !!q && q.ch >= 6 && chTier(q.ch) === S.tier; };
   const yearLeft = () => Math.max(0, yearGateIdx() - S.q.m);
+  // 2.0.0: 초등학교 졸업식도 종업식처럼 6학년 장을 마쳐야(졸업식 퀘스트까지 와야) 열 수 있어요. 마치지 않은 채 중학교에 가면 6학년 퀘스트가 중학교에서 막혀요
+  const promoteGateIdx = () => S.tier >= 1 ? MAIN.findIndex(q => q.t === 'tier' && q.n === S.tier + 1) : -1;
+  const promoteLocked = () => { const i = promoteGateIdx(), q = MAIN[S.q.m]; return i >= 0 && S.q.m < i && !!q && q.ch >= 6 && chTier(q.ch) === S.tier; };
+  const promoteLeft = () => Math.max(0, promoteGateIdx() - S.q.m);
   const canGraduate = () => S.grade >= GRAD_MIN && !finalYear() && !yearLocked();
-  const canPromote = () => finalYear() && S.grade >= GRAD_MIN;
+  const canPromote = () => finalYear() && S.grade >= GRAD_MIN && !promoteLocked();
   // 기금 = 이 학교급에서 모은 수료증 5장마다 1 + 졸업 축하 1. 올해 수료증도 함께 쳐요
   const FUND_PER = 5;
   const previewFund = () => Math.floor((S.tdip + previewDip()) / FUND_PER) + 1;
@@ -8412,7 +8421,8 @@ body{background:radial-gradient(120% 60% at 50% 0%, color-mix(in srgb, var(--pap
     { id: 'rea', name: '독서부', ab: 2, fac: 'library', img: 'club_reading', em: '📚', eff: p => `수업료 +${p}%` },
     { id: 'art', name: '미술부', ab: 3, fac: 'classroom', img: 'club_art', em: '🎨', eff: p => `장식 값 -${p}%` }
   ];
-  const CLUB = { seats: 3, per: 2, max: 30, grow: 5, growLv: 10, up: 1, show: 5, showMin: 30, showDays: 7 };
+  // showDays: 발표회 주기(게임 시계 날짜). 설계안은 일주일이지만 중학교 한 해가 하루 안팎이라 균형 제안서(2.0.0)에서 하루를 제안했어요. 지섭 확정 전이에요
+  const CLUB = { seats: 3, per: 2, max: 30, grow: 5, growLv: 10, up: 1, show: 5, showMin: 30, showDays: 1 };
   // 동물마다 잘하는 능력(0 과학, 1 운동, 2 독서, 3 미술)
   const SP_ABIL = { rabbit: 1, fox: 0, raccoon: 0, chick: 3, bear: 1, cat: 2, dog: 1, penguin: 0, panda: 2, koala: 2, otter: 3,
     hamster: 1, duck: 3, turtle: 2, mole: 0, frog: 1, waterdeer: 3 };
@@ -8582,7 +8592,7 @@ body{background:radial-gradient(120% 60% at 50% 0%, color-mix(in srgb, var(--pap
     const bg = IMG('club_bg'); $('#clubHead').style.backgroundImage = bg ? `url("${bg}")` : '';
     $('#clubHead').classList.toggle('fb', !bg);
     const wait = showWait();
-    $('#clubShowNote').textContent = wait > 0 ? `다음 발표회까지 ${wait}일` : '오늘 발표회를 열 수 있어요';
+    $('#clubShowNote').textContent = wait > 0 ? (wait === 1 ? '내일 다시 발표회를 열 수 있어요' : `다음 발표회까지 ${wait}일`) : '오늘 발표회를 열 수 있어요';
     box.innerHTML = CLUBS.map((C, c) => `<div class="club-card c${c}"><div class="club-top">${clubBadge(c, 40)}<span class="club-nm"><b>${C.name}</b><small>${ABIL[C.ab]} 별 ${clubStars(c)}개</small></span>` +
       `<span class="club-eff">${C.eff(clubShow(c))}</span></div><div class="club-seats">${clubSeatHTML(c)}</div>` +
       `<button class="cta small club-show" type="button" data-show="${c}" aria-disabled="${showReady() && clubMembers(c).length ? 'false' : 'true'}">${S.club.shown[c] ? '발표회 또 열기' : '발표회 열기'}</button></div>`).join('') +
@@ -8623,7 +8633,7 @@ body{background:radial-gradient(120% 60% at 50% 0%, color-mix(in srgb, var(--pap
   // 1초마다: 발표회 남은 날만 고쳐요(창 전체를 다시 그리지 않아요)
   function renderClubLite() {
     const n = $('#clubShowNote'); if (!n || !rosterOn()) return;
-    const w = showWait(), t = w > 0 ? `다음 발표회까지 ${w}일` : '오늘 발표회를 열 수 있어요';
+    const w = showWait(), t = w > 0 ? (w === 1 ? '내일 다시 발표회를 열 수 있어요' : `다음 발표회까지 ${w}일`) : '오늘 발표회를 열 수 있어요';
     if (n.textContent !== t) renderClub();
   }
   // 명부에서 학생을 누르면 동아리를 골라요
@@ -10512,6 +10522,7 @@ body{background:radial-gradient(120% 60% at 50% 0%, color-mix(in srgb, var(--pap
       { ok: S.tg >= T.grads, txt: `${T.name} ${T.years}${T.unit} 되기 (지금 ${yearNo()}${T.unit})` },
       { ok: S.grade >= GRAD_MIN, txt: `대도시 학교 되기 (지금 ${CFG.grades[S.grade].name})` }
     ];
+    if (promoteGateIdx() >= 0 && open) reqs.push({ ok: !promoteLocked(), txt: promoteLocked() ? `${T.years}${T.unit} 메인 퀘스트 마치기 (남은 퀘스트 ${promoteLeft()}개)` : `${T.years}${T.unit} 메인 퀘스트 마치기` });   // 2.0.0
     const html = reqs.map(r => `<li class="${r.ok ? 'ok' : ''}"><span class="mk2">${r.ok ? CHECK : ''}</span>${r.txt}</li>`).join('');
     if ($('#tierReqs').innerHTML !== html) $('#tierReqs').innerHTML = html;
     $('#tierFund').textContent = fmt(f);
@@ -10669,6 +10680,7 @@ body{background:radial-gradient(120% 60% at 50% 0%, color-mix(in srgb, var(--pap
     for (const k in S.p.perk) S.p.perk[k] = 0;
     newYear(true);
     rosterEnsure(newcomer && newcomer.k);   // 2.0.0 중학교부터 새 명부(방금 전학 온 친구도 함께)
+    { const gate = MAIN.findIndex(q => q.t === 'tier' && q.n === S.tier); if (S.tier >= 2 && gate >= 0 && S.q.m < gate) { S.q.m = gate; S.q.lat = ''; startMain(); } }   // 졸업식 퀘스트(바로 완료)에서 이어가요
     if (newcomer) rt.kidSeq = BASE_SPECIES.length + S.p.species - 1;
     $('#tierConfirm').hidden = true;
     queueModal(() => showEntrance(fund, leaving, from, newcomer, dipsIn));
@@ -11531,7 +11543,7 @@ body{background:radial-gradient(120% 60% at 50% 0%, color-mix(in srgb, var(--pap
     $('#clubAutoBtn').addEventListener('click', () => { if (clubAuto()) { sfx('quest'); toast('능력치에 맞게 동아리를 나눴어요'); questChanged(); } });
     $('#clubBody').addEventListener('click', e => {
       const seat = e.target.closest('[data-seat]'), show = e.target.closest('[data-show]'), row = e.target.closest('.rs-row[data-ri]');
-      if (show) { const c = +show.dataset.show; if (show.getAttribute('aria-disabled') === 'true') { shake(show); toast(!showReady() ? `발표회는 ${CLUB.showDays}일에 한 번 열 수 있어요. ${showWait()}일 남았어요` : '부원이 있어야 발표회를 열 수 있어요'); return; } clubShowGo(c); return; }
+      if (show) { const c = +show.dataset.show; if (show.getAttribute('aria-disabled') === 'true') { shake(show); toast(!showReady() ? (CLUB.showDays === 1 ? '발표회는 하루에 한 번 열 수 있어요. 내일 다시 열어요' : `발표회는 ${CLUB.showDays}일에 한 번 열 수 있어요. ${showWait()}일 남았어요`) : '부원이 있어야 발표회를 열 수 있어요'); return; } clubShowGo(c); return; }
       if (seat) { openSeatPick(+seat.dataset.seat); sfx('tap'); return; }
       if (row) { openClubPick(+row.dataset.ri); sfx('tap'); }
     });
@@ -13056,7 +13068,7 @@ body{background:radial-gradient(120% 60% at 50% 0%, color-mix(in srgb, var(--pap
   // 시험용 손잡이: 자동 시험(window.__FOREST_TEST)에서만 게임 속 함수를 꺼내 써요
   if (window.__FOREST_TEST) window.__forest = { get S() { return S; }, goTo,
     rosterEnsure, rosterMake, rosterAdd, clubAuto, clubSet, clubPct, clubShow, clubSum, clubStars, clubMembers, clubShowGo, showReady, showWait, showDay, clubWeekTick, clubFacUp, CLUBS, CLUB, star, clubTuitionMult, clubFestMult, clubDecoOff, renderClub, renderHall, openSeatPick, openClubPick,
-    snapTake, snapOf, tierViewOpen, tierViewClose, renderTierView, renderTierDots, viewMap, showNewTalk, talkNext, NEWCOMERS, TIERS, GEO, geoIdx, decoCost0, qMeasure, qDone, qGoal, kidSVG, newYear, checkGrade, gradeOf, townRep, FAC, sanitize200, mainReady, trialHunt, updateTrial, TRIAL, zoomAt, fitMap, ZOOM_MAX, DECO, DECO_SLOTS, DECO_SIGN, decoCost, decoSoldOut, pickDeco, buyDeco, decoPut, decoEditStart, decoEditEnd, openDecoPick, renderDeco, renderDecoShop, setSchoolNm, setMark, schoolTitle, markHTML, decoPlacedAll, achSync, esExLeft, esExCost, essItem, pickEss, buyEss, ESHOP, get Cloud() { return Cloud; }, get actx() { return actx; }, Music, musicWant, musicSync, ensureAudio, bgmLoad, pzUI, rt, makeDeal, furStage, DEAL, navInfo, navRoute, spawnDrop, repTipCheck, linkGoogle, retryCloud, sanitize, acctPending, renderMap, renderHUD, renderAffordance, syncKids, layoutMap, geo, startTrial, hitTrial, endTrial, startVisit, endVisit, showReward, recommend, needCost, prepTopUp, qReward, prepPhase, rankScore, pwOf, previewDip, dipMult, costScale, buyFacility, buyFur, buyFurAll, furCost, furReady, furDone, FUR, startTalk, endTalk, teacherAct, facCost, teaCost, facKeys, rate, rep, capacity, canGraduate, canPromote,
+    TIER_SCALE, legacyMult, tuitionMult, snapTake, snapOf, tierViewOpen, tierViewClose, renderTierView, renderTierDots, viewMap, showNewTalk, talkNext, NEWCOMERS, TIERS, GEO, geoIdx, decoCost0, qMeasure, qDone, qGoal, kidSVG, newYear, checkGrade, gradeOf, townRep, FAC, sanitize200, mainReady, trialHunt, updateTrial, TRIAL, zoomAt, fitMap, ZOOM_MAX, DECO, DECO_SLOTS, DECO_SIGN, decoCost, decoSoldOut, pickDeco, buyDeco, decoPut, decoEditStart, decoEditEnd, openDecoPick, renderDeco, renderDecoShop, setSchoolNm, setMark, schoolTitle, markHTML, decoPlacedAll, achSync, esExLeft, esExCost, essItem, pickEss, buyEss, ESHOP, get Cloud() { return Cloud; }, get actx() { return actx; }, Music, musicWant, musicSync, ensureAudio, bgmLoad, pzUI, rt, makeDeal, furStage, DEAL, navInfo, navRoute, spawnDrop, repTipCheck, linkGoogle, retryCloud, sanitize, acctPending, renderMap, renderHUD, renderAffordance, syncKids, layoutMap, geo, startTrial, hitTrial, endTrial, startVisit, endVisit, showReward, recommend, needCost, prepTopUp, qReward, prepPhase, rankScore, pwOf, previewDip, dipMult, costScale, buyFacility, buyFur, buyFurAll, furCost, furReady, furDone, FUR, startTalk, endTalk, teacherAct, facCost, teaCost, facKeys, rate, rep, capacity, canGraduate, canPromote,
     fmt, fmt2, graduate, promote, buyPerk, perkCost, perkMaxed, buyFundPerk, fpCost, claimMain, mainReady, curMain, qNo, earn, CFG, TEA, teaMaxed, PERKS, FPERKS, MAIN, finalYear, startTrip, claimTrip, TRIPS, yearLocked, startSports, endSports, rtSports: () => rt.sports, startFest, rtFest: () => rt.fest, facCap, addLeague, weekIdx, addMP, tutStart, endFest, claimSports, claimBox, musicWant, askBox, festWait, setTab, openSheet, closeSheet,
     dexMeet, dexSync, dexPending, dexGift, renderDex, evCurrent, evNext, evSync, claimStamp, claimEvMission, claimEvBox, renderEvent, evMissions, evOk, evSkipped, EV_MONTHS, EV_MEASURE, tierMinutes, minAcorns, IMG, sanitize171, ACH, achSync, claimAch, setTitle, renderAch, setDexSeg, achClaimable, XT, xtAct, xtCost, xtLv, feastMins, libMult, propInstances, walkBuild, festItemSvg, guestArt, adErrText, googleErrText, openSheet, closeSheet, startFest, startSports, sanitize170, EV_STAMPS, EV_SPECIAL, EV_MONTHLY, EV_BOX, DEX_KEYS, DEX_REWARD, DEX_GUEST_KEYS, seasonKey, roofArtKey, oakKey, setSeasonArt, VP, vpLv, vpCost, vpMult, vpAct, renderVpCard, sportsPrize, festPrize, renderTeachers, buildTeacherCards, bldImg, roofKey, bldStage, mapKey, setMapArt, applyThemes, buyFacility, startTrial, endTrial: () => rt.trial && (rt.trial.left = 0), spawnDeal, startVisit, IMG170, MG, mgCells, mgSetCells, mgTick, mgAddEnergy, mgAddUp, mgTapGen, mgDrop, mgSell, mgUpgrade, mgClaimOrder, mgSwapOrder, mgOrderOk, mgFillOrders, mgOpen, mgClose, mgRenderAll, mgSpawnLevel, mgNearestEmpty, mgEmptyBoard, mgOrderReward, mgUI, sanitize180, mgWatchAd, mgNewOrder, mgHintPick, mgShowHint, mgClearHint, mgTouch, mgOrderGuide, mgDexN, mgDexCan, mgDexClaim, mgOpenDex, MG_DEX, nice, claimMission, claimBonus, claimWeekMission, MP_BOX,   // 1.7.0 도감, 이벤트
     PZ, PZ_SHAPES, pzFits, pzAnyFit, pzStuck, pzFullLines, pzPlace, pzFreshGame, pzStart, PZB, pzbCost, pzApplyBoost, pzBoostOpen, pzBoostGo, festGoldLeft, festGoldTake, claimSports, renderStreet, pzFinish, pzLeft, pzCanAd, pzEssOf, pzMinOf, pzHelpSquirrel, pzHelpOwl, pzHelpBear, fillSubs, mapRoofTop, showAd, claimOfflineDouble, startBoost, tripAd, festFocus, festRange, visMap, renderMissions, pzHasHelp, pzRot, pzNewPiece, pzOpen, pzClose, pzGameOver, pzRenderAll, renderMini, addEss, ESHOP, SP_FUR, applyCos, essItem, pickEss, buyEss, renderEssShop, esAcornLeft, esGoldLeft, esAcornAmt, hatSVG, spFurImg, gameNow, gameToday, gameWeek, kstDay, setServerTime, SVR, dmDay, weekIdx, lgWeek, wkWeek, lgKey, pzDay, goldDay, boostLeft, dealLeft, canStamp };
