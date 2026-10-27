@@ -29,7 +29,7 @@ async def main():
             r = await pg.evaluate(f"(()=>{{ const p=document.querySelector('#panelEss'); return [!p.hidden, document.querySelector('#essHave2').textContent, document.querySelectorAll('#essList .si').length, document.querySelectorAll('#essList .sb').length, p.scrollWidth<=p.clientWidth+1]; }})()")
             if not r[0]: fails.append(f'[{tag}] 정수 상점 패널이 안 열려요')
             if r[1] != '1,000': fails.append(f'[{tag}] 정수 표시 {r[1]}')
-            if r[2] != 10 or r[3] != 2: fails.append(f'[{tag}] 상품 수 모자 가구 {r[2]} 묶음 {r[3]}')
+            if r[2] != 10 or r[3] != 3: fails.append(f'[{tag}] 상품 수 모자 가구 {r[2]} 묶음 {r[3]}')   # 1.7.4: 묶음 2개 + 도토리로 정수 바꾸기 1개
             if not r[4]: fails.append(f'[{tag}] 정수 상점이 가로로 넘쳐요')
             await pg.screenshot(path=f's51_shop_{tag}.png')
             # 2) 모자 사기: 묻는 창 → 사기 → 정수 120 줄고 입혀짐

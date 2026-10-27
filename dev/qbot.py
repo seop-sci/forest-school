@@ -26,6 +26,8 @@ JS = r"""(maxH) => {
     if (F.canPromote()) { F.promote(); continue; }
     if (q && !F.mainReady()) {
       if (q.t === 'picks') { W.pick += dt; if (W.pick >= 4) { W.pick = 0; S().st.picks += 1; } }
+      if (q.t === 'mgBest') { W.pick += dt; if (W.pick >= 2) { W.pick = 0; S().mg.best.a = Math.min(10, (S().mg.best.a || 0) + 1); } }   // 1.8.0
+      if (q.t === 'mgOrders') { W.pick += dt; if (W.pick >= 30) { W.pick = 0; S().mg.st.orders += 1; } }
       if (q.t === 'shakes') S().st.shakes += 1;
       if (q.t === 'fest') { S().fest.n[q.k] = (S().fest.n[q.k] || 0) + 1; }
       if (q.t === 'perks') { const k = Object.keys(F.PERKS).filter(x => !F.perkMaxed(x)).sort((a, b) => F.perkCost(a) - F.perkCost(b))[0]; if (k && F.perkCost(k) <= S().p.dip) F.buyPerk(k, document.body); }

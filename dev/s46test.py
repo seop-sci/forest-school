@@ -48,7 +48,9 @@ RULES = r"""() => {
   const r1 = F.pzPlace(g, 0, 0, 0), r2 = F.pzPlace(g, 1, 1, 0);
   eq([r1.gain, r2.gain, g.combo], [11, 1 + Math.round(10 * 1.5), 2], '콤보 배수');
   const r3 = F.pzPlace(g, 2, 5, 5);
-  eq([r3.n, g.combo], [0, 0], '콤보 끊김');
+  eq([r3.n, g.combo, g.miss], [0, 2, 1], '콤보 유지 (1.8.0: 못 지워도 4번까지)');
+  for (let j = 0; j < 3; j++) { g.tray[2] = { c: [[0, 0]], k: 5 }; F.pzPlace(g, 2, 6, j); }
+  eq([g.combo, g.miss], [0, 0], '콤보 끊김 (4번 연달아 못 지우면)');
   // 학생 부탁: 부탁 문양을 n개 지우면 정수를 주고 다음 학생이 와요
   g = F.pzFreshGame(true);
   const k = g.ask.k, who = g.ask.who; g.ask.n = 8;
@@ -146,7 +148,7 @@ async def run(b, dark, w, h):
     # 화면: 미니게임 탭 → 퍼즐 열기 → 끌어 놓기
     await pg.evaluate(f"{F}.S.pz = {{ day: '', n: 0, adN: 0, best: 0, cur: null }}; {F}.S.ess = 12; document.querySelector('.tab[data-tab=mini]').click()"); await pg.wait_for_timeout(400)
     txt = await pg.evaluate("[document.querySelector('#essHave').textContent, document.querySelector('#pzLeftTxt').textContent, document.querySelector('#pzAdBtn').hidden]")
-    if txt != ['12', '오늘 보상 판 10번 남음', True]: bad.append('미니게임 탭 글: ' + json.dumps(txt, ensure_ascii=False))
+    if txt != ['12', '보상 10/10', True]: bad.append('미니게임 탭 글: ' + json.dumps(txt, ensure_ascii=False))
     await pg.screenshot(path=f's46_mini_{tag}.png')
     await pg.evaluate("document.querySelector('#pzOpen').click(); const pb=document.querySelector('#pzBoost'); if (pb && !pb.hidden) document.querySelector('#pzbSkip').click()"); await pg.wait_for_timeout(500)
     st = await pg.evaluate(f"[!document.querySelector('#pzScene').hidden, document.querySelectorAll('#pzGrid .pz-cell').length, document.querySelectorAll('#pzTray .pz-slot .pz-piece').length, {F}.S.pz.n, {F}.S.pz.cur.rw]")
@@ -196,7 +198,13 @@ async def run(b, dark, w, h):
     if res != [score0, 1, 12]: bad.append('이어하기 저장: ' + json.dumps(res))
     await pg.evaluate("document.querySelector('.tab[data-tab=mini]').click()"); await pg.wait_for_timeout(300)
     sub = await pg.evaluate("[document.querySelector('#pzCardTag').textContent, document.querySelector('#pzCardSub').textContent]")
-    if sub[0] != '이어서': bad.append('이어서 카드: ' + json.dumps(sub, ensure_ascii=False))
+    if sub[0] != '이어하기': bad.append('이어하기 카드: ' + json.dumps(sub, ensure_ascii=False))
+    # 1.8.0 잠시 나가기: 나가기 → 잠시 나가기면 판이 끝나지 않고 그대로 남아요
+    await pg.evaluate("document.querySelector('#pzOpen').click(); const pb=document.querySelector('#pzBoost'); if (pb && !pb.hidden) document.querySelector('#pzbSkip').click()"); await pg.wait_for_timeout(400)
+    await pg.evaluate("document.querySelector('#pzQuit').click()"); await pg.wait_for_timeout(200)
+    await pg.evaluate("document.querySelector('#pzQuitPause').click()"); await pg.wait_for_timeout(400)
+    pa = await pg.evaluate(f"[document.querySelector('#pzScene').hidden, !!{F}.S.pz.cur, {F}.S.pz.cur && {F}.S.pz.cur.score, document.querySelector('#pzCardTag').textContent]")
+    if pa != [True, True, score0, '이어하기']: bad.append('잠시 나가기: ' + json.dumps(pa, ensure_ascii=False))
     # 그만하기 → 보상 창
     await pg.evaluate("document.querySelector('#pzOpen').click(); const pb=document.querySelector('#pzBoost'); if (pb && !pb.hidden) document.querySelector('#pzbSkip').click()"); await pg.wait_for_timeout(400)
     await pg.evaluate(f"{F}.S.pz.cur.score = 900; {F}.pzRenderAll(); document.querySelector('#pzQuit').click()"); await pg.wait_for_timeout(200)

@@ -31,7 +31,8 @@ async def run(b, dark, w, h, fails):
     for tb in ('quests', 'teachers', 'grad', 'shop', 'rank', 'settings'):
         mus.append(await pg.evaluate(f"(()=>{{ {F}.setTab('{tb}'); return {F}.musicWant(); }})()"))
     await pg.evaluate(f"{F}.setTab('school')")
-    if mus[0] != 'home' or any(m != 'room' for m in mus[1:]): fails.append(f'[{tag}] 배경음악이 이상해요 {mus}')
+    # 1.7.4: 홈에서 여는 탭(퀘스트 1, 선생님 2, 랭킹 5)도 홈 곡, 졸업 3, 상점 4, 설정 6은 쉬는 시간 곡
+    if [mus[i] for i in (0, 1, 2, 5)] != ['home'] * 4 or [mus[i] for i in (3, 4, 6)] != ['room'] * 3: fails.append(f'[{tag}] 배경음악이 이상해요 {mus}')
     # 시설 레벨 표시
     sub = await pg.evaluate(f"(()=>{{ const S={F}.S; S.f.classroom = {F}.facCap(); S.fu.classroom = S.fu.classroom.map(()=>S.f.classroom); {F}.openSheet('classroom'); return [document.querySelector('#sheetSub').textContent, document.querySelector('#sheetNeed').textContent, document.querySelector('#sheetBuyLabel').textContent]; }})()")
     await pg.wait_for_timeout(400); await pg.screenshot(path=f's40_sheet_{tag}.png')
