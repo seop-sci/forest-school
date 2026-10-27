@@ -29,6 +29,7 @@ RULES = r"""() => {
   let r = F.pzPlace(g, 0, 0, 3);
   eq([r.n, r.cleared.length, g.b.filter(Boolean).length, g.lines, g.combo], [2, 15, 0, 2, 1], '십자 지우기');
   eq(r.gain, 1 + Math.round(10 * 2 + 5 * 2 * 1), '십자 점수 (1 + 30)');
+  eq(g.tray.filter(Boolean).length, 3, '1.8.0: 쓴 자리에 바로 새 조각');
   // 문양 줄: 같은 문양 8칸 → 그 줄 3배 (10 → 30)
   g = F.pzFreshGame(true);
   for (let j = 1; j < 8; j++) g.b[j] = 3;
@@ -164,7 +165,7 @@ async def run(b, dark, w, h):
     await pg.screenshot(path=f's46_drag_{tag}.png')
     await pg.mouse.up(); await pg.wait_for_timeout(300)
     placed = await pg.evaluate(f"[{F}.S.pz.cur.b.filter(Boolean).length, {F}.S.pz.cur.score, {F}.S.pz.cur.tray.filter(Boolean).length, document.querySelectorAll('#pzGrid .pz-cell[data-v]:not([data-v=\"0:\"])').length]")
-    if placed != [len(p['c']), len(p['c']), 2, len(p['c'])]: bad.append('놓은 뒤 상태: ' + json.dumps(placed))
+    if placed != [len(p['c']), len(p['c']), 3, len(p['c'])]: bad.append('놓은 뒤 상태: ' + json.dumps(placed))
     if not await pg.evaluate(f"!!{F}.S.pz.cur"): bad.append('끌어 놓은 뒤 판이 사라졌어요: ' + json.dumps(placed))
     # 판을 조금 채운 모습 (봇이 되는 대로 놓아요) → 화면
     await pg.evaluate(f"""(() => {{ const F = {F}, c = F.S.pz.cur; let moves = 0;
@@ -235,7 +236,7 @@ async def run(b, dark, w, h):
     if brk != [0, 0, 2, 1e9, None] or e2: bad.append('깨진 저장 읽기: ' + json.dumps(brk) + ' ' + ' | '.join(e2))
     keep, e2 = await boot_with("d => { d.pz.cur = { b: new Array(64).fill(0).map((_, i) => i < 8 ? 2 : 0), tb: new Array(64).fill('').map((_, i) => i === 2 ? 'owl' : i === 40 ? 'bear' : ''), helps: { owl: 5, bear: 'x' }, tray: [{ c: [[0, 0], [0, 1]], k: 3, t: 'bear', ti: 1 }, null, { c: [[9, 9]], k: 1 }], score: 77, combo: 1, lines: 1, askI: 1, ask: { k: 2, n: 12, got: 3, who: 'fox' }, ess: 2, rw: true }; }")
     cur = keep[4]
-    okc = cur and cur['score'] == 77 and cur['helps'] == {'squirrel': 0, 'owl': 1, 'bear': 0} and cur['tb'][2] == 'owl' and cur['tb'][40] == '' and cur['tray'][0] and cur['tray'][0].get('t') == 'bear' and cur['tray'][0].get('ti') == 1 and cur['tray'][1] is None and cur['tray'][2] is None and cur['ask']['who'] == 'fox' and cur['ask']['n'] == 12 and cur['b'][0] == 2
+    okc = cur and cur['score'] == 77 and cur['helps'] == {'squirrel': 0, 'owl': 1, 'bear': 0} and cur['tb'][2] == 'owl' and cur['tb'][40] == '' and cur['tray'][0] and cur['tray'][0].get('t') == 'bear' and cur['tray'][0].get('ti') == 1 and cur['tray'][1] and cur['tray'][2] and cur['ask']['who'] == 'fox' and cur['ask']['n'] == 12 and cur['b'][0] == 2
     if not okc or e2: bad.append('하던 판 읽기: ' + json.dumps(keep, ensure_ascii=False)[:300] + ' ' + ' | '.join(e2))
     if errs: bad.append('페이지 오류: ' + ' | '.join(errs))
     await ctx.close()

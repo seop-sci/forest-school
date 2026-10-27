@@ -32,7 +32,7 @@ async def main():
             await pg.goto(URL); await pg.wait_for_timeout(3800)
             await pg.evaluate(f"(()=>{{ const t=document.querySelector('#tut'); if(t) t.hidden=true; {F}.S.tut.st='skip'; {F}.rt.tut=null; {CLEAN}; }})()")
             for tier in (1, 0):
-                await pg.evaluate(f"""(()=>{{ const F={F}, S=F.S; S.tier={tier}; S.budget=1e9;
+                await pg.evaluate(f"""(()=>{{ const F={F}, S=F.S; S.tier={tier}; S.budget=1e9; S.tips.rep = true;   // 1.8.0: 평판 도움말 창이 끌기를 막지 않게
                   for (const k of ['classroom','cafeteria','library','playground','science']) S.f[k]=Math.max(5,S.f[k]||0);
                   if ({tier}===0) S.f.science=0;
                   S.q.m = Math.min(F.MAIN.length - 2, {tier} ? 40 : 12); S.q.mb = 0; S.q.subs = []; F.fillSubs();
