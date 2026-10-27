@@ -383,6 +383,7 @@ button{font:inherit;color:inherit}
 .tnote{margin:-4px 0 10px;font-size:12.5px;color:var(--danger)}
 .panel-sub{margin:18px 0 8px 4px;font-family:var(--font-display);font-weight:400;font-size:15px;color:var(--muted)}
 .slist{display:grid;border-radius:16px;overflow:hidden;background:var(--card)}
+.mini-card.live-off{opacity:.55;filter:grayscale(.6)}
 .nt-dot{display:inline-block;width:8px;height:8px;margin-left:6px;border-radius:50%;background:#E04848;vertical-align:3px}
 .modal.nt-modal{text-align:left}
 .modal.nt-modal h2{text-align:center}
@@ -7181,12 +7182,12 @@ body{background:radial-gradient(120% 60% at 50% 0%, color-mix(in srgb, var(--pap
     return Date.now() - ntTime(N) < NT_RECENT && Date.now() >= S.nt.hide;
   }
   function noticeAuto() {
-    if (!S || !NOTICES.length) return;
+    if (!S || !NOTICES.length || rt.ntAuto) return;   // 한 번 켤 때 한 번만(핫픽스 공지를 받은 뒤 다시 불러도)
     if (window.__FOREST_TEST && !window.__NOTICE_AUTO) return;   // 자동 시험에서는 저절로 띄우지 않아요
     // 처음 시작한 학교는 튜토리얼이 먼저예요. 이번 공지는 본 것으로 쳐요
     if (S.tut.st !== 'done' && S.tut.st !== 'skip' && S.q.m < 3) { S.nt.ver = VERSION; S.nt.seen = NOTICES[0].id; save(); renderNoticeDot(); return; }
     if (!noticeWant()) return;
-    S.nt.ver = VERSION;
+    S.nt.ver = VERSION; rt.ntAuto = true;
     queueModal(() => openNotice(true));
   }
   const CLOUD_PUSH = 20000;   // 바뀐 게 있으면 20초마다 올려요
@@ -9864,7 +9865,7 @@ body{background:radial-gradient(120% 60% at 50% 0%, color-mix(in srgb, var(--pap
     save(); pzRenderTray(); pzRenderHelp();
   }
   function pzWire() {
-    $('#pzOpen').addEventListener('click', () => { sfx('tap'); pzOpen(); });
+    $('#pzOpen').addEventListener('click', () => { sfx('tap'); if (liveOff('puzzle')) { toast('숲속 퍼즐은 잠시 점검 중이에요. 조금만 기다려 주세요'); return; } pzOpen(); });
     bind180();   // 1.8.0 숲속 합치기
     $('#pzAdBtn').addEventListener('click', () => {
       if (!pzCanAd()) return;
@@ -12378,7 +12379,7 @@ body{background:radial-gradient(120% 60% at 50% 0%, color-mix(in srgb, var(--pap
   const EV_MONTHLY = EV_WEEKLY;   // 1.7.0 이름(시험과 옛 코드가 써요)
   const EV_ANCHOR = '2026-11-02';
   // 이벤트가 매주 열려서 한 번 보상은 1.x의 약 3분의 2예요(2026-10-27 지섭 결정, 한 달 합은 약 1.3~1.5배). 미션 도토리는 표의 m에 곱해요
-  const EV_SCALE = 2 / 3;
+  const EVC = { scale: 2 / 3 };   // 핫픽스(live.json의 ev.scale)로 바꿀 수 있어요
   // 특별 이벤트 표: start와 end('YYYY-MM-DD', 끝나는 날 포함)를 적으면 열려요. 비어 있으면 아직 열지 않아요. 반복 이벤트와 겹치면 특별 이벤트가 먼저예요.
   // ms는 미션 3개 [종류, 목표], m은 미션 하나의 수업료 분치, g는 황금 도토리. 내용과 날짜는 나중에 채워요
   const EV_SPECIAL = [
@@ -12438,6 +12439,7 @@ body{background:radial-gradient(120% 60% at 50% 0%, color-mix(in srgb, var(--pap
   const evWeekDef = mon => EV_WEEKLY[(((Math.round(dayDiff(EV_ANCHOR, mon) / 7)) % EV_WEEKLY.length) + EV_WEEKLY.length) % EV_WEEKLY.length];
   function evCurrent(day) {
     day = day || gameToday();
+    if (liveOff('event')) return null;   // 핫픽스로 잠시 끔
     for (const e of EV_SPECIAL) if (e.start && e.end && day >= e.start && day <= e.end) return { def: e, key: `${e.id}:${e.start}`, start: e.start, end: e.end };
     const start = weekMon(day), end = dayAdd(start, 6);
     if (evSpecialHits(start, end)) return null;   // 특별 이벤트가 있는 주는 매주 이벤트가 쉬어요
@@ -12468,7 +12470,7 @@ body{background:radial-gradient(120% 60% at 50% 0%, color-mix(in srgb, var(--pap
       let t = t0, n = n0;
       if (!evOk(t) || used.has(t)) { const alt = EV_FALLBACK.find(f => evOk(f[0]) && !used.has(f[0])) || ['claims', 3]; t = alt[0]; n = alt[1]; }
       used.add(t);
-      out.push({ t, n, b: Math.floor(S.st[t] || 0), m: Math.max(1, Math.round(row.m * EV_SCALE)), g: row.g, done: false });   // 2.0.0 매주라서 3분의 2
+      out.push({ t, n, b: Math.floor(S.st[t] || 0), m: Math.max(1, Math.round(row.m * EVC.scale)), g: row.g, done: false });   // 2.0.0 매주라서 3분의 2
     }
     return out;
   }
@@ -13408,7 +13410,7 @@ body{background:radial-gradient(120% 60% at 50% 0%, color-mix(in srgb, var(--pap
   }
   function bind180() {
     $('#mgScene').addEventListener('pointerdown', mgTouch, true);
-    $('#mgOpen').addEventListener('click', () => { sfx('tap'); mgOpen(); });
+    $('#mgOpen').addEventListener('click', () => { sfx('tap'); if (liveOff('merge')) { toast('숲속 합치기는 잠시 점검 중이에요. 조금만 기다려 주세요'); return; } mgOpen(); });
     $('#mgBack').addEventListener('click', () => { sfx('tap'); mgClose(); });
     $('#mgHelpOk').addEventListener('click', () => { S.mg.seen = true; $('#mgHelp').hidden = true; save(); });
     $('#mgAdBtn').addEventListener('click', () => { sfx('tap'); mgWatchAd(); });
@@ -13436,6 +13438,55 @@ body{background:radial-gradient(120% 60% at 50% 0%, color-mix(in srgb, var(--pap
     $('#mgUpYes').addEventListener('click', () => { if (mgUpgrade(mgUI.upAt)) $('#mgUpSheet').hidden = true; });
   }
   /* ===== 1.8.0 숲속 합치기 END ===== */
+
+  /* ---------- 2.0.0 핫픽스(원격 설정, 2026-10-27 지섭) ----------
+     웹 주소의 live.json을 켤 때 읽어요(웹, 안드로이드, 토스 모두). 코드는 받지 않고 숫자, 공지, 기능 끄기만 받아요.
+     바꿀 수 있는 숫자는 LIVE_KEYS에 적은 것만이고, 값마다 최소와 최대 안으로 맞춰요. 받은 것은 이 기기에 남겨 두고 인터넷이 없을 때 써요.
+     쓰는 법은 docs/HOTFIX.md */
+  const LIVE_URL = () => window.FS_LIVE_URL || (/github\.io$/.test(location.hostname) ? 'live.json' : 'https://seop-sci.github.io/forest-school/live.json');
+  const LIVE_KEYS = {   // 이름: [바꿀 곳, 칸, 최소, 최대]
+    pace: [() => CFG, 'pace', 0.1, 0.4],   // 게임 속도(수업료 배율)
+    'pz.perDay': [() => PZ, 'perDay', 3, 30], 'pz.adMore': [() => PZ, 'adMore', 0, 10], 'pz.adMax': [() => PZ, 'adMax', 0, 5],   // 숲속 퍼즐 하루 보상 판, 광고로 더 받는 판과 횟수
+    'mg.adN': [() => MG.AD, 'n', 0, 5], 'mg.adE': [() => MG.AD, 'e', 10, 200], 'mg.regen': [() => MG, 'REGEN', 20000, 300000],   // 숲속 합치기 광고 횟수와 에너지, 에너지 1 차는 시간(ms)
+    'ev.scale': [() => EVC, 'scale', 0.3, 1.5]   // 이벤트 미션 도토리 배율(다음 회차부터)
+  };
+  const LIVE_OFF_OK = ['puzzle', 'merge', 'event'];   // 잠시 끌 수 있는 기능
+  const Live = { v: 0, off: new Set(), base: null, ok: false };
+  function liveApply(j, from) {
+    if (!j || typeof j !== 'object') return false;
+    if (!Live.base) { Live.base = {}; for (const [k, [o, f]] of Object.entries(LIVE_KEYS)) Live.base[k] = o()[f]; }
+    for (const [k, [o, f, lo, hi]] of Object.entries(LIVE_KEYS)) {   // 빠진 값은 원래 값으로 되돌려요
+      const v = j.cfg && typeof j.cfg[k] === 'number' && isFinite(j.cfg[k]) ? Math.min(hi, Math.max(lo, j.cfg[k])) : Live.base[k];
+      o()[f] = Number.isInteger(Live.base[k]) ? Math.round(v) : v;
+    }
+    Live.off = new Set(Array.isArray(j.off) ? j.off.filter(x => LIVE_OFF_OK.includes(x)) : []);
+    // 원격 공지: 게임 안 공지(NOTICES) 위에 얹어요. 날짜가 새로운 것이 위로
+    const own = NOTICES.filter(n => !n.live);
+    const add = Array.isArray(j.notices) ? j.notices.slice(0, 10).filter(n => n && typeof n.id === 'string' && typeof n.title === 'string' && /^\d{4}-\d{2}-\d{2}$/.test(n.date || '') && Array.isArray(n.lines))
+      .map(n => ({ id: 'live-' + n.id.slice(0, 30), date: n.date, tag: typeof n.tag === 'string' ? n.tag.slice(0, 8) : '알림', title: n.title.slice(0, 40), lines: n.lines.filter(l => typeof l === 'string').slice(0, 20).map(l => l.slice(0, 200)), live: true })) : [];
+    NOTICES.length = 0; NOTICES.push(...[...add, ...own].sort((a, b) => (a.date < b.date ? 1 : a.date > b.date ? -1 : 0)));
+    Live.v = typeof j.v === 'number' ? j.v : 0; Live.ok = true; Live.from = from;
+    if (S) { renderNoticeDot(); renderLiveOff(); }
+    return true;
+  }
+  const liveOff = k => Live.off.has(k);
+  function renderLiveOff() {
+    for (const [k, id] of [['puzzle', '#pzOpen'], ['merge', '#mgOpen']]) { const b = $(id); if (b) b.classList.toggle('live-off', liveOff(k)); }
+  }
+  async function liveLoad() {
+    try { const c = JSON.parse(localStorage.getItem('forest-live') || 'null'); if (c) liveApply(c, 'cache'); } catch (e) { /* 남긴 것이 없으면 그만 */ }
+    if (location.protocol === 'file:' && !window.FS_LIVE_URL) return;   // 자동 시험(file://)은 받지 않아요
+    if (window.__FOREST_TEST && !window.FS_LIVE_URL) return;
+    try {
+      const ctl = typeof AbortController === 'function' ? new AbortController() : null;
+      const t = setTimeout(() => ctl && ctl.abort(), 6000);
+      const r = await fetch(LIVE_URL() + '?t=' + Math.floor(Date.now() / 60000), { cache: 'no-store', signal: ctl ? ctl.signal : undefined });
+      clearTimeout(t);
+      if (!r.ok) return;
+      const j = await r.json();
+      if (liveApply(j, 'net')) { try { localStorage.setItem('forest-live', JSON.stringify(j).slice(0, 20000)); } catch (e) { /* 저장 못 해도 이번에는 써요 */ } if (S && !rt.ntAuto) noticeAuto(); }
+    } catch (e) { /* 인터넷이 없거나 막혀 있으면 게임 안 값 그대로 */ }
+  }
 
   /* ---------- 시작 ---------- */
   function start(data) {
@@ -13486,7 +13537,8 @@ body{background:radial-gradient(120% 60% at 50% 0%, color-mix(in srgb, var(--pap
     requestAnimationFrame(loop);
     bootDone();
     setTimeout(tutAuto, bootLeft() + 900);
-    setTimeout(noticeAuto, bootLeft() + 1100);   // 2.0.0 공지
+    setTimeout(noticeAuto, bootLeft() + 1100);
+    liveLoad();   // 2.0.0 핫픽스(live.json)   // 2.0.0 공지
   }
   // 로딩 화면: 일찍 끝나도 적어도 3초는 보여 줘요. 막대는 로딩하는 것처럼 멈칫거리며 차오르고, 끝까지 채운 뒤 사르르 사라져요
   const BOOT_MIN = window.__FOREST_TEST && !window.__FOREST_BOOT ? 1200 : 3000;   // 자동 시험은 예전처럼 1.2초만 기다려요
@@ -13518,7 +13570,7 @@ body{background:radial-gradient(120% 60% at 50% 0%, color-mix(in srgb, var(--pap
     rosterEnsure, rosterMake, rosterAdd, clubAuto, clubSet, clubPct, clubShow, clubSum, clubStars, clubMembers, clubShowGo, showReady, showWait, showDay, clubWeekTick, clubFacUp, CLUBS, CLUB, star, clubTuitionMult, clubFestMult, clubDecoOff, renderClub, renderHall, openSeatPick, openClubPick,
     TIER_SCALE, legacyMult, tuitionMult, snapTake, snapOf, tierViewOpen, tierViewClose, renderTierView, renderTierDots, viewMap, showNewTalk, talkNext, NEWCOMERS, TIERS, GEO, geoIdx, decoCost0, qMeasure, qDone, qGoal, kidArt: kidSVG, newYear, checkGrade, gradeOf, townRep, FAC, sanitize200, mainReady, trialHunt, updateTrial, TRIAL, zoomAt, fitMap, ZOOM_MAX, DECO, DECO_SLOTS, DECO_SIGN, decoCost, decoSoldOut, pickDeco, buyDeco, decoPut, decoEditStart, decoEditEnd, openDecoPick, renderDeco, renderDecoShop, setSchoolNm, setMark, schoolTitle, markHTML, decoPlacedAll, achSync, esExLeft, esExCost, essItem, pickEss, buyEss, ESHOP, get Cloud() { return Cloud; }, get actx() { return actx; }, Music, musicWant, musicSync, ensureAudio, bgmLoad, pzUI, rt, makeDeal, furStage, DEAL, navInfo, navRoute, spawnDrop, repTipCheck, linkGoogle, retryCloud, sanitize, acctPending, renderMap, renderHUD, renderAffordance, syncKids, layoutMap, geo, startTrial, hitTrial, endTrial, startVisit, endVisit, showReward, recommend, needCost, prepTopUp, qReward, prepPhase, rankScore, pwOf, previewDip, dipMult, costScale, buyFacility, buyFur, buyFurAll, furCost, furReady, furDone, FUR, startTalk, endTalk, teacherAct, facCost, teaCost, facKeys, rate, rep, capacity, canGraduate, canPromote,
     fmt, fmt2, graduate, promote, buyPerk, perkCost, perkMaxed, buyFundPerk, fpCost, claimMain, mainReady, curMain, qNo, earn, CFG, TEA, teaMaxed, PERKS, FPERKS, MAIN, finalYear, startTrip, claimTrip, TRIPS, yearLocked, startSports, endSports, rtSports: () => rt.sports, startFest, rtFest: () => rt.fest, facCap, addLeague, weekIdx, addMP, tutStart, endFest, claimSports, claimBox, musicWant, askBox, festWait, setTab, openSheet, closeSheet,
-    dexMeet, dexSync, dexPending, dexGift, renderDex, evCurrent, evNext, evSync, EV_WEEKLY, EV_WEEK_BASE, weekMon, evSkipped, claimStamp, claimEvMission, claimEvBox, renderEvent, evMissions, evOk, evSkipped, EV_MONTHS, EV_MEASURE, tierMinutes, minAcorns, IMG, sanitize171, ACH, achSync, claimAch, setTitle, renderAch, setDexSeg, achClaimable, XT, xtAct, xtCost, xtLv, feastMins, libMult, propInstances, walkBuild, festItemSvg, guestArt, adErrText, googleErrText, openSheet, closeSheet, startFest, startSports, sanitize170, EV_STAMPS, EV_SPECIAL, EV_MONTHLY, EV_BOX, DEX_KEYS, DEX_REWARD, DEX_GUEST_KEYS, seasonKey, roofArtKey, oakKey, setSeasonArt, VP, vpLv, vpCost, vpMult, vpAct, renderVpCard, sportsPrize, festPrize, renderTeachers, buildTeacherCards, bldImg, roofKey, bldStage, mapKey, setMapArt, applyThemes, buyFacility, bldFx, setBldFx, mapHi, NOTICES, openNotice, noticeAuto, noticeWant, ntUnread, startTrial, endTrial: () => rt.trial && (rt.trial.left = 0), spawnDeal, startVisit, IMG170, MG, mgCells, mgSetCells, mgTick, mgAddEnergy, mgAddUp, mgTapGen, mgDrop, mgSell, mgUpgrade, mgClaimOrder, mgSwapOrder, mgOrderOk, mgFillOrders, mgOpen, mgClose, mgRenderAll, mgSpawnLevel, mgNearestEmpty, mgEmptyBoard, mgOrderReward, mgUI, sanitize180, mgWatchAd, mgNewOrder, mgHintPick, mgShowHint, mgClearHint, mgTouch, mgOrderGuide, mgDexN, mgDexCan, mgDexClaim, mgOpenDex, MG_DEX, MG_DEX_MS, mgDexEss, mgDexEssCan, mgDexEssN, mgDexMsCan, mgDexMsClaim, MGB, mgBuyBoost, mgBstLeft, mgOpenBoost, nice, claimMission, claimBonus, claimWeekMission, MP_BOX,   // 1.7.0 도감, 이벤트
+    dexMeet, dexSync, dexPending, dexGift, renderDex, evCurrent, evNext, evSync, EV_WEEKLY, EV_WEEK_BASE, weekMon, evSkipped, claimStamp, claimEvMission, claimEvBox, renderEvent, evMissions, evOk, evSkipped, EV_MONTHS, EV_MEASURE, tierMinutes, minAcorns, IMG, sanitize171, ACH, achSync, claimAch, setTitle, renderAch, setDexSeg, achClaimable, XT, xtAct, xtCost, xtLv, feastMins, libMult, propInstances, walkBuild, festItemSvg, guestArt, adErrText, googleErrText, openSheet, closeSheet, startFest, startSports, sanitize170, EV_STAMPS, EV_SPECIAL, EV_MONTHLY, EV_BOX, DEX_KEYS, DEX_REWARD, DEX_GUEST_KEYS, seasonKey, roofArtKey, oakKey, setSeasonArt, VP, vpLv, vpCost, vpMult, vpAct, renderVpCard, sportsPrize, festPrize, renderTeachers, buildTeacherCards, bldImg, roofKey, bldStage, mapKey, setMapArt, applyThemes, buyFacility, bldFx, setBldFx, mapHi, Live, liveApply, liveLoad, liveOff, LIVE_KEYS, EVC, NOTICES, openNotice, noticeAuto, noticeWant, ntUnread, startTrial, endTrial: () => rt.trial && (rt.trial.left = 0), spawnDeal, startVisit, IMG170, MG, mgCells, mgSetCells, mgTick, mgAddEnergy, mgAddUp, mgTapGen, mgDrop, mgSell, mgUpgrade, mgClaimOrder, mgSwapOrder, mgOrderOk, mgFillOrders, mgOpen, mgClose, mgRenderAll, mgSpawnLevel, mgNearestEmpty, mgEmptyBoard, mgOrderReward, mgUI, sanitize180, mgWatchAd, mgNewOrder, mgHintPick, mgShowHint, mgClearHint, mgTouch, mgOrderGuide, mgDexN, mgDexCan, mgDexClaim, mgOpenDex, MG_DEX, MG_DEX_MS, mgDexEss, mgDexEssCan, mgDexEssN, mgDexMsCan, mgDexMsClaim, MGB, mgBuyBoost, mgBstLeft, mgOpenBoost, nice, claimMission, claimBonus, claimWeekMission, MP_BOX,   // 1.7.0 도감, 이벤트
     PZ, PZ_SHAPES, pzFits, pzAnyFit, pzStuck, pzFullLines, pzPlace, pzFreshGame, pzStart, PZB, pzbCost, pzApplyBoost, pzBoostOpen, pzBoostGo, festGoldLeft, festGoldTake, claimSports, renderStreet, pzFinish, pzLeft, pzCanAd, pzEssOf, pzMinOf, pzHelpSquirrel, pzHelpOwl, pzHelpBear, fillSubs, mapRoofTop, showAd, claimOfflineDouble, startBoost, tripAd, festFocus, festRange, visMap, renderMissions, pzHasHelp, pzRot, pzNewPiece, pzOpen, pzClose, pzGameOver, pzRenderAll, renderMini, addEss, ESHOP, SP_FUR, applyCos, essItem, pickEss, buyEss, renderEssShop, esAcornLeft, esGoldLeft, esAcornAmt, hatSVG, spFurImg, gameNow, gameToday, gameWeek, kstDay, setServerTime, SVR, dmDay, weekIdx, lgWeek, wkWeek, lgKey, pzDay, goldDay, boostLeft, dealLeft, canStamp };
   if (window.claude && window.claude.hot && window.claude.hot.snapshot) {
     try { window.claude.hot.snapshot(() => { if (S) syncMid(); return { save: S }; }); } catch (e) { /* 무시 */ }

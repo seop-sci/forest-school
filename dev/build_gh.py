@@ -132,4 +132,5 @@ if OUT.resolve() != HERE.parent.resolve():
         shutil.copyfile(f, OUT / 'audio' / f.name)
     # 2.0.0 고화질 지도(img/maps)도 함께
     shutil.copytree(HERE.parent / 'img', OUT / 'img', dirs_exist_ok=True)
+    shutil.copyfile(HERE.parent / 'live.json', OUT / 'live.json')   # 2.0.0 핫픽스 원격 설정
 print('built', OUT, len(DOC))

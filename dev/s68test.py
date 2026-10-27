@@ -34,7 +34,7 @@ async def main():
         # (2)(3)
         r = await pg.evaluate(f"""(async()=>{{ const F={F}, S=F.S, out={{}}; window.__NOTICE_AUTO = true; S.tut.st = 'done'; S.q.m = 10;
           S.nt = {{ seen: F.NOTICES[0].id, ver: '1.7.4', hide: 0 }};
-          out.want1 = F.noticeWant(); F.noticeAuto(); await new Promise(r=>setTimeout(r,400));
+          out.want1 = F.noticeWant(); F.rt.ntAuto = false; F.noticeAuto(); await new Promise(r=>setTimeout(r,400));
           out.open = !document.querySelector('#mNotice').hidden; out.hideBtn = !document.querySelector('#ntHide').hidden;
           document.querySelector('#ntHide').click(); await new Promise(r=>setTimeout(r,300));
           out.days = Math.round((S.nt.hide - Date.now()) / 86400000); out.ver = S.nt.ver;
@@ -43,7 +43,7 @@ async def main():
           S.nt.seen = 'old'; out.want4 = F.noticeWant(); S.nt.seen = F.NOTICES[0].id;   // 새 공지
           S.nt.hide = 0; const d0 = F.NOTICES[0].date; F.NOTICES[0].date = '2026-01-01'; out.want5 = F.noticeWant(); F.NOTICES[0].date = d0;   // 오래된 공지
           // (4) 처음 시작한 학교
-          S.nt = {{ seen: '', ver: '', hide: 0 }}; S.tut.st = ''; S.q.m = 0; F.noticeAuto(); await new Promise(r=>setTimeout(r,300));
+          S.nt = {{ seen: '', ver: '', hide: 0 }}; S.tut.st = ''; S.q.m = 0; F.rt.ntAuto = false; F.noticeAuto(); await new Promise(r=>setTimeout(r,300));
           out.newbie = [document.querySelector('#mNotice').hidden, S.nt.seen === F.NOTICES[0].id, S.nt.ver];
           window.__NOTICE_AUTO = false; S.tut.st = 'skip'; return out; }})()""")
         ver = await pg.evaluate("document.querySelector('#verRow dd').textContent.slice(1)")
