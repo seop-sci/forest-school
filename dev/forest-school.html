@@ -1865,6 +1865,7 @@ body{background:radial-gradient(120% 60% at 50% 0%, color-mix(in srgb, var(--pap
 .club-seat.empty{border-style:dashed;color:var(--chip-ink);min-height:74px;justify-content:center}
 .club-seat.empty b{font-size:20px}
 .stars{color:#D99A16;font-size:11px;letter-spacing:-1px;white-space:nowrap}
+.st-on{color:#D99A16}.st-off{color:currentColor;opacity:.22}
 .rs-av{display:inline-grid;place-items:center;width:34px;height:42px;flex:none}
 .rs-av svg{width:30px;height:40px}
 .club-show{width:100%}
@@ -1894,7 +1895,10 @@ body{background:radial-gradient(120% 60% at 50% 0%, color-mix(in srgb, var(--pap
 .tier-view::before{content:"";position:absolute;inset:0;backdrop-filter:blur(8px);-webkit-backdrop-filter:blur(8px);background:rgba(20,40,20,.25)}
 .tier-view svg{position:absolute;inset:0;width:100%;height:100%}
 .tier-view .tv-lv rect{fill:#FFF9E9;stroke:#6E9A5E;stroke-width:1}.tier-view .tv-lv text{font-size:9px;fill:#183C2E}
-.tv-bar{position:absolute;left:10px;right:10px;top:calc(var(--left-h, 150px) + 8px);z-index:2;display:flex;align-items:center;gap:6px;padding:8px 8px 8px 12px;border-radius:16px;background:var(--paper);color:var(--ink);box-shadow:0 2px 6px rgba(20,40,20,.25)}
+.tv-bar .cta,.tv-bar .btn-sub,.talk-foot .cta,.club-tools .btn-sub{flex:none;width:auto;min-height:38px;padding:0 14px;font-size:15px;white-space:nowrap}
+.tv-bar .btn-sub{background:var(--card)}
+.talk-foot small{white-space:nowrap;margin-right:8px}
+.tv-bar{position:absolute;left:10px;right:10px;top:calc(10px + env(safe-area-inset-top, 0px));z-index:2;display:flex;align-items:center;gap:6px;padding:8px 8px 8px 12px;border-radius:16px;background:var(--paper);color:var(--ink);box-shadow:0 2px 6px rgba(20,40,20,.25)}
 .tv-tx{flex:1;min-width:0;display:flex;flex-direction:column}.tv-tx b{font-size:14px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}.tv-tx small{font-size:11.5px;color:var(--chip-ink)}
 .overlay.talk{z-index:31}
 .talk-box{position:relative;display:flex;gap:10px;width:100%;max-width:440px;margin:0 10px calc(14px + env(safe-area-inset-bottom,0px));padding:14px;border-radius:20px;background:var(--paper);color:var(--ink);box-shadow:0 4px 16px rgba(0,0,0,.25);opacity:0;transform:translateY(20px);transition:transform .2s,opacity .2s;cursor:pointer}
@@ -2443,7 +2447,6 @@ body{background:radial-gradient(120% 60% at 50% 0%, color-mix(in srgb, var(--pap
     </section>
     <!-- 2.0.0 학교 복도: 상점 거리처럼 복도 배경 위에 방문(그림은 작업지시서 20, 자리는 그림이 오면 맞춰요) -->
     <section class="panel street-panel hall-panel" id="panelHall" hidden aria-labelledby="hallTitle">
-    <button class="panel-x" type="button" aria-label="홈으로"><svg viewBox="0 0 24 24" width="18" height="18" aria-hidden="true"><path d="M6 6l12 12M18 6L6 18" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round"/></svg></button>
     <h2 id="hallTitle" class="street-title">학교 복도</h2>
     <div class="street-scene hall-scene" id="hallScene">
       <button class="shopfront door" type="button" data-go="club" id="hdClub" style="left:1.5%;top:9%;width:48%" aria-label="동아리실"><span class="sf-pic" data-front="hall_club" data-em="🏅" aria-hidden="true"></span><span class="sf-tag"><b>동아리실</b><span class="sf-have" id="hallClubN">0%</span></span></button>
@@ -3450,8 +3453,8 @@ body{background:radial-gradient(120% 60% at 50% 0%, color-mix(in srgb, var(--pap
   const TIER_OPEN = 3;   // 2.0.0: 중학교까지 열려요
   // 학교급이 오르면 수업료는 1000배, 공사비는 2000배라서 숫자 단위가 껑충 커져요
   // 2.0.0: 학교급마다 수업료와 공사비 배수를 표로 적어요(균형 제안서에서 고르는 값). 표에 없는 학교급은 예전 규칙(1000배, 2000배)
-  // 중학교 공사비는 균형 제안서(2.0.0) 제안값 4억 배(예전 규칙이면 400만 배). 지섭 확정 전이에요
-  const TIER_SCALE = { inc: [1, 1e3, 1e6], cost: [1, 2e3, 4e8] };
+  // 중학교 공사비는 균형 제안서(2.0.0) 제안값 5억 배(예전 규칙이면 400만 배). 지섭 확정 전이에요
+  const TIER_SCALE = { inc: [1, 1e3, 1e6], cost: [1, 2e3, 5e8] };
   const incomeScale = () => TIER_SCALE.inc[S.tier] !== undefined ? TIER_SCALE.inc[S.tier] : Math.pow(1000, S.tier);
   const costScale = () => TIER_SCALE.cost[S.tier] !== undefined ? TIER_SCALE.cost[S.tier] : Math.pow(2000, S.tier);
   const tierInfo = () => TIERS[S.tier];
@@ -3850,6 +3853,8 @@ body{background:radial-gradient(120% 60% at 50% 0%, color-mix(in srgb, var(--pap
     // 12장~15장 (2.0.0): 숲속 중학교. 입학 장 + 1, 2, 3학년. 목표 숫자는 균형 제안서(2.0.0)의 자동 플레이로 정해요. yt: 2는 중학교 학년 장이라는 뜻
     { id: 'j1', ch: 11, t: 'tier', n: 2, rm: 10, title: '중학교 입학식', how: '숲속 중학교에 입학했어요. 받기를 눌러요',
       say: '숲속 중학교 입학을 축하해요! 중학교는 수업료도 공사비도 훨씬 커요. 새로 생긴 매점과 동아리가 학교를 더 신나게 만들어 줄 거예요.' },
+    { id: 'j29', ch: 11, t: 'fpUp', n: 1, rm: 10, title: '장학재단 고치기', how: '졸업 탭 > 장학재단에서 기금을 써요',
+      say: '초등학교를 졸업하며 받은 기금이 많이 쌓였어요! 졸업 탭의 장학재단을 고쳐 보세요. 장학금은 수업료를 두 배씩 올려 줘서 중학교 살림이 훨씬 넉넉해져요. 기금이 남으면 모두 써도 좋아요.' },
     { id: 'j2', ch: 11, t: 'fac', k: 'store', n: 1, rm: 10, title: '매점 짓기', how: '지도 가운데 아래 공사 자리를 눌러요',
       say: '쉬는 시간에 간식을 사 먹을 매점이 있어야지요. 매점을 지으면 학교가 즐거워져서 수업료가 올라요.' },
     { id: 'j3', ch: 11, t: 'furAll', k: 'store', n: 1, rm: 10, title: '매점 가구 갖추기', how: '매점을 눌러서 가구를 모두 올려요',
@@ -3899,8 +3904,8 @@ body{background:radial-gradient(120% 60% at 50% 0%, color-mix(in srgb, var(--pap
 
     { id: 'j23', ch: 14, t: 'ygrade', n: 2, rm: 5, title: '3학년 읍내 되기', how: '평판을 모아서 읍내가 되어요',
       say: '중학교 3학년이 되었어요! 졸업 준비를 하려면 먼저 학교를 다시 키워야 해요. 읍내 학교가 되어 볼까요?' },
-    { id: 'j24', ch: 14, t: 'fac', k: 'library', n: 18, rm: 5, title: '졸업 문집 만들기', how: '도서관을 Lv.18까지 키워요',
-      say: '3학년은 졸업 문집을 만들어요. 도서관을 Lv.18까지 키워서 문집을 꽂을 자리를 마련해요.' },
+    { id: 'j24', ch: 14, t: 'fac', k: 'library', n: 15, rm: 5, title: '졸업 문집 만들기', how: '도서관을 Lv.15까지 키워요',
+      say: '3학년은 졸업 문집을 만들어요. 도서관을 Lv.15까지 키워서 문집을 꽂을 자리를 마련해요.' },
     { id: 'j25', ch: 14, t: 'clubShown', n: 2, rm: 5, title: '동아리 두 곳 발표회', how: '서로 다른 동아리 두 곳이 무대에 올라요',
       say: '졸업 전에 여러 동아리가 무대에 서 봐요. 지금까지 무대에 서지 않은 동아리를 골라 발표회를 열면 돼요. 서로 다른 두 곳이 서면 끝이에요.' },
     { id: 'j26', ch: 14, t: 'fest', k: 'photo', n: 1, rm: 5, title: '졸업 사진 찍기', how: '학교 행사 > 졸업 사진 찍기',
@@ -4006,7 +4011,7 @@ body{background:radial-gradient(120% 60% at 50% 0%, color-mix(in srgb, var(--pap
     fg: { day: '', got: [] },   // 1.7.2 학교 행사 황금 도토리: 행사마다 하루 한 번(got에 오늘 받은 행사 id)
     es: { day: '', n: 0, week: -1, g: 0, x: 0 },
     deco: freshDeco(),   // 1.7.4 꾸미기: own 가진 장식 수, lay 지도별 자리(유치원, 초등학교)마다 놓인 장식 id, nm 학교 이름 앞부분('' = 숲속), mk 학교 마크 [모양, 문양, 바탕 색, 문양 색] 또는 null   // 1.6.0 정수 상점: 오늘 산 도토리 묶음 수, 이번 주 산 황금 도토리 묶음 수
-    roster: freshRoster(), club: freshClub(), snap: {},   // 2.0.0 학생 명부, 동아리, 학교급 사진(졸업식 때 남긴 모습)
+    roster: freshRoster(), club: freshClub(), snap: {}, tfp: 0,   // tfp: 이 학교급에 들어올 때까지 장학재단을 고친 횟수   // 2.0.0 학생 명부, 동아리, 학교급 사진(졸업식 때 남긴 모습)
     q: freshQ()
   });
   const repOf = s => s.f.classroom + s.f.cafeteria + s.f.playground + 3 * s.f.library + s.f.science + 2 * (s.t.squirrel + s.t.owl + s.t.bear) + 5 * s.p.perk.rep + 10 * s.fp.rep;
@@ -4174,6 +4179,7 @@ body{background:radial-gradient(120% 60% at 50% 0%, color-mix(in srgb, var(--pap
     sanitize171(d, s);   // 1.7.1 업적
     sanitize174(d, s);   // 1.7.4 꾸미기
     sanitize200(d, s);   // 2.0.0 명부, 동아리, 학교급 사진
+    s.tfp = Math.min(s.st.fperks, Math.floor(num(d.tfp, 0, s.st.fperks)));
     // 1.7.0 학교급별 건물 외관: 예전 저장은 지금 보이는 모습 그대로(유치원 모습, 과학실과 운동장은 초등학교 모습) 시작해서 다음 업그레이드 때 바뀌어요
     if (d.bs && typeof d.bs === 'object') { for (const k of Object.keys(s.bs)) s.bs[k] = Math.min(s.tier, Math.floor(num(d.bs[k], 0, 0))); }
     else { s.bs.science = Math.min(1, s.tier); s.bs.playground = Math.min(1, s.tier); }
@@ -8215,8 +8221,8 @@ body{background:radial-gradient(120% 60% at 50% 0%, color-mix(in srgb, var(--pap
   const decoPlaced = m => S.deco.lay[m].filter(Boolean).length;
   const decoPlacedAll = () => S.deco.lay.reduce((a, L) => a + L.filter(Boolean).length, 0);
   const decoCost0 = id => { const d = DECO_BY[id]; if (!d) return Infinity; return d.rare ? d.ess : Math.ceil(d.ess * Math.pow(DECO_GROW, Math.min(DECO_MAX, decoOwn(id))) / 5) * 5; };
-  // 2.0.0 미술부 할인(최대 15%). 5 단위로 맞춰요
-  const decoCost = id => { const c = decoCost0(id); if (!isFinite(c)) return c; const off = typeof clubDecoOff === 'function' ? clubDecoOff() : 0; return off > 0 ? Math.max(5, Math.ceil(c * (1 - off / 100) / 5) * 5) : c; };
+  // 2.0.0 미술부 할인(최대 15%). 할인한 값은 1 단위로 반올림해요
+  const decoCost = id => { const c = decoCost0(id); if (!isFinite(c)) return c; const off = typeof clubDecoOff === 'function' ? clubDecoOff() : 0; return off > 0 ? Math.max(1, Math.round(c * (1 - off / 100))) : c; };
   const decoSoldOut = id => { const d = DECO_BY[id]; return !d || decoOwn(id) >= (d.rare ? 1 : DECO_MAX); };
   const cleanSchoolNm = v => typeof v === 'string' ? v.replace(/[\s<>&"'`\\]/g, '').slice(0, 6) : '';
   const schoolTitle = () => `${S.deco.nm || '숲속'} ${tierInfo().name}`;
@@ -8429,7 +8435,7 @@ body{background:radial-gradient(120% 60% at 50% 0%, color-mix(in srgb, var(--pap
   const KID_NAMES = ['도토리', '밤송이', '솔방울', '이슬', '새싹', '단풍', '보리', '콩알', '버찌', '다래', '머루', '호두', '달래', '나리', '송이', '들꽃',
     '구름', '바람', '햇살', '별님', '조약돌', '방울', '보라', '감자', '고구마', '앵두', '모과', '자두', '토실', '꼬물', '동글', '말랑'];
   const star = v => Math.max(1, Math.min(5, Math.ceil(v / 20)));
-  const starTxt = n => '★'.repeat(n) + '☆'.repeat(5 - n);
+  const starTxt = n => `<span class="st-on">${'★'.repeat(n)}</span><span class="st-off">${'★'.repeat(5 - n)}</span>`;   // 채운 별과 빈 별(연하게)
   const rosterOn = () => !!S && S.tier >= ROSTER_TIER;
   const freshRoster = () => ({ list: [], wk: -1, gen: 0 });
   const freshClub = () => ({ day: '', n: 0, shown: [0, 0, 0, 0], last: -1 });
@@ -8599,7 +8605,7 @@ body{background:radial-gradient(120% 60% at 50% 0%, color-mix(in srgb, var(--pap
       `<h3 class="qsec">학생 명부 <small>${yearLabel()} 대표 학생 ${S.roster.list.length}명</small></h3>` +
       `<div class="roster">${S.roster.list.map((s, i) => `<button class="rs-row${rt.clubPick === i ? ' pick' : ''}" type="button" data-ri="${i}">${kidFace(s.sp)}` +
         `<span class="rs-nm"><b>${esc(s.nm)}</b><small>${s.c >= 0 ? CLUBS[s.c].name : '동아리 없음'}</small></span>` +
-        `<span class="rs-ab">${ABIL.map((n, j) => `<i class="${s.c >= 0 && CLUBS[s.c].ab === j ? 'on' : ''}"><em>${n}</em>${starTxt(star(s.a[j]))}</i>`).join('')}</span></button>`).join('')}</div>`;
+        `<span class="rs-ab">${ABIL.map((n, j) => `<i class="${s.c >= 0 && CLUBS[s.c].ab === j ? 'on' : ''}"><em>${n}</em><span>${starTxt(star(s.a[j]))}</span></i>`).join('')}</span></button>`).join('')}</div>`;
   }
   // 동아리 자리 고르기: 자리를 누르면 명부에서 학생을 골라요(그 동아리에 맞는 능력치 순서)
   function openSeatPick(c) {
@@ -10674,6 +10680,7 @@ body{background:radial-gradient(120% 60% at 50% 0%, color-mix(in srgb, var(--pap
     if (S.p.species < NEWCOMERS.length) { newcomer = NEWCOMERS[S.p.species]; S.p.species += 1; }
     else { S.p.ticket = (S.p.ticket || 0) + 1; rt.tkReward = { title: '친구 성장 쪽지를 받았어요!', sub: '졸업 탭의 전학 온 친구들에서 키울 친구를 골라요', items: [{ ic: 'ticket', t: `친구 성장 쪽지 +1 (지금 ${S.p.ticket}장)` }] }; }
     snapTake();   // 2.0.0 졸업식 사진: 이 학교급의 마지막 모습
+    S.tfp = S.st.fperks;
     S.roster = freshRoster(); S.club = freshClub();
     S.tier += 1; S.tg = 0; S.tdip = 0; S.best = 0; S.hd.furNew = false;
     S.p.dip = 0;
@@ -10736,6 +10743,7 @@ body{background:radial-gradient(120% 60% at 50% 0%, color-mix(in srgb, var(--pap
       case 'clubSum': return clubSum();
       case 'star': return rosterOn() && S.roster.list.length ? Math.max(...S.roster.list.map(s => Math.max(...s.a.map(star)))) : 0;
       case 'clubShown': return S.club.shown.reduce((a, b) => a + b, 0);
+      case 'fpUp': return Math.max(0, S.st.fperks - (S.tfp || 0));   // 2.0.0 이 학교급에 와서 장학재단을 고친 횟수(퀘스트 전에 고쳤어도 쳐요)
       default: return S.st[q.t] || 0;   // picks, ups, trains, claims, grads, perks, fperks
     }
   }
@@ -10811,6 +10819,7 @@ body{background:radial-gradient(120% 60% at 50% 0%, color-mix(in srgb, var(--pap
       case 'clubSum': return `동아리 보너스 합 ${q.n}% 넘기`;
       case 'star': return `능력치 별 ${q.n}개 학생 만들기`;
       case 'clubShown': return `동아리 ${q.n}곳 발표회 열기`;
+      case 'fpUp': return `장학재단 ${q.n}번 고치기`;
     }
     return '';
   }
@@ -11223,7 +11232,7 @@ body{background:radial-gradient(120% 60% at 50% 0%, color-mix(in srgb, var(--pap
       case 'grads': case 'tgrads': return goGrad();
       case 'perks': return goGrad('perks');
       case 'tier': return goGrad('tier');
-      case 'fperks': return goGrad('fund');
+      case 'fperks': case 'fpUp': return goGrad('fund');
       case 'trips': case 'souv': case 'tripat': return openTrip();
       case 'sports': case 'fest': return openFest();
       case 'club': case 'shows': case 'clubSum': case 'star': case 'clubShown': return setTab('club');   // 2.0.0

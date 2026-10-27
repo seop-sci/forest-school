@@ -12,6 +12,9 @@ STATES = {
     '유치원 2년째': {'tg': 1, 'f': {'classroom': 18, 'cafeteria': 14, 'library': 13, 'playground': 14}, 't': {'squirrel': 8, 'owl': 5, 'bear': 7}, 'students': 80, 'fuFull': True},
     '초등학교 1학년': {'tier': 1, 'tg': 0, 'f': {'classroom': 8, 'cafeteria': 6, 'library': 6, 'playground': 6, 'science': 1}, 't': {'squirrel': 4, 'owl': 2, 'bear': 2}, 'students': 30, 'fuFull': True},
     '초등학교 4학년': {'tier': 1, 'tg': 3, 'f': {'classroom': 30, 'cafeteria': 26, 'library': 25, 'playground': 26, 'science': 15}, 't': {'squirrel': 20, 'owl': 5, 'bear': 18}, 'students': 120, 'fuFull': True},
+    # 2.0.0 중학교
+    '중학교 1학년': {'tier': 2, 'tg': 0, 'f': {'classroom': 8, 'cafeteria': 6, 'library': 6, 'playground': 6, 'science': 3, 'store': 3}, 't': {'squirrel': 8, 'owl': 5, 'bear': 5}, 'students': 30, 'fuFull': True},
+    '중학교 3학년': {'tier': 2, 'tg': 2, 'f': {'classroom': 25, 'cafeteria': 18, 'library': 17, 'playground': 18, 'science': 11, 'store': 17}, 't': {'squirrel': 20, 'owl': 5, 'bear': 15}, 'students': 100, 'fuFull': True},
 }
 SETUP = r"""(st) => {
   const F = window.__forest, S = F.S;
@@ -35,7 +38,7 @@ CHECK = r"""() => {
   for (const q of F.MAIN) {
     const c = F.needCost(q);
     if (!(isFinite(c) && c >= 0)) bad.push(`${q.id} needCost가 이상해요: ${c}`);
-    if (c > 1e15) bad.push(`${q.id} needCost가 너무 커요: ${c}`);
+    if (c > 1e15 * Math.max(1, F.costScale() / 2000)) bad.push(`${q.id} needCost가 너무 커요: ${c}`);   // 2.0.0 중학교는 공사비 배수만큼 크게 봐요
     const rw = F.qReward ? F.qReward(q) : 0;
     if (!(isFinite(rw) && rw >= 0)) bad.push(`${q.id} 보상이 이상해요: ${rw}`);
     rows.push([q.id, Math.round(c)]);
@@ -86,6 +89,54 @@ FLOW = r"""() => {
   return { min: +(t / 60).toFixed(1), tier: S().tier, maxBudget: maxB, maxWaitMin: +(maxWait / 60).toFixed(1), q: qid };
 }"""
 
+# 2.0.0 중학교 따라 하기: 초등학교 6학년 끝(졸업식 퀘스트)에서 졸업식을 열고 중학교 장 끝까지 해 봐요.
+# 게임 시계(rt.fakeNow)도 흘려서 동아리 발표회(하루 한 번)와 주간 성장이 실제처럼 돌아가요. 동아리는 자동 추천으로 나눠요
+FLOW2 = r"""() => {
+  const F = window.__forest, S = () => F.S; let t = 0, maxB = 0, maxWait = 0, qid = '', qt = 0, pick = 0, tri = 0, waitAt = '', tripEnd = 0; const dt = 10, t0 = Date.now();
+  const s0 = S(); s0.tier = 1; s0.tg = 5; s0.p.species = 6; Object.assign(s0.f, { classroom: 38, cafeteria: 30, library: 28, playground: 28, science: 18 });
+  for (const k in s0.fu) s0.fu[k] = s0.fu[k].map(() => s0.f[k]); s0.students = 158; s0.tdip = 250; s0.grade = 4; s0.best = 4;
+  s0.q.m = F.MAIN.findIndex(q => q.id === 'e39'); s0.q.lat = ''; F.checkGrade();
+  if (!F.canPromote()) return { err: '졸업식을 열 수 없어요' };
+  F.promote(); F.rt.modalQueue.length = 0; F.rt.modalOpen = null;
+  // 사람처럼: 추천을 사고, 추천이 비싸면 가장 싼 것을 사요. 장학재단은 기금이 되는 만큼 고쳐요
+  const buy = () => { const r = F.recommend(); let ok = false;
+    if (r) { if (r.kind === 'tea') ok = S().budget >= F.teaCost(r.k) && F.teacherAct(r.k);
+      else if (r.kind === 'fur') ok = S().budget >= F.furCost(r.k, r.i) && F.buyFur(r.k, r.i, true);
+      else ok = S().budget >= F.facCost(r.k) && F.buyFacility(r.k); }
+    if (ok) return true;
+    const c = [];
+    for (const k of F.facKeys()) { if (F.furReady(k)) c.push([F.facCost(k), () => F.buyFacility(k)]); else F.FUR[k].forEach((_, j) => { if (!F.furDone(k, j)) c.push([F.furCost(k, j), () => F.buyFur(k, j, true)]); }); }
+    for (const k of Object.keys(F.TEA)) if (!F.teaMaxed(k)) c.push([F.teaCost(k), () => F.teacherAct(k)]);
+    c.sort((a, b) => a[0] - b[0]);
+    return !!c.length && c[0][0] <= S().budget && c[0][1](); };
+  for (let i = 0; i < 40; i++) { const ks = Object.keys(F.FPERKS).sort((a, b) => F.fpCost(a) - F.fpCost(b)); if (F.fpCost(ks[0]) > S().fund) break; F.buyFundPerk(ks[0], document.body); }
+  while (t < 60 * 3600 && F.curMain()) {
+    const s = S(); F.rt.fakeNow = t0 + t * 1000;
+    const cap = F.capacity(); if (s.students < cap) s.students = Math.min(cap, s.students + F.CFG.enroll * dt);
+    const g = F.rate() * dt; s.budget += g; F.earn(g); t += dt;
+    const q = F.curMain(), id = q ? q.id : '';
+    if (id !== qid) { if (t - qt > maxWait) { maxWait = t - qt; waitAt = qid; } qid = id; qt = t; }
+    pick += dt; if (pick >= 15) { pick = 0; s.st.picks += 1; }
+    if (q && q.t === 'trials') { tri += dt; if (tri >= 8) { tri = 0; s.st.trials = (s.st.trials || 0) + 1; } }
+    if (q && q.t === 'fest') s.fest.n[q.k] = (s.fest.n[q.k] || 0) + 1;
+    if (q && q.t === 'sports') s.st.sports += 1;
+    if (q && q.t === 'club') F.clubAuto(true);
+    if (s.roster.list.some(x => x.c >= 0) && F.showReady()) { const c = [0, 1, 2, 3].find(c => !s.club.shown[c]); F.clubShowGo(c === undefined ? 0 : c); }
+    F.clubWeekTick();
+    // 현장체험학습: 갈 수 있는 곳 중 아직 기념품이 남은 가장 짧은 곳(다녀오면 수업료의 절반만큼 더 받아요)
+    if (!s.trip.cur) { const ok = F.TRIPS.filter(D => s.st.trips >= D.need); const D = ok.filter(x => x.souv.some((_, i) => !s.trip.souv.includes(x.id + ':' + i))).sort((a, b) => a.min - b.min)[0] || ok[0]; if (D) { s.trip.open = true; F.startTrip(D.id); tripEnd = t + D.min * 60; } }
+    else if (t >= tripEnd) { s.trip.end = Date.now() - 1; F.claimTrip(1); }
+    for (let i = 0; i < 40; i++) { const k = Object.keys(F.PERKS).filter(x => !F.perkMaxed(x)).sort((a, b) => F.perkCost(a) - F.perkCost(b))[0]; if (!k || F.perkCost(k) > s.p.dip) break; F.buyPerk(k, document.body); }
+    for (let i = 0; i < 5 && F.mainReady(); i++) F.claimMain(null);
+    if (F.canGraduate()) F.graduate();
+    for (let i = 0; i < 20; i++) if (!buy()) break;
+    F.rt.modalQueue.length = 0; F.rt.modalOpen = null;
+    maxB = Math.max(maxB, S().budget);
+    if (!isFinite(S().budget) || !isFinite(F.rate())) return { err: '유한하지 않은 값', q: qid };
+  }
+  return { h: +(t / 3600).toFixed(1), tier: S().tier, tg: S().tg, maxBudget: maxB, maxWaitMin: +(maxWait / 60).toFixed(1), waitAt, q: (F.curMain() || {}).id || '끝', roster: S().roster.list.length, club: F.clubSum() };
+}"""
+
 async def main():
     fails, report = [], {}
     async with async_playwright() as p:
@@ -116,6 +167,20 @@ async def main():
         if f['maxBudget'] > 1e9: fails.append(f'유치원에서 도토리가 {f["maxBudget"]:.3g}개까지 쌓였어요 (지원 폭발 의심)')
         if f['maxWaitMin'] > 30: fails.append(f'유치원에서 한 퀘스트에 {f["maxWaitMin"]}분 넘게 막혔어요')
         fails += [f'[따라 하기] 페이지 오류: {e}' for e in errs]
+        # 2.0.0 중학교 따라 하기
+        ctx = await b.new_context()
+        await ctx.add_init_script("window.__FOREST_TEST = true; localStorage.clear();")
+        pg = await ctx.new_page(); errs = []; pg.on('pageerror', lambda e: errs.append(str(e)))
+        await pg.goto(URL); await pg.wait_for_timeout(1500)
+        await pg.evaluate("const t=document.querySelector('#tut'); if(t && !t.hidden){ window.__forest.S.tut.st='skip'; t.hidden=true; window.__forest.rt.modalOpen=null; }")
+        f2 = await pg.evaluate(FLOW2); report['중학교 따라 하기'] = f2
+        if f2.get('err'): fails.append(f'중학교 따라 하기: {f2["err"]}')
+        elif f2['q'] != '끝': fails.append(f'중학교 장을 60시간 안에 끝내지 못했어요 (멈춘 퀘스트 {f2["q"]})')
+        else:
+            if f2['maxWaitMin'] > 720: fails.append(f'중학교에서 한 퀘스트({f2["waitAt"]})에 {f2["maxWaitMin"]}분 넘게 막혔어요')
+            if f2['maxBudget'] > 1e16: fails.append(f'중학교에서 도토리가 {f2["maxBudget"]:.3g}개까지 쌓였어요')
+            if f2['roster'] < 12: fails.append(f'중학교 명부가 {f2["roster"]}명이에요')
+        fails += [f'[중학교 따라 하기] 페이지 오류: {e}' for e in errs]
         await b.close()
     print(json.dumps(report, ensure_ascii=False, indent=1))
     if fails:
