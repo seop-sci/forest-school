@@ -1,5 +1,6 @@
 # 2.0.0 시험(2026-10-27 지섭 요청 묶음)
-# (1) 이벤트 중에 못 하게 된 미션(시설과 가구를 다 올림)은 할 수 있는 미션으로 바뀌고, 바뀐 미션은 지금부터 다시 세요
+# (1) 이벤트 중의 고치기 미션(2.0.0 전에 받은 것)이나 못 하게 된 미션은 할 수 있는 미션으로 바뀌고, 바뀐 미션은 지금부터 다시 세요
+# (1-2) 이벤트 미션에 고치기와 연수가 없어요. (2-2) 도장 7개째에 이벤트 한정 학생 모자
 # (2) 이벤트 정수: 도장 5개째 +5, 기념 상자 +10. 이벤트 한정 장식은 그림이 있을 때 그 이벤트 상자에서 처음 한 번만 받고, 가게에서는 살 수 없어요
 # (3) 동아리 발표회: 월~금 하루 한 번, 그 주에 못 연 날이 있으면 주말에 2번까지(못 연 날 수까지) 보충
 # (4) 황금 상점 부스터 세 가지 묶음 10% 할인(11 → 10), 한꺼번에 써요
@@ -13,7 +14,7 @@ F = 'window.__forest'
 CLEAN = "document.querySelectorAll('.overlay.center').forEach(o=>{o.hidden=true;o.classList.remove('open')}); window.__forest.rt.modalOpen=null; window.__forest.rt.modalQueue.length=0"
 SKIP = f"(()=>{{ const t=document.querySelector('#tut'); if(t) t.hidden=true; {F}.S.tut.st='skip'; {F}.rt.tut=null; {CLEAN}; }})()"
 kst = lambda y, m, d: calendar.timegm((y, m, d, 3, 0, 0)) * 1000
-NOTE = '도토리 양은 학교가 자랄수록 커져요'
+NOTE = '도토리 양은 학교가 성장할수록 커져요'
 PROMOTE = f"""(() => {{ const F = {F}, S = F.S; S.tier = 1; S.tg = 5; S.p.species = 6; Object.assign(S.f, {{ classroom: 38, cafeteria: 30, library: 28, playground: 28, science: 18 }});
   for (const k in S.fu) S.fu[k] = S.fu[k].map(() => S.f[k]); S.students = 158; S.tdip = 250; S.grade = 4; S.best = 4;
   S.q.m = F.MAIN.findIndex(q => q.id === 'e39'); S.q.lat = ''; F.checkGrade(); F.promote(); {CLEAN}; F.clubAuto(true); return S.tier; }})()"""
@@ -30,11 +31,9 @@ async def main():
         # (1) 미션 바꾸기
         r = await pg.evaluate(f"""(()=>{{ const F={F}, S=F.S; F.rt.fakeNow={kst(2026, 11, 3)}; S.clk.last=0; F.evSync();
           S.f.playground = 1; S.ev.list = [{{ t: 'ups', n: 40, b: S.st.ups || 0, m: 10, g: 1, done: false }}, {{ t: 'claims', n: 3, b: 0, m: 10, g: 1, done: false }}, {{ t: 'dmDone', n: 4, b: 0, m: 10, g: 1, done: false }}];
-          const before = F.evFix();
-          const cap = F.facCap(); for (const k of F.facKeys()) {{ S.f[k] = cap; S.fu[k] = S.fu[k].map(() => cap); }}
-          S.st.shakes = 500; const ch = F.evFix(); const m = S.ev.list[0];
-          return {{ before, ch, t: S.ev.list.map(x => x.t), b: m.b, st: Math.floor(S.st[m.t] || 0), ok: S.ev.list.every(x => F.evOk(x.t)) }}; }})()""")
-        if r['before'] or not r['ch'] or r['t'][0] == 'ups' or len(set(r['t'])) != 3 or not r['ok'] or r['b'] != r['st']: fails.append(f'미션 바꾸기 {r}')
+          S.st.shakes = 500; const ch = F.evFix(); const m = S.ev.list[0]; const again = F.evFix();
+          return {{ ch, again, t: S.ev.list.map(x => x.t), b: m.b, st: F.evVal(m.t), ok: S.ev.list.every(x => F.evOk(x.t)) }}; }})()""")
+        if r['again'] or not r['ch'] or r['t'][0] == 'ups' or len(set(r['t'])) != 3 or not r['ok'] or r['b'] != r['st']: fails.append(f'미션 바꾸기 {r}')
 
         # (2) 정수와 한정 장식
         r = await pg.evaluate(f"""(()=>{{ const F={F}, S=F.S; window.FS_IMG200 = window.FS_IMG200 || {{}}; window.FS_IMG200.evd_harvest = window.FS_IMG170.ev_box;
@@ -54,6 +53,23 @@ async def main():
         if r['e5'] != 5 or r['e10'] != 10 or r['e10b'] != 10: fails.append(f'이벤트 정수 {r}')
         if r['own1'] != 1 or r['own2'] != 1 or r['fr'] != 0 or r['bought'] is not False or r['lunch'] != 0 or not r['sec'] or r['n'] != 23: fails.append(f'이벤트 한정 장식 {r}')
 
+        # (1-2) 이벤트 미션 표에는 고치기와 연수가 없고(2026-10-27 지섭: 어려워서 빼요), 합치기 주문 미션은 S.mg.st.orders로 세요
+        r = await pg.evaluate(f"""(()=>{{ const F={F}, S=F.S; const rows = [];
+          for (let mo = 1; mo <= 12; mo++) for (const e of F.EV_WEEKLY) rows.push({{ def: e, start: `2026-${{String(mo).padStart(2,'0')}}-01` }});
+          for (const e of F.EV_SPECIAL) rows.push({{ def: e, start: e.start || '2026-12-24' }});
+          const hard = rows.filter(r => F.evMissions(r).some(m => m.t === 'ups' || m.t === 'trains')).map(r => r.def.id);
+          const fb = F.EV_FALLBACK.map(x => x[0]); const o0 = F.evVal('mgOrd'); S.mg.st.orders += 3;
+          return {{ hard, fb, d: F.evVal('mgOrd') - o0 }}; }})()""")
+        if r['hard'] or 'ups' in r['fb'] or 'trains' in r['fb'] or r['d'] != 3: fails.append(f'어려운 미션 빼기 {r}')
+        # (2-2) 도장 7개째에 그 이벤트 한정 학생 모자(그림이 있을 때), 상점에서는 살 수 없어요
+        r = await pg.evaluate(f"""(()=>{{ const F={F}, S=F.S; F.rt.fakeNow={kst(2026, 11, 24)}; S.clk.last=0; F.evSync();
+          window.FS_IMG200.cos_hat_ev_lunch = window.FS_IMG170.ev_box; const key = 'hat:ev_lunch';
+          const shop0 = F.pickShop('c:hat:ev_lunch'); const own0 = S.cos.own.includes(key);
+          S.ev.stamp = {{ n: 6, last: '' }}; F.claimStamp(); {CLEAN}; const own1 = S.cos.own.includes(key);
+          F.setTab('shop'); const shown = document.querySelector('#shopList').textContent.includes('요리사 모자');
+          F.pickShop('c:hat:ev_lunch'); const on = S.cos.hat; F.setTab('school');
+          return {{ cur: S.ev.cur, own0, own1, shown, on, n: F.EV_HAT.length }}; }})()""")
+        if r['own0'] or not r['own1'] or not r['shown'] or r['on'] != 'ev_lunch' or r['n'] != 23: fails.append(f'이벤트 한정 모자 {r}')
         # (4) 부스터 묶음
         r = await pg.evaluate(f"""(()=>{{ const F={F}, S=F.S; F.rt.fakeNow = 0; S.gold = 20; const b0 = S.budget, now = Date.now();
           S.hd.feastUntil = 0; S.autoUntil = 0; F.setTab('shop'); F.pickShop('b:all'); F.buyShop(); {CLEAN};

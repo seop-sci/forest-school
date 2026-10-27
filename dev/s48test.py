@@ -79,19 +79,19 @@ async def main():
         pn, errsn = await boot(ctx2)
         await set_day(pn, 2026, 11, 3)
         nw = await pn.evaluate(f"""(()=>{{ const F={F}, S=F.S; const out={{ pg: S.f.playground, cur: S.ev.cur, list: S.ev.list.map(m=>m.t), bad: [] }};
-          const doable = ['ups', 'claims', 'trains', 'dmDone', 'pz'];   // 놀이터 없는 새 학교가 할 수 있는 종류 (1.6.0부터 오늘의 미션은 놀이터 없이도 고치기와 연수가 나와요)
+          const doable = ['claims', 'dmDone', 'pz', 'mgOrd'];   // 놀이터 없는 새 학교가 할 수 있는 종류 (1.6.0부터 오늘의 미션은 놀이터 없이도 고치기와 연수가 나와요)
           const rows = [];
           for (let mo = 1; mo <= 12; mo++) for (const e of F.EV_MONTHLY) rows.push({{ def: e, start: `2026-${{String(mo).padStart(2,'0')}}-01` }});
           for (const e of F.EV_SPECIAL) rows.push({{ def: e, start: '2026-12-24' }});
           for (const r of rows) {{ const ts = F.evMissions(r).map(m=>m.t);
             if (ts.length !== 3 || new Set(ts).size !== 3 || ts.some(t => !F.evOk(t) || !doable.includes(t))) out.bad.push(r.def.id + r.start.slice(5,7) + ':' + ts.join(','));
-            if (ts.some(t => S.st[t] === undefined)) out.bad.push('st없음:' + ts.join(',')); }}
+            if (ts.some(t => !Number.isFinite(F.evVal(t)))) out.bad.push('셀 수 없음:' + ts.join(',')); }}
           out.ok = Object.keys(F.EV_MEASURE).filter(t => F.evOk(t));
           return out; }})()""")
         if nw['pg'] != 0 or nw['cur'] != 'harvest:2026-11-02': fails.append(f'새 저장 이벤트 준비가 이상해요 {nw}')
-        if len(nw['list']) != 3 or len(set(nw['list'])) != 3 or any(t not in ('ups', 'claims', 'trains', 'dmDone', 'pz') for t in nw['list']): fails.append(f"새 저장 이벤트 미션에 못 하는 종류가 있어요 {nw['list']}")
+        if len(nw['list']) != 3 or len(set(nw['list'])) != 3 or any(t not in ('claims', 'dmDone', 'pz', 'mgOrd') for t in nw['list']): fails.append(f"새 저장 이벤트 미션에 못 하는 종류가 있어요 {nw['list']}")
         if nw['bad']: fails.append(f"놀이터 없는 학교에서 이룰 수 없는 미션이 나와요 {nw['bad'][:6]}")
-        if sorted(nw['ok']) != ['claims', 'dmDone', 'pz', 'trains', 'ups']: fails.append(f"놀이터 없을 때 할 수 있는 종류가 달라요 {nw['ok']}")
+        if sorted(nw['ok']) != ['claims', 'dmDone', 'mgOrd', 'pz', 'trains', 'ups']: fails.append(f"놀이터 없을 때 할 수 있는 종류가 달라요 {nw['ok']}")
         # 흔들기: 놀이터 0에서는 참나무를 눌러도 횟수가 그대로라 미션으로 나오면 안 돼요(위에서 확인). 놀이터를 지으면 다시 나와요
         built = await pn.evaluate(f"(()=>{{ const F={F}, S=F.S; S.f.playground=1; return Object.keys(F.EV_MEASURE).filter(t => F.evOk(t)).sort(); }})()")
         if not all(t in built for t in ('picks', 'shakes', 'dmDone')): fails.append(f'놀이터를 지어도 줍기, 흔들기, 오늘의 미션이 안 열려요 {built}')
@@ -126,7 +126,7 @@ async def main():
         if not (s5['a'] is True and s5['n'] == 5 and s5['gold'] == 1 and '5개째' in s5['t'] and s5['cur'] == 'harvest:2026-11-02'): fails.append(f'5개째 큰 보상(일요일까지 같은 회차)이 틀려요 {s5}')
         # 미션: 횟수 통계의 차이로 재고, 셋 다 하면 기념 상자(2.0.0: 황금 도토리 1개, 수료증 1장)
         m = await pg.evaluate(f"""(()=>{{ const F={F}, S=F.S; const out={{}}; out.before=F.claimEvMission(0);
-          S.ev.list.forEach(x=>{{ S.st[x.t] = x.b + x.n; }}); const g0=S.gold, d0=S.p.dip;
+          S.ev.list.forEach(x=>{{ if (x.t === 'mgOrd') S.mg.st.orders = x.b + x.n; else S.st[x.t] = x.b + x.n; }}); const g0=S.gold, d0=S.p.dip;
           out.m=[0,1,2].map(i=>{{ const r=F.claimEvMission(i); {CLEAN}; return r; }}); out.boxBefore=S.ev.box; out.box=F.claimEvBox(); {CLEAN}; out.again=F.claimEvBox();
           out.gold=S.gold-g0; out.dip=S.p.dip-d0; out.done=S.ev.list.every(x=>x.done); out.mins=S.ev.list.map(x=>x.m); return out; }})()""")
         if m['before'] is not False or m['m'] != [True, True, True] or m['box'] is not True or m['again'] is not False: fails.append(f'이벤트 미션과 상자가 틀려요 {m}')
