@@ -1,27 +1,24 @@
-# 1.7.3 배경음악 파일 넣기: 반복 구간으로 잘라 둔 m4a(AAC) 파일을 글자(base64)로 바꿔 forest-school.html의 window.FS_AUD 묶음에 넣어요.
+# 배경음악 파일 넣기: 반복 구간으로 잘라 둔 m4a(AAC) 파일을 저장소 맨 위 audio 폴더에 넣어요.
+# 1.8.0부터 곡은 게임 파일(forest-school.html) 밖의 따로 된 파일이에요(게임 파일이 너무 커지지 않게, 지섭 결정).
+#   웹(GitHub Pages)은 index.html 옆 audio 폴더, 안드로이드는 app/build-www.mjs가 www/audio로, 토스는 toss/build.mjs가 dist/audio로 복사해요.
+#   자동 시험판(dev/test.html)만 dev/wrap.py가 곡을 글자로 넣어요(file:// 주소에서는 파일을 받을 수 없어서).
 # 쓰는 법: python3 embed_audio.py <m4a 폴더>
-#   파일 이름(확장자 뺀 것)이 열쇠예요: bgm_home(홈), bgm_room(그 밖의 화면), bgm_festival(학교 행사), bgm_play(미니게임)
-#   곡 원본은 지섭이 Suno 유료 플랜으로 만든 mp3예요. 반복 구간 자르기와 줄이기는 dev/README.md "배경음악 파일" 참고
-import base64, pathlib, sys
+#   파일 이름(확장자 뺀 것)이 열쇠예요: bgm_home(홈), bgm_room(그 밖의 화면), bgm_festival(학교 행사), bgm_play(미니게임),
+#   bgm_spring, bgm_summer, bgm_autumn, bgm_winter, bgm_xmas, bgm_space, bgm_retro(배경 테마 곡, 1.8.0)
+#   곡 원본은 지섭이 Suno 유료 플랜으로 만든 mp3예요. 반복 구간 자르기는 dev/bgm_loop.py
+import pathlib, shutil, sys
 
 HERE = pathlib.Path(__file__).resolve().parent
-SRC = HERE / 'forest-school.html'
-BEGIN, END = '<!-- FS_AUD:BEGIN -->', '<!-- FS_AUD:END -->'
+AUD = HERE.parent / 'audio'
 
 def main(d):
     files = sorted(pathlib.Path(d).glob('bgm_*.m4a'))
     if not files:
         sys.exit('bgm_*.m4a 파일이 없어요')
-    body = ',\n'.join(f'"{p.stem}":"data:audio/mp4;base64,{base64.b64encode(p.read_bytes()).decode()}"' for p in files)
-    new = f'{BEGIN}\n<script>window.FS_AUD={{\n{body}\n}};</script>\n{END}'
-    src = SRC.read_text(encoding='utf-8')
-    if BEGIN in src:
-        src = src[:src.index(BEGIN)] + new + src[src.index(END) + len(END):]
-    else:
-        at = src.index('<!-- FS_IMG:BEGIN -->')
-        src = src[:at] + new + '\n' + src[at:]
-    SRC.write_text(src, encoding='utf-8')
-    print(f'곡 {len(files)}개, 글자 크기 {sum(p.stat().st_size for p in files) * 4 / 3 / 1024:.0f} KB')
+    AUD.mkdir(exist_ok=True)
+    for p in files:
+        shutil.copyfile(p, AUD / p.name)
+    print(f'곡 {len(files)}개를 audio 폴더에 넣었어요 ({sum(p.stat().st_size for p in files) / 1024:.0f} KB)')
 
 if __name__ == '__main__':
     if len(sys.argv) < 2:
