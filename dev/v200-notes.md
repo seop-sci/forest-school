@@ -4,7 +4,7 @@
 
 ## 그림 없이 먼저 만든 것 (2026-10-27)
 
-- 학교급 셋: `TIER_OPEN = 3`, `TIERS`에 고등학교(아직 닫힘)와 `newb`(새 건물 이름). `geoIdx(t)`, `geo(t)`가 학교급마다 지도(`GEO[2]` 중학교, 그림이 오기 전에는 초등학교 지도와 자리, 매점은 초등학교의 매점 공사 자리, 기숙사 공사 자리는 임시로 교문 왼쪽 아래). `#mapImg2`, 지도 class `g-0/1/2`, `tier-2`(매점 보이기). `ART_FB`가 없는 그림 대신 쓸 그림(`bld_store_on` → 급식실 등). 장식 자리 `DECO_SLOTS[2]`, `DECO_SIGN[2]`
+- 학교급 셋: `TIER_OPEN = 3`, `TIERS`에 고등학교(아직 닫힘)와 `newb`(새 건물 이름). `geoIdx(t)`, `geo(t)`가 학교급마다 지도(`GEO[2]` 중학교, 2026-10-27 다시 그린 지도 6장과 lots_middle.md 좌표, 기숙사 공사 자리 이름표는 간판과 겹치지 않게 위로 `nextTagY`). `#mapImg2`, 지도 class `g-0/1/2`, `tier-2`(매점 보이기). `ART_FB`가 없는 그림 대신 쓸 그림(`bld_store_on` → 급식실 등). 장식 자리 `DECO_SLOTS[2]`, `DECO_SIGN[2]`
 - 수업료와 공사비 배수 표 `TIER_SCALE = { inc: [1, 1e3, 1e6], cost: [1, 2e3, 5e8] }`. 중학교 공사비 5억 배는 균형 제안서(2.0.0) 제안값(예전 규칙이면 400만 배)
 - 매점 `FAC.store`(tier 2, 레벨마다 수업료 +15%(`per`), 값 `60 × 1.8^L`), 가구 4종 `FUR.store`(간식 진열대, 음료 냉장고, 계산대, 간식 탁자), 방 그림이 없으면 `FUR_ROOM.store`(임시 그림), 지도 `#b-store`, 지붕 필터 `#rt-store`
 - 학생 명부 `S.roster = { list: [{ sp, nm, a: [과학, 운동, 독서, 미술] 1~100, c: 동아리(-1 없음), cw: 동아리에 든 주 }], wk, gen }`. 중학교부터(`ROSTER_TIER`), 처음 12명(만난 친구에서 겹치지 않게, 방금 전학 온 친구 포함), 중학교에서 전학 온 친구는 끝에 더해서 16명까지. 동물마다 잘하는 능력 `SP_ABIL`. 별 `star(v) = ceil(v/20)`
@@ -21,7 +21,7 @@
 
 ## 그림이 오면 할 일
 
-- 작업지시서 19: 지도 6장(다시 그리는 중) → `GEO[2]` 자리(lots_middle.md), `DECO_SLOTS[2]`, `DECO_SIGN[2]`, `BLD_ISL`에 새 그림 바닥 섬, `ART_FB` 지우기. 매점 그림, 중학교 건물 s3, 매점 방과 가구, 동아리 배지와 `club_bg`, `club_show`
+- 작업지시서 19: 지도 6장은 넣음(묶음 `FS_IMG200`, `embed_assets.py --block 200`). 남은 것: `BLD_ISL`에 새 그림 바닥 섬, `ART_FB` 지우기, 매점 그림, 중학교 건물 s3, 매점 방과 가구, 동아리 배지와 `club_bg`, `club_show`
 - 작업지시서 20: 복도 `hall_bg`와 문 6장 자리(hall_check 표), 새 학생 6종 `chr_*`(CHR_AR, HEAD_Y), `KID_EMOJI` 지우기
 - 균형 제안서 결정 반영(공사비, 매점, 발표회 주기)
 

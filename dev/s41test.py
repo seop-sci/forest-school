@@ -16,7 +16,7 @@ async def main():
         await pg.add_init_script("window.__FOREST_TEST = true; localStorage.clear();")
         await pg.goto(URL); await pg.wait_for_timeout(3800)
         await pg.evaluate("document.querySelectorAll('.overlay').forEach(o=>o.hidden=true); const t=document.querySelector('#tut'); if(t) t.hidden=true;")
-        for tier, name in ((0, '유치원'), (1, '초등학교')):
+        for tier, name in ((0, '유치원'), (1, '초등학교'), (2, '중학교')):   # 2.0.0 중학교 지도도
             info = await pg.evaluate(f"""(()=>{{ const F={F}; F.S.tier={tier}; F.S.students=0; F.syncKids(true); F.rt.mapLaid=-1; F.layoutMap(); F.renderMap();
               const nav=F.navInfo(), IN={INSIDE};
               const bad=nav.N.map((s,i)=>nav.blocks.some(b=>IN(b,s[0],s[1]))?i:-1).filter(i=>i>=0);
