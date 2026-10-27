@@ -12383,12 +12383,30 @@ body{background:radial-gradient(120% 60% at 50% 0%, color-mix(in srgb, var(--pap
   // 특별 이벤트 표: start와 end('YYYY-MM-DD', 끝나는 날 포함)를 적으면 열려요. 비어 있으면 아직 열지 않아요. 반복 이벤트와 겹치면 특별 이벤트가 먼저예요.
   // ms는 미션 3개 [종류, 목표], m은 미션 하나의 수업료 분치, g는 황금 도토리. 내용과 날짜는 나중에 채워요
   const EV_SPECIAL = [
-    // 2026-10-26 날짜 확정, 2026-10-27 매주 이벤트에 맞춰 기념일이 든 주의 월~일로 옮김: 수능(2026-11-19 목), 크리스마스(12-25 금), 설날(2027-02-07 일), 어린이날(05-05 수), 추석(09-15 수)
+    // 2.0.0 학교 특별 이벤트 달력(2026-10-27 지섭 결정): 기념일이 든 주 월~일, 서로 겹치지 않아요. 음력 날짜: 설날 2027-02-07(일), 부처님 오신 날 05-13(목), 추석 09-15(수), 수능 2027-11-18(목)
+    // 같은 id가 해마다 다시 열려요(key가 id:시작일이라 새 회차). fb는 배너 그림이 오기 전 대신 보여 줄 그림. 2028년 표는 나중에 더해요(2028년은 어린이날과 부처님 오신 날이 같은 주라 하나만)
     { id: 'exam', name: '수능 응원', start: '2026-11-16', end: '2026-11-22', banner: 'ev_banner_exam', lead: '숲속 선배들이 큰 시험을 봐요. 도장을 찍고 미션을 채워 응원 선물을 받아요. 모두 힘내요!', ms: [['trains', 3], ['ups', 30], ['dmDone', 4]], m: 20, g: 1 },
     { id: 'xmas', name: '크리스마스 파티', start: '2026-12-21', end: '2026-12-27', banner: 'ev_banner_xmas', lead: '숲속 학교에 눈이 내려요. 파티 선물을 받아 가요.', ms: [['picks', 60], ['ups', 30], ['dmDone', 4]], m: 20, g: 1 },
+    { id: 'newyear', name: '새해 해돋이', start: '2026-12-28', end: '2027-01-03', banner: 'ev_banner_newyear', fb: 'ev_banner_seollal', lead: '언덕에 올라 새해 첫 해를 봐요. 올해도 숲속 학교를 함께 키워요.', ms: [['picks', 60], ['claims', 3], ['dmDone', 4]], m: 20, g: 1 },
+    { id: 'winter1', name: '겨울방학 눈놀이', start: '2027-01-04', end: '2027-01-10', banner: 'ev_banner_winter', fb: 'ev_banner_xmas', lead: '신나는 겨울방학이 시작됐어요. 눈썰매를 타고 눈사람을 만들어요.', ms: [['shakes', 40], ['pz', 2], ['dmDone', 4]], m: 20, g: 1 },
+    { id: 'winter2', name: '겨울방학 숙제', start: '2027-01-11', end: '2027-01-17', banner: 'ev_banner_winter', fb: 'ev_banner_xmas', lead: '겨울방학 둘째 주예요. 놀면서 방학 숙제도 조금씩 해요.', ms: [['trains', 3], ['pz', 2], ['ups', 30]], m: 20, g: 1 },
     { id: 'seollal', name: '설날 잔치', start: '2027-02-01', end: '2027-02-07', banner: 'ev_banner_seollal', lead: '새해 복 많이 받아요! 설날 잔치 선물을 준비했어요.', ms: [['picks', 60], ['shakes', 40], ['ups', 30]], m: 20, g: 1 },
+    { id: 'grad', name: '졸업식과 종업식', start: '2027-02-15', end: '2027-02-21', banner: 'ev_banner_grad', fb: 'ev_banner_exam', lead: '한 해를 마치는 날이에요. 졸업하는 선배들을 꽃다발로 축하해요.', ms: [['ups', 30], ['trains', 3], ['dmDone', 4]], m: 20, g: 1 },
+    { id: 'spring', name: '새 학기 입학식', start: '2027-03-01', end: '2027-03-07', banner: 'ev_banner_spring', fb: 'ev_banner_friends', lead: '새 친구들이 숲속 학교에 들어와요. 새 학기를 반갑게 맞아요.', ms: [['ups', 30], ['picks', 60], ['claims', 3]], m: 20, g: 1 },
+    { id: 'trip_spring', name: '봄 체험학습', start: '2027-04-12', end: '2027-04-18', banner: 'ev_banner_trip_spring', fb: 'ev_banner_friends', lead: '꽃이 핀 들판으로 체험학습을 떠나요. 봄 소풍 선물을 받아요.', ms: [['trips', 1], ['picks', 60], ['dmDone', 4]], m: 20, g: 1 },
+    { id: 'science', name: '과학의 날', start: '2027-04-19', end: '2027-04-25', banner: 'ev_banner_science', fb: 'ev_banner_exam', lead: '돋보기와 물로켓으로 숲속 과학을 탐구해요.', ms: [['pz', 3], ['trains', 3], ['ups', 30]], m: 20, g: 1 },
     { id: 'children', name: '어린이날 큰잔치', start: '2027-05-03', end: '2027-05-09', banner: 'ev_banner_children', lead: '어린이날을 맞아 큰잔치를 열어요. 친구들과 신나게 놀아요.', ms: [['picks', 60], ['sports', 2], ['dmDone', 4]], m: 20, g: 1 },
-    { id: 'chuseok', name: '추석 달맞이', start: '2027-09-13', end: '2027-09-19', banner: 'ev_banner_chuseok', lead: '둥근 달을 보며 소원을 빌어요. 달맞이 선물이 기다려요.', ms: [['shakes', 40], ['ups', 30], ['trips', 1]], m: 20, g: 1 }
+    { id: 'buddha', name: '연등 축제', start: '2027-05-10', end: '2027-05-16', banner: 'ev_banner_buddha', fb: 'ev_banner_children', lead: '부처님 오신 날을 맞아 숲길에 알록달록한 연등이 걸렸어요.', ms: [['shakes', 40], ['dmDone', 4], ['claims', 3]], m: 20, g: 1 },
+    { id: 'final', name: '기말고사', start: '2027-06-21', end: '2027-06-27', banner: 'ev_banner_final', fb: 'ev_banner_exam', lead: '1학기 기말고사 주간이에요. 열심히 공부한 만큼 선물을 받아요.', ms: [['trains', 3], ['pz', 3], ['dmDone', 4]], m: 20, g: 1 },
+    { id: 'vacation', name: '여름방학식', start: '2027-07-19', end: '2027-07-25', banner: 'ev_banner_vacation', fb: 'ev_banner_children', lead: '1학기를 마치고 여름방학을 맞아요. 시냇가에서 물놀이해요.', ms: [['sports', 2], ['picks', 60], ['dmDone', 4]], m: 20, g: 1 },
+    { id: 'liberation', name: '광복절', start: '2027-08-09', end: '2027-08-15', banner: 'ev_banner_liberation', fb: 'ev_banner_chuseok', lead: '나라를 되찾은 날을 기억해요. 태극기를 달고 무궁화를 심어요.', ms: [['shakes', 40], ['ups', 30], ['dmDone', 4]], m: 20, g: 1 },
+    { id: 'fall', name: '2학기 개학', start: '2027-08-30', end: '2027-09-05', banner: 'ev_banner_fall', fb: 'ev_banner_friends', lead: '방학이 끝나고 다시 학교에 모였어요. 2학기도 힘차게 시작해요.', ms: [['ups', 30], ['trains', 3], ['claims', 3]], m: 20, g: 1 },
+    { id: 'chuseok', name: '추석 달맞이', start: '2027-09-13', end: '2027-09-19', banner: 'ev_banner_chuseok', lead: '둥근 달을 보며 소원을 빌어요. 달맞이 선물이 기다려요.', ms: [['shakes', 40], ['ups', 30], ['trips', 1]], m: 20, g: 1 },
+    { id: 'hangul', name: '한글날', start: '2027-10-04', end: '2027-10-10', banner: 'ev_banner_hangul', fb: 'ev_banner_exam', lead: '세종대왕님이 만든 한글을 기념해요. 붓으로 예쁜 글씨를 써 봐요.', ms: [['pz', 3], ['dmDone', 4], ['trains', 3]], m: 20, g: 1 },
+    { id: 'trip_fall', name: '가을 체험학습', start: '2027-10-18', end: '2027-10-24', banner: 'ev_banner_trip_fall', fb: 'ev_banner_harvest', lead: '단풍 든 과수원으로 체험학습을 떠나요. 사과를 따요.', ms: [['trips', 1], ['shakes', 40], ['picks', 60]], m: 20, g: 1 },
+    { id: 'exam', name: '수능 응원', start: '2027-11-15', end: '2027-11-21', banner: 'ev_banner_exam', lead: '숲속 선배들이 큰 시험을 봐요. 도장을 찍고 미션을 채워 응원 선물을 받아요. 모두 힘내요!', ms: [['trains', 3], ['ups', 30], ['dmDone', 4]], m: 20, g: 1 },
+    { id: 'xmas', name: '크리스마스 파티', start: '2027-12-20', end: '2027-12-26', banner: 'ev_banner_xmas', lead: '숲속 학교에 눈이 내려요. 파티 선물을 받아 가요.', ms: [['picks', 60], ['ups', 30], ['dmDone', 4]], m: 20, g: 1 },
+    { id: 'newyear', name: '새해 해돋이', start: '2027-12-27', end: '2028-01-02', banner: 'ev_banner_newyear', fb: 'ev_banner_seollal', lead: '언덕에 올라 새해 첫 해를 봐요. 올해도 숲속 학교를 함께 키워요.', ms: [['picks', 60], ['claims', 3], ['dmDone', 4]], m: 20, g: 1 }
   ];
   // 달마다 바뀌는 미션과 보상 표: 반복 이벤트마다 미션 3개 [종류, 목표], m은 미션 하나의 수업료 분치(분치 보정 적용), g는 황금 도토리
   const EV_MONTHS = {
