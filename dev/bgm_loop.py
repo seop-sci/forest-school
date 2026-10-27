@@ -10,6 +10,8 @@
 #  4) -18 LUFS로 소리 크기를 맞추고 AAC 80kbps m4a로 줄여요
 import subprocess, sys, pathlib, numpy as np, librosa, soundfile as sf
 
+MIN_LOOP = 60   # 되풀이 구간의 가장 짧은 길이(초). 짧은 곡은 --min으로 줄여요(1.8.0 크리스마스, 여름 곡은 1분 남짓)
+
 def find_loop(path):
     y, sr = librosa.load(path, sr=22050, mono=True); dur = len(y) / sr
     _, beats = librosa.beat.beat_track(y=y, sr=sr, units='frames')
@@ -20,7 +22,7 @@ def find_loop(path):
     for i in range(W, N // 2):
         for j in range(i + 8, N - W):
             if bt[j] > dur - 5: break
-            if (j - i) % 16 or bt[j] - bt[i] < 60: continue
+            if (j - i) % 16 or bt[j] - bt[i] < MIN_LOOP: continue
             s = float(np.mean(np.sum(Fb[:, i - W:i + W] * Fb[:, j - W:j + W], axis=0)))
             score = s + 0.04 * (bt[j] - bt[i]) / dur
             if best is None or score > best[0]: best = (score, s, bt[i], bt[j])
@@ -48,7 +50,8 @@ if __name__ == '__main__':
     if '--out' not in args: sys.exit('--out <폴더>를 적어 주세요')
     out = pathlib.Path(args[args.index('--out') + 1]); out.mkdir(parents=True, exist_ok=True)
     xf = float(args[args.index('--xfade') + 1]) if '--xfade' in args else 1
-    for kv in args[:args.index('--out')]:
+    if '--min' in args: MIN_LOOP = float(args[args.index('--min') + 1])
+    for kv in [a for a in args[:args.index('--out')] if '=' in a]:
         k, p = kv.split('=', 1); ab = None
         if '@' in p: p, r = p.rsplit('@', 1); ab = tuple(float(x) for x in r.split('-'))
         bake(k, pathlib.Path(p), out, ab, xf)

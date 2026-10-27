@@ -17,5 +17,7 @@ console.log(`게임 압축 ${(mz.before / 1024).toFixed(0)} KB → ${(mz.after /
 fs.rmSync('dist', { recursive: true, force: true });
 fs.mkdirSync('dist');
 fs.writeFileSync('dist/index.html', html);
+// 1.8.0 배경음악 파일(audio 폴더)도 함께 담아요
+fs.cpSync('../audio', 'dist/audio', { recursive: true });
 await build({ entryPoints: ['src/bridge.js'], bundle: true, format: 'iife', target: 'es2019', minify: true, outfile: 'dist/bridge.js', logLevel: 'warning' });
 console.log('dist 준비 완료');

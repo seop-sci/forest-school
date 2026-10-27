@@ -123,4 +123,11 @@ if not cfg.exists():
 for name in ('database.rules.json', 'README.md'):
     (OUT / name).write_text((HERE / ('gh_' + name)).read_text(encoding='utf-8'), encoding='utf-8')
 (OUT / '.nojekyll').write_text('', encoding='utf-8')
+# 1.8.0 배경음악은 게임 옆 audio 폴더의 파일이에요. 저장소 맨 위에 만들 때는 이미 거기 있고, 다른 곳에 만들 때만 복사해요
+import shutil
+AUD = HERE.parent / 'audio'
+if OUT.resolve() != HERE.parent.resolve():
+    (OUT / 'audio').mkdir(exist_ok=True)
+    for f in sorted(AUD.glob('bgm_*.mp4')):
+        shutil.copyfile(f, OUT / 'audio' / f.name)
 print('built', OUT, len(DOC))
