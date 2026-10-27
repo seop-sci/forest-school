@@ -382,6 +382,19 @@ button{font:inherit;color:inherit}
 .tnote{margin:-4px 0 10px;font-size:12.5px;color:var(--danger)}
 .panel-sub{margin:18px 0 8px 4px;font-family:var(--font-display);font-weight:400;font-size:15px;color:var(--muted)}
 .slist{display:grid;border-radius:16px;overflow:hidden;background:var(--card)}
+.nt-dot{display:inline-block;width:8px;height:8px;margin-left:6px;border-radius:50%;background:#E04848;vertical-align:3px}
+.modal.nt-modal{text-align:left}
+.modal.nt-modal h2{text-align:center}
+.nt-list{max-height:min(56vh, 460px);overflow-y:auto;margin:6px 0 14px;display:grid;gap:10px}
+.nt-item{border-radius:14px;background:var(--card);border:1.5px solid var(--line);padding:0}
+.nt-item summary{list-style:none;display:flex;align-items:center;gap:8px;padding:11px 12px;cursor:pointer}
+.nt-item summary::-webkit-details-marker{display:none}
+.nt-item summary b{flex:1;min-width:0;text-align:left;font-family:var(--font-display);font-weight:400;font-size:16px}
+.nt-item summary small{flex:none;font-size:12px;color:var(--muted);font-variant-numeric:tabular-nums}
+.nt-tag{flex:none;padding:1px 7px;border-radius:999px;background:var(--chip-bg);color:var(--chip-ink);font-size:11.5px;font-weight:700}
+.nt-body{padding:0 14px 12px;font-size:14px;line-height:1.55;color:var(--ink)}
+.nt-body ol{margin:0;padding-left:20px}
+.nt-body p{margin:0 0 6px}
 .srow{display:flex;align-items:center;gap:12px;width:100%;min-height:58px;padding:12px 14px;border:0;border-bottom:1px solid var(--line);background:none;text-align:left}
 label.srow,button.srow{cursor:pointer}
 #fireflies{pointer-events:none}
@@ -2417,6 +2430,7 @@ body{background:radial-gradient(120% 60% at 50% 0%, color-mix(in srgb, var(--pap
       <h3 class="panel-sub">학교 기록</h3>
       <div class="slist">
         <button class="srow" type="button" id="optAcct" hidden><span class="txt"><b id="acctTitle">구글 계정 연결</b><small id="acctSub">연결해 두면 휴대폰을 바꿔도 같은 학교를 이어 해요</small></span><svg viewBox="0 0 24 24" width="20" height="20" aria-hidden="true"><path d="M9 6l6 6-6 6" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"/></svg></button>
+        <button class="srow" type="button" id="optNotice"><span class="txt"><b>공지사항<i class="nt-dot" id="ntDot" hidden></i></b><small id="ntSub">업데이트 소식과 알림을 봐요</small></span><svg viewBox="0 0 24 24" width="20" height="20" aria-hidden="true"><path d="M9 6l6 6-6 6" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"/></svg></button>
         <button class="srow" type="button" id="optTut"><span class="txt"><b>튜토리얼</b><small id="tutSub">학교를 꾸려 가는 방법을 다시 봐요</small></span><svg viewBox="0 0 24 24" width="20" height="20" aria-hidden="true"><path d="M9 6l6 6-6 6" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"/></svg></button>
         <div class="srow" id="resetRow"><span class="txt"><b>처음부터 다시</b><small>수료증과 전학 온 친구들까지 모두 지워요</small></span><button class="btn-danger" type="button" id="optReset">초기화</button></div>
         <div class="srow" id="delRow" hidden><span class="txt"><b>계정과 서버 기록 지우기</b><small>서버에 저장된 학교, 랭킹, 구글 계정 연결을 모두 지워요</small></span><button class="btn-danger" type="button" id="optDel">지우기</button></div>
@@ -2816,6 +2830,15 @@ body{background:radial-gradient(120% 60% at 50% 0%, color-mix(in srgb, var(--pap
     <div class="move-from"><b id="acctFrom"></b><span id="acctInfo"></span></div>
     <p>어느 학교로 이어 할까요? 고르지 않은 학교는 지워져요.</p>
     <div class="btn-row"><button class="btn-sub" type="button" id="acctKeep">이 폰 학교</button><button class="cta" type="button" id="acctLoad">계정 학교</button></div>
+  </section>
+</div>
+
+<div class="overlay center" id="mNotice" hidden>
+  <div class="backdrop" data-close-notice></div>
+  <section class="modal wide nt-modal" role="dialog" aria-modal="true" aria-labelledby="ntTitle">
+    <h2 id="ntTitle">공지사항</h2>
+    <div class="nt-list" id="ntList"></div>
+    <div class="btn-row"><button class="btn-sub" type="button" id="ntHide" hidden>일주일간 열지 않기</button><button class="cta" type="button" id="ntClose">닫기</button></div>
   </section>
 </div>
 
@@ -3847,7 +3870,7 @@ body{background:radial-gradient(120% 60% at 50% 0%, color-mix(in srgb, var(--pap
     sports: { next: 0 },
     fest: { next: {}, n: {} },
     dm: { day: '', list: [], bonus: false },
-    tut: { st: '', step: 0, paid: false, nop: false }, tips: { rep: false },
+    tut: { st: '', step: 0, paid: false, nop: false }, tips: { rep: false }, nt: { seen: '', ver: '', hide: 0 },   // 1.8.1 공지: 마지막으로 본 공지, 마지막으로 띄운 버전, 일주일간 열지 않기 끝
     wk: { week: -1, pts: 0, got: [false, false, false, false, false], list: [] },
     lg: { week: -1, pts: 0, pos: 0, paid: false, last: null },
     gold: 5, gd: { day: '', n: 0, shop: 0 }, cos: { own: [], hat: '', neck: '', th: { bg: '', classroom: '', cafeteria: '', library: '', science: '', playground: '' }, sp: { classroom: '', cafeteria: '', library: '', science: '', playground: '' } }, autoUntil: 0,
@@ -3966,6 +3989,7 @@ body{background:radial-gradient(120% 60% at 50% 0%, color-mix(in srgb, var(--pap
       s.tut.paid = !!d.tut.paid; s.tut.nop = !!d.tut.nop;
     }
     if (d.tips && typeof d.tips === 'object') s.tips.rep = !!d.tips.rep;
+    if (d.nt && typeof d.nt === 'object') s.nt = { seen: typeof d.nt.seen === 'string' ? d.nt.seen.slice(0, 40) : '', ver: typeof d.nt.ver === 'string' ? d.nt.ver.slice(0, 12) : '', hide: Math.min(typeof d.nt.hide === 'number' && isFinite(d.nt.hide) && d.nt.hide > 0 ? d.nt.hide : 0, Date.now() + 8 * 86400000) };   // 1.8.1 공지
     if (d.wk && typeof d.wk === 'object') {
       s.wk.week = Math.floor(num(d.wk.week, -1, -1)); s.wk.pts = Math.floor(num(d.wk.pts, 0, 0));
       s.wk.got = MP_BOX.map((_, i) => !!(Array.isArray(d.wk.got) && d.wk.got[i]));
@@ -6767,6 +6791,45 @@ body{background:radial-gradient(120% 60% at 50% 0%, color-mix(in srgb, var(--pap
        forest/stats/<내 id>  테스트 현황 (어디까지 했는지, 얼마나 했는지)
      <내 id>는 Firebase 익명 로그인이 기기(브라우저)마다 만들어 줘요. */
   const VERSION = '1.8.0';
+  /* 1.8.1 공지사항 (2026-10-27 지섭): 설정 > 공지사항. 맨 위가 가장 새 공지예요.
+     패치노트는 자동으로 넣지 않아요. 지섭이 검수한 글만 여기에 적어요(CHANGELOG.md는 자세한 기록용이라 따로 있어요).
+     접속하면 새 공지 창을 띄워요(올라온 뒤 14일 동안, '일주일간 열지 않기'를 누르면 7일 쉬어요). 업데이트한 뒤 첫 접속에는 쉬는 중이어도 한 번 띄워요 */
+  const NOTICES = [
+    { id: '2026-10-27-v180', date: '2026-10-27', tag: '업데이트', title: '1.8.0 업데이트',
+      lines: ["새 미니게임 '숲속 합치기'", '숲속 퍼즐 부스터 추가', '건물 업그레이드 애니메이션 추가', '메인 퀘스트 추가', '테마 배경음악 추가', '메인화면 지도 개선', '학교 마크, 간판 추가'] }
+  ];
+  const NT_RECENT = 14 * 86400000, NT_HIDE = 7 * 86400000;
+  const ntTime = n => Date.parse(n.date + 'T00:00:00+09:00') || 0;
+  const ntUnread = () => !!NOTICES[0] && S.nt.seen !== NOTICES[0].id;
+  function renderNotice(auto) {
+    $('#ntList').innerHTML = NOTICES.map((n, i) => `<details class="nt-item"${i === 0 ? ' open' : ''}><summary><span class="nt-tag">${esc(n.tag)}</span><b>${esc(n.title)}</b><small>${n.date.replace(/-/g, '.')}</small></summary>` +
+      `<div class="nt-body">${n.tag === '업데이트' ? `<ol>${n.lines.map(l => `<li>${esc(l)}</li>`).join('')}</ol>` : n.lines.map(l => `<p>${esc(l)}</p>`).join('')}</div></details>`).join('') || '<p class="fine">아직 공지가 없어요</p>';
+    $('#ntHide').hidden = !auto;
+  }
+  function openNotice(auto) {
+    if (!NOTICES.length) { toast('아직 공지가 없어요'); return false; }
+    renderNotice(auto);
+    S.nt.seen = NOTICES[0].id; save(); renderNoticeDot();
+    openModal($('#mNotice'));
+    return true;
+  }
+  function renderNoticeDot() { const d = $('#ntDot'); if (d) d.hidden = !ntUnread(); }
+  // 접속할 때: 업데이트한 뒤 첫 접속이면 한 번, 아니면 최근 공지가 있고 쉬는 중이 아닐 때. 새 공지가 올라오면 쉬기도 풀려요
+  function noticeWant() {
+    const N = NOTICES[0]; if (!S || !N) return false;
+    if (S.nt.ver !== VERSION) return true;
+    if (S.nt.seen !== N.id) return true;
+    return Date.now() - ntTime(N) < NT_RECENT && Date.now() >= S.nt.hide;
+  }
+  function noticeAuto() {
+    if (!S || !NOTICES.length) return;
+    if (window.__FOREST_TEST && !window.__NOTICE_AUTO) return;   // 자동 시험에서는 저절로 띄우지 않아요
+    // 처음 시작한 학교는 튜토리얼이 먼저예요. 이번 공지는 본 것으로 쳐요
+    if (S.tut.st !== 'done' && S.tut.st !== 'skip' && S.q.m < 3) { S.nt.ver = VERSION; S.nt.seen = NOTICES[0].id; save(); renderNoticeDot(); return; }
+    if (!noticeWant()) return;
+    S.nt.ver = VERSION;
+    queueModal(() => openNotice(true));
+  }
   const CLOUD_PUSH = 20000;   // 바뀐 게 있으면 20초마다 올려요
   const STATS_PUSH = 60000;   // 테스트 현황은 1분마다
   const CLOUD_WAIT = 15000;   // 서버가 이만큼 답이 없으면 이 기기에만 저장해요
@@ -10802,7 +10865,7 @@ body{background:radial-gradient(120% 60% at 50% 0%, color-mix(in srgb, var(--pap
     if (t !== 'school') $('#scroller').scrollTop = 0;
     if (t === 'shop') { rt.shopPick = ''; renderShop(); $('#panelShop').scrollTop = 0; }
     if (t === 'rank') { rt.rankEdit = false; initRank(); renderRankPanel(); submitRank(); }
-    if (t === 'settings') renderCloudInfo();
+    if (t === 'settings') { renderCloudInfo(); renderNoticeDot(); }
     if (t === 'mini') renderMini();
     if (prev === 'quests' && t !== 'quests') markQuestsSeen();
     if (t === 'teachers') renderTeachers();
@@ -11266,6 +11329,10 @@ body{background:radial-gradient(120% 60% at 50% 0%, color-mix(in srgb, var(--pap
     $('#resetYes').addEventListener('click', resetGame);
     $('#tutAv').innerHTML = hedgehogAvatar();
     $('#optTut').addEventListener('click', () => { if (!rt.modalOpen) tutStart(S.tut.st === 'later' ? S.tut.step : 0); });
+    $('#optNotice').addEventListener('click', () => { sfx('tap'); if (!rt.modalOpen) openNotice(false); });   // 1.8.1 공지
+    $('#ntClose').addEventListener('click', () => closeModal($('#mNotice')));
+    $('[data-close-notice]').addEventListener('click', () => closeModal($('#mNotice')));
+    $('#ntHide').addEventListener('click', () => { S.nt.hide = Date.now() + NT_HIDE; save(); closeModal($('#mNotice')); toast('일주일 동안 공지 창을 열지 않아요. 설정 > 공지사항에서 언제든 볼 수 있어요'); });
     $('#tutNext').addEventListener('click', tutNext);
     $('#tutLater').addEventListener('click', () => tutEnd('later'));
     $('#tutSkip').addEventListener('click', () => { if (!rt.tut) return; if (rt.tut.confirm) tutEnd('skip'); else { rt.tut.confirm = true; tutShow(); } });
@@ -11324,6 +11391,7 @@ body{background:radial-gradient(120% 60% at 50% 0%, color-mix(in srgb, var(--pap
       else if (rt.modalOpen === $('#mAtt')) closeModal($('#mAtt'));
       else if (rt.modalOpen === $('#mDeal')) closeModal($('#mDeal'));
       else if (rt.modalOpen === $('#mStats')) closeModal($('#mStats'));
+      else if (rt.modalOpen === $('#mNotice')) closeModal($('#mNotice'));   // 1.8.1 공지
       else if (rt.modalOpen === $('#mTrip')) closeModal($('#mTrip'));
       else if (rt.modalOpen === $('#mSports')) closeModal($('#mSports'));
       else if (rt.modalOpen === $('#mFest')) closeModal($('#mFest'));
@@ -12613,6 +12681,7 @@ body{background:radial-gradient(120% 60% at 50% 0%, color-mix(in srgb, var(--pap
     requestAnimationFrame(loop);
     bootDone();
     setTimeout(tutAuto, bootLeft() + 900);
+    setTimeout(noticeAuto, bootLeft() + 1100);   // 1.8.1 공지
   }
   // 로딩 화면: 일찍 끝나도 적어도 3초는 보여 줘요. 막대는 로딩하는 것처럼 멈칫거리며 차오르고, 끝까지 채운 뒤 사르르 사라져요
   const BOOT_MIN = window.__FOREST_TEST && !window.__FOREST_BOOT ? 1200 : 3000;   // 자동 시험은 예전처럼 1.2초만 기다려요
@@ -12642,7 +12711,7 @@ body{background:radial-gradient(120% 60% at 50% 0%, color-mix(in srgb, var(--pap
   // 시험용 손잡이: 자동 시험(window.__FOREST_TEST)에서만 게임 속 함수를 꺼내 써요
   if (window.__FOREST_TEST) window.__forest = { get S() { return S; }, goTo, mainReady, trialHunt, updateTrial, TRIAL, zoomAt, fitMap, ZOOM_MAX, DECO, DECO_SLOTS, DECO_SIGN, decoCost, decoSoldOut, pickDeco, buyDeco, decoPut, decoEditStart, decoEditEnd, openDecoPick, renderDeco, renderDecoShop, setSchoolNm, setMark, schoolTitle, markHTML, decoPlacedAll, achSync, esExLeft, esExCost, essItem, pickEss, buyEss, ESHOP, get Cloud() { return Cloud; }, get actx() { return actx; }, Music, musicWant, musicSync, ensureAudio, bgmLoad, pzUI, rt, makeDeal, furStage, DEAL, navInfo, navRoute, spawnDrop, repTipCheck, linkGoogle, retryCloud, sanitize, acctPending, renderMap, renderHUD, renderAffordance, syncKids, layoutMap, geo, startTrial, hitTrial, endTrial, startVisit, endVisit, showReward, recommend, needCost, prepTopUp, qReward, prepPhase, rankScore, pwOf, previewDip, dipMult, costScale, buyFacility, buyFur, buyFurAll, furCost, furReady, furDone, FUR, startTalk, endTalk, teacherAct, facCost, teaCost, facKeys, rate, rep, capacity, canGraduate, canPromote,
     fmt, fmt2, graduate, promote, buyPerk, perkCost, perkMaxed, buyFundPerk, fpCost, claimMain, mainReady, curMain, qNo, earn, CFG, TEA, teaMaxed, PERKS, FPERKS, MAIN, finalYear, startTrip, claimTrip, TRIPS, yearLocked, startSports, endSports, rtSports: () => rt.sports, startFest, rtFest: () => rt.fest, facCap, addLeague, weekIdx, addMP, tutStart, endFest, claimSports, claimBox, musicWant, askBox, festWait, setTab, openSheet, closeSheet,
-    dexMeet, dexSync, dexPending, dexGift, renderDex, evCurrent, evNext, evSync, claimStamp, claimEvMission, claimEvBox, renderEvent, evMissions, evOk, evSkipped, EV_MONTHS, EV_MEASURE, tierMinutes, minAcorns, IMG, sanitize171, ACH, achSync, claimAch, setTitle, renderAch, setDexSeg, achClaimable, XT, xtAct, xtCost, xtLv, feastMins, libMult, propInstances, walkBuild, festItemSvg, guestArt, adErrText, googleErrText, openSheet, closeSheet, startFest, startSports, sanitize170, EV_STAMPS, EV_SPECIAL, EV_MONTHLY, EV_BOX, DEX_KEYS, DEX_REWARD, DEX_GUEST_KEYS, seasonKey, roofArtKey, oakKey, setSeasonArt, VP, vpLv, vpCost, vpMult, vpAct, renderVpCard, sportsPrize, festPrize, renderTeachers, buildTeacherCards, bldImg, roofKey, bldStage, mapKey, setMapArt, applyThemes, buyFacility, bldFx, setBldFx, mapHi, startTrial, endTrial: () => rt.trial && (rt.trial.left = 0), spawnDeal, startVisit, IMG170, MG, mgCells, mgSetCells, mgTick, mgAddEnergy, mgAddUp, mgTapGen, mgDrop, mgSell, mgUpgrade, mgClaimOrder, mgSwapOrder, mgOrderOk, mgFillOrders, mgOpen, mgClose, mgRenderAll, mgSpawnLevel, mgNearestEmpty, mgEmptyBoard, mgOrderReward, mgUI, sanitize180, mgWatchAd, mgNewOrder, mgHintPick, mgShowHint, mgClearHint, mgTouch, mgOrderGuide, mgDexN, mgDexCan, mgDexClaim, mgOpenDex, MG_DEX, MG_DEX_MS, mgDexEss, mgDexEssCan, mgDexEssN, mgDexMsCan, mgDexMsClaim, MGB, mgBuyBoost, mgBstLeft, mgOpenBoost, nice, claimMission, claimBonus, claimWeekMission, MP_BOX,   // 1.7.0 도감, 이벤트
+    dexMeet, dexSync, dexPending, dexGift, renderDex, evCurrent, evNext, evSync, claimStamp, claimEvMission, claimEvBox, renderEvent, evMissions, evOk, evSkipped, EV_MONTHS, EV_MEASURE, tierMinutes, minAcorns, IMG, sanitize171, ACH, achSync, claimAch, setTitle, renderAch, setDexSeg, achClaimable, XT, xtAct, xtCost, xtLv, feastMins, libMult, propInstances, walkBuild, festItemSvg, guestArt, adErrText, googleErrText, openSheet, closeSheet, startFest, startSports, sanitize170, EV_STAMPS, EV_SPECIAL, EV_MONTHLY, EV_BOX, DEX_KEYS, DEX_REWARD, DEX_GUEST_KEYS, seasonKey, roofArtKey, oakKey, setSeasonArt, VP, vpLv, vpCost, vpMult, vpAct, renderVpCard, sportsPrize, festPrize, renderTeachers, buildTeacherCards, bldImg, roofKey, bldStage, mapKey, setMapArt, applyThemes, buyFacility, bldFx, setBldFx, mapHi, NOTICES, openNotice, noticeAuto, noticeWant, ntUnread, startTrial, endTrial: () => rt.trial && (rt.trial.left = 0), spawnDeal, startVisit, IMG170, MG, mgCells, mgSetCells, mgTick, mgAddEnergy, mgAddUp, mgTapGen, mgDrop, mgSell, mgUpgrade, mgClaimOrder, mgSwapOrder, mgOrderOk, mgFillOrders, mgOpen, mgClose, mgRenderAll, mgSpawnLevel, mgNearestEmpty, mgEmptyBoard, mgOrderReward, mgUI, sanitize180, mgWatchAd, mgNewOrder, mgHintPick, mgShowHint, mgClearHint, mgTouch, mgOrderGuide, mgDexN, mgDexCan, mgDexClaim, mgOpenDex, MG_DEX, MG_DEX_MS, mgDexEss, mgDexEssCan, mgDexEssN, mgDexMsCan, mgDexMsClaim, MGB, mgBuyBoost, mgBstLeft, mgOpenBoost, nice, claimMission, claimBonus, claimWeekMission, MP_BOX,   // 1.7.0 도감, 이벤트
     PZ, PZ_SHAPES, pzFits, pzAnyFit, pzStuck, pzFullLines, pzPlace, pzFreshGame, pzStart, PZB, pzbCost, pzApplyBoost, pzBoostOpen, pzBoostGo, festGoldLeft, festGoldTake, claimSports, renderStreet, pzFinish, pzLeft, pzCanAd, pzEssOf, pzMinOf, pzHelpSquirrel, pzHelpOwl, pzHelpBear, fillSubs, mapRoofTop, showAd, claimOfflineDouble, startBoost, tripAd, festFocus, festRange, visMap, renderMissions, pzHasHelp, pzRot, pzNewPiece, pzOpen, pzClose, pzGameOver, pzRenderAll, renderMini, addEss, ESHOP, SP_FUR, applyCos, essItem, pickEss, buyEss, renderEssShop, esAcornLeft, esGoldLeft, esAcornAmt, hatSVG, spFurImg, gameNow, gameToday, gameWeek, kstDay, setServerTime, SVR, dmDay, weekIdx, lgWeek, wkWeek, lgKey, pzDay, goldDay, boostLeft, dealLeft, canStamp };
   if (window.claude && window.claude.hot && window.claude.hot.snapshot) {
     try { window.claude.hot.snapshot(() => { if (S) syncMid(); return { save: S }; }); } catch (e) { /* 무시 */ }
