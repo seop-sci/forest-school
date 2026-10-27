@@ -278,6 +278,23 @@ button{font:inherit;color:inherit}
 .bld .built,.bld .site{transform-box:fill-box;transform-origin:50% 100%;transition:transform .12s}
 .bld.press .built,.bld.press .site{transform:scale(.96)}
 .bld:not(.is-built) .built{display:none}
+/* 1.8.0 짓기와 업그레이드 효과: 처음 지으면 흙먼지 속에서 건물이 솟아오르고, 업그레이드하면 통통 튀며 반짝여요 */
+.bld .built.fx-rise{animation:bldRise 1.7s cubic-bezier(.25,.9,.35,1) both}
+@keyframes bldRise{0%,40%{transform:scale(.9,.02);opacity:0}42%{opacity:1}70%{transform:scale(1.05,1.1)}84%{transform:scale(.98,.95)}100%{transform:none;opacity:1}}
+.bld.fx-site .site{display:inline;animation:bldSite 1.7s linear both}
+@keyframes bldSite{0%{opacity:1;transform:none}8%,24%{transform:translateX(-2px) rotate(-.6deg)}16%,32%{transform:translateX(2px) rotate(.6deg)}40%{opacity:1;transform:none}60%,100%{opacity:0}}
+.bld .built.fx-up{animation:bldUp .8s ease-out}
+@keyframes bldUp{0%{transform:none}25%{transform:scale(1.07,.9)}55%{transform:scale(.97,1.08)}80%{transform:scale(1.01,.98)}100%{transform:none}}
+.bld .built.fx-shake{animation:bldShake .4s linear 2}
+@keyframes bldShake{0%,100%{transform:none}25%{transform:translateX(-1.5px)}75%{transform:translateX(1.5px)}}
+.bfx{pointer-events:none}
+.bfx .dust{fill:#F3EAD6;stroke:#D8C7A2;stroke-width:1.5;opacity:0;transform-box:fill-box;transform-origin:center;animation:bfxDust 1.3s ease-out var(--d,0s) both}
+@keyframes bfxDust{0%{opacity:0;transform:translate(0,0) scale(.4)}20%{opacity:1}60%{opacity:.9}100%{opacity:0;transform:translate(var(--dx),var(--dy)) scale(1.5)}}
+.bfx .spark{fill:#FFD54A;stroke:#FFF6C8;stroke-width:1.5;opacity:0;transform-box:fill-box;transform-origin:center;animation:bfxSpark .8s ease-out var(--d,0s) both}
+@keyframes bfxSpark{0%{opacity:0;transform:translate(0,0) scale(.2) rotate(0)}30%{opacity:1;transform:translate(calc(var(--dx) * .5),calc(var(--dy) * .5)) scale(1.1) rotate(40deg)}100%{opacity:0;transform:translate(var(--dx),var(--dy)) scale(.6) rotate(90deg)}}
+.bfx .lv{font-family:var(--font-display);font-size:30px;fill:#FFF8E6;stroke:#3A5A2A;stroke-width:4;paint-order:stroke;text-anchor:middle;opacity:0;animation:bfxLv 1.3s ease-out var(--d,0s) both}
+@keyframes bfxLv{0%{opacity:0;transform:translateY(8px)}20%{opacity:1;transform:none}75%{opacity:1}100%{opacity:0;transform:translateY(-16px)}}
+@media (prefers-reduced-motion:reduce){.bld .built.fx-rise,.bld .built.fx-up,.bld .built.fx-shake{animation:none}.bfx{display:none}}
 .bld.is-built .site{display:none}
 .plaque .can{display:none}
 .plaque.can-buy .can{display:inline}
@@ -1185,7 +1202,7 @@ body{background:radial-gradient(120% 60% at 50% 0%, color-mix(in srgb, var(--pap
 .mini-go{width:100%;text-align:left;cursor:pointer;color:var(--ink);font:inherit;transition:transform .08s, box-shadow .08s}
 .mini-go:active{transform:translateY(2px);box-shadow:0 1px 0 var(--line-shadow)}
 .mini-play{flex:none;padding:6px 14px;border-radius:999px;background:var(--accent);color:var(--accent-ink);font-family:var(--font-display);font-size:14px;line-height:1.2;white-space:nowrap;box-shadow:0 2px 0 var(--accent-shadow)}   /* 1.8.0: 퍼즐과 합치기 단추 모양 하나로 */
-.pz-thumb{flex:none;width:52px;height:52px;border-radius:12px;background:var(--pz-thumb) center/cover no-repeat;box-shadow:inset 0 0 0 2px rgba(0,0,0,.08)}
+.pz-thumb{flex:none;width:52px;height:52px;border-radius:12px;background-color:#DCEAC4;background-repeat:no-repeat;background-size:44% 44%;background-position:10% 10%,90% 10%,10% 90%,90% 90%;box-shadow:inset 0 0 0 2px rgba(0,0,0,.08)}
 #pzOpen .mc-txt b{display:flex;flex-wrap:wrap;align-items:center;gap:2px 6px}
 .mini-card .mc-left{display:inline-block;padding:1px 7px;border-radius:999px;background:var(--chip-bg);color:var(--chip-ink);font-family:var(--font-body);font-size:12px;font-weight:700;white-space:nowrap;font-variant-numeric:tabular-nums}
 .mini-card .mc-left.none{opacity:.6}
@@ -6090,6 +6107,8 @@ body{background:radial-gradient(120% 60% at 50% 0%, color-mix(in srgb, var(--pap
     w.classList.remove('open');
     rt.sheetKey = null;
     setTimeout(() => { if (!rt.sheetKey) w.hidden = true; }, 230);
+    const fw = rt.bldFxWait; rt.bldFxWait = null;   // 1.8.0 창 안에서 업그레이드했으면 닫을 때 지도에서 효과를 보여 줘요
+    if (fw && S.f[fw.k] === fw.L) setTimeout(() => bldFx(fw.k, fw.kind), 120);
   }
   function renderSheet() {
     const k = rt.sheetKey; if (!k) return;
@@ -6123,6 +6142,35 @@ body{background:radial-gradient(120% 60% at 50% 0%, color-mix(in srgb, var(--pap
     $('#sheetNeed').textContent = maxed ? `더 올리려면 학교가 다음 학년으로 올라가야 해요. 종업식을 열면 Lv.${cap + CAP_STEP}까지 키울 수 있어요` : !fr ? `가구 네 개를 모두 Lv.${L}로 올리면 건물을 키울 수 있어요` : ok ? ' ' : `도토리 ${fmt(Math.ceil(c - S.budget))}개가 더 필요해요`;
     $('#sheetNeed').classList.toggle('soft', maxed || !fr);
   }
+  // 1.8.0 짓기와 업그레이드 효과. kind 'build'(처음 지음) 또는 'up'. 건물 창이 열려 있으면 닫을 때 보여 줘요
+  function bldFx(k, kind) {
+    if (rt.reduced) return;
+    if (rt.sheetKey === k && kind === 'up') { rt.bldFxWait = { k, kind, L: S.f[k] }; return; }
+    const g = $('#b-' + k), b = g && g.querySelector('.built'); if (!b || !g.classList.contains('is-built')) return;
+    let bb; try { bb = b.getBBox(); } catch (e) { return; }
+    if (!bb.width) return;
+    const SVGNS = 'http://www.w3.org/2000/svg', old = g.querySelector('.bfx'); if (old) old.remove();
+    const fx = document.createElementNS(SVGNS, 'g'); fx.setAttribute('class', 'bfx');
+    const cx = bb.x + bb.width / 2, by = bb.y + bb.height, w = bb.width, build = kind === 'build';
+    let h = '';
+    if (build) for (let i = 0; i < 16; i++) {   // 흙먼지: 공사 자리에서 뭉게뭉게 퍼져요(두 번)
+      const t = ((i % 8) / 7) * 2 - 1, r = w * (0.09 + Math.random() * 0.07), y0 = by - w * (0.05 + Math.random() * 0.25);
+      h += `<circle class="dust" cx="${(cx + t * w * 0.34).toFixed(1)}" cy="${y0.toFixed(1)}" r="${r.toFixed(1)}" style="--dx:${(t * w * 0.3).toFixed(1)}px;--dy:${(-w * (0.05 + Math.random() * 0.15)).toFixed(1)}px;--d:${((i < 8 ? 0 : 0.35) + Math.random() * 0.15).toFixed(2)}s"/>`;
+    }
+    const n = build ? 14 : 10, d0 = build ? 1.05 : 0.1;
+    for (let i = 0; i < n; i++) {   // 반짝이: 지붕 위로 튀어요
+      const a = -Math.PI * (0.05 + 0.9 * (i / (n - 1))), R = w * (0.35 + Math.random() * 0.25), s = w * (0.07 + Math.random() * 0.05);
+      h += `<path class="spark" d="M0 ${-s}L${s * 0.3} ${-s * 0.3}L${s} 0L${s * 0.3} ${s * 0.3}L0 ${s}L${-s * 0.3} ${s * 0.3}L${-s} 0L${-s * 0.3} ${-s * 0.3}Z" transform="translate(${cx.toFixed(1)} ${(bb.y + bb.height * 0.45).toFixed(1)})" style="--dx:${(Math.cos(a) * R).toFixed(1)}px;--dy:${(Math.sin(a) * R).toFixed(1)}px;--d:${(d0 + Math.random() * 0.2).toFixed(2)}s"/>`;
+    }
+    h += `<text class="lv" x="${cx.toFixed(1)}" y="${(bb.y + 10).toFixed(1)}" style="--d:${build ? 1.1 : 0.15}s">${build ? '완공!' : 'Lv.' + S.f[k]}</text>`;
+    fx.innerHTML = h; g.appendChild(fx);
+    b.classList.remove('fx-rise', 'fx-up', 'fx-shake'); void b.getBBox();
+    b.classList.add(build ? 'fx-rise' : 'fx-up');
+    g.classList.toggle('fx-site', build);   // 처음 지을 때는 공사 자리가 흔들리다 사라져요
+    if (build) setTimeout(() => { sfx('done'); buzz(14); }, 1100);
+    clearTimeout(rt['bfxT' + k]);
+    rt['bfxT' + k] = setTimeout(() => { fx.remove(); b.classList.remove('fx-rise', 'fx-up'); g.classList.remove('fx-site'); }, 2800);
+  }
   function buyFacility(k, price) {
     if (!furReady(k)) return false;   // 가구를 다 채워야 건물을 키울 수 있어요
     const c = price || facCost(k);
@@ -6148,6 +6196,7 @@ body{background:radial-gradient(120% 60% at 50% 0%, color-mix(in srgb, var(--pap
     else toast(`${n} Lv.${L}! ${FAC[k].eff(L)}`);
     if (newLook) setTimeout(() => toast(`${n} 모습이 ${tierInfo().name}답게 새로 바뀌었어요!`), 1600);
     afterPurchase();
+    bldFx(k, was === 0 ? 'build' : 'up');   // 1.8.0
     return true;
   }
 
@@ -8962,7 +9011,7 @@ body{background:radial-gradient(120% 60% at 50% 0%, color-mix(in srgb, var(--pap
     pzDay();
     const left = pzLeft();
     renderEss();
-    $('.pz-thumb').style.backgroundImage = pzImg('pz_block_acorn');
+    $('.pz-thumb').style.backgroundImage = ['acorn', 'leaf', 'berry', 'flower'].map(k => pzImg('pz_block_' + k)).join(',');   // 블록 넷을 2×2로(한 장을 꽉 채우면 잘려 보였어요)
     $('#pzCardSub').textContent = S.pz.cur ? `하던 판 이어서 하기 (${fmt(S.pz.cur.score)}점)` : S.pz.best > 0 ? `최고 ${fmt(S.pz.best)}점` : '조각을 끌어다 놓고 줄을 지워요';
     $('#pzCardTag').textContent = S.pz.cur ? '이어하기' : '시작하기';
     const lt = $('#pzLeftTxt'); lt.textContent = `보상 ${left}/${pzQuota()}`; lt.classList.toggle('none', left <= 0);   // 오늘 남은 보상 판 / 오늘 받을 수 있는 판
@@ -12437,7 +12486,7 @@ body{background:radial-gradient(120% 60% at 50% 0%, color-mix(in srgb, var(--pap
   // 시험용 손잡이: 자동 시험(window.__FOREST_TEST)에서만 게임 속 함수를 꺼내 써요
   if (window.__FOREST_TEST) window.__forest = { get S() { return S; }, goTo, mainReady, trialHunt, updateTrial, TRIAL, zoomAt, fitMap, ZOOM_MAX, DECO, DECO_SLOTS, DECO_SIGN, decoCost, decoSoldOut, pickDeco, buyDeco, decoPut, decoEditStart, decoEditEnd, openDecoPick, renderDeco, renderDecoShop, setSchoolNm, setMark, schoolTitle, markHTML, decoPlacedAll, achSync, esExLeft, esExCost, essItem, pickEss, buyEss, ESHOP, get Cloud() { return Cloud; }, get actx() { return actx; }, Music, musicWant, musicSync, ensureAudio, bgmLoad, pzUI, rt, makeDeal, furStage, DEAL, navInfo, navRoute, spawnDrop, repTipCheck, linkGoogle, retryCloud, sanitize, acctPending, renderMap, renderHUD, renderAffordance, syncKids, layoutMap, geo, startTrial, hitTrial, endTrial, startVisit, endVisit, showReward, recommend, needCost, prepTopUp, qReward, prepPhase, rankScore, pwOf, previewDip, dipMult, costScale, buyFacility, buyFur, buyFurAll, furCost, furReady, furDone, FUR, startTalk, endTalk, teacherAct, facCost, teaCost, facKeys, rate, rep, capacity, canGraduate, canPromote,
     fmt, fmt2, graduate, promote, buyPerk, perkCost, perkMaxed, buyFundPerk, fpCost, claimMain, mainReady, curMain, qNo, earn, CFG, TEA, teaMaxed, PERKS, FPERKS, MAIN, finalYear, startTrip, claimTrip, TRIPS, yearLocked, startSports, endSports, rtSports: () => rt.sports, startFest, rtFest: () => rt.fest, facCap, addLeague, weekIdx, addMP, tutStart, endFest, claimSports, claimBox, musicWant, askBox, festWait, setTab, openSheet, closeSheet,
-    dexMeet, dexSync, dexPending, dexGift, renderDex, evCurrent, evNext, evSync, claimStamp, claimEvMission, claimEvBox, renderEvent, evMissions, evOk, evSkipped, EV_MONTHS, EV_MEASURE, tierMinutes, minAcorns, IMG, sanitize171, ACH, achSync, claimAch, setTitle, renderAch, setDexSeg, achClaimable, XT, xtAct, xtCost, xtLv, feastMins, libMult, propInstances, walkBuild, festItemSvg, guestArt, adErrText, googleErrText, openSheet, closeSheet, startFest, startSports, sanitize170, EV_STAMPS, EV_SPECIAL, EV_MONTHLY, EV_BOX, DEX_KEYS, DEX_REWARD, DEX_GUEST_KEYS, seasonKey, roofArtKey, oakKey, setSeasonArt, VP, vpLv, vpCost, vpMult, vpAct, renderVpCard, sportsPrize, festPrize, renderTeachers, buildTeacherCards, bldImg, roofKey, bldStage, mapKey, setMapArt, applyThemes, buyFacility, startTrial, endTrial: () => rt.trial && (rt.trial.left = 0), spawnDeal, startVisit, IMG170, MG, mgCells, mgSetCells, mgTick, mgAddEnergy, mgAddUp, mgTapGen, mgDrop, mgSell, mgUpgrade, mgClaimOrder, mgSwapOrder, mgOrderOk, mgFillOrders, mgOpen, mgClose, mgRenderAll, mgSpawnLevel, mgNearestEmpty, mgEmptyBoard, mgOrderReward, mgUI, sanitize180, mgWatchAd, mgNewOrder, mgHintPick, mgShowHint, mgClearHint, mgTouch, mgOrderGuide, mgDexN, mgDexCan, mgDexClaim, mgOpenDex, MG_DEX, MGB, mgBuyBoost, mgBstLeft, mgOpenBoost, nice, claimMission, claimBonus, claimWeekMission, MP_BOX,   // 1.7.0 도감, 이벤트
+    dexMeet, dexSync, dexPending, dexGift, renderDex, evCurrent, evNext, evSync, claimStamp, claimEvMission, claimEvBox, renderEvent, evMissions, evOk, evSkipped, EV_MONTHS, EV_MEASURE, tierMinutes, minAcorns, IMG, sanitize171, ACH, achSync, claimAch, setTitle, renderAch, setDexSeg, achClaimable, XT, xtAct, xtCost, xtLv, feastMins, libMult, propInstances, walkBuild, festItemSvg, guestArt, adErrText, googleErrText, openSheet, closeSheet, startFest, startSports, sanitize170, EV_STAMPS, EV_SPECIAL, EV_MONTHLY, EV_BOX, DEX_KEYS, DEX_REWARD, DEX_GUEST_KEYS, seasonKey, roofArtKey, oakKey, setSeasonArt, VP, vpLv, vpCost, vpMult, vpAct, renderVpCard, sportsPrize, festPrize, renderTeachers, buildTeacherCards, bldImg, roofKey, bldStage, mapKey, setMapArt, applyThemes, buyFacility, bldFx, startTrial, endTrial: () => rt.trial && (rt.trial.left = 0), spawnDeal, startVisit, IMG170, MG, mgCells, mgSetCells, mgTick, mgAddEnergy, mgAddUp, mgTapGen, mgDrop, mgSell, mgUpgrade, mgClaimOrder, mgSwapOrder, mgOrderOk, mgFillOrders, mgOpen, mgClose, mgRenderAll, mgSpawnLevel, mgNearestEmpty, mgEmptyBoard, mgOrderReward, mgUI, sanitize180, mgWatchAd, mgNewOrder, mgHintPick, mgShowHint, mgClearHint, mgTouch, mgOrderGuide, mgDexN, mgDexCan, mgDexClaim, mgOpenDex, MG_DEX, MGB, mgBuyBoost, mgBstLeft, mgOpenBoost, nice, claimMission, claimBonus, claimWeekMission, MP_BOX,   // 1.7.0 도감, 이벤트
     PZ, PZ_SHAPES, pzFits, pzAnyFit, pzStuck, pzFullLines, pzPlace, pzFreshGame, pzStart, PZB, pzbCost, pzApplyBoost, pzBoostOpen, pzBoostGo, festGoldLeft, festGoldTake, claimSports, renderStreet, pzFinish, pzLeft, pzCanAd, pzEssOf, pzMinOf, pzHelpSquirrel, pzHelpOwl, pzHelpBear, fillSubs, mapRoofTop, showAd, claimOfflineDouble, startBoost, tripAd, festFocus, festRange, visMap, renderMissions, pzHasHelp, pzRot, pzNewPiece, pzOpen, pzClose, pzGameOver, pzRenderAll, renderMini, addEss, ESHOP, SP_FUR, applyCos, essItem, pickEss, buyEss, renderEssShop, esAcornLeft, esGoldLeft, esAcornAmt, hatSVG, spFurImg, gameNow, gameToday, gameWeek, kstDay, setServerTime, SVR, dmDay, weekIdx, lgWeek, wkWeek, lgKey, pzDay, goldDay, boostLeft, dealLeft, canStamp };
   if (window.claude && window.claude.hot && window.claude.hot.snapshot) {
     try { window.claude.hot.snapshot(() => { if (S) syncMid(); return { save: S }; }); } catch (e) { /* 무시 */ }
