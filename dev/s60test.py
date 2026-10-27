@@ -13,7 +13,7 @@ CLEAN = "document.querySelectorAll('.overlay.center').forEach(o=>{o.hidden=true;
 SKIP = f"(()=>{{ const t=document.querySelector('#tut'); if(t) t.hidden=true; {F}.S.tut.st='skip'; {F}.rt.tut=null; {CLEAN}; }})()"
 LEN = {'bgm_home': 79.5, 'bgm_room': 93.81, 'bgm_festival': 60.46, 'bgm_play': 74.15,
        # 1.8.0 배경 테마 곡 7개(디코딩한 길이, ffprobe보다 0.1초쯤 짧아요)
-       'bgm_spring': 62.08, 'bgm_summer': 38.53, 'bgm_autumn': 91.73, 'bgm_winter': 60.0, 'bgm_xmas': 35.79, 'bgm_space': 74.2, 'bgm_retro': 66.26}
+       'bgm_spring': 62.08, 'bgm_summer': 38.55, 'bgm_autumn': 91.73, 'bgm_winter': 40.0, 'bgm_xmas': 35.79, 'bgm_space': 74.2, 'bgm_retro': 66.26}
 THEME_IDS = ['spring', 'summer', 'autumn', 'winter', 'xmas', 'space', 'retro']
 
 async def main():
