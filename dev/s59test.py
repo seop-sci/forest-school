@@ -98,7 +98,8 @@ async def main():
             if 'ess' in rail: bad.append(f'[{tag}] 오른쪽 메뉴에 정수 상점이 남아 있어요: {rail}')
             await pg.tap('.tabs .tab[data-tab="street"]'); await pg.wait_for_timeout(300)
             v = await pg.evaluate("[!document.querySelector('#panelStreet').hidden, document.querySelectorAll('#panelStreet button.shopfront').length, document.querySelector('.tabs .tab[data-tab=street]').getAttribute('aria-selected')]")
-            if v != [True, 2, 'true']: bad.append(f'[{tag}] 상점 거리 열기: ' + json.dumps(v))
+            # 1.7.4: 꾸미기 가게가 열려 가게 단추 3개
+            if v != [True, 3, 'true']: bad.append(f'[{tag}] 상점 거리 열기: ' + json.dumps(v))
             await pg.tap('#sfEss'); await pg.wait_for_timeout(300)
             v = await pg.evaluate(f"[{F}.rt.tab, !document.querySelector('#panelEss').hidden, document.querySelector('.tabs .tab[data-tab=street]').getAttribute('aria-selected')]")
             if v != ['ess', True, 'true']: bad.append(f'[{tag}] 정수 상점 들어가기: ' + json.dumps(v))
