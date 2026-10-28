@@ -1,6 +1,8 @@
 # 2.0.0 균형 자동 플레이: 새 학교에서 시작해 유치원, 초등학교, 중학교를 끝까지 해 봐요.
 # 사람처럼 메인 퀘스트를 따라 가장 싼 것부터 사고, 대도시가 되면 명예 교장실을 고치고 종업식과 졸업식을 열어요.
 # 게임 시계(rt.fakeNow)도 흉내 낸 시간만큼 흘려서 동아리 주간 성장과 발표회가 실제처럼 돌아가요. 황금 도토리와 광고는 쓰지 않아요.
+# 2.1.0 공사 시간: 시설을 사면 공사가 걸리고, 게임 시계가 흘러 끝나야 레벨이 올라요(동시 공사 제한 없음). 시간 단축권은 쓰지 않아요.
+#   설정 '{"con": false}'면 공사 시간을 0으로(예전처럼 바로) 재요
 # 쓰는 법: python3 wrap.py && python3 bal200.py [이름] [설정 JSON]
 #   설정 예: '{"club": false}' 동아리를 나누지 않아요, '{"store": 0}' 매점 효과 0, '{"newc": false}' 2.0.0 새 전학생 6종을 빼요
 # 결과: 해마다 걸린 시간(분), 퀘스트마다 걸린 시간, 수업료 배수. dev/bal200_<이름>.json에도 적어요
@@ -21,6 +23,7 @@ BOT = r"""(o) => {
     if (cfg.cost2 !== undefined) F.TIER_SCALE.cost[2] = cfg.cost2;
     if (cfg.inc2 !== undefined) F.TIER_SCALE.inc[2] = cfg.inc2;
     if (cfg.fundOff) W.fundOff = true;
+    if (cfg.con === false) for (const k of Object.keys(F.CON)) F.CON[k] = [0, 0];
   }
   const now = () => W.t0 + W.t * 1000;
   const buy = () => { for (let i = 0; i < 60; i++) {
@@ -30,7 +33,7 @@ BOT = r"""(o) => {
         else ok = S().budget >= F.facCost(r.k) && F.buyFacility(r.k); }
       if (!ok) { // 추천이 못 사면 가장 싼 것
         const c = [];
-        for (const k of F.facKeys()) { if (F.furReady(k)) c.push([F.facCost(k), () => F.buyFacility(k)]); else F.FUR[k].forEach((_, j) => { if (!F.furDone(k, j)) c.push([F.furCost(k, j), () => F.buyFur(k, j, true)]); }); }
+        for (const k of F.facKeys()) { if (F.conOn(k)) continue; if (F.furReady(k)) c.push([F.facCost(k), () => F.buyFacility(k)]); else F.FUR[k].forEach((_, j) => { if (!F.furDone(k, j)) c.push([F.furCost(k, j), () => F.buyFur(k, j, true)]); }); }
         for (const k of Object.keys(F.TEA)) if (!F.teaMaxed(k)) c.push([F.teaCost(k), () => F.teacherAct(k)]);
         c.sort((a, b) => a[0] - b[0]);
         if (!c.length || c[0][0] > S().budget) return; if (!c[0][1]()) return;
@@ -41,7 +44,7 @@ BOT = r"""(o) => {
   const yearSnap = what => { const s = S(); W.years.push({ what, tier: s.tier, tg: s.tg, min: Math.round(W.yearT / 60), totalH: +(W.t / 3600).toFixed(1), f: Object.assign({}, s.f), t: Object.assign({}, s.t), students: Math.floor(s.students),
       rate: +F.rate().toPrecision(3), store: (s.f.store || 0) * F.FAC.store.per, club: F.clubSum ? F.clubSum() : 0, clubT: +(F.clubTuitionMult() - 1).toFixed(2), species: s.p.species, fund: s.fund, fp: Object.assign({}, s.fp), perk: Object.assign({}, s.p.perk), dips: Math.round(s.st.dips), tdip: Math.round(s.tdip), mult: { legacy: +F.legacyMult().toPrecision(3), tuition: +F.tuitionMult().toPrecision(3) }, q: (F.curMain() || {}).id || 'end', budget: +s.budget.toPrecision(3) }); W.yearT = 0; };
   while (W.t < end && performance.now() - wall < 18000) {
-    const s = S(); F.rt.fakeNow = now();
+    const s = S(); F.rt.fakeNow = now(); F.conTick();
     const cap = F.capacity(); if (s.students < cap) s.students = Math.min(cap, s.students + F.CFG.enroll * dt);
     const g = F.rate() * dt; s.budget += g; F.earn(g); W.t += dt; W.yearT += dt;
     if (!isFinite(s.budget) || !isFinite(F.rate())) { W.notes.push('유한하지 않은 값 ' + W.t); W.done = true; break; }
