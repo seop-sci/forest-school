@@ -5,6 +5,7 @@
 #  3) 초등학교 졸업식: 장면이 5.2초 뒤 저절로 입학 창으로 넘어가요. 뜨자마자 누른 손(0.35초 안)은 넘기지 않아요
 #  4) 장면 동안 알림(현장체험학습이 열렸어요)은 장면이 끝난 뒤에 떠요. 누르거나 뒤로 가기(Escape)를 하면 건너뛸지 묻고(묻는 동안 멈춤), 계속 보기와 건너뛰기가 돼요. 동작 줄이기 설정이면 꽃가루를 숨기고 2.6초 뒤 넘어가요
 #  6) 매점 가구 갖추기(j3)와 책상 퀘스트를 누르면 건물 창의 가구 칸으로 가요(짓기 전에는 짓기 안내). 명예 교장실과 장학재단 추천은 고치기 버튼 바로 위. 복도 버튼은 문 그림과 '열기'(발표회 날은 '발표회!'와 빨간 점)
+#  7) 복도의 준비 중 방 5곳(표와 누르면 안내), 학생 모집 퀘스트 설명과 교실 자리, 퀘스트 점에서 이벤트 빼기, 이벤트 예정 4개와 특별 강조, 이벤트 설명, 지난 학교급 모습 간판 글자와 꾸미기 칸
 #  5) 390 밝은 화면과 360 어두운 화면에서 넘치지 않아요(캡처 s73_390.png, s73_360.png). 페이지 오류 없음
 # 쓰는 법: python3 wrap.py && python3 s73test.py   (마지막 줄이 PASS면 통과)
 import asyncio, json
@@ -184,6 +185,41 @@ async def main():
             print('복도 버튼', w, r)
             if r['hidden'] or not r['svg'] or r['bg'] or r['n'] not in ('열기', '발표회!') or (r['n'] == '열기') != r['dot']: bad.append(f'{w} 복도 버튼 {r}')
             await pg.screenshot(path=f's73_home_{w}.png', clip={'x': 0, 'y': 230, 'width': 160, 'height': 220})
+            # 7) 복도의 준비 중 방, 학생 모집 퀘스트 설명, 퀘스트 점, 이벤트 예정, 지난 학교급 모습
+            await pg.evaluate(f"{F}.setTab('hall')"); await pg.wait_for_timeout(500)
+            r = await pg.evaluate("""(() => { const soon = [...document.querySelectorAll('#panelHall .shopfront.soon')];
+              return { n: soon.length, chips: soon.filter(b => b.querySelector('.sf-soon')).length, msgs: soon.filter(b => b.dataset.soon).length }; })()""")
+            await pg.click('#panelHall .shopfront.soon >> nth=0', force=True); await pg.wait_for_timeout(200)
+            r['toast'] = await pg.evaluate("document.querySelector('#toast').textContent")
+            print('준비 중 방', w, r)
+            if r['n'] != 5 or r['chips'] != 5 or r['msgs'] != 5 or '준비 중이에요' not in r['toast']: bad.append(f'{w} 준비 중 방 {r}')
+            if w == 390:
+                r = await pg.evaluate(f"""(() => {{ const F = {F}, S = F.S, f0 = S.f.classroom, out = [];
+                  for (const q of F.MAIN.filter(q => q.t === 'students')) {{ const m = q.how.match(/Lv\\.(\\d+)까지 넓히고 학생을 (\\d+)명까지 모집해요/);
+                    if (!m || +m[2] !== q.n) {{ out.push(q.id + ' 글'); continue; }}
+                    S.f.classroom = +m[1]; const cap = F.capacity(); if (cap < q.n) out.push(`${{q.id}} Lv.${{m[1]}} 자리 ${{cap}} < ${{q.n}}`); }}
+                  S.f.classroom = f0; return {{ out, src: F.updateQuestDot.toString().includes('evClaimable') }}; }})()""")
+                print('학생 퀘스트와 퀘스트 점', r)
+                if r['out']: bad.append(f'학생 모집 퀘스트 설명 {r["out"]}')
+                if r['src']: bad.append('퀘스트 점이 아직 이벤트를 세요')
+                r = await pg.evaluate(f"""(() => {{ const F = {F}, u = F.evUpcoming('2026-11-02', 4).map(c => c.def.id + ':' + c.start);
+                  F.setTab('event'); F.renderEvent(); const li = [...document.querySelectorAll('#evBody .ev-up li')];
+                  return {{ u, n: li.length, sp: li.filter(x => x.classList.contains('sp')).map(x => x.textContent), h: [...document.querySelectorAll('#evBody .dex-h')].map(x => x.textContent),
+                    want: F.evUpcoming(F.gameToday(), 4).filter(c => c.def.start).length, lead: (document.querySelector('#evBody .lead') || {{}}).textContent || '' }}; }})()""")
+                print('이벤트 예정', json.dumps(r, ensure_ascii=False))
+                if len(r['u']) != 4 or not any(x.startswith('exam:2026-11-16') for x in r['u']) or any(x.startswith('harvest:2026-11-02') for x in r['u']): bad.append(f'다가오는 이벤트 {r["u"]}')
+                if r['n'] != 4 or len(r['sp']) != r['want'] or '이벤트 예정' not in r['h'] or '특별 이벤트 예정' in r['h']: bad.append(f'이벤트 예정 탭 {r}')
+                if '도장을 찍고' in r['lead'] or '시설을 고쳐' in r['lead']: bad.append(f'이벤트 설명에 하는 법이 남았어요 {r["lead"]}')
+                await pg.screenshot(path='s73_event.png', full_page=False)
+            for t in (0, 1):
+                await pg.evaluate(f"(() => {{ const F = {F}; F.setTab('school'); F.tierViewOpen({t}); F.rt.viewEdit = {str(t == 1).lower()}; F.renderTierView(true); }})()"); await pg.wait_for_timeout(600)
+                r = await pg.evaluate("""(() => { const m = document.querySelector('#tvMap'), sg = m.querySelector('.deco-sign-t'), hit = m.querySelector('.deco-hit');
+                  return { anchor: sg ? getComputedStyle(sg).textAnchor : '', hit: hit ? getComputedStyle(hit).fill : 'none', n: m.querySelectorAll('.deco-hit').length }; })()""")
+                print('지난 모습', t, r)
+                if r['anchor'] != 'middle': bad.append(f'{w} 지난 모습 {t} 간판 글자 {r}')
+                if t == 1 and (r['n'] < 5 or r['hit'] not in ('transparent', 'rgba(0, 0, 0, 0)')): bad.append(f'{w} 지난 모습 꾸미기 칸 {r}')
+            if w == 390: await pg.screenshot(path='s73_tvedit.png')
+            await pg.evaluate(f"(() => {{ const F = {F}; F.rt.viewEdit = false; F.tierViewClose(); }})()")
             if errs: bad.append(f'{w} 가구, 추천, 복도 페이지 오류 {errs[:3]}')
             await ctx.close()
         await b.close()
