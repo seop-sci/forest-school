@@ -16,7 +16,7 @@
         ],
         "$uid": {
           ".write": "auth != null && auth.uid === $uid",
-          ".validate": "newData.hasChildren(['name', 'score', 'at']) && newData.child('at').isNumber() && newData.child('at').val() >= now - 60000 && newData.child('at').val() <= now + 60000 && ((!data.exists() && newData.child('score').val() <= 50000) || (data.exists() && data.child('score').isNumber() && data.child('at').isNumber() && newData.child('score').val() <= data.child('score').val() + 2000 + (now - data.child('at').val()) / 500))",
+          ".validate": "newData.hasChildren(['name', 'score', 'at']) && newData.child('at').isNumber() && newData.child('at').val() === now && ((!data.exists() && newData.child('score').val() <= 50000) || (data.exists() && data.child('score').isNumber() && data.child('at').isNumber() && newData.child('score').val() <= data.child('score').val() + (now - data.child('at').val() >= 10000 ? 2000 : 0) + (now - data.child('at').val()) / 500))",
           "name": {
             ".validate": "newData.isString() && newData.val().length >= 1 && newData.val().length <= 10"
           },
@@ -33,7 +33,7 @@
             ".validate": "newData.isNumber() && newData.val() >= 0 && newData.val() <= 99"
           },
           "test": {
-            ".validate": "newData.isBoolean()"
+            ".validate": "newData.isBoolean() && newData.val() === false"
           },
           "pid": {
             ".validate": "newData.isString() && newData.val().matches(/^[0-9A-Z]{6,16}$/)"
@@ -42,10 +42,10 @@
             ".validate": "newData.isString() && newData.val().length >= 1 && newData.val().length <= 12 && newData.val().matches(/^[a-z]+$/)"
           },
           "week": {
-            ".validate": "newData.isNumber() && newData.val() >= -1 && newData.val() <= 9999"
+            ".validate": "newData.isNumber() && (newData.val() === -1 || (newData.val() * 604800000 <= (now + 32400000 - 1767571200000) + 604800000 && newData.val() * 604800000 >= (now + 32400000 - 1767571200000) - 1209600000))"
           },
           "lp": {
-            ".validate": "newData.isNumber() && newData.val() >= 0 && newData.val() <= 999999 && newData.val() <= (data.exists() && data.parent().child('week').val() === newData.parent().child('week').val() ? data.val() : 0) + 1000 + (data.parent().child('at').isNumber() ? (now - data.parent().child('at').val()) / 10000 : 0)"
+            ".validate": "newData.isNumber() && newData.val() >= 0 && newData.val() <= 999999 && newData.val() <= (data.exists() && data.parent().child('week').val() === newData.parent().child('week').val() ? data.val() : 0) + (data.parent().child('at').isNumber() ? ((now - data.parent().child('at').val() >= 10000 ? 1000 : 0) + (now - data.parent().child('at').val()) / 10000) : 1000)"
           },
           "ws": {
             ".validate": "newData.isNumber() && newData.val() >= 0 && newData.parent().child('week').isNumber() && newData.parent().child('lp').isNumber() && newData.val() === newData.parent().child('week').val() * 1000000 + newData.parent().child('lp').val()"
@@ -56,11 +56,77 @@
         }
       },
       "stats": {
-        ".read": "auth != null && root.child('forest/admins').child(auth.uid).val() === root.child('forest/adminKey').val()",
+        ".read": "auth != null && root.child('forest/adminKey').exists() && root.child('forest/admins').child(auth.uid).val() === root.child('forest/adminKey').val()",
         "$uid": {
-          ".write": "auth != null && (auth.uid === $uid || (!newData.exists() && root.child('forest/admins').child(auth.uid).val() === root.child('forest/adminKey').val()))",
+          ".write": "auth != null && (auth.uid === $uid || (!newData.exists() && root.child('forest/adminKey').exists() && root.child('forest/admins').child(auth.uid).val() === root.child('forest/adminKey').val()))",
           ".validate": "newData.hasChildren(['seen', 'pid']) && newData.child('seen').isNumber() && newData.child('pid').isString() && newData.child('pid').val().length <= 16",
-          ".read": "auth != null && auth.uid === $uid"
+          ".read": "auth != null && auth.uid === $uid",
+          "seen": {
+            ".validate": "newData.isNumber() || newData.isBoolean() || (newData.isString() && newData.val().length <= 60)"
+          },
+          "born": {
+            ".validate": "newData.isNumber() || newData.isBoolean() || (newData.isString() && newData.val().length <= 60)"
+          },
+          "pid": {
+            ".validate": "newData.isNumber() || newData.isBoolean() || (newData.isString() && newData.val().length <= 60)"
+          },
+          "name": {
+            ".validate": "newData.isNumber() || newData.isBoolean() || (newData.isString() && newData.val().length <= 60)"
+          },
+          "tier": {
+            ".validate": "newData.isNumber() || newData.isBoolean() || (newData.isString() && newData.val().length <= 60)"
+          },
+          "year": {
+            ".validate": "newData.isNumber() || newData.isBoolean() || (newData.isString() && newData.val().length <= 60)"
+          },
+          "town": {
+            ".validate": "newData.isNumber() || newData.isBoolean() || (newData.isString() && newData.val().length <= 60)"
+          },
+          "q": {
+            ".validate": "newData.isNumber() || newData.isBoolean() || (newData.isString() && newData.val().length <= 60)"
+          },
+          "qt": {
+            ".validate": "newData.isNumber() || newData.isBoolean() || (newData.isString() && newData.val().length <= 60)"
+          },
+          "play": {
+            ".validate": "newData.isNumber() || newData.isBoolean() || (newData.isString() && newData.val().length <= 60)"
+          },
+          "sess": {
+            ".validate": "newData.isNumber() || newData.isBoolean() || (newData.isString() && newData.val().length <= 60)"
+          },
+          "days": {
+            ".validate": "newData.isNumber() || newData.isBoolean() || (newData.isString() && newData.val().length <= 60)"
+          },
+          "ads": {
+            ".validate": "newData.isNumber() || newData.isBoolean() || (newData.isString() && newData.val().length <= 60)"
+          },
+          "score": {
+            ".validate": "newData.isNumber() || newData.isBoolean() || (newData.isString() && newData.val().length <= 60)"
+          },
+          "gold": {
+            ".validate": "newData.isNumber() || newData.isBoolean() || (newData.isString() && newData.val().length <= 60)"
+          },
+          "gearn": {
+            ".validate": "newData.isNumber() || newData.isBoolean() || (newData.isString() && newData.val().length <= 60)"
+          },
+          "gspent": {
+            ".validate": "newData.isNumber() || newData.isBoolean() || (newData.isString() && newData.val().length <= 60)"
+          },
+          "cos": {
+            ".validate": "newData.isNumber() || newData.isBoolean() || (newData.isString() && newData.val().length <= 60)"
+          },
+          "dev": {
+            ".validate": "newData.isNumber() || newData.isBoolean() || (newData.isString() && newData.val().length <= 60)"
+          },
+          "v": {
+            ".validate": "newData.isNumber() || newData.isBoolean() || (newData.isString() && newData.val().length <= 60)"
+          },
+          "env": {
+            ".validate": "newData.isNumber() || newData.isBoolean() || (newData.isString() && newData.val().length <= 60)"
+          },
+          "$other": {
+            ".validate": false
+          }
         }
       },
       "admins": {

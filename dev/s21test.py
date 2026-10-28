@@ -34,7 +34,7 @@ async def main():
             await pg.evaluate("document.querySelector('#tripClose').click()"); await pg.wait_for_timeout(400)
             r['questAfter'] = await pg.evaluate("document.querySelector('#questBar').innerText.slice(0,60)")
             # 테마 한 번에 바꾸기
-            await pg.evaluate("document.querySelector('.tab[data-tab=shop]').click()"); await pg.wait_for_timeout(300)
+            await pg.evaluate("window.__forest.setTab('shop')"); await pg.wait_for_timeout(300)
             await pg.evaluate("document.querySelector('[data-buy=\"s:spring\"]').click()"); await pg.wait_for_timeout(100)
             await pg.evaluate("document.querySelector('#shopYes').click()"); await pg.wait_for_timeout(300)
             await pg.evaluate("document.querySelector('[data-buy=\"s:xmas\"]').click()"); await pg.wait_for_timeout(100)

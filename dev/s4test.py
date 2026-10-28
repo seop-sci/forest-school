@@ -52,7 +52,7 @@ async def main():
             await page.tap('#gYes'); await page.wait_for_timeout(800)
             r['ceremony'] = await page.evaluate("[document.querySelector('#gradTitle').textContent, document.querySelector('#gradText').textContent, document.querySelector('#gradOk').textContent, document.querySelector('#gradDip').textContent]")
             await page.screenshot(path='s4_k1_ceremony.png')
-            await page.tap('#gradOk'); await page.wait_for_timeout(600)
+            await page.tap('#gradOk'); await page.wait_for_timeout(600); await page.evaluate("(()=>{ for (let i = 0; i < 6 && !document.querySelector('#mTalk').hidden; i++) document.querySelector('#talkNext').click(); })()"); await page.wait_for_timeout(400)   # 2.0.0 전학 대화 넘기기
             r['grad1'] = await page.evaluate(GRAD)
             await page.evaluate("window.scrollTo(0,0); document.querySelector('#panelGrad').scrollTop = 0")
             await page.screenshot(path='s4_k2_grad.png')
@@ -94,7 +94,7 @@ async def main():
             r['confirm'] = await page.evaluate("document.querySelector('#tierConfirmText').textContent")
             await page.tap('#tierYes'); await page.wait_for_timeout(800)
             r['entrance'] = await page.evaluate("[document.querySelector('#tierTitle').textContent, document.querySelector('#tierFundAmt').textContent, document.querySelector('#tierOk').textContent]")
-            await page.tap('#tierOk'); await page.wait_for_timeout(700)
+            await page.tap('#tierOk'); await page.wait_for_timeout(700); await page.evaluate("(()=>{ for (let i = 0; i < 6 && !document.querySelector('#mTalk').hidden; i++) document.querySelector('#talkNext').click(); })()"); await page.wait_for_timeout(400)   # 2.0.0 전학 대화 넘기기
             if await page.evaluate("!document.querySelector('#mGrade').hidden"):
                 await page.tap('#certOk'); await page.wait_for_timeout(500)
             await page.tap('.tab[data-tab="school"]'); await page.wait_for_timeout(400)
@@ -105,13 +105,13 @@ async def main():
             st = await saved(page); r['state'] = {k: st[k] for k in ('tier','tg','tdip','fund')}
             r['errors'] = errs; res['k2'] = r
             await ctx.close()
-        # 3) 초등학교 6학년, 큰 숫자 (360 낮, 390 밤): 칠판 네 칸이 넘치지 않는지
+        # 3) 초등학교 5학년(2.0.0부터 6학년은 졸업식이라 5학년), 큰 숫자 (360 낮, 390 밤): 칠판 네 칸이 넘치지 않는지
         if want('e6'):
             for scheme, w, h, fn in (('light',360,640,'s4_e6_360.png'),('dark',390,780,'s4_e6_dark.png')):
-                sv = base(tier=1, tg=5, tdip=150, fund=4, fp={'schol':2,'rep':1,'dip':0}, budget=3.2e11, students=118, f=dict(classroom=28,cafeteria=14,library=13,playground=10,science=11),
+                sv = base(tier=1, tg=4, tdip=150, fund=4, fp={'schol':2,'rep':1,'dip':0}, budget=3.2e11, students=118, f=dict(classroom=28,cafeteria=14,library=13,playground=10,science=11),
                           st={'picks':40,'ups':90,'trains':20,'claims':3,'grads':7,'perks':9}, p={'dip':87,'species':6,'perk':{'schol':4,'rep':2,'start':1,'drop':1,'night':0}},
                           yearEarned=2e11, hd={'day':TODAY,'n':1,'feastUntil':int(time.time()*1000)+200000,'album':False,'seen':True},
-                          q={'init':True,'mid':'e6','m':31,'mb':0,'subs':[],'done':[],'gen':0,'subDone':5,'seen':31})
+                          q={'init':True,'mid':'e34','m':31,'mb':0,'subs':[],'done':[],'gen':0,'subDone':5,'seen':31,'qv':2})
                 ctx, page, errs = await ctxpage(b, w, h, scheme, sv)
                 r = {'board': await page.evaluate(BOARD)}
                 await page.screenshot(path=fn)
@@ -123,7 +123,7 @@ async def main():
                     r['confirm'] = await page.evaluate("document.querySelector('#gConfirmText').textContent")
                     await page.tap('#gYes'); await page.wait_for_timeout(800)
                     r['ceremony'] = await page.evaluate("[document.querySelector('#gradText').textContent, document.querySelector('#gradOk').textContent]")
-                    await page.tap('#gradOk'); await page.wait_for_timeout(500)
+                    await page.tap('#gradOk'); await page.wait_for_timeout(500); await page.evaluate("(()=>{ for (let i = 0; i < 6 && !document.querySelector('#mTalk').hidden; i++) document.querySelector('#talkNext').click(); })()"); await page.wait_for_timeout(400)   # 2.0.0 전학 대화 넘기기
                     r['yearAfter'] = await page.evaluate("document.querySelector('#gYear').textContent")
                 r['errors'] = errs; res[fn] = r
                 await ctx.close()

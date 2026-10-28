@@ -56,7 +56,7 @@ async def main():
                 # 이름과 마크, 저장
                 r = await pg.evaluate(f"""(() => {{ const F = {F}, S = F.S; F.setSchoolNm('도토리<b>'); F.setMark([1, 5, 4, 2]);
                   const nm = document.querySelector('#schoolName').textContent, sign = [...document.querySelectorAll('#decoG .deco-sign-t')].map(t => t.textContent);
-                  const crest = !!document.querySelector('#schoolCrest .mk img');
+                  const crest = !!document.querySelector('#schoolCrest .smark img');
                   const back = F.sanitize(JSON.parse(JSON.stringify(S))).deco;
                   const old = JSON.parse(JSON.stringify(S)); delete old.deco; const o = F.sanitize(old).deco;
                   const bad = JSON.parse(JSON.stringify(S)); bad.deco = {{ own: {{ bench: 1e9, owl: 5, zzz: 3 }}, lay: [['bench', 'bench', 'zzz', 'owl'], 'x'], nm: 12345, mk: [9, 0, 0, 0] }}; const b2 = F.sanitize(bad).deco;
@@ -65,16 +65,16 @@ async def main():
                 if r['nm'] != '도토리b 유치원' or r['sign'] != ['도토리b', '유치원'] or not r['crest']: bad.append(f'이름/마크 {r["nm"]} {r["sign"]} {r["crest"]}')
                 if r['back'][0] != '도토리b' or r['back'][1] != [1, 5, 4, 2]: bad.append(f'저장 {r["back"]}')
                 o = r['old']
-                if o['nm'] != '' or o['mk'] is not None or o['own'] != {} or any(any(x) for x in o['lay']) or [len(x) for x in o['lay']] != [11, 11]: bad.append(f'옛 저장 {o}')
+                if o['nm'] != '' or o['mk'] is not None or o['own'] != {} or any(any(x) for x in o['lay']) or [len(x) for x in o['lay']] != [11, 11, 11]: bad.append(f'옛 저장 {o}')
                 b2 = r['b2']
                 if b2['own'] != {'bench': 11, 'owl': 1} or b2['lay'][0][:4] != ['bench', 'bench', '', 'owl'] or b2['nm'] != '' or b2['mk'] is not None: bad.append(f'망가진 저장 {b2}')
             # 화면: 상점 거리 → 꾸미기 가게
             await pg.evaluate(f"(() => {{ {F}.S.ess = 300; {F}.setTab('street'); }})()"); await pg.wait_for_timeout(300)
             await pg.click('#sfDeco'); await pg.wait_for_timeout(500)
-            r = await pg.evaluate("(() => ({ open: !document.querySelector('#panelDeco').hidden, items: document.querySelectorAll('#decoList [data-dbuy]').length, marks: document.querySelectorAll('#markRows [data-mk]').length, street: document.querySelector('.tab[data-tab=\"street\"]')?.getAttribute('aria-selected') }))()")
+            r = await pg.evaluate("(() => ({ open: !document.querySelector('#panelDeco').hidden, items: document.querySelectorAll('#decoList [data-dbuy]').length, evart: Object.keys(window.FS_IMG200 || {}).filter(k => k.startsWith('evd_')).length, marks: document.querySelectorAll('#markRows [data-mk]').length, street: document.querySelector('.tab[data-tab=\"street\"]')?.getAttribute('aria-selected') }))()")
             r['over'] = await pg.evaluate(OVER, '#panelDeco')
             print(w, scheme, '가게', json.dumps(r))
-            if not r['open'] or r['items'] != 16 or r['marks'] != 25 or r['over']: bad.append(f'{w} 가게 화면 {r}')
+            if not r['open'] or r['items'] != 16 + r['evart'] or r['marks'] != 25 or r['over']: bad.append(f'{w} 가게 화면 {r}')
             await pg.screenshot(path=f's62_{w}.png')
             await pg.evaluate("document.querySelector('#panelDeco').scrollTop = 9999"); await pg.wait_for_timeout(200)
             await pg.screenshot(path=f's62_{w}b.png')

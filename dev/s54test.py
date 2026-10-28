@@ -92,7 +92,7 @@ async def main():
         on = [c for c in r['cards'] if c[1]]
         if not on or not all(c[2] for c in on): fails.append(f"만난 특별 손님 그림 {r['cards']}")
         if r['pend']: fails.append(f"특별 손님이 선물 목록에 들어갔어요 {r['pend']}")
-        if f"/ {r['keys']}종" not in r['head'] or r['keys'] != 17: fails.append(f"만난 친구 수가 바뀌었어요 (1.7.1부터 17종) {r['head']}")
+        if f"/ {r['keys']}종" not in r['head'] or r['keys'] != 23: fails.append(f"만난 친구 수가 바뀌었어요 (2.0.0부터 23종: 학생 17, 선생님 6) {r['head']}")
         await pg.evaluate(f"{CLEAN}"); await pg.wait_for_timeout(300)
         await pg.evaluate("document.querySelector('#panelDex').scrollTop = 99999"); await pg.wait_for_timeout(200)
         await pg.screenshot(path='s54_dex_guests.png')

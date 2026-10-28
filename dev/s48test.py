@@ -1,4 +1,4 @@
-# 1.7.0 시험: 동물 도감(등록, 옛 저장 자동 채우기, 도감 선물 한 번만), 이벤트(달력 규칙, 출석 도장 하루 한 번과 5개째 큰 보상, 미션과 기념 상자,
+# 1.7.0 시험(2.0.0 매주 이벤트로 고침): 동물 도감(등록, 옛 저장 자동 채우기, 도감 선물 한 번만), 이벤트(달력 규칙, 출석 도장 하루 한 번과 5개째 큰 보상, 미션과 기념 상자,
 #   달이 바뀌면 새 회차, 특별 이벤트 표, 특별 이벤트와 겹치는 달의 반복 이벤트 건너뛰기와 쉬는 안내 한 줄, 못 하는 미션 대신 넣기,
 #   새 저장(놀이터 없음)과 시설과 가구를 모두 최고로 올린 학교에서 모든 달의 미션이 이룰 수 있는 종류인지), 분치 보정, 밝은 화면 390px과 어두운 화면 360px에서 넘침 없음
 # 쓰는 법: python3 wrap.py && python3 s48test.py   (마지막 줄이 PASS면 통과)
@@ -79,19 +79,19 @@ async def main():
         pn, errsn = await boot(ctx2)
         await set_day(pn, 2026, 11, 3)
         nw = await pn.evaluate(f"""(()=>{{ const F={F}, S=F.S; const out={{ pg: S.f.playground, cur: S.ev.cur, list: S.ev.list.map(m=>m.t), bad: [] }};
-          const doable = ['ups', 'claims', 'trains', 'dmDone'];   // 놀이터 없는 새 학교가 할 수 있는 종류 (1.6.0부터 오늘의 미션은 놀이터 없이도 고치기와 연수가 나와요)
+          const doable = ['claims', 'dmDone', 'pz', 'mgOrd'];   // 놀이터 없는 새 학교가 할 수 있는 종류 (1.6.0부터 오늘의 미션은 놀이터 없이도 고치기와 연수가 나와요)
           const rows = [];
           for (let mo = 1; mo <= 12; mo++) for (const e of F.EV_MONTHLY) rows.push({{ def: e, start: `2026-${{String(mo).padStart(2,'0')}}-01` }});
           for (const e of F.EV_SPECIAL) rows.push({{ def: e, start: '2026-12-24' }});
           for (const r of rows) {{ const ts = F.evMissions(r).map(m=>m.t);
             if (ts.length !== 3 || new Set(ts).size !== 3 || ts.some(t => !F.evOk(t) || !doable.includes(t))) out.bad.push(r.def.id + r.start.slice(5,7) + ':' + ts.join(','));
-            if (ts.some(t => S.st[t] === undefined)) out.bad.push('st없음:' + ts.join(',')); }}
+            if (ts.some(t => !Number.isFinite(F.evVal(t)))) out.bad.push('셀 수 없음:' + ts.join(',')); }}
           out.ok = Object.keys(F.EV_MEASURE).filter(t => F.evOk(t));
           return out; }})()""")
-        if nw['pg'] != 0 or nw['cur'] != 'harvest:2026-11': fails.append(f'새 저장 이벤트 준비가 이상해요 {nw}')
-        if len(nw['list']) != 3 or len(set(nw['list'])) != 3 or any(t not in ('ups', 'claims', 'trains', 'dmDone') for t in nw['list']): fails.append(f"새 저장 이벤트 미션에 못 하는 종류가 있어요 {nw['list']}")
+        if nw['pg'] != 0 or nw['cur'] != 'harvest:2026-11-02': fails.append(f'새 저장 이벤트 준비가 이상해요 {nw}')
+        if len(nw['list']) != 3 or len(set(nw['list'])) != 3 or any(t not in ('claims', 'dmDone', 'pz', 'mgOrd') for t in nw['list']): fails.append(f"새 저장 이벤트 미션에 못 하는 종류가 있어요 {nw['list']}")
         if nw['bad']: fails.append(f"놀이터 없는 학교에서 이룰 수 없는 미션이 나와요 {nw['bad'][:6]}")
-        if sorted(nw['ok']) != ['claims', 'dmDone', 'trains', 'ups']: fails.append(f"놀이터 없을 때 할 수 있는 종류가 달라요 {nw['ok']}")
+        if sorted(nw['ok']) != ['claims', 'dmDone', 'mgOrd', 'pz', 'trains', 'ups']: fails.append(f"놀이터 없을 때 할 수 있는 종류가 달라요 {nw['ok']}")
         # 흔들기: 놀이터 0에서는 참나무를 눌러도 횟수가 그대로라 미션으로 나오면 안 돼요(위에서 확인). 놀이터를 지으면 다시 나와요
         built = await pn.evaluate(f"(()=>{{ const F={F}, S=F.S; S.f.playground=1; return Object.keys(F.EV_MEASURE).filter(t => F.evOk(t)).sort(); }})()")
         if not all(t in built for t in ('picks', 'shakes', 'dmDone')): fails.append(f'놀이터를 지어도 줍기, 흔들기, 오늘의 미션이 안 열려요 {built}')
@@ -109,65 +109,67 @@ async def main():
         if mx['upsAgain'] is not True: fails.append('가구가 덜 끝났는데 고치기가 안 돼요')
         if errsn: fails.append(f'새 저장 페이지 오류 {errsn}')
         await ctx2.close()
-        # 4) 이벤트: 11월 3일(도토리 수확 축제 1~7일)
+        # 4) 이벤트(2.0.0 매주): 11월 3일(화)은 11월 2일(월)에 시작한 주의 도토리 수확 축제
         await set_day(pg, 2026, 11, 3)
         e = await pg.evaluate(f"""(()=>{{ const F={F}, S=F.S; F.setTab('event'); const txt=document.querySelector('#evBody').textContent;
           return {{ cur: S.ev.cur, list: S.ev.list.map(m=>m.t), n: S.ev.list.length, txt: txt.slice(0,200), btn: !!document.querySelector('[data-ev="stamp"]'), day: F.gameToday(), dot: !document.querySelector('#evDot').hidden }}; }})()""")
-        if e['cur'] != 'harvest:2026-11' or e['n'] != 3 or e['day'] != '2026-11-03': fails.append(f'11월 3일 이벤트 회차가 틀려요 {e}')
-        if '도토리 수확 축제' not in e['txt'] or not e['btn'] or not e['dot']: fails.append(f'이벤트 화면이나 도장 버튼이 안 보여요 {e}')
-        # 출석 도장: 하루 한 번, 날이 바뀌면 또, 5개째 큰 보상(황금 도토리 3개)
+        if e['cur'] != 'harvest:2026-11-02' or e['n'] != 3 or e['day'] != '2026-11-03': fails.append(f'11월 3일 이벤트 회차가 틀려요 {e}')
+        if '도토리 수확 축제' not in e['txt'] or '11월 2일 ~ 11월 8일' not in e['txt'] or not e['btn'] or not e['dot']: fails.append(f'이벤트 화면이나 도장 버튼이 안 보여요 {e}')
+        # 출석 도장: 하루 한 번, 날이 바뀌면 또, 5개째 큰 보상(2.0.0: 황금 도토리 1개)
         s1 = await pg.evaluate(f"(()=>{{ const F={F}, S=F.S; const g0=S.gold, b0=S.budget; const a=F.claimStamp(); {CLEAN}; const b=F.claimStamp(); return {{ a, b, n: S.ev.stamp.n, last: S.ev.stamp.last, acorn: S.budget-b0, gold: S.gold-g0 }}; }})()")
         if not (s1['a'] is True and s1['b'] is False and s1['n'] == 1 and s1['last'] == '2026-11-03' and s1['acorn'] > 0 and s1['gold'] == 0): fails.append(f'첫 도장이 틀려요 {s1}')
         await set_day(pg, 2026, 11, 4)
         s2 = await pg.evaluate(f"(()=>{{ const F={F}, S=F.S; const a=F.claimStamp(); {CLEAN}; return {{ a, n: S.ev.stamp.n, cur: S.ev.cur }}; }})()")
-        if not (s2['a'] is True and s2['n'] == 2 and s2['cur'] == 'harvest:2026-11'): fails.append(f'다음 날 도장이 틀려요 {s2}')
-        await set_day(pg, 2026, 11, 7)
-        s5 = await pg.evaluate(f"(()=>{{ const F={F}, S=F.S; S.ev.stamp.n=4; const g0=S.gold; const a=F.claimStamp(); const t=document.querySelector('#rwTitle').textContent; {CLEAN}; return {{ a, n: S.ev.stamp.n, gold: S.gold-g0, t, big: F.EV_STAMPS[4] }}; }})()")
-        if not (s5['a'] is True and s5['n'] == 5 and s5['gold'] == 3 and '5개째' in s5['t']): fails.append(f'5개째 큰 보상이 틀려요 {s5}')
-        # 미션: 횟수 통계의 차이로 재고, 셋 다 하면 기념 상자(황금 도토리 2개, 수료증 1장)
+        if not (s2['a'] is True and s2['n'] == 2 and s2['cur'] == 'harvest:2026-11-02'): fails.append(f'다음 날 도장이 틀려요 {s2}')
+        await set_day(pg, 2026, 11, 8)
+        s5 = await pg.evaluate(f"(()=>{{ const F={F}, S=F.S; S.ev.stamp.n=4; const g0=S.gold; const a=F.claimStamp(); const t=document.querySelector('#rwTitle').textContent; {CLEAN}; return {{ a, n: S.ev.stamp.n, gold: S.gold-g0, t, cur: S.ev.cur }}; }})()")
+        if not (s5['a'] is True and s5['n'] == 5 and s5['gold'] == 1 and '5개째' in s5['t'] and s5['cur'] == 'harvest:2026-11-02'): fails.append(f'5개째 큰 보상(일요일까지 같은 회차)이 틀려요 {s5}')
+        # 미션: 횟수 통계의 차이로 재고, 셋 다 하면 기념 상자(2.0.0: 황금 도토리 1개, 수료증 1장)
         m = await pg.evaluate(f"""(()=>{{ const F={F}, S=F.S; const out={{}}; out.before=F.claimEvMission(0);
-          S.ev.list.forEach(x=>{{ S.st[x.t] = x.b + x.n; }}); const g0=S.gold, d0=S.p.dip;
+          S.ev.list.forEach(x=>{{ if (x.t === 'mgOrd') S.mg.st.orders = x.b + x.n; else S.st[x.t] = x.b + x.n; }}); const g0=S.gold, d0=S.p.dip;
           out.m=[0,1,2].map(i=>{{ const r=F.claimEvMission(i); {CLEAN}; return r; }}); out.boxBefore=S.ev.box; out.box=F.claimEvBox(); {CLEAN}; out.again=F.claimEvBox();
-          out.gold=S.gold-g0; out.dip=S.p.dip-d0; out.done=S.ev.list.every(x=>x.done); return out; }})()""")
+          out.gold=S.gold-g0; out.dip=S.p.dip-d0; out.done=S.ev.list.every(x=>x.done); out.mins=S.ev.list.map(x=>x.m); return out; }})()""")
         if m['before'] is not False or m['m'] != [True, True, True] or m['box'] is not True or m['again'] is not False: fails.append(f'이벤트 미션과 상자가 틀려요 {m}')
-        if m['gold'] != 3 + 2 or m['dip'] != 1: fails.append(f'미션 보상(황금 3개와 상자 2개, 수료증 1장)이 틀려요 {m}')
-        # 이벤트 없는 날: 다음 이벤트 안내. 달이 바뀌면 새 회차(도장 0)
-        await set_day(pg, 2026, 11, 10)
-        w = await pg.evaluate(f"(()=>{{ const F={F}, S=F.S; F.setTab('school'); F.setTab('event'); return {{ cur: S.ev.cur, txt: document.querySelector('#evBody').textContent, dot: !document.querySelector('#evDot').hidden }}; }})()")
-        if w['cur'] != '' or '지금은 이벤트가 없어요' not in w['txt'] or '숲속 친구 주간' not in w['txt'] or '11월 15일' not in w['txt'] or w['dot']: fails.append(f"이벤트 없는 날 화면이 틀려요 {w['cur']} {w['txt'][:120]}")
-        # 유치원(운동회, 체험학습 아직 못 함)에서는 친구 주간 미션이 대신 미션으로 바뀌어요
+        if m['gold'] != 3 + 1 or m['dip'] != 1: fails.append(f'미션 보상(황금 3개와 상자 1개, 수료증 1장)이 틀려요 {m}')
+        if m['mins'] != [10, 10, 10]: fails.append(f'미션 도토리 분치가 3분의 2가 아니에요(11월 수확 축제 15분치 → 10) {m}')
+        # 월요일이 되면 다음 이벤트 새 회차(도장 0). 유치원(운동회, 체험학습 아직 못 함)에서는 친구 주간 미션이 대신 미션으로 바뀌어요
+        await set_day(pg, 2026, 11, 9)
+        fr = await pg.evaluate(f"(()=>{{ const F={F}, S=F.S; F.setTab('school'); F.setTab('event'); return {{ cur: S.ev.cur, list: S.ev.list.map(m=>m.t), n: S.ev.stamp.n, txt: document.querySelector('#evBody').textContent.slice(0,120) }}; }})()")
+        if fr['cur'] != 'friends:2026-11-09' or fr['n'] != 0 or any(t in ('sports', 'trips') for t in fr['list']) or len(set(fr['list'])) != 3 or '숲속 친구 주간' not in fr['txt']: fails.append(f'월요일 새 회차나 친구 주간 미션 대신 넣기가 틀려요 {fr}')
         await set_day(pg, 2026, 11, 16)
-        fr = await pg.evaluate(f"(()=>{{ const F={F}, S=F.S; return {{ cur: S.ev.cur, list: S.ev.list.map(m=>m.t), tier: S.tier, n: S.ev.stamp.n }}; }})()")
-        if fr['cur'] != 'friends:2026-11' or fr['n'] != 0 or any(t in ('sports', 'trips') for t in fr['list']) or len(set(fr['list'])) != 3: fails.append(f'친구 주간 미션 대신 넣기가 틀려요 {fr}')
+        bk = await pg.evaluate(f"(()=>{{ const F={F}, S=F.S; F.setTab('school'); F.setTab('event'); return {{ cur: S.ev.cur, list: S.ev.list.map(m=>m.t), img: !!document.querySelector('#evBody .ev-banner img') }}; }})()")
+        if bk['cur'] != 'books:2026-11-16' or 'pz' not in bk['list'] or not bk['img']: fails.append(f'책 읽는 주간(퍼즐 미션, 빌린 배너)이 틀려요 {bk}')
+        await set_day(pg, 2026, 11, 23)
+        ln = await pg.evaluate(f"(()=>{{ const S={F}.S; return {{ cur: S.ev.cur }}; }})()")
+        if ln['cur'] != 'lunch:2026-11-23': fails.append(f'맛있는 급식 주간이 틀려요 {ln}')
         await set_day(pg, 2026, 12, 2)
         dec = await pg.evaluate(f"(()=>{{ const F={F}, S=F.S; return {{ cur: S.ev.cur, n: S.ev.stamp.n, box: S.ev.box }}; }})()")
-        if dec['cur'] != 'harvest:2026-12' or dec['n'] != 0 or dec['box']: fails.append(f'12월 새 회차가 틀려요 {dec}')
-        # 특별 이벤트가 그달 반복 이벤트 기간과 하루라도 겹치면(12월 5~7일과 수확 축제 1~7일), 그달 수확 축제는 건너뛰어요
-        ov = await pg.evaluate(f"""(()=>{{ const F={F}, S=F.S; const x=F.EV_SPECIAL.find(e=>e.id==='xmas'); x.start='2026-12-05'; x.end='2026-12-07';
+        if dec['cur'] != 'harvest:2026-11-30' or dec['n'] != 0 or dec['box']: fails.append(f'4주 뒤 다시 수확 축제 새 회차가 틀려요 {dec}')
+        # 특별 이벤트가 월~일 한 주 전체(12월 7~13일)면 그 주 매주 이벤트 대신 열리고, 다음 주는 순서대로(책 읽는 주간)
+        ov = await pg.evaluate(f"""(()=>{{ const F={F}, S=F.S; const x=F.EV_SPECIAL.find(e=>e.id==='xmas'); x.start='2026-12-07'; x.end='2026-12-13';
           const nx=F.evNext('2026-12-02'); const nx2=F.evNext('2026-12-08');
-          return {{ d2: F.evCurrent('2026-12-02'), d6: F.evCurrent('2026-12-06').key, d8: F.evCurrent('2026-12-08'), nx: nx && nx.key, nx2: nx2 && nx2.key, friends: F.evCurrent('2026-12-16').key }}; }})()""")
-        if ov['d2'] is not None or ov['d6'] != 'xmas:2026-12-05' or ov['d8'] is not None or ov['nx'] != 'xmas:2026-12-05' or ov['nx2'] != 'friends:2026-12' or ov['friends'] != 'friends:2026-12':
-            fails.append(f'특별 이벤트와 겹치는 달의 반복 이벤트 건너뛰기가 틀려요 {ov}')
-        await pg.wait_for_timeout(1300)   # 표를 바꿨으니 1초 갱신이 회차를 닫아요(12월 2일이 더는 이벤트 날이 아니에요)
-        skip = await pg.evaluate(f"(()=>{{ const F={F}, S=F.S; F.setTab('school'); F.setTab('event'); return {{ cur: S.ev.cur, stamp: F.claimStamp(), txt: document.querySelector('#evBody').textContent }}; }})()")
-        if skip['cur'] != '' or skip['stamp'] is not False or '크리스마스 파티' not in skip['txt'] or '12월 5일' not in skip['txt']: fails.append(f'겹치는 달에 도장을 또 받거나 안내가 틀려요 {skip}')
-        if '이번 달은 크리스마스 파티 때문에 도토리 수확 축제는 쉬어요' not in skip['txt'] or not skip['txt'].startswith('이번 달은'): fails.append(f"건너뛴 달 안내 문구가 없어요(12월 2일) {skip['txt'][:80]}")
-        await set_day(pg, 2026, 12, 6)
-        x6 = await pg.evaluate(f"(()=>{{ const F={F}, S=F.S; const a=F.claimStamp(); {CLEAN}; F.setTab('school'); F.setTab('event'); return {{ cur: S.ev.cur, a, n: S.ev.stamp.n, txt: document.querySelector('#evBody').textContent }}; }})()")
-        if x6['cur'] != 'xmas:2026-12-05' or x6['a'] is not True or x6['n'] != 1: fails.append(f'겹치는 달의 특별 이벤트 도장이 틀려요 {x6}')
-        if '이번 달은 크리스마스 파티 때문에 도토리 수확 축제는 쉬어요' not in x6['txt']: fails.append('특별 이벤트 중에 건너뛴 달 안내 문구가 없어요(12월 6일)')
+          return {{ d6: F.evCurrent('2026-12-06').key, d8: F.evCurrent('2026-12-08').key, d13: F.evCurrent('2026-12-13').key, d14: F.evCurrent('2026-12-14').key, nx: nx && nx.key, nx2: nx2 && nx2.key, sk: F.evSkipped('2026-12-08') }}; }})()""")
+        if ov['d6'] != 'harvest:2026-11-30' or ov['d8'] != 'xmas:2026-12-07' or ov['d13'] != 'xmas:2026-12-07' or ov['d14'] != 'books:2026-12-14' or ov['nx'] != 'xmas:2026-12-07' or ov['nx2'] != 'books:2026-12-14' or ov['sk'] is not None:
+            fails.append(f'특별 이벤트 주가 틀려요 {ov}')
+        # 특별 이벤트가 주 가운데 며칠만(12월 9~11일)이면 그 주 매주 이벤트는 쉬고, 쉬는 날에는 안내 한 줄
+        pt = await pg.evaluate(f"""(()=>{{ const F={F}, S=F.S; const x=F.EV_SPECIAL.find(e=>e.id==='xmas'); x.start='2026-12-09'; x.end='2026-12-11';
+          return {{ d8: F.evCurrent('2026-12-08'), d10: F.evCurrent('2026-12-10').key, d12: F.evCurrent('2026-12-12'), sk: F.evSkipped('2026-12-08'), sk10: F.evSkipped('2026-12-10') }}; }})()""")
+        if pt['d8'] is not None or pt['d10'] != 'xmas:2026-12-09' or pt['d12'] is not None or not pt['sk'] or pt['sk']['def']['id'] != 'friends' or pt['sk10'] is not None:
+            fails.append(f'주 가운데 특별 이벤트가 틀려요 {pt}')
         await set_day(pg, 2026, 12, 8)
-        x8 = await pg.evaluate(f"(()=>{{ const F={F}, S=F.S; F.setTab('school'); F.setTab('event'); return {{ cur: S.ev.cur, stamp: F.claimStamp(), txt: document.querySelector('#evBody').textContent.slice(0,140) }}; }})()")
-        if x8['cur'] != '' or x8['stamp'] is not False or '숲속 친구 주간' not in x8['txt']: fails.append(f'특별 이벤트가 끝난 뒤 수확 축제가 다시 열려요 {x8}')
-        if '쉬어요' in x8['txt']: fails.append('수확 축제 기간이 아닌데 쉬는 안내가 나와요(12월 8일)')
-        # 특별 이벤트 표: 날짜를 적으면 예정 목록에 보이고, 그날이 되면 반복 이벤트보다 먼저 열려요
-        sp = await pg.evaluate(f"""(()=>{{ const F={F}, S=F.S; const x=F.EV_SPECIAL.find(e=>e.id==='xmas'); x.start='2026-12-24'; x.end='2026-12-26';
+        skip = await pg.evaluate(f"(()=>{{ const F={F}, S=F.S; F.setTab('school'); F.setTab('event'); return {{ cur: S.ev.cur, stamp: F.claimStamp(), txt: document.querySelector('#evBody').textContent }}; }})()")
+        if skip['cur'] != '' or skip['stamp'] is not False or '크리스마스 파티' not in skip['txt'] or not skip['txt'].startswith('이번 주는 크리스마스 파티 때문에 숲속 친구 주간은 쉬어요'): fails.append(f"쉬는 날 화면이 틀려요 {skip['cur']} {skip['txt'][:90]}")
+        await set_day(pg, 2026, 12, 10)
+        x10 = await pg.evaluate(f"(()=>{{ const F={F}, S=F.S; const a=F.claimStamp(); {CLEAN}; return {{ cur: S.ev.cur, a, n: S.ev.stamp.n }}; }})()")
+        if x10['cur'] != 'xmas:2026-12-09' or x10['a'] is not True or x10['n'] != 1: fails.append(f'특별 이벤트 도장이 틀려요 {x10}')
+        # 특별 이벤트 표: 날짜를 적으면 예정 목록에 보이고, 그날이 되면 열려요
+        sp = await pg.evaluate(f"""(()=>{{ const F={F}, S=F.S; const x=F.EV_SPECIAL.find(e=>e.id==='xmas'); x.start='2026-12-21'; x.end='2026-12-27';
           F.setTab('school'); F.setTab('event'); const up=document.querySelector('#evBody').textContent.includes('크리스마스 파티');
-          const nx=F.evNext('2026-12-20'); return {{ up, nx: nx && nx.def.id, cur: F.evCurrent('2026-12-25').key, first: F.evCurrent('2026-12-01').key }}; }})()""")
-        if not sp['up'] or sp['nx'] != 'xmas' or sp['cur'] != 'xmas:2026-12-24' or sp['first'] != 'harvest:2026-12': fails.append(f'특별 이벤트 표가 틀려요 {sp}')
+          const nx=F.evNext('2026-12-20'); return {{ up, nx: nx && nx.def.id, cur: F.evCurrent('2026-12-25').key }}; }})()""")
+        if not sp['up'] or sp['nx'] != 'xmas' or sp['cur'] != 'xmas:2026-12-21': fails.append(f'특별 이벤트 표가 틀려요 {sp}')
         await set_day(pg, 2026, 12, 25)
-        x = await pg.evaluate(f"(()=>{{ const F={F}, S=F.S; F.setTab('school'); F.setTab('event'); return {{ cur: S.ev.cur, txt: document.querySelector('#evBody').textContent.slice(0,80), n: S.ev.list.length }}; }})()")
-        if x['cur'] != 'xmas:2026-12-24' or '크리스마스 파티' not in x['txt'] or x['n'] != 3: fails.append(f'크리스마스 이벤트가 열리지 않아요 {x}')
+        x = await pg.evaluate(f"(()=>{{ const F={F}, S=F.S; F.setTab('school'); F.setTab('event'); return {{ cur: S.ev.cur, txt: document.querySelector('#evBody').textContent.slice(0,80), n: S.ev.list.length, m: S.ev.list.map(q=>q.m) }}; }})()")
+        if x['cur'] != 'xmas:2026-12-21' or '크리스마스 파티' not in x['txt'] or x['n'] != 3 or x['m'] != [13, 13, 13]: fails.append(f'크리스마스 이벤트가 열리지 않아요 {x}')
         # 5) 분치 보정: 유치원 1배, 초등 2배, 중학교 4배
         tm = await pg.evaluate(f"(()=>{{ const F={F}, S=F.S; const t=S.tier; const out=[0,1,2].map(i=>{{ S.tier=i; return F.tierMinutes(10); }}); S.tier=t; return out; }})()")
         if tm != [10, 20, 40]: fails.append(f'분치 보정이 틀려요 {tm}')

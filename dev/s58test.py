@@ -50,7 +50,7 @@ async def main():
         if r['noBuild'] is not False or not r['ok1'] or not r['paid'] or not r['r']: fails.append(f'영양 선생님 연수 {r}')
         if r['dietLv'] != 10 or r['feast'] != 40: fails.append(f'영양 선생님 최고 레벨과 특식 데이 {r}')
         if r['lib'] != [4, 1.12] or r['ess'][0] != 11 or r['ess'][1] < 11: fails.append(f'사서 선생님 정수 {r}')
-        if r['dex'] != [17, True, True]: fails.append(f'도감 17종 {r}')
+        if r['dex'] != [23, True, True]: fails.append(f'도감 23종(2.0.0 새 학생 6종) {r}')
         if r['san'] != [10, 0] or r['old'] != [0, 0]: fails.append(f'새 선생님 저장 {r}')
         # 선생님 탭 카드
         await pg.evaluate(f"{F}.setTab('teachers')"); await pg.wait_for_timeout(400)

@@ -9,17 +9,21 @@ on:
     paths: ['index.html', 'app/**', '.github/workflows/android.yml']
   workflow_dispatch:
 
+# 2.0.0 보안 점검(3-4): 저장소는 읽기만 해요. 액션은 태그가 아니라 커밋 값으로 고정해요(주석이 그 커밋의 태그)
+permissions:
+  contents: read
+
 jobs:
   build:
     runs-on: ubuntu-24.04   # 안드로이드 SDK가 깔려 있는 이미지
     env:
       VERSION_CODE: ${{ github.run_number }}
     steps:
-      - uses: actions/checkout@v4
-      - uses: actions/setup-node@v4
+      - uses: actions/checkout@11d5960a326750d5838078e36cf38b85af677262   # v4
+      - uses: actions/setup-node@49933ea5288caeca8642d1e84afbd3f7d6820020   # v4
         with:
           node-version: 22
-      - uses: actions/setup-java@v4
+      - uses: actions/setup-java@cf277c60eb25467037889841efdb72551f06f6c3   # v4
         with:
           distribution: temurin
           java-version: 21
@@ -54,8 +58,9 @@ jobs:
         if: failure()
         run: |
           grep -n -A14 "What went wrong" "$RUNNER_TEMP/build.log" | head -40 | while IFS= read -r l; do echo "::error::$l"; done || true
-      - uses: actions/upload-artifact@v4
+      - uses: actions/upload-artifact@ea165f8d65b6e75b540449e92b4886f43607fa02   # v4
         with:
+          retention-days: 7   # 2.0.0 보안 점검(3-1): 서명한 앱 파일은 7일만 남겨요(공개 저장소라 누구나 받을 수 있어요)
           name: forest-school-android-${{ github.run_number }}
           path: |
             app/android/app/build/outputs/bundle/release/*.aab
