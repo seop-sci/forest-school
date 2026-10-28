@@ -4918,6 +4918,54 @@ span.bt-stamp{display:none}.bt-duel.done span.bt-stamp{display:grid}
     { id: 'j28', ch: 14, ye: 3, yt: 2, t: 'ygrade', n: 4, r: 15, rk: 'dip', title: '3학년 대도시 되기', how: '평판을 모아서 대도시가 되어요',
       say: '중학교의 마지막 해예요. 3학년도 대도시 학교로 만들면 졸업 준비 끝! 고등학교는 곧 열릴 거예요.' }
   ];
+  // 2.1.1 지섭 요청: 공사에 시간이 들어서, 메인 퀘스트의 시설 목표를 직전 목표보다 한 단계씩만 올려요.
+  // 원래 퀘스트(id 그대로) 사이에 한 단계 퀘스트(id '원래id_레벨', step: 1)를 끼워 넣고, 보상은 원래 보상을 나눠요.
+  // 학교급이 바뀌면 시설이 처음부터라 그 학교급 첫 퀘스트부터 세요. 그 학년(학기)의 최고 레벨을 넘는 단계는 그 학년(학기)이 열린 뒤에 놓아요
+  const MAIN_OI = MAIN.map((q, i) => i);   // 원래 번호(서브 퀘스트 after를 옮길 때 써요)
+  (function mainSteps() {
+    const ORIG = MAIN.slice(), n0 = ORIG.length, tierOf = ch => ch <= 4 ? 0 : ch <= 10 ? 1 : 2;
+    // capAt[i]: i번 퀘스트가 현재일 때 지을 수 있는 최고 레벨
+    const capAt = [], tierStart = [];
+    let tier = -1, tg = 0, sem = 0;
+    for (let i = 0; i < n0; i++) {
+      const q = ORIG[i], t = tierOf(q.ch);
+      if (t !== tier) { tier = t; tg = 0; sem = 0; tierStart[t] = i; }
+      capAt[i] = (t >= 1 ? 18 : 16) + 5 * tg + (t >= 1 && sem ? 2 : 0);
+      if (q.t === 'grads' || q.t === 'tgrads') { tg += 1; sem = 0; }
+      else if (q.t === 'semH') sem = 1;
+    }
+    const before = Array.from({ length: n0 }, () => []), last = {}, lastIdx = {};
+    let cur = -1;
+    for (let j = 0; j < n0; j++) {
+      const q = ORIG[j], t = tierOf(q.ch);
+      if (t !== cur) { cur = t; for (const k in last) delete last[k]; last.classroom = 1; }
+      if (q.t !== 'fac') continue;
+      const from = last[q.k] || 0, k = q.n - from - 1;
+      const lo = lastIdx[q.k] != null && last[q.k] != null && lastIdx[q.k] >= tierStart[t] ? lastIdx[q.k] + 1 : (tierStart[t] + (t >= 1 ? 1 : 0));
+      if (k > 0) {
+        const parts = k + 1;
+        const share = q.rm ? Math.max(0.05, Math.round(q.rm / parts * 20) / 20) : Math.max(5, Math.round(q.r / parts / 5) * 5);
+        let prev = lo;
+        for (let x = 1; x <= k; x++) {
+          const L = from + x;
+          let slot = Math.min(j, Math.max(prev, lo + Math.floor(x * (j - lo + 1) / parts)));
+          while (slot < j && capAt[slot] < L) slot++;
+          prev = slot;
+          const nm = q.k === 'playground' ? (t >= 1 ? '운동장' : '놀이터') : FAC[q.k].name, jong = (nm.charCodeAt(nm.length - 1) - 0xAC00) % 28 ? '을' : '를';
+          const st = { id: q.id + '_' + L, ch: ORIG[slot].ch, t: 'fac', k: q.k, n: L, step: 1,
+            title: L === 1 ? `${nm} 짓기` : `${nm} Lv.${L}`, how: L === 1 ? `${nm + jong} 지어요` : `${nm + jong} 눌러서 Lv.${L}로 올려요`,
+            say: L === 1 ? `${nm + jong} 지어 볼까요? 공사가 끝나면 바로 알려 드릴게요.` : `${nm + jong} Lv.${L}로 한 단계 올려 주세요. 차근차근 키우면 공사도 금방이에요.` };
+          if (q.rm) st.rm = share; else st.r = share;
+          before[slot].push(st);
+        }
+        if (q.rm) q.rm = Math.max(share, Math.round((q.rm - share * k) * 100) / 100); else q.r = Math.max(share, q.r - share * k);
+      }
+      last[q.k] = q.n; lastIdx[q.k] = j;
+    }
+    MAIN.length = 0; MAIN_OI.length = 0;
+    for (let i = 0; i < n0; i++) { for (const st of before[i]) { MAIN.push(st); MAIN_OI.push(-1); } MAIN.push(ORIG[i]); MAIN_OI.push(i); }
+  })();
+  const mainNewIdx = oi => { const i = MAIN_OI.indexOf(oi); return i >= 0 ? i : MAIN.length; };
   // v3 저장은 메인 퀘스트를 번호로 기억했어요. 그때 순서의 id 목록 (q25 별빛숲, q27 무지개숲은 동네 5단계로 바뀌며, q24 졸업식 세 번은 유치원이 2년으로 줄며 빠졌어요)
   const LEGACY_IDS = Array.from({ length: 28 }, (_, i) => 'q' + i);
 
@@ -5363,14 +5411,14 @@ span.bt-stamp{display:none}.bt-duel.done span.bt-stamp{display:grid}
     const sc = ks.includes('schol') ? perkCost('schol') : Infinity;
     if (ks.includes('night') && S.p.perk.night < 1 && perkCost('night') <= sc) return { k: 'night', why: '학교를 비운 동안 도토리가 더 오래 쌓여요' };
     const cheap = ks.filter(k => k !== 'schol').sort((a, b) => perkCost(a) - perkCost(b))[0];
-    if (cheap && perkCost(cheap) * 3 <= sc) return { k: cheap, why: '싸게 고칠 수 있어요' };
-    return sc < Infinity ? { k: 'schol', why: '수업료가 가장 많이 올라요' } : { k: cheap, why: '싸게 고칠 수 있어요' };
+    if (cheap && perkCost(cheap) * 3 <= sc) return { k: cheap, why: '지금 가장 경제적이에요' };
+    return sc < Infinity ? { k: 'schol', why: '수업료가 가장 많이 올라요' } : { k: cheap, why: '지금 가장 경제적이에요' };
   }
   // 장학재단: 기본은 재단 장학금(수업료 두 배), 학급 문집이 장학금 값의 절반 이하면 학급 문집(수료증이 늘어 명예 교장실을 더 고쳐요)
   function fpRec() {
     const sc = fpCost('schol');
     if (fpCost('dip') * 2 <= sc) return { k: 'dip', why: '수료증이 늘어 명예 교장실을 더 고칠 수 있어요' };
-    if (fpCost('rep') * 4 <= sc) return { k: 'rep', why: '싸게 고칠 수 있어요' };
+    if (fpCost('rep') * 4 <= sc) return { k: 'rep', why: '지금 가장 경제적이에요' };
     return { k: 'schol', why: '수업료가 두 배로 올라요' };
   }
   function todayStr(d) {
@@ -5462,6 +5510,14 @@ span.bt-stamp{display:none}.bt-duel.done span.bt-stamp{display:grid}
   const TK = [{ k: 'h3', sec: 10800, name: '3시간권' }, { k: 'h1', sec: 3600, name: '1시간권' }, { k: 'm30', sec: 1800, name: '30분권' }, { k: 'm5', sec: 300, name: '5분권' }];
   const TKAD = { n: 12, perDay: 3 };
   const TK_CH = 6;   // 초등학교부터 메인 퀘스트 장을 마치면 5분권 6장
+  // 2.1.1 지섭 요청: 미션과 이벤트 보상에도 시간 단축권(초등학교부터, 유치원은 공사가 5초라 안 줘요). 양은 본부 제안
+  const TK_REW = { dm: ['m5', 2], wk: ['m30', 1], evm: ['m5', 3], stamp: ['m5', 3], stamp5: ['m30', 1], box: ['h1', 1] };
+  function tkGive(key) {
+    const r = TK_REW[key]; if (!r || !S || !S.tk || S.tier < 1) return null;
+    S.tk[r[0]] += r[1];
+    const nm = TK.find(x => x.k === r[0]).name.replace('권', ' 단축권'), im = IMG('ticket_' + r[0]);
+    return { ic: im ? `<img src="${im}" alt="" style="width:22px;height:22px;object-fit:contain">` : '⏱', t: `${nm} +${r[1]}장` };
+  }
   const conOn = k => !!(S && S.bd && S.bd[k]);
   const conLeft = k => conOn(k) ? Math.max(0, Math.ceil((S.bd[k].e - gameNow()) / 1000)) : 0;
   const facBusy = k => facMaxed(k) || conOn(k);   // 추천에서 빼요(공사 중이면 다음 레벨을 못 걸어요)
@@ -8901,10 +8957,10 @@ span.bt-stamp{display:none}.bt-duel.done span.bt-stamp{display:grid}
   }
   // 이름: 앞뒤 빈칸을 지우고 빈칸은 하나로, 10자까지
   function cleanName(v) { return typeof v === 'string' ? v.replace(/\s+/g, ' ').trim().slice(0, 10) : ''; }
-  function rankSchool(tier, year) {
+  function rankSchool(tier, year, sem) {
     const T = TIERS[Math.max(0, Math.min(TIERS.length - 1, tier | 0))];
     const y = Math.max(1, Math.min(T.years, year | 0 || 1));
-    return `${T.school} ${y}${T.unit}`;
+    return `${T.school} ${y}${T.unit}` + ((tier | 0) >= 1 && (sem === 0 || sem === 1) ? ` ${sem + 1}학기` : '');   // 2.1.1 학기
   }
   // 랭킹을 둘 곳: GitHub 판은 서버, Claude 화면은 공유 저장소, 둘 다 없으면 내 학교 점수만 보여요.
   // 어느 쪽이든 listen(받기), put(올리기), remove(빼기) 세 가지로 똑같이 써요
@@ -9015,7 +9071,7 @@ span.bt-stamp{display:none}.bt-duel.done span.bt-stamp{display:grid}
     return { id, name, score: Math.floor(score), tier: Number(d.tier) | 0, year: Number(d.year) | 0, test: !!d.test, at,
       pid: typeof d.pid === 'string' ? d.pid.slice(0, 16) : '', week: Number(d.week) | 0, lp: Math.max(0, Math.floor(Number(d.lp) || 0)),
       title: typeof d.title === 'string' && achById(d.title) ? d.title : '',
-      bt: typeof d.bt === 'number' && isFinite(d.bt) ? Math.max(1000, Math.min(9999, Math.floor(d.bt))) : 0, btm: typeof d.btm === 'number' ? Math.max(0, Math.min(5, Math.floor(d.btm))) : 0 };   // 2.0.1 대결
+      bt: typeof d.bt === 'number' && isFinite(d.bt) ? Math.max(1000, Math.min(9999, Math.floor(d.bt))) : 0, btm: typeof d.btm === 'number' ? Math.max(0, Math.min(5, Math.floor(d.btm))) : 0, sem: d.sem === 0 || d.sem === 1 ? d.sem : null };   // 2.0.1 대결, 2.1.1 학기
   }
   // 같은 학교(학교 번호)가 기기를 옮겨서 두 번 있으면 내 것이나 가장 최근 것 하나만 남겨요
   function rankRows(pairs, keep, order) {
@@ -9082,6 +9138,8 @@ span.bt-stamp{display:none}.bt-duel.done span.bt-stamp{display:grid}
       const ws = S.lg.week * 1000000 + lp;
       const doc = { name: S.rank.name, score: sc, tier: S.tier, year: yearNo(), test: !!S.u.dev, pid: S.pid, at: Date.now(), ws, lp, week: S.lg.week };
       if (ACH_RANK_TITLE && S.ach && S.ach.title) doc.title = S.ach.title;   // 1.7.1 칭호(서버 규칙을 게시한 뒤에 켜요)
+      // 2.1.1 학기(지섭 요청: 랭킹에 학기도). 서버 규칙(sem)을 아직 게시하지 않아 거절되면 학기 없이 다시 올려요
+      if (!Rank.noSem && semOn()) { doc.sem = S.sem; Rank.semSent = true; } else Rank.semSent = false;
       // 2.0.1 숲속 대결 순위: 규칙은 지난 값 + 200(하루마다 200 더)까지 받아요. 지난 값을 모르면 1200까지만 올리고 차례로 따라가요
       const bto = !be.toss && BT_RANK && btOpen() ? btRankDoc() : null;
       if (bto) { doc.bt = bto.bt; doc.btm = bto.btm; }
@@ -9090,6 +9148,7 @@ span.bt-stamp{display:none}.bt-duel.done span.bt-stamp{display:grid}
       if (g === Rank.gen) { S.rank.sent = sc; S.rank.by = Rank.uid; S.rank.sws = ws; if (bto) { Rank.sbt = bto.bt; Rank.sbtAt = perfNow(); Rank.sbtm = bto.btm; } save(); }
     } catch (e) {
       const c = String((e && (e.code || e.message)) || '');
+      if (g === Rank.gen && Rank.semSent && /permission/i.test(c) && !Rank.noSem) { Rank.noSem = true; Rank.writing = false; rankDirty(); renderRankPanel(); return; }   // 2.1.1 학기 칸 규칙이 아직 없어요
       // 2.0.0: 규칙의 간격이나 오름 폭에 걸렸을 수 있어서 한 번은 15초 뒤 다시 해 보고, 또 막히면 읽기만 해요
       if (g === Rank.gen && /permission/i.test(c) && !Rank.denied) { Rank.denied = 1; Rank.lastPut = Date.now() + 4500; }
       else if (g === Rank.gen && /invalid_argument|not_granted|revoked|permission/i.test(c)) Rank.readOnly = true;
@@ -9187,7 +9246,7 @@ span.bt-stamp{display:none}.bt-duel.done span.bt-stamp{display:grid}
     $('#rankPos').textContent = mine >= 0 ? `${mine + 1}위` : '-';
     const left = 7 - ((new Date(gameNow() + KST_MS).getUTCDay() + 6) % 7);   // 2.0.0 보안 점검(1-5): 한국 시간 요일
     $('#rankSub').textContent = bm ? (btOpen() ? `${BT_LG[S.bt.lg].n} 리그, 오늘 남은 대결 ${btLeft()}판` : '숲속 대결은 초등학교 3학년부터 열려요') : wk ? `월요일에 새 리그가 시작돼요 (${left}일 남음). 리그에 참여하면 순위와 상관없이 황금 도토리 1개`
-      : rankSchool(S.tier, yearNo()) + (Rank.state === 'on' && Rank.rows.length ? `, 랭킹에 ${Rank.rows.length}명` : '');
+      : rankSchool(S.tier, yearNo(), semOn() ? S.sem : null) + (Rank.state === 'on' && Rank.rows.length ? `, 랭킹에 ${Rank.rows.length}명` : '');
     $('#rankLead').textContent = bm ? '숲속 대결 점수로 겨뤄요. 이름 옆 메달은 지금까지 오른 가장 높은 리그예요. 공부 탭의 숲속 대결에서 이기면 점수가 올라요.' : wk ? '이번 주에 한 일로 겨뤄요. 오늘의 미션 10점, 미션 보너스 20점, 학교 행사 성공 15점, 체험학습 10점(1시간마다 +5), 종업식 20점, 퀘스트 3점이에요. 학교가 작아도 똑같이 겨룰 수 있어요.'
       : '학교 파워로 순위를 매겨요. 시설, 가구, 선생님, 수료증, 꾸미기처럼 쌓아 온 것이 모두 들어가요.';
     // 참여하기와 이름 바꾸기
@@ -9244,13 +9303,13 @@ span.bt-stamp{display:none}.bt-duel.done span.bt-stamp{display:grid}
         if (r.test) { const t = document.createElement('span'); t.className = 'rk-tag'; t.textContent = '테스트'; nm.appendChild(t); }
         const sc = document.createElement('div');
         sc.className = 'rk-school';
-        sc.textContent = rankSchool(r.tier, r.year);
+        sc.textContent = r.id === Rank.uid && semOn() ? rankSchool(S.tier, yearNo(), S.sem) : rankSchool(r.tier, r.year, r.sem);
         txt.append(nm, sc);
         const b = document.createElement('b');
         b.className = 'rk-score';
         b.textContent = fmt(bm ? r.bt : wk ? r.lp : r.score);
         li.append(no, txt, b);
-        li.setAttribute('aria-label', `${i + 1}위 ${r.name}, ${rankSchool(r.tier, r.year)}, ${bm ? `대결 점수, ${BT_LG[Math.max(0, Math.min(5, r.btm | 0))].n} 리그` : wk ? '리그 점수' : '학교 파워'} ${fmt(bm ? r.bt : wk ? r.lp : r.score)}`);
+        li.setAttribute('aria-label', `${i + 1}위 ${r.name}, ${rankSchool(r.tier, r.year, r.sem)}, ${bm ? `대결 점수, ${BT_LG[Math.max(0, Math.min(5, r.btm | 0))].n} 리그` : wk ? '리그 점수' : '학교 파워'} ${fmt(bm ? r.bt : wk ? r.lp : r.score)}`);
         list.appendChild(li);
       });
     }
@@ -9532,7 +9591,7 @@ span.bt-stamp{display:none}.bt-duel.done span.bt-stamp{display:grid}
   // 조금 어려운 퀘스트: 선생님 모두 키우기, 초당 도토리, 학생 50명 넘게, 시설 Lv.10 넘게, 도토리 15개 넘게 줍기.
   // 학생 부탁은 처음 한 번만 오는 이야기 부탁(s로 시작)만 쳐요. 반복 부탁은 끝없이 와서 넣지 않아요
   const hardQ = (q, sub) => !!q && (!sub || String(q.id)[0] === 's') && (q.t === 'teaAll' || q.t === 'rate' ||
-    (q.t === 'students' && q.n >= 50) || (q.t === 'fac' && q.n >= 10) || (q.t === 'picks' && q.n >= 15) ||
+    (q.t === 'students' && q.n >= 50) || (q.t === 'fac' && q.n >= 10 && !q.step) || (q.t === 'picks' && q.n >= 15) ||
     (q.t === 'trips' && q.n >= 3) || q.t === 'souv' || q.t === 'tripat' || q.t === 'sports' || q.t === 'fest');
   const autoOn = () => !!S && gameNow() < S.autoUntil;
   function goldDay() { const t = gameToday(); if (S.gd.day !== t) { S.gd.day = t; S.gd.n = 0; S.gd.shop = 0; } }
@@ -9954,7 +10013,7 @@ span.bt-stamp{display:none}.bt-duel.done span.bt-stamp{display:grid}
     // 2.0.0 중학교: lots_middle.md의 장식 후보 11곳(건물, 빈터, 길, 참나무와 간판 자리를 피한 풀밭)
     [[41.7, 35.16], [44.04, 58.59], [62.79, 88.28], [26.46, 86.72], [55.76, 35.94], [45.21, 45.31], [76.86, 71.88], [56.93, 46.09], [78.03, 89.84], [40.53, 90.62], [35.84, 51.56]].map(pctXY)
   ];
-  const DECO_SIGN = [pctXY([31, 79]), pctXY([37, 80]), pctXY([39, 86])];
+  const DECO_SIGN = [pctXY([31, 79]), pctXY([37, 80]), pctXY([60, 96])];   // 2.1.1 중학교 간판은 기숙사 자리와 매점 사이에 가려져서 매점 아래 오른쪽 길가로(지섭 제보)
   const MARK_BASE = ['shield', 'circle', 'flag'], MARK_SYM = ['acorn', 'leaf', 'star', 'book', 'sun', 'owl'];
   const MARK_COL = ['#D9534A', '#E8913A', '#F2C230', '#4E9A4A', '#3E78C2', '#8A5BC2', '#E77FA8', '#9A6A43'];
   const MARK_COL_NM = ['빨강', '주황', '노랑', '초록', '파랑', '보라', '분홍', '갈색'];
@@ -13037,8 +13096,8 @@ span.bt-stamp{display:none}.bt-duel.done span.bt-stamp{display:grid}
     addGold(DM.gold);
     addLeague(LP.mission);
     sfx('quest'); buzz(12);
-    const skIt = skAdd();   // 2.1.0 칭찬 스티커
-    showReward({ title: '미션 완료!', sub: MISSIONS[m.id].name(MISSIONS[m.id].n), items: (skIt ? [skIt] : []).concat([{ ic: 'acorn', t: `도토리 +${fmt(v)}` }, { ic: 'gold', t: `황금 도토리 +${DM.gold}` }, { ic: '⚡', t: `합치기 에너지 +${MG.E.dm}` }, { ic: '★', t: `미션 포인트 +${MP.daily}` }]) });
+    const skIt = skAdd(), tkIt = tkGive('dm');   // 2.1.0 칭찬 스티커, 2.1.1 단축권
+    showReward({ title: '미션 완료!', sub: MISSIONS[m.id].name(MISSIONS[m.id].n), items: [skIt, tkIt].filter(Boolean).concat([{ ic: 'acorn', t: `도토리 +${fmt(v)}` }, { ic: 'gold', t: `황금 도토리 +${DM.gold}` }, { ic: '⚡', t: `합치기 에너지 +${MG.E.dm}` }, { ic: '★', t: `미션 포인트 +${MP.daily}` }]) });
     save(); renderMissions(); renderHUD(); updateQuestDot();
   }
   function claimBonus() {
@@ -13154,6 +13213,7 @@ span.bt-stamp{display:none}.bt-duel.done span.bt-stamp{display:grid}
     if (B.dip) { addDip(B.dip); got.push(`수료증 +${B.dip}장`); }
     if (B.feast) { useBooster('feast'); got.push('특식 데이 10분'); }
     if (i === MP_BOX.length - 1) { mgAddUp(1); got.push('생산기 강화 조각 +1'); }   // 1.8.0: 마지막 주간 상자
+    { const tk = tkGive('wk'); if (tk) got.push(tk.t); }   // 2.1.1 단축권
     if (B.crown) {
       if (!S.cos.own.includes('hat:crown')) { S.cos.own.push('hat:crown'); S.cos.hat = 'crown'; applyCos(); got.push('금빛 왕관 (학생들이 바로 썼어요!)'); }
       else { addGold(1); got.push('황금 도토리 +1 더'); }
@@ -14000,7 +14060,7 @@ span.bt-stamp{display:none}.bt-duel.done span.bt-stamp{display:grid}
     const active = new Set(S.q.subs.map(s => s.id));
     for (const d of SUBS) {
       if (S.q.done.includes(d.id) || active.has(d.id)) continue;
-      return S.q.m >= d.after ? d : null;
+      return S.q.m >= mainNewIdx(d.after) ? d : null;   // 2.1.1 after는 한 단계 퀘스트를 넣기 전 번호예요
     }
     const c = S.q.gen, tpl = GEN[c % GEN.length];
     S.q.gen = c + 1;
@@ -15482,10 +15542,11 @@ span.bt-stamp{display:none}.bt-duel.done span.bt-stamp{display:grid}
     const hid = mu ? 'ev_' + cur.def.id : '', hat = hid && COS.hat.items.find(x => x.id === hid);
     const gotHat = !!(hat && evHatArt(hid) && !S.cos.own.includes('hat:' + hid));
     if (gotHat) S.cos.own.push('hat:' + hid);
+    const tkIts = [tkGive('stamp'), i + 1 === 5 ? tkGive('stamp5') : null];   // 2.1.1 단축권
     sfx('quest'); buzz(12);
     showReward({ title: `이벤트 도장 ${i + 1}개째!`, sub: gotHat ? `한정 모자 '${hat.name}'${eulOf(hat.name)} 받았어요! 꾸미기 백화점 옷장에서 학생들에게 씌울 수 있어요` : i + 1 === 5 ? '도장 다섯 개를 모아 큰 선물을 받았어요' : i + 1 < 5 ? `${5 - i - 1}개 더 모으면 큰 선물이 있어요` : '끝까지 함께해 줘서 고마워요',
       art: gotHat ? `<img src="${IMG('cos_hat_' + hid)}" alt="" style="width:92px;height:92px;object-fit:contain">` : undefined,
-      items: [a > 0 ? { ic: 'acorn', t: `도토리 +${fmt(a)}` } : null, r.g ? { ic: 'gold', t: `황금 도토리 +${r.g}` } : null, r.e ? { ic: 'ess', t: `숲의 정수 +${r.e}` } : null, { ic: '⚡', t: `합치기 에너지 +${me}` }, mu ? { ic: '🔑', t: '생산기 강화 조각 +1' } : null] });
+      items: [a > 0 ? { ic: 'acorn', t: `도토리 +${fmt(a)}` } : null, r.g ? { ic: 'gold', t: `황금 도토리 +${r.g}` } : null, r.e ? { ic: 'ess', t: `숲의 정수 +${r.e}` } : null, ...tkIts, { ic: '⚡', t: `합치기 에너지 +${me}` }, mu ? { ic: '🔑', t: '생산기 강화 조각 +1' } : null] });
     save(); renderEvent(); renderHUD();
     return true;
   }
@@ -15497,8 +15558,9 @@ span.bt-stamp{display:none}.bt-duel.done span.bt-stamp{display:grid}
     const a = m.m ? minAcorns(m.m) : 0;
     if (a > 0) { S.budget += a; earn(a); }
     if (m.g) addGold(m.g);
+    const tkIt = tkGive('evm');   // 2.1.1 단축권
     sfx('quest'); buzz(12);
-    showReward({ title: '이벤트 미션 완료!', sub: EV_MEASURE[m.t].name(m.n), items: [a > 0 ? { ic: 'acorn', t: `도토리 +${fmt(a)}` } : null, m.g ? { ic: 'gold', t: `황금 도토리 +${m.g}` } : null] });
+    showReward({ title: '이벤트 미션 완료!', sub: EV_MEASURE[m.t].name(m.n), items: [a > 0 ? { ic: 'acorn', t: `도토리 +${fmt(a)}` } : null, m.g ? { ic: 'gold', t: `황금 도토리 +${m.g}` } : null, tkIt] });
     save(); renderEvent(); renderHUD();
     return true;
   }
@@ -15510,9 +15572,10 @@ span.bt-stamp{display:none}.bt-duel.done span.bt-stamp{display:grid}
     const dd = DECO_BY['ev_' + cur.def.id], gotDeco = evDecoArt(dd) && !decoOwn(dd.id);   // 2.0.0 이벤트 한정 장식
     if (gotDeco) S.deco.own[dd.id] = 1;
     mgAddEnergy(MG.E.box); mgAddUp(1);   // 1.8.0
+    const tkIt = tkGive('box');   // 2.1.1 단축권
     sfx('quest'); buzz(12);
     showReward({ title: '기념 상자를 열었어요!', sub: gotDeco ? `한정 장식 '${dd.name}'${eulOf(dd.name)} 받았어요! 꾸미기 모드에서 지도에 놓아 보세요` : '이벤트 미션을 모두 마쳤어요',
-      art: gotDeco ? `<img src="${IMG(dd.img)}" alt="" style="width:92px;height:92px;object-fit:contain">` : pic7('ev_box', 'ic_fund'), items: [{ ic: 'gold', t: `황금 도토리 +${EV_BOX.g}` }, { ic: 'ess', t: `숲의 정수 +${EV_BOX.e}` }, { ic: '⚡', t: `합치기 에너지 +${MG.E.box}` }, { ic: '🔑', t: '생산기 강화 조각 +1' }, { ic: 'dip', t: `수료증 +${EV_BOX.dip}장` }] });
+      art: gotDeco ? `<img src="${IMG(dd.img)}" alt="" style="width:92px;height:92px;object-fit:contain">` : pic7('ev_box', 'ic_fund'), items: [{ ic: 'gold', t: `황금 도토리 +${EV_BOX.g}` }, { ic: 'ess', t: `숲의 정수 +${EV_BOX.e}` }, { ic: '⚡', t: `합치기 에너지 +${MG.E.box}` }, { ic: '🔑', t: '생산기 강화 조각 +1' }, { ic: 'dip', t: `수료증 +${EV_BOX.dip}장` }, tkIt].filter(Boolean) });
     save(); renderEvent(); renderHUD();
     return true;
   }
