@@ -1631,7 +1631,8 @@ body{background:radial-gradient(120% 60% at 50% 0%, color-mix(in srgb, var(--pap
 .dex-pic img,.dex-pic .p7{position:absolute;inset:0;width:100%;height:100%;object-fit:contain}
 .p7{display:grid;place-items:center;width:100%;height:100%}
 .p7 svg{width:100%;height:100%}
-.dex-detail{display:flex;align-items:center;gap:12px;margin:0 0 6px;padding:12px;border-radius:16px;background:var(--card);background-image:var(--dex-card-light);background-size:cover}
+.dex-detail{display:flex;align-items:center;gap:12px;margin:0 0 6px;padding:20px 22px 18px;border-radius:16px;background:var(--card);background-image:var(--dex-card-light);background-size:100% 100%;background-repeat:no-repeat}   /* 2.1.0 그림과 글이 카드 틀을 넘지 않게(지섭 제보) */
+.dex-detail > div{min-width:0}
 .dex-detail .dex-pic{flex:none;width:84px;height:84px}
 .dex-detail b{font-family:var(--font-display);font-weight:400;font-size:17px}
 .dex-detail p{margin:4px 0 2px;font-size:13px;line-height:1.5;color:var(--ink);word-break:keep-all}
@@ -5012,6 +5013,7 @@ span.bt-stamp{display:none}.bt-duel.done span.bt-stamp{display:grid}
     ess: 0, pz: { day: '', n: 0, adN: 0, best: 0, cur: null },
     ac: freshAc(),   // 2.0.1 공부: 과목 5개 학교 학력(lv, xp), 문제집 bk(day, n), 통계 st
     pc: freshPc(), sk: freshSk(),   // 2.1.0 숲속 소풍, 칭찬 스티커판
+    dsn: { day: '', trips: 0, sports: 0, fest: {} },   // 2.1.0 오늘 시작할 때의 체험학습, 운동회, 행사 횟수(오늘 한 것도 퀘스트에 쳐요)
     lab: freshLab(), rd: freshRd(), ex: freshEx(), bt: freshBt(),   // ex: 2.0.1 시험 기간(본 시험 주, 자율학습, 성적표, 기록)
     // 2.0.1 공부 2단계: 과학 탐구 실험(오늘 한 날, 모은 카드, 해 본 짝), 책 읽기(오늘 권수, 읽는 책과 시작 시각, 읽은 횟수)
     bd: {}, tk: { m5: 0, m30: 0, h1: 0, h3: 0 }, tka: { day: '', n: 0 },   // 2.1.0 공사(건물마다 { L 오를 레벨, s 시작, e 끝 }), 시간 단축권 장수, 광고 단축권 오늘 횟수
@@ -5208,6 +5210,10 @@ span.bt-stamp{display:none}.bt-duel.done span.bt-stamp{display:grid}
     sanitizeAc(d, s);   // 2.0.1 공부
     sanitizeStudy2(d, s);   // 2.0.1 공부 2단계: 실험, 책 읽기
     sanitize210(d, s);   // 2.1.0 숲속 소풍, 칭찬 스티커판
+    if (d.dsn && typeof d.dsn === 'object' && typeof d.dsn.day === 'string') {
+      s.dsn.day = d.dsn.day.slice(0, 10); s.dsn.trips = Math.min(s.st.trips, Math.floor(num(d.dsn.trips, 0, 0))); s.dsn.sports = Math.min(s.st.sports, Math.floor(num(d.dsn.sports, 0, 0)));
+      if (d.dsn.fest && typeof d.dsn.fest === 'object') for (const k of Object.keys(s.fest.n)) s.dsn.fest[k] = Math.min(s.fest.n[k] || 0, Math.floor(num(d.dsn.fest[k], 0, 0)));
+    }
     sanitizeExam(d, s);   // 2.0.1 공부 3단계: 시험 기간
     sanitizeBt(d, s);   // 2.0.1 공부 4단계: 숲속 대결
     // 2.1.0 공사와 시간 단축권: 예전 저장에는 없으니 공사 없음, 단축권 0장. 지금 레벨 다음 칸이 아닌 공사는 버려요
@@ -13819,7 +13825,7 @@ span.bt-stamp{display:none}.bt-duel.done span.bt-stamp{display:grid}
       case 'clubMat': return clubMembers(4).length;   // 2.0.1 수학부 부원 수
       case 'rdBooks': return S.rd.st;   // 2.0.1 다 읽은 책 수
       case 'labs': return S.lab.st.n;   // 2.0.1 실험 횟수
-      case 'picnics': return S.pc.st.n;   // 2.1.0 소풍 횟수
+      case 'picnics': return S.pc.st.n + (pcActive() ? 1 : 0);   // 2.1.0 소풍 횟수. 보낸 순간부터 한 번으로 쳐요(지섭 제보: 미리 보낸 소풍이 퀘스트에 안 쳐짐)
       case 'stickers': return S.sk.st.all;   // 2.1.0 받은 칭찬 스티커 수
       case 'btPlays': return S.bt.st.w + S.bt.st.l;   // 2.0.1 숲속 대결 판 수
       case 'btLg': return S.bt.lg;   // 2.0.1 대결 메달 리그
@@ -13831,14 +13837,25 @@ span.bt-stamp{display:none}.bt-duel.done span.bt-stamp{display:grid}
   const qNeed = q => (q.t === 'grade' || q.t === 'ygrade') ? townRep(q.n) : q.n;
   // 퀘스트 보상: rm이 있으면 지금 수업료 몇 분치
   const qReward = q => q.rm ? Math.max(10, nice(rate() * 60 * q.rm)) : q.r;
+  /* 2.1.0 지섭 결정(2026-10-29): 하루에 한 번이거나 기다리는 시간이 긴 행동(체험학습, 숲속 운동회, 학교 행사)은
+     퀘스트가 오기 전이라도 그날(게임 시계) 이미 했으면 퀘스트에 쳐요. 하루를 시작할 때의 횟수를 S.dsn에 적어 두고 그보다 늘어난 만큼을 세요 */
+  const TODAY_TYPES = new Set(['trips', 'sports', 'fest']);
+  function dsnSync() {
+    const t = gameToday();
+    if (S.dsn && S.dsn.day === t) return;
+    S.dsn = { day: t, trips: S.st.trips || 0, sports: S.st.sports || 0, fest: Object.assign({}, S.fest.n) };
+  }
+  const qBase = (q, base) => { if (!q || !TODAY_TYPES.has(q.t)) return base; dsnSync(); return Math.min(base, q.t === 'fest' ? (S.dsn.fest[q.k] || 0) : S.dsn[q.t]); };
   function qDone(q, base) {
     if (!q) return false;
+    base = qBase(q, base);
     if (q.t === 'grade') return S.best >= q.n;   // 한 번이라도 오른 등급이면 종업식 뒤에도 완료로 쳐요
     if (q.t === 'ygrade') return S.grade >= q.n;   // 올해 동네가 그 단계까지 자랐는지
     const v = qMeasure(q);
     return COUNT_TYPES.has(q.t) ? v - base >= q.n - 1e-6 : v >= q.n - 1e-6;
   }
   function qProg(q, base) {
+    base = qBase(q, base);
     const done = qDone(q, base) || (q === curMain() && S.q.lat === q.id), need = qNeed(q), v = qMeasure(q);
     let frac, text;
     if (COUNT_TYPES.has(q.t)) {
@@ -14133,7 +14150,7 @@ span.bt-stamp{display:none}.bt-duel.done span.bt-stamp{display:grid}
   /* 메인 화면 학생 부탁: 무엇을 부탁했는지와 진행 막대. 다 들어주면 눌러서 바로 받아요 */
   // 쪽지에는 짧게 '무엇 몇/몇'만 적어요. 누가 부탁했는지는 얼굴로, 자세한 말은 누르면 보여요
   function subText(s, p) {
-    const v = qMeasure(s), cur = COUNT_TYPES.has(s.t) ? v - s.b : v;
+    const v = qMeasure(s), cur = COUNT_TYPES.has(s.t) ? v - qBase(s, s.b) : v;
     const nums = `${fmt(Math.max(0, Math.min(s.n, Math.floor(cur + 1e-6))))}/${fmt(s.n)}`;
     switch (s.t) {
       case 'fac': return `${FAC[s.k].name} ${nums}`;
@@ -15554,6 +15571,7 @@ span.bt-stamp{display:none}.bt-duel.done span.bt-stamp{display:grid}
     elTick();   // 2.0.1 반장 선거
     rdTick();   // 2.0.1 책 읽기
     pcTick();   // 2.1.0 숲속 소풍
+    dsnSync();   // 2.1.0 하루 시작 횟수
     audioWatch();   // 2.1.1 소리가 멈춰 '삐~' 소리가 나면 소리를 새로 켜요
     exTick();   // 2.0.1 시험 기간
     if (rt.tab === 'club') renderClubLite();
