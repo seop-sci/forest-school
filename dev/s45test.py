@@ -49,7 +49,7 @@ async def main():
         txt = await pg.evaluate("[document.querySelector('#panelMini').textContent, [...document.querySelectorAll('[data-soon]')].map(b => b.dataset.soon).join('|')]")
         import re
         if re.search(r'\d+\.\d+\.\d+', txt[0] + txt[1]): fails.append(f'버전 번호가 남아 있어요 {txt}')
-        if '숲속 교육부에서 열심히 준비 중이에요' not in txt[0]: fails.append('미니게임 준비 문구가 없어요')
+        # 2.0.1부터 공부 탭에는 준비 중 카드가 없어요(국어, 과학, 체육 카드가 모두 열림)
         await pg.evaluate(f"{F}.setTab('mini')"); await pg.wait_for_timeout(400)
         await pg.screenshot(path='s45_mini.png')
         if errs: fails.append(f'페이지 오류 {errs[:3]}')

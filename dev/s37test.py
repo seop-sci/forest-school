@@ -65,6 +65,7 @@ FOCUS = r"""() => { const F = window.__forest; return ['q18', 'k5'].map(id => [i
 # 퀘스트를 따라 하는 사람처럼 유치원을 끝까지 해 보며 도토리가 폭발하지 않는지, 오래 막히지 않는지 봐요
 FLOW = r"""() => {
   const F = window.__forest, S = () => F.S; let t = 0, maxB = 0, maxWait = 0, qid = '', qt = 0, pick = 0, tri = 0; const dt = 2;
+  const ev = n => Math.floor(t / n) !== Math.floor((t - dt) / n);   // 2.0.1: n초마다 한 번(다른 퀘스트의 pick 셈과 따로)
   const buy = () => { const r = F.recommend(); if (!r) return false;
     if (r.kind === 'tea') return S().budget >= F.teaCost(r.k) && F.teacherAct(r.k);
     if (r.kind === 'fur') return S().budget >= F.furCost(r.k, r.i) && F.buyFur(r.k, r.i, true);
@@ -88,6 +89,12 @@ FLOW = r"""() => {
     if (q && q.t === 'xt' && s.budget >= F.xtCost(q.k)) F.xtAct(q.k);
     if (q && q.t === 'vp' && s.budget >= F.vpCost()) F.vpAct();
     if (q && (q.t === 'elects' || q.t === 'elMid')) { F.elSync(); F.elVote(0); }   // 2.0.1
+    if (q && q.t === 'rdBooks' && ev(900)) s.rd.st += 1;   // 2.0.1 책 읽기: 15분 뒤 한 권
+    if (q && q.t === 'labs' && s.f.science >= 1 && s.lab.day !== F.gameToday()) F.labRun(0, 2);   // 2.0.1 과학 실험: 하루 한 번
+    if (q && q.t === 'acMax' && ev(60)) F.acGain('math', 20);   // 2.0.1 공부: 퍼즐 한 판(약 20 XP)을 1분에 한 번
+    if (q && q.t === 'acBook' && ev(30)) { s.ess += 10; F.acBuyBook('kor'); }   // 문제집 한 권
+    if (q && (q.t === 'btPlays' || q.t === 'btMid') && ev(120)) { s.bt.st.w += 1; s.bt.st.wm += F.S.tier >= 2 ? 1 : 0; }   // 2.0.1 숲속 대결: 2분에 한 판 이김
+    if (q && q.t === 'btLg' && ev(600)) s.bt.lg = Math.max(s.bt.lg, 1);   // 동 리그: 이긴 판 넷쯤
     if (q && q.t === 'ach') { F.achSync(); const a = F.ACH.find(x => (s.ach.got[x.id] || 0) < (s.ach.hit[x.id] || 0)); if (a) F.claimAch(a.id); }
     if (q && q.t === 'perks') { const k = Object.keys(F.PERKS).filter(x => !F.perkMaxed(x)).sort((a, b) => F.perkCost(a) - F.perkCost(b))[0]; if (k && F.perkCost(k) <= s.p.dip) F.buyPerk(k, document.body); }
     for (let i = 0; i < 20; i++) if (!buy()) break;
@@ -100,6 +107,7 @@ FLOW = r"""() => {
 # 게임 시계(rt.fakeNow)도 흘려서 동아리 발표회(하루 한 번)와 주간 성장이 실제처럼 돌아가요. 동아리는 자동 추천으로 나눠요
 FLOW2 = r"""() => {
   const F = window.__forest, S = () => F.S; let t = 0, maxB = 0, maxWait = 0, qid = '', qt = 0, pick = 0, tri = 0, waitAt = '', tripEnd = 0; const dt = 10, t0 = Date.now();
+  const ev = n => Math.floor(t / n) !== Math.floor((t - dt) / n);   // 2.0.1: n초마다 한 번(다른 퀘스트의 pick 셈과 따로)
   const s0 = S(); s0.tier = 1; s0.tg = 5; s0.p.species = 6; Object.assign(s0.f, { classroom: 38, cafeteria: 30, library: 28, playground: 28, science: 18 });
   for (const k in s0.fu) s0.fu[k] = s0.fu[k].map(() => s0.f[k]); s0.students = 158; s0.tdip = 250; s0.grade = 4; s0.best = 4;
   s0.q.m = F.MAIN.findIndex(q => q.id === 'e39'); s0.q.lat = ''; F.checkGrade();
@@ -128,7 +136,14 @@ FLOW2 = r"""() => {
     if (q && q.t === 'fest') s.fest.n[q.k] = (s.fest.n[q.k] || 0) + 1;
     if (q && q.t === 'sports') s.st.sports += 1;
     if (q && q.t === 'club') F.clubAuto(true);
+    if (q && q.t === 'clubMat' && !s.roster.list.some(x => x.c === 4)) { const k = s.roster.list.slice().sort((a, b) => b.a[4] - a.a[4])[0]; if (k) k.c = 4; }   // 2.0.1 수학부 꾸리기: 사람처럼 수학 별이 많은 친구를 직접 넣어요
     if (q && (q.t === 'elects' || q.t === 'elMid')) { F.elSync(); F.elVote(0); }   // 2.0.1 반장 선거 안내 퀘스트: 첫 후보를 뽑아요
+    if (q && q.t === 'rdBooks' && ev(900)) s.rd.st += 1;   // 2.0.1 책 읽기: 15분 뒤 한 권
+    if (q && q.t === 'labs' && s.f.science >= 1 && s.lab.day !== F.gameToday()) F.labRun(0, 2);   // 2.0.1 과학 실험: 하루 한 번
+    if (q && q.t === 'acMax' && ev(60)) F.acGain('math', 20);   // 2.0.1 공부: 퍼즐 한 판(약 20 XP)을 1분에 한 번
+    if (q && q.t === 'acBook' && ev(30)) { s.ess += 10; F.acBuyBook('kor'); }   // 문제집 한 권
+    if (q && (q.t === 'btPlays' || q.t === 'btMid') && ev(120)) { s.bt.st.w += 1; s.bt.st.wm += F.S.tier >= 2 ? 1 : 0; }   // 2.0.1 숲속 대결: 2분에 한 판 이김
+    if (q && q.t === 'btLg' && ev(600)) s.bt.lg = Math.max(s.bt.lg, 1);   // 동 리그: 이긴 판 넷쯤
     if (s.roster.list.some(x => x.c >= 0) && F.showReady()) { const c = [0, 1, 2, 3].find(c => !s.club.shown[c]); F.clubShowGo(c === undefined ? 0 : c); }
     F.clubWeekTick();
     // 현장체험학습: 갈 수 있는 곳 중 아직 기념품이 남은 가장 짧은 곳(다녀오면 수업료의 절반만큼 더 받아요)

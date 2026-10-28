@@ -44,20 +44,20 @@ async def main():
                 r = await pg.evaluate(f"""(() => {{ const F = {F}, S = F.S, L = S.roster.list;
                   const q0 = F.qMeasure(F.MAIN.find(q => q.id === 'j4'));
                   const r0 = F.rate(); F.clubAuto(true); const r1 = F.rate();
-                  const per = [0, 1, 2, 3].map(c => F.clubMembers(c).length);
+                  const per = [0, 1, 2, 3, 4].map(c => F.clubMembers(c).length);   // 2.0.1 수학부까지 5곳
                   const tot = () => L.reduce((n, s) => n + (s.c >= 0 ? F.star(s.a[F.CLUBS[s.c].ab]) : 0), 0);
                   const t0 = tot(); let better = 0;
                   for (let i = 0; i < L.length; i++) for (let j = i + 1; j < L.length; j++) {{ const a = L[i].c, b = L[j].c; if (a === b) continue; L[i].c = b; L[j].c = a; if (tot() > t0) better++; L[i].c = a; L[j].c = b; }}
-                  const pct = [0, 1, 2, 3].map(F.clubPct), show = [0, 1, 2, 3].map(F.clubShow), stars = [0, 1, 2, 3].map(F.clubStars);
+                  const pct = [0, 1, 2, 3, 4].map(F.clubPct), show = [0, 1, 2, 3, 4].map(F.clubShow), stars = [0, 1, 2, 3, 4].map(F.clubStars);
                   const q1 = F.qMeasure(F.MAIN.find(q => q.id === 'j4')), qs = F.qMeasure(F.MAIN.find(q => q.id === 'j11'));
                   const fest = F.festPrize(false), dc0 = F.decoCost0('bench'), dc = F.decoCost('bench');
                   return {{ q0, q1, qs, r0, r1, per, t0, better, pct, show, stars, sum: F.clubSum(), tm: F.clubTuitionMult(), fm: F.clubFestMult(), off: F.clubDecoOff(), fest, dc0, dc }}; }})()""")
                 print('자동 추천', json.dumps(r))
-                if r['per'] != [3, 3, 3, 3] or r['q0'] != 0 or r['q1'] != 12: bad.append(f'나누기 {r}')
+                if sum(r['per']) != 12 or max(r['per']) > 3 or r['q0'] != 0 or r['q1'] != 12: bad.append(f'나누기 {r}')   # 2.0.1 다섯 곳에 12명(자리 15)
                 if r['better']: bad.append(f'자동 추천보다 나은 맞바꾸기가 {r["better"]}개 있어요')
                 if any(p != min(30, 2 * s) for p, s in zip(r['pct'], r['stars'])): bad.append(f'보너스 계산 {r["pct"]} {r["stars"]}')
                 if r['show'][3] != r['pct'][3] // 2 or r['sum'] != sum(r['show']) or r['qs'] != r['sum']: bad.append(f'보이는 보너스 {r}')
-                if abs(r['tm'] - (1 + (r['pct'][0] + r['pct'][2]) / 100)) > 1e-9 or abs(r['r1'] / r['r0'] - r['tm']) > 1e-6: bad.append(f'수업료 배수 {r}')
+                if abs(r['tm'] - (1 + (r['pct'][0] + r['pct'][2] + r['pct'][4]) / 100)) > 1e-9 or abs(r['r1'] / r['r0'] - r['tm']) > 1e-6: bad.append(f'수업료 배수 {r}')
                 if abs(r['fm'] - (1 + r['pct'][1] / 100)) > 1e-9 or not (0 < r['fest'] < 1e20): bad.append(f'행사 보상 {r}')
                 if r['dc'] > r['dc0'] or (r['off'] > 0 and r['dc'] == r['dc0'] and r['dc0'] > 5): bad.append(f'미술부 할인 {r}')
                 # 바꾸기와 빼기
@@ -65,11 +65,13 @@ async def main():
                   const i = L.findIndex(s => s.c === 1), j = L.findIndex(s => s.c === 0);
                   const low = F.clubMembers(0).sort((x, y) => x.a[0] - y.a[0])[0];
                   F.rt.fakeNow = Date.now() + 3 * 86400000;
-                  F.clubSet(i, 0); const after = [0, 1, 2, 3].map(c => F.clubMembers(c).length), moved = L[i].c, lowc = low.c, cw = L[i].cw;
-                  F.clubSet(i, -1); const out = [L[i].c, [0, 1, 2, 3].map(c => F.clubMembers(c).length)];
-                  F.clubAuto(true); return {{ after, moved, lowc, cw, wk: F.S.roster.wk, out }}; }})()""")
+                  const before = [0, 1, 2, 3, 4].map(c => F.clubMembers(c).length), full0 = before[0] >= 3;
+                  F.clubSet(i, 0); const after = [0, 1, 2, 3, 4].map(c => F.clubMembers(c).length), moved = L[i].c, lowc = low.c, cw = L[i].cw;
+                  F.clubSet(i, -1); const out = [L[i].c, [0, 1, 2, 3, 4].map(c => F.clubMembers(c).length)];
+                  F.clubAuto(true); return {{ before, full0, after, moved, lowc, cw, wk: F.S.roster.wk, out }}; }})()""")
                 print('바꾸기', json.dumps(r))
-                if r['after'] != [3, 3, 3, 3] or r['moved'] != 0 or r['lowc'] != 1: bad.append(f'꽉 찬 동아리 맞바꾸기 {r}')
+                exp = r['before'] if r['full0'] else [r['before'][0] + 1, r['before'][1] - 1] + r['before'][2:]
+                if r['after'] != exp or r['moved'] != 0 or (r['full0'] and r['lowc'] != 1): bad.append(f'꽉 찬 동아리 맞바꾸기 {r}')
                 if r['out'][0] != -1 or sum(r['out'][1]) != 11: bad.append(f'동아리 빼기 {r["out"]}')
                 # 발표회, 하루 한 번
                 r = await pg.evaluate(f"""(() => {{ const F = {F}, S = F.S; F.rt.fakeNow = Date.now() + 10 * 86400000;
@@ -82,7 +84,7 @@ async def main():
                 print('발표회', json.dumps(r))
                 if not (r['ready0'] and r['ok'] and not r['ready1'] and not r['again'] and r['ready2']): bad.append(f'발표회 하루 한 번 {r}')
                 if any(min(100, x + 5) != y for x, y in zip(r['a0'], r['a1'])): bad.append(f'발표회 능력치 {r["a0"]} {r["a1"]}')
-                if abs(r['got'] - r['prize']) > 1e-6 * r['prize'] + 1 or r['shows'] != 1 or r['shown'] != [0, 0, 1, 0] or r['q'] != [1, 1]: bad.append(f'발표회 보상과 기록 {r}')
+                if abs(r['got'] - r['prize']) > 1e-6 * r['prize'] + 1 or r['shows'] != 1 or r['shown'] != [0, 0, 1, 0, 0] or r['q'] != [1, 1]: bad.append(f'발표회 보상과 기록 {r}')
                 # 주간 성장과 건물 성장
                 r = await pg.evaluate(f"""(() => {{ const F = {F}, S = F.S, L = S.roster.list;
                   L.forEach(s => {{ s.cw = 0; }}); const w = F.gameWeek(); S.roster.wk = w - 2;
@@ -124,13 +126,13 @@ async def main():
             await pg.click('#btnHall'); await pg.wait_for_timeout(400)
             r = await pg.evaluate("({ doors: document.querySelectorAll('#panelHall .shopfront').length, soon: document.querySelectorAll('#panelHall .shopfront.soon').length, vis: !document.querySelector('#panelHall').hidden })")
             # 작업지시서 20 복도 그림: 방문 6개(동아리실 + 준비 중 5)
-            if r != {'doors': 6, 'soon': 4, 'vis': True}: bad.append(f'{w}: 복도 {r}')   # 2.0.1 학생회실(반장 선거)이 열려서 준비 중은 4곳
+            if r != {'doors': 6, 'soon': 3, 'vis': True}: bad.append(f'{w}: 복도 {r}')   # 2.0.1 학생회실(반장 선거)과 교무실(시험 기간)이 열려서 준비 중은 3곳
             o = await pg.evaluate(OVER, '#panelHall')
             if o: bad.append(f'{w}: 복도가 {o}곳 넘쳐요')
             await pg.screenshot(path=f's65_hall_{w}.png')
             await pg.click('#hdClub'); await pg.wait_for_timeout(400)
             r = await pg.evaluate("({ cards: document.querySelectorAll('#clubBody .club-card').length, rows: document.querySelectorAll('#clubBody .rs-row').length, seats: document.querySelectorAll('#clubBody .club-seat').length })")
-            if r['cards'] != 4 or r['rows'] < 12 or r['seats'] != 12: bad.append(f'{w}: 동아리실 {r}')
+            if r['cards'] != 5 or r['rows'] < 12 or r['seats'] != 15: bad.append(f'{w}: 동아리실 {r}')
             o = await pg.evaluate(OVER, '#panelClub')
             if o: bad.append(f'{w}: 동아리실이 {o}곳 넘쳐요')
             await pg.screenshot(path=f's65_club_{w}.png', full_page=False)
@@ -143,7 +145,7 @@ async def main():
             await pg.click('#seatClose'); await pg.wait_for_timeout(300)
             await pg.click('#clubBody .rs-row'); await pg.wait_for_timeout(300)
             r = await pg.evaluate("document.querySelectorAll('#seatList [data-pickc]').length")
-            if r != 4: bad.append(f'{w}: 학생 동아리 고르기 {r}')
+            if r != 5: bad.append(f'{w}: 학생 동아리 고르기 {r}')
             await pg.click('#seatList [data-pickc="3"]'); await pg.wait_for_timeout(300)
             bad += [f'{w}: 페이지 오류 {e}' for e in errs]
             await ctx.close()
