@@ -22,10 +22,12 @@ BOT = r"""(o) => {
     if (cfg.storeCost !== undefined) { const b = cfg.storeCost; F.FAC.store.cost = L => b * Math.pow(1.8, L); }
     if (cfg.cost2 !== undefined) F.TIER_SCALE.cost[2] = cfg.cost2;
     if (cfg.inc2 !== undefined) F.TIER_SCALE.inc[2] = cfg.inc2;
+    if (cfg.inc0 !== undefined) F.TIER_SCALE.inc[0] = cfg.inc0;
     if (cfg.fundOff) W.fundOff = true;
     if (cfg.con === false) for (const k of Object.keys(F.CON)) F.CON[k] = [0, 0];
   }
   const now = () => W.t0 + W.t * 1000;
+  const SKIP = new Set(['pz', 'pzBest', 'rdBooks', 'xt', 'vp', 'deco', 'ach', 'acMax', 'acBook', 'labs', 'elects', 'elMid', 'btPlays', 'btLg', 'btMid', 'mgDex', 'star', 'clubMat', 'clubShown', 'clubSum', 'fpUp']);
   const buy = () => { for (let i = 0; i < 60; i++) {
       const r = F.recommend(); let ok = false;
       if (r) { if (r.kind === 'tea') ok = S().budget >= F.teaCost(r.k) && F.teacherAct(r.k);
@@ -41,7 +43,7 @@ BOT = r"""(o) => {
   } };
   const perks = () => { for (let i = 0; i < 40; i++) { const ks = Object.keys(F.PERKS).filter(k => !F.perkMaxed(k)).sort((a, b) => F.perkCost(a) - F.perkCost(b)); if (!ks.length || F.perkCost(ks[0]) > S().p.dip) return; F.buyPerk(ks[0], document.body); } };
   const fperks = () => { for (let i = 0; i < 40; i++) { const ks = Object.keys(F.FPERKS).sort((a, b) => F.fpCost(a) - F.fpCost(b)); if (F.fpCost(ks[0]) > S().fund) return; F.buyFundPerk(ks[0], document.body); } };
-  const yearSnap = what => { const s = S(); W.years.push({ what, tier: s.tier, tg: s.tg, min: Math.round(W.yearT / 60), totalH: +(W.t / 3600).toFixed(1), f: Object.assign({}, s.f), t: Object.assign({}, s.t), students: Math.floor(s.students),
+  const yearSnap = what => { const s = S(); W.years.push({ what, tier: s.tier, tg: s.tg, sem: s.sem || 0, min: Math.round(W.yearT / 60), totalH: +(W.t / 3600).toFixed(1), f: Object.assign({}, s.f), t: Object.assign({}, s.t), students: Math.floor(s.students),
       rate: +F.rate().toPrecision(3), store: (s.f.store || 0) * F.FAC.store.per, club: F.clubSum ? F.clubSum() : 0, clubT: +(F.clubTuitionMult() - 1).toFixed(2), species: s.p.species, fund: s.fund, fp: Object.assign({}, s.fp), perk: Object.assign({}, s.p.perk), dips: Math.round(s.st.dips), tdip: Math.round(s.tdip), mult: { legacy: +F.legacyMult().toPrecision(3), tuition: +F.tuitionMult().toPrecision(3) }, q: (F.curMain() || {}).id || 'end', budget: +s.budget.toPrecision(3) }); W.yearT = 0; };
   while (W.t < end && performance.now() - wall < 18000) {
     const s = S(); F.rt.fakeNow = now(); F.conTick();
@@ -58,6 +60,8 @@ BOT = r"""(o) => {
     if (q && q.t === 'sports') s.st.sports += 1;
     if (q && q.t === 'mgBest') s.mg.best.a = Math.min(10, (s.mg.best.a || 0) + 1);
     if (q && q.t === 'mgOrders') s.mg.st.orders += 1;
+    // 2.1.0 봇이 못 하는 공부, 꾸미기, 선거, 대결 같은 퀘스트는 사람이 하는 시간(qskip초, 기본 10분)을 기다린 뒤 마친 것으로 쳐요
+    if (q && SKIP.has(q.t) && !F.mainReady() && W.t - W.qt >= (cfg.qskip || 600)) s.q.lat = q.id;
     // 현장체험학습(bot.py와 같아요)
     if (s.trip && (s.trip.open || (s.tier >= 1 && s.tg >= 2) || s.tier >= 2)) {
       if (!s.trip.cur) {
@@ -98,7 +102,7 @@ async def main():
         await pg.evaluate("const t=document.querySelector('#tut'); if(t && !t.hidden){ window.__forest.S.tut.st='skip'; t.hidden=true; window.__forest.rt.modalOpen=null; }")
         t0 = time.time()
         while True:
-            r = await pg.evaluate(BOT, {'hours': 2, 'cfg': cfg, 'maxH': 600})
+            r = await pg.evaluate(BOT, {'hours': 2, 'cfg': cfg, 'maxH': cfg.get('maxH', 600)})
             print(json.dumps(r, ensure_ascii=False), flush=True)
             if r['done']: break
         out = await pg.evaluate("({ years: window.__bal.years, quests: window.__bal.quests, maxB: window.__bal.maxB, maxRate: window.__bal.maxRate, notes: window.__bal.notes })")
