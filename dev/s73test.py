@@ -20,7 +20,7 @@ KG = f"""(() => {{ const F = {F}, S = F.S; S.tier = 0; S.tg = 1; S.p.species = 1
   for (const k in S.fu) S.fu[k] = S.fu[k].map(() => S.f[k]); S.students = 60; S.tdip = 20; S.grade = 4; S.best = 4;
   S.q.m = F.MAIN.findIndex(q => q.id === 'k1'); S.q.lat = ''; F.checkGrade();
   const can = F.canPromote(); F.promote(); return {{ can, tier: S.tier }}; }})()"""
-EL = f"""(() => {{ const F = {F}, S = F.S; S.tier = 1; S.tg = 5; S.p.species = 6; Object.assign(S.f, {{ classroom: 38, cafeteria: 30, library: 28, playground: 28, science: 18 }});
+EL = f"""(() => {{ const F = {F}, S = F.S; S.tier = 1; S.tg = 5; S.sem = 1; S.p.species = 6; Object.assign(S.f, {{ classroom: 38, cafeteria: 30, library: 28, playground: 28, science: 18 }});
   for (const k in S.fu) S.fu[k] = S.fu[k].map(() => S.f[k]); S.students = 158; S.tdip = 250; S.grade = 4; S.best = 4;
   S.q.m = F.MAIN.findIndex(q => q.id === 'e39'); S.q.lat = ''; F.checkGrade();
   const can = F.canPromote(); F.promote(); return {{ can, tier: S.tier }}; }})()"""
