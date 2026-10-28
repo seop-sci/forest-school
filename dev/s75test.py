@@ -1,8 +1,9 @@
 # 2.0.1 시험: 공부 탭(과목 5개 학교 학력)
 # 보는 것
 #  1) 새 저장: ac 다섯 과목 Lv.1, 상한 유치원 10. acGain으로 레벨업, 상한에서 멈추고 XP는 모아 둠, 학교급이 오르면(acAll) 풀림
-#  2) 퍼즐 pzFinish: 보상 판은 50점마다 1 XP(판당 30까지), 연습 판은 0. 합치기 주문: 단계 × 2 × 개수(주문당 40까지)
-#  3) 문제집: 정수 10에 +50, 과목마다 하루 2권, 정수 부족이면 안 됨, 날이 바뀌면 다시 2권
+#  2) 퍼즐 pzFinish: 보상 판은 100점마다 1 XP(판당 12까지), 연습 판은 0. 합치기 주문: 단계 × 1 × 개수(주문당 20까지) (2.1.0)
+#  3) 문제집: 정수 10 + 과목 레벨에 +50, 과목마다 하루 1권, 정수 부족이면 안 됨, 날이 바뀌면 다시 1권 (2.1.0)
+#  2.1.0 곡선 25 + 2n, 명부 시작값 8 + 레벨 ÷ 3 + 0~4(잘하는 과목 +20~32)
 #  4) 수업료 배수 acMult(합 × 0.1%), 평판 acRepOf(10레벨마다 +1), 동아리 수학부(5곳, clubTuitionMult에 포함)
 #  5) 옛 저장(ac 없음): 퍼즐 판 수 × 8, 합치기 주문 × 8로 환산. 명부 네 칸 저장은 수학 칸을 채움
 #  6) 메인 퀘스트 sa1~sa5 qMeasure, qGoal, goTo. 공부 탭에 과목 5줄과 문제집 단추가 보임
@@ -26,7 +27,7 @@ async def main():
             if w == 390:
                 # 1) 새 저장과 레벨 곡선, 상한
                 r = await pg.evaluate(f"""(() => {{ const F = {F}, S = F.S; const lv0 = F.AC.keys.map(k => S.ac[k].lv), cap = F.acCap();
-                  F.acGain('math', 20); const a = S.ac.math.lv; F.acGain('math', 5); const b2 = S.ac.math.lv;   // 20+5*1 = 25에서 Lv.2
+                  F.acGain('math', 20); const a = S.ac.math.lv; F.acGain('math', 7); const b2 = S.ac.math.lv;   // 2.1.0 25+2*1 = 27에서 Lv.2
                   F.acGain('math', 100000); const c = S.ac.math.lv, left = S.ac.math.xp;
                   S.tier = 1; const up = F.acAll(); const d = S.ac.math.lv; S.tier = 0;
                   return {{ lv0, cap, a, b2, c, left, up, d, sum: F.acSum() }}; }})()""")
@@ -34,28 +35,29 @@ async def main():
                 if r['lv0'] != [1, 1, 1, 1, 1] or r['cap'] != 10 or r['a'] != 1 or r['b2'] != 2 or r['c'] != 10 or r['left'] <= 0 or r['d'] != 20 or r['up'] != 10: bad.append(f'레벨 곡선이나 상한이 틀려요 {r}')
                 # 2) 퍼즐과 합치기 XP
                 r = await pg.evaluate(f"""(() => {{ const F = {F}, S = F.S; S.tier = 2; F.acAll(); const x0 = S.ac.math.xp + 0;
-                  const g = F.pzFreshGame(true); g.score = 1234; const r1 = F.pzFinish(g);
+                  const g = F.pzFreshGame(true); g.score = 834; const r1 = F.pzFinish(g);
                   const g2 = F.pzFreshGame(false); g2.score = 1234; const r2 = F.pzFinish(g2);
                   const g3 = F.pzFreshGame(true); g3.score = 9000; const r3 = F.pzFinish(g3);
                   return {{ x1: r1.xp, x2: r2.xp, x3: r3.xp }}; }})()""")
                 print('퍼즐 XP', r)
-                if r['x1'] != 24 or r['x2'] != 0 or r['x3'] != 30: bad.append(f'퍼즐 XP가 틀려요 {r}')
+                if r['x1'] != 8 or r['x2'] != 0 or r['x3'] != 12: bad.append(f'퍼즐 XP가 틀려요 {r}')
                 r = await pg.evaluate(f"""(() => {{ const F = {F}, S = F.S; const a0 = S.ac.art.lv * 1000 + S.ac.art.xp;
                   S.mg.orders = [{{ it: [{{ k: 'a', n: 5, c: 2 }}], who: 'rabbit' }}];
                   const cells = F.mgCells(); let put = 0; for (let i = 0; i < cells.length && put < 2; i++) if (cells[i] === '..') {{ cells[i] = 'a5'; put++; }} F.mgSetCells(cells);
                   const ok = F.mgClaimOrder(0); const a1 = S.ac.art.lv * 1000 + S.ac.art.xp;
                   return {{ ok, got: S.ac.st.xp, d: a1 - a0 }}; }})()""")
                 print('합치기 XP', r)
-                if not r['ok'] or r['d'] != 20: bad.append(f'합치기 XP가 틀려요(5단계 × 2 × 2개 = 20) {r}')
+                if not r['ok'] or r['d'] != 10: bad.append(f'합치기 XP가 틀려요(5단계 × 1 × 2개 = 10) {r}')
                 await pg.evaluate(T.CLEAN)
                 # 3) 문제집
                 r = await pg.evaluate(f"""(() => {{ const F = {F}, S = F.S; S.ess = 25; const l0 = F.acBkLeft('kor'), x0 = S.ac.kor.xp + S.ac.kor.lv * 1000;
                   const b1 = F.acBuyBook('kor'), b2 = F.acBuyBook('kor'), b3 = F.acBuyBook('kor'); const l1 = F.acBkLeft('kor'), ess = S.ess;
                   S.ess = 100; const b4 = F.acBuyBook('kor'); const bk = S.ac.st.bk;
-                  F.rt.fakeNow = F.gameNow() + 86400000; const l2 = F.acBkLeft('kor'); F.rt.fakeNow = null;
-                  return {{ l0, b1, b2, b3, l1, ess, b4, bk, l2, lv: S.ac.kor.lv }}; }})()""")
+                  F.rt.fakeNow = F.gameNow() + 86400000; const l2 = F.acBkLeft('kor');
+                  S.ac.kor.lv = 20; S.ess = 100; const b5 = F.acBuyBook('kor'), ess2 = S.ess; F.rt.fakeNow = null;   // 2.1.0 Lv.20이면 값 30
+                  return {{ l0, b1, b2, b3, l1, ess, b4, bk, l2, b5, ess2 }}; }})()""")
                 print('문제집', r)
-                if r['l0'] != 2 or not r['b1'] or not r['b2'] or r['b3'] or r['l1'] != 0 or r['ess'] != 5 or r['b4'] or r['bk'] != 2 or r['l2'] != 2: bad.append(f'문제집이 틀려요 {r}')
+                if r['l0'] != 1 or not r['b1'] or r['b2'] or r['b3'] or r['l1'] != 0 or r['ess'] != 14 or r['b4'] or r['bk'] != 1 or r['l2'] != 1 or not r['b5'] or r['ess2'] != 70: bad.append(f'문제집이 틀려요 {r}')
                 await pg.evaluate(T.CLEAN)
                 # 4) 수업료, 평판, 수학부
                 r = await pg.evaluate(f"""(() => {{ const F = {F}, S = F.S; S.tier = 2; for (const k of F.AC.keys) {{ S.ac[k].lv = 30; S.ac[k].xp = 0; }}
@@ -66,15 +68,15 @@ async def main():
                 print('수업료', r)
                 if abs(r['m'] - 1.15) > 1e-9 or r['rp'] != 15 or r['n'] != 5 or r['abil'] != ['과학', '체육', '국어', '미술', '수학'] or not r['five']: bad.append(f'수업료 배수나 과목이 틀려요 {r}')
                 tm2 = await pg.evaluate(f"1 + ({F}.clubPct(0) + {F}.clubPct(2) + {F}.clubPct(4)) / 100")
-                if min(r['a']) < 70 or r['mat'] < 1 or abs(r['tm'] - tm2) > 1e-9: bad.append(f'명부 시작 능력(학력 30이면 70 이상)이나 수학부가 틀려요 {r}')
+                if min(r['a']) < 18 or max(r['a']) > 54 or r['mat'] < 1 or abs(r['tm'] - tm2) > 1e-9: bad.append(f'명부 시작 능력(학력 30이면 18~54)이나 수학부가 틀려요 {r}')
                 # 5) 옛 저장 환산
                 r = await pg.evaluate(f"""(() => {{ const F = {F}; const d = JSON.parse(JSON.stringify(F.S)); delete d.ac; d.tier = 1; d.st.pz = 50; d.mg.st.orders = 10;
                   d.roster.list = [{{ sp: 'rabbit', nm: '도토리', a: [50, 50, 50, 50], c: 0, cw: 0 }}];
                   const s = F.sanitizeOnly ? F.sanitizeOnly(d) : null; const s2 = {{}}; s2.tier = 1; F.sanitizeAc(d, s2);
                   const r2 = {{}}; return {{ math: s2.ac.math.lv, mx: s2.ac.math.xp, art: s2.ac.art.lv, ax: s2.ac.art.xp, kor: s2.ac.kor.lv }}; }})()""")
                 print('옛 저장', r)
-                # 수학 400 XP: Lv.1→2 25, →3 30, →4 35, →5 40, →6 45, →7 50, →8 55, →9 60 (합 340) 남은 60, →10 65 안 됨 → Lv.9
-                if r['math'] != 9 or r['mx'] != 60 or r['art'] != 3 or r['ax'] != 25 or r['kor'] != 1: bad.append(f'옛 저장 환산이 틀려요 {r}')
+                # 2.1.0 수학 400 XP: 27, 29, 31, …, 45 (열 번 합 360) 남은 40, 다음 47 안 됨 → Lv.11
+                if r['math'] != 11 or r['mx'] != 40 or r['art'] != 3 or r['ax'] != 24 or r['kor'] != 1: bad.append(f'옛 저장 환산이 틀려요 {r}')
                 r = await pg.evaluate(f"""(() => {{ const F = {F}; F.S.tier = 2; const d = JSON.parse(JSON.stringify(F.S));
                   d.roster.list = [{{ sp: 'rabbit', nm: '도토리', a: [50, 50, 50, 50], c: 0, cw: 0 }}]; d.club.shown = [1, 0, 0, 0];
                   const S = F.sanitize(d); return {{ a: S.roster.list[0].a, shown: S.club.shown, lv: S.ac.math.lv }}; }})()""")
