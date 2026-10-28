@@ -6086,7 +6086,7 @@ span.bt-stamp{display:none}.bt-duel.done span.bt-stamp{display:grid}
     return best;
   }
   function spawnDrop(near) {
-    const [x, y] = dropSpot(near);
+    const [x, y] = dropSpot(near && !rt.sports);   // 운동회 중에는 참나무를 눌러도 공이 트랙 안에 와요
     const g = document.createElementNS(NS, 'g');
     g.setAttribute('class', 'drop');
     g.setAttribute('tabindex', '0');
@@ -6101,6 +6101,19 @@ span.bt-stamp{display:none}.bt-duel.done span.bt-stamp{display:grid}
     g.addEventListener('keydown', e => { if (e.key === 'Enter' || e.key === ' ') { e.preventDefault(); collect(d); } });
     rt.drops.push(d);
     const fall = g.querySelector('.drop-fall');
+    if (rt.sports) {   // 운동회 공은 참나무에서 떨어지지 않고 트랙 바깥에서 통통 튀며 굴러 들어와요(나무도 흔들지 않아요)
+      if (!rt.reduced && fall.animate) {
+        const dx = (x < SPORTS.cx ? -1 : 1) * rand(70, 110);
+        fall.animate([
+          { transform: `translate(${dx}px, 0px) rotate(${dx > 0 ? 300 : -300}deg)` },
+          { transform: `translate(${dx * 0.5}px, -10px) rotate(${dx > 0 ? 150 : -150}deg)`, offset: 0.4 },
+          { transform: `translate(${dx * 0.18}px, 0px) rotate(${dx > 0 ? 50 : -50}deg)`, offset: 0.75 },
+          { transform: `translate(${dx * 0.06}px, -3px) rotate(${dx > 0 ? 15 : -15}deg)`, offset: 0.88 },
+          { transform: 'translate(0px, 0px) rotate(0deg)' }
+        ], { duration: 750, easing: 'ease-out' });
+      }
+      return;
+    }
     if (!rt.reduced && fall.animate) {
       const dx = geo().oak[0] - x, dy = geo().oak[1] - 18 - y;
       fall.animate([
