@@ -2327,7 +2327,9 @@ span.bt-stamp{display:none}.bt-duel.done span.bt-stamp{display:grid}
 .mg-order .mo-one.got small{color:#4F6A3A;font-weight:700}
 .mg-order .mo-plus{font-style:normal;font-family:var(--font-display);font-size:13px;color:#8A9480;line-height:28px}
 .mg-order .mo-it .mg-tile{position:relative;inset:auto;width:28px;height:28px;border-radius:8px;font-size:15px}
-.mg-order .mo-it .mg-tile b{font-size:8px;padding:0 3px}
+.mg-order .mo-it .mg-tile b{display:none}
+.mg-order .mo-cnt{padding:0 6px;border-radius:999px;background:#2C4A3D;color:#FFF7E6;font-style:normal;font-family:var(--font-display);font-size:10px;line-height:14px;white-space:nowrap;box-shadow:0 1px 0 rgba(0,0,0,.25)}
+.mg-order .mo-one.got .mo-cnt{background:#3F8F2A}
 .mg-order .mo-n{font-family:var(--font-display);font-size:14px;color:#4F6A3A}
 .mg-order .mo-rw{font-size:11px;color:#5F6B55;display:flex;align-items:center;gap:2px}
 .mg-order .mo-rw svg{width:11px;height:11px}
@@ -15308,7 +15310,8 @@ span.bt-stamp{display:none}.bt-duel.done span.bt-stamp{display:grid}
     const cells = mgCells(), can = mgSwapLeft() <= 0;
     $('#mgOrders').innerHTML = S.mg.orders.map((o, i) => {
       const ok = mgOrderOk(o), r = mgOrderReward(o), img = IMG('chr_' + o.who);
-      const its = o.it.map(x => { const h = Math.min(x.c, mgCount(cells, x.k, x.n)); return `<span class="mo-one${h >= x.c ? ' got' : ''}">${mgTileHtml(x.k + mgLvCh(x.n))}<small>${h}/${x.c}</small></span>`; }).join('<i class="mo-plus">+</i>');
+      // 2.1.0: 그림 아래는 그 조각의 레벨, 필요한 개수는 그림 위 따로(지섭 요청: 숫자가 헷갈리지 않게)
+      const its = o.it.map(x => { const h = Math.min(x.c, mgCount(cells, x.k, x.n)), got = h >= x.c; return `<span class="mo-one${got ? ' got' : ''}">${mgTileHtml(x.k + mgLvCh(x.n))}<small>Lv.${x.n}</small><em class="mo-cnt" aria-label="${x.c}개 필요, ${h}개 있음">${got ? '✔ ' : ''}${x.c}개</em></span>`; }).join('<i class="mo-plus">+</i>');
       return `<button class="mg-order${ok ? ' ok' : ''}${o.it.length > 1 ? ' two' : ''}" type="button" data-order="${i}" aria-label="${mgOrderText(o)} 주문${ok ? ', 눌러서 건네기' : ''}">` +
         `<span class="mo-who" style="${img ? `--mo-img:url('${img}')` : ''}"></span><span class="mo-it">${its}</span>` +
         `<span class="mo-n">${ok ? '건네기' : '주문'}</span><span class="mo-rw">${acornIcon()}${fmt(r.a)}${r.pc ? ` 💎${r.pc}` : ''}${r.up ? ' 🔑' : ''}</span>` +
