@@ -81,7 +81,7 @@ async def main():
             await pg.evaluate(f"{F}.btStart()"); await pg.wait_for_timeout(1200)
             for i in range(4): await pg.mouse.click(w // 2, 420); await pg.wait_for_timeout(60)
             await pg.screenshot(path=f's78_play_{w}.png')
-            await pg.wait_for_timeout(14000)
+            await pg.wait_for_timeout(22000)   # 2.1.0 시작 연출 1.4초 + 종목마다 응원 4초와 공개 2.1초
             ph = await pg.evaluate(f"{F}.btUI.M && {F}.btUI.M.phase")
             if ph != 'result': bad.append(f'{w} 결과 화면으로 안 넘어갔어요 {ph}')
             await pg.screenshot(path=f's78_result_{w}.png')

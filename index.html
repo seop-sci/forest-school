@@ -2240,11 +2240,54 @@ span.bt-stamp{display:grid;place-items:center;border-radius:50%;border:3px solid
 @keyframes btStamp{from{transform:scale(1.8);opacity:0}to{transform:scale(1);opacity:1}}
 .bt-cheer{display:flex;flex-direction:column;align-items:center;gap:2px;min-height:48px;padding:6px 16px;border-radius:14px;background:rgba(44,74,61,.86);font-size:14px;text-align:center}.bt-cheer b{font-size:16px;color:#FFE9A8}
 .bt-line{display:flex;gap:6px}.bt-line i{display:grid;place-items:center;width:30px;height:30px;border-radius:50%;background:rgba(255,255,255,.85)}.bt-line i.w{box-shadow:0 0 0 3px #F3C04B}.bt-line i.l{opacity:.55}
+.bt *{-webkit-tap-highlight-color:transparent;-webkit-user-select:none;user-select:none;-webkit-touch-callout:none}
+.bt-play{touch-action:manipulation}
+.bt-play-ev:empty,.bt-cheer:empty,.bt-line:empty{visibility:hidden}
+.bt-duel:not(.live) .bt-bar i{transition:width .7s cubic-bezier(.2,.8,.3,1)}
+.bt-play-ev.pop{animation:btPop .45s cubic-bezier(.3,1.6,.5,1)}
+@keyframes btPop{from{transform:scale(.4);opacity:0}to{transform:none;opacity:1}}
+.bt-duel{position:relative;grid-template-columns:1fr 1fr}
+.bt-vs2{position:absolute;left:50%;top:38%;z-index:2;transform:translate(-50%,-50%);padding:4px 8px;border-radius:999px;background:#C24A3A;color:#FFF7E6;font-family:var(--font-display);font-size:16px;box-shadow:0 2px 0 rgba(0,0,0,.25)}
+.bt-fig{display:block;transform-origin:50% 100%}
+.bt-duel.live .bt-fig{animation:btBob .5s ease-in-out infinite alternate}
+.bt-duel.live.ev-pe .bt-fig{animation:btRun .22s ease-in-out infinite alternate}
+.bt-duel.live .opp .bt-fig{animation-delay:-.2s}
+@keyframes btBob{from{transform:translateY(0)}to{transform:translateY(-6px)}}
+@keyframes btRun{from{transform:translateY(0) rotate(-4deg)}to{transform:translateY(-8px) rotate(4deg)}}
+.bt-side.hit .bt-fig{animation:btHit .18s ease-out !important}
+@keyframes btHit{50%{transform:scale(1.08,.92)}}
+.bt-side em.wait{color:#B9A57A}
+.bt-duel.done .bt-side.win{animation:btWinJump .6s cubic-bezier(.3,1.6,.5,1)}
+.bt-duel.done .bt-side.win{box-shadow:0 0 0 3px #F3C04B,0 0 18px rgba(243,192,75,.7)}
+.bt-duel.done .bt-side.lose{animation:btLose .5s ease-in-out;filter:saturate(.6) brightness(.92)}
+@keyframes btWinJump{30%{transform:translateY(-14px) scale(1.04)}60%{transform:translateY(2px)}100%{transform:none}}
+@keyframes btLose{20%,60%{transform:translateX(-5px)}40%,80%{transform:translateX(5px)}}
+.bt-stamp{display:none}.bt-duel.done .bt-stamp{display:block}
+span.bt-stamp{display:none}.bt-duel.done span.bt-stamp{display:grid}
+.bt-cheer.on{border:2px solid #F3C04B}
+.bt-cheer.full{box-shadow:0 0 0 3px #F3C04B,0 0 22px rgba(243,192,75,.8)}
+.bt-meter{display:block;width:220px;max-width:70vw;height:12px;margin:4px 0 2px;border-radius:6px;background:rgba(255,255,255,.25);overflow:hidden}
+.bt-meter i{display:block;height:100%;width:0;border-radius:6px;background:linear-gradient(90deg,#F3C04B,#E85D5D);transition:width .08s}
+.bt-cnt{display:flex;gap:10px;align-items:baseline}.bt-cnt small{color:#FFE9A8}
+.bt-plus{position:fixed;z-index:41;pointer-events:none;font-family:var(--font-display);font-size:18px;color:#FFE9A8;text-shadow:0 1px 2px rgba(0,0,0,.5);animation:btPlus .65s ease-out forwards}
+@keyframes btPlus{from{transform:translateY(0);opacity:1}to{transform:translateY(-36px);opacity:0}}
+.bt-line i.now{box-shadow:0 0 0 3px #FFFFFF;animation:btBob .6s ease-in-out infinite alternate}
+.bt-intro{grid-column:1/-1;display:flex;align-items:center;justify-content:center;gap:12px;padding:20px 8px}
+.bt-in{display:flex;flex-direction:column;align-items:center;gap:6px;padding:12px;border-radius:16px;background:rgba(255,247,230,.95);color:#26301E;min-width:110px}
+.bt-in img,.bt-in svg{width:64px;height:64px;object-fit:contain}.bt-in .smark{width:64px;height:64px}.bt-in b{font-size:14px;text-align:center;word-break:keep-all}
+.bt-in.me{animation:btInL .5s cubic-bezier(.3,1.4,.5,1)}.bt-in.opp{animation:btInR .5s cubic-bezier(.3,1.4,.5,1)}
+.bt-intro em{font-style:normal;font-family:var(--font-display);font-size:30px;color:#FFE9A8;text-shadow:0 2px 0 #C24A3A;animation:btPop .5s .35s cubic-bezier(.3,1.8,.5,1) both}
+@keyframes btInL{from{transform:translateX(-120%);opacity:0}to{transform:none;opacity:1}}
+@keyframes btInR{from{transform:translateX(120%);opacity:0}to{transform:none;opacity:1}}
+.bt-confetti{position:absolute;inset:0;z-index:30;pointer-events:none;overflow:hidden}
+.bt-confetti i{position:absolute;top:-12px;width:8px;height:12px;border-radius:2px;animation:btFall 2s ease-in forwards}
+@keyframes btFall{to{transform:translate(var(--dx),110vh) rotate(var(--r))}}
+@media (prefers-reduced-motion: reduce){.bt-fig,.bt-side,.bt-in,.bt-intro em,.bt-play-ev.pop,.bt-line i.now{animation:none !important}}
 .bt-spark{position:fixed;z-index:40;width:46px;height:46px;margin:-23px 0 0 -23px;pointer-events:none;animation:btSpark .7s ease-out forwards}
 @keyframes btSpark{from{transform:scale(.5);opacity:1}to{transform:translateY(-40px) scale(1.2);opacity:0}}
 .bt-result{flex:1 1 auto;display:flex;align-items:center;justify-content:center;overflow-y:auto}
 .bt-res{width:100%;display:flex;flex-direction:column;align-items:center;gap:4px;padding:16px;border-radius:18px;background:rgba(255,247,230,.95);color:#26301E;text-align:center}
-.bt-res>img{width:90px;height:90px;object-fit:contain}.bt-res>b{font-family:var(--font-display);font-weight:400;font-size:26px}.bt-res.w>b{color:#C24A3A}.bt-res.l>b{color:#5A6A7A}
+.bt-res>img{width:90px;height:90px;object-fit:contain;animation:btPop .55s cubic-bezier(.3,1.8,.5,1)}.bt-res.w>b{animation:btPop .5s .15s cubic-bezier(.3,1.8,.5,1) both}.bt-up{animation:btPop .6s .3s cubic-bezier(.3,1.8,.5,1) both}.bt-res>b{font-family:var(--font-display);font-weight:400;font-size:26px}.bt-res.w>b{color:#C24A3A}.bt-res.l>b{color:#5A6A7A}
 .bt-res p{margin:2px 0;font-size:13.5px}.bt-res .fine{color:#7A6A50}
 .bt-up{display:flex;flex-direction:column;align-items:center;gap:2px;margin:6px 0;padding:8px 16px;border-radius:14px;background:#FFF1C9}.bt-up b{font-size:16px;color:#8A5A10}
 .bt-lgbar{display:flex;align-items:center;gap:8px;width:100%;margin:6px 0}.bt-lgbar .ac-bar{flex:1;display:block;height:10px}.bt-lgbar small{flex:none;font-size:11.5px;color:#7A6A50}
@@ -10027,7 +10070,7 @@ span.bt-stamp{display:grid;place-items:center;border-radius:50%;border:3px solid
     if (!elOpen()) return;
     if (elSync()) { save(); elBadge(); if (rt.modalOpen === $('#mElect')) renderElect(); rt.elNews = true; }
     // 새 선거 알림은 다른 알림과 창이 없을 때 띄워요(자리 비운 도토리 안내 같은 것을 덮지 않게)
-    if (rt.elNews && $('#toast').hidden && !rt.modalOpen && !rt.cereOn && !rt.paused) { rt.elNews = false; toast(S.tier >= 2 ? '새 반장 선거가 열렸어요!\n교실이나 복도의 학생회실에서 후보를 만나 보세요' : '새 반장 선거가 열렸어요!\n교실을 눌러 후보를 만나 보세요'); }
+    if (rt.elNews && $('#toast').hidden && !rt.modalOpen && !rt.cereOn && !rt.paused && !gameSceneOpen()) { rt.elNews = false; toast(S.tier >= 2 ? '새 반장 선거가 열렸어요!\n교실이나 복도의 학생회실에서 후보를 만나 보세요' : '새 반장 선거가 열렸어요!\n교실을 눌러 후보를 만나 보세요'); }
     if (rt.elBadgeT !== S.el.pick + ':' + rt.kids.length) { rt.elBadgeT = S.el.pick + ':' + rt.kids.length; elBadge(); }
   }
   /* ---------- 2.0.1 공부 2단계: 과학 탐구 실험(과학 공부), 책 읽기(국어 공부) (2026-10-28 지섭 결정) ----------
@@ -10217,7 +10260,7 @@ span.bt-stamp{display:grid;place-items:center;border-radius:50%;border:3px solid
     if (!S || !S.rd) return;
     rdSettle();
     if (S.rd.cur && rt.modalOpen === $('#mRead')) renderReadBar();
-    if (rt.rdNews && $('#toast').hidden && !rt.modalOpen && !rt.cereOn && !rt.paused) { const t = rt.rdNews; rt.rdNews = ''; toast(t); }
+    if (rt.rdNews && $('#toast').hidden && !rt.modalOpen && !rt.cereOn && !rt.paused && !gameSceneOpen()) { const t = rt.rdNews; rt.rdNews = ''; toast(t); }
   }
   function openRead() {
     if (!rdReady()) { toast(`${eul(FAC.library.name)} 지으면 책을 읽을 수 있어요`); return; }
@@ -10310,7 +10353,7 @@ span.bt-stamp{display:grid;place-items:center;border-radius:50%;border:3px solid
     if (exIsWeek(w) && S.ex.cur !== w) { S.ex.cur = w; S.ex.ss = 0; save(); rt.exNews = '시험 주가 시작됐어요!\n도서관에서 자율학습을 하면 성적이 올라요'; }
     const p = exPrev();
     if (!exIsWeek(w) && S.ex.cur === p && !(S.ex.rep && S.ex.rep.wk === p)) { S.ex.rep = exMake(p); save(); rt.exNews = '시험 성적표가 나왔어요!\n도서관이나 공부 탭에서 받아요'; if (rt.tab === 'mini') renderMini(); }
-    if (rt.exNews && $('#toast').hidden && !rt.modalOpen && !rt.cereOn && !rt.paused) { const t = rt.exNews; rt.exNews = ''; toast(t); }
+    if (rt.exNews && $('#toast').hidden && !rt.modalOpen && !rt.cereOn && !rt.paused && !gameSceneOpen()) { const t = rt.exNews; rt.exNews = ''; toast(t); }
   }
   const exReportReady = () => !!S && !!S.ex && !!S.ex.rep && !S.ex.rep.got;
   function exStudy(k) {
@@ -10394,7 +10437,9 @@ span.bt-stamp{display:grid;place-items:center;border-radius:50%;border:3px solid
      승 +25(3연승부터 +5씩, 최대 +15 더), 패 −10(1000 아래로 안 내려가요). 리그 6단계(내려가지 않아요), 승급마다 황금 도토리 1~5.
      오늘 첫 승리만 수업료 10분치. 이긴 종목(친선 포함)마다 그 과목 XP 10, 중학교 명부 학생은 능력치 +1(하루 학생마다 2번까지).
      주간 리그 승리마다 5점(하루 25점까지). 그림은 작업지시서 29, 29-1 */
-  const BT = { perDay: 5, win: 25, lose: 10, floor: 1000, streakFrom: 3, streakStep: 5, streakMax: 15, firstMin: 10, xp: 10, grow: 2, lp: 5, lpDay: 25, cheerMs: 3000, cheerMax: 10, dice: 60 };   // 주사위 0~60: 설계안의 승률(별 하나 차이 뒤집기 약 20~30%, 두 별 약 5%)에 맞춘 값. 0~30이면 별 하나 차이도 6%라 거의 못 뒤집어요
+  // 2.1.0 퍼즐, 합치기, 대결 화면에 있는 동안은 홈 알림(반장 선거, 시험 주, 책 다 읽음)을 미뤄요
+  const gameSceneOpen = () => { try { return !!((pzUI && pzUI.open) || (mgUI && mgUI.open) || (btUI && btUI.open)); } catch (e) { return false; } };
+  const BT = { perDay: 5, win: 25, lose: 10, floor: 1000, streakFrom: 3, streakStep: 5, streakMax: 15, firstMin: 10, xp: 10, grow: 2, lp: 5, lpDay: 25, cheerMs: 4000, cheerMax: 10, cheerTaps: 50, dice: 60 };   // 2.1.0 응원: 4초 동안 50번까지 두드려요(5번마다 1점, 최대 10점, 지섭 요청)   // 주사위 0~60: 설계안의 승률(별 하나 차이 뒤집기 약 20~30%, 두 별 약 5%)에 맞춘 값. 0~30이면 별 하나 차이도 6%라 거의 못 뒤집어요
   const BT_EV = { kor: { name: '책 읽기', ic: 'bev_read', em: '📖' }, math: { name: '수학 퀴즈', ic: 'bev_math', em: '➗' }, sci: { name: '과학 퀴즈', ic: 'bev_science', em: '🧪' },
     art: { name: '그리기', ic: 'bev_draw', em: '🎨' }, pe: { name: '달리기', ic: 'bev_run', em: '👟' } };
   const BT_LG = [
@@ -10510,32 +10555,54 @@ span.bt-stamp{display:grid;place-items:center;border-radius:50%;border:3px solid
     if (btLeft() <= 0) { toast(`숲속 대결은 하루 ${BT.perDay}판이에요.\n내일 또 겨뤄요`); return false; }
     S.bt.n += 1; M.phase = 'play'; M.i = 0;
     M.rolls = M.evs.map((e, i) => btRoll(M.me[i].st[e], M.opp[i].st, btOppCheer()));
-    save(); btPlayEv(); return true;
+    save(); M.intro = true; btRender(); sfx('quest');
+    btUI.timer = setTimeout(() => { if (btUI.M !== M) return; M.intro = false; btPlayEv(); }, rt.reduced ? 300 : 1400);   // 2.1.0 시작 연출: 두 학교 마크와 VS
+    return true;
   }
-  // 종목 하나: 3초 동안 두드리면 응원. 그다음 점수 공개
+  const btCheerPts = n => Math.min(BT.cheerMax, Math.round(Math.min(BT.cheerTaps, n) / (BT.cheerTaps / BT.cheerMax)));
+  // 2.1.0 점수가 0부터 차오르는 연출
+  function btCount(el, to, ms) { if (!el) return; if (rt.reduced) { el.textContent = to + '점'; return; } const t0 = performance.now(); const step = t => { const k = Math.min(1, (t - t0) / ms); el.textContent = Math.round(to * (1 - Math.pow(1 - k, 3))) + '점'; if (k < 1) requestAnimationFrame(step); }; requestAnimationFrame(step); }
+  // 종목 하나: 4초 동안 두드리면 응원. 그다음 점수 공개
   function btPlayEv() {
     const M = btUI.M; if (!M || M.phase !== 'play') return;
-    btUI.taps = 0; M.cheering = true; btRender();
-    const ms = rt.reduced ? 1500 : BT.cheerMs;
+    btUI.taps = 0; M.cheering = true; M.reveal = false; btRender();
+    const ms = rt.reduced ? 2000 : BT.cheerMs;
     $('#btPlay').style.setProperty('--bt-t', ms + 'ms');
     requestAnimationFrame(() => $('#btPlay').classList.add('go'));
     btUI.timer = setTimeout(() => {
       if (!btUI.M || btUI.M !== M) return;
       M.cheering = false; $('#btPlay').classList.remove('go');
-      const r = M.rolls[M.i]; r.mc = Math.min(BT.cheerMax, btUI.taps); r.win = btWin(r, r.mc); M.res.push(r);
-      sfx(r.win ? 'quest' : 'tap'); buzz(r.win ? [20, 30, 20] : 20); btRender();
+      const r = M.rolls[M.i]; r.mc = btCheerPts(btUI.taps); r.win = btWin(r, r.mc); M.res.push(r);
+      M.reveal = true; btRender(); buzz(20);
+      btCount($('#btScMe'), btScore(r.ms, r.md, r.mc), 700); btCount($('#btScOpp'), btScore(r.os, r.od, r.oc), 700);
+      setTimeout(() => { if (btUI.M !== M) return; $('#btDuel').classList.add('done'); sfx(r.win ? 'quest' : 'tap'); buzz(r.win ? [20, 30, 20] : 30); }, rt.reduced ? 0 : 750);
       btUI.timer = setTimeout(() => {
         if (!btUI.M || btUI.M !== M) return;
         M.i += 1;
         if (M.i < 3) btPlayEv(); else { M.phase = 'result'; btFinish(M); btRender(); }
-      }, rt.reduced ? 700 : 1500);
+      }, rt.reduced ? 900 : 2100);
     }, ms);
   }
   function btTap(e) {
     const M = btUI.M; if (!M || M.phase !== 'play' || !M.cheering) return;
-    btUI.taps += 1; buzz(6);
-    const n = $('#btCheerN'); if (n) n.textContent = `응원 ${Math.min(BT.cheerMax, btUI.taps)}`;
-    if (!rt.reduced && IMG('bfx_cheer') && e && e.clientX !== undefined) { const f = document.createElement('img'); f.className = 'bt-spark'; f.src = IMG('bfx_cheer'); f.style.left = e.clientX + 'px'; f.style.top = e.clientY + 'px'; document.body.appendChild(f); setTimeout(() => f.remove(), 700); }
+    if (e && e.cancelable) e.preventDefault();   // 2.1.0 두드려도 글자가 파랗게 잡히지 않게
+    if (btUI.taps >= BT.cheerTaps) return;
+    btUI.taps += 1; buzz(5);
+    const n = $('#btCheerN'); if (n) n.textContent = `${btUI.taps} / ${BT.cheerTaps}`;
+    const mi = $('#btMeterI'); if (mi) mi.style.width = (100 * btUI.taps / BT.cheerTaps) + '%';
+    const pt = $('#btCheerPt'); if (pt) pt.textContent = `응원 점수 +${btCheerPts(btUI.taps)}`;
+    const me = $('#btDuel .bt-side.me'); if (me && !rt.reduced) { me.classList.remove('hit'); void me.offsetWidth; me.classList.add('hit'); }
+    if (btUI.taps === BT.cheerTaps) { sfx('quest'); const c = $('#btCheer'); if (c) c.classList.add('full'); }
+    if (!rt.reduced && e && e.clientX !== undefined) {
+      if (IMG('bfx_cheer')) { const f = document.createElement('img'); f.className = 'bt-spark'; f.src = IMG('bfx_cheer'); f.style.left = e.clientX + 'px'; f.style.top = e.clientY + 'px'; document.body.appendChild(f); setTimeout(() => f.remove(), 700); }
+      const p = document.createElement('span'); p.className = 'bt-plus'; p.textContent = '+1'; p.style.left = (e.clientX + (Math.random() * 30 - 15)) + 'px'; p.style.top = (e.clientY - 20) + 'px'; document.body.appendChild(p); setTimeout(() => p.remove(), 650);
+    }
+  }
+  function btConfetti() {
+    const box = document.createElement('div'); box.className = 'bt-confetti'; box.setAttribute('aria-hidden', 'true');
+    const cs = ['#F3C04B', '#E85D5D', '#7FB069', '#5AA0E0', '#B48CE0', '#FFFFFF'];
+    for (let i = 0; i < 46; i++) { const c = document.createElement('i'); c.style.left = (Math.random() * 100) + '%'; c.style.background = cs[i % cs.length]; c.style.animationDelay = (Math.random() * 0.6) + 's'; c.style.setProperty('--dx', (Math.random() * 120 - 60) + 'px'); c.style.setProperty('--r', (Math.random() * 720 - 360) + 'deg'); box.appendChild(c); }
+    $('#btScene').appendChild(box); setTimeout(() => box.remove(), 2600);
   }
   function btAgain() { if (btLeft() <= 0) return; btUI.M = btMake(); S.bt.last = btUI.M.si; sfx('tap'); btRender(); }
   function btRender() {
@@ -10559,13 +10626,27 @@ span.bt-stamp{display:grid;place-items:center;border-radius:50%;border:3px solid
       $('#btGo').setAttribute('aria-disabled', ready && left > 0 ? 'false' : 'true');
       $('#btGo').textContent = left > 0 ? '대결 시작!' : '오늘은 다 했어요';
     } else if (M.phase === 'play') {
-      const i = Math.min(M.i, 2), e = M.evs[i], r = M.res[i], me = M.me[i], o = M.opp[i];
-      $('#btPlayEv').innerHTML = `${btEvIc(e, 34)}<b>${i + 1}번째 종목: ${BT_EV[e].name}</b>${i === 2 && M.res.length >= 2 && M.res[0].win === M.res[1].win ? '<small>친선 경기</small>' : ''}`;
-      const sc = r ? [btScore(r.ms, r.md, r.mc), btScore(r.os, r.od, r.oc)] : null;
-      $('#btDuel').innerHTML = `<div class="bt-side me">${btChr(me.sp, 'bt-big')}<b>${esc(me.nm)}</b><small class="stars">${starTxt(me.st[e])}</small><span class="bt-bar"><i></i></span>${sc ? `<em>${sc[0]}점</em>` : ''}${r ? (r.win ? (IMG('bfx_win') ? `<img class="bt-stamp" src="${IMG('bfx_win')}" alt="이김">` : '<span class="bt-stamp w">승</span>') : '') : ''}</div>` +
-        `<div class="bt-side opp">${btChr(o.sp, 'bt-big')}<b>${esc(o.nm)}</b><small class="stars">${starTxt(o.st)}</small><span class="bt-bar"><i></i></span>${sc ? `<em>${sc[1]}점</em>` : ''}${r && !r.win ? (IMG('bfx_lose') ? `<img class="bt-stamp" src="${IMG('bfx_lose')}" alt="짐">` : '<span class="bt-stamp l">패</span>') : ''}</div>`;
-      $('#btCheer').innerHTML = M.cheering ? `<b>화면을 톡톡 두드려 응원해요!</b><span id="btCheerN">응원 0</span>` : r ? `<b>${r.win ? '이겼어요!' : '아쉬워요!'}</b><span>응원 ${r.mc} : ${r.oc}</span>` : '';
-      $('#btScoreLine').innerHTML = M.res.map((x, j) => `<i class="${x.win ? 'w' : 'l'}">${btEvIc(M.evs[j], 18)}</i>`).join('');
+      const sch2 = BT_SCH[M.si];
+      if (M.intro) {   // 2.1.0 시작 연출
+        $('#btPlayEv').innerHTML = ''; $('#btScoreLine').innerHTML = ''; $('#btCheer').innerHTML = ''; $('#btCheer').className = 'bt-cheer';
+        $('#btDuel').className = 'bt-duel'; $('#btDuel').innerHTML = `<div class="bt-intro"><span class="bt-in me">${(S.deco.mk && markHTML(S.deco.mk)) || '<span style="font-size:46px">🏫</span>'}<b>${esc(schoolTitle())}</b></span><em>VS</em><span class="bt-in opp">${IMG('bmark_' + sch2.k) ? `<img src="${IMG('bmark_' + sch2.k)}" alt="">` : '🏫'}<b>${esc(sch2.name)}</b></span></div>`;
+        return;
+      }
+      const i = Math.min(M.i, 2), e = M.evs[i], r = M.reveal ? M.res[i] : null, me = M.me[i], o = M.opp[i];
+      const friendly = i === 2 && M.res.length >= 2 && M.res[0].win === M.res[1].win;
+      $('#btPlayEv').innerHTML = `${btEvIc(e, 34)}<b>${i + 1}번째 종목: ${BT_EV[e].name}</b>${friendly ? '<small>친선 경기</small>' : ''}`;
+      $('#btPlayEv').classList.remove('pop'); void $('#btPlayEv').offsetWidth; if (!r) $('#btPlayEv').classList.add('pop');
+      const scs = r ? [btScore(r.ms, r.md, r.mc), btScore(r.os, r.od, r.oc)] : null, top = scs ? Math.max(1, ...scs) : 1;
+      const side = (who, p, stars, mine) => `<div class="bt-side ${mine ? 'me' : 'opp'}${r ? ((mine ? r.win : !r.win) ? ' win' : ' lose') : ''}"><span class="bt-fig">${btChr(p.sp, 'bt-big')}</span><b>${esc(p.nm)}</b><small class="stars">${starTxt(stars)}</small><span class="bt-bar"><i${scs ? ` style="width:${Math.round(100 * scs[mine ? 0 : 1] / top)}%"` : ''}></i></span>` +
+        (r ? `<em id="${mine ? 'btScMe' : 'btScOpp'}">0점</em>` : '<em class="wait">?</em>') +
+        (r && (mine ? r.win : !r.win) ? (IMG('bfx_win') ? `<img class="bt-stamp" src="${IMG('bfx_win')}" alt="이김">` : '<span class="bt-stamp w">승</span>') : '') +
+        (r && (mine ? !r.win : r.win) ? (IMG('bfx_lose') ? `<img class="bt-stamp" src="${IMG('bfx_lose')}" alt="짐">` : '<span class="bt-stamp l">패</span>') : '') + '</div>';
+      $('#btDuel').className = 'bt-duel ev-' + e + (r ? '' : ' live');
+      $('#btDuel').innerHTML = side('me', me, me.st[e], true) + '<span class="bt-vs2">VS</span>' + side('opp', o, o.st, false);
+      $('#btCheer').className = 'bt-cheer' + (M.cheering ? ' on' : '');
+      $('#btCheer').innerHTML = M.cheering ? `<b>화면을 마구 두드려 응원해요!</b><span class="bt-meter"><i id="btMeterI"></i></span><span class="bt-cnt"><span id="btCheerN">0 / ${BT.cheerTaps}</span><small id="btCheerPt">응원 점수 +0</small></span>`
+        : r ? `<b>${r.win ? '이겼어요!' : '아쉬워요!'}</b><span>응원 점수 ${r.mc} : ${r.oc}</span>` : '';
+      $('#btScoreLine').innerHTML = [0, 1, 2].map(j => { const x = M.reveal || j < M.i ? M.res[j] : null; return `<i class="${x ? (x.win ? 'w' : 'l') : j === i ? 'now' : ''}">${btEvIc(M.evs[j], 18)}</i>`; }).join('');
     } else {
       const o = M.out || {}, L = S.bt.lg, nx = BT_LG[L + 1];
       $('#btResult').innerHTML = `<div class="bt-res ${o.win ? 'w' : 'l'}">${o.win ? (IMG('bfx_win') ? `<img src="${IMG('bfx_win')}" alt="">` : '🏆') : (IMG('bfx_lose') ? `<img src="${IMG('bfx_lose')}" alt="">` : '🌧️')}` +
@@ -10576,6 +10657,7 @@ span.bt-stamp{display:grid;place-items:center;border-radius:50%;border:3px solid
         `<div class="bt-lgbar">${btMedal(L, 28)}<span class="ac-bar"><i style="width:${nx ? Math.round(100 * Math.min(1, (S.bt.pts - BT_LG[L].at) / (nx.at - BT_LG[L].at))) : 100}%"></i></span><small>${nx ? `${nx.n} 리그까지 ${fmt(Math.max(0, nx.at - S.bt.pts))}점` : '가장 높은 리그예요'}</small></div>` +
         `<p class="fine">이긴 종목마다 그 과목 XP +${BT.xp}${rosterOn() ? ', 이긴 학생은 능력치가 자라요' : ''}. 오늘 남은 대결 ${btLeft()}판.</p>` +
         `<div class="btn-row">${btLeft() > 0 ? '<button class="cta" type="button" id="btAgain">한 판 더</button>' : ''}<button class="btn-sub" type="button" id="btDone">닫기</button></div></div>`;
+      if (o.win && !rt.reduced && !M.confetti) { M.confetti = true; btConfetti(); }   // 2.1.0 승리 꽃가루
     }
   }
   function renderBtCard() {
