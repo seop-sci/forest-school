@@ -67,3 +67,22 @@ jobs:
             app/android/app/build/outputs/apk/release/*.apk
             app/android/app/build/outputs/apk/debug/*.apk
           if-no-files-found: error
+
+  # 2026-10-28 지섭 요청: 빌드가 끝나면 예전 안드로이드 결과물을 지워요. 이번 것과 바로 앞 것 두 개만 남겨요(혹시 몰라 직전 판은 둬요)
+  cleanup:
+    needs: build
+    runs-on: ubuntu-24.04
+    permissions:
+      actions: write   # 결과물 지우기에만 써요
+    steps:
+      - name: 예전 안드로이드 결과물 지우기 (최근 두 개만 남김)
+        env:
+          GH_TOKEN: ${{ github.token }}
+          REPO: ${{ github.repository }}
+        run: |
+          gh api --paginate "repos/$REPO/actions/artifacts?per_page=100" \
+            --jq '.artifacts[] | select(.name | startswith("forest-school-android-")) | [.created_at, .id, .name] | @tsv' \
+            | sort -r | tail -n +3 | while IFS=$'\t' read -r at id name; do
+              echo "지워요: $name ($at)"
+              gh api -X DELETE "repos/$REPO/actions/artifacts/$id" || echo "::warning::$name 지우기 실패"
+            done
