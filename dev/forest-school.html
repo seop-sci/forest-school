@@ -2883,7 +2883,7 @@ span.bt-stamp{display:none}.bt-duel.done span.bt-stamp{display:grid}
     <div class="street-scene hall-scene" id="hallScene">
       <button class="shopfront door hroom" type="button" data-go="club" id="hdClub" style="left:0.00%;top:4.49%;width:44.82%;height:23.11%;--tx:104.8%;--ty:79.2%" aria-label="동아리실"><span class="sf-tag"><b>동아리실</b><span class="sf-have" id="hallClubN">0%</span></span></button>
       <button class="shopfront door hroom soon" id="hdCouncil" type="button" aria-disabled="true" data-soon="학생회실은 준비 중이에요. 업데이트를 기다려 주세요" style="left:58.79%;top:7.75%;width:41.21%;height:24.51%;--tx:-5.5%;--ty:94.3%" aria-label="학생회실, 준비 중"><span class="sf-tag"><b>학생회실</b><span class="sf-soon">준비 중</span></span></button>
-      <button class="shopfront door hroom soon" type="button" aria-disabled="true" data-soon="칭찬 게시판은 준비 중이에요. 업데이트를 기다려 주세요" style="left:0.00%;top:27.60%;width:43.55%;height:24.19%;--tx:106.7%;--ty:75.1%" aria-label="칭찬 게시판, 준비 중"><span class="sf-tag"><b>칭찬 게시판</b><span class="sf-soon">준비 중</span></span></button>
+      <button class="shopfront door hroom soon" id="hdBoard" type="button" aria-disabled="true" data-soon="칭찬 게시판은 준비 중이에요. 업데이트를 기다려 주세요" style="left:0.00%;top:27.60%;width:43.55%;height:24.19%;--tx:106.7%;--ty:75.1%" aria-label="칭찬 게시판, 준비 중"><span class="sf-tag"><b>칭찬 게시판</b><span class="sf-soon">준비 중</span></span></button>
       <button class="shopfront door hroom soon" id="hdOffice" type="button" aria-disabled="true" data-soon="교무실은 준비 중이에요. 업데이트를 기다려 주세요" style="left:58.69%;top:32.26%;width:41.31%;height:26.08%;--tx:-5.2%;--ty:88.2%" aria-label="교무실, 준비 중"><span class="sf-tag"><b>교무실</b><span class="sf-soon">준비 중</span></span></button>
       <button class="shopfront door hroom soon" type="button" aria-disabled="true" data-soon="상담실은 준비 중이에요. 업데이트를 기다려 주세요" style="left:0.00%;top:51.79%;width:43.16%;height:30.24%;--tx:108.8%;--ty:63.6%" aria-label="상담실, 준비 중"><span class="sf-tag"><b>상담실</b><span class="sf-soon">준비 중</span></span></button>
       <button class="shopfront door hroom soon" type="button" aria-disabled="true" data-soon="새 방은 공사 중이에요. 업데이트를 기다려 주세요" style="left:58.98%;top:58.34%;width:41.02%;height:28.90%;--tx:-5.9%;--ty:74.3%" aria-label="새 방, 준비 중"><span class="sf-tag"><b>새 방</b><span class="sf-soon">공사 중</span></span></button>
@@ -11468,6 +11468,13 @@ span.bt-stamp{display:none}.bt-duel.done span.bt-stamp{display:grid}
       const chip = hc.querySelector('.sf-soon'); if (chip) chip.className = 'sf-have';
       const pres = elPres(); hc.querySelector('.sf-have').textContent = pres ? `반장 ${pres.nm}` : '투표하기!';
     }
+    // 2.1.0 칭찬 게시판: 칭찬 스티커판이 열리면 문이 열려요
+    const hb = $('#hdBoard');
+    if (hb && skOpen()) {
+      hb.classList.remove('soon'); hb.setAttribute('aria-disabled', 'false'); hb.removeAttribute('data-soon'); hb.setAttribute('aria-label', '칭찬 게시판, 칭찬 스티커판');
+      const chip = hb.querySelector('.sf-soon'); if (chip) chip.className = 'sf-have';
+      hb.querySelector('.sf-have').textContent = skFull() ? '상 받기!' : `${S.sk.cur.length}/${SK.full}장`;
+    }
     // 2.0.1 교무실: 시험 기간
     const ho = $('#hdOffice');
     if (ho && exOpen()) {
@@ -14887,6 +14894,7 @@ span.bt-stamp{display:none}.bt-duel.done span.bt-stamp{display:grid}
     $$('[data-soon]').forEach(b => b.addEventListener('click', () => { if (!b.dataset.soon) return; toast(b.dataset.soon); sfx('tap'); }));
     $$('.panel p, .sheet p').forEach(nlP);   // 2.0.1 처음부터 적힌 설명 글도 문장마다 줄바꿈
     $('#hdCouncil').addEventListener('click', () => { if (elOpen()) openElect(); });   // 2.0.1
+    $('#hdBoard').addEventListener('click', () => { if (skOpen()) openSticker(); });   // 2.1.0
     $('#elClose').addEventListener('click', () => { sfx('tap'); closeModal($('#mElect')); });
     $('#mElect .backdrop').addEventListener('click', () => closeModal($('#mElect')));
     $('#elCands').addEventListener('click', e => { const b = e.target.closest('[data-el]'); if (b) elVote(+b.dataset.el); });

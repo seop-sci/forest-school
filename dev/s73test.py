@@ -5,7 +5,7 @@
 #  3) 초등학교 졸업식: 장면이 5.2초 뒤 저절로 입학 창으로 넘어가요. 뜨자마자 누른 손(0.35초 안)은 넘기지 않아요
 #  4) 장면 동안 알림(현장체험학습이 열렸어요)은 장면이 끝난 뒤에 떠요. 누르거나 뒤로 가기(Escape)를 하면 건너뛸지 묻고(묻는 동안 멈춤), 계속 보기와 건너뛰기가 돼요. 동작 줄이기 설정이면 꽃가루를 숨기고 2.6초 뒤 넘어가요
 #  6) 매점 가구 갖추기(j3)와 책상 퀘스트를 누르면 건물 창의 가구 칸으로 가요(짓기 전에는 짓기 안내). 명예 교장실과 장학재단 추천은 고치기 버튼 바로 위. 복도 버튼은 문 그림과 '열기'(발표회 날은 '발표회!'와 빨간 점)
-#  7) 복도의 준비 중 방(중학교는 학생회실과 교무실이 열려 3곳, 표와 누르면 안내), 학생 모집 퀘스트 설명과 교실 자리, 퀘스트 점에서 이벤트 빼기, 이벤트 예정 4개와 특별 강조, 이벤트 설명, 지난 학교급 모습 간판 글자와 꾸미기 칸
+#  7) 복도의 준비 중 방(중학교는 학생회실, 교무실, 칭찬 게시판이 열려 2곳, 표와 누르면 안내), 학생 모집 퀘스트 설명과 교실 자리, 퀘스트 점에서 이벤트 빼기, 이벤트 예정 4개와 특별 강조, 이벤트 설명, 지난 학교급 모습 간판 글자와 꾸미기 칸
 #  5) 390 밝은 화면과 360 어두운 화면에서 넘치지 않아요(캡처 s73_390.png, s73_360.png). 페이지 오류 없음
 # 쓰는 법: python3 wrap.py && python3 s73test.py   (마지막 줄이 PASS면 통과)
 import asyncio, json
@@ -192,7 +192,7 @@ async def main():
             await pg.click('#panelHall .shopfront.soon >> nth=0', force=True); await pg.wait_for_timeout(200)
             r['toast'] = await pg.evaluate("document.querySelector('#toast').textContent")
             print('준비 중 방', w, r)
-            if r['n'] != 3 or r['chips'] != 3 or r['msgs'] != 3 or '준비 중이에요' not in r['toast']: bad.append(f'{w} 준비 중 방 {r}')   # 2.0.1 중학교에서는 학생회실(반장 선거)과 교무실(시험 기간)이 열려서 3곳
+            if r['n'] != 2 or r['chips'] != 2 or r['msgs'] != 2 or '준비 중이에요' not in r['toast']: bad.append(f'{w} 준비 중 방 {r}')   # 2.0.1 중학교에서는 학생회실(반장 선거)과 교무실(시험 기간), 2.1.0부터 칭찬 게시판(스티커판)도 열려서 2곳
             if w == 390:
                 r = await pg.evaluate(f"""(() => {{ const F = {F}, S = F.S, f0 = S.f.classroom, out = [];
                   for (const q of F.MAIN.filter(q => q.t === 'students')) {{ const m = q.how.match(/Lv\\.(\\d+)까지 넓히고 학생을 (\\d+)명까지 모집해요/);
