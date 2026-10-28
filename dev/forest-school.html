@@ -1241,6 +1241,14 @@ body{background:radial-gradient(120% 60% at 50% 0%, color-mix(in srgb, var(--pap
 .ac-bk{padding:3px 9px;border:0;border-radius:999px;background:var(--chip-bg);color:var(--chip-ink);font:inherit;font-size:12px;white-space:nowrap;cursor:pointer;display:inline-flex;align-items:center;gap:3px}
 .ac-bk .tic{width:14px;height:14px}
 .ac-bk.poor,.ac-bk.off{opacity:.55}
+.bk-modal{max-width:340px}
+.bk-lead{margin:2px 0 12px;font-size:14px;line-height:1.55;text-align:center}
+.bk-rows{display:grid;gap:6px;margin-bottom:10px}
+.bk-row{display:flex;align-items:center;justify-content:space-between;gap:8px;padding:9px 12px;border-radius:12px;background:var(--card);font-size:14px}
+.bk-row span{color:var(--muted)}.bk-row b{display:inline-flex;align-items:center;gap:4px;font-size:15px}.bk-row .tic,.bk-row svg,.bk-row img{width:18px;height:18px}
+.bk-why{margin:0 0 10px;font-size:13px;line-height:1.5;color:var(--danger);text-align:center}
+#bkBuy{display:inline-flex;align-items:center;justify-content:center;gap:4px}#bkBuy .tic,#bkBuy svg,#bkBuy img{width:18px;height:18px}
+#bkBuy[aria-disabled="true"]{opacity:.5}
 .ac-note{color:var(--muted);font-size:12px;margin-top:2px}
 .mini-card .mc-sub{display:table;margin:0 0 3px;line-height:1.3;padding:1px 7px;border-radius:999px;background:var(--chip-bg);color:var(--chip-ink);font-family:var(--font-body);font-size:12px;font-weight:700;white-space:nowrap}
 @media (max-width:380px){.ac-row{grid-template-columns:30px 40px 1fr auto;gap:6px}.ac-bk{padding:3px 7px;font-size:11px}}
@@ -3254,6 +3262,17 @@ span.bt-stamp{display:grid;place-items:center;border-radius:50%;border:3px solid
       <p class="fine lab-note2" id="labNoteTx"></p>
     </div>
     <div class="btn-row"><button class="btn-sub" type="button" id="labClose">닫기</button></div>
+  </section>
+</div>
+
+<div class="overlay center" id="mBook" hidden>
+  <div class="backdrop"></div>
+  <section class="modal bk-modal" role="dialog" aria-modal="true" aria-labelledby="bkTitle">
+    <h2 id="bkTitle">문제집</h2>
+    <p class="bk-lead" id="bkLead"></p>
+    <div class="bk-rows"><div class="bk-row" id="bkLeft"></div><div class="bk-row" id="bkHave"></div></div>
+    <p class="bk-why" id="bkWhy" hidden></p>
+    <div class="btn-row"><button class="btn-sub" type="button" id="bkCancel">취소</button><button class="cta" type="button" id="bkBuy">구매하기</button></div>
   </section>
 </div>
 
@@ -9601,8 +9620,25 @@ span.bt-stamp{display:grid;place-items:center;border-radius:50%;border:3px solid
       AC.keys.map(k => { const a = S.ac[k], need = AC.need(a.lv), capped = a.lv >= cap, left = acBkLeft(k), poor = S.ess < AC.book.ess;
         return `<div class="ac-row"><span class="ac-nm">${AC.name[k]}</span><span class="ac-lv">Lv.${a.lv}</span>` +
           `<span class="ac-bar${capped ? ' cap' : ''}" role="progressbar" aria-label="${AC.name[k]} Lv.${a.lv}" aria-valuenow="${capped ? need : Math.min(need, a.xp)}" aria-valuemax="${need}"><i style="width:${capped ? 100 : Math.round(100 * Math.min(1, a.xp / need))}%"></i></span>` +
-          `<button class="ac-bk${poor ? ' poor' : ''}${left > 0 ? '' : ' off'}" type="button" data-book="${k}" aria-label="${AC.name[k]} 문제집, 숲의 정수 ${AC.book.ess}개, 오늘 ${left}권 남음">문제집 ${ic}${AC.book.ess} <small>${left}/${AC.book.perDay}</small></button></div>`; }).join('') +
+          `<button class="ac-bk${left > 0 ? '' : ' off'}" type="button" data-book="${k}" aria-label="${AC.name[k]} 문제집 구매, 오늘 ${left}권 남음">문제집 구매</button></div>`; }).join('') +
       `<div class="ac-note">${cap <= acLv('kor') && AC.keys.every(k => acLv(k) >= cap) ? `${tierInfo().name} 상한 Lv.${cap}이에요. 다음 학교급에서 더 배워요` : `문제집은 과목마다 하루 ${AC.book.perDay}권, 한 권에 XP +${AC.book.xp}. ${tierInfo().name} 상한은 Lv.${cap}이에요`}</div>`;
+  }
+  // 2.1.0 문제집 구매 확인창: 값, 효과, 오늘 남은 권수, 가진 숲의 정수
+  function openBook(k) {
+    if (!AC.name[k] || rt.paused || rt.modalOpen) return;
+    rt.bookK = k; renderBook(); openModal($('#mBook'));
+  }
+  function renderBook() {
+    const k = rt.bookK; if (!k || !$('#mBook')) return;
+    const left = acBkLeft(k), need = AC.book.ess, have = S.ess, ic = ESS_ICON();
+    $('#bkTitle').textContent = `${AC.name[k]} 문제집`;
+    $('#bkLead').textContent = `숲의 정수 ${need}개로 한 권을 사면 ${AC.name[k]} XP +${AC.book.xp}을 바로 받아요.`;
+    $('#bkLeft').innerHTML = `<span>오늘 남은 문제집</span><b>${left} / ${AC.book.perDay}권</b>`;
+    $('#bkHave').innerHTML = `<span>가진 숲의 정수</span><b>${ic}${fmt(have)}개</b>`;
+    const why = left <= 0 ? `${AC.name[k]} 문제집은 오늘 다 샀어요. 내일 다시 살 수 있어요.` : have < need ? `숲의 정수가 ${need - have}개 모자라요. 퍼즐이나 합치기로 모을 수 있어요.` : '';
+    $('#bkWhy').textContent = why; $('#bkWhy').hidden = !why;
+    $('#bkBuy').setAttribute('aria-disabled', why ? 'true' : 'false');
+    $('#bkBuy').innerHTML = `${ic}${need} 구매하기`;
   }
   // 옛 저장: 퍼즐 판 수와 합치기 주문 수로 수학과 미술 XP를 한 번 환산해요(2.0.1 테스트판 플레이어)
   function sanitizeAc(d, s) {
@@ -11495,7 +11531,9 @@ span.bt-stamp{display:grid;place-items:center;border-radius:50%;border:3px solid
     save(); pzRenderTray(); pzRenderHelp();
   }
   function pzWire() {
-    $('#acList').addEventListener('click', e => { const b = e.target.closest('[data-book]'); if (b) { sfx('tap'); acBuyBook(b.dataset.book); } });   // 2.0.1 문제집
+    $('#acList').addEventListener('click', e => { const b = e.target.closest('[data-book]'); if (b) { sfx('tap'); openBook(b.dataset.book); } });   // 2.1.0 문제집 구매: 확인창부터
+    $('#bkCancel').addEventListener('click', () => { sfx('tap'); closeModal($('#mBook')); });
+    $('#bkBuy').addEventListener('click', () => { if ($('#bkBuy').getAttribute('aria-disabled') === 'true') return; const k = rt.bookK; closeModal($('#mBook'), () => acBuyBook(k)); });
     $('#pzOpen').addEventListener('click', () => { sfx('tap'); if (liveOff('puzzle')) { toast('숲속 퍼즐은 잠시 점검 중이에요. 조금만 기다려 주세요'); return; } pzOpen(); });
     bind180();   // 1.8.0 숲속 합치기
     $('#pzAdBtn').addEventListener('click', () => {
@@ -15508,7 +15546,7 @@ span.bt-stamp{display:grid;place-items:center;border-radius:50%;border:3px solid
   }
 
   // 시험용 손잡이: 자동 시험(window.__FOREST_TEST)에서만 게임 속 함수를 꺼내 써요
-  if (window.__FOREST_TEST) window.__forest = { get S() { return S; }, goTo, LAB, LAB_IN, LAB_KEYS, LAB_CARDS, LAB_MIX, LAB_DBL, labOf, labRun, labCount, labReady, labDone, openLab, renderLab, labTap, labGo, RD, BOOKS, rdStart, rdSettle, rdTick, rdLeft, rdRemain, openRead, renderRead, renderStudy2, sanitizeStudy2, maintSync, maintTap, BT, BT_EV, BT_LG, BT_SCH, btOpen, btLeft, btRoster, btBest, btMake, btScore, btWin, btFinish, btOpenScene, btClose, btRankDoc, BT_RANK, readRow, btAuto, btPick, btStart, btRender, renderBtCard, sanitizeBt, get btUI() { return btUI; }, EX, exIsWeek, exNow, exPrev, exDays, exScore, exGrade, exStudy, exClaim, exTick, exMake, openExam, renderExam, exAwardTop, exReportReady, sanitizeExam, renderSheet, openSheet,   // 2.0.1 공부 2단계(s76)
+  if (window.__FOREST_TEST) window.__forest = { get S() { return S; }, goTo, LAB, LAB_IN, LAB_KEYS, LAB_CARDS, LAB_MIX, LAB_DBL, labOf, labRun, labCount, labReady, labDone, openLab, renderLab, labTap, labGo, RD, BOOKS, rdStart, rdSettle, rdTick, rdLeft, rdRemain, openRead, renderRead, renderStudy2, sanitizeStudy2, maintSync, maintTap, openBook, renderBook, BT, BT_EV, BT_LG, BT_SCH, btOpen, btLeft, btRoster, btBest, btMake, btScore, btWin, btFinish, btOpenScene, btClose, btRankDoc, BT_RANK, readRow, btAuto, btPick, btStart, btRender, renderBtCard, sanitizeBt, get btUI() { return btUI; }, EX, exIsWeek, exNow, exPrev, exDays, exScore, exGrade, exStudy, exClaim, exTick, exMake, openExam, renderExam, exAwardTop, exReportReady, sanitizeExam, renderSheet, openSheet,   // 2.0.1 공부 2단계(s76)
     AC, AC_GAME, AB_KEY, ABIL, acLv, acSum, acMult, acRepOf, acGain, acSettle, acAll, acCap, acBkLeft, acBuyBook, renderAc, sanitizeAc, freshAc, rankRows, awayStart, awaySettle, timeSrc, save, awayHold, rankCap, cloudVerify, liveApply, liveLoad, openNotice, NOTICES, get Live() { return Live; }, get Rank() { return Rank; }, liveOff,   // 2.0.0 보안 점검 시험(s71), Codex 검토 시험(s72)
     rosterEnsure, rosterMake, rosterAdd, clubAuto, clubSet, clubPct, clubShow, clubSum, clubStars, clubMembers, clubShowGo, showReady, showWait, showDay, clubWeekTick, clubFacUp, CLUBS, CLUB, star, clubTuitionMult, clubFestMult, clubDecoOff, renderClub, renderHall, openSeatPick, openClubPick,
     TIER_SCALE, legacyMult, tuitionMult, snapTake, snapOf, tierViewOpen, tierViewClose, renderTierView, renderTierDots, viewMap, showNewTalk, talkNext, showCere, cereEnd, cereCrew, cereAsk, cereKeep, goFur, updateQuestDot, openElect, renderElect, elVote, elSync, elMult, elClub, elPres, elBadge, elMake, EL_PLEDGES, clubPct, festPrize, dropValue, claimMission, gameWeek, NEWCOMERS, TIERS, GEO, geoIdx, decoCost0, qMeasure, qDone, qGoal, kidArt: kidSVG, newYear, checkGrade, gradeOf, townRep, FAC, sanitize200, trialHunt, updateTrial, TRIAL, zoomAt, fitMap, ZOOM_MAX, DECO, DECO_SLOTS, DECO_SIGN, decoCost, decoSoldOut, pickDeco, buyDeco, decoPut, decoEditStart, decoEditEnd, openDecoPick, renderDeco, setSchoolNm, setMark, schoolTitle, markHTML, decoPlacedAll, esExLeft, esExCost, get Cloud() { return Cloud; }, get actx() { return actx; }, Music, musicSync, ensureAudio, bgmLoad, pzUI, rt, makeDeal, furStage, DEAL, navInfo, navRoute, spawnDrop, repTipCheck, linkGoogle, retryCloud, sanitize, acctPending, renderMap, renderHUD, renderAffordance, syncKids, layoutMap, geo, hitTrial, endVisit, showReward, recommend, needCost, prepTopUp, qReward, prepPhase, rankScore, pwOf, previewDip, dipMult, costScale, buyFur, buyFurAll, furCost, furReady, furDone, FUR, startTalk, endTalk, teacherAct, facCost, teaCost, facKeys, rate, rep, capacity, canGraduate, canPromote,
