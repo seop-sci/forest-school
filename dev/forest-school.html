@@ -2484,7 +2484,7 @@ span.bt-stamp{display:none}.bt-duel.done span.bt-stamp{display:grid}
     <p class="boot-step" id="bootStep">학교 문을 여는 중...</p>
     <p class="boot-tip" id="bootTip">학교 문을 여는 중이에요</p>
   </div>
-  <span class="boot-ver" id="bootVer">v2.0.1</span>
+  <span class="boot-ver" id="bootVer">v2.1.0</span>
 </div>
 
 <div class="app on-school" id="app">
@@ -2929,7 +2929,7 @@ span.bt-stamp{display:none}.bt-duel.done span.bt-stamp{display:grid}
       </div>
       <h3 class="panel-sub">정보</h3>
       <dl class="info">
-        <div id="verRow"><dt>버전</dt><dd>v2.0.1</dd></div>
+        <div id="verRow"><dt>버전</dt><dd>v2.1.0</dd></div>
         <div id="pidRow" hidden><dt>학교 번호</dt><dd id="infoPid"></dd></div>
       </dl>
       <div id="devBox" hidden>
@@ -7597,7 +7597,7 @@ span.bt-stamp{display:none}.bt-duel.done span.bt-stamp{display:grid}
       pcSettle();
       $('#sheetPicnicIc').innerHTML = IMG('picnic_ic') ? `<img src="${IMG('picnic_ic')}" alt="">` : '🧺';
       const busy = pcActive(), done = !busy && S.pc.day === gameToday();
-      $('#sheetPicnicTx').textContent = busy ? `소풍 가는 중, ${Math.ceil(pcRemain() / 60000)}분 뒤 돌아와요` : done ? '오늘 소풍은 다녀왔어요' : `친구 ${PC.kids}명이 ${PC.min}분 동안 숲에 다녀와요`;
+      $('#sheetPicnicTx').textContent = busy ? `소풍 가는 중, ${Math.ceil(pcRemain() / 60000)}분 뒤 돌아와요` : done ? '오늘 소풍은 다녀왔어요' : `친구 ${PCN.kids}명이 ${PCN.min}분 동안 숲에 다녀와요`;
       $('#sheetPicnicGo').textContent = busy ? '보기' : done ? '보기' : '보내기!';
       sp.classList.toggle('todo', !busy && !done);
     }
@@ -8309,14 +8309,14 @@ span.bt-stamp{display:none}.bt-duel.done span.bt-stamp{display:grid}
        forest/rank/<내 id>   랭킹 이름과 학교 점수
        forest/stats/<내 id>  테스트 현황 (어디까지 했는지, 얼마나 했는지)
      <내 id>는 Firebase 익명 로그인이 기기(브라우저)마다 만들어 줘요. */
-  const VERSION = '2.0.1';
+  const VERSION = '2.1.0';
   /* 2.0.0 공지사항 (2026-10-27 지섭, 1.8.0은 이미 올려서 2.0.0부터): 설정 > 공지사항. 맨 위가 가장 새 공지예요.
      패치노트는 자동으로 넣지 않아요. 지섭이 검수한 글만 여기에 적어요(CHANGELOG.md는 자세한 기록용이라 따로 있어요).
      접속하면 새 공지 창을 띄워요(올라온 뒤 7일 동안, '일주일간 열지 않기'를 누르면 7일 쉬어요). 업데이트한 뒤 첫 접속에는 쉬는 중이어도 한 번 띄워요 */
   const NOTICES = [
-    // 2.1.0 공지(지섭이 고른 줄만). 나머지 줄과 날짜는 업데이트하는 날 지섭 확인을 받아 채워요
-    { id: '2026-10-28-v210', date: '2026-10-28', tag: '업데이트', title: '2.1.0 업데이트',
-      lines: ['학력과 능력치 균형을 다시 잡았어요'] },
+    // 2.1.0 공지(2026-10-29 지섭 확인: 일곱 줄)
+    { id: '2026-10-29-v210', date: '2026-10-29', tag: '업데이트', title: '2.1.0 업데이트',
+      lines: ['공사 시간과 시간 단축권 추가', '초등학교부터 한 학년이 두 학기로 변경', '숲속 소풍 추가', '초등학교 칭찬 스티커판 추가', '상점 리모델링: 꾸미기 백화점, 문방구, 꾸미기 가게', '밤 모드 추가', '숲속 대결 연출 개선'] },
     // 2.0.1 공지(2026-10-28 지섭 확인: 열한 줄). id를 v201s로 바꿔 공부 시스템을 더한 뒤 한 번 더 띄워요
     { id: '2026-10-28-v201s', date: '2026-10-28', tag: '업데이트', title: '2.0.1 업데이트',
       lines: ['초등학교 학급 반장 선거 추가', '반장 공약으로 한 주 동안 보너스', '중학교 반장은 동아리 보너스 두 배', '졸업식 장면 추가', '이벤트 예정에 다가오는 이벤트 4개 표시',
@@ -9785,7 +9785,7 @@ span.bt-stamp{display:none}.bt-duel.done span.bt-stamp{display:grid}
     if (S.pc && pcReady()) {
       const busy = pcActive(), done = !busy && S.pc.day === gameToday();
       h += `<h3 class="shop-h">소풍 도시락 <small>소풍 하루 한 번</small></h3>` +
-        row(IMG('picnic_lunch') ? `<img src="${IMG('picnic_lunch')}" alt="" draggable="false">` : ic, `소풍 도시락 (정수 ${PC.lunch})`, `주워 오는 도토리가 수업료 ${PC.acorn}분치에서 ${PC.lunchAcorn}분치로 늘어요`, busy ? '지금 소풍을 가 있어요' : done ? '오늘 소풍은 다녀왔어요' : '소풍 보낼 때 함께 싸요',
+        row(IMG('picnic_lunch') ? `<img src="${IMG('picnic_lunch')}" alt="" draggable="false">` : ic, `소풍 도시락 (정수 ${PCN.lunch})`, `주워 오는 도토리가 수업료 ${PCN.acorn}분치에서 ${PCN.lunchAcorn}분치로 늘어요`, busy ? '지금 소풍을 가 있어요' : done ? '오늘 소풍은 다녀왔어요' : '소풍 보낼 때 함께 싸요',
           `<button class="buy${busy || done ? ' off' : ''}" type="button" data-ebuy="lunch">싸서 보내기</button>`);
     }
     // 밤 모드
@@ -9834,7 +9834,7 @@ span.bt-stamp{display:none}.bt-duel.done span.bt-stamp{display:grid}
     const it = essItem(pick); if (!it) return;
     sfx('tap');
     if (it.kind === 'book') { rt.essPick = ''; openBook(it.k); return; }
-    if (it.kind === 'lunch') { rt.essPick = ''; openPicnic(); if (rt.modalOpen === $('#mPicnic') && S.ess >= PC.lunch) { rt.pcLunch = true; renderPicnic(); } return; }   // 2.1.0   // 문제집은 공부 탭과 같은 확인창으로
+    if (it.kind === 'lunch') { rt.essPick = ''; openPicnic(); if (rt.modalOpen === $('#mPicnic') && S.ess >= PCN.lunch) { rt.pcLunch = true; renderPicnic(); } return; }   // 2.1.0   // 문제집은 공부 탭과 같은 확인창으로
     if (it.kind === 'night' && !it.price) {
       S.cos.night = !S.cos.night; rt.essPick = '';
       renderNight(true); save(); renderEssShop();
@@ -10809,26 +10809,26 @@ span.bt-stamp{display:none}.bt-duel.done span.bt-stamp{display:grid}
      놀이터 안에서 게임 시계로 하루 한 번. 학생 3명을 골라 보내면 15분 뒤 돌아와요(앱을 꺼도 가요). 그동안 3명은 수업료를 내지 않아요.
      돌아오면 수업료 10분치(도시락을 싸면 15분치), 가끔 숲의 정수 1~2개, 아주 가끔 희귀 열매(꾸미기 가게에서 일반 장식 하나로 바꿔요).
      도시락은 숲의 정수 15(재설계안 3절), 보낼 때 싸요. 확률과 열매 쓰임은 본부 제안 */
-  const PC = { min: 15, kids: 3, acorn: 10, lunchAcorn: 15, lunch: 15, essP: 0.3, berryP: 0.05 };
+  const PCN = { min: 15, kids: 3, acorn: 10, lunchAcorn: 15, lunch: 15, essP: 0.3, berryP: 0.05 };
   const freshPc = () => ({ day: '', at: 0, kids: [], lunch: false, berry: 0, st: { n: 0, ess: 0, berry: 0 } });
   const pcReady = () => !!S && !!S.pc && S.f.playground >= 1;
   const pcActive = () => !!S && !!S.pc && S.pc.at > 0;
-  const pcAway = () => pcActive() ? PC.kids : 0;
+  const pcAway = () => pcActive() ? PCN.kids : 0;
   const pcDone = () => S.pc.day === gameToday() && !pcActive();
-  const pcEnd = () => S.pc.at + PC.min * 60000;
+  const pcEnd = () => S.pc.at + PCN.min * 60000;
   const pcRemain = () => pcActive() ? Math.max(0, pcEnd() - gameNow()) : 0;
   const pcChr = (sp, px) => IMG('chr_' + sp) ? `<img src="${IMG('chr_' + sp)}" alt="" draggable="false"${px ? ` style="width:${px}px;height:${px}px"` : ''}>` : `<span class="fb">${kidAvatar(sp)}</span>`;
   function pcStart(kids, lunch) {
     if (!pcReady() || rt.paused) return false;
     if (pcActive()) { toast('지금 소풍을 가 있어요'); return false; }
     if (S.pc.day === gameToday()) { toast('소풍은 하루 한 번이에요.\n내일 또 가요'); return false; }
-    const sp = speciesList(), list = [...new Set(kids)].filter(k => sp.includes(k)).slice(0, PC.kids);
-    if (list.length < Math.min(PC.kids, sp.length)) { toast(`소풍 갈 친구를 ${PC.kids}명 골라요`); return false; }
-    if (lunch && S.ess < PC.lunch) { toast(`도시락을 싸려면 숲의 정수 ${PC.lunch}개가 있어야 해요`); return false; }
-    if (lunch) { S.ess -= PC.lunch; S.st.esSpent = (S.st.esSpent || 0) + PC.lunch; renderEss(); }
+    const sp = speciesList(), list = [...new Set(kids)].filter(k => sp.includes(k)).slice(0, PCN.kids);
+    if (list.length < Math.min(PCN.kids, sp.length)) { toast(`소풍 갈 친구를 ${PCN.kids}명 골라요`); return false; }
+    if (lunch && S.ess < PCN.lunch) { toast(`도시락을 싸려면 숲의 정수 ${PCN.lunch}개가 있어야 해요`); return false; }
+    if (lunch) { S.ess -= PCN.lunch; S.st.esSpent = (S.st.esSpent || 0) + PCN.lunch; renderEss(); }
     S.pc.day = gameToday(); S.pc.at = gameNow(); S.pc.kids = list; S.pc.lunch = !!lunch;
     sfx('tap'); save(); renderHUD();
-    toast(`${list.map(spName).join(', ')} 친구가 소풍을 떠났어요.\n${PC.min}분 뒤 돌아와요`);
+    toast(`${list.map(spName).join(', ')} 친구가 소풍을 떠났어요.\n${PCN.min}분 뒤 돌아와요`);
     return true;
   }
   // 돌아왔으면 보상을 줘요. 보상 창은 다른 창이 없을 때(1초마다 pcTick)
@@ -10836,10 +10836,10 @@ span.bt-stamp{display:none}.bt-duel.done span.bt-stamp{display:grid}
     if (!pcActive() || gameNow() < pcEnd()) return false;
     const lunch = S.pc.lunch, kids = S.pc.kids.slice();
     S.pc.at = 0; S.pc.lunch = false; S.pc.st.n += 1;
-    const v = minAcorns(lunch ? PC.lunchAcorn : PC.acorn); S.budget += v; earn(v);
+    const v = minAcorns(lunch ? PCN.lunchAcorn : PCN.acorn); S.budget += v; earn(v);
     const items = [{ ic: 'acorn', t: `도토리 +${fmt(v)}${lunch ? ' (도시락 덕분에 더 많이)' : ''}` }];
-    if (Math.random() < PC.essP) { const e = Math.random() < 0.5 ? 1 : 2; addEss(e); S.pc.st.ess += e; items.push({ ic: 'ess', t: `숲의 정수 +${e}` }); }
-    if (Math.random() < PC.berryP) { S.pc.berry += 1; S.pc.st.berry += 1; items.push({ ic: IMG('picnic_berry') ? `<img src="${IMG('picnic_berry')}" alt="" style="width:22px;height:22px">` : '🫐', t: '희귀 열매 +1 (꾸미기 가게에서 장식으로 바꿔요)' }); }
+    if (Math.random() < PCN.essP) { const e = Math.random() < 0.5 ? 1 : 2; addEss(e); S.pc.st.ess += e; items.push({ ic: 'ess', t: `숲의 정수 +${e}` }); }
+    if (Math.random() < PCN.berryP) { S.pc.berry += 1; S.pc.st.berry += 1; items.push({ ic: IMG('picnic_berry') ? `<img src="${IMG('picnic_berry')}" alt="" style="width:22px;height:22px">` : '🫐', t: '희귀 열매 +1 (꾸미기 가게에서 장식으로 바꿔요)' }); }
     rt.pcNews = { kids, items };
     save(); renderHUD(); checkQuests();
     if (rt.modalOpen === $('#mPicnic')) renderPicnic();
@@ -10861,20 +10861,20 @@ span.bt-stamp{display:none}.bt-duel.done span.bt-stamp{display:grid}
     if (rt.paused || rt.modalOpen) return;
     pcSettle();
     const sp = speciesList();
-    rt.pcSel = sp.slice(0, PC.kids); rt.pcLunch = false;
+    rt.pcSel = sp.slice(0, PCN.kids); rt.pcLunch = false;
     renderPicnic(); openModal($('#mPicnic')); sfx('tap');
   }
   function renderPicnicNow() {
     const box = $('#pcNow'); if (!box) return;
     box.hidden = !pcActive(); if (box.hidden) return;
-    const left = pcRemain(), tot = PC.min * 60000, m = Math.ceil(left / 60000);
+    const left = pcRemain(), tot = PCN.min * 60000, m = Math.ceil(left / 60000);
     box.innerHTML = `${IMG('picnic_basket') ? `<img src="${IMG('picnic_basket')}" alt="">` : ''}<span class="pc-ntx"><b>소풍 가는 중${S.pc.lunch ? ' (도시락)' : ''}</b><span class="pc-who">${S.pc.kids.map(k => pcChr(k)).join('')}</span><small>${left > 0 ? `${m}분 뒤 돌아와요` : '돌아왔어요!'}</small><span class="ac-bar"><i style="width:${Math.round(100 * (1 - left / tot))}%"></i></span></span>`;
   }
   function renderPicnic() {
     if (!$('#mPicnic') || !S.pc) return;
     const bg = IMG('picnic_trail'); $('#pcHead').style.backgroundImage = bg ? `url("${bg}")` : '';
     const busy = pcActive(), done = !busy && S.pc.day === gameToday(), can = !busy && !done;
-    $('#pcLead').textContent = nl(busy ? '친구들이 숲으로 소풍을 갔어요. 앱을 꺼도 시간은 가요.' : done ? '오늘 소풍은 다녀왔어요. 내일 또 가요.' : `소풍 갈 친구 ${PC.kids}명을 골라요. ${PC.min}분 뒤 숲에서 이것저것 주워 와요. 그동안 ${PC.kids}명은 수업료를 내지 않아요.`);
+    $('#pcLead').textContent = nl(busy ? '친구들이 숲으로 소풍을 갔어요. 앱을 꺼도 시간은 가요.' : done ? '오늘 소풍은 다녀왔어요. 내일 또 가요.' : `소풍 갈 친구 ${PCN.kids}명을 골라요. ${PCN.min}분 뒤 숲에서 이것저것 주워 와요. 그동안 ${PCN.kids}명은 수업료를 내지 않아요.`);
     renderPicnicNow();
     const sp = speciesList();
     $('#pcKids').hidden = !can;
@@ -10882,19 +10882,19 @@ span.bt-stamp{display:none}.bt-duel.done span.bt-stamp{display:grid}
       return `<button class="pc-kid${on ? ' pick' : ''}" type="button" data-pk="${k}" aria-pressed="${on}">${pcChr(k)}<span>${spName(k)}</span></button>`; }).join('') : '';
     const lb = $('#pcLunch'); lb.hidden = !can;
     if (can) {
-      const poor = S.ess < PC.lunch;
+      const poor = S.ess < PCN.lunch;
       lb.setAttribute('aria-pressed', rt.pcLunch ? 'true' : 'false'); lb.setAttribute('aria-disabled', poor && !rt.pcLunch ? 'true' : 'false');
-      lb.innerHTML = `${IMG('picnic_lunch') ? `<img src="${IMG('picnic_lunch')}" alt="">` : ''}<span class="pc-ltx"><b>도시락 싸기</b><small>숲의 정수 ${PC.lunch}개. 주워 오는 도토리가 수업료 ${PC.acorn}분치에서 ${PC.lunchAcorn}분치로 늘어요</small></span><span class="pc-chk" aria-hidden="true">${rt.pcLunch ? '✓' : ''}</span>`;
+      lb.innerHTML = `${IMG('picnic_lunch') ? `<img src="${IMG('picnic_lunch')}" alt="">` : ''}<span class="pc-ltx"><b>도시락 싸기</b><small>숲의 정수 ${PCN.lunch}개. 주워 오는 도토리가 수업료 ${PCN.acorn}분치에서 ${PCN.lunchAcorn}분치로 늘어요</small></span><span class="pc-chk" aria-hidden="true">${rt.pcLunch ? '✓' : ''}</span>`;
     }
     const go = $('#pcGo'); go.hidden = !can;
-    go.setAttribute('aria-disabled', rt.pcSel.length >= Math.min(PC.kids, sp.length) ? 'false' : 'true');
-    go.textContent = `소풍 보내기 (${rt.pcSel.length}/${Math.min(PC.kids, sp.length)}명)`;
+    go.setAttribute('aria-disabled', rt.pcSel.length >= Math.min(PCN.kids, sp.length) ? 'false' : 'true');
+    go.textContent = `소풍 보내기 (${rt.pcSel.length}/${Math.min(PCN.kids, sp.length)}명)`;
     $('#pcNote').textContent = nl(`지금까지 소풍 ${S.pc.st.n}번.` + (S.pc.berry ? ` 희귀 열매 ${S.pc.berry}개가 있어요. 꾸미기 가게에서 일반 장식으로 바꿔요.` : ''));
   }
   function pcKidTap(k) {
     if (!speciesList().includes(k)) return;
     const s = rt.pcSel, i = s.indexOf(k);
-    if (i >= 0) s.splice(i, 1); else if (s.length < PC.kids) s.push(k); else { s.shift(); s.push(k); }
+    if (i >= 0) s.splice(i, 1); else if (s.length < PCN.kids) s.push(k); else { s.shift(); s.push(k); }
     sfx('tap'); renderPicnic();
   }
   function pcGo() {
@@ -10996,7 +10996,7 @@ span.bt-stamp{display:none}.bt-duel.done span.bt-stamp{display:grid}
     const P = d.pc && typeof d.pc === 'object' ? d.pc : null;
     if (P) {
       s.pc.day = typeof P.day === 'string' ? P.day.slice(0, 10) : '';
-      const kids = Array.isArray(P.kids) ? P.kids.filter(k => typeof k === 'string' && k.length < 20).slice(0, PC.kids) : [];
+      const kids = Array.isArray(P.kids) ? P.kids.filter(k => typeof k === 'string' && k.length < 20).slice(0, PCN.kids) : [];
       const at = num(P.at, 0, Date.now() + 366 * 86400000);
       if (at > 0 && kids.length) { s.pc.at = at; s.pc.kids = kids; s.pc.lunch = P.lunch === true; }
       s.pc.berry = Math.floor(num(P.berry, 0, 999));
@@ -14921,8 +14921,8 @@ span.bt-stamp{display:none}.bt-duel.done span.bt-stamp{display:grid}
     $('#pcClose').addEventListener('click', () => { sfx('tap'); closeModal($('#mPicnic')); });
     $('#skClose').addEventListener('click', () => { sfx('tap'); closeModal($('#mSticker')); });
     $('#pcKids').addEventListener('click', e => { const b = e.target.closest('[data-pk]'); if (b) pcKidTap(b.dataset.pk); });
-    $('#pcLunch').addEventListener('click', () => { if (!rt.pcLunch && S.ess < PC.lunch) { toast(`숲의 정수가 ${PC.lunch - S.ess}개 모자라요`); return; } rt.pcLunch = !rt.pcLunch; sfx('tap'); renderPicnic(); });
-    $('#pcGo').addEventListener('click', () => { if ($('#pcGo').getAttribute('aria-disabled') === 'true') { toast(`소풍 갈 친구를 ${PC.kids}명 골라요`); return; } pcGo(); });
+    $('#pcLunch').addEventListener('click', () => { if (!rt.pcLunch && S.ess < PCN.lunch) { toast(`숲의 정수가 ${PCN.lunch - S.ess}개 모자라요`); return; } rt.pcLunch = !rt.pcLunch; sfx('tap'); renderPicnic(); });
+    $('#pcGo').addEventListener('click', () => { if ($('#pcGo').getAttribute('aria-disabled') === 'true') { toast(`소풍 갈 친구를 ${PCN.kids}명 골라요`); return; } pcGo(); });
     $('#skSeg').addEventListener('click', e => { const b = e.target.closest('[data-sv]'); if (!b) return; if (b.dataset.sv === 'old' && !S.sk.done.length) { toast('아직 다 채운 판이 없어요'); return; } rt.skView = b.dataset.sv; sfx('tap'); renderSticker(); });
     $('#skPrev').addEventListener('click', () => { rt.skPage -= 1; renderSticker(); });
     $('#skNext').addEventListener('click', () => { rt.skPage += 1; renderSticker(); });
@@ -16530,15 +16530,15 @@ span.bt-stamp{display:none}.bt-duel.done span.bt-stamp{display:grid}
   // 시험용 손잡이: 자동 시험(window.__FOREST_TEST)에서만 게임 속 함수를 꺼내 써요
   if (window.__FOREST_TEST) window.__forest = { get S() { return S; }, goTo, conOn, conLeft, conTick, conSec, conFinish, tkPlan, tkUse, tkUseAll, TK, CON, TKAD, capNext, yearCap,   // 2.1.0 공사
     semOn, semFirst, semLabel, cereDip, semBreak,   // 2.1.0 학기(s80)
-    PC, pcStart, pcSettle, pcTick, pcActive, pcAway, pcRemain, openPicnic, renderPicnic, SK, SK_KINDS, skAdd, skPrize, skLeft, skFull, openSticker, renderSticker,
-    GSHOP, OUTFITS, evPastIds, renderNight, shopItem, essItem, buyEss, pickEss,   // 2.1.0 소풍, 스티커판, 상점
+    PCN, pcStart, pcSettle, pcTick, pcActive, pcAway, pcRemain, openPicnic, renderPicnic, SK, SK_KINDS, skAdd, skPrize, skLeft, skFull, openSticker, renderSticker,
+    GSHOP, OUTFITS, evPastIds, renderNight, shopItem, essItem, buyEss, pickEss, nickPrice, grantOffline, thSetPrice, pickDeco, buyDeco, buyDecoBerry,   // 2.1.0 소풍, 스티커판, 상점
     LAB, LAB_IN, LAB_KEYS, LAB_CARDS, LAB_MIX, LAB_DBL, labOf, labRun, labCount, labReady, labDone, openLab, renderLab, labTap, labGo, RD, BOOKS, rdStart, rdSettle, rdTick, rdLeft, rdRemain, openRead, renderRead, renderStudy2, sanitizeStudy2, maintSync, maintTap, openBook, renderBook, BT, BT_EV, BT_LG, BT_SCH, btOpen, btLeft, btRoster, btBest, btMake, btScore, btWin, btFinish, btOpenScene, btClose, btRankDoc, BT_RANK, readRow, btAuto, btPick, btStart, btRender, renderBtCard, sanitizeBt, get btUI() { return btUI; }, EX, exIsWeek, exNow, exPrev, exDays, exScore, exGrade, exStudy, exClaim, exTick, exMake, openExam, renderExam, exAwardTop, exReportReady, sanitizeExam, renderSheet, openSheet,   // 2.0.1 공부 2단계(s76)
     AC, AC_GAME, AB_KEY, ABIL, acLv, acSum, acMult, acRepOf, acGain, acSettle, acAll, acCap, acBkLeft, acBuyBook, renderAc, sanitizeAc, freshAc, rankRows, awayStart, awaySettle, timeSrc, save, awayHold, rankCap, cloudVerify, liveApply, liveLoad, openNotice, NOTICES, get Live() { return Live; }, get Rank() { return Rank; }, liveOff,   // 2.0.0 보안 점검 시험(s71), Codex 검토 시험(s72)
     rosterEnsure, rosterMake, rosterAdd, clubAuto, clubSet, clubPct, clubShow, clubSum, clubStars, clubMembers, clubShowGo, showReady, showWait, showDay, clubWeekTick, clubFacUp, CLUBS, CLUB, star, clubTuitionMult, clubFestMult, clubDecoOff, renderClub, renderHall, openSeatPick, openClubPick,
     TIER_SCALE, legacyMult, tuitionMult, snapTake, snapOf, tierViewOpen, tierViewClose, renderTierView, renderTierDots, viewMap, showNewTalk, talkNext, showCere, cereEnd, cereCrew, cereAsk, cereKeep, goFur, updateQuestDot, openElect, renderElect, elVote, elSync, elMult, elClub, elPres, elBadge, elMake, EL_PLEDGES, clubPct, festPrize, dropValue, claimMission, gameWeek, NEWCOMERS, TIERS, GEO, geoIdx, decoCost0, qMeasure, qDone, qGoal, kidArt: kidSVG, newYear, checkGrade, gradeOf, townRep, FAC, sanitize200, trialHunt, updateTrial, TRIAL, zoomAt, fitMap, ZOOM_MAX, DECO, DECO_SLOTS, DECO_SIGN, decoCost, decoSoldOut, pickDeco, buyDeco, decoPut, decoEditStart, decoEditEnd, openDecoPick, renderDeco, setSchoolNm, setMark, schoolTitle, markHTML, decoPlacedAll, esExLeft, esExCost, get Cloud() { return Cloud; }, get actx() { return actx; }, Music, musicSync, ensureAudio, bgmLoad, pzUI, rt, makeDeal, furStage, DEAL, navInfo, navRoute, spawnDrop, repTipCheck, linkGoogle, retryCloud, sanitize, acctPending, renderMap, renderHUD, renderAffordance, syncKids, layoutMap, geo, hitTrial, endVisit, showReward, recommend, needCost, prepTopUp, qReward, prepPhase, rankScore, pwOf, previewDip, dipMult, costScale, buyFur, buyFurAll, furCost, furReady, furDone, FUR, startTalk, endTalk, teacherAct, facCost, teaCost, facKeys, rate, rep, capacity, canGraduate, canPromote,
     fmt, fmt2, graduate, promote, buyPerk, perkCost, perkMaxed, buyFundPerk, fpCost, claimMain, mainReady, curMain, qNo, earn, CFG, TEA, teaMaxed, PERKS, FPERKS, MAIN, finalYear, startTrip, claimTrip, TRIPS, yearLocked, endSports, rtSports: () => rt.sports, rtFest: () => rt.fest, facCap, addLeague, addMP, tutStart, endFest, claimBox, musicWant, askBox, festWait, setTab,
     dexMeet, dexSync, dexPending, dexGift, renderDex, evCurrent, evNext, evUpcoming, evSync, evFix, evVal, EV_FALLBACK, EV_DECO, EV_HAT, COS, DECO_BY, decoOwn, perkRec, fpRec, BOOST_ALL, buyShop, pickShop, showNote, showOkOn, showWd, renderGradPanel, renderShop, renderDecoShop, EV_WEEKLY, EV_WEEK_BASE, weekMon, claimStamp, claimEvMission, claimEvBox, renderEvent, evMissions, evOk, evSkipped, EV_MONTHS, EV_MEASURE, tierMinutes, minAcorns, IMG, sanitize171, ACH, achSync, claimAch, setTitle, renderAch, setDexSeg, achClaimable, XT, xtAct, xtCost, xtLv, feastMins, libMult, propInstances, walkBuild, festItemSvg, guestArt, adErrText, googleErrText, openSheet, closeSheet, startFest, startSports, sanitize170, EV_STAMPS, EV_SPECIAL, EV_MONTHLY, EV_BOX, DEX_KEYS, DEX_REWARD, DEX_GUEST_KEYS, seasonKey, roofArtKey, oakKey, setSeasonArt, VP, vpLv, vpCost, vpMult, vpAct, renderVpCard, sportsPrize, festPrize, renderTeachers, buildTeacherCards, bldImg, roofKey, bldStage, mapKey, setMapArt, applyThemes, buyFacility, bldFx, setBldFx, mapHi, Live, liveApply, liveLoad, liveOff, LIVE_KEYS, EVC, NOTICES, openNotice, noticeAuto, noticeWant, ntUnread, startTrial, endTrial: () => rt.trial && (rt.trial.left = 0), spawnDeal, startVisit, IMG170, MG, mgCells, mgSetCells, mgTick, mgAddEnergy, mgAddUp, mgTapGen, mgDrop, mgSell, mgUpgrade, mgClaimOrder, mgSwapOrder, mgOrderOk, mgFillOrders, mgOpen, mgClose, mgRenderAll, mgSpawnLevel, mgNearestEmpty, mgEmptyBoard, mgOrderReward, mgUI, sanitize180, mgWatchAd, mgNewOrder, mgHintPick, mgShowHint, mgClearHint, mgTouch, mgOrderGuide, mgDexN, mgDexCan, mgDexClaim, mgOpenDex, MG_DEX, MG_DEX_MS, mgDexEss, mgDexEssCan, mgDexEssN, mgDexMsCan, mgDexMsClaim, MGB, mgBuyBoost, mgBstLeft, mgOpenBoost, nice, claimMission, claimBonus, claimWeekMission, MP_BOX,   // 1.7.0 도감, 이벤트
-    PZ, PZ_SHAPES, pzFits, pzAnyFit, pzStuck, pzFullLines, pzPlace, pzFreshGame, pzStart, PZB, pzbCost, pzApplyBoost, pzBoostOpen, pzBoostGo, festGoldLeft, festGoldTake, claimSports, renderStreet, pzFinish, pzLeft, pzCanAd, pzEssOf, pzMinOf, pzHelpSquirrel, pzHelpOwl, pzHelpBear, fillSubs, mapRoofTop, showAd, claimOfflineDouble, startBoost, tripAd, festFocus, festRange, visMap, renderMissions, pzHasHelp, pzRot, pzNewPiece, pzOpen, pzClose, pzGameOver, pzRenderAll, renderMini, addEss, ESHOP, SP_FUR, applyCos, essItem, pickEss, buyEss, renderEssShop, esAcornLeft, esGoldLeft, esAcornAmt, hatSVG, spFurImg, gameNow, gameToday, gameWeek, kstDay, setServerTime, SVR, dmDay, weekIdx, lgWeek, wkWeek, lgKey, pzDay, goldDay, boostLeft, dealLeft, canStamp };
+    PZ, PZ_SHAPES, pzFits, pzAnyFit, pzStuck, pzFullLines, pzPlace, pzFreshGame, pzStart, PZB, pzbCost, pzApplyBoost, pzBoostOpen, pzBoostGo, festGoldLeft, festGoldTake, claimSports, renderStreet, pzFinish, pzLeft, pzCanAd, pzEssOf, pzMinOf, pzHelpSquirrel, pzHelpOwl, pzHelpBear, fillSubs, mapRoofTop, showAd, claimOfflineDouble, startBoost, tripAd, festFocus, festRange, visMap, renderMissions, pzHasHelp, pzRot, pzNewPiece, pzOpen, pzClose, pzGameOver, pzRenderAll, renderMini, addEss, ESHOP, SP_FUR, applyCos, essItem, pickEss, buyEss, renderEssShop, hatSVG, spFurImg, gameNow, gameToday, gameWeek, kstDay, setServerTime, SVR, dmDay, weekIdx, lgWeek, wkWeek, lgKey, pzDay, goldDay, boostLeft, dealLeft, canStamp };
   if (window.claude && window.claude.hot && window.claude.hot.snapshot) {
     try { window.claude.hot.snapshot(() => { if (S) syncMid(); return { save: S }; }); } catch (e) { /* 무시 */ }
   }
