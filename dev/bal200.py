@@ -27,7 +27,7 @@ BOT = r"""(o) => {
     if (cfg.con === false) for (const k of Object.keys(F.CON)) F.CON[k] = [0, 0];
   }
   const now = () => W.t0 + W.t * 1000;
-  const SKIP = new Set(['pz', 'pzBest', 'rdBooks', 'xt', 'vp', 'deco', 'ach', 'acMax', 'acBook', 'labs', 'elects', 'elMid', 'btPlays', 'btLg', 'btMid', 'mgDex', 'star', 'clubMat', 'clubShown', 'clubSum', 'fpUp']);
+  const SKIP = new Set(['pz', 'pzBest', 'rdBooks', 'xt', 'vp', 'deco', 'ach', 'acMax', 'acBook', 'labs', 'elects', 'elMid', 'btPlays', 'btLg', 'btMid', 'mgDex', 'star', 'clubMat', 'clubShown', 'clubSum', 'fpUp', 'acSum']);
   const buy = () => { for (let i = 0; i < 60; i++) {
       const r = F.recommend(); let ok = false;
       if (r) { if (r.kind === 'tea') ok = S().budget >= F.teaCost(r.k) && F.teacherAct(r.k);

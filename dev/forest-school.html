@@ -4260,8 +4260,8 @@ span.bt-stamp{display:none}.bt-duel.done span.bt-stamp{display:grid}
   // '2년째가', '3학년이'처럼 뒤에 붙는 조사까지
   const yearSubj = (n, T) => `${n}${T.unit}${T.unit === '년째' ? '가' : '이'}`;
   // 동네 평판 기준도 학교급마다 20%씩 높아져요
-  // 2.1.0 2학기에는 동네 기준이 조금(+5%) 올라가요. 시설 상한은 그대로라 선생님과 남은 시설로 다시 대도시를 만들어요
-  const townRep = g => Math.round(CFG.grades[g].rep * (1 + 0.2 * S.tier) * (1 + 0.2 * (S.tg + (S.tier >= 1 ? 0.25 * (S.sem || 0) : 0))));
+  // 2.1.0 2학기에는 동네 기준이 반 단계(초등 15.6점, 중학교 18점) 올라가요(균형 제안서 두 학기 2절). 시설 상한은 그대로라 선생님과 남은 시설로 다시 대도시를 만들어요
+  const townRep = g => Math.round(CFG.grades[g].rep * (1 + 0.2 * S.tier) * (1 + 0.2 * (S.tg + (S.tier >= 1 ? 0.5 * (S.sem || 0) : 0))));
   // 숫자 뒤 조사: 끝자리가 0, 1, 3, 6, 7, 8이면 받침이 있어요 (십, 일, 삼, 육, 칠, 팔)
   const numEul = n => '013678'.includes(String(n).slice(-1)) ? '을' : '를';
   /* ---------- 오래 하는 구조: 종업식과 졸업식, 명예 교장실, 전학생, 출석부, 보충수업 ---------- */
@@ -4582,6 +4582,8 @@ span.bt-stamp{display:none}.bt-duel.done span.bt-stamp{display:grid}
       say: '초등학교도 대도시 학교로 만들어 봐요! 그러면 1학기 방학식을 열 수 있어요. 초등학교부터는 1학기 방학식과 2학기 종업식을 열어야 학년이 올라가요.' },
     { id: 'e40', ch: 5, t: 'fest', k: 'picnic', n: 1, rm: 3, title: '보물찾기 열기', how: '학교 행사 > 봄 소풍 보물찾기',
       say: '1학년 첫 행사는 뒷산 봄 소풍이에요! 지도 왼쪽의 학교 행사 버튼을 눌러 보물찾기를 해 봐요.' },
+    { id: 'hw1', ch: 5, t: 'acMax', n: 6, rm: 4, title: '1학년 학기 숙제', how: '공부 탭에서 과목 하나를 키워요',
+      say: '2학기 숙제가 나왔어요! 숙제를 마쳐야 1학년을 마칠 수 있어요.' },   // 2.1.0 학기 숙제(속도와 경제 재설계안 2-2)
     { id: 'e12', ch: 5, ye: 1, t: 'tgrads', n: 1, r: 5, rk: 'dip', title: '1학년 종업식', how: '1학기 방학식을 열고, 2학기에 종업식을 열어요',
       say: '1학년을 무사히 마쳤어요! 종업식을 열고 2학년으로 올라가요. 받은 수료증으로 명예 교장실도 다시 고쳐 봐요.' },
 
@@ -4602,6 +4604,8 @@ span.bt-stamp{display:none}.bt-duel.done span.bt-stamp{display:grid}
       say: '새 친구들이 앉을 책상과 의자가 모자라요. 교실 가구를 모두 Lv.15까지 올려 주세요.' },
     { id: 'e13', ch: 6, t: 'ygrade', n: 4, rm: 4, title: '2학년 대도시 되기', how: '평판을 모아서 대도시가 되어요',
       say: '이제 대도시 학교가 될 차례예요. 대도시가 되면 2학년을 마치는 종업식을 열 수 있어요.' },
+    { id: 'hw2', ch: 6, t: 'acMax', n: 8, rm: 4, title: '2학년 학기 숙제', how: '공부 탭에서 과목 하나를 키워요',
+      say: '2학기 숙제가 나왔어요! 숙제를 마쳐야 2학년을 마칠 수 있어요.' },   // 2.1.0 학기 숙제(속도와 경제 재설계안 2-2)
     { id: 'e19', ch: 6, ye: 2, t: 'tgrads', n: 2, r: 6, rk: 'dip', title: '2학년 종업식', how: '1학기 방학식을 열고, 2학기에 종업식을 열어요',
       say: '2학년을 무사히 마쳤어요! 종업식을 열고 3학년으로 올라가요. 3학년에는 현장체험학습이 기다려요.' },
 
@@ -4625,6 +4629,8 @@ span.bt-stamp{display:none}.bt-duel.done span.bt-stamp{display:grid}
       say: '체험학습 보고서를 쓰려면 공부가 더 필요해요. 공부 탭에서 문제집 한 권을 사서 풀어 봐요. 숲의 정수 10개로 학력이 쑥 올라요.' },
     { id: 'e23', ch: 7, t: 'ygrade', n: 4, rm: 4, title: '3학년 대도시 되기', how: '평판을 모아서 대도시가 되어요',
       say: '3학년도 대도시 학교로 만들어요. 대도시가 되면 종업식을 열 수 있어요.' },
+    { id: 'hw3', ch: 7, t: 'acMax', n: 10, rm: 4, title: '3학년 학기 숙제', how: '공부 탭에서 과목 하나를 키워요',
+      say: '2학기 숙제가 나왔어요! 숙제를 마쳐야 3학년을 마칠 수 있어요.' },   // 2.1.0 학기 숙제(속도와 경제 재설계안 2-2)
     { id: 'e24', ch: 7, ye: 3, t: 'tgrads', n: 3, r: 7, rk: 'dip', title: '3학년 종업식', how: '1학기 방학식을 열고, 2학기에 종업식을 열어요',
       say: '3학년을 마쳤어요! 4학년에는 숲속 운동회가 열려요.' },
 
@@ -4648,6 +4654,8 @@ span.bt-stamp{display:none}.bt-duel.done span.bt-stamp{display:grid}
       say: '행사가 많아지는 학년이에요. 교감 연수를 더 보내면 학교 행사 상품이 커져요.' },
     { id: 'e28', ch: 8, t: 'ygrade', n: 4, rm: 4, title: '4학년 대도시 되기', how: '평판을 모아서 대도시가 되어요',
       say: '운동회 소문이 숲에 쫙 퍼졌어요. 4학년도 대도시 학교가 되어 볼까요?' },
+    { id: 'hw4', ch: 8, t: 'acSum', n: 30, rm: 4, title: '4학년 학기 숙제', how: '공부 탭에서 다섯 과목을 골고루 키워요',
+      say: '2학기 숙제가 나왔어요! 숙제를 마쳐야 4학년을 마칠 수 있어요.' },   // 2.1.0 학기 숙제(속도와 경제 재설계안 2-2)
     { id: 'q26', ch: 8, ye: 4, t: 'tgrads', n: 4, r: 8, rk: 'dip', title: '여섯 번째 전학생 맞이하기', how: '1학기 방학식 뒤 4학년 종업식을 열면 여섯 번째 친구가 와요',
       say: '종업식을 열 때마다 새 친구가 전학 왔지요? 4학년 종업식을 열면 여섯 번째 친구가 와요! 앞으로도 해마다 새 친구가 찾아올 거예요.' },
 
@@ -4673,6 +4681,8 @@ span.bt-stamp{display:none}.bt-duel.done span.bt-stamp{display:grid}
       say: '학예회에서 우리 학교 학력을 뽐내요. 과목 하나를 Lv.15까지 올려 주세요. 문제집도 하루 두 권까지 살 수 있어요.' },
     { id: 'e33', ch: 9, t: 'ygrade', n: 4, rm: 5, title: '5학년 대도시 되기', how: '평판을 모아서 대도시가 되어요',
       say: '학예회가 대성공이에요! 5학년도 대도시 학교로 만들어요.' },
+    { id: 'hw5', ch: 9, t: 'acSum', n: 40, rm: 4, title: '5학년 학기 숙제', how: '공부 탭에서 다섯 과목을 골고루 키워요',
+      say: '2학기 숙제가 나왔어요! 숙제를 마쳐야 5학년을 마칠 수 있어요.' },   // 2.1.0 학기 숙제(속도와 경제 재설계안 2-2)
     { id: 'e34', ch: 9, ye: 5, t: 'tgrads', n: 5, r: 10, rk: 'dip', title: '5학년 종업식', how: '1학기 방학식을 열고, 2학기에 종업식을 열어요',
       say: '5학년을 마쳤어요! 드디어 초등학교 마지막 학년인 6학년이에요.' },
 
@@ -4694,6 +4704,8 @@ span.bt-stamp{display:none}.bt-duel.done span.bt-stamp{display:grid}
       say: '졸업 전에 합치기 도감을 채워 봐요. 처음 만든 조각마다 숲의 정수도 받을 수 있어요.' },
     { id: 'z2', ch: 10, t: 'pzBest', n: 1000, rm: 5, title: '숲속 퍼즐 1,000점', how: '공부 > 숲속 퍼즐에서 한 판에 1,000점',
       say: '졸업 기념 퍼즐 대회예요! 한 판에 1,000점을 넘겨 봐요. 콤보를 이어 가면 점수가 쑥쑥 올라요.' },
+    { id: 'hw6', ch: 10, t: 'acSum', n: 50, rm: 4, title: '6학년 학기 숙제', how: '공부 탭에서 다섯 과목을 골고루 키워요',
+      say: '2학기 숙제가 나왔어요! 숙제를 마쳐야 6학년을 마칠 수 있어요.' },   // 2.1.0 학기 숙제(속도와 경제 재설계안 2-2)
     { id: 'e38', ch: 10, t: 'ygrade', n: 4, r: 15, rk: 'dip', title: '6학년 대도시 되기', how: '평판을 모아서 대도시가 되어요',
       say: '초등학교의 마지막 해예요. 6학년도 대도시 학교로 만들면 졸업 준비 끝! 졸업 탭에서 졸업식을 열 수 있어요.' },
     { id: 'e39', ch: 10, t: 'tier', n: 2, r: 20, rk: 'dip', title: '초등학교 졸업식', how: '졸업 탭에서 졸업식을 열고 중학교에 입학해요',
@@ -4741,6 +4753,8 @@ span.bt-stamp{display:none}.bt-duel.done span.bt-stamp{display:grid}
       say: '중학생은 한창 자라서 급식을 두 번씩 먹어요. 급식실을 Lv.10까지 키워 주세요.' },
     { id: 'j14', ch: 12, t: 'grade', n: 4, r: 6, rk: 'dip', title: '중학교 대도시 되기', how: '대도시가 되면 1학기 방학식을 열어요',
       say: '중학교도 대도시 학교로 만들어 봐요! 그러면 1학기 방학식을 열 수 있어요.' },
+    { id: 'hw7', ch: 12, t: 'btLg', n: 2, rm: 4, title: '중학교 1학년 학기 숙제', how: '공부 탭의 숲속 대결에서 리그를 올려요',
+      say: '2학기 숙제가 나왔어요! 숙제를 마쳐야 중학교 1학년을 마칠 수 있어요.' },   // 2.1.0 학기 숙제(속도와 경제 재설계안 2-2)
     { id: 'j15', ch: 12, ye: 1, yt: 2, t: 'tgrads', n: 1, r: 6, rk: 'dip', title: '중학교 1학년 종업식', how: '1학기 방학식을 열고, 2학기에 종업식을 열어요',
       say: '중학교 1학년을 무사히 마쳤어요! 종업식을 열고 2학년으로 올라가요. 2학년에는 숲속 체육대회가 기다려요.' },
 
@@ -4758,6 +4772,8 @@ span.bt-stamp{display:none}.bt-duel.done span.bt-stamp{display:grid}
       say: '중학교 수학은 어려워요. 다람쥐 선생님을 Lv.15까지 연수 보내 주세요.' },
     { id: 'j21', ch: 13, t: 'ygrade', n: 4, rm: 5, title: '2학년 대도시 되기', how: '평판을 모아서 대도시가 되어요',
       say: '체육대회가 대성공이에요! 2학년도 대도시 학교로 만들면 종업식을 열 수 있어요.' },
+    { id: 'hw8', ch: 13, t: 'btLg', n: 3, rm: 4, title: '중학교 2학년 학기 숙제', how: '공부 탭의 숲속 대결에서 리그를 올려요',
+      say: '2학기 숙제가 나왔어요! 숙제를 마쳐야 중학교 2학년을 마칠 수 있어요.' },   // 2.1.0 학기 숙제(속도와 경제 재설계안 2-2)
     { id: 'j22', ch: 13, ye: 2, yt: 2, t: 'tgrads', n: 2, r: 7, rk: 'dip', title: '중학교 2학년 종업식', how: '1학기 방학식을 열고, 2학기에 종업식을 열어요',
       say: '2학년을 마쳤어요! 이제 중학교 마지막 학년이에요. 3학년은 졸업 준비로 바빠요.' },
 
@@ -4775,6 +4791,8 @@ span.bt-stamp{display:none}.bt-duel.done span.bt-stamp{display:grid}
       say: '중학교 졸업 앨범에 들어갈 단체 사진을 찍어요. 모두 활짝 웃게 웃음 별을 눌러 줘요!' },
     { id: 'j27', ch: 14, t: 'fac', k: 'store', n: 27, rm: 5, title: '졸업 잔치 매점', how: '매점을 Lv.15까지 키워요',
       say: '졸업식 날 매점에서 간식 잔치를 열어요. 매점을 Lv.15까지 키워 주세요.' },
+    { id: 'hw9', ch: 14, t: 'btLg', n: 4, rm: 4, title: '중학교 3학년 학기 숙제', how: '공부 탭의 숲속 대결에서 리그를 올려요',
+      say: '2학기 숙제가 나왔어요! 숙제를 마쳐야 중학교 3학년을 마칠 수 있어요.' },   // 2.1.0 학기 숙제(속도와 경제 재설계안 2-2)
     { id: 'j28', ch: 14, ye: 3, yt: 2, t: 'ygrade', n: 4, r: 15, rk: 'dip', title: '3학년 대도시 되기', how: '평판을 모아서 대도시가 되어요',
       say: '중학교의 마지막 해예요. 3학년도 대도시 학교로 만들면 졸업 준비 끝! 고등학교는 곧 열릴 거예요.' }
   ];
@@ -4847,7 +4865,7 @@ span.bt-stamp{display:none}.bt-duel.done span.bt-stamp{display:grid}
     xt: { diet: 0, lib: 0 },   // 1.7.1 양 영양 선생님, 사슴 사서 선생님 연수 레벨 (0~10, 그 건물을 지으면 오셔요)
     grade: 0, best: 0, sound: true, bgm: true, vibrate: true, savedAt: Date.now(),
     pending: 0, pendingSec: 0, away: { from: 0, skip: 0 }, certNo: 0, earned: 0, yearEarned: 0, pwBank: 0,
-    tier: 0, tg: 0, sem: 0, tdip: 0, fund: 0, fp: { schol: 0, rep: 0, dip: 0 },
+    tier: 0, tg: 0, sem: 0, semDip: 0, tdip: 0, fund: 0, fp: { schol: 0, rep: 0, dip: 0 },
     hd: { day: '', n: 0, feastUntil: 0, album: false, seen: false, furNew: true },
     oak: OAK.max,
     st: { picks: 0, ups: 0, trains: 0, claims: 0, grads: 0, perks: 0, fperks: 0, shakes: 0, dips: 0, play: 0, sess: 0, ads: 0, gold: 0, gspent: 0, trips: 0, sports: 0, dmDone: 0, pz: 0, trials: 0, shows: 0, visits: 0, esSpent: 0, pzb: 0, elects: 0, elMid: 0, sems: 0 },   // 2.1.0 sems: 1학기 방학식. 2.0.1 elects: 반장을 뽑은 횟수, elMid: 그 가운데 중학교부터
@@ -4928,6 +4946,7 @@ span.bt-stamp{display:none}.bt-duel.done span.bt-stamp{display:grid}
     s.tg = Math.floor(num(d.tg, 0, s.tier === 0 ? s.st.grads : 0));
     // 2.1.0 학기: 0은 1학기, 1은 2학기. 학기가 없던 저장은 지금 학년을 2학기로 쳐서, 다음 종업식에 원래대로 학년이 올라가요
     s.sem = d.sem === 0 || d.sem === 1 ? d.sem : (s.tier >= 1 ? 1 : 0);
+    s.semDip = s.sem ? Math.min(SAVE_CAP.count, Math.floor(num(d.semDip, 0, 0))) : 0;   // 2.1.0 1학기 방학식에 준 수료증
     s.fund = Math.floor(cap(num(d.fund, 0, 0), SAVE_CAP.count));
     if (d.fp && typeof d.fp === 'object') for (const k in s.fp) s.fp[k] = Math.floor(cap(num(d.fp[k], 0, 0), SAVE_CAP.fperk));
     if (d.hd && typeof d.hd === 'object') {
@@ -5171,7 +5190,9 @@ span.bt-stamp{display:none}.bt-duel.done span.bt-stamp{display:grid}
   const semOn = () => S.tier >= 1;
   const semFirst = () => semOn() && S.sem === 0;
   const semLabel = () => semOn() ? `${S.sem + 1}학기` : '';
-  const cereDip = () => semFirst() ? Math.ceil(previewDip() / 2) : previewDip();
+  // 2.1.0 수료증은 전처럼 한 해 전체 수입으로 셈해요(지섭 결정): 방학식은 그 절반, 종업식은 한 해 몫에서 방학식에 준 것을 뺀 나머지
+  const yearDip = () => semOn() ? Math.max(0, previewDip() - (S.semDip || 0)) : previewDip();
+  const cereDip = () => semFirst() ? Math.ceil(previewDip() / 2) : yearDip();
   // 마지막 해에는 종업식 대신 졸업식을 열어요. 다음 학교급이 아직 안 열렸으면 종업식을 계속 열 수 있어요
   // 초등학교는 학년마다 메인 퀘스트 한 장이 있어서, 그 장을 마쳐야(그 학년 종업식 퀘스트까지 와야) 종업식을 열 수 있어요
   // 2.0.0: 중학교 학년 장도 같은 규칙(yt는 그 퀘스트의 학교급, 없으면 초등학교)
@@ -5194,7 +5215,7 @@ span.bt-stamp{display:none}.bt-duel.done span.bt-stamp{display:grid}
   const canPromote = () => finalYear() && !semFirst() && S.grade >= GRAD_MIN && !promoteLocked();
   // 기금 = 이 학교급에서 모은 수료증 5장마다 1 + 졸업 축하 1. 올해 수료증도 함께 쳐요
   const FUND_PER = 5;
-  const previewFund = () => Math.floor((S.tdip + previewDip()) / FUND_PER) + 1;
+  const previewFund = () => Math.floor((S.tdip + yearDip()) / FUND_PER) + 1;
   const fpCost = k => FPERKS[k].cost(S.fp[k]);
   function addDip(v) { S.p.dip += v; S.tdip += v; S.st.dips += v; rankDirty(); }
   const perkCost = k => PERKS[k].cost(S.p.perk[k]);
@@ -12816,7 +12837,7 @@ span.bt-stamp{display:none}.bt-duel.done span.bt-stamp{display:grid}
   }
   // 졸업 전에 조금 더 벌면 기금이 하나 느는지 알려 줘요
   function nextFundNote() {
-    const tot = S.tdip + previewDip(), goal = (Math.floor(tot / FUND_PER) + 1) * FUND_PER;
+    const tot = S.tdip + yearDip(), goal = (Math.floor(tot / FUND_PER) + 1) * FUND_PER;
     const more = Math.ceil(dipAt(goal - S.tdip) - S.yearEarned);
     return more > 0 ? `도토리를 ${fmt(more)}개 더 벌고 가면 기금이 1 늘어요.` : '';
   }
@@ -12920,11 +12941,13 @@ span.bt-stamp{display:none}.bt-duel.done span.bt-stamp{display:grid}
     S.hd.album = false;
     rt.yearRec = facKeys().filter(k => S.f[k] > 0).map(k => `${FAC[k].name} Lv.${S.f[k]}`).join(', ') + `, 학생 ${Math.floor(S.students)}명`;
     S.st.grads += 1; S.st.sems = (S.st.sems || 0) + 1;
-    S.sem = 1;
+    S.sem = 1; S.semDip = (S.semDip || 0) + dip;   // 2.1.0 종업식 수료증에서 뺄 몫
     addLeague(Math.round(LP.grad / 2));
     cloudSoon();
     addGold(GOLD.grad);
+    const ye = S.yearEarned;
     newYear(false);
+    S.yearEarned = ye;   // 2.1.0 한 해 수입은 2학기 종업식까지 이어서 세요
     $('#gConfirm').hidden = true;
     checkGrade();
     syncKids(false);
@@ -12935,11 +12958,11 @@ span.bt-stamp{display:none}.bt-duel.done span.bt-stamp{display:grid}
   function graduate() {
     if (!canGraduate() || rt.paused) return;
     if (semFirst()) { semBreak(); return; }
-    const dip = previewDip(), leaving = Math.floor(S.students);
+    const dip = yearDip(), leaving = Math.floor(S.students);
     addDip(dip);
     S.hd.album = false;
     rt.yearRec = facKeys().filter(k => S.f[k] > 0).map(k => `${FAC[k].name} Lv.${S.f[k]}`).join(', ') + `, 학생 ${Math.floor(S.students)}명`;
-    S.st.grads += 1; S.tg += 1; S.sem = 0;
+    S.st.grads += 1; S.tg += 1; S.sem = 0; S.semDip = 0;
     addLeague(LP.grad);
     cloudSoon();
     addGold(GOLD.grad);
@@ -13005,9 +13028,9 @@ span.bt-stamp{display:none}.bt-duel.done span.bt-stamp{display:grid}
   function promote() {
     if (!canPromote() || rt.paused) return;
     const fund = previewFund(), leaving = Math.floor(S.students), from = tierInfo();
-    const dipsIn = Math.floor(S.tdip + previewDip());   // 이번 학교급에서 모은 수료증 (기금으로 바뀌어요)
+    const dipsIn = Math.floor(S.tdip + yearDip());   // 이번 학교급에서 모은 수료증 (기금으로 바뀌어요)
     S.fund += fund;
-    S.st.dips += previewDip();   // 마지막 해 수료증은 기금이 되지만 학교 점수에는 더해요
+    S.st.dips += yearDip();   // 마지막 해 수료증은 기금이 되지만 학교 점수에는 더해요
     rankDirty();
     S.hd.album = false;
     S.st.grads += 1;   // 졸업식도 종업식과 함께 행사 횟수로 쳐요
@@ -13020,7 +13043,7 @@ span.bt-stamp{display:none}.bt-duel.done span.bt-stamp{display:grid}
     snapTake();   // 2.0.0 졸업식 사진: 이 학교급의 마지막 모습
     S.tfp = S.st.fperks;
     S.roster = freshRoster(); S.club = freshClub();
-    S.tier += 1; S.tg = 0; S.sem = 0; S.tdip = 0; S.best = 0; S.hd.furNew = false;
+    S.tier += 1; S.tg = 0; S.sem = 0; S.semDip = 0; S.tdip = 0; S.best = 0; S.hd.furNew = false;
     S.bd = {};   // 2.1.0 새 학교급은 처음부터 지어요(하던 공사는 없어져요)
     acAll();   // 2.0.1 공부: 학교급 상한이 풀려요
     S.p.dip = 0;
@@ -13181,6 +13204,7 @@ span.bt-stamp{display:none}.bt-duel.done span.bt-stamp{display:grid}
       case 'mgDex': return mgDexN();   // 1.8.0 합치기 도감 칸
       case 'pzBest': return S.pz.best;   // 1.8.0 숲속 퍼즐 최고 점수
       case 'acMax': return Math.max(...AC.keys.map(acLv));   // 2.0.1 공부: 가장 높은 과목 레벨
+      case 'acSum': return acSum();   // 2.1.0 학기 숙제: 다섯 과목 레벨 합
       case 'acBook': return S.ac.st.bk;   // 2.0.1 산 문제집 수
       case 'clubMat': return clubMembers(4).length;   // 2.0.1 수학부 부원 수
       case 'rdBooks': return S.rd.st;   // 2.0.1 다 읽은 책 수
@@ -13291,6 +13315,7 @@ span.bt-stamp{display:none}.bt-duel.done span.bt-stamp{display:grid}
       case 'mgDex': return `합치기 도감 ${q.n}칸 채우기`;
       case 'pzBest': return `숲속 퍼즐 ${fmt(q.n)}점 넘기기`;
       case 'acMax': return `과목 하나 Lv.${q.n} 만들기`;   // 2.0.1 공부
+      case 'acSum': return `다섯 과목 레벨 합 ${q.n} 만들기`;
       case 'acBook': return q.n === 1 ? '문제집 한 권 풀기' : `문제집 ${q.n}권 풀기`;
       case 'clubMat': return `수학부 부원 ${q.n}명`;
       case 'rdBooks': return q.n === 1 ? '책 한 권 다 읽기' : `책 ${q.n}권 다 읽기`;
@@ -13733,7 +13758,7 @@ span.bt-stamp{display:none}.bt-duel.done span.bt-stamp{display:grid}
       case 'trips': case 'souv': case 'tripat': return openTrip();
       case 'sports': case 'fest': return openFest();
       case 'club': case 'shows': case 'clubSum': case 'star': case 'clubShown': case 'clubMat': return setTab('club');   // 2.0.0
-      case 'acMax': case 'acBook': return setTab('mini');   // 2.0.1 공부 탭
+      case 'acMax': case 'acBook': case 'acSum': return setTab('mini');   // 2.0.1 공부 탭
       case 'elects': case 'elMid': return openElect();   // 2.0.1
       case 'rdBooks': return rdReady() ? openRead() : goFac('library', `${eul(FAC.library.name)} 먼저 지어야 해요`);
       case 'labs': return labReady() ? openLab() : goFac('science', `${eul(FAC.science.name)} 먼저 지어야 해요`);
