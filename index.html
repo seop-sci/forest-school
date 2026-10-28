@@ -1316,7 +1316,23 @@ body{background:radial-gradient(120% 60% at 50% 0%, color-mix(in srgb, var(--pap
 .panel-x{position:sticky;top:0;float:right;z-index:2;margin:-6px -4px 0 8px;width:36px;height:36px;border:0;border-radius:12px;background:var(--card);color:var(--ink);display:grid;place-items:center;cursor:pointer}
 .qsec{padding:7px 12px;border-radius:12px;background:var(--board);color:#FFF4D6}
 .qsec small{color:color-mix(in srgb, #FFF4D6 72%, transparent)}
-/* 미니게임 탭 */
+/* 공부 탭 (2.0.1, 옛 미니게임 탭) */
+.ac-list{display:flex;flex-direction:column;gap:6px;margin:0 0 12px;padding:10px 12px;border:2px solid var(--line);border-radius:16px;background:var(--card);box-shadow:0 3px 0 var(--line-shadow)}
+.ac-head{display:flex;align-items:center;justify-content:space-between;gap:8px;margin-bottom:2px}
+.ac-head b{font-family:var(--font-display);font-weight:400;font-size:17px}
+.ac-head small{color:var(--muted);font-size:12.5px}
+.ac-row{display:grid;grid-template-columns:34px 44px 1fr auto;align-items:center;gap:8px;font-size:13px}
+.ac-row .ac-nm{font-family:var(--font-display);font-size:15px}
+.ac-row .ac-lv{color:var(--muted);font-size:12.5px;white-space:nowrap}
+.ac-bar{position:relative;height:10px;border-radius:999px;background:var(--chip-bg);overflow:hidden}
+.ac-bar i{position:absolute;inset:0 auto 0 0;border-radius:999px;background:var(--accent);transition:width .3s}
+.ac-bar.cap i{background:#B9A77A}
+.ac-bk{padding:3px 9px;border:0;border-radius:999px;background:var(--chip-bg);color:var(--chip-ink);font:inherit;font-size:12px;white-space:nowrap;cursor:pointer;display:inline-flex;align-items:center;gap:3px}
+.ac-bk .tic{width:14px;height:14px}
+.ac-bk.poor,.ac-bk.off{opacity:.55}
+.ac-note{color:var(--muted);font-size:12px;margin-top:2px}
+.mini-card .mc-sub{display:inline-block;margin-right:6px;padding:1px 7px;border-radius:999px;background:var(--chip-bg);color:var(--chip-ink);font-family:var(--font-body);font-size:12px;font-weight:700;white-space:nowrap}
+@media (max-width:380px){.ac-row{grid-template-columns:30px 40px 1fr auto;gap:6px}.ac-bk{padding:3px 7px;font-size:11px}}
 .mini-list{display:flex;flex-direction:column;gap:10px}
 .mini-card{display:flex;align-items:center;gap:12px;padding:12px 14px;border:2px solid var(--line);border-radius:16px;background:var(--card);box-shadow:0 3px 0 var(--line-shadow)}
 .mini-card .tic{flex:none;width:48px;height:48px}
@@ -2020,7 +2036,7 @@ body{background:radial-gradient(120% 60% at 50% 0%, color-mix(in srgb, var(--pap
 .club-top{display:flex;align-items:center;gap:8px}
 .club-badge{width:40px;height:40px;flex:none;object-fit:contain}
 .club-badge.em{display:grid;place-items:center;border-radius:50%;font-size:22px;background:#E8F0DA}
-.club-badge.em.c1{background:#FBE3CC}.club-badge.em.c2{background:#DCE8F7}.club-badge.em.c3{background:#F9DDE8}
+.club-badge.em.c1{background:#FBE3CC}.club-badge.em.c2{background:#DCE8F7}.club-badge.em.c3{background:#F9DDE8}.club-badge.em.c4{background:#E3E0F7}
 .club-nm{flex:1;min-width:0;display:flex;flex-direction:column}
 .club-nm b{font-size:15px}.club-nm small{font-size:12px;color:var(--chip-ink)}
 .club-eff{flex:none;padding:3px 8px;border-radius:999px;background:#F4C144;color:#3C2B06;font-size:12.5px;font-weight:700;white-space:nowrap}
@@ -2626,7 +2642,7 @@ body{background:radial-gradient(120% 60% at 50% 0%, color-mix(in srgb, var(--pap
     <button class="street-back" type="button" data-go="street">상점 거리로</button>
     <h2 id="essTitle" class="ph"><span class="tic" data-ic="ic_essence_shop" aria-hidden="true"></span><span>정수 상점</span></h2>
     <div class="shop-have ess-have" id="essHaveBox"><span class="ess-big" id="essBig" aria-hidden="true"></span><span class="tic" data-ic="ic_essence" aria-hidden="true"></span><span id="essHave2">0</span></div>
-    <p class="fine shop-adleft">숲의 정수는 미니게임에서만 모을 수 있어요. 도토리 양은 학교가 성장할수록 커져요</p>
+    <p class="fine shop-adleft">숲의 정수는 공부 탭에서만 모을 수 있어요. 도토리 양은 학교가 성장할수록 커져요</p>
     <div class="shop-scroll" id="essList"></div>
     <div class="shop-ask" id="essAsk" hidden>
       <p id="essAskText"></p>
@@ -2635,17 +2651,18 @@ body{background:radial-gradient(120% 60% at 50% 0%, color-mix(in srgb, var(--pap
     </section>
 
     <section class="panel" id="panelMini" hidden aria-labelledby="ttlMini">
-      <h2 id="ttlMini" class="ph"><span class="tic" data-ic="ic_minigame" aria-hidden="true"></span><span>미니게임</span></h2>
-      <p class="lead">미니게임을 하면 숲의 정수와 도토리를 받아요. 숲의 정수로는 한정 의상, 특별 가구 같은 꾸미기를 살 수 있어요.</p>
+      <h2 id="ttlMini" class="ph"><span class="tic" data-ic="ic_study" aria-hidden="true"></span><span>공부</span></h2>
+      <p class="lead">공부하면 그 과목의 학교 학력이 올라요. 학력이 오르면 수업료와 평판이 조금씩 올라요. 숲의 정수와 도토리도 그대로 받아요.</p>
       <div class="mini-have"><span class="tic" data-ic="ic_essence" aria-hidden="true"></span><span>숲의 정수</span><b id="essHave">0</b></div>
+      <div class="ac-list" id="acList" aria-label="학교 학력"></div>
       <div class="mini-list">
-        <button class="mini-card mini-go" type="button" id="pzOpen"><span class="pz-thumb" aria-hidden="true"></span><span class="mc-txt"><b>숲속 퍼즐<span class="mc-left" id="pzLeftTxt">보상 10/10</span></b><small id="pzCardSub">조각을 끌어다 놓고 줄을 지워요</small></span><span class="mini-play" id="pzCardTag">시작하기</span></button>
+        <button class="mini-card mini-go" type="button" id="pzOpen"><span class="pz-thumb" aria-hidden="true"></span><span class="mc-txt"><b><span class="mc-sub">수학 공부</span>숲속 퍼즐<span class="mc-left" id="pzLeftTxt">보상 10/10</span></b><small id="pzCardSub">조각을 끌어다 놓고 줄을 지워요</small></span><span class="mini-play" id="pzCardTag">시작하기</span></button>
         <div class="mini-pzrow" id="pzAdRow" hidden>
           <span>오늘 보상 판을 다 썼어요</span>
           <button class="btn-sub small" type="button" id="pzAdBtn" hidden>광고 보고 3판 더</button>
         </div>
-        <button class="mini-card mini-go" type="button" id="mgOpen"><span class="mg-thumb" aria-hidden="true">🌰</span><span class="mc-txt"><b>숲속 합치기</b><small id="mgCardSub">에너지 100/100</small></span><span class="mini-play" id="mgCardTag">시작하기</span></button>
-        <div class="mini-card"><span class="tic" data-ic="ic_rank" aria-hidden="true"></span><span class="mc-txt"><b>숲속 대결</b><small>숲속 교육부에서 열심히 준비 중이에요</small></span><span class="mini-soon">준비 중</span></div>
+        <button class="mini-card mini-go" type="button" id="mgOpen"><span class="mg-thumb" aria-hidden="true">🌰</span><span class="mc-txt"><b><span class="mc-sub">미술 공부</span>숲속 합치기</b><small id="mgCardSub">에너지 100/100</small></span><span class="mini-play" id="mgCardTag">시작하기</span></button>
+        <div class="mini-card"><span class="tic" data-ic="ic_rank" aria-hidden="true"></span><span class="mc-txt"><b>국어, 과학, 체육 공부</b><small>책 읽기, 과학 탐구 실험, 숲속 대결을 준비 중이에요. 그때까지는 문제집으로 올려요</small></span><span class="mini-soon">준비 중</span></div>
       </div>
     </section>
 
@@ -2768,7 +2785,7 @@ body{background:radial-gradient(120% 60% at 50% 0%, color-mix(in srgb, var(--pap
       <span class="dot" id="tabDot" hidden></span>
       <span class="tguide" aria-hidden="true"><svg viewBox="-10 -22 20 22"><path d="M0 -1 L-8.5 -11 L-3.8 -11 L-3.8 -21 L3.8 -21 L3.8 -11 L8.5 -11 Z"/></svg></span>
     </button>
-    <button class="tab" type="button" role="tab" data-tab="mini" aria-selected="false"><span class="tic" data-ic="ic_minigame" aria-hidden="true"></span>미니게임</button>
+    <button class="tab" type="button" role="tab" data-tab="mini" aria-selected="false"><span class="tic" data-ic="ic_study" aria-hidden="true"></span>공부</button>
     <button class="tab" type="button" role="tab" data-tab="grad" aria-selected="false"><span class="tic" data-ic="ic_grad" aria-hidden="true"></span>졸업
       <span class="dot" id="gDot" hidden></span>
       <span class="tguide" aria-hidden="true"><svg viewBox="-10 -22 20 22"><path d="M0 -1 L-8.5 -11 L-3.8 -11 L-3.8 -21 L3.8 -21 L3.8 -11 L8.5 -11 Z"/></svg></span>
@@ -2817,7 +2834,7 @@ body{background:radial-gradient(120% 60% at 50% 0%, color-mix(in srgb, var(--pap
 <div class="pz mg" id="mgScene" hidden role="dialog" aria-modal="true" aria-label="숲속 합치기">
   <div class="pz-bg" aria-hidden="true"></div>
   <div class="mg-top">
-    <button class="pz-x" type="button" id="mgBack" aria-label="미니게임으로 돌아가기"><svg viewBox="0 0 24 24" width="20" height="20" aria-hidden="true"><path d="M15 5l-7 7 7 7" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"/></svg></button>
+    <button class="pz-x" type="button" id="mgBack" aria-label="공부 탭으로 돌아가기"><svg viewBox="0 0 24 24" width="20" height="20" aria-hidden="true"><path d="M15 5l-7 7 7 7" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"/></svg></button>
     <div class="mg-stat" id="mgEnergy" aria-live="polite"><span class="mg-ic" data-mg="mg_ic_energy">⚡</span><b id="mgE">100</b><small id="mgEMax">/100</small><small id="mgETimer"></small></div>
     <div class="mg-stat" id="mgPieces" title="장식 조각"><span class="mg-ic" data-mg="mg_ic_piece">💎</span><b id="mgPc">0</b></div>
     <div class="mg-stat" id="mgUps" title="생산기 강화 조각"><span class="mg-ic" data-mg="mg_ic_up">🔑</span><b id="mgUp">0</b></div>
@@ -2864,7 +2881,7 @@ body{background:radial-gradient(120% 60% at 50% 0%, color-mix(in srgb, var(--pap
 <div class="pz" id="pzScene" hidden role="dialog" aria-modal="true" aria-label="숲속 퍼즐">
   <div class="pz-bg" aria-hidden="true"></div>
   <div class="pz-top">
-    <button class="pz-x" type="button" id="pzBack" aria-label="미니게임으로 돌아가기"><svg viewBox="0 0 24 24" width="20" height="20" aria-hidden="true"><path d="M15 5l-7 7 7 7" fill="none" stroke="currentColor" stroke-width="2.6" stroke-linecap="round" stroke-linejoin="round"/></svg></button>
+    <button class="pz-x" type="button" id="pzBack" aria-label="공부 탭으로 돌아가기"><svg viewBox="0 0 24 24" width="20" height="20" aria-hidden="true"><path d="M15 5l-7 7 7 7" fill="none" stroke="currentColor" stroke-width="2.6" stroke-linecap="round" stroke-linejoin="round"/></svg></button>
     <div class="pz-sc"><small>점수</small><b id="pzScore">0</b><em class="pz-combo" id="pzCombo" hidden></em></div>
     <div class="pz-sc pz-sc2"><small>최고</small><b id="pzBest">0</b></div>
     <div class="pz-sc pz-sc2"><small>이번 판 정수</small><b id="pzEssNow">0</b></div>
@@ -3363,6 +3380,7 @@ body{background:radial-gradient(120% 60% at 50% 0%, color-mix(in srgb, var(--pap
 "ic_grad":"data:image/webp;base64,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",
 "ic_home":"data:image/webp;base64,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",
 "ic_library":"data:image/webp;base64,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",
+"ic_study":"data:image/svg+xml;charset=utf-8,%3Csvg%20xmlns=%22http://www.w3.org/2000/svg%22%20viewBox=%220%200%2064%2064%22%3E%3Cpath%20d=%22M10%2014c0-3%202-5%205-5h14c2%200%203%201%203%203v36c0-2-1-3-3-3H15c-3%200-5%202-5%205z%22%20fill=%22%23F7E7B8%22%20stroke=%22%238A5A2B%22%20stroke-width=%223%22%20stroke-linejoin=%22round%22/%3E%3Cpath%20d=%22M54%2014c0-3-2-5-5-5H35c-2%200-3%201-3%203v36c0-2%201-3%203-3h14c3%200%205%202%205%205z%22%20fill=%22%23FFF6DD%22%20stroke=%22%238A5A2B%22%20stroke-width=%223%22%20stroke-linejoin=%22round%22/%3E%3Cpath%20d=%22M17%2019h11M17%2026h11M17%2033h11M36%2019h11M36%2026h11M36%2033h11%22%20stroke=%22%23C9A66B%22%20stroke-width=%222.5%22%20stroke-linecap=%22round%22/%3E%3Cpath%20d=%22M44%2044l6-6%206%206-6%2012z%22%20fill=%22%23F4C542%22%20stroke=%22%238A5A2B%22%20stroke-width=%222.5%22%20stroke-linejoin=%22round%22/%3E%3Ccircle%20cx=%2232%22%20cy=%2212%22%20r=%225%22%20fill=%22%23F4C542%22%20stroke=%22%238A5A2B%22%20stroke-width=%222.5%22/%3E%3C/svg%3E",
 "ic_minigame":"data:image/webp;base64,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",
 "ic_note":"data:image/webp;base64,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",
 "ic_playground":"data:image/webp;base64,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",
@@ -4098,8 +4116,8 @@ body{background:radial-gradient(120% 60% at 50% 0%, color-mix(in srgb, var(--pap
     // 1.7.4 지섭 결정: 매와 뱀 쫓아내기. 이 퀘스트를 하는 동안에는 매나 뱀이 바로, 자주 와요(updateTrial)
     { id: 'h1', ch: 1, t: 'trials', n: 1, r: 200, title: '침입자 쫓아내기', how: '매나 뱀이 나타나면 여러 번 눌러서 쫓아내요',
       say: '큰일이에요! 학교 소문을 듣고 매와 뱀이 기웃거려요. 나타나면 빨간 테두리가 생겨요. 20초 안에 여러 번 톡톡 눌러서 쫓아내 주세요!' },
-    { id: 'z1', ch: 1, t: 'pz', n: 1, r: 200, title: '숲속 퍼즐 한 판', how: '미니게임 > 숲속 퍼즐에서 한 판을 끝까지 해요',
-      say: '미니게임 탭에 숲속 퍼즐이 있어요. 조각을 끌어다 줄을 채우면 지워져요. 한 판 끝까지 해 보면 숲의 정수와 도토리를 받아요.' },
+    { id: 'z1', ch: 1, t: 'pz', n: 1, r: 200, title: '수학 공부: 숲속 퍼즐 한 판', how: '공부 > 숲속 퍼즐에서 한 판을 끝까지 해요',
+      say: '공부 탭에 숲속 퍼즐이 있어요. 조각을 끌어다 줄을 채우면 지워져요. 한 판 끝까지 하면 수학 학력이 오르고 숲의 정수와 도토리도 받아요.' },
     { id: 'q8', ch: 1, t: 'students', n: 30, r: 250, title: '학생 30명 맞이하기', how: '교실을 Lv.6까지 넓히고 학생을 30명까지 모집해요',
       say: '마을에서 입학 문의가 밀려와요. 교실을 넓혀서 학생 30명을 맞이해 볼까요?' },
     { id: 'q9', ch: 1, t: 'fac', k: 'cafeteria', n: 3, r: 250, title: '급식실 키우기', how: '급식실 Lv.3이면 수업료가 60% 올라요',
@@ -4119,8 +4137,8 @@ body{background:radial-gradient(120% 60% at 50% 0%, color-mix(in srgb, var(--pap
       say: '도서관에는 사슴 사서 선생님이 계셔요. 연수를 보내면 숲속 퍼즐에서 받는 숲의 정수가 늘어요.' },
     { id: 'p2', ch: 2, t: 'picks', n: 8, r: 600, title: '참나무 도토리 줍기', how: '참나무를 눌러서 떨어진 도토리를 주워요',
       say: '곰 선생님이 오시니 참나무도 신이 났나 봐요. 떨어진 도토리를 주워서 학교 살림에 보태요.' },
-    { id: 'm1', ch: 2, t: 'mgBest', n: 3, r: 700, title: '숲속 합치기 3단계 만들기', how: '미니게임 > 숲속 합치기에서 같은 조각 둘을 겹쳐요',
-      say: '미니게임 탭에 숲속 합치기가 열렸어요. 생산기를 눌러 조각을 만들고, 같은 조각 둘을 겹치면 다음 단계가 돼요. 3단계까지 만들어 볼까요?' },
+    { id: 'm1', ch: 2, t: 'mgBest', n: 3, r: 700, title: '숲속 합치기 3단계 만들기', how: '공부 > 숲속 합치기에서 같은 조각 둘을 겹쳐요',
+      say: '공부 탭에 숲속 합치기가 열렸어요. 생산기를 눌러 조각을 만들고, 같은 조각 둘을 겹치면 다음 단계가 돼요. 3단계까지 만들어 볼까요?' },
     { id: 'm2', ch: 2, t: 'mgOrders', n: 3, r: 800, title: '학생 주문 3개 채우기', how: '숲속 합치기 위쪽 주문 쪽지를 눌러 조각을 건네요',
       say: '학생들이 합치기 조각을 갖고 싶어 해요. 주문 쪽지에 적힌 조각을 만들어 건네면 도토리를 받아요.' },
     { id: 'q13', ch: 2, t: 'fac', k: 'library', n: 5, r: 1000, title: '도서관 키우기', how: '도서관을 키우면 평판이 쑥쑥 올라요',
@@ -4150,6 +4168,8 @@ body{background:radial-gradient(120% 60% at 50% 0%, color-mix(in srgb, var(--pap
       say: '대도시 학교라면 급식도 숲에서 제일이어야지요. 급식실을 Lv.12까지 키워 주세요.' },
     { id: 'q20', ch: 3, t: 'fac', k: 'library', n: 11, r: 15000, title: '천 년의 도서관', how: '도서관을 Lv.11까지 키워요',
       say: '천 년 동안 읽을 책을 모아 볼까요? 도서관을 Lv.11까지 키우면 대도시가 코앞이에요.' },
+    { id: 'sa1', ch: 3, t: 'acMax', n: 5, r: 12000, title: '과목 하나 Lv.5', how: '공부 탭에서 퍼즐이나 합치기를 하면 그 과목 학력이 올라요. 문제집을 사도 돼요',
+      say: '동네 소문보다 더 믿음직한 건 학교 학력이에요. 공부 탭에서 과목 하나를 Lv.5까지 올려 볼까요?' },
     { id: 'q21', ch: 3, t: 'grade', n: 4, r: 20000, title: '대도시 학교 되기', how: '평판을 ★{REP}까지 모으면 종업식이 열려요',
       say: '평판을 ★{REP}까지 모으면 나무 빌딩이 숲을 이룬 대도시가 돼요! 대도시 학교가 되면 1년째를 마치는 종업식을 열 수 있어요.' },
 
@@ -4238,6 +4258,8 @@ body{background:radial-gradient(120% 60% at 50% 0%, color-mix(in srgb, var(--pap
       say: '체험학습 날에는 급식실에서 도시락을 싸 줘요. 급식실을 Lv.18까지 키워 주세요.' },
     { id: 'e49', ch: 7, t: 'picks', n: 20, rm: 3, title: '도토리 20개 줍기', how: '참나무를 누르면 도토리가 떨어져요',
       say: '시냇가에서 돌아오는 길에 참나무 아래 도토리를 주워요. 20개를 주워 주세요!' },
+    { id: 'sa2', ch: 7, t: 'acBook', n: 1, rm: 3, title: '문제집 한 권 풀기', how: '공부 탭의 과목 줄 오른쪽 문제집 단추를 눌러요. 숲의 정수 10개예요',
+      say: '체험학습 보고서를 쓰려면 공부가 더 필요해요. 공부 탭에서 문제집 한 권을 사서 풀어 봐요. 숲의 정수 10개로 학력이 쑥 올라요.' },
     { id: 'e23', ch: 7, t: 'ygrade', n: 4, rm: 4, title: '3학년 대도시 되기', how: '평판을 모아서 대도시가 되어요',
       say: '3학년도 대도시 학교로 만들어요. 대도시가 되면 종업식을 열 수 있어요.' },
     { id: 'e24', ch: 7, ye: 3, t: 'tgrads', n: 3, r: 7, rk: 'dip', title: '3학년 종업식', how: '졸업 탭에서 종업식을 열어요',
@@ -4278,6 +4300,8 @@ body{background:radial-gradient(120% 60% at 50% 0%, color-mix(in srgb, var(--pap
       say: '학예회 준비로 도서관이 바빠요. 사서 선생님을 Lv.5까지 보내면 퍼즐 정수가 더 늘어요.' },
     { id: 'c2', ch: 9, t: 'deco', n: 3, rm: 4, title: '장식 3개 놓기', how: '상점 > 꾸미기 가게에서 장식을 사서 지도에 놓아요',
       say: '학예회에 손님이 와요. 학교를 장식 3개로 꾸며서 맞이해 봐요.' },
+    { id: 'sa3', ch: 9, t: 'acMax', n: 15, rm: 4, title: '과목 하나 Lv.15', how: '공부 탭에서 날마다 공부하면 학력이 쌓여요. 초등학교 상한은 Lv.20이에요',
+      say: '학예회에서 우리 학교 학력을 뽐내요. 과목 하나를 Lv.15까지 올려 주세요. 문제집도 하루 두 권까지 살 수 있어요.' },
     { id: 'e33', ch: 9, t: 'ygrade', n: 4, rm: 5, title: '5학년 대도시 되기', how: '평판을 모아서 대도시가 되어요',
       say: '학예회가 대성공이에요! 5학년도 대도시 학교로 만들어요.' },
     { id: 'e34', ch: 9, ye: 5, t: 'tgrads', n: 5, r: 10, rk: 'dip', title: '5학년 종업식', how: '졸업 탭에서 종업식을 열어요',
@@ -4295,9 +4319,9 @@ body{background:radial-gradient(120% 60% at 50% 0%, color-mix(in srgb, var(--pap
       say: '졸업 앨범에 들어갈 단체 사진을 찍어요. 모두 활짝 웃게 웃음 별을 눌러 줘요!' },
     { id: 'e54', ch: 10, t: 'tea', k: 'squirrel', n: 25, rm: 5, title: '다람쥐 선생님 Lv.25', how: '선생님 탭에서 다람쥐 선생님을 연수 보내요',
       say: '중학교 수학을 미리 배워 두면 좋겠지요? 다람쥐 선생님을 Lv.25까지 연수 보내 주세요.' },
-    { id: 'g1', ch: 10, t: 'mgDex', n: 20, rm: 5, title: '합치기 도감 20칸', how: '미니게임 > 숲속 합치기에서 조각을 키워 도감을 채워요',
+    { id: 'g1', ch: 10, t: 'mgDex', n: 20, rm: 5, title: '합치기 도감 20칸', how: '공부 > 숲속 합치기에서 조각을 키워 도감을 채워요',
       say: '졸업 전에 합치기 도감을 채워 봐요. 처음 만든 조각마다 숲의 정수도 받을 수 있어요.' },
-    { id: 'z2', ch: 10, t: 'pzBest', n: 1000, rm: 5, title: '숲속 퍼즐 1,000점', how: '미니게임 > 숲속 퍼즐에서 한 판에 1,000점',
+    { id: 'z2', ch: 10, t: 'pzBest', n: 1000, rm: 5, title: '숲속 퍼즐 1,000점', how: '공부 > 숲속 퍼즐에서 한 판에 1,000점',
       say: '졸업 기념 퍼즐 대회예요! 한 판에 1,000점을 넘겨 봐요. 콤보를 이어 가면 점수가 쑥쑥 올라요.' },
     { id: 'e38', ch: 10, t: 'ygrade', n: 4, r: 15, rk: 'dip', title: '6학년 대도시 되기', how: '평판을 모아서 대도시가 되어요',
       say: '초등학교의 마지막 해예요. 6학년도 대도시 학교로 만들면 졸업 준비 끝! 졸업 탭에서 졸업식을 열 수 있어요.' },
@@ -4326,6 +4350,8 @@ body{background:radial-gradient(120% 60% at 50% 0%, color-mix(in srgb, var(--pap
       say: '동아리가 생겼으니 첫 발표회를 열어 봐요! 무대에 선 동아리 친구들은 능력치가 쑥 오르고 도토리도 받아요. 발표회는 월요일부터 금요일까지 하루에 한 번 열고, 못 연 날이 있으면 주말에 2번까지 보충할 수 있어요.' },
     { id: 'jl1', ch: 12, t: 'elMid', n: 1, rm: 5, title: '중학교 반장 뽑기', how: '복도의 학생회실이나 교실에서 반장을 뽑아요',
       say: '중학교 반장 선거예요! 이번에는 명부의 친구들이 후보로 나와요. 반장이 속한 동아리는 보너스가 두 배가 되니, 동아리를 보고 골라 봐요.' },
+    { id: 'sa4', ch: 12, t: 'clubMat', n: 1, rm: 4, title: '수학부 꾸리기', how: '동아리실에서 수학 별이 많은 친구를 수학부에 넣어요',
+      say: '새로 생긴 수학부에 부원이 없어요. 명부에서 수학 별이 많은 친구를 수학부에 넣어 주세요. 수학부도 수업료를 올려 줘요.' },
     { id: 'j8', ch: 12, t: 'fac', k: 'science', n: 3, rm: 4, title: '과학실 키우기', how: '과학실을 Lv.3까지 키워요',
       say: '과학부 친구들이 실험할 자리가 모자라요. 과학실을 Lv.3까지 키우면 과학부 친구들의 과학 능력치도 올라요.' },
     { id: 'j9', ch: 12, t: 'fac', k: 'store', n: 5, rm: 4, title: '매점 넓히기', how: '매점을 Lv.5까지 키워요',
@@ -4333,7 +4359,7 @@ body{background:radial-gradient(120% 60% at 50% 0%, color-mix(in srgb, var(--pap
     { id: 'j10', ch: 12, t: 'students', n: 50, rm: 4, title: '학생 50명 맞이하기', how: '교실을 Lv.11까지 넓히고 학생을 50명까지 모집해요',
       say: '동아리 소문이 퍼져서 입학 문의가 많아요. 교실을 넓혀서 50명을 맞이해요.' },
     { id: 'j11', ch: 12, t: 'clubSum', n: 60, rm: 4, title: '동아리 보너스 60%', how: '능력치가 맞는 학생을 동아리에 넣어요',
-      say: '동아리 보너스는 부원의 능력치 별만큼 커져요. 동아리 네 곳의 보너스를 더해서 60%를 넘겨 봐요.' },
+      say: '동아리 보너스는 부원의 능력치 별만큼 커져요. 동아리 다섯 곳의 보너스를 더해서 60%를 넘겨 봐요.' },
     { id: 'j12', ch: 12, t: 'grade', n: 3, rm: 4, title: '중학교 도시 되기', how: '평판을 모아서 도시가 되어요',
       say: '중학교 둘레에 나무 아파트가 들어서요. 평판을 모아서 도시 학교가 되어 봐요.' },
     { id: 'j13', ch: 12, t: 'fac', k: 'cafeteria', n: 10, rm: 4, title: '급식실 Lv.10', how: '급식실을 Lv.10까지 키워요',
@@ -4364,6 +4390,8 @@ body{background:radial-gradient(120% 60% at 50% 0%, color-mix(in srgb, var(--pap
       say: '3학년은 졸업 문집을 만들어요. 도서관을 Lv.15까지 키워서 문집을 꽂을 자리를 마련해요.' },
     { id: 'j25', ch: 14, t: 'clubShown', n: 2, rm: 5, title: '동아리 두 곳 발표회', how: '서로 다른 동아리 두 곳이 무대에 올라요',
       say: '졸업 전에 여러 동아리가 무대에 서 봐요. 지금까지 무대에 서지 않은 동아리를 골라 발표회를 열면 돼요. 서로 다른 두 곳이 서면 끝이에요.' },
+    { id: 'sa5', ch: 14, t: 'acMax', n: 25, rm: 5, title: '과목 하나 Lv.25', how: '공부 탭에서 공부하고 문제집을 풀어요. 중학교 상한은 Lv.30이에요',
+      say: '고등학교에 가기 전에 학력을 다져요. 과목 하나를 Lv.25까지 올려 주세요.' },
     { id: 'j26', ch: 14, t: 'fest', k: 'photo', n: 1, rm: 5, title: '졸업 사진 찍기', how: '학교 행사 > 졸업 사진 찍기',
       say: '중학교 졸업 앨범에 들어갈 단체 사진을 찍어요. 모두 활짝 웃게 웃음 별을 눌러 줘요!' },
     { id: 'j27', ch: 14, t: 'fac', k: 'store', n: 15, rm: 5, title: '졸업 잔치 매점', how: '매점을 Lv.15까지 키워요',
@@ -4464,6 +4492,7 @@ body{background:radial-gradient(120% 60% at 50% 0%, color-mix(in srgb, var(--pap
     dex: { got: {}, paid: [] }, ev: { cur: '', start: 0, stamp: { n: 0, last: '' }, list: [], box: false },   // 1.7.0 도감, 이벤트
     // 1.6.0 숲의 정수(미니게임에서만 얻어요)와 블록 퍼즐: 오늘 보상 판 수, 광고로 더한 횟수, 최고 점수, 하던 판
     ess: 0, pz: { day: '', n: 0, adN: 0, best: 0, cur: null },
+    ac: freshAc(),   // 2.0.1 공부: 과목 5개 학교 학력(lv, xp), 문제집 bk(day, n), 통계 st
     clk: { last: 0 },   // 게임 시계: 지금까지 본 가장 늦은 시각 (gameNow)
     fg: { day: '', got: [] },   // 1.7.2 학교 행사 황금 도토리: 행사마다 하루 한 번(got에 오늘 받은 행사 id)
     es: { day: '', n: 0, week: -1, g: 0, x: 0 },
@@ -4472,7 +4501,7 @@ body{background:radial-gradient(120% 60% at 50% 0%, color-mix(in srgb, var(--pap
       // tfp: 이 학교급에 들어올 때까지 장학재단을 고친 횟수   // 2.0.0 학생 명부, 동아리, 학교급 사진(졸업식 때 남긴 모습)
     q: freshQ()
   });
-  const repOf = s => s.f.classroom + s.f.cafeteria + s.f.playground + 3 * s.f.library + s.f.science + 2 * (s.t.squirrel + s.t.owl + s.t.bear) + 5 * s.p.perk.rep + 10 * s.fp.rep;
+  const repOf = s => s.f.classroom + s.f.cafeteria + s.f.playground + 3 * s.f.library + s.f.science + 2 * (s.t.squirrel + s.t.owl + s.t.bear) + 5 * s.p.perk.rep + 10 * s.fp.rep + acRepOf(s);   // 2.0.1 학력 10레벨마다 +1
   const gradeOf = r => { let g = 0; CFG.grades.forEach((x, i) => { if (r >= townRep(i)) g = i; }); return g; };
 
   function sanitize(d) {
@@ -4644,6 +4673,7 @@ body{background:radial-gradient(120% 60% at 50% 0%, color-mix(in srgb, var(--pap
     else { s.bs.science = Math.min(1, s.tier); s.bs.playground = Math.min(1, s.tier); }
     // 1.6.0: 숲의 정수와 블록 퍼즐. 예전 저장에는 없으니 0에서 시작하고, 하던 판은 모양이 맞을 때만 이어요
     s.ess = Math.floor(num(d.ess, 0, 0));
+    sanitizeAc(d, s);   // 2.0.1 공부
     if (d.pz && typeof d.pz === 'object') {
       s.pz.day = typeof d.pz.day === 'string' ? d.pz.day.slice(0, 10) : '';
       s.pz.n = Math.floor(num(d.pz.n, 0, 0)); s.pz.adN = Math.floor(num(d.pz.adN, 0, 0));
@@ -4725,7 +4755,7 @@ body{background:radial-gradient(120% 60% at 50% 0%, color-mix(in srgb, var(--pap
   // 친구 성장 쪽지 고르기: 전학생을 다 만났거나, 이미 쪽지를 받아 키우기 시작한 학교(2.0.0에 전학생이 12종으로 늘기 전에 6종을 다 만난 학교)
   const growOn = () => S.p.species >= NEWCOMERS.length || (S.p.ticket || 0) > 0 || nlSum() > 0;
   const legacyMult = () => Math.pow(1.3, S.p.perk.schol) * (1 + 0.05 * S.p.species + 0.02 * nlSum()) * Math.pow(2, S.fp.schol);
-  const tuitionMult = () => (1 + 0.2 * S.f.cafeteria) * (1 + 0.15 * S.t.squirrel) * (1 + FAC.store.per / 100 * (S.f.store || 0)) * legacyMult() * setBonusMult() * tripMult() * clubTuitionMult() * elMult('tuition');
+  const tuitionMult = () => (1 + 0.2 * S.f.cafeteria) * (1 + 0.15 * S.t.squirrel) * (1 + FAC.store.per / 100 * (S.f.store || 0)) * legacyMult() * setBonusMult() * tripMult() * clubTuitionMult() * elMult('tuition') * acMult();
   const feastOn = () => gameNow() < S.hd.feastUntil;   // 2.0.0 보안 점검(2-5): 게임 시계
   const rate = () => Math.min(S.students, capacity()) * CFG.base * CFG.pace * tuitionMult() * Math.pow(CFG.gradeMult, S.grade) * incomeScale() * (feastOn() ? 2 : 1);
   const offlineEff = () => Math.min(1, 0.3 + 0.15 * S.t.owl);
@@ -8881,8 +8911,8 @@ body{background:radial-gradient(120% 60% at 50% 0%, color-mix(in srgb, var(--pap
     if (it) {
       const enough = it.acorn ? S.budget >= it.price : S.ess >= it.price;
       $('#essAskText').textContent = it.acorn ? (enough ? `도토리 ${fmt(it.price)}로 ${it.name}${it.ga} 바꿀까요?` : `도토리가 ${fmt(it.price - S.budget)} 모자라요.`)
-        : enough ? `${it.name}${it.ga} 숲의 정수 ${it.price}개로 살까요?` : `숲의 정수가 ${it.price - S.ess}개 모자라요. 미니게임에서 모을 수 있어요.`;
-      $('#essYes').textContent = it.acorn ? (enough ? '바꾸기' : '닫기') : enough ? '사기' : '미니게임 가기';
+        : enough ? `${it.name}${it.ga} 숲의 정수 ${it.price}개로 살까요?` : `숲의 정수가 ${it.price - S.ess}개 모자라요. 공부 탭에서 모을 수 있어요.`;
+      $('#essYes').textContent = it.acorn ? (enough ? '바꾸기' : '닫기') : enough ? '사기' : '공부 가기';
     }
   }
   function pickEss(pick) {
@@ -9106,7 +9136,7 @@ body{background:radial-gradient(120% 60% at 50% 0%, color-mix(in srgb, var(--pap
     if (d) {
       const c = decoCost(d.id), enough = S.ess >= c;
       $('#decoAskText').textContent = enough ? `${d.name}${eulOf(d.name)} 숲의 정수 ${c}개로 살까요?` : `숲의 정수가 ${c - S.ess}개 모자라요. 미니게임에서 모으거나 정수 상점에서 바꿀 수 있어요.`;
-      $('#decoYes').textContent = enough ? '사기' : '미니게임 가기';
+      $('#decoYes').textContent = enough ? '사기' : '공부 가기';
     }
     const inp = $('#decoName'); if (document.activeElement !== inp) inp.value = S.deco.nm;
     $('#decoTier').textContent = tierInfo().name;
@@ -9186,20 +9216,96 @@ body{background:radial-gradient(120% 60% at 50% 0%, color-mix(in srgb, var(--pap
 
   /* ---------- 2.0.0 학생 명부와 동아리 ----------
      학생 수(수업료 계산)는 그대로 두고, 그 가운데 얼굴이 되는 대표 학생 12명을 명부에 따로 적어요(S.roster).
-     중학교부터 명부가 생기고 동아리 네 곳에 3명씩 나눠요. 졸업식(학교급 올리기) 때 명부 학생은 졸업 사진(S.snap)에 남고 새 친구들이 입학해요.
-     능력치는 과학, 운동, 독서, 미술(속으로 1~100, 화면에는 별 1~5개). 동아리 보너스는 부원 셋의 맞는 능력치 별 하나에 2%(최대 30%), 미술부 할인은 절반.
+     중학교부터 명부가 생기고 동아리 다섯 곳(2.0.1부터 수학부)에 3명씩 나눠요. 졸업식(학교급 올리기) 때 명부 학생은 졸업 사진(S.snap)에 남고 새 친구들이 입학해요.
+     능력치는 과학, 체육, 국어, 미술, 수학(2.0.1에 이름을 바꾸고 수학을 더함. 속으로 1~100, 화면에는 별 1~5개). 동아리 보너스는 부원 셋의 맞는 능력치 별 하나에 2%(최대 30%), 미술부 할인은 절반.
      능력치가 자라는 법: 그 동아리 건물을 한 레벨 올릴 때마다 부원 +1, 한 주(게임 시계) 내내 같은 동아리였으면 +5와 건물 레벨 10마다 +1, 발표회 +5 */
   const ROSTER_N = 12, ROSTER_MAX = 16, ROSTER_TIER = 2;   // 처음 12명, 중학교에서 전학 온 친구가 더해지면 16명까지(동아리 자리는 12개)
-  const ABIL = ['과학', '운동', '독서', '미술'];
+  const ABIL = ['과학', '체육', '국어', '미술', '수학'];   // 2.0.1 공부: 저장 배열 순서는 그대로, 이름만 체육과 국어로, 수학을 다섯째로
+  const AB_KEY = ['sci', 'pe', 'kor', 'art', 'math'];   // 능력 번호 → 과목 키
   const CLUBS = [
     { id: 'sci', name: '과학부', ab: 0, fac: 'science', img: 'club_science', em: '🔬', eff: p => `수업료 +${p}%` },
     { id: 'spo', name: '운동부', ab: 1, fac: 'playground', img: 'club_sports', em: '⚽', eff: p => `학교 행사 보상 +${p}%` },
     { id: 'rea', name: '독서부', ab: 2, fac: 'library', img: 'club_reading', em: '📚', eff: p => `수업료 +${p}%` },
-    { id: 'art', name: '미술부', ab: 3, fac: 'classroom', img: 'club_art', em: '🎨', eff: p => `장식 값 -${p}%` }
+    { id: 'art', name: '미술부', ab: 3, fac: 'classroom', img: 'club_art', em: '🎨', eff: p => `장식 값 -${p}%` },
+    { id: 'mat', name: '수학부', ab: 4, fac: 'classroom', img: 'club_math', em: '➗', eff: p => `수업료 +${p}%` }   // 2.0.1 공부: 수학부(지섭 결정)
   ];
   // showDays: 발표회 주기(게임 시계 날짜). 설계안은 일주일이지만 중학교 한 해가 하루 안팎이라 균형 제안서(2.0.0)에서 하루를 제안했어요. 지섭 확정 전이에요
   const CLUB = { seats: 3, per: 2, max: 30, grow: 5, growLv: 10, up: 1, show: 5, showMin: 30, showDays: 1, weekend: 2 };   // 2.0.0 지섭 확정: 발표회는 월~금 하루 한 번, 그 주에 못 연 날이 있으면 주말에 2번까지 보충
-  // 동물마다 잘하는 능력(0 과학, 1 운동, 2 독서, 3 미술)
+  /* ---------- 2.0.1 공부: 과목 5개(국어, 수학, 과학, 미술, 체육)의 학교 학력 레벨 (2026-10-28 지섭 결정) ----------
+     공부(퍼즐=수학, 합치기=미술, 뒤에 책 읽기=국어, 과학 실험=과학, 숲속 대결=체육)를 하면 그 과목 학습 경험치(XP)가 바로 들어와요.
+     숲의 정수로 문제집을 사면 +50(과목마다 하루 2권). 다음 레벨까지 20 + 5n, 상한은 학교급마다(유 10, 초 20, 중 30, 고 40, 대 50, 원 60).
+     효과: 수업료 레벨 합 × 0.1%(acMult), 평판 10레벨마다 +1(acRepOf), 새 명부 학생의 시작 능력 바탕(rosterKid). 숫자는 "균형 제안서 (2.0.1 공부 탭)" */
+  const AC = { keys: ['kor', 'math', 'sci', 'art', 'pe'], name: { kor: '국어', math: '수학', sci: '과학', art: '미술', pe: '체육' },
+    cap: [10, 20, 30, 40, 50, 60], need: n => 20 + 5 * n, pzPer: 50, pzMax: 30, mgPer: 2, mgMax: 40,
+    book: { ess: 10, xp: 50, perDay: 2 }, tuition: 0.001, repPer: 10 };
+  const AC_GAME = { kor: '책 읽기', math: '숲속 퍼즐', sci: '과학 탐구 실험', art: '숲속 합치기', pe: '숲속 대결' };
+  const freshAc = () => { const o = { bk: { day: '', n: {} }, st: { xp: 0, bk: 0 } }; for (const k of AC.keys) { o[k] = { lv: 1, xp: 0 }; o.bk.n[k] = 0; } return o; };
+  const acCapOf = tier => AC.cap[Math.max(0, Math.min(AC.cap.length - 1, tier))];
+  const acCap = () => acCapOf(S.tier);
+  const acLv = k => (S && S.ac && S.ac[k]) ? S.ac[k].lv : 1;
+  const acSumOf = s => s && s.ac ? AC.keys.reduce((n, k) => n + ((s.ac[k] && s.ac[k].lv) || 1), 0) : 0;
+  const acSum = () => acSumOf(S);
+  const acMult = () => 1 + acSum() * AC.tuition;
+  const acRepOf = s => Math.floor(acSumOf(s) / AC.repPer);
+  // 상한까지 레벨업. 상한에 닿은 뒤 받은 XP는 모아 뒀다가 학교급이 오르면 풀려요
+  function acSettle(k, cap) {
+    const a = S.ac[k]; cap = cap === undefined ? acCap() : cap; let up = 0;
+    while (a.lv < cap && a.xp >= AC.need(a.lv)) { a.xp -= AC.need(a.lv); a.lv += 1; up += 1; }
+    return up;
+  }
+  const acAll = () => AC.keys.reduce((n, k) => n + acSettle(k), 0);
+  function acGain(k, v) {
+    if (!S.ac || !S.ac[k] || !(v > 0)) return 0;
+    v = Math.floor(v); S.ac[k].xp += v; S.ac.st.xp += v;
+    const up = acSettle(k);
+    if (up) { const lv = S.ac[k].lv, capped = lv >= acCap(); setTimeout(() => toast(`${AC.name[k]} Lv.${lv}!${capped ? ` ${tierInfo().name}에서는 여기까지예요` : ''}`), 500); }
+    checkQuests(true); return v;
+  }
+  function acBkDay() { const t = gameToday(); if (S.ac.bk.day !== t) { S.ac.bk.day = t; for (const k of AC.keys) S.ac.bk.n[k] = 0; } }
+  const acBkLeft = k => { acBkDay(); return Math.max(0, AC.book.perDay - (S.ac.bk.n[k] || 0)); };
+  function acBuyBook(k) {
+    if (!AC.name[k]) return false;
+    if (acBkLeft(k) <= 0) { toast(`${AC.name[k]} 문제집은 하루 ${AC.book.perDay}권까지예요. 내일 다시 살 수 있어요`); return false; }
+    if (S.ess < AC.book.ess) { toast(`숲의 정수가 ${AC.book.ess - S.ess}개 모자라요. 퍼즐이나 합치기로 모을 수 있어요`); return false; }
+    S.ess -= AC.book.ess; S.st.esSpent = (S.st.esSpent || 0) + AC.book.ess;
+    S.ac.bk.n[k] = (S.ac.bk.n[k] || 0) + 1; S.ac.st.bk += 1;
+    acGain(k, AC.book.xp);
+    sfx('quest'); buzz(14);
+    toast(`${AC.name[k]} 문제집을 풀었어요! ${AC.name[k]} XP +${AC.book.xp}`);
+    save(); renderEss(); renderMini(); renderHUD(); checkQuests(); return true;
+  }
+  // 공부 탭 위쪽 과목 5줄: 이름, Lv., 진행 막대, 문제집 단추
+  function renderAc() {
+    const box = $('#acList'); if (!box || !S.ac) return;
+    acBkDay();
+    const cap = acCap(), ic = ESS_ICON();
+    box.innerHTML = `<div class="ac-head"><b>학교 학력 ${acSum()}</b><small>수업료 +${(acSum() * AC.tuition * 100).toFixed(1)}%, 평판 +${acRepOf(S)}</small></div>` +
+      AC.keys.map(k => { const a = S.ac[k], need = AC.need(a.lv), capped = a.lv >= cap, left = acBkLeft(k), poor = S.ess < AC.book.ess;
+        return `<div class="ac-row"><span class="ac-nm">${AC.name[k]}</span><span class="ac-lv">Lv.${a.lv}</span>` +
+          `<span class="ac-bar${capped ? ' cap' : ''}" role="progressbar" aria-label="${AC.name[k]} Lv.${a.lv}" aria-valuenow="${capped ? need : Math.min(need, a.xp)}" aria-valuemax="${need}"><i style="width:${capped ? 100 : Math.round(100 * Math.min(1, a.xp / need))}%"></i></span>` +
+          `<button class="ac-bk${poor ? ' poor' : ''}${left > 0 ? '' : ' off'}" type="button" data-book="${k}" aria-label="${AC.name[k]} 문제집, 숲의 정수 ${AC.book.ess}개, 오늘 ${left}권 남음">문제집 ${ic}${AC.book.ess} <small>${left}/${AC.book.perDay}</small></button></div>`; }).join('') +
+      `<div class="ac-note">${cap <= acLv('kor') && AC.keys.every(k => acLv(k) >= cap) ? `${tierInfo().name} 상한 Lv.${cap}이에요. 다음 학교급에서 더 배워요` : `문제집은 과목마다 하루 ${AC.book.perDay}권, 한 권에 XP +${AC.book.xp}. ${tierInfo().name} 상한은 Lv.${cap}이에요`}</div>`;
+  }
+  // 옛 저장: 퍼즐 판 수와 합치기 주문 수로 수학과 미술 XP를 한 번 환산해요(2.0.1 테스트판 플레이어)
+  function sanitizeAc(d, s) {
+    s.ac = freshAc();
+    const num = (v, lo, hi) => typeof v === 'number' && isFinite(v) ? Math.max(lo, Math.min(hi, v)) : lo;
+    const cap = acCapOf(s.tier);
+    if (d.ac && typeof d.ac === 'object') {
+      for (const k of AC.keys) { const a = d.ac[k] && typeof d.ac[k] === 'object' ? d.ac[k] : {}; s.ac[k].lv = Math.floor(num(a.lv, 1, 60)); s.ac[k].xp = Math.floor(num(a.xp, 0, 1e7)); }
+      const bk = d.ac.bk && typeof d.ac.bk === 'object' ? d.ac.bk : {};
+      s.ac.bk.day = typeof bk.day === 'string' ? bk.day.slice(0, 10) : '';
+      for (const k of AC.keys) s.ac.bk.n[k] = Math.floor(num(bk.n && bk.n[k], 0, AC.book.perDay));
+      const st = d.ac.st && typeof d.ac.st === 'object' ? d.ac.st : {};
+      s.ac.st.xp = Math.floor(num(st.xp, 0, 1e9)); s.ac.st.bk = Math.floor(num(st.bk, 0, 1e6));
+    } else {
+      s.ac.math.xp = 8 * Math.floor(num(d.st && d.st.pz, 0, 1e5));
+      s.ac.art.xp = 8 * Math.floor(num(d.mg && d.mg.st && d.mg.st.orders, 0, 1e5));
+    }
+    // 레벨이 상한을 넘는 저장은 상한에서 멈추고, 모아 둔 XP로 올릴 수 있는 만큼 올려요
+    for (const k of AC.keys) { const a = s.ac[k]; if (a.lv > cap) a.lv = cap; while (a.lv < cap && a.xp >= AC.need(a.lv)) { a.xp -= AC.need(a.lv); a.lv += 1; } }
+  }
+  // 동물마다 잘하는 능력(0 과학, 1 체육, 2 국어, 3 미술, 4 수학)
   const SP_ABIL = { rabbit: 1, fox: 0, raccoon: 0, chick: 3, bear: 1, cat: 2, dog: 1, penguin: 0, panda: 2, koala: 2, otter: 3,
     hamster: 1, duck: 3, turtle: 2, mole: 0, frog: 1, waterdeer: 3 };
   const KID_NAMES = ['도토리', '밤송이', '솔방울', '이슬', '새싹', '단풍', '보리', '콩알', '버찌', '다래', '머루', '호두', '달래', '나리', '송이', '들꽃',
@@ -9208,13 +9314,14 @@ body{background:radial-gradient(120% 60% at 50% 0%, color-mix(in srgb, var(--pap
   const starTxt = n => `<span class="st-on">${'★'.repeat(n)}</span><span class="st-off">${'★'.repeat(5 - n)}</span>`;   // 채운 별과 빈 별(연하게)
   const rosterOn = () => !!S && S.tier >= ROSTER_TIER;
   const freshRoster = () => ({ list: [], wk: -1, gen: 0 });
-  const freshClub = () => ({ day: '', n: 0, shown: [0, 0, 0, 0], last: -1, wk: -1, wd: 0, we: 0 });   // 2.0.0 wk: 이번 주 월요일(날 번호), wd: 이번 주 월~금에 연 횟수, we: 주말에 연 횟수
+  const freshClub = () => ({ day: '', n: 0, shown: [0, 0, 0, 0, 0], last: -1, wk: -1, wd: 0, we: 0 });   // 2.0.0 wk: 이번 주 월요일(날 번호), wd: 이번 주 월~금에 연 횟수, we: 주말에 연 횟수
   // 새 명부: 만난 친구들 가운데서 겹치지 않게 12명(모자라면 겹쳐요). 잘하는 능력 하나가 도드라지고, 가끔 둘째도 조금
   function rosterKid(sp, taken) {
-    const a = [0, 1, 2, 3].map(() => 8 + Math.floor(Math.random() * 20));
-    const main = SP_ABIL[sp] !== undefined ? SP_ABIL[sp] : Math.floor(Math.random() * 4);
+    // 2.0.1 공부: 시작 능력의 바탕은 그 과목의 학교 학력(10 + 레벨 × 2, 70까지). 학력이 없던 옛 방식은 8~28 무작위였어요
+    const a = AB_KEY.map(k => Math.min(70, 10 + 2 * acLv(k)) + Math.floor(Math.random() * 6));
+    const main = SP_ABIL[sp] !== undefined ? SP_ABIL[sp] : Math.floor(Math.random() * ABIL.length);
     a[main] += 20 + Math.floor(Math.random() * 14);
-    if (Math.random() < 0.4) { const o = (main + 1 + Math.floor(Math.random() * 3)) % 4; a[o] += 10; }
+    if (Math.random() < 0.4) { const o = (main + 1 + Math.floor(Math.random() * (ABIL.length - 1))) % ABIL.length; a[o] += 10; }
     const free = KID_NAMES.filter(n => !taken.includes(n)), nm = (free.length ? free : KID_NAMES)[Math.floor(Math.random() * (free.length || KID_NAMES.length))];
     taken.push(nm);
     return { sp, nm, a: a.map(v => Math.min(100, v)), c: -1, cw: gameWeek() };
@@ -9241,8 +9348,8 @@ body{background:radial-gradient(120% 60% at 50% 0%, color-mix(in srgb, var(--pap
   const clubStars = c => clubMembers(c).reduce((n, s) => n + star(s.a[CLUBS[c].ab]), 0);
   const clubPct = c => rosterOn() ? Math.min(CLUB.max, CLUB.per * clubStars(c)) * (elClub() === c ? 2 : 1) : 0;   // 2.0.1 반장이 속한 동아리는 두 배
   const clubShow = c => c === 3 ? Math.floor(clubPct(3) / 2) : clubPct(c);   // 화면에 보이는 효과 숫자(미술부는 할인이라 절반)
-  const clubSum = () => [0, 1, 2, 3].reduce((n, c) => n + clubShow(c), 0);
-  const clubTuitionMult = () => 1 + (clubPct(0) + clubPct(2)) / 100;
+  const clubSum = () => CLUBS.reduce((n, _, c) => n + clubShow(c), 0);
+  const clubTuitionMult = () => 1 + (clubPct(0) + clubPct(2) + clubPct(4)) / 100;   // 2.0.1 수학부도 수업료
   const clubFestMult = () => 1 + clubPct(1) / 100;
   const clubDecoOff = () => clubShow(3);
   // 자동 추천: 동아리마다 3명씩, 맞는 능력치 별의 합이 가장 크게(12명이라 모든 경우를 셈으로 따져요)
@@ -9348,14 +9455,14 @@ body{background:radial-gradient(120% 60% at 50% 0%, color-mix(in srgb, var(--pap
     s.roster.gen = Math.max(0, Math.floor(num(r.gen)) || 0);
     s.roster.list = (Array.isArray(r.list) ? r.list : []).slice(0, ROSTER_MAX).filter(x => x && typeof x.sp === 'string' && (BASE_SPECIES.includes(x.sp) || NEWCOMERS.some(n => n.k === x.sp)))
       .map(x => ({ sp: x.sp, nm: typeof x.nm === 'string' ? x.nm.replace(/[<>&"'`\\]/g, '').slice(0, 8) : '친구',
-        a: [0, 1, 2, 3].map(i => Math.max(1, Math.min(100, Math.floor(Array.isArray(x.a) ? num(x.a[i]) || 1 : 1)))),
+        a: ABIL.map((_, i) => Math.max(1, Math.min(100, Math.floor(Array.isArray(x.a) ? (i === 4 && x.a.length < 5 ? 8 + Math.floor(Math.random() * 20) : num(x.a[i]) || 1) : 1)))),   // 2.0.1 옛 저장(네 칸)은 수학 칸을 채워요
         c: Number.isInteger(x.c) && x.c >= 0 && x.c < CLUBS.length ? x.c : -1, cw: Math.floor(num(x.cw)) || 0 }));
     // 한 동아리에 3명보다 많으면 넘치는 학생은 동아리 밖으로
     CLUBS.forEach((_, c) => s.roster.list.filter(x => x.c === c).slice(CLUB.seats).forEach(x => { x.c = -1; }));
     const k = d.club && typeof d.club === 'object' ? d.club : {};
     s.club.last = Math.floor(num(k.last)) >= 0 ? Math.floor(num(k.last)) : -1;
     s.club.n = Math.max(0, Math.floor(num(k.n)) || 0);
-    s.club.shown = [0, 1, 2, 3].map(i => Array.isArray(k.shown) && k.shown[i] ? 1 : 0);
+    s.club.shown = CLUBS.map((_, i) => Array.isArray(k.shown) && k.shown[i] ? 1 : 0);
     s.club.wk = Math.floor(num(k.wk)) >= 0 ? Math.floor(num(k.wk)) : -1;   // 옛 저장에는 없어서 -1(이번 주 기록 없음)
     s.club.wd = Math.max(0, Math.min(5, Math.floor(num(k.wd)) || 0)); s.club.we = Math.max(0, Math.min(CLUB.weekend, Math.floor(num(k.we)) || 0));
     // 2.0.1 반장 선거: 후보는 그 주 것만 써요(망가진 값은 새 선거로)
@@ -10098,9 +10205,10 @@ body{background:radial-gradient(120% 60% at 50% 0%, color-mix(in srgb, var(--pap
     const newBest = score > S.pz.best;
     if (newBest) S.pz.best = score;
     S.st.pz = (S.st.pz || 0) + 1;
+    const xp = rw ? acGain('math', Math.min(AC.pzMax, Math.floor(score / AC.pzPer))) : 0;   // 2.0.1 공부: 보상 판은 수학 XP(50점마다 1, 판당 30까지)
     S.pz.cur = null;
     save();
-    return { score, ess, askEss: rw ? cur.ess : 0, mins, acorns, newBest, rw };
+    return { score, ess, askEss: rw ? cur.ess : 0, mins, acorns, newBest, rw, xp };
   }
   // 1.7.2 숲속 퍼즐 부스터 (2026-10-26 지섭 결정). 값은 수업료 몇 분치라 학교급이 올라가도 알맞아요. 보상 상한(정수 25, 도토리 15분치)은 그대로
   const PZB = {
@@ -10438,6 +10546,7 @@ body{background:radial-gradient(120% 60% at 50% 0%, color-mix(in srgb, var(--pap
     if (r.ess > 0) items.push(`<li><span class="tic" style="background-image:${pzImg('ic_essence')}"></span>숲의 정수<b>+${r.ess}</b></li>`);
     if (r.askEss > 0) items.push(`<li><span class="tic" style="background-image:${pzImg('ic_essence')}"></span>학생 부탁 보상<b>+${r.askEss}</b></li>`);
     if (r.acorns > 0) items.push(`<li><span data-acorn>${acornIcon()}</span>도토리<b>+${fmt(r.acorns)}</b></li>`);
+    if (r.xp > 0) items.push(`<li><span class="tic" style="background-image:${pzImg('ic_study')}"></span>수학 XP<b>+${r.xp}</b></li>`);   // 2.0.1 공부
     $('#pzEndList').innerHTML = items.join('');
     const ea = $('#pzEndArt'), gotEss = r.ess > 0 || r.askEss > 0;   // 정수를 받았으면 정수 무더기 그림
     ea.hidden = !(gotEss && IMG('essence_pile')); if (!ea.hidden) ea.style.backgroundImage = pzImg('essence_pile');
@@ -10470,6 +10579,7 @@ body{background:radial-gradient(120% 60% at 50% 0%, color-mix(in srgb, var(--pap
     save(); pzRenderTray(); pzRenderHelp();
   }
   function pzWire() {
+    $('#acList').addEventListener('click', e => { const b = e.target.closest('[data-book]'); if (b) { sfx('tap'); acBuyBook(b.dataset.book); } });   // 2.0.1 문제집
     $('#pzOpen').addEventListener('click', () => { sfx('tap'); if (liveOff('puzzle')) { toast('숲속 퍼즐은 잠시 점검 중이에요. 조금만 기다려 주세요'); return; } pzOpen(); });
     bind180();   // 1.8.0 숲속 합치기
     $('#pzAdBtn').addEventListener('click', () => {
@@ -10515,6 +10625,7 @@ body{background:radial-gradient(120% 60% at 50% 0%, color-mix(in srgb, var(--pap
     $('#pzCardTag').textContent = S.pz.cur ? '이어하기' : '시작하기';
     const lt = $('#pzLeftTxt'); lt.textContent = `보상 ${left}/${pzQuota()}`; lt.classList.toggle('none', left <= 0);   // 오늘 남은 보상 판 / 오늘 받을 수 있는 판
     $('#pzAdBtn').hidden = !pzCanAd(); $('#pzAdRow').hidden = $('#pzAdBtn').hidden;
+    renderAc();   // 2.0.1 공부
     renderMiniMg();   // 1.8.0
   }
 
@@ -11241,7 +11352,7 @@ body{background:radial-gradient(120% 60% at 50% 0%, color-mix(in srgb, var(--pap
     { sel: '#b-classroom', t: '건물 키우기', d: '건물을 누르면 안이 보여요. 가구 네 개를 모두 건물 레벨까지 올리면 건물을 키울 수 있어요. 교실을 넓히면 학생이 더 들어오고, 급식실은 수업료, 도서관은 평판을 올려 줘요. 지도는 손가락으로 밀어 볼 수 있어요.', scroll: true },
     { sel: '#oak', t: '참나무 흔들기', d: '놀이터를 지으면 옆 참나무를 눌러 도토리를 떨어뜨릴 수 있어요. 떨어진 도토리를 눌러 주우면 도토리를 듬뿍 받아요.', scroll: true },
     { sel: '.map-left', t: '지도 왼쪽 버튼', d: '가끔 부엉이 선생님의 보충수업(광고 보고 도토리)이 잠깐 나타나요. 체험학습, 학교 행사도 여기에 생겨요. 학년이 올라가면 하나씩 열려요.', scroll: true },
-    { sel: '.tabs', t: '아래 탭', d: '선생님, 미니게임, 졸업(종업식), 황금 도토리 상점은 아래 탭에서 열어요. 매일, 매주 미션이 있는 퀘스트 목록과 랭킹은 지도 오른쪽 단추, 설정은 오른쪽 위 톱니바퀴예요.' },
+    { sel: '.tabs', t: '아래 탭', d: '선생님, 공부, 졸업(종업식), 황금 도토리 상점은 아래 탭에서 열어요. 매일, 매주 미션이 있는 퀘스트 목록과 랭킹은 지도 오른쪽 단추, 설정은 오른쪽 위 톱니바퀴예요.' },
     { sel: null, t: '준비 끝!', d: '이제 교실부터 키워 볼까요? 자리를 비워도 도토리는 계속 쌓여요. 약속한 황금 도토리를 드릴게요.' }
   ];
   function tutAuto() {
@@ -11603,6 +11714,7 @@ body{background:radial-gradient(120% 60% at 50% 0%, color-mix(in srgb, var(--pap
     S.tfp = S.st.fperks;
     S.roster = freshRoster(); S.club = freshClub();
     S.tier += 1; S.tg = 0; S.tdip = 0; S.best = 0; S.hd.furNew = false;
+    acAll();   // 2.0.1 공부: 학교급 상한이 풀려요
     S.p.dip = 0;
     for (const k in S.p.perk) S.p.perk[k] = 0;
     newYear(true);
@@ -11759,6 +11871,9 @@ body{background:radial-gradient(120% 60% at 50% 0%, color-mix(in srgb, var(--pap
       case 'ach': return ACH.reduce((a, x) => a + achGot(x.id), 0);   // 1.8.0 받은 업적 메달 수
       case 'mgDex': return mgDexN();   // 1.8.0 합치기 도감 칸
       case 'pzBest': return S.pz.best;   // 1.8.0 숲속 퍼즐 최고 점수
+      case 'acMax': return Math.max(...AC.keys.map(acLv));   // 2.0.1 공부: 가장 높은 과목 레벨
+      case 'acBook': return S.ac.st.bk;   // 2.0.1 산 문제집 수
+      case 'clubMat': return clubMembers(4).length;   // 2.0.1 수학부 부원 수
       default: return S.st[q.t] || 0;   // picks, ups, trains, claims, grads, perks, fperks
     }
   }
@@ -11804,6 +11919,8 @@ body{background:radial-gradient(120% 60% at 50% 0%, color-mix(in srgb, var(--pap
       else if (q.t === 'mgDex') text = `${shown}/${need}칸`;
       else if (q.t === 'mgBest') text = `${shown}/${need}단계`;
       else if (q.t === 'pzBest') text = `${fmt(shown)}/${fmt(need)}점`;
+      else if (q.t === 'acBook') text = `${shown}/${need}권`;   // 2.0.1 공부
+      else if (q.t === 'clubMat') text = `${shown}/${need}명`;
       else text = `Lv.${shown}/${need}`;
     }
     return { done, frac: done ? 1 : Math.max(0, Math.min(1, frac)), text };
@@ -11851,6 +11968,9 @@ body{background:radial-gradient(120% 60% at 50% 0%, color-mix(in srgb, var(--pap
       case 'ach': return `업적 메달 ${q.n}개 받기`;
       case 'mgDex': return `합치기 도감 ${q.n}칸 채우기`;
       case 'pzBest': return `숲속 퍼즐 ${fmt(q.n)}점 넘기기`;
+      case 'acMax': return `과목 하나 Lv.${q.n} 만들기`;   // 2.0.1 공부
+      case 'acBook': return q.n === 1 ? '문제집 한 권 풀기' : `문제집 ${q.n}권 풀기`;
+      case 'clubMat': return `수학부 부원 ${q.n}명`;
     }
     return '';
   }
@@ -12284,7 +12404,8 @@ body{background:radial-gradient(120% 60% at 50% 0%, color-mix(in srgb, var(--pap
       case 'fperks': case 'fpUp': return goGrad('fund');
       case 'trips': case 'souv': case 'tripat': return openTrip();
       case 'sports': case 'fest': return openFest();
-      case 'club': case 'shows': case 'clubSum': case 'star': case 'clubShown': return setTab('club');   // 2.0.0
+      case 'club': case 'shows': case 'clubSum': case 'star': case 'clubShown': case 'clubMat': return setTab('club');   // 2.0.0
+      case 'acMax': case 'acBook': return setTab('mini');   // 2.0.1 공부 탭
       case 'elects': case 'elMid': return openElect();   // 2.0.1
       // 1.8.0 보강 퀘스트
       case 'xt': return xtHere(q.k) ? goTeacher(q.k) : goFac(XT[q.k].fac, `${XT[q.k].fac === 'cafeteria' ? '급식실' : '도서관'}을 지으면 오셔요`);
@@ -13931,12 +14052,13 @@ body{background:radial-gradient(120% 60% at 50% 0%, color-mix(in srgb, var(--pap
     if (r.up) mgAddUp(r.up);
     if (r.pc) mgBump('#mgPc'); if (r.up) mgBump('#mgUp');
     S.mg.st.orders += 1;
+    const xp = acGain('art', Math.min(AC.mgMax, o.it.reduce((n, x) => n + x.n * AC.mgPer * x.c, 0)));   // 2.0.1 공부: 주문 단계 × 2 미술 XP(주문당 40까지)
     S.mg.orders.splice(i, 1); mgFillOrders();
     mgUI.sel = -1;
     sfx('quest'); buzz(14);
     const who = (typeof DEX_NAMES === 'object' && DEX_NAMES[o.who]) || (NEWCOMERS.find(x => x.k === o.who) || {}).name || '학생';
     showReward({ title: '주문을 채웠어요!', sub: `${who}에게 ${mgOrderText(o)}를 줬어요`,
-      items: [{ ic: 'acorn', t: `도토리 +${fmt(r.a)}` }, r.pc ? { ic: '💎', t: `장식 조각 +${r.pc}` } : null, r.up ? { ic: '🔑', t: `생산기 강화 조각 +${r.up}` } : null] });
+      items: [{ ic: 'acorn', t: `도토리 +${fmt(r.a)}` }, xp ? { ic: '📘', t: `미술 XP +${xp}` } : null, r.pc ? { ic: '💎', t: `장식 조각 +${r.pc}` } : null, r.up ? { ic: '🔑', t: `생산기 강화 조각 +${r.up}` } : null] });
     mgRenderAll(); renderHUD(); checkQuests(); save();
     return true;
   }
@@ -14387,7 +14509,7 @@ body{background:radial-gradient(120% 60% at 50% 0%, color-mix(in srgb, var(--pap
   }
 
   // 시험용 손잡이: 자동 시험(window.__FOREST_TEST)에서만 게임 속 함수를 꺼내 써요
-  if (window.__FOREST_TEST) window.__forest = { get S() { return S; }, goTo, rankRows, awayStart, awaySettle, timeSrc, save, awayHold, rankCap, cloudVerify, liveApply, liveLoad, openNotice, NOTICES, get Live() { return Live; }, get Rank() { return Rank; }, liveOff,   // 2.0.0 보안 점검 시험(s71), Codex 검토 시험(s72)
+  if (window.__FOREST_TEST) window.__forest = { get S() { return S; }, goTo, AC, AC_GAME, AB_KEY, ABIL, acLv, acSum, acMult, acRepOf, acGain, acSettle, acAll, acCap, acBkLeft, acBuyBook, renderAc, sanitizeAc, freshAc, rankRows, awayStart, awaySettle, timeSrc, save, awayHold, rankCap, cloudVerify, liveApply, liveLoad, openNotice, NOTICES, get Live() { return Live; }, get Rank() { return Rank; }, liveOff,   // 2.0.0 보안 점검 시험(s71), Codex 검토 시험(s72)
     rosterEnsure, rosterMake, rosterAdd, clubAuto, clubSet, clubPct, clubShow, clubSum, clubStars, clubMembers, clubShowGo, showReady, showWait, showDay, clubWeekTick, clubFacUp, CLUBS, CLUB, star, clubTuitionMult, clubFestMult, clubDecoOff, renderClub, renderHall, openSeatPick, openClubPick,
     TIER_SCALE, legacyMult, tuitionMult, snapTake, snapOf, tierViewOpen, tierViewClose, renderTierView, renderTierDots, viewMap, showNewTalk, talkNext, showCere, cereEnd, cereCrew, cereAsk, cereKeep, goFur, updateQuestDot, openElect, renderElect, elVote, elSync, elMult, elClub, elPres, elBadge, elMake, EL_PLEDGES, clubPct, festPrize, dropValue, claimMission, gameWeek, NEWCOMERS, TIERS, GEO, geoIdx, decoCost0, qMeasure, qDone, qGoal, kidArt: kidSVG, newYear, checkGrade, gradeOf, townRep, FAC, sanitize200, trialHunt, updateTrial, TRIAL, zoomAt, fitMap, ZOOM_MAX, DECO, DECO_SLOTS, DECO_SIGN, decoCost, decoSoldOut, pickDeco, buyDeco, decoPut, decoEditStart, decoEditEnd, openDecoPick, renderDeco, setSchoolNm, setMark, schoolTitle, markHTML, decoPlacedAll, esExLeft, esExCost, get Cloud() { return Cloud; }, get actx() { return actx; }, Music, musicSync, ensureAudio, bgmLoad, pzUI, rt, makeDeal, furStage, DEAL, navInfo, navRoute, spawnDrop, repTipCheck, linkGoogle, retryCloud, sanitize, acctPending, renderMap, renderHUD, renderAffordance, syncKids, layoutMap, geo, hitTrial, endVisit, showReward, recommend, needCost, prepTopUp, qReward, prepPhase, rankScore, pwOf, previewDip, dipMult, costScale, buyFur, buyFurAll, furCost, furReady, furDone, FUR, startTalk, endTalk, teacherAct, facCost, teaCost, facKeys, rate, rep, capacity, canGraduate, canPromote,
     fmt, fmt2, graduate, promote, buyPerk, perkCost, perkMaxed, buyFundPerk, fpCost, claimMain, mainReady, curMain, qNo, earn, CFG, TEA, teaMaxed, PERKS, FPERKS, MAIN, finalYear, startTrip, claimTrip, TRIPS, yearLocked, endSports, rtSports: () => rt.sports, rtFest: () => rt.fest, facCap, addLeague, addMP, tutStart, endFest, claimBox, musicWant, askBox, festWait, setTab,
