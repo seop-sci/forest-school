@@ -37,6 +37,18 @@ t('rank write other', W('B', '/forest/rank/A', RANK), false);
 t('rank server time', W('B', '/forest/rank/B', Object.assign({}, RANK, { at: { '.sv': 'timestamp' } })), true);
 t('rank name 10', W('B', '/forest/rank/B', Object.assign({}, RANK, { name: '가나다라마바사아자차' })), true);
 t('rank name 11', W('B', '/forest/rank/B', Object.assign({}, RANK, { name: '가나다라마바사아자차카' })), false);
+// 2.0.1 숲속 대결 순위(bt 대결 점수, btm 메달): bt는 1000~9999이고 처음에는 1000 + 400(마지막 쓰기 뒤 하루마다 200 더), 메달은 내려가지 않아요
+t('bt first 1200', W('B', '/forest/rank/B', Object.assign({}, RANK, { bt: 1200, btm: 1 })), true);
+t('bt first 1500', W('B', '/forest/rank/B', Object.assign({}, RANK, { bt: 1500, btm: 1 })), false);
+t('bt below 1000', W('B', '/forest/rank/B', Object.assign({}, RANK, { bt: 999 })), false);
+t('btm 6', W('B', '/forest/rank/B', Object.assign({}, RANK, { bt: 1000, btm: 6 })), false);
+t('bt old row', W('A', '/forest/rank/A', Object.assign({}, RANK, { bt: 1200, btm: 0 })), true);
+{ const db = targaryen.database(rules, { forest: { rank: { D: Object.assign({}, RANK, { at: NOW - 86400e3, bt: 1500, btm: 2 }) } } }).as({ uid: 'D', provider: 'anonymous' });
+  t('bt day later +390', db.write('/forest/rank/D', Object.assign({}, RANK, { bt: 1890, btm: 2 })).allowed, true);
+  t('bt day later +500', db.write('/forest/rank/D', Object.assign({}, RANK, { bt: 2000, btm: 2 })).allowed, false);
+  t('btm down', db.write('/forest/rank/D', Object.assign({}, RANK, { bt: 1500, btm: 1 })).allowed, false);
+  t('bt down ok', db.write('/forest/rank/D', Object.assign({}, RANK, { bt: 1000, btm: 2 })).allowed, true);
+  t('no bt ok', db.write('/forest/rank/D', Object.assign({}, RANK)).allowed, true); }
 t('rank name empty', W('B', '/forest/rank/B', Object.assign({}, RANK, { name: '' })), false);
 t('rank score neg', W('B', '/forest/rank/B', Object.assign({}, RANK, { score: -1 })), false);
 t('rank score str', W('B', '/forest/rank/B', Object.assign({}, RANK, { score: '9' })), false);

@@ -1,7 +1,7 @@
 # 2.0.1 시험: 공부 4단계(숲속 대결)
 # 보는 것
 #  1) 열리는 때: 유치원, 초등 1~2학년 잠김, 초등 3학년(tg 2)부터, 중학교 열림
-#  2) 점수식과 승부: 별 × 20 + 주사위 + 응원, 같은 점수면 별 높은 쪽, 그래도 같으면 내 승. 별 하나 차이 승률(많이 돌려 25~40%), 두 별 차이 10% 아래
+#  2) 점수식과 승부: 별 × 20 + 주사위(0~60) + 응원, 같은 점수면 별 높은 쪽, 그래도 같으면 내 승. 별 하나 차이 뒤집기(많이 돌려 15~40%), 두 별 차이 10% 아래
 #  3) 상대 만들기: 같은 학교 연속 금지, 황금숲은 무지개 리그만, 종목 셋 서로 다름, 상대 별 1~5, 별 합 = 내 가장 좋은 배치 + 리그 보정(3~15)
 #  4) 판 끝: 승 +25, 3연승부터 +5씩(최대 +15), 패 −10과 1000 바닥, 첫 승리 도토리 하루 한 번, 주간 리그 하루 25점까지, 리그 승급과 황금(내려가지 않음),
 #     이긴 종목 과목 XP 10, 중학교 명부 능력치 +1(학생마다 하루 2번)
@@ -28,8 +28,8 @@ async def main():
                   S.tier = 0; S.tg = 3; o.push(F.btOpen()); S.tier = 1; S.tg = 1; o.push(F.btOpen()); S.tg = 2; o.push(F.btOpen()); S.tier = 2; S.tg = 0; o.push(F.btOpen()); S.tier = 1; S.tg = 2; return o; }})()""")
                 if r != [False, False, True, True]: bad.append(f'열리는 때가 틀려요 {r}')
                 r = await pg.evaluate(f"""(() => {{ const F = {F}; const N = 20000; let w1 = 0, w2 = 0;
-                  for (let i = 0; i < N; i++) {{ const a = F.btWin({{ ms: 3, os: 4, md: Math.floor(Math.random() * 31), od: Math.floor(Math.random() * 31), oc: 5 }}, 5); if (a) w1++;
-                    const c = F.btWin({{ ms: 3, os: 5, md: Math.floor(Math.random() * 31), od: Math.floor(Math.random() * 31), oc: 5 }}, 5); if (c) w2++; }}
+                  for (let i = 0; i < N; i++) {{ const a = F.btWin({{ ms: 3, os: 4, md: Math.floor(Math.random() * 61), od: Math.floor(Math.random() * 61), oc: 5 }}, 5); if (a) w1++;
+                    const c = F.btWin({{ ms: 3, os: 5, md: Math.floor(Math.random() * 61), od: Math.floor(Math.random() * 61), oc: 5 }}, 5); if (c) w2++; }}
                   return {{ s: F.btScore(3, 10, 4), tie1: F.btWin({{ ms: 4, os: 3, md: 0, od: 20, oc: 0 }}, 0), tie2: F.btWin({{ ms: 3, os: 4, md: 20, od: 0, oc: 0 }}, 0), tie3: F.btWin({{ ms: 3, os: 3, md: 5, od: 5, oc: 2 }}, 2), p1: w1 / N, p2: w2 / N }}; }})()""")
                 print('승부', r)
                 if r['s'] != 74 or not r['tie1'] or r['tie2'] or not r['tie3'] or not (0.15 < r['p1'] < 0.4) or r['p2'] > 0.1: bad.append(f'점수식이나 승률이 틀려요 {r}')
@@ -43,9 +43,9 @@ async def main():
                 print('상대', r)
                 if not r['ok'] or r['rep'] or r['gold'] == 0 or r['nsum'] > 15: bad.append(f'상대 만들기가 틀려요 {r}')
                 r = await pg.evaluate(f"""(() => {{ const F = {F}, S = F.S; const out = {{}}; const mk = (w) => {{ const M = F.btMake(); M.me = F.btRoster().slice(0, 3); M.res = [0, 1, 2].map(i => ({{ win: w[i], ms: 3, os: 3, md: 0, od: 0, mc: 0, oc: 0 }})); return M; }};
-                  const b0 = S.budget, x0 = F.AC.keys.reduce((a, k) => a + S.ac[k].xp + S.ac[k].lv * 1000, 0);
-                  const o1 = F.btFinish(mk([true, true, false])); out.d1 = o1.d; out.acorn = S.budget > b0; out.dx = F.AC.keys.reduce((a, k) => a + S.ac[k].xp + S.ac[k].lv * 1000, 0) - x0;
-                  const b1 = S.budget; F.btFinish(mk([true, false, true])); out.acorn2 = S.budget > b1;
+                  const b0 = S.budget, x0 = F.AC.keys.reduce((a, k) => a + ((a) => {{ let t = a.xp; for (let n = 1; n < a.lv; n++) t += 20 + 5 * n; return t; }})(S.ac[k]), 0);
+                  const o1 = F.btFinish(mk([true, true, false])); out.d1 = o1.d; out.acorn = S.budget > b0; out.dx = F.AC.keys.reduce((a, k) => a + ((a) => {{ let t = a.xp; for (let n = 1; n < a.lv; n++) t += 20 + 5 * n; return t; }})(S.ac[k]), 0) - x0;
+                  const o2 = F.btFinish(mk([true, false, true])); out.acorn2 = !!o2.acorn;
                   const o3 = F.btFinish(mk([true, true, true])); out.d3 = o3.d;
                   const o4 = F.btFinish(mk([true, true, true])); out.d4 = o4.d;
                   out.lp = S.bt.lp.p; out.up = o4.up; out.lg = S.bt.lg;

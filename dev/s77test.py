@@ -33,7 +33,7 @@ async def main():
                 await pg.evaluate(TO_EX)
                 r = await pg.evaluate(f"""(() => {{ const F = {F}, S = F.S; S.tier = 1; S.f.library = 0; S.students = 100; const out = {{}};
                   F.exTick(); out.cur = S.ex.cur; out.noLib = F.exStudy('math'); S.f.library = 12;
-                  const x0 = S.ac.math.xp + S.ac.math.lv * 1000; out.a = F.exStudy('math'); out.dx = S.ac.math.xp + S.ac.math.lv * 1000 - x0; out.b = F.exStudy('kor');
+                  const x0 = ((a) => {{ let t = a.xp; for (let n = 1; n < a.lv; n++) t += 20 + 5 * n; return t; }})(S.ac.math); out.a = F.exStudy('math'); out.dx = ((a) => {{ let t = a.xp; for (let n = 1; n < a.lv; n++) t += 20 + 5 * n; return t; }})(S.ac.math) - x0; out.b = F.exStudy('kor');
                   out.days = F.exDays(); out.prev = F.exPrev();
                   F.rt.fakeNow = F.gameNow() + 86400000; if (F.exNow()) {{ out.c = F.exStudy('kor'); }} else out.c = 32;
                   return out; }})()""")

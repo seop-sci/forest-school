@@ -2192,6 +2192,7 @@ body{background:radial-gradient(120% 60% at 50% 0%, color-mix(in srgb, var(--pap
 .bt-mark img{width:38px;height:38px;object-fit:contain;display:block}
 .bt-me-hd{flex:none;flex-direction:column;justify-content:center;gap:0;padding:4px 8px}.bt-me-hd #btMe{display:flex;align-items:center;gap:4px}.bt-me-hd b{font-family:var(--font-display);font-weight:400;font-size:16px;color:#FFE9A8}.bt-me-hd small{font-size:10.5px;color:#CFE0C8}
 .bt-medal{object-fit:contain;vertical-align:middle}
+.rk-medal{display:inline-flex;margin-right:3px;vertical-align:-3px}
 .bt-pick{flex:1 1 auto;min-height:0;display:flex;flex-direction:column;gap:8px}
 .bt-rows{display:flex;flex-direction:column;gap:6px}
 .bt-row{display:grid;grid-template-columns:54px 1fr 24px 1fr;align-items:center;gap:6px;padding:6px;border-radius:14px;background:rgba(255,247,230,.92);color:#26301E;box-shadow:0 3px 0 rgba(0,0,0,.22)}
@@ -2807,7 +2808,7 @@ span.bt-stamp{display:grid;place-items:center;border-radius:50%;border:3px solid
     <section class="panel" id="panelRank" hidden aria-labelledby="ttlRank">
       <button class="panel-x" type="button" aria-label="홈으로"><svg viewBox="0 0 24 24" width="18" height="18" aria-hidden="true"><path d="M6 6l12 12M18 6L6 18" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round"/></svg></button>
       <h2 id="ttlRank" class="ph"><span class="tic" data-ic="ic_rank" aria-hidden="true"></span><span>랭킹</span></h2>
-      <div class="seg rank-seg" id="rankView" role="radiogroup" aria-label="랭킹 보기"><button type="button" role="radio" data-rv="week" aria-checked="true">주간 리그</button><button type="button" role="radio" data-rv="all" aria-checked="false">전체 순위</button></div>
+      <div class="seg rank-seg" id="rankView" role="radiogroup" aria-label="랭킹 보기"><button type="button" role="radio" data-rv="week" aria-checked="true">주간 리그</button><button type="button" role="radio" data-rv="all" aria-checked="false">전체 순위</button><button type="button" role="radio" data-rv="bt" aria-checked="false">대결 순위</button></div>
       <p class="lead" id="rankLead">학교 파워로 순위를 매겨요. 시설, 가구, 선생님, 수료증, 꾸미기처럼 쌓아 온 것이 모두 들어가요.</p>
       <div class="rank-me" id="rankMe">
         <div><span class="lab" id="rankScoreLab">내 학교 파워</span><b id="rankScore">0</b></div>
@@ -7910,7 +7911,7 @@ span.bt-stamp{display:grid;place-items:center;border-radius:50%;border:3px solid
      패치노트는 자동으로 넣지 않아요. 지섭이 검수한 글만 여기에 적어요(CHANGELOG.md는 자세한 기록용이라 따로 있어요).
      접속하면 새 공지 창을 띄워요(올라온 뒤 7일 동안, '일주일간 열지 않기'를 누르면 7일 쉬어요). 업데이트한 뒤 첫 접속에는 쉬는 중이어도 한 번 띄워요 */
   const NOTICES = [
-    // 2.0.1 공지(2026-10-28 지섭 확인: 다섯 줄만). 반영하는 날 date를 그날로 맞춰요
+    // 2.0.1 공지(2026-10-28 지섭 확인: 다섯 줄만). 반영하는 날 date를 그날로 맞춰요. 공부 시스템 줄은 지섭이 정리해 주면 더해요
     { id: '2026-10-28-v201', date: '2026-10-28', tag: '업데이트', title: '2.0.1 업데이트',
       lines: ['초등학교 학급 반장 선거 추가', '반장 공약으로 한 주 동안 보너스', '중학교 반장은 동아리 보너스 두 배', '졸업식 장면 추가', '이벤트 예정에 다가오는 이벤트 4개 표시'] },
     // 2.0.0 공지(2026-10-28 지섭이 확인): 반영하는 날 date를 그날로 맞춰요. 공지는 올라온 날부터 7일간 띄워요
@@ -8429,7 +8430,7 @@ span.bt-stamp{display:grid;place-items:center;border-radius:50%;border:3px solid
      토스 미니앱: 랭킹은 토스 게임 센터가 맡아요. 점수가 오를 때 submitGameCenterLeaderBoardScore({ score: String(rankScore()) })를 보내고,
      랭킹 버튼에서는 openGameCenterLeaderboard()로 토스 랭킹 화면을 열면 돼요. 미니앱마다 랭킹은 하나라서 학교 점수 하나만 보내요. */
   const RANK_MAX = 50;
-  const Rank = { state: 'idle', gen: 0, be: null, uid: null, rows: [], wrows: [], readOnly: false, writing: false, timer: 0, unsub: null, unsubW: null };
+  const Rank = { state: 'idle', gen: 0, be: null, uid: null, rows: [], wrows: [], brows: [], readOnly: false, writing: false, timer: 0, unsub: null, unsubW: null, unsubB: null, sbt: 0, sbtAt: 0, sbtm: 0 };   // 2.0.1 brows: 대결 순위, sbt: 이번에 켠 뒤 올린 대결 점수
   /* 학교 파워: 다른 게임의 전투력처럼 쌓아 온 것에 가중치를 둔 합이에요. 쓰거나 종업식을 열어도 줄지 않아요.
      지금 학교(졸업하면 처음으로): 시설 레벨 ×10, 가구 레벨 ×2, 선생님 레벨 ×12. 졸업할 때 이 몫은 pwBank에 넣어 둬요.
      계속 남는 것: 받은 수료증 ×5, 졸업 강화 레벨 ×20, 장학재단 강화 레벨 ×40, 기념품 ×25, 꾸미기 ×15, 학교급 ×500,
@@ -8479,6 +8480,7 @@ span.bt-stamp{display:grid;place-items:center;border-radius:50%;border:3px solid
       uid, readOnly,
       listen: (ok, no) => col.orderBy('score', 'desc').limit(RANK_MAX).onSnapshot(snap => ok(snap.docs.map(d => [d.id, d.data()])), no),
       listenWeek: (ok, no) => col.orderBy('ws', 'desc').limit(RANK_MAX).onSnapshot(snap => ok(snap.docs.map(d => [d.id, d.data()])), no),
+      listenBt: (ok, no) => col.orderBy('bt', 'desc').limit(RANK_MAX).onSnapshot(snap => ok(snap.docs.map(d => [d.id, d.data()])), no),   // 2.0.1 대결 순위
       put: doc => col.doc(uid).set(doc),
       remove: () => col.doc(uid).delete()
     };
@@ -8496,6 +8498,12 @@ span.bt-stamp{display:grid;place-items:center;border-radius:50%;border:3px solid
       },
       listenWeek: (ok, no) => {
         const q = ref.orderByChild('ws').limitToLast(RANK_MAX + 10);
+        const cb = snap => { const out = []; snap.forEach(ch => { out.push([ch.key, ch.val()]); }); ok(out.reverse()); };
+        q.on('value', cb, no);
+        return () => q.off('value', cb);
+      },
+      listenBt: (ok, no) => {   // 2.0.1 대결 순위(서버 규칙 indexOn bt)
+        const q = ref.orderByChild('bt').limitToLast(RANK_MAX + 10);
         const cb = snap => { const out = []; snap.forEach(ch => { out.push([ch.key, ch.val()]); }); ok(out.reverse()); };
         q.on('value', cb, no);
         return () => q.off('value', cb);
@@ -8529,6 +8537,11 @@ span.bt-stamp{display:grid;place-items:center;border-radius:50%;border:3px solid
         Rank.wrows = rankRows(pairs, r => r.week === w && r.lp > 0, (a, b) => b.lp - a.lp || a.at - b.at);
         renderRankPanel();
       }, () => {});
+      if (be.listenBt) Rank.unsubB = be.listenBt(pairs => {
+        if (g !== Rank.gen) return;
+        Rank.brows = rankRows(pairs, r => r.bt > 0, (a, b) => b.bt - a.bt || a.at - b.at);
+        renderRankPanel();
+      }, () => {});
     } catch (e) { Rank.state = 'off'; }
     renderRankPanel();
     submitRank();
@@ -8539,8 +8552,9 @@ span.bt-stamp{display:grid;place-items:center;border-radius:50%;border:3px solid
     Rank.gen += 1;
     if (Rank.unsub) { try { Rank.unsub(); } catch (e) { /* 무시 */ } }
     if (Rank.unsubW) { try { Rank.unsubW(); } catch (e) { /* 무시 */ } }
+    if (Rank.unsubB) { try { Rank.unsubB(); } catch (e) { /* 무시 */ } }
     clearTimeout(Rank.timer);
-    Object.assign(Rank, { state: 'idle', be: null, uid: null, rows: [], wrows: [], readOnly: false, writing: false, unsub: null, unsubW: null });
+    Object.assign(Rank, { state: 'idle', be: null, uid: null, rows: [], wrows: [], brows: [], readOnly: false, writing: false, unsub: null, unsubW: null, unsubB: null, sbt: 0, sbtAt: 0 });
   }
   function rankAfterCloud() {
     if (Rank.state === 'loading') return;   // 이미 서버 연결을 기다리는 중이면 알아서 이어져요
@@ -8555,7 +8569,8 @@ span.bt-stamp{display:grid;place-items:center;border-radius:50%;border:3px solid
     const at = typeof d.at === 'number' ? d.at : (Date.parse(d.at) || 0);
     return { id, name, score: Math.floor(score), tier: Number(d.tier) | 0, year: Number(d.year) | 0, test: !!d.test, at,
       pid: typeof d.pid === 'string' ? d.pid.slice(0, 16) : '', week: Number(d.week) | 0, lp: Math.max(0, Math.floor(Number(d.lp) || 0)),
-      title: typeof d.title === 'string' && achById(d.title) ? d.title : '' };
+      title: typeof d.title === 'string' && achById(d.title) ? d.title : '',
+      bt: typeof d.bt === 'number' && isFinite(d.bt) ? Math.max(1000, Math.min(9999, Math.floor(d.bt))) : 0, btm: typeof d.btm === 'number' ? Math.max(0, Math.min(5, Math.floor(d.btm))) : 0 };   // 2.0.1 대결
   }
   // 같은 학교(학교 번호)가 기기를 옮겨서 두 번 있으면 내 것이나 가장 최근 것 하나만 남겨요
   function rankRows(pairs, keep, order) {
@@ -8592,6 +8607,15 @@ span.bt-stamp{display:grid;place-items:center;border-radius:50%;border:3px solid
     return { score: Math.floor(score + up * 2000 + dt / 500), lp: Math.floor((week === S.lg.week ? lp : 0) + up * 1000 + dt / 10000) };
   }
   const be0 = () => !!(Rank.be && Rank.be.remove);
+  const BT_RANK = true;   // 2.0.1 대결 순위: Firebase 콘솔에 새 규칙(bt, btm, indexOn bt)을 게시해야 해요
+  function btRankDoc() {
+    const mine = (Rank.rows || []).find(r => r.id === Rank.uid) || (Rank.brows || []).find(r => r.id === Rank.uid);
+    let prev = 0, dt = 0, m = 0;
+    if (Rank.sbt) { prev = Rank.sbt; dt = perfNow() - Rank.sbtAt; m = Rank.sbtm || 0; }
+    else if (mine && mine.bt) { prev = mine.bt; dt = gameNow() - mine.at; m = mine.btm; }
+    const cap = prev ? prev + 199 + Math.max(0, dt - 60000) / 432000 : 1200;
+    return { bt: Math.max(1000, Math.min(S.bt.pts, Math.floor(cap))), btm: Math.max(S.bt.lg, m || 0, mine ? mine.btm : 0) };
+  }
   async function submitRank(force) {
     if (Rank.state !== 'on' || Rank.readOnly || !Rank.uid || !(S.rank.joined || tossRank()) || Rank.writing) return;
     if (S.u.dev) {   // 2.0.0 보안 점검(2-7): 개발자 메뉴로 재화를 받은 학교는 랭킹에 올리지 않아요
@@ -8613,9 +8637,12 @@ span.bt-stamp{display:grid;place-items:center;border-radius:50%;border:3px solid
       const ws = S.lg.week * 1000000 + lp;
       const doc = { name: S.rank.name, score: sc, tier: S.tier, year: yearNo(), test: !!S.u.dev, pid: S.pid, at: Date.now(), ws, lp, week: S.lg.week };
       if (ACH_RANK_TITLE && S.ach && S.ach.title) doc.title = S.ach.title;   // 1.7.1 칭호(서버 규칙을 게시한 뒤에 켜요)
+      // 2.0.1 숲속 대결 순위: 규칙은 지난 값 + 200(하루마다 200 더)까지 받아요. 지난 값을 모르면 1200까지만 올리고 차례로 따라가요
+      const bto = !be.toss && BT_RANK && btOpen() ? btRankDoc() : null;
+      if (bto) { doc.bt = bto.bt; doc.btm = bto.btm; }
       await be.put(doc);
       Rank.lastPut = Date.now(); Rank.lastPerf = perfNow(); Rank.denied = 0;
-      if (g === Rank.gen) { S.rank.sent = sc; S.rank.by = Rank.uid; S.rank.sws = ws; save(); }
+      if (g === Rank.gen) { S.rank.sent = sc; S.rank.by = Rank.uid; S.rank.sws = ws; if (bto) { Rank.sbt = bto.bt; Rank.sbtAt = perfNow(); Rank.sbtm = bto.btm; } save(); }
     } catch (e) {
       const c = String((e && (e.code || e.message)) || '');
       // 2.0.0: 규칙의 간격이나 오름 폭에 걸렸을 수 있어서 한 번은 15초 뒤 다시 해 보고, 또 막히면 읽기만 해요
@@ -8625,7 +8652,7 @@ span.bt-stamp{display:grid;place-items:center;border-radius:50%;border:3px solid
     }
     if (g !== Rank.gen) return;
     Rank.writing = false;
-    if (S.rank.joined && !Rank.readOnly && (rankScore() !== S.rank.sent || S.rank.by !== Rank.uid || lgKey() !== S.rank.sws)) rankDirty();
+    if (S.rank.joined && !Rank.readOnly && (rankScore() !== S.rank.sent || S.rank.by !== Rank.uid || lgKey() !== S.rank.sws || (BT_RANK && btOpen() && S.bt.pts !== Rank.sbt))) rankDirty();
     renderRankPanel();
   }
   /* 교장 선생님 이름: 처음 한 번은 무료, 그다음부터는 바꿀 때마다 황금 도토리 50개, 60개, 70개...
@@ -8705,18 +8732,18 @@ span.bt-stamp{display:grid;place-items:center;border-radius:50%;border:3px solid
   function renderRankPanel() {
     if (!S || rt.tab !== 'rank') return;
     lgWeek();
-    const wk = rt.rankView !== 'all' && !tossRank();
+    const mode = tossRank() ? 'all' : (rt.rankView === 'all' || rt.rankView === 'bt' ? rt.rankView : 'week'), wk = mode === 'week', bm = mode === 'bt';   // 2.0.1 대결 순위
     $('#rankView').hidden = tossRank();
-    $$('#rankView [data-rv]').forEach(b => b.setAttribute('aria-checked', String((b.dataset.rv === 'week') === wk)));
-    const R = wk ? Rank.wrows : Rank.rows, score = wk ? S.lg.pts : rankScore(), mine = R.findIndex(r => r.id === Rank.uid);
+    $$('#rankView [data-rv]').forEach(b => b.setAttribute('aria-checked', String(b.dataset.rv === mode)));
+    const R = bm ? (Rank.brows || []) : wk ? Rank.wrows : Rank.rows, score = bm ? S.bt.pts : wk ? S.lg.pts : rankScore(), mine = R.findIndex(r => r.id === Rank.uid);
     if (wk && mine >= 0 && S.lg.pos !== mine + 1) { S.lg.pos = mine + 1; }
-    $('#rankScoreLab').textContent = wk ? '이번 주 리그 점수' : '내 학교 파워';
+    $('#rankScoreLab').textContent = bm ? '내 대결 점수' : wk ? '이번 주 리그 점수' : '내 학교 파워';
     $('#rankScore').textContent = fmt(score);
     $('#rankPos').textContent = mine >= 0 ? `${mine + 1}위` : '-';
     const left = 7 - ((new Date(gameNow() + KST_MS).getUTCDay() + 6) % 7);   // 2.0.0 보안 점검(1-5): 한국 시간 요일
-    $('#rankSub').textContent = wk ? `월요일에 새 리그가 시작돼요 (${left}일 남음). 리그에 참여하면 순위와 상관없이 황금 도토리 1개`
+    $('#rankSub').textContent = bm ? (btOpen() ? `${BT_LG[S.bt.lg].n} 리그, 오늘 남은 대결 ${btLeft()}판` : '숲속 대결은 초등학교 3학년부터 열려요') : wk ? `월요일에 새 리그가 시작돼요 (${left}일 남음). 리그에 참여하면 순위와 상관없이 황금 도토리 1개`
       : rankSchool(S.tier, yearNo()) + (Rank.state === 'on' && Rank.rows.length ? `, 랭킹에 ${Rank.rows.length}명` : '');
-    $('#rankLead').textContent = wk ? '이번 주에 한 일로 겨뤄요. 오늘의 미션 10점, 미션 보너스 20점, 학교 행사 성공 15점, 체험학습 10점(1시간마다 +5), 종업식 20점, 퀘스트 3점이에요. 학교가 작아도 똑같이 겨룰 수 있어요.'
+    $('#rankLead').textContent = bm ? '숲속 대결 점수로 겨뤄요. 이름 옆 메달은 지금까지 오른 가장 높은 리그예요. 공부 탭의 숲속 대결에서 이기면 점수가 올라요.' : wk ? '이번 주에 한 일로 겨뤄요. 오늘의 미션 10점, 미션 보너스 20점, 학교 행사 성공 15점, 체험학습 10점(1시간마다 +5), 종업식 20점, 퀘스트 3점이에요. 학교가 작아도 똑같이 겨룰 수 있어요.'
       : '학교 파워로 순위를 매겨요. 시설, 가구, 선생님, 수료증, 꾸미기처럼 쌓아 온 것이 모두 들어가요.';
     // 참여하기와 이름 바꾸기
     const join = $('#rankJoin'), key = `${Rank.state}|${Rank.readOnly}|${S.rank.joined}|${S.rank.name}|${rt.rankEdit ? 1 : 0}|${Cloud.state}|${Cloud.err}|${nickPrice()}|${S.gold >= nickPrice()}`;
@@ -8748,7 +8775,7 @@ span.bt-stamp{display:grid;place-items:center;border-radius:50%;border:3px solid
     }
     // 순위표: 이름은 다른 사람이 적은 글이라 textContent로만 넣어요
     const list = $('#rankList'), rows = Rank.state === 'on' ? R : [];
-    const lkey = (wk ? 'w' : 'a') + rows.map(r => `${r.id}:${r.score}:${r.lp}:${r.name}:${r.tier}:${r.year}:${r.test ? 1 : 0}:${r.title}`).join('|') + `|${Rank.uid}|${S.units}|${S.ach ? S.ach.title : ''}`;
+    const lkey = mode + rows.map(r => `${r.id}:${r.score}:${r.lp}:${r.bt}:${r.btm}:${r.name}:${r.tier}:${r.year}:${r.test ? 1 : 0}:${r.title}`).join('|') + `|${Rank.uid}|${S.units}|${S.ach ? S.ach.title : ''}`;
     if (list.dataset.key !== lkey) {
       list.dataset.key = lkey;
       list.textContent = '';
@@ -8766,6 +8793,7 @@ span.bt-stamp{display:grid;place-items:center;border-radius:50%;border:3px solid
         ns.textContent = r.name;
         nm.appendChild(ns);
         const tt = r.id === Rank.uid && S.ach ? S.ach.title : r.title;   // 1.7.1 칭호(내 줄은 서버에 없어도 보여요)
+        if (bm) { const md = document.createElement('span'); md.className = 'rk-medal'; md.innerHTML = btMedal(Math.max(0, Math.min(5, r.btm | 0)), 18); nm.insertBefore(md, ns); }   // 2.0.1 대결 메달(숫자만 써서 그려요)
         if (tt && achTitleName(tt)) { const t = document.createElement('span'); t.className = 'rk-title'; t.textContent = achTitleName(tt); nm.appendChild(t); }
         if (r.id === Rank.uid) { const t = document.createElement('span'); t.className = 'rk-tag me'; t.textContent = '나'; nm.appendChild(t); }
         if (r.test) { const t = document.createElement('span'); t.className = 'rk-tag'; t.textContent = '테스트'; nm.appendChild(t); }
@@ -8775,15 +8803,15 @@ span.bt-stamp{display:grid;place-items:center;border-radius:50%;border:3px solid
         txt.append(nm, sc);
         const b = document.createElement('b');
         b.className = 'rk-score';
-        b.textContent = fmt(wk ? r.lp : r.score);
+        b.textContent = fmt(bm ? r.bt : wk ? r.lp : r.score);
         li.append(no, txt, b);
-        li.setAttribute('aria-label', `${i + 1}위 ${r.name}, ${rankSchool(r.tier, r.year)}, ${wk ? '리그 점수' : '학교 파워'} ${fmt(wk ? r.lp : r.score)}`);
+        li.setAttribute('aria-label', `${i + 1}위 ${r.name}, ${rankSchool(r.tier, r.year)}, ${bm ? `대결 점수, ${BT_LG[Math.max(0, Math.min(5, r.btm | 0))].n} 리그` : wk ? '리그 점수' : '학교 파워'} ${fmt(bm ? r.bt : wk ? r.lp : r.score)}`);
         list.appendChild(li);
       });
     }
     const empty = $('#rankEmpty');
     empty.hidden = tossRank() || !(Rank.state === 'on' && rows.length === 0);
-    if (!empty.hidden) empty.textContent = '아직 랭킹에 이름을 올린 교장 선생님이 없어요. 첫 번째가 되어 보세요!';
+    if (!empty.hidden) empty.textContent = bm ? '아직 대결 순위에 오른 학교가 없어요. 숲속 대결에서 첫 번째가 되어 보세요!' : '아직 랭킹에 이름을 올린 교장 선생님이 없어요. 첫 번째가 되어 보세요!';
   }
 
   /* ---------- 황금 도토리와 꾸미기 상점 ----------
@@ -10168,7 +10196,7 @@ span.bt-stamp{display:grid;place-items:center;border-radius:50%;border:3px solid
     if (R) {
       s.rd.day = typeof R.day === 'string' ? R.day.slice(0, 10) : '';
       s.rd.n = Math.floor(num(R.n, 0, RD.perDay));
-      if (typeof R.cur === 'string' && bookOf(R.cur)) { s.rd.cur = R.cur; s.rd.at = Math.min(num(R.at, 0, 0), Date.now() + 366 * 86400000); if (!s.rd.at) s.rd.cur = ''; }
+      if (typeof R.cur === 'string' && bookOf(R.cur)) { s.rd.cur = R.cur; s.rd.at = num(R.at, 0, Date.now() + 366 * 86400000); if (!s.rd.at) s.rd.cur = ''; }
       if (R.got && typeof R.got === 'object') for (const b of BOOKS) { const v = Math.floor(num(R.got[b.k], 0, 1e6)); if (v > 0) s.rd.got[b.k] = v; }
       s.rd.st = Math.floor(num(R.st, 0, 1e7));
     }
@@ -10300,11 +10328,11 @@ span.bt-stamp{display:grid;place-items:center;border-radius:50%;border:3px solid
   }
   /* ---------- 2.0.1 공부 4단계: 숲속 대결 (미니게임 3, 체육 공부) (2026-10-28 지섭 확정, 설계안 "숲속 대결 설계안") ----------
      초등학교 3학년부터. 컴퓨터 학교 8곳과 학생 셋이 세 종목(다섯 과목 가운데 셋)으로 겨루는 2선승 승부. 하루 5판(게임 시계).
-     종목 점수 = 별 × 20 + 주사위(0~30) + 응원(0~10). 별은 초등학교에서 과목 레벨 ÷ 4(올림, 1~5) + 잘하는 과목 1, 중학교부터 명부 능력치.
+     종목 점수 = 별 × 20 + 주사위(0~60) + 응원(0~10). 별은 초등학교에서 과목 레벨 ÷ 4(올림, 1~5) + 잘하는 과목 1, 중학교부터 명부 능력치.
      승 +25(3연승부터 +5씩, 최대 +15 더), 패 −10(1000 아래로 안 내려가요). 리그 6단계(내려가지 않아요), 승급마다 황금 도토리 1~5.
      오늘 첫 승리만 수업료 10분치. 이긴 종목(친선 포함)마다 그 과목 XP 10, 중학교 명부 학생은 능력치 +1(하루 학생마다 2번까지).
      주간 리그 승리마다 5점(하루 25점까지). 그림은 작업지시서 29, 29-1 */
-  const BT = { perDay: 5, win: 25, lose: 10, floor: 1000, streakFrom: 3, streakStep: 5, streakMax: 15, firstMin: 10, xp: 10, grow: 2, lp: 5, lpDay: 25, cheerMs: 3000, cheerMax: 10, dice: 30 };
+  const BT = { perDay: 5, win: 25, lose: 10, floor: 1000, streakFrom: 3, streakStep: 5, streakMax: 15, firstMin: 10, xp: 10, grow: 2, lp: 5, lpDay: 25, cheerMs: 3000, cheerMax: 10, dice: 60 };   // 주사위 0~60: 설계안의 승률(별 하나 차이 뒤집기 약 20~30%, 두 별 약 5%)에 맞춘 값. 0~30이면 별 하나 차이도 6%라 거의 못 뒤집어요
   const BT_EV = { kor: { name: '책 읽기', ic: 'bev_read', em: '📖' }, math: { name: '수학 퀴즈', ic: 'bev_math', em: '➗' }, sci: { name: '과학 퀴즈', ic: 'bev_science', em: '🧪' },
     art: { name: '그리기', ic: 'bev_draw', em: '🎨' }, pe: { name: '달리기', ic: 'bev_run', em: '👟' } };
   const BT_LG = [
@@ -10373,7 +10401,7 @@ span.bt-stamp{display:grid;place-items:center;border-radius:50%;border:3px solid
   function btOppCheer() { const m = BT_LG[S.bt.lg].cheer; return Math.max(0, Math.min(BT.cheerMax, Math.round(m - 2 + Math.random() * 4))); }
   // 판 끝: 점수, 리그, 보상(한 번만)
   function btFinish(M) {
-    if (M.done) return M.out; M.done = true;
+    if (M.done) return M.out; M.done = true; btDay();   // 날짜를 먼저 맞춰요(뒤에서 btDay가 오늘 첫 승리 표시를 지우지 않게)
     const wins = M.res.filter(r => r.win).length, win = M.res.slice(0, 3).filter(r => r.win).length >= 2;
     const before = S.bt.pts, lg0 = S.bt.lg, out = { win, wins, pts0: before, items: [] };
     if (win) { S.bt.streak += 1; const bonus = S.bt.streak >= BT.streakFrom ? Math.min(BT.streakMax, BT.streakStep * (S.bt.streak - BT.streakFrom + 1)) : 0; S.bt.pts = Math.min(9999, S.bt.pts + BT.win + bonus); out.bonus = bonus;
@@ -10390,7 +10418,7 @@ span.bt-stamp{display:grid;place-items:center;border-radius:50%;border:3px solid
     // 리그 승급(내려가지 않아요)
     const lg = Math.max(S.bt.lg, btLgOf(S.bt.pts));
     if (lg > lg0) { let g = 0; for (let i = lg0 + 1; i <= lg; i++) g += BT_LG[i].gold; S.bt.lg = lg; if (g) addGold(g); out.up = lg; out.gold = g; }
-    M.out = out; save(); renderHUD(); checkQuests(); renderMini(); return out;
+    M.out = out; save(); renderHUD(); checkQuests(); renderMini(); rankDirty(); return out;
   }
   // ---------- 화면 ----------
   const btUI = { open: false, M: null, taps: 0, timer: 0 };
@@ -15522,7 +15550,7 @@ span.bt-stamp{display:grid;place-items:center;border-radius:50%;border:3px solid
   }
 
   // 시험용 손잡이: 자동 시험(window.__FOREST_TEST)에서만 게임 속 함수를 꺼내 써요
-  if (window.__FOREST_TEST) window.__forest = { get S() { return S; }, goTo, LAB, LAB_IN, LAB_KEYS, LAB_CARDS, LAB_MIX, LAB_DBL, labOf, labRun, labCount, labReady, labDone, openLab, renderLab, labTap, labGo, RD, BOOKS, rdStart, rdSettle, rdTick, rdLeft, rdRemain, openRead, renderRead, renderStudy2, sanitizeStudy2, BT, BT_EV, BT_LG, BT_SCH, btOpen, btLeft, btRoster, btBest, btMake, btScore, btWin, btFinish, btOpenScene, btClose, btAuto, btPick, btStart, btRender, renderBtCard, sanitizeBt, get btUI() { return btUI; }, EX, exIsWeek, exNow, exPrev, exDays, exScore, exGrade, exStudy, exClaim, exTick, exMake, openExam, renderExam, exAwardTop, exReportReady, sanitizeExam, renderSheet, openSheet,   // 2.0.1 공부 2단계(s76)
+  if (window.__FOREST_TEST) window.__forest = { get S() { return S; }, goTo, LAB, LAB_IN, LAB_KEYS, LAB_CARDS, LAB_MIX, LAB_DBL, labOf, labRun, labCount, labReady, labDone, openLab, renderLab, labTap, labGo, RD, BOOKS, rdStart, rdSettle, rdTick, rdLeft, rdRemain, openRead, renderRead, renderStudy2, sanitizeStudy2, BT, BT_EV, BT_LG, BT_SCH, btOpen, btLeft, btRoster, btBest, btMake, btScore, btWin, btFinish, btOpenScene, btClose, btRankDoc, BT_RANK, readRow, btAuto, btPick, btStart, btRender, renderBtCard, sanitizeBt, get btUI() { return btUI; }, EX, exIsWeek, exNow, exPrev, exDays, exScore, exGrade, exStudy, exClaim, exTick, exMake, openExam, renderExam, exAwardTop, exReportReady, sanitizeExam, renderSheet, openSheet,   // 2.0.1 공부 2단계(s76)
     AC, AC_GAME, AB_KEY, ABIL, acLv, acSum, acMult, acRepOf, acGain, acSettle, acAll, acCap, acBkLeft, acBuyBook, renderAc, sanitizeAc, freshAc, rankRows, awayStart, awaySettle, timeSrc, save, awayHold, rankCap, cloudVerify, liveApply, liveLoad, openNotice, NOTICES, get Live() { return Live; }, get Rank() { return Rank; }, liveOff,   // 2.0.0 보안 점검 시험(s71), Codex 검토 시험(s72)
     rosterEnsure, rosterMake, rosterAdd, clubAuto, clubSet, clubPct, clubShow, clubSum, clubStars, clubMembers, clubShowGo, showReady, showWait, showDay, clubWeekTick, clubFacUp, CLUBS, CLUB, star, clubTuitionMult, clubFestMult, clubDecoOff, renderClub, renderHall, openSeatPick, openClubPick,
     TIER_SCALE, legacyMult, tuitionMult, snapTake, snapOf, tierViewOpen, tierViewClose, renderTierView, renderTierDots, viewMap, showNewTalk, talkNext, showCere, cereEnd, cereCrew, cereAsk, cereKeep, goFur, updateQuestDot, openElect, renderElect, elVote, elSync, elMult, elClub, elPres, elBadge, elMake, EL_PLEDGES, clubPct, festPrize, dropValue, claimMission, gameWeek, NEWCOMERS, TIERS, GEO, geoIdx, decoCost0, qMeasure, qDone, qGoal, kidArt: kidSVG, newYear, checkGrade, gradeOf, townRep, FAC, sanitize200, trialHunt, updateTrial, TRIAL, zoomAt, fitMap, ZOOM_MAX, DECO, DECO_SLOTS, DECO_SIGN, decoCost, decoSoldOut, pickDeco, buyDeco, decoPut, decoEditStart, decoEditEnd, openDecoPick, renderDeco, setSchoolNm, setMark, schoolTitle, markHTML, decoPlacedAll, esExLeft, esExCost, get Cloud() { return Cloud; }, get actx() { return actx; }, Music, musicSync, ensureAudio, bgmLoad, pzUI, rt, makeDeal, furStage, DEAL, navInfo, navRoute, spawnDrop, repTipCheck, linkGoogle, retryCloud, sanitize, acctPending, renderMap, renderHUD, renderAffordance, syncKids, layoutMap, geo, hitTrial, endVisit, showReward, recommend, needCost, prepTopUp, qReward, prepPhase, rankScore, pwOf, previewDip, dipMult, costScale, buyFur, buyFurAll, furCost, furReady, furDone, FUR, startTalk, endTalk, teacherAct, facCost, teaCost, facKeys, rate, rep, capacity, canGraduate, canPromote,

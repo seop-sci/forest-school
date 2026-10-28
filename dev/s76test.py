@@ -34,12 +34,12 @@ async def main():
                 r = await pg.evaluate(f"""(() => {{ const F = {F}, S = F.S; const out = {{}};
                   out.kinder = F.labRun(0, 2); S.tier = 1; S.f.science = 0; out.noLab = F.labRun(0, 2); S.f.science = 1;
                   out.lock = F.labRun(0, 4);
-                  const b0 = S.budget, g0 = S.gold, x0 = S.ac.sci.xp + S.ac.sci.lv * 1000;
+                  const b0 = S.budget, g0 = S.gold, x0 = ((a) => {{ let t = a.xp; for (let n = 1; n < a.lv; n++) t += 20 + 5 * n; return t; }})(S.ac.sci);
                   const r1 = F.labRun(0, 2); out.r1 = r1 && r1.r; out.ok = r1 && r1.ok; out.isNew = r1 && r1.isNew;
-                  out.db = S.budget - b0; out.dg = S.gold - g0; out.dx = S.ac.sci.xp + S.ac.sci.lv * 1000 - x0;
+                  out.db = S.budget - b0; out.dg = S.gold - g0; out.dx = ((a) => {{ let t = a.xp; for (let n = 1; n < a.lv; n++) t += 20 + 5 * n; return t; }})(S.ac.sci) - x0;
                   out.again = F.labRun(1, 3); out.done = F.labDone();
                   F.rt.fakeNow = F.gameNow() + 86400000; out.next = F.labDone();
-                  const x1 = S.ac.sci.xp + S.ac.sci.lv * 1000, g1 = S.gold; const r2 = F.labRun(0, 0); out.r2 = r2 && r2.r; out.ok2 = r2 && r2.ok; out.dx2 = S.ac.sci.xp + S.ac.sci.lv * 1000 - x1; out.dg2 = S.gold - g1;
+                  const x1 = ((a) => {{ let t = a.xp; for (let n = 1; n < a.lv; n++) t += 20 + 5 * n; return t; }})(S.ac.sci), g1 = S.gold; const r2 = F.labRun(0, 0); out.r2 = r2 && r2.r; out.ok2 = r2 && r2.ok; out.dx2 = ((a) => {{ let t = a.xp; for (let n = 1; n < a.lv; n++) t += 20 + 5 * n; return t; }})(S.ac.sci) - x1; out.dg2 = S.gold - g1;
                   F.rt.fakeNow = F.gameNow() + 86400000; const g2 = S.gold; const r3 = F.labRun(2, 0); out.same = r3 && r3.isNew; out.dg3 = S.gold - g2;
                   out.cnt = F.labCount(); out.n = S.lab.st.n; out.minV = Math.max(10, Math.round(F.rate() * 60 * 15 * 2));
                   F.rt.fakeNow = null; return out; }})()""")
@@ -49,9 +49,9 @@ async def main():
                 await pg.evaluate(T.CLEAN)
                 # 3) 책 읽기
                 r = await pg.evaluate(f"""(() => {{ const F = {F}, S = F.S; const out = {{}}; S.f.library = 0; out.noLib = F.rdStart('acorn'); S.f.library = 1;
-                  const x0 = S.ac.kor.xp + S.ac.kor.lv * 1000; out.s1 = F.rdStart('acorn'); out.s2 = F.rdStart('sea'); out.left = F.rdLeft();
+                  const x0 = ((a) => {{ let t = a.xp; for (let n = 1; n < a.lv; n++) t += 20 + 5 * n; return t; }})(S.ac.kor); out.s1 = F.rdStart('acorn'); out.s2 = F.rdStart('sea'); out.left = F.rdLeft();
                   F.rt.fakeNow = F.gameNow() + 14 * 60000; out.early = F.rdSettle();
-                  F.rt.fakeNow = F.gameNow() + 2 * 60000; out.fin = F.rdSettle(); out.dx = S.ac.kor.xp + S.ac.kor.lv * 1000 - x0; out.got = S.rd.got.acorn; out.cur = S.rd.cur;
+                  F.rt.fakeNow = F.gameNow() + 2 * 60000; out.fin = F.rdSettle(); out.dx = ((a) => {{ let t = a.xp; for (let n = 1; n < a.lv; n++) t += 20 + 5 * n; return t; }})(S.ac.kor) - x0; out.got = S.rd.got.acorn; out.cur = S.rd.cur;
                   F.rdStart('sea'); F.rt.fakeNow = F.gameNow() + 16 * 60000; F.rdSettle(); F.rdStart('dino'); F.rt.fakeNow = F.gameNow() + 16 * 60000; F.rdSettle();
                   out.four = F.rdStart('snow'); out.st = S.rd.st;
                   F.rt.fakeNow = F.gameNow() + 86400000; out.left2 = F.rdLeft(); out.s4 = F.rdStart('snow');

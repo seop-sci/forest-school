@@ -12,7 +12,8 @@
         ".read": "auth != null",
         ".indexOn": [
           "score",
-          "ws"
+          "ws",
+          "bt"
         ],
         "$uid": {
           ".write": "auth != null && auth.uid === $uid",
@@ -49,6 +50,12 @@
           },
           "ws": {
             ".validate": "newData.isNumber() && newData.val() >= 0 && newData.parent().child('week').isNumber() && newData.parent().child('lp').isNumber() && newData.val() === newData.parent().child('week').val() * 1000000 + newData.parent().child('lp').val()"
+          },
+          "bt": {
+            ".validate": "newData.isNumber() && newData.val() >= 1000 && newData.val() <= 9999 && newData.val() <= (data.exists() ? data.val() : 1000) + 200 + (data.parent().child('at').isNumber() ? (now - data.parent().child('at').val()) / 432000 : 200)"
+          },
+          "btm": {
+            ".validate": "newData.isNumber() && newData.val() >= 0 && newData.val() <= 5 && (!data.exists() || newData.val() >= data.val())"
           },
           "$other": {
             ".validate": false
