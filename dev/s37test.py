@@ -90,6 +90,8 @@ FLOW = r"""() => {
     if (q && (q.t === 'elects' || q.t === 'elMid')) { F.elSync(); F.elVote(0); }   // 2.0.1
     if (q && q.t === 'rdBooks') { pick += dt; if (pick >= 900) { pick = 0; s.rd.st += 1; } }   // 2.0.1 책 읽기: 15분 뒤 한 권
     if (q && q.t === 'labs' && s.f.science >= 1 && s.lab.day !== F.gameToday()) F.labRun(0, 2);   // 2.0.1 과학 실험: 하루 한 번
+    if (q && (q.t === 'btPlays' || q.t === 'btMid')) { pick += dt; if (pick >= 120) { pick = 0; s.bt.st.w += 1; s.bt.st.wm += F.S.tier >= 2 ? 1 : 0; } }   // 2.0.1 숲속 대결: 2분에 한 판 이김
+    if (q && q.t === 'btLg') { pick += dt; if (pick >= 600) { pick = 0; s.bt.lg = Math.max(s.bt.lg, 1); } }   // 동 리그: 이긴 판 넷쯤
     if (q && q.t === 'ach') { F.achSync(); const a = F.ACH.find(x => (s.ach.got[x.id] || 0) < (s.ach.hit[x.id] || 0)); if (a) F.claimAch(a.id); }
     if (q && q.t === 'perks') { const k = Object.keys(F.PERKS).filter(x => !F.perkMaxed(x)).sort((a, b) => F.perkCost(a) - F.perkCost(b))[0]; if (k && F.perkCost(k) <= s.p.dip) F.buyPerk(k, document.body); }
     for (let i = 0; i < 20; i++) if (!buy()) break;
@@ -133,6 +135,8 @@ FLOW2 = r"""() => {
     if (q && (q.t === 'elects' || q.t === 'elMid')) { F.elSync(); F.elVote(0); }   // 2.0.1 반장 선거 안내 퀘스트: 첫 후보를 뽑아요
     if (q && q.t === 'rdBooks') { pick += dt; if (pick >= 900) { pick = 0; s.rd.st += 1; } }   // 2.0.1 책 읽기: 15분 뒤 한 권
     if (q && q.t === 'labs' && s.f.science >= 1 && s.lab.day !== F.gameToday()) F.labRun(0, 2);   // 2.0.1 과학 실험: 하루 한 번
+    if (q && (q.t === 'btPlays' || q.t === 'btMid')) { pick += dt; if (pick >= 120) { pick = 0; s.bt.st.w += 1; s.bt.st.wm += F.S.tier >= 2 ? 1 : 0; } }   // 2.0.1 숲속 대결: 2분에 한 판 이김
+    if (q && q.t === 'btLg') { pick += dt; if (pick >= 600) { pick = 0; s.bt.lg = Math.max(s.bt.lg, 1); } }   // 동 리그: 이긴 판 넷쯤
     if (s.roster.list.some(x => x.c >= 0) && F.showReady()) { const c = [0, 1, 2, 3].find(c => !s.club.shown[c]); F.clubShowGo(c === undefined ? 0 : c); }
     F.clubWeekTick();
     // 현장체험학습: 갈 수 있는 곳 중 아직 기념품이 남은 가장 짧은 곳(다녀오면 수업료의 절반만큼 더 받아요)
