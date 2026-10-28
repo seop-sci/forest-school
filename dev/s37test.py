@@ -87,6 +87,7 @@ FLOW = r"""() => {
     if (q && q.t === 'deco' && s.ess >= 60) { F.rt.decoPick = 'bench'; if (F.buyDeco()) for (let i = 0; i < 11; i++) if (F.decoPut(i, 'bench')) break; }
     if (q && q.t === 'xt' && s.budget >= F.xtCost(q.k)) F.xtAct(q.k);
     if (q && q.t === 'vp' && s.budget >= F.vpCost()) F.vpAct();
+    if (q && (q.t === 'elects' || q.t === 'elMid')) { F.elSync(); F.elVote(0); }   // 2.0.1
     if (q && q.t === 'ach') { F.achSync(); const a = F.ACH.find(x => (s.ach.got[x.id] || 0) < (s.ach.hit[x.id] || 0)); if (a) F.claimAch(a.id); }
     if (q && q.t === 'perks') { const k = Object.keys(F.PERKS).filter(x => !F.perkMaxed(x)).sort((a, b) => F.perkCost(a) - F.perkCost(b))[0]; if (k && F.perkCost(k) <= s.p.dip) F.buyPerk(k, document.body); }
     for (let i = 0; i < 20; i++) if (!buy()) break;
@@ -127,6 +128,7 @@ FLOW2 = r"""() => {
     if (q && q.t === 'fest') s.fest.n[q.k] = (s.fest.n[q.k] || 0) + 1;
     if (q && q.t === 'sports') s.st.sports += 1;
     if (q && q.t === 'club') F.clubAuto(true);
+    if (q && (q.t === 'elects' || q.t === 'elMid')) { F.elSync(); F.elVote(0); }   // 2.0.1 반장 선거 안내 퀘스트: 첫 후보를 뽑아요
     if (s.roster.list.some(x => x.c >= 0) && F.showReady()) { const c = [0, 1, 2, 3].find(c => !s.club.shown[c]); F.clubShowGo(c === undefined ? 0 : c); }
     F.clubWeekTick();
     // 현장체험학습: 갈 수 있는 곳 중 아직 기념품이 남은 가장 짧은 곳(다녀오면 수업료의 절반만큼 더 받아요)
