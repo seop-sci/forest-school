@@ -56,7 +56,7 @@ async def main():
                 # 이름과 마크, 저장
                 r = await pg.evaluate(f"""(() => {{ const F = {F}, S = F.S; F.setSchoolNm('도토리<b>'); F.setMark([1, 5, 4, 2]);
                   const nm = document.querySelector('#schoolName').textContent, sign = [...document.querySelectorAll('#decoG .deco-sign-t')].map(t => t.textContent);
-                  const crest = !!document.querySelector('#schoolCrest .mk img');
+                  const crest = !!document.querySelector('#schoolCrest .smark img');
                   const back = F.sanitize(JSON.parse(JSON.stringify(S))).deco;
                   const old = JSON.parse(JSON.stringify(S)); delete old.deco; const o = F.sanitize(old).deco;
                   const bad = JSON.parse(JSON.stringify(S)); bad.deco = {{ own: {{ bench: 1e9, owl: 5, zzz: 3 }}, lay: [['bench', 'bench', 'zzz', 'owl'], 'x'], nm: 12345, mk: [9, 0, 0, 0] }}; const b2 = F.sanitize(bad).deco;

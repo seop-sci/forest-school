@@ -1950,9 +1950,10 @@ body{background:radial-gradient(120% 60% at 50% 0%, color-mix(in srgb, var(--pap
 .mark-row button.sw i{display:block;width:100%;height:100%;border-radius:50%}
 .school-crest.has-mark{background:none !important}
 .school-crest svg{width:100%;height:100%;display:block}
-.mk{position:relative;display:block;width:100%;height:100%;isolation:isolate}
-.mk > *{position:absolute;inset:0;width:100%;height:100%;object-fit:contain}
-.mk > i{mix-blend-mode:multiply;-webkit-mask-size:contain;mask-size:contain;-webkit-mask-repeat:no-repeat;mask-repeat:no-repeat;-webkit-mask-position:center;mask-position:center}
+/* 2.0.0: 학교 마크는 smark(메인 퀘스트 체크 동그라미 .mk와 이름이 겹쳐 동그라미가 줄 전체로 커지던 오류) */
+.smark{position:relative;display:block;width:100%;height:100%;isolation:isolate}
+.smark > *{position:absolute;inset:0;width:100%;height:100%;object-fit:contain}
+.smark > i{mix-blend-mode:multiply;-webkit-mask-size:contain;mask-size:contain;-webkit-mask-repeat:no-repeat;mask-repeat:no-repeat;-webkit-mask-position:center;mask-position:center}
 .deco-pick .si{min-height:96px}
 .deco-pick .si.dis{opacity:.45;pointer-events:none}
 /* 1.7.1 칭호 리본: 학교 카드 안에서 학년 줄 아래 자기 줄에 놓아요(옆에 끼우면 좁은 화면에서 잘려요) */
@@ -8867,7 +8868,7 @@ body{background:radial-gradient(120% 60% at 50% 0%, color-mix(in srgb, var(--pap
     const b = IMG('mark_base_' + MARK_BASE[mk[0]]), y = IMG('mark_sym_' + MARK_SYM[mk[1]]);
     if (!b || !y) return '';
     const lay = (u, c) => `<img src="${u}" alt="" draggable="false"><i style="background:${c};-webkit-mask-image:url('${u}');mask-image:url('${u}')"></i>`;
-    return `<span class="mk">${lay(b, MARK_COL[mk[2]])}${lay(y, MARK_COL[mk[3]])}</span>`;
+    return `<span class="smark">${lay(b, MARK_COL[mk[2]])}${lay(y, MARK_COL[mk[3]])}</span>`;
   }
   function renderCrest() {
     const el = $('#schoolCrest'); if (!el) return;
