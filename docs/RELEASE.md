@@ -54,6 +54,10 @@ npm run build            # dist/ 만들고 forest-school.ait로 묶어요 (index
 - 만든 `toss/forest-school.ait`를 사용자에게 보내면 사용자가 앱인토스 콘솔에 올려요.
 - 광고 그룹 ID는 `toss/src/bridge.js`의 `AD_GROUP_ID`. 바꾸지 않아요.
 
+## 4-1. 안드로이드 결과물 정리 (2026-10-28 지섭)
+
+- `android.yml`의 `cleanup` 단계가 빌드가 끝날 때마다 예전 `forest-school-android-*` 결과물을 지워요. 이번 것과 바로 앞 것 두 개만 남아요.
+
 ## 5. Claude 화면의 게임 (아티팩트)
 
 - `dev/forest-school.html`을 그대로 같은 아티팩트 주소에 올려요. 사용자가 승인한 뒤에 바꿔요.
