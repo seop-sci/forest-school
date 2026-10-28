@@ -1961,6 +1961,27 @@ body{background:radial-gradient(120% 60% at 50% 0%, color-mix(in srgb, var(--pap
 .talk-tx{flex:1;min-width:0}.talk-tx b{font-size:13px;color:#3E7E4A}
 .talk-tx p{margin:4px 0 8px;font-size:15px;line-height:1.45}
 .talk-foot{display:flex;align-items:center;justify-content:space-between}.talk-foot small{color:var(--chip-ink)}
+/* 2.0.1 창은 게임 본체(.app) 밖에 있어서 누를 때 강조색과 글자 선택이 그대로 남았어요. 전학 대화는 창 전체를 눌러 넘기므로 화면 전체가 잠깐 어둡게 덮였어요(테스터 제보) */
+.overlay{-webkit-tap-highlight-color:transparent}
+.overlay.talk,.overlay.cere{user-select:none;-webkit-user-select:none;-webkit-touch-callout:none}
+/* 2.0.1 졸업식 장면: 유치원과 초등학교 졸업식에서 입학 창 앞에 잠깐 보여요. 누르면 넘어가요 */
+.overlay.cere{z-index:32;flex-direction:column;align-items:center;justify-content:center;gap:4px;padding:16px;background:linear-gradient(#BFE6F7 0%,#E6F4FA 46%,#EAF6D6 64%,#C6E29A 100%);opacity:0;transition:opacity .3s;cursor:pointer;overflow:hidden}
+.overlay.cere.open{opacity:1}
+.cere-svg{display:block;width:100%;max-width:440px;height:auto;overflow:visible}
+.cere-ban{font-family:var(--font-display);font-size:12.5px;fill:#5A3A16}
+.cere-h{margin:2px 0 0;font-family:var(--font-display);font-size:26px;color:#2F5A2A;text-align:center;animation:cereIn .5s 1.9s both}
+.cere-sub{margin:0;font-size:15.5px;color:#3E5A2A;text-align:center;animation:cereIn .5s 2.7s both}
+.cere-skip{outline:none;position:absolute;left:50%;transform:translateX(-50%);bottom:calc(14px + env(safe-area-inset-bottom,0px));margin:0;padding:8px 14px;border:0;background:none;font:inherit;font-size:12.5px;cursor:pointer;color:#557048;text-align:center;opacity:.8}
+.cere-kid{transform-box:fill-box;transform-origin:50% 100%;animation:cereKid .5s both}
+.cere-cap{transform-box:fill-box;transform-origin:50% 50%;animation:cereCap 2.4s cubic-bezier(.25,.6,.4,1) both}
+.cere-cf{transform-box:fill-box;transform-origin:50% 50%;animation:cereCf 2.8s linear both}
+.cere-star{transform-box:fill-box;transform-origin:50% 50%;animation:cereStar 1.6s ease-in-out infinite}
+@keyframes cereIn{from{opacity:0;transform:translateY(8px)}to{opacity:1;transform:none}}
+@keyframes cereKid{0%{opacity:0;transform:translateY(14px) scale(.9)}70%{opacity:1;transform:translateY(-3px) scale(1.03)}100%{opacity:1;transform:none}}
+@keyframes cereCap{0%{transform:none;opacity:1}55%{transform:translateY(-44px) rotate(-260deg);opacity:1}80%{transform:translateY(-50px) rotate(-340deg);opacity:1}100%{transform:translateY(-60px) rotate(-400deg);opacity:0}}
+@keyframes cereCf{0%{opacity:0;transform:translateY(0) rotate(0)}8%{opacity:1}100%{opacity:1;transform:translateY(215px) rotate(540deg)}}
+@keyframes cereStar{0%,100%{transform:scale(.8);opacity:.6}50%{transform:scale(1.15);opacity:1}}
+@media (prefers-reduced-motion: reduce){.cere-h,.cere-sub,.cere-kid,.cere-cap,.cere-star{animation:none}.cere-cf{display:none}}
 .street-back{display:inline-flex;align-items:center;gap:4px;min-height:36px;margin:-6px 0 6px;padding:0 12px 0 8px;border:1px solid var(--line);border-radius:999px;background:var(--card);color:var(--ink);font:inherit;font-size:13.5px;cursor:pointer}
 .street-back::before{content:"";width:8px;height:8px;border-left:2px solid currentColor;border-bottom:2px solid currentColor;transform:rotate(45deg);margin-right:2px}
 /* 1.7.2: 학교 상세(펼침)에는 위쪽에 없는 정원과 학교 파워만 보여요. 평판은 위쪽 재화 줄에 늘 있어요 */
@@ -2128,7 +2149,7 @@ body{background:radial-gradient(120% 60% at 50% 0%, color-mix(in srgb, var(--pap
     <p class="boot-step" id="bootStep">학교 문을 여는 중...</p>
     <p class="boot-tip" id="bootTip">학교 문을 여는 중이에요</p>
   </div>
-  <span class="boot-ver" id="bootVer">v2.0.0</span>
+  <span class="boot-ver" id="bootVer">v2.0.1</span>
 </div>
 
 <div class="app on-school" id="app">
@@ -2568,7 +2589,7 @@ body{background:radial-gradient(120% 60% at 50% 0%, color-mix(in srgb, var(--pap
       </div>
       <h3 class="panel-sub">정보</h3>
       <dl class="info">
-        <div id="verRow"><dt>버전</dt><dd>v2.0.0</dd></div>
+        <div id="verRow"><dt>버전</dt><dd>v2.0.1</dd></div>
         <div id="pidRow" hidden><dt>학교 번호</dt><dd id="infoPid"></dd></div>
       </dl>
       <div id="devBox" hidden>
@@ -2940,6 +2961,12 @@ body{background:radial-gradient(120% 60% at 50% 0%, color-mix(in srgb, var(--pap
     <div class="talk-tx"><b id="talkWho"></b><p id="talkText" aria-live="polite"></p>
       <div class="talk-foot"><small id="talkStep"></small><button class="cta small" id="talkNext" type="button" data-autofocus>다음</button></div></div>
   </section>
+</div>
+<div class="overlay cere" id="mCere" role="dialog" aria-modal="true" aria-labelledby="cereH" hidden>
+  <svg class="cere-svg" id="cereArt" viewBox="0 0 220 192" aria-hidden="true"></svg>
+  <h2 class="cere-h" id="cereH">졸업을 축하해요!</h2>
+  <p class="cere-sub" id="cereSub"></p>
+  <button class="cere-skip" id="cereSkip" type="button" data-autofocus>눌러서 넘기기</button>
 </div>
 
 <div class="overlay center" id="mDecoPick" hidden>
@@ -4203,7 +4230,7 @@ body{background:radial-gradient(120% 60% at 50% 0%, color-mix(in srgb, var(--pap
   let S = null;
   const rt = {
     lastT: 0, uiT: 0, affT: 0, sortT: 0, floatAcc: 0, floatT: 0, dropT: 0,
-    kids: [], drops: [], kidSeq: 0, talk: null, talkT: 20, furKey: '', modalQueue: [], modalOpen: null, sheetKey: null, tab: 'school',
+    kids: [], drops: [], kidSeq: 0, talk: null, talkT: 20, furKey: '', modalQueue: [], modalOpen: null, cereOn: false, cereToasts: [], sheetKey: null, tab: 'school',
     paused: false, closedAt: 0, hiddenAt: 0, reduced: !!(motionMQ && motionMQ.matches),
     qr: {}, qKey: '', guideKey: null,
     adOpen: false, adTimer: 0, adOk: null, adNo: null, adEarned: false, gKey: '', townStage: -1, townTier: -1,
@@ -5360,13 +5387,13 @@ body{background:radial-gradient(120% 60% at 50% 0%, color-mix(in srgb, var(--pap
   // 2.0.0 새 전학생 그림(작업지시서 20)이 오기 전에는 그림 문자로 보여 줘요
   const KID_EMOJI = { hamster: '🐹', duck: '🦆', turtle: '🐢', mole: '🐭', frog: '🐸', waterdeer: '🦌' };
   function kidSVG(sp, bag, look) {
-    const hat = look ? look.hat : (S ? S.cos.hat : ''), neck = look ? look.neck : (S ? S.cos.neck : '');
+    const hat = look ? look.hat : (S ? S.cos.hat : ''), neck = look ? look.neck : (S ? S.cos.neck : ''), cap = look && look.cap;   // 2.0.1 cap: 졸업식 학사모(던지기 시작 초)
     const ar = CHR_AR['chr_' + sp] || 0.75, h = Math.min(24, 21 / ar), w = h * ar, top = 11.5 - h;
     const hy = top + h * (HEAD_Y[sp] || 0.33), r = h * 0.2, pic = FSI('chr_' + sp);
     return `<ellipse cx="0" cy="11.6" rx="${(w * 0.32).toFixed(1)}" ry="1.6" class="c-shadow"/>` +
       (pic || !KID_EMOJI[sp] ? `<image href="${pic}" x="${(-w / 2).toFixed(2)}" y="${top.toFixed(2)}" width="${w.toFixed(2)}" height="${h.toFixed(2)}"/>`
         : `<text x="0" y="9.5" text-anchor="middle" font-size="15">${KID_EMOJI[sp]}</text>`) +
-      (hat || neck ? `<g transform="translate(0 ${hy.toFixed(2)}) scale(${(r / 6).toFixed(3)})">${neck ? NECKS[neck] : ''}${hat ? hatSVG(hat) : ''}</g>` : '') +
+      (hat || neck || cap ? `<g transform="translate(0 ${hy.toFixed(2)}) scale(${(r / 6).toFixed(3)})">${neck ? NECKS[neck] : ''}${cap ? `<g class="cere-cap" style="animation-delay:${cap}s">${GRAD_CAP}</g>` : hat ? hatSVG(hat) : ''}</g>` : '') +
       `<g transform="translate(0 ${(top + 4).toFixed(1)})">${nlBadge(sp)}</g>`;
   }
   // 친구 성장 쪽지로 키운 전학생: 머리 옆에 별, Lv.5부터 금빛 별
@@ -7301,7 +7328,7 @@ body{background:radial-gradient(120% 60% at 50% 0%, color-mix(in srgb, var(--pap
        forest/rank/<내 id>   랭킹 이름과 학교 점수
        forest/stats/<내 id>  테스트 현황 (어디까지 했는지, 얼마나 했는지)
      <내 id>는 Firebase 익명 로그인이 기기(브라우저)마다 만들어 줘요. */
-  const VERSION = '2.0.0';
+  const VERSION = '2.0.1';
   /* 2.0.0 공지사항 (2026-10-27 지섭, 1.8.0은 이미 올려서 2.0.0부터): 설정 > 공지사항. 맨 위가 가장 새 공지예요.
      패치노트는 자동으로 넣지 않아요. 지섭이 검수한 글만 여기에 적어요(CHANGELOG.md는 자세한 기록용이라 따로 있어요).
      접속하면 새 공지 창을 띄워요(올라온 뒤 7일 동안, '일주일간 열지 않기'를 누르면 7일 쉬어요). 업데이트한 뒤 첫 접속에는 쉬는 중이어도 한 번 띄워요 */
@@ -11250,6 +11277,7 @@ body{background:radial-gradient(120% 60% at 50% 0%, color-mix(in srgb, var(--pap
     S.st.grads += 1;   // 졸업식도 종업식과 함께 행사 횟수로 쳐요
     cloudSoon();
     addGold(GOLD.promote);
+    const crew = cereCrew();   // 2.0.1 졸업식 장면의 졸업생(명부를 비우기 전에)
     let newcomer = null;
     if (S.p.species < NEWCOMERS.length) { newcomer = NEWCOMERS[S.p.species]; S.p.species += 1; }
     else { S.p.ticket = (S.p.ticket || 0) + 1; rt.tkReward = { title: '친구 성장 쪽지를 받았어요!', sub: '졸업 탭의 전학 온 친구들에서 키울 친구를 골라요', items: [{ ic: 'ticket', t: `친구 성장 쪽지 +1 (지금 ${S.p.ticket}장)` }] }; }
@@ -11264,6 +11292,7 @@ body{background:radial-gradient(120% 60% at 50% 0%, color-mix(in srgb, var(--pap
     { const gate = MAIN.findIndex(q => q.t === 'tier' && q.n === S.tier); if (S.tier >= 2 && gate >= 0 && S.q.m < gate) { S.q.m = gate; S.q.lat = ''; startMain(); } }   // 졸업식 퀘스트(바로 완료)에서 이어가요
     if (newcomer) rt.kidSeq = BASE_SPECIES.length + S.p.species - 1;
     $('#tierConfirm').hidden = true;
+    queueModal(() => showCere(from, crew));   // 2.0.1 졸업식 장면 먼저
     queueModal(() => showEntrance(fund, leaving, from, newcomer, dipsIn));
     if (newcomer) queueModal(() => showNewTalk(newcomer));   // 2.0.0 전학 대화
     if (rt.tkReward) { showReward(rt.tkReward); rt.tkReward = null; }   // 친구 성장 쪽지는 식이 끝난 뒤에 알려 줘요
@@ -11284,8 +11313,72 @@ body{background:radial-gradient(120% 60% at 50% 0%, color-mix(in srgb, var(--pap
       `새로 생긴 ${eul(T.newb || '건물')} 지어 보세요. 기금은 졸업 탭의 장학재단에서 써요. 졸업 선물로 황금 도토리 +${GOLD.promote}개를 받았어요.`;
     $('#tierOk').textContent = `${T.name} 입학하기`;
     openModal($('#mTier'));
-    sfx('bell'); setTimeout(() => sfx('quest'), 900);
+    if (rt.cereRang) { rt.cereRang = false; sfx('done'); }   // 2.0.1 졸업식 장면에서 종을 울렸으면 짧게만
+    else { sfx('bell'); setTimeout(() => sfx('quest'), 900); }
     return true;
+  }
+  /* ---------- 2.0.1 졸업식 장면 ----------
+     유치원과 초등학교 졸업식(학교급이 오르는 식)에서 입학 창 앞에 5초쯤 보여요. 졸업생이 하나씩 무대에 서고, 학사모를 던지면 꽃가루가 내려요.
+     화면 아무 곳이나 누르면 바로 입학 창으로 넘어가요. 동작 줄이기 설정이면 움직이지 않는 그림으로 보여요 */
+  const GRAD_CAP = '<path d="M-5.2 -3 L-5.2 -6.6 Q0 -8 5.2 -6.6 L5.2 -3 Q0 -4.4 -5.2 -3 Z" fill="#2E2A3A"/>' +
+    '<path d="M-10.4 -7.4 L0 -11 L10.4 -7.4 L0 -3.8 Z" fill="#3D3852" stroke="#25212F" stroke-width=".5"/>' +
+    '<path d="M0 -7.4 Q6.4 -7 7.8 -3.6" fill="none" stroke="#F3C04B" stroke-width=".9"/><rect x="7.1" y="-4" width="1.5" height="3.2" rx=".6" fill="#F3C04B"/><circle cx="0" cy="-7.4" r="1" fill="#F3C04B"/>';
+  const CERE_MS = 5200;
+  // 졸업생: 이 학교급 명부 친구들, 만난 전학생, 처음 다섯 친구 순서로 다섯 명(방금 전학 온 친구는 입학 창에서 만나요)
+  function cereCrew(skip) {
+    const out = [], add = sp => { if (sp && sp !== skip && !out.includes(sp) && out.length < 5 && (FSI('chr_' + sp) || KID_EMOJI[sp])) out.push(sp); };
+    ((S.roster && S.roster.list) || []).forEach(s => add(s.sp));
+    NEWCOMERS.slice(0, S.p.species).forEach(n => add(n.k));
+    BASE_SPECIES.forEach(add);
+    return out;
+  }
+  function cereArt(from, crew) {
+    const flags = ['#E8735A', '#F3C04B', '#6DB3E0', '#8CC66B', '#C48AD8'];
+    let h = '<path d="M-4 10 Q110 34 224 10" fill="none" stroke="#8A5D2B" stroke-width="1"/>';
+    for (let i = 0; i < 13; i++) {   // 줄에 걸린 깃발
+      const x = 6 + i * 17.5, t = (x + 4) / 228, y = 10 + 48 * t * (1 - t);
+      h += `<path d="M${(x - 5).toFixed(1)} ${y.toFixed(1)} L${(x + 5).toFixed(1)} ${y.toFixed(1)} L${x.toFixed(1)} ${(y + 10).toFixed(1)} Z" fill="${flags[i % 5]}"/>`;
+    }
+    h += '<rect x="44" y="28" width="132" height="30" rx="7" fill="#8A5D2B"/><rect x="48" y="32" width="124" height="22" rx="5" fill="#FFF4D6"/>' +
+      `<text class="cere-ban" x="110" y="47.5" text-anchor="middle">${esc(from.school)} 졸업식</text>` +
+      '<path class="cere-star" d="M36 39 l1.6 3.4 3.6 .4 -2.7 2.4 .8 3.6 -3.3 -1.9 -3.3 1.9 .8 -3.6 -2.7 -2.4 3.6 -.4 Z" fill="#F3C04B"/>' +
+      '<path class="cere-star" style="animation-delay:.8s" d="M184 39 l1.6 3.4 3.6 .4 -2.7 2.4 .8 3.6 -3.3 -1.9 -3.3 1.9 .8 -3.6 -2.7 -2.4 3.6 -.4 Z" fill="#F3C04B"/>' +
+      '<rect x="8" y="150" width="204" height="10" rx="3" fill="#C99A5B"/><rect x="8" y="158" width="204" height="12" rx="2" fill="#A8743C"/>' +
+      '<path d="M8 162 h204" stroke="#8A5D2B" stroke-width=".8" opacity=".6"/>';
+    const n = crew.length, gap = n > 4 ? 38 : 44;
+    crew.forEach((sp, i) => {
+      const x = 110 + (i - (n - 1) / 2) * gap;
+      h += `<g class="cere-kid" style="animation-delay:${(0.25 + i * 0.22).toFixed(2)}s"><g transform="translate(${x.toFixed(1)} 151) scale(1.75)">${kidSVG(sp, i, { hat: '', neck: '', cap: (2.0 + i * 0.07).toFixed(2) })}</g></g>`;
+    });
+    const cc = ['#E8735A', '#F3C04B', '#6DB3E0', '#8CC66B', '#C48AD8', '#FFFFFF'];
+    for (let i = 0; i < 34; i++) {   // 꽃가루(고정된 순서라 시험에서도 같은 그림)
+      const x = (i * 53 + 11) % 214 + 3, y = -14 - (i * 37) % 30, d = 2.0 + (i * 0.11) % 1.3;
+      h += `<rect class="cere-cf" style="animation-delay:${d.toFixed(2)}s" x="${x}" y="${y}" width="${i % 3 ? 3 : 2.2}" height="${i % 3 ? 4.4 : 2.2}" rx=".6" fill="${cc[i % 6]}"/>`;
+    }
+    return h;
+  }
+  function showCere(from, crew) {
+    const m = $('#mCere'); if (!m || !crew || !crew.length) return false;
+    const T = tierInfo();
+    $('#cereArt').innerHTML = cereArt(from, crew);
+    $('#cereSub').textContent = `이제 ${T.school}에 입학해요!`;
+    rt.cereOn = true; rt.cereToasts = [];
+    { const tEl = $('#toast'); if (!tEl.hidden) { rt.cereToasts.push(tEl.textContent); tEl.hidden = true; } }   // 식 직전에 뜬 알림도 장면 뒤로
+    openModal(m);
+    sfx('bell'); rt.cereRang = true;
+    clearTimeout(rt.cereT1); clearTimeout(rt.cereT2);
+    rt.cereT1 = setTimeout(() => { if (rt.cereOn) { sfx('quest'); buzz([30, 60, 30]); } }, 2000);
+    rt.cereT2 = setTimeout(cereEnd, rt.reduced ? 2600 : CERE_MS);
+    rt.cereAt = performance.now();
+    return true;
+  }
+  function cereEnd() {
+    if (!rt.cereOn) return;
+    if (performance.now() - (rt.cereAt || 0) < 350) return;   // 졸업식 창 단추를 누른 손이 바로 넘기지 않게
+    rt.cereOn = false;
+    clearTimeout(rt.cereT1); clearTimeout(rt.cereT2);
+    closeModal($('#mCere'));
+    rt.cereToasts.splice(0).forEach((t, i) => setTimeout(() => toast(t), 450 + i * 2400));   // 미뤄 둔 알림을 차례로
   }
   function goGrad(where) {
     setTab('grad');
@@ -11862,6 +11955,7 @@ body{background:radial-gradient(120% 60% at 50% 0%, color-mix(in srgb, var(--pap
   /* ---------- 알림, 탭 ---------- */
   let toastTimer = 0;
   function toast(msg) {
+    if (rt.cereOn) { if (!rt.cereToasts.includes(msg)) rt.cereToasts.push(msg); return; }   // 2.0.1 졸업식 장면 동안 온 알림은 장면이 끝난 뒤에
     const el = $('#toast');
     el.textContent = msg;
     el.hidden = false;
@@ -12237,6 +12331,7 @@ body{background:radial-gradient(120% 60% at 50% 0%, color-mix(in srgb, var(--pap
     $('#tierNo').addEventListener('click', () => { $('#tierConfirm').hidden = true; });
     $('#tierYes').addEventListener('click', promote);
     $('#tierOk').addEventListener('click', () => { sfx('tap'); closeModal($('#mTier')); setTab('school'); });
+    $('#mCere').addEventListener('click', cereEnd);   // 2.0.1 졸업식 장면은 아무 곳이나 누르면 넘어가요
     $('#devTier').addEventListener('click', () => {
       S.u.dev = true;
       if (!nextTierOpen()) { toast(`${TIERS[S.tier + 1].name}는 아직 준비 중이에요`); return; }
@@ -12454,6 +12549,7 @@ body{background:radial-gradient(120% 60% at 50% 0%, color-mix(in srgb, var(--pap
       else if (rt.modalOpen === $('#mTrip')) closeModal($('#mTrip'));
       else if (rt.modalOpen === $('#mSports')) closeModal($('#mSports'));
       else if (rt.modalOpen === $('#mFest')) closeModal($('#mFest'));
+      else if (rt.modalOpen === $('#mCere')) { rt.cereAt = 0; cereEnd(); }   // 2.0.1 뒤로 가기도 넘기기
       else if (rt.modalOpen === $('#tut')) tutEnd('later');
       else if (rt.sheetKey && !rt.modalOpen) closeSheet();
     });
@@ -13894,7 +13990,7 @@ body{background:radial-gradient(120% 60% at 50% 0%, color-mix(in srgb, var(--pap
   // 시험용 손잡이: 자동 시험(window.__FOREST_TEST)에서만 게임 속 함수를 꺼내 써요
   if (window.__FOREST_TEST) window.__forest = { get S() { return S; }, goTo, rankRows, awayStart, awaySettle, timeSrc, save, awayHold, rankCap, cloudVerify, liveApply, liveLoad, openNotice, NOTICES, get Live() { return Live; }, get Rank() { return Rank; }, liveOff,   // 2.0.0 보안 점검 시험(s71), Codex 검토 시험(s72)
     rosterEnsure, rosterMake, rosterAdd, clubAuto, clubSet, clubPct, clubShow, clubSum, clubStars, clubMembers, clubShowGo, showReady, showWait, showDay, clubWeekTick, clubFacUp, CLUBS, CLUB, star, clubTuitionMult, clubFestMult, clubDecoOff, renderClub, renderHall, openSeatPick, openClubPick,
-    TIER_SCALE, legacyMult, tuitionMult, snapTake, snapOf, tierViewOpen, tierViewClose, renderTierView, renderTierDots, viewMap, showNewTalk, talkNext, NEWCOMERS, TIERS, GEO, geoIdx, decoCost0, qMeasure, qDone, qGoal, kidArt: kidSVG, newYear, checkGrade, gradeOf, townRep, FAC, sanitize200, trialHunt, updateTrial, TRIAL, zoomAt, fitMap, ZOOM_MAX, DECO, DECO_SLOTS, DECO_SIGN, decoCost, decoSoldOut, pickDeco, buyDeco, decoPut, decoEditStart, decoEditEnd, openDecoPick, renderDeco, setSchoolNm, setMark, schoolTitle, markHTML, decoPlacedAll, esExLeft, esExCost, get Cloud() { return Cloud; }, get actx() { return actx; }, Music, musicSync, ensureAudio, bgmLoad, pzUI, rt, makeDeal, furStage, DEAL, navInfo, navRoute, spawnDrop, repTipCheck, linkGoogle, retryCloud, sanitize, acctPending, renderMap, renderHUD, renderAffordance, syncKids, layoutMap, geo, hitTrial, endVisit, showReward, recommend, needCost, prepTopUp, qReward, prepPhase, rankScore, pwOf, previewDip, dipMult, costScale, buyFur, buyFurAll, furCost, furReady, furDone, FUR, startTalk, endTalk, teacherAct, facCost, teaCost, facKeys, rate, rep, capacity, canGraduate, canPromote,
+    TIER_SCALE, legacyMult, tuitionMult, snapTake, snapOf, tierViewOpen, tierViewClose, renderTierView, renderTierDots, viewMap, showNewTalk, talkNext, showCere, cereEnd, cereCrew, NEWCOMERS, TIERS, GEO, geoIdx, decoCost0, qMeasure, qDone, qGoal, kidArt: kidSVG, newYear, checkGrade, gradeOf, townRep, FAC, sanitize200, trialHunt, updateTrial, TRIAL, zoomAt, fitMap, ZOOM_MAX, DECO, DECO_SLOTS, DECO_SIGN, decoCost, decoSoldOut, pickDeco, buyDeco, decoPut, decoEditStart, decoEditEnd, openDecoPick, renderDeco, setSchoolNm, setMark, schoolTitle, markHTML, decoPlacedAll, esExLeft, esExCost, get Cloud() { return Cloud; }, get actx() { return actx; }, Music, musicSync, ensureAudio, bgmLoad, pzUI, rt, makeDeal, furStage, DEAL, navInfo, navRoute, spawnDrop, repTipCheck, linkGoogle, retryCloud, sanitize, acctPending, renderMap, renderHUD, renderAffordance, syncKids, layoutMap, geo, hitTrial, endVisit, showReward, recommend, needCost, prepTopUp, qReward, prepPhase, rankScore, pwOf, previewDip, dipMult, costScale, buyFur, buyFurAll, furCost, furReady, furDone, FUR, startTalk, endTalk, teacherAct, facCost, teaCost, facKeys, rate, rep, capacity, canGraduate, canPromote,
     fmt, fmt2, graduate, promote, buyPerk, perkCost, perkMaxed, buyFundPerk, fpCost, claimMain, mainReady, curMain, qNo, earn, CFG, TEA, teaMaxed, PERKS, FPERKS, MAIN, finalYear, startTrip, claimTrip, TRIPS, yearLocked, endSports, rtSports: () => rt.sports, rtFest: () => rt.fest, facCap, addLeague, addMP, tutStart, endFest, claimBox, musicWant, askBox, festWait, setTab,
     dexMeet, dexSync, dexPending, dexGift, renderDex, evCurrent, evNext, evSync, evFix, evVal, EV_FALLBACK, EV_DECO, EV_HAT, COS, DECO_BY, decoOwn, perkRec, fpRec, BOOST_ALL, buyShop, pickShop, showNote, showOkOn, showWd, renderGradPanel, renderShop, renderDecoShop, EV_WEEKLY, EV_WEEK_BASE, weekMon, claimStamp, claimEvMission, claimEvBox, renderEvent, evMissions, evOk, evSkipped, EV_MONTHS, EV_MEASURE, tierMinutes, minAcorns, IMG, sanitize171, ACH, achSync, claimAch, setTitle, renderAch, setDexSeg, achClaimable, XT, xtAct, xtCost, xtLv, feastMins, libMult, propInstances, walkBuild, festItemSvg, guestArt, adErrText, googleErrText, openSheet, closeSheet, startFest, startSports, sanitize170, EV_STAMPS, EV_SPECIAL, EV_MONTHLY, EV_BOX, DEX_KEYS, DEX_REWARD, DEX_GUEST_KEYS, seasonKey, roofArtKey, oakKey, setSeasonArt, VP, vpLv, vpCost, vpMult, vpAct, renderVpCard, sportsPrize, festPrize, renderTeachers, buildTeacherCards, bldImg, roofKey, bldStage, mapKey, setMapArt, applyThemes, buyFacility, bldFx, setBldFx, mapHi, Live, liveApply, liveLoad, liveOff, LIVE_KEYS, EVC, NOTICES, openNotice, noticeAuto, noticeWant, ntUnread, startTrial, endTrial: () => rt.trial && (rt.trial.left = 0), spawnDeal, startVisit, IMG170, MG, mgCells, mgSetCells, mgTick, mgAddEnergy, mgAddUp, mgTapGen, mgDrop, mgSell, mgUpgrade, mgClaimOrder, mgSwapOrder, mgOrderOk, mgFillOrders, mgOpen, mgClose, mgRenderAll, mgSpawnLevel, mgNearestEmpty, mgEmptyBoard, mgOrderReward, mgUI, sanitize180, mgWatchAd, mgNewOrder, mgHintPick, mgShowHint, mgClearHint, mgTouch, mgOrderGuide, mgDexN, mgDexCan, mgDexClaim, mgOpenDex, MG_DEX, MG_DEX_MS, mgDexEss, mgDexEssCan, mgDexEssN, mgDexMsCan, mgDexMsClaim, MGB, mgBuyBoost, mgBstLeft, mgOpenBoost, nice, claimMission, claimBonus, claimWeekMission, MP_BOX,   // 1.7.0 도감, 이벤트
     PZ, PZ_SHAPES, pzFits, pzAnyFit, pzStuck, pzFullLines, pzPlace, pzFreshGame, pzStart, PZB, pzbCost, pzApplyBoost, pzBoostOpen, pzBoostGo, festGoldLeft, festGoldTake, claimSports, renderStreet, pzFinish, pzLeft, pzCanAd, pzEssOf, pzMinOf, pzHelpSquirrel, pzHelpOwl, pzHelpBear, fillSubs, mapRoofTop, showAd, claimOfflineDouble, startBoost, tripAd, festFocus, festRange, visMap, renderMissions, pzHasHelp, pzRot, pzNewPiece, pzOpen, pzClose, pzGameOver, pzRenderAll, renderMini, addEss, ESHOP, SP_FUR, applyCos, essItem, pickEss, buyEss, renderEssShop, esAcornLeft, esGoldLeft, esAcornAmt, hatSVG, spFurImg, gameNow, gameToday, gameWeek, kstDay, setServerTime, SVR, dmDay, weekIdx, lgWeek, wkWeek, lgKey, pzDay, goldDay, boostLeft, dealLeft, canStamp };
