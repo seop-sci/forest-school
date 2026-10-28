@@ -1349,6 +1349,13 @@ body{background:radial-gradient(120% 60% at 50% 0%, color-mix(in srgb, var(--pap
 .pz-sc .pz-combo[hidden]{display:none}
 .pz-cell.ghost{background-image:var(--pz-ghost);opacity:.9}
 .pz-cell.will{filter:brightness(1.2) saturate(1.15)}
+/* 2.1.1 다람쥐 선생님 3×3 제거: 마우스나 손가락이 있는 자리의 3×3을 미리 보여 줘요 */
+#pzGrid.sq-mode .pz-cell{cursor:crosshair}
+.pz-cell.aim{z-index:2;transform:scale(1.04);filter:brightness(1.25) saturate(1.1)}
+#pzGrid .pz-cell.aim::before{content:"";position:absolute;inset:2%;border-radius:20%;background:rgba(255,226,120,.38);box-shadow:inset 0 0 0 3px #FFD54A, 0 0 10px rgba(255,200,60,.85);pointer-events:none;animation:pzAim .8s ease-in-out infinite alternate}
+#pzGrid .pz-cell.aim.on::before{background:rgba(255,120,80,.28);box-shadow:inset 0 0 0 3px #FF8A50, 0 0 10px rgba(255,120,60,.85)}
+@keyframes pzAim{from{opacity:.75}to{opacity:1}}
+@media (prefers-reduced-motion: reduce){#pzGrid .pz-cell.aim::before{animation:none}}
 .pz-cell.will::after{content:"";position:absolute;inset:12%;border-radius:22%;background:rgba(255,245,200,.45)}
 .pz-cell.pop{animation:pzPop .34s ease forwards}
 @keyframes pzPop{40%{transform:scale(1.14);filter:brightness(1.6)}100%{transform:scale(.2);opacity:0}}
@@ -3114,10 +3121,10 @@ span.bt-stamp{display:none}.bt-duel.done span.bt-stamp{display:grid}
     </div>
   </div>
   <div class="pz-tray" id="pzTray" aria-label="놓을 조각"></div>
-  <p class="pz-teatip" id="pzTeaTip">선생님 블록이 든 줄을 지우면 도움을 받아요. 다람쥐는 둘레 3×3 치우기, 부엉이는 조각 3개 바꾸기, 곰은 조각 돌리기</p>
+  <p class="pz-teatip" id="pzTeaTip">선생님 블록이 든 줄을 지우면 도움을 받아요.<br>다람쥐는 3×3 제거, 부엉이는 조각 3개 바꾸기, 곰은 조각 돌리기</p>
   <div class="pz-foot">
     <div class="pz-helps" id="pzHelps" aria-label="선생님 도움">
-      <button class="pz-tea" type="button" data-help="squirrel" aria-label="다람쥐 선생님 도움: 고른 칸 둘레 3×3 치우기"><span class="pz-teapic" data-tea="tea_squirrel"></span><small class="pz-tead">둘레 치우기</small><b class="pz-tean">0</b></button>
+      <button class="pz-tea" type="button" data-help="squirrel" aria-label="다람쥐 선생님 도움: 고른 칸을 가운데로 3×3 제거"><span class="pz-teapic" data-tea="tea_squirrel"></span><small class="pz-tead">3×3 제거</small><b class="pz-tean">0</b></button>
       <button class="pz-tea" type="button" data-help="owl" aria-label="부엉이 선생님 도움: 조각 3개 새로 바꾸기"><span class="pz-teapic" data-tea="tea_owl"></span><small class="pz-tead">조각 바꾸기</small><b class="pz-tean">0</b></button>
       <button class="pz-tea" type="button" data-help="bear" aria-label="곰 선생님 도움: 고른 조각 돌리기"><span class="pz-teapic" data-tea="tea_bear"></span><small class="pz-tead">조각 돌리기</small><b class="pz-tean">0</b></button>
     </div>
@@ -5575,6 +5582,31 @@ span.bt-stamp{display:none}.bt-duel.done span.bt-stamp{display:grid}
     }
     if (actx.state === 'suspended' && !document.hidden && !rt.paused) actx.resume().catch(() => {});
     musicSync();
+  }
+  /* 2.1.1 소리 지킴이(2026-10-29 지섭 제보: 웹판 숲속 퍼즐 중 배경음악이 '삐~' 소리로 바뀌어 퍼즐을 나갈 때까지 이어짐).
+     기기의 소리 출력이 걸리면 마지막 소리 조각이 되풀이되어 '삐~' 하고 들리고, 그동안 소리 시계(actx.currentTime)가 거의 가지 않아요.
+     켜져 있는데 2초 넘게 소리 시계가 거의 멈춰 있으면 소리를 닫고 새로 열어 곡을 처음부터 다시 틀어요(풀어 둔 곡은 그대로 써요). 1초마다 봐요 */
+  const AW = { wall: 0, at: 0, bad: 0, resets: 0 };
+  function audioWatch() {
+    if (!actx || actx.state !== 'running' || document.hidden || rt.paused || rt.adOpen) { AW.wall = 0; AW.bad = 0; return; }
+    const w = performance.now() / 1000, a = actx.currentTime;
+    if (AW.wall) {
+      const dw = w - AW.wall, da = a - AW.at;
+      if (dw > 0.8 && dw < 5 && da < dw * 0.2) AW.bad += 1; else AW.bad = 0;
+      if (AW.bad >= 2) { AW.bad = 0; AW.wall = 0; audioReset(); return; }
+    }
+    AW.wall = w; AW.at = a;
+  }
+  function audioReset() {
+    AW.resets += 1;
+    const old = actx;
+    clearInterval(Music.timer); Music.timer = 0;
+    Music.cur = ''; Music.bus = null; Music.src = null; Music.out = null; Music.track = null; Music.noise = null;
+    actx = null; master = null;
+    try { if (old) old.close().catch(() => {}); } catch (e) { /* 이미 닫힘 */ }
+    try { if (window.__fsAudio === old) window.__fsAudio = null; } catch (e) { /* 무시 */ }
+    bgmBuf.clear();   // 풀어 둔 곡은 앞 소리판 것이라 새로 풀어요
+    ensureAudio(true);
   }
   function note(freq, at, dur, type, vol, partial) {
     const t0 = actx.currentTime + at;
@@ -11858,7 +11890,7 @@ span.bt-stamp{display:none}.bt-duel.done span.bt-stamp{display:grid}
     pats: ['acorn', 'leaf', 'flower', 'mushroom', 'berry', 'water'],
     patName: { acorn: '도토리', leaf: '잎', flower: '꽃', mushroom: '버섯', berry: '산딸기', water: '물방울' },
     teas: ['squirrel', 'owl', 'bear'], teaName: { squirrel: '다람쥐', owl: '부엉이', bear: '곰' },
-    teaRate: 1 / 8, teaMax: 1, teaBonus: 15,   // 조각 8개 중 1개꼴로 선생님 블록. 선생님마다 1개 보관, 이미 있으면 점수 15점
+    teaRate: 1 / 8, teaMax: 5, teaBonus: 15,   // 조각 8개 중 1개꼴로 선생님 블록. 2.1.1부터 선생님마다 5개까지 쌓여요(지섭 요청: 여러 개, 5는 본부 제안), 다 차 있으면 점수 15점
     essPer: 150, essMax: 25,        // 점수 150점마다 숲의 정수 1개, 한 판에 25개까지
     minPer: 100, minMax: 15,        // 점수 100점마다 수업료 1분치, 한 판에 15분치까지 (2026-10-26 균형 제안서, 지섭 확정)
     askN: [8, 12, 16, 20, 24], askEss: [2, 3, 4, 5, 5],
@@ -12213,6 +12245,7 @@ span.bt-stamp{display:none}.bt-duel.done span.bt-stamp{display:grid}
   }
   // 선생님 도움 단추: 갖고 있으면 밝게, 쓰는 중이면 테두리
   function pzRenderHelp() {
+    if (pzUI.mode !== 'squirrel') pzAim(null);   // 2.1.1 다람쥐 모드를 나가면 3×3 미리 보기를 지워요
     const cur = S.pz.cur; if (!cur) return;
     $$('#pzHelps .pz-tea').forEach(b => {
       const t = b.dataset.help, n = cur.helps[t] || 0;
@@ -12411,11 +12444,21 @@ span.bt-stamp{display:none}.bt-duel.done span.bt-stamp{display:grid}
     sfx('tap');
     if (kind === 'owl') { pzHelpOwl(cur); sfx('leaf'); buzz(12); pzHint('부엉이 선생님이 조각을 바꿔 줬어요'); save(); pzRenderTray(); pzRenderHelp(); if (pzStuck(cur)) pzGameOver(); return; }
     pzUI.mode = kind;
-    pzHint(kind === 'squirrel' ? '치울 칸을 눌러 주세요 (둘레 3×3)' : '돌릴 조각을 눌러 주세요', 2500);
+    if (kind === 'squirrel') setTimeout(() => { if (pzUI.mode === 'squirrel') pzAim((PZ.N >> 1) * PZ.N + (PZ.N >> 1)); }, 0);   // 2.1.1 3×3 크기를 먼저 보여 줘요
+    pzHint(kind === 'squirrel' ? '3×3을 지울 가운데 칸을 눌러 주세요' : '돌릴 조각을 눌러 주세요', 2500);
     pzRenderTray(); pzRenderHelp();
+  }
+  // 2.1.1 다람쥐 선생님 3×3 미리 보기(지섭 요청: 마우스를 가져가면 잘 보이게). i가 없으면 지워요
+  function pzAim(i) {
+    const g = $('#pzGrid'); if (!g || !pzUI.cells) return;
+    const on = pzUI.mode === 'squirrel' && i != null && i >= 0;
+    g.classList.toggle('sq-mode', pzUI.mode === 'squirrel');
+    const r0 = on ? Math.floor(i / PZ.N) : -9, c0 = on ? i % PZ.N : -9;
+    pzUI.cells.forEach((el, j) => { const r = Math.floor(j / PZ.N), c = j % PZ.N; el.classList.toggle('aim', on && Math.abs(r - r0) <= 1 && Math.abs(c - c0) <= 1); });
   }
   function pzCellTap(i) {
     const cur = S.pz.cur; if (!cur || pzUI.mode !== 'squirrel') return;
+    pzAim(null);
     const gone = pzHelpSquirrel(cur, Math.floor(i / PZ.N), i % PZ.N);
     pzUI.mode = '';
     if (gone.length) { gone.forEach(j => { pzUI.cells[j].classList.add('sq'); pzUI.cells[j].dataset.v = '-1'; }); setTimeout(pzRenderBoard, rt.reduced ? 0 : 320); pzLeaves(gone, ''); sfx('leaf'); buzz(15); }
@@ -12451,6 +12494,11 @@ span.bt-stamp{display:none}.bt-duel.done span.bt-stamp{display:grid}
     $('#pzEndOut').addEventListener('click', () => { sfx('tap'); $('#pzEnd').hidden = true; pzClose(); });
     $$('#pzHelps [data-help]').forEach(b => b.addEventListener('click', () => pzUseHelp(b.dataset.help)));
     $('#pzGrid').addEventListener('click', e => { const c = e.target.closest('.pz-cell'); if (c) pzCellTap(+c.dataset.i); });
+    // 2.1.1 다람쥐 선생님: 마우스를 올리거나 손가락을 대면 3×3을 미리 보여 줘요
+    const aimAt = e => { if (pzUI.mode !== 'squirrel') return; const el = document.elementFromPoint(e.clientX, e.clientY), c = el && el.closest && el.closest('#pzGrid .pz-cell'); pzAim(c ? +c.dataset.i : null); };
+    $('#pzGrid').addEventListener('pointermove', aimAt);
+    $('#pzGrid').addEventListener('pointerdown', aimAt);
+    $('#pzGrid').addEventListener('pointerleave', () => { if (pzUI.mode === 'squirrel') pzAim(null); });
     const tray = $('#pzTray');
     tray.addEventListener('pointerdown', e => { const s = e.target.closest('.pz-slot'); if (!s || s.classList.contains('empty')) return; e.preventDefault(); pzDragStart(e, +s.dataset.slot); });
     const move = e => { if (pzUI.drag && e.pointerId === pzUI.drag.pid) { e.preventDefault(); pzDragMove(e); } };
@@ -15506,6 +15554,7 @@ span.bt-stamp{display:none}.bt-duel.done span.bt-stamp{display:grid}
     elTick();   // 2.0.1 반장 선거
     rdTick();   // 2.0.1 책 읽기
     pcTick();   // 2.1.0 숲속 소풍
+    audioWatch();   // 2.1.1 소리가 멈춰 '삐~' 소리가 나면 소리를 새로 켜요
     exTick();   // 2.0.1 시험 기간
     if (rt.tab === 'club') renderClubLite();
     const dd = $('#dexDot'), ed = $('#evDot');
@@ -16539,6 +16588,7 @@ span.bt-stamp{display:none}.bt-duel.done span.bt-stamp{display:grid}
   if (window.__FOREST_TEST) window.__forest = { get S() { return S; }, goTo, conOn, conLeft, conTick, conSec, conFinish, tkPlan, tkUse, tkUseAll, TK, CON, TKAD, capNext, yearCap,   // 2.1.0 공사
     semOn, semFirst, semLabel, cereDip, semBreak,   // 2.1.0 학기(s80)
     PCN, pcStart, pcSettle, pcTick, pcActive, pcAway, pcRemain, openPicnic, renderPicnic, SK, SK_KINDS, skAdd, skPrize, skLeft, skFull, openSticker, renderSticker,
+    AW, audioWatch, audioReset, pzHelpSquirrel,   // 2.1.1 소리 지킴이, 퍼즐
     GSHOP, OUTFITS, evPastIds, renderNight, shopItem, essItem, buyEss, pickEss, nickPrice, grantOffline, thSetPrice, pickDeco, buyDeco, buyDecoBerry,   // 2.1.0 소풍, 스티커판, 상점
     LAB, LAB_IN, LAB_KEYS, LAB_CARDS, LAB_MIX, LAB_DBL, labOf, labRun, labCount, labReady, labDone, openLab, renderLab, labTap, labGo, RD, BOOKS, rdStart, rdSettle, rdTick, rdLeft, rdRemain, openRead, renderRead, renderStudy2, sanitizeStudy2, maintSync, maintTap, openBook, renderBook, BT, BT_EV, BT_LG, BT_SCH, btOpen, btLeft, btRoster, btBest, btMake, btScore, btWin, btFinish, btOpenScene, btClose, btRankDoc, BT_RANK, readRow, btAuto, btPick, btStart, btRender, renderBtCard, sanitizeBt, get btUI() { return btUI; }, EX, exIsWeek, exNow, exPrev, exDays, exScore, exGrade, exStudy, exClaim, exTick, exMake, openExam, renderExam, exAwardTop, exReportReady, sanitizeExam, renderSheet, openSheet,   // 2.0.1 공부 2단계(s76)
     AC, AC_GAME, AB_KEY, ABIL, acLv, acSum, acMult, acRepOf, acGain, acSettle, acAll, acCap, acBkLeft, acBuyBook, renderAc, sanitizeAc, freshAc, rankRows, awayStart, awaySettle, timeSrc, save, awayHold, rankCap, cloudVerify, liveApply, liveLoad, openNotice, NOTICES, get Live() { return Live; }, get Rank() { return Rank; }, liveOff,   // 2.0.0 보안 점검 시험(s71), Codex 검토 시험(s72)

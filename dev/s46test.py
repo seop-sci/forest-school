@@ -77,10 +77,10 @@ RULES = r"""() => {
   g = F.pzFreshGame(true); g.tray[0] = { c: [[0, 0], [1, 0]], k: 2, t: 'bear', ti: 1 };
   r = F.pzPlace(g, 0, 3, 3); eq([g.tb[27], g.tb[35], g.helps.bear], ['', 'bear', 0], '선생님 블록 자리 기억');
   // 벌써 갖고 있으면 점수로
-  g = F.pzFreshGame(true); g.helps.owl = 1;
+  g = F.pzFreshGame(true); g.helps.owl = PZ.teaMax;   // 2.1.1 선생님마다 5개까지 쌓여요
   for (let j = 1; j < 8; j++) g.b[j] = 2;
   g.tray[0] = { c: [[0, 0]], k: 2, t: 'owl', ti: 0 };
-  r = F.pzPlace(g, 0, 0, 0); eq([r.gain, g.helps.owl, r.teas[0].got], [1 + 30 + PZ.teaBonus, 1, false], '보관함이 차 있으면 점수');
+  r = F.pzPlace(g, 0, 0, 0); eq([r.gain, g.helps.owl, r.teas[0].got], [1 + 30 + PZ.teaBonus, PZ.teaMax, false], '보관함이 차 있으면 점수');
   // 선생님 도움 쓰기
   g = F.pzFreshGame(true); g.helps.squirrel = 1;
   for (let i = 0; i < 64; i++) g.b[i] = 1;
@@ -211,7 +211,7 @@ async def run(b, dark, w, h):
     await pg.evaluate(f"{F}.S.pz.cur.score = 900; {F}.pzRenderAll(); document.querySelector('#pzQuit').click()"); await pg.wait_for_timeout(200)
     await pg.evaluate("document.querySelector('#pzQuitYes').click()"); await pg.wait_for_timeout(400)
     end = await pg.evaluate(f"[!document.querySelector('#pzEnd').hidden, document.querySelector('#pzEndScore').textContent, document.querySelectorAll('#pzEndList li').length, {F}.S.ess, {F}.S.pz.best, {F}.S.pz.cur]")
-    if end[:2] != [True, '900'] or end[2] not in (2, 3) or end[3] != 18 or end[4] != 900 or end[5] is not None: bad.append('그만하기 보상: ' + json.dumps(end, ensure_ascii=False))
+    if end[:2] != [True, '900'] or end[2] not in (2, 3, 4) or end[3] != 18 or end[4] != 900 or end[5] is not None: bad.append('그만하기 보상: ' + json.dumps(end, ensure_ascii=False))
     await pg.screenshot(path=f's46_end_{tag}.png')
     await pg.evaluate("document.querySelector('#pzEndAgain').click(); const pb=document.querySelector('#pzBoost'); if (pb && !pb.hidden) document.querySelector('#pzbSkip').click()"); await pg.wait_for_timeout(300)
     again = await pg.evaluate(f"[document.querySelector('#pzEnd').hidden, {F}.S.pz.cur && {F}.S.pz.cur.score, {F}.S.pz.n]")
@@ -236,7 +236,7 @@ async def run(b, dark, w, h):
     if brk != [0, 0, 2, 1e9, None] or e2: bad.append('깨진 저장 읽기: ' + json.dumps(brk) + ' ' + ' | '.join(e2))
     keep, e2 = await boot_with("d => { d.pz.cur = { b: new Array(64).fill(0).map((_, i) => i < 8 ? 2 : 0), tb: new Array(64).fill('').map((_, i) => i === 2 ? 'owl' : i === 40 ? 'bear' : ''), helps: { owl: 5, bear: 'x' }, tray: [{ c: [[0, 0], [0, 1]], k: 3, t: 'bear', ti: 1 }, null, { c: [[9, 9]], k: 1 }], score: 77, combo: 1, lines: 1, askI: 1, ask: { k: 2, n: 12, got: 3, who: 'fox' }, ess: 2, rw: true }; }")
     cur = keep[4]
-    okc = cur and cur['score'] == 77 and cur['helps'] == {'squirrel': 0, 'owl': 1, 'bear': 0} and cur['tb'][2] == 'owl' and cur['tb'][40] == '' and cur['tray'][0] and cur['tray'][0].get('t') == 'bear' and cur['tray'][0].get('ti') == 1 and cur['tray'][1] and cur['tray'][2] and cur['ask']['who'] == 'fox' and cur['ask']['n'] == 12 and cur['b'][0] == 2
+    okc = cur and cur['score'] == 77 and cur['helps'] == {'squirrel': 0, 'owl': 5, 'bear': 0} and cur['tb'][2] == 'owl' and cur['tb'][40] == '' and cur['tray'][0] and cur['tray'][0].get('t') == 'bear' and cur['tray'][0].get('ti') == 1 and cur['tray'][1] and cur['tray'][2] and cur['ask']['who'] == 'fox' and cur['ask']['n'] == 12 and cur['b'][0] == 2
     if not okc or e2: bad.append('하던 판 읽기: ' + json.dumps(keep, ensure_ascii=False)[:300] + ' ' + ' | '.join(e2))
     if errs: bad.append('페이지 오류: ' + ' | '.join(errs))
     await ctx.close()
