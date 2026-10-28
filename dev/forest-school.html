@@ -2818,7 +2818,7 @@ span.bt-stamp{display:none}.bt-duel.done span.bt-stamp{display:grid}
     <button class="street-back" type="button" data-go="street">상점 거리로</button>
     <h2 id="essTitle" class="ph"><span class="tic" data-ic="ic_essence_shop" aria-hidden="true"></span><span>문방구</span></h2>
     <div class="shop-have ess-have" id="essHaveBox"><span class="ess-big" id="essBig" aria-hidden="true"></span><span class="tic" data-ic="ic_essence" aria-hidden="true"></span><span id="essHave2">0</span></div>
-    <p class="fine shop-adleft">숲의 정수는 공부 탭에서 모아요. 넘치는 도토리는 정수로 바꿀 수 있어요</p>
+    <p class="fine shop-adleft">숲의 정수는 공부 탭에서 모아요. 도토리 양은 학교가 성장할수록 커져요</p>
     <div class="shop-scroll" id="essList"></div>
     <div class="shop-ask" id="essAsk" hidden>
       <p id="essAskText"></p>
@@ -9785,7 +9785,7 @@ span.bt-stamp{display:none}.bt-duel.done span.bt-stamp{display:grid}
     if (S.pc && pcReady()) {
       const busy = pcActive(), done = !busy && S.pc.day === gameToday();
       h += `<h3 class="shop-h">소풍 도시락 <small>소풍 하루 한 번</small></h3>` +
-        row(IMG('picnic_lunch') ? `<img src="${IMG('picnic_lunch')}" alt="" draggable="false">` : ic, `소풍 도시락 (정수 ${PCN.lunch})`, `주워 오는 도토리가 수업료 ${PCN.acorn}분치에서 ${PCN.lunchAcorn}분치로 늘어요`, busy ? '지금 소풍을 가 있어요' : done ? '오늘 소풍은 다녀왔어요' : '소풍 보낼 때 함께 싸요',
+        row(IMG('picnic_lunch') ? `<img src="${IMG('picnic_lunch')}" alt="" draggable="false">` : ic, `소풍 도시락 (정수 ${PCN.lunch})`, `주워 오는 도토리가 ${fmt(minAcorns(PCN.acorn))}에서 ${fmt(minAcorns(PCN.lunchAcorn))}로 늘어요`, busy ? '지금 소풍을 가 있어요' : done ? '오늘 소풍은 다녀왔어요' : '소풍 보낼 때 함께 싸요',
           `<button class="buy${busy || done ? ' off' : ''}" type="button" data-ebuy="lunch">싸서 보내기</button>`);
     }
     // 밤 모드
@@ -10884,7 +10884,7 @@ span.bt-stamp{display:none}.bt-duel.done span.bt-stamp{display:grid}
     if (can) {
       const poor = S.ess < PCN.lunch;
       lb.setAttribute('aria-pressed', rt.pcLunch ? 'true' : 'false'); lb.setAttribute('aria-disabled', poor && !rt.pcLunch ? 'true' : 'false');
-      lb.innerHTML = `${IMG('picnic_lunch') ? `<img src="${IMG('picnic_lunch')}" alt="">` : ''}<span class="pc-ltx"><b>도시락 싸기</b><small>숲의 정수 ${PCN.lunch}개. 주워 오는 도토리가 수업료 ${PCN.acorn}분치에서 ${PCN.lunchAcorn}분치로 늘어요</small></span><span class="pc-chk" aria-hidden="true">${rt.pcLunch ? '✓' : ''}</span>`;
+      lb.innerHTML = `${IMG('picnic_lunch') ? `<img src="${IMG('picnic_lunch')}" alt="">` : ''}<span class="pc-ltx"><b>도시락 싸기</b><small>숲의 정수 ${PCN.lunch}개. 주워 오는 도토리가 ${fmt(minAcorns(PCN.acorn))}에서 ${fmt(minAcorns(PCN.lunchAcorn))}로 늘어요</small></span><span class="pc-chk" aria-hidden="true">${rt.pcLunch ? '✓' : ''}</span>`;
     }
     const go = $('#pcGo'); go.hidden = !can;
     go.setAttribute('aria-disabled', rt.pcSel.length >= Math.min(PCN.kids, sp.length) ? 'false' : 'true');

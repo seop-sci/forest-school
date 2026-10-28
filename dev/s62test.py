@@ -4,7 +4,7 @@
 #  2) 놓기: 가진 수보다 많이 놓을 수 없고, 치우기가 돼요. 지도에 그림이 그려지고 꾸미기 중에는 빈 자리 표시가 나와요
 #  3) 학교 이름(1~6글자)이 학교 카드와 간판에, 마크가 학교 카드에 보여요
 #  4) 저장했다 불러와도 남고, 옛 저장(deco 없음)과 망가진 저장도 받아 줘요. 업적 '학교 꾸미기' 값
-#  5) 꾸미기 가게 화면과 고르기 창이 넘치지 않아요(360 어두운, 390 밝은). 상점 거리의 가게 단추가 꾸미기 가게를 열어요. 페이지 오류 없음
+#  5) 꾸미기 가게 화면(2.1.0부터 한정 모자 5와 특별 가구 5도)과 고르기 창이 넘치지 않아요(360 어두운, 390 밝은). 상점 거리의 가게 단추가 꾸미기 가게를 열어요. 페이지 오류 없음
 # 쓰는 법: python3 wrap.py && python3 s62test.py   (마지막 줄이 PASS면 통과)
 import asyncio, json
 from playwright.async_api import async_playwright
@@ -74,7 +74,7 @@ async def main():
             r = await pg.evaluate("(() => ({ open: !document.querySelector('#panelDeco').hidden, items: document.querySelectorAll('#decoList [data-dbuy]').length, evart: Object.keys(window.FS_IMG200 || {}).filter(k => k.startsWith('evd_')).length, marks: document.querySelectorAll('#markRows [data-mk]').length, street: document.querySelector('.tab[data-tab=\"street\"]')?.getAttribute('aria-selected') }))()")
             r['over'] = await pg.evaluate(OVER, '#panelDeco')
             print(w, scheme, '가게', json.dumps(r))
-            if not r['open'] or r['items'] != 16 + r['evart'] or r['marks'] != 25 or r['over']: bad.append(f'{w} 가게 화면 {r}')
+            if not r['open'] or r['items'] != 16 + r['evart'] + 10 or r['marks'] != 25 or r['over']: bad.append(f'{w} 가게 화면 {r}')
             await pg.screenshot(path=f's62_{w}.png')
             await pg.evaluate("document.querySelector('#panelDeco').scrollTop = 9999"); await pg.wait_for_timeout(200)
             await pg.screenshot(path=f's62_{w}b.png')
