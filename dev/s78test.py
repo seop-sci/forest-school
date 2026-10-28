@@ -4,7 +4,7 @@
 #  2) 점수식과 승부: 별 × 20 + 주사위(0~60) + 응원, 같은 점수면 별 높은 쪽, 그래도 같으면 내 승. 별 하나 차이 뒤집기(많이 돌려 15~40%), 두 별 차이 10% 아래
 #  3) 상대 만들기: 같은 학교 연속 금지, 황금숲은 무지개 리그만, 종목 셋 서로 다름, 상대 별 1~5, 별 합 = 내 가장 좋은 배치 + 리그 보정(3~15)
 #  4) 판 끝: 승 +25, 3연승부터 +5씩(최대 +15), 패 −10과 1000 바닥, 첫 승리 도토리 하루 한 번, 주간 리그 하루 25점까지, 리그 승급과 황금(내려가지 않음),
-#     이긴 종목 과목 XP 10, 중학교 명부 능력치 +1(학생마다 하루 2번)
+#     이긴 종목 과목 XP 12와 한 판 체육 XP 5(2.1.0, 두 판 이기면 29), 중학교 명부 능력치 +1(학생마다 하루 2번)
 #  5) 하루 5판, 날이 바뀌면 다시. 저장 읽기(망가진 값), 퀘스트 bt1 bt2 bt3, 업적 battle league
 #  6) 390 밝은, 360 어두운 화면: 고르기, 겨루기, 결과 화면이 넘치지 않아요(캡처 s78_*). 페이지 오류 없음
 # 쓰는 법: python3 wrap.py && python3 s78test.py   (마지막 줄이 PASS면 통과)
@@ -43,8 +43,8 @@ async def main():
                 print('상대', r)
                 if not r['ok'] or r['rep'] or r['gold'] == 0 or r['nsum'] > 15: bad.append(f'상대 만들기가 틀려요 {r}')
                 r = await pg.evaluate(f"""(() => {{ const F = {F}, S = F.S; const out = {{}}; const mk = (w) => {{ const M = F.btMake(); M.me = F.btRoster().slice(0, 3); M.res = [0, 1, 2].map(i => ({{ win: w[i], ms: 3, os: 3, md: 0, od: 0, mc: 0, oc: 0 }})); return M; }};
-                  const b0 = S.budget, x0 = F.AC.keys.reduce((a, k) => a + ((a) => {{ let t = a.xp; for (let n = 1; n < a.lv; n++) t += 20 + 5 * n; return t; }})(S.ac[k]), 0);
-                  const o1 = F.btFinish(mk([true, true, false])); out.d1 = o1.d; out.acorn = S.budget > b0; out.dx = F.AC.keys.reduce((a, k) => a + ((a) => {{ let t = a.xp; for (let n = 1; n < a.lv; n++) t += 20 + 5 * n; return t; }})(S.ac[k]), 0) - x0;
+                  const b0 = S.budget, x0 = F.AC.keys.reduce((a, k) => a + ((a) => {{ let t = a.xp; for (let n = 1; n < a.lv; n++) t += F.AC.need(n); return t; }})(S.ac[k]), 0);
+                  const o1 = F.btFinish(mk([true, true, false])); out.d1 = o1.d; out.acorn = S.budget > b0; out.dx = F.AC.keys.reduce((a, k) => a + ((a) => {{ let t = a.xp; for (let n = 1; n < a.lv; n++) t += F.AC.need(n); return t; }})(S.ac[k]), 0) - x0;
                   const o2 = F.btFinish(mk([true, false, true])); out.acorn2 = !!o2.acorn;
                   const o3 = F.btFinish(mk([true, true, true])); out.d3 = o3.d;
                   const o4 = F.btFinish(mk([true, true, true])); out.d4 = o4.d;
@@ -54,7 +54,7 @@ async def main():
                   const twice = F.btFinish(o6 && mk([true, true, true])); out.st = S.bt.st;
                   return out; }})()""")
                 print('판 끝', r)
-                if r['d1'] != 25 or not r['acorn'] or r['dx'] != 20 or r['acorn2'] or r['d3'] != 30 or r['d4'] != 35 or r['lp'] != 20 or r['up'] != 1 or r['lg'] != 1: bad.append(f'승리 점수, 연승, 승급이 틀려요 {r}')
+                if r['d1'] != 25 or not r['acorn'] or r['dx'] != 29 or r['acorn2'] or r['d3'] != 30 or r['d4'] != 35 or r['lp'] != 20 or r['up'] != 1 or r['lg'] != 1: bad.append(f'승리 점수, 연승, 승급이 틀려요 {r}')
                 if r['d5'] != -10 or r['streak'] != 0 or r['floor'] != 1000 or r['lgKeep'] != 1: bad.append(f'패배 점수나 리그 유지가 틀려요 {r}')
                 # 중학교 명부 성장
                 r = await pg.evaluate(f"""(() => {{ const F = {F}, S = F.S; S.tier = 2; F.rosterEnsure(); const s = S.roster.list[0]; s.a = [50, 50, 50, 50, 50]; const M = F.btMake(); M.me = F.btRoster().slice(0, 3); M.evs = ['math', 'kor', 'sci'];
@@ -81,7 +81,7 @@ async def main():
             await pg.evaluate(f"{F}.btStart()"); await pg.wait_for_timeout(1200)
             for i in range(4): await pg.mouse.click(w // 2, 420); await pg.wait_for_timeout(60)
             await pg.screenshot(path=f's78_play_{w}.png')
-            await pg.wait_for_timeout(14000)
+            await pg.wait_for_timeout(22000)   # 2.1.0 시작 연출 1.4초 + 종목마다 응원 4초와 공개 2.1초
             ph = await pg.evaluate(f"{F}.btUI.M && {F}.btUI.M.phase")
             if ph != 'result': bad.append(f'{w} 결과 화면으로 안 넘어갔어요 {ph}')
             await pg.screenshot(path=f's78_result_{w}.png')

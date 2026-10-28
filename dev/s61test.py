@@ -39,7 +39,7 @@ async def main():
                   const old = JSON.parse(JSON.stringify(S)); delete old.es.x; const oldX = F.sanitize(old).es.x;
                   S.es.day = '2000-01-01'; const leftNew = F.esExLeft();
                   S.budget = 0; const e0 = S.ess; F.pickEss('ex'); F.buyEss(); const poor = [S.ess - e0, S.budget];
-                  const arb = F.ESHOP.acorn.ess * (F.ESHOP.ex.min / F.ESHOP.ex.n) > F.ESHOP.acorn.min;
+                  const arb = !F.essItem('acorn');   // 2.1.0: 정수로 도토리 묶음을 사는 길이 없어서 거꾸로 바꿔 남길 수 없어요
                   return {{ back, oldX, leftNew, poor, arb }}; }})()""")
                 print('저장과 날', json.dumps(r))
                 if r['back'] != 5 or r['oldX'] != 0 or r['leftNew'] != 5 or r['poor'] != [0, 0] or not r['arb']: bad.append(f'저장/날/모자람/거꾸로: {r}')

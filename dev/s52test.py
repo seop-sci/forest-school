@@ -43,7 +43,7 @@ async def main():
                 await pg.goto(URL); await pg.wait_for_timeout(3500)
                 await pg.evaluate(f"""(()=>{{ const F={F}, S=F.S; const t=document.querySelector('#tut'); if(t) t.hidden=true; S.tut.st='skip'; F.rt.tut=null; {CLEAN};
                   S.tier=1; S.tg=5; S.grade=2; S.budget=1e9; for (const k of ['classroom','cafeteria','library','playground','science']) S.f[k]=Math.max(10,S.f[k]||0);
-                  S.students=60; S.q.m=40; S.q.mb=0; S.q.subs=[]; F.fillSubs(); F.rt.mapLaid=-1; F.layoutMap(); F.renderMap(); F.renderHUD(); F.renderAffordance(); F.syncKids(); F.setTab('grad'); F.setTab('school'); }})()""")
+                  S.students=60; S.q.m=F.MAIN.findIndex(q=>q.id==='q23'); S.q.mb=0; S.q.subs=[]; F.fillSubs(); F.rt.mapLaid=-1; F.layoutMap(); F.renderMap(); F.renderHUD(); F.renderAffordance(); F.syncKids(); F.setTab('grad'); F.setTab('school'); }})()""")
                 await pg.wait_for_timeout(1500)
                 # 더 나쁜 경우: 지도를 위로 끝까지 밀어 둔 채 행사를 열어요
                 await pg.evaluate(f"{F}.festFocus(520, 540)"); await pg.wait_for_timeout(300)

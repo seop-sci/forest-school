@@ -15,7 +15,7 @@ CLEAN = "document.querySelectorAll('.overlay.center').forEach(o=>{o.hidden=true;
 SKIP = f"(()=>{{ const t=document.querySelector('#tut'); if(t) t.hidden=true; {F}.S.tut.st='skip'; {F}.rt.tut=null; {CLEAN}; }})()"
 kst = lambda y, m, d: calendar.timegm((y, m, d, 3, 0, 0)) * 1000
 NOTE = '도토리 양은 학교가 성장할수록 커져요'
-PROMOTE = f"""(() => {{ const F = {F}, S = F.S; S.tier = 1; S.tg = 5; S.p.species = 6; Object.assign(S.f, {{ classroom: 38, cafeteria: 30, library: 28, playground: 28, science: 18 }});
+PROMOTE = f"""(() => {{ const F = {F}, S = F.S; S.tier = 1; S.tg = 5; S.sem = 1; S.p.species = 6; Object.assign(S.f, {{ classroom: 38, cafeteria: 30, library: 28, playground: 28, science: 18 }});
   for (const k in S.fu) S.fu[k] = S.fu[k].map(() => S.f[k]); S.students = 158; S.tdip = 250; S.grade = 4; S.best = 4;
   S.q.m = F.MAIN.findIndex(q => q.id === 'e39'); S.q.lat = ''; F.checkGrade(); F.promote(); {CLEAN}; F.clubAuto(true); return S.tier; }})()"""
 
@@ -74,16 +74,14 @@ async def main():
           F.pickShop('c:hat:ev_lunch'); const on = S.cos.hat; F.setTab('school');
           return {{ cur: S.ev.cur, own0, own1, shown, on, n: F.EV_HAT.length, art }}; }})()""")
         if r['own0'] or not r['own1'] or not r['shown'] or r['on'] != 'ev_lunch' or r['n'] != 23 or r['art'] != 23: fails.append(f'이벤트 한정 모자 {r}')
-        # (4) 부스터 묶음
-        r = await pg.evaluate(f"""(()=>{{ const F={F}, S=F.S; F.rt.fakeNow = 0; S.gold = 20; const b0 = S.budget, now = Date.now();
-          S.hd.feastUntil = 0; S.autoUntil = 0; F.setTab('shop'); F.pickShop('b:all'); F.buyShop(); {CLEAN};
-          return {{ all: F.BOOST_ALL(), gold: S.gold, feast: S.hd.feastUntil > now + 500000, auto: S.autoUntil > now + 500000, got: S.budget > b0,
-            txt: document.querySelector('#panelShop').textContent }}; }})()""")
-        if r['all'] != {'full': 11, 'price': 10} or r['gold'] != 10 or not (r['feast'] and r['auto'] and r['got']): fails.append(f'부스터 묶음 {dict((k, r[k]) for k in r if k != "txt")}')
-        if '부스터 세 가지 묶음' not in r['txt'] or '10% 할인' not in r['txt'] or NOTE not in r['txt'] or '분치' in r['txt']: fails.append('황금 상점 글자')
+        # (4) 2.1.0: 황금 도토리 부스터 묶음은 빼고(황금은 꾸미기에만), 수업료 2배는 문방구 정수 부스터로
+        r = await pg.evaluate(f"""(()=>{{ const F={F}, S=F.S; F.setTab('shop'); const t = document.querySelector('#panelShop').textContent; {CLEAN};
+          return {{ item: F.shopItem('b:all'), boost: !!document.querySelector('#shopList [data-buy^="b:"]'), feast: !!F.essItem('bf'), txt: t }}; }})()""")
+        if r['item'] is not None or r['boost'] or not r['feast']: fails.append(f'부스터 자리 {dict((k, r[k]) for k in r if k != "txt")}')
+        if '부스터 세 가지 묶음' in r['txt'] or '분치' in r['txt']: fails.append('꾸미기 백화점 글자')
         await pg.screenshot(path='s70_shop.png')
         r = await pg.evaluate(f"""(()=>{{ const F={F}; F.setTab('ess'); F.renderEssShop(); return document.querySelector('#panelEss').textContent; }})()""")
-        if NOTE not in r or '분치' in r: fails.append('정수 상점 글자')
+        if NOTE not in r or '분치' in r: fails.append('문방구 글자')
         r = await pg.evaluate(f"""(()=>{{ const F={F}; F.setTab('school'); const g = document.querySelector('#attGrid'); if (g) F.renderAtt && F.renderAtt(); return g ? g.textContent : ''; }})()""")
         if '분치' in r: fails.append(f'출석부에 분치 {r[:80]}')
 
