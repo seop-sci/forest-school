@@ -44,6 +44,22 @@ const as = (d, uid) => d.as({ uid, provider: 'anonymous' });
   out('2-2 처음 쓰기 50,001은 막힘', big, false, '정상');
 }
 
+// Codex 검토(2, 2026-10-28): at을 서버보다 60초 과거로 직접 적으며 0.1초마다 점수 +2000, 리그 +1000
+{
+  let d = db(true), t = NOW, ok = 0;
+  let r = as(d, 'A').write('/forest/rank/A', RANK({ score: 0, at: t - 60000, pid: 'ATTACK04', week: 42, lp: 0, ws: 42000000 }), { now: t });
+  if (r.allowed) d = r.newDatabase;
+  let score = 0, lp = 0;
+  for (let i = 0; i < 10; i++) {
+    t += 100; score += 2000; lp += 1000;
+    r = as(d, 'A').write('/forest/rank/A', RANK({ score, at: t - 60000, pid: 'ATTACK04', week: 42, lp, ws: 42 * 1e6 + lp }), { now: t });
+    if (r.allowed) { ok++; d = r.newDatabase; }
+  }
+  out('Codex 2 과거 at으로 0.1초마다 올리기가 막혀야 해요', ok, 0, `${ok}/10번 통과`);
+  const fine = as(db(true), 'B').write('/forest/rank/B', RANK({ score: 10, at: NOW, pid: 'GOOD0004' }), { now: NOW }).allowed;
+  out('Codex 2 서버 시각(at = 지금)으로 쓰기는 돼요', fine, true, '정상');
+}
+
 // 2-3 남의 pid로 쓰기
 {
   const r = as(db(true), 'A').write('/forest/rank/A', RANK({ score: 10, at: NOW, pid: 'VICTIM01' }), { now: NOW });
