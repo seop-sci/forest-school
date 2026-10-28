@@ -66,13 +66,14 @@ async def main():
         if r['hard'] or 'ups' in r['fb'] or 'trains' in r['fb'] or r['d'] != 3: fails.append(f'어려운 미션 빼기 {r}')
         # (2-2) 도장 7개째에 그 이벤트 한정 학생 모자(그림이 있을 때), 상점에서는 살 수 없어요
         r = await pg.evaluate(f"""(()=>{{ const F={F}, S=F.S; F.rt.fakeNow={kst(2026, 11, 24)}; S.clk.last=0; F.evSync();
-          window.FS_IMG200.cos_hat_ev_lunch = window.FS_IMG170.ev_box; const key = 'hat:ev_lunch';
+          const art = F.EV_HAT.filter(([k]) => (window.FS_IMG200 || {{}})['cos_hat_ev_' + k]).length;   // 작업지시서 27 그림 23개(2026-10-28 넣음)
+          const key = 'hat:ev_lunch';
           const shop0 = F.pickShop('c:hat:ev_lunch'); const own0 = S.cos.own.includes(key);
           S.ev.stamp = {{ n: 6, last: '' }}; F.claimStamp(); {CLEAN}; const own1 = S.cos.own.includes(key);
           F.setTab('shop'); const shown = document.querySelector('#shopList').textContent.includes('요리사 모자');
           F.pickShop('c:hat:ev_lunch'); const on = S.cos.hat; F.setTab('school');
-          return {{ cur: S.ev.cur, own0, own1, shown, on, n: F.EV_HAT.length }}; }})()""")
-        if r['own0'] or not r['own1'] or not r['shown'] or r['on'] != 'ev_lunch' or r['n'] != 23: fails.append(f'이벤트 한정 모자 {r}')
+          return {{ cur: S.ev.cur, own0, own1, shown, on, n: F.EV_HAT.length, art }}; }})()""")
+        if r['own0'] or not r['own1'] or not r['shown'] or r['on'] != 'ev_lunch' or r['n'] != 23 or r['art'] != 23: fails.append(f'이벤트 한정 모자 {r}')
         # (4) 부스터 묶음
         r = await pg.evaluate(f"""(()=>{{ const F={F}, S=F.S; F.rt.fakeNow = 0; S.gold = 20; const b0 = S.budget, now = Date.now();
           S.hd.feastUntil = 0; S.autoUntil = 0; F.setTab('shop'); F.pickShop('b:all'); F.buyShop(); {CLEAN};
