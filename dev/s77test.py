@@ -3,7 +3,7 @@
 #  1) 시험 주: 4주마다 한 주(gameWeek % 4 === 2), exPrev와 exDays가 맞아요. 유치원에서는 안 열려요
 #  2) 자율학습: 시험 주에만, 도서관이 있어야, 하루 한 번. XP는 20 + 도서관 Lv(60까지). 날이 바뀌면 다시
 #  3) 성적표: 시험 주에 왔던 학교만, 시험 주가 끝나면 한 장. 등급은 상한 대비 80/60/40%, 자율학습 한 번마다 +3%(5번까지).
-#     중학교부터는 명부 평균과 반반. 받으면 도토리(점수 × 6분치 보정), 모두 A면 황금 3, 15점 이상 1. 두 번 받을 수 없어요
+#     중학교부터는 학력 0.6 + 명부 평균 0.4(2.1.0, 학력 상한과 명부 90이면 0.96). 받으면 도토리(점수 × 6분치 보정), 모두 A면 황금 3, 15점 이상 1. 두 번 받을 수 없어요
 #  4) 상장: 받은 뒤 다음 시험까지 교실 창에 전교 1등. 저장: 망가진 성적표는 버려요
 #  5) 390 밝은, 360 어두운 화면에서 시험 창과 공부 탭 시험 줄이 넘치지 않아요(캡처 s77_*). 페이지 오류 없음
 # 쓰는 법: python3 wrap.py && python3 s77test.py   (마지막 줄이 PASS면 통과)
@@ -33,7 +33,7 @@ async def main():
                 await pg.evaluate(TO_EX)
                 r = await pg.evaluate(f"""(() => {{ const F = {F}, S = F.S; S.tier = 1; S.f.library = 0; S.students = 100; const out = {{}};
                   F.exTick(); out.cur = S.ex.cur; out.noLib = F.exStudy('math'); S.f.library = 12;
-                  const x0 = ((a) => {{ let t = a.xp; for (let n = 1; n < a.lv; n++) t += 20 + 5 * n; return t; }})(S.ac.math); out.a = F.exStudy('math'); out.dx = ((a) => {{ let t = a.xp; for (let n = 1; n < a.lv; n++) t += 20 + 5 * n; return t; }})(S.ac.math) - x0; out.b = F.exStudy('kor');
+                  const x0 = ((a) => {{ let t = a.xp; for (let n = 1; n < a.lv; n++) t += F.AC.need(n); return t; }})(S.ac.math); out.a = F.exStudy('math'); out.dx = ((a) => {{ let t = a.xp; for (let n = 1; n < a.lv; n++) t += F.AC.need(n); return t; }})(S.ac.math) - x0; out.b = F.exStudy('kor');
                   out.days = F.exDays(); out.prev = F.exPrev();
                   F.rt.fakeNow = F.gameNow() + 86400000; if (F.exNow()) {{ out.c = F.exStudy('kor'); }} else out.c = 32;
                   return out; }})()""")
@@ -55,7 +55,7 @@ async def main():
                 r = await pg.evaluate(f"""(() => {{ const F = {F}, S = F.S; S.tier = 2; F.rosterEnsure(); for (const s of S.roster.list) s.a = [90, 90, 90, 90, 90]; for (const k of F.AC.keys) S.ac[k].lv = 30; S.ex.ss = 0;
                   F.exTick(); const sc = F.exScore('math'); F.rt.fakeNow = F.gameNow() + 7 * 86400000; F.exTick(); const g0 = S.gold; F.exClaim(); return {{ sc, g: S.ex.rep.g, dg: S.gold - g0, a: S.ex.st.a }}; }})()""")
                 print('중학교', r)
-                if abs(r['sc'] - 0.95) > 1e-9 or r['g'] != ['A'] * 5 or r['dg'] != 3 or r['a'] != 1: bad.append(f'중학교 성적이나 모두 A 보상이 틀려요 {r}')
+                if abs(r['sc'] - 0.96) > 1e-9 or r['g'] != ['A'] * 5 or r['dg'] != 3 or r['a'] != 1: bad.append(f'중학교 성적이나 모두 A 보상이 틀려요 {r}')
                 # 4) 저장
                 r = await pg.evaluate(f"""(() => {{ const F = {F}; const d = JSON.parse(JSON.stringify(F.S)); const a = F.sanitize(d);
                   const d2 = JSON.parse(JSON.stringify(F.S)); d2.ex = {{ cur: 'x', ss: 99, day: 3, rep: {{ wk: 5, g: ['A', 'Z', 'A', 'A', 'A'] }}, st: {{ n: 2, best: 99, a: 9 }} }}; const c = F.sanitize(d2);

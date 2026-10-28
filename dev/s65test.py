@@ -1,9 +1,9 @@
 # 2.0.0 시험: 학생 명부, 능력치, 동아리(자동 추천, 보너스, 바꾸기), 발표회, 주간 성장, 저장
 # 보는 것
-#  1) 초등학교 졸업식을 열면 중학교 명부 12명이 생기고(방금 전학 온 햄스터 포함, 동물이 겹치지 않게), 동아리는 비어 있어요. 졸업식 사진(S.snap[1])이 남아요
+#  1) 초등학교 졸업식을 열면 중학교 명부 15명이 생기고(2.1.0, 방금 전학 온 햄스터 포함, 만난 12종이 모두 들어가요), 동아리는 비어 있어요. 졸업식 사진(S.snap[1])이 남아요
 #  2) 자동 추천: 동아리마다 3명, 두 학생을 맞바꿔도 별 합이 더 커지지 않아요(가장 좋은 나누기). 보너스는 별 하나에 2%, 30%까지, 미술부 할인은 절반
 #  3) 보너스가 수업료, 행사 보상, 장식 값에 들어가고 값이 유한해요. 동아리 바꾸기(자리가 차 있으면 맞바꿈)와 빼기
-#  4) 발표회: 부원 능력치 +5, 수업료 30분치, 하루 한 번(게임 시계). 한 주가 지나면 부원이 자라고, 동아리 건물을 키우면 부원 +1
+#  4) 발표회: 부원 능력치 +4(2.1.0), 수업료 30분치, 하루 한 번(게임 시계). 한 주가 지나면 부원이 자라고, 동아리 건물을 키우면 부원 +1
 #  5) 저장했다 불러와도 남고, 옛 저장과 망가진 명부도 받아 줘요. 퀘스트 측정(club, clubSum, star, clubShown, fpUp)
 #  6) 복도와 동아리실 화면이 넘치지 않아요(390 밝은, 360 어두운). 페이지 오류 없음
 # 쓰는 법: python3 wrap.py && python3 s65test.py   (마지막 줄이 PASS면 통과)
@@ -16,7 +16,7 @@ SKIP = f"(()=>{{ const t=document.querySelector('#tut'); if(t) t.hidden=true; {F
 OVER = """(sel) => { const W = innerWidth; const r = document.querySelector(sel); if (!r) return -1;
   return [...r.querySelectorAll('*')].filter(e => { const q = e.getBoundingClientRect(); return q.width && e.offsetParent !== null && (q.right > W + 1 || q.left < -1); }).length; }"""
 # 초등학교 6학년 끝(졸업식 퀘스트)에서 졸업식을 열어요
-PROMOTE = f"""(() => {{ const F = {F}, S = F.S; S.tier = 1; S.tg = 5; S.p.species = 6; Object.assign(S.f, {{ classroom: 38, cafeteria: 30, library: 28, playground: 28, science: 18 }});
+PROMOTE = f"""(() => {{ const F = {F}, S = F.S; S.tier = 1; S.tg = 5; S.sem = 1; S.p.species = 6; Object.assign(S.f, {{ classroom: 38, cafeteria: 30, library: 28, playground: 28, science: 18 }});
   for (const k in S.fu) S.fu[k] = S.fu[k].map(() => S.f[k]); S.students = 158; S.tdip = 250; S.grade = 4; S.best = 4;
   S.q.m = F.MAIN.findIndex(q => q.id === 'e39'); S.q.lat = ''; F.checkGrade();
   const can = F.canPromote(); F.promote(); {CLEAN};
@@ -34,7 +34,7 @@ async def main():
             r = await pg.evaluate(PROMOTE)
             print('졸업식', json.dumps(r, ensure_ascii=False))
             if not r['can'] or r['tier'] != 2: bad.append(f'졸업식을 열지 못했어요 {r}')
-            if r['n'] != 12 or len(set(r['sp'])) != 12 or 'hamster' not in r['sp']: bad.append(f'명부 {r["sp"]}')
+            if r['n'] != 15 or len(set(r['sp'])) != 12 or 'hamster' not in r['sp']: bad.append(f'명부 {r["sp"]}')
             if r['clubs'] != 0: bad.append(f'처음 동아리가 비어 있어야 해요 {r["clubs"]}')
             if not r['snap'] or r['snap']['classroom'] != 38: bad.append(f'졸업식 사진 {r["snap"]}')
             if r['tfp'] != r['fperks']: bad.append(f'tfp {r}')
@@ -53,7 +53,7 @@ async def main():
                   const fest = F.festPrize(false), dc0 = F.decoCost0('bench'), dc = F.decoCost('bench');
                   return {{ q0, q1, qs, r0, r1, per, t0, better, pct, show, stars, sum: F.clubSum(), tm: F.clubTuitionMult(), fm: F.clubFestMult(), off: F.clubDecoOff(), fest, dc0, dc }}; }})()""")
                 print('자동 추천', json.dumps(r))
-                if sum(r['per']) != 12 or max(r['per']) > 3 or r['q0'] != 0 or r['q1'] != 12: bad.append(f'나누기 {r}')   # 2.0.1 다섯 곳에 12명(자리 15)
+                if sum(r['per']) != 15 or max(r['per']) > 3 or r['q0'] != 0 or r['q1'] != 15: bad.append(f'나누기 {r}')   # 2.1.0 다섯 곳에 15명(자리 15)
                 if r['better']: bad.append(f'자동 추천보다 나은 맞바꾸기가 {r["better"]}개 있어요')
                 if any(p != min(30, 2 * s) for p, s in zip(r['pct'], r['stars'])): bad.append(f'보너스 계산 {r["pct"]} {r["stars"]}')
                 if r['show'][3] != r['pct'][3] // 2 or r['sum'] != sum(r['show']) or r['qs'] != r['sum']: bad.append(f'보이는 보너스 {r}')
@@ -72,7 +72,7 @@ async def main():
                 print('바꾸기', json.dumps(r))
                 exp = r['before'] if r['full0'] else [r['before'][0] + 1, r['before'][1] - 1] + r['before'][2:]
                 if r['after'] != exp or r['moved'] != 0 or (r['full0'] and r['lowc'] != 1): bad.append(f'꽉 찬 동아리 맞바꾸기 {r}')
-                if r['out'][0] != -1 or sum(r['out'][1]) != 11: bad.append(f'동아리 빼기 {r["out"]}')
+                if r['out'][0] != -1 or sum(r['out'][1]) != 14: bad.append(f'동아리 빼기 {r["out"]}')
                 # 발표회, 하루 한 번
                 r = await pg.evaluate(f"""(() => {{ const F = {F}, S = F.S; F.rt.fakeNow = Date.now() + 10 * 86400000;
                   const ready0 = F.showReady(), mem = F.clubMembers(2), a0 = mem.map(s => s.a[2]), b0 = S.budget, prize = Math.max(10, F.nice(F.rate() * 60 * 30));
@@ -83,7 +83,7 @@ async def main():
                   return {{ ready0, ok, a0, a1, got, prize, ready1, again, ready2, shows: S.st.shows, shown: S.club.shown, q }}; }})()""")
                 print('발표회', json.dumps(r))
                 if not (r['ready0'] and r['ok'] and not r['ready1'] and not r['again'] and r['ready2']): bad.append(f'발표회 하루 한 번 {r}')
-                if any(min(100, x + 5) != y for x, y in zip(r['a0'], r['a1'])): bad.append(f'발표회 능력치 {r["a0"]} {r["a1"]}')
+                if any(min(100, x + 4) != y for x, y in zip(r['a0'], r['a1'])): bad.append(f'발표회 능력치 {r["a0"]} {r["a1"]}')
                 if abs(r['got'] - r['prize']) > 1e-6 * r['prize'] + 1 or r['shows'] != 1 or r['shown'] != [0, 0, 1, 0, 0] or r['q'] != [1, 1]: bad.append(f'발표회 보상과 기록 {r}')
                 # 주간 성장과 건물 성장
                 r = await pg.evaluate(f"""(() => {{ const F = {F}, S = F.S, L = S.roster.list;
@@ -91,7 +91,7 @@ async def main():
                   const sci = F.clubMembers(0), s0 = sci.map(s => s.a[0]), lv = S.f.science, none = L.filter(s => s.c < 0).map(s => s.a.slice());
                   F.clubWeekTick(); const s1 = sci.map(s => s.a[0]);
                   const before = sci.map(s => s.a[0]); S.budget = 1e30; for (const k in S.fu) S.fu[k] = S.fu[k].map(() => 99);
-                  const okb = F.buyFacility('science'); const s2 = sci.map(s => s.a[0]);
+                  const okb = F.buyFacility('science'); F.conFinish('science'); const s2 = sci.map(s => s.a[0]);
                   return {{ w, wk: S.roster.wk, lv, s0, s1, before, okb, s2, none, none2: L.filter(s => s.c < 0).map(s => s.a.slice()) }}; }})()""")
                 print('성장', json.dumps(r))
                 g = 5 + r['lv'] // 10
