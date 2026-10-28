@@ -568,6 +568,7 @@ label.srow,button.srow{cursor:pointer}
 .sb .tx span{font-size:12.5px;line-height:1.4;color:var(--muted)}
 .sb .buy{flex:none;display:flex;align-items:center;gap:4px;min-height:38px;padding:0 12px;border:0;border-radius:11px;background:var(--accent);color:var(--accent-ink);font-family:var(--font-chalk);font-weight:700;font-size:17px;box-shadow:0 3px 0 var(--accent-shadow);cursor:pointer}
 .sb .buy svg{width:15px;height:15px}
+.sb .buy s{margin-right:2px;font-size:13px;opacity:.6}   /* 2.1.0 할인 전 값 */
 .sb .buy.poor{background:var(--line);color:var(--muted);box-shadow:0 3px 0 var(--line-shadow)}
 .shop-ask{margin:10px 0 0;padding:10px 12px;border-radius:14px;background:var(--chip-bg);color:var(--chip-ink);text-align:center}
 .modal .shop-ask p{margin:0 0 8px;color:var(--chip-ink);font-size:14px}
@@ -2645,7 +2646,7 @@ span.bt-stamp{display:grid;place-items:center;border-radius:50%;border:3px solid
           <div class="btn-row"><button class="btn-sub" type="button" id="tierNo">취소</button><button class="cta" type="button" id="tierYes">졸업식 열기</button></div>
         </div>
       </div>
-      <h3 class="qsec second" id="perkHead">명예 교장실 <small>한 번 고치면 종업식을 열어도 효과가 남아요. 졸업하면 처음부터예요</small></h3>
+      <h3 class="qsec second" id="perkHead">명예 교장실 <small>한 번 고치면 종업식을 열어도 효과가 남아요.<br>단, 졸업하면 처음부터예요.</small></h3>
       <p class="fund-have" id="perkHave"></p>
       <div class="perks" id="perkList"></div>
       <h3 class="qsec second" id="fundHead">장학재단 <small>기금으로 고치면 졸업해도 효과가 남아요</small></h3>
@@ -8978,7 +8979,7 @@ span.bt-stamp{display:grid;place-items:center;border-radius:50%;border:3px solid
           return `<button class="th-all${poor ? ' poor' : ''}" type="button" data-buy="s:${t.id}"><span>${R.left.length === TH_SLOTS.length ? '세트 한 번에 사기' : `남은 ${R.left.length}개 한 번에`}${R.left.length >= 2 ? ` <small>${Math.round(TH_SET_SALE * 100)}% 할인</small>` : ''}</span><b>${R.left.length >= 2 ? `<s>${R.full}</s>` : ''}${coin}${R.price}</b></button>`; })()) +
         (() => { const own = TH_SLOTS.filter(([sl]) => thOwn(t.id, sl)), on = own.every(([sl]) => S.cos.th[sl] === t.id);
           return own.length >= 2 ? `<button class="th-apply${on ? ' on' : ''}" type="button" data-apply="${t.id}" aria-pressed="${on}">${on ? '이 테마를 모두 쓰는 중' : done ? '이 테마로 한 번에 바꾸기' : `가진 ${own.length}개 한 번에 쓰기`}</button>` : ''; })() +
-        `<p class="th-bonus">${done ? `세트 효과 수업료 +${t.bonus}% 받는 중` : `모두 모으면 수업료 +${t.bonus}%`}. 배경을 사면 바깥 색, 칠판 색, 학교 배경음악도 바뀌어요</p><div class="shop-grid">`;
+        `<p class="th-bonus">${done ? `세트 효과 수업료 +${t.bonus}% 받는 중. 학교 배경음악도 바뀌어요.` : `모두 모으면 수업료 +${t.bonus}%, 학교 배경음악도 바뀌어요.`}</p><div class="shop-grid">`;
       for (const [slot, sname] of TH_SLOTS) {
         const own = thOwn(t.id, slot), on = S.cos.th[slot] === t.id, price = thPrice(t, slot), poor = !own && S.gold < price;
         const pr = on ? '쓰는 중' : own ? '쓰기' : `${coin}${price}`;
@@ -9080,8 +9081,8 @@ span.bt-stamp{display:grid;place-items:center;border-radius:50%;border:3px solid
     const coin = `<svg viewBox="-8 -11 16 20" aria-hidden="true">${GOLD_ICON.slice(GOLD_ICON.indexOf('>') + 1, -6)}</svg>`;
     let h = '<h3 class="shop-h">부스터 <small>(1회 사용 가능)</small></h3>';
     { const all = BOOST_ALL(), poor = S.gold < all.price;   // 2.0.0 세 가지 한꺼번에 10% 할인(지섭)
-      h += `<div class="sb boost-all"><span class="pv">${BOOST_ART.skip}</span><span class="tx"><b>부스터 세 가지 묶음 <em class="sale">10% 할인</em></b><span>세 가지를 한꺼번에 바로 써요 (원래 ${all.full})</span></span>` +
-        `<button class="buy${poor ? ' poor' : ''}" type="button" data-buy="b:all" aria-label="부스터 세 가지 묶음, 황금 도토리 ${all.price}개">${coin}${all.price}</button></div>`; }
+      h += `<div class="sb boost-all"><span class="pv">${BOOST_ART.skip}</span><span class="tx"><b>부스터 세 가지 묶음 <em class="sale">10% 할인</em></b><span>세 가지를 한꺼번에 바로 써요</span></span>` +
+        `<button class="buy${poor ? ' poor' : ''}" type="button" data-buy="b:all" aria-label="부스터 세 가지 묶음, 원래 ${all.full}개에서 할인한 황금 도토리 ${all.price}개"><s>${all.full}</s>${coin}${all.price}</button></div>`; }   // 2.1.0 테마 세트처럼 원래 값에 취소선
     for (const k of Object.keys(BOOSTERS)) {
       const B = BOOSTERS[k], poor = S.gold < B.price;
       h += `<div class="sb"><span class="pv">${BOOST_ART[k]}</span><span class="tx"><b>${B.name}</b><span>${B.desc}</span></span>` +
@@ -12524,7 +12525,7 @@ span.bt-stamp{display:grid;place-items:center;border-radius:50%;border:3px solid
     if ($('#tierReqs').innerHTML !== html) $('#tierReqs').innerHTML = html;
     $('#tierFund').textContent = fmt(f);
     $('#tierNote').textContent = !open
-      ? `${N.name}는 다음 업데이트에 열려요. 그동안 종업식을 열어 수료증을 모아 두면 졸업할 때 기금이 늘어요.`
+      ? `${N.name}는 숲속 교육부가 열심히 준비 중이에요. 그동안 종업식을 열어 수료증을 모아 두면 졸업할 때 기금이 늘어요.`
       : can ? `지금 졸업하면 기금 ${fmt(f)}${numEul(f)} 받아요. ${nextFundNote()}`
       : `이 학교급에서 모은 수료증 ${FUND_PER}장마다 기금이 1씩 늘어요. 올해 수료증도 함께 쳐요. 지금까지 ${fmt(S.tdip)}장을 모았어요.`;
     const btn = $('#tierBtn');
@@ -13206,7 +13207,7 @@ span.bt-stamp{display:grid;place-items:center;border-radius:50%;border:3px solid
   function buildQuestPanel() {
     const i = S.q.m, q = MAIN[i];
     if (!q) {
-      $('#qMain').innerHTML = '<div class="qall"><b>메인 퀘스트를 모두 마쳤어요</b><p>숲속 초등학교까지 왔어요! 중학교는 다음 업데이트에 열려요. 그동안 종업식으로 수료증을 모으고 학생들의 부탁도 들어주세요.</p></div>';
+      $('#qMain').innerHTML = '<div class="qall"><b>메인 퀘스트를 모두 마쳤어요</b><p>끝까지 왔어요! 다음 학교급은 숲속 교육부가 열심히 준비 중이에요. 그동안 종업식으로 수료증을 모으고 학생들의 부탁도 들어주세요.</p></div>';
     } else {
       const ch = q.ch, list = [];
       MAIN.forEach((m, j) => { if (m.ch === ch) list.push(j); });
