@@ -64,13 +64,14 @@ CHECK = r"""() => {
 FOCUS = r"""() => { const F = window.__forest; return ['q18', 'k5'].map(id => [id, F.needCost(F.MAIN.find(q => q.id === id))]); }"""
 # 퀘스트를 따라 하는 사람처럼 유치원을 끝까지 해 보며 도토리가 폭발하지 않는지, 오래 막히지 않는지 봐요
 FLOW = r"""() => {
-  const F = window.__forest, S = () => F.S; let t = 0, maxB = 0, maxWait = 0, qid = '', qt = 0, pick = 0, tri = 0; const dt = 2;
+  const F = window.__forest, S = () => F.S; let t = 0, maxB = 0, maxWait = 0, qid = '', qt = 0, pick = 0, tri = 0; const dt = 2, t0 = Date.now();
   const ev = n => Math.floor(t / n) !== Math.floor((t - dt) / n);   // 2.0.1: n초마다 한 번(다른 퀘스트의 pick 셈과 따로)
   const buy = () => { const r = F.recommend(); if (!r) return false;
     if (r.kind === 'tea') return S().budget >= F.teaCost(r.k) && F.teacherAct(r.k);
     if (r.kind === 'fur') return S().budget >= F.furCost(r.k, r.i) && F.buyFur(r.k, r.i, true);
     return S().budget >= F.facCost(r.k) && F.buyFacility(r.k); };
   while (t < 6 * 3600 && S().tier === 0) {
+    F.rt.fakeNow = t0 + t * 1000; F.conTick();   // 2.1.0 공사 시간(유치원 5초)도 게임 시계로 끝나요
     const s = S(), cap = F.capacity(); if (s.students < cap) s.students = Math.min(cap, s.students + F.CFG.enroll * dt);
     const g = F.rate() * dt; s.budget += g; F.earn(g); t += dt;
     const q = F.curMain(), id = q ? q.id : '';
@@ -109,6 +110,7 @@ FLOW2 = r"""() => {
   const F = window.__forest, S = () => F.S; let t = 0, maxB = 0, maxWait = 0, qid = '', qt = 0, pick = 0, tri = 0, waitAt = '', tripEnd = 0; const dt = 10, t0 = Date.now();
   const ev = n => Math.floor(t / n) !== Math.floor((t - dt) / n);   // 2.0.1: n초마다 한 번(다른 퀘스트의 pick 셈과 따로)
   const s0 = S(); s0.tier = 1; s0.tg = 5; s0.p.species = 6; Object.assign(s0.f, { classroom: 38, cafeteria: 30, library: 28, playground: 28, science: 18 });
+  s0.sem = 1;   // 2.1.0 졸업식은 6학년 2학기에
   for (const k in s0.fu) s0.fu[k] = s0.fu[k].map(() => s0.f[k]); s0.students = 158; s0.tdip = 250; s0.grade = 4; s0.best = 4;
   s0.q.m = F.MAIN.findIndex(q => q.id === 'e39'); s0.q.lat = ''; F.checkGrade();
   if (!F.canPromote()) return { err: '졸업식을 열 수 없어요' };
@@ -120,13 +122,14 @@ FLOW2 = r"""() => {
       else ok = S().budget >= F.facCost(r.k) && F.buyFacility(r.k); }
     if (ok) return true;
     const c = [];
-    for (const k of F.facKeys()) { if (F.furReady(k)) c.push([F.facCost(k), () => F.buyFacility(k)]); else F.FUR[k].forEach((_, j) => { if (!F.furDone(k, j)) c.push([F.furCost(k, j), () => F.buyFur(k, j, true)]); }); }
+    for (const k of F.facKeys()) { if (F.conOn(k)) continue; if (F.furReady(k)) c.push([F.facCost(k), () => F.buyFacility(k)]); else F.FUR[k].forEach((_, j) => { if (!F.furDone(k, j)) c.push([F.furCost(k, j), () => F.buyFur(k, j, true)]); }); }
     for (const k of Object.keys(F.TEA)) if (!F.teaMaxed(k)) c.push([F.teaCost(k), () => F.teacherAct(k)]);
     c.sort((a, b) => a[0] - b[0]);
     return !!c.length && c[0][0] <= S().budget && c[0][1](); };
   for (let i = 0; i < 40; i++) { const ks = Object.keys(F.FPERKS).sort((a, b) => F.fpCost(a) - F.fpCost(b)); if (F.fpCost(ks[0]) > S().fund) break; F.buyFundPerk(ks[0], document.body); }
-  while (t < 60 * 3600 && F.curMain()) {
-    const s = S(); F.rt.fakeNow = t0 + t * 1000;
+  // 2.1.0: 공사가 끝나기를 기다리는 동안 도토리가 더 쌓이고 한 퀘스트가 길어져서 기준을 넓혔어요(막힘 2,000분, 도토리 1e17 = 중학교 공사비 배수 5억 × 2억)
+  while (t < 120 * 3600 && F.curMain()) {   // 2.1.0 공사 시간과 두 학기로 중학교가 길어졌어요(자동 플레이 약 78시간)
+    const s = S(); F.rt.fakeNow = t0 + t * 1000; F.conTick();
     const cap = F.capacity(); if (s.students < cap) s.students = Math.min(cap, s.students + F.CFG.enroll * dt);
     const g = F.rate() * dt; s.budget += g; F.earn(g); t += dt;
     const q = F.curMain(), id = q ? q.id : '';
@@ -143,7 +146,9 @@ FLOW2 = r"""() => {
     if (q && q.t === 'acMax' && ev(60)) F.acGain('math', 20);   // 2.0.1 공부: 퍼즐 한 판(약 20 XP)을 1분에 한 번
     if (q && q.t === 'acBook' && ev(30)) { s.ess += 10; F.acBuyBook('kor'); }   // 문제집 한 권
     if (q && (q.t === 'btPlays' || q.t === 'btMid') && ev(120)) { s.bt.st.w += 1; s.bt.st.wm += F.S.tier >= 2 ? 1 : 0; }   // 2.0.1 숲속 대결: 2분에 한 판 이김
-    if (q && q.t === 'btLg' && ev(600)) s.bt.lg = Math.max(s.bt.lg, 1);   // 동 리그: 이긴 판 넷쯤
+    if (q && q.t === 'btLg' && ev(600)) s.bt.lg = Math.min(q.n, s.bt.lg + 1);   // 2.1.0 학기 숙제 리그: 10분에 한 리그씩(사람은 며칠)
+    if (q && q.t === 'btWins' && ev(120)) s.bt.st.w += 1;   // 2.1.0 학기 숙제: 2분에 한 판 이김
+    if (q && q.t === 'acSum' && ev(60)) F.acGain(F.AC.keys[Math.floor(t / 60) % 5], 20);   // 2.1.0 학기 숙제: 과목을 돌아가며 공부
     if (s.roster.list.some(x => x.c >= 0) && F.showReady()) { const c = [0, 1, 2, 3].find(c => !s.club.shown[c]); F.clubShowGo(c === undefined ? 0 : c); }
     F.clubWeekTick();
     // 현장체험학습: 갈 수 있는 곳 중 아직 기념품이 남은 가장 짧은 곳(다녀오면 수업료의 절반만큼 더 받아요)
@@ -198,10 +203,10 @@ async def main():
         await pg.evaluate("const t=document.querySelector('#tut'); if(t && !t.hidden){ window.__forest.S.tut.st='skip'; t.hidden=true; window.__forest.rt.modalOpen=null; }")
         f2 = await pg.evaluate(FLOW2); report['중학교 따라 하기'] = f2
         if f2.get('err'): fails.append(f'중학교 따라 하기: {f2["err"]}')
-        elif f2['q'] != '끝': fails.append(f'중학교 장을 60시간 안에 끝내지 못했어요 (멈춘 퀘스트 {f2["q"]})')
+        elif f2['q'] != '끝': fails.append(f'중학교 장을 120시간 안에 끝내지 못했어요 (멈춘 퀘스트 {f2["q"]})')
         else:
-            if f2['maxWaitMin'] > 720: fails.append(f'중학교에서 한 퀘스트({f2["waitAt"]})에 {f2["maxWaitMin"]}분 넘게 막혔어요')
-            if f2['maxBudget'] > 1e16: fails.append(f'중학교에서 도토리가 {f2["maxBudget"]:.3g}개까지 쌓였어요')
+            if f2['maxWaitMin'] > 2000: fails.append(f'중학교에서 한 퀘스트({f2["waitAt"]})에 {f2["maxWaitMin"]}분 넘게 막혔어요')
+            if f2['maxBudget'] > 1e17: fails.append(f'중학교에서 도토리가 {f2["maxBudget"]:.3g}개까지 쌓였어요')
             if f2['roster'] < 12: fails.append(f'중학교 명부가 {f2["roster"]}명이에요')
         fails += [f'[중학교 따라 하기] 페이지 오류: {e}' for e in errs]
         await b.close()
