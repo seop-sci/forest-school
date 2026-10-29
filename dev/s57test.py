@@ -76,7 +76,7 @@ async def main():
         if r['best'] != 3 or r['merges'] != 2: fails.append(f'best와 횟수 {r}')
         if r['five'] != 'merge' or r['after5'] != '2/2/2' or r['m5'] != 6: fails.append(f'5개 보너스 {r}')
         if r['fullTap'] or not r['fullE']: fails.append(f'판 가득 참 {r}')
-        if r['sold'] != '..' or r['sell'] != r['sellWant']: fails.append(f'팔기 {r}')
+        if r['sold'] != '..' or abs(r['sell'] - r['sellWant']) > 1e-6 * max(1, r['sellWant']): fails.append(f'팔기 {r}')   # 도토리 빼기 소수 오차는 봐줘요
         # ---- (3) 생산기
         r = await pg.evaluate(f"""(()=>{{ const F={F}, S=F.S, out={{}};
           const c = F.mgEmptyBoard(); F.mgSetCells(c);

@@ -64,7 +64,7 @@ Claude는 구현, 시험, 빌드, PR, 패치노트를 맡아요. 아래 공통 �
 cd dev
 python3 wrap.py                 # 시험용 test.html
 python3 s37test.py              # 교감 선생님 지원 회귀 시험 (PASS여야 해요)
-python3 s36test.py              # 그 밖에 바뀐 곳에 맞는 시험 (docs/TESTING.md)
+python3 s86test.py              # 그 밖에 바뀐 곳에 맞는 시험 (docs/TESTING.md)
 python3 build_gh.py ..          # 맨 위 index.html 다시 만들기
 cd ../toss && npm ci && npm run build   # 토스 판 forest-school.ait (사용자에게 보내요)
 ```
