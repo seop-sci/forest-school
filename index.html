@@ -2,7 +2,7 @@
 <html lang="ko">
 <head>
 <meta charset="utf-8">
-<meta name="forest-version" content="2.1.20">
+<meta name="forest-version" content="2.1.2.2">
 <meta name="viewport" content="width=device-width, initial-scale=1">
 <meta name="description" content="도토리를 모아 숲속 학교를 키우는 방치형 게임 테스트판이에요.">
 <style>html,body{margin:0}</style>
@@ -1246,6 +1246,14 @@ html.ait .app{padding-top:calc(10px + var(--ait-top, 0px));padding-bottom:var(--
 .rw-list li{display:flex;align-items:center;gap:10px;padding:8px 12px;border-radius:12px;background:var(--card);font-family:var(--font-display);font-size:16px;color:var(--ink)}
 .rw-ic{flex:none;width:24px;height:24px;display:grid;place-items:center}
 .rw-ic svg{width:22px;height:22px}
+/* 2.1.2.2 보상 칩: 보상을 글 대신 작은 아이콘과 숫자로 한 줄에 정리해요(지섭 요청: 다 쓰면 지저분하니 예쁘게) */
+.rw-chips{display:flex;flex-wrap:wrap;gap:4px 5px;margin-top:4px}
+.rwc{display:inline-flex;align-items:center;gap:2px;padding:1px 7px 1px 3px;border-radius:999px;background:var(--chip-bg);color:var(--chip-ink);font-size:11.5px;line-height:18px;font-weight:700;white-space:nowrap}
+.rwc i{flex:none;width:16px;height:16px;display:grid;place-items:center;font-style:normal;font-size:12px;line-height:1}
+.rwc i svg,.rwc i img,.rwc i .tic{width:15px;height:15px}
+.rwc.sp{background:linear-gradient(135deg,#FFE9A8,#F7D46A);color:#5A3C05}
+.dm-h .rw-chips,.dex-h .rw-chips{display:inline-flex;margin:0 0 0 6px;vertical-align:middle}
+.dm-rw{display:flex;align-items:center;gap:6px;margin:-2px 2px 6px;font-size:12px;color:var(--muted)}.dm-rw .rw-chips{margin:0}
 @media (prefers-reduced-motion: reduce){.rw-art{animation:none}}
 
 /* 상장 */
@@ -2656,6 +2664,10 @@ span.bt-stamp{display:none}.bt-duel.done span.bt-stamp{display:grid}
 .mg-tile.gen.has-img{background-color:transparent;box-shadow:none;background-size:96%}
 .mg-tile.gen.has-img::after{content:"";position:absolute;inset:6%;border-radius:50%;background:radial-gradient(closest-side, rgba(255,236,150,.55), rgba(255,236,150,0));z-index:-1}
 .mg-tile.gen.tired{filter:saturate(.5) brightness(.8)}
+/* 2.1.2.2 합치기 그림 잘 보이게(지섭 요청): 판 위 조각마다 밝은 둥근 받침과 종류 색 테두리를 깔아 판 바탕과 떨어져 보이게 하고, 그림을 조금 키우고, 단계 숫자는 작게 모서리로 */
+.mg-cell .mg-tile.has-img:not(.gen){inset:5%;border-radius:24%;background:var(--mg-img) center 46%/90% no-repeat, radial-gradient(circle at 50% 42%, #FFFDF6 0 52%, color-mix(in srgb, var(--mg-c, #FFF4D6) 80%, #FFFDF6) 100%);box-shadow:inset 0 0 0 1.5px color-mix(in srgb, var(--mg-c, #E8D3A8) 55%, #8F6A3D), inset 0 -2.5px 0 rgba(120,80,30,.16), 0 1.5px 2.5px rgba(70,45,15,.3)}
+.mg-cell .mg-tile.has-img:not(.gen) b{right:-3px;bottom:-3px;min-width:13px;padding:0 3px;font-size:9.5px;line-height:13px;box-shadow:0 0 0 1.5px #FFF7E6}
+.mg-cell .mg-tile.has-img.lv10:not(.gen){box-shadow:inset 0 0 0 2px #E2A92A, inset 0 -2.5px 0 rgba(120,80,30,.16), 0 0 6px rgba(255,200,60,.7)}
 .mg-drag{position:fixed;z-index:30;width:52px;height:52px;pointer-events:none;transform:translate(-50%,-50%) scale(1.15);filter:drop-shadow(0 6px 8px rgba(0,0,0,.4))}
 .mg-drag .mg-tile{position:absolute;inset:0}
 .mg-foot{flex:none;min-height:54px;display:flex;align-items:center;gap:10px;padding:6px 10px;border-radius:16px;background:rgba(255,247,230,.94);color:#26301E;box-shadow:0 3px 0 rgba(0,0,0,.25)}
@@ -2716,7 +2728,7 @@ span.bt-stamp{display:none}.bt-duel.done span.bt-stamp{display:grid}
     <p class="boot-step" id="bootStep">학교 문을 여는 중...</p>
     <p class="boot-tip" id="bootTip">학교 문을 여는 중이에요</p>
   </div>
-  <span class="boot-ver" id="bootVer">v2.1.20</span>
+  <span class="boot-ver" id="bootVer">v2.1.2.2</span>
 </div>
 
 <div class="app on-school" id="app">
@@ -3169,7 +3181,7 @@ span.bt-stamp{display:none}.bt-duel.done span.bt-stamp{display:grid}
       </div>
       <h3 class="panel-sub">정보</h3>
       <dl class="info">
-        <div id="verRow"><dt>버전</dt><dd>v2.1.20</dd></div>
+        <div id="verRow"><dt>버전</dt><dd>v2.1.2.2</dd></div>
         <div id="pidRow" hidden><dt>학교 번호</dt><dd id="infoPid"></dd></div>
       </dl>
       <div id="devBox" hidden>
@@ -3312,7 +3324,7 @@ span.bt-stamp{display:none}.bt-duel.done span.bt-stamp{display:grid}
     <div class="mg-help">
       <div class="mh"><span class="mh-pic" data-mg="mg_help_1">👆</span><span><b>1. 생산기를 눌러요</b>에너지 1을 쓰고 조각이 하나 나와요. 에너지는 1분에 1씩 차요</span></div>
       <div class="mh"><span class="mh-pic" data-mg="mg_help_2">🌰🌰</span><span><b>2. 같은 조각 둘을 겹쳐요</b>끌어다 놓으면 다음 단계가 돼요. 종류마다 10단계까지</span></div>
-      <div class="mh"><span class="mh-pic" data-mg="mg_help_3">📜</span><span><b>3. 학생 주문을 채워요</b>위쪽 주문 쪽지를 누르면 도토리와 장식 조각을 받아요</span></div>
+      <div class="mh"><span class="mh-pic" data-mg="mg_help_3">📜</span><span><b>3. 학생 주문을 채워요</b>위쪽 주문 쪽지를 누르면 도토리와 장식 조각, 큰 주문은 강화 조각도 받아요</span></div>
     </div>
     <button class="cta" type="button" id="mgHelpOk">시작하기</button>
   </div>
@@ -3520,7 +3532,7 @@ span.bt-stamp{display:none}.bt-duel.done span.bt-stamp{display:grid}
   <div class="backdrop" data-close-att></div>
   <section class="modal" role="dialog" aria-modal="true" aria-labelledby="attTitle">
     <h2 id="attTitle">출석부</h2>
-    <p>매일 들러서 도장을 받아요. 7일째에는 수료증 3장을 줘요.</p>
+    <p>매일 들러서 도장을 받아요. 날마다 황금 도토리 1개도 받고, 7일째에는 수료증 3장을 줘요.</p>
     <div class="att-grid" id="attGrid"></div>
     <div class="btn-row"><button class="btn-sub" type="button" id="attNo">닫기</button><button class="cta" type="button" id="attGo">오늘 도장 받기</button></div>
     <p class="fine" id="attTotal" style="margin:12px 0 0"></p>
@@ -9033,8 +9045,8 @@ span.bt-stamp{display:none}.bt-duel.done span.bt-stamp{display:grid}
        forest/rank/<내 id>   랭킹 이름과 학교 점수
        forest/stats/<내 id>  테스트 현황 (어디까지 했는지, 얼마나 했는지)
      <내 id>는 Firebase 익명 로그인이 기기(브라우저)마다 만들어 줘요. */
-  const VERSION = '2.1.20';
-  const NT_QUIET = ['2.1.20'];   // 2.1.20 지섭 결정: 이 버전들은 업데이트해도 공지 창을 띄우지 않아요(공지는 그대로 2.1.2)
+  const VERSION = '2.1.2.2';
+  const NT_QUIET = ['2.1.20', '2.1.2.2'];   // 2.1.20 지섭 결정: 이 버전들은 업데이트해도 공지 창을 띄우지 않아요(공지는 그대로 2.1.2)
   /* 2.0.0 공지사항 (2026-10-27 지섭, 1.8.0은 이미 올려서 2.0.0부터): 설정 > 공지사항. 맨 위가 가장 새 공지예요.
      패치노트는 자동으로 넣지 않아요. 지섭이 검수한 글만 여기에 적어요(CHANGELOG.md는 자세한 기록용이라 따로 있어요).
      접속하면 새 공지 창을 띄워요(올라온 뒤 7일 동안, '일주일간 열지 않기'를 누르면 7일 쉬어요). 업데이트한 뒤 첫 접속에는 쉬는 중이어도 한 번 띄워요 */
@@ -11719,7 +11731,7 @@ span.bt-stamp{display:none}.bt-duel.done span.bt-stamp{display:grid}
     $('#skLead').textContent = nl(full ? '스티커판을 다 채웠어요! 반 전체 상을 골라요.' : `오늘의 미션이나 퀘스트를 끝낼 때마다 스티커 한 장을 붙여요. ${SK.full}장을 채우면 반 전체 상을 받아요.`);
     $('#skPrize').hidden = !full;
     if (full) {
-      $('#skPickA').innerHTML = `도토리 묶음<br><small>+${fmt(minAcorns(SK.acornMin))}</small>`;
+      $('#skPickA').innerHTML = `도토리<br><small>+${fmt(minAcorns(SK.acornMin))}</small>`;
       $('#skPickG').innerHTML = `황금 도토리<br><small>+${SK.gold}개</small>`;
     }
     $('#skNote').textContent = nl(`${S.sk.cur.length}/${SK.full}장. ${full ? '상을 받으면 새 판이 붙어요.' : left > 0 ? `오늘 ${left}장 더 받을 수 있어요.` : '오늘 스티커는 다 받았어요. 내일 또 모아요.'}`);
@@ -13964,6 +13976,15 @@ span.bt-stamp{display:none}.bt-duel.done span.bt-stamp{display:grid}
     });
   }
 
+  // 2.1.2.2 보상 칩: [[아이콘, 숫자나 짧은 말, 'sp'(금빛 강조)], ...]. 아이콘은 showReward와 같은 이름(acorn, gold, dip, ess)이나 단축권 키(tk:m5)나 그림 문자
+  function rwIcon(ic) {
+    if (ic === 'acorn') return acornIcon(); if (ic === 'dip') return dipIcon(); if (ic === 'gold') return GOLD_ICON; if (ic === 'ess') return ESS_ICON();
+    if (typeof ic === 'string' && ic.startsWith('tk:')) { const im = IMG('ticket_' + ic.slice(3)); return im ? `<img src="${im}" alt="">` : '⏱'; }
+    return esc(ic || '');
+  }
+  const rwChips = list => `<span class="rw-chips">${list.filter(Boolean).map(([ic, t, sp]) => `<span class="rwc${sp ? ' sp' : ''}"><i>${rwIcon(ic)}</i>${esc(String(t))}</span>`).join('')}</span>`;
+  const tkChip = key => { const r = TK_REW[key]; if (!r || !S || S.tier < 1) return null; return ['tk:' + r[0], `${TK.find(x => x.k === r[0]).name.replace('권', '')} ${r[1]}장`]; };
+
   /* ---------- 지도 위 장면: 체험학습 버스, 숲속 운동회 ---------- */
   // 버스: 아래 교문으로 들어와 멈췄다가 다시 나가요. 떠날 때는 학생 몇 명이 걸어가서 타고, 돌아올 때는 내려서 흩어져요
   const BUS_MAP = '<g class="bus-body"><rect x="-21" y="-14" width="42" height="22" rx="5" fill="#F3C04B"/><rect x="-21" y="2" width="42" height="3" fill="#D9A23A"/>' +
@@ -14130,7 +14151,7 @@ span.bt-stamp{display:none}.bt-duel.done span.bt-stamp{display:grid}
     rt.sportsWin = win; rt.prizeName = '운동회'; rt.prizeId = 'sports';
     $('#srTitle').textContent = win ? '청팀 승리!' : tie ? '무승부!' : '백팀 승리!';
     $('#srScore').textContent = `청팀 ${R.blue} : ${R.white} 백팀`;
-    $('#srText').textContent = (win ? `공을 ${R.blue}개나 주웠어요! 이긴 상품으로 도토리를 받아요.` : `다음에는 공을 더 빨리 주워 봐요. 그래도 도토리를 조금 받아요.`) + `${vpLv() ? ` 교감 선생님 덕분에 +${VP.per * vpLv()}%예요.` : ''}`;
+    $('#srText').textContent = (win ? `공을 ${R.blue}개나 주웠어요! 이긴 상품으로 도토리${festGoldLeft('sports') ? '와 황금 도토리 1개(하루 한 번)' : ''}를 받아요.` : `다음에는 공을 더 빨리 주워 봐요. 그래도 도토리를 조금 받아요.`) + `${vpLv() ? ` 교감 선생님 덕분에 +${VP.per * vpLv()}%예요.` : ''}`;
     $('#srPrize').textContent = fmt(sportsPrize(win));
     $('#srArt').innerHTML = `<svg viewBox="-26 -19 52 38" aria-hidden="true">` + ['rabbit', 'fox', 'chick'].map((sp, i) => `<g transform="translate(${(i - 1) * 15} ${i === 1 ? -3 : 1})">${kidSVG(sp, i)}<rect class="band ${win ? 'b' : 'w'}" x="-6.4" y="-4.6" width="12.8" height="2.4" rx="1.2"/></g>`).join('') + '</svg>';
     sfx(win ? 'quest' : 'done'); buzz(20);
@@ -14483,9 +14504,9 @@ span.bt-stamp{display:none}.bt-duel.done span.bt-stamp{display:grid}
       return `<div class="dm${m.done ? ' done' : ''}"><div class="dm-tx"><b>${M.name(M.n)} <em>+${MP.daily}점</em></b><div class="qbar"><i style="width:${(p / M.n * 100).toFixed(0)}%"></i></div></div>` +
         (m.done ? `<span class="dm-ok">${CHECK}</span>` : ready ? `<button class="cta small" type="button" data-dm="${i}">받기</button>` : `<span class="dm-n">${p}/${M.n}</span>`) + '</div>';
     }).join('') +
-      `<div class="dm bonus${S.dm.bonus ? ' done' : ''}"><div class="dm-tx"><b>보너스 상자 <em>+${MP.bonus}점</em></b><span>${S.dm.list.length === 3 ? '셋 다' : '모두'} 하면 ${gi}${DM.bonusGold}, 수료증 ${DM.bonusDip}장</span></div>` +
+      `<div class="dm bonus${S.dm.bonus ? ' done' : ''}"><div class="dm-tx"><b>보너스 상자 <em>+${MP.bonus}점</em></b><span>${S.dm.list.length === 3 ? '셋 다' : '모두'} 하면</span>${rwChips([['gold', DM.bonusGold], ['dip', DM.bonusDip], ['⚡', MG.E.bonus]])}</div>` +
       (S.dm.bonus ? `<span class="dm-ok">${CHECK}</span>` : all ? '<button class="cta small" type="button" data-dm="bonus">열기</button>' : `<span class="dm-n">${S.dm.list.filter(m => m.done).length}/${S.dm.list.length}</span>`) + '</div>' +
-      '<h4 class="dm-h">이번 주 미션 <small>월요일에 바뀌어요. 하나에 황금 도토리 1개</small></h4>' + renderWeekList();
+      `<h4 class="dm-h">이번 주 미션 <small>월요일에 바뀌어요</small></h4><div class="dm-rw"><span>미션 하나에</span>${rwChips([['gold', MP.weekGold], ['⚡', MG.E.wk]])}</div>` + renderWeekList();
   }
 
   // 주간 리그
@@ -14588,7 +14609,7 @@ span.bt-stamp{display:none}.bt-duel.done span.bt-stamp{display:grid}
     };
     return `<div class="mp"><div class="mp-top"><b>미션 포인트 <span>${S.wk.pts}</span>점</b><small>월요일에 새로 시작 (${left}일 남음)</small></div>` +
       `<div class="mp-track"><div class="mp-bar"><i style="width:${pct.toFixed(1)}%"></i></div>${MP_BOX.map((_, i) => box(i)).join('')}</div>` +
-      `<p class="mp-note">오늘의 미션 ${MP.daily}점, 보너스 상자 ${MP.bonus}점, 이번 주 미션 ${MP.week}점. 상자마다 도토리가 들어 있고, 마지막 상자에는 주간 보상으로만 받는 금빛 왕관이 들어 있어요.</p></div>`;
+      `<p class="mp-note">오늘의 미션 ${MP.daily}점, 보너스 상자 ${MP.bonus}점, 이번 주 미션 ${MP.week}점. 상자마다 도토리, 황금 도토리${S.tier >= 1 ? ', 30분 단축권' : ''}이 들어 있어요. 수료증과 특식 데이가 든 상자도 있고, 마지막 상자에는 강화 조각과 처음 한 번 금빛 왕관이 들어 있어요.</p></div>`;
   }
   function renderWeekList() {
     return S.wk.list.map((m, i) => {
@@ -17023,14 +17044,15 @@ span.bt-stamp{display:none}.bt-duel.done span.bt-stamp{display:grid}
         (m.done ? `<span class="dm-ok">${CHECK}</span>` : rd ? `<button class="cta small" type="button" data-ev="m${i}">받기</button>` : `<span class="dm-n">${p}/${m.n}</span>`) + '</div>';
     }).join('');
     const all = evAllDone();
-    const box = `<div class="dm ev-box${S.ev.box ? ' done' : ''}"><span class="dex-pic">${pic7('ev_box', 'ic_fund')}</span><div class="dm-tx"><b>기념 상자</b><small>미션 3개를 다 하면 황금 도토리 ${EV_BOX.g}개와 수료증 ${EV_BOX.dip}장</small></div>` +
+    const evBoxDeco = () => { const dd = DECO_BY['ev_' + cur.def.id]; return !S.ev.box && dd && evDecoArt(dd) && !decoOwn(dd.id); };   // 2.1.2.2 처음 한 번 받는 한정 장식
+    const box = `<div class="dm ev-box${S.ev.box ? ' done' : ''}"><span class="dex-pic">${pic7('ev_box', 'ic_fund')}</span><div class="dm-tx"><b>기념 상자</b><small>미션 3개를 다 하면 열려요</small>${rwChips([evBoxDeco() ? ['🎁', '한정 장식', 1] : null, ['gold', EV_BOX.g], ['ess', EV_BOX.e], ['dip', EV_BOX.dip], tkChip('box'), ['⚡', MG.E.box], ['🔑', 1]])}</div>` +
       (S.ev.box ? `<span class="dm-ok">${CHECK}</span>` : all ? '<button class="cta small" type="button" data-ev="box">열기</button>' : `<span class="dm-n">${S.ev.list.filter(m => m.done).length}/3</span>`) + '</div>';
     const u = IMG7(cur.def.banner) || (cur.def.fb ? IMG7(cur.def.fb) : '');   // 2.0.0 새 배너 그림이 오기 전에는 비슷한 배너를 빌려 써요
     body.innerHTML = `<div class="ev-banner ${cur.def.id}${u ? ' has-img' : ''}">${u ? `<img src="${u}" alt="">` : ''}<b>${esc(cur.def.name)}</b></div>` +
       `<div class="ev-period"><span>${dayText(cur.start)} ~ ${dayText(cur.end)}</span><span>${left > 0 ? `${left}일 남음` : '오늘까지'}</span></div>` +
       `<p class="lead">${esc(nl(cur.def.lead))}</p>` + evSkipLine(day) +
       `<h4 class="dex-h">이벤트 도장</h4><div class="ev-stamps">${stamps}</div>${stampBtn}` +
-      `<h4 class="dex-h">이벤트 미션 <small>미션마다 황금 도토리와 도토리</small></h4><div class="dms">${missions}${box}</div>` + upcoming;
+      `<h4 class="dex-h">이벤트 미션 <small>미션마다</small>${rwChips([['acorn', '도토리'], ['gold', 1], tkChip('evm')])}</h4><div class="dms">${missions}${box}</div>` + upcoming;
   }
 
   /* ---------- 공통: 1초 갱신, 패널 열기, 버튼 ---------- */
