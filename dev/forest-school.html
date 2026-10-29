@@ -1,4 +1,24 @@
 <title>숲속 동물 학교</title>
+<script>
+/* 2.1.0 태블릿 맞춤: 화면이 휴대폰보다 확연히 크면 화면 너비를 좁게 잡아 게임 전체를 크게 보여 준다.
+   게임 칸(480)과 세로(800)가 둘 다 들어가는 만큼만 키우고, 휴대폰과 가로 화면은 그대로 둔다 */
+(function(){
+  var DW = 500, DH = 800, last = '';
+  function fit(){
+    var m = document.querySelector('meta[name=viewport]');
+    if (!m) return;
+    var a = screen.width || 0, b = screen.height || 0;
+    var land = window.matchMedia && matchMedia('(orientation: landscape)').matches;
+    var W = land ? Math.max(a, b) : Math.min(a, b), H = land ? Math.min(a, b) : Math.max(a, b);
+    var s = Math.min(W / DW, H / DH);
+    var c = (W && s > 1.15) ? 'width=' + Math.round(W / s) : 'width=device-width, initial-scale=1';
+    if (c !== last) { last = c; m.setAttribute('content', c); }
+  }
+  fit();
+  window.addEventListener('orientationchange', function(){ setTimeout(fit, 150); });
+  if (screen.orientation && screen.orientation.addEventListener) screen.orientation.addEventListener('change', fit);
+})();
+</script>
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Gaegu:wght@400;700&family=Gowun+Batang:wght@400;700&family=Gowun+Dodum&family=Jua&display=swap">
