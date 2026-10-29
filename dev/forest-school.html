@@ -7140,6 +7140,7 @@ span.bt-stamp{display:none}.bt-duel.done span.bt-stamp{display:grid}
     renderQuestPanel(false);
     updateQuestDot();
     renderBoostBtn();
+    ffRender();   // 2.1.1 즉시 완공 칩(행사가 시작되면 바로 숨게)
     renderTripBtn();
     renderSportsBtn();
     if (rt.tab === 'quests') renderMissions();
@@ -7958,7 +7959,7 @@ span.bt-stamp{display:none}.bt-duel.done span.bt-stamp{display:grid}
     const ks = facKeys().filter(ffCan), on = cbOn();
     for (const k of Object.keys(FAC)) { const p = document.getElementById('pq-' + k); if (p) p.classList.toggle('ff-on', ks.includes(k)); }
     const c = $('#ffChip'); if (!c) return;
-    const show = rt.tab === 'school' && rt.viewTier == null && !rt.decoEdit && S.tier >= 1 && (ks.length > 0 || on);
+    const show = rt.tab === 'school' && rt.viewTier == null && !rt.decoEdit && !rt.fest && !rt.sports && !festBusy() && !rt.paused && S.tier >= 1 && (ks.length > 0 || on);   // 학교 행사 중에는 숨겨요
     const key = [show, ks.length, on ? Math.floor(cbLeft() / 60) : -1].join('|');
     if (!force && c.dataset.key === key) return; c.dataset.key = key;
     c.hidden = !show; if (!show) return;
