@@ -2282,6 +2282,17 @@ span.bt-stamp{display:grid;place-items:center;border-radius:50%;border:3px solid
 .bt-stamp{display:none}.bt-duel.done .bt-stamp{display:block}
 span.bt-stamp{display:none}.bt-duel.done span.bt-stamp{display:grid}
 .bt-cheer.on{border:2px solid #F3C04B}
+/* 2.1.1 숲속 대결 종목 문제 */
+.bt-cheer.btq{gap:7px;padding:10px 12px 9px;width:min(100%,420px);box-sizing:border-box}
+.btq-q{font-size:17px;line-height:1.35;word-break:keep-all}.btq-q.math{font-size:26px;letter-spacing:1px}
+.btq-time{display:block;width:100%;height:6px;border-radius:99px;background:rgba(255,255,255,.18);overflow:hidden}.btq-time i{display:block;height:100%;background:#F3C04B;border-radius:inherit;animation:btqT linear forwards}.btq-time.stop i{animation-play-state:paused}
+@keyframes btqT{from{width:100%}to{width:0}}
+.btq-opts{display:grid;grid-template-columns:1fr;gap:6px;width:100%}.btq-o{min-height:42px;padding:6px 10px;border:2px solid rgba(255,233,168,.55);border-radius:12px;background:#FFF8E6;color:#4A3214;font:inherit;font-size:15.5px;font-weight:700;cursor:pointer;word-break:keep-all}
+.btq-o.right{background:#7FC46A;border-color:#4E9A3F;color:#FFFFFF}.btq-o.wrong{background:#E86A5E;border-color:#B5443B;color:#FFFFFF}.btq-o:disabled{cursor:default}
+.btq-q.math ~ .btq-opts{grid-template-columns:repeat(3,1fr)}.btq-q.math ~ .btq-opts .btq-o{font-size:22px}
+.btq-n{font-size:12px;color:#CFE3C2}
+.btq-seq{display:flex;gap:10px;justify-content:center;min-height:40px;align-items:center}.btq-dot{width:34px;height:34px;border-radius:50%;background:var(--c);box-shadow:inset 0 -3px 0 rgba(0,0,0,.18)}.btq-dot.blank{background:rgba(255,255,255,.14);box-shadow:inset 0 0 0 2px rgba(255,255,255,.35)}.btq-dot.on{transform:scale(1.15);box-shadow:0 0 0 3px #FFF3D6,0 0 14px var(--c)}
+.btq-pal{display:grid;grid-template-columns:repeat(6,1fr);gap:6px;width:100%}.btq-c{aspect-ratio:1;border:3px solid #FFF3D6;border-radius:50%;background:var(--c);cursor:pointer;box-shadow:inset 0 -4px 0 rgba(0,0,0,.18)}.btq-c:active{transform:scale(.92)}.btq-c:disabled{opacity:.6}
 .bt-cheer.full{box-shadow:0 0 0 3px #F3C04B,0 0 22px rgba(243,192,75,.8)}
 .bt-meter{display:block;width:220px;max-width:70vw;height:12px;margin:4px 0 2px;border-radius:6px;background:rgba(255,255,255,.25);overflow:hidden}
 .bt-meter i{display:block;height:100%;width:0;border-radius:6px;background:linear-gradient(90deg,#F3C04B,#E85D5D);transition:width .08s}
@@ -11918,29 +11929,291 @@ span.bt-stamp{display:none}.bt-duel.done span.bt-stamp{display:grid}
     btUI.timer = setTimeout(() => { if (btUI.M !== M) return; M.intro = false; btPlayEv(); }, rt.reduced ? 300 : 1400);   // 2.1.0 시작 연출: 두 학교 마크와 VS
     return true;
   }
+  /* ---------- 2.1.1 숲속 대결 종목 문제 (2026-10-29 지섭 결정) ----------
+     달리기만 지금처럼 두드리기. 수학 퀴즈는 한 자리 수 사칙연산(중학교부터 더하기, 빼기는 두 자리 수 + 한 자리 수), 과학 퀴즈는 기초 상식,
+     책 읽기는 낱말 문제, 그리기는 색 순서 기억 놀이. 응원 점수(0~10) 자리에 들어가서 점수 계산과 승률은 그대로예요.
+     퀴즈는 3문제(보기 3개, 한 문제 7초), 맞힌 수 0, 1, 2, 3 → 0, 3, 7, 10점. 기억 놀이는 맞게 누른 칸 비율 × 10점 */
+  const BTQ = { n: 3, qMs: 7000, fbMs: 650, pts: [0, 3, 7, 10], memShow: 750, memGap: 200, memMs: 9000 };
+  // 과학 퀴즈: [문제, 정답, 오답, 오답]. 보기는 섞어서 보여 줘요
+  const BTQ_SCI = [
+    ['물이 얼면 무엇이 될까요?', '얼음', '구름', '모래'], ['얼음이 녹으면 무엇이 될까요?', '물', '돌', '흙'],
+    ['해는 어느 쪽에서 떠요?', '동쪽', '서쪽', '북쪽'], ['해는 어느 쪽으로 져요?', '서쪽', '동쪽', '남쪽'],
+    ['개구리는 어릴 때 무엇이었을까요?', '올챙이', '애벌레', '병아리'], ['나비가 되기 전 모습은?', '애벌레', '올챙이', '달팽이'],
+    ['닭의 새끼는?', '병아리', '송아지', '망아지'], ['소의 새끼는?', '송아지', '강아지', '병아리'], ['말의 새끼는?', '망아지', '송아지', '올챙이'],
+    ['거미의 다리는 몇 개일까요?', '8개', '6개', '10개'], ['곤충의 다리는 몇 개일까요?', '6개', '4개', '8개'],
+    ['식물이 자라려면 꼭 필요한 것은?', '햇빛', '사탕', '장난감'], ['자석에 붙는 것은?', '철 클립', '나무젓가락', '지우개'],
+    ['자석에 붙지 않는 것은?', '플라스틱 자', '쇠못', '철 클립'], ['무지개는 몇 가지 색일까요?', '7가지', '5가지', '9가지'],
+    ['소리를 듣는 곳은?', '귀', '코', '무릎'], ['냄새를 맡는 곳은?', '코', '귀', '팔꿈치'], ['맛을 느끼는 곳은?', '혀', '귀', '발'],
+    ['물에 뜨는 것은?', '나뭇잎', '돌멩이', '쇠못'], ['물에 가라앉는 것은?', '돌멩이', '스티로폼', '나뭇잎'],
+    ['가장 추운 계절은?', '겨울', '여름', '봄'], ['가장 더운 계절은?', '여름', '겨울', '가을'], ['단풍이 드는 계절은?', '가을', '여름', '봄'],
+    ['꽃이 피고 새싹이 돋는 계절은?', '봄', '겨울', '가을'], ['고래는 어디에 살까요?', '바다', '사막', '나무 위'],
+    ['낙타가 사는 곳은?', '사막', '바다', '남극'], ['펭귄이 많이 사는 곳은?', '남극', '사막', '열대 숲'],
+    ['씨앗을 심으면 처음 땅 위로 나오는 것은?', '새싹', '열매', '꽃'], ['날마다 조금씩 모양이 바뀌어 보이는 밤하늘의 것은?', '달', '해', '북극성'],
+    ['우리가 사는 행성의 이름은?', '지구', '화성', '달'], ['낮에 하늘에서 빛나며 우리를 따뜻하게 해 주는 것은?', '해', '달', '별똥별'],
+    ['비가 오기 전 하늘에 많아지는 것은?', '구름', '무지개', '별'], ['비가 그친 뒤 해가 나면 볼 수 있는 것은?', '무지개', '눈사람', '오로라'],
+    ['눈은 어느 계절에 많이 올까요?', '겨울', '여름', '늦봄'], ['번개가 친 뒤 들리는 소리는?', '천둥', '박수', '빗자루 소리'],
+    ['뼈를 튼튼하게 하는 음식은?', '우유', '사탕', '콜라'], ['이를 닦아야 하는 까닭은?', '충치를 막으려고', '키가 크려고', '눈이 좋아지려고'],
+    ['숨을 쉴 때 공기를 받아들이는 곳은?', '폐', '위', '발'], ['피를 온몸으로 보내는 곳은?', '심장', '폐', '위'],
+    ['음식이 가장 먼저 들어가는 곳은?', '입', '귀', '코'], ['눈을 지키는 습관은?', '해를 똑바로 보지 않기', '해를 오래 보기', '눈을 세게 비비기'],
+    ['손을 꼭 씻어야 할 때는?', '밥 먹기 전', '잠자는 중', '꿈꿀 때'], ['나무에서 얻을 수 없는 것은?', '우유', '열매', '나뭇잎'],
+    ['꿀을 만드는 곤충은?', '꿀벌', '개미', '무당벌레'], ['거미줄을 치는 동물은?', '거미', '개미', '나비'],
+    ['알을 낳는 동물은?', '닭', '강아지', '고양이'], ['새끼를 낳아 젖을 먹이는 동물은?', '소', '닭', '개구리'],
+    ['날개가 있어 하늘을 나는 동물은?', '참새', '토끼', '거북'], ['아가미로 숨을 쉬는 동물은?', '물고기', '강아지', '참새'],
+    ['겨울잠을 자는 동물은?', '곰', '참새', '소'], ['다리가 없는 동물은?', '뱀', '개미', '거미'],
+    ['등에 딱딱한 등딱지가 있는 동물은?', '거북', '토끼', '사슴'], ['코가 아주 긴 동물은?', '코끼리', '기린', '하마'],
+    ['목이 아주 긴 동물은?', '기린', '코끼리', '돼지'], ['밤에 활동하는 새는?', '부엉이', '참새', '닭'],
+    ['식물의 뿌리가 하는 일은?', '물을 빨아들여요', '노래를 해요', '하늘을 날아요'], ['해바라기 꽃은 무슨 색일까요?', '노란색', '파란색', '검은색'],
+    ['사과가 열리는 곳은?', '나무', '땅속', '물속'], ['땅속에서 자라 캐 먹는 것은?', '감자', '사과', '포도'],
+    ['물을 끓이면 올라오는 것은?', '김', '얼음', '모래'], ['설탕이 더 잘 녹는 물은?', '따뜻한 물', '차가운 물', '얼음물'],
+    ['얼음을 햇볕에 두면?', '녹아요', '커져요', '단단해져요'], ['그림자가 생기려면 꼭 필요한 것은?', '빛', '소리', '냄새'],
+    ['손전등이 빛을 내려면 필요한 것은?', '건전지', '물', '모래'], ['쇠로 만든 물건은?', '못', '지우개', '종이컵'],
+    ['유리로 만든 물건은?', '유리컵', '고무공', '나무 의자'], ['고무로 만든 물건은?', '고무장갑', '유리병', '쇠숟가락'],
+    ['잡아당기면 잘 늘어나는 것은?', '고무줄', '유리컵', '돌멩이'], ['공기가 들어 있어 통통 튀는 것은?', '공', '돌', '책'],
+    ['바람이 불면 빙글빙글 도는 것은?', '바람개비', '연필', '접시'], ['지구에서 가장 넓은 곳을 차지하는 것은?', '바다', '강', '호수'],
+    ['바닷물의 맛은?', '짜요', '달아요', '아무 맛 없어요'], ['화산에서 흘러나오는 뜨거운 것은?', '용암', '얼음', '눈'],
+    ['땅이 흔들리는 것을 무엇이라 할까요?', '지진', '무지개', '번개'], ['지진이 나면 먼저 할 일은?', '탁자 밑에 몸을 숨겨요', '엘리베이터를 타요', '창가로 가요'],
+    ['불이 나면 먼저 할 일은?', '불이야 외치고 밖으로 나가요', '옷장에 숨어요', '물건부터 챙겨요'], ['불을 끌 때 쓰는 것은?', '소화기', '선풍기', '부채'],
+    ['낮과 밤이 생기는 까닭은?', '지구가 돌아서', '달이 커져서', '구름이 많아서'], ['하루는 몇 시간일까요?', '24시간', '12시간', '100시간'],
+    ['한 해는 몇 달일까요?', '12달', '10달', '7달'], ['일주일은 며칠일까요?', '7일', '5일', '10일'],
+    ['밤하늘에 반짝이는 것은?', '별', '무지개', '해'], ['사람이 달에 갈 때 탄 것은?', '우주선', '기차', '배'],
+    ['지구 둘레를 도는 달은 몇 개일까요?', '1개', '2개', '10개'], ['사람이 숨 쉴 때 꼭 필요한 것은?', '산소', '모래', '소금'],
+    ['물을 주지 않으면 식물은?', '시들어요', '더 커져요', '꽃이 많아져요'], ['개구리가 사는 곳은?', '연못', '사막', '구름 위'],
+    ['다람쥐가 좋아하는 먹이는?', '도토리', '생선', '사탕'], ['토끼가 좋아하는 먹이는?', '당근', '고기', '생선'],
+    ['판다가 좋아하는 먹이는?', '대나무', '생선', '치즈'], ['물고기가 헤엄칠 때 쓰는 것은?', '지느러미', '날개', '뿔'],
+    ['새가 날 때 쓰는 것은?', '날개', '지느러미', '뿔'], ['바다거북이 알을 낳는 곳은?', '모래밭', '나뭇가지', '구름 위'],
+    ['개미는 어디에 집을 지을까요?', '땅속', '물속', '구름 위'], ['벌집 한 칸의 모양은?', '육각형', '동그라미', '별 모양'],
+    ['꽃가루를 옮겨 주는 곤충은?', '벌', '모기', '바퀴벌레'], ['모기가 많은 계절은?', '여름', '겨울', '한겨울 눈 오는 날'],
+    ['눈사람이 녹는 까닭은?', '날이 따뜻해져서', '바람이 없어서', '밤이 와서'], ['물웅덩이 물이 줄어드는 까닭은?', '물이 증발해서', '물이 얼어서', '물이 무거워져서'],
+    ['얼음물 컵 바깥에 맺히는 것은?', '물방울', '모래', '연기'], ['그늘보다 햇빛 아래가 더 어떨까요?', '따뜻해요', '차가워요', '어두워요'],
+    ['빛을 가장 잘 통과시키는 것은?', '투명한 유리', '나무판', '두꺼운 책'], ['돋보기로 보면 물체가 어떻게 보일까요?', '크게 보여요', '작게 보여요', '사라져요'],
+    ['멀리 있는 별을 볼 때 쓰는 도구는?', '망원경', '현미경', '온도계'], ['아주 작은 것을 크게 보는 도구는?', '현미경', '망원경', '온도계'],
+    ['온도를 재는 도구는?', '온도계', '저울', '자'], ['무게를 재는 도구는?', '저울', '온도계', '시계'],
+    ['길이를 재는 도구는?', '자', '저울', '컵'], ['시간을 알려 주는 것은?', '시계', '저울', '자'],
+    ['방향을 알려 주는 도구는?', '나침반', '돋보기', '온도계'], ['나침반 바늘이 가리키는 방향은?', '북쪽', '서쪽', '위쪽'],
+    ['감기를 막는 좋은 습관은?', '손 씻기', '손톱 물어뜯기', '늦게 자기'], ['키가 크려면 필요한 것은?', '골고루 먹고 푹 자기', '사탕만 먹기', '밤새 게임하기'],
+    ['젖니가 빠진 자리에 새로 나는 이는?', '영구치', '젖니', '틀니'], ['한 손의 손가락은 몇 개일까요?', '5개', '4개', '6개'],
+    ['빨간 신호등은 무슨 뜻일까요?', '멈춰요', '건너요', '뛰어요'], ['초록 신호등에서는 어떻게 할까요?', '좌우를 보고 건너요', '멈춰 서서 기다려요', '뒤로 걸어요'],
+    ['비 오는 날 쓰는 것은?', '우산', '선글라스', '부채'], ['추운 날 입는 것은?', '두꺼운 외투', '수영복', '반바지'],
+    ['계곡물은 어디로 흘러갈까요?', '낮은 곳', '높은 곳', '하늘'], ['강물이 모여 마지막에 가는 곳은?', '바다', '산꼭대기', '사막'],
+    ['나무를 많이 심으면 좋은 점은?', '공기가 맑아져요', '시끄러워져요', '비가 안 와요'], ['쓰레기를 종류별로 나눠 버리는 것은?', '분리배출', '재채기', '낮잠'],
+    ['다시 쓸 수 있게 모으는 것은?', '유리병', '바나나 껍질', '쓴 휴지'], ['해가 진 뒤 하늘은 어떻게 될까요?', '어두워져요', '더 밝아져요', '초록색이 돼요'],
+    ['국자 모양의 별 일곱 개는?', '북두칠성', '은하수', '무지개'], ['태양계에서 가장 큰 행성은?', '목성', '지구', '화성'],
+    ['붉은 행성이라고 불리는 것은?', '화성', '금성', '지구'], ['멋진 고리가 있는 행성은?', '토성', '화성', '지구'],
+    ['공룡은 지금 어떻게 되었을까요?', '옛날에 살다 사라졌어요', '동물원에 많아요', '우리 집 마당에 살아요'], ['화석은 무엇일까요?', '옛 생물의 흔적이 돌에 남은 것', '반짝이는 보석', '얼음 조각'],
+    ['달팽이가 지나간 자리에 남는 것은?', '끈적한 자국', '모래성', '발자국'], ['무당벌레 등의 무늬는?', '점무늬', '줄무늬', '체크무늬'],
+    ['얼룩말의 무늬는?', '줄무늬', '점무늬', '꽃무늬'], ['카멜레온이 잘하는 것은?', '몸 색 바꾸기', '하늘 날기', '노래하기'],
+    ['박쥐는 주로 언제 활동할까요?', '밤', '아침', '한낮'], ['연어가 알을 낳으러 거슬러 올라가는 곳은?', '강', '사막', '산꼭대기'],
+    ['오리 발가락 사이에 있는 것은?', '물갈퀴', '날개', '지느러미'], ['고슴도치 몸을 덮고 있는 것은?', '가시', '비늘', '깃털'],
+    ['물고기 몸을 덮고 있는 것은?', '비늘', '깃털', '털'], ['새의 몸을 덮고 있는 것은?', '깃털', '비늘', '가시'],
+    ['바나나가 노랗게 되는 까닭은?', '익어서', '추워서', '비가 와서'], ['마른 콩을 물에 불리면?', '커져요', '작아져요', '사라져요'],
+    ['스스로 빛을 내는 것은?', '해', '달', '구름'], ['바람이 강하게 불고 비가 많이 오는 여름 날씨는?', '태풍', '황사', '서리'],
+    ['아침에 풀잎에 맺힌 작은 물방울은?', '이슬', '우박', '눈송이'], ['얼음 알갱이가 하늘에서 떨어지는 것은?', '우박', '무지개', '안개'],
+    ['코끼리가 물을 마실 때 쓰는 것은?', '코', '꼬리', '귀'], ['캥거루가 새끼를 넣고 다니는 곳은?', '배 주머니', '등', '입'],
+    ['병아리가 깨고 나오는 것은?', '알', '씨앗', '고치'], ['누에가 실을 뽑아 만드는 집은?', '고치', '둥지', '굴'],
+    ['새가 알을 낳고 품는 곳은?', '둥지', '어항', '벌집'], ['가을에 나무에서 떨어지는 것은?', '낙엽', '눈', '얼음'],
+    ['소금물을 햇볕에 두어 물이 마르면 남는 것은?', '소금', '설탕', '모래'], ['물, 우유, 주스는 모두 무엇일까요?', '액체', '돌', '기체'],
+    ['풍선 속을 채운 것은?', '공기', '모래', '물감'], ['비누로 손을 씻으면 없어지는 것은?', '세균', '손톱', '손가락'],
+    ['식물의 잎이 하는 일은?', '햇빛으로 양분을 만들어요', '땅속을 파요', '소리를 내요'], ['우리 몸을 지탱하는 단단한 것은?', '뼈', '머리카락', '손톱'],
+    ['자석의 두 극은?', 'N극과 S극', '빨강과 파랑', '위와 아래'], ['같은 극끼리 자석을 가까이 하면?', '밀어내요', '붙어요', '녹아요'],
+    ['물을 얼리면 부피는?', '조금 커져요', '조금 작아져요', '사라져요'], ['메아리는 무엇이 되돌아오는 것일까요?', '소리', '빛', '냄새'],
+    ['낮에 생기는 그림자가 가장 짧은 때는?', '한낮', '해 뜰 때', '해 질 때'], ['개가 냄새를 잘 맡는 까닭은?', '코가 예민해서', '귀가 커서', '꼬리가 길어서']
+  ];
+  // 책 읽기: 낱말 문제 [문제, 정답, 오답, 오답]
+  const BTQ_KOR = [
+    // 반대말
+    ["'크다'의 반대말은?", '작다', '높다', '길다'], ["'덥다'의 반대말은?", '춥다', '밝다', '빠르다'], ["'높다'의 반대말은?", '낮다', '넓다', '짧다'],
+    ["'길다'의 반대말은?", '짧다', '좁다', '낮다'], ["'많다'의 반대말은?", '적다', '크다', '가볍다'], ["'무겁다'의 반대말은?", '가볍다', '어둡다', '느리다'],
+    ["'빠르다'의 반대말은?", '느리다', '작다', '얇다'], ["'밝다'의 반대말은?", '어둡다', '춥다', '좁다'], ["'넓다'의 반대말은?", '좁다', '짧다', '낮다'],
+    ["'깊다'의 반대말은?", '얕다', '넓다', '무겁다'], ["'두껍다'의 반대말은?", '얇다', '좁다', '작다'], ["'기쁘다'의 반대말은?", '슬프다', '배고프다', '졸리다'],
+    ["'쉽다'의 반대말은?", '어렵다', '느리다', '무겁다'], ["'가깝다'의 반대말은?", '멀다', '좁다', '낮다'], ["'열다'의 반대말은?", '닫다', '자르다', '접다'],
+    ["'들어가다'의 반대말은?", '나오다', '올라가다', '앉다'], ["'올라가다'의 반대말은?", '내려가다', '들어가다', '달려가다'], ["'앞'의 반대말은?", '뒤', '옆', '위'],
+    ["'위'의 반대말은?", '아래', '앞', '옆'], ["'낮'의 반대말은?", '밤', '아침', '저녁'], ["'오른쪽'의 반대말은?", '왼쪽', '위쪽', '앞쪽'],
+    ["'시작'의 반대말은?", '끝', '처음', '중간'], ["'같다'의 반대말은?", '다르다', '닮다', '크다'], ["'깨끗하다'의 반대말은?", '더럽다', '조용하다', '시원하다'],
+    ["'웃다'의 반대말은?", '울다', '뛰다', '자다'], ["'주다'의 반대말은?", '받다', '놓다', '찾다'], ["'사다'의 반대말은?", '팔다', '주다', '먹다'],
+    ["'이기다'의 반대말은?", '지다', '비기다', '달리다'], ["'입다'의 반대말은?", '벗다', '신다', '쓰다'], ["'켜다'의 반대말은?", '끄다', '열다', '누르다'],
+    ["'따뜻하다'의 반대말은?", '차갑다', '부드럽다', '맛있다'], ["'젖다'의 반대말은?", '마르다', '녹다', '얼다'], ["'새것'의 반대말은?", '헌것', '큰것', '좋은것'],
+    ["'일어나다'의 반대말은?", '눕다', '걷다', '뛰다'], ["'안'의 반대말은?", '밖', '위', '옆'],
+    // 맞춤법
+    ['바르게 쓴 것은?', '깨끗하다', '깨끄타다', '깨끝하다'], ['바르게 쓴 것은?', '설거지', '설겆이', '설거찌'], ['바르게 쓴 것은?', '며칠', '몇일', '몇칠'],
+    ['바르게 쓴 것은?', '어떡해', '어떻해', '어떠캐'], ['바르게 쓴 것은?', '왠지', '웬지', '왼지'], ['바르게 쓴 것은?', '금세', '금새', '금쌔'],
+    ['바르게 쓴 것은?', '베개', '배게', '베게'], ['바르게 쓴 것은?', '찌개', '찌게', '찌깨'], ['바르게 쓴 것은?', '오랜만에', '오랫만에', '오랜마네'],
+    ['바르게 쓴 것은?', '안 돼요', '안 되요', '않 돼요'], ['바르게 쓴 것은?', '됐어요', '됬어요', '됏어요'], ['바르게 쓴 것은?', '할게요', '할께요', '할개요'],
+    ['바르게 쓴 것은?', '곰곰이', '곰곰히', '곰곰니'], ['바르게 쓴 것은?', '깨끗이', '깨끗히', '깨끄시'], ['바르게 쓴 것은?', '틈틈이', '틈틈히', '틈틈니'],
+    ['바르게 쓴 것은?', '떡볶이', '떡볶기', '떡뽁이'], ['바르게 쓴 것은?', '눈곱', '눈꼽', '눈곰'], ['바르게 쓴 것은?', '해님', '햇님', '핸님'],
+    ['바르게 쓴 것은?', '숟가락', '숫가락', '숟갈락'], ['바르게 쓴 것은?', '젓가락', '젇가락', '젓갈락'], ['바르게 쓴 것은?', '무릎', '무릅', '무릇'],
+    ['바르게 쓴 것은?', '부엌', '부억', '부엇'], ['바르게 쓴 것은?', '꽃잎', '꼿잎', '꽃입'], ['바르게 쓴 것은?', '웃어른', '윗어른', '우어른'],
+    ['바르게 쓴 것은?', '아니에요', '아니예요', '아니애요'], ['바르게 쓴 것은?', '꼼꼼히', '꼼꼼이', '꼼꼼니'], ['바르게 쓴 것은?', '닭', '닥', '닯'],
+    ['바르게 쓴 것은?', '희한하다', '히한하다', '희안하다'], ['바르게 쓴 것은?', '돌멩이', '돌맹이', '돌멩니'], ['바르게 쓴 것은?', '나뭇잎', '나무잎', '나묻잎'],
+    // 흉내 내는 말
+    ['소리를 흉내 낸 말은?', '멍멍', '반짝반짝', '엉금엉금'], ['모양을 흉내 낸 말은?', '깡충깡충', '야옹', '딩동'], ['닭 울음소리는?', '꼬끼오', '음매', '꽥꽥'],
+    ['오리 울음소리는?', '꽥꽥', '멍멍', '꿀꿀'], ['돼지 울음소리는?', '꿀꿀', '야옹', '짹짹'], ['소 울음소리는?', '음매', '짹짹', '개굴개굴'],
+    ['참새 울음소리는?', '짹짹', '음매', '어흥'], ['개구리 울음소리는?', '개굴개굴', '꿀꿀', '야옹'], ['호랑이 울음소리는?', '어흥', '짹짹', '꽥꽥'],
+    ['별이 빛나는 모양은?', '반짝반짝', '쿵쿵', '멍멍'], ['거북이 느릿느릿 기어가는 모양은?', '엉금엉금', '깡충깡충', '훨훨'], ['새가 날아가는 모양은?', '훨훨', '엉금엉금', '뒤뚱뒤뚱'],
+    ['비가 많이 내리는 소리는?', '주룩주룩', '반짝반짝', '살금살금'], ['문을 두드리는 소리는?', '똑똑', '훨훨', '살랑살랑'], ['몰래 조용히 걷는 모양은?', '살금살금', '쿵쾅쿵쾅', '펄쩍펄쩍'],
+    ['바람이 부드럽게 부는 모양은?', '살랑살랑', '쾅쾅', '뻘뻘'], ['크게 웃는 소리는?', '하하', '엉엉', '콜록콜록'], ['크게 우는 소리는?', '엉엉', '하하', '깔깔'],
+    ['기침하는 소리는?', '콜록콜록', '하하', '쿨쿨'], ['깊이 잠든 모양은?', '쿨쿨', '깡충깡충', '짹짹'], ['배고플 때 배에서 나는 소리는?', '꼬르륵', '딩동', '짹짹'],
+    ['오리가 걷는 모양은?', '뒤뚱뒤뚱', '훨훨', '반짝반짝'], ['초인종 소리는?', '딩동', '음매', '쿨쿨'],
+    // 아닌 것 찾기
+    ['과일이 아닌 것은?', '당근', '사과', '바나나'], ['탈것이 아닌 것은?', '연필', '버스', '기차'], ['동물이 아닌 것은?', '의자', '토끼', '여우'],
+    ['계절이 아닌 것은?', '아침', '봄', '가을'], ['악기가 아닌 것은?', '숟가락', '피아노', '북'], ['학용품이 아닌 것은?', '냄비', '연필', '지우개'],
+    ['채소가 아닌 것은?', '포도', '오이', '배추'], ['운동이 아닌 것은?', '낮잠', '축구', '줄넘기'], ['날씨를 나타내는 말이 아닌 것은?', '책상', '비', '눈'],
+    ['몸의 한 부분이 아닌 것은?', '모자', '팔', '다리'], ['옷이 아닌 것은?', '우산', '치마', '바지'], ['꽃이 아닌 것은?', '소나무', '장미', '튤립'],
+    ['새가 아닌 것은?', '박쥐', '참새', '비둘기'], ['바다에 사는 동물이 아닌 것은?', '다람쥐', '고래', '문어'], ['가구가 아닌 것은?', '사과', '침대', '책상'],
+    ['색깔을 나타내는 말이 아닌 것은?', '동그라미', '빨강', '노랑'], ['먹을 수 없는 것은?', '돌멩이', '밥', '빵'], ['곤충이 아닌 것은?', '거미', '나비', '개미'],
+    // 알맞은 말 넣기
+    ["'토끼가 깡충깡충 ( ).' 알맞은 말은?", '뛰어요', '헤엄쳐요', '날아요'], ["'물고기가 물속에서 ( ).' 알맞은 말은?", '헤엄쳐요', '날아요', '기어요'],
+    ["'새가 하늘을 ( ).' 알맞은 말은?", '날아요', '헤엄쳐요', '굴러요'], ["'밥 먹기 전에 손을 ( ).' 알맞은 말은?", '씻어요', '던져요', '접어요'],
+    ["'책을 ( ).' 알맞은 말은?", '읽어요', '마셔요', '신어요'], ["'신발을 ( ).' 알맞은 말은?", '신어요', '입어요', '써요'],
+    ["'모자를 ( ).' 알맞은 말은?", '써요', '신어요', '먹어요'], ["'옷을 ( ).' 알맞은 말은?", '입어요', '신어요', '써요'],
+    ["'장갑을 ( ).' 알맞은 말은?", '껴요', '써요', '마셔요'], ["'우유를 ( ).' 알맞은 말은?", '마셔요', '신어요', '읽어요'],
+    ["'노래를 ( ).' 알맞은 말은?", '불러요', '먹어요', '입어요'], ["'그림을 ( ).' 알맞은 말은?", '그려요', '불러요', '마셔요'],
+    ["'피아노를 ( ).' 알맞은 말은?", '쳐요', '입어요', '먹어요'], ["'선물을 받아서 ( ).' 알맞은 말은?", '기뻐요', '슬퍼요', '아파요'],
+    ["'넘어져서 무릎이 ( ).' 알맞은 말은?", '아파요', '맛있어요', '반짝여요'], ["'봄에는 꽃이 ( ).' 알맞은 말은?", '피어요', '녹아요', '얼어요'],
+    ["'겨울에는 눈이 ( ).' 알맞은 말은?", '와요', '피어요', '익어요'], ["'가을에는 사과가 빨갛게 ( ).' 알맞은 말은?", '익어요', '녹아요', '피어요'],
+    ["'졸려서 하품을 ( ).' 알맞은 말은?", '해요', '마셔요', '그려요'], ["'친구에게 편지를 ( ).' 알맞은 말은?", '써요', '신어요', '마셔요'],
+    // 높임말
+    ["'밥'의 높임말은?", '진지', '밥알', '반찬'], ["'집'의 높임말은?", '댁', '방', '마당'], ["'나이'의 높임말은?", '연세', '키', '이름'],
+    ["'이름'의 높임말은?", '성함', '별명', '글씨'], ["'자다'의 높임말은?", '주무시다', '먹다', '일어나다'], ["'먹다'의 높임말은?", '드시다', '마시다', '먹이다'],
+    ["'있다'의 높임말은?", '계시다', '없다', '주다'], ["'말'의 높임말은?", '말씀', '말투', '말풍선'], ["'아프다'의 높임말은?", '편찮으시다', '아프다', '슬프다'],
+    ["'할머니께 선물을 ( ).' 알맞은 말은?", '드려요', '줘요', '받아요'],
+    // 세는 말
+    ["'연필 한 ( )' 알맞은 말은?", '자루', '마리', '켤레'], ["'신발 한 ( )' 알맞은 말은?", '켤레', '자루', '장'], ["'종이 한 ( )' 알맞은 말은?", '장', '마리', '그루'],
+    ["'나무 한 ( )' 알맞은 말은?", '그루', '켤레', '자루'], ["'강아지 한 ( )' 알맞은 말은?", '마리', '장', '켤레'], ["'책 한 ( )' 알맞은 말은?", '권', '마리', '그루'],
+    ["'자동차 한 ( )' 알맞은 말은?", '대', '권', '장'], ["'집 한 ( )' 알맞은 말은?", '채', '마리', '켤레'], ["'꽃 한 ( )' 알맞은 말은?", '송이', '켤레', '대'],
+    ["'옷 한 ( )' 알맞은 말은?", '벌', '그루', '송이'], ["'양말 한 ( )' 알맞은 말은?", '켤레', '권', '그루'], ["'사람 한 ( )' 알맞은 말은?", '명', '그루', '장'],
+    ["'물 한 ( )' 알맞은 말은?", '잔', '켤레', '그루'], ["'밥 한 ( )' 알맞은 말은?", '그릇', '켤레', '권'],
+    // 비슷한 말
+    ["'기쁘다'와 뜻이 비슷한 말은?", '즐겁다', '슬프다', '무섭다'], ["'예쁘다'와 뜻이 비슷한 말은?", '아름답다', '더럽다', '무겁다'],
+    ["'크다'와 뜻이 비슷한 말은?", '커다랗다', '조그맣다', '좁다'], ["'말하다'와 뜻이 비슷한 말은?", '이야기하다', '듣다', '잠자다'],
+    ["'빠르다'와 뜻이 비슷한 말은?", '재빠르다', '느리다', '늦다'], ["'걱정하다'와 뜻이 비슷한 말은?", '염려하다', '웃다', '뽐내다'],
+    ["'시작하다'와 뜻이 비슷한 말은?", '출발하다', '끝내다', '멈추다'], ["'고맙다'와 뜻이 비슷한 말은?", '감사하다', '미안하다', '심심하다']
+  ];
+  // 그리기: 색 순서 기억 놀이에 쓰는 색 여섯
+  const BTQ_COL = [['빨강', '#E8575A'], ['주황', '#F29A3A'], ['노랑', '#F3C83F'], ['초록', '#5DB35A'], ['파랑', '#4A8FD9'], ['보라', '#9B6BD3']];
+  const btqMix = a => { a = a.slice(); for (let i = a.length - 1; i > 0; i--) { const j = Math.floor(Math.random() * (i + 1)); [a[i], a[j]] = [a[j], a[i]]; } return a; };
+  // 문제 은행에서 이번 판에 안 나온 문제부터(세 판쯤은 겹치지 않게)
+  function btqPick(bank, key, n) {
+    const seen = (rt.btqSeen = rt.btqSeen || {})[key] = rt.btqSeen[key] || [];
+    let pool = bank.map((_, i) => i).filter(i => !seen.includes(i));
+    if (pool.length < n) { seen.length = 0; pool = bank.map((_, i) => i); }
+    const pick = btqMix(pool).slice(0, n);
+    seen.push(...pick); if (seen.length > bank.length * 0.8) seen.splice(0, seen.length - Math.floor(bank.length * 0.8));
+    return pick.map(i => { const [q, a, ...w] = bank[i]; return { q, a, opts: btqMix([a, ...w]) }; });
+  }
+  // 수학: 한 자리 수 사칙연산. 빼기는 0 이상, 나누기는 나누어떨어지게. 중학교부터 더하기와 빼기는 두 자리 수 + 한 자리 수
+  function btqMath() {
+    const r = n => 1 + Math.floor(Math.random() * n), big = S.tier >= 2, op = Math.floor(Math.random() * 4);
+    let a, b, ans, t;
+    if (op === 0) { a = big ? 9 + r(90) : r(9); b = r(9); ans = a + b; t = '+'; }
+    else if (op === 1) { a = big ? 9 + r(90) : r(9); b = r(9); if (b > a) [a, b] = [b, a]; ans = a - b; t = '−'; }
+    else if (op === 2) { a = r(9); b = r(9); ans = a * b; t = '×'; }
+    else { b = r(9); ans = r(9); a = ans * b; t = '÷'; }
+    const w = new Set();
+    for (const d of btqMix([1, 2, -1, -2, 3, -3])) { const v = ans + d; if (v >= 0 && v !== ans) w.add(v); if (w.size >= 2) break; }
+    return { q: `${a} ${t} ${b} = ?`, a: String(ans), opts: btqMix([ans, ...w]).map(String), math: true };
+  }
+  function btqMake(e) {
+    if (e === 'math') return { kind: 'q', qs: Array.from({ length: BTQ.n }, btqMath), k: 0, got: 0, fb: null };
+    if (e === 'sci') return { kind: 'q', qs: btqPick(BTQ_SCI, 'sci', BTQ.n), k: 0, got: 0, fb: null };
+    if (e === 'kor') return { kind: 'q', qs: btqPick(BTQ_KOR, 'kor', BTQ.n), k: 0, got: 0, fb: null };
+    const len = S.tier >= 2 ? 4 : 3, seq = [];
+    for (let i = 0; i < len; i++) { let c; do { c = Math.floor(Math.random() * BTQ_COL.length); } while (seq.length && c === seq[seq.length - 1]); seq.push(c); }
+    return { kind: 'mem', seq, show: -1, input: [], phase: 'show', ok: true };
+  }
+  const btqPts = Z => Z.kind === 'q' ? BTQ.pts[Math.min(BTQ.n, Z.got)] : Math.round(10 * (Z.ok ? Z.input.length : Math.max(0, Z.input.length - 1)) / Z.seq.length);
+  function btqHTML(Z) {
+    if (Z.kind === 'q') {
+      const q = Z.qs[Z.k];
+      return `<b class="btq-q${q.math ? ' math' : ''}">${esc(q.q)}</b><span class="btq-time${Z.fb ? ' stop' : ''}"><i style="animation-duration:${BTQ.qMs}ms"></i></span>` +
+        `<span class="btq-opts">${q.opts.map((o, i) => `<button type="button" class="btq-o${Z.fb && o === q.a ? ' right' : ''}${Z.fb && Z.fb.pick === i && o !== q.a ? ' wrong' : ''}" data-bq="${i}"${Z.fb ? ' disabled' : ''}>${esc(o)}</button>`).join('')}</span>` +
+        `<small class="btq-n">${Z.k + 1} / ${BTQ.n}번째 문제, 맞힌 문제 ${Z.got}개</small>`;
+    }
+    const dot = (c, on) => `<i class="btq-dot${on ? ' on' : ''}" style="--c:${BTQ_COL[c][1]}" aria-label="${BTQ_COL[c][0]}"></i>`;
+    if (Z.phase === 'show') return `<b>색 순서를 기억해요!</b><span class="btq-seq">${Z.seq.map((c, i) => i === Z.show ? dot(c, true) : '<i class="btq-dot blank"></i>').join('')}</span><small class="btq-n">${Z.seq.length}개의 색이 차례로 나와요</small>`;
+    return `<b>${Z.phase === 'done' ? (Z.ok ? '모두 맞혔어요!' : '아쉬워요!') : '본 순서대로 눌러요'}</b><span class="btq-time${Z.phase === 'done' ? ' stop' : ''}"><i style="animation-duration:${BTQ.memMs}ms"></i></span>` +
+      `<span class="btq-seq">${Z.seq.map((c, i) => i < Z.input.length ? dot(Z.input[i], true) : '<i class="btq-dot blank"></i>').join('')}</span>` +
+      `<span class="btq-pal">${BTQ_COL.map((c, i) => `<button type="button" class="btq-c" style="--c:${c[1]}" data-bm="${i}" aria-label="${c[0]}"${Z.phase === 'done' ? ' disabled' : ''}></button>`).join('')}</span>`;
+  }
+  function btqRender(M) { const c = $('#btCheer'); if (!c || !M || !M.quiz) return; c.className = 'bt-cheer on btq'; c.innerHTML = btqHTML(M.quiz); }
+  // 문제 하나: 7초 안에 고르지 않으면 틀린 것으로
+  function btqAsk(M) {
+    const Z = M.quiz; Z.fb = null; btqRender(M);
+    clearTimeout(btUI.timer);
+    btUI.timer = setTimeout(() => { if (btUI.M === M && M.quiz === Z && !Z.fb) btqAnswer(-1); }, BTQ.qMs);
+  }
+  function btqAnswer(i) {
+    const M = btUI.M; if (!M || !M.quiz || M.quiz.kind !== 'q' || M.quiz.fb) return;
+    const Z = M.quiz, q = Z.qs[Z.k], ok = i >= 0 && q.opts[i] === q.a;
+    clearTimeout(btUI.timer);
+    Z.fb = { pick: i }; if (ok) Z.got += 1;
+    sfx(ok ? 'done' : 'tap'); buzz(ok ? 12 : [20, 30, 20]); btqRender(M);
+    btUI.timer = setTimeout(() => {
+      if (btUI.M !== M || M.quiz !== Z) return;
+      Z.k += 1;
+      if (Z.k < BTQ.n) btqAsk(M); else btReveal(M, btqPts(Z));
+    }, BTQ.fbMs);
+  }
+  // 기억 놀이: 색이 하나씩 켜졌다 꺼지고, 그다음 9초 안에 같은 순서로 눌러요. 틀리면 거기서 끝
+  function btqMemShow(M) {
+    const Z = M.quiz, step = j => {
+      if (btUI.M !== M || M.quiz !== Z) return;
+      if (j >= Z.seq.length) { Z.show = -1; Z.phase = 'input'; btqRender(M); btUI.timer = setTimeout(() => { if (btUI.M === M && M.quiz === Z && Z.phase === 'input') btqMemEnd(M, false); }, BTQ.memMs); return; }
+      Z.show = j; btqRender(M); sfx('tap');
+      btUI.timer = setTimeout(() => { Z.show = -1; btqRender(M); btUI.timer = setTimeout(() => step(j + 1), BTQ.memGap); }, BTQ.memShow);
+    };
+    btUI.timer = setTimeout(() => step(0), 400);
+  }
+  function btqMemTap(c) {
+    const M = btUI.M; if (!M || !M.quiz || M.quiz.kind !== 'mem' || M.quiz.phase !== 'input') return;
+    const Z = M.quiz, ok = Z.seq[Z.input.length] === c;
+    Z.input.push(c); buzz(ok ? 8 : [20, 30, 20]); sfx(ok ? 'tap' : 'tap');
+    if (!ok) { btqMemEnd(M, false); return; }
+    if (Z.input.length >= Z.seq.length) { btqMemEnd(M, true); return; }
+    btqRender(M);
+  }
+  function btqMemEnd(M, ok) {
+    const Z = M.quiz; if (Z.phase === 'done') return;
+    clearTimeout(btUI.timer);
+    Z.phase = 'done'; Z.ok = ok && Z.input.length >= Z.seq.length; btqRender(M);
+    if (Z.ok) sfx('done');
+    btUI.timer = setTimeout(() => { if (btUI.M === M && M.quiz === Z) btReveal(M, btqPts(Z)); }, BTQ.fbMs + 150);
+  }
   const btCheerPts = n => Math.min(BT.cheerMax, Math.round(Math.min(BT.cheerTaps, n) / (BT.cheerTaps / BT.cheerMax)));
   // 2.1.0 점수가 0부터 차오르는 연출
   function btCount(el, to, ms) { if (!el) return; if (rt.reduced) { el.textContent = to + '점'; return; } const t0 = performance.now(); const step = t => { const k = Math.min(1, (t - t0) / ms); el.textContent = Math.round(to * (1 - Math.pow(1 - k, 3))) + '점'; if (k < 1) requestAnimationFrame(step); }; requestAnimationFrame(step); }
-  // 종목 하나: 4초 동안 두드리면 응원. 그다음 점수 공개
+  // 종목 하나: 달리기는 4초 동안 두드리면 응원, 다른 종목은 문제(2.1.1). 그다음 점수 공개
   function btPlayEv() {
     const M = btUI.M; if (!M || M.phase !== 'play') return;
-    btUI.taps = 0; M.cheering = true; M.reveal = false; btRender();
+    const e = M.evs[M.i];
+    btUI.taps = 0; M.reveal = false;
+    if (e !== 'pe') {   // 2.1.1 수학, 과학, 책 읽기는 퀴즈, 그리기는 색 기억 놀이
+      M.cheering = false; M.quiz = btqMake(e); btRender();
+      if (M.quiz.kind === 'q') btqAsk(M); else btqMemShow(M);
+      return;
+    }
+    M.quiz = null; M.cheering = true; btRender();
     const ms = rt.reduced ? 2000 : BT.cheerMs;
     $('#btPlay').style.setProperty('--bt-t', ms + 'ms');
     requestAnimationFrame(() => $('#btPlay').classList.add('go'));
     btUI.timer = setTimeout(() => {
       if (!btUI.M || btUI.M !== M) return;
       M.cheering = false; $('#btPlay').classList.remove('go');
-      const r = M.rolls[M.i]; r.mc = btCheerPts(btUI.taps); r.win = btWin(r, r.mc); M.res.push(r);
-      M.reveal = true; btRender(); buzz(20);
-      btCount($('#btScMe'), btScore(r.ms, r.md, r.mc), 700); btCount($('#btScOpp'), btScore(r.os, r.od, r.oc), 700);
-      setTimeout(() => { if (btUI.M !== M) return; $('#btDuel').classList.add('done'); sfx(r.win ? 'quest' : 'tap'); buzz(r.win ? [20, 30, 20] : 30); }, rt.reduced ? 0 : 750);
-      btUI.timer = setTimeout(() => {
-        if (!btUI.M || btUI.M !== M) return;
-        M.i += 1;
-        if (M.i < 3) btPlayEv(); else { M.phase = 'result'; btFinish(M); btRender(); }
-      }, rt.reduced ? 900 : 2100);
+      btReveal(M, btCheerPts(btUI.taps));
     }, ms);
+  }
+  // 점수 공개: 응원(문제) 점수 mc를 넣고 이겼는지 보여 준 뒤 다음 종목으로
+  function btReveal(M, mc) {
+    if (!btUI.M || btUI.M !== M) return;
+    clearTimeout(btUI.timer);
+    const r = M.rolls[M.i]; r.mc = Math.max(0, Math.min(BT.cheerMax, mc | 0)); r.win = btWin(r, r.mc); M.res.push(r);
+    M.quiz = null; M.reveal = true; btRender(); buzz(20);
+    btCount($('#btScMe'), btScore(r.ms, r.md, r.mc), 700); btCount($('#btScOpp'), btScore(r.os, r.od, r.oc), 700);
+    setTimeout(() => { if (btUI.M !== M) return; $('#btDuel').classList.add('done'); sfx(r.win ? 'quest' : 'tap'); buzz(r.win ? [20, 30, 20] : 30); }, rt.reduced ? 0 : 750);
+    btUI.timer = setTimeout(() => {
+      if (!btUI.M || btUI.M !== M) return;
+      M.i += 1;
+      if (M.i < 3) btPlayEv(); else { M.phase = 'result'; btFinish(M); btRender(); }
+    }, rt.reduced ? 900 : 2100);
   }
   function btTap(e) {
     const M = btUI.M; if (!M || M.phase !== 'play' || !M.cheering) return;
@@ -12002,9 +12275,9 @@ span.bt-stamp{display:none}.bt-duel.done span.bt-stamp{display:grid}
         (r && (mine ? !r.win : r.win) ? (IMG('bfx_lose') ? `<img class="bt-stamp" src="${IMG('bfx_lose')}" alt="짐">` : '<span class="bt-stamp l">패</span>') : '') + '</div>';
       $('#btDuel').className = 'bt-duel ev-' + e + (r ? '' : ' live');
       $('#btDuel').innerHTML = side('me', me, me.st[e], true) + '<span class="bt-vs2">VS</span>' + side('opp', o, o.st, false);
-      $('#btCheer').className = 'bt-cheer' + (M.cheering ? ' on' : '');
-      $('#btCheer').innerHTML = M.cheering ? `<b>화면을 마구 두드려 응원해요!</b><span class="bt-meter"><i id="btMeterI"></i></span><span class="bt-cnt"><span id="btCheerN">0 / ${BT.cheerTaps}</span><small id="btCheerPt">응원 점수 +0</small></span>`
-        : r ? `<b>${r.win ? '이겼어요!' : '아쉬워요!'}</b><span>응원 점수 ${r.mc} : ${r.oc}</span>` : '';
+      $('#btCheer').className = 'bt-cheer' + (M.cheering || M.quiz ? ' on' : '') + (M.quiz ? ' btq' : '');
+      $('#btCheer').innerHTML = M.quiz ? btqHTML(M.quiz) : M.cheering ? `<b>화면을 마구 두드려 응원해요!</b><span class="bt-meter"><i id="btMeterI"></i></span><span class="bt-cnt"><span id="btCheerN">0 / ${BT.cheerTaps}</span><small id="btCheerPt">응원 점수 +0</small></span>`
+        : r ? `<b>${r.win ? '이겼어요!' : '아쉬워요!'}</b><span>${e === 'pe' ? '응원' : e === 'art' ? '기억' : '퀴즈'} 점수 ${r.mc} : ${r.oc}</span>` : '';
       $('#btScoreLine').innerHTML = [0, 1, 2].map(j => { const x = M.reveal || j < M.i ? M.res[j] : null; return `<i class="${x ? (x.win ? 'w' : 'l') : j === i ? 'now' : ''}">${btEvIc(M.evs[j], 18)}</i>`; }).join('');
     } else {
       const o = M.out || {}, L = S.bt.lg, nx = BT_LG[L + 1];
@@ -15603,6 +15876,7 @@ span.bt-stamp{display:none}.bt-duel.done span.bt-stamp{display:grid}
     $('#btRows').addEventListener('click', e => { const b = e.target.closest('[data-bslot]'); if (!b || !btUI.M || btUI.M.phase !== 'pick') return; btUI.M.sel = +b.dataset.bslot; sfx('tap'); btRender(); });
     $('#btList').addEventListener('click', e => { const b = e.target.closest('[data-bpick]'); if (b) btPick(b.dataset.bpick); });
     $('#btPlay').addEventListener('pointerdown', btTap);
+    $('#btCheer').addEventListener('click', e => { const q = e.target.closest('[data-bq]'), c = e.target.closest('[data-bm]'); if (q) btqAnswer(+q.dataset.bq); else if (c) btqMemTap(+c.dataset.bm); });   // 2.1.1 종목 문제
     $('#btResult').addEventListener('click', e => { if (e.target.closest('#btAgain')) btAgain(); else if (e.target.closest('#btDone')) { sfx('tap'); btClose(); } });
     // 2.0.1 시험 기간
     $('#sheetExam').addEventListener('click', () => { closeSheet(); setTimeout(openExam, 240); });
@@ -17253,6 +17527,7 @@ span.bt-stamp{display:none}.bt-duel.done span.bt-stamp{display:grid}
   // 시험용 손잡이: 자동 시험(window.__FOREST_TEST)에서만 게임 속 함수를 꺼내 써요
   if (window.__FOREST_TEST) window.__forest = { get S() { return S; }, goTo, conOn, conLeft, conTick, conSec, conFinish, tkPlan, tkUse, tkUseAll, TK, CON, TKAD, capNext, yearCap,   // 2.1.0 공사
     semOn, semFirst, semLabel, cereDip, semBreak,   // 2.1.0 학기(s80)
+    get btUI() { return btUI; }, BTQ, BTQ_SCI, BTQ_KOR, BTQ_COL, btqMake, btqMath, btqPick, btqAnswer, btqMemTap, btqPts, btReveal,   // 2.1.1 대결 종목 문제
     BF, FR_LINES, frSync, frMake, frOf, frNm, frFull, frHeart, frList, frPat, frGift, frGiftLeft, frAddP, frRename, frHere, frKidTap, frLetter, frTick, bdParty, bdPlace, bdClaim, bdDoneToday, bdRender, bdHats,
     albAdd, albMigrate, openAlbum, renderAlbum, openLetter, sanitize211,   // 2.1.1 학생과 추억
     PCN, pcStart, pcSettle, pcTick, pcActive, pcAway, pcRemain, openPicnic, renderPicnic, SK, SK_KINDS, skAdd, skPrize, skLeft, skFull, openSticker, renderSticker,

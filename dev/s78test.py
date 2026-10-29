@@ -78,6 +78,7 @@ async def main():
             print(w, '고르기', r)
             if r['rows'] != 3 or r['go'] != 'false' or r['over']: bad.append(f'{w} 고르기 화면이 틀려요 {r}')
             await pg.screenshot(path=f's78_pick_{w}.png')
+            await pg.evaluate(f"{F}.btUI.M.evs = ['pe', 'pe', 'pe']")   # 2.1.1 다른 종목은 문제(s84)라 여기서는 두드리기 종목만
             await pg.evaluate(f"{F}.btStart()"); await pg.wait_for_timeout(1200)
             for i in range(4): await pg.mouse.click(w // 2, 420); await pg.wait_for_timeout(60)
             await pg.screenshot(path=f's78_play_{w}.png')
