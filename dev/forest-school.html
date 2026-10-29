@@ -5598,8 +5598,9 @@ span.bt-stamp{display:none}.bt-duel.done span.bt-stamp{display:grid}
      시설을 한 레벨 올리거나 새로 지으면 돈을 내고 공사가 시작돼요. 끝나야 레벨이 올라요. 같은 건물은 한 번에 한 레벨, 다른 건물은 동시에 몇 개든.
      레벨 하나 공사 시간 [짧은 쪽, 긴 쪽](초): 학년 첫 레벨이 짧은 쪽, 그 학년 상한 레벨이 긴 쪽으로 고르게 늘어요. 새 건물(Lv.1 짓기)은 긴 쪽.
      자리 비운 동안에도 게임 시계(gameNow)로 공사가 돌아가요. 가구와 선생님 연수는 그대로 바로예요 */
-  const CON = { kinder: [5, 5], low: [1800, 3600], high: [3600, 7200], mid: [7200, 14400], hs: [10800, 21600], uni: [14400, 28800] };
-  const conBand = () => S.tier < 1 ? CON.kinder : S.tier === 1 ? (S.tg < 3 ? CON.low : CON.high) : S.tier === 2 ? CON.mid : S.tier === 3 ? CON.hs : CON.uni;
+  // 2.1.1 지섭 결정: 초등 저학년 1~15분, 고학년 15분~1시간, 중학교 1~2시간, 고등학교 2~3시간, 대학교 3~4시간, 대학원 4~8시간
+  const CON = { kinder: [5, 5], low: [60, 900], high: [900, 3600], mid: [3600, 7200], hs: [7200, 10800], uni: [10800, 14400], grad: [14400, 28800] };
+  const conBand = () => S.tier < 1 ? CON.kinder : S.tier === 1 ? (S.tg < 3 ? CON.low : CON.high) : S.tier === 2 ? CON.mid : S.tier === 3 ? CON.hs : S.tier === 4 ? CON.uni : CON.grad;
   function conSec(k, L) {   // L: 공사가 끝나면 오를 레벨
     const [a, b] = conBand();
     if (L <= 1) return b;
