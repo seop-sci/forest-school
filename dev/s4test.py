@@ -23,6 +23,10 @@ async def ctxpage(b, w, h, scheme, save):
     page.on('pageerror', lambda e: errs.append(str(e)))
     page.on('console', lambda m: errs.append('console:'+m.text) if m.type=='error' and 'ERR_TUNNEL' not in m.text else None)
     await page.goto(URL); await page.wait_for_timeout(900)
+    # 2.0.0부터 업데이트 뒤 첫 접속에 공지 창이 떠요. 이 시험은 공지를 보지 않으니 닫아요(2026-10-29)
+    for _ in range(3):
+        if not await page.evaluate("!document.querySelector('#mNotice').hidden"): break
+        await page.evaluate("document.querySelector('#ntClose').click()"); await page.wait_for_timeout(300)
     return ctx, page, errs
 
 BOARD = """(() => { const q = s => document.querySelector(s);
