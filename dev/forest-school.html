@@ -2226,7 +2226,8 @@ body{background:radial-gradient(120% 60% at 50% 0%, color-mix(in srgb, var(--pap
 .alb-slot .alb-bd{position:absolute;right:-6%;top:-6%;width:34%}.alb-slot .alb-el{position:absolute;left:-6%;top:-6%;width:34%}
 .alb-big{position:absolute;left:53.6%;top:25%;width:33%;height:31.2%;overflow:hidden;border-radius:2px}
 .alb-big img.m{width:100%;height:100%;object-fit:cover;object-position:50% 45%}
-.alb-cn{position:absolute;width:13%}.alb-cn.a{left:51.8%;top:23.2%}.alb-cn.b{left:75.6%;top:23.2%;transform:scaleX(-1)}.alb-cn.c{left:51.8%;top:49.6%;transform:scaleY(-1)}.alb-cn.d{left:75.6%;top:49.6%;transform:scale(-1)}
+.alb-big svg.m{display:block;width:100%;height:100%}
+.alb-cn{position:absolute;width:7%;pointer-events:none}.alb-cn.a{left:52.4%;top:23.6%}.alb-cn.b{left:80.8%;top:23.6%;transform:scaleX(-1)}.alb-cn.c{left:52.4%;top:46%;transform:scaleY(-1)}.alb-cn.d{left:80.8%;top:46%;transform:scale(-1)}   /* 2.1.3 사진 귀퉁이가 너무 커서 글자를 가렸어요 */
 .alb-cap{position:absolute;left:55%;top:58.4%;width:30.5%;height:14.2%;display:grid;grid-template-rows:1fr 1fr 1fr;text-align:center;color:#5A3A16;font-size:10px;line-height:1.1}
 .alb-cap span{align-self:end;padding-bottom:1px;white-space:nowrap;overflow:hidden}.alb-cap b{align-self:end;padding-bottom:1px;font-family:var(--font-display);font-weight:400;font-size:11px;white-space:nowrap}
 .alb-none{position:absolute;inset:18% 12%;display:grid;place-items:center;text-align:center;color:#5A3A16;font-size:13px}
@@ -2576,8 +2577,9 @@ span.bt-stamp{display:none}.bt-duel.done span.bt-stamp{display:grid}
 .mg-tile.gen.has-img::after{content:"";position:absolute;inset:6%;border-radius:50%;background:radial-gradient(closest-side, rgba(255,236,150,.55), rgba(255,236,150,0));z-index:-1}
 .mg-tile.gen.tired{filter:saturate(.5) brightness(.8)}
 /* 2.1.2.2 합치기 그림 잘 보이게(지섭 요청): 판 위 조각마다 밝은 둥근 받침과 종류 색 테두리를 깔아 판 바탕과 떨어져 보이게 하고, 그림을 조금 키우고, 단계 숫자는 작게 모서리로 */
-.mg-cell .mg-tile.has-img:not(.gen){inset:5%;border-radius:24%;background:var(--mg-img) center 46%/90% no-repeat, radial-gradient(circle at 50% 42%, #FFFDF6 0 52%, color-mix(in srgb, var(--mg-c, #FFF4D6) 80%, #FFFDF6) 100%);box-shadow:inset 0 0 0 1.5px color-mix(in srgb, var(--mg-c, #E8D3A8) 55%, #8F6A3D), inset 0 -2.5px 0 rgba(120,80,30,.16), 0 1.5px 2.5px rgba(70,45,15,.3)}
+.mg-cell .mg-tile.has-img:not(.gen),.mo-it .mg-tile.has-img,.md-t .mg-tile.has-img:not(.gen){inset:5%;border-radius:24%;background:var(--mg-img) center 46%/90% no-repeat, radial-gradient(circle at 50% 42%, #FFFDF6 0 52%, color-mix(in srgb, var(--mg-c, #FFF4D6) 80%, #FFFDF6) 100%);box-shadow:inset 0 0 0 1.5px color-mix(in srgb, var(--mg-c, #E8D3A8) 55%, #8F6A3D), inset 0 -2.5px 0 rgba(120,80,30,.16), 0 1.5px 2.5px rgba(70,45,15,.3)}
 .mg-cell .mg-tile.has-img:not(.gen) b{right:-3px;bottom:-3px;min-width:13px;padding:0 3px;font-size:9.5px;line-height:13px;box-shadow:0 0 0 1.5px #FFF7E6}
+.mo-it .mg-tile.has-img{inset:auto}.md-t .mg-tile.has-img:not(.gen){inset:3%}   /* 2.1.3 주문과 도감 조각도 판과 같은 모습(지섭: 주문 그림과 판 그림이 달라 헷갈려요) */
 .mg-cell .mg-tile.has-img.lv10:not(.gen){box-shadow:inset 0 0 0 2px #E2A92A, inset 0 -2.5px 0 rgba(120,80,30,.16), 0 0 6px rgba(255,200,60,.7)}
 .mg-drag{position:fixed;z-index:30;width:52px;height:52px;pointer-events:none;transform:translate(-50%,-50%) scale(1.15);filter:drop-shadow(0 6px 8px rgba(0,0,0,.4))}
 .mg-drag .mg-tile{position:absolute;inset:0}
@@ -12000,8 +12002,23 @@ span.bt-stamp{display:none}.bt-duel.done span.bt-stamp{display:grid}
   /* 졸업 앨범: 종업식('y')과 졸업식('g')마다 한 쪽. 사진 칸 6개는 그해 하트가 높은 단짝, 큰 사진은 그 학교급 지도 */
   const ALB_MAP = ['map_kinder', 'map_elem', 'map_middle'];
   const ALB_SLOTS = [[14.2, 20.2], [31, 20.2], [14.2, 39.5], [31, 39.5], [14.2, 58.6], [31, 58.6]];
+  // 2.1.3 앨범 쪽 그림: 빈 지도 대신 그때 학교 모습(그때 건물 레벨로 지은 건물과 공사 자리). 학교급 모습 보기와 같은 그림 규칙(지섭 제보)
+  function albSchool(pg) {
+    const t = pg.t, G = GEO[geoIdx(t)]; if (!G) return '';
+    const mk = mapKey(G.map), mapU = IMG170(mk); if (!mapU) return '';
+    const f = pg.f || {}, bs = pg.bs || {}, items = [];
+    const keys = Object.keys(FAC).filter(k => (FAC[k].tier || 0) <= t && G.lot[k]);
+    for (const k of keys) {
+      const built = (f[k] || 0) >= 1, im = seasonKey(built ? viewBldKey(k, t, bs[k] != null ? bs[k] : t) : SITE_IMG[k]), u = IMG170(im); if (!u) continue;
+      const [cx, cy, w] = lotRect(G.lot[k], im);
+      items.push({ y: cy, s: `<image href="${u}" x="${(cx - w / 2).toFixed(1)}" y="${(cy - w / 2).toFixed(1)}" width="${w.toFixed(1)}" height="${w.toFixed(1)}"/>` });
+    }
+    if (G.oak) { const [ox, oy] = G.oak, u = IMG170(oakKey()); if (u) items.push({ y: oy + 20, s: `<image href="${u}" x="${ox - 34}" y="${oy - 41}" width="68" height="65"/>` }); }
+    items.sort((a, b) => a.y - b.y);
+    return `<svg class="m" viewBox="58 70 244 270" preserveAspectRatio="xMidYMid slice" aria-hidden="true"><image x="0" y="-60" width="360" height="540" preserveAspectRatio="none" href="${mapU}"/>${items.map(o => o.s).join('')}</svg>`;
+  }
   function albAdd(kind, extra) {
-    const pg = Object.assign({ t: S.tier, y: S.tg + 1, k: kind, at: Date.now(), st: Math.floor(S.students), f: Object.assign({}, S.f), dip: 0,
+    const pg = Object.assign({ t: S.tier, y: S.tg + 1, k: kind, at: Date.now(), st: Math.floor(S.students), f: Object.assign({}, S.f), bs: Object.assign({}, S.bs), dip: 0,
       kids: frRank(frList()).slice(0, 6), el: (elPres() || {}).sp || '', ph: false, ltr: null, v: 0 }, extra || {});
     pg.ph = !!pg.ph; pg.dip = Math.max(0, Math.floor(pg.dip || 0));
     S.alb.push(pg);
@@ -12057,7 +12074,7 @@ span.bt-stamp{display:none}.bt-duel.done span.bt-stamp{display:grid}
         (bdSp.has(sp) && IMG('bday_cake') ? `<img class="alb-bd" src="${IMG('bday_cake')}" alt="오늘 생일">` : '') + '</div>';
     }).join('');
     const cn = pg.ph && IMG('album_corner') ? ['a', 'b', 'c', 'd'].map(c => `<img class="alb-cn ${c}" src="${IMG('album_corner')}" alt="">`).join('') : '';
-    box.innerHTML = slots + `<div class="alb-big">${map ? `<img class="m" src="${map}" alt="">` : ''}</div>${cn}` +
+    box.innerHTML = slots + `<div class="alb-big">${albSchool(pg) || (map ? `<img class="m" src="${map}" alt="">` : '')}</div>${cn}` +
       `<div class="alb-cap"><b>${esc(`${TIERS[pg.t].name} ${pg.y}${TIERS[pg.t].unit}`)}</b><span>${pg.k === 'g' ? '졸업식' : '종업식'}${pg.ph ? ', 단체 사진' : ''}</span><span>${albDate(pg.at)}</span></div>`;
     const facs = Object.keys(pg.f || {}).filter(k => FAC[k] && pg.f[k] > 0).map(k => `${k === 'playground' ? (pg.t >= 1 ? '운동장' : '놀이터') : FAC[k].name} Lv.${pg.f[k]}`).join(', ');
     $('#albLead').textContent = [`학생 ${pg.st}명${pg.dip ? `, 수료증 ${fmt(pg.dip)}장` : ''}${pg.old ? ' (옛 기록으로 만든 쪽)' : ''}.`, facs ? facs + '.' : '',
@@ -12119,7 +12136,9 @@ span.bt-stamp{display:none}.bt-duel.done span.bt-stamp{display:grid}
       if (p.f && typeof p.f === 'object') for (const k of Object.keys(FAC)) f[k] = Math.floor(num(p.f[k], 0, 999));
       const L = p.ltr && typeof p.ltr === 'object' && typeof p.ltr.txt === 'string' && DEX_STUDENTS.includes(p.ltr.sp)
         ? { sp: p.ltr.sp, nm: typeof p.ltr.nm === 'string' ? p.ltr.nm.slice(0, 4) : '', h: Math.floor(num(p.ltr.h, 0, 5)), txt: p.ltr.txt.slice(0, 1200), gold: Math.floor(num(p.ltr.gold, 0, 1)) } : null;
-      return { t: p.t, y: Math.max(1, Math.floor(num(p.y, 1, 9))), k: p.k === 'g' ? 'g' : 'y', at: num(p.at, 0, Date.now() + 366 * 86400000), st: Math.floor(num(p.st, 0, 1e7)), f,
+      const bs = {};   // 2.1.3 그때 건물 그림 단계(앨범 쪽 그림). 옛 쪽에는 없어요
+      if (p.bs && typeof p.bs === 'object') for (const k of Object.keys(FAC)) if (p.bs[k] != null) bs[k] = Math.floor(num(p.bs[k], 0, 9));
+      return { t: p.t, y: Math.max(1, Math.floor(num(p.y, 1, 9))), k: p.k === 'g' ? 'g' : 'y', at: num(p.at, 0, Date.now() + 366 * 86400000), st: Math.floor(num(p.st, 0, 1e7)), f, bs,
         dip: Math.floor(num(p.dip, 0, 1e12)), kids: (Array.isArray(p.kids) ? p.kids : []).filter(sp => DEX_STUDENTS.includes(sp)).slice(0, 6),
         el: DEX_STUDENTS.includes(p.el) ? p.el : '', ph: p.ph === true, ltr: L, v: Math.floor(num(p.v, 0, 999)), old: p.old === true };
     });
