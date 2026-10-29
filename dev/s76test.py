@@ -72,7 +72,8 @@ async def main():
                 r = await pg.evaluate(f"""(() => {{ const F = {F}, S = F.S; const q1 = F.MAIN.find(q => q.id === 'rd1'), q2 = F.MAIN.find(q => q.id === 'lb1');
                   const i1 = F.MAIN.indexOf(q1), z1 = F.MAIN.findIndex(q => q.id === 'z1'), i2 = F.MAIN.indexOf(q2), e1 = F.MAIN.findIndex(q => q.id === 'el1');
                   const a = F.ACH.find(x => x.id === 'lab');
-                  return {{ ok: !!q1 && !!q2, order: i1 === z1 + 1 && i2 === e1 + 1, m1: F.qMeasure(q1), m2: F.qMeasure(q2), g1: F.qGoal(q1), g2: F.qGoal(q2), ach: a && a.v(), title: a && a.title }}; }})()""")
+                  const nx = j => {{ j += 1; while (j < F.MAIN.length && F.MAIN[j].step) j += 1; return j; }};   // 2.1.1 한 단계 퀘스트는 건너뛰고 봐요
+                  return {{ ok: !!q1 && !!q2, order: i1 === nx(z1) && i2 === nx(e1), m1: F.qMeasure(q1), m2: F.qMeasure(q2), g1: F.qGoal(q1), g2: F.qGoal(q2), ach: a && a.v(), title: a && a.title }}; }})()""")
                 print('퀘스트', r)
                 if not r['ok'] or not r['order'] or r['m1'] != 3 or r['m2'] != 3 or not r['g1'] or not r['g2'] or r['ach'] != 2 or r['title'] != '꼬마 과학자': bad.append(f'퀘스트나 업적이 틀려요 {r}')
             # 6) 화면

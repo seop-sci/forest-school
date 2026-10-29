@@ -52,7 +52,7 @@ async def main():
             if o: bad.append(f'{w} 선거 창이 넘쳐요 {o}')
             # 2) 공약별 효과: 각 공약을 가진 후보를 뽑은 것처럼 바꿔 가며 값 확인
             r = await pg.evaluate(f"""(() => {{ const F = {F}, S = F.S, out = {{}};
-              const base = {{ rate: F.rate(), fest: F.festPrize(true), drop: F.dropValue(), pct: [0, 1, 2, 3].map(F.clubPct) }};
+              const base = {{ rate: F.rate(), fest: F.festPrize(true), drop: F.dropValue(), pct: [0, 1, 2, 3, 4].map(F.clubPct) }};
               for (const k of Object.keys(F.EL_PLEDGES)) {{
                 S.el.cand[0].p = k; S.el.pick = 0;
                 out[k] = {{ rate: F.rate() / base.rate, fest: F.festPrize(true) / base.fest, drop: F.dropValue() / base.drop, m: F.elMult('mission') }};
@@ -69,10 +69,10 @@ async def main():
                 # 동아리를 나눈 뒤, 동아리에 든 후보를 뽑아요
                 pick = await pg.evaluate(f"""(() => {{ const F = {F}, S = F.S; F.clubAuto(true); F.renderElect(); return S.el.cand.findIndex(c => (S.roster.list.find(x => x.nm === c.nm && x.sp === c.sp) || {{}}).c >= 0); }})()""")
                 if pick < 0: bad.append('동아리에 든 후보가 없어요'); pick = 0
-                base_pct = await pg.evaluate(f"[0, 1, 2, 3].map({F}.clubPct)")
+                base_pct = await pg.evaluate(f"[0, 1, 2, 3, 4].map({F}.clubPct)")
             await pg.click(f'#elCands [data-el="{pick}"]'); await pg.wait_for_timeout(500)
             r = await pg.evaluate(f"""(() => {{ const F = {F}, S = F.S; return {{ pick: S.el.pick, el: S.st.elects, mid: S.st.elMid, btn: document.querySelectorAll('#elCands [data-el]').length,
-              won: document.querySelectorAll('#elCands .el-card.pick').length, again: F.elVote((S.el.pick + 1) % 3), club: F.elClub(), pct: [0, 1, 2, 3].map(F.clubPct),
+              won: document.querySelectorAll('#elCands .el-card.pick').length, again: F.elVote((S.el.pick + 1) % 3), club: F.elClub(), pct: [0, 1, 2, 3, 4].map(F.clubPct),
               q: F.qDone(F.MAIN.find(q => q.id === '{qid}')) }}; }})()""")
             print('뽑기', w, r)
             if r['pick'] != pick or r['el'] != 1 or r['btn'] != 0 or r['won'] != 1 or r['again']: bad.append(f'{w} 뽑기 {r}')
@@ -80,7 +80,7 @@ async def main():
             if mid:
                 if r['mid'] != 1 or r['club'] < 0: bad.append(f'중학교 반장 셈과 동아리 {r}')
                 c = r['club']
-                if abs(r['pct'][c] - 2 * base_pct[c]) > 1e-9 or any(r['pct'][i] != base_pct[i] for i in range(4) if i != c): bad.append(f'반장 동아리 보너스 두 배 {base_pct} -> {r["pct"]}')
+                if abs(r['pct'][c] - 2 * base_pct[c]) > 1e-9 or any(r['pct'][i] != base_pct[i] for i in range(5) if i != c): bad.append(f'반장 동아리 보너스 두 배 {base_pct} -> {r["pct"]}')
             elif r['mid'] != 0: bad.append(f'초등학교 반장은 elMid에 세지 않아요 {r}')
             await pg.screenshot(path=f's74_{w}.png')
             o = await pg.evaluate(OVER, '#mElect')
