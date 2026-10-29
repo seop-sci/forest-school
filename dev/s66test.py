@@ -51,7 +51,7 @@ async def main():
             if r != {'v': True, 't': None}: bad.append(f'{w}: 돌아가기 {r}')
             if w == 390:
                 # 종업식 전학 대화: 1학년 종업식이면 세 번째 친구(펭귄)
-                r = await pg.evaluate(f"""(() => {{ const F = {F}, S = F.S; S.tg = 0; S.p.species = 2; S.grade = 4; S.best = 4; S.q.m = F.MAIN.findIndex(q => q.id === 'e12'); S.q.lat = '';
+                r = await pg.evaluate(f"""(() => {{ const F = {F}, S = F.S; S.tg = 0; S.sem = 1; S.p.species = 2; S.grade = 4; S.best = 4; S.q.m = F.MAIN.findIndex(q => q.id === 'e12'); S.q.lat = '';
                   const can = F.canGraduate(); F.graduate(); return {{ can, sp: S.p.species, q: F.rt.modalQueue.length, open: F.rt.modalOpen && F.rt.modalOpen.id }}; }})()""")
                 await pg.wait_for_timeout(500)
                 if not r['can'] or r['sp'] != 3 or r['open'] != 'mGrad' or r['q'] != 1: bad.append(f'종업식 창 순서 {r}')
@@ -93,11 +93,11 @@ async def main():
                   return {{ grow: document.querySelectorAll('#friendList [data-grow]').length, locked: document.querySelectorAll('#friendList .friend.locked').length, note: !document.querySelector('#friendNote').hidden }}; }})()""")
                 if r != {'grow': 6, 'locked': 6, 'note': True}: bad.append(f'친구 성장 쪽지 {r}')
                 # 초등학교 졸업식은 6학년 장을 마쳐야
-                r = await pg.evaluate(f"""(() => {{ const F = {F}, S = F.S; S.tier = 1; S.tg = 5; S.grade = 4; S.best = 4; S.q.m = F.MAIN.findIndex(q => q.id === 'e15'); S.q.lat = '';
+                r = await pg.evaluate(f"""(() => {{ const F = {F}, S = F.S; S.tier = 1; S.tg = 5; S.sem = 1; S.grade = 4; S.best = 4; S.q.m = F.MAIN.findIndex(q => q.id === 'e15'); S.q.lat = '';
                   const a = F.canPromote(); F.setTab('grad'); const li = [...document.querySelectorAll('#tierReqs li')].map(l => [l.className, l.textContent]);
                   S.q.m = F.MAIN.findIndex(q => q.id === 'e39'); const b2 = F.canPromote(); return {{ a, b: b2, li }}; }})()""")
                 print('졸업식 잠금', json.dumps(r, ensure_ascii=False))
-                if r['a'] or not r['b'] or len(r['li']) != 3 or '남은 퀘스트' not in r['li'][2][1]: bad.append(f'졸업식 잠금 {r}')
+                if r['a'] or not r['b'] or len(r['li']) != 4 or '남은 퀘스트' not in r['li'][3][1]: bad.append(f'졸업식 잠금 {r}')   # 2.1.0 두 학기: 1학기 방학식 줄이 더해져 넷
                 # 졸업식 사진이 있는 초등학교 보기(중학교에서)
                 r = await pg.evaluate(f"""(() => {{ const F = {F}, S = F.S; Object.assign(S.f, {{ classroom: 30, cafeteria: 22, library: 21, playground: 23, science: 13 }}); for (const k in S.fu) S.fu[k] = S.fu[k].map(() => S.f[k]); S.tdip = 100;
                   F.promote(); {CLEAN}; F.setTab('school'); F.tierViewOpen(1);
