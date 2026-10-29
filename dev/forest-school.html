@@ -7764,7 +7764,7 @@ span.bt-stamp{display:none}.bt-duel.done span.bt-stamp{display:grid}
     $('#effNextLabel').textContent = maxed ? (semFirst() ? '2학기' : '다음 학년') : L >= 1 ? '다음 레벨' : '지으면';
     $('#effNext').textContent = maxed ? `Lv.${capNext()}까지 열려요` : F.eff(L + 1);
     $('#sheetRep').textContent = k === 'library' ? '도서관은 평판을 가장 많이 올려요. 평판이 쌓이면 학교 등급이 올라가요.' : `레벨이 오를 때마다 평판도 ★${F.rep} 올라요.`;
-    $('#sheetBuyLabel').textContent = (maxed ? '최고 레벨' : L >= 1 ? '업그레이드' : '짓기') + (!maxed && !conOn(k) && conSec(k, L + 1) > 10 && conFreeLeft(k) ? ' (바로 완공)' : '');   // 2.1.1 하루 한 번
+    $('#sheetBuyLabel').textContent = (maxed ? '최고 레벨' : L >= 1 ? '업그레이드' : '짓기') + (!maxed && !conOn(k) && conSec(k, L + 1) > 10 && conFreeLeft(k) ? ' (즉시 완공)' : '');   // 2.1.1 하루 한 번
     $('#sheetCost').textContent = maxed ? '-' : fmt(c);
     $('#sheetBuy').setAttribute('aria-disabled', ok ? 'false' : 'true');
     $('#sheetBuy').classList.toggle('is-rec', !!rt.rec && rt.rec.kind === 'fac' && rt.rec.k === k && !maxed);
@@ -7940,8 +7940,8 @@ span.bt-stamp{display:none}.bt-duel.done span.bt-stamp{display:grid}
     if (!force && c.dataset.key === key) return; c.dataset.key = key;
     c.hidden = !show; if (!show) return;
     c.classList.toggle('pulse', ks.length > 0);
-    c.innerHTML = (ks.length ? `<b>오늘 바로 완공 ${ks.length}곳 가능!</b>` : '') + (on ? `<small>건설 가속 2배, ${hm(cbLeft())} 남음</small>` : '');
-    c.setAttribute('aria-label', (ks.length ? `오늘 바로 완공할 수 있는 건물 ${ks.length}곳, 눌러서 건물 창 열기` : '') + (on ? ` 건설 가속 중` : ''));
+    c.innerHTML = (ks.length ? `<b>즉시 완공 ${ks.length}곳 가능!</b>` : '') + (on ? `<small>건설 가속 2배, ${hm(cbLeft())} 남음</small>` : '');
+    c.setAttribute('aria-label', (ks.length ? `즉시 완공할 수 있는 건물 ${ks.length}곳, 눌러서 건물 창 열기` : '') + (on ? ` 건설 가속 중` : ''));
   }
   // 2.1.1 건물마다 하루 한 번 바로 완공. S.ff[건물] = 바로 완공을 쓴 날
   const conFreeLeft = k => !!S && !!S.ff && S.ff[k] !== gameToday();
@@ -7958,7 +7958,7 @@ span.bt-stamp{display:none}.bt-duel.done span.bt-stamp{display:grid}
       S.ff[k] = gameToday();
       sfx('quest');
       conFinish(k);
-      setTimeout(() => toast(`오늘의 바로 완공! ${FAC[k].name} Lv.${L}\n이 건물은 내일 또 바로 지을 수 있어요`), 900);
+      setTimeout(() => toast(`즉시 완공! ${FAC[k].name} Lv.${L}\n이 건물은 내일 또 즉시 완공할 수 있어요`), 900);
       renderMap(); conRender(true);
       return true;
     }
@@ -15987,8 +15987,8 @@ span.bt-stamp{display:none}.bt-duel.done span.bt-stamp{display:grid}
     $('#sheetFriend').addEventListener('click', () => { const sp = $('#sheetFriend').dataset.sp, f = frOf(sp); if (!f) return; if (!frToday(f)) frPat(sp); else toast(`${frFull(sp)}: ${frLine(sp, rt.sheetKey)}`); });
     $('#sheetBday').addEventListener('click', () => { closeSheet(); setTimeout(bdClaim, 240); });
     $('#gAlbum').addEventListener('click', openAlbum);
-    for (const k of Object.keys(FAC)) { const p = document.getElementById('pq-' + k); if (p && !p.querySelector('.ffb')) p.insertAdjacentHTML('beforeend', '<g class="ffb" transform="translate(-40 -19)"><rect x="0" y="-6" width="52" height="12" rx="6"/><text x="26" y="3" text-anchor="middle">오늘 바로 완공</text></g>'); }   // 2.1.1
-    $('#ffChip').addEventListener('click', () => { const k = facKeys().find(ffCan); if (k) { sfx('tap'); openSheet(k); } else toast(cbOn() ? `건설 가속 중이에요. ${hm(cbLeft())} 남았어요` : '오늘 바로 완공은 다 썼어요'); });
+    for (const k of Object.keys(FAC)) { const p = document.getElementById('pq-' + k); if (p && !p.querySelector('.ffb')) p.insertAdjacentHTML('beforeend', '<g class="ffb" transform="translate(-38 -20)"><rect x="0" y="-6.5" width="76" height="13" rx="6.5"/><text x="38" y="3" text-anchor="middle">즉시 완공 1회 가능!</text></g>'); }   // 2.1.1
+    $('#ffChip').addEventListener('click', () => { const k = facKeys().find(ffCan); if (k) { sfx('tap'); openSheet(k); } else toast(cbOn() ? `건설 가속 중이에요. ${hm(cbLeft())} 남았어요` : '오늘 즉시 완공은 다 썼어요. 내일 건물마다 1회씩 다시 생겨요'); });
     $('#conCb').addEventListener('click', e => { const b = e.target.closest('[data-cb]'); if (b) cbBuy(b.dataset.cb); });
     $('#albPrev').addEventListener('click', () => { rt.albPage -= 1; sfx('tap'); renderAlbum(); });
     $('#albNext').addEventListener('click', () => { rt.albPage += 1; sfx('tap'); renderAlbum(); });
