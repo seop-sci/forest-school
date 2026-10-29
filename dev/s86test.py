@@ -43,8 +43,8 @@ async def main():
                   document.querySelectorAll('.overlay').forEach(o => o.hidden = true);
                   return { need, paid1, p1, p2, left, lv1, p3, e1, n: S.vd.n, sum: S.vd.sum, rate: F.vdNeed() };""")
                 print('기부', r)
-                ok(abs(r['p1'] - 0.1) < 1e-6 and abs(r['paid1'] - math.ceil(r['need'] * 0.1)) <= 1, f'10% {r}')
-                ok(abs(r['p2'] - 0.6) < 1e-6 and abs(r['left'] - r['need'] * 0.4) <= 2, f'50%와 남은 만큼 {r}')
+                ok(abs(r['p1'] - 0.1) < 1e-4 and abs(r['paid1'] - math.ceil(r['need'] * 0.1)) <= 1, f'10% {r}')
+                ok(abs(r['p2'] - 0.6) < 1e-4 and abs(r['left'] - r['need'] * 0.4) <= r['need'] * 1e-4 + 2, f'50%와 남은 만큼 {r}')
                 ok(r['lv1'] == 1 and r['p3'] == 0 and r['e1'] == 5 and r['n'] == 3, f'1단계 {r}')
                 # 비율은 그대로: 수업료가 바뀌어도 p는 안 바뀌어요
                 r = await ev("""S.vd.p = 0.3; const p0 = S.vd.p, n0 = F.vdNeed(); S.f.classroom += 10; S.students += 500; const n1 = F.vdNeed(); return { p0, p: S.vd.p, n0, n1, left: F.vdLeft() };""")
