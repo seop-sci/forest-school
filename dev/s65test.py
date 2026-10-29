@@ -126,7 +126,7 @@ async def main():
             await pg.click('#btnHall'); await pg.wait_for_timeout(400)
             r = await pg.evaluate("({ doors: document.querySelectorAll('#panelHall .shopfront').length, soon: document.querySelectorAll('#panelHall .shopfront.soon').length, vis: !document.querySelector('#panelHall').hidden })")
             # 작업지시서 20 복도 그림: 방문 6개(동아리실 + 준비 중 5)
-            if r != {'doors': 6, 'soon': 3, 'vis': True}: bad.append(f'{w}: 복도 {r}')   # 2.0.1 학생회실(반장 선거)과 교무실(시험 기간)이 열려서 준비 중은 3곳
+            if r != {'doors': 6, 'soon': 2, 'vis': True}: bad.append(f'{w}: 복도 {r}')   # 2.0.1 학생회실, 교무실, 2.1.0 게시판(스티커판)이 열려서 준비 중은 2곳(s73과 같게)
             o = await pg.evaluate(OVER, '#panelHall')
             if o: bad.append(f'{w}: 복도가 {o}곳 넘쳐요')
             await pg.screenshot(path=f's65_hall_{w}.png')

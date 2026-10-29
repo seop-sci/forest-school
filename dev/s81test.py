@@ -38,6 +38,8 @@ async def main():
                 r = await pg.evaluate(f"""(() => {{ const F = {F}, S = F.S, o = {{}}, t0 = Date.now(); F.rt.fakeNow = t0;
                   S.tier = 1; S.tg = 0; S.sem = 0; S.budget = 1e15;
                   for (const k of ['library', 'cafeteria']) {{ S.f[k] = 15; S.fu[k] = S.fu[k].map(() => 15); }}
+                  S.budget = 1e13; S.ff = {{}}; const lf = S.f.library; F.buyFacility('library'); o.free = [S.f.library === lf + 1 && !F.conOn('library'), F.conFreeLeft('library'), F.conFreeLeft('cafeteria')];   // 2.1.1 하루 한 번 바로 완공
+                  S.f.library = 15; S.fu.library = S.fu.library.map(() => 15); S.ff = {{ library: F.gameToday(), cafeteria: F.gameToday(), classroom: F.gameToday(), science: F.gameToday(), playground: F.gameToday() }};
                   S.budget = 1e13; const b0 = S.budget, c = F.facCost('library');
                   o.a = F.buyFacility('library'); o.paid = b0 - S.budget > 0 && b0 - S.budget <= c * (1 + 1e-9); o.lv = S.f.library; o.again = F.buyFacility('library');
                   o.b = F.buyFacility('cafeteria'); o.both = F.conOn('library') && F.conOn('cafeteria');
@@ -45,7 +47,7 @@ async def main():
                   F.rt.fakeNow = t0 + 481e3; F.conTick(); o.end = [S.f.library, S.f.cafeteria, F.conOn('library')];
                   return o; }})()""")
                 print('사기', r)
-                if r != {'a': True, 'paid': True, 'lv': 15, 'again': False, 'b': True, 'both': True, 'mid': 15, 'end': [16, 16, False]}:
+                if r != {'free': [True, False, True], 'a': True, 'paid': True, 'lv': 15, 'again': False, 'b': True, 'both': True, 'mid': 15, 'end': [16, 16, False]}:
                     bad.append(f'공사 사기가 틀려요 {r}')
                 # 4) 단축권
                 r = await pg.evaluate(f"""(() => {{ const F = {F}, S = F.S, o = {{}};
@@ -54,7 +56,7 @@ async def main():
                   o.p1 = u(F.tkPlan(7800)); o.p2 = u(F.tkPlan(21000)); o.p3 = u(F.tkPlan(39600));
                   S.tk = {{ m5: 0, m30: 0, h1: 1, h3: 1 }}; o.p4 = u(F.tkPlan(3000));
                   S.tk = {{ m5: 1, m30: 1, h1: 0, h3: 0 }}; S.f.library = 15; S.fu.library = S.fu.library.map(() => 15); delete S.bd.library;
-                  F.rt.fakeNow = Date.now(); F.buyFacility('library'); const L = F.conLeft('library');
+                  F.rt.fakeNow = Date.now(); S.ff = {{ library: F.gameToday() }}; F.buyFacility('library'); const L = F.conLeft('library');
                   F.tkUse('library', 'm5'); o.cut5 = L - F.conLeft('library'); o.m5 = S.tk.m5;
                   F.tkUseAll('library'); o.after = [F.conOn('library'), S.tk.m30, S.f.library];
                   F.rt.fakeNow = 0; return o; }})()""")
@@ -72,7 +74,7 @@ async def main():
             # 6) 공사 칸 화면
             await pg.evaluate(T.CLEAN)
             await pg.evaluate(f"""(() => {{ const F = {F}, S = F.S; S.tier = 1; S.tg = 0; S.sem = 0; S.budget = 1e15; S.tk = {{ m5: 20, m30: 1, h1: 1, h3: 0 }};
-              S.f.library = 10; S.fu.library = S.fu.library.map(() => 10); delete S.bd.library; F.rt.fakeNow = 0; F.buyFacility('library'); F.openSheet('library'); }})()""")
+              S.f.library = 10; S.fu.library = S.fu.library.map(() => 10); delete S.bd.library; F.rt.fakeNow = 0; S.ff = {{ library: F.gameToday() }}; F.buyFacility('library'); F.openSheet('library'); }})()""")
             await pg.wait_for_timeout(500)
             r = await pg.evaluate("""(() => { const c = document.querySelector('#sheetCon'), s = document.querySelector('#sheetWrap .sheet'); s.scrollTop = s.scrollHeight;
               const out = [...c.querySelectorAll('button')].some(e => { const r = e.getBoundingClientRect(); return r.right > innerWidth + 1 || r.left < -1; });
