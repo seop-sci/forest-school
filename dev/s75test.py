@@ -47,7 +47,7 @@ async def main():
                   const ok = F.mgClaimOrder(0); const a1 = S.ac.art.lv * 1000 + S.ac.art.xp;
                   return {{ ok, got: S.ac.st.xp, d: a1 - a0 }}; }})()""")
                 print('합치기 XP', r)
-                if not r['ok'] or r['d'] != 10: bad.append(f'합치기 XP가 틀려요(5단계 × 1 × 2개 = 10) {r}')
+                if not r['ok'] or r['d'] != 5: bad.append(f'합치기 XP가 틀려요(2.1.3: 5단계 2개는 에너지 32, 6마다 1이라 5) {r}')
                 await pg.evaluate(T.CLEAN)
                 # 3) 문제집
                 r = await pg.evaluate(f"""(() => {{ const F = {F}, S = F.S; S.ess = 25; const l0 = F.acBkLeft('kor'), x0 = S.ac.kor.xp + S.ac.kor.lv * 1000;
