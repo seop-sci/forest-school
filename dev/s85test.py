@@ -69,7 +69,7 @@ async def main():
             await ev("S.ff = { library: F.gameToday() }; S.bd = {}; S.f.library = 8; F.buyFacility('library'); F.openSheet('library'); return 1;")
             await pg.wait_for_timeout(600)
             r = await ev("const c = document.querySelector('#conCb'); return { vis: !c.hidden && !document.querySelector('#sheetCon').hidden, n: c.querySelectorAll('[data-cb]').length, t: c.textContent };")
-            ok(r['vis'] and r['n'] == 2 and '건설 가속' in r['t'], f'{w} 공사 칸 가속 줄 {r}')
+            ok(r['vis'] and r['n'] == 2 and '건설 부스터' in r['t'], f'{w} 공사 칸 가속 줄 {r}')
             await pg.evaluate("document.querySelector('#conCb').scrollIntoView({ block: 'center' })"); await pg.wait_for_timeout(300)
             await pg.screenshot(path=f's85_sheet_{w}.png')
             o = await pg.evaluate(OVER + "('#conCb, #conCb *')"); ok(not o, f'{w} 가속 줄이 넘쳐요 {o}')

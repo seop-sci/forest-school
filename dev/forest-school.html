@@ -7917,7 +7917,7 @@ span.bt-stamp{display:none}.bt-duel.done span.bt-stamp{display:grid}
   // 2.1.0: 돈을 내면 공사가 시작돼요. 레벨은 공사가 끝날 때(conFinish) 올라요
   /* 2.1.1 건설 가속(지섭 요청, 도토리가 남을 때 쓸 곳): 사 두면 그동안 모든 공사가 2배 빨라요(초등학교부터).
      값은 수업료 분치(minAcorns)라 학교가 클수록 커요. 겹쳐 사면 시간이 이어 붙고, 남은 시간은 6시간까지. 숫자는 본부 제안 */
-  const CB = { tier: 1, maxH: 6, items: [{ k: 'm30', min: 30, m: 60, name: '30분 가속' }, { k: 'h1', min: 60, m: 110, name: '1시간 가속' }] };
+  const CB = { tier: 1, maxH: 6, items: [{ k: 'm30', min: 30, m: 60, name: '건설 부스터(30분)' }, { k: 'h1', min: 60, m: 110, name: '건설 부스터(1시간)' }] };
   const cbOn = () => !!S && !!S.cb && S.cb.until > gameNow();
   const cbLeft = () => S && S.cb ? Math.max(0, Math.ceil((S.cb.until - gameNow()) / 1000)) : 0;
   const cbCost = it => minAcorns(it.m);
@@ -7933,13 +7933,13 @@ span.bt-stamp{display:none}.bt-duel.done span.bt-stamp{display:grid}
   }
   function cbBuy(key) {
     const it = CB.items.find(x => x.k === key); if (!it || !S || rt.paused) return false;
-    if (S.tier < CB.tier) { toast('건설 가속은 초등학교부터 써요'); return false; }
+    if (S.tier < CB.tier) { toast('건설 부스터는 초등학교부터 써요'); return false; }
     cbApply();
     const now = gameNow(), base = Math.max(S.cb.until, now), next = base + it.min * 60000;
-    if (next - now > CB.maxH * 3600000) { toast(`가속은 ${CB.maxH}시간까지만 모아 둘 수 있어요`); return false; }
+    if (next - now > CB.maxH * 3600000) { toast(`건설 부스터는 ${CB.maxH}시간까지만 모아 둘 수 있어요`); return false; }
     const c = cbCost(it); if (S.budget < c) { toast(`도토리가 ${fmt(c - S.budget)}개 모자라요`); return false; }
     S.budget -= c; S.cb.until = next; S.cb.at = now; S.st.cbBuy = (S.st.cbBuy || 0) + 1;
-    sfx('quest'); toast(`건설 가속! ${hm(Math.ceil((next - now) / 1000))} 동안 모든 공사가 2배 빨라요`);
+    sfx('quest'); toast(`건설 부스터! ${hm(Math.ceil((next - now) / 1000))} 동안 모든 공사가 2배 빨라져요`);
     conRender(true); renderHUD(); ffRender(true); save();
     return true;
   }
@@ -7949,7 +7949,7 @@ span.bt-stamp{display:none}.bt-duel.done span.bt-stamp{display:grid}
     if (box.hidden) return;
     const on = cbOn(), key = [on ? Math.floor(cbLeft() / 60) : -1, S.tier, ...CB.items.map(it => S.budget >= cbCost(it) ? 1 : 0)].join('|');
     if (box.dataset.key === key) return; box.dataset.key = key;
-    box.innerHTML = `<b>건설 가속 (도토리)</b><small class="${on ? 'on' : ''}">${on ? `지금 모든 공사가 2배 빨라요. ${hm(cbLeft())} 남았어요` : '사 두면 그동안 모든 공사가 2배 빨라요'}</small>` +
+    box.innerHTML = `<b>건설 부스터 (도토리)</b><small class="${on ? 'on' : ''}">${on ? `지금 모든 공사가 2배 빨라져요. ${hm(cbLeft())} 남았어요` : '해당 시간 동안 모든 공사가 2배 빨라져요.'}</small>` +
       `<span class="row">${CB.items.map(it => `<button type="button" class="cb-b" data-cb="${it.k}" aria-disabled="${S.budget >= cbCost(it) ? 'false' : 'true'}"><span>${it.name}</span><em>${acornIcon()}${fmt(cbCost(it))}</em></button>`).join('')}</span>`;
   }
   // 2.1.1 바로 완공을 쓸 수 있는 건물(이 학교급에 있고, 최고 레벨이 아니고, 공사 중이 아니고, 공사가 10초 넘게 걸리는 레벨)
@@ -7964,8 +7964,8 @@ span.bt-stamp{display:none}.bt-duel.done span.bt-stamp{display:grid}
     if (!force && c.dataset.key === key) return; c.dataset.key = key;
     c.hidden = !show; if (!show) return;
     c.classList.toggle('pulse', ks.length > 0);
-    c.innerHTML = (ks.length ? `<b>즉시 완공 ${ks.length}곳 가능!</b>` : '') + (on ? `<small>건설 가속 2배, ${hm(cbLeft())} 남음</small>` : '');
-    c.setAttribute('aria-label', (ks.length ? `즉시 완공할 수 있는 건물 ${ks.length}곳, 눌러서 건물 창 열기` : '') + (on ? ` 건설 가속 중` : ''));
+    c.innerHTML = (ks.length ? `<b>즉시 완공 ${ks.length}곳 가능!</b>` : '') + (on ? `<small>건설 부스터 2배, ${hm(cbLeft())} 남음</small>` : '');
+    c.setAttribute('aria-label', (ks.length ? `즉시 완공할 수 있는 건물 ${ks.length}곳, 눌러서 건물 창 열기` : '') + (on ? ` 건설 부스터 사용 중` : ''));
   }
   // 2.1.1 건물마다 하루 한 번 바로 완공. S.ff[건물] = 바로 완공을 쓴 날
   const conFreeLeft = k => !!S && !!S.ff && S.ff[k] !== gameToday();
@@ -8628,7 +8628,7 @@ span.bt-stamp{display:none}.bt-duel.done span.bt-stamp{display:grid}
   const NOTICES = [
     // 2.1.1 공지(2026-10-29 지섭 확인: 일곱 줄)
     { id: '2026-10-29-v211', date: '2026-10-29', tag: '업데이트', title: '2.1.1 업데이트',
-      lines: ['단짝 친구, 친밀도, 생일 잔치 추가', '졸업 앨범, 졸업 편지 추가', '유치원, 초등학교, 중학교 건물 외형 변경', '건물마다 하루 1회 즉시 완공, 건설 가속 추가', '공사 시간 단축', '숲속 대결 종목별 놀이 개선', '메인 퀘스트와 보상 개선'] },
+      lines: ['단짝 친구, 친밀도, 생일 잔치 추가', '졸업 앨범, 졸업 편지 추가', '유치원, 초등학교, 중학교 건물 외형 변경', '건물마다 하루 1회 즉시 완공, 건설 부스터 추가', '공사 시간 단축', '숲속 대결 종목별 놀이 개선', '메인 퀘스트와 보상 개선'] },
     // 2.1.0 공지(2026-10-29 지섭 확인: 일곱 줄)
     { id: '2026-10-29-v210', date: '2026-10-29', tag: '업데이트', title: '2.1.0 업데이트',
       lines: ['공사 시간과 시간 단축권 추가', '초등학교부터 한 학년이 두 학기로 변경', '숲속 소풍 추가', '초등학교 칭찬 스티커판 추가', '상점 리모델링: 꾸미기 백화점, 문방구, 꾸미기 가게', '밤 모드 추가', '숲속 대결 연출 개선'] },
@@ -16016,7 +16016,7 @@ span.bt-stamp{display:none}.bt-duel.done span.bt-stamp{display:grid}
     $('#sheetBday').addEventListener('click', () => { closeSheet(); setTimeout(bdClaim, 240); });
     $('#gAlbum').addEventListener('click', openAlbum);
     for (const k of Object.keys(FAC)) { const p = document.getElementById('pq-' + k); if (p && !p.querySelector('.ffb')) p.insertAdjacentHTML('beforeend', '<g class="ffb" transform="translate(-38 -20)"><rect x="0" y="-6.5" width="76" height="13" rx="6.5"/><text x="38" y="3" text-anchor="middle">즉시 완공 1회 가능!</text></g>'); }   // 2.1.1
-    $('#ffChip').addEventListener('click', () => { const k = facKeys().find(ffCan); if (k) { sfx('tap'); openSheet(k); } else toast(cbOn() ? `건설 가속 중이에요. ${hm(cbLeft())} 남았어요` : '오늘 즉시 완공은 다 썼어요. 내일 건물마다 1회씩 다시 생겨요'); });
+    $('#ffChip').addEventListener('click', () => { const k = facKeys().find(ffCan); if (k) { sfx('tap'); openSheet(k); } else toast(cbOn() ? `건설 부스터를 쓰는 중이에요. ${hm(cbLeft())} 남았어요` : '오늘 즉시 완공은 다 썼어요. 내일 건물마다 1회씩 다시 생겨요'); });
     $('#conCb').addEventListener('click', e => { const b = e.target.closest('[data-cb]'); if (b) cbBuy(b.dataset.cb); });
     $('#albPrev').addEventListener('click', () => { rt.albPage -= 1; sfx('tap'); renderAlbum(); });
     $('#albNext').addEventListener('click', () => { rt.albPage += 1; sfx('tap'); renderAlbum(); });
