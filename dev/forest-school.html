@@ -709,6 +709,15 @@ html.ait .app{padding-top:calc(10px + var(--ait-top, 0px));padding-bottom:var(--
 .con-tk.armed{border-color:var(--seal)}
 .con-ad{padding:8px 10px;border-radius:12px;border:1.5px dashed rgba(0,0,0,.25);background:transparent;color:inherit;font:inherit;font-size:13px;cursor:pointer}
 .con-ad[aria-disabled="true"]{opacity:.5}
+/* 2.1.1 하루 한 번 바로 완공 표시와 건설 가속 */
+.ff-chip{position:absolute;right:10px;bottom:calc(var(--bot-h, 70px) + 46px);z-index:6;max-width:62%;display:flex;flex-direction:column;align-items:flex-end;gap:1px;padding:5px 11px;border:2px solid #E2A21C;border-radius:14px;background:rgba(255,246,214,.95);color:#5A3A16;font:inherit;font-size:12.5px;font-weight:700;line-height:1.3;text-align:right;box-shadow:0 2px 6px rgba(20,40,20,.25);cursor:pointer}
+.ff-chip b{font-family:var(--font-display);font-weight:400;font-size:14px;color:#B5651D}.ff-chip small{font-size:11.5px;font-weight:700;color:#3F6E2A}
+.ff-chip.pulse{animation:ffPulse 2.2s ease-in-out infinite}@keyframes ffPulse{0%,100%{transform:scale(1)}50%{transform:scale(1.04)}}
+@media (prefers-reduced-motion: reduce){.ff-chip.pulse{animation:none}}
+.plaque .ffb{display:none;pointer-events:none}.plaque.ff-on .ffb{display:inline}.ffb rect{fill:#F3C04B;stroke:#B5651D;stroke-width:1}.ffb text{fill:#5A3A16;font-family:var(--font-display);font-size:8px}
+.con-cb{display:grid;gap:6px;padding:8px 6px 2px;border-top:1px dashed var(--line)}.con-cb b{font-size:13.5px}.con-cb small{font-size:12px;color:var(--muted)}.con-cb .row{display:flex;gap:6px;justify-content:center}
+.con-cb .cb-b{flex:1;max-width:170px;display:flex;flex-direction:column;align-items:center;padding:6px 8px;border:1.5px solid var(--line);border-radius:12px;background:var(--card);color:var(--ink);font:inherit;font-size:12.5px;cursor:pointer}.con-cb .cb-b em{font-style:normal;font-weight:700;display:flex;align-items:center;gap:3px;white-space:nowrap}.con-cb .cb-b em svg,.con-cb .cb-b em img{width:15px;height:15px;flex:none}
+.con-cb .cb-b[aria-disabled="true"]{opacity:.5}.con-cb .on{color:#3F6E2A;font-weight:700}
 .con image,.con rect,.con text{pointer-events:none}
 .con .con-scaf{opacity:.92}
 .con .con-back{fill:rgba(60,40,20,.55)}
@@ -2744,6 +2753,7 @@ span.bt-stamp{display:none}.bt-duel.done span.bt-stamp{display:grid}
         <div class="tv-bar"><span class="tv-tx"><b id="tvTitle"></b><small id="tvSub"></small></span><button class="btn-sub small" id="tvEdit" type="button">꾸미기</button><button class="cta small" id="tvBack" type="button">돌아가기</button></div>
       </div>
       <div class="tier-dots" id="tierDots" hidden role="group" aria-label="학교급 모습 보기"></div>
+      <button class="ff-chip" id="ffChip" type="button" hidden></button><!-- 2.1.1 오늘 바로 완공, 건설 가속 -->
       <div class="deco-bar" id="decoBar" hidden><span><b>꾸미기 중</b><small>빈 자리를 누르면 장식을 놓아요</small></span><button class="cta small" type="button" id="decoDone">다 했어요</button></div>
       <div class="map-left">
         <button class="shopbtn" id="btnShop" type="button" hidden aria-label="꾸미기 백화점"><svg viewBox="-8 -11 16 20" aria-hidden="true"><path d="M-4.6 -1 Q-4.9 5.4 0 7.4 Q4.9 5.4 4.6 -1 Z" class="c-gnut"/><ellipse cx="-1.8" cy="2" rx="0.9" ry="2.1" class="c-gshine"/><path d="M-5.8 -0.8 Q-5.8 -6.2 0 -6.6 Q5.8 -6.2 5.8 -0.8 Q0 0.8 -5.8 -0.8 Z" class="c-gcap"/><path d="M-4 -3.2 H4 M-2.8 -5 H2.8" class="s-gline"/><path d="M0 -6.6 L0.9 -9.2" class="s-gstem"/></svg><b id="goldN">0</b>상점</button>
@@ -3076,6 +3086,7 @@ span.bt-stamp{display:none}.bt-duel.done span.bt-stamp{display:grid}
       <p class="con-plan" id="conPlan"></p>
       <div class="con-tks" id="conTks" role="group" aria-label="골라서 쓰기"></div>
       <button class="con-ad" type="button" id="conAd">광고 보고 5분권 받기</button>
+      <div class="con-cb" id="conCb" hidden></div><!-- 2.1.1 건설 가속(도토리) -->
     </div>
     <p class="need" id="sheetNeed">&nbsp;</p>
   </section>
@@ -5171,6 +5182,7 @@ span.bt-stamp{display:none}.bt-duel.done span.bt-stamp{display:grid}
     ac: freshAc(),   // 2.0.1 공부: 과목 5개 학교 학력(lv, xp), 문제집 bk(day, n), 통계 st
     pc: freshPc(), sk: freshSk(),   // 2.1.0 숲속 소풍, 칭찬 스티커판
     ff: {},   // 2.1.1 건물마다 바로 완공을 쓴 날
+    cb: { until: 0, at: 0 },   // 2.1.1 건설 가속(도토리): until까지 공사 2배, at은 마지막으로 셈한 때
     fr: {}, frg: { day: '', n: 0 }, frc: { pat: 0, gift: 0, cake: 0, alb: 0 }, bday: { day: '', done: false }, alb: [],   // 2.1.1 단짝 친구, 오늘 선물, 횟수, 오늘 생일 잔치, 졸업 앨범
     dsn: { day: '', trips: 0, sports: 0, fest: {} },   // 2.1.0 오늘 시작할 때의 체험학습, 운동회, 행사 횟수(오늘 한 것도 퀘스트에 쳐요)
     lab: freshLab(), rd: freshRd(), ex: freshEx(), bt: freshBt(),   // ex: 2.0.1 시험 기간(본 시험 주, 자율학습, 성적표, 기록)
@@ -7879,6 +7891,58 @@ span.bt-stamp{display:none}.bt-duel.done span.bt-stamp{display:grid}
     rt['bfxT' + k] = setTimeout(() => { fx.remove(); b.classList.remove('fx-rise', 'fx-up'); g.classList.remove('fx-site'); }, build ? 3300 : 1700);
   }
   // 2.1.0: 돈을 내면 공사가 시작돼요. 레벨은 공사가 끝날 때(conFinish) 올라요
+  /* 2.1.1 건설 가속(지섭 요청, 도토리가 남을 때 쓸 곳): 사 두면 그동안 모든 공사가 2배 빨라요(초등학교부터).
+     값은 수업료 분치(minAcorns)라 학교가 클수록 커요. 겹쳐 사면 시간이 이어 붙고, 남은 시간은 6시간까지. 숫자는 본부 제안 */
+  const CB = { tier: 1, maxH: 6, items: [{ k: 'm30', min: 30, m: 60, name: '30분 가속' }, { k: 'h1', min: 60, m: 110, name: '1시간 가속' }] };
+  const cbOn = () => !!S && !!S.cb && S.cb.until > gameNow();
+  const cbLeft = () => S && S.cb ? Math.max(0, Math.ceil((S.cb.until - gameNow()) / 1000)) : 0;
+  const cbCost = it => minAcorns(it.m);
+  // 지난번 셈한 때부터 지금까지 가속이 켜져 있던 만큼, 공사마다 끝나는 때를 그만큼 당겨요(그 공사가 시작한 뒤의 시간만)
+  function cbApply() {
+    if (!S || !S.cb) return;
+    const now = gameNow(), C = S.cb;
+    if (C.until > C.at && S.bd) {
+      const hi = Math.min(now, C.until);
+      for (const k of Object.keys(S.bd)) { const b = S.bd[k], lo = Math.max(C.at, b.s), ov = hi - lo; if (ov > 0) b.e -= ov; }
+    }
+    C.at = now;
+  }
+  function cbBuy(key) {
+    const it = CB.items.find(x => x.k === key); if (!it || !S || rt.paused) return false;
+    if (S.tier < CB.tier) { toast('건설 가속은 초등학교부터 써요'); return false; }
+    cbApply();
+    const now = gameNow(), base = Math.max(S.cb.until, now), next = base + it.min * 60000;
+    if (next - now > CB.maxH * 3600000) { toast(`가속은 ${CB.maxH}시간까지만 모아 둘 수 있어요`); return false; }
+    const c = cbCost(it); if (S.budget < c) { toast(`도토리가 ${fmt(c - S.budget)}개 모자라요`); return false; }
+    S.budget -= c; S.cb.until = next; S.cb.at = now; S.st.cbBuy = (S.st.cbBuy || 0) + 1;
+    sfx('quest'); toast(`건설 가속! ${hm(Math.ceil((next - now) / 1000))} 동안 모든 공사가 2배 빨라요`);
+    conRender(true); renderHUD(); ffRender(true); save();
+    return true;
+  }
+  function cbSheet() {
+    const box = $('#conCb'); if (!box) return;
+    box.hidden = !S || S.tier < CB.tier;
+    if (box.hidden) return;
+    const on = cbOn(), key = [on ? Math.floor(cbLeft() / 60) : -1, S.tier, ...CB.items.map(it => S.budget >= cbCost(it) ? 1 : 0)].join('|');
+    if (box.dataset.key === key) return; box.dataset.key = key;
+    box.innerHTML = `<b>건설 가속 (도토리)</b><small class="${on ? 'on' : ''}">${on ? `지금 모든 공사가 2배 빨라요. ${hm(cbLeft())} 남았어요` : '사 두면 그동안 모든 공사가 2배 빨라요'}</small>` +
+      `<span class="row">${CB.items.map(it => `<button type="button" class="cb-b" data-cb="${it.k}" aria-disabled="${S.budget >= cbCost(it) ? 'false' : 'true'}"><span>${it.name}</span><em>${acornIcon()}${fmt(cbCost(it))}</em></button>`).join('')}</span>`;
+  }
+  // 2.1.1 바로 완공을 쓸 수 있는 건물(이 학교급에 있고, 최고 레벨이 아니고, 공사 중이 아니고, 공사가 10초 넘게 걸리는 레벨)
+  const ffCan = k => !!S && S.tier >= 1 && facKeys().includes(k) && !facMaxed(k) && !conOn(k) && conFreeLeft(k) && conSec(k, S.f[k] + 1) > 10;
+  function ffRender(force) {
+    if (!S) return;
+    const ks = facKeys().filter(ffCan), on = cbOn();
+    for (const k of Object.keys(FAC)) { const p = document.getElementById('pq-' + k); if (p) p.classList.toggle('ff-on', ks.includes(k)); }
+    const c = $('#ffChip'); if (!c) return;
+    const show = rt.tab === 'school' && rt.viewTier == null && !rt.decoEdit && S.tier >= 1 && (ks.length > 0 || on);
+    const key = [show, ks.length, on ? Math.floor(cbLeft() / 60) : -1].join('|');
+    if (!force && c.dataset.key === key) return; c.dataset.key = key;
+    c.hidden = !show; if (!show) return;
+    c.classList.toggle('pulse', ks.length > 0);
+    c.innerHTML = (ks.length ? `<b>오늘 바로 완공 ${ks.length}곳 가능!</b>` : '') + (on ? `<small>건설 가속 2배, ${hm(cbLeft())} 남음</small>` : '');
+    c.setAttribute('aria-label', (ks.length ? `오늘 바로 완공할 수 있는 건물 ${ks.length}곳, 눌러서 건물 창 열기` : '') + (on ? ` 건설 가속 중` : ''));
+  }
   // 2.1.1 건물마다 하루 한 번 바로 완공. S.ff[건물] = 바로 완공을 쓴 날
   const conFreeLeft = k => !!S && !!S.ff && S.ff[k] !== gameToday();
   function buyFacility(k, price) {
@@ -7937,6 +8001,7 @@ span.bt-stamp{display:none}.bt-duel.done span.bt-stamp{display:grid}
   // 게임 시계로 끝난 공사를 마쳐요. 한 번에 둘 이상 끝났으면(자리 비운 뒤 켤 때) 하나로 묶어 알려요
   function conTick() {
     if (!S || !S.bd) return 0;
+    cbApply();   // 2.1.1 건설 가속
     const now = gameNow(), done = Object.keys(S.bd).filter(k => S.bd[k].e <= now);
     if (!done.length) return 0;
     const many = done.length >= 2, names = [];
@@ -8021,6 +8086,7 @@ span.bt-stamp{display:none}.bt-duel.done span.bt-stamp{display:grid}
     $('#conPlan').textContent = !p.n ? '시간 단축권이 없어요. 광고를 보거나 문방구에서 살 수 있어요'
       : p.left ? `${tkPlanText(p)}을 써서 ${hm(p.cut)} 줄이고 ${hm(p.left)} 남아요` : `${tkPlanText(p)}을 써서 바로 끝나요`;
     $('#conTks').innerHTML = TK.slice().reverse().map(t => `<button type="button" class="con-tk${rt.conPick === t.k ? ' armed' : ''}" data-tk="${t.k}" aria-disabled="${S.tk[t.k] > 0 ? 'false' : 'true'}">${IMG('ticket_' + t.k) ? `<img src="${IMG('ticket_' + t.k)}" alt="">` : '⌛'}<span>${t.name}</span><b>${fmt(S.tk[t.k])}장</b></button>`).join('');
+    cbSheet();   // 2.1.1 건설 가속
     const al = tkAdLeft();
     $('#conAd').setAttribute('aria-disabled', al > 0 ? 'false' : 'true');
     $('#conAd').textContent = al > 0 ? `광고 보고 5분권 ${TKAD.n}장 받기 (오늘 ${al}번 남음)` : '오늘 광고 단축권을 다 받았어요';
@@ -11663,6 +11729,7 @@ span.bt-stamp{display:none}.bt-duel.done span.bt-stamp{display:grid}
     const num = (v, lo, hi) => typeof v === 'number' && isFinite(v) ? Math.max(lo, Math.min(hi, v)) : lo;
     const day = v => typeof v === 'string' ? v.slice(0, 10) : '';
     s.ff = {};   // 2.1.1 바로 완공
+    { const C = d.cb && typeof d.cb === 'object' ? d.cb : {}, lim = Date.now() + 366 * 86400000; s.cb = { until: num(C.until, 0, lim), at: num(C.at, 0, lim) }; }   // 2.1.1 건설 가속
     if (d.ff && typeof d.ff === 'object') for (const k of Object.keys(FAC)) if (typeof d.ff[k] === 'string') s.ff[k] = d.ff[k].slice(0, 10);
     s.fr = {};
     if (d.fr && typeof d.fr === 'object') for (const sp of Object.keys(d.fr)) {
@@ -15920,6 +15987,9 @@ span.bt-stamp{display:none}.bt-duel.done span.bt-stamp{display:grid}
     $('#sheetFriend').addEventListener('click', () => { const sp = $('#sheetFriend').dataset.sp, f = frOf(sp); if (!f) return; if (!frToday(f)) frPat(sp); else toast(`${frFull(sp)}: ${frLine(sp, rt.sheetKey)}`); });
     $('#sheetBday').addEventListener('click', () => { closeSheet(); setTimeout(bdClaim, 240); });
     $('#gAlbum').addEventListener('click', openAlbum);
+    for (const k of Object.keys(FAC)) { const p = document.getElementById('pq-' + k); if (p && !p.querySelector('.ffb')) p.insertAdjacentHTML('beforeend', '<g class="ffb" transform="translate(-40 -19)"><rect x="0" y="-6" width="52" height="12" rx="6"/><text x="26" y="3" text-anchor="middle">오늘 바로 완공</text></g>'); }   // 2.1.1
+    $('#ffChip').addEventListener('click', () => { const k = facKeys().find(ffCan); if (k) { sfx('tap'); openSheet(k); } else toast(cbOn() ? `건설 가속 중이에요. ${hm(cbLeft())} 남았어요` : '오늘 바로 완공은 다 썼어요'); });
+    $('#conCb').addEventListener('click', e => { const b = e.target.closest('[data-cb]'); if (b) cbBuy(b.dataset.cb); });
     $('#albPrev').addEventListener('click', () => { rt.albPage -= 1; sfx('tap'); renderAlbum(); });
     $('#albNext').addEventListener('click', () => { rt.albPage += 1; sfx('tap'); renderAlbum(); });
     $('#albClose').addEventListener('click', () => { sfx('tap'); closeModal($('#mAlbum')); });
@@ -16506,6 +16576,7 @@ span.bt-stamp{display:none}.bt-duel.done span.bt-stamp{display:grid}
     rdTick();   // 2.0.1 책 읽기
     pcTick();   // 2.1.0 숲속 소풍
     frTick();   // 2.1.1 단짝 친구, 생일 잔치
+    cbApply(); ffRender();   // 2.1.1 건설 가속, 오늘 바로 완공 표시
     dsnSync();   // 2.1.0 하루 시작 횟수
     audioWatch();   // 2.1.1 소리가 멈춰 '삐~' 소리가 나면 소리를 새로 켜요
     exTick();   // 2.0.1 시험 기간
@@ -17542,7 +17613,7 @@ span.bt-stamp{display:none}.bt-duel.done span.bt-stamp{display:grid}
   // 시험용 손잡이: 자동 시험(window.__FOREST_TEST)에서만 게임 속 함수를 꺼내 써요
   if (window.__FOREST_TEST) window.__forest = { get S() { return S; }, goTo, conOn, conLeft, conTick, conSec, conFinish, tkPlan, tkUse, tkUseAll, TK, CON, TKAD, capNext, yearCap,   // 2.1.0 공사
     semOn, semFirst, semLabel, cereDip, semBreak,   // 2.1.0 학기(s80)
-    get btUI() { return btUI; }, conFreeLeft, BTQ, BTQ_SCI, BTQ_KOR, BTQ_COL, btqMake, btqMath, btqPick, btqAnswer, btqMemTap, btqPts, btReveal,   // 2.1.1 대결 종목 문제
+    get btUI() { return btUI; }, conFreeLeft, CB, cbOn, cbLeft, cbCost, cbApply, cbBuy, ffCan, ffRender, BTQ, BTQ_SCI, BTQ_KOR, BTQ_COL, btqMake, btqMath, btqPick, btqAnswer, btqMemTap, btqPts, btReveal,   // 2.1.1 대결 종목 문제
     BF, FR_LINES, frSync, frMake, frOf, frNm, frFull, frHeart, frList, frPat, frGift, frGiftLeft, frAddP, frRename, frHere, frKidTap, frLetter, frTick, bdParty, bdPlace, bdClaim, bdDoneToday, bdRender, bdHats,
     albAdd, albMigrate, openAlbum, renderAlbum, openLetter, sanitize211,   // 2.1.1 학생과 추억
     PCN, pcStart, pcSettle, pcTick, pcActive, pcAway, pcRemain, openPicnic, renderPicnic, SK, SK_KINDS, skAdd, skPrize, skLeft, skFull, openSticker, renderSticker,
