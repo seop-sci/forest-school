@@ -4,7 +4,7 @@
 
 ## 아직 반영 안 함
 
-1. (다음 패치) 안드로이드 세로 고정 뒤 플레이 지원 기기가 줄어든 것 되돌리기: `app/android/app/src/main/AndroidManifest.xml`에 `<uses-feature android:name="android.hardware.screen.portrait" android:required="false" />` 한 줄 더하기. 2.1.1에서 태블릿 6, TV 3, 차량 17대가 빠졌어요(2026-10-29 지섭 확인). 세로 고정은 그대로 둬요
+(없음)
 
 ## 남은 일 (1.6.0, feat/v160-puzzle, 2026-10-26부터 본부 대화가 맡아요)
 
