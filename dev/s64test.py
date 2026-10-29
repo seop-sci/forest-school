@@ -23,7 +23,8 @@ async def main():
         r = await pg.evaluate(f"""(() => {{ const F = {F}, S = F.S; const t = document.querySelector('#tut'); if (t) t.hidden = true; S.tut.st = 'skip'; F.rt.tut = null; {CLEAN};
           const ids = F.MAIN.map(q => q.id), i = ids.indexOf('h1');
           S.q.m = i; S.q.mb = S.st.trials || 0; S.q.lat = ''; F.rt.trialT = 999; F.rt.trial && F.endTrial(true); F.setTab('school');
-          return {{ i, prev: ids[i - 1], next: ids[i + 1], ch: F.MAIN[i].ch, hunt: F.trialHunt() }}; }})()""")
+          const orig = j => {{ while (j >= 0 && j < ids.length && (F.MAIN[j].step || ids[j] === 'bf1')) j += j < i ? -1 : 1; return ids[j]; }};   // 2.1.1 한 단계 퀘스트와 단짝 퀘스트는 건너뛰고 봐요
+          return {{ i, prev: orig(i - 1), next: orig(i + 1), ch: F.MAIN[i].ch, hunt: F.trialHunt() }}; }})()""")
         print('자리', r)
         if r['prev'] != 'q7' or r['next'] != 'z1' or r['ch'] != 1 or not r['hunt']: bad.append(f'자리 {r}')
         txt = await pg.evaluate("document.querySelector('#questBar') ? document.querySelector('#questBar').textContent : ''")
