@@ -718,8 +718,8 @@ html.ait .app{padding-top:calc(10px + var(--ait-top, 0px));padding-bottom:var(--
 .con-prog{height:12px;border-radius:999px;background:rgba(0,0,0,.12);overflow:hidden}
 .con-prog i{display:block;height:100%;width:0;background:#7BC86C;border-radius:999px;transition:width .4s}
 .con-row{display:flex;gap:8px;justify-content:center}
-.con-row .cta{flex:1}
-.con-row .cta.ghost{flex:0 0 auto;background:transparent;color:inherit;box-shadow:none;border:1.5px solid rgba(0,0,0,.2)}
+.con-row .cta{flex:1 1 0;min-width:0;width:auto;white-space:nowrap}
+.con-row .cta.ghost{flex:0 0 auto;width:auto;padding-left:18px;padding-right:18px;background:transparent;color:inherit;box-shadow:none;border:1.5px solid rgba(0,0,0,.2)}   /* 2.1.2 '이대로 쓸게요'가 세로로 찌그러지던 것(지섭 제보) */
 .con-plan{margin:0;font-size:13px;opacity:.85;line-height:1.5}
 .con-tks{display:grid;grid-template-columns:repeat(4,1fr);gap:6px}
 .con-tk{display:grid;justify-items:center;gap:2px;padding:6px 2px;border-radius:12px;border:1.5px solid rgba(0,0,0,.12);background:transparent;color:inherit;font:inherit;font-size:12px;cursor:pointer}
@@ -727,6 +727,8 @@ html.ait .app{padding-top:calc(10px + var(--ait-top, 0px));padding-bottom:var(--
 .con-tk b{font-size:12.5px}
 .con-tk[aria-disabled="true"]{opacity:.45}
 .con-tk.armed{border-color:var(--seal)}
+.con-tk{position:relative}.con-tk.plan{border-color:var(--seal);background:color-mix(in srgb,var(--seal) 12%,transparent)}
+.con-tk .use{position:absolute;top:-7px;right:-4px;padding:1px 6px;border-radius:9px;background:var(--seal);color:#fff;font-size:11px;font-weight:700;font-style:normal}   /* 2.1.2 바로 줄이기에서 쓸 권 표시 */
 .con-ad{padding:8px 10px;border-radius:12px;border:1.5px dashed rgba(0,0,0,.25);background:transparent;color:inherit;font:inherit;font-size:13px;cursor:pointer}
 .con-ad[aria-disabled="true"]{opacity:.5}
 /* 2.1.1 하루 한 번 바로 완공 표시와 건설 가속 */
@@ -8428,7 +8430,8 @@ span.bt-stamp{display:none}.bt-duel.done span.bt-stamp{display:grid}
     $('#conNo').hidden = !(rt.conArm && p.n);
     $('#conPlan').textContent = !p.n ? '시간 단축권이 없어요. 광고를 보거나 문방구에서 살 수 있어요'
       : p.left ? `${tkPlanText(p)}을 써서 ${hm(p.cut)} 줄이고 ${hm(p.left)} 남아요` : `${tkPlanText(p)}을 써서 바로 끝나요`;
-    $('#conTks').innerHTML = TK.slice().reverse().map(t => `<button type="button" class="con-tk${rt.conPick === t.k ? ' armed' : ''}" data-tk="${t.k}" aria-disabled="${S.tk[t.k] > 0 ? 'false' : 'true'}">${IMG('ticket_' + t.k) ? `<img src="${IMG('ticket_' + t.k)}" alt="">` : '⌛'}<span>${t.name}</span><b>${fmt(S.tk[t.k])}장</b></button>`).join('');
+    const arm = rt.conArm && p.n;   // 2.1.2 바로 줄이기를 누르면 쓸 권을 표시해요
+    $('#conTks').innerHTML = TK.slice().reverse().map(t => `<button type="button" class="con-tk${rt.conPick === t.k ? ' armed' : ''}${arm && p.use[t.k] ? ' plan' : ''}" data-tk="${t.k}" aria-disabled="${S.tk[t.k] > 0 ? 'false' : 'true'}">${IMG('ticket_' + t.k) ? `<img src="${IMG('ticket_' + t.k)}" alt="">` : '⌛'}<span>${t.name}</span><b>${fmt(S.tk[t.k])}장</b>${arm && p.use[t.k] ? `<em class="use">−${p.use[t.k]}장</em>` : ''}</button>`).join('');
     cbSheet();   // 2.1.1 건설 가속
     const al = tkAdLeft();
     $('#conAd').setAttribute('aria-disabled', al > 0 ? 'false' : 'true');
