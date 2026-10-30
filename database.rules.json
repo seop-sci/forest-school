@@ -102,9 +102,9 @@
         }
       },
       "stats": {
-        ".read": "auth != null && root.child('forest/adminKey').exists() && root.child('forest/admins').child(auth.uid).val() === root.child('forest/adminKey').val()",
+        ".read": "auth != null && root.child('forest/adminUids').child(auth.uid).val() === true",
         "$uid": {
-          ".write": "auth != null && (auth.uid === $uid || (!newData.exists() && root.child('forest/adminKey').exists() && root.child('forest/admins').child(auth.uid).val() === root.child('forest/adminKey').val()))",
+          ".write": "auth != null && (auth.uid === $uid || (!newData.exists() && root.child('forest/adminUids').child(auth.uid).val() === true))",
           ".validate": "newData.hasChildren(['seen', 'pid']) && newData.child('seen').isNumber() && newData.child('pid').isString() && newData.child('pid').val().length <= 16",
           ".read": "auth != null && auth.uid === $uid",
           "seen": {
@@ -178,7 +178,19 @@
       "admins": {
         "$uid": {
           ".read": "auth != null && auth.uid === $uid",
-          ".write": "auth != null && auth.uid === $uid && (!newData.exists() || (root.child('forest/adminKey').exists() && newData.val() === root.child('forest/adminKey').val()))"
+          ".write": "auth != null && auth.uid === $uid && !newData.exists()"
+        }
+      },
+      "adminUids": {
+        "$uid": {
+          ".read": "auth != null && auth.uid === $uid",
+          ".write": false
+        }
+      },
+      "webOk": {
+        "$uid": {
+          ".read": "auth != null && auth.uid === $uid",
+          ".write": false
         }
       }
     }

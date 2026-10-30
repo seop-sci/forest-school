@@ -2053,6 +2053,15 @@ body{background:radial-gradient(120% 60% at 50% 0%, color-mix(in srgb, var(--pap
 .sn-dex-grid .sn-card.no img{filter:brightness(0);opacity:.22}
 .sn-dex-grid .sn-card small{color:var(--muted);font-size:10.5px}
 #vRate.sn-on::after{content:'';display:inline-block;width:12px;height:12px;margin-left:3px;vertical-align:-2px;background:var(--sn-mood) center/contain no-repeat}
+/* 2.3.0 웹판 잠금 */
+.web-lock{position:fixed;inset:0;z-index:95;display:flex;align-items:center;justify-content:center;padding:20px;background:#2C4A3D}
+.web-lock[hidden]{display:none}
+body.wl-on .toast{z-index:300}
+.wl-box{width:100%;max-width:330px;padding:24px 18px 18px;border-radius:20px;background:#F8FAF1;color:#26301E;text-align:center}
+.wl-box b{display:block;font-family:var(--font-display);font-size:21px;margin-bottom:8px}
+.wl-box p{margin:0 0 14px;font-size:14.5px;line-height:1.5}
+.wl-box .wl-id{font-size:12px;color:#5F6B55;word-break:break-all;margin:12px 0 8px}
+.wl-box .cta,.wl-box .btn-sub{width:100%}
 /* 2.3.0 즉시 완공 단추, 숲의 정수로 즉시 완료, 동그란 체크 */
 .buy-row{display:flex;gap:8px;align-items:stretch}
 .buy-row #sheetBuy{flex:1;min-width:0;margin:0}
@@ -3959,6 +3968,16 @@ span.bt-stamp{display:none}.bt-duel.done span.bt-stamp{display:grid}
   </section>
 </div>
 <!-- 2.2.0 예전 학교 되돌리기 -->
+<!-- 2.3.0 웹판 잠금(지섭 결정): GitHub Pages 판에서만 켜져요(build_gh가 FS_WEB_LOCK을 넣어요). 허용된 구글 계정만 열려요 -->
+<div class="web-lock" id="webLock" hidden role="dialog" aria-modal="true" aria-labelledby="wlTitle">
+  <div class="wl-box">
+    <b id="wlTitle">숲속 동물 학교 테스트판</b>
+    <p id="wlTx">계정을 확인하는 중이에요</p>
+    <button class="cta" type="button" id="wlGo" hidden>구글로 로그인</button>
+    <p class="wl-id" id="wlId"></p>
+    <button class="btn-sub" type="button" id="wlCopy" hidden>계정 번호 복사</button>
+  </div>
+</div>
 <!-- 2.3.0 숲의 정수로 즉시 완료 확인 -->
 <div class="overlay center" id="mCes" hidden>
   <div class="backdrop"></div>
@@ -10436,7 +10455,7 @@ span.bt-stamp{display:none}.bt-duel.done span.bt-stamp{display:grid}
         }
         const gift = giveAcctGift();
         toast('구글 계정을 연결했어요.' + gift); sfx('quest');
-        renderAcct(); cloudPush(true);
+        renderAcct(); cloudPush(true); webLockCheck();
       } catch (e) {
         if (!/credential-already-in-use|email-already-in-use|account-exists/.test(String(e && e.code))) throw e;
         cred = cred || (e && e.credential);
@@ -10463,6 +10482,21 @@ span.bt-stamp{display:none}.bt-duel.done span.bt-stamp{display:grid}
     }
     rt.acctBusy = false;
   }
+  // 2.3.0 웹판 잠금: 구글 계정이고 forest/webOk/<계정 번호>가 true면 열려요. 앱(안드로이드, 토스) 판에는 FS_WEB_LOCK이 없어요
+  async function webLockCheck() {
+    if (!window.FS_WEB_LOCK) return;
+    const el = $('#webLock'), tx = $('#wlTx'), go = $('#wlGo'), id = $('#wlId'), cp = $('#wlCopy');
+    el.hidden = false; document.body.classList.add('wl-on');
+    if (!cloudOn()) { tx.textContent = '서버에 연결하지 못했어요. 인터넷을 확인하고 새로 고침해 주세요'; go.hidden = true; return; }
+    if (!Cloud.uid || !Cloud.db) { tx.textContent = '계정을 확인하는 중이에요'; go.hidden = true; clearTimeout(rt.wlT); rt.wlT = setTimeout(webLockCheck, 1200); return; }
+    id.textContent = '계정 번호 ' + Cloud.uid; cp.hidden = false;
+    if (!googleUser()) { tx.textContent = '테스트 전용 판이에요. 허용된 구글 계정으로 로그인해 주세요'; go.hidden = false; return; }
+    let ok = false;
+    try { ok = (await waitFor(Cloud.db.ref('forest/webOk/' + Cloud.uid).once('value'), CLOUD_WAIT)).val() === true; } catch (e) { ok = false; }
+    if (ok) { el.hidden = true; document.body.classList.remove('wl-on'); return; }
+    go.hidden = true;
+    tx.textContent = '이 구글 계정은 아직 테스트 계정이 아니에요. 아래 계정 번호를 Firebase 콘솔의 forest/webOk에 true로 넣으면 열려요';
+  }
   function askAcct(d, local) {
     let inc = null;
     try { inc = sanitize(JSON.parse(d)); } catch (e) { inc = null; }
@@ -10485,23 +10519,13 @@ span.bt-stamp{display:none}.bt-duel.done span.bt-stamp{display:grid}
     openModal($('#mStats'));
     checkAdmin().then(loadStats);
   }
-  /* 관리자: Firebase 콘솔에서 forest/adminKey에 정해 둔 비밀 글자를 넣은 기기만 forest/admins/<내 id>에 적을 수 있고,
-     그 기기만 다른 테스터의 테스트 현황 기록을 지울 수 있어요 (규칙이 막아 줘요). 비밀 글자는 아무도 읽을 수 없어요 */
+  /* 2.3.0 관리자(지섭 결정): 비밀 글자 대신 구글 계정. Firebase 콘솔에서 forest/adminUids/<계정 번호>에 true를 넣은 계정만
+     다른 테스터의 테스트 현황을 보고 지울 수 있어요(규칙이 막아 줘요). 규칙에 이메일은 적지 않아요(공개 저장소) */
   async function checkAdmin() {
     rt.isAdmin = false;
-    try { rt.isAdmin = !!(await waitFor(Cloud.db.ref('forest/admins/' + Cloud.uid).once('value'), CLOUD_WAIT)).val(); } catch (e) { /* 아니면 일반 화면 */ }
-    $('#stKeyForm').hidden = rt.isAdmin;
+    try { rt.isAdmin = (await waitFor(Cloud.db.ref('forest/adminUids/' + Cloud.uid).once('value'), CLOUD_WAIT)).val() === true; } catch (e) { /* 아니면 일반 화면 */ }
+    $('#stKeyForm').hidden = true;
     renderStatsDel();
-  }
-  async function submitAdminKey(e) {
-    e.preventDefault();
-    const key = $('#stKey').value.trim();
-    if (!key) { shake($('#stKey')); return; }
-    try {
-      await waitFor(Cloud.db.ref('forest/admins/' + Cloud.uid).set(key), CLOUD_WAIT);
-      $('#stKey').value = ''; toast('이 기기에서 기록을 지울 수 있어요');
-      await checkAdmin(); loadStats();
-    } catch (er) { shake($('#stKey')); toast(cloudErrKey(er) === 'rules' ? '비밀 글자가 맞지 않아요' : '서버에 연결하지 못했어요'); }
   }
   function renderStatsDel() {
     const b = $('#statsDel'), n = rt.stPick ? rt.stPick.size : 0;
@@ -10539,7 +10563,7 @@ span.bt-stamp{display:none}.bt-duel.done span.bt-stamp{display:grid}
     sum.textContent = '불러오는 중이에요';
     let v = null;
     try { v = (await waitFor(Cloud.db.ref('forest/stats').once('value'), CLOUD_WAIT)).val(); }
-    catch (e) { sum.textContent = cloudErrKey(e) === 'rules' ? (rt.isAdmin ? '불러오지 못했어요. ' + CLOUD_ERR.rules : '테스트 현황은 관리자만 볼 수 있어요. 관리자 비밀 글자를 넣어 주세요') : '불러오지 못했어요. ' + CLOUD_ERR.net; return; }
+    catch (e) { sum.textContent = cloudErrKey(e) === 'rules' ? (rt.isAdmin ? '불러오지 못했어요. ' + CLOUD_ERR.rules : '테스트 현황은 관리자 계정만 볼 수 있어요') : '불러오지 못했어요. ' + CLOUD_ERR.net; return; }
     const now = Date.now() + Cloud.offset, best = new Map();
     rt.stIds = new Map();   // 같은 학교(pid)가 여러 기기에 남긴 기록을 한꺼번에 지우려고 모아 둬요
     Object.keys(v || {}).forEach(id => {
@@ -17595,7 +17619,6 @@ span.bt-stamp{display:none}.bt-duel.done span.bt-stamp{display:grid}
     $('#acctKeep').addEventListener('click', () => { const a = rt.acctPick; if (a) { bakAdd(a.d, '고르지 않은 계정 학교'); adoptSave(a.local, '이 폰의 학교를 구글 계정에 저장했어요'); } });   // 2.2.0 계정 학교도 남겨요
     $('#devStats').addEventListener('click', openStats);
     $('#statsReload').addEventListener('click', loadStats);
-    $('#stKeyForm').addEventListener('submit', submitAdminKey);
     $('#statsDel').addEventListener('click', deleteStats);
     $('#statsClose').addEventListener('click', () => closeModal($('#mStats')));
     $('[data-close-stats]').addEventListener('click', () => closeModal($('#mStats')));
@@ -17739,6 +17762,9 @@ span.bt-stamp{display:none}.bt-duel.done span.bt-stamp{display:grid}
     $('#conEss').addEventListener('click', () => { const k = rt.sheetKey; if (k) askConEss(k); });
     $('#cesQuiet').addEventListener('click', () => { const b = $('#cesQuiet'), on = !b.classList.contains('on'); b.classList.toggle('on', on); b.setAttribute('aria-checked', on ? 'true' : 'false'); sfx('tap'); });
     $('#cesNo').addEventListener('click', () => { closeModal($('#mCes')); });
+    $('#wlGo').addEventListener('click', () => { linkGoogle(); });
+    $('#wlCopy').addEventListener('click', () => { const u = Cloud.uid || ''; try { navigator.clipboard.writeText(u).then(() => toast('계정 번호를 복사했어요'), () => toast(u)); } catch (e) { toast(u); } });
+    webLockCheck();
     $('#cesGo').addEventListener('click', () => {
       const k = rt.cesK; if ($('#cesQuiet').classList.contains('on')) S.ces = gameToday();
       closeModal($('#mCes')); if (k) conEss(k); if (rt.sheetKey) renderSheet();
