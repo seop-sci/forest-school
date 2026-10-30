@@ -207,9 +207,9 @@ def main(dirs, block=''):
     old = {}
     if BEGIN in src:
         block = src[src.index(BEGIN):src.index(END)]
-        for k, v in re.findall(r'"([A-Za-z0-9_]+)":"(data:image/webp;base64,[^"]+)"', block):
+        for k, v in re.findall(r'"([A-Za-z0-9_]+)":"(data:image/[^"]+)"', block):
             old[k] = v
-    old.update(imgs)   # 이번에 준 폴더의 그림만 바꾸고, 전에 넣은 그림은 그대로 둬요
+    old.update(imgs)   # 이번에 준 폴더의 그림만 바꾸고, 전에 넣은 그림은 그대로 둬요(webp가 아닌 SVG 같은 그림도, 2.2.0)
     body = ',\n'.join(f'"{k}":"{v}"' for k, v in sorted(old.items()))
     new = f'{BEGIN}\n<script>window.{VAR}={{\n{body}\n}};</script>\n{END}'
     if BEGIN in src:
