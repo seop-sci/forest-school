@@ -2014,6 +2014,12 @@ body{background:radial-gradient(120% 60% at 50% 0%, color-mix(in srgb, var(--pap
 .vd-btns button[aria-disabled="true"]{opacity:.5}
 .vd-sum{text-align:center;margin:8px 0 4px;padding:0 16px;white-space:pre-line}
 #decoG .deco-on .deco-ring,#tvMap .deco-ring{fill:none;stroke:#F4C144;stroke-width:2;stroke-dasharray:4 3}
+/* 2.1.3 학부모 편지 */
+.pl-chip{position:absolute;right:10px;bottom:calc(var(--bot-h, 70px) + 92px);z-index:6;display:flex;align-items:center;gap:4px;padding:5px 11px;border:2px solid #E2A21C;border-radius:14px;background:rgba(255,246,214,.95);color:#5A3A16;font:inherit;font-size:12.5px;font-weight:700;box-shadow:0 2px 4px rgba(0,0,0,.25);cursor:pointer;animation:plBob 1.6s ease-in-out infinite}
+.pl-chip span{font-size:15px}
+@keyframes plBob{50%{transform:translateY(-3px)}}
+.lt-nav{display:flex;align-items:center;justify-content:center;gap:12px;margin:-4px 0 8px;font-size:13px;color:var(--muted)}
+@media (prefers-reduced-motion:reduce){.pl-chip{animation:none}}
 /* 2.1.3 날씨 */
 .wx-fx{position:absolute;inset:0;z-index:1;pointer-events:none;overflow:hidden;border-radius:15px}   /* 테마 낙엽(fallfx)과 같은 층: 현황판과 탭 아래 */
 .wx-fx.wx-rain{background:repeating-linear-gradient(105deg,rgba(200,225,255,0) 0 14px,rgba(200,225,255,.38) 14px 15px,rgba(200,225,255,0) 15px 31px);background-size:62px 62px;animation:wxRain .55s linear infinite;box-shadow:inset 0 0 0 999px rgba(40,60,90,.12)}
@@ -2914,6 +2920,7 @@ span.bt-stamp{display:none}.bt-duel.done span.bt-stamp{display:grid}
       <!-- 2.0.0 학교급 모습 보기: 동그라미 6개와 지난 학교급 지도 -->
       <div class="wx-fx" id="wxFx" hidden aria-hidden="true"></div><!-- 2.1.3 날씨 효과 -->
       <button class="wx-chip" id="wxChip" type="button" hidden></button>
+      <button class="pl-chip" id="plChip" type="button" hidden aria-label="까치 우체부가 가져온 학부모 편지 읽기"><span aria-hidden="true">✉</span>새 편지</button><!-- 2.1.3 학부모 쪽지 이야기 -->
       <div class="tier-view" id="tierView" hidden>
         <svg id="tvMap" viewBox="0 -60 360 540" preserveAspectRatio="xMidYMid meet" role="img" aria-label="지난 학교급 지도"></svg>
         <div class="tv-bar"><span class="tv-mark" id="tvMark" aria-hidden="true"></span><span class="tv-tx"><b id="tvTitle"></b><small id="tvSub"></small></span><button class="btn-sub small" id="tvEdit" type="button">꾸미기</button><button class="cta small" id="tvBack" type="button">돌아가기</button></div>
@@ -3153,6 +3160,7 @@ span.bt-stamp{display:none}.bt-duel.done span.bt-stamp{display:grid}
       <h3 class="panel-sub">학교 기록</h3>
       <div class="slist">
         <button class="srow" type="button" id="optAcct" hidden><span class="txt"><b id="acctTitle">구글 계정 연결</b><small id="acctSub">연결해 두면 휴대폰을 바꿔도 같은 학교를 이어 해요</small></span><svg viewBox="0 0 24 24" width="20" height="20" aria-hidden="true"><path d="M9 6l6 6-6 6" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"/></svg></button>
+        <button class="srow" type="button" id="optPLetter"><span class="txt"><b>학부모 편지함</b><small id="plSub">까치 우체부가 학부모 편지를 가져와요</small></span><svg viewBox="0 0 24 24" width="20" height="20" aria-hidden="true"><path d="M9 6l6 6-6 6" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"/></svg></button><!-- 2.1.3 -->
         <button class="srow" type="button" id="optNotice"><img class="srow-ic" id="ntIc" alt="" hidden><span class="txt"><b>공지사항<i class="nt-dot" id="ntDot" hidden></i></b><small id="ntSub">업데이트 소식과 알림을 봐요</small></span><svg viewBox="0 0 24 24" width="20" height="20" aria-hidden="true"><path d="M9 6l6 6-6 6" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"/></svg></button>
         <button class="srow" type="button" id="optTut"><span class="txt"><b>튜토리얼</b><small id="tutSub">학교를 꾸려 가는 방법을 다시 봐요</small></span><svg viewBox="0 0 24 24" width="20" height="20" aria-hidden="true"><path d="M9 6l6 6-6 6" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"/></svg></button>
         <div class="srow" id="resetRow"><span class="txt"><b>처음부터 다시</b><small>수료증과 전학 온 친구들까지 모두 지워요</small></span><button class="btn-danger" type="button" id="optReset">초기화</button></div>
@@ -3705,6 +3713,7 @@ span.bt-stamp{display:none}.bt-duel.done span.bt-stamp{display:grid}
   <section class="modal lab-modal" role="dialog" aria-modal="true" aria-labelledby="ltTitle">
     <h2 class="sk-title" id="ltTitle">졸업 편지</h2>
     <div class="lt-paper"><p id="ltText"></p></div>
+    <div class="lt-nav" id="ltNav" hidden><button class="btn-sub small" type="button" id="ltPrev" aria-label="앞 편지">◀</button><span id="ltPg"></span><button class="btn-sub small" type="button" id="ltNext" aria-label="다음 편지">▶</button></div><!-- 2.1.3 학부모 편지함 -->
     <div class="btn-row" style="padding:0 16px"><button class="cta" type="button" id="ltClose">고마워!</button></div>
   </section>
 </div>
@@ -5464,7 +5473,8 @@ span.bt-stamp{display:none}.bt-duel.done span.bt-stamp{display:grid}
     cb: { until: 0, at: 0 },   // 2.1.1 건설 가속(도토리): until까지 공사 2배, at은 마지막으로 셈한 때
     fr: {}, frg: { day: '', n: 0 }, frc: { pat: 0, gift: 0, cake: 0, alb: 0 }, bday: { day: '', done: false }, alb: [],   // 2.1.1 단짝 친구, 오늘 선물, 횟수, 오늘 생일 잔치, 졸업 앨범
     dsn: { day: '', trips: 0, sports: 0, fest: {} },   // 2.1.0 오늘 시작할 때의 체험학습, 운동회, 행사 횟수(오늘 한 것도 퀘스트에 쳐요)
-    lab: freshLab(), rd: freshRd(), ex: freshEx(), bt: freshBt(), ps: freshPs(), rare: { got: [], miss: 0 }, rs: { n: 0, p: 0, pos: 0, king: 0 }, lk: { on: false, at: 0, h: '' }, wx: '',   // wx: 2.1.3 날씨 알림을 본 날. ps: 2.1.3 숲속 패스, rs: 랭킹 시즌(번호, 점수, 마지막으로 본 순위, 시즌 왕 횟수), lk: 내 학교 보여 주기, rare: 2.1.3 반짝 친구(만난 종, 연속 못 만난 횟수)
+    lab: freshLab(), rd: freshRd(), ex: freshEx(), bt: freshBt(), ps: freshPs(), rare: { got: [], miss: 0 }, rs: { n: 0, p: 0, pos: 0, king: 0 }, lk: { on: false, at: 0, h: '' }, wx: '', pl: { got: 0, read: 0, wk: -1 },   // pl: 2.1.3 학부모 편지(받은 통, 읽은 통, 받은 주)
+      // wx: 2.1.3 날씨 알림을 본 날. ps: 2.1.3 숲속 패스, rs: 랭킹 시즌(번호, 점수, 마지막으로 본 순위, 시즌 왕 횟수), lk: 내 학교 보여 주기, rare: 2.1.3 반짝 친구(만난 종, 연속 못 만난 횟수)
       // ex: 2.0.1 시험 기간(본 시험 주, 자율학습, 성적표, 기록)
     // 2.0.1 공부 2단계: 과학 탐구 실험(오늘 한 날, 모은 카드, 해 본 짝), 책 읽기(오늘 권수, 읽는 책과 시작 시각, 읽은 횟수)
     bd: {}, tk: { m5: 0, m30: 0, h1: 0, h3: 0 }, tka: { day: '', n: 0 },   // 2.1.0 공사(건물마다 { L 오를 레벨, s 시작, e 끝 }), 시간 단축권 장수, 광고 단축권 오늘 횟수
@@ -5670,6 +5680,7 @@ span.bt-stamp{display:none}.bt-duel.done span.bt-stamp{display:grid}
     sanitizeBt(d, s);   // 2.0.1 공부 4단계: 숲속 대결
     sanitizePs(d, s);   // 2.1.3 숲속 패스
     s.wx = typeof d.wx === 'string' ? d.wx.slice(0, 10) : '';   // 2.1.3 날씨 알림 본 날
+    { const P = d.pl && typeof d.pl === 'object' ? d.pl : {}, got = Math.max(0, Math.min(PL.list.length, Math.floor(Number(P.got) || 0))); s.pl = { got, read: Math.max(0, Math.min(got, Math.floor(Number(P.read) || 0))), wk: Math.floor(Number(P.wk)) || -1 }; }   // 2.1.3 학부모 편지
     { const R = d.rs && typeof d.rs === 'object' ? d.rs : {}, n = (v, hi) => Math.max(0, Math.min(hi, Math.floor(Number(v) || 0))); s.rs = { n: n(R.n, 1e4), p: n(R.p, 1e9), pos: n(R.pos, 1e4), king: n(R.king, 1e4) }; }   // 2.1.3 랭킹 시즌
     { const L = d.lk && typeof d.lk === 'object' ? d.lk : {}; s.lk = { on: L.on === true, at: Math.max(0, Math.min(Date.now() + 864e5, Number(L.at) || 0)), h: '' }; }   // 2.1.3 내 학교 보여 주기(처음에는 꺼짐)
     { const R = d.rare && typeof d.rare === 'object' ? d.rare : {}; s.rare = { got: [...new Set((Array.isArray(R.got) ? R.got : []).filter(sp => RARE.list.some(x => x.sp === sp)))], miss: Math.min(RARE.pity, Math.max(0, Math.floor(Number(R.miss) || 0))) }; }   // 2.1.3 반짝 친구
@@ -12284,6 +12295,7 @@ span.bt-stamp{display:none}.bt-duel.done span.bt-stamp{display:grid}
     m.style.setProperty('--lt-l', IMG('bond_paper_light') ? `url("${IMG('bond_paper_light')}")` : 'none');
     m.style.setProperty('--lt-d', IMG('bond_paper_dark') ? `url("${IMG('bond_paper_dark')}")` : 'none');
     $('#ltTitle').textContent = `${pg.ltr.nm}의 졸업 편지`;
+    $('#ltNav').hidden = true; $('#ltClose').textContent = '고마워!'; rt.plAt = null;   // 2.1.3 학부모 편지와 같은 창
     $('#ltText').innerHTML = esc(pg.ltr.txt + (pg.ltr.gold && !back ? `\n\n(황금 도토리 +${pg.ltr.gold})` : '')).replace(/\n/g, '<br>');   // 글자 칸이 줄바꿈을 빈칸으로 바꿔서 <br>로
     rt.ltBack = !!back;
     openModal(m); sfx('quest');
@@ -16615,6 +16627,10 @@ span.bt-stamp{display:none}.bt-duel.done span.bt-stamp{display:grid}
     $('#mAlbum .backdrop').addEventListener('click', () => closeModal($('#mAlbum')));
     $('#albLetter').addEventListener('click', () => { const pg = S.alb[rt.albPage]; if (pg && pg.ltr) { closeModal($('#mAlbum')); setTimeout(() => openLetter(pg, true), 240); } });
     $('#ltClose').addEventListener('click', () => { sfx('tap'); closeModal($('#mLetter')); });
+    $('#ltPrev').addEventListener('click', () => { if (rt.plAt != null) openPLetter(rt.plAt - 1, true); });   // 2.1.3 학부모 편지함
+    $('#ltNext').addEventListener('click', () => { if (rt.plAt != null) openPLetter(rt.plAt + 1, true); });
+    $('#plChip').addEventListener('click', () => openPLetter());
+    $('#optPLetter').addEventListener('click', () => { sfx('tap'); openPLetter(null, true); });
     $('#mLetter .backdrop').addEventListener('click', () => closeModal($('#mLetter')));
     $('#frNameNo').addEventListener('click', () => { sfx('tap'); closeModal($('#mFrName')); });
     $('#mFrName .backdrop').addEventListener('click', () => closeModal($('#mFrName')));
@@ -17396,6 +17412,59 @@ span.bt-stamp{display:none}.bt-duel.done span.bt-stamp{display:grid}
     if (show && S.wx !== gameToday() && !rt.modalOpen) { S.wx = gameToday(); save(); setTimeout(() => toast(`${WX[k].em} 오늘은 ${k === 'fog' ? '안개가 꼈어요' : WX[k].name + '가 와요'}.\n${WX[k].tip}`), 600); }
   }
   /* ===== 2.1.3 날씨 END ===== */
+  /* ===== 2.1.3 학부모 쪽지 이야기 BEGIN (로드맵 9절) =====
+     까치 우체부가 게임 시계 한 주에 한 통씩 학부모 편지를 가져와요. 열두 통이 이어지는 짧은 이야기예요(그림 없이 글만).
+     처음 받는 날에 첫 통, 그 뒤로 월요일마다 한 통. 읽으면 숲의 정수 2(작은 고마움). 다 읽은 편지는 설정 > 학부모 편지함에서 다시 봐요 */
+  const PL = { ess: 2, list: [
+    { from: '토끼 학생네 엄마', title: '처음 보내는 편지', txt: '교장 선생님, 안녕하세요.\n우리 아이가 숲속 학교에 다닌 지 한 달이 됐어요.\n처음에는 교문 앞에서 귀를 축 늘어뜨리고 울었는데, 요즘은 아침마다 먼저 가방을 메고 기다려요.\n고맙다는 말을 꼭 전하고 싶어서 까치 우체부에게 부탁했어요.' },
+    { from: '여우 학생네 아빠', title: '책 읽는 소리', txt: '교장 선생님, 어젯밤 우리 집에 작은 소리가 들렸어요.\n아이가 도서관에서 빌린 그림책을 동생에게 읽어 주고 있더라고요.\n글자를 더듬더듬 읽다가 웃다가, 끝까지 다 읽었어요.\n학교에서 배운 걸 집에서 나누는 모습이 참 뿌듯했어요.' },
+    { from: '너구리 학생네 할머니', title: '비 오는 날의 우산', txt: '교장 선생님, 지난번 비 오던 날 우리 손주가 우산을 두고 갔지요.\n그런데 병아리 친구가 자기 우산을 같이 썼다고 하더군요.\n둘 다 어깨가 흠뻑 젖어서 왔는데, 얼굴은 해님처럼 웃고 있었어요.\n좋은 친구를 만나게 해 주셔서 고맙습니다.' },
+    { from: '곰 학생네 엄마', title: '생일 케이크', txt: '교장 선생님, 급식실에서 열어 주신 생일 잔치 이야기를 들었어요.\n우리 아이가 집에 와서 케이크 이야기를 열 번도 넘게 했답니다.\n친구들이 노래를 불러 줄 때 너무 좋아서 꼬리가 저절로 흔들렸대요.\n오래오래 기억할 하루가 됐어요.' },
+    { from: '학부모 모임 대표 다람쥐', title: '작은 비밀 계획', txt: '교장 선생님께만 살짝 말씀드려요.\n학부모들이 모여서 학교에 작은 선물을 하기로 했어요.\n무엇인지는 아직 비밀이에요!\n다음 편지부터 조금씩 알려 드릴게요. 기대해 주세요.' },
+    { from: '학부모 모임 대표 다람쥐', title: '도토리 모으기', txt: '교장 선생님, 비밀 계획 첫 단계는 도토리 모으기예요.\n아침마다 숲길에서 한 알씩 주워 커다란 항아리에 모으고 있어요.\n아이들이 눈치챌까 봐 항아리는 부엉이 선생님 댁 뒤에 숨겨 두었답니다.\n벌써 항아리 절반이 찼어요.' },
+    { from: '병아리 학생네 아빠', title: '선생님 놀이', txt: '교장 선생님, 요즘 우리 아이가 집에서 선생님 놀이를 해요.\n인형들을 줄 세워 놓고 "숙제는 다 했나요?" 하고 묻는답니다.\n나중에 커서 숲속 학교 선생님이 되고 싶대요.\n학교가 아이에게 꿈을 하나 심어 주었어요.' },
+    { from: '여우 학생네 아빠', title: '운동회 전날', txt: '교장 선생님, 내일이 운동회라 아이가 잠을 못 이루고 있어요.\n달리기에서 넘어지면 어쩌나 걱정이 많더라고요.\n"넘어져도 다시 일어나서 끝까지 달리면 그게 일등이야" 하고 말해 주었어요.\n내일 운동장에서 크게 응원할게요.' },
+    { from: '학부모 모임 대표 다람쥐', title: '씨앗 고르기', txt: '교장 선생님, 비밀 계획 둘째 단계예요.\n모은 도토리를 숲속 시장에 가져가 꽃씨와 묘목으로 바꾸었어요.\n해바라기, 코스모스, 그리고 작은 참나무 묘목 하나예요.\n이제 무엇을 하려는지 눈치채셨나요?' },
+    { from: '너구리 학생네 할머니', title: '첫눈 오던 날', txt: '교장 선생님, 첫눈이 오던 날 아이들이 운동장에서 눈사람을 만들었다지요.\n우리 손주는 눈사람에게 자기 목도리를 둘러 주고 왔어요.\n목이 시렸을 텐데 "눈사람이 더 추워 보였어요" 하더군요.\n마음이 따뜻한 아이로 자라고 있어요.' },
+    { from: '학부모 모임 대표 다람쥐', title: '숲속 꽃밭', txt: '교장 선생님, 드디어 비밀 계획을 말씀드려요!\n학부모들이 학교 뒤뜰에 작은 꽃밭을 만들었어요.\n한가운데에는 참나무 묘목을 심고, 둘레에 아이들 이름표를 하나씩 꽂았어요.\n아이들이 졸업해도 이 나무는 학교에 남아 함께 자랄 거예요.' },
+    { from: '숲속 학교 학부모 모두', title: '고맙습니다', txt: '교장 선생님, 열두 통의 편지를 끝까지 읽어 주셔서 고마워요.\n아이들이 웃으며 학교에 가는 아침이 저희에게는 가장 큰 선물이에요.\n꽃밭의 참나무가 자라는 만큼 아이들도 쑥쑥 자라겠지요.\n앞으로도 숲속 학교를 잘 부탁드려요. 늘 응원할게요!' }
+  ] };
+  // 받은 편지 수: 처음 열어 본 주에 첫 통, 그 뒤 주마다 한 통
+  function plSync() {
+    if (!S || !S.pl) return;
+    const w = gameWeek();
+    if (S.pl.got === 0) { S.pl.got = 1; S.pl.wk = w; return; }
+    if (S.pl.got < PL.list.length && w > S.pl.wk) { S.pl.got = Math.min(PL.list.length, S.pl.got + 1); S.pl.wk = w; }
+  }
+  const plUnread = () => !!S && !!S.pl && S.pl.read < S.pl.got;
+  function openPLetter(i, archive) {
+    plSync();
+    if (i == null) i = archive ? Math.max(0, S.pl.got - 1) : S.pl.read;
+    if (i < 0 || i >= S.pl.got) { toast('아직 받은 편지가 없어요'); return; }
+    const L = PL.list[i], m = $('#mLetter'), first = i >= S.pl.read && !archive;
+    m.style.setProperty('--lt-l', IMG('bond_paper_light') ? `url("${IMG('bond_paper_light')}")` : 'none');
+    m.style.setProperty('--lt-d', IMG('bond_paper_dark') ? `url("${IMG('bond_paper_dark')}")` : 'none');
+    let gift = '';
+    if (i >= S.pl.read) { S.pl.read = i + 1; addEss(PL.ess); gift = `\n\n(숲의 정수 +${PL.ess})`; save(); }
+    $('#ltTitle').textContent = `${L.title}`;
+    $('#ltText').innerHTML = esc(`${L.txt}\n\n${L.from} 드림${gift}`).replace(/\n/g, '<br>');
+    rt.ltBack = true; rt.plAt = i;
+    $('#ltNav').hidden = S.pl.got < 2;
+    $('#ltPg').textContent = `${i + 1} / ${PL.list.length}`;
+    $('#ltPrev').disabled = i <= 0; $('#ltNext').disabled = i >= S.pl.got - 1;
+    $('#ltClose').textContent = '고마워요!';
+    if (!m.hidden && rt.modalOpen === m) { sfx('tap'); return; }
+    openModal(m); sfx(first ? 'quest' : 'tap');
+  }
+  function renderPLetter() {
+    const chip = $('#plChip'); if (!chip || !S) return;
+    plSync();
+    const show = plUnread() && rt.tab === 'school' && rt.viewTier == null && !rt.decoEdit && !rt.fest && !rt.sports;
+    chip.hidden = !show;
+    const sub = $('#plSub'); if (sub) sub.textContent = S.pl.got ? `받은 편지 ${S.pl.got}통${plUnread() ? ', 새 편지가 있어요' : ''}` : '까치 우체부가 학부모 편지를 가져와요';
+  }
+  /* ===== 2.1.3 학부모 쪽지 이야기 END ===== */
+
 
   /* ===== 2.1.3 랭킹 시즌과 다른 학교 구경 BEGIN (시즌 설계안 2, 4절, 지섭 확정) =====
      랭킹 시즌: 계절마다(겨울 12~2월, 봄 3~5월, 여름 6~8월, 가을 9~11월) 주간 리그 점수를 모아요. 2026 겨울이 시즌 1.
@@ -17549,6 +17618,7 @@ span.bt-stamp{display:none}.bt-duel.done span.bt-stamp{display:grid}
     if (ed) ed.hidden = !evClaimable() && !psClaimable();   // 2.1.3 숲속 패스도
     { const pd = $('#psDot'); if (pd) pd.hidden = !psClaimable(); }
     renderWeather();   // 2.1.3 날씨
+    renderPLetter();   // 2.1.3 학부모 편지
     if (rt.tab === 'dex') renderDex();
     if (rt.tab === 'event') { if (rt.evSeg === 'ps') renderPass(); else renderEvent(); }
   }
@@ -18648,7 +18718,7 @@ span.bt-stamp{display:none}.bt-duel.done span.bt-stamp{display:grid}
     rosterEnsure, rosterMake, rosterAdd, clubAuto, clubSet, clubPct, clubShow, clubSum, clubStars, clubMembers, clubShowGo, showReady, showWait, showDay, clubWeekTick, clubFacUp, CLUBS, CLUB, star, clubTuitionMult, clubFestMult, clubDecoOff, renderClub, renderHall, openSeatPick, openClubPick,
     TIER_SCALE, legacyMult, tuitionMult, snapTake, snapOf, tierViewOpen, tierViewClose, renderTierView, renderTierDots, viewMap, showNewTalk, talkNext, showCere, cereEnd, cereCrew, cereAsk, cereKeep, goFur, updateQuestDot, openElect, renderElect, elVote, elSync, elMult, elClub, elPres, elBadge, elMake, EL_PLEDGES, clubPct, festPrize, dropValue, claimMission, gameWeek, NEWCOMERS, TIERS, GEO, geoIdx, decoCost0, qMeasure, qDone, qGoal, kidArt: kidSVG, newYear, checkGrade, gradeOf, townRep, FAC, sanitize200, trialHunt, updateTrial, TRIAL, zoomAt, fitMap, ZOOM_MAX, DECO, DECO_SLOTS, DECO_SIGN, decoCost, decoSoldOut, pickDeco, buyDeco, decoPut, decoEditStart, decoEditEnd, openDecoPick, renderDeco, setSchoolNm, setMark, schoolTitle, markHTML, decoPlacedAll, esExLeft, esExCost, get Cloud() { return Cloud; }, get actx() { return actx; }, Music, musicSync, ensureAudio, bgmLoad, pzUI, rt, makeDeal, furStage, DEAL, navInfo, navRoute, spawnDrop, repTipCheck, linkGoogle, retryCloud, sanitize, acctPending, renderMap, renderHUD, renderAffordance, syncKids, layoutMap, geo, hitTrial, endVisit, showReward, recommend, needCost, prepTopUp, qReward, prepPhase, rankScore, pwOf, previewDip, dipMult, costScale, buyFur, buyFurAll, furCost, furReady, furDone, FUR, startTalk, endTalk, teacherAct, facCost, teaCost, facKeys, rate, rep, capacity, canGraduate, canPromote,
     fmt, fmt2, graduate, promote, buyPerk, perkCost, perkMaxed, buyFundPerk, fpCost, claimMain, mainReady, curMain, qNo, earn, CFG, TEA, teaMaxed, PERKS, FPERKS, MAIN, finalYear, startTrip, claimTrip, TRIPS, yearLocked, endSports, rtSports: () => rt.sports, rtFest: () => rt.fest, facCap, addLeague, addMP, tutStart, endFest, claimBox, musicWant, askBox, festWait, setTab,
-    RARE, rareRoll, rareGot, showRareTalk, rareDexHTML, kidSVG, rosterKid, WX, wxOf, wxIs, rdMinNow, renderWeather, RS, rsNum, rsSync, rsAdd, rsLabel, lookDoc, lookRead, lookPush, lookSet, openLook, MODEL_SCHOOL, joinRank, PS, PS_M, PS_SEASONS, psSeason, psOpen, psSync, psLv, psGot, psReward, psClaimAll, psClaimMission, psWatchAd, psClaimable, psStepReady, psExtraReady, psChooseFur, psFurImg, renderPass, setEvSeg, xtGot, achTitles,   // 2.1.3 숲속 패스
+    RARE, rareRoll, rareGot, showRareTalk, rareDexHTML, kidSVG, rosterKid, WX, wxOf, wxIs, rdMinNow, renderWeather, PL, plSync, plUnread, openPLetter, renderPLetter, RS, rsNum, rsSync, rsAdd, rsLabel, lookDoc, lookRead, lookPush, lookSet, openLook, MODEL_SCHOOL, joinRank, PS, PS_M, PS_SEASONS, psSeason, psOpen, psSync, psLv, psGot, psReward, psClaimAll, psClaimMission, psWatchAd, psClaimable, psStepReady, psExtraReady, psChooseFur, psFurImg, renderPass, setEvSeg, xtGot, achTitles,   // 2.1.3 숲속 패스
     dexMeet, dexSync, dexPending, dexGift, renderDex, evCurrent, evNext, evUpcoming, evSync, evFix, evVal, EV_FALLBACK, EV_DECO, EV_HAT, COS, DECO_BY, decoOwn, perkRec, fpRec, BOOST_ALL, buyShop, pickShop, showNote, showOkOn, showWd, renderGradPanel, renderShop, renderDecoShop, EV_WEEKLY, EV_WEEK_BASE, weekMon, claimStamp, claimEvMission, claimEvBox, renderEvent, evMissions, evOk, evSkipped, EV_MONTHS, EV_MEASURE, tierMinutes, minAcorns, IMG, sanitize171, ACH, achSync, claimAch, setTitle, renderAch, setDexSeg, achClaimable, XT, xtAct, xtCost, xtLv, feastMins, libMult, propInstances, walkBuild, festItemSvg, guestArt, adErrText, googleErrText, openSheet, closeSheet, startFest, startSports, sanitize170, EV_STAMPS, EV_SPECIAL, EV_MONTHLY, EV_BOX, DEX_KEYS, DEX_REWARD, DEX_GUEST_KEYS, seasonKey, roofArtKey, oakKey, setSeasonArt, VP, vpLv, vpCost, vpMult, vpAct, renderVpCard, sportsPrize, festPrize, renderTeachers, buildTeacherCards, bldImg, roofKey, bldStage, mapKey, setMapArt, applyThemes, buyFacility, bldFx, setBldFx, mapHi, Live, liveApply, liveLoad, liveOff, LIVE_KEYS, EVC, NOTICES, openNotice, noticeAuto, noticeWant, ntUnread, startTrial, endTrial: () => rt.trial && (rt.trial.left = 0), spawnDeal, startVisit, IMG170, MG, mgCells, mgSetCells, mgTick, mgAddEnergy, mgAddUp, mgTapGen, mgDrop, mgSell, mgUpgrade, mgClaimOrder, mgSwapOrder, mgOrderOk, mgFillOrders, mgOpen, mgClose, mgRenderAll, mgSpawnLevel, mgNearestEmpty, mgEmptyBoard, mgOrderReward, mgUI, sanitize180, mgWatchAd, mgNewOrder, mgHintPick, mgShowHint, mgClearHint, mgTouch, mgOrderGuide, mgDexN, mgDexCan, mgDexClaim, mgOpenDex, MG_DEX, MG_DEX_MS, mgDexEss, mgDexEssCan, mgDexEssN, mgDexMsCan, mgDexMsClaim, MGB, mgBuyBoost, mgBstLeft, mgOpenBoost, nice, claimMission, claimBonus, claimWeekMission, MP_BOX,   // 1.7.0 도감, 이벤트
     PZ, PZ_SHAPES, pzFits, pzAnyFit, pzStuck, pzFullLines, pzPlace, pzFreshGame, pzStart, PZB, pzbCost, pzApplyBoost, pzBoostOpen, pzBoostGo, festGoldLeft, festGoldTake, claimSports, renderStreet, pzFinish, pzLeft, pzCanAd, pzEssOf, pzMinOf, pzHelpSquirrel, pzHelpOwl, pzHelpBear, fillSubs, mapRoofTop, showAd, claimOfflineDouble, startBoost, tripAd, festFocus, festRange, visMap, renderMissions, pzHasHelp, pzRot, pzNewPiece, pzOpen, pzClose, pzGameOver, pzRenderAll, renderMini, addEss, ESHOP, SP_FUR, applyCos, essItem, pickEss, buyEss, renderEssShop, hatSVG, spFurImg, gameNow, gameToday, gameWeek, kstDay, setServerTime, SVR, dmDay, weekIdx, lgWeek, wkWeek, lgKey, pzDay, goldDay, boostLeft, dealLeft, canStamp };
   if (window.claude && window.claude.hot && window.claude.hot.snapshot) {
