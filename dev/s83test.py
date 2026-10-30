@@ -13,7 +13,7 @@ from s4test import URL
 import s73test as T
 F = 'window.__forest'
 CITY = f"(() => {{ const F = {F}, S = F.S; let n = 0; while (F.gradeOf(F.rep()) < 4 && n < 200) {{ S.f.library += 1; n++; }} F.checkGrade(); return S.grade; }})()"
-GATE = f"(() => {{ const F = {F}, S = F.S; const i = F.MAIN.findIndex(q => q.ye === S.tg + 1 && (q.yt || 1) === S.tier); if (i >= 0) S.q.m = i; return i; }})()"
+GATE = f"(() => {{ const F = {F}, S = F.S; const i = F.MAIN.findIndex(q => q.ye === S.tg + 1 && (q.yt || 1) === S.tier); if (i >= 0) S.q.m = i; else {{ const j = F.MAIN.findIndex(q => q.t === 'tier' && q.n === S.tier + 1); if (j >= 0) S.q.m = j; }} return i; }})()"   # 2.3.0 졸업은 메인 퀘스트를 다 끝내야 해서 졸업 퀘스트로 옮겨요
 OVER = """(sel => { const out = []; document.querySelectorAll(sel).forEach(el => { const r = el.getBoundingClientRect(); if (r.width && (r.right > innerWidth + 1 || r.left < -1 || el.scrollWidth > el.clientWidth + 2)) out.push((el.id || el.className) + ' ' + Math.round(r.left) + '~' + Math.round(r.right)); }); return out; })"""
 
 

@@ -30,7 +30,7 @@ async def main():
           return out; }})()""")
         if r['lv0'] != 0 or r['mult0'] != 1: fails.append(f"처음 교감 레벨 {r['lv0']} {r['mult0']}")
         if r['vpCost'] != r['bearCost']: fails.append(f"교감 연수 값이 곰 곡선과 달라요 {r['vpCost']} {r['bearCost']}")
-        if r['cards'] != ['squirrel', 'owl', 'bear', 'vp', 'diet', 'lib']:   # 1.7.1: 교감 선생님 밑에 영양, 사서 선생님
+        if r['cards'] != ['squirrel', 'bear', 'owl', 'kor', 'art', 'vp', 'diet', 'lib', 'snack']:   # 1.7.1: 교감 선생님 밑에 영양, 사서 선생님. 2.3.0 곰과 부엉이 순서, 국어 미술(교감 위), 매점(맨 밑)
             fails.append(f"선생님 카드 순서 {r['cards']}")
         if r['lv1'] != 1 or r['tr1'] != r['tr0'] + 1 or abs(r['mult1'] - 1.1) > 1e-9: fails.append(f"연수 1번 {r}")
         if r['lvMax'] != 10 or abs(r['multMax'] - 2) > 1e-9 or r['btn'] != '최고 레벨': fails.append(f"최고 레벨 {r['lvMax']} {r['multMax']} {r['btn']}")
@@ -50,7 +50,7 @@ async def main():
           const card = document.querySelector('#dexBody .dex-card[data-dex="tea_hedgehog"]');
           const goal = F.DEX_REWARD.goals.find(g => g.key === 's14');
           return {{ n: F.DEX_KEYS.length, got: !!S.dex.got.tea_hedgehog, on: card && card.classList.contains('on'), head, need: goal.need }}; }})()""")
-        if r['n'] != 23 or not r['got'] or not r['on'] or r['need'] != 23 or '/ 23종' not in r['head']: fails.append(f"도감 교감 선생님 {r}")
+        if r['n'] != 26 or not r['got'] or not r['on'] or r['need'] != 26 or '/ 26종' not in r['head']: fails.append(f"도감 교감 선생님 {r}")
         # 예전 저장
         r = await pg.evaluate(f"(()=>{{ const F={F}; const d = JSON.parse(JSON.stringify(F.S)); delete d.vp; const a = F.sanitize(d).vp; d.vp = 99; const b = F.sanitize(d).vp; d.vp = -3; const c = F.sanitize(d).vp; return [a, b, c]; }})()")
         if r != [0, 10, 0]: fails.append(f'예전 저장 교감 레벨 {r}')

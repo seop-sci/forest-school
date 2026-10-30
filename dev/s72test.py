@@ -27,7 +27,11 @@ FAKE_FB = r"""
   const snap = v => ({ val: () => v, exists: () => v != null, forEach() {}, numChildren: () => 0 });
   const ref = p => {
     const r = {
-      once: () => { const s = getSrv(); return Promise.resolve(snap(p === 'forest/saves/u1' ? s : p === 'forest/saves/u1/at' ? (s ? s.at : null) : p === '.info/serverTimeOffset' ? 0 : null)); },
+      once: () => { const s = getSrv(); return Promise.resolve(snap(p === 'forest/saves/u1' ? s : p === 'forest/saves/u1/at' ? (s ? s.at : null) : p === 'forest/saves/u1/r' ? (s && s.r != null ? s.r : null) : p === '.info/serverTimeOffset' ? 0 : null)); },
+      // 2.2.0 검토 2: 저장 리비전 트랜잭션(서버 값으로 부르고, undefined면 그만둬요)
+      transaction: fn => { const s = getSrv(); const v = fn(p === 'forest/saves/u1' && s ? JSON.parse(JSON.stringify(s)) : null);
+        if (v === undefined) return Promise.resolve({ committed: false, snapshot: snap(s) });
+        log(p, v); if (p === 'forest/saves/u1') sessionStorage.setItem('__srv', JSON.stringify(v)); return Promise.resolve({ committed: true, snapshot: snap(v) }); },
       on: (ev, cb) => { if (p === '.info/connected') cb(snap(true)); else if (p === '.info/serverTimeOffset') cb(snap(0)); else cb(snap(null)); return cb; },
       off() {}, set: v => { log(p, v); if (p === 'forest/saves/u1') sessionStorage.setItem('__srv', JSON.stringify(v)); return Promise.resolve(); },
       update: v => { log(p, v); return Promise.resolve(); },

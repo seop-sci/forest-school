@@ -181,11 +181,16 @@ async def main():
                 api('/__seed', {'path': f'/forest/saves/{uid}', 'value': {'d': json.dumps(newer), 'at': int(time.time() * 1000) + 60000, 'v': '1.0'}})
                 n0 = len(navs)
                 await page.reload(); await page.wait_for_timeout(3500)
+                # 2.2.0 검토 2: 이 기기가 맞춘 뒤로 서버(리비전 없는 옛 판 저장)와 이 기기가 둘 다 바뀌었으면 시각으로 고르지 않고 물어요. 서버 학교를 골라요
+                if await page.evaluate("!document.querySelector('#mPick').hidden"):
+                    await page.click('#pickLoad'); await page.wait_for_timeout(3500)
                 res['newer'] = {'navs': len(navs) - n0, 'budget': (await local(page))['budget'], 'toast': await toast(page), 'errors': errs}
                 # 반대로 서버 저장이 더 오래됐으면 이 기기 학교를 서버에 올려요
                 api('/__seed', {'path': f'/forest/saves/{uid}', 'value': {'d': json.dumps(kinder(budget=1)), 'at': 1000, 'v': '1.0'}})
                 n0 = len(navs)
                 await page.reload(); await page.wait_for_timeout(2500)
+                if await page.evaluate("!document.querySelector('#mPick').hidden"):   # 2.2.0 검토 2: 물으면 이 기기 학교를 골라요
+                    await page.click('#pickKeep'); await page.wait_for_timeout(2500)
                 srvb = json.loads(dump()['forest']['saves'][uid]['d'])['budget']
                 res['older'] = {'navs': len(navs) - n0, 'localBudget': (await local(page))['budget'], 'serverBudget': srvb}
                 await ctx.close()

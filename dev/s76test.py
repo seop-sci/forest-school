@@ -67,7 +67,7 @@ async def main():
                   d2.rd = {{ day: [], n: 99, cur: 'nobook', at: 5, got: {{ acorn: 2, zz: 3 }}, st: -1 }}; const c = F.sanitize(d2);
                   return {{ a: [a.lab.st.n, Object.keys(a.lab.got).length, a.rd.st, a.rd.cur], got: Object.keys(c.lab.got), pairs: Object.keys(c.lab.pairs), last: c.lab.last, st: c.lab.st, rd: [c.rd.n, c.rd.cur, Object.keys(c.rd.got), c.rd.st, c.rd.day] }}; }})()""")
                 print('저장', r)
-                if r['a'] != [0, 0, 0, ''] or r['got'] != ['r01'] or r['pairs'] != ['0+1'] or r['last'] is not None or r['st'] != {'n': 0, 'ok': 0} or r['rd'] != [3, '', ['acorn'], 0, '']: bad.append(f'저장 읽기가 틀려요 {r}')
+                if r['a'] != [0, 0, 0, ''] or r['got'] != ['r01'] or r['pairs'] != ['0+1'] or r['last'] is not None or r['st'] != {'n': 0, 'ok': 0} or r['rd'] != [5, '', ['acorn'], 0, '']: bad.append(f'저장 읽기가 틀려요 {r}')   # 2.3.0 하루 권수 상한이 국어 선생님 몫 2권만큼 늘어 5
                 # 5) 퀘스트와 업적
                 r = await pg.evaluate(f"""(() => {{ const F = {F}, S = F.S; const q1 = F.MAIN.find(q => q.id === 'rd1'), q2 = F.MAIN.find(q => q.id === 'lb1');
                   const i1 = F.MAIN.indexOf(q1), z1 = F.MAIN.findIndex(q => q.id === 'z1'), i2 = F.MAIN.indexOf(q2), e1 = F.MAIN.findIndex(q => q.id === 'el1');

@@ -64,7 +64,7 @@ CHECK = r"""() => {
 FOCUS = r"""() => { const F = window.__forest; return ['q18', 'k5'].map(id => [id, F.needCost(F.MAIN.find(q => q.id === id))]); }"""
 # 퀘스트를 따라 하는 사람처럼 유치원을 끝까지 해 보며 도토리가 폭발하지 않는지, 오래 막히지 않는지 봐요
 FLOW = r"""() => {
-  const F = window.__forest, S = () => F.S; let t = 0, maxB = 0, maxWait = 0, qid = '', qt = 0, pick = 0, tri = 0; const dt = 2, t0 = Date.now();
+  const F = window.__forest, S = () => F.S; let t = 0, maxB = 0, maxWait = 0, qid = '', qt = 0, pick = 0, tri = 0, waitAt = ''; const dt = 2, t0 = Date.now();
   const ev = n => Math.floor(t / n) !== Math.floor((t - dt) / n);   // 2.0.1: n초마다 한 번(다른 퀘스트의 pick 셈과 따로)
   const buy = () => { const r = F.recommend(); if (!r) return false;
     if (r.kind === 'tea') return S().budget >= F.teaCost(r.k) && F.teacherAct(r.k);
@@ -75,7 +75,7 @@ FLOW = r"""() => {
     const s = S(), cap = F.capacity(); if (s.students < cap) s.students = Math.min(cap, s.students + F.CFG.enroll * dt);
     const g = F.rate() * dt; s.budget += g; F.earn(g); t += dt;
     const q = F.curMain(), id = q ? q.id : '';
-    if (id !== qid) { maxWait = Math.max(maxWait, t - qt); qid = id; qt = t; }
+    if (id !== qid) { if (t - qt > maxWait) { maxWait = t - qt; waitAt = qid; } qid = id; qt = t; }
     for (let i = 0; i < 3 && F.mainReady(); i++) F.claimMain(null);
     if (F.canGraduate()) F.graduate(); else if (F.canPromote()) F.promote();
     if (q && q.t === 'picks') { pick += dt; if (pick >= 4) { pick = 0; s.st.picks += 1; } }
@@ -88,6 +88,8 @@ FLOW = r"""() => {
     if (q && (q.t === 'pz' || q.t === 'deco')) { pick += dt; if (pick >= 60) { pick = 0; s.st.pz = (s.st.pz || 0) + 1; s.ess += 15; } }
     if (q && q.t === 'deco' && s.ess >= 60) { F.rt.decoPick = 'bench'; if (F.buyDeco()) for (let i = 0; i < 11; i++) if (F.decoPut(i, 'bench')) break; }
     if (q && q.t === 'xt' && s.budget >= F.xtCost(q.k)) F.xtAct(q.k);
+    if (q && q.t === 'picnics' && s.pc && s.pc.st) s.pc.st.n += 1;   // 2.3.0 유치원 졸업 잠금: 소풍(하루 한 번)을 보낸 셈
+    if (q && (q.t === 'frPat' || q.t === 'frGift')) { s.frc = s.frc || { pat: 0, gift: 0 }; if (q.t === 'frPat') s.frc.pat += 1; else s.frc.gift += 1; }   // 2.3.0 유치원 졸업 잠금: 단짝 쓰다듬기, 선물
     if (q && q.t === 'vp' && s.budget >= F.vpCost()) F.vpAct();
     if (q && (q.t === 'elects' || q.t === 'elMid')) { F.elSync(); F.elVote(0); }   // 2.0.1
     if (q && q.t === 'rdBooks' && ev(900)) s.rd.st += 1;   // 2.0.1 책 읽기: 15분 뒤 한 권
@@ -97,7 +99,7 @@ FLOW = r"""() => {
     if (q && (q.t === 'vdGive' || q.t === 'vdLv') && F.vdOpen() && s.budget >= F.vdLeft()) F.vdGive('left');   // 2.1.2 마을 기부: 다음 단계까지 모이면 내요
     if (q && q.t === 'psGot' && F.psOpen()) { F.psSync(); if (F.psLv() < 1) s.ps.pts += F.PS.per; F.psClaimAll(true); }   // 2.1.3 숲속 패스: 미션을 한 셈 치고 1단계를 받아요
     if (q && (q.t === 'snDraw' || q.t === 'snDex') && F.snOpen() && s.budget >= F.snCost(false)) F.snDraw(false);   // 2.1.2 간식 뽑기: 30분치가 모이면 한 번씩
-    if (q && (q.t === 'gdHarvest' || q.t === 'gdCook') && F.gdOpen()) { F.gdSync(); s.gn.plots.forEach((p, i) => { if (!p.c) F.gdPlant(i, 'lettuce'); else F.gdHarvest(i); }); if (q.t === 'gdCook') F.GD_MENU.some(m => F.gdCook(m.id)); }   // 2.2.0 텃밭
+    if (q && (q.t === 'gdHarvest' || q.t === 'gdPlant' || q.t === 'gdCook') && F.gdOpen()) { F.gdSync(); s.gn.plots.forEach((p, i) => { if (!p.c) F.gdPlant(i, i % 2 ? 'carrot' : 'lettuce'); else F.gdHarvest(i); }); if (q.t === 'gdCook') F.GD_MENU.some(m => F.gdCook(m.id)); }   // 2.2.0 텃밭
     if (q && (q.t === 'bxSeen' || q.t === 'bxKinds') && F.bxOpen()) { F.bxSync(); if (s.bx.sp.length) F.bxTap(s.bx.sp[0].i); }   // 2.2.0 생물 탐사
     if (q && (q.t === 'cgPrac' || q.t === 'cgShow') && F.cgOpen()) { F.cgSync(true); if (q.t === 'cgPrac') F.cgPractice(); else if (F.showReady()) { const c = F.CLUBS.findIndex((_, i) => F.clubMembers(i).length); if (c >= 0) F.clubShowGo(c); } }   // 2.2.0 동아리 대항전
     if (q && (q.t === 'btPlays' || q.t === 'btMid') && ev(120)) { s.bt.st.w += 1; s.bt.st.wm += F.S.tier >= 2 ? 1 : 0; }   // 2.0.1 숲속 대결: 2분에 한 판 이김
@@ -107,7 +109,7 @@ FLOW = r"""() => {
     for (let i = 0; i < 20; i++) if (!buy()) break;
     maxB = Math.max(maxB, S().budget);
   }
-  return { min: +(t / 60).toFixed(1), tier: S().tier, maxBudget: maxB, maxWaitMin: +(maxWait / 60).toFixed(1), q: qid };
+  return { min: +(t / 60).toFixed(1), tier: S().tier, maxBudget: maxB, maxWaitMin: +(maxWait / 60).toFixed(1), waitAt, q: qid };
 }"""
 
 # 2.0.0 중학교 따라 하기: 초등학교 6학년 끝(졸업식 퀘스트)에서 졸업식을 열고 중학교 장 끝까지 해 봐요.
@@ -145,6 +147,10 @@ FLOW2 = r"""() => {
     if (q && q.t === 'fest') s.fest.n[q.k] = (s.fest.n[q.k] || 0) + 1;
     if (q && q.t === 'sports') s.st.sports += 1;
     if (q && q.t === 'club') F.clubAuto(true);
+    if (q && q.t === 'xt' && s.budget >= F.xtCost(q.k)) F.xtAct(q.k);   // 2.3.0 매점 선생님
+    if (q && q.t === 'vp' && s.budget >= F.vpCost()) F.vpAct();
+    if (q && q.t === 'picnics' && s.pc && s.pc.st) s.pc.st.n += 1;   // 2.3.0 유치원 졸업 잠금: 소풍(하루 한 번)을 보낸 셈
+    if (q && (q.t === 'frPat' || q.t === 'frGift')) { s.frc = s.frc || { pat: 0, gift: 0 }; if (q.t === 'frPat') s.frc.pat += 1; else s.frc.gift += 1; }   // 2.3.0 유치원 졸업 잠금: 단짝 쓰다듬기, 선물
     if (q && q.t === 'clubMat' && !s.roster.list.some(x => x.c === 4)) { const k = s.roster.list.slice().sort((a, b) => b.a[4] - a.a[4])[0]; if (k) k.c = 4; }   // 2.0.1 수학부 꾸리기: 사람처럼 수학 별이 많은 친구를 직접 넣어요
     if (q && (q.t === 'elects' || q.t === 'elMid')) { F.elSync(); F.elVote(0); }   // 2.0.1 반장 선거 안내 퀘스트: 첫 후보를 뽑아요
     if (q && q.t === 'rdBooks' && ev(900)) s.rd.st += 1;   // 2.0.1 책 읽기: 15분 뒤 한 권
@@ -154,7 +160,7 @@ FLOW2 = r"""() => {
     if (q && (q.t === 'vdGive' || q.t === 'vdLv') && F.vdOpen() && s.budget >= F.vdLeft()) F.vdGive('left');   // 2.1.2 마을 기부: 다음 단계까지 모이면 내요
     if (q && q.t === 'psGot' && F.psOpen()) { F.psSync(); if (F.psLv() < 1) s.ps.pts += F.PS.per; F.psClaimAll(true); }   // 2.1.3 숲속 패스: 미션을 한 셈 치고 1단계를 받아요
     if (q && (q.t === 'snDraw' || q.t === 'snDex') && F.snOpen() && s.budget >= F.snCost(false)) F.snDraw(false);   // 2.1.2 간식 뽑기: 30분치가 모이면 한 번씩
-    if (q && (q.t === 'gdHarvest' || q.t === 'gdCook') && F.gdOpen()) { F.gdSync(); s.gn.plots.forEach((p, i) => { if (!p.c) F.gdPlant(i, 'lettuce'); else F.gdHarvest(i); }); if (q.t === 'gdCook') F.GD_MENU.some(m => F.gdCook(m.id)); }   // 2.2.0 텃밭
+    if (q && (q.t === 'gdHarvest' || q.t === 'gdPlant' || q.t === 'gdCook') && F.gdOpen()) { F.gdSync(); s.gn.plots.forEach((p, i) => { if (!p.c) F.gdPlant(i, i % 2 ? 'carrot' : 'lettuce'); else F.gdHarvest(i); }); if (q.t === 'gdCook') F.GD_MENU.some(m => F.gdCook(m.id)); }   // 2.2.0 텃밭
     if (q && (q.t === 'bxSeen' || q.t === 'bxKinds') && F.bxOpen()) { F.bxSync(); if (s.bx.sp.length) F.bxTap(s.bx.sp[0].i); }   // 2.2.0 생물 탐사
     if (q && (q.t === 'cgPrac' || q.t === 'cgShow') && F.cgOpen()) { F.cgSync(true); if (q.t === 'cgPrac') F.cgPractice(); else if (F.showReady()) { const c = F.CLUBS.findIndex((_, i) => F.clubMembers(i).length); if (c >= 0) F.clubShowGo(c); } }   // 2.2.0 동아리 대항전
     if (q && (q.t === 'btPlays' || q.t === 'btMid') && ev(120)) { s.bt.st.w += 1; s.bt.st.wm += F.S.tier >= 2 ? 1 : 0; }   // 2.0.1 숲속 대결: 2분에 한 판 이김
@@ -205,7 +211,8 @@ async def main():
         f = await pg.evaluate(FLOW); report['유치원 따라 하기'] = f
         if f['tier'] < 1: fails.append(f'유치원을 6시간 안에 졸업하지 못했어요 (멈춘 퀘스트 {f["q"]})')
         if f['maxBudget'] > 1e9: fails.append(f'유치원에서 도토리가 {f["maxBudget"]:.3g}개까지 쌓였어요 (지원 폭발 의심)')
-        if f['maxWaitMin'] > 30: fails.append(f'유치원에서 한 퀘스트에 {f["maxWaitMin"]}분 넘게 막혔어요')
+        # 2.3.0 졸업에 메인 퀘스트가 다 필요해져서 gd4(급식 만들기)의 당근(60분)을 기다릴 수 있어요. 그 퀘스트만 70분까지 봐요
+        if f['maxWaitMin'] > (70 if f.get('waitAt') == 'gd4' else 30): fails.append(f'유치원에서 한 퀘스트({f.get("waitAt")})에 {f["maxWaitMin"]}분 넘게 막혔어요')
         fails += [f'[따라 하기] 페이지 오류: {e}' for e in errs]
         # 2.0.0 중학교 따라 하기
         ctx = await b.new_context()

@@ -63,7 +63,7 @@ LOADER = """<script src="config.js"></script>
     function card() {
       var box = document.createElement('div');
       box.id = 'gsiBox';
-      box.style.cssText = 'position:fixed;inset:0;z-index:60;display:flex;align-items:center;justify-content:center;padding:16px;background:rgba(28,40,20,.45)';
+      box.style.cssText = 'position:fixed;inset:0;z-index:300;display:flex;align-items:center;justify-content:center;padding:16px;background:rgba(28,40,20,.45)';
       box.innerHTML = '<div style="width:100%;max-width:320px;padding:22px 18px 16px;border-radius:20px;background:#F8FAF1;color:#26301E;text-align:center;font-family:inherit">' +
         '<b style="display:block;font-size:19px;margin-bottom:6px">구글 계정 연결</b>' +
         '<p style="margin:0 0 14px;font-size:14px;line-height:1.5;color:#5F6B55">연결할 구글 계정을 골라 주세요</p>' +
@@ -108,6 +108,7 @@ DOC = f"""<!doctype html>
 <meta name="theme-color" content="#2C4A3D">
 <link rel="icon" href="{ICON}">
 {LOADER}
+<script>window.FS_WEB_LOCK = true;</script>
 <!-- /github-only -->
 {head}
 </head>

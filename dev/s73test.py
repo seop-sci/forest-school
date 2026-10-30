@@ -2,7 +2,7 @@
 # 보는 것
 #  1) 창(.overlay)은 누를 때 강조색이 투명하고, 전학 대화와 졸업식 장면은 글자 선택이 막혀 있어요(테스터 제보: 다음을 누르면 화면이 잠깐 어두워짐)
 #  2) 유치원 졸업식: 졸업식 장면이 먼저 뜨고(졸업생 5명, 학사모 5개, 현수막 "숲속 유치원 졸업식"), 건너뛰면 입학 창, 입학 창을 닫으면 전학 대화
-#  3) 초등학교 졸업식: 장면이 5.2초 뒤 저절로 입학 창으로 넘어가요. 뜨자마자 누른 손(0.35초 안)은 넘기지 않아요
+#  3) 초등학교 졸업식: 장면이 8.6초 뒤(2.3.0부터, 예전 5.2초) 저절로 입학 창으로 넘어가요. 뜨자마자 누른 손(0.35초 안)은 넘기지 않아요
 #  4) 장면 동안 알림(현장체험학습이 열렸어요)은 장면이 끝난 뒤에 떠요. 누르거나 뒤로 가기(Escape)를 하면 건너뛸지 묻고(묻는 동안 멈춤), 계속 보기와 건너뛰기가 돼요. 동작 줄이기 설정이면 꽃가루를 숨기고 2.6초 뒤 넘어가요
 #  6) 매점 가구 갖추기(j3)와 책상 퀘스트를 누르면 건물 창의 가구 칸으로 가요(짓기 전에는 짓기 안내). 명예 교장실과 장학재단 추천은 고치기 버튼 바로 위. 복도 버튼은 문 그림과 '열기'(발표회 날은 '발표회!'와 빨간 점)
 #  7) 복도의 준비 중 방(중학교는 학생회실, 교무실, 칭찬 게시판이 열려 2곳, 표와 누르면 안내), 학생 모집 퀘스트 설명과 교실 자리, 퀘스트 점에서 이벤트 빼기, 이벤트 예정 4개와 특별 강조, 이벤트 설명, 지난 학교급 모습 간판 글자와 꾸미기 칸
@@ -15,7 +15,7 @@ F = 'window.__forest'
 CLEAN = "document.querySelectorAll('.overlay').forEach(o=>{o.hidden=true;o.classList.remove('open')}); window.__forest.rt.modalOpen=null; window.__forest.rt.modalQueue.length=0"
 SKIP = f"(()=>{{ const t=document.querySelector('#tut'); if(t) t.hidden=true; {F}.S.tut.st='skip'; {F}.rt.tut=null; {CLEAN}; }})()"
 OVER = """(sel) => { const W = innerWidth; const r = document.querySelector(sel); if (!r) return -1;
-  return [...r.querySelectorAll('*')].filter(e => { const q = e.getBoundingClientRect(); return q.width && (q.right > W + 1 || q.left < -1); }).map(e => e.tagName + '.' + (e.getAttribute('class') || '')); }"""
+  return [...r.querySelectorAll('*')].filter(e => { const q = e.getBoundingClientRect(); return q.width && !e.closest('svg *') && (q.right > W + 1 || q.left < -1); }).map(e => e.tagName + '.' + (e.getAttribute('class') || '')); }"""
 KG = f"""(() => {{ const F = {F}, S = F.S; S.tier = 0; S.tg = 1; S.p.species = 1; Object.assign(S.f, {{ classroom: 20, cafeteria: 16, library: 14, playground: 14 }});
   for (const k in S.fu) S.fu[k] = S.fu[k].map(() => S.f[k]); S.students = 60; S.tdip = 20; S.grade = 4; S.best = 4;
   S.q.m = F.MAIN.findIndex(q => q.id === 'k1'); S.q.lat = ''; F.checkGrade();
@@ -107,9 +107,9 @@ async def main():
                 if o: bad.append(f'360 장면이 넘쳐요 {o}')
                 if await pg.evaluate(OPEN) != 'mCere': bad.append('2.7초에는 아직 장면이어야 해요')
                 if not await pg.evaluate("document.querySelector('#toast').hidden"): bad.append('초등학교 장면 동안 알림이 떠 있어요')
-                await pg.wait_for_timeout(2900)
+                await pg.wait_for_timeout(6200)   # 2.3.0 새 졸업식 장면은 8.6초
                 m = await pg.evaluate(OPEN)
-                if m != 'mTier': bad.append(f'5.2초 뒤 입학 창으로 넘어가야 해요 {m}')
+                if m != 'mTier': bad.append(f'8.6초 뒤 입학 창으로 넘어가야 해요 {m}')
                 seen = []
                 for _ in range(14):
                     seen.append(await pg.evaluate("document.querySelector('#toast').hidden ? '' : document.querySelector('#toast').textContent")); await pg.wait_for_timeout(800)
