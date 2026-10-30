@@ -2014,6 +2014,16 @@ body{background:radial-gradient(120% 60% at 50% 0%, color-mix(in srgb, var(--pap
 .vd-btns button[aria-disabled="true"]{opacity:.5}
 .vd-sum{text-align:center;margin:8px 0 4px;padding:0 16px;white-space:pre-line}
 #decoG .deco-on .deco-ring,#tvMap .deco-ring{fill:none;stroke:#F4C144;stroke-width:2;stroke-dasharray:4 3}
+/* 2.1.3 날씨 */
+.wx-fx{position:absolute;inset:0;z-index:1;pointer-events:none;overflow:hidden;border-radius:15px}   /* 테마 낙엽(fallfx)과 같은 층: 현황판과 탭 아래 */
+.wx-fx.wx-rain{background:repeating-linear-gradient(105deg,rgba(200,225,255,0) 0 14px,rgba(200,225,255,.38) 14px 15px,rgba(200,225,255,0) 15px 31px);background-size:62px 62px;animation:wxRain .55s linear infinite;box-shadow:inset 0 0 0 999px rgba(40,60,90,.12)}
+@keyframes wxRain{to{background-position:-17px 62px}}
+.wx-fx.wx-snow{box-shadow:inset 0 0 0 999px rgba(230,240,255,.1)}
+.wx-fx.wx-snow i{position:absolute;top:-3%;width:var(--s,5px);height:var(--s,5px);border-radius:50%;background:#FFFFFF;opacity:.92;box-shadow:0 0 2px rgba(120,140,160,.5);animation:leafFall linear infinite}
+.wx-fx.wx-fog{background:linear-gradient(180deg,rgba(245,248,250,.42),rgba(245,248,250,.18) 45%,rgba(245,248,250,.4));animation:wxFog 9s ease-in-out infinite alternate}
+@keyframes wxFog{from{opacity:.75}to{opacity:1}}
+.wx-chip{position:absolute;left:50%;transform:translateX(-50%);bottom:calc(var(--bot-h, 70px) + 12px);z-index:6;display:flex;align-items:center;gap:4px;padding:3px 10px;border:0;border-radius:999px;background:rgba(255,249,233,.88);color:#3A4A5A;font:inherit;font-size:12px;box-shadow:0 1px 3px rgba(20,40,20,.25);cursor:pointer}
+@media (prefers-reduced-motion:reduce){.wx-fx{animation:none!important}}
 /* 2.1.3 다른 학교 구경과 예시 학교 */
 .tier-view.tv-model .tv-bar{box-shadow:inset 0 0 0 2px #E8B53A}
 .tier-view.tv-model #tvSub{color:#A0620A;font-weight:700}
@@ -2902,6 +2912,8 @@ span.bt-stamp{display:none}.bt-duel.done span.bt-stamp{display:grid}
       <div class="sportsbar festbar" id="festBar" hidden role="status" aria-live="off"><span id="fbName">행사</span><span class="sb-t"><b id="fbN">0/0</b></span><span class="sb-t"><b id="fbT">30</b>초</span></div>
       <div class="sportsbar" id="sportsBar" hidden role="status" aria-live="off"><span class="sb-b">청팀 <b id="spBlue">0</b></span><span class="sb-t"><b id="spTime">40</b>초</span><span class="sb-w"><b id="spWhite">0</b> 백팀</span></div>
       <!-- 2.0.0 학교급 모습 보기: 동그라미 6개와 지난 학교급 지도 -->
+      <div class="wx-fx" id="wxFx" hidden aria-hidden="true"></div><!-- 2.1.3 날씨 효과 -->
+      <button class="wx-chip" id="wxChip" type="button" hidden></button>
       <div class="tier-view" id="tierView" hidden>
         <svg id="tvMap" viewBox="0 -60 360 540" preserveAspectRatio="xMidYMid meet" role="img" aria-label="지난 학교급 지도"></svg>
         <div class="tv-bar"><span class="tv-mark" id="tvMark" aria-hidden="true"></span><span class="tv-tx"><b id="tvTitle"></b><small id="tvSub"></small></span><button class="btn-sub small" id="tvEdit" type="button">꾸미기</button><button class="cta small" id="tvBack" type="button">돌아가기</button></div>
@@ -5452,7 +5464,7 @@ span.bt-stamp{display:none}.bt-duel.done span.bt-stamp{display:grid}
     cb: { until: 0, at: 0 },   // 2.1.1 건설 가속(도토리): until까지 공사 2배, at은 마지막으로 셈한 때
     fr: {}, frg: { day: '', n: 0 }, frc: { pat: 0, gift: 0, cake: 0, alb: 0 }, bday: { day: '', done: false }, alb: [],   // 2.1.1 단짝 친구, 오늘 선물, 횟수, 오늘 생일 잔치, 졸업 앨범
     dsn: { day: '', trips: 0, sports: 0, fest: {} },   // 2.1.0 오늘 시작할 때의 체험학습, 운동회, 행사 횟수(오늘 한 것도 퀘스트에 쳐요)
-    lab: freshLab(), rd: freshRd(), ex: freshEx(), bt: freshBt(), ps: freshPs(), rare: { got: [], miss: 0 }, rs: { n: 0, p: 0, pos: 0, king: 0 }, lk: { on: false, at: 0, h: '' },   // ps: 2.1.3 숲속 패스, rs: 랭킹 시즌(번호, 점수, 마지막으로 본 순위, 시즌 왕 횟수), lk: 내 학교 보여 주기, rare: 2.1.3 반짝 친구(만난 종, 연속 못 만난 횟수)
+    lab: freshLab(), rd: freshRd(), ex: freshEx(), bt: freshBt(), ps: freshPs(), rare: { got: [], miss: 0 }, rs: { n: 0, p: 0, pos: 0, king: 0 }, lk: { on: false, at: 0, h: '' }, wx: '',   // wx: 2.1.3 날씨 알림을 본 날. ps: 2.1.3 숲속 패스, rs: 랭킹 시즌(번호, 점수, 마지막으로 본 순위, 시즌 왕 횟수), lk: 내 학교 보여 주기, rare: 2.1.3 반짝 친구(만난 종, 연속 못 만난 횟수)
       // ex: 2.0.1 시험 기간(본 시험 주, 자율학습, 성적표, 기록)
     // 2.0.1 공부 2단계: 과학 탐구 실험(오늘 한 날, 모은 카드, 해 본 짝), 책 읽기(오늘 권수, 읽는 책과 시작 시각, 읽은 횟수)
     bd: {}, tk: { m5: 0, m30: 0, h1: 0, h3: 0 }, tka: { day: '', n: 0 },   // 2.1.0 공사(건물마다 { L 오를 레벨, s 시작, e 끝 }), 시간 단축권 장수, 광고 단축권 오늘 횟수
@@ -5657,6 +5669,7 @@ span.bt-stamp{display:none}.bt-duel.done span.bt-stamp{display:grid}
     sanitizeExam(d, s);   // 2.0.1 공부 3단계: 시험 기간
     sanitizeBt(d, s);   // 2.0.1 공부 4단계: 숲속 대결
     sanitizePs(d, s);   // 2.1.3 숲속 패스
+    s.wx = typeof d.wx === 'string' ? d.wx.slice(0, 10) : '';   // 2.1.3 날씨 알림 본 날
     { const R = d.rs && typeof d.rs === 'object' ? d.rs : {}, n = (v, hi) => Math.max(0, Math.min(hi, Math.floor(Number(v) || 0))); s.rs = { n: n(R.n, 1e4), p: n(R.p, 1e9), pos: n(R.pos, 1e4), king: n(R.king, 1e4) }; }   // 2.1.3 랭킹 시즌
     { const L = d.lk && typeof d.lk === 'object' ? d.lk : {}; s.lk = { on: L.on === true, at: Math.max(0, Math.min(Date.now() + 864e5, Number(L.at) || 0)), h: '' }; }   // 2.1.3 내 학교 보여 주기(처음에는 꺼짐)
     { const R = d.rare && typeof d.rare === 'object' ? d.rare : {}; s.rare = { got: [...new Set((Array.isArray(R.got) ? R.got : []).filter(sp => RARE.list.some(x => x.sp === sp)))], miss: Math.min(RARE.pity, Math.max(0, Math.floor(Number(R.miss) || 0))) }; }   // 2.1.3 반짝 친구
@@ -5756,7 +5769,7 @@ span.bt-stamp{display:none}.bt-duel.done span.bt-stamp{display:grid}
   const rate = () => Math.max(0, Math.min(S.students, capacity()) - pcAway()) * CFG.base * CFG.pace * tuitionMult() * Math.pow(CFG.gradeMult, S.grade) * incomeScale() * (feastOn() ? 2 : 1);
   const offlineEff = () => Math.min(1, 0.3 + 0.15 * S.t.owl);
   const offlineCapH = () => CFG.offlineCapH + 4 * S.p.perk.night;
-  const dropValue = () => rate() * 4 * (1 + 0.15 * S.t.bear) * (1 + 0.5 * S.p.perk.drop) * elMult('pick');   // 2.0.1 반장 공약
+  const dropValue = () => rate() * 4 * (1 + 0.15 * S.t.bear) * (1 + 0.5 * S.p.perk.drop) * elMult('pick') * (wxIs('snow') ? 1.5 : 1);   // 2.0.1 반장 공약, 2.1.3 눈 오는 날 1.5배
   function earn(v) { S.earned += v; S.yearEarned += v; }
   // 수료증 = 10 × (올해 번 도토리 ÷ 100만)의 세제곱근 × 수료증 배수. 학교급이 오르면 공사비 배수로 나눠서 비슷한 장수가 나와요
   // (예전에는 제곱근이라 수업료가 크게 뛰는 고학년에서 수료증이 너무 많이 쌓였어요. 첫해 장수는 그대로예요)
@@ -11451,7 +11464,7 @@ span.bt-stamp{display:none}.bt-duel.done span.bt-stamp{display:grid}
     S.lab.st.n += 1; if (ok) S.lab.st.ok += 1;
     let v = 0;
     if (ok) { v = minAcorns(LAB.min); S.budget += v; earn(v); }
-    const xp = acGain('sci', ok ? LAB.xp : LAB.xpF);
+    const xp = acGain('sci', ok ? LAB.xp + (wxIs('fog') ? 15 : 0) : LAB.xpF);   // 2.1.3 안개 낀 날 성공 +15
     if (isNew) addGold(LAB.gold);
     save(); renderHUD(); checkQuests(); renderMini();
     return { r, ok, isNew, v, xp };
@@ -11557,7 +11570,7 @@ span.bt-stamp{display:none}.bt-duel.done span.bt-stamp{display:grid}
   const rdReady = () => !!S && S.f.library >= 1;
   function rdDay() { const t = gameToday(); if (S.rd.day !== t) { S.rd.day = t; S.rd.n = 0; } }
   const rdLeft = () => { rdDay(); return Math.max(0, RD.perDay - S.rd.n); };
-  const rdEnd = () => S.rd.at + RD.min * 60000;
+  const rdEnd = () => S.rd.at + (S.rd.m || RD.min) * 60000;   // 2.1.3 m: 읽기 시작할 때 정한 분(비 오는 날 10분)
   const rdRemain = () => S.rd.cur ? Math.max(0, rdEnd() - gameNow()) : 0;
   const bookOf = k => BOOKS.find(b => b.k === k);
   const bookCover = (b, cls) => IMG('book_' + b.k) ? `<img class="${cls || 'bk-img'}" src="${IMG('book_' + b.k)}" alt="" draggable="false">` : `<span class="bk-fb ${cls || ''}" style="--bk:${b.c}"><i>${b.em}</i></span>`;
@@ -11565,18 +11578,18 @@ span.bt-stamp{display:none}.bt-duel.done span.bt-stamp{display:grid}
     const b = bookOf(k); if (!b || !rdReady() || rt.paused) return false;
     if (S.rd.cur) { toast(`지금 「${bookOf(S.rd.cur).name}」${batchim(bookOf(S.rd.cur).name) ? '을' : '를'} 읽고 있어요`); return false; }
     if (rdLeft() <= 0) { toast(`책은 하루 ${RD.perDay}권까지예요.\n내일 또 읽어요`); return false; }
-    S.rd.n += 1; S.rd.cur = k; S.rd.at = gameNow();
+    S.rd.n += 1; S.rd.cur = k; S.rd.at = gameNow(); S.rd.m = rdMinNow();
     sfx('tap'); save(); renderRead(); renderMini();
-    toast(`「${b.name}」${batchim(b.name) ? '을' : '를'} 읽기 시작했어요.\n${RD.min}분 뒤 다 읽어요`);
+    toast(`「${b.name}」${batchim(b.name) ? '을' : '를'} 읽기 시작했어요.\n${S.rd.m}분 뒤 다 읽어요${S.rd.m < RD.min ? ' (비 오는 날)' : ''}`);
     return true;
   }
   // 다 읽었으면 끝내요. 알림은 다른 알림이 없을 때(1초마다 rdTick)
   function rdSettle() {
     if (!S.rd.cur || gameNow() < rdEnd()) return false;
-    const b = bookOf(S.rd.cur); S.rd.cur = ''; S.rd.at = 0;
+    const b = bookOf(S.rd.cur); S.rd.cur = ''; S.rd.at = 0; S.rd.m = 0;
     if (!b) return false;
     S.rd.got[b.k] = (S.rd.got[b.k] || 0) + 1; S.rd.st += 1;
-    const xp = acGain('kor', RD.xp);
+    const xp = acGain('kor', RD.xp + (wxIs('rain') ? 5 : 0));   // 2.1.3 비 오는 날 +5
     const who = speciesList()[Math.floor(Math.random() * Math.max(1, speciesList().length))] || 'rabbit';
     rt.rdNews = `「${b.name}」${batchim(b.name) ? '을' : '를'} 다 읽었어요! 국어 XP +${xp}\n${spName(who)}: "${b.say}"`;
     save(); checkQuests(); renderMini();
@@ -11628,7 +11641,7 @@ span.bt-stamp{display:none}.bt-duel.done span.bt-stamp{display:grid}
     if (R) {
       s.rd.day = typeof R.day === 'string' ? R.day.slice(0, 10) : '';
       s.rd.n = Math.floor(num(R.n, 0, RD.perDay));
-      if (typeof R.cur === 'string' && bookOf(R.cur)) { s.rd.cur = R.cur; s.rd.at = num(R.at, 0, Date.now() + 366 * 86400000); if (!s.rd.at) s.rd.cur = ''; }
+      if (typeof R.cur === 'string' && bookOf(R.cur)) { s.rd.cur = R.cur; s.rd.at = num(R.at, 0, Date.now() + 366 * 86400000); s.rd.m = R.m === 10 ? 10 : 0; if (!s.rd.at) s.rd.cur = ''; }   // 2.1.3 m
       if (R.got && typeof R.got === 'object') for (const b of BOOKS) { const v = Math.floor(num(R.got[b.k], 0, 1e6)); if (v > 0) s.rd.got[b.k] = v; }
       s.rd.st = Math.floor(num(R.st, 0, 1e7));
     }
@@ -16335,6 +16348,7 @@ span.bt-stamp{display:none}.bt-duel.done span.bt-stamp{display:grid}
     $('#mSeat .backdrop').addEventListener('click', () => closeModal($('#mSeat')));
     $('#tierDots').addEventListener('click', e => { const b = e.target.closest('[data-td]'); if (!b) return; const t = +b.dataset.td; if (t > S.tier) { shake(b); toast(`${TIER_ALL[t]}는 아직 갈 수 없어요`); return; } if (t === S.tier) tierViewClose(); else tierViewOpen(t); });
     $('#tvBack').addEventListener('click', () => { sfx('tap'); tierViewClose(); });
+    $('#wxChip').addEventListener('click', () => { const k = wxOf(); if (k) { sfx('tap'); toast(`${WX[k].em} ${WX[k].tip}`); } });   // 2.1.3 날씨
     $('#tvEdit').addEventListener('click', () => { sfx('tap'); rt.viewEdit = !rt.viewEdit; renderTierView(true); if (!rt.viewEdit) save(); });
     $('#tvMap').addEventListener('click', e => { const h = e.target.closest('[data-tvslot]'); if (h && rt.viewEdit) openDecoPick(+h.dataset.tvslot); });
     $('#mTalk').addEventListener('click', () => talkNext());
@@ -17342,6 +17356,47 @@ span.bt-stamp{display:none}.bt-duel.done span.bt-stamp{display:grid}
         return `<div class="dex-card rare${on ? ' on' : ' off'}" aria-label="${on ? x.name : '아직 못 만난 반짝 친구'}"><span class="dex-pic">${on && im ? `<img src="${im}" alt="">` : pic7('dex_unknown')}</span>${on && bd ? `<img class="rare-bd" src="${bd}" alt="">` : ''}<b>${on ? x.name : '???'}</b><small>${on ? '등록' : '미등록'}</small></div>`; }).join('') + '</div>';
   }
   /* ===== 2.1.3 반짝 친구 END ===== */
+  /* ===== 2.1.3 날씨 BEGIN (로드맵 9절 "언제든 넣을 수 있는 작은 것") =====
+     게임 시계의 날마다 날씨가 정해져요(모두에게 같은 날씨). 맑음이 대부분이고 가끔 비, 눈(12~2월), 안개.
+     지도에 효과만 얹고, 그날 작은 보너스가 있어요. 수업료와 공사 같은 큰 균형은 건드리지 않아요.
+     비: 책 읽기 10분(원래 15분), 국어 XP +5. 눈: 떨어진 도토리 1.5배. 안개: 과학 실험 성공 XP +15 */
+  const WX = { rain: { em: '🌧', name: '비', tip: '비 오는 날은 책 읽기 좋아요. 책 읽기 10분, 국어 XP +5' },
+    snow: { em: '❄', name: '눈', tip: '눈 오는 날은 도토리가 반짝여요. 떨어진 도토리 1.5배' },
+    fog: { em: '🌫', name: '안개', tip: '안개 낀 날은 신비로운 실험 날이에요. 과학 실험 성공하면 XP +15' } };
+  // 날마다 정해지는 날씨: 100 가운데 18은 비(겨울은 눈), 8은 안개, 나머지는 맑음
+  function wxOf(day) {
+    day = day || gameToday();
+    if (liveOff('weather')) return '';
+    const m = Number(day.slice(5, 7)), h = dayHash('wx:' + day) % 100;
+    if (h < 18) return m === 12 || m <= 2 ? 'snow' : 'rain';
+    if (h < 26) return 'fog';
+    return '';
+  }
+  const wxIs = k => !!S && wxOf() === k;
+  const rdMinNow = () => wxIs('rain') ? 10 : RD.min;
+  function renderWeather() {
+    const fx = $('#wxFx'), chip = $('#wxChip'); if (!fx || !chip || !S) return;
+    const k = wxOf(), show = !!k && rt.tab === 'school' && rt.viewTier == null && !rt.decoEdit;
+    if (fx.dataset.k !== k) {
+      fx.dataset.k = k; fx.className = 'wx-fx' + (k ? ' wx-' + k : ''); fx.textContent = '';
+      for (let i = 0; k === 'snow' && i < 34; i++) {   // 눈송이는 테마 낙엽처럼 하나씩 흩날려요
+        const e = document.createElement('i');
+        e.style.left = (Math.random() * 100).toFixed(1) + '%';
+        e.style.setProperty('--dx', (Math.random() * 40 - 20).toFixed(0) + 'px');
+        e.style.setProperty('--s', (3 + Math.random() * 4).toFixed(1) + 'px');
+        e.style.animationDuration = (6 + Math.random() * 7).toFixed(1) + 's';
+        e.style.animationDelay = (-Math.random() * 13).toFixed(1) + 's';
+        fx.appendChild(e);
+      }
+    }
+    fx.hidden = !k || rt.viewTier != null;
+    chip.hidden = !show;
+    if (show && chip.dataset.k !== k) { chip.dataset.k = k; chip.innerHTML = `<span aria-hidden="true">${WX[k].em}</span>${WX[k].name} 오는 날`.replace('안개 오는 날', '안개 낀 날'); }
+    // 그날 처음 홈을 볼 때 한 번 알려 줘요
+    if (show && S.wx !== gameToday() && !rt.modalOpen) { S.wx = gameToday(); save(); setTimeout(() => toast(`${WX[k].em} 오늘은 ${k === 'fog' ? '안개가 꼈어요' : WX[k].name + '가 와요'}.\n${WX[k].tip}`), 600); }
+  }
+  /* ===== 2.1.3 날씨 END ===== */
+
   /* ===== 2.1.3 랭킹 시즌과 다른 학교 구경 BEGIN (시즌 설계안 2, 4절, 지섭 확정) =====
      랭킹 시즌: 계절마다(겨울 12~2월, 봄 3~5월, 여름 6~8월, 가을 9~11월) 주간 리그 점수를 모아요. 2026 겨울이 시즌 1.
      시즌 점수 300점이면 그 계절 기념 장식, 시즌 순위 1~3위는 칭호 '숲속 시즌 왕', 기념 장식 넷을 다 모으면 '사계절 교장'.
@@ -17493,6 +17548,7 @@ span.bt-stamp{display:none}.bt-duel.done span.bt-stamp{display:grid}
     tick171ach();
     if (ed) ed.hidden = !evClaimable() && !psClaimable();   // 2.1.3 숲속 패스도
     { const pd = $('#psDot'); if (pd) pd.hidden = !psClaimable(); }
+    renderWeather();   // 2.1.3 날씨
     if (rt.tab === 'dex') renderDex();
     if (rt.tab === 'event') { if (rt.evSeg === 'ps') renderPass(); else renderEvent(); }
   }
@@ -18430,7 +18486,7 @@ span.bt-stamp{display:none}.bt-duel.done span.bt-stamp{display:grid}
     'mg.adN': [() => MG.AD, 'n', 0, 5], 'mg.adE': [() => MG.AD, 'e', 10, 200], 'mg.regen': [() => MG, 'REGEN', 20000, 300000],   // 숲속 합치기 광고 횟수와 에너지, 에너지 1 차는 시간(ms)
     'ev.scale': [() => EVC, 'scale', 0.3, 1.5]   // 이벤트 미션 도토리 배율(다음 회차부터)
   };
-  const LIVE_OFF_OK = ['puzzle', 'merge', 'event', 'battle'];   // 2.0.1 숲속 대결도   // 잠시 끌 수 있는 기능
+  const LIVE_OFF_OK = ['puzzle', 'merge', 'event', 'battle', 'weather'];   // 2.1.3 날씨도   // 2.0.1 숲속 대결도   // 잠시 끌 수 있는 기능
   const Live = { v: 0, off: new Set(), base: null, ok: false };
   function liveApply(j, from) {
     if (!j || typeof j !== 'object') return false;
@@ -18592,7 +18648,7 @@ span.bt-stamp{display:none}.bt-duel.done span.bt-stamp{display:grid}
     rosterEnsure, rosterMake, rosterAdd, clubAuto, clubSet, clubPct, clubShow, clubSum, clubStars, clubMembers, clubShowGo, showReady, showWait, showDay, clubWeekTick, clubFacUp, CLUBS, CLUB, star, clubTuitionMult, clubFestMult, clubDecoOff, renderClub, renderHall, openSeatPick, openClubPick,
     TIER_SCALE, legacyMult, tuitionMult, snapTake, snapOf, tierViewOpen, tierViewClose, renderTierView, renderTierDots, viewMap, showNewTalk, talkNext, showCere, cereEnd, cereCrew, cereAsk, cereKeep, goFur, updateQuestDot, openElect, renderElect, elVote, elSync, elMult, elClub, elPres, elBadge, elMake, EL_PLEDGES, clubPct, festPrize, dropValue, claimMission, gameWeek, NEWCOMERS, TIERS, GEO, geoIdx, decoCost0, qMeasure, qDone, qGoal, kidArt: kidSVG, newYear, checkGrade, gradeOf, townRep, FAC, sanitize200, trialHunt, updateTrial, TRIAL, zoomAt, fitMap, ZOOM_MAX, DECO, DECO_SLOTS, DECO_SIGN, decoCost, decoSoldOut, pickDeco, buyDeco, decoPut, decoEditStart, decoEditEnd, openDecoPick, renderDeco, setSchoolNm, setMark, schoolTitle, markHTML, decoPlacedAll, esExLeft, esExCost, get Cloud() { return Cloud; }, get actx() { return actx; }, Music, musicSync, ensureAudio, bgmLoad, pzUI, rt, makeDeal, furStage, DEAL, navInfo, navRoute, spawnDrop, repTipCheck, linkGoogle, retryCloud, sanitize, acctPending, renderMap, renderHUD, renderAffordance, syncKids, layoutMap, geo, hitTrial, endVisit, showReward, recommend, needCost, prepTopUp, qReward, prepPhase, rankScore, pwOf, previewDip, dipMult, costScale, buyFur, buyFurAll, furCost, furReady, furDone, FUR, startTalk, endTalk, teacherAct, facCost, teaCost, facKeys, rate, rep, capacity, canGraduate, canPromote,
     fmt, fmt2, graduate, promote, buyPerk, perkCost, perkMaxed, buyFundPerk, fpCost, claimMain, mainReady, curMain, qNo, earn, CFG, TEA, teaMaxed, PERKS, FPERKS, MAIN, finalYear, startTrip, claimTrip, TRIPS, yearLocked, endSports, rtSports: () => rt.sports, rtFest: () => rt.fest, facCap, addLeague, addMP, tutStart, endFest, claimBox, musicWant, askBox, festWait, setTab,
-    RARE, rareRoll, rareGot, showRareTalk, rareDexHTML, kidSVG, rosterKid, RS, rsNum, rsSync, rsAdd, rsLabel, lookDoc, lookRead, lookPush, lookSet, openLook, MODEL_SCHOOL, joinRank, PS, PS_M, PS_SEASONS, psSeason, psOpen, psSync, psLv, psGot, psReward, psClaimAll, psClaimMission, psWatchAd, psClaimable, psStepReady, psExtraReady, psChooseFur, psFurImg, renderPass, setEvSeg, xtGot, achTitles,   // 2.1.3 숲속 패스
+    RARE, rareRoll, rareGot, showRareTalk, rareDexHTML, kidSVG, rosterKid, WX, wxOf, wxIs, rdMinNow, renderWeather, RS, rsNum, rsSync, rsAdd, rsLabel, lookDoc, lookRead, lookPush, lookSet, openLook, MODEL_SCHOOL, joinRank, PS, PS_M, PS_SEASONS, psSeason, psOpen, psSync, psLv, psGot, psReward, psClaimAll, psClaimMission, psWatchAd, psClaimable, psStepReady, psExtraReady, psChooseFur, psFurImg, renderPass, setEvSeg, xtGot, achTitles,   // 2.1.3 숲속 패스
     dexMeet, dexSync, dexPending, dexGift, renderDex, evCurrent, evNext, evUpcoming, evSync, evFix, evVal, EV_FALLBACK, EV_DECO, EV_HAT, COS, DECO_BY, decoOwn, perkRec, fpRec, BOOST_ALL, buyShop, pickShop, showNote, showOkOn, showWd, renderGradPanel, renderShop, renderDecoShop, EV_WEEKLY, EV_WEEK_BASE, weekMon, claimStamp, claimEvMission, claimEvBox, renderEvent, evMissions, evOk, evSkipped, EV_MONTHS, EV_MEASURE, tierMinutes, minAcorns, IMG, sanitize171, ACH, achSync, claimAch, setTitle, renderAch, setDexSeg, achClaimable, XT, xtAct, xtCost, xtLv, feastMins, libMult, propInstances, walkBuild, festItemSvg, guestArt, adErrText, googleErrText, openSheet, closeSheet, startFest, startSports, sanitize170, EV_STAMPS, EV_SPECIAL, EV_MONTHLY, EV_BOX, DEX_KEYS, DEX_REWARD, DEX_GUEST_KEYS, seasonKey, roofArtKey, oakKey, setSeasonArt, VP, vpLv, vpCost, vpMult, vpAct, renderVpCard, sportsPrize, festPrize, renderTeachers, buildTeacherCards, bldImg, roofKey, bldStage, mapKey, setMapArt, applyThemes, buyFacility, bldFx, setBldFx, mapHi, Live, liveApply, liveLoad, liveOff, LIVE_KEYS, EVC, NOTICES, openNotice, noticeAuto, noticeWant, ntUnread, startTrial, endTrial: () => rt.trial && (rt.trial.left = 0), spawnDeal, startVisit, IMG170, MG, mgCells, mgSetCells, mgTick, mgAddEnergy, mgAddUp, mgTapGen, mgDrop, mgSell, mgUpgrade, mgClaimOrder, mgSwapOrder, mgOrderOk, mgFillOrders, mgOpen, mgClose, mgRenderAll, mgSpawnLevel, mgNearestEmpty, mgEmptyBoard, mgOrderReward, mgUI, sanitize180, mgWatchAd, mgNewOrder, mgHintPick, mgShowHint, mgClearHint, mgTouch, mgOrderGuide, mgDexN, mgDexCan, mgDexClaim, mgOpenDex, MG_DEX, MG_DEX_MS, mgDexEss, mgDexEssCan, mgDexEssN, mgDexMsCan, mgDexMsClaim, MGB, mgBuyBoost, mgBstLeft, mgOpenBoost, nice, claimMission, claimBonus, claimWeekMission, MP_BOX,   // 1.7.0 도감, 이벤트
     PZ, PZ_SHAPES, pzFits, pzAnyFit, pzStuck, pzFullLines, pzPlace, pzFreshGame, pzStart, PZB, pzbCost, pzApplyBoost, pzBoostOpen, pzBoostGo, festGoldLeft, festGoldTake, claimSports, renderStreet, pzFinish, pzLeft, pzCanAd, pzEssOf, pzMinOf, pzHelpSquirrel, pzHelpOwl, pzHelpBear, fillSubs, mapRoofTop, showAd, claimOfflineDouble, startBoost, tripAd, festFocus, festRange, visMap, renderMissions, pzHasHelp, pzRot, pzNewPiece, pzOpen, pzClose, pzGameOver, pzRenderAll, renderMini, addEss, ESHOP, SP_FUR, applyCos, essItem, pickEss, buyEss, renderEssShop, hatSVG, spFurImg, gameNow, gameToday, gameWeek, kstDay, setServerTime, SVR, dmDay, weekIdx, lgWeek, wkWeek, lgKey, pzDay, goldDay, boostLeft, dealLeft, canStamp };
   if (window.claude && window.claude.hot && window.claude.hot.snapshot) {
