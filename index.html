@@ -2,7 +2,7 @@
 <html lang="ko">
 <head>
 <meta charset="utf-8">
-<meta name="forest-version" content="2.2.0">
+<meta name="forest-version" content="2.3.0">
 <meta name="viewport" content="width=device-width, initial-scale=1">
 <meta name="description" content="도토리를 모아 숲속 학교를 키우는 방치형 게임 테스트판이에요.">
 <style>html,body{margin:0}</style>
@@ -2921,7 +2921,7 @@ span.bt-stamp{display:none}.bt-duel.done span.bt-stamp{display:grid}
     <p class="boot-step" id="bootStep">학교 문을 여는 중...</p>
     <p class="boot-tip" id="bootTip">학교 문을 여는 중이에요</p>
   </div>
-  <span class="boot-ver" id="bootVer">v2.2.0</span>
+  <span class="boot-ver" id="bootVer">v2.3.0</span>
 </div>
 
 <div class="app on-school" id="app">
@@ -3389,7 +3389,7 @@ span.bt-stamp{display:none}.bt-duel.done span.bt-stamp{display:grid}
       </div>
       <h3 class="panel-sub">정보</h3>
       <dl class="info">
-        <div id="verRow"><dt>버전</dt><dd>v2.2.0</dd></div>
+        <div id="verRow"><dt>버전</dt><dd>v2.3.0</dd></div>
         <div id="pidRow" hidden><dt>학교 번호</dt><dd id="infoPid"></dd></div>
       </dl>
       <div id="devBox" hidden>
@@ -9995,13 +9995,15 @@ span.bt-stamp{display:none}.bt-duel.done span.bt-stamp{display:grid}
        forest/rank/<내 id>   랭킹 이름과 학교 점수
        forest/stats/<내 id>  테스트 현황 (어디까지 했는지, 얼마나 했는지)
      <내 id>는 Firebase 익명 로그인이 기기(브라우저)마다 만들어 줘요. */
-  const VERSION = '2.2.0';
+  const VERSION = '2.3.0';
   const NT_QUIET = ['2.1.20', '2.1.2.2'];   // 2.1.20 지섭 결정: 이 버전들은 업데이트해도 공지 창을 띄우지 않아요(공지는 그대로 2.1.2)
   /* 2.0.0 공지사항 (2026-10-27 지섭, 1.8.0은 이미 올려서 2.0.0부터): 설정 > 공지사항. 맨 위가 가장 새 공지예요.
      패치노트는 자동으로 넣지 않아요. 지섭이 검수한 글만 여기에 적어요(CHANGELOG.md는 자세한 기록용이라 따로 있어요).
      접속하면 새 공지 창을 띄워요(올라온 뒤 7일 동안, '일주일간 열지 않기'를 누르면 7일 쉬어요). 업데이트한 뒤 첫 접속에는 쉬는 중이어도 한 번 띄워요 */
   const NOTICES = [
     // 2.2.0 공지(2026-10-30 지섭 확인: B안 다섯 줄). 2.2.0부터는 실제 날짜. 그 앞 공지 날짜는 업데이트 간격이 너무 가까워 보여서 지섭 요청으로 3~5일 간격으로 고쳐 적었어요(id는 그대로라 다시 뜨지 않아요)
+    { id: '2026-10-30-v230', date: '2026-10-30', tag: '업데이트', title: '2.3.0 업데이트',
+      lines: ['졸업식 장면 새 단장', '새 선생님 3명 추가 (고니 국어, 공작 미술, 알파카 매점)', '숲의 정수로 공사 즉시 완료 추가', '건물 공사 시간 단축', '원할 때 쓰는 즉시 완공 단추 추가', '오류 수정과 안정성 개선'] },
     { id: '2026-10-30-v220', date: '2026-10-30', tag: '업데이트', title: '2.2.0 업데이트',
       lines: ['야간 건물 건설 이벤트 추가', '학교 텃밭 추가', '숲속 생물 탐사 추가', '동아리 대항전 추가', '예전 학교 되돌리기 추가'] },
     // 2.1.3 공지(2026-10-30 지섭 확인: A안 일곱 줄)
@@ -10575,7 +10577,7 @@ span.bt-stamp{display:none}.bt-duel.done span.bt-stamp{display:grid}
   }
   // 2.3.0 웹판 잠금: 구글 계정이고 forest/webOk/<계정 번호>가 true면 열려요. 앱(안드로이드, 토스) 판에는 FS_WEB_LOCK이 없어요
   async function webLockCheck() {
-    if (!window.FS_WEB_LOCK) return;
+    if (!window.FS_WEB_LOCK || !/github\.io$/.test(location.hostname)) return;   // 자동 시험(localhost)과 앱 판은 잠그지 않아요
     const el = $('#webLock'), tx = $('#wlTx'), go = $('#wlGo'), id = $('#wlId'), cp = $('#wlCopy');
     el.hidden = false; document.body.classList.add('wl-on');
     if (!cloudOn()) { tx.textContent = '서버에 연결하지 못했어요. 인터넷을 확인하고 새로 고침해 주세요'; go.hidden = true; return; }

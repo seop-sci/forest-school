@@ -13,17 +13,13 @@ let fail = 0;
 const out = (name, got, want, note) => { const ok = got === want; if (!ok) fail++; console.log(`${ok ? 'ok  ' : 'FAIL'} ${name}: 실제 ${got}, 바른 값 ${want}${note ? '  (' + note + ')' : ''}`); };
 const as = (d, uid) => d.as({ uid, provider: 'anonymous' });
 
-// 2-1 adminKey가 없을 때
+// 2-1 (2.3.0) 관리자는 forest/adminUids(콘솔에서만 씀). 비밀 글자를 맞혀 관리자가 되는 길은 없어요
 {
-  const d = db(false);
-  out('2-1 adminKey 없음, 남(X)이 stats 전체 읽기', as(d, 'X').read('/forest/stats', { now: NOW }).allowed, false);
-  out('2-1 adminKey 없음, 남(X)이 V의 stats 지우기', as(d, 'X').write('/forest/stats/V', null, { now: NOW }).allowed, false);
   const k = db(true);
-  out('2-1 adminKey 있음, X가 stats 읽기', as(k, 'X').read('/forest/stats', { now: NOW }).allowed, false);
-  out('2-1 adminKey 있음, 틀린 키로 admins/X 쓰기', as(k, 'X').write('/forest/admins/X', '0000', { now: NOW }).allowed, false);
-  // 맞는 키를 맞히면 관리자가 돼요(틀린 시도에 횟수 제한은 규칙에 없어요)
-  const r = as(k, 'X').write('/forest/admins/X', 'k9!Qz', { now: NOW });
-  out('2-1 맞힌 키로 admins/X 쓰기(관리자 되기)', r.allowed, true, '정상 경로');
+  out('2-1 X가 stats 읽기', as(k, 'X').read('/forest/stats', { now: NOW }).allowed, false);
+  out('2-1 X가 V의 stats 지우기', as(k, 'X').write('/forest/stats/V', null, { now: NOW }).allowed, false);
+  out('2-1 맞힌 키로 admins/X 쓰기', as(k, 'X').write('/forest/admins/X', 'k9!Qz', { now: NOW }).allowed, false);
+  out('2-1 adminUids/X 스스로 쓰기', as(k, 'X').write('/forest/adminUids/X', true, { now: NOW }).allowed, false);
 }
 
 // 2-2 랭킹 점수: 처음 5만, 그 뒤 0.1초마다 +2000
