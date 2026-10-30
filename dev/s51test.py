@@ -41,7 +41,7 @@ async def main():
             r = await pg.evaluate(f"(()=>{{ const S={F}.S; return [S.ess, S.cos.hat, S.cos.own.includes('hat:wizard'), document.querySelector('#decoList .si.on .nm') && document.querySelector('#decoList .si.on .nm').textContent]; }})()")
             if r != [880, 'wizard', True, '마법사 모자']: fails.append(f'[{tag}] 모자 사기 뒤 상태 {r}')
             # 학생 머리에 그림 모자
-            kid = await pg.evaluate(f"(()=>{{ const F={F}; F.rt.kids.forEach(k => {{ k.g.innerHTML = F.kidSVG ? '' : k.g.innerHTML; }}); const svg = document.querySelector('#kids image[href*=\"webp\"]'); const hats = document.querySelectorAll('#kids g[transform*=scale] image'); return hats.length; }})()")
+            kid = await pg.evaluate(f"(()=>{{ const F={F}; const svg = document.querySelector('#kids image[href*=\"webp\"]'); const hats = document.querySelectorAll('#kids g[transform*=scale] image'); return hats.length; }})()")
             if kid < 1: fails.append(f'[{tag}] 학생 머리에 그림 모자가 안 보여요 ({kid})')
             # 한 번 더 누르면 벗어요, 또 누르면 입어요
             await pg.evaluate(f"{F}.pickDeco('hat:wizard')"); await pg.wait_for_timeout(150)
