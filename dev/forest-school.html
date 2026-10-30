@@ -2050,6 +2050,28 @@ body{background:radial-gradient(120% 60% at 50% 0%, color-mix(in srgb, var(--pap
 .sn-dex-grid .sn-card.no img{filter:brightness(0);opacity:.22}
 .sn-dex-grid .sn-card small{color:var(--muted);font-size:10.5px}
 #vRate.sn-on::after{content:'';display:inline-block;width:12px;height:12px;margin-left:3px;vertical-align:-2px;background:var(--sn-mood) center/contain no-repeat}
+/* 2.3.0 즉시 완공 단추, 숲의 정수로 즉시 완료, 동그란 체크 */
+.buy-row{display:flex;gap:8px;align-items:stretch}
+.buy-row #sheetBuy{flex:1;min-width:0;margin:0}
+.ff-btn{position:relative;flex:0 0 60px;border:2px solid var(--line);border-radius:14px;background:linear-gradient(#FFE58A,#F6C343);box-shadow:0 3px 0 #C8901F;font:inherit;font-weight:800;font-size:11px;color:#6A4300;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:1px;padding:4px 2px;cursor:pointer}
+.ff-btn .z{font-size:19px;line-height:1}
+.ff-btn .n{position:absolute;top:-8px;right:-8px;min-width:20px;height:20px;border-radius:10px;background:var(--seal);color:#fff;font-size:12px;line-height:20px;text-align:center;border:2px solid #fff}
+.ff-btn[aria-disabled="true"]{filter:grayscale(.7);opacity:.6;box-shadow:none}
+.ff-btn.wide{width:100%;flex-direction:row;gap:6px;font-size:14px;padding:9px;margin:0 0 8px}
+.ff-btn.wide .z{font-size:17px}
+.con-ess{display:flex;justify-content:space-between;align-items:center;width:100%;margin:8px 0 2px;padding:10px 14px;border:2px solid #6B4FB0;border-radius:14px;background:linear-gradient(#EDE4FF,#D9C9FF);box-shadow:0 3px 0 #6B4FB0;font:inherit;font-weight:800;color:#3B2A72;font-size:15px;cursor:pointer}
+.con-ess[aria-disabled="true"]{opacity:.55;box-shadow:none}
+.con-ess .p,.ces-cost{display:flex;align-items:center;gap:4px}
+.con-ess .tic{width:20px;height:20px;display:inline-block;background-size:contain;background-repeat:no-repeat}
+.ces-cost{justify-content:center;gap:6px;margin:6px 0 4px;font-size:22px;font-weight:800;color:#3B2A72}
+.ces-cost .tic{width:26px;height:26px;display:inline-block;background-size:contain;background-repeat:no-repeat}
+.chk{display:flex;align-items:center;justify-content:center;gap:8px;margin:12px auto 4px;padding:4px 8px;border:0;background:none;font:inherit;font-size:14px;color:var(--ink);opacity:.85;cursor:pointer}
+.chk i{width:22px;height:22px;border-radius:50%;border:2px solid #A89474;background:#fff;display:flex;align-items:center;justify-content:center;flex:none}
+.chk.on i{background:#4E9A3E;border-color:#3C7C2F}
+.chk.on i::after{content:'';width:9px;height:5px;border:2.5px solid #fff;border-top:0;border-right:0;transform:translate(0,-1px) rotate(-45deg)}
+:root[data-theme="dark"] .con-ess{background:linear-gradient(#4A3C78,#3A2E63);color:#EDE4FF}
+:root[data-theme="dark"] .ces-cost{color:#D9C9FF}
+@media (prefers-color-scheme: dark){:root:not([data-theme="light"]) .con-ess{background:linear-gradient(#4A3C78,#3A2E63);color:#EDE4FF}:root:not([data-theme="light"]) .ces-cost{color:#D9C9FF}}
 /* 2.1.2 마을 기부: 지도의 기념물 자리와 기부 창 */
 #decoG .vd-hit{fill:transparent;cursor:pointer}
 #decoG .vd-it{pointer-events:none;transform-box:fill-box;transform-origin:50% 92%}
@@ -3328,13 +3350,15 @@ span.bt-stamp{display:none}.bt-duel.done span.bt-stamp{display:grid}
     <p class="rep-note" id="sheetRep"></p>
     <!-- 1.6.0: 가구 일괄 레벨업은 업그레이드 버튼 바로 위에 -->
     <button class="fur-all" type="button" id="furAll" hidden><span>가구 일괄 레벨업</span><span class="cost"><span data-acorn></span><b id="furAllCost">0</b></span></button>
-    <button class="cta split" type="button" id="sheetBuy" aria-disabled="false"><span id="sheetBuyLabel">업그레이드</span><span class="cost"><span data-acorn></span><b id="sheetCost">20</b></span></button>
+    <div class="buy-row"><button class="cta split" type="button" id="sheetBuy" aria-disabled="false"><span id="sheetBuyLabel">업그레이드</span><span class="cost"><span data-acorn></span><b id="sheetCost">20</b></span></button><button class="ff-btn" type="button" id="sheetFree" aria-label="업그레이드하고 바로 즉시 완공(오늘 1회)" hidden><span class="z" aria-hidden="true">⚡</span>즉시 완공<span class="n" aria-hidden="true">1</span></button></div>
     <!-- 2.1.0 공사 칸: 공사 중에는 업그레이드 단추 대신 보여요 -->
     <div class="con-box" id="sheetCon" hidden>
       <div class="con-head"><span id="conClock" aria-hidden="true"></span><span id="conTx">공사 중</span></div>
       <div class="con-prog" aria-hidden="true"><i id="conFill"></i></div>
-      <div class="con-row"><button class="cta" type="button" id="conAll" aria-disabled="false"><span id="conAllLbl">바로 줄이기</span></button><button class="cta ghost" type="button" id="conNo" hidden>그만두기</button></div>
+      <button class="ff-btn wide" type="button" id="conFree" hidden><span class="z" aria-hidden="true">⚡</span>즉시 완공 (오늘 1회)<span class="n" aria-hidden="true">1</span></button>
+      <div class="con-row"><button class="cta" type="button" id="conAll" aria-disabled="false"><span id="conAllLbl">단축권 자동 사용</span></button><button class="cta ghost" type="button" id="conNo" hidden>그만두기</button></div>
       <p class="con-plan" id="conPlan"></p>
+      <button class="con-ess" type="button" id="conEss"><span>숲의 정수로 즉시 완료</span><span class="p" id="conEssCost"></span></button>
       <div class="con-tks" id="conTks" role="group" aria-label="골라서 쓰기"></div>
       <button class="con-ad" type="button" id="conAd">광고 보고 5분권 받기</button>
       <div class="con-cb" id="conCb" hidden></div><!-- 2.1.1 건설 가속(도토리) -->
@@ -3911,6 +3935,18 @@ span.bt-stamp{display:none}.bt-duel.done span.bt-stamp{display:grid}
   </section>
 </div>
 <!-- 2.2.0 예전 학교 되돌리기 -->
+<!-- 2.3.0 숲의 정수로 즉시 완료 확인 -->
+<div class="overlay center" id="mCes" hidden>
+  <div class="backdrop"></div>
+  <section class="modal" role="dialog" aria-modal="true" aria-labelledby="cesTitle">
+    <h2 id="cesTitle">숲의 정수로 즉시 완료할까요?</h2>
+    <p class="fine" id="cesText"></p>
+    <div class="ces-cost" id="cesCost"></div>
+    <p class="fine" id="cesHave" style="margin:0"></p>
+    <button class="chk" type="button" id="cesQuiet" role="checkbox" aria-checked="false"><i aria-hidden="true"></i>오늘은 다시 묻지 않기</button>
+    <div class="btn-row"><button class="btn-sub" type="button" id="cesNo">취소</button><button class="cta" type="button" id="cesGo">즉시 완료</button></div>
+  </section>
+</div>
 <div class="overlay center" id="mBak" hidden>
   <div class="backdrop"></div>
   <section class="modal" role="dialog" aria-modal="true" aria-labelledby="bakTitle">
@@ -5733,6 +5769,8 @@ span.bt-stamp{display:none}.bt-duel.done span.bt-stamp{display:grid}
     ac: freshAc(),   // 2.0.1 공부: 과목 5개 학교 학력(lv, xp), 문제집 bk(day, n), 통계 st
     pc: freshPc(), sk: freshSk(),   // 2.1.0 숲속 소풍, 칭찬 스티커판
     ff: {},   // 2.1.1 건물마다 바로 완공을 쓴 날
+    ces: '',   // 2.3.0 숲의 정수로 즉시 완료 '오늘은 다시 묻지 않기'를 고른 날
+    ffx: '',   // 2.3.0 홈 지도 칩을 닫은 날
     sn: { got: {}, day: '', mood: 0, pity: 0, n: 0, gold: false },   // 2.1.2 매점 간식 뽑기: 간식마다 뽑은 수, 기분 날짜와 칸, 희귀 없이 뽑은 수, 모두 뽑은 수, 다 모아 받은 황금 기계
     vd: { lv: 0, p: 0, sum: 0, n: 0 },   // 2.1.2 마을 기부: 단계, 이번 단계 채운 비율(0~1), 모두 낸 도토리, 낸 횟수
     cb: { until: 0, at: 0 },   // 2.1.1 건설 가속(도토리): until까지 공사 +100%, at은 마지막으로 셈한 때
@@ -6193,11 +6231,13 @@ span.bt-stamp{display:none}.bt-duel.done span.bt-stamp{display:grid}
      레벨 하나 공사 시간 [짧은 쪽, 긴 쪽](초): 학년 첫 레벨이 짧은 쪽, 그 학년 상한 레벨이 긴 쪽으로 고르게 늘어요. 새 건물(Lv.1 짓기)은 긴 쪽.
      자리 비운 동안에도 게임 시계(gameNow)로 공사가 돌아가요. 가구와 선생님 연수는 그대로 바로예요 */
   // 2.1.1 지섭 결정: 초등 저학년 1~15분, 고학년 15분~1시간, 중학교 1~2시간, 고등학교 2~3시간, 대학교 3~4시간, 대학원 4~8시간
-  const CON = { kinder: [5, 5], low: [60, 900], high: [900, 3600], mid: [3600, 7200], hs: [7200, 10800], uni: [10800, 14400], grad: [14400, 28800] };
-  const conBand = () => S.tier < 1 ? CON.kinder : S.tier === 1 ? (S.tg < 3 ? CON.low : CON.high) : S.tier === 2 ? CON.mid : S.tier === 3 ? CON.hs : S.tier === 4 ? CON.uni : CON.grad;
+  // 2.3.0 지섭 결정: 모든 학교급 처음 짓기 10초, 초등 1~3학년 30초~5분, 4~6학년 1~20분, 중학교 1학년 5~30분, 2학년 10~45분, 3학년 15분~1시간,
+  // 고등학교 30분~1시간, 대학교 30분~2시간, 대학원 1~3시간(유치원 업그레이드는 5초 그대로)
+  const CON = { kinder: [5, 5], low: [30, 300], high: [60, 1200], mid: [[300, 1800], [600, 2700], [900, 3600]], hs: [1800, 3600], uni: [1800, 7200], grad: [3600, 10800], first: 10 };
+  const conBand = () => S.tier < 1 ? CON.kinder : S.tier === 1 ? (S.tg < 3 ? CON.low : CON.high) : S.tier === 2 ? CON.mid[Math.min(2, Math.max(0, S.tg))] : S.tier === 3 ? CON.hs : S.tier === 4 ? CON.uni : CON.grad;
   function conSec(k, L) {   // L: 공사가 끝나면 오를 레벨
     const [a, b] = conBand();
-    if (L <= 1) return b;
+    if (L <= 1) return CON.first;   // 2.3.0 처음 짓기는 모든 학교급 10초
     const first = yearCap() - CAP_STEP + 1;   // 2학기에 상한이 +2 되어도 학년 첫 레벨은 그대로. 2학기에 열린 레벨(상한 +1, +2)은 긴 쪽
     return Math.round(a + (b - a) * Math.min(1, Math.max(0, (L - first) / (CAP_STEP - 1))));
   }
@@ -8345,7 +8385,8 @@ span.bt-stamp{display:none}.bt-duel.done span.bt-stamp{display:grid}
     $('#effNextLabel').textContent = maxed ? (semFirst() ? '2학기' : '다음 학년') : L >= 1 ? '다음 레벨' : '지으면';
     $('#effNext').textContent = maxed ? `Lv.${capNext()}까지 열려요` : F.eff(L + 1);
     $('#sheetRep').textContent = k === 'library' ? '도서관은 평판을 가장 많이 올려요. 평판이 쌓이면 학교 등급이 올라가요.' : `레벨이 오를 때마다 평판도 ★${F.rep} 올라요.`;
-    $('#sheetBuyLabel').textContent = (maxed ? '최고 레벨' : L >= 1 ? '업그레이드' : '짓기') + (!maxed && !conOn(k) && conSec(k, L + 1) > 10 && conFreeLeft(k) ? ' (즉시 완공)' : '');   // 2.1.1 하루 한 번
+    $('#sheetBuyLabel').textContent = (maxed ? '최고 레벨' : L >= 1 ? '업그레이드' : '짓기') ;   // 2.3.0 즉시 완공은 옆 ⚡ 단추로
+    { const fb = $('#sheetFree'), ok = ffCan(k) && !conOn(k); fb.hidden = !(S.tier >= 1 && !maxed && conFreeLeft(k) && conSec(k, L + 1) > 10); fb.setAttribute('aria-disabled', ok && furReady(k) && S.budget >= facCost(k) ? 'false' : 'true'); }
     $('#sheetCost').textContent = maxed ? '-' : fmt(c);
     $('#sheetBuy').setAttribute('aria-disabled', ok ? 'false' : 'true');
     $('#sheetBuy').classList.toggle('is-rec', !!rt.rec && rt.rec.kind === 'fac' && rt.rec.k === k && !maxed);
@@ -8575,7 +8616,8 @@ span.bt-stamp{display:none}.bt-duel.done span.bt-stamp{display:grid}
       `<span class="row">${CB.items.map(it => `<button type="button" class="cb-b" data-cb="${it.k}" aria-disabled="${S.budget >= cbCost(it) ? 'false' : 'true'}"><span>${it.name}</span><em>${acornIcon()}${fmt(cbCost(it))}</em></button>`).join('')}</span>`;
   }
   // 2.1.1 바로 완공을 쓸 수 있는 건물(이 학교급에 있고, 최고 레벨이 아니고, 공사 중이 아니고, 공사가 10초 넘게 걸리는 레벨)
-  const ffCan = k => !!S && S.tier >= 1 && facKeys().includes(k) && !facMaxed(k) && !conOn(k) && conFreeLeft(k) && conSec(k, S.f[k] + 1) > 10;
+  // 2.3.0: 공사 중이면 바로 쓸 수 있고, 아니면 다음 레벨 공사가 10초 넘게 걸릴 때
+  const ffCan = k => !!S && S.tier >= 1 && facKeys().includes(k) && conFreeLeft(k) && (conOn(k) ? conLeft(k) > 0 : (!facMaxed(k) && conSec(k, S.f[k] + 1) > 10));
   /* 2.1.2 매점 간식 뽑기(프로젝트 문서 '매점 간식 뽑기 설계안 (2.1.2)', 지섭 확정 2026-10-29): 중학교부터 매점에서 도토리로 간식을 뽑아요.
      간식이 학교 기분을 올리고(일반 +1칸, 희귀 +3칸, 하루 10칸), 1칸마다 그날 수업료 +1%. 값은 수업료(특식 데이와 기분 배수는 빼고) 30분치, 10번 270분치.
      기분 10칸을 채우는 값(300분치)이 하루 +10%(144분치)보다 커서 도토리가 불어나지 않아요 */
@@ -9044,6 +9086,45 @@ span.bt-stamp{display:none}.bt-duel.done span.bt-stamp{display:grid}
   }
   // 2.1.1 건물마다 하루 한 번 바로 완공. S.ff[건물] = 바로 완공을 쓴 날
   const conFreeLeft = k => !!S && !!S.ff && S.ff[k] !== gameToday();
+  // 2.3.0 즉시 완공 단추: 공사 중인 건물을 하루 한 번(건물마다) 바로 끝내요. 공사 중이 아니면 먼저 공사를 시작하고 바로 끝내요
+  function conFree(k) {
+    if (!S || S.tier < 1 || !facKeys().includes(k) || !conFreeLeft(k) || rt.paused) return false;
+    if (!conOn(k)) { if (!furReady(k) || facMaxed(k) || S.budget < facCost(k)) return false; if (!buyFacility(k)) return false; }
+    if (!conOn(k)) return false;   // 10초 공사가 이미 끝났으면 쓰지 않아요
+    const L = S.bd[k].L;
+    S.ff[k] = gameToday();
+    sfx('quest'); conFinish(k);
+    setTimeout(() => toast(`즉시 완공! ${FAC[k].name} Lv.${L}\n이 건물은 내일 또 즉시 완공할 수 있어요`), 900);
+    renderMap(); conRender(true); ffRender(true); save();
+    return true;
+  }
+  // 2.3.0 숲의 정수로 즉시 완료(지섭 확정): 남은 시간 5분 이하는 정수 2, 그 위로는 10분마다 4(올림)
+  const CESS = { min5: 2, per10: 4 };
+  const conEssCost = sec => sec <= 0 ? 0 : sec <= 300 ? CESS.min5 : CESS.per10 * Math.ceil(sec / 600);
+  const conEssQuiet = () => !!S && S.ces === gameToday();
+  function conEss(k) {
+    if (!S || !conOn(k) || rt.paused) return false;
+    const c = conEssCost(conLeft(k)); if (!c) return false;
+    if (S.ess < c) { toast(`숲의 정수가 모자라요 (${c} 필요)`); return false; }
+    const L = S.bd[k].L;
+    S.ess -= c; S.st.esSpent = (S.st.esSpent || 0) + c; renderEss();
+    sfx('quest'); conFinish(k);
+    setTimeout(() => toast(`숲의 정수 ${c}로 즉시 완료! ${FAC[k].name} Lv.${L}`), 900);
+    renderMap(); conRender(true); ffRender(true); save();
+    return true;
+  }
+  function askConEss(k) {
+    if (!conOn(k)) return;
+    const left = conLeft(k), c = conEssCost(left);
+    if (S.ess < c) { shake($('#conEss')); toast(`숲의 정수가 모자라요 (${c} 필요)`); return; }
+    if (conEssQuiet()) { conEss(k); renderSheet(); return; }
+    rt.cesK = k;
+    $('#cesText').textContent = `${FAC[k].name} Lv.${S.bd[k].L} 공사가 남은 ${hm(left)}을 기다리지 않고 바로 끝나요.`;
+    $('#cesCost').innerHTML = `${ESS_ICON()}<b>${c}</b>`;
+    $('#cesHave').textContent = `가진 숲의 정수 ${fmt(S.ess)} → ${fmt(S.ess - c)}`;
+    $('#cesQuiet').classList.remove('on'); $('#cesQuiet').setAttribute('aria-checked', 'false');
+    openModal($('#mCes'));
+  }
   function buyFacility(k, price) {
     if (!furReady(k) || conOn(k)) return false;   // 가구를 다 채워야 건물을 키울 수 있어요. 공사 중이면 다음 레벨은 끝난 뒤에
     const c = price || facCost(k);
@@ -9052,15 +9133,7 @@ span.bt-stamp{display:none}.bt-duel.done span.bt-stamp{display:grid}
     const L = S.f[k] + 1, now = gameNow(), sec = conSec(k, L);
     S.bd[k] = { L, s: now, e: now + sec * 1000 };
     S.st.cons = (S.st.cons || 0) + 1;
-    // 2.1.1 지섭 요청: 건물마다 하루 한 번은 기다리지 않고 바로 완공(공사가 10초 넘게 걸리는 초등학교부터)
-    if (sec > 10 && conFreeLeft(k)) {
-      S.ff[k] = gameToday();
-      sfx('quest');
-      conFinish(k);
-      setTimeout(() => toast(`즉시 완공! ${FAC[k].name} Lv.${L}\n이 건물은 내일 또 즉시 완공할 수 있어요`), 900);
-      renderMap(); conRender(true);
-      return true;
-    }
+    // 2.3.0 지섭 결정: 하루 한 번 즉시 완공은 저절로 쓰지 않고, 건물 창의 ⚡ 즉시 완공 단추로 원할 때 써요(conFree)
     toast(sec <= 10 ? `${FAC[k].name} 공사 시작! 금방 끝나요` : `${FAC[k].name} 공사 시작! ${hm(sec)} 뒤에 Lv.${L}`);
     sfx('tap');
     afterPurchase();
@@ -9170,7 +9243,7 @@ span.bt-stamp{display:none}.bt-duel.done span.bt-stamp{display:grid}
     const f = el.querySelector('.con-fill'); f.setAttribute('width', (Number(f.dataset.w) * pr).toFixed(1));
     const t = el.querySelector('.con-t'), tx = hm(left); if (t.textContent !== tx) t.textContent = tx;
   }
-  // 건물 창의 공사 칸: 남은 시간, 바로 줄이기(일괄), 골라서 쓰기, 광고
+  // 건물 창의 공사 칸: 남은 시간, 즉시 완공(하루 한 번), 단축권 자동 사용(일괄), 숲의 정수로 즉시 완료, 골라서 쓰기, 광고
   function conSheet() {
     const k = rt.sheetKey, on = conOn(k), box = $('#sheetCon');
     box.hidden = !on;
@@ -9182,7 +9255,9 @@ span.bt-stamp{display:none}.bt-duel.done span.bt-stamp{display:grid}
     $('#conFill').style.width = (pr * 100).toFixed(1) + '%';
     const p = tkPlan(left);
     $('#conAll').setAttribute('aria-disabled', p.n ? 'false' : 'true');
-    $('#conAllLbl').textContent = rt.conArm && p.n ? '이대로 쓸게요' : '바로 줄이기';
+    $('#conAllLbl').textContent = rt.conArm && p.n ? '이대로 쓸게요' : '단축권 자동 사용';   // 2.3.0 이름(지섭)
+    $('#conFree').hidden = !(S.tier >= 1 && conFreeLeft(k));
+    { const c = conEssCost(left); $('#conEssCost').innerHTML = `${ESS_ICON()}<b>${c}</b>`; $('#conEss').setAttribute('aria-disabled', S.ess >= c ? 'false' : 'true'); }
     $('#conNo').hidden = !(rt.conArm && p.n);
     $('#conPlan').textContent = !p.n ? '시간 단축권이 없어요. 광고를 보거나 문방구에서 살 수 있어요'
       : p.left ? `${tkPlanText(p)}을 써서 ${hm(p.cut)} 줄이고 ${hm(p.left)} 남아요` : `${tkPlanText(p)}을 써서 바로 끝나요`;
@@ -13204,6 +13279,8 @@ span.bt-stamp{display:none}.bt-duel.done span.bt-stamp{display:grid}
     const num = (v, lo, hi) => typeof v === 'number' && isFinite(v) ? Math.max(lo, Math.min(hi, v)) : lo;
     const day = v => typeof v === 'string' ? v.slice(0, 10) : '';
     s.ff = {};   // 2.1.1 바로 완공
+    s.ces = typeof d.ces === 'string' ? d.ces.slice(0, 10) : '';   // 2.3.0
+    s.ffx = typeof d.ffx === 'string' ? d.ffx.slice(0, 10) : '';   // 2.3.0
     { const N = d.sn && typeof d.sn === 'object' ? d.sn : {}, got = {};   // 2.1.2 매점 간식 뽑기
       if (N.got && typeof N.got === 'object') for (const x of SN_ALL) { const c = Math.floor(num(N.got[x.id], 0, 1e9)); if (c) got[x.id] = c; }
       s.sn = { got, day: day(N.day), mood: Math.floor(num(N.mood, 0, SN.moodMax)), pity: Math.floor(num(N.pity, 0, SN.pity)), n: Math.floor(num(N.n, 0, 1e9)), gold: N.gold === true && SN_ALL.every(x => got[x.id]) }; }
@@ -17492,6 +17569,22 @@ span.bt-stamp{display:none}.bt-duel.done span.bt-stamp{display:grid}
       rt.conArm = false; tkUseAll(k); renderSheet();
     });
     $('#conNo').addEventListener('click', () => { rt.conArm = false; sfx('tap'); conSheet(); });
+    // 2.3.0 즉시 완공 단추와 숲의 정수로 즉시 완료
+    $('#sheetFree').addEventListener('click', () => {
+      const k = rt.sheetKey; if (!k) return;
+      if (!furReady(k)) { shake($('#sheetFree')); toast(`가구 네 개를 모두 Lv.${S.f[k]}로 올려 주세요`); return; }
+      if (S.budget < facCost(k)) { shake($('#sheetFree')); toast('도토리가 모자라요'); return; }
+      if (!conFree(k)) shake($('#sheetFree'));
+      renderSheet();
+    });
+    $('#conFree').addEventListener('click', () => { const k = rt.sheetKey; if (!k || !conFree(k)) shake($('#conFree')); renderSheet(); });
+    $('#conEss').addEventListener('click', () => { const k = rt.sheetKey; if (k) askConEss(k); });
+    $('#cesQuiet').addEventListener('click', () => { const b = $('#cesQuiet'), on = !b.classList.contains('on'); b.classList.toggle('on', on); b.setAttribute('aria-checked', on ? 'true' : 'false'); sfx('tap'); });
+    $('#cesNo').addEventListener('click', () => { closeModal($('#mCes')); });
+    $('#cesGo').addEventListener('click', () => {
+      const k = rt.cesK; if ($('#cesQuiet').classList.contains('on')) S.ces = gameToday();
+      closeModal($('#mCes')); if (k) conEss(k); if (rt.sheetKey) renderSheet();
+    });
     $('#conTks').addEventListener('click', e => {
       const b = e.target.closest('[data-tk]'), k = rt.sheetKey; if (!b || !k || !conOn(k)) return;
       const t = TK.find(x => x.k === b.dataset.tk); rt.conArm = false;
@@ -19711,7 +19804,7 @@ span.bt-stamp{display:none}.bt-duel.done span.bt-stamp{display:grid}
   // 시험용 손잡이: 자동 시험(window.__FOREST_TEST)에서만 게임 속 함수를 꺼내 써요
   if (window.__FOREST_TEST) window.__forest = { get S() { return S; }, goTo, conOn, conLeft, conTick, conSec, conFinish, tkPlan, tkUse, tkUseAll, TK, CON, TKAD, capNext, yearCap,   // 2.1.0 공사
     semOn, semFirst, semLabel, cereDip, semBreak,   // 2.1.0 학기(s80)
-    get btUI() { return btUI; }, conFreeLeft, CB, cbOn, cbLeft, cbCost, cbApply, cbBuy, conRender, progOf, parseSave, saveSum, bakList, bakAdd, bakAll, askPick, pickKeepLocal, pickLoadSrv, openBak, cloudShouldRestore, get Cloud() { return Cloud; }, CG, CG_FLAGS, cgOpen, cgSync, cgPractice, cgMy, cgTable, cgOppNow, cgHTML, cgNewWeek, renderClub, BX, BX_SPOT, BIO, BIO_BY, bxOpen, bxSync, bxPick, bxOk, bxTap, bxCount, bxRareP, bxMapHTML, bxDexRender, setDexSeg, renderDeco, gdOpen, showReady, GD, GD_CROPS, GD_MENU, GD_M, gdN, gdSync, gdPlant, gdWater, gdHarvest, gdCook, gdMult, gdPct, gdToday, gdReadyN, gdMenuCount, openGd, gdRender, gdMark, nbApply, NB, nbAdd, nbAddOf, nbOn, nbOnAt, nbLeft, nbOverlap, nbApply, nbNotice, conAdd, get Live() { return Live; }, sanitize211, ffCan, ffRender, BTQ, BTQ_SCI, BTQ_KOR, BTQ_COL, btqMake, btqMath, btqPick, btqAnswer, btqMemTap, btqPts, btReveal,   // 2.1.1 대결 종목 문제
+    get btUI() { return btUI; }, conFreeLeft, conFree, conEss, conEssCost, askConEss, CON, conSec, conBand, CB, cbOn, cbLeft, cbCost, cbApply, cbBuy, conRender, progOf, parseSave, saveSum, bakList, bakAdd, bakAll, askPick, pickKeepLocal, pickLoadSrv, openBak, cloudShouldRestore, get Cloud() { return Cloud; }, CG, CG_FLAGS, cgOpen, cgSync, cgPractice, cgMy, cgTable, cgOppNow, cgHTML, cgNewWeek, renderClub, BX, BX_SPOT, BIO, BIO_BY, bxOpen, bxSync, bxPick, bxOk, bxTap, bxCount, bxRareP, bxMapHTML, bxDexRender, setDexSeg, renderDeco, gdOpen, showReady, GD, GD_CROPS, GD_MENU, GD_M, gdN, gdSync, gdPlant, gdWater, gdHarvest, gdCook, gdMult, gdPct, gdToday, gdReadyN, gdMenuCount, openGd, gdRender, gdMark, nbApply, NB, nbAdd, nbAddOf, nbOn, nbOnAt, nbLeft, nbOverlap, nbApply, nbNotice, conAdd, get Live() { return Live; }, sanitize211, ffCan, ffRender, BTQ, BTQ_SCI, BTQ_KOR, BTQ_COL, btqMake, btqMath, btqPick, btqAnswer, btqMemTap, btqPts, btReveal,   // 2.1.1 대결 종목 문제
     SN, SN_ALL, snOpen, snCount, snSync, snMult, snBase, snCost, snPick, snDraw, openSn, snRender, snDexRender, setDexSeg, rate,
     qProg, VD, vdH, vdOpen, vdNeed, vdLeft, vdAmt, vdGive, vdUp, openVd, vdRender, vdMapHTML, achTitles, achTitleName, setTitle,
     BF, FR_LINES, frSync, frMake, frOf, frNm, frFull, frHeart, frList, frPat, frGift, frGiftLeft, frAddP, frRename, frHere, frKidTap, frLetter, frTick, bdParty, bdPlace, bdClaim, bdDoneToday, bdRender, bdHats,
