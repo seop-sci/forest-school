@@ -2014,6 +2014,14 @@ body{background:radial-gradient(120% 60% at 50% 0%, color-mix(in srgb, var(--pap
 .vd-btns button[aria-disabled="true"]{opacity:.5}
 .vd-sum{text-align:center;margin:8px 0 4px;padding:0 16px;white-space:pre-line}
 #decoG .deco-on .deco-ring,#tvMap .deco-ring{fill:none;stroke:#F4C144;stroke-width:2;stroke-dasharray:4 3}
+/* 2.1.3 반짝 친구 */
+.rare-spark path{fill:#FFE27A;stroke:#E2A92A;stroke-width:.35;animation:rareTw 1.8s ease-in-out infinite}
+.rare-spark path+path{animation-delay:.9s}
+@keyframes rareTw{0%,100%{opacity:.25}50%{opacity:1}}
+.dex-card.rare .dex-pic img{width:100%;height:100%;object-fit:contain}
+.dex-card .rare-bd{position:absolute;top:4px;right:4px;width:22px;height:22px}
+.dex-rare-lead{margin:-2px 2px 6px}
+@media (prefers-reduced-motion:reduce){.rare-spark path{animation:none;opacity:.8}}
 /* 2.1.3 숲속 패스 */
 .ps-head{position:relative;border-radius:16px;overflow:hidden;min-height:96px;background:linear-gradient(135deg,#CFE6A8,#9CC46E);margin-bottom:8px}
 .ps-head img{display:block;width:100%;height:auto;aspect-ratio:1024/420;object-fit:cover}
@@ -5433,7 +5441,7 @@ span.bt-stamp{display:none}.bt-duel.done span.bt-stamp{display:grid}
     cb: { until: 0, at: 0 },   // 2.1.1 건설 가속(도토리): until까지 공사 2배, at은 마지막으로 셈한 때
     fr: {}, frg: { day: '', n: 0 }, frc: { pat: 0, gift: 0, cake: 0, alb: 0 }, bday: { day: '', done: false }, alb: [],   // 2.1.1 단짝 친구, 오늘 선물, 횟수, 오늘 생일 잔치, 졸업 앨범
     dsn: { day: '', trips: 0, sports: 0, fest: {} },   // 2.1.0 오늘 시작할 때의 체험학습, 운동회, 행사 횟수(오늘 한 것도 퀘스트에 쳐요)
-    lab: freshLab(), rd: freshRd(), ex: freshEx(), bt: freshBt(), ps: freshPs(),   // ps: 2.1.3 숲속 패스
+    lab: freshLab(), rd: freshRd(), ex: freshEx(), bt: freshBt(), ps: freshPs(), rare: { got: [], miss: 0 },   // ps: 2.1.3 숲속 패스, rare: 2.1.3 반짝 친구(만난 종, 연속 못 만난 횟수)
       // ex: 2.0.1 시험 기간(본 시험 주, 자율학습, 성적표, 기록)
     // 2.0.1 공부 2단계: 과학 탐구 실험(오늘 한 날, 모은 카드, 해 본 짝), 책 읽기(오늘 권수, 읽는 책과 시작 시각, 읽은 횟수)
     bd: {}, tk: { m5: 0, m30: 0, h1: 0, h3: 0 }, tka: { day: '', n: 0 },   // 2.1.0 공사(건물마다 { L 오를 레벨, s 시작, e 끝 }), 시간 단축권 장수, 광고 단축권 오늘 횟수
@@ -5638,6 +5646,7 @@ span.bt-stamp{display:none}.bt-duel.done span.bt-stamp{display:grid}
     sanitizeExam(d, s);   // 2.0.1 공부 3단계: 시험 기간
     sanitizeBt(d, s);   // 2.0.1 공부 4단계: 숲속 대결
     sanitizePs(d, s);   // 2.1.3 숲속 패스
+    { const R = d.rare && typeof d.rare === 'object' ? d.rare : {}; s.rare = { got: [...new Set((Array.isArray(R.got) ? R.got : []).filter(sp => RARE.list.some(x => x.sp === sp)))], miss: Math.min(RARE.pity, Math.max(0, Math.floor(Number(R.miss) || 0))) }; }   // 2.1.3 반짝 친구
     // 2.1.0 공사와 시간 단축권: 예전 저장에는 없으니 공사 없음, 단축권 0장. 지금 레벨 다음 칸이 아닌 공사는 버려요
     if (d.bd && typeof d.bd === 'object') for (const k of Object.keys(FAC)) {
       const b = d.bd[k];
@@ -6655,15 +6664,18 @@ span.bt-stamp{display:none}.bt-duel.done span.bt-stamp{display:grid}
   const HEAD_Y = { rabbit: 0.5, fox: 0.36, raccoon: 0.33, chick: 0.34, bear: 0.31, cat: 0.35, dog: 0.32, penguin: 0.3, panda: 0.31, koala: 0.33, otter: 0.33 };
   // 2.0.0 새 전학생 그림(작업지시서 20)이 오기 전에는 그림 문자로 보여 줘요
   const KID_EMOJI = { hamster: '🐹', duck: '🦆', turtle: '🐢', mole: '🐭', frog: '🐸', waterdeer: '🦌' };
-  function kidSVG(sp, bag, look) {
+  function kidSVG(sp0, bag, look) {
+    // 2.1.3 반짝 친구: 'rabbit_rare'처럼 받으면 반짝 친구 그림(같은 캔버스)과 둘레 반짝임
+    const rare = typeof sp0 === 'string' && sp0.endsWith('_rare') && !!FSI('chr_' + sp0), sp = rare ? sp0.slice(0, -5) : (typeof sp0 === 'string' ? sp0.replace(/_rare$/, '') : sp0);
     const hat = look ? look.hat : (S ? S.cos.hat : ''), neck = look ? look.neck : (S ? S.cos.neck : ''), cap = look && look.cap;   // 2.0.1 cap: 졸업식 학사모(던지기 시작 초)
     const ar = CHR_AR['chr_' + sp] || 0.75, h = Math.min(24, 21 / ar), w = h * ar, top = 11.5 - h;
-    const hy = top + h * (HEAD_Y[sp] || 0.33), r = h * 0.2, pic = FSI('chr_' + sp);
+    const hy = top + h * (HEAD_Y[sp] || 0.33), r = h * 0.2, pic = FSI('chr_' + (rare ? sp0 : sp));
     return `<ellipse cx="0" cy="11.6" rx="${(w * 0.32).toFixed(1)}" ry="1.6" class="c-shadow"/>` +
       (pic || !KID_EMOJI[sp] ? `<image href="${pic}" x="${(-w / 2).toFixed(2)}" y="${top.toFixed(2)}" width="${w.toFixed(2)}" height="${h.toFixed(2)}"/>`
         : `<text x="0" y="9.5" text-anchor="middle" font-size="15">${KID_EMOJI[sp]}</text>`) +
       (hat || neck || cap ? `<g transform="translate(0 ${hy.toFixed(2)}) scale(${(r / 6).toFixed(3)})">${neck ? NECKS[neck] : ''}${cap ? `<g class="cere-cap" style="animation-delay:${cap}s">${GRAD_CAP}</g>` : hat ? hatSVG(hat) : ''}</g>` : '') +
-      `<g transform="translate(0 ${(top + 4).toFixed(1)})">${nlBadge(sp)}</g>`;
+      `<g transform="translate(0 ${(top + 4).toFixed(1)})">${nlBadge(sp)}</g>` +
+      (rare ? `<g class="rare-spark"><path d="M-8 ${(top + 3).toFixed(1)}l.8 1.8 1.8.8-1.8.8-.8 1.8-.8-1.8-1.8-.8 1.8-.8z"/><path d="M7.5 ${(top + 9).toFixed(1)}l.6 1.3 1.3.6-1.3.6-.6 1.3-.6-1.3-1.3-.6 1.3-.6z"/></g>` : '');
   }
   // 친구 성장 쪽지로 키운 전학생: 머리 옆에 별, Lv.5부터 금빛 별
   function nlBadge(sp) {
@@ -6750,9 +6762,10 @@ span.bt-stamp{display:none}.bt-duel.done span.bt-stamp{display:grid}
     dexMeet(sp);   // 1.7.0 도감
     const g = document.createElementNS(NS, 'g');
     g.setAttribute('class', 'kid');
-    g.innerHTML = kidSVG(sp, bag);
+    const rare = rareGot(sp) && Math.random() < RARE.walk;   // 2.1.3 반짝 친구는 그 종 학생 가운데 가끔
+    g.innerHTML = kidSVG(rare ? sp + '_rare' : sp, bag);
     layerKids.appendChild(g);
-    const k = { g, sp, bag, x: 0, y: 0, tx: 0, ty: 0, spot: -1, wait: rand(0, 2), speed: rand(14, 22), phase: rand(0, 6), moving: false };
+    const k = { g, sp, bag, rare, x: 0, y: 0, tx: 0, ty: 0, spot: -1, wait: rand(0, 2), speed: rand(14, 22), phase: rand(0, 6), moving: false };
     pickTarget(k);
     if (fromGate && !rt.reduced) { const [gx, gy] = geo().gate; k.x = gx + rand(-8, 8); k.y = gy; k.wait = 0; }
     else { k.x = k.tx; k.y = k.ty; pickTarget(k); }
@@ -10248,7 +10261,7 @@ span.bt-stamp{display:none}.bt-duel.done span.bt-stamp{display:grid}
   }
   // 꾸민 모습을 학교에 입혀요: 학생 소품은 학생을 다시 그리고, 지붕과 칠판은 색 이름표를 바꿔요
   function applyCos() {
-    rt.kids.forEach(k => { k.g.innerHTML = kidSVG(k.sp, k.bag); });
+    rt.kids.forEach(k => { k.g.innerHTML = kidSVG(k.rare ? k.sp + '_rare' : k.sp, k.bag); });
     rt.bdHatK = null; rt.elBadgeT = '';   // 2.1.1 생일 고깔과 반장 배지는 다음 틱에 다시
     const map = $('#map');
     applyThemes();
@@ -11069,7 +11082,9 @@ span.bt-stamp{display:none}.bt-duel.done span.bt-stamp{display:grid}
     if (Math.random() < 0.4) { const o = (main + 1 + Math.floor(Math.random() * (ABIL.length - 1))) % ABIL.length; a[o] += 6; }
     const free = KID_NAMES.filter(n => !taken.includes(n)), nm = (free.length ? free : KID_NAMES)[Math.floor(Math.random() * (free.length || KID_NAMES.length))];
     taken.push(nm);
-    return { sp, nm, a: a.map(v => Math.min(100, v)), c: -1, cw: gameWeek() };
+    const out = { sp, nm, a: a.map(v => Math.min(100, v)), c: -1, cw: gameWeek() };
+    if (rareGot(sp) && Math.random() < RARE.roster) out.r = true;   // 2.1.3 반짝 친구 모습(능력치는 같아요)
+    return out;
   }
   // must: 꼭 넣을 친구(방금 전학 온 친구)
   function rosterMake(must) {
@@ -11201,7 +11216,7 @@ span.bt-stamp{display:none}.bt-duel.done span.bt-stamp{display:grid}
     s.roster.list = (Array.isArray(r.list) ? r.list : []).slice(0, ROSTER_MAX).filter(x => x && typeof x.sp === 'string' && (BASE_SPECIES.includes(x.sp) || NEWCOMERS.some(n => n.k === x.sp)))
       .map(x => ({ sp: x.sp, nm: typeof x.nm === 'string' ? x.nm.replace(/[<>&"'`\\]/g, '').slice(0, 8) : '친구',
         a: ABIL.map((_, i) => Math.max(1, Math.min(100, Math.floor(Array.isArray(x.a) ? (i === 4 && x.a.length < 5 ? 8 + Math.floor(Math.random() * 20) : num(x.a[i]) || 1) : 1)))),   // 2.0.1 옛 저장(네 칸)은 수학 칸을 채워요
-        c: Number.isInteger(x.c) && x.c >= 0 && x.c < CLUBS.length ? x.c : -1, cw: Math.floor(num(x.cw)) || 0 }));
+        c: Number.isInteger(x.c) && x.c >= 0 && x.c < CLUBS.length ? x.c : -1, cw: Math.floor(num(x.cw)) || 0, ...(x.r === true ? { r: true } : {}) }));   // r: 2.1.3 반짝 친구 모습
     // 한 동아리에 3명보다 많으면 넘치는 학생은 동아리 밖으로
     CLUBS.forEach((_, c) => s.roster.list.filter(x => x.c === c).slice(CLUB.seats).forEach(x => { x.c = -1; }));
     // 2.1.0 학력과 능력치 균형: 옛 명부(v 없음)는 한 번만 능력치를 0.6배로(100 → 60). 그 뒤로는 v: 2라 다시 줄지 않아요
@@ -12086,7 +12101,7 @@ span.bt-stamp{display:none}.bt-duel.done span.bt-stamp{display:grid}
       const o = rt.bdHatK; rt.bdHatK = null;
       if (rt.kids.includes(o)) { o.g.innerHTML = kidSVG(o.sp, o.bag); rt.elBadgeT = ''; }
     }
-    if (k && rt.bdHatK !== k && IMG('cos_hat_bday')) { k.g.innerHTML = kidSVG(k.sp, k.bag, { hat: 'bday', neck: S.cos.neck }); rt.bdHatK = k; rt.elBadgeT = ''; }
+    if (k && rt.bdHatK !== k && IMG('cos_hat_bday')) { k.g.innerHTML = kidSVG(k.rare ? k.sp + '_rare' : k.sp, k.bag, { hat: 'bday', neck: S.cos.neck }); rt.bdHatK = k; rt.elBadgeT = ''; }
   }
   function frTick() {
     if (!S || !S.fr) return;
@@ -12908,14 +12923,14 @@ span.bt-stamp{display:none}.bt-duel.done span.bt-stamp{display:grid}
   // 동아리 배지: 그림(작업지시서 19)이 있으면 그림, 없으면 그림 문자
   const clubBadge = (c, px) => IMG(CLUBS[c].img) ? `<img class="club-badge" src="${IMG(CLUBS[c].img)}" alt="" draggable="false"${px ? ` style="width:${px}px;height:${px}px"` : ''}>`
     : `<span class="club-badge em c${c}"${px ? ` style="width:${px}px;height:${px}px;font-size:${Math.round(px * 0.55)}px"` : ''}>${CLUBS[c].em}</span>`;
-  const kidFace = sp => `<span class="rs-av">${kidAvatar(sp)}</span>`;
+  const kidFace = (sp, r) => `<span class="rs-av">${kidAvatar(r ? sp + '_rare' : sp)}</span>`;   // 2.1.3 r: 반짝 친구 모습
   function clubSeatHTML(c) {
     const mem = clubMembers(c), C = CLUBS[c];
     return Array.from({ length: CLUB.seats }, (_, j) => {
       const s = mem[j];
       if (!s) return `<button class="club-seat empty" type="button" data-seat="${c}" aria-label="${C.name} 빈자리, 눌러서 학생 넣기"><b>+</b><small>빈자리</small></button>`;
       const i = S.roster.list.indexOf(s);
-      return `<button class="club-seat" type="button" data-seat="${c}" data-ri="${i}" aria-label="${C.name} ${s.nm}, ${ABIL[C.ab]} 별 ${star(s.a[C.ab])}개">${kidFace(s.sp)}<b>${esc(s.nm)}</b><small class="stars">${starTxt(star(s.a[C.ab]))}</small></button>`;
+      return `<button class="club-seat" type="button" data-seat="${c}" data-ri="${i}" aria-label="${C.name} ${s.nm}, ${ABIL[C.ab]} 별 ${star(s.a[C.ab])}개">${kidFace(s.sp, s.r)}<b>${esc(s.nm)}</b><small class="stars">${starTxt(star(s.a[C.ab]))}</small></button>`;
     }).join('');
   }
   function renderClub() {
@@ -12930,7 +12945,7 @@ span.bt-stamp{display:none}.bt-duel.done span.bt-stamp{display:grid}
       `<span class="club-eff">${C.eff(clubShow(c))}</span></div><div class="club-seats">${clubSeatHTML(c)}</div>` +
       `<button class="cta small club-show" type="button" data-show="${c}" aria-disabled="${showReady() && clubMembers(c).length ? 'false' : 'true'}">${S.club.shown[c] ? '발표회 또 열기' : '발표회 열기'}</button></div>`).join('') +
       `<h3 class="qsec">학생 명부 <small>${yearLabel()} 대표 학생 ${S.roster.list.length}명</small></h3>` +
-      `<div class="roster">${S.roster.list.map((s, i) => `<button class="rs-row${rt.clubPick === i ? ' pick' : ''}" type="button" data-ri="${i}">${kidFace(s.sp)}` +
+      `<div class="roster">${S.roster.list.map((s, i) => `<button class="rs-row${rt.clubPick === i ? ' pick' : ''}" type="button" data-ri="${i}">${kidFace(s.sp, s.r)}` +
         `<span class="rs-nm"><b>${esc(s.nm)}</b><small>${s.c >= 0 ? CLUBS[s.c].name : '동아리 없음'}</small></span>` +
         `<span class="rs-ab">${ABIL.map((n, j) => `<i class="${s.c >= 0 && CLUBS[s.c].ab === j ? 'on' : ''}"><em>${n}</em><span>${starTxt(star(s.a[j]))}</span></i>`).join('')}</span></button>`).join('')}</div>`;
   }
@@ -12939,7 +12954,7 @@ span.bt-stamp{display:none}.bt-duel.done span.bt-stamp{display:grid}
     rt.seatClub = c; rt.seatStudent = null; $('#seatOut').hidden = true;
     const C = CLUBS[c], L = S.roster.list.map((s, i) => [s, i]).sort((x, y) => y[0].a[C.ab] - x[0].a[C.ab]);
     $('#seatTitle').textContent = `${C.name}에 넣을 학생`;
-    $('#seatList').innerHTML = L.map(([s, i]) => `<button class="rs-row${s.c === c ? ' pick' : ''}" type="button" data-pick="${i}">${kidFace(s.sp)}<span class="rs-nm"><b>${esc(s.nm)}</b><small>${s.c >= 0 ? CLUBS[s.c].name : '동아리 없음'}</small></span>` +
+    $('#seatList').innerHTML = L.map(([s, i]) => `<button class="rs-row${s.c === c ? ' pick' : ''}" type="button" data-pick="${i}">${kidFace(s.sp, s.r)}<span class="rs-nm"><b>${esc(s.nm)}</b><small>${s.c >= 0 ? CLUBS[s.c].name : '동아리 없음'}</small></span>` +
       `<span class="rs-one">${ABIL[C.ab]} <b>${starTxt(star(s.a[C.ab]))}</b></span></button>`).join('') +
       `<p class="note">이미 다른 동아리에 있는 학생을 고르면 이 동아리로 옮겨요. 자리가 차 있으면 별이 가장 적은 부원과 바꿔요. 바꾼 학생은 이번 주 능력치 오름을 처음부터 다시 세요.</p>`;
     openModal($('#mSeat'));
@@ -13135,7 +13150,7 @@ span.bt-stamp{display:none}.bt-duel.done span.bt-stamp{display:grid}
     const L = T.lines[T.i], hh = L.who === 'hedgehog';
     $('#talkAv').innerHTML = hh ? hedgehogAvatar() : kidAvatar(L.who);
     $('#talkAv').classList.toggle('kid', !hh);
-    $('#talkWho').textContent = hh ? '교감 고슴도치' : `새 친구 ${T.n.name}`;
+    $('#talkWho').textContent = hh ? '교감 고슴도치' : T.n.lab || `새 친구 ${T.n.name}`;   // 2.1.3 반짝 친구는 lab
     $('#talkText').textContent = nl(L.t);
     $('#talkNext').textContent = T.i >= T.lines.length - 1 ? '반가워요!' : '다음';
     $('#talkStep').textContent = `${T.i + 1} / ${T.lines.length}`;
@@ -15061,6 +15076,7 @@ span.bt-stamp{display:none}.bt-duel.done span.bt-stamp{display:grid}
     save();
     queueModal(() => showCeremony(dip, leaving, newcomer));
     if (newcomer) queueModal(() => showNewTalk(newcomer));   // 2.0.0 전학 대화(식 창 다음에)
+    rareAfterCere();   // 2.1.3 반짝 친구
     if (rt.tkReward) { showReward(rt.tkReward); rt.tkReward = null; }   // 친구 성장 쪽지는 식이 끝난 뒤에 알려 줘요
   }
   function showCeremony(dip, leaving, newcomer, half) {
@@ -15141,6 +15157,7 @@ span.bt-stamp{display:none}.bt-duel.done span.bt-stamp{display:grid}
     queueModal(() => showEntrance(fund, leaving, from, newcomer, dipsIn));
     if (albPg.ltr) queueModal(() => openLetter(albPg));   // 2.1.1 졸업 편지
     if (newcomer) queueModal(() => showNewTalk(newcomer));   // 2.0.0 전학 대화
+    rareAfterCere();   // 2.1.3 반짝 친구
     if (rt.tkReward) { showReward(rt.tkReward); rt.tkReward = null; }   // 친구 성장 쪽지는 식이 끝난 뒤에 알려 줘요
     checkGrade();
     syncKids(false);
@@ -16809,7 +16826,7 @@ span.bt-stamp{display:none}.bt-duel.done span.bt-stamp{display:grid}
   function renderDex() {
     const body = $('#dexBody');
     if (!body || !S) return;
-    const n = dexCount('all'), key = [n, DEX_GUEST_KEYS.filter(k => S.dex.got[k]).length, rt.dexPick, Object.keys(rt.dexNew || {}).join(''), S.dex.paid.length, frDexKey(rt.dexPick)].join('|');
+    const n = dexCount('all'), key = [n, S.rare ? S.rare.got.join() : '', DEX_GUEST_KEYS.filter(k => S.dex.got[k]).length, rt.dexPick, Object.keys(rt.dexNew || {}).join(''), S.dex.paid.length, frDexKey(rt.dexPick)].join('|');
     $('#dexHead').innerHTML = `<span>만난 친구</span><b>${n} / ${DEX_KEYS.length}종</b>`;
     if (body.dataset.key === key) return;
     body.dataset.key = key;
@@ -16819,6 +16836,7 @@ span.bt-stamp{display:none}.bt-duel.done span.bt-stamp{display:grid}
       `<p>${got ? esc(DEX_LINES[pk] || (dexGuest(pk) || {}).line || '') : '아직 만나지 못했어요.'}</p><small>${got ? dexDate(got) : esc(dexHow(pk))}</small>${got ? frDexBox(pk) : ''}</div></div>` : '';
     body.innerHTML = detail +
       `<h4 class="dex-h">학생 <small>${dexCount('students')} / ${DEX_STUDENTS.length}</small></h4><div class="dex-grid">${DEX_STUDENTS.map(dexCard).join('')}</div>` +
+      rareDexHTML() +   // 2.1.3 반짝 친구는 학생 줄 바로 아래, 같은 카드 크기
       `<h4 class="dex-h">선생님 <small>${DEX_TEA.filter(k => S.dex.got['tea_' + k]).length} / ${DEX_TEA.length}</small></h4><div class="dex-grid">${DEX_TEA.map(k => dexCard('tea_' + k)).join('')}</div>` +
       `<h4 class="dex-h">특별 손님 <small>${DEX_GUEST_KEYS.filter(k => S.dex.got[k]).length} / ${DEX_GUESTS.length}</small></h4><div class="dex-grid">${DEX_GUEST_KEYS.map(dexCard).join('')}</div>` +
       `<h4 class="dex-h">앞으로 올 친구</h4><div class="dex-grid">${Array.from({ length: DEX_FUTURE }, (_, i) => dexLock('숲속 교육부에서 준비 중')).join('')}</div>`;
@@ -17217,6 +17235,47 @@ span.bt-stamp{display:none}.bt-duel.done span.bt-stamp{display:grid}
   }
   VD.titles.push({ id: 'psnew', title: '패스 새내기', got: d => !!(d && d.ps && d.ps.badge >= 1) });   // 2.1.3 패스 10단계 첫 배지
   /* ===== 2.1.3 숲속 패스 END ===== */
+  /* ===== 2.1.3 반짝 친구 BEGIN (시즌 설계안 3절, 지섭 확정) =====
+     종업식과 졸업식마다 5% 확률로 아직 못 만난 반짝 친구가 와요. 12번 연속 못 만나면 다음 번은 꼭.
+     지섭 당부(2026-10-30): 털 색으로 친구를 부르거나 견주지 않아요. 반짝이는 까닭은 숲의 별빛을 받은 행운이고, 능력치와 수업료는 다른 친구와 똑같아요 */
+  const RARE = { p: 0.05, pity: 12, walk: 0.2, roster: 0.1, gold: 1, list: [
+    { sp: 'rabbit', name: '달빛 토끼', say: '안녕! 달님이 환하던 밤에 별빛 가루를 잔뜩 맞았더니 반짝반짝해졌어요.' },
+    { sp: 'fox', name: '눈송이 여우', say: '첫눈 오는 날 숲길에서 별빛을 만났어요. 친구들이랑 눈싸움하고 싶어요!' },
+    { sp: 'chick', name: '햇살 병아리', say: '아침 햇살 사이로 내려온 별빛을 받았어요. 노래 부르는 걸 제일 좋아해요!' },
+    { sp: 'panda', name: '단풍 판다', need: 1, say: '단풍 숲에서 별빛을 만났어요. 대나무 간식을 넉넉히 가져왔으니 같이 먹어요!' },
+    { sp: 'bear', name: '눈꽃 곰', say: '눈꽃이 피던 날 별빛이 살포시 내려왔어요. 따뜻한 꿀차를 좋아해요.' },
+    { sp: 'dog', name: '별무늬 강아지', need: 1, say: '별빛이 콕콕 내려앉아 별무늬가 생겼어요. 같이 뛰어놀아요, 멍!' }] };
+  const rareGot = sp => !!S && !!S.rare && S.rare.got.includes(sp);
+  const rareDef = sp => RARE.list.find(x => x.sp === sp);
+  function rareRoll() {
+    if (!S || !S.rare) return null;
+    const cand = RARE.list.filter(x => !S.rare.got.includes(x.sp) && (!x.need || speciesList().includes(x.sp)) && FSI('chr_' + x.sp + '_rare'));
+    if (!cand.length) return null;
+    if (S.rare.miss < RARE.pity && Math.random() >= RARE.p) { S.rare.miss += 1; return null; }
+    const x = cand[Math.floor(Math.random() * cand.length)];
+    S.rare.got.push(x.sp); S.rare.miss = 0; addGold(RARE.gold);
+    const k = rt.kids.find(z => z.sp === x.sp && !z.rare); if (k) { k.rare = true; k.g.innerHTML = kidSVG(x.sp + '_rare', k.bag); }   // 지도에 바로 한 명
+    return x;
+  }
+  function showRareTalk(x) {
+    const m = $('#mTalk'); if (!m || !x) return false;
+    const w = x.sp + '_rare';
+    rt.talkSeq = { n: { k: w, name: x.name, lab: `반짝 친구 ${x.name}` }, i: 0, lines: [
+      { who: 'hedgehog', t: `교장 선생님, 숲의 별빛이 우리 학교에 내려앉았어요! 반짝반짝 빛나는 ${iga(x.name)} 놀러 왔어요.` },
+      { who: w, t: x.say },
+      { who: 'hedgehog', t: `${eun(x.name)} 별빛을 받은 반짝 친구예요. 다른 친구들과 똑같이 공부하고 뛰어놀아요. 동물 도감 반짝 친구 칸에 등록했고, 선물로 황금 도토리 ${RARE.gold}개를 받았어요!`, last: true }] };
+    talkLine(); openModal(m);
+    return true;
+  }
+  // 종업식, 졸업식에서 불러요(전학 대화 다음)
+  function rareAfterCere() { const x = rareRoll(); if (x) { queueModal(() => showRareTalk(x)); save(); } }
+  function rareDexHTML() {
+    const n = S.rare.got.length;
+    return `<h4 class="dex-h">반짝 친구 <small>${n} / ${RARE.list.length}</small></h4><p class="fine dex-rare-lead">숲의 별빛을 받아 반짝이는 친구예요. 종업식과 졸업식 때 아주 가끔 놀러 와요.</p><div class="dex-grid">` +
+      RARE.list.map(x => { const on = rareGot(x.sp), im = FSI('chr_' + x.sp + '_rare'), bd = IMG('rare_badge');
+        return `<div class="dex-card rare${on ? ' on' : ' off'}" aria-label="${on ? x.name : '아직 못 만난 반짝 친구'}"><span class="dex-pic">${on && im ? `<img src="${im}" alt="">` : pic7('dex_unknown')}</span>${on && bd ? `<img class="rare-bd" src="${bd}" alt="">` : ''}<b>${on ? x.name : '???'}</b><small>${on ? '등록' : '미등록'}</small></div>`; }).join('') + '</div>';
+  }
+  /* ===== 2.1.3 반짝 친구 END ===== */
   function renderEvent() {
     const body = $('#evBody');
     if (!body || !S) return;
@@ -17373,9 +17432,10 @@ span.bt-stamp{display:none}.bt-duel.done span.bt-stamp{display:grid}
     { id: 'league', name: '대결 리그', goals: [1, 2, 3, 4, 5], title: '숲속 챔피언', t: n => `숲속 대결 ${BT_LG[n].n} 리그 가기`, v: () => S.bt ? S.bt.lg : 0 },   // 2.0.1 동~무지개
     { id: 'snack', name: '간식 도감', goals: [5, 10, 14, 17, 20], title: '매점 단골', ic: 'snack_01', t: n => n >= 20 ? '간식 도감 모두 모으기' : `간식 도감 ${n}종 모으기`, v: () => snCount() },   // 2.1.2
     { id: 'donate', name: '마을 기부', goals: [1, 3, 5, 8, 20], title: '숲속 기부왕', ic: 'donate_ic', t: n => `마을 기부 ${n}단계`, v: () => S.vd ? S.vd.lv : 0 },   // 2.1.2
+    { id: 'rare', name: '반짝 친구', goals: [1, 2, 3, 4, 6], title: '반짝 친구 수집가', ic: 'rare_badge', t: n => n >= 6 ? '반짝 친구 모두 만나기' : `반짝 친구 ${n}명 만나기`, v: () => S.rare ? S.rare.got.length : 0 },   // 2.1.3
     { id: 'lab', name: '과학 탐구 실험', goals: [3, 8, 14, 20, 24], title: '꼬마 과학자', t: n => n >= 24 ? '실험 노트 모두 채우기' : `실험 노트 ${n}장 채우기`, v: () => labCount() }   // 2.0.1 공부 2단계(노트 24장)
   ];
-  const ACH_EM = { students: '🐰', grad: '🎓', building: '🏫', teacher: '🦔', quest: '📝', puzzle: '🧩', dex: '📖', fest: '🎈', attend: '📅', trip: '🚌', gold: '🌰', rank: '🏆', deco: '🪴', lab: '🧪', battle: '⚔️', league: '🏅' , donate: '🌳', snack: '🍪' };
+  const ACH_EM = { rare: '✨', students: '🐰', grad: '🎓', building: '🏫', teacher: '🦔', quest: '📝', puzzle: '🧩', dex: '📖', fest: '🎈', attend: '📅', trip: '🚌', gold: '🌰', rank: '🏆', deco: '🪴', lab: '🧪', battle: '⚔️', league: '🏅' , donate: '🌳', snack: '🍪' };
   const ACH_RANK_TITLE = true;   // 랭킹 서버에 칭호를 올려요. 서버 규칙(database.rules.json)의 title 칸을 Firebase 콘솔에 게시해야 해요(1.7.1)
   const achById = id => ACH.find(a => a.id === id);
   const achGoal = (a, i) => a.id === 'dex' && i === ACH_N - 1 ? DEX_KEYS.length : a.goals[i];
@@ -18384,7 +18444,7 @@ span.bt-stamp{display:none}.bt-duel.done span.bt-stamp{display:grid}
     rosterEnsure, rosterMake, rosterAdd, clubAuto, clubSet, clubPct, clubShow, clubSum, clubStars, clubMembers, clubShowGo, showReady, showWait, showDay, clubWeekTick, clubFacUp, CLUBS, CLUB, star, clubTuitionMult, clubFestMult, clubDecoOff, renderClub, renderHall, openSeatPick, openClubPick,
     TIER_SCALE, legacyMult, tuitionMult, snapTake, snapOf, tierViewOpen, tierViewClose, renderTierView, renderTierDots, viewMap, showNewTalk, talkNext, showCere, cereEnd, cereCrew, cereAsk, cereKeep, goFur, updateQuestDot, openElect, renderElect, elVote, elSync, elMult, elClub, elPres, elBadge, elMake, EL_PLEDGES, clubPct, festPrize, dropValue, claimMission, gameWeek, NEWCOMERS, TIERS, GEO, geoIdx, decoCost0, qMeasure, qDone, qGoal, kidArt: kidSVG, newYear, checkGrade, gradeOf, townRep, FAC, sanitize200, trialHunt, updateTrial, TRIAL, zoomAt, fitMap, ZOOM_MAX, DECO, DECO_SLOTS, DECO_SIGN, decoCost, decoSoldOut, pickDeco, buyDeco, decoPut, decoEditStart, decoEditEnd, openDecoPick, renderDeco, setSchoolNm, setMark, schoolTitle, markHTML, decoPlacedAll, esExLeft, esExCost, get Cloud() { return Cloud; }, get actx() { return actx; }, Music, musicSync, ensureAudio, bgmLoad, pzUI, rt, makeDeal, furStage, DEAL, navInfo, navRoute, spawnDrop, repTipCheck, linkGoogle, retryCloud, sanitize, acctPending, renderMap, renderHUD, renderAffordance, syncKids, layoutMap, geo, hitTrial, endVisit, showReward, recommend, needCost, prepTopUp, qReward, prepPhase, rankScore, pwOf, previewDip, dipMult, costScale, buyFur, buyFurAll, furCost, furReady, furDone, FUR, startTalk, endTalk, teacherAct, facCost, teaCost, facKeys, rate, rep, capacity, canGraduate, canPromote,
     fmt, fmt2, graduate, promote, buyPerk, perkCost, perkMaxed, buyFundPerk, fpCost, claimMain, mainReady, curMain, qNo, earn, CFG, TEA, teaMaxed, PERKS, FPERKS, MAIN, finalYear, startTrip, claimTrip, TRIPS, yearLocked, endSports, rtSports: () => rt.sports, rtFest: () => rt.fest, facCap, addLeague, addMP, tutStart, endFest, claimBox, musicWant, askBox, festWait, setTab,
-    PS, PS_M, PS_SEASONS, psSeason, psOpen, psSync, psLv, psGot, psReward, psClaimAll, psClaimMission, psWatchAd, psClaimable, psStepReady, psExtraReady, psChooseFur, psFurImg, renderPass, setEvSeg, xtGot, achTitles,   // 2.1.3 숲속 패스
+    RARE, rareRoll, rareGot, showRareTalk, rareDexHTML, kidSVG, rosterKid, PS, PS_M, PS_SEASONS, psSeason, psOpen, psSync, psLv, psGot, psReward, psClaimAll, psClaimMission, psWatchAd, psClaimable, psStepReady, psExtraReady, psChooseFur, psFurImg, renderPass, setEvSeg, xtGot, achTitles,   // 2.1.3 숲속 패스
     dexMeet, dexSync, dexPending, dexGift, renderDex, evCurrent, evNext, evUpcoming, evSync, evFix, evVal, EV_FALLBACK, EV_DECO, EV_HAT, COS, DECO_BY, decoOwn, perkRec, fpRec, BOOST_ALL, buyShop, pickShop, showNote, showOkOn, showWd, renderGradPanel, renderShop, renderDecoShop, EV_WEEKLY, EV_WEEK_BASE, weekMon, claimStamp, claimEvMission, claimEvBox, renderEvent, evMissions, evOk, evSkipped, EV_MONTHS, EV_MEASURE, tierMinutes, minAcorns, IMG, sanitize171, ACH, achSync, claimAch, setTitle, renderAch, setDexSeg, achClaimable, XT, xtAct, xtCost, xtLv, feastMins, libMult, propInstances, walkBuild, festItemSvg, guestArt, adErrText, googleErrText, openSheet, closeSheet, startFest, startSports, sanitize170, EV_STAMPS, EV_SPECIAL, EV_MONTHLY, EV_BOX, DEX_KEYS, DEX_REWARD, DEX_GUEST_KEYS, seasonKey, roofArtKey, oakKey, setSeasonArt, VP, vpLv, vpCost, vpMult, vpAct, renderVpCard, sportsPrize, festPrize, renderTeachers, buildTeacherCards, bldImg, roofKey, bldStage, mapKey, setMapArt, applyThemes, buyFacility, bldFx, setBldFx, mapHi, Live, liveApply, liveLoad, liveOff, LIVE_KEYS, EVC, NOTICES, openNotice, noticeAuto, noticeWant, ntUnread, startTrial, endTrial: () => rt.trial && (rt.trial.left = 0), spawnDeal, startVisit, IMG170, MG, mgCells, mgSetCells, mgTick, mgAddEnergy, mgAddUp, mgTapGen, mgDrop, mgSell, mgUpgrade, mgClaimOrder, mgSwapOrder, mgOrderOk, mgFillOrders, mgOpen, mgClose, mgRenderAll, mgSpawnLevel, mgNearestEmpty, mgEmptyBoard, mgOrderReward, mgUI, sanitize180, mgWatchAd, mgNewOrder, mgHintPick, mgShowHint, mgClearHint, mgTouch, mgOrderGuide, mgDexN, mgDexCan, mgDexClaim, mgOpenDex, MG_DEX, MG_DEX_MS, mgDexEss, mgDexEssCan, mgDexEssN, mgDexMsCan, mgDexMsClaim, MGB, mgBuyBoost, mgBstLeft, mgOpenBoost, nice, claimMission, claimBonus, claimWeekMission, MP_BOX,   // 1.7.0 도감, 이벤트
     PZ, PZ_SHAPES, pzFits, pzAnyFit, pzStuck, pzFullLines, pzPlace, pzFreshGame, pzStart, PZB, pzbCost, pzApplyBoost, pzBoostOpen, pzBoostGo, festGoldLeft, festGoldTake, claimSports, renderStreet, pzFinish, pzLeft, pzCanAd, pzEssOf, pzMinOf, pzHelpSquirrel, pzHelpOwl, pzHelpBear, fillSubs, mapRoofTop, showAd, claimOfflineDouble, startBoost, tripAd, festFocus, festRange, visMap, renderMissions, pzHasHelp, pzRot, pzNewPiece, pzOpen, pzClose, pzGameOver, pzRenderAll, renderMini, addEss, ESHOP, SP_FUR, applyCos, essItem, pickEss, buyEss, renderEssShop, hatSVG, spFurImg, gameNow, gameToday, gameWeek, kstDay, setServerTime, SVR, dmDay, weekIdx, lgWeek, wkWeek, lgKey, pzDay, goldDay, boostLeft, dealLeft, canStamp };
   if (window.claude && window.claude.hot && window.claude.hot.snapshot) {
