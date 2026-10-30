@@ -5,6 +5,7 @@
 #  3) 자리 비운 동안: 전날 19시에 셈하고 다음 날 1시에 켜면 4시간 당겨져요. 공사가 시작하기 전 시간은 안 쳐요
 #  4) 핫픽스 off에 night가 있으면 당기지 않아요
 #  5) 홈 칩: 초등학교부터 늘 '매일 20~24시 건설 가속 이벤트', 이벤트 중에는 '야간 건설 +100%, n 남음'. 유치원에는 줄이 없어요
+#  2-1) 학교 특별 이벤트 날은 +200%
 #  6) 시작 알림은 하루 한 번, 건설 부스터 설명에 '+100%'와 '매일 20~24시', '2배' 글자 없음
 #  7) 저장 nb 읽기, 390 밝은과 360 어두운 화면에서 칩이 넘치지 않아요. 페이지 오류 없음
 # 쓰는 법: python3 wrap.py && python3 s93test.py   (마지막 줄이 PASS면 통과)
@@ -64,6 +65,9 @@ async def main():
                   return { away, late };""")
                 print('자리 비움', r)
                 ok(r['away'] == 4 and r['late'] == 3, f'자리 비운 동안 {r}')
+                # 2-1) 학교 특별 이벤트 날(수능 응원 2026-11-16~22)은 +200%: 야간 1시간이 2시간 당겨요
+                r = await ev("return [F.nbAddOf('2026-11-17'), F.nbAddOf('2026-11-10'), F.nbOverlap(K(17, 20), K(17, 21), true) / H, F.nbOverlap(K(15, 20), K(16, 21), true) / H];")
+                ok(r == [200, 100, 2, 6], f'특별 이벤트 +200% {r}')
                 # 4) 핫픽스 끄기
                 r = await ev("""S.bd = { library: { L: 9, s: K(6, 19), e: K(6, 19) + 30 * H } }; S.nb.at = K(6, 19); const e0 = S.bd.library.e;
                   F.Live.off.add('night'); F.rt.fakeNow = K(6, 22); F.nbApply(); const d = e0 - S.bd.library.e, on = F.nbOn();
