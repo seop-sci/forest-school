@@ -97,7 +97,7 @@ FLOW = r"""() => {
     if (q && (q.t === 'vdGive' || q.t === 'vdLv') && F.vdOpen() && s.budget >= F.vdLeft()) F.vdGive('left');   // 2.1.2 마을 기부: 다음 단계까지 모이면 내요
     if (q && q.t === 'psGot' && F.psOpen()) { F.psSync(); if (F.psLv() < 1) s.ps.pts += F.PS.per; F.psClaimAll(true); }   // 2.1.3 숲속 패스: 미션을 한 셈 치고 1단계를 받아요
     if (q && (q.t === 'snDraw' || q.t === 'snDex') && F.snOpen() && s.budget >= F.snCost(false)) F.snDraw(false);   // 2.1.2 간식 뽑기: 30분치가 모이면 한 번씩
-    if (q && (q.t === 'gdHarvest' || q.t === 'gdCook') && F.gdOpen()) { F.gdSync(); s.gn.plots.forEach((p, i) => { if (!p.c) F.gdPlant(i, 'lettuce'); else F.gdHarvest(i); }); if (q.t === 'gdCook') F.GD_MENU.some(m => F.gdCook(m.id)); }   // 2.2.0 텃밭
+    if (q && (q.t === 'gdHarvest' || q.t === 'gdPlant' || q.t === 'gdCook') && F.gdOpen()) { F.gdSync(); s.gn.plots.forEach((p, i) => { if (!p.c) F.gdPlant(i, 'lettuce'); else F.gdHarvest(i); }); if (q.t === 'gdCook') F.GD_MENU.some(m => F.gdCook(m.id)); }   // 2.2.0 텃밭
     if (q && (q.t === 'bxSeen' || q.t === 'bxKinds') && F.bxOpen()) { F.bxSync(); if (s.bx.sp.length) F.bxTap(s.bx.sp[0].i); }   // 2.2.0 생물 탐사
     if (q && (q.t === 'cgPrac' || q.t === 'cgShow') && F.cgOpen()) { F.cgSync(true); if (q.t === 'cgPrac') F.cgPractice(); else if (F.showReady()) { const c = F.CLUBS.findIndex((_, i) => F.clubMembers(i).length); if (c >= 0) F.clubShowGo(c); } }   // 2.2.0 동아리 대항전
     if (q && (q.t === 'btPlays' || q.t === 'btMid') && ev(120)) { s.bt.st.w += 1; s.bt.st.wm += F.S.tier >= 2 ? 1 : 0; }   // 2.0.1 숲속 대결: 2분에 한 판 이김
@@ -154,7 +154,7 @@ FLOW2 = r"""() => {
     if (q && (q.t === 'vdGive' || q.t === 'vdLv') && F.vdOpen() && s.budget >= F.vdLeft()) F.vdGive('left');   // 2.1.2 마을 기부: 다음 단계까지 모이면 내요
     if (q && q.t === 'psGot' && F.psOpen()) { F.psSync(); if (F.psLv() < 1) s.ps.pts += F.PS.per; F.psClaimAll(true); }   // 2.1.3 숲속 패스: 미션을 한 셈 치고 1단계를 받아요
     if (q && (q.t === 'snDraw' || q.t === 'snDex') && F.snOpen() && s.budget >= F.snCost(false)) F.snDraw(false);   // 2.1.2 간식 뽑기: 30분치가 모이면 한 번씩
-    if (q && (q.t === 'gdHarvest' || q.t === 'gdCook') && F.gdOpen()) { F.gdSync(); s.gn.plots.forEach((p, i) => { if (!p.c) F.gdPlant(i, 'lettuce'); else F.gdHarvest(i); }); if (q.t === 'gdCook') F.GD_MENU.some(m => F.gdCook(m.id)); }   // 2.2.0 텃밭
+    if (q && (q.t === 'gdHarvest' || q.t === 'gdPlant' || q.t === 'gdCook') && F.gdOpen()) { F.gdSync(); s.gn.plots.forEach((p, i) => { if (!p.c) F.gdPlant(i, 'lettuce'); else F.gdHarvest(i); }); if (q.t === 'gdCook') F.GD_MENU.some(m => F.gdCook(m.id)); }   // 2.2.0 텃밭
     if (q && (q.t === 'bxSeen' || q.t === 'bxKinds') && F.bxOpen()) { F.bxSync(); if (s.bx.sp.length) F.bxTap(s.bx.sp[0].i); }   // 2.2.0 생물 탐사
     if (q && (q.t === 'cgPrac' || q.t === 'cgShow') && F.cgOpen()) { F.cgSync(true); if (q.t === 'cgPrac') F.cgPractice(); else if (F.showReady()) { const c = F.CLUBS.findIndex((_, i) => F.clubMembers(i).length); if (c >= 0) F.clubShowGo(c); } }   // 2.2.0 동아리 대항전
     if (q && (q.t === 'btPlays' || q.t === 'btMid') && ev(120)) { s.bt.st.w += 1; s.bt.st.wm += F.S.tier >= 2 ? 1 : 0; }   // 2.0.1 숲속 대결: 2분에 한 판 이김

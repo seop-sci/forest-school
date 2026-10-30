@@ -4,7 +4,7 @@
 #  2) 심기 → 물 주기(남은 시간 -20%) → 다 자라면 거두기(물 준 작물 2개, 아니면 1개). 비 오는 날은 저절로 물
 #  3) 오늘의 급식: 재료를 쓰고 그날 수업료 +5%(재료 3가지 +8%), 하루 한 번, 처음 메뉴 정수 3, 8가지에 황금 1. 다음 날 효과 끝
 #  4) 영양 선생님 Lv.5마다 +1%p, 간식 뽑기와 마을 기부 값은 급식 효과를 빼고 셈
-#  5) 메인 퀘스트 gd1, gd2(유치원 2장), 패스 미션 gd, 업적 garden, 저장 읽기
+#  5) 메인 퀘스트 gd1 심기(유치원 3장), gd3 거두기와 gd4 급식(4장, 2.2.1), 패스 미션 gd, 업적 garden, 저장 읽기
 #  6) 창 화면(390 밝은, 360 어두운) 넘침 없음, 급식실 창 단추, 페이지 오류 없음
 # 쓰는 법: python3 wrap.py && python3 s94test.py   (마지막 줄이 PASS면 통과)
 import asyncio
@@ -80,14 +80,14 @@ async def main():
                 print('비', r)
                 ok(r['day'] is None or (r['auto'] == 1 and abs(r['e'] - 48) < 0.01 and r['p'] == 1), f'비 오는 날 물 {r}')
                 # 5) 퀘스트, 패스, 업적, 저장
-                r = await ev("""const ids = F.MAIN.map(q => q.id), i1 = ids.indexOf('gd1'), i2 = ids.indexOf('gd2');
-                  const ch = [F.MAIN[i1].ch, F.MAIN[i2].ch], m1 = F.qMeasure ? F.qMeasure(F.MAIN[i1]) : null, m2 = F.qMeasure ? F.qMeasure(F.MAIN[i2]) : null;
+                r = await ev("""const ids = F.MAIN.map(q => q.id), i1 = ids.indexOf('gd1'), i2 = ids.indexOf('gd3'), i3 = ids.indexOf('gd4'), old = ids.indexOf('gd2');
+                  const ch = [F.MAIN[i1].ch, F.MAIN[i2].ch, F.MAIN[i3].ch], ts = [F.MAIN[i1].t, F.MAIN[i2].t, F.MAIN[i3].t], m1 = F.qMeasure ? F.qMeasure(F.MAIN[i2]) : null, m2 = F.qMeasure ? F.qMeasure(F.MAIN[i3]) : null, mp = F.qMeasure ? F.qMeasure(F.MAIN[i1]) : null;
                   const ps = F.PS_M && F.PS_M.gd ? F.PS_M.gd.v() : null, ach = F.ACH ? F.ACH.find(a => a.id === 'garden') : null;
                   const a = F.sanitize({ ...JSON.parse(JSON.stringify(S)), gn: { plots: [{ c: 'xx' }, { c: 'corn', s: 1, e: 2, w: 3 }], inv: { lettuce: 500, bad: 3 }, menu: { menu_01: 2, menu_99: 1 }, today: { day: '2026-11-05', id: 'menu_77' }, g8: 1, st: { h: -4 } } });
                   const b = F.sanitize({ ...JSON.parse(JSON.stringify(S)), gn: undefined });
-                  return { i1, i2, ch, m1, m2, ps, ach: ach ? [ach.title, ach.v()] : null, a: a.gn, b: b.gn.plots.length };""")
+                  return { i1, i2, i3, old, ch, ts, mp, m1, m2, ps, ach: ach ? [ach.title, ach.v()] : null, a: a.gn, b: b.gn.plots.length };""")
                 print('퀘스트와 저장', {k: v for k, v in r.items() if k != 'a'})
-                ok(r['i1'] > 0 and r['i2'] == r['i1'] + 1 and r['ch'] == [2, 2], f'메인 퀘스트 자리 {r}')
+                ok(r['i1'] > 0 and r['old'] == -1 and r['i3'] == r['i2'] + 1 and r['ch'] == [2, 3, 3] and r['ts'] == ['gdPlant', 'gdHarvest', 'gdCook'] and r['mp'] >= 1, f'메인 퀘스트 자리 (2.2.1 심기 3장, 거두기와 급식 4장) {r}')
                 ok(r['m1'] == 2 and r['m2'] == 3, f'메인 퀘스트 셈 {r}')
                 ok(r['ps'] == 2 and r['ach'] == ['숲속 요리사', 8], f'패스 미션과 업적 {r}')
                 a = r['a']
