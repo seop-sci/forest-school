@@ -13,7 +13,8 @@
         ".indexOn": [
           "score",
           "ws",
-          "bt"
+          "bt",
+          "sp"
         ],
         "$uid": {
           ".write": "auth != null && auth.uid === $uid",
@@ -59,6 +60,28 @@
           },
           "sem": {
             ".validate": "newData.isNumber() && (newData.val() === 0 || newData.val() === 1)"
+          },
+          "sk": {
+            ".validate": "newData.isNumber() && newData.val() >= 1 && newData.val() <= 10000"
+          },
+          "sp": {
+            ".validate": "newData.isNumber() && newData.val() >= 0 && newData.val() <= 999999999 && newData.parent().child('sk').isNumber() && newData.val() <= (data.exists() && data.parent().child('sk').val() === newData.parent().child('sk').val() ? data.val() : 0) + (data.parent().child('at').isNumber() ? ((now - data.parent().child('at').val() >= 10000 ? 1000 : 0) + (now - data.parent().child('at').val()) / 10000) : 1000)"
+          },
+          "$other": {
+            ".validate": false
+          }
+        }
+      },
+      "look": {
+        ".read": "auth != null",
+        "$uid": {
+          ".write": "auth != null && auth.uid === $uid && (!newData.exists() || !data.exists() || now - data.child('at').val() >= 60000)",
+          ".validate": "newData.hasChildren(['d', 'at']) && newData.child('d').isString() && newData.child('d').val().length <= 4000 && newData.child('at').isNumber() && newData.child('at').val() === now",
+          "d": {
+            ".validate": true
+          },
+          "at": {
+            ".validate": true
           },
           "$other": {
             ".validate": false

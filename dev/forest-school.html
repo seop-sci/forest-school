@@ -2014,6 +2014,16 @@ body{background:radial-gradient(120% 60% at 50% 0%, color-mix(in srgb, var(--pap
 .vd-btns button[aria-disabled="true"]{opacity:.5}
 .vd-sum{text-align:center;margin:8px 0 4px;padding:0 16px;white-space:pre-line}
 #decoG .deco-on .deco-ring,#tvMap .deco-ring{fill:none;stroke:#F4C144;stroke-width:2;stroke-dasharray:4 3}
+/* 2.1.3 다른 학교 구경과 예시 학교 */
+.tier-view.tv-model .tv-bar{box-shadow:inset 0 0 0 2px #E8B53A}
+.tier-view.tv-model #tvSub{color:#A0620A;font-weight:700}
+.tv-mark{flex:none;width:30px;height:30px;display:grid;place-items:center}.tv-mark:empty{display:none}.tv-mark .smark{width:30px;height:30px}
+.rank-look{margin:6px 0 8px;display:flex;flex-direction:column;gap:6px}
+.rank-look .rl-on{display:flex;align-items:flex-start;gap:8px;padding:8px 10px;border-radius:12px;background:var(--card);cursor:pointer}
+.rank-look .rl-on input{width:20px;height:20px;margin:2px 0 0;accent-color:#4E9A4A;flex:none}
+.rank-look .rl-on span{display:flex;flex-direction:column;gap:1px}.rank-look .rl-on b{font-size:14px}.rank-look .rl-on small{font-size:12px;color:var(--muted)}
+.rank-look .rl-model{width:100%}.rank-look .fine{margin:0}
+.rank-list li.can-look{cursor:pointer}
 /* 2.1.3 반짝 친구 */
 .rare-spark path{fill:#FFE27A;stroke:#E2A92A;stroke-width:.35;animation:rareTw 1.8s ease-in-out infinite}
 .rare-spark path+path{animation-delay:.9s}
@@ -2894,7 +2904,7 @@ span.bt-stamp{display:none}.bt-duel.done span.bt-stamp{display:grid}
       <!-- 2.0.0 학교급 모습 보기: 동그라미 6개와 지난 학교급 지도 -->
       <div class="tier-view" id="tierView" hidden>
         <svg id="tvMap" viewBox="0 -60 360 540" preserveAspectRatio="xMidYMid meet" role="img" aria-label="지난 학교급 지도"></svg>
-        <div class="tv-bar"><span class="tv-tx"><b id="tvTitle"></b><small id="tvSub"></small></span><button class="btn-sub small" id="tvEdit" type="button">꾸미기</button><button class="cta small" id="tvBack" type="button">돌아가기</button></div>
+        <div class="tv-bar"><span class="tv-mark" id="tvMark" aria-hidden="true"></span><span class="tv-tx"><b id="tvTitle"></b><small id="tvSub"></small></span><button class="btn-sub small" id="tvEdit" type="button">꾸미기</button><button class="cta small" id="tvBack" type="button">돌아가기</button></div>
       </div>
       <div class="tier-dots" id="tierDots" hidden role="group" aria-label="학교급 모습 보기"></div>
       <button class="ff-chip" id="ffChip" type="button" hidden></button><!-- 2.1.1 오늘 바로 완공, 건설 가속 -->
@@ -3056,7 +3066,7 @@ span.bt-stamp{display:none}.bt-duel.done span.bt-stamp{display:grid}
     <section class="panel" id="panelRank" hidden aria-labelledby="ttlRank">
       <button class="panel-x" type="button" aria-label="홈으로"><svg viewBox="0 0 24 24" width="18" height="18" aria-hidden="true"><path d="M6 6l12 12M18 6L6 18" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round"/></svg></button>
       <h2 id="ttlRank" class="ph"><span class="tic" data-ic="ic_rank" aria-hidden="true"></span><span>랭킹</span></h2>
-      <div class="seg rank-seg" id="rankView" role="radiogroup" aria-label="랭킹 보기"><button type="button" role="radio" data-rv="week" aria-checked="true">주간 리그</button><button type="button" role="radio" data-rv="all" aria-checked="false">전체 순위</button><button type="button" role="radio" data-rv="bt" aria-checked="false">대결 순위</button></div>
+      <div class="seg rank-seg" id="rankView" role="radiogroup" aria-label="랭킹 보기"><button type="button" role="radio" data-rv="week" aria-checked="true">주간 리그</button><button type="button" role="radio" data-rv="sea" aria-checked="false">시즌</button><button type="button" role="radio" data-rv="all" aria-checked="false">전체 순위</button><button type="button" role="radio" data-rv="bt" aria-checked="false">대결 순위</button></div>
       <p class="lead" id="rankLead">학교 파워로 순위를 매겨요. 시설, 가구, 선생님, 수료증, 꾸미기처럼 쌓아 온 것이 모두 들어가요.</p>
       <div class="rank-me" id="rankMe">
         <div><span class="lab" id="rankScoreLab">내 학교 파워</span><b id="rankScore">0</b></div>
@@ -3064,6 +3074,7 @@ span.bt-stamp{display:none}.bt-duel.done span.bt-stamp{display:grid}
         <div class="rank-sub" id="rankSub"></div>
       </div>
       <div class="rank-join" id="rankJoin"></div>
+      <div class="rank-look" id="rankLook"></div>
       <ol class="rank-list" id="rankList" aria-label="학교 파워 순위"></ol>
       <p class="rank-empty" id="rankEmpty" hidden></p>
     </section>
@@ -5441,7 +5452,7 @@ span.bt-stamp{display:none}.bt-duel.done span.bt-stamp{display:grid}
     cb: { until: 0, at: 0 },   // 2.1.1 건설 가속(도토리): until까지 공사 2배, at은 마지막으로 셈한 때
     fr: {}, frg: { day: '', n: 0 }, frc: { pat: 0, gift: 0, cake: 0, alb: 0 }, bday: { day: '', done: false }, alb: [],   // 2.1.1 단짝 친구, 오늘 선물, 횟수, 오늘 생일 잔치, 졸업 앨범
     dsn: { day: '', trips: 0, sports: 0, fest: {} },   // 2.1.0 오늘 시작할 때의 체험학습, 운동회, 행사 횟수(오늘 한 것도 퀘스트에 쳐요)
-    lab: freshLab(), rd: freshRd(), ex: freshEx(), bt: freshBt(), ps: freshPs(), rare: { got: [], miss: 0 },   // ps: 2.1.3 숲속 패스, rare: 2.1.3 반짝 친구(만난 종, 연속 못 만난 횟수)
+    lab: freshLab(), rd: freshRd(), ex: freshEx(), bt: freshBt(), ps: freshPs(), rare: { got: [], miss: 0 }, rs: { n: 0, p: 0, pos: 0, king: 0 }, lk: { on: false, at: 0, h: '' },   // ps: 2.1.3 숲속 패스, rs: 랭킹 시즌(번호, 점수, 마지막으로 본 순위, 시즌 왕 횟수), lk: 내 학교 보여 주기, rare: 2.1.3 반짝 친구(만난 종, 연속 못 만난 횟수)
       // ex: 2.0.1 시험 기간(본 시험 주, 자율학습, 성적표, 기록)
     // 2.0.1 공부 2단계: 과학 탐구 실험(오늘 한 날, 모은 카드, 해 본 짝), 책 읽기(오늘 권수, 읽는 책과 시작 시각, 읽은 횟수)
     bd: {}, tk: { m5: 0, m30: 0, h1: 0, h3: 0 }, tka: { day: '', n: 0 },   // 2.1.0 공사(건물마다 { L 오를 레벨, s 시작, e 끝 }), 시간 단축권 장수, 광고 단축권 오늘 횟수
@@ -5646,6 +5657,8 @@ span.bt-stamp{display:none}.bt-duel.done span.bt-stamp{display:grid}
     sanitizeExam(d, s);   // 2.0.1 공부 3단계: 시험 기간
     sanitizeBt(d, s);   // 2.0.1 공부 4단계: 숲속 대결
     sanitizePs(d, s);   // 2.1.3 숲속 패스
+    { const R = d.rs && typeof d.rs === 'object' ? d.rs : {}, n = (v, hi) => Math.max(0, Math.min(hi, Math.floor(Number(v) || 0))); s.rs = { n: n(R.n, 1e4), p: n(R.p, 1e9), pos: n(R.pos, 1e4), king: n(R.king, 1e4) }; }   // 2.1.3 랭킹 시즌
+    { const L = d.lk && typeof d.lk === 'object' ? d.lk : {}; s.lk = { on: L.on === true, at: Math.max(0, Math.min(Date.now() + 864e5, Number(L.at) || 0)), h: '' }; }   // 2.1.3 내 학교 보여 주기(처음에는 꺼짐)
     { const R = d.rare && typeof d.rare === 'object' ? d.rare : {}; s.rare = { got: [...new Set((Array.isArray(R.got) ? R.got : []).filter(sp => RARE.list.some(x => x.sp === sp)))], miss: Math.min(RARE.pity, Math.max(0, Math.floor(Number(R.miss) || 0))) }; }   // 2.1.3 반짝 친구
     // 2.1.0 공사와 시간 단축권: 예전 저장에는 없으니 공사 없음, 단축권 0장. 지금 레벨 다음 칸이 아닌 공사는 버려요
     if (d.bd && typeof d.bd === 'object') for (const k of Object.keys(FAC)) {
@@ -9631,8 +9644,14 @@ span.bt-stamp{display:none}.bt-duel.done span.bt-stamp{display:grid}
       listen: (ok, no) => col.orderBy('score', 'desc').limit(RANK_MAX).onSnapshot(snap => ok(snap.docs.map(d => [d.id, d.data()])), no),
       listenWeek: (ok, no) => col.orderBy('ws', 'desc').limit(RANK_MAX).onSnapshot(snap => ok(snap.docs.map(d => [d.id, d.data()])), no),
       listenBt: (ok, no) => col.orderBy('bt', 'desc').limit(RANK_MAX).onSnapshot(snap => ok(snap.docs.map(d => [d.id, d.data()])), no),   // 2.0.1 대결 순위
+      listenSea: (ok, no) => col.orderBy('sp', 'desc').limit(RANK_MAX).onSnapshot(snap => ok(snap.docs.map(d => [d.id, d.data()])), no),   // 2.1.3 랭킹 시즌
       put: doc => col.doc(uid).set(doc),
-      remove: () => col.doc(uid).delete()
+      remove: () => col.doc(uid).delete(),
+      // 2.1.3 다른 학교 구경
+      lookPut: d => db.collection('look').doc(uid).set({ d, at: Date.now() }),
+      lookDel: () => db.collection('look').doc(uid).delete(),
+      lookGet: id => { const r = db.collection('look').doc(id); return typeof r.get === 'function' ? r.get().then(x => x && (typeof x.data === 'function' ? (x.exists === false ? null : x.data()) : x)) :
+        new Promise(res => { let un = null; un = r.onSnapshot(x => { if (un) un(); res(x && x.exists !== false ? x.data() : null); }, () => res(null)); }); }
     };
   }
   function fbRank() {
@@ -9658,8 +9677,17 @@ span.bt-stamp{display:none}.bt-duel.done span.bt-stamp{display:grid}
         q.on('value', cb, no);
         return () => q.off('value', cb);
       },
+      listenSea: (ok, no) => {   // 2.1.3 랭킹 시즌(서버 규칙 indexOn sp)
+        const q = ref.orderByChild('sp').limitToLast(RANK_MAX + 10);
+        const cb = snap => { const out = []; snap.forEach(ch => { out.push([ch.key, ch.val()]); }); ok(out.reverse()); };
+        q.on('value', cb, no);
+        return () => q.off('value', cb);
+      },
       put: doc => ref.child(uid).set(Object.assign({}, doc, { at: Cloud.fb.database.ServerValue.TIMESTAMP })),
       remove: () => ref.child(uid).remove(),
+      lookPut: d => Cloud.db.ref('forest/look/' + uid).set({ d, at: Cloud.fb.database.ServerValue.TIMESTAMP }),   // 2.1.3 다른 학교 구경(서버 규칙 forest/look)
+      lookDel: () => Cloud.db.ref('forest/look/' + uid).remove(),
+      lookGet: id => Cloud.db.ref('forest/look/' + id).once('value').then(x => x.val()),
       names: () => ref.once('value').then(snap => { const out = []; snap.forEach(ch => { const v = ch.val(); if (ch.key !== uid && v && typeof v.name === 'string') out.push(v.name); }); return out; })
     };
   }
@@ -9687,6 +9715,12 @@ span.bt-stamp{display:none}.bt-duel.done span.bt-stamp{display:grid}
         Rank.wrows = rankRows(pairs, r => r.week === w && r.lp > 0, (a, b) => b.lp - a.lp || a.at - b.at);
         renderRankPanel();
       }, () => {});
+      if (be.listenSea) Rank.unsubS = be.listenSea(pairs => {   // 2.1.3 랭킹 시즌: 이번 시즌 줄만
+        if (g !== Rank.gen) return;
+        const n = rsNum();
+        Rank.srows = rankRows(pairs, r => r.sk === n && r.sp > 0, (a, b) => b.sp - a.sp || a.at - b.at);
+        renderRankPanel();
+      }, () => {});
       if (be.listenBt) Rank.unsubB = be.listenBt(pairs => {
         if (g !== Rank.gen) return;
         Rank.brows = rankRows(pairs, r => r.bt > 0, (a, b) => b.bt - a.bt || a.at - b.at);
@@ -9703,8 +9737,9 @@ span.bt-stamp{display:none}.bt-duel.done span.bt-stamp{display:grid}
     if (Rank.unsub) { try { Rank.unsub(); } catch (e) { /* 무시 */ } }
     if (Rank.unsubW) { try { Rank.unsubW(); } catch (e) { /* 무시 */ } }
     if (Rank.unsubB) { try { Rank.unsubB(); } catch (e) { /* 무시 */ } }
+    if (Rank.unsubS) { try { Rank.unsubS(); } catch (e) { /* 무시 */ } }
     clearTimeout(Rank.timer);
-    Object.assign(Rank, { state: 'idle', be: null, uid: null, rows: [], wrows: [], brows: [], readOnly: false, writing: false, unsub: null, unsubW: null, unsubB: null, sbt: 0, sbtAt: 0 });
+    Object.assign(Rank, { state: 'idle', be: null, uid: null, rows: [], wrows: [], brows: [], srows: [], readOnly: false, writing: false, unsub: null, unsubW: null, unsubB: null, unsubS: null, sbt: 0, sbtAt: 0 });
   }
   function rankAfterCloud() {
     if (Rank.state === 'loading') return;   // 이미 서버 연결을 기다리는 중이면 알아서 이어져요
@@ -9720,7 +9755,8 @@ span.bt-stamp{display:none}.bt-duel.done span.bt-stamp{display:grid}
     return { id, name, score: Math.floor(score), tier: Number(d.tier) | 0, year: Number(d.year) | 0, test: !!d.test, at,
       pid: typeof d.pid === 'string' ? d.pid.slice(0, 16) : '', week: Number(d.week) | 0, lp: Math.max(0, Math.floor(Number(d.lp) || 0)),
       title: typeof d.title === 'string' && achTitleName(d.title) ? d.title : '',   // 2.1.3 업적 말고 받는 칭호도
-      bt: typeof d.bt === 'number' && isFinite(d.bt) ? Math.max(1000, Math.min(9999, Math.floor(d.bt))) : 0, btm: typeof d.btm === 'number' ? Math.max(0, Math.min(5, Math.floor(d.btm))) : 0, sem: d.sem === 0 || d.sem === 1 ? d.sem : null };   // 2.0.1 대결, 2.1.1 학기
+      bt: typeof d.bt === 'number' && isFinite(d.bt) ? Math.max(1000, Math.min(9999, Math.floor(d.bt))) : 0, btm: typeof d.btm === 'number' ? Math.max(0, Math.min(5, Math.floor(d.btm))) : 0, sem: d.sem === 0 || d.sem === 1 ? d.sem : null,
+      sk: Math.max(0, Math.floor(Number(d.sk) || 0)), sp: Math.max(0, Math.min(1e9, Math.floor(Number(d.sp) || 0))) };   // 2.0.1 대결, 2.1.1 학기, 2.1.3 랭킹 시즌
   }
   // 같은 학교(학교 번호)가 기기를 옮겨서 두 번 있으면 내 것이나 가장 최근 것 하나만 남겨요
   function rankRows(pairs, keep, order) {
@@ -9789,14 +9825,18 @@ span.bt-stamp{display:none}.bt-duel.done span.bt-stamp{display:grid}
       if (ACH_RANK_TITLE && S.ach && S.ach.title) doc.title = S.ach.title;   // 1.7.1 칭호(서버 규칙을 게시한 뒤에 켜요)
       // 2.1.1 학기(지섭 요청: 랭킹에 학기도). 서버 규칙(sem)을 아직 게시하지 않아 거절되면 학기 없이 다시 올려요
       if (!Rank.noSem && semOn()) { doc.sem = S.sem; Rank.semSent = true; } else Rank.semSent = false;
+      // 2.1.3 랭킹 시즌: 규칙(sk, sp)을 아직 게시하지 않아 거절되면 시즌 없이 다시 올려요. 규칙은 리그 점수처럼 10초에 1,000쯤까지 받아요
+      if (!Rank.noSk && rsOn()) { rsSync(); const mine = (Rank.srows || []).find(r => r.id === Rank.uid), prev = mine && mine.sk === S.rs.n ? mine.sp : (Rank.ssp && Rank.ssk === S.rs.n ? Rank.ssp : null);
+        const dt = mine ? gameNow() - mine.at : Rank.sspAt ? perfNow() - Rank.sspAt : 0; doc.sk = S.rs.n; doc.sp = Math.min(S.rs.p, prev == null ? 1000 : Math.floor(prev + (dt >= 11000 ? 1000 : 0) + Math.max(0, dt - 1500) / 10000)); Rank.skSent = true; } else Rank.skSent = false;
       // 2.0.1 숲속 대결 순위: 규칙은 지난 값 + 200(하루마다 200 더)까지 받아요. 지난 값을 모르면 1200까지만 올리고 차례로 따라가요
       const bto = !be.toss && BT_RANK && btOpen() ? btRankDoc() : null;
       if (bto) { doc.bt = bto.bt; doc.btm = bto.btm; }
       await be.put(doc);
       Rank.lastPut = Date.now(); Rank.lastPerf = perfNow(); Rank.denied = 0;
-      if (g === Rank.gen) { S.rank.sent = sc; S.rank.by = Rank.uid; S.rank.sws = ws; if (bto) { Rank.sbt = bto.bt; Rank.sbtAt = perfNow(); Rank.sbtm = bto.btm; } save(); }
+      if (g === Rank.gen) { S.rank.sent = sc; S.rank.by = Rank.uid; S.rank.sws = ws; if (bto) { Rank.sbt = bto.bt; Rank.sbtAt = perfNow(); Rank.sbtm = bto.btm; } if (Rank.skSent) { Rank.ssp = doc.sp; Rank.ssk = doc.sk; Rank.sspAt = perfNow(); } save(); lookPush(); }
     } catch (e) {
       const c = String((e && (e.code || e.message)) || '');
+      if (g === Rank.gen && Rank.skSent && /permission/i.test(c) && !Rank.noSk) { Rank.noSk = true; Rank.writing = false; rankDirty(); renderRankPanel(); return; }   // 2.1.3 시즌 칸 규칙이 아직 없어요
       if (g === Rank.gen && Rank.semSent && /permission/i.test(c) && !Rank.noSem) { Rank.noSem = true; Rank.writing = false; rankDirty(); renderRankPanel(); return; }   // 2.1.1 학기 칸 규칙이 아직 없어요
       // 2.0.0: 규칙의 간격이나 오름 폭에 걸렸을 수 있어서 한 번은 15초 뒤 다시 해 보고, 또 막히면 읽기만 해요
       if (g === Rank.gen && /permission/i.test(c) && !Rank.denied) { Rank.denied = 1; Rank.lastPut = Date.now() + 4500; }
@@ -9805,7 +9845,7 @@ span.bt-stamp{display:none}.bt-duel.done span.bt-stamp{display:grid}
     }
     if (g !== Rank.gen) return;
     Rank.writing = false;
-    if (S.rank.joined && !Rank.readOnly && (rankScore() !== S.rank.sent || S.rank.by !== Rank.uid || lgKey() !== S.rank.sws || (BT_RANK && btOpen() && S.bt.pts !== Rank.sbt))) rankDirty();
+    if (S.rank.joined && !Rank.readOnly && (rankScore() !== S.rank.sent || S.rank.by !== Rank.uid || lgKey() !== S.rank.sws || (BT_RANK && btOpen() && S.bt.pts !== Rank.sbt) || (Rank.skSent && Rank.ssp < S.rs.p))) rankDirty();
     renderRankPanel();
   }
   /* 교장 선생님 이름: 처음 한 번은 무료, 그다음부터는 바꿀 때마다 황금 도토리 5개, 6개, 7개... (2.1.0부터, 예전에는 50개, 60개, 70개)
@@ -9885,18 +9925,25 @@ span.bt-stamp{display:none}.bt-duel.done span.bt-stamp{display:grid}
   function renderRankPanel() {
     if (!S || rt.tab !== 'rank') return;
     lgWeek();
-    const mode = tossRank() ? 'all' : (rt.rankView === 'all' || rt.rankView === 'bt' ? rt.rankView : 'week'), wk = mode === 'week', bm = mode === 'bt';   // 2.0.1 대결 순위
+    rsSync();
+    const mode = tossRank() ? 'all' : (['all', 'bt', 'sea'].includes(rt.rankView) ? rt.rankView : 'week'), wk = mode === 'week', bm = mode === 'bt', sea = mode === 'sea';   // 2.0.1 대결 순위, 2.1.3 시즌
     $('#rankView').hidden = tossRank();
     $$('#rankView [data-rv]').forEach(b => b.setAttribute('aria-checked', String(b.dataset.rv === mode)));
-    const R = bm ? (Rank.brows || []) : wk ? Rank.wrows : Rank.rows, score = bm ? S.bt.pts : wk ? S.lg.pts : rankScore(), mine = R.findIndex(r => r.id === Rank.uid);
+    const R = sea ? (Rank.srows || []) : bm ? (Rank.brows || []) : wk ? Rank.wrows : Rank.rows, score = sea ? S.rs.p : bm ? S.bt.pts : wk ? S.lg.pts : rankScore(), mine = R.findIndex(r => r.id === Rank.uid);
     if (wk && mine >= 0 && S.lg.pos !== mine + 1) { S.lg.pos = mine + 1; }
-    $('#rankScoreLab').textContent = bm ? '내 대결 점수' : wk ? '이번 주 리그 점수' : '내 학교 파워';
+    if (sea && mine >= 0 && S.rs.pos !== mine + 1) { S.rs.pos = mine + 1; save(); }   // 2.1.3 시즌이 끝날 때 칭호를 정하는 순위
+    $('#rankScoreLab').textContent = sea ? '이번 시즌 점수' : bm ? '내 대결 점수' : wk ? '이번 주 리그 점수' : '내 학교 파워';
     $('#rankScore').textContent = fmt(score);
     $('#rankPos').textContent = mine >= 0 ? `${mine + 1}위` : '-';
     const left = 7 - ((new Date(gameNow() + KST_MS).getUTCDay() + 6) % 7);   // 2.0.0 보안 점검(1-5): 한국 시간 요일
+    if (sea) {   // 2.1.3 랭킹 시즌
+      const n = rsNum(), q = n ? RS_Q[rsQ(n)] : null;
+      $('#rankSub').textContent = n ? `${rsLabel(n)}. ${S.rs.p >= RS.min ? `기념 장식 '${q[3]}'${eulOf(q[3])} 받아요` : `${fmt(RS.min - S.rs.p)}점 더 모으면 기념 장식 '${q[3]}'`}` : '랭킹 시즌은 2026년 12월에 시작해요';
+      $('#rankLead').textContent = '계절마다 한 시즌이에요. 주간 리그 점수를 시즌 내내 모아요. 300점을 넘기면 그 계절 기념 장식, 시즌이 끝날 때 1~3위는 칭호 \'숲속 시즌 왕\'을 받아요.';
+    } else
     $('#rankSub').textContent = bm ? (btOpen() ? `${BT_LG[S.bt.lg].n} 리그, 오늘 남은 대결 ${btLeft()}판` : '숲속 대결은 초등학교 3학년부터 열려요') : wk ? `월요일에 새 리그가 시작돼요 (${left}일 남음). 리그에 참여하면 순위와 상관없이 황금 도토리 1개`
       : rankSchool(S.tier, yearNo(), semOn() ? S.sem : null) + (Rank.state === 'on' && Rank.rows.length ? `, 랭킹에 ${Rank.rows.length}명` : '');
-    $('#rankLead').textContent = bm ? '숲속 대결 점수로 겨뤄요. 이름 옆 메달은 지금까지 오른 가장 높은 리그예요. 공부 탭의 숲속 대결에서 이기면 점수가 올라요.' : wk ? '이번 주에 한 일로 겨뤄요. 오늘의 미션 10점, 미션 보너스 20점, 학교 행사 성공 15점, 체험학습 10점(1시간마다 +5), 종업식 20점, 퀘스트 3점이에요. 학교가 작아도 똑같이 겨룰 수 있어요.'
+    if (!sea) $('#rankLead').textContent = bm ? '숲속 대결 점수로 겨뤄요. 이름 옆 메달은 지금까지 오른 가장 높은 리그예요. 공부 탭의 숲속 대결에서 이기면 점수가 올라요.' : wk ? '이번 주에 한 일로 겨뤄요. 오늘의 미션 10점, 미션 보너스 20점, 학교 행사 성공 15점, 체험학습 10점(1시간마다 +5), 종업식 20점, 퀘스트 3점이에요. 학교가 작아도 똑같이 겨룰 수 있어요.'
       : '학교 파워로 순위를 매겨요. 시설, 가구, 선생님, 수료증, 꾸미기처럼 쌓아 온 것이 모두 들어가요.';
     // 참여하기와 이름 바꾸기
     const join = $('#rankJoin'), key = `${Rank.state}|${Rank.readOnly}|${S.rank.joined}|${S.rank.name}|${rt.rankEdit ? 1 : 0}|${Cloud.state}|${Cloud.err}|${nickPrice()}|${S.gold >= nickPrice()}`;
@@ -9926,9 +9973,14 @@ span.bt-stamp{display:none}.bt-duel.done span.bt-stamp{display:grid}
         $('#rankName', join).value = S.rank.name;
       }
     }
+    // 2.1.3 다른 학교 구경: 내 학교 보여 주기(처음에는 꺼짐)와 예시 학교
+    { const lk = $('#rankLook'), can = Rank.state === 'on' && !Rank.readOnly && S.rank.joined && !tossRank() && !!(Rank.be && Rank.be.lookPut), k2 = `${can}|${S.lk.on}|${Rank.noLook ? 1 : 0}`;
+      if (lk && lk.dataset.key !== k2) { lk.dataset.key = k2;
+        lk.innerHTML = (can ? `<label class="rl-on"><input type="checkbox" id="lookOn"${S.lk.on ? ' checked' : ''}><span><b>내 학교 보여 주기</b><small>${S.lk.on ? (Rank.noLook ? '서버 준비 중이에요. 준비되면 저절로 올라가요' : '랭킹에서 다른 교장 선생님이 내 학교 지도를 구경할 수 있어요') : '켜면 랭킹에서 내 학교 지도를 구경할 수 있어요'}</small></span></label>` : '') +
+          `<button class="btn-sub rl-model" type="button" data-look="model">예시 학교 구경하기</button><p class="fine">랭킹의 학교 이름을 누르면 그 학교를 구경해요(보여 주기를 켠 학교만)</p>`; } }
     // 순위표: 이름은 다른 사람이 적은 글이라 textContent로만 넣어요
     const list = $('#rankList'), rows = Rank.state === 'on' ? R : [];
-    const lkey = mode + rows.map(r => `${r.id}:${r.score}:${r.lp}:${r.bt}:${r.btm}:${r.name}:${r.tier}:${r.year}:${r.test ? 1 : 0}:${r.title}`).join('|') + `|${Rank.uid}|${S.units}|${S.ach ? S.ach.title : ''}`;
+    const lkey = mode + rows.map(r => `${r.id}:${r.score}:${r.lp}:${r.sp}:${r.bt}:${r.btm}:${r.name}:${r.tier}:${r.year}:${r.test ? 1 : 0}:${r.title}`).join('|') + `|${Rank.uid}|${S.units}|${S.ach ? S.ach.title : ''}`;
     if (list.dataset.key !== lkey) {
       list.dataset.key = lkey;
       list.textContent = '';
@@ -9956,7 +10008,8 @@ span.bt-stamp{display:none}.bt-duel.done span.bt-stamp{display:grid}
         txt.append(nm, sc);
         const b = document.createElement('b');
         b.className = 'rk-score';
-        b.textContent = fmt(bm ? r.bt : wk ? r.lp : r.score);
+        b.textContent = fmt(sea ? r.sp : bm ? r.bt : wk ? r.lp : r.score);
+        li.dataset.look = r.id; li.dataset.who = r.name; li.classList.add('can-look');   // 2.1.3 누르면 그 학교 구경
         li.append(no, txt, b);
         li.setAttribute('aria-label', `${i + 1}위 ${r.name}, ${rankSchool(r.tier, r.year, r.sem)}, ${bm ? `대결 점수, ${BT_LG[Math.max(0, Math.min(5, r.btm | 0))].n} 리그` : wk ? '리그 점수' : '학교 파워'} ${fmt(bm ? r.bt : wk ? r.lp : r.score)}`);
         list.appendChild(li);
@@ -9964,7 +10017,7 @@ span.bt-stamp{display:none}.bt-duel.done span.bt-stamp{display:grid}
     }
     const empty = $('#rankEmpty');
     empty.hidden = tossRank() || !(Rank.state === 'on' && rows.length === 0);
-    if (!empty.hidden) empty.textContent = bm ? '아직 대결 순위에 오른 학교가 없어요. 숲속 대결에서 첫 번째가 되어 보세요!' : '아직 랭킹에 이름을 올린 교장 선생님이 없어요. 첫 번째가 되어 보세요!';
+    if (!empty.hidden) empty.textContent = sea ? (Rank.noSk ? '시즌 순위는 서버 준비 중이에요. 시즌 점수는 지금도 모이고 있어요.' : '아직 이번 시즌 순위에 오른 학교가 없어요. 주간 리그 점수를 모아 첫 번째가 되어 보세요!') : bm ? '아직 대결 순위에 오른 학교가 없어요. 숲속 대결에서 첫 번째가 되어 보세요!' : '아직 랭킹에 이름을 올린 교장 선생님이 없어요. 첫 번째가 되어 보세요!';
   }
 
   /* ---------- 황금 도토리와 꾸미기 상점 ----------
@@ -10671,6 +10724,7 @@ span.bt-stamp{display:none}.bt-duel.done span.bt-stamp{display:grid}
     ['늦가을 도토리', 'pass_deco_s13', '도토리 미끄럼틀', 'pass_fur_s13', '도토리 책장']
   ];
   const psDecoId = n => 'ps_' + n, psFurId = n => 'psf_' + n;
+  [['winter', '눈꽃 트로피'], ['spring', '벚꽃 트로피'], ['summer', '파도 분수 트로피'], ['autumn', '단풍 도토리 조각상']].forEach(([q, nm]) => DECO.push({ id: 'rs_' + q, name: nm, ess: 0, img: 'season_' + q, rare: 1, ev: 1, rs: 1 }));   // 2.1.3 랭킹 시즌 기념 장식
   PS_SEASONS.forEach((x, n) => { if (x[1]) DECO.push({ id: psDecoId(n), name: x[2], ess: 0, img: x[1], rare: 1, ev: 1, ps: 1 }); });   // 2.1.3 숲속 패스 한정 장식
   for (const [k, name, sm] of EV_DECO) DECO.push({ id: 'ev_' + k, name, ess: 0, img: 'evd_' + k, rare: 1, ev: 1, ...(sm ? { sm: 1 } : {}) });
   const evDecoArt = d => !!(d && d.ev && IMG(d.img));
@@ -13066,23 +13120,30 @@ span.bt-stamp{display:none}.bt-duel.done span.bt-stamp{display:grid}
     if (t === S.tier || t == null) { tierViewClose(); return; }
     if (!(t >= 0 && t < S.tier)) { toast(`${TIER_ALL[t] || '그 학교급'}은 아직 갈 수 없어요`); return; }
     if (rt.decoEdit) decoEditEnd();
-    rt.viewTier = t; rt.viewEdit = false; sfx('tap');
+    rt.viewTier = t; rt.viewEdit = false; rt.lookData = null; sfx('tap');
     renderTierView(true); renderTierDots();
   }
   function tierViewClose() {
     if (rt.viewTier == null) return;
-    rt.viewTier = null; rt.viewEdit = false;
+    rt.viewTier = null; rt.viewEdit = false; rt.lookData = null;   // 2.1.3 구경도 닫아요
     $('#tierView').hidden = true; renderTierDots();
   }
   function renderTierView(force) {
     const box = $('#tierView'); if (!box) return;
     const t = rt.viewTier; if (t == null) { box.hidden = true; return; }
-    const gi = geoIdx(t), G = GEO[gi], x = snapOf(t), L = S.deco.lay[gi], edit = !!rt.viewEdit;
-    const key = [t, gi, L.join(), S.deco.nm, edit, JSON.stringify(x.f)].join('|');
+    // 2.1.3 다른 학교 구경(rt.lookData): 그 학교가 올린 모습으로, 보기만 해요. 예시 학교는 늘 '예시'라고 적어요
+    const LD = rt.lookData || null;
+    const gi = geoIdx(t), G = GEO[gi], x = LD ? { f: LD.f, bs: LD.bs, st: LD.st, at: 0, roster: LD.kids.map(sp => ({ sp })) } : snapOf(t), L = LD ? LD.lay : S.deco.lay[gi], edit = !LD && !!rt.viewEdit;
+    const schNm = LD ? (LD.model ? '본보기(예시)' : LD.nm) : S.deco.nm;
+    const key = [t, gi, L.join(), schNm, edit, JSON.stringify(x.f), LD ? (LD.who || '') + LD.vd : ''].join('|');
     box.hidden = false;
-    $('#tvTitle').textContent = `${S.deco.nm || '숲속'} ${TIER_ALL[t]} 시절 모습`;
-    $('#tvSub').textContent = x.all ? '그때는 사진을 남기지 않아서 모두 지어진 모습으로 보여요' : `${x.at ? kstDay(x.at) + ' 졸업식, ' : ''}학생 ${fmt(x.st)}명`;
+    box.classList.toggle('tv-visit', !!LD); box.classList.toggle('tv-model', !!(LD && LD.model));   // .look은 다른 곳에서 숨김 이름이라 tv-visit
+    $('#tvTitle').textContent = LD ? (LD.model ? `[예시] 본보기 숲속 ${TIER_ALL[t]}` : `${LD.who} 교장 선생님의 ${LD.nm || '숲속'} ${TIER_ALL[t]}`) : `${S.deco.nm || '숲속'} ${TIER_ALL[t]} 시절 모습`;
+    $('#tvSub').textContent = LD ? (LD.model ? '예시로 꾸민 학교예요. 실제 교장 선생님의 학교가 아니에요' : `${TIERS[t].unit === '년째' ? '' : `${LD.y}${TIERS[t].unit}, `}학생 ${fmt(LD.st)}명${LD.rare.length ? `, 반짝 친구 ${LD.rare.length}명` : ''}${LD.vd ? `, 마을 기부 ${LD.vd}단계` : ''}${LD.ti && achTitleName(LD.ti) ? `, 칭호 ${achTitleName(LD.ti)}` : ''}`)
+      : x.all ? '그때는 사진을 남기지 않아서 모두 지어진 모습으로 보여요' : `${x.at ? kstDay(x.at) + ' 졸업식, ' : ''}학생 ${fmt(x.st)}명`;
     $('#tvEdit').textContent = edit ? '다 했어요' : '꾸미기';
+    $('#tvEdit').hidden = !!LD;
+    $('#tvMark').innerHTML = LD && LD.mk && markOk(LD.mk) ? markHTML(LD.mk, '') : '';
     if (!force && box.dataset.key === key) return; box.dataset.key = key;
     const mapU = IMG170(mapKey(G.map));
     box.style.setProperty('--map-bg', mapU ? `url("${mapU}")` : 'none');
@@ -13099,7 +13160,7 @@ span.bt-stamp{display:none}.bt-duel.done span.bt-stamp{display:grid}
     { const [ncx, ncy, nw] = lotRect(G.nextLot, G.nextKey); items.push({ y: ncy, s: `<image href="${IMG170(seasonKey(G.next.img))}" x="${(ncx - nw / 2).toFixed(1)}" y="${(ncy - nw / 2).toFixed(1)}" width="${nw.toFixed(1)}" height="${nw.toFixed(1)}" opacity=".85"/>` }); }
     { const [ox, oy] = G.oak; items.push({ y: oy + 20, s: `<image href="${IMG170(oakKey()) || IMG('deco_autumn_1')}" x="${ox - 34}" y="${oy - 41}" width="68" height="65"/>` }); }
     // 장식과 간판
-    const [sx, sy] = DECO_SIGN[gi], sw = 84, sh = 42, nm = S.deco.nm || '숲속', tn = TIER_ALL[t];
+    const [sx, sy] = DECO_SIGN[gi], sw = 84, sh = 42, nm = schNm || '숲속', tn = TIER_ALL[t];
     if (IMG('sign_board')) items.push({ y: sy, s: `<g class="deco-sign"><image x="${sx - sw / 2}" y="${sy - sh * 0.97}" width="${sw}" height="${sh}" href="${IMG('sign_board')}"/>` +
       `<text class="deco-sign-t" x="${sx}" y="${sy - sh * 0.6}" style="font-size:${Math.min(10, 52 / Math.max(1, nm.length)).toFixed(1)}px">${esc(nm)}</text><text class="deco-sign-t" x="${sx}" y="${sy - sh * 0.36}" style="font-size:${Math.min(9, 52 / tn.length).toFixed(1)}px">${tn}</text></g>` });
     DECO_SLOTS[gi].forEach(([dx, dy], i) => {
@@ -14572,6 +14633,7 @@ span.bt-stamp{display:none}.bt-duel.done span.bt-stamp{display:grid}
     if (!(p > 0)) return;
     lgWeek();
     S.lg.pts += Math.round(p);
+    rsAdd(p);   // 2.1.3 랭킹 시즌 점수
     rankDirty();
   }
   const lgKey = () => weekIdx() * 1e6 + Math.min(999999, S.lg.pts);
@@ -16204,6 +16266,9 @@ span.bt-stamp{display:none}.bt-duel.done span.bt-stamp{display:grid}
       toast(S.units === 'en' ? '큰 숫자를 K, M, B로 줄여 써요' : '큰 숫자를 만, 억, 조로 줄여 써요');
     });
     $('#rankView').addEventListener('click', e => { const b = e.target.closest('[data-rv]'); if (!b) return; rt.rankView = b.dataset.rv; sfx('tap'); renderRankPanel(); });
+    $('#rankLook').addEventListener('click', e => { const b = e.target.closest('[data-look]'); if (b) openLook(b.dataset.look); });   // 2.1.3 예시 학교
+    $('#rankLook').addEventListener('change', e => { if (e.target.id === 'lookOn') lookSet(e.target.checked); });
+    $('#rankList').addEventListener('click', e => { const li = e.target.closest('li[data-look]'); if (li) openLook(li.dataset.look, li.dataset.who); });   // 2.1.3 순위 줄을 누르면 그 학교 구경
     $('#rankJoin').addEventListener('click', e => {
       const b = e.target.closest('[data-rank]');
       if (!b || b.tagName === 'FORM') return;
@@ -17234,6 +17299,7 @@ span.bt-stamp{display:none}.bt-duel.done span.bt-stamp{display:grid}
     const tr = $('#psTrack'), cur = tr && tr.children[Math.max(0, lv - 2)]; if (tr && cur) tr.scrollLeft = cur.offsetLeft - 8;
   }
   VD.titles.push({ id: 'psnew', title: '패스 새내기', got: d => !!(d && d.ps && d.ps.badge >= 1) });   // 2.1.3 패스 10단계 첫 배지
+  VD.titles.push({ id: 'seasonking', title: '숲속 시즌 왕', got: d => !!(d && d.rs && d.rs.king >= 1) }, { id: 'fourseason', title: '사계절 교장', got: d => !!(d && d.deco && d.deco.own && ['winter', 'spring', 'summer', 'autumn'].every(q => d.deco.own['rs_' + q])) });   // 2.1.3 랭킹 시즌
   /* ===== 2.1.3 숲속 패스 END ===== */
   /* ===== 2.1.3 반짝 친구 BEGIN (시즌 설계안 3절, 지섭 확정) =====
      종업식과 졸업식마다 5% 확률로 아직 못 만난 반짝 친구가 와요. 12번 연속 못 만나면 다음 번은 꼭.
@@ -17276,6 +17342,88 @@ span.bt-stamp{display:none}.bt-duel.done span.bt-stamp{display:grid}
         return `<div class="dex-card rare${on ? ' on' : ' off'}" aria-label="${on ? x.name : '아직 못 만난 반짝 친구'}"><span class="dex-pic">${on && im ? `<img src="${im}" alt="">` : pic7('dex_unknown')}</span>${on && bd ? `<img class="rare-bd" src="${bd}" alt="">` : ''}<b>${on ? x.name : '???'}</b><small>${on ? '등록' : '미등록'}</small></div>`; }).join('') + '</div>';
   }
   /* ===== 2.1.3 반짝 친구 END ===== */
+  /* ===== 2.1.3 랭킹 시즌과 다른 학교 구경 BEGIN (시즌 설계안 2, 4절, 지섭 확정) =====
+     랭킹 시즌: 계절마다(겨울 12~2월, 봄 3~5월, 여름 6~8월, 가을 9~11월) 주간 리그 점수를 모아요. 2026 겨울이 시즌 1.
+     시즌 점수 300점이면 그 계절 기념 장식, 시즌 순위 1~3위는 칭호 '숲속 시즌 왕', 기념 장식 넷을 다 모으면 '사계절 교장'.
+     다른 학교 구경: 교장 선생님이 '내 학교 보여 주기'를 켠 학교만 서버(forest/look)에 학교 모습을 올려요. 처음에는 꺼져 있어요.
+     예시 학교: 게임 안에 들어 있는 예쁘게 꾸민 본보기 학교. 누가 봐도 예시인 걸 알게 이름과 띠에 늘 적어요 */
+  const RS = { min: 300, startKey: 2027 * 4, look: 600000 };   // 2027*4 = 2026년 12월~2027년 2월 겨울
+  const rsKeyOf = day => { const [y, m] = day.split('-').map(Number); return (m === 12 ? y + 1 : y) * 4 + (m === 12 || m <= 2 ? 0 : m <= 5 ? 1 : m <= 8 ? 2 : 3); };
+  const rsNum = day => { const k = rsKeyOf(day || gameToday()); return k < RS.startKey ? 0 : k - RS.startKey + 1; };
+  const rsQ = n => (RS.startKey + n - 1) % 4;
+  const rsLabel = n => { const k = RS.startKey + n - 1, y = Math.floor(k / 4), q = k % 4; return q === 0 ? `${y - 1}~${String(y).slice(2)} 겨울 시즌` : `${y} ${RS_Q[q][1]} 시즌`; };
+  const rsOn = () => !!S && !!S.rs && rsNum() >= 1;
+  function rsAdd(p) { if (!rsOn()) return; rsSync(); S.rs.p += Math.round(p); }
+  function rsSync() {
+    if (!S || !S.rs) return;
+    const n = rsNum();
+    if (n === S.rs.n) return;
+    const old = S.rs.n, items = [];
+    if (old >= 1 && S.rs.p >= RS.min) {
+      const id = 'rs_' + RS_Q[rsQ(old)][0];
+      if (DECO_BY[id] && !decoOwn(id)) { S.deco.own[id] = 1; items.push({ ic: '🎁', t: `기념 장식 '${DECO_BY[id].name}'` }); }
+      else { addGold(1); items.push({ ic: 'gold', t: '황금 도토리 +1 (기념 장식은 이미 있어요)' }); }
+    }
+    if (old >= 1 && S.rs.pos >= 1 && S.rs.pos <= 3 && S.rs.p > 0) { S.rs.king += 1; items.push({ ic: '🏆', t: `시즌 순위 ${S.rs.pos}위! 칭호 '숲속 시즌 왕'` }); }
+    if (items.length) showReward({ title: `${rsLabel(old)}이 끝났어요`, sub: `시즌 점수 ${fmt(S.rs.p)}점`, items });
+    S.rs.n = n; S.rs.p = 0; S.rs.pos = 0;
+  }
+  const RS_Q = [['winter', '겨울', 'season_winter', '눈꽃 트로피'], ['spring', '봄', 'season_spring', '벚꽃 트로피'], ['summer', '여름', 'season_summer', '파도 분수 트로피'], ['autumn', '가을', 'season_autumn', '단풍 도토리 조각상']];
+  // 2.1.3 다른 학교 구경에 올리는 내 학교 모습(4,000자 안)
+  function lookDoc() {
+    const gi = geoIdx(S.tier), f = {}, bs = {};
+    for (const k of Object.keys(FAC)) if ((FAC[k].tier || 0) <= S.tier) { f[k] = Math.min(999, S.f[k] | 0); bs[k] = S.bs ? (S.bs[k] | 0) : S.tier; }
+    const kids = (rosterOn() && S.roster.list.length ? S.roster.list.map(x => x.r ? x.sp + '_rare' : x.sp) : speciesList().map(sp => rareGot(sp) ? sp + '_rare' : sp)).slice(0, 8);
+    return JSON.stringify({ v: 1, t: S.tier, y: yearNo(), nm: S.deco.nm || '', mk: S.deco.mk || null, ti: S.ach ? S.ach.title : '', f, bs, lay: S.deco.lay[gi].slice(0, 11), st: Math.floor(S.students), rare: S.rare.got.slice(), vd: S.vd.lv, kids });
+  }
+  // 남이 올린 글은 그대로 믿지 않고 모양을 확인해요
+  function lookRead(raw) {
+    let d = null; try { d = typeof raw === 'string' && raw.length <= 4000 ? JSON.parse(raw) : null; } catch (e) { d = null; }
+    if (!d || typeof d !== 'object') return null;
+    const t = Number.isInteger(d.t) && d.t >= 0 && d.t < Math.min(TIERS.length, GEO.length) ? d.t : 0, f = {}, bs = {};
+    for (const k of Object.keys(FAC)) { f[k] = Math.max(0, Math.min(999, Math.floor(Number(d.f && d.f[k]) || 0))); bs[k] = Math.max(0, Math.min(9, Math.floor(Number(d.bs && d.bs[k]) || 0))); }
+    const lay = Array.from({ length: DECO_SLOTS[geoIdx(t)].length }, (_, i) => { const id = Array.isArray(d.lay) ? d.lay[i] : ''; return typeof id === 'string' && DECO_BY[id] ? id : ''; });
+    const okSp = sp => typeof sp === 'string' && (DEX_STUDENTS.includes(sp) || (sp.endsWith('_rare') && RARE.list.some(x => x.sp + '_rare' === sp)));
+    return { t, y: Math.max(1, Math.min(9, Math.floor(Number(d.y) || 1))), nm: cleanSchoolNm(d.nm), mk: markOk(d.mk) ? d.mk : null, ti: typeof d.ti === 'string' && achTitleName(d.ti) ? d.ti : '', f, bs, lay,
+      st: Math.max(0, Math.min(1e7, Math.floor(Number(d.st) || 0))), rare: (Array.isArray(d.rare) ? d.rare : []).filter(sp => RARE.list.some(x => x.sp === sp)).slice(0, 6),
+      vd: Math.max(0, Math.min(9999, Math.floor(Number(d.vd) || 0))), kids: (Array.isArray(d.kids) ? d.kids : []).filter(okSp).slice(0, 8) };
+  }
+  // 예시 학교(지섭 요청 2026-10-30): 서버 없이 누구나 볼 수 있어요. 이름과 띠에 '예시'를 늘 적어요
+  const MODEL_SCHOOL = { model: true, who: '숲속 학교 예시', t: 2, y: 3, nm: '본보기', mk: [0, 0, 3, 2], ti: '',
+    f: { classroom: 60, cafeteria: 55, library: 55, playground: 55, science: 50, store: 50 }, bs: { classroom: 3, cafeteria: 3, library: 3, playground: 3, science: 3, store: 3 },
+    lay: ['fountain', 'flowerbed', 'arch', 'swingtree', 'pond', 'clock', 'crystal', 'streetlamp', 'bench', 'rainbow', 'owl'], st: 240, rare: ['rabbit', 'fox', 'chick'], vd: 8,
+    kids: ['rabbit_rare', 'fox_rare', 'chick_rare', 'bear', 'panda', 'dog', 'cat', 'otter'] };
+  async function lookPush(force) {
+    if (!S || !S.lk || !S.lk.on || !S.rank.joined || Rank.state !== 'on' || Rank.readOnly || !Rank.be || !Rank.be.lookPut || S.u.dev) return;
+    const d = lookDoc();
+    if (!force && (d === S.lk.h || Date.now() - (S.lk.at || 0) < RS.look)) return;
+    try { await Rank.be.lookPut(d); S.lk.at = Date.now(); S.lk.h = d; save(); }
+    catch (e) { if (/permission/i.test(String((e && (e.code || e.message)) || ''))) Rank.noLook = true; }
+  }
+  async function lookSet(on) {
+    S.lk.on = !!on; S.lk.h = ''; save(); sfx('tap');
+    if (on) { await lookPush(true); toast(Rank.noLook ? '서버가 아직 준비 중이라 지금은 올리지 못했어요. 준비되면 저절로 올라가요' : '랭킹에서 다른 교장 선생님이 내 학교를 구경할 수 있어요'); }
+    else { try { if (Rank.be && Rank.be.lookDel) await Rank.be.lookDel(); } catch (e) { /* 다음에 다시 */ } toast('내 학교를 보여 주지 않아요'); }
+    renderRankPanel();
+  }
+  async function openLook(id, who) {
+    if (!S) return;
+    let data = null;
+    if (id === 'model') data = MODEL_SCHOOL;
+    else if (id === Rank.uid) data = Object.assign(lookRead(lookDoc()), { who: S.rank.name, me: true });
+    else {
+      if (!Rank.be || !Rank.be.lookGet) { toast('다른 학교 구경은 서버에 연결된 판에서 열려요'); return; }
+      try { const v = await Rank.be.lookGet(id); data = v && typeof v.d === 'string' ? lookRead(v.d) : null; } catch (e) { data = null; }
+      if (!data) { toast('이 학교는 모습을 보여 주지 않아요'); return; }
+      data.who = who || '교장 선생님';
+    }
+    sfx('tap'); setTab('school');
+    if (rt.decoEdit) decoEditEnd();
+    rt.lookData = data; rt.viewTier = data.t; rt.viewEdit = false;
+    renderTierView(true); renderTierDots();
+  }
+  /* ===== 2.1.3 랭킹 시즌과 다른 학교 구경 END ===== */
+
   function renderEvent() {
     const body = $('#evBody');
     if (!body || !S) return;
@@ -18444,7 +18592,7 @@ span.bt-stamp{display:none}.bt-duel.done span.bt-stamp{display:grid}
     rosterEnsure, rosterMake, rosterAdd, clubAuto, clubSet, clubPct, clubShow, clubSum, clubStars, clubMembers, clubShowGo, showReady, showWait, showDay, clubWeekTick, clubFacUp, CLUBS, CLUB, star, clubTuitionMult, clubFestMult, clubDecoOff, renderClub, renderHall, openSeatPick, openClubPick,
     TIER_SCALE, legacyMult, tuitionMult, snapTake, snapOf, tierViewOpen, tierViewClose, renderTierView, renderTierDots, viewMap, showNewTalk, talkNext, showCere, cereEnd, cereCrew, cereAsk, cereKeep, goFur, updateQuestDot, openElect, renderElect, elVote, elSync, elMult, elClub, elPres, elBadge, elMake, EL_PLEDGES, clubPct, festPrize, dropValue, claimMission, gameWeek, NEWCOMERS, TIERS, GEO, geoIdx, decoCost0, qMeasure, qDone, qGoal, kidArt: kidSVG, newYear, checkGrade, gradeOf, townRep, FAC, sanitize200, trialHunt, updateTrial, TRIAL, zoomAt, fitMap, ZOOM_MAX, DECO, DECO_SLOTS, DECO_SIGN, decoCost, decoSoldOut, pickDeco, buyDeco, decoPut, decoEditStart, decoEditEnd, openDecoPick, renderDeco, setSchoolNm, setMark, schoolTitle, markHTML, decoPlacedAll, esExLeft, esExCost, get Cloud() { return Cloud; }, get actx() { return actx; }, Music, musicSync, ensureAudio, bgmLoad, pzUI, rt, makeDeal, furStage, DEAL, navInfo, navRoute, spawnDrop, repTipCheck, linkGoogle, retryCloud, sanitize, acctPending, renderMap, renderHUD, renderAffordance, syncKids, layoutMap, geo, hitTrial, endVisit, showReward, recommend, needCost, prepTopUp, qReward, prepPhase, rankScore, pwOf, previewDip, dipMult, costScale, buyFur, buyFurAll, furCost, furReady, furDone, FUR, startTalk, endTalk, teacherAct, facCost, teaCost, facKeys, rate, rep, capacity, canGraduate, canPromote,
     fmt, fmt2, graduate, promote, buyPerk, perkCost, perkMaxed, buyFundPerk, fpCost, claimMain, mainReady, curMain, qNo, earn, CFG, TEA, teaMaxed, PERKS, FPERKS, MAIN, finalYear, startTrip, claimTrip, TRIPS, yearLocked, endSports, rtSports: () => rt.sports, rtFest: () => rt.fest, facCap, addLeague, addMP, tutStart, endFest, claimBox, musicWant, askBox, festWait, setTab,
-    RARE, rareRoll, rareGot, showRareTalk, rareDexHTML, kidSVG, rosterKid, PS, PS_M, PS_SEASONS, psSeason, psOpen, psSync, psLv, psGot, psReward, psClaimAll, psClaimMission, psWatchAd, psClaimable, psStepReady, psExtraReady, psChooseFur, psFurImg, renderPass, setEvSeg, xtGot, achTitles,   // 2.1.3 숲속 패스
+    RARE, rareRoll, rareGot, showRareTalk, rareDexHTML, kidSVG, rosterKid, RS, rsNum, rsSync, rsAdd, rsLabel, lookDoc, lookRead, lookPush, lookSet, openLook, MODEL_SCHOOL, joinRank, PS, PS_M, PS_SEASONS, psSeason, psOpen, psSync, psLv, psGot, psReward, psClaimAll, psClaimMission, psWatchAd, psClaimable, psStepReady, psExtraReady, psChooseFur, psFurImg, renderPass, setEvSeg, xtGot, achTitles,   // 2.1.3 숲속 패스
     dexMeet, dexSync, dexPending, dexGift, renderDex, evCurrent, evNext, evUpcoming, evSync, evFix, evVal, EV_FALLBACK, EV_DECO, EV_HAT, COS, DECO_BY, decoOwn, perkRec, fpRec, BOOST_ALL, buyShop, pickShop, showNote, showOkOn, showWd, renderGradPanel, renderShop, renderDecoShop, EV_WEEKLY, EV_WEEK_BASE, weekMon, claimStamp, claimEvMission, claimEvBox, renderEvent, evMissions, evOk, evSkipped, EV_MONTHS, EV_MEASURE, tierMinutes, minAcorns, IMG, sanitize171, ACH, achSync, claimAch, setTitle, renderAch, setDexSeg, achClaimable, XT, xtAct, xtCost, xtLv, feastMins, libMult, propInstances, walkBuild, festItemSvg, guestArt, adErrText, googleErrText, openSheet, closeSheet, startFest, startSports, sanitize170, EV_STAMPS, EV_SPECIAL, EV_MONTHLY, EV_BOX, DEX_KEYS, DEX_REWARD, DEX_GUEST_KEYS, seasonKey, roofArtKey, oakKey, setSeasonArt, VP, vpLv, vpCost, vpMult, vpAct, renderVpCard, sportsPrize, festPrize, renderTeachers, buildTeacherCards, bldImg, roofKey, bldStage, mapKey, setMapArt, applyThemes, buyFacility, bldFx, setBldFx, mapHi, Live, liveApply, liveLoad, liveOff, LIVE_KEYS, EVC, NOTICES, openNotice, noticeAuto, noticeWant, ntUnread, startTrial, endTrial: () => rt.trial && (rt.trial.left = 0), spawnDeal, startVisit, IMG170, MG, mgCells, mgSetCells, mgTick, mgAddEnergy, mgAddUp, mgTapGen, mgDrop, mgSell, mgUpgrade, mgClaimOrder, mgSwapOrder, mgOrderOk, mgFillOrders, mgOpen, mgClose, mgRenderAll, mgSpawnLevel, mgNearestEmpty, mgEmptyBoard, mgOrderReward, mgUI, sanitize180, mgWatchAd, mgNewOrder, mgHintPick, mgShowHint, mgClearHint, mgTouch, mgOrderGuide, mgDexN, mgDexCan, mgDexClaim, mgOpenDex, MG_DEX, MG_DEX_MS, mgDexEss, mgDexEssCan, mgDexEssN, mgDexMsCan, mgDexMsClaim, MGB, mgBuyBoost, mgBstLeft, mgOpenBoost, nice, claimMission, claimBonus, claimWeekMission, MP_BOX,   // 1.7.0 도감, 이벤트
     PZ, PZ_SHAPES, pzFits, pzAnyFit, pzStuck, pzFullLines, pzPlace, pzFreshGame, pzStart, PZB, pzbCost, pzApplyBoost, pzBoostOpen, pzBoostGo, festGoldLeft, festGoldTake, claimSports, renderStreet, pzFinish, pzLeft, pzCanAd, pzEssOf, pzMinOf, pzHelpSquirrel, pzHelpOwl, pzHelpBear, fillSubs, mapRoofTop, showAd, claimOfflineDouble, startBoost, tripAd, festFocus, festRange, visMap, renderMissions, pzHasHelp, pzRot, pzNewPiece, pzOpen, pzClose, pzGameOver, pzRenderAll, renderMini, addEss, ESHOP, SP_FUR, applyCos, essItem, pickEss, buyEss, renderEssShop, hatSVG, spFurImg, gameNow, gameToday, gameWeek, kstDay, setServerTime, SVR, dmDay, weekIdx, lgWeek, wkWeek, lgKey, pzDay, goldDay, boostLeft, dealLeft, canStamp };
   if (window.claude && window.claude.hot && window.claude.hot.snapshot) {
