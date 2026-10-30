@@ -1991,6 +1991,7 @@ body{background:radial-gradient(120% 60% at 50% 0%, color-mix(in srgb, var(--pap
 .cg-tab li img,.cg-tab li .smark{width:22px;height:22px;object-fit:contain}.cg-tab .cg-rk{font-weight:700;text-align:center}.cg-tab li:nth-child(-n+3) .cg-rk{color:#B5651D}
 .cg-clubs{display:flex;flex-wrap:wrap;justify-content:center;gap:4px 10px;margin:8px 10px 4px;font-size:12px;font-weight:700}.cg-clubs span{display:inline-flex;align-items:center;gap:2px}
 .cg-prac{display:block;margin:6px auto 4px}.cg-note{display:block;margin:0 12px;font-size:11px;opacity:.75;line-height:1.4}
+.bak-row{display:flex;align-items:center;gap:8px;padding:8px 4px;border-bottom:1px solid var(--line)}.bak-row .txt{flex:1;min-width:0;display:grid}.bak-row small{opacity:.75;font-size:11.5px}
 .gd-head{background-color:#E3EFC9}
 .gd-head.noimg{height:58px}.gd-head.noimg b{right:0;width:100%}
 .gd-body{max-height:min(62vh,560px);overflow-y:auto;padding:0 12px}
@@ -3228,6 +3229,7 @@ span.bt-stamp{display:none}.bt-duel.done span.bt-stamp{display:grid}
         <button class="srow" type="button" id="optPLetter"><span class="txt"><b>학부모 편지함</b><small id="plSub">까치 우체부가 학부모 편지를 가져와요</small></span><svg viewBox="0 0 24 24" width="20" height="20" aria-hidden="true"><path d="M9 6l6 6-6 6" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"/></svg></button><!-- 2.1.3 -->
         <button class="srow" type="button" id="optNotice"><img class="srow-ic" id="ntIc" alt="" hidden><span class="txt"><b>공지사항<i class="nt-dot" id="ntDot" hidden></i></b><small id="ntSub">업데이트 소식과 알림을 봐요</small></span><svg viewBox="0 0 24 24" width="20" height="20" aria-hidden="true"><path d="M9 6l6 6-6 6" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"/></svg></button>
         <button class="srow" type="button" id="optTut"><span class="txt"><b>튜토리얼</b><small id="tutSub">학교를 꾸려 가는 방법을 다시 봐요</small></span><svg viewBox="0 0 24 24" width="20" height="20" aria-hidden="true"><path d="M9 6l6 6-6 6" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"/></svg></button>
+        <div class="srow" id="bakRow"><span class="txt"><b>예전 학교 되돌리기</b><small>바뀌거나 덮이기 전 학교를 3개까지 남겨 둬요</small></span><button class="btn-sub" type="button" id="optBak">보기</button></div><!-- 2.2.0 -->
         <div class="srow" id="resetRow"><span class="txt"><b>처음부터 다시</b><small>수료증과 전학 온 친구들까지 모두 지워요</small></span><button class="btn-danger" type="button" id="optReset">초기화</button></div>
         <div class="srow" id="delRow" hidden><span class="txt"><b>계정과 서버 기록 지우기</b><small>서버에 저장된 학교, 랭킹, 구글 계정 연결을 모두 지워요</small></span><button class="btn-danger" type="button" id="optDel">지우기</button></div>
         <div class="confirm" id="delConfirm" hidden>
@@ -3892,8 +3894,30 @@ span.bt-stamp{display:none}.bt-duel.done span.bt-stamp{display:grid}
   <section class="modal" role="alertdialog" aria-modal="true" aria-labelledby="acctAskTitle">
     <h2 id="acctAskTitle">이 구글 계정에 학교가 있어요</h2>
     <div class="move-from"><b id="acctFrom"></b><span id="acctInfo"></span></div>
-    <p>어느 학교로 이어 할까요? 고르지 않은 학교는 지워져요.</p>
+    <p>어느 학교로 이어 할까요? 고르지 않은 학교는 설정 &gt; 예전 학교 되돌리기에 남아요.</p>
     <div class="btn-row"><button class="btn-sub" type="button" id="acctKeep">이 폰 학교</button><button class="cta" type="button" id="acctLoad">계정 학교</button></div>
+  </section>
+</div>
+
+<!-- 2.2.0 저장 안전 장치: 두 학교 중 고르기 -->
+<div class="overlay center" id="mPick" hidden>
+  <div class="backdrop"></div>
+  <section class="modal" role="alertdialog" aria-modal="true" aria-labelledby="pickTitle">
+    <h2 id="pickTitle">학교가 두 개예요</h2>
+    <p>이 기기의 학교와 서버의 학교가 달라요. 어느 학교로 이어 할까요? 고르지 않은 학교는 설정 &gt; 예전 학교 되돌리기에 남아요.</p>
+    <div class="move-from"><b>이 기기 학교</b><span id="pickLoc"></span></div>
+    <div class="move-from"><b id="pickSrvNm">서버 학교</b><span id="pickSrv"></span></div>
+    <div class="btn-row"><button class="btn-sub" type="button" id="pickLoad">서버 학교</button><button class="cta" type="button" id="pickKeep">이 기기 학교</button></div>
+  </section>
+</div>
+<!-- 2.2.0 예전 학교 되돌리기 -->
+<div class="overlay center" id="mBak" hidden>
+  <div class="backdrop"></div>
+  <section class="modal" role="dialog" aria-modal="true" aria-labelledby="bakTitle">
+    <h2 id="bakTitle">예전 학교 되돌리기</h2>
+    <p class="fine">학교가 바뀌거나 덮이기 직전 학교를 3개까지 남겨 둬요. 되돌리면 지금 학교도 여기에 남아요.</p>
+    <div id="bakList"></div>
+    <div class="btn-row"><button class="btn-sub" type="button" id="bakClose">닫기</button></div>
   </section>
 </div>
 
@@ -9825,15 +9849,20 @@ span.bt-stamp{display:none}.bt-duel.done span.bt-stamp{display:grid}
         acctPending(false);
         if (!S.acctGift) giveAcctGift();
       }
-      if (srv && typeof srv.d === 'string' && !Cloud.skipRestore && cloudShouldRestore(srv)) {
-        const r = adoptSave(srv.d, '서버에 저장된 학교를 불러왔어요');
-        if (r === 'ok') return;
-        if (r === 'storage') throw { code: 'storage' };
-        // 서버 저장이 망가졌으면 이 기기 학교로 덮어써요
+      if (srv && typeof srv.d === 'string') {
+        // 2.2.0 저장 안전 장치: 진행이 줄어드는 쪽으로 바뀌면(서버가 더 늦게 저장했지만 덜 키운 학교이거나, 이 기기 학교가 서버보다 덜 키운 학교) 물어봐요
+        const ss = parseSave(srv.d), sp = progOf(ss), lp = progOf(S), restore = !Cloud.skipRestore && cloudShouldRestore(srv);
+        if (ss && ((restore && sp < lp) || (!restore && sp > lp)) && askPick(srv.d, restore ? '서버가 덜 키운 학교' : '이 기기가 덜 키운 학교')) return;
+        if (restore) {
+          const r = adoptSave(srv.d, '서버에 저장된 학교를 불러왔어요');
+          if (r === 'ok') return;
+          if (r === 'storage') throw { code: 'storage' };
+          // 서버 저장이 망가졌으면 이 기기 학교로 덮어써요
+        } else if (ss && ss.pid !== S.pid) bakAdd(srv.d, '덮이기 전 서버 학교');   // 다른 학교를 덮기 전에 남겨요
       }
       Cloud.state = 'on';
       renderCloudInfo();
-      cloudPush(true);
+      cloudPush(true); bakPush();   // 2.2.0 이 기기에 남긴 학교도 서버에
       rankAfterCloud();
     } catch (e) {
       if (g !== Cloud.gen) return;
@@ -9850,6 +9879,108 @@ span.bt-stamp{display:none}.bt-duel.done span.bt-stamp{display:grid}
     // 2.0.0 Codex 검토(4): 이 기기 저장 시각이 서버 시간보다 1분 넘게 미래면(기기 시계가 앞서 있었어요) 믿지 않고 서버 학교를 불러와요
     if (serverTimeOk() && (Cloud.bootSavedAt || 0) > gameNow() + 60000) return at > 0;
     return at > (Cloud.bootSavedAt || 0) + 5000;   // 2.0.0 보안 점검(1-1): 켠 뒤 이 기기에서 저장한 시각이 아니라 켤 때 저장 시각과 비교해요
+  }
+  /* ---------- 2.2.0 저장 안전 장치 (2026-10-30 지섭 결정) ----------
+     계정 하나에 서버 저장이 한 칸이라, 다른 기기의 옛 학교(초등 4학년 2학기)가 중학교 3학년 학교를 묻지 않고 덮은 일이 있었어요.
+     1) 진행(학교급, 학년, 학기)이 줄어드는 쪽으로 학교가 바뀔 때는 꼭 두 학교를 보여 주고 물어요. 고르기 전에는 서버에 올리지 않아요
+     2) 학교가 바뀌거나 덮이기 직전 학교를 이 기기(forest-school-bak)와 서버(forest/bak/<id>/0~2)에 3개까지 남겨요.
+        설정 > 예전 학교 되돌리기에서 골라 되돌려요(되돌리기 전 지금 학교도 남겨요) */
+  const BAK_KEY = 'forest-school-bak', BAK_MAX = 3;
+  const progOf = s => s && typeof s === 'object' ? (Number(s.tier) || 0) * 10000 + (Number(s.tg) || 0) * 10 + (s.sem ? 5 : 0) : 0;
+  const parseSave = d => { try { const o = typeof d === 'string' ? JSON.parse(d) : d; return o && typeof o === 'object' ? sanitize(o) : null; } catch (e) { return null; } };
+  function saveSum(s) {
+    try {
+      const T = TIERS[s.tier], y = Math.min((s.tg || 0) + 1, T.years);
+      return `${T.school} ${y}${T.unit}${s.tier >= 1 ? (s.sem ? ' 2학기' : ' 1학기') : ''}, 학교 파워 ${fmt(pwOf(s))}`;
+    } catch (e) { return '학교'; }
+  }
+  function bakList() {
+    try { const L = JSON.parse(localStorage.getItem(BAK_KEY) || '[]'); return Array.isArray(L) ? L.filter(b => b && typeof b.d === 'string' && typeof b.pid === 'string').slice(0, BAK_MAX) : []; } catch (e) { return []; }
+  }
+  const bakSame = (a, b) => a.pid === b.pid && a.prog === b.prog;
+  // 학교 하나를 남겨요. 같은 학교(번호와 진행이 같음)는 새것으로 바꾸고, 넘치면 가장 오래 남긴 것부터 빼요
+  function bakAdd(d, why) {
+    const s = parseSave(d); if (!s) return null;
+    let raw = null; try { raw = typeof d === 'string' ? JSON.parse(d) : d; } catch (er) { raw = null; }
+    const pid = raw && typeof raw.pid === 'string' && raw.pid ? raw.pid.slice(0, 16) : 'b' + (Number(raw && raw.born) || 0);   // 원래 저장의 학교 번호(읽을 때 새로 만든 번호가 아니라)
+    const e = { pid, prog: progOf(s), sum: saveSum(s), sv: Number(s.savedAt) || 0, at: Date.now(), why: String(why || '').slice(0, 40), d: typeof d === 'string' ? d : JSON.stringify(d) };
+    const L = [e, ...bakList().filter(b => !bakSame(b, e))].slice(0, BAK_MAX);
+    try { localStorage.setItem(BAK_KEY, JSON.stringify(L)); } catch (er) {
+      try { localStorage.setItem(BAK_KEY, JSON.stringify(L.slice(0, 1))); } catch (er2) { /* 저장소가 가득 찼어요 */ }
+    }
+    if (cloudOn() && !Cloud.hold) bakPush();
+    return e;
+  }
+  // 이 기기에 남긴 학교를 서버 칸 0~2에도 올려요(서버에 이미 같은 학교가 있으면 그 칸에). 켤 때와 남길 때 불러요
+  async function bakPush() {
+    if (!cloudOn() || !Cloud.db || !Cloud.uid || Cloud.bakBusy) return;
+    const L = bakList(); if (!L.length) return;
+    Cloud.bakBusy = true;
+    try {
+      const ref = Cloud.db.ref('forest/bak/' + Cloud.uid);
+      const srv = (await waitFor(ref.once('value'), CLOUD_WAIT)).val() || {};
+      const slots = [0, 1, 2].map(i => srv[i] && typeof srv[i].d === 'string' ? srv[i] : null);
+      for (const b of L.slice().reverse()) {
+        let i = slots.findIndex(x => x && x.pid === b.pid && x.prog === b.prog);
+        if (i >= 0 && slots[i].at >= b.at) continue;
+        if (i < 0) i = slots.findIndex(x => !x);
+        if (i < 0) { i = 0; slots.forEach((x, j) => { if (x.at < slots[i].at) i = j; }); }
+        const doc = { d: b.d, at: b.at, v: VERSION, pid: b.pid, prog: b.prog, sum: b.sum, sv: b.sv, why: b.why };
+        await ref.child(String(i)).set(doc); slots[i] = doc;
+      }
+    } catch (e) { /* 다음에 다시 올려요 */ }
+    Cloud.bakBusy = false;
+  }
+  async function bakAll() {
+    const L = bakList();
+    if (cloudOn() && Cloud.db && Cloud.uid) {
+      try {
+        const srv = (await waitFor(Cloud.db.ref('forest/bak/' + Cloud.uid).once('value'), CLOUD_WAIT)).val() || {};
+        for (const i of [0, 1, 2]) { const x = srv[i]; if (x && typeof x.d === 'string' && !L.some(b => b.pid === x.pid && b.prog === x.prog)) L.push({ pid: x.pid, prog: x.prog, sum: x.sum, sv: x.sv, at: x.at, why: x.why || '', d: x.d, srv: true }); }
+      } catch (e) { /* 이 기기 것만 보여요 */ }
+    }
+    return L.sort((a, b) => b.at - a.at);
+  }
+  // 두 학교 중 하나를 골라요. 고르기 전에는 서버에 올리지 않아요(Cloud.hold)
+  function askPick(srvD, why) {
+    const s = parseSave(srvD); if (!s) return false;
+    Cloud.hold = true; Cloud.state = 'hold';
+    rt.pickSave = { d: srvD, why };
+    $('#pickSrv').textContent = saveSum(s) + (s.savedAt ? `, ${agoText(s.savedAt)} 저장` : '');
+    $('#pickLoc').textContent = saveSum(S) + (S.savedAt ? `, ${agoText(S.savedAt)} 저장` : '');
+    $('#pickSrvNm').textContent = s.rank && s.rank.name ? `서버 학교 (${s.rank.name})` : '서버 학교';
+    renderCloudInfo();
+    if (rt.modalOpen) closeModal(rt.modalOpen);
+    setTimeout(() => openModal($('#mPick')), 200);
+    return true;
+  }
+  function pickKeepLocal() {
+    const P = rt.pickSave; if (!P) return;
+    rt.pickSave = null;
+    Cloud.hold = false; Cloud.state = 'on'; Cloud.fresh = true;
+    bakAdd(P.d, '고르지 않은 서버 학교');
+    closeModal($('#mPick'));
+    renderCloudInfo(); cloudPush(true); rankAfterCloud();
+    toast('이 기기 학교로 이어 해요. 서버 학교는 설정 > 예전 학교 되돌리기에 남겼어요');
+  }
+  function pickLoadSrv() {
+    const P = rt.pickSave; if (!P) return;
+    rt.pickSave = null;
+    Cloud.hold = false;
+    adoptSave(P.d, '서버 학교로 이어 해요. 이 기기 학교는 설정 > 예전 학교 되돌리기에 남겼어요');
+  }
+  async function openBak() {
+    $('#bakList').innerHTML = '<p class="lead">불러오는 중이에요</p>';
+    openModal($('#mBak'));
+    const L = await bakAll(); rt.bakL = L;
+    $('#bakList').innerHTML = L.length ? L.map((b, i) => `<div class="bak-row"><span class="txt"><b>${esc(b.sum)}</b><small>${agoText(b.at)} 남김${b.why ? `, ${esc(b.why)}` : ''}${b.srv ? ', 서버' : ''}</small></span><button class="btn-sub small" type="button" data-bak="${i}">되돌리기</button></div>`).join('')
+      : '<p class="lead">아직 남긴 학교가 없어요. 학교가 바뀌거나 덮일 때 저절로 남아요.</p>';
+  }
+  function bakRestore(i) {
+    const b = rt.bakL && rt.bakL[i]; if (!b) return;
+    if (rt.bakArm !== i) { rt.bakArm = i; toast(`한 번 더 누르면 "${b.sum}" 학교로 되돌려요. 지금 학교는 남겨 둬요`); return; }
+    rt.bakArm = -1;
+    adoptSave(b.d, '예전 학교로 되돌렸어요. 바로 전 학교는 예전 학교 되돌리기에 남겼어요');
   }
   // 구글 계정 바꾸기가 끝나지 않았다는 표시 (다시 열어도 남아요). 인자 없이 부르면 읽고, false면 지워요
   const ACCT_PENDING = 'forest-acct-pending';
@@ -9873,6 +10004,7 @@ span.bt-stamp{display:none}.bt-duel.done span.bt-stamp{display:grid}
     let obj = null;
     try { obj = JSON.parse(d); } catch (e) { obj = null; }
     if (!obj || typeof obj !== 'object') return 'bad';
+    if (S && S.pid && !rt.adopting) bakAdd(JSON.stringify(S), '바꾸기 전 이 기기 학교');   // 2.2.0 저장 안전 장치
     try { localStorage.setItem(SAVE_KEY, JSON.stringify(obj)); sessionStorage.setItem('forest-adopt', msg || ''); } catch (e) { return 'storage'; }
     acctPending(false);
     rt.adopting = true;   // 다시 여는 동안 지금 학교가 저장을 덮어쓰지 않게 막아요
@@ -9897,7 +10029,7 @@ span.bt-stamp{display:none}.bt-duel.done span.bt-stamp{display:grid}
     initCloud();
   }
   async function cloudPush(force) {
-    if (!cloudOn() || rt.adopting || Cloud.pushing || !S || Cloud.delLeft) return;
+    if (!cloudOn() || rt.adopting || Cloud.pushing || !S || Cloud.delLeft || Cloud.hold) return;   // 2.2.0 고르는 동안은 올리지 않아요
     if (!force && !Cloud.dirty) return;
     if (!Cloud.fresh) { Cloud.dirty = true; cloudVerify(); return; }   // 2.0.0 Codex 검토(3): 다시 켠 뒤에는 서버 저장을 먼저 확인해요
     Cloud.pushing = true; Cloud.dirty = false;
@@ -9930,6 +10062,7 @@ span.bt-stamp{display:none}.bt-duel.done span.bt-stamp{display:grid}
       if (at > (Cloud.lastAt || 0) + 5000) {
         const srv = (await waitFor(db.ref('forest/saves/' + uid).once('value'), CLOUD_WAIT)).val();
         if (g !== Cloud.gen) return;
+        if (srv && typeof srv.d === 'string' && progOf(parseSave(srv.d)) < progOf(S) && askPick(srv.d, '다른 기기가 덜 키운 학교')) return;   // 2.2.0 저장 안전 장치
         if (srv && typeof srv.d === 'string' && adoptSave(srv.d, '다른 기기에서 이어 한 학교를 불러왔어요') === 'ok') return;
       }
       Cloud.lastAt = Math.max(Cloud.lastAt || 0, at);
@@ -9972,6 +10105,7 @@ span.bt-stamp{display:none}.bt-duel.done span.bt-stamp{display:grid}
     if (hasCloudBuild()) {
       if (Cloud.state === 'on' && Cloud.delLeft) t = '이 기기의 브라우저 (지난번 계정 지우기가 끝나지 않았어요. 아래 계정 지우기를 다시 눌러 주세요)';
       else if (Cloud.state === 'on') t = !Cloud.online ? '서버 (인터넷이 끊겼어요. 다시 이어지면 저장해요)' : Cloud.lastPush ? `서버 (${agoText(Cloud.lastPush)} 저장)` : '서버';
+      else if (Cloud.state === 'hold') t = '서버에 학교가 하나 더 있어요. 어느 학교로 이어 할지 골라 주세요';   // 2.2.0
       else if (Cloud.state === 'idle' || Cloud.state === 'wait') t = '서버에 연결하는 중이에요';
       else if (Cloud.state === 'error') t = `이 기기의 브라우저 (${CLOUD_ERR[Cloud.err] || CLOUD_ERR.etc})`;
       else t = '이 기기의 브라우저 (서버를 연결하기 전 체험판)';
@@ -16869,6 +17003,7 @@ span.bt-stamp{display:none}.bt-duel.done span.bt-stamp{display:grid}
     location.reload();
   }
   function resetGame() {
+    if (S && S.pid) bakAdd(JSON.stringify(S), '처음부터 다시 하기 전');   // 2.2.0
     try { localStorage.removeItem(SAVE_KEY); } catch (e) { /* 무시 */ }
     S = fresh();
     startMain(); S.q.init = true;
@@ -17091,8 +17226,13 @@ span.bt-stamp{display:none}.bt-duel.done span.bt-stamp{display:grid}
     $('#shopAd').addEventListener('click', shopAd);
     // 서버 저장: 구글 계정 연결, 테스트 현황
     $('#optAcct').addEventListener('click', () => { sfx('tap'); linkGoogle(); });
+    $('#pickKeep').addEventListener('click', pickKeepLocal);   // 2.2.0 저장 안전 장치
+    $('#pickLoad').addEventListener('click', pickLoadSrv);
+    $('#optBak').addEventListener('click', () => { sfx('tap'); rt.bakArm = -1; openBak(); });
+    $('#bakClose').addEventListener('click', () => { sfx('tap'); closeModal($('#mBak')); });
+    $('#bakList').addEventListener('click', e => { const b = e.target.closest('[data-bak]'); if (b) bakRestore(Number(b.dataset.bak)); });
     $('#acctLoad').addEventListener('click', () => { const a = rt.acctPick; if (a) adoptSave(a.d, '구글 계정의 학교를 불러왔어요'); });
-    $('#acctKeep').addEventListener('click', () => { const a = rt.acctPick; if (a) adoptSave(a.local, '이 폰의 학교를 구글 계정에 저장했어요'); });
+    $('#acctKeep').addEventListener('click', () => { const a = rt.acctPick; if (a) { bakAdd(a.d, '고르지 않은 계정 학교'); adoptSave(a.local, '이 폰의 학교를 구글 계정에 저장했어요'); } });   // 2.2.0 계정 학교도 남겨요
     $('#devStats').addEventListener('click', openStats);
     $('#statsReload').addEventListener('click', loadStats);
     $('#stKeyForm').addEventListener('submit', submitAdminKey);
@@ -19427,7 +19567,7 @@ span.bt-stamp{display:none}.bt-duel.done span.bt-stamp{display:grid}
   // 시험용 손잡이: 자동 시험(window.__FOREST_TEST)에서만 게임 속 함수를 꺼내 써요
   if (window.__FOREST_TEST) window.__forest = { get S() { return S; }, goTo, conOn, conLeft, conTick, conSec, conFinish, tkPlan, tkUse, tkUseAll, TK, CON, TKAD, capNext, yearCap,   // 2.1.0 공사
     semOn, semFirst, semLabel, cereDip, semBreak,   // 2.1.0 학기(s80)
-    get btUI() { return btUI; }, conFreeLeft, CB, cbOn, cbLeft, cbCost, cbApply, cbBuy, conRender, CG, CG_FLAGS, cgOpen, cgSync, cgPractice, cgMy, cgTable, cgOppNow, cgHTML, cgNewWeek, renderClub, BX, BX_SPOT, BIO, BIO_BY, bxOpen, bxSync, bxPick, bxOk, bxTap, bxCount, bxRareP, bxMapHTML, bxDexRender, setDexSeg, renderDeco, gdOpen, showReady, GD, GD_CROPS, GD_MENU, GD_M, gdN, gdSync, gdPlant, gdWater, gdHarvest, gdCook, gdMult, gdPct, gdToday, gdReadyN, gdMenuCount, openGd, gdRender, gdMark, nbApply, NB, nbAdd, nbAddOf, nbOn, nbOnAt, nbLeft, nbOverlap, nbApply, nbNotice, conAdd, get Live() { return Live; }, sanitize211, ffCan, ffRender, BTQ, BTQ_SCI, BTQ_KOR, BTQ_COL, btqMake, btqMath, btqPick, btqAnswer, btqMemTap, btqPts, btReveal,   // 2.1.1 대결 종목 문제
+    get btUI() { return btUI; }, conFreeLeft, CB, cbOn, cbLeft, cbCost, cbApply, cbBuy, conRender, progOf, parseSave, saveSum, bakList, bakAdd, bakAll, askPick, pickKeepLocal, pickLoadSrv, openBak, cloudShouldRestore, get Cloud() { return Cloud; }, CG, CG_FLAGS, cgOpen, cgSync, cgPractice, cgMy, cgTable, cgOppNow, cgHTML, cgNewWeek, renderClub, BX, BX_SPOT, BIO, BIO_BY, bxOpen, bxSync, bxPick, bxOk, bxTap, bxCount, bxRareP, bxMapHTML, bxDexRender, setDexSeg, renderDeco, gdOpen, showReady, GD, GD_CROPS, GD_MENU, GD_M, gdN, gdSync, gdPlant, gdWater, gdHarvest, gdCook, gdMult, gdPct, gdToday, gdReadyN, gdMenuCount, openGd, gdRender, gdMark, nbApply, NB, nbAdd, nbAddOf, nbOn, nbOnAt, nbLeft, nbOverlap, nbApply, nbNotice, conAdd, get Live() { return Live; }, sanitize211, ffCan, ffRender, BTQ, BTQ_SCI, BTQ_KOR, BTQ_COL, btqMake, btqMath, btqPick, btqAnswer, btqMemTap, btqPts, btReveal,   // 2.1.1 대결 종목 문제
     SN, SN_ALL, snOpen, snCount, snSync, snMult, snBase, snCost, snPick, snDraw, openSn, snRender, snDexRender, setDexSeg, rate,
     qProg, VD, vdH, vdOpen, vdNeed, vdLeft, vdAmt, vdGive, vdUp, openVd, vdRender, vdMapHTML, achTitles, achTitleName, setTitle,
     BF, FR_LINES, frSync, frMake, frOf, frNm, frFull, frHeart, frList, frPat, frGift, frGiftLeft, frAddP, frRename, frHere, frKidTap, frLetter, frTick, bdParty, bdPlace, bdClaim, bdDoneToday, bdRender, bdHats,
