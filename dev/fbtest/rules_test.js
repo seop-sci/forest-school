@@ -29,6 +29,19 @@ t('save bad shape', W('A', '/forest/saves/A', { d: 1, at: 1, v: '1.0' }), false)
 t('save missing v', W('A', '/forest/saves/A', { d: 'x', at: 1 }), false);
 t('save too big', W('A', '/forest/saves/A', { d: 'x'.repeat(200000), at: 1, v: '1.0' }), false);
 t('save delete own', W('A', '/forest/saves/A', null), true);
+// 2.2.0 예전 학교 남기기: 나만, 칸은 0~2
+const BAK = { d: '{"v":4}', at: 1, v: '2.2.0', pid: 'K7QM2XPA', prog: 20015, sum: '중학교 3학년', sv: 1, why: 'x' };
+t('bak write own slot', W('A', '/forest/bak/A/0', BAK), true);
+t('bak write own slot 2', W('A', '/forest/bak/A/2', BAK), true);
+t('bak write slot 3', W('A', '/forest/bak/A/3', BAK), false);
+t('bak write other', W('B', '/forest/bak/A/0', BAK), false);
+t('bak write anon', W(null, '/forest/bak/A/0', BAK), false);
+t('bak read own', R('A', '/forest/bak/A'), true);
+t('bak read other', R('B', '/forest/bak/A'), false);
+t('bak list', R('A', '/forest/bak'), false);
+t('bak bad shape', W('A', '/forest/bak/A/1', { d: 1, at: 1, v: '1' }), false);
+t('bak too big', W('A', '/forest/bak/A/1', { d: 'x'.repeat(200000), at: 1, v: '1' }), false);
+t('bak delete own', W('A', '/forest/bak/A/1', null), true);
 // 랭킹: 로그인한 사람은 모두 읽고, 내 칸만 써요
 t('rank read', R('B', '/forest/rank'), true);
 t('rank read anon', R(null, '/forest/rank'), false);

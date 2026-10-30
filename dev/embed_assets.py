@@ -16,10 +16,25 @@ BLOCKS = {'170': ('<!-- FS_IMG170:BEGIN -->', '<!-- FS_IMG170:END -->', 'FS_IMG1
           '174': ('<!-- FS_IMG174:BEGIN -->', '<!-- FS_IMG174:END -->', 'FS_IMG174'),   # 1.7.4 꾸미기(장식, 마크, 간판, 꾸미기 가게)
           '180': ('<!-- FS_IMG180:BEGIN -->', '<!-- FS_IMG180:END -->', 'FS_IMG180'),   # 1.8.0 숲속 합치기 (작업지시서 13)
           '200': ('<!-- FS_IMG200:BEGIN -->', '<!-- FS_IMG200:END -->', 'FS_IMG200'),
-          '213': ('<!-- FS_IMG213:BEGIN -->', '<!-- FS_IMG213:END -->', 'FS_IMG213')}   # 2.1.3 숲속 패스, 반짝 친구, 시즌 기념 장식 (작업지시서 17, 23, 34)   # 2.0.0 중학교 (작업지시서 19, 20)
+          '213': ('<!-- FS_IMG213:BEGIN -->', '<!-- FS_IMG213:END -->', 'FS_IMG213'),
+          '220': ('<!-- FS_IMG220:BEGIN -->', '<!-- FS_IMG220:END -->', 'FS_IMG220')}   # 2.2.0 야간 건설, 텃밭, 생물 탐사, 대항전 (작업지시서 36, 37)   # 2.1.3 숲속 패스, 반짝 친구, 시즌 기념 장식 (작업지시서 17, 23, 34)   # 2.0.0 중학교 (작업지시서 19, 20)
 
 # 열쇠 앞부분마다 줄일 크기(긴 변 픽셀)와 화질
 RULES = [
+    ('garden_bg', 720, 72),     # 2.2.0 학교 텃밭(작업지시서 37-A)
+    ('garden_bubble', 96, 86),
+    ('plot_', 160, 84),
+    ('crop_', 160, 84),
+    ('item_', 112, 86),
+    ('menu_', 192, 82),
+    ('bio_hut', 240, 82),       # 2.2.0 생물 탐사(작업지시서 37-B)
+    ('bio_rustle', 128, 84),
+    ('bio_lens', 128, 86),
+    ('bio_', 192, 82),
+    ('league_banner', 720, 75), # 2.2.0 동아리 대항전
+    ('league_podium', 240, 82),
+    ('league_', 112, 86),
+    ('flag_', 200, 82),
     ('pass_bg', 720, 72),       # 2.1.3 숲속 패스(작업지시서 23, 34)
     ('pass_ribbon', 512, 84),
     ('pass_node_', 96, 86),
@@ -192,9 +207,9 @@ def main(dirs, block=''):
     old = {}
     if BEGIN in src:
         block = src[src.index(BEGIN):src.index(END)]
-        for k, v in re.findall(r'"([A-Za-z0-9_]+)":"(data:image/webp;base64,[^"]+)"', block):
+        for k, v in re.findall(r'"([A-Za-z0-9_]+)":"(data:image/[^"]+)"', block):
             old[k] = v
-    old.update(imgs)   # 이번에 준 폴더의 그림만 바꾸고, 전에 넣은 그림은 그대로 둬요
+    old.update(imgs)   # 이번에 준 폴더의 그림만 바꾸고, 전에 넣은 그림은 그대로 둬요(webp가 아닌 SVG 같은 그림도, 2.2.0)
     body = ',\n'.join(f'"{k}":"{v}"' for k, v in sorted(old.items()))
     new = f'{BEGIN}\n<script>window.{VAR}={{\n{body}\n}};</script>\n{END}'
     if BEGIN in src:
