@@ -5496,7 +5496,7 @@ span.bt-stamp{display:none}.bt-duel.done span.bt-stamp{display:grid}
       say: '저도 연수를 받고 싶어요! 교감 연수를 보내 주시면 학교 행사 상품 도토리가 늘어나요.' },
     { id: 'gd3', ch: 3, t: 'gdHarvest', n: 1, r: 3000, title: '첫 작물 거두기', how: '급식실을 눌러 다 자란 작물을 거둬요',
       say: '지난번에 심은 작물이 쑥쑥 자랐어요! 급식실 텃밭에 가서 거둬 볼까요? 물을 줬던 밭은 두 개씩 나와요.' },   // 2.2.1 3장 gd1에서 옮김
-    { id: 'gd4', ch: 3, t: 'gdCook', n: 1, r: 3000, title: '오늘의 급식 만들기', how: '텃밭 재료 두 가지로 급식 메뉴를 만들어요. 그날 수업료가 올라요',
+    { id: 'gd4', ch: 3, t: 'gdCook', n: 1, r: 3000, title: '오늘의 급식 만들기', how: '텃밭 재료로 급식 메뉴를 만들어요. 상추 두 개면 상추 샐러드를 만들 수 있어요. 그날 수업료가 올라요',
       say: '거둔 채소로 오늘의 급식을 만들어 볼까요? 맛있는 급식을 먹은 날은 친구들이 수업료를 조금 더 내요.' },   // 2.2.1 3장 gd2에서 옮김
     { id: 'c1', ch: 3, t: 'deco', n: 1, r: 3000, title: '장식 하나 놓기', how: '상점 > 꾸미기 가게에서 장식을 사서 지도에 놓아요',
       say: '학교를 우리만의 모습으로 꾸며 봐요. 꾸미기 가게에서 숲의 정수로 장식을 사서 지도의 빈자리에 놓아요.' },
@@ -9080,6 +9080,7 @@ span.bt-stamp{display:none}.bt-duel.done span.bt-stamp{display:grid}
     { k: 'strawberry', nm: '딸기', em: '🍓', min: 480, tier: 2 }, { k: 'sweetpotato', nm: '고구마', em: '🍠', min: 600, tier: 2 }];
   const GD_C = Object.fromEntries(GD_CROPS.map(c => [c.k, c]));
   const GD_MENU = [
+    ['17', '상추 샐러드', '🥗', { lettuce: 2 }],   // 2.3.0 상추만으로 만드는 첫 메뉴(유치원 gd4에서 당근을 기다리지 않게)
     ['01', '상추 비빔밥', '🍚', { lettuce: 1, carrot: 1 }], ['02', '당근 수프', '🥣', { carrot: 1, potato: 1 }], ['03', '감자전', '🥞', { potato: 1, lettuce: 1 }],
     ['04', '옥수수 수프', '🥣', { corn: 1, potato: 1 }], ['05', '토마토 스파게티', '🍝', { tomato: 1, lettuce: 1 }], ['06', '호박죽', '🥣', { pumpkin: 1, corn: 1 }],
     ['07', '딸기 우유', '🥛', { strawberry: 2 }], ['08', '고구마 맛탕', '🍠', { sweetpotato: 2 }], ['09', '감자 샐러드', '🥗', { potato: 1, carrot: 1, lettuce: 1 }],
@@ -19083,7 +19084,7 @@ span.bt-stamp{display:none}.bt-duel.done span.bt-stamp{display:grid}
     { id: 'snack', name: '간식 도감', goals: [5, 10, 14, 17, 20], title: '매점 단골', ic: 'snack_01', t: n => n >= 20 ? '간식 도감 모두 모으기' : `간식 도감 ${n}종 모으기`, v: () => snCount() },   // 2.1.2
     { id: 'donate', name: '마을 기부', goals: [1, 3, 5, 8, 20], title: '숲속 기부왕', ic: 'donate_ic', t: n => `마을 기부 ${n}단계`, v: () => S.vd ? S.vd.lv : 0 },   // 2.1.2
     { id: 'rare', name: '반짝 친구', goals: [1, 2, 3, 4, 6], title: '반짝 친구 수집가', ic: 'rare_badge', t: n => n >= 6 ? '반짝 친구 모두 만나기' : `반짝 친구 ${n}명 만나기`, v: () => S.rare ? S.rare.got.length : 0 },   // 2.1.3
-    { id: 'garden', name: '급식 메뉴', goals: [2, 4, 8, 12, 16], title: '숲속 요리사', ic: 'menu_01', t: n => n >= 16 ? '급식 메뉴 모두 만들기' : `급식 메뉴 ${n}가지 만들기`, v: () => gdMenuCount() },   // 2.2.0
+    { id: 'garden', name: '급식 메뉴', goals: [2, 4, 8, 12, 16], title: '숲속 요리사', ic: 'menu_01', t: n => n >= GD_MENU.length ? '급식 메뉴 모두 만들기' : `급식 메뉴 ${n}가지 만들기`, v: () => gdMenuCount() },   // 2.2.0
     { id: 'cgwin', name: '동아리 대항전', goals: [1, 2, 4, 7, 10], title: '대항전 챔피언', ic: 'league_ic', t: n => `동아리 대항전 ${n}번 우승`, v: () => S.cg.wins },   // 2.2.0
     { id: 'bio', name: '생물 탐사', goals: [5, 10, 18, 24, 30], title: '꼬마 생물학자', ic: 'bio_ladybug', t: n => n >= 30 ? '생물 도감 모두 채우기' : `생물 ${n}종 관찰하기`, v: () => bxCount() },   // 2.2.0
     { id: 'lab', name: '과학 탐구 실험', goals: [3, 8, 14, 20, 24], title: '꼬마 과학자', t: n => n >= 24 ? '실험 노트 모두 채우기' : `실험 노트 ${n}장 채우기`, v: () => labCount() }   // 2.0.1 공부 2단계(노트 24장)
