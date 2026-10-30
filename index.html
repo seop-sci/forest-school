@@ -10580,9 +10580,16 @@ span.bt-stamp{display:none}.bt-duel.done span.bt-stamp{display:grid}
   async function webLockCheck() {
     if (!window.FS_WEB_LOCK || !/github\.io$/.test(location.hostname)) return;   // 자동 시험(localhost)과 앱 판은 잠그지 않아요
     const el = $('#webLock'), tx = $('#wlTx'), go = $('#wlGo'), id = $('#wlId'), cp = $('#wlCopy');
+    clearTimeout(rt.wlT);
+    // 2.3.0 고침: 켜자마자 부르면 서버에 붙는 중('wait')이라 연결 실패로 보였어요. 붙을 때까지 다시 봐요.
+    // 서버 학교와 이 기기 학교 중 고르는 창이 떠 있으면 그 창을 먼저 고를 수 있게 잠깐 비켜 줘요
+    if (Cloud.state !== 'on' && Cloud.state !== 'off' && Cloud.state !== 'error') {
+      el.hidden = !!rt.modalOpen; document.body.classList.toggle('wl-on', !rt.modalOpen);
+      tx.textContent = '서버에 연결하는 중이에요'; go.hidden = true; rt.wlT = setTimeout(webLockCheck, 1000); return;
+    }
     el.hidden = false; document.body.classList.add('wl-on');
-    if (!cloudOn()) { tx.textContent = '서버에 연결하지 못했어요. 인터넷을 확인하고 새로 고침해 주세요'; go.hidden = true; return; }
-    if (!Cloud.uid || !Cloud.db) { tx.textContent = '계정을 확인하는 중이에요'; go.hidden = true; clearTimeout(rt.wlT); rt.wlT = setTimeout(webLockCheck, 1200); return; }
+    if (!cloudOn()) { tx.textContent = '서버에 연결하지 못했어요. 인터넷을 확인하고 새로 고침해 주세요'; go.hidden = true; rt.wlT = setTimeout(webLockCheck, 5000); return; }
+    if (!Cloud.uid || !Cloud.db) { tx.textContent = '계정을 확인하는 중이에요'; go.hidden = true; rt.wlT = setTimeout(webLockCheck, 1200); return; }
     id.textContent = '계정 번호 ' + Cloud.uid; cp.hidden = false;
     if (!googleUser()) { tx.textContent = '테스트 전용 판이에요. 허용된 구글 계정으로 로그인해 주세요'; go.hidden = false; return; }
     let ok = false;
