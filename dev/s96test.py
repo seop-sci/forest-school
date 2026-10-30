@@ -74,8 +74,8 @@ async def main():
                   return { i1, i2, ch: [F.MAIN[i1].ch, F.MAIN[i2].ch], m1: F.qMeasure(F.MAIN[i1]), m2: F.qMeasure(F.MAIN[i2]), ps: F.PS_M.cg.v(), ach: (F.ACH.find(x => x.id === 'cgwin') || {}).title, a: a.cg, b: b.cg.wk };""")
                 print('퀘스트와 저장', {k: v for k, v in r.items() if k != 'a'})
                 ok(r['i1'] > 0 and r['i2'] > r['i1'] and r['ch'] == [12, 12] and r['m1'] == 1 and r['m2'] == 1 and r['ps'] == 1 and r['ach'] == '대항전 챔피언', f'퀘스트 {r}')
-                a = r['a']
-                ok(a['wk'] == 3 and a['opp'] == [{'k': 'oak', 'f': 50}] and a['prac'] == [7, 1, 0, 0, 0] and a['show'] == [1, 0, 0, 0, 0] and a['pd'] == '' and a['res']['rank'] == 1 and a['wins'] == 0 and a['st'] == {'p': 3, 'n': 0} and r['b'] == -1, f'저장 읽기 {a}')
+                a = r['a']   # 2.2.0 검토 5: st.s(대항전 발표회 수)가 없던 저장은 이번 주 show 합(1)을 받아요
+                ok(a['wk'] == 3 and a['opp'] == [{'k': 'oak', 'f': 50}] and a['prac'] == [7, 1, 0, 0, 0] and a['show'] == [1, 0, 0, 0, 0] and a['pd'] == '' and a['res']['rank'] == 1 and a['wins'] == 0 and a['st'] == {'p': 3, 'n': 0, 's': 1} and r['b'] == -1, f'저장 읽기 {a}')
             else:
                 await ev("F.rt.fakeNow = K(4, 9); " + MID + " F.cgSync(true);")
             # 5) 동아리실 화면

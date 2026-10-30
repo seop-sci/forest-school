@@ -3321,7 +3321,7 @@ span.bt-stamp{display:none}.bt-duel.done span.bt-stamp{display:grid}
         <button class="srow" type="button" id="optTut"><span class="txt"><b>튜토리얼</b><small id="tutSub">학교를 꾸려 가는 방법을 다시 봐요</small></span><svg viewBox="0 0 24 24" width="20" height="20" aria-hidden="true"><path d="M9 6l6 6-6 6" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"/></svg></button>
         <div class="srow" id="bakRow"><span class="txt"><b>예전 학교 되돌리기</b><small>바뀌거나 덮이기 전 학교를 3개까지 남겨 둬요</small></span><button class="btn-sub" type="button" id="optBak">보기</button></div><!-- 2.2.0 -->
         <div class="srow" id="resetRow"><span class="txt"><b>처음부터 다시</b><small>수료증과 전학 온 친구들까지 모두 지워요</small></span><button class="btn-danger" type="button" id="optReset">초기화</button></div>
-        <div class="srow" id="delRow" hidden><span class="txt"><b>계정과 서버 기록 지우기</b><small>서버에 저장된 학교, 랭킹, 구글 계정 연결을 모두 지워요</small></span><button class="btn-danger" type="button" id="optDel">지우기</button></div>
+        <div class="srow" id="delRow" hidden><span class="txt"><b>계정과 서버 기록 지우기</b><small>서버에 저장된 학교, 예전 학교, 랭킹, 공개한 학교 모습, 구글 계정 연결을 모두 지워요</small></span><button class="btn-danger" type="button" id="optDel">지우기</button></div>
         <div class="confirm" id="delConfirm" hidden>
           <p>서버의 학교 기록과 랭킹, 계정을 지울까요? 이 기기의 학교도 함께 지워지고 되돌릴 수 없어요.</p>
           <div class="btn-row"><button class="btn-sub" type="button" id="delNo">취소</button><button class="btn-danger solid" type="button" id="delYes">모두 지우기</button></div>
@@ -5779,7 +5779,7 @@ span.bt-stamp{display:none}.bt-duel.done span.bt-stamp{display:grid}
   }
   // 서버 저장 상태. GitHub 테스트판에서만 켜져요 (아래 '서버 저장'에 자세히 적었어요)
   const Cloud = { state: 'off', gen: 0, fb: null, db: null, uid: null, dirty: false, pushing: false, lastPush: 0, lastStats: 0, timer: 0,
-    offset: 0, online: true, err: '', bootHadSave: false, bootSavedAt: 0, skipRestore: false, listening: false };
+    offset: 0, online: true, err: '', bootHadSave: false, bootSavedAt: 0, skipRestore: false, listening: false, rev: 0, syncSv: null, hideSv: null, hold: false, deleting: false };
 
   // q.m: 지금 메인 퀘스트 번호, q.mb: 그 퀘스트를 시작할 때의 기준값, q.subs: 받아 둔 학생 부탁들
   // mid: 지금 메인 퀘스트의 id. 퀘스트 목록이 바뀌어도 이어서 할 수 있게 저장해요
@@ -5832,8 +5832,8 @@ span.bt-stamp{display:none}.bt-duel.done span.bt-stamp{display:grid}
     gn: freshGd(),   // 2.2.0 학교 텃밭(황금 도토리 상점 gd와 다른 칸): 밭(작물, 심은 때, 다 자라는 때, 물), 재료, 만든 메뉴, 오늘의 급식, 메뉴 8가지 황금, 비로 물 준 날, 기록   // 2.2.0 야간 건설 이벤트: at 마지막으로 셈한 때, seen 시작 알림을 본 날
     fr: {}, frg: { day: '', n: 0 }, frc: { pat: 0, gift: 0, cake: 0, alb: 0 }, bday: { day: '', done: false }, alb: [],   // 2.1.1 단짝 친구, 오늘 선물, 횟수, 오늘 생일 잔치, 졸업 앨범
     dsn: { day: '', trips: 0, sports: 0, fest: {} },   // 2.1.0 오늘 시작할 때의 체험학습, 운동회, 행사 횟수(오늘 한 것도 퀘스트에 쳐요)
-    lab: freshLab(), rd: freshRd(), ex: freshEx(), bt: freshBt(), ps: freshPs(), rare: { got: [], miss: 0 }, rs: { n: 0, p: 0, pos: 0, king: 0 }, lk: { on: false, at: 0, h: '' }, wx: '', pl: { got: 0, read: 0, wk: -1 },   // pl: 2.1.3 학부모 편지(받은 통, 읽은 통, 받은 주)
-      // wx: 2.1.3 날씨 알림을 본 날. ps: 2.1.3 숲속 패스, rs: 랭킹 시즌(번호, 점수, 마지막으로 본 순위, 시즌 왕 횟수), lk: 내 학교 보여 주기, rare: 2.1.3 반짝 친구(만난 종, 연속 못 만난 횟수)
+    lab: freshLab(), rd: freshRd(), ex: freshEx(), bt: freshBt(), ps: freshPs(), rare: { got: [], miss: 0 }, rs: { n: 0, p: 0, pos: 0, king: 0 }, lk: { on: false, at: 0, h: '', pub: false, del: false }, wx: '', pl: { got: 0, read: 0, wk: -1 },   // pl: 2.1.3 학부모 편지(받은 통, 읽은 통, 받은 주)
+      // wx: 2.1.3 날씨 알림을 본 날. ps: 2.1.3 숲속 패스, rs: 랭킹 시즌(번호, 점수, 마지막으로 본 순위, 시즌 왕 횟수), lk: 내 학교 보여 주기(pub 서버에 올린 적 있음, del 끄기를 서버에 아직 못 지움. 2.2.0 검토 6), rare: 2.1.3 반짝 친구(만난 종, 연속 못 만난 횟수)
       // ex: 2.0.1 시험 기간(본 시험 주, 자율학습, 성적표, 기록)
     // 2.0.1 공부 2단계: 과학 탐구 실험(오늘 한 날, 모은 카드, 해 본 짝), 책 읽기(오늘 권수, 읽는 책과 시작 시각, 읽은 횟수)
     bd: {}, tk: { m5: 0, m30: 0, h1: 0, h3: 0 }, tka: { day: '', n: 0 },   // 2.1.0 공사(건물마다 { L 오를 레벨, s 시작, e 끝 }), 시간 단축권 장수, 광고 단축권 오늘 횟수
@@ -6026,7 +6026,7 @@ span.bt-stamp{display:none}.bt-duel.done span.bt-stamp{display:grid}
     if (d.bs && typeof d.bs === 'object') { for (const k of Object.keys(s.bs)) s.bs[k] = Math.min(s.tier, Math.floor(num(d.bs[k], 0, 0))); }
     else { s.bs.science = Math.min(1, s.tier); s.bs.playground = Math.min(1, s.tier); }
     // 1.6.0: 숲의 정수와 블록 퍼즐. 예전 저장에는 없으니 0에서 시작하고, 하던 판은 모양이 맞을 때만 이어요
-    s.ess = Math.floor(num(d.ess, 0, 0));
+    s.ess = Math.min(1e9, Math.floor(num(d.ess, 0, 0)));   // 2.2.0 검토(추가 1): addEss와 같은 상한 10억(예전에는 읽을 때 상한이 없어 1e308도 받았어요)
     sanitizeAc(d, s);   // 2.0.1 공부
     sanitizeStudy2(d, s);   // 2.0.1 공부 2단계: 실험, 책 읽기
     sanitize210(d, s);   // 2.1.0 숲속 소풍, 칭찬 스티커판
@@ -6044,7 +6044,7 @@ span.bt-stamp{display:none}.bt-duel.done span.bt-stamp{display:grid}
     s.wx = typeof d.wx === 'string' ? d.wx.slice(0, 10) : '';   // 2.1.3 날씨 알림 본 날
     { const P = d.pl && typeof d.pl === 'object' ? d.pl : {}, got = Math.max(0, Math.min(PL.list.length, Math.floor(Number(P.got) || 0))); s.pl = { got, read: Math.max(0, Math.min(got, Math.floor(Number(P.read) || 0))), wk: Math.floor(Number(P.wk)) || -1 }; }   // 2.1.3 학부모 편지
     { const R = d.rs && typeof d.rs === 'object' ? d.rs : {}, n = (v, hi) => Math.max(0, Math.min(hi, Math.floor(Number(v) || 0))); s.rs = { n: n(R.n, 1e4), p: n(R.p, 1e9), pos: n(R.pos, 1e4), king: n(R.king, 1e4) }; }   // 2.1.3 랭킹 시즌
-    { const L = d.lk && typeof d.lk === 'object' ? d.lk : {}; s.lk = { on: L.on === true, at: Math.max(0, Math.min(Date.now() + 864e5, Number(L.at) || 0)), h: '' }; }   // 2.1.3 내 학교 보여 주기(처음에는 꺼짐)
+    { const L = d.lk && typeof d.lk === 'object' ? d.lk : {}; s.lk = { on: L.on === true, at: Math.max(0, Math.min(Date.now() + 864e5, Number(L.at) || 0)), h: '', pub: L.pub === true, del: L.del === true }; }   // 2.1.3 내 학교 보여 주기(처음에는 꺼짐)
     { const R = d.rare && typeof d.rare === 'object' ? d.rare : {}; s.rare = { got: [...new Set((Array.isArray(R.got) ? R.got : []).filter(sp => RARE.list.some(x => x.sp === sp)))], miss: Math.min(RARE.pity, Math.max(0, Math.floor(Number(R.miss) || 0))) }; }   // 2.1.3 반짝 친구
     // 2.1.0 공사와 시간 단축권: 예전 저장에는 없으니 공사 없음, 단축권 0장. 지금 레벨 다음 칸이 아닌 공사는 버려요
     if (d.bd && typeof d.bd === 'object') for (const k of Object.keys(FAC)) {
@@ -9915,7 +9915,13 @@ span.bt-stamp{display:none}.bt-duel.done span.bt-stamp{display:grid}
       Cloud.fb = fb; Cloud.db = db; Cloud.uid = user.uid;
       // 지난번에 계정을 다 못 지웠으면, 이 계정으로 다시 저장하기 전에 먼저 지워요
       Cloud.delLeft = false;
-      if (delPending()) {
+      // 2.2.0 검토 3: 서버 기록을 다 못 지운 채 꺼졌으면 그 계정이면 이어서 지워요(못 지우면 올리지 않고 기다려요)
+      if (delData() && delData() === user.uid) {
+        Cloud.deleting = true;
+        if (await delResume(user.uid)) return;
+        Cloud.deleting = false; Cloud.delLeft = true;
+      } else if (delData()) delData(false);   // 다른 계정 표시는 지워요(그 계정은 이미 없어요)
+      if (!Cloud.delLeft && delPending()) {
         if (await deleteAuthUser(false)) {
           delPending(false);
           setTimeout(() => toast('지난번에 남았던 계정까지 모두 지웠어요'), 1200);
@@ -9940,6 +9946,7 @@ span.bt-stamp{display:none}.bt-duel.done span.bt-stamp{display:grid}
       const srv = (await waitFor(db.ref('forest/saves/' + user.uid).once('value'), CLOUD_WAIT)).val();
       if (g !== Cloud.gen) return;
       Cloud.lastAt = srv ? Number(srv.at) || 0 : 0; Cloud.fresh = true;   // 2.0.0 Codex 검토(3): 서버에서 마지막으로 본 저장 시각
+      Cloud.rev = revOf(srv);   // 2.2.0 검토 2: 이 기기가 본 서버 저장 리비전. 올릴 때 서버가 이 값 그대로일 때만 덮어써요
       // 1.5.4: 구글 계정으로 바꾸다 끊겼으면, 그 계정의 학교를 덮어쓰지 않고 어느 학교로 할지 다시 물어봐요
       if (acctPending()) {
         if (srv && typeof srv.d === 'string') { rt.adopting = true; askAcct(srv.d, JSON.stringify(S)); return; }
@@ -9948,8 +9955,10 @@ span.bt-stamp{display:none}.bt-duel.done span.bt-stamp{display:grid}
       }
       if (srv && typeof srv.d === 'string') {
         // 2.2.0 저장 안전 장치: 진행이 줄어드는 쪽으로 바뀌면(서버가 더 늦게 저장했지만 덜 키운 학교이거나, 이 기기 학교가 서버보다 덜 키운 학교) 물어봐요
-        const ss = parseSave(srv.d), sp = progOf(ss), lp = progOf(S), restore = !Cloud.skipRestore && cloudShouldRestore(srv);
-        if (ss && ((restore && sp < lp) || (!restore && sp > lp)) && askPick(srv.d, restore ? '서버가 덜 키운 학교' : '이 기기가 덜 키운 학교')) return;
+        const ss = parseSave(srv.d), sp = progOf(ss), lp = progOf(S), how = Cloud.skipRestore ? 'keep' : cloudBootPick(srv), restore = how === 'restore';
+        // 2.2.0 검토 2: 지난번 이 기기가 맞춘 뒤로 서버(다른 기기)와 이 기기가 둘 다 바뀌었으면, 어느 쪽도 덮지 않고 물어봐요
+        if (ss && how === 'clash' && askPick(srv.d, '다른 기기가 저장한 학교', Cloud.rev)) return;
+        if (ss && ((restore && sp < lp) || (!restore && sp > lp)) && askPick(srv.d, restore ? '서버가 덜 키운 학교' : '이 기기가 덜 키운 학교', Cloud.rev)) return;
         if (restore) {
           const r = adoptSave(srv.d, '서버에 저장된 학교를 불러왔어요');
           if (r === 'ok') return;
@@ -9967,6 +9976,28 @@ span.bt-stamp{display:none}.bt-duel.done span.bt-stamp{display:grid}
       renderCloudInfo();
       rankAfterCloud();
     }
+  }
+  /* 2.2.0 검토 2: 저장 리비전(r). 서버 저장에 1, 2, 3…을 붙이고, 올릴 때는 트랜잭션으로 '내가 본 리비전 그대로일 때만' 덮어써요.
+     다른 기기가 그사이 저장했으면 덮지 않고 자동 올리기를 멈춘 뒤 두 학교를 보여 주고 물어요(고르지 않은 쪽은 예전 학교 되돌리기에 남아요).
+     기기 시계로 최신 저장을 가리지 않아요. 이 기기가 마지막으로 서버와 맞춘 리비전과 그때 저장 시각(sv)을 기기에 남겨 켤 때 비교해요.
+     리비전이 없는 옛 저장(2.2.0까지, 또는 옛 앱이 올린 저장)은 0으로 읽어요 */
+  const SYNC_KEY = 'forest-cloud-sync';
+  const revOf = v => v && typeof v === 'object' && Number.isInteger(v.r) && v.r > 0 ? v.r : 0;
+  function syncGet() { try { const o = JSON.parse(localStorage.getItem(SYNC_KEY) || 'null'); return o && typeof o.u === 'string' && Number.isInteger(o.r) ? o : null; } catch (e) { return null; } }
+  function syncSet(r, sv) {
+    Cloud.rev = r; Cloud.syncSv = sv;
+    try { if (r == null) localStorage.removeItem(SYNC_KEY); else localStorage.setItem(SYNC_KEY, JSON.stringify({ u: Cloud.uid, r, sv })); } catch (e) { /* 남기지 못하면 다음에 켤 때 예전 방식으로 골라요 */ }
+  }
+  // 켤 때: 'restore' 서버 학교로, 'keep' 이 기기 학교로, 'clash' 둘 다 바뀌어서 묻기
+  function cloudBootPick(srv) {
+    const k = syncGet();
+    if (k && k.u === Cloud.uid && Cloud.bootHadSave) {   // 이 기기 저장이 없으면(새 화면, 지워짐) 예전처럼 서버 학교를 받아요
+      Cloud.syncSv = k.sv;
+      if (revOf(srv) === k.r) return 'keep';   // 서버는 지난번 맞춘 그대로예요. 이 기기 학교가 같거나 더 나중이에요
+      if (S.savedAt === k.sv) return 'restore';   // 이 기기는 맞춘 뒤로 바뀌지 않았어요. 다른 기기가 이어 한 학교를 받아요
+      return 'clash';
+    }
+    return cloudShouldRestore(srv) ? 'restore' : 'keep';   // 맞춘 기록이 없으면(옛 판에서 올렸거나 새 기기) 예전 방식
   }
   // 이 기기에 저장이 없던 새 화면이면 서버 학교를 이어 해요 (새로 10분 넘게 했으면 지금 학교를 지켜요).
   // 둘 다 있으면 더 나중에 저장한 쪽을 써요
@@ -10010,7 +10041,7 @@ span.bt-stamp{display:none}.bt-duel.done span.bt-stamp{display:grid}
   }
   // 이 기기에 남긴 학교를 서버 칸 0~2에도 올려요(서버에 이미 같은 학교가 있으면 그 칸에). 켤 때와 남길 때 불러요
   async function bakPush() {
-    if (!cloudOn() || !Cloud.db || !Cloud.uid || Cloud.bakBusy) return;
+    if (!cloudOn() || !Cloud.db || !Cloud.uid || Cloud.bakBusy || Cloud.deleting || Cloud.delLeft || Cloud.hold) return;   // 2.2.0 검토 3: 지우는 동안이나 지우기가 남았으면 올리지 않아요
     const L = bakList(); if (!L.length) return;
     Cloud.bakBusy = true;
     try {
@@ -10039,10 +10070,10 @@ span.bt-stamp{display:none}.bt-duel.done span.bt-stamp{display:grid}
     return L.sort((a, b) => b.at - a.at);
   }
   // 두 학교 중 하나를 골라요. 고르기 전에는 서버에 올리지 않아요(Cloud.hold)
-  function askPick(srvD, why) {
+  function askPick(srvD, why, r) {
     const s = parseSave(srvD); if (!s) return false;
-    Cloud.hold = true; Cloud.state = 'hold';
-    rt.pickSave = { d: srvD, why };
+    Cloud.hold = true; Cloud.state = 'hold'; clearTimeout(Cloud.timer);
+    rt.pickSave = { d: srvD, why, r: Number.isInteger(r) ? r : Cloud.rev };
     $('#pickSrv').textContent = saveSum(s) + (s.savedAt ? `, ${agoText(s.savedAt)} 저장` : '');
     $('#pickLoc').textContent = saveSum(S) + (S.savedAt ? `, ${agoText(S.savedAt)} 저장` : '');
     $('#pickSrvNm').textContent = s.rank && s.rank.name ? `서버 학교 (${s.rank.name})` : '서버 학교';
@@ -10055,6 +10086,7 @@ span.bt-stamp{display:none}.bt-duel.done span.bt-stamp{display:grid}
     const P = rt.pickSave; if (!P) return;
     rt.pickSave = null;
     Cloud.hold = false; Cloud.state = 'on'; Cloud.fresh = true;
+    Cloud.rev = P.r || 0;   // 2.2.0 검토 2: 본 서버 리비전 위에 이 기기 학교를 올려요(그사이 또 바뀌면 다시 물어요)
     bakAdd(P.d, '고르지 않은 서버 학교');
     closeModal($('#mPick'));
     renderCloudInfo(); cloudPush(true); rankAfterCloud();
@@ -10126,43 +10158,74 @@ span.bt-stamp{display:none}.bt-duel.done span.bt-stamp{display:grid}
     initCloud();
   }
   async function cloudPush(force) {
-    if (!cloudOn() || rt.adopting || Cloud.pushing || !S || Cloud.delLeft || Cloud.hold) return;   // 2.2.0 고르는 동안은 올리지 않아요
+    if (!cloudOn() || rt.adopting || Cloud.pushing || !S || Cloud.delLeft || Cloud.hold || Cloud.deleting) return;   // 2.2.0 고르는 동안, 검토 3 계정을 지우는 동안은 올리지 않아요
     if (!force && !Cloud.dirty) return;
     if (!Cloud.fresh) { Cloud.dirty = true; cloudVerify(); return; }   // 2.0.0 Codex 검토(3): 다시 켠 뒤에는 서버 저장을 먼저 확인해요
     Cloud.pushing = true; Cloud.dirty = false;
     syncMid();
-    const db = Cloud.db, uid = Cloud.uid, g = Cloud.gen, at = S.savedAt;
+    const db = Cloud.db, uid = Cloud.uid, g = Cloud.gen, at = S.savedAt, base = Cloud.rev || 0;
+    const doc = { d: JSON.stringify(S), at, v: VERSION };
+    let clash = null;
     try {
-      await db.ref('forest/saves/' + uid).set({ d: JSON.stringify(S), at, v: VERSION });
-      Cloud.lastAt = Math.max(Cloud.lastAt || 0, at);
-      Cloud.lastPush = Date.now();
-      if (force || Date.now() - Cloud.lastStats >= STATS_PUSH) {
-        Cloud.lastStats = Date.now();
-        await db.ref('forest/stats/' + uid).set(statsDoc());
+      // 2.2.0 검토 2: 읽고 set하는 사이 다른 기기가 끼어들지 못하게 트랜잭션으로 '서버 리비전이 내가 본 값일 때만' 써요.
+      // 서버가 비었으면(처음, 지운 뒤) 그대로 써요. SDK가 아직 서버 값을 모를 때 null로 한 번 부르고 진짜 값으로 다시 불러요
+      const res = await db.ref('forest/saves/' + uid).transaction(cur => {
+        clash = null;
+        if (cur && typeof cur === 'object') {
+          const r = revOf(cur);
+          if (r !== base) { clash = cur; return; }   // 그만둬요(덮지 않아요)
+          return Object.assign({}, doc, { r: r + 1 });
+        }
+        return Object.assign({}, doc, { r: base + 1 });
+      }, undefined, false);
+      if (g !== Cloud.gen) return;
+      if (!res || !res.committed) {
+        const v = clash || (res && res.snapshot && res.snapshot.val());
+        Cloud.dirty = true;
+        cloudClash(v);
+      } else {
+        syncSet(revOf(res.snapshot.val()) || base + 1, at);
+        Cloud.lastAt = Math.max(Cloud.lastAt || 0, at);
+        Cloud.lastPush = Date.now();
+        if (force || Date.now() - Cloud.lastStats >= STATS_PUSH) {
+          Cloud.lastStats = Date.now();
+          await db.ref('forest/stats/' + uid).set(statsDoc());
+        }
       }
     } catch (e) {
       Cloud.dirty = true;
       if (g === Cloud.gen && cloudErrKey(e) === 'rules') { Cloud.state = 'error'; Cloud.err = 'rules'; rankAfterCloud(); }
-    }
-    Cloud.pushing = false;
+    } finally { Cloud.pushing = false; }
     renderCloudInfo();
   }
+  // 2.2.0 검토 2: 올리려는데 다른 기기가 먼저 저장했어요. 자동 올리기를 멈추고 두 학교를 보여 주며 물어요.
+  // 서버 저장이 망가졌으면(읽을 수 없으면) 그 리비전 위에 이 기기 학교를 다시 올려요
+  function cloudClash(v) {
+    const r = revOf(v);
+    if (v && typeof v.d === 'string' && askPick(v.d, '다른 기기가 저장한 학교', r)) return;
+    Cloud.rev = r; Cloud.pushing = false; setTimeout(() => cloudPush(true), 0);
+  }
   // 2.0.0 Codex 검토(3): 앱을 내렸다 다시 켜면, 그사이 다른 기기가 서버에 더 나중 학교를 올렸는지 먼저 봐요.
-  // 그랬으면 이 기기의 옛 학교로 덮지 않고 서버 학교를 불러와요. 아니면 확인됐다고 표시하고 밀린 저장을 올려요
+  // 2.2.0 검토 2: 저장 시각(기기 시계) 대신 리비전으로 봐요. 바뀌었으면 이 기기가 맞춘 뒤로 그대로일 때만 서버 학교를 불러오고,
+  // 이 기기도 그사이 바뀌었으면 묻는 창을 띄워요. 아니면 확인됐다고 표시하고 밀린 저장을 올려요
   async function cloudVerify() {
-    if (!cloudOn() || Cloud.verifying || rt.adopting || !S || document.hidden) return;   // 내려 둔 동안에는 확인하지 않아요(그동안 올리지도 않아요)
+    if (!cloudOn() || Cloud.verifying || rt.adopting || !S || document.hidden || Cloud.hold) return;   // 내려 둔 동안에는 확인하지 않아요(그동안 올리지도 않아요)
     Cloud.verifying = true;
-    const db = Cloud.db, uid = Cloud.uid, g = Cloud.gen;
+    const db = Cloud.db, uid = Cloud.uid, g = Cloud.gen, mine = S.savedAt === Cloud.syncSv || (Cloud.hideSv != null && Cloud.hideSv === Cloud.syncSv);   // 켜는 순간 이 기기 학교가 맞춘 그대로인지(내릴 때 올린 그대로인지)
     try {
-      const at = Number((await waitFor(db.ref('forest/saves/' + uid + '/at').once('value'), CLOUD_WAIT)).val()) || 0;
+      const r = Number((await waitFor(db.ref('forest/saves/' + uid + '/r').once('value'), CLOUD_WAIT)).val()) || 0;
       if (g !== Cloud.gen) return;
-      if (at > (Cloud.lastAt || 0) + 5000) {
+      if (r !== (Cloud.rev || 0)) {
         const srv = (await waitFor(db.ref('forest/saves/' + uid).once('value'), CLOUD_WAIT)).val();
         if (g !== Cloud.gen) return;
-        if (srv && typeof srv.d === 'string' && progOf(parseSave(srv.d)) < progOf(S) && askPick(srv.d, '다른 기기가 덜 키운 학교')) return;   // 2.2.0 저장 안전 장치
-        if (srv && typeof srv.d === 'string' && adoptSave(srv.d, '다른 기기에서 이어 한 학교를 불러왔어요') === 'ok') return;
+        const rr = revOf(srv);
+        if (srv && typeof srv.d === 'string' && rr !== (Cloud.rev || 0)) {
+          if (progOf(parseSave(srv.d)) < progOf(S) && askPick(srv.d, '다른 기기가 덜 키운 학교', rr)) return;   // 2.2.0 저장 안전 장치
+          if (!mine && askPick(srv.d, '다른 기기가 저장한 학교', rr)) return;
+          if (adoptSave(srv.d, '다른 기기에서 이어 한 학교를 불러왔어요') === 'ok') return;
+        }
+        if (!srv) Cloud.rev = 0;   // 서버 저장이 지워졌어요(계정 지우기 등). 다음 올리기가 새로 써요
       }
-      Cloud.lastAt = Math.max(Cloud.lastAt || 0, at);
       if (document.hidden) return;   // 확인하는 사이 다시 내렸으면 다음에 켤 때 다시 확인해요
       Cloud.fresh = true;
     } catch (e) { /* 다음에 다시 확인해요(그때까지 서버에 올리지 않아요) */ }
@@ -10438,7 +10501,7 @@ span.bt-stamp{display:none}.bt-duel.done span.bt-stamp{display:grid}
      토스 미니앱: 랭킹은 토스 게임 센터가 맡아요. 점수가 오를 때 submitGameCenterLeaderBoardScore({ score: String(rankScore()) })를 보내고,
      랭킹 버튼에서는 openGameCenterLeaderboard()로 토스 랭킹 화면을 열면 돼요. 미니앱마다 랭킹은 하나라서 학교 점수 하나만 보내요. */
   const RANK_MAX = 50;
-  const Rank = { state: 'idle', gen: 0, be: null, uid: null, rows: [], wrows: [], brows: [], readOnly: false, writing: false, timer: 0, unsub: null, unsubW: null, unsubB: null, sbt: 0, sbtAt: 0, sbtm: 0 };   // 2.0.1 brows: 대결 순위, sbt: 이번에 켠 뒤 올린 대결 점수
+  const Rank = { state: 'idle', gen: 0, be: null, uid: null, rows: [], wrows: [], brows: [], readOnly: false, writing: false, timer: 0, unsub: null, unsubW: null, unsubB: null, sbt: 0, sbtq: null, sbtm: 0 };   // 2.0.1 brows: 대결 순위, sbt: 이번에 켠 뒤 올린 대결 점수
   /* 학교 파워: 다른 게임의 전투력처럼 쌓아 온 것에 가중치를 둔 합이에요. 쓰거나 종업식을 열어도 줄지 않아요.
      지금 학교(졸업하면 처음으로): 시설 레벨 ×10, 가구 레벨 ×2, 선생님 레벨 ×12. 졸업할 때 이 몫은 pwBank에 넣어 둬요.
      계속 남는 것: 받은 수료증 ×5, 졸업 강화 레벨 ×20, 장학재단 강화 레벨 ×40, 기념품 ×25, 꾸미기 ×15, 학교급 ×500,
@@ -10547,6 +10610,7 @@ span.bt-stamp{display:none}.bt-duel.done span.bt-stamp{display:grid}
     if (!be) { Rank.state = 'off'; renderRankPanel(); return; }
     Rank.be = be; Rank.uid = be.uid; Rank.readOnly = !!be.readOnly;
     Rank.state = 'on';
+    setTimeout(lookRetry, 0);   // 2.2.0 검토 6: 지난번에 못 지운 공개 학교를 다시 지워요
     try {
       Rank.unsub = be.listen(pairs => {
         if (g !== Rank.gen) return;
@@ -10584,7 +10648,7 @@ span.bt-stamp{display:none}.bt-duel.done span.bt-stamp{display:grid}
     if (Rank.unsubB) { try { Rank.unsubB(); } catch (e) { /* 무시 */ } }
     if (Rank.unsubS) { try { Rank.unsubS(); } catch (e) { /* 무시 */ } }
     clearTimeout(Rank.timer);
-    Object.assign(Rank, { state: 'idle', be: null, uid: null, rows: [], wrows: [], brows: [], srows: [], readOnly: false, writing: false, unsub: null, unsubW: null, unsubB: null, unsubS: null, sbt: 0, sbtAt: 0 });
+    Object.assign(Rank, { state: 'idle', be: null, uid: null, rows: [], wrows: [], brows: [], srows: [], readOnly: false, writing: false, unsub: null, unsubW: null, unsubB: null, unsubS: null, sbt: 0, sbtq: null, sbtm: 0 });
   }
   function rankAfterCloud() {
     if (Rank.state === 'loading') return;   // 이미 서버 연결을 기다리는 중이면 알아서 이어져요
@@ -10600,7 +10664,7 @@ span.bt-stamp{display:none}.bt-duel.done span.bt-stamp{display:grid}
     return { id, name, score: Math.floor(score), tier: Number(d.tier) | 0, year: Number(d.year) | 0, test: !!d.test, at,
       pid: typeof d.pid === 'string' ? d.pid.slice(0, 16) : '', week: Number(d.week) | 0, lp: Math.max(0, Math.floor(Number(d.lp) || 0)),
       title: typeof d.title === 'string' && achTitleName(d.title) ? d.title : '',   // 2.1.3 업적 말고 받는 칭호도
-      bt: typeof d.bt === 'number' && isFinite(d.bt) ? Math.max(1000, Math.min(9999, Math.floor(d.bt))) : 0, btm: typeof d.btm === 'number' ? Math.max(0, Math.min(5, Math.floor(d.btm))) : 0, sem: d.sem === 0 || d.sem === 1 ? d.sem : null,
+      bt: typeof d.bt === 'number' && isFinite(d.bt) ? Math.max(1000, Math.min(9999, Math.floor(d.bt))) : 0, btm: typeof d.btm === 'number' ? Math.max(0, Math.min(5, Math.floor(d.btm))) : 0, btq: typeof d.btq === 'number' && isFinite(d.btq) ? d.btq : null, sem: d.sem === 0 || d.sem === 1 ? d.sem : null,
       sk: Math.max(0, Math.floor(Number(d.sk) || 0)), sp: Math.max(0, Math.min(1e9, Math.floor(Number(d.sp) || 0))) };   // 2.0.1 대결, 2.1.1 학기, 2.1.3 랭킹 시즌
   }
   // 같은 학교(학교 번호)가 기기를 옮겨서 두 번 있으면 내 것이나 가장 최근 것 하나만 남겨요
@@ -10639,16 +10703,24 @@ span.bt-stamp{display:none}.bt-duel.done span.bt-stamp{display:grid}
   }
   const be0 = () => !!(Rank.be && Rank.be.remove);
   const BT_RANK = true;   // 2.0.1 대결 순위: Firebase 콘솔에 새 규칙(bt, btm, indexOn bt)을 게시해야 해요
+  // 2.2.0 검토 1: 대결 점수는 서버 규칙이 '하루 200점' 시간 예산(btq)으로 막아요. 오른 점수 1점마다 btq가 432초(하루 ÷ 200) 앞으로 가고,
+  // btq는 서버 시각(now)을 넘을 수 없고 하루 전보다 뒤처진 만큼은 쌓이지 않아요. 그래서 쉬었다 와도 한 번에 200점, 그 뒤로는 하루 200점까지만 올라요.
+  // 한 판 최대 +40, 하루 5판이라 정상 게임은 하루 200점을 넘지 않아요. 넘는 점수는 다음 업로드에서 차례로 따라가요
+  const BT_DAY = 86400000, BT_MS = 432000, BT_SLACK = 15000;   // 서버 시각과 기기 추정 시각 차이를 15초까지 견뎌요
   function btRankDoc() {
     const mine = (Rank.rows || []).find(r => r.id === Rank.uid) || (Rank.brows || []).find(r => r.id === Rank.uid);
-    let prev = 0, dt = 0, m = 0;
-    if (Rank.sbt) { prev = Rank.sbt; dt = perfNow() - Rank.sbtAt; m = Rank.sbtm || 0; }
-    else if (mine && mine.bt) { prev = mine.bt; dt = gameNow() - mine.at; m = mine.btm; }
-    const cap = prev ? prev + 199 + Math.max(0, dt - 60000) / 432000 : 1200;
-    return { bt: Math.max(1000, Math.min(S.bt.pts, Math.floor(cap))), btm: Math.max(S.bt.lg, m || 0, mine ? mine.btm : 0) };
+    // 두 기기가 같은 계정이면 btq가 더 큰 쪽(더 나중 서버 상태)을 기준으로 해요. btq는 줄어들 수 없어요
+    let prev = 0, q = null, m = 0;
+    if (Rank.sbt) { prev = Rank.sbt; q = Rank.sbtq; m = Rank.sbtm || 0; }
+    if (mine && mine.bt && (q == null || (mine.btq != null && mine.btq > q))) { prev = mine.bt; q = mine.btq; m = Math.max(m, mine.btm); }
+    if (!prev) prev = 1000;   // 처음이거나 bt 없이 올라간 줄은 1000부터
+    const now = gameNow(), base = Math.max(q == null ? -Infinity : q, now - BT_DAY + BT_SLACK);
+    const room = Math.max(0, Math.floor((now - BT_SLACK - base) / BT_MS));
+    const bt = Math.max(1000, Math.min(S.bt.pts, prev + room)), d = Math.max(0, bt - prev);
+    return { bt, btq: base + d * BT_MS, btm: Math.max(m, mine ? mine.btm : 0, Math.min(S.bt.lg, btLgOf(bt))) };
   }
   async function submitRank(force) {
-    if (Rank.state !== 'on' || Rank.readOnly || !Rank.uid || !(S.rank.joined || tossRank()) || Rank.writing) return;
+    if (Rank.state !== 'on' || Rank.readOnly || !Rank.uid || !(S.rank.joined || tossRank()) || Rank.writing || (hasCloudBuild() && (Cloud.deleting || Cloud.delLeft))) return;   // 2.2.0 검토 3
     if (S.u.dev) {   // 2.0.0 보안 점검(2-7): 개발자 메뉴로 재화를 받은 학교는 랭킹에 올리지 않아요
       if (S.rank.sent && be0()) { try { await Rank.be.remove(); } catch (e) { /* 다음에 다시 */ } S.rank.sent = 0; save(); }
       return;
@@ -10673,14 +10745,15 @@ span.bt-stamp{display:none}.bt-duel.done span.bt-stamp{display:grid}
       // 2.1.3 랭킹 시즌: 규칙(sk, sp)을 아직 게시하지 않아 거절되면 시즌 없이 다시 올려요. 규칙은 리그 점수처럼 10초에 1,000쯤까지 받아요
       if (!Rank.noSk && rsOn()) { rsSync(); const mine = (Rank.srows || []).find(r => r.id === Rank.uid), prev = mine && mine.sk === S.rs.n ? mine.sp : (Rank.ssp && Rank.ssk === S.rs.n ? Rank.ssp : null);
         const dt = mine ? gameNow() - mine.at : Rank.sspAt ? perfNow() - Rank.sspAt : 0; doc.sk = S.rs.n; doc.sp = Math.min(S.rs.p, prev == null ? 1000 : Math.floor(prev + (dt >= 11000 ? 1000 : 0) + Math.max(0, dt - 1500) / 10000)); Rank.skSent = true; } else Rank.skSent = false;
-      // 2.0.1 숲속 대결 순위: 규칙은 지난 값 + 200(하루마다 200 더)까지 받아요. 지난 값을 모르면 1200까지만 올리고 차례로 따라가요
+      // 2.0.1 숲속 대결 순위. 2.2.0 검토 1부터 규칙은 btq 시간 예산으로 하루 200점까지 받아요(btRankDoc)
       const bto = !be.toss && BT_RANK && btOpen() ? btRankDoc() : null;
-      if (bto) { doc.bt = bto.bt; doc.btm = bto.btm; }
+      if (bto) { doc.bt = bto.bt; doc.btm = bto.btm; if (!Rank.noBtq) { doc.btq = bto.btq; Rank.btqSent = true; } else Rank.btqSent = false; } else Rank.btqSent = false;   // 2.2.0 검토 1: 새 규칙(btq)을 게시하기 전에는 btq 없이
       await be.put(doc);
       Rank.lastPut = Date.now(); Rank.lastPerf = perfNow(); Rank.denied = 0;
-      if (g === Rank.gen) { S.rank.sent = sc; S.rank.by = Rank.uid; S.rank.sws = ws; if (bto) { Rank.sbt = bto.bt; Rank.sbtAt = perfNow(); Rank.sbtm = bto.btm; } if (Rank.skSent) { Rank.ssp = doc.sp; Rank.ssk = doc.sk; Rank.sspAt = perfNow(); } save(); lookPush(); }
+      if (g === Rank.gen) { S.rank.sent = sc; S.rank.by = Rank.uid; S.rank.sws = ws; if (bto) { Rank.sbt = bto.bt; Rank.sbtq = bto.btq; Rank.sbtm = bto.btm; } if (Rank.skSent) { Rank.ssp = doc.sp; Rank.ssk = doc.sk; Rank.sspAt = perfNow(); } save(); lookPush(); }
     } catch (e) {
       const c = String((e && (e.code || e.message)) || '');
+      if (g === Rank.gen && Rank.btqSent && /permission/i.test(c) && !Rank.noBtq) { Rank.noBtq = true; Rank.writing = false; rankDirty(); renderRankPanel(); return; }   // 2.2.0 검토 1 btq 칸 규칙이 아직 없어요
       if (g === Rank.gen && Rank.skSent && /permission/i.test(c) && !Rank.noSk) { Rank.noSk = true; Rank.writing = false; rankDirty(); renderRankPanel(); return; }   // 2.1.3 시즌 칸 규칙이 아직 없어요
       if (g === Rank.gen && Rank.semSent && /permission/i.test(c) && !Rank.noSem) { Rank.noSem = true; Rank.writing = false; rankDirty(); renderRankPanel(); return; }   // 2.1.1 학기 칸 규칙이 아직 없어요
       // 2.0.0: 규칙의 간격이나 오름 폭에 걸렸을 수 있어서 한 번은 15초 뒤 다시 해 보고, 또 막히면 읽기만 해요
@@ -10758,6 +10831,7 @@ span.bt-stamp{display:none}.bt-duel.done span.bt-stamp{display:grid}
     if (Rank.state === 'on' && Rank.uid && !Rank.readOnly) {
       try { await Rank.be.remove(); } catch (e) { /* 다음에 다시 빼면 돼요 */ }
     }
+    if (S.lk.pub || S.lk.on || S.lk.del) await lookDelNow();   // 2.2.0 검토 6: 랭킹에서 빠지면 공개한 학교 모습도 지워요(켜 둔 설정은 다시 들어오면 써요)
     toast('랭킹에서 이름을 뺐어요');
     renderRankPanel();
   }
@@ -10819,9 +10893,9 @@ span.bt-stamp{display:none}.bt-duel.done span.bt-stamp{display:grid}
       }
     }
     // 2.1.3 다른 학교 구경: 내 학교 보여 주기(처음에는 꺼짐)와 예시 학교
-    { const lk = $('#rankLook'), can = Rank.state === 'on' && !Rank.readOnly && S.rank.joined && !tossRank() && !!(Rank.be && Rank.be.lookPut), k2 = `${can}|${S.lk.on}|${Rank.noLook ? 1 : 0}`;
+    { const lk = $('#rankLook'), can = Rank.state === 'on' && !Rank.readOnly && S.rank.joined && !tossRank() && !!(Rank.be && Rank.be.lookPut), k2 = `${can}|${S.lk.on}|${S.lk.del ? 1 : 0}|${Rank.noLook ? 1 : 0}`;
       if (lk && lk.dataset.key !== k2) { lk.dataset.key = k2;
-        lk.innerHTML = (can ? `<label class="rl-on"><input type="checkbox" id="lookOn"${S.lk.on ? ' checked' : ''}><span><b>내 학교 보여 주기</b><small>${S.lk.on ? (Rank.noLook ? '서버 준비 중이에요. 준비되면 저절로 올라가요' : '랭킹에서 다른 교장 선생님이 내 학교 지도를 구경할 수 있어요') : '켜면 랭킹에서 내 학교 지도를 구경할 수 있어요'}</small></span></label>` : '') +
+        lk.innerHTML = (can ? `<label class="rl-on"><input type="checkbox" id="lookOn"${S.lk.on ? ' checked' : ''}><span><b>내 학교 보여 주기</b><small>${S.lk.on ? (Rank.noLook ? '서버 준비 중이에요. 준비되면 저절로 올라가요' : '랭킹에서 다른 교장 선생님이 내 학교 지도를 구경할 수 있어요') : S.lk.del ? '서버에서 내 학교를 지우는 중이에요. 인터넷이 이어지면 다시 지워요' : '켜면 랭킹에서 내 학교 지도를 구경할 수 있어요'}</small></span></label>` : '') +
           `<button class="btn-sub rl-model" type="button" data-look="model">예시 학교 구경하기</button><p class="fine">랭킹의 학교 이름을 누르면 그 학교를 구경해요(보여 주기를 켠 학교만)</p>`; } }
     // 순위표: 이름은 다른 사람이 적은 글이라 textContent로만 넣어요
     const list = $('#rankList'), rows = Rank.state === 'on' ? R : [];
@@ -12103,7 +12177,7 @@ span.bt-stamp{display:none}.bt-duel.done span.bt-stamp{display:grid}
     if (S.club.wk !== wk) { S.club.wk = wk; S.club.wd = 0; S.club.we = 0; }
     if (showWd(d) < 5) S.club.wd += 1; else S.club.we += 1;
     S.club.last = d; S.club.n += 1; S.club.shown[c] = 1; S.st.shows = (S.st.shows || 0) + 1;
-    cgShowAdd(c); if (cgOpen()) S.cg.st.s = (S.cg.st.s || 0) + 1;   // 2.2.0 대항전 발표회 점수
+    cgShowAdd(c); if (cgOpen()) S.cg.st.s += 1;   // 2.2.0 대항전 발표회 점수
     S.budget += v; earn(v);
     addLeague(LP.festWin);
     save();
@@ -12119,7 +12193,7 @@ span.bt-stamp{display:none}.bt-duel.done span.bt-stamp{display:grid}
   const CG = { tier: 2, star: 10, prac: 20, show: 30, grow: 2, gold1: 2, gold23: 1, partMin: 30, flagAt: [1, 3, 6],
     f: [1.22, 1.12, 1.04, 0.97, 0.9, 0.82, 0.72], jitter: 0.04, practiceRate: 0.7, showGuess: 5 };
   const CG_FLAGS = [['cg_flag_b', '동메달 우승 깃발', 'flag_bronze'], ['cg_flag_s', '은메달 우승 깃발', 'flag_silver'], ['cg_flag_g', '금메달 우승 깃발', 'flag_gold']];
-  const freshCg = () => ({ wk: -1, opp: [], prac: CLUBS.map(() => 0), show: CLUBS.map(() => 0), pd: '', res: null, wins: 0, pod: 0, st: { p: 0, n: 0 } });
+  const freshCg = () => ({ wk: -1, opp: [], prac: CLUBS.map(() => 0), show: CLUBS.map(() => 0), pd: '', res: null, wins: 0, pod: 0, st: { p: 0, n: 0, s: 0 } });   // s: 2.2.0 검토 5 대항전 중 발표회 수(cgShow 퀘스트)
   const cgOpen = () => !!S && !!S.cg && rosterOn() && S.tier >= CG.tier;
   const cgStarPts = () => CLUBS.reduce((n, _, c) => n + clubStars(c) * CG.star, 0);
   const cgClubPts = c => clubStars(c) * CG.star + (S.cg.prac[c] || 0) * CG.prac + (S.cg.show[c] || 0) * CG.show;
@@ -12197,7 +12271,9 @@ span.bt-stamp{display:none}.bt-duel.done span.bt-stamp{display:grid}
     o.prac = CLUBS.map((_, c) => n(Array.isArray(G.prac) ? G.prac[c] : 0, 7)); o.show = CLUBS.map((_, c) => n(Array.isArray(G.show) ? G.show[c] : 0, 14));
     o.pd = typeof G.pd === 'string' ? G.pd.slice(0, 10) : '';
     o.res = G.res && typeof G.res === 'object' ? { wk: n(G.res.wk, 1e5), rank: Math.max(1, n(G.res.rank, 8)), my: n(G.res.my, 1e7) } : null;
-    o.wins = n(G.wins, 1e4); o.pod = n(G.pod, 1e4); o.st = { p: n(G.st && G.st.p, 1e6), n: n(G.st && G.st.n, 1e6) };
+    o.wins = n(G.wins, 1e4); o.pod = n(G.pod, 1e4); o.st = { p: n(G.st && G.st.p, 1e6), n: n(G.st && G.st.n, 1e6), s: n(G.st && G.st.s, 1e6) };
+    // 2.2.0 검토 5: st.s가 없던 2.2.0 저장은 이번 주 대항전 발표회 수(show)를 최소값으로 받아요(그전 주 것은 알 수 없어요)
+    if (!(G.st && 's' in G.st)) o.st.s = Math.max(o.st.s, o.wk >= 0 ? o.show.reduce((a, v) => a + v, 0) : 0);
     s.cg = o;
   }
   function sanitize200(d, s) {
@@ -17085,21 +17161,61 @@ span.bt-stamp{display:none}.bt-duel.done span.bt-stamp{display:grid}
       } catch (er) { return false; }
     }
   }
-  // 계정 지우기: 서버의 저장, 랭킹, 테스트 기록을 지우고 Firebase 계정(익명, 구글 연결)도 지운 뒤 새 학교로 다시 열어요.
-  // 계정만 못 지웠으면 표시를 남겨 두고, 다음에 열 때 서버에 새로 올리기 전에 다시 지워요
+  /* 계정 지우기: 서버의 저장, 예전 학교 칸, 랭킹, 공개 학교 모습, 테스트 기록, 관리자 표시를 지우고 Firebase 계정(익명, 구글 연결)도 지운 뒤 새 학교로 다시 열어요.
+     2.2.0 검토 3: 서버 기록을 모두 지우기 전에는 계정(인증)을 지우지 않아요(계정이 없으면 내 칸을 지울 권한도 없어져요).
+     지우는 동안과 일부를 못 지웠을 때는 저장, 예전 학교, 랭킹, 공개 모습을 올리지 않고(Cloud.deleting), 못 지운 것은 기기에 표시(DEL_DATA)를 남겨 다음에 열 때 먼저 지워요.
+     이 기기의 예전 학교(forest-school-bak)와 저장 맞춤 기록도 지워서, 지운 뒤 새 익명 계정으로 예전 학교가 올라가지 않아요.
+     계정만 못 지웠으면(구글 다시 로그인 취소, 인터넷 끊김) 표시(DEL_PENDING)를 남겨 두고, 다음에 열 때 서버에 새로 올리기 전에 다시 지워요 */
+  const DEL_PATHS = ['saves', 'bak', 'rank', 'look', 'stats', 'admins'];
+  const DEL_DATA = 'forest-del-data';
+  function delData(uid) {
+    try {
+      if (uid === undefined) return localStorage.getItem(DEL_DATA) || '';
+      if (uid) localStorage.setItem(DEL_DATA, uid); else localStorage.removeItem(DEL_DATA);
+    } catch (e) { /* 저장소가 막혀 있어요 */ }
+    return '';
+  }
+  // 서버 칸을 모두 지워요. 못 지운 칸 이름을 돌려줘요(빈 배열이면 모두 지움)
+  async function delServer(uid) {
+    const rs = await Promise.allSettled(DEL_PATHS.map(k => waitFor(Cloud.db.ref(`forest/${k}/${uid}`).remove(), CLOUD_WAIT)));
+    return DEL_PATHS.filter((k, i) => rs[i].status !== 'fulfilled');
+  }
+  function delLocal() {
+    try { [SAVE_KEY, BAK_KEY, SYNC_KEY, ACCT_PENDING].forEach(k => localStorage.removeItem(k)); } catch (e) { /* 무시 */ }
+  }
   async function deleteAccount() {
     if (!cloudOn() || rt.deleting) return;
     rt.deleting = true;
     const btn = $('#delYes'); btn.disabled = true; btn.textContent = '지우는 중';
     const uid = Cloud.uid;
+    Cloud.deleting = true; clearTimeout(Cloud.timer);   // 지우는 동안 저장, 예전 학교, 랭킹, 공개 모습을 올리지 않아요
     rt.adopting = true;   // 지우는 동안 다시 저장하지 않아요
-    const refs = ['saves', 'rank', 'stats', 'admins'].map(k => Cloud.db.ref(`forest/${k}/${uid}`));   // 2.0.0 보안 점검(2-12): 관리자 표시도 지워요
-    try { await Promise.all(refs.map(r => r.remove())); }
-    catch (e) { rt.deleting = false; rt.adopting = false; btn.disabled = false; btn.textContent = '모두 지우기'; toast('서버 기록을 지우지 못했어요. 인터넷을 확인하고 다시 해 주세요'); return; }
+    delData(uid);   // 다 지우기 전에 앱이 꺼져도 다음에 열 때 이어서 지워요
+    const left = await delServer(uid);
+    if (left.length) {
+      rt.deleting = false; rt.adopting = false; btn.disabled = false; btn.textContent = '모두 지우기';
+      Cloud.delLeft = true; renderCloudInfo();   // 서버에 다시 올리지 않고 기다려요(앱을 다시 열면 먼저 지워요)
+      toast('서버 기록을 다 지우지 못했어요. 인터넷을 확인하고 다시 눌러 주세요. 그동안 서버에 저장하지 않아요');
+      return;
+    }
+    delData(false);
     const gone = await deleteAuthUser(true);
     if (!gone) delPending(true);
-    try { localStorage.removeItem(SAVE_KEY); sessionStorage.setItem('forest-adopt', gone ? '계정과 서버 기록을 모두 지웠어요. 새 학교로 시작해요' : '서버 기록은 지웠어요. 계정은 아직 남아 있어서 다음에 열 때 다시 지워요'); } catch (e) { /* 무시 */ }
+    delLocal();
+    try { sessionStorage.setItem('forest-adopt', gone ? '계정과 서버 기록을 모두 지웠어요. 새 학교로 시작해요' : '서버 기록은 지웠어요. 계정은 아직 남아 있어서 다음에 열 때 다시 지워요'); } catch (e) { /* 무시 */ }
     location.reload();
+  }
+  // 다음에 열 때: 지난번에 서버 기록을 다 못 지웠으면 이어서 지우고, 다 지우면 이 기기 학교도 지운 뒤 다시 열어요
+  async function delResume(uid) {
+    const left = await delServer(uid);
+    if (left.length) return false;
+    delData(false);
+    const gone = await deleteAuthUser(false);
+    if (!gone) delPending(true);
+    delLocal();
+    try { sessionStorage.setItem('forest-adopt', gone ? '지난번에 남았던 계정과 서버 기록을 모두 지웠어요. 새 학교로 시작해요' : '서버 기록은 지웠어요. 계정은 아직 남아 있어서 다음에 열 때 다시 지워요'); } catch (e) { /* 무시 */ }
+    rt.adopting = true; location.reload();
+    return true;
   }
   function resetGame() {
     if (S && S.pid) bakAdd(JSON.stringify(S), '처음부터 다시 하기 전');   // 2.2.0
@@ -17711,6 +17827,7 @@ span.bt-stamp{display:none}.bt-duel.done span.bt-stamp{display:grid}
       if (document.hidden) {
         rt.hiddenAt = gameNow();
         if (!rt.paused) save(rt.hiddenAt);
+        Cloud.hideSv = S.savedAt;   // 2.2.0 검토 2: 내릴 때 학교. 이것이 서버에 올라갔으면 내려 둔 동안 저절로 흐른 것만 달라요
         cloudPush();   // 앱을 내리면 서버에도 바로 올려요
         if (cloudOn()) Cloud.fresh = false;   // 2.0.0 Codex 검토(3): 다시 켜면 서버 저장부터 확인해요
         awayHold(true);   // 2.0.0 Codex 검토(6): 내려 둔 시간은 '켠 뒤 논 시간'에 넣지 않아요
@@ -18472,17 +18589,35 @@ span.bt-stamp{display:none}.bt-duel.done span.bt-stamp{display:grid}
     f: { classroom: 60, cafeteria: 55, library: 55, playground: 55, science: 50, store: 50 }, bs: { classroom: 3, cafeteria: 3, library: 3, playground: 3, science: 3, store: 3 },
     lay: ['fountain', 'flowerbed', 'arch', 'swingtree', 'pond', 'clock', 'crystal', 'streetlamp', 'bench', 'rainbow', 'owl'], st: 240, rare: ['rabbit', 'fox', 'chick'], vd: 8,
     kids: ['rabbit_rare', 'fox_rare', 'chick_rare', 'bear', 'panda', 'dog', 'cat', 'otter'] };
+  /* 2.2.0 검토 6: 공개를 끄면 서버의 forest/look/<id>를 지워요. 못 지웠으면 S.lk.del을 남겨(앱을 껐다 켜도) 랭킹이 다시 이어질 때 다시 지워요.
+     다른 기기의 옛 저장(공개 켬)이 다시 올리지 않게, 올린 적이 있는데(pub) 서버에 내 학교가 없으면 다른 곳에서 끈 것으로 보고 이 기기도 꺼요 */
+  async function lookDelNow() {
+    if (!S || !S.lk) return false;
+    S.lk.del = true; S.lk.pub = false; S.lk.h = ''; save();
+    if (Rank.state !== 'on' || !Rank.be || !Rank.be.lookDel || Rank.lookDeling) return false;
+    Rank.lookDeling = true;
+    try { await waitFor(Rank.be.lookDel(), CLOUD_WAIT); S.lk.del = false; save(); return true; }
+    catch (e) { return false; }
+    finally { Rank.lookDeling = false; renderRankPanel(); }
+  }
+  function lookRetry() { if (S && S.lk && S.lk.del && !S.lk.on) lookDelNow(); }
   async function lookPush(force) {
-    if (!S || !S.lk || !S.lk.on || !S.rank.joined || Rank.state !== 'on' || Rank.readOnly || !Rank.be || !Rank.be.lookPut || S.u.dev) return;
+    if (S && S.lk && S.lk.del && !S.lk.on) { lookDelNow(); return; }
+    if (!S || !S.lk || !S.lk.on || !S.rank.joined || Rank.state !== 'on' || Rank.readOnly || !Rank.be || !Rank.be.lookPut || S.u.dev || Cloud.deleting || Cloud.delLeft) return;
     const d = lookDoc();
     if (!force && (d === S.lk.h || Date.now() - (S.lk.at || 0) < RS.look)) return;
-    try { await Rank.be.lookPut(d); S.lk.at = Date.now(); S.lk.h = d; save(); }
+    if (!force && S.lk.pub && Rank.be.lookGet) {
+      let v = null; try { v = await waitFor(Rank.be.lookGet(Rank.uid), CLOUD_WAIT); } catch (e) { return; }   // 못 읽으면 다음에
+      if (!v) { S.lk.on = false; S.lk.pub = false; S.lk.h = ''; save(); renderRankPanel(); return; }   // 다른 기기나 랭킹 빼기, 계정 지우기로 꺼졌어요
+    }
+    try { await Rank.be.lookPut(d); S.lk.at = Date.now(); S.lk.h = d; S.lk.pub = true; S.lk.del = false; save(); }
     catch (e) { if (/permission/i.test(String((e && (e.code || e.message)) || ''))) Rank.noLook = true; }
   }
   async function lookSet(on) {
-    S.lk.on = !!on; S.lk.h = ''; save(); sfx('tap');
+    S.lk.on = !!on; S.lk.h = ''; if (on) S.lk.del = false; save(); sfx('tap');
     if (on) { await lookPush(true); toast(Rank.noLook ? '서버가 아직 준비 중이라 지금은 올리지 못했어요. 준비되면 저절로 올라가요' : '랭킹에서 다른 교장 선생님이 내 학교를 구경할 수 있어요'); }
-    else { try { if (Rank.be && Rank.be.lookDel) await Rank.be.lookDel(); } catch (e) { /* 다음에 다시 */ } toast('내 학교를 보여 주지 않아요'); }
+    else if (await lookDelNow()) toast('내 학교를 보여 주지 않아요');
+    else toast('서버에서 아직 내 학교를 지우지 못했어요. 인터넷이 이어지면 다시 지울게요');
     renderRankPanel();
   }
   async function openLook(id, who) {
@@ -19682,6 +19817,7 @@ span.bt-stamp{display:none}.bt-duel.done span.bt-stamp{display:grid}
     RARE, rareRoll, rareGot, showRareTalk, rareDexHTML, kidSVG, rosterKid, WX, wxOf, wxIs, rdMinNow, renderWeather, PL, plSync, plUnread, openPLetter, renderPLetter, RS, rsNum, rsSync, rsAdd, rsLabel, lookDoc, lookRead, lookPush, lookSet, openLook, MODEL_SCHOOL, joinRank, PS, PS_M, PS_SEASONS, psSeason, psOpen, psSync, psLv, psGot, psReward, psClaimAll, psClaimMission, psWatchAd, psClaimable, psStepReady, psExtraReady, psChooseFur, psFurImg, renderPass, setEvSeg, xtGot, achTitles,   // 2.1.3 숲속 패스
     dexMeet, dexSync, dexPending, dexGift, renderDex, evCurrent, evNext, evUpcoming, evSync, evFix, evVal, EV_FALLBACK, EV_DECO, EV_HAT, COS, DECO_BY, decoOwn, perkRec, fpRec, BOOST_ALL, buyShop, pickShop, showNote, showOkOn, showWd, renderGradPanel, renderShop, renderDecoShop, EV_WEEKLY, EV_WEEK_BASE, weekMon, claimStamp, claimEvMission, claimEvBox, renderEvent, evMissions, evOk, evSkipped, EV_MONTHS, EV_MEASURE, tierMinutes, minAcorns, IMG, sanitize171, ACH, achSync, claimAch, setTitle, renderAch, setDexSeg, achClaimable, XT, xtAct, xtCost, xtLv, feastMins, libMult, propInstances, walkBuild, festItemSvg, guestArt, adErrText, googleErrText, openSheet, closeSheet, startFest, startSports, sanitize170, EV_STAMPS, EV_SPECIAL, EV_MONTHLY, EV_BOX, DEX_KEYS, DEX_REWARD, DEX_GUEST_KEYS, seasonKey, roofArtKey, oakKey, setSeasonArt, VP, vpLv, vpCost, vpMult, vpAct, renderVpCard, sportsPrize, festPrize, renderTeachers, buildTeacherCards, bldImg, roofKey, bldStage, mapKey, setMapArt, applyThemes, buyFacility, bldFx, setBldFx, mapHi, Live, liveApply, liveLoad, liveOff, LIVE_KEYS, EVC, NOTICES, openNotice, noticeAuto, noticeWant, ntUnread, startTrial, endTrial: () => rt.trial && (rt.trial.left = 0), spawnDeal, startVisit, IMG170, MG, mgCells, mgSetCells, mgTick, mgAddEnergy, mgAddUp, mgTapGen, mgDrop, mgSell, mgUpgrade, mgClaimOrder, mgSwapOrder, mgOrderOk, mgFillOrders, mgOpen, mgClose, mgRenderAll, mgSpawnLevel, mgNearestEmpty, mgEmptyBoard, mgOrderReward, mgUI, sanitize180, mgWatchAd, mgNewOrder, mgHintPick, mgShowHint, mgClearHint, mgTouch, mgOrderGuide, mgDexN, mgDexCan, mgDexClaim, mgOpenDex, MG_DEX, MG_DEX_MS, mgDexEss, mgDexEssCan, mgDexEssN, mgDexMsCan, mgDexMsClaim, MGB, mgBuyBoost, mgBstLeft, mgOpenBoost, nice, claimMission, claimBonus, claimWeekMission, MP_BOX,   // 1.7.0 도감, 이벤트
     PZ, PZ_SHAPES, pzFits, pzAnyFit, pzStuck, pzFullLines, pzPlace, pzFreshGame, pzStart, PZB, pzbCost, pzApplyBoost, pzBoostOpen, pzBoostGo, festGoldLeft, festGoldTake, claimSports, renderStreet, pzFinish, pzLeft, pzCanAd, pzEssOf, pzMinOf, pzHelpSquirrel, pzHelpOwl, pzHelpBear, fillSubs, mapRoofTop, showAd, claimOfflineDouble, startBoost, tripAd, festFocus, festRange, visMap, renderMissions, pzHasHelp, pzRot, pzNewPiece, pzOpen, pzClose, pzGameOver, pzRenderAll, renderMini, addEss, ESHOP, SP_FUR, applyCos, essItem, pickEss, buyEss, renderEssShop, hatSVG, spFurImg, gameNow, gameToday, gameWeek, kstDay, setServerTime, SVR, dmDay, weekIdx, lgWeek, wkWeek, lgKey, pzDay, goldDay, boostLeft, dealLeft, canStamp };
+  if (window.__FOREST_TEST) Object.assign(window.__forest, { cloudPush, cloudClash, syncGet, revOf, deleteAccount, lookDel: () => lookDelNow(), lookSet, lookPush, leaveRank, sanitizeCg, freshCg });   // 2.2.0 검토 시험 손잡이
   if (window.claude && window.claude.hot && window.claude.hot.snapshot) {
     try { window.claude.hot.snapshot(() => { if (S) syncMid(); return { save: S }; }); } catch (e) { /* 무시 */ }
   }

@@ -3,10 +3,13 @@ import { AdMob, RewardAdPluginEvents, AdmobConsentStatus } from '@capacitor-comm
 
 const AD_UNIT = 'ca-app-pub-5932346459951963/3611713925';   // 보상형 광고 단위 (황금 도토리 1개)
 const TESTING = __ADMOB_TEST__;                              // 시험 빌드에서는 구글 테스트 광고를 써요
-const CONSENT_RETRY = 60000;                                 // 동의 정보를 못 받았으면 1분 뒤에 다시 물어봐요
+const CONSENT_RETRY = 60000;                                 // 동의 정보를 못 받았으면 1분 뒤부터 다시 물어봐요(실패가 이어지면 10분까지 늘려요)
+const CONSENT_RETRY_MAX = 600000;
+const CONSENT_KEY = 'forest-ads-consent';                    // 2.2.0 검토 4: 지난번에 SDK가 알려 준 canRequestAds(1 또는 0)
 
 let ready = false, loading = false, started = false;
 let canAds = false, consentAt = 0, asking = false;           // 1.5.4: 동의 상태가 광고를 허락할 때만 광고를 준비해요
+let consentWait = CONSENT_RETRY, consentFails = 0, consentErr = false;
 let onDone = null, earned = false;
 let lastErr = '';                                            // 1.7.1: 광고를 못 불러온 까닭(애드몹 오류 코드)을 게임 알림에 보여 줘요
 
@@ -16,28 +19,37 @@ function finish() {
   earned = false;
   preload();
 }
-// 유럽 등 동의가 필요한 지역이면 구글 동의 창을 보여 주고, canRequestAds로 광고를 불러도 되는지 확인해요.
-// 동의 정보를 못 받으면(인터넷 끊김 등) 광고는 준비하지 않고 게임은 그대로 이어 가요
+function savedConsent() { try { return localStorage.getItem(CONSENT_KEY); } catch (e) { return null; } }
+function keepConsent(ok) { try { localStorage.setItem(CONSENT_KEY, ok ? '1' : '0'); } catch (e) { /* 남기지 못해도 이번에는 SDK 답을 써요 */ } }
+// 유럽 등 동의가 필요한 지역이면 구글 동의 창을 보여 주고, SDK가 알려 준 canRequestAds가 true일 때만 광고를 불러요.
+// 2.2.0 검토 4: 예전(1.7.2)에는 동의 정보를 못 받으면 광고를 불렀어요. 이제는 실패를 허락으로 바꾸지 않아요.
+// 구글 UMP는 동의 정보 갱신이 실패해도 지난 세션에 SDK가 얻은 동의로 canRequestAds를 답해요. 이 꾸러미는 실패하면 그 값을 주지 않아서,
+// 지난번 성공한 확인에서 SDK가 준 canRequestAds를 기기에 남겨 두었다가 같은 뜻으로만 써요(SDK가 허락한 적이 없으면 광고 없음).
+// 광고가 없어도 게임은 그대로 이어 가고, 동의 확인은 1분, 2분, 4분… 10분 간격으로 다시 해 봐요
 async function checkConsent() {
   if (canAds || asking) return canAds;
-  if (consentAt && Date.now() - consentAt < CONSENT_RETRY) return false;
+  if (consentAt && Date.now() - consentAt < consentWait) return false;
   asking = true; consentAt = Date.now();
   try {
     let c = await AdMob.requestConsentInfo();
-    if (c && c.isConsentFormAvailable && c.status === AdmobConsentStatus.REQUIRED) c = (await AdMob.showConsentForm()) || c;
-    canAds = !!(c && c.canRequestAds);
+    if (c && c.isConsentFormAvailable && c.status === AdmobConsentStatus.REQUIRED) {
+      const f = await AdMob.showConsentForm();
+      if (f && typeof f.canRequestAds === 'boolean') c = f;
+    }
+    canAds = !!(c && c.canRequestAds === true);
+    keepConsent(canAds); consentErr = false; consentFails = 0; consentWait = CONSENT_RETRY; lastErr = canAds ? lastErr : 'consent:denied';
   } catch (e) {
-    // 1.7.2: 동의 정보를 못 받아도(애드몹 '개인 정보 보호 및 메시지'를 아직 안 만들었거나 일시 오류) 광고는 불러 봐요.
-    // 동의가 필요한 지역이면 애드몹이 알아서 맞춤형이 아닌 광고만 줘요. 한국은 동의 창이 필요 없어요
     lastErr = 'consent:' + String((e && (e.code ?? e.message)) || '').slice(0, 40);
-    canAds = true;
+    canAds = savedConsent() === '1';   // 지난번 SDK가 광고를 허락했을 때만. 처음 켰거나 거절했으면 광고 없음
+    consentErr = !canAds;
+    consentFails += 1; consentWait = Math.min(CONSENT_RETRY_MAX, CONSENT_RETRY * 2 ** (consentFails - 1));
   }
   asking = false;
   return canAds;
 }
 async function preload() {
   if (!started || ready || loading) return;
-  if (!(await checkConsent())) { setTimeout(preload, CONSENT_RETRY); return; }
+  if (!(await checkConsent())) { setTimeout(preload, consentWait); return; }
   loading = true;
   try { await AdMob.prepareRewardVideoAd({ adId: AD_UNIT, isTesting: TESTING }); ready = true; lastErr = ''; }
   catch (e) { lastErr = String((e && (e.code ?? e.message)) || 'unknown').slice(0, 60); setTimeout(preload, 20000); }

@@ -63,10 +63,13 @@
             ".validate": "newData.isNumber() && newData.val() >= 0 && newData.parent().child('week').isNumber() && newData.parent().child('lp').isNumber() && newData.val() === newData.parent().child('week').val() * 1000000 + newData.parent().child('lp').val()"
           },
           "bt": {
-            ".validate": "newData.isNumber() && newData.val() >= 1000 && newData.val() <= 9999 && newData.val() <= (data.exists() ? data.val() : 1000) + 200 + (data.parent().child('at').isNumber() ? (now - data.parent().child('at').val()) / 432000 : 200)"
+            ".validate": "newData.isNumber() && newData.val() >= 1000 && newData.val() <= 9999 && (newData.parent().child('btq').isNumber() || (!data.parent().child('btq').exists() && newData.val() <= (data.exists() ? data.val() : 1000)))"
+          },
+          "btq": {
+            ".validate": "newData.isNumber() && newData.parent().child('bt').isNumber() && newData.val() <= now && newData.val() >= now - 86400000 + ((newData.parent().child('bt').val() - (data.parent().child('bt').isNumber() ? data.parent().child('bt').val() : 1000)) > 0 ? (newData.parent().child('bt').val() - (data.parent().child('bt').isNumber() ? data.parent().child('bt').val() : 1000)) * 432000 : 0) && (!data.exists() || newData.val() >= data.val() + ((newData.parent().child('bt').val() - (data.parent().child('bt').isNumber() ? data.parent().child('bt').val() : 1000)) > 0 ? (newData.parent().child('bt').val() - (data.parent().child('bt').isNumber() ? data.parent().child('bt').val() : 1000)) * 432000 : 0))"
           },
           "btm": {
-            ".validate": "newData.isNumber() && newData.val() >= 0 && newData.val() <= 5 && (!data.exists() || newData.val() >= data.val())"
+            ".validate": "newData.isNumber() && newData.val() >= 0 && newData.val() <= 5 && newData.parent().child('bt').isNumber() && (!data.exists() || newData.val() >= data.val()) && (newData.val() <= (newData.parent().child('bt').val() >= 2500 ? 5 : newData.parent().child('bt').val() >= 2000 ? 4 : newData.parent().child('bt').val() >= 1600 ? 3 : newData.parent().child('bt').val() >= 1300 ? 2 : newData.parent().child('bt').val() >= 1100 ? 1 : 0) || (data.exists() && newData.val() <= data.val()))"
           },
           "sem": {
             ".validate": "newData.isNumber() && (newData.val() === 0 || newData.val() === 1)"
