@@ -18,6 +18,7 @@ def base(**kw):
 
 async def ctxpage(b, w, h, scheme, save):
     ctx = await b.new_context(viewport={'width':w,'height':h}, device_scale_factor=2, is_mobile=True, has_touch=True, color_scheme=scheme)
+    await ctx.add_init_script("window.__FOREST_TEST = true;")   # 2026-10-30: 업데이트 공지 창이 늦게 떠서 단추를 가려요. 시험 모드에서는 공지를 저절로 띄우지 않아요
     await ctx.add_init_script("if(!sessionStorage.getItem('seeded')){localStorage.setItem('forest-school-v1', %s);sessionStorage.setItem('seeded','1');}" % json.dumps(json.dumps(save)))
     page = await ctx.new_page(); errs = []
     page.on('pageerror', lambda e: errs.append(str(e)))
@@ -145,5 +146,9 @@ async def main():
             await ctx.close()
         out = json.dumps(res, ensure_ascii=False, indent=1)
         open('s4res.json', 'w').write(out)
+        # 2026-10-30: 결과 파일과 함께 간단한 통과 판정(페이지 오류가 없고 식과 진학이 끝까지 갔는지)
+        errs = [e for v in res.values() for e in (v.get('errors') or [])]
+        ok = not errs and (not want('k1') or res['k1']['state']['tg'] == 1) and (not want('k2') or res['k2']['state']['tier'] == 1)
+        print('PASS' if ok else 'FAIL ' + json.dumps(errs, ensure_ascii=False)[:300])
         await b.close()
 if __name__ == "__main__": asyncio.run(main())

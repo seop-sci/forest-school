@@ -6,7 +6,7 @@ Playwright(Python)로 `dev/test.html`을 열어 시험해요. 먼저 `cd dev && 
 ## 시험 정리 (2026-10-29)
 
 - 시험이 너무 많아져서(66개) 옛 시험 14개를 `dev/tests_old/`로 옮겼어요(지우지 않고 보관, 까닭은 그 폴더의 README). 업데이트 때는 `dev/` 바로 아래의 `s*test.py`만 돌려요(52개).
-- 아직 실패하는 시험(화면이 바뀌어 옛 모습을 기다려요, 고칠 거리): `s4test.py`(다른 시험이 URL을 가져다 써서 파일은 꼭 남겨요), `s7test.py`, `s18test.py`(가짜 서버), `s66test.py`.
+- 2026-10-30 고침: `s4test.py`(시험 모드로 열어 공지 창이 단추를 가리지 않게, 마지막 줄 PASS), `s7test.py`, `s18test.py`(가짜 서버 저장에 이번 공지를 본 것으로 넣어요, 마지막 줄 PASS), `s66test.py`(두 학기). 가짜 서버 시험은 `NODE_PATH`에 targaryen이 있어야 해요.
 
 ## 꼭 돌리는 시험
 
@@ -114,3 +114,10 @@ Issue 양식은 기본 브랜치(`main`)에 있어야 GitHub의 새 Issue 화면
 | `fbtest/rules_sec.js` | 2.0.0 보안 점검 규칙: `NODE_PATH=<targaryen> node dev/fbtest/rules_sec.js database.rules.json`. adminKey, 랭킹 점수와 리그 점수 10초 간격, 주 번호, test 거부, stats 칸 |
 
 가짜 Firebase 시험(s7, s18, s26, s27, s34, s44)은 `python3 build_gh.py gh`로 웹판을 먼저 만들어요. 2026-10-28 기준 s4, s7, s18, s40은 옛 화면(아래 설정 탭, `#gBtn`)이나 배경음악 기대값 때문에 고치기 전부터 멈춰요.
+
+## 2.1.3 새 시험 (2026-10-30)
+- `s88test.py`: 숲속 패스(여는 때, 미션, 광고 2배, 30단계 보상, 덤 상자, 시즌 넘어감, 옛 저장, 화면). 마지막 줄 PASS면 통과
+- `s89test.py`: 반짝 친구(5%, 천장 12, 소개 대화, 털 색 말이 없는지, 도감, 업적, 명부, 옛 저장)
+- `s90test.py`: 랭킹 시즌, 내 학교 보여 주기, 다른 학교 구경, 예시 학교(공유 저장소를 흉내 내요)
+- `fbtest/rules_test.js`: 서버 규칙(시즌 sk, sp와 forest/look 포함 86개). `NODE_PATH=<targaryen 폴더> node fbtest/rules_test.js database.rules.json`
+
