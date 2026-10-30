@@ -32,22 +32,23 @@ async def main():
                   S.tier = 2; S.tg = 0; o.m1 = [F.conSec('library', 14), F.conSec('library', 18), F.conSec('store', 1)];
                   S.tier = 0; S.tg = 0; return o; }})()""")
                 print('공사 시간', r)
-                if r != {'kinder': 5, 'e1': [60, 480, 900, 900], 'e1s2': [60, 900, 900, 900, 20], 'e4': [900, 3600], 'm1': [3600, 7200, 7200]}:
+                if r != {'kinder': 5, 'e1': [30, 165, 300, 10], 'e1s2': [30, 300, 300, 300, 20], 'e4': [60, 1200], 'm1': [300, 1800, 10]}:   # 2.3.0 공사 시간(처음 짓기 10초)
                     bad.append(f'공사 시간이 틀려요 {r}')
                 # 3) 사기와 동시 공사
                 r = await pg.evaluate(f"""(() => {{ const F = {F}, S = F.S, o = {{}}, t0 = Date.now(); F.rt.fakeNow = t0;
                   S.tier = 1; S.tg = 0; S.sem = 0; S.budget = 1e15;
                   for (const k of ['library', 'cafeteria']) {{ S.f[k] = 15; S.fu[k] = S.fu[k].map(() => 15); }}
                   S.budget = 1e13; S.ff = {{}}; const lf = S.f.library; F.buyFacility('library'); o.free = [S.f.library === lf + 1 && !F.conOn('library'), F.conFreeLeft('library'), F.conFreeLeft('cafeteria')];   // 2.1.1 하루 한 번 바로 완공
-                  S.f.library = 15; S.fu.library = S.fu.library.map(() => 15); S.ff = {{ library: F.gameToday(), cafeteria: F.gameToday(), classroom: F.gameToday(), science: F.gameToday(), playground: F.gameToday() }};
+                  S.f.library = 15; S.fu.library = S.fu.library.map(() => 15); delete S.bd.library; S.ff = {{ library: F.gameToday(), cafeteria: F.gameToday(), classroom: F.gameToday(), science: F.gameToday(), playground: F.gameToday() }};
                   S.budget = 1e13; const b0 = S.budget, c = F.facCost('library');
                   o.a = F.buyFacility('library'); o.paid = b0 - S.budget > 0 && b0 - S.budget <= c * (1 + 1e-9); o.lv = S.f.library; o.again = F.buyFacility('library');
                   o.b = F.buyFacility('cafeteria'); o.both = F.conOn('library') && F.conOn('cafeteria');
-                  F.rt.fakeNow = t0 + 479e3; F.conTick(); o.mid = S.f.library;
-                  F.rt.fakeNow = t0 + 481e3; F.conTick(); o.end = [S.f.library, S.f.cafeteria, F.conOn('library')];
+                  F.rt.fakeNow = t0 + 164e3; F.conTick(); o.mid = S.f.library;   // 2.3.0 초등 1학년 Lv.16은 165초
+                  F.rt.fakeNow = t0 + 166e3; F.conTick(); o.end = [S.f.library, S.f.cafeteria, F.conOn('library')];
                   return o; }})()""")
                 print('사기', r)
-                if r != {'free': [True, False, True], 'a': True, 'paid': True, 'lv': 15, 'again': False, 'b': True, 'both': True, 'mid': 15, 'end': [16, 16, False]}:
+                if r != {'free': [False, True, True],   # 2.3.0 즉시 완공은 저절로 쓰지 않아요
+                          'a': True, 'paid': True, 'lv': 15, 'again': False, 'b': True, 'both': True, 'mid': 15, 'end': [16, 16, False]}:
                     bad.append(f'공사 사기가 틀려요 {r}')
                 # 4) 단축권
                 r = await pg.evaluate(f"""(() => {{ const F = {F}, S = F.S, o = {{}};
@@ -61,7 +62,7 @@ async def main():
                   F.tkUseAll('library'); o.after = [F.conOn('library'), S.tk.m30, S.f.library];
                   F.rt.fakeNow = 0; return o; }})()""")
                 print('단축권', r)
-                if r['p1'] != [0, 2, 0, 2, 0] or r['p2'] != [1, 2, 1, 4, 0] or r['p3'] != [1, 2, 1, 7, 17700] or r['p4'] != [0, 1, 0, 0, 0] or r['cut5'] != 300 or r['m5'] != 0 or r['after'] != [False, 0, 16]:
+                if r['p1'] != [0, 2, 0, 2, 0] or r['p2'] != [1, 2, 1, 4, 0] or r['p3'] != [1, 2, 1, 7, 17700] or r['p4'] != [0, 1, 0, 0, 0] or r['cut5'] != 165 or r['m5'] != 0 or r['after'] != [False, 1, 16]:   # 2.3.0 공사가 165초라 5분권 한 장에 끝나요
                     bad.append(f'단축권이 틀려요 {r}')
                 # 5) 저장
                 r = await pg.evaluate(f"""(() => {{ const F = {F}; const d = JSON.parse(JSON.stringify(F.S)); const n = Date.now();

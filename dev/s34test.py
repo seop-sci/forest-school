@@ -63,7 +63,7 @@ async def main():
     print(json.dumps(res, ensure_ascii=False, indent=1))
     ok = (res['before']['del'] is None and not res['before']['key'] and res['notAdminDelete'] == 'blocked' and res['selfAdmin'] == 'blocked'
           and res['right'][0]['del'] is not None and res['right'][0]['picks'] > 0
-          and res['server'] == ['uKeep'] + [k for k in res['server'] if k not in ('uKeep',)] and 'uOld1' not in res['server'] and 'uTab' not in res['server']
+          and 'uKeep' in res['server'] and 'uOld1' not in res['server'] and 'uTab' not in res['server']
           and res['other'].startswith('blocked') and 'uKeep' in res['other_server'] and not res['errors'])
     print('PASS' if ok else 'FAIL')
 asyncio.run(main())

@@ -36,7 +36,7 @@ async def main():
               for (const k of ['classroom', 'cafeteria', 'library', 'playground', 'science']) { S.f[k] = 8; S.fu[k] = S.fu[k].map(() => 8); }
               F.renderMap(); F.ffRender(true);
               const n0 = F.facKeys().filter(F.ffCan).length, chip = document.querySelector('#ffChip'), t0 = chip.textContent, on0 = document.querySelector('#pq-classroom').classList.contains('ff-on');
-              F.buyFacility('classroom'); F.ffRender(true);
+              F.conFree('classroom'); F.ffRender(true);   // 2.3.0 즉시 완공 단추
               return { n0, t0, on0, lv: S.f.classroom, con: F.conOn('classroom'), n1: F.facKeys().filter(F.ffCan).length, t1: chip.textContent, on1: document.querySelector('#pq-classroom').classList.contains('ff-on'), vis: !chip.hidden };""")
             print(w, '바로 완공', r)
             ok(r['n0'] == 5 and '5곳' in r['t0'] and r['on0'], f'처음 칩과 배지 {r}')
@@ -47,6 +47,7 @@ async def main():
             # 2) 건설 가속
             if w == 390:
                 r = await ev("""const t0 = Date.now(); F.rt.fakeNow = t0; S.ff = { library: F.gameToday(), cafeteria: F.gameToday() }; S.cb = { until: 0, at: t0 }; S.bd = {};
+                  S.tier = 2; S.tg = 2; S.sem = 0; S.budget = 1e18; for (const k of ['library', 'cafeteria']) { S.f[k] = 27; S.fu[k] = S.fu[k].map(() => 27); }   // 2.3.0 공사가 짧아져서 중학교 3학년 상한(1시간)으로 재요
                   const it = F.CB.items[0], c = F.cbCost(it);
                   F.buyFacility('library'); const e0 = S.bd.library.e;
                   F.rt.fakeNow = t0 + 60e3; F.cbApply(); const pre = e0 - S.bd.library.e;   // 가속 전 1분: 그대로
@@ -57,7 +58,7 @@ async def main():
                   const onAfter = F.cbOn();
                   S.cb = { until: 0, at: F.rt.fakeNow }; let n = 0; while (F.cbBuy('h1') && n < 10) n++;
                   const left = F.cbLeft();
-                  F.rt.fakeNow = 0; S.bd = {}; S.cb = { until: 0, at: 0 };
+                  F.rt.fakeNow = 0; S.bd = {}; S.cb = { until: 0, at: 0 }; S.tier = 1; S.tg = 0;
                   return { c, paid, ok1, pre, mid, end, cad, onAfter, n, left };""")
                 print('가속', r)
                 ok(r['ok1'] and abs(r['paid'] - r['c']) < 1 and r['c'] > 0, f'가속 값 {r}')
