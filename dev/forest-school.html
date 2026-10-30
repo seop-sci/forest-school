@@ -2776,7 +2776,7 @@ span.bt-stamp{display:none}.bt-duel.done span.bt-stamp{display:grid}
     <p class="boot-step" id="bootStep">학교 문을 여는 중...</p>
     <p class="boot-tip" id="bootTip">학교 문을 여는 중이에요</p>
   </div>
-  <span class="boot-ver" id="bootVer">v2.1.3</span>
+  <span class="boot-ver" id="bootVer">v2.2.0</span>
 </div>
 
 <div class="app on-school" id="app">
@@ -3243,7 +3243,7 @@ span.bt-stamp{display:none}.bt-duel.done span.bt-stamp{display:grid}
       </div>
       <h3 class="panel-sub">정보</h3>
       <dl class="info">
-        <div id="verRow"><dt>버전</dt><dd>v2.1.3</dd></div>
+        <div id="verRow"><dt>버전</dt><dd>v2.2.0</dd></div>
         <div id="pidRow" hidden><dt>학교 번호</dt><dd id="infoPid"></dd></div>
       </dl>
       <div id="devBox" hidden>
@@ -5737,7 +5737,7 @@ span.bt-stamp{display:none}.bt-duel.done span.bt-stamp{display:grid}
     nb: { at: 0, seen: '' },
     cg: freshCg(),   // 2.2.0 동아리 대항전(숲속 대결 주간 순위 lg와 다른 칸): 주, 상대 학교 한 주 점수, 동아리마다 연습과 발표회 수, 오늘 연습한 날, 지난주 결과, 우승 수, 3등 안 수, 기록
     bx: freshBx(),   // 2.2.0 숲속 생물 탐사(시험 기간 ex와 다른 칸): 지도, 숨은 생물(자리, 생물, 나타난 때), 다음 나타날 때, 관찰 수, 받은 단계 보상, 기록
-    gd: freshGd(),   // 2.2.0 학교 텃밭: 밭(작물, 심은 때, 다 자라는 때, 물), 재료, 만든 메뉴, 오늘의 급식, 메뉴 8가지 황금, 비로 물 준 날, 기록   // 2.2.0 야간 건설 이벤트: at 마지막으로 셈한 때, seen 시작 알림을 본 날
+    gn: freshGd(),   // 2.2.0 학교 텃밭(황금 도토리 상점 gd와 다른 칸): 밭(작물, 심은 때, 다 자라는 때, 물), 재료, 만든 메뉴, 오늘의 급식, 메뉴 8가지 황금, 비로 물 준 날, 기록   // 2.2.0 야간 건설 이벤트: at 마지막으로 셈한 때, seen 시작 알림을 본 날
     fr: {}, frg: { day: '', n: 0 }, frc: { pat: 0, gift: 0, cake: 0, alb: 0 }, bday: { day: '', done: false }, alb: [],   // 2.1.1 단짝 친구, 오늘 선물, 횟수, 오늘 생일 잔치, 졸업 앨범
     dsn: { day: '', trips: 0, sports: 0, fest: {} },   // 2.1.0 오늘 시작할 때의 체험학습, 운동회, 행사 횟수(오늘 한 것도 퀘스트에 쳐요)
     lab: freshLab(), rd: freshRd(), ex: freshEx(), bt: freshBt(), ps: freshPs(), rare: { got: [], miss: 0 }, rs: { n: 0, p: 0, pos: 0, king: 0 }, lk: { on: false, at: 0, h: '' }, wx: '', pl: { got: 0, read: 0, wk: -1 },   // pl: 2.1.3 학부모 편지(받은 통, 읽은 통, 받은 주)
@@ -8824,49 +8824,49 @@ span.bt-stamp{display:none}.bt-duel.done span.bt-stamp{display:grid}
     .map(([n, nm, em, need]) => ({ id: 'menu_' + n, nm, em, need, kinds: Object.keys(need).length }));
   const GD_M = Object.fromEntries(GD_MENU.map(m => [m.id, m]));
   const freshGd = () => ({ plots: [], inv: {}, menu: {}, today: { day: '', id: '' }, g8: false, wx: '', st: { h: 0, cook: 0, plant: 0 } });
-  const gdOpen = () => !!S && !!S.gd && (S.f.cafeteria || 0) >= 1;
+  const gdOpen = () => !!S && !!S.gn && (S.f.cafeteria || 0) >= 1;
   const gdN = () => GD.plots[Math.max(0, Math.min(GD.plots.length - 1, S.tier))];
   const gdCropOk = c => !!GD_C[c] && GD_C[c].tier <= S.tier;
   const gdMenuOk = m => Object.keys(m.need).every(gdCropOk);
-  const gdMenuCount = () => S && S.gd ? GD_MENU.filter(m => S.gd.menu[m.id]).length : 0;
+  const gdMenuCount = () => S && S.gn ? GD_MENU.filter(m => S.gn.menu[m.id]).length : 0;
   const gdReady = p => !!p && !!p.c && gameNow() >= p.e;
-  const gdReadyN = () => S && S.gd ? S.gd.plots.slice(0, gdN()).filter(gdReady).length : 0;
+  const gdReadyN = () => S && S.gn ? S.gn.plots.slice(0, gdN()).filter(gdReady).length : 0;
   const gdDiet = () => Math.min(GD.dietMax, Math.floor(xtLv('diet') / GD.dietPer));
   const gdPct = m => (m.kinds >= 3 ? GD.p3 : GD.p2) + gdDiet();
-  const gdToday = () => S && S.gd && S.gd.today.day === gameToday() && GD_M[S.gd.today.id] ? GD_M[S.gd.today.id] : null;
-  const gdMult = () => { const m = S && S.gd ? gdToday() : null; return m ? 1 + gdPct(m) / 100 : 1; };
-  const gdCanCook = m => gdMenuOk(m) && Object.entries(m.need).every(([c, n]) => (S.gd.inv[c] || 0) >= n);
+  const gdToday = () => S && S.gn && S.gn.today.day === gameToday() && GD_M[S.gn.today.id] ? GD_M[S.gn.today.id] : null;
+  const gdMult = () => { const m = S && S.gn ? gdToday() : null; return m ? 1 + gdPct(m) / 100 : 1; };
+  const gdCanCook = m => gdMenuOk(m) && Object.entries(m.need).every(([c, n]) => (S.gn.inv[c] || 0) >= n);
   const gdImg = (key, em, cls) => IMG(key) ? `<img${cls ? ` class="${cls}"` : ''} src="${IMG(key)}" alt="">` : `<span class="gd-em${cls ? ' ' + cls : ''}" aria-hidden="true">${em}</span>`;
   // 비 오는 날: 심어 둔 밭에 저절로 물(하루 한 번 셈)
   function gdSync() {
-    if (!S || !S.gd) return;
-    const n = gdN(); while (S.gd.plots.length < n) S.gd.plots.push({ c: '', s: 0, e: 0, w: 0 });
+    if (!S || !S.gn) return;
+    const n = gdN(); while (S.gn.plots.length < n) S.gn.plots.push({ c: '', s: 0, e: 0, w: 0 });
     const d = gameToday();
-    if (S.gd.wx !== d && wxIs('rain')) { S.gd.wx = d; for (const p of S.gd.plots) if (p.c && !p.w && !gdReady(p)) gdWet(p); }
+    if (S.gn.wx !== d && wxIs('rain')) { S.gn.wx = d; for (const p of S.gn.plots) if (p.c && !p.w && !gdReady(p)) gdWet(p); }
   }
   function gdWet(p) { const now = gameNow(); p.w = 1; p.e = Math.max(now, p.e - Math.max(0, p.e - now) * GD.water); }
   function gdPlant(i, c) {
     if (!gdOpen() || rt.paused) return false;
     gdSync();
-    const p = S.gd.plots[i]; if (!p || i >= gdN() || p.c || !gdCropOk(c)) return false;
+    const p = S.gn.plots[i]; if (!p || i >= gdN() || p.c || !gdCropOk(c)) return false;
     const now = gameNow(); p.c = c; p.s = now; p.e = now + GD_C[c].min * 60000; p.w = 0;
     if (wxIs('rain')) gdWet(p);
-    S.gd.st.plant += 1; rt.gdPick = -1;
+    S.gn.st.plant += 1; rt.gdPick = -1;
     sfx('tap'); toast(`${eul(GD_C[c].nm)} 심었어요. ${hm(Math.ceil((p.e - now) / 1000))} 뒤에 거둬요${p.w ? ' (비가 와서 물을 줬어요)' : ''}`);
     gdRender(true); gdMark(); save();
     return true;
   }
   function gdWater(i) {
-    const p = S.gd.plots[i]; if (!p || !p.c || p.w || gdReady(p)) return false;
+    const p = S.gn.plots[i]; if (!p || !p.c || p.w || gdReady(p)) return false;
     gdWet(p); sfx('tap'); toast(`물을 줬어요! ${hm(Math.max(0, Math.ceil((p.e - gameNow()) / 1000)))} 남았어요`);
     gdRender(true); gdMark(); save();
     return true;
   }
   function gdHarvest(i) {
-    const p = S.gd.plots[i]; if (!p || !gdReady(p)) return false;
+    const p = S.gn.plots[i]; if (!p || !gdReady(p)) return false;
     const c = p.c, n = p.w ? 2 : 1;
-    S.gd.inv[c] = Math.min(GD.invMax, (S.gd.inv[c] || 0) + n);
-    S.gd.plots[i] = { c: '', s: 0, e: 0, w: 0 }; S.gd.st.h += 1;
+    S.gn.inv[c] = Math.min(GD.invMax, (S.gn.inv[c] || 0) + n);
+    S.gn.plots[i] = { c: '', s: 0, e: 0, w: 0 }; S.gn.st.h += 1;
     sfx('coin'); toast(`${GD_C[c].nm} ${n}개를 거뒀어요!`);
     gdRender(true); gdMark(); save();
     return true;
@@ -8875,13 +8875,13 @@ span.bt-stamp{display:none}.bt-duel.done span.bt-stamp{display:grid}
     const m = GD_M[id]; if (!m || !gdOpen() || rt.paused) return false;
     if (gdToday()) { toast('오늘의 급식은 이미 만들었어요. 내일 또 만들어요'); return false; }
     if (!gdCanCook(m)) { toast('재료가 모자라요'); return false; }
-    for (const [c, n] of Object.entries(m.need)) S.gd.inv[c] -= n;
-    const nw = !S.gd.menu[m.id];
-    S.gd.menu[m.id] = (S.gd.menu[m.id] || 0) + 1; S.gd.st.cook += 1;
-    S.gd.today = { day: gameToday(), id: m.id };
+    for (const [c, n] of Object.entries(m.need)) S.gn.inv[c] -= n;
+    const nw = !S.gn.menu[m.id];
+    S.gn.menu[m.id] = (S.gn.menu[m.id] || 0) + 1; S.gn.st.cook += 1;
+    S.gn.today = { day: gameToday(), id: m.id };
     let e = 0, g = 0;
     if (nw) e += GD.ess;
-    if (!S.gd.g8 && gdMenuCount() >= 8) { S.gd.g8 = true; g += GD.gold8; }
+    if (!S.gn.g8 && gdMenuCount() >= 8) { S.gn.g8 = true; g += GD.gold8; }
     if (e) addEss(e); if (g) addGold(g);
     sfx('quest');
     toast(`오늘의 급식 ${m.nm}! 오늘 수업료 +${gdPct(m)}%${e ? `, 새 메뉴라 숲의 정수 +${e}` : ''}${g ? `, 메뉴 8가지라 황금 도토리 +${g}` : ''}`);
@@ -8889,20 +8889,20 @@ span.bt-stamp{display:none}.bt-duel.done span.bt-stamp{display:grid}
     return true;
   }
   function gdMark() {
-    const pq = document.getElementById('pq-cafeteria'); if (!pq || !S || !S.gd) return;
+    const pq = document.getElementById('pq-cafeteria'); if (!pq || !S || !S.gn) return;
     let g = pq.querySelector('.gdb');
     if (!g) { g = document.createElementNS('http://www.w3.org/2000/svg', 'g'); g.setAttribute('class', 'gdb'); g.setAttribute('transform', 'translate(-30 -22)'); g.innerHTML = IMG('garden_bubble') ? `<image href="${IMG('garden_bubble')}" x="-12" y="-14" width="24" height="24"/>` : '<circle r="10"/><text y="4" text-anchor="middle">🌱</text>'; pq.appendChild(g); }
     pq.classList.toggle('gd-on', gdOpen() && rt.viewTier == null && gdReadyN() > 0);
   }
   function sanitizeGd(d, s) {
-    const G = d.gd && typeof d.gd === 'object' ? d.gd : {}, o = freshGd(), lim = Date.now() + 366 * 86400000, n = (v, hi) => Math.max(0, Math.min(hi, Math.floor(Number(v) || 0)));
+    const G = d.gn && typeof d.gn === 'object' ? d.gn : {}, o = freshGd(), lim = Date.now() + 366 * 86400000, n = (v, hi) => Math.max(0, Math.min(hi, Math.floor(Number(v) || 0)));
     o.plots = (Array.isArray(G.plots) ? G.plots : []).slice(0, GD.plots[GD.plots.length - 1]).map(p => p && GD_C[p.c] ? { c: p.c, s: n(p.s, lim), e: n(p.e, lim), w: p.w ? 1 : 0 } : { c: '', s: 0, e: 0, w: 0 });
     if (G.inv && typeof G.inv === 'object') for (const c of Object.keys(GD_C)) if (G.inv[c]) o.inv[c] = n(G.inv[c], GD.invMax);
     if (G.menu && typeof G.menu === 'object') for (const m of GD_MENU) if (G.menu[m.id]) o.menu[m.id] = n(G.menu[m.id], 1e6);
     if (G.today && typeof G.today.day === 'string' && GD_M[G.today.id]) o.today = { day: G.today.day.slice(0, 10), id: G.today.id };
     o.g8 = G.g8 === true; o.wx = typeof G.wx === 'string' ? G.wx.slice(0, 10) : '';
     if (G.st && typeof G.st === 'object') for (const k of Object.keys(o.st)) o.st[k] = n(G.st[k], 1e9);
-    s.gd = o;
+    s.gn = o;
   }
   function openGd() {
     if (!gdOpen()) { toast('급식실을 지으면 텃밭을 가꿀 수 있어요'); return; }
@@ -8911,12 +8911,12 @@ span.bt-stamp{display:none}.bt-duel.done span.bt-stamp{display:grid}
     gdRender(true); openModal($('#mGd')); sfx('tap');
   }
   function gdRender(force) {
-    if (!S || !S.gd || $('#mGd').hidden && !force) return;
+    if (!S || !S.gn || $('#mGd').hidden && !force) return;
     gdSync();
     const now = gameNow(), n = gdN(), tm = gdToday();
-    const key = [n, rt.gdPick, JSON.stringify(S.gd.plots.slice(0, n).map(p => [p.c, p.w, gdReady(p), p.c ? Math.floor(Math.max(0, p.e - now) / 60000) : 0])), JSON.stringify(S.gd.inv), tm ? tm.id : '', gdDiet()].join('|');
+    const key = [n, rt.gdPick, JSON.stringify(S.gn.plots.slice(0, n).map(p => [p.c, p.w, gdReady(p), p.c ? Math.floor(Math.max(0, p.e - now) / 60000) : 0])), JSON.stringify(S.gn.inv), tm ? tm.id : '', gdDiet()].join('|');
     if (!force && $('#gdPlots').dataset.key === key) return; $('#gdPlots').dataset.key = key;
-    $('#gdPlots').innerHTML = S.gd.plots.slice(0, n).map((p, i) => {
+    $('#gdPlots').innerHTML = S.gn.plots.slice(0, n).map((p, i) => {
       const C = GD_C[p.c], ready = gdReady(p), st = !C ? 0 : ready ? 3 : (now - p.s) / Math.max(1, p.e - p.s) < 0.5 ? 1 : 2;
       const bed = IMG(p.w && !ready ? 'plot_wet' : 'plot_dry'), crop = C ? gdImg(`crop_${p.c}_${st}`, st === 3 ? C.em : st === 2 ? '🌿' : '🌱', 'crop') : '';
       const tx = !C ? '빈 밭' : ready ? `${C.nm} 다 자람` : `${C.nm} ${hm(Math.max(1, Math.ceil((p.e - now) / 1000)))}`;
@@ -8928,12 +8928,12 @@ span.bt-stamp{display:none}.bt-duel.done span.bt-stamp{display:grid}
     if (rt.gdPick >= 0) pk.innerHTML = `<b>무엇을 심을까요?</b><div class="gd-seeds">${GD_CROPS.map(c => gdCropOk(c.k)
       ? `<button type="button" data-gd="seed" data-c="${c.k}">${gdImg('item_' + c.k, c.em)}<span>${c.nm}</span><small>${hm(c.min * 60)}</small></button>`
       : `<button type="button" aria-disabled="true">${gdImg('item_' + c.k, c.em)}<span>${c.nm}</span><small>${['', '초등학교', '중학교'][c.tier]}부터</small></button>`).join('')}</div>`;
-    $('#gdInv').innerHTML = `<b>재료</b>${GD_CROPS.filter(c => gdCropOk(c.k) || S.gd.inv[c.k]).map(c => `<span class="gd-it">${gdImg('item_' + c.k, c.em)}${S.gd.inv[c.k] || 0}</span>`).join('')}`;
+    $('#gdInv').innerHTML = `<b>재료</b>${GD_CROPS.filter(c => gdCropOk(c.k) || S.gn.inv[c.k]).map(c => `<span class="gd-it">${gdImg('item_' + c.k, c.em)}${S.gn.inv[c.k] || 0}</span>`).join('')}`;
     const dz = gdDiet();
     $('#gdToday').innerHTML = tm ? `${gdImg(tm.id, tm.em)}<span>오늘의 급식은 <b>${esc(tm.nm)}</b>! 오늘 수업료 +${gdPct(tm)}%</span>`
       : `<span>오늘의 급식을 만들면 그날 수업료 +${GD.p2 + dz}%(재료 3가지 메뉴는 +${GD.p3 + dz}%)${dz ? `. 영양 선생님 덕분에 +${dz}%p` : ''}</span>`;
     $('#gdMenus').innerHTML = `<b>급식 메뉴 ${gdMenuCount()}/${GD_MENU.length}</b><div class="gd-mgrid">${GD_MENU.map(m => {
-      const has = S.gd.menu[m.id], ok = gdMenuOk(m), can = !tm && gdCanCook(m);
+      const has = S.gn.menu[m.id], ok = gdMenuOk(m), can = !tm && gdCanCook(m);
       const need = Object.entries(m.need).map(([c, k]) => `${GD_C[c].em}${k > 1 ? '×' + k : ''}`).join('');
       return `<button type="button" class="gd-menu${has ? '' : ' no'}${can ? ' can' : ''}${tm && tm.id === m.id ? ' on' : ''}" data-gd="cook" data-m="${m.id}" aria-disabled="${can ? 'false' : 'true'}">` +
         `${has ? gdImg(m.id, m.em) : gdImg('menu_frame', '🍽')}<span class="ell">${has || ok ? esc(m.nm) : '???'}</span><small>${ok ? need : '나중에 열려요'}</small></button>`;
@@ -9694,31 +9694,34 @@ span.bt-stamp{display:none}.bt-duel.done span.bt-stamp{display:grid}
        forest/rank/<내 id>   랭킹 이름과 학교 점수
        forest/stats/<내 id>  테스트 현황 (어디까지 했는지, 얼마나 했는지)
      <내 id>는 Firebase 익명 로그인이 기기(브라우저)마다 만들어 줘요. */
-  const VERSION = '2.1.3';
+  const VERSION = '2.2.0';
   const NT_QUIET = ['2.1.20', '2.1.2.2'];   // 2.1.20 지섭 결정: 이 버전들은 업데이트해도 공지 창을 띄우지 않아요(공지는 그대로 2.1.2)
   /* 2.0.0 공지사항 (2026-10-27 지섭, 1.8.0은 이미 올려서 2.0.0부터): 설정 > 공지사항. 맨 위가 가장 새 공지예요.
      패치노트는 자동으로 넣지 않아요. 지섭이 검수한 글만 여기에 적어요(CHANGELOG.md는 자세한 기록용이라 따로 있어요).
      접속하면 새 공지 창을 띄워요(올라온 뒤 7일 동안, '일주일간 열지 않기'를 누르면 7일 쉬어요). 업데이트한 뒤 첫 접속에는 쉬는 중이어도 한 번 띄워요 */
   const NOTICES = [
+    // 2.2.0 공지(2026-10-30 지섭 확인: B안 다섯 줄). 2.2.0부터는 실제 날짜. 그 앞 공지 날짜는 업데이트 간격이 너무 가까워 보여서 지섭 요청으로 3~5일 간격으로 고쳐 적었어요(id는 그대로라 다시 뜨지 않아요)
+    { id: '2026-10-30-v220', date: '2026-10-30', tag: '업데이트', title: '2.2.0 업데이트',
+      lines: ['야간 건물 건설 이벤트 추가', '학교 텃밭 추가', '숲속 생물 탐사 추가', '동아리 대항전 추가', '예전 학교 되돌리기 추가'] },
     // 2.1.3 공지(2026-10-30 지섭 확인: A안 일곱 줄)
-    { id: '2026-10-30-v213', date: '2026-10-30', tag: '업데이트', title: '2.1.3 업데이트',
+    { id: '2026-10-30-v213', date: '2026-10-25', tag: '업데이트', title: '2.1.3 업데이트',
       lines: ['숲속 패스 추가', '반짝 친구 추가', '랭킹 시즌 추가', '다른 학교 구경과 예시 학교 추가', '날씨 추가', '학부모 쪽지 이야기 추가', '숲속 합치기 에너지 배수와 그림 개선'] },
     // 2.1.1 공지(2026-10-29 지섭 확인: 일곱 줄)
-    { id: '2026-10-29-v212', date: '2026-10-29', tag: '업데이트', title: '2.1.2 업데이트',
+    { id: '2026-10-29-v212', date: '2026-10-22', tag: '업데이트', title: '2.1.2 업데이트',
       lines: ['마을 기부 추가', '매점 간식 뽑기 추가', '간식 도감과 학교 기분 추가', '마을 기부, 간식 도감 업적과 칭호 추가'] },   // 2.1.2 지섭이 고른 네 줄
-    { id: '2026-10-29-v211', date: '2026-10-29', tag: '업데이트', title: '2.1.1 업데이트',
+    { id: '2026-10-29-v211', date: '2026-10-19', tag: '업데이트', title: '2.1.1 업데이트',
       lines: ['단짝 친구, 친밀도, 생일 잔치 추가', '졸업 앨범, 졸업 편지 추가', '유치원, 초등학교, 중학교 건물 외형 변경', '건물마다 하루 1회 즉시 완공, 건설 부스터 추가', '공사 시간 단축', '숲속 대결 종목별 놀이 개선', '메인 퀘스트와 보상 개선'] },
     // 2.1.0 공지(2026-10-29 지섭 확인: 일곱 줄)
-    { id: '2026-10-29-v210', date: '2026-10-29', tag: '업데이트', title: '2.1.0 업데이트',
+    { id: '2026-10-29-v210', date: '2026-10-15', tag: '업데이트', title: '2.1.0 업데이트',
       lines: ['공사 시간과 시간 단축권 추가', '초등학교부터 한 학년이 두 학기로 변경', '숲속 소풍 추가', '초등학교 칭찬 스티커판 추가', '상점 리모델링: 꾸미기 백화점, 문방구, 꾸미기 가게', '밤 모드 추가', '숲속 대결 연출 개선'] },
     // 2.0.1 공지(2026-10-28 지섭 확인: 열한 줄). id를 v201s로 바꿔 공부 시스템을 더한 뒤 한 번 더 띄워요
-    { id: '2026-10-28-v201s', date: '2026-10-28', tag: '업데이트', title: '2.0.1 업데이트',
+    { id: '2026-10-28-v201s', date: '2026-10-11', tag: '업데이트', title: '2.0.1 업데이트',
       lines: ['초등학교 학급 반장 선거 추가', '반장 공약으로 한 주 동안 보너스', '중학교 반장은 동아리 보너스 두 배', '졸업식 장면 추가', '이벤트 예정에 다가오는 이벤트 4개 표시',
         '미니게임 탭이 공부 탭으로, 다섯 과목 학교 학력 추가', '과학 탐구 실험과 실험 노트 추가', '도서관 책 읽기 추가', '4주마다 시험 기간과 성적표 추가', "새 미니게임 '숲속 대결'과 대결 순위 추가", '동아리 수학부 추가'] },
     // 2.0.0 공지(2026-10-28 지섭이 확인): 반영하는 날 date를 그날로 맞춰요. 공지는 올라온 날부터 7일간 띄워요
-    { id: '2026-10-28-v200', date: '2026-10-28', tag: '업데이트', title: '2.0.0 업데이트',
+    { id: '2026-10-28-v200', date: '2026-10-06', tag: '업데이트', title: '2.0.0 업데이트',
       lines: ['새 학교급 중학교 추가', '매점 추가', '학생 명부와 학생 능력치 추가', '동아리와 동아리 발표회 추가', '학교 복도 추가', '전학 오는 새 학생 6명과 인사 장면 추가', '지난 학교급 모습 보기 추가', '중학교 메인 퀘스트 추가', '매주 이벤트와 학교 특별 이벤트 추가', '이벤트 보상에 숲의 정수 추가', '이벤트 한정 장식 추가', '이벤트 미션을 더 쉽게 바꿈', '공지사항 추가', '황금 도토리 상점 부스터 묶음 10% 할인', '명예 교장실과 장학재단 업그레이드 추천 표시 추가'] },
-    { id: '2026-10-27-v180', date: '2026-10-27', tag: '업데이트', title: '1.8.0 업데이트',
+    { id: '2026-10-27-v180', date: '2026-10-01', tag: '업데이트', title: '1.8.0 업데이트',
       lines: ["새 미니게임 '숲속 합치기'", '숲속 퍼즐 부스터 추가', '건물 업그레이드 애니메이션 추가', '메인 퀘스트 추가', '테마 배경음악 추가', '메인화면 지도 개선', '학교 마크, 간판 추가'] }
   ];
   const NT_RECENT = 7 * 86400000, NT_HIDE = 7 * 86400000;   // 공지는 올라온 뒤 7일만 띄워요(2026-10-27 지섭)
@@ -16229,12 +16232,12 @@ span.bt-stamp{display:none}.bt-duel.done span.bt-stamp{display:grid}
       case 'vdGive': return S.vd.n;   // 2.1.2 마을 기부 횟수
       case 'snDraw': return S.sn.n;   // 2.1.2 간식 뽑은 수
       case 'snDex': return snCount();   // 2.1.2 간식 도감 종류
-      case 'gdHarvest': return S.gd.st.h;   // 2.2.0 텃밭 거둔 수
+      case 'gdHarvest': return S.gn.st.h;   // 2.2.0 텃밭 거둔 수
       case 'bxSeen': return S.bx.st.n;   // 2.2.0 생물 관찰 수
       case 'cgPrac': return S.cg.st.p;   // 2.2.0 대항전 연습 수
       case 'cgShow': return S.cg.st.s || 0;   // 2.2.0 대항전 중 발표회 수
       case 'bxKinds': return bxCount();   // 2.2.0 생물 도감 종류
-      case 'gdCook': return S.gd.st.cook;   // 2.2.0 오늘의 급식 만든 수
+      case 'gdCook': return S.gn.st.cook;   // 2.2.0 오늘의 급식 만든 수
       case 'vdLv': return S.vd.lv;   // 2.1.2 마을 기부 단계
       default: return S.st[q.t] || 0;   // picks, ups, trains, claims, grads, perks, fperks
     }
@@ -18032,7 +18035,7 @@ span.bt-stamp{display:none}.bt-duel.done span.bt-stamp{display:grid}
     out: { w: 3, name: n => `소풍이나 체험학습 ${n}번 보내기`, v: () => S.pc.st.n + S.st.trips },
     con: { w: 5, name: n => `시설 공사 ${n}번 하기`, v: () => S.st.cons || 0 },
     sn: { w: 5, name: n => `매점 간식 ${n}번 뽑기`, v: () => S.sn.n, ok: () => snOpen() },
-    gd: { d: 2, w: 10, name: n => `텃밭 작물 ${n}번 거두기`, v: () => S.gd.st.h, ok: () => gdOpen() },   // 2.2.0
+    gd: { d: 2, w: 10, name: n => `텃밭 작물 ${n}번 거두기`, v: () => S.gn.st.h, ok: () => gdOpen() },   // 2.2.0
     bx: { d: 2, w: 8, name: n => `생물 ${n}번 관찰하기`, v: () => S.bx.st.n, ok: () => bxOpen() },   // 2.2.0
     cg: { d: 1, w: 5, name: n => `동아리 대항전 연습 ${n}번`, v: () => S.cg.st.p, ok: () => cgOpen() }   // 2.2.0
   };
