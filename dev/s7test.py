@@ -28,10 +28,15 @@ def kinder(**kw):
               st={'picks': 10, 'ups': 12, 'trains': 2, 'claims': 1, 'grads': 0, 'perks': 0, 'dips': 0}, q=Q('q5', 5))
     sv.update(kw); return sv
 
+import re as _re
+_SRC = (HERE / 'forest-school.html').read_text(encoding='utf-8')
+# 2026-10-30: 업데이트 공지 창이 늦게 떠서 단추를 가려요. 시험 저장은 이번 공지를 이미 본 것으로 넣어요
+NT_SEEN = {'seen': _re.search(r"const NOTICES = \[[^{]*\{ id: '([^']+)'", _SRC).group(1), 'ver': _re.search(r"const VERSION = '([^']+)'", _SRC).group(1), 'hide': 4102444800000}
 async def device(b, w=390, h=780, scheme='light', seed=None, sdk='mock', path='/'):
     ctx = await b.new_context(viewport={'width': w, 'height': h}, device_scale_factor=2, is_mobile=True, has_touch=True, color_scheme=scheme)
     await ctx.grant_permissions(['clipboard-read', 'clipboard-write'], origin=ORIGIN)
     if seed is not None:
+        seed = dict(seed); seed.setdefault('nt', NT_SEEN)
         await ctx.add_init_script("if(!sessionStorage.getItem('seeded')){localStorage.setItem('forest-school-v1', %s);sessionStorage.setItem('seeded','1');}" % json.dumps(json.dumps(seed)))
     await ctx.add_init_script("""document.addEventListener('DOMContentLoaded', () => {
       const t = document.querySelector('#toast'); if (!t) return;
@@ -213,5 +218,11 @@ async def main():
     finally:
         srv.terminate()
     open('s7res.json', 'w').write(json.dumps(res, ensure_ascii=False, indent=1))
-    print('done')
+    # 2026-10-30: 통과 판정(결과 파일은 그대로 남겨요). 페이지 오류가 없고, 저장, 복원, 다시 연결이 제대로 됐는지
+    errs = [e for v in res.values() if isinstance(v, dict) for e in (v.get('errors') or [])]
+    ok = not errs
+    if 'flow' in res: ok = ok and '서버' in res['flow'].get('info', '')
+    if 'newer' in res: ok = ok and res['newer'].get('budget', 0) >= 424242 and res['older'].get('serverBudget', 0) > 1000
+    if 'authOff' in res: ok = ok and '서버' in (res['authOff'].get('retryInfo') or '')
+    print('PASS' if ok else 'FAIL ' + json.dumps(errs, ensure_ascii=False)[:300])
 if __name__ == '__main__': asyncio.run(main())

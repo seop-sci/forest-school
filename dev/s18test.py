@@ -47,4 +47,7 @@ async def main():
     finally:
         srv.kill()
     print(json.dumps(out, ensure_ascii=False, indent=1))
+    # 2026-10-30: 통과 판정(2.1.0부터 이름 바꾸기 값은 5, 6, 7 …)
+    g = out.get('gh', {}); ok = g.get('modal') and g.get('dup', [0])[0] and g.get('ok', [1])[0] is False and '용감한 수달' in g.get('server', {}).values() and g.get('price2') == '6 바꾸기' and g.get('noAskAgain') and not g.get('errors') and out.get('early', [0])[0] and not out['early'][1]
+    print('PASS' if ok else 'FAIL')
 asyncio.run(main())

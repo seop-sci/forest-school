@@ -95,6 +95,7 @@ FLOW = r"""() => {
     if (q && q.t === 'acMax' && ev(60)) F.acGain('math', 20);   // 2.0.1 공부: 퍼즐 한 판(약 20 XP)을 1분에 한 번
     if (q && q.t === 'acBook' && ev(30)) { s.ess += 10; F.acBuyBook('kor'); }   // 문제집 한 권
     if (q && (q.t === 'vdGive' || q.t === 'vdLv') && F.vdOpen() && s.budget >= F.vdLeft()) F.vdGive('left');   // 2.1.2 마을 기부: 다음 단계까지 모이면 내요
+    if (q && q.t === 'psGot' && F.psOpen()) { F.psSync(); if (F.psLv() < 1) s.ps.pts += F.PS.per; F.psClaimAll(true); }   // 2.1.3 숲속 패스: 미션을 한 셈 치고 1단계를 받아요
     if (q && (q.t === 'snDraw' || q.t === 'snDex') && F.snOpen() && s.budget >= F.snCost(false)) F.snDraw(false);   // 2.1.2 간식 뽑기: 30분치가 모이면 한 번씩
     if (q && (q.t === 'btPlays' || q.t === 'btMid') && ev(120)) { s.bt.st.w += 1; s.bt.st.wm += F.S.tier >= 2 ? 1 : 0; }   // 2.0.1 숲속 대결: 2분에 한 판 이김
     if (q && q.t === 'btLg' && ev(600)) s.bt.lg = Math.max(s.bt.lg, 1);   // 동 리그: 이긴 판 넷쯤
@@ -148,6 +149,7 @@ FLOW2 = r"""() => {
     if (q && q.t === 'acMax' && ev(60)) F.acGain('math', 20);   // 2.0.1 공부: 퍼즐 한 판(약 20 XP)을 1분에 한 번
     if (q && q.t === 'acBook' && ev(30)) { s.ess += 10; F.acBuyBook('kor'); }   // 문제집 한 권
     if (q && (q.t === 'vdGive' || q.t === 'vdLv') && F.vdOpen() && s.budget >= F.vdLeft()) F.vdGive('left');   // 2.1.2 마을 기부: 다음 단계까지 모이면 내요
+    if (q && q.t === 'psGot' && F.psOpen()) { F.psSync(); if (F.psLv() < 1) s.ps.pts += F.PS.per; F.psClaimAll(true); }   // 2.1.3 숲속 패스: 미션을 한 셈 치고 1단계를 받아요
     if (q && (q.t === 'snDraw' || q.t === 'snDex') && F.snOpen() && s.budget >= F.snCost(false)) F.snDraw(false);   // 2.1.2 간식 뽑기: 30분치가 모이면 한 번씩
     if (q && (q.t === 'btPlays' || q.t === 'btMid') && ev(120)) { s.bt.st.w += 1; s.bt.st.wm += F.S.tier >= 2 ? 1 : 0; }   // 2.0.1 숲속 대결: 2분에 한 판 이김
     if (q && q.t === 'btLg' && ev(600)) s.bt.lg = Math.min(q.n, s.bt.lg + 1);   // 2.1.0 학기 숙제 리그: 10분에 한 리그씩(사람은 며칠)

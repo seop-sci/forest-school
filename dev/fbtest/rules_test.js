@@ -96,6 +96,27 @@ t('move read gone', R('B', '/forest/moves/K7QM2XPA'), false);
 t('move list gone', R('B', '/forest/moves'), false);
 t('move create gone', W('B', '/forest/moves/ABCD2345', MV), false);
 t('move delete gone', W('B', '/forest/moves/K7QM2XPA', null), false);
+// 2.1.3 랭킹 시즌(sk, sp): 리그 점수처럼 시즌이 같으면 지난 값 + 폭까지, 바뀌면 0부터
+const RSN = Object.assign({}, RANK, { sk: 2, sp: 500 });
+t('season first', W('B', '/forest/rank/B', Object.assign({}, RANK, { sk: 2, sp: 900 })), true);
+t('season first too big', W('B', '/forest/rank/B', Object.assign({}, RANK, { sk: 2, sp: 5000 })), false);
+t('season sp without sk', W('B', '/forest/rank/B', Object.assign({}, RANK, { sp: 10 })), false);
+t('season bad sk', W('B', '/forest/rank/B', Object.assign({}, RANK, { sk: 0, sp: 10 })), false);
+t('season grow', W('A', '/forest/rank/A', Object.assign({}, RANK, { sk: 2, sp: 1200 })), true);
+// 2.1.3 다른 학교 구경(forest/look): 로그인하면 읽기, 쓰기는 나만, 4,000자, 60초에 한 번, 지우기는 언제나
+const LOOK = { d: '{"v":1}', at: { '.sv': 'timestamp' } };
+t('look read', R('B', '/forest/look/A'), true);
+t('look read anon', R(null, '/forest/look/A'), false);
+t('look write own', W('B', '/forest/look/B', LOOK), true);
+t('look write other', W('B', '/forest/look/A', LOOK), false);
+t('look too big', W('B', '/forest/look/B', { d: 'x'.repeat(4001), at: { '.sv': 'timestamp' } }), false);
+t('look old time', W('B', '/forest/look/B', { d: 'x', at: 5 }), false);
+t('look extra field', W('B', '/forest/look/B', Object.assign({ x: 1 }, LOOK)), false);
+{ const db = targaryen.database(rules, { forest: { look: { B: { d: 'x', at: Date.now() - 5000 } } } }).as({ uid: 'B', provider: 'anonymous' });
+  t('look too soon', db.write('/forest/look/B', LOOK).allowed, false);
+  t('look delete anytime', db.write('/forest/look/B', null).allowed, true); }
+{ const db = targaryen.database(rules, { forest: { look: { B: { d: 'x', at: Date.now() - 61000 } } } }).as({ uid: 'B', provider: 'anonymous' });
+  t('look after a minute', db.write('/forest/look/B', LOOK).allowed, true); }
 // 나머지는 막혀요
 t('root read', R('A', '/'), false);
 t('root write', W('A', '/hack', 1), false);
