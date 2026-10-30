@@ -2016,7 +2016,7 @@ body{background:radial-gradient(120% 60% at 50% 0%, color-mix(in srgb, var(--pap
 .vd-sum{text-align:center;margin:8px 0 4px;padding:0 16px;white-space:pre-line}
 #decoG .deco-on .deco-ring,#tvMap .deco-ring{fill:none;stroke:#F4C144;stroke-width:2;stroke-dasharray:4 3}
 /* 2.1.3 학부모 편지 */
-.pl-chip{position:absolute;right:10px;bottom:calc(var(--bot-h, 70px) + 92px);z-index:6;display:flex;align-items:center;gap:4px;padding:5px 11px;border:2px solid #E2A21C;border-radius:14px;background:rgba(255,246,214,.95);color:#5A3A16;font:inherit;font-size:12.5px;font-weight:700;box-shadow:0 2px 4px rgba(0,0,0,.25);cursor:pointer;animation:plBob 1.6s ease-in-out infinite}
+.pl-chip{position:absolute;right:10px;bottom:calc(var(--bot-h, 70px) + 46px + var(--ff-up, 46px));z-index:6;display:flex;align-items:center;gap:4px;padding:5px 11px;border:2px solid #E2A21C;border-radius:14px;background:rgba(255,246,214,.95);color:#5A3A16;font:inherit;font-size:12.5px;font-weight:700;box-shadow:0 2px 4px rgba(0,0,0,.25);cursor:pointer;animation:plBob 1.6s ease-in-out infinite}
 .pl-chip span{font-size:15px}
 @keyframes plBob{50%{transform:translateY(-3px)}}
 .lt-nav{display:flex;align-items:center;justify-content:center;gap:12px;margin:-4px 0 8px;font-size:13px;color:var(--muted)}
@@ -8475,6 +8475,8 @@ span.bt-stamp{display:none}.bt-duel.done span.bt-stamp{display:grid}
       `<g class="vd-tag"><rect x="${(x - tw / 2).toFixed(1)}" y="${(y + 1).toFixed(1)}" width="${tw.toFixed(1)}" height="11" rx="5.5"/><text x="${x}" y="${(y + 9).toFixed(1)}">${t}</text></g>` +
       `<rect class="vd-hit" data-vd="1" x="${x - hw / 2}" y="${(y - hw * 0.85).toFixed(1)}" width="${hw}" height="${(hw * 0.85 + 13).toFixed(1)}"/>`;
   }
+  // 2.2.0 칩이 두세 줄이 되면 위의 '새 편지' 칩을 그만큼 올려요
+  function ffUp(c) { const h = c && !c.hidden ? c.offsetHeight + 6 : 0; if (c && c.parentElement) c.parentElement.style.setProperty('--ff-up', Math.max(46, h) + 'px'); }
   function ffRender(force) {
     if (!S) return;
     const ks = facKeys().filter(ffCan), on = cbOn(), nb = nbOn(), nbShow = S.tier >= NB.tier && !liveOff('night');
@@ -8483,7 +8485,7 @@ span.bt-stamp{display:none}.bt-duel.done span.bt-stamp{display:grid}
     const show = rt.tab === 'school' && rt.viewTier == null && !rt.decoEdit && !rt.fest && !rt.sports && !festBusy() && !rt.paused && S.tier >= 1 && (ks.length > 0 || on || nbShow);   // 학교 행사 중에는 숨겨요. 2.2.0 야간 건설 줄은 초등학교부터 늘 보여요
     const key = [show, ks.length, on ? Math.floor(cbLeft() / 60) : -1, nbShow ? (nb ? Math.floor(nbLeft() / 60) : -2) : -1].join('|');
     if (!force && c.dataset.key === key) return; c.dataset.key = key;
-    c.hidden = !show; if (!show) return;
+    c.hidden = !show; if (!show) { ffUp(c); return; }
     c.classList.toggle('pulse', ks.length > 0);
     const nbIc = IMG('ic_nightbuild') ? `<img class="nb-ic" src="${IMG('ic_nightbuild')}" alt="">` : '🌙';
     const nbTx = !nbShow ? '' : nb ? `야간 건설 +${NB.add}%, ${hm(nbLeft())} 남음` : `매일 ${NB.h0}~${NB.h1}시 건설 가속 이벤트`;
@@ -8491,6 +8493,7 @@ span.bt-stamp{display:none}.bt-duel.done span.bt-stamp{display:grid}
     c.innerHTML = (ks.length ? `<b>즉시 완공 ${ks.length}곳 가능!</b>` : '') + (on ? `<small>건설 부스터 +100%, ${hm(cbLeft())} 남음</small>` : '') +
       (nbShow ? `<small class="nb">${nbIc} ${nbTx}</small>` : '');
     c.setAttribute('aria-label', (ks.length ? `즉시 완공할 수 있는 건물 ${ks.length}곳, 눌러서 건물 창 열기` : '') + (on ? ` 건설 부스터 사용 중` : '') + (nbShow ? ` ${nbTx}` : ''));
+    ffUp(c);
   }
   // 2.1.1 건물마다 하루 한 번 바로 완공. S.ff[건물] = 바로 완공을 쓴 날
   const conFreeLeft = k => !!S && !!S.ff && S.ff[k] !== gameToday();

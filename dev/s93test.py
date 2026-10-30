@@ -106,4 +106,4 @@ async def main():
         await b.close()
     print('PASS' if not bad else f'FAIL {len(bad)}')
 
-asyncio.run(main())
+if __name__ == "__main__": asyncio.run(main())
