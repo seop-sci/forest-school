@@ -1963,6 +1963,23 @@ body{background:radial-gradient(120% 60% at 50% 0%, color-mix(in srgb, var(--pap
 .nb-ban{position:relative;aspect-ratio:1536/600;background:#1E2466 left center/cover no-repeat;color:#FFF3C8}
 .nb-ban b{position:absolute;right:4%;top:30%;width:52%;font-family:var(--font-display);font-weight:400;font-size:22px;line-height:1.2;text-align:center;text-shadow:0 1px 2px rgba(0,0,0,.5)}
 .nb-ban span{position:absolute;right:4%;top:62%;width:52%;font-size:14px;font-weight:700;text-align:center;color:#FFD86E}
+.bx-it{animation:bxWig 1.6s ease-in-out infinite;animation-delay:var(--d,0s);transform-box:fill-box;transform-origin:50% 100%}
+@keyframes bxWig{0%,70%,100%{transform:rotate(0)}78%{transform:rotate(-7deg)}86%{transform:rotate(6deg)}93%{transform:rotate(-3deg)}}
+@media (prefers-reduced-motion: reduce){.bx-it{animation:none}}
+.bx-hit{fill:transparent;cursor:pointer}
+.bx-modal{max-width:340px;padding:14px 0}
+.bx-card-big{display:grid;justify-items:center;gap:3px;padding:0 18px 10px;text-align:center}
+.bx-look{position:relative;width:170px;height:170px}.bx-look .pic{position:absolute;inset:14px;width:142px;height:142px;object-fit:contain;opacity:0;transform:scale(.6)}
+.bx-look .lens{position:absolute;left:0;top:0;width:110px;height:110px;opacity:0}
+.bx-card-big.open .lens{animation:bxLens .9s ease-out forwards}.bx-card-big.open .pic{animation:bxPic .5s .55s ease-out forwards}
+@keyframes bxLens{0%{opacity:0;transform:translate(40px,40px) scale(.6)}35%{opacity:1;transform:translate(30px,30px) scale(1)}70%{opacity:1;transform:translate(10px,20px) scale(1)}100%{opacity:0;transform:translate(-20px,0) scale(.9)}}
+@keyframes bxPic{to{opacity:1;transform:scale(1)}}
+@media (prefers-reduced-motion: reduce){.bx-card-big.open .lens{animation:none}.bx-card-big.open .pic{animation:none;opacity:1;transform:none}}
+.bx-look .bx-em{position:absolute;inset:0;display:grid;place-items:center;font-size:64px}
+.bx-nm{font-family:var(--font-display);font-weight:400;font-size:21px}.bx-nm .nw{font-style:normal;font-size:11px;color:#fff;background:#E2553A;border-radius:8px;padding:1px 6px;vertical-align:middle}
+.bx-g{opacity:.75;font-size:12px}.bx-d{margin:6px 0 0;font-size:13px;line-height:1.45}.bx-got{margin:6px 0 0;font-size:12.5px;font-weight:700;color:#3F6E2A;line-height:1.5}.bx-cnt{opacity:.7;font-size:11.5px}
+.bx-dex-grid .bx-gh{grid-column:1/-1;margin-top:6px;font-size:13px}.bx-card{font:inherit;color:inherit}
+.bx-card .bx-em{font-size:30px}
 .gd-head{background-color:#E3EFC9}
 .gd-head.noimg{height:58px}.gd-head.noimg b{right:0;width:100%}
 .gd-body{max-height:min(62vh,560px);overflow-y:auto;padding:0 12px}
@@ -3132,7 +3149,7 @@ span.bt-stamp{display:none}.bt-duel.done span.bt-stamp{display:grid}
     <section class="panel" id="panelDex" hidden aria-labelledby="ttlDex">
       <button class="panel-x" type="button" aria-label="홈으로"><svg viewBox="0 0 24 24" width="18" height="18" aria-hidden="true"><path d="M6 6l12 12M18 6L6 18" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round"/></svg></button>
       <h2 id="ttlDex" class="ph"><span class="tic" data-ic="ic_book" aria-hidden="true"></span><span>동물 도감</span></h2>
-      <div class="seg rank-seg" id="dexSeg" role="radiogroup" aria-label="도감과 업적"><button type="button" role="radio" data-dseg="dex" aria-checked="true">동물 도감</button><button type="button" role="radio" data-dseg="sn" aria-checked="false" id="dsegSn" hidden>간식</button><button type="button" role="radio" data-dseg="ach" aria-checked="false">업적<i class="seg-dot" id="achDot" hidden></i></button></div>
+      <div class="seg rank-seg" id="dexSeg" role="radiogroup" aria-label="도감과 업적"><button type="button" role="radio" data-dseg="dex" aria-checked="true">동물 도감</button><button type="button" role="radio" data-dseg="sn" aria-checked="false" id="dsegSn" hidden>간식</button><button type="button" role="radio" data-dseg="bx" aria-checked="false" id="dsegBx" hidden>생물</button><button type="button" role="radio" data-dseg="ach" aria-checked="false">업적<i class="seg-dot" id="achDot" hidden></i></button></div>
       <div id="dexPane">
       <p class="lead">숲속 학교에서 만난 친구들을 모아요. 처음 만나면 황금 도토리 1개, 많이 모으면 더 큰 선물이 있어요. 카드를 누르면 자세히 볼 수 있어요.</p>
       <div class="dex-head" id="dexHead"></div>
@@ -3143,6 +3160,12 @@ span.bt-stamp{display:none}.bt-duel.done span.bt-stamp{display:grid}
         <p class="lead">매점 간식 뽑기에서 나온 간식을 모아요. 처음 나온 일반 간식은 숲의 정수 2, 희귀 간식은 황금 도토리 1. 20종을 다 모으면 황금 도토리 3과 황금빛 뽑기 기계!</p>
         <div class="dex-head" id="snDexHead"></div>
         <div class="sn-dex-grid" id="snDexGrid"></div>
+      </div>
+      <!-- 2.2.0 생물 도감. 안쪽은 bxDexRender()가 그려요 -->
+      <div id="bxPane" hidden>
+        <p class="lead">학교 지도 풀숲과 물가에 숨은 생물을 눌러 관찰해요. 계절, 밤, 비 오는 날에 따라 나오는 생물이 달라요. 처음 보면 과학 XP 10과 숲의 정수 1, 10종 황금 도토리 1, 20종 숲의 정수 20, 30종을 다 모으면 관찰 오두막 장식!</p>
+        <div class="dex-head" id="bxDexHead"></div>
+        <div class="sn-dex-grid bx-dex-grid" id="bxDexGrid"></div>
       </div>
       <!-- 1.7.1 업적과 칭호. 안쪽은 renderAch()가 그려요 -->
       <div id="achPane" hidden>
@@ -3722,6 +3745,15 @@ span.bt-stamp{display:none}.bt-duel.done span.bt-stamp{display:grid}
     <p class="fine sn-pity" id="snPity"></p>
     <div class="sn-btns" id="snBtns"></div>
     <div class="btn-row" style="padding:0 16px"><button class="btn-sub" type="button" id="snDexBtn">간식 도감</button><button class="btn-sub" type="button" id="snClose">닫기</button></div>
+  </section>
+</div>
+
+<!-- 2.2.0 숲속 생물 탐사: 관찰 카드 -->
+<div class="overlay center" id="mBx" hidden>
+  <div class="backdrop"></div>
+  <section class="modal bx-modal" role="dialog" aria-modal="true" aria-label="생물 관찰">
+    <div class="bx-card-big" id="bxCard"></div>
+    <div class="btn-row" style="padding:0 16px"><button class="btn-sub" type="button" id="bxDexBtn">생물 도감</button><button class="cta" type="button" id="bxOk">좋아요</button></div>
   </section>
 </div>
 
@@ -5246,6 +5278,10 @@ span.bt-stamp{display:none}.bt-duel.done span.bt-stamp{display:grid}
       say: '초등학교에서는 매주 반장 선거를 해요! 후보 세 명이 저마다 공약을 들고 나왔어요. 교실을 눌러 마음에 드는 공약의 후보를 뽑아 봐요. 공약은 일요일까지 이어져요.' },
     { id: 'lb1', ch: 5, t: 'labs', n: 1, rm: 10, title: '과학 공부: 첫 실험', how: '과학실을 눌러 재료 둘을 섞어요. 하루 한 번이에요',
       say: '과학실이 생겼으니 실험을 해 봐요! 재료 두 가지를 골라 섞으면 무슨 일이 생길까요? 결과는 실험 노트에 모여요.' },
+    { id: 'bx1', ch: 5, t: 'bxSeen', n: 1, rm: 10, title: '과학 공부: 첫 생물 관찰', how: '홈 지도 풀숲이나 물가에서 흔들리는 곳을 눌러 생물을 관찰해요',
+      say: '학교 둘레 풀숲이 바스락거려요! 흔들리는 곳을 누르면 돋보기로 숨은 생물을 볼 수 있어요. 두 시간마다 새 친구가 숨어요.' },   // 2.2.0
+    { id: 'bx2', ch: 5, t: 'bxKinds', n: 5, rm: 10, title: '생물 5종 관찰하기', how: '지도에 숨은 생물을 관찰해 생물 도감을 5종 채워요',
+      say: '계절과 날씨, 밤낮에 따라 다른 생물이 나와요. 도감 > 생물 칸에서 아직 못 본 생물의 힌트를 볼 수 있어요.' },   // 2.2.0
     { id: 'sk1', ch: 5, t: 'stickers', n: 5, rm: 10, title: '칭찬 스티커 5장', how: '오늘의 미션이나 퀘스트를 끝내면 칭찬 스티커를 받아요. 교실에서 볼 수 있어요',
       say: '초등학교 교실 벽에 칭찬 스티커판이 붙었어요! 오늘의 미션이나 퀘스트를 끝낼 때마다 스티커를 한 장씩 붙여요. 다섯 장을 모아 볼까요?' },
 { id: 'e3', ch: 5, t: 'grade', n: 2, rm: 15, title: '초등학교 소도시 되기', how: '초등학교는 평판 기준이 조금 더 높아요',
@@ -5657,6 +5693,7 @@ span.bt-stamp{display:none}.bt-duel.done span.bt-stamp{display:grid}
     vd: { lv: 0, p: 0, sum: 0, n: 0 },   // 2.1.2 마을 기부: 단계, 이번 단계 채운 비율(0~1), 모두 낸 도토리, 낸 횟수
     cb: { until: 0, at: 0 },   // 2.1.1 건설 가속(도토리): until까지 공사 +100%, at은 마지막으로 셈한 때
     nb: { at: 0, seen: '' },
+    bx: freshBx(),   // 2.2.0 숲속 생물 탐사(시험 기간 ex와 다른 칸): 지도, 숨은 생물(자리, 생물, 나타난 때), 다음 나타날 때, 관찰 수, 받은 단계 보상, 기록
     gd: freshGd(),   // 2.2.0 학교 텃밭: 밭(작물, 심은 때, 다 자라는 때, 물), 재료, 만든 메뉴, 오늘의 급식, 메뉴 8가지 황금, 비로 물 준 날, 기록   // 2.2.0 야간 건설 이벤트: at 마지막으로 셈한 때, seen 시작 알림을 본 날
     fr: {}, frg: { day: '', n: 0 }, frc: { pat: 0, gift: 0, cake: 0, alb: 0 }, bday: { day: '', done: false }, alb: [],   // 2.1.1 단짝 친구, 오늘 선물, 횟수, 오늘 생일 잔치, 졸업 앨범
     dsn: { day: '', trips: 0, sports: 0, fest: {} },   // 2.1.0 오늘 시작할 때의 체험학습, 운동회, 행사 횟수(오늘 한 것도 퀘스트에 쳐요)
@@ -5867,6 +5904,7 @@ span.bt-stamp{display:none}.bt-duel.done span.bt-stamp{display:grid}
     sanitizeBt(d, s);   // 2.0.1 공부 4단계: 숲속 대결
     sanitizePs(d, s);   // 2.1.3 숲속 패스
     sanitizeGd(d, s);   // 2.2.0 학교 텃밭
+    sanitizeBx(d, s);   // 2.2.0 숲속 생물 탐사
     s.wx = typeof d.wx === 'string' ? d.wx.slice(0, 10) : '';   // 2.1.3 날씨 알림 본 날
     { const P = d.pl && typeof d.pl === 'object' ? d.pl : {}, got = Math.max(0, Math.min(PL.list.length, Math.floor(Number(P.got) || 0))); s.pl = { got, read: Math.max(0, Math.min(got, Math.floor(Number(P.read) || 0))), wk: Math.floor(Number(P.wk)) || -1 }; }   // 2.1.3 학부모 편지
     { const R = d.rs && typeof d.rs === 'object' ? d.rs : {}, n = (v, hi) => Math.max(0, Math.min(hi, Math.floor(Number(v) || 0))); s.rs = { n: n(R.n, 1e4), p: n(R.p, 1e9), pos: n(R.pos, 1e4), king: n(R.king, 1e4) }; }   // 2.1.3 랭킹 시즌
@@ -8579,6 +8617,147 @@ span.bt-stamp{display:none}.bt-duel.done span.bt-stamp{display:grid}
     const on = S.tier >= SN.tier && S.sn.mood > 0, mi = on ? snMoodImg() : '';
     v.classList.toggle('sn-on', !!mi); if (mi && v.dataset.mood !== mi.length + ':' + S.sn.mood) { v.dataset.mood = mi.length + ':' + S.sn.mood; v.style.setProperty('--sn-mood', `url("${mi}")`); }
     const ds = $('#dsegSn'); if (ds) ds.hidden = !(S.tier >= SN.tier || snCount() > 0);
+    const de = $('#dsegBx'); if (de) de.hidden = !(bxOpen() || bxCount() > 0);   // 2.2.0 생물 도감
+  }
+  /* ---------- 2.2.0 숲속 생물 탐사 (프로젝트 문서 '2.2.0 설계안' 4절, 지섭 확정 2026-10-30) ----------
+     초등학교부터 홈 지도의 정해진 자리(지도마다 6곳, 풀숲과 물가)에 게임 시계 2시간마다 생물이 하나씩 숨어요(최대 3마리 기다림).
+     누르면 돋보기로 관찰하고 생물 카드가 생물 도감(동물 도감의 '생물' 칸)에 모여요. 계절, 밤(20~24시), 비, 물가에 따라 나오는 생물이 달라요.
+     처음 관찰 과학 XP 10과 숲의 정수 1, 다시 보면 과학 XP 3과 수업료 3분치. 희귀 4%(과학실 Lv.5마다 +1%, 최대 8%).
+     10종 황금 도토리 1, 20종 숲의 정수 20, 30종 지도 장식 '관찰 오두막'(업적 '생물 탐사' 칭호 꼬마 생물학자) */
+  const BX = { tier: 1, every: 2 * 3600000, max: 3, rare0: 4, rareMax: 8, xpNew: 10, xpDup: 3, essNew: 1, dupMin: 3, gold10: 1, ess20: 20 };
+  // 지도(geoIdx)마다 [가로 %, 세로 %, 물가면 1]. 장식 자리, 건물 빈터(울타리 안), 길을 피했어요
+  const BX_SPOT = [null,
+    [[14, 20, 0], [62, 15, 0], [9, 47, 1], [84, 46, 1], [30, 73, 1], [92, 60, 0]],
+    [[9, 31, 1], [4, 38, 1], [68, 30, 0], [27, 33, 0], [88, 52, 0], [6, 70, 0]]];
+  const SPR = [3, 4, 5], SUM = [6, 7, 8], AUT = [9, 10, 11];
+  // [열쇠, 이름, 무리(0 곤충, 1 식물, 2 새와 작은 동물), 조건, 설명]. 조건: s 달, n 밤, r 비, w 물가, rare 희귀, en 멸종위기
+  const BIO = [
+    ['ladybug', '무당벌레', 0, {}, '빨간 등에 까만 점. 진딧물을 잡아먹어서 텃밭의 친구예요.'],
+    ['swallowtail', '호랑나비', 0, { s: [...SPR, ...SUM] }, '호랑이 무늬 날개를 가진 큰 나비예요. 꽃꿀을 빨아 먹어요.'],
+    ['dragonfly', '고추잠자리', 0, { s: [...SUM, ...AUT] }, '늦여름부터 가을에 빨갛게 익는 잠자리예요.'],
+    ['rhinobeetle', '장수풍뎅이', 0, { s: SUM }, '수컷 머리에 긴 뿔이 있어요. 참나무 수액을 좋아해요.'],
+    ['stagbeetle', '사슴벌레', 0, { s: SUM }, '사슴뿔 같은 큰 턱을 가졌어요. 밤에 나무 수액을 먹으러 와요.'],
+    ['cicada', '매미', 0, { s: SUM }, '땅속에서 몇 년을 지내고 나와 여름 내내 노래해요.'],
+    ['firefly', '반딧불이', 0, { n: 1, s: [5, 6, 7, 8, 9], rare: 1 }, '꽁무니에서 빛을 내는 곤충이에요. 물이 맑고 깨끗한 곳에서만 살아요.'],
+    ['waterstrider', '소금쟁이', 0, { w: 1 }, '긴 다리로 물 위를 미끄러지듯 걸어요. 물에 빠지지 않아요.'],
+    ['snail', '달팽이', 0, { r: 1 }, '비 오는 날 촉촉한 잎 위로 나와요. 눈은 긴 더듬이 끝에 있어요.'],
+    ['honeybee', '꿀벌', 0, { s: [...SPR, ...SUM, 9] }, '꽃가루를 옮겨 열매가 맺히게 도와줘요.'],
+    ['dandelion', '민들레', 1, { s: SPR }, '노란 꽃이 지면 하얀 솜털 씨앗이 바람을 타고 멀리 날아가요.'],
+    ['azalea', '진달래', 1, { s: [3, 4] }, '이른 봄 잎보다 꽃이 먼저 피는 분홍 꽃이에요.'],
+    ['foxtail', '강아지풀', 1, { s: [...SUM, ...AUT] }, '강아지 꼬리처럼 복슬복슬한 이삭이 달려요.'],
+    ['fern', '고사리', 1, {}, '꽃 없이 잎 뒤의 포자로 퍼져요. 어린잎은 돌돌 말려 있어요.'],
+    ['lotus', '연꽃', 1, { w: 1, s: SUM }, '진흙 속에서 자라도 깨끗하고 큰 꽃을 피워요.'],
+    ['maple', '단풍잎', 1, { s: AUT }, '가을이 되면 잎의 초록 색소가 줄어 빨갛게 물들어요.'],
+    ['ginkgo', '은행잎', 1, { s: AUT }, '부채 모양 잎이 가을에 노랗게 물들어요. 아주 오래전부터 살아온 나무예요.'],
+    ['pine', '소나무', 1, {}, '사계절 내내 푸른 바늘잎 나무예요. 솔방울에 씨앗이 들어 있어요.'],
+    ['hericium', '노루궁뎅이버섯', 1, { s: AUT }, '노루 엉덩이 털처럼 하얗고 복슬복슬한 버섯이에요. 버섯은 식물이 아니라 균류예요.'],
+    ['miseon', '미선나무', 1, { s: [3, 4], rare: 1 }, '세계에서 우리나라에만 자라는 특산 식물이에요. 하얀 꽃이 피어요.'],
+    ['greattit', '박새', 2, {}, '검은 넥타이 무늬가 있는 작은 새예요. 벌레를 많이 잡아 줘요.'],
+    ['woodpecker', '오색딱따구리', 2, {}, '부리로 나무를 콕콕 두드려 속의 벌레를 찾아요.'],
+    ['kingfisher', '물총새', 2, { w: 1 }, '물속으로 총알처럼 뛰어들어 물고기를 잡아요.'],
+    ['mandarin', '원앙', 2, { w: 1 }, '수컷의 깃털이 알록달록 화려한 오리예요. 천연기념물이에요.'],
+    ['squirrel_red', '청설모', 2, {}, '귀 끝에 긴 털이 있는 회갈색 다람쥐 무리예요. 잣과 솔방울을 좋아해요.'],
+    ['salamander', '도롱뇽', 2, { r: 1 }, '깨끗한 계곡 근처에 사는 양서류예요. 비 오는 날 밖으로 나와요.'],
+    ['flyingsquirrel', '하늘다람쥐', 2, { n: 1, rare: 1, en: 'Ⅱ급' }, '앞다리와 뒷다리 사이 막을 펴고 나무 사이를 날아요. 천연기념물이에요.'],
+    ['otter', '수달', 2, { w: 1, rare: 1, en: 'Ⅰ급' }, '헤엄을 아주 잘 치는 물가의 동물이에요. 천연기념물이에요.'],
+    ['redbat', '붉은박쥐', 2, { n: 1, rare: 1, en: 'Ⅰ급' }, '주황빛 털 때문에 황금박쥐라고도 불러요. 천연기념물이에요.'],
+    ['pitta', '팔색조', 2, { s: [5, 6, 7, 8], rare: 1, en: 'Ⅱ급' }, '여덟 가지 빛깔 깃털을 가진 여름 철새예요. 천연기념물이에요.']]
+    .map(([k, nm, g, c, d]) => ({ id: 'bio_' + k, nm, g, ...c, d }));
+  const BIO_BY = Object.fromEntries(BIO.map(b => [b.id, b]));
+  const BIO_G = ['곤충', '식물', '새와 작은 동물'];
+  const freshBx = () => ({ m: -1, sp: [], next: 0, got: {}, g: 0, st: { n: 0 } });
+  const bxOpen = () => !!S && !!S.bx && S.tier >= BX.tier;
+  const bxSpots = () => BX_SPOT[decoMap()] || null;
+  const bxCount = () => S && S.bx ? BIO.filter(b => S.bx.got[b.id]).length : 0;
+  const bxRareP = () => Math.min(BX.rareMax, BX.rare0 + Math.floor((S.f.science || 0) / 5));
+  const kstMonth = t => new Date(t + KST_MS).getUTCMonth() + 1;
+  function bxOk(b, t, water) {
+    if (!!b.w !== !!water) return false;
+    if (b.s && !b.s.includes(kstMonth(t))) return false;
+    if (b.n && !nbOnAt(t)) return false;
+    if (b.r && wxOf(kstDay(t)) !== 'rain') return false;
+    return true;
+  }
+  function bxPick(t, water) {
+    const el = BIO.filter(b => bxOk(b, t, water)), rares = el.filter(b => b.rare), com = el.filter(b => !b.rare);
+    if (rares.length && (Math.random() * 100 < bxRareP() || !com.length)) return rares[Math.floor(Math.random() * rares.length)];
+    // 계절, 밤, 비처럼 때를 타는 생물은 그때 잘 보이게 세 배로 뽑아요
+    const wt = com.map(b => (b.s || b.n || b.r ? 3 : 1)), sum = wt.reduce((a, v) => a + v, 0);
+    let r = Math.random() * sum;
+    for (let i = 0; i < com.length; i++) { r -= wt[i]; if (r < 0) return com[i]; }
+    return com[com.length - 1] || null;
+  }
+  // 게임 시계로 2시간마다 한 마리(자리 비운 동안의 몫도 그때 시각으로 뽑아요). 지도가 바뀌면 숨어 있던 생물은 떠나요
+  function bxSync() {
+    if (!bxOpen()) return;
+    const L = bxSpots(); if (!L) return;
+    const now = gameNow(), m = decoMap();
+    if (S.bx.m !== m) { S.bx.m = m; S.bx.sp = []; }
+    if (!S.bx.next) S.bx.next = now;
+    for (let k = 0; k < 40 && S.bx.next <= now; k++) {
+      if (S.bx.sp.length >= BX.max) { S.bx.next = now + BX.every; break; }
+      const free = L.map((_, i) => i).filter(i => !S.bx.sp.some(x => x.i === i));
+      const i = free[Math.floor(Math.random() * free.length)], b = bxPick(S.bx.next, L[i][2]);
+      if (b) S.bx.sp.push({ i, id: b.id, t: S.bx.next });
+      S.bx.next += BX.every;
+    }
+  }
+  function bxMapHTML(m) {
+    if (!bxOpen() || S.bx.m !== m || rt.viewTier != null) return '';
+    const L = BX_SPOT[m]; if (!L) return '';
+    return S.bx.sp.map(x => {
+      const s = L[x.i]; if (!s) return '';
+      const [px, py] = pctXY([s[0], s[1]]), w = 30, u = IMG(s[2] ? 'bio_rustle_water' : 'bio_rustle');
+      return `<g class="bx-it" style="--d:${(x.i * 0.37).toFixed(2)}s">${u ? `<image x="${px - w / 2}" y="${py - w * 0.8}" width="${w}" height="${w}" href="${u}"/>` : `<text x="${px}" y="${py - 4}" text-anchor="middle" font-size="18">${s[2] ? '💧' : '🌿'}</text>`}` +
+        `<rect class="bx-hit" data-bx="${x.i}" x="${px - 22}" y="${py - 34}" width="44" height="44"/></g>`;
+    }).join('');
+  }
+  function bxTap(i) {
+    if (!bxOpen() || rt.paused) return null;
+    const k = S.bx.sp.findIndex(x => x.i === i); if (k < 0) return null;
+    const b = BIO_BY[S.bx.sp[k].id]; S.bx.sp.splice(k, 1);
+    if (!b) return null;
+    const nw = !S.bx.got[b.id];
+    S.bx.got[b.id] = (S.bx.got[b.id] || 0) + 1; S.bx.st.n += 1;
+    const got = [];
+    acGain('sci', nw ? BX.xpNew : BX.xpDup); got.push(`과학 XP +${nw ? BX.xpNew : BX.xpDup}`);
+    if (nw) { addEss(BX.essNew); got.push(`숲의 정수 +${BX.essNew}`); }
+    else { const a = minAcorns(BX.dupMin); S.budget += a; earn(a); got.push(`도토리 +${fmt(a)}`); }
+    const n = bxCount();
+    if (n >= 10 && S.bx.g < 1) { S.bx.g = 1; addGold(BX.gold10); got.push(`생물 10종! 황금 도토리 +${BX.gold10}`); }
+    if (n >= 20 && S.bx.g < 2) { S.bx.g = 2; addEss(BX.ess20); got.push(`생물 20종! 숲의 정수 +${BX.ess20}`); }
+    if (n >= BIO.length && S.bx.g < 3) { S.bx.g = 3; S.deco.own.bio_hut = 1; got.push('생물 30종을 다 모았어요! 지도 장식 관찰 오두막'); }
+    rt.bxRes = { b, nw, got };
+    sfx(b.rare ? 'quest' : 'coin');
+    renderDeco(true); renderHUD(); bxShow(); save();
+    return rt.bxRes;
+  }
+  const bxImg = (b, cls) => IMG(b.id) ? `<img${cls ? ` class="${cls}"` : ''} src="${IMG(b.id)}" alt="">` : `<span class="bx-em">${['🐞', '🌿', '🐦'][b.g]}</span>`;
+  function bxShow() {
+    const R = rt.bxRes; if (!R) return;
+    const b = R.b, lens = IMG('bio_lens');
+    $('#bxCard').innerHTML = `<div class="bx-look">${lens ? `<img class="lens" src="${lens}" alt="">` : ''}${bxImg(b, 'pic')}</div>` +
+      `<b class="bx-nm">${esc(b.nm)}${R.nw ? ' <i class="nw">NEW</i>' : ''}</b><small class="bx-g">${BIO_G[b.g]}${b.en ? `, 멸종위기 야생생물 ${b.en}` : b.rare ? ', 귀한 생물' : ''}</small>` +
+      `<p class="bx-d">${esc(b.d)}</p><p class="bx-got">${R.got.map(esc).join('<br>')}</p><small class="bx-cnt">생물 도감 ${bxCount()}/${BIO.length}종</small>`;
+    $('#bxCard').classList.remove('open'); void $('#bxCard').offsetWidth; $('#bxCard').classList.add('open');
+    openModal($('#mBx'));
+  }
+  const bxHint = b => [b.w ? '물가' : '', b.s ? (b.s.every(m => SPR.includes(m)) ? '봄' : b.s.every(m => SUM.includes(m)) ? '여름' : b.s.every(m => AUT.includes(m)) ? '가을' : `${b.s[0]}~${b.s[b.s.length - 1]}월`) : '', b.n ? '밤 20~24시' : '', b.r ? '비 오는 날' : ''].filter(Boolean).join(', ');
+  function bxDexRender() {
+    if (!S || !S.bx) return;
+    $('#bxDexHead').textContent = `관찰한 생물 ${bxCount()}/${BIO.length}종 (귀한 생물 ${BIO.filter(b => b.rare && S.bx.got[b.id]).length}/6). 오늘 지도에 숨은 생물 ${S.bx.sp.length}마리`;
+    $('#bxDexGrid').innerHTML = BIO_G.map((g, gi) => `<b class="bx-gh">${g}</b>` + BIO.filter(b => b.g === gi).map(b => { const n = S.bx.got[b.id] || 0;
+      return `<button type="button" class="sn-card bx-card${b.rare ? ' rare' : ''}${n ? '' : ' no'}" data-bxd="${b.id}">${n ? bxImg(b) : IMG('bio_frame') ? `<img src="${IMG('bio_frame')}" alt="">` : '❔'}<span class="ell">${n ? esc(b.nm) : '???'}</span><small>${n ? `${fmt(n)}번` : bxHint(b) || '언제든'}</small></button>`; }).join('')).join('');
+  }
+  function sanitizeBx(d, s) {
+    const X = d.bx && typeof d.bx === 'object' ? d.bx : {}, o = freshBx(), lim = Date.now() + 366 * 86400000, n = (v, hi) => Math.max(0, Math.min(hi, Math.floor(Number(v) || 0)));
+    o.m = Number.isInteger(X.m) && X.m >= 0 && X.m < BX_SPOT.length ? X.m : -1;
+    const L = BX_SPOT[o.m] || [], used = {};
+    o.sp = (Array.isArray(X.sp) ? X.sp : []).filter(x => x && Number.isInteger(x.i) && x.i >= 0 && x.i < L.length && BIO_BY[x.id] && !used[x.i] && (used[x.i] = 1)).slice(0, BX.max).map(x => ({ i: x.i, id: x.id, t: n(x.t, lim) }));
+    o.next = n(X.next, lim);
+    if (X.got && typeof X.got === 'object') for (const b of BIO) if (X.got[b.id]) o.got[b.id] = n(X.got[b.id], 1e6);
+    o.g = n(X.g, 3); o.st.n = n(X.st && X.st.n, 1e9);
+    s.bx = o;
   }
   /* ---------- 2.2.0 학교 텃밭 (프로젝트 문서 '2.2.0 설계안' 3절, 지섭 확정 2026-10-30) ----------
      유치원부터 급식실 창에서 열어요. 씨앗은 공짜, 작물마다 자라는 시간이 있고 물을 주면 남은 시간 -20%(비 오는 날은 저절로).
@@ -11141,6 +11320,7 @@ span.bt-stamp{display:none}.bt-duel.done span.bt-stamp{display:grid}
   const psDecoId = n => 'ps_' + n, psFurId = n => 'psf_' + n;
   [['winter', '눈꽃 트로피'], ['spring', '벚꽃 트로피'], ['summer', '파도 분수 트로피'], ['autumn', '단풍 도토리 조각상']].forEach(([q, nm]) => DECO.push({ id: 'rs_' + q, name: nm, ess: 0, img: 'season_' + q, rare: 1, ev: 1, rs: 1 }));   // 2.1.3 랭킹 시즌 기념 장식
   PS_SEASONS.forEach((x, n) => { if (x[1]) DECO.push({ id: psDecoId(n), name: x[2], ess: 0, img: x[1], rare: 1, ev: 1, ps: 1 }); });   // 2.1.3 숲속 패스 한정 장식
+  DECO.push({ id: 'bio_hut', name: '관찰 오두막', ess: 0, img: 'bio_hut', rare: 1, ev: 1, bio: 1 });   // 2.2.0 생물 30종을 다 모으면
   for (const [k, name, sm] of EV_DECO) DECO.push({ id: 'ev_' + k, name, ess: 0, img: 'evd_' + k, rare: 1, ev: 1, ...(sm ? { sm: 1 } : {}) });
   const evDecoArt = d => !!(d && d.ev && IMG(d.img));
   const DECO_BY = Object.fromEntries(DECO.map(d => [d.id, d]));
@@ -11204,9 +11384,9 @@ span.bt-stamp{display:none}.bt-duel.done span.bt-stamp{display:grid}
     renderNight();   // 2.1.0 밤 모드: 건물이 늘면 창 불빛도
     const g = $('#decoG'); if (!g || !S) return;
     const m = decoMap(), L = S.deco.lay[m], edit = !!rt.decoEdit;
-    const key = [m, L.join(), S.deco.nm, S.tier, edit, S.vd ? S.vd.lv : 0].join('|');
+    const key = [m, L.join(), S.deco.nm, S.tier, edit, S.vd ? S.vd.lv : 0, S.bx ? S.bx.m + ':' + S.bx.sp.map(x => x.i).join() : ''].join('|');
     if (!force && g.dataset.key === key) return; g.dataset.key = key;
-    let h = edit ? '<rect class="deco-dim" x="-200" y="-200" width="760" height="940"/>' : vdMapHTML(m);   // 2.1.2 마을 기부 기념물(꾸미기 중에는 숨겨요). 2.1.3 꾸미기 중에는 지도를 살짝 어둡게 해서 빈 자리가 잘 보여요
+    let h = edit ? '<rect class="deco-dim" x="-200" y="-200" width="760" height="940"/>'  : vdMapHTML(m) + bxMapHTML(m);   // 2.2.0 숨은 생물. 2.1.2 마을 기부 기념물(꾸미기 중에는 숨겨요). 2.1.3 꾸미기 중에는 지도를 살짝 어둡게 해서 빈 자리가 잘 보여요
     const [sx, sy] = DECO_SIGN[m], sw = 96, sh = 48, nm = S.deco.nm || '숲속', tn = tierInfo().name;
     if (IMG('sign_board')) {
       // 글자는 간판 안쪽 판(그림 높이의 27%~71%) 가운데에 두 줄로. 판이 낮아서 글자를 작게 해요(1.7.4 지섭: 위로 삐져나감)
@@ -11290,7 +11470,7 @@ span.bt-stamp{display:none}.bt-duel.done span.bt-stamp{display:grid}
       h += `<h3 class="shop-h">${title}</h3><div class="shop-grid">`;
       for (const d of list) {
         const n = decoOwn(d.id), out = decoSoldOut(d.id), c = decoCost(d.id), poor = !out && S.ess < c;
-        const pr = d.ev ? (n ? '가졌어요' : d.ps ? '패스 보상' : d.rs ? '시즌 기념' : '이벤트 선물') : out ? (d.rare ? '가졌어요' : '더 살 수 없어요') : `${ic}${c}`;
+        const pr = d.ev ? (n ? '가졌어요' : d.ps ? '패스 보상' : d.rs ? '시즌 기념' : d.bio ? '생물 30종' : '이벤트 선물') : out ? (d.rare ? '가졌어요' : '더 살 수 없어요') : `${ic}${c}`;
         h += `<button class="si${n ? ' own' : ''}${poor ? ' poor' : ''}" type="button" data-dbuy="${d.id}" aria-label="${d.name}${out ? '' : `, 숲의 정수 ${c}개`}">` +
           (d.rare ? '<span class="rare-mark" aria-hidden="true">★</span>' : '') +
           `<span class="pv deco"><img src="${IMG(d.img)}" alt="" draggable="false"></span><span class="nm">${d.name}${!d.rare && n ? ` <small>${n}개</small>` : ''}</span><span class="pr">${pr}</span></button>`;
@@ -15804,6 +15984,8 @@ span.bt-stamp{display:none}.bt-duel.done span.bt-stamp{display:grid}
       case 'snDraw': return S.sn.n;   // 2.1.2 간식 뽑은 수
       case 'snDex': return snCount();   // 2.1.2 간식 도감 종류
       case 'gdHarvest': return S.gd.st.h;   // 2.2.0 텃밭 거둔 수
+      case 'bxSeen': return S.bx.st.n;   // 2.2.0 생물 관찰 수
+      case 'bxKinds': return bxCount();   // 2.2.0 생물 도감 종류
       case 'gdCook': return S.gd.st.cook;   // 2.2.0 오늘의 급식 만든 수
       case 'vdLv': return S.vd.lv;   // 2.1.2 마을 기부 단계
       default: return S.st[q.t] || 0;   // picks, ups, trains, claims, grads, perks, fperks
@@ -15870,7 +16052,7 @@ span.bt-stamp{display:none}.bt-duel.done span.bt-stamp{display:grid}
       else if (q.t === 'rdBooks') text = `${shown}/${need}권`;
       else if (q.t === 'labs' || q.t === 'picnics' || q.t === 'frPat' || q.t === 'frGift' || q.t === 'albOpen') text = `${shown}/${need}번`;
       else if (q.t === 'stickers') text = `${shown}/${need}장`;
-      else if (q.t === 'vdGive' || q.t === 'snDraw' || q.t === 'gdHarvest' || q.t === 'gdCook') text = `${shown}/${need}번`;
+      else if (q.t === 'vdGive' || q.t === 'snDraw' || q.t === 'gdHarvest' || q.t === 'gdCook' || q.t === 'bxSeen') text = `${shown}/${need}번`;
       else if (q.t === 'snDex') text = `${shown}/${need}종`;
       else if (q.t === 'vdLv') text = `${shown}/${need}단계`;
       else if (q.t === 'btPlays' || q.t === 'btMid') text = `${shown}/${need}판`;
@@ -15943,6 +16125,8 @@ span.bt-stamp{display:none}.bt-duel.done span.bt-stamp{display:grid}
       case 'snDraw': return '간식 뽑기';
       case 'snDex': return `간식 도감 ${q.n}종`;
       case 'gdHarvest': return q.n === 1 ? '텃밭 작물 거두기' : `텃밭 작물 ${q.n}번 거두기`;
+      case 'bxSeen': return q.n === 1 ? '생물 관찰하기' : `생물 ${q.n}번 관찰하기`;
+      case 'bxKinds': return `생물 도감 ${q.n}종`;
       case 'gdCook': return q.n === 1 ? '오늘의 급식 만들기' : `오늘의 급식 ${q.n}번 만들기`;
       case 'vdLv': return `마을 기부 ${q.n}단계`;
     }
@@ -16395,6 +16579,7 @@ span.bt-stamp{display:none}.bt-duel.done span.bt-stamp{display:grid}
       // 1.8.0 보강 퀘스트
       case 'xt': return xtHere(q.k) ? goTeacher(q.k) : goFac(XT[q.k].fac, `${XT[q.k].fac === 'cafeteria' ? '급식실' : '도서관'}을 지으면 오셔요`);
       case 'vp': return goTeacher('vp');
+      case 'bxSeen': case 'bxKinds': if (bxOpen()) { if (S.bx.sp.length) { setTab('school'); return toast('지도에서 흔들리는 풀숲이나 물가를 눌러 봐요'); } return toast(`지금은 숨은 생물이 없어요. ${hm(Math.max(60, Math.ceil((S.bx.next - gameNow()) / 1000)))} 뒤에 새 생물이 숨어요`); } return toast('생물 탐사는 초등학교부터 열려요');   // 2.2.0
       case 'gdHarvest': case 'gdCook': if (gdOpen()) return openGd(); return goFac('cafeteria', '급식실을 지으면 텃밭을 가꿀 수 있어요');   // 2.2.0
       case 'snDraw': case 'snDex': if (snOpen()) return openSn(); return goFac('store', '매점을 지으면 간식 뽑기를 할 수 있어요');   // 2.1.2
       case 'vdGive': case 'vdLv': setTab('school'); if (vdOpen()) return openVd(); return toast('마을 기부는 초등학교부터 열려요');   // 2.1.2
@@ -16732,7 +16917,7 @@ span.bt-stamp{display:none}.bt-duel.done span.bt-stamp{display:grid}
     $('#markRows').addEventListener('click', e => { const b = e.target.closest('[data-mk]'); if (!b) return; const [g, i] = b.dataset.mk.split(':').map(Number); sfx('tap'); rt.mkDraft[g] = i; renderMarkEdit(); });
     $('#markSave').addEventListener('click', () => { sfx('quest'); setMark(rt.mkDraft); toast('학교 마크를 바꿨어요. 위쪽 학교 카드에 보여요'); });
     $('#markOff').addEventListener('click', () => { sfx('tap'); setMark(null); toast('학교 카드를 교실 그림으로 되돌렸어요'); });
-    $('#decoG').addEventListener('click', e => { if (!rt.decoEdit && e.target.closest('[data-vd]')) { e.stopPropagation(); openVd(); return; } const r = e.target.closest('[data-slot]'); if (!r || !rt.decoEdit) return; e.stopPropagation(); openDecoPick(+r.dataset.slot); });
+    $('#decoG').addEventListener('click', e => { if (!rt.decoEdit && e.target.closest('[data-vd]')) { e.stopPropagation(); openVd(); return; } { const x = !rt.decoEdit && e.target.closest('[data-bx]'); if (x) { e.stopPropagation(); bxTap(Number(x.dataset.bx)); return; } } const r = e.target.closest('[data-slot]'); if (!r || !rt.decoEdit) return; e.stopPropagation(); openDecoPick(+r.dataset.slot); });   // 2.2.0 생물 탐사(data-bx)
     $('#decoDone').addEventListener('click', () => { sfx('tap'); decoEditEnd(); toast('학교 꾸미기를 마쳤어요'); });
     $('#decoPickList').addEventListener('click', e => { const b = e.target.closest('[data-dput]'); if (!b) return; if (decoPut(rt.decoSlot, b.dataset.dput)) { sfx('quest'); achSync(); closeModal($('#mDecoPick')); } });
     $('#decoPickClear').addEventListener('click', () => { decoPut(rt.decoSlot, ''); sfx('tap'); closeModal($('#mDecoPick')); });
@@ -17015,6 +17200,8 @@ span.bt-stamp{display:none}.bt-duel.done span.bt-stamp{display:grid}
     $('#snBtns').addEventListener('click', e => { const b = e.target.closest('[data-sn]'); if (b) snDraw(b.dataset.sn === '10'); });
     $('#snClose').addEventListener('click', () => { sfx('tap'); closeModal($('#mSn')); });
     $('#gdClose').addEventListener('click', () => { sfx('tap'); closeModal($('#mGd')); });   // 2.2.0 학교 텃밭
+    $('#bxOk').addEventListener('click', () => { sfx('tap'); closeModal($('#mBx')); });   // 2.2.0 생물 탐사
+    $('#bxDexBtn').addEventListener('click', () => { sfx('tap'); closeModal($('#mBx')); setTimeout(() => { setTab('dex'); setDexSeg('bx'); }, 240); });
     $('#nbOk').addEventListener('click', () => { sfx('tap'); closeModal($('#mNb')); });   // 2.2.0 야간 건설
     $('#sheetGarden').addEventListener('click', () => { closeSheet(); setTimeout(openGd, 240); });
     $('#mGd').addEventListener('click', e => {
@@ -17588,7 +17775,8 @@ span.bt-stamp{display:none}.bt-duel.done span.bt-stamp{display:grid}
     out: { w: 3, name: n => `소풍이나 체험학습 ${n}번 보내기`, v: () => S.pc.st.n + S.st.trips },
     con: { w: 5, name: n => `시설 공사 ${n}번 하기`, v: () => S.st.cons || 0 },
     sn: { w: 5, name: n => `매점 간식 ${n}번 뽑기`, v: () => S.sn.n, ok: () => snOpen() },
-    gd: { d: 2, w: 10, name: n => `텃밭 작물 ${n}번 거두기`, v: () => S.gd.st.h, ok: () => gdOpen() }   // 2.2.0
+    gd: { d: 2, w: 10, name: n => `텃밭 작물 ${n}번 거두기`, v: () => S.gd.st.h, ok: () => gdOpen() },   // 2.2.0
+    bx: { d: 2, w: 8, name: n => `생물 ${n}번 관찰하기`, v: () => S.bx.st.n, ok: () => bxOpen() }   // 2.2.0
   };
   const psOk = id => { const M = PS_M[id]; try { return !!M && (!M.ok || M.ok()); } catch (e) { return false; } };
   const psVal = id => { try { return Math.floor(PS_M[id].v()) || 0; } catch (e) { return 0; } };
@@ -18018,6 +18206,7 @@ span.bt-stamp{display:none}.bt-duel.done span.bt-stamp{display:grid}
     if (!$('#mVd').hidden) vdRender();
     snSync(); snHud(); if (!$('#mSn').hidden) snRender();   // 2.1.2 간식 뽑기(날이 바뀌면 기분 0칸)   // 2.1.2 마을 기부 창(도토리가 늘면 단추가 켜져요)
     gdSync(); gdMark(); if (!$('#mGd').hidden) gdRender();   // 2.2.0 학교 텃밭
+    { const n0 = S.bx ? S.bx.sp.length : 0; bxSync(); if (S.bx && S.bx.sp.length !== n0) renderDeco(); }   // 2.2.0 생물 탐사
     cbApply(); nbApply(); ffRender(); nbNotice();   // 2.1.1 건설 가속, 2.2.0 야간 건설, 오늘 바로 완공 표시
     dsnSync();   // 2.1.0 하루 시작 횟수
     audioWatch();   // 2.1.1 소리가 멈춰 '삐~' 소리가 나면 소리를 새로 켜요
@@ -18119,6 +18308,7 @@ span.bt-stamp{display:none}.bt-duel.done span.bt-stamp{display:grid}
     { id: 'donate', name: '마을 기부', goals: [1, 3, 5, 8, 20], title: '숲속 기부왕', ic: 'donate_ic', t: n => `마을 기부 ${n}단계`, v: () => S.vd ? S.vd.lv : 0 },   // 2.1.2
     { id: 'rare', name: '반짝 친구', goals: [1, 2, 3, 4, 6], title: '반짝 친구 수집가', ic: 'rare_badge', t: n => n >= 6 ? '반짝 친구 모두 만나기' : `반짝 친구 ${n}명 만나기`, v: () => S.rare ? S.rare.got.length : 0 },   // 2.1.3
     { id: 'garden', name: '급식 메뉴', goals: [2, 4, 8, 12, 16], title: '숲속 요리사', ic: 'menu_01', t: n => n >= 16 ? '급식 메뉴 모두 만들기' : `급식 메뉴 ${n}가지 만들기`, v: () => gdMenuCount() },   // 2.2.0
+    { id: 'bio', name: '생물 탐사', goals: [5, 10, 18, 24, 30], title: '꼬마 생물학자', ic: 'bio_ladybug', t: n => n >= 30 ? '생물 도감 모두 채우기' : `생물 ${n}종 관찰하기`, v: () => bxCount() },   // 2.2.0
     { id: 'lab', name: '과학 탐구 실험', goals: [3, 8, 14, 20, 24], title: '꼬마 과학자', t: n => n >= 24 ? '실험 노트 모두 채우기' : `실험 노트 ${n}장 채우기`, v: () => labCount() }   // 2.0.1 공부 2단계(노트 24장)
   ];
   const ACH_EM = { rare: '✨', students: '🐰', grad: '🎓', building: '🏫', teacher: '🦔', quest: '📝', puzzle: '🧩', dex: '📖', fest: '🎈', attend: '📅', trip: '🚌', gold: '🌰', rank: '🏆', deco: '🪴', lab: '🧪', battle: '⚔️', league: '🏅' , donate: '🌳', snack: '🍪' };
@@ -18197,10 +18387,10 @@ span.bt-stamp{display:none}.bt-duel.done span.bt-stamp{display:grid}
     }).join('');
   }
   function setDexSeg(v) {
-    rt.dexSeg = v === 'ach' ? 'ach' : v === 'sn' ? 'sn' : 'dex';   // 2.1.2 간식 도감
+    rt.dexSeg = v === 'ach' ? 'ach' : v === 'sn' ? 'sn' : v === 'bx' ? 'bx' : 'dex';   // 2.1.2 간식 도감, 2.2.0 생물 도감
     $$('#dexSeg [data-dseg]').forEach(b => b.setAttribute('aria-checked', String(b.dataset.dseg === rt.dexSeg)));
-    $('#dexPane').hidden = rt.dexSeg !== 'dex'; $('#achPane').hidden = rt.dexSeg !== 'ach'; $('#snPane').hidden = rt.dexSeg !== 'sn';
-    if (rt.dexSeg === 'ach') renderAch(true); else if (rt.dexSeg === 'sn') snDexRender(); else renderDex();
+    $('#dexPane').hidden = rt.dexSeg !== 'dex'; $('#achPane').hidden = rt.dexSeg !== 'ach'; $('#snPane').hidden = rt.dexSeg !== 'sn'; $('#bxPane').hidden = rt.dexSeg !== 'bx';
+    if (rt.dexSeg === 'ach') renderAch(true); else if (rt.dexSeg === 'sn') snDexRender(); else if (rt.dexSeg === 'bx') bxDexRender(); else renderDex();
   }
   // tick170에서 1초마다 불러요
   // 메인 화면 위쪽 학교 카드에 단 칭호를 보여 줘요. 누르면 업적 화면이 열려요
@@ -19117,7 +19307,7 @@ span.bt-stamp{display:none}.bt-duel.done span.bt-stamp{display:grid}
   // 시험용 손잡이: 자동 시험(window.__FOREST_TEST)에서만 게임 속 함수를 꺼내 써요
   if (window.__FOREST_TEST) window.__forest = { get S() { return S; }, goTo, conOn, conLeft, conTick, conSec, conFinish, tkPlan, tkUse, tkUseAll, TK, CON, TKAD, capNext, yearCap,   // 2.1.0 공사
     semOn, semFirst, semLabel, cereDip, semBreak,   // 2.1.0 학기(s80)
-    get btUI() { return btUI; }, conFreeLeft, CB, cbOn, cbLeft, cbCost, cbApply, cbBuy, conRender, GD, GD_CROPS, GD_MENU, GD_M, gdN, gdSync, gdPlant, gdWater, gdHarvest, gdCook, gdMult, gdPct, gdToday, gdReadyN, gdMenuCount, openGd, gdRender, gdMark, nbApply, NB, nbAdd, nbAddOf, nbOn, nbOnAt, nbLeft, nbOverlap, nbApply, nbNotice, conAdd, get Live() { return Live; }, sanitize211, ffCan, ffRender, BTQ, BTQ_SCI, BTQ_KOR, BTQ_COL, btqMake, btqMath, btqPick, btqAnswer, btqMemTap, btqPts, btReveal,   // 2.1.1 대결 종목 문제
+    get btUI() { return btUI; }, conFreeLeft, CB, cbOn, cbLeft, cbCost, cbApply, cbBuy, conRender, BX, BX_SPOT, BIO, BIO_BY, bxOpen, bxSync, bxPick, bxOk, bxTap, bxCount, bxRareP, bxMapHTML, bxDexRender, setDexSeg, renderDeco, GD, GD_CROPS, GD_MENU, GD_M, gdN, gdSync, gdPlant, gdWater, gdHarvest, gdCook, gdMult, gdPct, gdToday, gdReadyN, gdMenuCount, openGd, gdRender, gdMark, nbApply, NB, nbAdd, nbAddOf, nbOn, nbOnAt, nbLeft, nbOverlap, nbApply, nbNotice, conAdd, get Live() { return Live; }, sanitize211, ffCan, ffRender, BTQ, BTQ_SCI, BTQ_KOR, BTQ_COL, btqMake, btqMath, btqPick, btqAnswer, btqMemTap, btqPts, btReveal,   // 2.1.1 대결 종목 문제
     SN, SN_ALL, snOpen, snCount, snSync, snMult, snBase, snCost, snPick, snDraw, openSn, snRender, snDexRender, setDexSeg, rate,
     qProg, VD, vdH, vdOpen, vdNeed, vdLeft, vdAmt, vdGive, vdUp, openVd, vdRender, vdMapHTML, achTitles, achTitleName, setTitle,
     BF, FR_LINES, frSync, frMake, frOf, frNm, frFull, frHeart, frList, frPat, frGift, frGiftLeft, frAddP, frRename, frHere, frKidTap, frLetter, frTick, bdParty, bdPlace, bdClaim, bdDoneToday, bdRender, bdHats,
