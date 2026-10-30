@@ -46,6 +46,13 @@ function handle(b) {
     if (b.q && b.q.last) pairs = pairs.slice(-b.q.last);
     return { ok: true, val: v, pairs };
   }
+  if (b.op === 'cas') {   // 2.2.0 검토 2: 트랜잭션 흉내(지금 값이 expect와 같을 때만 규칙 검사 뒤 써요)
+    const canon = v => JSON.stringify(v, (k, x) => x && typeof x === 'object' && !Array.isArray(x) ? Object.keys(x).sort().reduce((o, kk) => (o[kk] = x[kk], o), {}) : x);
+    if (!d.read(norm(b.path), { now: Date.now() }).allowed) return deny;
+    const now = get(b.path);
+    if (canon(now === undefined ? null : now) !== canon(b.expect === undefined ? null : b.expect)) { LOG.push({ op: 'cas-stale', path: norm(b.path), uid: b.uid, t: Date.now() }); return { ok: true, stale: true, val: now }; }
+    b.op = 'set';
+  }
   if (b.op === 'set' || b.op === 'update') {
     const r = b.op === 'set' ? d.write(norm(b.path), b.value) : d.update(norm(b.path), b.value);
     LOG.push({ op: b.op, path: norm(b.path), uid: b.uid, ok: r.allowed, t: Date.now() });

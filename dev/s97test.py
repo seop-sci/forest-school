@@ -8,12 +8,13 @@
 # 쓰는 법: python3 wrap.py && python3 build_gh.py gh && python3 s97test.py   (마지막 줄이 PASS면 통과, 가짜 서버 시험이라 다른 서버 시험과 따로 돌려요)
 import asyncio, json, time, subprocess
 from playwright.async_api import async_playwright
-from s7test import HERE, PORT, api, dump, mode, elem, device, wait_cloud, wait_text, local, uid_of, toast, INFO, open_settings
+from s7test import HERE, PORT, api, dump, mode, elem, device, wait_cloud, wait_text, local, uid_of, toast, INFO, open_settings, NT_SEEN
 
+# 2.2.0 검토(2026-10-30): 서버에 바로 넣는 저장에도 이번 공지를 본 것으로 넣어요(불러온 뒤 공지 창이 늦게 떠서 설정 단추를 가렸어요)
 def mid(**kw):
-    return elem(tier=2, tg=2, sem=1, **kw)   # 중학교 3학년 2학기
+    kw.setdefault('nt', NT_SEEN); return elem(tier=2, tg=2, sem=1, **kw)   # 중학교 3학년 2학기
 def e4(**kw):
-    return elem(tier=1, tg=3, sem=1, **kw)   # 초등 4학년 2학기
+    kw.setdefault('nt', NT_SEEN); return elem(tier=1, tg=3, sem=1, **kw)   # 초등 4학년 2학기
 
 PICK = "(() => { const m = document.querySelector('#mPick'); return { open: !!m && !m.hidden, loc: document.querySelector('#pickLoc').textContent, srv: document.querySelector('#pickSrv').textContent }; })()"
 BAK = "JSON.parse(localStorage.getItem('forest-school-bak') || '[]').map(b => [b.sum, b.why])"

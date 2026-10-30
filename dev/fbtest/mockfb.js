@@ -46,6 +46,18 @@
       update: v => write('update', v),
       remove: () => write('set', null),
       once: () => read(),
+      // 2.2.0 검토 2: 진짜 SDK처럼 처음에는 모르는 값(null)으로 한 번 부르고, 서버 값과 다르면 서버 값으로 다시 불러요(서버가 비교하고 써요)
+      transaction: async (fn, done, applyLocally) => {
+        let cur = null;
+        for (let i = 0; i < 25; i++) {
+          const v = fn(clone(cur));
+          if (v === undefined) return { committed: false, snapshot: snap(key, cur) };
+          const j = await call({ op: 'cas', path, expect: cur, value: v });
+          if (!j.stale) { bump(); return { committed: true, snapshot: snap(key, v) }; }
+          cur = j.val;
+        }
+        throw Object.assign(new Error('maxretry'), { code: 'maxretry' });
+      },
       on: (ev, cb, err) => { const l = { path, q, cb, err, read, sig: undefined }; st.listeners.add(l); poll(l); return cb; },
       off: (ev, cb) => { st.listeners.forEach(l => { if (l.path === path && (!cb || l.cb === cb)) st.listeners.delete(l); }); }
     };

@@ -132,3 +132,12 @@ Issue 양식은 기본 브랜치(`main`)에 있어야 GitHub의 새 Issue 화면
 - `fbtest/rules_test.js`: forest/bak 포함 97개
 - 2.2.0 회귀: 62개 가운데 판정 줄 있는 것 모두 PASS(s49, s73, s74는 여럿을 함께 돌리면 가끔 흔들려서 하나씩 다시 돌려 PASS), s26 s27 s34 s67은 판정 줄 없음
 - **이름 겹침 주의**: 저장 칸 `ex`(시험 기간), `lg`(숲속 대결 주간 순위), `gd`(황금 도토리 상점)는 이미 있어요. 2.2.0은 `bx`, `cg`, `gn`, `nb`
+
+## 2.2.0 검토 수정 시험 (2026-10-30, PR fix/v220-review)
+- `fbtest/rules_bt.js`: 대결 순위 규칙(bt, btq, btm). 공격(0.1초 간격 +200, 10초 간격 1시간, btq 지우기와 되돌리기, 메달만 5)과 정상(하루 5판 30일, 옛 줄 이어 올리기와 기기 시각 ±10초, 7일 쉬고 나눠 올리기, 두 기기, 지기). `NODE_PATH=<targaryen> node dev/fbtest/rules_bt.js database.rules.json`, 마지막 줄 PASS
+- `fbtest/rules_test.js`: bt 칸 시험을 btq 규칙에 맞게 바꿈(102개)
+- `node dev/check_ads.mjs`: 동의 거절, 동의 정보 오류(처음, 지난번 허락, 지난번 거절), 허락, 지난번 허락 뒤 거절, 오류 뒤 1분 2분 4분 재시도
+- `s98test.py` (가짜 Firebase, 따로 돌려요): 저장 리비전(옛 저장 r 없음, 두 기기 Lv.12와 옛 Lv.11, 동시에 올리기, 오프라인에서 돌아오기, 학기, 내렸다 켜기), 학교 공개 끄기(실패 표시와 다시 열어 지우기, 다른 기기 옛 저장, 랭킹 빼기), 계정 지우기(실패하면 올리지 않고 다음에 이어서, 서버 칸 6개와 이 기기 예전 학교, 새 계정으로 안 올라감). `python3 build_gh.py gh` 뒤에 돌려요
+- `s99test.py`: 동아리 발표회 횟수(cg.st.s) 저장 읽기와 다시 열기, 옛 저장, 숲의 정수 읽기 상한 10억
+- 바꾼 옛 시험: `s7test.py`(newer, older에서 묻는 창이 뜨면 서버 학교와 이 기기 학교를 골라요), `s72test.py`(가짜 SDK에 트랜잭션과 r 읽기), `s96test.py`(st.s), `s97test.py`(서버에 넣는 저장에도 이번 공지를 본 것으로)
+- `fbtest/mockfb.js`, `fbtest/fbserver.js`: 트랜잭션 흉내(cas)

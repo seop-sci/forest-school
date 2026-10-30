@@ -50,17 +50,23 @@ t('rank write other', W('B', '/forest/rank/A', RANK), false);
 t('rank server time', W('B', '/forest/rank/B', Object.assign({}, RANK, { at: { '.sv': 'timestamp' } })), true);
 t('rank name 10', W('B', '/forest/rank/B', Object.assign({}, RANK, { name: '가나다라마바사아자차' })), true);
 t('rank name 11', W('B', '/forest/rank/B', Object.assign({}, RANK, { name: '가나다라마바사아자차카' })), false);
-// 2.0.1 숲속 대결 순위(bt 대결 점수, btm 메달): bt는 1000~9999이고 처음에는 1000 + 400(마지막 쓰기 뒤 하루마다 200 더), 메달은 내려가지 않아요
-t('bt first 1200', W('B', '/forest/rank/B', Object.assign({}, RANK, { bt: 1200, btm: 1 })), true);
-t('bt first 1500', W('B', '/forest/rank/B', Object.assign({}, RANK, { bt: 1500, btm: 1 })), false);
-t('bt below 1000', W('B', '/forest/rank/B', Object.assign({}, RANK, { bt: 999 })), false);
-t('btm 6', W('B', '/forest/rank/B', Object.assign({}, RANK, { bt: 1000, btm: 6 })), false);
-t('bt old row', W('A', '/forest/rank/A', Object.assign({}, RANK, { bt: 1200, btm: 0 })), true);
-{ const db = targaryen.database(rules, { forest: { rank: { D: Object.assign({}, RANK, { at: NOW - 86400e3, bt: 1500, btm: 2 }) } } }).as({ uid: 'D', provider: 'anonymous' });
-  t('bt day later +390', db.write('/forest/rank/D', Object.assign({}, RANK, { bt: 1890, btm: 2 })).allowed, true);
-  t('bt day later +500', db.write('/forest/rank/D', Object.assign({}, RANK, { bt: 2000, btm: 2 })).allowed, false);
-  t('btm down', db.write('/forest/rank/D', Object.assign({}, RANK, { bt: 1500, btm: 1 })).allowed, false);
-  t('bt down ok', db.write('/forest/rank/D', Object.assign({}, RANK, { bt: 1000, btm: 2 })).allowed, true);
+// 2.0.1 숲속 대결 순위(bt 대결 점수, btm 메달). 2.2.0 검토 1: bt를 올리려면 btq(하루 200점 시간 예산)가 있어야 하고, 메달은 bt 리그를 넘지 못해요(자세한 시험은 rules_bt.js)
+const DAY = 86400e3;
+t('bt first 1190', W('B', '/forest/rank/B', Object.assign({}, RANK, { bt: 1190, btq: NOW - DAY + 190 * 432000 + 5000, btm: 1 })), true);
+t('bt first 1500', W('B', '/forest/rank/B', Object.assign({}, RANK, { bt: 1500, btq: NOW - 1000, btm: 1 })), false);
+t('bt first no btq', W('B', '/forest/rank/B', Object.assign({}, RANK, { bt: 1200, btm: 1 })), false);
+t('bt first 1000 no btq', W('B', '/forest/rank/B', Object.assign({}, RANK, { bt: 1000, btm: 0 })), true);
+t('bt below 1000', W('B', '/forest/rank/B', Object.assign({}, RANK, { bt: 999, btq: NOW - DAY })), false);
+t('btm 6', W('B', '/forest/rank/B', Object.assign({}, RANK, { bt: 1000, btq: NOW - DAY, btm: 6 })), false);
+t('btm over league', W('B', '/forest/rank/B', Object.assign({}, RANK, { bt: 1000, btq: NOW - DAY, btm: 1 })), false);
+t('bt old row', W('A', '/forest/rank/A', Object.assign({}, RANK, { bt: 1190, btq: NOW - DAY + 190 * 432000 + 5000, btm: 0 })), true);
+{ const db = targaryen.database(rules, { forest: { rank: { D: Object.assign({}, RANK, { at: NOW - DAY, bt: 1500, btq: NOW - 2 * DAY, btm: 2 }) } } }).as({ uid: 'D', provider: 'anonymous' });
+  t('bt day later +190', db.write('/forest/rank/D', Object.assign({}, RANK, { bt: 1690, btq: NOW - DAY + 190 * 432000 + 1000, btm: 2 })).allowed, true);
+  t('bt day later +390', db.write('/forest/rank/D', Object.assign({}, RANK, { bt: 1890, btq: NOW - 1000, btm: 2 })).allowed, false);
+  t('btm down', db.write('/forest/rank/D', Object.assign({}, RANK, { bt: 1500, btq: NOW - DAY, btm: 1 })).allowed, false);
+  t('bt down ok', db.write('/forest/rank/D', Object.assign({}, RANK, { bt: 1000, btq: NOW - DAY + 5000, btm: 2 })).allowed, true);
+  t('btq future', db.write('/forest/rank/D', Object.assign({}, RANK, { bt: 1500, btq: NOW + 60000, btm: 2 })).allowed, false);
+  t('btq dropped', db.write('/forest/rank/D', Object.assign({}, RANK, { bt: 1500, btm: 2 })).allowed, false);
   t('no bt ok', db.write('/forest/rank/D', Object.assign({}, RANK)).allowed, true); }
 t('rank name empty', W('B', '/forest/rank/B', Object.assign({}, RANK, { name: '' })), false);
 t('rank score neg', W('B', '/forest/rank/B', Object.assign({}, RANK, { score: -1 })), false);
