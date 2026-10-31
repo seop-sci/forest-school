@@ -2593,6 +2593,8 @@ body.wl-on .toast{z-index:300}
 .bt-cand .bt-chr{width:36px;height:46px;object-fit:contain}.bt-cand b{font-size:11.5px;max-width:100%;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}.bt-cand .stars{font-size:10px;letter-spacing:-1px}
 .bt-cand.used{opacity:.55}.bt-cand i{position:absolute;top:2px;left:2px;right:2px;font-style:normal;font-size:9px;padding:1px 3px;border-radius:6px;background:#7FB069;color:#FFF;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
 .bt-go{flex:none}
+#btAdMore{white-space:nowrap;font-size:15px}
+.bt-why{white-space:pre-line;text-align:center;line-height:1.5;margin:6px 0 2px}   /* 3.0.0 대결에서 졌을 때 까닭 */
 .bt-play{flex:1 1 auto;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:12px;cursor:pointer}
 .bt-play-ev{display:flex;align-items:center;gap:8px;padding:6px 14px;border-radius:999px;background:rgba(44,74,61,.88);font-size:15px}.bt-play-ev small{font-size:11px;padding:2px 8px;border-radius:999px;background:#F3C04B;color:#3A2A14}
 .bt-duel{display:grid;grid-template-columns:1fr 1fr;gap:12px;width:100%}
@@ -5787,8 +5789,8 @@ span.bt-stamp{display:none}.bt-duel.done span.bt-stamp{display:grid}
       say: '4학년이 되면 숲속 운동회를 열 수 있어요! 청팀과 백팀으로 나뉘어 달리는 동안, 굴러오는 공을 주워서 청팀을 이기게 해 줘요.' },
     { id: 'vd2', ch: 8, t: 'vdLv', n: 3, rm: 4, title: '마을 기부 3단계', how: '지도의 기념물을 눌러 기부 단계를 3까지 올려요',
       say: '마을 친구들이 기념물을 보고 무척 기뻐해요. 기부 3단계가 되면 "마을 후원자" 칭호도 받을 수 있어요!' },   // 2.1.2 마을 기부
-    { id: 'bt2', ch: 8, t: 'btLg', n: 1, rm: 4, title: '숲속 대결 동 리그', how: '숲속 대결에서 이겨 대결 점수 1,100을 넘겨요',
-      say: '운동회 기운을 받아 숲속 대결에서도 이겨 봐요! 대결 점수가 1,100을 넘으면 동 리그 메달을 받아요.' },
+    { id: 'bt2', ch: 8, t: 'btWins', n: 3, rm: 4, title: '숲속 대결 3번 이기기', how: '공부 탭의 숲속 대결에서 세 번 이겨요',   // 3.0.0 지섭: 동 리그(이긴 판 4판쯤)는 며칠 걸려서 낮춤
+      say: '운동회 기운을 받아 숲속 대결에서도 이겨 봐요! 숲속 대결에서 세 번 이겨 주세요.' },
     { id: 'e26', ch: 8, t: 'fac', k: 'playground', n: 32, rm: 4, title: '운동장 Lv.32', how: '운동장을 Lv.32까지 넓혀요',
       say: '이어달리기를 하려면 운동장이 더 넓어야 해요. 운동장을 Lv.24까지 넓혀요.' },
     { id: 'e27', ch: 8, t: 'trips', n: 3, rm: 4, title: '체험학습 세 번', how: '체험학습을 세 번 다녀와요',
@@ -14297,7 +14299,7 @@ span.bt-stamp{display:none}.bt-duel.done span.bt-stamp{display:grid}
      주간 리그 승리마다 5점(하루 25점까지). 그림은 작업지시서 29, 29-1 */
   // 2.1.0 퍼즐, 합치기, 대결 화면에 있는 동안은 홈 알림(반장 선거, 시험 주, 책 다 읽음)을 미뤄요
   const gameSceneOpen = () => { try { return !!((pzUI && pzUI.open) || (mgUI && mgUI.open) || (btUI && btUI.open)); } catch (e) { return false; } };
-  const BT = { perDay: 5, win: 25, lose: 10, floor: 1000, streakFrom: 3, streakStep: 5, streakMax: 15, firstMin: 10, xp: 12, play: 5, grow: 2, lp: 5, lpDay: 25, cheerMs: 4000, cheerMax: 10, cheerTaps: 50, dice: 60 };   // 2.1.0 응원: 4초 동안 50번까지 두드려요(5번마다 1점, 최대 10점, 지섭 요청)   // 주사위 0~60: 설계안의 승률(별 하나 차이 뒤집기 약 20~30%, 두 별 약 5%)에 맞춘 값. 0~30이면 별 하나 차이도 6%라 거의 못 뒤집어요
+  const BT = { perDay: 5, adMore: 2, adMax: 1, win: 25, lose: 10, floor: 1000, streakFrom: 3, streakStep: 5, streakMax: 15, firstMin: 10, xp: 12, play: 5, grow: 2, lp: 5, lpDay: 25, cheerMs: 4000, cheerMax: 10, cheerTaps: 50, dice: 60 };   // 2.1.0 응원: 4초 동안 50번까지 두드려요(5번마다 1점, 최대 10점, 지섭 요청)   // 주사위 0~60: 설계안의 승률(별 하나 차이 뒤집기 약 20~30%, 두 별 약 5%)에 맞춘 값. 0~30이면 별 하나 차이도 6%라 거의 못 뒤집어요
   const BT_EV = { kor: { name: '책 읽기', ic: 'bev_read', em: '📖' }, math: { name: '수학 퀴즈', ic: 'bev_math', em: '➗' }, sci: { name: '과학 퀴즈', ic: 'bev_science', em: '🧪' },
     art: { name: '그리기', ic: 'bev_draw', em: '🎨' }, pe: { name: '달리기', ic: 'bev_run', em: '👟' } };
   const BT_LG = [
@@ -14317,10 +14319,17 @@ span.bt-stamp{display:none}.bt-duel.done span.bt-stamp{display:grid}
     { k: 'stream', name: '시냇물 학교', c: '#3E7FB8', trait: 'even', p: [['goose', '물결', 'kor'], ['boar', '첨벙', 'pe'], ['crow', '반짝', 'math']] },
     { k: 'goldforest', name: '황금숲 학교', c: '#C9962A', trait: 'math', gold: true, p: [['wolf', '황금', 'pe'], ['crow', '까망', 'math'], ['goose', '깃털', 'kor']] }
   ];
-  const freshBt = () => ({ pts: 1000, lg: 0, day: '', n: 0, won: false, streak: 0, grow: { day: '', m: {} }, last: -1, lp: { day: '', p: 0 }, st: { w: 0, l: 0, ev: 0, best: 0, wm: 0 } });
+  const freshBt = () => ({ pts: 1000, lg: 0, day: '', n: 0, adN: 0, won: false, streak: 0, grow: { day: '', m: {} }, last: -1, lp: { day: '', p: 0 }, st: { w: 0, l: 0, ev: 0, best: 0, wm: 0 } });
   const btOpen = () => !!S && (S.tier >= 2 || (S.tier === 1 && S.tg >= 2));
-  function btDay() { const t = gameToday(); if (S.bt.day !== t) { S.bt.day = t; S.bt.n = 0; S.bt.won = false; } }
-  const btLeft = () => { btDay(); return Math.max(0, BT.perDay - S.bt.n); };
+  function btDay() { const t = gameToday(); if (S.bt.day !== t) { S.bt.day = t; S.bt.n = 0; S.bt.won = false; S.bt.adN = 0; } }
+  // 3.0.0 지섭 요청: 다 쓰면 광고를 보고 하루 한 번 2판 더(숲속 퍼즐과 같게)
+  const btQuota = () => BT.perDay + (S.bt.adN || 0) * BT.adMore;
+  const btLeft = () => { btDay(); return Math.max(0, btQuota() - S.bt.n); };
+  const btCanAd = () => btOpen() && btLeft() <= 0 && (S.bt.adN || 0) < BT.adMax && BT.adMore > 0;
+  function btAdMore() {
+    if (!btCanAd()) return;
+    showAd(() => { btDay(); S.bt.adN = (S.bt.adN || 0) + 1; save(); if (btUI.M) btRender(); renderBtCard(); toast(`오늘 숲속 대결 ${BT.adMore}판을 더 할 수 있어요`); }, r => { if (r !== 'noad') toast('광고를 끝까지 보지 않아서 판을 더 받지 못했어요'); });
+  }
   const btLgOf = pts => { let i = 0; BT_LG.forEach((L, j) => { if (pts >= L.at) i = j; }); return i; };
   const btMedal = (i, px) => IMG(BT_LG[i].medal) ? `<img class="bt-medal" src="${IMG(BT_LG[i].medal)}" alt="${BT_LG[i].n} 리그" style="width:${px}px;height:${px}px">` : `<span class="bt-medal em" style="font-size:${Math.round(px * 0.7)}px">🏅</span>`;
   const btEvIc = (k, px) => IMG(BT_EV[k].ic) ? `<img src="${IMG(BT_EV[k].ic)}" alt="" style="width:${px}px;height:${px}px">` : `<span style="font-size:${Math.round(px * 0.7)}px">${BT_EV[k].em}</span>`;
@@ -14411,7 +14420,7 @@ span.bt-stamp{display:none}.bt-duel.done span.bt-stamp{display:grid}
   }
   function btStart() {
     const M = btUI.M; if (!M || M.phase !== 'pick' || M.me.some(x => !x)) return false;
-    if (btLeft() <= 0) { toast(`숲속 대결은 하루 ${BT.perDay}판이에요.\n내일 또 겨뤄요`); return false; }
+    if (btLeft() <= 0) { if (btCanAd()) btAdMore(); else toast(`숲속 대결은 하루 ${btQuota()}판이에요.\n내일 또 겨뤄요`); return false; }
     S.bt.n += 1; M.phase = 'play'; M.i = 0;
     M.rolls = M.evs.map((e, i) => btRoll(M.me[i].st[e], M.opp[i].st, btOppCheer()));
     save(); M.intro = true; btRender(); sfx('quest');
@@ -14731,7 +14740,7 @@ span.bt-stamp{display:none}.bt-duel.done span.bt-stamp{display:grid}
     const sch = BT_SCH[M.si], left = btLeft();
     $('#btOppMark').innerHTML = IMG('bmark_' + sch.k) ? `<img src="${IMG('bmark_' + sch.k)}" alt="">` : '🏫';
     $('#btOppName').textContent = sch.name; $('#btOppName').style.color = '';
-    $('#btLeft').textContent = `오늘 ${left}/${BT.perDay}판`;
+    $('#btLeft').textContent = `오늘 ${left}/${btQuota()}판`;
     $('#btMe').innerHTML = `${btMedal(S.bt.lg, 26)}<b>${fmt(S.bt.pts)}</b>`;
     $('#btPickPane').hidden = M.phase !== 'pick'; $('#btPlay').hidden = M.phase !== 'play'; $('#btResult').hidden = M.phase !== 'result';
     if (M.phase === 'pick') {
@@ -14744,8 +14753,9 @@ span.bt-stamp{display:none}.bt-duel.done span.bt-stamp{display:grid}
       $('#btList').innerHTML = list.map(p => { const at = M.me.findIndex(x => x && x.id === p.id);
         return `<button class="bt-cand${at >= 0 ? ' used' : ''}" type="button" data-bpick="${p.id}">${btChr(p.sp)}<b>${esc(p.nm)}</b><small class="stars">${starTxt(p.st[e])}</small>${at >= 0 ? `<i>${BT_EV[M.evs[at]].name}</i>` : ''}</button>`; }).join('');
       const ready = !M.me.some(x => !x);
-      $('#btGo').setAttribute('aria-disabled', ready && left > 0 ? 'false' : 'true');
-      $('#btGo').textContent = left > 0 ? '대결 시작!' : '오늘은 다 했어요';
+      const ad = left <= 0 && btCanAd();   // 3.0.0 광고 보고 2판 더
+      $('#btGo').setAttribute('aria-disabled', (ready && left > 0) || ad ? 'false' : 'true');
+      $('#btGo').textContent = left > 0 ? '대결 시작!' : ad ? `광고 보고 ${BT.adMore}판 더` : '오늘은 다 했어요';
     } else if (M.phase === 'play') {
       const sch2 = BT_SCH[M.si];
       if (M.intro) {   // 2.1.0 시작 연출
@@ -14777,7 +14787,8 @@ span.bt-stamp{display:none}.bt-duel.done span.bt-stamp{display:grid}
         (o.up !== undefined ? `<div class="bt-up">${btMedal(o.up, 56)}<b>${BT_LG[o.up].n} 리그 승급!</b>${o.gold ? `<small>황금 도토리 +${o.gold}</small>` : ''}</div>` : '') +
         `<div class="bt-lgbar">${btMedal(L, 28)}<span class="ac-bar"><i style="width:${nx ? Math.round(100 * Math.min(1, (S.bt.pts - BT_LG[L].at) / (nx.at - BT_LG[L].at))) : 100}%"></i></span><small>${nx ? `${nx.n} 리그까지 ${fmt(Math.max(0, nx.at - S.bt.pts))}점` : '가장 높은 리그예요'}</small></div>` +
         `<p class="fine">이긴 종목마다 그 과목 XP +${BT.xp}${rosterOn() ? ', 이긴 학생은 능력치가 자라요' : ''}. 오늘 남은 대결 ${btLeft()}판.</p>` +
-        `<div class="btn-row">${btLeft() > 0 ? '<button class="cta" type="button" id="btAgain">한 판 더</button>' : ''}<button class="btn-sub" type="button" id="btDone">닫기</button></div></div>`;
+        (o.win ? '' : `<p class="fine bt-why">퀴즈와 응원을 잘해도 질 수 있어요\n점수 = 별 × 20 + 주사위 + 퀴즈와 응원\n주사위(0~${BT.dice})가 커서 운도 따라요\n별이 높은 학생을 세우면 유리해요</p>`) +   // 3.0.0 지섭 요청: 다 맞혀도 지는 까닭
+        `<div class="btn-row">${btLeft() > 0 ? '<button class="cta" type="button" id="btAgain">한 판 더</button>' : btCanAd() ? `<button class="cta" type="button" id="btAdMore">광고 보고 ${BT.adMore}판 더</button>` : ''}<button class="btn-sub" type="button" id="btDone">닫기</button></div></div>`;
       if (o.win && !rt.reduced && !M.confetti) { M.confetti = true; btConfetti(); }   // 2.1.0 승리 꽃가루
     }
   }
@@ -14786,14 +14797,14 @@ span.bt-stamp{display:none}.bt-duel.done span.bt-stamp{display:grid}
     const on = btOpen(); c.classList.toggle('lock', !on);
     const art = IMG('card_battle'); $('#btThumb').style.backgroundImage = art ? `url("${art}")` : '';
     $('#btCardSub').innerHTML = on ? `${btMedal(S.bt.lg, 18)} ${BT_LG[S.bt.lg].n} 리그, 대결 점수 ${fmt(S.bt.pts)}` : '초등학교 3학년부터 열려요';
-    const lt = $('#btLeftTxt'); lt.textContent = on ? `오늘 ${btLeft()}/${BT.perDay}판` : '잠김'; lt.classList.toggle('none', on && btLeft() <= 0);
+    const lt = $('#btLeftTxt'); lt.textContent = on ? `오늘 ${btLeft()}/${btQuota()}판` : '잠김'; lt.classList.toggle('none', on && btLeft() <= 0);
     $('#btCardTag').textContent = on ? '시작하기' : '잠김';
   }
   function sanitizeBt(d, s) {
     const num = (v, lo, hi) => typeof v === 'number' && isFinite(v) ? Math.max(lo, Math.min(hi, v)) : lo;
     s.bt = freshBt(); const B = d.bt && typeof d.bt === 'object' ? d.bt : null; if (!B) return;
     s.bt.pts = Math.floor(num(B.pts, 1000, 9999)); s.bt.lg = Math.max(Math.floor(num(B.lg, 0, 5)), 0);
-    s.bt.day = typeof B.day === 'string' ? B.day.slice(0, 10) : ''; s.bt.n = Math.floor(num(B.n, 0, BT.perDay)); s.bt.won = !!B.won;
+    s.bt.day = typeof B.day === 'string' ? B.day.slice(0, 10) : ''; s.bt.adN = Math.floor(num(B.adN, 0, BT.adMax)); s.bt.n = Math.floor(num(B.n, 0, BT.perDay + BT.adMore * BT.adMax)); s.bt.won = !!B.won;   // 3.0.0 광고로 더 받은 판
     s.bt.streak = Math.floor(num(B.streak, 0, 1e4)); s.bt.last = Number.isInteger(B.last) && B.last >= 0 && B.last < BT_SCH.length ? B.last : -1;
     if (B.grow && typeof B.grow === 'object') { s.bt.grow.day = typeof B.grow.day === 'string' ? B.grow.day.slice(0, 10) : ''; if (B.grow.m && typeof B.grow.m === 'object') for (const k of Object.keys(B.grow.m).slice(0, 40)) s.bt.grow.m[String(k).slice(0, 12)] = Math.floor(num(B.grow.m[k], 0, BT.grow)); }
     if (B.lp && typeof B.lp === 'object') { s.bt.lp.day = typeof B.lp.day === 'string' ? B.lp.day.slice(0, 10) : ''; s.bt.lp.p = Math.floor(num(B.lp.p, 0, BT.lpDay)); }
@@ -18597,12 +18608,12 @@ span.bt-stamp{display:none}.bt-duel.done span.bt-stamp{display:grid}
     $('#btCard').addEventListener('click', () => { sfx('tap'); btOpenScene(); });
     $('#btBack').addEventListener('click', () => { sfx('tap'); btClose(); });
     $('#btAuto').addEventListener('click', btAuto);
-    $('#btGo').addEventListener('click', () => { if ($('#btGo').getAttribute('aria-disabled') !== 'true') btStart(); });
+    $('#btGo').addEventListener('click', () => { if ($('#btGo').getAttribute('aria-disabled') !== 'true') { if (btLeft() <= 0) btAdMore(); else btStart(); } });
     $('#btRows').addEventListener('click', e => { const b = e.target.closest('[data-bslot]'); if (!b || !btUI.M || btUI.M.phase !== 'pick') return; btUI.M.sel = +b.dataset.bslot; sfx('tap'); btRender(); });
     $('#btList').addEventListener('click', e => { const b = e.target.closest('[data-bpick]'); if (b) btPick(b.dataset.bpick); });
     $('#btPlay').addEventListener('pointerdown', btTap);
     $('#btCheer').addEventListener('click', e => { const q = e.target.closest('[data-bq]'), c = e.target.closest('[data-bm]'); if (q) btqAnswer(+q.dataset.bq); else if (c) btqMemTap(+c.dataset.bm); });   // 2.1.1 종목 문제
-    $('#btResult').addEventListener('click', e => { if (e.target.closest('#btAgain')) btAgain(); else if (e.target.closest('#btDone')) { sfx('tap'); btClose(); } });
+    $('#btResult').addEventListener('click', e => { if (e.target.closest('#btAgain')) btAgain(); else if (e.target.closest('#btAdMore')) btAdMore(); else if (e.target.closest('#btDone')) { sfx('tap'); btClose(); } });
     // 2.0.1 시험 기간
     $('#sheetExam').addEventListener('click', () => { closeSheet(); setTimeout(openExam, 240); });
     $('#exRowBtn').addEventListener('click', openExam);
@@ -20812,7 +20823,7 @@ span.bt-stamp{display:none}.bt-duel.done span.bt-stamp{display:grid}
   }
 
   // 시험용 손잡이: 자동 시험(window.__FOREST_TEST)에서만 게임 속 함수를 꺼내 써요
-  if (window.__FOREST_TEST) window.__forest = { get S() { return S; }, goTo, sportsCon, festCon, warmRooms, blobUrl, vdSize, vdBlock, pzSweep, pzSwGain, pzSwOpen, pzXpOf, mgMulMax, mgMulOk, mgMul, mgModeTap, acTip, kidDupIdx, trialSafe, closeAd,
+  if (window.__FOREST_TEST) window.__forest = { get S() { return S; }, goTo, sportsCon, festCon, btQuota, btCanAd, btAdMore, warmRooms, blobUrl, vdSize, vdBlock, pzSweep, pzSwGain, pzSwOpen, pzXpOf, mgMulMax, mgMulOk, mgMul, mgModeTap, acTip, kidDupIdx, trialSafe, closeAd,
     TKE, TK_Q, tkDaily, nbAllDay, nbBuildAt, nbOn, conAdd, BX_SPOT, PERKS, offlineCapH, applyAway, pzFinish, mgClaimOrder,
     NSL, nsStart, nsSettle, nsOpen, nsOn, nsOverlap, nsExtraH, isNight, nightDayOf, openNs, renderNs, bxSpots, renderNight,   // 3.0.0
    conOn, conLeft, conTick, conSec, conFinish, tkPlan, tkUse, tkUseAll, TK, CON, TKAD, capNext, yearCap,   // 2.1.0 공사
