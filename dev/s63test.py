@@ -54,7 +54,7 @@ async def main():
         # 배경음악
         m = await pg.evaluate(f"(() => {{ const F = {F}; F.S.bgm = true; const out = []; F.setTab('teachers'); out.push(F.musicWant()); F.setTab('grad'); out.push(F.musicWant()); for (const t of ['quests', 'rank', 'dex', 'event', 'settings']) {{ F.setTab(t); out.push(F.musicWant()); }} F.setTab('school'); out.push(F.musicWant()); return out; }})()")
         print('곡', m)
-        if m != ['home', 'room', 'home', 'home', 'home', 'home', 'home', 'home']: bad.append(f'배경음악 {m}')
+        if m != ['home', 'home', 'home', 'home', 'home', 'home', 'home', 'home']: bad.append(f'배경음악 {m}')
         # 1.8.0 고화질 지도: 게임 옆 img/maps 파일이 있으면 받아서 바꿔 끼우고, 없으면 게임 안 그림 그대로
         h = await pg.evaluate("""(async () => { const F = window.__forest, el = document.querySelector('#mapImg0'); const a = el.getAttribute('href').slice(0, 15);
           window.FS_IMG_BASE = '../img/'; for (const k in F.mapHi) delete F.mapHi[k]; F.setMapArt(); await new Promise(r => setTimeout(r, 1500));

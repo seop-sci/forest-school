@@ -40,7 +40,7 @@ async def main():
                   const g3 = F.pzFreshGame(true); g3.score = 9000; const r3 = F.pzFinish(g3);
                   return {{ x1: r1.xp, x2: r2.xp, x3: r3.xp }}; }})()""")
                 print('퍼즐 XP', r)
-                if r['x1'] != 8 or r['x2'] != 0 or r['x3'] != 12: bad.append(f'퍼즐 XP가 틀려요 {r}')
+                if r['x1'] != 16 or r['x2'] != 0 or r['x3'] != 24: bad.append(f'퍼즐 XP가 틀려요 {r}')
                 r = await pg.evaluate(f"""(() => {{ const F = {F}, S = F.S; const a0 = S.ac.art.lv * 1000 + S.ac.art.xp;
                   S.mg.orders = [{{ it: [{{ k: 'a', n: 5, c: 2 }}], who: 'rabbit' }}];
                   const cells = F.mgCells(); let put = 0; for (let i = 0; i < cells.length && put < 2; i++) if (cells[i] === '..') {{ cells[i] = 'a5'; put++; }} F.mgSetCells(cells);

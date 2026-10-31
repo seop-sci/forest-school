@@ -30,7 +30,7 @@ async def main():
             pg = await ctx.new_page(); errs = []; pg.on('pageerror', lambda e: errs.append(str(e)))
             await pg.goto(URL); await pg.wait_for_timeout(2500); await pg.evaluate(T.SKIP)
             ev = lambda js: pg.evaluate(f"(() => {{ const F = {F}, S = F.S; {js} }})()")
-            r = await ev("F.renderMap(); return { open: F.vdOpen(), el: !!document.querySelector('#decoG [data-vd]') };")
+            r = await ev("F.renderMap(); return { open: F.vdOpen(), el: !!document.querySelector('#vdTop [data-vd]') };")
             ok(r == {'open': False, 'el': False}, f'유치원에 기부가 보여요 {r}')
             if w == 390:
                 r = await ev("return [1,2,3,4,5,6,7,8,9,10,12].map(F.vdH);")
@@ -73,7 +73,8 @@ async def main():
                 r = await ev("""const d = JSON.parse(JSON.stringify(S)); d.vd = { lv: 7.6, p: 1.5, sum: 'x', n: -3 }; d.ach.title = 'vdgold'; const s = F.sanitize(d);
                   const d2 = JSON.parse(JSON.stringify(S)); d2.vd = { lv: 2 }; d2.ach.title = 'vdgold'; const s2 = F.sanitize(d2); const d3 = JSON.parse(JSON.stringify(S)); delete d3.vd; const s3 = F.sanitize(d3);
                   return [s.vd, s.ach.title, s2.ach.title, s3.vd];""")
-                ok(r[0] == {'lv': 7, 'p': 0.999999, 'sum': 0, 'n': 0} and r[1] == '' and r[2] == '' and r[3] == {'lv': 0, 'p': 0, 'sum': 0, 'n': 0}, f'저장 읽기 {r}')
+                LK = {'day': '', 'lv': 0, 'need': 0}   # 2.3.1 그날 가격
+                ok(r[0] == {'lv': 7, 'p': 0.999999, 'sum': 0, 'n': 0, 'lk': LK} and r[1] == '' and r[2] == '' and r[3] == {'lv': 0, 'p': 0, 'sum': 0, 'n': 0, 'lk': LK}, f'저장 읽기 {r}')
                 r = await ev("""const d = JSON.parse(JSON.stringify(S)); d.vd = { lv: 9, p: 0.2, sum: 5, n: 2 }; d.ach.title = 'vdgold'; return F.sanitize(d).ach.title;""")
                 ok(r == 'vdgold', f'칭호 저장 {r}')
                 # 메인 퀘스트
@@ -85,9 +86,9 @@ async def main():
             for t in (1, 2):
                 await ev(f"S.tier = {t}; S.tg = 0; S.budget = 1e15; S.vd = {{ lv: {3 if t == 1 else 8}, p: 0.4, sum: 1, n: 1 }}; F.renderMap(); return 1;")
                 await pg.evaluate(T.CLEAN); await pg.wait_for_timeout(900)
-                r = await ev("const h = document.querySelector('#decoG [data-vd]'); return !!h;")
+                r = await ev("const h = document.querySelector('#vdTop [data-vd]'); return !!h;")
                 ok(r, f'{w} 학교급 {t} 지도에 기념물이 없어요')
-                await pg.click('#decoG [data-vd]', force=True); await pg.wait_for_timeout(700)
+                await pg.click('#vdTop [data-vd]', force=True); await pg.wait_for_timeout(700)
                 r = await ev("return { vis: !document.querySelector('#mVd').hidden, n: document.querySelectorAll('#vdBtns [data-vdk]').length, t: document.querySelector('#vdLead').textContent };")
                 ok(r['vis'] and r['n'] == 3, f'{w} 기부 창 {r}')
                 await pg.screenshot(path=f's86_modal_{w}_{t}.png')
