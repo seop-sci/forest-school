@@ -104,7 +104,7 @@ async def main():
             await pg2.evaluate("document.querySelector('.tab[data-tab=mini]').click()"); await pg2.wait_for_timeout(400)
             r = await pg2.evaluate("""(()=>{ const t = document.querySelector('#pzLeftTxt'), c = document.querySelector('#pzOpen'), tr = t.getBoundingClientRect(), cr = c.getBoundingClientRect(); return { txt: t.textContent, inside: tr.right <= cr.right && tr.top >= cr.top, same: Math.abs((tr.top+tr.bottom)/2 - (()=>{ const b = document.querySelector('#pzOpen .mc-txt b').firstChild; const rg = document.createRange(); rg.selectNodeContents(b); const q = rg.getBoundingClientRect(); return (q.top+q.bottom)/2; })()) < 6, row: document.querySelector('#pzAdRow').hidden }; })()""")
             await pg2.screenshot(path=f's67_mini_{w}.png')
-            if r != {'txt': '보상 10/10', 'inside': True, 'same': True, 'row': True}: fails.append(f'{w}px 퍼즐 카드 보상 잔여 {r}')
+            if r != {'txt': '보상 5/5', 'inside': True, 'same': True, 'row': True}: fails.append(f'{w}px 퍼즐 카드 보상 잔여 {r}')
             await pg2.evaluate(f"(()=>{{ const F={F}, S=F.S; S.ess = 30; F.mgOpen(); S.mg.bst.luck = 12; F.mgRenderAll(); }})()")
             await pg2.wait_for_timeout(300)
             r = await pg2.evaluate("""(()=>{ const f = document.querySelector('#mgFoot'), fr = f.getBoundingClientRect(); const over = [...f.querySelectorAll('*')].filter(el => { const r = el.getBoundingClientRect(); return r.width && (r.right > fr.right + 1 || r.left < fr.left - 1); }).map(el => el.className || el.tagName); return { over, sw: document.documentElement.scrollWidth }; })()""")

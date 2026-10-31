@@ -102,22 +102,22 @@ RULES = r"""() => {
   ok(F.pzStuck(g), '막힘을 알아채야 해요');
   g.tray[2] = { c: [[0, 0]], k: 1 }; ok(!F.pzStuck(g), '1칸 조각이 있으면 안 막혀요');
   // 보상 상한: 점수 150점마다 정수 1(25개까지), 100점마다 수업료 1분치(15분치까지, 2026-10-26 균형 제안서)
-  eq([F.pzEssOf(149), F.pzEssOf(150), F.pzEssOf(1e9), F.pzMinOf(99), F.pzMinOf(100), F.pzMinOf(1e9)], [0, 1, 25, 0, 1, 15], '보상 상한');
+  eq([F.pzEssOf(149), F.pzEssOf(150), F.pzEssOf(1e9), F.pzMinOf(99), F.pzMinOf(100), F.pzMinOf(1e9)], [0, 2, 50, 0, 2, 30], '보상 상한(2.3.1 두 배)');
   // 하루 10판 + 광고 3판
   S.pz = { day: '', n: 0, adN: 0, best: 0, cur: null };
   const rws = [];
   for (let i = 0; i < 11; i++) { rws.push(F.pzStart().rw); }
-  eq([rws.filter(Boolean).length, rws[10], F.pzLeft(), F.pzCanAd()], [10, false, 0, true], '하루 10판');
-  S.pz.adN = 1; eq([F.pzLeft(), F.pzCanAd()], [3, false], '광고 뒤 3판 더, 광고는 하루 1번');
+  eq([rws.filter(Boolean).length, rws[5], F.pzLeft(), F.pzCanAd()], [5, false, 0, true], '하루 5판(2.3.1)');
+  S.pz.adN = 1; eq([F.pzLeft(), F.pzCanAd()], [2, false], '광고 뒤 2판 더, 광고는 하루 1번');
   // 끝내기: 정수와 도토리가 유한하고, 연습 판은 0
   S.pz.n = 0; S.pz.adN = 0; S.ess = 0;
   const b0 = S.budget;
   let cur = F.pzStart(); cur.score = 3000; cur.ess = 4; S.ess = 4;
   let fin = F.pzFinish(cur);
-  eq([fin.ess, fin.askEss, fin.mins, fin.newBest, S.ess, S.pz.best, S.pz.cur], [20, 4, 15, true, 24, 3000, null], '판 끝 보상');
+  eq([fin.ess, fin.askEss, fin.mins, fin.newBest, S.ess, S.pz.best, S.pz.cur], [40, 4, 30, true, 44, 3000, null], '판 끝 보상(2.3.1 두 배)');
   ok(isFinite(fin.acorns) && fin.acorns > 0 && fin.acorns < 1e15 && S.budget - b0 === fin.acorns, '도토리 보상이 유한하고 지급돼요: ' + fin.acorns);
   S.pz.n = 99; cur = F.pzStart(); cur.score = 3000; fin = F.pzFinish(cur);
-  eq([cur.rw, fin.ess, fin.acorns, S.ess], [false, 0, 0, 24], '연습 판은 보상 없음');
+  eq([cur.rw, fin.ess, fin.acorns, S.ess], [false, 0, 0, 44], '연습 판은 보상 없음');
   // 초등학교에서도 도토리 보상이 수업료 기준으로 커져요
   const keep = { tier: S.tier, f: JSON.stringify(S.f) };
   S.pz.n = 0; S.tier = 1; const r0 = F.rate();
@@ -149,7 +149,7 @@ async def run(b, dark, w, h):
     # 화면: 미니게임 탭 → 퍼즐 열기 → 끌어 놓기
     await pg.evaluate(f"{F}.S.pz = {{ day: '', n: 0, adN: 0, best: 0, cur: null }}; {F}.S.ess = 12; document.querySelector('.tab[data-tab=mini]').click()"); await pg.wait_for_timeout(400)
     txt = await pg.evaluate("[document.querySelector('#essHave').textContent, document.querySelector('#pzLeftTxt').textContent, document.querySelector('#pzAdBtn').hidden]")
-    if txt != ['12', '보상 10/10', True]: bad.append('미니게임 탭 글: ' + json.dumps(txt, ensure_ascii=False))
+    if txt != ['12', '보상 5/5', True]: bad.append('미니게임 탭 글: ' + json.dumps(txt, ensure_ascii=False))
     await pg.screenshot(path=f's46_mini_{tag}.png')
     await pg.evaluate("document.querySelector('#pzOpen').click(); const pb=document.querySelector('#pzBoost'); if (pb && !pb.hidden) document.querySelector('#pzbSkip').click()"); await pg.wait_for_timeout(500)
     st = await pg.evaluate(f"[!document.querySelector('#pzScene').hidden, document.querySelectorAll('#pzGrid .pz-cell').length, document.querySelectorAll('#pzTray .pz-slot .pz-piece').length, {F}.S.pz.n, {F}.S.pz.cur.rw]")
@@ -211,7 +211,8 @@ async def run(b, dark, w, h):
     await pg.evaluate(f"{F}.S.pz.cur.score = 900; {F}.pzRenderAll(); document.querySelector('#pzQuit').click()"); await pg.wait_for_timeout(200)
     await pg.evaluate("document.querySelector('#pzQuitYes').click()"); await pg.wait_for_timeout(400)
     end = await pg.evaluate(f"[!document.querySelector('#pzEnd').hidden, document.querySelector('#pzEndScore').textContent, document.querySelectorAll('#pzEndList li').length, {F}.S.ess, {F}.S.pz.best, {F}.S.pz.cur]")
-    if end[:2] != [True, '900'] or end[2] not in (2, 3, 4) or end[3] != 18 or end[4] != 900 or end[5] is not None: bad.append('그만하기 보상: ' + json.dumps(end, ensure_ascii=False))
+    # 2.3.0.1: 5분 단축권 줄이 하나 더 생길 수 있어요(하루 3장)
+    if end[:2] != [True, '900'] or end[2] not in (2, 3, 4, 5) or end[3] != 24 or end[4] != 900 or end[5] is not None: bad.append('그만하기 보상: ' + json.dumps(end, ensure_ascii=False))
     await pg.screenshot(path=f's46_end_{tag}.png')
     await pg.evaluate("document.querySelector('#pzEndAgain').click(); const pb=document.querySelector('#pzBoost'); if (pb && !pb.hidden) document.querySelector('#pzbSkip').click()"); await pg.wait_for_timeout(300)
     again = await pg.evaluate(f"[document.querySelector('#pzEnd').hidden, {F}.S.pz.cur && {F}.S.pz.cur.score, {F}.S.pz.n]")

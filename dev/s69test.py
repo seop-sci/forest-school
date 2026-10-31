@@ -47,7 +47,7 @@ async def main():
         mode['status'] = 200; mode['body'] = json.dumps({'v': 4})
         await pg.reload(); await pg.wait_for_timeout(3000)
         r = await pg.evaluate(f"(()=>{{ const F={F}; return [F.PZ.perDay, F.MG.AD.e, F.Live.from, [...F.Live.off], F.NOTICES.filter(n => n.live).length, F.EVC.scale]; }})()")
-        if r[:5] != [10, 50, 'net', [], 0] or abs(r[5] - 2 / 3) > 1e-9: fails.append(f'빈 설정 {r}')
+        if r[:5] != [5, 50, 'net', [], 0] or abs(r[5] - 2 / 3) > 1e-9: fails.append(f'빈 설정 {r}')
         if errs: fails.append(f'오류 {errs}')
         await b.close()
     print('\n'.join(fails) if fails else 'PASS')

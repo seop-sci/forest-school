@@ -39,7 +39,7 @@ async def main():
             t = await pg.evaluate(f"{F}.rt.trialT")
             print('놓친 뒤 남은 시간', t)
             if not (0 <= t <= 40): bad.append(f'놓친 뒤 다시 오는 시간 {t}')
-            await pg.evaluate(f"(() => {{ {F}.rt.trialT = 0.5; }})()"); await pg.wait_for_timeout(1500)
+            await pg.evaluate(f"(() => {{ {F}.rt.trialT = 0.5; }})()"); await pg.wait_for_timeout(2600)   # 2.3.1 매는 그림자가 먼저 지나가요
             # 쫓아내기
             r = await pg.evaluate(f"""(() => {{ const F = {F}; if (!F.rt.trial) return 'none'; let n = 0; while (F.rt.trial && n < 40) {{ F.hitTrial(); n++; }}
               {CLEAN}; return {{ n, trials: F.S.st.trials, ready: F.mainReady(), hunt: F.trialHunt() }}; }})()""")

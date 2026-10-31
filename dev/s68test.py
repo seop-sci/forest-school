@@ -48,7 +48,7 @@ async def main():
           out.newbie = [document.querySelector('#mNotice').hidden, S.nt.seen === F.NOTICES[0].id, S.nt.ver];
           window.__NOTICE_AUTO = false; S.tut.st = 'skip'; return out; }})()""")
         ver = await pg.evaluate("document.querySelector('#verRow dd').textContent.slice(1)")
-        exp = {'want1': True, 'open': True, 'hideBtn': True, 'days': 7, 'ver': ver, 'want2': False, 'want3': True, 'want4': True, 'want5': False, 'newbie': [True, True, ver]}
+        exp = {'want1': True, 'open': True, 'hideBtn': True, 'days': 7, 'ver': ver, 'want2': False, 'want3': ver not in ('2.1.20', '2.1.2.2', '2.3.0.1'), 'want4': True, 'want5': False, 'newbie': [True, True, ver]}
         if r != exp: fails.append(f'접속할 때 공지 {r}')
         # (5)
         r = await pg.evaluate(f"""(()=>{{ const F={F}, S=F.S; const d = JSON.parse(JSON.stringify(S)); delete d.nt; const a = F.sanitize(d).nt;
