@@ -29,6 +29,12 @@ async def main():
             print('소탕', r)
             if r['a'] or not r['b'] or r['n'] != 3 or r['ess'] != r['g0e'] or r['ess'] <= 0: bad.append(f'소탕 {r}')
             if '70' in r['txt'] or '%' in r['txt']: bad.append(f'소탕 비율이 보여요 {r}')
+            # 소탕 줄은 퍼즐 카드 안, 시작하기 아래(2.3.1 지섭 요청)
+            for st in ("S.pz.hand = ''; S.pz.n = 0;", "S.pz.hand = F.gameToday(); S.pz.best = 3000; S.pz.n = 1;"):
+                r = await ev(st + " F.setTab('mini'); F.renderMini(); document.querySelector('#pzOpen').scrollIntoView({ block: 'center' }); const c = document.querySelector('#pzOpen').getBoundingClientRect(), p = document.querySelector('#pzCardTag').getBoundingClientRect(), w = document.querySelector('#pzSwRow'), q = w.getBoundingClientRect(), b = document.querySelector('#pzSwBtn'); const vis = b.hidden ? document.querySelector('#pzSwTx') : b, v = vis.getBoundingClientRect(); return { shown: !w.hidden, inside: v.left >= c.left && v.right <= c.right && v.bottom <= c.bottom + 0.5, below: v.top >= p.bottom, mid: Math.abs((v.left + v.right) / 2 - (p.left + p.right) / 2) < 3, btn: !b.hidden, tx: b.hidden ? vis.textContent : b.textContent };")
+                print('소탕 자리', r)
+                if not (r['shown'] and r['inside'] and r['below'] and r['mid']): bad.append(f'소탕 자리 {r}')
+            await ev("F.setTab('school'); return 1;")
             # 3) 합치기 배수
             r = await ev("const mul = JSON.stringify(F.MG.MUL); const ks = Object.keys(F.MG.kinds); ks.forEach(k => S.mg.best[k] = 2); const m2 = F.mgMulMax(); ks.forEach(k => S.mg.best[k] = 3); const m3 = F.mgMulMax(); S.mg.best[ks[0]] = 5; const m5 = F.mgMulMax(); S.mg.best[ks[0]] = 7; const m7 = F.mgMulMax(); S.mg.mm = 1; const ok3 = F.mgMulOk(3), ok4 = F.mgMulOk(4); S.mg.mm = 0; return { mul, m2, m3, m5, m7, ok3, ok4, ok3b: F.mgMulOk(3) };")
             print('합치기', r)

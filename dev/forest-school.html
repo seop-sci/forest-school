@@ -1384,8 +1384,13 @@ body{background:radial-gradient(120% 60% at 50% 0%, color-mix(in srgb, var(--pap
 #panelMini .mini-list>.mini-card{min-height:108px;box-sizing:border-box}   /* 다섯 카드 높이를 같게(설명이 두 줄인 카드 높이) */
 @media (max-width:380px){#pzOpen,#mgOpen{gap:8px}.mini-card .mc-left{font-size:11px;padding:1px 5px}#panelMini .mini-list>.mini-card{gap:8px}.mini-card .mc-right{width:100px}.mini-card .mc-right .mc-left{max-width:100px}.mini-list .mini-card b{font-size:16.5px;white-space:nowrap}}   /* 2.1.0 좁은 화면: 제목이 두 줄로 꺾이지 않게 */
 .mini-pzrow[hidden]{display:none}
-.mini-pzrow.pz-sweep{margin:-4px 0 4px;font-size:12px}
-.mini-pzrow.pz-sweep .btn-sub.small{min-height:30px;font-size:13px;background:var(--accent);color:var(--accent-ink)}
+.pz-cardw{position:relative}
+.pz-cardw>.mini-card{min-height:108px;box-sizing:border-box}
+.pz-cardw.sw-on #pzOpen{padding-bottom:42px}   /* 2.3.1 소탕 줄 자리(오른쪽 칸 시작하기 아래) */
+.pz-cardw .pz-sweep{position:absolute;right:16px;bottom:12px;width:112px;display:flex;justify-content:center;align-items:center;min-height:30px;color:var(--muted);font-size:11px;font-weight:700;text-align:center;line-height:1.25}
+.pz-cardw .pz-sweep[hidden]{display:none}
+.pz-cardw .pz-swb{width:84px;padding:5px 0;border:0;cursor:pointer;background:#5E8C3A;color:#fff;font-size:13px}
+@media (max-width:380px){.pz-cardw .pz-sweep{width:100px}}
 .sw-opt{display:flex;flex-direction:column;gap:2px;width:100%;margin:0 0 8px;padding:10px 12px;border:2px solid var(--line);border-radius:14px;background:var(--card);color:var(--ink);text-align:left;cursor:pointer}
 .sw-opt.on{border-color:var(--accent);box-shadow:0 0 0 2px var(--accent) inset}
 .sw-opt b{font-size:15px}.sw-opt small{font-size:12.5px;color:var(--chip-ink);line-height:1.5}
@@ -2887,7 +2892,7 @@ span.bt-stamp{display:none}.bt-duel.done span.bt-stamp{display:grid}
     <p class="boot-step" id="bootStep">학교 문을 여는 중...</p>
     <p class="boot-tip" id="bootTip">학교 문을 여는 중이에요</p>
   </div>
-  <span class="boot-ver" id="bootVer">v2.3.1</span>
+  <span class="boot-ver" id="bootVer">v2.3.1.1</span>
 </div>
 
 <div class="app on-school" id="app">
@@ -3244,8 +3249,10 @@ span.bt-stamp{display:none}.bt-duel.done span.bt-stamp{display:grid}
       <button class="ex-row-btn" type="button" id="exRowBtn" hidden><span class="ex-ic" id="exRowIc" aria-hidden="true"></span><span class="ex-tx"><b id="exRowT">시험 기간</b><small id="exRowS"></small></span><em id="exRowGo">보기</em></button>
       <div class="mini-list">
         <button class="mini-card mini-go" type="button" id="rdCard"><span class="tic" data-ic="ic_book" aria-hidden="true"></span><span class="mc-txt"><b><span class="mc-sub">국어 공부</span>책 읽기</b><small id="rdCardSub">책을 골라 15분 동안 읽어요</small></span><span class="mc-right"><span class="mc-left" id="rdLeftTxt">오늘 3/3권</span><span class="mini-play" id="rdCardTag">고르기</span></span></button>
-        <button class="mini-card mini-go" type="button" id="pzOpen"><span class="pz-thumb" aria-hidden="true"></span><span class="mc-txt"><b><span class="mc-sub">수학 공부</span>숲속 퍼즐</b><small id="pzCardSub">조각을 끌어다 놓고 줄을 지워요</small></span><span class="mc-right"><span class="mc-left" id="pzLeftTxt">보상 10/10</span><span class="mini-play" id="pzCardTag">시작하기</span></span></button>
-        <div class="mini-pzrow pz-sweep" id="pzSwRow"><span id="pzSwTx">하루 1판 플레이하면 소탕할 수 있어요</span><button class="btn-sub small" type="button" id="pzSwBtn" hidden>소탕</button></div>
+        <div class="pz-cardw sw-on" id="pzCardW"><!-- 2.3.1 지섭 요청: 소탕은 카드 안 시작하기 단추 아래 -->
+          <button class="mini-card mini-go" type="button" id="pzOpen"><span class="pz-thumb" aria-hidden="true"></span><span class="mc-txt"><b><span class="mc-sub">수학 공부</span>숲속 퍼즐</b><small id="pzCardSub">조각을 끌어다 놓고 줄을 지워요</small></span><span class="mc-right"><span class="mc-left" id="pzLeftTxt">보상 10/10</span><span class="mini-play" id="pzCardTag">시작하기</span></span></button>
+          <div class="pz-sweep" id="pzSwRow"><span id="pzSwTx">1판 하면 소탕 가능</span><button class="mini-play pz-swb" type="button" id="pzSwBtn" hidden>소탕</button></div>
+        </div>
         <div class="mini-pzrow" id="pzAdRow" hidden>
           <span>오늘 보상 판을 다 썼어요</span>
           <button class="btn-sub small" type="button" id="pzAdBtn" hidden>광고 보고 2판 더</button>
@@ -3358,7 +3365,7 @@ span.bt-stamp{display:none}.bt-duel.done span.bt-stamp{display:grid}
       </div>
       <h3 class="panel-sub">정보</h3>
       <dl class="info">
-        <div id="verRow"><dt>버전</dt><dd>v2.3.1</dd></div>
+        <div id="verRow"><dt>버전</dt><dd>v2.3.1.1</dd></div>
         <div id="pidRow" hidden><dt>학교 번호</dt><dd id="infoPid"></dd></div>
       </dl>
       <div id="devBox" hidden>
@@ -10183,8 +10190,8 @@ span.bt-stamp{display:none}.bt-duel.done span.bt-stamp{display:grid}
        forest/rank/<내 id>   랭킹 이름과 학교 점수
        forest/stats/<내 id>  테스트 현황 (어디까지 했는지, 얼마나 했는지)
      <내 id>는 Firebase 익명 로그인이 기기(브라우저)마다 만들어 줘요. */
-  const VERSION = '2.3.1';
-  const NT_QUIET = ['2.1.20', '2.1.2.2', '2.3.0.1'];   // 2.3.0.1도 공지 창 없이(공지는 그대로 2.3.0)
+  const VERSION = '2.3.1.1';
+  const NT_QUIET = ['2.1.20', '2.1.2.2', '2.3.0.1', '2.3.1.1'];   // 2.3.0.1도 공지 창 없이(공지는 그대로 2.3.0)
     // 2.1.20 지섭 결정: 이 버전들은 업데이트해도 공지 창을 띄우지 않아요(공지는 그대로 2.1.2)
   /* 2.0.0 공지사항 (2026-10-27 지섭, 1.8.0은 이미 올려서 2.0.0부터): 설정 > 공지사항. 맨 위가 가장 새 공지예요.
      패치노트는 자동으로 넣지 않아요. 지섭이 검수한 글만 여기에 적어요(CHANGELOG.md는 자세한 기록용이라 따로 있어요).
@@ -15560,8 +15567,9 @@ span.bt-stamp{display:none}.bt-duel.done span.bt-stamp{display:grid}
     const lt = $('#pzLeftTxt'); lt.textContent = `보상 ${left}/${pzQuota()}`; lt.classList.toggle('none', left <= 0);   // 오늘 남은 보상 판 / 오늘 받을 수 있는 판
     $('#pzAdBtn').hidden = !pzCanAd(); $('#pzAdRow').hidden = $('#pzAdBtn').hidden;
     { const on = pzSwOpen(), can = on && left > 0;   // 2.3.1 소탕 안내 줄
-      $('#pzSwTx').textContent = !on ? '하루 1판 플레이하면 소탕할 수 있어요' : can ? `소탕 가능, 남은 ${left}판` : '오늘 보상 판을 다 썼어요';
-      $('#pzSwBtn').hidden = !can; $('#pzSwRow').hidden = on && !can && !$('#pzAdRow').hidden; }
+      $('#pzSwTx').textContent = !on ? '1판 하면 소탕 가능' : can ? '' : '';   // 2.3.1 카드 안 시작하기 아래(좁아서 짧게)
+      $('#pzSwTx').hidden = on; $('#pzSwBtn').hidden = !can; $('#pzSwBtn').textContent = `소탕 ${left}판`;
+      const show = !on || can; $('#pzSwRow').hidden = !show; $('#pzCardW').classList.toggle('sw-on', show); }
     renderAc();   // 2.0.1 공부
     renderStudy2();   // 2.0.1 국어, 과학 카드
     renderExRow();   // 2.0.1 시험 기간 줄
