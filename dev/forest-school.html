@@ -1075,7 +1075,7 @@ html.ait .app{padding-top:calc(10px + var(--ait-top, 0px));padding-bottom:var(--
 .overlay.center{z-index:30;align-items:center;padding:16px}
 .backdrop{position:absolute;inset:0;background:var(--scrim);opacity:0;transition:opacity .2s}
 .overlay.open .backdrop{opacity:1}
-.sheet{position:relative;width:100%;max-width:480px;max-height:92%;overflow-y:auto;padding:10px 20px calc(20px + env(safe-area-inset-bottom, 0px));border-radius:22px 22px 0 0;background:var(--paper);color:var(--ink);box-shadow:0 -6px 24px var(--shadow);transform:translateY(100%);transition:transform .25s ease}
+.sheet{position:relative;width:100%;max-width:480px;max-height:92%;overflow-y:auto;will-change:transform;padding:10px 20px calc(20px + env(safe-area-inset-bottom, 0px));border-radius:22px 22px 0 0;background:var(--paper);color:var(--ink);box-shadow:0 -6px 24px var(--shadow);transform:translateY(100%);transition:transform .25s ease}
 .overlay.open .sheet{transform:none}
 .grip{width:40px;height:5px;margin:0 auto 12px;border-radius:3px;background:var(--line)}
 .sheet-head{display:flex;align-items:center;gap:14px}
@@ -8728,7 +8728,7 @@ span.bt-stamp{display:none}.bt-duel.done span.bt-stamp{display:grid}
   };
   const walkTeaHere = k => { const t = WALK[k] && WALK[k].tea; return !!t && (t === 'dietitian' ? xtHere('diet') : t === 'librarian' ? xtHere('lib') : S.t[t] > 0); };
   function walkSprite(key, h) {
-    const ar = CHR_AR[key] || 0.7, u = FSI(key); if (!u) return null;
+    const ar = CHR_AR[key] || 0.7, u = blobUrl(FSI(key)); if (!u) return null;   // 3.0.0 Blob 주소
     const w = h * ar;
     return `<ellipse cx="0" cy="-0.5" rx="${(w * 0.36).toFixed(1)}" ry="${(1.6 + w * 0.05).toFixed(1)}" class="fur-shadow"/><g class="wk-flip"><image href="${u}" x="${(-w / 2).toFixed(1)}" y="${(-h).toFixed(1)}" width="${w.toFixed(1)}" height="${h.toFixed(1)}"/></g>`;
   }
@@ -8774,6 +8774,28 @@ span.bt-stamp{display:none}.bt-duel.done span.bt-stamp{display:grid}
       `<text x="54" y="42" text-anchor="middle" class="fur-menu">${m[0]}</text><text x="54" y="54" text-anchor="middle" class="fur-menu">${m[1]}</text></g>`; }
   };
   const SN_MACH = [40, 152, 62];   // 2.1.2 매점 방 뽑기 기계 자리(가운데 x, 바닥 y, 크기)
+  /* 3.0.0 지섭 제보(건물을 눌러 안이 나올 때 살짝 끊김): 방 그림, 가구, 건물 그림이 data: 글자(수백 KB)로 들어 있어서 창을 열 때마다
+     긴 글자를 다시 읽고 그림을 다시 풀었어요. 한 번 Blob 주소로 바꿔 두면 짧은 주소만 넣고, 풀어 둔 그림을 다시 써요 */
+  const BLOB = new Map(), BLOB_KEEP = [];
+  function blobUrl(u) {
+    if (!u || u.charCodeAt(0) !== 100 || !u.startsWith('data:') || !window.URL || !URL.createObjectURL) return u;
+    let b = BLOB.get(u); if (b) return b;
+    try {
+      const i = u.indexOf(','), head = u.slice(5, i), bin = atob(u.slice(i + 1)), a = new Uint8Array(bin.length);
+      for (let j = 0; j < bin.length; j++) a[j] = bin.charCodeAt(j);
+      b = URL.createObjectURL(new Blob([a], { type: head.split(';')[0] || 'image/webp' }));
+    } catch (e) { return u; }
+    BLOB.set(u, b); return b;
+  }
+  const blobHtml = h => h.indexOf('"data:') < 0 ? h : h.replace(/(href|src)="(data:[^"]+)"/g, (m, a, u) => `${a}="${blobUrl(u)}"`);
+  // 그림을 미리 풀어 둬요(풀린 그림을 잡아 두려고 Image를 남겨요)
+  function blobWarm(u) { const b = blobUrl(u); if (!b || b === u || BLOB_KEEP.some(x => x.src === b)) return; const im = new Image(); im.decoding = 'async'; im.src = b; BLOB_KEEP.push(im); if (im.decode) im.decode().catch(() => {}); }
+  function warmRooms() {
+    if (!S) return;
+    const ks = facKeys().filter(k => S.f[k] >= 1);
+    const job = () => { const k = ks.shift(); if (!k) return; try { blobWarm(IMG('room_' + k)); blobWarm(IMG170(seasonKey(bldImg(k)))); if (!rt.sheetKey) { const ft = rt.furTag; blobHtml(renderFurScene(k)); rt.furTag = ft; } } catch (e) { /* 미리 풀기는 실패해도 괜찮아요 */ } (window.requestIdleCallback || (f => setTimeout(f, 200)))(job); };
+    (window.requestIdleCallback || (f => setTimeout(f, 1500)))(job);
+  }
   const roomImg = k => (IMG('room_' + k) || !FUR_ROOM[k] ? `<image href="${IMG('room_' + k)}" x="-12.5" y="0" width="345" height="230" preserveAspectRatio="none"/>` : FUR_ROOM[k]) + (ROOM_TXT[k] ? ROOM_TXT[k]() : '');
   // 방 안 가구를 모두 그려요. 앞(아래)에 있는 것이 위에 그려지게 깊이 순서로 놓아요
   function furInstances(k) {
@@ -8838,7 +8860,7 @@ span.bt-stamp{display:none}.bt-duel.done span.bt-stamp{display:grid}
     const same = !!rt.furKey && rt.furKey.startsWith(sk + '|');
     rt.furKey = key;
     if (same) $$('#furScene .fur-tagg').forEach(t => { const i = +t.dataset.fur, n = S.fu[k][i], done = n >= L; if (!t.classList.contains('rec')) t.classList.toggle('can', !done && S.budget >= furCost(k, i)); });
-    else { $('#furScene').innerHTML = renderFurScene(k); walkBuild(k); }   // 1.7.1
+    else { $('#furScene').innerHTML = blobHtml(renderFurScene(k)); walkBuild(k); }   // 1.7.1   // 3.0.0 Blob 주소로
     $('#furScene').setAttribute('aria-label', `${FAC[k].name} 안`);
     $('#furList').innerHTML = FUR[k].map((F, i) => {
       const n = S.fu[k][i], done = n >= L, c = furCost(k, i), ok = !done && S.budget >= c, st = furStage(n);
@@ -8979,14 +9001,15 @@ span.bt-stamp{display:none}.bt-duel.done span.bt-stamp{display:grid}
   function openSheet(k) {
     if (rt.paused || rt.fest || rt.sports) return;   // 학교 행사 중에는 도토리를 줍다가 건물 창이 열리지 않게 해요
     rt.sheetKey = k;
-    $('#sheetArt').innerHTML = `<img src="${IMG170(seasonKey(S.f[k] >= 1 ? bldImg(k) : SITE_IMG[k]))}" alt="" aria-hidden="true">`;
+    $('#sheetArt').innerHTML = `<img src="${blobUrl(IMG170(seasonKey(S.f[k] >= 1 ? bldImg(k) : SITE_IMG[k])))}" alt="" aria-hidden="true" decoding="async">`;   // 3.0.0 Blob 주소
+    rt.sheetAnimTo = performance.now() + 320;   // 3.0.0 창이 올라오는 동안은 지도 학생 걸음을 쉬어요(그리기 부담 줄이기)
     rt.furKey = '';
     renderSheet();
     const w = $('#sheetWrap');
     w.hidden = false;
-    $('#sheetWrap .sheet').scrollTop = 0;
-    requestAnimationFrame(() => w.classList.add('open'));
-    $('#sheetBuy').focus({ preventScroll: true });
+    // 3.0.0 끊김 줄이기: 맨 위로 되돌리기와 단추 초점은 화면을 한 번 더 재게 해서, 그리는 프레임 안과 창이 다 올라온 뒤로 옮겨요
+    requestAnimationFrame(() => { const sh = $('#sheetWrap .sheet'); if (sh.scrollTop) sh.scrollTop = 0; w.classList.add('open'); });
+    setTimeout(() => { if (rt.sheetKey === k) $('#sheetBuy').focus({ preventScroll: true }); }, 280);
     sfx('tap');
   }
   function closeSheet() {
@@ -9002,7 +9025,11 @@ span.bt-stamp{display:none}.bt-duel.done span.bt-stamp{display:grid}
   // 2.3.1 지섭 제보(업그레이드, 공사 시작 단추를 누를 때 화면이 깜빡임): 공사 칸이 생기거나 사라지면 아래에서 올라온 창의 높이가 한 번에 120px쯤 바뀌어
   // 창 전체가 툭 튀었어요. 다시 그리기 전후 창 위치를 재서 0.22초 동안 부드럽게 옮겨요
   function renderSheet() {
-    const sh = $('#sheetWrap .sheet'), open = sh && !$('#sheetWrap').hidden, t0 = open ? sh.getBoundingClientRect().top : 0;
+    // 3.0.0 지섭 제보(건물 창이 끊김): 도토리가 오를 때마다(1초에 여러 번) 창 위치를 재느라 화면 전체를 다시 쟀어요. 공사 칸처럼 창 높이가 바뀔 수 있을 때만 재요
+    const k = rt.sheetKey, shape = k ? [k, conOn(k), S.f[k], facMaxed(k), furReady(k)].join('|') : '';
+    const sh = $('#sheetWrap .sheet'), open = sh && !$('#sheetWrap').hidden && rt.sheetShape === shape ? false : sh && !$('#sheetWrap').hidden;
+    const t0 = open ? sh.getBoundingClientRect().top : 0;
+    rt.sheetShape = shape;
     renderSheet0();
     if (!open || rt.reduced || !sh.animate) return;
     const dy = t0 - sh.getBoundingClientRect().top;
@@ -18174,7 +18201,7 @@ span.bt-stamp{display:none}.bt-duel.done span.bt-stamp{display:grid}
         if (rt.dropT >= iv) { rt.dropT = 0; if (rt.drops.length < CFG.maxDrops) spawnDrop(); }
       }
       syncKids(false);
-      updateKids(dt, now);
+      if (!(rt.sheetAnimTo > now)) updateKids(dt, now);   // 3.0.0 건물 창이 올라오는 0.3초 동안은 쉬어요
       updateDrops(now);
       updateTalk(dt);
       updateBoostWin(dt);
@@ -20728,6 +20755,7 @@ span.bt-stamp{display:none}.bt-duel.done span.bt-stamp{display:grid}
     checkGrade();
     renderCloudInfo();
     applyCos(); renderShopBtn();
+    warmRooms();   // 3.0.0 건물 안 그림을 쉬는 틈에 미리 풀어 둬요
     // GitHub 테스트판: 서버에 연결해서 저장을 맞춰요
     if (hasCloudBuild()) {
       Cloud.state = 'idle';
@@ -20784,7 +20812,7 @@ span.bt-stamp{display:none}.bt-duel.done span.bt-stamp{display:grid}
   }
 
   // 시험용 손잡이: 자동 시험(window.__FOREST_TEST)에서만 게임 속 함수를 꺼내 써요
-  if (window.__FOREST_TEST) window.__forest = { get S() { return S; }, goTo, sportsCon, festCon, pzSweep, pzSwGain, pzSwOpen, pzXpOf, mgMulMax, mgMulOk, mgMul, mgModeTap, acTip, kidDupIdx, trialSafe, closeAd,
+  if (window.__FOREST_TEST) window.__forest = { get S() { return S; }, goTo, sportsCon, festCon, warmRooms, blobUrl, vdSize, vdBlock, pzSweep, pzSwGain, pzSwOpen, pzXpOf, mgMulMax, mgMulOk, mgMul, mgModeTap, acTip, kidDupIdx, trialSafe, closeAd,
     TKE, TK_Q, tkDaily, nbAllDay, nbBuildAt, nbOn, conAdd, BX_SPOT, PERKS, offlineCapH, applyAway, pzFinish, mgClaimOrder,
     NSL, nsStart, nsSettle, nsOpen, nsOn, nsOverlap, nsExtraH, isNight, nightDayOf, openNs, renderNs, bxSpots, renderNight,   // 3.0.0
    conOn, conLeft, conTick, conSec, conFinish, tkPlan, tkUse, tkUseAll, TK, CON, TKAD, capNext, yearCap,   // 2.1.0 공사
