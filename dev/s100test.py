@@ -61,10 +61,10 @@ async def main():
           nsat: F.nbBuildAt({kst(2026, 11, 28, 10)}), all: F.nbAllDay('2026-11-21') }}; }})()""")
         if r != {'sat10': True, 'fri10': False, 'fri21': True, 'sun3': True, 'nsat': False, 'all': True}: bad.append(f'주말 건설 가속 {r}')
         # 7) 공사 가속 배지: 낮에는 없고(게임 시계는 뒤로 가지 않아서 낮을 먼저 봐요), 20시부터 +100%
-        r = await pg.evaluate(f"""(() => {{ const F = {F}, S = F.S; {CLEAN}; F.rt.fakeNow = {kst(2026, 11, 3, 13)}; const n = F.rt.fakeNow; S.f.library = 3; S.bd.library = {{ L: 4, s: n - 60000, e: n + 600000 }}; F.renderMap(); F.conRender(true); const c = document.querySelector('#b-library .con'); return {{ add: F.conAdd(), fast: !!c && c.classList.contains('fast') }}; }})()""")
+        r = await pg.evaluate(f"""(() => {{ const F = {F}, S = F.S; {CLEAN}; F.rt.fakeNow = {kst(2026, 11, 3, 13)}; const n = F.rt.fakeNow; S.f.library = 3; S.bd.library = {{ L: 4, s: n - 60000, e: n + 600000 }}; F.renderMap(); F.conRender(true); const c = document.querySelector('#cu-library'); return {{ add: F.conAdd(), fast: !!c && c.classList.contains('fast') }}; }})()""")
         if r['add'] != 0 or r['fast']: bad.append(f'낮 배지 {r}')
         r = await pg.evaluate(f"""(() => {{ const F = {F}, S = F.S; {CLEAN}; F.rt.fakeNow = {kst(2026, 11, 3, 21)}; const n = F.rt.fakeNow; S.f.library = 3; S.bd.library = {{ L: 4, s: n - 60000, e: n + 600000 }}; F.renderMap(); F.conRender(true);
-          const c = document.querySelector('#b-library .con'); return {{ add: F.conAdd(), fast: !!c && c.classList.contains('fast'), tx: c ? c.querySelector('.con-sp text').textContent : '' }}; }})()""")
+          const c = document.querySelector('#cu-library'); return {{ add: F.conAdd(), fast: !!c && c.classList.contains('fast'), tx: c ? c.querySelector('.con-sp text').textContent : '' }}; }})()""")
         if r != {'add': 100, 'fast': True, 'tx': '⚡+100%'}: bad.append(f'가속 배지 {r}')
         await pg.screenshot(path='s100_con.png')
         if errs: bad.append(f'페이지 오류 {errs[:3]}')
