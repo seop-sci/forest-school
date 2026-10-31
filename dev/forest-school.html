@@ -2148,7 +2148,8 @@ body.wl-on .toast{z-index:300}
 @media (prefers-color-scheme: dark){:root:not([data-theme="light"]) .con-ess{background:linear-gradient(#4A3C78,#3A2E63);color:#EDE4FF}:root:not([data-theme="light"]) .ces-cost{color:#D9C9FF}}
 /* 2.1.2 마을 기부: 지도의 기념물 자리와 기부 창 */
 #vdTop .vd-hit{fill:transparent;cursor:pointer}
-#vdTop .vd-it{pointer-events:none;transform-box:fill-box;transform-origin:50% 92%}
+#vdTop .vd-it{pointer-events:none;transform-box:fill-box;transform-origin:50% 92%;filter:drop-shadow(0 0 1.2px #FFF8E6) drop-shadow(0 0 1.2px #FFF8E6) drop-shadow(0 1.5px 1.5px rgba(60,40,10,.45))}   /* 3.0.0 잔디 위에서 잘 보이게 둘레를 밝게 */
+#vdTop .vd-sh{fill:rgba(40,30,10,.28);pointer-events:none}
 #vdTop .vd-it.pop{animation:vdPop .9s ease-out}
 @keyframes vdPop{0%{transform:scale(.55);opacity:.4}60%{transform:scale(1.15);opacity:1}100%{transform:scale(1)}}
 #vdTop .vd-tag{pointer-events:none}#vdTop .vd-tag rect{fill:#FFF6E0;stroke:#B98A4A;stroke-width:.8}
@@ -7509,14 +7510,22 @@ span.bt-stamp{display:none}.bt-duel.done span.bt-stamp{display:grid}
   /* 1.5.1 학생 길 찾기: 건물, 공사 자리, 분수를 막힌 곳으로 보고 그 둘레 길로만 다녀요.
      막힌 곳은 건물 그림의 바닥 둘레(누르는 자리보다 조금 좁게)와 분수(타원)예요. 길이 끊긴 곳(초등학교 매점 공사 자리 아래)으로는
      걸어가지 않고 살짝 사라졌다가 나타나요 */
+  // 3.0.0 지섭 제보: 학생이 마을 기부 기념물을 뚫고 지나가서, 기념물 바닥(이름표까지)도 막힌 곳으로 봐요
+  function vdBlock() {
+    if (!vdOpen() || rt.viewTier != null) return null;
+    const m = decoMap(); if (!VD.spot[m]) return null;
+    const [x, y] = pctXY(VD.spot[m]), { cw } = vdSize(S.vd.lv);
+    return [x - cw / 2 - 2, y - cw * 0.4, x + cw / 2 + 2, y + 12];
+  }
   function navInfo() {
-    const G = geo();
-    if (rt.nav && rt.nav.G === G) return rt.nav;
+    const G = geo(), vb = vdBlock(), vk = vb ? vb.map(Math.round).join() : '';
+    if (rt.nav && rt.nav.G === G && rt.nav.vk === vk) return rt.nav;
     const M = 2, box = ([cx, cy, w]) => [cx - w * 0.38 - M, cy - w * 0.38 - M, cx + w * 0.38 + M, cy + w * 0.3 + M];
     const blocks = Object.values(G.b).map(box).concat([box(G.next.at)]);
     if (G.fount) { const [fx, fy, rx, ry] = G.fount; blocks.push([fx - rx, fy - ry, fx + rx, fy + ry, 1]); }
+    if (vb) blocks.push(vb);   // 3.0.0 마을 기부 기념물
     const N = G.spots;
-    const nav = { G, blocks, N, adj: N.map(() => []) };
+    const nav = { G, vk, blocks, N, adj: N.map(() => []) };
     for (let i = 0; i < N.length; i++) for (let j = i + 1; j < N.length; j++)
       if (navClear(nav, N[i][0], N[i][1], N[j][0], N[j][1], null)) { const d = Math.hypot(N[i][0] - N[j][0], N[i][1] - N[j][1]); nav.adj[i].push([j, d]); nav.adj[j].push([i, d]); }
     return (rt.nav = nav);
@@ -7567,10 +7576,11 @@ span.bt-stamp{display:none}.bt-duel.done span.bt-stamp{display:grid}
   function pickTarget(k) {
     const SP = geo().spots;
     let i;
-    do { i = Math.floor(Math.random() * SP.length); } while (i === k.spot && SP.length > 1);
+    const nav = navInfo(), vb = vdBlock();
+    for (let t = 0; t < 12; t++) { i = Math.floor(Math.random() * SP.length); if ((i !== k.spot || SP.length < 2) && !(vb && inBlock(vb, SP[i][0], SP[i][1], 2))) break; }   // 3.0.0 기념물 자리에 선 자리는 피해요
     k.spot = i;
     // 자리 둘레로 조금씩 흩어져 서요. 흩어진 곳이 건물이나 분수에 닿으면 자리 한가운데에 서요
-    const nav = navInfo(), x = SP[i][0] + rand(-7, 7), y = SP[i][1] + rand(-5, 5), ok = !nav.blocks.some(b => inBlock(b, x, y));
+    const x = SP[i][0] + rand(-7, 7), y = SP[i][1] + rand(-5, 5), ok = !nav.blocks.some(b => inBlock(b, x, y));
     k.tx = ok ? x : SP[i][0];
     k.ty = ok ? y : SP[i][1];
   }
@@ -9702,8 +9712,9 @@ span.bt-stamp{display:none}.bt-duel.done span.bt-stamp{display:grid}
   /* 2.1.2 마을 기부(프로젝트 문서 '마을 기부 설계안 (2.1.2)', 지섭 확정 2026-10-29): 도토리를 숲속 마을에 기부하면 기부 단계가 올라요.
      상한이 없고 힘(수입, 공사 속도)은 주지 않아요. 기념물, 칭호, 업적, 정수와 가끔 황금 도토리만. 졸업해도 남아요.
      단계마다 필요한 양 = 지금 수업료(초당, 특식 데이 2배는 빼고) × H(n)시간. 진행은 이번 단계 비율 p로 저장해서 수업료가 올라도 채운 만큼은 그대로예요 */
-  const VD = { tier: 1, H: [1, 2, 3, 5, 8, 12, 18, 24], after: 6, ess: 5, goldEvery: 5, art: 8, w: 62,
-    spot: [null, [64, 49.5], [59, 50.5], [70, 86]],   // 3.0.0 고등학교는 아래쪽 오른편 잔디(lots_high.md)
+  const VD = { tier: 1, H: [1, 2, 3, 5, 8, 12, 18, 24], after: 6, ess: 5, goldEvery: 5, art: 8, w: 62, box: 46,
+    fr: [0.9, 0.34, 0.4, 0.45, 0.43, 0.43, 0.54, 0.65, 0.66],   // 3.0.0 그림 캔버스에서 실제 그림이 차지하는 너비(기부함, 1~8단계). 1, 2단계는 그림이 작게 그려져서 이걸로 키워요
+    spot: [null, [64, 49.5], [59, 50.5], [59, 50.5]],   // 3.0.0 고등학교는 아래쪽 오른편 잔디(lots_high.md)
         // 지도(decoMap)마다 기념물 자리(지도 %, 기념물 바닥). 초등학교는 분수 오른쪽, 중학교는 분수 오른쪽 위
     titles: [{ id: 'vdpatron', lv: 3, title: '마을 후원자' }, { id: 'vdgold', lv: 8, title: '황금 나무 주인' }] };   // 20단계 '숲속 기부왕'은 업적 줄의 칭호
   const vdH = n => n <= VD.H.length ? VD.H[n - 1] : VD.H[VD.H.length - 1] + VD.after * (n - VD.H.length);
@@ -9714,6 +9725,8 @@ span.bt-stamp{display:none}.bt-duel.done span.bt-stamp{display:grid}
   const vdLocked = () => { const k = S.vd.lk; return !!k && k.day === gameToday() && k.lv === S.vd.lv && k.need >= 1; };
   const vdNeed = () => vdLocked() ? S.vd.lk.need : vdLive();
   const vdLeft = () => Math.max(1, Math.ceil(vdNeed() * (1 - S.vd.p)));
+  // 3.0.0 지도 기념물 크기: 실제 그림 너비 cw(기부함 41, 1단계 38에서 8단계 52까지), 캔버스 w
+  const vdSize = lv => { const L = Math.min(VD.art, Math.max(0, lv)), cw = L ? 36 + 2 * L : VD.box * VD.fr[0]; return { cw, w: L ? Math.min(130, cw / VD.fr[L]) : VD.box }; };
   const vdImg = lv => lv <= 0 ? IMG('donate_box') : IMG('donate_m' + Math.min(VD.art, lv));
   // 그림(512 캔버스)마다 보이는 부분. 창과 보상 그림에서는 이만큼만 잘라 크게 보여요(앞 단계 기념물은 캔버스에 작게 그려져 있어요)
   const VD_BOX = [[26, 41, 485, 469], [168, 366, 344, 472], [151, 353, 360, 472], [139, 253, 371, 473], [143, 226, 369, 472], [144, 182, 367, 472], [117, 148, 393, 472], [90, 115, 423, 474], [88, 80, 424, 474]];
@@ -9775,12 +9788,13 @@ span.bt-stamp{display:none}.bt-duel.done span.bt-stamp{display:grid}
   // 지도의 기념물(renderDeco가 불러요): 지금 지도에 자리가 있을 때만
   function vdMapHTML(m) {
     if (!vdOpen() || !VD.spot[m]) return '';
-    const [x, y] = pctXY(VD.spot[m]), lv = S.vd.lv, w = lv ? VD.w : 38, u = vdImg(lv);   // 2.3.1 조금 크게(그전 30, 54)
+    const [x, y] = pctXY(VD.spot[m]), lv = S.vd.lv, { w, cw } = vdSize(lv), u = vdImg(lv);   // 3.0.0 지섭: 그래도 잘 안 보여서 그림 실제 크기로 맞춰 키워요
     if (!u) return '';   // 기부함은 캔버스를 꽉 채워서 작게
     const pop = rt.vdPop ? ' pop' : ''; rt.vdPop = false;
     const t = lv ? `마을 기부 ${lv}단계` : '마을 기부', tw = t.length * 6.2 + 10;
-    const hw = Math.max(w, 44);   // 누르는 칸은 손가락 크기 이상
-    return `<image class="vd-it${pop}" x="${x - w / 2}" y="${(y - w * 472 / 512).toFixed(1)}" width="${w}" height="${w}" href="${u}"/>` +
+    const hw = Math.max(cw + 6, 44);   // 누르는 칸은 손가락 크기 이상
+    return `<ellipse class="vd-sh" cx="${x}" cy="${(y - 1).toFixed(1)}" rx="${(cw * 0.56).toFixed(1)}" ry="${(cw * 0.15).toFixed(1)}"/>` +   // 3.0.0 바닥 그림자
+      `<image class="vd-it${pop}" x="${x - w / 2}" y="${(y - w * 472 / 512).toFixed(1)}" width="${w}" height="${w}" href="${u}"/>` +
       `<g class="vd-tag"><rect x="${(x - tw / 2).toFixed(1)}" y="${(y + 1).toFixed(1)}" width="${tw.toFixed(1)}" height="11" rx="5.5"/><text x="${x}" y="${(y + 9).toFixed(1)}">${t}</text></g>` +
       `<rect class="vd-hit" data-vd="1" x="${x - hw / 2}" y="${(y - hw * 0.85).toFixed(1)}" width="${hw}" height="${(hw * 0.85 + 13).toFixed(1)}"/>`;
   }
