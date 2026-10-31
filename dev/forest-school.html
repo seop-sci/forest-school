@@ -16010,6 +16010,7 @@ span.bt-stamp{display:none}.bt-duel.done span.bt-stamp{display:grid}
   const SPORTS = { sec: 40, gap: 2 * 3600000, every: 0.65, ground: 6, cx: 165, cy: 336, rx: 100, ry: 33 };
   const sportsOpen = () => !!S && (S.tier >= 2 || (S.tier >= 1 && S.tg >= 3)) && S.f.playground >= 1;
   const sportsWait = () => Math.max(0, S.sports.next - Date.now());
+  const sportsCon = () => !!S && S.f.playground >= 1 && conOn('playground');   // 3.0.0 지섭 요청: 운동장 공사 중에는 운동회를 못 열어요(공사판 트랙을 달리면 이상해서)
   const sportsPrize = win => Math.max(10, nice(rate() * 180 * (win ? 2 : 1) * vpMult() * clubFestMult() * elMult('fest')));   // 2.0.0 운동부 보너스   // 1.7.0: 교감 선생님 레벨만큼 더
   function renderSportsBtn() { renderFestBtn(); }
   function renderSportsBtnOld() {
@@ -16025,6 +16026,7 @@ span.bt-stamp{display:none}.bt-duel.done span.bt-stamp{display:grid}
     if (rt.paused) return;
     if (!sportsOpen()) { toast(S.f.playground < 1 ? `${eul(FAC.playground.name)} 먼저 지어야 해요` : '숲속 운동회는 초등학교 4학년부터 열 수 있어요'); return; }
     if (rt.sports) return;
+    if (sportsCon()) { toast(`${FAC.playground.name} 공사가 끝나면 운동회를 열 수 있어요`); return; }   // 3.0.0
     if (rt.modalOpen && rt.modalOpen !== $('#mSports')) return;
     sfx('tap');
     renderSportsModal();
@@ -16058,6 +16060,7 @@ span.bt-stamp{display:none}.bt-duel.done span.bt-stamp{display:grid}
   window.FOREST_SAVE = () => { try { save(); } catch (e) { /* 저장 실패는 넘어가요 */ } };
   function startSports(viaAd) {
     if (rt.sports || !sportsOpen()) return;
+    if (sportsCon()) { if (rt.modalOpen === $('#mSports')) closeModal($('#mSports')); toast(`${FAC.playground.name} 공사가 끝나면 운동회를 열 수 있어요`); return; }   // 3.0.0
     if (!viaAd && sportsWait() > 0) {
       closeModal($('#mSports'), () => askAd('다음 운동회까지 기다리지 않고 광고를 보면 바로 열 수 있어요.', () => showAd(() => startSports(true), r => { if (r !== 'noad') toast('광고를 끝까지 보지 않아서 운동회를 바로 열지 못했어요'); })));
       return;
@@ -16193,16 +16196,17 @@ span.bt-stamp{display:none}.bt-duel.done span.bt-stamp{display:grid}
   const festWait = id => id === 'sports' ? sportsWait() : Math.max(0, (S.fest.next[id] || 0) - Date.now());
   const festPrize = win => Math.max(10, nice(rate() * 180 * (win ? 2 : 1) * vpMult() * clubFestMult() * elMult('fest')));
   const festBusy = () => !!(rt.fest || rt.sports);
+  const festCon = id => id === 'sports' && sportsCon();   // 3.0.0 운동장 공사 중에는 운동회를 잠가요
   // 지도 왼쪽 '학교 행사' 버튼: 열 수 있는 행사 수나, 가장 빨리 열리는 행사까지 남은 시간
   function renderFestBtn() {
     const b = $('#btnSports'), open = FEST_IDS.filter(festOpen), on = open.length > 0 && !festBusy();
     b.hidden = !on;
     if (!on) return;
-    const ready = open.filter(id => festWait(id) <= 0).length;
-    const txt = ready ? `${ready}` : hms(Math.min(...open.map(festWait)));
+    const ready = open.filter(id => festWait(id) <= 0 && !festCon(id)).length;   // 3.0.0 공사 중인 운동회는 열린 수에 넣지 않아요
+    const tm = open.filter(id => !festCon(id)), txt = ready ? `${ready}` : tm.length ? hms(Math.min(...tm.map(festWait))) : '공사 중';
     if (rt.festTxt !== txt) { rt.festTxt = txt; $('#sportsN').textContent = txt; b.classList.toggle('ready', ready > 0); b.setAttribute('aria-label', ready ? `학교 행사, ${ready}개 열렸어요` : `학교 행사, 다음 행사까지 ${txt}`); }
     if (rt.modalOpen === $('#mFest')) {
-      const key = FEST_IDS.map(id => festOpen(id) ? (festWait(id) > 0 ? hms(festWait(id)) : 'r') : 'x').join('|');
+      const key = FEST_IDS.map(id => festOpen(id) ? (festCon(id) ? 'c' : festWait(id) > 0 ? hms(festWait(id)) : 'r') : 'x').join('|');
       if (rt.festKey !== key) renderFestList();
     }
   }
@@ -16215,20 +16219,22 @@ span.bt-stamp{display:none}.bt-duel.done span.bt-stamp{display:grid}
     if (rt.modalOpen !== $('#mFest')) openModal($('#mFest'));
   }
   function renderFestList() {
-    rt.festKey = FEST_IDS.map(id => festOpen(id) ? (festWait(id) > 0 ? hms(festWait(id)) : 'r') : 'x').join('|');
+    rt.festKey = FEST_IDS.map(id => festOpen(id) ? (festCon(id) ? 'c' : festWait(id) > 0 ? hms(festWait(id)) : 'r') : 'x').join('|');
     const ac = acornIcon();
     $('#festList').innerHTML = FEST_IDS.map(id => {
-      const F = FEST[id], open = festOpen(id), w = open ? festWait(id) : 0;
+      const F = FEST[id], open = festOpen(id), w = open ? festWait(id) : 0, con = open && festCon(id);
       const btn = !open ? `<span class="fe-lock">${F.tg + 1}학년부터</span>`
+        : con ? `<span class="fe-lock">공사 중</span>`   // 3.0.0 운동장 공사 중
         : w > 0 ? `<button class="btn-sub small" type="button" data-fest="${id}" data-ad="1"><span>광고 보고 바로</span><small>${hms(w)}</small></button>`
         : `<button class="cta small" type="button" data-fest="${id}">열기</button>`;
-      return `<div class="tr-row fe-row${open ? '' : ' lock'}"><span class="tr-ic" style="--tc:#F3C04B">${festIcon(id)}</span>` +
-        `<div class="tr-tx"><b>${F.name} <small>${F.sec}초</small></b><span>${open ? F.lead : '학년이 올라가면 열려요'}</span>` +
-        (open ? `<span class="tr-meta"><span class="tr-rw">${ac}<b>${fmt(festPrize(true))}</b></span><span class="tr-sv">${festGoldLeft(id) ? '성공 상품, 황금 도토리 +1 (하루 한 번)' : '성공 상품 (황금 도토리는 오늘 받았어요)'}</span></span>` : '') + `</div>${btn}</div>`;
+      return `<div class="tr-row fe-row${open && !con ? '' : ' lock'}"><span class="tr-ic" style="--tc:#F3C04B">${festIcon(id)}</span>` +
+        `<div class="tr-tx"><b>${F.name} <small>${F.sec}초</small></b><span>${con ? `${FAC.playground.name} 공사가 끝나면 열 수 있어요` : open ? F.lead : '학년이 올라가면 열려요'}</span>` +
+        (open && !con ? `<span class="tr-meta"><span class="tr-rw">${ac}<b>${fmt(festPrize(true))}</b></span><span class="tr-sv">${festGoldLeft(id) ? '성공 상품, 황금 도토리 +1 (하루 한 번)' : '성공 상품 (황금 도토리는 오늘 받았어요)'}</span></span>` : '') + `</div>${btn}</div>`;
     }).join('');
   }
   function startFest(id, viaAd) {
     if (festBusy() || !festOpen(id)) return;
+    if (festCon(id)) { toast(`${FAC.playground.name} 공사가 끝나면 운동회를 열 수 있어요`); return; }   // 3.0.0
     if (!viaAd && festWait(id) > 0) { closeModal($('#mFest'), () => askAd(`${FEST[id].name}${batchim(FEST[id].name) ? '을' : '를'} 기다리지 않고 광고를 보면 바로 열 수 있어요.`, () => showAd(() => startFest(id, true), () => openFest()), () => openFest())); return; }
     if (id === 'sports') { if (rt.modalOpen === $('#mFest')) closeModal($('#mFest'), () => startSports(true)); else startSports(true); return; }
     const go = () => {
@@ -20764,7 +20770,7 @@ span.bt-stamp{display:none}.bt-duel.done span.bt-stamp{display:grid}
   }
 
   // 시험용 손잡이: 자동 시험(window.__FOREST_TEST)에서만 게임 속 함수를 꺼내 써요
-  if (window.__FOREST_TEST) window.__forest = { get S() { return S; }, goTo, pzSweep, pzSwGain, pzSwOpen, pzXpOf, mgMulMax, mgMulOk, mgMul, mgModeTap, acTip, kidDupIdx, trialSafe, closeAd,
+  if (window.__FOREST_TEST) window.__forest = { get S() { return S; }, goTo, sportsCon, festCon, pzSweep, pzSwGain, pzSwOpen, pzXpOf, mgMulMax, mgMulOk, mgMul, mgModeTap, acTip, kidDupIdx, trialSafe, closeAd,
     TKE, TK_Q, tkDaily, nbAllDay, nbBuildAt, nbOn, conAdd, BX_SPOT, PERKS, offlineCapH, applyAway, pzFinish, mgClaimOrder,
     NSL, nsStart, nsSettle, nsOpen, nsOn, nsOverlap, nsExtraH, isNight, nightDayOf, openNs, renderNs, bxSpots, renderNight,   // 3.0.0
    conOn, conLeft, conTick, conSec, conFinish, tkPlan, tkUse, tkUseAll, TK, CON, TKAD, capNext, yearCap,   // 2.1.0 공사
