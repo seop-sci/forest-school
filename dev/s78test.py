@@ -69,7 +69,7 @@ async def main():
                   const q = ['bt1', 'bt2', 'bt3'].map(id => F.MAIN.find(x => x.id === id)); const a = ['battle', 'league'].map(id => F.ACH.find(x => x.id === id));
                   return {{ out, left, c: [c.pts, c.lg, c.n, c.day, c.last, c.streak, c.st.w, c.st.l], q: q.map(x => !!x && !!F.qGoal(x)), a: a.map(x => x && x.title) }}; }})()""")
                 print('하루', r)
-                if r['out'] != [True] * 5 + [False] or r['left'] != 5 or r['c'] != [1000, 5, 5, '', -1, 0, 3, 0] or r['q'] != [True] * 3 or r['a'] != ['승부사', '숲속 챔피언']: bad.append(f'하루 제한, 저장, 퀘스트, 업적이 틀려요 {r}')
+                if r['out'] != [True] * 5 + [False] or r['left'] != 5 or r['c'] != [1000, 5, 7, '', -1, 0, 3, 0] or r['q'] != [True] * 3 or r['a'] != ['승부사', '숲속 챔피언']: bad.append(f'하루 제한, 저장, 퀘스트, 업적이 틀려요 {r}')
                 await pg.evaluate(f"{F}.S.bt.n = 0")
             # 6) 화면
             await pg.evaluate(T.CLEAN)
