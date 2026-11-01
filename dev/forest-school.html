@@ -2736,7 +2736,20 @@ span.bt-stamp{display:none}.bt-duel.done span.bt-stamp{display:grid}
 /* ===== 홈 UI 정리 END ===== */
 /* ===== 1.8.0 숲속 합치기 BEGIN ===== (블록 퍼즐 장면(.pz)의 틀을 같이 써요. 그림이 오기 전에는 색 조각과 그림 문자로 보여요) */
 .mg .pz-bg{background:#86A866 var(--mg-bg, none) center/cover no-repeat}
-.mg-top{display:flex;align-items:stretch;gap:6px;flex:none}
+.mg-top{display:grid;grid-template-columns:auto minmax(0,1.9fr) auto minmax(0,1fr) minmax(0,1fr);gap:5px 6px;flex:none;align-items:stretch}   /* 3.0.0 두 줄 */
+.mg-top>#mgBack{grid-row:1 / span 2;width:42px}
+.mg-top>#mgEnergy{grid-column:2;grid-row:1}.mg-top>#mgMuls{grid-column:3;grid-row:1}.mg-top>#mgPieces{grid-column:4;grid-row:1}.mg-top>#mgUps{grid-column:5;grid-row:1}
+.mg-top>#mgAdBtn{grid-column:2;grid-row:2;flex-direction:row;gap:4px;min-height:30px;min-width:0;padding:0 6px;font-size:12.5px}.mg-top>#mgAdBtn small{font-size:10px}.mg-top>#mgModes{grid-column:3 / -1;grid-row:2}
+.mg-seg{display:flex;gap:3px;padding:3px;border-radius:14px;background:rgba(44,74,61,.86);box-shadow:0 3px 0 rgba(0,0,0,.3)}
+.mg-seg[hidden]{display:none}
+.mg-seg button{position:relative;flex:1 1 auto;border:0;border-radius:11px;padding:3px 7px;background:transparent;color:#FFE9A8;font-family:var(--font-display);font-size:15px;line-height:1.1;white-space:nowrap;cursor:pointer}
+.mg-modes button{font-family:var(--font-body);font-size:12.5px;font-weight:700}
+.mg-seg button.on{background:#E8913A;color:#FFF7E6}.mg-modes button.on.one{background:#7C4DDB}
+.mg-seg button[aria-disabled="true"]{opacity:.38}
+.mg-seg button.new{animation:mgNew 1s ease-in-out infinite;outline:2px solid #FFE36B;outline-offset:1px}
+.mg-seg button.new::after{content:"NEW";position:absolute;right:-6px;top:-8px;padding:0 4px;border-radius:6px;background:#E2553A;color:#fff;font-family:var(--font-body);font-size:9px;font-weight:800;line-height:1.5}
+@media (prefers-reduced-motion:reduce){.mg-seg button.new{animation:none}}
+@media (max-width:380px){.mg-seg button{padding:3px 5px;font-size:14px}.mg-modes button{font-size:12px}}
 .mg-stat{flex:1 1 0;min-width:0;overflow:hidden;display:flex;align-items:center;justify-content:center;gap:4px;padding:5px 5px;border-radius:14px;background:rgba(44,74,61,.86);box-shadow:0 3px 0 rgba(0,0,0,.3);color:#FFF7E6;font-family:var(--font-display);font-size:15px;line-height:1.1;white-space:nowrap}
 #mgEnergy{flex:1.9 1 0}
 .mg-stat b{font-size:19px;color:#FFE9A8}
@@ -2760,6 +2773,7 @@ span.bt-stamp{display:none}.bt-duel.done span.bt-stamp{display:grid}
 @media (max-width:380px){.mg-stat{font-size:14px;gap:3px;padding:4px 4px}.mg-stat b{font-size:17px}.mg-stat small{font-size:10px}.mg-ad{font-size:12px;padding:0 6px}}
 .mg-ad[aria-disabled="true"]{background:#B9BFAE;color:#5F6B55;box-shadow:0 3px 0 #8F968A}
 .mg-orders{flex:none;display:grid;grid-template-columns:repeat(3,1fr);gap:6px}
+.mg-order.up{outline:2px solid #FFE36B;outline-offset:1px;position:relative}.mg-order.up::before{content:"새 단계";position:absolute;top:-8px;left:-4px;z-index:1;padding:0 5px;border-radius:7px;background:#E2553A;color:#fff;font-size:10px;font-weight:800;line-height:1.6}   /* 3.0.0 한 단계 위 주문 */
 .mg-order{display:flex;flex-direction:column;align-items:center;gap:3px;padding:6px 4px 5px;border:0;border-radius:14px;background:rgba(255,247,230,.94);color:#26301E;font:inherit;cursor:pointer;box-shadow:0 3px 0 rgba(0,0,0,.25);text-align:center;position:relative}
 .mg-order.ok{background:#DDF3C4;box-shadow:0 0 0 3px #57A83A, 0 0 12px 2px rgba(120,200,80,.75), 0 3px 0 rgba(0,0,0,.25);animation:mgReady 1.1s ease-in-out infinite}
 .mg-order.ok .mo-n{color:#FFF;background:#3F8F2A;border-radius:999px;padding:1px 12px;box-shadow:0 2px 0 #2C6B1C}
@@ -3524,11 +3538,11 @@ span.bt-stamp{display:none}.bt-duel.done span.bt-stamp{display:grid}
   <div class="mg-top">
     <button class="pz-x" type="button" id="mgBack" aria-label="공부 탭으로 돌아가기"><svg viewBox="0 0 24 24" width="20" height="20" aria-hidden="true"><path d="M15 5l-7 7 7 7" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"/></svg></button>
     <div class="mg-stat" id="mgEnergy" aria-live="polite"><span class="mg-ic" data-mg="mg_ic_energy">⚡</span><b id="mgE">100</b><small id="mgEMax">/100</small><small id="mgETimer"></small></div>
-    <button class="mg-mul" type="button" id="mgMul" hidden>×1</button>
-    <button class="mg-mode" type="button" id="mgMode" hidden>따로</button>
+    <div class="mg-seg mg-muls" id="mgMuls" role="group" aria-label="에너지 배수" hidden></div><!-- 3.0.0 지섭 요청: 위 칸을 두 줄로. 배수와 방식은 나란히 두고 바로 골라요 -->
     <div class="mg-stat" id="mgPieces" title="장식 조각"><span class="mg-ic" data-mg="mg_ic_piece">💎</span><b id="mgPc">0</b></div>
     <div class="mg-stat" id="mgUps" title="생산기 강화 조각"><span class="mg-ic" data-mg="mg_ic_up">🔑</span><b id="mgUp">0</b></div>
-    <button class="mg-ad" type="button" id="mgAdBtn">광고 +50</button>
+    <button class="mg-ad" type="button" id="mgAdBtn">▷ 에너지 +50</button>
+    <div class="mg-seg mg-modes" id="mgModes" role="group" aria-label="만드는 방식" hidden></div>
   </div>
   <div class="mg-orders" id="mgOrders" aria-label="학생 주문"></div>
   <div class="mg-mid">
@@ -3680,7 +3694,7 @@ span.bt-stamp{display:none}.bt-duel.done span.bt-stamp{display:grid}
   <div class="backdrop" data-close-adask></div>
   <section class="modal" role="alertdialog" aria-modal="true" aria-labelledby="adAskTitle" aria-describedby="adAskText">
     <h2 id="adAskTitle">광고를 볼까요?</h2>
-    <p id="adAskText"></p>
+    <p id="adAskText" style="white-space:pre-line;text-align:center"></p>
     <div class="btn-row"><button class="btn-sub" type="button" id="adAskNo" data-autofocus>그만두기</button><button class="cta" type="button" id="adAskYes">광고 보기</button></div>
   </section>
 </div>
@@ -19938,13 +19952,14 @@ span.bt-stamp{display:none}.bt-duel.done span.bt-stamp{display:grid}
     },
     gens: { A: { name: '참나무', em: '🌳', kinds: ['a', 'm'] }, F: { name: '급식 냄비', em: '🍲', kinds: ['f', 'd'] }, S: { name: '문구함', em: '🧰', kinds: ['s', 'c'] }, G: { name: '화분', em: '🪴', kinds: ['g', 'v'] } },
     genAt: [0, 2, 5, 7],                              // 처음 생산기 자리(맨 위 줄)
+    UP_EVERY: 20,   // 3.0.0 지섭 결정: 주문 20개마다 한 단계 위 주문
     MUL: [[3, 2], [5, 3], [7, 4]]   // 2.3.1 지섭: ×2 3단계, ×3 5단계, ×4 7단계로 앞당김(2.1.3은 4, 6, 8)
                         // 2.1.3 에너지 배수(지섭 요청): 어느 종류든 이 단계를 처음 만들면 ×2, ×3, ×4가 열려요(주문이 그 단계쯤부터 나와요)
   };
   const MG_KINDS = Object.keys(MG.kinds), MG_GENS = Object.keys(MG.gens), MG_N = MG.W * MG.H;
   // 1.8.0 지섭: 합치기 도감 모은 개수 보상(10칸마다, 업적처럼). min은 수업료 분치
   const MG_DEX_MS = [[10, { ess: 5 }], [20, { min: 30 }], [30, { ess: 10 }], [40, { min: 60 }], [50, { ess: 15 }], [60, { min: 90 }], [70, { ess: 20 }], [80, { ess: 30, gold: 5 }]];
-  const mgFresh = () => ({ mul: 1, mulSeen: 1, mm: 0, mulNew: false, xr: 0, xd: { day: '', n: 0 }, e: MG.EMAX, eAt: 0, board: '', last: {}, orders: [], swapAt: 0, best: {}, pieces: 0, up: 0, ad: { day: '', n: 0 }, bst: { day: '', lucky: 0, energy: 0, luck: 0 }, seen: false, dexPaid: [], dexE: {}, dexMs: 0, st: { merges: 0, orders: 0, made10: 0, ups: 0, taps: 0 } });
+  const mgFresh = () => ({ mul: 1, mulSeen: 1, mm: 0, mulNew: false, upq: 0, xr: 0, xd: { day: '', n: 0 }, e: MG.EMAX, eAt: 0, board: '', last: {}, orders: [], swapAt: 0, best: {}, pieces: 0, up: 0, ad: { day: '', n: 0 }, bst: { day: '', lucky: 0, energy: 0, luck: 0 }, seen: false, dexPaid: [], dexE: {}, dexMs: 0, st: { merges: 0, orders: 0, made10: 0, ups: 0, taps: 0 } });
   // 칸 글자: 조각은 종류 소문자 + 단계(1~9, 10은 x), 생산기는 대문자 + 레벨(1~5), 빈칸은 '..'
   const mgLvCh = n => n >= 10 ? 'x' : String(n);
   const mgLvOf = ch => ch === 'x' ? 10 : (Number(ch) || 0);
@@ -19987,7 +20002,7 @@ span.bt-stamp{display:none}.bt-duel.done span.bt-stamp{display:grid}
       const it = raw.filter(x => x && MG.kinds[x.k] && num(x.n, 2, 0) >= 2 && num(x.n, 0, 0) <= 10).slice(0, 2)
         .map(x => ({ k: x.k, n: Math.floor(x.n), c: Math.min(3, Math.max(1, Math.floor(num(x.c, 1, 1)))) }));
       if (!it.length || (it.length === 2 && it[0].k === it[1].k)) return null;
-      return { it, who: typeof o.who === 'string' ? o.who.slice(0, 12) : 'rabbit' };
+      return { it, who: typeof o.who === 'string' ? o.who.slice(0, 12) : 'rabbit', ...(o.up && it.length === 1 ? { up: 1 } : {}) };
     }).filter(Boolean).slice(0, 3);
     s.mg.swapAt = num(m.swapAt, 0, 0);
     if (m.best && typeof m.best === 'object') for (const k of MG_KINDS) s.mg.best[k] = Math.min(10, Math.floor(num(m.best[k], 0, 0)));
@@ -19999,7 +20014,7 @@ span.bt-stamp{display:none}.bt-duel.done span.bt-stamp{display:grid}
     if (m.dexE && typeof m.dexE === 'object') for (const k of MG_KINDS) { const v = Math.floor(num(m.dexE[k], 0, 0)); if (v) s.mg.dexE[k] = v & 1023; }   // 1.8.0 도감 칸마다 받은 정수(10칸 비트)
     s.mg.dexMs = Math.min(MG_DEX_MS.length, Math.floor(num(m.dexMs, 0, 0)));   // 1.8.0 모은 개수 보상 받은 단계
     s.mg.seen = !!m.seen;
-    s.mg.mul = Math.min(4, Math.max(1, Math.floor(num(m.mul, 1, 1)))); s.mg.mulSeen = Math.min(4, Math.max(1, Math.floor(num(m.mulSeen, 1, 1)))); s.mg.mm = m.mm ? 1 : 0; s.mg.mulNew = !!m.mulNew;   // 2.3.1 만드는 방식, 새 배수 강조   // 2.1.3 에너지 배수
+    s.mg.mul = Math.min(4, Math.max(1, Math.floor(num(m.mul, 1, 1)))); s.mg.mulSeen = Math.min(4, Math.max(1, Math.floor(num(m.mulSeen, 1, 1)))); s.mg.mm = m.mm ? 1 : 0; s.mg.mulNew = !!m.mulNew; s.mg.upq = Math.min(3, Math.floor(num(m.upq, 0, 0)));   // 3.0.0 한 단계 위 주문을 기다리는 수   // 2.3.1 만드는 방식, 새 배수 강조   // 2.1.3 에너지 배수
     s.mg.xr = Math.min(1, num(m.xr, 0, 0)); if (m.xd && typeof m.xd === 'object') s.mg.xd = { day: typeof m.xd.day === 'string' ? m.xd.day.slice(0, 10) : '', n: Math.floor(num(m.xd.n, 0, 0)) };   // 2.1.3 미술 XP 남은 몫과 오늘 받은 양
     if (m.st && typeof m.st === 'object') for (const k of Object.keys(s.mg.st)) s.mg.st[k] = Math.floor(num(m.st[k], 0, 0));
   }
@@ -20082,31 +20097,38 @@ span.bt-stamp{display:none}.bt-duel.done span.bt-stamp{display:grid}
   // 2.3.1 지섭 결정: '합쳐서 1개'(S.mg.mm = 1)면 같은 에너지로 단계가 높은 조각 하나. ×3은 나누어떨어지지 않아서 건너뛰어요(×1, ×2, ×4)
   const mgMulOk = x => !(S.mg.mm && x === 3);
   const mgMul = () => { let m = Math.max(1, Math.min(S.mg.mul || 1, mgMulMax())); if (!mgMulOk(m)) m = 2; return m; };
-  function mgMulTap() {
-    const mx = mgMulMax(); if (mx <= 1) return;
-    let m = mgMul(); do { m = m >= mx ? 1 : m + 1; } while (!mgMulOk(m));
-    S.mg.mul = m; S.mg.mulNew = false;
+  // 3.0.0 지섭 요청: 배수와 방식은 단추를 나란히 두고 바로 골라요. 고를 때마다 뜨던 안내 글은 빼고, 처음 열릴 때만 NEW와 설명 창
+  function mgPickMul(x) {
+    const mx = mgMulMax(); x = Math.max(1, Math.min(mx, x | 0));
+    if (!mgMulOk(x)) { toast('×3은 따로만 만들 수 있어요'); return; }
+    S.mg.mul = x; S.mg.mulNew = false;
     sfx('tap'); buzz(6); mgRenderMul(); save();
-    toast(m === 1 ? '생산기를 한 번 누르면 조각 1개' : S.mg.mm ? `생산기를 한 번 누르면 에너지 ${m}을 쓰고 ${m === 4 ? '두' : '한'} 단계 높은 조각 1개가 나와요` : `생산기를 한 번 누르면 에너지 ${m}을 쓰고 조각 ${m}개가 나와요`);
   }
-  function mgModeTap() {
-    S.mg.mm = S.mg.mm ? 0 : 1; if (!mgMulOk(S.mg.mul)) S.mg.mul = 2;
+  function mgPickMode(v) {
+    v = v ? 1 : 0;
+    if (v && mgMul() === 3) { toast('×3은 합쳐서 만들 수 없어요'); return; }
+    S.mg.mm = v; if (!mgMulOk(S.mg.mul)) S.mg.mul = 2;
     sfx('tap'); buzz(6); mgRenderMul(); save();
-    toast(S.mg.mm ? '합쳐서 1개: 같은 에너지로 단계가 높은 조각 하나가 나와요(×2, ×4)' : '따로 n개: 에너지만큼 조각이 여러 개 나와요');
   }
+  function mgMulTap() { const mx = mgMulMax(); if (mx <= 1) return; let m = mgMul(); do { m = m >= mx ? 1 : m + 1; } while (!mgMulOk(m)); mgPickMul(m); }
+  function mgModeTap() { mgPickMode(S.mg.mm ? 0 : 1); }
   function mgRenderMul() {
-    const b = $('#mgMul'); if (!b || !S) return;
-    const mx = mgMulMax(); b.hidden = mx <= 1;
-    b.textContent = '×' + mgMul(); b.classList.toggle('on', mgMul() > 1); b.classList.toggle('new', !!S.mg.mulNew && mx > 1);
-    b.setAttribute('aria-label', `에너지 배수 ×${mgMul()}, 눌러서 바꾸기 (최대 ×${mx})`);
-    const md = $('#mgMode'); if (md) { md.hidden = mx <= 1; md.textContent = S.mg.mm ? '합쳐서 1개' : `따로 ${mgMul() > 1 ? mgMul() : 'n'}개`; md.classList.toggle('one', !!S.mg.mm); md.setAttribute('aria-label', `만드는 방식: ${md.textContent}, 눌러서 바꾸기`); }
+    const b = $('#mgMuls'), md = $('#mgModes'); if (!b || !md || !S) return;
+    const mx = mgMulMax(), m = mgMul(), key = [mx, m, S.mg.mm, !!S.mg.mulNew].join('|');
+    if (b.dataset.key !== key) {
+      b.dataset.key = key; b.hidden = md.hidden = mx <= 1;
+      const xs = []; for (let x = 1; x <= mx; x++) xs.push(x);
+      b.innerHTML = xs.map(x => `<button type="button" data-mul="${x}" class="${x === m ? 'on' : ''}${S.mg.mulNew && x === mx ? ' new' : ''}" aria-pressed="${x === m}" aria-disabled="${mgMulOk(x) ? 'false' : 'true'}" aria-label="에너지 ×${x}">×${x}</button>`).join('');
+      md.innerHTML = `<button type="button" data-mm="0" class="${S.mg.mm ? '' : 'on'}" aria-pressed="${!S.mg.mm}">따로 ${m > 1 ? m : 'n'}개</button>` +
+        `<button type="button" data-mm="1" class="one${S.mg.mm ? ' on' : ''}" aria-pressed="${!!S.mg.mm}" aria-disabled="${m === 3 ? 'true' : 'false'}">합쳐서 1개</button>`;
+    }
     if (mx > (S.mg.mulSeen || 1)) { S.mg.mulSeen = mx; S.mg.mulNew = true; save(); mgMulSheet(mx); }
   }
   // 2.3.1 지섭 요청: 배수가 처음 열리면 토스트 대신 설명 창(잘 안 보여서)
   function mgMulSheet(mx) {
     const sh = $('#mgMulSheet'); if (!sh) return;
     $('#mgMulTitle').textContent = `에너지 ×${mx}가 열렸어요!`;
-    $('#mgMulLead').textContent = `에너지 옆 ×단추를 누르면\n생산기를 한 번 누를 때 에너지를 ${mx}까지 써요.\n옆의 방식 단추로 고를 수 있어요.\n따로: 조각이 여러 개 나와요\n합쳐서 1개: 단계가 높은 조각 하나(×2, ×4)`;
+    $('#mgMulLead').textContent = `에너지 옆 ×${mx}를 고르면\n생산기를 한 번 누를 때 에너지를 ${mx}까지 써요.\n아래 줄에서 만드는 방식을 골라요.\n따로: 조각이 여러 개 나와요\n합쳐서 1개: 단계가 높은 조각 하나(×2, ×4)`;   // 3.0.0 두 줄
     $('.mg-mul-pic', sh).textContent = '×' + mx;
     sh.hidden = false; sfx('quest');
   }
@@ -20294,8 +20316,20 @@ span.bt-stamp{display:none}.bt-duel.done span.bt-stamp{display:grid}
     if (mixed) it.push(mgOrderItem(mgPickKind(avoid.concat([k1])), true));
     const who = MG_WHO(); return { it, who: who[Math.floor(Math.random() * who.length)] };
   }
+  // 3.0.0 지섭 요청: 주문을 따라가다 보면 위 단계가 열리게. 주문 MG.UP_EVERY개를 채울 때마다 지금 만든 가장 높은 단계보다 한 단계 위 주문 하나
+  function mgUpOrder(avoid) {
+    const ks = MG_KINDS.filter(k => (S.mg.best[k] || 0) < 10); if (!ks.length) return null;
+    const top = Math.max(...ks.map(k => S.mg.best[k] || 0)), tops = ks.filter(k => (S.mg.best[k] || 0) === top);
+    const pool = tops.filter(k => !avoid.includes(k)).length ? tops.filter(k => !avoid.includes(k)) : tops, k = pool[Math.floor(Math.random() * pool.length)];
+    const who = MG_WHO(); return { it: [{ k, n: Math.min(10, Math.max(2, (S.mg.best[k] || 0) + 1)), c: 1 }], who: who[Math.floor(Math.random() * who.length)], up: 1 };
+  }
   function mgFillOrders() {
-    while (S.mg.orders.length < 3) S.mg.orders.push(mgNewOrder(S.mg.orders.flatMap(mgOrderKinds)));
+    while (S.mg.orders.length < 3) {
+      const av = S.mg.orders.flatMap(mgOrderKinds);
+      const u = S.mg.upq > 0 && !S.mg.orders.some(o => o.up) ? mgUpOrder(av) : null;
+      if (u) S.mg.upq -= 1;
+      S.mg.orders.push(u || mgNewOrder(av));
+    }
   }
   const mgCount = (cells, k, n) => cells.filter(c => c === k + mgLvCh(n)).length;
   const mgOrderOk = o => { const cells = mgCells(); return o.it.every(x => mgCount(cells, x.k, x.n) >= x.c); };
@@ -20332,6 +20366,7 @@ span.bt-stamp{display:none}.bt-duel.done span.bt-stamp{display:grid}
     if (r.up) mgAddUp(r.up);
     if (r.pc) mgBump('#mgPc'); if (r.up) mgBump('#mgUp');
     S.mg.st.orders += 1;
+    if (S.mg.st.orders % MG.UP_EVERY === 0) S.mg.upq = Math.min(3, (S.mg.upq || 0) + 1);   // 3.0.0 한 단계 위 주문
     const tk = S.mg.st.orders % TKE.mgEvery === 0 ? tkDaily('mg') : null;   // 2.3.0.1 주문 5개마다 5분권 1장(하루 3장)
     const xp = mgArtXp(o);   // 2.1.3 미술 XP는 주문에 든 에너지로(에너지 6마다 1, 하루 100까지)
     S.mg.orders.splice(i, 1); mgFillOrders();
@@ -20348,6 +20383,7 @@ span.bt-stamp{display:none}.bt-duel.done span.bt-stamp{display:grid}
     if (!S.mg.orders[i]) return false;
     if (mgSwapLeft() > 0) { toast(`${Math.ceil(mgSwapLeft() / 60000)}분 뒤에 바꿀 수 있어요`); return false; }
     S.mg.swapAt = gameNow();
+    if (S.mg.orders[i].up) S.mg.upq = Math.min(3, (S.mg.upq || 0) + 1);   // 3.0.0 한 단계 위 주문을 바꿔도 다음에 다시 와요
     S.mg.orders[i] = mgNewOrder(S.mg.orders.flatMap(mgOrderKinds));   // 지금 주문의 종류도 피해서 다른 것이 나오게
     sfx('tap');
     mgRenderOrders(); mgRenderBoard(); save();
@@ -20435,7 +20471,7 @@ span.bt-stamp{display:none}.bt-duel.done span.bt-stamp{display:grid}
     $('#mgPc').textContent = m.pieces; $('#mgUp').textContent = m.up;
     mgRenderMul();
     const ad = $('#mgAdBtn'), left = mgAdLeft();
-    ad.innerHTML = `광고 +${MG.AD.e}<small>${left}/${MG.AD.n}</small>`;
+    ad.innerHTML = `▷ 에너지 +${MG.AD.e}<small>${left}/${MG.AD.n}</small>`;   // 3.0.0 지섭 요청
     ad.setAttribute('aria-disabled', left > 0 ? 'false' : 'true');
   }
   function mgRenderOrders() {
@@ -20445,7 +20481,7 @@ span.bt-stamp{display:none}.bt-duel.done span.bt-stamp{display:grid}
       const ok = mgOrderOk(o), r = mgOrderReward(o), img = IMG('chr_' + o.who);
       // 2.1.0: 그림 아래는 그 조각의 레벨, 필요한 개수는 그림 위 따로(지섭 요청: 숫자가 헷갈리지 않게)
       const its = o.it.map(x => { const h = Math.min(x.c, mgCount(cells, x.k, x.n)), got = h >= x.c; return `<span class="mo-one${got ? ' got' : ''}">${mgTileHtml(x.k + mgLvCh(x.n))}<small>Lv.${x.n}</small><em class="mo-cnt" aria-label="${x.c}개 필요, ${h}개 있음">${got ? '✔ ' : ''}${x.c}개</em></span>`; }).join('<i class="mo-plus">+</i>');
-      return `<button class="mg-order${ok ? ' ok' : ''}${o.it.length > 1 ? ' two' : ''}" type="button" data-order="${i}" aria-label="${mgOrderText(o)} 주문${ok ? ', 눌러서 건네기' : ''}">` +
+      return `<button class="mg-order${ok ? ' ok' : ''}${o.it.length > 1 ? ' two' : ''}${o.up ? ' up' : ''}" type="button" data-order="${i}" aria-label="${o.up ? '새 단계 ' : ''}${mgOrderText(o)} 주문${ok ? ', 눌러서 건네기' : ''}">` +
         `<span class="mo-who" style="${img ? `--mo-img:url('${img}')` : ''}"></span><span class="mo-it">${its}</span>` +
         `<span class="mo-n">${ok ? '건네기' : '주문'}</span><span class="mo-rw">${acornIcon()}${fmt(r.a)}${r.pc ? ` 💎${r.pc}` : ''}${r.up ? ' 🔑' : ''}</span>` +
         `<span class="mo-swap" data-swap="${i}" title="다른 주문으로" ${can ? '' : 'hidden'} role="button" aria-label="다른 주문으로 바꾸기">↻</span></button>`;
@@ -20549,6 +20585,11 @@ span.bt-stamp{display:none}.bt-duel.done span.bt-stamp{display:grid}
     $('#mgUpYes').setAttribute('aria-disabled', S.mg.up >= cost ? 'false' : 'true');
     $('#mgUpSheet').hidden = false;
   }
+  function mgAdAsk() {
+    const left = mgAdLeft();
+    if (left <= 0) { toast('오늘 광고 에너지는 다 받았어요'); return; }
+    askBox({ title: '광고를 볼까요?', text: `광고를 보고 에너지 ${MG.AD.e}을 받아요\n오늘 ${left}번 더 볼 수 있어요`, onYes: () => mgWatchAd() });
+  }
   function mgWatchAd() {
     if (mgAdLeft() <= 0) { toast('오늘 광고 에너지는 다 받았어요'); return; }
     showAd(() => { mgAdLeft(); S.mg.ad.n += 1; mgAddEnergy(MG.AD.e); save(); mgRenderTop(); toast(`에너지 +${MG.AD.e}`); }, r => { if (r !== 'noad') toast('광고를 끝까지 보지 않아서 에너지가 없어요'); });
@@ -20635,10 +20676,10 @@ span.bt-stamp{display:none}.bt-duel.done span.bt-stamp{display:grid}
     $('#mgOpen').addEventListener('click', () => { sfx('tap'); if (liveOff('merge')) { toast('숲속 합치기는 잠시 점검 중이에요. 조금만 기다려 주세요'); return; } mgOpen(); });
     $('#mgBack').addEventListener('click', () => { sfx('tap'); mgClose(); });
     $('#mgHelpOk').addEventListener('click', () => { S.mg.seen = true; $('#mgHelp').hidden = true; save(); });
-    $('#mgMul').addEventListener('click', mgMulTap);
-    $('#mgMode').addEventListener('click', mgModeTap);   // 2.3.1
+    $('#mgMuls').addEventListener('click', e => { const t = e.target.closest('[data-mul]'); if (t) mgPickMul(+t.dataset.mul); });   // 3.0.0
+    $('#mgModes').addEventListener('click', e => { const t = e.target.closest('[data-mm]'); if (t) mgPickMode(+t.dataset.mm); });
     $('#mgMulOk').addEventListener('click', () => { $('#mgMulSheet').hidden = true; });
-    $('#mgAdBtn').addEventListener('click', () => { sfx('tap'); mgWatchAd(); });
+    $('#mgAdBtn').addEventListener('click', () => { sfx('tap'); mgAdAsk(); });   // 3.0.0 지섭 요청: 바로 광고 대신 확인 창 먼저
     $('#mgOrders').addEventListener('click', e => {
       const sw = e.target.closest('[data-swap]'); if (sw) { e.stopPropagation(); mgSwapOrder(+sw.dataset.swap); return; }
       const b = e.target.closest('[data-order]'); if (!b) return;
@@ -20823,7 +20864,7 @@ span.bt-stamp{display:none}.bt-duel.done span.bt-stamp{display:grid}
   }
 
   // 시험용 손잡이: 자동 시험(window.__FOREST_TEST)에서만 게임 속 함수를 꺼내 써요
-  if (window.__FOREST_TEST) window.__forest = { get S() { return S; }, goTo, sportsCon, festCon, btQuota, btCanAd, btAdMore, warmRooms, blobUrl, vdSize, vdBlock, pzSweep, pzSwGain, pzSwOpen, pzXpOf, mgMulMax, mgMulOk, mgMul, mgModeTap, acTip, kidDupIdx, trialSafe, closeAd,
+  if (window.__FOREST_TEST) window.__forest = { get S() { return S; }, goTo, mgPickMul, mgPickMode, mgUpOrder, mgFillOrders, mgAdAsk, sportsCon, festCon, btQuota, btCanAd, btAdMore, warmRooms, blobUrl, vdSize, vdBlock, pzSweep, pzSwGain, pzSwOpen, pzXpOf, mgMulMax, mgMulOk, mgMul, mgModeTap, acTip, kidDupIdx, trialSafe, closeAd,
     TKE, TK_Q, tkDaily, nbAllDay, nbBuildAt, nbOn, conAdd, BX_SPOT, PERKS, offlineCapH, applyAway, pzFinish, mgClaimOrder,
     NSL, nsStart, nsSettle, nsOpen, nsOn, nsOverlap, nsExtraH, isNight, nightDayOf, openNs, renderNs, bxSpots, renderNight,   // 3.0.0
    conOn, conLeft, conTick, conSec, conFinish, tkPlan, tkUse, tkUseAll, TK, CON, TKAD, capNext, yearCap,   // 2.1.0 공사
