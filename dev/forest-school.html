@@ -1809,6 +1809,9 @@ body{background:radial-gradient(120% 60% at 50% 0%, color-mix(in srgb, var(--pap
 /* ===== 홈 UI 정리 BEGIN ===== (art/ui_cleanup 명세. 홈 화면(.app.on-school)에만 적용하고, 정보와 동작은 그대로 두고 묶음과 정렬만 바꿔요)
    색은 design-tokens.css 참고값을 기존 밝은/어두운/시스템 테마에 이어요 */
 :root{--home-paper:#FFF9E9;--home-paper-edge:#E4D4AC;--home-ink:#183C2E;--home-muted:#5F604C;--home-forest:#244E3E;--home-forest-deep:#173C2C;--home-on-forest:#FFF9E9;--home-on-forest-muted:#C8D6C3;--home-gold:#F4C144;--home-gold-ink:#3C2B06;--home-selected:#D7E5B8;--home-selected-ink:#183C2E;--home-alert:#C74D3E;--home-plaque-line:#6E9A5E;--home-panel-shadow:0 3px 9px rgb(20 40 25 / 15%)}
+.app .board[data-thf]{--home-forest:var(--th-forest);--home-forest-deep:var(--th-forest-deep)}   /* 3.0.0 테마 색 도토리 칸 */
+:root[data-theme="dark"] .app .board[data-thf]{--home-forest:color-mix(in srgb,var(--th-forest) 72%,#000);--home-forest-deep:color-mix(in srgb,var(--th-forest-deep) 72%,#000)}
+@media (prefers-color-scheme: dark){:root:not([data-theme="light"]) .app .board[data-thf]{--home-forest:color-mix(in srgb,var(--th-forest) 72%,#000);--home-forest-deep:color-mix(in srgb,var(--th-forest-deep) 72%,#000)}}
 :root[data-theme="dark"]{--home-paper:#20392F;--home-paper-edge:#526449;--home-ink:#F4F1DF;--home-muted:#C2C8B5;--home-forest:#17382A;--home-forest-deep:#10281F;--home-selected:#426344;--home-selected-ink:#FFF9E9;--home-plaque-line:#8DBB78}
 @media (prefers-color-scheme: dark){:root:not([data-theme="light"]){--home-paper:#20392F;--home-paper-edge:#526449;--home-ink:#F4F1DF;--home-muted:#C2C8B5;--home-forest:#17382A;--home-forest-deep:#10281F;--home-selected:#426344;--home-selected-ink:#FFF9E9;--home-plaque-line:#8DBB78}}
 
@@ -11913,7 +11916,7 @@ span.bt-stamp{display:none}.bt-duel.done span.bt-stamp{display:grid}
     const bgT = THEME[S.cos.th.bg];
     // 지도 크기와 위치(fitMap)는 그대로 두고 테마 색만 지워요
     for (const T of THEMES) for (const k of Object.keys(T.bg)) map.style.removeProperty(k);
-    board.removeAttribute('style');
+    board.removeAttribute('style'); board.removeAttribute('data-thf');
     document.body.classList.toggle('th-bg', !!bgT);
     document.body.style.setProperty('--th-bg', bgT ? bgT.page : '');
     setMapArt(); setSeasonArt();   // 1.7.0 테마 지도와 겨울 건물, 계절 참나무
@@ -11928,6 +11931,8 @@ span.bt-stamp{display:none}.bt-duel.done span.bt-stamp{display:grid}
     if (bgT) {
       for (const [k, v] of Object.entries(bgT.bg)) map.style.setProperty(k, v);
       board.style.setProperty('--board', bgT.board); board.style.setProperty('--board-line', bgT.boardLine);
+      // 3.0.0 지섭 요청: 위쪽 도토리 칸(초록 고정)도 테마 칠판 색으로
+      board.style.setProperty('--th-forest', bgT.board); board.style.setProperty('--th-forest-deep', `color-mix(in srgb, ${bgT.board} 75%, #000)`); board.setAttribute('data-thf', '');
     }
     for (const [slot] of TH_SLOTS) {
       if (slot === 'bg') continue;
