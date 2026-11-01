@@ -539,6 +539,9 @@ label.srow,button.srow{cursor:pointer}
 .th-card{margin:0 0 10px;padding:10px 10px 10px;border-radius:16px;background:color-mix(in srgb, var(--card) 55%, var(--bg))}
 .th-card.done{box-shadow:inset 0 0 0 2px var(--accent)}
 .th-top{display:flex;align-items:center;justify-content:space-between;gap:8px;margin:0 2px 2px}
+.th-prev{margin-right:auto}
+.th-prevbar{position:fixed;left:12px;right:12px;max-width:456px;margin:0 auto;top:auto;height:auto;bottom:calc(150px + env(safe-area-inset-bottom,0px));z-index:22;display:flex;align-items:center;gap:8px;padding:8px 10px;border-radius:16px;background:rgba(36,78,62,.94);color:#FFF9E9;box-shadow:0 4px 12px rgba(0,0,0,.25)}
+.th-prevbar[hidden]{display:none}.th-prevbar>span{flex:1;min-width:0;display:flex;flex-direction:column;line-height:1.3}.th-prevbar b{font-size:14px}.th-prevbar small{font-size:11px;color:#CFE0C8}.th-prevbar .cta{flex:none;width:auto;min-height:36px;padding:0 12px;white-space:nowrap}.th-play:not(.th-prev){margin-right:0}
 .th-play{margin-right:auto;min-height:30px;padding:0 10px;border:1.5px solid var(--line);border-radius:999px;background:var(--card);color:var(--chip-ink);font:inherit;font-size:12.5px;cursor:pointer}
 .th-play.on{border-color:var(--accent);background:color-mix(in srgb, var(--accent) 18%, var(--card))}
 .th-top b{font-family:var(--font-display);font-weight:400;font-size:16px;color:var(--ink)}
@@ -3119,6 +3122,7 @@ span.bt-stamp{display:none}.bt-duel.done span.bt-stamp{display:grid}
       <div class="fallfx" id="fallFx" hidden aria-hidden="true"></div>
       <div class="danger-fx" aria-hidden="true"></div>
       <div class="fever-fx" id="feverFx" hidden aria-hidden="true"><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i></div>
+      <div class="th-prevbar" id="thPrevBar" hidden role="status"><span><b id="thPrevName">테마 미리 보기</b><small>♪ 테마 곡, 지도, 건물 색을 미리 봐요</small></span><button class="cta small" type="button" id="thPrevBack">상점으로 돌아가기</button></div><!-- 3.0.0 테마 미리 보기 -->
       <div class="sportsbar festbar" id="festBar" hidden role="status" aria-live="off"><span id="fbName">행사</span><span class="sb-t"><b id="fbN">0/0</b></span><span class="sb-t"><b id="fbT">30</b>초</span></div>
       <div class="sportsbar" id="sportsBar" hidden role="status" aria-live="off"><span class="sb-b">청팀 <b id="spBlue">0</b></span><span class="sb-t"><b id="spTime">40</b>초</span><span class="sb-w"><b id="spWhite">0</b> 백팀</span></div>
       <!-- 2.0.0 학교급 모습 보기: 동그라미 6개와 지난 학교급 지도 -->
@@ -6873,15 +6877,18 @@ span.bt-stamp{display:none}.bt-duel.done span.bt-stamp{display:grid}
     return p;
   }
   const HOME_MUSIC_TABS = new Set(['school', 'teachers', 'quests', 'rank', 'dex', 'event', 'hall', 'club', 'settings', 'mini', 'grad']);   // 2.3.1 지섭: 공부 탭과 졸업 탭도 홈 곡, 쉬는 시간 곡은 상점에서만   // 2.0.0 학교 복도와 동아리실, 설정(2026-10-27 지섭)도 홈 곡
+  // 3.0.0 테마 세트 미리 보기: 저장(S.cos.th)은 그대로 두고 화면만 미리 보는 테마로 그려요
+  const thOn = () => (rt.thPrev ? rt.thPrev.th : S.cos.th);
   function musicWant() {
     if (!S || rt.paused || rt.adOpen) return '';   // 2.3.1 광고 중에는 배경음악을 틀지 않아요
     if (Music.preview && rt.tab === 'shop') return Music.preview;
+    if (rt.thPrev && SONGS[rt.thPrev.id]) return rt.thPrev.id;   // 3.0.0 미리 보기 중에는 그 테마 곡
     if (!S.bgm) return '';
     if (rt.fest || rt.sports) return 'festival';
     let play = false; try { play = !!((pzUI && pzUI.open) || (mgUI && mgUI.open) || (btUI && btUI.open)); } catch (e) { /* 퍼즐과 합치기가 아직 준비 전 */ }   // 1.8.0: 숲속 합치기도 미니게임 곡
     if (play) return 'play';
     // 1.7.4 지섭 결정: 곡이 자주 바뀌지 않게 홈에서 여는 탭(선생님, 퀘스트, 랭킹, 도감, 이벤트)도 홈 곡 그대로
-    if (HOME_MUSIC_TABS.has(rt.tab)) return THEME_MUSIC && SONGS[S.cos.th.bg] ? S.cos.th.bg : 'home';
+    if (HOME_MUSIC_TABS.has(rt.tab)) return THEME_MUSIC && SONGS[thOn().bg] ? thOn().bg : 'home';
     return 'room';
   }
   // 곡을 바꿀 때는 지금 곡을 살짝 줄이고 새 곡을 키워요
@@ -7094,14 +7101,14 @@ span.bt-stamp{display:none}.bt-duel.done span.bt-stamp{display:grid}
   };
   // 1.7.0 겨울 그림: 겨울 눈꽃과 크리스마스 배경 테마면 건물과 공사 자리를 눈 덮인 그림(_winter)으로, 참나무는 계절 그림(oak_봄, 가을, 겨울, 크리스마스)으로.
   // 겨울 그림이면 지붕 조각도 겨울 그림에서 오린 것(roof_*_winter)을 써요. 그림이 없으면 원래 그림 그대로예요
-  const winterOn = () => !!(S && S.cos && S.cos.th && (S.cos.th.bg === 'winter' || S.cos.th.bg === 'xmas'));
+  const winterOn = () => !!(S && S.cos && S.cos.th && (thOn().bg === 'winter' || thOn().bg === 'xmas'));
   const seasonKey = key => winterOn() && has170(key + '_winter') ? key + '_winter' : key;
   const roofArtKey = k => {
     const rk = roofKey(k); if (!rk || seasonKey(bldImg(k)) === bldImg(k)) return rk;
     const wk = rk + '_winter';
     return has170(wk) ? wk : '';
   };
-  const oakKey = () => { const id = S && S.cos && S.cos.th && S.cos.th.bg; return id && has170('oak_' + id) ? 'oak_' + id : 'oak'; };
+  const oakKey = () => { const id = S && S.cos && S.cos.th && thOn().bg; return id && has170('oak_' + id) ? 'oak_' + id : 'oak'; };
   function setBldArt(k) {
     const g = $('#b-' + k); if (!g || !geo().lot[k]) return;
     const key = seasonKey(bldImg(k)), G = geo(), [bx, by, bw] = lotRect(G.lot[k], key);
@@ -7118,7 +7125,7 @@ span.bt-stamp{display:none}.bt-duel.done span.bt-stamp{display:grid}
     const oak = $('.oak-img'); if (oak) oak.setAttribute('href', IMG170(oakKey()) || IMG('deco_autumn_1'));
   }
   // 1.7.0 테마 지도: 배경 테마(봄, 여름, 가을, 겨울, 크리스마스)를 고르면 지도 그림도 그 계절 모습으로 바꿔요. 그림이 없는 테마는 기본 지도
-  const mapKey = base => { const id = S && S.cos && S.cos.th && S.cos.th.bg; if (ART_FB[base] && !has170(base) && !IMG(base)) base = ART_FB[base]; return id && has170(`${base}_${id}`) ? `${base}_${id}` : base; };
+  const mapKey = base => { const id = S && S.cos && S.cos.th && thOn().bg; if (ART_FB[base] && !has170(base) && !IMG(base)) base = ART_FB[base]; return id && has170(`${base}_${id}`) ? `${base}_${id}` : base; };
   // 1.8.0 지도 고화질: 게임 안 지도는 480×720이라 확대하면 흐려요. 게임 옆 img/maps 폴더의 원본 크기(1024×1536) 그림을 받아 다 오면 바꿔 끼워요.
   // 파일이 없거나 늦으면 게임 안 그림을 그대로 써요(곡 파일과 같은 방식)
   const IMG_BASE = () => window.FS_IMG_BASE || 'img/';
@@ -11626,7 +11633,7 @@ span.bt-stamp{display:none}.bt-duel.done span.bt-stamp{display:grid}
   }
   function applyThemes() {
     const map = $('#map'), board = $('.board');
-    const bgT = THEME[S.cos.th.bg];
+    const bgT = THEME[thOn().bg];   // 3.0.0 미리 보기 중에는 미리 보는 테마
     // 지도 크기와 위치(fitMap)는 그대로 두고 테마 색만 지워요
     for (const T of THEMES) for (const k of Object.keys(T.bg)) map.style.removeProperty(k);
     board.removeAttribute('style'); board.removeAttribute('data-thf');
@@ -11649,7 +11656,7 @@ span.bt-stamp{display:none}.bt-duel.done span.bt-stamp{display:grid}
     }
     for (const [slot] of TH_SLOTS) {
       if (slot === 'bg') continue;
-      const g = $('#b-' + slot), t = THEME[S.cos.th[slot]];
+      const g = $('#b-' + slot), t = THEME[thOn()[slot]];
       g.removeAttribute('style');
       let deco = g.querySelector('.th-deco');
       if (!deco) {
@@ -11696,7 +11703,7 @@ span.bt-stamp{display:none}.bt-duel.done span.bt-stamp{display:grid}
     for (const t of THEMES) {
       const n = thCount(t.id), done = n === TH_SLOTS.length;
       const playing = Music.preview === t.id;
-      h += `<div class="th-card${done ? ' done' : ''}"><div class="th-top"><b>${t.name}</b><button${THEME_MUSIC ? '' : ' hidden'} class="th-play${playing ? ' on' : ''}" type="button" data-play="${t.id}" aria-pressed="${playing}">${playing ? '♪ 듣는 중' : '♪ 테마 곡 듣기'}</button><span class="th-prog">${done ? '가졌어요' : n ? n + '/' + TH_SLOTS.length : ''}</span></div>` +
+      h += `<div class="th-card${done ? ' done' : ''}"><div class="th-top"><b>${t.name}</b><button${THEME_MUSIC ? '' : ' hidden'} class="th-play${playing ? ' on' : ''}" type="button" data-play="${t.id}" aria-pressed="${playing}">${playing ? '♪ 듣는 중' : '♪ 테마 곡 듣기'}</button><button class="th-play th-prev" type="button" data-thprev="${t.id}">미리 보기</button><span class="th-prog">${done ? '가졌어요' : n ? n + '/' + TH_SLOTS.length : ''}</span></div>` +
         (done ? '' : (() => { const p = thSetPrice(t.id), poor = S.gold < p;
           return `<button class="th-all${poor ? ' poor' : ''}" type="button" data-buy="s:${t.id}"><span>${n ? `남은 ${TH_SLOTS.length - n}칸까지 세트로 사기` : '세트 사기'}${thOwn(t.id, 'bg') ? ` <small>배경 산 값 ${GSHOP.themeBgOff} 빼 줌</small>` : ''}</span><b>${thOwn(t.id, 'bg') ? `<s>${GSHOP.theme}</s>` : ''}${coin}${p}</b></button>`; })()) +
         (() => { const own = TH_SLOTS.filter(([sl]) => thOwn(t.id, sl)), on = own.every(([sl]) => S.cos.th[sl] === t.id);
@@ -11748,12 +11755,29 @@ span.bt-stamp{display:none}.bt-duel.done span.bt-stamp{display:grid}
     $('#btnShop').setAttribute('aria-label', `꾸미기 백화점, 황금 도토리 ${fmt(S.gold)}개`);
   }
   // 꾸민 모습을 학교에 입혀요: 학생 소품은 학생을 다시 그리고, 지붕과 칠판은 색 이름표를 바꿔요
+  /* 3.0.0 지섭 요청: 테마 세트를 사기 전에 지도, 건물 지붕과 벽 색, 테마 곡이 어떻게 바뀌는지 홈 지도에서 미리 봐요.
+     저장(S.cos.th)은 바꾸지 않고 rt.thPrev로만 그려요. 다른 탭으로 가거나 '돌아가기'를 누르면 끝나요 */
+  function thPreview(id) {
+    const T = THEME[id]; if (!T) return;
+    const th = {}; for (const [sl] of TH_SLOTS) th[sl] = id;
+    rt.thPrev = { id, th }; Music.preview = '';
+    sfx('tap'); setTab('school'); applyCos(); ensureAudio(true); musicSync();
+    const b = $('#thPrevBar');
+    if (b) { $('#thPrevName').textContent = `${T.name} 세트 미리 보기`; b.hidden = false; }
+    if (!S.bgm && SONGS[id]) toast('미리 보기 곡만 나와요\n배경음악은 설정에서 켤 수 있어요');
+  }
+  function thPreviewEnd(quiet) {
+    if (!rt.thPrev) return;
+    rt.thPrev = null; const b = $('#thPrevBar'); if (b) b.hidden = true;
+    applyCos(); musicSync();
+    if (!quiet) { openShop(); }
+  }
   function applyCos() {
     rt.kids.forEach(k => { k.g.innerHTML = kidSVG(k.rare ? k.sp + '_rare' : k.sp, k.bag); });
     rt.bdHatK = null; rt.elBadgeT = '';   // 2.1.1 생일 고깔과 반장 배지는 다음 틱에 다시
     const map = $('#map');
     applyThemes();
-    const bgT = THEME[S.cos.th.bg];
+    const bgT = THEME[thOn().bg];
     const fx = $('#fallFx'), kind = bgT ? bgT.fx : '';
     if (fx.dataset.kind !== kind) {
       fx.dataset.kind = kind;
@@ -17755,6 +17779,7 @@ span.bt-stamp{display:none}.bt-duel.done span.bt-stamp{display:grid}
   function shake(el) { el.classList.remove('shake'); void el.offsetWidth; el.classList.add('shake'); el.addEventListener('animationend', () => el.classList.remove('shake'), { once: true }); setTimeout(() => el.classList.remove('shake'), 900); sfx('deny'); }
   function setTab(t) {
     const prev = rt.tab;
+    if (rt.thPrev && t !== 'school') thPreviewEnd(true);   // 3.0.0 다른 탭으로 가면 미리 보기를 끝내요
     rt.tab = t;
     const tabOn = t === 'shop' || t === 'ess' || t === 'deco' ? 'street' : t;   // 1.7.2: 가게 안에 있어도 아래 '상점' 탭이 켜져 있어요
     $$('.tab').forEach(b => b.setAttribute('aria-selected', b.dataset.tab === tabOn ? 'true' : 'false'));
@@ -18108,6 +18133,7 @@ span.bt-stamp{display:none}.bt-duel.done span.bt-stamp{display:grid}
     $('#mTalk').addEventListener('click', () => talkNext());
     $('#mDecoPick .backdrop').addEventListener('click', () => closeModal($('#mDecoPick')));
     $('#btnShop').addEventListener('click', () => { if (!rt.paused && !rt.modalOpen) { sfx('tap'); openShop(); } });
+    $('#thPrevBack').addEventListener('click', () => { sfx('tap'); thPreviewEnd(false); });   // 3.0.0
     $('#shopList').addEventListener('click', e => {
       const ap = e.target.closest('[data-apply]');
       if (ap) {
@@ -18117,6 +18143,8 @@ span.bt-stamp{display:none}.bt-duel.done span.bt-stamp{display:grid}
         sfx('tap'); applyCos(); save(); renderShop();
         return;
       }
+      const pv = e.target.closest('[data-thprev]');
+      if (pv) { thPreview(pv.dataset.thprev); return; }   // 3.0.0
       const p = e.target.closest('[data-play]');
       if (p) {
         Music.preview = Music.preview === p.dataset.play ? '' : p.dataset.play;
@@ -20574,7 +20602,7 @@ span.bt-stamp{display:none}.bt-duel.done span.bt-stamp{display:grid}
   }
 
   // 시험용 손잡이: 자동 시험(window.__FOREST_TEST)에서만 게임 속 함수를 꺼내 써요
-  if (window.__FOREST_TEST) window.__forest = { get S() { return S; }, goTo, busScene, tripCrowd, openTrip, mgPickMul, mgPickMode, mgUpOrder, mgFillOrders, mgAdAsk, sportsCon, festCon, btQuota, btCanAd, btAdMore, warmRooms, blobUrl, vdSize, vdBlock, pzSweep, pzSwGain, pzSwOpen, pzXpOf, mgMulMax, mgMulOk, mgMul, mgModeTap, acTip, kidDupIdx, trialSafe, closeAd,
+  if (window.__FOREST_TEST) window.__forest = { get S() { return S; }, goTo, openShop, thPreview, thPreviewEnd, thOn, busScene, tripCrowd, openTrip, mgPickMul, mgPickMode, mgUpOrder, mgFillOrders, mgAdAsk, sportsCon, festCon, btQuota, btCanAd, btAdMore, warmRooms, blobUrl, vdSize, vdBlock, pzSweep, pzSwGain, pzSwOpen, pzXpOf, mgMulMax, mgMulOk, mgMul, mgModeTap, acTip, kidDupIdx, trialSafe, closeAd,
     TKE, TK_Q, tkDaily, nbAllDay, nbBuildAt, nbOn, conAdd, BX_SPOT, PERKS, offlineCapH, applyAway, pzFinish, mgClaimOrder,
    conOn, conLeft, conTick, conSec, conFinish, tkPlan, tkUse, tkUseAll, TK, CON, TKAD, capNext, yearCap,   // 2.1.0 공사
     semOn, semFirst, semLabel, cereDip, semBreak,   // 2.1.0 학기(s80)
