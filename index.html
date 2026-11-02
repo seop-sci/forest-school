@@ -3476,6 +3476,7 @@ span.bt-stamp{display:none}.bt-duel.done span.bt-stamp{display:grid}
         <button class="srow" type="button" id="optAcct" hidden><span class="txt"><b id="acctTitle">구글 계정 연결</b><small id="acctSub">연결해 두면 휴대폰을 바꿔도 같은 학교를 이어 해요</small></span><svg viewBox="0 0 24 24" width="20" height="20" aria-hidden="true"><path d="M9 6l6 6-6 6" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"/></svg></button>
         <button class="srow" type="button" id="optPLetter"><span class="txt"><b>학부모 편지함</b><small id="plSub">까치 우체부가 학부모 편지를 가져와요</small></span><svg viewBox="0 0 24 24" width="20" height="20" aria-hidden="true"><path d="M9 6l6 6-6 6" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"/></svg></button><!-- 2.1.3 -->
         <button class="srow" type="button" id="optNotice"><img class="srow-ic" id="ntIc" alt="" hidden><span class="txt"><b>공지사항<i class="nt-dot" id="ntDot" hidden></i></b><small id="ntSub">업데이트 소식과 알림을 봐요</small></span><svg viewBox="0 0 24 24" width="20" height="20" aria-hidden="true"><path d="M9 6l6 6-6 6" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"/></svg></button>
+        <button class="srow" type="button" id="optAdPrivacy" hidden><span class="txt"><b>광고 개인정보 설정</b><small>광고 개인정보 선택을 확인하고 바꿔요</small></span></button>
         <button class="srow" type="button" id="optTut"><span class="txt"><b>튜토리얼</b><small id="tutSub">학교를 꾸려 가는 방법을 다시 봐요</small></span><svg viewBox="0 0 24 24" width="20" height="20" aria-hidden="true"><path d="M9 6l6 6-6 6" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"/></svg></button>
         <div class="srow" id="bakRow"><span class="txt"><b>예전 학교 되돌리기</b><small>바뀌거나 덮이기 전 학교를 3개까지 남겨 둬요</small></span><button class="btn-sub" type="button" id="optBak">보기</button></div><!-- 2.2.0 -->
         <div class="srow" id="resetRow"><span class="txt"><b>처음부터 다시</b><small>수료증과 전학 온 친구들까지 모두 지워요</small></span><button class="btn-danger" type="button" id="optReset">초기화</button></div>
@@ -18646,6 +18647,9 @@ span.bt-stamp{display:none}.bt-duel.done span.bt-stamp{display:grid}
     $('#tutAv').innerHTML = hedgehogAvatar();
     $('#optTut').addEventListener('click', () => { if (!rt.modalOpen) tutStart(S.tut.st === 'later' ? S.tut.step : 0); });
     $('#optNotice').addEventListener('click', () => { sfx('tap'); if (!rt.modalOpen) openNotice(false); });   // 2.0.0 공지
+    const syncAdPrivacy = () => { const a = window.FOREST_ADS; $('#optAdPrivacy').hidden = !(a && typeof a.privacyRequired === 'function' && a.privacyRequired()); };
+    window.addEventListener('forest-ad-privacy', syncAdPrivacy); syncAdPrivacy();
+    $('#optAdPrivacy').addEventListener('click', async () => { const a = window.FOREST_ADS; if (!a || typeof a.privacyOptions !== 'function') return; $('#optAdPrivacy').disabled = true; try { await a.privacyOptions(); } finally { $('#optAdPrivacy').disabled = false; syncAdPrivacy(); } });
     $('#ntClose').addEventListener('click', () => closeModal($('#mNotice')));
     $('[data-close-notice]').addEventListener('click', () => closeModal($('#mNotice')));
     $('#ntHide').addEventListener('click', () => { S.nt.hide = Date.now() + NT_HIDE; save(); closeModal($('#mNotice')); toast('일주일 동안 공지 창을 열지 않아요. 설정 > 공지사항에서 언제든 볼 수 있어요'); });
