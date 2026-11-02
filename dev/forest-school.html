@@ -502,7 +502,7 @@ label.srow,button.srow{cursor:pointer}
 .modal.wide{max-width:440px;max-height:100%;display:flex;flex-direction:column}
 .stats-list{list-style:none;flex:1 1 auto;min-height:0;overflow-y:auto;overscroll-behavior:contain;margin:6px -4px 0;padding:0 4px;display:grid;gap:6px;align-content:start;text-align:left}
 .st-row{padding:9px 12px;border-radius:14px;background:var(--card);font-size:12.5px;line-height:1.5;color:var(--muted)}
-.st-top{display:flex;align-items:center;gap:6px;min-width:0}
+.st-top{display:flex;align-items:center;gap:6px;min-width:0}.st-top .st-look{flex:none;padding:3px 10px;font-size:12px;min-height:0}   /* 3.0.0 관리자 학교 보기 */
 .st-top b{min-width:0;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;font-family:var(--font-display);font-weight:400;font-size:16px;color:var(--ink)}
 .st-top .rk-tag{flex:none;padding:0 6px;border-radius:6px;font-size:11px;line-height:1.7;background:var(--chip-bg);color:var(--chip-ink)}
 .st-top .rk-tag.me{background:var(--accent);color:var(--accent-ink)}
@@ -11023,6 +11023,25 @@ body.cam-scene #ffChip,body.cam-scene #tierDots,body.cam-scene #plChip{opacity:0
       score: Math.floor(n(d.score, 1e12)), gearn: Math.floor(n(d.gearn, 1e9)), gspent: Math.floor(n(d.gspent, 1e9)), cos: Math.floor(n(d.cos, 999)), dev: !!d.dev, v: typeof d.v === 'string' ? d.v.slice(0, 10) : '', env: ENV_NAME[d.env] || ''
     };
   }
+  /* 3.0.0 지섭 요청: 관리자는 테스트 현황에서 그 테스터의 학교를 구경해요(다른 학교 구경과 같은 보기 전용 화면).
+     서버 규칙이 forest/saves/<id> 읽기를 관리자(forest/adminUids)에게만 열어 줘요. 저장을 읽어 학교 모습만 만들고, 내 학교는 건드리지 않아요 */
+  function adminLookData(raw) {
+    const st = parseSave(raw); if (!st) return null;
+    const keep = S; let doc = null;
+    try { S = st; doc = lookDoc(); } catch (e) { doc = null; } finally { S = keep; }
+    return doc ? lookRead(doc) : null;
+  }
+  async function adminLook(id, name) {
+    if (!rt.isAdmin || !cloudOn()) return;
+    let v = null;
+    try { v = (await waitFor(Cloud.db.ref('forest/saves/' + id).once('value'), CLOUD_WAIT)).val(); }
+    catch (e) { toast(cloudErrKey(e) === 'rules' ? '새 서버 규칙을 게시해야 볼 수 있어요' : '불러오지 못했어요. ' + CLOUD_ERR.net); return; }
+    if (!v || typeof v.d !== 'string') { toast('이 학교는 서버 저장이 없어요'); return; }
+    const data = adminLookData(v.d);
+    if (!data) { toast('학교 모습을 만들지 못했어요'); return; }
+    data.who = `${name || '이름 없는 학교'} (관리자 보기)`;
+    closeModal($('#mStats'), () => { sfx('tap'); setTab('school'); if (rt.decoEdit) decoEditEnd(); rt.lookData = data; rt.viewTier = data.t; rt.viewEdit = false; renderTierView(true); renderTierDots(); });
+  }
   async function loadStats() {
     if (!cloudOn()) return;
     const sum = $('#statsSum'), list = $('#statsList');
@@ -11066,6 +11085,10 @@ body.cam-scene #ffChip,body.cam-scene #tierDots,body.cam-scene #plChip{opacity:0
       tag('#' + r.pid.slice(0, 4));
       if (r.id === Cloud.uid) tag('나', true);
       if (r.dev) tag('테스트 도구');
+      if (rt.isAdmin && r.id !== Cloud.uid) {   // 3.0.0 지섭 요청: 관리자는 그 학교 구경
+        const lk = document.createElement('button'); lk.type = 'button'; lk.className = 'btn-sub small st-look'; lk.textContent = '학교 보기';
+        lk.addEventListener('click', () => adminLook(r.id, r.name)); top.appendChild(lk);
+      }
       const ago = document.createElement('span');
       ago.className = 'ago';
       ago.textContent = agoText(r.seen - Cloud.offset);
@@ -20813,7 +20836,7 @@ body.cam-scene #ffChip,body.cam-scene #tierDots,body.cam-scene #plChip{opacity:0
     TKE, TK_Q, tkDaily, nbAllDay, nbBuildAt, nbOn, conAdd, BX_SPOT, PERKS, offlineCapH, applyAway, pzFinish, mgClaimOrder,
    conOn, conLeft, conTick, conSec, conFinish, tkPlan, tkUse, tkUseAll, TK, CON, TKAD, capNext, yearCap,   // 2.1.0 공사
     semOn, semFirst, semLabel, cereDip, semBreak,   // 2.1.0 학기(s80)
-    get btUI() { return btUI; }, conFreeLeft, ffLeft, FF, TIER_X, conFree, conEss, conEssCost, askConEss, CON, conSec, conBand, CB, cbOn, cbLeft, cbCost, cbApply, cbBuy, conRender, progOf, parseSave, saveSum, bakList, bakAdd, bakAll, askPick, pickKeepLocal, pickLoadSrv, openBak, cloudShouldRestore, get Cloud() { return Cloud; }, CG, CG_FLAGS, cgOpen, cgSync, cgPractice, cgMy, cgTable, cgOppNow, cgHTML, cgNewWeek, renderClub, BX, BX_SPOT, BIO, BIO_BY, bxOpen, bxSync, bxPick, bxOk, bxTap, bxCount, bxRareP, bxMapHTML, bxDexRender, setDexSeg, renderDeco, gdOpen, showReady, GD, GD_CROPS, GD_MENU, GD_M, gdN, gdSync, gdPlant, gdWater, gdHarvest, gdCook, gdMult, gdPct, gdToday, gdReadyN, gdMenuCount, openGd, gdRender, gdMark, nbApply, NB, nbAdd, nbAddOf, nbOn, nbOnAt, nbLeft, nbOverlap, nbApply, nbNotice, conAdd, get Live() { return Live; }, sanitize211, ffCan, ffRender, BTQ, BTQ_SCI, BTQ_KOR, BTQ_COL, btqMake, btqMath, btqPick, btqAnswer, btqMemTap, btqPts, btReveal,   // 2.1.1 대결 종목 문제
+    get btUI() { return btUI; }, adminLookData, conFreeLeft, ffLeft, FF, TIER_X, conFree, conEss, conEssCost, askConEss, CON, conSec, conBand, CB, cbOn, cbLeft, cbCost, cbApply, cbBuy, conRender, progOf, parseSave, saveSum, bakList, bakAdd, bakAll, askPick, pickKeepLocal, pickLoadSrv, openBak, cloudShouldRestore, get Cloud() { return Cloud; }, CG, CG_FLAGS, cgOpen, cgSync, cgPractice, cgMy, cgTable, cgOppNow, cgHTML, cgNewWeek, renderClub, BX, BX_SPOT, BIO, BIO_BY, bxOpen, bxSync, bxPick, bxOk, bxTap, bxCount, bxRareP, bxMapHTML, bxDexRender, setDexSeg, renderDeco, gdOpen, showReady, GD, GD_CROPS, GD_MENU, GD_M, gdN, gdSync, gdPlant, gdWater, gdHarvest, gdCook, gdMult, gdPct, gdToday, gdReadyN, gdMenuCount, openGd, gdRender, gdMark, nbApply, NB, nbAdd, nbAddOf, nbOn, nbOnAt, nbLeft, nbOverlap, nbApply, nbNotice, conAdd, get Live() { return Live; }, sanitize211, ffCan, ffRender, BTQ, BTQ_SCI, BTQ_KOR, BTQ_COL, btqMake, btqMath, btqPick, btqAnswer, btqMemTap, btqPts, btReveal,   // 2.1.1 대결 종목 문제
     SN, SN_ALL, snOpen, snCount, snSync, snMult, snBase, snCost, snPick, snDraw, openSn, snRender, snDexRender, setDexSeg, rate,
     qProg, VD, vdH, vdOpen, vdNeed, vdLeft, vdLocked, vdLive, boostAmount, TKAD, tripCut, achMedal, vdAmt, vdGive, vdUp, openVd, vdRender, vdMapHTML, achTitles, achTitleName, setTitle,
     BF, FR_LINES, frSync, frMake, frOf, frNm, frFull, frHeart, frList, frPat, frGift, frGiftLeft, frAddP, frRename, frHere, frKidTap, frLetter, frTick, bdParty, bdPlace, bdClaim, bdDoneToday, bdRender, bdHats,
