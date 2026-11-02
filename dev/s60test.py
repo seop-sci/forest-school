@@ -70,12 +70,13 @@ async def main():
         if hid is not False: bad.append(f'테마 곡 듣기 단추가 안 보여요: {hid}')
 
         # 4) 파일이 없을 때
-        s = await state("F.S.cos.th.bg = ''; window.__fsAudKeep = window.FS_AUD; window.FS_AUD = null; F.setTab('teachers'); F.pzUI.open = true")
+        s = await state("F.S.cos.th.bg = ''; window.__fsAudKeep = window.FS_AUD; window.FS_AUD = null; window.FS_AUD_BASE = 'data:,'; F.setTab('teachers'); F.pzUI.open = true")
         print('파일 없음', s)
         if s['cur'] != 'play' or s['file'] or not s['synth']: bad.append(f'파일 없음: {s}')
-        await pg.evaluate(f"(() => {{ window.FS_AUD = window.__fsAudKeep; {F}.pzUI.open = false; }})()")
+        await pg.evaluate(f"(() => {{ window.FS_AUD = window.__fsAudKeep; delete window.FS_AUD_BASE; {F}.pzUI.open = false; }})()")
         if errs: bad.append(f'페이지 오류 {errs[:3]}')
         await b.close()
     print('FAIL ' + ' | '.join(bad) if bad else 'PASS')
+    if bad: raise SystemExit(1)
 
 asyncio.run(main())

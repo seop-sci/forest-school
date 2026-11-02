@@ -84,5 +84,6 @@ async def main():
             await ctx.close()
         await b.close()
     print('FAIL ' + ' | '.join(bad) if bad else 'PASS')
+    if bad: raise SystemExit(1)
 
 asyncio.run(main())

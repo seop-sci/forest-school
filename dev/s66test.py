@@ -114,4 +114,5 @@ async def main():
     if bad:
         print('FAIL'); [print(' -', x) for x in bad]
     else: print('PASS')
+    if bad: raise SystemExit(1)
 asyncio.run(main())

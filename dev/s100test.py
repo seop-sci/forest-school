@@ -41,13 +41,13 @@ async def main():
         r = await pg.evaluate("""(() => { const ol = document.querySelector('#qMain .qsteps'); return { fold: ol.classList.contains('fold'), vis: [...ol.querySelectorAll('.qs')].filter(e => e.offsetParent !== null).length, ex: document.querySelector('#qMain .ch-fold').getAttribute('aria-expanded') }; })()""")
         if r['fold'] or r['vis'] < 2 or r['ex'] != 'true': bad.append(f'펼치기 {r}')
         await pg.evaluate(f"{F}.setTab('school')")
-        # 4) 퍼즐과 합치기 단축권(하루 3장)
+        # 4) 퍼즐과 합치기 단축권(하루 1장)
         r = await pg.evaluate(f"""(() => {{ const F = {F}, S = F.S; S.tier = 0; const m0 = S.tk.m5; const got = [];
           for (let i = 0; i < 5; i++) got.push(!!F.pzFinish({{ rw: true, score: 300, ess: 0 }}).tk);
           return {{ got, add: S.tk.m5 - m0, day: S.tkd.pz }}; }})()""")
-        if r['got'] != [True, True, True, False, False] or r['add'] != 3: bad.append(f'퍼즐 단축권 {r}')
+        if r['got'] != [True, False, False, False, False] or r['add'] != 1: bad.append(f'퍼즐 단축권 {r}')
         r = await pg.evaluate(f"""(() => {{ const F = {F}, S = F.S; const m0 = S.tk.m5; let n = 0; for (let i = 0; i < 25; i++) {{ S.mg.st.orders += 1; if (S.mg.st.orders % F.TKE.mgEvery === 0 && F.tkDaily('mg')) n++; }} return {{ n, add: S.tk.m5 - m0 }}; }})()""")
-        if r != {'n': 3, 'add': 3}: bad.append(f'합치기 단축권 {r}')
+        if r != {'n': 1, 'add': 1}: bad.append(f'합치기 단축권 {r}')
         # 5) 숨은 생물 자리: 왼쪽 단추 줄, 오른쪽 단추 줄, 화면 가장자리를 피해요
         r = await pg.evaluate(f"""(() => {{ const L = {F}.BX_SPOT; const bad = []; for (let m = 1; m < L.length; m++) for (const [x, y] of L[m]) {{
           if (x < 11 || x > 91 || (x < 25 && y > 12 && y < 48) || (x > 79 && y < 31) || (x > 48 && y > 71 && y < 85)) bad.push([m, x, y]); }} return bad; }})()""")
@@ -70,5 +70,6 @@ async def main():
         if errs: bad.append(f'페이지 오류 {errs[:3]}')
         await b.close()
     print('\n'.join(bad) if bad else '', 'FAIL' if bad else 'PASS')
+    if bad: raise SystemExit(1)
 
 asyncio.run(main())

@@ -100,7 +100,7 @@ async def main():
               F.openGd(); F.rt.gdPick = 2; F.gdRender(true);
               return { plots: document.querySelectorAll('#gdPlots .gd-plot').length, menus: document.querySelectorAll('#gdMenus .gd-menu').length, can: document.querySelectorAll('#gdMenus .gd-menu.can').length, seeds: document.querySelectorAll('#gdPick button:not([aria-disabled="true"])').length };""")
             print(w, '창', r)
-            ok(r['plots'] == 3 and r['menus'] == 16 and r['can'] >= 2 and r['seeds'] == 6, f'{w} 창 {r}')
+            ok(r['plots'] == 3 and r['menus'] == 17 and r['can'] >= 2 and r['seeds'] == 6, f'{w} 창 {r}')
             await pg.wait_for_timeout(500); await pg.screenshot(path=f's94_garden_{w}.png')
             o = await pg.evaluate(OVER + "('#mGd .modal, #mGd .modal *')"); ok(not o, f'{w} 텃밭 창이 넘쳐요 {o[:5]}')
             # 칸 누르기: 거두기 단추
@@ -113,6 +113,7 @@ async def main():
             await ctx.close()
         await b.close()
     print('PASS' if not bad else f'FAIL {len(bad)}')
+    if bad: raise SystemExit(1)
 
 if __name__ == '__main__':
     asyncio.run(main())
