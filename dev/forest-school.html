@@ -3316,6 +3316,7 @@ span.bt-stamp{display:none}.bt-duel.done span.bt-stamp{display:grid}
       <div class="mini-have"><span class="tic" data-ic="ic_essence" aria-hidden="true"></span><span>숲의 정수</span><b id="essHave">0</b></div>
       <div class="ac-list" id="acList" aria-label="학교 학력"></div>
       <button class="ex-row-btn" type="button" id="exRowBtn" hidden><span class="ex-ic" id="exRowIc" aria-hidden="true"></span><span class="ex-tx"><b id="exRowT">시험 기간</b><small id="exRowS"></small></span><em id="exRowGo">보기</em></button>
+      <button class="ex-row-btn" type="button" id="nsRowBtn" hidden><span class="ex-ic" id="nsRowIc" aria-hidden="true"></span><span class="ex-tx"><b id="nsRowT">야간 자율학습</b><small id="nsRowS"></small></span><em id="nsRowGo">보기</em></button>
       <div class="mini-list">
         <button class="mini-card mini-go" type="button" id="rdCard"><span class="tic" data-ic="ic_book" aria-hidden="true"></span><span class="mc-txt"><b><span class="mc-sub">국어 공부</span>책 읽기</b><small id="rdCardSub">책을 골라 15분 동안 읽어요</small></span><span class="mc-right"><span class="mc-left" id="rdLeftTxt">오늘 3/3권</span><span class="mini-play" id="rdCardTag">고르기</span></span></button>
         <div class="pz-cardw sw-on" id="pzCardW"><!-- 2.3.1 지섭 요청: 소탕은 카드 안 시작하기 단추 아래 -->
@@ -15003,6 +15004,18 @@ span.bt-stamp{display:none}.bt-duel.done span.bt-stamp{display:grid}
     $('#exRowGo').textContent = ready ? '받기' : now && !exStudyDone() ? '자율학습' : '보기';
     b.classList.toggle('todo', ready || (now && !exStudyDone() && S.f.library >= 1));
   }
+  // 3.0.0 공부 탭의 야간 자율학습 줄(기숙사를 지으면 보여요, 지섭 결정 2026-11-02)
+  function renderNsRow() {
+    const b = $('#nsRowBtn'); if (!b) return;
+    b.hidden = !nsOpen(); if (b.hidden) return;
+    const on = nsOn(), used = nsUsedTonight(), night = isNight(), planned = nsPlanned();
+    const ic = IMG('ic_selfstudy'); $('#nsRowIc').innerHTML = ic ? `<img src="${ic}" alt="">` : '🌙';
+    $('#nsRowT').textContent = on ? '야간 자율학습 중' : planned ? '오늘 밤 자율학습 예약됨' : used ? '오늘 밤 자율학습 끝' : '야간 자율학습';
+    $('#nsRowS').textContent = on || planned ? `아침 ${NSL.h1}시에 ${AC.name[S.ns.sub]} XP +${NSL.xp}` : used ? '내일 밤에 다시 할 수 있어요'
+      : night ? `켜면 자리 비운 보상 +${hm(nsExtraH() * 3600)}` : `밤 ${NSL.h0 - 12}시부터 아침 ${NSL.h1}시까지, 미리 예약해요`;
+    $('#nsRowGo').textContent = on || planned || used ? '보기' : night ? '켜기' : '예약';
+    b.classList.toggle('todo', !on && !planned && !used);
+  }
   // 공부 탭의 국어, 과학 카드
   function renderStudy2() {
     const rc = $('#rdCard'), lc = $('#labCard'); if (!rc || !lc || !S.rd) return;
@@ -16168,6 +16181,7 @@ span.bt-stamp{display:none}.bt-duel.done span.bt-stamp{display:grid}
     renderAc();   // 2.0.1 공부
     renderStudy2();   // 2.0.1 국어, 과학 카드
     renderExRow();   // 2.0.1 시험 기간 줄
+    renderNsRow();   // 3.0.0 야간 자율학습 줄
     renderBtCard();   // 2.0.1 숲속 대결 카드
     renderMiniMg();   // 1.8.0
   }
@@ -16716,7 +16730,8 @@ span.bt-stamp{display:none}.bt-duel.done span.bt-stamp{display:grid}
     puzzle: { n: 1, name: () => '숲속 퍼즐 한 판 끝내기', v: () => S.st.pz || 0, ok: () => !liveOff('puzzle') },
     merge: { n: 2, name: n => `숲속 합치기 주문 ${n}개 채우기`, v: () => S.mg.st.orders, ok: () => !liveOff('merge') },
     fest: { n: 1, name: () => '학교 행사 한 번 열기', v: () => S.st.sports + Object.values(S.fest.n).reduce((a, b) => a + b, 0), ok: () => FEST_IDS.some(festOpen) },
-    trip: { n: 1, name: () => '현장체험학습 다녀오기', v: () => S.st.trips, ok: () => tripOpen() }
+    trip: { n: 1, name: () => '현장체험학습 다녀오기', v: () => S.st.trips, ok: () => tripOpen() },
+    ns: { n: 1, name: () => '야간 자율학습 켜거나 예약하기', v: () => S.ns ? S.ns.n : 0, ok: () => nsOpen() && !nsUsedTonight() }   // 3.0.0 고등학교 기숙사부터(지섭 결정 2026-11-02)
   };
   const DM = { min: 5, bonusGold: 1, bonusDip: 1 };
   const LP = { mission: 10, bonus: 20, festWin: 15, festLose: 5, trip: 10, tripHour: 5, grad: 20, quest: 3 };
@@ -18897,6 +18912,7 @@ span.bt-stamp{display:none}.bt-duel.done span.bt-stamp{display:grid}
     // 2.0.1 시험 기간
     $('#sheetExam').addEventListener('click', () => { closeSheet(); setTimeout(openExam, 240); });
     $('#exRowBtn').addEventListener('click', openExam);
+    $('#nsRowBtn').addEventListener('click', () => { sfx('tap'); openNs(); });   // 3.0.0
     $('#exClose').addEventListener('click', () => { sfx('tap'); closeModal($('#mExam')); });
     $('#exSubj').addEventListener('click', e => { const b = e.target.closest('[data-ex]'); if (b && b.getAttribute('aria-disabled') !== 'true') exStudy(b.dataset.ex); });
     $('#exClaim').addEventListener('click', exClaim);
@@ -20083,9 +20099,10 @@ span.bt-stamp{display:none}.bt-duel.done span.bt-stamp{display:grid}
     { id: 'garden', name: '급식 메뉴', goals: [2, 4, 8, 12, 16], title: '숲속 요리사', ic: 'menu_01', t: n => n >= GD_MENU.length ? '급식 메뉴 모두 만들기' : `급식 메뉴 ${n}가지 만들기`, v: () => gdMenuCount() },   // 2.2.0
     { id: 'cgwin', name: '동아리 대항전', goals: [1, 2, 4, 7, 10], title: '대항전 챔피언', ic: 'league_ic', t: n => `동아리 대항전 ${n}번 우승`, v: () => S.cg.wins },   // 2.2.0
     { id: 'bio', name: '생물 탐사', goals: [5, 10, 18, 24, 30], title: '꼬마 생물학자', ic: 'bio_ladybug', t: n => n >= 30 ? '생물 도감 모두 채우기' : `생물 ${n}종 관찰하기`, v: () => bxCount() },   // 2.2.0
-    { id: 'lab', name: '과학 탐구 실험', goals: [3, 8, 14, 20, 24], title: '꼬마 과학자', t: n => n >= 24 ? '실험 노트 모두 채우기' : `실험 노트 ${n}장 채우기`, v: () => labCount() }   // 2.0.1 공부 2단계(노트 24장)
+    { id: 'lab', name: '과학 탐구 실험', goals: [3, 8, 14, 20, 24], title: '꼬마 과학자', t: n => n >= 24 ? '실험 노트 모두 채우기' : `실험 노트 ${n}장 채우기`, v: () => labCount() },   // 2.0.1 공부 2단계(노트 24장)
+    { id: 'selfstudy', name: '야간 자율학습', goals: [1, 5, 15, 30, 60], title: '밤공부 대장', ic: 'ic_selfstudy', t: n => `야간 자율학습 ${n}번 마치기`, v: () => S.ns ? S.ns.fin || 0 : 0 }   // 3.0.0 마친 밤(지섭 결정 2026-11-02)
   ];
-  const ACH_EM = { rare: '✨', students: '🐰', grad: '🎓', building: '🏫', teacher: '🦔', quest: '📝', puzzle: '🧩', dex: '📖', fest: '🎈', attend: '📅', trip: '🚌', gold: '🌰', rank: '🏆', deco: '🪴', lab: '🧪', battle: '⚔️', league: '🏅' , donate: '🌳', snack: '🍪' };
+  const ACH_EM = { selfstudy: '🌙', rare: '✨', students: '🐰', grad: '🎓', building: '🏫', teacher: '🦔', quest: '📝', puzzle: '🧩', dex: '📖', fest: '🎈', attend: '📅', trip: '🚌', gold: '🌰', rank: '🏆', deco: '🪴', lab: '🧪', battle: '⚔️', league: '🏅' , donate: '🌳', snack: '🍪' };
   const ACH_RANK_TITLE = true;   // 랭킹 서버에 칭호를 올려요. 서버 규칙(database.rules.json)의 title 칸을 Firebase 콘솔에 게시해야 해요(1.7.1)
   const achById = id => ACH.find(a => a.id === id);
   const achGoal = (a, i) => a.id === 'dex' && i === ACH_N - 1 ? DEX_KEYS.length : a.goals[i];
