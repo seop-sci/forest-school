@@ -2707,6 +2707,7 @@ span.bt-stamp{display:none}.bt-duel.done span.bt-stamp{display:grid}
 .ex-row-btn .ex-ic{flex:none;display:grid;place-items:center;width:36px;height:36px;font-size:22px}.ex-row-btn .ex-ic img{width:36px;height:36px;object-fit:contain}
 .ex-row-btn .ex-tx{flex:1;min-width:0;display:flex;flex-direction:column}.ex-row-btn b{font-size:14px}.ex-row-btn small{font-size:12px;color:var(--muted)}
 .ex-row-btn em{flex:none;padding:4px 10px;border-radius:999px;background:var(--chip-bg);color:var(--chip-ink);font-style:normal;font-size:12.5px;font-weight:700}
+body.cam-scene #ffChip,body.cam-scene #tierDots,body.cam-scene #plChip{opacity:0;pointer-events:none;transition:opacity .3s}   /* 3.0.0 체험학습 배웅과 마중 동안 아래 칩을 잠깐 숨겨요 */
 .ex-row-btn.todo{border-color:#E2A21C}.ex-row-btn.todo em{background:#D9534A;color:#FFFFFF}
 .sheet-award{cursor:default;margin:2px 0 10px;font-size:13px}.sheet-award img{flex:none;width:40px;height:40px;object-fit:contain}
 /* 2.0.1 공부 2단계: 책 읽기 */
@@ -8146,6 +8147,26 @@ span.bt-stamp{display:none}.bt-duel.done span.bt-stamp{display:grid}
     rt.zoom = z; fitMap(false, [cx - r.left, cy - r.top]);
     return true;
   }
+  /* 3.0.0 지섭 요청: 체험학습 배웅과 마중 때 잠깐 버스 쪽으로 화면을 당겼다가 원래 자리로 돌아와요.
+     camAnim(z, x, y, ms): z 확대(1~ZOOM_MAX), x y 지도 왼쪽 위 자리(panTo와 같은 값)로 부드럽게. camAt(mx, my): 지도 좌표를 화면 가운데에 두는 x y */
+  function camAt(z, mx, my) {
+    const fr = $('.frame'); if (!fr || !rt.mapS) return null;
+    const W = fr.clientWidth, H = fr.clientHeight, mid = ((rt.hudTop || 0) + H - (rt.hudBot || 0)) / 2, sc = rt.mapS / (rt.zoom || 1) * z;
+    return [W / 2 - mx * sc, mid - (my + 60) * sc];
+  }
+  function camAnim(z, x, y, ms) {
+    return new Promise(done => {
+      if (!rt.mapS || rt.tab !== 'school') { done(); return; }
+      const z0 = rt.zoom || 1, x0 = rt.panX, y0 = rt.panY, t0 = performance.now(), id = (rt.camId = (rt.camId || 0) + 1);
+      const step = now => {
+        if (rt.camId !== id || rt.tab !== 'school') { done(); return; }
+        const p = Math.min(1, (now - t0) / ms), e = p < 0.5 ? 2 * p * p : 1 - Math.pow(-2 * p + 2, 2) / 2;
+        rt.zoom = z0 + (z - z0) * e; fitMap(false); panTo(x0 + (x - x0) * e, y0 + (y - y0) * e);
+        if (p < 1) requestAnimationFrame(step); else done();
+      };
+      requestAnimationFrame(step);
+    });
+  }
   function setupPan() {
     const fr = $('.frame');
     let st = null, pinch = null;
@@ -9245,9 +9266,10 @@ span.bt-stamp{display:none}.bt-duel.done span.bt-stamp{display:grid}
   const BX = { tier: 1, every: 2 * 3600000, max: 3, rare0: 4, rareMax: 8, xpNew: 10, xpDup: 3, essNew: 1, dupMin: 3, gold10: 1, ess20: 20 };
   // 지도(geoIdx)마다 [가로 %, 세로 %, 물가면 1]. 장식 자리, 건물 빈터(울타리 안), 길을 피했어요
   // 2.3.0.1 지섭 제보(학교 행사 단추가 청설모를 가림): 왼쪽 단추 줄, 오른쪽 단추 줄, 아래 칩, 화면 밖(가장자리 11%)에 걸리던 자리를 안쪽 풀숲과 물가로 옮겼어요
+  // 3.0.0 지섭 제보(중학교 과학실 뒤 생물을 누르기 힘듦): 건물 누르는 칸과 이름표에 가리던 자리를 손가락이 다 닿는 풀밭과 호수로 옮겼어요(390px, 360px에서 잼)
   const BX_SPOT = [null,
-    [[28, 19, 0], [62, 15, 0], [38, 48, 0], [84, 46, 1], [30, 73, 1], [64, 87, 0]],
-    [[58, 19, 1], [45, 19, 1], [68, 30, 0], [28, 33, 0], [88, 52, 0], [36, 52, 0]]];
+    [[28, 19, 0], [72, 14, 0], [38, 48, 0], [84, 46, 1], [18, 72, 1], [64, 82, 0]],
+    [[70, 18, 1], [32, 14, 1], [70, 30, 0], [28, 33, 0], [58, 46, 0], [22, 24, 0]]];
   const SPR = [3, 4, 5], SUM = [6, 7, 8], AUT = [9, 10, 11];
   // [열쇠, 이름, 무리(0 곤충, 1 식물, 2 새와 작은 동물), 조건, 설명]. 조건: s 달, n 밤, r 비, w 물가, rare 희귀, en 멸종위기
   const BIO = [
@@ -15823,16 +15845,22 @@ span.bt-stamp{display:none}.bt-duel.done span.bt-stamp{display:grid}
   function tripCrowd(mode, bx, by, skip) {
     for (const k of rt.kids) if (k.trip) { k.trip = false; k.hold = false; const f = k.g.querySelector('.trip-prop'); if (f) f.remove(); if (!k.board) { k.wait = rand(0.2, 1.2); pickTarget(k); } }
     if (!mode) return;
-    const pool = rt.kids.filter(k => !k.board).slice(0, Math.max(0, rt.kids.length - (skip || 0))).slice(0, 5);
+    const pool = rt.kids.filter(k => !k.board).slice(0, Math.max(0, rt.kids.length - (skip || 0)))
+      .sort((a, b) => Math.hypot(a.x - bx, a.y - by) - Math.hypot(b.x - bx, b.y - by)).slice(0, 5);   // 3.0.0 버스에서 가까운 친구부터(늦게 도착하지 않게)
     const flag = IMG('trip_fx_flag'), bal = IMG('trip_fx_balloons');
     pool.forEach((k, i) => {
-      k.trip = true; k.hold = true; k.cheer = rand(0, 6); k.wait = 0; k.speed = 30;
+      k.trip = true; k.hold = true; k.cheer = rand(0, 6); k.wait = 0; k.speed = 46;
       k.tx = bx - 50 + (i % 3) * 13 + rand(-2, 2); k.ty = by - 8 + Math.floor(i / 3) * 10 + rand(-2, 2);   // 버스 왼쪽 위 길가
       const u = mode === 'go' ? flag : bal; if (!u) return;
       const im = document.createElementNS(NS, 'image'); im.setAttribute('class', 'trip-prop' + (mode === 'go' ? ' wave' : ' float'));
       im.setAttribute('href', u); if (mode === 'go') { im.setAttribute('x', 3); im.setAttribute('y', -22); im.setAttribute('width', 12); im.setAttribute('height', 12); } else { im.setAttribute('x', 2); im.setAttribute('y', -34); im.setAttribute('width', 11); im.setAttribute('height', 16); }
       k.g.appendChild(im);
     });
+  }
+  // 3.0.0 배웅, 마중 친구가 다 모였는지(아무리 늦어도 ms 뒤에는 넘어가요)
+  const tripCrowdIn = () => rt.kids.filter(k => k.trip).every(k => Math.hypot(k.x - k.tx, k.y - k.ty) < 4);
+  function tripWait(ms, ok) {
+    return new Promise(done => { const t0 = performance.now(); const chk = () => (ok() || performance.now() - t0 > ms) ? done() : requestAnimationFrame(chk); requestAnimationFrame(chk); });
   }
   function tripPop(x, y) {   // 내리는 친구 머리 위 작은 꽃가루
     if (rt.reduced) return;
@@ -15862,11 +15890,16 @@ span.bt-stamp{display:none}.bt-duel.done span.bt-stamp{display:grid}
     const [bx, by] = geo().bus;
     const at = y => `translate(${bx}px, ${y}px)`;
     const drive = (from, to, ms) => g.animate([{ transform: at(from) }, { transform: at(to) }], { duration: ms, easing: from > to ? 'cubic-bezier(.2,.7,.3,1)' : 'cubic-bezier(.6,0,.8,.4)', fill: 'forwards' });
-    const leave = () => { door(false); dust(); if (bob) bob.play(); sfx('leaf'); drive(by, 490, 1300).onfinish = () => { g.remove(); if (rt.bus === g) rt.bus = null; tripCrowd(null); if (then) then(); }; };
-    if (mode === 'back') tripCrowd('back', bx, by);   // 3.0.0 돌아올 때는 친구들이 먼저 마중 나가요
+    // 3.0.0 지섭 요청: 친구들이 걸어가다 끝나지 않게, 다 모여 응원한 뒤(최대 4초) 떠나고, 버스가 사라진 뒤에도 잠깐 손을 흔들다 흩어져요.
+    // 그동안 화면을 버스 쪽으로 잠깐 당겼다가(1.6배) 원래 자리로 돌아와요
+    const cam0 = { z: rt.zoom || 1, x: rt.panX, y: rt.panY }, camGo = camAt(Math.max(cam0.z, 1.6), bx - 18, by - 12);
+    if (camGo) camAnim(Math.max(cam0.z, 1.6), camGo[0], camGo[1], 700);
+    document.body.classList.add('cam-scene');
+    const finish = () => setTimeout(() => { tripCrowd(null); document.body.classList.remove('cam-scene'); if (cam0.x != null && rt.tab === 'school') camAnim(cam0.z, cam0.x, cam0.y, 700); if (then) then(); }, 1200);
+    const leave = () => tripWait(4000, tripCrowdIn).then(() => { door(false); dust(); if (bob) bob.play(); sfx('leaf'); drive(by, 490, 1300).onfinish = () => { g.remove(); if (rt.bus === g) rt.bus = null; finish(); }; });
+    tripCrowd(mode === 'back' ? 'back' : 'go', bx, by, mode === 'go' ? n : 0);   // 3.0.0 버스가 오는 동안 친구들이 먼저 모여요(떠날 때 배웅, 돌아올 때 마중)
     drive(490, by, 1300).onfinish = () => {
       if (bob) bob.pause(); dust(); door(true);
-      if (mode === 'go') tripCrowd('go', bx, by, n);   // 3.0.0 남은 친구들이 버스 옆에서 배웅해요
       if (mode === 'go') {
         // 학생 n명이 버스 문으로 걸어가요. 다 타면(아무리 늦어도 5초) 떠나요
         const riders = rt.kids.filter(k => !k.board).slice(-n);
