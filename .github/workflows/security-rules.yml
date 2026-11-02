@@ -19,5 +19,13 @@ jobs:
         with:
           distribution: temurin
           java-version: 21
-      - run: npm ci && npm test
+      - run: |
+          set +e
+          (npm ci && npm test) > security.log 2>&1
+          result=$?
+          cat security.log
+          if [ "$result" -ne 0 ]; then
+            python3 -c 'import pathlib; s=pathlib.Path("security.log").read_text()[-10000:]; print("::error::"+s.replace("%","%25").replace("\n","%0A").replace("\r","%0D"))'
+          fi
+          exit "$result"
         working-directory: dev/fbtest/emulator
