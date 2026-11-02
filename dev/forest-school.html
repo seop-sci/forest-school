@@ -1086,6 +1086,7 @@ html.ait .app{padding-top:calc(10px + var(--ait-top, 0px));padding-bottom:var(--
 /* 겹쳐 올라오는 화면 */
 .overlay{position:fixed;inset:0;z-index:20;display:flex;align-items:flex-end;justify-content:center}
 .overlay.center{z-index:30;align-items:center;padding:16px}
+.overlay.center > .modal{max-height:calc(100dvh - 32px);overflow-y:auto;overscroll-behavior:contain}   /* 3.0.0 창이 화면보다 길면 창 안에서 밀어 내려요(책 읽기 창이 넘쳐 닫기 단추가 화면 밖에 있던 일) */
 .backdrop{position:absolute;inset:0;background:var(--scrim);opacity:0;transition:opacity .2s}
 .overlay.open .backdrop{opacity:1}
 .sheet{position:relative;width:100%;max-width:480px;max-height:92%;overflow-y:auto;will-change:transform;padding:10px 20px calc(20px + env(safe-area-inset-bottom, 0px));border-radius:22px 22px 0 0;background:var(--paper);color:var(--ink);box-shadow:0 -6px 24px var(--shadow);transform:translateY(100%);transition:transform .25s ease}
@@ -2723,6 +2724,7 @@ body.cam-scene #ffChip,body.cam-scene #tierDots,body.cam-scene #plChip{opacity:0
 .sheet-award{cursor:default;margin:2px 0 10px;font-size:13px}.sheet-award img{flex:none;width:40px;height:40px;object-fit:contain}
 /* 2.0.1 공부 2단계: 책 읽기 */
 .rd-modal{max-width:380px}
+.rd-modal > .btn-row:last-child{position:sticky;bottom:-20px;margin:10px -20px -20px;padding:10px 20px 14px;background:var(--paper);border-top:1px solid var(--line);z-index:1}   /* 3.0.0 닫기는 늘 보이게 */
 .rd-lead{margin:4px 0 10px;font-size:13.5px;line-height:1.5;text-align:center;white-space:pre-line}
 .rd-now{display:flex;align-items:center;gap:10px;margin:0 0 10px;padding:8px 10px;border-radius:14px;background:var(--card);border:1.5px solid #7FB069}
 .rd-now .rd-tx{flex:1;min-width:0;display:flex;flex-direction:column;gap:3px}.rd-now b{font-size:13.5px}.rd-now small{font-size:12px;color:var(--muted)}
@@ -6010,7 +6012,7 @@ body.cam-scene #ffChip,body.cam-scene #tierDots,body.cam-scene #plChip{opacity:0
       say: '발표회를 열면 대항전 점수도 올라요. 일요일 밤까지 1등을 노려 봐요!' },   // 2.2.0
     { id: 'jl1', ch: 12, t: 'elMid', n: 1, rm: 5, title: '중학교 반장 뽑기', how: '복도의 학생회실이나 교실에서 반장을 뽑아요',
       say: '중학교 반장 선거예요! 이번에는 명부의 친구들이 후보로 나와요. 반장이 속한 동아리는 보너스가 +100% 늘어나니, 동아리를 보고 골라 봐요.' },
-    { id: 'bt3', ch: 12, t: 'btMid', n: 1, rm: 5, title: '명부 학생으로 대결 이기기', how: '숲속 대결에서 명부 학생을 세워 한 번 이겨요',
+    { id: 'bt3', ch: 12, t: 'btMid', n: 1, rm: 5, title: '명부 학생으로 대결하기', how: '숲속 대결에서 명부 학생을 세워 한 판 겨뤄요. 오늘 이미 했으면 바로 끝나요',   // 3.0.0 지섭: 오늘 판을 다 쓴 뒤 받아도 막히지 않게
       say: '중학교에서는 명부 학생들이 직접 대결에 나가요. 동아리에서 키운 학생을 세워 한 번 이겨 봐요. 이긴 학생은 능력치가 자라요.' },
     { id: 'sa4', ch: 12, t: 'clubMat', n: 1, rm: 4, title: '수학부 꾸리기', how: '동아리실에서 수학 별이 많은 친구를 수학부에 넣어요',
       say: '새로 생긴 수학부에 부원이 없어요. 명부에서 수학 별이 많은 친구를 수학부에 넣어 주세요. 수학부도 수업료를 올려 줘요.' },
@@ -17665,7 +17667,7 @@ body.cam-scene #ffChip,body.cam-scene #tierDots,body.cam-scene #plChip{opacity:0
       case 'psGot': return psOpen() ? (S.ps.tot || 0) : q.n;   // 2.1.3 숲속 패스에서 받은 단계 수(패스가 닫혀 있으면 멈추지 않게 마친 것으로)
       case 'btLg': return S.bt.lg;   // 2.0.1 대결 메달 리그
       case 'btWins': return S.bt.st.w;   // 2.1.0 대결에서 이긴 판 수
-      case 'btMid': return S.bt.st.wm;   // 2.0.1 명부 학생으로 이긴 판
+      case 'btMid': return S.bt.st.wm + (S.tier >= 2 && S.bt.day === gameToday() && S.bt.n > 0 ? 1 : 0);   // 2.0.1 명부 학생으로 이긴 판. 3.0.0 오늘 중학교부터 한 판이라도 했으면 쳐요
       case 'vdGive': return S.vd.n;   // 2.1.2 마을 기부 횟수
       case 'snDraw': return S.sn.n;   // 2.1.2 간식 뽑은 수
       case 'snDex': return snCount();   // 2.1.2 간식 도감 종류
@@ -17812,7 +17814,7 @@ body.cam-scene #ffChip,body.cam-scene #tierDots,body.cam-scene #plChip{opacity:0
       case 'psGot': return `숲속 패스 ${q.n}단계 받기`;
       case 'btLg': return `숲속 대결 ${BT_LG[q.n].n} 리그`;
       case 'btWins': return `숲속 대결 ${q.n}번 이기기`;
-      case 'btMid': return `명부 학생으로 대결 ${q.n}번 이기기`;
+      case 'btMid': return '명부 학생으로 대결하기';
       case 'vdGive': return '마을에 기부하기';
       case 'snDraw': return '간식 뽑기';
       case 'snDex': return `간식 도감 ${q.n}종`;
@@ -19139,6 +19141,8 @@ body.cam-scene #ffChip,body.cam-scene #tierDots,body.cam-scene #plChip{opacity:0
       else if (rt.modalOpen === $('#mFest')) closeModal($('#mFest'));
       else if (rt.modalOpen === $('#mCere')) { if (rt.cereAsking) cereKeep(); else { rt.cereAt = 0; cereAsk(); } }   // 2.0.1 뒤로 가기는 건너뛸지 묻고, 물을 때 다시 누르면 계속 봐요
       else if (rt.modalOpen === $('#tut')) tutEnd('later');
+      // 3.0.0 지섭 제보(책 읽기 창이 뒤로 가기로 안 닫힘): 위에 없는 창도 뒤로 가기로 닫아요. 꼭 골라야 하는 창(저장 고르기, 전학 대화, 자리 비운 보상)은 그대로
+      else if (rt.modalOpen && rt.modalOpen.classList.contains('overlay') && !['mPick', 'mTalk', 'mOffline'].includes(rt.modalOpen.id)) closeModal(rt.modalOpen);
       else if (rt.sheetKey && !rt.modalOpen) closeSheet();
     });
     document.addEventListener('visibilitychange', () => {
@@ -20653,17 +20657,19 @@ body.cam-scene #ffChip,body.cam-scene #tierDots,body.cam-scene #plChip{opacity:0
     const pool = MG_KINDS.filter(k => !avoid.includes(k));
     return (pool.length ? pool : MG_KINDS)[Math.floor(Math.random() * (pool.length ? pool.length : MG_KINDS.length))];
   }
-  function mgOrderItem(k, mixed) {
-    const best = Math.max(2, S.mg.best[k] || 0);
-    const n = Math.max(2, best - Math.floor(Math.random() * 3));
+  // 3.0.0 지섭 요청: 높은 단계 주문(새 단계 주문 포함)은 한 번에 하나만, 나머지는 낮은 단계로(퀘스트의 '주문 n개 채우기'가 막히지 않게)
+  const mgIsHigh = o => !!o && (!!o.up || o.it.some(x => x.n >= Math.max(4, (S.mg.best[x.k] || 0) - 2)));
+  function mgOrderItem(k, mixed, low) {
+    const best = Math.max(2, S.mg.best[k] || 0), lowMax = Math.max(2, Math.min(best - 3, Math.ceil(best / 2) + 1));
+    const n = low ? 2 + Math.floor(Math.random() * (lowMax - 1)) : Math.max(2, best - Math.floor(Math.random() * 3));
     const c = !mixed && n <= 3 && Math.random() < 0.4 ? 2 : 1;   // 섞인 주문은 종류마다 1개씩
     return { k, n, c };
   }
   // 주문 하나: 한 종류(1~2개) 또는 두 종류를 섞어서(각 1개, 절반 확률). 다른 주문에 있는 종류는 되도록 피해요
-  function mgNewOrder(avoid) {
+  function mgNewOrder(avoid, low) {
     const mixed = Math.random() < MG.MIXED;
-    const k1 = mgPickKind(avoid), it = [mgOrderItem(k1, mixed)];
-    if (mixed) it.push(mgOrderItem(mgPickKind(avoid.concat([k1])), true));
+    const k1 = mgPickKind(avoid), it = [mgOrderItem(k1, mixed, low)];
+    if (mixed) it.push(mgOrderItem(mgPickKind(avoid.concat([k1])), true, low));
     const who = MG_WHO(); return { it, who: who[Math.floor(Math.random() * who.length)] };
   }
   // 3.0.0 지섭 요청: 주문을 따라가다 보면 위 단계가 열리게. 주문 MG.UP_EVERY개를 채울 때마다 지금 만든 가장 높은 단계보다 한 단계 위 주문 하나
@@ -20678,7 +20684,7 @@ body.cam-scene #ffChip,body.cam-scene #tierDots,body.cam-scene #plChip{opacity:0
       const av = S.mg.orders.flatMap(mgOrderKinds);
       const u = S.mg.upq > 0 && !S.mg.orders.some(o => o.up) ? mgUpOrder(av) : null;
       if (u) S.mg.upq -= 1;
-      S.mg.orders.push(u || mgNewOrder(av));
+      S.mg.orders.push(u || mgNewOrder(av, S.mg.orders.some(mgIsHigh)));
     }
   }
   const mgCount = (cells, k, n) => cells.filter(c => c === k + mgLvCh(n)).length;
@@ -20734,7 +20740,7 @@ body.cam-scene #ffChip,body.cam-scene #tierDots,body.cam-scene #plChip{opacity:0
     if (mgSwapLeft() > 0) { toast(`${Math.ceil(mgSwapLeft() / 60000)}분 뒤에 바꿀 수 있어요`); return false; }
     S.mg.swapAt = gameNow();
     if (S.mg.orders[i].up) S.mg.upq = Math.min(3, (S.mg.upq || 0) + 1);   // 3.0.0 한 단계 위 주문을 바꿔도 다음에 다시 와요
-    S.mg.orders[i] = mgNewOrder(S.mg.orders.flatMap(mgOrderKinds));   // 지금 주문의 종류도 피해서 다른 것이 나오게
+    S.mg.orders[i] = mgNewOrder(S.mg.orders.flatMap(mgOrderKinds), S.mg.orders.some((o, j) => j !== i && mgIsHigh(o)));   // 지금 주문의 종류도 피해서 다른 것이 나오게
     sfx('tap');
     mgRenderOrders(); mgRenderBoard(); save();
     return true;
