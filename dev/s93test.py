@@ -17,7 +17,7 @@ CLEAN = "document.querySelectorAll('.overlay').forEach(o=>{o.hidden=true;o.class
 SKIP = f"(()=>{{ const t=document.querySelector('#tut'); if(t) t.hidden=true; {F}.S.tut.st='skip'; {F}.rt.tut=null; {CLEAN}; }})()"
 OVER = """(sel => { const out = []; document.querySelectorAll(sel).forEach(el => { const r = el.getBoundingClientRect(); if (r.width && (r.right > innerWidth + 1 || r.left < -1 || el.scrollWidth > el.clientWidth + 2)) out.push((el.id || el.className) + ' ' + Math.round(r.left) + '~' + Math.round(r.right)); }); return out; })"""
 # 한국 시간 2026-11-02(월) h시 m분 = UTC h-9
-K = "((d, h, m) => Date.UTC(2026, 10, d, h - 9, m || 0))"
+K = "((d, h, m) => Date.UTC(2030, 10, d + 2, h - 9, m || 0))"   # 3.0.0: 시험 날짜가 오늘보다 앞이면 게임 시계가 뒤로 안 가서 2030-11-04(월)부터
 H = 3600000
 
 
@@ -66,7 +66,7 @@ async def main():
                 print('자리 비움', r)
                 ok(r['away'] == 4 and r['late'] == 3, f'자리 비운 동안 {r}')
                 # 2-1) 학교 특별 이벤트 날(수능 응원 2026-11-16~22)은 +200%: 야간 1시간이 2시간 당겨요
-                r = await ev("return [F.nbAddOf('2026-11-17'), F.nbAddOf('2026-11-10'), F.nbOverlap(K(17, 20), K(17, 21), true) / H, F.nbOverlap(K(15, 20), K(16, 21), true) / H];")
+                r = await ev("const K26 = (d, h, m) => Date.UTC(2026, 10, d, h - 9, m || 0); return [F.nbAddOf('2026-11-17'), F.nbAddOf('2026-11-10'), F.nbOverlap(K26(17, 20), K26(17, 21), true) / H, F.nbOverlap(K26(15, 20), K26(16, 21), true) / H];")
                 ok(r == [200, 100, 2, 6], f'특별 이벤트 +200% {r}')
                 # 4) 핫픽스 끄기
                 r = await ev("""S.bd = { library: { L: 9, s: K(6, 19), e: K(6, 19) + 30 * H } }; S.nb.at = K(6, 19); const e0 = S.bd.library.e;
@@ -78,7 +78,7 @@ async def main():
                   F.nbNotice(); const s1 = S.nb.seen; F.nbNotice(); const s2 = S.nb.seen;
                   F.rt.fakeNow = K(8, 15); S.nb.seen = ''; F.nbNotice(); const s3 = S.nb.seen;
                   return { s1, s2, s3 };""")
-                ok(r['s1'] == '2026-11-07' and r['s2'] == '2026-11-07' and r['s3'] == '', f'시작 알림 {r}')
+                ok(r['s1'] == '2030-11-09' and r['s2'] == '2030-11-09' and r['s3'] == '', f'시작 알림 {r}')
                 # 7) 저장
                 r = await ev("""const a = F.sanitize({ ...JSON.parse(JSON.stringify(S)), nb: { at: 'x', seen: 5 } }), b = F.sanitize({ ...JSON.parse(JSON.stringify(S)), nb: undefined });
                   return [a.nb.at, a.nb.seen, b.nb.at, b.nb.seen];""")

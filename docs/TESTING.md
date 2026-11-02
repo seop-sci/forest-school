@@ -147,3 +147,20 @@ Issue 양식은 기본 브랜치(`main`)에 있어야 GitHub의 새 Issue 화면
 - `s101test.py`: 2.3.1 묶음. 광고 중 배경음악 멈춤, 숲속 퍼즐 하루 5판과 보상 두 배와 소탕(비율 글자 안 보임), 숲속 합치기 배수 단계와 '합쳐서 1개'에서 ×3 건너뛰기, 과학실 값 1.8배, 공사 막대 층(#conUi), 마을 기부 창 제목 자리와 그날 가격 고정과 지도 층(#vdTop), 광고 30분(보충수업, 단축권 6장, 체험학습), 업적 그림 크기, 지도 학생 종류, 뱀과 매(안전한 길, 아래 칩 흐리게, 이기면 보상, 지면 10% 안). 360px과 390px
 - 바꾼 옛 시험: `s46test.py`(퍼즐 끝 창 줄이 단축권까지 5줄일 수 있어요), `s68test.py`(공지 창을 띄우지 않는 버전 NT_QUIET에서는 업데이트 뒤에도 창이 안 떠요)
 - 시험은 한국 시간 밤(20~24시)에 돌리면 야간 건설 창이 화면을 막아요. 브라우저 Date를 낮 13시로 옮기는 sitecustomize를 PYTHONPATH로 넣고 돌렸어요
+
+
+## 3.0.0 보안 회귀
+
+운영 Firebase를 호출하지 않아요. 수정과 결과의 근거는 `docs/SECURITY-v300.md`에 있어요.
+
+- `node dev/check_ads.mjs`: 가짜 광고 SDK로 현재 동의 요구, 개인정보 옵션, 철회, 양식 오류, 오래된 캐시, 광고 준비 경합을 검사해요.
+- `NODE_PATH=<targaryen 설치 경로> node dev/fbtest/rules_storage_guard.js <규칙 절대 경로>`: 저장/백업 필드와 크기 제한. `rules_season_guard.js`, `rules_sec.js`, `rules_bt.js`, `rules_test.js`도 두 규칙 파일 각각에 실행해요.
+- `node dev/fbtest/season_listener_test.js`: 실제 소스의 시즌 조회, 경계에서 구독 교체, 해제를 검사해요.
+- 공식 Firebase Emulator: Node24, Java21에서 `cd dev/fbtest/emulator`, `npm ci`, `npm test`. 테스트용 `demo-forest-security` 프로젝트와 로컬 Database Emulator만 사용해요. 운영 비밀값이 필요 없어요. CI는 `.github/workflows/security-rules.yml`이에요.
+- 원본 변경 뒤 `wrap.py`와 s37, 관련 저장/랭킹 시험 s71/s72/s98을 실행해요. 이번 보안 작업에서는 s90/s102/s103도 통과했어요. 종료 코드뿐 아니라 마지막 PASS/FAIL을 확인해요.
+- 실제 UMP, 운영 콘솔 규칙, 최종 AAB 검수는 가짜 SDK나 Emulator 시험으로 대신할 수 없어요.
+
+- `s104test.py` (3.0.0 통합): 고등학교 자율학습 20시/6시 경계, 같은 밤 중복 시작, 아침 XP 한 번 지급, ns 없는 옛 저장, hs1~hs37, 390px 밝은 화면/360px 어두운 화면의 창 넘침 검사.
+- s37의 상태별 수치 검사에는 고등학교 1학년/3학년도 포함해요. 자동 진행 모형 결과를 실제 이용자의 플레이 일수로 해석하지 않아요.
+
+- `s105test.py` (3.0.0 낮 예약): 낮 버튼/예약 복원, 같은 밤 중복/과목 변경 금지, 낮 보상 없음, 20시 자동 시작/6시 결과 한 번, 다음 밤 자동 반복 없음, 늦은 시작 소급 없음, hs9/hs22/hs26의 낮 접속 진행, 옛/잘못된 저장, 학교급/기숙사 잠금, 밝은390/어두운360 창을 검사해요. s104의 낮 차단 기대값은 낮 예약으로 갱신했어요.

@@ -15,6 +15,9 @@ STATES = {
     # 2.0.0 중학교
     '중학교 1학년': {'tier': 2, 'tg': 0, 'f': {'classroom': 8, 'cafeteria': 6, 'library': 6, 'playground': 6, 'science': 3, 'store': 3}, 't': {'squirrel': 8, 'owl': 5, 'bear': 5}, 'students': 30, 'fuFull': True},
     '중학교 3학년': {'tier': 2, 'tg': 2, 'f': {'classroom': 25, 'cafeteria': 18, 'library': 17, 'playground': 18, 'science': 11, 'store': 17}, 't': {'squirrel': 20, 'owl': 5, 'bear': 15}, 'students': 100, 'fuFull': True},
+    # 3.0.0 통합: 기숙사가 있는 고등학교에서도 지원/비용이 유한해야 해요
+    '고등학교 1학년': {'tier': 3, 'tg': 0, 'f': {'classroom': 8, 'cafeteria': 6, 'library': 6, 'playground': 6, 'science': 3, 'store': 3, 'dorm': 1}, 't': {'squirrel': 8, 'owl': 5, 'bear': 5}, 'students': 30, 'fuFull': True},
+    '고등학교 3학년': {'tier': 3, 'tg': 2, 'f': {'classroom': 25, 'cafeteria': 18, 'library': 17, 'playground': 18, 'science': 11, 'store': 17, 'dorm': 18}, 't': {'squirrel': 20, 'owl': 5, 'bear': 15}, 'students': 100, 'fuFull': True},
 }
 SETUP = r"""(st) => {
   const F = window.__forest, S = F.S;
@@ -136,7 +139,7 @@ FLOW2 = r"""() => {
     return !!c.length && c[0][0] <= S().budget && c[0][1](); };
   for (let i = 0; i < 40; i++) { const ks = Object.keys(F.FPERKS).sort((a, b) => F.fpCost(a) - F.fpCost(b)); if (F.fpCost(ks[0]) > S().fund) break; F.buyFundPerk(ks[0], document.body); }
   // 2.1.0: 공사가 끝나기를 기다리는 동안 도토리가 더 쌓이고 한 퀘스트가 길어져서 기준을 넓혔어요(막힘 2,000분, 도토리 1e17 = 중학교 공사비 배수 5억 × 2억)
-  while (t < 120 * 3600 && F.curMain()) {   // 2.1.0 공사 시간과 두 학기로 중학교가 길어졌어요(자동 플레이 약 78시간)
+  while (t < 120 * 3600 && F.curMain() && S().tier < 3) {   // 2.1.0 공사 시간과 두 학기로 중학교가 길어졌어요(자동 플레이 약 78시간)
     const s = S(); F.rt.fakeNow = t0 + t * 1000; F.conTick();
     const cap = F.capacity(); if (s.students < cap) s.students = Math.min(cap, s.students + F.CFG.enroll * dt);
     const g = F.rate() * dt; s.budget += g; F.earn(g); t += dt;
@@ -174,8 +177,8 @@ FLOW2 = r"""() => {
     else if (t >= tripEnd) { s.trip.end = Date.now() - 1; F.claimTrip(1); }
     for (let i = 0; i < 40; i++) { const k = Object.keys(F.PERKS).filter(x => !F.perkMaxed(x)).sort((a, b) => F.perkCost(a) - F.perkCost(b))[0]; if (!k || F.perkCost(k) > s.p.dip) break; F.buyPerk(k, document.body); }
     for (let i = 0; i < 5 && F.mainReady(); i++) F.claimMain(null);
-    if (F.canGraduate()) F.graduate();
-    for (let i = 0; i < 20; i++) if (!buy()) break;
+    if (F.canPromote()) F.promote(); else if (F.canGraduate()) F.graduate();
+    for (let i = 0; i < 20 && S().tier < 3; i++) if (!buy()) break;
     F.rt.modalQueue.length = 0; F.rt.modalOpen = null;
     maxB = Math.max(maxB, S().budget);
     if (!isFinite(S().budget) || !isFinite(F.rate())) return { err: '유한하지 않은 값', q: qid };
@@ -222,7 +225,7 @@ async def main():
         await pg.evaluate("const t=document.querySelector('#tut'); if(t && !t.hidden){ window.__forest.S.tut.st='skip'; t.hidden=true; window.__forest.rt.modalOpen=null; }")
         f2 = await pg.evaluate(FLOW2); report['중학교 따라 하기'] = f2
         if f2.get('err'): fails.append(f'중학교 따라 하기: {f2["err"]}')
-        elif f2['q'] != '끝': fails.append(f'중학교 장을 120시간 안에 끝내지 못했어요 (멈춘 퀘스트 {f2["q"]})')
+        elif f2['tier'] < 3: fails.append(f'중학교 장을 120시간 안에 끝내지 못했어요 (멈춘 퀘스트 {f2["q"]})')
         else:
             if f2['maxWaitMin'] > 2000: fails.append(f'중학교에서 한 퀘스트({f2["waitAt"]})에 {f2["maxWaitMin"]}분 넘게 막혔어요')
             if f2['maxBudget'] > 1e17: fails.append(f'중학교에서 도토리가 {f2["maxBudget"]:.3g}개까지 쌓였어요')

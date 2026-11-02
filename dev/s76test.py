@@ -48,7 +48,7 @@ async def main():
                 if r['again'] or not r['done'] or r['next'] or r['r2'] != 'f04' or r['ok2'] or r['dx2'] != 15 or r['dg2'] != 1 or r['same'] or r['dg3'] != 0 or r['cnt'] != 2 or r['n'] != 3: bad.append(f'실험 다음 날이 틀려요 {r}')
                 await pg.evaluate(T.CLEAN)
                 # 3) 책 읽기
-                r = await pg.evaluate(f"""(() => {{ const F = {F}, S = F.S; const out = {{}}; F.rt.fakeNow = Math.floor((F.gameNow() + 9 * 3600000) / 86400000) * 86400000 + 86400000 + 3 * 3600000;   /* 다음 날 한국 시간 한낮에서 시작(게임 시계가 밤이면 자정을 넘어 하루 권수가 다시 차요) */ S.rd.day = ''; S.rd.n = 0; S.f.library = 0; out.noLib = F.rdStart('acorn'); S.f.library = 1;
+                r = await pg.evaluate(f"""(() => {{ const F = {F}, S = F.S; const out = {{}}; F.rt.fakeNow = Math.floor((F.gameNow() + 9 * 3600000) / 86400000) * 86400000 + 86400000 + 3 * 3600000; while (F.wxOf(F.kstDay(F.rt.fakeNow)) === 'rain') F.rt.fakeNow += 86400000;   /* 3.0.0: 비 오는 날은 10분, XP +5라서 맑은 날에 */   /* 다음 날 한국 시간 한낮에서 시작(게임 시계가 밤이면 자정을 넘어 하루 권수가 다시 차요) */ S.rd.day = ''; S.rd.n = 0; S.f.library = 0; out.noLib = F.rdStart('acorn'); S.f.library = 1;
                   const x0 = ((a) => {{ let t = a.xp; for (let n = 1; n < a.lv; n++) t += F.AC.need(n); return t; }})(S.ac.kor); out.s1 = F.rdStart('acorn'); out.s2 = F.rdStart('sea'); out.left = F.rdLeft();
                   F.rt.fakeNow = F.gameNow() + 14 * 60000; out.early = F.rdSettle();
                   F.rt.fakeNow = F.gameNow() + 2 * 60000; out.fin = F.rdSettle(); out.dx = ((a) => {{ let t = a.xp; for (let n = 1; n < a.lv; n++) t += F.AC.need(n); return t; }})(S.ac.kor) - x0; out.got = S.rd.got.acorn; out.cur = S.rd.cur;

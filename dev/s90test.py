@@ -61,7 +61,8 @@ async def main():
             if r['sk'] != 2 or r['sp'] != 80 or r['look'] or not r['toggle'] or r['checked']: bad.append(f'{w}: 랭킹 시즌 올리기 {r}')
             await pg.click('#rankView [data-rv=sea]'); await pg.wait_for_timeout(500)
             r = await pg.evaluate("(() => ({ rows: document.querySelectorAll('#rankList li').length, lab: document.querySelector('#rankScoreLab').textContent, sc: document.querySelector('#rankScore').textContent, look: document.querySelectorAll('#rankList li[data-look]').length }))()")
-            if r['rows'] != 1 or r['lab'] != '이번 시즌 점수' or r['sc'] != '80' or r['look'] != 1: bad.append(f'{w}: 시즌 보기 {r}')
+            # 3.0.0: 봇 학교로 순위표가 20줄까지 차요. 구경(data-look)은 사람 줄 하나만
+            if r['rows'] != 20 or r['lab'] != '이번 시즌 점수' or r['sc'] != '80' or r['look'] != 1: bad.append(f'{w}: 시즌 보기 {r}')
             await pg.screenshot(path=f's90_rank_{w}.png')
             # 3) 보여 주기 켜고 끄기
             await pg.click('#lookOn'); await pg.wait_for_timeout(600)
