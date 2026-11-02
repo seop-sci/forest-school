@@ -15,7 +15,7 @@ CLEAN = "document.querySelectorAll('.overlay').forEach(o=>{o.hidden=true;o.class
 SKIP = f"(()=>{{ const t=document.querySelector('#tut'); if(t) t.hidden=true; {F}.S.tut.st='skip'; {F}.rt.tut=null; {CLEAN}; }})()"
 OVER = """(sel => { const out = []; document.querySelectorAll(sel).forEach(el => { const r = el.getBoundingClientRect(); if (r.width && (r.right > innerWidth + 1 || r.left < -1 || el.scrollWidth > el.clientWidth + 2)) out.push((el.id || el.className) + ' ' + Math.round(r.left) + '~' + Math.round(r.right)); }); return out; })"""
 # 한국 시간 (월, 일, 시, 분)
-K = "((mo, d, h, m) => Date.UTC(2026, mo - 1, d, h - 9, m || 0))"
+K = "((mo, d, h, m) => Date.UTC(2030, mo - 1, d, h - 9, m || 0))"   # 2026-11-03 시험 날짜가 오늘보다 앞이면 게임 시계가 뒤로 가지 않아서 실패해요. 먼 미래로
 H = 3600000
 
 
@@ -37,8 +37,9 @@ async def main():
             if w == 390:
                 # 2) 조건 (뽑기 대신 exOk로)
                 r = await ev("""const ok = (k, t, w) => F.bxOk(F.BIO_BY['bio_' + k], t, w);
-                  const day = K(11, 3, 14), night = K(11, 3, 21), sum = K(7, 10, 14);
-                  let rain = null; for (let d = 1; d <= 28; d++) { const s = `2026-11-${String(d).padStart(2, '0')}`; if (F.wxOf(s) === 'rain') { rain = K(11, d, 14); break; } }
+                  let dd = 3; while (F.wxOf(`2030-11-${String(dd).padStart(2, '0')}`) === 'rain') dd++;   // 비 안 오는 날
+                  const day = K(11, dd, 14), night = K(11, dd, 21), sum = K(7, 10, 14);
+                  let rain = null; for (let d = 1; d <= 28; d++) { const s = `2030-11-${String(d).padStart(2, '0')}`; if (F.wxOf(s) === 'rain') { rain = K(11, d, 14); break; } }
                   return { strider_w: ok('waterstrider', day, 1), strider_l: ok('waterstrider', day, 0), lady_w: ok('ladybug', day, 1), cicada_nov: ok('cicada', day, 0), cicada_jul: ok('cicada', sum, 0),
                     maple_nov: ok('maple', day, 0), fly_day: ok('flyingsquirrel', day, 0), fly_night: ok('flyingsquirrel', night, 0), firefly_nov: ok('firefly', night, 0),
                     snail_dry: ok('snail', day, 0), snail_rain: rain ? ok('snail', rain, 0) : true,
