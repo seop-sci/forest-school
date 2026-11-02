@@ -20,6 +20,6 @@ fs.writeFileSync('dist/index.html', html);
 // 1.8.0 배경음악 파일(audio 폴더)도 함께 담아요
 fs.cpSync('../audio', 'dist/audio', { recursive: true });
 // 2.0.0 고화질 지도 그림(img/maps)도 함께 담아요
-fs.cpSync('../img', 'dist/img', { recursive: true });
+fs.cpSync('../img', 'dist/img', { recursive: true, filter: f => !/_lux\.webp$/.test(f) });   // 3.0.0 관리자 고급 지도는 웹 판에만
 await build({ entryPoints: ['src/bridge.js'], bundle: true, format: 'iife', target: 'es2019', minify: true, outfile: 'dist/bridge.js', logLevel: 'warning' });
 console.log('dist 준비 완료');
