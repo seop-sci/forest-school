@@ -3521,12 +3521,12 @@ span.bt-stamp{display:none}.bt-duel.done span.bt-stamp{display:grid}
     <p class="rep-note" id="sheetRep"></p>
     <!-- 1.6.0: 가구 일괄 레벨업은 업그레이드 버튼 바로 위에 -->
     <button class="fur-all" type="button" id="furAll" hidden><span>가구 일괄 레벨업</span><span class="cost"><span data-acorn></span><b id="furAllCost">0</b></span></button>
-    <div class="buy-row"><button class="cta split" type="button" id="sheetBuy" aria-disabled="false"><span id="sheetBuyLabel">업그레이드</span><span class="cost"><span data-acorn></span><b id="sheetCost">20</b></span></button><button class="ff-btn" type="button" id="sheetFree" aria-label="업그레이드하고 바로 즉시 완공(오늘 1회)" hidden><span class="z" aria-hidden="true">⚡</span>즉시 완공<span class="n" aria-hidden="true">1</span></button></div>
+    <div class="buy-row"><button class="cta split" type="button" id="sheetBuy" aria-disabled="false"><span id="sheetBuyLabel">업그레이드</span><span class="cost"><span data-acorn></span><b id="sheetCost">20</b></span></button><button class="ff-btn" type="button" id="sheetFree" aria-label="업그레이드하고 바로 즉시 완공(학교 전체 하루 3번)" hidden><span class="z" aria-hidden="true">⚡</span>즉시 완공<span class="n" aria-hidden="true">1</span></button></div>
     <!-- 2.1.0 공사 칸: 공사 중에는 업그레이드 단추 대신 보여요 -->
     <div class="con-box" id="sheetCon" hidden>
       <div class="con-head"><span id="conClock" aria-hidden="true"></span><span id="conTx">공사 중</span></div>
       <div class="con-prog" aria-hidden="true"><i id="conFill"></i></div>
-      <button class="ff-btn wide" type="button" id="conFree" hidden><span class="z" aria-hidden="true">⚡</span>즉시 완공 (오늘 1회)<span class="n" aria-hidden="true">1</span></button>
+      <button class="ff-btn wide" type="button" id="conFree" hidden><span class="z" aria-hidden="true">⚡</span><span id="conFreeTx">즉시 완공 (오늘 3번 남음)</span><span class="n" aria-hidden="true">1</span></button>
       <div class="con-row"><button class="cta" type="button" id="conAll" aria-disabled="false"><span id="conAllLbl">단축권 자동 사용</span></button><button class="cta ghost" type="button" id="conNo" hidden>그만두기</button></div>
       <p class="con-plan" id="conPlan"></p>
       <button class="con-ess" type="button" id="conEss"><span>숲의 정수로 즉시 완료</span><span class="p" id="conEssCost"></span></button>
@@ -6304,10 +6304,11 @@ span.bt-stamp{display:none}.bt-duel.done span.bt-stamp{display:grid}
     mg: mgFresh(),   // 1.8.0 숲속 합치기
     dex: { got: {}, paid: [] }, ev: { cur: '', start: 0, stamp: { n: 0, last: '' }, list: [], box: false },   // 1.7.0 도감, 이벤트
     // 1.6.0 숲의 정수(미니게임에서만 얻어요)와 블록 퍼즐: 오늘 보상 판 수, 광고로 더한 횟수, 최고 점수, 하던 판
-    ess: 0, pz: { day: '', n: 0, adN: 0, best: 0, cur: null, hand: '' },   // 2.3.1 hand: 보상 판을 직접 한 날(소탕)
+    ess: 0, pz: { day: '', n: 0, adN: 0, best: 0, cur: null, hand: '', tb: 0 },   // 2.3.1 hand: 보상 판을 직접 한 날(소탕), 3.0.0 tb: 그날 직접 한 보상 판의 최고 점수
     ac: freshAc(),   // 2.0.1 공부: 과목 5개 학교 학력(lv, xp), 문제집 bk(day, n), 통계 st
     pc: freshPc(), sk: freshSk(),   // 2.1.0 숲속 소풍, 칭찬 스티커판
-    ff: {},   // 2.1.1 건물마다 바로 완공을 쓴 날
+    ff: {},   // 2.1.1 건물마다 바로 완공을 쓴 날(3.0.0부터는 기록만, 횟수는 ffd)
+    ffd: { day: '', n: 0 },   // 3.0.0 조정안 7: 오늘 학교 전체에서 쓴 무료 즉시 완공 횟수
     ces: '',   // 2.3.0 숲의 정수로 즉시 완료 '오늘은 다시 묻지 않기'를 고른 날
     ffx: '',   // 2.3.0 홈 지도 칩을 닫은 날
     sn: { got: {}, day: '', mood: 0, pity: 0, n: 0, gold: false },   // 2.1.2 매점 간식 뽑기: 간식마다 뽑은 수, 기분 날짜와 칸, 희귀 없이 뽑은 수, 모두 뽑은 수, 다 모아 받은 황금 기계
@@ -6553,6 +6554,7 @@ span.bt-stamp{display:none}.bt-duel.done span.bt-stamp{display:grid}
       s.pz.n = Math.floor(num(d.pz.n, 0, 0)); s.pz.adN = Math.floor(num(d.pz.adN, 0, 0));
       s.pz.best = Math.min(1e9, Math.floor(num(d.pz.best, 0, 0)));
       s.pz.hand = typeof d.pz.hand === 'string' ? d.pz.hand.slice(0, 10) : '';   // 2.3.1 소탕
+      s.pz.tb = d.pz.tb === undefined ? s.pz.best : Math.min(1e9, Math.floor(num(d.pz.tb, 0, 0)));   // 3.0.0 옛 저장은 업데이트한 날만 예전처럼 최고 점수로
       s.pz.cur = pzSanitize(d.pz.cur, num);
     }
     // 게임 시계: 망가진 값으로 영영 멈추지 않게 기기 시간 + 1년까지만 받아요
@@ -9172,7 +9174,7 @@ span.bt-stamp{display:none}.bt-duel.done span.bt-stamp{display:grid}
     $('#effNext').textContent = maxed ? `Lv.${capNext()}까지 열려요` : F.eff(L + 1);
     $('#sheetRep').textContent = k === 'library' ? '도서관은 평판을 가장 많이 올려요. 평판이 쌓이면 학교 등급이 올라가요.' : `레벨이 오를 때마다 평판도 ★${F.rep} 올라요.`;
     $('#sheetBuyLabel').textContent = (maxed ? '최고 레벨' : L >= 1 ? '업그레이드' : '짓기') ;   // 2.3.0 즉시 완공은 옆 ⚡ 단추로
-    { const fb = $('#sheetFree'), ok = ffCan(k) && !conOn(k); fb.hidden = !(S.tier >= 1 && !maxed && conFreeLeft(k) && conSec(k, L + 1) > 10); fb.setAttribute('aria-disabled', ok && furReady(k) && S.budget >= facCost(k) ? 'false' : 'true'); }
+    { const fb = $('#sheetFree'), ok = ffCan(k) && !conOn(k); fb.querySelector('.n').textContent = ffLeft(); fb.hidden = !(S.tier >= 1 && !maxed && conFreeLeft(k) && conSec(k, L + 1) > 10); fb.setAttribute('aria-disabled', ok && furReady(k) && S.budget >= facCost(k) ? 'false' : 'true'); }
     $('#sheetCost').textContent = maxed ? '-' : fmt(c);
     $('#sheetBuy').setAttribute('aria-disabled', ok ? 'false' : 'true');
     $('#sheetBuy').classList.toggle('is-rec', !!rt.rec && rt.rec.kind === 'fac' && rt.rec.k === k && !maxed);
@@ -9957,7 +9959,7 @@ span.bt-stamp{display:none}.bt-duel.done span.bt-stamp{display:grid}
     for (const k of Object.keys(FAC)) { const p = document.getElementById('pq-' + k); if (p) p.classList.toggle('ff-on', ks.includes(k)); }
     const c = $('#ffChip'); if (!c) return;
     const show = S.ffx !== gameToday() && rt.tab === 'school' && rt.viewTier == null && !rt.decoEdit && !rt.fest && !rt.sports && !festBusy() && !rt.paused && S.tier >= 1 && (ks.length > 0 || on || nbShow);   // 학교 행사 중에는 숨겨요. 2.2.0 야간 건설 줄은 초등학교부터 늘 보여요
-    const key = [show, S.ffx, ks.length, on ? Math.floor(cbLeft() / 60) : -1, nbShow ? (nb ? Math.floor(nbLeft() / 60) : -2) : -1, nbAdd()].join('|');
+    const key = [show, S.ffx, ks.length, ffLeft(), on ? Math.floor(cbLeft() / 60) : -1, nbShow ? (nb ? Math.floor(nbLeft() / 60) : -2) : -1, nbAdd()].join('|');
     if (!force && c.dataset.key === key) return; c.dataset.key = key;
     c.hidden = !show; if (!show) { ffUp(c); return; }
     c.classList.toggle('pulse', ks.length > 0);
@@ -9965,22 +9967,24 @@ span.bt-stamp{display:none}.bt-duel.done span.bt-stamp{display:grid}
     const sp = nbAdd() > NB.add, nbTx = !nbShow ? '' : nb ? `${nbAllDay(gameToday()) ? '주말 건설 가속' : '야간 건설'} +${nbAdd()}%, ${hm(nbLeft())} 남음` : sp ? (nbAllDay(gameToday()) ? `오늘 하루 종일 건설 가속 +${nbAdd()}%(특별 이벤트 주말)` : `오늘 ${NB.h0}~${NB.h1}시 건설 가속 +${nbAdd()}%(특별 이벤트)`) : `매일 ${NB.h0}~${NB.h1}시 건설 가속 이벤트`;
     c.classList.toggle('nb-on', nb && nbShow);
     const mp = $('#map'); if (mp) mp.classList.toggle('nb-night', nb);   // 2.2.0 비계에 등불
-    c.innerHTML = (ks.length ? `<b>즉시 완공 ${ks.length}곳 가능!</b>` : '') + (on ? `<small>건설 부스터 +100%, ${hm(cbLeft())} 남음</small>` : '') +
+    c.innerHTML = (ks.length ? `<b>오늘 즉시 완공 ${ffLeft()}/${FF.day}</b>` : '') + (on ? `<small>건설 부스터 +100%, ${hm(cbLeft())} 남음</small>` : '') +
       (nbShow ? `<small class="nb">${nbIc} ${nbTx}</small>` : '') + '<span class="ffx" role="button" aria-label="오늘은 이 알림 닫기">×</span>';
-    c.setAttribute('aria-label', (ks.length ? `즉시 완공할 수 있는 건물 ${ks.length}곳, 눌러서 건물 창 열기` : '') + (on ? ` 건설 부스터 사용 중` : '') + (nbShow ? ` ${nbTx}` : ''));
+    c.setAttribute('aria-label', (ks.length ? `오늘 즉시 완공 ${FF.day}번 가운데 ${ffLeft()}번 남음, 눌러서 건물 창 열기` : '') + (on ? ` 건설 부스터 사용 중` : '') + (nbShow ? ` ${nbTx}` : ''));
     ffUp(c);
   }
-  // 2.1.1 건물마다 하루 한 번 바로 완공. S.ff[건물] = 바로 완공을 쓴 날
-  const conFreeLeft = k => !!S && !!S.ff && S.ff[k] !== gameToday();
-  // 2.3.0 즉시 완공 단추: 공사 중인 건물을 하루 한 번(건물마다) 바로 끝내요. 공사 중이 아니면 먼저 공사를 시작하고 바로 끝내요
+  // 2.1.1 건물마다 하루 한 번 바로 완공 → 3.0.0 조정안 7(지섭 결정): 학교 전체 하루 3번, 고르는 건물은 마음대로. S.ffd = { 날, 쓴 횟수 }
+  const FF = { day: 3 };
+  const ffLeft = () => !S || !S.ffd ? 0 : S.ffd.day === gameToday() ? Math.max(0, FF.day - S.ffd.n) : FF.day;
+  const conFreeLeft = k => ffLeft() > 0;
+  // 2.3.0 즉시 완공 단추: 공사 중인 건물을 바로 끝내요(3.0.0 학교 전체 하루 3번). 공사 중이 아니면 먼저 공사를 시작하고 바로 끝내요
   function conFree(k) {
     if (!S || S.tier < 1 || !facKeys().includes(k) || !conFreeLeft(k) || rt.paused) return false;
     if (!conOn(k)) { if (!furReady(k) || facMaxed(k) || S.budget < facCost(k)) return false; if (!buyFacility(k)) return false; }
     if (!conOn(k)) return false;   // 10초 공사가 이미 끝났으면 쓰지 않아요
     const L = S.bd[k].L;
-    S.ff[k] = gameToday();
+    { const t = gameToday(); S.ff[k] = t; if (S.ffd.day !== t) S.ffd = { day: t, n: 0 }; S.ffd.n += 1; }
     sfx('quest'); conFinish(k);
-    setTimeout(() => toast(`즉시 완공! ${FAC[k].name} Lv.${L}\n이 건물은 내일 또 즉시 완공할 수 있어요`), 900);
+    { const n = ffLeft(); setTimeout(() => toast(`즉시 완공! ${FAC[k].name} Lv.${L}\n${n ? `오늘 즉시 완공 ${n}번 더 쓸 수 있어요` : '오늘 즉시 완공을 다 썼어요. 내일 다시 3번이에요'}`), 900); }
     renderMap(); conRender(true); ffRender(true); save();
     return true;
   }
@@ -10153,6 +10157,7 @@ span.bt-stamp{display:none}.bt-duel.done span.bt-stamp{display:grid}
     $('#conAll').setAttribute('aria-disabled', p.n ? 'false' : 'true');
     $('#conAllLbl').textContent = rt.conArm && p.n ? '이대로 쓸게요' : '단축권 자동 사용';   // 2.3.0 이름(지섭)
     $('#conFree').hidden = !(S.tier >= 1 && conFreeLeft(k));
+    if (!$('#conFree').hidden) { $('#conFreeTx').textContent = `즉시 완공 (오늘 ${ffLeft()}번 남음)`; $('#conFree .n').textContent = ffLeft(); }   // 3.0.0 학교 전체 하루 3번
     { const c = conEssCost(left); $('#conEssCost').innerHTML = `${ESS_ICON()}<b>${c}</b>`; $('#conEss').setAttribute('aria-disabled', S.ess >= c ? 'false' : 'true'); }
     $('#conNo').hidden = !(rt.conArm && p.n);
     $('#conPlan').textContent = !p.n ? '시간 단축권이 없어요. 광고를 보거나 문방구에서 살 수 있어요'
@@ -12916,7 +12921,7 @@ span.bt-stamp{display:none}.bt-duel.done span.bt-stamp{display:grid}
      효과: 수업료 레벨 합 × 0.1%(acMult), 평판 10레벨마다 +1(acRepOf), 새 명부 학생의 시작 능력 바탕(rosterKid). 숫자는 "균형 제안서 (2.0.1 공부 탭)" */
   const AC = { keys: ['kor', 'math', 'sci', 'art', 'pe'], name: { kor: '국어', math: '수학', sci: '과학', art: '미술', pe: '체육' },
     cap: [10, 20, 30, 40, 50, 60], need: n => 25 + 2 * n, pzPer: 100, pzMax: 12, mgPer: 1, mgMax: 20, mgE: 6, mgDay: 100,   // 2.1.0 학력과 능력치 균형: 과목마다 하루 XP를 비슷하게(균형 제안서 2.1.0 학력과 능력치 1절)
-    book: { ess: 10, xp: 50, perDay: 1, perLv: 1 }, tuition: 0.001, repPer: 10 };   // 문제집 값은 정수 10 + 그 과목 레벨, 과목마다 하루 1권
+    book: { ess: 10, xp: 50, perDay: 2, perLv: 1 }, tuition: 0.001, repPer: 10 };   // 문제집 값은 정수 10 + 그 과목 레벨, 과목마다 하루 2권(3.0.0 조정안 5, 예전 1권)
   const AC_GAME = { kor: '책 읽기', math: '숲속 퍼즐', sci: '과학 탐구 실험', art: '숲속 합치기', pe: '숲속 대결' };
   const freshAc = () => { const o = { bk: { day: '', n: {} }, st: { xp: 0, bk: 0 } }; for (const k of AC.keys) { o[k] = { lv: 1, xp: 0 }; o.bk.n[k] = 0; } return o; };
   const acCapOf = tier => AC.cap[Math.max(0, Math.min(AC.cap.length - 1, tier))];
@@ -14313,6 +14318,9 @@ span.bt-stamp{display:none}.bt-duel.done span.bt-stamp{display:grid}
         got: num(N.got, 0, SAVE_CAP.big), sec: num(N.sec, 0, 86400), done: N.done !== false, n: Math.floor(num(N.n, 0, SAVE_CAP.count)), at: num(N.at, 0, 253402300799999), fin: Math.floor(num(N.fin, 0, SAVE_CAP.count)) };
       if (s.ns.day && (!Number.isFinite(nightStart(s.ns.day)) || kstDay(nightStart(s.ns.day)) !== s.ns.day)) { s.ns.day = ''; s.ns.done = true; s.ns.at = 0; } }
     if (d.ff && typeof d.ff === 'object') for (const k of Object.keys(FAC)) if (typeof d.ff[k] === 'string') s.ff[k] = d.ff[k].slice(0, 10);
+    { const F = d.ffd && typeof d.ffd === 'object' ? d.ffd : null;   // 3.0.0 학교 전체 하루 횟수. 옛 저장은 오늘 건물마다 쓴 것을 세어요
+      if (F) s.ffd = { day: day(F.day), n: Math.floor(num(F.n, 0, 99)) };
+      else { const t = gameToday(); s.ffd = { day: t, n: Object.values(s.ff).filter(v => v === t).length }; } }
     s.fr = {};
     if (d.fr && typeof d.fr === 'object') for (const sp of Object.keys(d.fr)) {
       const F = d.fr[sp];
@@ -15474,7 +15482,7 @@ span.bt-stamp{display:none}.bt-duel.done span.bt-stamp{display:grid}
      - 선생님 도움: 조각에 가끔 선생님 블록이 끼어 나와요. 그 블록이 든 줄을 지우면 다람쥐(3×3 치우기), 부엉이(조각 바꾸기), 곰(조각 돌리기) 도움을 받아요
      하루에 5판까지 보상을 주고(2.3.1 지섭: 10판에서 5판, 대신 한 판 보상 +100%), 광고를 보면 2판 더 받아요. 그 뒤에도 연습으로는 계속 할 수 있어요. 하던 판은 저장돼요 */
   const PZ = {
-    N: 8, perDay: 5, adMore: 2, adMax: 1, rw: 2, sweep: 0.7,   // 2.3.1 rw: 한 판 보상 배수, sweep: 소탕 점수(최고 점수의 70%, 화면에는 쓰지 않아요)
+    N: 8, perDay: 5, adMore: 2, adMax: 1, rw: 2, sweep: 0.7,   // 2.3.1 rw: 한 판 보상 배수, sweep: 소탕 점수(3.0.0부터 오늘 직접 한 판 점수의 70%, 화면에는 쓰지 않아요)
     comboGrace: 4,   // 1.8.0: 줄을 못 지운 놓기가 이만큼 이어져야 콤보가 끊겨요
     pats: ['acorn', 'leaf', 'flower', 'mushroom', 'berry', 'water'],
     patName: { acorn: '도토리', leaf: '잎', flower: '꽃', mushroom: '버섯', berry: '산딸기', water: '물방울' },
@@ -15672,16 +15680,16 @@ span.bt-stamp{display:none}.bt-duel.done span.bt-stamp{display:grid}
     if (newBest) S.pz.best = score;
     S.st.pz = (S.st.pz || 0) + 1;
     const xp = rw ? acGain('math', pzXpOf(score)) : 0;   // 2.0.1 공부: 보상 판은 수학 XP(2.1.0 100점마다 1, 판당 12까지. 2.3.1 두 배)
-    if (rw && cur.hand !== false) S.pz.hand = gameToday();   // 2.3.1 오늘 직접 한 판이 있으면 소탕이 열려요
+    if (rw && cur.hand !== false) { const t = gameToday(); S.pz.tb = S.pz.hand === t ? Math.max(S.pz.tb || 0, score) : score; S.pz.hand = t; }   // 2.3.1 오늘 직접 한 판이 있으면 소탕이 열려요(3.0.0 그날 직접 한 판의 최고 점수를 남겨요)
     const tk = rw ? tkDaily('pz') : null;   // 2.3.0.1 보상 판마다 5분권 1장(하루 3장)
     S.pz.cur = null;
     save();
     return { score, ess, askEss: rw ? cur.ess : 0, mins, acorns, newBest, rw, xp, tk };
   }
-  /* 2.3.1 숲속 퍼즐 소탕(지섭 결정): 그날 보상 판을 1판 직접 하면 열려요. 판마다 최고 점수의 70%(PZ.sweep)로 친 보상을 바로 받아요.
+  /* 2.3.1 숲속 퍼즐 소탕(지섭 결정): 그날 보상 판을 1판 직접 하면 열려요. 판마다 오늘 직접 한 판 점수의 70%(PZ.sweep, 3.0.0 조정안 5. 예전에는 역대 최고 점수)로 친 보상을 바로 받아요.
      비율은 화면에 쓰지 않고 받을 양만 보여 줘요. 학생 부탁은 소탕으로 채우지 않아요. 오늘의 미션, 이벤트의 '퍼즐 n판'에는 쳐요 */
-  const pzSwOpen = () => { pzDay(); return S.pz.hand === gameToday() && S.pz.best > 0; };
-  const pzSwScore = () => Math.floor(S.pz.best * PZ.sweep);
+  const pzSwOpen = () => { pzDay(); return S.pz.hand === gameToday() && (S.pz.tb || 0) > 0; };
+  const pzSwScore = () => S.pz.hand === gameToday() ? Math.floor((S.pz.tb || 0) * PZ.sweep) : 0;
   function pzSwGain(n) {
     const sc = pzSwScore(), one = { ess: Math.floor(pzEssOf(sc) * libMult()), m: pzMinOf(sc), xp: pzXpOf(sc) };
     const tkLeft = Math.max(0, TKE.perDay - (S.tkd && S.tkd.day === gameToday() ? S.tkd.pz : 0));
@@ -18914,7 +18922,7 @@ span.bt-stamp{display:none}.bt-duel.done span.bt-stamp{display:grid}
     $('#sheetFriend').addEventListener('click', () => { const sp = $('#sheetFriend').dataset.sp, f = frOf(sp); if (!f) return; if (!frToday(f)) frPat(sp); else toast(`${frFull(sp)}: ${frLine(sp, rt.sheetKey)}`); });
     $('#sheetBday').addEventListener('click', () => { closeSheet(); setTimeout(bdClaim, 240); });
     $('#gAlbum').addEventListener('click', openAlbum);
-    for (const k of Object.keys(FAC)) { const p = document.getElementById('pq-' + k); if (p && !p.querySelector('.ffb')) p.insertAdjacentHTML('beforeend', '<g class="ffb" transform="translate(-38 -20)"><rect x="0" y="-6.5" width="76" height="13" rx="6.5"/><text x="38" y="3" text-anchor="middle">즉시 완공 1회 가능!</text></g>'); }   // 2.1.1
+    for (const k of Object.keys(FAC)) { const p = document.getElementById('pq-' + k); if (p && !p.querySelector('.ffb')) p.insertAdjacentHTML('beforeend', '<g class="ffb" transform="translate(-38 -20)"><rect x="0" y="-6.5" width="76" height="13" rx="6.5"/><text x="38" y="3" text-anchor="middle">즉시 완공 가능!</text></g>'); }   // 2.1.1
     $('#ffChip').addEventListener('click', e => { if (e.target.closest('.ffx')) { S.ffx = gameToday(); sfx('tap'); ffRender(true); save(); toast('오늘은 이 알림을 닫았어요. 내일 다시 보여요'); return; } const k = facKeys().find(ffCan); if (k) { sfx('tap'); openSheet(k); } else toast(conAdd() > 0 ? `지금 모든 공사 +${conAdd()}%예요${cbOn() ? `. 건설 부스터 ${hm(cbLeft())} 남았어요` : ''}${nbOn() ? `. 야간 건설은 ${hm(nbLeft())} 남았어요` : ''}` : `매일 ${NB.h0}~${NB.h1}시에는 야간 건설 이벤트로 모든 공사 +${NB.add}%예요. 학교 특별 이벤트 주간에는 +${NB.addSp}%예요`); });   // 2.2.0
     $('#conCb').addEventListener('click', e => { const b = e.target.closest('[data-cb]'); if (b) cbBuy(b.dataset.cb); });
     $('#albPrev').addEventListener('click', () => { rt.albPage -= 1; sfx('tap'); renderAlbum(); });
@@ -21168,7 +21176,7 @@ span.bt-stamp{display:none}.bt-duel.done span.bt-stamp{display:grid}
     NSL, nsStart, nsSettle, nsOpen, nsOn, nsOverlap, nsExtraH, isNight, nightDayOf, openNs, renderNs, bxSpots, renderNight,   // 3.0.0
    conOn, conLeft, conTick, conSec, conFinish, tkPlan, tkUse, tkUseAll, TK, CON, TKAD, capNext, yearCap,   // 2.1.0 공사
     semOn, semFirst, semLabel, cereDip, semBreak,   // 2.1.0 학기(s80)
-    get btUI() { return btUI; }, conFreeLeft, conFree, conEss, conEssCost, askConEss, CON, conSec, conBand, CB, cbOn, cbLeft, cbCost, cbApply, cbBuy, conRender, progOf, parseSave, saveSum, bakList, bakAdd, bakAll, askPick, pickKeepLocal, pickLoadSrv, openBak, cloudShouldRestore, get Cloud() { return Cloud; }, CG, CG_FLAGS, cgOpen, cgSync, cgPractice, cgMy, cgTable, cgOppNow, cgHTML, cgNewWeek, renderClub, BX, BX_SPOT, BIO, BIO_BY, bxOpen, bxSync, bxPick, bxOk, bxTap, bxCount, bxRareP, bxMapHTML, bxDexRender, setDexSeg, renderDeco, gdOpen, showReady, GD, GD_CROPS, GD_MENU, GD_M, gdN, gdSync, gdPlant, gdWater, gdHarvest, gdCook, gdMult, gdPct, gdToday, gdReadyN, gdMenuCount, openGd, gdRender, gdMark, nbApply, NB, nbAdd, nbAddOf, nbOn, nbOnAt, nbLeft, nbOverlap, nbApply, nbNotice, conAdd, get Live() { return Live; }, sanitize211, ffCan, ffRender, BTQ, BTQ_SCI, BTQ_KOR, BTQ_COL, btqMake, btqMath, btqPick, btqAnswer, btqMemTap, btqPts, btReveal,   // 2.1.1 대결 종목 문제
+    get btUI() { return btUI; }, conFreeLeft, ffLeft, FF, conFree, conEss, conEssCost, askConEss, CON, conSec, conBand, CB, cbOn, cbLeft, cbCost, cbApply, cbBuy, conRender, progOf, parseSave, saveSum, bakList, bakAdd, bakAll, askPick, pickKeepLocal, pickLoadSrv, openBak, cloudShouldRestore, get Cloud() { return Cloud; }, CG, CG_FLAGS, cgOpen, cgSync, cgPractice, cgMy, cgTable, cgOppNow, cgHTML, cgNewWeek, renderClub, BX, BX_SPOT, BIO, BIO_BY, bxOpen, bxSync, bxPick, bxOk, bxTap, bxCount, bxRareP, bxMapHTML, bxDexRender, setDexSeg, renderDeco, gdOpen, showReady, GD, GD_CROPS, GD_MENU, GD_M, gdN, gdSync, gdPlant, gdWater, gdHarvest, gdCook, gdMult, gdPct, gdToday, gdReadyN, gdMenuCount, openGd, gdRender, gdMark, nbApply, NB, nbAdd, nbAddOf, nbOn, nbOnAt, nbLeft, nbOverlap, nbApply, nbNotice, conAdd, get Live() { return Live; }, sanitize211, ffCan, ffRender, BTQ, BTQ_SCI, BTQ_KOR, BTQ_COL, btqMake, btqMath, btqPick, btqAnswer, btqMemTap, btqPts, btReveal,   // 2.1.1 대결 종목 문제
     SN, SN_ALL, snOpen, snCount, snSync, snMult, snBase, snCost, snPick, snDraw, openSn, snRender, snDexRender, setDexSeg, rate,
     qProg, VD, vdH, vdOpen, vdNeed, vdLeft, vdLocked, vdLive, boostAmount, TKAD, tripCut, achMedal, vdAmt, vdGive, vdUp, openVd, vdRender, vdMapHTML, achTitles, achTitleName, setTitle,
     BF, FR_LINES, frSync, frMake, frOf, frNm, frFull, frHeart, frList, frPat, frGift, frGiftLeft, frAddP, frRename, frHere, frKidTap, frLetter, frTick, bdParty, bdPlace, bdClaim, bdDoneToday, bdRender, bdHats,
