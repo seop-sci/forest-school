@@ -13,8 +13,8 @@ async def main():
               R.fakePerf=0;R.paused=false;
               const at=s=>F.setServerTime(Date.parse(s));
               S.f.dorm=1;S.ns={day:'',sub:'math',got:0,sec:0,done:false,n:0};
-              at('2026-11-02T19:59:59+09:00');out.dayBlocked=F.nsStart()===false;
-              at('2026-11-02T20:00:00+09:00');out.started=F.nsStart()===true;
+              at('2026-11-02T19:59:59+09:00');out.dayReserved=F.nsStart()===true&&!F.nsOn();
+              at('2026-11-02T20:00:00+09:00');out.started=F.nsOn()&&F.nsStart()===false;
               out.twice=F.nsStart()===false&&S.ns.n===1;
               out.cap=F.nsExtraH()===0.5;
               out.overlap=F.nsOverlap(Date.parse('2026-11-02T19:00:00+09:00'),Date.parse('2026-11-03T07:00:00+09:00'))===36000;

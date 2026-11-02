@@ -134,7 +134,7 @@ async def main():
                 await ctx.close()
         # 4) 0.6 저장: '졸업식 세 번'(q24) 중이고 졸업식 2번을 연 유치원
         if want('mig'):
-            sv = base(tg=2, tdip=30, grade=1, best=4, st={'picks':40,'ups':90,'trains':20,'claims':3,'grads':2,'perks':3},
+            sv = base(tg=2, tdip=30, grade=1, best=4, tut={'st':'skip','step':0,'paid':False,'nop':True}, st={'picks':40,'ups':90,'trains':20,'claims':3,'grads':2,'perks':3},
                       p={'dip':9,'species':2,'perk':{'schol':2,'rep':1,'start':0,'drop':0,'night':0}},
                       q={'init':True,'mid':'q24','m':24,'mb':0,'subs':[],'done':[],'gen':0,'subDone':5,'seen':24})
             ctx, page, errs = await ctxpage(b, 390, 780, 'light', sv)
