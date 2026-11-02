@@ -25,12 +25,12 @@ async def main():
             r = await ev("return { pd: F.PZ.perDay, ad: F.PZ.adMore, rw: F.PZ.rw, e: F.pzEssOf(5000), x: F.pzXpOf(1000) };")
             print('퍼즐', r)
             if r['pd'] != 5 or r['ad'] != 2 or r['rw'] != 2 or r['e'] % 2 or r['x'] % 2: bad.append(f'퍼즐 값 {r}')
-            r = await ev("S.pz.best = 0; S.pz.hand = ''; const a = F.pzSwOpen(); S.pz.best = 3000; S.pz.n = 1; S.pz.hand = F.gameToday(); const b = F.pzSwOpen(); const g0 = F.pzSwGain(2), e0 = S.ess; const g = F.pzSweep(2); " + CLEAN + "; return { a, b, n: S.pz.n, ess: S.ess - e0, g0e: g0.ess, ok: !!g, txt: document.querySelector('#pzSwTx') ? document.querySelector('#pzSwTx').textContent : '' };")
+            r = await ev("S.pz.best = 0; S.pz.hand = ''; const a = F.pzSwOpen(); S.pz.best = 3000; S.pz.tb = 3000; S.pz.n = 1; S.pz.hand = F.gameToday(); const b = F.pzSwOpen(); const g0 = F.pzSwGain(2), e0 = S.ess; const g = F.pzSweep(2); " + CLEAN + "; return { a, b, n: S.pz.n, ess: S.ess - e0, g0e: g0.ess, ok: !!g, txt: document.querySelector('#pzSwTx') ? document.querySelector('#pzSwTx').textContent : '' };")
             print('소탕', r)
             if r['a'] or not r['b'] or r['n'] != 3 or r['ess'] != r['g0e'] or r['ess'] <= 0: bad.append(f'소탕 {r}')
             if '70' in r['txt'] or '%' in r['txt']: bad.append(f'소탕 비율이 보여요 {r}')
             # 소탕 줄은 퍼즐 카드 안, 시작하기 아래(2.3.1 지섭 요청)
-            for st in ("S.pz.hand = ''; S.pz.n = 0;", "S.pz.hand = F.gameToday(); S.pz.best = 3000; S.pz.n = 1;"):
+            for st in ("S.pz.hand = ''; S.pz.n = 0;", "S.pz.hand = F.gameToday(); S.pz.best = 3000; S.pz.tb = 3000; S.pz.n = 1;"):
                 r = await ev(st + " F.setTab('mini'); F.renderMini(); document.querySelector('#pzOpen').scrollIntoView({ block: 'center' }); const c = document.querySelector('#pzOpen').getBoundingClientRect(), p = document.querySelector('#pzCardTag').getBoundingClientRect(), w = document.querySelector('#pzSwRow'), q = w.getBoundingClientRect(), b = document.querySelector('#pzSwBtn'); const vis = b.hidden ? document.querySelector('#pzSwTx') : b, v = vis.getBoundingClientRect(); return { shown: !w.hidden, inside: v.left >= c.left && v.right <= c.right && v.bottom <= c.bottom + 0.5, below: v.top >= p.bottom, mid: Math.abs((v.left + v.right) / 2 - (p.left + p.right) / 2) < 3, btn: !b.hidden, tx: b.hidden ? vis.textContent : b.textContent };")
                 print('소탕 자리', r)
                 if not (r['shown'] and r['inside'] and r['below'] and r['mid']): bad.append(f'소탕 자리 {r}')

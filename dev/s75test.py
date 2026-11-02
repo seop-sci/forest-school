@@ -57,7 +57,7 @@ async def main():
                   S.ac.kor.lv = 20; S.ess = 100; const b5 = F.acBuyBook('kor'), ess2 = S.ess; F.rt.fakeNow = null;   // 2.1.0 Lv.20이면 값 30
                   return {{ l0, b1, b2, b3, l1, ess, b4, bk, l2, b5, ess2 }}; }})()""")
                 print('문제집', r)
-                if r['l0'] != 1 or not r['b1'] or r['b2'] or r['b3'] or r['l1'] != 0 or r['ess'] != 14 or r['b4'] or r['bk'] != 1 or r['l2'] != 1 or not r['b5'] or r['ess2'] != 70: bad.append(f'문제집이 틀려요 {r}')
+                if r['l0'] != 2 or not r['b1'] or not r['b2'] or r['b3'] or r['l1'] != 0 or r['ess'] != 2 or r['b4'] or r['bk'] != 2 or r['l2'] != 2 or not r['b5'] or r['ess2'] != 70: bad.append(f'문제집이 틀려요 {r}')
                 await pg.evaluate(T.CLEAN)
                 # 4) 수업료, 평판, 수학부
                 r = await pg.evaluate(f"""(() => {{ const F = {F}, S = F.S; S.tier = 2; for (const k of F.AC.keys) {{ S.ac[k].lv = 30; S.ac[k].xp = 0; }}

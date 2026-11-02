@@ -26,9 +26,9 @@ async def main():
             const want0 = I['map_kinder_' + th] || window.FS_IMG.map_kinder, want1 = I['map_elem_' + th] || window.FS_IMG.map_elem;
             out[th || 'none'] = [h0 === want0 || (!I['map_kinder_' + th] && h0.endsWith('/map_kinder.webp')), h1 === want1 || (!I['map_elem_' + th] && h1.endsWith('/map_elem.webp')), !!I['map_kinder_' + th], !!I['map_elem_' + th]]; }}
           S.cos.th.bg = ''; F.applyThemes(); return out; }})()""")
-        for th in ['spring', 'summer', 'autumn', 'winter', 'xmas']:
+        for th in ['spring', 'summer', 'autumn', 'winter', 'xmas', 'space']:   # 2.3.3부터 우주 탐험도 테마 지도가 있어요
             if r[th] != [True, True, True, True]: fails.append(f'테마 지도 {th}: {r[th]}')
-        for th in ['none', 'space']:
+        for th in ['none']:
             if r[th][:2] != [True, True] or r[th][2] or r[th][3]: fails.append(f'기본 지도 {th}: {r[th]}')
         # 2) 건물 외관: 유치원에서는 그대로
         r = await pg.evaluate(f"""(()=>{{ const F={F}, S=F.S; S.tier=0; for (const k of ['classroom','cafeteria','library','playground']) {{ S.f[k]=Math.max(3,S.f[k]||0); F.FUR[k].forEach((_,i)=>{{ if (S.fu && S.fu[k]) S.fu[k][i]=Math.max(S.fu[k][i]||0, S.f[k]); }}); }}
@@ -40,7 +40,7 @@ async def main():
           for (const k of ['classroom','cafeteria','library']) {{
             const g=document.querySelector('#b-'+k); const b0=F.bldImg(k);
             for (let i=0;i<8 && !F.furReady(k);i++) {{ const j=F.FUR[k].findIndex((_,j)=>!F.furDone(k,j)); if (j<0) break; F.buyFur(k,j,true); }}
-            S.ff = {{}}; const ok = F.conFree(k);   // 2.3.0 즉시 완공 단추로(예전에는 저절로 바로 완공)
+            S.ff = {{}}; S.ffd = {{ day: '', n: 0 }}; const ok = F.conFree(k);   // 2.3.0 즉시 완공 단추로(예전에는 저절로 바로 완공)
             const href = g.querySelector('.built .bimg').getAttribute('href'), roof = g.querySelector('.roofimg').getAttribute('href');
             out[k] = {{ b0, ok, b1: F.bldImg(k), bs: S.bs[k], hrefOk: href === window.FS_IMG170['bld_'+k+'_s2'], roofOk: roof === window.FS_IMG170['roof_'+k+'_s2'], roofKey: F.roofKey(k) }};
           }}

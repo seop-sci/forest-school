@@ -3,7 +3,8 @@
 #  1) 유치원에는 없고 초등학교부터. 게임 시계 2시간마다 한 마리, 최대 3마리, 자리 비운 동안 몫도 그때 시각으로
 #  2) 조건: 물가 자리에는 물가 생물만, 계절(여름 매미, 가을 단풍잎), 밤 20~24시(반딧불이, 하늘다람쥐), 비(달팽이, 도롱뇽)
 #  3) 관찰: 처음 과학 XP 10과 정수 1, 다시 보면 XP 3과 도토리. 10종 황금 1, 20종 정수 20, 30종 관찰 오두막 장식
-#  4) 지도에 흔들리는 풀숲 표시와 누르기, 관찰 카드 창, 도감 '생물' 칸 30칸
+#     2.3.5: 60종 황금 3과 곤충 호텔, 90종 정수 50과 생태 연못, 칭호 숲속 박사
+#  4) 지도에 흔들리는 풀숲 표시와 누르기, 관찰 카드 창, 도감 '생물' 칸 90칸(2.3.5)
 #  5) 메인 퀘스트 bx1, bx2(초등 5장), 패스 미션 bx, 업적 bio, 저장 읽기
 #  6) 390 밝은, 360 어두운 화면 넘침 없음, 페이지 오류 없음
 # 쓰는 법: python3 wrap.py && python3 s95test.py   (마지막 줄이 PASS면 통과)
@@ -15,7 +16,7 @@ CLEAN = "document.querySelectorAll('.overlay').forEach(o=>{o.hidden=true;o.class
 SKIP = f"(()=>{{ const t=document.querySelector('#tut'); if(t) t.hidden=true; {F}.S.tut.st='skip'; {F}.rt.tut=null; {CLEAN}; }})()"
 OVER = """(sel => { const out = []; document.querySelectorAll(sel).forEach(el => { const r = el.getBoundingClientRect(); if (r.width && (r.right > innerWidth + 1 || r.left < -1 || el.scrollWidth > el.clientWidth + 2)) out.push((el.id || el.className) + ' ' + Math.round(r.left) + '~' + Math.round(r.right)); }); return out; })"""
 # 한국 시간 (월, 일, 시, 분)
-K = "((mo, d, h, m) => Date.UTC(2026, mo - 1, d, h - 9, m || 0))"
+K = "((mo, d, h, m) => Date.UTC(2030, mo - 1, d, h - 9, m || 0))"   # 2026-11-03 시험 날짜가 오늘보다 앞이면 게임 시계가 뒤로 가지 않아서 실패해요. 먼 미래로
 H = 3600000
 
 
@@ -37,8 +38,9 @@ async def main():
             if w == 390:
                 # 2) 조건 (뽑기 대신 exOk로)
                 r = await ev("""const ok = (k, t, w) => F.bxOk(F.BIO_BY['bio_' + k], t, w);
-                  const day = K(11, 3, 14), night = K(11, 3, 21), sum = K(7, 10, 14);
-                  let rain = null; for (let d = 1; d <= 28; d++) { const s = `2026-11-${String(d).padStart(2, '0')}`; if (F.wxOf(s) === 'rain') { rain = K(11, d, 14); break; } }
+                  let dd = 3; while (F.wxOf(`2030-11-${String(dd).padStart(2, '0')}`) === 'rain') dd++;   // 비 안 오는 날
+                  const day = K(11, dd, 14), night = K(11, dd, 21), sum = K(7, 10, 14);
+                  let rain = null; for (let d = 1; d <= 28; d++) { const s = `2030-11-${String(d).padStart(2, '0')}`; if (F.wxOf(s) === 'rain') { rain = K(11, d, 14); break; } }
                   return { strider_w: ok('waterstrider', day, 1), strider_l: ok('waterstrider', day, 0), lady_w: ok('ladybug', day, 1), cicada_nov: ok('cicada', day, 0), cicada_jul: ok('cicada', sum, 0),
                     maple_nov: ok('maple', day, 0), fly_day: ok('flyingsquirrel', day, 0), fly_night: ok('flyingsquirrel', night, 0), firefly_nov: ok('firefly', night, 0),
                     snail_dry: ok('snail', day, 0), snail_rain: rain ? ok('snail', rain, 0) : true,
@@ -71,6 +73,16 @@ async def main():
                 print('관찰', {k: v for k, v in r.items() if k != 'card'})
                 ok(r['nw'] and r['e1'] == 1 and r['left'] == 2 and r['acorn'] and r['e3'] == 0, f'처음과 다시 보기 {r}')
                 ok(r['g10'] == 1 and r['e20'] == 20 + 1 and r['g'] == 3 and r['hut'] == 1 and r['cnt'] == 30, f'10, 20, 30종 보상 {r}')
+                r6 = await ev("""S.bx.got = Object.fromEntries(F.BIO.slice(0, 59).map(b => [b.id, 1])); S.bx.g = 3; S.bx.sp = [{ i: 1, id: F.BIO[59].id, t: 0 }]; const g0 = S.gold; F.bxTap(1);
+                  const g60 = S.gold - g0, hotel = S.deco.own.deco_bug_hotel, gg = S.bx.g;
+                  S.bx.got = Object.fromEntries(F.BIO.slice(0, 89).map(b => [b.id, 1])); S.bx.sp = [{ i: 1, id: F.BIO[89].id, t: 0 }]; const e0 = S.ess; F.bxTap(1);
+                  const t = F.VD.titles.find(x => x.id === 'biodoc');
+                  const tt = !!(t && t.got(S)), g5 = S.bx.g; S.bx.got = Object.fromEntries(F.BIO.slice(0, 30).map(b => [b.id, 1])); S.bx.g = 3; S.bx.st.n = 4;
+                  return { n: F.BIO.length, g60, hotel, gg, e90: S.ess - e0, pond: S.deco.own.deco_eco_pond, g: g5, title: tt, ach: F.ACH.find(x => x.id === 'bio').goals,
+                    imgs: F.BIO.filter(b => !F.IMG(b.id)).map(b => b.id), deco: ['deco_bug_hotel', 'deco_eco_pond'].every(k => F.DECO.some(d => d.id === k)) };""")
+                print('60, 90종', r6)
+                ok(r6['n'] == 90 and r6['g60'] == 3 and r6['hotel'] == 1 and r6['gg'] == 4 and r6['e90'] == 50 + 1 and r6['pond'] == 1 and r6['g'] == 5 and r6['title'], f'60, 90종 보상 {r6}')
+                ok(r6['ach'] == [10, 25, 45, 70, 90] and not r6['imgs'] and r6['deco'], f'업적 목표, 그림, 장식 {r6}')
                 ok(r['open'] and 'NEW' in r['card'] and '멸종위기 야생생물' in r['card'], f'관찰 카드 {r["card"]}')
                 await pg.evaluate(CLEAN)
                 # 5) 퀘스트, 패스, 업적, 저장
@@ -81,7 +93,7 @@ async def main():
                 print('퀘스트와 저장', {k: v for k, v in r.items() if k != 'a'})
                 ok(r['i1'] > 0 and r['i2'] > r['i1'] and r['ch'] == [5, 5] and r['m1'] == 4 and r['m2'] == 30 and r['ps'] == 4 and r['ach'] == '꼬마 생물학자', f'퀘스트 {r}')
                 a = r['a']
-                ok(a['m'] == 1 and a['sp'] == [{'i': 0, 'id': 'bio_pine', 't': 5}] and a['next'] == 0 and a['got'] == {'bio_pine': 3} and a['g'] == 3 and a['st']['n'] == 0 and r['b'] == [-1, 0], f'저장 읽기 {a}')
+                ok(a['m'] == 1 and a['sp'] == [{'i': 0, 'id': 'bio_pine', 't': 5}] and a['next'] == 0 and a['got'] == {'bio_pine': 3} and a['g'] == 5 and a['st']['n'] == 0 and r['b'] == [-1, 0], f'저장 읽기 {a}')
             # 4) 지도와 도감
             r = await ev("""S.tier = 1; F.rt.fakeNow = K(11, 20, 9); S.bx.sp = [{ i: 0, id: 'bio_pine', t: 0 }, { i: 2, id: 'bio_waterstrider', t: 0 }]; S.bx.m = 1; S.bx.next = K(11, 20, 11);
               F.renderDeco(true); return document.querySelectorAll('#decoG [data-bx]').length;""")
@@ -96,7 +108,7 @@ async def main():
             r = await ev("""F.setTab('dex'); F.renderHUD && F.renderHUD(); const seg = document.querySelector('#dsegBx'); F.setDexSeg('bx');
               return { seg: !seg.hidden, cards: document.querySelectorAll('#bxDexGrid .bx-card').length };""")
             await pg.wait_for_timeout(500); await pg.screenshot(path=f's95_dex_{w}.png')
-            ok(r['cards'] == 30, f'{w} 도감 {r}')
+            ok(r['cards'] == 90, f'{w} 도감 {r}')   # 2.3.5 90종
             o = await pg.evaluate(OVER + "('#bxPane, #bxPane *')"); ok(not o, f'{w} 도감이 넘쳐요 {o[:4]}')
             ok(not errs, f'{w} 페이지 오류 {errs}')
             await ctx.close()

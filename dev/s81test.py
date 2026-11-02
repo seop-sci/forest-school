@@ -38,7 +38,7 @@ async def main():
                 r = await pg.evaluate(f"""(() => {{ const F = {F}, S = F.S, o = {{}}, t0 = Date.now(); F.rt.fakeNow = t0;
                   S.tier = 1; S.tg = 0; S.sem = 0; S.budget = 1e15;
                   for (const k of ['library', 'cafeteria']) {{ S.f[k] = 15; S.fu[k] = S.fu[k].map(() => 15); }}
-                  S.budget = 1e13; S.ff = {{}}; const lf = S.f.library; F.buyFacility('library'); o.free = [S.f.library === lf + 1 && !F.conOn('library'), F.conFreeLeft('library'), F.conFreeLeft('cafeteria')];   // 2.1.1 하루 한 번 바로 완공
+                  S.budget = 1e13; S.ff = {{}}; S.ffd = {{ day: '', n: 0 }}; const lf = S.f.library; F.buyFacility('library'); o.free = [S.f.library === lf + 1 && !F.conOn('library'), F.conFreeLeft('library'), F.conFreeLeft('cafeteria')];   // 2.1.1 하루 한 번 바로 완공
                   S.f.library = 15; S.fu.library = S.fu.library.map(() => 15); delete S.bd.library; S.ff = {{ library: F.gameToday(), cafeteria: F.gameToday(), classroom: F.gameToday(), science: F.gameToday(), playground: F.gameToday() }};
                   S.budget = 1e13; const b0 = S.budget, c = F.facCost('library');
                   o.a = F.buyFacility('library'); o.paid = b0 - S.budget > 0 && b0 - S.budget <= c * (1 + 1e-9); o.lv = S.f.library; o.again = F.buyFacility('library');
