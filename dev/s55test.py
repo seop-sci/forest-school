@@ -30,7 +30,7 @@ async def main():
           return out; }})()""")
         if r['lv0'] != 0 or r['mult0'] != 1: fails.append(f"처음 교감 레벨 {r['lv0']} {r['mult0']}")
         if r['vpCost'] != r['bearCost']: fails.append(f"교감 연수 값이 곰 곡선과 달라요 {r['vpCost']} {r['bearCost']}")
-        if r['cards'] != ['squirrel', 'bear', 'owl', 'kor', 'art', 'vp', 'diet', 'lib', 'snack', 'dorm']:   # 1.7.1: 교감 선생님 밑에 영양, 사서 선생님. 2.3.0 곰과 부엉이 순서, 국어 미술(교감 위), 매점(맨 밑)
+        if r['cards'] != ['squirrel', 'bear', 'owl', 'kor', 'art', 'vp', 'diet', 'lib', 'snack', 'dorm', 'fix']:   # 1.7.1: 교감 선생님 밑에 영양, 사서 선생님. 2.3.0 곰과 부엉이 순서, 국어 미술(교감 위), 매점(맨 밑)
             fails.append(f"선생님 카드 순서 {r['cards']}")
         if r['lv1'] != 1 or r['tr1'] != r['tr0'] + 1 or abs(r['mult1'] - 1.1) > 1e-9: fails.append(f"연수 1번 {r}")
         if r['lvMax'] != 10 or abs(r['multMax'] - 2) > 1e-9 or r['btn'] != '최고 레벨': fails.append(f"최고 레벨 {r['lvMax']} {r['multMax']} {r['btn']}")
