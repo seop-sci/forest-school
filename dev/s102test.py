@@ -41,7 +41,7 @@ async def main():
         assert r['picnic']==[5,2], '소풍 단축권'
         assert r['trip']==[5,1], '체험학습 단축권'
         assert r['deco']==[0,1], '합치기 조각 교환'
-        assert r['ad']==[3,9], '광고 황금 도토리 상한'
+        assert r['ad']==[3,3], '광고 황금 도토리 상한'
         assert r['daily']==[1,45,3,True], '일일 임무 보상과 중복 수령 방지'
         assert r['saving'], '간식 목표 저축 중 시설 추천'
         assert r['nextSchool']=='숲속 대학교', '고등학교 다음 학교급 안내'
