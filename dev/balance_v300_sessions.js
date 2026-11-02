@@ -5,20 +5,33 @@ window.auditSessions = function(o) {
  let seed=o.seed;Math.random=()=>{seed=(Math.imul(seed,1664525)+1013904223)>>>0;return seed/4294967296};
  const start=Date.parse('2026-11-02T13:00:00+09:00');let t=start,day=0,elapsed=0;
  const clock=x=>{t=x;window._auditNow=x;R.fakeNow=x;R.fakePerf=0;F.SVR.ok=false;S.clk.last=x};clock(t);
- // Explicit reference graduate fixture; not a prediction of the preceding school.
- S.tier=2;S.tg=2;S.sem=1;S.grade=4;S.best=4;S.students=120;
- Object.assign(S.f,{classroom:32,cafeteria:26,library:26,playground:28,science:18,store:24});
- for(const k in S.fu)S.fu[k]=S.fu[k].map(()=>S.f[k]||0);
- S.fp={schol:o.fp??6,rep:3,dip:2};S.fund=0;S.tdip=500;S.yearEarned=1e19;S.p.species=12;
- for(const k of F.AC.keys)S.ac[k]={lv:20,xp:0};S.bt.pts=1600;S.bt.lg=3;S.bt.st.w=20;
- S.q.m=F.MAIN.findIndex(q=>q.id==='j31');S.q.mid='j31';S.q.mb=0;S.q.lat='';
+ // 2026-11-02 Claude: two start states. 'high' = middle-school graduate who already passed hw9
+ // (the old fixture entered at gold league, which hw9 makes impossible). 'mid' = elementary graduate.
+ // Facility levels are set to the year cap (an upper bound); other inputs are stated assumptions.
+ const mode=o.start||'high';
+ if(mode==='mid'){
+  S.tier=1;S.tg=5;S.sem=1;S.grade=4;S.best=4;S.students=80;
+  for(const k of F.facKeys())S.f[k]=F.facCap();
+  for(const k in S.fu)S.fu[k]=S.fu[k].map(()=>S.f[k]||0);
+  S.fp={schol:o.fp??3,rep:2,dip:1};S.fund=0;S.tdip=200;S.yearEarned=1e14;S.p.species=8;
+  for(const k of F.AC.keys)S.ac[k]={lv:15,xp:0};S.bt.pts=1200;S.bt.lg=1;S.bt.st.w=o.plays??1;S.bt.st.l=0;
+  S.q.m=F.MAIN.findIndex(q=>q.id==='e39');S.q.mid='e39';S.q.mb=0;S.q.lat='';
+ } else {
+  S.tier=2;S.tg=2;S.sem=1;S.grade=4;S.best=4;S.students=120;
+  Object.assign(S.f,{classroom:32,cafeteria:26,library:26,playground:28,science:18,store:24});
+  for(const k in S.fu)S.fu[k]=S.fu[k].map(()=>S.f[k]||0);
+  S.fp={schol:o.fp??6,rep:3,dip:2};S.fund=0;S.tdip=500;S.yearEarned=1e19;S.p.species=12;
+  for(const k of F.AC.keys)S.ac[k]={lv:20,xp:0};S.bt.pts=2500;S.bt.lg=5;S.bt.st.w=Math.round((o.plays??20)*0.45);S.bt.st.l=(o.plays??20)-S.bt.st.w;
+  S.q.m=F.MAIN.findIndex(q=>q.id==='j31');S.q.mid='j31';S.q.mb=0;S.q.lat='';
+ }
  S.tut={st:'skip',nop:true};S.sound=false;S.bgm=false;S.pending=0;S.pendingSec=0;
  if(!F.canPromote())throw Error('reference fixture cannot graduate');F.promote();
- S.pid='AUDIT42';S.q.m=F.MAIN.findIndex(q=>q.id==='hs1');S.q.mid='hs1';S.q.mb=0;S.q.lat='';
+ const firstQ=mode==='mid'?'j1':'hs1',qi=F.MAIN.findIndex(q=>q.id===firstQ);
+ S.pid='AUDIT42';S.q.m=qi>=0?qi:F.MAIN.findIndex(q=>F.chTier?F.chTier(q.ch)===S.tier:false);S.q.mid=F.MAIN[S.q.m].id;S.q.mb=0;S.q.lat='';
  F.rosterEnsure();F.clubAuto(true);S.ess=0;S.gold=0;S.tk={h3:0,h1:0,m30:0,m5:0};
  F.mgOpen();F.mgClose();
  R.modalQueue=[];R.modalOpen=null;R.fest=null;R.sports=null;
- const input={fp:{...S.fp},fund:S.fund,species:S.p.species,ac:JSON.parse(JSON.stringify(S.ac)),bt:{pts:S.bt.pts,lg:S.bt.lg,w:S.bt.st.w},budget:S.budget,roster:S.roster.list.length};
+ const input={start:mode,tier:S.tier,f:{...S.f},fp:{...S.fp},fund:S.fund,species:S.p.species,ac:JSON.parse(JSON.stringify(S.ac)),bt:{pts:S.bt.pts,lg:S.bt.lg,w:S.bt.st.w,l:S.bt.st.l},budget:S.budget,roster:S.roster.list.length};
  const ledger={},history=[],milestones=[],daily=[],mergeTrace=[];const actionCounts={};const rngs={};let dormDay=null,complete=false,lastQuest='',lastEnd=start,adsUsed=0,battles=0,puzzles=0,sw=0;
  const wallet=()=>({acorns:S.budget,gold:S.gold,ess:S.ess,dip:S.p.dip,fund:S.fund,ticketMinutes:S.tk.m5*5+S.tk.m30*30+S.tk.h1*60+S.tk.h3*180,pieces:S.mg.pieces,up:S.mg.up,energy:S.mg.e});
  const initialWallet=wallet();
@@ -88,13 +101,21 @@ window.auditSessions = function(o) {
    // One daily puzzle then actual available sweeps; score/time are explicit skill assumptions.
    puzzle();sweep();collect();invest();
    if(F.nsOpen())record('nightReserve',()=>{R.nsSub='math';F.nsStart()});
+   // 2026-11-02 Claude: middle-school system quests use the real game functions, one try a day.
+   {const q2=quest(),t2=q2?.t;
+    if(t2==='club'||t2==='clubSum'||t2==='clubShown')record('club',()=>F.clubAuto(true));
+    if(t2==='clubMat'&&!S.roster.list.some(x=>x.c===4))record('club',()=>{const k=S.roster.list.slice().sort((a,b)=>b.a[4]-a.a[4])[0];if(k)k.c=4;});
+    if((t2==='cgPrac'||t2==='cgShow')&&F.cgOpen())spend(20,()=>{F.cgSync(true);if(t2==='cgPrac')F.cgPractice();},'clubLeague');
+    if(t2==='elMid'||t2==='elects')spend(15,()=>{F.elSync();F.elVote(0)},'election');
+    for(let i=0;i<10&&(t2==='snDraw'||t2==='snDex')&&F.snOpen()&&S.budget>=F.snCost(false);i++)if(!spend(5,()=>F.snDraw(false),'snack'))break;
+    if(t2==='sports'&&!F.sportsCon())spend(65,()=>{F.startSports(false);if(R.sports)F.endSports();},'sportsDay');}
    const q=quest();if(q?.t==='trials')spend(30,()=>{F.startTrial('snake');for(let i=0;i<30&&R.trial;i++)F.hitTrial()},'intruder');
-   if(F.showReady())spend(15,()=>{F.clubAuto(true);const i=F.CLUBS.findIndex((_,i)=>F.clubMembers(i).length);if(i>=0)F.clubShowGo(i)},'clubShow');
+   if(F.showReady())spend(15,()=>{F.clubAuto(true);const ok=F.CLUBS.map((_,i)=>i).filter(i=>F.clubMembers(i).length);const i=ok.find(i=>!(S.club.shown||{})[i])??ok[0];if(i!==undefined)F.clubShowGo(i)},'clubShow');
    if(!S.trip.cur&&S.students>=10)record('tripStart',()=>{const d=F.TRIPS.filter(x=>S.st.trips>=x.need).sort((a,b)=>a.min-b.min)[0];if(d)F.startTrip(d.id)});
    if(S.trip.cur&&S.trip.end<=t)record('tripReturn',()=>F.claimTrip(1));
    // Focus math until Lv30, then the lowest subject. No injected currency.
    const bookKey=S.ac.math.lv<30?'math':F.AC.keys.slice().sort((a,b)=>S.ac[a].lv-S.ac[b].lv)[0];
-   if(S.ess>=A.bookCost(bookKey))spend(5,()=>A.acBuyBook(bookKey),'book');
+   for(let b=0;b<2;b++)if(A.acBkLeft(bookKey)>0&&S.ess>=A.bookCost(bookKey))spend(5,()=>A.acBuyBook(bookKey),'book');
    // Battle consumes actual simulated time; do not grant league/wins directly.
    battle();if(o.minutes===15)battle();
    while(elapsed+3<=o.minutes*60){claim();const q=quest();
@@ -106,12 +127,13 @@ window.auditSessions = function(o) {
    claim();const qend=quest();
    const todayLedger={};for(const tag in ledger){todayLedger[tag]={};for(const key in ledger[tag]){const v=ledger[tag][key],b=ledgerBefore[tag]?.[key]||{in:0,out:0};todayLedger[tag][key]={in:v.in-b.in,out:v.out-b.out}}}daily.push({day:day+1,seconds:elapsed,wallet:wallet(),ledger:todayLedger,tg:S.tg,sem:S.sem,quest:qend?.id||null,math:S.ac.math.lv,battle:S.bt.pts,missions:S.dm.list.map(x=>({id:x.id,done:x.done}))});
    if(elapsed>o.minutes*60)throw Error('time budget exceeded');
-   if(S.tg>=3&&!qend){complete=true;break;}
+   if(mode==='high'&&S.tg>=3&&!qend){complete=true;break;}
+   if(mode==='mid'&&qend&&qend.t==='tier'&&F.canPromote()){complete=true;break;}
    lastEnd=t;
    history.push({day:day+1,id:'END',quest:qend?.id,rate:F.rate(),wallet:wallet(),tg:S.tg,sem:S.sem,ac:S.ac.math.lv,bt:S.bt.pts,dailyDone:S.dm.list.filter(x=>x.done).length});
  }
  const finalWallet=wallet(),reconcile={};for(const k of Object.keys(finalWallet)){const net=Object.values(ledger).reduce((n,x)=>n+(x[k]?.in||0)-(x[k]?.out||0),0);const error=finalWallet[k]-initialWallet[k]-net;reconcile[k]=error;if(Math.abs(error)>1e-8*Math.max(1,Math.abs(finalWallet[k]),Math.abs(net)))throw Error('untracked balance '+k+':'+error);if(!Number.isFinite(finalWallet[k])||finalWallet[k]<0)throw Error('invalid balance '+k)}
- return {...o,input,initialWallet,reconcile,dormDay,milestones,complete,endQuest:F.curMain()?.id||null,endDay:Math.min(day+1,o.days),ledger,history,daily,actionCounts,mergeTrace,wallet:wallet(),adsUsed,battles,puzzles,sweeps:sw,final:{tier:S.tier,tg:S.tg,sem:S.sem,f:{...S.f},t:{...S.t},fp:{...S.fp},perks:{...S.p.perk},math:{...S.ac.math},bt:{pts:S.bt.pts,lg:S.bt.lg,w:S.bt.st.w},ns:{...S.ns}}};
+ return {...o,input,initialWallet,reconcile,dormDay,milestones,complete,endQuest:F.curMain()?.id||null,endDay:Math.min(day+1,o.days),ledger,history,daily,actionCounts,mergeTrace,wallet:wallet(),adsUsed,battles,puzzles,sweeps:sw,final:{tier:S.tier,tg:S.tg,sem:S.sem,f:{...S.f},t:{...S.t},fp:{...S.fp},perks:{...S.p.perk},math:{...S.ac.math},bt:{pts:S.bt.pts,lg:S.bt.lg,w:S.bt.st.w,l:S.bt.st.l},ns:{...S.ns}},questDays:history.filter(h=>h.id!=='END').map(h=>[h.id,h.day])};
 };
 window.auditConstants = function(){
  const F=window.__forest,A=window.__audit,S=F.S;A.mute();S.tier=3;S.students=30;S.f.classroom=6;S.f.cafeteria=3;S.t.owl=3;S.t.squirrel=3;
