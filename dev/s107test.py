@@ -28,7 +28,7 @@ async def main():
             await ctx.add_init_script("window.__FOREST_TEST = true; localStorage.clear();")
             pg = await ctx.new_page(); errs = []; pg.on('pageerror', lambda e: errs.append(str(e)))
             await pg.goto(URL); await pg.wait_for_timeout(2500); await pg.evaluate(SKIP)
-            for tier, tg in ((1, 3), (2, 0), (3, 0)):
+            for tier, tg in ((1, 3), (2, 0), (3, 0))[:await pg.evaluate(f"{F}.BX_SPOT.length - 1")]:   # 3.0.0 전에는 고등학교가 없어요
                 r = await pg.evaluate(f"""(async () => {{ const F = {F}, S = F.S; S.tier = {tier}; S.tg = {tg}; S.sem = 0;
                   for (const k of F.facKeys()) S.f[k] = Math.max(S.f[k] || 0, 8); S.bd = {{}};
                   S.bx.m = {tier}; S.bx.sp = F.BX_SPOT[{tier}].map((_, i) => ({{ i, id: 'bio_ladybug', t: 0 }})); S.bx.next = Date.now() + 9e9;
