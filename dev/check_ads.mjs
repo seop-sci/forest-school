@@ -9,9 +9,11 @@ export const RewardAdPluginEvents = { Rewarded: 'r', Dismissed: 'd', FailedToSho
 export const AdMob = {
   initialize: async () => {}, addListener: () => {},
   requestConsentInfo: async () => { const m = globalThis.MODES.shift() || globalThis.MODE; globalThis.CUR = m; globalThis.LOG.push('consent:' + m); if (m === 'fail') throw new Error('net');
+    if (m === 'req_yes' || m === 'req_no') return { status: 'OBTAINED', isConsentFormAvailable: false, canRequestAds: m === 'req_yes', privacyOptionsRequirementStatus: 'REQUIRED' };
     if (m === 'ok') return { status: 'OBTAINED', isConsentFormAvailable: false, canRequestAds: true };
     return { status: 'REQUIRED', isConsentFormAvailable: true, canRequestAds: false }; },
   showConsentForm: async () => { globalThis.LOG.push('form'); const y = globalThis.CUR === 'yes'; return { status: y ? 'OBTAINED' : 'REQUIRED', canRequestAds: y }; },
+  showPrivacyOptionsForm: async () => { globalThis.LOG.push('privacy'); if (globalThis.NEXT === 'form_fail') throw new Error('form'); globalThis.MODE = globalThis.NEXT; },
   prepareRewardVideoAd: async () => { globalThis.LOG.push('prepare'); },
   showRewardVideoAd: async () => {}
 };`;
@@ -36,7 +38,7 @@ async function run(name, { mode, modes = [], saved = null, steps = 0 }) {
   }
   const st = g.FOREST_ADS.adState();
   console.log(name, g.LOG.join(','), 'state=' + (st || 'ready'), 'saved=' + store.get('forest-ads-consent'), waits.length ? 'waits=' + waits.join('/') : '');
-  return { prepared: g.LOG.includes('prepare'), st, saved: store.get('forest-ads-consent'), log: g.LOG, waits };
+  return { prepared: g.LOG.includes('prepare'), st, saved: store.get('forest-ads-consent'), log: g.LOG, waits, g, store };
 }
 let r = await run('거절', { mode: 'no' });
 if (r.prepared) fails.push('거절: 광고를 준비했어요'); if (r.st !== 'consent') fails.push('거절: 상태가 consent가 아니에요'); if (r.saved !== '0') fails.push('거절: 거절을 남기지 않았어요');
@@ -55,5 +57,14 @@ if (r.log.filter(x => x === 'consent:fail').length !== 3) fails.push('재시도:
 if (!r.prepared) fails.push('재시도: 다시 물어 허락을 받았는데 광고를 준비하지 않았어요');
 if (r.log.indexOf('prepare') < r.log.indexOf('consent:ok')) fails.push('재시도: 허락 전에 광고를 준비했어요');
 if (!(r.waits[0] === 60000 && r.waits[1] === 120000 && r.waits[2] === 240000)) fails.push('재시도: 간격이 1분, 2분, 4분이 아니에요 ' + r.waits.join('/'));
+r = await run('개인정보 옵션 필요', { mode: 'req_yes' });
+if (!r.g.FOREST_ADS.privacyRequired() || !r.g.FOREST_ADS.adReady()) fails.push('개인정보 옵션: 필요 표시나 광고 준비 실패');
+r.g.NEXT = 'req_no'; await r.g.FOREST_ADS.privacyOptions(); await tick();
+if (r.g.FOREST_ADS.adReady() || r.store.get('forest-ads-consent') !== '0') fails.push('동의 철회 후 준비 광고나 동의 캐시가 남았어요');
+r.g.NEXT = 'req_yes'; await r.g.FOREST_ADS.privacyOptions(); await tick();
+if (!r.g.FOREST_ADS.adReady() || r.store.get('forest-ads-consent') !== '1') fails.push('동의 재허락 후 광고가 준비되지 않았어요');
+r.g.NEXT = 'form_fail'; await r.g.FOREST_ADS.privacyOptions(); await tick();
+if (r.g.FOREST_ADS.adReady() || r.store.get('forest-ads-consent') !== '0') fails.push('개인정보 창 오류 후 이전 허락을 그대로 썼어요');
 fails.forEach(f => console.log('FAIL', f));
 console.log(fails.length ? `FAIL (${fails.length})` : 'PASS');
+if (fails.length) process.exitCode = 1;
