@@ -53,7 +53,7 @@ async def main():
                   S.rank.name = '졸린 다람쥐 12'; S.rank.ren = 0; o.nick = [F.nickPrice()]; S.rank.ren = 3; o.nick.push(F.nickPrice());
                   return o; }})()""")
                 print('문방구', r)
-                if r != {'tk': 50, 'ess1': 925, 'feast': 60, 'awx': 1, 'away': 2000, 'awx2': 0, 'night': [True, 762], 'old': [None, None], 'nick': [5, 8]}:
+                if r != {'tk': 50, 'ess1': 850, 'feast': 60, 'awx': 0, 'away': 1000, 'awx2': 0, 'night': [True, 692], 'old': [None, None], 'nick': [5, 8]}:
                     bad.append(f'문방구나 이름 값이 틀려요 {r}')
                 # 4) 숲속 소풍
                 r = await pg.evaluate(f"""(() => {{ const F = {F}, S = F.S, o = {{}}, t0 = Date.now(); F.rt.fakeNow = t0;

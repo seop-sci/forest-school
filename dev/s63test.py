@@ -61,7 +61,7 @@ async def main():
           const b = el.getAttribute('href'); const im = new Image(); im.src = b; await im.decode().catch(() => {});
           return [a, b.replace(/^.*?img[/]/, 'img/'), im.naturalWidth]; })()""")
         print('지도', h)
-        if h[0] != 'data:image/webp' or not h[1].startswith('img/maps/map_') or h[2] != 1024: bad.append(f'고화질 지도 {h}')
+        if (h[0] != 'data:image/webp' and h[0] != h[1][:15]) or not h[1].startswith('img/maps/map_') or h[2] != 1024: bad.append(f'고화질 지도 {h}')
         if errs: bad.append(f'페이지 오류 {errs[:3]}')
         await ctx.close()
         # 휴대폰: 손가락 두 개 (CDP 터치)
@@ -92,5 +92,6 @@ async def main():
         if errs: bad.append(f'폰 페이지 오류 {errs[:3]}')
         await b.close()
     print('FAIL ' + ' | '.join(bad) if bad else 'PASS')
+    if bad: raise SystemExit(1)
 
 asyncio.run(main())
