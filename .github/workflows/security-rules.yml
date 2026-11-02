@@ -26,6 +26,8 @@ jobs:
           cat security.log
           if [ "$result" -ne 0 ]; then
             python3 -c 'import pathlib; s=pathlib.Path("security.log").read_text()[-2500:]; print("::error::"+s.replace("%","%25").replace("\n","%0A").replace("\r","%0D"))'
+          else
+            python3 -c 'import pathlib; s="\n".join(x for x in pathlib.Path("security.log").read_text().splitlines() if "PASS" in x); print("::notice::"+s.replace("%","%25").replace("\n","%0A").replace("\r","%0D"))'
           fi
           exit "$result"
         working-directory: dev/fbtest/emulator
