@@ -19129,8 +19129,12 @@ span.bt-stamp{display:none}.bt-duel.done span.bt-stamp{display:grid}
   // 임시 함수는 기기 시간만 돌려주고 저장 칸을 만들지 않아요
 
   // 1.7.0 보상용 분치 보정(공용): 학교급이 오르면 수업료는 1000배, 공사비는 2000배라서 "수업료 몇 분치"의 실제 가치가 학교급마다 절반이 돼요.
-  // 분치 × 2^학교급(유치원 1배, 초등 2배, 중학교 4배)으로 공사비 기준 가치를 맞춰요. 기존 퀘스트와 행사 보상에는 쓰지 않아요
-  const tierMinutes = m => m * Math.pow(2, S.tier);
+  // 분치 × 학교급 배수로 공사비 기준 가치를 맞춰요. 기존 퀘스트와 행사 보상에는 쓰지 않아요(수업료 n분치 = rate × 60 × n 그대로).
+  // 3.0.0 조정안 6(2026-11-02): 숨은 2^학교급 대신 이름 있는 표. 건물 한 레벨 값을 수업료 분으로 재면(같은 상한 비율에서)
+  // 고등학교는 중학교의 약 4분의 1~3분의 1이라(공사비 배수 2.5e11 ÷ 수업료 1e9 = 250, 중학교 500), 고등학교는 8배가 아니라 중학교와 같은 4배예요.
+  // 이 배수를 쓰는 곳: 합치기 주문과 팔기, 대결 첫 승리, 실험, 소풍, 생일, 스티커판, 시험 성적표, 대항전 참가, 생물 중복, 이벤트, 도감, 건설 부스터 값
+  const TIER_X = [1, 2, 4, 4];   // 유치원, 초등, 중학교, 고등학교(대학교부터는 그때 다시 재요)
+  const tierMinutes = m => m * TIER_X[Math.min(S.tier, TIER_X.length - 1)];
   const minAcorns = m => Math.max(10, nice(rate() * 60 * tierMinutes(m)));
 
   // 1.7.0 그림: FS_IMG170 묶음 → 기존 FS_IMG → 임시 도형(PLACE170) 순서로 찾아요.
@@ -21176,7 +21180,7 @@ span.bt-stamp{display:none}.bt-duel.done span.bt-stamp{display:grid}
     NSL, nsStart, nsSettle, nsOpen, nsOn, nsOverlap, nsExtraH, isNight, nightDayOf, openNs, renderNs, bxSpots, renderNight,   // 3.0.0
    conOn, conLeft, conTick, conSec, conFinish, tkPlan, tkUse, tkUseAll, TK, CON, TKAD, capNext, yearCap,   // 2.1.0 공사
     semOn, semFirst, semLabel, cereDip, semBreak,   // 2.1.0 학기(s80)
-    get btUI() { return btUI; }, conFreeLeft, ffLeft, FF, conFree, conEss, conEssCost, askConEss, CON, conSec, conBand, CB, cbOn, cbLeft, cbCost, cbApply, cbBuy, conRender, progOf, parseSave, saveSum, bakList, bakAdd, bakAll, askPick, pickKeepLocal, pickLoadSrv, openBak, cloudShouldRestore, get Cloud() { return Cloud; }, CG, CG_FLAGS, cgOpen, cgSync, cgPractice, cgMy, cgTable, cgOppNow, cgHTML, cgNewWeek, renderClub, BX, BX_SPOT, BIO, BIO_BY, bxOpen, bxSync, bxPick, bxOk, bxTap, bxCount, bxRareP, bxMapHTML, bxDexRender, setDexSeg, renderDeco, gdOpen, showReady, GD, GD_CROPS, GD_MENU, GD_M, gdN, gdSync, gdPlant, gdWater, gdHarvest, gdCook, gdMult, gdPct, gdToday, gdReadyN, gdMenuCount, openGd, gdRender, gdMark, nbApply, NB, nbAdd, nbAddOf, nbOn, nbOnAt, nbLeft, nbOverlap, nbApply, nbNotice, conAdd, get Live() { return Live; }, sanitize211, ffCan, ffRender, BTQ, BTQ_SCI, BTQ_KOR, BTQ_COL, btqMake, btqMath, btqPick, btqAnswer, btqMemTap, btqPts, btReveal,   // 2.1.1 대결 종목 문제
+    get btUI() { return btUI; }, conFreeLeft, ffLeft, FF, TIER_X, conFree, conEss, conEssCost, askConEss, CON, conSec, conBand, CB, cbOn, cbLeft, cbCost, cbApply, cbBuy, conRender, progOf, parseSave, saveSum, bakList, bakAdd, bakAll, askPick, pickKeepLocal, pickLoadSrv, openBak, cloudShouldRestore, get Cloud() { return Cloud; }, CG, CG_FLAGS, cgOpen, cgSync, cgPractice, cgMy, cgTable, cgOppNow, cgHTML, cgNewWeek, renderClub, BX, BX_SPOT, BIO, BIO_BY, bxOpen, bxSync, bxPick, bxOk, bxTap, bxCount, bxRareP, bxMapHTML, bxDexRender, setDexSeg, renderDeco, gdOpen, showReady, GD, GD_CROPS, GD_MENU, GD_M, gdN, gdSync, gdPlant, gdWater, gdHarvest, gdCook, gdMult, gdPct, gdToday, gdReadyN, gdMenuCount, openGd, gdRender, gdMark, nbApply, NB, nbAdd, nbAddOf, nbOn, nbOnAt, nbLeft, nbOverlap, nbApply, nbNotice, conAdd, get Live() { return Live; }, sanitize211, ffCan, ffRender, BTQ, BTQ_SCI, BTQ_KOR, BTQ_COL, btqMake, btqMath, btqPick, btqAnswer, btqMemTap, btqPts, btReveal,   // 2.1.1 대결 종목 문제
     SN, SN_ALL, snOpen, snCount, snSync, snMult, snBase, snCost, snPick, snDraw, openSn, snRender, snDexRender, setDexSeg, rate,
     qProg, VD, vdH, vdOpen, vdNeed, vdLeft, vdLocked, vdLive, boostAmount, TKAD, tripCut, achMedal, vdAmt, vdGive, vdUp, openVd, vdRender, vdMapHTML, achTitles, achTitleName, setTitle,
     BF, FR_LINES, frSync, frMake, frOf, frNm, frFull, frHeart, frList, frPat, frGift, frGiftLeft, frAddP, frRename, frHere, frKidTap, frLetter, frTick, bdParty, bdPlace, bdClaim, bdDoneToday, bdRender, bdHats,
