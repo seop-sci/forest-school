@@ -10,11 +10,12 @@ export const AdMob = {
   initialize: async () => {}, addListener: () => {},
   requestConsentInfo: async () => { const m = globalThis.MODES.shift() || globalThis.MODE; globalThis.CUR = m; globalThis.LOG.push('consent:' + m); if (m === 'fail') throw new Error('net');
     if (m === 'req_yes' || m === 'req_no') return { status: 'OBTAINED', isConsentFormAvailable: false, canRequestAds: m === 'req_yes', privacyOptionsRequirementStatus: 'REQUIRED' };
+    if (m === 'form_fail') return { status: 'REQUIRED', isConsentFormAvailable: true, canRequestAds: false, privacyOptionsRequirementStatus: 'REQUIRED' };
     if (m === 'ok') return { status: 'OBTAINED', isConsentFormAvailable: false, canRequestAds: true };
     return { status: 'REQUIRED', isConsentFormAvailable: true, canRequestAds: false }; },
-  showConsentForm: async () => { globalThis.LOG.push('form'); const y = globalThis.CUR === 'yes'; return { status: y ? 'OBTAINED' : 'REQUIRED', canRequestAds: y }; },
+  showConsentForm: async () => { globalThis.LOG.push('form'); if(globalThis.CUR === 'form_fail') throw new Error('form'); const y = globalThis.CUR === 'yes'; return { status: y ? 'OBTAINED' : 'REQUIRED', canRequestAds: y }; },
   showPrivacyOptionsForm: async () => { globalThis.LOG.push('privacy'); if (globalThis.NEXT === 'form_fail') throw new Error('form'); globalThis.MODE = globalThis.NEXT; },
-  prepareRewardVideoAd: async () => { globalThis.LOG.push('prepare'); },
+  prepareRewardVideoAd: async () => { globalThis.LOG.push('prepare'); if(globalThis.HOLD) await new Promise(r => globalThis.RELEASE = r); },
   showRewardVideoAd: async () => {}
 };`;
 const out = await build({ entryPoints: ['app/src/ads.js'], bundle: true, write: false, format: 'iife', define: { __ADMOB_TEST__: 'true' },
@@ -23,9 +24,9 @@ const code = out.outputFiles[0].text;
 const fails = [];
 const tick = () => new Promise(r => setTimeout(r, 30));
 // 한 경우: modes는 차례로 쓰는 SDK 답, saved는 기기에 남은 지난 답, steps는 시계를 앞으로 돌리며 다시 부르는 횟수
-async function run(name, { mode, modes = [], saved = null, steps = 0 }) {
+async function run(name, { mode, modes = [], saved = null, steps = 0, hold = false }) {
   let clock = 1e12; const timers = [], store = new Map(saved == null ? [] : [['forest-ads-consent', saved]]);
-  const g = { LOG: [], MODE: mode, MODES: modes.slice(), setTimeout: (f, ms) => { timers.push({ f, at: clock + ms }); return timers.length; }, console,
+  const g = { HOLD: hold, LOG: [], MODE: mode, MODES: modes.slice(), setTimeout: (f, ms) => { timers.push({ f, at: clock + ms }); return timers.length; }, console,
     Date: class extends Date { static now() { return clock; } },
     localStorage: { getItem: k => (store.has(k) ? store.get(k) : null), setItem: (k, v) => store.set(k, String(v)) } };
   g.window = g; g.globalThis = g;
@@ -47,7 +48,7 @@ if (r.prepared) fails.push('오류(처음): 동의 확인이 실패했는데 광
 r = await run('오류(지난번 거절)', { mode: 'fail', saved: '0' });
 if (r.prepared) fails.push('오류(지난번 거절): 광고를 준비했어요');
 r = await run('오류(지난번 허락)', { mode: 'fail', saved: '1' });
-if (!r.prepared) fails.push('오류(지난번 허락): SDK가 지난번 허락한 동의로 광고를 준비하지 않았어요');
+if (r.prepared) fails.push('오류(지난번 허락): SDK 확인 실패인데 로컬 캐시만으로 광고 요청');
 r = await run('허락', { mode: 'yes' });
 if (!r.prepared) fails.push('허락: 광고를 준비하지 않았어요'); if (r.saved !== '1') fails.push('허락: 허락을 남기지 않았어요');
 r = await run('지난번 허락 뒤 거절', { mode: 'no', saved: '1' });
@@ -65,6 +66,14 @@ r.g.NEXT = 'req_yes'; await r.g.FOREST_ADS.privacyOptions(); await tick();
 if (!r.g.FOREST_ADS.adReady() || r.store.get('forest-ads-consent') !== '1') fails.push('동의 재허락 후 광고가 준비되지 않았어요');
 r.g.NEXT = 'form_fail'; await r.g.FOREST_ADS.privacyOptions(); await tick();
 if (r.g.FOREST_ADS.adReady() || r.store.get('forest-ads-consent') !== '0') fails.push('개인정보 창 오류 후 이전 허락을 그대로 썼어요');
+r = await run('준비 중 동의 철회', { mode: 'req_yes', hold: true });
+r.g.NEXT = 'req_no'; await r.g.FOREST_ADS.privacyOptions(); r.g.RELEASE(); await tick();
+if(r.g.FOREST_ADS.adReady()) fails.push('늦게 끝난 이전 광고가 철회 후 준비됨');
+r = await run('개인정보 옵션 불필요', { mode: 'ok' });
+await r.g.FOREST_ADS.privacyOptions();
+if(r.g.LOG.includes('privacy') || r.g.FOREST_ADS.privacyRequired()) fails.push('불필요한 개인정보 창 노출');
+r = await run('초기 양식 오류와 개인정보 진입점', { mode: 'form_fail' });
+if(!r.g.FOREST_ADS.privacyRequired() || r.g.FOREST_ADS.adReady()) fails.push('SDK가 요구한 개인정보 진입점이 양식 오류 후 사라짐');
 fails.forEach(f => console.log('FAIL', f));
 console.log(fails.length ? `FAIL (${fails.length})` : 'PASS');
 if (fails.length) process.exitCode = 1;
