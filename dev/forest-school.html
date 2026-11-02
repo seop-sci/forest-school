@@ -3356,7 +3356,7 @@ body.cam-scene #ffChip,body.cam-scene #tierDots,body.cam-scene #plChip{opacity:0
       </div>
       <!-- 2.2.0 생물 도감. 안쪽은 bxDexRender()가 그려요 -->
       <div id="bxPane" hidden>
-        <p class="lead">학교 지도 풀숲과 물가에 숨은 생물을 눌러 관찰해요. 계절, 밤, 비 오는 날에 따라 나오는 생물이 달라요. 처음 보면 과학 XP 10과 숲의 정수 1, 10종 황금 도토리 1, 20종 숲의 정수 20, 30종을 다 모으면 관찰 오두막 장식!</p>
+        <p class="lead">학교 지도 풀숲과 물가에 숨은 생물을 눌러 관찰해요. 계절, 밤, 비 오는 날에 따라 나오는 생물이 달라요. 처음 보면 과학 XP 10과 숲의 정수 1, 10종 황금 도토리 1, 20종 숲의 정수 20, 30종 관찰 오두막, 60종 황금 도토리 3과 곤충 호텔, 90종을 다 모으면 숲의 정수 50과 생태 연못, 칭호 숲속 박사!</p>
         <div class="dex-head" id="bxDexHead"></div>
         <div class="sn-dex-grid bx-dex-grid" id="bxDexGrid"></div>
       </div>
@@ -9357,15 +9357,16 @@ body.cam-scene #ffChip,body.cam-scene #tierDots,body.cam-scene #plChip{opacity:0
      초등학교부터 홈 지도의 정해진 자리(지도마다 6곳, 풀숲과 물가)에 게임 시계 2시간마다 생물이 하나씩 숨어요(최대 3마리 기다림).
      누르면 돋보기로 관찰하고 생물 카드가 생물 도감(동물 도감의 '생물' 칸)에 모여요. 계절, 밤(20~24시), 비, 물가에 따라 나오는 생물이 달라요.
      처음 관찰 과학 XP 10과 숲의 정수 1, 다시 보면 과학 XP 3과 수업료 3분치. 희귀 4%(과학실 Lv.5마다 +1%, 최대 8%).
-     10종 황금 도토리 1, 20종 숲의 정수 20, 30종 지도 장식 '관찰 오두막'(업적 '생물 탐사' 칭호 꼬마 생물학자) */
-  const BX = { tier: 1, every: 2 * 3600000, max: 3, rare0: 4, rareMax: 8, xpNew: 10, xpDup: 3, essNew: 1, dupMin: 3, gold10: 1, ess20: 20 };
+     10종 황금 도토리 1, 20종 숲의 정수 20, 30종 지도 장식 '관찰 오두막'(업적 '생물 탐사' 칭호 꼬마 생물학자)
+     2.3.5: 90종으로. 60종 황금 도토리 3과 곤충 호텔, 90종 숲의 정수 50과 생태 연못, 칭호 숲속 박사 */
+  const BX = { tier: 1, every: 2 * 3600000, max: 3, rare0: 4, rareMax: 8, xpNew: 10, xpDup: 3, essNew: 1, dupMin: 3, gold10: 1, ess20: 20, gold60: 3, ess90: 50 };
   // 지도(geoIdx)마다 [가로 %, 세로 %, 물가면 1]. 장식 자리, 건물 빈터(울타리 안), 길을 피했어요
   // 2.3.0.1 지섭 제보(학교 행사 단추가 청설모를 가림): 왼쪽 단추 줄, 오른쪽 단추 줄, 아래 칩, 화면 밖(가장자리 11%)에 걸리던 자리를 안쪽 풀숲과 물가로 옮겼어요
   // 3.0.0 지섭 제보(중학교 과학실 뒤 생물을 누르기 힘듦): 건물 누르는 칸과 이름표에 가리던 자리를 손가락이 다 닿는 풀밭과 호수로 옮겼어요(390px, 360px에서 잼)
   const BX_SPOT = [null,
     [[28, 19, 0], [72, 14, 0], [38, 48, 0], [84, 46, 1], [18, 72, 1], [24, 86, 0]],
     [[70, 18, 1], [32, 14, 1], [70, 30, 0], [28, 33, 0], [58, 46, 0], [26, 22, 0]]];
-  const SPR = [3, 4, 5], SUM = [6, 7, 8], AUT = [9, 10, 11];
+  const SPR = [3, 4, 5], SUM = [6, 7, 8], AUT = [9, 10, 11], WIN = [12, 1, 2];
   // [열쇠, 이름, 무리(0 곤충, 1 식물, 2 새와 작은 동물), 조건, 설명]. 조건: s 달, n 밤, r 비, w 물가, rare 희귀, en 멸종위기
   const BIO = [
     ['ladybug', '무당벌레', 0, {}, '빨간 등에 까만 점. 진딧물을 잡아먹어서 텃밭의 친구예요.'],
@@ -9397,7 +9398,68 @@ body.cam-scene #ffChip,body.cam-scene #tierDots,body.cam-scene #plChip{opacity:0
     ['flyingsquirrel', '하늘다람쥐', 2, { n: 1, rare: 1, en: 'Ⅱ급' }, '앞다리와 뒷다리 사이 막을 펴고 나무 사이를 날아요. 천연기념물이에요.'],
     ['otter', '수달', 2, { w: 1, rare: 1, en: 'Ⅰ급' }, '헤엄을 아주 잘 치는 물가의 동물이에요. 천연기념물이에요.'],
     ['redbat', '붉은박쥐', 2, { n: 1, rare: 1, en: 'Ⅰ급' }, '주황빛 털 때문에 황금박쥐라고도 불러요. 천연기념물이에요.'],
-    ['pitta', '팔색조', 2, { s: [5, 6, 7, 8], rare: 1, en: 'Ⅱ급' }, '여덟 가지 빛깔 깃털을 가진 여름 철새예요. 천연기념물이에요.']]
+    ['pitta', '팔색조', 2, { s: [5, 6, 7, 8], rare: 1, en: 'Ⅱ급' }, '여덟 가지 빛깔 깃털을 가진 여름 철새예요. 천연기념물이에요.'],
+    // 2.3.5 생물 60종 더하기(작업지시서 48, 지섭 결정 2026-11-03). WIN 겨울 12~2월
+    ['cabbagewhite', '배추흰나비', 0, { s: [...SPR, ...SUM] }, '하얀 날개에 까만 점이 있는 나비예요. 애벌레는 배추와 양배추 잎을 먹고 자라요.'],
+    ['sulphur', '노랑나비', 0, { s: SPR }, '봄 들판을 노랗게 나는 나비예요. 토끼풀 같은 콩과 식물에 알을 낳아요.'],
+    ['mantis', '사마귀', 0, { s: AUT }, '낫처럼 생긴 앞다리로 벌레를 잡아요. 고개를 돌려 뒤도 볼 수 있어요.'],
+    ['grasshopper', '메뚜기', 0, { s: [...SUM, ...AUT] }, '튼튼한 뒷다리로 멀리 뛰어요. 벼와 풀잎을 갉아 먹어요.'],
+    ['longheaded', '방아깨비', 0, { s: [...SUM, ...AUT] }, '머리가 길쭉한 큰 메뚜기 무리예요. 뒷다리를 잡으면 방아를 찧듯 몸을 끄덕여요.'],
+    ['cricket', '귀뚜라미', 0, { s: AUT, n: 1 }, '가을밤에 날개를 비벼 귀뚤귀뚤 노래해요. 소리를 듣는 귀가 앞다리에 있어요.'],
+    ['katydid', '여치', 0, { s: SUM }, '긴 더듬이를 가진 초록 곤충이에요. 여름 풀밭에서 날개를 비벼 울어요.'],
+    ['longhorn', '하늘소', 0, { s: SUM }, '몸보다 긴 더듬이를 가진 딱정벌레예요. 애벌레는 나무 속을 파먹으며 자라요.'],
+    ['jewelbeetle', '비단벌레', 0, { s: SUM, rare: 1 }, '초록빛 금속처럼 반짝이는 딱정벌레예요. 옛날에는 날개로 장신구를 꾸몄대요.'],
+    ['divingbeetle', '물방개', 0, { w: 1 }, '노처럼 생긴 뒷다리로 물속을 헤엄쳐요. 날개 밑에 공기 방울을 담아 숨을 쉬어요.'],
+    ['damselfly', '실잠자리', 0, { w: 1, s: [...SPR, ...SUM] }, '실처럼 가는 몸을 가진 작은 잠자리예요. 앉을 때 날개를 접어요.'],
+    ['emperor', '왕잠자리', 0, { w: 1, s: SUM }, '몸이 크고 빠르게 나는 잠자리예요. 연못 위를 오가며 영역을 지켜요.'],
+    ['ant', '개미', 0, {}, '여왕개미를 중심으로 모여 사는 곤충이에요. 냄새로 길을 알려 주며 함께 먹이를 날라요.'],
+    ['hoverfly', '꽃등에', 0, { s: [...SPR, ...SUM] }, '벌처럼 줄무늬가 있지만 침이 없는 파리 무리예요. 공중에 멈춘 듯 떠 있을 수 있어요.'],
+    ['dungbeetle', '소똥구리', 0, { rare: 1, en: 'Ⅱ급' }, '소똥을 동그랗게 빚어 물구나무서듯 굴려요. 그 경단에 알을 낳아요.'],
+    ['apollo', '붉은점모시나비', 0, { s: SPR, rare: 1, en: 'Ⅰ급' }, '얇고 하얀 날개에 붉은 점이 있는 나비예요. 늦봄에 잠깐만 날아요.'],
+    ['bumblebee', '호박벌', 0, { s: [...SPR, ...SUM] }, '통통하고 털이 복슬복슬한 큰 벌이에요. 몸을 떨어 꽃가루를 털어 내요.'],
+    ['pillbug', '공벌레', 0, { r: 1 }, '건드리면 몸을 공처럼 동그랗게 말아요. 곤충이 아니라 새우와 가까운 동물이에요.'],
+    ['mayfly', '하루살이', 0, { w: 1, s: SPR }, '물속에서 애벌레로 오래 지내다 어른이 되면 며칠만 살아요. 어른은 입이 없어 먹지 않아요.'],
+    ['wintermoth', '겨울자나방', 0, { s: WIN, n: 1 }, '추운 겨울밤에 나오는 나방이에요. 암컷은 날개가 거의 없어 나무를 기어올라요.'],
+    ['cherry', '벚꽃', 1, { s: [4] }, '4월에 분홍빛 꽃이 한꺼번에 피었다가 바람에 꽃잎이 흩날려요.'],
+    ['forsythia', '개나리', 1, { s: [3, 4] }, '이른 봄 잎보다 먼저 노란 꽃이 가지 가득 피어요.'],
+    ['magnolia', '목련', 1, { s: [3, 4] }, '커다란 하얀 꽃이 피는 나무예요. 꽃눈이 털옷을 입고 겨울을 나요.'],
+    ['violet', '제비꽃', 1, { s: SPR }, '제비가 돌아올 즈음 피는 작은 보라 꽃이에요. 씨앗을 개미가 옮겨 줘요.'],
+    ['clover', '토끼풀', 1, { s: [...SPR, ...SUM] }, '잎이 세 장인 풀이에요. 하얀 꽃으로 꽃반지를 만들어요. 네 잎은 아주 드물어요.'],
+    ['sunflower', '해바라기', 1, { s: SUM }, '키가 크고 큰 노란 꽃이 피어요. 꽃 가운데에 씨앗이 빽빽하게 열려요.'],
+    ['morningglory', '나팔꽃', 1, { s: SUM }, '아침에 나팔 모양 꽃이 피었다가 낮에 오므려요. 덩굴이 감고 올라가요.'],
+    ['hydrangea', '수국', 1, { s: [6, 7] }, '작은 꽃이 공처럼 모여 피어요. 흙에 따라 꽃 색이 파랑이나 분홍으로 달라져요.'],
+    ['cosmos', '코스모스', 1, { s: AUT }, '가을 길가에 하늘하늘 피는 꽃이에요. 분홍, 하양, 자주 꽃이 있어요.'],
+    ['silvergrass', '억새', 1, { s: AUT }, '가을 산과 들에 은빛 이삭이 바람에 물결쳐요. 씨앗은 솜털을 달고 날아가요.'],
+    ['oak', '상수리나무와 도토리', 1, { s: AUT }, '가을에 동그란 도토리가 열리는 참나무예요. 다람쥐와 어치가 도토리를 숨겨 숲을 넓혀요.'],
+    ['chestnut', '밤송이', 1, { s: AUT }, '가시투성이 밤송이가 가을에 벌어지면 밤톨이 나와요.'],
+    ['camellia', '동백꽃', 1, { s: [12, 1, 2, 3] }, '추운 겨울에 빨간 꽃이 피어요. 동박새가 꿀을 먹으며 꽃가루를 옮겨요.'],
+    ['adonis', '복수초', 1, { s: [1, 2, 3] }, '눈을 녹이며 피어나는 노란 꽃이에요. 봄이 오는 것을 가장 먼저 알려 줘요.'],
+    ['moss', '이끼', 1, { r: 1 }, '뿌리와 꽃이 없는 작은 식물이에요. 물을 머금어 비 온 뒤 더 파릇해요.'],
+    ['reed', '갈대', 1, { w: 1, s: AUT }, '물가에서 자라는 키 큰 풀이에요. 억새와 닮았지만 물가에 살고 이삭이 갈색이에요.'],
+    ['waterlily', '수련', 1, { w: 1, s: SUM }, '물 위에 둥근 잎을 띄우고 꽃을 피워요. 낮에 피고 저녁에 오므려요.'],
+    ['cattail', '부들', 1, { w: 1, s: [...SUM, ...AUT] }, '물가에 소시지처럼 생긴 갈색 이삭이 달려요. 다 익으면 솜털 씨앗이 날려요.'],
+    ['ladyslipper', '광릉요강꽃', 1, { s: SPR, rare: 1, en: 'Ⅰ급' }, '주머니처럼 부푼 꽃이 피는 난초예요. 우리나라 숲 몇 곳에서만 자라요.'],
+    ['euryale', '가시연꽃', 1, { w: 1, s: SUM, rare: 1, en: 'Ⅱ급' }, '잎과 줄기에 가시가 돋은 큰 연꽃이에요. 잎이 아주 크고 보라 꽃이 피어요.'],
+    ['sparrow', '참새', 2, {}, '사람 사는 곳 가까이에 사는 작은 새예요. 무리 지어 짹짹 지저귀어요.'],
+    ['bulbul', '직박구리', 2, {}, '삐이익 하고 시끄럽게 우는 회색 새예요. 열매와 꽃꿀을 좋아해요.'],
+    ['whiteeye', '동박새', 2, { s: [...WIN, ...SPR] }, '눈 둘레가 하얀 연두색 작은 새예요. 동백꽃 꿀을 먹으며 꽃가루를 옮겨요.'],
+    ['wren', '굴뚝새', 2, { s: WIN }, '꼬리를 쫑긋 세운 아주 작은 갈색 새예요. 겨울에도 맑게 노래해요.'],
+    ['mallard', '청둥오리', 2, { w: 1, s: WIN }, '수컷 머리가 초록빛으로 반짝이는 오리예요. 겨울에 우리나라를 찾아와요.'],
+    ['heron', '왜가리', 2, { w: 1 }, '긴 다리로 물가에 가만히 서 있다가 물고기를 콕 잡아요.'],
+    ['swan', '큰고니', 2, { w: 1, s: WIN, rare: 1, en: 'Ⅱ급' }, '온몸이 하얀 큰 새예요. 먼 북쪽에서 겨울을 나러 날아와요. 천연기념물이에요.'],
+    ['crane', '두루미', 2, { s: WIN, rare: 1, en: 'Ⅰ급' }, '머리 꼭대기가 붉은 하얀 새예요. 겨울에 찾아와 짝과 함께 춤을 춰요. 천연기념물이에요.'],
+    ['eagleowl', '수리부엉이', 2, { n: 1, rare: 1, en: 'Ⅱ급' }, '머리에 귀깃이 솟은 아주 큰 부엉이예요. 밤에 소리 없이 날아요. 천연기념물이에요.'],
+    ['scopsowl', '소쩍새', 2, { n: 1, s: [...SPR, ...SUM] }, '봄밤에 소쩍소쩍 우는 작은 올빼미 무리예요. 천연기념물이에요.'],
+    ['cuckoo', '뻐꾸기', 2, { s: SUM }, '뻐꾹뻐꾹 우는 여름 철새예요. 다른 새 둥지에 몰래 알을 낳아요.'],
+    ['swallow', '제비', 2, { s: [...SPR, ...SUM] }, '봄에 남쪽에서 날아와 처마 밑에 진흙 둥지를 지어요. 날면서 벌레를 잡아요.'],
+    ['treefrog', '청개구리', 2, { r: 1 }, '발가락 끝 빨판으로 잎에 착 붙어요. 비가 오려고 하면 더 크게 울어요.'],
+    ['toad', '두꺼비', 2, { r: 1 }, '오돌토돌한 피부를 가진 개구리 무리예요. 비 오는 밤에 엉금엉금 걸어 다녀요.'],
+    ['turtle', '남생이', 2, { w: 1, rare: 1, en: 'Ⅱ급' }, '우리나라 냇가에 사는 토종 거북이에요. 돌 위에서 햇볕을 쬐어요. 천연기념물이에요.'],
+    ['lizard', '아무르장지뱀', 2, { s: SUM }, '꼬리가 아주 긴 도마뱀이에요. 위험하면 꼬리를 끊고 달아나요.'],
+    ['weasel', '족제비', 2, {}, '몸이 가늘고 길어 좁은 굴에도 쏙 들어가요. 쥐를 잘 잡아요.'],
+    ['hare', '멧토끼', 2, {}, '산과 들에 사는 야생 토끼예요. 긴 귀로 소리를 잘 듣고 아주 빨리 달려요.'],
+    ['roedeer', '노루', 2, {}, '엉덩이에 하얀 털이 있는 작은 사슴이에요. 놀라면 엉덩이 털을 펴서 알려요.'],
+    ['leopardcat', '삵', 2, { n: 1, rare: 1, en: 'Ⅱ급' }, '고양이를 닮은 야생 동물이에요. 이마에 줄무늬, 몸에 점무늬가 있어요. 밤에 사냥해요.']]
     .map(([k, nm, g, c, d]) => ({ id: 'bio_' + k, nm, g, ...c, d }));
   const BIO_BY = Object.fromEntries(BIO.map(b => [b.id, b]));
   const BIO_G = ['곤충', '식물', '새와 작은 동물'];
@@ -9464,7 +9526,10 @@ body.cam-scene #ffChip,body.cam-scene #tierDots,body.cam-scene #plChip{opacity:0
     const n = bxCount();
     if (n >= 10 && S.bx.g < 1) { S.bx.g = 1; addGold(BX.gold10); got.push(`생물 10종! 황금 도토리 +${BX.gold10}`); }
     if (n >= 20 && S.bx.g < 2) { S.bx.g = 2; addEss(BX.ess20); got.push(`생물 20종! 숲의 정수 +${BX.ess20}`); }
-    if (n >= BIO.length && S.bx.g < 3) { S.bx.g = 3; S.deco.own.bio_hut = 1; got.push('생물 30종을 다 모았어요! 지도 장식 관찰 오두막'); }
+    if (n >= 30 && S.bx.g < 3) { S.bx.g = 3; S.deco.own.bio_hut = 1; got.push('생물 30종! 지도 장식 관찰 오두막'); }
+    // 2.3.5 지섭 결정: 60종 황금 도토리 3과 곤충 호텔, 90종 숲의 정수 50과 생태 연못, 칭호 숲속 박사
+    if (n >= 60 && S.bx.g < 4) { S.bx.g = 4; addGold(BX.gold60); S.deco.own.deco_bug_hotel = 1; got.push(`생물 60종! 황금 도토리 +${BX.gold60}, 지도 장식 곤충 호텔`); }
+    if (n >= BIO.length && S.bx.g < 5) { S.bx.g = 5; addEss(BX.ess90); S.deco.own.deco_eco_pond = 1; got.push(`생물 ${BIO.length}종을 다 모았어요! 숲의 정수 +${BX.ess90}, 지도 장식 생태 연못, 칭호 숲속 박사`); }
     rt.bxRes = { b, nw, got };
     sfx(b.rare ? 'quest' : 'coin');
     renderDeco(true); renderHUD(); bxShow(); save();
@@ -9483,7 +9548,7 @@ body.cam-scene #ffChip,body.cam-scene #tierDots,body.cam-scene #plChip{opacity:0
   const bxHint = b => [b.w ? '물가' : '', b.s ? (b.s.every(m => SPR.includes(m)) ? '봄' : b.s.every(m => SUM.includes(m)) ? '여름' : b.s.every(m => AUT.includes(m)) ? '가을' : `${b.s[0]}~${b.s[b.s.length - 1]}월`) : '', b.n ? '밤 20~24시' : '', b.r ? '비 오는 날' : ''].filter(Boolean).join(', ');
   function bxDexRender() {
     if (!S || !S.bx) return;
-    $('#bxDexHead').textContent = `관찰한 생물 ${bxCount()}/${BIO.length}종 (귀한 생물 ${BIO.filter(b => b.rare && S.bx.got[b.id]).length}/6). 오늘 지도에 숨은 생물 ${S.bx.sp.length}마리`;
+    $('#bxDexHead').textContent = `관찰한 생물 ${bxCount()}/${BIO.length}종 (귀한 생물 ${BIO.filter(b => b.rare && S.bx.got[b.id]).length}/${BIO.filter(b => b.rare).length}). 오늘 지도에 숨은 생물 ${S.bx.sp.length}마리`;
     $('#bxDexGrid').innerHTML = BIO_G.map((g, gi) => `<b class="bx-gh">${g}</b>` + BIO.filter(b => b.g === gi).map(b => { const n = S.bx.got[b.id] || 0;
       return `<button type="button" class="sn-card bx-card${b.rare ? ' rare' : ''}${n ? '' : ' no'}" data-bxd="${b.id}">${n ? bxImg(b) : IMG('bio_frame') ? `<img src="${IMG('bio_frame')}" alt="">` : '❔'}<span class="ell">${n ? esc(b.nm) : '???'}</span><small>${n ? `${fmt(n)}번` : bxHint(b) || '언제든'}</small></button>`; }).join('')).join('');
   }
@@ -9494,7 +9559,7 @@ body.cam-scene #ffChip,body.cam-scene #tierDots,body.cam-scene #plChip{opacity:0
     o.sp = (Array.isArray(X.sp) ? X.sp : []).filter(x => x && Number.isInteger(x.i) && x.i >= 0 && x.i < L.length && BIO_BY[x.id] && !used[x.i] && (used[x.i] = 1)).slice(0, BX.max).map(x => ({ i: x.i, id: x.id, t: n(x.t, lim) }));
     o.next = n(X.next, lim);
     if (X.got && typeof X.got === 'object') for (const b of BIO) if (X.got[b.id]) o.got[b.id] = n(X.got[b.id], 1e6);
-    o.g = n(X.g, 3); o.st.n = n(X.st && X.st.n, 1e9);
+    o.g = n(X.g, 5); o.st.n = n(X.st && X.st.n, 1e9);
     s.bx = o;
   }
   /* ---------- 2.2.0 학교 텃밭 (프로젝트 문서 '2.2.0 설계안' 3절, 지섭 확정 2026-10-30) ----------
@@ -12386,7 +12451,8 @@ body.cam-scene #ffChip,body.cam-scene #tierDots,body.cam-scene #plChip{opacity:0
   [['winter', '눈꽃 트로피'], ['spring', '벚꽃 트로피'], ['summer', '파도 분수 트로피'], ['autumn', '단풍 도토리 조각상']].forEach(([q, nm]) => DECO.push({ id: 'rs_' + q, name: nm, ess: 0, img: 'season_' + q, rare: 1, ev: 1, rs: 1 }));   // 2.1.3 랭킹 시즌 기념 장식
   PS_SEASONS.forEach((x, n) => { if (x[1]) DECO.push({ id: psDecoId(n), name: x[2], ess: 0, img: x[1], rare: 1, ev: 1, ps: 1 }); });   // 2.1.3 숲속 패스 한정 장식
   [['cg_flag_b', '동메달 우승 깃발', 'flag_bronze'], ['cg_flag_s', '은메달 우승 깃발', 'flag_silver'], ['cg_flag_g', '금메달 우승 깃발', 'flag_gold']].forEach(([id, name, img]) => DECO.push({ id, name, ess: 0, img, rare: 1, ev: 1, cg: 1 }));   // 2.2.0 대항전 우승 깃발(CG_FLAGS와 같아요)
-  DECO.push({ id: 'bio_hut', name: '관찰 오두막', ess: 0, img: 'bio_hut', rare: 1, ev: 1, bio: 1 });   // 2.2.0 생물 30종을 다 모으면
+  DECO.push({ id: 'bio_hut', name: '관찰 오두막', ess: 0, img: 'bio_hut', rare: 1, ev: 1, bio: 30 });
+  DECO.push({ id: 'deco_bug_hotel', name: '곤충 호텔', ess: 0, img: 'deco_bug_hotel', rare: 1, ev: 1, bio: 60 }, { id: 'deco_eco_pond', name: '생태 연못', ess: 0, img: 'deco_eco_pond', rare: 1, ev: 1, bio: 90 });   // 2.3.5 생물 60종, 90종   // 2.2.0 생물 30종을 다 모으면
   for (const [k, name, sm] of EV_DECO) DECO.push({ id: 'ev_' + k, name, ess: 0, img: 'evd_' + k, rare: 1, ev: 1, ...(sm ? { sm: 1 } : {}) });
   const evDecoArt = d => !!(d && d.ev && IMG(d.img));
   const DECO_BY = Object.fromEntries(DECO.map(d => [d.id, d]));
@@ -12537,7 +12603,7 @@ body.cam-scene #ffChip,body.cam-scene #tierDots,body.cam-scene #plChip{opacity:0
       h += `<h3 class="shop-h">${title}</h3><div class="shop-grid">`;
       for (const d of list) {
         const n = decoOwn(d.id), out = decoSoldOut(d.id), c = decoCost(d.id), poor = !out && S.ess < c;
-        const pr = d.ev ? (n ? '가졌어요' : d.ps ? '패스 보상' : d.rs ? '시즌 기념' : d.bio ? '생물 30종' : d.cg ? '대항전 우승' : '이벤트 선물') : out ? (d.rare ? '가졌어요' : '더 살 수 없어요') : `${ic}${c}`;
+        const pr = d.ev ? (n ? '가졌어요' : d.ps ? '패스 보상' : d.rs ? '시즌 기념' : d.bio ? `생물 ${d.bio}종` : d.cg ? '대항전 우승' : '이벤트 선물') : out ? (d.rare ? '가졌어요' : '더 살 수 없어요') : `${ic}${c}`;
         h += `<button class="si${n ? ' own' : ''}${poor ? ' poor' : ''}" type="button" data-dbuy="${d.id}" aria-label="${d.name}${out ? '' : `, 숲의 정수 ${c}개`}">` +
           (d.rare ? '<span class="rare-mark" aria-hidden="true">★</span>' : '') +
           `<span class="pv deco"><img src="${IMG(d.img)}" alt="" draggable="false"></span><span class="nm">${d.name}${!d.rare && n ? ` <small>${n}개</small>` : ''}</span><span class="pr">${pr}</span></button>`;
@@ -19519,6 +19585,7 @@ body.cam-scene #ffChip,body.cam-scene #tierDots,body.cam-scene #plChip{opacity:0
       (furs.length ? `<h4 class="dex-h">교실 시즌 가구 <small>하나를 골라 교실에 놓아요</small></h4><div class="ps-furs">${furs.map(id => `<button type="button" class="${S.ps.fsel === id ? 'on' : ''}" data-psf="${id}" aria-pressed="${S.ps.fsel === id}"><img src="${IMG(psDef(Number(id.slice(4))).fur)}" alt=""><small>${esc(psDef(Number(id.slice(4))).furNm)}</small></button>`).join('')}<button type="button" class="${S.ps.fsel ? '' : 'on'}" data-psf="">치우기</button></div>` : '');
     const tr = $('#psTrack'), cur = tr && tr.children[Math.max(0, lv - 2)]; if (tr && cur) tr.scrollLeft = cur.offsetLeft - 8;
   }
+  VD.titles.push({ id: 'biodoc', title: '숲속 박사', got: d => !!(d && d.bx && d.bx.g >= 5) });   // 2.3.5 생물 90종
   VD.titles.push({ id: 'psnew', title: '패스 새내기', got: d => !!(d && d.ps && d.ps.badge >= 1) });   // 2.1.3 패스 10단계 첫 배지
   VD.titles.push({ id: 'seasonking', title: '숲속 시즌 왕', got: d => !!(d && d.rs && d.rs.king >= 1) }, { id: 'fourseason', title: '사계절 교장', got: d => !!(d && d.deco && d.deco.own && ['winter', 'spring', 'summer', 'autumn'].every(q => d.deco.own['rs_' + q])) });   // 2.1.3 랭킹 시즌
   /* ===== 2.1.3 숲속 패스 END ===== */
@@ -19921,7 +19988,7 @@ body.cam-scene #ffChip,body.cam-scene #tierDots,body.cam-scene #plChip{opacity:0
     { id: 'rare', name: '반짝 친구', goals: [1, 2, 3, 4, 6], title: '반짝 친구 수집가', ic: 'rare_badge', t: n => n >= 6 ? '반짝 친구 모두 만나기' : `반짝 친구 ${n}명 만나기`, v: () => S.rare ? S.rare.got.length : 0 },   // 2.1.3
     { id: 'garden', name: '급식 메뉴', goals: [2, 4, 8, 12, 16], title: '숲속 요리사', ic: 'menu_01', t: n => n >= GD_MENU.length ? '급식 메뉴 모두 만들기' : `급식 메뉴 ${n}가지 만들기`, v: () => gdMenuCount() },   // 2.2.0
     { id: 'cgwin', name: '동아리 대항전', goals: [1, 2, 4, 7, 10], title: '대항전 챔피언', ic: 'league_ic', t: n => `동아리 대항전 ${n}번 우승`, v: () => S.cg.wins },   // 2.2.0
-    { id: 'bio', name: '생물 탐사', goals: [5, 10, 18, 24, 30], title: '꼬마 생물학자', ic: 'bio_ladybug', t: n => n >= 30 ? '생물 도감 모두 채우기' : `생물 ${n}종 관찰하기`, v: () => bxCount() },   // 2.2.0
+    { id: 'bio', name: '생물 탐사', goals: [10, 25, 45, 70, 90], title: '꼬마 생물학자', ic: 'bio_ladybug', t: n => n >= BIO.length ? '생물 도감 모두 채우기' : `생물 ${n}종 관찰하기`, v: () => bxCount() },   // 2.2.0
     { id: 'lab', name: '과학 탐구 실험', goals: [3, 8, 14, 20, 24], title: '꼬마 과학자', t: n => n >= 24 ? '실험 노트 모두 채우기' : `실험 노트 ${n}장 채우기`, v: () => labCount() }   // 2.0.1 공부 2단계(노트 24장)
   ];
   const ACH_EM = { rare: '✨', students: '🐰', grad: '🎓', building: '🏫', teacher: '🦔', quest: '📝', puzzle: '🧩', dex: '📖', fest: '🎈', attend: '📅', trip: '🚌', gold: '🌰', rank: '🏆', deco: '🪴', lab: '🧪', battle: '⚔️', league: '🏅' , donate: '🌳', snack: '🍪' };
