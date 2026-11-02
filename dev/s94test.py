@@ -14,7 +14,7 @@ F = 'window.__forest'
 CLEAN = "document.querySelectorAll('.overlay').forEach(o=>{o.hidden=true;o.classList.remove('open')}); window.__forest.rt.modalOpen=null; window.__forest.rt.modalQueue.length=0"
 SKIP = f"(()=>{{ const t=document.querySelector('#tut'); if(t) t.hidden=true; {F}.S.tut.st='skip'; {F}.rt.tut=null; {CLEAN}; }})()"
 OVER = """(sel => { const out = []; document.querySelectorAll(sel).forEach(el => { const r = el.getBoundingClientRect(); if (r.width && (r.right > innerWidth + 1 || r.left < -1 || el.scrollWidth > el.clientWidth + 2)) out.push((el.id || el.className) + ' ' + Math.round(r.left) + '~' + Math.round(r.right)); }); return out; })"""
-K = "((d, h, m) => Date.UTC(2026, 10, d, h - 9, m || 0))"
+K = "((d, h, m) => Date.UTC(2032, 10, d, h - 9, m || 0))"   # 3.0.0: 시험 날짜가 오늘보다 앞이면 게임 시계가 안 돌아서 먼 미래(11월 3~5일이 맑은 해)
 
 
 async def main():
@@ -42,7 +42,7 @@ async def main():
                 print('칸', r)
                 ok(r['shut'] is False and r['n0'] == 2 and r['n1'] == 3 and r['n2'] == 4 and r['corn0'] is False, f'밭 칸과 열림 {r}')
                 # 2) 심기, 물, 거두기 (11/3은 비가 아닌 날인지 먼저 확인)
-                r = await ev("""const wx = F.wxOf ? F.wxOf('2026-11-03') : '';
+                r = await ev("""const wx = F.wxOf ? F.wxOf('2032-11-03') : '';
                   F.rt.fakeNow = K(3, 9); S.gn.inv = {}; S.gn.st = { h: 0, cook: 0, plant: 0 };
                   const p1 = F.gdPlant(0, 'lettuce'), p2 = F.gdPlant(1, 'carrot'), again = F.gdPlant(0, 'potato');
                   const e0 = S.gn.plots[1].e; F.rt.fakeNow = K(3, 9, 10); F.gdWater(1); const cut = (e0 - S.gn.plots[1].e) / 60000;
@@ -71,7 +71,7 @@ async def main():
                   const sb = F.snBase ? F.snBase() : null; return { pct, mx };""")
                 ok(r['pct'] == 7 and r['mx'] == 11, f'영양 선생님 {r}')
                 # 비 오는 날 저절로 물
-                r = await ev("""let day = null; for (let d = 6; d <= 30; d++) { const s = `2026-11-${String(d).padStart(2, '0')}`; if (F.wxOf(s) === 'rain') { day = d; break; } }
+                r = await ev("""let day = null; for (let d = 6; d <= 30; d++) { const s = `2032-11-${String(d).padStart(2, '0')}`; if (F.wxOf(s) === 'rain') { day = d; break; } }
                   if (!day) return { day };
                   F.rt.fakeNow = K(day, 9); S.gn.plots[0] = { c: 'potato', s: K(day, 8), e: K(day, 10), w: 0 }; S.gn.wx = ''; F.gdSync();
                   const auto = S.gn.plots[0].w, e = (S.gn.plots[0].e - K(day, 9)) / 60000;
@@ -83,7 +83,7 @@ async def main():
                 r = await ev("""const ids = F.MAIN.map(q => q.id), i1 = ids.indexOf('gd1'), i2 = ids.indexOf('gd3'), i3 = ids.indexOf('gd4'), old = ids.indexOf('gd2');
                   const ch = [F.MAIN[i1].ch, F.MAIN[i2].ch, F.MAIN[i3].ch], ts = [F.MAIN[i1].t, F.MAIN[i2].t, F.MAIN[i3].t], m1 = F.qMeasure ? F.qMeasure(F.MAIN[i2]) : null, m2 = F.qMeasure ? F.qMeasure(F.MAIN[i3]) : null, mp = F.qMeasure ? F.qMeasure(F.MAIN[i1]) : null;
                   const ps = F.PS_M && F.PS_M.gd ? F.PS_M.gd.v() : null, ach = F.ACH ? F.ACH.find(a => a.id === 'garden') : null;
-                  const a = F.sanitize({ ...JSON.parse(JSON.stringify(S)), gn: { plots: [{ c: 'xx' }, { c: 'corn', s: 1, e: 2, w: 3 }], inv: { lettuce: 500, bad: 3 }, menu: { menu_01: 2, menu_99: 1 }, today: { day: '2026-11-05', id: 'menu_77' }, g8: 1, st: { h: -4 } } });
+                  const a = F.sanitize({ ...JSON.parse(JSON.stringify(S)), gn: { plots: [{ c: 'xx' }, { c: 'corn', s: 1, e: 2, w: 3 }], inv: { lettuce: 500, bad: 3 }, menu: { menu_01: 2, menu_99: 1 }, today: { day: '2032-11-05', id: 'menu_77' }, g8: 1, st: { h: -4 } } });
                   const b = F.sanitize({ ...JSON.parse(JSON.stringify(S)), gn: undefined });
                   return { i1, i2, i3, old, ch, ts, mp, m1, m2, ps, ach: ach ? [ach.title, ach.v()] : null, a: a.gn, b: b.gn.plots.length };""")
                 print('퀘스트와 저장', {k: v for k, v in r.items() if k != 'a'})
