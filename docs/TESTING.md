@@ -159,3 +159,6 @@ Issue 양식은 기본 브랜치(`main`)에 있어야 GitHub의 새 Issue 화면
 - 공식 Firebase Emulator: Node24, Java21에서 `cd dev/fbtest/emulator`, `npm ci`, `npm test`. 테스트용 `demo-forest-security` 프로젝트와 로컬 Database Emulator만 사용해요. 운영 비밀값이 필요 없어요. CI는 `.github/workflows/security-rules.yml`이에요.
 - 원본 변경 뒤 `wrap.py`와 s37, 관련 저장/랭킹 시험 s71/s72/s98을 실행해요. 이번 보안 작업에서는 s90/s102/s103도 통과했어요. 종료 코드뿐 아니라 마지막 PASS/FAIL을 확인해요.
 - 실제 UMP, 운영 콘솔 규칙, 최종 AAB 검수는 가짜 SDK나 Emulator 시험으로 대신할 수 없어요.
+
+- `s104test.py` (3.0.0 통합): 고등학교 자율학습 20시/6시 경계, 같은 밤 중복 시작, 아침 XP 한 번 지급, ns 없는 옛 저장, hs1~hs37, 390px 밝은 화면/360px 어두운 화면의 창 넘침 검사.
+- s37의 상태별 수치 검사에는 고등학교 1학년/3학년도 포함해요. 자동 진행 모형 결과를 실제 이용자의 플레이 일수로 해석하지 않아요.

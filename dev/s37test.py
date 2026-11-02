@@ -15,6 +15,9 @@ STATES = {
     # 2.0.0 중학교
     '중학교 1학년': {'tier': 2, 'tg': 0, 'f': {'classroom': 8, 'cafeteria': 6, 'library': 6, 'playground': 6, 'science': 3, 'store': 3}, 't': {'squirrel': 8, 'owl': 5, 'bear': 5}, 'students': 30, 'fuFull': True},
     '중학교 3학년': {'tier': 2, 'tg': 2, 'f': {'classroom': 25, 'cafeteria': 18, 'library': 17, 'playground': 18, 'science': 11, 'store': 17}, 't': {'squirrel': 20, 'owl': 5, 'bear': 15}, 'students': 100, 'fuFull': True},
+    # 3.0.0 통합: 기숙사가 있는 고등학교에서도 지원/비용이 유한해야 해요
+    '고등학교 1학년': {'tier': 3, 'tg': 0, 'f': {'classroom': 8, 'cafeteria': 6, 'library': 6, 'playground': 6, 'science': 3, 'store': 3, 'dorm': 1}, 't': {'squirrel': 8, 'owl': 5, 'bear': 5}, 'students': 30, 'fuFull': True},
+    '고등학교 3학년': {'tier': 3, 'tg': 2, 'f': {'classroom': 25, 'cafeteria': 18, 'library': 17, 'playground': 18, 'science': 11, 'store': 17, 'dorm': 18}, 't': {'squirrel': 20, 'owl': 5, 'bear': 15}, 'students': 100, 'fuFull': True},
 }
 SETUP = r"""(st) => {
   const F = window.__forest, S = F.S;
