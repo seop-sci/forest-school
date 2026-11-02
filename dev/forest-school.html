@@ -11122,11 +11122,17 @@ span.bt-stamp{display:none}.bt-duel.done span.bt-stamp{display:grid}
         q.on('value', cb, no);
         return () => q.off('value', cb);
       },
-      listenSea: (ok, no) => {   // 2.1.3 랭킹 시즌(서버 규칙 indexOn sp)
-        const q = ref.orderByChild('sp').limitToLast(RANK_MAX + 10);
-        const cb = snap => { const out = []; snap.forEach(ch => { out.push([ch.key, ch.val()]); }); ok(out.reverse()); };
-        q.on('value', cb, no);
-        return () => q.off('value', cb);
+      listenSea: (ok, no) => {
+        // 이전 판의 sk/sp 기록도 포함해 현재 시즌을 먼저 고른 다음 점수순으로 정렬해요.
+        let q = null, season = -1;
+        const cb = snap => { const out = []; snap.forEach(ch => { out.push([ch.key, ch.val()]); }); ok(out); };
+        const sync = () => {
+          const next = rsNum(); if (next === season) return;
+          if (q) q.off('value', cb);
+          season = next; q = ref.orderByChild('sk').equalTo(next); q.on('value', cb, no);
+        };
+        sync(); const timer = setInterval(sync, 30000);
+        return () => { clearInterval(timer); if (q) q.off('value', cb); };
       },
       put: doc => ref.child(uid).set(Object.assign({}, doc, { at: Cloud.fb.database.ServerValue.TIMESTAMP })),
       remove: () => ref.child(uid).remove(),
