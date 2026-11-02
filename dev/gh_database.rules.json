@@ -3,7 +3,7 @@
     "forest": {
       "saves": {
         "$uid": {
-          ".read": "auth != null && auth.uid === $uid",
+          ".read": "auth != null && (auth.uid === $uid || root.child('forest/adminUids').child(auth.uid).val() === true)",
           ".write": "auth != null && auth.uid === $uid",
           ".validate": "newData.hasChildren(['d', 'at', 'v']) && newData.child('d').isString() && newData.child('d').val().length < 200000 && newData.child('at').isNumber() && newData.child('v').isString()",
           "d": {
