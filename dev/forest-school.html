@@ -754,6 +754,15 @@ html.ait .app{padding-top:calc(10px + var(--ait-top, 0px));padding-bottom:var(--
 .con-cb .cb-b[aria-disabled="true"]{opacity:.5}.con-cb .on{color:#3F6E2A;font-weight:700}
 .con image,.con rect,.con text{pointer-events:none}
 .con .con-scaf{opacity:.92}
+/* 2.3.5 비버 시설 선생님: 7칸(0.35초씩) 1 2 1 2 1 2 3 */
+.con-bv{cursor:pointer}.con .con-bv rect.bv-hit{pointer-events:all}.con-bv image{opacity:0}
+.con-bv .bv1{animation:bv1 2.45s step-end infinite}.con-bv .bv2,.con-bv .bv-sp{animation:bv2 2.45s step-end infinite}.con-bv .bv3,.con-bv .bv-du{animation:bv3 2.45s step-end infinite}
+.con-bv.no3 image{animation-duration:.7s}.con-bv.no3 .bv1{animation-name:bv1b}.con-bv.no3 .bv2,.con-bv.no3 .bv-sp{animation-name:bv2b}
+@keyframes bv1{0%{opacity:1}14.28%{opacity:0}28.57%{opacity:1}42.85%{opacity:0}57.14%{opacity:1}71.42%{opacity:0}}
+@keyframes bv2{0%{opacity:0}14.28%{opacity:1}28.57%{opacity:0}42.85%{opacity:1}57.14%{opacity:0}71.42%{opacity:1}85.71%{opacity:0}}
+@keyframes bv3{0%{opacity:0}85.71%{opacity:1}}
+@keyframes bv1b{0%{opacity:1}50%{opacity:0}}@keyframes bv2b{0%{opacity:0}50%{opacity:1}}
+@media (prefers-reduced-motion:reduce){.con-bv image{animation:none!important}.con-bv .bv1{opacity:1}}
 .con .con-lan{display:none}#map.nb-night .con .con-lan{display:inline;filter:drop-shadow(0 0 3px rgba(255,214,110,.9))}
 .con .con-back{fill:rgba(60,40,20,.55)}
 .con .con-fill{fill:#8DD27B}
@@ -5556,7 +5565,7 @@ body.cam-scene #ffChip,body.cam-scene #tierDots,body.cam-scene #plChip{opacity:0
     '<path d="M15.4 -7.6 L22 -6 L15.4 -4.4 Z" class="f-magbeak"/><path d="M3 12.5 v4.5 M7 12.5 v4.5" class="s-magleg"/>' +
     '<g transform="translate(19.5 -5.6) rotate(18)"><rect x="0" y="0" width="11" height="7.6" rx="1.6" class="c-seal"/><circle cx="2.2" cy="3.8" r="1.1" class="c-dip"/><path d="M4.6 2.4 h4.4 M4.6 5.2 h3" class="s-tagline"/></g></g>';
   // 1.5.0: 선생님(고슴도치 교감 선생님 포함)은 그림(PNG)으로
-  const CHR_AR = { chr_bear: 0.69, chr_cat: 0.75, chr_chick: 0.67, chr_dog: 0.84, chr_fox: 0.73, chr_koala: 0.99, chr_otter: 0.96, chr_panda: 0.68, chr_penguin: 0.64, chr_rabbit: 0.65, chr_raccoon: 0.88, chr_hamster: 0.66, chr_duck: 0.58, chr_turtle: 0.6, chr_mole: 0.63, chr_frog: 0.63, chr_waterdeer: 0.59, tea_bear: 0.61, tea_hedgehog: 0.75, tea_owl: 0.64, tea_squirrel: 0.83, tea_dietitian: 0.64, tea_librarian: 0.58, tea_swan: 0.7, tea_peacock: 0.77, tea_alpaca: 0.52 };
+  const CHR_AR = { tea_beaver: 0.92, chr_bear: 0.69, chr_cat: 0.75, chr_chick: 0.67, chr_dog: 0.84, chr_fox: 0.73, chr_koala: 0.99, chr_otter: 0.96, chr_panda: 0.68, chr_penguin: 0.64, chr_rabbit: 0.65, chr_raccoon: 0.88, chr_hamster: 0.66, chr_duck: 0.58, chr_turtle: 0.6, chr_mole: 0.63, chr_frog: 0.63, chr_waterdeer: 0.59, tea_bear: 0.61, tea_hedgehog: 0.75, tea_owl: 0.64, tea_squirrel: 0.83, tea_dietitian: 0.64, tea_librarian: 0.58, tea_swan: 0.7, tea_peacock: 0.77, tea_alpaca: 0.52 };
   const FSI = k => (window.FS_IMG && window.FS_IMG[k]) || (window.FS_IMG171 && window.FS_IMG171[k]) || (window.FS_IMG200 && window.FS_IMG200[k]) || (window.FS_IMG213 && window.FS_IMG213[k]) || (window.FS_IMG220 && window.FS_IMG220[k]) || (window.FS_IMG230 && window.FS_IMG230[k]) || (window.FS_IMG231 && window.FS_IMG231[k]) || (window.FS_IMG235 && window.FS_IMG235[k]) || '';   // 2.1.3, 2.2.0 묶음도   // 1.7.1, 2.0.0 묶음도 찾아요
   const teaPic = k => { const h = Math.min(44, 46 / CHR_AR['tea_' + k]), w = h * CHR_AR['tea_' + k]; return `<image href="${FSI('tea_' + k)}" x="${(-w / 2).toFixed(1)}" y="${(22 - h).toFixed(1)}" width="${w.toFixed(1)}" height="${h.toFixed(1)}"/>`; };
   const AV = {
@@ -5567,8 +5576,8 @@ body.cam-scene #ffChip,body.cam-scene #tierDots,body.cam-scene #plChip{opacity:0
   };
   // 1.7.1 새 선생님 두 분(그림이 없으면 그림 문자)
   AV.dietitian = '<text x="0" y="10" text-anchor="middle" font-size="28">🐑</text>'; AV.librarian = '<text x="0" y="10" text-anchor="middle" font-size="28">🦌</text>';
-  AV.swan = '<text x="0" y="10" text-anchor="middle" font-size="28">🦢</text>'; AV.peacock = '<text x="0" y="10" text-anchor="middle" font-size="28">🦚</text>'; AV.alpaca = '<text x="0" y="10" text-anchor="middle" font-size="28">🦙</text>';   // 2.3.0
-  for (const k of ['hedgehog', 'squirrel', 'owl', 'bear', 'dietitian', 'librarian', 'swan', 'peacock', 'alpaca']) if (FSI('tea_' + k)) AV[k] = teaPic(k);
+  AV.swan = '<text x="0" y="10" text-anchor="middle" font-size="28">🦢</text>'; AV.peacock = '<text x="0" y="10" text-anchor="middle" font-size="28">🦚</text>'; AV.alpaca = '<text x="0" y="10" text-anchor="middle" font-size="28">🦙</text>'; AV.beaver = '<text x="0" y="10" text-anchor="middle" font-size="28">🦫</text>';   // 2.3.0, 2.3.5 비버
+  for (const k of ['hedgehog', 'squirrel', 'owl', 'bear', 'dietitian', 'librarian', 'swan', 'peacock', 'alpaca', 'beaver']) if (FSI('tea_' + k)) AV[k] = teaPic(k);
 
   const TEA = {   // 2.3.0 탭 순서: 다람쥐, 곰, 부엉이(지섭). 저장은 열쇠라 그대로
     squirrel: { name: '다람쥐 선생님', subject: '수학',
@@ -6129,7 +6138,7 @@ body.cam-scene #ffChip,body.cam-scene #tierDots,body.cam-scene #plChip{opacity:0
     t: { squirrel: 1, owl: 0, bear: 0 },
     vp: 0,   // 1.7.0 고슴도치 교감 선생님 연수 레벨 (0~10)
     ach: { hit: {}, got: {}, title: '' },   // 1.7.1 업적: hit 이룬 등급(0~3), got 받은 등급, title 단 칭호(업적 종류 id)
-    xt: { diet: 0, lib: 0, kor: 0, art: 0, snack: 0 },   // 2.3.0 국어, 미술, 매점 선생님   // 1.7.1 양 영양 선생님, 사슴 사서 선생님 연수 레벨 (0~10, 그 건물을 지으면 오셔요)
+    xt: { diet: 0, lib: 0, kor: 0, art: 0, snack: 0, fix: 0 },   // 2.3.0 국어, 미술, 매점 선생님   // 1.7.1 양 영양 선생님, 사슴 사서 선생님 연수 레벨 (0~10, 그 건물을 지으면 오셔요)
     grade: 0, best: 0, sound: true, bgm: true, vibrate: true, savedAt: Date.now(),
     pending: 0, pendingSec: 0, away: { from: 0, skip: 0 }, certNo: 0, earned: 0, yearEarned: 0, pwBank: 0,
     tier: 0, tg: 0, sem: 0, semDip: 0, tdip: 0, fund: 0, fp: { schol: 0, rep: 0, dip: 0 },
@@ -6637,7 +6646,7 @@ body.cam-scene #ffChip,body.cam-scene #tierDots,body.cam-scene #plChip{opacity:0
     const [a, b] = conBand();
     if (L <= 1) return CON.first;   // 2.3.0 처음 짓기는 모든 학교급 10초
     const first = yearCap() - CAP_STEP + 1;   // 2학기에 상한이 +2 되어도 학년 첫 레벨은 그대로. 2학기에 열린 레벨(상한 +1, +2)은 긴 쪽
-    return Math.round(a + (b - a) * Math.min(1, Math.max(0, (L - first) / (CAP_STEP - 1))));
+    return Math.round((a + (b - a) * Math.min(1, Math.max(0, (L - first) / (CAP_STEP - 1)))) * fixMult());   // 2.3.5 비버 시설 선생님
   }
   // 시간 단축권 넷(큰 것부터). 광고 1번에 5분권 6장, 하루 2번
   const TK = [{ k: 'h3', sec: 10800, name: '3시간권' }, { k: 'h1', sec: 3600, name: '1시간권' }, { k: 'm30', sec: 1800, name: '30분권' }, { k: 'm5', sec: 300, name: '5분권' }];
@@ -6708,14 +6717,20 @@ body.cam-scene #ffChip,body.cam-scene #tierDots,body.cam-scene #plChip{opacity:0
       eff: L => L < 1 ? '합치기 보너스 없음' : `합치기 미술 XP +${5 * L}%` + (Math.floor(L / 5) ? `, 에너지 최대 +${10 * Math.floor(L / 5)}` : '') },
     snack: { name: '알파카 매점 선생님', subject: '매점', fac: 'store', tier: 2, max: 10, per: 0.5, av: 'alpaca',
       desc: '복슬복슬한 매점 선생님이에요. 연수를 보내면 간식 뽑기에서 귀한 간식이 조금 더 잘 나와요.',
-      eff: L => `귀한 간식 ${(8 + 0.5 * L).toFixed(1).replace(/\.0$/, '')}%` + (L ? ` (+${(0.5 * L).toFixed(1).replace(/\.0$/, '')}%p)` : '') } };
+      eff: L => `귀한 간식 ${(8 + 0.5 * L).toFixed(1).replace(/\.0$/, '')}%` + (L ? ` (+${(0.5 * L).toFixed(1).replace(/\.0$/, '')}%p)` : '') },
+    // 2.3.5 비버 시설 선생님(작업지시서 48, 지섭 결정): 초등학교부터, 연수는 숲의 정수(20+10n), 한 레벨에 공사 시간 -2%
+    fix: { name: '비버 시설 선생님', subject: '시설', fac: 'classroom', tier: 1, max: 10, per: 2, av: 'beaver', ess: true,
+      desc: '망치질이 특기인 시설 선생님이에요. 공사장에서 뚝딱뚝딱 고쳐요. 연수를 보내면 건물 공사 시간이 줄어요.',
+      eff: L => L < 1 ? '공사 시간 그대로' : `공사 시간 -${2 * L}%` } };
   const xtLv = k => (S && S.xt && S.xt[k]) || 0;
   const xtHere = k => !!S && S.tier >= (XT[k].tier || 0) && S.f[XT[k].fac] >= 1;   // 2.3.0 tier: 그 학교급부터
   const rdPerDay = () => RD.perDay + Math.floor(xtLv('kor') / 5);   // 2.3.0 고니 국어 선생님
   const mgEMax = () => MG.EMAX + 10 * Math.floor(xtLv('art') / 5);   // 2.3.0 공작 미술 선생님
   const snRareP = () => SN.rare + XT.snack.per / 100 * xtLv('snack');   // 2.3.0 알파카 매점 선생님
   const xtMaxed = k => xtLv(k) >= XT[k].max;
-  const xtCost = k => Math.ceil(softCost(TEA.bear.cost, xtLv(k) + 1, SOFT.tea) * costScale());
+  const xtCost = k => XT[k].ess ? 20 + 10 * (xtLv(k) + 1) : Math.ceil(softCost(TEA.bear.cost, xtLv(k) + 1, SOFT.tea) * costScale());   // 2.3.5 정수로 연수하는 선생님
+  const xtHave = k => XT[k].ess ? S.ess : S.budget;
+  const fixMult = () => 1 - XT.fix.per / 100 * xtLv('fix');   // 2.3.5 비버 시설 선생님
   const feastMins = () => DEAL.feastMin + XT.diet.per * xtLv('diet');   // 까치 특식 데이 길이
   const libMult = () => 1 + XT.lib.per / 100 * xtLv('lib');   // 퍼즐 점수 정수 배수
 
@@ -9892,11 +9907,32 @@ body.cam-scene #ffChip,body.cam-scene #tierDots,body.cam-scene #plChip{opacity:0
       const lay = $('#conUi'); if (lay) lay.appendChild(ui); else el.appendChild(ui);
       for (const c of ['.con-back', '.con-fill', '.con-bar', '.con-t', '.con-sp']) { const n = el.querySelector(c); if (n) ui.appendChild(n); }
     }
+    conBeaver(ui, x, y, w);   // 2.3.5 비버는 학생 위 층(건물 누르는 칸에 가리지 않게)
     ui.classList.toggle('fast', conAdd() > 0);
     { const add = conAdd(), sp = ui.querySelector('.con-sp text'); el.classList.toggle('fast', add > 0); const st = `⚡+${add}%`; if (add > 0 && sp && sp.textContent !== st) sp.textContent = st; }
     g.classList.add('is-con');
     const f = ui.querySelector('.con-fill'); if (f) f.setAttribute('width', (Number(f.dataset.w) * pr).toFixed(1));
     const t = ui.querySelector('.con-t'), tx = hm(left); if (t && t.textContent !== tx) t.textContent = tx;
+  }
+  // 2.3.5 비버 시설 선생님이 공사장에서 망치질해요(초등학교부터). 그림 1, 2를 0.35초마다 번갈아, 가끔 3(먼지)
+  const BV_LINES = ['뚝딱뚝딱! 튼튼하게 짓는 중이에요', '못 하나도 꼼꼼하게 박아요', '조금만 기다려 주세요, 금방 끝나요', '연수를 받으면 더 빨리 지을 수 있어요'];
+  function conBeaver(el, x, y, w) {
+    const has = xtHere('fix') && FSI('fix_beaver_1') && FSI('fix_beaver_2');
+    let bv = el.querySelector('.con-bv');
+    if (!has) { if (bv) bv.remove(); return; }
+    if (bv) return;
+    const s = Math.min(w, 110) * 0.44, bx = x + w * 0.8 - s / 2, by = y + w * 0.8 - s;
+    const im = (k, c) => FSI(k) ? `<image class="${c}" href="${FSI(k)}" x="${bx.toFixed(1)}" y="${by.toFixed(1)}" width="${s.toFixed(1)}" height="${s.toFixed(1)}"/>` : '';
+    bv = document.createElementNS('http://www.w3.org/2000/svg', 'g'); bv.setAttribute('class', 'con-bv');
+    bv.setAttribute('role', 'button'); bv.setAttribute('aria-label', XT.fix.name);
+    bv.innerHTML = `<rect class="bv-hit" x="${bx.toFixed(1)}" y="${by.toFixed(1)}" width="${s.toFixed(1)}" height="${s.toFixed(1)}" fill="transparent"/>` +
+      im('fix_beaver_1', 'bv1') + im('fix_beaver_2', 'bv2') + (FSI('fix_beaver_3') ? im('fix_beaver_3', 'bv3') : '') +
+      (FSI('fix_spark') ? `<image class="bv-sp" href="${FSI('fix_spark')}" x="${(bx - s * 0.18).toFixed(1)}" y="${(by + s * 0.1).toFixed(1)}" width="${(s * 0.42).toFixed(1)}" height="${(s * 0.42).toFixed(1)}"/>` : '') +
+      (FSI('fix_dust') ? `<image class="bv-du" href="${FSI('fix_dust')}" x="${(bx - s * 0.1).toFixed(1)}" y="${(by + s * 0.6).toFixed(1)}" width="${(s * 0.6).toFixed(1)}" height="${(s * 0.45).toFixed(1)}"/>` : '');
+    if (!FSI('fix_beaver_3')) bv.classList.add('no3');
+    bv.addEventListener('click', e => { e.stopPropagation(); rt.bvN = ((rt.bvN || 0) + 1) % BV_LINES.length; sfx('tap'); toast(`${XT.fix.name}: ${BV_LINES[rt.bvN]}`); });
+    bv.addEventListener('pointerdown', e => e.stopPropagation());
+    el.appendChild(bv);
   }
   // 건물 창의 공사 칸: 남은 시간, 즉시 완공(하루 한 번), 단축권 자동 사용(일괄), 숲의 정수로 즉시 완료, 골라서 쓰기, 광고
   function conSheet() {
@@ -9957,7 +9993,7 @@ body.cam-scene #ffChip,body.cam-scene #tierDots,body.cam-scene #plChip{opacity:0
           <p class="tdesc">${XT[k].desc}</p>
           <div class="teff"><span class="k">지금</span><span class="v now"></span><span class="k k-next">연수 후</span><span class="v next"></span></div>
           <p class="tnote" hidden></p>
-          <button class="cta split small" type="button" data-k="${k}"><span class="lbl"></span><span class="cost">${acornIcon()}<b></b></span></button>
+          <button class="cta split small" type="button" data-k="${k}"><span class="lbl"></span><span class="cost">${XT[k].ess ? ESS_ICON() : acornIcon()}<b></b></span></button>
         </div>
       </article>`).join('');
   }
@@ -9986,15 +10022,15 @@ body.cam-scene #ffChip,body.cam-scene #tierDots,body.cam-scene #plChip{opacity:0
       $('.lbl', btn).textContent = maxed ? '최고 레벨' : '연수 보내기';
       $('.cost', btn).hidden = maxed || !here;
       $('.cost b', btn).textContent = fmt(c);
-      btn.setAttribute('aria-disabled', (!here || maxed || S.budget < c) ? 'true' : 'false');
+      btn.setAttribute('aria-disabled', (!here || maxed || xtHave(k) < c) ? 'true' : 'false');
     }
   }
   function xtAct(k, btn) {
     if (rt.paused || !XT[k] || xtMaxed(k)) return false;
     if (!xtHere(k)) { toast(S.tier < (XT[k].tier || 0) ? `${XT[k].name}은 ${TIERS[XT[k].tier].school}에서 오셔요` : `${eul(FAC[XT[k].fac].name)} 지으면 ${XT[k].name}이 오셔요`); if (btn) shake(btn); return false; }
     const c = xtCost(k);
-    if (S.budget < c) { if (btn) shake(btn); return false; }
-    S.budget -= c;
+    if (xtHave(k) < c) { if (XT[k].ess) toast(`숲의 정수가 모자라요 (${c} 필요)`); if (btn) shake(btn); return false; }
+    if (XT[k].ess) { S.ess -= c; S.st.esSpent = (S.st.esSpent || 0) + c; renderEss(); } else S.budget -= c;
     S.xt[k] = xtLv(k) + 1;
     S.st.trains += 1;
     toast(`${XT[k].name} 연수 끝! Lv.${S.xt[k]}, ${XT[k].eff(S.xt[k])}`);
