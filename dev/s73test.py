@@ -59,6 +59,7 @@ async def main():
                 if sc['capAnim'] != 'cereCap' or not sc['cfShown']: bad.append(f'움직임 {sc}')
                 if not await pg.evaluate("document.querySelector('#toast').hidden"): bad.append('장면 동안 알림이 떠 있어요')
                 await pg.wait_for_timeout(50)
+                await pg.evaluate(f"{F}.rt.cereAt = performance.now()")
                 await pg.mouse.click(w / 2, 300); await pg.wait_for_timeout(300)
                 if await pg.evaluate(OPEN) != 'mCere' or not await pg.evaluate(ASKH): bad.append('뜨자마자 누른 손이 장면을 넘기거나 물었어요')
                 await pg.wait_for_timeout(2400)
@@ -224,5 +225,6 @@ async def main():
             await ctx.close()
         await b.close()
     print('\n'.join(bad) if bad else '', 'FAIL' if bad else 'PASS')
+    if bad: raise SystemExit(1)
 
 if __name__ == "__main__": asyncio.run(main())

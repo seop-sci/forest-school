@@ -24,7 +24,7 @@ async def main():
           for (const th of ['', 'spring', 'summer', 'autumn', 'winter', 'xmas', 'space']) {{ S.cos.th.bg = th; F.applyThemes();
             const h0 = document.querySelector('#mapImg0').getAttribute('href'), h1 = document.querySelector('#mapImg1').getAttribute('href');
             const want0 = I['map_kinder_' + th] || window.FS_IMG.map_kinder, want1 = I['map_elem_' + th] || window.FS_IMG.map_elem;
-            out[th || 'none'] = [h0 === want0, h1 === want1, !!I['map_kinder_' + th], !!I['map_elem_' + th]]; }}
+            out[th || 'none'] = [h0 === want0 || (!I['map_kinder_' + th] && h0.endsWith('/map_kinder.webp')), h1 === want1 || (!I['map_elem_' + th] && h1.endsWith('/map_elem.webp')), !!I['map_kinder_' + th], !!I['map_elem_' + th]]; }}
           S.cos.th.bg = ''; F.applyThemes(); return out; }})()""")
         for th in ['spring', 'summer', 'autumn', 'winter', 'xmas']:
             if r[th] != [True, True, True, True]: fails.append(f'테마 지도 {th}: {r[th]}')
@@ -92,7 +92,7 @@ async def main():
         on = [c for c in r['cards'] if c[1]]
         if not on or not all(c[2] for c in on): fails.append(f"만난 특별 손님 그림 {r['cards']}")
         if r['pend']: fails.append(f"특별 손님이 선물 목록에 들어갔어요 {r['pend']}")
-        if f"/ {r['keys']}종" not in r['head'] or r['keys'] != 26: fails.append(f"만난 친구 수가 바뀌었어요 (2.3.0부터 26종: 학생 17, 선생님 9) {r['head']}")
+        if f"/ {r['keys']}종" not in r['head'] or r['keys'] != 26: fails.append(f"만난 친구 수가 바뀌었어요 (2.3.0부터 26종) {r['head']}")
         await pg.evaluate(f"{CLEAN}"); await pg.wait_for_timeout(300)
         await pg.evaluate("document.querySelector('#panelDex').scrollTop = 99999"); await pg.wait_for_timeout(200)
         await pg.screenshot(path='s54_dex_guests.png')

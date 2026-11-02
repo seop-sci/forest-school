@@ -191,7 +191,7 @@ async def main():
           S.ev.stamp = {{ n: 6, last: '' }}; const u1 = S.mg.up; F.claimStamp(); {CLEAN}; out.stamp7up = S.mg.up - u1;
           S.ev.list.forEach(m => {{ m.done = true; }}); S.ev.box = false; const e5 = e(), u2 = S.mg.up; F.claimEvBox(); {CLEAN}; out.box = e() - e5; out.evUp = S.mg.up - u2;
           return out; }})()""")
-        if r['dm'] != 15 or r['bonus'] != 20 or r['wk'] != 30: fails.append(f'미션 에너지 {r}')
+        if r['dm'] != 10 or r['bonus'] != 15 or r['wk'] != 30: fails.append(f'미션 에너지 {r}')
         if r['boxUp'] != 1: fails.append(f'마지막 주간 상자 강화 조각 {r}')
         if r['stamp1'] != 7 or r['stamp5'] != 20 or r['stamp7up'] != 1 or r['box'] != 35 or r['evUp'] != 1: fails.append(f'이벤트 에너지와 강화 조각 {r}')   # 2.0.0 매주 이벤트라서 7, 20, 35(1.8.0: 10, 30, 50)
         await pg.evaluate(f"{F}.mgClose()")

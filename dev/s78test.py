@@ -91,5 +91,6 @@ async def main():
         await b.close()
     for x in bad: print('FAIL', x)
     print('PASS' if not bad else f'FAIL {len(bad)}')
+    if bad: raise SystemExit(1)
 
 asyncio.run(main())

@@ -124,7 +124,7 @@ FLOW2 = r"""() => {
   if (!F.canPromote()) return { err: '졸업식을 열 수 없어요' };
   F.promote(); F.rt.modalQueue.length = 0; F.rt.modalOpen = null;
   // 사람처럼: 추천을 사고, 추천이 비싸면 가장 싼 것을 사요. 장학재단은 기금이 되는 만큼 고쳐요
-  const buy = () => { const r = F.recommend(); let ok = false;
+  const buy = () => { const q = F.curMain(); if (q && (q.t === 'snDraw' || q.t === 'snDex') && F.snOpen() && !F.mainReady()) return false; const r = F.recommend(); let ok = false;
     if (r) { if (r.kind === 'tea') ok = S().budget >= F.teaCost(r.k) && F.teacherAct(r.k);
       else if (r.kind === 'fur') ok = S().budget >= F.furCost(r.k, r.i) && F.buyFur(r.k, r.i, true);
       else ok = S().budget >= F.facCost(r.k) && F.buyFacility(r.k); }

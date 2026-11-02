@@ -62,7 +62,7 @@ async def main():
                 # 4) 수업료, 평판, 수학부
                 r = await pg.evaluate(f"""(() => {{ const F = {F}, S = F.S; S.tier = 2; for (const k of F.AC.keys) {{ S.ac[k].lv = 30; S.ac[k].xp = 0; }}
                   const m = F.acMult(), rp = F.acRepOf(S), n = F.CLUBS.length, abil = F.ABIL.slice();
-                  F.rosterEnsure(); const five = S.roster.list.every(s => s.a.length === 5); const kid = S.roster.list[0];
+                  S.roster.list = []; F.rosterEnsure(); const five = S.roster.list.every(s => s.a.length === 5); const kid = S.roster.list[0];
                   F.clubAuto(true); const mat = F.clubMembers(4).length; const tm = F.clubTuitionMult();
                   return {{ m, rp, n, abil, five, a: kid.a, mat, tm, pct4: F.clubPct(4) }}; }})()""")
                 print('수업료', r)
@@ -105,5 +105,6 @@ async def main():
         await b.close()
     for x in bad: print('FAIL', x)
     print('PASS' if not bad else f'FAIL {len(bad)}')
+    if bad: raise SystemExit(1)
 
 asyncio.run(main())
