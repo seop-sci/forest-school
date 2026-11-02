@@ -40,7 +40,7 @@ async def main():
           for (const k of ['classroom','cafeteria','library']) {{
             const g=document.querySelector('#b-'+k); const b0=F.bldImg(k);
             for (let i=0;i<8 && !F.furReady(k);i++) {{ const j=F.FUR[k].findIndex((_,j)=>!F.furDone(k,j)); if (j<0) break; F.buyFur(k,j,true); }}
-            S.ff = {{}}; const ok = F.conFree(k);   // 2.3.0 즉시 완공 단추로(예전에는 저절로 바로 완공)
+            S.ff = {{}}; S.ffd = {{ day: '', n: 0 }}; const ok = F.conFree(k);   // 2.3.0 즉시 완공 단추로(예전에는 저절로 바로 완공)
             const href = g.querySelector('.built .bimg').getAttribute('href'), roof = g.querySelector('.roofimg').getAttribute('href');
             out[k] = {{ b0, ok, b1: F.bldImg(k), bs: S.bs[k], hrefOk: href === window.FS_IMG170['bld_'+k+'_s2'], roofOk: roof === window.FS_IMG170['roof_'+k+'_s2'], roofKey: F.roofKey(k) }};
           }}

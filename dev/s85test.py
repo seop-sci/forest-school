@@ -32,15 +32,15 @@ async def main():
             r = await ev("F.ffRender(true); return !document.querySelector('#ffChip').hidden;")
             ok(r is False, '유치원에도 바로 완공 칩이 보여요')
             # 1) 초등학교
-            r = await ev("""S.tier = 1; S.tg = 0; S.sem = 0; S.budget = 1e15; S.ff = {}; S.bd = {};
+            r = await ev("""S.tier = 1; S.tg = 0; S.sem = 0; S.budget = 1e15; S.ff = {}; S.ffd = { day: '', n: 0 }; S.bd = {};
               for (const k of ['classroom', 'cafeteria', 'library', 'playground', 'science']) { S.f[k] = 8; S.fu[k] = S.fu[k].map(() => 8); }
               F.renderMap(); F.ffRender(true);
               const n0 = F.facKeys().filter(F.ffCan).length, chip = document.querySelector('#ffChip'), t0 = chip.textContent, on0 = document.querySelector('#pq-classroom').classList.contains('ff-on');
               F.conFree('classroom'); F.ffRender(true);   // 2.3.0 즉시 완공 단추
               return { n0, t0, on0, lv: S.f.classroom, con: F.conOn('classroom'), n1: F.facKeys().filter(F.ffCan).length, t1: chip.textContent, on1: document.querySelector('#pq-classroom').classList.contains('ff-on'), vis: !chip.hidden };""")
             print(w, '바로 완공', r)
-            ok(r['n0'] == 5 and '5곳' in r['t0'] and r['on0'], f'처음 칩과 배지 {r}')
-            ok(r['lv'] == 9 and not r['con'] and r['n1'] == 4 and '4곳' in r['t1'] and not r['on1'] and r['vis'], f'바로 완공 뒤 {r}')
+            ok(r['n0'] == 5 and '3/3' in r['t0'] and r['on0'], f'처음 칩과 배지 {r}')   # 3.0.0 학교 전체 하루 3번
+            ok(r['lv'] == 9 and not r['con'] and r['n1'] == 5 and '2/3' in r['t1'] and r['on1'] and r['vis'], f'바로 완공 뒤 {r}')   # 3.0.0 남은 2번은 어느 건물이든
             await pg.evaluate(T.CLEAN); await pg.wait_for_timeout(1200)
             await pg.screenshot(path=f's85_chip_{w}.png')
             o = await pg.evaluate(OVER + "('#ffChip, #ffChip *')"); ok(not o, f'{w} 칩이 넘쳐요 {o}')
