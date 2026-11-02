@@ -1453,6 +1453,8 @@ body{background:radial-gradient(120% 60% at 50% 0%, color-mix(in srgb, var(--pap
 .pz-sc .pz-combo[hidden]{display:none}
 .pz-cell.ghost{background-image:var(--pz-ghost);opacity:.9}
 .pz-cell.will{filter:brightness(1.2) saturate(1.15)}
+.pz-bomb{position:fixed;z-index:60;pointer-events:none;display:grid;place-items:center}.pz-bomb img{width:100%;height:100%;object-fit:contain}.pz-bomb span{line-height:1}
+.pz-ring{position:fixed;z-index:59;width:40px;height:40px;border-radius:50%;border:4px solid #FFE36B;box-shadow:0 0 18px #FFB23B;pointer-events:none}   /* 3.0.0 폭탄 */
 /* 2.1.1 다람쥐 선생님 3×3 제거: 마우스나 손가락이 있는 자리의 3×3을 미리 보여 줘요 */
 #pzGrid.sq-mode .pz-cell{cursor:crosshair}
 .pz-cell.aim{z-index:2;transform:scale(1.04);filter:brightness(1.25) saturate(1.1)}
@@ -2652,6 +2654,7 @@ span.bt-stamp{display:grid;place-items:center;border-radius:50%;border:3px solid
 .bt-stamp{display:none}.bt-duel.done .bt-stamp{display:block}
 span.bt-stamp{display:none}.bt-duel.done span.bt-stamp{display:grid}
 .bt-cheer.on{border:2px solid #F3C04B}
+.bt-track{position:relative;width:240px;max-width:72vw;height:62px;margin:2px 0 4px;border-radius:10px;overflow:hidden;--off:0px;background:repeating-linear-gradient(90deg,rgba(255,255,255,.6) 0 10px,transparent 10px 28px) var(--off) 50%/auto 3px repeat-x,linear-gradient(#C8643E,#B35634);transition:background-position .15s ease-out}.bt-track .bt-fin{position:absolute;right:4px;top:50%;transform:translateY(-50%);font-size:18px}.bt-lane{position:absolute;left:0;right:0;height:50%}.bt-lane.me{bottom:0}.bt-lane.opp{top:0;opacity:.85}.bt-run{position:absolute;left:4%;bottom:0;width:30px;height:30px;transition:left .18s ease-out}.bt-runi{width:30px;height:30px;object-fit:contain;display:block}.bt-run.hop .bt-runi{animation:btHop .22s ease-out}@keyframes btHop{40%{transform:translateY(-6px) rotate(-6deg)}}@media (prefers-reduced-motion: reduce){.bt-run,.bt-track{transition:none}.bt-run.hop .bt-runi{animation:none}}   /* 3.0.0 달리기 트랙 */
 /* 2.1.1 숲속 대결 종목 문제 */
 .bt-cheer.btq{gap:7px;padding:10px 12px 9px;width:min(100%,420px);box-sizing:border-box}
 .btq-q{font-size:17px;line-height:1.35;word-break:keep-all}.btq-q.math{font-size:26px;letter-spacing:1px}
@@ -3641,10 +3644,10 @@ body.cam-scene #ffChip,body.cam-scene #tierDots,body.cam-scene #plChip{opacity:0
     </div>
   </div>
   <div class="pz-tray" id="pzTray" aria-label="놓을 조각"></div>
-  <p class="pz-teatip" id="pzTeaTip">선생님 블록이 든 줄을 지우면 도움을 받아요.<br>다람쥐는 3×3 제거, 부엉이는 조각 3개 바꾸기, 곰은 조각 돌리기</p>
+  <p class="pz-teatip" id="pzTeaTip">선생님 블록이 든 줄을 지우면 도움을 받아요.<br>다람쥐는 3×3 폭탄, 부엉이는 조각 3개 바꾸기, 곰은 조각 돌리기</p>
   <div class="pz-foot">
     <div class="pz-helps" id="pzHelps" aria-label="선생님 도움">
-      <button class="pz-tea" type="button" data-help="squirrel" aria-label="다람쥐 선생님 도움: 고른 칸을 가운데로 3×3 제거"><span class="pz-teapic" data-tea="tea_squirrel"></span><small class="pz-tead">3×3 제거</small><b class="pz-tean">0</b></button>
+      <button class="pz-tea" type="button" data-help="squirrel" aria-label="다람쥐 선생님 도움: 고른 칸에 폭탄을 떨어뜨려 3×3 제거"><span class="pz-teapic" data-tea="tea_squirrel"></span><small class="pz-tead">3×3 폭탄</small><b class="pz-tean">0</b></button>
       <button class="pz-tea" type="button" data-help="owl" aria-label="부엉이 선생님 도움: 조각 3개 새로 바꾸기"><span class="pz-teapic" data-tea="tea_owl"></span><small class="pz-tead">조각 바꾸기</small><b class="pz-tean">0</b></button>
       <button class="pz-tea" type="button" data-help="bear" aria-label="곰 선생님 도움: 고른 조각 돌리기"><span class="pz-teapic" data-tea="tea_bear"></span><small class="pz-tead">조각 돌리기</small><b class="pz-tean">0</b></button>
     </div>
@@ -14910,6 +14913,19 @@ body.cam-scene #ffChip,body.cam-scene #tierDots,body.cam-scene #plChip{opacity:0
   const btCheerPts = n => Math.min(BT.cheerMax, Math.round(Math.min(BT.cheerTaps, n) / (BT.cheerTaps / BT.cheerMax)));
   // 2.1.0 점수가 0부터 차오르는 연출
   function btCount(el, to, ms) { if (!el) return; if (rt.reduced) { el.textContent = to + '점'; return; } const t0 = performance.now(); const step = t => { const k = Math.min(1, (t - t0) / ms); el.textContent = Math.round(to * (1 - Math.pow(1 - k, 3))) + '점'; if (k < 1) requestAnimationFrame(step); }; requestAnimationFrame(step); }
+  /* 3.0.0 지섭 요청: 달리기는 트랙을 달리는 모습. 두드릴 때마다 우리 선수가 앞으로 뛰고(통통) 트랙 줄이 뒤로 흘러요.
+     상대 선수는 정해진 응원 점수만큼 일정하게 달려요. 그림 bt_track(작업지시서 48)이 없으면 CSS 트랙 */
+  function btTrackHTML(me, o) {
+    const tr = IMG('bt_track');
+    return `<div class="bt-track"${tr ? ` style="background:url('${tr}') var(--off) 0/auto 100% repeat-x"` : ''} aria-hidden="true"><span class="bt-fin">🏁</span>` +
+      `<div class="bt-lane me"><span class="bt-run" id="btRunMe">${btChr(me.sp, 'bt-runi')}</span></div><div class="bt-lane opp"><span class="bt-run" id="btRunOpp">${btChr(o.sp, 'bt-runi')}</span></div></div>`;
+  }
+  function btTrackStep() {
+    const r = $('#btRunMe'), tk = $('#btCheer .bt-track'); if (!r) return;
+    r.style.left = (4 + 78 * Math.min(1, btUI.taps / BT.cheerTaps)) + '%';
+    if (!rt.reduced) { r.classList.remove('hop'); void r.offsetWidth; r.classList.add('hop'); }
+    if (tk) tk.style.setProperty('--off', (-btUI.taps * 14) + 'px');
+  }
   // 종목 하나: 달리기는 4초 동안 두드리면 응원, 다른 종목은 문제(2.1.1). 그다음 점수 공개
   function btPlayEv() {
     const M = btUI.M; if (!M || M.phase !== 'play') return;
@@ -14924,6 +14940,7 @@ body.cam-scene #ffChip,body.cam-scene #tierDots,body.cam-scene #plChip{opacity:0
     const ms = rt.reduced ? 2000 : BT.cheerMs;
     $('#btPlay').style.setProperty('--bt-t', ms + 'ms');
     requestAnimationFrame(() => $('#btPlay').classList.add('go'));
+    { const ro = $('#btRunOpp'), oc = (M.rolls[M.i] && M.rolls[M.i].oc) || 0; if (ro) { ro.style.transition = `left ${ms}ms linear`; requestAnimationFrame(() => { ro.style.left = (4 + 78 * Math.min(1, oc / BT.cheerMax)) + '%'; }); } }   // 3.0.0 상대는 일정하게
     btUI.timer = setTimeout(() => {
       if (!btUI.M || btUI.M !== M) return;
       M.cheering = false; $('#btPlay').classList.remove('go');
@@ -14953,6 +14970,7 @@ body.cam-scene #ffChip,body.cam-scene #tierDots,body.cam-scene #plChip{opacity:0
     const mi = $('#btMeterI'); if (mi) mi.style.width = (100 * btUI.taps / BT.cheerTaps) + '%';
     const pt = $('#btCheerPt'); if (pt) pt.textContent = `응원 점수 +${btCheerPts(btUI.taps)}`;
     const me = $('#btDuel .bt-side.me'); if (me && !rt.reduced) { me.classList.remove('hit'); void me.offsetWidth; me.classList.add('hit'); }
+    btTrackStep();   // 3.0.0 달리기 트랙
     if (btUI.taps === BT.cheerTaps) { sfx('quest'); const c = $('#btCheer'); if (c) c.classList.add('full'); }
     if (!rt.reduced && e && e.clientX !== undefined) {
       if (IMG('bfx_cheer')) { const f = document.createElement('img'); f.className = 'bt-spark'; f.src = IMG('bfx_cheer'); f.style.left = e.clientX + 'px'; f.style.top = e.clientY + 'px'; document.body.appendChild(f); setTimeout(() => f.remove(), 700); }
@@ -15006,7 +15024,7 @@ body.cam-scene #ffChip,body.cam-scene #tierDots,body.cam-scene #plChip{opacity:0
       $('#btDuel').className = 'bt-duel ev-' + e + (r ? '' : ' live');
       $('#btDuel').innerHTML = side('me', me, me.st[e], true) + '<span class="bt-vs2">VS</span>' + side('opp', o, o.st, false);
       $('#btCheer').className = 'bt-cheer' + (M.cheering || M.quiz ? ' on' : '') + (M.quiz ? ' btq' : '');
-      $('#btCheer').innerHTML = M.quiz ? btqHTML(M.quiz) : M.cheering ? `<b>화면을 마구 두드려 응원해요!</b><span class="bt-meter"><i id="btMeterI"></i></span><span class="bt-cnt"><span id="btCheerN">0 / ${BT.cheerTaps}</span><small id="btCheerPt">응원 점수 +0</small></span>`
+      $('#btCheer').innerHTML = M.quiz ? btqHTML(M.quiz) : M.cheering ? btTrackHTML(me, o) + `<b>화면을 마구 두드려 응원해요!</b><span class="bt-meter"><i id="btMeterI"></i></span><span class="bt-cnt"><span id="btCheerN">0 / ${BT.cheerTaps}</span><small id="btCheerPt">응원 점수 +0</small></span>`
         : r ? `<b>${r.win ? '이겼어요!' : '아쉬워요!'}</b><span>${e === 'pe' ? '응원' : e === 'art' ? '기억' : '퀴즈'} 점수 ${r.mc} : ${r.oc}</span>` : '';
       $('#btScoreLine').innerHTML = [0, 1, 2].map(j => { const x = M.reveal || j < M.i ? M.res[j] : null; return `<i class="${x ? (x.win ? 'w' : 'l') : j === i ? 'now' : ''}">${btEvIc(M.evs[j], 18)}</i>`; }).join('');
     } else {
@@ -16149,7 +16167,7 @@ body.cam-scene #ffChip,body.cam-scene #tierDots,body.cam-scene #plChip{opacity:0
     if (kind === 'owl') { pzHelpOwl(cur); sfx('leaf'); buzz(12); pzHint('부엉이 선생님이 조각을 바꿔 줬어요'); save(); pzRenderTray(); pzRenderHelp(); if (pzStuck(cur)) pzGameOver(); return; }
     pzUI.mode = kind;
     if (kind === 'squirrel') setTimeout(() => { if (pzUI.mode === 'squirrel') pzAim((PZ.N >> 1) * PZ.N + (PZ.N >> 1)); }, 0);   // 2.1.1 3×3 크기를 먼저 보여 줘요
-    pzHint(kind === 'squirrel' ? '3×3을 지울 가운데 칸을 눌러 주세요' : '돌릴 조각을 눌러 주세요', 2500);
+    pzHint(kind === 'squirrel' ? '폭탄을 떨어뜨릴 칸을 눌러 주세요(3×3이 지워져요)' : '돌릴 조각을 눌러 주세요', 2500);
     pzRenderTray(); pzRenderHelp();
   }
   // 2.1.1 다람쥐 선생님 3×3 미리 보기(지섭 요청: 마우스를 가져가면 잘 보이게). i가 없으면 지워요
@@ -16160,14 +16178,39 @@ body.cam-scene #ffChip,body.cam-scene #tierDots,body.cam-scene #plChip{opacity:0
     const r0 = on ? Math.floor(i / PZ.N) : -9, c0 = on ? i % PZ.N : -9;
     pzUI.cells.forEach((el, j) => { const r = Math.floor(j / PZ.N), c = j % PZ.N; el.classList.toggle('aim', on && Math.abs(r - r0) <= 1 && Math.abs(c - c0) <= 1); });
   }
+  /* 3.0.0 지섭 요청: 다람쥐 선생님 3×3 제거를 폭탄으로. 고른 칸 위로 폭탄이 떨어져 '쾅' 터지면서 3×3이 지워져요.
+     그림 pz_bomb, pz_boom(작업지시서 48)이 없으면 그림 문자로 대신해요. 줄이기 설정이면 바로 지워요 */
+  function pzBombDrop(i, then) {
+    const cell = pzUI.cells[i]; if (rt.reduced || !cell || !document.body.animate) { then(); return; }
+    const r = cell.getBoundingClientRect(), cx = r.left + r.width / 2, cy = r.top + r.height / 2, w = r.width * 1.5;
+    const mk = (key, em, sz) => { const d = document.createElement('div'); d.className = 'pz-bomb'; d.style.cssText = `left:${cx - sz / 2}px;top:${cy - sz / 2}px;width:${sz}px;height:${sz}px`;
+      const u = IMG(key); d.innerHTML = u ? `<img src="${u}" alt="">` : `<span style="font-size:${Math.round(sz * 0.8)}px">${em}</span>`; document.body.appendChild(d); return d; };
+    const b = mk('pz_bomb', '💣', w);
+    sfx('tap');
+    b.animate([{ transform: `translate(0,${-cy - w}px) rotate(-30deg) scale(.8)` }, { transform: 'translate(0,0) rotate(10deg) scale(1)', offset: 0.85 }, { transform: 'translate(0,0) rotate(0) scale(1.15,.85)' }],
+      { duration: 520, easing: 'cubic-bezier(.5,0,.9,.6)' }).onfinish = () => {
+      b.remove();
+      const boom = mk('pz_boom', '💥', r.width * 4.2), ring = document.createElement('div');
+      ring.className = 'pz-ring'; ring.style.cssText = `left:${cx}px;top:${cy}px`; document.body.appendChild(ring);
+      boom.animate([{ transform: 'scale(.3)', opacity: 1 }, { transform: 'scale(1.1)', opacity: 1, offset: 0.4 }, { transform: 'scale(1.3)', opacity: 0 }], { duration: 560, easing: 'ease-out' }).onfinish = () => boom.remove();
+      ring.animate([{ transform: 'translate(-50%,-50%) scale(.2)', opacity: 0.9 }, { transform: 'translate(-50%,-50%) scale(3.2)', opacity: 0 }], { duration: 480, easing: 'ease-out' }).onfinish = () => ring.remove();
+      const g = $('#pzGrid'); if (g) g.animate([{ transform: 'translate(0,0)' }, { transform: 'translate(-4px,2px)' }, { transform: 'translate(4px,-2px)' }, { transform: 'translate(-2px,1px)' }, { transform: 'translate(0,0)' }], { duration: 260 });
+      sfx('coin'); buzz(30);
+      then();
+    };
+  }
   function pzCellTap(i) {
-    const cur = S.pz.cur; if (!cur || pzUI.mode !== 'squirrel') return;
+    const cur = S.pz.cur; if (!cur || pzUI.mode !== 'squirrel' || pzUI.bombing) return;
     pzAim(null);
-    const gone = pzHelpSquirrel(cur, Math.floor(i / PZ.N), i % PZ.N);
-    pzUI.mode = '';
-    if (gone.length) { gone.forEach(j => { pzUI.cells[j].classList.add('sq'); pzUI.cells[j].dataset.v = '-1'; }); setTimeout(pzRenderBoard, rt.reduced ? 0 : 320); pzLeaves(gone, ''); sfx('leaf'); buzz(15); }
-    pzHint('다람쥐 선생님이 치워 줬어요');
-    save(); pzRenderTray(); pzRenderHelp();
+    pzUI.bombing = true;
+    pzBombDrop(i, () => {
+      pzUI.bombing = false;
+      const gone = pzHelpSquirrel(cur, Math.floor(i / PZ.N), i % PZ.N);
+      pzUI.mode = '';
+      if (gone.length) { gone.forEach(j => { pzUI.cells[j].classList.add('sq'); pzUI.cells[j].dataset.v = '-1'; }); setTimeout(pzRenderBoard, rt.reduced ? 0 : 320); pzLeaves(gone, ''); sfx('leaf'); buzz(15); }
+      pzHint('다람쥐 선생님의 폭탄으로 치웠어요');
+      save(); pzRenderTray(); pzRenderHelp();
+    });
   }
   function pzWire() {
     $('#acList').addEventListener('click', e => { const b = e.target.closest('[data-book]'); if (b) { sfx('tap'); openBook(b.dataset.book); return; } const row = e.target.closest('[data-ac]'); if (row) acTip(row.dataset.ac, row); });   // 2.3.1 과목을 누르면 얻는 곳 말풍선   // 2.1.0 문제집 구매: 확인창부터
