@@ -25,6 +25,10 @@ async def main():
           F.rt.decoPick=item.id;const owned=S.deco.own[item.id]||0;F.buyDecoPieces();
           out.deco=[S.mg.pieces,(S.deco.own[item.id]||0)-owned];
           F.goldDay();S.gd.n=0;const gold=S.gold;for(let i=0;i<5;i++)F.adGold();out.ad=[S.gd.n,S.gold-gold];
+          S.tier=2; S.mg.e=0; S.mg.eAt=F.gameNow(); S.tk.m5=0; S.st.ups=15;
+          S.dm={day:F.gameToday(),list:[0,1,2].map(()=>({id:'ups',b:0,done:false})),bonus:false};
+          const beforeGold=S.gold; for(let i=0;i<3;i++) F.claimMission(i); F.claimBonus(); F.claimBonus();
+          out.daily=[S.gold-beforeGold,S.mg.e,S.tk.m5,S.dm.bonus];
           S.tier=2; S.f.store=1; S.sn.n=0; S.sn.got={}; S.q.m=F.MAIN.findIndex(q=>q.id==='sn1'); S.q.lat=''; out.saving=F.recommend()===null;
           S.tier=3; F.renderGradPanel(true); out.nextSchool=document.querySelector('#tierTo').textContent;
           return out;
@@ -38,6 +42,7 @@ async def main():
         assert r['trip']==[5,1], '체험학습 단축권'
         assert r['deco']==[0,1], '합치기 조각 교환'
         assert r['ad']==[3,9], '광고 황금 도토리 상한'
+        assert r['daily']==[1,45,3,True], '일일 임무 보상과 중복 수령 방지'
         assert r['saving'], '간식 목표 저축 중 시설 추천'
         assert r['nextSchool']=='숲속 대학교', '고등학교 다음 학교급 안내'
         assert not errs, f'화면 오류 {errs}'
