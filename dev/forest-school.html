@@ -15465,9 +15465,15 @@ body.cam-scene #ffChip,body.cam-scene #tierDots,body.cam-scene #plChip{opacity:0
     pzHint(pick.map(id => PZB[id].name).join(', ') + ' 부스터를 들고 시작해요');
     save(); renderHUD(); renderEss(); pzRenderAll();
   }
-  function pzOpen() {
+  function pzOpen(asked) {
     pzInitArt();
     pzDay();
+    // 3.0.0 지섭 요청: 보상 없는 연습 판이 남아 있는데 오늘 보상 판이 있으면 이어 할지 새 보상 판으로 할지 물어요(뒤로 가기는 이어 하기)
+    if (!asked && S.pz.cur && !S.pz.cur.rw && pzLeft() > 0) {
+      askBox({ title: '새 보상 판이 있어요', text: `하던 연습 판(${fmt(S.pz.cur.score)}점)이 남아 있어요.\n연습 판은 끝까지 해도 보상이 없어요.\n오늘 보상 판 ${pzLeft()}판이 남았어요.`,
+        yes: '새 보상 판 시작', no: '연습 판 이어 하기', onYes: () => { S.pz.cur = null; pzStart(); pzOpen(true); }, onNo: () => pzOpen(true) });
+      return;
+    }
     if (!S.pz.cur) pzStart();
     pzUI.open = true; pzUI.mode = '';
     $('#pzScene').hidden = false;
@@ -15817,7 +15823,7 @@ body.cam-scene #ffChip,body.cam-scene #tierDots,body.cam-scene #plChip{opacity:0
     const left = pzLeft();
     renderEss();
     $('.pz-thumb').style.backgroundImage = ['acorn', 'leaf', 'berry', 'flower'].map(k => pzImg('pz_block_' + k)).join(',');   // 블록 넷을 2×2로(한 장을 꽉 채우면 잘려 보였어요)
-    $('#pzCardSub').textContent = S.pz.cur ? `하던 판 이어서 하기 (${fmt(S.pz.cur.score)}점)` : S.pz.best > 0 ? `최고 ${fmt(S.pz.best)}점` : '조각을 끌어다 놓고 줄을 지워요';
+    $('#pzCardSub').textContent = S.pz.cur ? `${S.pz.cur.rw ? '하던 판' : '연습 판'} 이어서 하기 (${fmt(S.pz.cur.score)}점)` : S.pz.best > 0 ? `최고 ${fmt(S.pz.best)}점` : '조각을 끌어다 놓고 줄을 지워요';
     $('#pzCardTag').textContent = S.pz.cur ? '이어하기' : '시작하기';
     const lt = $('#pzLeftTxt'); lt.textContent = `보상 ${left}/${pzQuota()}`; lt.classList.toggle('none', left <= 0);   // 오늘 남은 보상 판 / 오늘 받을 수 있는 판
     $('#pzAdBtn').hidden = !pzCanAd(); $('#pzAdRow').hidden = $('#pzAdBtn').hidden;
