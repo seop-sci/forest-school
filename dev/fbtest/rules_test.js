@@ -127,11 +127,16 @@ t('move create gone', W('B', '/forest/moves/ABCD2345', MV), false);
 t('move delete gone', W('B', '/forest/moves/K7QM2XPA', null), false);
 // 2.1.3 랭킹 시즌(sk, sp): 리그 점수처럼 시즌이 같으면 지난 값 + 폭까지, 바뀌면 0부터
 const RSN = Object.assign({}, RANK, { sk: 2, sp: 500 });
-t('season first', W('B', '/forest/rank/B', Object.assign({}, RANK, { sk: 2, sp: 900 })), true);
-t('season first too big', W('B', '/forest/rank/B', Object.assign({}, RANK, { sk: 2, sp: 5000 })), false);
+const seasonNow = Date.parse('2027-03-01T00:00:00+09:00');
+const WS = (uid, path, data) => {
+  const week = Math.floor((seasonNow + 32400000 - Date.UTC(2026, 0, 5)) / 604800000);
+  return as(uid).write(path, Object.assign({}, data, { at: seasonNow, week, lp: 0, ws: week * 1000000 }), { now: seasonNow }).allowed;
+};
+t('season first', WS('B', '/forest/rank/B', Object.assign({}, RANK, { sk: 2, sp: 900 })), true);
+t('season first too big', WS('B', '/forest/rank/B', Object.assign({}, RANK, { sk: 2, sp: 5000 })), false);
 t('season sp without sk', W('B', '/forest/rank/B', Object.assign({}, RANK, { sp: 10 })), false);
 t('season bad sk', W('B', '/forest/rank/B', Object.assign({}, RANK, { sk: 0, sp: 10 })), false);
-t('season grow', W('A', '/forest/rank/A', Object.assign({}, RANK, { sk: 2, sp: 1200 })), true);
+t('season grow', WS('A', '/forest/rank/A', Object.assign({}, RANK, { sk: 2, sp: 1200 })), true);
 // 2.1.3 다른 학교 구경(forest/look): 로그인하면 읽기, 쓰기는 나만, 4,000자, 60초에 한 번, 지우기는 언제나
 const LOOK = { d: '{"v":1}', at: { '.sv': 'timestamp' } };
 t('look read', R('B', '/forest/look/A'), true);

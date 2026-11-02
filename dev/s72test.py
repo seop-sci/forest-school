@@ -94,7 +94,9 @@ async def main():
         bsv = dict(base, budget=999999, savedAt=now + 60000)
         await pg.evaluate("(s) => { sessionStorage.setItem('__srv', s); sessionStorage.setItem('__mark', JSON.parse(sessionStorage.getItem('__writes') || '[]').length); }", json.dumps({'d': json.dumps(bsv), 'at': bsv['savedAt'], 'v': '2.0.0'}))
         await pg.wait_for_timeout(2500)   # 내려 둔 채 1초 타이머가 몇 번 돌아요(그동안 A가 올리면 안 돼요)
-        await pg.evaluate("window.__hid = false; document.dispatchEvent(new Event('visibilitychange'))"); await pg.wait_for_timeout(3500)
+        await pg.evaluate("window.__hid = false; document.dispatchEvent(new Event('visibilitychange'))")
+        # 서버 학교 복원은 페이지를 다시 열어요. 큰 그림을 읽는 시간 대신 실제 복원 완료를 기다려요.
+        await pg.wait_for_function("window.__forest && window.__forest.S && window.__forest.S.budget >= 999999", timeout=15000)
         r = await pg.evaluate(f"""(()=>{{ const w = JSON.parse(sessionStorage.getItem('__writes') || '[]').slice(+sessionStorage.getItem('__mark')).filter(x => x[0] === 'forest/saves/u1');
           return {{ budget: Math.round({F}.S.budget), srvBudget: Math.round(JSON.parse(JSON.parse(sessionStorage.getItem('__srv')).d).budget), oldPushes: w.filter(x => JSON.parse(x[1].d).budget < 999999).length }}; }})()""")
         r['cloud0'] = st; r['reloads'] = len(navs) - 1

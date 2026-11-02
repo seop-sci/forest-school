@@ -43,6 +43,7 @@ function handle(b) {
     let pairs = v && typeof v === 'object' ? Object.keys(v).map(k => [k, v[k]]) : [];
     if (b.q && b.q.order) pairs.sort((x, y) => ((x[1] || {})[b.q.order] ?? -Infinity) - ((y[1] || {})[b.q.order] ?? -Infinity) || (x[0] < y[0] ? -1 : 1));
     else pairs.sort((x, y) => (x[0] < y[0] ? -1 : 1));
+    if (b.q && Object.hasOwn(b.q, 'equal')) pairs = pairs.filter(([, v]) => v && v[b.q.order] === b.q.equal);
     if (b.q && b.q.last) pairs = pairs.slice(-b.q.last);
     return { ok: true, val: v, pairs };
   }
