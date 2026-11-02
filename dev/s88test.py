@@ -36,7 +36,7 @@ async def main():
             # 2) 미션
             r = await pg.evaluate(f"""(() => {{ const F = {F}, S = F.S; S.f.playground = 3; S.ps.day = ''; S.ps.wk = -1; F.psSync();
               const d = S.ps.dl.map(m => m.id), wl = S.ps.wl.map(m => m.id);
-              const m = S.ps.dl[0], key = m.id; const bump = n => {{ if (key === 'picks') S.st.picks += n; else if (key === 'shakes') S.st.shakes += n; else if (key === 'dm') S.st.dmDone += n; else if (key === 'pz') S.st.pz = (S.st.pz||0) + n; else if (key === 'mg') S.mg.st.orders += n; else if (key === 'rd') S.rd.st += n; else if (key === 'bt') S.bt.st.w += n; else if (key === 'sk') S.sk.st.all += n; else S.st.sports += n; }};
+              const m = S.ps.dl[0], key = m.id; const bump = n => {{ if (key === 'picks') S.st.picks += n; else if (key === 'shakes') S.st.shakes += n; else if (key === 'dm') S.st.dmDone += n; else if (key === 'pz') S.st.pz = (S.st.pz||0) + n; else if (key === 'mg') S.mg.st.orders += n; else if (key === 'rd') S.rd.st += n; else if (key === 'bt') S.bt.st.w += n; else if (key === 'sk') S.sk.st.all += n; else if (key === 'gd') S.gn.st.h += n; else if (key === 'bx') S.bx.st.n += n; else if (key === 'cg') S.cg.st.p += n; else S.st.sports += n; }};   // 3.0.0 텃밭, 생물, 대항전 미션도
               const no = F.psClaimMission('d', 0); bump(m.n); const ok = F.psClaimMission('d', 0), again = F.psClaimMission('d', 0);
               return {{ d: d.length, w: wl.length, uniq: new Set(d).size === 3 && new Set(wl).size === wl.length, no, ok, again, pts: S.ps.pts }}; }})()""")
             print('미션', r)
