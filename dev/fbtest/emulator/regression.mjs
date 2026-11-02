@@ -32,7 +32,7 @@ try {
   }
   await assertSucceeds(set(ref(db, 'forest/saves/A'), { ...doc, v: '1.8.0' }));
   await assertSucceeds(update(ref(db, 'forest/saves/A'), { r: 1 }));
-  await assertSucceeds(runTransaction(ref(db, 'forest/saves/A'), current => current ? { ...current, r: current.r + 1 } : undefined));
+  await assertSucceeds(runTransaction(ref(db, 'forest/saves/A'), current => ({ ...(current || doc), r: (current?.r || 0) + 1 })));
   assert.equal((await get(ref(db, 'forest/saves/A/r'))).val(), 2);
   await assertSucceeds(set(ref(db, 'forest/bak/A/0'), { ...doc, pid: 'ABC123', prog: 20015, sum: '학교', sv: doc.at, why: '백업' }));
   await assertFails(set(ref(db, 'forest/bak/A/3'), doc));
