@@ -7560,7 +7560,7 @@ body.cam-scene #ffChip,body.cam-scene #tierDots,body.cam-scene #plChip{opacity:0
   // 1.7.0 테마 지도: 배경 테마(봄, 여름, 가을, 겨울, 크리스마스)를 고르면 지도 그림도 그 계절 모습으로 바꿔요. 그림이 없는 테마는 기본 지도
   // 3.0.0 지섭 요청: 관리자만 쓰는 고급 지도와 건물(작업지시서 49, 열쇠 map_*_lux, bld_*_lux). 이 기기에만 켜요(저장에는 안 들어가요)
   const luxOn = () => { if (rt.lux === undefined) { try { rt.lux = localStorage.getItem('forest-lux') === '1'; } catch (e) { rt.lux = false; } } return rt.lux; };
-  const mapKey = base => { const id = S && S.cos && S.cos.th && thOn().bg; if (ART_FB[base] && !has170(base) && !IMG(base)) base = ART_FB[base]; if (luxOn() && has170(`${base}_lux`)) return `${base}_lux`; return id && has170(`${base}_${id}`) ? `${base}_${id}` : base; };
+  const mapKey = (base, lux) => { const id = S && S.cos && S.cos.th && thOn().bg; if (ART_FB[base] && !has170(base) && !IMG(base)) base = ART_FB[base]; if ((lux || luxOn()) && has170(`${base}_lux`)) return `${base}_lux`; return id && has170(`${base}_${id}`) ? `${base}_${id}` : base; };
   // 1.8.0 지도 고화질: 게임 안 지도는 480×720이라 확대하면 흐려요. 게임 옆 img/maps 폴더의 원본 크기(1024×1536) 그림을 받아 다 오면 바꿔 끼워요.
   // 파일이 없거나 늦으면 게임 안 그림을 그대로 써요(곡 파일과 같은 방식)
   const IMG_BASE = () => window.FS_IMG_BASE || 'img/';
@@ -12075,9 +12075,9 @@ body.cam-scene #ffChip,body.cam-scene #tierDots,body.cam-scene #plChip{opacity:0
   }
   /* 3.0.0 순위표 보조 줄(지섭 결정 2026-11-03, 자세한 것은 본부 인수인계 문서). 서버에는 아무것도 올리지 않아요 */
   const RKF = { fill: 20, lo: 0.3, hi: 1.1, endLo: 0.3, endHi: 0.9, start: 0.25, tierDrop: 0.04, floor: { week: 300, sea: 3000, bt: 60, all: 300 }, titled: 0.65 };
-  // 3.0.1 지섭: 보조 줄도 칭호를 달아요. 점수가 높은 쪽 65%만 달고(낮은 쪽은 안 달아요), 그 줄의 학교급에서 열리는 칭호만 골라요(숫자는 열리는 학교급)
-  const RKF_TI = { students: 0, grad: 0, building: 0, teacher: 0, quest: 0, puzzle: 0, dex: 0, fest: 0, attend: 0, gold: 0, rank: 0, deco: 0, garden: 0,
-    trip: 1, battle: 1, league: 1, rare: 1, lab: 1, bio: 1, donate: 1, vdpatron: 1, vdgold: 1, snack: 2, cgwin: 2, selfstudy: 3 };
+  // 3.0.1 지섭: 보조 줄도 칭호를 달아요. 점수가 높은 쪽 65%만 달고(낮은 쪽은 안 달아요), 실제로 얻을 수 있는 칭호만 그 학교급부터 골라요(숫자는 학교급)
+  // 숲의 길잡이(메인 퀘스트 80개, 초등학교 2학년쯤), 마을 후원자(마을 기부 3단계), 꼬마 과학자(실험 노트 24장), 꾸미기 장인(지도 한 장에 장식 11개)
+  const RKF_TI = { quest: 1, vdpatron: 1, lab: 1, deco: 1 };
   const rkHash = t => { let h = 2166136261; for (let i = 0; i < t.length; i++) { h ^= t.charCodeAt(i); h = Math.imul(h, 16777619); } return h >>> 0; };
   const rkRnd = (seed, i) => (rkHash(seed + ':' + i) % 100000) / 100000;
   function rkPeriod(mode) {   // 기간이 얼마나 지났는지(0~1)
@@ -14552,7 +14552,7 @@ body.cam-scene #ffChip,body.cam-scene #tierDots,body.cam-scene #plChip{opacity:0
     const f = pg.f || {}, bs = pg.bs || {}, items = [];
     const keys = Object.keys(FAC).filter(k => (FAC[k].tier || 0) <= t && G.lot[k]);
     for (const k of keys) {
-      const built = (f[k] || 0) >= 1, im = seasonKey(built ? viewBldKey(k, t, bs[k] != null ? bs[k] : t) : SITE_IMG[k]), u = IMG170(im); if (!u) continue;
+      const built = (f[k] || 0) >= 1, im = seasonKey(built ? viewBldKey(k, t, bs[k] != null ? bs[k] : t, luxOn()) : SITE_IMG[k]), u = IMG170(im); if (!u) continue;
       const [cx, cy, w] = lotRect(G.lot[k], im);
       items.push({ y: cy, s: `<image href="${u}" x="${(cx - w / 2).toFixed(1)}" y="${(cy - w / 2).toFixed(1)}" width="${w.toFixed(1)}" height="${w.toFixed(1)}"/>` });
     }
@@ -15521,9 +15521,9 @@ body.cam-scene #ffChip,body.cam-scene #tierDots,body.cam-scene #plChip{opacity:0
     return { f, bs, st: 0, at: 0, roster: [], all: true };
   }
   // 지난 학교급 건물 그림(그 학교급 모습). bldImg와 같은 규칙을 그 학교급 기준으로
-  function viewBldKey(k, t, bsv) {
+  function viewBldKey(k, t, bsv, lux) {
     const n = Math.min(4, (bsv || 0) + 1);
-    if (luxOn()) { const lk = k === 'playground' && t >= 1 ? 'bld_field_lux' : `bld_${k}_lux`; if (has170(lk)) return lk; }   // 3.0.1 지섭: 예시 학교와 다른 학교 구경, 지난 모습에도 관리자 고급 건물
+    if (lux) { const lk = k === 'playground' && t >= 1 ? 'bld_field_lux' : `bld_${k}_lux`; if (has170(lk)) return lk; }   // 3.0.1 지섭: 예시 학교는 누구나 고급 건물(모델하우스처럼), 관리자는 다른 구경과 지난 모습에도
     if (k === 'playground') return t >= 1 ? (stageKey('bld_field', n, 3) || 'bld_field_on') : 'bld_playground_on';
     if (k === 'science') return stageKey('bld_science', n, 3) || BLD_IMG[k];
     return stageKey('bld_' + k, n, 2) || BLD_IMG[k];
@@ -15569,15 +15569,16 @@ body.cam-scene #ffChip,body.cam-scene #tierDots,body.cam-scene #plChip{opacity:0
     $('#tvEdit').hidden = !!LD;
     $('#tvMark').innerHTML = LD && LD.mk && markOk(LD.mk) ? markHTML(LD.mk, '') : '';
     if (!force && box.dataset.key === key) return; box.dataset.key = key;
-    const mapU = IMG170(mapKey(G.map));
+    const lux = luxOn() || !!(LD && LD.model);   // 3.0.1 지섭: 예시 학교는 고급 배경을 켜지 않아도 고급 지도와 건물(그림이 있는 판에서만)
+    const mapU = IMG170(mapKey(G.map, lux));
     box.style.setProperty('--map-bg', mapU ? `url("${mapU}")` : 'none');
-    const mk = mapKey(G.map); if (mapHi[mk] !== 'ok') mapHiGet(mk, () => { if (rt.viewTier === t) renderTierView(true); });   // 고화질 지도가 오면 다시 그려요
+    const mk = mapKey(G.map, lux); if (mapHi[mk] !== 'ok') mapHiGet(mk, () => { if (rt.viewTier === t) renderTierView(true); });   // 고화질 지도가 오면 다시 그려요
     let h = `<image x="0" y="-60" width="360" height="540" preserveAspectRatio="none" href="${mapHi[mk] === 'ok' ? IMG_BASE() + 'maps/' + mk + '.webp' : mapU}"/>`;
     // 건물: 앞(아래)에 있는 것이 위에 그려지게
     const keys = Object.keys(FAC).filter(k => (FAC[k].tier || 0) <= t && G.lot[k]).sort((a, b) => G.lot[a][1] - G.lot[b][1]);
     const items = [];
     for (const k of keys) {
-      const built = (x.f[k] || 0) >= 1, im = seasonKey(built ? viewBldKey(k, t, x.bs[k]) : SITE_IMG[k]), [cx, cy, w] = lotRect(G.lot[k], im);
+      const built = (x.f[k] || 0) >= 1, im = seasonKey(built ? viewBldKey(k, t, x.bs[k], lux) : SITE_IMG[k]), [cx, cy, w] = lotRect(G.lot[k], im);
       items.push({ y: cy, s: `<image href="${IMG170(im)}" x="${(cx - w / 2).toFixed(1)}" y="${(cy - w / 2).toFixed(1)}" width="${w.toFixed(1)}" height="${w.toFixed(1)}"/>` +
         (built && x.f[k] > 1 && !x.all ? `<g class="tv-lv" transform="translate(${cx.toFixed(1)} ${(cy + w * 0.36).toFixed(1)})"><rect x="-30" y="-9" width="60" height="18" rx="9"/><text y="4" text-anchor="middle">${k === 'playground' ? (t >= 1 ? '운동장' : '놀이터') : FAC[k].name} Lv.${x.f[k]}</text></g>` : '') });
     }
