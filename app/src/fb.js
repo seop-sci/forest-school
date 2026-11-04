@@ -4,7 +4,7 @@ import firebase from 'firebase/compat/app';
 import 'firebase/compat/database';
 import {
   initializeAuth, indexedDBLocalPersistence, browserLocalPersistence, onAuthStateChanged,
-  signInAnonymously, signInWithCredential, linkWithCredential, reauthenticateWithCredential, GoogleAuthProvider,
+  signInAnonymously, signInWithCredential, linkWithCredential, reauthenticateWithCredential, GoogleAuthProvider, signOut,
 } from 'firebase/auth';
 
 const cfg = window.FOREST_FIREBASE;
@@ -22,6 +22,7 @@ if (cfg) {
     onAuthStateChanged: (next, err) => onAuthStateChanged(auth, (u) => next(wrap(u)), err),
     signInAnonymously: async () => ({ user: wrap((await signInAnonymously(auth)).user) }),
     signInWithCredential: async (c) => ({ user: wrap((await signInWithCredential(auth, c)).user) }),
+    signOut: () => signOut(auth),   // 3.1.0 로그아웃
   };
   firebase.auth = Object.assign(() => facade, { GoogleAuthProvider: { credential: (idToken) => GoogleAuthProvider.credential(idToken) } });
   window.firebase = firebase;

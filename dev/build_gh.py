@@ -75,6 +75,8 @@ LOADER = """<script src="config.js"></script>
     }
     return {
       web: true,
+      // 3.1.0 계정 바꾸기와 로그아웃: 다음에 계정을 저절로 고르지 않게 해요
+      logout: function () { try { if (window.google && google.accounts) google.accounts.id.disableAutoSelect(); } catch (e) { /* 무시 */ } return Promise.resolve(); },
       login: function () {
         return load().then(function () {
           return new Promise(function (ok, no) {
