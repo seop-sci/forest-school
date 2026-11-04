@@ -7531,6 +7531,7 @@ body.cam-scene #ffChip,body.cam-scene #tierDots,body.cam-scene #plChip{opacity:0
 
   /* ---------- 지도 만들기 ---------- */
   const map = $('#map'), layerKids = $('#kids'), layerFx = $('#fx'), layerTeachers = $('#teachers');
+  const kidsAway = () => !!map && map.classList.contains('hs-night');   // 3.1.1 고등학교 밤(20~6시)에는 학생이 기숙사에 있어 지도에 없어요
 
   /* 1.5.0 그림 지도: 학교급마다 지도 그림과 건물 자리가 달라요.
      좌표는 지도 viewBox(0 0 360 420) 기준이고, 지도 그림(1024×1536)은 y -60~480에 깔려요.
@@ -8019,6 +8020,7 @@ body.cam-scene #ffChip,body.cam-scene #tierDots,body.cam-scene #plChip{opacity:0
   }
   function updateKids(dt, now) {
     if (rt.reduced) return;
+    const away = kidsAway();   // 3.1.1 고등학교 밤에는 학생층이 숨어 있어서 걷기 계산만 하고 그리기(매 프레임 16명 setAttribute)와 줄 세우기는 쉬어요
     for (const k of rt.kids) {
       if (k.wait > 0) { k.wait -= dt; k.moving = false; }
       else {
@@ -8030,8 +8032,10 @@ body.cam-scene #ffChip,body.cam-scene #tierDots,body.cam-scene #plChip{opacity:0
         else if (d < 0.8) { k.moving = false; if (!k.board && !k.hold && k.ang === undefined) { k.wait = rand(1, 4.5); pickTarget(k); } }
         else { const st = Math.min(d, k.speed * dt); k.x += dx / d * st; k.y += dy / d * st; k.moving = true; }
       }
-      placeKid(k, k.moving ? -Math.abs(Math.sin(now / 110 + k.phase)) * 1.6 : k.hold ? -Math.abs(Math.sin(now / 260 + k.cheer)) * 2.4 : 0);
+      if (!away) placeKid(k, k.moving ? -Math.abs(Math.sin(now / 110 + k.phase)) * 1.6 : k.hold ? -Math.abs(Math.sin(now / 260 + k.cheer)) * 2.4 : 0);
     }
+    if (away) { rt.kidsAway = true; return; }
+    if (rt.kidsAway) { rt.kidsAway = false; rt.kids.forEach(k => placeKid(k, 0)); }   // 아침 6시에 다시 보일 때 지금 자리로
     rt.sortT += dt;
     if (rt.sortT > 0.5) {
       rt.sortT = 0;
@@ -8411,6 +8415,7 @@ body.cam-scene #ffChip,body.cam-scene #tierDots,body.cam-scene #plChip{opacity:0
 
   function updateTalk(dt) {
     const T = rt.talk;
+    if (T && kidsAway()) { endTalk(); return; }   // 3.1.1 지섭 제보: 학생은 안 보이는데 '!' 말풍선만 떠 있었어요
     if (T) {
       if (T.k.g.isConnected && rt.kids.includes(T.k) && !T.k.board) {
         T.age += dt;
@@ -8419,7 +8424,7 @@ body.cam-scene #ffChip,body.cam-scene #tierDots,body.cam-scene #plChip{opacity:0
       } else endTalk();
       return;
     }
-    if (rt.tab !== 'school' || rt.modalOpen || festBusy()) return;
+    if (rt.tab !== 'school' || rt.modalOpen || festBusy() || kidsAway()) return;
     rt.talkT -= dt;
     if (rt.talkT > 0) return;
     rt.talkT = rand(TALK.every[0], TALK.every[1]);
