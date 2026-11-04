@@ -20144,7 +20144,9 @@ body.cam-scene #ffChip,body.cam-scene #tierDots,body.cam-scene #plChip{opacity:0
         if (cloudOn()) Cloud.fresh = false;   // 2.0.0 Codex 검토(3): 다시 켜면 서버 저장부터 확인해요
         awayHold(true);   // 2.0.0 Codex 검토(6): 내려 둔 시간은 '켠 뒤 논 시간'에 넣지 않아요
         if (actx && actx.state === 'running') actx.suspend().catch(() => {});
+        clearTimeout(rt.netT); rt.netT = setTimeout(netSleep, NET_IDLE.hidden);   // 3.1.0 서버 연결 줄이기
       } else {
+        clearTimeout(rt.netT); netWake();
         const away = rt.hiddenAt && !rt.awayWait ? (gameNow() - rt.hiddenAt) / 1000 : 0;
         rt.hiddenAt = 0;
         rt.lastT = performance.now();
@@ -20161,7 +20163,26 @@ body.cam-scene #ffChip,body.cam-scene #tierDots,body.cam-scene #plChip{opacity:0
       if (S && !rt.paused && !document.hidden) save();
       cloudTick();
       if (rt.tab === 'settings') renderCloudInfo();
+      if (!document.hidden && cloudOn() && !Cloud.asleep && Date.now() - (rt.netAct || 0) > NET_IDLE.still) { cloudPush(); clearTimeout(rt.netT); rt.netT = setTimeout(netSleep, 3000); }   // 3.1.0 켜 둔 채 오래 안 만지면
     }, 5000);
+    rt.netAct = Date.now();
+    ['pointerdown', 'keydown'].forEach(t => document.addEventListener(t, () => { rt.netAct = Date.now(); if (Cloud.asleep) netWake(); }, true));
+  }
+  /* 3.1.0 지섭 결정: 서버 연결 줄이기. 무료 요금제는 서버에 동시에 붙는 기기가 100대까지라, 화면 밖에 잠시 있거나(1분)
+     켜 둔 채 오래 안 만지면(10분) 서버 연결을 끊고, 다시 보거나 누르면 붙어요. 저장은 끊기 전에 올리고, 다시 붙으면 서버 학교부터 확인해요(숫자는 본부 제안) */
+  const NET_IDLE = { hidden: 60000, still: 600000 };
+  function netSleep() {
+    if (!Cloud.db || Cloud.asleep || !cloudOn()) return;
+    if (Cloud.pushing) { clearTimeout(rt.netT); rt.netT = setTimeout(netSleep, 2000); return; }   // 올리는 중이면 끝난 뒤에
+    Cloud.asleep = true;
+    try { Cloud.db.goOffline(); } catch (e) { Cloud.asleep = false; }
+  }
+  function netWake() {
+    rt.netAct = Date.now();
+    if (!Cloud.asleep || !Cloud.db) return;
+    Cloud.asleep = false;
+    try { Cloud.db.goOnline(); } catch (e) { /* 무시 */ }
+    Cloud.fresh = false; cloudVerify();   // 끊긴 사이 다른 기기가 저장했을 수 있어서 서버 학교부터 봐요
   }
 
   /* ===== 1.7.0 도감, 이벤트 BEGIN =====
