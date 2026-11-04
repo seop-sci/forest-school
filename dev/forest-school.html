@@ -17712,6 +17712,7 @@ body.cam-scene #ffChip,body.cam-scene #tierDots,body.cam-scene #plChip{opacity:0
   window.FOREST_SAVE = () => { try { save(); } catch (e) { /* 저장 실패는 넘어가요 */ } };
   function startSports(viaAd) {
     if (rt.sports || !sportsOpen()) return;
+    if (festNight()) { if (rt.modalOpen === $('#mSports')) closeModal($('#mSports')); toast('밤에는 학생들이 기숙사에 있어요. 운동회는 아침 6시부터 열 수 있어요'); return; }   // 3.1.1
     if (sportsCon()) { if (rt.modalOpen === $('#mSports')) closeModal($('#mSports')); toast(`${FAC.playground.name} 공사가 끝나면 운동회를 열 수 있어요`); return; }   // 3.0.0
     if (!viaAd && sportsWait() > 0) {
       closeModal($('#mSports'), () => askAd('다음 운동회까지 기다리지 않고 광고를 보면 바로 열 수 있어요.', () => showAd(() => startSports(true), r => { if (r !== 'noad') toast('광고를 끝까지 보지 않아서 운동회를 바로 열지 못했어요'); })));
@@ -17775,7 +17776,7 @@ body.cam-scene #ffChip,body.cam-scene #tierDots,body.cam-scene #plChip{opacity:0
     rt.sportsWin = win; rt.prizeName = '운동회'; rt.prizeId = 'sports';
     $('#srTitle').textContent = win ? '청팀 승리!' : tie ? '무승부!' : '백팀 승리!';
     $('#srScore').textContent = `청팀 ${R.blue} : ${R.white} 백팀`;
-    $('#srText').textContent = (win ? `공을 ${R.blue}개나 주웠어요! 이긴 상품으로 도토리${festGoldLeft('sports') ? '와 황금 도토리 1개(하루 한 번)' : ''}를 받아요.` : `다음에는 공을 더 빨리 주워 봐요. 그래도 도토리를 조금 받아요.`) + `${vpLv() ? ` 교감 선생님 덕분에 +${VP.per * vpLv()}%예요.` : ''}`;
+    $('#srText').textContent = (win ? `공을 ${R.blue}개나 주웠어요! 이긴 상품으로 도토리를 받아요.` : `다음에는 공을 더 빨리 주워 봐요. 그래도 도토리를 조금 받아요.`) + `${vpLv() ? ` 교감 선생님 덕분에 +${VP.per * vpLv()}%예요.` : ''}`;
     $('#srPrize').textContent = fmt(sportsPrize(win));
     $('#srArt').innerHTML = `<svg viewBox="-26 -19 52 38" aria-hidden="true">` + ['rabbit', 'fox', 'chick'].map((sp, i) => `<g transform="translate(${(i - 1) * 15} ${i === 1 ? -3 : 1})">${kidSVG(sp, i)}<rect class="band ${win ? 'b' : 'w'}" x="-6.4" y="-4.6" width="12.8" height="2.4" rx="1.2"/></g>`).join('') + '</svg>';
     sfx(win ? 'quest' : 'done'); buzz(20);
@@ -17793,8 +17794,7 @@ body.cam-scene #ffChip,body.cam-scene #tierDots,body.cam-scene #plChip{opacity:0
     const v = sportsPrize(rt.sportsWin) * x;
     if (rt.sportsWin && x === 1) acGain('pe', 15);   // 2.0.1 공부: 운동회에서 이기면 체육 XP 15(광고 두 배 받기에서는 한 번만)
     S.budget += v; earn(v);
-    const g = rt.sportsWin && festGoldTake(rt.prizeId || rt.prizeName || 'fest');
-    if (g) addGold(1);
+    const g = false;   // 3.1.1 지섭 결정: 학교 행사(운동회 포함)는 황금 도토리를 주지 않아요. S.fg는 옛 저장 호환으로 남겨요
     floatText(SPORTS.cx, SPORTS.cy - 30, '+' + fmt(v), 'gold');
     toast(`${rt.prizeName || '학교 행사'} 상품 도토리 +${fmt(v)}${g ? ', 황금 도토리 +1' : ''}`);
     sfx('coin'); save(); renderHUD();
@@ -17814,7 +17814,14 @@ body.cam-scene #ffChip,body.cam-scene #tierDots,body.cam-scene #plChip{opacity:0
     show: { name: '학예회', tg: 4, sec: 35, goal: 18, form: 'stage', item: 'note', how: 'rise',
       lead: '광장 무대에서 친구들이 차례로 공연해요. 무대에서 떠오르는 음표를 눌러 박수를 보내요. 35초 안에 18개면 대성공!', win: '앙코르! 박수가 쏟아졌어요.', unit: '개' },
     photo: { name: '졸업 사진 찍기', tg: 5, sec: 30, goal: 14, form: 'rows', item: 'smile', how: 'pop',
-      lead: '교실 앞에 두 줄로 서서 졸업 사진을 찍어요. 친구들 머리 위에 반짝이는 웃음 별을 눌러 모두 웃게 해요. 14개면 찰칵!', win: '찰칵! 모두 활짝 웃은 졸업 사진이 나왔어요.', unit: '개' }
+      lead: '교실 앞에 두 줄로 서서 졸업 사진을 찍어요. 친구들 머리 위에 반짝이는 웃음 별을 눌러 모두 웃게 해요. 14개면 찰칵!', win: '찰칵! 모두 활짝 웃은 졸업 사진이 나왔어요.', unit: '개' },
+    // 3.1.1 고등학교 밤(20~6시) 전용 행사(지섭 결정): 학생은 기숙사 창가에서 봐서 지도에 없어요. 메인 퀘스트에는 넣지 않아요. 목표 숫자는 본부 제안
+    meteor: { name: '별똥별 보기', tg: 0, sec: 30, goal: 14, form: 'free', item: 'meteor', how: 'fall', night: true,
+      lead: '기숙사 친구들이 창가에 모였어요. 밤하늘을 가로지르는 별똥별을 눌러 소원을 빌어요. 30초 안에 14개면 성공!', win: '소원을 가득 빌었어요! 기숙사 창가가 반짝여요.', unit: '개' },
+    lantern: { name: '소원 등불 날리기', tg: 0, sec: 30, goal: 15, form: 'free', item: 'lantern', how: 'rise', night: true,
+      lead: '광장에서 소원 등불이 하나씩 떠올라요. 등불을 눌러 하늘 높이 보내 줘요. 30초 안에 15개면 성공!', win: '밤하늘이 등불로 가득해요!', unit: '개' },
+    firefly: { name: '반딧불 세기', tg: 0, sec: 30, goal: 12, form: 'free', item: 'firefly', how: 'pop', night: true,
+      lead: '풀숲에 반딧불이 깜빡여요. 불빛이 꺼지기 전에 눌러 세어 봐요. 30초 안에 12마리면 성공!', win: '반딧불이 한가득! 숲이 환해졌어요.', unit: '마리' }
   };
   const FEST_IDS = Object.keys(FEST);
   const FEST_ITEM = {
@@ -17833,7 +17840,7 @@ body.cam-scene #ffChip,body.cam-scene #tierDots,body.cam-scene #plChip{opacity:0
   };
   const festIcon = id => IMG('fest_ic_' + id) ? `<img src="${IMG('fest_ic_' + id)}" alt="" aria-hidden="true" draggable="false" style="width:100%;height:100%;object-fit:contain">` : `<svg viewBox="-11 -11 22 22" aria-hidden="true">${FEST_ICON[id]}</svg>`;
   // 1.7.1 학교 행사 그림(작업지시서 9). 그림이 있으면 그림으로, 없으면 예전 도형으로 그려요. 누르는 자리와 크기는 그대로예요
-  const FEST_ART = { paper: ['fest_paper'], balloon: ['fest_balloon_red', 'fest_balloon_yellow', 'fest_balloon_blue'], note: ['fest_note_1', 'fest_note_2'], smile: ['fest_star'] };
+  const FEST_ART = { meteor: ['fest_meteor_1', 'fest_meteor_2'], lantern: ['fest_lantern_orange', 'fest_lantern_pink', 'fest_lantern_yellow'], firefly: ['fest_firefly_on', 'fest_firefly_half'], paper: ['fest_paper'], balloon: ['fest_balloon_red', 'fest_balloon_yellow', 'fest_balloon_blue'], note: ['fest_note_1', 'fest_note_2'], smile: ['fest_star'] };
   const FEST_AR = { fest_paper: 0.92, fest_balloon_red: 1.22, fest_balloon_yellow: 1.24, fest_balloon_blue: 1.2, fest_note_1: 1.13, fest_note_2: 1.01, fest_star: 0.96, fest_ball_blue: 1 };
   function festArtSvg(key, w) {
     const u = IMG(key); if (!u) return '';
@@ -17844,7 +17851,12 @@ body.cam-scene #ffChip,body.cam-scene #tierDots,body.cam-scene #plChip{opacity:0
     const keys = (FEST_ART[item] || []).filter(k => IMG(k)); if (!keys.length) return w ? `<g transform="scale(${(w / 22).toFixed(2)})">${FEST_ITEM[item]}</g>` : FEST_ITEM[item];
     return festArtSvg(keys[Math.floor(Math.random() * keys.length)], w || (item === 'balloon' ? 19 : 22));
   }
-  const festOpen = id => !!S && S.f.playground >= 1 && (S.tier >= 2 || (S.tier === 1 && S.tg >= FEST[id].tg));
+  // 3.1.1 고등학교 밤(20~6시, 지도 hs-night와 같은 때)에는 낮 행사를 쉬고 밤 행사만, 낮에는 그 반대예요. 밤 행사는 그림이 있어야 보여요
+  const festNight = () => !!S && S.tier >= NSL.tier && geoIdx() === 3 && isNight();
+  const festShown = id => !FEST[id].night || (!!S && S.tier >= NSL.tier && geoIdx() === 3 && (FEST_ART[FEST[id].item] || []).some(k => IMG(k)));
+  const festTimeLock = id => !!S && festShown(id) && !!FEST[id].night !== festNight();
+  const festBase = id => !!S && festShown(id) && S.f.playground >= 1 && (S.tier >= 2 || (S.tier === 1 && S.tg >= FEST[id].tg));
+  const festOpen = id => festBase(id) && !festTimeLock(id);
   const festWait = id => id === 'sports' ? sportsWait() : Math.max(0, (S.fest.next[id] || 0) - Date.now());
   const festPrize = win => Math.max(10, nice(rate() * 180 * (win ? 2 : 1) * vpMult() * clubFestMult() * elMult('fest')));
   const festBusy = () => !!(rt.fest || rt.sports);
@@ -17858,7 +17870,7 @@ body.cam-scene #ffChip,body.cam-scene #tierDots,body.cam-scene #plChip{opacity:0
     const tm = open.filter(id => !festCon(id)), txt = ready ? `${ready}` : tm.length ? hms(Math.min(...tm.map(festWait))) : '공사 중';
     if (rt.festTxt !== txt) { rt.festTxt = txt; $('#sportsN').textContent = txt; b.classList.toggle('ready', ready > 0); b.setAttribute('aria-label', ready ? `학교 행사, ${ready}개 열렸어요` : `학교 행사, 다음 행사까지 ${txt}`); }
     if (rt.modalOpen === $('#mFest')) {
-      const key = FEST_IDS.map(id => festOpen(id) ? (festCon(id) ? 'c' : festWait(id) > 0 ? hms(festWait(id)) : 'r') : 'x').join('|');
+      const key = FEST_IDS.map(id => festTimeLock(id) ? 'n' : festOpen(id) ? (festCon(id) ? 'c' : festWait(id) > 0 ? hms(festWait(id)) : 'r') : 'x').join('|');
       if (rt.festKey !== key) renderFestList();
     }
   }
@@ -17871,21 +17883,26 @@ body.cam-scene #ffChip,body.cam-scene #tierDots,body.cam-scene #plChip{opacity:0
     if (rt.modalOpen !== $('#mFest')) openModal($('#mFest'));
   }
   function renderFestList() {
-    rt.festKey = FEST_IDS.map(id => festOpen(id) ? (festCon(id) ? 'c' : festWait(id) > 0 ? hms(festWait(id)) : 'r') : 'x').join('|');
+    rt.festKey = FEST_IDS.map(id => festTimeLock(id) ? 'n' : festOpen(id) ? (festCon(id) ? 'c' : festWait(id) > 0 ? hms(festWait(id)) : 'r') : 'x').join('|');
     const ac = acornIcon();
-    $('#festList').innerHTML = FEST_IDS.map(id => {
-      const F = FEST[id], open = festOpen(id), w = open ? festWait(id) : 0, con = open && festCon(id);
+    $('#festList').innerHTML = FEST_IDS.filter(festShown).sort((a, b) => festTimeLock(a) - festTimeLock(b)).map(id => {   // 3.1.1 지금 열 수 있는 쪽(낮 행사나 밤 행사)을 위에
+      const F = FEST[id];
+      if (festBase(id) && festTimeLock(id)) return `<div class="tr-row fe-row lock"><span class="tr-ic" style="--tc:#F3C04B">${festIcon(id)}</span>` +
+        `<div class="tr-tx"><b>${F.name} <small>${F.sec}초</small></b><span>${F.night ? '밤(20~6시)에 여는 기숙사 행사예요' : '밤에는 학생들이 기숙사에 있어요'}</span></div><span class="fe-lock">${F.night ? '밤 8시부터' : '아침 6시부터'}</span></div>`;
+      const open = festOpen(id), w = open ? festWait(id) : 0, con = open && festCon(id);
       const btn = !open ? `<span class="fe-lock">${F.tg + 1}학년부터</span>`
         : con ? `<span class="fe-lock">공사 중</span>`   // 3.0.0 운동장 공사 중
         : w > 0 ? `<button class="btn-sub small" type="button" data-fest="${id}" data-ad="1"><span>광고 보고 바로</span><small>${hms(w)}</small></button>`
         : `<button class="cta small" type="button" data-fest="${id}">열기</button>`;
       return `<div class="tr-row fe-row${open && !con ? '' : ' lock'}"><span class="tr-ic" style="--tc:#F3C04B">${festIcon(id)}</span>` +
         `<div class="tr-tx"><b>${F.name} <small>${F.sec}초</small></b><span>${con ? `${FAC.playground.name} 공사가 끝나면 열 수 있어요` : open ? F.lead : '학년이 올라가면 열려요'}</span>` +
-        (open && !con ? `<span class="tr-meta"><span class="tr-rw">${ac}<b>${fmt(festPrize(true))}</b></span><span class="tr-sv">${festGoldLeft(id) ? '성공 상품, 황금 도토리 +1 (하루 한 번)' : '성공 상품 (황금 도토리는 오늘 받았어요)'}</span></span>` : '') + `</div>${btn}</div>`;
+        (open && !con ? `<span class="tr-meta"><span class="tr-rw">${ac}<b>${fmt(festPrize(true))}</b></span><span class="tr-sv">성공 상품</span></span>` : '') + `</div>${btn}</div>`;
     }).join('');
   }
   function startFest(id, viaAd) {
-    if (festBusy() || !festOpen(id)) return;
+    if (festBusy()) return;
+    if (festTimeLock(id)) { toast(FEST[id].night ? '기숙사 행사는 밤 8시부터 열려요' : '밤에는 학생들이 기숙사에 있어요. 아침 6시에 다시 열 수 있어요'); return; }
+    if (!festOpen(id)) return;
     if (festCon(id)) { toast(`${FAC.playground.name} 공사가 끝나면 운동회를 열 수 있어요`); return; }   // 3.0.0
     if (!viaAd && festWait(id) > 0) { closeModal($('#mFest'), () => askAd(`${FEST[id].name}${batchim(FEST[id].name) ? '을' : '를'} 기다리지 않고 광고를 보면 바로 열 수 있어요.`, () => showAd(() => startFest(id, true), () => openFest()), () => openFest())); return; }
     if (id === 'sports') { if (rt.modalOpen === $('#mFest')) closeModal($('#mFest'), () => startSports(true)); else startSports(true); return; }
@@ -17981,7 +17998,8 @@ body.cam-scene #ffChip,body.cam-scene #tierDots,body.cam-scene #plChip{opacity:0
   }
   function festSpawn(F) {
     let x, y;
-    if (F.item === 'paper') { const P0 = [[34, 176], [58, 300], [322, 240], [312, 372], [94, 398], [336, 150], [26, 248], [262, 404], [104, 86], [252, 92], [44, 360], [330, 300]], v0 = visMap(), P = v0 ? P0.filter(([px, py]) => px > v0[0] + 16 && px < v0[2] - 16 && py > v0[1] + 16 && py < v0[3] - 16) : P0; const PP = P.length >= 4 ? P : P0; [x, y] = PP[Math.floor(Math.random() * PP.length)]; x += rand(-8, 8); y += rand(-6, 6); }
+    if (F.item === 'meteor') { const v0 = visMap() || [0, 0, 360, 480]; x = rand(v0[0] + 20, (v0[0] + v0[2]) / 2 + 40); y = rand(v0[1] + 30, v0[1] + (v0[3] - v0[1]) * 0.45); }   // 3.1.1 하늘 위쪽 왼편에서 오른쪽 아래로
+    else if (F.item === 'paper' || F.item === 'firefly') { const P0 = [[34, 176], [58, 300], [322, 240], [312, 372], [94, 398], [336, 150], [26, 248], [262, 404], [104, 86], [252, 92], [44, 360], [330, 300]], v0 = visMap(), P = v0 ? P0.filter(([px, py]) => px > v0[0] + 16 && px < v0[2] - 16 && py > v0[1] + 16 && py < v0[3] - 16) : P0; const PP = P.length >= 4 ? P : P0; [x, y] = PP[Math.floor(Math.random() * PP.length)]; x += rand(-8, 8); y += rand(-6, 6); }
     else if (F.item === 'smile') { const ks = rt.kids.filter(k => k.hold); if (!ks.length) return; const k = ks[Math.floor(Math.random() * ks.length)]; x = k.x; y = k.y - 20; }
     else if (F.form === 'stage') { x = pzx() + rand(-34, 34); y = pzy() - 30; }
     else { x = pzx() + rand(-60, 60); y = pzy() + 2 + rand(-10, 16); }
@@ -17990,18 +18008,18 @@ body.cam-scene #ffChip,body.cam-scene #tierDots,body.cam-scene #plChip{opacity:0
     const g = document.createElementNS(NS, 'g');
     g.setAttribute('class', 'fest-item');
     g.setAttribute('role', 'button');
-    g.setAttribute('aria-label', F.item === 'paper' ? '보물 쪽지' : F.item === 'balloon' ? '풍선' : F.item === 'note' ? '음표' : '웃음 별');
+    g.setAttribute('aria-label', F.item === 'meteor' ? '별똥별' : F.item === 'lantern' ? '소원 등불' : F.item === 'firefly' ? '반딧불' : F.item === 'paper' ? '보물 쪽지' : F.item === 'balloon' ? '풍선' : F.item === 'note' ? '음표' : '웃음 별');
     g.style.setProperty('--bc', FEST_COLORS[Math.floor(Math.random() * FEST_COLORS.length)]);
     // 2.3.1 지섭: 보물 쪽지가 풀숲에서 잘 안 보여서 더 크게, 밝은 고리와 둘레 빛, 통통 튀게
     if (F.item === 'paper') { g.classList.add('fi-paper'); g.innerHTML = `<circle r="20" class="drop-hit"/><circle r="17" class="fi-glow"/><circle r="15" class="fi-ring"/><g class="fi-in"><g class="fi-bob">${festItemSvg(F.item, 30)}</g></g>`; }
     else g.innerHTML = `<circle r="15" class="drop-hit"/><circle r="12" class="fi-glow"/><g class="fi-in">${festItemSvg(F.item)}</g>`;
     g.setAttribute('transform', `translate(${x.toFixed(1)} ${y.toFixed(1)})`);
     layerFx.appendChild(g);
-    const it = { g, x, y, born: performance.now(), life: F.how === 'rise' ? 3800 : F.item === 'paper' ? 2600 : 2000, dead: false, rise: F.how === 'rise' };
+    const it = { g, x, y, born: performance.now(), life: F.how === 'rise' ? 3800 : F.how === 'fall' ? 2600 : F.item === 'paper' ? 2600 : 2000, dead: false, rise: F.how === 'rise', fall: F.how === 'fall' };
     const hit = e => { e.preventDefault(); e.stopPropagation(); festHit(it); };
     g.addEventListener('pointerdown', hit);
     rt.fest.items.push(it);
-    if (!rt.reduced && g.animate && !it.rise) g.querySelector('.fi-in').animate([{ transform: 'scale(.2)', opacity: 0 }, { transform: 'scale(1.15)', opacity: 1, offset: 0.25 }, { transform: 'scale(1)', opacity: 1 }], { duration: 320 });
+    if (!rt.reduced && g.animate && !it.rise && !it.fall) g.querySelector('.fi-in').animate([{ transform: 'scale(.2)', opacity: 0 }, { transform: 'scale(1.15)', opacity: 1, offset: 0.25 }, { transform: 'scale(1)', opacity: 1 }], { duration: 320 });
   }
   function festHit(it) {
     const R = rt.fest;
@@ -18021,13 +18039,15 @@ body.cam-scene #ffChip,body.cam-scene #tierDots,body.cam-scene #plChip{opacity:0
     if (!R) return;
     const F = FEST[R.id];
     renderFestBar();
-    if (feverIntro(R, dt, F.name, F.item === 'paper' ? '나무 사이에 나타나는 쪽지를 눌러요' : F.item === 'balloon' ? '날아오르는 풍선을 눌러요' : F.item === 'note' ? '떠오르는 음표를 눌러요' : '반짝이는 웃음 별을 눌러요')) return;
+    if (feverIntro(R, dt, F.name, F.item === 'meteor' ? '떨어지는 별똥별을 눌러요' : F.item === 'lantern' ? '떠오르는 등불을 눌러요' : F.item === 'firefly' ? '깜빡이는 반딧불을 눌러요' : F.item === 'paper' ? '나무 사이에 나타나는 쪽지를 눌러요' : F.item === 'balloon' ? '날아오르는 풍선을 눌러요' : F.item === 'note' ? '떠오르는 음표를 눌러요' : '반짝이는 웃음 별을 눌러요')) return;
     if (R.ending) return;
     R.t -= dt; R.spawn -= dt;
     if (R.spawn <= 0) { R.spawn = F.sec / (F.goal * 2); if (R.items.filter(i => !i.dead).length < 7) festSpawn(F); }
     for (const it of R.items) {
       if (it.dead) continue;
       const age = now - it.born;
+      if (it.fall) { it.x += dt * 62; it.y += dt * 40; it.g.setAttribute('transform', `translate(${it.x.toFixed(1)} ${it.y.toFixed(1)})`); }   // 3.1.1 별똥별
+      const vf = it.fall && visMap(); if (vf && (it.x > vf[2] - 10 || it.y > vf[3] - 10)) it.born = -1e9;   // 화면 밖으로 나가면 사라져요
       if (it.rise) { it.y -= dt * 30; it.x += Math.sin(age / 400) * 0.25; it.g.setAttribute('transform', `translate(${it.x.toFixed(1)} ${it.y.toFixed(1)})`); }
       const vt = it.rise && visMap();   // 1.6.0: 떠오르는 음표와 풍선은 위쪽 칸에 닿기 전에 사라져요(가려져서 못 누르는 일이 없게)
       if (age > it.life || (vt && it.y < vt[1] + 12)) { it.dead = true; if (!rt.reduced && it.g.animate) it.g.animate([{ opacity: 1 }, { opacity: 0 }], { duration: 200 }).onfinish = () => it.g.remove(); else it.g.remove(); }
@@ -18065,9 +18085,9 @@ body.cam-scene #ffChip,body.cam-scene #tierDots,body.cam-scene #plChip{opacity:0
     rt.sportsWin = win; rt.prizeName = F.name; rt.prizeId = R.id;
     $('#srTitle').textContent = win ? `${F.name} 성공!` : `${F.name} 끝!`;
     $('#srScore').textContent = `${R.n}/${F.goal}${F.unit}`;
-    $('#srText').textContent = (win ? `${F.win} 상품으로 도토리${festGoldLeft(R.id) ? '와 황금 도토리 1개(행사마다 하루 한 번)' : ''}를 받아요.` : `아깝게 ${F.goal - R.n}${F.unit} 모자랐어요. 그래도 도토리를 조금 받아요.`) + `${vpLv() ? ` 교감 선생님 덕분에 +${VP.per * vpLv()}%예요.` : ''}`;
+    $('#srText').textContent = (win ? `${F.win} 상품으로 도토리를 받아요.` : `아깝게 ${F.goal - R.n}${F.unit} 모자랐어요. 그래도 도토리를 조금 받아요.`) + `${vpLv() ? ` 교감 선생님 덕분에 +${VP.per * vpLv()}%예요.` : ''}`;
     $('#srPrize').textContent = fmt(festPrize(win));
-    $('#srArt').innerHTML = `<svg viewBox="-11 -11 22 22" aria-hidden="true">${FEST_ICON[R.id]}</svg>`;
+    $('#srArt').innerHTML = FEST_ICON[R.id] ? `<svg viewBox="-11 -11 22 22" aria-hidden="true">${FEST_ICON[R.id]}</svg>` : festIcon(R.id);   // 3.1.1 밤 행사는 그림 아이콘만
     sfx(win ? 'quest' : 'done'); buzz(20);
     musicSync(); save(); renderFestBtn(); checkQuests(); renderAffordance();
     queueModal(() => { openModal($('#mSportsEnd')); return true; });
@@ -22635,7 +22655,7 @@ body.cam-scene #ffChip,body.cam-scene #tierDots,body.cam-scene #plChip{opacity:0
     fmt, fmt2, graduate, promote, buyPerk, perkCost, perkMaxed, buyFundPerk, fpCost, claimMain, mainReady, curMain, qNo, earn, CFG, TEA, teaMaxed, PERKS, FPERKS, MAIN, finalYear, startTrip, claimTrip, TRIPS, yearLocked, endSports, rtSports: () => rt.sports, rtFest: () => rt.fest, facCap, addLeague, addMP, tutStart, endFest, claimBox, musicWant, askBox, festWait, setTab,
     RARE, rareRoll, rareGot, showRareTalk, rareDexHTML, kidSVG, rosterKid, WX, wxOf, wxIs, rdMinNow, renderWeather, PL, plSync, plUnread, openPLetter, renderPLetter, RS, rsNum, rsSync, rsAdd, rsLabel, lookDoc, lookRead, lookPush, lookSet, openLook, MODEL_SCHOOL, joinRank, PS, PS_M, PS_SEASONS, psSeason, psOpen, psSync, psLv, psGot, psReward, psClaimAll, psClaimMission, psWatchAd, psClaimable, psStepReady, psExtraReady, psChooseFur, psFurImg, renderPass, setEvSeg, xtGot, achTitles,   // 2.1.3 숲속 패스
     dexMeet, dexSync, dexPending, dexGift, renderDex, evCurrent, evNext, evUpcoming, evSync, evFix, evVal, EV_FALLBACK, EV_DECO, EV_HAT, COS, DECO_BY, decoOwn, perkRec, fpRec, BOOST_ALL, buyShop, pickShop, showNote, showOkOn, showWd, renderGradPanel, renderShop, renderDecoShop, EV_WEEKLY, EV_WEEK_BASE, weekMon, claimStamp, claimEvMission, claimEvBox, renderEvent, evMissions, evOk, evSkipped, EV_MONTHS, EV_MEASURE, tierMinutes, minAcorns, IMG, sanitize171, ACH, achSync, claimAch, setTitle, renderAch, setDexSeg, achClaimable, XT, xtAct, xtCost, xtLv, feastMins, libMult, propInstances, walkBuild, festItemSvg, guestArt, adErrText, googleErrText, openSheet, closeSheet, startFest, startSports, sanitize170, EV_STAMPS, EV_SPECIAL, EV_MONTHLY, EV_BOX, DEX_KEYS, DEX_REWARD, DEX_GUEST_KEYS, seasonKey, roofArtKey, oakKey, setSeasonArt, VP, vpLv, vpCost, vpMult, vpAct, renderVpCard, sportsPrize, festPrize, renderTeachers, buildTeacherCards, bldImg, roofKey, bldStage, mapKey, setMapArt, applyThemes, buyFacility, bldFx, setBldFx, mapHi, Live, liveApply, liveLoad, liveOff, LIVE_KEYS, EVC, NOTICES, openNotice, noticeAuto, noticeWant, ntUnread, startTrial, endTrial: () => rt.trial && (rt.trial.left = 0), spawnDeal, startVisit, IMG170, MG, mgCells, mgSetCells, mgTick, mgAddEnergy, mgAddUp, mgTapGen, mgDrop, mgSell, mgUpgrade, mgAddUp, mgUpSwap, mgGensMax, MG_UP_ESS, mgClaimOrder, mgSwapOrder, mgOrderOk, mgFillOrders, mgOpen, mgClose, mgRenderAll, mgSpawnLevel, mgNearestEmpty, mgEmptyBoard, mgOrderReward, mgUI, sanitize180, mgWatchAd, mgNewOrder, mgHintPick, mgShowHint, mgClearHint, mgTouch, mgOrderGuide, mgDexN, mgDexCan, mgDexClaim, mgOpenDex, MG_DEX, MG_DEX_MS, mgDexEss, mgDexEssCan, mgDexEssN, mgDexMsCan, mgDexMsClaim, MGB, mgBuyBoost, mgBstLeft, mgOpenBoost, nice, claimMission, claimBonus, claimWeekMission, MP_BOX, swapDaily, repairMissions, MISSIONS, WMISSIONS, dmDay, wkWeek,   // 1.7.0 도감, 이벤트
-    PZ, PZ_SHAPES, pzFits, pzAnyFit, pzStuck, pzFullLines, pzPlace, pzFreshGame, pzStart, PZB, pzbCost, pzApplyBoost, pzBoostOpen, pzBoostGo, festGoldLeft, festGoldTake, claimSports, renderStreet, pzFinish, pzLeft, pzCanAd, pzEssOf, pzMinOf, pzHelpSquirrel, pzHelpOwl, pzHelpBear, fillSubs, mapRoofTop, showAd, claimOfflineDouble, startBoost, tripAd, festFocus, festRange, visMap, renderMissions, pzHasHelp, pzRot, pzNewPiece, pzOpen, pzClose, pzGameOver, pzRenderAll, renderMini, addEss, ESHOP, SP_FUR, applyCos, essItem, pickEss, buyEss, renderEssShop, hatSVG, spFurImg, gameNow, gameToday, gameWeek, kstDay, setServerTime, SVR, dmDay, weekIdx, lgWeek, wkWeek, lgKey, pzDay, goldDay, boostLeft, dealLeft, canStamp };
+    PZ, PZ_SHAPES, pzFits, pzAnyFit, pzStuck, pzFullLines, pzPlace, pzFreshGame, pzStart, PZB, pzbCost, pzApplyBoost, pzBoostOpen, pzBoostGo, festGoldLeft, festGoldTake, claimSports, FEST, FEST_IDS, festNight, festShown, festTimeLock, festOpen, startFest, openFest, endFest, renderStreet, pzFinish, pzLeft, pzCanAd, pzEssOf, pzMinOf, pzHelpSquirrel, pzHelpOwl, pzHelpBear, fillSubs, mapRoofTop, showAd, claimOfflineDouble, startBoost, tripAd, festFocus, festRange, visMap, renderMissions, pzHasHelp, pzRot, pzNewPiece, pzOpen, pzClose, pzGameOver, pzRenderAll, renderMini, addEss, ESHOP, SP_FUR, applyCos, essItem, pickEss, buyEss, renderEssShop, hatSVG, spFurImg, gameNow, gameToday, gameWeek, kstDay, setServerTime, SVR, dmDay, weekIdx, lgWeek, wkWeek, lgKey, pzDay, goldDay, boostLeft, dealLeft, canStamp };
   if (window.__FOREST_TEST) Object.assign(window.__forest, { tripUseTicket, readUseTicket, picnicUseTicket, buyDecoPieces, adGold, claimBonus, cloudPush, cloudClash, syncGet, revOf, deleteAccount, lookDel: () => lookDelNow(), lookSet, lookPush, leaveRank, sanitizeCg, freshCg });   // 시험 손잡이
   if (window.claude && window.claude.hot && window.claude.hot.snapshot) {
     try { window.claude.hot.snapshot(() => { if (S) syncMid(); return { save: S }; }); } catch (e) { /* 무시 */ }
