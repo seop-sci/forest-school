@@ -15,7 +15,8 @@ SETUP = r"""(tier) => {
 CHECK = r"""() => {
   const F = window.__forest, S = F.S, bad = [], ok = (c, m) => { if (!c) bad.push(m); };
   ok(F.JOBS.length === 12, '진로 12종');
-  ok(F.CS_WORRY.length === 5 && F.CS_WORRY.every(a => a.length === 6), '과목마다 고민 6줄');
+  ok(F.CS_WORRY.length === 12 && F.JOBS.every(J => J.worry.length >= 3 && J.ans.length >= 2 && J.alt.length >= 1), '진로마다 고민 3줄 이상, 답 2줄, 권하는 말');
+  { const T = F.csTalkMake(0); ok(T && F.JOBS[T.t].worry.includes(T.worry), '고민은 이번 진로의 줄에서 나와요'); }
   ok(F.csOpen(), '고등학교에서 상담실이 열려야 해요');
   F.openCounsel(); ok(!document.querySelector('#mCounsel').hidden, '상담 창이 열려요');
   ok(S.roster.list.every(x => x.jc.length === 3 && new Set(x.jc).size === 3 && x.jo.length === 0 && x.jb === -1), '학생마다 후보 3장(겹치지 않게), 처음엔 뒷면');
