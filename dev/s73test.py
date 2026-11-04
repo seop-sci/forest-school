@@ -193,7 +193,7 @@ async def main():
             await pg.click('#panelHall .shopfront.soon >> nth=0', force=True); await pg.wait_for_timeout(200)
             r['toast'] = await pg.evaluate("document.querySelector('#toast').textContent")
             print('준비 중 방', w, r)
-            if r['n'] != 2 or r['chips'] != 2 or r['msgs'] != 2 or '준비 중이에요' not in r['toast']: bad.append(f'{w} 준비 중 방 {r}')   # 2.0.1 중학교에서는 학생회실(반장 선거)과 교무실(시험 기간), 2.1.0부터 칭찬 게시판(스티커판)도 열려서 2곳
+            if r['n'] != 2 or r['chips'] != 2 or r['msgs'] != 2 or not ('준비 중이에요' in r['toast'] or '고등학교부터 열려요' in r['toast']): bad.append(f'{w} 준비 중 방 {r}')   # 3.1.0 상담실은 '고등학교부터 열려요'   # 2.0.1 중학교에서는 학생회실(반장 선거)과 교무실(시험 기간), 2.1.0부터 칭찬 게시판(스티커판)도 열려서 2곳
             if w == 390:
                 r = await pg.evaluate(f"""(() => {{ const F = {F}, S = F.S, f0 = S.f.classroom, out = [];
                   for (const q of F.MAIN.filter(q => q.t === 'students')) {{ const m = q.how.match(/Lv\\.(\\d+)까지 넓히고 학생을 (\\d+)명까지 모집해요/);

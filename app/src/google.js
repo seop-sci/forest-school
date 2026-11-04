@@ -17,5 +17,10 @@ if (WEB_CLIENT_ID) {
       if (!res || !res.idToken) throw { code: 'no-id-token' };
       return { idToken: res.idToken, email: res.profile && res.profile.email };
     },
+    // 3.1.0 계정 바꾸기와 로그아웃: 앱의 구글 로그인도 풀어야 다음에 계정 고르는 창이 떠요
+    async logout() {
+      await init();
+      await SocialLogin.logout({ provider: 'google' });
+    },
   };
 }
