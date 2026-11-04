@@ -16,7 +16,6 @@ CHECK = r"""() => {
   const F = window.__forest, S = F.S, bad = [], ok = (c, m) => { if (!c) bad.push(m); };
   ok(F.JOBS.length === 12, '진로 12종');
   ok(F.CS_WORRY.length === 12 && F.JOBS.every(J => J.worry.length >= 3 && J.ans.length >= 2 && J.alt.length >= 1), '진로마다 고민 3줄 이상, 답 2줄, 권하는 말');
-  { const T = F.csTalkMake(0); ok(T && F.JOBS[T.t].worry.includes(T.worry), '고민은 이번 진로의 줄에서 나와요'); }
   ok(F.csOpen(), '고등학교에서 상담실이 열려야 해요');
   F.openCounsel(); ok(!document.querySelector('#mCounsel').hidden, '상담 창이 열려요');
   ok(S.roster.list.every(x => x.jc.length === 3 && new Set(x.jc).size === 3 && x.jo.length === 0 && x.jb === -1), '학생마다 후보 3장(겹치지 않게), 처음엔 뒷면');
@@ -26,7 +25,7 @@ CHECK = r"""() => {
   S.xt.cou = 5; ok(F.csMax() === 4, '코끼리 Lv.5에 하루 4번'); S.xt.cou = 10; ok(F.csMax() === 5, 'Lv.10에 하루 5번'); S.xt.cou = 0;
   ok(F.csNeed(x) === 3, '♥ 없으면 카드 한 장에 관심 3');
   // 상담: 맞는 답 두 번이면 카드 한 장(관심 2 × 배수 ≥ 1)
-  for (let n = 0; n < 2; n++) { F.rt.csTalk = F.csTalkMake(0); const k = F.rt.csTalk.opts.findIndex(o => o.how === 'good'); ok(F.rt.csTalk.opts.length === 3 && new Set(F.rt.csTalk.opts.map(o => o.how)).size === 3, '답 셋은 맞는 답, 다른 후보, 엇나간 답'); F.csAnswer(k); }
+  for (let n = 0; n < 2; n++) { F.rt.csTalk = F.csTalkMake(0); ok(F.JOBS[F.rt.csTalk.t].worry.includes(F.rt.csTalk.worry) && F.rt.csTalk.opts.some(o => o.how === 'other' && F.JOBS[o.j].alt.includes(o.tx)), '고민은 이번 진로 줄, 다른 길은 권하는 말'); const k = F.rt.csTalk.opts.findIndex(o => o.how === 'good'); ok(F.rt.csTalk.opts.length === 3 && new Set(F.rt.csTalk.opts.map(o => o.how)).size === 3, '답 셋은 맞는 답, 다른 후보, 엇나간 답'); F.csAnswer(k); }
   ok(x.jo.length === 1, '맞는 답 두 번에 카드 한 장 열림: ' + x.jo.length);
   ok(S.cs.talks === 2 && S.cs.n === 2 && F.csLeft() === 1, '상담 횟수');
   F.rt.csTalk = F.csTalkMake(1); F.csAnswer(0); ok(F.csLeft() === 0, '오늘 다 씀');
