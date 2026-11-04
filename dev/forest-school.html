@@ -903,6 +903,7 @@ html.ait .app{padding-top:calc(10px + var(--ait-top, 0px));padding-bottom:var(--
 .stage.fever .frame{border-color:#F3C04B;animation:feverGlow .8s ease-in-out infinite alternate}
 /* 1.6.0: 행사 중에는 건물을 눌러도 창이 안 열리게 해서, 건물 위에 떨어진 공과 아이템을 바로 누를 수 있어요 */
 .stage.fever .bld .hit{pointer-events:none}
+.stage.fever #vdTop .vd-hit,.stage.fever #decoG [data-vd]{pointer-events:none}   /* 3.1.1 지섭: 행사 중에는 마을 기부 기념물도 눌러지지 않아요 */
 @keyframes feverGlow{from{box-shadow:0 3px 0 var(--wood-dark),0 0 0 3px rgba(243,192,75,.35),0 0 18px rgba(243,192,75,.45)}to{box-shadow:0 3px 0 var(--wood-dark),0 0 0 6px rgba(243,192,75,.65),0 0 34px rgba(243,192,75,.85)}}
 .fever-fx{position:absolute;inset:0;z-index:2;border-radius:15px;pointer-events:none;overflow:hidden;background:radial-gradient(120% 90% at 50% 50%, transparent 55%, rgba(243,192,75,.35) 100%)}
 .fever-fx i{position:absolute;top:-6%;width:6px;height:10px;border-radius:2px;opacity:.85;animation:confetti 3.2s linear infinite}
@@ -19979,8 +19980,8 @@ body.cam-scene #ffChip,body.cam-scene #tierDots,body.cam-scene #plChip{opacity:0
     $('#markRows').addEventListener('click', e => { const b = e.target.closest('[data-mk]'); if (!b) return; const [g, i] = b.dataset.mk.split(':').map(Number); sfx('tap'); rt.mkDraft[g] = i; renderMarkEdit(); });
     $('#markSave').addEventListener('click', () => { sfx('quest'); setMark(rt.mkDraft); toast('학교 마크를 바꿨어요. 위쪽 학교 카드에 보여요'); });
     $('#markOff').addEventListener('click', () => { sfx('tap'); setMark(null); toast('학교 카드를 교실 그림으로 되돌렸어요'); });
-    $('#vdTop').addEventListener('click', e => { if (!rt.decoEdit && e.target.closest('[data-vd]')) { e.stopPropagation(); openVd(); } });
-    $('#decoG').addEventListener('click', e => { if (!rt.decoEdit && e.target.closest('[data-vd]')) { e.stopPropagation(); openVd(); return; } { const x = !rt.decoEdit && e.target.closest('[data-bx]'); if (x) { e.stopPropagation(); bxTap(Number(x.dataset.bx)); return; } } const r = e.target.closest('[data-slot]'); if (!r || !rt.decoEdit) return; e.stopPropagation(); openDecoPick(+r.dataset.slot); });   // 2.2.0 생물 탐사(data-bx)
+    $('#vdTop').addEventListener('click', e => { if (!rt.decoEdit && !festBusy() && e.target.closest('[data-vd]')) { e.stopPropagation(); openVd(); } });
+    $('#decoG').addEventListener('click', e => { if (!rt.decoEdit && !festBusy() && e.target.closest('[data-vd]')) { e.stopPropagation(); openVd(); return; } { const x = !rt.decoEdit && e.target.closest('[data-bx]'); if (x) { e.stopPropagation(); bxTap(Number(x.dataset.bx)); return; } } const r = e.target.closest('[data-slot]'); if (!r || !rt.decoEdit) return; e.stopPropagation(); openDecoPick(+r.dataset.slot); });   // 2.2.0 생물 탐사(data-bx)
     $('#decoDone').addEventListener('click', () => { sfx('tap'); decoEditEnd(); toast('학교 꾸미기를 마쳤어요'); });
     $('#decoPickList').addEventListener('click', e => { const b = e.target.closest('[data-dput]'); if (!b) return; if (decoPut(rt.decoSlot, b.dataset.dput)) { sfx('quest'); achSync(); closeModal($('#mDecoPick')); } });
     $('#decoPickClear').addEventListener('click', () => { decoPut(rt.decoSlot, ''); sfx('tap'); closeModal($('#mDecoPick')); });
