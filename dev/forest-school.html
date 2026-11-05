@@ -2072,6 +2072,7 @@ body{background:radial-gradient(120% 60% at 50% 0%, color-mix(in srgb, var(--pap
 .ns-subs button[aria-disabled="true"]{opacity:.5;cursor:default}
 .ns-note{margin:2px 0 8px;padding:0 16px;font-size:12.5px;line-height:1.5;text-align:center;color:var(--chip-ink);white-space:pre-line}
 #map.hs-night #kids{display:none}
+.hs-night .firefly,.hs-night .bx-glow,.hs-night .rare-spark,.hs-night .de-halo,.hs-night .drop-ring{animation:none}   /* 3.2.0 고등학교 밤에는 지도 안의 끝없는 움직임을 멈춰요(끊김 줄이기) */
 .ns-z{animation:nsZ 2.6s ease-in-out infinite;transform-box:fill-box;transform-origin:center}
 @keyframes nsZ{0%{opacity:0;transform:translate(0,4px) scale(.7)}30%{opacity:1}100%{opacity:0;transform:translate(5px,-9px) scale(1.05)}}
 @media (prefers-reduced-motion:reduce){.ns-z{animation:none}}
@@ -9303,7 +9304,8 @@ body.cam-scene #ffChip,body.cam-scene #tierDots,body.cam-scene #plChip{opacity:0
   }
   const blobHtml = h => h.indexOf('"data:') < 0 ? h : h.replace(/(href|src)="(data:[^"]+)"/g, (m, a, u) => `${a}="${blobUrl(u)}"`);
   // 그림을 미리 풀어 둬요(풀린 그림을 잡아 두려고 Image를 남겨요)
-  function blobWarm(u) { const b = blobUrl(u); if (!b || b === u || BLOB_KEEP.some(x => x.src === b)) return; const im = new Image(); im.decoding = 'async'; im.src = b; BLOB_KEEP.push(im); if (im.decode) im.decode().catch(() => {}); }
+  function blobWarm(u) { const b = blobUrl(u); if (!b || BLOB_KEEP.some(x => x.src === b || x.dataset.u === b)) return;   // 3.2.0 그림이 파일 주소여도 미리 불러 둬요
+    if (b === u && !/^(img\/|https?:|blob:)/.test(u)) return; const im = new Image(); im.decoding = 'async'; im.dataset.u = b; im.src = b; BLOB_KEEP.push(im); if (im.decode) im.decode().catch(() => {}); }
   function warmRooms() {
     if (!S) return;
     const ks = facKeys().filter(k => S.f[k] >= 1);
@@ -13143,9 +13145,30 @@ body.cam-scene #ffChip,body.cam-scene #tierDots,body.cam-scene #plChip{opacity:0
     g.innerHTML = '<defs><radialGradient id="nmGlow"><stop offset="0" stop-color="#FFE29A" stop-opacity=".95"/><stop offset=".55" stop-color="#FFD36B" stop-opacity=".35"/><stop offset="1" stop-color="#FFD36B" stop-opacity="0"/></radialGradient></defs>' +
       (hsN ? nsSleepers() : '') +
       '<rect x="-300" y="-300" width="960" height="1020" fill="#141C3E" opacity=".46"/>' +   // 2.3.0 multiply는 지도 그림(svg 밖)과 섞이지 않아 거의 안 어두워져서 그냥 덮어요
-      (geoIdx() === 3 && IMG('night_sky') ? `<image href="${IMG('night_sky')}" x="0" y="${MAP_Y}" width="${MAP_W}" height="${MAP_H}" preserveAspectRatio="none"/>` : '') +   // 3.0.0 달, 별, 반딧불(고등학교 지도만)
+      '<g class="nb-src">' + (geoIdx() === 3 && IMG('night_sky') ? `<image href="${IMG('night_sky')}" x="0" y="${MAP_Y}" width="${MAP_W}" height="${MAP_H}" preserveAspectRatio="none"/>` : '') +   // 3.0.0 달, 별, 반딧불(고등학교 지도만)
       ks.map(k => { const gi = IMG(gk(k)); if (gi) { const [bx, by, bw] = lotRect(geo().lot[k], seasonKey(bldImg(k))); return `<image href="${gi}" x="${(bx - bw / 2).toFixed(1)}" y="${(by - bw / 2).toFixed(1)}" width="${bw.toFixed(1)}" height="${bw.toFixed(1)}"/>`; }
-        const [cx, cy, w] = bpos(k); return `<ellipse cx="${cx.toFixed(1)}" cy="${(cy - w * 0.3).toFixed(1)}" rx="${(w * 0.42).toFixed(1)}" ry="${(w * 0.3).toFixed(1)}" fill="url(#nmGlow)" style="mix-blend-mode:screen"/>`; }).join('');
+        const [cx, cy, w] = bpos(k); return `<ellipse cx="${cx.toFixed(1)}" cy="${(cy - w * 0.3).toFixed(1)}" rx="${(w * 0.42).toFixed(1)}" ry="${(w * 0.3).toFixed(1)}" fill="url(#nmGlow)" style="mix-blend-mode:screen"/>`; }).join('') + '</g>';
+    nightBake(g, key);
+  }
+  /* 3.2.0 지섭 제보(고등학교 밤 끊김): 밤하늘과 건물 불빛 조각(큰 그림 여러 장)이 지도 안에 겹쳐 있어서, 조금만 움직여도 휴대폰이 전부 다시 칠했어요.
+     처음 한 번 캔버스에 합쳐 그림 한 장으로 바꿔 끼워요. 합치는 동안과 실패하면 예전 그림들을 그대로 써요 */
+  const NBK = { key: "", url: "" };
+  function nightBake(g, key) {
+    const src = g.querySelector('.nb-src'); if (!src) return;
+    const swap = () => { const s0 = g.querySelector('.nb-src'); if (s0 && g.dataset.key === key) s0.outerHTML = `<image class="nb-img" href="${NBK.url}" x="0" y="${MAP_Y}" width="${MAP_W}" height="${MAP_H}" preserveAspectRatio="none"/>`; };
+    if (NBK.key === key && NBK.url) { swap(); return; }
+    const L = [...src.querySelectorAll('image')].map(im => ({ u: im.getAttribute('href'), x: +im.getAttribute('x'), y: +im.getAttribute('y'), w: +im.getAttribute('width'), h: +im.getAttribute('height') }));
+    if (!L.length || src.querySelector('ellipse') || !window.Promise) return;   // 둥근 빛(그림 없음)은 섞는 방식이 달라서 그대로
+    const cv = document.createElement('canvas'); if (!cv.getContext || !cv.toBlob) return;
+    const r = map.getBoundingClientRect(), sc = Math.max(1.5, Math.min(3, (r.width || 390) / MAP_W * (window.devicePixelRatio || 1)));
+    cv.width = Math.round(MAP_W * sc); cv.height = Math.round(MAP_H * sc);
+    Promise.all(L.map(l => new Promise((ok, no) => { const im = new Image(); im.onload = () => ok([im, l]); im.onerror = no; im.src = l.u; })))
+      .then(list => {
+        if (g.dataset.key !== key) return;
+        const c = cv.getContext('2d');
+        for (const [im, l] of list) c.drawImage(im, l.x * sc, (l.y - MAP_Y) * sc, l.w * sc, l.h * sc);
+        cv.toBlob(b => { if (!b || g.dataset.key !== key) return; if (NBK.url) URL.revokeObjectURL(NBK.url); NBK.url = URL.createObjectURL(b); NBK.key = key; swap(); }, 'image/webp', 0.92);
+      }).catch(() => { /* 실패하면 예전처럼 여러 장 */ });
   }
   // 3.0.0 밤에는 학생이 걷지 않고 기숙사 앞(기숙사가 없으면 분수 옆)에 셋이 앉아 졸아요. 나머지는 기숙사 안
   function nsSleepers() {

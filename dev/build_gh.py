@@ -119,6 +119,25 @@ DOC = f"""<!doctype html>
 </body>
 </html>
 """
+# 3.2.0 지섭 결정(무거움 줄이기): 게임 안 그림(base64 글자 약 1,200장)을 img/a 폴더 파일로 꺼내고, 게임에는 파일 주소만 남겨요.
+# 원본(dev/forest-school.html)은 그대로라 시험(test.html)과 그림 넣는 도구는 바뀌지 않아요. 같은 그림은 한 파일로 써요.
+import base64, hashlib
+IMGDIR = (HERE.parent if OUT.resolve() == HERE.parent.resolve() else OUT) / 'img' / 'a'
+IMGDIR.mkdir(parents=True, exist_ok=True)
+_used = set()
+_EXT = {'webp': 'webp', 'png': 'png', 'jpeg': 'jpg', 'jpg': 'jpg', 'gif': 'gif'}
+def _out_img(m):
+    key, kind, b64 = m.group(1), m.group(3), m.group(4)
+    raw = base64.b64decode(b64)
+    name = f"{re.sub(r'[^A-Za-z0-9_]', '_', key)[:60]}-{hashlib.sha1(raw).hexdigest()[:10]}.{_EXT.get(kind, 'bin')}"
+    f = IMGDIR / name
+    if not f.exists(): f.write_bytes(raw)
+    _used.add(name)
+    return f'"{key}":{m.group(2)}"img/a/{name}"'
+DOC = re.sub(r'"([A-Za-z0-9_]+)":(\s*)"data:image/(webp|png|jpeg|jpg|gif);base64,([A-Za-z0-9+/=]+)"', _out_img, DOC)
+for f in IMGDIR.iterdir():
+    if f.name not in _used: f.unlink()   # 더는 안 쓰는 옛 그림 파일은 지워요
+print('그림 파일', len(_used))
 (OUT / 'index.html').write_text(DOC, encoding='utf-8')
 cfg = OUT / 'config.js'
 if not cfg.exists():
