@@ -2,7 +2,7 @@
 <html lang="ko">
 <head>
 <meta charset="utf-8">
-<meta name="forest-version" content="3.2.0">
+<meta name="forest-version" content="3.2.1">
 <meta name="viewport" content="width=device-width, initial-scale=1">
 <meta name="description" content="도토리를 모아 숲속 학교를 키우는 방치형 게임 테스트판이에요.">
 <style>html,body{margin:0}</style>
@@ -103,7 +103,10 @@
     var land = window.matchMedia && matchMedia('(orientation: landscape)').matches;
     var W = land ? Math.max(a, b) : Math.min(a, b), H = land ? Math.min(a, b) : Math.max(a, b);
     var s = Math.min(W / DW, H / DH);
-    var c = (W && s > 1.15) ? 'width=' + Math.round(W / s) : 'width=device-width, initial-scale=1';
+    // 3.2.1 지섭 제보(안드로이드 화면이 작게 보임): 너비가 PW_MAX보다 넓은 휴대폰(예: 화면 크기를 작게 한 기기, 약 512칸)은 게임 칸(최대 480)이 가운데에 작게 놓여요.
+    // 세로 휴대폰은 PW칸 너비로 그려서 화면에 꽉 차게 키워요(숫자는 본부 제안)
+    var PW = 412, PW_MAX = 440;
+    var c = (W && s > 1.15) ? 'width=' + Math.round(W / s) : (!land && W > PW_MAX) ? 'width=' + PW : 'width=device-width, initial-scale=1';
     if (c !== last) { last = c; m.setAttribute('content', c); }
   }
   fit();
@@ -2528,6 +2531,8 @@ body.wl-on .toast{z-index:300}
 .tier-dots .td.cur{border-color:#3E7E4A;box-shadow:0 0 0 2px #3E7E4A inset}
 .tier-dots .td.on{background:#3E7E4A;color:#FFF9E9}
 .tier-dots .td.lock{opacity:.55;cursor:default}
+body.sheet-open :is(#map, .map-left, .map-right, #qCard, .wx-fx, #tierDots, #ffChip, #plChip, #wxChip), body.sheet-open :is(#map, .map-left, .map-right, #qCard, .wx-fx, #tierDots, #ffChip, #plChip, #wxChip) *{animation-play-state:paused!important}   /* 3.2.1 건물 창이 열려 있으면 뒤 움직임을 멈춰요 */
+.tier-dots .td.nl{margin-left:3px;border-color:#6F6AA8;background:#2E2F58;font-size:13px;line-height:1}   /* 3.2.1 고등학교 밤 모습 */
 .tier-dots .td svg{width:13px;height:13px}
 .tier-view{position:absolute;inset:0;z-index:5;background:#3E6B3A var(--map-bg,none) center/cover no-repeat}
 .tier-view::before{content:"";position:absolute;inset:0;backdrop-filter:blur(8px);-webkit-backdrop-filter:blur(8px);background:rgba(20,40,20,.25)}
@@ -3158,7 +3163,7 @@ body.cam-scene #ffChip,body.cam-scene #tierDots,body.cam-scene #plChip{opacity:0
     <p class="boot-step" id="bootStep">학교 문을 여는 중...</p>
     <p class="boot-tip" id="bootTip">학교 문을 여는 중이에요</p>
   </div>
-  <span class="boot-ver" id="bootVer">v3.2.0</span>
+  <span class="boot-ver" id="bootVer">v3.2.1</span>
 </div>
 
 <div class="app on-school" id="app">
@@ -3657,7 +3662,7 @@ body.cam-scene #ffChip,body.cam-scene #tierDots,body.cam-scene #plChip{opacity:0
       </div>
       <h3 class="panel-sub">정보</h3>
       <dl class="info">
-        <div id="verRow"><dt>버전</dt><dd>v3.2.0</dd></div>
+        <div id="verRow"><dt>버전</dt><dd>v3.2.1</dd></div>
         <div id="pidRow" hidden><dt>학교 번호</dt><dd id="infoPid"></dd></div>
       </dl>
       <div id="devBox" hidden>
@@ -5895,6 +5900,9 @@ body.cam-scene #ffChip,body.cam-scene #tierDots,body.cam-scene #plChip{opacity:0
   const NS = 'http://www.w3.org/2000/svg';
   const $ = (s, r = document) => r.querySelector(s);
   const $$ = (s, r = document) => Array.from(r.querySelectorAll(s));
+  // 3.2.1 지섭 제보(안드로이드 건물 창 끊김): 건물 창은 0.25초마다 다시 그려서, 같은 글과 그림도 매번 새로 넣느라 휴대폰이 다시 칠했어요. 바뀐 것만 넣어요
+  const setT = (el, v) => { if (!el) return; v = v == null ? '' : String(v); if (el.textContent !== v) el.textContent = v; };
+  const setH = (el, v) => { if (!el) return; v = v == null ? '' : String(v); if (el._h !== v) { el._h = v; el.innerHTML = v; } };
   const SAVE_KEY = 'forest-school-v1';
   // 토스 미니앱 판이면 toss/src/bridge.js가 window.AIT에 광고, 저장소, 게임센터 기능을 담아 둬요
   const AIT = window.AIT || null;
@@ -6813,6 +6821,7 @@ body.cam-scene #ffChip,body.cam-scene #tierDots,body.cam-scene #plChip{opacity:0
     awx: 0,   // 2.1.0 자리 비운 보상 2배 부스터: 다음 받기에 2배(남은 번 수)
     deco: freshDeco(),   // 1.7.4 꾸미기: own 가진 장식 수, lay 지도별 자리(유치원, 초등학교)마다 놓인 장식 id, nm 학교 이름 앞부분('' = 숲속), mk 학교 마크 [모양, 문양, 바탕 색, 문양 색] 또는 null   // 1.6.0 정수 상점: 오늘 산 도토리 묶음 수, 이번 주 산 황금 도토리 묶음 수
     cs: freshCs(),
+    nl: 0,   // 3.2.1 고등학교 밤 모습: 0 밤(어둡게), 1 저녁(조금 어둡게), 2 밝게(지섭 요청, 보이는 모습만 바뀌고 밤 규칙은 그대로)
     tr2: freshTr2(),   // 3.2.0 수학여행: 다녀온 학년, 지금 여행, 떠난 수, 돌아온 수, 기념품   // 3.1.0 진로 상담: 오늘 날짜와 횟수, 모든 상담 수, 진로를 고른 수, 이룬 학생 수, 정산한 명부 번호, 진로 도감
     roster: freshRoster(), club: freshClub(), el: freshEl(), snap: {}, tfp: 0,   // 2.0.1 el: 반장 선거
       // tfp: 이 학교급에 들어올 때까지 장학재단을 고친 횟수   // 2.0.0 학생 명부, 동아리, 학교급 사진(졸업식 때 남긴 모습)
@@ -6998,6 +7007,7 @@ body.cam-scene #ffChip,body.cam-scene #tierDots,body.cam-scene #plChip{opacity:0
     sanitize200(d, s);   // 2.0.0 명부, 동아리, 학교급 사진
     sanitizeCs(d, s);   // 3.1.0 진로 상담
     sanitizeTr2(d, s);   // 3.2.0 수학여행
+    s.nl = [0, 1, 2].includes(d.nl) ? d.nl : 0;   // 3.2.1 고등학교 밤 모습
     s.tfp = Math.min(s.st.fperks, Math.floor(num(d.tfp, 0, s.st.fperks)));
     // 1.7.0 학교급별 건물 외관: 예전 저장은 지금 보이는 모습 그대로(유치원 모습, 과학실과 운동장은 초등학교 모습) 시작해서 다음 업그레이드 때 바뀌어요
     if (d.bs && typeof d.bs === 'object') { for (const k of Object.keys(s.bs)) s.bs[k] = Math.min(s.tier, Math.floor(num(d.bs[k], 0, 0))); }
@@ -9687,6 +9697,7 @@ body.cam-scene #ffChip,body.cam-scene #tierDots,body.cam-scene #plChip{opacity:0
     renderSheet();
     const w = $('#sheetWrap');
     w.hidden = false;
+    document.body.classList.add('sheet-open');   // 3.2.1 창이 열려 있는 동안 뒤 지도와 홈 칩 움직임을 멈춰요(끊김 줄이기)
     // 3.0.0 끊김 줄이기: 맨 위로 되돌리기와 단추 초점은 화면을 한 번 더 재게 해서, 그리는 프레임 안과 창이 다 올라온 뒤로 옮겨요
     requestAnimationFrame(() => { const sh = $('#sheetWrap .sheet'); if (sh.scrollTop) sh.scrollTop = 0; w.classList.add('open'); });
     setTimeout(() => { if (rt.sheetKey === k) $('#sheetBuy').focus({ preventScroll: true }); }, 280);
@@ -9698,6 +9709,7 @@ body.cam-scene #ffChip,body.cam-scene #tierDots,body.cam-scene #plChip{opacity:0
     const w = $('#sheetWrap');
     w.classList.remove('open');
     rt.sheetKey = null;
+    document.body.classList.remove('sheet-open');
     setTimeout(() => { if (!rt.sheetKey) w.hidden = true; }, 230);
     const fw = rt.bldFxWait; rt.bldFxWait = null;   // 1.8.0 창 안에서 업그레이드했으면 닫을 때 지도에서 효과를 보여 줘요
     if (fw && S.f[fw.k] === fw.L) setTimeout(() => bldFx(fw.k, fw.kind), 120);
@@ -9720,17 +9732,17 @@ body.cam-scene #ffChip,body.cam-scene #tierDots,body.cam-scene #plChip{opacity:0
     const F = FAC[k], L = S.f[k], c = facCost(k), fr = furReady(k), ok = fr && S.budget >= c, cap = facCap(), maxed = facMaxed(k);
     renderFur();
     $('#sheetWrap .sheet').classList.toggle('is-room', !$('#furBox').hidden);
-    $('#sheetHaveN').textContent = fmt(S.budget);
-    $('#sheetTitle').textContent = F.name;
-    $('#sheetSub').textContent = L >= 1 ? `Lv.${L} / Lv.${cap}` : '아직 짓지 않았어요';   // 지금 레벨 / 올해 올릴 수 있는 최고 레벨
-    $('#sheetDesc').textContent = F.desc;
-    $('#effNow').textContent = F.eff(L);
-    $('#effNextLabel').textContent = maxed ? (semFirst() ? '2학기' : '다음 학년') : L >= 1 ? '다음 레벨' : '지으면';
-    $('#effNext').textContent = maxed ? `Lv.${capNext()}까지 열려요` : F.eff(L + 1);
-    $('#sheetRep').textContent = k === 'library' ? '도서관은 평판을 가장 많이 올려요. 평판이 쌓이면 학교 등급이 올라가요.' : `레벨이 오를 때마다 평판도 ★${F.rep} 올라요.`;
-    $('#sheetBuyLabel').textContent = (maxed ? '최고 레벨' : L >= 1 ? '업그레이드' : '짓기') ;   // 2.3.0 즉시 완공은 옆 ⚡ 단추로
-    { const fb = $('#sheetFree'), ok = ffCan(k) && !conOn(k); fb.querySelector('.n').textContent = ffLeft(); fb.hidden = !(S.tier >= 1 && !maxed && conFreeLeft(k) && conSec(k, L + 1) > 10); fb.setAttribute('aria-disabled', ok && furReady(k) && S.budget >= facCost(k) ? 'false' : 'true'); }
-    $('#sheetCost').textContent = maxed ? '-' : fmt(c);
+    setT($('#sheetHaveN'), fmt(S.budget));
+    setT($('#sheetTitle'), F.name);
+    setT($('#sheetSub'), L >= 1 ? `Lv.${L} / Lv.${cap}` : '아직 짓지 않았어요');   // 지금 레벨 / 올해 올릴 수 있는 최고 레벨
+    setT($('#sheetDesc'), F.desc);
+    setT($('#effNow'), F.eff(L));
+    setT($('#effNextLabel'), maxed ? (semFirst() ? '2학기' : '다음 학년') : L >= 1 ? '다음 레벨' : '지으면');
+    setT($('#effNext'), maxed ? `Lv.${capNext()}까지 열려요` : F.eff(L + 1));
+    setT($('#sheetRep'), k === 'library' ? '도서관은 평판을 가장 많이 올려요. 평판이 쌓이면 학교 등급이 올라가요.' : `레벨이 오를 때마다 평판도 ★${F.rep} 올라요.`);
+    setT($('#sheetBuyLabel'), (maxed ? '최고 레벨' : L >= 1 ? '업그레이드' : '짓기') );   // 2.3.0 즉시 완공은 옆 ⚡ 단추로
+    { const fb = $('#sheetFree'), ok = ffCan(k) && !conOn(k); setT(fb.querySelector('.n'), ffLeft()); fb.hidden = !(S.tier >= 1 && !maxed && conFreeLeft(k) && conSec(k, L + 1) > 10); fb.setAttribute('aria-disabled', ok && furReady(k) && S.budget >= facCost(k) ? 'false' : 'true'); }
+    setT($('#sheetCost'), maxed ? '-' : fmt(c));
     $('#sheetBuy').setAttribute('aria-disabled', ok ? 'false' : 'true');
     $('#sheetBuy').classList.toggle('is-rec', !!rt.rec && rt.rec.kind === 'fac' && rt.rec.k === k && !maxed);
     conSheet();   // 2.1.0 공사 중이면 공사 칸
@@ -9746,55 +9758,55 @@ body.cam-scene #ffChip,body.cam-scene #tierDots,body.cam-scene #plChip{opacity:0
     }
     const qn = $('#sheetQuest');
     qn.hidden = !qtxt;
-    qn.textContent = qtxt;
+    setT(qn, qtxt);
     // 2.0.1 과학실 창의 실험 단추, 도서관 창의 책 읽기 단추
     const sl = $('#sheetLab'), slOn = k === 'science' && labReady();
     sl.hidden = !slOn;
     if (slOn) {
-      $('#sheetLabIc').innerHTML = IMG('lab_flask') ? `<img src="${IMG('lab_flask')}" alt="">` : '⚗️';
-      $('#sheetLabTx').textContent = labDone() ? `오늘 실험 끝, 노트 ${labCount()}/${LAB_KEYS.length}` : `하루 한 번, 노트 ${labCount()}/${LAB_KEYS.length}`;
-      $('#sheetLabGo').textContent = labDone() ? '노트 보기' : '실험하기';
+      setH($('#sheetLabIc'), IMG('lab_flask') ? `<img src="${IMG('lab_flask')}" alt="">` : '⚗️');
+      setT($('#sheetLabTx'), labDone() ? `오늘 실험 끝, 노트 ${labCount()}/${LAB_KEYS.length}` : `하루 한 번, 노트 ${labCount()}/${LAB_KEYS.length}`);
+      setT($('#sheetLabGo'), labDone() ? '노트 보기' : '실험하기');
       sl.classList.toggle('todo', !labDone());
     }
     const sr = $('#sheetRead'), srOn = k === 'library' && rdReady();
     sr.hidden = !srOn;
     if (srOn) {
       const b = S.rd.cur && BOOKS.find(x => x.k === S.rd.cur);
-      $('#sheetReadIc').innerHTML = b ? bookCover(b, 'bk-mini') : '📚';
-      $('#sheetReadTx').textContent = b ? `「${b.name}」 ${Math.ceil(rdRemain() / 60000)}분 남았어요` : `오늘 ${rdLeft()}/${rdPerDay()}권 남았어요`;
-      $('#sheetReadGo').textContent = b ? '보기' : '고르기';
+      setH($('#sheetReadIc'), b ? bookCover(b, 'bk-mini') : '📚');
+      setT($('#sheetReadTx'), b ? `「${b.name}」 ${Math.ceil(rdRemain() / 60000)}분 남았어요` : `오늘 ${rdLeft()}/${rdPerDay()}권 남았어요`);
+      setT($('#sheetReadGo'), b ? '보기' : '고르기');
       sr.classList.toggle('todo', !b && rdLeft() > 0);
     }
     // 2.0.1 도서관 창의 시험 기간 단추, 교실 창의 전교 1등 상장
     const sx = $('#sheetExam'), sxOn = k === 'library' && exOpen() && S.f.library >= 1;
     sx.hidden = !sxOn;
     if (sxOn) {
-      $('#sheetExamIc').innerHTML = IMG('exam_book') ? `<img src="${IMG('exam_book')}" alt="">` : '📝';
-      $('#sheetExamTx').textContent = exReportReady() ? '성적표가 나왔어요!' : exNow() ? (exStudyDone() ? `시험 주, 오늘 자율학습 끝(${exDays()}일 남음)` : `시험 주, 자율학습을 해요(${exDays()}일 남음)`) : `다음 시험까지 ${exDays()}일`;
-      $('#sheetExamGo').textContent = exReportReady() ? '받기' : exNow() && !exStudyDone() ? '자율학습' : '보기';
+      setH($('#sheetExamIc'), IMG('exam_book') ? `<img src="${IMG('exam_book')}" alt="">` : '📝');
+      setT($('#sheetExamTx'), exReportReady() ? '성적표가 나왔어요!' : exNow() ? (exStudyDone() ? `시험 주, 오늘 자율학습 끝(${exDays()}일 남음)` : `시험 주, 자율학습을 해요(${exDays()}일 남음)`) : `다음 시험까지 ${exDays()}일`);
+      setT($('#sheetExamGo'), exReportReady() ? '받기' : exNow() && !exStudyDone() ? '자율학습' : '보기');
       sx.classList.toggle('todo', exReportReady() || (exNow() && !exStudyDone()));
     }
     const aw = $('#sheetAward'), top = k === 'classroom' ? exAwardTop() : null;
     aw.hidden = !top;
-    if (top) aw.innerHTML = `${IMG('exam_award') ? `<img src="${IMG('exam_award')}" alt="">` : '🏅'}<span>전교 1등 <b>${esc(top.nm)}</b>의 상장이 걸려 있어요. 다음 시험까지 걸려 있어요.</span>`;
+    if (top) setH(aw, `${IMG('exam_award') ? `<img src="${IMG('exam_award')}" alt="">` : '🏅'}<span>전교 1등 <b>${esc(top.nm)}</b>의 상장이 걸려 있어요. 다음 시험까지 걸려 있어요.</span>`);
     // 2.2.0 급식실 창의 학교 텃밭
     const sg = $('#sheetGarden'), sgOn = k === 'cafeteria' && gdOpen();
     sg.hidden = !sgOn;
     if (sgOn) {
       gdSync(); const rd = gdReadyN(), tm = gdToday();
-      $('#sheetGardenIc').innerHTML = gdImg('item_carrot', '🥕');
-      $('#sheetGardenTx').textContent = `${rd ? `거둘 작물 ${rd}개` : `밭 ${gdN()}칸`}, ${tm ? `오늘의 급식 ${tm.nm}` : '오늘의 급식 아직'}`;
-      $('#sheetGardenGo').textContent = rd ? '거두기' : '가꾸기';
+      setH($('#sheetGardenIc'), gdImg('item_carrot', '🥕'));
+      setT($('#sheetGardenTx'), `${rd ? `거둘 작물 ${rd}개` : `밭 ${gdN()}칸`}, ${tm ? `오늘의 급식 ${tm.nm}` : '오늘의 급식 아직'}`);
+      setT($('#sheetGardenGo'), rd ? '거두기' : '가꾸기');
       sg.classList.toggle('todo', rd > 0 || (!tm && GD_MENU.some(gdCanCook)));
     }
     // 3.0.0 기숙사와 도서관 창의 야간 자율학습
     const ns = $('#sheetNs'), nsVis = (k === 'dorm' || k === 'library') && nsOpen();
     ns.hidden = !nsVis;
     if (nsVis) {
-      const ic = IMG('ic_selfstudy'); $('#sheetNsIc').innerHTML = ic ? `<img src="${ic}" alt="">` : '🌙';
+      const ic = IMG('ic_selfstudy'); setH($('#sheetNsIc'), ic ? `<img src="${ic}" alt="">` : '🌙');
       const on = nsOn(), used = nsUsedTonight(), night = isNight(), planned = nsPlanned();
-      $('#sheetNsTx').textContent = on ? `자율학습 중, 아침 ${NSL.h1}시에 ${AC.name[S.ns.sub]} XP +${NSL.xp}` : planned ? `오늘 밤 ${NSL.h0 - 12}시 자율학습을 예약했어요` : used ? '오늘 밤 자율학습을 마쳤어요' : night ? `켜면 자리 비운 보상 +${hm(nsExtraH() * 3600)}` : '오늘 밤 자율학습을 미리 예약해요';
-      $('#sheetNsGo').textContent = on || used ? '보기' : night ? '켜기' : '예약';
+      setT($('#sheetNsTx'), on ? `자율학습 중, 아침 ${NSL.h1}시에 ${AC.name[S.ns.sub]} XP +${NSL.xp}` : planned ? `오늘 밤 ${NSL.h0 - 12}시 자율학습을 예약했어요` : used ? '오늘 밤 자율학습을 마쳤어요' : night ? `켜면 자리 비운 보상 +${hm(nsExtraH() * 3600)}` : '오늘 밤 자율학습을 미리 예약해요');
+      setT($('#sheetNsGo'), on || used ? '보기' : night ? '켜기' : '예약');
       ns.classList.toggle('todo', !used && !on);
     }
     // 2.1.2 매점 창의 간식 뽑기
@@ -9803,8 +9815,8 @@ body.cam-scene #ffChip,body.cam-scene #tierDots,body.cam-scene #plChip{opacity:0
     if (snOn) {
       snSync();
       const mi = snMoodImg();
-      $('#sheetSnackIc').innerHTML = mi ? `<img src="${mi}" alt="">` : '🍪';
-      $('#sheetSnackTx').textContent = `학교 기분 ${S.sn.mood}/${SN.moodMax}칸, 간식 도감 ${snCount()}/${SN_ALL.length}종`;
+      setH($('#sheetSnackIc'), mi ? `<img src="${mi}" alt="">` : '🍪');
+      setT($('#sheetSnackTx'), `학교 기분 ${S.sn.mood}/${SN.moodMax}칸, 간식 도감 ${snCount()}/${SN_ALL.length}종`);
       sn.classList.toggle('todo', S.sn.mood < SN.moodMax && S.budget >= snCost(false));
     }
     // 2.1.0 놀이터 창의 숲속 소풍, 교실 창의 칭찬 스티커판
@@ -9812,18 +9824,18 @@ body.cam-scene #ffChip,body.cam-scene #tierDots,body.cam-scene #plChip{opacity:0
     sp.hidden = !spOn;
     if (spOn) {
       pcSettle();
-      $('#sheetPicnicIc').innerHTML = IMG('picnic_ic') ? `<img src="${IMG('picnic_ic')}" alt="">` : '🧺';
+      setH($('#sheetPicnicIc'), IMG('picnic_ic') ? `<img src="${IMG('picnic_ic')}" alt="">` : '🧺');
       const busy = pcActive(), done = !busy && S.pc.day === gameToday();
-      $('#sheetPicnicTx').textContent = busy ? `소풍 가는 중, ${Math.ceil(pcRemain() / 60000)}분 뒤 돌아와요` : done ? '오늘 소풍은 다녀왔어요' : `친구 ${PCN.kids}명이 ${PCN.min}분 동안 숲에 다녀와요`;
-      $('#sheetPicnicGo').textContent = busy ? '보기' : done ? '보기' : '보내기!';
+      setT($('#sheetPicnicTx'), busy ? `소풍 가는 중, ${Math.ceil(pcRemain() / 60000)}분 뒤 돌아와요` : done ? '오늘 소풍은 다녀왔어요' : `친구 ${PCN.kids}명이 ${PCN.min}분 동안 숲에 다녀와요`);
+      setT($('#sheetPicnicGo'), busy ? '보기' : done ? '보기' : '보내기!');
       sp.classList.toggle('todo', !busy && !done);
     }
     const sk = $('#sheetSticker'), skOn = k === 'classroom' && skOpen() && S.f.classroom >= 1;
     sk.hidden = !skOn;
     if (skOn) {
-      $('#sheetStickerIc').innerHTML = IMG('sticker_star') ? `<img src="${IMG('sticker_star')}" alt="">` : '⭐';
-      $('#sheetStickerTx').textContent = skFull() ? '다 채웠어요! 상을 골라요' : `스티커 ${S.sk.cur.length}/${SK.full}장`;
-      $('#sheetStickerGo').textContent = skFull() ? '상 받기' : '보기';
+      setH($('#sheetStickerIc'), IMG('sticker_star') ? `<img src="${IMG('sticker_star')}" alt="">` : '⭐');
+      setT($('#sheetStickerTx'), skFull() ? '다 채웠어요! 상을 골라요' : `스티커 ${S.sk.cur.length}/${SK.full}장`);
+      setT($('#sheetStickerGo'), skFull() ? '상 받기' : '보기');
       sk.classList.toggle('todo', skFull());
     }
     // 2.0.1 교실 창의 반장 선거 단추
@@ -9832,12 +9844,12 @@ body.cam-scene #ffChip,body.cam-scene #tierDots,body.cam-scene #plChip{opacity:0
     if (seOn) {
       elSync();
       const pres = elPres();
-      $('#sheetElectIc').innerHTML = IMG('elect_ballot_box') ? `<img src="${IMG('elect_ballot_box')}" alt="">` : '🗳️';
-      $('#sheetElectTx').textContent = pres ? `이번 주 반장 ${elWho(pres)}: ${EL_PLEDGES[pres.p].t}` : '이번 주 후보 세 명이 기다려요';
-      $('#sheetElectGo').textContent = pres ? '보기' : '투표하기!';
+      setH($('#sheetElectIc'), IMG('elect_ballot_box') ? `<img src="${IMG('elect_ballot_box')}" alt="">` : '🗳️');
+      setT($('#sheetElectTx'), pres ? `이번 주 반장 ${elWho(pres)}: ${EL_PLEDGES[pres.p].t}` : '이번 주 후보 세 명이 기다려요');
+      setT($('#sheetElectGo'), pres ? '보기' : '투표하기!');
       se.classList.toggle('todo', !pres);
     }
-    $('#sheetNeed').textContent = conOn(k) ? ' ' : maxed ? (semFirst() ? `더 올리려면 1학기를 마쳐야 해요. 1학기 방학식을 열면 Lv.${capNext()}까지 키울 수 있어요` : `더 올리려면 학교가 다음 학년으로 올라가야 해요. ${semOn() ? '2학기 ' : ''}종업식을 열면 Lv.${capNext()}까지 키울 수 있어요`) : !fr ? `가구 네 개를 모두 Lv.${L}로 올리면 건물을 키울 수 있어요` : ok ? ' ' : `도토리 ${fmt(Math.ceil(c - S.budget))}개가 더 필요해요`;
+    setT($('#sheetNeed'), conOn(k) ? ' ' : maxed ? (semFirst() ? `더 올리려면 1학기를 마쳐야 해요. 1학기 방학식을 열면 Lv.${capNext()}까지 키울 수 있어요` : `더 올리려면 학교가 다음 학년으로 올라가야 해요. ${semOn() ? '2학기 ' : ''}종업식을 열면 Lv.${capNext()}까지 키울 수 있어요`) : !fr ? `가구 네 개를 모두 Lv.${L}로 올리면 건물을 키울 수 있어요` : ok ? ' ' : `도토리 ${fmt(Math.ceil(c - S.budget))}개가 더 필요해요`);
     $('#sheetNeed').classList.toggle('soft', maxed || !fr);
   }
   // 1.8.0 짓기와 업그레이드 효과. kind 'build'(처음 지음) 또는 'up'. 건물 창이 열려 있으면 닫을 때 보여 줘요
@@ -9999,7 +10011,7 @@ body.cam-scene #ffChip,body.cam-scene #tierDots,body.cam-scene #plChip{opacity:0
   }
   function nsTick(dt) {
     rt.nsT = (rt.nsT || 0) + dt; if (rt.nsT < 1) return; rt.nsT = 0;
-    renderNight(); nsSettle(); tr2Tick(); renderTr2Btn();   // 3.2.0 수학여행 떠나 있는 동안 학생 숨김
+    renderNight(); renderTierDots(); nsSettle(); tr2Tick(); renderTr2Btn();   // 3.2.1 밤이 되면 밤 모습 단추   // 3.2.0 수학여행 떠나 있는 동안 학생 숨김
   }
   function openNs() {
     if (!nsOpen()) { toast('야간 자율학습은 고등학교 기숙사를 지으면 열려요'); return; }
@@ -10040,8 +10052,8 @@ body.cam-scene #ffChip,body.cam-scene #tierDots,body.cam-scene #plChip{opacity:0
     if (box.hidden) return;
     const on = cbOn(), key = [on ? Math.floor(cbLeft() / 60) : -1, nbOn() ? nbAdd() : 0, S.tier, ...CB.items.map(it => S.budget >= cbCost(it) ? 1 : 0)].join('|');
     if (box.dataset.key === key) return; box.dataset.key = key;
-    box.innerHTML = `<b>건설 부스터 (도토리)</b><small class="${on ? 'on' : ''}">${on ? `지금 모든 공사 +${conAdd()}%예요. ${hm(cbLeft())} 남았어요` : '쓰는 동안 모든 공사 +100%예요.'} 매일 ${NB.h0}~${NB.h1}시에 쓰면 효과 +${NB.add}%가 더해져요(학교 특별 이벤트 주간은 +${NB.addSp}%)${nbOn() ? '. 지금 야간 건설 중' : ''}.</small>` +
-      `<span class="row">${CB.items.map(it => `<button type="button" class="cb-b" data-cb="${it.k}" aria-disabled="${S.budget >= cbCost(it) ? 'false' : 'true'}"><span>${it.name}</span><em>${acornIcon()}${fmt(cbCost(it))}</em></button>`).join('')}</span>`;
+    setH(box, `<b>건설 부스터 (도토리)</b><small class="${on ? 'on' : ''}">${on ? `지금 모든 공사 +${conAdd()}%예요. ${hm(cbLeft())} 남았어요` : '쓰는 동안 모든 공사 +100%예요.'} 매일 ${NB.h0}~${NB.h1}시에 쓰면 효과 +${NB.add}%가 더해져요(학교 특별 이벤트 주간은 +${NB.addSp}%)${nbOn() ? '. 지금 야간 건설 중' : ''}.</small>` +
+      `<span class="row">${CB.items.map(it => `<button type="button" class="cb-b" data-cb="${it.k}" aria-disabled="${S.budget >= cbCost(it) ? 'false' : 'true'}"><span>${it.name}</span><em>${acornIcon()}${fmt(cbCost(it))}</em></button>`).join('')}</span>`);
   }
   // 2.1.1 바로 완공을 쓸 수 있는 건물(이 학교급에 있고, 최고 레벨이 아니고, 공사 중이 아니고, 공사가 10초 넘게 걸리는 레벨)
   // 2.3.0: 공사 중이면 바로 쓸 수 있고, 아니면 다음 레벨 공사가 10초 넘게 걸릴 때
@@ -10792,24 +10804,24 @@ body.cam-scene #ffChip,body.cam-scene #tierDots,body.cam-scene #plChip{opacity:0
     $('#sheetBuy').hidden = on;
     if (!on) { rt.conArm = false; rt.conPick = ''; return; }
     const b = S.bd[k], left = conLeft(k), pr = Math.min(1, Math.max(0, 1 - left * 1000 / Math.max(1, b.e - b.s)));
-    $('#conClock').innerHTML = IMG('ic_clock') ? `<img src="${IMG('ic_clock')}" alt="">` : '⏰';
-    $('#conTx').textContent = `Lv.${b.L} 공사 중, ${hm(left)} 남았어요`;
+    setH($('#conClock'), IMG('ic_clock') ? `<img src="${IMG('ic_clock')}" alt="">` : '⏰');
+    setT($('#conTx'), `Lv.${b.L} 공사 중, ${hm(left)} 남았어요`);
     $('#conFill').style.width = (pr * 100).toFixed(1) + '%';
     const p = tkPlan(left);
     $('#conAll').setAttribute('aria-disabled', p.n ? 'false' : 'true');
-    $('#conAllLbl').textContent = rt.conArm && p.n ? '이대로 쓸게요' : '단축권 자동 사용';   // 2.3.0 이름(지섭)
+    setT($('#conAllLbl'), rt.conArm && p.n ? '이대로 쓸게요' : '단축권 자동 사용');   // 2.3.0 이름(지섭)
     $('#conFree').hidden = !(S.tier >= 1 && conFreeLeft(k));
-    if (!$('#conFree').hidden) { $('#conFreeTx').textContent = `즉시 완공 (오늘 ${ffLeft()}번 남음)`; $('#conFree .n').textContent = ffLeft(); }   // 3.0.0 학교 전체 하루 3번
-    { const c = conEssCost(left); $('#conEssCost').innerHTML = `${ESS_ICON()}<b>${c}</b>`; $('#conEss').setAttribute('aria-disabled', S.ess >= c ? 'false' : 'true'); }
+    if (!$('#conFree').hidden) { setT($('#conFreeTx'), `즉시 완공 (오늘 ${ffLeft()}번 남음)`); setT($('#conFree .n'), ffLeft()); }   // 3.0.0 학교 전체 하루 3번
+    { const c = conEssCost(left); setH($('#conEssCost'), `${ESS_ICON()}<b>${c}</b>`); $('#conEss').setAttribute('aria-disabled', S.ess >= c ? 'false' : 'true'); }
     $('#conNo').hidden = !(rt.conArm && p.n);
-    $('#conPlan').textContent = !p.n ? '시간 단축권이 없어요. 광고를 보거나 문방구에서 살 수 있어요'
-      : p.left ? `${tkPlanText(p)}을 써서 ${hm(p.cut)} 줄이고 ${hm(p.left)} 남아요` : `${tkPlanText(p)}을 써서 바로 끝나요`;
+    setT($('#conPlan'), !p.n ? '시간 단축권이 없어요. 광고를 보거나 문방구에서 살 수 있어요'
+      : p.left ? `${tkPlanText(p)}을 써서 ${hm(p.cut)} 줄이고 ${hm(p.left)} 남아요` : `${tkPlanText(p)}을 써서 바로 끝나요`);
     const arm = rt.conArm && p.n;   // 2.1.2 바로 줄이기를 누르면 쓸 권을 표시해요
-    $('#conTks').innerHTML = TK.slice().reverse().map(t => `<button type="button" class="con-tk${rt.conPick === t.k ? ' armed' : ''}${arm && p.use[t.k] ? ' plan' : ''}" data-tk="${t.k}" aria-disabled="${S.tk[t.k] > 0 ? 'false' : 'true'}">${IMG('ticket_' + t.k) ? `<img src="${IMG('ticket_' + t.k)}" alt="">` : '⌛'}<span>${t.name}</span><b>${fmt(S.tk[t.k])}장</b>${arm && p.use[t.k] ? `<em class="use">−${p.use[t.k]}장</em>` : ''}</button>`).join('');
+    setH($('#conTks'), TK.slice().reverse().map(t => `<button type="button" class="con-tk${rt.conPick === t.k ? ' armed' : ''}${arm && p.use[t.k] ? ' plan' : ''}" data-tk="${t.k}" aria-disabled="${S.tk[t.k] > 0 ? 'false' : 'true'}">${IMG('ticket_' + t.k) ? `<img src="${IMG('ticket_' + t.k)}" alt="">` : '⌛'}<span>${t.name}</span><b>${fmt(S.tk[t.k])}장</b>${arm && p.use[t.k] ? `<em class="use">−${p.use[t.k]}장</em>` : ''}</button>`).join(''));
     cbSheet();   // 2.1.1 건설 가속
     const al = tkAdLeft();
     $('#conAd').setAttribute('aria-disabled', al > 0 ? 'false' : 'true');
-    $('#conAd').textContent = al > 0 ? `광고 보고 5분권 ${TKAD.n}장 받기 (오늘 ${al}번 남음)` : '오늘 광고 단축권을 다 받았어요';
+    setT($('#conAd'), al > 0 ? `광고 보고 5분권 ${TKAD.n}장 받기 (오늘 ${al}번 남음)` : '오늘 광고 단축권을 다 받았어요');
   }
 
   /* ---------- 선생님 ---------- */
@@ -11321,7 +11333,7 @@ body.cam-scene #ffChip,body.cam-scene #tierDots,body.cam-scene #plChip{opacity:0
        forest/rank/<내 id>   랭킹 이름과 학교 점수
        forest/stats/<내 id>  테스트 현황 (어디까지 했는지, 얼마나 했는지)
      <내 id>는 Firebase 익명 로그인이 기기(브라우저)마다 만들어 줘요. */
-  const VERSION = '3.2.0';
+  const VERSION = '3.2.1';
   const NT_QUIET = ['2.1.20', '2.1.2.2', '2.3.0.1', '2.3.4'];   // 2.3.0.1도 공지 창 없이(공지는 그대로 2.3.0). 2.3.4도 조용히(지섭 결정)
     // 2.1.20 지섭 결정: 이 버전들은 업데이트해도 공지 창을 띄우지 않아요(공지는 그대로 2.1.2)
   /* 2.0.0 공지사항 (2026-10-27 지섭, 1.8.0은 이미 올려서 2.0.0부터): 설정 > 공지사항. 맨 위가 가장 새 공지예요.
@@ -13300,19 +13312,21 @@ body.cam-scene #ffChip,body.cam-scene #tierDots,body.cam-scene #plChip{opacity:0
     const g = $('#nightG'); if (!g || !S) return;
     const bought = !!(S.cos && S.cos.night && S.cos.own.includes(NIGHT_KEY));
     const hsN = S.tier >= NSL.tier && geoIdx() === 3 && rt.viewTier == null && isNight();   // 3.0.0 고등학교부터 밤(20~6시)이면 저절로(A안)
-    const on = bought || hsN;
+    const on = bought || hsN, look = hsN ? (S.nl || 0) : 0;   // 3.2.1 고등학교 밤 모습(0 밤, 1 저녁, 2 밝게)
     map.classList.toggle('hs-night', hsN);
+    map.classList.toggle('nl-light', hsN && look === 2);
     // 2.3.0 창문 불빛 조각(작업지시서 42): 건물 그림마다 glow_ 조각이 있으면 같은 자리에 겹치고, 없으면 예전처럼 둥근 빛
     const gk = k => seasonKey(bldImg(k)).replace(/^bld_/, 'glow_').replace(/^glow_dorm_on/, 'glow_dorm');   // 3.0.0 기숙사 불빛은 glow_dorm(_winter)
-    const ks = on ? Object.keys(FAC).filter(k => S.f[k] >= 1 && bpos(k) && geo().lot[k] && (k !== 'playground' || IMG(gk(k)))) : [];
-    const key = on ? geoIdx() + '|' + hsN + '|' + (hsN && S.f.dorm >= 1) + '|' + ks.map(k => k + ':' + gk(k)).join() : '';
+    // 3.2.1 지섭 제보: 공사 중(비계)인 건물에는 창문 불빛을 켜지 않아요. 밝게 보기에서는 불빛과 밤하늘 없이 학생만 기숙사에
+    const ks = on && look < 2 ? Object.keys(FAC).filter(k => S.f[k] >= 1 && !conOn(k) && bpos(k) && geo().lot[k] && (k !== 'playground' || IMG(gk(k)))) : [];
+    const key = on ? geoIdx() + '|' + hsN + '|' + look + '|' + (hsN && S.f.dorm >= 1) + '|' + ks.map(k => k + ':' + gk(k)).join() : '';
     if (!force && g.dataset.key === key) return;
     g.dataset.key = key;
     if (!on) { g.innerHTML = ''; return; }
     g.innerHTML = '<defs><radialGradient id="nmGlow"><stop offset="0" stop-color="#FFE29A" stop-opacity=".95"/><stop offset=".55" stop-color="#FFD36B" stop-opacity=".35"/><stop offset="1" stop-color="#FFD36B" stop-opacity="0"/></radialGradient></defs>' +
       (hsN ? nsSleepers() : '') +
-      '<rect x="-300" y="-300" width="960" height="1020" fill="#141C3E" opacity=".46"/>' +   // 2.3.0 multiply는 지도 그림(svg 밖)과 섞이지 않아 거의 안 어두워져서 그냥 덮어요
-      '<g class="nb-src">' + (geoIdx() === 3 && IMG('night_sky') ? `<image href="${IMG('night_sky')}" x="0" y="${MAP_Y}" width="${MAP_W}" height="${MAP_H}" preserveAspectRatio="none"/>` : '') +   // 3.0.0 달, 별, 반딧불(고등학교 지도만)
+      (look === 2 ? '' : `<rect x="-300" y="-300" width="960" height="1020" fill="#141C3E" opacity="${look === 1 ? '.24' : '.46'}"/>`) +   // 2.3.0 multiply는 지도 그림(svg 밖)과 섞이지 않아 거의 안 어두워져서 그냥 덮어요
+      '<g class="nb-src">' + (look < 2 && geoIdx() === 3 && IMG('night_sky') ? `<image href="${IMG('night_sky')}" x="0" y="${MAP_Y}" width="${MAP_W}" height="${MAP_H}" preserveAspectRatio="none"/>` : '') +   // 3.0.0 달, 별, 반딧불(고등학교 지도만)
       ks.map(k => { const gi = IMG(gk(k)); if (gi) { const [bx, by, bw] = lotRect(geo().lot[k], seasonKey(bldImg(k))); return `<image href="${gi}" x="${(bx - bw / 2).toFixed(1)}" y="${(by - bw / 2).toFixed(1)}" width="${bw.toFixed(1)}" height="${bw.toFixed(1)}"/>`; }
         const [cx, cy, w] = bpos(k); return `<ellipse cx="${cx.toFixed(1)}" cy="${(cy - w * 0.3).toFixed(1)}" rx="${(w * 0.42).toFixed(1)}" ry="${(w * 0.3).toFixed(1)}" fill="url(#nmGlow)" style="mix-blend-mode:screen"/>`; }).join('') + '</g>';
     nightBake(g, key);
@@ -15103,17 +15117,17 @@ body.cam-scene #ffChip,body.cam-scene #tierDots,body.cam-scene #plChip{opacity:0
     if (sp) {
       const f = frOf(sp), done = frToday(f);
       row.dataset.sp = sp;
-      $('#sheetFriendIc').innerHTML = kidAvatar(sp);
-      $('#sheetFriendNm').innerHTML = `${esc(frFull(sp))}<span class="fr-mini" aria-label="하트 ${frHeart(f.p)}칸">${heartsHTML(f.p)}</span>`;
-      $('#sheetFriendTx').textContent = frLineDay(sp, k);
-      $('#sheetFriendGo').textContent = done ? '♥ 오늘 했어요' : '쓰다듬기';
+      setH($('#sheetFriendIc'), kidAvatar(sp));
+      setH($('#sheetFriendNm'), `${esc(frFull(sp))}<span class="fr-mini" aria-label="하트 ${frHeart(f.p)}칸">${heartsHTML(f.p)}</span>`);
+      setT($('#sheetFriendTx'), frLineDay(sp, k));
+      setT($('#sheetFriendGo'), done ? '♥ 오늘 했어요' : '쓰다듬기');
       row.setAttribute('aria-label', `${frFull(sp)}, ${done ? '오늘 쓰다듬었어요' : '눌러서 쓰다듬기'}`);
     }
     const br = $('#sheetBday'), bp = bdParty(), bOn = !!bp && bdPlace() === k && !bdDoneToday();
     br.hidden = !bOn;
     if (bOn) {
-      $('#sheetBdayIc').innerHTML = IMG('bday_cake') ? `<img src="${IMG('bday_cake')}" alt="">` : '🎂';
-      $('#sheetBdayTx').textContent = bp.fr ? `오늘은 ${frFull(bp.sp)}의 생일이에요!` : `오늘은 반 친구 ${spName(bp.sp)} ${bp.nm}의 생일이에요!`;
+      setH($('#sheetBdayIc'), IMG('bday_cake') ? `<img src="${IMG('bday_cake')}" alt="">` : '🎂');
+      setT($('#sheetBdayTx'), bp.fr ? `오늘은 ${frFull(bp.sp)}의 생일이에요!` : `오늘은 반 친구 ${spName(bp.sp)} ${bp.nm}의 생일이에요!`);
       br.classList.add('todo');
     }
   }
@@ -16772,16 +16786,31 @@ body.cam-scene #ffChip,body.cam-scene #tierDots,body.cam-scene #plChip{opacity:0
     return stageKey('bld_' + k, n, 2) || BLD_IMG[k];
   }
   const viewMap = () => rt.viewTier == null ? decoMap() : geoIdx(rt.viewTier);
+  // 3.2.1 지섭 요청: 고등학교 밤(20~6시)에도 밝기를 고를 수 있어요. 학생은 그대로 기숙사에서 쉬어요
+  const NL_NAME = ['밤', '저녁', '밝게'], NL_EM = ['🌙', '🌆', '☀️'];
+  function nlCycle() {
+    S.nl = ((S.nl || 0) + 1) % 3; sfx('tap'); save();
+    renderNight(true); renderTierDots();
+    toast(S.nl === 2 ? '밤에도 밝게 보여요.\n학생들은 그대로 기숙사에서 쉬어요' : S.nl === 1 ? '밤 화면을 조금 어둡게 보여요' : '밤 화면을 어둡게 보여요');
+  }
+  // 3.2.1 날씨 칩이 가운데에 있어서 좁은 화면이나 밤 모습 단추가 있을 때 학교급 단추와 겹쳤어요. 학교급 단추 오른쪽에 붙여요
+  function wxPlace() {
+    const c = $('#wxChip'), d = $('#tierDots'); if (!c) return;
+    if (c.hidden || !d || d.hidden || !d.offsetWidth) { c.style.left = ''; c.style.transform = ''; return; }
+    c.style.left = (d.offsetLeft + d.offsetWidth + 6) + 'px'; c.style.transform = 'none';
+  }
   function renderTierDots() {
     const box = $('#tierDots'); if (!box || !S) return;
     box.hidden = S.tier < 1 || rt.tab !== 'school' || !!rt.decoEdit;
-    const key = [S.tier, rt.viewTier].join('|');
+    const nlOn = !!map && map.classList.contains('hs-night') && rt.viewTier == null;   // 3.2.1 고등학교 밤 모습 단추
+    const key = [S.tier, rt.viewTier, nlOn, S.nl || 0, box.hidden].join('|');
     if (box.dataset.key === key) return; box.dataset.key = key;
+    setTimeout(wxPlace, 0);
     box.innerHTML = TIER_SHORT.map((c, t) => {
       const cur = t === S.tier, past = t < S.tier, on = rt.viewTier === t || (rt.viewTier == null && cur);
       return `<button type="button" class="td${cur ? ' cur' : ''}${past ? ' past' : ''}${on ? ' on' : ''}${t > S.tier ? ' lock' : ''}" data-td="${t}" aria-label="${TIER_ALL[t]}${cur ? ', 지금 학교' : past ? ', 그때 모습 보기' : ', 아직 못 가요'}"${t > S.tier ? ' aria-disabled="true"' : ''}>` +
         (t > S.tier ? '<svg viewBox="0 0 16 16" aria-hidden="true"><path d="M5 7V5.6a3 3 0 0 1 6 0V7M4.4 7h7.2v6H4.4z" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linejoin="round"/></svg>' : c) + '</button>';
-    }).join('');
+    }).join('') + (nlOn ? `<button type="button" class="td nl" data-nl="1" aria-label="밤 화면 밝기: ${NL_NAME[S.nl || 0]}, 눌러서 바꾸기">${NL_EM[S.nl || 0]}</button>` : '');
   }
   function tierViewOpen(t) {
     if (t === S.tier || t == null) { tierViewClose(); return; }
@@ -16943,7 +16972,10 @@ body.cam-scene #ffChip,body.cam-scene #tierDots,body.cam-scene #plChip{opacity:0
      돌아오면 도토리(수업료 2시간치), 숲의 정수, 그곳 기념품(지도 장식), 앨범에 사진 한 쪽. 숫자는 본부 제안 ===== */
   const tr2Key = () => `${S.tier}-${S.tg}`;
   const tr2Open = () => !!S && !!S.tr2 && S.tier >= TR2.tier;
-  const tr2Away = () => !!(S && S.tr2 && S.tr2.cur && S.tr2.cur.st === 'go' && gameNow() < S.tr2.cur.back);
+  const tr2Away = () => !!(S && S.tr2 && S.tr2.cur && S.tr2.cur.st === 'go' && gameNow() >= (S.tr2.cur.dep || 0) && gameNow() < S.tr2.cur.back);
+  // 3.2.1 지섭 요청: 출발 시간(6~17시) 밖에서도 미리 골라 사진까지 찍으면 다음 아침 6시에 떠나요(야간 자율학습 예약처럼)
+  const tr2Rsv = () => !!(S && S.tr2 && S.tr2.cur && S.tr2.cur.st === 'go' && gameNow() < (S.tr2.cur.dep || 0));
+  const tr2NextDep = () => { const t = gameNow(), h = kstHour(t); return t + Math.round(((TR2.h0 - h + 24) % 24) * 3600000); };
   const tr2Ready = () => !!(S && S.tr2 && S.tr2.cur && S.tr2.cur.st === 'go' && gameNow() >= S.tr2.cur.back);
   const tr2Day = () => { const h = kstHour(gameNow()); return h >= TR2.h0 && h < TR2.h1; };
   const tr2Placed = () => S.deco.lay.reduce((a, L) => a + L.filter(x => typeof x === 'string' && x.startsWith('sv2_')).length, 0);
@@ -16959,8 +16991,9 @@ body.cam-scene #ffChip,body.cam-scene #tierDots,body.cam-scene #plChip{opacity:0
     if (u && typeof u === 'object' && TR2_BY[u.pl] && /^\d-\d$/.test(u.k)) {
       const pk = (Array.isArray(u.pk) ? u.pk : []).filter(v => v === 0 || v === 1).slice(0, 3);
       const st = u.st === 'go' ? 'go' : pk.length >= 3 ? 'photo' : 'pick';
-      s.tr2.cur = { pl: u.pl, k: u.k, st, pk, start: n(u.start), back: n(u.back), kids: (Array.isArray(u.kids) ? u.kids : []).filter(sp => DEX_STUDENTS.includes(sp)).slice(0, 11) };
+      s.tr2.cur = { pl: u.pl, k: u.k, st, pk, start: n(u.start), back: n(u.back), dep: st === 'go' ? n(u.dep) : 0, kids: (Array.isArray(u.kids) ? u.kids : []).filter(sp => DEX_STUDENTS.includes(sp)).slice(0, 11) };   // 3.2.1 dep: 예약한 출발 시각
       if (st === 'go' && !(s.tr2.cur.back > 0)) s.tr2.cur.back = Date.now();
+      if (s.tr2.cur.dep > s.tr2.cur.back) s.tr2.cur.dep = 0;
     }
   }
   // 단체 사진: 그곳 배경 앞에 두 줄로 서요(뒷줄 5, 앞줄 6). 고른 둘째 활동에 따라 소품이 달라요
@@ -16976,12 +17009,12 @@ body.cam-scene #ffChip,body.cam-scene #tierDots,body.cam-scene #plChip{opacity:0
     const b = $('#btnTr2'); if (!b) return;
     const cur = S.tr2 && S.tr2.cur, on = tr2Open() && (!!cur || !S.tr2.done[tr2Key()]);
     b.hidden = !on; if (!on) return;
-    const txt = !cur ? '출발' : cur.st !== 'go' ? '여행 중' : tr2Ready() ? '도착!' : hms(Math.max(0, cur.back - gameNow()));
+    const txt = !cur ? (tr2Day() ? '출발' : '예약') : cur.st !== 'go' ? '여행 중' : tr2Rsv() ? '6시 출발' : tr2Ready() ? '도착!' : hms(Math.max(0, cur.back - gameNow()));
     if (rt.tr2Txt !== txt) { rt.tr2Txt = txt; $('#tr2N').textContent = txt; b.classList.toggle('ready', !cur || tr2Ready() || cur.st !== 'go'); b.setAttribute('aria-label', `수학여행, ${txt}`); }
     if (!$('#tr2Ic').firstChild && IMG('ic_trip2')) $('#tr2Ic').innerHTML = `<img src="${IMG('ic_trip2')}" alt="">`;
     if (rt.modalOpen === $('#mTr2') && cur && cur.st === 'go') {
-      if (rt.tr2View !== (tr2Ready() ? 'back' : 'go')) renderTr2();
-      else if (!tr2Ready()) { const L = $('#tr2Left'); if (L) L.textContent = `${hms(cur.back - gameNow())} 남았어요`; }
+      if (rt.tr2View !== (tr2Ready() ? 'back' : tr2Rsv() ? 'rsv' : 'go')) renderTr2();
+      else if (!tr2Ready()) { const L = $('#tr2Left'); if (L) L.textContent = tr2Rsv() ? `떠나기까지 ${hms(cur.dep - gameNow())}` : `${hms(cur.back - gameNow())} 남았어요`; }
     }
   }
   // 지도에서 학생을 숨기는 표시(고등학교 밤과 같은 방식)
@@ -16999,13 +17032,13 @@ body.cam-scene #ffChip,body.cam-scene #tierDots,body.cam-scene #plChip{opacity:0
   function renderTr2() {
     const T = S.tr2, cur = T.cur, P = cur && TR2_BY[cur.pl];
     let h = rt.tr2Msg ? `<p class="tr-got">${esc(rt.tr2Msg)}</p>` : '';
-    rt.tr2View = !cur ? 'idle' : cur.st === 'go' ? (tr2Ready() ? 'back' : 'go') : cur.st;
+    rt.tr2View = !cur ? 'idle' : cur.st === 'go' ? (tr2Ready() ? 'back' : tr2Rsv() ? 'rsv' : 'go') : cur.st;
     if (!cur) {
       const used = !!T.done[tr2Key()];
       h += `<p class="tr-lead">${used ? `${yearNo()}학년 수학여행은 다녀왔어요. 다음 학년에 또 떠나요.` : '학년마다 한 번 떠나는 수학여행이에요. 들를 곳 세 군데에서 하고 싶은 활동을 고르고, 마지막에 단체 사진을 찍어요.'}\n학생들이 ${TR2.hours}시간 동안 떠나 있어도 수업료는 그대로 들어와요.</p>`;
-      if (!used && !tr2Day()) h += '<p class="fine">수학여행은 아침 6시부터 오후 5시 사이에 출발해요(밤 자율학습과 겹치지 않게).</p>';
+      if (!used && !tr2Day()) h += '<p class="fine">지금은 출발 시간(아침 6시~오후 5시)이 아니에요. 미리 골라 단체 사진까지 찍어 두면 아침 6시에 떠나도록 예약돼요.</p>';
       h += '<div class="tr2-list">' + TR2_PL.map(Q => {
-        const got = Q.souv.filter(v => T.souv.includes(v[0])).length, can = !used && tr2Day() && !S.trip.cur && !festBusy();
+        const got = Q.souv.filter(v => T.souv.includes(v[0])).length, can = !used && !S.trip.cur && !festBusy();
         return `<button class="tr2-pl" type="button" data-tr2="p:${Q.id}"${can ? '' : ' aria-disabled="true"'} style="--tc:${Q.c}">` +
           (IMG(Q.img) ? `<img src="${IMG(Q.img)}" alt="">` : '') + `<b>${Q.name}</b><span>${Q.say}</span><small>기념품 ${got}/3</small></button>`;
       }).join('') + '</div>';
@@ -17018,6 +17051,9 @@ body.cam-scene #ffChip,body.cam-scene #tierDots,body.cam-scene #plChip{opacity:0
     } else if (cur.st === 'photo') {
       h += `<p class="tr-lead">${P.name}에서 단체 사진을 찍어요. 모두 웃어요!</p>` + tr2Photo(cur.pl, cur.pk, cur.kids) +
         `<div class="btn-row"><button class="cta" type="button" data-tr2="snap">찰칵!</button></div>`;
+    } else if (tr2Rsv()) {   // 3.2.1 예약
+      h += tr2Photo(cur.pl, cur.pk, cur.kids, 'small') + `<p class="tr-left" id="tr2Left">떠나기까지 ${hms(cur.dep - gameNow())}</p>` +
+        `<p class="fine">${P.name} 수학여행을 예약했어요. 아침 ${TR2.h0}시에 떠나서 ${TR2.h0 + TR2.hours}시에 돌아와요. 떠나기 전까지는 학교 행사, 체험학습, 진로 상담을 그대로 할 수 있어요.</p>`;
     } else if (!tr2Ready()) {
       const left = cur.back - gameNow();
       h += tr2Photo(cur.pl, cur.pk, cur.kids, 'small') + `<p class="tr-left" id="tr2Left">${hms(left)} 남았어요</p>` +
@@ -17039,7 +17075,6 @@ body.cam-scene #ffChip,body.cam-scene #tierDots,body.cam-scene #plChip{opacity:0
     if (v.startsWith('p:')) {
       const P = TR2_BY[v.slice(2)];
       if (!P || cur || T.done[tr2Key()]) return;
-      if (!tr2Day()) { toast('수학여행은 아침 6시부터 오후 5시 사이에 출발해요'); return; }
       if (S.trip.cur) { toast('체험학습 간 친구들이 돌아오면 떠날 수 있어요'); return; }
       if (festBusy()) return;
       // 사진에 설 학생: 명부(고등학교) 학생 종류를 먼저, 모자라면 학교 동물 종류를 돌려 가며(최대 11명)
@@ -17067,12 +17102,13 @@ body.cam-scene #ffChip,body.cam-scene #tierDots,body.cam-scene #plChip{opacity:0
         const subj = new Set(cur.pk.map((j, i) => P.stops[i].acts[j][1]));
         for (const x of S.roster.list) if (Array.isArray(x.jc) && x.jo.length < 3 && x.jc.some(j => subj.has(AB_KEY[JOBS[j].ab]))) { x.ji = Math.round((x.ji + 1) * 100) / 100; opened += csOpenCards(x).length; }
       }
-      cur.st = 'go'; cur.back = gameNow() + TR2.hours * 3600000;
+      const dep = tr2Day() ? 0 : tr2NextDep();   // 3.2.1 출발 시간 밖이면 다음 아침 6시에 떠나요
+      cur.st = 'go'; cur.dep = dep; cur.back = (dep || gameNow()) + TR2.hours * 3600000;
       sfx('done'); buzz(15);
-      rt.tr2Msg = `찰칵! 멋진 사진이 나왔어요. 학생들은 ${TR2.hours}시간 뒤에 돌아와요.` + (opened ? `\n여행 덕분에 진로 카드가 ${opened}장 열렸어요!` : '');
+      rt.tr2Msg = (dep ? `찰칵! 수학여행을 예약했어요. 아침 ${TR2.h0}시에 떠나서 ${TR2.h0 + TR2.hours}시에 돌아와요.` : `찰칵! 멋진 사진이 나왔어요. 학생들은 ${TR2.hours}시간 뒤에 돌아와요.`) + (opened ? `\n여행 덕분에 진로 카드가 ${opened}장 열렸어요!` : '');
       rt.tr2Txt = ''; save(); tr2Tick(); renderTr2(); renderTr2Btn(); syncKids(false); return;
     }
-    if (v.startsWith('t:') && cur.st === 'go' && !tr2Ready()) {
+    if (v.startsWith('t:') && cur.st === 'go' && !tr2Ready() && !tr2Rsv()) {
       const t = TK.find(x => x.k === v.slice(2)); if (!t || S.tk[t.k] < 1) return;
       S.tk[t.k] -= 1; S.st.tkUsed = (S.st.tkUsed || 0) + 1; cur.back -= t.sec * 1000;
       sfx('tap'); rt.tr2Txt = ''; save(); tr2Tick(); renderTr2(); renderTr2Btn(); return;
@@ -20381,7 +20417,7 @@ body.cam-scene #ffChip,body.cam-scene #tierDots,body.cam-scene #plChip{opacity:0
         if (rt.dropT >= iv) { rt.dropT = 0; if (rt.drops.length < CFG.maxDrops) spawnDrop(); }
       }
       syncKids(false);
-      if (!(rt.sheetAnimTo > now)) updateKids(dt, now);   // 3.0.0 건물 창이 올라오는 0.3초 동안은 쉬어요
+      if (!(rt.sheetAnimTo > now) && !rt.sheetKey) updateKids(dt, now);   // 3.0.0 건물 창이 올라오는 0.3초 동안은 쉬어요   // 3.2.1 창이 열려 있는 동안 계속 쉬어요(지도 학생은 그 자리에 서 있어요)
       updateDrops(now);
       updateTalk(dt);
       updateBoostWin(dt);
@@ -20546,7 +20582,7 @@ body.cam-scene #ffChip,body.cam-scene #tierDots,body.cam-scene #plChip{opacity:0
     $('#seatOut').addEventListener('click', () => { if (rt.seatStudent != null) clubSet(rt.seatStudent, -1); closeModal($('#mSeat')); renderClub(); questChanged(); });
     $('#seatClose').addEventListener('click', () => closeModal($('#mSeat')));
     $('#mSeat .backdrop').addEventListener('click', () => closeModal($('#mSeat')));
-    $('#tierDots').addEventListener('click', e => { const b = e.target.closest('[data-td]'); if (!b) return; const t = +b.dataset.td; if (t > S.tier) { shake(b); toast(`${TIER_ALL[t]}는 아직 갈 수 없어요`); return; } if (t === S.tier) tierViewClose(); else tierViewOpen(t); });
+    $('#tierDots').addEventListener('click', e => { if (e.target.closest('[data-nl]')) { nlCycle(); return; } const b = e.target.closest('[data-td]'); if (!b) return; const t = +b.dataset.td; if (t > S.tier) { shake(b); toast(`${TIER_ALL[t]}는 아직 갈 수 없어요`); return; } if (t === S.tier) tierViewClose(); else tierViewOpen(t); });
     $('#tvBack').addEventListener('click', () => { sfx('tap'); tierViewClose(); });
     $('#wxChip').addEventListener('click', () => { const k = wxOf(); if (k) { sfx('tap'); toast(`${WX[k].em} ${WX[k].tip}`); } });   // 2.1.3 날씨
     $('#tvEdit').addEventListener('click', () => { sfx('tap'); rt.viewEdit = !rt.viewEdit; renderTierView(true); if (!rt.viewEdit) save(); });
@@ -21711,7 +21747,7 @@ body.cam-scene #ffChip,body.cam-scene #tierDots,body.cam-scene #plChip{opacity:0
       }
     }
     fx.hidden = !k || rt.viewTier != null;
-    chip.hidden = !show;
+    if (chip.hidden !== !show) { chip.hidden = !show; wxPlace(); }   // 3.2.1 학교급 단추 옆에
     if (show && chip.dataset.k !== k) { chip.dataset.k = k; chip.innerHTML = `<span aria-hidden="true">${WX[k].em}</span>${WX[k].name} 오는 날`.replace('안개 오는 날', '안개 낀 날'); }
     // 그날 처음 홈을 볼 때 한 번 알려 줘요
     if (show && S.wx !== gameToday() && !rt.modalOpen) { S.wx = gameToday(); save(); setTimeout(() => toast(`${WX[k].em} 오늘은 ${k === 'fog' ? '안개가 꼈어요' : WX[k].name + '가 와요'}.\n${WX[k].tip}`), 600); }
@@ -23151,11 +23187,11 @@ body.cam-scene #ffChip,body.cam-scene #tierDots,body.cam-scene #plChip{opacity:0
     LAB, LAB_IN, LAB_KEYS, LAB_CARDS, LAB_MIX, LAB_DBL, labOf, labRun, labCount, labReady, labDone, openLab, renderLab, labTap, labGo, RD, BOOKS, rdStart, rdSettle, rdTick, rdLeft, rdRemain, openRead, renderRead, renderStudy2, sanitizeStudy2, maintSync, maintTap, openBook, renderBook, BT, BT_EV, BT_LG, BT_SCH, btOpen, btLeft, btRoster, btBest, btMake, btScore, btWin, btFinish, btOpenScene, btClose, btRankDoc, BT_RANK, readRow, btAuto, btPick, btStart, btRender, renderBtCard, sanitizeBt, get btUI() { return btUI; }, EX, exIsWeek, exNow, exPrev, exDays, exScore, exGrade, exStudy, exClaim, exTick, exMake, openExam, renderExam, exAwardTop, exReportReady, sanitizeExam, renderSheet, openSheet,   // 2.0.1 공부 2단계(s76)
     AC, AC_GAME, AB_KEY, ABIL, acLv, acSum, acMult, acRepOf, acGain, acSettle, acAll, acCap, acBkLeft, acBuyBook, renderAc, sanitizeAc, freshAc, rankRows, awayStart, awaySettle, timeSrc, save, awayHold, rankCap, cloudVerify, liveApply, liveLoad, openNotice, NOTICES, get Live() { return Live; }, get Rank() { return Rank; }, liveOff,   // 2.0.0 보안 점검 시험(s71), Codex 검토 시험(s72)
     rosterEnsure, rosterMake, rosterAdd, clubAuto, clubSet, clubPct, clubShow, clubSum, clubStars, clubMembers, clubShowGo, showReady, showWait, showDay, clubWeekTick, clubFacUp, CLUBS, CLUB, star, clubTuitionMult, clubFestMult, clubDecoOff, renderClub, renderHall, openSeatPick, openClubPick,
-    TIER_SCALE, legacyMult, tuitionMult, snapTake, snapOf, tierViewOpen, tierViewClose, renderTierView, renderTierDots, viewMap, showNewTalk, talkNext, showCere, cereEnd, cereCrew, cereAsk, cereKeep, goFur, updateQuestDot, openElect, renderElect, elVote, elSync, elMult, elClub, elPres, elBadge, elMake, EL_PLEDGES, clubPct, festPrize, dropValue, claimMission, gameWeek, NEWCOMERS, TIERS, GEO, geoIdx, decoCost0, qMeasure, qDone, qGoal, kidArt: kidSVG, newYear, checkGrade, gradeOf, townRep, FAC, sanitize200, trialHunt, updateTrial, TRIAL, zoomAt, fitMap, ZOOM_MAX, DECO, DECO_SLOTS, DECO_SIGN, decoCost, decoSoldOut, pickDeco, buyDeco, decoPut, decoEditStart, decoEditEnd, openDecoPick, renderDeco, setSchoolNm, setMark, schoolTitle, markHTML, decoPlacedAll, esExLeft, esExCost, get Cloud() { return Cloud; }, get actx() { return actx; }, Music, musicSync, ensureAudio, bgmLoad, pzUI, rt, makeDeal, furStage, DEAL, navInfo, navRoute, spawnDrop, repTipCheck, linkGoogle, retryCloud, sanitize, acctPending, renderMap, renderHUD, renderAffordance, syncKids, layoutMap, geo, hitTrial, endVisit, showReward, recommend, needCost, prepTopUp, qReward, prepPhase, rankScore, pwOf, previewDip, dipMult, costScale, buyFur, buyFurAll, furCost, furReady, furDone, FUR, startTalk, endTalk, teacherAct, facCost, teaCost, facKeys, rate, rep, capacity, canGraduate, canPromote,
+    TIER_SCALE, legacyMult, tuitionMult, snapTake, snapOf, tierViewOpen, tierViewClose, renderTierView, renderTierDots, nlCycle, viewMap, showNewTalk, talkNext, showCere, cereEnd, cereCrew, cereAsk, cereKeep, goFur, updateQuestDot, openElect, renderElect, elVote, elSync, elMult, elClub, elPres, elBadge, elMake, EL_PLEDGES, clubPct, festPrize, dropValue, claimMission, gameWeek, NEWCOMERS, TIERS, GEO, geoIdx, decoCost0, qMeasure, qDone, qGoal, kidArt: kidSVG, newYear, checkGrade, gradeOf, townRep, FAC, sanitize200, trialHunt, updateTrial, TRIAL, zoomAt, fitMap, ZOOM_MAX, DECO, DECO_SLOTS, DECO_SIGN, decoCost, decoSoldOut, pickDeco, buyDeco, decoPut, decoEditStart, decoEditEnd, openDecoPick, renderDeco, setSchoolNm, setMark, schoolTitle, markHTML, decoPlacedAll, esExLeft, esExCost, get Cloud() { return Cloud; }, get actx() { return actx; }, Music, musicSync, ensureAudio, bgmLoad, pzUI, rt, makeDeal, furStage, DEAL, navInfo, navRoute, spawnDrop, repTipCheck, linkGoogle, retryCloud, sanitize, acctPending, renderMap, renderHUD, renderAffordance, syncKids, layoutMap, geo, hitTrial, endVisit, showReward, recommend, needCost, prepTopUp, qReward, prepPhase, rankScore, pwOf, previewDip, dipMult, costScale, buyFur, buyFurAll, furCost, furReady, furDone, FUR, startTalk, endTalk, teacherAct, facCost, teaCost, facKeys, rate, rep, capacity, canGraduate, canPromote,
     fmt, fmt2, graduate, promote, buyPerk, perkCost, perkMaxed, buyFundPerk, fpCost, claimMain, mainReady, curMain, qNo, earn, CFG, TEA, teaMaxed, PERKS, FPERKS, MAIN, finalYear, startTrip, claimTrip, TRIPS, yearLocked, endSports, rtSports: () => rt.sports, rtFest: () => rt.fest, facCap, addLeague, addMP, tutStart, endFest, claimBox, musicWant, askBox, festWait, setTab,
     RARE, rareRoll, rareGot, showRareTalk, rareDexHTML, kidSVG, rosterKid, WX, wxOf, wxIs, rdMinNow, renderWeather, PL, plSync, plUnread, openPLetter, renderPLetter, RS, rsNum, rsSync, rsAdd, rsLabel, lookDoc, lookRead, lookPush, lookSet, openLook, MODEL_SCHOOL, joinRank, PS, PS_M, PS_SEASONS, psSeason, psOpen, psSync, psLv, psGot, psReward, psClaimAll, psClaimMission, psWatchAd, psClaimable, psStepReady, psExtraReady, psChooseFur, psFurImg, renderPass, setEvSeg, xtGot, achTitles,   // 2.1.3 숲속 패스
     dexMeet, dexSync, dexPending, dexGift, renderDex, evCurrent, evNext, evUpcoming, evSync, evFix, evVal, EV_FALLBACK, EV_DECO, EV_HAT, COS, DECO_BY, decoOwn, perkRec, fpRec, BOOST_ALL, buyShop, pickShop, showNote, showOkOn, showWd, renderGradPanel, renderShop, renderDecoShop, EV_WEEKLY, EV_WEEK_BASE, weekMon, claimStamp, claimEvMission, claimEvBox, renderEvent, evMissions, evOk, evSkipped, EV_MONTHS, EV_MEASURE, tierMinutes, minAcorns, IMG, sanitize171, ACH, achSync, claimAch, setTitle, renderAch, setDexSeg, achClaimable, XT, xtAct, xtCost, xtLv, feastMins, libMult, propInstances, walkBuild, festItemSvg, guestArt, adErrText, googleErrText, openSheet, closeSheet, startFest, startSports, sanitize170, EV_STAMPS, EV_SPECIAL, EV_MONTHLY, EV_BOX, DEX_KEYS, DEX_REWARD, DEX_GUEST_KEYS, seasonKey, roofArtKey, oakKey, setSeasonArt, VP, vpLv, vpCost, vpMult, vpAct, renderVpCard, sportsPrize, festPrize, renderTeachers, buildTeacherCards, bldImg, roofKey, bldStage, mapKey, setMapArt, applyThemes, buyFacility, bldFx, setBldFx, mapHi, Live, liveApply, liveLoad, liveOff, LIVE_KEYS, EVC, NOTICES, openNotice, noticeAuto, noticeWant, ntUnread, startTrial, endTrial: () => rt.trial && (rt.trial.left = 0), spawnDeal, startVisit, IMG170, MG, mgCells, mgSetCells, mgTick, mgAddEnergy, mgAddUp, mgTapGen, mgDrop, mgSell, mgUpgrade, mgAddUp, mgUpSwap, mgGensMax, MG_UP_ESS, mgClaimOrder, mgSwapOrder, mgOrderOk, mgFillOrders, mgOpen, mgClose, mgRenderAll, mgSpawnLevel, mgNearestEmpty, mgEmptyBoard, mgOrderReward, mgUI, sanitize180, mgWatchAd, mgNewOrder, mgHintPick, mgShowHint, mgClearHint, mgTouch, mgOrderGuide, mgDexN, mgDexCan, mgDexClaim, mgOpenDex, MG_DEX, MG_DEX_MS, mgDexEss, mgDexEssCan, mgDexEssN, mgDexMsCan, mgDexMsClaim, MGB, mgBuyBoost, mgBstLeft, mgOpenBoost, nice, claimMission, claimBonus, claimWeekMission, MP_BOX, swapDaily, repairMissions, MISSIONS, WMISSIONS, dmDay, wkWeek,   // 1.7.0 도감, 이벤트
-    PZ, PZ_SHAPES, pzFits, pzAnyFit, pzStuck, pzFullLines, pzPlace, pzFreshGame, pzStart, PZB, pzbCost, pzApplyBoost, pzBoostOpen, pzBoostGo, festGoldLeft, festGoldTake, claimSports, TR2, TR2_PL, openTr2, tr2Act, tr2Away, tr2Ready, tr2Tick, renderAlbum, FEST, FEST_IDS, festNight, festShown, festTimeLock, festOpen, startFest, openFest, endFest, renderStreet, pzFinish, pzLeft, pzCanAd, pzEssOf, pzMinOf, pzHelpSquirrel, pzHelpOwl, pzHelpBear, fillSubs, mapRoofTop, showAd, claimOfflineDouble, startBoost, tripAd, festFocus, festRange, visMap, renderMissions, pzHasHelp, pzRot, pzNewPiece, pzOpen, pzClose, pzGameOver, pzRenderAll, renderMini, addEss, ESHOP, SP_FUR, applyCos, essItem, pickEss, buyEss, renderEssShop, hatSVG, spFurImg, gameNow, gameToday, gameWeek, kstDay, setServerTime, SVR, dmDay, weekIdx, lgWeek, wkWeek, lgKey, pzDay, goldDay, boostLeft, dealLeft, canStamp };
+    PZ, PZ_SHAPES, pzFits, pzAnyFit, pzStuck, pzFullLines, pzPlace, pzFreshGame, pzStart, PZB, pzbCost, pzApplyBoost, pzBoostOpen, pzBoostGo, festGoldLeft, festGoldTake, claimSports, TR2, TR2_PL, openTr2, tr2Act, tr2Away, tr2Ready, tr2Rsv, tr2Tick, renderAlbum, FEST, FEST_IDS, festNight, festShown, festTimeLock, festOpen, startFest, openFest, endFest, renderStreet, pzFinish, pzLeft, pzCanAd, pzEssOf, pzMinOf, pzHelpSquirrel, pzHelpOwl, pzHelpBear, fillSubs, mapRoofTop, showAd, claimOfflineDouble, startBoost, tripAd, festFocus, festRange, visMap, renderMissions, pzHasHelp, pzRot, pzNewPiece, pzOpen, pzClose, pzGameOver, pzRenderAll, renderMini, addEss, ESHOP, SP_FUR, applyCos, essItem, pickEss, buyEss, renderEssShop, hatSVG, spFurImg, gameNow, gameToday, gameWeek, kstDay, setServerTime, SVR, dmDay, weekIdx, lgWeek, wkWeek, lgKey, pzDay, goldDay, boostLeft, dealLeft, canStamp };
   if (window.__FOREST_TEST) Object.assign(window.__forest, { tripUseTicket, readUseTicket, picnicUseTicket, buyDecoPieces, adGold, claimBonus, cloudPush, cloudClash, syncGet, revOf, deleteAccount, lookDel: () => lookDelNow(), lookSet, lookPush, leaveRank, sanitizeCg, freshCg });   // 시험 손잡이
   if (window.claude && window.claude.hot && window.claude.hot.snapshot) {
     try { window.claude.hot.snapshot(() => { if (S) syncMid(); return { save: S }; }); } catch (e) { /* 무시 */ }
