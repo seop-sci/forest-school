@@ -54,6 +54,23 @@ jobs:
           if [ -n "$ANDROID_KEYSTORE_PATH" ]; then T="bundleRelease assembleRelease"; else T="assembleDebug"; fi
           set -o pipefail
           ./gradlew --no-daemon --stacktrace $T 2>&1 | tee "$RUNNER_TEMP/build.log"
+      - name: 출시 파일 점검 기록 (광고 SDK 실제 버전, 권한, 디버그 여부, 서명)
+        # 보안 보강(2026-11-06): 빌드 성공만으로는 서명과 권한을 확인한 게 아니라서, 실제 결과물을 읽어 실행 요약에 남겨요. 실패해도 빌드는 그대로예요
+        if: success()
+        continue-on-error: true
+        working-directory: app/android
+        run: |
+          S="$GITHUB_STEP_SUMMARY"
+          echo "## 출시 파일 점검" >> "$S"
+          echo '### 광고 SDK 실제 버전 (25.4.+ 같은 범위가 무엇으로 풀렸는지)' >> "$S"
+          ./gradlew --no-daemon -q :app:dependencies --configuration releaseRuntimeClasspath 2>/dev/null | grep -E "play-services-ads|user-messaging-platform" | sort -u | head -8 | sed 's/^/    /' >> "$S" || true
+          BT=$(ls -d "$ANDROID_HOME"/build-tools/* | sort -V | tail -1)
+          APK=$(ls app/build/outputs/apk/release/*.apk 2>/dev/null | head -1)
+          [ -z "$APK" ] && APK=$(ls app/build/outputs/apk/debug/*.apk 2>/dev/null | head -1)
+          echo "### $APK" >> "$S"
+          "$BT/aapt2" dump badging "$APK" 2>/dev/null | grep -E "^package:|uses-permission|application-debuggable|targetSdkVersion" | sed 's/^/    /' >> "$S" || true
+          echo "debuggable 줄이 없으면 디버그가 꺼진 출시판이에요" >> "$S"
+          "$BT/apksigner" verify --print-certs "$APK" 2>/dev/null | grep -E "Signer #1 certificate (DN|SHA-256)" | sed 's/^/    /' >> "$S" || true
       - name: 실패하면 까닭 보여 주기
         if: failure()
         run: |
