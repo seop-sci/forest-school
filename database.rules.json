@@ -97,7 +97,7 @@
             ".validate": "newData.isString() && newData.val().length >= 1 && newData.val().length <= 12 && newData.val().matches(/^[a-z]+$/)"
           },
           "week": {
-            ".validate": "newData.isNumber() && (newData.val() === -1 || (newData.val() * 604800000 <= (now + 32400000 - 1767571200000) + 604800000 && newData.val() * 604800000 >= (now + 32400000 - 1767571200000) - 1209600000))"
+            ".validate": "newData.isNumber() && (newData.val() === -1 || (newData.val() % 1 === 0 && newData.val() * 604800000 <= (now + 32400000 - 1767571200000) + 60000 && newData.val() * 604800000 >= (now + 32400000 - 1767571200000) - 1209600000))"
           },
           "lp": {
             ".validate": "newData.isNumber() && newData.val() >= 0 && newData.val() <= 999999 && newData.val() <= (data.exists() && data.parent().child('week').val() === newData.parent().child('week').val() ? data.val() : 0) + (data.parent().child('at').isNumber() ? ((now - data.parent().child('at').val() >= 10000 ? 1000 : 0) + (now - data.parent().child('at').val()) / 10000) : 1000)"

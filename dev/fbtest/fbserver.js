@@ -44,6 +44,8 @@ function handle(b) {
     if (b.q && b.q.order) pairs.sort((x, y) => ((x[1] || {})[b.q.order] ?? -Infinity) - ((y[1] || {})[b.q.order] ?? -Infinity) || (x[0] < y[0] ? -1 : 1));
     else pairs.sort((x, y) => (x[0] < y[0] ? -1 : 1));
     if (b.q && Object.hasOwn(b.q, 'equal')) pairs = pairs.filter(([, v]) => v && v[b.q.order] === b.q.equal);
+    if (b.q && Object.hasOwn(b.q, 'start')) pairs = pairs.filter(([, v]) => v && v[b.q.order] >= b.q.start);   // 보안 보강: 이번 주 범위 조회(startAt, endAt)
+    if (b.q && Object.hasOwn(b.q, 'end')) pairs = pairs.filter(([, v]) => v && v[b.q.order] <= b.q.end);
     if (b.q && b.q.last) pairs = pairs.slice(-b.q.last);
     return { ok: true, val: v, pairs };
   }

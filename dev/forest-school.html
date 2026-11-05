@@ -12146,10 +12146,17 @@ body.cam-scene #ffChip,body.cam-scene #tierDots,body.cam-scene #plChip{opacity:0
         return () => q.off('value', cb);
       },
       listenWeek: (ok, no) => {
-        const q = ref.orderByChild('ws').limitToLast(RANK_MAX + 10);
+        // 보안 보강(2026-11-06 Codex 검토 1절): ws 위에서부터 받으면 다음 주로 쓴 줄이 조회 한도를 먼저 차지해 이번 주 기록이 밀려났어요.
+        // 시즌처럼 이번 주 범위(주 × 1,000,000 ~ +999,999)만 받고, 주가 바뀌면 다시 붙어요. 조회 개수는 그대로예요
+        let q = null, wk = null;
         const cb = snap => { const out = []; snap.forEach(ch => { out.push([ch.key, ch.val()]); }); ok(out.reverse()); };
-        q.on('value', cb, no);
-        return () => q.off('value', cb);
+        const sync = () => {
+          const next = weekIdx(); if (next === wk) return;
+          if (q) q.off('value', cb);
+          wk = next; q = ref.orderByChild('ws').startAt(wk * 1000000).endAt(wk * 1000000 + 999999).limitToLast(RANK_MAX + 10); q.on('value', cb, no);
+        };
+        sync(); const timer = setInterval(sync, 30000);
+        return () => { clearInterval(timer); if (q) q.off('value', cb); };
       },
       listenBt: (ok, no) => {   // 2.0.1 대결 순위(서버 규칙 indexOn bt)
         const q = ref.orderByChild('bt').limitToLast(RANK_MAX + 10);
@@ -12240,7 +12247,7 @@ body.cam-scene #ffChip,body.cam-scene #tierDots,body.cam-scene #plChip{opacity:0
     if (!isFinite(score) || score < 0 || !name) return null;
     const at = typeof d.at === 'number' ? d.at : (Date.parse(d.at) || 0);
     return { id, name, score: Math.floor(score), tier: Number(d.tier) | 0, year: Number(d.year) | 0, test: !!d.test, at,
-      pid: typeof d.pid === 'string' ? d.pid.slice(0, 16) : '', week: Number(d.week) | 0, lp: Math.max(0, Math.floor(Number(d.lp) || 0)),
+      pid: typeof d.pid === 'string' ? d.pid.slice(0, 16) : '', week: Number.isInteger(d.week) ? d.week : -2 /* 보안 보강: 소수 주를 정수로 바꿔 이번 주로 세지 않아요 */, lp: Math.max(0, Math.floor(Number(d.lp) || 0)),
       title: typeof d.title === 'string' && achTitleName(d.title) ? d.title : '',   // 2.1.3 업적 말고 받는 칭호도
       bt: typeof d.bt === 'number' && isFinite(d.bt) ? Math.max(1000, Math.min(9999, Math.floor(d.bt))) : 0, btm: typeof d.btm === 'number' ? Math.max(0, Math.min(5, Math.floor(d.btm))) : 0, btq: typeof d.btq === 'number' && isFinite(d.btq) ? d.btq : null, sem: d.sem === 0 || d.sem === 1 ? d.sem : null,
       sk: Math.max(0, Math.floor(Number(d.sk) || 0)), sp: Math.max(0, Math.min(1e9, Math.floor(Number(d.sp) || 0))) };   // 2.0.1 대결, 2.1.1 학기, 2.1.3 랭킹 시즌
