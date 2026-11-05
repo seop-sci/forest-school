@@ -396,7 +396,7 @@ button{font:inherit;color:inherit}
 .tr-sec{font-family:var(--font-display);font-size:10px;fill:#FFFFFF;stroke:#2A2520;stroke-width:2.4;paint-order:stroke}
 .trial.hawk .tr-body{animation:hawkFlap .5s ease-in-out infinite alternate;transform-origin:0 0}
 /* 2.3.1 침입자 액션(작업지시서 44): 그림이 있으면 날갯짓은 그림이 바꿔요 */
-.trial .tr-body:has(.tr-im){animation:none}
+.trial .tr-body.has-im{animation:none}   /* 보안 보강 판 끊김: :has()는 화면이 조금만 바뀌어도 휴대폰이 모든 칸을 다시 따져서 class로 바꿨어요 */
 .trial.trl-flash .tr-im{animation:trlFlash .2s ease-out}
 @keyframes trlFlash{0%{filter:drop-shadow(0 0 4px #ff4a3a) brightness(1.4) saturate(1.5)}100%{filter:none}}
 .trial.trl-angry .tr-im{filter:drop-shadow(0 0 3px rgba(255,80,40,.85))}
@@ -977,7 +977,7 @@ html.ait .app{padding-top:calc(10px + var(--ait-top, 0px));padding-bottom:var(--
 .sr-score{margin:0 0 6px;font-family:var(--font-chalk);font-weight:700;font-size:22px}
 .sp-wait{color:var(--chip-ink)}
 .trip-modal{text-align:left;max-height:calc(100dvh - 32px);overflow-y:auto;overscroll-behavior:contain}
-.trip-modal .tr-row, .trip-modal .tr-row *{text-align:left}
+.trip-modal .tr-row, .trip-modal .tr-row > *, .trip-modal .tr-row > * > *{text-align:left}
 .tr-got{margin:0 0 10px;padding:10px 12px;border-radius:12px;background:var(--chip-bg);color:var(--chip-ink);font-size:13.5px;line-height:1.5;text-align:center}
 .trip-modal h2{text-align:center}
 .tr-lead{margin:0 0 10px;font-size:14px;line-height:1.55;color:var(--muted)}
@@ -989,7 +989,7 @@ html.ait .app{padding-top:calc(10px + var(--ait-top, 0px));padding-bottom:var(--
 .trip-prop{pointer-events:none;transform-box:fill-box}.trip-prop.wave{transform-origin:15% 95%;animation:tripWave .5s ease-in-out infinite alternate}.trip-prop.float{transform-origin:50% 100%;animation:tripFloat 1.6s ease-in-out infinite alternate}
 @keyframes tripWave{from{transform:rotate(-18deg)}to{transform:rotate(14deg)}}@keyframes tripFloat{from{transform:translateY(0) rotate(-4deg)}to{transform:translateY(-2px) rotate(4deg)}}
 @media (prefers-reduced-motion:reduce){.trip-prop.wave,.trip-prop.float{animation:none}}
-.tr-ic .tr-dest{width:100%;height:100%;object-fit:cover;border-radius:inherit}.tr-ic:has(.tr-dest){width:62px;height:44px;overflow:hidden}.tr-ic.big:has(.tr-dest){width:96px;height:64px}   /* 3.0.0 목적지 그림 */
+.tr-ic .tr-dest{width:100%;height:100%;object-fit:cover;border-radius:inherit}.tr-ic.has-dest{width:62px;height:44px;overflow:hidden}.tr-ic.big.has-dest{width:96px;height:64px}   /* 3.0.0 목적지 그림 */
 .tr-head{height:110px;margin:-4px -4px 10px;border-radius:14px;background:center/cover no-repeat}
 .sv .sv-img{width:34px;height:34px;object-fit:contain}
 .tr-ic.big{width:64px;height:64px;border-radius:18px}
@@ -1929,7 +1929,7 @@ body{background:radial-gradient(120% 60% at 50% 0%, color-mix(in srgb, var(--pap
 .app.on-school .home-qcard .q-fold{position:absolute;z-index:2;right:6px;top:6px;margin:0;width:40px;height:40px;border-radius:12px;background:color-mix(in srgb, var(--home-paper-edge) 28%, var(--home-paper));border:1px solid var(--home-paper-edge);color:var(--home-ink)}
 .app.on-school .home-qcard .q-fold svg{width:20px;height:20px;transform:rotate(-90deg)}
 .app.on-school .home-qcard .qrow.folded .q-fold svg{transform:rotate(90deg)}
-.app.on-school .home-qcard:has(.qrow.folded){width:fit-content;min-width:150px;max-width:calc(100% - 68px)}
+.app.on-school .home-qcard.q-folded{width:fit-content;min-width:150px;max-width:calc(100% - 68px)}
 .app.on-school .home-qcard .qrow.folded{width:auto}
 .app.on-school .home-qcard .qrow.folded .quest{grid-template-columns:auto;grid-template-areas:"top";width:auto;padding:8px 10px 8px 10px}
 .app.on-school .home-qcard .qrow.folded .q-txt{display:contents}
@@ -2046,7 +2046,7 @@ body{background:radial-gradient(120% 60% at 50% 0%, color-mix(in srgb, var(--pap
 .app.on-school .map-right .sidebtn + .sidebtn{border-top:0}
 .app.on-school .map-right .sidebtn .sb-lb{font-size:10px}
 .app.on-school .map-right .sidebtn .sb-ring{border-radius:50%}
-.app.on-school .map-right .sidebtn:has(.dot:not([hidden])) .sb-ring{box-shadow:0 0 0 2px var(--home-gold)}
+.app.on-school .map-right .sidebtn .dot:not([hidden]) + .sb-ring{box-shadow:0 0 0 2px var(--home-gold)}
 /* 5) 지도 가운데 막: 밝은 화면은 크림색, 어두운 화면은 짙은 숲색(지도를 덜 밝히게) */
 #map .mc-s0{stop-color:#FFF9E9;stop-opacity:.08}
 #map .mc-s1{stop-color:#FFF9E9;stop-opacity:.04}
@@ -2265,6 +2265,7 @@ body.wl-on .toast{z-index:300}
 @keyframes wxSnow{0%{transform:translate(0,0)}50%{transform:translate(var(--dx,0),24vh)}100%{transform:translate(0,48vh);opacity:0}}   /* 하늘 쪽만 내려와요 */
 .wx-fx.wx-fog{background:linear-gradient(180deg,rgba(245,248,250,.46),rgba(245,248,250,.2) 45%,rgba(245,248,250,0));animation:wxFog 9s ease-in-out infinite alternate}
 @keyframes wxFog{from{opacity:.75}to{opacity:1}}
+.wx-chip.off{opacity:.62}.wx-chip.off::after{content:'끔';margin-left:4px;font-size:11px;color:#7A8790}
 .wx-chip{position:absolute;left:50%;transform:translateX(-50%);bottom:calc(var(--bot-h, 70px) + 12px);z-index:6;display:flex;align-items:center;gap:4px;padding:3px 10px;border:0;border-radius:999px;background:rgba(255,249,233,.88);color:#3A4A5A;font:inherit;font-size:12px;box-shadow:0 1px 3px rgba(20,40,20,.25);cursor:pointer}
 @media (prefers-reduced-motion:reduce){.wx-fx,.wx-fx::before,.wx-fx i{animation:none!important}}
 /* 2.1.3 다른 학교 구경과 예시 학교 */
@@ -2444,7 +2445,7 @@ body.wl-on .toast{z-index:300}
 .tier-dots .td.cur{border-color:#3E7E4A;box-shadow:0 0 0 2px #3E7E4A inset}
 .tier-dots .td.on{background:#3E7E4A;color:#FFF9E9}
 .tier-dots .td.lock{opacity:.55;cursor:default}
-body.sheet-open :is(#map, .map-left, .map-right, #qCard, .wx-fx, #tierDots, #ffChip, #plChip, #wxChip), body.sheet-open :is(#map, .map-left, .map-right, #qCard, .wx-fx, #tierDots, #ffChip, #plChip, #wxChip) *, body.sheet-open .wx-fx::before{animation-play-state:paused!important}   /* 3.2.1 건물 창이 열려 있으면 뒤 움직임을 멈춰요 */
+body.sheet-open #map, body.sheet-open .wx-fx::before, body.sheet-open .wx-fx i, body.sheet-open .map-left, body.sheet-open .map-right{animation-play-state:paused!important}   /* 3.2.1 건물 창이 열려 있으면 뒤 움직임을 멈춰요 */
 .tier-dots .td.nl{margin-left:3px;border-color:#6F6AA8;background:#2E2F58;font-size:13px;line-height:1}   /* 3.2.1 고등학교 밤 모습 */
 .tier-dots .td svg{width:13px;height:13px}
 .tier-view{position:absolute;inset:0;z-index:5;background:#3E6B3A var(--map-bg,none) center/cover no-repeat}
@@ -2502,10 +2503,10 @@ body.sheet-open :is(#map, .map-left, .map-right, #qCard, .wx-fx, #tierDots, #ffC
 @keyframes c2Flash{0%{opacity:0}30%{opacity:.85}100%{opacity:0}}
 @keyframes c2Frame{0%{opacity:0;transform:scale(1.08)}100%{opacity:1;transform:none}}
 @media (prefers-reduced-motion: reduce){.c2-fade,.c2-pop,.c2-walk,.c2-frame{animation:none}.c2-curl,.c2-curr,.c2-fw,.c2-petal,.c2-bal,.c2-flash,.c2-tw{display:none}}
-.overlay.cere.ask .cere-svg *{animation-play-state:paused}
+
 @keyframes cereStar{0%,100%{transform:scale(.8);opacity:.6}50%{transform:scale(1.15);opacity:1}}
 @media (prefers-reduced-motion: reduce){.cere-h,.cere-sub,.cere-kid,.cere-cap,.cere-star{animation:none}.cere-cf{display:none}}
-.overlay.cere.ask .cere-h,.overlay.cere.ask .cere-sub,.overlay.cere.ask .cere-svg *{animation-play-state:paused}
+.overlay.cere.ask .cere-h,.overlay.cere.ask .cere-sub{animation-play-state:paused}   /* 그림 속 움직임은 cerePause()가 멈춰요(모든 칸을 따지는 * 규칙을 뺐어요) */
 .overlay.cere.ask .cere-skip{visibility:hidden}
 /* 2.0.1 반장 선거 */
 .el-modal{max-width:380px;padding:0 0 16px;overflow:hidden}
@@ -2616,7 +2617,7 @@ body.sheet-open :is(#map, .map-left, .map-right, #qCard, .wx-fx, #tierDots, #ffC
 .lab-bench{display:flex;align-items:center;justify-content:center;gap:10px;padding:0 12px}
 .lab-slot-btn{flex:none;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:2px;width:78px;height:84px;border:2px dashed var(--line);border-radius:14px;background:var(--card);color:var(--ink);font:inherit;cursor:pointer}
 .lab-slot-btn b{font-size:24px;color:var(--muted);font-weight:400}.lab-slot-btn small{font-size:11px;color:var(--muted);line-height:1.2;word-break:keep-all;text-align:center}
-.lab-slot-btn:has(img){border-style:solid;border-color:#7FB069}
+.lab-slot-btn.has-img{border-style:solid;border-color:#7FB069}
 .lab-flask{position:relative;flex:none;width:104px;height:104px}
 .lab-flask .lab-fl{position:absolute;inset:0;width:100%;height:100%;object-fit:contain;z-index:2}
 .lab-flask .lab-liq{position:absolute;left:24%;right:24%;bottom:14%;height:34%;border-radius:0 0 40% 40%/0 0 60% 60%;opacity:.75;z-index:1;transition:background .3s}
@@ -2726,7 +2727,7 @@ span.bt-stamp{display:grid;place-items:center;border-radius:50%;border:3px solid
 @keyframes btStamp{from{transform:scale(1.8);opacity:0}to{transform:scale(1);opacity:1}}
 .bt-cheer{display:flex;flex-direction:column;align-items:center;gap:2px;min-height:48px;padding:6px 16px;border-radius:14px;background:rgba(44,74,61,.86);font-size:14px;text-align:center}.bt-cheer b{font-size:16px;color:#FFE9A8}
 .bt-line{display:flex;gap:6px}.bt-line i{display:grid;place-items:center;width:30px;height:30px;border-radius:50%;background:rgba(255,255,255,.85)}.bt-line i.w{box-shadow:0 0 0 3px #F3C04B}.bt-line i.l{opacity:.55}
-.bt *{-webkit-tap-highlight-color:transparent;-webkit-user-select:none;user-select:none;-webkit-touch-callout:none}
+.bt, .bt > *, .bt button{-webkit-tap-highlight-color:transparent;-webkit-user-select:none;user-select:none;-webkit-touch-callout:none}
 .bt-play{touch-action:manipulation}
 .bt-play-ev:empty,.bt-cheer:empty,.bt-line:empty{visibility:hidden}
 .bt-duel:not(.live) .bt-bar i{transition:width .7s cubic-bezier(.2,.8,.3,1)}
@@ -3318,10 +3319,10 @@ body.cam-scene #ffChip,body.cam-scene #tierDots,body.cam-scene #plChip{opacity:0
       </div>
       <div class="map-right">
         <button class="ui-fold side-fold" id="foldR" type="button" data-fold="r" aria-expanded="true" aria-label="오른쪽 메뉴 접기"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M6 15l6-6 6 6" fill="none" stroke="currentColor" stroke-width="2.6" stroke-linecap="round" stroke-linejoin="round"/></svg><i class="dot" hidden></i></button>
-        <button class="tab sidebtn" type="button" data-tab="quests" aria-selected="false" aria-label="퀘스트 전체 보기"><span class="sb-ring"><span class="tic" data-ic="ic_ui_quest" aria-hidden="true"></span></span><span class="sb-lb">퀘스트</span><span class="dot" id="qDot" hidden></span></button>
+        <button class="tab sidebtn" type="button" data-tab="quests" aria-selected="false" aria-label="퀘스트 전체 보기"><span class="dot" id="qDot" hidden></span><span class="sb-ring"><span class="tic" data-ic="ic_ui_quest" aria-hidden="true"></span></span><span class="sb-lb">퀘스트</span></button>
         <button class="tab sidebtn" type="button" data-tab="rank" aria-selected="false" aria-label="랭킹"><span class="sb-ring"><span class="tic" data-ic="ic_rank" aria-hidden="true"></span></span><span class="sb-lb">랭킹</span></button>
-        <button class="tab sidebtn" type="button" data-tab="dex" aria-selected="false" aria-label="동물 도감"><span class="sb-ring"><span class="tic" data-ic="ic_book" aria-hidden="true"></span></span><span class="sb-lb">도감</span><span class="dot" id="dexDot" hidden></span></button><!-- 1.7.0 -->
-        <button class="tab sidebtn" type="button" data-tab="event" aria-selected="false" aria-label="이벤트"><span class="sb-ring"><span class="tic" data-ic="ic_event" aria-hidden="true"></span></span><span class="sb-lb">이벤트</span><span class="dot" id="evDot" hidden></span></button><!-- 1.7.0 -->
+        <button class="tab sidebtn" type="button" data-tab="dex" aria-selected="false" aria-label="동물 도감"><span class="dot" id="dexDot" hidden></span><span class="sb-ring"><span class="tic" data-ic="ic_book" aria-hidden="true"></span></span><span class="sb-lb">도감</span></button><!-- 1.7.0 -->
+        <button class="tab sidebtn" type="button" data-tab="event" aria-selected="false" aria-label="이벤트"><span class="dot" id="evDot" hidden></span><span class="sb-ring"><span class="tic" data-ic="ic_event" aria-hidden="true"></span></span><span class="sb-lb">이벤트</span></button><!-- 1.7.0 -->
       </div>
       <!-- 까치 핫딜은 엄지가 닿기 쉬운 오른쪽 아래. 건물과 떨어진 도토리를 가리지 않아요 -->
       <button class="deal" id="btnDeal" type="button" hidden><span class="d-av" id="dealIc" aria-hidden="true"></span><span class="d-txt">까치 핫딜<span class="d-time" id="dealTime">2:00</span></span></button>
@@ -6733,6 +6734,7 @@ body.cam-scene #ffChip,body.cam-scene #tierDots,body.cam-scene #plChip{opacity:0
     awx: 0,   // 2.1.0 자리 비운 보상 2배 부스터: 다음 받기에 2배(남은 번 수)
     deco: freshDeco(),   // 1.7.4 꾸미기: own 가진 장식 수, lay 지도별 자리(유치원, 초등학교)마다 놓인 장식 id, nm 학교 이름 앞부분('' = 숲속), mk 학교 마크 [모양, 문양, 바탕 색, 문양 색] 또는 null   // 1.6.0 정수 상점: 오늘 산 도토리 묶음 수, 이번 주 산 황금 도토리 묶음 수
     cs: freshCs(),
+    wxOff: 0,   // 날씨 효과 끄기(칩을 눌러 켜고 꺼요)
     nl: 0,   // 3.2.1 고등학교 밤 모습: 0 밤(어둡게), 1 저녁(조금 어둡게), 2 밝게(지섭 요청, 보이는 모습만 바뀌고 밤 규칙은 그대로)
     tr2: freshTr2(),   // 3.2.0 수학여행: 다녀온 학년, 지금 여행, 떠난 수, 돌아온 수, 기념품   // 3.1.0 진로 상담: 오늘 날짜와 횟수, 모든 상담 수, 진로를 고른 수, 이룬 학생 수, 정산한 명부 번호, 진로 도감
     roster: freshRoster(), club: freshClub(), el: freshEl(), snap: {}, tfp: 0,   // 2.0.1 el: 반장 선거
@@ -6941,6 +6943,7 @@ body.cam-scene #ffChip,body.cam-scene #tierDots,body.cam-scene #plChip{opacity:0
     sanitizeBx(d, s);   // 2.2.0 숲속 생물 탐사
     sanitizeCg(d, s);   // 2.2.0 동아리 대항전
     s.wx = typeof d.wx === 'string' ? d.wx.slice(0, 10) : '';   // 2.1.3 날씨 알림 본 날
+    s.wxOff = d.wxOff ? 1 : 0;   // 보안 보강 판(2026-11-06 지섭): 날씨 칩을 눌러 비, 눈, 안개 효과 끄기(날씨 자체와 보너스는 그대로)
     { const P = d.pl && typeof d.pl === 'object' ? d.pl : {}, got = Math.max(0, Math.min(PL.list.length, Math.floor(Number(P.got) || 0))); s.pl = { got, read: Math.max(0, Math.min(got, Math.floor(Number(P.read) || 0))), wk: Math.floor(Number(P.wk)) || -1 }; }   // 2.1.3 학부모 편지
     { const R = d.rs && typeof d.rs === 'object' ? d.rs : {}, n = (v, hi) => Math.max(0, Math.min(hi, Math.floor(Number(v) || 0))); s.rs = { n: n(R.n, 1e4), p: n(R.p, 1e9), pos: n(R.pos, 1e4), king: n(R.king, 1e4) }; }   // 2.1.3 랭킹 시즌
     { const L = d.lk && typeof d.lk === 'object' ? d.lk : {}; s.lk = { on: L.on === true, at: Math.max(0, Math.min(Date.now() + 864e5, Number(L.at) || 0)), h: '', pub: L.pub === true, del: L.del === true }; }   // 2.1.3 내 학교 보여 주기(처음에는 꺼짐)
@@ -8452,7 +8455,7 @@ body.cam-scene #ffChip,body.cam-scene #tierDots,body.cam-scene #plChip{opacity:0
     const nm = kind === 'snake' ? '뱀' : '매';
     g.setAttribute('aria-label', `${iga(nm)} 나타났어요. 여러 번 눌러서 쫓아내요`);
     const need = trialNeed(), art = trlImg(kind === 'snake' ? 'trl_snake_move_1' : 'trl_hawk_up'), w = kind === 'snake' ? 46 : 52;
-    g.innerHTML = `<circle r="34" class="tr-hit"/>` + (art ? `<g class="tr-body"><g class="tr-flip"><image class="tr-im" x="${-w / 2}" y="${-w / 2}" width="${w}" height="${w}" href="${art}"/></g></g>` : `<g transform="scale(1.3)">${guestArt(kind)}</g>`) +
+    g.innerHTML = `<circle r="34" class="tr-hit"/>` + (art ? `<g class="tr-body has-im"><g class="tr-flip"><image class="tr-im" x="${-w / 2}" y="${-w / 2}" width="${w}" height="${w}" href="${art}"/></g></g>` : `<g transform="scale(1.3)">${guestArt(kind)}</g>`) +
       `<g transform="translate(0 -30)"><rect x="-22" y="-4" width="44" height="7" rx="3.5" class="tr-hpbg"/><rect x="-21" y="-3" width="42" height="5" rx="2.5" class="tr-hp"/><text y="-8" text-anchor="middle" class="tr-sec">${TRIAL.time}초</text></g>`;
     layerFx.appendChild(g);
     const sf = trialSafe();
@@ -8901,7 +8904,7 @@ body.cam-scene #ffChip,body.cam-scene #tierDots,body.cam-scene #plChip{opacity:0
     if (document.fonts && document.fonts.ready) document.fonts.ready.then(() => requestAnimationFrame(() => { fitMap(false); renderDeco(true); }));   // 글꼴이 늦게 와서 줄바꿈이 바뀌어도 다시 재요
     $('#qFold').addEventListener('click', () => {
       const r = $('#qRow'), f = !r.classList.contains('folded');
-      r.classList.toggle('folded', f); $('#qFold').setAttribute('aria-expanded', f ? 'false' : 'true');
+      r.classList.toggle('folded', f); $('#qCard').classList.toggle('q-folded', f); $('#qFold').setAttribute('aria-expanded', f ? 'false' : 'true');
       $('#qFold').setAttribute('aria-label', f ? '퀘스트 칸 펼치기' : '퀘스트 칸 접기');
       if (S && S.fold) { S.fold.q = f ? 1 : 0; save(); }
       sfx('tap'); requestAnimationFrame(hudVars);
@@ -8917,7 +8920,7 @@ body.cam-scene #ffChip,body.cam-scene #tierDots,body.cam-scene #plChip{opacity:0
       const el = $(FOLD_EL[k][0]), b = $('#fold' + k.toUpperCase()), f = !!S.fold[k]; if (!el || !b) continue;
       el.classList.toggle('folded', f); b.setAttribute('aria-expanded', f ? 'false' : 'true'); b.setAttribute('aria-label', `${FOLD_EL[k][1]} ${f ? '펼치기' : '접기'}`);
     }
-    const q = $('#qRow'); if (q && q.classList.contains('folded') !== !!S.fold.q) { q.classList.toggle('folded', !!S.fold.q); $('#qFold').setAttribute('aria-expanded', S.fold.q ? 'false' : 'true'); }
+    const q = $('#qRow'); if (q && q.classList.contains('folded') !== !!S.fold.q) { q.classList.toggle('folded', !!S.fold.q); $('#qCard').classList.toggle('q-folded', !!S.fold.q); $('#qFold').setAttribute('aria-expanded', S.fold.q ? 'false' : 'true'); }
     foldDots(); requestAnimationFrame(hudVars);
   }
   function foldDots() {   // 접은 칸 안에 알림 점이 있으면 접기 단추에 점
@@ -14475,6 +14478,7 @@ body.cam-scene #ffChip,body.cam-scene #tierDots,body.cam-scene #plChip{opacity:0
     const done = labDone(), sel = rt.labSel, L = S.lab.last;
     const slot = j => sel[j] >= 0 ? `${labInImg(sel[j], 44)}<small>${LAB_IN[sel[j]].name}</small>` : `<b>+</b><small>재료 ${j + 1}</small>`;
     $('#labSlot0').innerHTML = slot(0); $('#labSlot1').innerHTML = slot(1);
+    for (const id of ['#labSlot0', '#labSlot1']) $(id).classList.toggle('has-img', !!$(id).querySelector('img'));
     $('#labSlot0').setAttribute('aria-disabled', done ? 'true' : 'false'); $('#labSlot1').setAttribute('aria-disabled', done ? 'true' : 'false');
     const fl = IMG('lab_flask'), mx = IMG('lab_mix');
     const tint = sel[0] >= 0 && sel[1] >= 0 ? `linear-gradient(90deg, ${LAB_IN[sel[0]].c}, ${LAB_IN[sel[1]].c})` : sel[0] >= 0 ? LAB_IN[sel[0]].c : sel[1] >= 0 ? LAB_IN[sel[1]].c : 'transparent';
@@ -17091,7 +17095,7 @@ body.cam-scene #ffChip,body.cam-scene #tierDots,body.cam-scene #plChip{opacity:0
       h += '<p class="tr-lead">학생들과 곰 선생님이 다녀오는 동안에도 학교는 그대로 돌아가요. 돌아오면 도토리, 수료증, 그곳 기념품을 가져와요.</p><div class="tr-list">';
       for (const D of TRIPS) {
         const lock = S.st.trips < D.need, got = D.souv.filter((_, i) => S.trip.souv.includes(`${D.id}:${i}`)).length;
-        h += `<div class="tr-row${lock ? ' lock' : ''}"><span class="tr-ic" style="--tc:${D.c}">${tripIcon(D.id)}</span>` +
+        h += `<div class="tr-row${lock ? ' lock' : ''}"><span class="tr-ic${IMG('trip_dest_' + D.id) ? ' has-dest' : ''}" style="--tc:${D.c}">${tripIcon(D.id)}</span>` +
           `<div class="tr-tx"><b>${D.name} <small>${minText(D.min)}</small></b><span>${lock ? `체험학습을 ${D.need}번 다녀오면 열려요` : D.say}</span>` +
           `<span class="tr-meta">${lock ? '' : rw(tripReward(D), 1)}<span class="tr-sv">기념품 ${got}/3</span></span></div>` +
           (lock ? '<span class="tr-lock" aria-hidden="true"><svg viewBox="0 0 24 24"><rect x="5" y="10" width="14" height="10" rx="2" fill="currentColor"/><path d="M8 10V8a4 4 0 0 1 8 0v2" fill="none" stroke="currentColor" stroke-width="2"/></svg></span>'
@@ -17100,7 +17104,7 @@ body.cam-scene #ffChip,body.cam-scene #tierDots,body.cam-scene #plChip{opacity:0
       h += '</div>';
     } else if (!back) {
       const cut = tripCut(T);
-      h += `<div class="tr-now"><span class="tr-ic big" style="--tc:${T.c}">${tripIcon(T.id)}</span><b>${T.name}에 가 있어요</b><span>${T.say}</span></div>` +
+      h += `<div class="tr-now"><span class="tr-ic big${IMG('trip_dest_' + T.id) ? ' has-dest' : ''}" style="--tc:${T.c}">${tripIcon(T.id)}</span><b>${T.name}에 가 있어요</b><span>${T.say}</span></div>` +
         `<div class="tr-bar"><i id="tripBar" style="width:${((1 - tripLeft() / (S.trip.end - S.trip.start)) * 100).toFixed(1)}%"></i></div>` +
         `<p class="tr-left" id="tripLeft">${hms(tripLeft())} 남았어요</p>` +
         `<button class="cta" type="button" id="tripAd">광고 보고 ${minText(cut)} 당기기</button>` +
@@ -17108,7 +17112,7 @@ body.cam-scene #ffChip,body.cam-scene #tierDots,body.cam-scene #plChip{opacity:0
         '<p class="fine">학교를 닫아 두어도 시간은 흘러요. 돌아오면 버스에 \'도착!\'이 떠요.</p>';
     } else {
       const R = tripReward(T);
-      h += `<div class="tr-now"><span class="tr-ic big" style="--tc:${T.c}">${tripIcon(T.id)}</span><b>${T.name}에서 돌아왔어요!</b><span>기념품 하나와 함께 이만큼 가져왔어요</span></div>` +
+      h += `<div class="tr-now"><span class="tr-ic big${IMG('trip_dest_' + T.id) ? ' has-dest' : ''}" style="--tc:${T.c}">${tripIcon(T.id)}</span><b>${T.name}에서 돌아왔어요!</b><span>기념품 하나와 함께 이만큼 가져왔어요</span></div>` +
         `<div class="tr-gift">${rw(R, 1)}</div>` +
         `<div class="btn-row"><button class="cta" type="button" id="tripGet">받기</button></div>`;   // 1.4.0: 광고가 너무 많다는 의견으로 2배 받기를 뺐어요
     }
@@ -19362,7 +19366,7 @@ body.cam-scene #ffChip,body.cam-scene #tierDots,body.cam-scene #plChip{opacity:0
     $('#cereSub').textContent = `이제 ${T.school}에 입학해요!`;
     rt.cereOn = true; rt.cereToasts = [];
     { const tEl = $('#toast'); if (!tEl.hidden) { rt.cereToasts.push(tEl.textContent); tEl.hidden = true; } }   // 식 직전에 뜬 알림도 장면 뒤로
-    m.classList.remove('ask'); $('#cereAsk').hidden = true;
+    m.classList.remove('ask'); $('#cereAsk').hidden = true; cerePause(false);
     openModal(m);
     sfx('bell'); rt.cereRang = true;
     rt.cereAt = performance.now();
@@ -19378,19 +19382,25 @@ body.cam-scene #ffChip,body.cam-scene #tierDots,body.cam-scene #plChip{opacity:0
     rt.cereT2 = setTimeout(() => cereEnd(true), Math.max(300, R.dur - R.used));
   }
   // 2.0.1 장면을 누르면 바로 넘기지 않고 건너뛸지 물어요(지섭)
+  // 묻는 동안 졸업식 그림 속 움직임을 멈췄다가 이어요(멈춘 것만 다시 재생)
+  function cerePause(on) {
+    const sv = document.querySelector('#mCere .cere-svg'); if (!sv || !sv.getAnimations) return;
+    if (on) { rt.cerePaused = sv.getAnimations({ subtree: true }).filter(a => a.playState === 'running'); rt.cerePaused.forEach(a => a.pause()); }
+    else { (rt.cerePaused || []).forEach(a => { try { a.play(); } catch (e) { /* 무시 */ } }); rt.cerePaused = null; }
+  }
   function cereAsk() {
     if (!rt.cereOn || rt.cereAsking) return;
     if (performance.now() - (rt.cereAt || 0) < 350) return;   // 졸업식 창 단추를 누른 손이 바로 묻지 않게
     const R = rt.cereRun; if (R) R.used += performance.now() - R.from;
     clearTimeout(rt.cereT1); clearTimeout(rt.cereT2);
     rt.cereAsking = true;
-    $('#mCere').classList.add('ask'); $('#cereAsk').hidden = false;
+    $('#mCere').classList.add('ask'); $('#cereAsk').hidden = false; cerePause(true);
     sfx('tap');
   }
   function cereKeep() {
     if (!rt.cereAsking) return;
     rt.cereAsking = false;
-    $('#mCere').classList.remove('ask'); $('#cereAsk').hidden = true;
+    $('#mCere').classList.remove('ask'); $('#cereAsk').hidden = true; cerePause(false);
     if (rt.cereRun) rt.cereRun.from = performance.now();
     cereTimers();
   }
@@ -20318,6 +20328,24 @@ body.cam-scene #ffChip,body.cam-scene #tierDots,body.cam-scene #plChip{opacity:0
   }
 
   /* ---------- 게임 루프 ---------- */
+  // 끝없이 도는 CSS 움직임(반딧불, 빛 번짐, 단추 흔들림, 비 등)은 멈춰 두고,
+  // 학생 걸음과 같은 프레임에 시간만 옮겨 줘요. 1초마다 새로 생긴 움직임을 찾아요. 모습은 그대로예요
+  const MAP_DIV = 2;
+  function slowAnimTick(now) {
+    if (!document.getAnimations) return;
+    if (!rt.saAt || now - rt.saAt > 1000) {
+      rt.saAt = now;
+      const keep = [];
+      for (const a of document.getAnimations()) {
+        const e = a.effect, tg = e && e.target; if (!tg || !e.getTiming || e.getTiming().iterations !== Infinity) continue;
+        // 휴대폰 WebView에서는 transform, opacity 움직임도 따로 돌지 못하고 매 프레임 다시 계산하는 경우가 있어서 끝없는 움직임은 모두 같은 프레임에 모아요
+        if (a.playState === 'running' && !a._slow) { a._slow = true; a._t0 = now - (a.currentTime || 0); a.pause(); }
+        if (a._slow && a.playState === 'paused') keep.push(a);
+      }
+      rt.slowAnims = keep;
+    }
+    for (const a of rt.slowAnims || []) { try { a.currentTime = now - a._t0; } catch (er) { /* 지워진 움직임 */ } }
+  }
   function loop(now) {
     const dt = Math.min(1, Math.max(0, (now - rt.lastT) / 1000));
     rt.lastT = now;
@@ -20336,7 +20364,11 @@ body.cam-scene #ffChip,body.cam-scene #tierDots,body.cam-scene #plChip{opacity:0
         if (rt.dropT >= iv) { rt.dropT = 0; if (rt.drops.length < CFG.maxDrops) spawnDrop(); }
       }
       syncKids(false);
-      if (!(rt.sheetAnimTo > now) && !rt.sheetKey) updateKids(dt, now);   // 3.0.0 건물 창이 올라오는 0.3초 동안은 쉬어요   // 3.2.1 창이 열려 있는 동안 계속 쉬어요(지도 학생은 그 자리에 서 있어요)
+      // 보안 보강 판 끊김(2026-11-06 지섭 S26 울트라 제보): 학생 걸음, 지도 속 SVG 움직임, 빛 번짐처럼 휴대폰이 화면 전체를 다시 계산하는 일을
+      // 같은 프레임에 모아 1초에 30번만 해요(MAP_DIV). 바뀌는 프레임이 반으로 줄어요
+      rt.mf = (rt.mf || 0) + 1; rt.kdt = (rt.kdt || 0) + dt;
+      const vis = rt.mf % MAP_DIV === 0;
+      if (vis) { if (!(rt.sheetAnimTo > now) && !rt.sheetKey) updateKids(rt.kdt, now); rt.kdt = 0; slowAnimTick(now); }   // 3.0.0 건물 창이 올라오는 0.3초 동안은 쉬어요   // 3.2.1 창이 열려 있는 동안 계속 쉬어요(지도 학생은 그 자리에 서 있어요)
       updateDrops(now);
       updateTalk(dt);
       updateBoostWin(dt);
@@ -20351,8 +20383,8 @@ body.cam-scene #ffChip,body.cam-scene #tierDots,body.cam-scene #plChip{opacity:0
       nsTick(dt);   // 3.0.0 밤 모습과 야간 자율학습
       if (S.bd && Object.keys(S.bd).length) { conTick(); conRender(false); }   // 2.1.0 공사
       if (S.oak < OAK.max) { S.oak = Math.min(OAK.max, S.oak + dt / OAK.regen); renderOak(); }
-      rt.uiT += dt; if (rt.uiT >= 0.1) { rt.uiT = 0; renderHUD(); }
-      rt.affT += dt; if (rt.affT >= 0.25) { rt.affT = 0; renderAffordance(); repTipCheck(); }
+      rt.uiT += dt; if (rt.uiT >= 0.1 && vis) { rt.uiT = 0; renderHUD(); }   // 글자 바꾸기도 같은 프레임에
+      rt.affT += dt; if (rt.affT >= 0.25 && vis) { rt.affT = 0; renderAffordance(); repTipCheck(); }
     }
     requestAnimationFrame(loop);
   }
@@ -20503,7 +20535,8 @@ body.cam-scene #ffChip,body.cam-scene #tierDots,body.cam-scene #plChip{opacity:0
     $('#mSeat .backdrop').addEventListener('click', () => closeModal($('#mSeat')));
     $('#tierDots').addEventListener('click', e => { if (e.target.closest('[data-nl]')) { nlCycle(); return; } const b = e.target.closest('[data-td]'); if (!b) return; const t = +b.dataset.td; if (t > S.tier) { shake(b); toast(`${TIER_ALL[t]}는 아직 갈 수 없어요`); return; } if (t === S.tier) tierViewClose(); else tierViewOpen(t); });
     $('#tvBack').addEventListener('click', () => { sfx('tap'); tierViewClose(); });
-    $('#wxChip').addEventListener('click', () => { const k = wxOf(); if (k) { sfx('tap'); toast(`${WX[k].em} ${WX[k].tip}`); } });   // 2.1.3 날씨
+    $('#wxChip').addEventListener('click', () => { const k = wxOf(); if (!k) return; sfx('tap'); S.wxOff = S.wxOff ? 0 : 1; save(); renderWeather();   // 2.1.3 날씨, 날씨 효과 켜고 끄기(지섭)
+      toast(`${WX[k].em} ${S.wxOff ? '날씨 효과를 껐어요. 다시 누르면 켜져요' : '날씨 효과를 켰어요'}\n${WX[k].tip}`); });
     $('#tvEdit').addEventListener('click', () => { sfx('tap'); rt.viewEdit = !rt.viewEdit; renderTierView(true); if (!rt.viewEdit) save(); });
     $('#tvMap').addEventListener('click', e => { const h = e.target.closest('[data-tvslot]'); if (h && rt.viewEdit) openDecoPick(+h.dataset.tvslot); });
     $('#mTalk').addEventListener('click', () => talkNext());
@@ -21665,7 +21698,8 @@ body.cam-scene #ffChip,body.cam-scene #tierDots,body.cam-scene #plChip{opacity:0
         fx.appendChild(e);
       }
     }
-    fx.hidden = !k || rt.viewTier != null;
+    fx.hidden = !k || rt.viewTier != null || !!S.wxOff;
+    chip.classList.toggle('off', !!S.wxOff);
     if (chip.hidden !== !show) { chip.hidden = !show; wxPlace(); }   // 3.2.1 학교급 단추 옆에
     if (show && chip.dataset.k !== k) { chip.dataset.k = k; chip.innerHTML = `<span aria-hidden="true">${WX[k].em}</span>${WX[k].name} 오는 날`.replace('안개 오는 날', '안개 낀 날'); }
     // 그날 처음 홈을 볼 때 한 번 알려 줘요
