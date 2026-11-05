@@ -7928,6 +7928,8 @@ body.cam-scene #ffChip,body.cam-scene #tierDots,body.cam-scene #plChip{opacity:0
   };
   // 학생 옷차림은 학교급마다 달라요. 유치원은 노란 모자와 이름표, 초등학교는 책가방과 실내화 주머니
   // 1.5.0: 학생은 그림(PNG). 발은 y 11.5에 닿고, 모자와 목도리 꾸미기는 머리 자리에 겹쳐 그려요
+  // 3.1.2 동물마다 모자와 목 장식 자리(지섭 요청): [머리 꼭대기, 빨간 목수건 윗선] 그림 높이 비율. 그림에서 재고 눈으로 다듬었어요
+  const KID_FIT = { rabbit: [0.209, 0.673], fox: [0.182, 0.609], raccoon: [0.118, 0.55], chick: [0.018, 0.568], bear: [0.059, 0.573], cat: [0.105, 0.577], dog: [0.018, 0.541], penguin: [0.023, 0.518], panda: [0.064, 0.55], koala: [0.168, 0.614], otter: [0.018, 0.527], squirrel: [0.064, 0.523], hamster: [0.014, 0.527], duck: [0.005, 0.523], turtle: [0.0, 0.464], mole: [0.005, 0.505], frog: [0.064, 0.459], waterdeer: [0.141, 0.559], redpanda: [0.082, 0.523], capybara: [0.018, 0.473], kangaroo: [0.177, 0.541] };
   const HEAD_Y = { rabbit: 0.5, fox: 0.36, raccoon: 0.33, chick: 0.34, bear: 0.31, cat: 0.35, dog: 0.32, penguin: 0.3, panda: 0.31, koala: 0.33, otter: 0.33 };
   // 2.0.0 새 전학생 그림(작업지시서 20)이 오기 전에는 그림 문자로 보여 줘요
   const KID_EMOJI = { hamster: '🐹', duck: '🦆', turtle: '🐢', mole: '🐭', frog: '🐸', waterdeer: '🦌' };
@@ -7940,7 +7942,10 @@ body.cam-scene #ffChip,body.cam-scene #tierDots,body.cam-scene #plChip{opacity:0
     return `<ellipse cx="0" cy="11.6" rx="${(w * 0.32).toFixed(1)}" ry="1.6" class="c-shadow"/>` +
       (pic || !KID_EMOJI[sp] ? `<image href="${pic}" x="${(-w / 2).toFixed(2)}" y="${top.toFixed(2)}" width="${w.toFixed(2)}" height="${h.toFixed(2)}"/>`
         : `<text x="0" y="9.5" text-anchor="middle" font-size="15">${KID_EMOJI[sp]}</text>`) +
-      (hat || neck || cap ? `<g transform="translate(0 ${hy.toFixed(2)}) scale(${(r / 6).toFixed(3)})">${neck ? (IMG('cos_neck_' + neck) ? `<image href="${IMG('cos_neck_' + neck)}" x="-6" y="6.2" width="12" height="6"/>` : NECKS[neck] || '') : ''}${cap ? `<g class="cere-cap" style="animation-delay:${cap}s">${GRAD_CAP}</g>` : hat ? hatSVG(hat) : ''}</g>` : '') +
+      (hat || neck || cap ? (() => { const F = KID_FIT[sp], sc = r / 6, s3 = sc.toFixed(3);   // 3.1.2 표가 있으면 동물마다 자리
+        const yh = F ? top + h * (F[0] + 0.2 * (F[1] - F[0])) + 2.6 * sc : hy, yn = F ? top + h * F[1] - 6.4 * sc : hy;
+        return (neck ? `<g transform="translate(0 ${yn.toFixed(2)}) scale(${s3})">${neck ? (IMG('cos_neck_' + neck) ? `<image href="${IMG('cos_neck_' + neck)}" x="-6" y="6.2" width="12" height="6"/>` : NECKS[neck] || '') : ''}</g>` : '') +
+          (cap || hat ? `<g transform="translate(0 ${yh.toFixed(2)}) scale(${s3})">${cap ? `<g class="cere-cap" style="animation-delay:${cap}s">${GRAD_CAP}</g>` : hat ? hatSVG(hat) : ''}</g>` : ''); })() : '') +
       `<g transform="translate(0 ${(top + 4).toFixed(1)})">${nlBadge(sp)}</g>` +
       (rare ? `<g class="rare-spark"><path d="M-8 ${(top + 3).toFixed(1)}l.8 1.8 1.8.8-1.8.8-.8 1.8-.8-1.8-1.8-.8 1.8-.8z"/><path d="M7.5 ${(top + 9).toFixed(1)}l.6 1.3 1.3.6-1.3.6-.6 1.3-.6-1.3-1.3-.6 1.3-.6z"/></g>` : '');
   }
