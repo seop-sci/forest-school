@@ -2253,15 +2253,20 @@ body.wl-on .toast{z-index:300}
 .lt-nav{display:flex;align-items:center;justify-content:center;gap:12px;margin:-4px 0 8px;font-size:13px;color:var(--muted)}
 @media (prefers-reduced-motion:reduce){.pl-chip{animation:none}}
 /* 2.1.3 날씨 */
-.wx-fx{position:absolute;inset:0;z-index:1;pointer-events:none;overflow:hidden;border-radius:15px}   /* 테마 낙엽(fallfx)과 같은 층: 현황판과 탭 아래 */
-.wx-fx.wx-rain{background:repeating-linear-gradient(105deg,rgba(200,225,255,0) 0 14px,rgba(200,225,255,.38) 14px 15px,rgba(200,225,255,0) 15px 31px);background-size:62px 62px;animation:wxRain .55s linear infinite;box-shadow:inset 0 0 0 999px rgba(40,60,90,.12)}
-@keyframes wxRain{to{background-position:-17px 62px}}
+.wx-fx{position:absolute;inset:0;z-index:1;pointer-events:none;overflow:hidden;border-radius:15px;
+  /* 2026-11-06 지섭 요청(보안 보강 판): 비, 눈, 안개는 위쪽 하늘에만 보이고 건물 쪽은 덮지 않아요(아래로 갈수록 옅어져요) */
+  -webkit-mask-image:linear-gradient(180deg,#000 0,#000 34%,transparent 44%);mask-image:linear-gradient(180deg,#000 0,#000 34%,transparent 44%)}   /* 테마 낙엽(fallfx)과 같은 층: 현황판과 탭 아래 */
+.wx-fx.wx-rain{box-shadow:inset 0 0 0 999px rgba(40,60,90,.12)}
+/* 비 줄기는 큰 무늬 한 장을 옮겨서(transform) 휴대폰이 화면을 다시 칠하지 않게 해요(예전에는 무늬 위치를 매 프레임 바꿨어요) */
+.wx-fx.wx-rain::before{content:"";position:absolute;top:-62px;right:-17px;bottom:0;left:0;background:repeating-linear-gradient(105deg,rgba(200,225,255,0) 0 14px,rgba(200,225,255,.38) 14px 15px,rgba(200,225,255,0) 15px 31px);background-size:62px 62px;animation:wxRain .55s linear infinite;will-change:transform}
+@keyframes wxRain{to{transform:translate(-17px,62px)}}
 .wx-fx.wx-snow{box-shadow:inset 0 0 0 999px rgba(230,240,255,.1)}
-.wx-fx.wx-snow i{position:absolute;top:-3%;width:var(--s,5px);height:var(--s,5px);border-radius:50%;background:#FFFFFF;opacity:.92;box-shadow:0 0 2px rgba(120,140,160,.5);animation:leafFall linear infinite}
-.wx-fx.wx-fog{background:linear-gradient(180deg,rgba(245,248,250,.42),rgba(245,248,250,.18) 45%,rgba(245,248,250,.4));animation:wxFog 9s ease-in-out infinite alternate}
+.wx-fx.wx-snow i{position:absolute;top:-3%;width:var(--s,5px);height:var(--s,5px);border-radius:50%;background:#FFFFFF;opacity:.92;box-shadow:0 0 2px rgba(120,140,160,.5);animation:wxSnow linear infinite}
+@keyframes wxSnow{0%{transform:translate(0,0)}50%{transform:translate(var(--dx,0),24vh)}100%{transform:translate(0,48vh);opacity:0}}   /* 하늘 쪽만 내려와요 */
+.wx-fx.wx-fog{background:linear-gradient(180deg,rgba(245,248,250,.46),rgba(245,248,250,.2) 45%,rgba(245,248,250,0));animation:wxFog 9s ease-in-out infinite alternate}
 @keyframes wxFog{from{opacity:.75}to{opacity:1}}
 .wx-chip{position:absolute;left:50%;transform:translateX(-50%);bottom:calc(var(--bot-h, 70px) + 12px);z-index:6;display:flex;align-items:center;gap:4px;padding:3px 10px;border:0;border-radius:999px;background:rgba(255,249,233,.88);color:#3A4A5A;font:inherit;font-size:12px;box-shadow:0 1px 3px rgba(20,40,20,.25);cursor:pointer}
-@media (prefers-reduced-motion:reduce){.wx-fx{animation:none!important}}
+@media (prefers-reduced-motion:reduce){.wx-fx,.wx-fx::before,.wx-fx i{animation:none!important}}
 /* 2.1.3 다른 학교 구경과 예시 학교 */
 .tier-view.tv-model .tv-bar{box-shadow:inset 0 0 0 2px #E8B53A}
 .tier-view.tv-model #tvSub{color:#A0620A;font-weight:700}
@@ -2439,7 +2444,7 @@ body.wl-on .toast{z-index:300}
 .tier-dots .td.cur{border-color:#3E7E4A;box-shadow:0 0 0 2px #3E7E4A inset}
 .tier-dots .td.on{background:#3E7E4A;color:#FFF9E9}
 .tier-dots .td.lock{opacity:.55;cursor:default}
-body.sheet-open :is(#map, .map-left, .map-right, #qCard, .wx-fx, #tierDots, #ffChip, #plChip, #wxChip), body.sheet-open :is(#map, .map-left, .map-right, #qCard, .wx-fx, #tierDots, #ffChip, #plChip, #wxChip) *{animation-play-state:paused!important}   /* 3.2.1 건물 창이 열려 있으면 뒤 움직임을 멈춰요 */
+body.sheet-open :is(#map, .map-left, .map-right, #qCard, .wx-fx, #tierDots, #ffChip, #plChip, #wxChip), body.sheet-open :is(#map, .map-left, .map-right, #qCard, .wx-fx, #tierDots, #ffChip, #plChip, #wxChip) *, body.sheet-open .wx-fx::before{animation-play-state:paused!important}   /* 3.2.1 건물 창이 열려 있으면 뒤 움직임을 멈춰요 */
 .tier-dots .td.nl{margin-left:3px;border-color:#6F6AA8;background:#2E2F58;font-size:13px;line-height:1}   /* 3.2.1 고등학교 밤 모습 */
 .tier-dots .td svg{width:13px;height:13px}
 .tier-view{position:absolute;inset:0;z-index:5;background:#3E6B3A var(--map-bg,none) center/cover no-repeat}
