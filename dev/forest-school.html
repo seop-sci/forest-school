@@ -661,7 +661,9 @@ body.th-bg{background:var(--th-bg)}
 :root{--sab:env(safe-area-inset-bottom, 0px)}
 html.ait{--sab:var(--ait-bottom, 0px)}
 /* 토스 판: 오른쪽 위 토스 단추(··· ✕, 위 여백 + 10에서 시작)와 게임 단추가 겹치지 않게 그만큼 아래에서 시작해요(겹치면 검수 반려 사유) */
-html.ait .app{padding-top:calc(var(--ait-top, 0px) + var(--ait-nav, 52px));padding-bottom:var(--ait-bottom, 0px)}
+html.ait .app{padding-top:calc(var(--ait-top, 0px) + 8px);padding-bottom:var(--ait-bottom, 0px)}
+/* 3.2.3 토스 판: 현황판을 위로 올리고, 오른쪽 위 토스 단추(··· ✕) 자리만큼 가로로 줄여 왼쪽에 둬요 */
+html.ait .board{margin-right:var(--ait-capw, 112px)}
 html.ait .app.on-school .tabs{padding-bottom:6px}
 .confirm{padding:12px 14px 14px;border-top:1px solid var(--line)}
 .confirm p{margin:0 0 10px;font-size:14px}
@@ -23191,7 +23193,7 @@ body.cam-scene #ffChip,body.cam-scene #tierDots,body.cam-scene #plChip{opacity:0
   if (AIT) {
     document.documentElement.classList.add('ait');
     // 토스가 주는 여백은 기기 기준 픽셀이에요. 넓은 폰에서 화면 칸 수를 바꿨으면(맨 위 viewport 맞춤) 그 비율로 바꿔 써요
-    const inset = a => { if (!a) return; const r = document.documentElement.style, sw = (window.screen && screen.width) || 0, k = sw && innerWidth && Math.abs(innerWidth - sw) > 2 ? innerWidth / sw : 1, px = v => Math.max(0, Math.round((+v || 0) * k)) + 'px'; r.setProperty('--ait-top', px(a.top)); r.setProperty('--ait-bottom', px(a.bottom)); r.setProperty('--ait-nav', px(52)); };
+    const inset = a => { if (!a) return; const r = document.documentElement.style, sw = (window.screen && screen.width) || 0, k = sw && innerWidth && Math.abs(innerWidth - sw) > 2 ? innerWidth / sw : 1, px = v => Math.max(0, Math.round((+v || 0) * k)) + 'px'; r.setProperty('--ait-top', px(a.top)); r.setProperty('--ait-bottom', px(a.bottom)); r.setProperty('--ait-nav', px(52)); r.setProperty('--ait-capw', px(112)); };
     inset(AIT.safeArea()); AIT.subscribeSafe(inset);
     AIT.preload();
     (async () => {
