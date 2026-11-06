@@ -42,6 +42,8 @@
       child: c => ref(path + '/' + c),
       orderByChild: k => ref(path, Object.assign({}, q, { order: k })),
       equalTo: v => ref(path, Object.assign({}, q, { equal: v })),
+      startAt: v => ref(path, Object.assign({}, q, { start: v })),
+      endAt: v => ref(path, Object.assign({}, q, { end: v })),
       limitToLast: n => ref(path, Object.assign({}, q, { last: n })),
       set: v => write('set', v),
       update: v => write('update', v),
