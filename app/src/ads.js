@@ -1,7 +1,7 @@
 // 안드로이드 판 광고: 구글 애드몹 보상형 광고를 게임의 광고 버튼에 이어 줘요 (window.FOREST_ADS)
 import { AdMob, RewardAdPluginEvents, AdmobConsentStatus } from '@capacitor-community/admob';
 
-const AD_UNIT = 'ca-app-pub-5932346459951963/3611713925';   // 보상형 광고 단위 (황금 도토리 1개)
+const AD_UNIT = 'ca-app-pub-5932346459951963/9547614033';   // 보상형 광고 단위 (황금 도토리 1개). 3.2.3: Play 스토어가 연결된 새 애드몹 앱으로 옮김 (예전 단위 …/3611713925)
 const TESTING = __ADMOB_TEST__;                              // 시험 빌드에서는 구글 테스트 광고를 써요
 const CONSENT_RETRY = 60000;                                 // 동의 정보를 못 받았으면 1분 뒤부터 다시 물어봐요(실패가 이어지면 10분까지 늘려요)
 const CONSENT_RETRY_MAX = 600000;
