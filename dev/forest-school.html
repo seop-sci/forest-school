@@ -661,7 +661,12 @@ body.th-bg{background:var(--th-bg)}
 :root{--sab:env(safe-area-inset-bottom, 0px)}
 html.ait{--sab:var(--ait-bottom, 0px)}
 /* 토스 판: 오른쪽 위 토스 단추(··· ✕, 위 여백 + 10에서 시작)와 게임 단추가 겹치지 않게 그만큼 아래에서 시작해요(겹치면 검수 반려 사유) */
-html.ait .app{padding-top:calc(var(--ait-top, 0px) + var(--ait-nav, 52px));padding-bottom:var(--ait-bottom, 0px)}
+html.ait .app{padding-top:calc(var(--ait-top, 0px) + 8px);padding-bottom:var(--ait-bottom, 0px)}
+/* 3.2.3 토스 판: 현황판을 위로 올리고, 오른쪽 위 토스 단추(··· ✕) 자리만큼 가로로 줄여 왼쪽에 둬요 */
+html.ait .board{margin-right:var(--ait-capw, 112px)}
+html.ait .app .board .hud-res .stat-main b{font-size:18px}
+html.ait .app .board .hud-res .rep-pill b{font-size:15px}
+@media (max-width:380px){html.ait .app .board .hud-res .stat-main b{font-size:16px}html.ait .app .board .hud-res .rep-pill b{font-size:14px}}
 html.ait .app.on-school .tabs{padding-bottom:6px}
 .confirm{padding:12px 14px 14px;border-top:1px solid var(--line)}
 .confirm p{margin:0 0 10px;font-size:14px}
@@ -2270,7 +2275,6 @@ body.wl-on .toast{z-index:300}
 @keyframes wxSnow{0%{transform:translate(0,0)}50%{transform:translate(var(--dx,0),24vh)}100%{transform:translate(0,48vh);opacity:0}}   /* 하늘 쪽만 내려와요 */
 .wx-fx.wx-fog{background:linear-gradient(180deg,rgba(245,248,250,.46),rgba(245,248,250,.2) 45%,rgba(245,248,250,0));animation:wxFog 9s ease-in-out infinite alternate}
 @keyframes wxFog{from{opacity:.75}to{opacity:1}}
-.fps-meter{position:fixed;right:6px;top:46%;z-index:9999;pointer-events:none;padding:3px 7px;border-radius:8px;background:rgba(0,0,0,.72);color:#fff;font:600 11px/1.35 system-ui,sans-serif;white-space:pre}
 .app.on-school .wx-chip{color:var(--home-ink)}
 .wx-chip.off{opacity:.62}.wx-chip.off::after{content:'끔';margin-left:4px;font-size:11px;color:#7A8790}
 .wx-chip{position:absolute;left:50%;transform:translateX(-50%);bottom:calc(var(--bot-h, 70px) + 12px);z-index:6;display:flex;align-items:center;gap:4px;padding:3px 10px;border:0;border-radius:999px;background:rgba(255,249,233,.88);color:#3A4A5A;font:inherit;font-size:12px;box-shadow:0 1px 3px rgba(20,40,20,.25);cursor:pointer}
@@ -3089,7 +3093,7 @@ body.cam-scene #ffChip,body.cam-scene #tierDots,body.cam-scene #plChip{opacity:0
     <p class="boot-step" id="bootStep">학교 문을 여는 중...</p>
     <p class="boot-tip" id="bootTip">학교 문을 여는 중이에요</p>
   </div>
-  <span class="boot-ver" id="bootVer">v3.2.2</span>
+  <span class="boot-ver" id="bootVer">v3.2.3</span>
 </div>
 
 <div class="app on-school" id="app">
@@ -3588,9 +3592,8 @@ body.cam-scene #ffChip,body.cam-scene #tierDots,body.cam-scene #plChip{opacity:0
       </div>
       <h3 class="panel-sub">정보</h3>
       <dl class="info">
-        <div id="verRow"><dt>버전</dt><dd>v3.2.2</dd></div>
+        <div id="verRow"><dt>버전</dt><dd>v3.2.3</dd></div>
         <div id="pidRow" hidden><dt>학교 번호</dt><dd id="infoPid"></dd></div>
-        <div id="fpsRow"><dt>끊김 측정</dt><dd><button class="btn-sub small" type="button" id="fpsBtn">켜기</button></dd></div><!-- 임시(보안 보강 판에서만, 지섭 확인용): 1초에 그린 장수와 가장 길게 멈춘 시간 -->
       </dl>
       <div id="devBox" hidden>
         <h3 class="panel-sub">개발자 테스트</h3>
@@ -10588,8 +10591,8 @@ body.cam-scene #ffChip,body.cam-scene #tierDots,body.cam-scene #plChip{opacity:0
     // 2.3.0 지섭 결정: 하루 한 번 즉시 완공은 저절로 쓰지 않고, 건물 창의 ⚡ 즉시 완공 단추로 원할 때 써요(conFree)
     toast(sec <= 10 ? `${FAC[k].name} 공사 시작! 금방 끝나요` : `${FAC[k].name} 공사 시작! ${hm(sec)} 뒤에 Lv.${L}`);
     sfx('tap');
-    afterPurchase();
-    renderMap(); conRender(true);
+    afterPurchase();   // 3.2.3 끊김 줄이기: 여기서 지도를 그리므로 아래에서 한 번 더 그리지 않아요
+    conRender(true);
     return true;
   }
   // 공사 끝: 레벨이 오르고 예전처럼 효과와 알림이 나와요. quiet면 알림 대신 묶어서 한 번(켤 때 끝난 공사 n개)
@@ -10677,22 +10680,26 @@ body.cam-scene #ffChip,body.cam-scene #tierDots,body.cam-scene #plChip{opacity:0
   function conMap(k) {
     const g = $('#b-' + k); if (!g) return;
     let el = g.querySelector('.con'), ui = document.getElementById('cu-' + k);
-    if (!conOn(k) || !facKeys().includes(k)) { if (el) el.remove(); if (ui) ui.remove(); g.classList.remove('is-con'); return; }
+    if (!conOn(k) || !facKeys().includes(k)) { if (el) el.remove(); if (ui) ui.remove(); g.classList.remove('is-con'); ffbAt(k, 0, false); return; }
     const bi = g.querySelector(S.f[k] >= 1 ? '.built .bimg' : '.site .bimg') || g.querySelector('.bimg'); if (!bi) return;
+    if (el && el.dataset.lay !== String(rt.mapLaid)) { el.remove(); el = null; if (ui) { ui.remove(); ui = null; } }   // 3.2.3 학교급이 바뀌어 지도 배치가 달라지면 막대 자리를 다시 잡아요
     const num = a => Number(bi.getAttribute(a)) || 0, x = num('x'), y = num('y'), w = num('width'); if (!w) return;
     const b = S.bd[k], left = conLeft(k), pr = Math.min(1, Math.max(0, 1 - left * 1000 / Math.max(1, b.e - b.s)));
     if (!el) {
       el = document.createElementNS('http://www.w3.org/2000/svg', 'g'); el.setAttribute('class', 'con'); g.appendChild(el);
       const bw = Math.min(w, 104) * 0.74, bh = bw * 56 / 256,   // 2.1.2: 넓은 그림(운동장, 과학실)도 막대와 글씨는 다른 건물과 같은 크기
-        bx = x + (w - bw) / 2, by = y + w * 0.02;
+        bx = x + (w - bw) / 2,
+        // 3.2.3 지섭 요청: 막대가 건물 꼭대기에 있으면 촘촘한 지도(고등학교)에서 위 건물 이름판과 겹쳐요. 이름판 바로 위로 내리고, ⚡ 배지는 막대 위, '즉시 완공 가능!'은 그 위
+        G0 = geo().b[k], by = G0 ? G0[1] + G0[2] * 0.36 - 12 - bh * 0.82 : y + w * 0.02;
+      el.dataset.bh = bh.toFixed(2); el.dataset.lay = String(rt.mapLaid);
       el.innerHTML = (IMG180('fx_scaffold') ? `<image class="con-scaf" href="${IMG180('fx_scaffold')}" x="${x.toFixed(1)}" y="${y.toFixed(1)}" width="${w.toFixed(1)}" height="${w.toFixed(1)}"/>` : '') +
         (IMG('fx_lantern') ? `<image class="con-lan" href="${IMG('fx_lantern')}" x="${(x + w * 0.1).toFixed(1)}" y="${(y + w * 0.26).toFixed(1)}" width="${(w * 0.22).toFixed(1)}" height="${(w * 0.22).toFixed(1)}"/>` : '') +   // 2.2.0 야간 건설 때만 보이는 등불
         `<rect class="con-back" x="${(bx + bw * 0.06).toFixed(1)}" y="${(by + bh * 0.2).toFixed(1)}" width="${(bw * 0.88).toFixed(1)}" height="${(bh * 0.6).toFixed(1)}" rx="${(bh * 0.3).toFixed(1)}"/>` +
         `<rect class="con-fill" x="${(bx + bw * 0.06).toFixed(1)}" y="${(by + bh * 0.2).toFixed(1)}" width="0" height="${(bh * 0.6).toFixed(1)}" rx="${(bh * 0.3).toFixed(1)}" data-w="${(bw * 0.88).toFixed(1)}"/>` +
         (IMG('timer_bar') ? `<image class="con-bar" href="${IMG('timer_bar')}" x="${bx.toFixed(1)}" y="${by.toFixed(1)}" width="${bw.toFixed(1)}" height="${bh.toFixed(1)}"/>` : '') +
         `<text class="con-t" x="${(x + w / 2).toFixed(1)}" y="${(by + bh * 0.66).toFixed(1)}" font-size="${(bh * 0.5).toFixed(1)}" stroke-width="${(bh * 0.12).toFixed(1)}"></text>` +
-        `<g class="con-sp"><rect x="${(bx + bw / 2 - bh * 1.6).toFixed(1)}" y="${(by + bh * 0.95).toFixed(1)}" width="${(bh * 3.2).toFixed(1)}" height="${(bh * 0.95).toFixed(1)}" rx="${(bh * 0.47).toFixed(1)}"/>` +
-        `<text x="${(bx + bw / 2).toFixed(1)}" y="${(by + bh * 1.62).toFixed(1)}" font-size="${(bh * 0.58).toFixed(1)}" textLength="${(bh * 2.6).toFixed(1)}" lengthAdjust="spacingAndGlyphs"></text></g>`;   // 2.3.0.2 휴대폰에서 글자가 배지 밖으로 넘쳐서 배지를 넓히고 글자를 배지 안에 맞춰요   // 2.3.0.1 빠르기 배지(막대 바로 아래)
+        `<g class="con-sp"><rect x="${(bx + bw / 2 - bh * 1.6).toFixed(1)}" y="${(by - bh * 0.75 - 1).toFixed(1)}" width="${(bh * 3.2).toFixed(1)}" height="${(bh * 0.95).toFixed(1)}" rx="${(bh * 0.47).toFixed(1)}"/>` +
+        `<text x="${(bx + bw / 2).toFixed(1)}" y="${(by - bh * 0.08 - 1).toFixed(1)}" font-size="${(bh * 0.58).toFixed(1)}" textLength="${(bh * 2.6).toFixed(1)}" lengthAdjust="spacingAndGlyphs"></text></g>`;   // 2.3.0.2 휴대폰에서 글자가 배지 밖으로 넘쳐서 배지를 넓히고 글자를 배지 안에 맞춰요   // 2.3.0.1 빠르기 배지(막대 바로 아래)
     }
     if (!ui) {   // 2.3.1 막대와 글씨, 배지는 학생 위 층(#conUi)으로 옮겨요. 비계 그림은 건물에 그대로
       ui = document.createElementNS('http://www.w3.org/2000/svg', 'g'); ui.setAttribute('class', 'con con-ui'); ui.id = 'cu-' + k;
@@ -10700,11 +10707,18 @@ body.cam-scene #ffChip,body.cam-scene #tierDots,body.cam-scene #plChip{opacity:0
       for (const c of ['.con-back', '.con-fill', '.con-bar', '.con-t', '.con-sp']) { const n = el.querySelector(c); if (n) ui.appendChild(n); }
     }
     conBeaver(ui, x, y, w);   // 2.3.5 비버는 학생 위 층(건물 누르는 칸에 가리지 않게)
+    { const bv = ui.querySelector('.con-bv'); if (bv && ui.firstChild !== bv) ui.insertBefore(bv, ui.firstChild); }   // 3.2.3 막대와 배지가 비버 앞에 보여요(글씨가 가리지 않게)
     ui.classList.toggle('fast', conAdd() > 0);
     { const add = conAdd(), sp = ui.querySelector('.con-sp text'); el.classList.toggle('fast', add > 0); const st = `⚡+${add}%`; if (add > 0 && sp && sp.textContent !== st) sp.textContent = st; }
-    g.classList.add('is-con');
+    g.classList.add('is-con'); ffbAt(k, Number(el.dataset.bh) || 0, conAdd() > 0);
     const f = ui.querySelector('.con-fill'); if (f) f.setAttribute('width', (Number(f.dataset.w) * pr).toFixed(1));
     const t = ui.querySelector('.con-t'), tx = hm(left); if (t && t.textContent !== tx) t.textContent = tx;
+  }
+  // 3.2.3 '즉시 완공 가능!' 배지 자리: 공사 중이면 이름판 위 막대(와 ⚡ 배지) 위로 올려요
+  function ffbAt(k, bh, fast) {
+    const b = document.querySelector('#pq-' + k + ' .ffb'); if (!b) return;
+    const ty = !bh ? -20 : fast ? -21.5 - bh * 1.57 - 2 : -20.5 - bh * 0.62, tr = `translate(-38 ${ty.toFixed(1)})`;
+    if (b.getAttribute('transform') !== tr) b.setAttribute('transform', tr);
   }
   // 2.3.5 비버 선생님이 공사장에서 망치질해요(초등학교부터). 그림 1, 2를 0.35초마다 번갈아, 가끔 3(먼지)
   const BV_LINES = ['뚝딱뚝딱! 튼튼하게 짓는 중이에요', '못 하나도 꼼꼼하게 박아요', '조금만 기다려 주세요, 금방 끝나요', '연수를 받으면 더 빨리 지을 수 있어요'];
@@ -11262,8 +11276,8 @@ body.cam-scene #ffChip,body.cam-scene #tierDots,body.cam-scene #plChip{opacity:0
        forest/rank/<내 id>   랭킹 이름과 학교 점수
        forest/stats/<내 id>  테스트 현황 (어디까지 했는지, 얼마나 했는지)
      <내 id>는 Firebase 익명 로그인이 기기(브라우저)마다 만들어 줘요. */
-  const VERSION = '3.2.2';
-  const NT_QUIET = ['2.1.20', '2.1.2.2', '2.3.0.1', '2.3.4'];   // 2.3.0.1도 공지 창 없이(공지는 그대로 2.3.0). 2.3.4도 조용히(지섭 결정)
+  const VERSION = '3.2.3';
+  const NT_QUIET = ['2.1.20', '2.1.2.2', '2.3.0.1', '2.3.4', '3.2.3'];   // 2.3.0.1도 공지 창 없이(공지는 그대로 2.3.0). 2.3.4도 조용히(지섭 결정). 3.2.3도 공지 창 없이(공지 줄을 고르지 않음)
     // 2.1.20 지섭 결정: 이 버전들은 업데이트해도 공지 창을 띄우지 않아요(공지는 그대로 2.1.2)
   /* 2.0.0 공지사항 (2026-10-27 지섭, 1.8.0은 이미 올려서 2.0.0부터): 설정 > 공지사항. 맨 위가 가장 새 공지예요.
      패치노트는 자동으로 넣지 않아요. 지섭이 검수한 글만 여기에 적어요(CHANGELOG.md는 자세한 기록용이라 따로 있어요).
@@ -20363,27 +20377,6 @@ body.cam-scene #ffChip,body.cam-scene #tierDots,body.cam-scene #plChip{opacity:0
     }
     for (const a of rt.slowAnims || []) { try { a.currentTime = now - a._t0; } catch (er) { /* 지워진 움직임 */ } }
   }
-  // 임시(보안 보강 판, 지섭 휴대폰 끊김 확인용): 지난 1초에 그린 장수(fps), 지난 5초 가운데 가장 길게 멈춘 시간, 지금 화면
-  function fpsMeter(on) {
-    rt.fpsOn = !!on;
-    let el = $('#fpsMeter');
-    if (!on) { if (el) el.remove(); return; }
-    if (!el) { el = document.createElement('div'); el.id = 'fpsMeter'; el.className = 'fps-meter'; document.body.appendChild(el); }
-    const fr = []; let last = performance.now(), shown = 0;
-    const step = t => {
-      if (!rt.fpsOn) return;
-      fr.push([t, t - last]); last = t;
-      while (fr.length && t - fr[0][0] > 5000) fr.shift();
-      if (t - shown > 500) {
-        shown = t;
-        const n1 = fr.filter(f => t - f[0] <= 1000).length, worst = Math.max(0, ...fr.map(f => f[1])), long = fr.filter(f => f[1] > 50).length;
-        const where = rt.sheetKey ? '건물 창 ' + rt.sheetKey : rt.modalOpen ? '창 ' + (rt.modalOpen.id || '') : '탭 ' + ({ school: '홈', teachers: '선생님', mini: '공부', grad: '졸업', shop: '상점' }[rt.tab] || rt.tab) + (map && map.classList.contains('hs-night') ? ' 밤' : '');
-        el.textContent = `${n1}fps  최장 ${Math.round(worst)}ms\n끊김(50ms+) ${long}번/5초\n${where}`;
-      }
-      requestAnimationFrame(step);
-    };
-    requestAnimationFrame(step);
-  }
   function loop(now) {
     const dt = Math.min(1, Math.max(0, (now - rt.lastT) / 1000));
     rt.lastT = now;
@@ -20675,7 +20668,6 @@ body.cam-scene #ffChip,body.cam-scene #tierDots,body.cam-scene #plChip{opacity:0
 
     // 숨긴 개발자 메뉴: 정보의 '버전' 줄을 빠르게 다섯 번 누르면 열려요
     let verTaps = 0, verAt = 0;
-    $('#fpsBtn').addEventListener('click', () => { fpsMeter(!rt.fpsOn); $('#fpsBtn').textContent = rt.fpsOn ? '끄기' : '켜기'; });   // 임시 끊김 측정
     $('#verRow').addEventListener('click', () => {
       const now = Date.now();
       verTaps = now - verAt < 1500 ? verTaps + 1 : 1;
@@ -20876,6 +20868,8 @@ body.cam-scene #ffChip,body.cam-scene #tierDots,body.cam-scene #plChip{opacity:0
     $('#sheetFriend').addEventListener('click', () => { const sp = $('#sheetFriend').dataset.sp, f = frOf(sp); if (!f) return; if (!frToday(f)) frPat(sp); else toast(`${frFull(sp)}: ${frLine(sp, rt.sheetKey)}`); });
     $('#sheetBday').addEventListener('click', () => { closeSheet(); setTimeout(bdClaim, 240); });
     $('#gAlbum').addEventListener('click', openAlbum);
+    // 3.2.3 끊김 줄이기: 공사를 처음 시작할 때 비계, 막대, 비버 그림을 푸느라 한 번 멈추지 않게 켜고 조금 뒤 미리 풀어 둬요
+    setTimeout(() => { for (const u of [IMG180('fx_scaffold'), IMG('timer_bar'), IMG('fx_lantern'), FSI('fix_beaver_1'), FSI('fix_beaver_2'), FSI('fix_beaver_3')]) if (u) { const im = new Image(); im.src = u; if (im.decode) im.decode().catch(() => {}); } }, 3000);
     for (const k of Object.keys(FAC)) { const p = document.getElementById('pq-' + k); if (p && !p.querySelector('.ffb')) p.insertAdjacentHTML('beforeend', '<g class="ffb" transform="translate(-38 -20)"><rect x="0" y="-6.5" width="76" height="13" rx="6.5"/><text x="38" y="3" text-anchor="middle">즉시 완공 가능!</text></g>'); }   // 2.1.1
     $('#ffChip').addEventListener('click', e => { if (e.target.closest('.ffx')) { S.ffx = gameToday(); sfx('tap'); ffRender(true); save(); toast('오늘은 이 알림을 닫았어요. 내일 다시 보여요'); return; } const k = facKeys().find(ffCan); if (k) { sfx('tap'); openSheet(k); } else toast(conAdd() > 0 ? `지금 모든 공사 +${conAdd()}%예요${cbOn() ? `. 건설 부스터 ${hm(cbLeft())} 남았어요` : ''}${nbOn() ? `. 야간 건설은 ${hm(nbLeft())} 남았어요` : ''}` : `매일 ${NB.h0}~${NB.h1}시에는 야간 건설 이벤트로 모든 공사 +${NB.add}%예요. 학교 특별 이벤트 주간에는 +${NB.addSp}%예요`); });   // 2.2.0
     $('#conCb').addEventListener('click', e => { const b = e.target.closest('[data-cb]'); if (b) cbBuy(b.dataset.cb); });
@@ -23191,7 +23185,7 @@ body.cam-scene #ffChip,body.cam-scene #tierDots,body.cam-scene #plChip{opacity:0
   if (AIT) {
     document.documentElement.classList.add('ait');
     // 토스가 주는 여백은 기기 기준 픽셀이에요. 넓은 폰에서 화면 칸 수를 바꿨으면(맨 위 viewport 맞춤) 그 비율로 바꿔 써요
-    const inset = a => { if (!a) return; const r = document.documentElement.style, sw = (window.screen && screen.width) || 0, k = sw && innerWidth && Math.abs(innerWidth - sw) > 2 ? innerWidth / sw : 1, px = v => Math.max(0, Math.round((+v || 0) * k)) + 'px'; r.setProperty('--ait-top', px(a.top)); r.setProperty('--ait-bottom', px(a.bottom)); r.setProperty('--ait-nav', px(52)); };
+    const inset = a => { if (!a) return; const r = document.documentElement.style, sw = (window.screen && screen.width) || 0, k = sw && innerWidth && Math.abs(innerWidth - sw) > 2 ? innerWidth / sw : 1, px = v => Math.max(0, Math.round((+v || 0) * k)) + 'px'; r.setProperty('--ait-top', px(a.top)); r.setProperty('--ait-bottom', px(a.bottom)); r.setProperty('--ait-nav', px(52)); r.setProperty('--ait-capw', px(112)); };
     inset(AIT.safeArea()); AIT.subscribeSafe(inset);
     AIT.preload();
     (async () => {

@@ -63,7 +63,7 @@ jobs:
           S="$GITHUB_STEP_SUMMARY"
           echo "## 출시 파일 점검" >> "$S"
           echo '### 광고 SDK 실제 버전 (25.4.+ 같은 범위가 무엇으로 풀렸는지)' >> "$S"
-          ./gradlew --no-daemon -q :app:dependencies --configuration releaseRuntimeClasspath 2>/dev/null | grep -E "play-services-ads|user-messaging-platform" | sort -u | head -8 | sed 's/^/    /' >> "$S" || true
+          ./gradlew --no-daemon -q :app:dependencies --configuration releaseRuntimeClasspath 2>/dev/null | grep -E "play-services-ads|user-messaging-platform" | sort -u | head -8 | tee /dev/stderr | sed 's/^/    /' >> "$S" || true
           BT=$(ls -d "$ANDROID_HOME"/build-tools/* | sort -V | tail -1)
           APK=$(ls app/build/outputs/apk/release/*.apk 2>/dev/null | head -1)
           [ -z "$APK" ] && APK=$(ls app/build/outputs/apk/debug/*.apk 2>/dev/null | head -1)
