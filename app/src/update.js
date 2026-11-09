@@ -3,7 +3,7 @@
 // 플레이는 새 버전의 이름(1.4.0)을 알려 주지 않아서, 같은 때 바뀌는 웹 판(GitHub Pages) 첫머리의 버전 표시를 읽어 비교해요.
 import { AppUpdate, AppUpdateAvailability, FlexibleUpdateInstallStatus } from '@capawesome/capacitor-app-update';
 
-const PAGES = 'https://forest-school-7dd78.web.app/';   // 2026-11-07 GitHub Pages 대신 Firebase Hosting
+const PAGES = 'https://seop-sci.github.io/forest-school/';   // 2026-11-10 GitHub 복구: 다시 GitHub Pages(정지 동안은 web.app)
 const parts = s => { const m = /(\d+)\.(\d+)\.(\d+)/.exec(String(s || '')); return m ? m.slice(1).map(Number) : null; };
 const mine = () => { const m = document.querySelector('meta[name="forest-version"]'); return m ? m.content : ''; };
 

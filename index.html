@@ -2,7 +2,7 @@
 <html lang="ko">
 <head>
 <meta charset="utf-8">
-<meta name="forest-version" content="3.3.1">
+<meta name="forest-version" content="3.3.2">
 <meta name="viewport" content="width=device-width, initial-scale=1">
 <meta name="description" content="도토리를 모아 숲속 학교를 키우는 방치형 게임 테스트판이에요.">
 <style>html,body{margin:0}</style>
@@ -761,6 +761,8 @@ html.ait .app .board .hud-res .stat-main b{font-size:18px}
 html.ait .app .board .hud-res .rep-pill b{font-size:15px}
 @media (max-width:380px){html.ait .app .board .hud-res .stat-main b{font-size:16px}html.ait .app .board .hud-res .rep-pill b{font-size:14px}}
 html.ait .app.on-school .tabs{padding-bottom:6px}
+/* 3.3.2 지섭 제보(토스 정식 출시): 숲속 합치기와 숲속 퍼즐은 화면 전체를 덮어서 위쪽 칸이 토스 단추(··· ✕)에 가렸어요. 토스 단추 줄 아래에서 시작해요 */
+html.ait .pz{padding-top:calc(var(--ait-top, 0px) + 54px)}
 .confirm{padding:12px 14px 14px;border-top:1px solid var(--line)}
 .confirm p{margin:0 0 10px;font-size:14px}
 .info{margin:0;padding:2px 14px;border-radius:16px;background:var(--card)}
@@ -2238,7 +2240,7 @@ body{background:radial-gradient(120% 60% at 50% 0%, color-mix(in srgb, var(--pap
 .gd-head{background-color:#E3EFC9}
 .gd-head.noimg{height:58px}.gd-head.noimg b{right:0;width:100%}
 .gd-body{max-height:min(62vh,560px);overflow-y:auto;padding:0 12px}
-.gd-plots{display:grid;grid-template-columns:repeat(auto-fit,minmax(96px,1fr));gap:6px;margin-top:10px}
+.gd-plots{display:grid;grid-template-columns:repeat(auto-fit,minmax(90px,1fr));gap:6px;margin-top:8px}
 .gd-plot{display:grid;justify-items:center;gap:3px;padding:6px 4px;border-radius:12px;background:rgba(139,94,52,.08);border:1.5px solid var(--line);font-size:11.5px;text-align:center;min-width:0}
 .gd-plot.ready{border-color:#6BA23A;background:rgba(107,162,58,.12)}.gd-plot.pick{border-color:#E2A21C}
 .gd-plot .bed{position:relative;display:grid;place-items:center;width:84px;height:84px;background:center/contain no-repeat}.gd-plot .bed:not([style]){border-radius:10px;background-color:#B98B5E}
@@ -2247,6 +2249,14 @@ body{background:radial-gradient(120% 60% at 50% 0%, color-mix(in srgb, var(--pap
 .gd-plot button{padding:4px 10px;border-radius:10px;border:1.5px solid var(--line);background:var(--card);font:inherit;font-weight:700;color:inherit}
 .gd-plot button.go{background:#6BA23A;border-color:#4E7F25;color:#fff}.gd-plot small{opacity:.7}
 .gd-pick{margin-top:8px;padding:8px;border-radius:12px;background:rgba(226,162,28,.12)}.gd-pick b{font-size:13px}
+.gd-bulk{display:flex;flex-wrap:wrap;gap:4px;margin-top:10px}.gd-bulk:empty{display:none}
+.gd-bulk button{flex:1 1 30%;padding:7px 6px;border-radius:12px;border:1.5px solid #6BA23A;background:rgba(107,162,58,.12);font:inherit;font-size:12.5px;font-weight:700;color:#2F5A2A;white-space:nowrap}
+.gd-body .gd-pick{position:sticky;bottom:0;z-index:2;background:#FBEFCF;box-shadow:0 -6px 12px rgba(60,40,10,.14)}   /* 3.3.2 고르는 칸이 밭 아래로 밀려 안 보이지 않게 늘 아래에 붙어요 */
+.gd-plot .bed{width:68px!important;height:68px!important}
+.gd-cut b small{font-weight:500;opacity:.75;margin-left:4px}.gd-cut button{padding:6px 8px;border-radius:10px;border:1.5px solid var(--line);background:var(--card);font:inherit;font-size:12px;font-weight:700;color:inherit}
+.gd-cut button[aria-disabled="true"]{opacity:.45}.gd-cut .free{display:block;width:100%;margin-top:6px;background:#6BA23A;border-color:#4E7F25;color:#fff}
+.gd-tks{display:grid;grid-template-columns:repeat(4,1fr);gap:4px;margin-top:6px}.gd-tks button{display:grid;justify-items:center}.gd-tks small{font-size:10.5px;font-weight:500;opacity:.75}
+.gd-tkrow{display:grid;grid-template-columns:1fr 1.6fr;gap:4px;margin-top:4px}
 .gd-seeds{display:grid;grid-template-columns:repeat(4,1fr);gap:4px;margin-top:4px}
 .gd-seeds button{display:grid;justify-items:center;gap:1px;padding:4px 2px;border-radius:10px;border:1.5px solid var(--line);background:var(--card);font:inherit;font-size:11px;color:inherit}
 .gd-seeds button[aria-disabled="true"]{opacity:.45}.gd-seeds img{width:30px;height:30px;object-fit:contain}.gd-seeds .gd-em{font-size:22px}.gd-seeds small{font-size:10px;opacity:.75}
@@ -3226,7 +3236,7 @@ body.cam-scene #ffChip,body.cam-scene #plChip,body.cam-scene .b-ring{animation-p
     <p class="boot-step" id="bootStep">학교 문을 여는 중...</p>
     <p class="boot-tip" id="bootTip">학교 문을 여는 중이에요</p>
   </div>
-  <span class="boot-ver" id="bootVer">v3.3.1</span>
+  <span class="boot-ver" id="bootVer">v3.3.2</span>
 </div>
 
 <div class="app on-school" id="app">
@@ -3719,7 +3729,7 @@ body.cam-scene #ffChip,body.cam-scene #plChip,body.cam-scene .b-ring{animation-p
       </div>
       <h3 class="panel-sub">정보</h3>
       <dl class="info">
-        <div id="verRow"><dt>버전</dt><dd>v3.3.1</dd></div>
+        <div id="verRow"><dt>버전</dt><dd>v3.3.2</dd></div>
         <div id="pidRow" hidden><dt>학교 번호</dt><dd id="infoPid"></dd></div>
       </dl>
       <div id="devBox" hidden>
@@ -4307,7 +4317,9 @@ body.cam-scene #ffChip,body.cam-scene #plChip,body.cam-scene .b-ring{animation-p
   <section class="modal lab-modal gd-modal" role="dialog" aria-modal="true" aria-labelledby="gdTitle">
     <div class="lab-head gd-head" id="gdHead"><b id="gdTitle">학교 텃밭</b></div>
     <div class="gd-body">
+      <div class="gd-bulk" id="gdBulk"></div><!-- 3.3.2 모두 심기, 모두 거두기, 모두 물 주기 -->
       <div class="gd-plots" id="gdPlots"></div>
+      <div class="gd-pick gd-cut" id="gdCut" hidden></div><!-- 3.3.2 텃밭 시간 당기기 -->
       <div class="gd-pick" id="gdPick" hidden></div>
       <div class="gd-inv" id="gdInv"></div>
       <div class="gd-today" id="gdToday"></div>
@@ -10503,7 +10515,7 @@ body.cam-scene #ffChip,body.cam-scene #plChip,body.cam-scene .b-ring{animation-p
     ['15', '숲속 채소 피자', '🍕', { tomato: 1, corn: 1, pumpkin: 1 }], ['16', '무지개 채소 김밥', '🍙', { lettuce: 1, carrot: 1, sweetpotato: 1 }]]
     .map(([n, nm, em, need]) => ({ id: 'menu_' + n, nm, em, need, kinds: Object.keys(need).length }));
   const GD_M = Object.fromEntries(GD_MENU.map(m => [m.id, m]));
-  const freshGd = () => ({ plots: [], inv: {}, menu: {}, today: { day: '', id: '' }, g8: false, wx: '', st: { h: 0, cook: 0, plant: 0 } });
+  const freshGd = () => ({ plots: [], inv: {}, menu: {}, today: { day: '', id: '' }, g8: false, wx: '', st: { h: 0, cook: 0, plant: 0 }, free: 0, fq: [] });   // 3.3.2 free: 텃밭 바로 자라기 무료 횟수, fq: 그 기회를 준 퀘스트
   const gdOpen = () => !!S && !!S.gn && (S.f.cafeteria || 0) >= 1;
   const gdN = () => GD.plots[Math.max(0, Math.min(GD.plots.length - 1, S.tier))];
   const gdCropOk = c => !!GD_C[c] && GD_C[c].tier <= S.tier;
@@ -10527,6 +10539,16 @@ body.cam-scene #ffChip,body.cam-scene #plChip,body.cam-scene .b-ring{animation-p
   function gdWet(p) { const now = gameNow(); p.w = 1; p.e = Math.max(now, p.e - Math.max(0, p.e - now) * GD.water); }
   function gdPlant(i, c) {
     if (!gdOpen() || rt.paused) return false;
+    if (i === -2) {   // 3.3.2 빈 밭 모두 같은 작물로
+      gdSync(); if (!gdCropOk(c)) return false;
+      const now = gameNow(); let k = 0;
+      S.gn.plots.slice(0, gdN()).forEach(p => { if (p.c) return; p.c = c; p.s = now; p.e = now + GD_C[c].min * 60000; p.w = 0; if (wxIs('rain')) gdWet(p); k++; });
+      if (!k) return false;
+      S.gn.st.plant += k; rt.gdPick = -1;
+      sfx('tap'); toast(`${GD_C[c].nm}을(를) ${k}곳에 심었어요. ${hm(GD_C[c].min * 60)} 뒤에 거둬요`);
+      gdRender(true); gdMark(); save();
+      return true;
+    }
     gdSync();
     const p = S.gn.plots[i]; if (!p || i >= gdN() || p.c || !gdCropOk(c)) return false;
     const now = gameNow(); p.c = c; p.s = now; p.e = now + GD_C[c].min * 60000; p.w = 0;
@@ -10536,17 +10558,53 @@ body.cam-scene #ffChip,body.cam-scene #plChip,body.cam-scene .b-ring{animation-p
     gdRender(true); gdMark(); save();
     return true;
   }
+  /* 3.3.2 지섭 요청: 텃밭도 시간 단축권과 광고로 당겨요(공사와 같은 단축권). 그리고 텃밭 퀘스트(첫 작물 거두기, 오늘의 급식 만들기)가
+     시작될 때 '바로 자라기' 무료 한 번(미리 오래 걸리는 작물을 심어 두면 퀘스트가 막혀서) */
+  const GD_FREE_Q = ['gd3', 'gd4'];
+  function gdFreeGrant(q) {
+    if (!S || !S.gn || !q || !GD_FREE_Q.includes(q.id) || S.gn.fq.includes(q.id)) return;
+    S.gn.fq.push(q.id); S.gn.free = Math.min(9, (S.gn.free || 0) + 1);
+  }
+  function gdCut(i, sec) {
+    const p = S.gn.plots[i]; if (!p || !p.c || gdReady(p)) return false;
+    const now = gameNow(); p.e = Math.max(now, p.e - sec * 1000);
+    gdRender(true); gdMark(); save();
+    return true;
+  }
+  function gdTk(i, tk) {
+    const t = TK.find(x => x.k === tk), p = S.gn.plots[i]; if (!t || !p || !p.c || gdReady(p)) return;
+    if (S.tk[tk] < 1) { toast(`${t.name}이 없어요. 광고를 보면 5분권 ${TKAD.n}장을 받아요`); return; }
+    S.tk[tk] -= 1; S.st.tkUsed = (S.st.tkUsed || 0) + 1; sfx('tap');
+    gdCut(i, t.sec);
+    toast(gdReady(p) ? `${GD_C[p.c].nm}이(가) 다 자랐어요!` : `${t.name}으로 ${hm(t.sec)} 당겼어요`);
+  }
+  function gdTkAll(i) {
+    const p = S.gn.plots[i]; if (!p || !p.c || gdReady(p)) return;
+    const rem = Math.ceil((p.e - gameNow()) / 1000), pl = tkPlan(rem);
+    if (!pl.n) { toast(`시간 단축권이 없어요. 광고를 보면 5분권 ${TKAD.n}장을 받아요`); return; }
+    for (const t of TK) S.tk[t.k] -= pl.use[t.k];
+    S.st.tkUsed = (S.st.tkUsed || 0) + pl.n; sfx('tap');
+    gdCut(i, pl.cut + (pl.left ? 0 : 1));
+    toast(pl.left ? `${tkPlanText(pl)}을 써서 ${hm(pl.cut)} 당겼어요. ${hm(pl.left)} 남아요` : `${tkPlanText(pl)}을 써서 다 자랐어요!`);
+  }
+  function gdFree(i) {
+    const p = S.gn.plots[i]; if (!p || !p.c || gdReady(p) || !(S.gn.free > 0)) return;
+    S.gn.free -= 1; sfx('quest');
+    gdCut(i, 1e7);
+    toast(`${GD_C[p.c].nm}이(가) 바로 다 자랐어요!`);
+  }
   function gdWater(i) {
     const p = S.gn.plots[i]; if (!p || !p.c || p.w || gdReady(p)) return false;
     gdWet(p); sfx('tap'); toast(`물을 줬어요! ${hm(Math.max(0, Math.ceil((p.e - gameNow()) / 1000)))} 남았어요`);
     gdRender(true); gdMark(); save();
     return true;
   }
-  function gdHarvest(i) {
+  function gdHarvest(i, quiet) {
     const p = S.gn.plots[i]; if (!p || !gdReady(p)) return false;
     const c = p.c, n = p.w ? 2 : 1;
     S.gn.inv[c] = Math.min(GD.invMax, (S.gn.inv[c] || 0) + n);
     S.gn.plots[i] = { c: '', s: 0, e: 0, w: 0 }; S.gn.st.h += 1;
+    if (quiet) return true;   // 3.3.2 모두 거두기는 한 번에 알려요
     sfx('coin'); toast(`${GD_C[c].nm} ${n}개를 거뒀어요!`);
     gdRender(true); gdMark(); save();
     return true;
@@ -10582,11 +10640,13 @@ body.cam-scene #ffChip,body.cam-scene #plChip,body.cam-scene .b-ring{animation-p
     if (G.today && typeof G.today.day === 'string' && GD_M[G.today.id]) o.today = { day: G.today.day.slice(0, 10), id: G.today.id };
     o.g8 = G.g8 === true; o.wx = typeof G.wx === 'string' ? G.wx.slice(0, 10) : '';
     if (G.st && typeof G.st === 'object') for (const k of Object.keys(o.st)) o.st[k] = n(G.st[k], 1e9);
+    o.free = n(G.free, 9); o.fq = (Array.isArray(G.fq) ? G.fq : []).filter(x => GD_FREE_Q.includes(x));
     s.gn = o;
   }
   function openGd() {
     if (!gdOpen()) { toast('급식실을 지으면 텃밭을 가꿀 수 있어요'); return; }
-    gdSync(); rt.gdPick = -1;
+    gdSync(); rt.gdPick = -1; rt.gdCutI = -1;
+    gdFreeGrant(curMain());   // 3.3.2 이미 그 퀘스트 중인 학교도 텃밭을 열면 무료 한 번
     const bg = IMG('garden_bg'); $('#gdHead').style.backgroundImage = bg ? `url("${bg}")` : ''; $('#gdHead').classList.toggle('noimg', !bg);   // 그림(작업지시서 37-A)이 오기 전에는 낮게
     gdRender(true); openModal($('#mGd')); sfx('tap');
   }
@@ -10594,18 +10654,31 @@ body.cam-scene #ffChip,body.cam-scene #plChip,body.cam-scene .b-ring{animation-p
     if (!S || !S.gn || $('#mGd').hidden && !force) return;
     gdSync();
     const now = gameNow(), n = gdN(), tm = gdToday();
-    const key = [n, rt.gdPick, JSON.stringify(S.gn.plots.slice(0, n).map(p => [p.c, p.w, gdReady(p), p.c ? Math.floor(Math.max(0, p.e - now) / 60000) : 0])), JSON.stringify(S.gn.inv), tm ? tm.id : '', gdDiet()].join('|');
+    const key = [n, rt.gdPick, JSON.stringify(S.gn.plots.slice(0, n).map(p => [p.c, p.w, gdReady(p), p.c ? Math.floor(Math.max(0, p.e - now) / 60000) : 0])), JSON.stringify(S.gn.inv), tm ? tm.id : '', gdDiet(), rt.gdCutI, S.gn.free, JSON.stringify(S.tk), tkAdLeft()].join('|');
     if (!force && $('#gdPlots').dataset.key === key) return; $('#gdPlots').dataset.key = key;
     $('#gdPlots').innerHTML = S.gn.plots.slice(0, n).map((p, i) => {
       const C = GD_C[p.c], ready = gdReady(p), st = !C ? 0 : ready ? 3 : (now - p.s) / Math.max(1, p.e - p.s) < 0.5 ? 1 : 2;
       const bed = IMG(p.w && !ready ? 'plot_wet' : 'plot_dry'), crop = C ? gdImg(`crop_${p.c}_${st}`, st === 3 ? C.em : st === 2 ? '🌿' : '🌱', 'crop') : '';
       const tx = !C ? '빈 밭' : ready ? `${C.nm} 다 자람` : `${C.nm} ${hm(Math.max(1, Math.ceil((p.e - now) / 1000)))}`;
       const act = !C ? `<button type="button" data-gd="pick" data-i="${i}">심기</button>` : ready ? `<button type="button" class="go" data-gd="har" data-i="${i}">거두기</button>`
-        : p.w ? '<small>물 줬어요</small>' : `<button type="button" data-gd="wat" data-i="${i}">💧 물 주기</button>`;
-      return `<div class="gd-plot${ready ? ' ready' : ''}${rt.gdPick === i ? ' pick' : ''}"><span class="bed"${bed ? ` style="background-image:url('${bed}')"` : ''}>${crop}</span><span class="tx">${tx}</span>${act}</div>`;
+        : (p.w ? '<small>물 줬어요</small>' : `<button type="button" data-gd="wat" data-i="${i}">💧 물 주기</button>`) + `<button type="button" data-gd="cut" data-i="${i}">⏱ 당기기</button>`;   // 3.3.2
+      return `<div class="gd-plot${ready ? ' ready' : ''}${rt.gdPick === i || rt.gdCutI === i ? ' pick' : ''}"><span class="bed"${bed ? ` style="background-image:url('${bed}')"` : ''}>${crop}</span><span class="tx">${tx}</span>${act}</div>`;
     }).join('');
-    const pk = $('#gdPick'); pk.hidden = !(rt.gdPick >= 0);
-    if (rt.gdPick >= 0) pk.innerHTML = `<b>무엇을 심을까요?</b><div class="gd-seeds">${GD_CROPS.map(c => gdCropOk(c.k)
+    { const cb = $('#gdCut'), ci = rt.gdCutI, cp = ci >= 0 ? S.gn.plots[ci] : null, ok = cp && cp.c && !gdReady(cp);
+      if (!ok) rt.gdCutI = -1;
+      cb.hidden = !ok;
+      if (ok) { const rem = Math.ceil((cp.e - now) / 1000), adL = tkAdLeft();
+        cb.innerHTML = `<b>${GD_C[cp.c].nm} 시간 당기기 <small>${hm(rem)} 남음</small></b>` +
+          (S.gn.free > 0 ? `<button type="button" class="go free" data-gd="free" data-i="${ci}">🎁 무료로 바로 자라기 (${S.gn.free}번)</button>` : '') +
+          `<div class="gd-tks">${TK.slice().reverse().map(t => `<button type="button" data-gd="tk" data-tk="${t.k}" data-i="${ci}" aria-disabled="${S.tk[t.k] > 0 ? 'false' : 'true'}">${t.name}<small>${S.tk[t.k]}장</small></button>`).join('')}</div>` +
+          `<div class="gd-tkrow"><button type="button" data-gd="tkall" data-i="${ci}" aria-disabled="${tkSum() > 0 ? 'false' : 'true'}">남은 시간만큼 쓰기</button>` +
+          `<button type="button" data-gd="tkad" aria-disabled="${adL > 0 ? 'false' : 'true'}">📺 광고 보고 5분권 ${TKAD.n}장 (${adL}번 남음)</button></div>`; } }
+    { const live = S.gn.plots.slice(0, n), em = live.filter(p => !p.c).length, rd = live.filter(p => p.c && gdReady(p)).length, wt = live.filter(p => p.c && !p.w && !gdReady(p)).length;
+      if (rt.gdPick === -2 && !em) rt.gdPick = -1;
+      $('#gdBulk').innerHTML = n < 2 ? '' : (em ? `<button type="button" data-gd="pickall">🌱 빈 밭 모두 심기 (${em})</button>` : '') +
+        (rd ? `<button type="button" data-gd="harall">🧺 모두 거두기 (${rd})</button>` : '') + (wt ? `<button type="button" data-gd="watall">💧 모두 물 주기 (${wt})</button>` : ''); }
+    const pk = $('#gdPick'); pk.hidden = !(rt.gdPick >= 0 || rt.gdPick === -2);
+    if (rt.gdPick >= 0 || rt.gdPick === -2) pk.innerHTML = `<b>${rt.gdPick === -2 ? `빈 밭 ${S.gn.plots.slice(0, n).filter(p => !p.c).length}곳에 무엇을 심을까요?` : `${rt.gdPick + 1}번 밭에 무엇을 심을까요?`}</b><div class="gd-seeds">${GD_CROPS.map(c => gdCropOk(c.k)
       ? `<button type="button" data-gd="seed" data-c="${c.k}">${gdImg('item_' + c.k, c.em)}<span>${c.nm}</span><small>${hm(c.min * 60)}</small></button>`
       : `<button type="button" aria-disabled="true">${gdImg('item_' + c.k, c.em)}<span>${c.nm}</span><small>${['', '초등학교', '중학교'][c.tier]}부터</small></button>`).join('')}</div>`;
     $('#gdInv').innerHTML = `<b>재료</b>${GD_CROPS.filter(c => gdCropOk(c.k) || S.gn.inv[c.k]).map(c => `<span class="gd-it">${gdImg('item_' + c.k, c.em)}${S.gn.inv[c.k] || 0}</span>`).join('')}`;
@@ -11469,8 +11542,8 @@ body.cam-scene #ffChip,body.cam-scene #plChip,body.cam-scene .b-ring{animation-p
        forest/rank/<내 id>   랭킹 이름과 학교 점수
        forest/stats/<내 id>  테스트 현황 (어디까지 했는지, 얼마나 했는지)
      <내 id>는 Firebase 익명 로그인이 기기(브라우저)마다 만들어 줘요. */
-  const VERSION = '3.3.1';
-  const NT_QUIET = ['2.1.20', '2.1.2.2', '2.3.0.1', '2.3.4', '3.2.3', '3.2.4', '3.2.5', '3.3.1'];   // 3.3.1도 공지 창 없이(지섭). 2.3.0.1도 공지 창 없이(공지는 그대로 2.3.0). 2.3.4도 조용히(지섭 결정). 3.2.3, 3.2.4, 3.2.5도 공지 창 없이(공지 줄을 고르지 않음)
+  const VERSION = '3.3.2';
+  const NT_QUIET = ['2.1.20', '2.1.2.2', '2.3.0.1', '2.3.4', '3.2.3', '3.2.4', '3.2.5', '3.3.1', '3.3.2'];   // 3.3.1, 3.3.2도 공지 창 없이(지섭). 2.3.0.1도 공지 창 없이(공지는 그대로 2.3.0). 2.3.4도 조용히(지섭 결정). 3.2.3, 3.2.4, 3.2.5도 공지 창 없이(공지 줄을 고르지 않음)
     // 2.1.20 지섭 결정: 이 버전들은 업데이트해도 공지 창을 띄우지 않아요(공지는 그대로 2.1.2)
   /* 2.0.0 공지사항 (2026-10-27 지섭, 1.8.0은 이미 올려서 2.0.0부터): 설정 > 공지사항. 맨 위가 가장 새 공지예요.
      패치노트는 자동으로 넣지 않아요. 지섭이 검수한 글만 여기에 적어요(CHANGELOG.md는 자세한 기록용이라 따로 있어요).
@@ -20015,7 +20088,7 @@ body.cam-scene #ffChip,body.cam-scene #plChip,body.cam-scene .b-ring{animation-p
   const kidAvatar = sp => `<svg viewBox="-10 -15.5 20 27" aria-hidden="true">${kidSVG(sp, 0)}</svg>`;
   const hedgehogAvatar = () => `<svg viewBox="-24 -24 48 48" aria-hidden="true">${AV.hedgehog}</svg>`;
 
-  function startMain() { const q = curMain(); S.q.mb = q ? qMeasure(q) : 0; }
+  function startMain() { const q = curMain(); S.q.mb = q ? qMeasure(q) : 0; gdFreeGrant(q); }
   // 퀘스트가 생기기 전부터 하던 학교는 이미 이룬 메인 퀘스트를 보상 없이 건너뛰어요
   function fastForwardMain() {
     while (S.q.m < MAIN.length) {
@@ -21221,7 +21294,15 @@ body.cam-scene #ffChip,body.cam-scene #plChip,body.cam-scene .b-ring{animation-p
     $('#mGd').addEventListener('click', e => {
       const b = e.target.closest('[data-gd]'); if (!b || b.getAttribute('aria-disabled') === 'true' && b.dataset.gd !== 'cook') return;
       const i = Number(b.dataset.i), g = b.dataset.gd;
-      if (g === 'pick') { sfx('tap'); rt.gdPick = rt.gdPick === i ? -1 : i; gdRender(true); }
+      if (g === 'pick') { sfx('tap'); rt.gdCutI = -1; rt.gdPick = rt.gdPick === i ? -1 : i; gdRender(true); }
+      else if (g === 'pickall') { sfx('tap'); rt.gdCutI = -1; rt.gdPick = rt.gdPick === -2 ? -1 : -2; gdRender(true); }
+      else if (g === 'harall') { let k = 0; S.gn.plots.slice(0, gdN()).forEach((p, j) => { if (p.c && gdReady(p) && gdHarvest(j, true)) k++; }); if (k) { sfx('coin'); toast(`작물 ${k}곳을 거뒀어요!`); gdRender(true); gdMark(); save(); } }
+      else if (g === 'watall') { let k = 0; S.gn.plots.slice(0, gdN()).forEach(p => { if (p.c && !p.w && !gdReady(p)) { gdWet(p); k++; } }); if (k) { sfx('tap'); toast(`밭 ${k}곳에 물을 줬어요!`); gdRender(true); gdMark(); save(); } }
+      else if (g === 'cut') { sfx('tap'); rt.gdPick = -1; rt.gdCutI = rt.gdCutI === i ? -1 : i; gdRender(true); }
+      else if (g === 'tk') gdTk(i, b.dataset.tk);
+      else if (g === 'tkall') gdTkAll(i);
+      else if (g === 'tkad') { tkAd(); setTimeout(() => gdRender(true), 400); }
+      else if (g === 'free') gdFree(i);
       else if (g === 'seed') gdPlant(rt.gdPick, b.dataset.c);
       else if (g === 'wat') gdWater(i);
       else if (g === 'har') gdHarvest(i);
@@ -23342,7 +23423,7 @@ body.cam-scene #ffChip,body.cam-scene #plChip,body.cam-scene .b-ring{animation-p
      웹 주소의 live.json을 켤 때 읽어요(웹, 안드로이드, 토스 모두). 코드는 받지 않고 숫자, 공지, 기능 끄기만 받아요.
      바꿀 수 있는 숫자는 LIVE_KEYS에 적은 것만이고, 값마다 최소와 최대 안으로 맞춰요. 받은 것은 이 기기에 남겨 두고 인터넷이 없을 때 써요.
      쓰는 법은 docs/HOTFIX.md */
-  const LIVE_URL = () => window.FS_LIVE_URL || (/(github\.io|web\.app|firebaseapp\.com)$/.test(location.hostname) ? 'live.json' : 'https://forest-school-7dd78.web.app/live.json');
+  const LIVE_URL = () => window.FS_LIVE_URL || (/(github\.io|web\.app|firebaseapp\.com)$/.test(location.hostname) ? 'live.json' : 'https://seop-sci.github.io/forest-school/live.json');   // 2026-11-10 GitHub 복구로 다시 github.io(3.2.4~3.3.1 앱은 web.app을 읽어서 Firebase가 github.io로 넘겨줘요)
   const LIVE_KEYS = {   // 이름: [바꿀 곳, 칸, 최소, 최대]
     pace: [() => CFG, 'pace', 0.1, 0.4],   // 게임 속도(수업료 배율)
     'pz.perDay': [() => PZ, 'perDay', 3, 30], 'pz.adMore': [() => PZ, 'adMore', 0, 10], 'pz.adMax': [() => PZ, 'adMax', 0, 5],   // 숲속 퍼즐 하루 보상 판, 광고로 더 받는 판과 횟수
@@ -23497,7 +23578,7 @@ body.cam-scene #ffChip,body.cam-scene #plChip,body.cam-scene .b-ring{animation-p
   }
 
   // 시험용 손잡이: 자동 시험(window.__FOREST_TEST)에서만 게임 속 함수를 꺼내 써요
-  if (window.__FOREST_TEST) window.__forest = { get S() { return S; }, goTo, navInfo, openShop, thPreview, thPreviewEnd, thOn, busScene, tripCrowd, openTrip, startTrip, claimTrip, TRIPS, mgPickMul, mgPickMode, mgUpOrder, mgFillOrders, mgAdAsk, sportsCon, festCon, btQuota, btCanAd, btAdMore, warmRooms, blobUrl, vdSize, vdBlock, pzSweep, pzSwGain, pzSwOpen, pzXpOf, mgMulMax, mgMulOk, mgMul, mgModeTap, acTip, kidDupIdx, trialSafe, closeAd,
+  if (window.__FOREST_TEST) window.__forest = { get S() { return S; }, goTo, navInfo, openShop, gdReady, thPreview, thPreviewEnd, thOn, busScene, tripCrowd, openTrip, startTrip, claimTrip, TRIPS, mgPickMul, mgPickMode, mgUpOrder, mgFillOrders, mgAdAsk, sportsCon, festCon, btQuota, btCanAd, btAdMore, warmRooms, blobUrl, vdSize, vdBlock, pzSweep, pzSwGain, pzSwOpen, pzXpOf, mgMulMax, mgMulOk, mgMul, mgModeTap, acTip, kidDupIdx, trialSafe, closeAd,
     TKE, TK_Q, tkDaily, nbAllDay, nbBuildAt, nbOn, conAdd, BX_SPOT, PERKS, offlineCapH, applyAway, pzFinish, mgClaimOrder,
     CS, JOBS, CS_WORRY, freshCs, csOpen, csLeft, csMax, csEnsure, csCands, csNeed, csMul, csOpenCards, csReady, csDone, csTalkMake, csAnswer, csChoose, csSettle, openCounsel, renderCounsel, renderHall, MAIN, qMeasure, qGoal, sanitize,   // 3.1.0 진로 상담
     NSL, nsStart, nsSettle, nsOpen, nsOn, nsOverlap, nsExtraH, isNight, nightDayOf, openNs, renderNs, bxSpots, renderNight,   // 3.0.0
