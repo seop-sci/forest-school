@@ -8195,7 +8195,8 @@ body.cam-scene #ffChip,body.cam-scene #tierDots,body.cam-scene #plChip{opacity:0
   // 줄일 때는 같은 종류가 겹친 학생부터 빼요. 새 친구가 오면 겹치는 학생 하나를 그 친구로 바꿔요
   function syncKids(initial) {
     const list = speciesList();
-    const want = Math.max(0, Math.min(Math.max(CFG.maxKids, list.length), Math.floor(S.students)) - (S.trip.kids || 0));
+    // 3.2.5 체험학습 출발 장면 동안은 떠날 친구(rt.busHold명)가 버스에 탈 때까지 지도에 남아 있어요
+    const want = Math.max(0, Math.min(Math.max(CFG.maxKids, list.length), Math.floor(S.students)) - Math.max(0, (S.trip.kids || 0) - (rt.busHold || 0)));
     while (rt.kids.length < want) addKid(!initial);
     while (rt.kids.length > want) { const i = kidDupIdx(); const k = rt.kids.splice(i, 1)[0]; k.g.remove(); }
     if (rt.kidSpN !== list.length) {
@@ -8219,7 +8220,7 @@ body.cam-scene #ffChip,body.cam-scene #tierDots,body.cam-scene #plChip{opacity:0
         const wp = k.ang === undefined && k.route && k.route.length ? k.route[0] : null;
         const dx = (wp ? wp[0] : k.tx) - k.x, dy = (wp ? wp[1] : k.ty) - k.y, d = Math.hypot(dx, dy);
         if (wp && d < 0.8) { k.route.shift(); k.moving = true; }
-        else if (d < 0.8) { k.moving = false; if (!k.board && !k.hold && k.ang === undefined) { k.wait = rand(1, 4.5); pickTarget(k); } }
+        else if (d < 0.8) { k.moving = false; if (k.propU) tripProp(k); if (!k.board && !k.hold && !k.rider && k.ang === undefined) { k.wait = rand(1, 4.5); pickTarget(k); } }
         else { const st = Math.min(d, k.speed * dt); k.x += dx / d * st; k.y += dy / d * st; k.moving = true; }
       }
       if (!away) placeKid(k, k.moving ? -Math.abs(Math.sin(now / 110 + k.phase)) * 1.6 : k.hold ? -Math.abs(Math.sin(now / 260 + k.cheer)) * 2.4 : 0);
@@ -8792,19 +8793,24 @@ body.cam-scene #ffChip,body.cam-scene #tierDots,body.cam-scene #plChip{opacity:0
   }
   // 지도에서 가장 위에 있는 건물(공사 자리 포함)의 지붕 꼭대기 y (지도 좌표)
   const mapRoofTop = () => { const G = geo(); return Math.min(...Object.values(G.b).concat([G.next.at]).map(([, cy, w]) => cy - w * 0.46)); };
+  // 3.2.5 화면 당기기(camAnim)가 마지막 자리를 미리 알 수 있게 자리 맞추기만 따로 떼었어요
   function panTo(x, y) {
+    const [px, py] = panClamp(x, y);
+    rt.panX = px; rt.panY = py;
+    map.style.transform = `translate(${rt.panX.toFixed(1)}px, ${rt.panY.toFixed(1)}px)`;
+  }
+  function panClamp(x, y) {
     const fr = $('.frame'), W = fr.clientWidth, H = fr.clientHeight;
     // 지도가 화면보다 작은 쪽은 그 안에서만, 큰 쪽은 빈틈이 보이지 않는 데까지만 움직여요
     const cl = (v, room) => Math.min(Math.max(0, room), Math.max(Math.min(0, room), v));
-    rt.panX = cl(x, W - rt.mapW);
+    const px = cl(x, W - rt.mapW);
     // 1.6.0: 긴 휴대폰에서도 가장 위 건물(초등학교 과학실)이 위쪽 칸에 가려지지 않게, 그 지붕이 위쪽 칸 바로 아래 올 때까지 지도를 내릴 수 있어요.
     // 지도 위 끝은 위쪽 칸 뒤에 머물러서 빈 곳이 보이지 않아요(그 뒤는 .frame의 하늘색)
     const down = Math.max(0, (rt.hudTop || 0) + 4 - (mapRoofTop() + 60) * rt.mapS);
     const lo = rt.mapH < H ? H - (rt.hudBot || 0) - rt.mapH : H - rt.mapH;
     // 1.7.3: 지도를 360칸으로 줄이면 긴 휴대폰에서는 지도 전체가 위쪽 칸과 아래 탭 사이에 다 들어가요(lo > down).
     // 그때는 지도 아래 끝을 아래 탭 위에 맞춰 두고(위아래로 움직이지 않아요), 지도 위쪽 빈 곳은 흐린 배경(.frame::before)이 채워요
-    rt.panY = lo > down ? lo : Math.min(down, Math.max(lo, y));
-    map.style.transform = `translate(${rt.panX.toFixed(1)}px, ${rt.panY.toFixed(1)}px)`;
+    return [px, lo > down ? lo : Math.min(down, Math.max(lo, y))];
   }
   // 1.6.0 학교 행사: 행사 자리(지도 y 범위)가 위쪽 칸과 아래 탭 사이에 다 보이게 지도를 옮겨요. 범위가 더 크면 위쪽을 맞춰요
   function festFocus(top, bot) {
@@ -8861,12 +8867,22 @@ body.cam-scene #ffChip,body.cam-scene #tierDots,body.cam-scene #plChip{opacity:0
   function camAnim(z, x, y, ms) {
     return new Promise(done => {
       if (!rt.mapS || rt.tab !== 'school') { done(); return; }
+      /* 3.2.5 지섭 제보(체험학습 출발과 귀환 때 심하게 끊김): 예전에는 매 프레임 fitMap으로 지도 크기(width, height)를 바꾸고
+         위쪽 칸 자리를 다시 재서(hudVars), 휴대폰이 큰 지도를 프레임마다 다시 배치하고 다시 그렸어요.
+         이제 움직이는 동안은 지도 크기는 그대로 두고 transform(옮기기와 키우기)만 바꾸고, 크기는 끝에 한 번만 맞춰요 */
       const z0 = rt.zoom || 1, x0 = rt.panX, y0 = rt.panY, t0 = performance.now(), id = (rt.camId = (rt.camId || 0) + 1);
+      const m0 = { s: rt.mapS, w: rt.mapW, h: rt.mapH }, s1 = m0.s / z0 * z;
+      rt.mapS = s1; rt.mapW = 360 * s1; rt.mapH = 540 * s1;
+      const [x1, y1] = panClamp(x, y);   // 마지막 자리(빈틈이 보이지 않게 맞춘 값)
+      rt.mapS = m0.s; rt.mapW = m0.w; rt.mapH = m0.h;
+      const end = () => { rt.zoom = z; fitMap(false); panTo(x1, y1); done(); };
       const step = now => {
-        if (rt.camId !== id || rt.tab !== 'school') { done(); return; }
+        if (rt.camId !== id) { done(); return; }   // 새 당기기가 이어받아요(그쪽이 처음 자리부터 다시 움직여요)
+        if (rt.tab !== 'school') { end(); return; }
         const p = Math.min(1, (now - t0) / ms), e = p < 0.5 ? 2 * p * p : 1 - Math.pow(-2 * p + 2, 2) / 2;
-        rt.zoom = z0 + (z - z0) * e; fitMap(false); panTo(x0 + (x - x0) * e, y0 + (y - y0) * e);
-        if (p < 1) requestAnimationFrame(step); else done();
+        const zc = z0 + (z - z0) * e;
+        map.style.transform = `translate(${(x0 + (x1 - x0) * e).toFixed(1)}px, ${(y0 + (y1 - y0) * e).toFixed(1)}px) scale(${(zc / z0).toFixed(4)})`;
+        if (p < 1) requestAnimationFrame(step); else end();
       };
       requestAnimationFrame(step);
     });
@@ -17168,7 +17184,8 @@ body.cam-scene #ffChip,body.cam-scene #tierDots,body.cam-scene #plChip{opacity:0
     S.trip.kids = Math.max(0, Math.min(5, rt.kids.length - 2));
     rt.tripTxt = ''; save(); renderTripBtn();
     const n = S.trip.kids;
-    closeModal($('#mTrip'), () => { setTab('school'); busScene('go', n, () => syncKids(false)); });
+    rt.busHold = rt.reduced ? 0 : n;
+    closeModal($('#mTrip'), () => { setTab('school'); busScene('go', n, () => { rt.busHold = 0; syncKids(false); }); });
   }
   function tripUseTicket(k) {
     const t = TK.find(x => x.k === k);
@@ -17208,7 +17225,9 @@ body.cam-scene #ffChip,body.cam-scene #tierDots,body.cam-scene #plChip{opacity:0
       rw.bigSub = left.length === 1 ? `${D.name} 기념품을 모두 모았어요! 수업료 +2%에 +10% 더` : '기념품 하나에 수업료 +2%';
       if (left.length === 1) msg += `까지! ${D.name} 기념품을 모두 모아서 수업료가 10% 더 올랐어요`;
     } else { addGold(1); msg += ', 기념품이 겹쳐서 황금 도토리 +1'; rw.items.push({ ic: 'gold', t: '기념품이 겹쳐서 황금 도토리 +1' }); }
-    showReward(rw);
+    // 3.2.5 지섭 제보(돌아올 때 끊김): 보상 창이 버스 장면과 같은 순간에 열려 겹쳤어요. 학생들이 다 내린 뒤에 보여요
+    const n0 = S.trip.kids, rwNow = rt.reduced || !n0 || !layerFx.animate;
+    if (rwNow) showReward(rw);
     S.trip.been[D.id] = (S.trip.been[D.id] || 0) + 1;
     S.st.trips += 1;
     addLeague(LP.trip + LP.tripHour * Math.floor(D.min / 60));
@@ -17217,7 +17236,7 @@ body.cam-scene #ffChip,body.cam-scene #tierDots,body.cam-scene #plChip{opacity:0
     rt.tripGot = msg;
     rt.tripTxt = '';
     save(); renderHUD(); renderAffordance(); renderTripBtn(); renderGradPanel(true);
-    const n = S.trip.kids, arrive = () => { setTab('school'); if (n > 0) busScene('back', n, () => { S.trip.kids = 0; syncKids(false); save(); }); };
+    const n = S.trip.kids, arrive = () => { setTab('school'); if (n > 0) busScene('back', n, () => { S.trip.kids = 0; syncKids(false); save(); if (!rwNow) showReward(rw); }); };
     if (rt.reduced) { S.trip.kids = 0; syncKids(false); }
     if (rt.modalOpen === $('#mTrip')) closeModal($('#mTrip'), arrive); else arrive();
   }
@@ -18033,19 +18052,24 @@ body.cam-scene #ffChip,body.cam-scene #tierDots,body.cam-scene #plChip{opacity:0
   /* 3.0.0 지섭 요청: 체험학습을 모두 알게. 떠날 때 남은 친구들이 버스 옆에 모여 깡충 뛰며 깃발을 흔들고, 돌아올 때는 풍선을 들고 마중 나와요.
      친구들은 버스 옆에 서서 응원하듯 통통 뛰어요(k.hold). 버스가 떠나거나 다 내리면 다시 흩어져요 */
   function tripCrowd(mode, bx, by, skip) {
-    for (const k of rt.kids) if (k.trip) { k.trip = false; k.hold = false; const f = k.g.querySelector('.trip-prop'); if (f) f.remove(); if (!k.board) { k.wait = rand(0.2, 1.2); pickTarget(k); } }
+    for (const k of rt.kids) if (k.trip) { k.trip = false; k.hold = false; k.propU = ''; const f = k.g.querySelector('.trip-prop'); if (f) f.remove(); if (!k.board) { k.wait = rand(0.2, 1.2); pickTarget(k); } }
     if (!mode) return;
-    const pool = rt.kids.filter(k => !k.board).slice(0, Math.max(0, rt.kids.length - (skip || 0)))
+    const pool = rt.kids.filter(k => !k.board && !k.rider)   // 3.2.5 버스에 탈 친구(k.rider)는 배웅하지 않아요
       .sort((a, b) => Math.hypot(a.x - bx, a.y - by) - Math.hypot(b.x - bx, b.y - by)).slice(0, 5);   // 3.0.0 버스에서 가까운 친구부터(늦게 도착하지 않게)
     const flag = IMG('trip_fx_flag'), bal = IMG('trip_fx_balloons');
     pool.forEach((k, i) => {
       k.trip = true; k.hold = true; k.cheer = rand(0, 6); k.wait = 0; k.speed = 46;
       k.tx = bx - 50 + (i % 3) * 13 + rand(-2, 2); k.ty = by - 8 + Math.floor(i / 3) * 10 + rand(-2, 2);   // 버스 왼쪽 위 길가
-      const u = mode === 'go' ? flag : bal; if (!u) return;
+      k.propU = mode === 'go' ? flag : bal; k.propGo = mode === 'go';   // 3.2.5 깃발과 풍선은 버스 옆에 도착한 뒤에 들어요(tripProp)
+    });
+  }
+  function tripProp(k) {
+    const u = k.propU; k.propU = ''; if (!u || !k.trip) return;
+    { const mode = k.propGo ? 'go' : 'back';
       const im = document.createElementNS(NS, 'image'); im.setAttribute('class', 'trip-prop' + (mode === 'go' ? ' wave' : ' float'));
       im.setAttribute('href', u); if (mode === 'go') { im.setAttribute('x', 3); im.setAttribute('y', -22); im.setAttribute('width', 12); im.setAttribute('height', 12); } else { im.setAttribute('x', 2); im.setAttribute('y', -34); im.setAttribute('width', 11); im.setAttribute('height', 16); }
       k.g.appendChild(im);
-    });
+    }
   }
   // 3.0.0 배웅, 마중 친구가 다 모였는지(아무리 늦어도 ms 뒤에는 넘어가요)
   const tripCrowdIn = () => rt.kids.filter(k => k.trip).every(k => Math.hypot(k.x - k.tx, k.y - k.ty) < 4);
@@ -18062,7 +18086,7 @@ body.cam-scene #ffChip,body.cam-scene #tierDots,body.cam-scene #plChip{opacity:0
     }
   }
   function busScene(mode, n, then) {
-    if (rt.reduced || !layerFx.animate) { if (then) then(); return; }
+    if (rt.reduced || !layerFx.animate) { rt.busHold = 0; if (then) then(); return; }
     if (rt.bus) rt.bus.remove();
     const g = document.createElementNS(NS, 'g');
     g.setAttribute('class', 'bus');
@@ -18086,25 +18110,31 @@ body.cam-scene #ffChip,body.cam-scene #tierDots,body.cam-scene #plChip{opacity:0
     if (camGo) camAnim(Math.max(cam0.z, 1.6), camGo[0], camGo[1], 700);
     document.body.classList.add('cam-scene');
     const finish = () => setTimeout(() => { tripCrowd(null); document.body.classList.remove('cam-scene'); if (cam0.x != null && rt.tab === 'school') camAnim(cam0.z, cam0.x, cam0.y, 700); if (then) then(); }, 1200);
-    const leave = () => tripWait(4000, tripCrowdIn).then(() => { door(false); dust(); if (bob) bob.play(); sfx('leaf'); drive(by, 490, 1300).onfinish = () => { g.remove(); if (rt.bus === g) rt.bus = null; finish(); }; });
-    tripCrowd(mode === 'back' ? 'back' : 'go', bx, by, mode === 'go' ? n : 0);   // 3.0.0 버스가 오는 동안 친구들이 먼저 모여요(떠날 때 배웅, 돌아올 때 마중)
+    const leave = () => tripWait(12000, tripCrowdIn).then(() => { door(false); dust(); if (bob) bob.play(); sfx('leaf'); drive(by, 490, 1300).onfinish = () => { g.remove(); if (rt.bus === g) rt.bus = null; finish(); }; });
+    /* 3.2.5 지섭 요청: 학생들이 버스에 다 온 뒤에 장면이 이어지게. 탈 친구는 버스에서 가까운 친구 n명을 먼저 골라 버스가 오는 동안
+       정류장 옆으로 걸어가 줄을 서고(k.rider), 버스가 서면 문으로 들어가요. 다 탈 때까지(넉넉히 15초) 기다려요 */
+    const dr = [bx + (IMG('trip_bus') ? -12 : 16), by + 4];   // 3.0.0 새 버스는 앞문이 왼쪽
+    const riders = mode === 'go' ? rt.kids.filter(k => !k.board).sort((a, b) => Math.hypot(a.x - dr[0], a.y - dr[1]) - Math.hypot(b.x - dr[0], b.y - dr[1])).slice(0, n) : [];
+    riders.forEach((k, i) => { k.rider = true; k.wait = 0; k.speed = 46; k.tx = dr[0] - 8 - i * 7; k.ty = dr[1] + 10; });
+    tripCrowd(mode === 'back' ? 'back' : 'go', bx, by, 0);   // 3.0.0 버스가 오는 동안 친구들이 먼저 모여요(떠날 때 배웅, 돌아올 때 마중)
     drive(490, by, 1300).onfinish = () => {
       if (bob) bob.pause(); dust(); door(true);
       if (mode === 'go') {
-        // 학생 n명이 버스 문으로 걸어가요. 다 타면(아무리 늦어도 5초) 떠나요
-        const riders = rt.kids.filter(k => !k.board).slice(-n);
-        riders.forEach(k => { k.board = true; k.wait = 0; k.tx = bx + (IMG('trip_bus') ? -12 : 16); k.ty = by + 4; k.speed = 34; });   // 3.0.0 새 버스는 앞문이 왼쪽
+        // 줄 선 친구들이 한 명씩 버스 문으로 들어가요. 다 타면 떠나요(아무리 늦어도 15초)
+        riders.forEach((k, i) => { k.board = true; k.wait = i * 0.25; k.tx = dr[0]; k.ty = dr[1]; k.speed = 40; });
         const t0 = performance.now();
         const check = () => {
-          for (const k of riders) if (!k.gone && Math.hypot(k.x - k.tx, k.y - k.ty) < 3) { k.gone = true; k.g.style.opacity = '0'; }
-          if (riders.every(k => k.gone) || performance.now() - t0 > 5000) {
+          for (const k of riders) if (!k.gone && Math.hypot(k.x - k.tx, k.y - k.ty) < 3) { k.gone = true; k.g.style.opacity = '0'; sfx('tap'); }
+          if (riders.every(k => k.gone) || performance.now() - t0 > 15000) {
             riders.forEach(k => { k.g.remove(); const i = rt.kids.indexOf(k); if (i >= 0) rt.kids.splice(i, 1); });
+            rt.busHold = 0;
             setTimeout(leave, 400);
           } else requestAnimationFrame(check);
         };
         requestAnimationFrame(check);
       } else {
         // 돌아오면 학생들이 한 명씩 내려요
+        // 3.2.5 마중 친구들이 버스 옆에 다 모인 뒤에 내려요(아무리 늦어도 8초)
         let i = 0;
         const off = () => {
           if (i >= n) { setTimeout(leave, 500); return; }
@@ -18116,7 +18146,7 @@ body.cam-scene #ffChip,body.cam-scene #tierDots,body.cam-scene #plChip{opacity:0
           sfx('tap');
           setTimeout(off, 260);
         };
-        setTimeout(off, 300);
+        tripWait(8000, tripCrowdIn).then(() => setTimeout(off, 300));
       }
     };
   }
@@ -23156,7 +23186,7 @@ body.cam-scene #ffChip,body.cam-scene #tierDots,body.cam-scene #plChip{opacity:0
   }
 
   // 시험용 손잡이: 자동 시험(window.__FOREST_TEST)에서만 게임 속 함수를 꺼내 써요
-  if (window.__FOREST_TEST) window.__forest = { get S() { return S; }, goTo, navInfo, openShop, thPreview, thPreviewEnd, thOn, busScene, tripCrowd, openTrip, mgPickMul, mgPickMode, mgUpOrder, mgFillOrders, mgAdAsk, sportsCon, festCon, btQuota, btCanAd, btAdMore, warmRooms, blobUrl, vdSize, vdBlock, pzSweep, pzSwGain, pzSwOpen, pzXpOf, mgMulMax, mgMulOk, mgMul, mgModeTap, acTip, kidDupIdx, trialSafe, closeAd,
+  if (window.__FOREST_TEST) window.__forest = { get S() { return S; }, goTo, navInfo, openShop, thPreview, thPreviewEnd, thOn, busScene, tripCrowd, openTrip, startTrip, claimTrip, TRIPS, mgPickMul, mgPickMode, mgUpOrder, mgFillOrders, mgAdAsk, sportsCon, festCon, btQuota, btCanAd, btAdMore, warmRooms, blobUrl, vdSize, vdBlock, pzSweep, pzSwGain, pzSwOpen, pzXpOf, mgMulMax, mgMulOk, mgMul, mgModeTap, acTip, kidDupIdx, trialSafe, closeAd,
     TKE, TK_Q, tkDaily, nbAllDay, nbBuildAt, nbOn, conAdd, BX_SPOT, PERKS, offlineCapH, applyAway, pzFinish, mgClaimOrder,
     CS, JOBS, CS_WORRY, freshCs, csOpen, csLeft, csMax, csEnsure, csCands, csNeed, csMul, csOpenCards, csReady, csDone, csTalkMake, csAnswer, csChoose, csSettle, openCounsel, renderCounsel, renderHall, MAIN, qMeasure, qGoal, sanitize,   // 3.1.0 진로 상담
     NSL, nsStart, nsSettle, nsOpen, nsOn, nsOverlap, nsExtraH, isNight, nightDayOf, openNs, renderNs, bxSpots, renderNight,   // 3.0.0
