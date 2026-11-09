@@ -2146,7 +2146,7 @@ body{background:radial-gradient(120% 60% at 50% 0%, color-mix(in srgb, var(--pap
 .gd-head{background-color:#E3EFC9}
 .gd-head.noimg{height:58px}.gd-head.noimg b{right:0;width:100%}
 .gd-body{max-height:min(62vh,560px);overflow-y:auto;padding:0 12px}
-.gd-plots{display:grid;grid-template-columns:repeat(auto-fit,minmax(96px,1fr));gap:6px;margin-top:10px}
+.gd-plots{display:grid;grid-template-columns:repeat(auto-fit,minmax(90px,1fr));gap:6px;margin-top:8px}
 .gd-plot{display:grid;justify-items:center;gap:3px;padding:6px 4px;border-radius:12px;background:rgba(139,94,52,.08);border:1.5px solid var(--line);font-size:11.5px;text-align:center;min-width:0}
 .gd-plot.ready{border-color:#6BA23A;background:rgba(107,162,58,.12)}.gd-plot.pick{border-color:#E2A21C}
 .gd-plot .bed{position:relative;display:grid;place-items:center;width:84px;height:84px;background:center/contain no-repeat}.gd-plot .bed:not([style]){border-radius:10px;background-color:#B98B5E}
@@ -2155,6 +2155,10 @@ body{background:radial-gradient(120% 60% at 50% 0%, color-mix(in srgb, var(--pap
 .gd-plot button{padding:4px 10px;border-radius:10px;border:1.5px solid var(--line);background:var(--card);font:inherit;font-weight:700;color:inherit}
 .gd-plot button.go{background:#6BA23A;border-color:#4E7F25;color:#fff}.gd-plot small{opacity:.7}
 .gd-pick{margin-top:8px;padding:8px;border-radius:12px;background:rgba(226,162,28,.12)}.gd-pick b{font-size:13px}
+.gd-bulk{display:flex;flex-wrap:wrap;gap:4px;margin-top:10px}.gd-bulk:empty{display:none}
+.gd-bulk button{flex:1 1 30%;padding:7px 6px;border-radius:12px;border:1.5px solid #6BA23A;background:rgba(107,162,58,.12);font:inherit;font-size:12.5px;font-weight:700;color:#2F5A2A;white-space:nowrap}
+.gd-body .gd-pick{position:sticky;bottom:0;z-index:2;background:#FBEFCF;box-shadow:0 -6px 12px rgba(60,40,10,.14)}   /* 3.3.2 고르는 칸이 밭 아래로 밀려 안 보이지 않게 늘 아래에 붙어요 */
+.gd-plot .bed{width:68px!important;height:68px!important}
 .gd-cut b small{font-weight:500;opacity:.75;margin-left:4px}.gd-cut button{padding:6px 8px;border-radius:10px;border:1.5px solid var(--line);background:var(--card);font:inherit;font-size:12px;font-weight:700;color:inherit}
 .gd-cut button[aria-disabled="true"]{opacity:.45}.gd-cut .free{display:block;width:100%;margin-top:6px;background:#6BA23A;border-color:#4E7F25;color:#fff}
 .gd-tks{display:grid;grid-template-columns:repeat(4,1fr);gap:4px;margin-top:6px}.gd-tks button{display:grid;justify-items:center}.gd-tks small{font-size:10.5px;font-weight:500;opacity:.75}
@@ -4218,6 +4222,7 @@ body.cam-scene #ffChip,body.cam-scene #plChip,body.cam-scene .b-ring{animation-p
   <section class="modal lab-modal gd-modal" role="dialog" aria-modal="true" aria-labelledby="gdTitle">
     <div class="lab-head gd-head" id="gdHead"><b id="gdTitle">학교 텃밭</b></div>
     <div class="gd-body">
+      <div class="gd-bulk" id="gdBulk"></div><!-- 3.3.2 모두 심기, 모두 거두기, 모두 물 주기 -->
       <div class="gd-plots" id="gdPlots"></div>
       <div class="gd-pick gd-cut" id="gdCut" hidden></div><!-- 3.3.2 텃밭 시간 당기기 -->
       <div class="gd-pick" id="gdPick" hidden></div>
@@ -10439,6 +10444,16 @@ body.cam-scene #ffChip,body.cam-scene #plChip,body.cam-scene .b-ring{animation-p
   function gdWet(p) { const now = gameNow(); p.w = 1; p.e = Math.max(now, p.e - Math.max(0, p.e - now) * GD.water); }
   function gdPlant(i, c) {
     if (!gdOpen() || rt.paused) return false;
+    if (i === -2) {   // 3.3.2 빈 밭 모두 같은 작물로
+      gdSync(); if (!gdCropOk(c)) return false;
+      const now = gameNow(); let k = 0;
+      S.gn.plots.slice(0, gdN()).forEach(p => { if (p.c) return; p.c = c; p.s = now; p.e = now + GD_C[c].min * 60000; p.w = 0; if (wxIs('rain')) gdWet(p); k++; });
+      if (!k) return false;
+      S.gn.st.plant += k; rt.gdPick = -1;
+      sfx('tap'); toast(`${GD_C[c].nm}을(를) ${k}곳에 심었어요. ${hm(GD_C[c].min * 60)} 뒤에 거둬요`);
+      gdRender(true); gdMark(); save();
+      return true;
+    }
     gdSync();
     const p = S.gn.plots[i]; if (!p || i >= gdN() || p.c || !gdCropOk(c)) return false;
     const now = gameNow(); p.c = c; p.s = now; p.e = now + GD_C[c].min * 60000; p.w = 0;
@@ -10489,11 +10504,12 @@ body.cam-scene #ffChip,body.cam-scene #plChip,body.cam-scene .b-ring{animation-p
     gdRender(true); gdMark(); save();
     return true;
   }
-  function gdHarvest(i) {
+  function gdHarvest(i, quiet) {
     const p = S.gn.plots[i]; if (!p || !gdReady(p)) return false;
     const c = p.c, n = p.w ? 2 : 1;
     S.gn.inv[c] = Math.min(GD.invMax, (S.gn.inv[c] || 0) + n);
     S.gn.plots[i] = { c: '', s: 0, e: 0, w: 0 }; S.gn.st.h += 1;
+    if (quiet) return true;   // 3.3.2 모두 거두기는 한 번에 알려요
     sfx('coin'); toast(`${GD_C[c].nm} ${n}개를 거뒀어요!`);
     gdRender(true); gdMark(); save();
     return true;
@@ -10562,8 +10578,12 @@ body.cam-scene #ffChip,body.cam-scene #plChip,body.cam-scene .b-ring{animation-p
           `<div class="gd-tks">${TK.slice().reverse().map(t => `<button type="button" data-gd="tk" data-tk="${t.k}" data-i="${ci}" aria-disabled="${S.tk[t.k] > 0 ? 'false' : 'true'}">${t.name}<small>${S.tk[t.k]}장</small></button>`).join('')}</div>` +
           `<div class="gd-tkrow"><button type="button" data-gd="tkall" data-i="${ci}" aria-disabled="${tkSum() > 0 ? 'false' : 'true'}">남은 시간만큼 쓰기</button>` +
           `<button type="button" data-gd="tkad" aria-disabled="${adL > 0 ? 'false' : 'true'}">📺 광고 보고 5분권 ${TKAD.n}장 (${adL}번 남음)</button></div>`; } }
-    const pk = $('#gdPick'); pk.hidden = !(rt.gdPick >= 0);
-    if (rt.gdPick >= 0) pk.innerHTML = `<b>무엇을 심을까요?</b><div class="gd-seeds">${GD_CROPS.map(c => gdCropOk(c.k)
+    { const live = S.gn.plots.slice(0, n), em = live.filter(p => !p.c).length, rd = live.filter(p => p.c && gdReady(p)).length, wt = live.filter(p => p.c && !p.w && !gdReady(p)).length;
+      if (rt.gdPick === -2 && !em) rt.gdPick = -1;
+      $('#gdBulk').innerHTML = n < 2 ? '' : (em ? `<button type="button" data-gd="pickall">🌱 빈 밭 모두 심기 (${em})</button>` : '') +
+        (rd ? `<button type="button" data-gd="harall">🧺 모두 거두기 (${rd})</button>` : '') + (wt ? `<button type="button" data-gd="watall">💧 모두 물 주기 (${wt})</button>` : ''); }
+    const pk = $('#gdPick'); pk.hidden = !(rt.gdPick >= 0 || rt.gdPick === -2);
+    if (rt.gdPick >= 0 || rt.gdPick === -2) pk.innerHTML = `<b>${rt.gdPick === -2 ? `빈 밭 ${S.gn.plots.slice(0, n).filter(p => !p.c).length}곳에 무엇을 심을까요?` : `${rt.gdPick + 1}번 밭에 무엇을 심을까요?`}</b><div class="gd-seeds">${GD_CROPS.map(c => gdCropOk(c.k)
       ? `<button type="button" data-gd="seed" data-c="${c.k}">${gdImg('item_' + c.k, c.em)}<span>${c.nm}</span><small>${hm(c.min * 60)}</small></button>`
       : `<button type="button" aria-disabled="true">${gdImg('item_' + c.k, c.em)}<span>${c.nm}</span><small>${['', '초등학교', '중학교'][c.tier]}부터</small></button>`).join('')}</div>`;
     $('#gdInv').innerHTML = `<b>재료</b>${GD_CROPS.filter(c => gdCropOk(c.k) || S.gn.inv[c.k]).map(c => `<span class="gd-it">${gdImg('item_' + c.k, c.em)}${S.gn.inv[c.k] || 0}</span>`).join('')}`;
@@ -21180,6 +21200,9 @@ body.cam-scene #ffChip,body.cam-scene #plChip,body.cam-scene .b-ring{animation-p
       const b = e.target.closest('[data-gd]'); if (!b || b.getAttribute('aria-disabled') === 'true' && b.dataset.gd !== 'cook') return;
       const i = Number(b.dataset.i), g = b.dataset.gd;
       if (g === 'pick') { sfx('tap'); rt.gdCutI = -1; rt.gdPick = rt.gdPick === i ? -1 : i; gdRender(true); }
+      else if (g === 'pickall') { sfx('tap'); rt.gdCutI = -1; rt.gdPick = rt.gdPick === -2 ? -1 : -2; gdRender(true); }
+      else if (g === 'harall') { let k = 0; S.gn.plots.slice(0, gdN()).forEach((p, j) => { if (p.c && gdReady(p) && gdHarvest(j, true)) k++; }); if (k) { sfx('coin'); toast(`작물 ${k}곳을 거뒀어요!`); gdRender(true); gdMark(); save(); } }
+      else if (g === 'watall') { let k = 0; S.gn.plots.slice(0, gdN()).forEach(p => { if (p.c && !p.w && !gdReady(p)) { gdWet(p); k++; } }); if (k) { sfx('tap'); toast(`밭 ${k}곳에 물을 줬어요!`); gdRender(true); gdMark(); save(); } }
       else if (g === 'cut') { sfx('tap'); rt.gdPick = -1; rt.gdCutI = rt.gdCutI === i ? -1 : i; gdRender(true); }
       else if (g === 'tk') gdTk(i, b.dataset.tk);
       else if (g === 'tkall') gdTkAll(i);
