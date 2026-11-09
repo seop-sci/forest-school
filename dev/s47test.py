@@ -37,7 +37,7 @@ async def main():
                 if r[4] < 12: fails.append(f'[{tag}] 도토리 글자가 너무 작아요 {r}')
             await pg.screenshot(path=f's47_top_{tag}.png', clip={'x': 0, 'y': 0, 'width': w, 'height': 140})
             # 3) 행사 카운트다운 알림판이 행사 자리(광장, 운동장) 아래에 떠요
-            await pg.evaluate(f"(()=>{{ const F={F}, S=F.S; S.budget=1000; S.tier=1; S.tg=5; S.students=30; S.f.playground=Math.max(1,S.f.playground); F.rt.mapLaid=-1; F.layoutMap(); F.renderMap(); F.renderHUD(); }})()")
+            await pg.evaluate(f"(()=>{{ const F={F}, S=F.S; S.budget=1000; S.tier=1; S.tg=5; S.students=30; S.f.playground=Math.max(1,S.f.playground); F.rt.mapLaid=-1; F.layoutMap(); F.renderMap(); F.syncKids(true); F.renderHUD(); }})()")   # 3.3.0 학생이 이미 학교에 있는 상태로(새 지도는 교문에서 걸어 들어오는 길이 이어져서, 방금 늘린 학생이 아직 걷는 중이면 알림판 아래에 있어요)
             for fid in ('welcome', 'show', 'photo', 'sports'):
                 await pg.evaluate(f"(()=>{{ const F={F}; for (const k in F.S.fest.next) F.S.fest.next[k]=0; F.S.sports.next=0; {CLEAN}; F.startFest('{fid}', true); }})()")
                 await pg.wait_for_timeout(2500)   # 카운트다운 끝 무렵: 학생들이 행사 자리에 다 모였을 때
