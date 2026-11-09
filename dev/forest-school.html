@@ -19671,11 +19671,13 @@ body.cam-scene #ffChip,body.cam-scene #plChip,body.cam-scene .b-ring{animation-p
       hall += win(d, 11.4 - d, `<g class="c3-pop" style="animation-delay:${d}s"><g class="c3-stat"><rect x="${x}" y="${y}" width="144" height="48" rx="14"/><text x="${x + 72}" y="${y + 18}" class="s">${a}</text><text x="${x + 72}" y="${y + 39}">${b}</text></g></g>`); });
     // 2 입장과 4 졸업장: 졸업생
     let kids = '';
+    // 3.3.3 지섭: 의자 위에 서 보이지 않게 가운데 통로에 2열 종대로(뒤 줄부터 그려서 앞 줄이 위에 겹쳐요)
     crew.forEach((sp, i) => {
-      const x = 180 + (i - (n - 1) / 2) * (n > 4 ? 52 : 58), aw = i < 3, ad = 11.6 + i * 1.5, nmK = I.nm[sp] || '';
-      const award = aw ? `style="--ax:${(132 - x).toFixed(1)}px;--ay:${(fy + 14 - rowY).toFixed(1)}px;animation-delay:${ad}s" class="c3-award"` : '';
-      kids += `<g transform="translate(${x.toFixed(1)} ${rowY})"><g class="c3-walk" style="--fx:${(180 - x).toFixed(1)}px;--fy:330px;animation-delay:${(3.8 + i * 0.35).toFixed(2)}s"><g ${award}>` +
-        `<g transform="scale(${sc})">${kidSVG(sp, i, { hat: '', neck: '' })}${prop(pi, aw ? ad + 0.75 : 15.6)}</g>` +
+      const r = i >> 1, solo = i === n - 1 && i % 2 === 0, x = 180 + (solo ? 0 : (i % 2 ? 1 : -1) * (21 + r * 4)), y = rowY + r * 54, ks = sc * (1 + r * 0.07);
+      const aw = i < 3, ad = 11.6 + i * 1.5, nmK = I.nm[sp] || '';
+      const award = aw ? `style="--ax:${(132 - x).toFixed(1)}px;--ay:${(fy + 14 - y).toFixed(1)}px;animation-delay:${ad}s" class="c3-award"` : '';
+      kids += `<g transform="translate(${x.toFixed(1)} ${y})"><g class="c3-walk" style="--fx:${(180 - x).toFixed(1)}px;--fy:${330 - r * 54}px;animation-delay:${(3.8 + i * 0.35).toFixed(2)}s"><g ${award}>` +
+        `<g transform="scale(${ks.toFixed(3)})">${kidSVG(sp, i, { hat: '', neck: '' })}${prop(pi, aw ? ad + 0.75 : 15.6)}</g>` +
         (nmK ? `<g class="c3-in c3-tag" style="animation-delay:${(5.4 + i * 0.35).toFixed(2)}s"><rect x="-24" y="-52" width="48" height="15" rx="7.5"/><text x="0" y="-41.5">${esc(nmK)}</text></g>` : '') + '</g></g></g>';
       if (aw) kids += win(ad + 0.35, 1.1, `<g class="c3-pop" style="animation-delay:${(ad + 0.35).toFixed(2)}s">${im('diploma', 112, fy - 44, 34, 34)}</g>`);
     });
