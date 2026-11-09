@@ -12,7 +12,7 @@ safe(() => graniteEvent.addEventListener('backEvent', { onEvent: () => { if (typ
 
 // 콘솔 > 인앱 광고에서 만든 리워드 광고 그룹 ID로 바꿔요.
 // 개발과 QR 테스트 중에는 테스트 ID를 써야 해요 (진짜 ID로 테스트하면 제재를 받을 수 있어요)
-const AD_GROUP_ID = 'ait-ad-test-rewarded-id';
+const AD_GROUP_ID = 'ait.v2.live.1224acc72c424186';   // 2026-11-10 지섭이 준 정식 리워드 광고 그룹 ID
 
 const ads = safe(() => loadFullScreenAd.isSupported(), false);
 let ready = false, loading = false;
