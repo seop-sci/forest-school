@@ -1,7 +1,7 @@
 # 3.0.0 시험: 랭킹 순위표 보조 줄, 홈 칸 접기, 숲속 합치기 판 크기, 선생님 이름, 관리자 고급 배경
 # 보는 것
-#  1) 랭킹 보조 줄: 순위표가 20줄까지 차요. 주간 리그 보조 줄 점수는 한 주 동안 줄지 않고, 월요일에는 나(0점)보다 높고,
-#     일요일 밤에는 가장 높은 보조 줄이 지난주 내 점수보다 낮아요. 학교 파워 보조 줄은 내 점수의 30~110%. 보조 줄은 눌러도 구경이 안 돼요(data-look 없음)
+#  1) 랭킹 보조 줄: 순위표가 20줄까지 차요. 주간 리그 보조 줄 점수는 한 주 동안 줄지 않고, 3.2.6부터 월요일 0시 30분에는 거의 0점(10점 아래),
+#     6시간마다 늘어나는 점수가 하루 상한(RKF.dayCap)을 넘지 않고, 일요일 밤에는 가장 높은 보조 줄이 지난주 내 점수보다 낮아요. 학교 파워 보조 줄은 내 점수의 30~110%. 보조 줄은 눌러도 구경이 안 돼요(data-look 없음)
 #  2) 홈 칸 접기: 학교 칸, 왼쪽 단추, 오른쪽 메뉴, 퀘스트 칸을 접고 펴요. 저장(S.fold)에 남고 옛 저장은 모두 펼침
 #  3) 숲속 합치기(393x762, 360x780): 위 칸 두 줄이 있어도 판이 남은 높이 안에 들어가고(마지막 줄 안 잘림) 판이 화면 너비의 88% 넘게, 주문 쪽지 높이 90px 아래
 #  4) 선생님 이름: 양, 사슴, 고니, 공작, 알파카, 비버, 오소리 선생님
@@ -34,19 +34,21 @@ with sync_playwright() as p:
       S.lg.last = { week: 0, pts: 500, pos: 1, gold: 0 };
       const mon = Date.UTC(2030, 0, 7, 0 - 9, 30);   // 2030-01-07 월요일 한국 시간 0시 30분
       const mine = { id: 'me', name: '나', lp: 0, score: 0 };
-      const runs = []; let mono = true, prev = null;
+      const runs = []; let mono = true, prev = null, jump = 0;
+      S.clk.last = 0; F.rt.rkMax = {};
       for (let h = 0; h <= 167; h += 6) { F.rt.fakeNow = mon + h * 3600000; const rows = F.rkFill('week', [mine], 0).filter(x => x.nx);
-        const v = Object.fromEntries(rows.map(x => [x.id, x.lp])); if (prev) for (const k in v) if (v[k] < prev[k]) mono = false; prev = v; runs.push(Math.max(...rows.map(x => x.lp))); }
-      F.rt.fakeNow = mon + 3600000; const monRows = F.rkFill('week', [mine], 0);
+        const v = Object.fromEntries(rows.map(x => [x.id, x.lp])); if (prev) for (const k in v) { if (v[k] < prev[k]) mono = false; jump = Math.max(jump, v[k] - prev[k]); } prev = v; runs.push(Math.max(...rows.map(x => x.lp))); }
+      S.clk.last = 0; F.rt.rkMax = {}; F.rt.fakeNow = mon + 3600000; const monRows = F.rkFill('week', [mine], 0);   // 3.2.6 시계는 뒤로 가지 않고 한 번 보인 점수는 남아서, 월요일을 다시 잴 때 둘 다 비워요
       F.rt.fakeNow = mon + 167 * 3600000; const sunTop = Math.max(...F.rkFill('week', [mine], 0).filter(x => x.nx).map(x => x.lp));
       const all = F.rkFill('all', [{ id: 'me', name: '나', score: 10000 }], 10000).filter(x => x.nx).map(x => x.score / 10000);
-      const n = monRows.length, low = Math.min(...monRows.filter(x => x.nx).map(x => x.lp));
-      F.rt.fakeNow = null;
-      return { n, mono, monLow: low, sunTop, minF: Math.min(...all), maxF: Math.max(...all), names: new Set(monRows.map(x => x.name)).size }; }""")
+      const n = monRows.length, low = Math.min(...monRows.filter(x => x.nx).map(x => x.lp)), monTop = Math.max(...monRows.filter(x => x.nx).map(x => x.lp));
+      S.clk.last = 0; F.rt.fakeNow = null;
+      return { n, mono, monLow: low, monTop, jump, cap: F.RKF.dayCap, sunTop, minF: Math.min(...all), maxF: Math.max(...all), names: new Set(monRows.map(x => x.name)).size }; }""")
     print('보조 줄', r)
     check(r['n'] == 20 and r['names'] == 20, '순위표 20줄, 이름 겹침 없음')
     check(r['mono'], '주간 보조 줄 점수가 한 주 동안 줄지 않아요')
-    check(r['monLow'] > 0 and r['sunTop'] < 500, '월요일엔 보조 줄이 0점인 나보다 높고, 일요일엔 가장 높은 보조 줄이 지난주 내 점수보다 낮아요')
+    check(r['monTop'] < 10 and r['sunTop'] < 500, '3.2.6 월요일 0시 30분엔 보조 줄이 거의 0점, 일요일엔 가장 높은 보조 줄이 지난주 내 점수보다 낮아요')
+    check(r['jump'] <= r['cap'], f"3.2.6 6시간 동안 늘어나는 점수가 하루 상한 안 {r['jump']} <= {r['cap']}")
     check(r['minF'] >= 0.3 * 0.92 - 1e-9 and r['maxF'] <= 1.1 + 1e-9, '학교 파워 보조 줄은 내 점수의 30~110%')
     r = pg.evaluate("""() => { const F = window.__forest, S = F.S; F.Rank.state = 'on'; F.Rank.uid = 'me'; F.Rank.rows = []; F.Rank.wrows = []; F.rt.rankView = 'all';
       F.setTab('rank'); const li = [...document.querySelectorAll('#rankList li')];
