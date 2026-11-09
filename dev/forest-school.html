@@ -19752,6 +19752,7 @@ body.cam-scene #ffChip,body.cam-scene #plChip,body.cam-scene .b-ring{animation-p
     closeModal($('#mCere'));
     rt.cereToasts.splice(0).forEach((t, i) => setTimeout(() => toast(t), 450 + i * 2400));   // 미뤄 둔 알림을 차례로
   }
+  function goRep(msg) { const b = bestPick('rep'); return b.f ? goFac(b.f, msg) : goTeacher(b.t, '연수를 보내면 평판이 ★2 올라요'); }   // 3.3.3 평판 추천
   function goGrad(where) {
     setTab('grad');
     const el = where === 'perks' ? $('#perkHead') : where === 'tier' ? $('#tierCard') : where === 'fund' ? $('#fundHead') : null;
@@ -20401,7 +20402,7 @@ body.cam-scene #ffChip,body.cam-scene #plChip,body.cam-scene .b-ring{animation-p
       case 'picks':
         if (S.f.playground < 1) return goFac('playground', `${eul(FAC.playground.name)} 먼저 지어야 해요`);
         setTab('school'); return toast(`참나무를 누르면 도토리가 떨어져요. ${FAC.playground.name}에 떨어진 도토리를 눌러서 주워요`);
-      case 'grade': case 'ygrade': { const b = bestPick('rep'); return b.f ? goFac(b.f, '지금 평판을 올리기 좋은 곳이에요') : goTeacher(b.t, '연수를 보내면 평판이 ★2 올라요'); }
+      case 'grade': case 'ygrade': return goRep('지금 평판을 올리기 좋은 곳이에요');
       case 'rate': { const b = bestPick('rate'); return b.f ? goFac(b.f, '지금 수업료를 올리기 좋은 곳이에요') : goTeacher(b.t, '다람쥐 선생님이 수업료를 올려 줘요'); }
       case 'ups': return goFac(bestPick('ups').f, '지금 가장 싸게 고칠 수 있는 시설이에요');
       case 'trains': {
@@ -20410,9 +20411,10 @@ body.cam-scene #ffChip,body.cam-scene #plChip,body.cam-scene .b-ring{animation-p
       }
       case 'claims': setTab('school'); return toast('오른쪽 위 X로 학교 문을 닫고 30초 뒤에 다시 열어 보세요');
       case 'earned': setTab('school'); return toast(`수업료와 ${FAC.playground.name} 도토리가 쌓이면 채워져요`);
-      case 'grads': case 'tgrads': case 'semH': return goGrad();
+      // 3.3.3 지섭: 아직 대도시가 아니면 평판 올릴 곳으로, 대도시가 되어 열 수 있으면 졸업 탭으로
+      case 'grads': case 'tgrads': case 'semH': return canGraduate() || S.grade >= GRAD_MIN ? goGrad() : goRep(`대도시가 되어야 ${semFirst() ? '방학식' : '종업식'}을 열 수 있어요. 지금 평판을 올리기 좋은 곳이에요`);
       case 'perks': return goGrad('perks');
-      case 'tier': return goGrad('tier');
+      case 'tier': return canPromote() || S.grade >= GRAD_MIN ? goGrad('tier') : goRep('대도시가 되어야 졸업식을 열 수 있어요. 지금 평판을 올리기 좋은 곳이에요');
       case 'fperks': case 'fpUp': return goGrad('fund');
       case 'trips': case 'souv': case 'tripat': return openTrip();
       case 'sports': case 'fest': return openFest();
