@@ -2522,6 +2522,7 @@ body.sheet-open #map, body.sheet-open .wx-fx::before, body.sheet-open .wx-fx i, 
 @keyframes c2Fw{0%{opacity:0;transform:scale(.2)}35%{opacity:1;transform:scale(1)}100%{opacity:0;transform:scale(1.25)}}
 @keyframes c2Petal{0%{opacity:0;transform:translateY(0) rotate(0)}10%{opacity:1}100%{opacity:.9;transform:translateY(205px) rotate(420deg)}}
 @keyframes c2Bal{0%{opacity:0;transform:translateY(0)}10%{opacity:1}100%{opacity:1;transform:translateY(-240px)}}
+#map.deco-on .bld,#map.deco-on #b-next,#map.deco-on #plaques,#map.deco-on .drop,#map.deco-on #oak,#map.deco-on #teachers,#map.deco-on #kids,#map.deco-on .bx-hit{pointer-events:none}   /* 3.3.1 꾸미기 중에는 꾸미기 자리만 눌러요 */
 @keyframes c2Flash{0%{opacity:0}30%{opacity:.85}100%{opacity:0}}
 /* 3.3.0 새 졸업식: 화면 가득(cereArt3) */
 .overlay.cere.v3{padding:0;background:#2A2018}
@@ -3132,7 +3133,7 @@ body.cam-scene #ffChip,body.cam-scene #plChip,body.cam-scene .b-ring{animation-p
     <p class="boot-step" id="bootStep">학교 문을 여는 중...</p>
     <p class="boot-tip" id="bootTip">학교 문을 여는 중이에요</p>
   </div>
-  <span class="boot-ver" id="bootVer">v3.3.0</span>
+  <span class="boot-ver" id="bootVer">v3.3.1</span>
 </div>
 
 <div class="app on-school" id="app">
@@ -3625,7 +3626,7 @@ body.cam-scene #ffChip,body.cam-scene #plChip,body.cam-scene .b-ring{animation-p
       </div>
       <h3 class="panel-sub">정보</h3>
       <dl class="info">
-        <div id="verRow"><dt>버전</dt><dd>v3.3.0</dd></div>
+        <div id="verRow"><dt>버전</dt><dd>v3.3.1</dd></div>
         <div id="pidRow" hidden><dt>학교 번호</dt><dd id="infoPid"></dd></div>
       </dl>
       <div id="devBox" hidden>
@@ -8361,7 +8362,7 @@ body.cam-scene #ffChip,body.cam-scene #plChip,body.cam-scene .b-ring{animation-p
     shakeOak();
   }
   function tapOak() {
-    if (rt.paused) return;
+    if (rt.paused || rt.decoEdit || rt.fest) return;   // 3.3.1 학교 행사와 꾸미기 중에는 참나무를 흔들지 않아요(운동회는 공 놀이라 그대로)
     shakeOak(); sfx('leaf');
     if (S.f.playground < 1) { oakHint(`${eul(FAC.playground.name)} 지으면 참나무 도토리를 주울 수 있어요`); return; }
     if (S.oak < 1) { oakHint(`참나무가 도토리를 다시 맺는 중이에요. ${Math.ceil((1 - S.oak) * OAK.regen)}초만 기다려요`); return; }
@@ -9717,6 +9718,7 @@ body.cam-scene #ffChip,body.cam-scene #plChip,body.cam-scene .b-ring{animation-p
 
   /* ---------- 시설 시트 ---------- */
   function openSheet(k) {
+    if (rt.decoEdit) return;   // 3.3.1 꾸미기 중에는 건물을 열지 않아요
     if (rt.paused || rt.fest || rt.sports) return;   // 학교 행사 중에는 도토리를 줍다가 건물 창이 열리지 않게 해요
     rt.sheetKey = k;
     $('#sheetArt').innerHTML = `<img src="${blobUrl(IMG170(seasonKey(S.f[k] >= 1 ? bldImg(k) : SITE_IMG[k])))}" alt="" aria-hidden="true" decoding="async">`;   // 3.0.0 Blob 주소
@@ -11374,8 +11376,8 @@ body.cam-scene #ffChip,body.cam-scene #plChip,body.cam-scene .b-ring{animation-p
        forest/rank/<내 id>   랭킹 이름과 학교 점수
        forest/stats/<내 id>  테스트 현황 (어디까지 했는지, 얼마나 했는지)
      <내 id>는 Firebase 익명 로그인이 기기(브라우저)마다 만들어 줘요. */
-  const VERSION = '3.3.0';
-  const NT_QUIET = ['2.1.20', '2.1.2.2', '2.3.0.1', '2.3.4', '3.2.3', '3.2.4', '3.2.5'];   // 2.3.0.1도 공지 창 없이(공지는 그대로 2.3.0). 2.3.4도 조용히(지섭 결정). 3.2.3, 3.2.4, 3.2.5도 공지 창 없이(공지 줄을 고르지 않음)
+  const VERSION = '3.3.1';
+  const NT_QUIET = ['2.1.20', '2.1.2.2', '2.3.0.1', '2.3.4', '3.2.3', '3.2.4', '3.2.5', '3.3.1'];   // 3.3.1도 공지 창 없이(지섭). 2.3.0.1도 공지 창 없이(공지는 그대로 2.3.0). 2.3.4도 조용히(지섭 결정). 3.2.3, 3.2.4, 3.2.5도 공지 창 없이(공지 줄을 고르지 않음)
     // 2.1.20 지섭 결정: 이 버전들은 업데이트해도 공지 창을 띄우지 않아요(공지는 그대로 2.1.2)
   /* 2.0.0 공지사항 (2026-10-27 지섭, 1.8.0은 이미 올려서 2.0.0부터): 설정 > 공지사항. 맨 위가 가장 새 공지예요.
      패치노트는 자동으로 넣지 않아요. 지섭이 검수한 글만 여기에 적어요(CHANGELOG.md는 자세한 기록용이라 따로 있어요).
@@ -13634,6 +13636,7 @@ body.cam-scene #ffChip,body.cam-scene #plChip,body.cam-scene .b-ring{animation-p
       im.style.display = near.some(([x, y]) => Math.hypot(x - cx, y - cy) < 30) ? 'none' : '';
     });
     const bar = $('#decoBar'); if (bar) bar.hidden = !(edit && rt.tab === 'school');
+    map.classList.toggle('deco-on', edit);   // 3.3.1 지섭: 꾸미기 중에는 꾸미기만(건물, 참나무, 도토리, 선생님, 학생을 누르지 않아요)
   }
   // 2.1.3 빈 장식 자리 표시: 금빛 테 흰 동그라미에 + , 둘레가 숨 쉬듯 반짝여요. 차례 번호는 애니메이션이 한꺼번에 깜빡이지 않게 늦춤에 써요
   const decoEmptyMark = (x, y, i) => `<g class="deco-empty" transform="translate(${x} ${y - 10})" style="--d:${(i % 4) * 0.3}s"><circle class="de-halo" r="17"/><circle class="de-dot" r="11.5"/><path class="de-plus" d="M-5 0H5M0 -5V5"/></g>`;
@@ -20625,7 +20628,7 @@ body.cam-scene #ffChip,body.cam-scene #plChip,body.cam-scene .b-ring{animation-p
       if (isFinite(iv) && pickTutorial()) iv = Math.min(iv, 5);   // 도토리 줍기 퀘스트 동안은 더 자주 떨어져요
       if (isFinite(iv)) {
         rt.dropT += dt;
-        if (rt.dropT >= iv) { rt.dropT = 0; if (rt.drops.length < CFG.maxDrops) spawnDrop(); }
+        if (rt.dropT >= iv) { rt.dropT = 0; if (rt.drops.length < CFG.maxDrops && !rt.fest && !rt.sports && !rt.decoEdit) spawnDrop(); }   // 3.3.1 지섭: 학교 행사와 꾸미기 중에는 도토리가 떨어지지 않아요
       }
       syncKids(false);
       // 보안 보강 판 끊김(2026-11-06 지섭 S26 울트라 제보): 학생 걸음, 지도 속 SVG 움직임, 빛 번짐처럼 휴대폰이 화면 전체를 다시 계산하는 일을

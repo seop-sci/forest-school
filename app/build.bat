@@ -1,6 +1,6 @@
 @echo off
 setlocal
-rem Forest School 3.3.0 Android AAB build (upload key signing)
+rem Forest School 3.3.1 Android AAB build (upload key signing)
 cd /d "%~dp0"
 
 set "JAVA_HOME="
@@ -24,8 +24,8 @@ set "SDKDIR=%ANDROID_HOME:\=\\%"
 > android\local.properties echo sdk.dir=%SDKDIR%
 
 set "VERSION_CODE="
-set /p "VERSION_CODE=versionCode (Enter = 102): "
-if not defined VERSION_CODE set "VERSION_CODE=102"
+set /p "VERSION_CODE=versionCode (Enter = 103): "
+if not defined VERSION_CODE set "VERSION_CODE=103"
 
 set "ANDROID_KEYSTORE_PATH="
 set /p "ANDROID_KEYSTORE_PATH=Upload key .jks file path (drag the file here): "
@@ -49,9 +49,9 @@ if errorlevel 1 (
   exit /b 1
 )
 cd ..
-copy /y "android\app\build\outputs\bundle\release\app-release.aab" "forest-school-3.3.0-vc%VERSION_CODE%.aab" >nul
+copy /y "android\app\build\outputs\bundle\release\app-release.aab" "forest-school-3.3.1-vc%VERSION_CODE%.aab" >nul
 echo.
-echo DONE: forest-school-3.3.0-vc%VERSION_CODE%.aab
+echo DONE: forest-school-3.3.1-vc%VERSION_CODE%.aab
 echo Upload this file to Google Play Console.
 pause
 exit /b 0
