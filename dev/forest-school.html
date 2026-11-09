@@ -2283,6 +2283,10 @@ body.wl-on .toast{z-index:300}
 /* 2.1.3 다른 학교 구경과 예시 학교 */
 .tier-view.tv-model .tv-bar{box-shadow:inset 0 0 0 2px #E8B53A}
 .tier-view.tv-model #tvSub{color:#A0620A;font-weight:700}
+/* 3.3.0 지섭: 모델하우스(예시 학교)는 유, 초, 중, 고를 골라 봐요 */
+.tv-tabs{position:absolute;left:50%;transform:translateX(-50%);width:max-content;max-width:calc(100% - 20px);top:calc(74px + env(safe-area-inset-top, 0px));z-index:2;display:flex;gap:4px;padding:4px;border-radius:999px;background:rgba(255,249,233,.94);box-shadow:0 2px 6px rgba(40,30,10,.25),inset 0 0 0 2px #E8B53A}
+.tv-tabs button{flex:none;white-space:nowrap;border:0;border-radius:999px;padding:6px 12px;min-height:32px;font:inherit;font-size:13px;font-weight:700;color:#7A5A20;background:transparent;cursor:pointer}
+.tv-tabs button.on{background:linear-gradient(#FFD86B,#F2B33A);color:#4A2E08;box-shadow:0 1px 2px rgba(80,50,0,.35)}
 .tv-mark{flex:none;width:30px;height:30px;display:grid;place-items:center}.tv-mark:empty{display:none}.tv-mark .smark{width:30px;height:30px}
 .rank-look{margin:6px 0 8px;display:flex;flex-direction:column;gap:6px}
 .rank-look .rl-on{display:flex;align-items:flex-start;gap:8px;padding:8px 10px;border-radius:12px;background:var(--card);cursor:pointer}
@@ -3317,6 +3321,7 @@ body.cam-scene #ffChip,body.cam-scene #plChip,body.cam-scene .b-ring{animation-p
       <div class="tier-view" id="tierView" hidden>
         <svg id="tvMap" viewBox="0 -60 360 540" preserveAspectRatio="xMidYMid meet" role="img" aria-label="지난 학교급 지도"></svg>
         <div class="tv-bar"><span class="tv-mark" id="tvMark" aria-hidden="true"></span><span class="tv-tx"><b id="tvTitle"></b><small id="tvSub"></small></span><button class="btn-sub small" id="tvEdit" type="button">꾸미기</button><button class="cta small" id="tvBack" type="button">돌아가기</button></div>
+        <div class="tv-tabs" id="tvTabs" hidden role="group" aria-label="예시 학교 학교급 고르기"><button type="button" data-mt="0">유치원</button><button type="button" data-mt="1">초등학교</button><button type="button" data-mt="2">중학교</button><button type="button" data-mt="3">고등학교</button></div><!-- 3.3.0 모델하우스 학교급 고르기 -->
       </div>
       <div class="tier-dots" id="tierDots" hidden role="group" aria-label="학교급 모습 보기"></div>
       <button class="ff-chip" id="ffChip" type="button" hidden></button><!-- 2.1.1 오늘 바로 완공, 건설 가속 -->
@@ -7783,7 +7788,7 @@ body.cam-scene #ffChip,body.cam-scene #plChip,body.cam-scene .b-ring{animation-p
   // 크기와 세로 배율, 회전은 바닥 섬 아래 끝(빈터 자리 점)을 기준으로 해서, 같은 건물의 다른 단계, 겨울, 고급 그림도 같이 맞아요. 0번부터 유치원, 초등, 중, 고(다음 학교급 자리는 next)
   const LOT_XF = [{ next: [4.34, 10.33, 1.1, 1.0, 0.0], classroom: [0.53, 6.38, 1.31, 1.0, 0.0], cafeteria: [-0.72, 0.95, 1.15, 1.0, 0.0], library: [3.17, 9.93, 1.21, 1.0, 0.0], playground: [-0.33, 9.79, 1.13, 1.0, 0.0], science: [4.34, 10.33, 1.1, 1.0, 0.0] },
     { next: [-1.38, 11.22, 1.21, 1.0, 0.0], science: [-3.06, 9.79, 1.25, 1.11, 0.0], classroom: [-5.75, 9.52, 1.21, 1.0, 0.0], cafeteria: [-4.54, 6.49, 1.3, 1.0, 0.0], library: [-3.77, 6.47, 1.25, 1.0, 0.0], playground: [1.91, 20.5, 1.06, 0.94, -0.36] },
-    { next: [-7.5, 4.5, 0.97, 0.99, 0.0], science: [-0.21, 8.39, 1.14, 1.0, 0.0], classroom: [-0.63, 9.49, 1.09, 1.0, 0.0], cafeteria: [-4.09, 6.34, 1.13, 1.0, 0.0], library: [-3.98, 7.07, 1.19, 1.0, 0.0], playground: [2.68, 12.84, 1.06, 0.85, 0.0], store: [-7.51, 11.11, 1.21, 1.0, 0.0] },
+    { next: [-7.5, 4.5, 0.97, 0.99, 0.0], science: [-0.21, 8.39, 1.14, 1.0, 0.0], classroom: [-0.63, 9.49, 1.09, 1.0, 0.0], cafeteria: [-4.09, 6.34, 1.13, 1.0, 0.0], library: [-3.98, 7.07, 1.19, 1.0, 0.0], playground: [-3.5, 17, 1.03, 0.85, 0.0], store: [-7.51, 11.11, 1.21, 1.0, 0.0] },
     { next: [1.5, 19.5, 1.0, 0.86, 0.0], science: [-1.14, 7.12, 1.2, 1.0, 0.0], classroom: [-2.81, 10.0, 1.16, 1.0, 0.0], cafeteria: [0.09, 6.44, 1.13, 1.0, 0.0], library: [-6.37, 8.82, 1.27, 1.04, 0.0], playground: [-1.5, 18.5, 1.03, 0.83, -4], store: [-0.76, 9.74, 1.22, 1.0, 0.0], dorm: [-1.88, 7.54, 1.54, 0.81, 0.0] }];
   const lotXf = new Map();   // 빈터 배열 → 위 값(GEO를 만든 뒤 채워요)
   function lotRect(L, key, T) {
@@ -16874,7 +16879,8 @@ body.cam-scene #ffChip,body.cam-scene #plChip,body.cam-scene .b-ring{animation-p
     const schNm = LD ? (LD.model ? '본보기(예시)' : LD.nm) : S.deco.nm;
     const key = [t, gi, L.join(), schNm, edit, JSON.stringify(x.f), LD ? (LD.who || '') + LD.vd : ''].join('|');
     box.hidden = false;
-    box.classList.toggle('tv-visit', !!LD); box.classList.toggle('tv-model', !!(LD && LD.model));   // .look은 다른 곳에서 숨김 이름이라 tv-visit
+    box.classList.toggle('tv-visit', !!LD); box.classList.toggle('tv-model', !!(LD && LD.model));
+    { const tb = $('#tvTabs'); if (tb) { tb.hidden = !(LD && LD.model); $$('button', tb).forEach(b => { const on = +b.dataset.mt === t; b.classList.toggle('on', on); b.setAttribute('aria-pressed', on ? 'true' : 'false'); }); } }   // .look은 다른 곳에서 숨김 이름이라 tv-visit
     $('#tvTitle').textContent = LD ? (LD.model ? `[예시] 본보기 숲속 ${TIER_ALL[t]}` : `${LD.who} 교장 선생님의 ${LD.nm || '숲속'} ${TIER_ALL[t]}`) : `${S.deco.nm || '숲속'} ${TIER_ALL[t]} 시절 모습`;
     $('#tvSub').textContent = LD ? (LD.model ? '예시로 꾸민 학교예요. 실제 교장 선생님의 학교가 아니에요' : `${TIERS[t].unit === '년째' ? '' : `${LD.y}${TIERS[t].unit}, `}학생 ${fmt(LD.st)}명${LD.rare.length ? `, 반짝 친구 ${LD.rare.length}명` : ''}${LD.vd ? `, 마을 기부 ${LD.vd}단계` : ''}${LD.ti && achTitleName(LD.ti) ? `, 칭호 ${achTitleName(LD.ti)}` : ''}`)
       : x.all ? '그때는 사진을 남기지 않아서 모두 지어진 모습으로 보여요' : `${x.at ? kstDay(x.at) + ' 졸업식, ' : ''}학생 ${fmt(x.st)}명`;
@@ -16889,11 +16895,11 @@ body.cam-scene #ffChip,body.cam-scene #plChip,body.cam-scene .b-ring{animation-p
     let h = `<image x="0" y="-60" width="360" height="540" preserveAspectRatio="none" href="${mapHi[mk] === 'ok' ? IMG_BASE() + 'maps/' + mk + '.webp' : mapU}"/>`;
     // 건물: 앞(아래)에 있는 것이 위에 그려지게
     const keys = Object.keys(FAC).filter(k => (FAC[k].tier || 0) <= t && G.lot[k]).sort((a, b) => G.lot[a][1] - G.lot[b][1]);
-    const items = [];
+    const items = [], tags = [];
     for (const k of keys) {
-      const built = (x.f[k] || 0) >= 1, im = seasonKey(built ? viewBldKey(k, t, x.bs[k], lux) : SITE_IMG[k]), R = lotRect(G.lot[k], im), [cx, cy, w] = R;
-      items.push({ y: cy, s: `<image href="${IMG170(im)}" x="${(cx - w / 2).toFixed(1)}" y="${(cy - w / 2).toFixed(1)}" width="${w.toFixed(1)}" height="${w.toFixed(1)}"${xfAt(R)}/>` +
-        (built && x.f[k] > 1 && !x.all ? `<g class="tv-lv" transform="translate(${cx.toFixed(1)} ${(cy + w * 0.36).toFixed(1)})"><rect x="-30" y="-9" width="60" height="18" rx="9"/><text y="4" text-anchor="middle">${k === 'playground' ? (t >= 1 ? '운동장' : '놀이터') : FAC[k].name} Lv.${x.f[k]}</text></g>` : '') });
+      const built = (x.f[k] || 0) >= 1, im = seasonKey(built ? viewBldKey(k, t, x.bs[k], luxOn()) : SITE_IMG[k]), R = lotRect(G.lot[k], im), [cx, cy, w] = R;   // 3.3.0 예시 학교도 그 학교급 새 건물(고급 건물은 학교급마다 같은 모양이라 지도만 고급으로)
+      items.push({ y: cy, s: `<image href="${IMG170(im)}" x="${(cx - w / 2).toFixed(1)}" y="${(cy - w / 2).toFixed(1)}" width="${w.toFixed(1)}" height="${w.toFixed(1)}"${xfAt(R)}/>` });
+      tags.push((built && x.f[k] > 1 && !x.all ? `<g class="tv-lv" transform="translate(${cx.toFixed(1)} ${(cy + w * 0.36).toFixed(1)})"><rect x="-30" y="-9" width="60" height="18" rx="9"/><text y="4" text-anchor="middle">${k === 'playground' ? (t >= 1 ? '운동장' : '놀이터') : FAC[k].name} Lv.${x.f[k]}</text></g>` : ''));   // 3.3.0 이름표는 장식과 학생 위에
     }
     { const R = lotRect(G.nextLot, G.nextKey), [ncx, ncy, nw] = R; items.push({ y: ncy, s: `<image href="${IMG170(seasonKey(G.next.img))}" x="${(ncx - nw / 2).toFixed(1)}" y="${(ncy - nw / 2).toFixed(1)}" width="${nw.toFixed(1)}" height="${nw.toFixed(1)}" opacity=".85"${xfAt(R)}/>` }); }
     { const [ox, oy] = G.oak; items.push({ y: oy + 20, s: `<image href="${IMG170(oakKey()) || IMG('deco_autumn_1')}" x="${ox - 34}" y="${oy - 41}" width="68" height="65"/>` }); }
@@ -16912,7 +16918,7 @@ body.cam-scene #ffChip,body.cam-scene #plChip,body.cam-scene .b-ring{animation-p
     // 그때 명부 학생(사진에 남은 친구들)
     (x.roster || []).slice(0, Math.min(8, G.spots.length)).forEach((r, i) => { const [kx, ky] = G.spots[i]; items.push({ y: ky + 11, s: `<g transform="translate(${kx} ${ky})">${kidSVG(r.sp, i)}</g>` }); });
     items.sort((a, b) => a.y - b.y);
-    $('#tvMap').innerHTML = h + items.map(o => o.s).join('');
+    $('#tvMap').innerHTML = h + items.map(o => o.s).join('') + tags.join('');
   }
   /* ---------- 2.0.0 전학 대화 ----------
      종업식이나 졸업식 창을 닫으면 화면 아래 대화 창이 떠요. 교감 고슴도치가 소개하고, 새 친구가 자기소개를 두 줄 해요.
@@ -20671,6 +20677,7 @@ body.cam-scene #ffChip,body.cam-scene #plChip,body.cam-scene .b-ring{animation-p
     $('#tvBack').addEventListener('click', () => { sfx('tap'); tierViewClose(); });
     $('#wxChip').addEventListener('click', () => { const k = wxOf(); if (!k) return; sfx('tap'); S.wxOff = S.wxOff ? 0 : 1; save(); renderWeather();   // 2.1.3 날씨, 날씨 효과 켜고 끄기(지섭)
       toast(`${WX[k].em} ${S.wxOff ? '날씨 효과를 껐어요. 다시 누르면 켜져요' : '날씨 효과를 켰어요'}\n${WX[k].tip}`); });
+    $('#tvTabs').addEventListener('click', e => { const b = e.target.closest('[data-mt]'); if (!b || !rt.lookData || !rt.lookData.model) return; const t = +b.dataset.mt; if (t === rt.viewTier) return; sfx('tap'); rt.lookData = modelOf(t); rt.viewTier = t; renderTierView(true); renderTierDots(); });
     $('#tvEdit').addEventListener('click', () => { sfx('tap'); rt.viewEdit = !rt.viewEdit; renderTierView(true); if (!rt.viewEdit) save(); });
     $('#tvMap').addEventListener('click', e => { const h = e.target.closest('[data-tvslot]'); if (h && rt.viewEdit) openDecoPick(+h.dataset.tvslot); });
     $('#mTalk').addEventListener('click', () => talkNext());
@@ -21948,6 +21955,17 @@ body.cam-scene #ffChip,body.cam-scene #plChip,body.cam-scene .b-ring{animation-p
     f: { classroom: 30, cafeteria: 30, library: 30, playground: 30, science: 30, store: 30, dorm: 30 }, bs: { classroom: 3, cafeteria: 3, library: 3, playground: 3, science: 3, store: 3, dorm: 3 },
     lay: ['fountain', 'flowerbed', 'arch', 'swingtree', 'pond', 'clock', 'crystal', 'streetlamp', 'bench', 'rainbow', 'owl'], st: 150, rare: ['rabbit', 'fox', 'chick'], vd: 8,
     kids: ['rabbit_rare', 'fox_rare', 'chick_rare', 'redpanda', 'capybara', 'kangaroo', 'panda', 'otter'] };
+  // 3.3.0 지섭: 모델하우스는 유, 초, 중, 고를 모두 볼 수 있게. 학교급마다 장식과 학생을 다르게 꾸며요(학생 수와 연차는 어림한 값)
+  const MODEL_TIER = [
+    { y: 1, st: 40, lay: ['flowerbed', 'swingtree', 'mushroom', 'pond', 'birdhouse', 'rainbow', 'picnic', 'bench', 'arch', 'owl', 'fountain'], kids: ['rabbit_rare', 'fox_rare', 'chick_rare', 'bear', 'raccoon', 'hamster', 'duck', 'frog'] },
+    { y: 6, st: 80, lay: ['fountain', 'flowerbed', 'picnic', 'swingtree', 'pond', 'birdhouse', 'rainbow', 'bench', 'arch', 'statue', 'signpost'], kids: ['rabbit_rare', 'fox_rare', 'chick_rare', 'cat', 'dog', 'penguin', 'otter', 'turtle'] },
+    { y: 3, st: 120, lay: ['statue', 'flowerbed', 'arch', 'streetlamp', 'pond', 'clock', 'crystal', 'bench', 'swingtree', 'fountain', 'owl'], kids: ['rabbit_rare', 'fox_rare', 'chick_rare', 'panda', 'koala', 'mole', 'waterdeer', 'cat'] },
+    { y: MODEL_SCHOOL.y, st: MODEL_SCHOOL.st, lay: MODEL_SCHOOL.lay, kids: MODEL_SCHOOL.kids }];
+  function modelOf(t) {
+    t = Math.max(0, Math.min(3, Math.min(TIERS.length, GEO.length) - 1, t | 0)); const M = MODEL_TIER[t], f = {}, bs = {};
+    for (const k of Object.keys(FAC)) { f[k] = (FAC[k].tier || 0) <= t ? 30 : 0; bs[k] = t; }
+    return Object.assign({}, MODEL_SCHOOL, { t, y: M.y, st: M.st, f, bs, lay: M.lay.slice(0, DECO_SLOTS[geoIdx(t)].length), kids: M.kids });
+  }
   /* 2.2.0 검토 6: 공개를 끄면 서버의 forest/look/<id>를 지워요. 못 지웠으면 S.lk.del을 남겨(앱을 껐다 켜도) 랭킹이 다시 이어질 때 다시 지워요.
      다른 기기의 옛 저장(공개 켬)이 다시 올리지 않게, 올린 적이 있는데(pub) 서버에 내 학교가 없으면 다른 곳에서 끈 것으로 보고 이 기기도 꺼요 */
   async function lookDelNow() {
@@ -21982,7 +22000,7 @@ body.cam-scene #ffChip,body.cam-scene #plChip,body.cam-scene .b-ring{animation-p
   async function openLook(id, who) {
     if (!S) return;
     let data = null;
-    if (id === 'model') data = MODEL_SCHOOL;
+    if (id === 'model') data = modelOf(S.tier);   // 3.3.0 처음에는 지금 내 학교급으로 열어요
     else if (id === Rank.uid) data = Object.assign(lookRead(lookDoc()), { who: S.rank.name, me: true });
     else {
       if (!Rank.be || !Rank.be.lookGet) { toast('다른 학교 구경은 서버에 연결된 판에서 열려요'); return; }
@@ -23278,7 +23296,7 @@ body.cam-scene #ffChip,body.cam-scene #plChip,body.cam-scene .b-ring{animation-p
     rosterEnsure, rosterMake, rosterAdd, clubAuto, clubSet, clubPct, clubShow, clubSum, clubStars, clubMembers, clubShowGo, showReady, showWait, showDay, clubWeekTick, clubFacUp, CLUBS, CLUB, star, clubTuitionMult, clubFestMult, clubDecoOff, renderClub, renderHall, openSeatPick, openClubPick,
     TIER_SCALE, legacyMult, tuitionMult, snapTake, snapOf, tierViewOpen, tierViewClose, renderTierView, renderTierDots, nlCycle, viewMap, showNewTalk, talkNext, showCere, cereEnd, cereCrew, cereAsk, cereKeep, goFur, updateQuestDot, openElect, renderElect, elVote, elSync, elMult, elClub, elPres, elBadge, elMake, EL_PLEDGES, clubPct, festPrize, dropValue, claimMission, gameWeek, NEWCOMERS, TIERS, GEO, geoIdx, decoCost0, qMeasure, qDone, qGoal, kidArt: kidSVG, newYear, checkGrade, gradeOf, townRep, FAC, sanitize200, trialHunt, updateTrial, TRIAL, zoomAt, fitMap, ZOOM_MAX, DECO, DECO_SLOTS, DECO_SIGN, decoCost, decoSoldOut, pickDeco, buyDeco, decoPut, decoEditStart, decoEditEnd, openDecoPick, renderDeco, setSchoolNm, setMark, schoolTitle, markHTML, decoPlacedAll, esExLeft, esExCost, get Cloud() { return Cloud; }, get actx() { return actx; }, Music, musicSync, ensureAudio, bgmLoad, pzUI, rt, makeDeal, furStage, DEAL, navInfo, navRoute, spawnDrop, repTipCheck, linkGoogle, retryCloud, sanitize, acctPending, renderMap, renderHUD, renderAffordance, syncKids, layoutMap, geo, hitTrial, endVisit, showReward, recommend, needCost, prepTopUp, qReward, prepPhase, rankScore, pwOf, previewDip, dipMult, costScale, buyFur, buyFurAll, furCost, furReady, furDone, FUR, startTalk, endTalk, teacherAct, facCost, teaCost, facKeys, rate, rep, capacity, canGraduate, canPromote,
     fmt, fmt2, graduate, promote, buyPerk, perkCost, perkMaxed, buyFundPerk, fpCost, claimMain, mainReady, curMain, qNo, earn, CFG, TEA, teaMaxed, PERKS, FPERKS, MAIN, finalYear, startTrip, claimTrip, TRIPS, yearLocked, endSports, rtSports: () => rt.sports, rtFest: () => rt.fest, facCap, addLeague, addMP, tutStart, endFest, claimBox, musicWant, askBox, festWait, setTab,
-    RARE, rareRoll, rareGot, showRareTalk, rareDexHTML, kidSVG, rosterKid, WX, wxOf, wxIs, rdMinNow, renderWeather, PL, plSync, plUnread, openPLetter, renderPLetter, RS, rsNum, rsSync, rsAdd, rsLabel, lookDoc, lookRead, lookPush, lookSet, openLook, MODEL_SCHOOL, joinRank, PS, PS_M, PS_SEASONS, psSeason, psOpen, psSync, psLv, psGot, psReward, psClaimAll, psClaimMission, psWatchAd, psClaimable, psStepReady, psExtraReady, psChooseFur, psFurImg, renderPass, setEvSeg, xtGot, achTitles,   // 2.1.3 숲속 패스
+    RARE, modelOf, rareRoll, rareGot, showRareTalk, rareDexHTML, kidSVG, rosterKid, WX, wxOf, wxIs, rdMinNow, renderWeather, PL, plSync, plUnread, openPLetter, renderPLetter, RS, rsNum, rsSync, rsAdd, rsLabel, lookDoc, lookRead, lookPush, lookSet, openLook, MODEL_SCHOOL, joinRank, PS, PS_M, PS_SEASONS, psSeason, psOpen, psSync, psLv, psGot, psReward, psClaimAll, psClaimMission, psWatchAd, psClaimable, psStepReady, psExtraReady, psChooseFur, psFurImg, renderPass, setEvSeg, xtGot, achTitles,   // 2.1.3 숲속 패스
     dexMeet, dexSync, dexPending, dexGift, renderDex, evCurrent, evNext, evUpcoming, evSync, evFix, evVal, EV_FALLBACK, EV_DECO, EV_HAT, COS, DECO_BY, decoOwn, perkRec, fpRec, BOOST_ALL, buyShop, pickShop, showNote, showOkOn, showWd, renderGradPanel, renderShop, renderDecoShop, EV_WEEKLY, EV_WEEK_BASE, weekMon, claimStamp, claimEvMission, claimEvBox, renderEvent, evMissions, evOk, evSkipped, EV_MONTHS, EV_MEASURE, tierMinutes, minAcorns, IMG, sanitize171, ACH, achSync, claimAch, setTitle, renderAch, setDexSeg, achClaimable, XT, xtAct, xtCost, xtLv, feastMins, libMult, propInstances, walkBuild, festItemSvg, guestArt, adErrText, googleErrText, openSheet, closeSheet, startFest, startSports, sanitize170, EV_STAMPS, EV_SPECIAL, EV_MONTHLY, EV_BOX, DEX_KEYS, DEX_REWARD, DEX_GUEST_KEYS, seasonKey, roofArtKey, oakKey, setSeasonArt, VP, vpLv, vpCost, vpMult, vpAct, renderVpCard, sportsPrize, festPrize, renderTeachers, buildTeacherCards, bldImg, roofKey, bldStage, mapKey, setMapArt, applyThemes, buyFacility, bldFx, setBldFx, mapHi, Live, liveApply, liveLoad, liveOff, LIVE_KEYS, EVC, NOTICES, openNotice, noticeAuto, noticeWant, ntUnread, startTrial, endTrial: () => rt.trial && (rt.trial.left = 0), spawnDeal, startVisit, IMG170, MG, mgCells, mgSetCells, mgTick, mgAddEnergy, mgAddUp, mgTapGen, mgDrop, mgSell, mgUpgrade, mgAddUp, mgUpSwap, mgGensMax, MG_UP_ESS, mgClaimOrder, mgSwapOrder, mgOrderOk, mgFillOrders, mgOpen, mgClose, mgRenderAll, mgSpawnLevel, mgNearestEmpty, mgEmptyBoard, mgOrderReward, mgUI, sanitize180, mgWatchAd, mgNewOrder, mgHintPick, mgShowHint, mgClearHint, mgTouch, mgOrderGuide, mgDexN, mgDexCan, mgDexClaim, mgOpenDex, MG_DEX, MG_DEX_MS, mgDexEss, mgDexEssCan, mgDexEssN, mgDexMsCan, mgDexMsClaim, MGB, mgBuyBoost, mgBstLeft, mgOpenBoost, nice, claimMission, claimBonus, claimWeekMission, MP_BOX, swapDaily, repairMissions, MISSIONS, WMISSIONS, dmDay, wkWeek,   // 1.7.0 도감, 이벤트
     PZ, PZ_SHAPES, pzFits, pzAnyFit, pzStuck, pzFullLines, pzPlace, pzFreshGame, pzStart, PZB, pzbCost, pzApplyBoost, pzBoostOpen, pzBoostGo, festGoldLeft, festGoldTake, claimSports, TR2, TR2_PL, openTr2, tr2Act, tr2Away, tr2Ready, tr2Rsv, tr2Tick, renderAlbum, FEST, FEST_IDS, festNight, festShown, festTimeLock, festOpen, startFest, openFest, endFest, renderStreet, pzFinish, pzLeft, pzCanAd, pzEssOf, pzMinOf, pzHelpSquirrel, pzHelpOwl, pzHelpBear, fillSubs, mapRoofTop, showAd, claimOfflineDouble, startBoost, tripAd, festFocus, festRange, visMap, renderMissions, pzHasHelp, pzRot, pzNewPiece, pzOpen, pzClose, pzGameOver, pzRenderAll, renderMini, addEss, ESHOP, SP_FUR, applyCos, essItem, pickEss, buyEss, renderEssShop, hatSVG, spFurImg, gameNow, gameToday, gameWeek, kstDay, setServerTime, SVR, dmDay, weekIdx, lgWeek, wkWeek, lgKey, pzDay, goldDay, boostLeft, dealLeft, canStamp };
   if (window.__FOREST_TEST) Object.assign(window.__forest, { tripUseTicket, readUseTicket, picnicUseTicket, buyDecoPieces, adGold, claimBonus, cloudPush, cloudClash, syncGet, revOf, deleteAccount, lookDel: () => lookDelNow(), lookSet, lookPush, leaveRank, sanitizeCg, freshCg });   // 시험 손잡이
