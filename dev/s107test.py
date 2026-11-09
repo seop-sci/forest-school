@@ -52,7 +52,7 @@ async def main():
                   if ('{mode}' === 'back') S.trip.kids = 3;
                   F.busScene('{mode}', 3, () => {{ done = true; }});
                   const t0 = performance.now();
-                  while (!done && performance.now() - t0 < 20000) {{ await new Promise(r => setTimeout(r, 50)); zmax = Math.max(zmax, rt.zoom || 1); hid = hid || document.body.classList.contains('cam-scene');
+                  while (!done && performance.now() - t0 < 20000) {{ await new Promise(r => setTimeout(r, 50)); {{ const m = /scale\(([0-9.]+)\)/.exec(document.querySelector('#map').style.transform || ''); zmax = Math.max(zmax, (rt.zoom || 1) * (m ? +m[1] : 1)); }}   /* 3.2.6 장면 동안은 지도 크기 대신 그림을 키워요(transform scale) */ hid = hid || document.body.classList.contains('cam-scene');
                     const tr = rt.kids.filter(k => k.trip); if (tr.length) last = Math.max(...tr.map(k => Math.hypot(k.x - k.tx, k.y - k.ty))); }}
                   await new Promise(r => setTimeout(r, 1000));
                   return {{ done, zmax: +zmax.toFixed(2), z: +(rt.zoom || 1).toFixed(2), z0, pan: [Math.round(rt.panX - p0[0]), Math.round(rt.panY - p0[1])], last: last == null ? null : +last.toFixed(1), hid, cls: document.body.classList.contains('cam-scene') }}; }})()""")

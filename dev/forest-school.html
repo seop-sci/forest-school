@@ -2837,7 +2837,11 @@ span.bt-stamp{display:none}.bt-duel.done span.bt-stamp{display:grid}
 .ex-row-btn .ex-ic{flex:none;display:grid;place-items:center;width:36px;height:36px;font-size:22px}.ex-row-btn .ex-ic img{width:36px;height:36px;object-fit:contain}
 .ex-row-btn .ex-tx{flex:1;min-width:0;display:flex;flex-direction:column}.ex-row-btn b{font-size:14px}.ex-row-btn small{font-size:12px;color:var(--muted)}
 .ex-row-btn em{flex:none;padding:4px 10px;border-radius:999px;background:var(--chip-bg);color:var(--chip-ink);font-style:normal;font-size:12.5px;font-weight:700}
-body.cam-scene #ffChip,body.cam-scene #tierDots,body.cam-scene #plChip{opacity:0;pointer-events:none;transition:opacity .3s}   /* 3.0.0 체험학습 배웅과 마중 동안 아래 칩을 잠깐 숨겨요 */
+body.cam-scene #ffChip,body.cam-scene #tierDots,body.cam-scene #plChip{opacity:0;pointer-events:none;transition:opacity .3s}
+/* 3.2.6 끊김: 체험학습 장면 동안 지도 안 장식 움직임(반딧불, 반짝임 등)과 숨긴 칩, 왼쪽 단추 고리 움직임을 멈춰요. 버스와 깃발, 풍선만 움직여요 */
+body.cam-scene #map .firefly,body.cam-scene #map .c-can,body.cam-scene #map [class^="bx-"],body.cam-scene #map .g-arrow,body.cam-scene #map .rec,body.cam-scene #map .t-rec,body.cam-scene #map .float,
+body.cam-scene #ffChip,body.cam-scene #plChip,body.cam-scene .b-ring{animation-play-state:paused}   /* 지도 전체(#map *)를 고르면 켜고 끌 때 지도 모든 칸의 스타일을 다시 세서, 움직이는 것만 골라요 */
+#map.cam-move{will-change:transform}   /* 3.0.0 체험학습 배웅과 마중 동안 아래 칩을 잠깐 숨겨요 */
 .ex-row-btn.todo{border-color:#E2A21C}.ex-row-btn.todo em{background:#D9534A;color:#FFFFFF}
 .sheet-award{cursor:default;margin:2px 0 10px;font-size:13px}.sheet-award img{flex:none;width:40px;height:40px;object-fit:contain}
 /* 2.0.1 공부 2단계: 책 읽기 */
@@ -8161,7 +8165,9 @@ body.cam-scene #ffChip,body.cam-scene #tierDots,body.cam-scene #plChip{opacity:0
     k.ty = ok ? y : SP[i][1];
   }
   function placeKid(k, bob) {
-    k.g.setAttribute('transform', `translate(${k.x.toFixed(1)} ${(k.y + bob).toFixed(1)}) scale(1.1)`);
+    const tf = `translate(${k.x.toFixed(1)} ${(k.y + bob).toFixed(1)}) scale(1.1)`;
+    if (k.tf === tf) return;   // 3.2.6 끊김: 서 있는 학생은 같은 값을 다시 쓰지 않아요(지도 전체를 다시 그리게 돼서)
+    k.tf = tf; k.g.setAttribute('transform', tf);
   }
   // 같은 종류가 가장 많이 겹친 학생의 자리(뒤쪽부터). 겹치는 학생이 없으면 -1
   function kidDupIdx(strict) {
@@ -8213,6 +8219,7 @@ body.cam-scene #ffChip,body.cam-scene #tierDots,body.cam-scene #plChip{opacity:0
     if (rt.reduced) return;
     const away = kidsAway();   // 3.1.1 고등학교 밤에는 학생층이 숨어 있어서 걷기 계산만 하고 그리기(매 프레임 16명 setAttribute)와 줄 세우기는 쉬어요
     for (const k of rt.kids) {
+      if (k.frz) continue;   // 3.2.6 체험학습 장면 동안 장면에 나오지 않는 친구는 잠깐 멈춰요(busScene)
       if (k.wait > 0) { k.wait -= dt; k.moving = false; }
       else {
         // 운동회 달리기(k.ang)는 운동장 트랙을 그대로 돌고, 그 밖에는 막힌 곳을 돌아서 가요
@@ -8230,7 +8237,10 @@ body.cam-scene #ffChip,body.cam-scene #tierDots,body.cam-scene #plChip{opacity:0
     rt.sortT += dt;
     if (rt.sortT > 0.5) {
       rt.sortT = 0;
-      rt.kids.slice().sort((a, b) => a.y - b.y).forEach(k => layerKids.appendChild(k.g));
+      // 3.2.6 끊김: 예전에는 순서가 그대로여도 0.5초마다 학생 그림을 모두 빼서 다시 넣었어요(화면 배치를 다시 셈). 순서가 바뀐 때만 옮겨요
+      const ord = rt.kids.slice().sort((a, b) => a.y - b.y);
+      let prev = null;
+      for (const k of ord) { const want = prev ? prev.g.nextSibling : layerKids.firstChild; if (k.g !== want) layerKids.insertBefore(k.g, want); prev = k; }
     }
   }
 
@@ -8678,32 +8688,36 @@ body.cam-scene #ffChip,body.cam-scene #tierDots,body.cam-scene #plChip{opacity:0
   }
 
   /* ---------- 화면 그리기 ---------- */
+  // 3.2.6 끊김: 0.1초마다 도는 화면 갱신이 같은 글자도 다시 써서 화면 배치를 매번 다시 셌어요. 바뀐 때만 써요
+  const setTx = (el, v) => { if (el && el.textContent !== String(v)) el.textContent = v; };
+  const setAt = (el, a, v) => { if (el && el.getAttribute(a) !== String(v)) el.setAttribute(a, v); };
+  const setHid = (el, h) => { if (el && el.hidden !== !!h) el.hidden = !!h; };
   function renderHUD() {
-    $('#vBudget').textContent = fmt2(S.budget);
-    $('#vRate').textContent = `초당 +${fmtRate(rate())}${feastOn() ? ' (+100%)' : ''}`;
+    setTx($('#vBudget'), fmt2(S.budget));
+    setTx($('#vRate'), `초당 +${fmtRate(rate())}${feastOn() ? ' (+100%)' : ''}`);
     renderDeal();
-    $('#vStudents').textContent = `${Math.floor(S.students)}/${capacity()}`;
+    setTx($('#vStudents'), `${Math.floor(S.students)}/${capacity()}`);
     const r = rep();
-    $('#vRep').textContent = r;
+    setTx($('#vRep'), r);
     const kn = Math.floor(S.students);
-    $('#vRepTop').textContent = fmt(r); $('#vKidsTop').textContent = `${fmt(kn)}명`;
-    $('#repPill').setAttribute('aria-label', `평판 ${fmt(r)}`); $('#kidsPill').setAttribute('aria-label', `학생 ${fmt(kn)}명`);
+    setTx($('#vRepTop'), fmt(r)); setTx($('#vKidsTop'), `${fmt(kn)}명`);
+    setAt($('#repPill'), 'aria-label', `평판 ${fmt(r)}`); setAt($('#kidsPill'), 'aria-label', `학생 ${fmt(kn)}명`);
     renderPower();
     fitText($('#vBudget'), 14, budgetTpl(S.budget)); fitText($('#vRate'), 11, $('#vRate').textContent.replace(/[0-9]/g, '8')); fitText($('#vStudents'), 15); fitText($('#vPower'), 15);
     const G = CFG.grades, g = S.grade;
-    $('#schoolName').textContent = schoolTitle();   // 1.7.4 꾸미기 가게에서 이름 앞부분을 바꿀 수 있어요
+    setTx($('#schoolName'), schoolTitle());   // 1.7.4 꾸미기 가게에서 이름 앞부분을 바꿀 수 있어요
     renderCrest();
     renderYear();
-    $('#gradePill').textContent = G[g].name;
+    setTx($('#gradePill'), G[g].name);
     let p = 1, txt = semFirst() ? (semLocked() ? `대도시예요! 퀘스트 ${semLeft()}개를 마치면 1학기 방학식` : '대도시예요! 1학기 방학식을 열 수 있어요') : finalYear() ? '대도시예요! 졸업식을 열 수 있어요' : yearLocked() ? `대도시예요! 퀘스트 ${yearLeft()}개를 마치면 종업식` : '대도시예요! 종업식을 열 수 있어요';
     if (g < G.length - 1) {
       const lo = townRep(g), hi = townRep(g + 1);
       p = Math.max(0, Math.min(1, (r - lo) / (hi - lo)));
       txt = `${G[g + 1].name}까지 ★${Math.max(0, hi - r)}`;
     }
-    $('#barFill').style.width = (p * 100).toFixed(1) + '%';
-    $('#gradeBar').setAttribute('aria-valuenow', Math.round(p * 100));
-    $('#vNext').textContent = txt;
+    { const bw = (p * 100).toFixed(1) + '%', bf = $('#barFill'); if (bf.style.width !== bw) bf.style.width = bw; }
+    setAt($('#gradeBar'), 'aria-valuenow', Math.round(p * 100));
+    setTx($('#vNext'), txt);
   }
   // 칠판 숫자가 칸보다 길면 글자를 줄여서 한 칸에 맞춰요. 글자 수나 칸 너비가 바뀔 때만 다시 재요
   // tpl: 크기를 정할 때 쓸 가장 긴 글자(예: '8888억 8888만'). 주면 그 글자로 크기를 정해서, 숫자가 '4167억'처럼 잠깐 짧아져도 글자가 커졌다 작아졌다 하지 않아요(1.7.3)
@@ -8795,6 +8809,7 @@ body.cam-scene #ffChip,body.cam-scene #tierDots,body.cam-scene #plChip{opacity:0
   const mapRoofTop = () => { const G = geo(); return Math.min(...Object.values(G.b).concat([G.next.at]).map(([, cy, w]) => cy - w * 0.46)); };
   // 3.2.5 화면 당기기(camAnim)가 마지막 자리를 미리 알 수 있게 자리 맞추기만 따로 떼었어요
   function panTo(x, y) {
+    if (rt.camHold) { rt.camHold = null; map.classList.remove('cam-move'); }   // 3.2.6 키운 채로 멈춘 그림을 손으로 옮기면 그 자리에서 끝내요
     const [px, py] = panClamp(x, y);
     rt.panX = px; rt.panY = py;
     map.style.transform = `translate(${rt.panX.toFixed(1)}px, ${rt.panY.toFixed(1)}px)`;
@@ -8864,24 +8879,33 @@ body.cam-scene #ffChip,body.cam-scene #tierDots,body.cam-scene #plChip{opacity:0
     const W = fr.clientWidth, H = fr.clientHeight, mid = ((rt.hudTop || 0) + H - (rt.hudBot || 0)) / 2, sc = rt.mapS / (rt.zoom || 1) * z;
     return [W / 2 - mx * sc, mid - (my + 60) * sc];
   }
-  function camAnim(z, x, y, ms) {
+  function camAnim(z, x, y, ms, hold) {
     return new Promise(done => {
       if (!rt.mapS || rt.tab !== 'school') { done(); return; }
+      /* 3.2.6 hold: 다 당긴 뒤에도 지도 크기를 다시 맞추지 않고(그때 한 번 크게 끊겼어요) 키운 그림 그대로 두었다가,
+         원래 크기로 돌아오는 다음 당기기에서 그대로 되돌려요. 그러면 장면 내내 지도 크기를 한 번도 바꾸지 않아요 */
+      const H = rt.camHold; rt.camHold = null;
       /* 3.2.5 지섭 제보(체험학습 출발과 귀환 때 심하게 끊김): 예전에는 매 프레임 fitMap으로 지도 크기(width, height)를 바꾸고
          위쪽 칸 자리를 다시 재서(hudVars), 휴대폰이 큰 지도를 프레임마다 다시 배치하고 다시 그렸어요.
          이제 움직이는 동안은 지도 크기는 그대로 두고 transform(옮기기와 키우기)만 바꾸고, 크기는 끝에 한 번만 맞춰요 */
-      const z0 = rt.zoom || 1, x0 = rt.panX, y0 = rt.panY, t0 = performance.now(), id = (rt.camId = (rt.camId || 0) + 1);
+      const z0 = rt.zoom || 1, x0 = H ? H.x : rt.panX, y0 = H ? H.y : rt.panY, sc0 = H ? H.s : 1, t0 = performance.now(), id = (rt.camId = (rt.camId || 0) + 1);
       const m0 = { s: rt.mapS, w: rt.mapW, h: rt.mapH }, s1 = m0.s / z0 * z;
       rt.mapS = s1; rt.mapW = 360 * s1; rt.mapH = 540 * s1;
       const [x1, y1] = panClamp(x, y);   // 마지막 자리(빈틈이 보이지 않게 맞춘 값)
       rt.mapS = m0.s; rt.mapW = m0.w; rt.mapH = m0.h;
-      const end = () => { rt.zoom = z; fitMap(false); panTo(x1, y1); done(); };
+      map.classList.add('cam-move');   // 3.2.6 움직이는 동안 지도를 한 장의 그림처럼 옮기고 키워요(끝나면 한 번 다시 그림)
+      const end = () => {
+        if (hold && rt.tab === 'school') { rt.camHold = { s: z / z0, x: x1, y: y1 }; done(); return; }   // 키운 그림 그대로
+        map.classList.remove('cam-move');
+        if (Math.abs(z - z0) < 1e-6) panTo(x1, y1); else { rt.zoom = z; fitMap(false); panTo(x1, y1); }   // 원래 크기로 돌아오면 크기는 그대로
+        done();
+      };
       const step = now => {
-        if (rt.camId !== id) { done(); return; }   // 새 당기기가 이어받아요(그쪽이 처음 자리부터 다시 움직여요)
+        if (rt.camId !== id) { map.classList.remove('cam-move'); done(); return; }   // 새 당기기가 이어받아요(그쪽이 처음 자리부터 다시 움직여요)
         if (rt.tab !== 'school') { end(); return; }
         const p = Math.min(1, (now - t0) / ms), e = p < 0.5 ? 2 * p * p : 1 - Math.pow(-2 * p + 2, 2) / 2;
-        const zc = z0 + (z - z0) * e;
-        map.style.transform = `translate(${(x0 + (x1 - x0) * e).toFixed(1)}px, ${(y0 + (y1 - y0) * e).toFixed(1)}px) scale(${(zc / z0).toFixed(4)})`;
+        const sc = sc0 + (z / z0 - sc0) * e;
+        map.style.transform = `translate(${(x0 + (x1 - x0) * e).toFixed(1)}px, ${(y0 + (y1 - y0) * e).toFixed(1)}px) scale(${sc.toFixed(4)})`;
         if (p < 1) requestAnimationFrame(step); else end();
       };
       requestAnimationFrame(step);
@@ -8983,9 +9007,9 @@ body.cam-scene #ffChip,body.cam-scene #tierDots,body.cam-scene #plChip{opacity:0
     renderTr2Btn();
     renderSportsBtn();
     if (rt.tab === 'quests') renderMissions();
-    $('#btnAtt').hidden = !attUnlocked();
-    $('#attDot').hidden = !attUnlocked() || !canStamp();
-    $('#gDot').hidden = rt.tab === 'grad' || !(canGraduate() || canPromote() || (S.p.ticket > 0 && growOn()) || Object.keys(PERKS).some(k => !perkMaxed(k) && S.p.dip >= perkCost(k)) || Object.keys(FPERKS).some(k => S.fund >= fpCost(k)));
+    setHid($('#btnAtt'), !attUnlocked());
+    setHid($('#attDot'), !attUnlocked() || !canStamp());
+    setHid($('#gDot'), rt.tab === 'grad' || !(canGraduate() || canPromote() || (S.p.ticket > 0 && growOn()) || Object.keys(PERKS).some(k => !perkMaxed(k) && S.p.dip >= perkCost(k)) || Object.keys(FPERKS).some(k => S.fund >= fpCost(k))));
     renderGradPanel(false);
   }
 
@@ -11186,18 +11210,18 @@ body.cam-scene #ffChip,body.cam-scene #tierDots,body.cam-scene #plChip{opacity:0
   const clock = sec => `${Math.floor(sec / 60)}:${String(sec % 60).padStart(2, '0')}`;
   function renderDeal() {
     const b = $('#btnDeal'), d = rt.deal;
-    b.hidden = !d;
+    setHid(b, !d);   // 3.2.6 바뀐 때만
     if (d) {
       const t = clock(Math.max(0, Math.ceil((d.exp - Date.now()) / 1000)));
       if (b.dataset.t !== t) { b.dataset.t = t; $('#dealTime').textContent = t; b.setAttribute('aria-label', `까치 핫딜, ${t} 남았어요`); }
       if (rt.modalOpen === $('#mDeal')) $('#dealClock').textContent = t;
     }
     const on = feastOn();
-    $('#feastChip').hidden = !on;
-    if (on) $('#feastTime').textContent = clock(Math.ceil((S.hd.feastUntil - gameNow()) / 1000));
+    setHid($('#feastChip'), !on);
+    if (on) setTx($('#feastTime'), clock(Math.ceil((S.hd.feastUntil - gameNow()) / 1000)));
     const au = autoOn();
-    $('#autoChip').hidden = !au;
-    if (au) $('#autoTime').textContent = clock(Math.ceil((S.autoUntil - gameNow()) / 1000));
+    setHid($('#autoChip'), !au);
+    if (au) setTx($('#autoTime'), clock(Math.ceil((S.autoUntil - gameNow()) / 1000)));
   }
   function openDeal() {
     if (rt.paused || rt.modalOpen || !rt.deal) return;
@@ -17010,7 +17034,7 @@ body.cam-scene #ffChip,body.cam-scene #tierDots,body.cam-scene #plChip{opacity:0
   function renderTr2Btn() {
     const b = $('#btnTr2'); if (!b) return;
     const cur = S.tr2 && S.tr2.cur, on = tr2Open() && (!!cur || !S.tr2.done[tr2Key()]);
-    b.hidden = !on; if (!on) return;
+    setHid(b, !on); if (!on) return;   // 3.2.6 바뀐 때만
     const txt = !cur ? (tr2Day() ? '출발' : '예약') : cur.st !== 'go' ? '여행 중' : tr2Rsv() ? '6시 출발' : tr2Ready() ? '도착!' : hms(Math.max(0, cur.back - gameNow()));
     if (rt.tr2Txt !== txt) { rt.tr2Txt = txt; $('#tr2N').textContent = txt; b.classList.toggle('ready', !cur || tr2Ready() || cur.st !== 'go'); b.setAttribute('aria-label', `수학여행, ${txt}`); }
     if (!$('#tr2Ic').firstChild && IMG('ic_trip2')) $('#tr2Ic').innerHTML = `<img src="${IMG('ic_trip2')}" alt="">`;
@@ -17217,7 +17241,7 @@ body.cam-scene #ffChip,body.cam-scene #tierDots,body.cam-scene #plChip{opacity:0
     rt.tripTxt = ''; save(); renderTripBtn();
     const n = S.trip.kids;
     rt.busHold = rt.reduced ? 0 : n;
-    closeModal($('#mTrip'), () => { setTab('school'); busScene('go', n, () => { rt.busHold = 0; syncKids(false); }); });
+    closeModal($('#mTrip'), () => { if (rt.tab !== 'school') setTab('school'); busScene('go', n, () => { rt.busHold = 0; syncKids(false); }); });
   }
   function tripUseTicket(k) {
     const t = TK.find(x => x.k === k);
@@ -17268,7 +17292,7 @@ body.cam-scene #ffChip,body.cam-scene #tierDots,body.cam-scene #plChip{opacity:0
     rt.tripGot = msg;
     rt.tripTxt = '';
     save(); renderHUD(); renderAffordance(); renderTripBtn(); renderGradPanel(true);
-    const n = S.trip.kids, arrive = () => { setTab('school'); if (n > 0) busScene('back', n, () => { S.trip.kids = 0; syncKids(false); save(); if (!rwNow) showReward(rw); }); };
+    const n = S.trip.kids, arrive = () => { if (rt.tab !== 'school') setTab('school'); if (n > 0) busScene('back', n, () => { S.trip.kids = 0; syncKids(false); save(); if (!rwNow) showReward(rw); }); };
     if (rt.reduced) { S.trip.kids = 0; syncKids(false); }
     if (rt.modalOpen === $('#mTrip')) closeModal($('#mTrip'), arrive); else arrive();
   }
@@ -18139,9 +18163,9 @@ body.cam-scene #ffChip,body.cam-scene #tierDots,body.cam-scene #plChip{opacity:0
     // 3.0.0 지섭 요청: 친구들이 걸어가다 끝나지 않게, 다 모여 응원한 뒤(최대 4초) 떠나고, 버스가 사라진 뒤에도 잠깐 손을 흔들다 흩어져요.
     // 그동안 화면을 버스 쪽으로 잠깐 당겼다가(1.6배) 원래 자리로 돌아와요
     const cam0 = { z: rt.zoom || 1, x: rt.panX, y: rt.panY }, camGo = camAt(Math.max(cam0.z, 1.6), bx - 18, by - 12);
-    if (camGo) camAnim(Math.max(cam0.z, 1.6), camGo[0], camGo[1], 700);
+    if (camGo) camAnim(Math.max(cam0.z, 1.6), camGo[0], camGo[1], 700, true);
     document.body.classList.add('cam-scene');
-    const finish = () => setTimeout(() => { tripCrowd(null); document.body.classList.remove('cam-scene'); if (cam0.x != null && rt.tab === 'school') camAnim(cam0.z, cam0.x, cam0.y, 700); if (then) then(); }, 1200);
+    const finish = () => setTimeout(() => { tripCrowd(null); rt.kids.forEach(k => { k.frz = false; }); document.body.classList.remove('cam-scene'); if (cam0.x != null && rt.tab === 'school') camAnim(cam0.z, cam0.x, cam0.y, 700); if (then) then(); }, 1200);
     const leave = () => tripWait(12000, tripCrowdIn).then(() => { door(false); dust(); if (bob) bob.play(); sfx('leaf'); drive(by, 490, 1300).onfinish = () => { g.remove(); if (rt.bus === g) rt.bus = null; finish(); }; });
     /* 3.2.5 지섭 요청: 학생들이 버스에 다 온 뒤에 장면이 이어지게. 탈 친구는 버스에서 가까운 친구 n명을 먼저 골라 버스가 오는 동안
        정류장 옆으로 걸어가 줄을 서고(k.rider), 버스가 서면 문으로 들어가요. 다 탈 때까지(넉넉히 15초) 기다려요 */
@@ -18149,6 +18173,8 @@ body.cam-scene #ffChip,body.cam-scene #tierDots,body.cam-scene #plChip{opacity:0
     const riders = mode === 'go' ? rt.kids.filter(k => !k.board).sort((a, b) => Math.hypot(a.x - dr[0], a.y - dr[1]) - Math.hypot(b.x - dr[0], b.y - dr[1])).slice(0, n) : [];
     riders.forEach((k, i) => { k.rider = true; k.wait = 0; k.speed = 46; k.tx = dr[0] - 8 - i * 7; k.ty = dr[1] + 10; });
     tripCrowd(mode === 'back' ? 'back' : 'go', bx, by, 0);   // 3.0.0 버스가 오는 동안 친구들이 먼저 모여요(떠날 때 배웅, 돌아올 때 마중)
+    // 3.2.6 끊김: 지도는 SVG 한 장이라 안에서 무엇이 움직이면 지도 전체를 다시 그려요. 장면에 나오지 않는 친구는 장면이 끝날 때까지 멈춰요
+    rt.kids.forEach(k => { if (!k.trip && !k.rider && !k.board) k.frz = true; });
     drive(490, by, 1300).onfinish = () => {
       if (bob) bob.pause(); dust(); door(true);
       if (mode === 'go') {
@@ -19899,7 +19925,7 @@ body.cam-scene #ffChip,body.cam-scene #tierDots,body.cam-scene #plChip{opacity:0
       if (!s) { bar.hidden = true; return; }
       q = s; base = s.b; no = '부탁'; title = `${WHO[s.who]}의 부탁`; how = qGoal(s); av = s.who;
     }
-    bar.hidden = rt.tab === 'quests';
+    setHid(bar, rt.tab === 'quests');
     const key = `${no}|${title}|${how}`;
     if (bar.dataset.key !== key) {
       const first = !bar.dataset.key;
@@ -19912,13 +19938,13 @@ body.cam-scene #ffChip,body.cam-scene #tierDots,body.cam-scene #plChip{opacity:0
       if (!first && !rt.reduced && bar.animate) bar.animate([{ opacity: 0.3, transform: 'translateY(-6px)' }, { opacity: 1, transform: 'none' }], { duration: 300, easing: 'ease-out' });
     }
     const p = qProg(q, base);
-    $('#qbRew').textContent = fmt(qReward(q));
-    $('#qbGold').hidden = !hardQ(q);
+    setTx($('#qbRew'), fmt(qReward(q)));   // 3.2.6 바뀐 때만
+    setHid($('#qbGold'), !hardQ(q));
     if (!$('#qbGold').firstChild) $('#qbGold').innerHTML = GOLD_ICON;
-    $('#qbCnt').textContent = p.done ? '완료' : p.text;
-    $('#qbFill').style.width = (p.frac * 100).toFixed(1) + '%';
-    bar.classList.toggle('ready', p.done);
-    bar.setAttribute('aria-label', `${mq ? '메인 퀘스트 ' + no : '학생 부탁'} ${title}. ${p.done ? '완료했어요. 눌러서 보상 받기' : p.text + '. 눌러서 바로 가기'}`);
+    setTx($('#qbCnt'), p.done ? '완료' : p.text);
+    { const fw = (p.frac * 100).toFixed(1) + '%', qf = $('#qbFill'); if (qf.style.width !== fw) qf.style.width = fw; }
+    if (bar.classList.contains('ready') !== !!p.done) bar.classList.toggle('ready', p.done);
+    setAt(bar, 'aria-label', `${mq ? '메인 퀘스트 ' + no : '학생 부탁'} ${title}. ${p.done ? '완료했어요. 눌러서 보상 받기' : p.text + '. 눌러서 바로 가기'}`);
   }
 
   /* 메인 화면 학생 부탁: 무엇을 부탁했는지와 진행 막대. 다 들어주면 눌러서 바로 받아요 */
