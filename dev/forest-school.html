@@ -12477,7 +12477,24 @@ body.cam-scene #ffChip,body.cam-scene #tierDots,body.cam-scene #plChip{opacity:0
     return '서버를 연결하기 전 체험판이라서 지금은 내 학교 파워만 볼 수 있어요.';
   }
   /* 3.0.0 순위표 보조 줄(지섭 결정 2026-11-03, 자세한 것은 본부 인수인계 문서). 서버에는 아무것도 올리지 않아요 */
-  const RKF = { fill: 20, lo: 0.3, hi: 1.1, endLo: 0.3, endHi: 0.9, start: 0.25, tierDrop: 0.04, floor: { week: 300, sea: 3000, bt: 60, all: 300 }, titled: 0.65 };
+  const RKF = { fill: 20, lo: 0.3, hi: 1.1, endLo: 0.3, endHi: 0.9, start: 0.25, tierDrop: 0.04, floor: { week: 300, sea: 3000, bt: 60, all: 300 }, titled: 0.65,
+    // 3.2.6 지섭 제보(월요일인데 이미 점수가 높음, 시즌 시작 전인데 시즌 점수): 주간과 시즌은 월요일 0점에서 시작해 사람처럼 요일과 시간대에 따라 올라가요.
+    // 줄마다 요일별 노는 양이 다르고 쉬는 날(off)도 있어요. 하루에 오르는 점수는 dayCap을 넘지 않아요(오늘의 미션, 보너스, 행사, 체험학습, 대결을 열심히 한 하루쯤). 숫자는 본부 제안
+    off: 0.22, dayCap: 260, refCap: 1800 };
+  // 하루 중 노는 양(0~23시). 새벽은 거의 없고 아침, 점심, 저녁에 몰려요
+  const RKF_HOUR = [0.02, 0, 0, 0, 0, 0, 0.1, 0.5, 0.7, 0.35, 0.3, 0.35, 0.8, 0.6, 0.3, 0.3, 0.45, 0.7, 0.9, 1, 1, 0.9, 0.6, 0.25];
+  const RKF_CUM = (() => { const c = [0]; RKF_HOUR.forEach(v => c.push(c[c.length - 1] + v)); return c.map(v => v / c[24]); })();
+  const rkHourCum = h => { const i = Math.min(23, Math.floor(h)); return RKF_CUM[i] + (RKF_CUM[i + 1] - RKF_CUM[i]) * (h - i); };
+  // 한 줄의 한 주: 요일별 몫(0~6, 월요일부터)과 그 주 마지막 점수
+  function rkWeekPlan(rs, ref) {
+    const w = Array.from({ length: 7 }, (_, d) => rkRnd(rs, 'd' + d) < RKF.off ? 0 : 0.5 + rkRnd(rs, 'v' + d));
+    if (!w.some(x => x > 0)) w[rkHash(rs) % 7] = 1;
+    const tot = w.reduce((a, b) => a + b, 0), u = rkRnd(rs, 'e');
+    const end = Math.min(ref * (RKF.endLo + (RKF.endHi - RKF.endLo) * u), RKF.dayCap * tot / Math.max(...w));   // 가장 많이 노는 날도 하루 상한 안
+    return { w, tot, end };
+  }
+  // 그 주 시작부터 (요일 dow, 시 h)까지 쌓인 점수
+  function rkWeekAt(P, dow, h) { let done = 0; for (let d = 0; d < dow; d++) done += P.w[d]; done += P.w[dow] * rkHourCum(h); return P.end * done / P.tot; }
   // 3.0.1 지섭: 보조 줄도 칭호를 달아요. 점수가 높은 쪽 65%만 달고(낮은 쪽은 안 달아요), 실제로 얻을 수 있는 칭호만 그 학교급부터 골라요(숫자는 학교급)
   // 숲의 길잡이(메인 퀘스트 80개, 초등학교 2학년쯤), 마을 후원자(마을 기부 3단계), 꼬마 과학자(실험 노트 24장), 꾸미기 장인(지도 한 장에 장식 11개)
   const RKF_TI = { quest: 1, vdpatron: 1, lab: 1, deco: 1 };
@@ -12492,15 +12509,15 @@ body.cam-scene #ffChip,body.cam-scene #tierDots,body.cam-scene #plChip{opacity:0
   }
   function rkFill(mode, rows, mine) {
     const need = RKF.fill - rows.length; if (need <= 0 || Rank.state !== 'on') return rows;
-    const seed = `${mode}|${mode === 'sea' ? 's' + rsNum() : gameWeek()}|${Rank.uid || ''}`, timed = mode === 'week' || mode === 'sea', w = rkPeriod(mode);
-    const lastWk = S.lg && S.lg.last && S.lg.last.pts || 0, ref = mode === 'week' ? Math.max(RKF.floor.week, lastWk) : mode === 'sea' ? Math.max(RKF.floor.sea, lastWk * 13) : 0;
+    if (mode === 'sea' && !rsOn()) return rows;   // 3.2.6 시즌이 시작하기 전에는 보조 줄도 없어요
+    const seed = `${mode}|${mode === 'sea' ? 's' + rsNum() : gameWeek()}|${Rank.uid || ''}`, timed = mode === 'week' || mode === 'sea';   // 3.2.6 주간과 시즌은 rkTimed가 셈
     const shrink = 1 - RKF.tierDrop * Math.min(4, S.tier), memo = rt.rkMax || (rt.rkMax = {});
     const taken = new Set(rows.map(r => nickKey(r.name))), out = rows.slice();
     const us = Array.from({ length: need }, (_, i) => rkRnd(seed, i)), uCut = us.slice().sort((a, b) => b - a)[Math.max(0, Math.round(need * RKF.titled) - 1)];   // 점수는 u가 클수록 높아요
     for (let i = 0; i < need; i++) {
       const u = us[i];
       let v;
-      if (timed) { const end = ref * (RKF.endLo + (RKF.endHi - RKF.endLo) * u); v = end * (RKF.start + (1 - RKF.start) * w); }
+      if (timed) v = rkTimed(mode, seed + '|' + i);
       else v = Math.max(mine, RKF.floor[mode]) * (RKF.lo + (RKF.hi - RKF.lo) * u) * shrink;
       const mk = seed + '|' + i; v = Math.max(memo[mk] || 0, Math.max(1, Math.round(v))); memo[mk] = v;   // 한 번 보인 점수보다 내려가지 않아요
       let nm = NICK_ADJ[rkHash(seed + 'a' + i) % NICK_ADJ.length] + ' ' + NICK_NOUN[rkHash(seed + 'n' + i) % NICK_NOUN.length];
@@ -12512,6 +12529,21 @@ body.cam-scene #ffChip,body.cam-scene #tierDots,body.cam-scene #plChip{opacity:0
     }
     const key = r => mode === 'sea' ? r.sp : mode === 'bt' ? r.bt : mode === 'week' ? r.lp : r.score;
     return out.sort((a, b) => (key(b) || 0) - (key(a) || 0));
+  }
+  // 3.2.6 주간: 이번 주 계획에서 지금까지. 시즌: 시즌 첫날부터 오늘까지 날마다 그 주 계획의 몫을 더해요(주간 줄과 같은 방식)
+  function rkRef() { const lastWk = S.lg && S.lg.last && S.lg.last.pts || 0; return Math.min(RKF.refCap, Math.max(RKF.floor.week, lastWk)); }
+  function rkTimed(mode, rs) {
+    const ref = rkRef(), now = gameNow() + KST_MS, day = Math.floor(now / 86400000), h = (now % 86400000) / 3600000;
+    const dowOf = dy => ((dy - 4) % 7 + 7) % 7, wkOf = dy => Math.floor((dy - 4) / 7);   // 1970-01-05가 월요일
+    if (mode === 'week') return rkWeekAt(rkWeekPlan(rs + '|w' + wkOf(day), ref), dowOf(day), h);
+    const d = new Date(now), m = d.getUTCMonth(), y = d.getUTCFullYear(), sm = m === 11 ? 11 : m < 2 ? -1 : m - (m - 2) % 3;
+    const st = Math.floor(Date.UTC(sm < 0 ? y - 1 : y, sm < 0 ? 11 : sm, 1) / 86400000);
+    let v = 0, P = null, pk = null;
+    for (let dy = st; dy <= day; dy++) {
+      const k = wkOf(dy); if (k !== pk) { P = rkWeekPlan(rs + '|w' + k, ref); pk = k; }
+      v += P.end * P.w[dowOf(dy)] * (dy === day ? rkHourCum(h) : 1) / P.tot;
+    }
+    return v;
   }
   function renderRankPanel() {
     if (!S || rt.tab !== 'rank') return;
