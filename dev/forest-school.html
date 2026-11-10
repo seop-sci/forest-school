@@ -7635,6 +7635,7 @@ body.cam-scene #ffChip,body.cam-scene #plChip,body.cam-scene .b-ring{animation-p
   // 4.0.0 호칭(지섭 결정 2026-11-11): 대학교부터 과목을 가르치는 분(다람쥐, 곰, 부엉이, 고니, 공작)만 '교수님', 고슴도치 교감 선생님은 '부총장님'.
   // 영양, 사서, 매점, 사감, 시설, 진로처럼 과목이 아닌 분은 그대로 '선생님'. 아래 탭과 탭 안 제목은 대학교에서 '교수님'
   const uniNow = () => { try { return !!S && S.tier >= 4; } catch (e) { return false; } };
+  const headText = t => uniNow() && typeof t === 'string' ? t.replace(/교장 선생님/g, '총장님') : t;   // 4.0.0 지섭 결정(2026-11-11): 대학교에서는 교장 선생님을 총장님으로(랭킹의 다른 사람 호칭은 그대로)
   const profText = t => uniNow() ? t.replace('교감 선생님', '부총장님').replace(/ 선생님/g, ' 교수님') : t;
   for (const o of [...Object.values(TEA), ...Object.values(XT).filter(X => X.sub), VP]) for (const f of ['name', 'desc']) { const t = o[f]; Object.defineProperty(o, f, { get: () => profText(t), enumerable: true, configurable: true }); }
   { const sj = VP.subject; Object.defineProperty(VP, 'subject', { get: () => uniNow() ? '부총장' : sj, enumerable: true, configurable: true }); }
@@ -9228,6 +9229,7 @@ body.cam-scene #ffChip,body.cam-scene #plChip,body.cam-scene .b-ring{animation-p
     renderHUD(); renderAffordance();
   }
   function sayBubble(x, y, txt) {
+    txt = headText(txt);
     const w = Math.ceil(txt.length * 10.4 + 16), h = 22;
     const bx = Math.max(4, Math.min(356 - w, x - w / 2)), by = Math.max(4, y - h - 8);
     const tx = Math.max(bx + 8, Math.min(bx + w - 8, x));
@@ -11619,6 +11621,7 @@ body.cam-scene #ffChip,body.cam-scene #plChip,body.cam-scene .b-ring{animation-p
     { const t = $('#ttlTeachers span:last-child'); if (t) setT(t, nm); }
     { const t = $('#tabTeaTx'); if (t) setT(t, nm); }
     { const t = $('#qsecVp'); if (t) setT(t, profText('교감 선생님의 안내')); }
+    { const t = $('#offTitle'); if (t) setT(t, headText('다녀오셨어요, 교장 선생님!')); }
   }
   function renderXtCards() {
     profTitles();
@@ -15085,7 +15088,7 @@ body.cam-scene #ffChip,body.cam-scene #plChip,body.cam-scene .b-ring{animation-p
     if (rt.csView === 'hi') {   // 처음 만날 때
       const u = IMG('cou_smile') || IMG('tea_elephant');
       body.innerHTML = `<div class="cs-talk"><div class="cs-face">${u ? `<img src="${u}" alt="">` : '<span class="cs-em">🐘</span>'}</div>` +
-        `<div class="cs-bub tea"><p><b>코끼리 선생님</b>안녕하세요, 교장 선생님. 저는 상담을 맡은 코끼리예요. 귀가 커서 이야기를 잘 들어요.</p></div>` +
+        `<div class="cs-bub tea"><p><b>코끼리 선생님</b>안녕하세요, ${headText('교장 선생님')}. 저는 상담을 맡은 코끼리예요. 귀가 커서 이야기를 잘 들어요.</p></div>` +
         `<div class="cs-bub tea"><p>학생들이 꿈을 찾도록 같이 이야기 나눠 봐요. 하루 ${csMax() === 3 ? '세 ' : csMax()}번 상담할 수 있어요.</p></div>` +
         `<div class="btn-row"><button class="cta" type="button" data-cs="met">좋아요</button></div></div>`;
       return;
@@ -15923,7 +15926,7 @@ body.cam-scene #ffChip,body.cam-scene #plChip,body.cam-scene .b-ring{animation-p
       row.dataset.sp = sp;
       setH($('#sheetFriendIc'), kidAvatar(sp));
       setH($('#sheetFriendNm'), `${esc(frFull(sp))}<span class="fr-mini" aria-label="하트 ${frHeart(f.p)}칸">${heartsHTML(f.p)}</span>`);
-      setT($('#sheetFriendTx'), frLineDay(sp, k));
+      setT($('#sheetFriendTx'), headText(frLineDay(sp, k)));
       setT($('#sheetFriendGo'), done ? '♥ 오늘 했어요' : '쓰다듬기');
       row.setAttribute('aria-label', `${frFull(sp)}, ${done ? '오늘 쓰다듬었어요' : '눌러서 쓰다듬기'}`);
     }
@@ -15960,6 +15963,7 @@ body.cam-scene #ffChip,body.cam-scene #plChip,body.cam-scene .b-ring{animation-p
     return true;
   }
   function mapBubble(x, y, name, line) {
+    line = headText(line);
     if (rt.frBub) { rt.frBub.remove(); rt.frBub = null; }
     const W = 158, H = 40, bx = Math.max(W / 2 + 4, Math.min(360 - W / 2 - 4, x)), by = Math.max(-56 + H, y);
     const L = IMG('bond_bubble_light'), D = IMG('bond_bubble_dark');
@@ -17729,7 +17733,7 @@ body.cam-scene #ffChip,body.cam-scene #plChip,body.cam-scene .b-ring{animation-p
     $('#talkAv').innerHTML = hh ? hedgehogAvatar() : kidAvatar(L.who);
     $('#talkAv').classList.toggle('kid', !hh);
     $('#talkWho').textContent = hh ? '교감 고슴도치' : T.n.lab || `새 친구 ${T.n.name}`;   // 2.1.3 반짝 친구는 lab
-    $('#talkText').textContent = nl(L.t);
+    $('#talkText').textContent = nl(headText(L.t));
     $('#talkNext').textContent = T.i >= T.lines.length - 1 ? '반가워요!' : '다음';
     $('#talkStep').textContent = `${T.i + 1} / ${T.lines.length}`;
   }
@@ -18867,8 +18871,8 @@ body.cam-scene #ffChip,body.cam-scene #plChip,body.cam-scene .b-ring{animation-p
   function showReward(o) {
     queueModal(() => {
       const icon = ic => ic === 'acorn' ? acornIcon() : ic === 'dip' ? dipIcon() : ic === 'gold' ? GOLD_ICON : ic === 'fund' ? fundIcon() : ic === 'ticket' ? TICKET_SVG : ic === 'ess' ? ESS_ICON() : (ic || '');
-      $('#rwTitle').textContent = o.title;
-      $('#rwSub').textContent = o.sub || '';
+      $('#rwTitle').textContent = headText(o.title);
+      $('#rwSub').textContent = headText(o.sub || '');
       $('#rwSub').hidden = !o.sub;
       const art = $('#rwArt');
       art.hidden = !o.art;
@@ -21868,7 +21872,7 @@ body.cam-scene #ffChip,body.cam-scene #plChip,body.cam-scene .b-ring{animation-p
     $('#skPickA').addEventListener('click', () => skPrize('acorn'));
     $('#skPickG').addEventListener('click', () => skPrize('gold'));
     // 2.1.1 학생과 추억
-    $('#sheetFriend').addEventListener('click', () => { const sp = $('#sheetFriend').dataset.sp, f = frOf(sp); if (!f) return; if (!frToday(f)) frPat(sp); else toast(`${frFull(sp)}: ${frLine(sp, rt.sheetKey)}`); });
+    $('#sheetFriend').addEventListener('click', () => { const sp = $('#sheetFriend').dataset.sp, f = frOf(sp); if (!f) return; if (!frToday(f)) frPat(sp); else toast(`${frFull(sp)}: ${headText(frLine(sp, rt.sheetKey))}`); });
     $('#sheetBday').addEventListener('click', () => { closeSheet(); setTimeout(bdClaim, 240); });
     $('#gAlbum').addEventListener('click', openAlbum);
     // 3.2.3 끊김 줄이기: 공사를 처음 시작할 때 비계, 막대, 비버 그림을 푸느라 한 번 멈추지 않게 켜고 조금 뒤 미리 풀어 둬요
@@ -22792,7 +22796,7 @@ body.cam-scene #ffChip,body.cam-scene #plChip,body.cam-scene .b-ring{animation-p
     let gift = '';
     if (i >= S.pl.read) { S.pl.read = i + 1; addEss(PL.ess); gift = `\n\n(숲의 정수 +${PL.ess})`; save(); }
     $('#ltTitle').textContent = `${L.title}`;
-    $('#ltText').innerHTML = esc(`${L.txt}\n\n${L.from} 드림${gift}`).replace(/\n/g, '<br>');
+    $('#ltText').innerHTML = esc(headText(`${L.txt}\n\n${L.from} 드림${gift}`)).replace(/\n/g, '<br>');
     rt.ltBack = true; rt.plAt = i;
     $('#ltNav').hidden = S.pl.got < 2;
     $('#ltPg').textContent = `${i + 1} / ${PL.list.length}`;
