@@ -7,6 +7,7 @@
 #  5) 페이지 오류 없음
 # 쓰는 법: python3 wrap.py && python3 s114test.py   (마지막 줄이 PASS면 통과)
 import os
+from tclock import PAST
 from playwright.sync_api import sync_playwright
 HERE = os.path.dirname(os.path.abspath(__file__))
 F = 'window.__forest'
@@ -23,7 +24,7 @@ with sync_playwright() as p:
     b = p.chromium.launch()
     pg = b.new_page(viewport={'width': 390, 'height': 844}, device_scale_factor=2)
     errs = []; pg.on('pageerror', lambda e: errs.append(str(e)))
-    pg.add_init_script("window.__FOREST_TEST=1; localStorage.clear()")
+    pg.add_init_script(PAST + "window.__FOREST_TEST=1; localStorage.clear()")
     pg.goto('file://' + os.path.join(HERE, 'test.html')); pg.wait_for_timeout(2500); pg.evaluate(SKIP)
     r = pg.evaluate(f"""() => {{ const F = window.__forest, S = F.S, R = F.Rank; R.state = 'on'; R.uid = 'me'; F.rt.rkMax = {{}};
       S.lg.last = {{ week: 0, pts: 1500, pos: 1, gold: 0 }};

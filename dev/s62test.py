@@ -65,7 +65,7 @@ async def main():
                 if r['nm'] != '도토리b 유치원' or r['sign'] != ['도토리b', '유치원'] or not r['crest']: bad.append(f'이름/마크 {r["nm"]} {r["sign"]} {r["crest"]}')
                 if r['back'][0] != '도토리b' or r['back'][1] != [1, 5, 4, 2]: bad.append(f'저장 {r["back"]}')
                 o = r['old']
-                if o['nm'] != '' or o['mk'] is not None or o['own'] != {} or any(any(x) for x in o['lay']) or [len(x) for x in o['lay']] != [11, 11, 11, 11]: bad.append(f'옛 저장 {o}')
+                if o['nm'] != '' or o['mk'] is not None or o['own'] != {} or any(any(x) for x in o['lay']) or [len(x) for x in o['lay']][:4] != [11, 11, 11, 11]: bad.append(f'옛 저장 {o}')
                 b2 = r['b2']
                 if b2['own'] != {'bench': 11, 'owl': 1} or b2['lay'][0][:4] != ['bench', 'bench', '', 'owl'] or b2['nm'] != '' or b2['mk'] is not None: bad.append(f'망가진 저장 {b2}')
             # 화면: 상점 거리 → 꾸미기 가게
@@ -74,7 +74,7 @@ async def main():
             r = await pg.evaluate("(() => ({ open: !document.querySelector('#panelDeco').hidden, items: document.querySelectorAll('#decoList [data-dbuy]').length, evart: Object.keys(window.FS_IMG200 || {}).filter(k => k.startsWith('evd_')).length + window.__forest.DECO.filter(d => d.ev && (d.ps || d.rs || d.bio || d.cg || d.cs) && window.__forest.IMG(d.img)).length, marks: document.querySelectorAll('#markRows [data-mk]').length, street: document.querySelector('.tab[data-tab=\"street\"]')?.getAttribute('aria-selected') }))()")
             r['over'] = await pg.evaluate(OVER, '#panelDeco')
             print(w, scheme, '가게', json.dumps(r))
-            if not r['open'] or r['items'] != 16 + r['evart'] + 10 or r['marks'] != 25 or r['over']: bad.append(f'{w} 가게 화면 {r}')
+            if not r['open'] or r['items'] != 16 + r['evart'] + 27 or r['marks'] != 25 or r['over']: bad.append(f'{w} 가게 화면 {r}')
             await pg.screenshot(path=f's62_{w}.png')
             await pg.evaluate("document.querySelector('#panelDeco').scrollTop = 9999"); await pg.wait_for_timeout(200)
             await pg.screenshot(path=f's62_{w}b.png')

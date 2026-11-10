@@ -120,7 +120,9 @@ async def main():
                 r = await pg.evaluate(f"""(() => {{ const F = {F}, S = F.S, q = F.MAIN.find(x => x.id === 'j29'); const a = F.qMeasure(q); S.fund = 100; F.buyFundPerk('schol', document.body); {CLEAN}; return [a, F.qMeasure(q)]; }})()""")
                 if r != [0, 1]: bad.append(f'장학재단 퀘스트 {r}')
             # 화면: 복도와 동아리실
-            await pg.evaluate(f"{F}.setTab('school')"); await pg.wait_for_timeout(1300)
+            # 2026-11-11: 위에서 날짜를 10일쯤 앞으로 꾸며서, 그날이 학교 특별 이벤트 주말이면 '하루 종일 공사 가속' 알림 창이 떠서 단추를 가려요. 본 것으로 해 두고 창을 닫아요
+            await pg.evaluate(f"(() => {{ const F = {F}; if (F.S.nb) F.S.nb.seen = F.gameToday(); F.setTab('school'); }})()"); await pg.wait_for_timeout(1300)
+            await pg.evaluate(f"(() => {{ const F = {F}; if (F.S.nb) F.S.nb.seen = F.gameToday(); {CLEAN}; }})()")
             r = await pg.evaluate(f"""(() => {{ const b = document.querySelector('#btnHall'); return {{ hall: !b.hidden, n: document.querySelector('#hallN').textContent }}; }})()""")
             if not r['hall']: bad.append(f'{w}: 복도 단추가 안 보여요')
             await pg.click('#btnHall'); await pg.wait_for_timeout(400)

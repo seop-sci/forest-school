@@ -24,8 +24,8 @@ async def main():
         await pg.evaluate(f"(()=>{{ const F={F}, S=F.S; S.pending = 5000; S.pendingSec = 3600; F.rt.b0 = S.budget; F.claimOfflineDouble(); }})()")
         await pg.wait_for_timeout(900)
         r = await pg.evaluate(f"[{F}.S.budget - {F}.rt.b0, {F}.S.pending, {toast}]")
-        if not (5000 <= r[0] < 7000) or r[1] != 0: fails.append(f'자리 비운 도토리: 광고가 없을 때 기본 보상이 안 들어와요 {r}')
-        if '기본 보상' not in r[2]: fails.append(f'자리 비운 도토리 안내 {r[2]}')
+        if r[0] >= 5000 or r[1] != 5000: fails.append(f'자리 비운 도토리: 광고가 없을 때 보상을 그대로 두고 창을 다시 열어야 해요(4.0.0) {r}')
+        if '광고를 불러오지 못했어요' not in r[2]: fails.append(f'자리 비운 도토리 안내 {r[2]}')
         # 2) 보충수업: 버튼이 그대로
         await pg.evaluate(f"(()=>{{ const F={F}; F.rt.boostUntil = Date.now() + 60000; F.startBoost(); }})()")
         await pg.wait_for_timeout(900)

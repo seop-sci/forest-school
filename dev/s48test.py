@@ -5,6 +5,7 @@
 import asyncio, json, sys
 from playwright.async_api import async_playwright
 from s4test import URL
+from tclock import PAST
 F = 'window.__forest'
 CLEAN = "document.querySelectorAll('.overlay.center').forEach(o=>{o.hidden=true;o.classList.remove('open')}); window.__forest.rt.modalOpen=null; window.__forest.rt.modalQueue.length=0"
 # 기기 시간을 흉내 내요: Date.now만 바꿔요(게임 시계 gameNow는 서버 시간이 없으면 기기 시간을 써요).
@@ -33,7 +34,7 @@ async def main():
     async with async_playwright() as p:
         b = await p.chromium.launch()
         ctx = await b.new_context(viewport={'width': 390, 'height': 844}, device_scale_factor=2)
-        await ctx.add_init_script("window.__FOREST_TEST = true; localStorage.clear(); " + FAKE)
+        await ctx.add_init_script(PAST + "window.__FOREST_TEST = true; localStorage.clear(); " + FAKE)
         pg, errs = await boot(ctx)
         # 1) 새 게임: 학생이 지도에 나타나면 등록, 다람쥐 선생님은 기록으로 등록, 버튼이 보이고 선물 점이 켜져요
         d1 = await pg.evaluate(f"""(()=>{{ const F={F}, S=F.S; const bd=document.querySelector('[data-tab="dex"]'), be=document.querySelector('[data-tab="event"]');
@@ -75,7 +76,7 @@ async def main():
         await pg2.close(); await pg3.close()
         # 새 저장(놀이터 없음)으로 이벤트를 열면 미션 3개가 모두 이룰 수 있는 종류이고 겹치지 않아요
         ctx2 = await b.new_context(viewport={'width': 390, 'height': 844})
-        await ctx2.add_init_script("window.__FOREST_TEST = true; localStorage.clear(); " + FAKE)
+        await ctx2.add_init_script(PAST + "window.__FOREST_TEST = true; localStorage.clear(); " + FAKE)
         pn, errsn = await boot(ctx2)
         await set_day(pn, 2026, 11, 3)
         nw = await pn.evaluate(f"""(()=>{{ const F={F}, S=F.S; const out={{ pg: S.f.playground, cur: S.ev.cur, list: S.ev.list.map(m=>m.t), bad: [] }};
