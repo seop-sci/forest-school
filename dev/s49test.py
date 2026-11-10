@@ -4,6 +4,7 @@
 import asyncio, json, sys
 from playwright.async_api import async_playwright
 from s4test import URL
+from tclock import PAST
 F = 'window.__forest'
 SKIPTUT = "const t=document.querySelector('#tut'); if(t && !t.hidden){ window.__forest.S.tut.st='skip'; t.hidden=true; window.__forest.rt.modalOpen=null; }"
 DAY = 86400000
@@ -67,7 +68,7 @@ CHECK = r"""() => {
 
 async def run(b, tz, w):
     ctx = await b.new_context(viewport={'width': w, 'height': 760}, is_mobile=True, has_touch=True, timezone_id=tz)
-    await ctx.add_init_script("window.__FOREST_TEST = true;")
+    await ctx.add_init_script(PAST + "window.__FOREST_TEST = true;")
     pg = await ctx.new_page(); errs = []; pg.on('pageerror', lambda e: errs.append(str(e)))
     await pg.goto(URL); await pg.wait_for_timeout(800); await pg.evaluate("localStorage.clear()")
     await pg.reload(); await pg.wait_for_timeout(2600); await pg.evaluate(SKIPTUT)

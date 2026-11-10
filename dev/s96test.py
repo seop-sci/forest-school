@@ -9,6 +9,7 @@
 import asyncio
 from playwright.async_api import async_playwright
 from s4test import URL
+from tclock import PAST
 F = 'window.__forest'
 CLEAN = "document.querySelectorAll('.overlay').forEach(o=>{o.hidden=true;o.classList.remove('open')}); window.__forest.rt.modalOpen=null; window.__forest.rt.modalQueue.length=0"
 SKIP = f"(()=>{{ const t=document.querySelector('#tut'); if(t) t.hidden=true; {F}.S.tut.st='skip'; {F}.rt.tut=null; {CLEAN}; }})()"
@@ -28,7 +29,7 @@ async def main():
         b = await p.chromium.launch()
         for w, scheme in ((390, 'light'), (360, 'dark')):
             ctx = await b.new_context(viewport={'width': w, 'height': 844}, device_scale_factor=2, is_mobile=True, has_touch=True, color_scheme=scheme)
-            await ctx.add_init_script("window.__FOREST_TEST = true; localStorage.clear();")
+            await ctx.add_init_script(PAST + "window.__FOREST_TEST = true; localStorage.clear();")
             pg = await ctx.new_page(); errs = []; pg.on('pageerror', lambda e: errs.append(str(e)))
             await pg.goto(URL); await pg.wait_for_timeout(2500); await pg.evaluate(SKIP)
             ev = lambda js: pg.evaluate(f"(() => {{ const F = {F}, S = F.S, K = {K}; {js} }})()")

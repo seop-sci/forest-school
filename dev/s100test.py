@@ -3,6 +3,7 @@
 import asyncio, json, datetime
 from playwright.async_api import async_playwright
 from s4test import URL
+from tclock import PAST
 F = 'window.__forest'
 CLEAN = "document.querySelectorAll('.overlay').forEach(o=>{o.hidden=true;o.classList.remove('open')}); window.__forest.rt.modalOpen=null; window.__forest.rt.modalQueue.length=0"
 SKIP = f"(()=>{{ const t=document.querySelector('#tut'); if(t) t.hidden=true; {F}.S.tut.st='skip'; {F}.rt.tut=null; {CLEAN}; }})()"
@@ -14,7 +15,7 @@ async def main():
         b = await p.chromium.launch()
         ctx = await b.new_context(viewport={'width': 390, 'height': 844}, device_scale_factor=2, is_mobile=True, has_touch=True)
         # 옛 2.3.0 저장: perk.night가 NaN이라 null로 저장된 학교
-        await ctx.add_init_script("window.__FOREST_TEST = true; if (!sessionStorage.getItem('s100')) { localStorage.clear(); sessionStorage.setItem('s100', '1'); }")
+        await ctx.add_init_script(PAST + "window.__FOREST_TEST = true; if (!sessionStorage.getItem('s100')) { localStorage.clear(); sessionStorage.setItem('s100', '1'); }")
         pg = await ctx.new_page(); errs = []; pg.on('pageerror', lambda e: errs.append(str(e)))
         await pg.goto(URL); await pg.wait_for_timeout(2500); await pg.evaluate(SKIP)
         # 1) 부엉이 밤샘 수업
@@ -48,10 +49,17 @@ async def main():
         if r['got'] != [True, False, False, False, False] or r['add'] != 1: bad.append(f'퍼즐 단축권 {r}')
         r = await pg.evaluate(f"""(() => {{ const F = {F}, S = F.S; const m0 = S.tk.m5; let n = 0; for (let i = 0; i < 25; i++) {{ S.mg.st.orders += 1; if (S.mg.st.orders % F.TKE.mgEvery === 0 && F.tkDaily('mg')) n++; }} return {{ n, add: S.tk.m5 - m0 }}; }})()""")
         if r != {'n': 1, 'add': 1}: bad.append(f'합치기 단축권 {r}')
-        # 5) 숨은 생물 자리: 왼쪽 단추 줄, 오른쪽 단추 줄, 화면 가장자리를 피해요
-        r = await pg.evaluate(f"""(() => {{ const L = {F}.BX_SPOT; const bad = []; for (let m = 1; m < L.length; m++) for (const [x, y] of L[m]) {{
-          if (x < 11 || x > 91 || (x < 25 && y > 12 && y < 48) || (x > 79 && y < 31) || (x > 48 && y > 71 && y < 85)) bad.push([m, x, y]); }} return bad; }})()""")
-        if r: bad.append(f'숨은 생물 자리 {r}')
+        # 5) 숨은 생물 자리: 지도 밖으로 나가지 않고, 단추와 건물에 가려 못 누르는 자리가 없어요
+        #    (3.3.0 새 단장으로 지도와 단추 자리가 바뀌어서, 옛 좌표 규칙 대신 화면에서 실제로 눌리는지 재요. 2026-11-11)
+        for tier in (1, 2, 3):
+            r = await pg.evaluate(f"""(() => {{ const F = {F}, S = F.S; {CLEAN}; S.tier = {tier}; S.f.science = 1; S.bx.m = {tier}; S.bx.sp = F.BX_SPOT[{tier}].map((s, i) => ({{ i, id: 'ladybug', t: Date.now() }})); F.renderMap(); F.renderDeco(true);
+              const map = document.querySelector('#map').getBoundingClientRect(), bad = [];
+              document.querySelectorAll('#decoG .bx-hit').forEach(h => {{ const q = h.getBoundingClientRect(); let hit = 0;
+                for (const fx of [0.2, 0.5, 0.8]) for (const fy of [0.2, 0.5, 0.8]) if (document.elementFromPoint(q.left + q.width * fx, q.top + q.height * fy) === h) hit++;
+                if (hit < 5 || q.left < map.left - 1 || q.right > map.right + 1 || q.top < map.top - 1 || q.bottom > map.bottom + 1) bad.push([F.BX_SPOT[{tier}][+h.dataset.bx], hit]); }});
+              return {{ n: document.querySelectorAll('#decoG .bx-hit').length, bad }}; }})()""")
+            if r['n'] != 6 or r['bad']: bad.append(f'숨은 생물 자리 {tier} {r}')
+        await pg.evaluate(f"(() => {{ const S = {F}.S; S.tier = 0; S.bx.sp = []; }})()")
         r = await pg.evaluate(f"""(() => {{ const F = {F}, S = F.S; S.tier = 1; S.f.science = 1; F.renderMap(); S.bx.m = 1; S.bx.sp = [{{ i: 0, id: 'ladybug', t: Date.now() }}]; F.renderDeco(true);
           return {{ glow: document.querySelectorAll('#decoG .bx-glow').length, hit: document.querySelectorAll('#decoG .bx-hit').length }}; }})()""")
         if r['glow'] != 1 or r['hit'] != 1: bad.append(f'숨은 생물 강조 {r}')

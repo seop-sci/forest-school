@@ -6180,15 +6180,15 @@ body.cam-scene #ffChip,body.cam-scene #plChip,body.cam-scene .b-ring{animation-p
 
   const FAC = {
     classroom: { name: '교실', rep: 1, view: '104 0 152 140',
-      desc: '동물 친구들이 수업을 듣는 곳이에요.',
+      desc: '동물 친구들이 수업을 듣는 곳이에요. 넓힐수록 학생이 더 들어와요.',
       cost: L => 20 * Math.pow(1.7, L - 1),
       eff: L => `정원 ${CFG.cap0 + CFG.capStep * L}명` },
     cafeteria: { name: '급식실', rep: 1, view: '238 124 94 120',
-      desc: '도토리 급식이 맛있는 급식실이에요.',
+      desc: '도토리 급식이 맛있으면 학교가 즐거워져요. 수업료가 올라요.',
       cost: L => 60 * Math.pow(1.8, L),
       eff: L => L < 1 ? '아직 없어요' : `수업료 +${20 * L}%` },
     library: { name: '도서관', rep: 3, view: '24 104 102 144',
-      desc: '큰 나무 속 도서관이에요.',
+      desc: '큰 나무 속 도서관이에요. 책을 읽을수록 학교 평판이 쌓여요.',
       cost: L => 100 * Math.pow(1.8, L),
       eff: L => L < 1 ? '아직 없어요' : `평판 +${3 * L}` },
     // 유치원에서는 미끄럼틀 놀이터, 초등학교부터는 운동장
@@ -6203,17 +6203,17 @@ body.cam-scene #ffChip,body.cam-scene #plChip,body.cam-scene .b-ring{animation-p
       eff: L => L < 1 ? '아직 없어요' : `수료증 +${3 * L}%, 평판 +${L}` },
     // 2.0.0 중학교부터 생기는 새 시설. 값과 효과는 균형 제안서(2.0.0)에서 정해요
     store: { name: '매점', rep: 1, tier: 2, per: 15, view: '0 0 100 100',
-      desc: '간식과 음료를 파는 매점이에요.',
+      desc: '간식과 음료를 파는 매점이에요. 쉬는 시간이 즐거워서 수업료가 올라요.',
       cost: L => 60 * Math.pow(1.8, L),   // 균형 제안서(2.0.0) 제안값: 처음 짓기가 입학 뒤 30분쯤
       eff: L => L < 1 ? '아직 없어요' : `수업료 +${FAC.store.per * L}%` },
     // 3.0.0 고등학교부터 생기는 새 시설(3.0.0 설계안 3절). 효과는 매점과 같은 수업료 +15%/Lv, 값은 균형 제안서(3.0.0)에서 봇으로 다시 재요
     dorm: { name: '기숙사', rep: 1, tier: 3, per: 15, view: '0 0 100 100',
-      desc: '먼 곳에서 온 친구들이 함께 지내는 기숙사예요.',
+      desc: '먼 곳에서 온 친구들이 함께 지내는 기숙사예요. 밤에는 야간 자율학습을 켤 수 있어요.',
       cost: L => 60 * Math.pow(1.8, L),
       eff: L => L < 1 ? '아직 없어요' : `수업료 +${FAC.dorm.per * L}%` },
     // 4.0.0 대학교부터 생기는 새 시설(4.0.0 설계안 4절). 효과는 매점, 기숙사와 같은 수업료 +15%/Lv(지섭 결정). 값 곡선은 기숙사와 같게 둔 제안값이고 균형 제안서(4.0.0)에서 다시 재요
     union: { name: '학생회관', rep: 1, tier: 4, per: 15, view: '0 0 100 100',
-      desc: '동아리와 학생회가 모이는 학생회관이에요.',
+      desc: '동아리와 학생회가 모이는 학생회관이에요. 캠퍼스 생활이 즐거워져서 수업료가 올라요.',
       cost: L => 60 * Math.pow(1.8, L),
       eff: L => L < 1 ? '아직 없어요' : `수업료 +${FAC.union.per * L}%` }
   };
@@ -22122,7 +22122,7 @@ body.cam-scene #ffChip,body.cam-scene #plChip,body.cam-scene .b-ring{animation-p
   // 3.0.0 조정안 6(2026-11-02): 숨은 2^학교급 대신 이름 있는 표. 건물 한 레벨 값을 수업료 분으로 재면(같은 상한 비율에서)
   // 고등학교는 중학교의 약 4분의 1~3분의 1이라(공사비 배수 2.5e11 ÷ 수업료 1e9 = 250, 중학교 500), 고등학교는 8배가 아니라 중학교와 같은 4배예요.
   // 이 배수를 쓰는 곳: 합치기 주문과 팔기, 대결 첫 승리, 실험, 소풍, 생일, 스티커판, 시험 성적표, 대항전 참가, 생물 중복, 이벤트, 도감, 건설 부스터 값
-  const TIER_X = [1, 2, 4, 4];   // 유치원, 초등, 중학교, 고등학교(대학교부터는 그때 다시 재요)
+  const TIER_X = [1, 2, 4, 4, 4];   // 유치원, 초등, 중학교, 고등학교, 대학교(4.0.0 지섭 결정 2026-11-11: 고등학교와 같게)
   const tierMinutes = m => m * TIER_X[Math.min(S.tier, TIER_X.length - 1)];
   const minAcorns = m => Math.max(10, nice(rate() * 60 * tierMinutes(m)));
 
