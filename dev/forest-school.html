@@ -2273,6 +2273,11 @@ body.wl-on .toast{z-index:300}
 /* 2.1.3 학부모 편지 */
 .pl-chip{position:absolute;right:10px;bottom:calc(var(--bot-h, 70px) + 46px + var(--ff-up, 46px));z-index:6;display:flex;align-items:center;gap:4px;padding:5px 11px;border:2px solid #E2A21C;border-radius:14px;background:rgba(255,246,214,.95);color:#5A3A16;font:inherit;font-size:12.5px;font-weight:700;box-shadow:0 2px 4px rgba(0,0,0,.25);cursor:pointer;animation:plBob 1.6s ease-in-out infinite}
 .pl-chip span{font-size:15px}
+/* 3.3.4 지섭(A안): 지도 오른쪽 아래 큰 나무가 누르는 참나무가 되어서, 그 위를 덮던 칩(즉시 완공과 건설 가속, 새 편지, 까치 핫딜)을 왼쪽 아래로 옮겨요. 기부함이 있는 학교급(--chip-lift)은 기부함 위에 쌓아요 */
+.ff-chip{right:auto;left:10px;align-items:flex-start;bottom:calc(var(--bot-h, 70px) + 46px + var(--chip-lift, 0px))}
+.ff-chip .ffx{left:auto;right:-9px}
+.pl-chip{right:auto;left:10px;bottom:calc(var(--bot-h, 70px) + 46px + var(--ff-up, 46px) + var(--chip-lift, 0px))}
+.app.on-school .deal{right:auto;left:10px;bottom:calc(var(--bot-h, 70px) + 46px + var(--ff-up, 46px) + 40px + var(--chip-lift, 0px));transform-origin:15% 50%}
 @keyframes plBob{50%{transform:translateY(-3px)}}
 .lt-nav{display:flex;align-items:center;justify-content:center;gap:12px;margin:-4px 0 8px;font-size:13px;color:var(--muted)}
 @media (prefers-reduced-motion:reduce){.pl-chip{animation:none}}
@@ -3389,7 +3394,7 @@ body.cam-scene #ffChip,body.cam-scene #plChip,body.cam-scene .b-ring{animation-p
         <button class="tab sidebtn" type="button" data-tab="dex" aria-selected="false" aria-label="동물 도감"><span class="dot" id="dexDot" hidden></span><span class="sb-ring"><span class="tic" data-ic="ic_book" aria-hidden="true"></span></span><span class="sb-lb">도감</span></button><!-- 1.7.0 -->
         <button class="tab sidebtn" type="button" data-tab="event" aria-selected="false" aria-label="이벤트"><span class="dot" id="evDot" hidden></span><span class="sb-ring"><span class="tic" data-ic="ic_event" aria-hidden="true"></span></span><span class="sb-lb">이벤트</span></button><!-- 1.7.0 -->
       </div>
-      <!-- 까치 핫딜은 엄지가 닿기 쉬운 오른쪽 아래. 건물과 떨어진 도토리를 가리지 않아요 -->
+      <!-- 까치 핫딜: 3.3.4부터 왼쪽 아래 칩 줄 맨 위(오른쪽 아래는 참나무 자리) -->
       <button class="deal" id="btnDeal" type="button" hidden><span class="d-av" id="dealIc" aria-hidden="true"></span><span class="d-txt">까치 핫딜<span class="d-time" id="dealTime">2:00</span></span></button>
     </div>
 
@@ -10735,7 +10740,7 @@ body.cam-scene #ffChip,body.cam-scene #plChip,body.cam-scene .b-ring{animation-p
       `<rect class="vd-hit" data-vd="1" x="${x - hw / 2}" y="${(y - hw * 0.85).toFixed(1)}" width="${hw}" height="${(hw * 0.85 + 13).toFixed(1)}"/>`;
   }
   // 2.2.0 칩이 두세 줄이 되면 위의 '새 편지' 칩을 그만큼 올려요
-  function ffUp(c) { const h = c && !c.hidden ? c.offsetHeight + 6 : 0; if (c && c.parentElement) c.parentElement.style.setProperty('--ff-up', Math.max(46, h) + 'px'); }
+  function ffUp(c) { const h = c && !c.hidden ? c.offsetHeight + 6 : 0; if (c && c.parentElement) { c.parentElement.style.setProperty('--ff-up', h + 'px'); c.parentElement.style.setProperty('--chip-lift', (vdOpen() && rt.viewTier == null ? 84 : 0) + 'px'); } }   // 3.3.4 칩이 없으면 자리도 비우고, 기부함이 있으면 그 위로
   function ffRender(force) {
     if (!S) return;
     const ks = facKeys().filter(ffCan), on = cbOn(), nb = nbOn(), nbShow = S.tier >= NB.tier && !liveOff('night');
@@ -11377,7 +11382,7 @@ body.cam-scene #ffChip,body.cam-scene #plChip,body.cam-scene .b-ring{animation-p
     rt.deal = d;
     rt.dealT = rand(DEAL.gap[0], DEAL.gap[1]);
     dexMeet('g_magpie');   // 1.7.0 도감 특별 손님
-    if (!S.hd.seen) { S.hd.seen = true; toast('까치가 반가운 소식을 물어 왔어요! 지도 오른쪽 아래를 눌러 보세요'); save(); }
+    if (!S.hd.seen) { S.hd.seen = true; toast('까치가 반가운 소식을 물어 왔어요! 지도 왼쪽 아래를 눌러 보세요'); save(); }
     sfx('magpie');
     renderDeal();
     return true;
