@@ -23463,7 +23463,16 @@ body.cam-scene #ffChip,body.cam-scene #plChip,body.cam-scene .b-ring{animation-p
   }
   // 로딩 화면: 일찍 끝나도 적어도 3초는 보여 줘요. 막대는 로딩하는 것처럼 멈칫거리며 차오르고, 끝까지 채운 뒤 사르르 사라져요
   const BOOT_MIN = window.__FOREST_TEST && !window.__FOREST_BOOT ? 1200 : 3000;   // 자동 시험은 예전처럼 1.2초만 기다려요
-  const bootLeft = () => Math.max(0, BOOT_MIN - performance.now());
+  // 3.3.3 지섭: 토스는 자기 로딩 화면을 페이지가 다 열릴 때까지 띄워서, 그동안 우리 로딩 화면이 가려진 채 끝나 버렸어요. 토스 판은 페이지가 다 열린 때부터 2.5초를 세요
+  let bootT0 = 0;
+  const bootRestart = () => {   // 토스 판: 화면이 보이기 시작할 때 막대와 안내 글을 처음부터 다시 보여 줘요
+    bootT0 = performance.now();
+    const i = document.getElementById('bootBar'), st = document.getElementById('bootStep');
+    if (i) { i.style.animation = 'none'; void i.offsetWidth; i.style.animation = 'bootFill 2.4s linear forwards'; }
+    BOOT_STEPS.forEach((m, k) => setTimeout(() => { if (st && st.isConnected && !document.getElementById('boot').classList.contains('done')) st.textContent = m; }, k * 480));
+  };
+  if (AIT && !window.__FOREST_TEST) { if (document.readyState === 'complete') bootT0 = performance.now(); else addEventListener('load', bootRestart, { once: true }); }
+  const bootLeft = () => Math.max(0, (AIT && !window.__FOREST_TEST ? 2500 : BOOT_MIN) - (performance.now() - bootT0));
   const BOOT_STEPS = ['학교 문을 여는 중...', '도토리를 세는 중...', '교실 창문을 여는 중...', '학생들을 깨우는 중...', '출석부를 챙기는 중...'];
   const BOOT_TIPS = ['참나무를 누르면 도토리가 떨어져요', '체험학습을 보내 두면 기다리는 동안에도 학교가 자라요', '오늘의 미션으로 미션 포인트를 모아 주간 상자를 열어요', '종업식을 열면 학교는 그대로 남고 시설 레벨이 확장돼요', '꾸미기 백화점의 테마 세트를 가지면 수업료가 올라요', '숲의 정수는 공부 탭에서 모아요. 문방구에서 도토리로 바꿀 수도 있어요', '꾸미기 가게에서 산 장식을 지도의 빈 자리에 놓아 학교를 꾸며요', '꾸미기 가게에서 학교 이름과 학교 마크를 바꿀 수 있어요', '매나 뱀이 나타나면 여러 번 눌러서 쫓아내요. 곰 선생님이 도와줘요', '업적을 모두 이루면 칭호를 받아요. 칭호는 랭킹 이름 옆에 붙어요', '숲속 퍼즐은 잠시 나갔다가 이어하기로 돌아올 수 있어요', '홈 지도는 두 손가락으로 벌리면 크게 볼 수 있어요'];   // 1.7.4 지섭 다듬음(4번, 학교 행사 줄 빼기) + 새 기능 도움말
   (() => {
@@ -23472,18 +23481,18 @@ body.cam-scene #ffChip,body.cam-scene #plChip,body.cam-scene .b-ring{animation-p
     if (t) t.textContent = BOOT_TIPS[Math.floor(Math.random() * BOOT_TIPS.length)];
     const st = document.getElementById('bootStep');
     BOOT_STEPS.forEach((m, i) => { if (i) setTimeout(() => { if (st && st.isConnected) st.textContent = m; }, i * 620); });
-    setTimeout(() => bootDone(), 8000);   // 무슨 일이 있어도 8초 뒤에는 걷어요
+    setTimeout(() => bootDone(), AIT ? 10000 : 8000);   // 무슨 일이 있어도 8초(토스 판은 10초) 뒤에는 걷어요
   })();
   function bootDone() {
     const b = document.getElementById('boot');
     if (!b || b.dataset.done) return;
     b.dataset.done = '1';
-    const wait = bootLeft();
-    setTimeout(() => {
+    const go = () => setTimeout(() => {
       b.classList.add('done');
       const st = document.getElementById('bootStep'); if (st) st.textContent = '준비 끝!';
       setTimeout(() => { b.classList.add('out'); setTimeout(() => b.remove(), 500); }, 280);
-    }, wait);
+    }, bootLeft());
+    if (AIT && !window.__FOREST_TEST && document.readyState !== 'complete') addEventListener('load', go, { once: true }); else go();   // 토스 판: 페이지가 다 열린 뒤에 세요
   }
 
   // 시험용 손잡이: 자동 시험(window.__FOREST_TEST)에서만 게임 속 함수를 꺼내 써요
