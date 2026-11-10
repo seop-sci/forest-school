@@ -2273,11 +2273,16 @@ body.wl-on .toast{z-index:300}
 /* 2.1.3 학부모 편지 */
 .pl-chip{position:absolute;right:10px;bottom:calc(var(--bot-h, 70px) + 46px + var(--ff-up, 46px));z-index:6;display:flex;align-items:center;gap:4px;padding:5px 11px;border:2px solid #E2A21C;border-radius:14px;background:rgba(255,246,214,.95);color:#5A3A16;font:inherit;font-size:12.5px;font-weight:700;box-shadow:0 2px 4px rgba(0,0,0,.25);cursor:pointer;animation:plBob 1.6s ease-in-out infinite}
 .pl-chip span{font-size:15px}
-/* 3.3.4 지섭(A안): 지도 오른쪽 아래 큰 나무가 누르는 참나무가 되어서, 그 위를 덮던 칩(즉시 완공과 건설 가속, 새 편지, 까치 핫딜)을 왼쪽 아래로 옮겨요. 기부함이 있는 학교급(--chip-lift)은 기부함 위에 쌓아요 */
-.ff-chip{right:auto;left:10px;align-items:flex-start;bottom:calc(var(--bot-h, 70px) + 46px + var(--chip-lift, 0px))}
-.ff-chip .ffx{left:auto;right:-9px}
-.pl-chip{right:auto;left:10px;bottom:calc(var(--bot-h, 70px) + 46px + var(--ff-up, 46px) + var(--chip-lift, 0px))}
-.app.on-school .deal{right:auto;left:10px;bottom:calc(var(--bot-h, 70px) + 46px + var(--ff-up, 46px) + 40px + var(--chip-lift, 0px));transform-origin:15% 50%}
+/* 3.3.4 지섭: 지도 오른쪽 아래 큰 나무가 누르는 참나무가 되어서, 그 위를 덮던 칩(즉시 완공과 건설 가속, 새 편지, 까치 핫딜)을 작게 줄여 맨 아래 한 줄(학교급 단추와 같은 높이, 나무 밑동 아래)에 놓아요.
+   왼쪽 아래로 옮기는 안(A안)은 초등학교부터 기부함과 왼쪽 건물을 가려서 접었어요. 자리(right, bottom)는 chipRow()가 오른쪽부터 차례로 놓고, 학교급 단추에 닿으면 한 줄 위로 올려요 */
+.ff-chip,.pl-chip,.app.on-school .deal{bottom:calc(var(--bot-h, 70px) + 10px);height:30px;box-sizing:border-box;max-width:none;white-space:nowrap}
+.ff-chip{flex-direction:row;align-items:center;gap:5px;padding:0 9px;border-radius:999px;font-size:12px}
+.ff-chip b{font-size:13px}.ff-chip small{font-size:11.5px}.ff-chip small.nb{gap:2px}
+.ff-chip .ffx{left:-7px;top:-9px;width:18px;height:18px;font-size:12px;line-height:14px}
+.pl-chip{padding:0 9px;border-radius:999px;font-size:0;gap:0}.pl-chip span{font-size:16px}
+.app.on-school .deal{padding:1px 9px 1px 2px;gap:4px;font-size:0;border-radius:999px;box-shadow:0 2px 0 var(--wood-dark)}
+.app.on-school .deal .d-av{width:22px;height:22px}.app.on-school .deal .d-av svg{width:21px;height:21px}
+.app.on-school .deal .d-time{font-size:13.5px}
 @keyframes plBob{50%{transform:translateY(-3px)}}
 .lt-nav{display:flex;align-items:center;justify-content:center;gap:12px;margin:-4px 0 8px;font-size:13px;color:var(--muted)}
 @media (prefers-reduced-motion:reduce){.pl-chip{animation:none}}
@@ -3394,7 +3399,7 @@ body.cam-scene #ffChip,body.cam-scene #plChip,body.cam-scene .b-ring{animation-p
         <button class="tab sidebtn" type="button" data-tab="dex" aria-selected="false" aria-label="동물 도감"><span class="dot" id="dexDot" hidden></span><span class="sb-ring"><span class="tic" data-ic="ic_book" aria-hidden="true"></span></span><span class="sb-lb">도감</span></button><!-- 1.7.0 -->
         <button class="tab sidebtn" type="button" data-tab="event" aria-selected="false" aria-label="이벤트"><span class="dot" id="evDot" hidden></span><span class="sb-ring"><span class="tic" data-ic="ic_event" aria-hidden="true"></span></span><span class="sb-lb">이벤트</span></button><!-- 1.7.0 -->
       </div>
-      <!-- 까치 핫딜: 3.3.4부터 왼쪽 아래 칩 줄 맨 위(오른쪽 아래는 참나무 자리) -->
+      <!-- 까치 핫딜: 3.3.4부터 맨 아래 칩 줄의 오른쪽 끝(작게) -->
       <button class="deal" id="btnDeal" type="button" hidden><span class="d-av" id="dealIc" aria-hidden="true"></span><span class="d-txt">까치 핫딜<span class="d-time" id="dealTime">2:00</span></span></button>
     </div>
 
@@ -8909,6 +8914,7 @@ body.cam-scene #ffChip,body.cam-scene #plChip,body.cam-scene .b-ring{animation-p
   function hudVars() {
     const app = $('#app'), fr = $('.frame');
     if (!app || !fr || rt.tab !== 'school') return;
+    chipRow();   // 3.3.4
     const f = fr.getBoundingClientRect(), b = $('.board').getBoundingClientRect(), q = $('#qRow').getBoundingClientRect(), sb = $('#subBar'), qc = $('#qCard');
     const left = Math.max(q.bottom, sb && !sb.hidden ? sb.getBoundingClientRect().bottom : 0, qc ? qc.getBoundingClientRect().bottom : 0) - f.top;
     // 홈 UI 정리: 오른쪽 메뉴 레일이 가리는 폭. 행사 아이템과 떨어진 도토리가 레일 밑에 나오지 않게 visMap()에서 빼요
@@ -10740,7 +10746,20 @@ body.cam-scene #ffChip,body.cam-scene #plChip,body.cam-scene .b-ring{animation-p
       `<rect class="vd-hit" data-vd="1" x="${x - hw / 2}" y="${(y - hw * 0.85).toFixed(1)}" width="${hw}" height="${(hw * 0.85 + 13).toFixed(1)}"/>`;
   }
   // 2.2.0 칩이 두세 줄이 되면 위의 '새 편지' 칩을 그만큼 올려요
-  function ffUp(c) { const h = c && !c.hidden ? c.offsetHeight + 6 : 0; if (c && c.parentElement) { c.parentElement.style.setProperty('--ff-up', h + 'px'); c.parentElement.style.setProperty('--chip-lift', (vdOpen() && rt.viewTier == null ? 84 : 0) + 'px'); } }   // 3.3.4 칩이 없으면 자리도 비우고, 기부함이 있으면 그 위로
+  // 3.3.4 아래 한 줄 칩: 오른쪽부터 까치 핫딜, 새 편지, 즉시 완공 순서로 놓아요. 학교급 단추에 닿으면 한 줄 위로
+  function chipRow() {
+    const fr = $('#ffChip') && $('#ffChip').parentElement; if (!fr) return;
+    const dots = $('#tierDots'), W = fr.clientWidth, lim = dots && !dots.hidden && dots.offsetWidth ? dots.offsetLeft + dots.offsetWidth + 8 : 10;
+    let r = 10, row = 0;
+    for (const el of [$('#btnDeal'), $('#plChip'), $('#ffChip')]) {
+      if (!el || el.hidden || !el.offsetWidth) continue;
+      const w = el.offsetWidth;
+      if (r > 10 && W - r - w < lim) { row += 1; r = 10; }
+      el.style.right = r + 'px'; el.style.bottom = `calc(var(--bot-h, 70px) + ${10 + row * 35}px)`;
+      r += w + 6;
+    }
+  }
+  function ffUp() { chipRow(); }
   function ffRender(force) {
     if (!S) return;
     const ks = facKeys().filter(ffCan), on = cbOn(), nb = nbOn(), nbShow = S.tier >= NB.tier && !liveOff('night');
@@ -10755,8 +10774,10 @@ body.cam-scene #ffChip,body.cam-scene #plChip,body.cam-scene .b-ring{animation-p
     const sp = nbAdd() > NB.add, nbTx = !nbShow ? '' : nb ? `${nbAllDay(gameToday()) ? '주말 건설 가속' : '야간 건설'} +${nbAdd()}%, ${hm(nbLeft())} 남음` : sp ? (nbAllDay(gameToday()) ? `오늘 하루 종일 건설 가속 +${nbAdd()}%(특별 이벤트 주말)` : `오늘 ${NB.h0}~${NB.h1}시 건설 가속 +${nbAdd()}%(특별 이벤트)`) : `매일 ${NB.h0}~${NB.h1}시 건설 가속 이벤트`;
     c.classList.toggle('nb-on', nb && nbShow);
     const mp = $('#map'); if (mp) mp.classList.toggle('nb-night', nb);   // 2.2.0 비계에 등불
-    c.innerHTML = (ks.length ? `<b>오늘 즉시 완공 ${ffLeft()}/${FF.day}</b>` : '') + (on ? `<small>건설 부스터 +100%, ${hm(cbLeft())} 남음</small>` : '') +
-      (nbShow ? `<small class="nb">${nbIc} ${nbTx}</small>` : '') + '<span class="ffx" role="button" aria-label="오늘은 이 알림 닫기">×</span>';
+    // 3.3.4 작은 알약: ⚡남은 번, 건설 부스터, 야간 건설 아이콘(켜져 있을 때만 +n%). 자세한 말은 누르면 떠요
+    c.innerHTML = (ks.length ? `<b>⚡${ffLeft()}/${FF.day}</b>` : '') + (on ? `<small>🔨+100%</small>` : '') +
+      (nbShow ? `<small class="nb">${nbIc}${nb || sp ? ` +${nbAdd()}%` : ''}</small>` : '') + '<span class="ffx" role="button" aria-label="오늘은 이 알림 닫기">×</span>';
+    c.dataset.tip = [ks.length ? `오늘 즉시 완공 ${ffLeft()}/${FF.day}` : '', on ? `건설 부스터 +100%, ${hm(cbLeft())} 남음` : '', nbShow ? nbTx : ''].filter(Boolean).join(' / ');
     c.setAttribute('aria-label', (ks.length ? `오늘 즉시 완공 ${FF.day}번 가운데 ${ffLeft()}번 남음, 눌러서 건물 창 열기` : '') + (on ? ` 건설 부스터 사용 중` : '') + (nbShow ? ` ${nbTx}` : ''));
     ffUp(c);
   }
@@ -11382,7 +11403,7 @@ body.cam-scene #ffChip,body.cam-scene #plChip,body.cam-scene .b-ring{animation-p
     rt.deal = d;
     rt.dealT = rand(DEAL.gap[0], DEAL.gap[1]);
     dexMeet('g_magpie');   // 1.7.0 도감 특별 손님
-    if (!S.hd.seen) { S.hd.seen = true; toast('까치가 반가운 소식을 물어 왔어요! 지도 왼쪽 아래를 눌러 보세요'); save(); }
+    if (!S.hd.seen) { S.hd.seen = true; toast('까치가 반가운 소식을 물어 왔어요! 지도 오른쪽 아래 까치를 눌러 보세요'); save(); }
     sfx('magpie');
     renderDeal();
     return true;
@@ -11395,7 +11416,7 @@ body.cam-scene #ffChip,body.cam-scene #plChip,body.cam-scene .b-ring{animation-p
   const clock = sec => `${Math.floor(sec / 60)}:${String(sec % 60).padStart(2, '0')}`;
   function renderDeal() {
     const b = $('#btnDeal'), d = rt.deal;
-    setHid(b, !d);   // 3.2.6 바뀐 때만
+    if (b.hidden !== !d) { setHid(b, !d); chipRow(); }   // 3.2.6 바뀐 때만, 3.3.4 아래 줄 맞추기
     if (d) {
       const t = clock(Math.max(0, Math.ceil((d.exp - Date.now()) / 1000)));
       if (b.dataset.t !== t) { b.dataset.t = t; $('#dealTime').textContent = t; b.setAttribute('aria-label', `까치 핫딜, ${t} 남았어요`); }
@@ -21237,7 +21258,7 @@ body.cam-scene #ffChip,body.cam-scene #plChip,body.cam-scene .b-ring{animation-p
     // 3.2.3 끊김 줄이기: 공사를 처음 시작할 때 비계, 막대, 비버 그림을 푸느라 한 번 멈추지 않게 켜고 조금 뒤 미리 풀어 둬요
     setTimeout(() => { for (const u of [IMG180('fx_scaffold'), IMG('timer_bar'), IMG('fx_lantern'), FSI('fix_beaver_1'), FSI('fix_beaver_2'), FSI('fix_beaver_3')]) if (u) { const im = new Image(); im.src = u; if (im.decode) im.decode().catch(() => {}); } }, 3000);
     for (const k of Object.keys(FAC)) { const p = document.getElementById('pq-' + k); if (p && !p.querySelector('.ffb')) p.insertAdjacentHTML('beforeend', '<g class="ffb" transform="translate(-38 -20)"><rect x="0" y="-6.5" width="76" height="13" rx="6.5"/><text x="38" y="3" text-anchor="middle">즉시 완공 가능!</text></g>'); }   // 2.1.1
-    $('#ffChip').addEventListener('click', e => { if (e.target.closest('.ffx')) { S.ffx = gameToday(); sfx('tap'); ffRender(true); save(); toast('오늘은 이 알림을 닫았어요. 내일 다시 보여요'); return; } const k = facKeys().find(ffCan); if (k) { sfx('tap'); openSheet(k); } else toast(conAdd() > 0 ? `지금 모든 공사 +${conAdd()}%예요${cbOn() ? `. 건설 부스터 ${hm(cbLeft())} 남았어요` : ''}${nbOn() ? `. 야간 건설은 ${hm(nbLeft())} 남았어요` : ''}` : `매일 ${NB.h0}~${NB.h1}시에는 야간 건설 이벤트로 모든 공사 +${NB.add}%예요. 학교 특별 이벤트 주간에는 +${NB.addSp}%예요`); });   // 2.2.0
+    $('#ffChip').addEventListener('click', e => { if (e.target.closest('.ffx')) { S.ffx = gameToday(); sfx('tap'); ffRender(true); save(); toast('오늘은 이 알림을 닫았어요. 내일 다시 보여요'); return; } const k = facKeys().find(ffCan); if (k) { sfx('tap'); openSheet(k); toast(e.currentTarget.dataset.tip || ''); } else toast(conAdd() > 0 ? `지금 모든 공사 +${conAdd()}%예요${cbOn() ? `. 건설 부스터 ${hm(cbLeft())} 남았어요` : ''}${nbOn() ? `. 야간 건설은 ${hm(nbLeft())} 남았어요` : ''}` : `매일 ${NB.h0}~${NB.h1}시에는 야간 건설 이벤트로 모든 공사 +${NB.add}%예요. 학교 특별 이벤트 주간에는 +${NB.addSp}%예요`); });   // 2.2.0
     $('#conCb').addEventListener('click', e => { const b = e.target.closest('[data-cb]'); if (b) cbBuy(b.dataset.cb); });
     $('#albPrev').addEventListener('click', () => { rt.albPage -= 1; sfx('tap'); renderAlbum(); });
     $('#albNext').addEventListener('click', () => { rt.albPage += 1; sfx('tap'); renderAlbum(); });
@@ -22161,7 +22182,7 @@ body.cam-scene #ffChip,body.cam-scene #plChip,body.cam-scene .b-ring{animation-p
     const chip = $('#plChip'); if (!chip || !S) return;
     plSync();
     const show = plUnread() && rt.tab === 'school' && rt.viewTier == null && !rt.decoEdit && !rt.fest && !rt.sports;
-    chip.hidden = !show;
+    chip.hidden = !show; chipRow();
     const sub = $('#plSub'); if (sub) sub.textContent = S.pl.got ? `받은 편지 ${S.pl.got}통${plUnread() ? ', 새 편지가 있어요' : ''}` : '까치 우체부가 학부모 편지를 가져와요';
   }
   /* ===== 2.1.3 학부모 쪽지 이야기 END ===== */

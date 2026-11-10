@@ -88,8 +88,8 @@ async def main():
               const kd = document.querySelector('#ffChip'), k0 = kd.hidden || !kd.querySelector('.nb');
               S.tier = 1; S.tg = 0; S.ff = {}; for (const k of ['classroom', 'cafeteria', 'library', 'playground', 'science']) { S.f[k] = 8; S.fu[k] = S.fu[k].map(() => 8); }
               S.ff = Object.fromEntries(['classroom', 'cafeteria', 'library', 'playground', 'science'].map(k => [k, F.gameToday()]));
-              F.renderMap(); F.ffRender(true); const day = kd.hidden ? '' : kd.textContent;
-              F.rt.fakeNow = K(9, 21, 30); F.ffRender(true); const night = kd.textContent;
+              F.renderMap(); F.ffRender(true); const day = kd.hidden ? '' : kd.dataset.tip;   // 3.3.4 칩이 작아져서 자세한 말은 누르면 뜨는 글(tip)에 있어요
+              F.rt.fakeNow = K(9, 21, 30); F.ffRender(true); const night = kd.dataset.tip;
               return { k0, day, night };""")
             print(w, '칩', r)
             ok(r['k0'], '유치원에도 야간 건설 줄이 보여요')
