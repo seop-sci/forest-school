@@ -1,11 +1,13 @@
 // database.rules.json을 targaryen으로 시험해요: 누가 어디를 읽고 쓸 수 있는지
+// 2026-11-11: 주 번호를 오늘 날짜에서 계산해요(42, 43을 박아 두면 2주 뒤부터 규칙과 상관없이 실패했어요)
+const W0 = Math.floor((Date.now() + 32400000 - Date.UTC(2026, 0, 5)) / 604800000) - 1;   // W0는 지난주, W0 + 1이 이번 주
 const targaryen = require('targaryen');
 const rules = require(process.argv[2]);
 const SAVE = { d: '{"v":4}', at: 1, v: '1.0' };
-const RANK = { name: '지섭 교장', score: 120, at: { '.sv': 'timestamp' }, tier: 1, year: 2, test: false, pid: 'K7QM2XPA', week: 42, lp: 310, ws: 42000310 };
+const RANK = { name: '지섭 교장', score: 120, at: { '.sv': 'timestamp' }, tier: 1, year: 2, test: false, pid: 'K7QM2XPA', week: W0, lp: 310, ws: W0 * 1e6 + 310 };
 const STAT = { seen: 1, pid: 'K7QM2XPA', name: '', tier: 0 };
 const NOW = Date.now();
-const base = { forest: { saves: { A: SAVE }, rank: { A: Object.assign({}, RANK, { at: NOW - 3600e3 }), C: Object.assign({}, RANK, { score: 5000, at: NOW - 10e3, lp: 900, ws: 42000900 }) }, stats: { A: STAT }, admins: { Z: 'key' }, adminKey: 'key', adminUids: { Z: true }, webOk: { W: true },
+const base = { forest: { saves: { A: SAVE }, rank: { A: Object.assign({}, RANK, { at: NOW - 3600e3 }), C: Object.assign({}, RANK, { score: 5000, at: NOW - 10e3, lp: 900, ws: W0 * 1e6 + 900 }) }, stats: { A: STAT }, admins: { Z: 'key' }, adminKey: 'key', adminUids: { Z: true }, webOk: { W: true },
   moves: { K7QM2XPA: { d: 'x', at: NOW - 60000, from: 'A', v: '1.0' }, OLDC2345: { d: 'x', at: NOW - 31 * 60000, from: 'A', v: '1.0' } } } };
 const fresh = () => targaryen.database(rules, base);   // 처음 상태는 로그인 안 한 사람
 const as = uid => uid ? fresh().as({ uid, provider: 'anonymous' }) : fresh();
@@ -78,7 +80,7 @@ const RK = o => Object.assign({}, RANK, o);
 t('rank extra field', W('B', '/forest/rank/B', RK({ hack: 1 })), false);
 t('rank lp huge', W('B', '/forest/rank/B', RK({ lp: 1e30, ws: 42 * 1e6 + 1e30 })), false);
 t('rank ws huge', W('B', '/forest/rank/B', RK({ ws: 1e30 })), false);
-t('rank ws mismatch', W('B', '/forest/rank/B', RK({ ws: 42000999 })), false);
+t('rank ws mismatch', W('B', '/forest/rank/B', RK({ ws: W0 * 1e6 + 999 })), false);
 t('rank bad pid', W('B', '/forest/rank/B', RK({ pid: 'abc' })), false);
 t('rank tier big', W('B', '/forest/rank/B', RK({ tier: 99 })), false);
 t('rank test str', W('B', '/forest/rank/B', RK({ test: 'yes' })), false);
@@ -87,15 +89,15 @@ t('rank score max first', W('B', '/forest/rank/B', RK({ score: 999999999 })), fa
 // 1.6.0 랭킹 점수 조작 막기: 처음은 5만 점까지, 그다음은 지난번보다 2,000점 + 지난 초 x 2점까지만 올라요. 시각은 서버 시각 앞뒤 1분
 t('rank first 50000', W('B', '/forest/rank/B', RK({ score: 50000 })), true);
 t('rank first 50001', W('B', '/forest/rank/B', RK({ score: 50001 })), false);
-t('rank jump small', W('C', '/forest/rank/C', RK({ score: 7000, lp: 900, ws: 42000900 })), true);
-t('rank jump big', W('C', '/forest/rank/C', RK({ score: 7100, lp: 900, ws: 42000900 })), false);
+t('rank jump small', W('C', '/forest/rank/C', RK({ score: 7000, lp: 900, ws: W0 * 1e6 + 900 })), true);
+t('rank jump big', W('C', '/forest/rank/C', RK({ score: 7100, lp: 900, ws: W0 * 1e6 + 900 })), false);
 t('rank after an hour', W('A', '/forest/rank/A', RK({ score: 120 + 2000 + 7000 })), true);
-t('rank down ok', W('C', '/forest/rank/C', RK({ score: 10, lp: 900, ws: 42000900 })), true);
+t('rank down ok', W('C', '/forest/rank/C', RK({ score: 10, lp: 900, ws: W0 * 1e6 + 900 })), true);
 t('rank past at', W('B', '/forest/rank/B', RK({ at: NOW - 3600e3 })), false);
-t('rank lp jump', W('C', '/forest/rank/C', RK({ score: 5000, lp: 9000, ws: 42009000 })), false);
-t('rank lp ok', W('C', '/forest/rank/C', RK({ score: 5000, lp: 1800, ws: 42001800 })), true);
-t('rank lp new week', W('C', '/forest/rank/C', RK({ score: 5000, week: 43, lp: 1000, ws: 43001000 })), true);
-t('rank lp new week big', W('C', '/forest/rank/C', RK({ score: 5000, week: 43, lp: 1900, ws: 43001900 })), false);
+t('rank lp jump', W('C', '/forest/rank/C', RK({ score: 5000, lp: 9000, ws: W0 * 1e6 + 9000 })), false);
+t('rank lp ok', W('C', '/forest/rank/C', RK({ score: 5000, lp: 1800, ws: W0 * 1e6 + 1800 })), true);
+t('rank lp new week', W('C', '/forest/rank/C', RK({ score: 5000, week: W0 + 1, lp: 1000, ws: (W0 + 1) * 1e6 + 1000 })), true);
+t('rank lp new week big', W('C', '/forest/rank/C', RK({ score: 5000, week: W0 + 1, lp: 1900, ws: (W0 + 1) * 1e6 + 1900 })), false);
 t('rank no week', W('B', '/forest/rank/B', { name: '다람쥐', score: 5, at: { '.sv': 'timestamp' } }), true);
 t('rank delete other', W('B', '/forest/rank/A', null), false);
 // 테스트 현황

@@ -1,11 +1,13 @@
 // 보안 점검 검증(2026-10-28): database.rules.json을 targaryen 규칙 시뮬레이터로 돌려 문서 2-1, 2-2, 2-3, 2-4, 2-11이 실제로 통과하는 값인지 봐요
 // 이 시험은 "고친 뒤 바른 동작"을 기대값으로 적었어요. 지금 규칙에서 FAIL이 나오면 문서의 문제가 재현된 거예요.
 // 쓰는 법: NODE_PATH=<targaryen이 깔린 node_modules> node dev/fbtest/rules_sec.js database.rules.json
+// 2026-11-11: 주 번호를 오늘 날짜에서 계산해요(42, 43을 박아 두면 2주 뒤부터 규칙과 상관없이 실패했어요)
+const W0 = Math.floor((Date.now() + 32400000 - Date.UTC(2026, 0, 5)) / 604800000) - 1;   // W0는 지난주, W0 + 1이 이번 주
 const targaryen = require('targaryen');
 const path = require('path');
 const rules = require(path.resolve(process.argv[2]));
 const NOW = Date.now();
-const RANK = (o) => Object.assign({ name: '교장', score: 100, at: NOW - 3600e3, tier: 1, year: 1, test: false, pid: 'VICTIM01', week: 42, lp: 300, ws: 42000300 }, o);
+const RANK = (o) => Object.assign({ name: '교장', score: 100, at: NOW - 3600e3, tier: 1, year: 1, test: false, pid: 'VICTIM01', week: W0, lp: 300, ws: W0 * 1e6 + 300 }, o);
 const STAT = { seen: 1, pid: 'VICTIM01' };
 const mk = (withKey) => ({ forest: { rank: { V: RANK({}) }, stats: { V: STAT }, admins: {}, ...(withKey ? { adminKey: 'k9!Qz' } : {}) } });
 const db = (withKey = true) => targaryen.database(rules, mk(withKey));
@@ -43,12 +45,12 @@ const as = (d, uid) => d.as({ uid, provider: 'anonymous' });
 // Codex 검토(2, 2026-10-28): at을 서버보다 60초 과거로 직접 적으며 0.1초마다 점수 +2000, 리그 +1000
 {
   let d = db(true), t = NOW, ok = 0;
-  let r = as(d, 'A').write('/forest/rank/A', RANK({ score: 0, at: t - 60000, pid: 'ATTACK04', week: 42, lp: 0, ws: 42000000 }), { now: t });
+  let r = as(d, 'A').write('/forest/rank/A', RANK({ score: 0, at: t - 60000, pid: 'ATTACK04', week: W0, lp: 0, ws: W0 * 1e6 + 0 }), { now: t });
   if (r.allowed) d = r.newDatabase;
   let score = 0, lp = 0;
   for (let i = 0; i < 10; i++) {
     t += 100; score += 2000; lp += 1000;
-    r = as(d, 'A').write('/forest/rank/A', RANK({ score, at: t - 60000, pid: 'ATTACK04', week: 42, lp, ws: 42 * 1e6 + lp }), { now: t });
+    r = as(d, 'A').write('/forest/rank/A', RANK({ score, at: t - 60000, pid: 'ATTACK04', week: W0, lp, ws: 42 * 1e6 + lp }), { now: t });
     if (r.allowed) { ok++; d = r.newDatabase; }
   }
   out('Codex 2 과거 at으로 0.1초마다 올리기가 막혀야 해요', ok, 0, `${ok}/10번 통과`);

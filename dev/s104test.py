@@ -23,7 +23,7 @@ async def main():
               const got=S.ac.st.xp;F.nsSettle(true);out.once=S.ns.done&&got>xp&&S.ac.st.xp===got&&!F.nsOn();
               const old=JSON.parse(JSON.stringify(S));delete old.ns;const clean=F.sanitize(old);
               out.oldSave=!!clean.ns&&!clean.ns.day&&clean.ns.n===0;
-              out.quests=F.MAIN.filter(q=>/^hs[0-9]+$/.test(q.id)).length===37;
+              out.quests=F.MAIN.filter(q=>/^hs[0-9]+$/.test(q.id)).length===38;
               out.geometry=F.geoIdx()===3&&F.TIERS[3].name==='고등학교'&&!!F.FAC.dorm;
               F.openNs();return out;
             }''')

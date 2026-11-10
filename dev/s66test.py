@@ -74,7 +74,7 @@ async def main():
                 # 새 전학생 6종: 그림(작업지시서 20, 2.0.0에 넣음)으로 나오고 대사가 모두 있어요
                 r = await pg.evaluate(f"""(() => {{ const F = {F}; return {{ n: F.NEWCOMERS.length, ks: F.NEWCOMERS.slice(6).map(n => n.k), emoji: F.NEWCOMERS.slice(6).map(n => F.kidArt(n.k, 0).includes('<image') && !F.kidArt(n.k, 0).includes('<text')),
                   lines: F.NEWCOMERS.map(n => F.showNewTalk && n.k), dex: F.DEX_KEYS.length }}; }})()""")
-                if r['n'] != 15 or r['ks'] != ['hamster', 'duck', 'turtle', 'mole', 'frog', 'waterdeer', 'redpanda', 'capybara', 'kangaroo']: bad.append(f'새 전학생 {r}')
+                if r['n'] != 18 or r['ks'] != ['hamster', 'duck', 'turtle', 'mole', 'frog', 'waterdeer', 'redpanda', 'capybara', 'kangaroo', 'meerkat', 'sloth', 'chinchilla']: bad.append(f'새 전학생 {r}')
                 if not all(r['emoji']): bad.append(f'새 전학생 그림이 없어요 {r["emoji"]}')
                 await pg.evaluate(CLEAN)
                 # 옛 저장: 전학생 6종을 다 만난 초등학교 6학년(퀘스트 다 마침, 쪽지 2장)
@@ -85,13 +85,13 @@ async def main():
                   const q26 = F.MAIN.find(x => x.id === 'q26');
                   return {{ species: s.p.species, nl: s.p.nl.length, ticket: s.p.ticket, q: q && q.id, q26: [q26.title, q26.how], tfp: s.tfp }}; }})()""")
                 print('옛 저장', json.dumps(r, ensure_ascii=False))
-                if r['species'] != 6 or r['nl'] != 15 or r['ticket'] != 2: bad.append(f'옛 저장 전학생 {r}')
+                if r['species'] != 6 or r['nl'] != 18 or r['ticket'] != 2: bad.append(f'옛 저장 전학생 {r}')
                 if r['q'] != 'e39': bad.append(f'옛 저장 퀘스트 {r["q"]}')
                 if r['q26'][0] != '여섯 번째 전학생 맞이하기' or '마지막' in r['q26'][1]: bad.append(f'q26 {r["q26"]}')
                 # 친구 성장 쪽지: 6종을 만난 학교는 계속 키울 수 있어요
                 r = await pg.evaluate(f"""(() => {{ const F = {F}, S = F.S; S.p.species = 6; S.p.ticket = 2; S.p.nl = Array(12).fill(0); S.p.nl[0] = 1; F.setTab('grad'); F.renderGradPanel && 0;
                   return {{ grow: document.querySelectorAll('#friendList [data-grow]').length, locked: document.querySelectorAll('#friendList .friend.locked').length, note: !document.querySelector('#friendNote').hidden }}; }})()""")
-                if r != {'grow': 6, 'locked': 9, 'note': True}: bad.append(f'친구 성장 쪽지 {r}')
+                if r != {'grow': 6, 'locked': 12, 'note': True}: bad.append(f'친구 성장 쪽지 {r}')
                 # 초등학교 졸업식은 6학년 장을 마쳐야
                 r = await pg.evaluate(f"""(() => {{ const F = {F}, S = F.S; S.tier = 1; S.tg = 5; S.sem = 1; S.grade = 4; S.best = 4; S.q.m = F.MAIN.findIndex(q => q.id === 'e15'); S.q.lat = '';
                   const a = F.canPromote(); F.setTab('grad'); const li = [...document.querySelectorAll('#tierReqs li')].map(l => [l.className, l.textContent]);
