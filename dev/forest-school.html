@@ -3716,7 +3716,7 @@ body.cam-scene #ffChip,body.cam-scene #plChip,body.cam-scene .b-ring{animation-p
           <button class="srow" type="button" id="devDip"><span class="txt"><b>수료증, 기금, 쪽지 받기</b><small>수료증 100개, 기금 100, 친구 성장 쪽지 3장</small></span><svg viewBox="0 0 24 24" width="20" height="20" aria-hidden="true"><path d="M9 6l6 6-6 6" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"/></svg></button>
           <button class="srow" type="button" id="devTrip"><span class="txt"><b>체험학습 바로 돌아오기</b><small>3학년 전이면 체험학습을 먼저 열어 줘요</small></span><svg viewBox="0 0 24 24" width="20" height="20" aria-hidden="true"><path d="M9 6l6 6-6 6" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"/></svg></button>
           <button class="srow" type="button" id="devDay"><span class="txt"><b>다음 날로 넘기기</b><small>출석 도장, 보충수업, 핫딜 횟수가 다시 열려요</small></span><svg viewBox="0 0 24 24" width="20" height="20" aria-hidden="true"><path d="M9 6l6 6-6 6" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"/></svg></button>
-          <button class="srow" type="button" id="devUni"><span class="txt"><b>대학교 미리 보기 (개발 중)</b><small>저장하지 않고 이 화면에서만 대학교 캠퍼스를 봐요. 새로 고치면 원래 학교로 돌아와요</small></span></button>
+          <button class="srow" type="button" id="devUni"><span class="txt"><b>대학교 미리 보기 (개발 중)</b><small>저장하지 않고 이 탭에서만 대학교 캠퍼스와 퀘스트를 봐요. 누르면 다시 열려요. 한 번 더 누르거나 탭을 닫으면 원래 학교로 돌아와요</small></span></button>
           <button class="srow" type="button" id="devLux" hidden><span class="txt"><b>고급 배경 켜기 (관리자)</b><small id="devLuxTx">이 기기에서만 고급 지도와 건물을 써요(작업지시서 49 그림)</small></span></button>
           <button class="srow" type="button" id="devStats" hidden><span class="txt"><b>테스트 현황 보기</b><small>테스터마다 어디까지 했는지 서버 기록을 봐요</small></span><svg viewBox="0 0 24 24" width="20" height="20" aria-hidden="true"><path d="M9 6l6 6-6 6" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"/></svg></button>
         </div>
@@ -6234,13 +6234,18 @@ body.cam-scene #ffChip,body.cam-scene #plChip,body.cam-scene .b-ring{animation-p
 
   /* ---------- 퀘스트 목록 ---------- */
   // 메인 퀘스트: 교감 선생님이 장마다 하나씩 기능을 알려 주는 튜토리얼. 마지막 퀘스트가 그 장의 상장(학교 등급)이다
+  // 4.0.0 대학교 메인 퀘스트(19~23장)는 대학교가 열렸을 때만 MAIN에 붙여요. 닫혀 있는 동안에는 고등학교 3학년까지가 끝이라 지금 학교에 아무 영향이 없어요.
+  // 개발자 메뉴 '대학교 미리 보기'는 이 탭에만 표시(sessionStorage)를 남기고 다시 열어서 퀘스트까지 보여 줘요(웹에서만)
+  const UNI_Q = TIER_OPEN >= 5 || (() => { try { return !window.AIT && !window.FOREST_STORE && sessionStorage.getItem('fs-uni-prev') === '1'; } catch (e) { return false; } })();
   const CHAPTERS = ['첫 출근', '선생님을 모셔요', '소문난 학교', '대도시를 향해', '유치원 졸업', '숲속 초등학교', '2학년 새 친구들', '3학년 현장체험학습', '4학년 숲속 운동회', '5학년 학예회', '6학년 졸업 여행',
     '숲속 중학교', '1학년 동아리 발표회', '2학년 숲속 체육대회', '3학년 졸업 준비',   // 2.0.0 중학교 4장
-    '숲속 고등학교', '1학년 야간 자율학습', '2학년 기숙사 생활', '3학년 대학 준비'];   // 3.0.0 고등학교 4장
+    '숲속 고등학교', '1학년 야간 자율학습', '2학년 기숙사 생활', '3학년 대학 준비',
+    '숲속 대학교', '1학년 새내기', '2학년 전공 생활', '3학년 캠퍼스 축제 준비', '4학년 졸업 작품'];   // 4.0.0 대학교 5장(UNI_Q일 때만 퀘스트가 붙어요)   // 3.0.0 고등학교 4장
   // 다음 장이 열리는 때 (장 순서대로)
   const CH_NEXT = ['마을 학교가 되면', '소도시 학교가 되면', '도시 학교가 되면', '대도시 학교가 되면', '초등학교에 입학하면', '1학년 종업식을 마치면', '2학년 종업식을 마치면', '3학년 종업식을 마치면', '4학년 종업식을 마치면', '5학년 종업식을 마치면', '중학교에 입학하면',
     '중학교 마을 학교가 되면', '중학교 1학년 종업식을 마치면', '중학교 2학년 종업식을 마치면', '고등학교에 입학하면',
-    '고등학교 마을 학교가 되면', '고등학교 1학년 종업식을 마치면', '고등학교 2학년 종업식을 마치면', '대학교가 열리면'];   // 3.0.0 고등학교 장
+    '고등학교 마을 학교가 되면', '고등학교 1학년 종업식을 마치면', '고등학교 2학년 종업식을 마치면', UNI_Q ? '대학교에 입학하면' : '대학교가 열리면',
+    '대학교 마을 학교가 되면', '대학교 1학년 종업식을 마치면', '대학교 2학년 종업식을 마치면', '대학교 3학년 종업식을 마치면', '대학원이 열리면'];   // 4.0.0 대학교 장   // 3.0.0 고등학교 장
   // id는 저장에 쓰여요. 순서를 바꾸거나 퀘스트를 빼도 하던 퀘스트를 그대로 찾아요
   const MAIN = [
     { id: 'f0', ch: 0, t: 'fur', k: 'classroom', i: 0, n: 1, r: 15, title: '책상 고치기', how: '교실을 눌러서 책상을 올려요',
@@ -6738,12 +6743,99 @@ body.cam-scene #ffChip,body.cam-scene #plChip,body.cam-scene .b-ring{animation-p
     { id: 'hs37', ch: 18, ye: 3, yt: 3, t: 'ygrade', n: 4, r: 15, rk: 'dip', title: '3학년 대도시 되기', how: '평판을 모아서 대도시가 되어요',
       say: '고등학교의 마지막 해예요. 3학년도 대도시 학교로 만들면 대학 준비 끝! 대학교는 숲속 교육부가 준비하고 있어요.' }
   ];
+  // ===== 4.0.0 대학교 5장(19~23장, 4.0.0 설계안 2절). 고등학교 장과 같은 짜임(여는 장 + 학년 장). 목표 레벨은 상한(1학년 18, 2학기 +2, 학년마다 +5) 1~2 아래.
+  // 숫자(목표, 보상, 대결 판 수)는 모두 본부 제안이고 균형 제안서(4.0.0)에서 봇으로 다시 재요. 단과대학 퀘스트(dp1~dp3)는 단과대학을 넣을 때 끼워요 =====
+  if (UNI_Q) MAIN.push(
+    { id: 'hs38', ch: 18, t: 'tier', n: 4, r: 25, rk: 'dip', title: '고등학교 졸업식', how: '졸업 탭에서 졸업식을 열고 대학교에 입학해요',
+      say: '고등학교 3년을 모두 마쳤어요! 졸업 탭에서 졸업식을 열면 숲속 대학교에 입학해요. 넓은 캠퍼스가 기다리고 있어요.' },
+    { id: 'un1', ch: 19, t: 'tier', n: 4, rm: 10, title: '대학교 입학식', how: '숲속 대학교에 입학했어요. 받기를 눌러요',
+      say: '숲속 대학교 입학을 축하해요! 대학교부터는 저를 부총장님이라고 불러 주세요. 캠퍼스가 넓어서 구역 네 곳으로 나뉘어 있어요.' },
+    { id: 'un2', ch: 19, t: 'zones', n: 4, rm: 8, title: '캠퍼스 둘러보기', how: '캠퍼스 지도에서 구역 이름표를 눌러 네 곳을 모두 들어가 봐요',
+      say: '학술 구역, 생활 구역, 광장 구역, 체육 구역을 한 번씩 둘러봐요. 캠퍼스 지도에서 구역 이름표를 누르면 들어가요.' },
+    { id: 'un3', ch: 19, t: 'fpUp', n: 1, rm: 10, title: '장학재단 고치기', how: '졸업 탭 > 장학재단에서 기금을 써요',
+      say: '고등학교를 졸업하며 받은 기금이 쌓였어요. 장학재단을 고치면 대학교 수업료가 쑥 올라요.' },
+    { id: 'un4', ch: 19, t: 'fac', k: 'union', n: 1, rm: 10, title: '학생회관 짓기', how: '광장 구역 위쪽 공사 자리를 눌러요',
+      say: '대학교의 중심은 학생회관이에요. 광장 구역에 학생회관을 지으면 수업료가 오르고 두루미 학장 교수님이 오셔요.' },
+    { id: 'un5', ch: 19, t: 'furAll', k: 'union', n: 1, rm: 10, title: '학생회관 가구 갖추기', how: '학생회관을 눌러서 가구를 모두 올려요',
+      say: '학생회관이 텅 비었어요. 동아리 게시판, 소파, 자판기, 무대를 갖춰 주세요.' },
+    { id: 'un6', ch: 19, t: 'xt', k: 'dean', n: 1, rm: 8, title: '학장 교수님 연수', how: '선생님 탭 > 두루미 학장 교수님 연수',
+      say: '두루미 학장 교수님이 오셨어요! 연수를 보내 두면 단과대학이 열릴 때 보너스가 커져요.' },
+    { id: 'un7', ch: 19, t: 'students', n: 30, rm: 8, title: '신입생 30명 맞이하기', how: '교실을 Lv.6까지 넓히고 학생을 30명까지 모집해요',
+      say: '새내기들이 캠퍼스로 몰려와요. 학술 구역 교실을 넓혀서 학생 30명을 맞이해요.' },
+    { id: 'un8', ch: 19, t: 'grade', n: 1, rm: 8, title: '대학교 마을 되기', how: '평판을 ★{REP}까지 모으면 마을이 생겨요',
+      say: '캠퍼스 둘레에도 대학가 마을이 생길 차례예요. 평판을 ★{REP}까지 모아 봐요.' },
+    { id: 'un9', ch: 20, t: 'fac', k: 'library', n: 8, rm: 4, title: '도서관 키우기', how: '학술 구역 도서관을 Lv.8까지 키워요',
+      say: '대학교는 스스로 찾아 읽는 곳이에요. 도서관을 Lv.8까지 키워 봐요.' },
+    { id: 'un10', ch: 20, t: 'fac', k: 'cafeteria', n: 8, rm: 4, title: '급식실 키우기', how: '생활 구역 급식실을 Lv.8까지 키워요',
+      say: '새내기는 밥심으로 공부해요. 생활 구역 급식실을 Lv.8까지 키워 주세요.' },
+    { id: 'un11', ch: 20, sy: 1, yt: 4, t: 'semH', n: 1, r: 4, rk: 'dip', title: '대학교 1학년 1학기 방학식', how: '대도시 학교가 되면 졸업 탭에서 1학기 방학식을 열어요',
+      say: '1학기가 끝나 가요. 대도시 학교가 되면 졸업 탭에서 1학기 방학식을 열 수 있어요.' },
+    { id: 'un12', ch: 20, t: 'fac', k: 'science', n: 8, rm: 4, title: '과학실 키우기', how: '학술 구역 과학실을 Lv.8까지 키워요',
+      say: '대학교 실험은 훨씬 커요. 과학실을 Lv.8까지 키워 주세요.' },
+    { id: 'un13', ch: 20, t: 'fac', k: 'union', n: 12, rm: 4, title: '학생회관 넓히기', how: '광장 구역 학생회관을 Lv.12까지 키워요',
+      say: '동아리가 늘어서 학생회관이 좁아요. 학생회관을 Lv.12까지 넓혀요.' },
+    { id: 'un14', ch: 20, t: 'students', n: 50, rm: 4, title: '학생 50명 맞이하기', how: '교실을 Lv.11까지 넓히고 학생을 50명까지 모집해요',
+      say: '캠퍼스 소문을 듣고 친구들이 더 와요. 학생 50명을 맞이해요.' },
+    { id: 'un15', ch: 20, t: 'grade', n: 3, rm: 4, title: '대학교 도시 되기', how: '평판을 모아서 도시가 되어요',
+      say: '이제 도시 학교가 될 차례예요. 평판을 모아 봐요.' },
+    { id: 'un16', ch: 20, t: 'fac', k: 'dorm', n: 16, rm: 4, title: '기숙사 Lv.16', how: '생활 구역 기숙사를 Lv.16까지 키워요',
+      say: '먼 곳에서 온 새내기가 많아요. 기숙사를 Lv.16까지 키워 주세요.' },
+    { id: 'un17', ch: 20, t: 'grade', n: 4, r: 6, rk: 'dip', title: '대학교 대도시 되기', how: '대도시가 되면 1학기 방학식을 열어요',
+      say: '대학교 대도시가 되면 1학기 방학식을 열 수 있어요. 조금만 더 힘내요!' },
+    { id: 'un18', ch: 20, t: 'btPlays', n: 52, rm: 4, title: '대학교 1학년 학기 숙제', how: '공부 탭의 숲속 대결을 모두 52판 해요(이기고 지는 것은 상관없어요)',
+      say: '1학년 학기 숙제예요. 숲속 대결을 꾸준히 해 봐요.' },
+    { id: 'un19', ch: 20, ye: 1, yt: 4, t: 'tgrads', n: 1, r: 7, rk: 'dip', title: '대학교 1학년 종업식', how: '1학기 방학식을 열고, 2학기에 종업식을 열어요',
+      say: '새내기 한 해를 잘 마쳤어요! 2학기에 대도시가 되면 종업식을 열어요. 신입생도 새로 올 거예요.' },
+    { id: 'un20', ch: 21, t: 'ygrade', n: 2, rm: 4, title: '2학년 소도시 되기', how: '평판을 모아서 소도시가 되어요',
+      say: '2학년이 되었어요. 이제 전공 공부가 시작돼요. 먼저 소도시 학교가 되어 봐요.' },
+    { id: 'un21', ch: 21, t: 'fac', k: 'playground', n: 22, rm: 4, title: '대운동장 넓히기', how: '체육 구역 운동장을 Lv.22까지 넓혀요',
+      say: '대학교 체육대회는 구경 오는 동물도 많아요. 체육 구역 운동장을 Lv.22까지 넓혀요.' },
+    { id: 'un22', ch: 21, sy: 2, yt: 4, t: 'semH', n: 2, r: 5, rk: 'dip', title: '대학교 2학년 1학기 방학식', how: '대도시 학교가 되면 졸업 탭에서 1학기 방학식을 열어요',
+      say: '2학년 1학기가 끝나 가요. 대도시 학교가 되면 1학기 방학식을 열어요.' },
+    { id: 'un23', ch: 21, t: 'xt', k: 'dean', n: 5, rm: 4, title: '학장 교수님 Lv.5', how: '선생님 탭에서 두루미 학장 교수님을 Lv.5까지',
+      say: '학장 교수님 연수를 더 보내면 단과대학 보너스가 더 커져요.' },
+    { id: 'un24', ch: 21, t: 'fac', k: 'store', n: 24, rm: 4, title: '매점 Lv.24', how: '생활 구역 매점을 Lv.24까지 키워요',
+      say: '수업 사이에 들르는 친구가 많아요. 매점을 Lv.24까지 키워 주세요.' },
+    { id: 'un25', ch: 21, t: 'fac', k: 'classroom', n: 24, rm: 4, title: '교실 Lv.24', how: '학술 구역 교실을 Lv.24까지 키워요',
+      say: '2학년이 끝나 가요. 교실을 Lv.24까지 넓혀 주세요.' },
+    { id: 'un26', ch: 21, t: 'ygrade', n: 4, rm: 5, title: '2학년 대도시 되기', how: '평판을 모아서 대도시가 되어요',
+      say: '2학년도 대도시 학교로 만들어요.' },
+    { id: 'un27', ch: 21, ye: 2, yt: 4, t: 'tgrads', n: 2, r: 8, rk: 'dip', title: '대학교 2학년 종업식', how: '1학기 방학식을 열고, 2학기에 종업식을 열어요',
+      say: '2학년도 끝! 종업식을 열면 3학년이 되고 신입생이 와요.' },
+    { id: 'un28', ch: 22, t: 'ygrade', n: 2, rm: 5, title: '3학년 소도시 되기', how: '평판을 모아서 소도시가 되어요',
+      say: '3학년이에요. 캠퍼스 축제를 준비할 때가 됐어요. 먼저 소도시 학교가 되어 봐요.' },
+    { id: 'un29', ch: 22, t: 'fac', k: 'library', n: 27, rm: 5, title: '도서관 Lv.27', how: '학술 구역 도서관을 Lv.27까지 키워요',
+      say: '전공 책이 산더미예요. 도서관을 Lv.27까지 키워 주세요.' },
+    { id: 'un30', ch: 22, sy: 3, yt: 4, t: 'semH', n: 3, r: 8, rk: 'dip', title: '대학교 3학년 1학기 방학식', how: '대도시 학교가 되면 졸업 탭에서 1학기 방학식을 열어요',
+      say: '3학년 1학기가 끝나 가요. 대도시 학교가 되면 1학기 방학식을 열어요.' },
+    { id: 'un31', ch: 22, t: 'fac', k: 'union', n: 29, rm: 5, title: '학생회관 Lv.29', how: '광장 구역 학생회관을 Lv.29까지 키워요',
+      say: '축제 무대는 학생회관이 맡아요. 학생회관을 Lv.29까지 키워요.' },
+    { id: 'un32', ch: 22, t: 'btPlays', n: 64, rm: 4, title: '대학교 3학년 학기 숙제', how: '공부 탭의 숲속 대결을 모두 64판 해요(이기고 지는 것은 상관없어요)',
+      say: '3학년 학기 숙제예요. 숲속 대결을 꾸준히 해 봐요.' },
+    { id: 'un33', ch: 22, t: 'ygrade', n: 4, rm: 5, title: '3학년 대도시 되기', how: '평판을 모아서 대도시가 되어요',
+      say: '3학년도 대도시 학교로 만들어요.' },
+    { id: 'un34', ch: 22, ye: 3, yt: 4, t: 'tgrads', n: 3, r: 9, rk: 'dip', title: '대학교 3학년 종업식', how: '1학기 방학식을 열고, 2학기에 종업식을 열어요',
+      say: '3학년도 끝! 종업식을 열면 마지막 학년이 되고 신입생이 와요.' },
+    { id: 'un35', ch: 23, t: 'ygrade', n: 2, rm: 5, title: '4학년 소도시 되기', how: '평판을 모아서 소도시가 되어요',
+      say: '드디어 4학년이에요. 졸업 작품을 준비하려면 학교부터 든든해야 해요. 소도시 학교가 되어 봐요.' },
+    { id: 'un36', ch: 23, t: 'fac', k: 'science', n: 32, rm: 5, title: '과학실 Lv.32', how: '학술 구역 과학실을 Lv.32까지 키워요',
+      say: '졸업 실험이 한창이에요. 과학실을 Lv.32까지 키워 주세요.' },
+    { id: 'un37', ch: 23, sy: 4, yt: 4, t: 'semH', n: 4, r: 10, rk: 'dip', title: '대학교 4학년 1학기 방학식', how: '대도시 학교가 되면 졸업 탭에서 1학기 방학식을 열어요',
+      say: '4학년 1학기가 끝나 가요. 대도시 학교가 되면 1학기 방학식을 열어요.' },
+    { id: 'un38', ch: 23, t: 'fac', k: 'dorm', n: 34, rm: 5, title: '기숙사 Lv.34', how: '생활 구역 기숙사를 Lv.34까지 키워요',
+      say: '졸업 작품을 만드느라 기숙사 불이 꺼지지 않아요. 기숙사를 Lv.34까지 키워요.' },
+    { id: 'un39', ch: 23, t: 'fest', k: 'photo', n: 1, rm: 5, title: '졸업 사진 찍기', how: '학교 행사 > 졸업 사진 찍기',
+      say: '대학교 졸업 앨범에 넣을 사진을 찍어요. 학교 행사에서 졸업 사진 찍기를 열어요.' },
+    { id: 'un40', ch: 23, t: 'btPlays', n: 76, rm: 4, title: '대학교 4학년 학기 숙제', how: '공부 탭의 숲속 대결을 모두 76판 해요(이기고 지는 것은 상관없어요)',
+      say: '마지막 학기 숙제예요. 숲속 대결을 꾸준히 해 봐요.' },
+    { id: 'un41', ch: 23, ye: 4, yt: 4, t: 'ygrade', n: 4, r: 20, rk: 'dip', title: '4학년 대도시 되기', how: '평판을 모아서 대도시가 되어요',
+      say: '대학교의 마지막 해예요. 4학년도 대도시 학교로 만들면 졸업 준비 끝! 대학원은 숲속 교육부가 준비하고 있어요.' });
   // 2.1.1 지섭 요청: 공사에 시간이 들어서, 메인 퀘스트의 시설 목표를 직전 목표보다 한 단계씩만 올려요.
   // 원래 퀘스트(id 그대로) 사이에 한 단계 퀘스트(id '원래id_레벨', step: 1)를 끼워 넣고, 보상은 원래 보상을 나눠요.
   // 학교급이 바뀌면 시설이 처음부터라 그 학교급 첫 퀘스트부터 세요. 그 학년(학기)의 최고 레벨을 넘는 단계는 그 학년(학기)이 열린 뒤에 놓아요
   const MAIN_OI = MAIN.map((q, i) => i);   // 원래 번호(서브 퀘스트 after를 옮길 때 써요)
   (function mainSteps() {
-    const ORIG = MAIN.slice(), n0 = ORIG.length, tierOf = ch => ch <= 4 ? 0 : ch <= 10 ? 1 : ch <= 14 ? 2 : 3;
+    const ORIG = MAIN.slice(), n0 = ORIG.length, tierOf = ch => ch <= 4 ? 0 : ch <= 10 ? 1 : ch <= 14 ? 2 : ch <= 18 ? 3 : 4;
     // capAt[i]: i번 퀘스트가 현재일 때 지을 수 있는 최고 레벨
     const capAt = [], tierStart = [];
     let tier = -1, tg = 0, sem = 0;
@@ -6914,6 +7006,7 @@ body.cam-scene #ffChip,body.cam-scene #plChip,body.cam-scene .b-ring{animation-p
     fg: { day: '', got: [] },   // 1.7.2 학교 행사 황금 도토리: 행사마다 하루 한 번(got에 오늘 받은 행사 id)
     es: { day: '', n: 0, week: -1, g: 0, x: 0, t: 0, bf: 0, ba: 0 },   // 2.1.0 t 오늘 산 단축권 묶음 수, bf ba 오늘 산 부스터(수업료 2배, 자리 비운 보상 2배)
     awx: 0,   // 2.1.0 자리 비운 보상 2배 부스터: 다음 받기에 2배(남은 번 수)
+    zv: {},   // 4.0.0 들어가 본 구역({academic: 1, ...}). '캠퍼스 둘러보기' 퀘스트가 세요
     zone: '',   // 4.0.0 대학교에서 지금 보는 구역('' = 캠퍼스 화면, 'academic' | 'life' | 'plaza' | 'sports')
     deco: freshDeco(),   // 1.7.4 꾸미기: own 가진 장식 수, lay 지도별 자리(유치원, 초등학교)마다 놓인 장식 id, nm 학교 이름 앞부분('' = 숲속), mk 학교 마크 [모양, 문양, 바탕 색, 문양 색] 또는 null   // 1.6.0 정수 상점: 오늘 산 도토리 묶음 수, 이번 주 산 황금 도토리 묶음 수
     cs: freshCs(),
@@ -6967,6 +7060,7 @@ body.cam-scene #ffChip,body.cam-scene #plChip,body.cam-scene .b-ring{animation-p
     // 학교급과 장학재단. 졸업식이 없던 저장은 지금까지의 종업식이 모두 유치원에서 열린 것으로 쳐요
     s.tier = Math.min(Math.floor(num(d.tier, 0, 0)), TIER_OPEN - 1);
     s.zone = typeof d.zone === 'string' && ZONE_KEYS.includes(d.zone) ? d.zone : '';   // 4.0.0
+    s.zv = {}; if (d.zv && typeof d.zv === 'object') for (const z of ZONE_KEYS) if (d.zv[z]) s.zv[z] = 1;
     s.tg = Math.floor(num(d.tg, 0, s.tier === 0 ? s.st.grads : 0));
     // 2.1.0 학기: 0은 1학기, 1은 2학기. 학기가 없던 저장은 지금 학년을 2학기로 쳐서, 다음 종업식에 원래대로 학년이 올라가요
     s.sem = d.sem === 0 || d.sem === 1 ? d.sem : (s.tier >= 1 ? 1 : 0);
@@ -7256,7 +7350,7 @@ body.cam-scene #ffChip,body.cam-scene #plChip,body.cam-scene .b-ring{animation-p
   const yearGateIdx = () => S.tier >= 1 ? MAIN.findIndex(q => q.ye === S.tg + 1 && (q.yt || 1) === S.tier) : -1;
   // 예전 장(1~6장)에 머물러 있는 학교는 막지 않아요. 수료증이 있어야 하는 퀘스트가 종업식에 막혀 멈추지 않게요
   // 2.0.0: 장마다 어느 학교급의 장인지(0~4장 유치원, 5~10장 초등학교, 11~14장 중학교). 다른 학교급의 장에 머물러 있으면 막지 않아요
-  const chTier = ch => ch <= 4 ? 0 : ch <= 10 ? 1 : ch <= 14 ? 2 : 3;   // 3.0.0 15~18장은 고등학교
+  const chTier = ch => ch <= 4 ? 0 : ch <= 10 ? 1 : ch <= 14 ? 2 : ch <= 18 ? 3 : 4;   // 4.0.0 19~23장은 대학교   // 3.0.0 15~18장은 고등학교
   // 2.1.0: 1학년 장(5장)도 막아요(퀘스트 목표를 상한 가까이로 다시 잡아서 학년 길이를 퀘스트가 맡아요)
   const yearLocked = () => { const i = yearGateIdx(), q = MAIN[S.q.m]; return i >= 0 && S.q.m < i && !!q && q.ch >= 5 && chTier(q.ch) === S.tier; };
   // 2.1.0 1학기 방학식: 그 학년 장의 앞 절반을 마쳐야(sy 표시가 붙은 '1학기 방학식' 퀘스트까지 와야) 열려요
@@ -7469,6 +7563,11 @@ body.cam-scene #ffChip,body.cam-scene #plChip,body.cam-scene .b-ring{animation-p
     dean: { name: '두루미 학장 교수님', subject: '학장', fac: 'union', tier: 4, max: 10, per: 3, av: 'crane',
       desc: '단과대학을 두루 살피는 학장 교수님이에요. 학생회관 학과 사무실에 계셔요. 연수를 보내면 단과대학 보너스가 커져요.',
       eff: L => L < 1 ? '단과대학 보너스 그대로' : `단과대학 보너스 +${3 * L}%` } };
+  // 4.0.0 호칭(4.0.0 설계안 6절, 지섭 결정): 대학교부터 '선생님'은 '교수님', 고슴도치 교감 선생님은 '부총장님'. 아래 탭 이름 '선생님'은 그대로 두고 탭 안 제목만 바꿔요
+  const uniNow = () => { try { return !!S && S.tier >= 4; } catch (e) { return false; } };
+  const profName = n => uniNow() ? n.replace('교감 선생님', '부총장님').replace(' 선생님', ' 교수님') : n;
+  for (const o of [...Object.values(TEA), ...Object.values(XT), VP]) { const n = o.name; Object.defineProperty(o, 'name', { get: () => profName(n), enumerable: true, configurable: true }); }
+  { const sj = VP.subject; Object.defineProperty(VP, 'subject', { get: () => uniNow() ? '부총장' : sj, enumerable: true, configurable: true }); }
   const deanMult = () => 1 + XT.dean.per / 100 * xtLv('dean');   // 4.0.0 단과대학 보너스에 곱해요
   const xtLv = k => (S && S.xt && S.xt[k]) || 0;
   const xtHere = k => !!S && S.tier >= (XT[k].tier || 0) && S.f[XT[k].fac] >= 1;   // 2.3.0 tier: 그 학교급부터
@@ -9095,7 +9194,7 @@ body.cam-scene #ffChip,body.cam-scene #plChip,body.cam-scene .b-ring{animation-p
     if (!uniOn()) return;
     z = ZONE_KEYS.includes(z) ? z : '';
     const was = geoIdx();
-    S.zone = z; if (z) rt.zoneLast = z;
+    S.zone = z; if (z) { rt.zoneLast = z; if (!S.zv) S.zv = {}; if (!S.zv[z]) { S.zv[z] = 1; if (typeof renderQuestBar === 'function') renderQuestBar(); } }   // 4.0.0 '캠퍼스 둘러보기' 퀘스트
     if (geoIdx() !== was) {
       rt.nav = null; rt.guideKey = undefined;
       rt.kids.forEach(k => k.g.remove()); rt.kids = []; clearDrops();
@@ -9150,13 +9249,16 @@ body.cam-scene #ffChip,body.cam-scene #plChip,body.cam-scene .b-ring{animation-p
   // 4.0.0 대학교 미리 보기(개발자 메뉴에서만): 저장하지 않고 이 화면에서만 대학교로 바꿔 봐요. 새로 고치면 원래 학교로 돌아와요
   function uniPreview() {
     if (AIT || window.FOREST_STORE || !S) return false;
+    // 대학교 퀘스트(UNI_Q)는 게임을 열 때 정해져요. 표시가 없으면 이 탭에만 표시를 남기고 다시 열어요(다시 열리면 start()가 미리 보기를 켜요)
+    if (!UNI_Q) { try { sessionStorage.setItem('fs-uni-prev', '1'); } catch (e) { return false; } save(); location.reload(); return false; }
     if (!rt.uniPrev) save();
     rt.uniPrev = true; S.u.dev = true;
     S.tier = UNI_TIER; S.tg = 0; S.sem = 0; S.zone = ''; rt.zoneLast = '';
     for (const k of Object.keys(S.bs)) if (S.f[k] >= 1) S.bs[k] = UNI_TIER;   // 미리 보기에서는 지은 건물을 대학교 모습으로
     rt.mapLaid = undefined; rt.nav = null;
+    { const i = MAIN.findIndex(q => q.id === 'un1'); if (i >= 0 && S.q.m < i) { S.q.m = i; S.q.mb = 0; S.q.mid = 'un1'; } }   // 미리 보기에서는 대학교 첫 퀘스트부터
     rt.kids.forEach(k => k.g.remove()); rt.kids = []; clearDrops();
-    setTab('school'); renderMap(); syncKids(true); renderHUD(); renderAffordance();
+    setTab('school'); renderMap(); syncKids(true); renderHUD(); renderAffordance(); renderQuestBar();
     if (typeof renderCampus === 'function') renderCampus();
     return true;
   }
@@ -11358,7 +11460,14 @@ body.cam-scene #ffChip,body.cam-scene #plChip,body.cam-scene .b-ring{animation-p
     $('.cost b', btn).textContent = fmt(c);
     btn.setAttribute('aria-disabled', (maxed || S.budget < c) ? 'true' : 'false');
   }
+  function profTitles() {   // 4.0.0 카드 이름과 탭 안 제목을 지금 학교급 호칭으로
+    for (const k of Object.keys(TEA)) { const h = $(`.tcard[data-k="${k}"] h3`); if (h) setT(h, TEA[k].name); }
+    for (const k of Object.keys(XT)) { const h = $(`.tcard[data-k="${k}"] h3`); if (h) setT(h, XT[k].name); }
+    { const c = $('.tcard[data-k="vp"]'); if (c) { setT($('h3', c), VP.name); setT($('.chip', c), VP.subject); } }
+    { const t = $('#ttlTeachers span:last-child'); if (t) setT(t, uniNow() ? '교수님' : '선생님'); }
+  }
   function renderXtCards() {
+    profTitles();
     for (const k of Object.keys(XT)) {
       const card = $(`.tcard[data-k="${k}"]`); if (!card) continue;
       const X = XT[k], L = xtLv(k), here = xtHere(k), maxed = xtMaxed(k), c = xtCost(k);
@@ -20167,6 +20276,7 @@ body.cam-scene #ffChip,body.cam-scene #plChip,body.cam-scene .b-ring{animation-p
       case 'rate': return rate();
       case 'earned': return S.earned;
       case 'tier': return S.tier;
+      case 'zones': return ZONE_KEYS.filter(z => S.zv && S.zv[z]).length;   // 4.0.0 들어가 본 구역 수
       case 'tgrads': return S.tg;
       case 'semH': return S.tg + (S.sem ? 1 : 0);   // 2.1.0 그 학년 1학기 방학식을 열었는지
       case 'souv': return S.trip.souv.length;
@@ -20305,6 +20415,7 @@ body.cam-scene #ffChip,body.cam-scene #plChip,body.cam-scene .b-ring{animation-p
       case 'grade': case 'ygrade': return `${CFG.grades[q.n].title} 되기`;
       case 'rate': return `초당 도토리 ${fmt(q.n)}개 벌기`;
       case 'picks': return `떨어진 도토리 ${q.n}개 줍기`;
+      case 'zones': return `구역 ${q.n}곳 둘러보기`;
       case 'trials': return q.n === 1 ? '매나 뱀 쫓아내기' : `매나 뱀 ${q.n}번 쫓아내기`;
       case 'ups': return `시설 ${q.n}번 고치기`;
       case 'trains': return `선생님 연수 ${q.n}번 보내기`;
@@ -20824,6 +20935,7 @@ body.cam-scene #ffChip,body.cam-scene #plChip,body.cam-scene .b-ring{animation-p
       case 'perks': return goGrad('perks');
       case 'tier': return canPromote() || S.grade >= GRAD_MIN ? goGrad('tier') : goRep('대도시가 되어야 졸업식을 열 수 있어요. 지금 평판을 올리기 좋은 곳이에요');
       case 'fperks': case 'fpUp': return goGrad('fund');
+      case 'zones': { setTab('school'); const z = ZONE_KEYS.find(z => !(S.zv && S.zv[z])); if (zoneKey()) setZone(''); return toast(z ? `캠퍼스 지도에서 ${ZONE_GEO[ZONE_KEYS.indexOf(z)].zname} 이름표를 눌러 봐요` : '구역을 모두 둘러봤어요'); }   // 4.0.0
       case 'trips': case 'souv': case 'tripat': return openTrip();
       case 'sports': case 'fest': return openFest();
       case 'club': case 'shows': case 'clubSum': case 'star': case 'clubShown': case 'clubMat': case 'cgPrac': case 'cgShow': return setTab('club');   // 2.0.0, 2.2.0 대항전
@@ -21417,7 +21529,10 @@ body.cam-scene #ffChip,body.cam-scene #plChip,body.cam-scene .b-ring{animation-p
     $('#zoneHome').addEventListener('click', () => { sfx('tap'); setZone(''); });
     $('#zonePrev').addEventListener('click', () => zoneStep(-1));
     $('#zoneNext').addEventListener('click', () => zoneStep(1));
-    $('#devUni').addEventListener('click', () => { if (uniPreview()) toast('대학교 미리 보기예요. 저장되지 않아요 (테스트)'); });
+    $('#devUni').addEventListener('click', () => {
+      if (rt.uniPrev) { try { sessionStorage.removeItem('fs-uni-prev'); } catch (e) {} location.reload(); return; }   // 한 번 더 누르면 미리 보기를 끝내고 원래 학교로
+      if (uniPreview()) toast('대학교 미리 보기예요. 저장되지 않아요 (테스트)');
+    });
     $('#devCash').addEventListener('click', () => {
       S.u.dev = true;
       const v = Math.max(1000, rate() * 3600);
@@ -23877,6 +23992,8 @@ body.cam-scene #ffChip,body.cam-scene #plChip,body.cam-scene .b-ring{animation-p
     bootDone();
     setTimeout(tutAuto, bootLeft() + 900);
     setTimeout(noticeAuto, bootLeft() + 1100);
+    if (UNI_Q && TIER_OPEN < 5 && S.tier < 4) rt.uniPrev = true;   // 미리 보기 표시가 있는 탭은 처음부터 저장하지 않아요
+    if (UNI_Q && TIER_OPEN < 5 && S.tier < 4) setTimeout(() => { if (uniPreview()) toast('대학교 미리 보기예요. 저장되지 않아요\n끝내려면 개발자 메뉴에서 한 번 더 눌러요'); }, bootLeft() + 300);   // 4.0.0 미리 보기 표시가 있는 탭
     liveLoad();   // 2.0.0 핫픽스(live.json)   // 2.0.0 공지
     $('#maintRetry').addEventListener('click', async () => { sfx('tap'); $('#maintRetry').setAttribute('aria-disabled', 'true'); await liveLoad(); $('#maintRetry').setAttribute('aria-disabled', 'false'); if (Live.maint) toast('아직 점검 중이에요.\n조금만 기다려 주세요'); });   // 2.1.0 점검 모드
     $('#maintTitle').addEventListener('click', maintTap);
