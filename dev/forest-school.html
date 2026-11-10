@@ -1206,7 +1206,8 @@ html.ait .pz{padding-top:calc(var(--ait-top, 0px) + 54px)}
 .sheet.is-room .sheet-art svg{width:40px;height:40px}
 .sheet.is-room .sheet-ttl h2{font-size:20px;line-height:1.15}
 .sheet.is-room .sheet-sub{font-size:16px;line-height:1.1}
-.sheet.is-room .sheet-desc,.sheet.is-room .rep-note,.sheet.is-room .fur-h{display:none}
+.sheet.is-room .rep-note,.sheet.is-room .fur-h{display:none}
+.sheet.is-room .sheet-desc{margin:6px 2px;font-size:13px;line-height:1.4}   /* 2026-11-11 지섭 결정: 되살린 건물 효과 글을 방 모습 창에서도 보여요 */
 .sheet.is-room .sheet-quest{margin:8px 0 6px;padding:6px 10px;font-size:13px}
 .sheet.is-room .fur{margin:8px 0 8px}
 .sheet.is-room .fur-scene{height:min(calc((min(100vw, 480px) - 40px) * .72), 27vh);background:var(--card)}
@@ -7034,7 +7035,7 @@ body.cam-scene #ffChip,body.cam-scene #plChip,body.cam-scene .b-ring{animation-p
     units: 'ko',
     trip: { open: false, cur: '', start: 0, end: 0, souv: [], been: {}, kids: 0 },
     sports: { next: 0 },
-    fest: { next: {}, n: {} },
+    fest: { next: {}, n: {}, sub: {} },   // sub: 밤이라 낮 행사가 잠겼을 때 밤 행사로 대신 채운 메인 퀘스트 횟수
     dm: { day: '', list: [], bonus: false, swapped: false },
     tut: { st: '', step: 0, paid: false, nop: false }, tips: { rep: false }, nt: { seen: '', ver: '', hide: 0 },   // 2.0.0 공지: 마지막으로 본 공지, 마지막으로 띄운 버전, 일주일간 열지 않기 끝
     wk: { week: -1, pts: 0, got: [false, false, false, false, false], list: [] },
@@ -7188,6 +7189,7 @@ body.cam-scene #ffChip,body.cam-scene #plChip,body.cam-scene .b-ring{animation-p
     if (d.fest && typeof d.fest === 'object') for (const id of FEST_IDS) {
       if (d.fest.next && d.fest.next[id]) s.fest.next[id] = Math.min(num(d.fest.next[id], 0, 0), Date.now() + 2 * 3600000);
       if (d.fest.n && d.fest.n[id]) s.fest.n[id] = Math.floor(num(d.fest.n[id], 0, 0));
+      if (d.fest.sub && d.fest.sub[id] && !FEST[id].night) s.fest.sub[id] = Math.floor(cap(num(d.fest.sub[id], 0, 0), SAVE_CAP.count));
     }
     if (d.dm && typeof d.dm === 'object' && typeof d.dm.day === 'string') {
       s.dm.day = d.dm.day.slice(0, 10); s.dm.bonus = !!d.dm.bonus; s.dm.swapped = d.dm.swapped === true;
@@ -7544,7 +7546,7 @@ body.cam-scene #ffChip,body.cam-scene #plChip,body.cam-scene .b-ring{animation-p
     const [a, b] = conBand();
     if (L <= 1) return CON.first;   // 2.3.0 처음 짓기는 모든 학교급 10초
     const first = yearCap() - CAP_STEP + 1;   // 2학기에 상한이 +2 되어도 학년 첫 레벨은 그대로. 2학기에 열린 레벨(상한 +1, +2)은 긴 쪽
-    return Math.round((a + (b - a) * Math.min(1, Math.max(0, (L - first) / (CAP_STEP - 1)))) * fixMult());   // 2.3.5 비버 선생님
+    return Math.round((a + (b - a) * Math.min(1, Math.max(0, (L - first) / (CAP_STEP - 1)))) * fixMult() * (1 - deptX('eng') / 100));   // 2.3.5 비버 선생님
   }
   // 시간 단축권 넷(큰 것부터). 광고 1번에 5분권 6장, 하루 2번
   const TK = [{ k: 'h3', sec: 10800, name: '3시간권' }, { k: 'h1', sec: 3600, name: '1시간권' }, { k: 'm30', sec: 1800, name: '30분권' }, { k: 'm5', sec: 300, name: '5분권' }];
@@ -7581,12 +7583,14 @@ body.cam-scene #ffChip,body.cam-scene #plChip,body.cam-scene .b-ring{animation-p
     const use = { h3: 0, h1: 0, m30: 0, m5: 0 }; let r = rem;
     for (const t of TK.slice(0, 3)) { const n = Math.min(S.tk[t.k], Math.floor(r / t.sec)); use[t.k] = n; r -= n * t.sec; }
     if (r > 0) { const n = Math.min(S.tk.m5, Math.ceil(r / 300)); use.m5 = n; r -= n * 300; }
-    if (r > 0) { const t = TK.slice().reverse().find(x => S.tk[x.k] - use[x.k] > 0 && x.sec >= r); if (t) { use[t.k] += 1; r -= t.sec; } }
+    if (r > 0) { const t = TK.slice().reverse().find(x => S.tk[x.k] - use[x.k] > 0 && x.sec >= r); if (t) { use[t.k] += 1; r -= t.sec;
+      // 2026-11-11: 큰 권 하나를 더 쓰게 됐으면, 그 권이 덮는 만큼 앞에서 넣은 작은 권은 도로 빼요(5분권이 같이 나가 버려지던 문제)
+      for (const x of TK.slice().reverse()) { if (x.sec >= t.sec) continue; while (use[x.k] > 0 && r + x.sec <= 0) { use[x.k] -= 1; r += x.sec; } } } }
     const n = TK.reduce((a, t) => a + use[t.k], 0);
     return { use, n, left: Math.max(0, r), cut: rem - Math.max(0, r) };
   }
   const tkPlanText = p => TK.filter(t => p.use[t.k]).map(t => `${t.name} ${p.use[t.k]}장`).join(', ');
-  const teaCost = k => Math.ceil(softCost(TEA[k].cost, S.t[k], SOFT.tea) * costScale());
+  const teaCost = k => Math.ceil(softCost(TEA[k].cost, S.t[k], SOFT.tea) * costScale() * (1 - deptX('edu') / 100));
   const teaMaxed = k => !!TEA[k].max && S.t[k] >= TEA[k].max;
   // 1.7.0 고슴도치 교감 선생님: 처음부터 계셔요(Lv.0). 연수를 보내면 학교 행사 상품 도토리가 레벨마다 +10%, 최고 Lv.10(+100%).
   // 올리는 값은 곰 선생님 연수 곡선(400부터 1.85배)과 같아요. 수업료 계산(rate)과 선생님 추천(TEA)에는 들어가지 않아요
@@ -7595,7 +7599,7 @@ body.cam-scene #ffChip,body.cam-scene #plChip,body.cam-scene .b-ring{animation-p
     eff: L => L < 1 ? '학교 행사 보너스 없음' : `학교 행사 상품 +${VP.per * L}%` };
   const vpLv = () => (S && S.vp) || 0;
   const vpMaxed = () => vpLv() >= VP.max;
-  const vpCost = () => Math.ceil(softCost(TEA.bear.cost, vpLv() + 1, SOFT.tea) * costScale());
+  const vpCost = () => Math.ceil(softCost(TEA.bear.cost, vpLv() + 1, SOFT.tea) * costScale() * (1 - deptX('edu') / 100));
   const vpMult = () => 1 + VP.per / 100 * vpLv();
   // 1.7.1 새 선생님 두 분: 그 건물을 지으면 학교에 오셔요(Lv.0). 교감 선생님처럼 따로 연수하고 값도 곰 연수 곡선, 최고 Lv.10.
   // 수업료 계산(rate)과 선생님 추천(TEA)에는 들어가지 않아요
@@ -7667,10 +7671,19 @@ body.cam-scene #ffChip,body.cam-scene #plChip,body.cam-scene .b-ring{animation-p
     for (const J of JOBS) if (done[J.k] && D.sub.includes(DEPT_AB[J.ab])) n += (D.k === 'med' && J.k === 'doctor') ? 2 : 1;
     return Math.min(DEPT.jobMax, n * DEPT.job);
   }
+  const deptF = D => { const cap = Math.max(2, acCap()); return Math.max(0, Math.min(1, (deptLv(D) - 1) / (cap - 1))); };   // 그 단과대학 학력이 상한에 얼마나 가까운지(0~1)
   function deptPct(D) {   // 수업료 보너스 %: 기본 10, 학력이 상한에 가까울수록 30까지, 진로 보너스를 더한 뒤 학장 교수님 보너스를 곱해요
-    const cap = Math.max(2, acCap()), f = Math.max(0, Math.min(1, (deptLv(D) - 1) / (cap - 1)));
-    return (DEPT.base + (DEPT.max - DEPT.base) * f + deptJobPct(D)) * deanMult();
+    return (DEPT.base + (DEPT.max - DEPT.base) * deptF(D) + deptJobPct(D)) * deanMult();
   }
+  // 4.0.0 단과대학마다 따로 받는 보너스(지섭 결정 2026-11-11, 제안표 그대로): [기본, 학력이 상한일 때]. 다니는 곳만 받아요. 학장 교수님은 곱하지 않아요
+  const DEPT_X = {
+    science: { v: [50, 100], t: n => `실험 성공 도토리 +${n}%` }, sports: { v: [50, 100], t: n => `대결 첫 승 도토리 +${n}%` },
+    human: { v: [20, 40], t: n => `책 읽기 국어 XP +${n}%` }, art: { v: [10, 20], t: n => `합치기 에너지 상한 +${n}` },
+    biz: { v: [10, 20], t: n => `간식 뽑기 값 -${n}%` }, eng: { v: [5, 10], t: n => `공사 시간 -${n}%` },
+    edu: { v: [5, 10], t: n => `연수비 -${n}%` }, med: { v: [1, 2], t: n => `학교 기분 상한 +${n}칸` } };
+  const deptXOf = D => { const [a, b] = DEPT_X[D.k].v; return Math.round(a + (b - a) * deptF(D)); };
+  const deptX = k => (!S || !uniNow() || !deptPicks().includes(k)) ? 0 : deptXOf(deptOf(k));
+  const snMoodMax = () => SN.moodMax + deptX('med');
   const deptMult = () => { if (!S || !uniNow()) return 1; let p = 0; for (const k of deptPicks()) p += deptPct(deptOf(k)); return 1 + p / 100; };
   const deptIc = D => { const u = IMG('ic_col_' + D.k); return u ? `<img src="${u}" alt="">` : D.em; };
   function openDept() {
@@ -7691,7 +7704,7 @@ body.cam-scene #ffChip,body.cam-scene #plChip,body.cam-scene .b-ring{animation-p
         : sw ? (on ? `<button class="cta small" type="button" data-dp="swap:${D.k}">여기와 바꾸기</button>` : D.k === sw.k ? `<button class="btn-sub small" type="button" data-dp="cancel">그만두기</button>` : '')
         : on ? '<span class="fe-lock">다니는 중</span>'
         : `<button class="${full ? 'btn-sub' : 'cta'} small" type="button" data-dp="pick:${D.k}">${full ? '바꾸기' : '고르기'}</button>`;
-      return `<div class="dp-row${on ? ' on' : ''}${lock ? ' lock' : ''}"><span class="dp-ic">${deptIc(D)}</span><div class="dp-tx"><b>${D.name}</b><small>${subTx} Lv.${Math.floor(lv)}, ${FAC[D.fac].name}</small><em>수업료 +${Math.round(deptPct(D))}%</em></div>${btn}</div>`;
+      return `<div class="dp-row${on ? ' on' : ''}${lock ? ' lock' : ''}"><span class="dp-ic">${deptIc(D)}</span><div class="dp-tx"><b>${D.name}</b><small>${subTx} Lv.${Math.floor(lv)}, ${FAC[D.fac].name}</small><em>수업료 +${Math.round(deptPct(D))}%</em><em class="dp-x">${DEPT_X[D.k].t(deptXOf(D))}</em></div>${btn}</div>`;
     }).join('') + '</div>';
   }
   function deptSet(k, out) {   // out: 바꿀 때 빼는 곳('' = 빈 자리에 넣기)
@@ -7717,10 +7730,10 @@ body.cam-scene #ffChip,body.cam-scene #plChip,body.cam-scene .b-ring{animation-p
   const xtLv = k => (S && S.xt && S.xt[k]) || 0;
   const xtHere = k => !!S && S.tier >= (XT[k].tier || 0) && S.f[XT[k].fac] >= 1;   // 2.3.0 tier: 그 학교급부터
   const rdPerDay = () => RD.perDay + Math.floor(xtLv('kor') / 5);   // 2.3.0 고니 선생님
-  const mgEMax = () => MG.EMAX + 10 * Math.floor(xtLv('art') / 5);   // 2.3.0 공작 선생님
+  const mgEMax = () => MG.EMAX + 10 * Math.floor(xtLv('art') / 5) + deptX('art');   // 2.3.0 공작 선생님
   const snRareP = () => SN.rare + XT.snack.per / 100 * xtLv('snack');   // 2.3.0 알파카 선생님
   const xtMaxed = k => xtLv(k) >= XT[k].max;
-  const xtCost = k => XT[k].ess ? 20 + 10 * (xtLv(k) + 1) : Math.ceil(softCost(TEA.bear.cost, xtLv(k) + 1, SOFT.tea) * costScale());   // 2.3.5 정수로 연수하는 선생님
+  const xtCost = k => XT[k].ess ? 20 + 10 * (xtLv(k) + 1) : Math.ceil(softCost(TEA.bear.cost, xtLv(k) + 1, SOFT.tea) * costScale() * (1 - deptX('edu') / 100));   // 2.3.5 정수로 연수하는 선생님
   const xtHave = k => XT[k].ess ? S.ess : S.budget;
   const fixMult = () => 1 - XT.fix.per / 100 * xtLv('fix');   // 2.3.5 비버 선생님
   const feastMins = () => DEAL.feastMin + XT.diet.per * xtLv('diet');   // 까치 특식 데이 길이
@@ -10459,8 +10472,8 @@ body.cam-scene #ffChip,body.cam-scene #plChip,body.cam-scene .b-ring{animation-p
       snSync();
       const mi = snMoodImg();
       setH($('#sheetSnackIc'), mi ? `<img src="${mi}" alt="">` : '🍪');
-      setT($('#sheetSnackTx'), `학교 기분 ${S.sn.mood}/${SN.moodMax}칸, 간식 도감 ${snCount()}/${SN_ALL.length}종`);
-      sn.classList.toggle('todo', S.sn.mood < SN.moodMax && S.budget >= snCost(false));
+      setT($('#sheetSnackTx'), `학교 기분 ${S.sn.mood}/${snMoodMax()}칸, 간식 도감 ${snCount()}/${SN_ALL.length}종`);
+      sn.classList.toggle('todo', S.sn.mood < snMoodMax() && S.budget >= snCost(false));
     }
     // 2.1.0 놀이터 창의 숲속 소풍, 교실 창의 칭찬 스티커판
     const sp = $('#sheetPicnic'), spOn = k === 'playground' && pcReady();
@@ -10715,7 +10728,7 @@ body.cam-scene #ffChip,body.cam-scene #plChip,body.cam-scene .b-ring{animation-p
   function snSync() { if (!S || !S.sn) return; const t = gameToday(); if (S.sn.day !== t) { S.sn.day = t; S.sn.mood = 0; } }
   const snMult = () => S && S.sn && S.tier >= SN.tier ? 1 + S.sn.mood / 100 : 1;
   const snBase = () => Math.max(1, rate() / (feastOn() ? 2 : 1) / snMult() / gdMult());
-  const snCost = ten => Math.max(1, Math.ceil(snBase() * 60 * (ten ? SN.tenMin : SN.min)));
+  const snCost = ten => Math.max(1, Math.ceil(snBase() * 60 * (ten ? SN.tenMin : SN.min) * (1 - deptX('biz') / 100)));
   const snMoodImg = () => IMG(S.sn.mood >= 6 ? 'mood_happy' : S.sn.mood >= 1 ? 'mood_ok' : 'mood_sleepy');
   function snPick() {
     const pool = S.sn.pity >= SN.pity || Math.random() < snRareP() ? SN_ALL.filter(x => x.rare) : SN_ALL.filter(x => !x.rare);
@@ -10736,7 +10749,7 @@ body.cam-scene #ffChip,body.cam-scene #plChip,body.cam-scene .b-ring{animation-p
       S.sn.got[it.id] = (S.sn.got[it.id] || 0) + 1;
       if (nw) { if (it.rare) g += SN.goldNewR; else e += SN.essNew; }
       else if (it.rare) e += SN.essDupR;
-      S.sn.mood = Math.min(SN.moodMax, S.sn.mood + (it.rare ? SN.moodR : SN.moodN));
+      S.sn.mood = Math.min(snMoodMax(), S.sn.mood + (it.rare ? SN.moodR : SN.moodN));
       out.push({ it, nw });
     }
     S.sn.n += n;
@@ -10763,7 +10776,7 @@ body.cam-scene #ffChip,body.cam-scene #plChip,body.cam-scene .b-ring{animation-p
     const c1 = snCost(false), c10 = snCost(true), key = [S.sn.mood, S.sn.pity, c1, c10, S.budget >= c1, S.budget >= c10, rt.snRes ? rt.snRes.at : 0, S.sn.gold].join('|');
     if (!force && $('#snBtns').dataset.key === key) return; $('#snBtns').dataset.key = key;
     const mi = snMoodImg();
-    $('#snMood').innerHTML = `${mi ? `<img src="${mi}" alt="">` : ''}<span>학교 기분 ${S.sn.mood}/${SN.moodMax}칸, 오늘 수업료 +${S.sn.mood}%</span>`;
+    $('#snMood').innerHTML = `${mi ? `<img src="${mi}" alt="">` : ''}<span>학교 기분 ${S.sn.mood}/${snMoodMax()}칸, 오늘 수업료 +${S.sn.mood}%</span>`;
     const R = rt.snRes;
     if (force || !R || $('#snStage').dataset.at !== String(R ? R.at : 0)) {
       $('#snStage').dataset.at = String(R ? R.at : 0);
@@ -15336,7 +15349,7 @@ body.cam-scene #ffChip,body.cam-scene #plChip,body.cam-scene .b-ring{animation-p
     S.lab.day = gameToday(); S.lab.last = { a, b, r, n: isNew ? 1 : 0 };
     S.lab.st.n += 1; if (ok) S.lab.st.ok += 1;
     let v = 0;
-    if (ok) { v = minAcorns(LAB.min); S.budget += v; earn(v); }
+    if (ok) { v = Math.round(minAcorns(LAB.min) * (1 + deptX('science') / 100)); S.budget += v; earn(v); }
     const xp = acGain('sci', ok ? LAB.xp + (wxIs('fog') ? 15 : 0) : LAB.xpF);   // 2.1.3 안개 낀 날 성공 +15
     if (isNew) addGold(LAB.gold);
     save(); renderHUD(); checkQuests(); renderMini();
@@ -15463,7 +15476,7 @@ body.cam-scene #ffChip,body.cam-scene #plChip,body.cam-scene .b-ring{animation-p
     const b = bookOf(S.rd.cur); S.rd.cur = ''; S.rd.at = 0; S.rd.m = 0;
     if (!b) return false;
     S.rd.got[b.k] = (S.rd.got[b.k] || 0) + 1; S.rd.st += 1;
-    const xp = acGain('kor', Math.round((RD.xp + (wxIs('rain') ? 5 : 0)) * (1 + XT.kor.per / 100 * xtLv('kor'))));   // 2.1.3 비 오는 날 +5, 2.3.0 국어 선생님
+    const xp = acGain('kor', Math.round((RD.xp + (wxIs('rain') ? 5 : 0)) * (1 + XT.kor.per / 100 * xtLv('kor')) * (1 + deptX('human') / 100)));   // 2.1.3 비 오는 날 +5, 2.3.0 국어 선생님
     const who = speciesList()[Math.floor(Math.random() * Math.max(1, speciesList().length))] || 'rabbit';
     rt.rdNews = `「${b.name}」${batchim(b.name) ? '을' : '를'} 다 읽었어요! 국어 XP +${xp}\n${spName(who)}: "${b.say}"`;
     save(); checkQuests(); renderMini();
@@ -15506,7 +15519,7 @@ body.cam-scene #ffChip,body.cam-scene #plChip,body.cam-scene .b-ring{animation-p
     $('#rdTickets').innerHTML = busy && rdRemain() > 0 ? waitTicketButtons('data-read-tk') : '';
     $('#rdBooks').innerHTML = BOOKS.map(b => { const n = S.rd.got[b.k] || 0, now = S.rd.cur === b.k;
       return `<button class="rd-book${now ? ' now' : ''}" type="button" data-bk="${b.k}" aria-disabled="${!busy && left > 0 ? 'false' : 'true'}" aria-label="${b.name}${n ? `, ${n}번 읽음` : ''}">${bookCover(b)}<b>${b.name}</b><small>${now ? '읽는 중' : n ? `${n}번 읽음` : '새 책'}</small></button>`; }).join('');
-    $('#rdNote').textContent = nl(`오늘 ${rdPerDay() - left}/${rdPerDay()}권. 지금까지 ${S.rd.st}권 읽었어요. 한 권에 국어 XP +${Math.round(RD.xp * (1 + XT.kor.per / 100 * xtLv('kor')))}.`);
+    $('#rdNote').textContent = nl(`오늘 ${rdPerDay() - left}/${rdPerDay()}권. 지금까지 ${S.rd.st}권 읽었어요. 한 권에 국어 XP +${Math.round(RD.xp * (1 + XT.kor.per / 100 * xtLv('kor')) * (1 + deptX('human') / 100))}.`);
   }
   // 저장 읽기(2.0.1 공부 2단계)
   function sanitizeStudy2(d, s) {
@@ -16200,7 +16213,7 @@ body.cam-scene #ffChip,body.cam-scene #plChip,body.cam-scene .b-ring{animation-p
     s.ffx = typeof d.ffx === 'string' ? d.ffx.slice(0, 10) : '';   // 2.3.0
     { const N = d.sn && typeof d.sn === 'object' ? d.sn : {}, got = {};   // 2.1.2 매점 간식 뽑기
       if (N.got && typeof N.got === 'object') for (const x of SN_ALL) { const c = Math.floor(num(N.got[x.id], 0, 1e9)); if (c) got[x.id] = c; }
-      s.sn = { got, day: day(N.day), mood: Math.floor(num(N.mood, 0, SN.moodMax)), pity: Math.floor(num(N.pity, 0, SN.pity)), n: Math.floor(num(N.n, 0, 1e9)), gold: N.gold === true && SN_ALL.every(x => got[x.id]) }; }
+      s.sn = { got, day: day(N.day), mood: Math.floor(num(N.mood, 0, SN.moodMax + 2)), pity: Math.floor(num(N.pity, 0, SN.pity)), n: Math.floor(num(N.n, 0, 1e9)), gold: N.gold === true && SN_ALL.every(x => got[x.id]) }; }
     { const V = d.vd && typeof d.vd === 'object' ? d.vd : {}; s.vd = { lv: Math.floor(num(V.lv, 0, 9999)), p: num(V.p, 0, 1), sum: num(V.sum, 0, 1e300), n: Math.floor(num(V.n, 0, 1e9)), lk: { day: '', lv: 0, need: 0 } }; if (s.vd.p >= 1) s.vd.p = 0.999999;
     if (V.lk && typeof V.lk === 'object' && typeof V.lk.day === 'string') s.vd.lk = { day: V.lk.day.slice(0, 10), lv: Math.floor(num(V.lk.lv, 0, 9999)), need: Math.floor(num(V.lk.need, 0, SAVE_CAP.big)) };   /* 2.3.1 */ }   // 2.1.2 마을 기부
     { const C = d.cb && typeof d.cb === 'object' ? d.cb : {}, lim = Date.now() + 366 * 86400000; s.cb = { until: num(C.until, 0, lim), at: num(C.at, 0, lim) }; }   // 2.1.1 건설 가속
@@ -16458,7 +16471,7 @@ body.cam-scene #ffChip,body.cam-scene #plChip,body.cam-scene .b-ring{animation-p
     const before = S.bt.pts, lg0 = S.bt.lg, out = { win, wins, pts0: before, items: [] };
     if (win) { S.bt.streak += 1; const bonus = S.bt.streak >= BT.streakFrom ? Math.min(BT.streakMax, BT.streakStep * (S.bt.streak - BT.streakFrom + 1)) : 0; S.bt.pts = Math.min(9999, S.bt.pts + BT.win + bonus); out.bonus = bonus;
       S.bt.st.w += 1; if (rosterOn()) S.bt.st.wm += 1; S.bt.st.best = Math.max(S.bt.st.best, S.bt.streak);
-      if (!S.bt.won) { S.bt.won = true; const v = minAcorns(BT.firstMin); S.budget += v; earn(v); out.acorn = v; }
+      if (!S.bt.won) { S.bt.won = true; const v = Math.round(minAcorns(BT.firstMin) * (1 + deptX('sports') / 100)); S.budget += v; earn(v); out.acorn = v; }
       const t = gameToday(); if (S.bt.lp.day !== t) { S.bt.lp.day = t; S.bt.lp.p = 0; } const lp = Math.min(BT.lp, BT.lpDay - S.bt.lp.p); if (lp > 0) { S.bt.lp.p += lp; addLeague(lp); out.lp = lp; }
     } else { S.bt.streak = 0; S.bt.pts = Math.max(BT.floor, S.bt.pts - BT.lose); S.bt.st.l += 1; }
     out.d = S.bt.pts - before;
@@ -19443,6 +19456,8 @@ body.cam-scene #ffChip,body.cam-scene #plChip,body.cam-scene .b-ring{animation-p
     }
     festCamera(false); festGarland(false); festPhotoDecor(false); festNightDecor(null);
     S.fest.n[R.id] = (S.fest.n[R.id] || 0) + 1;
+    // 2026-11-11 지섭 결정: 밤(20~6시)에는 낮 행사가 잠겨서 메인 퀘스트가 멈췄어요. 밤 행사를 한 번 열면 그 퀘스트를 한 것으로 쳐요
+    { const cm = curMain(); if (F.night && cm && cm.t === 'fest' && FEST[cm.k] && !FEST[cm.k].night && festBase(cm.k)) { if (!S.fest.sub) S.fest.sub = {}; S.fest.sub[cm.k] = (S.fest.sub[cm.k] || 0) + 1; } }
     const win = R.n >= F.goal;
     addLeague(win ? LP.festWin : LP.festLose);
     rt.sportsWin = win; rt.prizeName = F.name; rt.prizeId = R.id;
@@ -20443,7 +20458,7 @@ body.cam-scene #ffChip,body.cam-scene #plChip,body.cam-scene .b-ring{animation-p
       case 'semH': return S.tg + (S.sem ? 1 : 0);   // 2.1.0 그 학년 1학기 방학식을 열었는지
       case 'souv': return S.trip.souv.length;
       case 'tripat': return S.trip.been[q.k] || 0;
-      case 'fest': return S.fest.n[q.k] || 0;
+      case 'fest': return (S.fest.n[q.k] || 0) + ((S.fest.sub && S.fest.sub[q.k]) || 0);
       case 'mgBest': return Math.max(0, ...Object.values(S.mg.best));   // 1.8.0 숲속 합치기에서 만든 가장 높은 단계
       case 'mgOrders': return S.mg.st.orders;
       // 2.0.0 동아리 퀘스트
@@ -20810,7 +20825,8 @@ body.cam-scene #ffChip,body.cam-scene #plChip,body.cam-scene .b-ring{animation-p
     const bar = $('#questBar');
     const mq = curMain();
     let q, base, no, title, how, av;
-    if (mq) { q = mq; base = S.q.mb; no = qNo(S.q.m); title = mq.title; how = repTxt(mq, mq.how); av = 'h'; }
+    if (mq) { q = mq; base = S.q.mb; no = qNo(S.q.m); title = mq.title; how = repTxt(mq, mq.how); av = 'h';
+      if (mq.t === 'fest' && FEST[mq.k] && !FEST[mq.k].night && festBase(mq.k) && festTimeLock(mq.k)) how = '밤에는 학교 행사의 밤 행사 한 번으로 대신해요'; }
     else {
       const s = S.q.subs.find(subReady) || S.q.subs[0];
       if (!s) { bar.hidden = true; return; }
@@ -23101,6 +23117,8 @@ body.cam-scene #ffChip,body.cam-scene #plChip,body.cam-scene .b-ring{animation-p
     { id: 'counsel', name: '진로 상담', goals: [3, 6, 10, 14, 18], title: '꿈 찾기 선생님', ic: 'ach_counsel', t: n => `진로를 이룬 학생 ${n}명`, v: () => S.cs ? S.cs.won : 0 },
     { id: 'trip2', name: '수학여행', goals: [1, 3, 5, 7, 9], title: '여행 기록가', ic: 'ic_trip2', t: n => `수학여행 기념품 ${n}종`, v: () => S.tr2 ? S.tr2.souv.length : 0 }   // 3.2.0   // 3.1.0 졸업 정산에서 진로를 이룬 학생 수
   ];
+  // 4.0.0 단과대학 장식 8개 모으기(대학교가 열렸을 때만 보여요). 숫자와 칭호는 제안값
+  if (UNI_Q) ACH.push({ id: 'college', name: '단과대학', goals: [1, 2, 4, 6, 8], title: '숲속 종합대학', ic: 'ic_col_edu', t: n => n >= 8 ? '단과대학 8곳 모두 다녀 보기' : `단과대학 ${n}곳 다녀 보기`, v: () => S.dp && S.dp.own ? Object.keys(S.dp.own).filter(k => deptOf(k)).length : 0 });
   const ACH_EM = { counsel: '🐘', selfstudy: '🌙', rare: '✨', students: '🐰', grad: '🎓', building: '🏫', teacher: '🦔', quest: '📝', puzzle: '🧩', dex: '📖', fest: '🎈', attend: '📅', trip: '🚌', gold: '🌰', rank: '🏆', deco: '🪴', lab: '🧪', battle: '⚔️', league: '🏅' , donate: '🌳', snack: '🍪' };
   const ACH_RANK_TITLE = true;   // 랭킹 서버에 칭호를 올려요. 서버 규칙(database.rules.json)의 title 칸을 Firebase 콘솔에 게시해야 해요(1.7.1)
   const achById = id => ACH.find(a => a.id === id);
@@ -24210,7 +24228,7 @@ body.cam-scene #ffChip,body.cam-scene #plChip,body.cam-scene .b-ring{animation-p
     NSL, nsStart, nsSettle, nsOpen, nsOn, nsOverlap, nsExtraH, isNight, nightDayOf, openNs, renderNs, bxSpots, renderNight,   // 3.0.0
    conOn, conLeft, conTick, conSec, conFinish, tkPlan, tkUse, tkUseAll, TK, CON, TKAD, capNext, yearCap,   // 2.1.0 공사
     semOn, semFirst, semLabel, cereDip, semBreak,   // 2.1.0 학기(s80)
-    get btUI() { return btUI; }, rkFill, RKF, rkPeriod, luxOn, foldApply, adminLookData, conFreeLeft, ffLeft, FF, TIER_X, conFree, conEss, conEssCost, askConEss, CON, conSec, conBand, CB, cbOn, cbLeft, cbCost, cbApply, cbBuy, conRender, progOf, parseSave, saveSum, bakList, bakAdd, bakAll, askPick, pickKeepLocal, pickLoadSrv, openBak, cloudShouldRestore, get Cloud() { return Cloud; }, CG, CG_FLAGS, cgOpen, cgSync, cgPractice, cgMy, cgTable, cgOppNow, cgHTML, cgNewWeek, renderClub, BX, BX_SPOT, BIO, BIO_BY, bxOpen, bxSync, bxPick, bxOk, bxTap, bxCount, bxRareP, bxMapHTML, bxDexRender, setDexSeg, renderDeco, gdOpen, showReady, GD, GD_CROPS, GD_MENU, GD_M, gdN, gdSync, gdPlant, gdWater, gdHarvest, gdCook, gdMult, gdPct, gdToday, gdReadyN, gdMenuCount, openGd, gdRender, gdMark, nbApply, NB, nbAdd, nbAddOf, nbOn, nbOnAt, nbLeft, nbOverlap, nbApply, nbNotice, conAdd, get Live() { return Live; }, sanitize211, ffCan, ffRender, BTQ, BTQ_SCI, BTQ_KOR, BTQ_COL, btqMake, btqMath, btqPick, btqAnswer, btqMemTap, btqPts, btReveal,   // 2.1.1 대결 종목 문제
+    get btUI() { return btUI; }, rkFill, RKF, rkPeriod, luxOn, foldApply, adminLookData, conFreeLeft, ffLeft, FF, TIER_X, deptX, deptXOf, DEPT_X, snMoodMax, mgEMax, festTimeLock, festNight, conFree, conEss, conEssCost, askConEss, CON, conSec, conBand, CB, cbOn, cbLeft, cbCost, cbApply, cbBuy, conRender, progOf, parseSave, saveSum, bakList, bakAdd, bakAll, askPick, pickKeepLocal, pickLoadSrv, openBak, cloudShouldRestore, get Cloud() { return Cloud; }, CG, CG_FLAGS, cgOpen, cgSync, cgPractice, cgMy, cgTable, cgOppNow, cgHTML, cgNewWeek, renderClub, BX, BX_SPOT, BIO, BIO_BY, bxOpen, bxSync, bxPick, bxOk, bxTap, bxCount, bxRareP, bxMapHTML, bxDexRender, setDexSeg, renderDeco, gdOpen, showReady, GD, GD_CROPS, GD_MENU, GD_M, gdN, gdSync, gdPlant, gdWater, gdHarvest, gdCook, gdMult, gdPct, gdToday, gdReadyN, gdMenuCount, openGd, gdRender, gdMark, nbApply, NB, nbAdd, nbAddOf, nbOn, nbOnAt, nbLeft, nbOverlap, nbApply, nbNotice, conAdd, get Live() { return Live; }, sanitize211, ffCan, ffRender, BTQ, BTQ_SCI, BTQ_KOR, BTQ_COL, btqMake, btqMath, btqPick, btqAnswer, btqMemTap, btqPts, btReveal,   // 2.1.1 대결 종목 문제
     SN, SN_ALL, snOpen, snCount, snSync, snMult, snBase, snCost, snPick, snDraw, openSn, snRender, snDexRender, setDexSeg, rate,
     qProg, VD, vdH, vdOpen, vdNeed, vdLeft, vdLocked, vdLive, boostAmount, TKAD, tripCut, achMedal, vdAmt, vdGive, vdUp, openVd, vdRender, vdMapHTML, achTitles, achTitleName, setTitle,
     BF, FR_LINES, frSync, frMake, frOf, frNm, frFull, frHeart, frList, frPat, frGift, frGiftLeft, frAddP, frRename, frHere, frKidTap, frLetter, frTick, bdParty, bdPlace, bdClaim, bdDoneToday, bdRender, bdHats,
