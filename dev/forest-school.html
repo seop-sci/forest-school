@@ -7027,7 +7027,7 @@ body.cam-scene #ffChip,body.cam-scene #plChip,body.cam-scene .b-ring{animation-p
     tier: 0, tg: 0, sem: 0, semDip: 0, tdip: 0, fund: 0, fp: { schol: 0, rep: 0, dip: 0 },
     hd: { day: '', n: 0, feastUntil: 0, album: false, seen: false, furNew: true },
     oak: OAK.max,
-    st: { picks: 0, ups: 0, trains: 0, claims: 0, grads: 0, perks: 0, fperks: 0, shakes: 0, dips: 0, play: 0, sess: 0, ads: 0, gold: 0, gspent: 0, trips: 0, sports: 0, dmDone: 0, pz: 0, trials: 0, shows: 0, visits: 0, esSpent: 0, pzb: 0, elects: 0, elMid: 0, sems: 0 },   // 2.1.0 sems: 1학기 방학식. 2.0.1 elects: 반장을 뽑은 횟수, elMid: 그 가운데 중학교부터
+    st: { picks: 0, ups: 0, trains: 0, claims: 0, grads: 0, perks: 0, fperks: 0, shakes: 0, dips: 0, play: 0, sess: 0, ads: 0, gold: 0, gspent: 0, trips: 0, sports: 0, dmDone: 0, pz: 0, trials: 0, shows: 0, visits: 0, esSpent: 0, pzb: 0, elects: 0, elMid: 0, sems: 0, cons: 0, tkUsed: 0, cbBuy: 0, nsAway: 0 },   // 2026-11-11 cons, tkUsed, cbBuy, nsAway: 쓰기만 하고 저장에서 빠지던 칸(패스 미션 '시설 공사'가 0으로 돌아가던 문제)   // 2.1.0 sems: 1학기 방학식. 2.0.1 elects: 반장을 뽑은 횟수, elMid: 그 가운데 중학교부터
       // 2.0.0: trials(1.7.4 침입자)가 저장에서 빠지던 것을 고치고 shows(동아리 발표회)를 더해요
     p: { dip: 0, species: 0, ticket: 0, nl: NEWCOMERS.map(() => 0), perk: { schol: 0, rep: 0, start: 0, drop: 0, night: 0 } },
     att: { last: '', n: 0 },
@@ -11833,7 +11833,9 @@ body.cam-scene #ffChip,body.cam-scene #plChip,body.cam-scene .b-ring{animation-p
   function claimOfflineDouble() {
     closeModal($('#mOffline'), () => showAd(
       () => { grantOffline(2); toast('+100%로 받았어요!'); },
-      r => { grantOffline(1); toast(r === 'noad' ? '광고를 불러오지 못해서 기본 보상만 받았어요' : '광고를 끝까지 보지 않아서 기본 보상만 받았어요'); }
+      r => {   // 2026-11-11: 광고가 아직 준비 안 됐으면 보상을 주지 않고 창을 다시 열어요(2배 기회를 잃지 않게). 보상은 S.pending에 그대로 있어요
+        if (r === 'noad') { setTimeout(() => { if (S.pending > 0 && !rt.modalOpen) showOffline(); }, 350); return; }
+        grantOffline(1); toast('광고를 끝까지 보지 않아서 기본 보상만 받았어요'); }
     ));
   }
 
@@ -21639,7 +21641,7 @@ body.cam-scene #ffChip,body.cam-scene #plChip,body.cam-scene .b-ring{animation-p
     $('#optBak').addEventListener('click', () => { sfx('tap'); rt.bakArm = -1; openBak(); });
     $('#bakClose').addEventListener('click', () => { sfx('tap'); closeModal($('#mBak')); });
     $('#bakList').addEventListener('click', e => { const b = e.target.closest('[data-bak]'); if (b) bakRestore(Number(b.dataset.bak)); });
-    $('#acctLoad').addEventListener('click', () => { const a = rt.acctPick; if (a) adoptSave(a.d, '구글 계정의 학교를 불러왔어요'); });
+    $('#acctLoad').addEventListener('click', () => { const a = rt.acctPick; if (a) { bakAdd(a.local, '고르지 않은 이 폰 학교'); adoptSave(a.d, '구글 계정의 학교를 불러왔어요'); } });   // 2026-11-11: 이 폰 학교도 예전 학교 되돌리기에 남겨요(안내 글과 같게)
     $('#acctKeep').addEventListener('click', () => { const a = rt.acctPick; if (a) { bakAdd(a.d, '고르지 않은 계정 학교'); adoptSave(a.local, '이 폰의 학교를 구글 계정에 저장했어요'); } });   // 2.2.0 계정 학교도 남겨요
     $('#devStats').addEventListener('click', openStats);
     $('#statsReload').addEventListener('click', loadStats);
