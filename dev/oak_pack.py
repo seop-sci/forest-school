@@ -51,7 +51,9 @@ def main():
         layer.save(fl, 'WEBP', quality=90, method=6)
         patch.save(fp, 'WEBP', quality=88, method=6)
         total += os.path.getsize(fl) + os.path.getsize(fp)
-        pv, tap = e['pivot_px'], e['tap_px']
+        # v7 자리 표에는 tap_px가 없고 tap(가로, 세로 %와 지도 가로 폭 기준 반지름 %)만 있어요
+        pv = e['pivot_px']
+        tap = e.get('tap_px') or [e['tap'][0] / 100 * 1024, e['tap'][1] / 100 * 1536, e['tap'][2] / 100 * 1024]
         # 도토리 맺히는 자리 6곳: 잎이 꽉 찬 곳(둘레 6px이 모두 불투명) 가운데, 층 높이의 22~62% 띠에서 서로 멀리 떨어지게 골라요
         solid = np.array(Image.fromarray(((al > 200) * 255).astype('uint8')).filter(ImageFilter.MinFilter(13))) > 0
         hh = y1 - y0
