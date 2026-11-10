@@ -14108,7 +14108,8 @@ body.cam-scene #ffChip,body.cam-scene #plChip,body.cam-scene .b-ring{animation-p
   function renderNight(force) {
     const g = $('#nightG'); if (!g || !S) return;
     const bought = !!(S.cos && S.cos.night && S.cos.own.includes(NIGHT_KEY));
-    const hsN = S.tier >= NSL.tier && geoIdx() === 3 && rt.viewTier == null && isNight();   // 3.0.0 고등학교부터 밤(20~6시)이면 저절로(A안)
+    const hsN = S.tier >= NSL.tier && geoIdx() >= 3 && rt.viewTier == null && isNight();   // 4.0.0 대학교 구역과 캠퍼스 지도도 밤이 와요
+    //   // 3.0.0 고등학교부터 밤(20~6시)이면 저절로(A안)
     const on = bought || hsN, look = hsN ? (S.nl || 0) : 0;   // 3.2.1 고등학교 밤 모습(0 밤, 1 저녁, 2 밝게)
     map.classList.toggle('hs-night', hsN);
     map.classList.toggle('nl-light', hsN && look === 2);
@@ -14123,7 +14124,7 @@ body.cam-scene #ffChip,body.cam-scene #plChip,body.cam-scene .b-ring{animation-p
     g.innerHTML = '<defs><radialGradient id="nmGlow"><stop offset="0" stop-color="#FFE29A" stop-opacity=".95"/><stop offset=".55" stop-color="#FFD36B" stop-opacity=".35"/><stop offset="1" stop-color="#FFD36B" stop-opacity="0"/></radialGradient></defs>' +
       (hsN ? nsSleepers() : '') +
       (look === 2 ? '' : `<rect x="-300" y="-300" width="960" height="1020" fill="#141C3E" opacity="${look === 1 ? '.24' : '.46'}"/>`) +   // 2.3.0 multiply는 지도 그림(svg 밖)과 섞이지 않아 거의 안 어두워져서 그냥 덮어요
-      '<g class="nb-src">' + (look < 2 && geoIdx() === 3 && IMG('night_sky') ? `<image href="${IMG('night_sky')}" x="0" y="${MAP_Y}" width="${MAP_W}" height="${MAP_H}" preserveAspectRatio="none"/>` : '') +   // 3.0.0 달, 별, 반딧불(고등학교 지도만)
+      '<g class="nb-src">' + (look < 2 && geoIdx() >= 3 && IMG('night_sky') ? `<image href="${IMG('night_sky')}" x="0" y="${MAP_Y}" width="${MAP_W}" height="${MAP_H}" preserveAspectRatio="none"/>` : '') +   // 3.0.0 달, 별, 반딧불(고등학교 지도만)
       ks.map(k => { const gi = IMG(gk(k)); if (gi) { const R = lotRect(geo().lot[k], seasonKey(bldImg(k))), [bx, by, bw] = R; return `<image href="${gi}" x="${(bx - bw / 2).toFixed(1)}" y="${(by - bw / 2).toFixed(1)}" width="${bw.toFixed(1)}" height="${bw.toFixed(1)}"${xfAt(R)}/>`; }
         const [cx, cy, w] = bpos(k); return `<ellipse cx="${cx.toFixed(1)}" cy="${(cy - w * 0.3).toFixed(1)}" rx="${(w * 0.42).toFixed(1)}" ry="${(w * 0.3).toFixed(1)}" fill="url(#nmGlow)" style="mix-blend-mode:screen"/>`; }).join('') + '</g>';
     nightBake(g, key);
@@ -19196,8 +19197,8 @@ body.cam-scene #ffChip,body.cam-scene #plChip,body.cam-scene .b-ring{animation-p
     return festArtSvg(keys[Math.floor(Math.random() * keys.length)], w || (item === 'balloon' ? 19 : item === 'meteor' ? 30 : item === 'lantern' ? 20 : 22));
   }
   // 3.1.1 고등학교 밤(20~6시, 지도 hs-night와 같은 때)에는 낮 행사를 쉬고 밤 행사만, 낮에는 그 반대예요. 밤 행사는 그림이 있어야 보여요
-  const festNight = () => !!S && S.tier >= NSL.tier && geoIdx() === 3 && isNight();
-  const festShown = id => !FEST[id].night || (!!S && S.tier >= NSL.tier && geoIdx() === 3 && (FEST_ART[FEST[id].item] || []).some(k => IMG(k)));
+  const festNight = () => !!S && S.tier >= NSL.tier && geoIdx() >= 3 && isNight();
+  const festShown = id => !FEST[id].night || (!!S && S.tier >= NSL.tier && geoIdx() >= 3 && (FEST_ART[FEST[id].item] || []).some(k => IMG(k)));
   const festTimeLock = id => !!S && festShown(id) && !!FEST[id].night !== festNight();
   const festBase = id => !!S && festShown(id) && S.f.playground >= 1 && (S.tier >= 2 || (S.tier === 1 && S.tg >= FEST[id].tg));
   const festOpen = id => festBase(id) && !festTimeLock(id);
