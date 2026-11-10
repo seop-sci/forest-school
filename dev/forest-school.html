@@ -7901,7 +7901,12 @@ body.cam-scene #ffChip,body.cam-scene #plChip,body.cam-scene .b-ring{animation-p
   // 4.0.0 대학교는 지도가 한 장이 아니라 구역 지도 4장이에요. 구역 줄을 GEO 뒤(ZONE0부터)에 붙여서 지금 지도 엔진을 그대로 써요.
   // 구역 줄에는 다음 학교급 자리(next), 선생님 자리(tea), 운동회 자리(sports)가 없을 수 있어요. 없는 것은 그리지 않거나 광장 자리로 대신해요
   const ZONE0 = GEO.length, UNI_TIER = 4, ZONE_KEYS = ZONE_GEO.map(Z => Z.zone);
-  ZONE_GEO.forEach(Z => GEO.push(Object.assign({ eaves: {}, tea: null, next: null, fount: null, bus: Z.gate, sports: [Z.drop[0], Z.drop[1], 44, 16] }, Z)));
+  // 구역마다 서 있는 선생님(지섭 결정 2026-11-10): 다람쥐와 부엉이는 학술 구역, 곰은 생활 구역, 고슴도치 부총장님은 광장 구역 정문 옆. 자리는 구역 그림의 빈 풀밭에서 골랐어요
+  const ZONE_TEA = { academic: { squirrel: [222, 116, 0.6], owl: [285, 236, 0.69], owlAway: [226, 262, 0.63] }, life: { bear: [84, 176, 0.72] }, plaza: { hedgehog: [122, 352, 0.57] } };
+  const ZONE_SPORTS = { sports: [222, 300, 70, 22] };   // 체육 구역 운동회는 대운동장 아래 넓은 풀밭에서
+  ZONE_GEO.forEach(Z => GEO.push(Object.assign({ eaves: {}, tea: ZONE_TEA[Z.zone] || null, next: null, fount: null, bus: Z.gate, sports: ZONE_SPORTS[Z.zone] || [Z.drop[0], Z.drop[1], 44, 16] }, Z,
+    // 학생회관은 건물 그림과 방 그림(작업지시서 54번 2단계)이 오면 지을 수 있게 해요. 그때까지 광장 빈터에는 공사 자리 그림만 보여요
+    Z.lot.union ? { nextLot: Z.lot.union, nextKey: 'bld_union_lock', next: { img: 'bld_union_lock', tag: '곧 지을 수 있어요', name: '학생회관' }, nextTagY: 0.24 } : null)));
   // 캠퍼스 전체 지도도 같은 엔진의 지도 한 줄이에요(건물과 참나무, 꾸미기 자리가 없고 학생 몇 명만 길을 걸어요). 그 위에 구역 이름표를 얹어요(renderCampus)
   const CAMPUS_GI = GEO.length;
   GEO.push({ map: CAMPUS.map, campus: true, zone: '', zname: '캠퍼스', lot: {}, eaves: {}, tea: null, next: null, oak: [-900, -900], plaza: CAMPUS.fount, gate: CAMPUS.gate, bus: CAMPUS.gate,
@@ -8106,8 +8111,6 @@ body.cam-scene #ffChip,body.cam-scene #plChip,body.cam-scene .b-ring{animation-p
     nx.setAttribute('aria-label', `${G.next.name}, ${G.next.tag}`);
     }
     layoutOak();   // 3.3.4 지도 참나무(없으면 예전 참나무 그림)
-    const hh = G.tea && G.tea.hedgehog, mh = $('#m-hedgehog');
-    if (mh && hh) mh.setAttribute('transform', `translate(${hh[0]} ${hh[1]}) scale(${hh[2]})`);
     [SPORTS.cx, SPORTS.cy, SPORTS.rx, SPORTS.ry] = G.sports;
     rt.guideKey = undefined;
     applyThemes();
@@ -8212,15 +8215,13 @@ body.cam-scene #ffChip,body.cam-scene #plChip,body.cam-scene .b-ring{animation-p
   function renderTeachersOnMap() {
     for (const k of Object.keys(TEA)) {
       const g = $('#m-' + k);
-      const T = geo().tea, mh0 = $('#m-hedgehog');
-      if (!T) { g.style.display = 'none'; if (mh0) mh0.style.display = 'none'; continue; }   // 4.0.0 선생님 자리가 없는 구역
-      if (mh0) mh0.style.display = '';
-      g.style.display = S.t[k] > 0 ? '' : 'none';
+      const T = geo().tea || {};   // 4.0.0 구역 지도에는 그 구역 선생님만 있어요(자리가 없으면 숨겨요)
       const p = k === 'owl' && !(S.f.library > 0) ? T.owlAway : T[k];
-      const hh = T.hedgehog, mh = $('#m-hedgehog');
-      if (mh) mh.setAttribute('transform', `translate(${hh[0]} ${hh[1]}) scale(${hh[2]})`);
-      g.setAttribute('transform', `translate(${p[0]} ${p[1]}) scale(${p[2]})`);
+      g.style.display = p && S.t[k] > 0 ? '' : 'none';
+      if (p) g.setAttribute('transform', `translate(${p[0]} ${p[1]}) scale(${p[2]})`);
     }
+    const hh = (geo().tea || {}).hedgehog, mh = $('#m-hedgehog');
+    if (mh) { mh.style.display = hh ? '' : 'none'; if (hh) mh.setAttribute('transform', `translate(${hh[0]} ${hh[1]}) scale(${hh[2]})`); }
   }
 
   /* ---------- 학생들 ---------- */
@@ -10407,6 +10408,11 @@ body.cam-scene #ffChip,body.cam-scene #plChip,body.cam-scene .b-ring{animation-p
     [[10, 78, 1], [79, 18, 0], [85, 64, 0], [46, 76, 0], [49, 18, 0], [28, 76, 0]],
     [[79, 20, 1], [10, 82, 0], [62, 46, 0], [49, 64, 0], [49, 80, 0], [28, 24, 0]],
     [[80, 19.5, 1], [24, 81, 0], [52, 49.5, 0], [10, 54, 0], [56, 72, 0], [48, 27, 0]]];   // 3.3.0 건물을 빈터에 꽉 맞춘 뒤 다시 골랐어요(가장자리 단추와 건물 누르는 칸에 안 가리게, 390px와 360px 모두)   // 3.0.0 고등학교
+  // 4.0.0 구역 지도마다 6곳(구역 그림의 빈 풀밭, 첫째는 물가. 광장 구역에는 물가가 없어요). 캠퍼스 지도에는 없어요
+  BX_SPOT.push([[94, 46, 1], [65, 28, 0], [61, 74, 0], [24, 82, 0], [80, 85, 0], [56, 62, 0]],
+    [[80, 30, 1], [20, 52, 0], [66, 40, 0], [26, 79, 0], [80, 79, 0], [13, 62, 0]],
+    [[19, 28, 0], [78, 27, 0], [17, 47, 0], [87, 49, 0], [22, 74, 0], [80, 77, 0]],
+    [[94, 40, 1], [11, 31, 0], [56, 58, 0], [80, 69, 0], [61, 79, 0], [15, 79, 0]]);
   const SPR = [3, 4, 5], SUM = [6, 7, 8], AUT = [9, 10, 11], WIN = [12, 1, 2];
   // [열쇠, 이름, 무리(0 곤충, 1 식물, 2 새와 작은 동물), 조건, 설명]. 조건: s 달, n 밤, r 비, w 물가, rare 희귀, en 멸종위기
   const BIO = [
@@ -11644,7 +11650,7 @@ body.cam-scene #ffChip,body.cam-scene #plChip,body.cam-scene .b-ring{animation-p
       const ok = isFac ? buyFacility(d.k, half) : teacherAct(d.k, null, half);
       if (!ok) { S.hd.n -= 1; save(); renderDeal(); toast('도토리가 모자라서 핫딜을 쓰지 못했어요. 횟수는 그대로예요'); return; }
       // 산 건물이나 오신 선생님 위로 아낀 도토리가 떠올라요
-      const T = geo().tea, tq = !T ? geo().plaza : d.k === 'owl' && !(S.f.library > 0) ? T.owlAway : T[d.k];
+      const T = geo().tea || {}, tq = (d.k === 'owl' && !(S.f.library > 0) ? T.owlAway : T[d.k]) || geo().plaza;
       const bp = bpos(d.k) || [geo().plaza[0], geo().plaza[1], 0];   // 4.0.0 다른 구역 건물이면 광장 위에 띄워요
       const tp = isFac ? [bp[0], bp[1] - bp[2] * 0.3] : [tq[0], tq[1] - 20];
       setTimeout(() => floatText(tp[0], tp[1], `반값! ${fmt(full - half)} 아낌`, 'gold'), 250);
