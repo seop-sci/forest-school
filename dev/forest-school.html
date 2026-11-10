@@ -7956,6 +7956,10 @@ body.cam-scene #ffChip,body.cam-scene #plChip,body.cam-scene .b-ring{animation-p
   { const U = { classroom: [0, 0.259, 0.913], cafeteria: [0, 0.259, 0.913], library: [0, 0.259, 0.913], science: [0, 0.259, 0.913], dorm: [0, 0.259, 0.913], store: [0, 0.251, 0.915], field: [0, 0.21, 0.916] };
     for (const k of Object.keys(U)) { BLD_ISL[`bld_${k}_s5`] = U[k]; BLD_ISL[`bld_${k}_s5_winter`] = U[k]; }
     BLD_ISL.bld_union_on = BLD_ISL.bld_union_on_winter = [0, 0.233, 0.917]; BLD_ISL.bld_lab_lock = BLD_ISL.bld_lab_lock_winter = [0, 0.27, 0.917]; }
+  // 4.0.0 대학교 구역 지도의 공사 자리 그림(지섭 요청 2026-11-10: 빈터에 딱 맞게). 공사 자리 그림은 옛 지도에 맞춘 둥근 판이라 납작한 구역 빈터에서는 위로 뜨고 작았어요.
+  // 구역에서만 이 값으로 놓아요: 판 아래 끝이 빈터 아래 끝에 닿고, 판 너비가 빈터를 조금 넘게 덮어요(그림에서 판의 가장 넓은 줄과 아래 끝을 재서 구함). 다른 학교급은 BLD_ISL과 LOT_XF 그대로
+  const ZONE_SITE_ISL = { bld_classroom_lock: [0.0012, 0.175, 0.88, 0.9, 0.3675], bld_cafeteria_lock: [-0.0025, 0.225, 0.92, 0.82, 0.42], bld_playground_lock: [0.0038, 0.232, 0.895, 0.8, 0.425], bld_store_lock: [0.0012, 0.257, 0.915, 0.8, 0.45], bld_dorm_lock: [0, 0.224, 0.925, 0.82, 0.42], bld_union_lock: [0, 0.2215, 0.925, 0.82, 0.4175] };   // [옆, 가운데 높이, 판 너비, 세로 배율, 판 아래 끝]. 세로 배율은 판 아래 끝을 기준으로 눌러요
+  for (const k of Object.keys(ZONE_SITE_ISL)) ZONE_SITE_ISL[k + '_winter'] = ZONE_SITE_ISL[k];
   const LOT_FIT = 0.98;   // 바닥 섬이 울타리 안쪽에 살짝 들어가게(울타리가 둘레에 보여요)
   // 빈터 [x%, y%, w%]와 그림 열쇠로 그림 네모 [가운데 x, 가운데 y, 한 변](지도 칸)을 구해요
   // 3.3.0 지섭 요청(빈터에 꽉 맞게): 빈터마다 [옆으로, 아래로, 크기 배율, 세로 배율, 회전(도)]. 지도 그림의 빈터(흙, 보도)가 건물 그림에 덮여 안 보이게 하나씩 맞췄어요(dev/gen330/fit2).
@@ -7994,6 +7998,7 @@ body.cam-scene #ffChip,body.cam-scene #plChip,body.cam-scene .b-ring{animation-p
   function lotRect(L, key, T) {
     const I = (T && T[key]) || BLD_ISL[key] || [0, 0.4, 0.94], w = L[2] / 100 * MAP_W * LOT_FIT / I[2];
     const r = [L[0] / 100 * MAP_W - I[0] * w, L[1] / 100 * MAP_H + MAP_Y - I[1] * w, w, ''], p = lotXf.get(L);
+    if (!p && I[3]) { const By = r[1] + I[4] * w; r[3] = `translate(0 ${By.toFixed(1)}) scale(1 ${I[3]}) translate(0 ${(-By).toFixed(1)})`; return r; }   // 4.0.0 구역 공사 자리: 판 아래 끝을 붙잡고 세로로 눌러요
     if (!p) return r;
     const [dx, dy, f, a, rot] = p, Px = L[0] / 100 * MAP_W, Py = L[1] / 100 * MAP_H + MAP_Y, Qx = Px + dx, Qy = Py + dy;
     return [Px + (r[0] - Px) * f + dx, Py + (r[1] - Py) * f + dy, w * f,
@@ -8216,7 +8221,7 @@ body.cam-scene #ffChip,body.cam-scene #plChip,body.cam-scene .b-ring{animation-p
       const g = $('#b-' + k); if (!g || !G.b[k]) continue;
       const [cx, cy, w] = G.b[k];
       setBldArt(k);
-      const sk = seasonKey(SITE_IMG[k]), [sx, sy, sw, stf] = lotRect(G.lot[k], sk);
+      const sk = seasonKey(SITE_IMG[k]), [sx, sy, sw, stf] = lotRect(G.lot[k], sk, G.zone ? ZONE_SITE_ISL : undefined);
       setA($('.site .bimg', g), { x: sx - sw / 2, y: sy - sw / 2, width: sw, height: sw, href: IMG170(sk), transform: stf });
       const box = { x: cx - w * 0.42, y: cy - w * 0.4, width: w * 0.84, height: w * 0.74 };
       setA($('.hit', g), box); setA($('.focus-ring', g), box);
@@ -17389,7 +17394,7 @@ body.cam-scene #ffChip,body.cam-scene #plChip,body.cam-scene .b-ring{animation-p
     const keys = Object.keys(FAC).filter(k => (FAC[k].tier || 0) <= t && G.lot[k]).sort((a, b) => G.lot[a][1] - G.lot[b][1]);
     const items = [], tags = [];
     for (const k of keys) {
-      const built = (x.f[k] || 0) >= 1, im = seasonKey(built ? viewBldKey(k, t, x.bs[k], luxOn()) : SITE_IMG[k]), R = lotRect(G.lot[k], im), [cx, cy, w] = R;   // 3.3.0 예시 학교도 그 학교급 새 건물(고급 건물은 학교급마다 같은 모양이라 지도만 고급으로)
+      const built = (x.f[k] || 0) >= 1, im = seasonKey(built ? viewBldKey(k, t, x.bs[k], luxOn()) : SITE_IMG[k]), R = lotRect(G.lot[k], im, !built && G.zone ? ZONE_SITE_ISL : undefined), [cx, cy, w] = R;   // 3.3.0 예시 학교도 그 학교급 새 건물(고급 건물은 학교급마다 같은 모양이라 지도만 고급으로)
       items.push({ y: cy, s: `<image href="${IMG170(im)}" x="${(cx - w / 2).toFixed(1)}" y="${(cy - w / 2).toFixed(1)}" width="${w.toFixed(1)}" height="${w.toFixed(1)}"${xfAt(R)}/>` });
       tags.push((built && x.f[k] > 1 && !x.all ? `<g class="tv-lv" transform="translate(${cx.toFixed(1)} ${(cy + w * 0.36).toFixed(1)})"><rect x="-30" y="-9" width="60" height="18" rx="9"/><text y="4" text-anchor="middle">${k === 'playground' ? (t >= 1 ? '운동장' : '놀이터') : FAC[k].name} Lv.${x.f[k]}</text></g>` : ''));   // 3.3.0 이름표는 장식과 학생 위에
     }
