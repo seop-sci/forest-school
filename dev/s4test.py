@@ -22,7 +22,7 @@ async def ctxpage(b, w, h, scheme, save):
     await ctx.add_init_script("if(!sessionStorage.getItem('seeded')){localStorage.setItem('forest-school-v1', %s);sessionStorage.setItem('seeded','1');}" % json.dumps(json.dumps(save)))
     page = await ctx.new_page(); errs = []
     page.on('pageerror', lambda e: errs.append(str(e)))
-    page.on('console', lambda m: errs.append('console:'+m.text) if m.type=='error' and 'ERR_TUNNEL' not in m.text else None)
+    page.on('console', lambda m: errs.append('console:'+m.text) if m.type=='error' and 'ERR_TUNNEL' not in m.text and 'ERR_FILE_NOT_FOUND' not in m.text else None)   # 3.3.0부터 졸업식 큰 그림(img/cere)은 게임 밖 파일이라 시험 폴더에는 없어요
     await page.goto(URL); await page.wait_for_timeout(900)
     # 2.0.0부터 업데이트 뒤 첫 접속에 공지 창이 떠요. 이 시험은 공지를 보지 않으니 닫아요(2026-10-29)
     for _ in range(3):

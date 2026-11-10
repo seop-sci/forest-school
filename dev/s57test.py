@@ -213,7 +213,8 @@ async def main():
             await pg.set_viewport_size({'width': w, 'height': h})
             await pg.evaluate(f"document.documentElement.setAttribute('data-theme','{theme}'); (()=>{{ const F={F}; F.mgSetCells(F.mgEmptyBoard()); F.mgOpen(); const c=F.mgCells(); c[12]='a1'; c[13]='a1'; F.mgSetCells(c); F.mgRenderAll(); }})()")
             await pg.wait_for_timeout(300)
-            ov = await pg.evaluate("(()=>{ const sc=document.querySelector('#mgScene'); const b=document.querySelector('#mgBoard').getBoundingClientRect(), o=document.querySelector('#mgOrders').getBoundingClientRect(), f=document.querySelector('#mgFoot').getBoundingClientRect(); return { doc: document.documentElement.scrollWidth - innerWidth, bw: b.right <= innerWidth + 1 && b.left >= -1, ow: o.right <= innerWidth + 1, foot: f.bottom <= innerHeight + 1, topOk: o.bottom < b.top + 2, cell: document.querySelector('.mg-cell').getBoundingClientRect().width }; })()")
+            # 3.2.0부터 판 테두리를 양옆 10px씩 화면 밖으로 내보내요(판을 크게). 그래서 판은 화면 밖 10px까지 괜찮아요
+            ov = await pg.evaluate("(()=>{ const sc=document.querySelector('#mgScene'); const b=document.querySelector('#mgBoard').getBoundingClientRect(), o=document.querySelector('#mgOrders').getBoundingClientRect(), f=document.querySelector('#mgFoot').getBoundingClientRect(); return { doc: document.documentElement.scrollWidth - innerWidth, bw: b.right <= innerWidth + 11 && b.left >= -11, ow: o.right <= innerWidth + 1, foot: f.bottom <= innerHeight + 1, topOk: o.bottom < b.top + 2, cell: document.querySelector('.mg-cell').getBoundingClientRect().width }; })()")
             if ov['doc'] > 0 or not ov['bw'] or not ov['ow'] or not ov['foot'] or not ov['topOk'] or ov['cell'] < 34: fails.append(f'{theme} {w}x{h} 화면 {ov}')
             await pg.screenshot(path=f's57_{theme}_{w}.png')
             # 끌어서 합치기 (12 → 13)

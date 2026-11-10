@@ -2,7 +2,7 @@
 <html lang="ko">
 <head>
 <meta charset="utf-8">
-<meta name="forest-version" content="3.3.2">
+<meta name="forest-version" content="3.3.4">
 <meta name="viewport" content="width=device-width, initial-scale=1">
 <meta name="description" content="도토리를 모아 숲속 학교를 키우는 방치형 게임 테스트판이에요.">
 <style>html,body{margin:0}</style>
@@ -456,6 +456,11 @@ g.plaque[id^="pq-"] .t-plaque{font-size:8.6px}   /* 3.3.0 지섭: 건물 이름�
 #oak:focus-visible .oak-hit{stroke:var(--accent);stroke-width:2}
 .oak-nut.off{display:none}
 #oakCanopy.shake{animation:oak .5s ease-in-out}
+/* 3.3.4 지도 참나무: 지도에 그려진 큰 나무를 따로 뗀 층으로 써요(작업지시서 54). 줄기 밑동을 중심으로 살짝만 흔들어요 */
+#oak.mapoak .c-shadow{display:none}
+#oak.mapoak #oakCanopy.shake{animation:oakM .6s ease-in-out}
+@keyframes oakM{0%,100%{transform:rotate(0)}25%{transform:rotate(-1.6deg)}75%{transform:rotate(1.6deg)}}
+#oakPatch{pointer-events:none}
 @keyframes oak{0%,100%{transform:rotate(0)}25%{transform:rotate(-3deg)}75%{transform:rotate(3deg)}}
 .bell{transform-box:fill-box;transform-origin:50% 0%}
 .bell.ring{animation:ring 1.4s ease-in-out}
@@ -755,11 +760,9 @@ body.th-bg{background:var(--th-bg)}
 html.ait{--sab:var(--ait-bottom, 0px)}
 /* 토스 판: 오른쪽 위 토스 단추(··· ✕, 위 여백 + 10에서 시작)와 게임 단추가 겹치지 않게 그만큼 아래에서 시작해요(겹치면 검수 반려 사유) */
 html.ait .app{padding-top:calc(var(--ait-top, 0px) + 8px);padding-bottom:var(--ait-bottom, 0px)}
-/* 3.2.3 토스 판: 현황판을 위로 올리고, 오른쪽 위 토스 단추(··· ✕) 자리만큼 가로로 줄여 왼쪽에 둬요 */
-html.ait .board{margin-right:var(--ait-capw, 112px)}
-html.ait .app .board .hud-res .stat-main b{font-size:18px}
-html.ait .app .board .hud-res .rep-pill b{font-size:15px}
-@media (max-width:380px){html.ait .app .board .hud-res .stat-main b{font-size:16px}html.ait .app .board .hud-res .rep-pill b{font-size:14px}}
+/* 3.3.3 지섭: 토스 판도 현황판을 안드로이드와 똑같이 둬요. 우리 ✕ 단추는 숨기고 그 자리를 토스 단추(··· ✕) 자리로 비워서, 토스 단추가 현황판 오른쪽 위에 쏙 들어가 보이게 해요 */
+html.ait .app .board #btnExit{visibility:hidden;pointer-events:none;width:calc(var(--ait-capw, 112px) - 22px)}
+html.ait .app.on-school .board.folded .board-top{padding-right:calc(var(--ait-capw, 112px) - 20px)}
 html.ait .app.on-school .tabs{padding-bottom:6px}
 /* 3.3.2 지섭 제보(토스 정식 출시): 숲속 합치기와 숲속 퍼즐은 화면 전체를 덮어서 위쪽 칸이 토스 단추(··· ✕)에 가렸어요. 토스 단추 줄 아래에서 시작해요 */
 html.ait .pz{padding-top:calc(var(--ait-top, 0px) + 54px)}
@@ -2362,6 +2365,16 @@ body.wl-on .toast{z-index:300}
 /* 2.1.3 학부모 편지 */
 .pl-chip{position:absolute;right:10px;bottom:calc(var(--bot-h, 70px) + 46px + var(--ff-up, 46px));z-index:6;display:flex;align-items:center;gap:4px;padding:5px 11px;border:2px solid #E2A21C;border-radius:14px;background:rgba(255,246,214,.95);color:#5A3A16;font:inherit;font-size:12.5px;font-weight:700;box-shadow:0 2px 4px rgba(0,0,0,.25);cursor:pointer;animation:plBob 1.6s ease-in-out infinite}
 .pl-chip span{font-size:15px}
+/* 3.3.4 지섭: 지도 오른쪽 아래 큰 나무가 누르는 참나무가 되어서, 그 위를 덮던 칩(즉시 완공과 건설 가속, 새 편지, 까치 핫딜)을 작게 줄여 맨 아래 한 줄(학교급 단추와 같은 높이, 나무 밑동 아래)에 놓아요.
+   왼쪽 아래로 옮기는 안(A안)은 초등학교부터 기부함과 왼쪽 건물을 가려서 접었어요. 자리(right, bottom)는 chipRow()가 오른쪽부터 차례로 놓고, 학교급 단추에 닿으면 한 줄 위로 올려요 */
+.ff-chip,.pl-chip,.app.on-school .deal{bottom:calc(var(--bot-h, 70px) + 10px);height:30px;box-sizing:border-box;max-width:none;white-space:nowrap}
+.ff-chip{flex-direction:row;align-items:center;gap:5px;padding:0 9px;border-radius:999px;font-size:12px}
+.ff-chip b{font-size:13px}.ff-chip small{font-size:11.5px}.ff-chip small.nb{gap:2px}
+.ff-chip .ffx{left:-7px;top:-9px;width:18px;height:18px;font-size:12px;line-height:14px}
+.pl-chip{padding:0 9px;border-radius:999px;font-size:0;gap:0}.pl-chip span{font-size:16px}
+.app.on-school .deal{padding:1px 9px 1px 2px;gap:4px;font-size:0;border-radius:999px;box-shadow:0 2px 0 var(--wood-dark)}
+.app.on-school .deal .d-av{width:22px;height:22px}.app.on-school .deal .d-av svg{width:21px;height:21px}
+.app.on-school .deal .d-time{font-size:13.5px}
 @keyframes plBob{50%{transform:translateY(-3px)}}
 .lt-nav{display:flex;align-items:center;justify-content:center;gap:12px;margin:-4px 0 8px;font-size:13px;color:var(--muted)}
 @media (prefers-reduced-motion:reduce){.pl-chip{animation:none}}
@@ -3217,7 +3230,7 @@ body.cam-scene #ffChip,body.cam-scene #plChip,body.cam-scene .b-ring{animation-p
 .mg-order .mo-one small{font-size:10px;line-height:1.05}
 .mg-order .mo-who{display:none}
 .mg-order .mo-rw{font-size:10.5px;line-height:1.15}
-.mg-foot{min-height:42px;padding:4px 8px;border-radius:13px}
+.mg-foot{min-height:48px;padding:4px 8px;border-radius:13px}   /* 3.3.3 지섭: 조각을 고르면 아래 칸이 42→48로 커져 판이 줄었다 커졌다 해서 높이를 48로 고정 */
 .mg-foot .mf-tx span{display:none}
 .mg-foot .mf-btn{min-height:32px;font-size:13px;padding:0 10px}
 .mg-mid{overflow-x:hidden}
@@ -3236,7 +3249,7 @@ body.cam-scene #ffChip,body.cam-scene #plChip,body.cam-scene .b-ring{animation-p
     <p class="boot-step" id="bootStep">학교 문을 여는 중...</p>
     <p class="boot-tip" id="bootTip">학교 문을 여는 중이에요</p>
   </div>
-  <span class="boot-ver" id="bootVer">v3.3.2</span>
+  <span class="boot-ver" id="bootVer">v3.3.4</span>
 </div>
 
 <div class="app on-school" id="app">
@@ -3325,6 +3338,7 @@ body.cam-scene #ffChip,body.cam-scene #plChip,body.cam-scene .b-ring{animation-p
           <image id="mapImg1" class="mapimg mi-1" x="0" y="-60" width="360" height="540" preserveAspectRatio="none"/>
           <image id="mapImg2" class="mapimg mi-2" x="0" y="-60" width="360" height="540" preserveAspectRatio="none"/>
           <image id="mapImg3" class="mapimg mi-3" x="0" y="-60" width="360" height="540" preserveAspectRatio="none"/>
+          <image id="oakPatch" preserveAspectRatio="none" aria-hidden="true"/><!-- 3.3.4 지도 참나무: 나무를 지운 조각을 지도 위에 덮어요 -->
           <g id="thDeco" aria-hidden="true"></g>
           <rect class="map-dim" x="-300" y="-300" width="960" height="1020"/>
           <!-- 1.7.3 지도 가운데 차분하게: 배경 그림 위, 건물 아래에 엷은 막(가운데만, 가장자리는 0) -->
@@ -3478,7 +3492,7 @@ body.cam-scene #ffChip,body.cam-scene #plChip,body.cam-scene .b-ring{animation-p
         <button class="tab sidebtn" type="button" data-tab="dex" aria-selected="false" aria-label="동물 도감"><span class="dot" id="dexDot" hidden></span><span class="sb-ring"><span class="tic" data-ic="ic_book" aria-hidden="true"></span></span><span class="sb-lb">도감</span></button><!-- 1.7.0 -->
         <button class="tab sidebtn" type="button" data-tab="event" aria-selected="false" aria-label="이벤트"><span class="dot" id="evDot" hidden></span><span class="sb-ring"><span class="tic" data-ic="ic_event" aria-hidden="true"></span></span><span class="sb-lb">이벤트</span></button><!-- 1.7.0 -->
       </div>
-      <!-- 까치 핫딜은 엄지가 닿기 쉬운 오른쪽 아래. 건물과 떨어진 도토리를 가리지 않아요 -->
+      <!-- 까치 핫딜: 3.3.4부터 맨 아래 칩 줄의 오른쪽 끝(작게) -->
       <button class="deal" id="btnDeal" type="button" hidden><span class="d-av" id="dealIc" aria-hidden="true"></span><span class="d-txt">까치 핫딜<span class="d-time" id="dealTime">2:00</span></span></button>
     </div>
 
@@ -3729,7 +3743,7 @@ body.cam-scene #ffChip,body.cam-scene #plChip,body.cam-scene .b-ring{animation-p
       </div>
       <h3 class="panel-sub">정보</h3>
       <dl class="info">
-        <div id="verRow"><dt>버전</dt><dd>v3.3.2</dd></div>
+        <div id="verRow"><dt>버전</dt><dd>v3.3.4</dd></div>
         <div id="pidRow" hidden><dt>학교 번호</dt><dd id="infoPid"></dd></div>
       </dl>
       <div id="devBox" hidden>
@@ -5244,36 +5258,36 @@ body.cam-scene #ffChip,body.cam-scene #plChip,body.cam-scene .b-ring{animation-p
 "cere_photo_frame":"img/a/cere_photo_frame-be07e48ae0.webp",
 "cere_podium":"img/a/cere_podium-4e98817e62.webp",
 "cere_sparkle":"img/a/cere_sparkle-17dceebda2.webp",
-"glow_cafeteria_on":"",
-"glow_cafeteria_on_winter":"",
-"glow_cafeteria_s2":"",
-"glow_cafeteria_s2_winter":"",
-"glow_cafeteria_s3":"",
-"glow_cafeteria_s3_winter":"",
-"glow_classroom_on":"",
-"glow_classroom_on_winter":"",
-"glow_classroom_s2":"",
-"glow_classroom_s2_winter":"",
-"glow_classroom_s3":"",
-"glow_classroom_s3_winter":"",
+"glow_cafeteria_on":"img/a/glow_cafeteria_on-8d4bf56abc.webp",
+"glow_cafeteria_on_winter":"img/a/glow_cafeteria_on_winter-eec1574d55.webp",
+"glow_cafeteria_s2":"img/a/glow_cafeteria_s2-bac78b2f27.webp",
+"glow_cafeteria_s2_winter":"img/a/glow_cafeteria_s2_winter-59031ac715.webp",
+"glow_cafeteria_s3":"img/a/glow_cafeteria_s3-a4b3ef2cf3.webp",
+"glow_cafeteria_s3_winter":"img/a/glow_cafeteria_s3_winter-028adec7c4.webp",
+"glow_classroom_on":"img/a/glow_classroom_on-24dd931c87.webp",
+"glow_classroom_on_winter":"img/a/glow_classroom_on_winter-31b9ef0464.webp",
+"glow_classroom_s2":"img/a/glow_classroom_s2-30a5aceb20.webp",
+"glow_classroom_s2_winter":"img/a/glow_classroom_s2_winter-6aad07afc3.webp",
+"glow_classroom_s3":"img/a/glow_classroom_s3-0b31f000ab.webp",
+"glow_classroom_s3_winter":"img/a/glow_classroom_s3_winter-44ea8dc481.webp",
 "glow_field_on":"img/a/glow_field_on-8ab39c1bd3.webp",
 "glow_field_on_winter":"img/a/glow_field_on_winter-444145b8fc.webp",
 "glow_field_s3":"img/a/glow_field_s3-a191e00dc5.webp",
 "glow_field_s3_winter":"img/a/glow_field_s3_winter-d364f71eaa.webp",
-"glow_library_on":"",
-"glow_library_on_winter":"",
-"glow_library_s2":"",
-"glow_library_s2_winter":"",
-"glow_library_s3":"",
-"glow_library_s3_winter":"",
+"glow_library_on":"img/a/glow_library_on-2a4c3d14e5.webp",
+"glow_library_on_winter":"img/a/glow_library_on_winter-e26dc21d2b.webp",
+"glow_library_s2":"img/a/glow_library_s2-7c6b0026ee.webp",
+"glow_library_s2_winter":"img/a/glow_library_s2_winter-7a4f0e1e2d.webp",
+"glow_library_s3":"img/a/glow_library_s3-e0c1642b9d.webp",
+"glow_library_s3_winter":"img/a/glow_library_s3_winter-49fa21168f.webp",
 "glow_playground_on":"img/a/glow_playground_on-18d6f69a79.webp",
 "glow_playground_on_winter":"img/a/glow_playground_on_winter-4a6f38f9a2.webp",
-"glow_science_on":"",
-"glow_science_on_winter":"",
-"glow_science_s3":"",
-"glow_science_s3_winter":"",
-"glow_store_on":"",
-"glow_store_on_winter":"",
+"glow_science_on":"img/a/glow_science_on-88bd62bcdf.webp",
+"glow_science_on_winter":"img/a/glow_science_on_winter-6598a941cb.webp",
+"glow_science_s3":"img/a/glow_science_s3-60e3faaaa6.webp",
+"glow_science_s3_winter":"img/a/glow_science_s3_winter-10f8909b2b.webp",
+"glow_store_on":"img/a/glow_store_on-71e0510b9d.webp",
+"glow_store_on_winter":"img/a/glow_store_on_winter-2d235cea24.webp",
 "tea_alpaca":"img/a/tea_alpaca-576257558c.webp",
 "tea_peacock":"img/a/tea_peacock-5564f768e1.webp",
 "tea_swan":"img/a/tea_swan-973d8019ba.webp"
@@ -5304,20 +5318,20 @@ body.cam-scene #ffChip,body.cam-scene #plChip,body.cam-scene .b-ring{animation-p
 "fur_closet_shiny":"img/a/fur_closet_shiny-eacc9c9477.webp",
 "fur_rug_shiny":"img/a/fur_rug_shiny-28ed4a692a.webp",
 "fur_sdesk_shiny":"img/a/fur_sdesk_shiny-d15c990b3e.webp",
-"glow_cafeteria_s4":"",
-"glow_cafeteria_s4_winter":"",
-"glow_classroom_s4":"",
-"glow_classroom_s4_winter":"",
-"glow_dorm":"",
-"glow_dorm_winter":"",
+"glow_cafeteria_s4":"img/a/glow_cafeteria_s4-ef011e277e.webp",
+"glow_cafeteria_s4_winter":"img/a/glow_cafeteria_s4_winter-33d1236153.webp",
+"glow_classroom_s4":"img/a/glow_classroom_s4-84a73e708f.webp",
+"glow_classroom_s4_winter":"img/a/glow_classroom_s4_winter-d8ba2ad8ce.webp",
+"glow_dorm":"img/a/glow_dorm-37648efd62.webp",
+"glow_dorm_winter":"img/a/glow_dorm_winter-a248356392.webp",
 "glow_field_s4":"img/a/glow_field_s4-0215614964.webp",
 "glow_field_s4_winter":"img/a/glow_field_s4_winter-ef649f0e6b.webp",
-"glow_library_s4":"",
-"glow_library_s4_winter":"",
-"glow_science_s4":"",
-"glow_science_s4_winter":"",
-"glow_store_s4":"",
-"glow_store_s4_winter":"",
+"glow_library_s4":"img/a/glow_library_s4-d906dd64a9.webp",
+"glow_library_s4_winter":"img/a/glow_library_s4_winter-07ac49283e.webp",
+"glow_science_s4":"img/a/glow_science_s4-2ca8e44c31.webp",
+"glow_science_s4_winter":"img/a/glow_science_s4_winter-7abbbd8e1c.webp",
+"glow_store_s4":"img/a/glow_store_s4-28ca464f4e.webp",
+"glow_store_s4_winter":"img/a/glow_store_s4_winter-60d1b2c008.webp",
 "ic_dorm":"img/a/ic_dorm-b0e68da879.webp",
 "ic_night":"img/a/ic_night-6c3c224759.webp",
 "ic_selfstudy":"img/a/ic_selfstudy-931e94f5b4.webp",
@@ -6304,13 +6318,13 @@ body.cam-scene #ffChip,body.cam-scene #plChip,body.cam-scene .b-ring{animation-p
     { id: 'q17', ch: 3, t: 'teaAll', n: 5, r: 5000, title: '선생님 모두 Lv.5', how: '세 선생님을 모두 Lv.5까지 연수 보내요',
       say: '실력 있는 선생님이 좋은 학교를 만들어요. 다람쥐, 부엉이, 곰 선생님을 모두 Lv.5까지 키워 주세요.' },
     { id: 'q18', ch: 3, t: 'rate', n: 30, r: 8000, title: '초당 도토리 30', how: '급식실과 다람쥐 선생님이 수업료를 올려 줘요',
-      say: '학교 살림이 넉넉해야 더 크게 키울 수 있어요. 1초에 도토리 300개가 들어오게 만들어 봐요.' },
+      say: '학교 살림이 넉넉해야 더 크게 키울 수 있어요. 1초에 도토리 30개가 들어오게 만들어 봐요.' },
     { id: 'q19', ch: 3, t: 'fac', k: 'cafeteria', n: 12, r: 10000, title: '숲속 최고 급식실', how: '급식실을 Lv.12까지 키워요',
       say: '대도시 학교라면 급식도 숲에서 제일이어야지요. 급식실을 Lv.12까지 키워 주세요.' },
     { id: 'q20', ch: 3, t: 'fac', k: 'library', n: 11, r: 15000, title: '천 년의 도서관', how: '도서관을 Lv.11까지 키워요',
       say: '천 년 동안 읽을 책을 모아 볼까요? 도서관을 Lv.11까지 키우면 대도시가 코앞이에요.' },
-    { id: 'sa1', ch: 3, t: 'acMax', n: 3, r: 12000, title: '과목 하나 Lv.3', how: '공부 탭에서 퍼즐이나 합치기를 하면 그 과목 학력이 올라요. 문제집을 사도 돼요',
-      say: '동네 소문보다 더 믿음직한 건 학교 학력이에요. 공부 탭에서 과목 하나를 Lv.5까지 올려 볼까요?' },
+    { id: 'sa1', ch: 3, t: 'acMax', n: 2, r: 12000, title: '과목 하나 Lv.2', how: '공부 탭에서 퍼즐이나 합치기를 하면 그 과목 학력이 올라요. 문제집을 사도 돼요',
+      say: '동네 소문보다 더 믿음직한 건 학교 학력이에요. 공부 탭에서 과목 하나를 Lv.2까지 올려 볼까요?' },
     { id: 'q21', ch: 3, t: 'grade', n: 4, r: 20000, title: '대도시 학교 되기', how: '평판을 ★{REP}까지 모으면 종업식이 열려요',
       say: '평판을 ★{REP}까지 모으면 나무 빌딩이 숲을 이룬 대도시가 돼요! 대도시 학교가 되면 1년째를 마치는 종업식을 열 수 있어요.' },
 
@@ -6364,16 +6378,16 @@ body.cam-scene #ffChip,body.cam-scene #plChip,body.cam-scene .b-ring{animation-p
       say: '초등학교는 한 반에 친구가 많아요. 교실을 넓혀서 60명을 맞이해요.' },
     { id: 'sb1', ch: 5, sy: 1, t: 'semH', n: 1, r: 3, rk: 'dip', title: '1학년 1학기 방학식', how: '대도시 학교가 되면 졸업 탭에서 1학기 방학식을 열어요',
       say: '1학기 퀘스트를 다 했어요! 대도시 학교를 만들고 1학기 방학식을 열어요. 방학이 끝나면 2학기 퀘스트가 기다려요.' },   // 2.1.0 학기 나누기
-    { id: 'e9', ch: 5, t: 'picks', n: 20, rm: 3, title: '운동회 도토리 줍기', how: '참나무를 누르면 도토리가 떨어져요',
-      say: '운동회 날이에요! 운동장 옆 참나무를 흔들어서 떨어진 도토리를 20개 주워 주세요.' },
+    { id: 'e9', ch: 5, t: 'picks', n: 20, rm: 3, title: '참나무 도토리 줍기', how: '참나무를 누르면 도토리가 떨어져요',
+      say: '간식 살 도토리가 모자라요! 참나무를 흔들어서 떨어진 도토리를 20개 주워 주세요.' },
     { id: 'e10', ch: 5, t: 'fac', k: 'cafeteria', n: 19, rm: 4, title: '급식실 Lv.19', how: '급식실을 Lv.19까지 키워요',
-      say: '한창 클 나이라 급식을 많이 먹어요. 급식실을 Lv.11까지 키워 주세요.' },
+      say: '한창 클 나이라 급식을 많이 먹어요. 급식실을 Lv.19까지 키워 주세요.' },
     { id: 'e44', ch: 5, t: 'furAll', k: 'science', n: 3, rm: 3, title: '과학실 가구 갖추기', how: '과학실 가구를 모두 Lv.3까지 올려요',
       say: '경시대회를 준비하려면 실험대와 현미경이 튼튼해야 해요. 과학실 가구를 모두 Lv.3까지 올려 주세요.' },
     { id: 'e45', ch: 5, t: 'fac', k: 'playground', n: 19, rm: 3, title: '운동장 넓히기', how: '운동장을 Lv.19까지 넓혀요',
-      say: '초등학생은 운동장에서 공을 차며 놀아요. 운동장을 Lv.8까지 넓혀 주세요.' },
+      say: '초등학생은 운동장에서 공을 차며 놀아요. 운동장을 Lv.19까지 넓혀 주세요.' },
     { id: 'e11', ch: 5, t: 'fac', k: 'science', n: 10, rm: 4, title: '과학 경시대회', how: '과학실을 Lv.10까지 키워요',
-      say: '숲속 과학 경시대회가 열려요. 과학실을 Lv.8까지 키우면 대도시가 눈앞이에요.' },
+      say: '숲속 과학 경시대회가 열려요. 과학실을 Lv.10까지 키우면 대도시가 눈앞이에요.' },
     { id: 'e5', ch: 5, t: 'grade', n: 4, r: 5, rk: 'dip', title: '초등학교 대도시 되기', how: '대도시가 되면 1학기 방학식을 열어요',
       say: '초등학교도 대도시 학교로 만들어 봐요! 그러면 1학기 방학식을 열 수 있어요. 초등학교부터는 1학기 방학식과 2학기 종업식을 열어야 학년이 올라가요.' },
     { id: 'e40', ch: 5, t: 'fest', k: 'picnic', n: 1, rm: 3, title: '보물찾기 열기', how: '학교 행사 > 봄 소풍 보물찾기',
@@ -6395,7 +6409,7 @@ body.cam-scene #ffChip,body.cam-scene #plChip,body.cam-scene .b-ring{animation-p
     { id: 'e17', ch: 6, t: 'students', n: 90, rm: 3, title: '학생 90명 맞이하기', how: '교실을 Lv.21까지 넓히고 학생을 90명까지 모집해요',
       say: '전학 온 친구들 소문을 듣고 학생들이 더 오고 싶어 해요. 교실을 넓혀서 90명을 맞이해요.' },
     { id: 'e18', ch: 6, t: 'fac', k: 'science', n: 14, rm: 4, title: '과학실 Lv.14', how: '과학실을 Lv.14까지 키워요',
-      say: '2학년은 강낭콩 키우기 관찰 일기를 써요. 과학실을 Lv.10까지 키워서 돋보기를 마련해 줘요.' },
+      say: '2학년은 강낭콩 키우기 관찰 일기를 써요. 과학실을 Lv.14까지 키워서 돋보기를 마련해 줘요.' },
     { id: 'e41', ch: 6, t: 'fest', k: 'welcome', n: 1, rm: 3, title: '환영회 열기', how: '학교 행사 > 새 친구 환영회',
       say: '전학 온 친구들을 위해 환영회를 열어요. 광장에 둥글게 모여 풍선을 날려 볼까요?' },
     { id: 'sb2', ch: 6, sy: 2, t: 'semH', n: 2, r: 3, rk: 'dip', title: '2학년 1학기 방학식', how: '대도시 학교가 되면 졸업 탭에서 1학기 방학식을 열어요',
@@ -6422,13 +6436,13 @@ body.cam-scene #ffChip,body.cam-scene #plChip,body.cam-scene .b-ring{animation-p
     { id: 'e21', ch: 7, t: 'tea', k: 'bear', n: 15, rm: 3, title: '곰 선생님 Lv.15', how: '선생님 탭에서 곰 선생님을 연수 보내요',
       say: '체험학습에서는 곰 선생님이 앞장서요. 곰 선생님을 Lv.15까지 연수 보내 주세요.' },
     { id: 'e22', ch: 7, t: 'fac', k: 'library', n: 26, rm: 4, title: '체험학습 보고서', how: '도서관을 Lv.26까지 키워요',
-      say: '다녀온 이야기를 보고서로 써서 도서관에 꽂아 둬요. 도서관을 Lv.17까지 키워요.' },
+      say: '다녀온 이야기를 보고서로 써서 도서관에 꽂아 둬요. 도서관을 Lv.26까지 키워요.' },
     { id: 'e14', ch: 7, t: 'fac', k: 'science', n: 18, rm: 4, title: '과학실 Lv.18', how: '과학실을 Lv.18까지 키워요',
-      say: '시냇가에서 주운 조약돌을 현미경으로 들여다봐요. 과학실을 Lv.12까지 키워 볼까요?' },
+      say: '시냇가에서 주운 조약돌을 현미경으로 들여다봐요. 과학실을 Lv.18까지 키워 볼까요?' },
     { id: 'sb3', ch: 7, sy: 3, t: 'semH', n: 3, r: 4, rk: 'dip', title: '3학년 1학기 방학식', how: '대도시 학교가 되면 졸업 탭에서 1학기 방학식을 열어요',
       say: '1학기 퀘스트를 다 했어요! 대도시 학교를 만들고 1학기 방학식을 열어요. 방학이 끝나면 2학기 퀘스트가 기다려요.' },   // 2.1.0 학기 나누기
     { id: 'e48', ch: 7, t: 'fac', k: 'cafeteria', n: 30, rm: 4, title: '체험학습 도시락', how: '급식실을 Lv.30까지 키워요',
-      say: '체험학습 날에는 급식실에서 도시락을 싸 줘요. 급식실을 Lv.18까지 키워 주세요.' },
+      say: '체험학습 날에는 급식실에서 도시락을 싸 줘요. 급식실을 Lv.30까지 키워 주세요.' },
     { id: 'e49', ch: 7, t: 'picks', n: 20, rm: 3, title: '도토리 20개 줍기', how: '참나무를 누르면 도토리가 떨어져요',
       say: '시냇가에서 돌아오는 길에 참나무 아래 도토리를 주워요. 20개를 주워 주세요!' },
     { id: 'sa2', ch: 7, t: 'acBook', n: 1, rm: 3, title: '문제집 한 권 풀기', how: '공부 탭의 과목 줄 오른쪽 문제집 단추를 눌러요. 숲의 정수 10개예요',
@@ -6447,7 +6461,7 @@ body.cam-scene #ffChip,body.cam-scene #plChip,body.cam-scene .b-ring{animation-p
     { id: 'bt2', ch: 8, t: 'btWins', n: 3, rm: 4, title: '숲속 대결 3번 이기기', how: '공부 탭의 숲속 대결에서 세 번 이겨요',   // 3.0.0 지섭: 동 리그(이긴 판 4판쯤)는 며칠 걸려서 낮춤
       say: '운동회 기운을 받아 숲속 대결에서도 이겨 봐요! 숲속 대결에서 세 번 이겨 주세요.' },
     { id: 'e26', ch: 8, t: 'fac', k: 'playground', n: 32, rm: 4, title: '운동장 Lv.32', how: '운동장을 Lv.32까지 넓혀요',
-      say: '이어달리기를 하려면 운동장이 더 넓어야 해요. 운동장을 Lv.24까지 넓혀요.' },
+      say: '이어달리기를 하려면 운동장이 더 넓어야 해요. 운동장을 Lv.32까지 넓혀요.' },
     { id: 'e27', ch: 8, t: 'trips', n: 3, rm: 4, title: '체험학습 세 번', how: '체험학습을 세 번 다녀와요',
       say: '운동회 연습 사이사이 체험학습도 다녀와요. 세 번 다녀와요. 많이 다녀올수록 더 먼 곳이 열려요.' },
     { id: 'sb4', ch: 8, sy: 4, t: 'semH', n: 4, r: 4, rk: 'dip', title: '4학년 1학기 방학식', how: '대도시 학교가 되면 졸업 탭에서 1학기 방학식을 열어요',
@@ -6470,11 +6484,11 @@ body.cam-scene #ffChip,body.cam-scene #plChip,body.cam-scene .b-ring{animation-p
       say: '종업식을 열 때마다 새 친구가 전학 왔지요? 4학년 종업식을 열면 여섯 번째 친구가 와요! 앞으로도 해마다 새 친구가 찾아올 거예요.' },
 
     { id: 'e30', ch: 9, t: 'fac', k: 'library', n: 36, rm: 4, title: '학예회 그림 전시', how: '도서관을 Lv.36까지 키워요',
-      say: '5학년은 학예회를 열어요! 도서관을 Lv.24까지 키워서 그림을 걸 자리를 만들어요.' },
+      say: '5학년은 학예회를 열어요! 도서관을 Lv.36까지 키워서 그림을 걸 자리를 만들어요.' },
     { id: 'e31', ch: 9, t: 'souv', n: 6, rm: 4, title: '기념품 6종 모으기', how: '체험학습에서 기념품을 가져와요',
       say: '학예회에 체험학습 기념품도 전시해요. 서로 다른 기념품을 6종 모아 볼까요?' },
     { id: 'e32', ch: 9, t: 'fac', k: 'cafeteria', n: 37, rm: 4, title: '학예회 잔치 급식', how: '급식실을 Lv.37까지 키워요',
-      say: '학예회 날엔 부모님도 오셔요. 급식실을 Lv.24까지 키워서 잔치 급식을 준비해요.' },
+      say: '학예회 날엔 부모님도 오셔요. 급식실을 Lv.37까지 키워서 잔치 급식을 준비해요.' },
     { id: 'e42', ch: 9, t: 'fest', k: 'show', n: 1, rm: 4, title: '학예회 열기', how: '학교 행사 > 학예회',
       say: '드디어 학예회 날이에요! 광장 무대에서 친구들이 공연하면 음표를 눌러 박수를 보내 줘요.' },
     { id: 'sb5', ch: 9, sy: 5, t: 'semH', n: 5, r: 5, rk: 'dip', title: '5학년 1학기 방학식', how: '대도시 학교가 되면 졸업 탭에서 1학기 방학식을 열어요',
@@ -6490,7 +6504,7 @@ body.cam-scene #ffChip,body.cam-scene #plChip,body.cam-scene .b-ring{animation-p
     { id: 'c2', ch: 9, t: 'deco', n: 3, rm: 4, title: '장식 3개 놓기', how: '상점 > 꾸미기 가게에서 장식을 사서 지도에 놓아요',
       say: '학예회에 손님이 와요. 학교를 장식 3개로 꾸며서 맞이해 봐요.' },
     { id: 'sa3', ch: 9, t: 'acMax', n: 13, rm: 4, title: '과목 하나 Lv.13', how: '공부 탭에서 날마다 공부하면 학력이 쌓여요. 초등학교 상한은 Lv.20이에요',
-      say: '학예회에서 우리 학교 학력을 뽐내요. 과목 하나를 Lv.15까지 올려 주세요. 문제집도 하루 두 권까지 살 수 있어요.' },
+      say: '학예회에서 우리 학교 학력을 뽐내요. 과목 하나를 Lv.13까지 올려 주세요. 문제집도 하루 두 권까지 살 수 있어요.' },
     { id: 'e33', ch: 9, t: 'ygrade', n: 4, rm: 5, title: '5학년 대도시 되기', how: '평판을 모아서 대도시가 되어요',
       say: '학예회가 대성공이에요! 5학년도 대도시 학교로 만들어요.' },
     { id: 'hw5', ch: 9, t: 'acSum', n: 60, rm: 4, title: '5학년 학기 숙제', how: '다섯 과목 레벨 합을 60까지 골고루 키워요',
@@ -6501,7 +6515,7 @@ body.cam-scene #ffChip,body.cam-scene #plChip,body.cam-scene .b-ring{animation-p
     { id: 'e15', ch: 10, t: 'students', n: 158, rm: 5, title: '학생 158명 맞이하기', how: '교실을 Lv.38까지 넓히고 학생을 158명까지 모집해요',
       say: '숲속 초등학교가 숲에서 제일 큰 학교가 되어 가요. 교실을 넓혀서 158명을 맞이해요.' },
     { id: 'e35', ch: 10, t: 'fac', k: 'science', n: 28, rm: 5, title: '졸업 과학 전시회', how: '과학실을 Lv.28까지 키워요',
-      say: '6학년은 졸업 전에 과학 전시회를 열어요. 과학실을 Lv.18까지 키워요.' },
+      say: '6학년은 졸업 전에 과학 전시회를 열어요. 과학실을 Lv.28까지 키워요.' },
     { id: 'e36', ch: 10, t: 'souv', n: 10, rm: 5, title: '기념품 10종 모으기', how: '체험학습에서 기념품을 가져와요',
       say: '졸업 앨범에 체험학습 추억을 담아요. 서로 다른 기념품을 10종 모아요.' },
     { id: 'e37', ch: 10, t: 'tripat', k: 'star', n: 1, rm: 6, title: '졸업 여행: 별빛 천문대', how: '체험학습에서 별빛 천문대를 골라요',
@@ -6558,9 +6572,9 @@ body.cam-scene #ffChip,body.cam-scene #plChip,body.cam-scene .b-ring{animation-p
     { id: 'sj1', ch: 12, sy: 1, yt: 2, t: 'semH', n: 1, r: 3, rk: 'dip', title: '중학교 1학년 1학기 방학식', how: '대도시 학교가 되면 졸업 탭에서 1학기 방학식을 열어요',
       say: '1학기 퀘스트를 다 했어요! 대도시 학교를 만들고 1학기 방학식을 열어요. 방학이 끝나면 2학기 퀘스트가 기다려요.' },   // 2.1.0 학기 나누기
     { id: 'j8', ch: 12, t: 'fac', k: 'science', n: 8, rm: 4, title: '과학실 키우기', how: '과학실을 Lv.8까지 키워요',
-      say: '과학부 친구들이 실험할 자리가 모자라요. 과학실을 Lv.3까지 키우면 과학부 친구들의 과학 능력치도 올라요.' },
+      say: '과학부 친구들이 실험할 자리가 모자라요. 과학실을 Lv.8까지 키우면 과학부 친구들의 과학 능력치도 올라요.' },
     { id: 'j9', ch: 12, t: 'fac', k: 'store', n: 12, rm: 4, title: '매점 넓히기', how: '매점을 Lv.12까지 키워요',
-      say: '매점 앞에 줄이 길어요! 매점을 Lv.5까지 키우면 수업료가 더 올라요.' },
+      say: '매점 앞에 줄이 길어요! 매점을 Lv.12까지 키우면 수업료가 더 올라요.' },
     { id: 'sn1', ch: 12, t: 'snDraw', n: 1, rm: 4, title: '간식 뽑기 한 번', how: '매점을 눌러 간식 뽑기를 해요. 도토리를 모으는 동안 다른 시설 추천을 쉬어요',
       say: '매점에 알록달록한 뽑기 기계가 들어왔어요! 간식을 뽑으면 학생들 기분이 좋아져서 그날 수업료가 조금 늘어요. 한 번 뽑아 볼까요?' },   // 2.1.2 매점 간식 뽑기
     { id: 'x7', ch: 12, t: 'xt', k: 'snack', n: 1, rm: 4, title: '매점 선생님 연수', how: '선생님 탭 > 알파카 선생님 연수',
@@ -6568,11 +6582,11 @@ body.cam-scene #ffChip,body.cam-scene #plChip,body.cam-scene .b-ring{animation-p
     { id: 'j10', ch: 12, t: 'students', n: 50, rm: 4, title: '학생 50명 맞이하기', how: '교실을 Lv.11까지 넓히고 학생을 50명까지 모집해요',
       say: '동아리 소문이 퍼져서 입학 문의가 많아요. 교실을 넓혀서 50명을 맞이해요.' },
     { id: 'j11', ch: 12, t: 'clubSum', n: 45, rm: 4, title: '동아리 보너스 45%', how: '능력치가 맞는 학생을 동아리에 넣어요',
-      say: '동아리 보너스는 부원의 능력치 별만큼 커져요. 동아리 다섯 곳의 보너스를 더해서 60%를 넘겨 봐요.' },
+      say: '동아리 보너스는 부원의 능력치 별만큼 커져요. 동아리 다섯 곳의 보너스를 더해서 45%를 넘겨 봐요.' },
     { id: 'j12', ch: 12, t: 'grade', n: 3, rm: 4, title: '중학교 도시 되기', how: '평판을 모아서 도시가 되어요',
       say: '중학교 둘레에 나무 아파트가 들어서요. 평판을 모아서 도시 학교가 되어 봐요.' },
     { id: 'j13', ch: 12, t: 'fac', k: 'cafeteria', n: 16, rm: 4, title: '급식실 Lv.16', how: '급식실을 Lv.16까지 키워요',
-      say: '중학생은 한창 자라서 급식을 두 번씩 먹어요. 급식실을 Lv.10까지 키워 주세요.' },
+      say: '중학생은 한창 자라서 급식을 두 번씩 먹어요. 급식실을 Lv.16까지 키워 주세요.' },
     { id: 'j14', ch: 12, t: 'grade', n: 4, r: 6, rk: 'dip', title: '중학교 대도시 되기', how: '대도시가 되면 1학기 방학식을 열어요',
       say: '중학교도 대도시 학교로 만들어 봐요! 그러면 1학기 방학식을 열 수 있어요.' },
     { id: 'hw7', ch: 12, t: 'btPlays', n: 8, rm: 4, title: '중학교 1학년 학기 숙제', how: '공부 탭의 숲속 대결을 모두 8판 해요(이기고 지는 것은 상관없어요)',   // 3.0.0 조정안 1: 승리 대신 누적 판 수
@@ -6583,7 +6597,7 @@ body.cam-scene #ffChip,body.cam-scene #plChip,body.cam-scene .b-ring{animation-p
     { id: 'j16', ch: 13, t: 'ygrade', n: 2, rm: 4, title: '2학년 소도시 되기', how: '명예 교장실 덕분에 2학년은 더 빨라요',
       say: '2학년이 되었어요! 명예 교장실을 다시 고치면 작년보다 빨리 자라요. 먼저 소도시 학교가 되어 볼까요?' },
     { id: 'j17', ch: 13, t: 'fac', k: 'playground', n: 22, rm: 4, title: '체육대회 운동장', how: '운동장을 Lv.22까지 넓혀요',
-      say: '숲속 체육대회를 열려면 운동장이 넓어야 해요. 운동장을 Lv.16까지 넓히면 운동부 친구들의 운동 능력치도 올라요.' },
+      say: '숲속 체육대회를 열려면 운동장이 넓어야 해요. 운동장을 Lv.22까지 넓히면 운동부 친구들의 운동 능력치도 올라요.' },
     { id: 'j18', ch: 13, t: 'sports', n: 2, rm: 4, title: '숲속 운동회 두 번', how: '학교 행사 > 숲속 운동회',
       say: '체육대회 예선전이에요! 숲속 운동회를 두 번 열어서 청팀을 응원해 줘요.' },
     { id: 'sn2', ch: 13, t: 'snDex', n: 10, rm: 4, title: '간식 도감 10종', how: '매점 간식 뽑기에서 간식 10종을 모아요. 도토리를 모으는 동안 다른 시설 추천을 쉬어요',
@@ -6606,17 +6620,17 @@ body.cam-scene #ffChip,body.cam-scene #plChip,body.cam-scene .b-ring{animation-p
     { id: 'j23', ch: 14, t: 'ygrade', n: 2, rm: 5, title: '3학년 소도시 되기', how: '평판을 모아서 소도시가 되어요',
       say: '중학교 3학년이 되었어요! 졸업 준비를 하려면 먼저 학교를 다시 키워야 해요. 소도시 학교가 되어 볼까요?' },
     { id: 'j24', ch: 14, t: 'fac', k: 'library', n: 26, rm: 5, title: '졸업 문집 만들기', how: '도서관을 Lv.26까지 키워요',
-      say: '3학년은 졸업 문집을 만들어요. 도서관을 Lv.15까지 키워서 문집을 꽂을 자리를 마련해요.' },
+      say: '3학년은 졸업 문집을 만들어요. 도서관을 Lv.26까지 키워서 문집을 꽂을 자리를 마련해요.' },
     { id: 'j25', ch: 14, t: 'clubShown', n: 2, rm: 5, title: '동아리 두 곳 발표회', how: '서로 다른 동아리 두 곳이 무대에 올라요',
       say: '졸업 전에 여러 동아리가 무대에 서 봐요. 지금까지 무대에 서지 않은 동아리를 골라 발표회를 열면 돼요. 서로 다른 두 곳이 서면 끝이에요.' },
     { id: 'sj3', ch: 14, sy: 3, yt: 2, t: 'semH', n: 3, r: 8, rk: 'dip', title: '중학교 3학년 1학기 방학식', how: '대도시 학교가 되면 졸업 탭에서 1학기 방학식을 열어요',
       say: '1학기 퀘스트를 다 했어요! 대도시 학교를 만들고 1학기 방학식을 열어요. 방학이 끝나면 2학기 퀘스트가 기다려요.' },   // 2.1.0 학기 나누기
     { id: 'sa5', ch: 14, t: 'acMax', n: 22, rm: 5, title: '과목 하나 Lv.22', how: '공부 탭에서 공부하고 문제집을 풀어요. 중학교 상한은 Lv.30이에요',
-      say: '고등학교에 가기 전에 학력을 다져요. 과목 하나를 Lv.25까지 올려 주세요.' },
+      say: '고등학교에 가기 전에 학력을 다져요. 과목 하나를 Lv.22까지 올려 주세요.' },
     { id: 'j26', ch: 14, t: 'fest', k: 'photo', n: 1, rm: 5, title: '졸업 사진 찍기', how: '학교 행사 > 졸업 사진 찍기',
       say: '중학교 졸업 앨범에 들어갈 단체 사진을 찍어요. 모두 활짝 웃게 웃음 별을 눌러 줘요!' },
     { id: 'j27', ch: 14, t: 'fac', k: 'store', n: 29, rm: 5, title: '졸업 잔치 매점', how: '매점을 Lv.29까지 키워요',
-      say: '졸업식 날 매점에서 간식 잔치를 열어요. 매점을 Lv.15까지 키워 주세요.' },
+      say: '졸업식 날 매점에서 간식 잔치를 열어요. 매점을 Lv.29까지 키워 주세요.' },
     { id: 'hw9', ch: 14, t: 'btPlays', n: 20, rm: 4, title: '중학교 3학년 학기 숙제', how: '공부 탭의 숲속 대결을 모두 20판 해요(이기고 지는 것은 상관없어요)',   // 3.0.0 조정안 1: 무지개 리그 대신 누적 판 수
       say: '2학기 숙제가 나왔어요! 숙제를 마쳐야 중학교 3학년을 마칠 수 있어요.' },   // 2.1.0 학기 숙제(속도와 경제 재설계안 2-2)
     { id: 'j28', ch: 14, ye: 3, yt: 2, t: 'ygrade', n: 4, r: 15, rk: 'dip', title: '3학년 대도시 되기', how: '평판을 모아서 대도시가 되어요',
@@ -8001,7 +8015,7 @@ body.cam-scene #ffChip,body.cam-scene #plChip,body.cam-scene .b-ring{animation-p
     if (!S || !$('#map')) return;
     for (const k of Object.keys(FAC)) { const g = $('#b-' + k); if (!g || !geo().lot[k]) continue; setBldArt(k); $('.site .bimg', g).setAttribute('href', IMG170(seasonKey(SITE_IMG[k]))); }
     const nx = $('#b-next'), G = geo(); if (nx && G.next) $('.bimg', nx).setAttribute('href', IMG170(seasonKey(G.next.img)));
-    const oak = $('.oak-img'); if (oak) oak.setAttribute('href', IMG170(oakKey()) || IMG('deco_autumn_1'));
+    layoutOak();
   }
   // 1.7.0 테마 지도: 배경 테마(봄, 여름, 가을, 겨울, 크리스마스)를 고르면 지도 그림도 그 계절 모습으로 바꿔요. 그림이 없는 테마는 기본 지도
   // 3.0.0 지섭 요청: 관리자만 쓰는 고급 지도와 건물(작업지시서 49, 열쇠 map_*_lux, bld_*_lux). 이 기기에만 켜요(저장에는 안 들어가요)
@@ -8011,8 +8025,99 @@ body.cam-scene #ffChip,body.cam-scene #plChip,body.cam-scene .b-ring{animation-p
   // 파일이 없거나 늦으면 게임 안 그림을 그대로 써요(곡 파일과 같은 방식)
   const IMG_BASE = () => window.FS_IMG_BASE || 'img/';
   // 3.3.0 지섭 제보(웹에 새 지도가 안 보임): 지도 파일 이름이 그대로라 웹이 7일 동안 저장해 둔 옛 지도를 썼어요. 지도 그림을 바꾼 판마다 MAPS_V를 올려요
-  const MAPS_V = '330';
+  const MAPS_V = '334';
   const mapUrl = key => IMG_BASE() + 'maps/' + key + '.webp?v=' + MAPS_V;
+  // 3.3.4 지섭: 지도마다 오른쪽 아래에 그려진 큰 참나무를 누르는 참나무로 써요(게임이 따로 올리던 참나무 그림 대신).
+  // 지도 열쇠 → 참나무 층(l)과 나무 지운 조각(p)의 자리 [x, y, 너비, 높이], 흔드는 중심(pv), 누르는 자리(tap [x, y, 반지름]), 도토리 맺히는 자리(nuts), 떨어지는 자리(drop). 모두 지도 좌표.
+  // 표는 dev/oak_pack.py가 작업지시서 54 그림에서 만들어요. 그림 파일(img/maps/oakl_*, oakp_*)이 없거나 못 받으면 예전 참나무 그림을 그대로 써요
+  const MAP_OAK = {
+    /*MAP_OAK_BEGIN*/
+    map_kinder: {l: [230.6, 302.1, 129.4, 116.4], p: [215.2, 286.6, 144.8, 147.3], pv: [316.8, 412.1], tap: [295.7, 360.3, 48], nuts: [[294.6, 348.5], [355.8, 373.8], [355.8, 327.4], [235.5, 367.5], [250.3, 338.0], [311.5, 373.8]], drop: [[273.5, 404.1], [280.5, 417.4], [292.9, 424.5], [310.4, 426.2], [331.2, 423.4], [341.7, 414.6], [343.8, 398.8], [284.1, 390.0]]},
+    map_elem: {l: [241.5, 303.2, 118.5, 114.3], p: [226.1, 287.7, 133.9, 145.2], pv: [317.5, 411.4], tap: [301.1, 360.3, 48], nuts: [[301.3, 349.2], [246.4, 372.4], [356.1, 372.4], [356.1, 328.1], [259.1, 345.0], [286.5, 372.4]], drop: [[272.5, 404.1], [279.5, 417.8], [291.8, 424.8], [309.4, 426.6], [330.1, 423.8], [340.7, 417.4], [348.0, 402.3], [283.0, 390.4]]},
+    map_middle: {l: [241.2, 300.7, 118.8, 120.9], p: [225.7, 285.2, 134.3, 151.9], pv: [324.1, 415.0], tap: [300.9, 361.1, 48], nuts: [[300.9, 348.2], [355.8, 373.5], [355.8, 327.1], [246.1, 369.3], [258.8, 343.9], [288.3, 373.5]], drop: [[279.5, 408.3], [286.5, 421.6], [298.8, 428.7], [316.4, 429.7], [336.8, 427.6], [348.0, 418.8], [349.8, 403.0], [290.0, 394.2]]},
+    map_high: {l: [264.0, 348.2, 96.0, 80.9], p: [248.6, 332.7, 111.4, 111.8], pv: [332.2, 423.4], tap: [312.4, 388.6, 48], nuts: [[311.1, 380.5], [355.4, 397.4], [353.3, 365.7], [271.1, 395.3], [323.8, 397.4], [283.7, 374.2]], drop: [[285.5, 417.8], [293.2, 430.8], [304.8, 438.2], [322.4, 439.9], [343.1, 437.1], [353.7, 428.3], [355.8, 412.5], [293.6, 406.5]]},
+    map_zone_academic: {l: [224.6, 235.0, 125.5, 88.6], p: [209.2, 219.5, 150.8, 119.5], pv: [285.8, 316.2], tap: [287.4, 279.3, 48], nuts: [[286.5, 271.2], [345.6, 285.9], [229.6, 279.6], [326.6, 258.5], [250.7, 256.4], [263.3, 288.0]], drop: [[235.9, 326.0], [246.1, 339.0], [266.1, 341.8], [292.5, 339.4], [311.8, 329.5], [327.7, 315.5], [319.6, 297.9], [234.1, 308.4]]},
+    map_zone_life: {l: [232.4, 270.8, 100.9, 87.2], p: [216.9, 255.4, 131.8, 118.1], pv: [283.7, 351.7], tap: [282.8, 314.4, 48], nuts: [[283.7, 306.7], [237.3, 321.4], [241.5, 289.8], [325.9, 323.6], [317.5, 302.5], [268.9, 323.6]], drop: [[228.5, 354.8], [243.6, 365.4], [267.5, 368.9], [292.1, 370.3], [312.2, 363.3], [335.0, 350.3], [327.7, 333.4], [246.1, 343.6]]},
+    map_zone_plaza: {l: [0.0, 239.5, 89.6, 72.4], p: [0.0, 224.1, 105.1, 103.4], pv: [42.9, 303.2], tap: [44.8, 275.7, 48], nuts: [[45.0, 268.0], [4.9, 282.8], [83.0, 282.8], [11.2, 259.6], [76.6, 261.7], [32.3, 282.8]], drop: [[11.2, 299.6], [18.6, 316.9], [34.8, 328.8], [54.8, 329.5], [73.1, 319.7], [83.7, 302.8], [77.0, 289.5], [16.5, 296.5]]},
+    map_zone_sports: {l: [1.8, 239.9, 99.8, 91.8], p: [0.0, 224.4, 117.1, 122.7], pv: [53.8, 325.0], tap: [51.7, 285.8, 48], nuts: [[51.0, 276.8], [6.7, 295.8], [91.1, 295.8], [21.4, 259.9], [84.7, 264.1], [40.4, 295.8]], drop: [[14.4, 329.9], [21.8, 340.4], [41.1, 347.8], [61.5, 350.6], [80.2, 342.5], [93.9, 325.3], [89.3, 308.8], [26.7, 314.4]]},
+    map_elem_autumn: {l: [238.4, 301.1, 121.6, 117.8], p: [222.9, 285.6, 137.1, 148.7], pv: [317.5, 411.4], tap: [299.5, 360.0, 48], nuts: [[298.1, 347.8], [355.1, 373.1], [245.4, 373.1], [355.1, 326.7], [310.8, 373.1], [258.0, 345.7]], drop: [[272.5, 404.1], [279.5, 417.8], [291.8, 424.8], [309.4, 426.6], [330.1, 423.8], [340.7, 417.4], [348.0, 402.3], [283.0, 390.4]]},
+    map_elem_lux: {l: [240.8, 303.2, 119.2, 115.0], p: [225.4, 287.7, 134.6, 145.9], pv: [317.5, 411.4], tap: [300.7, 360.7, 48], nuts: [[300.6, 349.2], [245.7, 372.4], [355.4, 330.2], [349.1, 372.4], [277.4, 328.1], [285.8, 372.4]], drop: [[272.5, 404.1], [279.5, 417.8], [291.8, 424.8], [309.4, 426.6], [330.1, 423.8], [340.7, 417.4], [348.0, 402.3], [283.0, 390.4]]},
+    map_elem_retro: {l: [240.5, 313.7, 119.5, 105.8], p: [225.0, 298.2, 135.0, 136.8], pv: [317.5, 411.4], tap: [300.6, 366.6, 48], nuts: [[300.2, 355.9], [245.4, 370.7], [350.9, 336.9], [342.4, 374.9], [264.4, 339.0], [281.2, 374.9]], drop: [[272.5, 404.1], [279.5, 417.8], [291.8, 424.8], [309.4, 426.6], [330.1, 423.8], [340.7, 417.4], [348.0, 402.3], [283.0, 390.4]]},
+    map_elem_space: {l: [239.4, 304.2, 120.6, 118.8], p: [223.9, 288.8, 136.1, 149.8], pv: [317.5, 411.4], tap: [300.1, 363.6, 48], nuts: [[299.2, 351.3], [246.4, 372.4], [356.1, 349.2], [326.6, 376.6], [326.6, 330.2], [259.1, 345.0]], drop: [[272.5, 404.1], [279.5, 417.8], [291.8, 424.8], [309.4, 426.6], [330.1, 423.8], [340.7, 417.4], [348.0, 402.3], [283.0, 390.4]]},
+    map_elem_spring: {l: [241.9, 303.9, 118.1, 114.3], p: [226.4, 288.4, 133.6, 145.2], pv: [317.5, 411.4], tap: [301.3, 361.0, 48], nuts: [[301.6, 349.9], [246.8, 373.1], [356.5, 328.8], [350.2, 373.1], [259.5, 345.7], [286.9, 373.1]], drop: [[272.5, 404.1], [279.5, 417.8], [291.8, 424.8], [309.4, 426.6], [330.1, 423.8], [340.7, 417.4], [348.0, 402.3], [283.0, 390.4]]},
+    map_elem_summer: {l: [234.1, 310.5, 125.9, 107.6], p: [218.7, 295.1, 141.3, 138.5], pv: [317.5, 411.4], tap: [297.4, 364.3, 48], nuts: [[296.0, 353.1], [355.1, 334.1], [239.1, 370.0], [338.2, 374.2], [270.7, 334.1], [283.4, 376.3]], drop: [[272.5, 404.1], [279.5, 417.8], [291.8, 424.8], [309.4, 426.6], [330.1, 423.8], [340.7, 417.4], [348.0, 402.3], [283.0, 390.4]]},
+    map_elem_winter: {l: [238.7, 303.9, 121.3, 116.7], p: [223.2, 288.4, 136.8, 147.7], pv: [317.5, 411.4], tap: [299.7, 362.2, 48], nuts: [[296.4, 350.6], [355.4, 333.8], [349.1, 373.8], [258.4, 371.7], [309.0, 373.8], [283.7, 329.5]], drop: [[272.5, 404.1], [279.5, 417.8], [291.8, 424.8], [309.4, 426.6], [330.1, 423.8], [340.7, 417.4], [348.0, 402.3], [283.0, 390.4]]},
+    map_elem_xmas: {l: [237.3, 304.9, 122.7, 115.0], p: [221.8, 289.5, 138.2, 145.9], pv: [317.5, 411.4], tap: [299.0, 362.4, 48], nuts: [[299.2, 351.0], [242.2, 374.2], [356.1, 329.9], [351.9, 372.1], [257.0, 348.9], [284.4, 374.2]], drop: [[272.5, 404.1], [279.5, 417.8], [291.8, 424.8], [309.4, 426.6], [330.1, 423.8], [340.7, 417.4], [348.0, 402.3], [283.0, 390.4]]},
+    map_high_autumn: {l: [261.6, 347.8, 98.4, 84.4], p: [246.1, 332.3, 113.9, 115.3], pv: [332.2, 423.4], tap: [311.1, 390.0, 48], nuts: [[310.8, 380.9], [266.5, 397.7], [353.0, 366.1], [348.8, 397.7], [281.2, 374.5], [298.1, 397.7]], drop: [[285.5, 417.8], [293.2, 430.8], [304.8, 438.2], [322.4, 439.9], [343.1, 437.1], [353.7, 428.3], [355.8, 412.5], [293.6, 406.5]]},
+    map_high_lux: {l: [263.3, 347.8, 96.7, 84.4], p: [247.9, 332.3, 112.1, 115.3], pv: [332.2, 423.4], tap: [312.0, 390.0, 48], nuts: [[312.5, 380.9], [268.2, 395.6], [356.8, 395.6], [354.7, 366.1], [280.9, 374.5], [299.9, 397.7]], drop: [[285.5, 417.8], [293.2, 430.8], [304.8, 438.2], [322.4, 439.9], [343.1, 437.1], [353.7, 428.3], [355.8, 412.5], [293.6, 406.5]]},
+    map_high_retro: {l: [263.7, 347.5, 96.3, 85.4], p: [248.2, 332.0, 111.8, 116.4], pv: [332.2, 423.4], tap: [312.2, 390.2, 48], nuts: [[310.8, 380.9], [353.0, 366.1], [350.9, 397.7], [268.6, 393.5], [302.3, 399.8], [281.2, 374.5]], drop: [[285.5, 417.8], [293.2, 430.8], [304.8, 438.2], [322.4, 439.9], [343.1, 437.1], [353.7, 428.3], [355.8, 412.5], [293.6, 406.5]]},
+    map_high_space: {l: [260.5, 345.0, 99.5, 86.8], p: [245.0, 329.5, 115.0, 117.8], pv: [332.2, 423.4], tap: [310.6, 388.4, 48], nuts: [[309.7, 378.8], [265.4, 395.6], [356.1, 366.1], [347.7, 397.7], [299.2, 397.7], [280.2, 374.5]], drop: [[285.5, 417.8], [293.2, 430.8], [304.8, 438.2], [322.4, 439.9], [343.1, 437.1], [353.7, 428.3], [355.8, 412.5], [293.6, 406.5]]},
+    map_high_spring: {l: [263.0, 347.1, 97.0, 82.6], p: [247.5, 331.6, 112.5, 113.6], pv: [332.2, 423.4], tap: [311.8, 388.4, 48], nuts: [[312.2, 379.8], [267.9, 396.7], [356.5, 396.7], [354.4, 365.0], [280.5, 375.6], [299.5, 396.7]], drop: [[285.5, 417.8], [293.2, 430.8], [304.8, 438.2], [322.4, 439.9], [343.1, 437.1], [353.7, 428.3], [355.8, 412.5], [293.6, 406.5]]},
+    map_high_summer: {l: [262.6, 347.1, 97.4, 84.0], p: [247.1, 331.6, 112.9, 115.0], pv: [332.2, 423.4], tap: [311.7, 389.1, 48], nuts: [[311.8, 380.2], [267.5, 397.0], [356.1, 397.0], [354.0, 365.4], [280.2, 375.9], [299.2, 397.0]], drop: [[285.5, 417.8], [293.2, 430.8], [304.8, 438.2], [322.4, 439.9], [343.1, 437.1], [353.7, 428.3], [355.8, 412.5], [293.6, 406.5]]},
+    map_high_winter: {l: [261.9, 346.8, 98.1, 84.0], p: [246.4, 331.3, 113.6, 115.0], pv: [332.2, 423.4], tap: [311.3, 388.8, 48], nuts: [[309.0, 379.8], [355.4, 367.1], [266.8, 392.5], [347.0, 396.7], [325.9, 365.0], [300.6, 396.7]], drop: [[285.5, 417.8], [293.2, 430.8], [304.8, 438.2], [322.4, 439.9], [343.1, 437.1], [353.7, 428.3], [355.8, 412.5], [293.6, 406.5]]},
+    map_high_xmas: {l: [261.6, 345.4, 98.4, 87.5], p: [246.1, 329.9, 113.9, 118.5], pv: [332.2, 423.4], tap: [311.1, 389.1, 48], nuts: [[310.8, 381.2], [355.1, 364.3], [355.1, 398.1], [266.5, 393.9], [281.2, 374.9], [323.4, 364.3]], drop: [[285.5, 417.8], [293.2, 430.8], [304.8, 438.2], [322.4, 439.9], [343.1, 437.1], [353.7, 428.3], [355.8, 412.5], [293.6, 406.5]]},
+    map_kinder_autumn: {l: [226.1, 302.5, 133.9, 114.3], p: [210.6, 287.0, 149.4, 145.2], pv: [316.8, 412.1], tap: [293.4, 359.6, 48], nuts: [[292.1, 348.5], [355.4, 371.7], [231.0, 367.5], [353.3, 329.5], [247.9, 340.1], [313.2, 371.7]], drop: [[273.5, 404.1], [280.5, 417.4], [292.9, 424.5], [310.4, 426.2], [331.2, 423.4], [341.7, 414.6], [343.8, 398.8], [284.1, 390.0]]},
+    map_kinder_lux: {l: [228.9, 302.5, 131.1, 115.7], p: [213.4, 287.0, 146.6, 146.6], pv: [316.8, 412.1], tap: [294.8, 360.3, 48], nuts: [[295.0, 348.9], [356.1, 372.1], [356.1, 327.8], [233.8, 367.9], [248.6, 338.3], [313.9, 372.1]], drop: [[273.5, 404.1], [280.5, 417.4], [292.9, 424.5], [310.4, 426.2], [331.2, 423.4], [341.7, 414.6], [343.8, 398.8], [284.1, 390.0]]},
+    map_kinder_retro: {l: [228.2, 301.8, 131.8, 116.4], p: [212.7, 286.3, 147.3, 147.3], pv: [316.8, 412.1], tap: [294.4, 360.0, 48], nuts: [[294.3, 348.2], [355.4, 369.3], [235.2, 369.3], [344.9, 327.1], [250.0, 339.7], [311.1, 373.5]], drop: [[273.5, 404.1], [280.5, 417.4], [292.9, 424.5], [310.4, 426.2], [331.2, 423.4], [341.7, 414.6], [343.8, 398.8], [284.1, 390.0]]},
+    map_kinder_space: {l: [229.9, 302.5, 130.1, 115.0], p: [214.5, 287.0, 145.5, 145.9], pv: [316.8, 412.1], tap: [295.3, 360.0, 48], nuts: [[293.9, 348.5], [355.1, 371.7], [355.1, 327.4], [234.8, 365.4], [249.6, 338.0], [312.9, 371.7]], drop: [[273.5, 404.1], [280.5, 417.4], [292.9, 424.5], [310.4, 426.2], [331.2, 423.4], [341.7, 414.6], [343.8, 398.8], [284.1, 390.0]]},
+    map_kinder_spring: {l: [229.6, 302.1, 130.4, 116.0], p: [214.1, 286.6, 145.9, 147.0], pv: [316.8, 412.1], tap: [295.1, 360.1, 48], nuts: [[295.7, 348.5], [352.6, 371.7], [234.5, 365.4], [354.7, 329.5], [251.4, 338.0], [312.5, 371.7]], drop: [[273.5, 404.1], [280.5, 417.4], [292.9, 424.5], [310.4, 426.2], [331.2, 423.4], [341.7, 414.6], [343.8, 398.8], [284.1, 390.0]]},
+    map_kinder_summer: {l: [229.9, 302.5, 130.1, 115.7], p: [214.5, 287.0, 145.5, 146.6], pv: [316.8, 412.1], tap: [295.3, 360.3, 48], nuts: [[293.9, 348.9], [355.1, 372.1], [355.1, 327.8], [234.8, 367.9], [249.6, 338.3], [312.9, 372.1]], drop: [[273.5, 404.1], [280.5, 417.4], [292.9, 424.5], [310.4, 426.2], [331.2, 423.4], [341.7, 414.6], [343.8, 398.8], [284.1, 390.0]]},
+    map_kinder_winter: {l: [229.2, 310.5, 130.8, 107.9], p: [213.8, 295.1, 146.2, 138.9], pv: [316.8, 412.1], tap: [294.9, 364.5, 48], nuts: [[295.3, 353.1], [356.5, 367.9], [236.2, 357.3], [343.8, 334.1], [316.4, 376.3], [270.0, 334.1]], drop: [[273.5, 404.1], [280.5, 417.4], [292.9, 424.5], [310.4, 426.2], [331.2, 423.4], [341.7, 414.6], [343.8, 398.8], [284.1, 390.0]]},
+    map_kinder_xmas: {l: [225.7, 299.6, 134.3, 122.3], p: [210.2, 284.2, 149.8, 153.3], pv: [316.8, 412.1], tap: [293.2, 360.8, 48], nuts: [[291.8, 349.6], [355.1, 374.9], [355.1, 330.6], [230.6, 366.4], [247.5, 336.9], [310.8, 374.9]], drop: [[273.5, 404.1], [280.5, 417.4], [292.9, 424.5], [310.4, 426.2], [331.2, 423.4], [341.7, 414.6], [343.8, 398.8], [284.1, 390.0]]},
+    map_middle_autumn: {l: [240.8, 301.1, 119.2, 120.2], p: [225.4, 285.6, 134.6, 151.2], pv: [324.1, 415.0], tap: [300.7, 361.1, 48], nuts: [[300.6, 348.5], [355.4, 373.8], [355.4, 327.4], [245.7, 369.6], [258.4, 344.3], [287.9, 373.8]], drop: [[279.5, 408.3], [286.5, 421.6], [298.8, 428.7], [316.4, 429.7], [336.8, 427.6], [348.0, 418.8], [349.8, 403.0], [290.0, 394.2]]},
+    map_middle_lux: {l: [240.8, 300.7, 119.2, 121.6], p: [225.4, 285.2, 134.6, 152.6], pv: [324.1, 415.0], tap: [300.7, 361.5, 48], nuts: [[300.6, 348.5], [355.4, 373.8], [355.4, 327.4], [245.7, 367.5], [287.9, 373.8], [262.6, 340.1]], drop: [[279.5, 408.3], [286.5, 421.6], [298.8, 428.7], [316.4, 429.7], [336.8, 427.6], [348.0, 418.8], [349.8, 403.0], [290.0, 394.2]]},
+    map_middle_retro: {l: [240.8, 301.8, 119.2, 120.6], p: [225.4, 286.3, 134.6, 151.5], pv: [324.1, 415.0], tap: [300.7, 362.1, 48], nuts: [[300.6, 349.2], [355.4, 370.3], [245.7, 368.2], [351.2, 334.5], [287.9, 374.5], [262.6, 340.8]], drop: [[279.5, 408.3], [286.5, 421.6], [298.8, 428.7], [316.4, 429.7], [336.8, 427.6], [348.0, 418.8], [349.8, 403.0], [290.0, 394.2]]},
+    map_middle_space: {l: [239.8, 302.1, 120.2, 121.6], p: [224.3, 286.6, 135.7, 152.6], pv: [324.1, 415.0], tap: [300.2, 362.9, 48], nuts: [[299.5, 349.9], [356.5, 373.1], [356.5, 328.8], [253.1, 375.2], [257.3, 343.6], [312.2, 375.2]], drop: [[279.5, 408.3], [286.5, 421.6], [298.8, 428.7], [316.4, 429.7], [336.8, 427.6], [348.0, 418.8], [349.8, 403.0], [290.0, 394.2]]},
+    map_middle_spring: {l: [239.1, 301.4, 120.9, 120.6], p: [223.6, 285.9, 136.4, 151.5], pv: [324.1, 415.0], tap: [299.9, 361.7, 48], nuts: [[298.8, 348.9], [355.8, 374.2], [355.8, 327.8], [248.2, 374.2], [256.6, 344.6], [311.5, 374.2]], drop: [[279.5, 408.3], [286.5, 421.6], [298.8, 428.7], [316.4, 429.7], [336.8, 427.6], [348.0, 418.8], [349.8, 403.0], [290.0, 394.2]]},
+    map_middle_summer: {l: [236.6, 301.4, 123.4, 120.9], p: [221.1, 285.9, 138.9, 151.9], pv: [324.1, 415.0], tap: [298.7, 361.8, 48], nuts: [[298.5, 348.9], [355.4, 374.2], [355.4, 327.8], [241.5, 370.0], [256.3, 344.6], [283.7, 374.2]], drop: [[279.5, 408.3], [286.5, 421.6], [298.8, 428.7], [316.4, 429.7], [336.8, 427.6], [348.0, 418.8], [349.8, 403.0], [290.0, 394.2]]},
+    map_middle_winter: {l: [241.5, 310.5, 118.5, 112.1], p: [226.1, 295.1, 133.9, 143.1], pv: [324.1, 415.0], tap: [301.1, 366.6, 48], nuts: [[301.3, 356.2], [356.1, 335.2], [354.0, 371.0], [250.7, 358.4], [273.9, 337.3], [278.1, 377.3]], drop: [[279.5, 408.3], [286.5, 421.6], [298.8, 428.7], [316.4, 429.7], [336.8, 427.6], [348.0, 418.8], [349.8, 403.0], [290.0, 394.2]]},
+    map_middle_xmas: {l: [236.2, 300.0, 123.8, 133.6], p: [220.8, 284.5, 139.2, 164.5], pv: [324.1, 415.0], tap: [298.5, 366.8, 48], nuts: [[298.1, 352.4], [355.1, 381.9], [355.1, 329.2], [243.3, 373.5], [306.6, 381.9], [253.8, 343.9]], drop: [[279.5, 408.3], [286.5, 421.6], [298.8, 428.7], [316.4, 429.7], [336.8, 427.6], [348.0, 418.8], [349.8, 403.0], [290.0, 394.2]]},
+    map_zone_academic_winter: {l: [223.9, 234.6, 125.9, 93.2], p: [208.5, 219.1, 151.5, 124.1], pv: [285.8, 316.2], tap: [286.9, 281.2, 48], nuts: [[285.8, 271.9], [344.9, 286.6], [228.9, 280.3], [328.0, 257.1], [252.1, 255.0], [306.9, 290.9]], drop: [[235.9, 326.0], [246.1, 339.0], [266.1, 341.8], [292.5, 339.4], [311.8, 329.5], [327.7, 315.5], [319.6, 297.9], [234.1, 308.4]]},
+    map_zone_life_winter: {l: [231.3, 269.4, 102.3, 86.5], p: [215.9, 253.9, 133.2, 117.4], pv: [283.7, 351.7], tap: [282.5, 312.7, 48], nuts: [[282.7, 303.2], [236.2, 322.1], [329.1, 317.9], [240.5, 288.4], [270.0, 322.1], [312.2, 296.8]], drop: [[228.5, 354.8], [243.6, 365.4], [267.5, 368.9], [292.1, 370.3], [312.2, 363.3], [335.0, 350.3], [327.7, 333.4], [246.1, 343.6]]},
+    map_zone_plaza_winter: {l: [0.7, 237.4, 89.3, 74.2], p: [0.0, 222.0, 105.5, 105.1], pv: [42.9, 303.2], tap: [45.4, 274.5, 48], nuts: [[45.7, 266.2], [7.7, 281.0], [83.7, 281.0], [12.0, 257.8], [75.2, 262.0], [35.2, 281.0]], drop: [[11.2, 299.6], [18.6, 316.9], [34.8, 328.8], [54.8, 329.5], [73.1, 319.7], [83.7, 302.8], [77.0, 289.5], [16.5, 296.5]]},
+    map_zone_sports_winter: {l: [1.4, 238.1, 100.5, 93.5], p: [0.0, 222.7, 117.4, 124.5], pv: [53.8, 325.0], tap: [51.7, 284.9, 48], nuts: [[50.6, 275.4], [6.3, 294.4], [97.0, 288.0], [84.4, 260.6], [12.7, 269.1], [65.4, 294.4]], drop: [[14.4, 329.9], [21.8, 340.4], [41.1, 347.8], [61.5, 350.6], [80.2, 342.5], [93.9, 325.3], [89.3, 308.8], [26.7, 314.4]]},
+    /*MAP_OAK_END*/
+  };
+  const oakArt = {};   // 지도 열쇠 → 'ok' | 'no' | 'wait'
+  const oakUrl = (kind, key) => IMG_BASE() + 'maps/oak' + kind + '_' + key.replace(/^map_/, '') + '.webp?v=' + MAPS_V;
+  function oakArtGet(key) {
+    if (!MAP_OAK[key] || oakArt[key]) return;
+    if (location.protocol === 'file:' && !window.FS_IMG_BASE) return;
+    oakArt[key] = 'wait';
+    let left = 2, bad = false;
+    const fin = () => { if (--left) return; oakArt[key] = bad ? 'no' : 'ok'; if (!bad && S && mapKey(geo().map) === key) layoutOak(); };
+    for (const kind of ['l', 'p']) { const im = new Image(); im.onload = fin; im.onerror = () => { bad = true; fin(); }; im.src = oakUrl(kind, key); }
+  }
+  // 지금 지도에서 지도 참나무를 쓸 수 있으면 그 표 줄, 아니면 null
+  const mapOak = () => { if (!S) return null; const k = mapKey(geo().map); return MAP_OAK[k] && oakArt[k] === 'ok' ? MAP_OAK[k] : null; };
+  // 참나무 가운데(안내 고리, 도토리가 날아오는 곳)
+  const oakAt = () => { const M = mapOak(); return M ? [M.tap[0], M.tap[1] + 8, M.tap[2]] : [geo().oak[0], geo().oak[1], 36]; };
+  function layoutOak() {
+    const G = geo(), M = mapOak(), g = $('#oak'), pt = $('#oakPatch'), img = $('.oak-img'), hit = $('.oak-hit'), cv = $('#oakCanopy'); if (!g) return;
+    oakArtGet(mapKey(G.map));
+    g.classList.toggle('mapoak', !!M);
+    let nuts;
+    if (M) {
+      const k = mapKey(G.map), [lx, ly, lw, lh] = M.l, [px, py, pw, ph] = M.p, [vx, vy] = M.pv;
+      setA(pt, { href: oakUrl('p', k), x: px, y: py, width: pw, height: ph }); pt.style.display = '';
+      g.setAttribute('transform', `translate(${vx} ${vy})`);
+      setA(img, { href: oakUrl('l', k), x: lx - vx, y: ly - vy, width: lw, height: lh });
+      setA(hit, { cx: M.tap[0] - vx, cy: M.tap[1] - vy, r: M.tap[2] });
+      cv.style.transformOrigin = `${((vx - lx) / lw * 100).toFixed(1)}% ${((vy - ly) / lh * 100).toFixed(1)}%`;
+      nuts = M.nuts.slice(0, 6).map(([x, y]) => [x - vx, y - vy]);
+    } else {
+      if (pt) { pt.removeAttribute('href'); pt.style.display = 'none'; }
+      const [ox, oy] = G.oak;
+      g.setAttribute('transform', `translate(${ox} ${oy})`);
+      setA(img, { href: IMG170(oakKey()) || IMG('deco_autumn_1'), x: -34, y: -41, width: 68, height: 65 });
+      setA(hit, { cx: 0, cy: -6, r: 34 });
+      cv.style.transformOrigin = '';
+      nuts = [[-16, -20], [12, -26], [-4, -8], [18, -10], [-20, -4], [4, -32]];
+    }
+    $('.oak-nuts').innerHTML = nuts.map(([x, y]) => `<image class="oak-nut" x="${(x - 5).toFixed(1)}" y="${(y - 5).toFixed(1)}" width="10" height="10" href="${IMG('ic_acorn')}"/>`).join('');
+    rt.oakN = -1;
+    if (S) renderOak();
+  }
   const mapHi = {};   // 열쇠 → 'ok' | 'no' | 'wait'
   function mapHiGet(key, done) {
     const st = mapHi[key], url = mapUrl(key);
@@ -8067,12 +8172,7 @@ body.cam-scene #ffChip,body.cam-scene #plChip,body.cam-scene .b-ring{animation-p
     $('.next-tag', nx).setAttribute('transform', `translate(${ncx.toFixed(1)} ${(ncy + nw * (G.nextTagY !== undefined ? G.nextTagY : 0.36)).toFixed(1)})`);   // 2.0.0 중학교는 간판 자리와 겹치지 않게 위로
     $('#pl-next').textContent = G.next.name; $('#pl-next2').textContent = G.next.tag;   // 2.3.0 이름표 두 줄
     nx.setAttribute('aria-label', `${G.next.name}, ${G.next.tag}`);
-    const [ox, oy] = G.oak;
-    $('#oak').setAttribute('transform', `translate(${ox} ${oy})`);
-    $('.oak-img').setAttribute('href', IMG170(oakKey()) || IMG('deco_autumn_1'));
-    const nuts = [[-16, -20], [12, -26], [-4, -8], [18, -10], [-20, -4], [4, -32]];
-    $('.oak-nuts').innerHTML = nuts.map(([x, y]) => `<image class="oak-nut" x="${x - 5}" y="${y - 5}" width="10" height="10" href="${IMG('ic_acorn')}"/>`).join('');
-    rt.oakN = -1;
+    layoutOak();   // 3.3.4 지도 참나무(없으면 예전 참나무 그림)
     const hh = G.tea.hedgehog, mh = $('#m-hedgehog');
     if (mh) mh.setAttribute('transform', `translate(${hh[0]} ${hh[1]}) scale(${hh[2]})`);
     [SPORTS.cx, SPORTS.cy, SPORTS.rx, SPORTS.ry] = G.sports;
@@ -8416,8 +8516,9 @@ body.cam-scene #ffChip,body.cam-scene #plChip,body.cam-scene .b-ring{animation-p
       const a = Math.random() * Math.PI * 2, r = Math.sqrt(Math.random());
       // 1.5.5: 숲속 운동회 동안에는 운동장 트랙 안 잔디에 떨어져요 (평소에는 광장)
       const [ox, oy] = geo().oak, [dcx, dcy, drx, dry] = rt.sports ? [SPORTS.cx, SPORTS.cy, SPORTS.rx * 0.55, SPORTS.ry * 0.5] : geo().drop;
-      const x = near ? ox + (ox < 180 ? 36 : -36) + Math.cos(a) * 26 * r : dcx + Math.cos(a) * drx * r;
-      const y = near ? oy + 18 + Math.sin(a) * 12 * r : dcy + Math.sin(a) * dry * r;
+      const MO = near && mapOak(), md = MO && MO.drop[Math.floor(Math.random() * MO.drop.length)];   // 3.3.4 지도 참나무는 정해 둔 풀밭 자리 둘레에 떨어져요
+      const x = md ? md[0] + Math.cos(a) * 7 * r : near ? ox + (ox < 180 ? 36 : -36) + Math.cos(a) * 26 * r : dcx + Math.cos(a) * drx * r;
+      const y = md ? md[1] + Math.sin(a) * 4 * r : near ? oy + 18 + Math.sin(a) * 12 * r : dcy + Math.sin(a) * dry * r;
       const d = rt.drops.reduce((m, o) => Math.min(m, Math.hypot(o.x - x, o.y - y)), 99);
       if (d > bestD) { bestD = d; best = [x, y]; }
       if (d >= 26) break;
@@ -8457,7 +8558,7 @@ body.cam-scene #ffChip,body.cam-scene #plChip,body.cam-scene .b-ring{animation-p
       return;
     }
     if (!rt.reduced && fall.animate) {
-      const dx = geo().oak[0] - x, dy = geo().oak[1] - 18 - y;
+      const oa = oakAt(), dx = oa[0] - x, dy = oa[1] - 18 - y;
       fall.animate([
         { transform: `translate(${dx}px, ${dy}px)` },
         { transform: `translate(${dx * 0.45}px, ${Math.min(dy * 0.45, -18)}px)`, offset: 0.45 },
@@ -8950,6 +9051,7 @@ body.cam-scene #ffChip,body.cam-scene #plChip,body.cam-scene .b-ring{animation-p
   function hudVars() {
     const app = $('#app'), fr = $('.frame');
     if (!app || !fr || rt.tab !== 'school') return;
+    chipRow();   // 3.3.4
     const f = fr.getBoundingClientRect(), b = $('.board').getBoundingClientRect(), q = $('#qRow').getBoundingClientRect(), sb = $('#subBar'), qc = $('#qCard');
     const left = Math.max(q.bottom, sb && !sb.hidden ? sb.getBoundingClientRect().bottom : 0, qc ? qc.getBoundingClientRect().bottom : 0) - f.top;
     // 홈 UI 정리: 오른쪽 메뉴 레일이 가리는 폭. 행사 아이템과 떨어진 도토리가 레일 밑에 나오지 않게 visMap()에서 빼요
@@ -10781,7 +10883,20 @@ body.cam-scene #ffChip,body.cam-scene #plChip,body.cam-scene .b-ring{animation-p
       `<rect class="vd-hit" data-vd="1" x="${x - hw / 2}" y="${(y - hw * 0.85).toFixed(1)}" width="${hw}" height="${(hw * 0.85 + 13).toFixed(1)}"/>`;
   }
   // 2.2.0 칩이 두세 줄이 되면 위의 '새 편지' 칩을 그만큼 올려요
-  function ffUp(c) { const h = c && !c.hidden ? c.offsetHeight + 6 : 0; if (c && c.parentElement) c.parentElement.style.setProperty('--ff-up', Math.max(46, h) + 'px'); }
+  // 3.3.4 아래 한 줄 칩: 오른쪽부터 까치 핫딜, 새 편지, 즉시 완공 순서로 놓아요. 학교급 단추에 닿으면 한 줄 위로
+  function chipRow() {
+    const fr = $('#ffChip') && $('#ffChip').parentElement; if (!fr) return;
+    const dots = $('#tierDots'), W = fr.clientWidth, lim = dots && !dots.hidden && dots.offsetWidth ? dots.offsetLeft + dots.offsetWidth + 8 : 10;
+    let r = 10, row = 0;
+    for (const el of [$('#btnDeal'), $('#plChip'), $('#ffChip')]) {
+      if (!el || el.hidden || !el.offsetWidth) continue;
+      const w = el.offsetWidth;
+      if (r > 10 && W - r - w < lim) { row += 1; r = 10; }
+      el.style.right = r + 'px'; el.style.bottom = `calc(var(--bot-h, 70px) + ${10 + row * 35}px)`;
+      r += w + 6;
+    }
+  }
+  function ffUp() { chipRow(); }
   function ffRender(force) {
     if (!S) return;
     const ks = facKeys().filter(ffCan), on = cbOn(), nb = nbOn(), nbShow = S.tier >= NB.tier && !liveOff('night');
@@ -10796,8 +10911,10 @@ body.cam-scene #ffChip,body.cam-scene #plChip,body.cam-scene .b-ring{animation-p
     const sp = nbAdd() > NB.add, nbTx = !nbShow ? '' : nb ? `${nbAllDay(gameToday()) ? '주말 건설 가속' : '야간 건설'} +${nbAdd()}%, ${hm(nbLeft())} 남음` : sp ? (nbAllDay(gameToday()) ? `오늘 하루 종일 건설 가속 +${nbAdd()}%(특별 이벤트 주말)` : `오늘 ${NB.h0}~${NB.h1}시 건설 가속 +${nbAdd()}%(특별 이벤트)`) : `매일 ${NB.h0}~${NB.h1}시 건설 가속 이벤트`;
     c.classList.toggle('nb-on', nb && nbShow);
     const mp = $('#map'); if (mp) mp.classList.toggle('nb-night', nb);   // 2.2.0 비계에 등불
-    c.innerHTML = (ks.length ? `<b>오늘 즉시 완공 ${ffLeft()}/${FF.day}</b>` : '') + (on ? `<small>건설 부스터 +100%, ${hm(cbLeft())} 남음</small>` : '') +
-      (nbShow ? `<small class="nb">${nbIc} ${nbTx}</small>` : '') + '<span class="ffx" role="button" aria-label="오늘은 이 알림 닫기">×</span>';
+    // 3.3.4 작은 알약: ⚡남은 번, 건설 부스터, 야간 건설 아이콘(켜져 있을 때만 +n%). 자세한 말은 누르면 떠요
+    c.innerHTML = (ks.length ? `<b>⚡${ffLeft()}/${FF.day}</b>` : '') + (on ? `<small>🔨+100%</small>` : '') +
+      (nbShow ? `<small class="nb">${nbIc}${nb || sp ? ` +${nbAdd()}%` : ''}</small>` : '') + '<span class="ffx" role="button" aria-label="오늘은 이 알림 닫기">×</span>';
+    c.dataset.tip = [ks.length ? `오늘 즉시 완공 ${ffLeft()}/${FF.day}` : '', on ? `건설 부스터 +100%, ${hm(cbLeft())} 남음` : '', nbShow ? nbTx : ''].filter(Boolean).join(' / ');
     c.setAttribute('aria-label', (ks.length ? `오늘 즉시 완공 ${FF.day}번 가운데 ${ffLeft()}번 남음, 눌러서 건물 창 열기` : '') + (on ? ` 건설 부스터 사용 중` : '') + (nbShow ? ` ${nbTx}` : ''));
     ffUp(c);
   }
@@ -11423,7 +11540,7 @@ body.cam-scene #ffChip,body.cam-scene #plChip,body.cam-scene .b-ring{animation-p
     rt.deal = d;
     rt.dealT = rand(DEAL.gap[0], DEAL.gap[1]);
     dexMeet('g_magpie');   // 1.7.0 도감 특별 손님
-    if (!S.hd.seen) { S.hd.seen = true; toast('까치가 반가운 소식을 물어 왔어요! 지도 오른쪽 아래를 눌러 보세요'); save(); }
+    if (!S.hd.seen) { S.hd.seen = true; toast('까치가 반가운 소식을 물어 왔어요! 지도 오른쪽 아래 까치를 눌러 보세요'); save(); }
     sfx('magpie');
     renderDeal();
     return true;
@@ -11436,7 +11553,7 @@ body.cam-scene #ffChip,body.cam-scene #plChip,body.cam-scene .b-ring{animation-p
   const clock = sec => `${Math.floor(sec / 60)}:${String(sec % 60).padStart(2, '0')}`;
   function renderDeal() {
     const b = $('#btnDeal'), d = rt.deal;
-    setHid(b, !d);   // 3.2.6 바뀐 때만
+    if (b.hidden !== !d) { setHid(b, !d); chipRow(); }   // 3.2.6 바뀐 때만, 3.3.4 아래 줄 맞추기
     if (d) {
       const t = clock(Math.max(0, Math.ceil((d.exp - Date.now()) / 1000)));
       if (b.dataset.t !== t) { b.dataset.t = t; $('#dealTime').textContent = t; b.setAttribute('aria-label', `까치 핫딜, ${t} 남았어요`); }
@@ -11542,13 +11659,16 @@ body.cam-scene #ffChip,body.cam-scene #plChip,body.cam-scene .b-ring{animation-p
        forest/rank/<내 id>   랭킹 이름과 학교 점수
        forest/stats/<내 id>  테스트 현황 (어디까지 했는지, 얼마나 했는지)
      <내 id>는 Firebase 익명 로그인이 기기(브라우저)마다 만들어 줘요. */
-  const VERSION = '3.3.2';
-  const NT_QUIET = ['2.1.20', '2.1.2.2', '2.3.0.1', '2.3.4', '3.2.3', '3.2.4', '3.2.5', '3.3.1', '3.3.2'];   // 3.3.1, 3.3.2도 공지 창 없이(지섭). 2.3.0.1도 공지 창 없이(공지는 그대로 2.3.0). 2.3.4도 조용히(지섭 결정). 3.2.3, 3.2.4, 3.2.5도 공지 창 없이(공지 줄을 고르지 않음)
+  const VERSION = '3.3.4';
+  const NT_QUIET = ['2.1.20', '2.1.2.2', '2.3.0.1', '2.3.4', '3.2.3', '3.2.4', '3.2.5', '3.3.1', '3.3.2', '3.3.3'];   // 3.3.1, 3.3.2, 3.3.3(토스 먼저)도 공지 창 없이(지섭). 2.3.0.1도 공지 창 없이(공지는 그대로 2.3.0). 2.3.4도 조용히(지섭 결정). 3.2.3, 3.2.4, 3.2.5도 공지 창 없이(공지 줄을 고르지 않음)
     // 2.1.20 지섭 결정: 이 버전들은 업데이트해도 공지 창을 띄우지 않아요(공지는 그대로 2.1.2)
   /* 2.0.0 공지사항 (2026-10-27 지섭, 1.8.0은 이미 올려서 2.0.0부터): 설정 > 공지사항. 맨 위가 가장 새 공지예요.
      패치노트는 자동으로 넣지 않아요. 지섭이 검수한 글만 여기에 적어요(CHANGELOG.md는 자세한 기록용이라 따로 있어요).
      접속하면 새 공지 창을 띄워요(올라온 뒤 7일 동안, '일주일간 열지 않기'를 누르면 7일 쉬어요). 업데이트한 뒤 첫 접속에는 쉬는 중이어도 한 번 띄워요 */
   const NOTICES = [
+    // 3.3.4 공지(2026-11-10 지섭이 고른 한 줄)
+    { id: '2026-11-10-v334', date: '2026-11-10', tag: '업데이트', title: '3.3.4 업데이트',
+      lines: ['지도 참나무 새 단장과 편의 개선'] },
     // 3.3.0 공지(2026-11-09 지섭이 고른 B안 두 줄)
     { id: '2026-11-09-v330', date: '2026-11-09', tag: '업데이트', title: '3.3.0 업데이트',
       lines: ['학교 건물, 지도, 졸업식 새 단장', '편의 개선과 오류 수정'] },
@@ -15536,7 +15656,8 @@ body.cam-scene #ffChip,body.cam-scene #plChip,body.cam-scene .b-ring{animation-p
       const R = lotRect(G.lot[k], im), [cx, cy, w] = R;
       items.push({ y: cy, s: `<image href="${u}" x="${(cx - w / 2).toFixed(1)}" y="${(cy - w / 2).toFixed(1)}" width="${w.toFixed(1)}" height="${w.toFixed(1)}"${xfAt(R)}/>` });
     }
-    if (G.oak) { const [ox, oy] = G.oak, u = IMG170(oakKey()); if (u) items.push({ y: oy + 20, s: `<image href="${u}" x="${ox - 34}" y="${oy - 41}" width="68" height="65"/>` }); }
+    // 3.3.4 지도에 그려진 참나무를 쓰는 지도는 참나무 그림을 덧그리지 않아요
+    if (G.oak && !MAP_OAK[mapKey(G.map)]) { const [ox, oy] = G.oak, u = IMG170(oakKey()); if (u) items.push({ y: oy + 20, s: `<image href="${u}" x="${ox - 34}" y="${oy - 41}" width="68" height="65"/>` }); }
     items.sort((a, b) => a.y - b.y);
     return `<svg class="m" viewBox="58 70 244 270" preserveAspectRatio="xMidYMid slice" aria-hidden="true"><image x="0" y="-60" width="360" height="540" preserveAspectRatio="none" href="${mapU}"/>${items.map(o => o.s).join('')}</svg>`;
   }
@@ -17110,7 +17231,7 @@ body.cam-scene #ffChip,body.cam-scene #plChip,body.cam-scene .b-ring{animation-p
       tags.push((built && x.f[k] > 1 && !x.all ? `<g class="tv-lv" transform="translate(${cx.toFixed(1)} ${(cy + w * 0.36).toFixed(1)})"><rect x="-30" y="-9" width="60" height="18" rx="9"/><text y="4" text-anchor="middle">${k === 'playground' ? (t >= 1 ? '운동장' : '놀이터') : FAC[k].name} Lv.${x.f[k]}</text></g>` : ''));   // 3.3.0 이름표는 장식과 학생 위에
     }
     { const R = lotRect(G.nextLot, G.nextKey), [ncx, ncy, nw] = R; items.push({ y: ncy, s: `<image href="${IMG170(seasonKey(G.next.img))}" x="${(ncx - nw / 2).toFixed(1)}" y="${(ncy - nw / 2).toFixed(1)}" width="${nw.toFixed(1)}" height="${nw.toFixed(1)}" opacity=".85"${xfAt(R)}/>` }); }
-    { const [ox, oy] = G.oak; items.push({ y: oy + 20, s: `<image href="${IMG170(oakKey()) || IMG('deco_autumn_1')}" x="${ox - 34}" y="${oy - 41}" width="68" height="65"/>` }); }
+    if (!MAP_OAK[mk]) { const [ox, oy] = G.oak; items.push({ y: oy + 20, s: `<image href="${IMG170(oakKey()) || IMG('deco_autumn_1')}" x="${ox - 34}" y="${oy - 41}" width="68" height="65"/>` }); }
     // 장식과 간판
     const [sx, sy] = DECO_SIGN[gi], sw = 84, sh = 42, nm = schNm || '숲속', tn = TIER_ALL[t];
     if (IMG('sign_board')) items.push({ y: sy, s: `<g class="deco-sign"><image x="${sx - sw / 2}" y="${sy - sh * 0.97}" width="${sw}" height="${sh}" href="${IMG('sign_board')}"/>` +
@@ -18588,7 +18709,7 @@ body.cam-scene #ffChip,body.cam-scene #plChip,body.cam-scene .b-ring{animation-p
      학생들이 행사 모양으로 모이고(둥글게, 관객석, 두 줄), 지도에 나타나는 것(쪽지, 풍선, 음표, 웃음 별)을 시간 안에 목표만큼 누르면 성공이에요 */
   const FEST = {
     picnic: { name: '봄 소풍 보물찾기', tg: 0, sec: 30, goal: 12, form: 'free', item: 'paper', how: 'pop',
-      lead: '뒷산으로 봄 소풍을 가요! 나무 사이에 숨은 보물 쪽지를 30초 안에 12장 찾으면 성공이에요.', win: '보물 쪽지를 다 찾았어요!', unit: '장' },
+      lead: '뒷산으로 봄 소풍을 가요! 화면 곳곳에 숨은 보물 쪽지를 30초 안에 12장 눌러 찾으면 성공이에요.', win: '보물 쪽지를 다 찾았어요!', unit: '장' },
     welcome: { name: '새 친구 환영회', tg: 1, sec: 30, goal: 15, form: 'ring', item: 'balloon', how: 'rise',
       lead: '광장에 둥글게 모여 새 친구를 환영해요. 하늘로 날아오르는 풍선을 눌러 터뜨려요. 30초 안에 15개면 성공!', win: '풍선이 펑펑! 새 친구들이 활짝 웃어요.', unit: '개' },
     sports: { name: '숲속 운동회', tg: 3, sec: SPORTS.sec, sports: true,
@@ -18833,7 +18954,7 @@ body.cam-scene #ffChip,body.cam-scene #plChip,body.cam-scene .b-ring{animation-p
     if (!R) return;
     const F = FEST[R.id];
     renderFestBar();
-    if (feverIntro(R, dt, F.name, F.item === 'meteor' ? '떨어지는 별똥별을 눌러요' : F.item === 'lantern' ? '떠오르는 등불을 눌러요' : F.item === 'firefly' ? '깜빡이는 반딧불을 눌러요' : F.item === 'paper' ? '나무 사이에 나타나는 쪽지를 눌러요' : F.item === 'balloon' ? '날아오르는 풍선을 눌러요' : F.item === 'note' ? '떠오르는 음표를 눌러요' : '반짝이는 웃음 별을 눌러요')) return;
+    if (feverIntro(R, dt, F.name, F.item === 'meteor' ? '떨어지는 별똥별을 눌러요' : F.item === 'lantern' ? '떠오르는 등불을 눌러요' : F.item === 'firefly' ? '깜빡이는 반딧불을 눌러요' : F.item === 'paper' ? '곳곳에 반짝이는 쪽지를 눌러요' : F.item === 'balloon' ? '날아오르는 풍선을 눌러요' : F.item === 'note' ? '떠오르는 음표를 눌러요' : '반짝이는 웃음 별을 눌러요')) return;
     if (R.ending) return;
     R.t -= dt; R.spawn -= dt;
     if (R.spawn <= 0) { R.spawn = F.sec / (F.goal * 2); if (R.items.filter(i => !i.dead).length < 7) festSpawn(F); }
@@ -19764,11 +19885,13 @@ body.cam-scene #ffChip,body.cam-scene #plChip,body.cam-scene .b-ring{animation-p
       hall += win(d, 11.4 - d, `<g class="c3-pop" style="animation-delay:${d}s"><g class="c3-stat"><rect x="${x}" y="${y}" width="144" height="48" rx="14"/><text x="${x + 72}" y="${y + 18}" class="s">${a}</text><text x="${x + 72}" y="${y + 39}">${b}</text></g></g>`); });
     // 2 입장과 4 졸업장: 졸업생
     let kids = '';
+    // 3.3.3 지섭: 의자 위에 서 보이지 않게 가운데 통로에 2열 종대로(뒤 줄부터 그려서 앞 줄이 위에 겹쳐요)
     crew.forEach((sp, i) => {
-      const x = 180 + (i - (n - 1) / 2) * (n > 4 ? 52 : 58), aw = i < 3, ad = 11.6 + i * 1.5, nmK = I.nm[sp] || '';
-      const award = aw ? `style="--ax:${(132 - x).toFixed(1)}px;--ay:${(fy + 14 - rowY).toFixed(1)}px;animation-delay:${ad}s" class="c3-award"` : '';
-      kids += `<g transform="translate(${x.toFixed(1)} ${rowY})"><g class="c3-walk" style="--fx:${(180 - x).toFixed(1)}px;--fy:330px;animation-delay:${(3.8 + i * 0.35).toFixed(2)}s"><g ${award}>` +
-        `<g transform="scale(${sc})">${kidSVG(sp, i, { hat: '', neck: '' })}${prop(pi, aw ? ad + 0.75 : 15.6)}</g>` +
+      const r = i >> 1, solo = i === n - 1 && i % 2 === 0, x = 180 + (solo ? 0 : (i % 2 ? 1 : -1) * (21 + r * 4)), y = rowY + r * 54, ks = sc * (1 + r * 0.07);
+      const aw = i < 3, ad = 11.6 + i * 1.5, nmK = I.nm[sp] || '';
+      const award = aw ? `style="--ax:${(132 - x).toFixed(1)}px;--ay:${(fy + 14 - y).toFixed(1)}px;animation-delay:${ad}s" class="c3-award"` : '';
+      kids += `<g transform="translate(${x.toFixed(1)} ${y})"><g class="c3-walk" style="--fx:${(180 - x).toFixed(1)}px;--fy:${330 - r * 54}px;animation-delay:${(3.8 + i * 0.35).toFixed(2)}s"><g ${award}>` +
+        `<g transform="scale(${ks.toFixed(3)})">${kidSVG(sp, i, { hat: '', neck: '' })}${prop(pi, aw ? ad + 0.75 : 15.6)}</g>` +
         (nmK ? `<g class="c3-in c3-tag" style="animation-delay:${(5.4 + i * 0.35).toFixed(2)}s"><rect x="-24" y="-52" width="48" height="15" rx="7.5"/><text x="0" y="-41.5">${esc(nmK)}</text></g>` : '') + '</g></g></g>';
       if (aw) kids += win(ad + 0.35, 1.1, `<g class="c3-pop" style="animation-delay:${(ad + 0.35).toFixed(2)}s">${im('diploma', 112, fy - 44, 34, 34)}</g>`);
     });
@@ -19845,6 +19968,7 @@ body.cam-scene #ffChip,body.cam-scene #plChip,body.cam-scene .b-ring{animation-p
     closeModal($('#mCere'));
     rt.cereToasts.splice(0).forEach((t, i) => setTimeout(() => toast(t), 450 + i * 2400));   // 미뤄 둔 알림을 차례로
   }
+  function goRep(msg) { const b = bestPick('rep'); return b.f ? goFac(b.f, msg) : goTeacher(b.t, '연수를 보내면 평판이 ★2 올라요'); }   // 3.3.3 평판 추천
   function goGrad(where) {
     setTab('grad');
     const el = where === 'perks' ? $('#perkHead') : where === 'tier' ? $('#tierCard') : where === 'fund' ? $('#fundHead') : null;
@@ -20398,7 +20522,7 @@ body.cam-scene #ffChip,body.cam-scene #plChip,body.cam-scene .b-ring{animation-p
     const g = $('#guide');
     if (!t) { g.innerHTML = ''; return; }
     // 도토리 줍기는 참나무를 가리켜요
-    if (t === 'picks') { const [ox, oy] = geo().oak; g.innerHTML = `<g class="g-ring"><circle cx="${ox}" cy="${oy - 8}" r="36"/></g><g transform="translate(${ox} ${oy - 46})"><g class="g-arrow"><path d="M0 0 L-9 -11 L-4 -11 L-4 -23 L4 -23 L4 -11 L9 -11 Z"/></g></g>`; return; }
+    if (t === 'picks') { const [ox, oy, orr] = oakAt(); g.innerHTML = `<g class="g-ring"><circle cx="${ox}" cy="${oy - 8}" r="${orr}"/></g><g transform="translate(${ox} ${oy - 10 - orr})"><g class="g-arrow"><path d="M0 0 L-9 -11 L-4 -11 L-4 -23 L4 -23 L4 -11 L9 -11 Z"/></g></g>`; return; }
     const fr = $('#b-' + t + ' .focus-ring');
     const ring = `<rect x="${fr.getAttribute('x')}" y="${fr.getAttribute('y')}" width="${fr.getAttribute('width')}" height="${fr.getAttribute('height')}" rx="16"/>`;
     // 화살표는 건물 위에서 아래로 가리켜요. 지도 맨 위 건물은 이름표 아래에서 위로 가리켜요
@@ -20494,7 +20618,7 @@ body.cam-scene #ffChip,body.cam-scene #plChip,body.cam-scene .b-ring{animation-p
       case 'picks':
         if (S.f.playground < 1) return goFac('playground', `${eul(FAC.playground.name)} 먼저 지어야 해요`);
         setTab('school'); return toast(`참나무를 누르면 도토리가 떨어져요. ${FAC.playground.name}에 떨어진 도토리를 눌러서 주워요`);
-      case 'grade': case 'ygrade': { const b = bestPick('rep'); return b.f ? goFac(b.f, '지금 평판을 올리기 좋은 곳이에요') : goTeacher(b.t, '연수를 보내면 평판이 ★2 올라요'); }
+      case 'grade': case 'ygrade': return goRep('지금 평판을 올리기 좋은 곳이에요');
       case 'rate': { const b = bestPick('rate'); return b.f ? goFac(b.f, '지금 수업료를 올리기 좋은 곳이에요') : goTeacher(b.t, '다람쥐 선생님이 수업료를 올려 줘요'); }
       case 'ups': return goFac(bestPick('ups').f, '지금 가장 싸게 고칠 수 있는 시설이에요');
       case 'trains': {
@@ -20503,9 +20627,10 @@ body.cam-scene #ffChip,body.cam-scene #plChip,body.cam-scene .b-ring{animation-p
       }
       case 'claims': setTab('school'); return toast('오른쪽 위 X로 학교 문을 닫고 30초 뒤에 다시 열어 보세요');
       case 'earned': setTab('school'); return toast(`수업료와 ${FAC.playground.name} 도토리가 쌓이면 채워져요`);
-      case 'grads': case 'tgrads': case 'semH': return goGrad();
+      // 3.3.3 지섭: 아직 대도시가 아니면 평판 올릴 곳으로, 대도시가 되어 열 수 있으면 졸업 탭으로
+      case 'grads': case 'tgrads': case 'semH': return canGraduate() || S.grade >= GRAD_MIN ? goGrad() : goRep(`대도시가 되어야 ${semFirst() ? '방학식' : '종업식'}을 열 수 있어요. 지금 평판을 올리기 좋은 곳이에요`);
       case 'perks': return goGrad('perks');
-      case 'tier': return goGrad('tier');
+      case 'tier': return canPromote() || S.grade >= GRAD_MIN ? goGrad('tier') : goRep('대도시가 되어야 졸업식을 열 수 있어요. 지금 평판을 올리기 좋은 곳이에요');
       case 'fperks': case 'fpUp': return goGrad('fund');
       case 'trips': case 'souv': case 'tripat': return openTrip();
       case 'sports': case 'fest': return openFest();
@@ -21274,7 +21399,7 @@ body.cam-scene #ffChip,body.cam-scene #plChip,body.cam-scene .b-ring{animation-p
     // 3.2.3 끊김 줄이기: 공사를 처음 시작할 때 비계, 막대, 비버 그림을 푸느라 한 번 멈추지 않게 켜고 조금 뒤 미리 풀어 둬요
     setTimeout(() => { for (const u of [IMG180('fx_scaffold'), IMG('timer_bar'), IMG('fx_lantern'), FSI('fix_beaver_1'), FSI('fix_beaver_2'), FSI('fix_beaver_3')]) if (u) { const im = new Image(); im.src = u; if (im.decode) im.decode().catch(() => {}); } }, 3000);
     for (const k of Object.keys(FAC)) { const p = document.getElementById('pq-' + k); if (p && !p.querySelector('.ffb')) p.insertAdjacentHTML('beforeend', '<g class="ffb" transform="translate(-38 -20)"><rect x="0" y="-6.5" width="76" height="13" rx="6.5"/><text x="38" y="3" text-anchor="middle">즉시 완공 가능!</text></g>'); }   // 2.1.1
-    $('#ffChip').addEventListener('click', e => { if (e.target.closest('.ffx')) { S.ffx = gameToday(); sfx('tap'); ffRender(true); save(); toast('오늘은 이 알림을 닫았어요. 내일 다시 보여요'); return; } const k = facKeys().find(ffCan); if (k) { sfx('tap'); openSheet(k); } else toast(conAdd() > 0 ? `지금 모든 공사 +${conAdd()}%예요${cbOn() ? `. 건설 부스터 ${hm(cbLeft())} 남았어요` : ''}${nbOn() ? `. 야간 건설은 ${hm(nbLeft())} 남았어요` : ''}` : `매일 ${NB.h0}~${NB.h1}시에는 야간 건설 이벤트로 모든 공사 +${NB.add}%예요. 학교 특별 이벤트 주간에는 +${NB.addSp}%예요`); });   // 2.2.0
+    $('#ffChip').addEventListener('click', e => { if (e.target.closest('.ffx')) { S.ffx = gameToday(); sfx('tap'); ffRender(true); save(); toast('오늘은 이 알림을 닫았어요. 내일 다시 보여요'); return; } const k = facKeys().find(ffCan); if (k) { sfx('tap'); openSheet(k); toast(e.currentTarget.dataset.tip || ''); } else toast(conAdd() > 0 ? `지금 모든 공사 +${conAdd()}%예요${cbOn() ? `. 건설 부스터 ${hm(cbLeft())} 남았어요` : ''}${nbOn() ? `. 야간 건설은 ${hm(nbLeft())} 남았어요` : ''}` : `매일 ${NB.h0}~${NB.h1}시에는 야간 건설 이벤트로 모든 공사 +${NB.add}%예요. 학교 특별 이벤트 주간에는 +${NB.addSp}%예요`); });   // 2.2.0
     $('#conCb').addEventListener('click', e => { const b = e.target.closest('[data-cb]'); if (b) cbBuy(b.dataset.cb); });
     $('#albPrev').addEventListener('click', () => { rt.albPage -= 1; sfx('tap'); renderAlbum(); });
     $('#albNext').addEventListener('click', () => { rt.albPage += 1; sfx('tap'); renderAlbum(); });
@@ -22198,7 +22323,7 @@ body.cam-scene #ffChip,body.cam-scene #plChip,body.cam-scene .b-ring{animation-p
     const chip = $('#plChip'); if (!chip || !S) return;
     plSync();
     const show = plUnread() && rt.tab === 'school' && rt.viewTier == null && !rt.decoEdit && !rt.fest && !rt.sports;
-    chip.hidden = !show;
+    chip.hidden = !show; chipRow();
     const sub = $('#plSub'); if (sub) sub.textContent = S.pl.got ? `받은 편지 ${S.pl.got}통${plUnread() ? ', 새 편지가 있어요' : ''}` : '까치 우체부가 학부모 편지를 가져와요';
   }
   /* ===== 2.1.3 학부모 쪽지 이야기 END ===== */
@@ -23554,7 +23679,16 @@ body.cam-scene #ffChip,body.cam-scene #plChip,body.cam-scene .b-ring{animation-p
   }
   // 로딩 화면: 일찍 끝나도 적어도 3초는 보여 줘요. 막대는 로딩하는 것처럼 멈칫거리며 차오르고, 끝까지 채운 뒤 사르르 사라져요
   const BOOT_MIN = window.__FOREST_TEST && !window.__FOREST_BOOT ? 1200 : 3000;   // 자동 시험은 예전처럼 1.2초만 기다려요
-  const bootLeft = () => Math.max(0, BOOT_MIN - performance.now());
+  // 3.3.3 지섭: 토스는 자기 로딩 화면을 페이지가 다 열릴 때까지 띄워서, 그동안 우리 로딩 화면이 가려진 채 끝나 버렸어요. 토스 판은 페이지가 다 열린 때부터 2.5초를 세요
+  let bootT0 = 0;
+  const bootRestart = () => {   // 토스 판: 화면이 보이기 시작할 때 막대와 안내 글을 처음부터 다시 보여 줘요
+    bootT0 = performance.now();
+    const i = document.getElementById('bootBar'), st = document.getElementById('bootStep');
+    if (i) { i.style.animation = 'none'; void i.offsetWidth; i.style.animation = 'bootFill 2.4s linear forwards'; }
+    BOOT_STEPS.forEach((m, k) => setTimeout(() => { if (st && st.isConnected && !document.getElementById('boot').classList.contains('done')) st.textContent = m; }, k * 480));
+  };
+  if (AIT && !window.__FOREST_TEST) { if (document.readyState === 'complete') bootT0 = performance.now(); else addEventListener('load', bootRestart, { once: true }); }
+  const bootLeft = () => Math.max(0, (AIT && !window.__FOREST_TEST ? 2500 : BOOT_MIN) - (performance.now() - bootT0));
   const BOOT_STEPS = ['학교 문을 여는 중...', '도토리를 세는 중...', '교실 창문을 여는 중...', '학생들을 깨우는 중...', '출석부를 챙기는 중...'];
   const BOOT_TIPS = ['참나무를 누르면 도토리가 떨어져요', '체험학습을 보내 두면 기다리는 동안에도 학교가 자라요', '오늘의 미션으로 미션 포인트를 모아 주간 상자를 열어요', '종업식을 열면 학교는 그대로 남고 시설 레벨이 확장돼요', '꾸미기 백화점의 테마 세트를 가지면 수업료가 올라요', '숲의 정수는 공부 탭에서 모아요. 문방구에서 도토리로 바꿀 수도 있어요', '꾸미기 가게에서 산 장식을 지도의 빈 자리에 놓아 학교를 꾸며요', '꾸미기 가게에서 학교 이름과 학교 마크를 바꿀 수 있어요', '매나 뱀이 나타나면 여러 번 눌러서 쫓아내요. 곰 선생님이 도와줘요', '업적을 모두 이루면 칭호를 받아요. 칭호는 랭킹 이름 옆에 붙어요', '숲속 퍼즐은 잠시 나갔다가 이어하기로 돌아올 수 있어요', '홈 지도는 두 손가락으로 벌리면 크게 볼 수 있어요'];   // 1.7.4 지섭 다듬음(4번, 학교 행사 줄 빼기) + 새 기능 도움말
   (() => {
@@ -23563,18 +23697,18 @@ body.cam-scene #ffChip,body.cam-scene #plChip,body.cam-scene .b-ring{animation-p
     if (t) t.textContent = BOOT_TIPS[Math.floor(Math.random() * BOOT_TIPS.length)];
     const st = document.getElementById('bootStep');
     BOOT_STEPS.forEach((m, i) => { if (i) setTimeout(() => { if (st && st.isConnected) st.textContent = m; }, i * 620); });
-    setTimeout(() => bootDone(), 8000);   // 무슨 일이 있어도 8초 뒤에는 걷어요
+    setTimeout(() => bootDone(), AIT ? 10000 : 8000);   // 무슨 일이 있어도 8초(토스 판은 10초) 뒤에는 걷어요
   })();
   function bootDone() {
     const b = document.getElementById('boot');
     if (!b || b.dataset.done) return;
     b.dataset.done = '1';
-    const wait = bootLeft();
-    setTimeout(() => {
+    const go = () => setTimeout(() => {
       b.classList.add('done');
       const st = document.getElementById('bootStep'); if (st) st.textContent = '준비 끝!';
       setTimeout(() => { b.classList.add('out'); setTimeout(() => b.remove(), 500); }, 280);
-    }, wait);
+    }, bootLeft());
+    if (AIT && !window.__FOREST_TEST && document.readyState !== 'complete') addEventListener('load', go, { once: true }); else go();   // 토스 판: 페이지가 다 열린 뒤에 세요
   }
 
   // 시험용 손잡이: 자동 시험(window.__FOREST_TEST)에서만 게임 속 함수를 꺼내 써요
@@ -23598,6 +23732,7 @@ body.cam-scene #ffChip,body.cam-scene #plChip,body.cam-scene .b-ring{animation-p
     TIER_SCALE, legacyMult, tuitionMult, snapTake, snapOf, showCere, cereCrew, cere3Info, cere3Load, cere3, tierViewOpen, tierViewClose, renderTierView, renderTierDots, nlCycle, viewMap, showNewTalk, talkNext, showCere, cereEnd, cereCrew, cereAsk, cereKeep, goFur, updateQuestDot, openElect, renderElect, elVote, elSync, elMult, elClub, elPres, elBadge, elMake, EL_PLEDGES, clubPct, festPrize, dropValue, claimMission, gameWeek, NEWCOMERS, TIERS, GEO, geoIdx, decoCost0, qMeasure, qDone, qGoal, kidArt: kidSVG, newYear, checkGrade, gradeOf, townRep, FAC, sanitize200, trialHunt, updateTrial, TRIAL, zoomAt, fitMap, ZOOM_MAX, DECO, DECO_SLOTS, DECO_SIGN, decoCost, decoSoldOut, pickDeco, buyDeco, decoPut, decoEditStart, decoEditEnd, openDecoPick, renderDeco, setSchoolNm, setMark, schoolTitle, markHTML, decoPlacedAll, esExLeft, esExCost, get Cloud() { return Cloud; }, get actx() { return actx; }, Music, musicSync, ensureAudio, bgmLoad, pzUI, rt, makeDeal, furStage, DEAL, navInfo, navRoute, spawnDrop, repTipCheck, linkGoogle, retryCloud, sanitize, acctPending, renderMap, renderHUD, renderAffordance, syncKids, layoutMap, geo, hitTrial, endVisit, showReward, recommend, needCost, prepTopUp, qReward, prepPhase, rankScore, pwOf, previewDip, dipMult, costScale, buyFur, buyFurAll, furCost, furReady, furDone, FUR, startTalk, endTalk, teacherAct, facCost, teaCost, facKeys, rate, rep, capacity, canGraduate, canPromote,
     fmt, fmt2, graduate, promote, buyPerk, perkCost, perkMaxed, buyFundPerk, fpCost, claimMain, mainReady, curMain, qNo, earn, CFG, TEA, teaMaxed, PERKS, FPERKS, MAIN, finalYear, startTrip, claimTrip, TRIPS, yearLocked, endSports, rtSports: () => rt.sports, rtFest: () => rt.fest, facCap, addLeague, addMP, tutStart, endFest, claimBox, musicWant, askBox, festWait, setTab,
     RARE, modelOf, rareRoll, rareGot, showRareTalk, rareDexHTML, kidSVG, rosterKid, WX, wxOf, wxIs, rdMinNow, renderWeather, PL, plSync, plUnread, openPLetter, renderPLetter, RS, rsNum, rsSync, rsAdd, rsLabel, lookDoc, lookRead, lookPush, lookSet, openLook, MODEL_SCHOOL, joinRank, PS, PS_M, PS_SEASONS, psSeason, psOpen, psSync, psLv, psGot, psReward, psClaimAll, psClaimMission, psWatchAd, psClaimable, psStepReady, psExtraReady, psChooseFur, psFurImg, renderPass, setEvSeg, xtGot, achTitles,   // 2.1.3 숲속 패스
+    MAP_OAK, oakArt, layoutOak, mapOak, oakAt, tapOak, dropSpot,
     dexMeet, dexSync, dexPending, dexGift, renderDex, evCurrent, evNext, evUpcoming, evSync, evFix, evVal, EV_FALLBACK, EV_DECO, EV_HAT, COS, DECO_BY, decoOwn, perkRec, fpRec, BOOST_ALL, buyShop, pickShop, showNote, showOkOn, showWd, renderGradPanel, renderShop, renderDecoShop, EV_WEEKLY, EV_WEEK_BASE, weekMon, claimStamp, claimEvMission, claimEvBox, renderEvent, evMissions, evOk, evSkipped, EV_MONTHS, EV_MEASURE, tierMinutes, minAcorns, IMG, sanitize171, ACH, achSync, claimAch, setTitle, renderAch, setDexSeg, achClaimable, XT, xtAct, xtCost, xtLv, feastMins, libMult, propInstances, walkBuild, festItemSvg, guestArt, adErrText, googleErrText, openSheet, closeSheet, startFest, startSports, sanitize170, EV_STAMPS, EV_SPECIAL, EV_MONTHLY, EV_BOX, DEX_KEYS, DEX_REWARD, DEX_GUEST_KEYS, seasonKey, roofArtKey, oakKey, setSeasonArt, VP, vpLv, vpCost, vpMult, vpAct, renderVpCard, sportsPrize, festPrize, renderTeachers, buildTeacherCards, bldImg, roofKey, bldStage, mapKey, setMapArt, applyThemes, buyFacility, bldFx, setBldFx, mapHi, Live, liveApply, liveLoad, liveOff, LIVE_KEYS, EVC, NOTICES, openNotice, noticeAuto, noticeWant, ntUnread, startTrial, endTrial: () => rt.trial && (rt.trial.left = 0), spawnDeal, startVisit, IMG170, MG, mgCells, mgSetCells, mgTick, mgAddEnergy, mgAddUp, mgTapGen, mgDrop, mgSell, mgUpgrade, mgAddUp, mgUpSwap, mgGensMax, MG_UP_ESS, mgClaimOrder, mgSwapOrder, mgOrderOk, mgFillOrders, mgOpen, mgClose, mgRenderAll, mgSpawnLevel, mgNearestEmpty, mgEmptyBoard, mgOrderReward, mgUI, sanitize180, mgWatchAd, mgNewOrder, mgHintPick, mgShowHint, mgClearHint, mgTouch, mgOrderGuide, mgDexN, mgDexCan, mgDexClaim, mgOpenDex, MG_DEX, MG_DEX_MS, mgDexEss, mgDexEssCan, mgDexEssN, mgDexMsCan, mgDexMsClaim, MGB, mgBuyBoost, mgBstLeft, mgOpenBoost, nice, claimMission, claimBonus, claimWeekMission, MP_BOX, swapDaily, repairMissions, MISSIONS, WMISSIONS, dmDay, wkWeek,   // 1.7.0 도감, 이벤트
     PZ, PZ_SHAPES, pzFits, pzAnyFit, pzStuck, pzFullLines, pzPlace, pzFreshGame, pzStart, PZB, pzbCost, pzApplyBoost, pzBoostOpen, pzBoostGo, festGoldLeft, festGoldTake, claimSports, TR2, TR2_PL, openTr2, tr2Act, tr2Away, tr2Ready, tr2Rsv, tr2Tick, renderAlbum, FEST, FEST_IDS, festNight, festShown, festTimeLock, festOpen, startFest, openFest, endFest, renderStreet, pzFinish, pzLeft, pzCanAd, pzEssOf, pzMinOf, pzHelpSquirrel, pzHelpOwl, pzHelpBear, fillSubs, mapRoofTop, showAd, claimOfflineDouble, startBoost, tripAd, festFocus, festRange, visMap, renderMissions, pzHasHelp, pzRot, pzNewPiece, pzOpen, pzClose, pzGameOver, pzRenderAll, renderMini, addEss, ESHOP, SP_FUR, applyCos, essItem, pickEss, buyEss, renderEssShop, hatSVG, spFurImg, gameNow, gameToday, gameWeek, kstDay, setServerTime, SVR, dmDay, weekIdx, lgWeek, wkWeek, lgKey, pzDay, goldDay, boostLeft, dealLeft, canStamp };
   if (window.__FOREST_TEST) Object.assign(window.__forest, { tripUseTicket, readUseTicket, picnicUseTicket, buyDecoPieces, adGold, claimBonus, cloudPush, cloudClash, syncGet, revOf, deleteAccount, lookDel: () => lookDelNow(), lookSet, lookPush, leaveRank, sanitizeCg, freshCg });   // 시험 손잡이
