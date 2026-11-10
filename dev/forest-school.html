@@ -17513,7 +17513,8 @@ body.cam-scene #ffChip,body.cam-scene #plChip,body.cam-scene .b-ring{animation-p
   // 학교 복도(2.0.0): 상점 거리처럼 복도 배경 위에 방문. 동아리실이 먼저 열리고 나머지 방은 앞으로 들어와요
   const hallOpen = () => rosterOn();
   function renderHall() {
-    const bg = IMG('hall_bg'); $('#hallScene').style.backgroundImage = bg ? `url("${bg}")` : '';
+    const bg = (uniNow() && IMG('hall_bg_uni')) || IMG('hall_bg');   // 4.0.0 대학교 복도 그림(작업지시서 62)이 들어오면 그것을 써요
+    $('#hallScene').style.backgroundImage = bg ? `url("${bg}")` : '';
     $('#hallScene').classList.toggle('fb', !bg);
     $$('#panelHall .sf-pic').forEach(el => {
       const u = IMG(el.dataset.front);
