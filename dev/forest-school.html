@@ -248,6 +248,7 @@ g.plaque[id^="pq-"] .t-plaque{font-size:8.6px}   /* 3.3.0 지섭: 건물 이름�
 #map.tier-0 #b-science,#map.tier-0 #pq-science{display:none}
 #map:not(.tier-2) #b-store,#map:not(.tier-2) #pq-store{display:none}
 #map:not(.tier-3) #b-dorm,#map:not(.tier-3) #pq-dorm{display:none}
+#map .no-lot{display:none!important}   /* 4.0.0 대학교 구역 지도: 이 구역에 없는 건물 */
 .plaque{cursor:pointer;outline:none}
 .plaque:focus-visible .c-plaque{stroke:var(--accent);stroke-width:2.4}
 /* 까치 */
@@ -1311,7 +1312,7 @@ html.ait .pz{padding-top:calc(var(--ait-top, 0px) + 54px)}
 
 /* ===== 1.5.0 그림 지도 ===== */
 .c-mapedge{fill:#3E6B3A}
-.mapimg{display:none}#map.g-0 .mi-0,#map.g-1 .mi-1,#map.g-2 .mi-2,#map.g-3 .mi-3{display:inline}
+.mapimg{display:none}#map.g-0 .mi-0,#map.g-1 .mi-1,#map.g-2 .mi-2,#map.g-3 .mi-3,#map.g-4 .mi-4,#map.g-5 .mi-5,#map.g-6 .mi-6,#map.g-7 .mi-7,#map.g-8 .mi-8{display:inline}
 .map-dim{fill:#0B1A12;opacity:0;pointer-events:none}
 /* 1.5.3 지도 그림만 연하게: 건물, 학생, 도토리가 또렷하게 보여요 */
 .mapimg{filter:saturate(.85) brightness(1.03) contrast(.95)}   /* 1.7.3: 차분한 지도(calm2)로 바꾸면서 덜 흐리게(예전 .62, 1.1, .86) */
@@ -2480,6 +2481,25 @@ body.wl-on .toast{z-index:300}
 .seat-list .club-pickc{display:flex;align-items:center;gap:8px;width:100%;padding:8px;border:0;border-radius:14px;background:var(--card);color:var(--ink);text-align:left;cursor:pointer}
 .seat-list .club-pickc.pick{outline:2px solid var(--accent)}
 .tier-dots{position:absolute;left:10px;bottom:calc(var(--bot-h, 70px) + 10px);z-index:6;display:flex;gap:5px;padding:3px 6px;border-radius:999px;background:rgba(255,249,233,.82);box-shadow:0 1px 3px rgba(20,40,20,.25)}
+.zone-bar{position:absolute;left:50%;transform:translateX(-50%);bottom:calc(var(--bot-h, 70px) + 46px);z-index:6;display:flex;align-items:center;gap:4px;padding:4px 6px;border-radius:999px;background:rgba(255,249,233,.92);box-shadow:0 1px 4px rgba(20,40,20,.3);white-space:nowrap}
+.zone-bar b{min-width:64px;text-align:center;font-family:var(--font-display);font-size:14px;font-weight:400;color:#183C2E}
+.zone-bar button{display:flex;align-items:center;gap:4px;height:30px;padding:0;border:1.5px solid #8FB07E;border-radius:999px;background:#FFF9E9;color:#183C2E;font-family:var(--font-display);font-size:13px;cursor:pointer}
+.zone-bar .zb-home{padding:0 10px 0 3px;margin-right:4px;background:#3E7E4A;border-color:#2F6A3C;color:#FFF9E9}
+.zone-bar .zb-home i{width:24px;height:24px;border-radius:50%;background:#CFE3B8 center 40%/170% no-repeat;border:1.5px solid #FFF9E9}
+.zone-bar .zb-home.guide{animation:zbGuide 1.1s ease-in-out infinite}
+@keyframes zbGuide{0%,100%{box-shadow:0 0 0 0 rgba(242,194,48,.0)}50%{box-shadow:0 0 0 5px rgba(242,194,48,.85)}}
+.zone-bar .zb-arr{width:30px;justify-content:center}.zone-bar .zb-arr svg{width:16px;height:16px}
+#campusG .cz{cursor:pointer}#campusG .cz-hit{fill:transparent}
+#campusG .cz:focus-visible .cz-plate{stroke:var(--accent);stroke-width:2.4}
+#campusG .cz-plate{fill:#FFF8E8;stroke:#B98A4E;stroke-width:1.4}
+#campusG .cz-name{font-family:var(--font-display);font-size:11.5px;fill:#4A3418;text-anchor:middle}
+#campusG .cz-sub{font-family:var(--font-body);font-weight:700;font-size:6.6px;fill:#7A6A52;text-anchor:middle}
+#campusG .cz.lock{cursor:default}#campusG .cz.lock .cz-plate{fill:#EFE7D6;stroke:#A99A7E}#campusG .cz.lock .cz-name{fill:#7A6F5C}
+#campusG .cz-bdg rect{stroke-width:1}#campusG .cz-bdg text{font-family:var(--font-display);font-size:8px;text-anchor:middle}
+#campusG .cz-bdg.ff rect{fill:#F3C04B;stroke:#B5651D}#campusG .cz-bdg.ff text{fill:#5A3A16}
+#campusG .cz-bdg.con rect{fill:#DCE9F7;stroke:#5B7FA8}#campusG .cz-bdg.con text{fill:#24476E}
+#campusG .cz-bdg.up rect{fill:#DDF0CF;stroke:#4E9A4A}#campusG .cz-bdg.up text{fill:#235A27}
+#map.deco-on #campusG{display:none}
 .tier-dots .td{display:grid;place-items:center;width:24px;height:24px;padding:0;border:1.5px solid #8FB07E;border-radius:50%;background:#FFF9E9;color:#183C2E;font-family:var(--font-display);font-size:12px;cursor:pointer}
 .tier-dots .td.cur{border-color:#3E7E4A;box-shadow:0 0 0 2px #3E7E4A inset}
 .tier-dots .td.on{background:#3E7E4A;color:#FFF9E9}
@@ -3245,6 +3265,11 @@ body.cam-scene #ffChip,body.cam-scene #plChip,body.cam-scene .b-ring{animation-p
           <image id="mapImg1" class="mapimg mi-1" x="0" y="-60" width="360" height="540" preserveAspectRatio="none"/>
           <image id="mapImg2" class="mapimg mi-2" x="0" y="-60" width="360" height="540" preserveAspectRatio="none"/>
           <image id="mapImg3" class="mapimg mi-3" x="0" y="-60" width="360" height="540" preserveAspectRatio="none"/>
+          <image id="mapImg4" class="mapimg mi-4" x="0" y="-60" width="360" height="540" preserveAspectRatio="none"/><!-- 4.0.0 대학교 구역 지도 4장 -->
+          <image id="mapImg5" class="mapimg mi-5" x="0" y="-60" width="360" height="540" preserveAspectRatio="none"/>
+          <image id="mapImg6" class="mapimg mi-6" x="0" y="-60" width="360" height="540" preserveAspectRatio="none"/>
+          <image id="mapImg7" class="mapimg mi-7" x="0" y="-60" width="360" height="540" preserveAspectRatio="none"/>
+          <image id="mapImg8" class="mapimg mi-8" x="0" y="-60" width="360" height="540" preserveAspectRatio="none"/><!-- 4.0.0 캠퍼스 전체 지도 -->
           <image id="oakPatch" preserveAspectRatio="none" aria-hidden="true"/><!-- 3.3.4 지도 참나무: 나무를 지운 조각을 지도 위에 덮어요 -->
           <g id="thDeco" aria-hidden="true"></g>
           <rect class="map-dim" x="-300" y="-300" width="960" height="1020"/>
@@ -3360,6 +3385,7 @@ body.cam-scene #ffChip,body.cam-scene #plChip,body.cam-scene .b-ring{animation-p
         <g id="nightG" pointer-events="none" aria-hidden="true"></g><!-- 2.1.0 밤 모드(문방구) -->
         <g id="conUi" aria-hidden="true"></g><!-- 2.3.1 공사 막대, 남은 시간, 빠르기 배지는 학생 위 층(학생이 막대를 덮지 않게) -->
         <g id="plaques"></g>
+        <g id="campusG"></g><!-- 4.0.0 캠퍼스 지도의 구역 이름표와 누르는 칸 -->
         <g id="fx"></g>
         <g id="guide"></g>
       </svg>
@@ -3379,6 +3405,12 @@ body.cam-scene #ffChip,body.cam-scene #plChip,body.cam-scene .b-ring{animation-p
         <div class="tv-tabs" id="tvTabs" hidden role="group" aria-label="예시 학교 학교급 고르기"><button type="button" data-mt="0">유치원</button><button type="button" data-mt="1">초등학교</button><button type="button" data-mt="2">중학교</button><button type="button" data-mt="3">고등학교</button></div><!-- 3.3.0 모델하우스 학교급 고르기 -->
       </div>
       <div class="tier-dots" id="tierDots" hidden role="group" aria-label="학교급 모습 보기"></div>
+      <div class="zone-bar" id="zoneBar" hidden role="group" aria-label="대학교 구역 이동"><!-- 4.0.0 -->
+        <button type="button" class="zb-home" id="zoneHome" aria-label="캠퍼스 지도로 나가기"><i id="zoneHomeIc" aria-hidden="true"></i>캠퍼스</button>
+        <button type="button" class="zb-arr" id="zonePrev" aria-label="앞 구역으로"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M15 6l-6 6 6 6" fill="none" stroke="currentColor" stroke-width="2.6" stroke-linecap="round" stroke-linejoin="round"/></svg></button>
+        <b id="zoneName">학술 구역</b>
+        <button type="button" class="zb-arr" id="zoneNext" aria-label="다음 구역으로"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M9 6l6 6-6 6" fill="none" stroke="currentColor" stroke-width="2.6" stroke-linecap="round" stroke-linejoin="round"/></svg></button>
+      </div>
       <button class="ff-chip" id="ffChip" type="button" hidden></button><!-- 2.1.1 오늘 바로 완공, 건설 가속 -->
       <div class="deco-bar" id="decoBar" hidden><span><b>꾸미기 중</b><small>반짝이는 빈 자리를 누르면 장식을 놓아요</small></span><button class="cta small" type="button" id="decoDone">다 했어요</button></div>
       <div class="map-left">
@@ -3670,6 +3702,7 @@ body.cam-scene #ffChip,body.cam-scene #plChip,body.cam-scene .b-ring{animation-p
           <button class="srow" type="button" id="devDip"><span class="txt"><b>수료증, 기금, 쪽지 받기</b><small>수료증 100개, 기금 100, 친구 성장 쪽지 3장</small></span><svg viewBox="0 0 24 24" width="20" height="20" aria-hidden="true"><path d="M9 6l6 6-6 6" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"/></svg></button>
           <button class="srow" type="button" id="devTrip"><span class="txt"><b>체험학습 바로 돌아오기</b><small>3학년 전이면 체험학습을 먼저 열어 줘요</small></span><svg viewBox="0 0 24 24" width="20" height="20" aria-hidden="true"><path d="M9 6l6 6-6 6" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"/></svg></button>
           <button class="srow" type="button" id="devDay"><span class="txt"><b>다음 날로 넘기기</b><small>출석 도장, 보충수업, 핫딜 횟수가 다시 열려요</small></span><svg viewBox="0 0 24 24" width="20" height="20" aria-hidden="true"><path d="M9 6l6 6-6 6" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"/></svg></button>
+          <button class="srow" type="button" id="devUni"><span class="txt"><b>대학교 미리 보기 (개발 중)</b><small>저장하지 않고 이 화면에서만 대학교 캠퍼스를 봐요. 새로 고치면 원래 학교로 돌아와요</small></span></button>
           <button class="srow" type="button" id="devLux" hidden><span class="txt"><b>고급 배경 켜기 (관리자)</b><small id="devLuxTx">이 기기에서만 고급 지도와 건물을 써요(작업지시서 49 그림)</small></span></button>
           <button class="srow" type="button" id="devStats" hidden><span class="txt"><b>테스트 현황 보기</b><small>테스터마다 어디까지 했는지 서버 기록을 봐요</small></span><svg viewBox="0 0 24 24" width="20" height="20" aria-hidden="true"><path d="M9 6l6 6-6 6" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"/></svg></button>
         </div>
@@ -5925,7 +5958,8 @@ body.cam-scene #ffChip,body.cam-scene #plChip,body.cam-scene .b-ring{animation-p
     { name: '유치원', school: '숲속 유치원', years: 2, grads: 1, unit: '년째' },
     { name: '초등학교', school: '숲속 초등학교', years: 6, grads: 5, unit: '학년', newb: '과학실' },
     { name: '중학교', school: '숲속 중학교', years: 3, grads: 2, unit: '학년', newb: '매점' },
-    { name: '고등학교', school: '숲속 고등학교', years: 3, grads: 2, unit: '학년', newb: '기숙사' }   // 3.0.0에 열렸어요
+    { name: '고등학교', school: '숲속 고등학교', years: 3, grads: 2, unit: '학년', newb: '기숙사' },   // 3.0.0에 열렸어요
+    { name: '대학교', school: '숲속 대학교', years: 4, grads: 3, unit: '학년', newb: '학생회관' }   // 4.0.0 준비 중: TIER_OPEN을 올리기 전에는 개발자 메뉴 '대학교 미리 보기'에서만 보여요
   ];
   const TIER_OPEN = 4;   // 2.0.0: 중학교까지, 3.0.0: 고등학교까지 열려요
   // 학교급이 오르면 수업료는 1000배, 공사비는 2000배라서 숫자 단위가 껑충 커져요
@@ -6809,6 +6843,7 @@ body.cam-scene #ffChip,body.cam-scene #plChip,body.cam-scene .b-ring{animation-p
     fg: { day: '', got: [] },   // 1.7.2 학교 행사 황금 도토리: 행사마다 하루 한 번(got에 오늘 받은 행사 id)
     es: { day: '', n: 0, week: -1, g: 0, x: 0, t: 0, bf: 0, ba: 0 },   // 2.1.0 t 오늘 산 단축권 묶음 수, bf ba 오늘 산 부스터(수업료 2배, 자리 비운 보상 2배)
     awx: 0,   // 2.1.0 자리 비운 보상 2배 부스터: 다음 받기에 2배(남은 번 수)
+    zone: '',   // 4.0.0 대학교에서 지금 보는 구역('' = 캠퍼스 화면, 'academic' | 'life' | 'plaza' | 'sports')
     deco: freshDeco(),   // 1.7.4 꾸미기: own 가진 장식 수, lay 지도별 자리(유치원, 초등학교)마다 놓인 장식 id, nm 학교 이름 앞부분('' = 숲속), mk 학교 마크 [모양, 문양, 바탕 색, 문양 색] 또는 null   // 1.6.0 정수 상점: 오늘 산 도토리 묶음 수, 이번 주 산 황금 도토리 묶음 수
     cs: freshCs(),
     wxOff: 0,   // 날씨 효과 끄기(칩을 눌러 켜고 꺼요)
@@ -6860,6 +6895,7 @@ body.cam-scene #ffChip,body.cam-scene #plChip,body.cam-scene .b-ring{animation-p
     if (d.ad && typeof d.ad === 'object') { s.ad.day = typeof d.ad.day === 'string' ? d.ad.day.slice(0, 10) : ''; s.ad.n = Math.floor(num(d.ad.n, 0, 0)); }
     // 학교급과 장학재단. 졸업식이 없던 저장은 지금까지의 종업식이 모두 유치원에서 열린 것으로 쳐요
     s.tier = Math.min(Math.floor(num(d.tier, 0, 0)), TIER_OPEN - 1);
+    s.zone = typeof d.zone === 'string' && ZONE_KEYS.includes(d.zone) ? d.zone : '';   // 4.0.0
     s.tg = Math.floor(num(d.tg, 0, s.tier === 0 ? s.st.grads : 0));
     // 2.1.0 학기: 0은 1학기, 1은 2학기. 학기가 없던 저장은 지금 학년을 2학기로 쳐서, 다음 종업식에 원래대로 학년이 올라가요
     s.sem = d.sem === 0 || d.sem === 1 ? d.sem : (s.tier >= 1 ? 1 : 0);
@@ -7102,7 +7138,7 @@ body.cam-scene #ffChip,body.cam-scene #plChip,body.cam-scene .b-ring{animation-p
     }
   }
   function save(at) {
-    if (!S || rt.adopting) return;   // 다른 학교로 바꾸며 다시 여는 중에는 지금 학교를 저장하지 않아요
+    if (!S || rt.adopting || rt.uniPrev) return;   // 다른 학교로 바꾸며 다시 여는 중에는 지금 학교를 저장하지 않아요. 4.0.0 대학교 미리 보기 동안도 저장하지 않아요
     S.savedAt = at || (rt.paused ? rt.closedAt : gameNow());   // 2.0.0 보안 점검(2-5): 기기 시계 대신 게임 시계
     if (rt.awayWait) S.away = { from: rt.awayWait.from, skip: awaySkip(rt.awayWait) };   // 서버 시간을 아직 못 받았으면 다음에 이어서 계산해요
     syncMid();
@@ -7847,6 +7883,29 @@ body.cam-scene #ffChip,body.cam-scene #plChip,body.cam-scene .b-ring{animation-p
     { next: [-1.38, 11.22, 1.21, 1.0, 0.0], science: [-3.06, 9.79, 1.25, 1.11, 0.0], classroom: [-5.75, 9.52, 1.21, 1.0, 0.0], cafeteria: [-4.54, 6.49, 1.3, 1.0, 0.0], library: [-3.77, 6.47, 1.25, 1.0, 0.0], playground: [1.91, 20.5, 1.06, 0.94, -0.36] },
     { next: [-7.5, 4.5, 0.97, 0.99, 0.0], science: [-0.21, 8.39, 1.14, 1.0, 0.0], classroom: [-0.63, 9.49, 1.09, 1.0, 0.0], cafeteria: [-4.09, 6.34, 1.13, 1.0, 0.0], library: [-3.98, 7.07, 1.19, 1.0, 0.0], playground: [-3.5, 17, 1.03, 0.85, 0.0], store: [-7.51, 11.11, 1.21, 1.0, 0.0] },
     { next: [1.5, 19.5, 1.0, 0.86, 0.0], science: [-1.14, 7.12, 1.2, 1.0, 0.0], classroom: [-2.81, 10.0, 1.16, 1.0, 0.0], cafeteria: [0.09, 6.44, 1.13, 1.0, 0.0], library: [-6.37, 8.82, 1.27, 1.04, 0.0], playground: [-1.5, 18.5, 1.03, 0.83, -4], store: [-0.76, 9.74, 1.22, 1.0, 0.0], dorm: [-1.88, 7.54, 1.54, 0.81, 0.0] }];
+  // 4.0.0 대학교 구역 지도 자리 표 (dev/gen400/zonegeo.py가 작업지시서 54 자리 표에서 만들어요. 손으로 고치지 않아요)
+  const ZONE_GEO = [
+    { map: 'map_zone_academic', zone: 'academic', zname: '학술 구역', lot: {'classroom': [29.44, 35.32, 30.47], 'library': [68.36, 46.45, 34.28], 'science': [28.52, 69.92, 29.39]}, oak: [282.3, 312.0], plaza: [144.1, 238.1], gate: [166.6, 411.1], drop: [144.1, 238.1, 36, 12], spots: [[169.2, 415.2], [164.9, 385.5], [184.3, 334.2], [154.8, 285.6], [181.8, 237.0], [160.2, 188.4], [190.8, 142.5], [149.4, 96.6], [147.6, 64.2], [126.0, 161.4], [219.6, 231.6], [153.0, 345.0], [160.2, 237.0]], deco: [[108.0, 80.4], [262.8, 134.4], [241.2, 363.9], [277.2, 393.6], [90.0, 377.4], [288.0, 350.4]] },
+    { map: 'map_zone_life', zone: 'life', zname: '생활 구역', lot: {'cafeteria': [31.64, 35.64, 34.28], 'store': [67.77, 50.62, 36.04], 'dorm': [28.71, 70.96, 33.5]}, oak: [286.2, 347.5], plaza: [173.7, 269.8], gate: [173.3, 410.4], drop: [173.7, 269.8, 36, 12], spots: [[174.6, 423.8], [175.3, 386.0], [198.0, 339.6], [194.4, 311.0], [172.8, 289.4], [165.6, 261.3], [158.4, 224.0], [167.4, 178.7], [202.3, 134.9], [216.0, 82.6], [144.0, 167.3], [203.4, 246.2], [177.5, 349.3]], deco: [[162.0, 85.8], [255.6, 161.4], [86.4, 274.8], [234.0, 377.4], [302.4, 404.4], [90.0, 377.4]] },
+    { map: 'map_zone_plaza', zone: 'plaza', zname: '광장 구역', lot: {'union': [48.44, 38.87, 42.29]}, oak: [40.8, 306.0], plaza: [175.1, 306.0], gate: [175.1, 393.5], drop: [175.1, 306.0, 36, 12], spots: [[176.4, 469.2], [176.4, 431.4], [176.4, 393.6], [176.4, 350.4], [176.4, 307.2], [122.4, 247.8], [115.2, 204.6], [133.2, 191.1], [176.4, 188.4], [234.0, 226.2], [216.0, 191.1], [223.2, 264.0], [136.8, 278.6], [212.4, 279.1]], deco: [[72.0, 107.4], [255.6, 99.3], [90.0, 210.0], [288.0, 237.0], [100.8, 334.2], [266.4, 334.2]], bus: [176.4, 449.2], sign: [86.4, 401.7], vd: [273.6, 388.2], fount: [177.2, 243.0, 22, 14] },
+    { map: 'map_zone_sports', zone: 'sports', zname: '체육 구역', lot: {'playground': [48.14, 45.25, 59.28]}, oak: [50.3, 324.6], plaza: [219.6, 323.4], gate: [170.2, 428.6], drop: [219.6, 323.4, 36, 12], spots: [[170.3, 444.9], [168.5, 423.8], [158.4, 407.1], [140.4, 380.1], [122.4, 355.8], [105.1, 328.8], [102.6, 307.2], [111.6, 289.4], [127.8, 274.8], [151.2, 258.6], [171.7, 245.1], [174.6, 232.7]], deco: [[90.0, 96.6], [266.4, 112.8], [50.4, 118.2], [288.0, 358.5], [223.2, 382.8], [79.2, 388.2]] },
+  ];
+  const CAMPUS = { map: 'map_campus', gate: [177.9, 411.1], fount: [182.1, 229.0], spots: [[180.0, 434.1], [177.8, 377.4], [259.2, 323.4], [181.8, 258.6], [143.3, 227.3], [151.2, 177.6], [187.2, 131.7], [234.0, 118.2], [199.8, 188.4], [133.2, 177.6]],
+    zones: [
+      { key: 'academic', name: '학술 구역', tag: [95.8, 134.4], hit: [25.2, 37.2, 151.2, 129.6], lock: false },
+      { key: 'life', name: '생활 구역', tag: [252.0, 196.5], hit: [187.2, 123.6, 151.2, 97.2], lock: false },
+      { key: 'plaza', name: '광장 구역', tag: [178.2, 353.1], hit: [93.6, 291.0, 172.8, 97.2], lock: false },
+      { key: 'sports', name: '체육 구역', tag: [81.0, 255.9], hit: [18.0, 193.8, 126.0, 91.8], lock: false },
+      { key: 'lab', name: '연구 구역', tag: [264.6, 84.2], hit: [194.4, 21.0, 140.4, 91.8], lock: true },
+    ] };
+  // 4.0.0 대학교는 지도가 한 장이 아니라 구역 지도 4장이에요. 구역 줄을 GEO 뒤(ZONE0부터)에 붙여서 지금 지도 엔진을 그대로 써요.
+  // 구역 줄에는 다음 학교급 자리(next), 선생님 자리(tea), 운동회 자리(sports)가 없을 수 있어요. 없는 것은 그리지 않거나 광장 자리로 대신해요
+  const ZONE0 = GEO.length, UNI_TIER = 4, ZONE_KEYS = ZONE_GEO.map(Z => Z.zone);
+  ZONE_GEO.forEach(Z => GEO.push(Object.assign({ eaves: {}, tea: null, next: null, fount: null, bus: Z.gate, sports: [Z.drop[0], Z.drop[1], 44, 16] }, Z)));
+  // 캠퍼스 전체 지도도 같은 엔진의 지도 한 줄이에요(건물과 참나무, 꾸미기 자리가 없고 학생 몇 명만 길을 걸어요). 그 위에 구역 이름표를 얹어요(renderCampus)
+  const CAMPUS_GI = GEO.length;
+  GEO.push({ map: CAMPUS.map, campus: true, zone: '', zname: '캠퍼스', lot: {}, eaves: {}, tea: null, next: null, oak: [-900, -900], plaza: CAMPUS.fount, gate: CAMPUS.gate, bus: CAMPUS.gate,
+    drop: [CAMPUS.fount[0], CAMPUS.fount[1] + 22, 36, 12], sports: [CAMPUS.fount[0], CAMPUS.fount[1] + 22, 44, 16], spots: CAMPUS.spots, fount: [CAMPUS.fount[0], CAMPUS.fount[1], 22, 14], deco: [] });
   const lotXf = new Map();   // 빈터 배열 → 위 값(GEO를 만든 뒤 채워요)
   function lotRect(L, key, T) {
     const I = (T && T[key]) || BLD_ISL[key] || [0, 0.4, 0.94], w = L[2] / 100 * MAP_W * LOT_FIT / I[2];
@@ -7866,12 +7925,17 @@ body.cam-scene #ffChip,body.cam-scene #plChip,body.cam-scene .b-ring{animation-p
   // 2.1.1 길 찾기, 누르는 자리, 이름표의 기준 자리(b)는 예전 그림의 바닥 섬 값으로 고정해요(새 건물 그림을 넣어도 학생 길과 자리가 그대로). 실제 그림만 새 값으로 맞춰요
   const GEO_ISL = {bld_classroom_on: [-0.0012, 0.47, 0.97], bld_cafeteria_on: [-0.0062, 0.44, 0.955], bld_library_on: [-0.0012, 0.4175, 0.96], bld_playground_on: [0.0138, 0.4325, 0.915], bld_science_on: [-0.0025, 0.425, 0.9725], bld_field_on: [0.0162, 0.42, 0.88], bld_store_on: [-0.0075, 0.4425, 0.9525]};
   GEO.forEach((G, i) => {
-    const X = LOT_XF[i] || {}; for (const k of Object.keys(G.lot)) if (X[k]) lotXf.set(G.lot[k], X[k]); if (X.next) lotXf.set(G.nextLot, X.next);
-    G.b = {}; for (const k of Object.keys(G.lot)) G.b[k] = lotRect(G.lot[k], BASE_KEY[i][k], GEO_ISL);
-    G.next.at = lotRect(G.nextLot, G.nextKey);
+    const X = LOT_XF[i] || {}; for (const k of Object.keys(G.lot)) if (X[k]) lotXf.set(G.lot[k], X[k]); if (X.next && G.next) lotXf.set(G.nextLot, X.next);
+    const BK = BASE_KEY[i] || BASE_KEY[ZONE0 - 1];   // 4.0.0 구역 지도는 고등학교 그림 기준(대학교 건물 그림이 오면 다시 맞춰요)
+    G.b = {}; for (const k of Object.keys(G.lot)) G.b[k] = lotRect(G.lot[k], BK[k] || 'bld_dorm_on', GEO_ISL);
+    if (G.next) G.next.at = lotRect(G.nextLot, G.nextKey);
   });
-  // 학교급마다 지도 한 장. 지도가 아직 없는 학교급은 마지막 지도를 써요
-  const geoIdx = t => Math.min(GEO.length - 1, Math.max(0, t === undefined ? (S ? S.tier : 0) : t));
+  // 학교급마다 지도 한 장(유치원~고등학교). 4.0.0 대학교는 보고 있는 구역의 지도예요
+  // S.zone은 지금 보는 구역 열쇠('' = 캠퍼스 지도)
+  const zoneKey = () => (rt.viewZone !== undefined && rt.viewZone !== null ? (ZONE_KEYS.includes(rt.viewZone) ? rt.viewZone : '') : S && ZONE_KEYS.includes(S.zone) ? S.zone : '');
+  const uniOn = () => !!S && S.tier >= UNI_TIER;
+  const zoneOf = k => { const Z = ZONE_GEO.find(Z => Z.lot[k]); return Z ? Z.zone : ''; };   // 그 건물이 있는 구역
+  const geoIdx = t => { const v = t === undefined ? (S ? S.tier : 0) : t; return v >= UNI_TIER ? (zoneKey() ? ZONE0 + ZONE_KEYS.indexOf(zoneKey()) : CAMPUS_GI) : Math.max(0, Math.min(ZONE0 - 1, v)); };
   const geo = t => GEO[geoIdx(t)];
   const IMG = k => (window.FS_IMG && window.FS_IMG[k]) || (window.FS_IMG171 && window.FS_IMG171[k]) || (window.FS_IMG174 && window.FS_IMG174[k]) || (window.FS_IMG200 && window.FS_IMG200[k]) || (window.FS_IMG213 && window.FS_IMG213[k]) || (window.FS_IMG220 && window.FS_IMG220[k]) || (window.FS_IMG230 && window.FS_IMG230[k]) || (window.FS_IMG231 && window.FS_IMG231[k]) || (window.FS_IMG235 && window.FS_IMG235[k]) || (window.FS_IMG300 && window.FS_IMG300[k]) || (window.FS_IMG310 && window.FS_IMG310[k]) || (window.FS_IMG311 && window.FS_IMG311[k]) || (window.FS_IMG312 && window.FS_IMG312[k]) || (window.FS_IMG320 && window.FS_IMG320[k]) || (window.FS_IMG249 && window.FS_IMG249[k]) || '';   // 1.7.1, 1.7.4, 2.0.0, 2.1.3, 2.2.0 묶음도 찾아요
   const BLD_IMG = { classroom: 'bld_classroom_on', cafeteria: 'bld_cafeteria_on', library: 'bld_library_on', science: 'bld_science_on', store: 'bld_store_on', dorm: 'bld_dorm_on' };
@@ -8029,15 +8093,21 @@ body.cam-scene #ffChip,body.cam-scene #plChip,body.cam-scene .b-ring{animation-p
       $('#pq-' + k).setAttribute('transform', `translate(${cx.toFixed(1)} ${(cy + w * 0.36).toFixed(1)})`);
       { const ic = $('.pq-ic', $('#pq-' + k)); if (ic) ic.setAttribute('href', IMG('ic_' + k)); }   // 3.3.0 이름표 그림은 뺐어요
     }
-    const nx = $('#b-next'), [ncx, ncy, nw, ntf] = G.next.at;
+    const nx = $('#b-next');
+    for (const k of Object.keys(FAC)) { const g = $('#b-' + k), pq = $('#pq-' + k); if (g) g.classList.toggle('no-lot', !G.b[k]); if (pq) pq.classList.toggle('no-lot', !G.b[k]); }   // 4.0.0 이 지도(구역)에 없는 건물은 숨겨요(테마가 style을 지워서 class로)
+    nx.classList.toggle('no-lot', !G.next);
+    { const ok = $('#oak'); if (ok) ok.classList.toggle('no-lot', !!G.campus); }
+    if (G.next) {
+    const [ncx, ncy, nw, ntf] = G.next.at;
     setA($('.bimg', nx), { x: ncx - nw / 2, y: ncy - nw / 2, width: nw, height: nw, href: IMG170(seasonKey(G.next.img)), transform: ntf });
     setA($('.hit', nx), { x: ncx - nw * 0.42, y: ncy - nw * 0.4, width: nw * 0.84, height: nw * 0.74 });
     $('.next-tag', nx).setAttribute('transform', `translate(${ncx.toFixed(1)} ${(ncy + nw * (G.nextTagY !== undefined ? G.nextTagY : 0.36)).toFixed(1)})`);   // 2.0.0 중학교는 간판 자리와 겹치지 않게 위로
     $('#pl-next').textContent = G.next.name; $('#pl-next2').textContent = G.next.tag;   // 2.3.0 이름표 두 줄
     nx.setAttribute('aria-label', `${G.next.name}, ${G.next.tag}`);
+    }
     layoutOak();   // 3.3.4 지도 참나무(없으면 예전 참나무 그림)
-    const hh = G.tea.hedgehog, mh = $('#m-hedgehog');
-    if (mh) mh.setAttribute('transform', `translate(${hh[0]} ${hh[1]}) scale(${hh[2]})`);
+    const hh = G.tea && G.tea.hedgehog, mh = $('#m-hedgehog');
+    if (mh && hh) mh.setAttribute('transform', `translate(${hh[0]} ${hh[1]}) scale(${hh[2]})`);
     [SPORTS.cx, SPORTS.cy, SPORTS.rx, SPORTS.ry] = G.sports;
     rt.guideKey = undefined;
     applyThemes();
@@ -8142,8 +8212,10 @@ body.cam-scene #ffChip,body.cam-scene #plChip,body.cam-scene .b-ring{animation-p
   function renderTeachersOnMap() {
     for (const k of Object.keys(TEA)) {
       const g = $('#m-' + k);
+      const T = geo().tea, mh0 = $('#m-hedgehog');
+      if (!T) { g.style.display = 'none'; if (mh0) mh0.style.display = 'none'; continue; }   // 4.0.0 선생님 자리가 없는 구역
+      if (mh0) mh0.style.display = '';
       g.style.display = S.t[k] > 0 ? '' : 'none';
-      const T = geo().tea;
       const p = k === 'owl' && !(S.f.library > 0) ? T.owlAway : T[k];
       const hh = T.hedgehog, mh = $('#m-hedgehog');
       if (mh) mh.setAttribute('transform', `translate(${hh[0]} ${hh[1]}) scale(${hh[2]})`);
@@ -8216,7 +8288,7 @@ body.cam-scene #ffChip,body.cam-scene #plChip,body.cam-scene .b-ring{animation-p
     const G = geo(), vb = vdBlock(), vk = vb ? vb.map(Math.round).join() : '';
     if (rt.nav && rt.nav.G === G && rt.nav.vk === vk) return rt.nav;
     const M = 2, box = ([cx, cy, w]) => [cx - w * 0.38 - M, cy - w * 0.38 - M, cx + w * 0.38 + M, cy + w * 0.3 + M];
-    const blocks = Object.values(G.b).map(box).concat([box(G.next.at)]);
+    const blocks = Object.values(G.b).map(box).concat(G.next ? [box(G.next.at)] : []);
     if (G.fount) { const [fx, fy, rx, ry] = G.fount; blocks.push([fx - rx, fy - ry, fx + rx, fy + ry, 1]); }
     if (vb) blocks.push(vb);   // 3.0.0 마을 기부 기념물
     // 기념물이 원래 걷는 점을 덮으면 그 점을 빼고 네 모서리에 우회점을 더해요.
@@ -8286,7 +8358,7 @@ body.cam-scene #ffChip,body.cam-scene #plChip,body.cam-scene .b-ring{animation-p
     k.ty = ok ? y : SP[i][1];
   }
   function placeKid(k, bob) {
-    const tf = `translate(${k.x.toFixed(1)} ${(k.y + bob).toFixed(1)}) scale(1.1)`;
+    const tf = `translate(${k.x.toFixed(1)} ${(k.y + bob).toFixed(1)}) scale(${geo().campus ? 0.72 : 1.1})`;   // 4.0.0 캠퍼스 지도는 건물이 작게 그려져 있어 학생도 작게
     if (k.tf === tf) return;   // 3.2.6 끊김: 서 있는 학생은 같은 값을 다시 쓰지 않아요(지도 전체를 다시 그리게 돼서)
     k.tf = tf; k.g.setAttribute('transform', tf);
   }
@@ -8323,7 +8395,8 @@ body.cam-scene #ffChip,body.cam-scene #plChip,body.cam-scene .b-ring{animation-p
   function syncKids(initial) {
     const list = speciesList();
     // 3.2.5 체험학습 출발 장면 동안은 떠날 친구(rt.busHold명)가 버스에 탈 때까지 지도에 남아 있어요
-    const want = Math.max(0, Math.min(Math.max(CFG.maxKids, list.length), Math.floor(S.students)) - Math.max(0, (S.trip.kids || 0) - (rt.busHold || 0)));
+    let want = Math.max(0, Math.min(Math.max(CFG.maxKids, list.length), Math.floor(S.students)) - Math.max(0, (S.trip.kids || 0) - (rt.busHold || 0)));
+    if (geo().campus) want = Math.min(want, 6);   // 4.0.0 캠퍼스 지도에는 몇 명만 걸어요
     while (rt.kids.length < want) addKid(!initial);
     while (rt.kids.length > want) { const i = kidDupIdx(); const k = rt.kids.splice(i, 1)[0]; k.g.remove(); }
     if (rt.kidSpN !== list.length) {
@@ -8886,6 +8959,75 @@ body.cam-scene #ffChip,body.cam-scene #plChip,body.cam-scene .b-ring{animation-p
   const lookOf = k => $(`#b-${k} .built`);
   const bellEl = () => $('.bell', lookOf('classroom'));
   function ringBell() { const b = bellEl(); if (!b) return; b.classList.remove('ring'); void b.getBBox(); b.classList.add('ring'); }
+  // 4.0.0 구역 바꾸기: z는 구역 열쇠, ''면 캠퍼스 화면. 지도 한 장을 통째로 바꾸는 것이라 학생과 떨어진 도토리를 새 지도에 다시 놓아요
+  function setZone(z, quiet) {
+    if (!uniOn()) return;
+    z = ZONE_KEYS.includes(z) ? z : '';
+    const was = geoIdx();
+    S.zone = z; if (z) rt.zoneLast = z;
+    if (geoIdx() !== was) {
+      rt.nav = null; rt.guideKey = undefined;
+      rt.kids.forEach(k => k.g.remove()); rt.kids = []; clearDrops();
+      renderMap(); syncKids(true);
+      rt.zoom = 1; fitMap(true);   // 새 지도는 처음 자리와 크기로
+    }
+    if (typeof renderCampus === 'function') renderCampus();
+    if (!quiet) { renderHUD(); renderAffordance(); save(); }
+  }
+  // 4.0.0 캠퍼스 지도 위의 구역 이름표. 배지는 그 구역 건물 가운데 급한 것 하나: 즉시 완공 가능 > 공사 중 > 올릴 수 있어요
+  function zoneBadge(z) {
+    const Z = ZONE_GEO.find(Z => Z.zone === z); if (!Z) return null;
+    const ks = Object.keys(Z.lot).filter(k => FAC[k] && facKeys().includes(k));
+    if (ks.some(k => { const p = document.getElementById('pq-' + k); return p && p.classList.contains('ff-on'); })) return ['ff', '즉시 완공 가능!'];
+    if (ks.some(k => conOn(k))) return ['con', '공사 중'];
+    if (ks.some(k => S.budget >= facNextCost(k))) return ['up', '올릴 수 있어요'];
+    return null;
+  }
+  function renderCampus() {
+    const g = $('#campusG'); if (!g || !S) return;
+    const on = uniOn() && !!geo().campus && rt.viewTier == null;
+    const key = on ? CAMPUS.zones.map(z => z.key + ':' + (z.lock ? 'L' : (zoneBadge(z.key) || [''])[0])).join() : '';
+    if (g.dataset.key !== key) {
+      g.dataset.key = key;
+      g.innerHTML = !on ? '' : CAMPUS.zones.map(z => {
+        const [tx, ty] = z.tag, [hx, hy, hw, hh] = z.hit, w = z.name.length * 11.5 + 18, bd = z.lock ? null : zoneBadge(z.key), bw = bd ? bd[1].length * 8 + 12 : 0;
+        return `<g class="cz${z.lock ? ' lock' : ''}" data-zone="${z.key}" tabindex="0" role="button" aria-label="${z.name}${z.lock ? ', 대학원에서 열려요' : ', 눌러서 들어가기' + (bd ? ', ' + bd[1] : '')}">` +
+          `<rect class="cz-hit" x="${hx}" y="${hy}" width="${hw}" height="${hh}" rx="18"/>` +
+          `<g transform="translate(${tx} ${ty})"><rect class="cz-plate" x="${-w / 2}" y="${z.lock ? -13 : -10}" width="${w}" height="${z.lock ? 28 : 20}" rx="10"/>` +
+          `<text class="cz-name" y="${z.lock ? 0 : 4}">${z.name}</text>` + (z.lock ? '<text class="cz-sub" y="10">대학원에서 열려요</text>' : '') +
+          (bd ? `<g class="cz-bdg ${bd[0]}" transform="translate(0 -19)"><rect x="${-bw / 2}" y="-6.5" width="${bw}" height="13" rx="6.5"/><text y="3">${bd[1]}</text></g>` : '') + '</g></g>';
+      }).join('');
+    }
+    renderZoneBar();
+  }
+  function renderZoneBar() {
+    const bar = $('#zoneBar'); if (!bar || !S) return;
+    const show = uniOn() && !geo().campus && rt.tab === 'school' && !rt.decoEdit && rt.viewTier == null;
+    bar.hidden = !show; if (!show) return;
+    $('#zoneName').textContent = geo().zname;
+    const ic = $('#zoneHomeIc'), u = mapHi[CAMPUS.map] === 'ok' ? mapUrl(CAMPUS.map) : IMG170(CAMPUS.map);
+    if (u && ic.dataset.u !== u) { ic.dataset.u = u; ic.style.backgroundImage = `url("${u}")`; }
+  }
+  const zoneStep = d => { const i = ZONE_KEYS.indexOf(S.zone); if (i >= 0) { sfx('tap'); setZone(ZONE_KEYS[(i + d + ZONE_KEYS.length) % ZONE_KEYS.length]); } };
+  function campusTap(el) {
+    const z = CAMPUS.zones.find(z => z.key === el.dataset.zone); if (!z) return;
+    if (z.lock) { toast(`${eun(z.name)} 대학원에서 열려요`); sfx('tap'); return; }
+    sfx('tap'); setZone(z.key);
+  }
+  // 4.0.0 장면이 일어나는 구역으로 조용히 옮겨요(운동회는 체육, 버스는 광장, 건물 바로 가기는 그 건물 구역)
+  const zoneGo = z => { if (uniOn() && z && geo().zone !== z) setZone(z, true); };
+  // 4.0.0 대학교 미리 보기(개발자 메뉴에서만): 저장하지 않고 이 화면에서만 대학교로 바꿔 봐요. 새로 고치면 원래 학교로 돌아와요
+  function uniPreview() {
+    if (AIT || window.FOREST_STORE || !S) return false;
+    if (!rt.uniPrev) save();
+    rt.uniPrev = true; S.u.dev = true;
+    S.tier = UNI_TIER; S.tg = 0; S.sem = 0; S.zone = ''; rt.zoneLast = '';
+    rt.mapLaid = undefined; rt.nav = null;
+    rt.kids.forEach(k => k.g.remove()); rt.kids = []; clearDrops();
+    setTab('school'); renderMap(); syncKids(true); renderHUD(); renderAffordance();
+    if (typeof renderCampus === 'function') renderCampus();
+    return true;
+  }
   function renderMap() {
     map.classList.toggle('tier-0', !(S.tier >= 1));
     map.classList.toggle('tier-1', S.tier >= 1);
@@ -8908,6 +9050,7 @@ body.cam-scene #ffChip,body.cam-scene #plChip,body.cam-scene .b-ring{animation-p
     renderOak();
     renderDeco();
     if (S.bd) for (const k of Object.keys(FAC)) conMap(k);   // 2.1.0 공사 표시
+    renderCampus();   // 4.0.0
   }
 
   /* 1.5.0 홈: 지도를 화면 가득 깔고 UI를 띄워요. 지도 그림은 화면보다 크게 그리고(가로세로 비율 유지), 손가락으로 밀어 볼 수 있어요 */
@@ -8933,7 +9076,7 @@ body.cam-scene #ffChip,body.cam-scene #plChip,body.cam-scene .b-ring{animation-p
     return [-(rt.panX || 0) / sc, ((rt.hudTop || 0) - (rt.panY || 0)) / sc - 60, (W - (rt.hudRight || 0) - (rt.panX || 0)) / sc, (H - (rt.hudBot || 0) - (rt.panY || 0)) / sc - 60];
   }
   // 지도에서 가장 위에 있는 건물(공사 자리 포함)의 지붕 꼭대기 y (지도 좌표)
-  const mapRoofTop = () => { const G = geo(); return Math.min(...Object.values(G.b).concat([G.next.at]).map(([, cy, w]) => cy - w * 0.46)); };
+  const mapRoofTop = () => { const G = geo(); return Math.min(...Object.values(G.b).concat(G.next ? [G.next.at] : []).map(([, cy, w]) => cy - w * 0.46)); };
   // 3.2.5 화면 당기기(camAnim)가 마지막 자리를 미리 알 수 있게 자리 맞추기만 따로 떼었어요
   function panTo(x, y) {
     if (rt.camHold) { rt.camHold = null; map.classList.remove('cam-move'); }   // 3.2.6 키운 채로 멈춘 그림을 손으로 옮기면 그 자리에서 끝내요
@@ -9125,6 +9268,7 @@ body.cam-scene #ffChip,body.cam-scene #plChip,body.cam-scene .b-ring{animation-p
     renderQuestBar();
     renderSubBar();
     renderGuide();
+    renderCampus();   // 4.0.0 구역 배지
     renderTeacherGuide();
     renderQuestPanel(false);
     updateQuestDot();
@@ -10664,6 +10808,7 @@ body.cam-scene #ffChip,body.cam-scene #plChip,body.cam-scene .b-ring{animation-p
     fr: [0.9, 0.34, 0.4, 0.45, 0.43, 0.43, 0.54, 0.65, 0.66],   // 3.0.0 그림 캔버스에서 실제 그림이 차지하는 너비(기부함, 1~8단계). 1, 2단계는 그림이 작게 그려져서 이걸로 키워요
     spot: [null, [12, 90], [12, 91], [12, 90]],   // 3.3.0 지섭: '새 편지' 단추에 가려서 아래로. 오른쪽 아래는 체험학습 버스 자리라 간판 왼쪽 아래 풀밭으로
     titles: [{ id: 'vdpatron', lv: 3, title: '마을 후원자' }, { id: 'vdgold', lv: 8, title: '황금 나무 주인' }] };   // 20단계 '숲속 기부왕'은 업적 줄의 칭호
+  ZONE_GEO.forEach(Z => VD.spot.push(Z.vd ? [Z.vd[0] / MAP_W * 100, (Z.vd[1] - MAP_Y) / MAP_H * 100] : null));   // 4.0.0 기념물은 광장 구역에만(작업지시서 54 자리 표)
   const vdH = n => n <= VD.H.length ? VD.H[n - 1] : VD.H[VD.H.length - 1] + VD.after * (n - VD.H.length);
   const vdOpen = () => !!S && !!S.vd && S.tier >= VD.tier;
   const vdRate = () => Math.max(1, rate() / (feastOn() ? 2 : 1) / snMult() / gdMult());   // 특식 데이와 간식 기분, 오늘의 급식은 빼요
@@ -10758,6 +10903,7 @@ body.cam-scene #ffChip,body.cam-scene #plChip,body.cam-scene .b-ring{animation-p
       el.style.right = r + 'px'; el.style.bottom = `calc(var(--bot-h, 70px) + ${10 + row * 35}px)`;
       r += w + 6;
     }
+    { const zb = $('#zoneBar'); if (zb) zb.style.bottom = `calc(var(--bot-h, 70px) + ${46 + row * 35}px)`; }   // 4.0.0 구역 막대는 칩 줄 바로 위
   }
   function ffUp() { chipRow(); }
   function ffRender(force) {
@@ -11498,8 +11644,9 @@ body.cam-scene #ffChip,body.cam-scene #plChip,body.cam-scene .b-ring{animation-p
       const ok = isFac ? buyFacility(d.k, half) : teacherAct(d.k, null, half);
       if (!ok) { S.hd.n -= 1; save(); renderDeal(); toast('도토리가 모자라서 핫딜을 쓰지 못했어요. 횟수는 그대로예요'); return; }
       // 산 건물이나 오신 선생님 위로 아낀 도토리가 떠올라요
-      const T = geo().tea, tq = d.k === 'owl' && !(S.f.library > 0) ? T.owlAway : T[d.k];
-      const tp = isFac ? [bpos(d.k)[0], bpos(d.k)[1] - bpos(d.k)[2] * 0.3] : [tq[0], tq[1] - 20];
+      const T = geo().tea, tq = !T ? geo().plaza : d.k === 'owl' && !(S.f.library > 0) ? T.owlAway : T[d.k];
+      const bp = bpos(d.k) || [geo().plaza[0], geo().plaza[1], 0];   // 4.0.0 다른 구역 건물이면 광장 위에 띄워요
+      const tp = isFac ? [bp[0], bp[1] - bp[2] * 0.3] : [tq[0], tq[1] - 20];
       setTimeout(() => floatText(tp[0], tp[1], `반값! ${fmt(full - half)} 아낌`, 'gold'), 250);
     } else if (d.type === 'feast') {
       S.hd.feastUntil = Math.max(gameNow(), S.hd.feastUntil) + feastMins() * 60000;
@@ -11927,7 +12074,7 @@ body.cam-scene #ffChip,body.cam-scene #plChip,body.cam-scene .b-ring{animation-p
     initCloud();
   }
   async function cloudPush(force) {
-    if (!cloudOn() || rt.adopting || Cloud.pushing || !S || Cloud.delLeft || Cloud.hold || Cloud.deleting) return;   // 2.2.0 고르는 동안, 검토 3 계정을 지우는 동안은 올리지 않아요
+    if (!cloudOn() || rt.adopting || rt.uniPrev || Cloud.pushing || !S || Cloud.delLeft || Cloud.hold || Cloud.deleting) return;   // 2.2.0 고르는 동안, 검토 3 계정을 지우는 동안은 올리지 않아요
     if (!force && !Cloud.dirty) return;
     if (!Cloud.fresh) { Cloud.dirty = true; cloudVerify(); return; }   // 2.0.0 Codex 검토(3): 다시 켠 뒤에는 서버 저장을 먼저 확인해요
     Cloud.pushing = true; Cloud.dirty = false;
@@ -12990,7 +13137,7 @@ body.cam-scene #ffChip,body.cam-scene #plChip,body.cam-scene .b-ring{animation-p
   const THEME = Object.fromEntries(THEMES.map(t => [t.id, t]));
   const TH_IDS = THEMES.flatMap(t => TH_SLOTS.map(([s]) => `th:${t.id}:${s}`));
   // 처마 자리 (건물마다 장식을 다는 선): x1, x2, y
-  const thEaves = k => { const [cx, cy, w] = bpos(k), e = geo().eaves[k] || 0; return [cx - w * 0.3, cx + w * 0.3, cy + w * e]; };
+  const thEaves = k => { const [cx, cy, w] = bpos(k) || [0, 0, 0], e = geo().eaves[k] || 0; return [cx - w * 0.3, cx + w * 0.3, cy + w * e]; };
   const thPrice = (t, slot) => slot === 'bg' ? t.bgPrice : t.price;
   const thOwn = (t, slot) => S.cos.own.includes(`th:${t}:${slot}`);
   const thCount = t => TH_SLOTS.filter(([s]) => thOwn(t, s)).length;
@@ -13686,7 +13833,9 @@ body.cam-scene #ffChip,body.cam-scene #plChip,body.cam-scene .b-ring{animation-p
     [[77, 28], [46.5, 33.3], [13, 79.5], [19, 79.5], [49, 81], [63, 80], [66, 84], [26.5, 86.5], [60, 84], [20, 28], [21.5, 83.5]].map(pctXY),
     [[53, 21], [77, 24], [57, 40.5], [20, 48], [14, 75], [23, 82.5], [14, 64], [82, 28.5], [64, 80], [22, 78.5], [21, 86.5]].map(pctXY),
   ];
+  ZONE_GEO.forEach(Z => DECO_SLOTS.push(Z.deco.map(p => p.slice()))); DECO_SLOTS.push([]);   // 4.0.0 구역 지도마다 꾸미기 6곳(작업지시서 54 자리 표)
   const DECO_SIGN = [[124.2, 424.3], [124.2, 416.2], [126.0, 421.6], [124.2, 424.3]];   // 3.3.0 지섭: 지도 그림의 정문 옆 나무 팻말 위에 덮어요(작업지시서 57 자리 표의 간판 가운데)
+  ZONE_GEO.forEach(Z => DECO_SIGN.push(Z.sign || null)); DECO_SIGN.push(null);   // 4.0.0 학교 간판은 정문이 있는 광장 구역에만
   const MARK_BASE = ['shield', 'circle', 'flag'], MARK_SYM = ['acorn', 'leaf', 'star', 'book', 'sun', 'owl'];
   const MARK_COL = ['#D9534A', '#E8913A', '#F2C230', '#4E9A4A', '#3E78C2', '#8A5BC2', '#E77FA8', '#9A6A43'];
   const MARK_COL_NM = ['빨강', '주황', '노랑', '초록', '파랑', '보라', '분홍', '갈색'];
@@ -13741,8 +13890,8 @@ body.cam-scene #ffChip,body.cam-scene #plChip,body.cam-scene .b-ring{animation-p
     if (!force && g.dataset.key === key) return; g.dataset.key = key;
     let h = edit ? '<rect class="deco-dim" x="-200" y="-200" width="760" height="940"/>'  : bxMapHTML(m);
     { const vt = $('#vdTop'); if (vt) vt.innerHTML = edit ? '' : vdMapHTML(m); }   // 2.3.1 마을 기부는 학생 위 층   // 2.2.0 숨은 생물. 2.1.2 마을 기부 기념물(꾸미기 중에는 숨겨요). 2.1.3 꾸미기 중에는 지도를 살짝 어둡게 해서 빈 자리가 잘 보여요
-    const [sx, sy] = DECO_SIGN[m], sw = 96, sh = 48, nm = S.deco.nm || '숲속', tn = tierInfo().name;
-    if (IMG('sign_board')) {
+    const [sx, sy] = DECO_SIGN[m] || [0, 0], sw = 96, sh = 48, nm = S.deco.nm || '숲속', tn = tierInfo().name;
+    if (DECO_SIGN[m] && IMG('sign_board')) {
       // 글자는 간판 안쪽 판(그림 높이의 27%~71%) 가운데에 두 줄로. 판이 낮아서 글자를 작게 해요(1.7.4 지섭: 위로 삐져나감)
       const fs1 = Math.min(8.5, 50 / Math.max(1, nm.length)), fs2 = Math.min(7.5, 50 / Math.max(1, tn.length)), mid = sy - sh * 0.477;
       h += `<g class="deco-sign"><image x="${sx - sw / 2}" y="${sy - sh * 0.97}" width="${sw}" height="${sh}" href="${IMG('sign_board')}"/>` +
@@ -13787,6 +13936,7 @@ body.cam-scene #ffChip,body.cam-scene #plChip,body.cam-scene .b-ring{animation-p
   // 2.1.3 빈 장식 자리 표시: 금빛 테 흰 동그라미에 + , 둘레가 숨 쉬듯 반짝여요. 차례 번호는 애니메이션이 한꺼번에 깜빡이지 않게 늦춤에 써요
   const decoEmptyMark = (x, y, i) => `<g class="deco-empty" transform="translate(${x} ${y - 10})" style="--d:${(i % 4) * 0.3}s"><circle class="de-halo" r="17"/><circle class="de-dot" r="11.5"/><path class="de-plus" d="M-5 0H5M0 -5V5"/></g>`;
   function decoEditStart() {
+    if (uniOn() && geo().campus) setZone('plaza', true);   // 4.0.0 캠퍼스 지도에는 꾸미기 자리가 없어서 광장 구역으로(다른 구역은 그 구역에서 꾸며요)
     rt.decoEdit = true; sfx('tap');
     setTab('school'); renderDeco(true);
     const m = decoMap(), i = S.deco.lay[m].indexOf('');
@@ -17039,7 +17189,7 @@ body.cam-scene #ffChip,body.cam-scene #plChip,body.cam-scene .b-ring{animation-p
     const nlOn = !!map && map.classList.contains('hs-night') && rt.viewTier == null;   // 3.2.1 고등학교 밤 모습 단추
     const key = [S.tier, rt.viewTier, nlOn, S.nl || 0, box.hidden].join('|');
     if (box.dataset.key === key) return; box.dataset.key = key;
-    setTimeout(wxPlace, 0);
+    setTimeout(wxPlace, 0); renderCampus();   // 4.0.0 구역 막대도 같은 때에
     box.innerHTML = TIER_SHORT.map((c, t) => {
       const cur = t === S.tier, past = t < S.tier, on = rt.viewTier === t || (rt.viewTier == null && cur);
       return `<button type="button" class="td${cur ? ' cur' : ''}${past ? ' past' : ''}${on ? ' on' : ''}${t > S.tier ? ' lock' : ''}" data-td="${t}" aria-label="${TIER_ALL[t]}${cur ? ', 지금 학교' : past ? ', 그때 모습 보기' : ', 아직 못 가요'}"${t > S.tier ? ' aria-disabled="true"' : ''}>` +
@@ -18351,6 +18501,7 @@ body.cam-scene #ffChip,body.cam-scene #plChip,body.cam-scene .b-ring{animation-p
     }
   }
   function busScene(mode, n, then) {
+    zoneGo('plaza');   // 4.0.0 버스 정류장은 광장 구역
     if (rt.reduced || !layerFx.animate) { rt.busHold = 0; if (then) then(); return; }
     if (rt.bus) rt.bus.remove();
     const g = document.createElementNS(NS, 'g');
@@ -18481,7 +18632,7 @@ body.cam-scene #ffChip,body.cam-scene #plChip,body.cam-scene .b-ring{animation-p
       return;
     }
     const go = () => {
-      setTab('school'); closeSheet();
+      setTab('school'); closeSheet(); zoneGo('sports');   // 4.0.0 운동회는 체육 구역에서
       $('#scroller').scrollTo({ top: $('#scroller').scrollHeight, behavior: rt.reduced ? 'auto' : 'smooth' });
       rt.sports = { t: SPORTS.sec, blue: 0, white: 0, spawn: 0, foe: 1.2, intro: 3 };
       feverOn(true);
@@ -18663,6 +18814,7 @@ body.cam-scene #ffChip,body.cam-scene #plChip,body.cam-scene .b-ring{animation-p
   }
   function startFest(id, viaAd) {
     if (festBusy()) return;
+    if (uniOn() && geo().campus && id !== 'sports') zoneGo('plaza');   // 4.0.0 학교 행사는 보고 있는 구역에서, 캠퍼스 지도에서 열면 광장 구역에서
     if (tr2Busy()) { toast(tr2Busy()); return; }   // 3.2.0
     if (festTimeLock(id)) { toast(FEST[id].night ? '기숙사 행사는 밤 8시부터 열려요' : '밤에는 학생들이 기숙사에 있어요. 아침 6시에 다시 열 수 있어요'); return; }
     if (!festOpen(id)) return;
@@ -20379,7 +20531,20 @@ body.cam-scene #ffChip,body.cam-scene #plChip,body.cam-scene .b-ring{animation-p
     if (t === rt.guideKey) return;
     rt.guideKey = t;
     const g = $('#guide');
+    { const zh = $('#zoneHome'); if (zh) zh.classList.remove('guide'); }
     if (!t) { g.innerHTML = ''; return; }
+    // 4.0.0 대학교: 가리킬 건물(도토리 줍기는 참나무가 있는 체육 구역)이 지금 지도에 없으면 그 구역으로 안내해요.
+    // 캠퍼스 지도에서는 구역 이름표를 가리키고, 다른 구역 안에서는 '캠퍼스' 단추를 반짝여요
+    if (uniOn()) {
+      const tz = t === 'picks' ? zoneOf('playground') : zoneOf(t);
+      if (tz && tz !== geo().zone) {
+        const cz = CAMPUS.zones.find(z => z.key === tz);
+        if (geo().campus && cz) { const [x, y] = cz.tag, w = cz.name.length * 11.5 + 18; g.innerHTML = `<g class="g-ring"><rect x="${x - w / 2 - 3}" y="${y - 13}" width="${w + 6}" height="26" rx="13"/></g><g transform="translate(${x} ${y + 17}) rotate(180)"><g class="g-arrow"><path d="M0 0 L-9 -11 L-4 -11 L-4 -23 L4 -23 L4 -11 L9 -11 Z"/></g></g>`; }
+        else { g.innerHTML = ''; const zh = $('#zoneHome'); if (zh) zh.classList.add('guide'); }
+        return;
+      }
+      if (!tz) { g.innerHTML = ''; return; }
+    }
     // 도토리 줍기는 참나무를 가리켜요
     if (t === 'picks') { const [ox, oy, orr] = oakAt(); g.innerHTML = `<g class="g-ring"><circle cx="${ox}" cy="${oy - 8}" r="${orr}"/></g><g transform="translate(${ox} ${oy - 10 - orr})"><g class="g-arrow"><path d="M0 0 L-9 -11 L-4 -11 L-4 -23 L4 -23 L4 -11 L9 -11 Z"/></g></g>`; return; }
     const fr = $('#b-' + t + ' .focus-ring');
@@ -20416,7 +20581,7 @@ body.cam-scene #ffChip,body.cam-scene #plChip,body.cam-scene .b-ring{animation-p
   }
 
   /* 바로 가기: 퀘스트에 필요한 곳을 열어 줘요 */
-  function goFac(k, msg) { setTab('school'); openSheet(k); if (msg) toast(msg); }
+  function goFac(k, msg) { setTab('school'); zoneGo(zoneOf(k)); openSheet(k); if (msg) toast(msg); }
   // 2.0.1 가구 퀘스트: 건물 창을 열고 가구 칸까지 내려가요(전에는 건물 창도 열리지 않았어요)
   function goFur(k, i) {
     if (!FAC[k] || !FUR[k]) return setTab('school');
@@ -20778,7 +20943,7 @@ body.cam-scene #ffChip,body.cam-scene #plChip,body.cam-scene .b-ring{animation-p
       if (isFinite(iv) && pickTutorial()) iv = Math.min(iv, 5);   // 도토리 줍기 퀘스트 동안은 더 자주 떨어져요
       if (isFinite(iv)) {
         rt.dropT += dt;
-        if (rt.dropT >= iv) { rt.dropT = 0; if (rt.drops.length < CFG.maxDrops && !rt.fest && !rt.sports && !rt.decoEdit) spawnDrop(); }   // 3.3.1 지섭: 학교 행사와 꾸미기 중에는 도토리가 떨어지지 않아요
+        if (rt.dropT >= iv) { rt.dropT = 0; if (rt.drops.length < CFG.maxDrops && !rt.fest && !rt.sports && !rt.decoEdit && !geo().campus) spawnDrop(); }   // 3.3.1 지섭: 학교 행사와 꾸미기 중에는 도토리가 떨어지지 않아요
       }
       syncKids(false);
       // 보안 보강 판 끊김(2026-11-06 지섭 S26 울트라 제보): 학생 걸음, 지도 속 SVG 움직임, 빛 번짐처럼 휴대폰이 화면 전체를 다시 계산하는 일을
@@ -21011,7 +21176,7 @@ body.cam-scene #ffChip,body.cam-scene #plChip,body.cam-scene .b-ring{animation-p
     window.addEventListener('online', () => { if (Cloud.state === 'error' && (Cloud.err === 'net' || Cloud.err === 'load' || Cloud.err === 'acct')) retryCloud(); });
     window.addEventListener('resize', refit);
     if (document.fonts && document.fonts.ready) document.fonts.ready.then(() => { rt.fitGen += 1; refit(); }).catch(() => {});
-    const nextTap = () => { const G = geo().next; toast(`${eun(G.name)} ${G.tag}`); sfx('tap'); };
+    const nextTap = () => { const G = geo().next; if (!G) return; toast(`${eun(G.name)} ${G.tag}`); sfx('tap'); };
     $('#b-next').addEventListener('click', nextTap);
     $('#b-next').addEventListener('keydown', e => { if (e.key === 'Enter' || e.key === ' ') { e.preventDefault(); nextTap(); } });
     $('#oak').addEventListener('click', tapOak);
@@ -21077,6 +21242,12 @@ body.cam-scene #ffChip,body.cam-scene #plChip,body.cam-scene .b-ring{animation-p
       rt.lux = !luxOn(); try { localStorage.setItem('forest-lux', rt.lux ? '1' : '0'); } catch (e) { /* 이번만 */ }
       applyThemes(); renderMap(); devLuxText(); toast(rt.lux ? '고급 배경을 켰어요' : '고급 배경을 껐어요');
     });
+    $('#campusG').addEventListener('click', e => { const el = e.target.closest('.cz'); if (el) campusTap(el); });
+    $('#campusG').addEventListener('keydown', e => { const el = e.target.closest('.cz'); if (el && (e.key === 'Enter' || e.key === ' ')) { e.preventDefault(); campusTap(el); } });
+    $('#zoneHome').addEventListener('click', () => { sfx('tap'); setZone(''); });
+    $('#zonePrev').addEventListener('click', () => zoneStep(-1));
+    $('#zoneNext').addEventListener('click', () => zoneStep(1));
+    $('#devUni').addEventListener('click', () => { if (uniPreview()) toast('대학교 미리 보기예요. 저장되지 않아요 (테스트)'); });
     $('#devCash').addEventListener('click', () => {
       S.u.dev = true;
       const v = Math.max(1000, rate() * 3600);
@@ -23588,7 +23759,7 @@ body.cam-scene #ffChip,body.cam-scene #plChip,body.cam-scene .b-ring{animation-p
     LAB, LAB_IN, LAB_KEYS, LAB_CARDS, LAB_MIX, LAB_DBL, labOf, labRun, labCount, labReady, labDone, openLab, renderLab, labTap, labGo, RD, BOOKS, rdStart, rdSettle, rdTick, rdLeft, rdRemain, openRead, renderRead, renderStudy2, sanitizeStudy2, maintSync, maintTap, openBook, renderBook, BT, BT_EV, BT_LG, BT_SCH, btOpen, btLeft, btRoster, btBest, btMake, btScore, btWin, btFinish, btOpenScene, btClose, btRankDoc, BT_RANK, readRow, btAuto, btPick, btStart, btRender, renderBtCard, sanitizeBt, get btUI() { return btUI; }, EX, exIsWeek, exNow, exPrev, exDays, exScore, exGrade, exStudy, exClaim, exTick, exMake, openExam, renderExam, exAwardTop, exReportReady, sanitizeExam, renderSheet, openSheet,   // 2.0.1 공부 2단계(s76)
     AC, AC_GAME, AB_KEY, ABIL, acLv, acSum, acMult, acRepOf, acGain, acSettle, acAll, acCap, acBkLeft, acBuyBook, renderAc, sanitizeAc, freshAc, rankRows, awayStart, awaySettle, timeSrc, save, awayHold, rankCap, cloudVerify, liveApply, liveLoad, openNotice, NOTICES, get Live() { return Live; }, get Rank() { return Rank; }, liveOff,   // 2.0.0 보안 점검 시험(s71), Codex 검토 시험(s72)
     rosterEnsure, rosterMake, rosterAdd, clubAuto, clubSet, clubPct, clubShow, clubSum, clubStars, clubMembers, clubShowGo, showReady, showWait, showDay, clubWeekTick, clubFacUp, CLUBS, CLUB, star, clubTuitionMult, clubFestMult, clubDecoOff, renderClub, renderHall, openSeatPick, openClubPick,
-    TIER_SCALE, legacyMult, tuitionMult, snapTake, snapOf, showCere, cereCrew, cere3Info, cere3Load, cere3, tierViewOpen, tierViewClose, renderTierView, renderTierDots, nlCycle, viewMap, showNewTalk, talkNext, showCere, cereEnd, cereCrew, cereAsk, cereKeep, goFur, updateQuestDot, openElect, renderElect, elVote, elSync, elMult, elClub, elPres, elBadge, elMake, EL_PLEDGES, clubPct, festPrize, dropValue, claimMission, gameWeek, NEWCOMERS, TIERS, GEO, geoIdx, decoCost0, qMeasure, qDone, qGoal, kidArt: kidSVG, newYear, checkGrade, gradeOf, townRep, FAC, sanitize200, trialHunt, updateTrial, TRIAL, zoomAt, fitMap, ZOOM_MAX, DECO, DECO_SLOTS, DECO_SIGN, decoCost, decoSoldOut, pickDeco, buyDeco, decoPut, decoEditStart, decoEditEnd, openDecoPick, renderDeco, setSchoolNm, setMark, schoolTitle, markHTML, decoPlacedAll, esExLeft, esExCost, get Cloud() { return Cloud; }, get actx() { return actx; }, Music, musicSync, ensureAudio, bgmLoad, pzUI, rt, makeDeal, furStage, DEAL, navInfo, navRoute, spawnDrop, repTipCheck, linkGoogle, retryCloud, sanitize, acctPending, renderMap, renderHUD, renderAffordance, syncKids, layoutMap, geo, hitTrial, endVisit, showReward, recommend, needCost, prepTopUp, qReward, prepPhase, rankScore, pwOf, previewDip, dipMult, costScale, buyFur, buyFurAll, furCost, furReady, furDone, FUR, startTalk, endTalk, teacherAct, facCost, teaCost, facKeys, rate, rep, capacity, canGraduate, canPromote,
+    TIER_SCALE, renderCampus, zoneBadge, uniPreview, setZone, zoneKey, uniOn, zoneOf, ZONE_GEO, CAMPUS, GEO, geoIdx, legacyMult, tuitionMult, snapTake, snapOf, showCere, cereCrew, cere3Info, cere3Load, cere3, tierViewOpen, tierViewClose, renderTierView, renderTierDots, nlCycle, viewMap, showNewTalk, talkNext, showCere, cereEnd, cereCrew, cereAsk, cereKeep, goFur, updateQuestDot, openElect, renderElect, elVote, elSync, elMult, elClub, elPres, elBadge, elMake, EL_PLEDGES, clubPct, festPrize, dropValue, claimMission, gameWeek, NEWCOMERS, TIERS, GEO, geoIdx, decoCost0, qMeasure, qDone, qGoal, kidArt: kidSVG, newYear, checkGrade, gradeOf, townRep, FAC, sanitize200, trialHunt, updateTrial, TRIAL, zoomAt, fitMap, ZOOM_MAX, DECO, DECO_SLOTS, DECO_SIGN, decoCost, decoSoldOut, pickDeco, buyDeco, decoPut, decoEditStart, decoEditEnd, openDecoPick, renderDeco, setSchoolNm, setMark, schoolTitle, markHTML, decoPlacedAll, esExLeft, esExCost, get Cloud() { return Cloud; }, get actx() { return actx; }, Music, musicSync, ensureAudio, bgmLoad, pzUI, rt, makeDeal, furStage, DEAL, navInfo, navRoute, spawnDrop, repTipCheck, linkGoogle, retryCloud, sanitize, acctPending, renderMap, renderHUD, renderAffordance, syncKids, layoutMap, geo, hitTrial, endVisit, showReward, recommend, needCost, prepTopUp, qReward, prepPhase, rankScore, pwOf, previewDip, dipMult, costScale, buyFur, buyFurAll, furCost, furReady, furDone, FUR, startTalk, endTalk, teacherAct, facCost, teaCost, facKeys, rate, rep, capacity, canGraduate, canPromote,
     fmt, fmt2, graduate, promote, buyPerk, perkCost, perkMaxed, buyFundPerk, fpCost, claimMain, mainReady, curMain, qNo, earn, CFG, TEA, teaMaxed, PERKS, FPERKS, MAIN, finalYear, startTrip, claimTrip, TRIPS, yearLocked, endSports, rtSports: () => rt.sports, rtFest: () => rt.fest, facCap, addLeague, addMP, tutStart, endFest, claimBox, musicWant, askBox, festWait, setTab,
     RARE, modelOf, rareRoll, rareGot, showRareTalk, rareDexHTML, kidSVG, rosterKid, WX, wxOf, wxIs, rdMinNow, renderWeather, PL, plSync, plUnread, openPLetter, renderPLetter, RS, rsNum, rsSync, rsAdd, rsLabel, lookDoc, lookRead, lookPush, lookSet, openLook, MODEL_SCHOOL, joinRank, PS, PS_M, PS_SEASONS, psSeason, psOpen, psSync, psLv, psGot, psReward, psClaimAll, psClaimMission, psWatchAd, psClaimable, psStepReady, psExtraReady, psChooseFur, psFurImg, renderPass, setEvSeg, xtGot, achTitles,   // 2.1.3 숲속 패스
     MAP_OAK, oakArt, layoutOak, mapOak, oakAt, tapOak, dropSpot,
