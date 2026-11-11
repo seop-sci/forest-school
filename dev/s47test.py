@@ -38,14 +38,16 @@ async def main():
             await pg.screenshot(path=f's47_top_{tag}.png', clip={'x': 0, 'y': 0, 'width': w, 'height': 140})
             # 3) 행사 카운트다운 알림판이 행사 자리(광장, 운동장) 아래에 떠요
             await pg.evaluate(f"(()=>{{ const F={F}, S=F.S; S.budget=1000; S.tier=1; S.tg=5; S.students=30; S.f.playground=Math.max(1,S.f.playground); F.rt.mapLaid=-1; F.layoutMap(); F.renderMap(); F.syncKids(true); F.renderHUD(); }})()")   # 3.3.0 학생이 이미 학교에 있는 상태로(새 지도는 교문에서 걸어 들어오는 길이 이어져서, 방금 늘린 학생이 아직 걷는 중이면 알림판 아래에 있어요)
+            await pg.wait_for_timeout(4000)   # 2026-11-11: 방금 늘린 학생이 교문에서 걸어 들어와 자리를 잡을 때까지(첫 행사에서만 알림판 아래를 지나가 흔들렸어요)
             for fid in ('welcome', 'show', 'photo', 'sports'):
                 await pg.evaluate(f"(()=>{{ const F={F}; for (const k in F.S.fest.next) F.S.fest.next[k]=0; F.S.sports.next=0; {CLEAN}; F.startFest('{fid}', true); }})()")
-                await pg.wait_for_timeout(2500)   # 카운트다운 끝 무렵: 학생들이 행사 자리에 다 모였을 때
-                r = await pg.evaluate(f"""(()=>{{ const F={F}, ban=document.querySelector('#feverBan'), br=ban.getBoundingClientRect();
+                # 카운트다운 끝 무렵(남은 0.5초): 학생들이 행사 자리에 다 모였을 때. 2026-11-11: 정해진 2.5초 대신 게임 안 카운트다운을 보고, 그 프레임에서 바로 재요(기계가 느리면 학생이 아직 걷는 중이거나 행사가 이미 시작돼 흔들렸어요)
+                r = await pg.evaluate(f"""new Promise(done => {{ const F={F}; const chk = () => {{ const x=F.rtFest() || F.rtSports(); if (x && (x.intro || 0) > 0.5) return requestAnimationFrame(chk);
+                  const ban=document.querySelector('#feverBan'), br=ban.getBoundingClientRect();
                   const ks=[...document.querySelectorAll('#kids > g')].map(g=>g.getBoundingClientRect()).filter(q=>q.width>0);
                   const hit=ks.filter(q => q.right>br.left+2 && q.left<br.right-2 && q.bottom>br.top+2 && q.top<br.bottom-2).length;
                   const tabs=document.querySelector('.tabs').getBoundingClientRect().top;
-                  return [!ban.hidden, Math.round(br.top), Math.round(br.bottom), Math.round(tabs), hit, ks.length]; }})()""")
+                  done([!ban.hidden, Math.round(br.top), Math.round(br.bottom), Math.round(tabs), hit, ks.length]); }}; chk(); }})""")
                 await pg.screenshot(path=f's47_{fid}_{tag}.png')
                 if not r[0]: fails.append(f'[{tag} {fid}] 카운트다운 알림판이 안 보여요')
                 elif r[2] > r[3] + 1: fails.append(f'[{tag} {fid}] 알림판이 아래 탭에 걸려요 {r}')

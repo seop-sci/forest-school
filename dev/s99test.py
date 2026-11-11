@@ -35,7 +35,10 @@ async def main():
           F.save(); return { sh, m1, s: S.cg.st.s, back: back.cg.st.s, show: S.cg.show[1] };""")
         print('발표회', r)
         ok(r['sh'] and r['m1'] == 1 and r['s'] == 1 and r['back'] == 1, f'발표회 수가 저장 읽기에서 남아요 {r}')
-        await pg.reload(); await pg.wait_for_function('window.__forest && window.__forest.S', timeout=60000); await pg.wait_for_timeout(2500); await pg.evaluate(SKIP)
+        # 2026-11-11: 다시 열 때 가끔 sessionStorage 표시가 안 보여 저장이 지워졌어요(흔들린 까닭). 방금 저장한 학교를 다시 열 때 그대로 넣어 줘요
+        kept = await pg.evaluate("localStorage.getItem('forest-school-v1')")
+        await ctx.add_init_script("localStorage.setItem('forest-school-v1', %s);" % json.dumps(kept))
+        await pg.reload(); await pg.wait_for_function('window.__forest && window.__forest.S && window.__forest.S.tier === 2', timeout=60000); await pg.wait_for_timeout(2500); await pg.evaluate(SKIP)   # 2026-11-11: 저장(중학교)을 다 읽은 뒤에 읽어요(느린 기계에서 흔들림)
         r = await ev("return { s: S.cg.st.s, m: F.qMeasure({ t: 'cgShow', n: 1 }), tier: S.tier };")
         print('다시 열기', r)
         ok(r['s'] == 1 and r['m'] == 1 and r['tier'] == 2, f'앱을 다시 열어도 발표회 수 1 {r}')
