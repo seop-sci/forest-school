@@ -34,6 +34,7 @@ Node.js 18 이상에서:
 cd toss
 npm install
 npm run build      # dist 폴더를 만들고 forest-school.ait로 묶어요
+AIT_AD_TEST=1 npm run build   # 테스트용 광고 ID로 만들어요 (QR 시험용. 토스 콘솔에 올리지 않아요)
 ```
 
 게임을 고친 뒤에는 맨 위 `index.html`이 바뀌므로 다시 빌드하면 토스 판에도 그대로 들어가요.
