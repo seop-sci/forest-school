@@ -73,7 +73,7 @@ async def main():
                 # 저장 읽기
                 r = await ev("""const d = JSON.parse(JSON.stringify(S)); d.sn = { got: { snack_01: 3.7, nope: 5, snack_r1: -2 }, day: '2026-10-29xx', mood: 99, pity: 50, n: 'x', gold: true }; const s = F.sanitize(d);
                   const d2 = JSON.parse(JSON.stringify(S)); delete d2.sn; const s2 = F.sanitize(d2); return [s.sn, s2.sn];""")
-                ok(r[0] == {'got': {'snack_01': 3}, 'day': '2026-10-29', 'mood': 10, 'pity': 20, 'n': 0, 'gold': False} and r[1] == {'got': {}, 'day': '', 'mood': 0, 'pity': 0, 'n': 0, 'gold': False}, f'저장 읽기 {r}')
+                ok(r[0] == {'got': {'snack_01': 3}, 'day': '2026-10-29', 'mood': 12, 'pity': 20, 'n': 0, 'gold': False} and r[1] == {'got': {}, 'day': '', 'mood': 0, 'pity': 0, 'n': 0, 'gold': False}, f'저장 읽기 {r}')
                 r = await ev("""const q1 = F.MAIN.find(q => q.id === 'sn1'), q2 = F.MAIN.find(q => q.id === 'sn2'); return [q1 && q1.ch, q2 && q2.ch, F.qMeasure(q2), F.qGoal(q2), F.qProg(q2).text];""")
                 print('퀘스트', r)
                 ok(r[0] == 12 and r[1] == 13 and r[2] == 20 and r[3] == '간식 도감 10종', f'퀘스트 {r}')

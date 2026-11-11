@@ -26,6 +26,7 @@ async def main():
         b = await p.chromium.launch()
         fac = dict(classroom=14, cafeteria=12, library=11, playground=8, science=3)
         ctx, page, errs = await ctxpage(b, 360, 740, 'light', base(tier=1, tg=2, f=fac))
+        await page.evaluate('window.__STORY_AUTO = true')   # 장면이 저절로 뜨게(시험 모드에서는 꺼져 있어요)
         await page.evaluate(CLEAN)
         # 1) 화요일
         d = await page.evaluate(CLOCK(1)); print('화요일', d)
@@ -79,6 +80,7 @@ async def main():
         await ctx.close()
         # 5) 이야기: 새 학교
         ctx, page, errs2 = await ctxpage(b, 360, 740, 'dark', base(tier=0, q={'init': True, 'mid': 'f0', 'm': 0, 'mb': 0, 'subs': [], 'done': [], 'gen': 0, 'subDone': 0, 'seen': 0}, sto={'v': 1, 'ch': -1, 'q': [], 'seen': {}, 'pick': {}, 'side': {}}))
+        await page.evaluate('window.__STORY_AUTO = true')   # 장면이 저절로 뜨게(시험 모드에서는 꺼져 있어요)
         await page.evaluate(CLEAN)
         s1 = await page.evaluate(f"""(async()=>{{ const F={F}, S=F.S, q=s=>document.querySelector(s); F.stTick(); const open=!q('#mSt').hidden, head=q('#stCh').textContent, who=q('#stWho').textContent, over=({OVER})('#mSt');
           let n=0; while (F.rt.st && n++<20) F.stNext(); return {{open, head, who, over, n, seen:S.sto.seen.o0||0, q:S.sto.q.slice(), ch:S.sto.ch}}; }})()""")
@@ -98,6 +100,7 @@ async def main():
         await ctx.close()
         # 옛 저장(새 칸 없음)과 엉뚱한 값
         ctx, page, errs3 = await ctxpage(b, 390, 800, 'light', base(tier=1, tg=1))
+        await page.evaluate('window.__STORY_AUTO = true')   # 장면이 저절로 뜨게(시험 모드에서는 꺼져 있어요)
         await page.evaluate(CLEAN)
         o = await page.evaluate(f"""(async()=>{{ const F={F}, S=F.S, q=s=>document.querySelector(s); const v0=S.sto.v; F.stTick(); const head=q('#stCh').textContent, open=!q('#mSt').hidden;
           document.querySelector('#stSkip').click(); return {{v0, v:S.sto.v, head, open, q:S.sto.q.slice(), ch:S.sto.ch, tags:F.stTags(), ex:!!S.xg, mk:!!S.mk}}; }})()""")
@@ -105,11 +108,14 @@ async def main():
         await ctx.close()
         junk = base(tier=2, xg={'day': 5, 's': 'x', 'n': 'a', 'bd': 1e300, 'got': -3, 'log': [1, {'sp': 'constructor', 'd': 3}, None]}, mk={'day': [], 'sold': 'q', 'buy': 7, 'cp': 1e99, 'own': 'z'}, sto={'v': 'k', 'ch': 1e9, 'q': {'a': 1}, 'seen': [1, 2], 'pick': 'x', 'side': {'nap': {'n': 1e9, 'd': 4}, 'zz': 1}}, fv='nope')
         ctx, page, errs4 = await ctxpage(b, 390, 800, 'light', junk)
-        j = await page.evaluate(f"(()=>{{ const S={F}.S; return [S.tier, S.xg.bd, S.xg.got, S.xg.log.length, S.mk.cp, S.mk.sold, S.sto.ch, S.sto.q.length, (S.sto.side.nap||{{}}).n, S.fv.st]; }})()")
+        await page.evaluate('window.__STORY_AUTO = true')   # 장면이 저절로 뜨게(시험 모드에서는 꺼져 있어요)
+        # 게임의 1초 틱이 먼저 돌면 이야기 칸이 옛 저장처럼 다시 맞춰져서, 읽은 직후의 값(sanitize)으로 봐요
+        j = await page.evaluate(f"(d=>{{ const S={F}.sanitize(d); return [S.tier, S.xg.bd, S.xg.got, S.xg.log.length, S.mk.cp, S.mk.sold, S.sto.ch, S.sto.q.length, (S.sto.side.nap||{{}}).n, S.fv.st]; }})(" + json.dumps(junk) + ")")
         print('엉뚱한 값', j); ok(j == [2, 9999, 0, 0, 200, 0, 24, 0, 4, 0], '엉뚱한 값이 든 저장도 읽어요')
         await ctx.close()
         # 8) 고등학교: 운동장과 기숙사가 겹친 자리에서 그림이 있는 건물이 열려요. 꾸미기 자리는 건물 그림 밖
         ctx, page, errs5 = await ctxpage(b, 390, 800, 'light', base(tier=3, tg=1, sto={'v': 1, 'ch': 23, 'q': [], 'seen': {}, 'pick': {}, 'side': {}}))
+        await page.evaluate('window.__STORY_AUTO = true')   # 장면이 저절로 뜨게(시험 모드에서는 꺼져 있어요)
         await page.evaluate(CLEAN)
         pk = await page.evaluate(f"""(async()=>{{ const F={F}, S=F.S; for (const k of F.facKeys()) S.f[k]=Math.max(S.f[k]||0,8); F.setTab('school'); F.renderMap(); await new Promise(r=>setTimeout(r,1500)); F.bldWarm(); await new Promise(r=>setTimeout(r,900));
           const svg=document.querySelector('#map'), m=svg.getScreenCTM(); const at=(x,y)=>{{ const p=svg.createSVGPoint(); p.x=x; p.y=y; const q=p.matrixTransform(m); return F.bldPick({{clientX:q.x, clientY:q.y}}, 'dorm'); }};

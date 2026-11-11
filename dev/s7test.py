@@ -49,6 +49,8 @@ _SRC = (HERE / 'forest-school.html').read_text(encoding='utf-8')
 NT_SEEN = {'seen': _re.search(r"const NOTICES = \[[^{]*\{ id: '([^']+)'", _SRC).group(1), 'ver': _re.search(r"const VERSION = '([^']+)'", _SRC).group(1), 'hide': 4102444800000}
 async def device(b, w=390, h=780, scheme='light', seed=None, sdk='mock', path='/'):
     ctx = await b.new_context(viewport={'width': w, 'height': h}, device_scale_factor=2, is_mobile=True, has_touch=True, color_scheme=scheme)
+    # 4.1.0: 게임이 자동 브라우저(navigator.webdriver)의 테스트 현황을 올리지 않아요. 이 시험은 올라가는 것을 봐야 해서 사람 브라우저처럼 보이게 해요
+    await ctx.add_init_script("Object.defineProperty(Navigator.prototype, 'webdriver', { get: () => false });")
     await ctx.grant_permissions(['clipboard-read', 'clipboard-write'], origin=ORIGIN)
     if seed is not None:
         seed = dict(seed); seed.setdefault('nt', NT_SEEN)

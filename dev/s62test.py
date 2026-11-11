@@ -74,7 +74,8 @@ async def main():
             r = await pg.evaluate("(() => ({ open: !document.querySelector('#panelDeco').hidden, items: document.querySelectorAll('#decoList [data-dbuy]').length, evart: Object.keys(window.FS_IMG200 || {}).filter(k => k.startsWith('evd_')).length + window.__forest.DECO.filter(d => d.ev && (d.ps || d.rs || d.bio || d.cg || d.cs) && window.__forest.IMG(d.img)).length, marks: document.querySelectorAll('#markRows [data-mk]').length, street: document.querySelector('.tab[data-tab=\"street\"]')?.getAttribute('aria-selected') }))()")
             r['over'] = await pg.evaluate(OVER, '#panelDeco')
             print(w, scheme, '가게', json.dumps(r))
-            if not r['open'] or r['items'] != 16 + r['evart'] + 27 or r['marks'] != 25 or r['over']: bad.append(f'{w} 가게 화면 {r}')
+            # 4.1.0: 받아서 얻는 장식 12개(축제 기념품 8, 우정 배지 1, 숲속 장터 3)가 더 보여요
+            if not r['open'] or r['items'] != 16 + r['evart'] + 27 + 12 or r['marks'] != 25 or r['over']: bad.append(f'{w} 가게 화면 {r}')
             await pg.screenshot(path=f's62_{w}.png')
             await pg.evaluate("document.querySelector('#panelDeco').scrollTop = 9999"); await pg.wait_for_timeout(200)
             await pg.screenshot(path=f's62_{w}b.png')
