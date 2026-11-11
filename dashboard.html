@@ -80,7 +80,7 @@ td.wrap{white-space:normal}
   var $ = function (s) { return document.querySelector(s); };
   var app = $('#app');
   var demo = /[?&]demo=1/.test(location.search);
-  var state = { hideDev: true, auto: true, timer: 0, db: null };
+  var state = { hideDev: true, hideShort: false, auto: true, timer: 0, db: null };   // hideShort: 플레이 5분이 안 되는 학교 빼기(잠깐 열어 본 기록, 시험 기록)
 
   function esc(s) { return String(s == null ? '' : s).replace(/[&<>"']/g, function (c) { return { '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;' }[c]; }); }
   function num(v) { v = Number(v); return isFinite(v) ? v : 0; }
@@ -132,6 +132,7 @@ td.wrap{white-space:normal}
   function render(stats, rankN) {
     var now = Date.now(), today = kstDay(now);
     var all = tidy(stats), list = state.hideDev ? all.filter(function (r) { return !r.dev; }) : all;
+    if (state.hideShort) list = list.filter(function (r) { return r.play >= 300; });
     var live = list.filter(function (r) { return now - r.seen <= LIVE_MIN * 60000; });
     var d1 = list.filter(function (r) { return kstDay(r.seen) === today; });
     var d7 = list.filter(function (r) { return today - kstDay(r.seen) < 7; });
@@ -151,13 +152,15 @@ td.wrap{white-space:normal}
     // 쉬는 중인 학교가 멈춘 메인 퀘스트
     var stuck = countBy(away, function (r) { return r.q === '끝' ? '메인 퀘스트 모두 끝' : (r.q ? r.q + ' ' : '') + (r.qt || '?'); }).slice(0, 12);
     var plays = list.map(function (r) { return r.play; }), sess = list.map(function (r) { return r.sess; });
-    var adsSum = list.reduce(function (a, r) { return a + r.ads; }, 0);
+    var adsSum = list.reduce(function (a, r) { return a + r.ads; }, 0), adN = list.filter(function (r) { return r.ads > 0; }).length;
+    var adTop = list.filter(function (r) { return r.ads > 0; }).sort(function (a, b) { return b.ads - a.ads; }).slice(0, 10).map(function (r) { return [(r.name || '(이름 없음)') + ' ' + school(r), r.ads]; });
     var vers = countBy(list, function (r) { return r.v; }).slice(0, 8);
     var envs = countBy(list, function (r) { return ENV[r.env] || r.env; });
     var recent = list.slice().sort(function (a, b) { return b.seen - a.seen; }).slice(0, RECENT_N);
 
     app.innerHTML =
       '<div class="opts"><label><input type="checkbox" id="optDev"' + (state.hideDev ? ' checked' : '') + '> 개발자 메뉴 쓴 학교 빼기</label>' +
+      '<label><input type="checkbox" id="optShort"' + (state.hideShort ? ' checked' : '') + '> 플레이 5분 미만 학교 빼기</label>' +
       '<label><input type="checkbox" id="optAuto"' + (state.auto ? ' checked' : '') + '> ' + AUTO_SEC + '초마다 새로 고침</label>' + (demo ? '<b>가짜 기록으로 보는 중(demo)</b>' : '') + '</div>' +
       '<div class="tiles">' +
         '<div class="tile live"><span>지금 접속 중 (' + LIVE_MIN + '분)</span><b>' + fmt(live.length) + '</b></div>' +
@@ -179,19 +182,24 @@ td.wrap{white-space:normal}
           '<span>접속 횟수 중간값</span><span>' + fmt(median(sess)) + '번</span>' +
           '<span>출석 일수 중간값</span><span>' + fmt(median(list.map(function (r) { return r.days; }))) + '일</span>' +
           '<span>광고 본 수 합계</span><span>' + fmt(adsSum) + '편</span>' +
-          '<span>광고 본 학교</span><span>' + fmt(list.filter(function (r) { return r.ads > 0; }).length) + '곳</span>' +
+          '<span>광고 본 학교</span><span>' + fmt(adN) + '곳 (' + (list.length ? Math.round(adN / list.length * 100) : 0) + '%)</span>' +
+          '<span>광고 본 학교의 평균</span><span>' + (adN ? (adsSum / adN).toFixed(1) : '0') + '편</span>' +
+          '<span>오늘 접속한 학교의 광고 합계</span><span>' + fmt(d1.reduce(function (a, r) { return a + r.ads; }, 0)) + '편</span>' +
+          '<span>황금 도토리 쓴 양 합계</span><span>' + fmt(list.reduce(function (a, r) { return a + r.gspent; }, 0)) + '개</span>' +
           '<span>황금 도토리 번 양 중간값</span><span>' + fmt(median(list.map(function (r) { return r.gearn; }))) + '개</span>' +
         '</div></section>' +
         '<section><h2>버전과 기기</h2><p class="note">버전</p>' + barsHTML(vers) + '<p class="note" style="margin-top:10px">기기</p>' + barsHTML(envs) + '</section>' +
-        '<section class="wide"><h2>최근 접속 ' + Math.min(RECENT_N, recent.length) + '곳</h2><div class="scroll"><table><thead><tr><th>교장</th><th>학교</th><th>메인 퀘스트</th><th>플레이</th><th>마지막</th></tr></thead><tbody>' +
+        '<section><h2>광고를 많이 본 학교</h2><p class="note">지금까지 본 광고 수(많은 순 10곳)</p>' + (adTop.length ? barsHTML(adTop) : '<p class="note">아직 없어요</p>') + '</section>' +
+        '<section class="wide"><h2>최근 접속 ' + Math.min(RECENT_N, recent.length) + '곳</h2><div class="scroll"><table><thead><tr><th>교장</th><th>학교</th><th>메인 퀘스트</th><th>플레이</th><th>접속</th><th>출석</th><th>광고</th><th>황금 도토리(번 것, 쓴 것)</th><th>학교 파워</th><th>버전</th><th>기기</th><th>마지막</th></tr></thead><tbody>' +
           recent.map(function (r) {
             var on = now - r.seen <= LIVE_MIN * 60000;
-            return '<tr><td><span class="dot' + (on ? ' on' : '') + '"></span>' + esc(r.name || '(이름 없음)') + (r.dev ? ' 🛠' : '') + '</td><td>' + esc(school(r)) + '</td><td class="wrap">' + esc(r.q === '끝' ? '모두 끝' : (r.q + ' ' + r.qt)) + '</td><td>' + playText(r.play) + '</td><td>' + ago(r.seen) + '</td></tr>';
+            return '<tr><td><span class="dot' + (on ? ' on' : '') + '"></span>' + esc(r.name || '(이름 없음)') + (r.dev ? ' 🛠' : '') + '</td><td>' + esc(school(r)) + '</td><td class="wrap">' + esc(r.q === '끝' ? '모두 끝' : (r.q + ' ' + r.qt)) + '</td><td>' + playText(r.play) + '</td><td>' + fmt(r.sess) + '번</td><td>' + fmt(r.days) + '일</td><td>' + fmt(r.ads) + '편</td><td>' + fmt(r.gearn) + ', ' + fmt(r.gspent) + '</td><td>' + fmt(r.score) + '</td><td>' + esc(r.v) + '</td><td>' + esc(ENV[r.env] || r.env) + '</td><td>' + ago(r.seen) + '</td></tr>';
           }).join('') + '</tbody></table></div></section>' +
       '</div>' +
       '<p class="note" style="margin-top:14px;color:var(--muted);font-size:12px">토스 판 이용자는 우리 서버를 쓰지 않아서 여기에 없어요(토스 콘솔에서 봐요). 서버에 저장이 켜진 학교만 1분마다 기록을 올려요.</p>';
 
     $('#optDev').onchange = function (e) { state.hideDev = e.target.checked; render(stats, rankN); };
+    $('#optShort').onchange = function (e) { state.hideShort = e.target.checked; render(stats, rankN); };
     $('#optAuto').onchange = function (e) { state.auto = e.target.checked; schedule(); };
     $('#when').textContent = new Date().toLocaleTimeString('ko-KR', { hour: '2-digit', minute: '2-digit', second: '2-digit' }) + ' 기준';
   }
