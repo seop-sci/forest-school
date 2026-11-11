@@ -3,7 +3,22 @@ import asyncio, json, time, sys, subprocess, urllib.request, pathlib
 from playwright.async_api import async_playwright
 from s4test import base, TODAY
 HERE = pathlib.Path(__file__).resolve().parent
-PORT = 8765
+def _free_port():
+    # 2026-11-11: 가짜 서버 시험(s7 계열)을 한꺼번에 돌리면 모두 8765를 써서 서로 부딪혔어요. 시험마다 빈 포트를 하나 받아요(FS_PORT로 정할 수도 있어요)
+    import os, socket
+    if os.environ.get('FS_PORT'): return int(os.environ['FS_PORT'])
+    with socket.socket() as k:
+        k.bind(('127.0.0.1', 0)); return k.getsockname()[1]
+PORT = _free_port()
+def wait_server(sec=20):
+    # 2026-11-11: 가짜 서버가 뜨기를 0.8초만 기다렸더니 기계가 느릴 때 '연결 거부'로 흔들렸어요. 포트가 열릴 때까지 기다려요
+    import socket
+    end = time.time() + sec
+    while time.time() < end:
+        try:
+            with socket.create_connection(('127.0.0.1', PORT), timeout=0.5): return True
+        except OSError: time.sleep(0.1)
+    return False
 ORIGIN = f'http://127.0.0.1:{PORT}'
 SEL = sys.argv[1:]
 want = lambda n: not SEL or n in SEL
@@ -94,7 +109,7 @@ async def open_settings(page):
 async def main():
     srv = subprocess.Popen(['node', str(HERE / 'fbtest' / 'fbserver.js'), str(HERE / 'gh'), str(PORT), str(HERE / 'gh_database.rules.json')],
                            cwd=str(HERE / 'fbtest'), stdout=subprocess.PIPE, stderr=subprocess.STDOUT)
-    time.sleep(0.8)
+    wait_server()
     res = {}
     try:
         async with async_playwright() as p:

@@ -11,6 +11,7 @@
 # 쓰는 법: python3 wrap.py && python3 build_gh.py gh && python3 s98test.py   (마지막 줄이 PASS면 통과, 가짜 서버 시험이라 따로 돌려요)
 import asyncio, json, time, subprocess
 from playwright.async_api import async_playwright
+import s7test
 from s7test import HERE, PORT, ORIGIN, MOCK, NT_SEEN, api, dump, mode, elem, wait_cloud, wait_text, local, uid_of, toast, INFO
 
 PICK = "(() => { const m = document.querySelector('#mPick'); return { open: !!m && !m.hidden, loc: document.querySelector('#pickLoc').textContent, srv: document.querySelector('#pickSrv').textContent }; })()"
@@ -83,7 +84,7 @@ async def main():
 
     srv = subprocess.Popen(['node', str(HERE / 'fbtest' / 'fbserver.js'), str(HERE / 'gh'), str(PORT), str(HERE / 'gh_database.rules.json')],
                            cwd=str(HERE / 'fbtest'), stdout=subprocess.PIPE, stderr=subprocess.STDOUT)
-    time.sleep(0.8)
+    s7test.wait_server()
     allerr = []
     try:
         async with async_playwright() as p:

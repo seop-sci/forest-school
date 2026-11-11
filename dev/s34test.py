@@ -2,6 +2,7 @@
 # 2.3.0: 비밀 글자 대신 forest/adminUids/<계정 번호>: true(콘솔에서만 넣어요)인 계정이 관리자예요
 import asyncio, json, time, subprocess
 from playwright.async_api import async_playwright
+import s7test
 from s7test import HERE, PORT, ORIGIN, api, dump, device, wait_cloud, push_now, open_settings, kinder, toast
 
 def stat(pid, name, seen):
@@ -10,7 +11,7 @@ def stat(pid, name, seen):
 async def main():
     srv = subprocess.Popen(['node', str(HERE / 'fbtest' / 'fbserver.js'), str(HERE / 'gh'), str(PORT), str(HERE / 'gh_database.rules.json')],
                            cwd=str(HERE / 'fbtest'), stdout=subprocess.PIPE, stderr=subprocess.STDOUT)
-    time.sleep(0.8); res = {}
+    s7test.wait_server(); res = {}
     try:
         now = int(time.time() * 1000)
         for uid, pid, nm, ago in (('uOld1', 'PIDOLD01', '옛날폰', 9e6), ('uOld2', 'PIDOLD01', '옛날폰', 8e6), ('uTab', 'PIDTAB01', '태블릿', 5e6), ('uKeep', 'PIDKEEP1', '친구 학교', 1e6)):

@@ -3,6 +3,16 @@
 Playwright(Python)로 `dev/test.html`을 열어 시험해요. 먼저 `cd dev && python3 wrap.py`.
 가짜 Firebase 서버 시험은 `dev/fbtest/fbserver.js`가 `targaryen` npm 꾸러미로 `dev/gh_database.rules.json` 규칙을 검사해요. 꾸러미가 없으면 `npm i targaryen` 한 폴더를 `NODE_PATH`로 잡아요.
 
+## 한꺼번에 돌릴 때 (2026-11-11)
+
+- 시험은 **세 개까지만 함께** 돌려요. 2코어 기계에서 세 개씩은 여러 번 돌려도 모두 PASS였고, 열 개를 함께 돌리면 시간에 기대는 시험(s47, s98, s105 등)이 흔들려요. 게임 문제가 아니라 기계가 느려져서예요.
+- 2026-11-11에 고친 흔들림: 가짜 서버 시험(s7 계열)이 모두 포트 8765를 써서 부딪히던 것(시험마다 빈 포트, `FS_PORT`로 정할 수도 있어요)과 서버가 뜨기 전에 붙던 것(`s7test.wait_server()`), s47(카운트다운을 게임 안 시간으로 보고 그 프레임에서 재기), s48(첫 화면의 5초 저장이 옛 저장을 덮던 것), s99와 s105(다시 열 때 sessionStorage 표시가 가끔 안 보여 처음 저장이 다시 깔리던 것).
+
+## 저장 지킴 시험 (2026-11-11)
+
+- `s115test.py`: 게임이 쓰는 통계 칸(`S.st`)이 모두 `fresh()`에 있는지, 저장하고 다시 켜도 통계가 그대로인지, 예전 메인 퀘스트 id(`dev/quest_ids.txt`)가 지금도 있거나 옮긴 표에 있는지 봐요. 퀘스트를 더하면 `python3 s115test.py --snap`으로 목록을 다시 적어요. 퀘스트를 지우거나 이름을 바꾸면 `mainIndexFromSave`의 옮긴 표에 꼭 적어요.
+- PR마다 `.github/workflows/build-check.yml`이 맨 위 `index.html`이 원본에서 만든 것과 같은지 봐요.
+
 ## 시험 정리 (2026-10-29)
 
 - 시험이 너무 많아져서(66개) 옛 시험 14개를 `dev/tests_old/`로 옮겼어요(지우지 않고 보관, 까닭은 그 폴더의 README). 업데이트 때는 `dev/` 바로 아래의 `s*test.py`만 돌려요(52개).

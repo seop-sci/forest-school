@@ -6,7 +6,8 @@ name: Android build
 on:
   push:
     branches: [main]
-    paths: ['index.html', 'app/**', '.github/workflows/android.yml']
+    # 2026-11-11 (3.3.2 분석): 앱에는 지도 그림(img), 소리(audio), config.js도 들어가요. 그것만 바뀌어도 새로 만들어요
+    paths: ['index.html', 'app/**', 'img/**', 'audio/**', 'config.js', 'dev/minify_game.mjs', '.github/workflows/android.yml']
   workflow_dispatch:
 
 # 2.0.0 보안 점검(3-4): 저장소는 읽기만 해요. 액션은 태그가 아니라 커밋 값으로 고정해요(주석이 그 커밋의 태그)
@@ -28,6 +29,10 @@ jobs:
         with:
           distribution: temurin
           java-version: 21
+      # 2026-11-11 (3.3.2 분석): 꾸러미 설치(npm ci)가 도는 동안에는 키 파일이 디스크에 없게, 설치를 먼저 하고 키를 꺼내요
+      - name: 꾸러미 설치
+        working-directory: app
+        run: npm ci
       - name: 업로드 키 꺼내기
         env:
           KS: ${{ secrets.ANDROID_KEYSTORE_BASE64 }}
@@ -43,7 +48,6 @@ jobs:
       - name: 웹 게임을 앱 안에 넣기
         working-directory: app
         run: |
-          npm ci
           node build-www.mjs
           npx cap sync android
       - name: 빌드
