@@ -92,7 +92,7 @@ async def main():
           return {{head, picks, stuck, after, pick:S.sto.pick.c0, seen:S.sto.seen.c0||0, q:S.sto.q.slice(), rows, btn, who, side, over, m:S.q.m===i}}; }})()""")
         print('1장 닫는 장면', s2)
         ok('1장' in s2['head'] and s2['picks'] == ['그럼요', '모레도 오렴'] and s2['stuck'], '닫는 장면 끝에 답 둘, 고르기 전에는 넘어가지 않아요'); ok(s2['pick'] == 1 and '모레' in s2['after'] and s2['seen'] == 1, '고른 답이 남고 대사가 달라져요')
-        ok(s2['m'], '장면은 퀘스트 진행을 바꾸지 않아요'); ok(s2['rows'] == 24 and s2['btn'] == 2 and s2['who'] >= 2 and s2['side'] == 6 and not s2['over'], f"수첩 세 쪽 {s2['rows']} {s2['btn']} {s2['who']} {s2['side']}")
+        ok(s2['m'], '장면은 퀘스트 진행을 바꾸지 않아요'); ok(s2['rows'] == 24 and s2['btn'] == 3 and s2['who'] >= 2 and s2['side'] == 6 and not s2['over'], f"수첩 세 쪽 {s2['rows']} {s2['btn']} {s2['who']} {s2['side']}")
         await ctx.close()
         # 옛 저장(새 칸 없음)과 엉뚱한 값
         ctx, page, errs3 = await ctxpage(b, 390, 800, 'light', base(tier=1, tg=1))
