@@ -12,7 +12,10 @@ safe(() => graniteEvent.addEventListener('backEvent', { onEvent: () => { if (typ
 
 // 콘솔 > 인앱 광고에서 만든 리워드 광고 그룹 ID로 바꿔요.
 // 개발과 QR 테스트 중에는 테스트 ID를 써야 해요 (진짜 ID로 테스트하면 제재를 받을 수 있어요)
-const AD_GROUP_ID = 'ait.v2.live.1224acc72c424186';   // 2026-11-10 지섭이 준 정식 리워드 광고 그룹 ID
+// 4.1.0 (3.3.2 분석 M8): 시험용으로 만들 때(AIT_AD_TEST=1 npm run build)는 토스가 준 테스트용 리워드 광고 ID를 써요. 그냥 만들면 정식 ID예요
+const AD_LIVE_ID = 'ait.v2.live.1224acc72c424186';   // 2026-11-10 지섭이 준 정식 리워드 광고 그룹 ID
+const AD_TEST_ID = 'ait-ad-test-rewarded-id';        // 2026-11-11 지섭이 준 토스 테스트용 리워드 광고 ID
+const AD_GROUP_ID = (typeof __AIT_AD_TEST__ !== 'undefined' && __AIT_AD_TEST__) ? AD_TEST_ID : AD_LIVE_ID;
 
 const ads = safe(() => loadFullScreenAd.isSupported(), false);
 let ready = false, loading = false;
