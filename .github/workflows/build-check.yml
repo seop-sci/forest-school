@@ -1,0 +1,29 @@
+# 배포 파일 검사 (2026-11-11, 3.3.2 분석): PR마다 맨 위 index.html이 원본(dev/forest-school.html)에서 만든 것과 같은지,
+# 규칙 파일 두 개가 같은지, live.json과 규칙이 올바른 JSON인지, CLAUDE.md와 AGENTS.md 공통 규칙이 같은지 봐요.
+name: Build check
+on:
+  pull_request:
+    branches: [main]
+  workflow_dispatch:
+permissions:
+  contents: read
+jobs:
+  check:
+    runs-on: ubuntu-24.04
+    timeout-minutes: 10
+    steps:
+      - uses: actions/checkout@11d5960a326750d5838078e36cf38b85af677262   # v4
+      - name: index.html이 원본에서 만든 것과 같은지
+        run: |
+          mkdir -p "$RUNNER_TEMP/site"
+          python3 dev/build_gh.py "$RUNNER_TEMP/site" > /dev/null
+          if ! cmp -s "$RUNNER_TEMP/site/index.html" index.html; then
+            echo "::error::index.html이 dev/forest-school.html에서 만든 것과 달라요. python3 dev/build_gh.py . 을 다시 돌려 주세요"
+            exit 1
+          fi
+      - name: 규칙 파일과 live.json
+        run: |
+          cmp database.rules.json dev/gh_database.rules.json
+          python3 -c "import json; json.load(open('database.rules.json')); d = json.load(open('live.json')); assert isinstance(d, dict) and isinstance(d.get('notices', []), list) and isinstance(d.get('cfg', {}), dict) and isinstance(d.get('off', []), list), 'live.json 모양이 달라요'"
+      - name: 공통 규칙
+        run: python3 dev/check_rules.py

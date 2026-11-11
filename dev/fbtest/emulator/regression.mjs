@@ -2,7 +2,7 @@
 import fs from 'node:fs';
 import assert from 'node:assert/strict';
 import { initializeTestEnvironment, assertSucceeds, assertFails } from '@firebase/rules-unit-testing';
-import { ref, set, get, update, remove, runTransaction, query, orderByChild, equalTo, limitToLast } from 'firebase/database';
+import { ref, set, get, update, remove, runTransaction, query, orderByChild, equalTo, limitToLast, serverTimestamp } from 'firebase/database';
 const host = process.env.FIREBASE_DATABASE_EMULATOR_HOST;
 if (!host || !/^127\.0\.0\.1:\d+$/.test(host)) throw Error('Loopback Firebase Emulator required');
 const [hostname, port] = host.split(':');
@@ -66,5 +66,20 @@ try {
   const fixed = await get(query(ref(db, 'forest/rank'), orderByChild('sk'), equalTo(2)));
   assert.deepEqual(Object.keys(fixed.val()), ['current']);
   console.log('PASS prior/future records cannot crowd current-season query');
+  // 2026-11-11 (3.3.2 분석 H1): 랭킹 줄을 일부 칸만 고쳐 쓰는 공격이 막히고, 줄 전체 정상 쓰기는 되는지 (가짜 엔진 시험 rules_partial.js와 같은 경우)
+  db = await open(source);
+  {
+    const now = Date.now(), wk = Math.floor((now + 9 * 3600000 - Date.UTC(2026, 0, 5)) / 604800000), TS = serverTimestamp();
+    await assertSucceeds(set(ref(db, 'forest/rank/A'), { name: 'A', score: 100, at: TS, bt: 1000, btq: now - 86400000 + 1000 }));
+    await assertFails(update(ref(db, 'forest/rank/A'), { bt: 9999, at: TS }));
+    await assertFails(update(ref(db, 'forest/rank/A'), { btq: null, at: TS }));
+    await assertFails(set(ref(db, 'forest/rank/A'), { name: 'A', score: 100, at: TS, bt: 9999, btq: now - 86400000 + 1000 }));
+    await env.withSecurityRulesDisabled(async context => {
+      await set(ref(context.database(), 'forest/rank/A'), { name: 'A', score: 100, at: now - 3600e3, week: wk - 1, lp: 900000, ws: (wk - 1) * 1e6 + 900000 });
+    });
+    await assertFails(update(ref(db, 'forest/rank/A'), { week: wk, ws: wk * 1e6 + 900000, at: TS }));
+    await assertSucceeds(set(ref(db, 'forest/rank/A'), { name: 'A', score: 100, at: TS, week: wk, lp: 30, ws: wk * 1e6 + 30 }));
+  }
+  console.log('PASS partial-field rank writes are rejected, full-row writes still work');
   console.log('PASS');
 } finally { if (env) await env.cleanup(); }
