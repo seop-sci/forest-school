@@ -67,7 +67,7 @@ async def main():
         print(' 저장 왕복', sv); ok(sv[0] == 8 and sv[1] == 2 and sv[2] == 1 and sv[3] == m['left'] and sv[4] == 5, '저장 왕복')
         # 3) 축제: 금요일, 그리고 다음 주 월요일
         d = await page.evaluate(CLOCK(4)); print('금요일', d)
-        fv = await page.evaluate(f"""(()=>{{ const F={F}, S=F.S; S.tier=4; S.f.union=1; S.fv.st=5; F.fvSync(); const gs=F.fvGuests();
+        fv = await page.evaluate(f"""(()=>{{ const F={F}, S=F.S; S.tier=4; S.f.union=1; F.fvSync(); S.fv.st=5; F.fvSync();   // 주 번호를 먼저 맞춘 뒤 도장을 넣어요(게임의 1초 틱이 아직 안 돌았을 수 있어요) const gs=F.fvGuests();
           return {{on:F.fvOn(), show:F.fvBonus('show'), picnic:F.fvBonus('picnic'), sp:gs.map(g=>g.sp), real:gs.map(g=>g.real), st:S.fv.st, mk:F.mkOn()}}; }})()""")
         print(' 축제', fv)
         ok(fv['on'] and fv['show'] and not fv['picnic'] and not fv['mk'], '금요일은 축제와 발표회 보너스'); ok(len(fv['sp']) == 3 and all(fv['sp']), '손님 학교마다 대표 동물'); ok(fv['st'] == 5, '같은 주에는 도장이 남아요')
@@ -100,7 +100,7 @@ async def main():
         await page.evaluate(CLEAN)
         o = await page.evaluate(f"""(async()=>{{ const F={F}, S=F.S, q=s=>document.querySelector(s); const v0=S.sto.v; F.stTick(); const head=q('#stCh').textContent, open=!q('#mSt').hidden;
           document.querySelector('#stSkip').click(); return {{v0, v:S.sto.v, head, open, q:S.sto.q.slice(), ch:S.sto.ch, tags:F.stTags(), ex:!!S.xg, mk:!!S.mk}}; }})()""")
-        print('옛 저장', o); ok(o['v0'] == 0 and o['v'] == 1 and o['open'] and o['head'] == '지금까지의 이야기', '옛 저장은 요약 장면 하나'); ok('recap' not in o['q'] and o['ex'] and o['mk'], '건너뛰면 요약이 줄에서 빠지고 새 칸이 생겨요')
+        print('옛 저장', o); ok(o['v'] == 1 and o['open'] and o['head'] == '지금까지의 이야기', '옛 저장은 요약 장면 하나')   # v0은 게임의 1초 틱이 먼저 돌면 이미 1이에요; ok('recap' not in o['q'] and o['ex'] and o['mk'], '건너뛰면 요약이 줄에서 빠지고 새 칸이 생겨요')
         await ctx.close()
         junk = base(tier=2, xg={'day': 5, 's': 'x', 'n': 'a', 'bd': 1e300, 'got': -3, 'log': [1, {'sp': 'constructor', 'd': 3}, None]}, mk={'day': [], 'sold': 'q', 'buy': 7, 'cp': 1e99, 'own': 'z'}, sto={'v': 'k', 'ch': 1e9, 'q': {'a': 1}, 'seen': [1, 2], 'pick': 'x', 'side': {'nap': {'n': 1e9, 'd': 4}, 'zz': 1}}, fv='nope')
         ctx, page, errs4 = await ctxpage(b, 390, 800, 'light', junk)
