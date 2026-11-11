@@ -11,6 +11,7 @@ Playwright(Python)로 `dev/test.html`을 열어 시험해요. 먼저 `cd dev && 
 ## 저장 지킴 시험 (2026-11-11)
 
 - `s115test.py`: 게임이 쓰는 통계 칸(`S.st`)이 모두 `fresh()`에 있는지, 저장하고 다시 켜도 통계가 그대로인지, 예전 메인 퀘스트 id(`dev/quest_ids.txt`)가 지금도 있거나 옮긴 표에 있는지 봐요. 퀘스트를 더하면 `python3 s115test.py --snap`으로 목록을 다시 적어요. 퀘스트를 지우거나 이름을 바꾸면 `mainIndexFromSave`의 옮긴 표에 꼭 적어요.
+- `s116test.py` (가짜 Firebase): 서버 학교가 이 앱보다 새 버전(앞자리나 가운데 자리)에서 저장됐으면 받지도 덮지도 않고 업데이트 안내를 보여 주는지, 끝자리만 다르면 예전처럼 받는지 봐요.
 - PR마다 `.github/workflows/build-check.yml`이 맨 위 `index.html`이 원본에서 만든 것과 같은지 봐요.
 
 ## 시험 정리 (2026-10-29)
