@@ -6,6 +6,7 @@
 #  4) 시계를 뒤로 돌려도 요일 행사가 다시 열리지 않아요
 #  5) 이야기: 새 학교의 1장 여는 장면, 장이 끝나면 닫는 장면과 고르기, 옛 저장은 '지금까지의 이야기' 하나, 수첩 세 쪽
 #  6) 옛 저장(새 칸이 없는 저장)과 엉뚱한 값이 든 저장을 읽어도 멈추지 않아요
+#  8) 고등학교에서 겹친 건물 누르기와 꾸미기 자리
 #  7) 360px에서 새 창 네 개가 옆으로 넘치지 않고 페이지 오류가 없어요
 # 쓰는 법: python3 wrap.py && python3 s117test.py   (마지막 줄이 PASS면 통과)
 import asyncio, json
@@ -61,8 +62,8 @@ async def main():
         ok(m['m5'] == 5, f"5분권은 하루 5번 {m['m5']}"); ok(m['ess'] == 5 and m['lamp'] == 0, '숲의 정수 5, 쿠폰이 모자라면 장식을 못 사요')
         await page.evaluate(CLEAN)
         # 저장 왕복
-        await page.evaluate(f"{F}.save()"); await page.reload(); await page.wait_for_timeout(900); await page.evaluate(CLEAN)
-        sv = await page.evaluate(f"(()=>{{ const S={F}.S; return [S.xg.bd, S.xg.got, S.xg.log.length, S.mk.cp, S.mk.buy.m5, S.sto.v]; }})()")
+        # 저장 왕복: 저장한 글자를 다시 읽어요(다시 켜기는 시험 도구의 저장 넣기와 엇갈릴 때가 있어서 sanitize로 바로 봐요)
+        sv = await page.evaluate(f"(()=>{{ const F={F}; F.save(); const S=F.sanitize(JSON.parse(localStorage.getItem('forest-school-v1'))); return [S.xg.bd, S.xg.got, S.xg.log.length, S.mk.cp, S.mk.buy.m5, S.sto.v]; }})()")
         print(' 저장 왕복', sv); ok(sv[0] == 8 and sv[1] == 2 and sv[2] == 1 and sv[3] == m['left'] and sv[4] == 5, '저장 왕복')
         # 3) 축제: 금요일, 그리고 다음 주 월요일
         d = await page.evaluate(CLOCK(4)); print('금요일', d)
@@ -106,7 +107,17 @@ async def main():
         j = await page.evaluate(f"(()=>{{ const S={F}.S; return [S.tier, S.xg.bd, S.xg.got, S.xg.log.length, S.mk.cp, S.mk.sold, S.sto.ch, S.sto.q.length, (S.sto.side.nap||{{}}).n, S.fv.st]; }})()")
         print('엉뚱한 값', j); ok(j == [2, 9999, 0, 0, 200, 0, 24, 0, 4, 0], '엉뚱한 값이 든 저장도 읽어요')
         await ctx.close()
-        all_errs = [e for e in errs + errs2 + errs3 + errs4 if 'ERR_' not in e]
+        # 8) 고등학교: 운동장과 기숙사가 겹친 자리에서 그림이 있는 건물이 열려요. 꾸미기 자리는 건물 그림 밖
+        ctx, page, errs5 = await ctxpage(b, 390, 800, 'light', base(tier=3, tg=1, sto={'v': 1, 'ch': 23, 'q': [], 'seen': {}, 'pick': {}, 'side': {}}))
+        await page.evaluate(CLEAN)
+        pk = await page.evaluate(f"""(async()=>{{ const F={F}, S=F.S; for (const k of F.facKeys()) S.f[k]=Math.max(S.f[k]||0,8); F.setTab('school'); F.renderMap(); await new Promise(r=>setTimeout(r,1500)); F.bldWarm(); await new Promise(r=>setTimeout(r,900));
+          const svg=document.querySelector('#map'), m=svg.getScreenCTM(); const at=(x,y)=>{{ const p=svg.createSVGPoint(); p.x=x; p.y=y; const q=p.matrixTransform(m); return F.bldPick({{clientX:q.x, clientY:q.y}}, 'dorm'); }};
+          const bx={{}}; for (const k of F.facKeys()) bx[k]=F.bldBox(k);
+          const hid=F.DECO_SLOTS[3].map(([x,y],i)=>Object.keys(bx).some(k=>bx[k] && x-4>bx[k][0] && x+4<bx[k][2] && y-6>bx[k][1] && y-30<bx[k][3]) ? i+1 : 0).filter(Boolean);
+          return {{field:at(110,225), low:at(110,258), dorm:at(110,310), hid}}; }})()""")
+        print('고등학교 누르기', pk); ok(pk['field'] == 'playground' and pk['low'] == 'playground' and pk['dorm'] == 'dorm', '운동장 아래쪽을 눌러도 운동장이 열려요'); ok(not pk['hid'], f"꾸미기 자리가 건물에 가려지지 않아요 {pk['hid']}")
+        await ctx.close()
+        all_errs = [e for e in errs + errs2 + errs3 + errs4 + errs5 if 'ERR_' not in e]
         ok(not all_errs, f'페이지 오류 {all_errs[:3]}')
         await b.close()
     print('PASS' if not bad else f'FAIL ({len(bad)})')

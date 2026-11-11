@@ -8659,6 +8659,49 @@ body.cam-scene #ffChip,body.cam-scene #plChip,body.cam-scene .b-ring{animation-p
     fr.style.setProperty('--map-bg', u ? `url("${u}")` : 'none');
   }
   const bpos = k => geo().b[k];
+  /* 4.1.0 (지섭 제보 2026-11-11: 고등학교에서 운동장을 누르면 기숙사가 열려요)
+     건물 그림은 네모 칸이라 비어 보이는 모서리가 옆 건물 위에 겹치고, 나중에 그린 건물이 누르기를 가져갔어요.
+     그림마다 실제로 칠해진 곳(투명하지 않은 곳)의 네모를 한 번 재 두고, 누른 자리가 그 안에 든 건물을 골라요. 여럿이면 가운데가 가까운 쪽 */
+  const BLD_OPQ = {};
+  function bldOpaque(href) {
+    if (!href) return null;
+    const c = BLD_OPQ[href]; if (c) return c === 1 ? null : c;
+    BLD_OPQ[href] = 1;
+    const im = new Image();
+    im.onload = () => { try {
+      const N = 48, cv = document.createElement('canvas'); cv.width = cv.height = N;
+      const cx = cv.getContext('2d', { willReadFrequently: true }); cx.drawImage(im, 0, 0, N, N);
+      const d = cx.getImageData(0, 0, N, N).data; let x0 = N, y0 = N, x1 = -1, y1 = -1;
+      for (let y = 0; y < N; y++) for (let x = 0; x < N; x++) if (d[(y * N + x) * 4 + 3] > 40) { if (x < x0) x0 = x; if (x > x1) x1 = x; if (y < y0) y0 = y; if (y > y1) y1 = y; }
+      BLD_OPQ[href] = x1 < 0 ? [0, 0, 1, 1] : [x0 / N, y0 / N, (x1 + 1) / N, (y1 + 1) / N];
+    } catch (e) { BLD_OPQ[href] = [0, 0, 1, 1]; } };
+    im.onerror = () => { BLD_OPQ[href] = [0, 0, 1, 1]; };
+    im.src = href;
+    return null;
+  }
+  // 지금 보이는 건물 그림의 칠해진 네모(지도 칸 기준). 아직 못 쟀으면 그림 칸에서 가장자리를 조금 뺀 네모
+  function bldBox(k) {
+    const g = $('#b-' + k); if (!g || getComputedStyle(g).display === 'none') return null;
+    const im = $((S.f[k] || 0) >= 1 ? '.built .bimg' : '.site .bimg', g); if (!im) return null;
+    const x = +im.getAttribute('x'), y = +im.getAttribute('y'), w = +im.getAttribute('width'), h = +im.getAttribute('height');
+    if (!(w > 0 && h > 0)) return null;
+    const o = bldOpaque(im.getAttribute('href')) || [0.1, 0.12, 0.9, 0.95];
+    return [x + w * o[0], y + h * o[1], x + w * o[2], y + h * o[3]];
+  }
+  function bldWarm() { for (const k of Object.keys(FAC)) bldBox(k); }
+  function bldPick(e, k) {
+    try {
+      const svg = $('#map'), m = svg && svg.getScreenCTM && svg.getScreenCTM(); if (!m || !e || e.clientX == null || (!e.clientX && !e.clientY)) return k;
+      const p = svg.createSVGPoint(); p.x = e.clientX; p.y = e.clientY; const q = p.matrixTransform(m.inverse());
+      let best = null, bd = Infinity;
+      for (const kk of Object.keys(FAC)) {
+        const b = bldBox(kk); if (!b || q.x < b[0] || q.x > b[2] || q.y < b[1] || q.y > b[3]) continue;
+        const d = Math.hypot((q.x - (b[0] + b[2]) / 2) / (b[2] - b[0]), (q.y - (b[1] + b[3]) / 2) / (b[3] - b[1]));
+        if (d < bd) { bd = d; best = kk; }
+      }
+      return best || k;
+    } catch (err) { return k; }
+  }
   const setA = (el, o) => { for (const [k, v] of Object.entries(o)) el.setAttribute(k, typeof v === 'number' ? +v.toFixed(1) : v); };
   function layoutMap() {
     const G = geo(), key = geoIdx();
@@ -8677,6 +8720,7 @@ body.cam-scene #ffChip,body.cam-scene #plChip,body.cam-scene .b-ring{animation-p
       $('#pq-' + k).setAttribute('transform', `translate(${cx.toFixed(1)} ${(cy + w * 0.36).toFixed(1)})`);
       { const ic = $('.pq-ic', $('#pq-' + k)); if (ic) ic.setAttribute('href', IMG('ic_' + k)); }   // 3.3.0 이름표 그림은 뺐어요
     }
+    setTimeout(bldWarm, 1500);   // 4.1.0 건물 그림의 칠해진 네모를 미리 재 둬요
     const nx = $('#b-next');
     for (const k of Object.keys(FAC)) { const g = $('#b-' + k), pq = $('#pq-' + k); if (g) g.classList.toggle('no-lot', !G.b[k]); if (pq) pq.classList.toggle('no-lot', !G.b[k]); }   // 4.0.0 이 지도(구역)에 없는 건물은 숨겨요(테마가 style을 지워서 class로)
     nx.classList.toggle('no-lot', !G.next);
@@ -14516,10 +14560,11 @@ body.cam-scene #ffChip,body.cam-scene #plChip,body.cam-scene .b-ring{animation-p
   // 장식 자리(지도 그림의 %). 건물(Lv.5 크기)과 이름표, 호수를 피해서 지도마다 11곳. 간판 자리는 따로
   const pctXY = ([x, y]) => [Math.round(x * MAP_W / 100), Math.round(y * MAP_H / 100 + MAP_Y)];
   const DECO_SLOTS = [   // 3.3.0 새 단장: 작업지시서 57 자리 표의 꾸미기 11곳(D01~D11)
-    [[78, 23], [83, 29], [52, 39], [52, 43], [30, 35.5], [17, 60], [62, 83], [27, 81], [10, 60], [62, 87], [70, 28]].map(pctXY),
-    [[62, 25], [76, 27], [15, 36], [27, 37], [69, 43], [13, 55], [27, 55], [89, 65], [31, 77], [24, 83], [62, 82]].map(pctXY),
+    // 4.1.0 지섭 제보(2026-11-11): 건물 뒤에 가려지거나 서로 겹치던 자리를 옮겼어요. 유치원 4, 10번, 초등학교 4, 5, 11번, 고등학교 2, 4, 5, 7, 8, 10번(장식은 건물보다 먼저 그려져서 건물 그림과 겹치면 안 보여요)
+    [[78.1, 23], [83.1, 29.1], [51.9, 39.1], [66.7, 73.7], [30, 35.6], [16.9, 60], [61.9, 83], [26.9, 80.9], [10, 60], [38.9, 75.9], [70, 28]].map(pctXY),
+    [[61.9, 25], [76.1, 27], [15, 35.9], [9.4, 24.8], [70, 80], [13.1, 55], [26.9, 55], [88.9, 65], [31.1, 77], [23.9, 83], [56.9, 83.7]].map(pctXY),
     [[77, 28], [46.5, 33.3], [13, 79.5], [19, 79.5], [49, 81], [63, 80], [66, 84], [26.5, 86.5], [60, 84], [20, 28], [21.5, 83.5]].map(pctXY),
-    [[53, 21], [77, 24], [57, 40.5], [20, 48], [14, 75], [23, 82.5], [14, 64], [82, 28.5], [64, 80], [22, 78.5], [21, 86.5]].map(pctXY),
+    [[53.1, 20.9], [78.1, 22.8], [56.9, 40.6], [61.7, 87], [8.3, 81.1], [23.1, 82.6], [92.2, 75], [55.6, 67.8], [63.9, 80], [65.6, 19.3], [21.1, 86.5]].map(pctXY),
   ];
   ZONE_GEO.forEach(Z => DECO_SLOTS.push(Z.deco.map(p => p.slice()))); DECO_SLOTS.push([]);   // 4.0.0 구역 지도마다 꾸미기 6곳(작업지시서 54 자리 표)
   const DECO_SIGN = [[124.2, 424.3], [124.2, 416.2], [126.0, 421.6], [124.2, 424.3]];   // 3.3.0 지섭: 지도 그림의 정문 옆 나무 팻말 위에 덮어요(작업지시서 57 자리 표의 간판 가운데)
@@ -22812,7 +22857,7 @@ body.cam-scene #ffChip,body.cam-scene #plChip,body.cam-scene .b-ring{animation-p
     });
     $$('.bld').forEach(g => {
       const k = g.getAttribute('data-k');
-      g.addEventListener('click', () => openSheet(k));
+      g.addEventListener('click', e => openSheet(bldPick(e, k)));   // 4.1.0 겹친 자리에서는 그림이 실제로 있는 건물을 골라요
       g.addEventListener('keydown', e => { if (e.key === 'Enter' || e.key === ' ') { e.preventDefault(); openSheet(k); } });
       g.addEventListener('pointerdown', () => g.classList.add('press'));
       ['pointerup', 'pointerleave', 'pointercancel'].forEach(ev => g.addEventListener(ev, () => g.classList.remove('press')));
@@ -25298,7 +25343,7 @@ body.cam-scene #ffChip,body.cam-scene #plChip,body.cam-scene .b-ring{animation-p
   }
 
   // 시험용 손잡이: 자동 시험(window.__FOREST_TEST)에서만 게임 속 함수를 꺼내 써요
-  if (window.__FOREST_TEST) window.__forest = { get S() { return S; }, XG, MK, ST, SIDE, ST_SIDE, xgOn, xgGuest, xgSpots, xgGreet, xgVisit, xgLunch, openXg, mkOn, mkHot, mkSell, mkBuy, mkSur, openMk, wdBar, wdTick, stTick, stPlay, stNext, stPick, stEnd, stTags, openSb, renderSb, sideCan, fvFlag, FV, FV_POS, fvOn, fvOpen, fvBonus, fvSync, fvStamp, fvGuests, openFv, renderFv, fvMeet, fvBoothStart, fvMap, fvTip, festDef, goTo, navInfo, openShop, gdReady, thPreview, thPreviewEnd, thOn, busScene, tripCrowd, openTrip, startTrip, claimTrip, TRIPS, mgPickMul, mgPickMode, mgUpOrder, mgFillOrders, mgAdAsk, sportsCon, festCon, btQuota, btCanAd, btAdMore, warmRooms, blobUrl, vdSize, vdBlock, pzSweep, pzSwGain, pzSwOpen, pzXpOf, mgMulMax, mgMulOk, mgMul, mgModeTap, acTip, kidDupIdx, trialSafe, closeAd,
+  if (window.__FOREST_TEST) window.__forest = { get S() { return S; }, bldBox, bldPick, bldWarm, DECO_SLOTS, XG, MK, ST, SIDE, ST_SIDE, xgOn, xgGuest, xgSpots, xgGreet, xgVisit, xgLunch, openXg, mkOn, mkHot, mkSell, mkBuy, mkSur, openMk, wdBar, wdTick, stTick, stPlay, stNext, stPick, stEnd, stTags, openSb, renderSb, sideCan, fvFlag, FV, FV_POS, fvOn, fvOpen, fvBonus, fvSync, fvStamp, fvGuests, openFv, renderFv, fvMeet, fvBoothStart, fvMap, fvTip, festDef, goTo, navInfo, openShop, gdReady, thPreview, thPreviewEnd, thOn, busScene, tripCrowd, openTrip, startTrip, claimTrip, TRIPS, mgPickMul, mgPickMode, mgUpOrder, mgFillOrders, mgAdAsk, sportsCon, festCon, btQuota, btCanAd, btAdMore, warmRooms, blobUrl, vdSize, vdBlock, pzSweep, pzSwGain, pzSwOpen, pzXpOf, mgMulMax, mgMulOk, mgMul, mgModeTap, acTip, kidDupIdx, trialSafe, closeAd,
     TKE, TK_Q, tkDaily, nbAllDay, nbBuildAt, nbOn, conAdd, BX_SPOT, PERKS, offlineCapH, applyAway, pzFinish, mgClaimOrder,
     CS, JOBS, CS_WORRY, freshCs, csOpen, csLeft, csMax, csEnsure, csCands, csNeed, csMul, csOpenCards, csReady, csDone, csTalkMake, csAnswer, csChoose, csSettle, openCounsel, renderCounsel, renderHall, MAIN, qMeasure, qGoal, sanitize,   // 3.1.0 진로 상담
     NSL, nsStart, nsSettle, nsOpen, nsOn, nsOverlap, nsExtraH, isNight, nightDayOf, openNs, renderNs, bxSpots, renderNight,   // 3.0.0
