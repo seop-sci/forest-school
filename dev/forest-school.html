@@ -11742,7 +11742,7 @@ body.cam-scene #ffChip,body.cam-scene #plChip,body.cam-scene .b-ring{animation-p
   function conMap(k) {
     const g = $('#b-' + k); if (!g) return;
     let el = g.querySelector('.con'), ui = document.getElementById('cu-' + k);
-    if (!conOn(k) || !facKeys().includes(k)) { if (el) el.remove(); if (ui) ui.remove(); g.classList.remove('is-con'); ffbAt(k, 0, false); return; }
+    if (!conOn(k) || !facKeys().includes(k) || (uniOn() && !geo().lot[k])) { if (el) el.remove(); if (ui) ui.remove(); g.classList.remove('is-con'); ffbAt(k, 0, false); return; }   // 4.1.1 지섭 제보: 대학교에서 구역을 옮기면 다른 구역 건물의 공사 막대와 비버 선생님이 그대로 남았어요. 이 지도에 없는 건물은 지워요
     const bi = g.querySelector(S.f[k] >= 1 ? '.built .bimg' : '.site .bimg') || g.querySelector('.bimg'); if (!bi) return;
     if (el && el.dataset.lay !== String(rt.mapLaid)) { el.remove(); el = null; if (ui) { ui.remove(); ui = null; } }   // 3.2.3 학교급이 바뀌어 지도 배치가 달라지면 막대 자리를 다시 잡아요
     const num = a => Number(bi.getAttribute(a)) || 0, x = num('x'), y = num('y'), w = num('width'); if (!w) return;
@@ -14715,7 +14715,7 @@ body.cam-scene #ffChip,body.cam-scene #plChip,body.cam-scene .b-ring{animation-p
       h += `<h3 class="shop-h">${title}</h3><div class="shop-grid">`;
       for (const d of list) {
         const n = decoOwn(d.id), out = decoSoldOut(d.id), c = decoCost(d.id), poor = !out && S.ess < c;
-        const pr = d.ev ? (n ? '가졌어요' : d.ps ? '패스 보상' : d.rs ? '시즌 기념' : d.bio ? `생물 ${d.bio}종` : d.cs ? '진로 도감' : d.col ? '단과대학' : d.fv ? '축제 기념품' : d.xg ? '우정 배지' : d.mk ? '숲속 장터' : d.tr2 ? '수학여행' : d.cg ? '대항전 우승' : '이벤트 선물') : out ? (d.rare ? '가졌어요' : '더 살 수 없어요') : `${ic}${c}`;
+        const pr = d.ev ? (n ? '가졌어요' : d.ps ? '패스 보상' : d.rs ? '시즌 기념' : d.bio ? `생물 ${d.bio}종` : d.cs ? '진로 도감' : d.col ? '단과대학' : d.fv ? '축제 기념품' : d.xg ? '우정 배지' : d.mk ? '숲속 장터' : d.tr2 ? tr2Nm() : d.cg ? '대항전 우승' : '이벤트 선물') : out ? (d.rare ? '가졌어요' : '더 살 수 없어요') : `${ic}${c}`;
         h += `<button class="si${n ? ' own' : ''}${poor ? ' poor' : ''}" type="button" data-dbuy="${d.id}" aria-label="${d.name}${out ? '' : `, 숲의 정수 ${c}개`}">` +
           (d.rare ? '<span class="rare-mark" aria-hidden="true">★</span>' : '') +
           `<span class="pv deco"><img src="${IMG(d.img)}" alt="" draggable="false"></span><span class="nm">${d.name}${!d.rare && n ? ` <small>${n}개</small>` : ''}</span><span class="pr">${pr}</span></button>`;
@@ -14779,7 +14779,7 @@ body.cam-scene #ffChip,body.cam-scene #plChip,body.cam-scene .b-ring{animation-p
     }
     const d = DECO_BY[id]; if (!d) return;
     sfx('tap');
-    if (d.ev) { toast(decoOwn(id) ? `${d.name}${eulOf(d.name)} 가지고 있어요. '지도에 놓기'로 학교에 놓아 보세요` : d.cs ? `${eun(d.name)} 진로 도감 12칸을 다 채우면 받아요` : d.tr2 ? `${eun(d.name)} ${d.tr2} 수학여행에서 가져와요` : d.fv ? `${eun(d.name)} 축제 부스 놀이를 ${FV.win}번 성공하면 받아요` : d.xg ? `${eun(d.name)} 교환학생 우정 배지 8개를 모으면 받아요` : d.mk ? `${eun(d.name)} 목요일 숲속 장터에서 쿠폰으로 사요` : `${eun(d.name)} 이벤트 기념 상자에서 받을 수 있어요`); return; }
+    if (d.ev) { toast(decoOwn(id) ? `${d.name}${eulOf(d.name)} 가지고 있어요. '지도에 놓기'로 학교에 놓아 보세요` : d.cs ? `${eun(d.name)} 진로 도감 12칸을 다 채우면 받아요` : d.tr2 ? `${eun(d.name)} ${d.tr2} ${tr2Nm()}에서 가져와요` : d.fv ? `${eun(d.name)} 축제 부스 놀이를 ${FV.win}번 성공하면 받아요` : d.xg ? `${eun(d.name)} 교환학생 우정 배지 8개를 모으면 받아요` : d.mk ? `${eun(d.name)} 목요일 숲속 장터에서 쿠폰으로 사요` : `${eun(d.name)} 이벤트 기념 상자에서 받을 수 있어요`); return; }
     if (decoSoldOut(id)) { toast(d.rare ? `${eun(d.name)} 하나만 가질 수 있어요` : `${eun(d.name)} ${DECO_MAX}개까지 가질 수 있어요`); return; }
     rt.decoPick = id; renderDecoShop();
   }
@@ -18119,6 +18119,7 @@ body.cam-scene #ffChip,body.cam-scene #plChip,body.cam-scene .b-ring{animation-p
   /* ===== 3.2.0 수학여행(설계안 "3.2.0 설계안 (수학여행)", 2026-11-05 지섭 결정): 고등학교부터 학년마다 한 번.
      옛 도시, 섬 마을, 큰 도시 중 한 곳 → 들를 곳 세 군데에서 활동을 하나씩 고르고 → 단체 사진 → 학생들이 3시간 동안 떠나 있어요(수업료는 그대로).
      돌아오면 도토리(수업료 2시간치), 숲의 정수, 그곳 기념품(지도 장식), 앨범에 사진 한 쪽. 숫자는 본부 제안 ===== */
+  const tr2Nm = () => uniOn() ? '배낭여행' : '수학여행';   // 4.1.1 지섭: 대학교에서는 배낭여행이라고 불러요(이름만, 규칙과 저장은 그대로)
   const tr2Key = () => `${S.tier}-${S.tg}`;
   const tr2Open = () => !!S && !!S.tr2 && S.tier >= TR2.tier;
   const tr2Away = () => !!(S && S.tr2 && S.tr2.cur && S.tr2.cur.st === 'go' && gameNow() >= (S.tr2.cur.dep || 0) && gameNow() < S.tr2.cur.back);
@@ -18128,7 +18129,7 @@ body.cam-scene #ffChip,body.cam-scene #plChip,body.cam-scene .b-ring{animation-p
   const tr2Ready = () => !!(S && S.tr2 && S.tr2.cur && S.tr2.cur.st === 'go' && gameNow() >= S.tr2.cur.back);
   const tr2Day = () => { const h = kstHour(gameNow()); return h >= TR2.h0 && h < TR2.h1; };
   const tr2Placed = () => S.deco.lay.reduce((a, L) => a + L.filter(x => typeof x === 'string' && x.startsWith('sv2_')).length, 0);
-  const tr2Busy = () => tr2Away() ? '수학여행 중이에요. 학생들이 돌아오면 할 수 있어요' : '';
+  const tr2Busy = () => tr2Away() ? `${tr2Nm()} 중이에요. 학생들이 돌아오면 할 수 있어요` : '';
   function sanitizeTr2(d, s) {
     const c = d.tr2 && typeof d.tr2 === 'object' ? d.tr2 : {}, n = v => typeof v === 'number' && isFinite(v) ? Math.max(0, Math.floor(v)) : 0;
     s.tr2 = freshTr2();
@@ -18159,7 +18160,8 @@ body.cam-scene #ffChip,body.cam-scene #plChip,body.cam-scene .b-ring{animation-p
     const cur = S.tr2 && S.tr2.cur, on = tr2Open() && (!!cur || !S.tr2.done[tr2Key()]);
     setHid(b, !on); if (!on) return;   // 3.2.6 바뀐 때만
     const txt = !cur ? (tr2Day() ? '출발' : '예약') : cur.st !== 'go' ? '여행 중' : tr2Rsv() ? '6시 출발' : tr2Ready() ? '도착!' : hms(Math.max(0, cur.back - gameNow()));
-    if (rt.tr2Txt !== txt) { rt.tr2Txt = txt; $('#tr2N').textContent = txt; b.classList.toggle('ready', !cur || tr2Ready() || cur.st !== 'go'); b.setAttribute('aria-label', `수학여행, ${txt}`); }
+    if (rt.tr2Txt !== txt) { rt.tr2Txt = txt; $('#tr2N').textContent = txt; b.classList.toggle('ready', !cur || tr2Ready() || cur.st !== 'go'); b.setAttribute('aria-label', `${tr2Nm()}, ${txt}`); }
+    { const lb = b.querySelector('.b-lb'); if (lb && lb.textContent !== tr2Nm()) { lb.textContent = tr2Nm(); b.setAttribute('aria-label', `${tr2Nm()}, ${txt}`); } }
     if (!$('#tr2Ic').firstChild && IMG('ic_trip2')) $('#tr2Ic').innerHTML = `<img src="${IMG('ic_trip2')}" alt="">`;
     if (rt.modalOpen === $('#mTr2') && cur && cur.st === 'go') {
       if (rt.tr2View !== (tr2Ready() ? 'back' : tr2Rsv() ? 'rsv' : 'go')) renderTr2();
@@ -18175,7 +18177,7 @@ body.cam-scene #ffChip,body.cam-scene #plChip,body.cam-scene .b-ring{animation-p
   function openTr2() {
     if (rt.paused || !tr2Open()) { if (S && S.tier < TR2.tier) toast('수학여행은 고등학교부터 갈 수 있어요'); return; }
     if (rt.modalOpen && rt.modalOpen !== $('#mTr2')) return;
-    sfx('tap'); rt.tr2Msg = ''; renderTr2();
+    sfx('tap'); rt.tr2Msg = ''; setT($('#tr2Title'), tr2Nm()); renderTr2();
     if (rt.modalOpen !== $('#mTr2')) openModal($('#mTr2'));
   }
   function renderTr2() {
@@ -18184,7 +18186,7 @@ body.cam-scene #ffChip,body.cam-scene #plChip,body.cam-scene .b-ring{animation-p
     rt.tr2View = !cur ? 'idle' : cur.st === 'go' ? (tr2Ready() ? 'back' : tr2Rsv() ? 'rsv' : 'go') : cur.st;
     if (!cur) {
       const used = !!T.done[tr2Key()];
-      h += `<p class="tr-lead">${used ? `${yearNo()}학년 수학여행은 다녀왔어요. 다음 학년에 또 떠나요.` : '학년마다 한 번 떠나요. 들를 곳 세 군데에서 활동을 골라요.'}\n${TR2.hours}시간 동안 떠나 있어도 수업료는 그대로 들어와요.</p>`;
+      h += `<p class="tr-lead">${used ? `${yearNo()}학년 ${tr2Nm()}은 다녀왔어요. 다음 학년에 또 떠나요.` : '학년마다 한 번 떠나요. 들를 곳 세 군데에서 활동을 골라요.'}\n${TR2.hours}시간 동안 떠나 있어도 수업료는 그대로 들어와요.</p>`;
       if (!used && !tr2Day()) h += '<p class="fine">지금은 출발 시간(아침 6시~오후 5시)이 아니에요. 미리 골라 단체 사진까지 찍어 두면 아침 6시에 떠나도록 예약돼요.</p>';
       h += '<div class="tr2-list">' + TR2_PL.map(Q => {
         const got = Q.souv.filter(v => T.souv.includes(v[0])).length, can = !used && !S.trip.cur && !festBusy();
@@ -18202,7 +18204,7 @@ body.cam-scene #ffChip,body.cam-scene #plChip,body.cam-scene .b-ring{animation-p
         `<div class="btn-row"><button class="cta" type="button" data-tr2="snap">찰칵!</button></div>`;
     } else if (tr2Rsv()) {   // 3.2.1 예약
       h += tr2Photo(cur.pl, cur.pk, cur.kids, 'small') + `<p class="tr-left" id="tr2Left">떠나기까지 ${hms(cur.dep - gameNow())}</p>` +
-        `<p class="fine">${P.name} 수학여행을 예약했어요. 아침 ${TR2.h0}시에 떠나서 ${TR2.h0 + TR2.hours}시에 돌아와요. 떠나기 전까지는 학교 행사, 체험학습, 진로 상담을 그대로 할 수 있어요.</p>`;
+        `<p class="fine">${P.name} ${tr2Nm()}을 예약했어요. 아침 ${TR2.h0}시에 떠나서 ${TR2.h0 + TR2.hours}시에 돌아와요. 떠나기 전까지는 학교 행사, 체험학습, 진로 상담을 그대로 할 수 있어요.</p>`;
     } else if (!tr2Ready()) {
       const left = cur.back - gameNow();
       h += tr2Photo(cur.pl, cur.pk, cur.kids, 'small') + `<p class="tr-left" id="tr2Left">${hms(left)} 남았어요</p>` +
@@ -18213,7 +18215,7 @@ body.cam-scene #ffChip,body.cam-scene #plChip,body.cam-scene .b-ring{animation-p
         `<div class="tr-gift"><span class="tr-rw">${acornIcon()}<b>${fmt(minAcorns(TR2.acMin))}</b></span><span class="tr-rw">${IMG('ic_essence') ? `<img src="${IMG('ic_essence')}" alt="" style="width:16px;height:16px">` : ''}<b>${TR2.ess}</b></span></div>` +
         `<div class="btn-row"><button class="cta" type="button" data-tr2="get">받기</button></div>`;
     }
-    h += `<h3 class="tr-h">수학여행 기념품 <small>${T.souv.length}/9종</small></h3><div class="tr-souv">` +
+    h += `<h3 class="tr-h">${tr2Nm()} 기념품 <small>${T.souv.length}/9종</small></h3><div class="tr-souv">` +
       TR2_PL.flatMap(Q => Q.souv.map(([id, nm]) => { const own = T.souv.includes(id);
         return `<span class="sv${own ? ' own' : ''}" style="--tc:${Q.c}">${own && IMG(id) ? `<img src="${IMG(id)}" alt="">` : '<b>?</b>'}<small>${own ? nm : Q.name}</small></span>`; })).join('') +
       '</div><p class="fine tr-fine">기념품은 꾸미기 가게에서 지도에 놓을 수 있어요. 졸업해도 그대로 남아요.</p>';
@@ -18254,7 +18256,7 @@ body.cam-scene #ffChip,body.cam-scene #plChip,body.cam-scene .b-ring{animation-p
       const dep = tr2Day() ? 0 : tr2NextDep();   // 3.2.1 출발 시간 밖이면 다음 아침 6시에 떠나요
       cur.st = 'go'; cur.dep = dep; cur.back = (dep || gameNow()) + TR2.hours * 3600000;
       sfx('done'); buzz(15);
-      rt.tr2Msg = (dep ? `찰칵! 수학여행을 예약했어요. 아침 ${TR2.h0}시에 떠나서 ${TR2.h0 + TR2.hours}시에 돌아와요.` : `찰칵! 멋진 사진이 나왔어요. 학생들은 ${TR2.hours}시간 뒤에 돌아와요.`) + (opened ? `\n여행 덕분에 진로 카드가 ${opened}장 열렸어요!` : '');
+      rt.tr2Msg = (dep ? `찰칵! ${tr2Nm()}을 예약했어요. 아침 ${TR2.h0}시에 떠나서 ${TR2.h0 + TR2.hours}시에 돌아와요.` : `찰칵! 멋진 사진이 나왔어요. 학생들은 ${TR2.hours}시간 뒤에 돌아와요.`) + (opened ? `\n여행 덕분에 진로 카드가 ${opened}장 열렸어요!` : '');
       rt.tr2Txt = ''; save(); tr2Tick(); renderTr2(); renderTr2Btn(); syncKids(false); return;
     }
     if (v.startsWith('t:') && cur.st === 'go' && !tr2Ready() && !tr2Rsv()) {
