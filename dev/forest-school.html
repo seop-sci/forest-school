@@ -6052,7 +6052,7 @@ body.cam-scene #ffChip,body.cam-scene #plChip,body.cam-scene .b-ring{animation-p
   const SAVE_KEY = 'forest-school-v1';
   // 토스 미니앱 판이면 toss/src/bridge.js가 window.AIT에 광고, 저장소, 게임센터 기능을 담아 둬요
   const AIT = window.AIT || null;
-  const NOAD = !!window.FOREST_NOAD, ADS_EXT = window.FOREST_ADS || null;   // 2.0.0 보안 점검(2-8): 켤 때 한 번만 읽어요(나중에 바꿔 넣어도 소용없게)
+  const ADS_EXT = window.FOREST_ADS || null;   // 4.0.1 (3.3.2 분석): 광고 없이 보상을 주던 옛 스위치(FOREST_NOAD)는 켜는 판이 없어 지웠어요   // 2.0.0 보안 점검(2-8): 켤 때 한 번만 읽어요(나중에 바꿔 넣어도 소용없게)
   const motionMQ = window.matchMedia ? window.matchMedia('(prefers-reduced-motion: reduce)') : null;
 
   /* ---------- 게임 수치 ---------- */
@@ -7094,7 +7094,7 @@ body.cam-scene #ffChip,body.cam-scene #plChip,body.cam-scene .b-ring{animation-p
   function sanitize(d) {
     const s = fresh();
     if (!d || typeof d !== 'object') return s;
-    const num = (v, min, fb) => (typeof v === 'number' && isFinite(v) && v >= min) ? v : fb;
+    const num = (v, min, fb, max = SAVE_CAP.big) => (typeof v === 'number' && isFinite(v) && v >= min) ? Math.min(v, max) : fb;   // 4.0.1 (3.3.2 분석): 상한 없던 숫자 칸에도 상한을 둬요(셈은 SAVE_CAP.count)
     // 1.5.4: 손상되거나 고친 저장이 계산을 무한대로 만들거나 시작을 멈추지 않게 칸마다 넉넉한 상한을 둬요.
     // 실제 놀이로는 닿을 수 없는 값이라 정상 저장은 그대로예요 (SAVE_CAP)
     const cap = (v, max) => Math.min(max, v);
@@ -7126,8 +7126,8 @@ body.cam-scene #ffChip,body.cam-scene #plChip,body.cam-scene .b-ring{animation-p
       if (d.p.perk && typeof d.p.perk === 'object') for (const k in s.p.perk) s.p.perk[k] = Math.floor(cap(num(d.p.perk[k], 0, 0), PERKS[k].max || SAVE_CAP.perk));
       s.p.perk.night = Math.min(s.p.perk.night, PERKS.night.max) || 0;   // 2.3.0.1 NaN으로 저장된 학교도 0부터
     }
-    if (d.att && typeof d.att === 'object') { s.att.last = typeof d.att.last === 'string' ? d.att.last.slice(0, 10) : ''; s.att.n = Math.floor(num(d.att.n, 0, 0)); }
-    if (d.ad && typeof d.ad === 'object') { s.ad.day = typeof d.ad.day === 'string' ? d.ad.day.slice(0, 10) : ''; s.ad.n = Math.floor(num(d.ad.n, 0, 0)); }
+    if (d.att && typeof d.att === 'object') { s.att.last = typeof d.att.last === 'string' ? d.att.last.slice(0, 10) : ''; s.att.n = Math.floor(num(d.att.n, 0, 0, SAVE_CAP.count)); }
+    if (d.ad && typeof d.ad === 'object') { s.ad.day = typeof d.ad.day === 'string' ? d.ad.day.slice(0, 10) : ''; s.ad.n = Math.floor(num(d.ad.n, 0, 0, SAVE_CAP.count)); }
     // 학교급과 장학재단. 졸업식이 없던 저장은 지금까지의 종업식이 모두 유치원에서 열린 것으로 쳐요
     s.tier = Math.min(Math.floor(num(d.tier, 0, 0)), TIER_OPEN - 1);
     s.zone = typeof d.zone === 'string' && ZONE_KEYS.includes(d.zone) ? d.zone : '';   // 4.0.0
@@ -7143,7 +7143,7 @@ body.cam-scene #ffChip,body.cam-scene #plChip,body.cam-scene .b-ring{animation-p
     if (d.fp && typeof d.fp === 'object') for (const k in s.fp) s.fp[k] = Math.floor(cap(num(d.fp[k], 0, 0), SAVE_CAP.fperk));
     if (d.hd && typeof d.hd === 'object') {
       s.hd.day = typeof d.hd.day === 'string' ? d.hd.day.slice(0, 10) : '';
-      s.hd.n = Math.floor(num(d.hd.n, 0, 0));
+      s.hd.n = Math.floor(num(d.hd.n, 0, 0, SAVE_CAP.count));
       s.hd.feastUntil = Math.min(num(d.hd.feastUntil, 0, 0), Date.now() + 27 * 3600000);   // 2.0.0: 게임 시계 기준이라 하루 여유
       s.hd.furNew = d.hd.furNew !== false;
       s.hd.album = !!d.hd.album; s.hd.seen = !!d.hd.seen;
@@ -7160,7 +7160,7 @@ body.cam-scene #ffChip,body.cam-scene #plChip,body.cam-scene .b-ring{animation-p
     s.born = Math.min(num(d.born, 0, s.savedAt), Date.now());
     // 황금 도토리: 예전 저장에도 처음 선물 5개를 줘요. 꾸미기는 산 것만 입을 수 있어요
     s.gold = Math.floor(cap(num(d.gold, 0, s.gold), SAVE_CAP.count));
-    if (d.gd && typeof d.gd === 'object') { s.gd.day = typeof d.gd.day === 'string' ? d.gd.day.slice(0, 10) : ''; s.gd.n = Math.floor(num(d.gd.n, 0, 0)); s.gd.shop = Math.floor(num(d.gd.shop, 0, 0)); }
+    if (d.gd && typeof d.gd === 'object') { s.gd.day = typeof d.gd.day === 'string' ? d.gd.day.slice(0, 10) : ''; s.gd.n = Math.floor(num(d.gd.n, 0, 0, SAVE_CAP.count)); s.gd.shop = Math.floor(num(d.gd.shop, 0, 0, SAVE_CAP.count)); }
     if (d.cos && typeof d.cos === 'object') {
       // 칠판 색은 이제 배경 테마를 따라가요. 예전에 산 칠판은 값(10개씩)을 돌려줘요
       // 지붕도 이제 테마 세트가 맡아요. 예전에 산 지붕도 값(파란 지붕 15개, 벚꽃과 눈 오는 학교 25개)을 돌려줘요
@@ -7184,15 +7184,15 @@ body.cam-scene #ffChip,body.cam-scene #plChip,body.cam-scene .b-ring{animation-p
     }
     // 1.6.0 정수 상점 구매 횟수
     if (d.es && typeof d.es === 'object') {
-      s.es.day = typeof d.es.day === 'string' ? d.es.day.slice(0, 10) : ''; s.es.n = Math.floor(num(d.es.n, 0, 0));
-      s.es.week = Math.floor(num(d.es.week, -1, -1)); s.es.g = Math.floor(num(d.es.g, 0, 0));
-      s.es.x = Math.floor(num(d.es.x, 0, 0));   // 1.7.4 도토리로 정수 바꾸기(오늘 바꾼 횟수)
+      s.es.day = typeof d.es.day === 'string' ? d.es.day.slice(0, 10) : ''; s.es.n = Math.floor(num(d.es.n, 0, 0, SAVE_CAP.count));
+      s.es.week = Math.floor(num(d.es.week, -1, -1, SAVE_CAP.count)); s.es.g = Math.floor(num(d.es.g, 0, 0, SAVE_CAP.count));
+      s.es.x = Math.floor(num(d.es.x, 0, 0, SAVE_CAP.count));   // 1.7.4 도토리로 정수 바꾸기(오늘 바꾼 횟수)
       s.es.t = Math.min(99, Math.floor(num(d.es.t, 0, 0))); s.es.bf = Math.min(99, Math.floor(num(d.es.bf, 0, 0))); s.es.ba = Math.min(99, Math.floor(num(d.es.ba, 0, 0)));   // 2.1.0 문방구
     }
     s.autoUntil = Math.min(num(d.autoUntil, 0, 0), Date.now() + 27 * 3600000);
     if (d.fest && typeof d.fest === 'object') for (const id of FEST_IDS) {
       if (d.fest.next && d.fest.next[id]) s.fest.next[id] = Math.min(num(d.fest.next[id], 0, 0), Math.max(Date.now(), Number(d.clk && d.clk.last) || 0) + 2 * 3600000);   // 4.0.1 기기 시계를 뒤로 돌려 다시 열어도 대기가 줄지 않게, 마지막 게임 시계와 견줘요
-      if (d.fest.n && d.fest.n[id]) s.fest.n[id] = Math.floor(num(d.fest.n[id], 0, 0));
+      if (d.fest.n && d.fest.n[id]) s.fest.n[id] = Math.floor(num(d.fest.n[id], 0, 0, SAVE_CAP.count));
       if (d.fest.sub && d.fest.sub[id] && !FEST[id].night) s.fest.sub[id] = Math.floor(cap(num(d.fest.sub[id], 0, 0), SAVE_CAP.count));
     }
     if (d.dm && typeof d.dm === 'object' && typeof d.dm.day === 'string') {
@@ -7200,19 +7200,19 @@ body.cam-scene #ffChip,body.cam-scene #plChip,body.cam-scene .b-ring{animation-p
       s.dm.list = (Array.isArray(d.dm.list) ? d.dm.list : []).filter(m => m && MISSIONS[m.id]).slice(0, 3).map(m => ({ id: m.id, b: num(m.b, 0, 0), done: !!m.done }));
     }
     if (d.tut && typeof d.tut === 'object') {
-      s.tut.st = ['later', 'done', 'skip'].includes(d.tut.st) ? d.tut.st : ''; s.tut.step = Math.floor(num(d.tut.step, 0, 0));
+      s.tut.st = ['later', 'done', 'skip'].includes(d.tut.st) ? d.tut.st : ''; s.tut.step = Math.floor(num(d.tut.step, 0, 0, SAVE_CAP.count));
       s.tut.paid = !!d.tut.paid; s.tut.nop = !!d.tut.nop;
     }
     if (d.tips && typeof d.tips === 'object') s.tips.rep = !!d.tips.rep;
     if (d.nt && typeof d.nt === 'object') s.nt = { seen: typeof d.nt.seen === 'string' ? d.nt.seen.slice(0, 40) : '', ver: typeof d.nt.ver === 'string' ? d.nt.ver.slice(0, 12) : '', hide: Math.min(typeof d.nt.hide === 'number' && isFinite(d.nt.hide) && d.nt.hide > 0 ? d.nt.hide : 0, Date.now() + 8 * 86400000) };   // 2.0.0 공지
     if (d.wk && typeof d.wk === 'object') {
-      s.wk.week = Math.floor(num(d.wk.week, -1, -1)); s.wk.pts = Math.floor(num(d.wk.pts, 0, 0));
+      s.wk.week = Math.floor(num(d.wk.week, -1, -1, SAVE_CAP.count)); s.wk.pts = Math.floor(num(d.wk.pts, 0, 0, SAVE_CAP.count));
       s.wk.got = MP_BOX.map((_, i) => !!(Array.isArray(d.wk.got) && d.wk.got[i]));
       s.wk.list = (Array.isArray(d.wk.list) ? d.wk.list : []).filter(m => m && WMISSIONS[m.id]).slice(0, 4).map(m => ({ id: m.id, b: num(m.b, 0, 0), done: !!m.done }));
     }
     if (d.lg && typeof d.lg === 'object') {
-      s.lg.week = Math.floor(num(d.lg.week, -1, -1)); s.lg.pts = Math.floor(num(d.lg.pts, 0, 0)); s.lg.pos = Math.floor(num(d.lg.pos, 0, 0)); s.lg.paid = !!d.lg.paid;
-      if (d.lg.last && typeof d.lg.last === 'object') s.lg.last = { week: num(d.lg.last.week, 0, 0), pts: num(d.lg.last.pts, 0, 0), pos: num(d.lg.last.pos, 0, 0), gold: num(d.lg.last.gold, 0, 0) };
+      s.lg.week = Math.floor(num(d.lg.week, -1, -1, SAVE_CAP.count)); s.lg.pts = Math.floor(num(d.lg.pts, 0, 0, SAVE_CAP.count)); s.lg.pos = Math.floor(num(d.lg.pos, 0, 0, SAVE_CAP.count)); s.lg.paid = !!d.lg.paid;
+      if (d.lg.last && typeof d.lg.last === 'object') s.lg.last = { week: num(d.lg.last.week, 0, 0, SAVE_CAP.count), pts: num(d.lg.last.pts, 0, 0, SAVE_CAP.count), pos: num(d.lg.last.pos, 0, 0, SAVE_CAP.count), gold: num(d.lg.last.gold, 0, 0, SAVE_CAP.count) };
     }
     if (d.sports && typeof d.sports === 'object') s.sports.next = Math.min(num(d.sports.next, 0, 0), Math.max(Date.now(), Number(d.clk && d.clk.last) || 0) + 2 * 3600000);   // 4.0.1
     if (d.trip && typeof d.trip === 'object') {
@@ -7220,10 +7220,11 @@ body.cam-scene #ffChip,body.cam-scene #plChip,body.cam-scene .b-ring{animation-p
       s.trip.open = !!t.open;
       s.trip.kids = Math.min(6, Math.floor(num(t.kids, 0, 0)));
       s.trip.souv = Array.isArray(t.souv) ? [...new Set(t.souv.filter(k => typeof k === 'string' && SOUV_IDS.has(k)))] : [];
-      if (t.been && typeof t.been === 'object') for (const k of Object.keys(TRIP)) if (t.been[k]) s.trip.been[k] = Math.floor(num(t.been[k], 0, 0));
+      if (t.been && typeof t.been === 'object') for (const k of Object.keys(TRIP)) if (t.been[k]) s.trip.been[k] = Math.floor(num(t.been[k], 0, 0, SAVE_CAP.count));
       if (typeof t.cur === 'string' && TRIP[t.cur]) {
         const len = TRIP[t.cur].min * 60000, end = num(t.end, 0, 0), start = num(t.start, 0, 0);
-        if (end > 0 && end - Date.now() <= len + 86400000) { s.trip.cur = t.cur; s.trip.end = end; s.trip.start = Math.min(start || end - len, end - 1); }   // 2.0.0: 끝나는 시각은 게임 시계라 기기 시계와 어긋날 수 있어 하루 여유
+        if (end > 0 && end - Math.max(Date.now(), Number(d.clk && d.clk.last) || 0) <= len + 86400000) {   // 4.0.1: 기기 시계가 하루 넘게 느려도 가던 체험학습이 사라지지 않게 마지막 게임 시계와 견줘요
+          s.trip.cur = t.cur; s.trip.end = end; s.trip.start = Math.min(start || end - len, end - 1); }   // 2.0.0: 끝나는 시각은 게임 시계라 기기 시계와 어긋날 수 있어 하루 여유
       }
     }
     // 2.1.0: 토스 사용자 키는 옛 저장의 tk(글자)에서 tkey로 옮겨요. tk는 이제 시간 단축권 장수예요
@@ -7233,9 +7234,9 @@ body.cam-scene #ffChip,body.cam-scene #plChip,body.cam-scene .b-ring{animation-p
     if (d.rank && typeof d.rank === 'object') {
       s.rank.name = cleanName(d.rank.name);
       s.rank.joined = !!d.rank.joined && !!s.rank.name;
-      s.rank.sent = Math.floor(num(d.rank.sent, -1, -1));
+      s.rank.sent = Math.floor(num(d.rank.sent, -1, -1, SAVE_CAP.count));
       s.rank.by = typeof d.rank.by === 'string' ? d.rank.by.slice(0, 128) : '';
-      s.rank.ren = Math.floor(num(d.rank.ren, 0, 0)); s.rank.asked = !!d.rank.asked || s.rank.joined;
+      s.rank.ren = Math.floor(num(d.rank.ren, 0, 0, SAVE_CAP.count)); s.rank.asked = !!d.rank.asked || s.rank.joined;
     }
     // 학교 점수(지금까지 받은 수료증)가 없던 저장은 이번 학교급의 수료증과 받은 기금으로 어림해요
     if (!s.st.dips) {
@@ -7304,7 +7305,7 @@ body.cam-scene #ffChip,body.cam-scene #plChip,body.cam-scene .b-ring{animation-p
     // 2.1.0 공사와 시간 단축권: 예전 저장에는 없으니 공사 없음, 단축권 0장. 지금 레벨 다음 칸이 아닌 공사는 버려요
     if (d.bd && typeof d.bd === 'object') for (const k of Object.keys(FAC)) {
       const b = d.bd[k];
-      if (b && typeof b === 'object' && Math.floor(num(b.L, 0, 0)) === s.f[k] + 1 && s.f[k] + 1 <= SAVE_CAP.lv) {
+      if (b && typeof b === 'object' && Math.floor(num(b.L, 0, 0, SAVE_CAP.count)) === s.f[k] + 1 && s.f[k] + 1 <= SAVE_CAP.lv) {
         const st = num(b.s, 0, 0), e = num(b.e, 0, 0);
         if (e > 0 && e - st <= 30 * 86400000) s.bd[k] = { L: s.f[k] + 1, s: Math.min(st, e), e };
       }
@@ -7314,7 +7315,7 @@ body.cam-scene #ffChip,body.cam-scene #plChip,body.cam-scene .b-ring{animation-p
     if (d.tka && typeof d.tka === 'object') { s.tka.day = typeof d.tka.day === 'string' ? d.tka.day.slice(0, 10) : ''; s.tka.n = Math.min(TKAD.perDay, Math.floor(num(d.tka.n, 0, 0))); }
     if (d.pz && typeof d.pz === 'object') {
       s.pz.day = typeof d.pz.day === 'string' ? d.pz.day.slice(0, 10) : '';
-      s.pz.n = Math.floor(num(d.pz.n, 0, 0)); s.pz.adN = Math.floor(num(d.pz.adN, 0, 0));
+      s.pz.n = Math.floor(num(d.pz.n, 0, 0, SAVE_CAP.count)); s.pz.adN = Math.floor(num(d.pz.adN, 0, 0, SAVE_CAP.count));
       s.pz.best = Math.min(1e9, Math.floor(num(d.pz.best, 0, 0)));
       s.pz.hand = typeof d.pz.hand === 'string' ? d.pz.hand.slice(0, 10) : '';   // 2.3.1 소탕
       s.pz.tb = d.pz.tb === undefined ? s.pz.best : Math.min(1e9, Math.floor(num(d.pz.tb, 0, 0)));   // 3.0.0 옛 저장은 업데이트한 날만 예전처럼 최고 점수로
@@ -7335,8 +7336,8 @@ body.cam-scene #ffChip,body.cam-scene #plChip,body.cam-scene .b-ring{animation-p
     out.md = Math.floor(num(q.md, 0, out.m));   // 2.0.0 보안 점검(1-7): 끝낸 메인 퀘스트 수. 옛 저장은 지금 번호로 시작해요
     out.lat = typeof q.lat === 'string' ? q.lat.slice(0, 12) : '';
     out.seen = Math.min(out.m, Math.floor(typeof q.seen === 'number' && isFinite(q.seen) ? q.seen : -1));
-    out.gen = Math.floor(num(q.gen, 0, 0));
-    out.subDone = Math.floor(num(q.subDone, 0, 0));
+    out.gen = Math.floor(num(q.gen, 0, 0, SAVE_CAP.count));
+    out.subDone = Math.floor(num(q.subDone, 0, 0, SAVE_CAP.count));
     out.done = Array.isArray(q.done) ? q.done.filter(x => typeof x === 'string' && x.length < 12).slice(0, 100) : [];
     out.subs = (Array.isArray(q.subs) ? q.subs : [])
       .filter(x => x && typeof x.id === 'string' && WHO[x.who] && Q_TYPES.includes(x.t) &&
@@ -7360,7 +7361,7 @@ body.cam-scene #ffChip,body.cam-scene #plChip,body.cam-scene .b-ring{animation-p
       if (i >= 0) return i;
     }
     // v3 저장: 예전 번호 앞의 퀘스트는 모두 마친 것으로 보고, 새 순서에서 아직 안 한 첫 퀘스트부터 이어가요
-    const done = new Set(LEGACY_IDS.slice(0, Math.floor(num(q.m, 0, 0))));
+    const done = new Set(LEGACY_IDS.slice(0, Math.floor(num(q.m, 0, 0, SAVE_CAP.count))));
     const i = MAIN.findIndex(m => !done.has(m.id));
     return i >= 0 ? i : MAIN.length;
   }
@@ -11870,12 +11871,9 @@ body.cam-scene #ffChip,body.cam-scene #plChip,body.cam-scene .b-ring{animation-p
 
   /* ---------- 테스트 광고 ---------- */
   // 진짜 미니앱에서는 앱인토스 SDK의 보상형 광고로 바꿔요. 보상은 userEarnedReward 신호를 받았을 때만 줘요
+  const AD_GUARD_MS = 180000;
   function showAd(onReward, onSkip) {
     if (rt.adOpen) return;
-    if (NOAD) {   // 안드로이드 스토어 판: 광고 없이 바로 보상을 줘요
-      rt.adOk = onReward; rt.adNo = onSkip || null; rt.adEarned = true; closeAd();
-      return;
-    }
     const EXT = AIT && AIT.ads ? AIT : ADS_EXT;   // 토스 광고나 안드로이드 애드몹 광고
     if (EXT) {
       // 토스 리워드 광고: 끝까지 봤다는 신호(userEarnedReward)가 왔을 때만 보상을 줘요
@@ -11883,9 +11881,21 @@ body.cam-scene #ffChip,body.cam-scene #plChip,body.cam-scene .b-ring{animation-p
       if (!EXT.adReady()) { EXT.preload(); rt.adNoGold = false; toast('광고를 불러오지 못했어요. 잠시 뒤에 다시 눌러 주세요' + adErrText(EXT)); if (onSkip) onSkip('noad'); return; }
       rt.adOpen = true;
       if (actx && actx.state === 'running') actx.suspend().catch(() => {});   // 광고 중에는 게임 소리를 멈춰요
-      EXT.showAd(r => { rt.adOk = onReward; rt.adNo = onSkip || null; rt.adEarned = !!r.earned; closeAd(); });
+      // 4.0.1 (3.3.2 분석): 광고가 끝났다는 신호가 3분 동안 안 오면 풀어 줘요(광고 단추가 영영 막히지 않게). 늦게 온 신호는 받지 않아요
+      const tok = rt.adTok = (rt.adTok || 0) + 1;
+      clearTimeout(rt.adGuard);
+      rt.adGuard = setTimeout(() => {
+        if (!rt.adOpen || rt.adTok !== tok) return;
+        rt.adTok += 1; rt.adOpen = false; rt.adOk = rt.adNo = null; rt.adNoGold = false;
+        ensureAudio(); musicSync();
+        toast('광고가 끝났다는 신호를 받지 못했어요\n잠시 뒤에 다시 눌러 주세요');
+        if (onSkip) onSkip('noad');
+      }, (window.__FOREST_TEST && window.__AD_GUARD_MS) || AD_GUARD_MS);
+      EXT.showAd(r => { if (rt.adTok !== tok) return; clearTimeout(rt.adGuard); rt.adOk = onReward; rt.adNo = onSkip || null; rt.adEarned = !!(r && r.earned); closeAd(); });
       return;
     }
+    // 4.0.1 지섭 결정(2026-11-11): 토스 판에서 광고를 쓸 수 없으면 시험 광고 창 대신 알림만 띄워요(보상 없음)
+    if (AIT) { rt.adNoGold = false; toast('지금은 광고를 볼 수 없어요\n잠시 뒤에 다시 눌러 주세요'); if (onSkip) onSkip('noad'); return; }
     rt.adOpen = true; rt.adOk = onReward; rt.adNo = onSkip || null; rt.adEarned = false;
     let left = BOOST.adSec;
     $('#adCount').textContent = left;
@@ -12756,10 +12766,14 @@ body.cam-scene #ffChip,body.cam-scene #plChip,body.cam-scene .b-ring{animation-p
         // 이 구글 계정은 이미 다른 학교를 갖고 있어요. 지금 학교의 랭킹과 테스트 기록은 정리하고 그 계정으로 들어가요
         save();
         const local = JSON.stringify(S), old = Cloud.uid;
+        // 4.0.1 (3.3.2 분석 M14): 지우기 전에 올리기부터 멈춰요(지운 칸에 옛 계정 저장이 다시 올라가지 않게). 하던 올리기는 3초까지 기다려요
+        Cloud.gen += 1; rt.adopting = true; clearTimeout(Cloud.timer);
+        for (let i = 0; i < 30 && Cloud.pushing; i++) await new Promise(r => setTimeout(r, 100));
         try { await delServer(old); } catch (er) { /* 무시 */ }   // 4.0.1 예전 학교 칸과 공개 모습까지 서버 칸 여섯 곳을 모두 지워요   // 2.0.0 보안 점검(2-12): 다시 못 쓰는 옛 익명 계정의 저장도 지워요(이 학교는 local로 가져가요)
-        const u = (await auth.signInWithCredential(cred)).user;
-        Cloud.gen += 1; rt.adopting = true;   // 예전 id로 하던 저장은 멈추고, 고른 학교로 다시 열어요
-        acctPending(true);
+        let u = null;
+        try { u = (await auth.signInWithCredential(cred)).user; }
+        catch (er) { rt.adopting = false; Cloud.dirty = true; save(); cloudPush(true); throw er; }   // 들어가지 못했으면 지금 계정으로 다시 저장해요
+        acctPending(true);   // 예전 id로 하던 저장은 위에서 멈췄고, 고른 학교로 다시 열어요
         let srv = null;
         try { srv = (await waitFor(Cloud.db.ref('forest/saves/' + u.uid).once('value'), CLOUD_WAIT)).val(); }
         catch (er) { throw { acctFail: true }; }
@@ -14979,7 +14993,7 @@ body.cam-scene #ffChip,body.cam-scene #plChip,body.cam-scene .b-ring{animation-p
     o.res = G.res && typeof G.res === 'object' ? { wk: n(G.res.wk, 1e5), rank: Math.max(1, n(G.res.rank, 8)), my: n(G.res.my, 1e7) } : null;
     o.wins = n(G.wins, 1e4); o.pod = n(G.pod, 1e4); o.st = { p: n(G.st && G.st.p, 1e6), n: n(G.st && G.st.n, 1e6), s: n(G.st && G.st.s, 1e6) };
     // 2.2.0 검토 5: st.s가 없던 2.2.0 저장은 이번 주 대항전 발표회 수(show)를 최소값으로 받아요(그전 주 것은 알 수 없어요)
-    if (!(G.st && 's' in G.st)) o.st.s = Math.max(o.st.s, o.wk >= 0 ? o.show.reduce((a, v) => a + v, 0) : 0);
+    if (!(G.st && typeof G.st === 'object' && 's' in G.st))   /* 4.0.1 (3.3.2 분석): 글자나 숫자가 들어온 저장에도 읽기가 멈추지 않게 */ o.st.s = Math.max(o.st.s, o.wk >= 0 ? o.show.reduce((a, v) => a + v, 0) : 0);
     s.cg = o;
   }
   /* ===== 3.1.0 진로 상담 BEGIN (3.1.0 설계안, 지섭 결정 2026-11-03) =====
@@ -18276,12 +18290,12 @@ body.cam-scene #ffChip,body.cam-scene #plChip,body.cam-scene .b-ring{animation-p
     const tb = Array.isArray(d.tb) && d.tb.length === b.length ? d.tb.map((t, i) => b[i] && PZ.teas.includes(t) ? t : '') : new Array(b.length).fill('');
     const helps = { squirrel: 0, owl: 0, bear: 0 };
     if (d.helps && typeof d.helps === 'object') for (const t of PZ.teas) helps[t] = Math.min(PZ.teaMax, Math.floor(num(d.helps[t], 0, 0)));
-    const cur = { b, tb, tray, score: Math.min(1e9, Math.floor(num(d.score, 0, 0))), combo: Math.floor(num(d.combo, 0, 0)), miss: Math.floor(num(d.miss, 0, 0)), lines: Math.floor(num(d.lines, 0, 0)),
-      helps, askI: Math.floor(num(d.askI, 0, 0)), ask: null, ess: Math.floor(num(d.ess, 0, 0)), rw: d.rw !== false, mode: '' };
+    const cur = { b, tb, tray, score: Math.min(1e9, Math.floor(num(d.score, 0, 0))), combo: Math.floor(num(d.combo, 0, 0, SAVE_CAP.count)), miss: Math.floor(num(d.miss, 0, 0, SAVE_CAP.count)), lines: Math.floor(num(d.lines, 0, 0, SAVE_CAP.count)),
+      helps, askI: Math.floor(num(d.askI, 0, 0, SAVE_CAP.count)), ask: null, ess: Math.floor(num(d.ess, 0, 0, SAVE_CAP.count)), rw: d.rw !== false, mode: '' };
     if (d.bst && typeof d.bst === 'object') cur.bst = { teacher: !!d.bst.teacher, small: !!d.bst.small, combo: !!d.bst.combo };   // 1.7.2 부스터
     if (d.ask && typeof d.ask === 'object' && cell(d.ask.k)) {
       const who = PZ.askers.find(a => a[0] === d.ask.who) || PZ.askers[0];
-      cur.ask = { k: cell(d.ask.k), n: Math.max(1, Math.floor(num(d.ask.n, 1, 8))), got: Math.floor(num(d.ask.got, 0, 0)), who: who[0], name: who[1] };
+      cur.ask = { k: cell(d.ask.k), n: Math.max(1, Math.floor(num(d.ask.n, 1, 8, SAVE_CAP.count))), got: Math.floor(num(d.ask.got, 0, 0, SAVE_CAP.count)), who: who[0], name: who[1] };
     } else pzNewAsk(cur);
     cur.tray = cur.tray.map(p => p || pzNewPiece(cur));   // 1.8.0 빈 자리는 바로 채워요(옛 저장의 빈 자리도)
     return cur;
@@ -23106,7 +23120,7 @@ body.cam-scene #ffChip,body.cam-scene #plChip,body.cam-scene .b-ring{animation-p
   }
   // 저장 읽기: sanitize()에서 불러요. 1.7.0 전 저장은 기록으로 알 수 있는 친구들을 채워요(선물은 도감을 처음 열 때 한꺼번에)
   function sanitize170(d, s) {
-    const num = (v, min, fb) => (typeof v === 'number' && isFinite(v) && v >= min) ? v : fb;
+    const num = (v, min, fb, max = SAVE_CAP.big) => (typeof v === 'number' && isFinite(v) && v >= min) ? Math.min(v, max) : fb;   // 4.0.1 (3.3.2 분석): 상한 없던 숫자 칸에도 상한을 둬요(셈은 SAVE_CAP.count)
     if (d.dex && typeof d.dex === 'object') {
       const got = d.dex.got && typeof d.dex.got === 'object' ? d.dex.got : {};
       for (const k of DEX_KEYS.concat(DEX_GUEST_KEYS)) if (got[k]) s.dex.got[k] = num(got[k], 1, s.savedAt);
@@ -23123,7 +23137,7 @@ body.cam-scene #ffChip,body.cam-scene #plChip,body.cam-scene .b-ring{animation-p
       const st = d.ev.stamp && typeof d.ev.stamp === 'object' ? d.ev.stamp : {};
       s.ev.stamp = { n: Math.min(EV_STAMPS.length, Math.floor(num(st.n, 0, 0))), last: typeof st.last === 'string' ? st.last.slice(0, 10) : '' };
       s.ev.list = (Array.isArray(d.ev.list) ? d.ev.list : []).filter(m => m && EV_MEASURE[m.t] && typeof m.n === 'number' && isFinite(m.n) && m.n > 0).slice(0, 3)
-        .map(m => ({ t: m.t, n: Math.floor(m.n), b: num(m.b, 0, 0), m: num(m.m, 0, 15), g: Math.floor(num(m.g, 0, 1)), done: !!m.done }));
+        .map(m => ({ t: m.t, n: Math.floor(m.n), b: num(m.b, 0, 0), m: num(m.m, 0, 15), g: Math.floor(num(m.g, 0, 1, SAVE_CAP.count)), done: !!m.done }));
       s.ev.box = !!d.ev.box;
     }
   }
@@ -23358,7 +23372,7 @@ body.cam-scene #ffChip,body.cam-scene #plChip,body.cam-scene .b-ring{animation-p
   const mgOrderMin = (n, c) => mgEnergyOf(n) * c * MG.ORDER;
   // 저장 읽기: sanitize()에서 불러요. 판 글자가 이상하거나 생산기가 빠졌으면 바로잡아요
   function sanitize180(d, s) {
-    const num = (v, min, fb) => (typeof v === 'number' && isFinite(v) && v >= min) ? v : fb;
+    const num = (v, min, fb, max = SAVE_CAP.big) => (typeof v === 'number' && isFinite(v) && v >= min) ? Math.min(v, max) : fb;   // 4.0.1 (3.3.2 분석): 상한 없던 숫자 칸에도 상한을 둬요(셈은 SAVE_CAP.count)
     s.mg = mgFresh();
     const m = d.mg && typeof d.mg === 'object' ? d.mg : null;
     if (!m) { s.mg.board = mgEmptyBoard().join(''); return; }
@@ -23381,7 +23395,7 @@ body.cam-scene #ffChip,body.cam-scene #plChip,body.cam-scene .b-ring{animation-p
       if (!o || typeof o !== 'object') return null;
       const raw = Array.isArray(o.it) ? o.it : [o];
       const it = raw.filter(x => x && MG.kinds[x.k] && num(x.n, 2, 0) >= 2 && num(x.n, 0, 0) <= 10).slice(0, 2)
-        .map(x => ({ k: x.k, n: Math.floor(x.n), c: Math.min(3, Math.max(1, Math.floor(num(x.c, 1, 1)))) }));
+        .map(x => ({ k: x.k, n: Math.floor(x.n), c: Math.min(3, Math.max(1, Math.floor(num(x.c, 1, 1, SAVE_CAP.count)))) }));
       if (!it.length || (it.length === 2 && it[0].k === it[1].k)) return null;
       return { it, who: typeof o.who === 'string' ? o.who.slice(0, 12) : 'rabbit', ...(o.up && it.length === 1 ? { up: 1 } : {}) };
     }).filter(Boolean).slice(0, 3);
@@ -23390,14 +23404,14 @@ body.cam-scene #ffChip,body.cam-scene #plChip,body.cam-scene .b-ring{animation-p
     s.mg.pieces = Math.min(MG.PCAP, Math.floor(num(m.pieces, 0, 0)));
     s.mg.dexPaid = Array.isArray(m.dexPaid) ? [...new Set(m.dexPaid.filter(k => MG_KINDS.includes(k) || k === 'all'))] : [];   // 합치기 도감 받은 보상
     s.mg.up = Math.min(MG.UPCAP, Math.floor(num(m.up, 0, 0)));
-    if (m.ad && typeof m.ad === 'object') s.mg.ad = { day: typeof m.ad.day === 'string' ? m.ad.day.slice(0, 10) : '', n: Math.floor(num(m.ad.n, 0, 0)) };
-    if (m.bst && typeof m.bst === 'object') s.mg.bst = { day: typeof m.bst.day === 'string' ? m.bst.day.slice(0, 10) : '', lucky: Math.floor(num(m.bst.lucky, 0, 0)), energy: Math.floor(num(m.bst.energy, 0, 0)), luck: Math.min(MGB.lucky.taps, Math.floor(num(m.bst.luck, 0, 0))) };   // 1.8.0 부스터
-    if (m.dexE && typeof m.dexE === 'object') for (const k of MG_KINDS) { const v = Math.floor(num(m.dexE[k], 0, 0)); if (v) s.mg.dexE[k] = v & 1023; }   // 1.8.0 도감 칸마다 받은 정수(10칸 비트)
+    if (m.ad && typeof m.ad === 'object') s.mg.ad = { day: typeof m.ad.day === 'string' ? m.ad.day.slice(0, 10) : '', n: Math.floor(num(m.ad.n, 0, 0, SAVE_CAP.count)) };
+    if (m.bst && typeof m.bst === 'object') s.mg.bst = { day: typeof m.bst.day === 'string' ? m.bst.day.slice(0, 10) : '', lucky: Math.floor(num(m.bst.lucky, 0, 0, SAVE_CAP.count)), energy: Math.floor(num(m.bst.energy, 0, 0, SAVE_CAP.count)), luck: Math.min(MGB.lucky.taps, Math.floor(num(m.bst.luck, 0, 0))) };   // 1.8.0 부스터
+    if (m.dexE && typeof m.dexE === 'object') for (const k of MG_KINDS) { const v = Math.floor(num(m.dexE[k], 0, 0, SAVE_CAP.count)); if (v) s.mg.dexE[k] = v & 1023; }   // 1.8.0 도감 칸마다 받은 정수(10칸 비트)
     s.mg.dexMs = Math.min(MG_DEX_MS.length, Math.floor(num(m.dexMs, 0, 0)));   // 1.8.0 모은 개수 보상 받은 단계
     s.mg.seen = !!m.seen;
-    s.mg.mul = Math.min(4, Math.max(1, Math.floor(num(m.mul, 1, 1)))); s.mg.mulSeen = Math.min(4, Math.max(1, Math.floor(num(m.mulSeen, 1, 1)))); s.mg.mm = m.mm ? 1 : 0; s.mg.mulNew = !!m.mulNew; s.mg.upq = Math.min(3, Math.floor(num(m.upq, 0, 0)));   // 3.0.0 한 단계 위 주문을 기다리는 수   // 2.3.1 만드는 방식, 새 배수 강조   // 2.1.3 에너지 배수
-    s.mg.xr = Math.min(1, num(m.xr, 0, 0)); if (m.xd && typeof m.xd === 'object') s.mg.xd = { day: typeof m.xd.day === 'string' ? m.xd.day.slice(0, 10) : '', n: Math.floor(num(m.xd.n, 0, 0)) };   // 2.1.3 미술 XP 남은 몫과 오늘 받은 양
-    if (m.st && typeof m.st === 'object') for (const k of Object.keys(s.mg.st)) s.mg.st[k] = Math.floor(num(m.st[k], 0, 0));
+    s.mg.mul = Math.min(4, Math.max(1, Math.floor(num(m.mul, 1, 1, SAVE_CAP.count)))); s.mg.mulSeen = Math.min(4, Math.max(1, Math.floor(num(m.mulSeen, 1, 1, SAVE_CAP.count)))); s.mg.mm = m.mm ? 1 : 0; s.mg.mulNew = !!m.mulNew; s.mg.upq = Math.min(3, Math.floor(num(m.upq, 0, 0)));   // 3.0.0 한 단계 위 주문을 기다리는 수   // 2.3.1 만드는 방식, 새 배수 강조   // 2.1.3 에너지 배수
+    s.mg.xr = Math.min(1, num(m.xr, 0, 0)); if (m.xd && typeof m.xd === 'object') s.mg.xd = { day: typeof m.xd.day === 'string' ? m.xd.day.slice(0, 10) : '', n: Math.floor(num(m.xd.n, 0, 0, SAVE_CAP.count)) };   // 2.1.3 미술 XP 남은 몫과 오늘 받은 양
+    if (m.st && typeof m.st === 'object') for (const k of Object.keys(s.mg.st)) s.mg.st[k] = Math.floor(num(m.st[k], 0, 0, SAVE_CAP.count));
   }
   /* ---- 에너지 ---- */
   function mgTick() {
@@ -24137,6 +24151,7 @@ body.cam-scene #ffChip,body.cam-scene #plChip,body.cam-scene .b-ring{animation-p
   };
   const LIVE_OFF_OK = ['puzzle', 'merge', 'event', 'battle', 'weather', 'night'];   // 2.2.0 야간 건설도   // 2.1.3 날씨도   // 2.0.1 숲속 대결도   // 잠시 끌 수 있는 기능
   const Live = { v: 0, off: new Set(), base: null, ok: false };
+  const MAINT_KEY = 'forest-maint', MAINT_MAX_MS = 24 * 3600000;
   function liveApply(j, from) {
     if (!j || typeof j !== 'object') return false;
     if (!Live.base) { Live.base = {}; for (const [k, [o, f]] of Object.entries(LIVE_KEYS)) Live.base[k] = o()[f]; }
@@ -24156,6 +24171,15 @@ body.cam-scene #ffChip,body.cam-scene #plChip,body.cam-scene .b-ring{animation-p
       const m = j.maint;
       Live.maint = m && typeof m === 'object' && typeof m.msg === 'string' && m.msg.trim()
         ? { title: typeof m.title === 'string' && m.title.trim() ? m.title.trim().slice(0, 30) : '점검 중이에요', msg: m.msg.trim().slice(0, 300), until: typeof m.until === 'string' ? m.until.trim().slice(0, 40) : '' } : null;
+      // 4.0.1 (3.3.2 분석 M9): 같은 점검 글을 이 기기가 처음 본 지 24시간이 지나면 덮개가 저절로 풀려요(live.json이 잘못 남아도 갇히지 않게)
+      try {
+        if (Live.maint) {
+          const k = [Live.maint.title, Live.maint.msg, Live.maint.until].join('|'), now = Date.now();
+          let o = null; try { o = JSON.parse(localStorage.getItem(MAINT_KEY) || 'null'); } catch (e) { o = null; }
+          if (!o || o.k !== k || typeof o.at !== 'number' || o.at > now) { o = { k, at: now }; localStorage.setItem(MAINT_KEY, JSON.stringify(o)); }
+          if (now - o.at > MAINT_MAX_MS) Live.maint = null;
+        } else localStorage.removeItem(MAINT_KEY);
+      } catch (e) { /* 저장소가 막혀 있으면 예전처럼 */ }
       maintSync();
     }
     // 2.0.0 Codex 검토(10): 이 기기에 남길 때는 받아 준 것만 정리해서 통째로 남겨요(글자 수로 자르면 다음에 읽지 못해요)
