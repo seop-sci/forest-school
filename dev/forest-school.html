@@ -7840,7 +7840,7 @@ body.cam-scene #ffChip,body.cam-scene #plChip,body.cam-scene .b-ring{animation-p
      UT: [원래, 대학교, 받침이 없어지면 1, ㄹ 받침이 다른 받침이 되면 2]. 긴 낱말을 먼저 적어요 */
   const UT = [['교장 선생님 이름', '총장님 이름', 0], ['현장체험학습', '현장 답사', 1], ['야간 자율학습', '밤샘 공부', 1], ['숲속 운동회', '체육대회', 0], ['반장 선거', '학생회장 선거', 0], ['체험학습', '현장 답사', 1], ['보충수업', '계절학기', 1],
     ['종업식', '종강 파티', 1], ['방학식', '종강 파티', 1], ['졸업식', '학위수여식', 0], ['급식실', '학생 식당', 2], ['과학실', '실험실', 0], ['교실', '강의실', 0], ['운동회', '체육대회', 0], ['학예회', '동아리 공연', 0],
-    ['전학생', '신입생', 0], ['반장', '학생회장', 0], ['소풍', 'MT', 1], ['숙제', '과제', 0]];
+    ['전학생', '신입생', 0], ['반장', '학생회장', 0], ['소풍', 'MT', 1], ['숙제', '과제', 0], ['자율학습', '시험 공부', 1], ['전학 온', '새로 온', 0], ['전학 왔', '입학했', 0], ['전학 올', '새로 올', 0]];
   const UT_MAP = Object.fromEntries(UT.map(x => [x[0], x])), UT_JO = { '을': '를', '이': '가', '은': '는', '과': '와', '으로': '로', '이에요': '예요', '이라': '라', '이나': '나', '이랑': '랑', '이었': '였' };
   const UT_RE = new RegExp('(' + UT.map(x => x[0]).join('|') + ')(이에요|이었|이라|이나|이랑|으로|로|을|이|은|과)?', 'g');
   const UT_SKIP = '#panelRank, #mAlbum, #mSb, #mNotice, input, textarea, script, style';
@@ -15571,6 +15571,9 @@ body.cam-scene #ffChip,body.cam-scene #plChip,body.cam-scene .b-ring{animation-p
     mission: { ic: 'elect_ic_mission', em: '📝', t: '오늘의 미션 도토리 +100%', v: 2, say: '오늘의 미션을 다 같이 끝내요!' },
     pick: { ic: 'elect_ic_pick', em: '🧺', t: '줍기 도토리 +100%', v: 2, say: '떨어진 도토리를 하나도 남기지 않고 주울게요!' }
   };
+  // 4.1.1 대학교 학생회장 선거 공약 말(효과와 숫자는 그대로)
+  const EL_SAY_U = { tuition: '스터디 모임을 늘려서 수업료를 올리겠습니다!', fest: '학교 행사를 더 크게, 더 신나게 열겠습니다!', mission: '오늘의 미션, 다 같이 끝내는 캠퍼스를 만들겠습니다!', pick: '캠퍼스에 떨어진 도토리, 한 알도 놓치지 않겠습니다!' };
+  for (const k of Object.keys(EL_PLEDGES)) { const s0 = EL_PLEDGES[k].say; Object.defineProperty(EL_PLEDGES[k], 'say', { get: () => uniNow() && EL_SAY_U[k] ? EL_SAY_U[k] : s0, enumerable: true, configurable: true }); }
   function freshEl() { return { wk: -1, pick: -1, cand: [], tier: -1 }; }
   const elOpen = () => !!S && S.tier >= EL_TIER;
   const spName = sp => DEX_NAMES[sp] || (NEWCOMERS.find(n => n.k === sp) || {}).name || '친구';
@@ -19573,6 +19576,12 @@ body.cam-scene #ffChip,body.cam-scene #plChip,body.cam-scene .b-ring{animation-p
   // 4.1.1 지섭 결정(2026-11-12): 학교 행사 이름을 학교급에 맞게. 중학교와 고등학교, 대학교가 달라요(놀이와 숫자는 그대로)
   const FEST_NM = { 2: { sports: '체육대회', show: '학교 축제', photo: '졸업 앨범 촬영' }, 3: { sports: '체육대회', show: '학교 축제', photo: '졸업 앨범 촬영' },
     4: { picnic: 'MT 보물찾기', welcome: '신입생 환영회', sports: '체육대회', show: '동아리 공연', photo: '졸업 앨범 촬영' } };
+  const FEST_TX = { 4: {
+    picnic: { lead: 'MT 온 숲에서 보물찾기를 해요! 화면 곳곳에 숨은 보물 쪽지를 30초 안에 12장 눌러 찾으면 성공이에요.' },
+    welcome: { lead: '광장에 둥글게 모여 신입생을 환영해요. 하늘로 날아오르는 풍선을 눌러 터뜨려요. 30초 안에 15개면 성공!', win: '풍선이 펑펑! 신입생들이 활짝 웃어요.' },
+    show: { lead: '광장 무대에서 동아리들이 차례로 공연해요. 무대에서 떠오르는 음표를 눌러 박수를 보내요. 35초 안에 18개면 대성공!' },
+    photo: { lead: '강의실 앞에 두 줄로 서서 졸업 앨범 사진을 찍어요. 친구들 머리 위에 반짝이는 웃음 별을 눌러 모두 웃게 해요. 14개면 찰칵!', win: '찰칵! 모두 활짝 웃은 졸업 앨범 사진이 나왔어요.' } } };
+  for (const id of Object.keys(FEST)) for (const f of ['lead', 'win']) { const t0 = FEST[id][f]; if (t0 === undefined) continue; Object.defineProperty(FEST[id], f, { get: () => (S && FEST_TX[S.tier] && FEST_TX[S.tier][id] && FEST_TX[S.tier][id][f]) || t0, enumerable: true, configurable: true }); }
   for (const id of Object.keys(FEST)) { const nm0 = FEST[id].name; Object.defineProperty(FEST[id], 'name', { get: () => (S && FEST_NM[S.tier] && FEST_NM[S.tier][id]) || nm0, enumerable: true, configurable: true }); }
   const FEST_IDS = Object.keys(FEST);
   const FEST_ITEM = {
@@ -21892,7 +21901,7 @@ body.cam-scene #ffChip,body.cam-scene #plChip,body.cam-scene .b-ring{animation-p
   function showEntrance(fund, leaving, from, newcomer, dipsIn) {
     const T = tierInfo();
     $('#tierTitle').textContent = `${from.school} 졸업식`;
-    $('#tierText').textContent = `${eul(from.name)} 마친 친구들 ${leaving}명이 졸업장을 받았어요. 이제 책가방을 메고 ${T.school}에 입학해요!`;
+    $('#tierText').textContent = `${eul(from.name)} 마친 친구들 ${leaving}명이 졸업장을 받았어요. ` + (S.tier >= 4 ? `이제 ${T.school} 새내기가 돼요!` : `이제 책가방을 메고 ${T.school}에 입학해요!`);
     $('#tierFundAmt').textContent = '+' + fmt(fund);
     const crew = ['rabbit', newcomer ? newcomer.k : 'fox', 'chick'];
     $('#tierArt').innerHTML = `<svg viewBox="-26 -19 52 38" aria-hidden="true">` +
