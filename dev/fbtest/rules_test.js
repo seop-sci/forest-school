@@ -143,6 +143,7 @@ t('season grow', WS('A', '/forest/rank/A', Object.assign({}, RANK, { sk: 2, sp: 
 const LOOK = { d: '{"v":1}', at: { '.sv': 'timestamp' } };
 t('look read', R('B', '/forest/look/A'), true);
 t('look read anon', R(null, '/forest/look/A'), false);
+t('look list read (4.0.1: 한 학교씩만)', R('B', '/forest/look'), false);
 t('look write own', W('B', '/forest/look/B', LOOK), true);
 t('look write other', W('B', '/forest/look/A', LOOK), false);
 t('look too big', W('B', '/forest/look/B', { d: 'x'.repeat(4001), at: { '.sv': 'timestamp' } }), false);
