@@ -100,6 +100,11 @@ t('rank lp new week', W('C', '/forest/rank/C', RK({ score: 5000, week: W0 + 1, l
 t('rank lp new week big', W('C', '/forest/rank/C', RK({ score: 5000, week: W0 + 1, lp: 1900, ws: (W0 + 1) * 1e6 + 1900 })), false);
 t('rank no week', W('B', '/forest/rank/B', { name: '다람쥐', score: 5, at: { '.sv': 'timestamp' } }), true);
 t('rank delete other', W('B', '/forest/rank/A', null), false);
+// 4.1.1 관리자(adminUids)는 남의 랭킹 줄을 지울 수만 있어요(고치거나 새로 쓰지는 못해요)
+t('rank delete other (admin)', W('Z', '/forest/rank/A', null), true);
+t('rank overwrite other (admin)', W('Z', '/forest/rank/A', RK({ score: 1 })), false);
+t('rank partial write other (admin)', W('Z', '/forest/rank/A/name', '바꿈'), false);
+t('rank create other (admin)', W('Z', '/forest/rank/NEW1', { name: '다람쥐', score: 5, at: { '.sv': 'timestamp' } }), false);
 // 테스트 현황
 t('stats read all (not admin)', R('B', '/forest/stats'), false);
 t('stats read all (admin)', R('Z', '/forest/stats'), true);

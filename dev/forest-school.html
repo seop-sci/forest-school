@@ -7838,13 +7838,14 @@ body.cam-scene #ffChip,body.cam-scene #plChip,body.cam-scene .b-ring{animation-p
      화면에 글자가 들어올 때(MutationObserver) 바꾸고, 대학교가 아니게 되면 원래 글자로 되돌려요.
      바꾸지 않는 곳(data 없이 id로): 랭킹, 앨범, 이야기 수첩, 공지, 대학교 전 장의 이야기 장면, 지난 학교급과 다른 학교 구경 지도.
      UT: [원래, 대학교, 받침이 없어지면 1, ㄹ 받침이 다른 받침이 되면 2]. 긴 낱말을 먼저 적어요 */
-  const UT = [['교장 선생님 이름', '총장님 이름', 0], ['현장체험학습', '현장 답사', 1], ['야간 자율학습', '밤샘 공부', 1], ['숲속 운동회', '체육대회', 0], ['반장 선거', '학생회장 선거', 0], ['체험학습', '현장 답사', 1], ['보충수업', '계절학기', 1],
+  const UT = [['교장 선생님 이름', '총장님 이름', 0], ['명예 교장실', '명예 총장실', 0], ['교무실', '교수 연구실', 0], ['현장체험학습', '현장 답사', 1], ['야간 자율학습', '밤샘 공부', 1], ['숲속 운동회', '체육대회', 0], ['반장 선거', '학생회장 선거', 0], ['체험학습', '현장 답사', 1], ['보충수업', '계절학기', 1],
     ['종업식', '종강 파티', 1], ['방학식', '종강 파티', 1], ['졸업식', '학위수여식', 0], ['급식실', '학생 식당', 2], ['과학실', '실험실', 0], ['교실', '강의실', 0], ['운동회', '체육대회', 0], ['학예회', '동아리 공연', 0],
-    ['전학생', '신입생', 0], ['반장', '학생회장', 0], ['소풍', 'MT', 1], ['숙제', '과제', 0], ['자율학습', '시험 공부', 1], ['전학 온', '새로 온', 0], ['전학 왔', '입학했', 0], ['전학 올', '새로 올', 0]];
+    ['전학생', '신입생', 0], ['반장', '학생회장', 0], ['소풍', 'MT', 1], ['숙제', '과제', 0], ['자율학습', '자습', 0], ['전학 온', '새로 온', 0], ['전학 왔', '입학했', 0], ['전학 올', '새로 올', 0], ['급식', '학식', 0]];
   const UT_MAP = Object.fromEntries(UT.map(x => [x[0], x])), UT_JO = { '을': '를', '이': '가', '은': '는', '과': '와', '으로': '로', '이에요': '예요', '이라': '라', '이나': '나', '이랑': '랑', '이었': '였' };
   const UT_RE = new RegExp('(' + UT.map(x => x[0]).join('|') + ')(이에요|이었|이라|이나|이랑|으로|로|을|이|은|과)?', 'g');
   const UT_SKIP = '#panelRank, #mAlbum, #mSb, #mNotice, input, textarea, script, style';
-  const uniTerm = t => t.replace(UT_RE, (m, w, jo) => { const X = UT_MAP[w]; if (!jo) return X[1]; if (X[2] === 1) return X[1] + (UT_JO[jo] || jo); if (X[2] === 2 && jo === '로') return X[1] + '으로'; return X[1] + jo; });
+  const UT_OLD = /(유치원|초등학교|중학교|고등학교) $/;   // '유치원 졸업식'처럼 지난 학교급의 식 이름은 그대로 둬요
+  const uniTerm = t => t.replace(UT_RE, (m, w, jo, at, all) => { const X = UT_MAP[w]; if ((w === '졸업식' || w === '종업식' || w === '방학식') && UT_OLD.test(all.slice(0, at))) return m; if (!jo) return X[1]; if (X[2] === 1) return X[1] + (UT_JO[jo] || jo); if (X[2] === 2 && jo === '로') return X[1] + '으로'; return X[1] + jo; });
   function utNode(n) {
     const pe = n.parentElement; if (!pe || !n.nodeValue) return;
     if (!uniNow()) { if (n._o != null && n.nodeValue === n._u) n.nodeValue = n._o; n._o = null; return; }
@@ -21669,7 +21670,7 @@ body.cam-scene #ffChip,body.cam-scene #plChip,body.cam-scene .b-ring{animation-p
   }
   // 졸업식 카드: 다음 학교급, 조건 두 가지, 받게 될 기금
   function renderTierCard() {
-    const T = tierInfo(), N = TIERS[S.tier + 1] || { name: '대학교', school: '숲속 대학교' }, open = nextTierOpen(), can = canPromote(), f = previewFund();
+    const T = tierInfo(), N = TIERS[S.tier + 1] || { name: TIER_ALL[S.tier + 1] || '다음 학교', school: '숲속 ' + (TIER_ALL[S.tier + 1] || '다음 학교') }   /* 4.1.1 대학교에서는 다음이 대학원이에요(예전에는 '대학교 준비 중'으로 나왔어요) */, open = nextTierOpen(), can = canPromote(), f = previewFund();
     $('#tierFrom').textContent = T.school;
     $('#tierTo').textContent = N ? N.school : '';
     const reqs = [
@@ -21682,7 +21683,7 @@ body.cam-scene #ffChip,body.cam-scene #plChip,body.cam-scene .b-ring{animation-p
     if ($('#tierReqs').innerHTML !== html) $('#tierReqs').innerHTML = html;
     $('#tierFund').textContent = fmt(f);
     $('#tierNote').textContent = !open
-      ? `${N.name}는 숲속 교육부가 열심히 준비 중이에요. 그동안 종업식을 열어 수료증을 모아 두면 졸업할 때 기금이 늘어요.`
+      ? `${eun(N.name)} 숲속 교육부가 열심히 준비 중이에요. 그동안 종업식을 열어 수료증을 모아 두면 졸업할 때 기금이 늘어요.`
       : can ? `지금 졸업하면 기금 ${fmt(f)}${numEul(f)} 받아요. ${nextFundNote()}`
       : `이 학교급에서 모은 수료증 ${FUND_PER}장마다 기금이 1씩 늘어요. 지금까지 ${fmt(S.tdip)}장을 모았어요.`;
     const btn = $('#tierBtn');
