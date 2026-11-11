@@ -67,7 +67,8 @@ async def main():
         print(' 저장 왕복', sv); ok(sv[0] == 8 and sv[1] == 2 and sv[2] == 1 and sv[3] == m['left'] and sv[4] == 5, '저장 왕복')
         # 3) 축제: 금요일, 그리고 다음 주 월요일
         d = await page.evaluate(CLOCK(4)); print('금요일', d)
-        fv = await page.evaluate(f"""(()=>{{ const F={F}, S=F.S; S.tier=4; S.f.union=1; F.fvSync(); S.fv.st=5; F.fvSync();   // 주 번호를 먼저 맞춘 뒤 도장을 넣어요(게임의 1초 틱이 아직 안 돌았을 수 있어요) const gs=F.fvGuests();
+        # 주 번호를 먼저 맞춘 뒤 도장을 넣어요(게임의 1초 틱이 아직 안 돌았을 수 있어요)
+        fv = await page.evaluate(f"""(()=>{{ const F={F}, S=F.S; S.tier=4; S.f.union=1; F.fvSync(); S.fv.st=5; F.fvSync(); const gs=F.fvGuests();
           return {{on:F.fvOn(), show:F.fvBonus('show'), picnic:F.fvBonus('picnic'), sp:gs.map(g=>g.sp), real:gs.map(g=>g.real), st:S.fv.st, mk:F.mkOn()}}; }})()""")
         print(' 축제', fv)
         ok(fv['on'] and fv['show'] and not fv['picnic'] and not fv['mk'], '금요일은 축제와 발표회 보너스'); ok(len(fv['sp']) == 3 and all(fv['sp']), '손님 학교마다 대표 동물'); ok(fv['st'] == 5, '같은 주에는 도장이 남아요')
