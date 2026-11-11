@@ -7840,7 +7840,7 @@ body.cam-scene #ffChip,body.cam-scene #plChip,body.cam-scene .b-ring{animation-p
      UT: [원래, 대학교, 받침이 없어지면 1, ㄹ 받침이 다른 받침이 되면 2]. 긴 낱말을 먼저 적어요 */
   const UT = [['교장 선생님 이름', '총장님 이름', 0], ['명예 교장실', '명예 총장실', 0], ['교무실', '교수 연구실', 0], ['현장체험학습', '현장 답사', 1], ['야간 자율학습', '밤샘 공부', 1], ['숲속 운동회', '체육대회', 0], ['반장 선거', '학생회장 선거', 0], ['체험학습', '현장 답사', 1], ['보충수업', '계절학기', 1],
     ['종업식', '종강 파티', 1], ['방학식', '종강 파티', 1], ['졸업식', '학위수여식', 0], ['급식실', '학생 식당', 2], ['과학실', '실험실', 0], ['교실', '강의실', 0], ['운동회', '체육대회', 0], ['학예회', '동아리 공연', 0],
-    ['전학생', '신입생', 0], ['반장', '학생회장', 0], ['소풍', 'MT', 1], ['숙제', '과제', 0], ['자율학습', '자습', 0], ['전학 온', '새로 온', 0], ['전학 왔', '입학했', 0], ['전학 올', '새로 올', 0], ['급식', '학식', 0]];
+    ['전학생', '신입생', 0], ['반장', '학생회장', 0], ['소풍', 'MT', 1], ['숙제', '과제', 0], ['자율학습', '자습', 0], ['전학 온', '새로 온', 0], ['전학 왔', '입학했', 0], ['전학 올', '새로 올', 0], ['급식', '학식', 0], ['문제집', '전공책', 0]];
   const UT_MAP = Object.fromEntries(UT.map(x => [x[0], x])), UT_JO = { '을': '를', '이': '가', '은': '는', '과': '와', '으로': '로', '이에요': '예요', '이라': '라', '이나': '나', '이랑': '랑', '이었': '였' };
   const UT_RE = new RegExp('(' + UT.map(x => x[0]).join('|') + ')(이에요|이었|이라|이나|이랑|으로|로|을|이|은|과)?', 'g');
   const UT_SKIP = '#panelRank, #mAlbum, #mSb, #mNotice, input, textarea, script, style';
@@ -15820,6 +15820,15 @@ body.cam-scene #ffChip,body.cam-scene #plChip,body.cam-scene .b-ring{animation-p
     { k: 'music', name: '숲속 음악회', em: '🎻', c: '#E7C03A', say: '책에서 노랫소리가 들리는 것 같아요.' },
     { k: 'robot', name: '친절한 로봇', em: '🤖', c: '#8E969E', say: '로봇도 꽃을 좋아한대요.' }
   ];
+  // 4.1.1 지섭 결정(2026-11-12): 대학교에서는 책 12권이 전공 서적이에요. 열쇠(k)와 저장은 그대로이고 이름과 한마디만 바뀌어요. 표지 그림(book_u_<k>, 작업지시서 69)이 오면 그 그림을 써요
+  const BOOKS_U = {
+    acorn: ['도토리 경제학 원론', '도토리 한 알에도 값이 매겨지는 까닭을 알았어요.'], rabbit: ['달과 행성', '달의 뒷면은 생각보다 울퉁불퉁하대요.'],
+    seasons: ['숲 생태학', '나무 한 그루에 천 가지 생물이 기대어 살아요.'], sea: ['해양 생물학', '고래의 노래에도 사투리가 있대요.'],
+    stars: ['천체 물리학 입문', '별빛은 아주 오래전에 출발한 편지래요.'], bread: ['식품 영양학', '읽는 내내 배가 고팠어요. 이번에도요.'],
+    train: ['기계 공학 개론', '톱니 하나가 빠지면 기차가 서요.'], garden: ['원예학', '물은 아침에 주는 게 좋대요. 꽃도 저도요.'],
+    dino: ['고생물학', '뼈 한 조각으로 키를 알아낸대요.'], snow: ['기상학', '눈 결정은 하나도 같은 게 없대요.'],
+    music: ['음악 이론', '쉼표도 음악이라는 걸 배웠어요.'], robot: ['인공지능 개론', '로봇도 틀리면서 배운대요.'] };
+  for (const B of BOOKS) for (const [f, i] of [['name', 0], ['say', 1]]) { const t0 = B[f]; Object.defineProperty(B, f, { get: () => uniNow() && BOOKS_U[B.k] ? BOOKS_U[B.k][i] : t0, enumerable: true, configurable: true }); }
   const RD = { min: 15, perDay: 3, xp: 25 };
   const freshRd = () => ({ day: '', n: 0, cur: '', at: 0, got: {}, st: 0 });
   const rdReady = () => !!S && S.f.library >= 1;
@@ -15828,7 +15837,8 @@ body.cam-scene #ffChip,body.cam-scene #plChip,body.cam-scene .b-ring{animation-p
   const rdEnd = () => S.rd.at + (S.rd.m || RD.min) * 60000;   // 2.1.3 m: 읽기 시작할 때 정한 분(비 오는 날 10분)
   const rdRemain = () => S.rd.cur ? Math.max(0, rdEnd() - gameNow()) : 0;
   const bookOf = k => BOOKS.find(b => b.k === k);
-  const bookCover = (b, cls) => IMG('book_' + b.k) ? `<img class="${cls || 'bk-img'}" src="${IMG('book_' + b.k)}" alt="" draggable="false">` : `<span class="bk-fb ${cls || ''}" style="--bk:${b.c}"><i>${b.em}</i></span>`;
+  const bookKey = b => uniNow() && IMG('book_u_' + b.k) ? 'book_u_' + b.k : 'book_' + b.k;
+  const bookCover = (b, cls) => IMG(bookKey(b)) ? `<img class="${cls || 'bk-img'}" src="${IMG(bookKey(b))}" alt="" draggable="false">` : `<span class="bk-fb ${cls || ''}" style="--bk:${b.c}"><i>${b.em}</i></span>`;
   function rdStart(k) {
     const b = bookOf(k); if (!b || !rdReady() || rt.paused) return false;
     if (S.rd.cur) { toast(`지금 「${bookOf(S.rd.cur).name}」${batchim(bookOf(S.rd.cur).name) ? '을' : '를'} 읽고 있어요`); return false; }
@@ -18160,6 +18170,10 @@ body.cam-scene #ffChip,body.cam-scene #plChip,body.cam-scene .b-ring{animation-p
     { id: 'star', name: '별빛 천문대', min: 480, dip: 8, gold: 1, need: 7, c: '#5B4FA8', say: '산꼭대기 천문대에서 하룻밤 별을 봐요',
       souv: ['별자리 지도', '망원경 배지', '운석 조각'] }
   ];
+  // 4.1.1 대학교 현장 답사: 갈 곳 이름과 설명을 조사하는 말투로(시간, 보상, 기념품은 그대로)
+  const TRIPS_U = { hill: ['뒷산 식생 답사', '캠퍼스 뒷산을 돌며 나무와 풀을 조사해요'], creek: ['시냇가 수질 답사', '시냇물 수질을 재고 송사리를 기록해요'], museum: ['숲속 박물관', '옛 숲의 기록과 공룡 화석을 조사해요'],
+    beach: ['푸른 바닷가', '갯벌 생물을 조사하고 표본을 모아요'], star: ['별빛 천문대', '산꼭대기 천문대에서 밤새 별을 관측해요'] };
+  for (const T of TRIPS) for (const [f, i] of [['name', 0], ['say', 1]]) { const t0 = T[f]; Object.defineProperty(T, f, { get: () => uniNow() && TRIPS_U[T.id] ? TRIPS_U[T.id][i] : t0, enumerable: true, configurable: true }); }
   const TRIP = Object.fromEntries(TRIPS.map(t => [t.id, t]));
   const SOUV_IDS = new Set(TRIPS.flatMap(t => t.souv.map((_, i) => `${t.id}:${i}`)));
   const TRIP_ART = {
