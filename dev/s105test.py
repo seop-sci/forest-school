@@ -48,8 +48,11 @@ async def main():
             }''')
             assert all(result.values()), result
             await pg.wait_for_function("JSON.parse(localStorage.getItem('forest-school-v1')).ns.day==='2026-11-09'")
+            # 2026-11-11: 다시 열 때 가끔 sessionStorage 표시가 안 보여 처음 저장이 다시 깔렸어요(흔들린 까닭). 방금 저장한 학교를 다시 열 때 그대로 넣어 줘요
+            kept=await pg.evaluate("localStorage.getItem('forest-school-v1')")
+            await ctx.add_init_script("localStorage.setItem('forest-school-v1', %s);" % json.dumps(kept))
             await pg.reload()
-            await pg.wait_for_function('!!window.__forest')
+            await pg.wait_for_function('window.__forest && window.__forest.S && window.__forest.S.tier===3')   # 2026-11-11: 저장을 다 읽은 뒤에 읽어요. 켜는 중에는 S가 새 학교(유치원)라서, 기계가 느리면 저장을 읽기 전 값을 봐서 흔들렸어요
             restored=await pg.evaluate('''() => {
               const F=window.__forest;F.rt.fakePerf=0;F.setServerTime(Date.parse('2026-11-09T13:00:00+09:00'));
               F.openNs();return F.S.ns.day==='2026-11-09'&&F.S.ns.n===5&&F.S.ns.fin===4&&document.querySelector('#nsGo').textContent==='예약했어요';

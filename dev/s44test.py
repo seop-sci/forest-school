@@ -2,6 +2,7 @@
 # 쓰는 법: python3 build_gh.py gh && NODE_PATH=<targaryen 폴더> python3 s44test.py   (마지막 줄이 PASS면 통과)
 import asyncio, json, sys, subprocess, time
 from playwright.async_api import async_playwright
+import s7test
 from s7test import HERE, PORT, ORIGIN, api, mode, dump, device, wait_cloud, elem, kinder, local, uid_of, toast, push_now
 F = 'window.__forest'
 fails = []
@@ -85,7 +86,7 @@ async def delete_retry(b):
 async def main():
     srv = subprocess.Popen(['node', str(HERE / 'fbtest' / 'fbserver.js'), str(HERE / 'gh'), str(PORT), str(HERE / 'gh_database.rules.json')],
                            cwd=str(HERE / 'fbtest'), stdout=subprocess.PIPE, stderr=subprocess.STDOUT)
-    time.sleep(0.8)
+    s7test.wait_server()
     try:
         async with async_playwright() as p:
             b = await p.chromium.launch()

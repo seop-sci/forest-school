@@ -63,6 +63,8 @@ async def main():
         bad = await pg.evaluate(f"(()=>{{ const s={F}.sanitize({{born:1, savedAt:5, dex:{{got:{{rabbit:'x', bogus:3, fox:7}}, paid:['rabbit','zzz']}}, ev:{{cur:5, stamp:{{n:99, last:7}}, list:[{{t:'nope', n:3}}, {{t:'picks', n:5, b:1, done:true}}]}}}}); return {{ got: s.dex.got, paid: s.dex.paid, ev: s.ev }}; }})()")
         if set(bad['got']) != {'rabbit', 'fox'} or bad['got']['fox'] != 7 or bad['paid'] != ['rabbit']: fails.append(f'이상한 도감 저장을 걸러 내지 못했어요 {bad}')
         if bad['ev']['cur'] != '' or bad['ev']['stamp'] != {'n': 7, 'last': ''} or len(bad['ev']['list']) != 1 or bad['ev']['list'][0]['t'] != 'picks': fails.append(f'이상한 이벤트 저장을 걸러 내지 못했어요 {bad}')
+        # 2026-11-11: 첫 화면이 5초마다 저장해서, 기계가 느리면 pg2가 저장을 읽기 전에 첫 화면 학교로 덮였어요(한꺼번에 돌릴 때 흔들린 까닭). 옛 저장을 시험하는 동안 첫 화면 저장을 멈춰요
+        await pg.evaluate(f"{F}.rt.adopting = true")
         pg2, errs2 = await boot(ctx, old)
         r = await pg2.evaluate(f"""(()=>{{ const F={F}, S=F.S; const g0=S.gold, n=F.dexPending().length; F.setTab('dex');
           const t=document.querySelector('#rwTitle').textContent, sub=document.querySelector('#rwSub').textContent; const dg=S.gold-g0; {CLEAN};
@@ -74,6 +76,7 @@ async def main():
         r3 = await pg3.evaluate(f"(()=>{{ const F={F}, S=F.S; const g0=S.gold; F.setTab('dex'); return {{ dg: S.gold-g0, open: !document.querySelector('#mReward').hidden, pend: F.dexPending().length }}; }})()")
         if r3['dg'] != 0 or r3['open'] or r3['pend'] != 0: fails.append(f'다시 불러오니 선물을 또 줘요 {r3}')
         await pg2.close(); await pg3.close()
+        await pg.evaluate(f"{F}.rt.adopting = false")
         # 새 저장(놀이터 없음)으로 이벤트를 열면 미션 3개가 모두 이룰 수 있는 종류이고 겹치지 않아요
         ctx2 = await b.new_context(viewport={'width': 390, 'height': 844})
         await ctx2.add_init_script(PAST + "window.__FOREST_TEST = true; localStorage.clear(); " + FAKE)

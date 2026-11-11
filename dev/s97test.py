@@ -8,6 +8,7 @@
 # 쓰는 법: python3 wrap.py && python3 build_gh.py gh && python3 s97test.py   (마지막 줄이 PASS면 통과, 가짜 서버 시험이라 다른 서버 시험과 따로 돌려요)
 import asyncio, json, time, subprocess
 from playwright.async_api import async_playwright
+import s7test
 from s7test import HERE, PORT, api, dump, mode, elem, device, wait_cloud, wait_text, local, uid_of, toast, INFO, open_settings, NT_SEEN
 
 # 2.2.0 검토(2026-10-30): 서버에 바로 넣는 저장에도 이번 공지를 본 것으로 넣어요(불러온 뒤 공지 창이 늦게 떠서 설정 단추를 가렸어요)
@@ -31,7 +32,7 @@ async def main():
 
     srv = subprocess.Popen(['node', str(HERE / 'fbtest' / 'fbserver.js'), str(HERE / 'gh'), str(PORT), str(HERE / 'gh_database.rules.json')],
                            cwd=str(HERE / 'fbtest'), stdout=subprocess.PIPE, stderr=subprocess.STDOUT)
-    time.sleep(0.8)
+    s7test.wait_server()
     try:
         async with async_playwright() as p:
             b = await p.chromium.launch()
