@@ -7834,6 +7834,45 @@ body.cam-scene #ffChip,body.cam-scene #plChip,body.cam-scene .b-ring{animation-p
   const uniNow = () => { try { return !!S && S.tier >= 4; } catch (e) { return false; } };
   const headText = t => uniNow() && typeof t === 'string' ? t.replace(/교장 선생님/g, '총장님') : t;   // 4.0.0 지섭 결정(2026-11-11): 대학교에서는 교장 선생님을 총장님으로(랭킹의 다른 사람 호칭은 그대로)
   const profText = t => uniNow() ? t.replace('교감 선생님', '부총장님').replace(/ 선생님/g, ' 교수님') : t;
+  /* 4.1.1 지섭 결정(2026-11-12): 대학교에서는 학교 낱말을 대학교 낱말로 바꿔 보여요. 보이는 글자만 바꾸고 열쇠, 저장, 규칙은 그대로예요.
+     화면에 글자가 들어올 때(MutationObserver) 바꾸고, 대학교가 아니게 되면 원래 글자로 되돌려요.
+     바꾸지 않는 곳(data 없이 id로): 랭킹, 앨범, 이야기 수첩, 공지, 대학교 전 장의 이야기 장면, 지난 학교급과 다른 학교 구경 지도.
+     UT: [원래, 대학교, 받침이 없어지면 1, ㄹ 받침이 다른 받침이 되면 2]. 긴 낱말을 먼저 적어요 */
+  const UT = [['교장 선생님 이름', '총장님 이름', 0], ['현장체험학습', '현장 답사', 1], ['야간 자율학습', '밤샘 공부', 1], ['숲속 운동회', '체육대회', 0], ['반장 선거', '학생회장 선거', 0], ['체험학습', '현장 답사', 1], ['보충수업', '계절학기', 1],
+    ['종업식', '종강 파티', 1], ['방학식', '종강식', 0], ['졸업식', '학위수여식', 0], ['급식실', '학생 식당', 2], ['과학실', '실험실', 0], ['교실', '강의실', 0], ['운동회', '체육대회', 0], ['학예회', '동아리 공연', 0],
+    ['전학생', '신입생', 0], ['반장', '학생회장', 0], ['소풍', 'MT', 1], ['숙제', '과제', 0]];
+  const UT_MAP = Object.fromEntries(UT.map(x => [x[0], x])), UT_JO = { '을': '를', '이': '가', '은': '는', '과': '와', '으로': '로', '이에요': '예요', '이라': '라', '이나': '나', '이랑': '랑', '이었': '였' };
+  const UT_RE = new RegExp('(' + UT.map(x => x[0]).join('|') + ')(이에요|이었|이라|이나|이랑|으로|로|을|이|은|과)?', 'g');
+  const UT_SKIP = '#panelRank, #mAlbum, #mSb, #mNotice, input, textarea, script, style';
+  const uniTerm = t => t.replace(UT_RE, (m, w, jo) => { const X = UT_MAP[w]; if (!jo) return X[1]; if (X[2] === 1) return X[1] + (UT_JO[jo] || jo); if (X[2] === 2 && jo === '로') return X[1] + '으로'; return X[1] + jo; });
+  function utNode(n) {
+    const pe = n.parentElement; if (!pe || !n.nodeValue) return;
+    if (!uniNow()) { if (n._o != null && n.nodeValue === n._u) n.nodeValue = n._o; n._o = null; return; }
+    UT_RE.lastIndex = 0; if (!UT_RE.test(n.nodeValue)) return;
+    if (pe.closest(UT_SKIP)) return;
+    if (pe.closest('#mSt') && !(rt.st && rt.st.uni)) return;   // 유치원부터 고등학교까지의 이야기는 쓰인 그대로
+    if (rt.viewTier != null && pe.closest('#map')) return;      // 지난 학교급과 다른 학교 구경
+    const o = n.nodeValue, u = uniTerm(o); if (u === o) return;
+    n._o = o; n._u = u; n.nodeValue = u;
+  }
+  function utWalk(root) {
+    if (!root) return;
+    if (root.nodeType === 3) { utNode(root); return; }
+    if (root.nodeType !== 1) return;
+    const w = document.createTreeWalker(root, NodeFilter.SHOW_TEXT); let n; const L = [];
+    while ((n = w.nextNode())) L.push(n);
+    for (const x of L) utNode(x);
+  }
+  // 학교급이 대학교가 되거나(졸업식, 다른 기기 학교 불러오기) 아니게 되면 화면 전체를 한 번 훑어요
+  function utSync() {
+    const on = uniNow(); if (rt.utOn === on) return;
+    rt.utOn = on;
+    if (!rt.utObs && on && window.MutationObserver) {
+      rt.utObs = new MutationObserver(ms => { if (!rt.utOn) return; for (const m of ms) { if (m.type === 'characterData') utNode(m.target); else for (const a of m.addedNodes) utWalk(a); } });
+      rt.utObs.observe(document.body, { childList: true, subtree: true, characterData: true });
+    }
+    utWalk(document.body);
+  }
   for (const o of [...Object.values(TEA), ...Object.values(XT).filter(X => X.sub), VP]) for (const f of ['name', 'desc']) { const t = o[f]; Object.defineProperty(o, f, { get: () => profText(t), enumerable: true, configurable: true }); }
   { const sj = VP.subject; Object.defineProperty(VP, 'subject', { get: () => uniNow() ? '부총장' : sj, enumerable: true, configurable: true }); }
   const deanMult = () => 1 + XT.dean.per / 100 * xtLv('dean');   // 4.0.0 단과대학 보너스에 곱해요
@@ -23745,6 +23784,7 @@ body.cam-scene #ffChip,body.cam-scene #plChip,body.cam-scene .b-ring{animation-p
       }
     });
     window.addEventListener('pagehide', () => { save(rt.paused ? rt.closedAt : (document.hidden && rt.hiddenAt ? rt.hiddenAt : gameNow())); cloudPush(); });   // 4.0.1 닫힐 때 저장 시각도 게임 시계로(기기 시계를 뒤로 돌려 자리 비운 보상을 되풀이해 받던 길)
+    utSync(); setInterval(utSync, 1000);   // 4.1.1 대학교 낱말
     setInterval(() => {
       if (S && !rt.paused && !document.hidden) save();
       cloudTick();
@@ -25905,7 +25945,7 @@ body.cam-scene #ffChip,body.cam-scene #plChip,body.cam-scene .b-ring{animation-p
     MAP_OAK, oakArt, layoutOak, mapOak, oakAt, tapOak, dropSpot,
     dexMeet, dexSync, dexPending, dexGift, renderDex, evCurrent, evNext, evUpcoming, evSync, evFix, evVal, EV_FALLBACK, EV_DECO, EV_HAT, COS, DECO_BY, decoOwn, perkRec, fpRec, BOOST_ALL, buyShop, pickShop, showNote, showOkOn, showWd, renderGradPanel, renderShop, renderDecoShop, EV_WEEKLY, EV_WEEK_BASE, weekMon, claimStamp, claimEvMission, claimEvBox, renderEvent, evMissions, evOk, evSkipped, EV_MONTHS, EV_MEASURE, tierMinutes, minAcorns, IMG, sanitize171, ACH, achSync, claimAch, setTitle, renderAch, setDexSeg, achClaimable, XT, xtAct, xtCost, xtLv, feastMins, libMult, propInstances, walkBuild, festItemSvg, guestArt, adErrText, googleErrText, openSheet, closeSheet, startFest, startSports, sanitize170, EV_STAMPS, EV_SPECIAL, EV_MONTHLY, EV_BOX, DEX_KEYS, DEX_REWARD, DEX_GUEST_KEYS, seasonKey, roofArtKey, oakKey, setSeasonArt, VP, vpLv, vpCost, vpMult, vpAct, renderVpCard, sportsPrize, festPrize, renderTeachers, buildTeacherCards, bldImg, roofKey, bldStage, mapKey, setMapArt, applyThemes, buyFacility, bldFx, setBldFx, mapHi, Live, liveApply, liveLoad, liveOff, LIVE_KEYS, EVC, NOTICES, openNotice, noticeAuto, noticeWant, ntUnread, startTrial, endTrial: () => rt.trial && (rt.trial.left = 0), spawnDeal, startVisit, IMG170, MG, mgCells, mgSetCells, mgTick, mgAddEnergy, mgAddUp, mgTapGen, mgDrop, mgSell, mgUpgrade, mgAddUp, mgUpSwap, mgGensMax, MG_UP_ESS, mgClaimOrder, mgSwapOrder, mgOrderOk, mgFillOrders, mgOpen, mgClose, mgRenderAll, mgSpawnLevel, mgNearestEmpty, mgEmptyBoard, mgOrderReward, mgUI, sanitize180, mgWatchAd, mgNewOrder, mgHintPick, mgShowHint, mgClearHint, mgTouch, mgOrderGuide, mgDexN, mgDexCan, mgDexClaim, mgOpenDex, MG_DEX, MG_DEX_MS, mgDexEss, mgDexEssCan, mgDexEssN, mgDexMsCan, mgDexMsClaim, MGB, mgBuyBoost, mgBstLeft, mgOpenBoost, nice, claimMission, claimBonus, claimWeekMission, MP_BOX, swapDaily, repairMissions, MISSIONS, WMISSIONS, dmDay, wkWeek,   // 1.7.0 도감, 이벤트
     PZ, PZ_SHAPES, pzFits, pzAnyFit, pzStuck, pzFullLines, pzPlace, pzFreshGame, pzStart, PZB, pzbCost, pzApplyBoost, pzBoostOpen, pzBoostGo, festGoldLeft, festGoldTake, claimSports, TR2, TR2_PL, openTr2, tr2Act, tr2Away, tr2Ready, tr2Rsv, tr2Tick, renderAlbum, FEST, FEST_IDS, festNight, festShown, festTimeLock, festOpen, startFest, openFest, endFest, renderStreet, pzFinish, pzLeft, pzCanAd, pzEssOf, pzMinOf, pzHelpSquirrel, pzHelpOwl, pzHelpBear, fillSubs, mapRoofTop, showAd, claimOfflineDouble, startBoost, tripAd, festFocus, festRange, visMap, renderMissions, pzHasHelp, pzRot, pzNewPiece, pzOpen, pzClose, pzGameOver, pzRenderAll, renderMini, addEss, ESHOP, SP_FUR, applyCos, essItem, pickEss, buyEss, renderEssShop, hatSVG, spFurImg, gameNow, gameToday, gameWeek, kstDay, setServerTime, SVR, dmDay, weekIdx, lgWeek, wkWeek, lgKey, pzDay, goldDay, boostLeft, dealLeft, canStamp };
-  if (window.__FOREST_TEST) Object.assign(window.__forest, { tripUseTicket, readUseTicket, picnicUseTicket, buyDecoPieces, adGold, claimBonus, cloudPush, cloudClash, syncGet, revOf, deleteAccount, lookDel: () => lookDelNow(), lookSet, lookPush, leaveRank, sanitizeCg, freshCg });   // 시험 손잡이
+  if (window.__FOREST_TEST) Object.assign(window.__forest, { uniTerm, utSync, tripUseTicket, readUseTicket, picnicUseTicket, buyDecoPieces, adGold, claimBonus, cloudPush, cloudClash, syncGet, revOf, deleteAccount, lookDel: () => lookDelNow(), lookSet, lookPush, leaveRank, sanitizeCg, freshCg });   // 시험 손잡이
   if (window.claude && window.claude.hot && window.claude.hot.snapshot) {
     try { window.claude.hot.snapshot(() => { if (S) syncMid(); return { save: S }; }); } catch (e) { /* 무시 */ }
   }
