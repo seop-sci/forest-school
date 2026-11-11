@@ -9579,7 +9579,8 @@ body.cam-scene #ffChip,body.cam-scene #plChip,body.cam-scene .b-ring{animation-p
     return [-(rt.panX || 0) / sc, ((rt.hudTop || 0) - (rt.panY || 0)) / sc - 60, (W - (rt.hudRight || 0) - (rt.panX || 0)) / sc, (H - (rt.hudBot || 0) - (rt.panY || 0)) / sc - 60];
   }
   // 지도에서 가장 위에 있는 건물(공사 자리 포함)의 지붕 꼭대기 y (지도 좌표)
-  const mapRoofTop = () => { const G = geo(); return Math.min(...Object.values(G.b).concat(G.next ? [G.next.at] : []).map(([, cy, w]) => cy - w * 0.46)); };
+  const mapRoofTop = () => { const G = geo(); if (G.campus) return Math.min(...CAMPUS.zones.map(z => z.tag[1] - 100));   // 4.0.0 캠퍼스 지도에는 건물이 없어서 가장 위 구역 이름표를 기준으로 해요(이름표가 퀘스트 카드보다 70칸쯤 아래로 올 때까지 내릴 수 있어요). 없으면 지도가 움직이지 않아 위쪽 구역이 현황판 뒤에 숨었어요
+    return Math.min(...Object.values(G.b).concat(G.next ? [G.next.at] : []).map(([, cy, w]) => cy - w * 0.46)); };
   // 3.2.5 화면 당기기(camAnim)가 마지막 자리를 미리 알 수 있게 자리 맞추기만 따로 떼었어요
   function panTo(x, y) {
     if (rt.camHold) { rt.camHold = null; map.classList.remove('cam-move'); }   // 3.2.6 키운 채로 멈춘 그림을 손으로 옮기면 그 자리에서 끝내요
