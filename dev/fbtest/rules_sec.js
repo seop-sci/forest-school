@@ -101,4 +101,19 @@ const as = (d, uid) => d.as({ uid, provider: 'anonymous' });
   const r = as(db(true), 'A').write('/forest/stats/A', { seen: 1, pid: 'ATTACK01', junk: 'x'.repeat(500000) }, { now: NOW });
   out('2-11 stats/A에 500KB 필드 junk 쓰기', r.allowed, false);
 }
+// 4.1.1 테스트 기록 값 검사: 칸마다 자료형과 범위
+{
+  const OKD = { seen: NOW, born: 1, pid: 'GOOD0001', name: '', tier: 4, year: 7, town: 2.5, q: '끝', qt: '', play: 100, sess: 3, days: 2, ads: 1, score: 500, gold: 5, gearn: 9, gspent: 4, cos: 1, dev: true, v: '4.1.0', env: 'kakao' };
+  const w = (o) => as(db(true), 'A').write('/forest/stats/A', Object.assign({}, OKD, o), { now: NOW }).allowed;
+  out('4.1.1 stats 정상(이름 없음, 끝난 퀘스트, 반 단계 동네)', w({}), true);
+  out('4.1.1 stats seen 서버 시각', w({ seen: { '.sv': 'timestamp' } }), true);
+  out('4.1.1 stats play에 글자', w({ play: '많이' }), false);
+  out('4.1.1 stats ads에 너무 큰 수', w({ ads: 1e16 }), false);
+  out('4.1.1 stats tier 1001', w({ tier: 1001 }), false);
+  out('4.1.1 stats name 21자', w({ name: 'x'.repeat(21) }), false);
+  out('4.1.1 stats dev에 글자', w({ dev: 'yes' }), false);
+  out('4.1.1 stats env 17자', w({ env: 'x'.repeat(17) }), false);
+  out('4.1.1 stats score에 참거짓', w({ score: true }), false);
+  out('4.1.1 stats q 숫자(옛 모양)', w({ q: 12 }), true);
+}
 console.log(fail ? `FAIL ${fail}개` : 'PASS');

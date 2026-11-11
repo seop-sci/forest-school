@@ -12475,7 +12475,7 @@ body.cam-scene #ffChip,body.cam-scene #plChip,body.cam-scene .b-ring{animation-p
     S.nt.ver = VERSION; rt.ntAuto = true;
     queueModal(() => openNotice(true));
   }
-  const CLOUD_PUSH = 20000;   // 바뀐 게 있으면 20초마다 올려요
+  const CLOUD_PUSH = 60000;   // 바뀐 게 있으면 60초마다 올려요(4.1.1: 20초에서 늘림, 서버 내려받기 줄이기). 화면을 내리거나 닫을 때, 큰 일(cloudSoon)은 바로 올려요
   const STATS_PUSH = 60000;   // 테스트 현황은 1분마다
   const CLOUD_WAIT = 15000;   // 서버가 이만큼 답이 없으면 이 기기에만 저장해요
   const hasCloudBuild = () => typeof window.FOREST_FB !== 'undefined';
@@ -12689,6 +12689,7 @@ body.cam-scene #ffChip,body.cam-scene #plChip,body.cam-scene .b-ring{animation-p
       const srv = (await waitFor(ref.once('value'), CLOUD_WAIT)).val() || {};
       const slots = [0, 1, 2].map(i => srv[i] && typeof srv[i].d === 'string' ? srv[i] : null);
       for (const b of L.slice().reverse()) {
+        if (typeof b.d !== 'string' || b.d.length >= 100000) continue;   // 4.1.1 서버 규칙의 예전 학교 칸 크기(이 기기에는 그대로 남아요)
         let i = slots.findIndex(x => x && x.pid === b.pid && x.prog === b.prog);
         if (i >= 0 && slots[i].at >= b.at) continue;
         if (i < 0) i = slots.findIndex(x => !x);
@@ -12831,7 +12832,7 @@ body.cam-scene #ffChip,body.cam-scene #plChip,body.cam-scene .b-ring{animation-p
         // 4.1.0 지섭(2026-11-11): 자동으로 움직이는 브라우저(AI가 시험하려고 연 판)는 테스트 현황에 기록을 남기지 않아요. 자동 시험(가짜 서버)은 그대로 올려요
         if (!(navigator.webdriver && !window.__FOREST_TEST) && (force || Date.now() - Cloud.lastStats >= STATS_PUSH)) {
           Cloud.lastStats = Date.now();
-          await db.ref('forest/stats/' + uid).set(statsDoc());
+          try { await db.ref('forest/stats/' + uid).set(statsDoc()); } catch (e2) { /* 4.1.1 테스트 현황을 못 올려도 학교 저장은 그대로예요(저장 위치를 오류로 바꾸지 않아요) */ }
         }
       }
     } catch (e) {
