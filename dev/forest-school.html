@@ -12823,7 +12823,8 @@ body.cam-scene #ffChip,body.cam-scene #plChip,body.cam-scene .b-ring{animation-p
         syncSet(revOf(res.snapshot.val()) || base + 1, at);
         Cloud.lastAt = Math.max(Cloud.lastAt || 0, at);
         Cloud.lastPush = Date.now();
-        if (force || Date.now() - Cloud.lastStats >= STATS_PUSH) {
+        // 4.1.0 지섭(2026-11-11): 자동으로 움직이는 브라우저(AI가 시험하려고 연 판)는 테스트 현황에 기록을 남기지 않아요. 자동 시험(가짜 서버)은 그대로 올려요
+        if (!(navigator.webdriver && !window.__FOREST_TEST) && (force || Date.now() - Cloud.lastStats >= STATS_PUSH)) {
           Cloud.lastStats = Date.now();
           await db.ref('forest/stats/' + uid).set(statsDoc());
         }
