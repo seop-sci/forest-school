@@ -29,10 +29,10 @@ async def main():
         await page.evaluate(CLEAN)
         # 1) 화요일
         d = await page.evaluate(CLOCK(1)); print('화요일', d)
-        r = await page.evaluate(f"""(()=>{{ const F={F}, S=F.S; F.wdTick(); const b0=S.budget; const on=F.xgOn(); const bar=!document.querySelector('#wdBar').hidden;
+        r = await page.evaluate(f"""(()=>{{ const F={F}, S=F.S; F.wdTick(); const b0=S.budget; const on=F.xgOn(); const bar=!document.querySelector('#wdBar').hidden || !!document.querySelector('#wdG [data-wd="xg"]');
           F.openXg(); const over=({OVER})('#mXg'); const g=F.xgGuest(); const sp=F.xgSpots(); F.xgGreet(); return {{on, bar, over, g, sp, s:S.xg.s.slice(), up:S.budget>b0, log:S.xg.log.length}}; }})()""")
         print(' 인사', r)
-        ok(r['on'] and r['bar'], '화요일에 교환학생의 날이 열리고 띠가 보여요'); ok(not r['over'], '교환학생 창이 360px에서 넘치지 않아요')
+        ok(r['on'] and r['bar'], '화요일에 교환학생의 날이 열리고 지도(또는 띠)에 보여요'); ok(not r['over'], '교환학생 창이 360px에서 넘치지 않아요')
         ok(r['s'] == [1, 0, 0] and r['up'] and r['log'] == 1, '인사하면 수업료와 수첩 기록'); ok(len(r['sp']) == 3 and 'cafeteria' not in r['sp'], f"안내할 건물 세 곳 {r['sp']}")
         ok(r['g']['real'] is False and r['g']['who'], '랭킹이 없으면 꾸며 낸 이웃 학교')
         await page.wait_for_timeout(400); await page.evaluate(CLEAN)

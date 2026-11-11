@@ -2547,7 +2547,7 @@ body.wl-on .toast{z-index:300}
 .nb-list{display:grid;gap:5px}.nb-ch{display:flex;flex-wrap:wrap;align-items:center;gap:4px 8px;padding:7px 9px;border:1.5px solid var(--line);border-radius:12px;background:var(--card);font-size:13px}
 .nb-ch b{flex:1;min-width:0;font-weight:700}.nb-ch small{color:var(--muted);font-size:12px}.nb-ch span{display:flex;flex-wrap:wrap;gap:2px 8px}.nb-ch.dim{opacity:.5}
 .nb-who{display:flex;align-items:center;gap:10px;padding:6px 8px;border:1.5px solid var(--line);border-radius:12px;background:var(--card)}.nb-who .talk-av{width:48px;height:48px}.nb-who .talk-av img,.nb-who .talk-av svg{width:42px;height:42px;object-fit:contain}.nb-who p{margin:0}.nb-who b{display:block;font-size:13.5px}.nb-who small{font-size:12.5px;color:var(--muted)}
-#fvG .fv-booth,#fvG .fv-guest{cursor:pointer}#fvG .fv-hit{fill:transparent}
+#fvG .fv-booth,#fvG .fv-guest,#wdG .wd-it{cursor:pointer}#wdG .fv-hit{fill:transparent}#wdG .fv-pin circle{fill:#E04848;stroke:#fff;stroke-width:1.2}#wdG .fv-pin text{font-size:9px;font-weight:700;text-anchor:middle;fill:#fff}#fvG .fv-hit{fill:transparent}
 #fvG .fv-tag{fill:rgba(255,249,232,.94);stroke:#C9A25B;stroke-width:.8}#fvG .fv-nm{font-family:var(--font-display);font-size:7.5px;text-anchor:middle;fill:#5A3A16}
 #fvG .fv-guest.met{opacity:.7}#fvG .fv-pin circle{fill:#E04848;stroke:#fff;stroke-width:1.2}#fvG .fv-pin text{font-size:9px;font-weight:700;text-anchor:middle;fill:#fff}
 #fvTop .fv-glow{fill:#FFE38A;opacity:.38;mix-blend-mode:screen}
@@ -3456,6 +3456,7 @@ body.cam-scene #ffChip,body.cam-scene #plChip,body.cam-scene .b-ring{animation-p
           <circle class="firefly" cx="40" cy="150" r="1.8"/><circle class="firefly" cx="130" cy="112" r="1.8"/><circle class="firefly" cx="306" cy="108" r="1.8"/><circle class="firefly" cx="30" cy="250" r="1.8"/><circle class="firefly" cx="334" cy="236" r="1.8"/><circle class="firefly" cx="112" cy="392" r="1.8"/><circle class="firefly" cx="262" cy="396" r="1.8"/><circle class="firefly" cx="64" cy="344" r="1.8"/>
         </g>
         <g id="fvG"></g><!-- 4.1.0 대학 축제: 광장 구역의 부스, 무대, 손님 깃발 -->
+        <g id="wdG"></g><!-- 4.1.0 화요일 교환학생과 환영 현수막, 목요일 수레 가게 -->
         <g id="teachers" class="teachers"></g>
         <g id="kids"></g>
         <g id="fvTop" pointer-events="none" aria-hidden="true"></g><!-- 4.1.0 만국기와 밤 불빛은 학생 위 층 -->
@@ -20292,15 +20293,36 @@ body.cam-scene #ffChip,body.cam-scene #plChip,body.cam-scene .b-ring{animation-p
   function wdBar() {
     const el = $('#wdBar'); if (!el || !S) return;
     const t = gameToday(), ex = xgOn() && !xgDone(), mk = mkOn();
-    const show = (ex || mk) && rt.wdX !== t && rt.tab === 'school' && rt.viewTier == null && !rt.decoEdit && !festBusy() && !rt.paused;
+    const onMap = !!($('#wdG') && $('#wdG').dataset.key);   // 지도에 교환학생이나 수레 가게가 보이면 띠는 숨겨요(같은 자리를 가려요). 대학교의 다른 구역처럼 지도에 없을 때만 띠
+    const show = (ex || mk) && !onMap && rt.wdX !== t && rt.tab === 'school' && rt.viewTier == null && !rt.decoEdit && !festBusy() && !rt.paused;
     if (el.hidden === show) el.hidden = !show;
     if (!show) return;
     setH($('#wdBarIc'), ex ? wdImg('ic_ex', 20, '🎒') : wdImg('ic_mk', 20, '🛒'));
     setT($('#wdBarTx'), ex ? (S.xg.s[0] ? `교환학생 ${spName(xgGuest().sp)} 친구를 안내해요` : `교환학생 ${spName(xgGuest().sp)} 친구가 왔어요`) : '오늘은 숲속 장터가 열려요');
   }
+  // 지도에 얹기: 교문 안쪽 길목에 화요일은 교환학생과 환영 현수막, 목요일은 수달 보부상의 수레 가게. 누르면 그 창이 열려요(지도 그림은 그대로)
+  function wdMap(force) {
+    const g = $('#wdG'); if (!g || !S) return;
+    const G = geo(), ok = !!G.gate && rt.viewTier == null && !rt.decoEdit && !rt.fest && !rt.sports;
+    const xg = ok && xgOn(), mk = ok && mkOn(), sp = xg ? xgGuest().sp : '';
+    const key = !xg && !mk ? '' : [gameToday(), geoIdx(), xg ? sp + S.xg.s.join('') : 'mk'].join('|');
+    if (!force && g.dataset.key === key) return; g.dataset.key = key;
+    if (!key) { g.innerHTML = ''; return; }
+    const gx = G.gate[0], y = 398;
+    const im = (k, x, yy, w, ar) => IMG(k) ? `<image href="${IMG(k)}" x="${(x - w / 2).toFixed(1)}" y="${(yy - w * ar).toFixed(1)}" width="${w}" height="${(w * ar).toFixed(1)}"/>` : '';
+    const pin = (x, yy) => `<g class="fv-pin" transform="translate(${x} ${yy})"><circle r="6.5"/><text y="3.2">!</text></g>`;
+    if (xg) g.innerHTML = `<g class="wd-it" data-wd="xg" role="button" tabindex="0" aria-label="교환학생 ${spName(sp)}, 눌러서 교환학생의 날 열기">${im('ex_banner', gx, y - 30, 66, 0.25)}${im('chr_' + sp, gx - 3, y, 20, 1 / (CHR_AR['chr_' + sp] || 0.7))}${im('ex_bag', gx + 11, y, 11, 1)}<rect class="fv-hit" x="${gx - 34}" y="${y - 48}" width="68" height="52"/>${xgDone() ? '' : pin(gx + 14, y - 34)}</g>`;
+    else g.innerHTML = `<g class="wd-it" data-wd="mk" role="button" tabindex="0" aria-label="수달 보부상의 수레 가게, 눌러서 숲속 장터 열기">${im('mk_stall', gx + 4, y + 2, 46, 1)}${im('mk_who', gx - 22, y + 2, 19, 680 / 512)}<rect class="fv-hit" x="${gx - 34}" y="${y - 44}" width="66" height="48"/>${pin(gx + 22, y - 44)}</g>`;
+  }
+  function wdMapTap(e) {
+    const b = e.target.closest('[data-wd]'); if (!b) return;
+    if (e.type === 'keydown') { if (e.key !== 'Enter' && e.key !== ' ') return; e.preventDefault(); }
+    if (rt.paused || rt.modalOpen || festBusy() || rt.decoEdit) return;
+    if (b.dataset.wd === 'xg') openXg(); else openMk();
+  }
   function wdTick() {
     if (!S || !S.xg || !S.mk) return;
-    xgSync(); mkSync(); wdBar();
+    xgSync(); mkSync(); wdMap(); wdBar();
     const t = gameToday();
     if (rt.modalOpen === $('#mXg') && rt.xgKey !== t) { rt.xgKey = t; renderXg(); }
     if (rt.modalOpen === $('#mMk') && rt.mkKey !== t) { rt.mkKey = t; renderMk(); }
@@ -23006,6 +23028,7 @@ body.cam-scene #ffChip,body.cam-scene #plChip,body.cam-scene .b-ring{animation-p
     $('#mXg').addEventListener('click', xgClick); $('#xgClose').addEventListener('click', () => { sfx('tap'); closeModal($('#mXg')); });
     $('#mMk').addEventListener('click', mkClick); $('#mkClose').addEventListener('click', () => { sfx('tap'); closeModal($('#mMk')); });
     $('#wdBarGo').addEventListener('click', () => { if (xgOn() && !xgDone()) openXg(); else openMk(); });
+    $('#wdG').addEventListener('click', wdMapTap); $('#wdG').addEventListener('keydown', wdMapTap);
     $('#wdBarX').addEventListener('click', () => { sfx('tap'); rt.wdX = gameToday(); wdBar(); });
     $('#stSay').addEventListener('click', stNext); $('#stNext').addEventListener('click', stNext);
     $('#stSkip').addEventListener('click', () => { sfx('tap'); stEnd(); });
@@ -25344,7 +25367,7 @@ body.cam-scene #ffChip,body.cam-scene #plChip,body.cam-scene .b-ring{animation-p
   }
 
   // 시험용 손잡이: 자동 시험(window.__FOREST_TEST)에서만 게임 속 함수를 꺼내 써요
-  if (window.__FOREST_TEST) window.__forest = { get S() { return S; }, bldBox, bldPick, bldWarm, DECO_SLOTS, XG, MK, ST, SIDE, ST_SIDE, xgOn, xgGuest, xgSpots, xgGreet, xgVisit, xgLunch, openXg, mkOn, mkHot, mkSell, mkBuy, mkSur, openMk, wdBar, wdTick, stTick, stPlay, stNext, stPick, stEnd, stTags, openSb, renderSb, sideCan, fvFlag, FV, FV_POS, fvOn, fvOpen, fvBonus, fvSync, fvStamp, fvGuests, openFv, renderFv, fvMeet, fvBoothStart, fvMap, fvTip, festDef, goTo, navInfo, openShop, gdReady, thPreview, thPreviewEnd, thOn, busScene, tripCrowd, openTrip, startTrip, claimTrip, TRIPS, mgPickMul, mgPickMode, mgUpOrder, mgFillOrders, mgAdAsk, sportsCon, festCon, btQuota, btCanAd, btAdMore, warmRooms, blobUrl, vdSize, vdBlock, pzSweep, pzSwGain, pzSwOpen, pzXpOf, mgMulMax, mgMulOk, mgMul, mgModeTap, acTip, kidDupIdx, trialSafe, closeAd,
+  if (window.__FOREST_TEST) window.__forest = { get S() { return S; }, bldBox, bldPick, bldWarm, DECO_SLOTS, XG, MK, ST, SIDE, ST_SIDE, wdMap, xgOn, xgGuest, xgSpots, xgGreet, xgVisit, xgLunch, openXg, mkOn, mkHot, mkSell, mkBuy, mkSur, openMk, wdBar, wdTick, stTick, stPlay, stNext, stPick, stEnd, stTags, openSb, renderSb, sideCan, fvFlag, FV, FV_POS, fvOn, fvOpen, fvBonus, fvSync, fvStamp, fvGuests, openFv, renderFv, fvMeet, fvBoothStart, fvMap, fvTip, festDef, goTo, navInfo, openShop, gdReady, thPreview, thPreviewEnd, thOn, busScene, tripCrowd, openTrip, startTrip, claimTrip, TRIPS, mgPickMul, mgPickMode, mgUpOrder, mgFillOrders, mgAdAsk, sportsCon, festCon, btQuota, btCanAd, btAdMore, warmRooms, blobUrl, vdSize, vdBlock, pzSweep, pzSwGain, pzSwOpen, pzXpOf, mgMulMax, mgMulOk, mgMul, mgModeTap, acTip, kidDupIdx, trialSafe, closeAd,
     TKE, TK_Q, tkDaily, nbAllDay, nbBuildAt, nbOn, conAdd, BX_SPOT, PERKS, offlineCapH, applyAway, pzFinish, mgClaimOrder,
     CS, JOBS, CS_WORRY, freshCs, csOpen, csLeft, csMax, csEnsure, csCands, csNeed, csMul, csOpenCards, csReady, csDone, csTalkMake, csAnswer, csChoose, csSettle, openCounsel, renderCounsel, renderHall, MAIN, qMeasure, qGoal, sanitize,   // 3.1.0 진로 상담
     NSL, nsStart, nsSettle, nsOpen, nsOn, nsOverlap, nsExtraH, isNight, nightDayOf, openNs, renderNs, bxSpots, renderNight,   // 3.0.0
