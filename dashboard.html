@@ -107,11 +107,13 @@ td.wrap{white-space:normal}
     var by = {};
     Object.keys(raw || {}).forEach(function (id) {
       var d = raw[id]; if (!d || typeof d !== 'object') return;
+      // 엉뚱하게 큰 값 한 줄이 평균과 그래프를 망치지 않게 상한으로 잘라요(서버 규칙도 값 범위를 봐요)
+      var cap = function (v, max) { return Math.min(max, Math.max(0, num(v))); }, cut = function (v, n, d) { return typeof v === 'string' ? v.slice(0, n) : d; };
       var r = {
-        id: id, seen: num(d.seen), born: num(d.born), pid: typeof d.pid === 'string' && d.pid ? d.pid : id, name: typeof d.name === 'string' ? d.name : '',
-        tier: num(d.tier), year: num(d.year), q: d.q == null ? '' : String(d.q), qt: typeof d.qt === 'string' ? d.qt : '',
-        play: num(d.play), sess: num(d.sess), days: num(d.days), ads: num(d.ads), score: num(d.score), gearn: num(d.gearn), gspent: num(d.gspent),
-        dev: !!d.dev, v: typeof d.v === 'string' ? d.v : '?', env: typeof d.env === 'string' ? d.env : '?'
+        id: id, seen: cap(d.seen, 253402300799999), born: cap(d.born, 253402300799999), pid: typeof d.pid === 'string' && d.pid ? d.pid.slice(0, 16) : id, name: cut(d.name, 20, ''),
+        tier: cap(d.tier, 10), year: cap(d.year, 100), q: d.q == null ? '' : String(d.q).slice(0, 16), qt: cut(d.qt, 60, ''),
+        play: cap(d.play, 1e8), sess: cap(d.sess, 1e6), days: cap(d.days, 3650), ads: cap(d.ads, 1e5), score: cap(d.score, 1e9), gearn: cap(d.gearn, 1e7), gspent: cap(d.gspent, 1e7),
+        dev: !!d.dev, v: cut(d.v, 32, '?'), env: cut(d.env, 16, '?')
       };
       var o = by[r.pid]; if (!o || r.seen > o.seen) by[r.pid] = r;
     });

@@ -18,6 +18,9 @@ for(const path of ['/forest/saves/A','/forest/bak/A/0']) {
 }
 test('리비전 정상',write('/forest/saves/A',{...doc,r:5}),true);
 test('리비전 음수',write('/forest/saves/A',{...doc,r:-1}),false);
+test('4.1.1 백업 99,999자',write('/forest/bak/A/0',{...doc,d:'x'.repeat(99999)}),true);
+test('4.1.1 백업 100,000자 거부',write('/forest/bak/A/0',{...doc,d:'x'.repeat(100000)}),false);
+test('4.1.1 저장은 199,999자까지 그대로',write('/forest/saves/A',{...doc,d:'x'.repeat(199999)}),true);
 test('백업 메타데이터 정상',write('/forest/bak/A/0',{...doc,pid:'ABC123',prog:20015,sum:'학교',sv:1700000000000,why:'백업'}),true);
 test('백업 메타데이터 과다',write('/forest/bak/A/0',{...doc,why:'x'.repeat(1048576)}),false);
 {

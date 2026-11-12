@@ -28,9 +28,9 @@
           ".read": "auth != null && auth.uid === $uid",
           ".write": "auth != null && auth.uid === $uid",
           "$slot": {
-            ".validate": "($slot === '0' || $slot === '1' || $slot === '2') && newData.hasChildren(['d', 'at', 'v']) && newData.child('d').isString() && newData.child('d').val().length < 200000 && newData.child('at').isNumber() && newData.child('v').isString()",
+            ".validate": "($slot === '0' || $slot === '1' || $slot === '2') && newData.hasChildren(['d', 'at', 'v']) && newData.child('d').isString() && newData.child('d').val().length < 100000 && newData.child('at').isNumber() && newData.child('v').isString()",
             "d": {
-              ".validate": "newData.isString() && newData.val().length < 200000"
+              ".validate": "newData.isString() && newData.val().length < 100000"
             },
             "at": {
               ".validate": "newData.isNumber() && newData.val() >= 0 && newData.val() <= 253402300799999"
@@ -70,7 +70,7 @@
           "sk"
         ],
         "$uid": {
-          ".write": "auth != null && auth.uid === $uid",
+          ".write": "auth != null && (auth.uid === $uid || (!newData.exists() && root.child('forest/adminUids').child(auth.uid).val() === true))",
           ".validate": "newData.hasChildren(['name', 'score', 'at']) && newData.child('at').isNumber() && newData.child('at').val() === now && ((!data.exists() && newData.child('score').val() <= 50000) || (data.exists() && data.child('score').isNumber() && data.child('at').isNumber() && newData.child('score').val() <= data.child('score').val() + (now - data.child('at').val() >= 10000 ? 2000 : 0) + (now - data.child('at').val()) / 500)) && (newData.child('btq').exists() || !data.child('btq').exists() || !newData.child('bt').exists()) && (!newData.child('bt').exists() || newData.child('bt').val() <= (data.child('bt').isNumber() ? data.child('bt').val() : 1000) || (newData.child('btq').isNumber() && newData.child('btq').val() >= (data.child('btq').isNumber() ? data.child('btq').val() : now - 86400000) + (newData.child('bt').val() - (data.child('bt').isNumber() ? data.child('bt').val() : 1000)) * 432000)) && (!data.exists() || !newData.child('lp').exists() || newData.child('week').val() === data.child('week').val() || newData.child('lp').val() <= (data.child('at').isNumber() ? ((now - data.child('at').val() >= 10000 ? 1000 : 0) + (now - data.child('at').val()) / 10000) : 1000)) && (!data.exists() || !newData.child('sp').exists() || newData.child('sk').val() === data.child('sk').val() || newData.child('sp').val() <= (data.child('at').isNumber() ? ((now - data.child('at').val() >= 10000 ? 1000 : 0) + (now - data.child('at').val()) / 10000) : 1000))",
           "name": {
             ".validate": "newData.isString() && newData.val().length >= 1 && newData.val().length <= 10"
@@ -151,67 +151,67 @@
           ".validate": "newData.hasChildren(['seen', 'pid']) && newData.child('seen').isNumber() && newData.child('pid').isString() && newData.child('pid').val().length <= 16",
           ".read": "auth != null && auth.uid === $uid",
           "seen": {
-            ".validate": "newData.isNumber() || newData.isBoolean() || (newData.isString() && newData.val().length <= 60)"
+            ".validate": "newData.isNumber() && newData.val() >= 0 && newData.val() <= 253402300799999"
           },
           "born": {
-            ".validate": "newData.isNumber() || newData.isBoolean() || (newData.isString() && newData.val().length <= 60)"
+            ".validate": "newData.isNumber() && newData.val() >= 0 && newData.val() <= 253402300799999"
           },
           "pid": {
-            ".validate": "newData.isNumber() || newData.isBoolean() || (newData.isString() && newData.val().length <= 60)"
+            ".validate": "newData.isString() && newData.val().length <= 16"
           },
           "name": {
-            ".validate": "newData.isNumber() || newData.isBoolean() || (newData.isString() && newData.val().length <= 60)"
+            ".validate": "newData.isString() && newData.val().length <= 20"
           },
           "tier": {
-            ".validate": "newData.isNumber() || newData.isBoolean() || (newData.isString() && newData.val().length <= 60)"
+            ".validate": "newData.isNumber() && newData.val() >= 0 && newData.val() <= 1000"
           },
           "year": {
-            ".validate": "newData.isNumber() || newData.isBoolean() || (newData.isString() && newData.val().length <= 60)"
+            ".validate": "newData.isNumber() && newData.val() >= 0 && newData.val() <= 1000"
           },
           "town": {
-            ".validate": "newData.isNumber() || newData.isBoolean() || (newData.isString() && newData.val().length <= 60)"
+            ".validate": "newData.isNumber() && newData.val() >= 0 && newData.val() <= 1000"
           },
           "q": {
-            ".validate": "newData.isNumber() || newData.isBoolean() || (newData.isString() && newData.val().length <= 60)"
+            ".validate": "(newData.isNumber() && newData.val() >= 0 && newData.val() <= 100000) || (newData.isString() && newData.val().length <= 16)"
           },
           "qt": {
-            ".validate": "newData.isNumber() || newData.isBoolean() || (newData.isString() && newData.val().length <= 60)"
+            ".validate": "newData.isString() && newData.val().length <= 60"
           },
           "play": {
-            ".validate": "newData.isNumber() || newData.isBoolean() || (newData.isString() && newData.val().length <= 60)"
+            ".validate": "newData.isNumber() && newData.val() >= -1000000000000000 && newData.val() <= 1000000000000000"
           },
           "sess": {
-            ".validate": "newData.isNumber() || newData.isBoolean() || (newData.isString() && newData.val().length <= 60)"
+            ".validate": "newData.isNumber() && newData.val() >= -1000000000000000 && newData.val() <= 1000000000000000"
           },
           "days": {
-            ".validate": "newData.isNumber() || newData.isBoolean() || (newData.isString() && newData.val().length <= 60)"
+            ".validate": "newData.isNumber() && newData.val() >= -1000000000000000 && newData.val() <= 1000000000000000"
           },
           "ads": {
-            ".validate": "newData.isNumber() || newData.isBoolean() || (newData.isString() && newData.val().length <= 60)"
+            ".validate": "newData.isNumber() && newData.val() >= -1000000000000000 && newData.val() <= 1000000000000000"
           },
           "score": {
-            ".validate": "newData.isNumber() || newData.isBoolean() || (newData.isString() && newData.val().length <= 60)"
+            ".validate": "newData.isNumber() && newData.val() >= -1000000000000000 && newData.val() <= 1000000000000000"
           },
           "gold": {
-            ".validate": "newData.isNumber() || newData.isBoolean() || (newData.isString() && newData.val().length <= 60)"
+            ".validate": "newData.isNumber() && newData.val() >= -1000000000000000 && newData.val() <= 1000000000000000"
           },
           "gearn": {
-            ".validate": "newData.isNumber() || newData.isBoolean() || (newData.isString() && newData.val().length <= 60)"
+            ".validate": "newData.isNumber() && newData.val() >= -1000000000000000 && newData.val() <= 1000000000000000"
           },
           "gspent": {
-            ".validate": "newData.isNumber() || newData.isBoolean() || (newData.isString() && newData.val().length <= 60)"
+            ".validate": "newData.isNumber() && newData.val() >= -1000000000000000 && newData.val() <= 1000000000000000"
           },
           "cos": {
-            ".validate": "newData.isNumber() || newData.isBoolean() || (newData.isString() && newData.val().length <= 60)"
+            ".validate": "newData.isNumber() && newData.val() >= -1000000000000000 && newData.val() <= 1000000000000000"
           },
           "dev": {
-            ".validate": "newData.isNumber() || newData.isBoolean() || (newData.isString() && newData.val().length <= 60)"
+            ".validate": "newData.isBoolean()"
           },
           "v": {
-            ".validate": "newData.isNumber() || newData.isBoolean() || (newData.isString() && newData.val().length <= 60)"
+            ".validate": "newData.isString() && newData.val().length <= 32"
           },
           "env": {
-            ".validate": "newData.isNumber() || newData.isBoolean() || (newData.isString() && newData.val().length <= 60)"
+            ".validate": "newData.isString() && newData.val().length <= 16"
           },
           "$other": {
             ".validate": false
