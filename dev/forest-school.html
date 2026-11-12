@@ -2514,6 +2514,7 @@ body.wl-on .toast{z-index:300}
 .fv-board{display:grid;grid-template-columns:repeat(5,1fr);gap:5px;padding:2px}
 .fv-st{display:grid;place-items:center;aspect-ratio:1;border:1.5px dashed var(--line);border-radius:50%;font-size:15px;background:var(--card)}
 .fv-st.gift{border-style:solid;border-color:#E2A21C}.fv-st.on{border-style:solid;border-color:#D2587A;background:rgba(210,88,122,.1)}.fv-st:not(.on){filter:grayscale(.3);opacity:.8}
+.bf-board{grid-template-columns:repeat(8,1fr);gap:4px}.bf-board .fv-st{font-size:12px}.bf-board .fv-st img{width:20px!important;height:20px!important}   /* 4.2.0 대축제 도장판 24칸 */
 .fv-steps{display:flex;flex-wrap:wrap;gap:4px 8px;justify-content:center;margin:6px 0 2px;font-size:11.5px;color:var(--muted)}.fv-steps .ok{color:#3F7D3A;text-decoration:line-through}
 .fv-tip{position:fixed;z-index:6;left:50%;transform:translateX(-50%);bottom:calc(var(--bot-h, 70px) + 50px);display:flex;align-items:center;gap:6px;width:max-content;max-width:calc(100% - 24px);padding:3px 4px 3px 12px;border:1.5px solid #F0B8C6;border-radius:999px;background:rgba(255,233,238,.96);color:#5A2A3A;font-size:12.5px;box-shadow:0 2px 4px rgba(0,0,0,.2)}
 .fv-tip span:nth-child(2){flex:1;min-width:0}.fv-tip img{display:block;width:20px;height:20px}.fv-tip button{flex:none;width:26px;height:26px;border:0;border-radius:50%;background:transparent;color:inherit;font-size:13px;cursor:pointer}
@@ -3794,7 +3795,7 @@ body.cam-scene #ffChip,body.cam-scene #plChip,body.cam-scene .b-ring{animation-p
   </main>
 
 </div>
-  <div class="fv-tip" id="fvTip" hidden role="status"><span id="fvTipIc" aria-hidden="true"></span><span>숲속 대학교는 지금 축제 중이에요</span><button type="button" id="fvTipX" aria-label="닫기">✕</button></div><!-- 4.1.0 -->
+  <div class="fv-tip" id="fvTip" hidden role="status"><span id="fvTipIc" aria-hidden="true"></span><span id="fvTipTx">숲속 대학교는 지금 축제 중이에요</span><button type="button" id="fvTipX" aria-label="닫기">✕</button></div><!-- 4.1.0 -->
   <div class="fv-tip wd-bar" id="wdBar" hidden><button type="button" id="wdBarGo"><span id="wdBarIc" aria-hidden="true"></span><span id="wdBarTx"></span></button><button type="button" id="wdBarX" aria-label="닫기">✕</button></div><!-- 4.1.0 화요일 교환학생, 목요일 장터 -->
   <nav class="tabs" role="tablist" aria-label="화면 이동">
     <button class="tab" type="button" role="tab" data-tab="school" aria-selected="true"><span class="tic" data-ic="ic_home" aria-hidden="true"></span>홈</button>
@@ -7295,6 +7296,7 @@ body.cam-scene #ffChip,body.cam-scene #plChip,body.cam-scene .b-ring{animation-p
     awx: 0,   // 2.1.0 자리 비운 보상 2배 부스터: 다음 받기에 2배(남은 번 수)
     zv: {},   // 4.0.0 들어가 본 구역({academic: 1, ...}). '캠퍼스 둘러보기' 퀘스트가 세요
     rp: { b: 0 },   // 되풀이 학년 종업식 조건: 지난 식 때의 건물 레벨 합(0이면 아직 안 셈)
+    bf: freshBf(),   // 4.2.0 대축제: mon 그 달, st 도장, got 받은 단계, day 날짜, dn 그날 도장, o 창 열기, g2 손님 다섯 곳, fw 불꽃놀이, own 받은 달 장식, eve 전날 띠, tip 다른 학교 띠, auto 첫날 창
     fv: freshFv(),   // 4.1.0 대학 축제: wk 이번 주, st 도장 수, got 받은 단계, day 날짜, b 그날 한 부스, g 그날 만난 손님, o 그날 창을 열었는지, win 부스마다 성공 횟수, own 받은 기념품, tip 띠를 닫은 주, td 띠를 본 날
     xg: freshXg(), mk: freshMk(), sto: freshSto(),   // 4.1.0 교환학생의 날, 숲속 장터, 이야기(본 장면, 고른 답, 곁가지)
     dp: { pick: [], own: {}, free: 0 },   // 4.0.0 단과대학: pick 다니는 곳(열쇠), own 한 번이라도 고른 곳, free 1이면 다음 바꾸기가 공짜(종업식 뒤)
@@ -7496,6 +7498,7 @@ body.cam-scene #ffChip,body.cam-scene #plChip,body.cam-scene .b-ring{animation-p
     sanitizeCs(d, s);   // 3.1.0 진로 상담
     sanitizeTr2(d, s);   // 3.2.0 수학여행
     sanitizeFv(d, s);   // 4.1.0 대학 축제
+    sanitizeBf(d, s);   // 4.2.0 대축제
     sanitizeXg(d, s); sanitizeMk(d, s); sanitizeSto(d, s);   // 4.1.0 교환학생, 장터, 이야기
     s.nl = [0, 1, 2].includes(d.nl) ? d.nl : 0;   // 3.2.1 고등학교 밤 모습
     s.tfp = Math.min(s.st.fperks, Math.floor(num(d.tfp, 0, s.st.fperks)));
@@ -8266,7 +8269,7 @@ body.cam-scene #ffChip,body.cam-scene #plChip,body.cam-scene .b-ring{animation-p
   const Music = { cur: '', track: null, bus: null, out: null, step: 0, next: 0, timer: 0, preview: '', noise: null, src: null };
   // 1.7.3 음악 파일 곡(Suno 유료 플랜으로 지섭이 만든 곡). 1.8.0부터 저장소 맨 위 audio 폴더의 mp4(소리만) 파일이에요(dev/embed_audio.py가 넣어요).
   // 파일이 없거나 풀기에 실패하면 예전처럼 코드로 연주하는 곡(SONGS)으로 돌아가요. 'play'(미니게임)는 코드 곡이 없어서 'room' 곡으로 돌아가요
-  const FILE_SONG = { home: 'bgm_home', room: 'bgm_room', festival: 'bgm_festival', festnight: 'bgm_festnight', play: 'bgm_play',   // 3.2.0 밤 행사 곡(지섭 Suno)
+  const FILE_SONG = { bigfest: 'bgm_bigfest', home: 'bgm_home', room: 'bgm_room', festival: 'bgm_festival', festnight: 'bgm_festnight', play: 'bgm_play',   // 3.2.0 밤 행사 곡(지섭 Suno)
    
     // 1.8.0 배경 테마 곡 7개(지섭이 Suno로 만듦)
     spring: 'bgm_spring', summer: 'bgm_summer', autumn: 'bgm_autumn', winter: 'bgm_winter', xmas: 'bgm_xmas', space: 'bgm_space', retro: 'bgm_retro' };
@@ -8299,10 +8302,12 @@ body.cam-scene #ffChip,body.cam-scene #plChip,body.cam-scene .b-ring{animation-p
     if (Music.preview && rt.tab === 'shop') return Music.preview;
     if (rt.thPrev && SONGS[rt.thPrev.id]) return rt.thPrev.id;   // 3.0.0 미리 보기 중에는 그 테마 곡
     if (!S.bgm) return '';
+    if (BF_SONG && rt.fest && festDef(rt.fest.id) && (festDef(rt.fest.id).bf || festDef(rt.fest.id).fv) && bfOn()) return 'bigfest';   // 4.2.0 대축제 곡
     if (rt.fest || rt.sports) return rt.fest && festDef(rt.fest.id) && festDef(rt.fest.id).night ? 'festnight' : 'festival';   // 3.2.0 고등학교 밤 행사는 조용한 곡
     let play = false; try { play = !!((pzUI && pzUI.open) || (mgUI && mgUI.open) || (btUI && btUI.open)); } catch (e) { /* 퍼즐과 합치기가 아직 준비 전 */ }   // 1.8.0: 숲속 합치기도 미니게임 곡
     if (play) return 'play';
     // 1.7.4 지섭 결정: 곡이 자주 바뀌지 않게 홈에서 여는 탭(선생님, 퀘스트, 랭킹, 도감, 이벤트)도 홈 곡 그대로
+    if (BF_SONG && HOME_MUSIC_TABS.has(rt.tab) && bfOn()) return 'bigfest';   // 4.2.0 대축제 사흘 동안 대학교 홈 곡
     if (HOME_MUSIC_TABS.has(rt.tab)) return THEME_MUSIC && SONGS[thOn().bg] ? thOn().bg : 'home';
     return 'room';
   }
@@ -9724,6 +9729,7 @@ body.cam-scene #ffChip,body.cam-scene #plChip,body.cam-scene .b-ring{animation-p
   function zoneBadge(z) {
     const Z = ZONE_GEO.find(Z => Z.zone === z); if (!Z) return null;
     const ks = Object.keys(Z.lot).filter(k => FAC[k] && facKeys().includes(k));
+    if (z === 'plaza' && S.fv && bfOn() && (S.bf.dn || 0) < BIG.dayMax) return ['fv', '대축제!'];   // 4.2.0
     if (z === 'plaza' && S.fv && fvOn() && fvStampsToday() < Math.min(FV.dayMax, fvBooths().length + 2)) return ['fv', '축제!'];   // 4.1.0
     if (ks.some(k => { const p = document.getElementById('pq-' + k); return p && p.classList.contains('ff-on'); })) return ['ff', '즉시 완공 가능!'];
     if (ks.some(k => conOn(k))) return ['con', '공사 중'];
@@ -14711,6 +14717,9 @@ body.cam-scene #ffChip,body.cam-scene #plChip,body.cam-scene .b-ring{animation-p
   DECO.push({ id: 'bio_hut', name: '관찰 오두막', ess: 0, img: 'bio_hut', rare: 1, ev: 1, bio: 30 });
   if (UNI_Q) DECO.push({ id: 'deco_col_science', name: '온실 화분대', ess: 0, img: 'deco_col_science', rare: 1, ev: 1, col: 1 }, { id: 'deco_col_sports', name: '공 조형물', ess: 0, img: 'deco_col_sports', rare: 1, ev: 1, col: 1 }, { id: 'deco_col_human', name: '책 더미 벤치', ess: 0, img: 'deco_col_human', rare: 1, ev: 1, col: 1 }, { id: 'deco_col_art', name: '이젤과 조각', ess: 0, img: 'deco_col_art', rare: 1, ev: 1, col: 1 }, { id: 'deco_col_biz', name: '도토리 저울', ess: 0, img: 'deco_col_biz', rare: 1, ev: 1, col: 1 }, { id: 'deco_col_eng', name: '톱니 시계탑', ess: 0, img: 'deco_col_eng', rare: 1, ev: 1, col: 1 }, { id: 'deco_col_edu', name: '칠판 표지판', ess: 0, img: 'deco_col_edu', rare: 1, ev: 1, col: 1 }, { id: 'deco_col_med', name: '약초 화단', ess: 0, img: 'deco_col_med', rare: 1, ev: 1, col: 1 });   // 4.0.0 단과대학 장식(작업지시서 55): 처음 고르면 받아요
   const FV_SV = { science: '표본 진열대', sports: '우승컵 받침대', human: '시화 이젤', art: '작은 조각상', biz: '장터 수레', eng: '바람개비 풍차', edu: '사과 교탁', med: '약초차 수레' };
+  // 4.2.0 대축제 달 한정 장식 12종(작업지시서 70): 그 달 대축제 도장 24개를 모으면 받아요. 살 수 없어요
+  const BF_DECO = ['눈꽃 등불', '연날리기 연', '벚꽃 아치', '튤립 수레', '카네이션 화분 탑', '수국 우산', '수박 그네', '해바라기 풍차', '보름달 토끼 등불', '단풍 허수아비', '도토리 탑', '별 장식 트리'];
+  if (UNI_Q) DECO.push(...BF_DECO.map((nm, i) => ({ id: 'deco_bf_' + String(i + 1).padStart(2, '0'), name: nm, ess: 0, img: 'deco_bf_' + String(i + 1).padStart(2, '0'), rare: 1, ev: 1, bf: i + 1 })));
   if (UNI_Q) DECO.push(...Object.keys(FV_SV).map(k => ({ id: 'deco_fv_' + k, name: FV_SV[k], ess: 0, img: 'deco_fv_' + k, rare: 1, ev: 1, fv: 1 })));   // 4.1.0 축제 부스 기념품 8종(작업지시서 63): 그 부스 놀이를 여섯 번 성공하면 받아요
   // 4.1.0 교환학생 우정 배지 8개 보상과 장터 장식 3종(작업지시서 64). 초등학교부터라 대학교 조건이 없어요
   DECO.push({ id: 'deco_ex_sign', name: '방향 이정표', ess: 0, img: 'deco_ex_sign', rare: 1, ev: 1, xg: 1 }, { id: 'deco_mk_lamp', name: '장터 등불', ess: 0, img: 'deco_mk_lamp', rare: 1, ev: 1, mk: 1 }, { id: 'deco_mk_cart', name: '채소 수레', ess: 0, img: 'deco_mk_cart', rare: 1, ev: 1, mk: 1 }, { id: 'deco_mk_pack', name: '보부상 봇짐', ess: 0, img: 'deco_mk_pack', rare: 1, ev: 1, mk: 1 });
@@ -14872,7 +14881,7 @@ body.cam-scene #ffChip,body.cam-scene #plChip,body.cam-scene .b-ring{animation-p
       h += `<h3 class="shop-h">${title}</h3><div class="shop-grid">`;
       for (const d of list) {
         const n = decoOwn(d.id), out = decoSoldOut(d.id), c = decoCost(d.id), poor = !out && S.ess < c;
-        const pr = d.ev ? (n ? '가졌어요' : d.ps ? '패스 보상' : d.rs ? '시즌 기념' : d.bio ? `생물 ${d.bio}종` : d.cs ? '진로 도감' : d.col ? '단과대학' : d.fv ? '축제 기념품' : d.xg ? '우정 배지' : d.mk ? '숲속 장터' : d.tr2 ? tr2Nm() : d.cg ? '대항전 우승' : '이벤트 선물') : out ? (d.rare ? '가졌어요' : '더 살 수 없어요') : `${ic}${c}`;
+        const pr = d.ev ? (n ? '가졌어요' : d.ps ? '패스 보상' : d.rs ? '시즌 기념' : d.bio ? `생물 ${d.bio}종` : d.cs ? '진로 도감' : d.col ? '단과대학' : d.fv ? '축제 기념품' : d.bf ? `${d.bf}월 대축제` : d.xg ? '우정 배지' : d.mk ? '숲속 장터' : d.tr2 ? tr2Nm() : d.cg ? '대항전 우승' : '이벤트 선물') : out ? (d.rare ? '가졌어요' : '더 살 수 없어요') : `${ic}${c}`;
         h += `<button class="si${n ? ' own' : ''}${poor ? ' poor' : ''}" type="button" data-dbuy="${d.id}" aria-label="${d.name}${out ? '' : `, 숲의 정수 ${c}개`}">` +
           (d.rare ? '<span class="rare-mark" aria-hidden="true">★</span>' : '') +
           `<span class="pv deco"><img src="${IMG(d.img)}" alt="" draggable="false"></span><span class="nm">${d.name}${!d.rare && n ? ` <small>${n}개</small>` : ''}</span><span class="pr">${pr}</span></button>`;
@@ -14936,7 +14945,7 @@ body.cam-scene #ffChip,body.cam-scene #plChip,body.cam-scene .b-ring{animation-p
     }
     const d = DECO_BY[id]; if (!d) return;
     sfx('tap');
-    if (d.ev) { toast(decoOwn(id) ? `${d.name}${eulOf(d.name)} 가지고 있어요. '지도에 놓기'로 학교에 놓아 보세요` : d.cs ? `${eun(d.name)} 진로 도감 12칸을 다 채우면 받아요` : d.tr2 ? `${eun(d.name)} ${d.tr2} ${tr2Nm()}에서 가져와요` : d.fv ? `${eun(d.name)} 축제 부스 놀이를 ${FV.win}번 성공하면 받아요` : d.xg ? `${eun(d.name)} 교환학생 우정 배지 8개를 모으면 받아요` : d.mk ? `${eun(d.name)} 목요일 숲속 장터에서 쿠폰으로 사요` : `${eun(d.name)} 이벤트 기념 상자에서 받을 수 있어요`); return; }
+    if (d.ev) { toast(decoOwn(id) ? `${d.name}${eulOf(d.name)} 가지고 있어요. '지도에 놓기'로 학교에 놓아 보세요` : d.cs ? `${eun(d.name)} 진로 도감 12칸을 다 채우면 받아요` : d.tr2 ? `${eun(d.name)} ${d.tr2} ${tr2Nm()}에서 가져와요` : d.fv ? `${eun(d.name)} 축제 부스 놀이를 ${FV.win}번 성공하면 받아요` : d.bf ? `${eun(d.name)} ${d.bf}월 대축제에서 도장 ${BIG.max}개를 모으면 받아요` : d.xg ? `${eun(d.name)} 교환학생 우정 배지 8개를 모으면 받아요` : d.mk ? `${eun(d.name)} 목요일 숲속 장터에서 쿠폰으로 사요` : `${eun(d.name)} 이벤트 기념 상자에서 받을 수 있어요`); return; }
     if (decoSoldOut(id)) { toast(d.rare ? `${eun(d.name)} 하나만 가질 수 있어요` : `${eun(d.name)} ${DECO_MAX}개까지 가질 수 있어요`); return; }
     rt.decoPick = id; renderDecoShop();
   }
@@ -19737,6 +19746,7 @@ body.cam-scene #ffChip,body.cam-scene #plChip,body.cam-scene .b-ring{animation-p
     return `<image href="${u}" x="${(-w / 2).toFixed(1)}" y="${(-h / 2).toFixed(1)}" width="${w}" height="${h.toFixed(1)}"/>`;
   }
   function festItemSvg(item, w) {
+    if (item === 'bf_seed' && !IMG('bf_seed')) item = 'lantern';   // 4.2.0 불꽃 씨앗 그림(작업지시서 70)이 오기 전에는 등불 그림
     const keys = (FEST_ART[item] || []).filter(k => IMG(k)); if (!keys.length) { const sh = FEST_ITEM[item] || FEST_ITEM.balloon; return w ? `<g transform="scale(${(w / 22).toFixed(2)})">${sh}</g>` : sh; }
     return festArtSvg(keys[Math.floor(Math.random() * keys.length)], w || (item === 'balloon' ? 19 : item === 'meteor' ? 30 : item === 'lantern' ? 20 : 22));
   }
@@ -19900,7 +19910,8 @@ body.cam-scene #ffChip,body.cam-scene #plChip,body.cam-scene .b-ring{animation-p
   }
   function festSpawn(F) {
     let x, y;
-    if (F.fv) {   // 4.1.0 축제 부스 놀이: 떠오르기는 광장에서, 떨어지기는 위에서, 굴러오기는 왼쪽에서, 숨은 것 찾기는 곳곳에서
+    if (F.bf) { x = pzx() + rand(-90, 90); y = pzy() + rand(-6, 24); }   // 4.2.0 불꽃 씨앗은 광장에서 떠올라요
+    else if (F.fv) {   // 4.1.0 축제 부스 놀이: 떠오르기는 광장에서, 떨어지기는 위에서, 굴러오기는 왼쪽에서, 숨은 것 찾기는 곳곳에서
       const v0 = visMap() || [0, 0, 360, 480];
       if (F.how === 'drop') { x = rand(v0[0] + 30, v0[2] - 30); y = v0[1] + 24; }
       else if (F.how === 'roll') { x = v0[0] + 16; y = pzy() + rand(-70, 70); }
@@ -19938,6 +19949,7 @@ body.cam-scene #ffChip,body.cam-scene #plChip,body.cam-scene .b-ring{animation-p
     const v = Math.max(1, nice(rate() * 3));
     S.budget += v; earn(v);
     floatText(it.x, it.y - 10, '+' + fmt(v), 'gold');
+    if (festDef(R.id).bf) bfBurst(it.x, it.y);   // 4.2.0 불꽃이 펴져요(그림이 있을 때)
     sfx('coin'); buzz(10);
     if (!rt.reduced && it.g.animate) it.g.animate([{ transform: `translate(${it.x}px, ${it.y}px) scale(1)`, opacity: 1 }, { transform: `translate(${it.x}px, ${it.y}px) scale(1.8)`, opacity: 0 }], { duration: 220 }).onfinish = () => it.g.remove();
     else it.g.remove();
@@ -19991,6 +20003,7 @@ body.cam-scene #ffChip,body.cam-scene #plChip,body.cam-scene .b-ring{animation-p
     }
     festCamera(false); festGarland(false); festPhotoDecor(false); festNightDecor(null);
     if (F.fv) { fvBoothEnd(R, F); return; }   // 4.1.0 축제 부스 놀이는 따로 끝내요
+    if (F.bf) { bfFwEnd(R, F); return; }   // 4.2.0 대축제 불꽃놀이
     S.fest.n[R.id] = (S.fest.n[R.id] || 0) + 1;
     // 2026-11-11 지섭 결정: 밤(20~6시)에는 낮 행사가 잠겨서 메인 퀘스트가 멈췄어요. 밤 행사를 한 번 열면 그 퀘스트를 한 것으로 쳐요
     { const cm = curMain(); if (F.night && cm && cm.t === 'fest' && FEST[cm.k] && !FEST[cm.k].night && festBase(cm.k)) { if (!S.fest.sub) S.fest.sub = {}; S.fest.sub[cm.k] = (S.fest.sub[cm.k] || 0) + 1; } }
@@ -20025,17 +20038,17 @@ body.cam-scene #ffChip,body.cam-scene #plChip,body.cam-scene .b-ring{animation-p
   // 랭킹을 못 읽는 판(토스, 오프라인)에 오는 꾸며 낸 이웃 학교: [교장 선생님 이름, 학교급, 학년]
   const FV_FAKE = [['솔방울', 3, 2], ['산딸기', 2, 1], ['은방울', 4, 1], ['개암나무', 3, 3], ['물푸레', 1, 5], ['싸리꽃', 2, 3], ['머루', 4, 2], ['다래', 1, 3], ['밤송이', 3, 1]];
   // 광장 구역 지도(360 × 540 칸) 위 자리: 부스 세 곳, 무대, 등불 기둥, 만국기, 손님 깃발 세 곳
-  const FV_POS = { booth: [[60, 152, 56], [292, 152, 56], [270, 326, 50]], stage: [285, 268, 52], lamp: [[108, 252, 16], [242, 252, 16]], bunt: [108, 208, 134], flag: [[112, 318], [138, 366], [214, 366]] };
-  const freshFv = () => ({ wk: -1, st: 0, got: [0, 0, 0, 0, 0], day: '', b: {}, g: [0, 0, 0], o: 0, win: {}, own: {}, tip: -1, td: '' });
+  const FV_POS = { booth: [[60, 152, 56], [292, 152, 56], [270, 326, 50]], stage: [285, 268, 52], lamp: [[108, 252, 16], [242, 252, 16]], bunt: [108, 208, 134], flag: [[112, 318], [138, 366], [214, 366], [76, 270], [324, 334]] };   // 4.2.0 대축제에는 손님 다섯 곳(뒤 두 곳)
+  const freshFv = () => ({ wk: -1, st: 0, got: [0, 0, 0, 0, 0], day: '', b: {}, g: [0, 0, 0, 0, 0], o: 0, win: {}, own: {}, tip: -1, td: '' });
   function sanitizeFv(d, s) {
     const f = freshFv(), F = d && d.fv && typeof d.fv === 'object' ? d.fv : null; s.fv = f; if (!F) return;
     const n = (v, hi, lo = 0) => typeof v === 'number' && isFinite(v) ? Math.max(lo, Math.min(hi, Math.floor(v))) : lo;
     f.wk = n(F.wk, 1e6, -1); f.st = n(F.st, FV.weekMax); f.tip = n(F.tip, 1e6, -1); f.o = F.o ? 1 : 0;
     f.day = typeof F.day === 'string' ? F.day.slice(0, 10) : ''; f.td = typeof F.td === 'string' ? F.td.slice(0, 10) : '';
     if (Array.isArray(F.got)) f.got = FV.steps.map((_, i) => F.got[i] ? 1 : 0);
-    if (Array.isArray(F.g)) f.g = [0, 1, 2].map(i => F.g[i] ? 1 : 0);
+    if (Array.isArray(F.g)) f.g = [0, 1, 2, 3, 4].map(i => F.g[i] ? 1 : 0);   // 4.2.0 대축제에는 손님 다섯 곳
     for (const k of FV_KEYS) {
-      if (F.b && typeof F.b === 'object' && F.b[k]) f.b[k] = 1;
+      if (F.b && typeof F.b === 'object' && F.b[k]) f.b[k] = n(F.b[k], BIG.booth, 1);   // 4.2.0 대축제에는 부스 하루 두 번
       if (F.win && typeof F.win === 'object') { const w = n(F.win[k], 9999); if (w) f.win[k] = w; }
       if (F.own && typeof F.own === 'object' && F.own[k]) f.own[k] = 1;
     }
@@ -20043,7 +20056,7 @@ body.cam-scene #ffChip,body.cam-scene #plChip,body.cam-scene .b-ring{animation-p
   // 지섭 결정(2026-11-11 밤, 도토리가 남아돈다): 축제와 교환학생의 '수업료 N분치'는 학교급 배수(minAcorns) 없이 글자 그대로 N분치예요
   const fvPay = m => Math.max(10, nice(rate() * 60 * m));
   const fvWd = () => kstWd(gameToday());
-  const fvDay = () => FV.days.includes(fvWd());
+  const fvDay = () => FV.days.includes(fvWd()) || !!bfWin(gameToday());   // 4.2.0 대축제 사흘(마지막 금토일)도 축제 날
   const fvOpen = () => uniNow() && (S.f.union || 0) >= 1 && !!S.fv;
   const fvOn = () => fvOpen() && fvDay();
   const fvBonus = k => !!S && fvOn() && FV.bonus[fvWd()] === k;   // 요일 보너스: 월 소풍, 수 간식 뽑기, 금 발표회
@@ -20054,17 +20067,144 @@ body.cam-scene #ffChip,body.cam-scene #plChip,body.cam-scene .b-ring{animation-p
     if (on && !has) { const p = document.createElement('p'); p.className = 'fv-flag'; p.textContent = tx; anchor.after(p); }
     else if (!on && has) nx.remove();
   }
-  const fvNext = () => { const w = fvWd(); for (let i = 1; i <= 7; i++) if (FV.days.includes((w + i) % 7)) return FV_WD[(w + i) % 7] + '요일'; return ''; };
+  const fvNext = () => { const w = fvWd(); if (bfWin(gameToday())) return ''; for (let i = 1; i <= 7; i++) if (FV.days.includes((w + i) % 7)) return FV_WD[(w + i) % 7] + '요일'; return ''; };
+  /* ---------- 4.2.0 한 달에 한 번 대축제 (프로젝트 문서 '4.2.0 설계안 (한 달에 한 번 대축제)', 그림은 작업지시서 70) ----------
+     지섭 결정(2026-11-13): 매달 마지막 금, 토, 일 사흘. 대학교(학생회관 Lv.1)만. 달 장식은 다음 해 같은 달에 다시 받을 수 있어요. 마지막 단계 24개. 곡은 새로(지섭 Suno).
+     부스 하루 두 번, 손님 다섯 곳, 밤 20~24시 불꽃놀이, 사흘 동안 모으는 도장판. 매주 축제(월수금)는 그대로이고 사흘은 축제 날로 쳐요(fvDay).
+     숫자는 본부 제안이에요. 서버 규칙은 바꾸지 않아요 */
+  const BIG = { max: 24, dayMax: 10, booth: 2, guests: 5, guestSt: 2, fwFrom: 20, fwSec: 30, fwGoal: 16, fwWin: 3, fwLose: 1, fwEss: 5,
+    steps: [[4, 'm5', 3], [8, 'ess', 15], [12, 'm30', 1], [16, 'ess', 25], [20, 'gold', 1], [24, 'deco', 1]] };
+  const BF_SONG = false;   // 지섭이 대축제 곡(audio/bgm_bigfest.mp4)을 주면 켜요
+  const bfYmd = ms => new Date(ms).toISOString().slice(0, 10);
+  // 그 달 마지막 금요일(m은 1~12)
+  const bfFri = (y, m) => { const last = Date.UTC(y, m, 0); return bfYmd(last - ((new Date(last).getUTCDay() + 2) % 7) * 86400000); };
+  const bfMk = (y, m) => { const st = bfFri(y, m); return { key: `${y}-${String(m).padStart(2, '0')}`, mon: m, start: st, i: 0 }; };
+  // 날짜 t가 대축제 사흘 안이면 { key 그 달, mon 달, start 금요일, i 며칠째(0~2) }. 금요일이 그달 끝이면 토, 일은 다음 달 1, 2일이에요
+  function bfWin(t) {
+    if (!t) return null;
+    const y = +t.slice(0, 4), m = +t.slice(5, 7), d = dayNo(t);
+    for (const [yy, mm] of [[y, m], m === 1 ? [y - 1, 12] : [y, m - 1]]) { const w = bfMk(yy, mm), i = d - dayNo(w.start); if (i >= 0 && i <= 2) { w.i = i; return w; } }
+    return null;
+  }
+  // 다음 대축제(지금이 대축제 중이면 그것)
+  function bfNext(t) {
+    const w = bfWin(t); if (w) return w;
+    const y = +t.slice(0, 4), m = +t.slice(5, 7), a = bfMk(y, m);
+    return dayNo(a.start) > dayNo(t) ? a : bfMk(m === 12 ? y + 1 : y, m === 12 ? 1 : m + 1);
+  }
+  const bfMd = t => `${+t.slice(5, 7)}월 ${+t.slice(8, 10)}일`;
+  const bfNextTx = () => { const n = bfNext(gameToday()); return `다음 대축제 ${bfMd(n.start)}(금)부터 사흘`; };
+  const bfOn = () => !!S && !!S.bf && fvOpen() && !!bfWin(gameToday());
+  const bfFw = () => bfOn() && kstHour(gameNow()) >= BIG.fwFrom;   // 불꽃놀이는 밤 8시부터 자정까지
+  const bfDecoId = mon => 'deco_bf_' + String(mon).padStart(2, '0');
+  const freshBf = () => ({ mon: '', st: 0, got: [0, 0, 0, 0, 0, 0], day: '', dn: 0, o: 0, g2: 0, fw: 0, own: {}, eve: '', tip: '', auto: '' });
+  function sanitizeBf(d, s) {
+    const f = freshBf(), B = d && d.bf && typeof d.bf === 'object' ? d.bf : null; s.bf = f; if (!B) return;
+    const n = (v, hi) => typeof v === 'number' && isFinite(v) ? Math.max(0, Math.min(hi, Math.floor(v))) : 0;
+    const str = (v, k) => typeof v === 'string' ? v.slice(0, k) : '';
+    f.mon = str(B.mon, 7); f.day = str(B.day, 10); f.eve = str(B.eve, 7); f.tip = str(B.tip, 7); f.auto = str(B.auto, 7);
+    f.st = n(B.st, BIG.max); f.dn = n(B.dn, BIG.dayMax); f.o = B.o ? 1 : 0; f.g2 = B.g2 ? 1 : 0; f.fw = B.fw ? 1 : 0;
+    if (Array.isArray(B.got)) f.got = BIG.steps.map((_, i) => B.got[i] ? 1 : 0);
+    if (B.own && typeof B.own === 'object') for (let i = 1; i <= 12; i++) { const k = String(i).padStart(2, '0'); if (B.own[k]) f.own[k] = 1; }
+  }
+  function bfSync() {
+    if (!S || !S.bf) return;
+    const t = gameToday(), w = bfWin(t); let ch = false;
+    if (w && S.bf.mon !== w.key) { S.bf.mon = w.key; S.bf.st = 0; S.bf.got = BIG.steps.map(() => 0); ch = true; }   // 새 달 대축제는 빈 도장판으로
+    if (S.bf.day !== t) { S.bf.day = t; S.bf.dn = 0; S.bf.o = 0; S.bf.g2 = 0; S.bf.fw = 0; ch = true; }
+    if (ch) save();
+  }
+  const bfStampIc = px => { const u = IMG('ic_bf_stamp') || IMG('ic_fv_stamp'); return u ? `<img src="${u}" alt="" style="width:${px}px;height:${px}px">` : '🔖'; };
+  const bfDecoIc = (mon, px) => { const u = IMG(bfDecoId(mon)); return u ? `<img src="${u}" alt="" style="width:${px}px;height:${px}px;object-fit:contain">` : '🎁'; };
+  // 대축제 도장(하루 10개, 사흘 24개까지)을 찍고, 채운 단계의 보상을 바로 줘요
+  function bfStamp(n) {
+    const w = bfWin(gameToday()); if (!w || !S.bf) return [];
+    bfSync();
+    const add = Math.max(0, Math.min(n, BIG.dayMax - S.bf.dn, BIG.max - S.bf.st)); if (!add) return [];
+    S.bf.dn += add; S.bf.st += add;
+    const out = [{ ic: bfStampIc(18), t: `대축제 도장 +${add} (${S.bf.st}/${BIG.max})` }];
+    BIG.steps.forEach(([need, kind, amt], i) => {
+      if (S.bf.st < need || S.bf.got[i]) return;
+      S.bf.got[i] = 1;
+      if (kind === 'm5' || kind === 'm30') { S.tk[kind] = Math.min(SAVE_CAP.count, S.tk[kind] + amt); out.push({ ic: 'ticket', t: `도장 ${need}개: ${kind === 'm5' ? '5분권' : '30분권'} +${amt}` }); }
+      else if (kind === 'ess') { addEss(amt); out.push({ ic: 'ess', t: `도장 ${need}개: 숲의 정수 +${amt}` }); }
+      else if (kind === 'gold') { addGold(amt); out.push({ ic: 'gold', t: `도장 ${need}개: 황금 도토리 +${amt}` }); }
+      else { const k = String(w.mon).padStart(2, '0'), had = !!S.bf.own[k]; S.bf.own[k] = 1; if (S.deco && S.deco.own) S.deco.own[bfDecoId(w.mon)] = 1;
+        out.push({ ic: bfDecoIc(w.mon, 22), t: had ? `도장 ${need}개: ${BF_DECO[w.mon - 1]} (이미 있어요)` : `도장 ${need}개: ${w.mon}월 장식 '${BF_DECO[w.mon - 1]}' (꾸미기에서 놓아요)` }); }
+    });
+    return out;
+  }
+  // 축제 창 안 대축제 칸: 불꽃놀이와 도장판
+  function bfPart(w) {
+    const done = !!S.bf.fw, can = bfFw(), mm = String(w.mon).padStart(2, '0');
+    let h = `<p class="fv-bonus">${bfStampIc(16)}대축제! <b>부스 하루 두 번, 손님 다섯 곳</b></p>`;
+    h += '<h3 class="fv-h">밤 불꽃놀이</h3><div class="dp-list fv-list">' +
+      `<div class="dp-row${done ? ' on' : ''}"><span class="dp-ic">${IMG('bf_burst_gold') ? `<img src="${IMG('bf_burst_gold')}" alt="" style="width:38px;height:38px">` : '🎆'}</span><div class="dp-tx"><b>광장 불꽃놀이</b><small>불꽃 씨앗 ${BIG.fwGoal}개 누르기, ${BIG.fwSec}초</small><em>성공하면 숲의 정수 ${BIG.fwEss}</em></div>` +
+      (done ? '<span class="fe-lock">오늘 끝</span>' : can ? '<button class="cta small" type="button" data-fv="fw:1">하기</button>' : '<span class="fe-lock">밤 8시부터</span>') + '</div></div>';
+    h += `<h3 class="fv-h">대축제 도장판 <small>${S.bf.st}/${BIG.max}, 오늘 ${S.bf.dn}/${BIG.dayMax}</small></h3><div class="fv-board bf-board">` +
+      Array.from({ length: BIG.max }, (_, i) => { const stp = BIG.steps.find(x => x[0] === i + 1); return `<span class="fv-st${i < S.bf.st ? ' on' : ''}${stp ? ' gift' : ''}">${i < S.bf.st ? bfStampIc(22) : stp ? (stp[1] === 'deco' ? bfDecoIc(w.mon, 22) : stp[1] === 'ess' ? '✨' : stp[1] === 'gold' ? '🌰' : '🎫') : ''}</span>`; }).join('') + '</div>' +
+      '<p class="fv-steps">' + BIG.steps.map(([need, kind, amt], i) => `<span class="${S.bf.got[i] ? 'ok' : ''}">${need}개 ${kind === 'm5' ? `5분권 ${amt}장` : kind === 'm30' ? `30분권 ${amt}장` : kind === 'ess' ? `숲의 정수 ${amt}` : kind === 'gold' ? `황금 도토리 ${amt}` : `${w.mon}월 장식 '${BF_DECO[w.mon - 1]}'${S.bf.own[mm] ? '(있음)' : ''}`}</span>`).join('') + '</p>';
+    return h;
+  }
+  // 불꽃놀이 놀이 틀: 학교 행사 놀이(rt.fest)에 얹어요
+  function bfDef(id) {
+    if (id !== 'bf_fw') return null;
+    return { name: '대축제 불꽃놀이', sec: BIG.fwSec, goal: BIG.fwGoal, form: 'ring', item: 'bf_seed', how: 'rise', unit: '개', bf: 1, label: '불꽃 씨앗', hint: '떠오르는 불꽃 씨앗을 눌러 터뜨려요' };
+  }
+  function bfFwStart() {
+    bfSync();
+    if (!bfFw() || S.bf.fw || festBusy()) { if (bfOn() && !bfFw()) toast('불꽃놀이는 밤 8시부터 열려요'); return false; }
+    if (tr2Busy()) { toast(tr2Busy()); return false; }
+    const go = () => {
+      zoneGo('plaza'); setTab('school'); closeSheet();
+      $('#scroller').scrollTo({ top: 0, behavior: rt.reduced ? 'auto' : 'smooth' });
+      rt.fest = { id: 'bf_fw', t: BIG.fwSec, n: 0, spawn: 0.6, items: [], perf: 0, intro: 3 };
+      feverOn(true); festForm('ring');
+      S.bf.fw = 1;   // 시작하면 오늘 한 것으로 쳐요
+      $('#festBar').hidden = false;
+      festFocusNow(); renderFestBar(); musicSync(); buzz(20);
+      save(); renderFestBtn(); fvMap(true);
+    };
+    if (rt.modalOpen === $('#mFv')) closeModal($('#mFv'), go); else if (!rt.modalOpen) go(); else return false;
+    return true;
+  }
+  function bfFwEnd(R, F) {
+    const win = R.n >= F.goal, items = [];
+    if (win) { addEss(BIG.fwEss); items.push({ ic: 'ess', t: `숲의 정수 +${BIG.fwEss}` }); }
+    items.push(...bfStamp(win ? BIG.fwWin : BIG.fwLose));
+    sfx(win ? 'quest' : 'done'); buzz(20);
+    musicSync(); save(); renderHUD(); renderFestBtn(); fvMap(true);
+    const u = IMG('bf_burst_pink');
+    showReward({ title: win ? '불꽃놀이 대성공!' : '불꽃놀이 끝!', sub: win ? `불꽃 ${R.n}송이가 밤하늘에 펴졌어요` : `${F.goal - R.n}송이가 모자랐어요. 도장은 받아요`, art: u ? `<img src="${u}" alt="" style="width:120px;height:120px">` : '🎆', big: `${R.n}/${F.goal}개`, items });
+  }
+  // 누른 자리에 불꽃 한 송이(그림이 있을 때만)
+  function bfBurst(x, y) {
+    const ks = ['bf_burst_gold', 'bf_burst_pink', 'bf_burst_blue'].filter(k => IMG(k)); if (!ks.length) return;
+    const im = document.createElementNS(NS, 'image'), w = 64;
+    im.setAttribute('href', IMG(ks[Math.floor(Math.random() * ks.length)])); im.setAttribute('x', (x - w / 2).toFixed(1)); im.setAttribute('y', (y - w / 2).toFixed(1)); im.setAttribute('width', w); im.setAttribute('height', w);
+    im.setAttribute('pointer-events', 'none'); im.style.transformOrigin = `${x}px ${y}px`; im.style.transformBox = 'view-box'; layerFx.appendChild(im);
+    if (!rt.reduced && im.animate) im.animate([{ opacity: 0, transform: 'scale(.4)' }, { opacity: 1, transform: 'scale(1)', offset: 0.3 }, { opacity: 0, transform: 'scale(1.15)' }], { duration: 900, easing: 'ease-out' }).onfinish = () => im.remove();
+    else setTimeout(() => im.remove(), 600);
+  }
+  // 대축제 첫날 처음 들어오면 축제 창을 한 번 띄워요(시험판에서는 __BF_AUTO일 때만)
+  function bfAuto() {
+    if (!bfOn() || (window.__FOREST_TEST && !window.__BF_AUTO)) return;
+    const w = bfWin(gameToday());
+    if (S.bf.auto === w.key || rt.tab !== 'school' || rt.modalOpen || rt.paused || festBusy() || !S.tut.st || rt.talkSeq || rt.st) return;
+    S.bf.auto = w.key; save(); openFv();
+  }
   function fvSync() {
     if (!S || !S.fv) return;
     const wk = gameWeek(), t = gameToday(); let ch = false;
     if (S.fv.wk !== wk) { S.fv.wk = wk; S.fv.st = 0; S.fv.got = FV.steps.map(() => 0); ch = true; }   // 도장판은 매주 월요일 0시에 새로
-    if (S.fv.day !== t) { S.fv.day = t; S.fv.b = {}; S.fv.g = [0, 0, 0]; S.fv.o = 0; ch = true; }
+    if (S.fv.day !== t) { S.fv.day = t; S.fv.b = {}; S.fv.g = [0, 0, 0, 0, 0]; S.fv.o = 0; ch = true; }
+    bfSync();
     if (ch) save();
   }
   const fvBooths = () => deptPicks().filter(k => FV_B[k]);
   const fvItemImg = (k, px) => { const u = IMG('fv_item_' + k); return u ? `<img src="${u}" alt="" style="width:${px}px;height:${px}px;object-fit:contain">` : deptOf(k).em; };
-  const fvStampsToday = () => fvBooths().filter(k => S.fv.b[k]).length + (S.fv.g.filter(Boolean).length >= 3 ? 1 : 0) + (S.fv.o ? 1 : 0);
+  const fvStampsToday = () => fvBooths().filter(k => S.fv.b[k]).length + ([0, 1, 2].every(i => S.fv.g[i]) ? 1 : 0) + (S.fv.o ? 1 : 0);
+  const fvBoothMax = () => bfOn() ? BIG.booth : 1;   // 4.2.0 대축제에는 부스마다 하루 두 번
   // 도장을 찍고, 채운 단계의 보상을 바로 줘요
   function fvStamp(n) {
     const was = S.fv.st; S.fv.st = Math.min(FV.weekMax, S.fv.st + n);
@@ -20084,11 +20224,11 @@ body.cam-scene #ffChip,body.cam-scene #plChip,body.cam-scene .b-ring{animation-p
   const fvGuestSp = (t, i) => DEX_STUDENTS[dayHash('fv' + t + i) % DEX_STUDENTS.length];   // 손님 학교의 대표 동물: 날짜와 차례로 한 종
   function fvGuests() {
     const t = gameToday(), rows = (typeof Rank !== 'undefined' && Rank.state === 'on' && !tossRank() ? Rank.rows || [] : []).filter(r => r.id !== Rank.uid && !r.test && !r.nx).slice(0, 50);
-    const key = t + '|' + rows.length + '|' + (rows[0] ? rows[0].id : '');
+    const gn = bfOn() ? BIG.guests : 3, key = t + '|' + gn + '|' + rows.length + '|' + (rows[0] ? rows[0].id : '');
     if (rt.fvGs && rt.fvGs.key === key) return rt.fvGs.list;
     const dn = Math.floor(Date.parse(t + 'T00:00:00Z') / 86400000), list = [];
-    if (rows.length >= 3) for (let i = 0; i < 3; i++) { const r = rows[(dn * 3 + i) % rows.length]; list.push({ id: r.id, who: r.name, sch: rankSchool(r.tier, r.year, r.sem), real: true, sp: fvGuestSp(t, i) }); }
-    else for (let i = 0; i < 3; i++) { const f = FV_FAKE[(dn * 3 + i) % FV_FAKE.length]; list.push({ id: '', who: f[0], sch: rankSchool(f[1], f[2], null), real: false, sp: fvGuestSp(t, i) }); }
+    if (rows.length >= gn) for (let i = 0; i < gn; i++) { const r = rows[(dn * 3 + i) % rows.length]; list.push({ id: r.id, who: r.name, sch: rankSchool(r.tier, r.year, r.sem), real: true, sp: fvGuestSp(t, i) }); }
+    else for (let i = 0; i < gn; i++) { const f = FV_FAKE[(dn * 3 + i) % FV_FAKE.length]; list.push({ id: '', who: f[0], sch: rankSchool(f[1], f[2], null), real: false, sp: fvGuestSp(t, i) }); }
     rt.fvGs = { key, list };
     return list;
   }
@@ -20100,6 +20240,7 @@ body.cam-scene #ffChip,body.cam-scene #plChip,body.cam-scene .b-ring{animation-p
     fvSync(); sfx('tap');
     let news = [];
     if (fvOn() && !S.fv.o) { S.fv.o = 1; news = fvStamp(1); save(); }   // 축제 날 창을 열면 도장 하나
+    if (bfOn() && !S.bf.o) { S.bf.o = 1; news = news.concat(bfStamp(1)); save(); }   // 4.2.0 대축제 도장도 하나
     renderFv();
     if (rt.modalOpen !== $('#mFv')) openModal($('#mFv'));
     if (news.length) toast(news.map(x => x.t).join('\n'));
@@ -20107,16 +20248,18 @@ body.cam-scene #ffChip,body.cam-scene #plChip,body.cam-scene .b-ring{animation-p
   function renderFv() {
     const m = $('#mFv'); if (!m || !S || !S.fv) return;
     fvSync();
-    const on = fvOn(), hu = IMG('fv_head'), hd = $('#fvHead');
+    const on = fvOn(), bw = on && bfOn() ? bfWin(gameToday()) : null, hu = (bw && IMG('bf_head')) || IMG('fv_head'), hd = $('#fvHead');
     hd.classList.toggle('art', !!hu); hd.style.backgroundImage = hu ? `url("${blobUrl(hu)}")` : '';
-    setT($('#fvDayTx'), on ? '오늘 축제 중' : `다음 축제 ${fvNext()}`);
+    setT($('#fvTitle'), bw ? '숲속 대학교 대축제' : '대학 축제');
+    setT($('#fvDayTx'), bw ? `대축제 ${bw.i + 1}일째 (사흘 중)` : on ? '오늘 축제 중' : `다음 축제 ${fvNext()}`);
     let h = '';
     if (on) {
       const bn = FV.bonus[fvWd()];
-      h += `<p class="fv-bonus">${fvStampIc(16)}오늘의 보너스 <b>${FV.bonusTx[bn]}</b></p>`;
+      if (bn) h += `<p class="fv-bonus">${fvStampIc(16)}오늘의 보너스 <b>${FV.bonusTx[bn]}</b></p>`;
+      if (bw) h += bfPart(bw);
       h += '<h3 class="fv-h">단과대학 부스</h3><div class="dp-list fv-list">' + (fvBooths().map(k => {
-        const D = deptOf(k), done = !!S.fv.b[k], w = S.fv.win[k] || 0, own = !!S.fv.own[k];
-        return `<div class="dp-row${done ? ' on' : ''}"><span class="dp-ic">${fvItemImg(k, 38)}</span><div class="dp-tx"><b>${D.name} 부스</b><small>${FV_B[k].nm} ${FV.goal}개 누르기, ${FV.sec}초</small><em>${own ? '기념품 받음' : `기념품까지 ${Math.min(w, FV.win)}/${FV.win}`}</em></div>` +
+        const D = deptOf(k), bn = S.fv.b[k] || 0, done = bn >= fvBoothMax(), w = S.fv.win[k] || 0, own = !!S.fv.own[k];
+        return `<div class="dp-row${done ? ' on' : ''}"><span class="dp-ic">${fvItemImg(k, 38)}</span><div class="dp-tx"><b>${D.name} 부스</b><small>${FV_B[k].nm} ${FV.goal}개 누르기, ${FV.sec}초${fvBoothMax() > 1 ? `, 오늘 ${bn}/${fvBoothMax()}번` : ''}</small><em>${own ? '기념품 받음' : `기념품까지 ${Math.min(w, FV.win)}/${FV.win}`}</em></div>` +
           (done ? '<span class="fe-lock">오늘 끝</span>' : `<button class="cta small" type="button" data-fv="booth:${k}">하기</button>`) + '</div>';
       }).join('') || '<p class="dp-note">학과 사무실에서 단과대학을 고르면 부스가 서요</p>') + '</div>';
       const gs = fvGuests(), fl = IMG('fv_flag');
@@ -20127,6 +20270,7 @@ body.cam-scene #ffChip,body.cam-scene #plChip,body.cam-scene .b-ring{animation-p
           (met ? '<span class="fe-lock">만났어요</span>' : `<button class="cta small" type="button" data-fv="meet:${i}">만나기</button>`) + '</div>';
       }).join('') + '</div>';
     } else h += `<p class="dp-note">축제는 매주 월, 수, 금요일에 열려요</p>`;
+    if (!bw) h += `<p class="dp-note">${bfNextTx()}</p>`;
     h += `<h3 class="fv-h">이번 주 도장판 <small>${S.fv.st}/${FV.weekMax}</small></h3><div class="fv-board">` +
       Array.from({ length: FV.weekMax }, (_, i) => { const stp = FV.steps.find(x => x[0] === i + 1); return `<span class="fv-st${i < S.fv.st ? ' on' : ''}${stp ? ' gift' : ''}">${i < S.fv.st ? fvStampIc(26) : stp ? (stp[1] === 'tk' ? '🎫' : stp[1] === 'ess' ? '✨' : '🌰') : ''}</span>`; }).join('') + '</div>' +
       '<p class="fv-steps">' + FV.steps.map(([need, kind, amt], i) => `<span class="${S.fv.got[i] ? 'ok' : ''}">${need}개 ${kind === 'tk' ? `5분권 ${amt}장` : kind === 'ess' ? `숲의 정수 ${amt}` : `황금 도토리 ${amt}`}</span>`).join('') + '</p>';
@@ -20136,6 +20280,7 @@ body.cam-scene #ffChip,body.cam-scene #plChip,body.cam-scene .b-ring{animation-p
     const b = e.target.closest('[data-fv]'); if (!b) return;
     const [v, a] = b.dataset.fv.split(':');
     if (v === 'booth') fvBoothStart(a);
+    else if (v === 'fw') bfFwStart();
     else if (v === 'meet') { fvMeet(+a); renderFv(); }
     else if (v === 'look') { const g = fvGuests()[+a]; if (g && g.real) closeModal($('#mFv'), () => openLook(g.id, g.who)); }
   }
@@ -20146,7 +20291,8 @@ body.cam-scene #ffChip,body.cam-scene #plChip,body.cam-scene .b-ring{animation-p
     S.fv.g[i] = 1;
     const v = fvPay(FV.guestMin); S.budget += v; earn(v);
     const items = [{ ic: 'acorn', t: `도토리 +${fmt(v)}` }];
-    if ([0, 1, 2].every(j => S.fv.g[j])) items.push(...fvStamp(1));
+    if (i < 3 && [0, 1, 2].every(j => S.fv.g[j])) items.push(...fvStamp(1));
+    if (bfOn() && !S.bf.g2 && fvGuests().every((_, j) => S.fv.g[j])) { S.bf.g2 = 1; items.push(...bfStamp(BIG.guestSt)); }   // 4.2.0 대축제 손님 다섯 곳 모두
     sfx('coin'); save(); renderHUD(); fvMap(true);
     toast(`${g.who} 교장 선생님이 선물을 줬어요\n` + items.map(x => x.t).join('\n'));
     return true;
@@ -20156,11 +20302,11 @@ body.cam-scene #ffChip,body.cam-scene #plChip,body.cam-scene .b-ring{animation-p
     const k = typeof id === 'string' && id.startsWith('fv_') ? id.slice(3) : '', B = FV_B[k]; if (!B) return null;
     return { name: `${deptOf(k).name} 부스`, sec: FV.sec, goal: FV.goal, form: 'free', item: id, how: B.how, unit: '개', fv: k, label: B.nm, hint: `${FV_HOW[B.how]} ${B.nm}${batchim(B.nm) ? '을' : '를'} 눌러요` };
   }
-  function festDef(id) { return FEST[id] || fvDef(id); }
+  function festDef(id) { return FEST[id] || fvDef(id) || bfDef(id); }
   function fvBoothStart(k) {
     fvSync();
     if (!fvOn() || !FV_B[k] || !fvBooths().includes(k) || festBusy()) return false;
-    if (S.fv.b[k]) { toast('이 부스는 오늘 다 놀았어요'); return false; }
+    if ((S.fv.b[k] || 0) >= fvBoothMax()) { toast('이 부스는 오늘 다 놀았어요'); return false; }
     if (tr2Busy()) { toast(tr2Busy()); return false; }
     const go = () => {
       zoneGo('plaza');
@@ -20168,7 +20314,7 @@ body.cam-scene #ffChip,body.cam-scene #plChip,body.cam-scene .b-ring{animation-p
       $('#scroller').scrollTo({ top: 0, behavior: rt.reduced ? 'auto' : 'smooth' });
       rt.fest = { id: 'fv_' + k, t: FV.sec, n: 0, spawn: 0.6, items: [], perf: 0, intro: 3 };
       feverOn(true);
-      S.fv.b[k] = 1;   // 시작하면 오늘 한 것으로 쳐요(다시 하기 없음)
+      S.fv.b[k] = (S.fv.b[k] || 0) + 1;   // 시작하면 오늘 한 것으로 쳐요(다시 하기 없음). 4.2.0 대축제에는 하루 두 번
       $('#festBar').hidden = false;
       festFocusNow(); renderFestBar(); musicSync(); buzz(20);
       save(); renderFestBtn(); fvMap(true);
@@ -20188,7 +20334,8 @@ body.cam-scene #ffChip,body.cam-scene #plChip,body.cam-scene .b-ring{animation-p
         const u = IMG('deco_fv_' + k); items.push({ ic: u ? `<img src="${u}" alt="" style="width:22px;height:22px">` : '🎁', t: `기념품 '${FV_SV[k]}' (꾸미기에서 놓아요)` });
       }
     }
-    items.push(...fvStamp(1));
+    if ((S.fv.b[k] || 0) <= 1) items.push(...fvStamp(1));   // 매주 도장판은 부스마다 하루 한 번
+    if (bfOn()) items.push(...bfStamp(1));   // 4.2.0 대축제 도장은 판마다
     sfx(win ? 'quest' : 'done'); buzz(20);
     musicSync(); save(); renderHUD(); renderFestBtn(); fvMap(true);
     const u = IMG('fv_booth_' + k);
@@ -20199,13 +20346,13 @@ body.cam-scene #ffChip,body.cam-scene #plChip,body.cam-scene .b-ring{animation-p
     const g = $('#fvG'), top = $('#fvTop'); if (!g || !top || !S) return;
     const on = !!S.fv && fvOn() && uniOn() && geo().zone === 'plaza' && rt.viewTier == null && !rt.decoEdit;
     const bs = on ? fvBooths() : [], gs = on ? fvGuests() : [], night = on && isNight();
-    const key = !on ? '' : [gameToday(), bs.map(k => k + (S.fv.b[k] ? 1 : 0)).join(), gs.map((x, i) => x.who + x.sp + (S.fv.g[i] ? 1 : 0)).join(), night ? 'n' : 'd', rt.fest ? 'p' : ''].join('|');
+    const key = !on ? '' : [gameToday(), bs.map(k => k + (S.fv.b[k] || 0)).join(), gs.map((x, i) => x.who + x.sp + (S.fv.g[i] ? 1 : 0)).join(), night ? 'n' : 'd', rt.fest ? 'p' : ''].join('|');
     if (!force && g.dataset.key === key) return; g.dataset.key = key;
     if (!on) { g.innerHTML = ''; top.innerHTML = ''; return; }
     const im = (k, x, y, w, ar) => IMG(k) ? `<image href="${IMG(k)}" x="${(x - w / 2).toFixed(1)}" y="${(y - w * ar).toFixed(1)}" width="${w}" height="${(w * ar).toFixed(1)}"/>` : '';
     let h = im('fv_stage', ...FV_POS.stage, 1);
     FV_POS.lamp.forEach(([x, y, w]) => { h += im('fv_lamp', x, y, w, 2); });
-    bs.forEach((k, i) => { const [x, y, w] = FV_POS.booth[i]; const done = !!S.fv.b[k];
+    bs.forEach((k, i) => { const [x, y, w] = FV_POS.booth[i]; const done = (S.fv.b[k] || 0) >= fvBoothMax();
       h += `<g class="fv-booth${done ? ' done' : ''}" data-fvb="${k}" role="button" tabindex="0" aria-label="${deptOf(k).name} 부스${done ? ', 오늘 끝' : ', 눌러서 축제 창 열기'}">${im('fv_booth_' + k, x, y, w, 1)}` + (done ? '' : `<g class="fv-pin" transform="translate(${x} ${y - w - 2})"><circle r="6.5"/><text y="3.2">!</text></g>`) + '</g>'; });
     if (!rt.fest) gs.forEach((x, i) => { const [fx, fy] = FV_POS.flag[i], met = !!S.fv.g[i], nm = x.who.length > 6 ? x.who.slice(0, 6) + '…' : x.who;
       h += `<g class="fv-guest${met ? ' met' : ''}" data-fvg="${i}" role="button" tabindex="0" aria-label="${esc(x.who)} 교장 선생님의 ${esc(x.sch)}${met ? ', 만났어요' : ', 눌러서 만나기'}">${im('fv_flag', fx, fy, 24, 1.5)}${im('chr_' + x.sp, fx + 15, fy + 1, 17, 1 / (CHR_AR['chr_' + x.sp] || 0.7))}<circle class="fv-hit" cx="${fx}" cy="${fy - 18}" r="19"/>` +
@@ -20226,14 +20373,27 @@ body.cam-scene #ffChip,body.cam-scene #plChip,body.cam-scene .b-ring{animation-p
   // 대학교가 아닌 학교에는 한 주에 한 번, 그 주 처음 켠 축제 날에만 아래 탭 위에 작은 띠를 보여 줘요(X로 닫아요)
   function fvTip() {
     const el = $('#fvTip'); if (!el || !S || !S.fv) return;
-    const wk = gameWeek(), t = gameToday();
-    let show = !uniNow() && fvDay() && S.fv.tip !== wk && !!S.tut.st && rt.tab === 'school' && !festBusy();
-    if (show && S.fv.td !== t) { if (S.fv.td && weekMon(S.fv.td) === weekMon(t)) show = false; else { S.fv.td = t; save(); } }
-    if (el.hidden === show) { el.hidden = !show; if (show) { const u = IMG('ic_fv'); setH($('#fvTipIc'), u ? `<img src="${u}" alt="">` : '🎪'); } }
+    const wk = gameWeek(), t = gameToday(), base = !!S.tut.st && rt.tab === 'school' && !festBusy();
+    // 4.2.0 대축제: 대학교에는 전날 한 줄, 다른 학교에는 첫날부터 달에 한 번. 매주 축제 띠보다 먼저
+    const bw = S.bf ? bfWin(t) : null, bn = S.bf && !bw ? bfNext(t) : null;
+    let kind = '';
+    if (base && bw && !uniNow() && S.bf.tip !== bw.key) kind = 'bftip';
+    else if (base && bn && fvOpen() && dayNo(bn.start) - dayNo(t) === 1 && S.bf.eve !== bn.key) kind = 'bfeve';
+    else {
+      let show = !uniNow() && fvDay() && S.fv.tip !== wk && base;
+      if (show && S.fv.td !== t) { if (S.fv.td && weekMon(S.fv.td) === weekMon(t)) show = false; else { S.fv.td = t; save(); } }
+      if (show) kind = 'fv';
+    }
+    const show = !!kind;
+    if (el.hidden === show || rt.fvTipK !== kind) {
+      el.hidden = !show; rt.fvTipK = kind;
+      if (show) { const bfk = kind.startsWith('bf'), u = (bfk && IMG('ic_bf')) || IMG('ic_fv'); setH($('#fvTipIc'), u ? `<img src="${u}" alt="">` : '🎪');
+        setT($('#fvTipTx'), kind === 'bftip' ? '숲속 대학교에서 대축제가 열렸어요' : kind === 'bfeve' ? '내일부터 사흘 동안 대축제가 열려요' : '숲속 대학교는 지금 축제 중이에요'); }
+    }
   }
   function fvTick() {
     if (!S || !S.fv) return;
-    fvSync(); fvMap(); fvTip();
+    fvSync(); fvMap(); fvTip(); bfAuto();
     if (rt.modalOpen === $('#mFv') && rt.fvKey !== gameToday()) { rt.fvKey = gameToday(); renderFv(); }
   }
 
@@ -23743,7 +23903,7 @@ body.cam-scene #ffChip,body.cam-scene #plChip,body.cam-scene .b-ring{animation-p
     $('#mFv').addEventListener('click', fvClick);
     $('#fvClose').addEventListener('click', () => { sfx('tap'); closeModal($('#mFv')); });
     $('#fvG').addEventListener('click', fvMapTap); $('#fvG').addEventListener('keydown', fvMapTap);
-    $('#fvTipX').addEventListener('click', () => { sfx('tap'); S.fv.tip = gameWeek(); save(); fvTip(); });
+    $('#fvTipX').addEventListener('click', () => { sfx('tap'); const k = rt.fvTipK; if (k && k.startsWith('bf')) S.bf[k === 'bfeve' ? 'eve' : 'tip'] = (bfWin(gameToday()) || bfNext(gameToday())).key; else S.fv.tip = gameWeek(); save(); fvTip(); });
     // 4.1.0 교환학생, 장터, 이야기
     $('#mXg').addEventListener('click', xgClick); $('#xgClose').addEventListener('click', () => { sfx('tap'); closeModal($('#mXg')); });
     $('#mMk').addEventListener('click', mkClick); $('#mkClose').addEventListener('click', () => { sfx('tap'); closeModal($('#mMk')); });
@@ -24976,6 +25136,7 @@ body.cam-scene #ffChip,body.cam-scene #plChip,body.cam-scene .b-ring{animation-p
   // 4.0.0 단과대학 장식 8개 모으기(대학교가 열렸을 때만 보여요). 숫자와 칭호는 제안값
   if (UNI_Q) ACH.push({ id: 'college', name: '단과대학', goals: [1, 2, 4, 6, 8], title: '숲속 종합대학', ic: 'ic_col_edu', t: n => n >= 8 ? '단과대학 8곳 모두 다녀 보기' : `단과대학 ${n}곳 다녀 보기`, v: () => S.dp && S.dp.own ? Object.keys(S.dp.own).filter(k => deptOf(k)).length : 0 });
   // 4.1.0 대학 축제 부스 기념품 8종 모으기(대학교가 열렸을 때만 보여요). 숫자는 단과대학 업적과 같게(제안값)
+  if (UNI_Q) ACH.push({ id: 'bfown', name: '대축제', goals: [1, 3, 6, 9, 12], title: '사계절 축제왕', ic: 'ic_bf', t: n => n >= 12 ? '대축제 달 장식 12종 모두 모으기' : `대축제 달 장식 ${n}종 모으기`, v: () => S.bf && S.bf.own ? Object.keys(S.bf.own).filter(k => S.bf.own[k]).length : 0 });   // 4.2.0
   if (UNI_Q) ACH.push({ id: 'fvown', name: '대학 축제', goals: [1, 2, 4, 6, 8], title: '축제의 달인', ic: 'ic_fv', t: n => n >= 8 ? '부스 기념품 8종 모두 모으기' : `부스 기념품 ${n}종 모으기`, v: () => S.fv && S.fv.own ? Object.keys(S.fv.own).filter(k => S.fv.own[k]).length : 0 });
   const ACH_EM = { counsel: '🐘', selfstudy: '🌙', rare: '✨', students: '🐰', grad: '🎓', building: '🏫', teacher: '🦔', quest: '📝', puzzle: '🧩', dex: '📖', fest: '🎈', attend: '📅', trip: '🚌', gold: '🌰', rank: '🏆', deco: '🪴', lab: '🧪', battle: '⚔️', league: '🏅' , donate: '🌳', snack: '🍪' };
   const ACH_RANK_TITLE = true;   // 랭킹 서버에 칭호를 올려요. 서버 규칙(database.rules.json)의 title 칸을 Firebase 콘솔에 게시해야 해요(1.7.1)
@@ -26091,7 +26252,7 @@ body.cam-scene #ffChip,body.cam-scene #plChip,body.cam-scene .b-ring{animation-p
   }
 
   // 시험용 손잡이: 자동 시험(window.__FOREST_TEST)에서만 게임 속 함수를 꺼내 써요
-  if (window.__FOREST_TEST) window.__forest = { get S() { return S; }, bldBox, bldPick, bldWarm, DECO_SLOTS, XG, MK, ST, SIDE, ST_SIDE, wdMap, xgOn, xgGuest, xgSpots, xgGreet, xgVisit, xgLunch, openXg, mkOn, mkHot, mkSell, mkBuy, mkSur, openMk, wdBar, wdTick, stTick, stPlay, stNext, stPick, stEnd, stTags, openSb, renderSb, sideCan, sideMap, fvFlag, FV, FV_POS, fvOn, fvOpen, fvBonus, fvSync, fvStamp, fvGuests, openFv, renderFv, fvMeet, fvBoothStart, fvMap, fvTip, festDef, goTo, navInfo, openShop, gdReady, thPreview, thPreviewEnd, thOn, busScene, tripCrowd, openTrip, startTrip, claimTrip, TRIPS, mgPickMul, mgPickMode, mgUpOrder, mgFillOrders, mgAdAsk, sportsCon, festCon, btQuota, btCanAd, btAdMore, warmRooms, blobUrl, vdSize, vdBlock, pzSweep, pzSwGain, pzSwOpen, pzXpOf, mgMulMax, mgMulOk, mgMul, mgModeTap, acTip, kidDupIdx, trialSafe, closeAd,
+  if (window.__FOREST_TEST) window.__forest = { get S() { return S; }, BIG, BF_DECO, bfWin, bfNext, bfOn, bfFw, bfSync, bfStamp, bfFwStart, bfPart, bfNextTx, sanitizeBf, freshBf, fvBoothMax, bldBox, bldPick, bldWarm, DECO_SLOTS, XG, MK, ST, SIDE, ST_SIDE, wdMap, xgOn, xgGuest, xgSpots, xgGreet, xgVisit, xgLunch, openXg, mkOn, mkHot, mkSell, mkBuy, mkSur, openMk, wdBar, wdTick, stTick, stPlay, stNext, stPick, stEnd, stTags, openSb, renderSb, sideCan, sideMap, fvFlag, FV, FV_POS, fvOn, fvOpen, fvBonus, fvSync, fvStamp, fvGuests, openFv, renderFv, fvMeet, fvBoothStart, fvMap, fvTip, festDef, goTo, navInfo, openShop, gdReady, thPreview, thPreviewEnd, thOn, busScene, tripCrowd, openTrip, startTrip, claimTrip, TRIPS, mgPickMul, mgPickMode, mgUpOrder, mgFillOrders, mgAdAsk, sportsCon, festCon, btQuota, btCanAd, btAdMore, warmRooms, blobUrl, vdSize, vdBlock, pzSweep, pzSwGain, pzSwOpen, pzXpOf, mgMulMax, mgMulOk, mgMul, mgModeTap, acTip, kidDupIdx, trialSafe, closeAd,
     TKE, TK_Q, tkDaily, nbAllDay, nbBuildAt, nbOn, conAdd, BX_SPOT, PERKS, offlineCapH, applyAway, pzFinish, mgClaimOrder,
     CS, JOBS, CS_WORRY, freshCs, csOpen, csLeft, csMax, csEnsure, csCands, csNeed, csMul, csOpenCards, csReady, csDone, csTalkMake, csAnswer, csChoose, csSettle, openCounsel, renderCounsel, renderHall, MAIN, qMeasure, qGoal, sanitize,   // 3.1.0 진로 상담
     NSL, nsStart, nsSettle, nsOpen, nsOn, nsOverlap, nsExtraH, isNight, nightDayOf, openNs, renderNs, bxSpots, renderNight,   // 3.0.0
