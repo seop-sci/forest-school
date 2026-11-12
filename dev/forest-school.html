@@ -9173,8 +9173,10 @@ body.cam-scene #ffChip,body.cam-scene #plChip,body.cam-scene .b-ring{animation-p
       rt.sortT = 0;
       // 3.2.6 끊김: 예전에는 순서가 그대로여도 0.5초마다 학생 그림을 모두 빼서 다시 넣었어요(화면 배치를 다시 셈). 순서가 바뀐 때만 옮겨요
       const ord = rt.kids.slice().sort((a, b) => a.y - b.y);
+      // 4.1.2 지섭 제보: 학예회 무대, 조명 그늘, 환영회 줄 장식(.kfloor)은 학생 층 맨 아래에 있어요. 학생은 그 뒤부터 줄 세워요(전에는 맨 앞에 끼워 넣어 무대가 학생을 가렸어요)
+      const fl = layerKids.querySelectorAll(':scope > .kfloor'), floor = fl.length ? fl[fl.length - 1] : null;
       let prev = null;
-      for (const k of ord) { const want = prev ? prev.g.nextSibling : layerKids.firstChild; if (k.g !== want) layerKids.insertBefore(k.g, want); prev = k; }
+      for (const k of ord) { const want = prev ? prev.g.nextSibling : floor ? floor.nextSibling : layerKids.firstChild; if (k.g !== want) layerKids.insertBefore(k.g, want); prev = k; }
     }
   }
 
@@ -19834,7 +19836,7 @@ body.cam-scene #ffChip,body.cam-scene #plChip,body.cam-scene .b-ring{animation-p
     const old = $('#festLighting'); if (old) old.remove();
     if (!on) return;
     const g = document.createElementNS(NS, 'g');
-    g.id = 'festLighting'; g.setAttribute('aria-hidden', 'true');
+    g.id = 'festLighting'; g.setAttribute('class', 'kfloor'); g.setAttribute('aria-hidden', 'true');
     g.setAttribute('pointer-events', 'none');
     g.innerHTML = `<defs><radialGradient id="festShade" gradientUnits="userSpaceOnUse" cx="${pzx()}" cy="${pzy()-20}" r="155"><stop offset="0" stop-color="#17283a" stop-opacity="0"/><stop offset="1" stop-color="#17283a" stop-opacity=".55"/></radialGradient></defs><rect x="0" y="-60" width="360" height="540" fill="url(#festShade)"/><path class="fest-light-beam" d="M${pzx()-38} ${pzy()-100} L${pzx()-55} ${pzy()+10} L${pzx()+5} ${pzy()+10} Z" fill="#fff0a4" opacity=".3"/><path class="fest-light-beam alt" d="M${pzx()+38} ${pzy()-100} L${pzx()-5} ${pzy()+10} L${pzx()+55} ${pzy()+10} Z" fill="#ffc8d8" opacity=".3"/>`;
     if (rt.reduced) g.querySelectorAll('.fest-light-beam').forEach(e => e.style.animation = 'none');
@@ -19844,7 +19846,7 @@ body.cam-scene #ffChip,body.cam-scene #plChip,body.cam-scene .b-ring{animation-p
     const old = $('#festStage'); if (old) old.remove();
     if (!on) return;
     const g = document.createElementNS(NS, 'g');
-    g.id = 'festStage'; g.setAttribute('aria-hidden', 'true');
+    g.id = 'festStage'; g.setAttribute('class', 'kfloor'); g.setAttribute('aria-hidden', 'true');
     g.setAttribute('transform', `translate(${pzx() - 180} ${pzy() - 212})`);
     if (IMG('fest_stage')) g.innerHTML = `<image href="${IMG('fest_stage')}" x="128" y="${(210 - 104 * 0.684).toFixed(1)}" width="104" height="${(104 * 0.684).toFixed(1)}"/>`; else   // 1.7.1 그림 무대
     g.innerHTML = '<rect x="140" y="186" width="80" height="22" rx="3" fill="#8A5D3B"/><rect x="140" y="186" width="80" height="4" fill="#A8743C"/>' +
@@ -19856,7 +19858,7 @@ body.cam-scene #ffChip,body.cam-scene #plChip,body.cam-scene .b-ring{animation-p
     const old = $('#festGarland'); if (old) old.remove();
     if (!on || !IMG('fest_garland')) return;
     const g = document.createElementNS(NS, 'g');
-    g.id = 'festGarland'; g.setAttribute('aria-hidden', 'true');
+    g.id = 'festGarland'; g.setAttribute('class', 'kfloor'); g.setAttribute('aria-hidden', 'true');
     g.innerHTML = `<image href="${IMG('fest_garland')}" x="${(pzx() - 70).toFixed(1)}" y="${(pzy() - 50).toFixed(1)}" width="140" height="${(140 * 0.185).toFixed(1)}"/>`;
     layerKids.insertBefore(g, layerKids.firstChild);
   }
