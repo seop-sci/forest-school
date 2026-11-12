@@ -521,6 +521,8 @@ label.srow,button.srow{cursor:pointer}
 .rk-name .rk-tag.me{background:var(--accent);color:var(--accent-ink)}
 .rk-school{font-size:12.5px;color:var(--muted);overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
 .rk-score{font-family:var(--font-chalk);font-weight:700;font-size:20px;font-variant-numeric:tabular-nums}
+.rk-del{align-self:flex-start;margin-top:3px;padding:1px 9px;border:1.5px solid var(--danger);border-radius:999px;background:transparent;color:var(--danger);font:inherit;font-size:12px;line-height:1.6;cursor:pointer}   /* 4.1.2 관리자만: 랭킹 줄 지우기 */
+.rk-del.sure{background:var(--danger);color:#FFFFFF}
 .rank-empty{margin:12px 4px 0;font-size:13.5px;line-height:1.55;color:var(--muted)}
 /* 계정 학교 고르기, 테스트 현황 */
 .move-from{margin:4px 0 12px;padding:12px 14px;border-radius:14px;background:var(--card);display:flex;flex-direction:column;gap:2px}
@@ -13474,6 +13476,7 @@ body.cam-scene #ffChip,body.cam-scene #plChip,body.cam-scene .b-ring{animation-p
       },
       put: doc => ref.child(uid).set(Object.assign({}, doc, { at: Cloud.fb.database.ServerValue.TIMESTAMP })),
       remove: () => ref.child(uid).remove(),
+      removeOther: id => ref.child(id).remove(),   // 4.1.2 관리자만(서버 규칙이 forest/adminUids 계정의 지우기만 받아 줘요)
       lookPut: d => Cloud.db.ref('forest/look/' + uid).set({ d, at: Cloud.fb.database.ServerValue.TIMESTAMP }),   // 2.1.3 다른 학교 구경(서버 규칙 forest/look)
       lookDel: () => Cloud.db.ref('forest/look/' + uid).remove(),
       lookGet: id => Cloud.db.ref('forest/look/' + id).once('value').then(x => x.val()),
@@ -13791,10 +13794,22 @@ body.cam-scene #ffChip,body.cam-scene #plChip,body.cam-scene .b-ring{animation-p
     }
     return v;
   }
+  /* 4.1.2 관리자(forest/adminUids)가 랭킹의 엉뚱한 줄을 지워요. 규칙은 4.1.1에 들어 있어요(지우기만, 고치기는 안 돼요).
+     실시간으로 듣고 있어서 지우면 순위표가 저절로 다시 그려져요. 그 계정이 다시 올리는 것까지 막지는 못해요(차단 목록은 아직 없어요) */
+  async function rankAdminDel(id) {
+    if (!rt.isAdmin || !id || id === Rank.uid || !Rank.be || !Rank.be.removeOther) return;
+    if (rt.rkDel !== id) { rt.rkDel = id; clearTimeout(rt.rkDelT); rt.rkDelT = setTimeout(() => { rt.rkDel = ''; renderRankPanel(); }, 5000); renderRankPanel(); return; }
+    clearTimeout(rt.rkDelT); rt.rkDel = '';
+    try { await waitFor(Rank.be.removeOther(id), CLOUD_WAIT); toast('랭킹에서 그 줄을 지웠어요'); }
+    catch (e) { toast(cloudErrKey(e) === 'rules' ? '지우지 못했어요. 새 서버 규칙을 게시했는지 봐 주세요' : '지우지 못했어요. ' + CLOUD_ERR.net); }
+    renderRankPanel();
+  }
   function renderRankPanel() {
     if (!S || rt.tab !== 'rank') return;
     lgWeek();
     rsSync();
+    // 4.1.2 관리자 랭킹 줄 지우기: 개발자 메뉴가 있는 판(웹)에서만, 켠 뒤 한 번만 관리자인지 물어봐요
+    if (!rt.admChk && !AIT && !window.FOREST_STORE && cloudOn()) { rt.admChk = true; checkAdmin().then(() => { if (rt.isAdmin) renderRankPanel(); }).catch(() => {}); }
     const mode = tossRank() ? 'all' : (['all', 'bt', 'sea'].includes(rt.rankView) ? rt.rankView : 'week'), wk = mode === 'week', bm = mode === 'bt', sea = mode === 'sea';   // 2.0.1 대결 순위, 2.1.3 시즌
     $('#rankView').hidden = tossRank();
     $$('#rankView [data-rv]').forEach(b => b.setAttribute('aria-checked', String(b.dataset.rv === mode)));
@@ -13850,7 +13865,8 @@ body.cam-scene #ffChip,body.cam-scene #plChip,body.cam-scene .b-ring{animation-p
           `<button class="btn-sub rl-model" type="button" data-look="model">예시 학교 구경하기</button><p class="fine">랭킹의 학교 이름을 누르면 그 학교를 구경해요(보여 주기를 켠 학교만)</p>`; } }
     // 순위표: 이름은 다른 사람이 적은 글이라 textContent로만 넣어요
     const list = $('#rankList'), rows = Rank.state === 'on' ? R : [];
-    const lkey = mode + rows.map(r => `${r.id}:${r.score}:${r.lp}:${r.sp}:${r.bt}:${r.btm}:${r.name}:${r.tier}:${r.year}:${r.test ? 1 : 0}:${r.title}`).join('|') + `|${Rank.uid}|${S.units}|${S.ach ? S.ach.title : ''}`;
+    const lkey = mode + rows.map(r => `${r.id}:${r.score}:${r.lp}:${r.sp}:${r.bt}:${r.btm}:${r.name}:${r.tier}:${r.year}:${r.test ? 1 : 0}:${r.title}`).join('|') + `|${Rank.uid}|${S.units}|${S.ach ? S.ach.title : ''}|${rt.isAdmin ? 1 : 0}|${rt.rkDel || ''}`;
+    const canDel = !!(rt.isAdmin && Rank.be && Rank.be.removeOther && !Rank.readOnly);
     if (list.dataset.key !== lkey) {
       list.dataset.key = lkey;
       list.textContent = '';
@@ -13876,6 +13892,12 @@ body.cam-scene #ffChip,body.cam-scene #plChip,body.cam-scene .b-ring{animation-p
         sc.className = 'rk-school';
         sc.textContent = r.id === Rank.uid && semOn() ? rankSchool(S.tier, yearNo(), S.sem) : rankSchool(r.tier, r.year, r.sem);
         txt.append(nm, sc);
+        if (canDel && !r.nx && r.id !== Rank.uid) {   // 4.1.2 관리자만: 남의 줄 지우기(두 번 눌러요)
+          const db = document.createElement('button'), sure = rt.rkDel === r.id;
+          db.type = 'button'; db.className = 'rk-del' + (sure ? ' sure' : ''); db.dataset.del = r.id;
+          db.textContent = sure ? '한 번 더 누르면 지워요' : '이 줄 지우기';
+          txt.appendChild(db);
+        }
         const b = document.createElement('b');
         b.className = 'rk-score';
         b.textContent = fmt(sea ? r.sp : bm ? r.bt : wk ? r.lp : r.score);
@@ -23314,7 +23336,7 @@ body.cam-scene #ffChip,body.cam-scene #plChip,body.cam-scene .b-ring{animation-p
     $('#rankView').addEventListener('click', e => { const b = e.target.closest('[data-rv]'); if (!b) return; rt.rankView = b.dataset.rv; sfx('tap'); renderRankPanel(); });
     $('#rankLook').addEventListener('click', e => { const b = e.target.closest('[data-look]'); if (b) openLook(b.dataset.look); });   // 2.1.3 예시 학교
     $('#rankLook').addEventListener('change', e => { if (e.target.id === 'lookOn') lookSet(e.target.checked); });
-    $('#rankList').addEventListener('click', e => { const li = e.target.closest('li[data-look]'); if (li) openLook(li.dataset.look, li.dataset.who); });   // 2.1.3 순위 줄을 누르면 그 학교 구경
+    $('#rankList').addEventListener('click', e => { const d = e.target.closest('.rk-del'); if (d) { e.stopPropagation(); rankAdminDel(d.dataset.del); return; } const li = e.target.closest('li[data-look]'); if (li) openLook(li.dataset.look, li.dataset.who); });   // 2.1.3 순위 줄을 누르면 그 학교 구경
     $('#rankJoin').addEventListener('click', e => {
       const b = e.target.closest('[data-rank]');
       if (!b || b.tagName === 'FORM') return;
