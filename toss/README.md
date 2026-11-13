@@ -28,7 +28,7 @@ GitHub 전용 부분(Firebase 서버 저장, 링크 미리보기)은 빼고, `sr
 
 ## 다시 빌드하기
 
-Node.js 18 이상에서:
+Node.js 22 이상에서:
 
 ```bash
 cd toss
