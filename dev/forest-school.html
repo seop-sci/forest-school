@@ -9550,7 +9550,7 @@ body.cam-scene #ffChip,body.cam-scene #plChip,body.cam-scene .b-ring{animation-p
     V.g.remove();
     if (!take) return;
     const roll = Math.random(), items = [];
-    if (roll < 0.15) { addGold(1); items.push({ ic: 'gold', t: '황금 도토리 +1' }); }
+    if (roll < 0.15) items.push(goldOr(1));   // 4.2.0
     else if (roll < 0.4 && (S.tier > 0 || S.st.grads > 0)) { addDip(1); items.push({ ic: 'dip', t: '수료증 +1장' }); }
     else { const v = Math.max(20, nice(rate() * 60 * 10)); S.budget += v; earn(v); items.push({ ic: 'acorn', t: `도토리 +${fmt(v)}` }); }
     S.st.visits = (S.st.visits || 0) + 1;
@@ -13925,7 +13925,16 @@ body.cam-scene #ffChip,body.cam-scene #plChip,body.cam-scene .b-ring{animation-p
      광고마다 1개(3.0.0 조정안 3, 예전 3개. 상점 광고와 합쳐 하루 3번), 어려운 퀘스트와 출석 등의 보상은 각각 정해진 양을 줘요.
      쓰는 곳은 꾸미기와 테마 세트(계속 남아요), 부스터(1회 사용 가능). 뽑기 없이 정해진 값으로만 팔아요.
      토스 미니앱에서는 광고 그룹의 보상 이름을 '황금 도토리', 수량을 3으로 맞춰 두면 광고 화면에도 똑같이 보여요. */
-  const GOLD = { hard: 1, adDay: 3, ad: 1, shopAd: 3, shopAdN: 3, att: 1, att7: 1, chapter: 1, grad: 1, promote: 1 };
+  const GOLD = { hard: 1, adDay: 3, ad: 1, shopAd: 3, shopAdN: 3, att: 1, att7: 1, chapter: 1, grad: 1, promote: 1, rich: 60, essPer: 20 };
+  // 4.2.0 지섭 결정(2026-11-13): 지금까지 받은 황금 도토리가 60개(테마를 체험할 만큼)를 넘으면, 매일 매주 되풀이해 나오는 곳은 황금 도토리 1개 대신 숲의 정수 20을 줘요.
+  // 광고, 상점 광고, 축제와 대축제 도장판, 이벤트 기념 상자, 장 끝, 졸업, 학교급 올라가기, 마을 기부, 한 번만 나오는 보상은 그대로예요
+  const goldRich = () => !!S && (S.st.gold || 0) >= GOLD.rich;
+  function goldOr(n, why) {
+    if (!(n > 0)) return null;
+    const w = why ? ' ' + why : '';
+    if (!goldRich()) { addGold(n); return { ic: 'gold', t: `황금 도토리 +${n}${w}` }; }
+    const e = n * GOLD.essPer; addEss(e); return { ic: 'ess', t: `숲의 정수 +${e}${w}` };
+  }
   const HATS = {
     crown: '<path d="M-6 -3 L-6.6 -9.4 L-3.2 -6.6 L0 -10.4 L3.2 -6.6 L6.6 -9.4 L6 -3 Z" class="h-crown"/><rect x="-6.2" y="-4.6" width="12.4" height="1.8" rx=".6" class="h-crown2"/><circle cx="0" cy="-6.8" r="1" class="h-gem"/>',
     cap: '<path d="M-6.2 -3.2 Q-6.4 -9.6 0 -9.8 Q6.4 -9.6 6.2 -3.2 Z" class="h-cap"/><path d="M-2 -3.6 Q4.6 -5.2 9.6 -3 Q4.8 -1.9 -2 -2.5 Z" class="h-cap2"/><circle cx="0" cy="-9.6" r="0.9" class="h-cap2"/>',
@@ -14212,7 +14221,8 @@ body.cam-scene #ffChip,body.cam-scene #plChip,body.cam-scene .b-ring{animation-p
     if (rt.tab === 'street') renderStreet();
   }
   // 광고를 끝까지 보면 덤으로 3개 (상점 광고와 합쳐 하루 3번까지)
-  function adGold() { goldDay(); if (S.gd.n >= GOLD.adDay) return; S.gd.n += 1; addGold(GOLD.ad); }
+  // 4.2.0 지섭 제보: 광고를 끝까지 보면 받는 황금 도토리가 보이지 않았어요. 보상 창 뒤에 한 줄로 알려요
+  function adGold() { goldDay(); if (S.gd.n >= GOLD.adDay) return; S.gd.n += 1; addGold(GOLD.ad); setTimeout(() => toast(`광고 선물! 황금 도토리 +${GOLD.ad} (오늘 ${S.gd.n}/${GOLD.adDay})`), 1300); }
   function renderShopBtn() {
     $('#goldN').textContent = fmt(S.gold);
     $('#btnShop').setAttribute('aria-label', `꾸미기 백화점, 황금 도토리 ${fmt(S.gold)}개`);
@@ -15342,9 +15352,9 @@ body.cam-scene #ffChip,body.cam-scene #plChip,body.cam-scene .b-ring{animation-p
       const t = cgTable(true), rank = t.findIndex(r => r.me) + 1, my = cgMy(), items = [];
       const acorn = minAcorns(CG.partMin); S.budget += acorn; earn(acorn); items.push({ ic: 'acorn', t: `참가 도토리 +${fmt(acorn)}` });
       if (rank === 1) {
-        S.cg.wins += 1; addGold(CG.gold1); items.push({ ic: 'gold', t: `황금 도토리 +${CG.gold1}` });
+        S.cg.wins += 1; { const g = goldRich() ? 1 : CG.gold1; addGold(g); items.push({ ic: 'gold', t: `황금 도토리 +${g}` }); }   // 4.2.0 60개 뒤에는 우승 1개
         const fi = CG.flagAt.indexOf(S.cg.wins); if (fi >= 0) { S.deco.own[CG_FLAGS[fi][0]] = 1; items.push({ ic: IMG(CG_FLAGS[fi][2]) ? `<img src="${IMG(CG_FLAGS[fi][2])}" alt="" style="width:22px;height:22px;object-fit:contain">` : '🚩', t: `지도 장식 ${CG_FLAGS[fi][1]}` }); }
-      } else if (rank <= 3) { addGold(CG.gold23); items.push({ ic: 'gold', t: `황금 도토리 +${CG.gold23}` }); }
+      } else if (rank <= 3) items.push(goldOr(CG.gold23));   // 4.2.0
       if (rank <= 3) S.cg.pod += 1;
       S.cg.st.n += 1;
       res = { wk: S.cg.wk, rank, my, top: t.slice(0, 3).map(r => r.nm), items };
@@ -15560,13 +15570,13 @@ body.cam-scene #ffChip,body.cam-scene #plChip,body.cam-scene .b-ring{animation-p
     rt.csRw = [];
     if (S.cs.paid === S.roster.gen) { if (newDex) rt.csRw.push({ title: '진로 도감', sub: `새 진로 ${newDex}칸을 채웠어요`, items: [{ ic: 'ess', t: `숲의 정수 +${CS.dexEss * newDex}` }] }); return 0; }
     S.cs.paid = S.roster.gen; S.cs.won += won.length;
-    const gold = Math.floor(won.length / 5) * CS.gold5; if (gold) addGold(gold);
+    const gold = Math.floor(won.length / 5) * CS.gold5, gIt = gold ? goldOr(gold) : null;   // 4.2.0
     if (won.length) {
       const best = won.slice().sort((a, b) => csHearts(b) - csHearts(a))[0];
       const art = IMG('letter_career') ? `<img src="${IMG('letter_career')}" alt="">` : '';
       rt.csRw.push({ title: '진로를 찾은 친구들', art, big: `${won.length}명이 꿈을 찾았어요`,
         sub: `"코끼리 선생님, 교장 선생님! 덕분에 꿈을 찾았어요. 나중에 꼭 멋진 ${JOBS[best.jb].name}${batchim(JOBS[best.jb].name) ? '이' : '가'} 돼서 학교에 놀러 올게요." – ${best.nm} 올림`,
-        items: [{ ic: 'dip', t: `졸업식 수료증 +${Math.round(won.length * CS.dipPer * 100)}%` }, gold ? { ic: 'gold', t: `황금 도토리 +${gold}` } : null,
+        items: [{ ic: 'dip', t: `졸업식 수료증 +${Math.round(won.length * CS.dipPer * 100)}%` }, gIt,
           newDex ? { ic: 'ess', t: `진로 도감 ${newDex}칸, 숲의 정수 +${CS.dexEss * newDex}` } : null, allDex && S.deco.own.deco_career_tree ? { ic: '🌳', t: `진로 도감 완성! 장식 '진로 나무', 황금 도토리 +${CS.dexGold}` } : null].filter(Boolean) });
     }
     return won.length * CS.dipPer;
@@ -16179,7 +16189,7 @@ body.cam-scene #ffChip,body.cam-scene #plChip,body.cam-scene .b-ring{animation-p
   function skPrize(kind) {
     if (!skOpen() || !skFull() || rt.paused) return false;
     const items = [];
-    if (kind === 'gold') { addGold(SK.gold); items.push({ ic: 'gold', t: `황금 도토리 +${SK.gold}` }); }
+    if (kind === 'gold') items.push(goldOr(SK.gold));   // 4.2.0
     else { const v = minAcorns(SK.acornMin); S.budget += v; earn(v); items.push({ ic: 'acorn', t: `도토리 +${fmt(v)}` }); }
     S.sk.done.push({ mo: S.sk.mo || skMonth(), d: gameToday(), s: S.sk.cur.slice(0, SK.full) });
     if (S.sk.done.length > SK.keep) S.sk.done.splice(0, S.sk.done.length - SK.keep);
@@ -16833,11 +16843,11 @@ body.cam-scene #ffChip,body.cam-scene #plChip,body.cam-scene .b-ring{animation-p
     r.got = true;
     const v = minAcorns(r.pts * EX.minPer); S.budget += v; earn(v);
     const allA = r.g.every(g => g === 'A'), gold = allA ? EX.goldAll : r.pts >= EX.good ? EX.goldGood : 0;
-    if (gold) addGold(gold);
+    const gIt = gold ? goldOr(gold) : null;   // 4.2.0
     S.ex.st.n += 1; S.ex.st.best = Math.max(S.ex.st.best, r.pts); if (allA) S.ex.st.a += 1;
     save(); renderHUD(); checkQuests(); renderExam(); renderMini();
     sfx('quest'); buzz([20, 40, 20]);
-    toast(`성적표를 받았어요! 도토리 +${fmt(v)}` + (gold ? `, 황금 도토리 +${gold}` : '') + `\n전교 1등 ${r.top.nm}의 상장이 교실에 걸렸어요`);
+    toast(`성적표를 받았어요! 도토리 +${fmt(v)}` + (gIt ? `, ${gIt.t}` : '') + `\n전교 1등 ${r.top.nm}의 상장이 교실에 걸렸어요`);
     return { v, gold };
   }
   function openExam() {
@@ -18601,10 +18611,10 @@ body.cam-scene #ffChip,body.cam-scene #plChip,body.cam-scene .b-ring{animation-p
     const D = TRIP[S.trip.cur], R = tripReward(D);
     S.budget += R.acorns * x; earn(R.acorns * x);
     addDip(R.dip * x);
-    if (R.gold) addGold(R.gold);
+    const gIt = R.gold ? goldOr(R.gold) : null;   // 4.2.0
     const left = D.souv.map((_, i) => `${D.id}:${i}`).filter(k => !S.trip.souv.includes(k));
     let msg = `${D.name}에서 도토리 +${fmt(R.acorns * x)}, 수료증 +${R.dip * x}장`;
-    const rw = { title: `${D.name}에서 돌아왔어요!`, items: [{ ic: 'acorn', t: `도토리 +${fmt(R.acorns * x)}` }, R.dip ? { ic: 'dip', t: `수료증 +${R.dip * x}장` } : null, R.gold ? { ic: 'gold', t: `황금 도토리 +${R.gold}` } : null] };
+    const rw = { title: `${D.name}에서 돌아왔어요!`, items: [{ ic: 'acorn', t: `도토리 +${fmt(R.acorns * x)}` }, R.dip ? { ic: 'dip', t: `수료증 +${R.dip * x}장` } : null, gIt] };
     if (left.length) {
       const k = left[Math.floor(Math.random() * left.length)];
       S.trip.souv.push(k);
@@ -18612,7 +18622,7 @@ body.cam-scene #ffChip,body.cam-scene #plChip,body.cam-scene .b-ring{animation-p
       rw.art = souvIcon(k); rw.big = `새 기념품: ${D.souv[+k.split(':')[1]]}`;
       rw.bigSub = left.length === 1 ? `${D.name} 기념품을 모두 모았어요! 수업료 +2%에 +10% 더` : '기념품 하나에 수업료 +2%';
       if (left.length === 1) msg += `까지! ${D.name} 기념품을 모두 모아서 수업료가 10% 더 올랐어요`;
-    } else { addGold(1); msg += ', 기념품이 겹쳐서 황금 도토리 +1'; rw.items.push({ ic: 'gold', t: '기념품이 겹쳐서 황금 도토리 +1' }); }
+    } else { const it = goldOr(1, '(기념품이 겹쳐서)'); msg += ', ' + it.t; rw.items.push(it); }   // 4.2.0
     // 3.2.5 지섭 제보(돌아올 때 끊김): 보상 창이 버스 장면과 같은 순간에 열려 겹쳤어요. 학생들이 다 내린 뒤에 보여요
     const n0 = S.trip.kids, rwNow = rt.reduced || !n0 || !layerFx.animate;
     if (rwNow) showReward(rw);
@@ -21540,10 +21550,10 @@ body.cam-scene #ffChip,body.cam-scene #plChip,body.cam-scene .b-ring{animation-p
     S.dm.bonus = true;
     addMP(MP.bonus);
     mgAddEnergy(MG.E.bonus);   // 1.8.0
-    addGold(DM.bonusGold); addDip(DM.bonusDip);
+    const gIt = goldOr(DM.bonusGold); addDip(DM.bonusDip);   // 4.2.0
     addLeague(LP.bonus);
     sfx('quest'); buzz(20);
-    showReward({ title: '보너스 상자를 열었어요!', sub: '오늘의 미션을 모두 마쳤어요', items: [{ ic: 'gold', t: `황금 도토리 +${DM.bonusGold}` }, { ic: '⚡', t: `합치기 에너지 +${MG.E.bonus}` }, { ic: 'dip', t: `수료증 +${DM.bonusDip}장` }, { ic: '★', t: `미션 포인트 +${MP.bonus}` }] });
+    showReward({ title: '보너스 상자를 열었어요!', sub: '오늘의 미션을 모두 마쳤어요', items: [gIt, { ic: '⚡', t: `합치기 에너지 +${MG.E.bonus}` }, { ic: 'dip', t: `수료증 +${DM.bonusDip}장` }, { ic: '★', t: `미션 포인트 +${MP.bonus}` }] });
     save(); renderMissions(); renderHUD(); updateQuestDot();
   }
   function renderMissions() {
@@ -21578,8 +21588,8 @@ body.cam-scene #ffChip,body.cam-scene #plChip,body.cam-scene .b-ring{animation-p
       const r = S.lg.pos || 99, g = LG_PRIZE(r);
       S.lg.last = { week: S.lg.week, pts: S.lg.pts, pos: S.lg.pos || 0, gold: g };
       const pos = S.lg.pos || 0;
-      addGold(g);   // 2.0.0 보안 점검(1-4): 보상은 바로 주고 안내만 늦게(창을 닫아도 사라지지 않게)
-      setTimeout(() => toast(`지난주 리그 ${pos ? pos + '위' : '참여'} 보상! 황금 도토리 +${g}`), 1500);
+      const gIt = goldOr(g);   // 2.0.0 보안 점검(1-4): 보상은 바로 주고 안내만 늦게(창을 닫아도 사라지지 않게). 4.2.0 60개 뒤에는 정수
+      setTimeout(() => toast(`지난주 리그 ${pos ? pos + '위' : '참여'} 보상! ${gIt ? gIt.t : ''}`), 1500);
     }
     S.lg = { week: w, pts: 0, pos: 0, paid: false, last: S.lg.last || null };
   }
@@ -21635,10 +21645,10 @@ body.cam-scene #ffChip,body.cam-scene #plChip,body.cam-scene .b-ring{animation-p
     const m = S.wk.list[i];
     if (!m || !wkReady(m)) return;
     m.done = true;
-    addGold(MP.weekGold); addMP(MP.week); addLeague(LP.mission * 2);
+    const gIt = goldOr(MP.weekGold); addMP(MP.week); addLeague(LP.mission * 2);   // 4.2.0
     mgAddEnergy(MG.E.wk);   // 1.8.0
     sfx('quest'); buzz(15);
-    toast(`이번 주 미션 완료! 황금 도토리 +${MP.weekGold}, 미션 포인트 +${MP.week}, 합치기 에너지 +${MG.E.wk}`);
+    toast(`이번 주 미션 완료! ${gIt.t}, 미션 포인트 +${MP.week}, 합치기 에너지 +${MG.E.wk}`);
     save(); renderMissions(); updateQuestDot();
   }
   function claimBox(i) {
@@ -21648,7 +21658,7 @@ body.cam-scene #ffChip,body.cam-scene #plChip,body.cam-scene .b-ring{animation-p
     const got = [];
     // 1.4.0: 상자마다 도토리도 수업료 몇 분치(min)로 넣어요. 학교급이 올라도 알맞은 양이 나와요
     if (B.min) { const v = Math.max(10, nice(rate() * 60 * B.min)); S.budget += v; earn(v); got.push(`도토리 +${fmt(v)}`); }
-    if (B.gold) { addGold(B.gold); got.push(`황금 도토리 +${B.gold}`); }
+    if (B.gold) { if (i === MP_BOX.length - 1) { addGold(B.gold); got.push(`황금 도토리 +${B.gold}`); } else got.push(goldOr(B.gold).t); }   // 4.2.0 60개 뒤에는 마지막 상자만 황금
     if (B.dip) { addDip(B.dip); got.push(`수료증 +${B.dip}장`); }
     if (B.feast) { useBooster('feast'); got.push('특식 데이 10분'); }
     if (i === MP_BOX.length - 1) { const it = mgAddUp(1); if (it) got.push(it.t); }   // 1.8.0: 마지막 주간 상자(3.0.0 생산기가 모두 최고면 정수)
@@ -21873,9 +21883,9 @@ body.cam-scene #ffChip,body.cam-scene #plChip,body.cam-scene .b-ring{animation-p
     if (!canStamp()) { shake($('#attGo')); return; }
     const i = S.att.n % 7, r = attValue(i), g = i === 6 ? GOLD.att7 : GOLD.att;
     S.att.n += 1; S.att.last = gameToday();
-    if (r.kind === 'dip') { addDip(r.v); toast(`출석 도장 쾅! 수료증 +${r.v}장, 황금 도토리 +${g}`); }
-    else { S.budget += r.v; earn(r.v); toast(`출석 도장 쾅! 도토리 +${fmt(r.v)}, 황금 도토리 +${g}`); }
-    addGold(g);
+    const gIt = i === 6 ? (addGold(g), { t: `황금 도토리 +${g}` }) : goldOr(g);   // 4.2.0 60개 뒤에는 7일째만 황금
+    if (r.kind === 'dip') { addDip(r.v); toast(`출석 도장 쾅! 수료증 +${r.v}장, ${gIt.t}`); }
+    else { S.budget += r.v; earn(r.v); toast(`출석 도장 쾅! 도토리 +${fmt(r.v)}, ${gIt.t}`); }
     sfx('quest'); buzz(20);
     renderAtt(i);
     save(); renderHUD(); renderAffordance();
@@ -22733,7 +22743,7 @@ body.cam-scene #ffChip,body.cam-scene #plChip,body.cam-scene .b-ring{animation-p
     const rv = qReward(q), no = qNo(S.q.m);
     grant(rv, fromEl, q.rk);
     const items = [q.rk === 'dip' ? { ic: 'dip', t: `수료증 +${fmt(rv)}장` } : { ic: 'acorn', t: `도토리 +${fmt(rv)}` }];
-    if (hardQ(q)) { addGold(GOLD.hard); items.push({ ic: 'gold', t: `황금 도토리 +${GOLD.hard} (조금 어려운 퀘스트)` }); }
+    if (hardQ(q)) items.push(goldOr(GOLD.hard, '(조금 어려운 퀘스트)'));   // 4.2.0
     addLeague(LP.quest);
     S.q.m += 1; S.q.md += 1;
     startMain();
@@ -22761,7 +22771,7 @@ body.cam-scene #ffChip,body.cam-scene #plChip,body.cam-scene .b-ring{animation-p
     const s = S.q.subs[i];
     if (!subReady(s)) return;
     grant(s.r, fromEl);
-    if (hardQ(s, true)) addGold(GOLD.hard);
+    if (hardQ(s, true)) { const it = goldOr(GOLD.hard); if (it) setTimeout(() => toast(it.t + ' (조금 어려운 부탁)'), 900); }   // 4.2.0
     addLeague(LP.quest);
     S.q.subs.splice(i, 1);
     if (s.id[0] === 's') S.q.done.push(s.id);
@@ -24485,7 +24495,7 @@ body.cam-scene #ffChip,body.cam-scene #plChip,body.cam-scene .b-ring{animation-p
     S.ev.stamp = { n: i + 1, last: gameToday() };
     const a = r.m ? minAcorns(r.m) : 0;
     if (a > 0) { S.budget += a; earn(a); }
-    if (r.g) addGold(r.g);
+    const gIt = r.g ? goldOr(r.g) : null;   // 4.2.0
     if (r.e) addEss(r.e);
     const me = i + 1 === 5 ? MG.E.stamp5 : MG.E.stamp; mgAddEnergy(me);   // 1.8.0 합치기 에너지, 도장 7개를 다 모으면 강화 조각
     const mu = i + 1 === EV_STAMPS.length ? 1 : 0, muIt = mu ? mgAddUp(mu) : null;
@@ -24497,7 +24507,7 @@ body.cam-scene #ffChip,body.cam-scene #plChip,body.cam-scene .b-ring{animation-p
     sfx('quest'); buzz(12);
     showReward({ title: `이벤트 도장 ${i + 1}개째!`, sub: gotHat ? `한정 모자 '${hat.name}'${eulOf(hat.name)} 받았어요! 꾸미기 백화점 옷장에서 학생들에게 씌울 수 있어요` : i + 1 === 5 ? '도장 다섯 개를 모아 큰 선물을 받았어요' : i + 1 < 5 ? `${5 - i - 1}개 더 모으면 큰 선물이 있어요` : '끝까지 함께해 줘서 고마워요',
       art: gotHat ? `<img src="${IMG('cos_hat_' + hid)}" alt="" style="width:92px;height:92px;object-fit:contain">` : undefined,
-      items: [a > 0 ? { ic: 'acorn', t: `도토리 +${fmt(a)}` } : null, r.g ? { ic: 'gold', t: `황금 도토리 +${r.g}` } : null, r.e ? { ic: 'ess', t: `숲의 정수 +${r.e}` } : null, ...tkIts, { ic: '⚡', t: `합치기 에너지 +${me}` }, muIt] });
+      items: [a > 0 ? { ic: 'acorn', t: `도토리 +${fmt(a)}` } : null, gIt, r.e ? { ic: 'ess', t: `숲의 정수 +${r.e}` } : null, ...tkIts, { ic: '⚡', t: `합치기 에너지 +${me}` }, muIt] });
     save(); renderEvent(); renderHUD();
     return true;
   }
@@ -24508,10 +24518,10 @@ body.cam-scene #ffChip,body.cam-scene #plChip,body.cam-scene .b-ring{animation-p
     m.done = true;
     const a = m.m ? minAcorns(m.m) : 0;
     if (a > 0) { S.budget += a; earn(a); }
-    if (m.g) addGold(m.g);
+    const gIt = m.g ? goldOr(m.g) : null;   // 4.2.0
     const tkIt = tkGive('evm');   // 2.1.1 단축권
     sfx('quest'); buzz(12);
-    showReward({ title: '이벤트 미션 완료!', sub: EV_MEASURE[m.t].name(m.n), items: [a > 0 ? { ic: 'acorn', t: `도토리 +${fmt(a)}` } : null, m.g ? { ic: 'gold', t: `황금 도토리 +${m.g}` } : null, tkIt] });
+    showReward({ title: '이벤트 미션 완료!', sub: EV_MEASURE[m.t].name(m.n), items: [a > 0 ? { ic: 'acorn', t: `도토리 +${fmt(a)}` } : null, gIt, tkIt] });
     save(); renderEvent(); renderHUD();
     return true;
   }
@@ -24596,7 +24606,7 @@ body.cam-scene #ffChip,body.cam-scene #plChip,body.cam-scene .b-ring{animation-p
   }
   function psGive(r, n) {
     const out = [];
-    if (r.g) { addGold(r.g); out.push({ ic: 'gold', t: `황금 도토리 +${r.g}` }); }
+    if (r.g) out.push(goldOr(r.g));   // 4.2.0
     if (r.e) { addEss(r.e); out.push({ ic: 'ess', t: `숲의 정수 +${r.e}` }); }
     if (r.tk && S.tk) { S.tk[r.tk[0]] += r.tk[1]; const im = IMG('ticket_' + r.tk[0]); out.push({ ic: im ? `<img src="${im}" alt="" style="width:22px;height:22px;object-fit:contain">` : '⏱', t: `${TK.find(x => x.k === r.tk[0]).name.replace('권', ' 단축권')} +${r.tk[1]}장` }); }
     if (r.mge) { mgAddEnergy(r.mge); out.push({ ic: '⚡', t: `합치기 에너지 +${r.mge}` }); }
@@ -24865,7 +24875,7 @@ body.cam-scene #ffChip,body.cam-scene #plChip,body.cam-scene .b-ring{animation-p
     if (old >= 1 && S.rs.p >= RS.min) {
       const id = 'rs_' + RS_Q[rsQ(old)][0];
       if (DECO_BY[id] && !decoOwn(id)) { S.deco.own[id] = 1; items.push({ ic: '🎁', t: `기념 장식 '${DECO_BY[id].name}'` }); }
-      else { addGold(1); items.push({ ic: 'gold', t: '황금 도토리 +1 (기념 장식은 이미 있어요)' }); }
+      else items.push(goldOr(1, '(기념 장식은 이미 있어요)'));   // 4.2.0
     }
     if (old >= 1 && S.rs.pos >= 1 && S.rs.pos <= 3 && S.rs.p > 0) { S.rs.king += 1; items.push({ ic: '🏆', t: `시즌 순위 ${S.rs.pos}위! 칭호 '숲속 시즌 왕'` }); }
     if (items.length) showReward({ title: `${rsLabel(old)}이 끝났어요`, sub: `시즌 점수 ${fmt(S.rs.p)}점`, items });
@@ -24983,7 +24993,7 @@ body.cam-scene #ffChip,body.cam-scene #plChip,body.cam-scene .b-ring{animation-p
     const left = dayDiff(day, cur.end), gi = `<svg viewBox="-8 -11 16 20" aria-hidden="true">${GOLD_ICON.slice(GOLD_ICON.indexOf('>') + 1, -6)}</svg>`;
     const stamps = EV_STAMPS.map((r, i) => {
       const on = i < S.ev.stamp.n, big = i === 4;
-      return `<span class="ev-stamp${on ? ' on' : ''}${big ? ' big' : ''}"><span class="st">${pic7(on ? 'ev_stamp_on' : 'ev_stamp_off')}</span><small>${i + 1}일</small>${r.g ? `<em>${gi}${r.g}</em>` : ''}</span>`;
+      return `<span class="ev-stamp${on ? ' on' : ''}${big ? ' big' : ''}"><span class="st">${pic7(on ? 'ev_stamp_on' : 'ev_stamp_off')}</span><small>${i + 1}일</small>${r.g && !goldRich() ? `<em>${gi}${r.g}</em>` : ''}</span>`;
     }).join('');
     const ready = evStampReady(), full = S.ev.stamp.n >= EV_STAMPS.length;
     const stampBtn = ready ? '<button class="cta small" type="button" data-ev="stamp">이벤트 도장 받기</button>' :
@@ -26252,7 +26262,7 @@ body.cam-scene #ffChip,body.cam-scene #plChip,body.cam-scene .b-ring{animation-p
   }
 
   // 시험용 손잡이: 자동 시험(window.__FOREST_TEST)에서만 게임 속 함수를 꺼내 써요
-  if (window.__FOREST_TEST) window.__forest = { get S() { return S; }, BIG, BF_DECO, bfWin, bfNext, bfOn, bfFw, bfSync, bfStamp, bfFwStart, bfPart, bfNextTx, sanitizeBf, freshBf, fvBoothMax, bldBox, bldPick, bldWarm, DECO_SLOTS, XG, MK, ST, SIDE, ST_SIDE, wdMap, xgOn, xgGuest, xgSpots, xgGreet, xgVisit, xgLunch, openXg, mkOn, mkHot, mkSell, mkBuy, mkSur, openMk, wdBar, wdTick, stTick, stPlay, stNext, stPick, stEnd, stTags, openSb, renderSb, sideCan, sideMap, fvFlag, FV, FV_POS, fvOn, fvOpen, fvBonus, fvSync, fvStamp, fvGuests, openFv, renderFv, fvMeet, fvBoothStart, fvMap, fvTip, festDef, goTo, navInfo, openShop, gdReady, thPreview, thPreviewEnd, thOn, busScene, tripCrowd, openTrip, startTrip, claimTrip, TRIPS, mgPickMul, mgPickMode, mgUpOrder, mgFillOrders, mgAdAsk, sportsCon, festCon, btQuota, btCanAd, btAdMore, warmRooms, blobUrl, vdSize, vdBlock, pzSweep, pzSwGain, pzSwOpen, pzXpOf, mgMulMax, mgMulOk, mgMul, mgModeTap, acTip, kidDupIdx, trialSafe, closeAd,
+  if (window.__FOREST_TEST) window.__forest = { get S() { return S; }, goldOr, goldRich, adGold, stampAtt, GOLD, BIG, BF_DECO, bfWin, bfNext, bfOn, bfFw, bfSync, bfStamp, bfFwStart, bfPart, bfNextTx, sanitizeBf, freshBf, fvBoothMax, bldBox, bldPick, bldWarm, DECO_SLOTS, XG, MK, ST, SIDE, ST_SIDE, wdMap, xgOn, xgGuest, xgSpots, xgGreet, xgVisit, xgLunch, openXg, mkOn, mkHot, mkSell, mkBuy, mkSur, openMk, wdBar, wdTick, stTick, stPlay, stNext, stPick, stEnd, stTags, openSb, renderSb, sideCan, sideMap, fvFlag, FV, FV_POS, fvOn, fvOpen, fvBonus, fvSync, fvStamp, fvGuests, openFv, renderFv, fvMeet, fvBoothStart, fvMap, fvTip, festDef, goTo, navInfo, openShop, gdReady, thPreview, thPreviewEnd, thOn, busScene, tripCrowd, openTrip, startTrip, claimTrip, TRIPS, mgPickMul, mgPickMode, mgUpOrder, mgFillOrders, mgAdAsk, sportsCon, festCon, btQuota, btCanAd, btAdMore, warmRooms, blobUrl, vdSize, vdBlock, pzSweep, pzSwGain, pzSwOpen, pzXpOf, mgMulMax, mgMulOk, mgMul, mgModeTap, acTip, kidDupIdx, trialSafe, closeAd,
     TKE, TK_Q, tkDaily, nbAllDay, nbBuildAt, nbOn, conAdd, BX_SPOT, PERKS, offlineCapH, applyAway, pzFinish, mgClaimOrder,
     CS, JOBS, CS_WORRY, freshCs, csOpen, csLeft, csMax, csEnsure, csCands, csNeed, csMul, csOpenCards, csReady, csDone, csTalkMake, csAnswer, csChoose, csSettle, openCounsel, renderCounsel, renderHall, MAIN, qMeasure, qGoal, sanitize,   // 3.1.0 진로 상담
     NSL, nsStart, nsSettle, nsOpen, nsOn, nsOverlap, nsExtraH, isNight, nightDayOf, openNs, renderNs, bxSpots, renderNight,   // 3.0.0
