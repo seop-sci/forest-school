@@ -87,7 +87,7 @@ async def main():
               const seg=document.querySelector('#rankView'); return {{ lab: document.querySelector('#rankScoreLab').textContent, sc: document.querySelector('#rankScore').textContent,
               wrap: seg.scrollWidth <= seg.clientWidth + 1, h: [...seg.children].map(c=>c.getBoundingClientRect().top).every((t,i,a)=>Math.abs(t-a[0])<2) }}; }})()""")
             print(' 랭킹', r)
-            ok(r['lab'] == '이번 주 가장 깊은 층' and r['sc'].endswith('층'), f'{w} 랭킹 탐험 보기')
+            ok(r['lab'] == '이번 주 가장 높은 층' and r['sc'].endswith('층'), f'{w} 랭킹 탐험 보기')
             ok(r['wrap'] and r['h'], f'{w} 랭킹 보기 단추가 한 줄에 들어가요')
             if w == 360 and scheme == 'light': await page.screenshot(path=str(OUT / 's128_rank.png'))
             ok(not errs, f'{w} {scheme} 페이지 오류 {errs[:3]}')
