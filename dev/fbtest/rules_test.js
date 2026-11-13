@@ -144,6 +144,24 @@ t('season first too big', WS('B', '/forest/rank/B', Object.assign({}, RANK, { sk
 t('season sp without sk', W('B', '/forest/rank/B', Object.assign({}, RANK, { sp: 10 })), false);
 t('season bad sk', W('B', '/forest/rank/B', Object.assign({}, RANK, { sk: 0, sp: 10 })), false);
 t('season grow', WS('A', '/forest/rank/A', Object.assign({}, RANK, { sk: 2, sp: 1200 })), true);
+// 4.3.0 탐험 순위(tf, tq): 주가 같으면 지난 층 + (10초 지나면 10층) + 3초마다 1층, 처음은 10층까지
+const TM = (o) => Object.assign({}, RANK, o, { tq: RANK.week * 1e6 + o.tf });
+t('tam first 10', W('B', '/forest/rank/B', TM({ tf: 10 })), true);
+t('tam first 11', W('B', '/forest/rank/B', TM({ tf: 11 })), false);
+t('tam hour later 1000', W('A', '/forest/rank/A', TM({ tf: 1000 })), true);
+t('tam hour later 2000', W('A', '/forest/rank/A', TM({ tf: 2000 })), false);
+t('tam 10s later 13', W('C', '/forest/rank/C', TM({ tf: 13 })), true);
+t('tam 10s later 20', W('C', '/forest/rank/C', TM({ tf: 20 })), false);
+t('tam bad tq', W('B', '/forest/rank/B', Object.assign({}, RANK, { tf: 5, tq: RANK.week * 1e6 + 6 })), false);
+t('tam tq without tf', W('B', '/forest/rank/B', Object.assign({}, RANK, { tq: RANK.week * 1e6 })), false);
+t('tam half floor', W('B', '/forest/rank/B', TM({ tf: 2.5 })), false);
+t('tam neg', W('B', '/forest/rank/B', TM({ tf: -1 })), false);
+{ const db = targaryen.database(rules, { forest: { rank: { E: Object.assign({}, RANK, { at: NOW - 12e3, tf: 300, tq: RANK.week * 1e6 + 300 }) } } }).as({ uid: 'E', provider: 'anonymous' });
+  t('tam same week +14', db.write('/forest/rank/E', TM({ tf: 314 })).allowed, true);
+  t('tam same week +30', db.write('/forest/rank/E', TM({ tf: 330 })).allowed, false);
+  const nw = Object.assign({}, RANK, { week: RANK.week + 1, lp: 0, ws: (RANK.week + 1) * 1e6, tf: 300, tq: (RANK.week + 1) * 1e6 + 300 });
+  t('tam new week from 0', db.write('/forest/rank/E', nw).allowed, false);
+  t('tam new week small', db.write('/forest/rank/E', Object.assign({}, nw, { tf: 14, tq: (RANK.week + 1) * 1e6 + 14 })).allowed, true); }
 // 2.1.3 다른 학교 구경(forest/look): 로그인하면 읽기, 쓰기는 나만, 4,000자, 60초에 한 번, 지우기는 언제나
 const LOOK = { d: '{"v":1}', at: { '.sv': 'timestamp' } };
 t('look read', R('B', '/forest/look/A'), true);

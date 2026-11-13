@@ -70,6 +70,7 @@ cd ../toss && npm ci && npm run build   # 토스 판 forest-school.ait (사용�
 ```
 - 안드로이드는 `main`에 합쳐지면 GitHub Actions(`.github/workflows/android.yml`)가 만들어요.
 - 가짜 Firebase 서버를 쓰는 시험(s7, s18, s26, s27, s34)은 `targaryen` npm 꾸러미가 필요해요(`NODE_PATH`로 잡아요).
+- 서버 규칙의 원본은 `dev/gh_database.rules.json`이에요. 그곳을 고치고 맨 위 `database.rules.json`으로 복사해요. 밀어 올리기 전에 `sh dev/precheck.sh`(git hook pre-push)로 GitHub 검사와 같은 것을 먼저 봐요.
 
 ### 끝낼 때
 - PR 본문(템플릿)에 바뀐 파일, 구현 내용, 시험 결과, 못 돌린 시험, 버전과 패치노트를 적어요.
