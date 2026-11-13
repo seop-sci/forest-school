@@ -2552,6 +2552,8 @@ body.wl-on .toast{z-index:300}
 .nb-ch b{flex:1;min-width:0;font-weight:700}.nb-ch small{color:var(--muted);font-size:12px}.nb-ch span{display:flex;flex-wrap:wrap;gap:2px 8px}.nb-ch.dim{opacity:.5}
 .nb-who{display:flex;align-items:center;gap:10px;padding:6px 8px;border:1.5px solid var(--line);border-radius:12px;background:var(--card)}.nb-who .talk-av{width:48px;height:48px}.nb-who .talk-av img,.nb-who .talk-av svg{width:42px;height:42px;object-fit:contain}.nb-who p{margin:0}.nb-who b{display:block;font-size:13.5px}.nb-who small{font-size:12.5px;color:var(--muted)}
 #fvG .fv-booth,#fvG .fv-guest,#wdG .wd-it{cursor:pointer}#wdG .fv-hit{fill:transparent}.sd-bub{pointer-events:auto;cursor:pointer}.sd-bub .sd-hit{fill:transparent}#wdG .fv-pin circle{fill:#E04848;stroke:#fff;stroke-width:1.2}#wdG .fv-pin text{font-size:9px;font-weight:700;text-anchor:middle;fill:#fff}#fvG .fv-hit{fill:transparent}
+#dpBody [data-dp^="rx:"]{white-space:nowrap;display:inline-flex;align-items:center;gap:3px;min-width:76px;justify-content:center}#dpBody [data-dp^="rx:"] svg{width:13px;height:15px;flex:none}   /* 4.2.0 연구 투자 값 단추 */
+#dpBody [data-dp^="rx:"]{white-space:nowrap;display:inline-flex;align-items:center;gap:3px;min-width:76px;justify-content:center}#dpBody [data-dp^="rx:"] svg{width:13px;height:15px;flex:none}   /* 4.2.0 연구 투자 값 단추 */
 #fvTop .bf-gate{font-family:var(--font-display);font-size:8px;text-anchor:middle;fill:#B0472B;font-weight:700}   /* 4.2.0 */
 #fvG .fv-tag{fill:rgba(255,249,232,.94);stroke:#C9A25B;stroke-width:.8}#fvG .fv-nm{font-family:var(--font-display);font-size:7.5px;text-anchor:middle;fill:#5A3A16}
 #fvG .fv-guest.met{opacity:.7}#fvG .fv-pin circle{fill:#E04848;stroke:#fff;stroke-width:1.2}#fvG .fv-pin text{font-size:9px;font-weight:700;text-anchor:middle;fill:#fff}
@@ -7319,6 +7321,7 @@ body.cam-scene #ffChip,body.cam-scene #plChip,body.cam-scene .b-ring{animation-p
     zv: {},   // 4.0.0 들어가 본 구역({academic: 1, ...}). '캠퍼스 둘러보기' 퀘스트가 세요
     rp: { b: 0 },   // 되풀이 학년 종업식 조건: 지난 식 때의 건물 레벨 합(0이면 아직 안 셈)
     bf: freshBf(),   // 4.2.0 대축제: mon 그 달, st 도장, got 받은 단계, day 날짜, dn 그날 도장, o 창 열기, g2 손님 다섯 곳, fw 불꽃놀이, own 받은 달 장식, eve 전날 띠, tip 다른 학교 띠, auto 첫날 창
+    rx: { lv: {}, c: {} },   // 4.2.0 연구 투자: lv 연구마다 레벨, c 그 레벨에 정해 둔 값(열린 때의 수업료로 정하고 올릴 때까지 그대로)
     fv: freshFv(),   // 4.1.0 대학 축제: wk 이번 주, st 도장 수, got 받은 단계, day 날짜, b 그날 한 부스, g 그날 만난 손님, o 그날 창을 열었는지, win 부스마다 성공 횟수, own 받은 기념품, tip 띠를 닫은 주, td 띠를 본 날
     xg: freshXg(), mk: freshMk(), sto: freshSto(),   // 4.1.0 교환학생의 날, 숲속 장터, 이야기(본 장면, 고른 답, 곁가지)
     dp: { pick: [], own: {}, free: 0 },   // 4.0.0 단과대학: pick 다니는 곳(열쇠), own 한 번이라도 고른 곳, free 1이면 다음 바꾸기가 공짜(종업식 뒤)
@@ -7521,6 +7524,11 @@ body.cam-scene #ffChip,body.cam-scene #plChip,body.cam-scene .b-ring{animation-p
     sanitizeTr2(d, s);   // 3.2.0 수학여행
     sanitizeFv(d, s);   // 4.1.0 대학 축제
     sanitizeBf(d, s);   // 4.2.0 대축제
+    { const R = d && d.rx && typeof d.rx === 'object' ? d.rx : {}, f = { lv: {}, c: {} };   // 4.2.0 연구 투자
+      for (const x of RX.list) { const lv = R.lv && R.lv[x.k], c = R.c && R.c[x.k];
+        if (typeof lv === 'number' && isFinite(lv) && lv > 0) f.lv[x.k] = Math.min(1000, Math.floor(lv));
+        if (typeof c === 'number' && isFinite(c) && c > 0) f.c[x.k] = Math.min(1e30, Math.floor(c)); }
+      s.rx = f; }
     sanitizeXg(d, s); sanitizeMk(d, s); sanitizeSto(d, s);   // 4.1.0 교환학생, 장터, 이야기
     s.nl = [0, 1, 2].includes(d.nl) ? d.nl : 0;   // 3.2.1 고등학교 밤 모습
     s.tfp = Math.min(s.st.fperks, Math.floor(num(d.tfp, 0, s.st.fperks)));
@@ -7813,7 +7821,7 @@ body.cam-scene #ffChip,body.cam-scene #plChip,body.cam-scene .b-ring{animation-p
     const [a, b] = conBand();
     if (L <= 1) return CON.first;   // 2.3.0 처음 짓기는 모든 학교급 10초
     const first = yearCap() - CAP_STEP + 1;   // 2학기에 상한이 +2 되어도 학년 첫 레벨은 그대로. 2학기에 열린 레벨(상한 +1, +2)은 긴 쪽
-    return Math.round((a + (b - a) * Math.min(1, Math.max(0, (L - first) / (CAP_STEP - 1)))) * fixMult() * (1 - deptX('eng') / 100));   // 2.3.5 비버 선생님
+    return Math.round((a + (b - a) * Math.min(1, Math.max(0, (L - first) / (CAP_STEP - 1)))) * fixMult() * (1 - deptX('eng') / 100) * (1 - rxPct('build') / 100));   // 2.3.5 비버 선생님, 4.2.0 건축 연구
   }
   // 시간 단축권 넷(큰 것부터). 광고 1번에 5분권 6장, 하루 2번
   const TK = [{ k: 'h3', sec: 10800, name: '3시간권' }, { k: 'h1', sec: 3600, name: '1시간권' }, { k: 'm30', sec: 1800, name: '30분권' }, { k: 'm5', sec: 300, name: '5분권' }];
@@ -7966,6 +7974,42 @@ body.cam-scene #ffChip,body.cam-scene #plChip,body.cam-scene .b-ring{animation-p
   const DEPT_AB = ['sci', 'pe', 'kor', 'art', 'math'];   // 진로(JOBS.ab) 번호를 과목 열쇠로
   const deptOf = k => DEPT.list.find(D => D.k === k);
   const deptOpen = () => uniNow() && (S.f.union || 0) >= 1;
+  /* ---------- 4.2.0 연구 투자 (프로젝트 문서 '4.2.0 설계안 2 (황금 도토리와 광고)' 7절) ----------
+     학과 사무실에서 도토리를 넣어 연구를 올려요. 레벨 끝없음, 효과는 상한까지.
+     지섭 결정(2026-11-13): 값은 그 레벨이 열린 때의 수업료로 정해 두고 올리기 전까지 그대로, 올리면 그때의 수업료로 다음 값을 새로 정해요. 건축은 레벨마다 -0.5%.
+     숫자(레벨마다 효과, 상한, 2시간치, 1.25배)는 본부 제안이에요. var는 다른 곳(공사 시간, 정수, 공부)에서 먼저 불려도 멈추지 않게 */
+  var RX = { baseH: 2, grow: 1.25, list: [
+    { k: 'study', nm: '학력 연구', per: 2, cap: 100, unit: '공부 경험치', sign: '+', ic: '📚' },
+    { k: 'build', nm: '건축 연구', per: 0.5, cap: 30, unit: '공사 시간', sign: '-', ic: '🏗️' },
+    { k: 'ess', nm: '정수 연구', per: 1, cap: 30, unit: '받는 숲의 정수', sign: '+', ic: '✨' }] };
+  function rxPct(k) { if (!RX || !S || !S.rx) return 0; const R = RX.list.find(x => x.k === k); return R ? Math.min(R.cap, (S.rx.lv[k] || 0) * R.per) : 0; }
+  const rxOpen = () => deptOpen();
+  const rxFull = R => rxPct(R.k) >= R.cap;
+  // 그 레벨 값: 정해 둔 값이 없을 때만 지금 수업료로 정하고 저장해요
+  function rxCost(k) {
+    if (!S.rx.c[k]) { S.rx.c[k] = Math.max(100, nice(rate() * 3600 * RX.baseH * Math.pow(RX.grow, S.rx.lv[k] || 0))); save(); }
+    return S.rx.c[k];
+  }
+  function rxUp(k) {
+    const R = RX.list.find(x => x.k === k); if (!R || !rxOpen() || rxFull(R)) return false;
+    const c = rxCost(k);
+    if (S.budget < c) { toast(`도토리가 ${fmt(c - S.budget)}개 모자라요`); return false; }
+    S.budget -= c; S.st.rxSpent = (S.st.rxSpent || 0) + c;
+    S.rx.lv[k] = (S.rx.lv[k] || 0) + 1; S.rx.c[k] = 0;
+    if (!rxFull(R)) rxCost(k);   // 다음 레벨 값은 지금 수업료로 새로 정해요
+    sfx('quest'); buzz(15); save(); renderHUD();
+    toast(`${R.nm} Lv.${S.rx.lv[k]}!\n${R.unit} ${R.sign}${fmtPct(rxPct(k))}%`);
+    return true;
+  }
+  const fmtPct = v => (Math.round(v * 10) / 10).toString();
+  function rxPart() {
+    if (!rxOpen()) return '';
+    return '<h3 class="fv-h">연구 투자</h3><div class="dp-list">' + RX.list.map(R => {
+      const lv = S.rx.lv[R.k] || 0, full = rxFull(R), c = full ? 0 : rxCost(R.k), poor = S.budget < c;
+      return `<div class="dp-row"><span class="dp-ic">${R.ic}</span><div class="dp-tx"><b>${R.nm} Lv.${lv}</b><small>${R.unit} ${rxPct(R.k) ? R.sign + fmtPct(rxPct(R.k)) : '0'}%${full ? ' (최대)' : `, 다음 ${R.sign}${fmtPct(Math.min(R.cap, (lv + 1) * R.per))}%`}</small></div>` +
+        (full ? '<span class="fe-lock">완성</span>' : `<button class="${poor ? 'btn-sub' : 'cta'} small" type="button" data-dp="rx:${R.k}">${acornIcon()}${fmt(c)}</button>`) + '</div>';
+    }).join('') + '</div>';
+  }
   const deptSlots = () => !uniNow() ? 0 : Math.min(3, yearNo());   // 1학년 1곳, 2학년 2곳, 3학년부터 3곳
   const deptPicks = () => (S.dp && Array.isArray(S.dp.pick) ? S.dp.pick : []).filter(k => deptOf(k)).slice(0, deptSlots());
   const deptLocked = D => !!D.year && yearNo() < D.year;
@@ -8013,7 +8057,7 @@ body.cam-scene #ffChip,body.cam-scene #plChip,body.cam-scene .b-ring{animation-p
         : on ? '<span class="fe-lock">다니는 중</span>'
         : `<button class="${full ? 'btn-sub' : 'cta'} small" type="button" data-dp="pick:${D.k}">${full ? '바꾸기' : '고르기'}</button>`;
       return `<div class="dp-row${on ? ' on' : ''}${lock ? ' lock' : ''}"><span class="dp-ic">${deptIc(D)}</span><div class="dp-tx"><b>${D.name}</b><small>${subTx} Lv.${Math.floor(lv)}, ${FAC[D.fac].name}</small><em>수업료 +${Math.round(deptPct(D))}%</em><em class="dp-x">${DEPT_X[D.k].t(deptXOf(D))}</em></div>${btn}</div>`;
-    }).join('') + '</div>';
+    }).join('') + '</div>' + rxPart();   // 4.2.0 연구 투자
   }
   function deptSet(k, out) {   // out: 바꿀 때 빼는 곳('' = 빈 자리에 넣기)
     const D = deptOf(k); if (!D || deptLocked(D) || !deptOpen()) return false;
@@ -8033,6 +8077,7 @@ body.cam-scene #ffChip,body.cam-scene #plChip,body.cam-scene .b-ring{animation-p
     if (v === 'cancel') rt.dpSwap = '';
     else if (v === 'pick') { if (deptPicks().length >= deptSlots()) rt.dpSwap = k; else deptSet(k, ''); }
     else if (v === 'swap') { if (deptSet(rt.dpSwap, k)) rt.dpSwap = ''; }
+    else if (v === 'rx') rxUp(k);   // 4.2.0
     renderDept();
   }
   const xtLv = k => (S && S.xt && S.xt[k]) || 0;
@@ -15099,7 +15144,7 @@ body.cam-scene #ffChip,body.cam-scene #plChip,body.cam-scene .b-ring{animation-p
   const acAll = () => AC.keys.reduce((n, k) => n + acSettle(k), 0);
   function acGain(k, v) {
     if (!S.ac || !S.ac[k] || !(v > 0)) return 0;
-    v = Math.floor(v); S.ac[k].xp += v; S.ac.st.xp += v;
+    v = Math.floor(v * (1 + rxPct('study') / 100)); S.ac[k].xp += v; S.ac.st.xp += v;   // 4.2.0 학력 연구
     const up = acSettle(k);
     if (up) { const lv = S.ac[k].lv, capped = lv >= acCap(); setTimeout(() => toast(`${AC.name[k]} Lv.${lv}!${capped ? ` ${tierInfo().name}에서는 여기까지예요` : ''}`), 500); }
     checkQuests(true); return v;
@@ -18875,7 +18920,7 @@ body.cam-scene #ffChip,body.cam-scene #plChip,body.cam-scene .b-ring{animation-p
   const pzEssOf = score => Math.min(PZ.essMax, Math.floor(score / PZ.essPer)) * PZ.rw;   // 2.3.1 한 판 보상 두 배(하루 판 수는 절반)
   const pzMinOf = score => Math.min(PZ.minMax, Math.floor(score / PZ.minPer)) * PZ.rw;
   const pzXpOf = score => Math.min(AC.pzMax, Math.floor(score / AC.pzPer)) * PZ.rw;
-  function addEss(n) { if (!(n > 0)) return; S.ess = Math.min(1e9, S.ess + Math.floor(n)); renderEss(); }
+  function addEss(n) { if (!(n > 0)) return; S.ess = Math.min(1e9, S.ess + Math.floor(n * (1 + rxPct('ess') / 100))); renderEss(); }   // 4.2.0 정수 연구
   function renderEss() { const e = $('#essHave'); if (e) e.textContent = fmt(S.ess); const e2 = $('#essHave2'); if (e2) e2.textContent = fmt(S.ess); }
   // 판 끝내기(다 막혔거나 그만하기). 정수와 도토리를 주고 최고 점수를 남겨요
   function pzFinish(cur) {
@@ -26291,7 +26336,7 @@ body.cam-scene #ffChip,body.cam-scene #plChip,body.cam-scene .b-ring{animation-p
   }
 
   // 시험용 손잡이: 자동 시험(window.__FOREST_TEST)에서만 게임 속 함수를 꺼내 써요
-  if (window.__FOREST_TEST) window.__forest = { get S() { return S; }, goldOr, goldRich, adGold, stampAtt, GOLD, BIG, BF_DECO, bfWin, bfNext, bfOn, bfFw, bfSync, bfStamp, bfFwStart, bfPart, bfNextTx, sanitizeBf, freshBf, fvBoothMax, bldBox, bldPick, bldWarm, DECO_SLOTS, XG, MK, ST, SIDE, ST_SIDE, wdMap, xgOn, xgGuest, xgSpots, xgGreet, xgVisit, xgLunch, openXg, mkOn, mkHot, mkSell, mkBuy, mkSur, openMk, wdBar, wdTick, stTick, stPlay, stNext, stPick, stEnd, stTags, openSb, renderSb, sideCan, sideMap, fvFlag, FV, FV_POS, fvOn, fvOpen, fvBonus, fvSync, fvStamp, fvGuests, openFv, renderFv, fvMeet, fvBoothStart, fvMap, fvTip, festDef, goTo, navInfo, openShop, gdReady, thPreview, thPreviewEnd, thOn, busScene, tripCrowd, openTrip, startTrip, claimTrip, TRIPS, mgPickMul, mgPickMode, mgUpOrder, mgFillOrders, mgAdAsk, sportsCon, festCon, btQuota, btCanAd, btAdMore, warmRooms, blobUrl, vdSize, vdBlock, pzSweep, pzSwGain, pzSwOpen, pzXpOf, mgMulMax, mgMulOk, mgMul, mgModeTap, acTip, kidDupIdx, trialSafe, closeAd,
+  if (window.__FOREST_TEST) window.__forest = { get S() { return S; }, RX, rxPct, rxCost, rxUp, rxPart, renderDept, goldOr, goldRich, adGold, stampAtt, GOLD, BIG, BF_DECO, bfWin, bfNext, bfOn, bfFw, bfSync, bfStamp, bfFwStart, bfPart, bfNextTx, sanitizeBf, freshBf, fvBoothMax, bldBox, bldPick, bldWarm, DECO_SLOTS, XG, MK, ST, SIDE, ST_SIDE, wdMap, xgOn, xgGuest, xgSpots, xgGreet, xgVisit, xgLunch, openXg, mkOn, mkHot, mkSell, mkBuy, mkSur, openMk, wdBar, wdTick, stTick, stPlay, stNext, stPick, stEnd, stTags, openSb, renderSb, sideCan, sideMap, fvFlag, FV, FV_POS, fvOn, fvOpen, fvBonus, fvSync, fvStamp, fvGuests, openFv, renderFv, fvMeet, fvBoothStart, fvMap, fvTip, festDef, goTo, navInfo, openShop, gdReady, thPreview, thPreviewEnd, thOn, busScene, tripCrowd, openTrip, startTrip, claimTrip, TRIPS, mgPickMul, mgPickMode, mgUpOrder, mgFillOrders, mgAdAsk, sportsCon, festCon, btQuota, btCanAd, btAdMore, warmRooms, blobUrl, vdSize, vdBlock, pzSweep, pzSwGain, pzSwOpen, pzXpOf, mgMulMax, mgMulOk, mgMul, mgModeTap, acTip, kidDupIdx, trialSafe, closeAd,
     TKE, TK_Q, tkDaily, nbAllDay, nbBuildAt, nbOn, conAdd, BX_SPOT, PERKS, offlineCapH, applyAway, pzFinish, mgClaimOrder,
     CS, JOBS, CS_WORRY, freshCs, csOpen, csLeft, csMax, csEnsure, csCands, csNeed, csMul, csOpenCards, csReady, csDone, csTalkMake, csAnswer, csChoose, csSettle, openCounsel, renderCounsel, renderHall, MAIN, qMeasure, qGoal, sanitize,   // 3.1.0 진로 상담
     NSL, nsStart, nsSettle, nsOpen, nsOn, nsOverlap, nsExtraH, isNight, nightDayOf, openNs, renderNs, bxSpots, renderNight,   // 3.0.0
