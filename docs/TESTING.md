@@ -178,7 +178,7 @@ Issue 양식은 기본 브랜치(`main`)에 있어야 GitHub의 새 Issue 화면
 - `node dev/check_ads.mjs`: 가짜 광고 SDK로 현재 동의 요구, 개인정보 옵션, 철회, 양식 오류, 오래된 캐시, 광고 준비 경합을 검사해요.
 - `NODE_PATH=<targaryen 설치 경로> node dev/fbtest/rules_storage_guard.js <규칙 절대 경로>`: 저장/백업 필드와 크기 제한. `rules_season_guard.js`, `rules_sec.js`, `rules_bt.js`, `rules_test.js`도 두 규칙 파일 각각에 실행해요.
 - `node dev/fbtest/season_listener_test.js`: 실제 소스의 시즌 조회, 경계에서 구독 교체, 해제를 검사해요.
-- 공식 Firebase Emulator: Node24, Java21에서 `cd dev/fbtest/emulator`, `npm ci`, `npm test`. 테스트용 `demo-forest-security` 프로젝트와 로컬 Database Emulator만 사용해요. 운영 비밀값이 필요 없어요. CI는 `.github/workflows/security-rules.yml`이에요.
+- 공식 Firebase Emulator: Node22, Java21에서 `cd dev/fbtest/emulator`, `npm ci`, `npm test`. 테스트용 `demo-forest-security` 프로젝트와 로컬 Database Emulator만 사용해요. 운영 비밀값이 필요 없어요. CI는 `.github/workflows/security-rules.yml`이에요.
 - 원본 변경 뒤 `wrap.py`와 s37, 관련 저장/랭킹 시험 s71/s72/s98을 실행해요. 이번 보안 작업에서는 s90/s102/s103도 통과했어요. 종료 코드뿐 아니라 마지막 PASS/FAIL을 확인해요.
 - 실제 UMP, 운영 콘솔 규칙, 최종 AAB 검수는 가짜 SDK나 Emulator 시험으로 대신할 수 없어요.
 

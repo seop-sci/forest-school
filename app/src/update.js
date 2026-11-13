@@ -19,7 +19,7 @@ async function latestWeb() {
     const r = await fetch(PAGES + '?v=' + Date.now(), { headers: { Range: 'bytes=0-2047' }, cache: 'no-store' });
     const m = /name="forest-version" content="([\d.]+)"/.exec((await r.text()).slice(0, 8000));
     return m ? m[1] : '';
-  } catch (e) { return ''; }
+  } catch (e) { console.warn('[update] 웹 판 버전을 읽지 못했어요', e); return ''; }
 }
 
 // 게임의 확인 창으로 물어봐요. 게임이 아직 준비되지 않았으면 묻지 않은 것으로(false) 해요
@@ -31,7 +31,7 @@ const ask = o => new Promise(done => {
 async function mustUpdate() {
   for (let i = 0; i < 5; i++) {
     let r;
-    try { r = await AppUpdate.performImmediateUpdate(); } catch (e) { r = { code: 2 }; }
+    try { r = await AppUpdate.performImmediateUpdate(); } catch (e) { console.warn('[update] 즉시 업데이트 실패', e); r = { code: 2 }; }
     if (r && r.code === 0) return;
     const again = await ask({ title: '업데이트가 필요해요', text: '큰 업데이트가 나왔어요. 업데이트해야 계속 놀 수 있어요.', yes: '업데이트', no: '앱 닫기' });
     if (!again) { if (window.FOREST_APP) window.FOREST_APP.exit(); return; }
@@ -50,7 +50,7 @@ async function flexReady() {
 
 async function check() {
   let info;
-  try { info = await AppUpdate.getAppUpdateInfo(); } catch (e) { return; }   // 플레이에서 받지 않은 앱이면 조용히 넘어가요
+  try { info = await AppUpdate.getAppUpdateInfo(); } catch (e) { console.warn('[update] 업데이트 정보를 받지 못했어요', e); return; }   // 플레이에서 받지 않은 앱이면 조용히 넘어가요
   if (info.installStatus === FlexibleUpdateInstallStatus.DOWNLOADED) { flexReady(); return; }
   if (info.updateAvailability !== AppUpdateAvailability.UPDATE_AVAILABLE) return;
   const big = isBig(mine(), await latestWeb());

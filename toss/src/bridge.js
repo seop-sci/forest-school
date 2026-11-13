@@ -73,7 +73,7 @@ window.AIT = {
   safeArea: () => safe(() => SafeArea.get(), null),
   subscribeSafe: (fn) => safe(() => SafeArea.subscribe({ onEvent: fn }), () => {}),
   userKey: async () => {
-    try { const r = await getUserKeyForGame(); return r && r !== 'ERROR' && r.type === 'HASH' ? r.hash : ''; } catch (e) { return ''; }
+    try { const r = await getUserKeyForGame(); return r && r !== 'ERROR' && r.type === 'HASH' ? r.hash : ''; } catch (e) { console.warn('[ait] 사용자 키를 받지 못했어요', e); return ''; }
   },
   // 토스 서버 시간(ms). 게임 시계(gameNow)가 하루 제한에 써요. 토스앱 5.245.0 미만이거나 실패하면 null
   serverTime: async () => {
@@ -81,6 +81,6 @@ window.AIT = {
       if (!safe(() => Environment.getServerTime.isSupported(), false)) return null;
       const t = await Environment.getServerTime();
       return typeof t === 'number' && isFinite(t) && t > 0 ? t : null;
-    } catch (e) { return null; }
+    } catch (e) { console.warn('[ait] 서버 시간을 받지 못했어요', e); return null; }
   },
 };
