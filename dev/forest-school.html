@@ -2557,6 +2557,8 @@ body.wl-on .toast{z-index:300}
 .sy-modal{display:flex;flex-direction:column;gap:8px;max-width:440px;padding:12px}
 .sy-top{display:flex;align-items:center;justify-content:space-between;gap:8px}.sy-top b{font-family:var(--font-display);font-weight:400;font-size:15px}
 .sy-pic{border-radius:12px;overflow:hidden;background:#E8F0DA}.sy-pic img{display:block;width:100%;height:auto}.sy-pic[hidden]{display:none}
+/* 4.2.0 둘째 그림은 첫 그림 위에 겹쳐 천천히 나타나요 */
+.sy-pic{position:relative}.sy-pic img.sy-p2{position:absolute;inset:0;height:100%;object-fit:cover;opacity:0;transition:opacity .7s ease}.sy-pic img.sy-p2.on{opacity:1}.sy-pic img.sy-p2.solo{position:static;height:auto;transition:none}
 .sy-say{display:flex;gap:10px;align-items:flex-start;min-height:86px;cursor:pointer}.sy-say[hidden]{display:none}
 .sy-say .talk-av img{width:54px;height:54px;object-fit:contain}.sy-say .talk-av svg{width:52px;height:52px}.sy-em{font-size:34px}
 .sy-tx{flex:1;min-width:0}.sy-tx b{display:block;font-size:13.5px;color:var(--chip-ink)}.sy-tx p{margin:2px 0 0;font-size:15px;line-height:1.55;white-space:pre-line}
@@ -21528,9 +21530,10 @@ body.cam-scene #ffChip,body.cam-scene #plChip,body.cam-scene .b-ring{animation-p
     const m = $('#mSt'); if (!m || rt.st) return false;
     let lines, head, pic = '', pic2 = '';
     if (id === 'recap') { lines = ST_RECAP[Math.min(S.tier, ST_RECAP.length - 1)].map(t => ({ t })); head = '지금까지의 이야기'; pic = 'st_head'; }
-    else if (id.startsWith('side:')) { const [, sid, ep] = id.split(':'), X = SIDE.find(x => x.id === sid), L = (ST_SIDE[sid] || [])[+ep]; if (!X || !L) return false; lines = L; head = `${X.nm} ${+ep + 1}화`; pic = 'st_side_' + X.who; }
-    else { const D = ST[id]; if (!D) return false; lines = D.lines; head = `${D.ch + 1}장 ${CHAPTERS[D.ch]}`; pic2 = 'st_ch' + String(D.ch + 1).padStart(2, '0'); pic = pic2 + '_' + id[0]; }   // 그 장면만의 그림(st_ch05_o, st_ch01_c, 작업지시서 66)이 있으면 먼저, 없으면 장 그림
-    rt.st = { id, replay: !!replay, lines: lines.slice(), i: 0, uni: !!(ST[id] && ST[id].ch >= 19) };   // uni: 대학교 장면(20장부터)에서는 고슴도치 이름표가 '부총장 고슴도치'
+    let picB = '';   // 4.2.0 둘째 그림(작업지시서 71): 장면 가운데 줄부터 바꿔 보여요
+    if (id.startsWith('side:')) { const [, sid, ep] = id.split(':'), X = SIDE.find(x => x.id === sid), L = (ST_SIDE[sid] || [])[+ep]; if (!X || !L) return false; lines = L; head = `${X.nm} ${+ep + 1}화`; pic = 'st_side_' + X.who; picB = `st_side_${sid}_${+ep + 1}`; }
+    else { const D = ST[id]; if (!D) return false; lines = D.lines; head = `${D.ch + 1}장 ${CHAPTERS[D.ch]}`; pic2 = 'st_ch' + String(D.ch + 1).padStart(2, '0'); pic = pic2 + '_' + id[0]; picB = pic + '2'; }   // 그 장면만의 그림(st_ch05_o, st_ch01_c, 작업지시서 66)이 있으면 먼저, 없으면 장 그림
+    rt.st = { id, replay: !!replay, lines: lines.slice(), i: 0, uni: !!(ST[id] && ST[id].ch >= 19), mid: Math.floor(lines.length / 2), im2: null, sw: false };   // uni: 대학교 장면(20장부터)에서는 고슴도치 이름표가 '부총장 고슴도치'
     setT($('#stCh'), head);
     const pe = $('#stPic'); pe.hidden = true; pe.innerHTML = '';
     if (pic && !(location.protocol === 'file:' && !window.FS_IMG_BASE)) {   // 그림은 게임 밖 파일이에요. 못 받으면 그림 없이 대사만 나와요
@@ -21538,12 +21541,22 @@ body.cam-scene #ffChip,body.cam-scene #plChip,body.cam-scene .b-ring{animation-p
       im.onload = () => { if (rt.st && rt.st.id === id) { pe.appendChild(im); pe.hidden = false; } };
       im.onerror = () => { if (pic2) { const u = stPicUrl(pic2); pic2 = ''; im.src = u; } };
       im.src = stPicUrl(pic);
+      if (picB) { const b = new Image(); b.alt = ''; b.decoding = 'async'; b.className = 'sy-p2'; b.onload = () => { if (rt.st && rt.st.id === id) { rt.st.im2 = b; stPic2(); } }; b.src = stPicUrl(picB); }
     }
     stLine(); openModal(m);
     return true;
   }
+  // 4.2.0 장면이 가운데 줄을 넘으면 둘째 그림으로 부드럽게 바꿔요. 그림이 없으면 첫 그림 그대로
+  function stPic2() {
+    const R = rt.st; if (!R || R.sw || !R.im2 || R.i < R.mid) return;
+    R.sw = true;
+    const pe = $('#stPic'), b = R.im2;
+    if (pe.hidden || !pe.firstChild || rt.reduced) { pe.innerHTML = ''; b.classList.add('on', 'solo'); pe.appendChild(b); pe.hidden = false; return; }
+    pe.appendChild(b); void b.offsetWidth; b.classList.add('on');
+  }
   function stLine() {
     const R = rt.st; if (!R) return;
+    stPic2();
     const L = R.lines[R.i], pk = !!L.pick, nar = !pk && !L.w;
     $('#stSay').classList.toggle('nar', nar); $('#stSay').hidden = pk;
     const pb = $('#stPicks'); pb.hidden = !pk;
@@ -26471,7 +26484,7 @@ body.cam-scene #ffChip,body.cam-scene #plChip,body.cam-scene .b-ring{animation-p
   }
 
   // 시험용 손잡이: 자동 시험(window.__FOREST_TEST)에서만 게임 속 함수를 꺼내 써요
-  if (window.__FOREST_TEST) window.__forest = { get S() { return S; }, get rt4() { return rt; }, missionGo, MGO, MGO_MINI, MGO_Q, renderMissions, renderPass, BOOST, conLeft, gameToday, setTab, ADX, adStamp, adxDay, adxCan, adxMore, adPickNow, adPickGive, conNear, renderAdStamp, claimOfflineDouble, startBoost, openBoost, showOffline, fvBoothStart, bfFwStart, musicWant, renderCounsel, renderXg, renderFv, showCeremony, RX, rxPct, rxCost, rxUp, rxPart, renderDept, goldOr, goldRich, adGold, stampAtt, GOLD, BIG, BF_DECO, bfWin, bfNext, bfOn, bfFw, bfSync, bfStamp, bfFwStart, bfPart, bfNextTx, sanitizeBf, freshBf, fvBoothMax, bldBox, bldPick, bldWarm, DECO_SLOTS, XG, MK, ST, SIDE, ST_SIDE, wdMap, xgOn, xgGuest, xgSpots, xgGreet, xgVisit, xgLunch, openXg, mkOn, mkHot, mkSell, mkBuy, mkSur, openMk, wdBar, wdTick, stTick, stPlay, stNext, stPick, stEnd, stTags, openSb, renderSb, sideCan, sideMap, fvFlag, FV, FV_POS, fvOn, fvOpen, fvBonus, fvSync, fvStamp, fvGuests, openFv, renderFv, fvMeet, fvBoothStart, fvMap, fvTip, festDef, goTo, navInfo, openShop, gdReady, thPreview, thPreviewEnd, thOn, busScene, tripCrowd, openTrip, startTrip, claimTrip, TRIPS, mgPickMul, mgPickMode, mgUpOrder, mgFillOrders, mgAdAsk, sportsCon, festCon, btQuota, btCanAd, btAdMore, warmRooms, blobUrl, vdSize, vdBlock, pzSweep, pzSwGain, pzSwOpen, pzXpOf, mgMulMax, mgMulOk, mgMul, mgModeTap, acTip, kidDupIdx, trialSafe, closeAd,
+  if (window.__FOREST_TEST) window.__forest = { get S() { return S; }, get rt4() { return rt; }, stPlay, stNext, ST, ST_SIDE, SIDE, missionGo, MGO, MGO_MINI, MGO_Q, renderMissions, renderPass, BOOST, conLeft, gameToday, setTab, ADX, adStamp, adxDay, adxCan, adxMore, adPickNow, adPickGive, conNear, renderAdStamp, claimOfflineDouble, startBoost, openBoost, showOffline, fvBoothStart, bfFwStart, musicWant, renderCounsel, renderXg, renderFv, showCeremony, RX, rxPct, rxCost, rxUp, rxPart, renderDept, goldOr, goldRich, adGold, stampAtt, GOLD, BIG, BF_DECO, bfWin, bfNext, bfOn, bfFw, bfSync, bfStamp, bfFwStart, bfPart, bfNextTx, sanitizeBf, freshBf, fvBoothMax, bldBox, bldPick, bldWarm, DECO_SLOTS, XG, MK, ST, SIDE, ST_SIDE, wdMap, xgOn, xgGuest, xgSpots, xgGreet, xgVisit, xgLunch, openXg, mkOn, mkHot, mkSell, mkBuy, mkSur, openMk, wdBar, wdTick, stTick, stPlay, stNext, stPick, stEnd, stTags, openSb, renderSb, sideCan, sideMap, fvFlag, FV, FV_POS, fvOn, fvOpen, fvBonus, fvSync, fvStamp, fvGuests, openFv, renderFv, fvMeet, fvBoothStart, fvMap, fvTip, festDef, goTo, navInfo, openShop, gdReady, thPreview, thPreviewEnd, thOn, busScene, tripCrowd, openTrip, startTrip, claimTrip, TRIPS, mgPickMul, mgPickMode, mgUpOrder, mgFillOrders, mgAdAsk, sportsCon, festCon, btQuota, btCanAd, btAdMore, warmRooms, blobUrl, vdSize, vdBlock, pzSweep, pzSwGain, pzSwOpen, pzXpOf, mgMulMax, mgMulOk, mgMul, mgModeTap, acTip, kidDupIdx, trialSafe, closeAd,
     TKE, TK_Q, tkDaily, nbAllDay, nbBuildAt, nbOn, conAdd, BX_SPOT, PERKS, offlineCapH, applyAway, pzFinish, mgClaimOrder,
     CS, JOBS, CS_WORRY, freshCs, csOpen, csLeft, csMax, csEnsure, csCands, csNeed, csMul, csOpenCards, csReady, csDone, csTalkMake, csAnswer, csChoose, csSettle, openCounsel, renderCounsel, renderHall, MAIN, qMeasure, qGoal, sanitize,   // 3.1.0 진로 상담
     NSL, nsStart, nsSettle, nsOpen, nsOn, nsOverlap, nsExtraH, isNight, nightDayOf, openNs, renderNs, bxSpots, renderNight,   // 3.0.0
