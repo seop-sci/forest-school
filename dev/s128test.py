@@ -17,9 +17,9 @@ async def main():
         b = await p.chromium.launch()
         # 옛 저장: tam 칸이 없어요
         ctx, page, errs = await ctxpage(b, 360, 740, 'light', base(tier=0, tg=0))
-        r = await page.evaluate(f"(()=>{{ const S={F}.S; return {{ has: !!S.tam, best: S.tam.best, party: S.tam.party, wk: S.tam.wk, mat: S.tam.mat }}; }})()")
+        r = await page.evaluate(f"(()=>{{ const S={F}.S; return {{ has: !!S.tam, best: S.tam.best, party: S.tam.party, wk: S.tam.wk, mat: S.tam.mat, sg: S.tam.sg.length }}; }})()")
         print('옛 저장', r)
-        ok(r['has'] and r['best'] == 0 and len(r['party']) >= 1 and r['mat'] == [0, 0, 0, 0], '옛 저장도 탐험대 칸을 받아요')
+        ok(r['has'] and r['best'] == 0 and len(r['party']) >= 1 and r['mat'] == [0, 0, 0, 0] and r['sg'] == 5, '옛 저장도 탐험대 칸과 칸 장비 다섯 자리를 받아요')
         # 겨루기 셈: 1층부터 몇 층까지 이기는지, 레벨을 올리면 더 깊이
         r = await page.evaluate(f"""(()=>{{ const F={F}, S=F.S; const deep=()=>{{ let lo=1, hi=400; while(lo<hi){{ const m=(lo+hi+1)>>1; if(F.tamSim(m, F.tamTeam(), 3).win) lo=m; else hi=m-1; }} return lo; }};
           const d1=deep(); const t1=F.tamSim(1, F.tamTeam(), 3);

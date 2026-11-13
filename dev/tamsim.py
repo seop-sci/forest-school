@@ -6,7 +6,7 @@ from s4test import ctxpage, base
 F = 'window.__forest'
 JS = """(cfg)=>{ const F=window.__forest, S=F.S, out=[];
   for (const c of cfg) {
-    S.tam.gear={tool:c.g,bag:c.g,hat:c.g}; for (const k of ['sci','pe','kor','art','math']) if (S.ac[k]) S.ac[k].lv=c.ac;
+    S.tam.sg=[0,1,2,3,4].map(()=>({tool:c.g,bag:c.g,hat:c.g})); for (const k of ['sci','pe','kor','art','math']) if (S.ac[k]) S.ac[k].lv=c.ac;
     S.tam.party=c.party; for (const sp of c.party) S.tam.mem[sp]={lv:c.lv,st:c.st,sh:0};
     const team=F.tamTeam(); let lo=1, hi=4000;
     while (lo<hi) { const mid=Math.ceil((lo+hi)/2); if (F.tamSim(mid, team, 7).win) lo=mid; else hi=mid-1; }
