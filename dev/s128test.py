@@ -50,6 +50,17 @@ async def main():
         print('2배속', r)
         ok(r['out'] == [True, True, True, False] and r['n'] == 3, '2배속 광고는 하루 세 번')
         ok(r['fl'] == 10 and 19 * 60000 < r['until'] <= 20 * 60000 + 1000, '다음 10층, 20분')
+        # 4.3.0 둘째 판: 한 층의 흐름, 사건, 자동 편성, 강화 추천
+        r = await page.evaluate(f"""(async()=>{{ const F={F}, S=F.S, sl=ms=>new Promise(r=>setTimeout(r,ms)); F.setTab('tam'); await sl(200);
+          const T=F.rt4.tam; F.tamPh(T,'walk'); const seen=new Set(); for(let i=0;i<60;i++){{ seen.add(T.ph); await sl(150); if(T.ph==='climb') break; }}
+          T.F={{fl:S.tam.best,hard:false,ev:[],P:[],M:[]}}; T.ev={{k:'fork',ic:'ex_flag',t:'x',o:['큰길로 가기','숲길로 가기'],fl:3}}; F.tamPh(T,'event'); await sl(200);
+          const card=!document.querySelector('#tmEv').hidden; document.querySelector('[data-tev="1"]').click(); await sl(100);
+          const mod=T.mod, ph=T.ph, auto=F.tamAutoTeam(), rec=F.tamUpRec();
+          return {{ seen:[...seen], card, mod, ph, auto, rec: !!rec.mem, tabs:[...document.querySelectorAll('#tmSeg [data-tseg]')].map(b=>b.dataset.tseg) }}; }})()""")
+        print('흐름', r)
+        ok({'walk', 'meet', 'fight'} <= set(r['seen']), '걷기, 만남, 겨루기 차례')
+        ok(r['card'] and r['mod'] == {'hard': 1} and r['ph'] == 'climb', '갈림길에서 숲길을 고르면 다음 층이 어려워요')
+        ok(len(r['auto']) >= 3 and r['rec'] and r['tabs'] == ['mem', 'gear', 'mat'], '자동 편성과 강화 추천, 대원 장비 재료 탭')
         # 랭킹: 서버 규칙 폭에 맞춰 올려요
         r = await page.evaluate(f"""(()=>{{ const F={F}, S=F.S, R=F.Rank; S.tam.wk.best=500;
           R.stf=0; R.stfW=null; R.stfAt=0; R.lastPerf=null; S.rank.by=''; S.rank.sent=-1; const first=F.tamRankDoc();
@@ -73,7 +84,7 @@ async def main():
               const g=document.querySelector('.xgrad'), gr=g.getBoundingClientRect(), top=document.querySelector('.board-top').getBoundingClientRect();
               g.click(); await sl(300); const onGrad=!document.querySelector('#panelGrad').hidden;
               document.querySelector('[data-tab=tam]').click(); await sl(1500); const onTam=!document.querySelector('#panelTam').hidden;
-              const over=[...document.querySelectorAll('#panelTam *')].filter(e=>e.offsetParent && e.getBoundingClientRect().right > innerWidth + 1).map(e=>e.id||e.className).slice(0,5);
+              const over=[...document.querySelectorAll('#panelTam *')].filter(e=>e.offsetParent && !e.closest('.tm-bgs, .tm-fxl') && e.getBoundingClientRect().right > innerWidth + 1).map(e=>e.id||e.className).slice(0,5);
               const fl=document.querySelector('#tmFl').textContent;
               return {{ tabs, gIn: gr.top >= top.top - 2 && gr.bottom <= top.bottom + 30 && gr.width > 20, onGrad, onTam, over, fl, sw: document.documentElement.scrollWidth }}; }})()""")
             print(w, scheme, r)
