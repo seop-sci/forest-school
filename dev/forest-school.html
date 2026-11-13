@@ -993,6 +993,11 @@ html.ait .pz{padding-top:calc(var(--ait-top, 0px) + 54px)}
 .dm-h{margin:12px 2px 6px;font-family:var(--font-display);font-weight:400;font-size:14.5px;color:var(--ink)}
 .dm-h small{margin-left:4px;font-size:12px;color:var(--muted)}
 .dm-tx b em{margin-left:4px;font-style:normal;font-size:12px;color:var(--chip-ink)}
+/* 4.2.0 누르면 그 일을 하는 곳으로 가는 미션 */
+.dm-tx[data-mgo]{cursor:pointer;border-radius:8px}
+.dm-tx[data-mgo]>b::after{content:"가기 ›";margin-left:6px;padding:0 7px;border-radius:999px;background:var(--chip-bg);color:var(--chip-ink);font-family:var(--font-body, inherit);font-size:11px;line-height:17px;display:inline-block;vertical-align:1px;white-space:nowrap}
+.dm-tx[data-mgo]:active{opacity:.7}
+.dm-tx[data-mgo]:focus-visible{outline:2px solid var(--gold);outline-offset:2px}
 .tut{position:fixed;inset:0;z-index:90}
 .tut-hole{position:fixed;border-radius:16px;border:3px solid #F3C04B;box-shadow:0 0 0 9999px rgba(18,28,18,.62);transition:left .25s,top .25s,width .25s,height .25s;pointer-events:none}
 .tut-hole[hidden]{display:block !important;left:50% !important;top:50% !important;width:0 !important;height:0 !important;border:0}
@@ -21751,7 +21756,7 @@ body.cam-scene #ffChip,body.cam-scene #plChip,body.cam-scene .b-ring{animation-p
     let evOn = false; try { evOn = evClaimable(); } catch (e) { /* 무시 */ }
     box.innerHTML = (evOn ? '<button class="dm-ev" type="button" data-go="event"><span><b>이벤트에서 받을 선물이 있어요</b><small>이벤트 미션, 이벤트 도장, 기념 상자</small></span><span aria-hidden="true">›</span></button>' : '') + renderWeek() + '<h4 class="dm-h">오늘의 미션 <small>자정에 바뀌어요</small></h4>' + S.dm.list.map((m, i) => {
       const M = MISSIONS[m.id], p = dmProg(m), ready = dmReady(m);
-      return `<div class="dm${m.done ? ' done' : ''}"><div class="dm-tx"><b>${M.name(M.n)} <em>+${MP.daily}점</em></b><div class="qbar"><i style="width:${(p / M.n * 100).toFixed(0)}%"></i></div></div>` +
+      return `<div class="dm${m.done ? ' done' : ''}"><div class="dm-tx"${goAt(m.id, !m.done && !ready)}><b>${M.name(M.n)} <em>+${MP.daily}점</em></b><div class="qbar"><i style="width:${(p / M.n * 100).toFixed(0)}%"></i></div></div>` +
         (m.done ? `<span class="dm-ok">${CHECK}</span>` : ready ? `<button class="cta small" type="button" data-dm="${i}">받기</button>` : `<span class="dm-n">${p}/${M.n}${!S.dm.swapped && !S.dm.bonus ? `<button type="button" class="btn-sub small" data-dmswap="${i}" aria-label="미션 바꾸기, 하루 한 번 무료">바꾸기</button>` : ''}</span>`) + '</div>';
     }).join('') +
       `<div class="dm bonus${S.dm.bonus ? ' done' : ''}"><div class="dm-tx"><b>보너스 상자 <em>+${MP.bonus}점</em></b><span>${S.dm.list.length === 3 ? '셋 다' : '모두'} 하면</span>${rwChips([['gold', DM.bonusGold], ['dip', DM.bonusDip], ['⚡', MG.E.bonus]])}</div>` +
@@ -21868,7 +21873,7 @@ body.cam-scene #ffChip,body.cam-scene #plChip,body.cam-scene .b-ring{animation-p
   function renderWeekList() {
     return S.wk.list.map((m, i) => {
       const M = WMISSIONS[m.id], p = wkProg(m), ready = wkReady(m);
-      return `<div class="dm${m.done ? ' done' : ''}"><div class="dm-tx"><b>${M.name(M.n)} <em>+${MP.week}점</em></b><div class="qbar"><i style="width:${(p / M.n * 100).toFixed(0)}%"></i></div></div>` +
+      return `<div class="dm${m.done ? ' done' : ''}"><div class="dm-tx"${goAt(m.id, !m.done && !ready)}><b>${M.name(M.n)} <em>+${MP.week}점</em></b><div class="qbar"><i style="width:${(p / M.n * 100).toFixed(0)}%"></i></div></div>` +
         (m.done ? `<span class="dm-ok">${CHECK}</span>` : ready ? `<button class="cta small" type="button" data-wm="${i}">받기</button>` : `<span class="dm-n">${fmt(p)}/${fmt(M.n)}</span>`) + '</div>';
     }).join('');
   }
@@ -23268,6 +23273,23 @@ body.cam-scene #ffChip,body.cam-scene #plChip,body.cam-scene .b-ring{animation-p
     c.sort((a, b) => a.cost - b.cost);
     return c[0];
   }
+  /* 4.2.0 지섭: 오늘의 미션, 이번 주 미션, 패스 미션, 이벤트 미션을 누르면 그 일을 하는 곳으로 가요(찾아다니지 않게).
+     미션 이름(id)을 퀘스트 바로 가기(goTo)의 종류로 바꿔요. 퍼즐과 합치기는 그 화면을 바로 열어요 */
+  const MGO = { picks: 'picks', shakes: 'picks', ups: 'ups', con: 'ups', trains: 'trains', claims: 'claims', fest: 'fest', sports: 'fest',
+    trip: 'trips', trips: 'trips', out: 'trips', ns: 'nsOn', cs: 'csTalk', rd: 'rdBooks', bt: 'btPlays', sk: 'stickers', lab: 'labs',
+    sn: 'snDraw', gd: 'gdHarvest', bx: 'bxSeen', cg: 'cgPrac' };
+  const MGO_MINI = { puzzle: '#pzOpen', pz: '#pzOpen', merge: '#mgOpen', mg: '#mgOpen', mgOrd: '#mgOpen' };
+  const MGO_Q = { daily: '#qDaily', dm: '#qDaily', dmDone: '#qDaily', subs: '#qSubs' };
+  const mgoHas = id => !!(MGO[id] || MGO_MINI[id] || MGO_Q[id]);
+  const goAt = (id, on) => on && mgoHas(id) ? ` data-mgo="${id}" role="button" tabindex="0"` : '';
+  function missionGo(id) {
+    if (!S || rt.paused || !mgoHas(id)) return false;
+    sfx('tap');
+    if (MGO_MINI[id]) { setTab('mini'); setTimeout(() => { const b = $(MGO_MINI[id]); if (b && !b.closest('[hidden]')) b.click(); }, 60); return true; }
+    if (MGO_Q[id]) { setTab('quests'); setTimeout(() => { const el = $(MGO_Q[id]); if (el) el.scrollIntoView({ block: 'start', behavior: rt.reduced ? 'auto' : 'smooth' }); }, 60); return true; }
+    goTo({ t: MGO[id] });
+    return true;
+  }
   function goTo(q) {
     if (!q || rt.paused) return;
     switch (q.t) {
@@ -23709,6 +23731,9 @@ body.cam-scene #ffChip,body.cam-scene #plChip,body.cam-scene .b-ring{animation-p
       joinRank(i ? i.value : '');
     });
     $('#nickDice').addEventListener('click', () => rollNick($('#nickName')));
+    // 4.2.0 미션을 누르면 그 일을 하는 곳으로(퀘스트 탭, 패스, 이벤트 탭 모두)
+    document.addEventListener('click', e => { const g = e.target.closest('[data-mgo]'); if (g && !e.target.closest('button')) missionGo(g.dataset.mgo); });
+    document.addEventListener('keydown', e => { if (e.key !== 'Enter' && e.key !== ' ') return; const g = e.target.closest && e.target.closest('[data-mgo]'); if (g) { e.preventDefault(); missionGo(g.dataset.mgo); } });
     $('#qDaily').addEventListener('click', e => {
       const x = e.target.closest('[data-box]'); if (x) { if (boxReady(+x.dataset.box)) claimBox(+x.dataset.box); else toast(`미션 포인트 ${MP_BOX[+x.dataset.box].at}점이면 열 수 있어요`); return; }
       const w = e.target.closest('[data-wm]'); if (w) { claimWeekMission(+w.dataset.wm); return; }
@@ -24884,7 +24909,7 @@ body.cam-scene #ffChip,body.cam-scene #plChip,body.cam-scene .b-ring{animation-p
       nodes.push(`<div class="ps-node${got ? ' got' : open ? ' open' : ''}${big ? ' big' : ''}" title="${i}단계: ${esc(r.t)}"><span class="ps-nb" style="${bg ? `background-image:url('${bg}')` : ''}"><i>${psIc(r.ic)}</i></span><small>${i}</small>${i === Math.max(1, lv) && lv > 0 && IMG('pass_flag') ? `<img class="ps-flag" src="${IMG('pass_flag')}" alt="">` : ''}</div>`);
     }
     const ready = psStepReady() + psExtraReady();
-    const ms = (L, kind, p) => L.map((m, i) => { const pr = psProg(m), rd = psReady(m); return `<div class="dm${m.done ? ' done' : ''}"><div class="dm-tx"><b>${esc(PS_M[m.id].name(m.n))} <em>+${p}점</em></b><div class="qbar"><i style="width:${(pr / m.n * 100).toFixed(0)}%"></i></div></div>` +
+    const ms = (L, kind, p) => L.map((m, i) => { const pr = psProg(m), rd = psReady(m); return `<div class="dm${m.done ? ' done' : ''}"><div class="dm-tx"${goAt(m.id, !m.done && !rd)}><b>${esc(PS_M[m.id].name(m.n))} <em>+${p}점</em></b><div class="qbar"><i style="width:${(pr / m.n * 100).toFixed(0)}%"></i></div></div>` +
       (m.done ? `<span class="dm-ok">${CHECK}</span>` : rd ? `<button class="cta small" type="button" data-ps="${kind}${i}">받기</button>` : `<span class="dm-n">${pr}/${m.n}</span>`) + '</div>'; }).join('');
     const bg = IMG('pass_bg');
     const furs = S.ps.fur.filter(id => IMG(psDef(Number(id.slice(4))).fur));
@@ -25184,7 +25209,7 @@ body.cam-scene #ffChip,body.cam-scene #plChip,body.cam-scene .b-ring{animation-p
       `<button class="cta small" type="button" disabled>${full ? '도장을 다 모았어요' : '내일 또 만나요'}</button>`;
     const missions = S.ev.list.map((m, i) => {
       const p = evProg(m), rd = evReady(m);
-      return `<div class="dm${m.done ? ' done' : ''}"><div class="dm-tx"><b>${EV_MEASURE[m.t].name(m.n)}</b><div class="qbar"><i style="width:${(p / m.n * 100).toFixed(0)}%"></i></div></div>` +
+      return `<div class="dm${m.done ? ' done' : ''}"><div class="dm-tx"${goAt(m.t, !m.done && !rd)}><b>${EV_MEASURE[m.t].name(m.n)}</b><div class="qbar"><i style="width:${(p / m.n * 100).toFixed(0)}%"></i></div></div>` +
         (m.done ? `<span class="dm-ok">${CHECK}</span>` : rd ? `<button class="cta small" type="button" data-ev="m${i}">받기</button>` : `<span class="dm-n">${p}/${m.n}</span>`) + '</div>';
     }).join('');
     const all = evAllDone();
@@ -26446,7 +26471,7 @@ body.cam-scene #ffChip,body.cam-scene #plChip,body.cam-scene .b-ring{animation-p
   }
 
   // 시험용 손잡이: 자동 시험(window.__FOREST_TEST)에서만 게임 속 함수를 꺼내 써요
-  if (window.__FOREST_TEST) window.__forest = { get S() { return S; }, get rt4() { return rt; }, BOOST, conLeft, gameToday, setTab, ADX, adStamp, adxDay, adxCan, adxMore, adPickNow, adPickGive, conNear, renderAdStamp, claimOfflineDouble, startBoost, openBoost, showOffline, fvBoothStart, bfFwStart, musicWant, renderCounsel, renderXg, renderFv, showCeremony, RX, rxPct, rxCost, rxUp, rxPart, renderDept, goldOr, goldRich, adGold, stampAtt, GOLD, BIG, BF_DECO, bfWin, bfNext, bfOn, bfFw, bfSync, bfStamp, bfFwStart, bfPart, bfNextTx, sanitizeBf, freshBf, fvBoothMax, bldBox, bldPick, bldWarm, DECO_SLOTS, XG, MK, ST, SIDE, ST_SIDE, wdMap, xgOn, xgGuest, xgSpots, xgGreet, xgVisit, xgLunch, openXg, mkOn, mkHot, mkSell, mkBuy, mkSur, openMk, wdBar, wdTick, stTick, stPlay, stNext, stPick, stEnd, stTags, openSb, renderSb, sideCan, sideMap, fvFlag, FV, FV_POS, fvOn, fvOpen, fvBonus, fvSync, fvStamp, fvGuests, openFv, renderFv, fvMeet, fvBoothStart, fvMap, fvTip, festDef, goTo, navInfo, openShop, gdReady, thPreview, thPreviewEnd, thOn, busScene, tripCrowd, openTrip, startTrip, claimTrip, TRIPS, mgPickMul, mgPickMode, mgUpOrder, mgFillOrders, mgAdAsk, sportsCon, festCon, btQuota, btCanAd, btAdMore, warmRooms, blobUrl, vdSize, vdBlock, pzSweep, pzSwGain, pzSwOpen, pzXpOf, mgMulMax, mgMulOk, mgMul, mgModeTap, acTip, kidDupIdx, trialSafe, closeAd,
+  if (window.__FOREST_TEST) window.__forest = { get S() { return S; }, get rt4() { return rt; }, missionGo, MGO, MGO_MINI, MGO_Q, renderMissions, renderPass, BOOST, conLeft, gameToday, setTab, ADX, adStamp, adxDay, adxCan, adxMore, adPickNow, adPickGive, conNear, renderAdStamp, claimOfflineDouble, startBoost, openBoost, showOffline, fvBoothStart, bfFwStart, musicWant, renderCounsel, renderXg, renderFv, showCeremony, RX, rxPct, rxCost, rxUp, rxPart, renderDept, goldOr, goldRich, adGold, stampAtt, GOLD, BIG, BF_DECO, bfWin, bfNext, bfOn, bfFw, bfSync, bfStamp, bfFwStart, bfPart, bfNextTx, sanitizeBf, freshBf, fvBoothMax, bldBox, bldPick, bldWarm, DECO_SLOTS, XG, MK, ST, SIDE, ST_SIDE, wdMap, xgOn, xgGuest, xgSpots, xgGreet, xgVisit, xgLunch, openXg, mkOn, mkHot, mkSell, mkBuy, mkSur, openMk, wdBar, wdTick, stTick, stPlay, stNext, stPick, stEnd, stTags, openSb, renderSb, sideCan, sideMap, fvFlag, FV, FV_POS, fvOn, fvOpen, fvBonus, fvSync, fvStamp, fvGuests, openFv, renderFv, fvMeet, fvBoothStart, fvMap, fvTip, festDef, goTo, navInfo, openShop, gdReady, thPreview, thPreviewEnd, thOn, busScene, tripCrowd, openTrip, startTrip, claimTrip, TRIPS, mgPickMul, mgPickMode, mgUpOrder, mgFillOrders, mgAdAsk, sportsCon, festCon, btQuota, btCanAd, btAdMore, warmRooms, blobUrl, vdSize, vdBlock, pzSweep, pzSwGain, pzSwOpen, pzXpOf, mgMulMax, mgMulOk, mgMul, mgModeTap, acTip, kidDupIdx, trialSafe, closeAd,
     TKE, TK_Q, tkDaily, nbAllDay, nbBuildAt, nbOn, conAdd, BX_SPOT, PERKS, offlineCapH, applyAway, pzFinish, mgClaimOrder,
     CS, JOBS, CS_WORRY, freshCs, csOpen, csLeft, csMax, csEnsure, csCands, csNeed, csMul, csOpenCards, csReady, csDone, csTalkMake, csAnswer, csChoose, csSettle, openCounsel, renderCounsel, renderHall, MAIN, qMeasure, qGoal, sanitize,   // 3.1.0 진로 상담
     NSL, nsStart, nsSettle, nsOpen, nsOn, nsOverlap, nsExtraH, isNight, nightDayOf, openNs, renderNs, bxSpots, renderNight,   // 3.0.0
