@@ -2558,7 +2558,8 @@ body.wl-on .toast{z-index:300}
 .sy-top{display:flex;align-items:center;justify-content:space-between;gap:8px}.sy-top b{font-family:var(--font-display);font-weight:400;font-size:15px}
 .sy-pic{border-radius:12px;overflow:hidden;background:#E8F0DA}.sy-pic img{display:block;width:100%;height:auto}.sy-pic[hidden]{display:none}
 /* 4.2.0 둘째 그림은 첫 그림 위에 겹쳐 천천히 나타나요 */
-.sy-pic{position:relative}.sy-pic img.sy-p2{position:absolute;inset:0;height:100%;object-fit:cover;opacity:0;transition:opacity .7s ease}.sy-pic img.sy-p2.on{opacity:1}.sy-pic img.sy-p2.solo{position:static;height:auto;transition:none}
+.sy-pic{position:relative}
+.sy-nav{display:flex;gap:6px;align-items:center}.sy-nav #stPrev[hidden]{display:none}.sy-pic img.sy-p2{position:absolute;inset:0;height:100%;object-fit:cover;opacity:0;transition:opacity .7s ease}.sy-pic img.sy-p2.on{opacity:1}.sy-pic img.sy-p2.solo{position:static;height:auto;transition:none}
 .sy-say{display:flex;gap:10px;align-items:flex-start;min-height:86px;cursor:pointer}.sy-say[hidden]{display:none}
 .sy-say .talk-av img{width:54px;height:54px;object-fit:contain}.sy-say .talk-av svg{width:52px;height:52px}.sy-em{font-size:34px}
 .sy-tx{flex:1;min-width:0}.sy-tx b{display:block;font-size:13.5px;color:var(--chip-ink)}.sy-tx p{margin:2px 0 0;font-size:15px;line-height:1.55;white-space:pre-line}
@@ -4506,7 +4507,7 @@ body.cam-scene #ffChip,body.cam-scene #plChip,body.cam-scene .b-ring{animation-p
     <div class="sy-pic" id="stPic" hidden></div>
     <div class="sy-say" id="stSay"><span class="talk-av" id="stAv"></span><div class="sy-tx"><b id="stWho"></b><p id="stText" aria-live="polite"></p></div></div>
     <div class="sy-picks" id="stPicks" hidden></div>
-    <div class="talk-foot"><small id="stStep"></small><button class="cta small" id="stNext" type="button" data-autofocus>다음</button></div>
+    <div class="talk-foot"><small id="stStep"></small><span class="sy-nav"><button class="btn-sub small" id="stPrev" type="button" aria-label="앞 줄 다시 보기">‹ 이전</button><button class="cta small" id="stNext" type="button" data-autofocus>다음</button></span></div>
   </section>
 </div>
 <!-- 4.1.0 이야기 수첩 -->
@@ -21554,7 +21555,9 @@ body.cam-scene #ffChip,body.cam-scene #plChip,body.cam-scene .b-ring{animation-p
   }
   // 4.2.0 장면이 가운데 줄을 넘으면 둘째 그림으로 부드럽게 바꿔요. 그림이 없으면 첫 그림 그대로
   function stPic2() {
-    const R = rt.st; if (!R || R.sw || !R.im2 || R.i < R.mid) return;
+    const R = rt.st; if (!R || !R.im2) return;
+    if (R.sw) { if (!R.im2.classList.contains('solo')) R.im2.classList.toggle('on', R.i >= R.mid); return; }   // 4.2.1 이전으로 넘기면 첫 그림으로 돌아가요
+    if (R.i < R.mid) return;
     R.sw = true;
     const pe = $('#stPic'), b = R.im2;
     if (pe.hidden || !pe.firstChild || rt.reduced) { pe.innerHTML = ''; b.classList.add('on', 'solo'); pe.appendChild(b); pe.hidden = false; return; }
@@ -21569,6 +21572,7 @@ body.cam-scene #ffChip,body.cam-scene #plChip,body.cam-scene .b-ring{animation-p
     if (pk) pb.innerHTML = L.pick.map((t, i) => `<button class="cta" type="button" data-stp="${i}">${esc(t)}</button>`).join('');
     else { setH($('#stAv'), nar ? '' : stAv(L.w)); $('#stAv').hidden = nar; setT($('#stWho'), nar ? '' : stName(L.w)); $('#stText').textContent = nl(L.t); }
     $('#stNext').hidden = pk; $('#stNext').textContent = R.i >= R.lines.length - 1 ? '닫기' : '다음';
+    $('#stPrev').hidden = R.i <= 0;   // 4.2.1 지섭: 앞 줄을 다시 읽을 수 있게
     setT($('#stStep'), `${R.i + 1} / ${R.lines.length}`);
   }
   function stNext() {
@@ -21577,6 +21581,11 @@ body.cam-scene #ffChip,body.cam-scene #plChip,body.cam-scene .b-ring{animation-p
     sfx('tap');
     if (R.i < R.lines.length - 1) { R.i += 1; stLine(); return; }
     stEnd();
+  }
+  // 4.2.1 앞 줄로 돌아가요. 고른 답은 이미 그 뒤 대사로 바뀌어 있어서 다시 고르지는 않아요
+  function stPrev() {
+    const R = rt.st; if (!R || R.i <= 0) return;
+    sfx('tap'); R.i -= 1; stLine();
   }
   function stPick(i) {
     const R = rt.st; if (!R) return; const L = R.lines[R.i]; if (!L.pick || !L.re || !L.re[i]) return;
@@ -24148,7 +24157,7 @@ body.cam-scene #ffChip,body.cam-scene #plChip,body.cam-scene .b-ring{animation-p
     $('#wdBarGo').addEventListener('click', () => { if (xgOn() && !xgDone()) openXg(); else openMk(); });
     $('#wdG').addEventListener('click', wdMapTap); $('#wdG').addEventListener('keydown', wdMapTap);
     $('#wdBarX').addEventListener('click', () => { sfx('tap'); rt.wdX = gameToday(); wdBar(); });
-    $('#stSay').addEventListener('click', stNext); $('#stNext').addEventListener('click', stNext);
+    $('#stSay').addEventListener('click', stNext); $('#stNext').addEventListener('click', stNext); $('#stPrev').addEventListener('click', stPrev);
     $('#stSkip').addEventListener('click', () => { sfx('tap'); stEnd(); });
     $('#stPicks').addEventListener('click', e => { const b = e.target.closest('[data-stp]'); if (b) stPick(+b.dataset.stp); });
     $('#map').addEventListener('click', sideMapTap, true); $('#map').addEventListener('keydown', sideMapTap, true);   // 4.1.0 곁가지 말풍선
@@ -26490,7 +26499,7 @@ body.cam-scene #ffChip,body.cam-scene #plChip,body.cam-scene .b-ring{animation-p
   }
 
   // 시험용 손잡이: 자동 시험(window.__FOREST_TEST)에서만 게임 속 함수를 꺼내 써요
-  if (window.__FOREST_TEST) window.__forest = { get S() { return S; }, get rt4() { return rt; }, setZone, geo, stPlay, stNext, ST, ST_SIDE, SIDE, missionGo, MGO, MGO_MINI, MGO_Q, renderMissions, renderPass, BOOST, conLeft, gameToday, setTab, ADX, adStamp, adxDay, adxCan, adxMore, adPickNow, adPickGive, conNear, renderAdStamp, claimOfflineDouble, startBoost, openBoost, showOffline, fvBoothStart, bfFwStart, musicWant, renderCounsel, renderXg, renderFv, showCeremony, RX, rxPct, rxCost, rxUp, rxPart, renderDept, goldOr, goldRich, adGold, stampAtt, GOLD, BIG, BF_DECO, bfWin, bfNext, bfOn, bfFw, bfSync, bfStamp, bfFwStart, bfPart, bfNextTx, sanitizeBf, freshBf, fvBoothMax, bldBox, bldPick, bldWarm, DECO_SLOTS, XG, MK, ST, SIDE, ST_SIDE, wdMap, xgOn, xgGuest, xgSpots, xgGreet, xgVisit, xgLunch, openXg, mkOn, mkHot, mkSell, mkBuy, mkSur, openMk, wdBar, wdTick, stTick, stPlay, stNext, stPick, stEnd, stTags, openSb, renderSb, sideCan, sideMap, fvFlag, FV, FV_POS, fvOn, fvOpen, fvBonus, fvSync, fvStamp, fvGuests, openFv, renderFv, fvMeet, fvBoothStart, fvMap, fvTip, festDef, goTo, navInfo, openShop, gdReady, thPreview, thPreviewEnd, thOn, busScene, tripCrowd, openTrip, startTrip, claimTrip, TRIPS, mgPickMul, mgPickMode, mgUpOrder, mgFillOrders, mgAdAsk, sportsCon, festCon, btQuota, btCanAd, btAdMore, warmRooms, blobUrl, vdSize, vdBlock, pzSweep, pzSwGain, pzSwOpen, pzXpOf, mgMulMax, mgMulOk, mgMul, mgModeTap, acTip, kidDupIdx, trialSafe, closeAd,
+  if (window.__FOREST_TEST) window.__forest = { get S() { return S; }, get rt4() { return rt; }, stPrev, setZone, geo, stPlay, stNext, ST, ST_SIDE, SIDE, missionGo, MGO, MGO_MINI, MGO_Q, renderMissions, renderPass, BOOST, conLeft, gameToday, setTab, ADX, adStamp, adxDay, adxCan, adxMore, adPickNow, adPickGive, conNear, renderAdStamp, claimOfflineDouble, startBoost, openBoost, showOffline, fvBoothStart, bfFwStart, musicWant, renderCounsel, renderXg, renderFv, showCeremony, RX, rxPct, rxCost, rxUp, rxPart, renderDept, goldOr, goldRich, adGold, stampAtt, GOLD, BIG, BF_DECO, bfWin, bfNext, bfOn, bfFw, bfSync, bfStamp, bfFwStart, bfPart, bfNextTx, sanitizeBf, freshBf, fvBoothMax, bldBox, bldPick, bldWarm, DECO_SLOTS, XG, MK, ST, SIDE, ST_SIDE, wdMap, xgOn, xgGuest, xgSpots, xgGreet, xgVisit, xgLunch, openXg, mkOn, mkHot, mkSell, mkBuy, mkSur, openMk, wdBar, wdTick, stTick, stPlay, stNext, stPick, stEnd, stTags, openSb, renderSb, sideCan, sideMap, fvFlag, FV, FV_POS, fvOn, fvOpen, fvBonus, fvSync, fvStamp, fvGuests, openFv, renderFv, fvMeet, fvBoothStart, fvMap, fvTip, festDef, goTo, navInfo, openShop, gdReady, thPreview, thPreviewEnd, thOn, busScene, tripCrowd, openTrip, startTrip, claimTrip, TRIPS, mgPickMul, mgPickMode, mgUpOrder, mgFillOrders, mgAdAsk, sportsCon, festCon, btQuota, btCanAd, btAdMore, warmRooms, blobUrl, vdSize, vdBlock, pzSweep, pzSwGain, pzSwOpen, pzXpOf, mgMulMax, mgMulOk, mgMul, mgModeTap, acTip, kidDupIdx, trialSafe, closeAd,
     TKE, TK_Q, tkDaily, nbAllDay, nbBuildAt, nbOn, conAdd, BX_SPOT, PERKS, offlineCapH, applyAway, pzFinish, mgClaimOrder,
     CS, JOBS, CS_WORRY, freshCs, csOpen, csLeft, csMax, csEnsure, csCands, csNeed, csMul, csOpenCards, csReady, csDone, csTalkMake, csAnswer, csChoose, csSettle, openCounsel, renderCounsel, renderHall, MAIN, qMeasure, qGoal, sanitize,   // 3.1.0 진로 상담
     NSL, nsStart, nsSettle, nsOpen, nsOn, nsOverlap, nsExtraH, isNight, nightDayOf, openNs, renderNs, bxSpots, renderNight,   // 3.0.0

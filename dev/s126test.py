@@ -27,6 +27,13 @@ async def main():
         ok(r['a'] == ['st_ch01'] or r['a'] == ['st_ch01_o'], '처음에는 첫 그림') ; ok(r['b'] == r['a'], '가운데 전까지 그대로'); ok(r['c'][-1] == 'st_ch01_o2+', '가운데부터 둘째 그림')
         r = await run('c23'); print('24장 닫는 장면', r); ok(r['c'][-1] == 'st_ch24_c2+', '24장 닫는 장면 둘째 그림')
         r = await run('side:mole:2'); print('곁가지', r); ok(r['a'] == ['st_side_mole'] and r['c'][-1] == 'st_side_mole_3+', '곁가지 3화 둘째 그림')
+        # 4.2.1 이전 단추: 앞 줄로 돌아가고, 가운데 앞으로 가면 첫 그림으로
+        r = await page.evaluate(f"""(async()=>{{ const F={F}, sl=ms=>new Promise(r=>setTimeout(r,ms)); F.stPlay('o2', true); await sl(700); const R=F.rt4.st, P=document.querySelector('#stPrev');
+          const h0=P.hidden; while (R.i < R.mid) F.stNext(); await sl(300); const t1=document.querySelector('#stText').textContent, on1=!!document.querySelector('#stPic img.sy-p2.on');
+          P.click(); await sl(300); const i2=R.i, on2=!!document.querySelector('#stPic img.sy-p2.on'), t2=document.querySelector('#stText').textContent;
+          F.stNext(); const t3=document.querySelector('#stText').textContent; while (F.rt4.st) {{ const L=F.rt4.st.lines[F.rt4.st.i]; if (L.pick) {{ document.querySelector('[data-stp]').click(); continue; }} F.stNext(); }}
+          return {{h0, on1, on2, back: i2 === R.mid - 1, diff: t1 !== t2, again: t3 === t1}}; }})()""")
+        print('이전 단추', r); ok(r == {'h0': True, 'on1': True, 'on2': False, 'back': True, 'diff': True, 'again': True}, '이전으로 앞 줄 다시 보기, 첫 줄에서는 숨김, 그림도 되돌아감')
         r = await page.evaluate(f"(()=>{{ const F={F}; const ok=F.stPlay('recap', true); const h=document.querySelector('#stCh').textContent; while (F.rt4.st) F.stNext(); return [ok, h]; }})()")
         print('지금까지의 이야기', r); ok(r == [True, '지금까지의 이야기'], '요약 장면도 열려요')
         ok(not [e for e in errs if 'story' not in e], f'페이지 오류 {errs[:3]}')
