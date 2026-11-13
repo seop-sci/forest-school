@@ -75,7 +75,7 @@ async def main():
             r['over'] = await pg.evaluate(OVER, '#panelDeco')
             print(w, scheme, '가게', json.dumps(r))
             # 4.1.0: 받아서 얻는 장식 12개(축제 기념품 8, 우정 배지 1, 숲속 장터 3)가 더 보여요
-            if not r['open'] or r['items'] != 16 + r['evart'] + 27 + 12 or r['marks'] != 25 or r['over']: bad.append(f'{w} 가게 화면 {r}')
+            if not r['open'] or r['items'] != 16 + r['evart'] + 27 + 12 + 12 or r['marks'] != 25 or r['over']: bad.append(f'{w} 가게 화면 {r}')
             await pg.screenshot(path=f's62_{w}.png')
             await pg.evaluate("document.querySelector('#panelDeco').scrollTop = 9999"); await pg.wait_for_timeout(200)
             await pg.screenshot(path=f's62_{w}b.png')
