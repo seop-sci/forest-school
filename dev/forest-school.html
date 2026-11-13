@@ -3459,7 +3459,7 @@ body.cam-scene #ffChip,body.cam-scene #plChip,body.cam-scene .b-ring{animation-p
     <p class="boot-step" id="bootStep">학교 문을 여는 중...</p>
     <p class="boot-tip" id="bootTip">학교 문을 여는 중이에요</p>
   </div>
-  <span class="boot-ver" id="bootVer">v4.2.0</span>
+  <span class="boot-ver" id="bootVer">v4.3.0</span>
 </div>
 
 <div class="app on-school" id="app">
@@ -4008,7 +4008,7 @@ body.cam-scene #ffChip,body.cam-scene #plChip,body.cam-scene .b-ring{animation-p
       </div>
       <h3 class="panel-sub">정보</h3>
       <dl class="info">
-        <div id="verRow"><dt>버전</dt><dd>v4.2.0</dd></div>
+        <div id="verRow"><dt>버전</dt><dd>v4.3.0</dd></div>
         <div id="pidRow" hidden><dt>학교 번호</dt><dd id="infoPid"></dd></div>
       </dl>
       <div id="devBox" hidden>
@@ -12970,13 +12970,16 @@ body.cam-scene #ffChip,body.cam-scene #plChip,body.cam-scene .b-ring{animation-p
        forest/rank/<내 id>   랭킹 이름과 학교 점수
        forest/stats/<내 id>  테스트 현황 (어디까지 했는지, 얼마나 했는지)
      <내 id>는 Firebase 익명 로그인이 기기(브라우저)마다 만들어 줘요. */
-  const VERSION = '4.2.0';
+  const VERSION = '4.3.0';
   const NT_QUIET = ['2.1.20', '2.1.2.2', '2.3.0.1', '2.3.4', '3.2.3', '3.2.4', '3.2.5', '3.3.1', '3.3.2', '3.3.3'];   // 3.3.1, 3.3.2, 3.3.3(토스 먼저)도 공지 창 없이(지섭). 2.3.0.1도 공지 창 없이(공지는 그대로 2.3.0). 2.3.4도 조용히(지섭 결정). 3.2.3, 3.2.4, 3.2.5도 공지 창 없이(공지 줄을 고르지 않음)
     // 2.1.20 지섭 결정: 이 버전들은 업데이트해도 공지 창을 띄우지 않아요(공지는 그대로 2.1.2)
   /* 2.0.0 공지사항 (2026-10-27 지섭, 1.8.0은 이미 올려서 2.0.0부터): 설정 > 공지사항. 맨 위가 가장 새 공지예요.
      패치노트는 자동으로 넣지 않아요. 지섭이 검수한 글만 여기에 적어요(CHANGELOG.md는 자세한 기록용이라 따로 있어요).
      접속하면 새 공지 창을 띄워요(올라온 뒤 7일 동안, '일주일간 열지 않기'를 누르면 7일 쉬어요). 업데이트한 뒤 첫 접속에는 쉬는 중이어도 한 번 띄워요 */
   const NOTICES = [
+    // 4.3.0 공지(2026-11-14 지섭 확인한 세 줄)
+    { id: '2026-11-14-v430', date: '2026-11-14', tag: '업데이트', title: '4.3.0 업데이트',
+      lines: ['숲속 탐험대 업데이트(유치원부터, 층을 오르며 장난꾸러기 달래기)', '탐험 랭킹(이번 주 가장 높은 층)', '편의 개선과 오류 수정(운동회 트랙, 퀘스트 횟수, 업적 모두 받기, 숲속 대결 승률, 이야기 이전 단추)'] },
     // 4.2.0 공지(2026-11-13 지섭이 고른 세 줄)
     { id: '2026-11-13-v420', date: '2026-11-13', tag: '업데이트', title: '4.2.0 업데이트',
       lines: ['대축제 업데이트(월 1회 진행)', '연구 투자 업데이트', '편의 개선과 오류 수정'] },
@@ -14757,12 +14760,12 @@ body.cam-scene #ffChip,body.cam-scene #plChip,body.cam-scene .b-ring{animation-p
     slotNm: ['맨 앞', '앞', '가운데', '뒤', '맨 뒤'],
     mats: ['반짝 나뭇가지', '빛나는 조약돌', '무지개 꽃잎', '별 조각'], matIc: ['🪵', '🪨', '🌸', '⭐'],
     idleMax: 12 * 3600, idleMin: 600,
-    adSpd: { n: 3, fl: 10, min: 20 }, adRep: 1, buff: 1.3,
+    adSpd: { n: 3, min: 10, max: 30 },   // 4.3.0 지섭 결정: 광고 한 번에 2배속 10분(게임을 켜 둔 동안만 줄어요), 이어 붙여 30분까지, 하루 세 번 adRep: 1, buff: 1.3,
     // 4.3.0 지섭 요청(너무 빨라요, 탐험 느낌): 겨루기 속도와 한 층의 흐름(걷기, 만남, 이김, 사건, 오르기, 짐). 초 단위, 2배속이면 모두 반으로
     pace: 1.7, ph: { walk: 2.6, meet: 1.1, win: 1.5, climb: 1.3, lose: 3.6, ev: 8 }, evP: 0.3,
     mobPh: ['chr_mouse', 'chr_crow', 'chr_goose', 'chr_sheep', 'chr_goat', 'chr_beaver'], bossPh: 'chr_boar',
   };
-  function freshTam() { return { best: 0, party: ['bear', 'rabbit', 'fox'], mem: {}, gear: { tool: 0, bag: 0, hat: 0 }, sg: [0, 1, 2, 3, 4].map(() => ({ tool: 0, bag: 0, hat: 0 })), mat: [0, 0, 0, 0], it: 0, auto: 0, ad: { day: '', spd: 0, rep: 0, rv: 0 }, spd: { fl: 0, until: 0 }, wk: { w: -1, best: 0 }, seen: 0 }; }
+  function freshTam() { return { best: 0, party: ['bear', 'rabbit', 'fox'], mem: {}, gear: { tool: 0, bag: 0, hat: 0 }, sg: [0, 1, 2, 3, 4].map(() => ({ tool: 0, bag: 0, hat: 0 })), mat: [0, 0, 0, 0], it: 0, auto: 0, ad: { day: '', spd: 0, rep: 0, rv: 0 }, spd: { sec: 0 }, wk: { w: -1, best: 0 }, seen: 0 }; }
   function sanitizeTam(d, s) {
     const A = d && d.tam && typeof d.tam === 'object' ? d.tam : {}, f = freshTam(), n = (v, lo, hi, def) => typeof v === 'number' && isFinite(v) ? Math.max(lo, Math.min(hi, Math.floor(v))) : def;
     f.best = n(A.best, 0, 1e6, 0);
@@ -14774,7 +14777,7 @@ body.cam-scene #ffChip,body.cam-scene #plChip,body.cam-scene .b-ring{animation-p
     if (Array.isArray(A.mat)) f.mat = [0, 1, 2, 3].map(i => n(A.mat[i], 0, 1e12, 0));
     f.it = n(A.it, 0, 4e12, 0); f.auto = A.auto ? 1 : 0; f.seen = A.seen ? 1 : 0;
     if (A.ad && typeof A.ad === 'object') f.ad = { day: typeof A.ad.day === 'string' ? A.ad.day.slice(0, 10) : '', spd: n(A.ad.spd, 0, 99, 0), rep: n(A.ad.rep, 0, 99, 0), rv: n(A.ad.rv, 0, 1e6, 0) };
-    if (A.spd && typeof A.spd === 'object') f.spd = { fl: n(A.spd.fl, 0, 99, 0), until: n(A.spd.until, 0, 4e12, 0) };
+    if (A.spd && typeof A.spd === 'object') f.spd = { sec: n(A.spd.sec, 0, TAM.adSpd.max * 60, 0) };   // 옛 시험판의 층 단위 2배속(fl, until)은 받지 않아요
     if (A.wk && typeof A.wk === 'object') f.wk = { w: n(A.wk.w, -1, 1e7, -1), best: n(A.wk.best, 0, 1e6, 0) };
     s.tam = f;
   }
@@ -14849,7 +14852,7 @@ body.cam-scene #ffChip,body.cam-scene #plChip,body.cam-scene .b-ring{animation-p
     while (!r) { r = tamStep(F, 0.1, true, rnd); F.ev.length = 0; }
     return { win: r === 1, t: Math.round(F.t * 10) / 10 };
   }
-  const tamSpdOn = () => S.tam.spd.fl > 0 && S.tam.spd.until > gameNow();
+  const tamSpdOn = () => S.tam.spd.sec > 0;
   function tamAdDay() { const t = gameToday(); if (S.tam.ad.day !== t) S.tam.ad = { day: t, spd: 0, rep: 0, rv: S.tam.ad.rv || 0 }; }
   const tamLvCost = sp => minAcorns(TAM.lvMin * Math.pow(TAM.lvCost, tamMem(sp).lv - 1));
   const tamGearCost = (k, i) => { const L = S.tam.sg[i][k], G = TAM.gear.find(g => g.k === k); return { m: G.mat, n: 4 + 3 * L, star: L % 10 === 9 ? 3 * (1 + Math.floor(L / 10)) : 0 }; };
@@ -14877,7 +14880,6 @@ body.cam-scene #ffChip,body.cam-scene #plChip,body.cam-scene .b-ring{animation-p
       got.push(['나무', '은빛', '금빛'][c - 1] + ' 보물 상자');
     }
     if (fl % 100 === 0) { addGold(1); got.push('황금 도토리 +1'); }
-    if (S.tam.spd.fl > 0) S.tam.spd.fl -= 1;
     if (got.length) toast(`${fl}층 통과!\n${got.join('\n')}`);
     if (fl % 10 === 0) save();
   }
@@ -14914,7 +14916,8 @@ body.cam-scene #ffChip,body.cam-scene #plChip,body.cam-scene .b-ring{animation-p
   }
   function tamAdSpd() {
     tamAdDay(); if (S.tam.ad.spd >= TAM.adSpd.n) { toast('2배속 광고는 하루 세 번까지예요'); return; }
-    showAd(() => { tamAdDay(); S.tam.ad.spd += 1; S.tam.spd = { fl: TAM.adSpd.fl, until: gameNow() + TAM.adSpd.min * 60000 }; save(); toast(`다음 ${TAM.adSpd.fl}층 동안 2배속이에요`); tamRenderTop(); }, r => { if (r !== 'noad') toast('광고를 끝까지 보지 않아서 보상이 없어요'); });
+    if (S.tam.spd.sec > (TAM.adSpd.max - TAM.adSpd.min) * 60) { toast(`2배속은 ${TAM.adSpd.max}분까지 모을 수 있어요`); return; }
+    showAd(() => { tamAdDay(); S.tam.ad.spd += 1; S.tam.spd.sec = Math.min(TAM.adSpd.max * 60, S.tam.spd.sec + TAM.adSpd.min * 60); save(); toast(`2배속 ${TAM.adSpd.min}분! 게임을 켜 둔 동안만 줄어요`); tamRenderTop(); }, r => { if (r !== 'noad') toast('광고를 끝까지 보지 않아서 보상이 없어요'); });
   }
   function tamAdRevive() {
     showAd(() => { const T = rt.tam; if (T) { T.buff = 1; T.lose = 0; T.nLose = 0; if (T.ph === 'lose') T.t = TAM.ph.lose; } tamRenderTop(); toast('힘을 내서 다시 도전해요!'); }, r => { if (r !== 'noad') toast('광고를 끝까지 보지 않아서 보상이 없어요'); });
@@ -14947,6 +14950,7 @@ body.cam-scene #ffChip,body.cam-scene #plChip,body.cam-scene .b-ring{animation-p
     const T = rt.tam || (rt.tam = { ph: '', t: 0, F: null, buff: 0, lose: 0, nLose: 0, ev: null, mod: null });
     if (!T.ph) { tamPh(T, 'walk'); return; }
     const vis = tamFxOn(), d = dt * (tamSpdOn() ? 2 : 1), P = TAM.ph;
+    if (tamSpdOn()) { const was = Math.ceil(S.tam.spd.sec); S.tam.spd.sec = Math.max(0, S.tam.spd.sec - dt); if (vis && Math.ceil(S.tam.spd.sec) !== was) tamRenderTop(); }   // 2배속은 켜 둔 동안만 줄어요
     T.t += d;
     if (T.ph === 'walk') { if (T.t >= P.walk) tamPh(T, 'meet'); }
     else if (T.ph === 'meet') { if (vis && T.F) tamDraw(T.F); if (T.t >= P.meet) tamPh(T, 'fight'); }
@@ -15214,7 +15218,8 @@ body.cam-scene #ffChip,body.cam-scene #plChip,body.cam-scene .b-ring{animation-p
     $('#tmPow').textContent = `탐험대 힘 ${fmt(tamPow())}`;
     tamAdDay();
     const sb = $('#tmSpd'); sb.classList.toggle('on', tamSpdOn());
-    sb.textContent = tamSpdOn() ? `2배속 ${S.tam.spd.fl}층 남음` : `📺 2배속 (${TAM.adSpd.n - S.tam.ad.spd}/${TAM.adSpd.n})`;
+    const left = TAM.adSpd.n - S.tam.ad.spd;
+    sb.textContent = tamSpdOn() ? `2배속 ${hms(S.tam.spd.sec * 1000)}${left > 0 ? ` (📺 +${TAM.adSpd.min}분 ${left}/${TAM.adSpd.n})` : ''}` : `📺 2배속 ${TAM.adSpd.min}분 (${left}/${TAM.adSpd.n})`;
     const ab = $('#tmAuto'); ab.hidden = !tamAutoOn(); ab.setAttribute('aria-pressed', S.tam.auto ? 'true' : 'false'); ab.textContent = S.tam.auto ? '필살기 자동 켬' : '필살기 자동 끔';
     const T = rt.tam, rv = $('#tmRevive'); rv.hidden = !(T && T.lose && T.lose % TAM.bossEvery === 0);
     const I = tamIdle(), rp = $('#tmRep'); rp.hidden = I.sec < 60; rp.textContent = `탐험 보고서 받기 (${Math.floor(I.sec / 60)}분)`;
@@ -15313,7 +15318,7 @@ body.cam-scene #ffChip,body.cam-scene #plChip,body.cam-scene .b-ring{animation-p
     }
     if (b.dataset.tlv) { const sp = b.dataset.tlv, c = tamLvCost(sp); if (S.budget < c) return; S.budget -= c; tamMem(sp).lv += 1; tamRestartStat(); sfx('coin'); buzz(10); save(); renderHUD(); tamRenderTop(); tamRenderBody(); return; }
     if (b.dataset.tgear) { const [si, k] = b.dataset.tgear.split(':'), i = +si; if (!S.tam.sg[i] || !(k in S.tam.sg[i]) || i >= tamSlots()) return; const c = tamGearCost(k, i); if (S.tam.mat[c.m] < c.n || S.tam.mat[3] < c.star) return; S.tam.mat[c.m] -= c.n; S.tam.mat[3] -= c.star; S.tam.sg[i][k] += 1; tamRestartStat(); sfx('coin'); save(); tamRenderTop(); tamRenderBody(); return; }
-    if (b.id === 'tmSpd') { if (!tamSpdOn()) tamAdSpd(); return; }
+    if (b.id === 'tmSpd') { tamAdSpd(); return; }
     if (b.id === 'tmAuto') { S.tam.auto = S.tam.auto ? 0 : 1; sfx('tap'); save(); tamRenderTop(); return; }
     if (b.id === 'tmRevive') { tamAdRevive(); return; }
     if (b.id === 'tmRep') { tamReport(false); return; }

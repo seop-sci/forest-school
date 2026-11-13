@@ -1,6 +1,6 @@
 # 128번 시험(4.3.0): 숲속 탐험대
 # 1) 새 학교와 옛 저장(탐험 칸 없음)이 모두 탐험대를 받아요  2) 겨루기 셈이 층마다 유한하고, 대원을 키우면 더 깊이 가요
-# 3) 층 통과 보상, 자리 비운 보고서(12시간까지), 2배속 광고(하루 3번)  4) 탭(가운데 탐험)과 위쪽 졸업 단추, 360px과 390px 밝은 화면과 어두운 화면
+# 3) 층 통과 보상, 자리 비운 보고서(12시간까지), 2배속 광고(하루 3번, 한 번에 10분, 30분까지)  4) 탭(가운데 탐험)과 위쪽 졸업 단추, 360px과 390px 밝은 화면과 어두운 화면
 # 5) 랭킹 '탐험' 보기와 서버 규칙에 맞춘 층 올리기 폭
 import asyncio, json, pathlib
 from playwright.async_api import async_playwright
@@ -46,10 +46,10 @@ async def main():
         # 2배속 광고: 하루 3번
         r = await page.evaluate(f"""(async()=>{{ {AD} const F={F}, S=F.S; const out=[];
           for (let i=0;i<4;i++){{ F.tamAdSpd(); out.push(await watch()); }}
-          return {{ out, n: S.tam.ad.spd, fl: S.tam.spd.fl, until: S.tam.spd.until - Date.now() }}; }})()""")
+          const sec=S.tam.spd.sec; await new Promise(r=>setTimeout(r,2100)); return {{ out, n: S.tam.ad.spd, sec, sec2: S.tam.spd.sec }}; }})()""")
         print('2배속', r)
         ok(r['out'] == [True, True, True, False] and r['n'] == 3, '2배속 광고는 하루 세 번')
-        ok(r['fl'] == 10 and 19 * 60000 < r['until'] <= 20 * 60000 + 1000, '다음 10층, 20분')
+        ok(29 * 60 < r['sec'] <= 30 * 60 and 1.5 < r['sec'] - r['sec2'] < 3, '광고 한 번에 10분, 이어 붙여 30분, 켜 둔 동안 줄어요')
         # 4.3.0 둘째 판: 한 층의 흐름, 사건, 자동 편성, 강화 추천
         r = await page.evaluate(f"""(async()=>{{ const F={F}, S=F.S, sl=ms=>new Promise(r=>setTimeout(r,ms)); F.setTab('tam'); await sl(200);
           const T=F.rt4.tam; F.tamPh(T,'walk'); const seen=new Set(); for(let i=0;i<60;i++){{ seen.add(T.ph); await sl(150); if(T.ph==='climb') break; }}

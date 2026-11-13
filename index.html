@@ -2,7 +2,7 @@
 <html lang="ko">
 <head>
 <meta charset="utf-8">
-<meta name="forest-version" content="4.2.0">
+<meta name="forest-version" content="4.3.0">
 <meta name="viewport" content="width=device-width, initial-scale=1">
 <meta name="description" content="도토리를 모아 숲속 학교를 키우는 방치형 게임 테스트판이에요.">
 <style>html,body{margin:0}</style>
@@ -690,6 +690,187 @@ label.srow,button.srow{cursor:pointer}
 .shop-have{display:flex;align-items:center;justify-content:center;gap:6px;margin:0 0 8px;font-family:var(--font-chalk);font-weight:700;font-size:32px;line-height:1.1;font-variant-numeric:tabular-nums}
 .shop-have svg{width:28px;height:28px}
 .modal .shop-adleft{margin:6px 0 2px;font-size:12.5px}
+/* 4.3.0 숲속 탐험대: 아래 탭 가운데 큰 동그라미(지섭 시안 가안), 졸업은 위쪽 학교 카드로 */
+.tabs .tab.tab-tam{background:linear-gradient(#FFEBAE,#F6C94F);color:#5A3A12;font-weight:700;box-shadow:inset 0 0 0 2px #E2A92A,0 0 8px rgba(243,197,82,.5);animation:tmGlow 2.6s ease-in-out infinite}
+.tabs .tab.tab-tam[aria-selected="true"]{background:linear-gradient(#FFF3C6,#FFD45E);color:#4A2E0A;box-shadow:inset 0 0 0 2.5px #D99A1E,0 0 14px rgba(243,197,82,.9)}
+.tab-tam .tic{transform:scale(1.12)}
+@keyframes tmGlow{50%{box-shadow:inset 0 0 0 2px #E2A92A,0 0 15px rgba(243,197,82,.95)}}
+@media (prefers-reduced-motion:reduce){.tabs .tab.tab-tam{animation:none}}
+.xgrad{position:relative}.xgrad .tic{width:26px;height:26px;background-size:contain;background-repeat:no-repeat;background-position:center}
+.xgrad .dot{position:absolute;top:3px;right:3px;width:8px;height:8px;border-radius:50%;background:var(--seal)}
+.xgrad .tguide{top:auto;bottom:-24px;transform:rotate(180deg)}
+.icon-btn.tab.guide .tguide{display:block}
+.tm-top{display:flex;align-items:flex-end;justify-content:space-between;gap:8px;margin:2px 2px 6px}
+.tm-where{display:flex;align-items:baseline;gap:6px;flex-wrap:wrap}.tm-where b{font-family:var(--font-display);font-size:20px}.tm-where small,.tm-pow{color:var(--muted);font-size:12px}
+.tm-stage{position:relative;aspect-ratio:5/4;max-height:360px;width:100%;border-radius:18px;overflow:hidden;background:#BFE3A8;border:2px solid var(--line);isolation:isolate;--shx:0px;--shy:0px}
+.tm-stage[data-reg="garden"]{background-color:#A9D3A0}.tm-stage[data-reg="pond"]{background-color:#BFDDE6}.tm-stage[data-reg="library"]{background-color:#E9C48F}.tm-stage[data-reg="yard"]{background-color:#E6EEF6}.tm-stage[data-reg="tower"]{background-color:#8F82C9}
+.tm-world{position:absolute;inset:0;transform:translate(var(--shx),var(--shy))}
+.tm-bgs{position:absolute;inset:0;overflow:hidden}
+.tm-bg{position:absolute;inset:0;background:center 70%/cover no-repeat;will-change:transform}
+.tm-bg.nx{transform:translateY(-100%)}
+.tm-stage.deep .tm-bg{filter:hue-rotate(25deg) saturate(1.15) brightness(.92)}
+.tm-stage.boss .tm-bgs::after{content:"";position:absolute;inset:0;background:radial-gradient(ellipse at 70% 60%,transparent 30%,rgba(40,20,70,.45) 100%);animation:tmBossV 2.4s ease-in-out infinite}
+@keyframes tmBossV{50%{opacity:.6}}
+.tm-amb{position:absolute;inset:0;pointer-events:none;overflow:hidden}
+.tm-amb i{position:absolute;top:-6%;width:var(--s,6px);height:var(--s,6px);border-radius:50% 0 50% 50%;background:var(--pc,#FFC2D6);opacity:.85;animation:tmFall var(--d,7s) linear infinite;animation-delay:var(--dl,0s)}
+.tm-stage[data-reg="pond"] .tm-amb i{border-radius:50%;background:rgba(255,255,255,.7);box-shadow:inset -1px -1px 0 rgba(120,190,220,.6);animation-name:tmRise;top:auto;bottom:-6%}
+.tm-stage[data-reg="library"] .tm-amb i{--pc:#F2994A}.tm-stage[data-reg="garden"] .tm-amb i{--pc:#FFF3B0;border-radius:50%;box-shadow:0 0 6px #FFF3B0}
+.tm-stage[data-reg="yard"] .tm-amb i{--pc:#fff;border-radius:50%}.tm-stage[data-reg="tower"] .tm-amb i{--pc:#FFF6C8;border-radius:50%;box-shadow:0 0 6px #FFE98A;animation-name:tmTw}
+@keyframes tmFall{to{transform:translate(var(--dx,30px),118cqh) rotate(320deg)}}
+@keyframes tmRise{to{transform:translate(var(--dx,10px),-118cqh)}}
+@keyframes tmTw{0%,100%{opacity:.1;transform:translateY(calc(var(--y,20) * 1cqh))}50%{opacity:1;transform:translateY(calc(var(--y,20) * 1cqh)) scale(1.4)}}
+.tm-stage{container-type:size}
+.tm-speed{position:absolute;inset:0;pointer-events:none;opacity:0;background:repeating-linear-gradient(90deg,transparent 0 22px,rgba(255,255,255,.5) 22px 24px,transparent 24px 61px);background-size:100% 40%}
+.tm-stage.climb .tm-speed{animation:tmSpeed .9s ease-in-out}
+@keyframes tmSpeed{0%{opacity:0;background-position:0 -40%}30%,70%{opacity:.8}100%{opacity:0;background-position:0 160%}}
+.tm-side{position:absolute;inset:0;pointer-events:none}
+.tm-f{position:absolute;width:var(--w,23%);transform:translateX(-50%);display:flex;flex-direction:column;align-items:center;transition:opacity .45s,filter .45s}
+.tm-body{width:100%;animation:tmBob 1.6s ease-in-out infinite;animation-delay:var(--bd,0s);transform-origin:50% 100%}
+.tm-f img{display:block;width:100%;aspect-ratio:1;object-fit:contain;object-position:bottom;filter:drop-shadow(0 4px 3px rgba(0,0,0,.25))}
+.tm-f::before{content:"";position:absolute;left:18%;right:18%;bottom:7%;height:9%;border-radius:50%;background:rgba(40,30,10,.25);filter:blur(2px);z-index:-1}
+@keyframes tmBob{50%{transform:translateY(-3%) scaleY(1.03)}}
+.tm-mob.boss{--w:42%}
+.tm-hp{display:block;width:74%;height:6px;margin-top:-4%;border-radius:4px;background:rgba(30,20,10,.45);overflow:hidden;box-shadow:0 0 0 1.5px rgba(255,255,255,.75)}.tm-hp b{display:block;height:100%;background:linear-gradient(#9BE58A,#5EBF4E);transition:width .15s}
+.tm-mob .tm-hp b{background:linear-gradient(#FFB08A,#E8663C)}.tm-mob.boss .tm-hp{display:none}
+.tm-f.act .tm-body{animation:tmAct .34s cubic-bezier(.3,1.6,.5,1)}
+.tm-p .tm-f.act{--dx:34%}.tm-m .tm-f.act{--dx:-30%}
+.tm-p .tm-f.act.far .tm-body{animation:tmHop .34s ease-out}
+@keyframes tmAct{45%{transform:translateX(var(--dx)) scale(1.12) rotate(4deg)}}
+@keyframes tmHop{45%{transform:translateY(-14%) scale(1.08)}}
+.tm-f.hurt img{animation:tmHurt .32s}
+@keyframes tmHurt{25%{transform:translateX(-7%);filter:brightness(2.2) sepia(1) hue-rotate(-30deg) drop-shadow(0 0 4px #fff)}60%{transform:translateX(4%)}}
+.tm-mob.hurt img{animation:tmHurtM .32s}
+@keyframes tmHurtM{25%{transform:translateX(7%) scale(.94,1.06);filter:brightness(2.4) drop-shadow(0 0 5px #fff)}60%{transform:translateX(-4%)}}
+.tm-f.weak img{filter:saturate(.4) brightness(1.15) drop-shadow(0 0 5px #C9A2FF)}
+.tm-f.out{opacity:0;filter:blur(2px)}.tm-f.out .tm-body{animation:tmOut .5s ease-in forwards}
+@keyframes tmOut{to{transform:translateY(-30%) scale(.5) rotate(-20deg)}}
+.tm-f.in .tm-body{animation:tmDrop .6s cubic-bezier(.3,1.5,.6,1) backwards;animation-delay:var(--id,0s)}
+@keyframes tmDrop{0%{transform:translateY(-180%) scale(.8);opacity:0}60%{opacity:1}}
+.tm-p.jump .tm-f .tm-body{animation:tmJump .9s cubic-bezier(.3,.9,.4,1);animation-delay:var(--bd2,0s)}
+@keyframes tmJump{0%{transform:none}25%{transform:translateY(-55%) scale(.92,1.1)}55%{transform:translateY(-40%)}100%{transform:none}}
+.tm-fxl{position:absolute;inset:0;pointer-events:none;overflow:hidden}
+.tm-fxl img,.tm-fxl span{position:absolute;left:0;top:0;pointer-events:none}
+.tm-shot{width:15%;aspect-ratio:1;object-fit:contain;filter:drop-shadow(0 0 6px rgba(255,255,255,.9))}
+.tm-spark{width:17%;aspect-ratio:1;object-fit:contain}
+.tm-poof{width:26%;aspect-ratio:1;object-fit:contain}
+.tm-drop{width:8%;aspect-ratio:1;object-fit:contain;filter:drop-shadow(0 2px 2px rgba(0,0,0,.3))}
+.tm-num{font-family:var(--font-display);font-size:clamp(14px,5cqw,20px);font-weight:700;color:#fff;-webkit-text-stroke:1px #6B3A1F;text-shadow:0 2px 0 #6B3A1F;white-space:nowrap}
+.tm-num.cr{color:#FFE066;font-size:clamp(20px,8cqw,30px)}.tm-num.heal{color:#B8F5A8;-webkit-text-stroke-color:#2E6B22;text-shadow:0 2px 0 #2E6B22}.tm-num.ouch{color:#FFC4C4;font-size:clamp(12px,4cqw,16px)}
+.tm-bigfx{position:absolute;left:-10%;top:12%;width:120%;height:76%;object-fit:contain;pointer-events:none;mix-blend-mode:screen}
+.tm-stage.flash::after{content:"";position:absolute;inset:0;background:#fff;animation:tmFlash .5s ease-out forwards;pointer-events:none;z-index:6}
+@keyframes tmFlash{from{opacity:.85}to{opacity:0}}
+.tm-cut{position:absolute;left:0;right:0;top:22%;height:44%;z-index:5;pointer-events:none;display:flex;align-items:center;background:linear-gradient(100deg,transparent 0 6%,rgba(255,236,170,.95) 6% 94%,transparent 94%);animation:tmCut .8s cubic-bezier(.2,.9,.3,1) forwards}
+.tm-cut img{height:130%;margin-left:4%;filter:drop-shadow(0 4px 6px rgba(0,0,0,.35))}
+.tm-cut b{font-family:var(--font-display);font-size:clamp(18px,7cqw,28px);color:#5A3A12;-webkit-text-stroke:.5px #fff}
+.tm-cut[data-r="sci"]{--cc:#BDEBFF}.tm-cut[data-r="pe"]{--cc:#FFD0B0}.tm-cut[data-r="kor"]{--cc:#D8F5C6}.tm-cut[data-r="art"]{--cc:#FFD3EE}.tm-cut[data-r="math"]{--cc:#FFF0A8}
+.tm-cut[data-r]{background:linear-gradient(100deg,transparent 0 6%,var(--cc) 6% 94%,transparent 94%)}
+@keyframes tmCut{0%{transform:translateX(-100%) skewX(-8deg)}22%,72%{transform:none}100%{transform:translateX(100%);opacity:0}}
+.tm-rib{position:absolute;left:4%;right:4%;top:28%;height:22%;display:grid;place-items:center;padding:0 14%;text-align:center;font-family:var(--font-display);font-size:clamp(16px,6.2cqw,24px);color:#5A3A12;background:center/100% 100% no-repeat;animation:tmRib 1.3s ease-out forwards;z-index:7;text-shadow:0 1px 0 #fff}
+.tm-rib:not([style*="url"]){background-color:rgba(255,226,140,.92);border-radius:12px}
+.tm-rib.boss{color:#fff;text-shadow:0 2px 0 #4B2A86}.tm-rib.lose{background-color:rgba(255,255,255,.88);color:var(--ink);font-size:16px;border-radius:12px}
+@keyframes tmRib{0%{transform:scale(.3);opacity:0}14%{transform:scale(1.08);opacity:1}22%{transform:none}85%{opacity:1}100%{opacity:0;transform:translateY(-12%)}}
+.tm-time{position:absolute;left:12%;right:4%;top:3%;height:5px;border-radius:3px;background:rgba(0,0,0,.25);z-index:4}.tm-time b{display:block;height:100%;width:100%;border-radius:3px;background:#fff}
+.tm-flbig{position:absolute;left:50%;top:7%;transform:translateX(-50%);z-index:4;padding:0 12px;border-radius:20px;background:rgba(60,35,10,.42);font-family:var(--font-display);font-size:clamp(18px,7cqw,28px);color:#fff;-webkit-text-stroke:1px #6B3A1F;text-shadow:0 2px 0 #6B3A1F;white-space:nowrap;pointer-events:none}
+.tm-flbig.up{animation:tmFlUp .9s cubic-bezier(.2,1.4,.5,1)}
+@keyframes tmFlUp{0%{transform:translate(-50%,60%) scale(.6);opacity:0}50%{transform:translate(-50%,-12%) scale(1.35);opacity:1;color:#FFE066}100%{transform:translateX(-50%)}}
+.tm-tower{position:absolute;left:3%;top:4%;bottom:26%;width:6%;z-index:4;pointer-events:none}
+.tm-tower .tt-bar{position:absolute;left:35%;width:30%;top:10%;bottom:0;border-radius:6px;background:rgba(0,0,0,.28);box-shadow:0 0 0 1.5px rgba(255,255,255,.7);overflow:hidden}
+.tm-tower .tt-bar b{position:absolute;left:0;right:0;bottom:0;height:var(--p,0%);background:linear-gradient(#FFE38A,#F3A93C);transition:height .8s}
+.tm-tower .tt-boss{position:absolute;left:50%;top:-4%;width:150%;aspect-ratio:1;transform:translateX(-50%);border-radius:50%;background:#4B2A86 center/120% no-repeat;box-shadow:0 0 0 2px #fff,0 0 8px #C9A2FF}
+.tm-tower .tt-me{position:absolute;left:50%;bottom:calc(var(--p,0%) * .9 - 6%);width:140%;aspect-ratio:1;transform:translateX(-50%);border-radius:50%;background:#fff center/contain no-repeat;box-shadow:0 0 0 2px #F3A93C;transition:bottom .8s}
+.tm-bossbar{position:absolute;left:14%;right:14%;top:15%;z-index:4;display:flex;flex-direction:column;align-items:center;gap:2px;pointer-events:none}
+.tm-bossbar span{font-family:var(--font-display);font-size:clamp(12px,4cqw,15px);color:#fff;text-shadow:0 1px 2px #2E1F5C,0 0 4px #2E1F5C}
+.tm-bossbar i{display:block;width:100%;height:9px;border-radius:5px;background:rgba(30,10,60,.55);box-shadow:0 0 0 2px #fff;overflow:hidden}.tm-bossbar b{display:block;height:100%;background:linear-gradient(#D7B6FF,#8A5CE0);transition:width .15s}
+.tm-chest{position:absolute;left:50%;top:44%;width:30%;transform:translate(-50%,-50%);z-index:6;pointer-events:none;animation:tmChest 1.4s cubic-bezier(.3,1.5,.5,1) forwards;filter:drop-shadow(0 0 14px #FFE38A)}
+@keyframes tmChest{0%{transform:translate(-50%,-160%) scale(.4);opacity:0}30%{transform:translate(-50%,-50%) scale(1.1);opacity:1}45%{transform:translate(-50%,-50%) scale(1)}85%{opacity:1}100%{transform:translate(-50%,-80%) scale(1.2);opacity:0}}
+.tm-flag{position:absolute;width:12%;bottom:30%;left:46%;z-index:3;pointer-events:none;animation:tmFlag .8s cubic-bezier(.3,1.6,.5,1)}
+@keyframes tmFlag{from{transform:translateY(-60%) scale(.5);opacity:0}}
+.tm-bg.cur,.tm-bg.nx{right:-20%}
+.tm-p.walking .tm-f .tm-body{animation:tmWalk .42s ease-in-out infinite;animation-delay:var(--bd,0s)}
+@keyframes tmWalk{0%,100%{transform:translateY(0) rotate(-2deg)}50%{transform:translateY(-7%) rotate(2deg)}}
+.tm-p.walking .tm-f::after{content:"";position:absolute;left:10%;bottom:6%;width:22%;height:10%;border-radius:50%;background:rgba(210,180,130,.75);filter:blur(1.5px);animation:tmDust .42s ease-out infinite;animation-delay:var(--bd,0s)}
+@keyframes tmDust{from{transform:translateX(0) scale(.5);opacity:.9}to{transform:translateX(-120%) scale(1.4);opacity:0}}
+.tm-p.enter .tm-f{animation:tmEnter 1s cubic-bezier(.2,.8,.3,1) backwards}
+@keyframes tmEnter{from{transform:translateX(-260%)}}
+.tm-f.cheer .tm-body{animation:tmCheer .9s ease-out}
+@keyframes tmCheer{20%{transform:translateY(-22%) scale(1.06)}40%{transform:none}60%{transform:translateY(-12%)}80%{transform:none}}
+.tm-alert{position:absolute;left:50%;top:-12%;transform:translateX(-50%);width:26px;height:26px;border-radius:50%;display:grid;place-items:center;background:#fff;color:#E2582F;font-family:var(--font-display);font-size:19px;box-shadow:0 2px 0 #C9962B,0 0 0 2px #E2A92A;animation:tmPop .9s cubic-bezier(.3,1.8,.5,1) forwards;z-index:40}
+@keyframes tmPop{0%{transform:translateX(-50%) scale(0)}25%{transform:translateX(-50%) scale(1.2)}35%{transform:translateX(-50%) scale(1)}85%{opacity:1}100%{opacity:0;transform:translate(-50%,-30%)}}
+.tm-ev{position:absolute;inset:0;z-index:8;display:grid;place-items:center;background:rgba(30,20,10,.28);animation:tmFade .25s}
+.tm-ev[hidden]{display:none}
+@keyframes tmFade{from{opacity:0}}
+.tm-evc{position:relative;width:78%;padding:10px 12px 12px;border-radius:16px;background:var(--paper);box-shadow:0 0 0 3px #E2A92A,0 8px 20px rgba(0,0,0,.35);text-align:center;animation:tmEvIn .45s cubic-bezier(.3,1.5,.5,1);overflow:hidden}
+@keyframes tmEvIn{from{transform:scale(.6) translateY(20%);opacity:0}}
+.tm-evc img{width:30%;max-width:84px;aspect-ratio:1;object-fit:contain;margin:-2px auto 0;display:block;animation:tmBob 1.4s ease-in-out infinite}
+.tm-evc p{margin:4px 0 8px;font-size:13.5px;line-height:1.45;color:var(--ink);word-break:keep-all}
+.tm-evb{display:flex;gap:6px;justify-content:center;flex-wrap:wrap}
+.tm-evt{position:absolute;left:0;bottom:0;height:4px;width:100%;background:#F3C552;transform-origin:left;animation:tmEvT linear forwards}
+@keyframes tmEvT{to{transform:scaleX(0)}}
+@media (prefers-reduced-motion:reduce){.tm-body,.tm-amb i{animation:none!important}.tm-speed{display:none}}
+.tm-sks{display:flex;justify-content:center;gap:10px;margin:8px 0 4px}
+.tm-sk{position:relative;width:52px;height:52px;border-radius:50%;border:0;padding:3px;background:conic-gradient(#F3C552 var(--g,0%),var(--line) 0);cursor:pointer}
+.tm-sk img{width:100%;height:100%;border-radius:50%;object-fit:contain;background:var(--paper)}
+.tm-sk.ready{animation:tmReady .8s ease-in-out infinite;box-shadow:0 0 12px #F3C552}
+.tm-sk.out{opacity:.4}
+@keyframes tmReady{50%{transform:scale(1.08)}}
+.tm-acts{display:flex;flex-wrap:wrap;justify-content:center;gap:6px;margin:4px 0 8px}
+.tm-acts .on{background:#F3C552;color:#4A2E0A}
+.tm-best{display:inline-flex;align-items:center;gap:4px;padding:2px 9px 2px 3px;border-radius:999px;background:linear-gradient(#FFF0B8,#F6C94F);color:#5A3A12;font-family:var(--font-display);font-size:13px;box-shadow:inset 0 0 0 1.5px #E2A92A}
+.tm-best span{padding:1px 6px;border-radius:999px;background:#C9962B;color:#fff;font-size:11px}
+.tm-tabs{display:grid;grid-template-columns:repeat(3,1fr);gap:6px;margin:10px 0 8px}
+.tm-tabs button{position:relative;display:flex;align-items:center;justify-content:center;gap:6px;min-height:46px;padding:4px 6px;border:0;border-radius:14px;background:var(--card);color:var(--muted);font-family:var(--font-display);font-size:15px;box-shadow:inset 0 0 0 2px var(--line),0 3px 0 var(--line);cursor:pointer;transition:transform .15s}
+.tm-tabs button img{width:30px;height:30px;object-fit:contain}
+.tm-tabs button[aria-pressed="true"]{background:linear-gradient(#FFF0B8,#F6C94F);color:#4A2E0A;box-shadow:inset 0 0 0 2px #D99A1E,0 3px 0 #C68F14;transform:translateY(-2px)}
+.tm-tabs button:active{transform:translateY(1px)}
+.tm-dot{position:absolute;top:5px;right:7px;width:9px;height:9px;border-radius:50%;background:var(--seal,#E5533D);box-shadow:0 0 0 2px var(--paper)}
+.tm-rec{position:relative;display:flex;align-items:center;gap:8px;padding:12px 10px 8px;margin:14px 0 10px;border-radius:14px;background:linear-gradient(100deg,#FFF6D6,#FFE7A6);box-shadow:inset 0 0 0 2px #E9B949;color:#4A2E0A}
+.tm-rec>img{width:46px;height:46px;object-fit:contain}
+.tm-rtag{position:absolute;top:-9px;left:10px;padding:1px 8px;border-radius:999px;background:#E5533D;color:#fff;font-size:11px;font-weight:700}
+.tm-rtx{flex:1;min-width:0;display:flex;flex-direction:column}.tm-rtx b{font-size:14.5px}.tm-rtx small{font-size:12px;color:#8A5A12}
+.tm-party{display:grid;grid-template-columns:repeat(5,1fr);gap:5px;margin:0 0 6px}
+.tm-slot{position:relative;aspect-ratio:3/4;border-radius:12px;background:radial-gradient(circle at 50% 40%,var(--rc,#F4ECD8),color-mix(in srgb,var(--rc,#F4ECD8) 55%,var(--card)));box-shadow:inset 0 0 0 2px #E2A92A;display:flex;flex-direction:column;align-items:center;justify-content:flex-end;overflow:hidden;padding-bottom:3px}
+.tm-slot img{position:absolute;left:4%;right:4%;top:6%;width:92%;aspect-ratio:1;object-fit:contain}
+.tm-slot em{position:absolute;top:3px;left:3px;padding:0 4px;border-radius:6px;background:rgba(74,46,10,.75);color:#fff;font-size:10px;font-style:normal}
+.tm-slot small{position:relative;font-size:11px;font-weight:700;color:#4A2E0A;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;max-width:100%}
+.tm-slot.empty,.tm-slot.lock{background:var(--card);box-shadow:inset 0 0 0 2px var(--line);justify-content:center;color:var(--muted)}
+.tm-slot.empty span{font-size:22px}.tm-slot.lock span{font-size:16px;opacity:.6}.tm-slot.lock small{color:var(--muted);font-weight:400;font-size:10px}
+.tm-prow{display:flex;align-items:center;justify-content:space-between;margin:0 2px 8px;font-size:12.5px;color:var(--muted)}
+.tm-note{font-size:12.5px;color:var(--muted);margin:2px 2px 8px;text-align:center}
+.tm-mem{position:relative;display:flex;align-items:center;gap:10px;padding:9px;margin:0 0 7px;border-radius:14px;background:var(--card);box-shadow:inset 0 0 0 1.5px var(--line),0 2px 0 var(--line)}
+.tm-mem.on{box-shadow:inset 0 0 0 2px #E9B949,0 2px 0 #E2C47A;background:color-mix(in srgb,#F3C552 10%,var(--card))}
+.tm-mem.best{box-shadow:inset 0 0 0 2.5px #E5533D,0 0 10px rgba(229,83,61,.25)}
+.tm-face{position:relative;flex:none;width:56px;height:56px;border-radius:50%;display:grid;place-items:center;background:radial-gradient(circle at 50% 35%,#fff,var(--rc,#F4ECD8));box-shadow:0 0 0 2px #fff,0 0 0 3.5px var(--line);font-size:30px}
+.tm-face img{width:112%;height:112%;object-fit:contain;margin-top:-10%}
+.tm-face i{position:absolute;bottom:-5px;left:50%;transform:translateX(-50%);padding:0 6px;border-radius:999px;background:#5EBF4E;color:#fff;font-size:10px;font-style:normal;font-weight:700;white-space:nowrap}
+.tm-face.g1{--rc:#E9D3B0}.tm-face.g2{--rc:#DDE6F0}.tm-face.g3{--rc:#FFE59A}
+.tm-mtx{flex:1;min-width:0;display:flex;flex-direction:column;gap:2px}
+.tm-mtx b{display:flex;align-items:center;gap:5px;font-size:14.5px}.tm-mtx b em{font-style:normal;font-size:12px;padding:0 6px;border-radius:6px;background:#4A2E0A;color:#FFE7A6}
+.tm-mtx b u{text-decoration:none;font-size:10.5px;padding:0 6px;border-radius:999px;background:#E5533D;color:#fff}
+.tm-role{align-self:flex-start;font-size:11px;padding:0 7px;border-radius:999px;background:var(--rc,#EFE6D2);color:#4A2E0A}
+.tm-mtx small{font-size:11.5px;color:var(--muted)}
+.tm-st{color:#E9B949;font-size:12px;letter-spacing:1px;line-height:1}.tm-st i{font-style:normal;color:var(--line)}.tm-sh{font-size:10.5px}
+.tm-mbt{display:flex;flex-direction:column;gap:4px;flex:none}.tm-mbt .cta,.tm-mbt .btn-sub{min-width:88px;font-size:12px;padding:5px 8px;white-space:nowrap;display:flex;align-items:center;justify-content:center;gap:3px}
+.tm-mi{object-fit:contain;vertical-align:middle}
+.tm-mats{list-style:none;padding:0;margin:0;display:grid;grid-template-columns:1fr 1fr;gap:7px}
+.tm-mats li{display:flex;align-items:center;gap:8px;padding:10px;border-radius:14px;background:var(--card);box-shadow:inset 0 0 0 1.5px var(--line),0 2px 0 var(--line)}
+.tm-mats li.now{box-shadow:inset 0 0 0 2px #E9B949,0 2px 0 #E2C47A}
+.tm-mats b{flex:1;font-size:12.5px;line-height:1.25}.tm-mats em{font-style:normal;font-family:var(--font-display);font-size:16px}
+.tm-sgc{margin:0 0 8px;padding:9px;border-radius:14px;background:var(--card);box-shadow:inset 0 0 0 1.5px var(--line),0 2px 0 var(--line)}
+.tm-sgc.lock{opacity:.6}
+.tm-sgh{display:flex;align-items:center;gap:6px;margin:0 0 7px}.tm-sgh b{font-family:var(--font-display);font-size:15px}.tm-sgh>span{font-size:11px;padding:0 7px;border-radius:999px;background:#4A2E0A;color:#FFE7A6}.tm-sgh small{margin-left:auto;font-size:11.5px;color:var(--muted)}
+.tm-sgw{margin-left:auto;display:flex;align-items:center;gap:3px;font-style:normal;font-size:12.5px;font-weight:700}.tm-sgw img{width:28px;height:28px;object-fit:contain}.tm-sgw.none{color:var(--muted);font-weight:400}
+.tm-sgg{display:grid;grid-template-columns:repeat(3,1fr);gap:6px}
+.tm-gi{position:relative;display:flex;flex-direction:column;align-items:center;gap:3px;padding:6px 4px 5px;border-radius:12px;background:radial-gradient(circle at 50% 30%,#fff,var(--gc,#EFE3CC));color:#4A2E0A;box-shadow:inset 0 0 0 1.5px rgba(74,46,10,.15)}
+.tm-gi.g2{--gc:#DCE6F2}.tm-gi.g3{--gc:#FFE59A}
+.tm-gi.best{box-shadow:inset 0 0 0 2.5px #E5533D,0 0 8px rgba(229,83,61,.3)}
+.tm-gi u{position:absolute;top:-7px;right:-3px;text-decoration:none;font-size:10px;padding:0 5px;border-radius:999px;background:#E5533D;color:#fff;z-index:1}
+.tm-gim{position:relative;width:44px;height:44px}.tm-gim img{width:100%;height:100%;object-fit:contain}.tm-gim em{position:absolute;right:-8px;bottom:-3px;font-style:normal;font-size:10px;padding:0 4px;border-radius:6px;background:#4A2E0A;color:#FFE7A6}
+.tm-gi small{font-size:10.5px;text-align:center;line-height:1.2;color:#6B4A1A}
+.tm-gi .cta{width:100%;min-width:0;padding:4px 2px;font-size:11.5px;display:flex;align-items:center;justify-content:center;gap:2px;white-space:nowrap}
+.tm-evb .cta,.tm-evb .btn-sub{flex:1 1 0;width:auto;min-width:0}
+.tm-rec .cta{flex:none;width:auto;max-width:44%;min-width:92px;display:flex;align-items:center;justify-content:center;gap:3px;font-size:12.5px;padding:6px 9px;white-space:nowrap}
+.tm-rec .cta img,.tm-rec .cta svg,.tm-mbt .cta img:not(.tm-mi),.tm-mbt .cta svg{width:16px;height:16px;flex:none}
+.tm-rep{list-style:none;padding:0;margin:8px 0;display:flex;flex-direction:column;gap:4px;align-items:center}.tm-rep li{display:flex;align-items:center;gap:6px;font-size:14px}.tm-rep svg{width:14px;height:16px}
 /* 4.2.0 오늘의 광고 도장, 광고 보상 고르기, 한 판 더 */
 .ad-stamp{display:flex;flex-direction:column;align-items:center;gap:4px;margin:6px auto 2px;padding:6px 10px;border:1px solid var(--line);border-radius:12px;background:var(--card);max-width:340px;font-size:12.5px}
 .ad-stamp b small{font-weight:500;color:var(--muted);margin-left:4px}
@@ -1960,6 +2141,8 @@ body{background:radial-gradient(120% 60% at 50% 0%, color-mix(in srgb, var(--pap
 .ach-list{display:grid;gap:8px}
 .ach-row{display:grid;grid-template-columns:52px minmax(0,1fr) auto;align-items:center;gap:10px;padding:8px 10px;border-radius:14px;background:var(--card);border:2px solid var(--line)}
 .ach-row.can{border-color:#F3B92E}
+.ach-all{display:block;width:100%;min-height:44px;margin:0 0 10px;border:0;border-radius:14px;background:#F3B92E;color:#3A2905;font-family:var(--font-display);font-size:16px;box-shadow:0 3px 0 #C68F14;cursor:pointer}
+.ach-all[hidden]{display:none}.ach-all:active{transform:translateY(2px);box-shadow:0 1px 0 #C68F14}
 .ach-medal{position:relative;width:52px;height:52px}
 .ach-medal img{position:absolute;inset:0;width:100%;height:100%}
 .ach-medal img.am-ic{inset:0;width:100%;height:100%}
@@ -1995,7 +2178,7 @@ body{background:radial-gradient(120% 60% at 50% 0%, color-mix(in srgb, var(--pap
 @media (prefers-color-scheme: dark){:root:not([data-theme="light"]){--home-paper:#20392F;--home-paper-edge:#526449;--home-ink:#F4F1DF;--home-muted:#C2C8B5;--home-forest:#17382A;--home-forest-deep:#10281F;--home-selected:#426344;--home-selected-ink:#FFF9E9;--home-plaque-line:#8DBB78}}
 
 /* 1. 위쪽 현황판: 학교 줄 / 동네 줄 / 재화 줄을 판 하나에 */
-.app .board .board-top{position:relative;display:grid;grid-template-columns:auto minmax(0,1fr) auto auto auto;grid-template-areas:"crest school att gear exit" "prog prog prog prog prog" "res res res res res";column-gap:6px;row-gap:0;align-items:center;padding:8px 10px 0;background:var(--home-paper);color:var(--home-ink);border:1px solid var(--home-paper-edge);border-radius:18px;box-shadow:var(--home-panel-shadow);overflow:hidden}
+.app .board .board-top{position:relative;display:grid;grid-template-columns:auto minmax(0,1fr) auto auto auto auto;grid-template-areas:"crest school grad att gear exit" "prog prog prog prog prog prog" "res res res res res res";column-gap:6px;row-gap:0;align-items:center;padding:8px 10px 0;background:var(--home-paper);color:var(--home-ink);border:1px solid var(--home-paper-edge);border-radius:18px;box-shadow:var(--home-panel-shadow);overflow:hidden}
 .app .board .school-crest{grid-area:crest;width:40px;height:40px;background:center/contain no-repeat}
 .app .board .school{grid-area:school;min-width:0;align-self:center;border-radius:10px}
 .app .board .school:focus-visible{outline:2px solid var(--home-gold);outline-offset:2px}
@@ -2010,6 +2193,9 @@ body{background:radial-gradient(120% 60% at 50% 0%, color-mix(in srgb, var(--pap
 .app .board #btnAtt{grid-area:att}
 .app .board .xgear{grid-area:gear}
 .app .board #btnExit{grid-area:exit}
+.app .board .xgrad{grid-area:grad;position:relative;z-index:1;margin-top:3px;margin-bottom:3px}   /* 4.3.0 졸업 탭은 위쪽 학교 카드로 */
+.board .tab.xgrad{display:grid;place-items:center;padding:0;gap:0}
+.app.on-school .board.folded .xgrad{display:none}
 .app .board .board-top .icon-btn{width:44px;height:44px;border-radius:12px;background:color-mix(in srgb, var(--home-paper-edge) 28%, var(--home-paper));border:1px solid var(--home-paper-edge);color:var(--home-ink)}
 .app .board .board-top .icon-btn .tic{width:28px;height:28px}
 .app .board .progress{grid-area:prog;display:flex;align-items:center;gap:8px;min-width:0;margin:7px 0 8px}
@@ -2650,7 +2836,8 @@ body.wl-on .toast{z-index:300}
 .sy-top{display:flex;align-items:center;justify-content:space-between;gap:8px}.sy-top b{font-family:var(--font-display);font-weight:400;font-size:15px}
 .sy-pic{border-radius:12px;overflow:hidden;background:#E8F0DA}.sy-pic img{display:block;width:100%;height:auto}.sy-pic[hidden]{display:none}
 /* 4.2.0 둘째 그림은 첫 그림 위에 겹쳐 천천히 나타나요 */
-.sy-pic{position:relative}.sy-pic img.sy-p2{position:absolute;inset:0;height:100%;object-fit:cover;opacity:0;transition:opacity .7s ease}.sy-pic img.sy-p2.on{opacity:1}.sy-pic img.sy-p2.solo{position:static;height:auto;transition:none}
+.sy-pic{position:relative}
+.sy-nav{display:flex;gap:6px;align-items:center}.sy-nav #stPrev[hidden]{display:none}.sy-pic img.sy-p2{position:absolute;inset:0;height:100%;object-fit:cover;opacity:0;transition:opacity .7s ease}.sy-pic img.sy-p2.on{opacity:1}.sy-pic img.sy-p2.solo{position:static;height:auto;transition:none}
 .sy-say{display:flex;gap:10px;align-items:flex-start;min-height:86px;cursor:pointer}.sy-say[hidden]{display:none}
 .sy-say .talk-av img{width:54px;height:54px;object-fit:contain}.sy-say .talk-av svg{width:52px;height:52px}.sy-em{font-size:34px}
 .sy-tx{flex:1;min-width:0}.sy-tx b{display:block;font-size:13.5px;color:var(--chip-ink)}.sy-tx p{margin:2px 0 0;font-size:15px;line-height:1.55;white-space:pre-line}
@@ -3365,7 +3552,7 @@ body.cam-scene #ffChip,body.cam-scene #plChip,body.cam-scene .b-ring{animation-p
     <p class="boot-step" id="bootStep">학교 문을 여는 중...</p>
     <p class="boot-tip" id="bootTip">학교 문을 여는 중이에요</p>
   </div>
-  <span class="boot-ver" id="bootVer">v4.2.0</span>
+  <span class="boot-ver" id="bootVer">v4.3.0</span>
 </div>
 
 <div class="app on-school" id="app">
@@ -3398,6 +3585,10 @@ body.cam-scene #ffChip,body.cam-scene #plChip,body.cam-scene .b-ring{animation-p
       <button class="icon-btn" id="btnAtt" type="button" aria-label="출석부">
         <svg viewBox="0 0 24 24" width="20" height="20" aria-hidden="true"><rect x="4" y="5.5" width="16" height="14.5" rx="2.5" fill="none" stroke="currentColor" stroke-width="2"/><path d="M8 3.5v4M16 3.5v4M4 10h16" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"/><circle cx="12" cy="15" r="2.6" fill="currentColor"/></svg>
         <span class="dot" id="attDot" hidden></span>
+      </button>
+      <button class="icon-btn tab xgrad" type="button" role="tab" data-tab="grad" aria-selected="false" aria-label="졸업"><span class="tic" data-ic="ic_grad" aria-hidden="true"></span>
+        <span class="dot" id="gDot" hidden></span>
+        <span class="tguide" aria-hidden="true"><svg viewBox="-10 -22 20 22"><path d="M0 -1 L-8.5 -11 L-3.8 -11 L-3.8 -21 L3.8 -21 L3.8 -11 L8.5 -11 Z"/></svg></span>
       </button>
       <button class="icon-btn tab xgear" type="button" data-tab="settings" aria-selected="false" aria-label="설정"><span class="tic" data-ic="ic_settings" aria-hidden="true"></span></button>
       <button class="icon-btn" id="btnExit" type="button" aria-label="게임 나가기">
@@ -3657,6 +3848,29 @@ body.cam-scene #ffChip,body.cam-scene #plChip,body.cam-scene .b-ring{animation-p
       <div class="tlist" id="teacherList"></div>
     </section>
 
+    <section class="panel" id="panelTam" hidden aria-labelledby="ttlTam">
+      <h2 id="ttlTam" class="ph"><span class="tic" data-ic="ic_tab_ex" aria-hidden="true"></span><span>숲속 탐험대</span></h2>
+      <div class="tm-top"><div class="tm-where"><b id="tmFl">1층</b><span id="tmReg"></span><b class="tm-best" id="tmBest"></b></div><small class="tm-pow" id="tmPow"></small></div>
+      <div class="tm-stage" id="tmStage" data-reg="ground">
+        <div class="tm-world" id="tmWorld">
+          <div class="tm-bgs"><i class="tm-bg cur"></i><i class="tm-bg nx"></i></div>
+          <div class="tm-amb" id="tmAmb" aria-hidden="true"></div><i class="tm-speed" aria-hidden="true"></i>
+          <div class="tm-side tm-p" id="tmP"></div><div class="tm-side tm-m" id="tmM"></div>
+          <div class="tm-fxl" id="tmFx" aria-hidden="true"></div>
+        </div>
+        <div class="tm-tower" id="tmTower" aria-hidden="true"><i class="tt-bar"><b></b></i><span class="tt-boss"></span><span class="tt-me"></span></div>
+        <div class="tm-flbig" id="tmFlBig" aria-hidden="true"></div>
+        <div class="tm-bossbar" id="tmBossBar" hidden><span></span><i><b></b></i></div>
+        <div class="tm-cut" id="tmCut" hidden></div>
+        <div class="tm-ev" id="tmEv" hidden></div>
+        <div class="tm-rib" id="tmRib" hidden></div>
+        <i class="tm-time"><b id="tmTime"></b></i>
+      </div>
+      <div class="tm-sks" id="tmSk"></div>
+      <div class="tm-acts"><button type="button" class="btn-sub small" id="tmSpd"></button><button type="button" class="btn-sub small" id="tmAuto" aria-pressed="false" hidden></button><button type="button" class="cta small" id="tmRevive" hidden>📺 힘내서 다시 도전</button><button type="button" class="btn-sub small" id="tmRep" hidden></button></div>
+      <div class="tm-tabs" id="tmSeg" role="group" aria-label="탐험대 보기"></div>
+      <div id="tmBody"></div>
+    </section>
     <section class="panel" id="panelGrad" hidden aria-labelledby="ttlGrad">
       <h2 id="ttlGrad" class="ph"><span class="tic" data-ic="ic_grad" aria-hidden="true"></span><span>졸업</span></h2>
       <button class="sheet-elect" id="gAlbum" type="button"><span class="se-ic" id="gAlbumIc" aria-hidden="true"></span><span class="se-tx"><b>졸업 앨범</b><small id="gAlbumTx"></small></span><em>보기</em></button>
@@ -3781,7 +3995,7 @@ body.cam-scene #ffChip,body.cam-scene #plChip,body.cam-scene .b-ring{animation-p
     <section class="panel" id="panelRank" hidden aria-labelledby="ttlRank">
       <button class="panel-x" type="button" aria-label="홈으로"><svg viewBox="0 0 24 24" width="18" height="18" aria-hidden="true"><path d="M6 6l12 12M18 6L6 18" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round"/></svg></button>
       <h2 id="ttlRank" class="ph"><span class="tic" data-ic="ic_rank" aria-hidden="true"></span><span>랭킹</span></h2>
-      <div class="seg rank-seg" id="rankView" role="radiogroup" aria-label="랭킹 보기"><button type="button" role="radio" data-rv="week" aria-checked="true">주간 리그</button><button type="button" role="radio" data-rv="sea" aria-checked="false">시즌</button><button type="button" role="radio" data-rv="all" aria-checked="false">전체 순위</button><button type="button" role="radio" data-rv="bt" aria-checked="false">대결 순위</button></div>
+      <div class="seg rank-seg" id="rankView" role="radiogroup" aria-label="랭킹 보기"><button type="button" role="radio" data-rv="week" aria-checked="true">주간 리그</button><button type="button" role="radio" data-rv="sea" aria-checked="false">시즌</button><button type="button" role="radio" data-rv="all" aria-checked="false">전체 순위</button><button type="button" role="radio" data-rv="bt" aria-checked="false">대결 순위</button><button type="button" role="radio" data-rv="tam" aria-checked="false">탐험</button></div>
       <p class="lead" id="rankLead">학교 파워로 순위를 매겨요. 시설, 가구, 선생님, 수료증, 꾸미기처럼 쌓아 온 것이 모두 들어가요.</p>
       <div class="rank-me" id="rankMe">
         <div><span class="lab" id="rankScoreLab">내 학교 파워</span><b id="rankScore">0</b></div>
@@ -3820,6 +4034,7 @@ body.cam-scene #ffChip,body.cam-scene #plChip,body.cam-scene .b-ring{animation-p
       <div id="achPane" hidden>
         <p class="lead">단계마다 황금 도토리, 5단계(무지개)까지 이루면 칭호를 받아요.</p>
         <div class="ach-title" id="achTitle"></div>
+        <button class="ach-all" type="button" id="achAll" hidden>모두 받기</button>
         <div class="ach-list" id="achList"></div>
       </div>
     </section>
@@ -3886,7 +4101,7 @@ body.cam-scene #ffChip,body.cam-scene #plChip,body.cam-scene .b-ring{animation-p
       </div>
       <h3 class="panel-sub">정보</h3>
       <dl class="info">
-        <div id="verRow"><dt>버전</dt><dd>v4.2.0</dd></div>
+        <div id="verRow"><dt>버전</dt><dd>v4.3.0</dd></div>
         <div id="pidRow" hidden><dt>학교 번호</dt><dd id="infoPid"></dd></div>
       </dl>
       <div id="devBox" hidden>
@@ -3925,11 +4140,8 @@ body.cam-scene #ffChip,body.cam-scene #plChip,body.cam-scene .b-ring{animation-p
       <span class="dot" id="tabDot" hidden></span>
       <span class="tguide" aria-hidden="true"><svg viewBox="-10 -22 20 22"><path d="M0 -1 L-8.5 -11 L-3.8 -11 L-3.8 -21 L3.8 -21 L3.8 -11 L8.5 -11 Z"/></svg></span>
     </button>
+    <button class="tab tab-tam" type="button" role="tab" data-tab="tam" aria-selected="false" aria-label="숲속 탐험대"><span class="tic" data-ic="ic_tab_ex" aria-hidden="true"></span>탐험<span class="dot" id="tamDot" hidden></span></button>
     <button class="tab" type="button" role="tab" data-tab="mini" aria-selected="false"><span class="tic" data-ic="ic_study" aria-hidden="true"></span>공부</button>
-    <button class="tab" type="button" role="tab" data-tab="grad" aria-selected="false"><span class="tic" data-ic="ic_grad" aria-hidden="true"></span>졸업
-      <span class="dot" id="gDot" hidden></span>
-      <span class="tguide" aria-hidden="true"><svg viewBox="-10 -22 20 22"><path d="M0 -1 L-8.5 -11 L-3.8 -11 L-3.8 -21 L3.8 -21 L3.8 -11 L8.5 -11 Z"/></svg></span>
-    </button>
     <button class="tab" type="button" role="tab" data-tab="street" aria-selected="false"><span class="tic" data-ic="ic_shop" aria-hidden="true"></span>상점</button>
   </nav>
 </div>
@@ -4592,6 +4804,15 @@ body.cam-scene #ffChip,body.cam-scene #plChip,body.cam-scene .b-ring{animation-p
   </section>
 </div>
 <!-- 4.1.0 이야기 장면 -->
+<div class="overlay center" id="mTamRep" hidden>
+  <div class="backdrop"></div>
+  <section class="modal" role="dialog" aria-modal="true" aria-labelledby="tmRepT">
+    <h2 id="tmRepT">탐험 보고서</h2>
+    <p class="fine" id="tmRepSub"></p>
+    <ul class="tm-rep" id="tmRepList"></ul>
+    <div class="btn-row"><button class="btn-sub" type="button" id="tmRepAd">📺 광고 보고 두 배</button><button class="cta" type="button" id="tmRepOk" data-autofocus>받기</button></div>
+  </section>
+</div>
 <div class="overlay center" id="mSt" hidden>
   <div class="backdrop"></div>
   <section class="modal sy-modal" role="dialog" aria-modal="true" aria-labelledby="stCh">
@@ -4599,7 +4820,7 @@ body.cam-scene #ffChip,body.cam-scene #plChip,body.cam-scene .b-ring{animation-p
     <div class="sy-pic" id="stPic" hidden></div>
     <div class="sy-say" id="stSay"><span class="talk-av" id="stAv"></span><div class="sy-tx"><b id="stWho"></b><p id="stText" aria-live="polite"></p></div></div>
     <div class="sy-picks" id="stPicks" hidden></div>
-    <div class="talk-foot"><small id="stStep"></small><button class="cta small" id="stNext" type="button" data-autofocus>다음</button></div>
+    <div class="talk-foot"><small id="stStep"></small><span class="sy-nav"><button class="btn-sub small" id="stPrev" type="button" aria-label="앞 줄 다시 보기">‹ 이전</button><button class="cta small" id="stNext" type="button" data-autofocus>다음</button></span></div>
   </section>
 </div>
 <!-- 4.1.0 이야기 수첩 -->
@@ -6090,6 +6311,120 @@ body.cam-scene #ffChip,body.cam-scene #plChip,body.cam-scene .b-ring{animation-p
 "tea_crane":"img/a/tea_crane-57a704bd6b.webp"
 };</script>
 <!-- FS_IMG400:END -->
+<!-- FS_IMG430:BEGIN -->
+<script>window.FS_IMG430={
+"ex_bg_garden":"img/a/ex_bg_garden-b01f158d53.webp",
+"ex_bg_ground":"img/a/ex_bg_ground-101ff67e21.webp",
+"ex_bg_library":"img/a/ex_bg_library-992328e5a3.webp",
+"ex_bg_pond":"img/a/ex_bg_pond-bcac862fe4.webp",
+"ex_bg_tower":"img/a/ex_bg_tower-9a4f3c7b57.webp",
+"ex_bg_yard":"img/a/ex_bg_yard-1c56462434.webp",
+"ex_boss_garden":"img/a/ex_boss_garden-f475959ea7.webp",
+"ex_boss_ground":"img/a/ex_boss_ground-7863f58d26.webp",
+"ex_boss_library":"img/a/ex_boss_library-eb56c315a4.webp",
+"ex_boss_pond":"img/a/ex_boss_pond-cc7c7ea12e.webp",
+"ex_boss_tower":"img/a/ex_boss_tower-e9bd7db889.webp",
+"ex_boss_yard":"img/a/ex_boss_yard-4d92141f73.webp",
+"ex_chest_gold":"img/a/ex_chest_gold-204d0cda9a.webp",
+"ex_chest_silver":"img/a/ex_chest_silver-b0e2dcff90.webp",
+"ex_chest_wood":"img/a/ex_chest_wood-12672a7ea6.webp",
+"ex_flag":"img/a/ex_flag-2963406c3a.webp",
+"ex_fx_art":"img/a/ex_fx_art-51d3dd0b37.webp",
+"ex_fx_art_big":"img/a/ex_fx_art_big-e034bb8a14.webp",
+"ex_fx_heal":"img/a/ex_fx_heal-901f7d198f.webp",
+"ex_fx_hit":"img/a/ex_fx_hit-089c0fdd2d.webp",
+"ex_fx_kor":"img/a/ex_fx_kor-bb22f3eeca.webp",
+"ex_fx_kor_big":"img/a/ex_fx_kor_big-f253c2a48b.webp",
+"ex_fx_math":"img/a/ex_fx_math-c21c0a1551.webp",
+"ex_fx_math_big":"img/a/ex_fx_math_big-d4c3bd1bbe.webp",
+"ex_fx_pe":"img/a/ex_fx_pe-412e817a68.webp",
+"ex_fx_pe_big":"img/a/ex_fx_pe_big-6678c3a8f3.webp",
+"ex_fx_poof":"img/a/ex_fx_poof-ac3dc55338.webp",
+"ex_fx_sci":"img/a/ex_fx_sci-0f7e884f7d.webp",
+"ex_fx_sci_big":"img/a/ex_fx_sci_big-0c343226dd.webp",
+"ex_gear_bag_1":"img/a/ex_gear_bag_1-f5d368568a.webp",
+"ex_gear_bag_2":"img/a/ex_gear_bag_2-a094af43ed.webp",
+"ex_gear_bag_3":"img/a/ex_gear_bag_3-04c34c7509.webp",
+"ex_gear_hat_1":"img/a/ex_gear_hat_1-49ed431f4a.webp",
+"ex_gear_hat_2":"img/a/ex_gear_hat_2-96ccdfb583.webp",
+"ex_gear_hat_3":"img/a/ex_gear_hat_3-7c13b71ce7.webp",
+"ex_gear_tool_1":"img/a/ex_gear_tool_1-2263a1001a.webp",
+"ex_gear_tool_2":"img/a/ex_gear_tool_2-5c73c09e1e.webp",
+"ex_gear_tool_3":"img/a/ex_gear_tool_3-4e633c95f8.webp",
+"ex_mat_petal":"img/a/ex_mat_petal-2a0bd8475f.webp",
+"ex_mat_star":"img/a/ex_mat_star-2ad95843d7.webp",
+"ex_mat_stone":"img/a/ex_mat_stone-a4fd6fa267.webp",
+"ex_mat_twig":"img/a/ex_mat_twig-fc703a7503.webp",
+"ex_mob_garden_1":"img/a/ex_mob_garden_1-ddaaeec7f5.webp",
+"ex_mob_garden_2":"img/a/ex_mob_garden_2-3d80bf8a97.webp",
+"ex_mob_garden_3":"img/a/ex_mob_garden_3-b302cacb54.webp",
+"ex_mob_ground_1":"img/a/ex_mob_ground_1-0af601a7bd.webp",
+"ex_mob_ground_2":"img/a/ex_mob_ground_2-7f3a2cf965.webp",
+"ex_mob_ground_3":"img/a/ex_mob_ground_3-d5615a5b65.webp",
+"ex_mob_library_1":"img/a/ex_mob_library_1-3efc89d7d7.webp",
+"ex_mob_library_2":"img/a/ex_mob_library_2-c380aa3a09.webp",
+"ex_mob_library_3":"img/a/ex_mob_library_3-11db8094ff.webp",
+"ex_mob_pond_1":"img/a/ex_mob_pond_1-eaf3f524a9.webp",
+"ex_mob_pond_2":"img/a/ex_mob_pond_2-09359aa215.webp",
+"ex_mob_pond_3":"img/a/ex_mob_pond_3-f85a779f44.webp",
+"ex_mob_tower_1":"img/a/ex_mob_tower_1-2ef55e9f35.webp",
+"ex_mob_tower_2":"img/a/ex_mob_tower_2-14b523e75b.webp",
+"ex_mob_tower_3":"img/a/ex_mob_tower_3-6164a6fac7.webp",
+"ex_mob_yard_1":"img/a/ex_mob_yard_1-5cccc8bc94.webp",
+"ex_mob_yard_2":"img/a/ex_mob_yard_2-cd08a792e3.webp",
+"ex_mob_yard_3":"img/a/ex_mob_yard_3-a35f75133f.webp",
+"ex_pc_bear_act":"img/a/ex_pc_bear_act-19801f12d5.webp",
+"ex_pc_bear_idle":"img/a/ex_pc_bear_idle-b4e56c80a0.webp",
+"ex_pc_capybara_act":"img/a/ex_pc_capybara_act-fe92503b43.webp",
+"ex_pc_capybara_idle":"img/a/ex_pc_capybara_idle-c18f4db12a.webp",
+"ex_pc_cat_act":"img/a/ex_pc_cat_act-5ec9f31d1e.webp",
+"ex_pc_cat_idle":"img/a/ex_pc_cat_idle-73f0819f7f.webp",
+"ex_pc_chick_act":"img/a/ex_pc_chick_act-4117026887.webp",
+"ex_pc_chick_idle":"img/a/ex_pc_chick_idle-aecbbd2262.webp",
+"ex_pc_chinchilla_act":"img/a/ex_pc_chinchilla_act-24967351ce.webp",
+"ex_pc_chinchilla_idle":"img/a/ex_pc_chinchilla_idle-bb808b3d8d.webp",
+"ex_pc_dog_act":"img/a/ex_pc_dog_act-e51629781f.webp",
+"ex_pc_dog_idle":"img/a/ex_pc_dog_idle-03a40fd26b.webp",
+"ex_pc_duck_act":"img/a/ex_pc_duck_act-1c9fdf9979.webp",
+"ex_pc_duck_idle":"img/a/ex_pc_duck_idle-d59d972f3d.webp",
+"ex_pc_fox_act":"img/a/ex_pc_fox_act-22f5277a32.webp",
+"ex_pc_fox_idle":"img/a/ex_pc_fox_idle-fcaa328621.webp",
+"ex_pc_frog_act":"img/a/ex_pc_frog_act-716edfd987.webp",
+"ex_pc_frog_idle":"img/a/ex_pc_frog_idle-c1ad894238.webp",
+"ex_pc_hamster_act":"img/a/ex_pc_hamster_act-b9332a0d09.webp",
+"ex_pc_hamster_idle":"img/a/ex_pc_hamster_idle-0b22afea00.webp",
+"ex_pc_kangaroo_act":"img/a/ex_pc_kangaroo_act-e1864a48e7.webp",
+"ex_pc_kangaroo_idle":"img/a/ex_pc_kangaroo_idle-78be55e307.webp",
+"ex_pc_koala_act":"img/a/ex_pc_koala_act-0d88c06626.webp",
+"ex_pc_koala_idle":"img/a/ex_pc_koala_idle-8377c50141.webp",
+"ex_pc_meerkat_act":"img/a/ex_pc_meerkat_act-89835d7296.webp",
+"ex_pc_meerkat_idle":"img/a/ex_pc_meerkat_idle-6b401cbb07.webp",
+"ex_pc_mole_act":"img/a/ex_pc_mole_act-820da8acad.webp",
+"ex_pc_mole_idle":"img/a/ex_pc_mole_idle-c1f69fdbaf.webp",
+"ex_pc_otter_act":"img/a/ex_pc_otter_act-20b5ac8f4d.webp",
+"ex_pc_otter_idle":"img/a/ex_pc_otter_idle-ce51e42fac.webp",
+"ex_pc_panda_act":"img/a/ex_pc_panda_act-b895fd865c.webp",
+"ex_pc_panda_idle":"img/a/ex_pc_panda_idle-23f7ce81d6.webp",
+"ex_pc_penguin_act":"img/a/ex_pc_penguin_act-ca37fe4d38.webp",
+"ex_pc_penguin_idle":"img/a/ex_pc_penguin_idle-6727247f4c.webp",
+"ex_pc_rabbit_act":"img/a/ex_pc_rabbit_act-290bf8554d.webp",
+"ex_pc_rabbit_idle":"img/a/ex_pc_rabbit_idle-860a652873.webp",
+"ex_pc_raccoon_act":"img/a/ex_pc_raccoon_act-ace5e41346.webp",
+"ex_pc_raccoon_idle":"img/a/ex_pc_raccoon_idle-c13e38dba4.webp",
+"ex_pc_redpanda_act":"img/a/ex_pc_redpanda_act-51a010e01a.webp",
+"ex_pc_redpanda_idle":"img/a/ex_pc_redpanda_idle-e7cf5ab80c.webp",
+"ex_pc_sloth_act":"img/a/ex_pc_sloth_act-a373e19a9e.webp",
+"ex_pc_sloth_idle":"img/a/ex_pc_sloth_idle-35ddb6d693.webp",
+"ex_pc_turtle_act":"img/a/ex_pc_turtle_act-676171ee52.webp",
+"ex_pc_turtle_idle":"img/a/ex_pc_turtle_idle-b8e8279426.webp",
+"ex_pc_waterdeer_act":"img/a/ex_pc_waterdeer_act-7bcfd7cb00.webp",
+"ex_pc_waterdeer_idle":"img/a/ex_pc_waterdeer_idle-15b34be534.webp",
+"ex_ribbon_boss":"img/a/ex_ribbon_boss-b98f352137.webp",
+"ex_ribbon_clear":"img/a/ex_ribbon_clear-93b80f575a.webp",
+"ex_tam_head":"img/a/ex_tam_head-ba4f6722cf.webp",
+"ic_tab_ex":"img/a/ic_tab_ex-830a0dc484.webp"
+};</script>
+<!-- FS_IMG430:END -->
 <!-- FS_IMG174:BEGIN -->
 <script>window.FS_IMG174={
 "ach_ic_deco":"img/a/ach_ic_deco-a5f8ea97dc.webp",
@@ -6625,7 +6960,7 @@ body.cam-scene #ffChip,body.cam-scene #plChip,body.cam-scene .b-ring{animation-p
     '<g transform="translate(19.5 -5.6) rotate(18)"><rect x="0" y="0" width="11" height="7.6" rx="1.6" class="c-seal"/><circle cx="2.2" cy="3.8" r="1.1" class="c-dip"/><path d="M4.6 2.4 h4.4 M4.6 5.2 h3" class="s-tagline"/></g></g>';
   // 1.5.0: 선생님(고슴도치 교감 선생님 포함)은 그림(PNG)으로
   const CHR_AR = { tea_beaver: 0.92, chr_bear: 0.69, chr_cat: 0.75, chr_chick: 0.67, chr_dog: 0.84, chr_fox: 0.73, chr_koala: 0.99, chr_otter: 0.96, chr_panda: 0.68, chr_penguin: 0.64, chr_rabbit: 0.65, chr_raccoon: 0.88, chr_hamster: 0.66, chr_duck: 0.58, chr_turtle: 0.6, chr_mole: 0.63, chr_frog: 0.63, chr_waterdeer: 0.59, chr_redpanda: 0.68, chr_capybara: 0.6, chr_kangaroo: 0.58, chr_meerkat: 0.68, chr_sloth: 0.68, chr_chinchilla: 0.68, tea_crane: 0.75, tea_badger: 0.74, tea_bear: 0.61, tea_hedgehog: 0.75, tea_owl: 0.64, tea_squirrel: 0.83, tea_dietitian: 0.64, tea_librarian: 0.58, tea_swan: 0.7, tea_peacock: 0.77, tea_alpaca: 0.52, tea_elephant: 1 };
-  const FSI = k => (window.FS_IMG && window.FS_IMG[k]) || (window.FS_IMG400 && window.FS_IMG400[k]) || (window.FS_IMG171 && window.FS_IMG171[k]) || (window.FS_IMG200 && window.FS_IMG200[k]) || (window.FS_IMG213 && window.FS_IMG213[k]) || (window.FS_IMG220 && window.FS_IMG220[k]) || (window.FS_IMG230 && window.FS_IMG230[k]) || (window.FS_IMG231 && window.FS_IMG231[k]) || (window.FS_IMG235 && window.FS_IMG235[k]) || (window.FS_IMG300 && window.FS_IMG300[k]) || (window.FS_IMG310 && window.FS_IMG310[k]) || (window.FS_IMG311 && window.FS_IMG311[k]) || (window.FS_IMG312 && window.FS_IMG312[k]) || (window.FS_IMG320 && window.FS_IMG320[k]) || '';   // 2.1.3, 2.2.0 묶음도   // 1.7.1, 2.0.0 묶음도 찾아요
+  const FSI = k => (window.FS_IMG && window.FS_IMG[k]) || (window.FS_IMG400 && window.FS_IMG400[k]) || (window.FS_IMG430 && window.FS_IMG430[k]) || (window.FS_IMG171 && window.FS_IMG171[k]) || (window.FS_IMG200 && window.FS_IMG200[k]) || (window.FS_IMG213 && window.FS_IMG213[k]) || (window.FS_IMG220 && window.FS_IMG220[k]) || (window.FS_IMG230 && window.FS_IMG230[k]) || (window.FS_IMG231 && window.FS_IMG231[k]) || (window.FS_IMG235 && window.FS_IMG235[k]) || (window.FS_IMG300 && window.FS_IMG300[k]) || (window.FS_IMG310 && window.FS_IMG310[k]) || (window.FS_IMG311 && window.FS_IMG311[k]) || (window.FS_IMG312 && window.FS_IMG312[k]) || (window.FS_IMG320 && window.FS_IMG320[k]) || '';   // 2.1.3, 2.2.0 묶음도   // 1.7.1, 2.0.0 묶음도 찾아요
   const teaPic = k => { const h = Math.min(44, 46 / CHR_AR['tea_' + k]), w = h * CHR_AR['tea_' + k]; return `<image href="${FSI('tea_' + k)}" x="${(-w / 2).toFixed(1)}" y="${(22 - h).toFixed(1)}" width="${w.toFixed(1)}" height="${h.toFixed(1)}"/>`; };
   const AV = {
     hedgehog: HEDGEHOG,
@@ -6779,7 +7114,7 @@ body.cam-scene #ffChip,body.cam-scene #plChip,body.cam-scene .b-ring{animation-p
       say: '내일이 심사 날이에요. 나무 빌딩 꼭대기에서도 우리 학교 종소리가 들린대요. 가 봐요!' },
 
     // 5장: 1년째를 마치는 종업식, 2년째를 채우는 퀘스트, 유치원을 마치는 졸업식. 보상은 수료증(rk: 'dip')이나 수업료 몇 분치(rm)
-    { id: 'q22', ch: 4, t: 'grads', n: 1, r: 2, rk: 'dip', title: '첫 종업식', how: '아래 졸업 탭에서 종업식을 열어요',
+    { id: 'q22', ch: 4, t: 'grads', n: 1, r: 2, rk: 'dip', title: '첫 종업식', how: '위쪽 학교 카드의 졸업 단추(학사모)에서 종업식을 열어요',
       say: '종업식을 열 시간이에요. 학교는 새로 단장하지만, 수료증과 아이들은 그대로 남아요.' },
     { id: 'q23', ch: 4, t: 'perks', n: 1, r: 3, rk: 'dip', title: '명예 교장실 고치기', how: '수료증으로 명예 교장실을 고쳐요',
       say: '잠겨 있던 명예 교장실을 열었어요. 벽에 옛 교장 선생님 사진이 걸려 있네요. 거북 할아버지세요.' },
@@ -6912,7 +7247,7 @@ body.cam-scene #ffChip,body.cam-scene #plChip,body.cam-scene .b-ring{animation-p
       say: '운동회 기운이 남았을 때 숲속 대결도 해 봐요. 세 번 이기면 족제비 원장님 표정이 볼 만할 거예요.' },
     { id: 'e26', ch: 8, t: 'fac', k: 'playground', n: 32, rm: 4, title: '운동장 Lv.32', how: '운동장을 Lv.32까지 넓혀요',
       say: '이어달리기를 하려면 운동장이 더 넓어야 해요. 반짝 학원 아이들이 "옥상보다 넓다"며 부러워했어요.' },
-    { id: 'e27', ch: 8, t: 'trips', n: 3, rm: 4, title: '체험학습 세 번', how: '체험학습을 세 번 다녀와요',
+    { id: 'e27', ch: 8, t: 'trips', n: 1, rm: 4, title: '체험학습 다녀오기', how: '체험학습을 한 번 다녀와요',   // 4.2.1 지섭: 세 번은 시간만 오래 걸려서 한 번으로
       say: '운동회 연습 사이사이 체험학습도 가요. 멀리 다녀온 아이가 더 잘 돌아오니까요.' },
     { id: 'sb4', ch: 8, sy: 4, t: 'semH', n: 4, r: 4, rk: 'dip', title: '4학년 1학기 방학식', how: '대도시 학교가 되면 졸업 탭에서 1학기 방학식을 열어요',
       say: '방학식이에요. 반짝 학원은 방학이 없대요. 솜이가 그 말을 듣고 한참 조용했어요.' },   // 2.1.0 학기 나누기
@@ -6935,7 +7270,7 @@ body.cam-scene #ffChip,body.cam-scene #plChip,body.cam-scene .b-ring{animation-p
 
     { id: 'e30', ch: 9, t: 'fac', k: 'library', n: 36, rm: 4, title: '학예회 그림 전시', how: '도서관을 Lv.36까지 키워요',
       say: '아이들이 그린 \'우리 학교\' 그림이 서른 장이 넘어요. 참나무가 안 나오는 그림이 한 장도 없어요.' },
-    { id: 'e31', ch: 9, t: 'souv', n: 6, rm: 4, title: '기념품 6종 모으기', how: '체험학습에서 기념품을 가져와요',
+    { id: 'e31', ch: 9, t: 'souv', n: 3, rm: 4, title: '기념품 3종 모으기',   // 4.2.1: 기념품은 체험학습 한 번에 하나라 6종은 네 번 더 다녀와야 했어요 how: '체험학습에서 기념품을 가져와요',
       say: '체험학습 기념품도 전시해요. 솜이는 돌탑 옆에서 주운 솔방울을 내놨어요.' },
     { id: 'e32', ch: 9, t: 'fac', k: 'cafeteria', n: 37, rm: 4, title: '학예회 잔치 급식', how: '급식실을 Lv.37까지 키워요',
       say: '학예회 날엔 부모님도 오세요. 양 선생님이 "떡은 넉넉히"라고 세 번 말씀하셨어요.' },
@@ -6966,7 +7301,7 @@ body.cam-scene #ffChip,body.cam-scene #plChip,body.cam-scene .b-ring{animation-p
       say: '숲에서 제일 큰 학교가 되어 가요. 문 닫는 종이가 붙어 있던 교문으로 날마다 줄을 서서 들어와요.' },
     { id: 'e35', ch: 10, t: 'fac', k: 'science', n: 28, rm: 5, title: '졸업 과학 전시회', how: '과학실을 Lv.28까지 키워요',
       say: '6학년은 졸업 전에 과학 전시회를 열어요. 솜이네 모둠 주제는 \'반쪽 지도 읽기\'예요.' },
-    { id: 'e36', ch: 10, t: 'souv', n: 10, rm: 5, title: '기념품 10종 모으기', how: '체험학습에서 기념품을 가져와요',
+    { id: 'e36', ch: 10, t: 'souv', n: 5, rm: 5, title: '기념품 5종 모으기',   // 4.2.1: 10종에서 5종으로 how: '체험학습에서 기념품을 가져와요',
       say: '졸업 앨범에 체험학습 추억을 담아요. 솔방울부터 조약돌까지, 하나하나 사연이 있어요.' },
     { id: 'e37', ch: 10, t: 'tripat', k: 'star', n: 1, rm: 6, title: '졸업 여행: 별빛 천문대', how: '체험학습에서 별빛 천문대를 골라요',
       say: '졸업 여행 날이에요. 부엉이 선생님이 이렇게 신나신 건 처음 봐요. 밤 버스가 출발해요.' },
@@ -7048,8 +7383,8 @@ body.cam-scene #ffChip,body.cam-scene #plChip,body.cam-scene .b-ring{animation-p
       say: '2학년이 됐어요. 비밀을 들킨 뒤로 아이들이 저를 \'선배님\'이라고 불러요. 교감 선생님이라고 해 달라고 했는데요.' },
     { id: 'j17', ch: 13, t: 'fac', k: 'playground', n: 22, rm: 4, title: '체육대회 운동장', how: '운동장을 Lv.22까지 넓혀요',
       say: '체육대회를 열려면 운동장이 넓어야 해요. 제가 혼자 달리던 운동장이 이렇게 좁았나 싶어요.' },
-    { id: 'j18', ch: 13, t: 'sports', n: 2, rm: 4, title: '숲속 운동회 두 번', how: '학교 행사 > 숲속 운동회',
-      say: '체육대회 예선전이에요. 운동회를 두 번 열어서 청팀을 응원해 줘요. 달릴 아이가 많다는 게 이렇게 좋은 일이에요.' },
+    { id: 'j18', ch: 13, t: 'sports', n: 1, rm: 4, title: '숲속 운동회 열기', how: '학교 행사 > 숲속 운동회',   // 4.2.1: 운동회는 2시간에 한 번이라 두 번은 기다리기만 해서 한 번으로
+      say: '체육대회 예선전이에요. 운동회를 열어서 청팀을 응원해 줘요. 달릴 아이가 많다는 게 이렇게 좋은 일이에요.' },
     { id: 'sn2', ch: 13, t: 'snDex', n: 10, rm: 4, title: '간식 도감 10종', how: '매점 간식 뽑기에서 간식 10종을 모아요. 도토리를 모으는 동안 다른 시설 추천을 쉬어요',
       say: '매점 간식 이야기로 학교가 들썩여요. 제가 다닐 때는 매점이 없어서 도토리를 구워 먹었어요. 간식 10종을 모아 봐요.' },   // 2.1.2 매점 간식 뽑기
     { id: 'sj2', ch: 13, sy: 2, yt: 2, t: 'semH', n: 2, r: 4, rk: 'dip', title: '중학교 2학년 1학기 방학식', how: '대도시 학교가 되면 졸업 탭에서 1학기 방학식을 열어요',
@@ -7151,8 +7486,8 @@ body.cam-scene #ffChip,body.cam-scene #plChip,body.cam-scene .b-ring{animation-p
       say: '방학식이에요. 가로등 아래 그림자가 오늘은 교문 기둥까지 왔다가 갔어요.' },
     { id: 'hs25', ch: 17, t: 'xt', k: 'dorm', n: 5, rm: 4, title: '사감 선생님 Lv.5', how: '선생님 탭에서 오소리 선생님을 Lv.5까지',
       say: '오소리 선생님이 밤 순찰 때 가로등 아래에 따뜻한 차를 한 잔 놓아두신대요. 아침이면 빈 잔이 있고요.' },
-    { id: 'hs26', ch: 17, t: 'nsOn', n: 3, rm: 4, title: '자율학습 세 번 준비', how: '서로 다른 날에 자율학습을 예약하거나 켜요',
-      say: '꾸준히 공부하는 학교가 최고예요. 서로 다른 날에 자율학습을 세 번 준비해 봐요.' },
+    { id: 'hs26', ch: 17, t: 'nsOn', n: 2, rm: 4, title: '자율학습 두 번 준비', how: '서로 다른 날에 자율학습을 예약하거나 켜요',   // 4.2.1: 하루에 한 번이라 세 번은 사흘이 걸려서 두 번으로
+      say: '꾸준히 공부하는 학교가 최고예요. 서로 다른 날에 자율학습을 두 번 준비해 봐요.' },
     { id: 'hs27', ch: 17, t: 'fac', k: 'classroom', n: 24, rm: 4, title: '교실 Lv.24', how: '교실을 Lv.24까지 키워요',
       say: '교실을 넓혀요. 학원에서 온 아이들 책상이 아직 임시 책상이라 삐걱거려요. 그 소리, 오랜만에 듣네요.' },
     { id: 'hs28', ch: 17, t: 'ygrade', n: 4, rm: 5, title: '2학년 대도시 되기', how: '평판을 모아서 대도시가 되어요',
@@ -7448,6 +7783,7 @@ body.cam-scene #ffChip,body.cam-scene #plChip,body.cam-scene .b-ring{animation-p
     zv: {},   // 4.0.0 들어가 본 구역({academic: 1, ...}). '캠퍼스 둘러보기' 퀘스트가 세요
     rp: { b: 0 },   // 되풀이 학년 종업식 조건: 지난 식 때의 건물 레벨 합(0이면 아직 안 셈)
     bf: freshBf(),   // 4.2.0 대축제: mon 그 달, st 도장, got 받은 단계, day 날짜, dn 그날 도장, o 창 열기, g2 손님 다섯 곳, fw 불꽃놀이, own 받은 달 장식, eve 전날 띠, tip 다른 학교 띠, auto 첫날 창
+    tam: freshTam(),   // 4.3.0 숲속 탐험대: best 가장 깊은 층, party 대원, mem 동물마다 { lv, st 별, sh 별 조각 }, gear 장비 레벨, mat 재료 넷, it 보고서 마지막 받은 때, auto, ad, spd 2배속, wk 주간 최고, seen
     adx: freshAdx(),   // 4.2.0 광고: day 날짜, n 오늘 광고 도장, got 받은 단계, fv fw xg cs 오늘 쓴 '한 판 더'(축제 부스, 불꽃놀이, 교환학생 안내, 진로 상담)
     rx: { lv: {}, c: {} },   // 4.2.0 연구 투자: lv 연구마다 레벨, c 그 레벨에 정해 둔 값(열린 때의 수업료로 정하고 올릴 때까지 그대로)
     fv: freshFv(),   // 4.1.0 대학 축제: wk 이번 주, st 도장 수, got 받은 단계, day 날짜, b 그날 한 부스, g 그날 만난 손님, o 그날 창을 열었는지, win 부스마다 성공 횟수, own 받은 기념품, tip 띠를 닫은 주, td 띠를 본 날
@@ -7663,6 +7999,7 @@ body.cam-scene #ffChip,body.cam-scene #plChip,body.cam-scene .b-ring{animation-p
       if (Array.isArray(A.got)) f.got = ADX.st.map((_, i) => A.got[i] ? 1 : 0);
       for (const k of ['fv', 'fw', 'xg', 'cs']) f[k] = A[k] ? 1 : 0;
       s.adx = f; }
+    sanitizeTam(d, s);   // 4.3.0 숲속 탐험대
     sanitizeXg(d, s); sanitizeMk(d, s); sanitizeSto(d, s);   // 4.1.0 교환학생, 장터, 이야기
     s.nl = [0, 1, 2].includes(d.nl) ? d.nl : 0;   // 3.2.1 고등학교 밤 모습
     s.tfp = Math.min(s.st.fperks, Math.floor(num(d.tfp, 0, s.st.fperks)));
@@ -8473,7 +8810,9 @@ body.cam-scene #ffChip,body.cam-scene #plChip,body.cam-scene .b-ring{animation-p
   const FILE_SONG = { grad: 'bgm_grad', unigrad: 'bgm_unigrad', bigfest: 'bgm_bigfest', home: 'bgm_home', room: 'bgm_room', festival: 'bgm_festival', festnight: 'bgm_festnight', play: 'bgm_play',   // 3.2.0 밤 행사 곡(지섭 Suno)
    
     // 1.8.0 배경 테마 곡 7개(지섭이 Suno로 만듦)
-    spring: 'bgm_spring', summer: 'bgm_summer', autumn: 'bgm_autumn', winter: 'bgm_winter', xmas: 'bgm_xmas', space: 'bgm_space', retro: 'bgm_retro' };
+    spring: 'bgm_spring', summer: 'bgm_summer', autumn: 'bgm_autumn', winter: 'bgm_winter', xmas: 'bgm_xmas', space: 'bgm_space', retro: 'bgm_retro',
+    // 4.3.0 숲속 탐험대 곡 넷(지섭 Suno, 2026-11-14): 운동장과 텃밭은 낮, 연못과 도서관은 잔잔, 뒤뜰과 천문대는 밤, 큰 장난꾸러기 층은 보스
+    exday: 'bgm_ex_day', excalm: 'bgm_ex_calm', exnight: 'bgm_ex_night', exboss: 'bgm_ex_boss' };
   // 1.8.0 곡은 게임 파일 밖의 따로 된 파일이에요(게임 파일이 너무 커지지 않게, 지섭 결정). 웹, 안드로이드, 토스 판 모두 게임 옆 audio 폴더에 있어요
   const AUD_BASE = () => window.FS_AUD_BASE || 'audio/';
   const FILE_GAIN = 0.6;   // 파일 곡은 코드 곡보다 커서 조금 줄여요
@@ -8510,6 +8849,10 @@ body.cam-scene #ffChip,body.cam-scene #plChip,body.cam-scene .b-ring{animation-p
     if (rt.fest || rt.sports) return rt.fest && festDef(rt.fest.id) && festDef(rt.fest.id).night ? 'festnight' : 'festival';   // 3.2.0 고등학교 밤 행사는 조용한 곡
     let play = false; try { play = !!((pzUI && pzUI.open) || (mgUI && mgUI.open) || (btUI && btUI.open)); } catch (e) { /* 퍼즐과 합치기가 아직 준비 전 */ }   // 1.8.0: 숲속 합치기도 미니게임 곡
     if (play) return 'play';
+    if (rt.tab === 'tam' && S.tam) {   // 4.3.0 탐험 화면
+      const T = rt.tam; if (T && T.F && T.F.M[0] && T.F.M[0].boss && (T.ph === 'meet' || T.ph === 'fight')) return 'exboss';
+      const k = tamReg(S.tam.best + 1).k; return k === 'pond' || k === 'library' ? 'excalm' : k === 'yard' || k === 'tower' ? 'exnight' : 'exday';
+    }
     // 1.7.4 지섭 결정: 곡이 자주 바뀌지 않게 홈에서 여는 탭(선생님, 퀘스트, 랭킹, 도감, 이벤트)도 홈 곡 그대로
     if (BF_SONG && HOME_MUSIC_TABS.has(rt.tab) && bfOn()) return 'bigfest';   // 4.2.0 대축제 사흘 동안 대학교 홈 곡
     if (HOME_MUSIC_TABS.has(rt.tab)) return THEME_MUSIC && SONGS[thOn().bg] ? thOn().bg : 'home';
@@ -8641,6 +8984,7 @@ body.cam-scene #ffChip,body.cam-scene #plChip,body.cam-scene .b-ring{animation-p
      건물 자리는 지도 그림 기준 퍼센트(가로, 세로, 건물 그림 너비)로 적어요 (dev/assets 건물 자리 표) */
   const MAP_Y = -60, MAP_W = 360, MAP_H = 540;
   const pct = (x, y, w) => [x / 100 * MAP_W, y / 100 * MAP_H + MAP_Y, w / 100 * MAP_W];
+  // 4.2.1 지섭 제보: 운동장 그림이 옮겨진 뒤 운동회 트랙(sports: 가운데 x, y, 가로 반지름, 세로 반지름)이 엉뚱한 곳에 있었어요. 운동장 그림의 달리기 길(그림 가로 48%, 세로 52% 둘레)에 맞췄어요
   const GEO = [
     { map: 'map_kinder',
       // 3.3.0 새 단장: 지도와 빈터는 작업지시서 57 지도 그림에서 바닥(흙, 보도블록)을 직접 재서 가운데와 너비 × 0.96(dev/gen330/lotfit.py, 자리 표 값은 눈대중이라 조금씩 어긋났어요), 선생님 자리는 빈 풀밭에서 골랐어요(dev/gen330 기록)
@@ -8665,7 +9009,7 @@ body.cam-scene #ffChip,body.cam-scene #plChip,body.cam-scene .b-ring{animation-p
       fount: [151.2, 228.9, 22, 14],
       tea: { hedgehog: [144, 199.2, 0.57], squirrel: [158.4, 134.4, 0.6], bear: [172.8, 253.2, 0.72], owl: [165.6, 166.8, 0.69], owlAway: [79.2, 318, 0.63] },
       deco: [[56, 66], [312, 70], [22, 312], [338, 196], [60, 420], [302, 424], [128, 380], [236, 392]],
-      sports: [241.2, 277, 64.8, 16.2], eaves: { classroom: 0.02, cafeteria: 0.0, library: 0.0, science: -0.06, playground: -0.14 } },
+      sports: [247.4, 218.3, 50, 22.2], eaves: { classroom: 0.02, cafeteria: 0.0, library: 0.0, science: -0.06, playground: -0.14 } },
     // 2.0.0 중학교: 지도와 빈터는 작업지시서 19 다시 그린 판(art/v200/maps/lots_middle.md, 2026-10-27). 과학실 위 가운데, 교실과 급식실 위쪽 양옆,
     // 도서관과 운동장 아래쪽 양옆, 기숙사 공사 자리(고등학교에서 열려요) 왼쪽 아래, 매점 가운데 아래. 참나무 (82%, 81%), 간판 (39%, 86%)
     { map: 'map_middle',
@@ -8679,7 +9023,7 @@ body.cam-scene #ffChip,body.cam-scene #plChip,body.cam-scene .b-ring{animation-p
       fount: [194.4, 183, 22, 14],
       tea: { hedgehog: [216, 199.2, 0.57], squirrel: [201.6, 102, 0.6], bear: [172.8, 274.8, 0.72], owl: [43.2, 145.2, 0.69], owlAway: [158.4, 307.2, 0.63] },
       deco: [[56, 66], [312, 70], [22, 312], [338, 196], [60, 420], [302, 424], [29, 383], [252, 437]],
-      sports: [64.8, 285.6, 43.2, 21.6], eaves: { classroom: 0.02, cafeteria: 0.0, library: 0.0, science: -0.06, playground: -0.14, store: 0 } },
+      sports: [104.5, 207, 53.4, 21.4], eaves: { classroom: 0.02, cafeteria: 0.0, library: 0.0, science: -0.06, playground: -0.14, store: 0 } },
     // 3.0.0 고등학교: 지도와 빈터는 작업지시서 41(art/v300h/maps/lots_high.md). 과학실 위 가운데, 학생회관 공사 자리(대학교에서 열려요) 오른쪽 위,
     // 교실과 급식실, 도서관과 운동장, 매점과 기숙사가 양옆으로 세 줄. 분수는 가운데(50%, 52%), 참나무 (82%, 81%), 간판 (39%, 86%), 기념물 (70%, 86%)
     { map: 'map_high',
@@ -8692,7 +9036,7 @@ body.cam-scene #ffChip,body.cam-scene #plChip,body.cam-scene .b-ring{animation-p
       fount: [190.8, 210, 22, 14],
       tea: { hedgehog: [151.2, 156, 0.57], squirrel: [165.6, 102, 0.6], bear: [208.8, 231.6, 0.72], owl: [180, 166.8, 0.69], owlAway: [165.6, 285.6, 0.63] },
       deco: [[56, 66], [312, 70], [22, 312], [338, 196], [60, 420], [302, 424], [29, 383], [252, 437]],
-      sports: [104.4, 286.7, 50.4, 16], eaves: { classroom: 0.02, cafeteria: 0.0, library: 0.0, science: -0.06, playground: -0.14, store: 0, dorm: 0 } }
+      sports: [103.4, 236.2, 48.9, 19.1], eaves: { classroom: 0.02, cafeteria: 0.0, library: 0.0, science: -0.06, playground: -0.14, store: 0, dorm: 0 } }
   ];
   // 2.1.1 운동장 지붕 조각(roof_field, roof_field_s3와 겨울)은 새 그림의 트랙을 색으로 골라 만들었어요(1.5.2처럼 테마 색이 트랙을 칠해요)
   // 2.1.1 새 건물 그림(작업지시서 31, 32)은 아래에서부터 가장 넓은 띠의 가운데를 재고, 예전 값과 같은 크기가 되게 너비 × 0.96, 높이 − 0.02로 맞췄어요
@@ -8776,7 +9120,7 @@ body.cam-scene #ffChip,body.cam-scene #plChip,body.cam-scene .b-ring{animation-p
   const zoneOf = k => { const Z = ZONE_GEO.find(Z => Z.lot[k]); return Z ? Z.zone : ''; };   // 그 건물이 있는 구역
   const geoIdx = t => { const v = t === undefined ? (S ? S.tier : 0) : t; const z = v >= UNI_TIER ? zoneKey(t !== undefined) : ''; return v >= UNI_TIER ? (z ? ZONE0 + ZONE_KEYS.indexOf(z) : CAMPUS_GI) : Math.max(0, Math.min(ZONE0 - 1, v)); };
   const geo = t => GEO[geoIdx(t)];
-  const IMG = k => (window.FS_IMG && window.FS_IMG[k]) || (window.FS_IMG400 && window.FS_IMG400[k]) || (window.FS_IMG171 && window.FS_IMG171[k]) || (window.FS_IMG174 && window.FS_IMG174[k]) || (window.FS_IMG200 && window.FS_IMG200[k]) || (window.FS_IMG213 && window.FS_IMG213[k]) || (window.FS_IMG220 && window.FS_IMG220[k]) || (window.FS_IMG230 && window.FS_IMG230[k]) || (window.FS_IMG231 && window.FS_IMG231[k]) || (window.FS_IMG235 && window.FS_IMG235[k]) || (window.FS_IMG300 && window.FS_IMG300[k]) || (window.FS_IMG310 && window.FS_IMG310[k]) || (window.FS_IMG311 && window.FS_IMG311[k]) || (window.FS_IMG312 && window.FS_IMG312[k]) || (window.FS_IMG320 && window.FS_IMG320[k]) || (window.FS_IMG249 && window.FS_IMG249[k]) || '';   // 1.7.1, 1.7.4, 2.0.0, 2.1.3, 2.2.0 묶음도 찾아요
+  const IMG = k => (window.FS_IMG && window.FS_IMG[k]) || (window.FS_IMG400 && window.FS_IMG400[k]) || (window.FS_IMG430 && window.FS_IMG430[k]) || (window.FS_IMG171 && window.FS_IMG171[k]) || (window.FS_IMG174 && window.FS_IMG174[k]) || (window.FS_IMG200 && window.FS_IMG200[k]) || (window.FS_IMG213 && window.FS_IMG213[k]) || (window.FS_IMG220 && window.FS_IMG220[k]) || (window.FS_IMG230 && window.FS_IMG230[k]) || (window.FS_IMG231 && window.FS_IMG231[k]) || (window.FS_IMG235 && window.FS_IMG235[k]) || (window.FS_IMG300 && window.FS_IMG300[k]) || (window.FS_IMG310 && window.FS_IMG310[k]) || (window.FS_IMG311 && window.FS_IMG311[k]) || (window.FS_IMG312 && window.FS_IMG312[k]) || (window.FS_IMG320 && window.FS_IMG320[k]) || (window.FS_IMG249 && window.FS_IMG249[k]) || '';   // 1.7.1, 1.7.4, 2.0.0, 2.1.3, 2.2.0 묶음도 찾아요
   const BLD_IMG = { classroom: 'bld_classroom_on', cafeteria: 'bld_cafeteria_on', library: 'bld_library_on', science: 'bld_science_on', store: 'bld_store_on', dorm: 'bld_dorm_on', union: 'bld_union_on' };
   const SITE_IMG = { classroom: 'bld_classroom_lock', science: 'bld_classroom_lock', library: 'bld_classroom_lock', cafeteria: 'bld_cafeteria_lock', playground: 'bld_playground_lock', store: 'bld_store_lock', dorm: 'bld_dorm_lock', union: 'bld_union_lock' };
   // 2.0.0 그림이 아직 없을 때 대신 쓸 그림(매점 그림은 작업지시서 19). 그림을 넣으면 저절로 진짜 그림이 나와요
@@ -8785,7 +9129,7 @@ body.cam-scene #ffChip,body.cam-scene #plChip,body.cam-scene .b-ring{animation-p
   // S.bs[k]는 지금 보이는 모습의 학교급이고, 단계는 학교급 + 1(최대 4)이에요. 그림이 없는 단계는 바로 아래 단계 그림을 써요.
   // 1단계는 원래 그림(과학실과 운동장은 원래 그림이 2단계), 2~4단계는 1.7.0 묶음의 bld_{k}_s{n}이에요
   const IMG170 = k => (window.FS_IMG170 && window.FS_IMG170[k]) || IMG(k) || (ART_FB[k] ? IMG170(ART_FB[k]) : '');
-  const has170 = k => !!((window.FS_IMG170 && window.FS_IMG170[k]) || (window.FS_IMG400 && window.FS_IMG400[k]) || (window.FS_IMG200 && window.FS_IMG200[k]) || (window.FS_IMG300 && window.FS_IMG300[k]) || (window.FS_IMG249 && window.FS_IMG249[k]));   // FS_IMG249: 3.0.0 관리자 고급 배경(작업지시서 49)   // 3.0.0 고등학교 지도와 건물 단계도   // 2.0.0 중학교 지도와 건물 단계도
+  const has170 = k => !!((window.FS_IMG170 && window.FS_IMG170[k]) || (window.FS_IMG400 && window.FS_IMG400[k]) || (window.FS_IMG430 && window.FS_IMG430[k]) || (window.FS_IMG200 && window.FS_IMG200[k]) || (window.FS_IMG300 && window.FS_IMG300[k]) || (window.FS_IMG249 && window.FS_IMG249[k]));   // FS_IMG249: 3.0.0 관리자 고급 배경(작업지시서 49)   // 3.0.0 고등학교 지도와 건물 단계도   // 2.0.0 중학교 지도와 건물 단계도
   const bldStage = k => Math.min(5, ((S.bs && S.bs[k]) || 0) + 1);   // 4.0.0 대학교 모습은 5단계(bld_*_s5)
   const stageKey = (pre, n, min) => { for (let i = n; i >= min; i--) if (has170(`${pre}_s${i}`)) return `${pre}_s${i}`; return ''; };
   const bldImg = k => {
@@ -12719,13 +13063,16 @@ body.cam-scene #ffChip,body.cam-scene #plChip,body.cam-scene .b-ring{animation-p
        forest/rank/<내 id>   랭킹 이름과 학교 점수
        forest/stats/<내 id>  테스트 현황 (어디까지 했는지, 얼마나 했는지)
      <내 id>는 Firebase 익명 로그인이 기기(브라우저)마다 만들어 줘요. */
-  const VERSION = '4.2.0';
+  const VERSION = '4.3.0';
   const NT_QUIET = ['2.1.20', '2.1.2.2', '2.3.0.1', '2.3.4', '3.2.3', '3.2.4', '3.2.5', '3.3.1', '3.3.2', '3.3.3'];   // 3.3.1, 3.3.2, 3.3.3(토스 먼저)도 공지 창 없이(지섭). 2.3.0.1도 공지 창 없이(공지는 그대로 2.3.0). 2.3.4도 조용히(지섭 결정). 3.2.3, 3.2.4, 3.2.5도 공지 창 없이(공지 줄을 고르지 않음)
     // 2.1.20 지섭 결정: 이 버전들은 업데이트해도 공지 창을 띄우지 않아요(공지는 그대로 2.1.2)
   /* 2.0.0 공지사항 (2026-10-27 지섭, 1.8.0은 이미 올려서 2.0.0부터): 설정 > 공지사항. 맨 위가 가장 새 공지예요.
      패치노트는 자동으로 넣지 않아요. 지섭이 검수한 글만 여기에 적어요(CHANGELOG.md는 자세한 기록용이라 따로 있어요).
      접속하면 새 공지 창을 띄워요(올라온 뒤 7일 동안, '일주일간 열지 않기'를 누르면 7일 쉬어요). 업데이트한 뒤 첫 접속에는 쉬는 중이어도 한 번 띄워요 */
   const NOTICES = [
+    // 4.3.0 공지(2026-11-14 지섭 확인한 세 줄)
+    { id: '2026-11-14-v430', date: '2026-11-14', tag: '업데이트', title: '4.3.0 업데이트',
+      lines: ['숲속 탐험대 업데이트(유치원부터, 층을 오르며 장난꾸러기 달래기)', '탐험 랭킹(이번 주 가장 높은 층)', '편의 개선과 오류 수정(운동회 트랙, 퀘스트 횟수, 업적 모두 받기, 숲속 대결 승률, 이야기 이전 단추)'] },
     // 4.2.0 공지(2026-11-13 지섭이 고른 세 줄)
     { id: '2026-11-13-v420', date: '2026-11-13', tag: '업데이트', title: '4.2.0 업데이트',
       lines: ['대축제 업데이트(월 1회 진행)', '연구 투자 업데이트', '편의 개선과 오류 수정'] },
@@ -13597,7 +13944,7 @@ body.cam-scene #ffChip,body.cam-scene #plChip,body.cam-scene .b-ring{animation-p
      토스 미니앱: 랭킹은 토스 게임 센터가 맡아요. 점수가 오를 때 submitGameCenterLeaderBoardScore({ score: String(rankScore()) })를 보내고,
      랭킹 버튼에서는 openGameCenterLeaderboard()로 토스 랭킹 화면을 열면 돼요. 미니앱마다 랭킹은 하나라서 학교 점수 하나만 보내요. */
   const RANK_MAX = 50;
-  const Rank = { state: 'idle', gen: 0, be: null, uid: null, rows: [], wrows: [], brows: [], readOnly: false, writing: false, timer: 0, unsub: null, unsubW: null, unsubB: null, sbt: 0, sbtq: null, sbtm: 0 };   // 2.0.1 brows: 대결 순위, sbt: 이번에 켠 뒤 올린 대결 점수
+  const Rank = { state: 'idle', gen: 0, be: null, uid: null, rows: [], wrows: [], brows: [], trows: [], stf: 0, stfW: null, stfAt: 0, readOnly: false, writing: false, timer: 0, unsub: null, unsubW: null, unsubB: null, sbt: 0, sbtq: null, sbtm: 0 };   // 2.0.1 brows: 대결 순위, sbt: 이번에 켠 뒤 올린 대결 점수
   /* 학교 파워: 다른 게임의 전투력처럼 쌓아 온 것에 가중치를 둔 합이에요. 쓰거나 종업식을 열어도 줄지 않아요.
      지금 학교(졸업하면 처음으로): 시설 레벨 ×10, 가구 레벨 ×2, 선생님 레벨 ×12. 졸업할 때 이 몫은 pwBank에 넣어 둬요.
      계속 남는 것: 받은 수료증 ×5, 졸업 강화 레벨 ×20, 장학재단 강화 레벨 ×40, 기념품 ×25, 꾸미기 ×15, 학교급 ×500,
@@ -13649,6 +13996,7 @@ body.cam-scene #ffChip,body.cam-scene #plChip,body.cam-scene .b-ring{animation-p
       listenWeek: (ok, no) => col.orderBy('ws', 'desc').limit(RANK_MAX).onSnapshot(snap => ok(snap.docs.map(d => [d.id, d.data()])), no),
       listenBt: (ok, no) => col.orderBy('bt', 'desc').limit(RANK_MAX).onSnapshot(snap => ok(snap.docs.map(d => [d.id, d.data()])), no),   // 2.0.1 대결 순위
       listenSea: (ok, no) => col.orderBy('sp', 'desc').limit(RANK_MAX).onSnapshot(snap => ok(snap.docs.map(d => [d.id, d.data()])), no),   // 2.1.3 랭킹 시즌
+      listenTam: (ok, no) => col.orderBy('tq', 'desc').limit(RANK_MAX).onSnapshot(snap => ok(snap.docs.map(d => [d.id, d.data()])), no),   // 4.3.0 탐험 순위
       put: doc => col.doc(uid).set(doc),
       remove: () => col.doc(uid).delete(),
       // 2.1.3 다른 학교 구경
@@ -13700,6 +14048,17 @@ body.cam-scene #ffChip,body.cam-scene #plChip,body.cam-scene .b-ring{animation-p
         sync(); const timer = setInterval(sync, 30000);
         return () => { clearInterval(timer); if (q) q.off('value', cb); };
       },
+      listenTam: (ok, no) => {   // 4.3.0 탐험 순위: 주간 리그처럼 이번 주 범위(tq = 주 × 1,000,000 + 층)만 받아요(서버 규칙 indexOn tq)
+        let q = null, wk = null;
+        const cb = snap => { const out = []; snap.forEach(ch => { out.push([ch.key, ch.val()]); }); ok(out.reverse()); };
+        const sync = () => {
+          const next = weekIdx(); if (next === wk) return;
+          if (q) q.off('value', cb);
+          wk = next; q = ref.orderByChild('tq').startAt(wk * 1000000).endAt(wk * 1000000 + 999999).limitToLast(RANK_MAX + 10); q.on('value', cb, no);
+        };
+        sync(); const timer = setInterval(sync, 30000);
+        return () => { clearInterval(timer); if (q) q.off('value', cb); };
+      },
       put: doc => ref.child(uid).set(Object.assign({}, doc, { at: Cloud.fb.database.ServerValue.TIMESTAMP })),
       remove: () => ref.child(uid).remove(),
       removeOther: id => ref.child(id).remove(),   // 4.1.2 관리자만(서버 규칙이 forest/adminUids 계정의 지우기만 받아 줘요)
@@ -13740,6 +14099,12 @@ body.cam-scene #ffChip,body.cam-scene #plChip,body.cam-scene .b-ring{animation-p
         Rank.srows = rankRows(pairs, r => r.sk === n && r.sp > 0, (a, b) => b.sp - a.sp || a.at - b.at);
         renderRankPanel();
       }, () => {});
+      if (be.listenTam) Rank.unsubT = be.listenTam(pairs => {   // 4.3.0 탐험 순위: 이번 주 줄만
+        if (g !== Rank.gen) return;
+        const w = weekIdx();
+        Rank.trows = rankRows(pairs, r => r.week === w && r.tf > 0, (a, b) => b.tf - a.tf || a.at - b.at);
+        renderRankPanel();
+      }, () => {});
       if (be.listenBt) Rank.unsubB = be.listenBt(pairs => {
         if (g !== Rank.gen) return;
         Rank.brows = rankRows(pairs, r => r.bt > 0, (a, b) => b.bt - a.bt || a.at - b.at);
@@ -13757,8 +14122,9 @@ body.cam-scene #ffChip,body.cam-scene #plChip,body.cam-scene .b-ring{animation-p
     if (Rank.unsubW) { try { Rank.unsubW(); } catch (e) { /* 무시 */ } }
     if (Rank.unsubB) { try { Rank.unsubB(); } catch (e) { /* 무시 */ } }
     if (Rank.unsubS) { try { Rank.unsubS(); } catch (e) { /* 무시 */ } }
+    if (Rank.unsubT) { try { Rank.unsubT(); } catch (e) { /* 무시 */ } }
     clearTimeout(Rank.timer);
-    Object.assign(Rank, { state: 'idle', be: null, uid: null, rows: [], wrows: [], brows: [], srows: [], readOnly: false, writing: false, unsub: null, unsubW: null, unsubB: null, unsubS: null, sbt: 0, sbtq: null, sbtm: 0 });
+    Object.assign(Rank, { state: 'idle', be: null, uid: null, rows: [], wrows: [], brows: [], srows: [], trows: [], readOnly: false, writing: false, unsub: null, unsubW: null, unsubB: null, unsubS: null, unsubT: null, sbt: 0, sbtq: null, sbtm: 0, stf: 0, stfW: null, stfAt: 0 });
   }
   function rankAfterCloud() {
     if (Rank.state === 'loading') return;   // 이미 서버 연결을 기다리는 중이면 알아서 이어져요
@@ -13775,7 +14141,7 @@ body.cam-scene #ffChip,body.cam-scene #plChip,body.cam-scene .b-ring{animation-p
       pid: typeof d.pid === 'string' ? d.pid.slice(0, 16) : '', week: Number.isInteger(d.week) ? d.week : -2 /* 보안 보강: 소수 주를 정수로 바꿔 이번 주로 세지 않아요 */, lp: Math.max(0, Math.floor(Number(d.lp) || 0)),
       title: typeof d.title === 'string' && achTitleName(d.title) ? d.title : '',   // 2.1.3 업적 말고 받는 칭호도
       bt: typeof d.bt === 'number' && isFinite(d.bt) ? Math.max(1000, Math.min(9999, Math.floor(d.bt))) : 0, btm: typeof d.btm === 'number' ? Math.max(0, Math.min(5, Math.floor(d.btm))) : 0, btq: typeof d.btq === 'number' && isFinite(d.btq) ? d.btq : null, sem: d.sem === 0 || d.sem === 1 ? d.sem : null,
-      sk: Math.max(0, Math.floor(Number(d.sk) || 0)), sp: Math.max(0, Math.min(1e9, Math.floor(Number(d.sp) || 0))) };   // 2.0.1 대결, 2.1.1 학기, 2.1.3 랭킹 시즌
+      sk: Math.max(0, Math.floor(Number(d.sk) || 0)), sp: Math.max(0, Math.min(1e9, Math.floor(Number(d.sp) || 0))), tf: Math.max(0, Math.min(100000, Math.floor(Number(d.tf) || 0))) };   // 4.3.0 탐험 이번 주 가장 깊은 층   // 2.0.1 대결, 2.1.1 학기, 2.1.3 랭킹 시즌
   }
   // 같은 학교(학교 번호)가 기기를 옮겨서 두 번 있으면 내 것이나 가장 최근 것 하나만 남겨요
   function rankRows(pairs, keep, order) {
@@ -13829,6 +14195,18 @@ body.cam-scene #ffChip,body.cam-scene #plChip,body.cam-scene .b-ring{animation-p
     const bt = Math.max(1000, Math.min(S.bt.pts, prev + room)), d = Math.max(0, bt - prev);
     return { bt, btq: base + d * BT_MS, btm: Math.max(m, mine ? mine.btm : 0, Math.min(S.bt.lg, btLgOf(bt))) };
   }
+  // 4.3.0 탐험 순위에 올릴 이번 주 가장 깊은 층과, 서버 규칙이 받아 줄 만큼으로 줄인 값
+  function tamTf() { if (!S.tam) return 0; tamWeek(); return S.tam.wk.w === S.lg.week ? Math.max(0, Math.min(100000, S.tam.wk.best | 0)) : 0; }
+  function tamRankDoc() {
+    const tf = tamTf(), mine = (Rank.trows || []).find(r => r.id === Rank.uid), row = (Rank.rows || []).find(r => r.id === Rank.uid);
+    let prev = 0, dt = null;
+    if (Rank.stfAt && Rank.stfW === S.lg.week) prev = Rank.stf; else if (mine && mine.week === S.lg.week) prev = mine.tf;
+    if (Rank.lastPerf != null && S.rank.by === Rank.uid) dt = perfNow() - Rank.lastPerf; else if (row) dt = gameNow() - row.at;
+    const room = dt == null ? (S.rank.by === Rank.uid && S.rank.sent > 0 ? 0 : 10) : (dt >= 11000 ? 10 : 0) + Math.max(0, dt - 1500) / 3000;
+    const v = Math.max(0, Math.min(tf, Math.floor(prev + room)));
+    return { tf: v, tq: S.lg.week * 1000000 + v };
+  }
+  const tamRankBehind = () => !Rank.noTam && !tossRank() && Rank.state === 'on' && tamTf() > (Rank.stfW === S.lg.week ? Rank.stf : 0);
   async function submitRank(force) {
     if (Rank.state !== 'on' || Rank.readOnly || !Rank.uid || !(S.rank.joined || tossRank()) || Rank.writing || (hasCloudBuild() && (Cloud.deleting || Cloud.delLeft))) return;   // 2.2.0 검토 3
     if (S.u.dev) {   // 2.0.0 보안 점검(2-7): 개발자 메뉴로 재화를 받은 학교는 랭킹에 올리지 않아요
@@ -13837,7 +14215,7 @@ body.cam-scene #ffChip,body.cam-scene #plChip,body.cam-scene .b-ring{animation-p
     }
     const score = rankScore();
     // 다른 기기에서 옮겨 온 학교는 이 기기 id로 처음 올리는 거라서 점수가 같아도 올려요
-    if (!force && score === S.rank.sent && S.rank.by === Rank.uid && lgKey() === S.rank.sws) return;
+    if (!force && score === S.rank.sent && S.rank.by === Rank.uid && lgKey() === S.rank.sws && !tamRankBehind()) return;
     if (!force && Date.now() - (Rank.lastPut || 0) < RANK_GAP) { rankDirty(); return; }   // 10초 간격(2-2)
     const g = Rank.gen, be = Rank.be;
     Rank.writing = true;
@@ -13858,11 +14236,16 @@ body.cam-scene #ffChip,body.cam-scene #plChip,body.cam-scene .b-ring{animation-p
       // 2.0.1 숲속 대결 순위. 2.2.0 검토 1부터 규칙은 btq 시간 예산으로 하루 200점까지 받아요(btRankDoc)
       const bto = !be.toss && BT_RANK && btOpen() ? btRankDoc() : null;
       if (bto) { doc.bt = bto.bt; doc.btm = bto.btm; if (!Rank.noBtq) { doc.btq = bto.btq; Rank.btqSent = true; } else Rank.btqSent = false; } else Rank.btqSent = false;   // 2.2.0 검토 1: 새 규칙(btq)을 게시하기 전에는 btq 없이
+      // 4.3.0 탐험 순위: 규칙은 지난 쓰기 뒤 3초마다 1층(10초가 지나면 10층 더)까지 받아요. 규칙(tf, tq)을 게시하기 전에 거절되면 탐험 칸 없이 다시 올려요
+      const tfo = !be.toss && !Rank.noTam ? tamRankDoc() : null;
+      if (tfo) { doc.tf = tfo.tf; doc.tq = tfo.tq; Rank.tamSent = true; } else Rank.tamSent = false;
       await be.put(doc);
       Rank.lastPut = Date.now(); Rank.lastPerf = perfNow(); Rank.denied = 0;
+      if (tfo && g === Rank.gen) { Rank.stf = tfo.tf; Rank.stfW = doc.week; Rank.stfAt = perfNow(); }
       if (g === Rank.gen) { S.rank.sent = sc; S.rank.by = Rank.uid; S.rank.sws = ws; if (bto) { Rank.sbt = bto.bt; Rank.sbtq = bto.btq; Rank.sbtm = bto.btm; } if (Rank.skSent) { Rank.ssp = doc.sp; Rank.ssk = doc.sk; Rank.sspAt = perfNow(); } save(); lookPush(); }
     } catch (e) {
       const c = String((e && (e.code || e.message)) || '');
+      if (g === Rank.gen && Rank.tamSent && /permission/i.test(c) && !Rank.noTam) { Rank.noTam = true; Rank.writing = false; rankDirty(); renderRankPanel(); return; }   // 4.3.0 탐험 칸 규칙이 아직 없어요
       if (g === Rank.gen && Rank.btqSent && /permission/i.test(c) && !Rank.noBtq) { Rank.noBtq = true; Rank.writing = false; rankDirty(); renderRankPanel(); return; }   // 2.2.0 검토 1 btq 칸 규칙이 아직 없어요
       if (g === Rank.gen && Rank.skSent && /permission/i.test(c) && !Rank.noSk) { Rank.noSk = true; Rank.writing = false; rankDirty(); renderRankPanel(); return; }   // 2.1.3 시즌 칸 규칙이 아직 없어요
       if (g === Rank.gen && Rank.semSent && /permission/i.test(c) && !Rank.noSem) { Rank.noSem = true; Rank.writing = false; rankDirty(); renderRankPanel(); return; }   // 2.1.1 학기 칸 규칙이 아직 없어요
@@ -13873,7 +14256,7 @@ body.cam-scene #ffChip,body.cam-scene #plChip,body.cam-scene .b-ring{animation-p
     }
     if (g !== Rank.gen) return;
     Rank.writing = false;
-    if (S.rank.joined && !Rank.readOnly && (rankScore() !== S.rank.sent || S.rank.by !== Rank.uid || lgKey() !== S.rank.sws || (BT_RANK && btOpen() && S.bt.pts !== Rank.sbt) || (Rank.skSent && Rank.ssp < S.rs.p))) rankDirty();
+    if (S.rank.joined && !Rank.readOnly && (rankScore() !== S.rank.sent || S.rank.by !== Rank.uid || lgKey() !== S.rank.sws || (BT_RANK && btOpen() && S.bt.pts !== Rank.sbt) || (Rank.skSent && Rank.ssp < S.rs.p) || tamRankBehind())) rankDirty();
     renderRankPanel();
   }
   /* 교장 선생님 이름: 처음 한 번은 무료, 그다음부터는 바꿀 때마다 황금 도토리 5개, 6개, 7개... (2.1.0부터, 예전에는 50개, 60개, 70개)
@@ -14036,25 +14419,28 @@ body.cam-scene #ffChip,body.cam-scene #plChip,body.cam-scene .b-ring{animation-p
     rsSync();
     // 4.1.2 관리자 랭킹 줄 지우기: 개발자 메뉴가 있는 판(웹)에서만, 켠 뒤 한 번만 관리자인지 물어봐요
     if (!rt.admChk && !AIT && !window.FOREST_STORE && cloudOn()) { rt.admChk = true; checkAdmin().then(() => { if (rt.isAdmin) renderRankPanel(); }).catch(() => {}); }
-    const mode = tossRank() ? 'all' : (['all', 'bt', 'sea'].includes(rt.rankView) ? rt.rankView : 'week'), wk = mode === 'week', bm = mode === 'bt', sea = mode === 'sea';   // 2.0.1 대결 순위, 2.1.3 시즌
+    const mode = tossRank() ? 'all' : (['all', 'bt', 'sea', 'tam'].includes(rt.rankView) ? rt.rankView : 'week'), wk = mode === 'week', bm = mode === 'bt', sea = mode === 'sea', tm = mode === 'tam';   // 4.3.0 탐험 순위   // 2.0.1 대결 순위, 2.1.3 시즌
     $('#rankView').hidden = tossRank();
     $$('#rankView [data-rv]').forEach(b => b.setAttribute('aria-checked', String(b.dataset.rv === mode)));
-    const score = sea ? S.rs.p : bm ? S.bt.pts : wk ? S.lg.pts : rankScore();
-    const R = tossRank() || (bm && !btOpen()) ? (sea ? (Rank.srows || []) : bm ? (Rank.brows || []) : wk ? Rank.wrows : Rank.rows) : rkFill(mode, sea ? (Rank.srows || []) : bm ? (Rank.brows || []) : wk ? Rank.wrows : Rank.rows, score), mine = R.findIndex(r => r.id === Rank.uid);   // 3.0.0 보조 줄
+    const score = tm ? tamTf() : sea ? S.rs.p : bm ? S.bt.pts : wk ? S.lg.pts : rankScore();
+    const R = tm ? (Rank.trows || []) : tossRank() || (bm && !btOpen()) ? (sea ? (Rank.srows || []) : bm ? (Rank.brows || []) : wk ? Rank.wrows : Rank.rows) : rkFill(mode, sea ? (Rank.srows || []) : bm ? (Rank.brows || []) : wk ? Rank.wrows : Rank.rows, score), mine = R.findIndex(r => r.id === Rank.uid);   // 3.0.0 보조 줄
     if (wk && mine >= 0 && S.lg.pos !== mine + 1) { S.lg.pos = mine + 1; }
     if (sea && mine >= 0 && S.rs.pos !== mine + 1) { S.rs.pos = mine + 1; save(); }   // 2.1.3 시즌이 끝날 때 칭호를 정하는 순위
-    $('#rankScoreLab').textContent = sea ? '이번 시즌 점수' : bm ? '내 대결 점수' : wk ? '이번 주 리그 점수' : '내 학교 파워';
-    $('#rankScore').textContent = fmt(score);
+    $('#rankScoreLab').textContent = tm ? '이번 주 가장 높은 층' : sea ? '이번 시즌 점수' : bm ? '내 대결 점수' : wk ? '이번 주 리그 점수' : '내 학교 파워';
+    $('#rankScore').textContent = tm ? `${fmt(score)}층` : fmt(score);
     $('#rankPos').textContent = mine >= 0 ? `${mine + 1}위` : '-';
     const left = 7 - ((new Date(gameNow() + KST_MS).getUTCDay() + 6) % 7);   // 2.0.0 보안 점검(1-5): 한국 시간 요일
-    if (sea) {   // 2.1.3 랭킹 시즌
+    if (tm) {   // 4.3.0 탐험 순위
+      $('#rankSub').textContent = `월요일에 새로 시작해요 (${left}일 남음)`;
+      $('#rankLead').textContent = '이번 주에 탐험대가 오른 가장 높은 층으로 겨뤄요.';
+    } else if (sea) {   // 2.1.3 랭킹 시즌
       const n = rsNum(), q = n ? RS_Q[rsQ(n)] : null;
       $('#rankSub').textContent = n ? `${rsLabel(n)}. ${S.rs.p >= RS.min ? `기념 장식 '${q[3]}'${eulOf(q[3])} 받아요` : `${fmt(RS.min - S.rs.p)}점 더 모으면 기념 장식 '${q[3]}'`}` : '랭킹 시즌은 2026년 12월에 시작해요';
       $('#rankLead').textContent = '계절마다 한 시즌이에요. 주간 리그 점수를 시즌 내내 모아요. 300점을 넘기면 그 계절 기념 장식, 시즌이 끝날 때 1~3위는 칭호 \'숲속 시즌 왕\'을 받아요.';
     } else
     $('#rankSub').textContent = bm ? (btOpen() ? `${BT_LG[S.bt.lg].n} 리그, 오늘 남은 대결 ${btLeft()}판` : '숲속 대결은 초등학교 3학년부터 열려요') : wk ? `월요일에 새 리그가 시작돼요 (${left}일 남음). 리그에 참여하면 순위와 상관없이 황금 도토리 1개`
       : rankSchool(S.tier, yearNo(), semOn() ? S.sem : null) + (Rank.state === 'on' && R.length ? `, 랭킹에 ${R.length}명` : '');
-    if (!sea) $('#rankLead').textContent = bm ? '숲속 대결 점수로 겨뤄요. 이름 옆 메달은 지금까지 오른 가장 높은 리그예요.' : wk ? '이번 주에 한 일로 겨뤄요. 오늘의 미션 10점, 미션 보너스 20점, 학교 행사 성공 15점, 체험학습 10점(1시간마다 +5), 종업식 20점, 퀘스트 3점이에요.'
+    if (!sea && !tm) $('#rankLead').textContent = bm ? '숲속 대결 점수로 겨뤄요. 이름 옆 메달은 지금까지 오른 가장 높은 리그예요.' : wk ? '이번 주에 한 일로 겨뤄요. 오늘의 미션 10점, 미션 보너스 20점, 학교 행사 성공 15점, 체험학습 10점(1시간마다 +5), 종업식 20점, 퀘스트 3점이에요.'
       : '학교 파워로 순위를 매겨요. 시설, 가구, 선생님, 수료증, 꾸미기처럼 쌓아 온 것이 모두 들어가요.';
     // 참여하기와 이름 바꾸기
     const join = $('#rankJoin'), key = `${Rank.state}|${Rank.readOnly}|${S.rank.joined}|${S.rank.name}|${rt.rankEdit ? 1 : 0}|${Cloud.state}|${Cloud.err}|${nickPrice()}|${S.gold >= nickPrice()}`;
@@ -14091,7 +14477,7 @@ body.cam-scene #ffChip,body.cam-scene #plChip,body.cam-scene .b-ring{animation-p
           `<button class="btn-sub rl-model" type="button" data-look="model">예시 학교 구경하기</button><p class="fine">랭킹의 학교 이름을 누르면 그 학교를 구경해요(보여 주기를 켠 학교만)</p>`; } }
     // 순위표: 이름은 다른 사람이 적은 글이라 textContent로만 넣어요
     const list = $('#rankList'), rows = Rank.state === 'on' ? R : [];
-    const lkey = mode + rows.map(r => `${r.id}:${r.score}:${r.lp}:${r.sp}:${r.bt}:${r.btm}:${r.name}:${r.tier}:${r.year}:${r.test ? 1 : 0}:${r.title}`).join('|') + `|${Rank.uid}|${S.units}|${S.ach ? S.ach.title : ''}|${rt.isAdmin ? 1 : 0}|${rt.rkDel || ''}`;
+    const lkey = mode + rows.map(r => `${r.id}:${r.score}:${r.lp}:${r.sp}:${r.bt}:${r.btm}:${r.tf}:${r.name}:${r.tier}:${r.year}:${r.test ? 1 : 0}:${r.title}`).join('|') + `|${Rank.uid}|${S.units}|${S.ach ? S.ach.title : ''}|${rt.isAdmin ? 1 : 0}|${rt.rkDel || ''}`;
     const canDel = !!(rt.isAdmin && Rank.be && Rank.be.removeOther && !Rank.readOnly);
     if (list.dataset.key !== lkey) {
       list.dataset.key = lkey;
@@ -14126,16 +14512,16 @@ body.cam-scene #ffChip,body.cam-scene #plChip,body.cam-scene .b-ring{animation-p
         }
         const b = document.createElement('b');
         b.className = 'rk-score';
-        b.textContent = fmt(sea ? r.sp : bm ? r.bt : wk ? r.lp : r.score);
+        b.textContent = tm ? `${fmt(r.tf)}층` : fmt(sea ? r.sp : bm ? r.bt : wk ? r.lp : r.score);
         if (!r.nx) { li.dataset.look = r.id; li.dataset.who = r.name; li.classList.add('can-look'); }   // 2.1.3 누르면 그 학교 구경(3.0.0 보조 줄은 구경 안 돼요)
         li.append(no, txt, b);
-        li.setAttribute('aria-label', `${i + 1}위 ${r.name}, ${rankSchool(r.tier, r.year, r.sem)}, ${bm ? `대결 점수, ${BT_LG[Math.max(0, Math.min(5, r.btm | 0))].n} 리그` : wk ? '리그 점수' : '학교 파워'} ${fmt(bm ? r.bt : wk ? r.lp : r.score)}`);
+        li.setAttribute('aria-label', `${i + 1}위 ${r.name}, ${rankSchool(r.tier, r.year, r.sem)}, ${tm ? '탐험 가장 높은 층' : bm ? `대결 점수, ${BT_LG[Math.max(0, Math.min(5, r.btm | 0))].n} 리그` : wk ? '리그 점수' : '학교 파워'} ${fmt(tm ? r.tf : bm ? r.bt : wk ? r.lp : r.score)}`);
         list.appendChild(li);
       });
     }
     const empty = $('#rankEmpty');
     empty.hidden = tossRank() || !(Rank.state === 'on' && rows.length === 0);
-    if (!empty.hidden) empty.textContent = sea ? (Rank.noSk ? '시즌 순위는 서버 준비 중이에요. 시즌 점수는 지금도 모이고 있어요.' : '아직 이번 시즌 순위에 오른 학교가 없어요. 주간 리그 점수를 모아 첫 번째가 되어 보세요!') : bm ? '아직 대결 순위에 오른 학교가 없어요. 숲속 대결에서 첫 번째가 되어 보세요!' : '아직 랭킹에 이름을 올린 교장 선생님이 없어요. 첫 번째가 되어 보세요!';
+    if (!empty.hidden) empty.textContent = tm ? (Rank.noTam ? '탐험 순위는 서버 준비 중이에요. 탐험 기록은 지금도 모이고 있어요.' : '아직 이번 주 탐험 순위에 오른 학교가 없어요. 탐험대를 보내 첫 번째가 되어 보세요!') : sea ? (Rank.noSk ? '시즌 순위는 서버 준비 중이에요. 시즌 점수는 지금도 모이고 있어요.' : '아직 이번 시즌 순위에 오른 학교가 없어요. 주간 리그 점수를 모아 첫 번째가 되어 보세요!') : bm ? '아직 대결 순위에 오른 학교가 없어요. 숲속 대결에서 첫 번째가 되어 보세요!' : '아직 랭킹에 이름을 올린 교장 선생님이 없어요. 첫 번째가 되어 보세요!';
   }
 
   /* ---------- 황금 도토리와 꾸미기 상점 ----------
@@ -14441,6 +14827,595 @@ body.cam-scene #ffChip,body.cam-scene #plChip,body.cam-scene .b-ring{animation-p
   // 광고를 끝까지 보면 덤으로 3개 (상점 광고와 합쳐 하루 3번까지)
   // 4.2.0 지섭 제보: 광고를 끝까지 보면 받는 황금 도토리가 보이지 않았어요. 보상 창 뒤에 한 줄로 알려요
   function adGold() { goldDay(); if (S.gd.n >= GOLD.adDay) return; S.gd.n += 1; addGold(GOLD.ad); setTimeout(() => toast(`광고 선물! 황금 도토리 +${GOLD.ad} (오늘 ${S.gd.n}/${GOLD.adDay})`), 1300); }
+  /* ---------- 4.3.0 숲속 탐험대 (프로젝트 문서 '4.3.0 설계안 (숲속 탐험대) 초안', 지섭 결정 2026-11-14) ----------
+     밤마다 학교 곳곳에 숲의 장난꾸러기들이 와요. 학생 동물 대원이 1층, 2층… 끝없이 탐험해요. 숫자는 모두 본부 제안(dev/tamsim.py로 재요).
+     이름: 시험 기간이 EX를 써서 탐험은 TAM, 저장 S.tam. 다른 곳에서 먼저 불려도 멈추지 않게 var */
+  var TAM = {
+    reg: [
+      { k: 'ground', nm: '들꽃 운동장', mob: ['솜털 민들레 요정', '데굴데굴 공 꼬마', '떼쓰는 무당벌레'], boss: '토라진 큰 해바라기', mat: 0 },
+      { k: 'garden', nm: '버섯 텃밭', mob: ['잠꾸러기 버섯', '끈적끈적 달팽이', '퐁퐁 포자 방울'], boss: '하품하는 왕버섯', mat: 2 },
+      { k: 'pond', nm: '안개 연못', mob: ['장난꾸러기 물방울', '안개 솜사탕 요정', '연잎 정령'], boss: '안개 구름 고래', mat: 1 },
+      { k: 'library', nm: '단풍 도서관', mob: ['종이비행기 꼬마', '먼지 솜뭉치', '책갈피 나비'], boss: '잠꼬대하는 큰 책', mat: 0 },
+      { k: 'yard', nm: '눈 내린 뒤뜰', mob: ['눈뭉치 꼬마', '고드름 요정', '얼음 반딧불'], boss: '눈보라 눈사람 대장', mat: 1 },
+      { k: 'tower', nm: '별빛 천문대', mob: ['반짝 수정 꼬마', '그림자 솜뭉치', '졸린 박쥐'], boss: '수정 꼬마 용', mat: 3 }],
+    regLen: 50, bossEvery: 10, limit: 30,
+    mHp: 20, mAtk: 2.2, g: 1.07, bossHp: 7, bossAtk: 1.7, mobCd: 1.6,
+    // 역할(능력 번호 0 과학, 1 체육, 2 국어, 3 미술, 4 수학)
+    role: [{ k: 'sci', nm: '과학 실험', hp: 0.9, atk: 0.85, cd: 1.4 }, { k: 'pe', nm: '체육 돌격', hp: 1.7, atk: 0.9, cd: 1.1 },
+      { k: 'kor', nm: '국어 응원', hp: 1.1, atk: 0.7, cd: 1.3 }, { k: 'art', nm: '미술 물감', hp: 1.0, atk: 0.75, cd: 1.2 },
+      { k: 'math', nm: '수학 별 화살', hp: 0.85, atk: 1.2, cd: 1.3 }],
+    front: [2, 0, 4, 1, 3],   // 앞줄 차례: 체육, 미술, 과학, 수학, 국어
+    pHp: 40, pAtk: 7, lvG: 1.1, starG: 0.12, acG: 0.01, gauge: 10,
+    lvMin: 2, lvCost: 1.13,   // 레벨 올리기: 수업료 lvMin분치 × lvCost^(레벨-1)
+    star: [0, 5, 15, 35, 75], starTier: 1,   // ★2부터 별 조각, 초등학교부터
+    gear: [{ k: 'tool', nm: '탐험 도구', mat: 0, ic: '🪄', hint: '대원 힘' }, { k: 'bag', nm: '가방', mat: 1, ic: '🎒', hint: '대원 체력' }, { k: 'hat', nm: '모자', mat: 2, ic: '🎩', hint: '필살기 게이지' }],
+    gearPer: 0.08,   // 4.3.0 지섭 결정: 장비는 대원 칸마다(그 칸에 선 대원이 받아요). 한 칸 Lv마다 8%(제안)
+    slotNm: ['맨 앞', '앞', '가운데', '뒤', '맨 뒤'],
+    mats: ['반짝 나뭇가지', '빛나는 조약돌', '무지개 꽃잎', '별 조각'], matIc: ['🪵', '🪨', '🌸', '⭐'],
+    idleMax: 12 * 3600, idleMin: 600,
+    adSpd: { n: 3, min: 10, max: 30 },   // 4.3.0 지섭 결정: 광고 한 번에 2배속 10분(게임을 켜 둔 동안만 줄어요), 이어 붙여 30분까지, 하루 세 번 adRep: 1, buff: 1.3,
+    // 4.3.0 지섭 요청(너무 빨라요, 탐험 느낌): 겨루기 속도와 한 층의 흐름(걷기, 만남, 이김, 사건, 오르기, 짐). 초 단위, 2배속이면 모두 반으로
+    pace: 1.7, ph: { walk: 2.6, meet: 1.1, win: 1.5, climb: 1.3, lose: 3.6, ev: 8 }, evP: 0.3,
+    mobPh: ['chr_mouse', 'chr_crow', 'chr_goose', 'chr_sheep', 'chr_goat', 'chr_beaver'], bossPh: 'chr_boar',
+  };
+  function freshTam() { return { best: 0, party: ['bear', 'rabbit', 'fox'], mem: {}, gear: { tool: 0, bag: 0, hat: 0 }, sg: [0, 1, 2, 3, 4].map(() => ({ tool: 0, bag: 0, hat: 0 })), mat: [0, 0, 0, 0], it: 0, auto: 0, ad: { day: '', spd: 0, rep: 0, rv: 0 }, spd: { sec: 0 }, wk: { w: -1, best: 0 }, seen: 0 }; }
+  function sanitizeTam(d, s) {
+    const A = d && d.tam && typeof d.tam === 'object' ? d.tam : {}, f = freshTam(), n = (v, lo, hi, def) => typeof v === 'number' && isFinite(v) ? Math.max(lo, Math.min(hi, Math.floor(v))) : def;
+    f.best = n(A.best, 0, 1e6, 0);
+    if (A.mem && typeof A.mem === 'object') for (const k of Object.keys(A.mem).slice(0, 60)) { const m = A.mem[k]; if (typeof k === 'string' && /^[a-z]{2,16}$/.test(k) && m && typeof m === 'object') f.mem[k] = { lv: n(m.lv, 1, 1e5, 1), st: n(m.st, 1, 5, 1), sh: n(m.sh, 0, 1e6, 0) }; }
+    if (Array.isArray(A.party)) { const p = A.party.filter(k => typeof k === 'string' && /^[a-z]{2,16}$/.test(k)).slice(0, 5); if (p.length) f.party = [...new Set(p)]; }
+    if (A.gear && typeof A.gear === 'object') for (const k of ['tool', 'bag', 'hat']) f.gear[k] = n(A.gear[k], 0, 1e5, 0);
+    // 칸 장비(sg). 옛 저장(탐험대 전체 장비 gear)만 있으면 다섯 칸에 그대로 나눠 줘요
+    for (let i = 0; i < 5; i++) { const g = Array.isArray(A.sg) && A.sg[i] && typeof A.sg[i] === 'object' ? A.sg[i] : f.gear; for (const k of ['tool', 'bag', 'hat']) f.sg[i][k] = n(g[k], 0, 1e5, 0); }
+    if (Array.isArray(A.mat)) f.mat = [0, 1, 2, 3].map(i => n(A.mat[i], 0, 1e12, 0));
+    f.it = n(A.it, 0, 4e12, 0); f.auto = A.auto ? 1 : 0; f.seen = A.seen ? 1 : 0;
+    if (A.ad && typeof A.ad === 'object') f.ad = { day: typeof A.ad.day === 'string' ? A.ad.day.slice(0, 10) : '', spd: n(A.ad.spd, 0, 99, 0), rep: n(A.ad.rep, 0, 99, 0), rv: n(A.ad.rv, 0, 1e6, 0) };
+    if (A.spd && typeof A.spd === 'object') f.spd = { sec: n(A.spd.sec, 0, TAM.adSpd.max * 60, 0) };   // 옛 시험판의 층 단위 2배속(fl, until)은 받지 않아요
+    if (A.wk && typeof A.wk === 'object') f.wk = { w: n(A.wk.w, -1, 1e7, -1), best: n(A.wk.best, 0, 1e6, 0) };
+    s.tam = f;
+  }
+  const tamOn = () => !!S && !!S.tam;
+  const tamReg = fl => TAM.reg[Math.floor((Math.max(1, fl) - 1) / TAM.regLen) % TAM.reg.length];
+  const tamLap = fl => Math.floor((Math.max(1, fl) - 1) / (TAM.regLen * TAM.reg.length));   // 300층마다 '깊은 밤' 한 단계
+  const tamRole = sp => SP_ABIL[sp] !== undefined ? SP_ABIL[sp] : 1;
+  const tamMem = sp => S.tam.mem[sp] || (S.tam.mem[sp] = { lv: 1, st: 1, sh: 0 });
+  const tamSlots = () => S.tier <= 0 ? 3 : S.tier === 1 ? 4 : 5;
+  const tamStarOn = () => S.tier >= TAM.starTier;
+  const tamAvail = () => DEX_STUDENTS.filter(k => BASE_SPECIES.includes(k) || (S.dex && S.dex.got[k]));
+  const tamParty = () => S.tam.party.filter(k => tamAvail().includes(k)).slice(0, tamSlots());
+  const tamAutoOn = () => S.tam.best >= 2;   // 지섭: 자동 쓰기 단추는 2층을 넘으면
+  function tamStat(sp, slot) {
+    const m = tamMem(sp), ri = tamRole(sp), r = TAM.role[ri], G = slot != null && S.tam.sg[slot] ? S.tam.sg[slot] : { tool: 0, bag: 0, hat: 0 };
+    const mul = Math.pow(TAM.lvG, m.lv - 1) * (1 + TAM.starG * (m.st - 1)) * (1 + TAM.acG * (acLv(AB_KEY[ri]) - 1));
+    return { sp, ri, hp: TAM.pHp * r.hp * mul * (1 + TAM.gearPer * G.bag), atk: TAM.pAtk * r.atk * mul * (1 + TAM.gearPer * G.tool), cd: r.cd, gg: 1 + TAM.gearPer * G.hat };
+  }
+  const tamTeam = () => tamParty().map(sp => ({ sp, ri: tamRole(sp) })).sort((a, b) => TAM.front[a.ri] - TAM.front[b.ri]).map((x, i) => tamStat(x.sp, i));   // 앞줄부터 1번 칸
+  const tamPow = () => Math.round(tamTeam().reduce((s, p) => s + p.atk * 6 / p.cd + p.hp / 4, 0));   // 화면에 보이는 '탐험대 힘'
+  function tamMobs(fl) {
+    const R = tamReg(fl), m = Math.min(1e250, Math.pow(TAM.g, fl - 1)), boss = fl % TAM.bossEvery === 0, out = [];
+    if (boss) out.push({ boss: 1, nm: R.boss, i: 0, hp: TAM.mHp * m * TAM.bossHp, atk: TAM.mAtk * m * TAM.bossAtk });
+    for (let i = 0; i < (boss ? 2 : 3); i++) { const j = (fl + i) % 3; out.push({ nm: R.mob[j], i: j, hp: TAM.mHp * m, atk: TAM.mAtk * m }); }
+    return out;
+  }
+  function tamFight(fl, team, buff, mod) {
+    const b = buff || 1;
+    const pc = TAM.pace, md = mod || {}, ph = md.hp || 1, mh = md.hard ? 1.4 : 1;
+    return { id: (tamFight.n = (tamFight.n || 0) + 1), fl, hard: !!md.hard, t: 0, lim: TAM.limit * pc, ev: [], P: team.map((s, k) => ({ ...s, cd: s.cd * pc, hp: s.hp * b * ph, mx: s.hp * b * ph, atk: s.atk * b, c: (0.4 + k * 0.3) * pc, g: 0 })),
+      M: tamMobs(fl).map((m, k) => ({ ...m, hp: m.hp * mh, mx: m.hp * mh, c: (1 + k * 0.4) * pc, wk: 0 })) };
+  }
+  // 한 대원의 기술. big은 필살기
+  function tamAct(F, p, big, rnd) {
+    const L = F.M.filter(m => m.hp > 0); if (!L.length) return;
+    const hit = (m, d, cr) => { m.hp -= d; F.ev.push({ k: 'hit', m: F.M.indexOf(m), d, cr: !!cr }); };
+    const pi = F.P.indexOf(p); F.ev.push({ k: big ? 'big' : 'act', p: pi, ri: p.ri });
+    if (p.ri === 1) { if (big) L.forEach(m => hit(m, p.atk * 3)); else hit(L[0], p.atk); }
+    else if (p.ri === 0) L.forEach(m => hit(m, p.atk * (big ? 3.2 : 0.5)));
+    else if (p.ri === 2) {
+      const A = F.P.filter(q => q.hp > 0);
+      if (big) { A.forEach(q => { const h = q.mx * 0.5; q.hp = Math.min(q.mx, q.hp + h); F.ev.push({ k: 'heal', p: F.P.indexOf(q), d: h }); }); L.forEach(m => hit(m, p.atk)); }
+      else { const w = A.slice().sort((a, b) => a.hp / a.mx - b.hp / b.mx)[0]; if (w && w.hp / w.mx < 0.85) { const h = p.atk * 1.6; w.hp = Math.min(w.mx, w.hp + h); F.ev.push({ k: 'heal', p: F.P.indexOf(w), d: h }); } else hit(L[0], p.atk * 0.8); }
+    }
+    else if (p.ri === 3) { if (big) L.forEach(m => { hit(m, p.atk * 2); m.wk = 6; }); else { hit(L[0], p.atk * 0.8); L[0].wk = 3; } }
+    else { const w = L.slice().sort((a, b) => a.hp - b.hp)[0]; if (big) hit(w, p.atk * 8, true); else { const cr = rnd() < 0.25; hit(w, p.atk * (cr ? 2 : 1), cr); } }
+  }
+  function tamCastAt(F, p) { if (!p || p.hp <= 0 || p.g < TAM.gauge) return false; p.g = 0; tamAct(F, p, true, Math.random); return true; }
+  // 한 걸음: 1 이김, -1 짐, 0 이어서
+  function tamStep(F, dt, auto, rnd) {
+    F.t += dt;
+    for (const p of F.P) {
+      if (p.hp <= 0) continue;
+      p.c -= dt; if (p.c <= 0) { p.c += p.cd; tamAct(F, p, false, rnd); p.g = Math.min(TAM.gauge, p.g + p.gg); }
+      if (auto && p.g >= TAM.gauge) tamCastAt(F, p);
+    }
+    for (const m of F.M) {
+      if (m.hp <= 0) continue;
+      m.wk = Math.max(0, m.wk - dt); m.c -= dt;
+      if (m.c <= 0) { m.c += TAM.mobCd * TAM.pace; const tg = F.P.find(q => q.hp > 0); if (tg) { const d = m.atk * (m.wk > 0 ? 0.7 : 1); tg.hp -= d; tg.g = Math.min(TAM.gauge, tg.g + 0.4 * tg.gg); F.ev.push({ k: 'hurt', p: F.P.indexOf(tg), m: F.M.indexOf(m), d }); } }
+    }
+    for (const m of F.M) if (m.hp <= 0 && !m.out) { m.out = 1; F.ev.push({ k: 'poof', m: F.M.indexOf(m) }); }
+    for (const p of F.P) if (p.hp <= 0 && !p.out) { p.out = 1; F.ev.push({ k: 'ko', p: F.P.indexOf(p) }); }
+    if (F.M.every(m => m.hp <= 0)) return 1;
+    if (F.P.every(p => p.hp <= 0) || F.t >= (F.lim || TAM.limit)) return -1;
+    return 0;
+  }
+  // 시험과 균형 재기: 한 층을 끝까지 겨뤄 봐요(자동 쓰기)
+  function tamSim(fl, team, seed) {
+    let x = seed || 7; const rnd = () => (x = (x * 16807) % 2147483647) / 2147483647;
+    const F = tamFight(fl, team || tamTeam()); let r = 0;
+    while (!r) { r = tamStep(F, 0.1, true, rnd); F.ev.length = 0; }
+    return { win: r === 1, t: Math.round(F.t * 10) / 10 };
+  }
+  const tamSpdOn = () => S.tam.spd.sec > 0;
+  function tamAdDay() { const t = gameToday(); if (S.tam.ad.day !== t) S.tam.ad = { day: t, spd: 0, rep: 0, rv: S.tam.ad.rv || 0 }; }
+  const tamLvCost = sp => minAcorns(TAM.lvMin * Math.pow(TAM.lvCost, tamMem(sp).lv - 1));
+  const tamGearCost = (k, i) => { const L = S.tam.sg[i][k], G = TAM.gear.find(g => g.k === k); return { m: G.mat, n: 4 + 3 * L, star: L % 10 === 9 ? 3 * (1 + Math.floor(L / 10)) : 0 }; };
+  const tamGrade = L => Math.min(3, 1 + Math.floor(L / 10));
+  const tamStarNeed = st => st >= 5 ? 0 : TAM.star[st] - TAM.star[st - 1];
+  // 별 조각: 같은 동물을 학교에서 또 만나면(신입생, 교환학생 등)과 보물 상자
+  function tamShard(sp, n) {
+    if (!tamOn() || !tamStarOn() || !DEX_STUDENTS.includes(sp)) return;
+    const m = tamMem(sp); if (m.st >= 5) return;
+    m.sh += n;
+    while (m.st < 5 && m.sh >= tamStarNeed(m.st + 1)) { m.sh -= tamStarNeed(m.st + 1); m.st += 1; toast(`${spName(sp)} 대원 별이 올랐어요! ★${m.st}`); }
+    if (rt.tab === 'tam') tamRenderBody();
+  }
+  function tamWin(fl) {
+    const R = tamReg(fl), got = [];
+    S.tam.best = Math.max(S.tam.best, fl);
+    tamWeek(); if (fl > S.tam.wk.best) { S.tam.wk.best = fl; rankDirty(); }
+    const mi = R.mat; S.tam.mat[mi] = Math.min(1e12, S.tam.mat[mi] + 2 + Math.floor(fl / 40)); if (fl % 5 === 0) S.tam.mat[3] = Math.min(1e12, S.tam.mat[3] + 1);
+    const a = minAcorns(0.5); S.budget += a; earn(a);
+    if (fl % TAM.bossEvery === 0) { addEss(10); got.push('숲의 정수 +10'); }
+    if (fl % 50 === 0) {
+      const c = fl % 150 === 0 ? 3 : fl % 100 === 0 ? 2 : 1, q = [8, 16, 30][c - 1];
+      for (let i = 0; i < 4; i++) S.tam.mat[i] = Math.min(1e12, S.tam.mat[i] + (i === 3 ? Math.ceil(q / 3) : q));
+      const ps = tamParty(); if (ps.length) tamShard(ps[Math.floor(Math.random() * ps.length)], 3);
+      got.push(['나무', '은빛', '금빛'][c - 1] + ' 보물 상자');
+    }
+    if (fl % 100 === 0) { addGold(1); got.push('황금 도토리 +1'); }
+    if (got.length) toast(`${fl}층 통과!\n${got.join('\n')}`);
+    if (fl % 10 === 0) save();
+  }
+  function tamWeek() { const w = gameWeek(); if (S.tam.wk.w !== w) S.tam.wk = { w, best: 0 }; }
+  // 자리 비운 동안의 탐험 보고서: 가장 깊은 층에서 계속 모아요(최대 12시간)
+  function tamIdle() {
+    if (!S.tam.it) S.tam.it = gameNow();
+    const sec = Math.min(TAM.idleMax, Math.max(0, (gameNow() - S.tam.it) / 1000)), b = Math.max(1, S.tam.best), R = tamReg(b), min = sec / 60;
+    const main = Math.floor(min * (0.3 + b / 200)), side = Math.floor(main / 4), star = Math.floor(min / 30 * (1 + b / 100));
+    return { sec, mat: [0, 1, 2, 3].map(i => i === 3 ? star : i === R.mat ? main : side), acorn: S.tam.best ? minAcorns(sec / 3600 * 3) : 0, mobs: Math.floor(min * 2) };
+  }
+  function tamCollect(mul) {
+    const I = tamIdle(); if (I.sec < 60) return null;
+    for (let i = 0; i < 4; i++) S.tam.mat[i] = Math.min(1e12, S.tam.mat[i] + I.mat[i] * mul);
+    if (I.acorn) { S.budget += I.acorn * mul; earn(I.acorn * mul); }
+    S.tam.it = gameNow(); save();
+    return I;
+  }
+  function tamReport(auto) {
+    const I = tamIdle(); if (I.sec < (auto ? TAM.idleMin : 60)) { if (!auto) toast('조금 더 지나면 보고서가 쌓여요'); return; }
+    queueModal(() => {
+      tamAdDay();
+      const h = Math.floor(I.sec / 3600), mm = Math.floor(I.sec % 3600 / 60);
+      $('#tmRepSub').textContent = `${h ? h + '시간 ' : ''}${mm}분 동안 장난꾸러기 ${fmt(I.mobs)}마리를 달래 줬어요`;
+      setH($('#tmRepList'), I.mat.map((v, i) => v ? `<li><span>${TAM.matIc[i]}</span>${TAM.mats[i]} +${fmt(v)}</li>` : '').join('') + (I.acorn ? `<li>${acornIcon()}도토리 +${fmt(I.acorn)}</li>` : ''));
+      const ad = $('#tmRepAd'); ad.hidden = S.tam.ad.rep >= TAM.adRep;
+      openModal($('#mTamRep'));
+    });
+  }
+  function tamRepTake(dbl) {
+    const go = mul => { closeModal($('#mTamRep')); const I = tamCollect(mul); if (I) toast(mul > 1 ? '광고 선물! 보고서를 두 배로 받았어요' : '탐험 보고서를 받았어요'); tamRenderBody(); };
+    if (!dbl) return go(1);
+    showAd(() => { tamAdDay(); S.tam.ad.rep += 1; go(2); }, r => { if (r !== 'noad') toast('광고를 끝까지 보지 않아서 보상이 없어요'); });
+  }
+  function tamAdSpd() {
+    tamAdDay(); if (S.tam.ad.spd >= TAM.adSpd.n) { toast('2배속 광고는 하루 세 번까지예요'); return; }
+    if (S.tam.spd.sec > (TAM.adSpd.max - TAM.adSpd.min) * 60) { toast(`2배속은 ${TAM.adSpd.max}분까지 모을 수 있어요`); return; }
+    showAd(() => { tamAdDay(); S.tam.ad.spd += 1; S.tam.spd.sec = Math.min(TAM.adSpd.max * 60, S.tam.spd.sec + TAM.adSpd.min * 60); save(); toast(`2배속 ${TAM.adSpd.min}분! 게임을 켜 둔 동안만 줄어요`); tamRenderTop(); }, r => { if (r !== 'noad') toast('광고를 끝까지 보지 않아서 보상이 없어요'); });
+  }
+  function tamAdRevive() {
+    showAd(() => { const T = rt.tam; if (T) { T.buff = 1; T.lose = 0; T.nLose = 0; if (T.ph === 'lose') T.t = TAM.ph.lose; } tamRenderTop(); toast('힘을 내서 다시 도전해요!'); }, r => { if (r !== 'noad') toast('광고를 끝까지 보지 않아서 보상이 없어요'); });
+  }
+  // 매 프레임: 탐험 화면이 아니어도 겨뤄요(그림은 탐험 화면에서만)
+  // 4.3.0 한 층의 흐름: 걷기(배경이 흘러요) → 만남(장난꾸러기가 떨어져요) → 겨루기 → 이김(전리품) → 사건(가끔) → 오르기(다음 층) / 지면 물러났다가 다시
+  // 탐험 화면이 아니어도 같은 시간으로 흘러가요(그림만 안 그려요). 사건은 화면이 아니면 바로 기본 선택
+  function tamPh(T, ph) {
+    T.ph = ph; T.t = 0; if (rt.tab === 'tam') musicSync();
+    const vis = tamFxOn(), fl = S.tam.best + 1;
+    if (ph === 'walk') { T.F = null; if (vis) tamWalk(fl); }
+    else if (ph === 'meet') {
+      T.F = tamFight(fl, tamTeam(), T.buff ? TAM.buff : 1, T.mod); T.buff = 0; T.mod = null;
+      if (vis) { tamBuild(); tamAlert(); if (T.F.M[0].boss) tamRibbon('boss', '큰 장난꾸러기가 나타났어요!'); }
+    }
+    else if (ph === 'win') {
+      const f = T.F.fl, hard = T.F.hard; T.nLose = 0; tamWin(f); if (hard) tamWinHard(f);
+      T.ev = f % TAM.bossEvery && Math.random() < TAM.evP ? tamEvRoll(f) : null;
+      if (vis) { tamRibbon('clear', `${f}층 통과!`); tamRenderTop(); tamVictory(f); }
+    }
+    else if (ph === 'event') { if (vis) tamEvShow(T.ev); }
+    else if (ph === 'climb') { T.F = null; if (vis) tamClimb(S.tam.best); }
+    else if (ph === 'lose') {
+      T.lose = T.F.fl; T.nLose = (T.nLose || 0) + 1;
+      if (vis) { tamRibbon('lose', T.nLose >= 3 ? '대원 레벨을 올리면 이길 수 있어요' : '힘을 길러서 다시 와요'); tamRenderTop(); tamRenderBody(); }
+    }
+  }
+  function tamTick(dt) {
+    if (!tamOn() || !tamParty().length) return;
+    const T = rt.tam || (rt.tam = { ph: '', t: 0, F: null, buff: 0, lose: 0, nLose: 0, ev: null, mod: null });
+    if (!T.ph) { tamPh(T, 'walk'); return; }
+    const vis = tamFxOn(), d = dt * (tamSpdOn() ? 2 : 1), P = TAM.ph;
+    if (tamSpdOn()) { const was = Math.ceil(S.tam.spd.sec); S.tam.spd.sec = Math.max(0, S.tam.spd.sec - dt); if (vis && Math.ceil(S.tam.spd.sec) !== was) tamRenderTop(); }   // 2배속은 켜 둔 동안만 줄어요
+    T.t += d;
+    if (T.ph === 'walk') { if (T.t >= P.walk) tamPh(T, 'meet'); }
+    else if (T.ph === 'meet') { if (vis && T.F) tamDraw(T.F); if (T.t >= P.meet) tamPh(T, 'fight'); }
+    else if (T.ph === 'fight') {
+      const r = tamStep(T.F, d, !!S.tam.auto && tamAutoOn(), Math.random);
+      if (vis) tamDraw(T.F); T.F.ev.length = 0;
+      if (r === 1) tamPh(T, 'win'); else if (r === -1) tamPh(T, 'lose');
+    }
+    else if (T.ph === 'win') { if (T.t >= P.win * (S.tam.best % 50 === 0 ? 1.5 : 1)) tamPh(T, T.ev ? 'event' : 'climb'); }
+    else if (T.ph === 'event') { if (!vis || T.t >= P.ev) tamEvPick(T, -1); }
+    else if (T.ph === 'climb') { if (T.t >= P.climb) tamPh(T, 'walk'); }
+    else if (T.ph === 'lose') { if (T.t >= P.lose) tamPh(T, 'walk'); }
+  }
+  // 사건: 이긴 층 뒤에 가끔(보스 층 빼고). 고르지 않으면 첫째(안전한) 쪽
+  const TM_EV = [
+    { k: 'chest', ic: 'ex_chest_wood', t: '반짝이는 보물 상자를 찾았어요!', o: ['열어 보기'] },
+    { k: 'spring', ic: 'ex_fx_heal', t: '맑은 샘물이 솟아요. 마시면 다음 층에서 힘이 나요', o: ['마시고 가기'] },
+    { k: 'fork', ic: 'ex_flag', t: '갈림길이에요. 숲길은 장난꾸러기가 세지만 재료가 두 배예요', o: ['큰길로 가기', '숲길로 가기'] },
+    { k: 'lost', ic: '', t: '길 잃은 아기 동물을 만났어요', o: ['학교로 데려다주기'] }
+  ];
+  function tamEvRoll(fl) {
+    const E = TM_EV[Math.floor(Math.random() * TM_EV.length)], av = tamAvail();
+    return Object.assign({}, E, { fl, sp: E.k === 'lost' ? av[Math.floor(Math.random() * av.length)] : '' });
+  }
+  function tamEvPick(T, i) {
+    const E = T.ev; if (!E) { tamPh(T, 'climb'); return; }
+    const pick = i < 0 ? 0 : i, R = tamReg(E.fl); let msg = '';
+    if (E.k === 'chest') { const n = 3 + Math.floor(E.fl / 15); S.tam.mat[R.mat] = Math.min(1e12, S.tam.mat[R.mat] + n); if (E.fl >= 5) S.tam.mat[3] = Math.min(1e12, S.tam.mat[3] + 1); msg = `${TAM.mats[R.mat]} +${n}`; }
+    else if (E.k === 'spring') { T.mod = { hp: 1.3 }; msg = '다음 층에서 체력이 30% 많아요'; }
+    else if (E.k === 'fork') { if (pick === 1) { T.mod = { hard: 1 }; msg = '숲길로 가요. 조심해요!'; } else msg = '큰길로 가요'; }
+    else if (E.k === 'lost') { if (tamStarOn() && E.sp) { tamShard(E.sp, 1); msg = `${spName(E.sp)} 별 조각 +1`; } else { const a = minAcorns(1); S.budget += a; earn(a); msg = `도토리 +${fmt(a)}`; } }
+    T.ev = null; save();
+    const c = $('#tmEv'); if (c) c.hidden = true;
+    if (msg && tamFxOn()) toast(msg);
+    tamPh(T, 'climb');
+  }
+  // 강화하면 지금 겨루는 대원 능력치도 바로 올려요(체력은 같은 비율로)
+  function tamRestartStat() { const T = rt.tam, F = T && T.F; if (!F) return; const tm = tamTeam(); F.P.forEach((p, i) => { const n = tm[i]; if (!n || n.sp !== p.sp) return; const r = p.mx ? p.hp / p.mx : 1; p.atk = n.atk; p.mx = n.hp; p.hp = p.hp > 0 ? n.hp * r : 0; p.gg = n.gg; }); }
+  // 대원을 바꾸면 이번 층을 걷기부터 다시
+  function tamRestart() { const T = rt.tam; if (T && T.ph && T.ph !== 'event') { const c = $('#tmEv'); if (c) c.hidden = true; tamPh(T, 'walk'); } }
+  // 숲길(어려운 길)로 이긴 층은 재료를 한 번 더
+  function tamWinHard(fl) { const R = tamReg(fl); S.tam.mat[R.mat] = Math.min(1e12, S.tam.mat[R.mat] + 2 + Math.floor(fl / 40)); }
+  /* ----- 그림: 탐험 화면 ----- */
+  const tamPic = (k, fb) => IMG(k) || IMG(fb) || '';
+  const tamPcPic = (sp, act) => IMG(`ex_pc_${sp}_${act ? 'act' : 'idle'}`) || IMG('chr_' + sp) || '';
+  const tamMobPic = (fl, m) => m.boss ? tamPic(`ex_boss_${tamReg(fl).k}`, TAM.bossPh) : tamPic(`ex_mob_${tamReg(fl).k}_${m.i + 1}`, TAM.mobPh[(TAM.reg.indexOf(tamReg(fl)) + m.i) % TAM.mobPh.length]);
+  // 4.3.0 지섭 요청: 탐험대가 층을 오르며 장난꾸러기를 만나는 화려한 화면. 자리(왼쪽 %, 바닥 %), 앞줄부터
+  const TM_PPOS = [[37, 5], [23, 14], [22, -1], [9, 8], [8, 20]];
+  const TM_MPOS = [[65, 5], [80, 15], [83, -1]], TM_BPOS = [[74, 2], [55, 17], [55, -2]];
+  const TM_AMB = { ground: 14, garden: 12, pond: 12, library: 12, yard: 22, tower: 18 };
+  function tamFxOn() { return rt.tab === 'tam' && !rt.modalOpen && !document.hidden; }
+  function tamBg(fl) { return IMG('ex_bg_' + tamReg(fl).k); }
+  function tamAmb(k) {
+    const a = $('#tmAmb'); if (!a || a.dataset.k === k) return; a.dataset.k = k;
+    let h = ''; for (let i = 0; i < TM_AMB[k]; i++) { const r = (n => (Math.sin(i * 12.9898 + n * 78.233) * 43758.5453) % 1)(1), q = Math.abs(r);
+      h += `<i style="left:${(i * 37 % 100)}%;--s:${4 + (i * 7 % 5)}px;--d:${6 + (i * 13 % 6)}s;--dl:-${(i * 1.7 % 9).toFixed(1)}s;--dx:${(q * 60 - 30).toFixed(0)}px;--y:${(i * 23 % 70)}"></i>`; }
+    a.innerHTML = h;
+  }
+  function tamTower(fl) {
+    const t = $('#tmTower'); if (!t) return;
+    const p = ((fl - 1) % TAM.bossEvery) / (TAM.bossEvery - 1) * 100, R = tamReg(fl), P = tamParty();
+    t.style.setProperty('--p', p.toFixed(0) + '%');
+    const b = IMG(`ex_boss_${R.k}`), m = P.length ? (IMG(`ex_pc_${P[0]}_idle`) || IMG('chr_' + P[0])) : '';
+    t.querySelector('.tt-boss').style.backgroundImage = b ? `url("${b}")` : '';
+    t.querySelector('.tt-me').style.backgroundImage = m ? `url("${m}")` : '';
+  }
+  function tamFl(fl, up) {
+    const e = $('#tmFlBig'); if (!e) return; e.textContent = `${fmt(fl)}층`;
+    if (up) { e.classList.remove('up'); void e.offsetWidth; e.classList.add('up'); }
+  }
+  function tamBuild() {
+    const T = rt.tam, F = T && T.F, st = $('#tmStage'); if (!st) return;
+    const fl = F ? F.fl : S.tam.best + 1, R = tamReg(fl), bg = tamBg(fl);
+    st.dataset.reg = R.k; st.classList.toggle('deep', tamLap(fl) > 0);
+    if (!T || !T.climbing) { const c = $('.tm-bg.cur', st); c.style.backgroundImage = bg ? `url("${bg}")` : ''; }
+    tamAmb(R.k); tamTower(fl); tamFl(fl);
+    const boss = !!(F && F.M[0] && F.M[0].boss); st.classList.toggle('boss', boss);
+    const bb = $('#tmBossBar'); bb.hidden = !boss; if (boss) bb.querySelector('span').textContent = F.M[0].nm;
+    const party = F ? F.P : tamTeam();
+    $('#tmP').dataset.fid = F ? F.id : ''; $('#tmM').dataset.fid = F ? F.id : ''; $('#tmP').classList.remove('walking', 'enter', 'jump');
+    setH($('#tmP'), party.map((p, i) => { const [x, y] = TM_PPOS[i] || TM_PPOS[0];
+      return `<div class="tm-f" data-i="${i}" style="left:${x}%;bottom:${y}%;z-index:${30 - y};--bd:-${(i * 0.37).toFixed(2)}s;--bd2:${(i * 0.06).toFixed(2)}s"><div class="tm-body"><img src="${tamPcPic(p.sp)}" alt="${esc(spName(p.sp))}"></div><i class="tm-hp"><b></b></i></div>`; }).join(''));
+    if (!F) { setH($('#tmM'), ''); return; }
+    const pos = boss ? TM_BPOS : TM_MPOS;
+    setH($('#tmM'), F.M.map((m, i) => { const [x, y] = pos[i] || pos[0];
+      return `<div class="tm-f tm-mob in${m.boss ? ' boss' : ''}" data-i="${i}" style="left:${x}%;bottom:${y}%;z-index:${30 - y};--bd:-${(i * 0.5).toFixed(2)}s;--id:${(i * 0.12).toFixed(2)}s"><div class="tm-body"><img src="${tamMobPic(F.fl, m)}" alt="${esc(m.nm)}"></div><i class="tm-hp"><b></b></i></div>`; }).join(''));
+    if (boss) tamShake(7, 420);
+    tamSkills(); tamDraw(F);
+  }
+  // 무대 위 좌표(무대 너비, 높이에 대한 %)
+  function tamAt(el, fy) {
+    const st = $('#tmFx'), a = st.getBoundingClientRect(), r = el.getBoundingClientRect();
+    return [r.left - a.left + r.width / 2, r.top - a.top + r.height * (fy == null ? 0.45 : fy)];
+  }
+  function tamFxImg(cls, src, x, y, kf, ms, ease) {
+    const fx = $('#tmFx'); if (!fx || !src) return null;
+    const im = document.createElement('img'); im.className = cls; im.src = src; im.alt = ''; fx.appendChild(im);
+    const w = im.getBoundingClientRect().width || 40;
+    const k = kf.map(f => Object.assign({}, f, { transform: `translate(${x + (f.dx || 0) - w / 2}px,${y + (f.dy || 0) - w / 2}px) ${f.t || ''}` }));
+    k.forEach(f => { delete f.dx; delete f.dy; delete f.t; });
+    const an = im.animate(k, { duration: ms, easing: ease || 'ease-out', fill: 'forwards' });
+    an.onfinish = () => im.remove();
+    return im;
+  }
+  function tamFloat(el, tx, cls) {
+    if (!el) return; const fx = $('#tmFx'); if (!fx) return;
+    const [x, y] = tamAt(el, 0.15), s = document.createElement('span'); s.className = 'tm-num ' + (cls || ''); s.textContent = tx; fx.appendChild(s);
+    const w = s.getBoundingClientRect().width, jx = (Math.random() - 0.5) * 18;
+    s.animate([{ transform: `translate(${x - w / 2 + jx}px,${y}px) scale(.4)`, opacity: 0 }, { transform: `translate(${x - w / 2 + jx}px,${y - 14}px) scale(1.25)`, opacity: 1, offset: 0.2 },
+      { transform: `translate(${x - w / 2 + jx}px,${y - 20}px) scale(1)`, opacity: 1, offset: 0.6 }, { transform: `translate(${x - w / 2 + jx}px,${y - 40}px) scale(.9)`, opacity: 0 }], { duration: cls === 'cr' ? 1000 : 800, easing: 'ease-out', fill: 'forwards' }).onfinish = () => s.remove();
+  }
+  function tamShake(px, ms) {
+    const w = $('#tmWorld'); if (!w || rt.reduced) return;
+    const k = []; for (let i = 0; i <= 6; i++) { const f = (1 - i / 6) * px; k.push({ transform: `translate(${((i % 2 ? 1 : -1) * f).toFixed(1)}px,${((i % 3 - 1) * f * 0.6).toFixed(1)}px)` }); }
+    w.animate(k, { duration: ms, easing: 'linear' });
+  }
+  function tamHitFx(el, cr) {
+    const [x, y] = tamAt(el), rot = Math.round(Math.random() * 90);
+    tamFxImg('tm-spark', IMG('ex_fx_hit'), x + (Math.random() - 0.5) * 12, y, [{ t: `scale(.3) rotate(${rot}deg)`, opacity: 1 }, { t: `scale(${cr ? 1.7 : 1.1}) rotate(${rot + 30}deg)`, opacity: 1, offset: 0.4 }, { t: `scale(${cr ? 2 : 1.3}) rotate(${rot + 40}deg)`, opacity: 0 }], 360);
+  }
+  function tamShot(fromEl, toEl, ri, onHit) {
+    const src = IMG(`ex_fx_${TAM.role[ri].k}`); if (!src || !fromEl || !toEl) { if (onHit) onHit(); return; }
+    const [x0, y0] = tamAt(fromEl, 0.4), [x1, y1] = tamAt(toEl, 0.45), arc = ri === 3 || ri === 2 ? -36 : ri === 4 ? -10 : -18;
+    const im = tamFxImg('tm-shot', src, x0, y0, [{ t: 'scale(.5) rotate(0deg)', opacity: 0.2 }, { dx: (x1 - x0) * 0.5, dy: (y1 - y0) * 0.5 + arc, t: 'scale(1) rotate(180deg)', opacity: 1, offset: 0.5 }, { dx: x1 - x0, dy: y1 - y0, t: 'scale(1.15) rotate(360deg)', opacity: 1 }], 300, 'ease-in');
+    if (im) setTimeout(() => onHit && onHit(), 290); else if (onHit) onHit();
+  }
+  function tamDropFx(el, fl) {
+    const [x, y] = tamAt(el, 0.5), src = IMG(['ex_mat_twig', 'ex_mat_stone', 'ex_mat_petal'][tamReg(fl).mat] || 'ex_mat_star') || IMG('ex_mat_star');
+    tamFxImg('tm-poof', IMG('ex_fx_poof'), x, y, [{ t: 'scale(.4)', opacity: 1 }, { t: 'scale(1.3)', opacity: 0 }], 520);
+    const st = $('#tmFx').getBoundingClientRect();
+    for (let i = 0; i < 2; i++) tamFxImg('tm-drop', src, x, y, [{ t: 'scale(.6)', opacity: 1 }, { dx: (i ? 18 : -14), dy: -38, t: 'scale(1.1)', opacity: 1, offset: 0.35 }, { dx: (i ? 22 : -18), dy: 0, t: 'scale(1)', opacity: 1, offset: 0.6 }, { dx: -x + st.width * 0.08, dy: -y + st.height * 0.08, t: 'scale(.5)', opacity: 0.2 }], 1000 + i * 120, 'ease-in-out');
+  }
+  function tamDraw(F) {
+    const P = $$('#tmP .tm-f'), M = $$('#tmM .tm-f');
+    if (P.length !== F.P.length || M.length !== F.M.length || $('#tmM').dataset.fid !== String(F.id)) { tamBuild(); return; }   // 4.3.0 지섭 제보: 다른 판의 쓰러진 대원 그림을 그대로 쓰던 것 고침
+    let actor = -1;
+    for (const e of F.ev) {
+      if (e.k === 'act' || e.k === 'big') {
+        actor = e.p; const el = P[e.p], im = el && el.querySelector('img'); if (!el) continue;
+        el.classList.remove('act', 'far'); void el.offsetWidth; el.classList.add('act'); if (e.ri !== 1) el.classList.add('far');
+        const a = IMG(`ex_pc_${F.P[e.p].sp}_act`); if (a && im) { im.src = a; clearTimeout(el._t); el._t = setTimeout(() => { im.src = tamPcPic(F.P[e.p].sp); }, 420); }
+        if (e.k === 'big') tamBigFx(e.ri, F.P[e.p].sp);
+      } else if (e.k === 'hit') {
+        const el = M[e.m], d = fmt(Math.max(1, Math.round(e.d))), cr = e.cr, fromEl = actor >= 0 ? P[actor] : null, ri = actor >= 0 ? F.P[actor].ri : 1;
+        const land = () => { el.classList.remove('hurt'); void el.offsetWidth; el.classList.add('hurt'); tamHitFx(el, cr); tamFloat(el, d, cr ? 'cr' : ''); if (cr) tamShake(5, 260); };
+        if (ri === 1 || !fromEl) land(); else tamShot(fromEl, el, ri, land);
+      }
+      else if (e.k === 'heal') { const el = P[e.p]; tamFloat(el, '+' + fmt(Math.round(e.d)), 'heal'); const [x, y] = tamAt(el); tamFxImg('tm-spark', IMG('ex_fx_heal'), x, y, [{ t: 'scale(.4)', opacity: 0 }, { t: 'scale(1.2)', opacity: 1, offset: 0.4 }, { dy: -16, t: 'scale(1.4)', opacity: 0 }], 600); }
+      else if (e.k === 'hurt') {
+        const el = P[e.p], mm = M[e.m];
+        if (mm) { mm.classList.remove('act'); void mm.offsetWidth; mm.classList.add('act'); }
+        setTimeout(() => { el.classList.remove('hurt'); void el.offsetWidth; el.classList.add('hurt'); tamFloat(el, fmt(Math.max(1, Math.round(e.d))), 'ouch'); }, 140);
+      }
+      else if (e.k === 'poof') { const el = M[e.m]; setTimeout(() => { el.classList.add('out'); tamDropFx(el, F.fl); }, 300); }
+      else if (e.k === 'ko') P[e.p].classList.add('out');
+    }
+    F.P.forEach((p, i) => { P[i].querySelector('.tm-hp b').style.width = Math.max(0, p.hp / p.mx * 100) + '%'; });
+    F.M.forEach((m, i) => { M[i].querySelector('.tm-hp b').style.width = Math.max(0, m.hp / m.mx * 100) + '%'; M[i].classList.toggle('weak', m.wk > 0); });
+    if (F.M[0] && F.M[0].boss) $('#tmBossBar b').style.width = Math.max(0, F.M[0].hp / F.M[0].mx * 100) + '%';
+    const tb = $('#tmTime'); if (tb) tb.style.width = Math.max(0, 100 - F.t / (F.lim || TAM.limit) * 100) + '%';
+    tamSkills(true);
+  }
+  // 필살기: 대원이 크게 나오는 장면(컷인), 그다음 무대를 가로지르는 큰 효과, 번쩍, 흔들림
+  function tamBigFx(ri, sp) {
+    const st = $('#tmStage'), u = IMG(`ex_fx_${TAM.role[ri].k}_big`); if (!st) return;
+    const c = $('#tmCut'), pic = IMG(`ex_pc_${sp}_act`) || IMG('chr_' + sp);
+    c.hidden = false; c.dataset.r = TAM.role[ri].k; setH(c, `${pic ? `<img src="${pic}" alt="">` : ''}<b>${esc(TAM.role[ri].nm)}!</b>`);
+    c.style.animation = 'none'; void c.offsetWidth; c.style.animation = ''; clearTimeout(c._t); c._t = setTimeout(() => { c.hidden = true; }, 800);
+    setTimeout(() => {
+      st.classList.remove('flash'); void st.offsetWidth; st.classList.add('flash'); tamShake(9, 500);
+      if (u) { const im = document.createElement('img'); im.className = 'tm-bigfx'; im.src = u; im.alt = ''; $('#tmFx').appendChild(im);
+        im.animate([{ transform: 'translateX(-60%) scale(.8)', opacity: 0 }, { transform: 'translateX(0) scale(1.05)', opacity: 1, offset: 0.35 }, { transform: 'translateX(25%) scale(1.15)', opacity: 0 }], { duration: 900, easing: 'ease-out', fill: 'forwards' }).onfinish = () => im.remove(); }
+    }, 380);
+    sfx('quest'); buzz(25);
+  }
+  function tamRibbon(kind, tx) {
+    const r = $('#tmRib'); if (!r) return;
+    const u = kind === 'lose' ? '' : IMG(kind === 'boss' ? 'ex_ribbon_boss' : 'ex_ribbon_clear');
+    r.className = 'tm-rib ' + kind; r.style.backgroundImage = u ? `url("${u}")` : ''; r.textContent = tx; r.hidden = false;
+    r.style.animation = 'none'; void r.offsetWidth; r.style.animation = '';
+    clearTimeout(r._t); r._t = setTimeout(() => { r.hidden = true; }, 1300);
+    if (kind === 'clear') sfx('coin');
+  }
+  // 걷기: 탐험대가 오른쪽으로 걸어가고 배경이 왼쪽으로 흘러요
+  function tamSpdK() { return tamSpdOn() ? 2 : 1; }
+  function tamWalk(fl) {
+    const st = $('#tmStage'), T = rt.tam; if (!st || !T) return;
+    const R = tamReg(fl), cur = $('.tm-bg.cur', st), bg = tamBg(fl);
+    if (!T.climbing) { cur.getAnimations().forEach(a => a.cancel()); cur.style.backgroundImage = bg ? `url("${bg}")` : ''; }
+    st.dataset.reg = R.k; st.classList.toggle('deep', tamLap(fl) > 0); st.classList.remove('boss'); $('#tmBossBar').hidden = true;
+    tamAmb(R.k); tamTower(fl); tamFl(fl);
+    const team = tamTeam(), pp = $('#tmP');
+    pp.dataset.fid = 'walk';
+    setH(pp, team.map((p, i) => { const [x, y] = TM_PPOS[i] || TM_PPOS[0];
+      return `<div class="tm-f" data-i="${i}" style="left:${x}%;bottom:${y}%;z-index:${30 - y};--bd:-${(i * 0.13).toFixed(2)}s"><div class="tm-body"><img src="${tamPcPic(p.sp)}" alt="${esc(spName(p.sp))}"></div><i class="tm-hp"><b style="width:100%"></b></i></div>`; }).join(''));
+    setH($('#tmM'), ''); $('#tmM').dataset.fid = '';
+    if (T.nLose) pp.classList.add('enter'); else pp.classList.remove('enter');
+    pp.classList.add('walking'); clearTimeout(pp._t); const ms = TAM.ph.walk / tamSpdK() * 1000; pp._t = setTimeout(() => pp.classList.remove('walking', 'enter'), ms);
+    if (!T.climbing && !rt.reduced) cur.animate([{ transform: 'translateX(0)' }, { transform: 'translateX(-16%)' }], { duration: ms, easing: 'cubic-bezier(.3,0,.6,1)', fill: 'forwards' });
+    $('#tmTime').style.width = '100%';
+    tamSkills();
+  }
+  // 만남: 앞 대원 머리 위에 느낌표
+  function tamAlert() {
+    const f = $('#tmP .tm-f'); if (!f) return;
+    const a = document.createElement('b'); a.className = 'tm-alert'; a.textContent = '!'; f.appendChild(a); setTimeout(() => a.remove(), 900);
+  }
+  // 이김: 대원들이 기뻐 뛰고, 50층은 보물 상자, 10층마다 깃발
+  function tamVictory(fl) {
+    const st = $('#tmStage'); if (!st) return;
+    $$('#tmP .tm-f:not(.out)').forEach((el, i) => { const im = el.querySelector('img'), sp = tamTeam()[+el.dataset.i]; el.classList.remove('cheer'); void el.offsetWidth; el.classList.add('cheer');
+      const a = sp && IMG(`ex_pc_${sp.sp}_act`); if (a && im) { im.src = a; setTimeout(() => { im.src = tamPcPic(sp.sp); }, 900); } });
+    if (fl % 50 === 0) { const c = IMG(fl % 150 === 0 ? 'ex_chest_gold' : fl % 100 === 0 ? 'ex_chest_silver' : 'ex_chest_wood'); if (c) { const im = document.createElement('img'); im.className = 'tm-chest'; im.src = c; im.alt = ''; st.appendChild(im); setTimeout(() => im.remove(), 1400); } }
+    else if (fl % TAM.bossEvery === 0 && IMG('ex_flag')) { const im = document.createElement('img'); im.className = 'tm-flag'; im.src = IMG('ex_flag'); im.alt = ''; $('#tmFx').appendChild(im); setTimeout(() => im.remove(), 1400); }
+  }
+  // 사건 카드
+  function tamEvShow(E) {
+    const c = $('#tmEv'); if (!c || !E) return;
+    const ic = E.k === 'lost' ? (IMG(`ex_pc_${E.sp}_idle`) || IMG('chr_' + E.sp)) : IMG(E.ic);
+    setH(c, `<div class="tm-evc">${ic ? `<img src="${ic}" alt="">` : ''}<p>${esc(E.k === 'lost' ? `길 잃은 아기 ${eul(spName(E.sp))} 만났어요` : E.t)}</p>` +
+      `<div class="tm-evb">${E.o.map((o, i) => `<button type="button" class="${i ? 'btn-sub' : 'cta'} small" data-tev="${i}">${esc(o)}</button>`).join('')}</div><i class="tm-evt" style="animation-duration:${TAM.ph.ev / tamSpdK()}s"></i></div>`);
+    c.hidden = false;
+  }
+  // 지금 단계에 맞게 화면을 다시 그려요(탭을 열었을 때)
+  function tamSync() {
+    const T = rt.tam; if (!T || !T.ph) { tamWalk(S.tam.best + 1); return; }
+    const c = $('#tmEv'); if (c) c.hidden = T.ph !== 'event';
+    if (T.ph === 'meet' || T.ph === 'fight') tamBuild();
+    else if (T.ph === 'event') { tamWalk(S.tam.best + 1); tamEvShow(T.ev); $('#tmP').classList.remove('walking'); }
+    else { tamWalk(S.tam.best + (T.ph === 'lose' ? 1 : T.ph === 'walk' ? 1 : 1)); $('#tmP').classList.remove('walking'); }
+  }
+  // 오르기: 탐험대가 뛰어오르고 무대가 아래로 흘러 다음 층이 위에서 내려와요
+  function tamClimb(best) {
+    const st = $('#tmStage'), T = rt.tam; if (!st || !T) return;
+    const next = best + 1, cur = $('.tm-bg.cur', st), nx = $('.tm-bg.nx', st), bg = tamBg(next);
+    cur.getAnimations().forEach(a => a.commitStyles && a.commitStyles()); cur.getAnimations().forEach(a => a.cancel());
+    nx.style.backgroundImage = bg ? `url("${bg}")` : ''; T.climbing = true;
+    $('#tmP').classList.remove('jump'); void st.offsetWidth; $('#tmP').classList.add('jump');
+    st.classList.remove('climb'); void st.offsetWidth; st.classList.add('climb');
+    const o = { duration: TAM.ph.climb / tamSpdK() * 900, easing: 'cubic-bezier(.5,0,.3,1)', fill: 'forwards' }, x0 = cur.style.transform || 'translateX(0)';
+    cur.animate([{ transform: x0 }, { transform: x0 + ' translateY(100%)' }], o);
+    const a = nx.animate([{ transform: 'translateY(-100%)' }, { transform: 'translateY(0)' }], o);
+    a.onfinish = () => { cur.style.transform = ''; cur.style.backgroundImage = nx.style.backgroundImage; cur.getAnimations().forEach(x => x.cancel()); a.cancel(); T.climbing = false; st.classList.remove('climb'); $('#tmP').classList.remove('jump'); };
+    tamFl(next, true); tamTower(next); st.dataset.reg = tamReg(next).k; tamAmb(tamReg(next).k); st.classList.remove('boss'); $('#tmBossBar').hidden = true;
+    setH($('#tmM'), ''); sfx('tap');
+  }
+
+  // 대원 얼굴 줄: 필살기 게이지가 차면 반짝, 누르면 필살기
+  function tamSkills(upd) {
+    const box = $('#tmSk'), F = rt.tam && rt.tam.F; if (!box) return;
+    const P = F ? F.P : tamTeam().map(s => ({ ...s, g: 0, hp: 1 }));
+    if (!upd || box.children.length !== P.length) setH(box, P.map((p, i) => `<button type="button" class="tm-sk" data-tsk="${i}" aria-label="${esc(spName(p.sp))} 필살기"><img src="${IMG('chr_' + p.sp) || ''}" alt=""><i></i></button>`).join(''));
+    $$('.tm-sk', box).forEach((b, i) => { const p = P[i]; if (!p) return; const r = Math.min(1, p.g / TAM.gauge); b.style.setProperty('--g', (r * 100).toFixed(0) + '%'); b.classList.toggle('ready', r >= 1 && p.hp > 0); b.classList.toggle('out', p.hp <= 0); });
+  }
+  function tamCast(i) {
+    const F = rt.tam && rt.tam.F; if (!F) return;
+    if (tamCastAt(F, F.P[i])) { tamDraw(F); F.ev.length = 0; }
+  }
+  function tamRenderTop() {
+    if (!tamOn()) return;
+    const fl = S.tam.best + 1, R = tamReg(fl), lap = tamLap(fl);
+    $('#tmReg').textContent = R.nm + (lap ? ` (깊은 밤 ${lap})` : '');
+    $('#tmFl').textContent = `${fl}층`;
+    $('#tmBest').innerHTML = S.tam.best ? `<span>최고층</span>${fmt(S.tam.best)}층` : '<span>첫 탐험</span>';
+    $('#tmPow').textContent = `탐험대 힘 ${fmt(tamPow())}`;
+    tamAdDay();
+    const sb = $('#tmSpd'); sb.classList.toggle('on', tamSpdOn());
+    const left = TAM.adSpd.n - S.tam.ad.spd;
+    sb.textContent = tamSpdOn() ? `2배속 ${hms(S.tam.spd.sec * 1000)}${left > 0 ? ` (📺 +${TAM.adSpd.min}분 ${left}/${TAM.adSpd.n})` : ''}` : `📺 2배속 ${TAM.adSpd.min}분 (${left}/${TAM.adSpd.n})`;
+    const ab = $('#tmAuto'); ab.hidden = !tamAutoOn(); ab.setAttribute('aria-pressed', S.tam.auto ? 'true' : 'false'); ab.textContent = S.tam.auto ? '필살기 자동 켬' : '필살기 자동 끔';
+    const T = rt.tam, rv = $('#tmRevive'); rv.hidden = !(T && T.lose && T.lose % TAM.bossEvery === 0);
+    const I = tamIdle(), rp = $('#tmRep'); rp.hidden = I.sec < 60; rp.textContent = `탐험 보고서 받기 (${Math.floor(I.sec / 60)}분)`;
+  }
+  // 4.3.0 지섭 요청: 강화 추천과 자동 편성
+  const tamScore = s => s.atk * 6 / s.cd + s.hp / 4;
+  function tamAutoTeam() {
+    const av = tamAvail().map(tamStat).sort((a, b) => tamScore(b) - tamScore(a)), n = tamSlots(), pick = av.slice(0, n);
+    for (const ri of [1, 2]) {   // 앞에서 버틸 체육 대원, 고쳐 줄 국어 대원이 있으면 꼭 한 명(가장 약한 다른 대원과 바꿔요)
+      if (n < 3 || pick.some(p => p.ri === ri)) continue;
+      const c = av.find(p => p.ri === ri); if (!c) continue;
+      for (let i = pick.length - 1; i >= 0; i--) if (pick[i].ri !== 1 && pick[i].ri !== 2) { pick[i] = c; break; }
+    }
+    return pick.map(p => p.sp);
+  }
+  function tamPowWith(fn) { const st = JSON.stringify([S.tam.mem, S.tam.sg]); fn(); const v = tamPow(); const [m, g] = JSON.parse(st); S.tam.mem = m; S.tam.sg = g; return v; }
+  // 가장 이득이 큰 강화: 대원은 도토리 한 개당 힘, 장비는 지금 살 수 있는 것 가운데 힘이 가장 많이 느는 것
+  function tamUpRec() {
+    const p0 = tamPow(); let mem = null, gear = null;
+    for (const sp of tamParty()) { const c = tamLvCost(sp), g = tamPowWith(() => { tamMem(sp).lv += 1; }) - p0; const v = g / Math.max(1, c); if (!mem || v > mem.v) mem = { sp, c, g, v }; }
+    const nP = tamParty().length;
+    for (let i = 0; i < nP; i++) for (const G of TAM.gear) { const c = tamGearCost(G.k, i); if (S.tam.mat[c.m] < c.n || S.tam.mat[3] < c.star) continue; const g = tamPowWith(() => { S.tam.sg[i][G.k] += 1; }) - p0; if (!gear || g > gear.g) gear = { k: G.k, i, g, c }; }
+    return { mem, gear };
+  }
+  const TM_RC = { sci: '#BDEBFF', pe: '#FFD0B0', kor: '#D8F5C6', art: '#FFD3EE', math: '#FFF0A8' };
+  const tamMatImg = i => IMG(['ex_mat_twig', 'ex_mat_stone', 'ex_mat_petal', 'ex_mat_star'][i]);
+  const tamMatIc = (i, px) => { const u = tamMatImg(i); return u ? `<img class="tm-mi" src="${u}" alt="${TAM.mats[i]}" style="width:${px}px;height:${px}px">` : TAM.matIc[i]; };
+  function tamTabs(seg, rec) {
+    const can = rec.mem && S.budget >= rec.mem.c, gc = !!rec.gear;
+    const ic = { mem: IMG(`ex_pc_${tamParty()[0] || 'bear'}_idle`) || IMG('chr_bear'), gear: IMG('ex_gear_tool_1'), mat: IMG('ex_mat_star') };
+    setH($('#tmSeg'), [['mem', '대원', can], ['gear', '장비', gc], ['mat', '재료', false]].map(([k, n, dot]) =>
+      `<button type="button" data-tseg="${k}" aria-pressed="${seg === k}">${ic[k] ? `<img src="${ic[k]}" alt="">` : ''}<span>${n}</span>${dot ? '<i class="tm-dot"></i>' : ''}</button>`).join(''));
+  }
+  function tamRenderBody() {
+    const box = $('#tmBody'); if (!box || !tamOn()) return;
+    const seg = rt.tamSeg || 'mem', rec = tamUpRec();
+    tamTabs(seg, rec);
+    if (seg === 'mem') {
+      const party = tamParty(), slots = tamSlots(), auto = tamAutoTeam(), same = auto.length === party.length && auto.every(k => party.includes(k));
+      const R = rec.mem, rs = R && tamStat(R.sp);
+      let h = '';
+      if (R) h += `<div class="tm-rec"><span class="tm-rtag">추천 강화</span><img src="${tamPcPic(R.sp)}" alt=""><div class="tm-rtx"><b>${esc(spName(R.sp))} Lv.${tamMem(R.sp).lv} → ${tamMem(R.sp).lv + 1}</b><small>탐험대 힘 +${fmt(Math.max(1, Math.round(R.g)))}</small></div>` +
+        `<button type="button" class="cta small" data-tlv="${R.sp}"${S.budget >= R.c ? '' : ' aria-disabled="true"'}>${acornIcon()}${fmt(R.c)}</button></div>`;
+      h += `<div class="tm-party">${Array.from({ length: 5 }, (_, i) => { const sp = party[i];
+        if (i >= slots) return `<div class="tm-slot lock"><span>🔒</span><small>${i === 3 ? '초등학교' : '중학교'}</small></div>`;
+        if (!sp) return `<div class="tm-slot empty"><span>+</span></div>`;
+        const s = tamStat(sp); return `<div class="tm-slot" style="--rc:${TM_RC[TAM.role[s.ri].k]}"><img src="${tamPcPic(sp)}" alt=""><em>Lv.${tamMem(sp).lv}</em><small>${esc(spName(sp))}</small></div>`; }).join('')}</div>`;
+      h += `<div class="tm-prow"><span>대원 ${party.length}/${slots}명</span><button type="button" class="btn-sub small" data-tauto="1"${same ? ' aria-disabled="true"' : ''}>${same ? '가장 좋은 조합이에요' : '자동 편성'}</button></div>`;
+      h += tamAvail().slice().sort((a, b) => (party.includes(b) - party.includes(a)) || (tamScore(tamStat(b)) - tamScore(tamStat(a)))).map(sp => {
+        const m = tamMem(sp), on = party.includes(sp), s = tamStat(sp), r = TAM.role[s.ri], c = tamLvCost(sp), can = S.budget >= c, best = R && R.sp === sp, sug = !on && auto.includes(sp);
+        const st = tamStarOn() ? `<span class="tm-st">${'★'.repeat(m.st)}<i>${'★'.repeat(5 - m.st)}</i></span>${m.st < 5 ? `<small class="tm-sh">별 조각 ${m.sh}/${tamStarNeed(m.st + 1)}</small>` : ''}` : '';
+        return `<div class="tm-mem${on ? ' on' : ''}${best ? ' best' : ''}"><span class="tm-face" style="--rc:${TM_RC[r.k]}"><img src="${tamPcPic(sp)}" alt="">${on ? '<i>출동</i>' : ''}</span>` +
+          `<div class="tm-mtx"><b>${esc(spName(sp))}<em>Lv.${m.lv}</em>${sug ? '<u>추천</u>' : ''}</b><span class="tm-role" style="--rc:${TM_RC[r.k]}">${r.nm}</span><small>힘 ${fmt(Math.round(s.atk))}  체력 ${fmt(Math.round(s.hp))}</small>${st}</div>` +
+          `<div class="tm-mbt"><button type="button" class="cta small" data-tlv="${sp}"${can ? '' : ' aria-disabled="true"'}>${acornIcon()}${fmt(c)}</button><button type="button" class="btn-sub small" data-tpick="${sp}">${on ? '빼기' : '편성'}</button></div></div>`;
+      }).join('');
+      setH(box, h);
+    } else if (seg === 'gear') {
+      // 4.3.0 칸 장비: 대원이 아니라 칸을 강화해요. 대원을 바꿔도 그 칸의 장비는 그대로 남아요
+      const team = tamTeam(), slots = tamSlots(), rg = rec.gear;
+      let h = `<p class="tm-note">장비는 대원 칸에 붙어요. 대원을 바꿔도 칸 장비는 그대로예요</p>`;
+      if (rg) { const G = TAM.gear.find(g => g.k === rg.k), gu = IMG(`ex_gear_${rg.k}_${tamGrade(S.tam.sg[rg.i][rg.k])}`);
+        h += `<div class="tm-rec"><span class="tm-rtag">추천 강화</span>${gu ? `<img src="${gu}" alt="">` : ''}<div class="tm-rtx"><b>${rg.i + 1}번 칸 ${G.nm} Lv.${S.tam.sg[rg.i][rg.k]} → ${S.tam.sg[rg.i][rg.k] + 1}</b><small>탐험대 힘 +${fmt(Math.max(1, Math.round(rg.g)))}</small></div>` +
+          `<button type="button" class="cta small" data-tgear="${rg.i}:${rg.k}">${tamMatIc(rg.c.m, 18)}${rg.c.n}${rg.c.star ? ` ${tamMatIc(3, 18)}${rg.c.star}` : ''}</button></div>`; }
+      h += Array.from({ length: 5 }, (_, i) => {
+        const p = team[i], lock = i >= slots;
+        if (lock) return `<div class="tm-sgc lock"><div class="tm-sgh"><b>${i + 1}번 칸</b><span>${TAM.slotNm[i]}</span><small>🔒 ${i === 3 ? '초등학교' : '중학교'}부터 열려요</small></div></div>`;
+        return `<div class="tm-sgc"><div class="tm-sgh"><b>${i + 1}번 칸</b><span>${TAM.slotNm[i]}</span>${p ? `<em class="tm-sgw"><img src="${tamPcPic(p.sp)}" alt="">${esc(spName(p.sp))}</em>` : '<em class="tm-sgw none">비어 있음</em>'}</div><div class="tm-sgg">` +
+          TAM.gear.map(G => { const L = S.tam.sg[i][G.k], c = tamGearCost(G.k, i), can = S.tam.mat[c.m] >= c.n && S.tam.mat[3] >= c.star, gu = IMG(`ex_gear_${G.k}_${tamGrade(L)}`), best = rg && rg.i === i && rg.k === G.k;
+            return `<div class="tm-gi g${tamGrade(L)}${best ? ' best' : ''}">${best ? '<u>추천</u>' : ''}<span class="tm-gim">${gu ? `<img src="${gu}" alt="">` : G.ic}<em>Lv.${L}</em></span><small>${G.hint} +${Math.round(TAM.gearPer * L * 100)}%</small>` +
+              `<button type="button" class="cta small" data-tgear="${i}:${G.k}"${can ? '' : ' aria-disabled="true"'}>${tamMatIc(c.m, 16)}${c.n}${c.star ? ` ${tamMatIc(3, 16)}${c.star}` : ''}</button></div>`; }).join('') + '</div></div>';
+      }).join('');
+      setH(box, h);
+    } else {
+      const R = tamReg(Math.max(1, S.tam.best + 1));
+      setH(box, `<p class="tm-note">지금 탐험하는 ${R.nm}에서는 ${iga(TAM.mats[R.mat])} 많이 나와요</p><ul class="tm-mats">` + TAM.mats.map((n, i) => `<li${i === R.mat ? ' class="now"' : ''}>${tamMatIc(i, 34)}<b>${n}</b><em>${fmt(S.tam.mat[i])}</em></li>`).join('') + '</ul>');
+    }
+  }
+  function tamOpen() {
+    if (!tamOn()) return;
+    if (!S.tam.seen) { S.tam.seen = 1; S.tam.it = S.tam.it || gameNow(); save(); toast('밤이면 학교에 숲의 장난꾸러기들이 와요!\n탐험대와 함께 달래 주러 가요'); }
+    tamRenderTop(); tamSync(); tamRenderBody();
+    tamReport(true);
+  }
+  function tamClick(e) {
+    const b = e.target.closest('button'); if (!b || !tamOn()) return;
+    if (b.getAttribute('aria-disabled') === 'true') { if (b.dataset.tlv) toast('도토리가 모자라요'); else if (b.dataset.tgear) toast('재료가 모자라요'); return; }
+    if (b.dataset.tsk) { tamCast(+b.dataset.tsk); return; }
+    if (b.dataset.tev) { const T = rt.tam; if (T && T.ph === 'event') { sfx('tap'); tamEvPick(T, +b.dataset.tev); } return; }
+    if (b.dataset.tauto) { S.tam.party = tamAutoTeam(); sfx('coin'); save(); tamRestart(); tamRenderTop(); tamRenderBody(); tamSkills(); toast('가장 힘센 조합으로 편성했어요'); return; }
+    if (b.dataset.tseg) { rt.tamSeg = b.dataset.tseg; sfx('tap'); tamRenderBody(); return; }
+    if (b.dataset.tpick) {
+      const sp = b.dataset.tpick, P = S.tam.party.filter(k => tamAvail().includes(k));
+      if (P.includes(sp)) { if (P.length <= 1) { toast('대원이 한 명은 있어야 해요'); return; } S.tam.party = P.filter(k => k !== sp); }
+      else { if (P.length >= tamSlots()) { toast(`대원은 ${tamSlots()}명까지예요. 먼저 한 명을 빼 주세요`); return; } S.tam.party = P.concat(sp); }
+      sfx('tap'); save(); tamRestart(); tamRenderTop(); tamRenderBody(); tamSkills(); return;
+    }
+    if (b.dataset.tlv) { const sp = b.dataset.tlv, c = tamLvCost(sp); if (S.budget < c) return; S.budget -= c; tamMem(sp).lv += 1; tamRestartStat(); sfx('coin'); buzz(10); save(); renderHUD(); tamRenderTop(); tamRenderBody(); return; }
+    if (b.dataset.tgear) { const [si, k] = b.dataset.tgear.split(':'), i = +si; if (!S.tam.sg[i] || !(k in S.tam.sg[i]) || i >= tamSlots()) return; const c = tamGearCost(k, i); if (S.tam.mat[c.m] < c.n || S.tam.mat[3] < c.star) return; S.tam.mat[c.m] -= c.n; S.tam.mat[3] -= c.star; S.tam.sg[i][k] += 1; tamRestartStat(); sfx('coin'); save(); tamRenderTop(); tamRenderBody(); return; }
+    if (b.id === 'tmSpd') { tamAdSpd(); return; }
+    if (b.id === 'tmAuto') { S.tam.auto = S.tam.auto ? 0 : 1; sfx('tap'); save(); tamRenderTop(); return; }
+    if (b.id === 'tmRevive') { tamAdRevive(); return; }
+    if (b.id === 'tmRep') { tamReport(false); return; }
+  }
   // 4.2.0 오늘의 광고 도장(하루 6개). 날짜가 바뀌면 도장과 '한 판 더'를 새로
   function adxDay() { if (!S.adx) S.adx = freshAdx(); const t = gameToday(); if (S.adx.day !== t) { const f = freshAdx(); f.day = t; S.adx = f; } }
   function adStamp() {
@@ -15459,8 +16434,9 @@ body.cam-scene #ffChip,body.cam-scene #plChip,body.cam-scene .b-ring{animation-p
     const met = speciesList().filter(k => k !== must), pick = must ? [must] : [];
     for (let i = met.length - 1; i > 0; i--) { const j = Math.floor(Math.random() * (i + 1)); [met[i], met[j]] = [met[j], met[i]]; }
     for (let i = 0; pick.length < ROSTER_N; i++) pick.push(met[i % met.length]);
-    const taken = [];
-    return pick.map(sp => rosterKid(sp, taken));
+    const taken = [], out = pick.map(sp => rosterKid(sp, taken));
+    out.forEach(k => tamShard(k.sp, 1));   // 4.3.0 새 학년에 같은 동물 친구를 또 만나면 그 대원 별 조각 하나
+    return out;
   }
   // 학년 중간에 전학 온 친구는 명부 끝에 더해요(동아리 밖에서 시작)
   function rosterAdd(sp) {
@@ -17179,9 +18155,11 @@ body.cam-scene #ffChip,body.cam-scene #plChip,body.cam-scene .b-ring{animation-p
   const BT_EV = { kor: { name: '책 읽기', ic: 'bev_read', em: '📖' }, math: { name: '수학 퀴즈', ic: 'bev_math', em: '➗' }, sci: { name: '과학 퀴즈', ic: 'bev_science', em: '🧪' },
     art: { name: '그리기', ic: 'bev_draw', em: '🎨' }, pe: { name: '달리기', ic: 'bev_run', em: '👟' } };
   const BT_LG = [
-    { n: '새싹', at: 1000, gold: 0, medal: 'medal_sprout', off: -2, cheer: 2 }, { n: '동', at: 1100, gold: 1, medal: 'medal_bronze', off: -1, cheer: 3 },
-    { n: '은', at: 1300, gold: 2, medal: 'medal_silver', off: 0, cheer: 4 }, { n: '금', at: 1600, gold: 3, medal: 'medal_gold', off: 0, cheer: 5 },
-    { n: '백금', at: 2000, gold: 4, medal: 'medal_platinum', off: 1, cheer: 6 }, { n: '무지개', at: 2500, gold: 5, medal: 'medal_rainbow', off: 1, cheer: 7 }
+    // 4.2.1 지섭 요청(잘 골라도 너무 자주 져요): 상대 별(off)과 상대 응원(cheer)을 낮췄어요. 가장 좋게 고르고 응원을 꽉 채우면
+    // 이기는 판이 새싹 87→91%, 동 77→87%, 은 64→77%, 금 62→75%, 백금 48→64%, 무지개 44→60%(dev 시뮬레이션 3,000판)
+    { n: '새싹', at: 1000, gold: 0, medal: 'medal_sprout', off: -3, cheer: 1 }, { n: '동', at: 1100, gold: 1, medal: 'medal_bronze', off: -2, cheer: 2 },
+    { n: '은', at: 1300, gold: 2, medal: 'medal_silver', off: -1, cheer: 3 }, { n: '금', at: 1600, gold: 3, medal: 'medal_gold', off: -1, cheer: 4 },
+    { n: '백금', at: 2000, gold: 4, medal: 'medal_platinum', off: 0, cheer: 4 }, { n: '무지개', at: 2500, gold: 5, medal: 'medal_rainbow', off: 0, cheer: 5 }
   ];
   const BT_SP = { squirrel: '다람쥐', deer: '사슴', sheep: '양', boar: '멧돼지', beaver: '비버', mouse: '생쥐', goat: '염소', crane: '두루미', sparrow: '참새', wolf: '늑대', goose: '거위', crow: '까마귀' };
   // 상대 학교: 특징(trait) 'even' 고르게, 과목 키는 그 종목에 몰기, 'one' 한 명에 몰기. 선수 셋은 [종류, 이름, 잘하는 과목]
@@ -20787,6 +21765,7 @@ body.cam-scene #ffChip,body.cam-scene #plChip,body.cam-scene .b-ring{animation-p
     if (!xgOn() || S.xg.s[0] || festBusy()) return false;
     const g = xgGuest(), nm = spName(g.sp), say = XG_SAY[g.sp] || XG_SAY._;
     S.xg.s[0] = 1;
+    tamShard(g.sp, 2);   // 4.3.0 교환학생으로 온 동물 친구: 그 대원 별 조각 둘
     S.xg.log = [{ sp: g.sp, who: g.who, d: gameToday(), id: g.real ? g.id : '' }].concat(S.xg.log.filter(e => e.d !== gameToday())).slice(0, XG.log);
     const v = xgPay(XG.greetMin);
     save(); renderHUD();
@@ -21647,7 +22626,9 @@ body.cam-scene #ffChip,body.cam-scene #plChip,body.cam-scene .b-ring{animation-p
   }
   // 4.2.0 장면이 가운데 줄을 넘으면 둘째 그림으로 부드럽게 바꿔요. 그림이 없으면 첫 그림 그대로
   function stPic2() {
-    const R = rt.st; if (!R || R.sw || !R.im2 || R.i < R.mid) return;
+    const R = rt.st; if (!R || !R.im2) return;
+    if (R.sw) { if (!R.im2.classList.contains('solo')) R.im2.classList.toggle('on', R.i >= R.mid); return; }   // 4.2.1 이전으로 넘기면 첫 그림으로 돌아가요
+    if (R.i < R.mid) return;
     R.sw = true;
     const pe = $('#stPic'), b = R.im2;
     if (pe.hidden || !pe.firstChild || rt.reduced) { pe.innerHTML = ''; b.classList.add('on', 'solo'); pe.appendChild(b); pe.hidden = false; return; }
@@ -21662,6 +22643,7 @@ body.cam-scene #ffChip,body.cam-scene #plChip,body.cam-scene .b-ring{animation-p
     if (pk) pb.innerHTML = L.pick.map((t, i) => `<button class="cta" type="button" data-stp="${i}">${esc(t)}</button>`).join('');
     else { setH($('#stAv'), nar ? '' : stAv(L.w)); $('#stAv').hidden = nar; setT($('#stWho'), nar ? '' : stName(L.w)); $('#stText').textContent = nl(L.t); }
     $('#stNext').hidden = pk; $('#stNext').textContent = R.i >= R.lines.length - 1 ? '닫기' : '다음';
+    $('#stPrev').hidden = R.i <= 0;   // 4.2.1 지섭: 앞 줄을 다시 읽을 수 있게
     setT($('#stStep'), `${R.i + 1} / ${R.lines.length}`);
   }
   function stNext() {
@@ -21670,6 +22652,11 @@ body.cam-scene #ffChip,body.cam-scene #plChip,body.cam-scene .b-ring{animation-p
     sfx('tap');
     if (R.i < R.lines.length - 1) { R.i += 1; stLine(); return; }
     stEnd();
+  }
+  // 4.2.1 앞 줄로 돌아가요. 고른 답은 이미 그 뒤 대사로 바뀌어 있어서 다시 고르지는 않아요
+  function stPrev() {
+    const R = rt.st; if (!R || R.i <= 0) return;
+    sfx('tap'); R.i -= 1; stLine();
   }
   function stPick(i) {
     const R = rt.st; if (!R) return; const L = R.lines[R.i]; if (!L.pick || !L.re || !L.re[i]) return;
@@ -23526,6 +24513,7 @@ body.cam-scene #ffChip,body.cam-scene #plChip,body.cam-scene .b-ring{animation-p
     $('#panelQuests').hidden = t !== 'quests';
     $('#panelTeachers').hidden = t !== 'teachers';
     $('#panelGrad').hidden = t !== 'grad';
+    $('#panelTam').hidden = t !== 'tam'; if (t === 'tam') { tamOpen(); $('#panelTam').scrollTop = 0; }   // 4.3.0 숲속 탐험대
     $('#panelSettings').hidden = t !== 'settings';
     $('#panelRank').hidden = t !== 'rank';
     $('#panelShop').hidden = t !== 'shop';
@@ -23742,6 +24730,7 @@ body.cam-scene #ffChip,body.cam-scene #plChip,body.cam-scene .b-ring{animation-p
       tick170(dt);   // 1.7.0 도감, 이벤트
       tick171(dt);   // 1.7.1 방 안을 걷는 친구들
       tick180(dt);   // 1.8.0 숲속 합치기
+      tamTick(dt);   // 4.3.0 숲속 탐험대
       nsTick(dt);   // 3.0.0 밤 모습과 야간 자율학습
       if (S.bd && Object.keys(S.bd).length) { conTick(); conRender(false); }   // 2.1.0 공사
       if (S.oak < OAK.max) { S.oak = Math.min(OAK.max, S.oak + dt / OAK.regen); renderOak(); }
@@ -23796,6 +24785,8 @@ body.cam-scene #ffChip,body.cam-scene #plChip,body.cam-scene .b-ring{animation-p
     $('#boostNo').addEventListener('click', () => closeModal($('#mBoost')));
     $('[data-close-boost]').addEventListener('click', () => closeModal($('#mBoost')));
     $('#offDouble').addEventListener('click', claimOfflineDouble);
+    $('#panelTam').addEventListener('click', tamClick);   // 4.3.0
+    $('#tmRepOk').addEventListener('click', () => tamRepTake(false)); $('#tmRepAd').addEventListener('click', () => tamRepTake(true));
     for (const sel of ['#offPick', '#boostPick']) $(sel).addEventListener('click', e => { const b = e.target.closest('[data-adpk]'); if (!b || b.disabled) return; rt.adPick = b.dataset.adpk; sfx('tap'); adPickSync(); });   // 4.2.0 광고 보상 고르기
     $('#adDone').addEventListener('click', closeAd);
     $('#adSkip').addEventListener('click', closeAd);
@@ -24241,7 +25232,7 @@ body.cam-scene #ffChip,body.cam-scene #plChip,body.cam-scene .b-ring{animation-p
     $('#wdBarGo').addEventListener('click', () => { if (xgOn() && !xgDone()) openXg(); else openMk(); });
     $('#wdG').addEventListener('click', wdMapTap); $('#wdG').addEventListener('keydown', wdMapTap);
     $('#wdBarX').addEventListener('click', () => { sfx('tap'); rt.wdX = gameToday(); wdBar(); });
-    $('#stSay').addEventListener('click', stNext); $('#stNext').addEventListener('click', stNext);
+    $('#stSay').addEventListener('click', stNext); $('#stNext').addEventListener('click', stNext); $('#stPrev').addEventListener('click', stPrev);
     $('#stSkip').addEventListener('click', () => { sfx('tap'); stEnd(); });
     $('#stPicks').addEventListener('click', e => { const b = e.target.closest('[data-stp]'); if (b) stPick(+b.dataset.stp); });
     $('#map').addEventListener('click', sideMapTap, true); $('#map').addEventListener('keydown', sideMapTap, true);   // 4.1.0 곁가지 말풍선
@@ -25509,6 +26500,23 @@ body.cam-scene #ffChip,body.cam-scene #plChip,body.cam-scene .b-ring{animation-p
     save(); renderAch(true);
     return true;
   }
+  // 4.2.1 지섭 요청: 받을 업적이 여럿이면 맨 위 '모두 받기'로 한 번에 받아요
+  function claimAchAll() {
+    const ids = ACH.filter(a => achHit(a.id) > achGot(a.id)).map(a => a.id); if (!ids.length) return 0;
+    let g = 0, n = 0; const titles = [];
+    for (const id of ids) {
+      const a = achById(id), from = achGot(id), to = achHit(id);
+      for (let i = from; i < to; i++) { g += ACH_GOLD[i]; n += 1; }
+      S.ach.got[id] = to;
+      if (to >= ACH_N && from < ACH_N) { titles.push(a.title); if (!S.ach.title) { S.ach.title = id; rankDirty(); } }
+    }
+    addGold(g);
+    const art = IMG('ach_popup') ? `<img src="${IMG('ach_popup')}" alt="">` : '';
+    showReward({ title: '업적 모두 받기!', sub: `업적 ${ids.length}개에서 메달 ${n}개를 받았어요`, art, big: `메달 ${n}개`,
+      items: [{ ic: 'gold', t: `황금 도토리 +${g}` }, titles.length ? { ic: '🎖️', t: `새 칭호 ${titles.map(t => `"${t}"`).join(', ')}` } : null] });
+    save(); renderAch(true); renderHudTitle();
+    return ids.length;
+  }
   function setTitle(id) {
     if (id && achGot(id) < ACH_N && !VD.titles.some(t => t.id === id && xtGot(t))) return false;
     S.ach.title = S.ach.title === id ? '' : id;
@@ -25532,6 +26540,7 @@ body.cam-scene #ffChip,body.cam-scene #plChip,body.cam-scene .b-ring{animation-p
     if (!force && box.dataset.key === key) return; box.dataset.key = key;
     const ts = achTitles();
     $('#achTitle').innerHTML = `<span class="at-lab">내 칭호</span><span class="at-chips">${ts.length ? ts.map(a => `<button class="title-chip${S.ach.title === a.id ? ' on' : ' off'}" type="button" data-title="${a.id}" aria-pressed="${S.ach.title === a.id}">${esc(a.title)}</button>`).join('') : '<span class="at-none">업적을 5단계까지 이루면 칭호를 받아요</span>'}</span>`;
+    { const nAll = ACH.filter(a => achHit(a.id) > achGot(a.id)).length, all = $('#achAll'); if (all) { all.hidden = nAll < 2; all.textContent = `모두 받기 (${nAll}개)`; } }
     box.innerHTML = ACH.map((a, i) => {
       const h = achHit(a.id), g = achGot(a.id), next = Math.min(ACH_N - 1, h), goal = achGoal(a, next), v = vals[i];
       const can = h > g;
@@ -25581,6 +26590,7 @@ body.cam-scene #ffChip,body.cam-scene #plChip,body.cam-scene .b-ring{animation-p
   $('#hudTitle').addEventListener('click', () => { sfx('tap'); setTab('dex'); setDexSeg('ach'); });
   $('#panelDex').addEventListener('click', e => {
     const sg = e.target.closest('[data-dseg]'); if (sg) { sfx('tap'); setDexSeg(sg.dataset.dseg); return; }
+    if (e.target.closest('#achAll')) { claimAchAll(); return; }   // 4.2.1
     const b = e.target.closest('[data-ach]'); if (b) { claimAch(b.dataset.ach); return; }
     const t = e.target.closest('[data-title]'); if (t) { sfx('tap'); setTitle(t.dataset.title); }
   });
@@ -26583,7 +27593,7 @@ body.cam-scene #ffChip,body.cam-scene #plChip,body.cam-scene .b-ring{animation-p
   }
 
   // 시험용 손잡이: 자동 시험(window.__FOREST_TEST)에서만 게임 속 함수를 꺼내 써요
-  if (window.__FOREST_TEST) window.__forest = { get S() { return S; }, get rt4() { return rt; }, setZone, geo, stPlay, stNext, ST, ST_SIDE, SIDE, missionGo, MGO, MGO_MINI, MGO_Q, renderMissions, renderPass, BOOST, conLeft, gameToday, setTab, ADX, adStamp, adxDay, adxCan, adxMore, adPickNow, adPickGive, conNear, renderAdStamp, claimOfflineDouble, startBoost, openBoost, showOffline, fvBoothStart, bfFwStart, musicWant, renderCounsel, renderXg, renderFv, showCeremony, RX, rxPct, rxCost, rxUp, rxPart, renderDept, goldOr, goldRich, adGold, stampAtt, GOLD, BIG, BF_DECO, bfWin, bfNext, bfOn, bfFw, bfSync, bfStamp, bfFwStart, bfPart, bfNextTx, sanitizeBf, freshBf, fvBoothMax, bldBox, bldPick, bldWarm, DECO_SLOTS, XG, MK, ST, SIDE, ST_SIDE, wdMap, xgOn, xgGuest, xgSpots, xgGreet, xgVisit, xgLunch, openXg, mkOn, mkHot, mkSell, mkBuy, mkSur, openMk, wdBar, wdTick, stTick, stPlay, stNext, stPick, stEnd, stTags, openSb, renderSb, sideCan, sideMap, fvFlag, FV, FV_POS, fvOn, fvOpen, fvBonus, fvSync, fvStamp, fvGuests, openFv, renderFv, fvMeet, fvBoothStart, fvMap, fvTip, festDef, goTo, navInfo, openShop, gdReady, thPreview, thPreviewEnd, thOn, busScene, tripCrowd, openTrip, startTrip, claimTrip, TRIPS, mgPickMul, mgPickMode, mgUpOrder, mgFillOrders, mgAdAsk, sportsCon, festCon, btQuota, btCanAd, btAdMore, warmRooms, blobUrl, vdSize, vdBlock, pzSweep, pzSwGain, pzSwOpen, pzXpOf, mgMulMax, mgMulOk, mgMul, mgModeTap, acTip, kidDupIdx, trialSafe, closeAd,
+  if (window.__FOREST_TEST) window.__forest = { get S() { return S; }, get rt4() { return rt; }, musicWant, tamPh, tamEvPick, tamAutoTeam, tamUpRec, MAIN, startSports, GEO, claimAchAll, ACH, btMake, btBest, btRoster, btRoll, btWin, btOppCheer, BT, BT_LG, stPrev, get Rank() { return Rank; }, tamRankDoc, tamTf, tamAdSpd, tamReport, tamRepTake, tamAdRevive, renderRankPanel, TAM, tamSim, tamTeam, tamStat, tamMobs, tamWin, tamIdle, tamCollect, tamParty, tamShard, tamPow, tamFight, tamStep, TAM, tamSim, tamTeam, tamStat, tamMobs, tamWin, tamIdle, tamCollect, tamShard, tamParty, tamPow, tamLvCost, tamOpen, setZone, geo, stPlay, stNext, ST, ST_SIDE, SIDE, missionGo, MGO, MGO_MINI, MGO_Q, renderMissions, renderPass, BOOST, conLeft, gameToday, setTab, ADX, adStamp, adxDay, adxCan, adxMore, adPickNow, adPickGive, conNear, renderAdStamp, claimOfflineDouble, startBoost, openBoost, showOffline, fvBoothStart, bfFwStart, musicWant, renderCounsel, renderXg, renderFv, showCeremony, RX, rxPct, rxCost, rxUp, rxPart, renderDept, goldOr, goldRich, adGold, stampAtt, GOLD, BIG, BF_DECO, bfWin, bfNext, bfOn, bfFw, bfSync, bfStamp, bfFwStart, bfPart, bfNextTx, sanitizeBf, freshBf, fvBoothMax, bldBox, bldPick, bldWarm, DECO_SLOTS, XG, MK, ST, SIDE, ST_SIDE, wdMap, xgOn, xgGuest, xgSpots, xgGreet, xgVisit, xgLunch, openXg, mkOn, mkHot, mkSell, mkBuy, mkSur, openMk, wdBar, wdTick, stTick, stPlay, stNext, stPick, stEnd, stTags, openSb, renderSb, sideCan, sideMap, fvFlag, FV, FV_POS, fvOn, fvOpen, fvBonus, fvSync, fvStamp, fvGuests, openFv, renderFv, fvMeet, fvBoothStart, fvMap, fvTip, festDef, goTo, navInfo, openShop, gdReady, thPreview, thPreviewEnd, thOn, busScene, tripCrowd, openTrip, startTrip, claimTrip, TRIPS, mgPickMul, mgPickMode, mgUpOrder, mgFillOrders, mgAdAsk, sportsCon, festCon, btQuota, btCanAd, btAdMore, warmRooms, blobUrl, vdSize, vdBlock, pzSweep, pzSwGain, pzSwOpen, pzXpOf, mgMulMax, mgMulOk, mgMul, mgModeTap, acTip, kidDupIdx, trialSafe, closeAd,
     TKE, TK_Q, tkDaily, nbAllDay, nbBuildAt, nbOn, conAdd, BX_SPOT, PERKS, offlineCapH, applyAway, pzFinish, mgClaimOrder,
     CS, JOBS, CS_WORRY, freshCs, csOpen, csLeft, csMax, csEnsure, csCands, csNeed, csMul, csOpenCards, csReady, csDone, csTalkMake, csAnswer, csChoose, csSettle, openCounsel, renderCounsel, renderHall, MAIN, qMeasure, qGoal, sanitize,   // 3.1.0 진로 상담
     NSL, nsStart, nsSettle, nsOpen, nsOn, nsOverlap, nsExtraH, isNight, nightDayOf, openNs, renderNs, bxSpots, renderNight,   // 3.0.0
