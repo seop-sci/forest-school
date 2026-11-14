@@ -1,5 +1,5 @@
 # 132번 시험(4.3.1): 탐험 학년 상한과 기준 수업료로 정하는 대원 레벨 값, 탐험 화면 실시간 빨간 점
-# 1) 상한: 유치원 10, 20층 / 초등 25층부터 학기마다 +5 / 중 90 / 고 150 / 대 215층부터 +15, 대학교 4학년 2학기는 끝없이
+# 1) 상한(4.3.2): 유치원 30, 40층 / 초등 50층부터 학기마다 +5 / 중 120 / 고 185 / 대 255층부터 +15, 대학교 4학년 2학기는 끝없이
 # 2) 상한에 닿으면 멈추고(cap), 학기가 오르면 다시 걸어요. 2배속 시간은 멈춘 동안 줄지 않아요
 # 3) 레벨 값은 부스터와 소풍과 상관없이 같고, 학년이 오르면 지난 레벨이 싸져요. 모두 유한해요
 # 4) 정수로 도토리 바꾸기는 수업료 부스터를 켜도 두 배가 되지 않아요  5) 탐험 화면에서 재료를 얻으면 장비 칸 점이 바로 떠요
@@ -20,11 +20,11 @@ async def main():
           S.tier=t0; S.tg=g0; S.sem=s0; return out; }})()""")
         print('상한', r)
         caps = [x[3] for x in r]
-        ok(caps == [10, 20, 25, 30, 80, 90, 140, 150, 200, 215, 305, -1], f'학년 상한 {caps}')
+        ok(caps == [30, 40, 50, 55, 105, 120, 170, 185, 235, 255, 345, -1], f'학년 상한 {caps}')
         ok(all(r[i][4] <= r[i + 1][4] for i in range(len(r) - 2)), '기준 레벨은 학년이 오를수록 커져요')
         # 상한에서 멈추고 다시 걷기
         r = await page.evaluate(f"""(async()=>{{ const F={F}, S=F.S, sl=ms=>new Promise(r=>setTimeout(r,ms)); S.tam.seen=1; F.setTab('tam'); await sl(300);
-          S.tam.best = 10; const T=F.rt4.tam; F.tamPh(T,'walk'); const ph1=T.ph; S.tam.spd.sec = 600; await sl(1500); const spd=S.tam.spd.sec, txt=document.querySelector('#tmBest').textContent;
+          S.tam.best = 30; const T=F.rt4.tam; F.tamPh(T,'walk'); const ph1=T.ph; S.tam.spd.sec = 600; await sl(1500); const spd=S.tam.spd.sec, txt=document.querySelector('#tmBest').textContent;
           S.tg = 1; await sl(400); const ph2=T.ph; return {{ ph1, spd, txt, ph2 }}; }})()""")
         print('멈춤', r)
         ok(r['ph1'] == 'cap' and r['spd'] == 600, '상한에서 멈추고 2배속 시간은 그대로')
