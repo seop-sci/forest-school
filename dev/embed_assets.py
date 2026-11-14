@@ -33,6 +33,9 @@ BLOCKS = {'170': ('<!-- FS_IMG170:BEGIN -->', '<!-- FS_IMG170:END -->', 'FS_IMG1
 
 # 열쇠 앞부분마다 줄일 크기(긴 변 픽셀)와 화질
 RULES = [
+    # 4.4.1 홈 위쪽 현황판(작업지시서 79, python3 embed_assets.py --block 431 <폴더>). 9조각 늘이기라 구석 칸 비율이 그대로 남게 크기를 2/3로
+    ('hud_board_frame', 600, 82), ('hud_card_', 600, 82), ('hud_res_divider', 80, 84), ('hud_bar_', 400, 84), ('hud_pill_', 120, 86),
+    ('hud_btn_', 88, 86), ('hud_ic_', 64, 86), ('hud_fold_', 88, 86),
     # 4.4.0 탐험 전체 화면(작업지시서 77, 78, python3 embed_assets.py --block 431 <폴더>)
     ('ex4_bg_', 1280, 72), ('ex4_enter', 1280, 72), ('ex4_fg_', 720, 76), ('ex4_cut_', 720, 76), ('ex4_pc_', 220, 80),
     ('ex4_sk_sci_bubble', 96, 82), ('ex4_sk_pe_leaf', 96, 82), ('ex4_sk_kor_note', 96, 82), ('ex4_sk_art_drop', 96, 82), ('ex4_sk_math_star', 96, 82),

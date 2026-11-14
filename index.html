@@ -2,7 +2,7 @@
 <html lang="ko">
 <head>
 <meta charset="utf-8">
-<meta name="forest-version" content="4.4.0">
+<meta name="forest-version" content="4.4.1">
 <meta name="viewport" content="width=device-width, initial-scale=1">
 <meta name="description" content="도토리를 모아 숲속 학교를 키우는 방치형 게임 테스트판이에요.">
 <style>html,body{margin:0}</style>
@@ -805,36 +805,49 @@ label.srow,button.srow{cursor:pointer}
 #panelTam .tm-fg{bottom:calc(var(--sab,0px) + 56px);width:120%;aspect-ratio:3/1;left:-4%}
 #panelTam .tm-flbig{display:none}
 #panelTam .tm-f{--w:27%}#panelTam .tm-mob.solo{--w:33%}#panelTam .tm-mob.boss{--w:48%}
-#panelTam .tm-tower{top:calc(var(--x4t) + 128px);left:22%;right:22%}
-#panelTam .tm-bossbar{top:calc(var(--x4t) + 124px)}
-#panelTam .tm-time{top:calc(var(--x4t) + 152px);left:24%;right:24%;height:4px}
+#panelTam .tm-tower{top:calc(var(--x4t) + var(--x4d,0px) + 128px);left:22%;right:22%}
+#panelTam .tm-bossbar{top:calc(var(--x4t) + var(--x4d,0px) + 124px)}
+#panelTam .tm-time{top:calc(var(--x4t) + var(--x4d,0px) + 152px);left:24%;right:24%;height:4px}
 #panelTam .tm-cut{top:30%;height:26%}
 .tm-cut.x4{background:center/cover no-repeat;border-top:3px solid #FFF3C9;border-bottom:3px solid #FFF3C9;box-shadow:0 6px 18px rgba(0,0,0,.35)}
 .tm-cut.x4 b{color:#fff;-webkit-text-stroke:0;text-shadow:0 2px 0 rgba(60,30,10,.85),0 0 6px rgba(60,30,10,.6)}
 .tm-cut.x4 small{color:#fff;text-shadow:0 1px 0 rgba(60,30,10,.85)}
-.tm-bar{position:absolute;left:0;right:0;top:0;z-index:12;display:flex;align-items:center;gap:8px;padding:calc(8px + var(--x4t)) 10px 0}
-html.ait .tm-bar{padding-right:calc(var(--ait-capw,112px) + 2px)}
+.tm-bar{position:absolute;left:0;right:0;top:0;z-index:12;display:grid;grid-template-columns:minmax(0,1fr) auto minmax(0,1fr);align-items:center;gap:6px;padding:calc(8px + var(--x4t)) 10px 0}   /* 4.4.1 지섭: < 왼쪽, 탐험 고르기 가운데, 도토리 오른쪽 */
+.tm-bar #tmExit{grid-column:1;justify-self:start}.tm-bar .tm-mode{grid-column:2}.tm-bar .tm-ac{grid-column:3;justify-self:end;width:100%;max-width:214px}
+html.ait #panelTam{--x4d:48px}   /* 4.4.1 토스: 오른쪽 위는 토스 단추 자리라 도토리 칸은 그 아래 줄로, 그 밑은 모두 한 줄만큼 내려요 */
+html.ait #panelTam .tm-bar .tm-ac{grid-column:auto;position:absolute;right:10px;left:auto;top:calc(var(--x4t) + 56px);width:200px;max-width:calc(100vw - 140px)}
 .tm-rb{flex:none;width:44px;height:44px;border:0;border-radius:50%;padding:0;background:var(--x4-btn,#C98A4B) center/100% 100% no-repeat;display:grid;place-items:center;cursor:pointer}
 .tm-rb img{width:62%;height:62%;object-fit:contain}
+.tm-rb.tm-back{width:42px;height:42px;background:rgba(40,25,10,.6);box-shadow:0 0 0 2.5px #FFF3C9,0 3px 6px rgba(0,0,0,.35)}   /* 4.4.1 지섭: 또렷한 < 단추 */
+.tm-back svg{width:24px;height:24px;fill:none;stroke:#fff;stroke-width:3.4;stroke-linecap:round;stroke-linejoin:round;margin-left:-2px}
+.tm-rb.tm-back:active{transform:scale(.94)}
 #panelTam .tm-bar .tm-mode{margin:0;flex:none;background:rgba(40,25,10,.45)}
 #panelTam .tm-bar .tm-mode button{color:#FFF3C9;font-size:12px;padding:5px 10px}
-.tm-ac{margin-left:auto;flex:none;display:flex;align-items:center;justify-content:flex-end;height:42px;min-width:132px;padding:0 16px 2px 46px;background:var(--x4-top,#A86A34) center/100% 100% no-repeat;border-radius:12px}
-.tm-ac b{font-family:var(--font-display);font-size:17px;color:#FFF8E1;text-shadow:0 1.5px 0 #5A3414,0 0 3px #5A3414;white-space:nowrap}
-.tm-ac.bump{animation:tmAcB .3s}@keyframes tmAcB{50%{transform:scale(1.06)}}
-#panelTam .tm-top{position:absolute;left:0;right:0;top:calc(var(--x4t) + 58px);z-index:11;margin:0;display:flex;flex-direction:column;align-items:center;gap:3px;pointer-events:none}
+@media (max-width:380px){#panelTam .tm-bar .tm-mode button{font-size:11.5px;padding:5px 8px}}
+.tm-ac{min-width:0;display:flex;align-items:center;justify-content:flex-end;height:42px;padding:0 10px 2px 38px;box-sizing:border-box;background:var(--x4-top,#A86A34) center/100% 100% no-repeat;border-radius:12px}
+.tm-ac b{flex:1;min-width:0;text-align:right;overflow:hidden;font-family:var(--font-display);font-size:17px;color:#FFF8E1;text-shadow:0 1.5px 0 #5A3414,0 0 3px #5A3414;white-space:nowrap}
+#panelTam .tm-top{position:absolute;left:0;right:0;top:calc(var(--x4t) + var(--x4d,0px) + 58px);z-index:11;margin:0;display:flex;flex-direction:column;align-items:center;gap:3px;pointer-events:none}
 #panelTam .tm-where{flex-direction:column;align-items:center;gap:3px}
-#panelTam #tmFl{display:inline-block;min-width:120px;text-align:center;padding:4px 30px 6px;background:var(--x4-floor,#F2B347) center/100% 100% no-repeat;color:#6B3B10;font-size:22px;text-shadow:0 1px 0 #FFF3C9}
+#panelTam #tmFl{display:inline-block;min-width:168px;white-space:nowrap;text-align:center;padding:4px 44px 6px;background:var(--x4-floor,#F2B347) center/100% 100% no-repeat;color:#6B3B10;font-size:22px;text-shadow:0 1px 0 #FFF3C9}
 #panelTam #tmReg{font-family:var(--font-display);font-size:13px;color:#fff;text-shadow:0 1px 0 #4A2F14,0 0 3px #4A2F14}
 #panelTam .tm-where small{color:#fff}
 #panelTam .tm-best{font-size:11px;pointer-events:auto}
-#panelTam .tm-pow{position:absolute;left:10px;top:0;transform:scale(.88);transform-origin:left top}
-#panelTam .tm-acts{position:absolute;right:8px;top:calc(var(--x4t) + 176px);z-index:12;margin:0;flex-direction:column;flex-wrap:nowrap;gap:14px}
+#panelTam .tm-best .tm-cap{display:inline;margin:0 0 0 2px;padding-left:7px;border-left:1.5px solid rgba(120,60,10,.35);color:#9A3F06;font-size:11px;font-weight:800;opacity:1}   /* 4.4.1 지섭: 흰 글자가 안 보여서 */
+#panelTam .tm-pow{position:absolute;left:10px;top:calc(100% + 10px);transform:scale(.88);transform-origin:left top;white-space:nowrap}
+#panelTam .tm-acts{position:absolute;right:8px;top:calc(var(--x4t) + var(--x4d,0px) + 176px);z-index:12;margin:0;flex-direction:column;flex-wrap:nowrap;gap:14px}
 #panelTam .tm-acts button{position:relative;width:56px;height:56px;min-height:0;border:0;border-radius:50%;padding:0;background:var(--x4-btn,#C98A4B) center/100% 100% no-repeat;box-shadow:none;display:grid;place-items:center;color:#fff;font-size:0}
 #panelTam .tm-acts button[hidden],#panelTam #tmRep{display:none}
-#panelTam .tm-acts button.on,#panelTam .tm-acts button[aria-pressed="true"]{background-image:var(--x4-btnon,none);filter:drop-shadow(0 0 6px #FFD76A)}
+#panelTam .tm-acts button{box-shadow:0 0 0 2.5px #FFF3C9,0 4px 8px rgba(40,20,0,.45)}
+#panelTam .tm-acts button:not(.on):not([aria-pressed="true"]) img{filter:saturate(.75)}
+#panelTam .tm-acts button.on,#panelTam .tm-acts button[aria-pressed="true"]{background-image:var(--x4-btnon,none);box-shadow:0 0 0 3px #FFD54A,0 0 12px 2px rgba(255,214,90,.9),0 4px 8px rgba(40,20,0,.45)}
+#panelTam .tm-acts button.on small,#panelTam .tm-acts button[aria-pressed="true"] small{background:#C2410C;color:#fff}   /* 4.4.1 지섭: 오른쪽 단추가 잘 보이게, 켜진 단추는 금빛 테두리 */
 #panelTam .tm-acts img{width:56%;height:56%;object-fit:contain;pointer-events:none}
-#panelTam .tm-acts small{position:absolute;left:50%;bottom:-9px;transform:translateX(-50%);white-space:nowrap;padding:0 6px;border-radius:8px;background:#FFF3C9;color:#6B3B10;font-size:10.5px;font-weight:800;line-height:16px;box-shadow:0 1px 0 #B9853E}
+#panelTam .tm-acts small{position:absolute;left:50%;bottom:-11px;transform:translateX(-50%);white-space:nowrap;padding:0 8px;border-radius:9px;background:#4A2A10;color:#FFF3C9;font-size:12px;font-weight:800;line-height:19px;box-shadow:0 0 0 1.5px #FFE7A8,0 2px 4px rgba(0,0,0,.35)}
 #panelTam .tm-acts em{position:absolute;right:-4px;top:-4px;font-style:normal;font-size:10px;font-weight:800;color:#fff;background:#E2532F;border-radius:8px;padding:0 4px;line-height:15px}
+#panelTam .tm-acts .tm-skip{animation:tmSkipP 1.4s ease-in-out infinite}@keyframes tmSkipP{50%{box-shadow:0 0 0 3px #7CE38B,0 0 14px 3px rgba(124,227,139,.9),0 4px 8px rgba(40,20,0,.45)}}
+#panelTam .tm-acts .tm-skip em{background:#2F8F46;right:-10px}
+@media (prefers-reduced-motion:reduce){#panelTam .tm-acts .tm-skip{animation:none}}
+#panelTam .tm-acts{transition:opacity .15s}#panelTam.tm-cutting .tm-acts{opacity:0;pointer-events:none}
 #panelTam .tm-acts .tm-adb{position:absolute;left:-4px;top:-4px;width:22px;height:22px}
 #panelTam .tm-sks{position:absolute;left:0;right:0;bottom:calc(var(--sab,0px) + 92px);z-index:12;margin:0;gap:8px}
 #panelTam .tm-sk{width:56px;height:56px}
@@ -1931,7 +1944,7 @@ body{background:radial-gradient(120% 60% at 50% 0%, color-mix(in srgb, var(--pap
 .pz[hidden]{display:none}
 .pz-bg{position:absolute;inset:0;z-index:-1;background:#8FB36B var(--pz-bg) center/cover no-repeat}
 .pz-bg::after{content:"";position:absolute;inset:0;background:linear-gradient(rgba(20,40,20,.42), rgba(20,40,20,.08) 22%, rgba(20,40,20,.08) 70%, rgba(20,40,20,.5))}
-.pz-top{display:flex;align-items:stretch;gap:8px;flex:none}
+.pz-top{display:flex;align-items:stretch;gap:8px;flex:none;height:56px}   /* 4.4.1 지섭: 콤보 글자가 생겨도 높이가 그대로 */
 .pz-sc,.pz-x,.mg-stat,.mg-seg{outline:1px solid rgba(243,225,174,.48);outline-offset:-1px}
 .pz-ask,.mg-order{box-shadow:0 3px 0 rgba(66,52,30,.24),0 5px 15px rgba(36,40,22,.12)}
 .pz-x{flex:none;width:42px;border:0;border-radius:14px;background:rgba(44,74,61,.86);color:#FFF7E6;display:grid;place-items:center;cursor:pointer;box-shadow:0 3px 0 rgba(0,0,0,.3)}
@@ -1939,11 +1952,12 @@ body{background:radial-gradient(120% 60% at 50% 0%, color-mix(in srgb, var(--pap
 .pz-sc small{font-size:11px;color:#CFE0C8;line-height:1.1}
 .pz-sc b{font-family:var(--font-display);font-weight:400;font-size:22px;line-height:1.1;color:#FFE9A8}
 .pz-sc2 b{font-size:17px;color:#FFF7E6}
-.pz-ask{flex:none;display:flex;align-items:center;gap:10px;padding:6px 12px 6px 6px;border:0;border-radius:16px;background:rgba(255,247,230,.94);color:#26301E;text-align:left;font:inherit;cursor:default;box-shadow:0 3px 0 rgba(0,0,0,.25)}
+.pz-ask{flex:none;height:60px;box-sizing:border-box;overflow:hidden;display:flex;align-items:center;gap:10px;padding:6px 12px 6px 6px;border:0;border-radius:16px;background:rgba(255,247,230,.94);color:#26301E;text-align:left;font:inherit;cursor:default;box-shadow:0 3px 0 rgba(0,0,0,.25)}
 .pz-ask.done{animation:pzAskDone .5s ease}
 @keyframes pzAskDone{30%{transform:scale(1.04)}}
 .pz-askpic{flex:none;width:44px;height:44px;border-radius:12px;background:#E9F0DA var(--pz-chr) center/80% no-repeat}
 .pz-asktxt{flex:1;min-width:0;display:flex;flex-direction:column;gap:2px;font-size:14px;line-height:1.25;color:#26301E}
+.pz-asktxt>span{white-space:nowrap;overflow:hidden;text-overflow:ellipsis}   /* 4.4.1 두 줄이 되어 판이 들썩이지 않게 */
 .pz-asktxt b{font-family:var(--font-display);font-weight:400;font-size:15px;color:#4F6A3A}
 .pz-askbar{display:block;height:6px;margin-top:2px;border-radius:3px;background:#DCE6CC;overflow:hidden}
 .pz-askbar i{display:block;height:100%;width:0;border-radius:3px;background:#7DA857;transition:width .3s}
@@ -1962,7 +1976,8 @@ body{background:radial-gradient(120% 60% at 50% 0%, color-mix(in srgb, var(--pap
 .pz-cell:not(.on):not(.ghost)::before{content:"";position:absolute;inset:7%;border-radius:20%;background:rgba(70,40,12,.26);box-shadow:inset 0 2px 3px rgba(0,0,0,.32), inset 0 -1px 0 rgba(255,235,190,.35)}
 .pz-cell.on{filter:drop-shadow(0 2px 2px rgba(0,0,0,.38)) saturate(1.08)}
 .pz-cell.on::before{content:"";position:absolute;inset:3%;border-radius:22%;box-shadow:inset 0 0 0 2px rgba(255,250,235,.55);pointer-events:none}
-.pz-sc .pz-combo{display:block;font-style:normal;font-size:10px;line-height:1.1;color:#FFE27A;margin-top:1px}
+.pz-sc .pz-combo{display:block;max-width:100%;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;font-style:normal;font-size:10px;line-height:1.1;color:#FFE27A;margin-top:1px}
+.pz-sc{overflow:hidden}
 .pz-sc .pz-combo[hidden]{display:none}
 .pz-cell.ghost{background-image:var(--pz-ghost);opacity:.9}
 .pz-cell.will{filter:brightness(1.2) saturate(1.15)}
@@ -2012,7 +2027,7 @@ body{background:radial-gradient(120% 60% at 50% 0%, color-mix(in srgb, var(--pap
 .pz-tea .pz-teapic{width:32px;height:32px;filter:grayscale(1) opacity(.45)}
 .pz-tea .pz-tead{font-size:10px;line-height:1.1;color:#CFE0C8;white-space:nowrap}
 .pz-tea.has .pz-tead{color:#4F6A3A;font-weight:700}
-.pz-teatip{flex:none;margin:0;padding:0 4px;font-size:11px;line-height:1.3;color:#FFF7E6;text-shadow:0 1px 0 rgba(0,0,0,.5), 0 0 4px rgba(0,0,0,.45);text-align:center}
+.pz-teatip{flex:none;min-height:2.6em;margin:0;padding:0 4px;font-size:11px;line-height:1.3;color:#FFF7E6;text-shadow:0 1px 0 rgba(0,0,0,.5), 0 0 4px rgba(0,0,0,.45);text-align:center}
 .pz-tea .pz-tean{position:absolute;right:-4px;top:-6px;min-width:20px;height:20px;padding:0 6px;border-radius:10px;background:var(--accent);color:var(--accent-ink);font-family:var(--font-display);font-size:13px;line-height:20px;display:none}
 .pz-tea.has{background:rgba(255,247,230,.94);animation:pzReady 1.6s ease-in-out infinite}
 .pz-tea.has .pz-teapic{filter:none}
@@ -2515,6 +2530,60 @@ body{background:radial-gradient(120% 60% at 50% 0%, color-mix(in srgb, var(--pap
 .app .board .hud-res .rep-pill small{font-size:11px}
 .app .board .hud-res .rep-pill svg{width:18px;height:18px}
 @media (max-width:380px){.app .board .hud-res .rep-pill b{font-size:16px}.app .board .hud-res .rep-pill svg{width:16px;height:16px}}
+/* ===== 4.4.1 지섭 요청: 현황판 배치를 웹, 안드로이드, 토스 모두 같게(작업지시서 79 받고 나서 할 일 4번) =====
+   학교 그림 빼기 / 1줄 학교 이름 / 2줄 학년과 학기 + 오른쪽 끝 단추(졸업, 출석부, 설정, 웹과 안드로이드는 ✕까지) / 3줄 칭호 리본 / 진행 줄 / 재화 띠 */
+.app .board .board-top{grid-template-columns:minmax(0,1fr) auto auto auto auto;grid-template-areas:"school . . . ." "school grad att gear exit" "title title title title title" "prog prog prog prog prog" "res res res res res";row-gap:0}
+.app .board .school-crest{display:none}
+.app .board .school{grid-area:school;align-self:stretch;display:flex;flex-direction:column;justify-content:space-between;gap:2px;padding:6px 0 4px 10px;margin:0}
+.app .board .xgrad{grid-area:grad}.app .board #btnAtt{grid-area:att}.app .board .xgear{grid-area:gear}.app .board #btnExit{grid-area:exit}
+.app .board .board-top .icon-btn{margin-top:2px;margin-bottom:4px}
+.app .board #btnExit{margin-right:6px}
+.app .board .school-row{min-height:24px}
+.app .board .school-year{flex-wrap:nowrap;white-space:nowrap;min-width:0;overflow:hidden}
+.app .board .school-year .ynote{min-width:0;overflow:hidden;text-overflow:ellipsis}
+.app .board .board-top::before{grid-area:1 / 1 / 4 / -1}
+.app .board .hud-title{grid-area:title;justify-self:start;position:relative;z-index:1;margin:0 0 6px 10px;max-width:calc(100% - 20px)}
+.app .board .hud-title[hidden]{display:none}
+@media (max-width:380px){.app .board .ydots i{width:5px;height:5px}.app .board .ydots{gap:2px}.app .board .school-year{gap:4px}}
+html.ait .app .board #btnExit{display:none}
+html.ait .app .board .board-top{grid-template-columns:minmax(0,1fr) auto auto auto;grid-template-areas:"school . . ." "school grad att gear" "title title title title" "prog prog prog prog" "res res res res"}
+html.ait .app .board .board-top{grid-template-rows:minmax(36px,auto) auto auto auto auto}
+html.ait .app .board .board-top .icon-btn{align-self:end}   /* 토스 단추(··· ✕) 바로 아래 */
+
+html.ait .app .board .xgear{margin-right:6px}
+.app.on-school .board.folded .board-top{grid-template-columns:minmax(0,1fr) auto;grid-template-areas:"school res";padding-bottom:6px}
+.app.on-school .board.folded .board-top::before{grid-area:school}
+.app.on-school .board.folded .hud-title{display:none}
+html.ait .app.on-school .board.folded .board-top{grid-template-columns:minmax(0,1fr) auto;grid-template-areas:"school res"}
+/* 4.4.1 현황판 새 그림(작업지시서 79). 그림을 다 받으면(html.hud-art) 9조각으로 붙이고, 못 받으면 예전 모습 그대로 */
+html.hud-art{--hud-card:var(--hud-card-l);--hud-pill:var(--hud-pill-l);--hud-track:var(--hud-track-l);--hud-btn:var(--hud-btn-l);--hud-fold:var(--hud-fold-l)}
+:root.hud-art[data-theme="dark"]{--hud-card:var(--hud-card-d);--hud-pill:var(--hud-pill-d);--hud-track:var(--hud-track-d);--hud-btn:var(--hud-btn-d);--hud-fold:var(--hud-fold-d)}
+@media (prefers-color-scheme: dark){:root.hud-art:not([data-theme="light"]){--hud-card:var(--hud-card-d);--hud-pill:var(--hud-pill-d);--hud-track:var(--hud-track-d);--hud-btn:var(--hud-btn-d);--hud-fold:var(--hud-fold-d)}}
+html.hud-art .app .board .board-top::after{content:"";position:absolute;inset:0;z-index:2;pointer-events:none;border:22px solid transparent;border-image:var(--hud-frame) 48 / 22px stretch}
+html.hud-art .app .board .board-top::before{background:none;border:0;border-image:var(--hud-card) 28 fill / 14px stretch}
+html.hud-art .app .board .progress .grade-pill{background:none;border:0;border-image:var(--hud-pill) 0 18 fill / 0 9px stretch;color:#FFF3DA;padding:1px 12px}
+html.hud-art .app .board .progress .bar{height:10px;border-radius:0;background:none;border-image:var(--hud-track) 0 12 fill / 0 6px stretch;overflow:visible}
+html.hud-art .app .board .progress .bar i{display:block;height:100%;border-radius:0;background:none;border-image:var(--hud-fill) 0 12 fill / 0 6px stretch}
+html.hud-art .app .board .board-top .icon-btn{background:var(--hud-btn) center/100% 100% no-repeat;border:0;box-shadow:none}
+html.hud-art .app .board .board-top .icon-btn:active{background-image:var(--hud-btn-p)}
+html.hud-art .app.on-school .bd-fold{background:var(--hud-fold) center/100% 100% no-repeat;border:0;box-shadow:none}
+html.hud-art .app .board .hud-res > * + *{border-left:0;background:var(--hud-div) left center/4px 78% no-repeat}
+html.hud-art .app .board .hud-res .rep-pill img{grid-row:1 / 3;width:22px;height:22px;object-fit:contain}
+@media (max-width:380px){html.hud-art .app .board .hud-res .rep-pill img{width:18px;height:18px}}
+/* 4.4.1 지섭 요청: 현황판 아래도 같은 톤으로(새 그림 없이). 홈 색 변수(--home-*)를 나무 테두리와 크림 종이 색으로 바꾸고 테두리를 굵게 */
+html.hud-art{--home-paper:#FFF3D8;--home-paper-edge:#C98A4B;--home-ink:#3F2A14;--home-muted:#7A5A36;--home-selected:#F8D88F;--home-selected-ink:#5A3414;--home-plaque-line:#C98A4B;--home-panel-shadow:0 3px 0 #A0632A,0 6px 12px rgba(70,35,5,.2)}
+html.hud-art[data-theme="dark"]{--home-paper:#22372B;--home-paper-edge:#B07535;--home-ink:#FFF1D6;--home-muted:#E3CBA0;--home-selected:#7A5426;--home-selected-ink:#FFE9B8;--home-plaque-line:#B07535;--home-panel-shadow:0 3px 0 #6B3F16,0 6px 12px rgba(0,0,0,.35)}
+@media (prefers-color-scheme: dark){html.hud-art:not([data-theme="light"]){--home-paper:#22372B;--home-paper-edge:#B07535;--home-ink:#FFF1D6;--home-muted:#E3CBA0;--home-selected:#7A5426;--home-selected-ink:#FFE9B8;--home-plaque-line:#B07535;--home-panel-shadow:0 3px 0 #6B3F16,0 6px 12px rgba(0,0,0,.35)}}
+html.hud-art .app.on-school .home-qcard{box-shadow:inset 0 0 0 1px var(--home-paper-edge),var(--home-panel-shadow)}
+html.hud-art .app.on-school .map-right,html.hud-art .app.on-school .map-left .boost{box-shadow:inset 0 0 0 1px var(--home-paper-edge),var(--home-panel-shadow)}   /* 굵은 테두리는 안쪽 그림자로(크기가 그대로라 지도 생물 자리를 안 가려요) */
+html.hud-art .app.on-school .home-qcard .subbar{border-top:1.5px dashed color-mix(in srgb, var(--home-paper-edge) 70%, transparent)}
+html.hud-art .app.on-school .home-qcard .subbar .sub{border-width:1.5px}
+html.hud-art .app.on-school .tabs{border:0;border-top:3px solid var(--home-paper-edge);box-shadow:0 -2px 0 color-mix(in srgb, var(--home-paper-edge) 45%, transparent),0 -6px 14px rgba(70,35,5,.18)}
+html.hud-art .app.on-school .tabs > .tab[aria-selected="true"]{background:linear-gradient(#FFE6A8,#F4BF5E);color:#5A3414;box-shadow:inset 0 0 0 2px #C98A4B,inset 0 -3px 0 rgba(160,99,42,.35)}
+html.hud-art .tier-dots{background:color-mix(in srgb, var(--home-paper) 92%, transparent);box-shadow:0 0 0 2px var(--home-paper-edge),0 3px 0 rgba(160,99,42,.5)}
+html.hud-art .tier-dots .td{border-color:#D9A766;background:#FFF8E8;color:#5A3414}
+html.hud-art .tier-dots .td.cur{border-color:#B8692A;box-shadow:0 0 0 2px #E8A23E inset;background:#FFE3A0}
+html.hud-art .tier-dots .td.on{background:#E8A23E;color:#fff;border-color:#B8692A}
 /* 2) 퀘스트 카드: 위아래 여백과 받기 단추 높이를 줄이고, 학생 부탁은 한 줄 칩으로(모자라면 다음 줄로 넘어가요) */
 .app.on-school .home-qcard .quest{padding:5px 10px 6px;row-gap:1px}
 .app.on-school .home-qcard .q-top{min-height:34px}
@@ -3102,6 +3171,11 @@ body.sheet-open #map, body.sheet-open .wx-fx::before, body.sheet-open .wx-fx i, 
 .overlay.cere.v3 .cere-svg{position:absolute;inset:0;width:100%;height:100%;max-width:none}
 .overlay.cere.v3 .cere-h,.overlay.cere.v3 .cere-sub{display:none}
 .overlay.cere.v3 .cere-skip{color:#FFF3D6;text-shadow:0 1px 3px rgba(0,0,0,.6)}
+/* 4.4.1 지섭 요청: 건너뛰기를 더 잘 보이게. 오른쪽 아래 진한 알약 단추와 ≫ 표시 */
+.overlay.cere .cere-skip,.overlay.cere.v3 .cere-skip{left:auto;right:14px;transform:none;display:inline-flex;align-items:center;gap:4px;padding:9px 14px 9px 18px;border-radius:999px;background:rgba(28,20,10,.66);box-shadow:0 0 0 2px #FFF3D6,0 4px 10px rgba(0,0,0,.35);color:#fff;font-family:var(--font-display);font-size:16px;opacity:1;text-shadow:none;animation:cereSkipIn .5s ease-out .8s both}
+.cere-skip svg{width:18px;height:18px;fill:none;stroke:currentColor;stroke-width:2.6;stroke-linecap:round;stroke-linejoin:round}
+.overlay.cere .cere-skip:active{transform:scale(.95)}
+@keyframes cereSkipIn{from{opacity:0;transform:translateY(8px)}}
 .c3-ban{font-family:var(--font-display);fill:#5A3A16;text-anchor:middle}
 .c3-win{opacity:0;animation-name:c3Win;animation-fill-mode:both;animation-timing-function:linear}
 .c3-in{opacity:0;animation:c3In .7s both}
@@ -3723,7 +3797,7 @@ body.cam-scene #ffChip,body.cam-scene #plChip,body.cam-scene .b-ring{animation-p
     <p class="boot-step" id="bootStep">학교 문을 여는 중...</p>
     <p class="boot-tip" id="bootTip">학교 문을 여는 중이에요</p>
   </div>
-  <span class="boot-ver" id="bootVer">v4.4.0</span>
+  <span class="boot-ver" id="bootVer">v4.4.1</span>
 </div>
 
 <div class="app on-school" id="app">
@@ -3737,8 +3811,9 @@ body.cam-scene #ffChip,body.cam-scene #plChip,body.cam-scene .b-ring{animation-p
           <h1 class="school-name" id="schoolName">숲속 유치원</h1>
           <svg class="sc-chev" viewBox="0 0 24 24" aria-hidden="true"><path d="M6 9l6 6 6-6" fill="none" stroke="currentColor" stroke-width="2.6" stroke-linecap="round" stroke-linejoin="round"/></svg>
         </div>
-        <div class="school-year" id="schoolYear"><b id="yearNow">1년째</b><span class="ydots" id="yearDots" aria-hidden="true"></span><span class="ynote" id="yearNote"></span><button class="hud-title" type="button" id="hudTitle" hidden aria-label="내 칭호, 눌러서 업적 보기"></button></div>
+        <div class="school-year" id="schoolYear"><b id="yearNow">1년째</b><span class="ydots" id="yearDots" aria-hidden="true"></span><span class="ynote" id="yearNote"></span></div>
       </div>
+      <button class="hud-title" type="button" id="hudTitle" hidden aria-label="내 칭호, 눌러서 업적 보기"></button><!-- 4.4.1 칭호 리본은 따로 맨 아래 줄 -->
       <div class="progress" id="gradeRow">
           <span class="grade-pill" id="gradePill">분교</span>
       <div class="bar" id="gradeBar" role="progressbar" aria-label="다음 동네까지" aria-valuemin="0" aria-valuemax="100" aria-valuenow="0"><i id="barFill"></i></div>
@@ -4043,9 +4118,9 @@ body.cam-scene #ffChip,body.cam-scene #plChip,body.cam-scene .b-ring{animation-p
         <div class="tm-warn" id="tmWarn" aria-hidden="true" hidden><i></i><i></i></div>
         <div class="tm-enter" id="tmEnter" aria-hidden="true" hidden><b>숲속 탐험대</b><small>오늘도 출발!</small></div>
       </div>
-      <div class="tm-bar"><button type="button" class="tm-rb" id="tmExit" aria-label="학교로 돌아가기"><img data-x4="ex4_ic_close" alt=""></button><div class="tm-mode" id="tmMode" role="group" aria-label="탐험 고르기" hidden><button type="button" data-tmm="0" aria-pressed="true">일반 탐험</button><button type="button" data-tmm="1" aria-pressed="false">심화 탐험</button></div><div class="tm-ac" id="tmAc" aria-label="가진 도토리"><b id="tmAcN">0</b></div></div>
+      <div class="tm-bar"><button type="button" class="tm-rb tm-back" id="tmExit" aria-label="학교로 돌아가기"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M15 4.5 7.5 12l7.5 7.5"/></svg></button><div class="tm-mode" id="tmMode" role="group" aria-label="탐험 고르기" hidden><button type="button" data-tmm="0" aria-pressed="true">일반 탐험</button><button type="button" data-tmm="1" aria-pressed="false">심화 탐험</button></div><div class="tm-ac" id="tmAc" aria-label="가진 도토리"><b id="tmAcN">0</b></div></div>
       <div class="tm-top"><div class="tm-where"><b id="tmFl">1층</b><span id="tmReg"></span><b class="tm-best" id="tmBest"></b></div><span class="tm-pow" id="tmPow"></span></div>
-      <div class="tm-acts"><button type="button" class="btn-sub small" id="tmSpd"></button><button type="button" class="btn-sub small" id="tmAuto" aria-pressed="false" hidden></button><button type="button" class="btn-sub small" id="tmSkOff" aria-pressed="false" hidden></button><button type="button" class="cta small" id="tmRevive" hidden>📺 응원 받기</button><button type="button" class="btn-sub small" id="tmRep" hidden></button></div>
+      <div class="tm-acts"><button type="button" class="btn-sub small" id="tmSpd"></button><button type="button" class="btn-sub small" id="tmAuto" aria-pressed="false" hidden></button><button type="button" class="btn-sub small" id="tmSkOff" aria-pressed="false" hidden></button><button type="button" class="btn-sub small tm-skip" id="tmSkip" hidden></button><button type="button" class="cta small" id="tmRevive" hidden>📺 응원 받기</button><button type="button" class="btn-sub small" id="tmRep" hidden></button></div>
       <div class="tm-sks" id="tmSk"></div>
       <nav class="tm-nav" id="tmNav" aria-label="탐험대 메뉴"><button type="button" data-tnav="mem"><img data-x4="ex4_ic_member" alt=""><span>대원</span></button><button type="button" data-tnav="gear"><img data-x4="ex4_ic_gear" alt=""><span>장비</span></button><button type="button" data-tnav="mat"><img data-x4="ex4_ic_mat" alt=""><span>재료</span></button><button type="button" data-tnav="rank"><img data-x4="ex4_ic_rank" alt=""><span>랭킹</span></button><button type="button" data-tnav="rep"><img data-x4="ex4_ic_report" alt=""><span>보고서</span></button></nav>
       <div class="tm-sheet" id="tmSheet" hidden><div class="tm-shh"><b id="tmShT">대원</b><button type="button" class="btn-sub small" id="tmShX">닫기</button></div>
@@ -4283,7 +4358,7 @@ body.cam-scene #ffChip,body.cam-scene #plChip,body.cam-scene .b-ring{animation-p
       </div>
       <h3 class="panel-sub">정보</h3>
       <dl class="info">
-        <div id="verRow"><dt>버전</dt><dd>v4.4.0</dd></div>
+        <div id="verRow"><dt>버전</dt><dd>v4.4.1</dd></div>
         <div id="pidRow" hidden><dt>학교 번호</dt><dd id="infoPid"></dd></div>
       </dl>
       <div id="devBox" hidden>
@@ -4729,7 +4804,7 @@ body.cam-scene #ffChip,body.cam-scene #plChip,body.cam-scene .b-ring{animation-p
   <svg class="cere-svg" id="cereArt" viewBox="0 0 220 192" aria-hidden="true"></svg>
   <h2 class="cere-h" id="cereH">졸업을 축하해요!</h2>
   <p class="cere-sub" id="cereSub"></p>
-  <button class="cere-skip" id="cereSkip" type="button" data-autofocus>건너뛰기</button>
+  <button class="cere-skip" id="cereSkip" type="button" data-autofocus>건너뛰기<svg viewBox="0 0 24 24" aria-hidden="true"><path d="M5 5l7 7-7 7M12 5l7 7-7 7"/></svg></button>
   <div class="cere-ask" id="cereAsk" role="alertdialog" aria-labelledby="cereAskT" hidden>
     <p id="cereAskT">졸업식을 건너뛸까요?</p>
     <div class="btn-row"><button class="btn-sub" type="button" id="cereKeep">계속 보기</button><button class="cta" type="button" id="cereGo">건너뛰기</button></div>
@@ -6881,7 +6956,23 @@ body.cam-scene #ffChip,body.cam-scene #plChip,body.cam-scene .b-ring{animation-p
 "ex4_ui_sheet":"img/a/ex4_ui_sheet-878a03874b.webp",
 "ex4_ui_sk_frame":"img/a/ex4_ui_sk_frame-cce18a4755.webp",
 "ex4_ui_sk_ready":"img/a/ex4_ui_sk_ready-65d9935b09.webp",
-"ex4_ui_topbar":"img/a/ex4_ui_topbar-f7d4633e71.webp"
+"ex4_ui_topbar":"img/a/ex4_ui_topbar-f7d4633e71.webp",
+"hud_bar_fill":"img/a/hud_bar_fill-37c16b9231.webp",
+"hud_bar_track_dark":"img/a/hud_bar_track_dark-0080ea323c.webp",
+"hud_bar_track_light":"img/a/hud_bar_track_light-6a07d52490.webp",
+"hud_board_frame":"img/a/hud_board_frame-fd6e244ecf.webp",
+"hud_btn_dark":"img/a/hud_btn_dark-16db6b2143.webp",
+"hud_btn_light":"img/a/hud_btn_light-693ac31437.webp",
+"hud_btn_press":"img/a/hud_btn_press-48cbf8a5f7.webp",
+"hud_card_dark":"img/a/hud_card_dark-6fb0398a75.webp",
+"hud_card_light":"img/a/hud_card_light-57feecb595.webp",
+"hud_fold_dark":"img/a/hud_fold_dark-0c75e9e82a.webp",
+"hud_fold_light":"img/a/hud_fold_light-ac0964b71b.webp",
+"hud_ic_kids":"img/a/hud_ic_kids-76930aee59.webp",
+"hud_ic_star":"img/a/hud_ic_star-6b166bf799.webp",
+"hud_pill_dark":"img/a/hud_pill_dark-b90b549d65.webp",
+"hud_pill_light":"img/a/hud_pill_light-28d4b72315.webp",
+"hud_res_divider":"img/a/hud_res_divider-b8d6c4cbc5.webp"
 };</script>
 <!-- FS_IMG431:END -->
 <!-- FS_IMG174:BEGIN -->
@@ -9160,11 +9251,7 @@ body.cam-scene #ffChip,body.cam-scene #plChip,body.cam-scene .b-ring{animation-p
       else if (name === 'magpie') { note(1480, 0, 0.07, 'square', 0.03); note(1320, 0.13, 0.08, 'square', 0.03); }
       else if (name === 'done') { note(783.99, 0, 0.18, 'sine', 0.14, 2); note(1174.66, 0.12, 0.32, 'sine', 0.14, 2); }
       else if (name === 'quest') [1046.5, 1318.51, 1567.98, 2093].forEach((f, i) => note(f, i * 0.07, 0.22 + i * 0.05, 'triangle', 0.11));
-      else if (name === 'bell') {
-        // 학교 종소리: 딩동댕동 딩동댕동
-        [659.25, 523.25, 587.33, 392.0, 392.0, 587.33, 659.25, 523.25]
-          .forEach((f, i) => note(f, i * 0.42 + (i >= 4 ? 0.3 : 0), 1.3, 'sine', 0.17, 2.76));
-      }
+      else if (name === 'bell') { /* 4.4.1 지섭 요청: 학교 종소리(딩동댕동)는 이제 어디서도 울리지 않아요 */ }
     } catch (e) { /* 소리 실패는 무시 */ }
   }
   function buzz(ms) {   // 숫자 하나나 [켜짐, 꺼짐, 켜짐] 패턴
@@ -9976,6 +10063,16 @@ body.cam-scene #ffChip,body.cam-scene #plChip,body.cam-scene .b-ring{animation-p
     if (d >= 1) return p;
     const a = d < 0.05 ? Math.PI : Math.atan2(dy / ry, dx / rx);
     return [cx + Math.cos(a) * rx * 1.04, cy + Math.sin(a) * ry * 1.04, p[2]];
+  }
+  // 4.4.1 현황판 새 그림(작업지시서 79)을 CSS 변수로. 하나라도 없으면 붙이지 않아요(예전 모습 그대로)
+  function hudArtInit() {
+    const K = { '--hud-frame': 'hud_board_frame', '--hud-card-l': 'hud_card_light', '--hud-card-d': 'hud_card_dark', '--hud-pill-l': 'hud_pill_light', '--hud-pill-d': 'hud_pill_dark',
+      '--hud-track-l': 'hud_bar_track_light', '--hud-track-d': 'hud_bar_track_dark', '--hud-fill': 'hud_bar_fill', '--hud-btn-l': 'hud_btn_light', '--hud-btn-d': 'hud_btn_dark', '--hud-btn-p': 'hud_btn_press',
+      '--hud-fold-l': 'hud_fold_light', '--hud-fold-d': 'hud_fold_dark', '--hud-div': 'hud_res_divider' };
+    if (document.documentElement.classList.contains('hud-art') || !Object.values(K).every(k => IMG(k))) return;
+    const R = document.documentElement; for (const [v, k] of Object.entries(K)) R.style.setProperty(v, `url("${IMG(k)}")`);
+    R.classList.add('hud-art');
+    [['#repPill', 'hud_ic_star'], ['#kidsPill', 'hud_ic_kids']].forEach(([q, k]) => { const el = $(q), sv = el && el.querySelector('svg'), u = IMG(k); if (sv && u) { const im = document.createElement('img'); im.src = u; im.alt = ''; sv.replaceWith(im); } });
   }
   function renderTeachersOnMap() {
     for (const k of Object.keys(TEA)) {
@@ -10826,7 +10923,7 @@ body.cam-scene #ffChip,body.cam-scene #plChip,body.cam-scene .b-ring{animation-p
         const w = Math.ceil(tw) + 12; if (r.getAttribute('width') !== String(w)) { r.setAttribute('width', w); r.setAttribute('x', -w / 2); $('.can', pq).setAttribute('transform', `translate(${w / 2 + 1} -7)`); } }
       g.setAttribute('aria-label', L >= 1 ? `${FAC[k].name} 레벨 ${L}, 눌러서 업그레이드` : `${FAC[k].name}, 눌러서 짓기`);
     }
-    renderTeachersOnMap();
+    hudArtInit(); renderTeachersOnMap();   // 4.4.1 현황판 그림
     renderOak();
     renderDeco();
     if (S.bd) for (const k of Object.keys(FAC)) conMap(k);   // 2.1.0 공사 표시
@@ -12227,7 +12324,7 @@ body.cam-scene #ffChip,body.cam-scene #plChip,body.cam-scene .b-ring{animation-p
   const BX_SPOT = [null,   // 3.3.0 새 단장: 빈 풀밭과 길가에서 서로 멀리 6곳(첫째는 물가)
     [[10, 78, 1], [79, 18, 0], [85, 64, 0], [46, 76, 0], [49, 18, 0], [28, 76, 0]],
     [[79, 20, 1], [10, 82, 0], [62, 46, 0], [49, 64, 0], [49, 80, 0], [28, 24, 0]],
-    [[80, 19.5, 1], [24, 81, 0], [52, 49.5, 0], [10, 54, 0], [56, 72, 0], [48, 27, 0]]];   // 3.3.0 건물을 빈터에 꽉 맞춘 뒤 다시 골랐어요(가장자리 단추와 건물 누르는 칸에 안 가리게, 390px와 360px 모두)   // 3.0.0 고등학교
+    [[80, 19.5, 1], [24, 81, 0], [52, 49.5, 0], [10, 62, 0], [56, 72, 0], [48, 27, 0]]];   // 3.3.0 건물을 빈터에 꽉 맞춘 뒤 다시 골랐어요(가장자리 단추와 건물 누르는 칸에 안 가리게, 390px와 360px 모두)   // 3.0.0 고등학교   // 4.4.1 현황판이 낮아져 왼쪽 단추가 올라와서 [10, 62]로 옮김(예전 [10, 54])
   // 4.0.0 구역 지도마다 6곳(구역 그림의 빈 풀밭, 첫째는 물가. 광장 구역에는 물가가 없어요). 캠퍼스 지도에는 없어요
   BX_SPOT.push([[94, 46, 1], [65, 28, 0], [61, 74, 0], [24, 82, 0], [80, 85, 0], [56, 62, 0]],
     [[80, 30, 1], [20, 52, 0], [66, 40, 0], [26, 79, 0], [80, 79, 0], [13, 62, 0]],
@@ -13540,8 +13637,8 @@ body.cam-scene #ffChip,body.cam-scene #plChip,body.cam-scene .b-ring{animation-p
        forest/rank/<내 id>   랭킹 이름과 학교 점수
        forest/stats/<내 id>  테스트 현황 (어디까지 했는지, 얼마나 했는지)
      <내 id>는 Firebase 익명 로그인이 기기(브라우저)마다 만들어 줘요. */
-  const VERSION = '4.4.0';
-  const NT_QUIET = ['2.1.20', '2.1.2.2', '2.3.0.1', '2.3.4', '3.2.3', '3.2.4', '3.2.5', '3.3.1', '3.3.2', '3.3.3'];   // 3.3.1, 3.3.2, 3.3.3(토스 먼저)도 공지 창 없이(지섭). 2.3.0.1도 공지 창 없이(공지는 그대로 2.3.0). 2.3.4도 조용히(지섭 결정). 3.2.3, 3.2.4, 3.2.5도 공지 창 없이(공지 줄을 고르지 않음)
+  const VERSION = '4.4.1';
+  const NT_QUIET = ['2.1.20', '2.1.2.2', '2.3.0.1', '2.3.4', '3.2.3', '3.2.4', '3.2.5', '3.3.1', '3.3.2', '3.3.3', '4.4.1'];   // 4.4.1도 공지 없이(지섭)   // 3.3.1, 3.3.2, 3.3.3(토스 먼저)도 공지 창 없이(지섭). 2.3.0.1도 공지 창 없이(공지는 그대로 2.3.0). 2.3.4도 조용히(지섭 결정). 3.2.3, 3.2.4, 3.2.5도 공지 창 없이(공지 줄을 고르지 않음)
     // 2.1.20 지섭 결정: 이 버전들은 업데이트해도 공지 창을 띄우지 않아요(공지는 그대로 2.1.2)
   /* 2.0.0 공지사항 (2026-10-27 지섭, 1.8.0은 이미 올려서 2.0.0부터): 설정 > 공지사항. 맨 위가 가장 새 공지예요.
      패치노트는 자동으로 넣지 않아요. 지섭이 검수한 글만 여기에 적어요(CHANGELOG.md는 자세한 기록용이라 따로 있어요).
@@ -15430,7 +15527,7 @@ body.cam-scene #ffChip,body.cam-scene #plChip,body.cam-scene .b-ring{animation-p
   const tamTeam = () => tamParty().map(sp => ({ sp, ri: tamRole(sp) })).sort((a, b) => TAM.front[a.ri] - TAM.front[b.ri]).map((x, i) => tamStat(x.sp, i));   // 앞줄부터 1번 칸
   const tamPow = () => Math.round(tamTeam().reduce((s, p) => s + p.atk * 6 / p.cd + p.hp / 4, 0));   // 화면에 보이는 '탐험대 힘'
   function tamMobs(fl, hm) {
-    const R = tamReg(fl), m = Math.min(1e250, hm ? Math.pow(TAM.g, Math.max(1, S.tam.hc || tamCap()) - 1) * Math.pow(TAM.hG, fl) : Math.pow(TAM.g, fl - 1)), boss = fl % TAM.bossEvery === 0, out = [];
+    const R = tamReg(fl), m = Math.min(1e250, hm ? Math.pow(TAM.g, Math.max(1, S.tam.hc || tamCap()) - 1 + tamStgFl()) * Math.pow(TAM.hG, fl) : Math.pow(TAM.g, fl - 1 + tamStgFl())), boss = fl % TAM.bossEvery === 0, out = [];
     if (boss) out.push({ boss: 1, nm: R.boss, i: 0, hp: TAM.mHp * m * TAM.bossHp, atk: TAM.mAtk * m * TAM.bossAtk });
     if (boss) { for (let i = 0; i < 2; i++) { const j = (fl + i) % 3; out.push({ nm: R.mob[j], i: j, hp: TAM.mHp * m, atk: TAM.mAtk * m }); } return out; }
     // 4.3.2 지섭 요청(1~9층이 늘 셋이라 지루해요): 10층 묶음 안에서 1~3층은 한 마리씩 다른 친구, 4~6층은 두 마리, 7~9층은 세 마리.
@@ -15497,7 +15594,13 @@ body.cam-scene #ffChip,body.cam-scene #plChip,body.cam-scene .b-ring{animation-p
   // 4.3.2 지섭 요청(상한은 다 닿는 선이 아니라 도전의 선): 상한을 올리고, 레벨 값의 기준점을 상한보다 TAM_REACH층 아래에 둬요.
   // 기준점까지는 싸게 편하게 가고, 그 위 상한까지는 1.13배씩 비싸져서 도토리를 건물과 탐험 중 어디에 쓸지 고르게 돼요
   // 상한: 유치원 30, 40층 / 초등 50층부터 학기마다 +5(6학년 2학기 105층) / 중 120층부터 +10(170층) / 고 185층부터 +10(235층) / 대 255층부터 +15(4학년 1학기 345층), 4학년 2학기 끝없이
-  const TAM_CAP = [{ s: 30, d: 10 }, { s: 50, d: 5 }, { s: 120, d: 10 }, { s: 185, d: 10 }, { s: 255, d: 15 }], TAM_REACH = 24;
+  // 4.4.1 지섭 결정(전 학교급 레벨로 상한이 바로 뚫려요): 학기마다 상한 오르는 폭을 두 배로, 학교급이 오르면 더 많이 열려요(숫자는 제안)
+  // 유치원 30, 40층 / 초등 50층부터 학기마다 +10(160층) / 중 180층부터 +20(280층) / 고 300층부터 +20(400층) / 대 420층부터 +30, 4학년 2학기 끝없이
+  const TAM_CAP = [{ s: 30, d: 10 }, { s: 50, d: 10 }, { s: 180, d: 20 }, { s: 300, d: 20 }, { s: 420, d: 30 }], TAM_REACH = 24;
+  // 4.4.1 학기(유치원은 해)마다 장난꾸러기가 TAM_STG층치씩 세져요. 지난 학기에 올려 둔 레벨로 새 상한이 바로 뚫리지 않게(숫자는 제안)
+  const TAM_STG = 15;
+  const tamStageAll = () => { let n = 0; for (let t = 0; t < S.tier; t++) n += t === 0 ? TIERS[t].years : TIERS[t].years * 2; return n + tamStageIn(); };
+  const tamStgFl = () => TAM_STG * tamStageAll();
   const tamStageIn = () => { const T = TIERS[S.tier], y = Math.min(yearNo(), T.years) - 1; return S.tier === 0 ? y : y * 2 + (S.sem ? 1 : 0); };   // 학교급 안에서 몇째 단계(유치원은 해마다, 그 밖에는 학기마다)
   const tamCapAt = (t, k) => { const C = TAM_CAP[Math.min(t, TAM_CAP.length - 1)]; return C.s + C.d * k; };
   function tamCap() {
@@ -15513,15 +15616,15 @@ body.cam-scene #ffChip,body.cam-scene #plChip,body.cam-scene .b-ring{animation-p
     const P = TIERS[S.tier - 1]; return tamCapAt(S.tier - 1, S.tier - 1 === 0 ? P.years - 1 : P.years * 2 - 1);
   }
   const tamCapped = () => S.tam.best >= tamCap();
-  // 4.3.3 심화 탐험: 그 학기 상한에 닿으면 열려요. 상한이 오르면(다음 학기) 새 기준으로 1층부터
+  // 4.3.3 심화 탐험: 그 학기 상한에 닿으면 열려요. 4.4.1부터 상한이 올라도 심화 층은 남고, 세기만 새 상한에 맞춰요
   const tamHOpen = () => !!S && !!S.tam && isFinite(tamCap()) && S.tam.best >= tamCap();
-  function tamHSync() { const c = tamCap(); if (isFinite(c) && S.tam.hc !== c) { S.tam.hc = c; S.tam.hb = 0; } if (S.tam.hm && !tamHOpen()) S.tam.hm = 0; }
+  function tamHSync() { const c = tamCap(); if (isFinite(c) && S.tam.hc !== c) S.tam.hc = c; if (S.tam.hm && !tamHOpen()) S.tam.hm = 0; }   // 4.4.1 지섭 결정: 상한이 바뀌어도 심화 층은 그대로(세기는 새 상한에 맞춰 세져요)
   const tamHOn = () => !!(S.tam.hm && tamHOpen());
   const tamCurFl = () => tamHOn() ? S.tam.hb + 1 : S.tam.best + 1;
   const tamFlTx = (fl, hm) => `${hm ? '심화 ' : ''}${fmt(fl)}층`;
   const tamCapMsg = () => `${fmt(tamCap())}층까지 왔어요!\n심화 탐험이 열렸어요`;
   const tamReach = () => S.tier >= 4 ? 36 : TAM_REACH;   // 4.3.3 지섭 결정(대학교 1학년에 너무 빨리 닿아요): 대학교만 상한보다 36층 아래(숫자는 제안)
-  const tamLvRef = () => { const c = tamCap(), k = isFinite(c) ? c : tamCapAt(S.tier, tamStageIn() - 1) + 15; return Math.max(0, Math.round((k - tamReach() - 22) / 1.5)); };   // 4.3.2 편하게 가는 층(상한 - 24층)에 드는 레벨
+  const tamLvRef = () => { const c = tamCap(), k = (isFinite(c) ? c : tamCapAt(S.tier, tamStageIn() - 1) + 30) + tamStgFl(); return Math.max(0, Math.round((k - tamReach() - 22) / 1.5)); };   // 4.4.1 학기마다 세지는 만큼 기준 레벨도   // 4.3.2 편하게 가는 층(상한 - 24층)에 드는 레벨
   const tamBaseRate = () => 30 * CFG.base * CFG.pace * incomeScale() * Math.pow(CFG.gradeMult, 2) * legacyMult() * (S.sem ? 1.2 : 1);   // 초당 기준 수업료(2학기는 1.2배)
   const tamAcorns = m => Math.max(10, nice(tamBaseRate() * 60 * tierMinutes(m)));
   // 4.3.2 지섭 요청(누를 게 너무 많아요): 한 번에 여러 레벨. n은 1, 10, 또는 Infinity(가진 도토리로 되는 만큼, 한 번에 500까지)
@@ -15566,7 +15669,7 @@ body.cam-scene #ffChip,body.cam-scene #plChip,body.cam-scene .b-ring{animation-p
       got.push(['나무', '은빛', '금빛'][c - 1] + ' 보물 상자');
     }
     if (fl % 100 === 0) { addGold(1); got.push('황금 도토리 +1'); }
-    if (got.length) tamToast(`${fl}층 통과!\n${got.join('\n')}`);
+    if (got.length) { if (rt.tamQ) rt.tamQ.push(...got); else tamToast(`${fl}층 통과!\n${got.join('\n')}`); }
     if (fl % 10 === 0) save();
     tamLiveDots();
   }
@@ -15586,9 +15689,38 @@ body.cam-scene #ffChip,body.cam-scene #plChip,body.cam-scene .b-ring{animation-p
     add(R.mat, Math.round(TAM.hMat * (2 + Math.floor((S.tam.hc + fl) / 40)))); if (fl % 5 === 0) add(3, 1);
     if (fl % TAM.bossEvery === 0) { const ps = tamParty(); if (tamStarOn() && ps.length) { const sp = ps[Math.floor(Math.random() * ps.length)]; tamShard(sp, 1); got.push(`${spName(sp)} 별 조각 +1`); } else { add(3, 2); got.push(`${TAM.mats[3]} +2`); } }
     if (fl % 50 === 0) { for (let i = 0; i < 4; i++) add(i, i === 3 ? 10 : 30); const ps = tamParty(); if (ps.length) tamShard(ps[Math.floor(Math.random() * ps.length)], 3); got.push('금빛 보물 상자'); }
-    if (got.length) tamToast(`심화 ${fl}층 통과!\n${got.join('\n')}`);
+    if (got.length) { if (rt.tamQ) rt.tamQ.push(...got); else tamToast(`심화 ${fl}층 통과!\n${got.join('\n')}`); }
     if (fl % 10 === 0) save();
     tamLiveDots();
+  }
+  /* 4.4.1 지섭 요청: 탐험 화면을 보지 않을 때는 마지막으로 넘은 층만 되풀이하고, 층은 화면을 볼 때만 올라가요.
+     되풀이한 층은 기본 보상(재료와 도토리, 심화는 재료)만 받아요. 큰 장난꾸러기 정수, 보물 상자, 황금 도토리, 랭킹은 처음 넘을 때만 */
+  const tamWatch = () => rt.tab === 'tam' && !document.hidden;
+  const tamRepFl = () => Math.max(1, tamCurFl() - 1);
+  function tamWinRep(fl, hm) {
+    const R = tamReg(fl), add = (i, v) => { S.tam.mat[i] = Math.min(1e12, S.tam.mat[i] + v); };
+    if (hm) add(R.mat, Math.round(TAM.hMat * (2 + Math.floor((S.tam.hc + fl) / 40))));
+    else { add(R.mat, 2 + Math.floor(fl / 40)); const a = minAcorns(0.5); S.budget += a; earn(a); }
+    tamLiveDots();
+  }
+  /* 4.4.1 지섭 요청: 빠른 스킵. 지금 층부터 위로, 대원 한 번 공격(필살기 말고 보통 공격)으로 모든 장난꾸러기가 쓰러지는 층까지만 한 번에 넘어가요.
+     유리한 과목 덤은 빼고 셈(지역이 바뀌어도 안전하게). 넘은 층은 하나하나 이긴 것과 같은 보상, 사건은 없어요. 한 번에 1000층까지 */
+  function tamSkipTo() {
+    if (!tamOn() || !tamParty().length) return 0;
+    tamHSync(); const hm = tamHOn(), cur = tamCurFl(), cap = hm ? Infinity : tamCap(), adv = tamAdvRi(), cr = S.tam.cheer > 0 ? TAM.cheer.mul : 1;
+    if (!hm && tamCapped()) return 0;
+    const one = tamTeam().reduce((m, p) => Math.max(m, p.atk * cr / (p.ri === adv ? 1 + TAM.advG : 1) * [0.5, 1, 0.8, 0.8, 1][p.ri]), 0);
+    let fl = cur - 1;
+    while (fl - cur < 999 && fl + 1 <= cap) { const M = tamMobs(fl + 1, hm); if (!M.every(m => m.hp <= one)) break; fl++; }
+    return fl - cur + 1 >= 2 ? fl : 0;   // 두 층 이상일 때만
+  }
+  function tamSkipGo() {
+    const to = tamSkipTo(); if (!to) { tamToast('지금은 빠르게 넘을 층이 없어요'); return; }
+    const hm = tamHOn(), from = tamCurFl(); rt.tamQ = [];
+    try { for (let f = from; f <= to; f++) { if (hm) tamWinH(f); else tamWin(f); if (!hm && S.tam.cheer > 0) S.tam.cheer -= 1; } }
+    finally { const got = rt.tamQ; rt.tamQ = null; const n = {}; got.forEach(g => { n[g] = (n[g] || 0) + 1; });
+      sfx('coin'); save(); rankDirty(); tamRestart(); tamRenderTop(); tamRenderBody();
+      tamToast(`${tamFlTx(from, hm)}부터 ${fmt(to)}층까지 빠르게 넘었어요!` + (got.length ? '\n' + Object.keys(n).slice(0, 4).map(k => n[k] > 1 ? `${k} ×${n[k]}` : k).join('\n') : '')); }
   }
   // 자리 비운 동안의 탐험 보고서: 가장 깊은 층에서 계속 모아요(최대 12시간)
   function tamIdle() {
@@ -15645,12 +15777,14 @@ body.cam-scene #ffChip,body.cam-scene #plChip,body.cam-scene .b-ring{animation-p
     if (ph === 'walk' && !hm && tamCapped()) { T.ph = 'cap'; T.F = null; if (vis) { tamWalk(fl); $('#tmP') && $('#tmP').classList.remove('walking'); tamRibbon('clear', tamCapMsg()); tamRenderTop(); } return; }   // 4.3.1 학년 상한
     if (ph === 'walk') { T.F = null; if (vis) tamWalk(fl); }
     else if (ph === 'meet') {
-      T.F = tamFight(fl, tamTeam(), S.tam.cheer > 0 ? TAM.cheer.mul : 1, T.mod, hm); T.F.cheer = S.tam.cheer > 0 ? 1 : 0; T.mod = null;   // 4.3.1 응원
+      const rep = !tamWatch() && !T.mod; T.F = tamFight(rep ? tamRepFl() : fl, tamTeam(), !rep && S.tam.cheer > 0 ? TAM.cheer.mul : 1, T.mod, hm); T.F.cheer = !rep && S.tam.cheer > 0 ? 1 : 0; T.F.rep = rep ? 1 : 0; T.mod = null;   // 4.3.1 응원, 4.4.1 화면 밖이면 마지막으로 넘은 층을 되풀이
       if (vis) { tamBuild(); tamAlert(); tamCam(true, T.F.M[0].boss); if (T.F.M[0].boss) { tamRibbon('boss', '큰 장난꾸러기가 나타났어요!'); const w = $('#tmWarn'); if (w && !rt.reduced) { w.hidden = false; $$('i', w).forEach(i => { i.style.animation = 'none'; void i.offsetWidth; i.style.animation = ''; }); clearTimeout(w._t); w._t = setTimeout(() => { w.hidden = true; }, 1500); } } }
     }
     else if (ph === 'win') {
-      const f = T.F.fl, hard = T.F.hard; T.nLose = 0; T.lose = 0; if (T.F.cheer && S.tam.cheer > 0) S.tam.cheer -= 1; if (T.F.hm) tamWinH(f); else tamWin(f); if (hard) tamWinHard(f);
-      T.ev = !T.F.hm && f % TAM.bossEvery && Math.random() < TAM.evP ? tamEvRoll(f) : null;
+      const f = T.F.fl, hard = T.F.hard, rep = T.F.rep || (!tamWatch() && f >= tamCurFl()); T.nLose = 0; T.lose = 0;
+      if (rep) { tamWinRep(T.F.rep ? f : tamRepFl(), T.F.hm); T.ev = null; }   // 4.4.1 화면 밖에서는 층이 오르지 않아요
+      else { if (T.F.cheer && S.tam.cheer > 0) S.tam.cheer -= 1; if (T.F.hm) tamWinH(f); else tamWin(f); if (hard) tamWinHard(f);
+      T.ev = !T.F.hm && f % TAM.bossEvery && Math.random() < TAM.evP ? tamEvRoll(f) : null; }
       if (vis) { tamRibbon('clear', `${tamFlTx(f, T.F.hm)} 통과!`); tamRenderTop(); tamVictory(f); tamCam(false); }
     }
     else if (ph === 'event') { if (vis) tamEvShow(T.ev); }
@@ -15905,13 +16039,14 @@ body.cam-scene #ffChip,body.cam-scene #plChip,body.cam-scene .b-ring{animation-p
   function tamSkStop() {
     if (SKQ.raf) cancelAnimationFrame(SKQ.raf);
     Object.assign(SKQ, { list: [], t0: performance.now(), shift: 0, end: 0, cutEnd: 0, raf: 0 });
-    const c = $('#tmCut'), st = $('#tmStage'); if (c) c.hidden = true;
+    const c = $('#tmCut'), st = $('#tmStage'); if (c) c.hidden = true; $('#panelTam').classList.remove('tm-cutting');
     if (st) st.classList.remove('skdim'); if (SKQ.el) { SKQ.el.classList.remove('charge'); SKQ.el = null; }
   }
   const TM_GC = { sci: '#3FB8FF', pe: '#FF8A2A', kor: '#5CCB4A', art: '#FF5FB0', math: '#FFC21E' };   // 4.3.3 모으기 빛 색
   function tamCutIn(ri, sp) {
     const c = $('#tmCut'), pic = IMG(`ex4_pc_${sp}_sk`) || tamI(`ex_pc_${sp}_act`) || IMG('chr_' + sp), cb = IMG(`ex4_cut_${TAM.role[ri].k}`);
-    c.hidden = false; c.dataset.r = TAM.role[ri].k; c.style.setProperty('--cd', TAM.skCut + 'ms');
+    c.hidden = false; $('#panelTam').classList.add('tm-cutting'); c.dataset.r = TAM.role[ri].k;   // 4.4.1 지섭: 컷인 동안 오른쪽 단추는 잠깐 숨겨요
+    c.style.setProperty('--cd', TAM.skCut + 'ms');
     c.classList.toggle('x4', !!cb); c.style.backgroundImage = cb ? `url("${cb}")` : '';   // 4.4.0 과목 컷인 띠(작업지시서 77)
     setH(c, `${pic ? `<img src="${pic}" alt="">` : ''}<span><small>${esc(TAM.role[ri].nm.split(' ')[0])} 필살기</small><b>${esc(TM_SK[ri].n)}!</b></span>`);
     c.style.animation = 'none'; void c.offsetWidth; c.style.animation = '';
@@ -15938,7 +16073,7 @@ body.cam-scene #ffChip,body.cam-scene #plChip,body.cam-scene .b-ring{animation-p
     });
     // 2. 컷인: 들어와서 멈춰 이름을 읽고 빠져나가요
     if (!off) { skAt(t0 + TAM.skCharge, () => { tamCutIn(ri, p.sp); buzz(25); });
-      skAt(cutEnd, () => { $('#tmCut').hidden = true; if (el) el.classList.remove('charge');
+      skAt(cutEnd, () => { $('#tmCut').hidden = true; $('#panelTam').classList.remove('tm-cutting'); if (el) el.classList.remove('charge');
         if (!seen) { S.tam.skSeen |= 1 << ri; save(); tamRenderTop(); } }); }
     skAt(SKQ.end, () => { if (skNow() >= SKQ.end - 5) st.classList.remove('skdim'); });
     if (!el) return { hit: hitAt, heal: healAt };
@@ -16088,6 +16223,8 @@ body.cam-scene #ffChip,body.cam-scene #plChip,body.cam-scene .b-ring{animation-p
     rb(sb, 'ex4_ic_speed', tamSpdOn() ? hms(S.tam.spd.sec * 1000) : '2배속', `${left}`, !tamSpdOn() || left > 0, tamSpdOn() ? `2배속 ${hms(S.tam.spd.sec * 1000)} 남음` : `광고 보고 2배속 ${TAM.adSpd.min}분, 오늘 ${left}번 남음`);
     const ab = $('#tmAuto'); ab.hidden = !tamAutoOn(); ab.setAttribute('aria-pressed', S.tam.auto ? 'true' : 'false'); rb(ab, 'ex4_ic_auto', S.tam.auto ? '자동 켬' : '자동 끔', '', false, S.tam.auto ? '필살기 자동 켬' : '필살기 자동 끔');
     { const so = $('#tmSkOff'); so.hidden = !S.tam.skSeen; so.setAttribute('aria-pressed', S.tam.skOff ? 'true' : 'false'); rb(so, 'ex4_ic_report', S.tam.skOff ? '연출 끔' : '연출 켬', '', false, S.tam.skOff ? '필살기 연출 건너뛰기 켬' : '필살기 연출 건너뛰기 끔'); }   // 4.3.3 필살기를 한 번 본 뒤에 생겨요
+    { const sk = $('#tmSkip'), to = tamSkipTo(); sk.hidden = !to; if (to) { rb(sk, 'ex_flag', '빠른 스킵', `${fmt(to)}층`, false, `빠른 스킵: ${fmt(to)}층까지 한 번에 넘어가요`);   // 4.4.1
+      if (rt.tamSkTo !== to && (!rt.tamSkTo || to > rt.tamSkTo + 9)) tamToast(`누르면 ${fmt(to)}층까지 빠른 스킵이 가능해요`); } rt.tamSkTo = to; }
     const T = rt.tam, rv = $('#tmRevive'), cl = tamCheerLeft(); rv.hidden = !(S.tam.cheer > 0 || (T && T.lose && cl > 0));   // 4.3.1 지면 응원 단추, 응원 중에는 남은 층
     rb(rv, 'ex4_ic_cheer', S.tam.cheer > 0 ? `${S.tam.cheer}층` : '응원', S.tam.cheer > 0 ? '' : `${cl}`, S.tam.cheer <= 0, S.tam.cheer > 0 ? `응원 ${S.tam.cheer}층 남음` : `광고 보고 응원 받기 힘 +${Math.round((TAM.cheer.mul - 1) * 100)}%, 오늘 ${cl}번 남음`); rv.classList.toggle('on', S.tam.cheer > 0);
     tamAcorn(true);
@@ -16196,9 +16333,8 @@ body.cam-scene #ffChip,body.cam-scene #plChip,body.cam-scene .b-ring{animation-p
   }
   // 4.4.0 위 칸 도토리(탐험 화면을 볼 때만 바꿔요)
   function tamAcorn(force) {
-    const e = $('#tmAcN'); if (!e) return; const t = fmt(S.budget); if (!force && e.textContent === t) return;
-    const up = rt.tamAc != null && S.budget > rt.tamAc * 1.0001; e.textContent = t; rt.tamAc = S.budget;
-    if (up && !force) { const a = $('#tmAc'); a.classList.remove('bump'); void a.offsetWidth; a.classList.add('bump'); }
+    const e = $('#tmAcN'); if (!e) return; const t = fmt2(S.budget); if (!force && e.textContent === t) return;
+    e.textContent = t; rt.tamAc = S.budget; e.style.fontSize = ''; let z = parseFloat(getComputedStyle(e).fontSize); while (e.scrollWidth > e.clientWidth + 0.5 && z > 9) { z -= 0.5; e.style.fontSize = z + 'px'; }   // 글자가 바뀔 때만(0.4초마다 한 번까지) 칸에 맞춰요   // 4.4.1 지섭: 들썩임 없이, 홈처럼 두 단위까지
   }
   // 4.4.0 대원 레벨이 오르면 무대 위 그 대원 발밑에서 금빛 기둥(ex4_fx_levelup)
   function tamLvFx(sps) {
@@ -16233,6 +16369,7 @@ body.cam-scene #ffChip,body.cam-scene #plChip,body.cam-scene .b-ring{animation-p
     if (b.dataset.tlv) { const sp = b.dataset.tlv, inRec = !!b.closest('.tm-rec'), n = tamLvBuy(sp, inRec ? 1 : (rt.tamLvN || 1)); if (!n) return; tamLvFx([sp]); tamRestartStat(); sfx('coin'); buzz(10); save(); renderHUD(); tamRenderTop(); tamRenderBody(); if (n > 1) tamToast(`${spName(sp)} 레벨 +${n}`); return; }
     if (b.dataset.tgear) { const [si, k] = b.dataset.tgear.split(':'), i = +si; if (!S.tam.sg[i] || !(k in S.tam.sg[i]) || i >= tamSlots()) return; const c = tamGearCost(k, i); if (S.tam.mat[c.m] < c.n || S.tam.mat[3] < c.star) return; S.tam.mat[c.m] -= c.n; S.tam.mat[3] -= c.star; S.tam.sg[i][k] += 1; tamRestartStat(); sfx('coin'); save(); tamRenderTop(); tamRenderBody(); return; }
     if (b.id === 'tmSpd') { tamAdSpd(); return; }
+    if (b.id === 'tmSkip') { tamSkipGo(); return; }
     if (b.id === 'tmAuto') { S.tam.auto = S.tam.auto ? 0 : 1; sfx('tap'); save(); tamRenderTop(); return; }
     if (b.id === 'tmRevive') { tamAdRevive(); return; }
     if (b.id === 'tmRep') { tamReport(false); return; }
@@ -20915,7 +21052,27 @@ body.cam-scene #ffChip,body.cam-scene #plChip,body.cam-scene .b-ring{animation-p
     }
     cur.helps.squirrel -= 1; return out;
   }
-  function pzHelpOwl(cur) { if (!pzHasHelp(cur, 'owl')) return false; cur.tray = cur.tray.map(() => pzNewPiece(cur)); cur.helps.owl -= 1; return true; }
+  /* 4.4.1 지섭 요청: 부엉이 조각 바꾸기는 되도록 꼭 필요한 조각으로. 조각마다 후보 여러 개를 놓아 보고
+     줄을 가장 많이 지우는 조각, 없으면 놓을 자리가 있는 조각을 골라요. 세 조각이 같은 모양만 나오지 않게 겹치면 다음 후보 */
+  function pzBestLines(b, c) {
+    let best = -1;
+    for (let r = 0; r < PZ.N; r++) for (let cc = 0; cc < PZ.N; cc++) {
+      if (!pzFits(b, c, r, cc)) continue;
+      const t = b.slice(); for (const [dr, dc] of c) t[(r + dr) * PZ.N + cc + dc] = 1;
+      const L = pzFullLines(t), n = L.rows.length + L.cols.length; if (n > best) best = n;
+    }
+    return best;   // -1이면 놓을 데가 없어요
+  }
+  function pzSmartPiece(cur, used) {
+    let pick = null, ps = -2;
+    for (let i = 0; i < 24; i++) {
+      const p = pzNewPiece(cur), k = JSON.stringify(p.c); if (used.has(k) && i < 23) continue;
+      const sc = pzBestLines(cur.b, p.c) + p.c.length * 0.01;   // 같은 줄 수면 큰 조각이 조금 먼저
+      if (sc > ps) { ps = sc; pick = p; }
+    }
+    used.add(JSON.stringify(pick.c)); return pick;
+  }
+  function pzHelpOwl(cur) { if (!pzHasHelp(cur, 'owl')) return false; const used = new Set(); cur.tray = cur.tray.map(() => pzSmartPiece(cur, used)); cur.helps.owl -= 1; return true; }
   function pzHelpBear(cur, slot) {
     const p = cur.tray[slot]; if (!p || !pzHasHelp(cur, 'bear')) return false;
     // 돌리면 칸 순서가 바뀌니 선생님 블록이 어느 칸인지 따라가요
@@ -21138,7 +21295,7 @@ body.cam-scene #ffChip,body.cam-scene #plChip,body.cam-scene .b-ring{animation-p
     $('#pzScore').textContent = fmt(cur.score);
     $('#pzBest').textContent = fmt(Math.max(S.pz.best, cur.score));
     $('#pzEssNow').textContent = cur.rw ? fmt(pzEssOf(cur.score) + cur.ess) : '연습';
-    const cb = $('#pzCombo'); if (cb) { const on = cur.combo >= 1; cb.hidden = !on; if (on) cb.textContent = `콤보 ×${Math.min(4, 1 + 0.5 * cur.combo).toFixed(1).replace('.0', '')} (${PZ.comboGrace - (cur.miss || 0)}번 안에 지우기)`; }
+    const cb = $('#pzCombo'); if (cb) { const on = cur.combo >= 1; cb.hidden = !on; if (on) cb.textContent = `콤보 ×${Math.min(4, 1 + 0.5 * cur.combo).toFixed(1).replace('.0', '')} (${PZ.comboGrace - (cur.miss || 0)}번)`; }
   }
   function pzRenderAsk() {
     const cur = S.pz.cur; if (!cur || !cur.ask) return;
@@ -21216,7 +21373,7 @@ body.cam-scene #ffChip,body.cam-scene #plChip,body.cam-scene .b-ring{animation-p
     const inner = d.firstChild;
     inner.style.transformOrigin = `${w * cell / 2}px ${h * cell}px`;
     // 손가락은 조각 아래쪽 가운데를 잡은 것으로 보고, 조각을 손가락보다 한 칸 남짓 위에 띄워요
-    pzUI.drag = { slot, p, w, h, cell, offX: w * cell / 2, offY: h * cell + cell * 0.9, pid: e.pointerId, at: -1, inner, x: 0, y: 0 };
+    pzUI.drag = { slot, p, w, h, cell, offX: w * cell / 2, offY: h * cell + cell * 1.25, pid: e.pointerId, at: -1, inner, x: 0, y: 0 };
     $$('#pzTray .pz-slot')[slot].classList.add('lift');
     try { e.target.setPointerCapture && e.target.setPointerCapture(e.pointerId); } catch (x) { /* 무시 */ }
     sfx('tap'); buzz(8);
@@ -21228,9 +21385,11 @@ body.cam-scene #ffChip,body.cam-scene #plChip,body.cam-scene .b-ring{animation-p
     dg.x = x; dg.y = y;
     $('#pzDrag').style.transform = `translate(${x}px, ${y}px)`;
     const rect = pzGridRect();
-    const c = Math.round((x - rect.gl) / rect.cell), r = Math.round((y - rect.gt) / rect.cellY);
+    const fc = (x - rect.gl) / rect.cell, fr = (y - rect.gt) / rect.cellY;
     const cur = S.pz.cur;
-    const ok = pzFits(cur.b, dg.p.c, r, c);
+    // 4.4.1 지섭 요청(조작이 불편해요): 딱 맞는 칸이 아니어도 한 칸 남짓 안에서 가장 가까운 놓을 자리로 붙어요
+    let r = Math.round(fr), c = Math.round(fc), ok = pzFits(cur.b, dg.p.c, r, c);
+    if (!ok) { let bd = 0.95 * 0.95; for (let rr = Math.floor(fr) - 1; rr <= Math.ceil(fr) + 1; rr++) for (let cc = Math.floor(fc) - 1; cc <= Math.ceil(fc) + 1; cc++) { const d = (rr - fr) ** 2 + (cc - fc) ** 2; if (d < bd && pzFits(cur.b, dg.p.c, rr, cc)) { bd = d; r = rr; c = cc; ok = true; } } }
     const at = ok ? r * PZ.N + c : -1;
     // 자석: 놓을 수 있으면 조각이 그 칸에 딱 붙어 보여요
     if (ok) { const sx = rect.gl + c * rect.cell - x, sy = rect.gt + r * rect.cellY - y; dg.inner.style.transform = `translate(${sx}px, ${sy}px)`; }
@@ -25372,6 +25531,7 @@ body.cam-scene #ffChip,body.cam-scene #plChip,body.cam-scene .b-ring{animation-p
     $('#panelQuests').hidden = t !== 'quests';
     $('#panelTeachers').hidden = t !== 'teachers';
     $('#panelGrad').hidden = t !== 'grad';
+    if (t === 'tam' && rt.tam && rt.tam.F && rt.tam.F.rep) tamRestart();   // 4.4.1 되풀이 층에서 지금 층으로
     $('#app').classList.toggle('tam-full', t === 'tam'); if (t !== 'tam') { const sh = $('#tmSheet'); if (sh) sh.hidden = true; }   // 4.4.0 탐험 전체 화면
     $('#panelTam').hidden = t !== 'tam'; if (t === 'tam') { tamOpen(); $('#panelTam').scrollTop = 0; const td = $('#tamDot'); if (td) td.hidden = true; }   // 4.3.0 숲속 탐험대
     $('#panelSettings').hidden = t !== 'settings';
@@ -28467,7 +28627,7 @@ body.cam-scene #ffChip,body.cam-scene #plChip,body.cam-scene .b-ring{animation-p
   }
 
   // 시험용 손잡이: 자동 시험(window.__FOREST_TEST)에서만 게임 속 함수를 꺼내 써요
-  if (window.__FOREST_TEST) window.__forest = { get S() { return S; }, get rt4() { return rt; }, tamBg, teaOff, geo, qMeasure, IMG, tamHOn, tamHOpen, tamCurFl, tamWinH, tamHf, tamHRankDoc, tamSkBusy, tamReach, get SKQ() { return SKQ; }, esAxGain, esAxLeft, ESHOP, tamLvPlan, tamLvBuy, tamLvAll, mapUrl, mapBase, tamCheerLeft, tamAdRevive, tamCap, tamCapped, tamLvRef, tamBaseRate, tamLvCost, tamStageIn, musicWant, tamPh, tamEvPick, tamAutoTeam, tamUpRec, MAIN, startSports, GEO, claimAchAll, ACH, btMake, btBest, btRoster, btRoll, btWin, btOppCheer, BT, BT_LG, stPrev, get Rank() { return Rank; }, tamRankDoc, tamTf, tamAdSpd, tamReport, tamRepTake, tamAdRevive, renderRankPanel, TAM, tamSim, tamTeam, tamStat, tamMobs, tamWin, tamIdle, tamCollect, tamParty, tamShard, tamPow, tamFight, tamStep, TAM, tamSim, tamTeam, tamStat, tamMobs, tamWin, tamIdle, tamCollect, tamShard, tamParty, tamPow, tamLvCost, tamOpen, setZone, geo, stPlay, stNext, ST, ST_SIDE, SIDE, missionGo, MGO, MGO_MINI, MGO_Q, renderMissions, renderPass, BOOST, conLeft, gameToday, setTab, ADX, adStamp, adxDay, adxCan, adxMore, adPickNow, adPickGive, conNear, renderAdStamp, claimOfflineDouble, startBoost, openBoost, showOffline, fvBoothStart, bfFwStart, musicWant, renderCounsel, renderXg, renderFv, showCeremony, RX, rxPct, rxCost, rxUp, rxPart, renderDept, goldOr, goldRich, adGold, stampAtt, GOLD, BIG, BF_DECO, bfWin, bfNext, bfOn, bfFw, bfSync, bfStamp, bfFwStart, bfPart, bfNextTx, sanitizeBf, freshBf, fvBoothMax, bldBox, bldPick, bldWarm, DECO_SLOTS, XG, MK, ST, SIDE, ST_SIDE, wdMap, xgOn, xgGuest, xgSpots, xgGreet, xgVisit, xgLunch, openXg, mkOn, mkHot, mkSell, mkBuy, mkSur, openMk, wdBar, wdTick, stTick, stPlay, stNext, stPick, stEnd, stTags, openSb, renderSb, sideCan, sideMap, fvFlag, FV, FV_POS, fvOn, fvOpen, fvBonus, fvSync, fvStamp, fvGuests, openFv, renderFv, fvMeet, fvBoothStart, fvMap, fvTip, festDef, goTo, navInfo, openShop, gdReady, thPreview, thPreviewEnd, thOn, busScene, tripCrowd, openTrip, startTrip, claimTrip, TRIPS, mgPickMul, mgPickMode, mgUpOrder, mgFillOrders, mgAdAsk, sportsCon, festCon, btQuota, btCanAd, btAdMore, warmRooms, blobUrl, vdSize, vdBlock, pzSweep, pzSwGain, pzSwOpen, pzXpOf, mgMulMax, mgMulOk, mgMul, mgModeTap, acTip, kidDupIdx, trialSafe, closeAd,
+  if (window.__FOREST_TEST) window.__forest = { get S() { return S; }, get rt4() { return rt; }, tamSkipTo, tamSkipGo, tamWinRep, tamRepFl, tamRenderTop, tamBg, teaOff, geo, qMeasure, IMG, tamHOn, tamHOpen, tamCurFl, tamWinH, tamHf, tamHRankDoc, tamSkBusy, tamReach, get SKQ() { return SKQ; }, esAxGain, esAxLeft, ESHOP, tamLvPlan, tamLvBuy, tamLvAll, mapUrl, mapBase, tamCheerLeft, tamAdRevive, tamCap, tamCapped, tamLvRef, tamBaseRate, tamLvCost, tamStageIn, musicWant, tamPh, tamEvPick, tamAutoTeam, tamUpRec, MAIN, startSports, GEO, claimAchAll, ACH, btMake, btBest, btRoster, btRoll, btWin, btOppCheer, BT, BT_LG, stPrev, get Rank() { return Rank; }, tamRankDoc, tamTf, tamAdSpd, tamReport, tamRepTake, tamAdRevive, renderRankPanel, TAM, tamSim, tamTeam, tamStat, tamMobs, tamWin, tamIdle, tamCollect, tamParty, tamShard, tamPow, tamFight, tamStep, TAM, tamSim, tamTeam, tamStat, tamMobs, tamWin, tamIdle, tamCollect, tamShard, tamParty, tamPow, tamLvCost, tamOpen, setZone, geo, stPlay, stNext, ST, ST_SIDE, SIDE, missionGo, MGO, MGO_MINI, MGO_Q, renderMissions, renderPass, BOOST, conLeft, gameToday, setTab, ADX, adStamp, adxDay, adxCan, adxMore, adPickNow, adPickGive, conNear, renderAdStamp, claimOfflineDouble, startBoost, openBoost, showOffline, fvBoothStart, bfFwStart, musicWant, renderCounsel, renderXg, renderFv, showCeremony, RX, rxPct, rxCost, rxUp, rxPart, renderDept, goldOr, goldRich, adGold, stampAtt, GOLD, BIG, BF_DECO, bfWin, bfNext, bfOn, bfFw, bfSync, bfStamp, bfFwStart, bfPart, bfNextTx, sanitizeBf, freshBf, fvBoothMax, bldBox, bldPick, bldWarm, DECO_SLOTS, XG, MK, ST, SIDE, ST_SIDE, wdMap, xgOn, xgGuest, xgSpots, xgGreet, xgVisit, xgLunch, openXg, mkOn, mkHot, mkSell, mkBuy, mkSur, openMk, wdBar, wdTick, stTick, stPlay, stNext, stPick, stEnd, stTags, openSb, renderSb, sideCan, sideMap, fvFlag, FV, FV_POS, fvOn, fvOpen, fvBonus, fvSync, fvStamp, fvGuests, openFv, renderFv, fvMeet, fvBoothStart, fvMap, fvTip, festDef, goTo, navInfo, openShop, gdReady, thPreview, thPreviewEnd, thOn, busScene, tripCrowd, openTrip, startTrip, claimTrip, TRIPS, mgPickMul, mgPickMode, mgUpOrder, mgFillOrders, mgAdAsk, sportsCon, festCon, btQuota, btCanAd, btAdMore, warmRooms, blobUrl, vdSize, vdBlock, pzSweep, pzSwGain, pzSwOpen, pzXpOf, mgMulMax, mgMulOk, mgMul, mgModeTap, acTip, kidDupIdx, trialSafe, closeAd,
     TKE, TK_Q, tkDaily, nbAllDay, nbBuildAt, nbOn, conAdd, BX_SPOT, PERKS, offlineCapH, applyAway, pzFinish, mgClaimOrder,
     CS, JOBS, CS_WORRY, freshCs, csOpen, csLeft, csMax, csEnsure, csCands, csNeed, csMul, csOpenCards, csReady, csDone, csTalkMake, csAnswer, csChoose, csSettle, openCounsel, renderCounsel, renderHall, MAIN, qMeasure, qGoal, sanitize,   // 3.1.0 진로 상담
     NSL, nsStart, nsSettle, nsOpen, nsOn, nsOverlap, nsExtraH, isNight, nightDayOf, openNs, renderNs, bxSpots, renderNight,   // 3.0.0
