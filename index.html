@@ -2,7 +2,7 @@
 <html lang="ko">
 <head>
 <meta charset="utf-8">
-<meta name="forest-version" content="4.3.2">
+<meta name="forest-version" content="4.3.2.1">
 <meta name="viewport" content="width=device-width, initial-scale=1">
 <meta name="description" content="도토리를 모아 숲속 학교를 키우는 방치형 게임 테스트판이에요.">
 <style>html,body{margin:0}</style>
@@ -710,6 +710,8 @@ label.srow,button.srow{cursor:pointer}
 .tm-lvn button[aria-pressed="true"]{background:#F6C94F;color:#4A2E0A;box-shadow:inset 0 0 0 1.5px #E2A92A}
 .tm-hold{display:block;margin:-2px 2px 8px;font-size:11px;font-weight:600;color:#C06A1E}.tm-rec .tm-hold{margin:1px 0 0;font-size:10.5px}
 .tm-lvk{font-style:normal;font-weight:800;margin-right:3px;font-size:11px}
+/* 4.3.2.1 지섭 제보(안드로이드에서 레벨 단추를 꾹 누르면 복사 창이 떠요): 탐험 화면은 길게 눌러도 글 고르기, 그림 저장 창이 뜨지 않게 */
+#panelTam,#panelTam *{-webkit-user-select:none;user-select:none;-webkit-touch-callout:none}#panelTam [data-tlv]{touch-action:none}#panelTam [data-tlv] img,#panelTam [data-tlv] svg{pointer-events:none;-webkit-user-drag:none}
 @keyframes tmCoin{50%{filter:brightness(1.07) saturate(1.1)}}
 @media (prefers-reduced-motion:reduce){.tabs .tab.tab-tam,.app.on-school .tabs > .tab.tab-tam{animation:none}}
 
@@ -3637,7 +3639,7 @@ body.cam-scene #ffChip,body.cam-scene #plChip,body.cam-scene .b-ring{animation-p
     <p class="boot-step" id="bootStep">학교 문을 여는 중...</p>
     <p class="boot-tip" id="bootTip">학교 문을 여는 중이에요</p>
   </div>
-  <span class="boot-ver" id="bootVer">v4.3.2</span>
+  <span class="boot-ver" id="bootVer">v4.3.2.1</span>
 </div>
 
 <div class="app on-school" id="app">
@@ -4190,7 +4192,7 @@ body.cam-scene #ffChip,body.cam-scene #plChip,body.cam-scene .b-ring{animation-p
       </div>
       <h3 class="panel-sub">정보</h3>
       <dl class="info">
-        <div id="verRow"><dt>버전</dt><dd>v4.3.2</dd></div>
+        <div id="verRow"><dt>버전</dt><dd>v4.3.2.1</dd></div>
         <div id="pidRow" hidden><dt>학교 번호</dt><dd id="infoPid"></dd></div>
       </dl>
       <div id="devBox" hidden>
@@ -13305,7 +13307,7 @@ body.cam-scene #ffChip,body.cam-scene #plChip,body.cam-scene .b-ring{animation-p
        forest/rank/<내 id>   랭킹 이름과 학교 점수
        forest/stats/<내 id>  테스트 현황 (어디까지 했는지, 얼마나 했는지)
      <내 id>는 Firebase 익명 로그인이 기기(브라우저)마다 만들어 줘요. */
-  const VERSION = '4.3.2';
+  const VERSION = '4.3.2.1';
   const NT_QUIET = ['2.1.20', '2.1.2.2', '2.3.0.1', '2.3.4', '3.2.3', '3.2.4', '3.2.5', '3.3.1', '3.3.2', '3.3.3'];   // 3.3.1, 3.3.2, 3.3.3(토스 먼저)도 공지 창 없이(지섭). 2.3.0.1도 공지 창 없이(공지는 그대로 2.3.0). 2.3.4도 조용히(지섭 결정). 3.2.3, 3.2.4, 3.2.5도 공지 창 없이(공지 줄을 고르지 않음)
     // 2.1.20 지섭 결정: 이 버전들은 업데이트해도 공지 창을 띄우지 않아요(공지는 그대로 2.1.2)
   /* 2.0.0 공지사항 (2026-10-27 지섭, 1.8.0은 이미 올려서 2.0.0부터): 설정 > 공지사항. 맨 위가 가장 새 공지예요.
@@ -25230,13 +25232,15 @@ body.cam-scene #ffChip,body.cam-scene #plChip,body.cam-scene .b-ring{animation-p
     $('#panelTam').addEventListener('click', tamClick);   // 4.3.0
     // 4.3.2 지섭 요청: 레벨 단추를 꾹 누르고 있으면 0.4초 뒤부터 계속 올라가요(한 레벨씩, 점점 빠르게). 손을 떼거나 도토리가 모자라면 멈춰요
     { let hold = null;
-      const stop = () => { if (!hold) return; clearTimeout(hold.t); if (hold.n) { save(); if (hold.n > 1) tamToast(`${spName(hold.sp)} 레벨 +${hold.n}`); } setTimeout(() => { hold = null; }, 0); };
-      const tick = () => { if (!hold) return; const c = tamLvCost(hold.sp); if (S.budget < c) { stop(); return; }
+      const stop = () => { if (!hold) return; clearTimeout(hold.t); if (hold.n) { save(); if (hold.n > 1) tamToast(hold.rec ? `추천 강화 ${hold.n}번` : `${spName(hold.sp)} 레벨 +${hold.n}`); } setTimeout(() => { hold = null; }, 0); };
+      // 4.3.2.1 지섭 제보: 추천 칸을 꾹 누르면 처음 대원만 계속 올라가고 칸에는 다른 대원이 떠서 레벨이 안 오르는 것처럼 보였어요. 추천 칸은 매번 그때 추천된 대원을 올려요
+      const tick = () => { if (!hold) return; if (hold.rec) { const R = tamUpRec().mem; if (!R) { stop(); return; } hold.sp = R.sp; } const c = tamLvCost(hold.sp); if (S.budget < c) { stop(); return; }
         S.budget -= c; tamMem(hold.sp).lv += 1; hold.n += 1; tamRestartStat(); sfx('coin'); renderHUD(); tamRenderTop(); tamRenderBody();
         hold.t = setTimeout(tick, Math.max(50, 160 - hold.n * 6)); };
       $('#panelTam').addEventListener('pointerdown', e => { const b = e.target.closest('[data-tlv]'); if (!b || S.budget < tamLvCost(b.dataset.tlv)) return;
-        stop(); hold = { sp: b.dataset.tlv, n: 0, t: setTimeout(tick, 400) }; });
+        stop(); hold = { sp: b.dataset.tlv, rec: !!b.closest('.tm-rec'), n: 0, t: setTimeout(tick, 400) }; });
       ['pointerup', 'pointercancel', 'blur'].forEach(ev => window.addEventListener(ev, stop));
+      $('#panelTam').addEventListener('contextmenu', e => { if (e.target.closest('[data-tlv]')) e.preventDefault(); });   // 4.3.2.1 안드로이드 길게 누르기 메뉴를 막아요
       // 꾹 눌러서 올렸으면 손을 뗄 때 나오는 클릭은 버려요
       $('#panelTam').addEventListener('click', e => { if (hold && hold.n && e.target.closest('[data-tlv]')) { e.stopImmediatePropagation(); e.preventDefault(); } }, true); }
     $('#tmRepOk').addEventListener('click', () => tamRepTake(false)); $('#tmRepAd').addEventListener('click', () => tamRepTake(true));
