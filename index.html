@@ -15163,7 +15163,7 @@ body.cam-scene #ffChip,body.cam-scene #plChip,body.cam-scene .b-ring{animation-p
     // 4.3.3 지섭 결정(상한에 너무 빨리 닿아요): 심화 탐험(하드모드). 그 학기 상한을 넘으면 열려요. 1층 힘은 상한 층의 hG배, 층마다 hG배(일반은 g). 도토리 대신 재료와 별 조각(숫자는 제안)
     hG: 1.1, hMat: 1.5,
     // 4.3.3 지섭 요청(스킬이 너무 빨리 사라져요): 필살기 세 박자. 모으기, 컷인, 큰 움직임(ms). '연출 건너뛰기'를 켜 두면 모으기와 컷인 없이 바로 큰 움직임
-    skCharge: 450, skCut: 1200, skTail: 250,   // 4.3.3 지섭 요청(멈춰 있는 시간이 길어요): 모으기와 컷인을 줄이고, 끝난 뒤 바로 이어서
+    skCharge: 300, skCut: 900, skTail: 150, skFx: 0.75,   // 4.3.3 지섭 요청(필살기 전체 2초쯤): 모으기 0.3초, 컷인 0.9초, 큰 움직임은 0.75배 빠르게, 끝난 뒤 바로 이어서
   };
   function freshTam() { return { best: 0, party: ['bear', 'rabbit', 'fox'], mem: {}, gear: { tool: 0, bag: 0, hat: 0 }, sg: [0, 1, 2, 3, 4].map(() => ({ tool: 0, bag: 0, hat: 0 })), mat: [0, 0, 0, 0], it: 0, auto: 0, ad: { day: '', spd: 0, rep: 0, rv: 0, ch: 0 }, cheer: 0, spd: { sec: 0 }, wk: { w: -1, best: 0 }, seen: 0, hm: 0, hb: 0, hc: 0, hw: { w: -1, best: 0 }, skSeen: 0, skOff: 0 }; }
   function sanitizeTam(d, s) {
@@ -15695,8 +15695,9 @@ body.cam-scene #ffChip,body.cam-scene #plChip,body.cam-scene .b-ring{animation-p
   function tamSkillFx(F, pi, tgt) {
     skReset(); const P = $$('#tmP .tm-f'), el = P[pi], p = F.P[pi], ri = p.ri, S0 = TM_SK[ri], st = $('#tmStage');
     const t0 = Math.max(skNow(), SKQ.end), seen = (S.tam.skSeen >> ri) & 1, off = !!S.tam.skOff && S.tam.skSeen > 0, cutEnd = off ? t0 : t0 + TAM.skCharge + TAM.skCut, eb = cutEnd;
-    SKQ.end = eb + S0.hit + TAM.skTail;
-    const at = (ms, f) => skAt(eb + ms, f);
+    const hitAt = eb + S0.hit * TAM.skFx, healAt = eb + (S0.heal || S0.hit) * TAM.skFx;
+    SKQ.end = hitAt + TAM.skTail;
+    const at = (ms, f) => skAt(eb + ms * TAM.skFx, f);
     // 1. 모으기: 대원이 빛나고 둘레에서 과목 조각이 모여요
     if (off) skAt(t0, () => { SKQ.cutEnd = cutEnd; st.classList.add('skdim'); sfx('quest'); if (!seen) { S.tam.skSeen |= 1 << ri; save(); } });
     else skAt(t0, () => {
@@ -15710,7 +15711,7 @@ body.cam-scene #ffChip,body.cam-scene #plChip,body.cam-scene .b-ring{animation-p
       skAt(cutEnd, () => { $('#tmCut').hidden = true; if (el) el.classList.remove('charge');
         if (!seen) { S.tam.skSeen |= 1 << ri; save(); tamRenderTop(); } }); }
     skAt(SKQ.end, () => { if (skNow() >= SKQ.end - 5) st.classList.remove('skdim'); });
-    if (!el) return { hit: eb + S0.hit, heal: eb + (S0.heal || S0.hit) };
+    if (!el) return { hit: hitAt, heal: healAt };
     // 3. 큰 움직임
     at(0, () => { el.classList.remove('cast'); void el.offsetWidth; el.classList.add('cast'); setTimeout(() => el.classList.remove('cast'), 1100); });
     const fxr = () => $('#tmFx').getBoundingClientRect(), A = () => tamAt(el, 0.45);
@@ -15744,7 +15745,7 @@ body.cam-scene #ffChip,body.cam-scene #plChip,body.cam-scene .b-ring{animation-p
     }
     // 잔상: 과목 조각이 천천히 흩어져 내려요(겨루기는 기다리지 않아요)
     at(S0.hit + 150, () => { const mc = MC(), w = fxr().width; for (let k = 0; k < 10; k++) tamFxImg('tm-note', small, mc[0] + (Math.random() - 0.5) * w * 0.4, mc[1] - 40 - Math.random() * 30, [{ t: 'scale(.7) rotate(0deg)', opacity: 0 }, { t: 'scale(.8)', opacity: 0.9, offset: 0.15 }, { dy: 50 + Math.random() * 40, dx: (Math.random() - 0.5) * 30, t: `scale(.6) rotate(${Math.round(Math.random() * 240 - 120)}deg)`, opacity: 0 }], 1800 + Math.random() * 600, 'ease-in'); });
-    return { hit: eb + S0.hit, heal: eb + (S0.heal || S0.hit) };
+    return { hit: hitAt, heal: healAt };
   }
   function tamRibbon(kind, tx) {
     const r = $('#tmRib'); if (!r) return;
