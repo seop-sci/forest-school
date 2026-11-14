@@ -89,7 +89,7 @@ async def main():
               const g=document.querySelector('.xgrad'), gr=g.getBoundingClientRect(), top=document.querySelector('.board-top').getBoundingClientRect();
               g.click(); await sl(300); const onGrad=!document.querySelector('#panelGrad').hidden;
               document.querySelector('[data-tab=tam]').click(); await sl(1500); const onTam=!document.querySelector('#panelTam').hidden;
-              const over=[...document.querySelectorAll('#panelTam *')].filter(e=>e.offsetParent && !e.closest('.tm-bgs, .tm-fxl, .tm-rays') && e.getBoundingClientRect().right > innerWidth + 1).map(e=>e.id||e.className).slice(0,5);
+              const over=[...document.querySelectorAll('#panelTam *')].filter(e=>e.offsetParent && !e.closest('.tm-bgs, .tm-fxl, .tm-rays, .tm-fg') && e.getBoundingClientRect().right > innerWidth + 1).map(e=>e.id||e.className).slice(0,5);
               const fl=document.querySelector('#tmFl').textContent;
               return {{ tabs, gIn: gr.top >= top.top - 2 && gr.bottom <= top.bottom + 30 && gr.width > 20, onGrad, onTam, over, fl, sw: document.documentElement.scrollWidth }}; }})()""")
             print(w, scheme, r)
