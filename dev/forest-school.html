@@ -697,7 +697,6 @@ label.srow,button.srow{cursor:pointer}
 .tm-f.charge img{animation:tmCharge .8s ease-in-out infinite alternate}
 @keyframes tmCharge{from{filter:drop-shadow(0 0 2px var(--cc,#FFC21E)) brightness(1.05)}to{filter:drop-shadow(0 0 12px var(--cc,#FFC21E)) drop-shadow(0 0 4px #fff) brightness(1.25)}}
 .tm-stage.skdim .tm-bgs{filter:brightness(.55) saturate(.85);transition:filter .3s}
-.tm-skip{position:absolute;right:8px;bottom:8px;z-index:8;border:0;border-radius:999px;padding:6px 14px;font:inherit;font-size:13px;font-weight:800;color:#fff;background:rgba(40,25,10,.62);box-shadow:0 0 0 1.5px rgba(255,255,255,.7);cursor:pointer}
 .tm-stage.hm .tm-bgs{filter:hue-rotate(225deg) saturate(.8) brightness(.8)}
 .tm-stage.hm.skdim .tm-bgs{filter:hue-rotate(225deg) saturate(.7) brightness(.48)}
 .tm-mode{display:flex;justify-content:center;gap:0;margin:0 auto 6px;width:max-content;padding:3px;border-radius:999px;background:rgba(74,46,10,.12)}
@@ -3872,14 +3871,13 @@ body.cam-scene #ffChip,body.cam-scene #plChip,body.cam-scene .b-ring{animation-p
         <div class="tm-flbig" id="tmFlBig" aria-hidden="true"></div>
         <div class="tm-bossbar" id="tmBossBar" hidden><span></span><i><b></b></i></div>
         <div class="tm-cut" id="tmCut" hidden></div>
-        <button type="button" class="tm-skip" id="tmSkip" hidden>건너뛰기</button>
         <div class="tm-ev" id="tmEv" hidden></div>
         <div class="tm-msg" id="tmMsg" role="status" aria-live="polite" hidden></div>
         <div class="tm-rib" id="tmRib" hidden></div>
         <i class="tm-time"><b id="tmTime"></b></i>
       </div>
       <div class="tm-sks" id="tmSk"></div>
-      <div class="tm-acts"><button type="button" class="btn-sub small" id="tmSpd"></button><button type="button" class="btn-sub small" id="tmAuto" aria-pressed="false" hidden></button><button type="button" class="cta small" id="tmRevive" hidden>📺 응원 받기</button><button type="button" class="btn-sub small" id="tmRep" hidden></button></div>
+      <div class="tm-acts"><button type="button" class="btn-sub small" id="tmSpd"></button><button type="button" class="btn-sub small" id="tmAuto" aria-pressed="false" hidden></button><button type="button" class="btn-sub small" id="tmSkOff" aria-pressed="false" hidden></button><button type="button" class="cta small" id="tmRevive" hidden>📺 응원 받기</button><button type="button" class="btn-sub small" id="tmRep" hidden></button></div>
       <div class="tm-tabs" id="tmSeg" role="group" aria-label="탐험대 보기"></div>
       <div id="tmBody"></div>
     </section>
@@ -15071,10 +15069,10 @@ body.cam-scene #ffChip,body.cam-scene #plChip,body.cam-scene .b-ring{animation-p
     mobPh: ['chr_mouse', 'chr_crow', 'chr_goose', 'chr_sheep', 'chr_goat', 'chr_beaver'], bossPh: 'chr_boar',
     // 4.3.3 지섭 결정(상한에 너무 빨리 닿아요): 심화 탐험(하드모드). 그 학기 상한을 넘으면 열려요. 1층 힘은 상한 층의 hG배, 층마다 hG배(일반은 g). 도토리 대신 재료와 별 조각(숫자는 제안)
     hG: 1.1, hMat: 1.5,
-    // 4.3.3 지섭 요청(스킬이 너무 빨리 사라져요): 필살기 세 박자. 모으기, 컷인(처음 본 다음부터 건너뛰기), 큰 움직임(ms)
-    skCharge: 800, skCut: 1900,
+    // 4.3.3 지섭 요청(스킬이 너무 빨리 사라져요): 필살기 세 박자. 모으기, 컷인, 큰 움직임(ms). '연출 건너뛰기'를 켜 두면 모으기와 컷인 없이 바로 큰 움직임
+    skCharge: 450, skCut: 1200, skTail: 250,   // 4.3.3 지섭 요청(멈춰 있는 시간이 길어요): 모으기와 컷인을 줄이고, 끝난 뒤 바로 이어서
   };
-  function freshTam() { return { best: 0, party: ['bear', 'rabbit', 'fox'], mem: {}, gear: { tool: 0, bag: 0, hat: 0 }, sg: [0, 1, 2, 3, 4].map(() => ({ tool: 0, bag: 0, hat: 0 })), mat: [0, 0, 0, 0], it: 0, auto: 0, ad: { day: '', spd: 0, rep: 0, rv: 0, ch: 0 }, cheer: 0, spd: { sec: 0 }, wk: { w: -1, best: 0 }, seen: 0, hm: 0, hb: 0, hc: 0, hw: { w: -1, best: 0 }, skSeen: 0 }; }
+  function freshTam() { return { best: 0, party: ['bear', 'rabbit', 'fox'], mem: {}, gear: { tool: 0, bag: 0, hat: 0 }, sg: [0, 1, 2, 3, 4].map(() => ({ tool: 0, bag: 0, hat: 0 })), mat: [0, 0, 0, 0], it: 0, auto: 0, ad: { day: '', spd: 0, rep: 0, rv: 0, ch: 0 }, cheer: 0, spd: { sec: 0 }, wk: { w: -1, best: 0 }, seen: 0, hm: 0, hb: 0, hc: 0, hw: { w: -1, best: 0 }, skSeen: 0, skOff: 0 }; }
   function sanitizeTam(d, s) {
     const A = d && d.tam && typeof d.tam === 'object' ? d.tam : {}, f = freshTam(), n = (v, lo, hi, def) => typeof v === 'number' && isFinite(v) ? Math.max(lo, Math.min(hi, Math.floor(v))) : def;
     f.best = n(A.best, 0, 1e6, 0);
@@ -15090,7 +15088,7 @@ body.cam-scene #ffChip,body.cam-scene #plChip,body.cam-scene .b-ring{animation-p
     if (A.spd && typeof A.spd === 'object') f.spd = { sec: n(A.spd.sec, 0, TAM.adSpd.max * 60, 0) };   // 옛 시험판의 층 단위 2배속(fl, until)은 받지 않아요
     if (A.wk && typeof A.wk === 'object') f.wk = { w: n(A.wk.w, -1, 1e7, -1), best: n(A.wk.best, 0, 1e6, 0) };
     // 4.3.3 심화 탐험(hm 켬, hb 가장 높은 심화 층, hc 그 기록의 기준 상한, hw 이번 주 심화 층), 필살기 컷인을 본 과목(skSeen 비트)
-    f.hm = A.hm ? 1 : 0; f.hb = n(A.hb, 0, 1e6, 0); f.hc = n(A.hc, 0, 1e7, 0); f.skSeen = n(A.skSeen, 0, 31, 0);
+    f.hm = A.hm ? 1 : 0; f.hb = n(A.hb, 0, 1e6, 0); f.hc = n(A.hc, 0, 1e7, 0); f.skSeen = n(A.skSeen, 0, 31, 0); f.skOff = A.skOff ? 1 : 0;
     if (A.hw && typeof A.hw === 'object') f.hw = { w: n(A.hw.w, -1, 1e7, -1), best: n(A.hw.best, 0, 1e6, 0) };
     s.tam = f;
   }
@@ -15565,8 +15563,8 @@ body.cam-scene #ffChip,body.cam-scene #plChip,body.cam-scene .b-ring{animation-p
     { n: '무지개 물감 폭탄', s: '무지개 폭탄', d: '모두에게 물감, 한동안 약해져요', hit: 640 },
     { n: '별빛 정답 화살', s: '별빛 화살', d: '가장 약한 하나에게 아주 큰 한 방', hit: 900 }
   ];
-  // 4.3.3 지섭 요청(스킬이 너무 빨리 사라져요, 컷인은 처음 한 번 본 뒤 건너뛰기): 필살기 연출 시계.
-  // 연출에 딸린 일(맞는 숫자, 회복, 사라짐)은 모두 이 시계로 맞춰요. 건너뛰면 시계를 앞으로 당겨서 뒤의 일도 함께 당겨져요.
+  // 4.3.3 지섭 요청(스킬이 너무 빨리 사라져요, 켜 두는 연출 건너뛰기): 필살기 연출 시계.
+  // 연출에 딸린 일(맞는 숫자, 회복, 사라짐)은 모두 이 시계로 맞춰요.
   // 연출이 도는 동안(탐험 화면을 보고 있을 때만) 겨루기는 잠깐 멈춰요(tamTick)
   const SKQ = { list: [], t0: 0, shift: 0, end: 0, cutEnd: 0, raf: 0, el: null };
   const skNow = () => performance.now() - SKQ.t0 + SKQ.shift;
@@ -15587,14 +15585,8 @@ body.cam-scene #ffChip,body.cam-scene #plChip,body.cam-scene .b-ring{animation-p
   function tamSkStop() {
     if (SKQ.raf) cancelAnimationFrame(SKQ.raf);
     Object.assign(SKQ, { list: [], t0: performance.now(), shift: 0, end: 0, cutEnd: 0, raf: 0 });
-    const c = $('#tmCut'), k = $('#tmSkip'), st = $('#tmStage'); if (c) c.hidden = true; if (k) k.hidden = true;
+    const c = $('#tmCut'), st = $('#tmStage'); if (c) c.hidden = true;
     if (st) st.classList.remove('skdim'); if (SKQ.el) { SKQ.el.classList.remove('charge'); SKQ.el = null; }
-  }
-  function tamSkSkip() {
-    const n = skNow(); if (n >= SKQ.cutEnd) return;
-    SKQ.shift += SKQ.cutEnd - n; sfx('tap');
-    const c = $('#tmCut'), k = $('#tmSkip'); if (c) c.hidden = true; if (k) k.hidden = true;
-    if (SKQ.el) SKQ.el.classList.remove('charge');
   }
   const TM_GC = { sci: '#3FB8FF', pe: '#FF8A2A', kor: '#5CCB4A', art: '#FF5FB0', math: '#FFC21E' };   // 4.3.3 모으기 빛 색
   function tamCutIn(ri, sp) {
@@ -15609,21 +15601,21 @@ body.cam-scene #ffChip,body.cam-scene #plChip,body.cam-scene .b-ring{animation-p
   // 돌려주는 값: 연출 시계로 맞는 때(hit)와 회복되는 때(heal)
   function tamSkillFx(F, pi, tgt) {
     skReset(); const P = $$('#tmP .tm-f'), el = P[pi], p = F.P[pi], ri = p.ri, S0 = TM_SK[ri], st = $('#tmStage');
-    const t0 = Math.max(skNow(), SKQ.end), seen = (S.tam.skSeen >> ri) & 1, cutEnd = t0 + TAM.skCharge + TAM.skCut, eb = cutEnd;
-    SKQ.end = eb + S0.hit + 700;
+    const t0 = Math.max(skNow(), SKQ.end), seen = (S.tam.skSeen >> ri) & 1, off = !!S.tam.skOff && S.tam.skSeen > 0, cutEnd = off ? t0 : t0 + TAM.skCharge + TAM.skCut, eb = cutEnd;
+    SKQ.end = eb + S0.hit + TAM.skTail;
     const at = (ms, f) => skAt(eb + ms, f);
     // 1. 모으기: 대원이 빛나고 둘레에서 과목 조각이 모여요
-    skAt(t0, () => {
+    if (off) skAt(t0, () => { SKQ.cutEnd = cutEnd; st.classList.add('skdim'); sfx('quest'); if (!seen) { S.tam.skSeen |= 1 << ri; save(); } });
+    else skAt(t0, () => {
       SKQ.cutEnd = cutEnd; SKQ.el = el; st.classList.add('skdim'); sfx('quest');
       if (!el) return; el.classList.add('charge'); el.style.setProperty('--cc', TM_GC[TAM.role[ri].k]);
       const [x, y] = tamAt(el, 0.5), sm = tamI(`ex_fx_${TAM.role[ri].k}`), r = st.getBoundingClientRect().width * 0.2;
       for (let k = 0; k < 9; k++) { const a = k / 9 * Math.PI * 2; tamFxImg('tm-note', sm, x, y, [{ dx: Math.cos(a) * r, dy: Math.sin(a) * r, t: 'scale(1)', opacity: 0 }, { dx: Math.cos(a + 1) * r * 0.45, dy: Math.sin(a + 1) * r * 0.45, t: 'scale(.8)', opacity: 1, offset: 0.55 }, { t: 'scale(.2)', opacity: 0 }], TAM.skCharge, 'ease-in'); }
-      const k = $('#tmSkip'); if (k) k.hidden = !seen;
     });
     // 2. 컷인: 들어와서 멈춰 이름을 읽고 빠져나가요
-    skAt(t0 + TAM.skCharge, () => { tamCutIn(ri, p.sp); buzz(25); });
-    skAt(cutEnd, () => { $('#tmCut').hidden = true; const k = $('#tmSkip'); if (k) k.hidden = true; if (el) el.classList.remove('charge');
-      if (!seen) { S.tam.skSeen |= 1 << ri; save(); } });
+    if (!off) { skAt(t0 + TAM.skCharge, () => { tamCutIn(ri, p.sp); buzz(25); });
+      skAt(cutEnd, () => { $('#tmCut').hidden = true; if (el) el.classList.remove('charge');
+        if (!seen) { S.tam.skSeen |= 1 << ri; save(); tamRenderTop(); } }); }
     skAt(SKQ.end, () => { if (skNow() >= SKQ.end - 5) st.classList.remove('skdim'); });
     if (!el) return { hit: eb + S0.hit, heal: eb + (S0.heal || S0.hit) };
     // 3. 큰 움직임
@@ -15763,6 +15755,7 @@ body.cam-scene #ffChip,body.cam-scene #plChip,body.cam-scene .b-ring{animation-p
     const left = TAM.adSpd.n - S.tam.ad.spd;
     sb.textContent = tamSpdOn() ? `2배속 ${hms(S.tam.spd.sec * 1000)}${left > 0 ? ` (📺 +${TAM.adSpd.min}분 ${left}/${TAM.adSpd.n})` : ''}` : `📺 2배속 ${TAM.adSpd.min}분 (${left}/${TAM.adSpd.n})`;
     const ab = $('#tmAuto'); ab.hidden = !tamAutoOn(); ab.setAttribute('aria-pressed', S.tam.auto ? 'true' : 'false'); ab.textContent = S.tam.auto ? '필살기 자동 켬' : '필살기 자동 끔';
+    { const so = $('#tmSkOff'); so.hidden = !S.tam.skSeen; so.setAttribute('aria-pressed', S.tam.skOff ? 'true' : 'false'); so.textContent = S.tam.skOff ? '연출 건너뛰기 켬' : '연출 건너뛰기 끔'; }   // 4.3.3 필살기를 한 번 본 뒤에 생겨요
     const T = rt.tam, rv = $('#tmRevive'), cl = tamCheerLeft(); rv.hidden = !(S.tam.cheer > 0 || (T && T.lose && cl > 0));   // 4.3.1 지면 응원 단추, 응원 중에는 남은 층
     rv.textContent = S.tam.cheer > 0 ? `💪 응원 ${S.tam.cheer}층 남음` : `📺 응원 받기 힘 +${Math.round((TAM.cheer.mul - 1) * 100)}% (${cl}/${TAM.cheer.n})`; rv.classList.toggle('on', S.tam.cheer > 0);
     const I = tamIdle(), rp = $('#tmRep'); rp.hidden = I.sec < 60; rp.textContent = `탐험 보고서 받기 (${Math.floor(I.sec / 60)}분)`;
@@ -15861,7 +15854,7 @@ body.cam-scene #ffChip,body.cam-scene #plChip,body.cam-scene .b-ring{animation-p
     if (b.getAttribute('aria-disabled') === 'true' && !(b.dataset.tlv && S.budget >= tamLvCost(b.dataset.tlv))) { if (b.dataset.tlv) tamToast('도토리가 모자라요\n정수 상점에서 숲의 정수로 바꿀 수 있어요'); else if (b.dataset.tgear) tamToast('재료가 모자라요'); return; }
     if (b.dataset.tsk) { tamCast(+b.dataset.tsk); return; }
     if (b.dataset.tmm) { const v = +b.dataset.tmm; if ((v && !tamHOpen()) || (rt.tam && rt.tam.ph === 'event')) return; if ((S.tam.hm ? 1 : 0) === v) return; S.tam.hm = v; tamHSync(); sfx('tap'); save(); tamSkStop(); tamRestart(); tamRenderTop(); tamRenderBody(); musicSync(); return; }   // 4.3.3 심화 탐험
-    if (b.id === 'tmSkip') { tamSkSkip(); return; }   // 4.3.3 필살기 건너뛰기
+    if (b.id === 'tmSkOff') { S.tam.skOff = S.tam.skOff ? 0 : 1; sfx('tap'); save(); tamRenderTop(); return; }   // 4.3.3 지섭 요청: 켜 두는 필살기 연출 건너뛰기
     if (b.dataset.tev) { const T = rt.tam; if (T && T.ph === 'event') { sfx('tap'); tamEvPick(T, +b.dataset.tev); } return; }
     if (b.dataset.tauto) { S.tam.party = tamAutoTeam(); sfx('coin'); save(); tamRestart(); tamRenderTop(); tamRenderBody(); tamSkills(); tamToast('가장 힘센 조합으로 편성했어요'); return; }
     if (b.dataset.tseg) { rt.tamSeg = b.dataset.tseg; sfx('tap'); tamRenderBody(); return; }
@@ -28109,7 +28102,7 @@ body.cam-scene #ffChip,body.cam-scene #plChip,body.cam-scene .b-ring{animation-p
   }
 
   // 시험용 손잡이: 자동 시험(window.__FOREST_TEST)에서만 게임 속 함수를 꺼내 써요
-  if (window.__FOREST_TEST) window.__forest = { get S() { return S; }, get rt4() { return rt; }, tamHOn, tamHOpen, tamCurFl, tamWinH, tamHf, tamHRankDoc, tamSkBusy, tamReach, tamSkSkip, get SKQ() { return SKQ; }, esAxGain, esAxLeft, ESHOP, tamLvPlan, tamLvBuy, tamLvAll, mapUrl, mapBase, tamCheerLeft, tamAdRevive, tamCap, tamCapped, tamLvRef, tamBaseRate, tamLvCost, tamStageIn, musicWant, tamPh, tamEvPick, tamAutoTeam, tamUpRec, MAIN, startSports, GEO, claimAchAll, ACH, btMake, btBest, btRoster, btRoll, btWin, btOppCheer, BT, BT_LG, stPrev, get Rank() { return Rank; }, tamRankDoc, tamTf, tamAdSpd, tamReport, tamRepTake, tamAdRevive, renderRankPanel, TAM, tamSim, tamTeam, tamStat, tamMobs, tamWin, tamIdle, tamCollect, tamParty, tamShard, tamPow, tamFight, tamStep, TAM, tamSim, tamTeam, tamStat, tamMobs, tamWin, tamIdle, tamCollect, tamShard, tamParty, tamPow, tamLvCost, tamOpen, setZone, geo, stPlay, stNext, ST, ST_SIDE, SIDE, missionGo, MGO, MGO_MINI, MGO_Q, renderMissions, renderPass, BOOST, conLeft, gameToday, setTab, ADX, adStamp, adxDay, adxCan, adxMore, adPickNow, adPickGive, conNear, renderAdStamp, claimOfflineDouble, startBoost, openBoost, showOffline, fvBoothStart, bfFwStart, musicWant, renderCounsel, renderXg, renderFv, showCeremony, RX, rxPct, rxCost, rxUp, rxPart, renderDept, goldOr, goldRich, adGold, stampAtt, GOLD, BIG, BF_DECO, bfWin, bfNext, bfOn, bfFw, bfSync, bfStamp, bfFwStart, bfPart, bfNextTx, sanitizeBf, freshBf, fvBoothMax, bldBox, bldPick, bldWarm, DECO_SLOTS, XG, MK, ST, SIDE, ST_SIDE, wdMap, xgOn, xgGuest, xgSpots, xgGreet, xgVisit, xgLunch, openXg, mkOn, mkHot, mkSell, mkBuy, mkSur, openMk, wdBar, wdTick, stTick, stPlay, stNext, stPick, stEnd, stTags, openSb, renderSb, sideCan, sideMap, fvFlag, FV, FV_POS, fvOn, fvOpen, fvBonus, fvSync, fvStamp, fvGuests, openFv, renderFv, fvMeet, fvBoothStart, fvMap, fvTip, festDef, goTo, navInfo, openShop, gdReady, thPreview, thPreviewEnd, thOn, busScene, tripCrowd, openTrip, startTrip, claimTrip, TRIPS, mgPickMul, mgPickMode, mgUpOrder, mgFillOrders, mgAdAsk, sportsCon, festCon, btQuota, btCanAd, btAdMore, warmRooms, blobUrl, vdSize, vdBlock, pzSweep, pzSwGain, pzSwOpen, pzXpOf, mgMulMax, mgMulOk, mgMul, mgModeTap, acTip, kidDupIdx, trialSafe, closeAd,
+  if (window.__FOREST_TEST) window.__forest = { get S() { return S; }, get rt4() { return rt; }, tamHOn, tamHOpen, tamCurFl, tamWinH, tamHf, tamHRankDoc, tamSkBusy, tamReach, get SKQ() { return SKQ; }, esAxGain, esAxLeft, ESHOP, tamLvPlan, tamLvBuy, tamLvAll, mapUrl, mapBase, tamCheerLeft, tamAdRevive, tamCap, tamCapped, tamLvRef, tamBaseRate, tamLvCost, tamStageIn, musicWant, tamPh, tamEvPick, tamAutoTeam, tamUpRec, MAIN, startSports, GEO, claimAchAll, ACH, btMake, btBest, btRoster, btRoll, btWin, btOppCheer, BT, BT_LG, stPrev, get Rank() { return Rank; }, tamRankDoc, tamTf, tamAdSpd, tamReport, tamRepTake, tamAdRevive, renderRankPanel, TAM, tamSim, tamTeam, tamStat, tamMobs, tamWin, tamIdle, tamCollect, tamParty, tamShard, tamPow, tamFight, tamStep, TAM, tamSim, tamTeam, tamStat, tamMobs, tamWin, tamIdle, tamCollect, tamShard, tamParty, tamPow, tamLvCost, tamOpen, setZone, geo, stPlay, stNext, ST, ST_SIDE, SIDE, missionGo, MGO, MGO_MINI, MGO_Q, renderMissions, renderPass, BOOST, conLeft, gameToday, setTab, ADX, adStamp, adxDay, adxCan, adxMore, adPickNow, adPickGive, conNear, renderAdStamp, claimOfflineDouble, startBoost, openBoost, showOffline, fvBoothStart, bfFwStart, musicWant, renderCounsel, renderXg, renderFv, showCeremony, RX, rxPct, rxCost, rxUp, rxPart, renderDept, goldOr, goldRich, adGold, stampAtt, GOLD, BIG, BF_DECO, bfWin, bfNext, bfOn, bfFw, bfSync, bfStamp, bfFwStart, bfPart, bfNextTx, sanitizeBf, freshBf, fvBoothMax, bldBox, bldPick, bldWarm, DECO_SLOTS, XG, MK, ST, SIDE, ST_SIDE, wdMap, xgOn, xgGuest, xgSpots, xgGreet, xgVisit, xgLunch, openXg, mkOn, mkHot, mkSell, mkBuy, mkSur, openMk, wdBar, wdTick, stTick, stPlay, stNext, stPick, stEnd, stTags, openSb, renderSb, sideCan, sideMap, fvFlag, FV, FV_POS, fvOn, fvOpen, fvBonus, fvSync, fvStamp, fvGuests, openFv, renderFv, fvMeet, fvBoothStart, fvMap, fvTip, festDef, goTo, navInfo, openShop, gdReady, thPreview, thPreviewEnd, thOn, busScene, tripCrowd, openTrip, startTrip, claimTrip, TRIPS, mgPickMul, mgPickMode, mgUpOrder, mgFillOrders, mgAdAsk, sportsCon, festCon, btQuota, btCanAd, btAdMore, warmRooms, blobUrl, vdSize, vdBlock, pzSweep, pzSwGain, pzSwOpen, pzXpOf, mgMulMax, mgMulOk, mgMul, mgModeTap, acTip, kidDupIdx, trialSafe, closeAd,
     TKE, TK_Q, tkDaily, nbAllDay, nbBuildAt, nbOn, conAdd, BX_SPOT, PERKS, offlineCapH, applyAway, pzFinish, mgClaimOrder,
     CS, JOBS, CS_WORRY, freshCs, csOpen, csLeft, csMax, csEnsure, csCands, csNeed, csMul, csOpenCards, csReady, csDone, csTalkMake, csAnswer, csChoose, csSettle, openCounsel, renderCounsel, renderHall, MAIN, qMeasure, qGoal, sanitize,   // 3.1.0 진로 상담
     NSL, nsStart, nsSettle, nsOpen, nsOn, nsOverlap, nsExtraH, isNight, nightDayOf, openNs, renderNs, bxSpots, renderNight,   // 3.0.0

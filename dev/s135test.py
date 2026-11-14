@@ -3,7 +3,7 @@
 # 2) 심화 1층 장난꾸러기는 상한 층보다 세요. 심화 층을 이기면 도토리와 황금 도토리는 그대로, 재료와 이번 주 심화 기록이 늘어요
 # 3) 심화 순위 문서(hf, hq = 주 × 1,000,000 + hf)
 # 4) 대학교만 레벨 값 기준점이 상한보다 36층 아래
-# 5) 필살기: 모으기 뒤 컷인, 연출 동안 겨루기가 멈춰요. 처음 본 과목은 건너뛰기가 없고, 다음부터 있어요. 건너뛰면 바로 끝나요
+# 5) 필살기: 모으기 뒤 컷인, 연출 동안 겨루기가 멈춰요. 한 번 본 뒤 생기는 '연출 건너뛰기'를 켜 두면 컷인 없이 빨리 끝나요
 import asyncio, json
 from playwright.async_api import async_playwright
 from s4test import ctxpage, base
@@ -45,24 +45,24 @@ async def main():
         await page.wait_for_function(f"{F}.rt4.tam && {F}.rt4.tam.ph==='fight'", timeout=15000)
         r = await page.evaluate(f"""(async()=>{{ const F={F}, S=F.S, sl=ms=>new Promise(r=>setTimeout(r,ms)), T=F.rt4.tam, Fi=T.F;
           Fi.M.forEach(m=>{{m.hp*=50;m.mx*=50;m.atk=0}}); Fi.P.forEach(p=>{{p.g=F.TAM.gauge}});
-          const ri = Fi.P[0].ri;
+          const ri = Fi.P[0].ri, tog0 = !document.querySelector('#tmSkOff').hidden;
           document.querySelector('.tm-sk[data-tsk="0"]').click(); await sl(300);
-          const busy = F.tamSkBusy(), skip0 = !document.querySelector('#tmSkip').hidden, t0 = Fi.t; await sl(900);
+          const busy = F.tamSkBusy(), t0 = Fi.t; await sl(600);
           const cut = !document.querySelector('#tmCut').hidden, t1 = Fi.t;
           let n=0; while (F.tamSkBusy() && n<80) {{ await sl(100); n++; }}
-          const took = n*100+1200, seen = (S.tam.skSeen>>ri)&1;
+          const took = n*100+900, seen = (S.tam.skSeen>>ri)&1;
+          const tog1 = !document.querySelector('#tmSkOff').hidden;
+          document.querySelector('#tmSkOff').click(); await sl(50);
           Fi.P.forEach(p=>{{p.g=F.TAM.gauge}});
-          document.querySelector('.tm-sk[data-tsk="0"]').click(); await sl(300);
-          const skip1 = !document.querySelector('#tmSkip').hidden;
-          document.querySelector('#tmSkip').click(); await sl(50);
-          const cutGone = document.querySelector('#tmCut').hidden;
+          document.querySelector('.tm-sk[data-tsk="0"]').click(); await sl(250);
+          const cut2 = !document.querySelector('#tmCut').hidden;
           let m=0; while (F.tamSkBusy() && m<80) {{ await sl(100); m++; }}
-          return {{ busy, skip0, cut, paused: t1===t0, took, seen, skip1, cutGone, took2: m*100+350 }}; }})()""")
+          return {{ busy, cut, paused: t1===t0, took, seen, tog0, tog1, skOff: S.tam.skOff, cut2, took2: m*100+250 }}; }})()""")
         print('필살기', json.dumps(r))
         ok(r['busy'] and r['cut'] and r['paused'], '모으기 뒤 컷인, 연출 동안 겨루기 멈춤')
-        ok(r['took'] >= 3000, f"필살기 연출이 3초 넘게 보여요 {r['took']}")
-        ok(not r['skip0'] and r['seen'] == 1 and r['skip1'], '처음은 건너뛰기 없음, 다음부터 있음')
-        ok(r['cutGone'] and r['took2'] < r['took'] - 1000, '건너뛰면 컷인이 바로 사라지고 빨리 끝나요')
+        ok(2000 <= r['took'] <= 3600, f"필살기 연출은 2~3.6초 {r['took']}")
+        ok(not r['tog0'] and r['seen'] == 1 and r['tog1'] and r['skOff'] == 1, "'연출 건너뛰기' 단추는 필살기를 한 번 본 뒤에 생기고 켜 둘 수 있어요")
+        ok(not r['cut2'] and r['took2'] < r['took'] - 1000, '켜 두면 컷인 없이 빨리 끝나요')
         ok(not errs, f'오류 없음 {errs[:2]}')
         await ctx.close(); await b.close()
     print('PASS' if not bad else 'FAIL', len(bad))
