@@ -21,7 +21,7 @@ fs.copyFileSync('../config.js', 'www/config.js');
 // 1.8.0 배경음악 파일(audio 폴더)도 함께 담아요
 fs.cpSync('../audio', 'www/audio', { recursive: true });
 // 2.0.0 고화질 지도 그림(img/maps)도 함께 담아요
-fs.cpSync('../img', 'www/img', { recursive: true });   // 3.0.1 고급 지도도 담아요(예시 학교)
+fs.cpSync('../img', 'www/img', { recursive: true, filter: f => !/[\\/]maps[\\/][^\\/]*_(spring|summer|autumn|winter|xmas|space|retro)\.webp$/.test(f) });   // 4.3.2 테마 지도와 테마 참나무 층은 앱에 넣지 않고 웹에서 받아요(게임의 mapBase)   // 3.0.1 고급 지도도 담아요(예시 학교)
 const test = process.env.ADMOB_TEST === '1';
 for (const f of ['fb', 'google', 'app', 'update']) await build({ entryPoints: [`src/${f}.js`], bundle: true, format: 'iife', target: 'es2019', minify: true, outfile: `www/${f}.js`, logLevel: 'warning' });
 await build({ entryPoints: ['src/ads.js'], bundle: true, format: 'iife', target: 'es2019', minify: true, outfile: 'www/ads.js',
