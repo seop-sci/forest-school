@@ -15312,7 +15312,8 @@ body.cam-scene #ffChip,body.cam-scene #plChip,body.cam-scene .b-ring{animation-p
   const tamPcPic = (sp, act) => tamI(`ex_pc_${sp}_${act ? 'act' : 'idle'}`) || IMG('chr_' + sp) || '';
   const tamMobPic = (fl, m) => m.boss ? tamPic(`ex_boss_${tamReg(fl).k}`, TAM.bossPh) : tamPic(`ex_mob_${tamReg(fl).k}_${m.i + 1}`, TAM.mobPh[(TAM.reg.indexOf(tamReg(fl)) + m.i) % TAM.mobPh.length]);
   // 4.3.0 지섭 요청: 탐험대가 층을 오르며 장난꾸러기를 만나는 화려한 화면. 자리(왼쪽 %, 바닥 %), 앞줄부터
-  const TM_PPOS = [[37, 5], [23, 14], [22, -1], [9, 8], [8, 20]];
+  // 4.3.0 지섭 요청: 맨 앞 장식(풀과 꽃)에 가리지 않게 대원과 장난꾸러기를 9%만큼 위로(TM_UP)
+  const TM_UP = 9, TM_PPOS = [[37, 5], [23, 14], [22, -1], [9, 8], [8, 20]];
   const TM_MPOS = [[65, 5], [80, 15], [83, -1]], TM_BPOS = [[74, 2], [55, 17], [55, -2]];
   const TM_AMB = { ground: 14, garden: 12, pond: 12, library: 12, yard: 22, tower: 18 };
   // 깊이: 뒷줄(바닥 % 큼)일수록 조금 작고 어둡게
@@ -15359,11 +15360,11 @@ body.cam-scene #ffChip,body.cam-scene #plChip,body.cam-scene .b-ring{animation-p
     const party = F ? F.P : tamTeam();
     $('#tmP').dataset.fid = F ? F.id : ''; $('#tmM').dataset.fid = F ? F.id : ''; $('#tmP').classList.remove('walking', 'enter', 'jump');
     setH($('#tmP'), party.map((p, i) => { const [x, y] = TM_PPOS[i] || TM_PPOS[0];
-      return `<div class="tm-f" data-i="${i}" style="left:${x}%;bottom:${y}%;z-index:${30 - y};${tamDz(y)}--bd:-${(i * 0.37).toFixed(2)}s;--bd2:${(i * 0.06).toFixed(2)}s"><div class="tm-body"><img src="${tamPcPic(p.sp)}" alt="${esc(spName(p.sp))}"></div><i class="tm-hp"><b></b></i></div>`; }).join(''));
+      return `<div class="tm-f" data-i="${i}" style="left:${x}%;bottom:${y + TM_UP}%;z-index:${30 - y};${tamDz(y)}--bd:-${(i * 0.37).toFixed(2)}s;--bd2:${(i * 0.06).toFixed(2)}s"><div class="tm-body"><img src="${tamPcPic(p.sp)}" alt="${esc(spName(p.sp))}"></div><i class="tm-hp"><b></b></i></div>`; }).join(''));
     if (!F) { setH($('#tmM'), ''); return; }
     const pos = boss ? TM_BPOS : TM_MPOS;
     setH($('#tmM'), F.M.map((m, i) => { const [x, y] = pos[i] || pos[0];
-      return `<div class="tm-f tm-mob in${m.boss ? ' boss' : ''}" data-i="${i}" style="left:${x}%;bottom:${y}%;z-index:${30 - y};${tamDz(y)}--bd:-${(i * 0.5).toFixed(2)}s;--id:${(i * 0.12).toFixed(2)}s"><div class="tm-body"><img src="${tamMobPic(F.fl, m)}" alt="${esc(m.nm)}"></div><i class="tm-hp"><b></b></i></div>`; }).join(''));
+      return `<div class="tm-f tm-mob in${m.boss ? ' boss' : ''}" data-i="${i}" style="left:${x}%;bottom:${y + TM_UP}%;z-index:${30 - y};${tamDz(y)}--bd:-${(i * 0.5).toFixed(2)}s;--id:${(i * 0.12).toFixed(2)}s"><div class="tm-body"><img src="${tamMobPic(F.fl, m)}" alt="${esc(m.nm)}"></div><i class="tm-hp"><b></b></i></div>`; }).join(''));
     if (boss) tamShake(7, 420);
     tamSkills(); tamDraw(F);
   }
@@ -15514,7 +15515,7 @@ body.cam-scene #ffChip,body.cam-scene #plChip,body.cam-scene .b-ring{animation-p
     const team = tamTeam(), pp = $('#tmP');
     pp.dataset.fid = 'walk';
     setH(pp, team.map((p, i) => { const [x, y] = TM_PPOS[i] || TM_PPOS[0];
-      return `<div class="tm-f" data-i="${i}" style="left:${x}%;bottom:${y}%;z-index:${30 - y};${tamDz(y)}--bd:-${(i * 0.13).toFixed(2)}s"><div class="tm-body"><img src="${tamPcPic(p.sp)}" alt="${esc(spName(p.sp))}"></div><i class="tm-hp"><b style="width:100%"></b></i></div>`; }).join(''));
+      return `<div class="tm-f" data-i="${i}" style="left:${x}%;bottom:${y + TM_UP}%;z-index:${30 - y};${tamDz(y)}--bd:-${(i * 0.13).toFixed(2)}s"><div class="tm-body"><img src="${tamPcPic(p.sp)}" alt="${esc(spName(p.sp))}"></div><i class="tm-hp"><b style="width:100%"></b></i></div>`; }).join(''));
     setH($('#tmM'), ''); $('#tmM').dataset.fid = '';
     if (T.nLose) pp.classList.add('enter'); else pp.classList.remove('enter');
     pp.classList.add('walking'); clearTimeout(pp._t); const ms = TAM.ph.walk / tamSpdK() * 1000; pp._t = setTimeout(() => pp.classList.remove('walking', 'enter'), ms);
