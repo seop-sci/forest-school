@@ -57,6 +57,16 @@ async def main():
         ok(r['weak'] == 0, '약하면 빠른 스킵 없음')
         ok(r['to'] >= 22 and r['to'] <= r['cap'] and r['mobOk'] and r['btn'] and r['best'] == r['to'], f'빠른 스킵은 상한 안에서 그 층까지 {r["to"]}')
         ok(not errs, f'오류 없음 {errs[:2]}')
+        await ctx.close()
+        # 5) 4.4.1 학기가 오르면 장난꾸러기가 세지고, 심화 층은 그대로
+        ctx, page, errs = await ctxpage(b, 390, 844, 'light', base(tier=1, budget=1e9, students=30))
+        await page.wait_for_timeout(800)
+        r = await page.evaluate(f"""(()=>{{ const F={F}, S=F.S; S.tam.best=F.tamCap(); S.tam.hb=37; const c0=F.tamCap(), h0=F.tamMobs(10,false)[0].hp;
+          if(S.sem) {{ S.sem=0; S.tg=(S.tg||0)+1; }} else S.sem=1; const c1=F.tamCap(), h1=F.tamMobs(10,false)[0].hp; F.tamCurFl(); F.tamHOn(); return {{c0,c1,ratio:h1/h0,hb:S.tam.hb,fin:isFinite(h1)}}; }})()""")
+        print('학기 세기와 심화 층', json.dumps(r))
+        ok(r['c1'] > r['c0'] and r['ratio'] > 2 and r['fin'], '학기가 오르면 상한이 오르고 같은 층도 세져요')
+        ok(r['hb'] == 37, '상한이 바뀌어도 심화 층은 그대로')
+        ok(not errs, f'오류 없음 {errs[:2]}')
         await ctx.close(); await b.close()
     print('PASS' if not bad else 'FAIL', len(bad))
 asyncio.run(main())

@@ -20,7 +20,7 @@ async def main():
           S.tier=t0; S.tg=g0; S.sem=s0; return out; }})()""")
         print('상한', r)
         caps = [x[3] for x in r]
-        ok(caps == [30, 40, 50, 55, 105, 120, 170, 185, 235, 255, 345, -1], f'학년 상한 {caps}')
+        ok(caps == [30, 40, 50, 60, 160, 180, 280, 300, 400, 420, 600, -1], f'학년 상한 {caps}')   # 4.4.1 학기마다 오르는 폭 두 배
         ok(all(r[i][4] <= r[i + 1][4] for i in range(len(r) - 2)), '기준 레벨은 학년이 오를수록 커져요')
         # 상한에서 멈추고 다시 걷기
         r = await page.evaluate(f"""(async()=>{{ const F={F}, S=F.S, sl=ms=>new Promise(r=>setTimeout(r,ms)); S.tam.seen=1; F.setTab('tam'); await sl(300);
