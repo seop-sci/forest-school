@@ -25232,12 +25232,13 @@ body.cam-scene #ffChip,body.cam-scene #plChip,body.cam-scene .b-ring{animation-p
     $('#panelTam').addEventListener('click', tamClick);   // 4.3.0
     // 4.3.2 지섭 요청: 레벨 단추를 꾹 누르고 있으면 0.4초 뒤부터 계속 올라가요(한 레벨씩, 점점 빠르게). 손을 떼거나 도토리가 모자라면 멈춰요
     { let hold = null;
-      const stop = () => { if (!hold) return; clearTimeout(hold.t); if (hold.n) { save(); if (hold.n > 1) tamToast(`${spName(hold.sp)} 레벨 +${hold.n}`); } setTimeout(() => { hold = null; }, 0); };
-      const tick = () => { if (!hold) return; const c = tamLvCost(hold.sp); if (S.budget < c) { stop(); return; }
+      const stop = () => { if (!hold) return; clearTimeout(hold.t); if (hold.n) { save(); if (hold.n > 1) tamToast(hold.rec ? `추천 강화 ${hold.n}번` : `${spName(hold.sp)} 레벨 +${hold.n}`); } setTimeout(() => { hold = null; }, 0); };
+      // 4.3.2.1 지섭 제보: 추천 칸을 꾹 누르면 처음 대원만 계속 올라가고 칸에는 다른 대원이 떠서 레벨이 안 오르는 것처럼 보였어요. 추천 칸은 매번 그때 추천된 대원을 올려요
+      const tick = () => { if (!hold) return; if (hold.rec) { const R = tamUpRec().mem; if (!R) { stop(); return; } hold.sp = R.sp; } const c = tamLvCost(hold.sp); if (S.budget < c) { stop(); return; }
         S.budget -= c; tamMem(hold.sp).lv += 1; hold.n += 1; tamRestartStat(); sfx('coin'); renderHUD(); tamRenderTop(); tamRenderBody();
         hold.t = setTimeout(tick, Math.max(50, 160 - hold.n * 6)); };
       $('#panelTam').addEventListener('pointerdown', e => { const b = e.target.closest('[data-tlv]'); if (!b || S.budget < tamLvCost(b.dataset.tlv)) return;
-        stop(); hold = { sp: b.dataset.tlv, n: 0, t: setTimeout(tick, 400) }; });
+        stop(); hold = { sp: b.dataset.tlv, rec: !!b.closest('.tm-rec'), n: 0, t: setTimeout(tick, 400) }; });
       ['pointerup', 'pointercancel', 'blur'].forEach(ev => window.addEventListener(ev, stop));
       $('#panelTam').addEventListener('contextmenu', e => { if (e.target.closest('[data-tlv]')) e.preventDefault(); });   // 4.3.2.1 안드로이드 길게 누르기 메뉴를 막아요
       // 꾹 눌러서 올렸으면 손을 뗄 때 나오는 클릭은 버려요
