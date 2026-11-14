@@ -607,6 +607,11 @@ label.srow,button.srow{cursor:pointer}
 .tabs .tab.tab-tam:active,.app.on-school .tabs > .tab.tab-tam:active{transform:translateY(3px);box-shadow:inset 0 2px 0 rgba(255,255,255,.9),inset 0 -2px 0 rgba(176,116,10,.35),0 0 0 2px #E2A92A,0 1px 0 #C68F14}
 .tabs .tab.tab-tam .dot,.app.on-school .tabs > .tab.tab-tam .dot{top:1px;left:auto;right:3px;width:12px;height:12px;box-shadow:0 0 0 2px #FFF8D8}   /* 4.3.1 금빛 단추 위 빨간 점 */
 .tm-cap{display:block;margin-top:1px;font-size:10px;font-weight:600;opacity:.85;white-space:nowrap}   /* 4.3.1 학년 상한 */
+.tm-pow{display:inline-flex;align-items:center;gap:5px;flex:none;padding:2px 11px 2px 3px;border-radius:999px;background:linear-gradient(#FFE6D2,#FFB07A);color:#6A2E0E;box-shadow:inset 0 1px 0 rgba(255,255,255,.8),inset 0 0 0 1.5px #E27B3C,0 2px 0 rgba(150,60,10,.22)}   /* 4.3.2 지섭: 탐험대 힘 칸 꾸미기 */
+.tm-pow img{width:24px;height:24px;object-fit:contain;filter:drop-shadow(0 1px 1px rgba(120,40,0,.3))}
+.tm-pow span{display:flex;flex-direction:column;line-height:1.05}.tm-pow small{font-size:9.5px;font-weight:600;opacity:.8}.tm-pow b{font-family:var(--font-display);font-size:15px;letter-spacing:-.2px}
+.tm-pow.up{animation:tmPowUp .7s ease-out}@keyframes tmPowUp{30%{transform:scale(1.12);filter:brightness(1.12)}}
+@media (prefers-reduced-motion:reduce){.tm-pow.up{animation:none}}
 @keyframes tmCoin{50%{filter:brightness(1.07) saturate(1.1)}}
 @media (prefers-reduced-motion:reduce){.tabs .tab.tab-tam,.app.on-school .tabs > .tab.tab-tam{animation:none}}
 
@@ -615,7 +620,7 @@ label.srow,button.srow{cursor:pointer}
 .xgrad .tguide{top:auto;bottom:-24px;transform:rotate(180deg)}
 .icon-btn.tab.guide .tguide{display:block}
 .tm-top{display:flex;align-items:flex-end;justify-content:space-between;gap:8px;margin:2px 2px 6px}
-.tm-where{display:flex;align-items:baseline;gap:6px;flex-wrap:wrap}.tm-where b{font-family:var(--font-display);font-size:20px}.tm-where small,.tm-pow{color:var(--muted);font-size:12px}
+.tm-where{display:flex;align-items:baseline;gap:6px;flex-wrap:wrap}.tm-where b{font-family:var(--font-display);font-size:20px}.tm-where small{color:var(--muted);font-size:12px}
 .tm-stage{position:relative;aspect-ratio:5/4;max-height:360px;width:100%;border-radius:18px;overflow:hidden;background:#BFE3A8;border:2px solid var(--line);isolation:isolate;--shx:0px;--shy:0px}
 .tm-stage[data-reg="garden"]{background-color:#A9D3A0}.tm-stage[data-reg="pond"]{background-color:#BFDDE6}.tm-stage[data-reg="library"]{background-color:#E9C48F}.tm-stage[data-reg="yard"]{background-color:#E6EEF6}.tm-stage[data-reg="tower"]{background-color:#8F82C9}
 .tm-world{position:absolute;inset:0;transform:translate(var(--shx),var(--shy))}
@@ -3830,7 +3835,7 @@ body.cam-scene #ffChip,body.cam-scene #plChip,body.cam-scene .b-ring{animation-p
 
     <section class="panel" id="panelTam" hidden aria-labelledby="ttlTam">
       <h2 id="ttlTam" class="ph"><span class="tic" data-ic="ic_tab_ex" aria-hidden="true"></span><span>숲속 탐험대</span></h2>
-      <div class="tm-top"><div class="tm-where"><b id="tmFl">1층</b><span id="tmReg"></span><b class="tm-best" id="tmBest"></b></div><small class="tm-pow" id="tmPow"></small></div>
+      <div class="tm-top"><div class="tm-where"><b id="tmFl">1층</b><span id="tmReg"></span><b class="tm-best" id="tmBest"></b></div><span class="tm-pow" id="tmPow"></span></div>
       <div class="tm-stage" id="tmStage" data-reg="ground">
         <div class="tm-cam"><div class="tm-world" id="tmWorld">
           <div class="tm-bgs"><i class="tm-bg cur"></i><i class="tm-bg nx"></i></div>
@@ -15565,7 +15570,10 @@ body.cam-scene #ffChip,body.cam-scene #plChip,body.cam-scene .b-ring{animation-p
     $('#tmReg').textContent = R.nm + (lap ? ` (깊은 밤 ${lap})` : '');
     $('#tmFl').textContent = `${fl}층`;
     $('#tmBest').innerHTML = (S.tam.best ? `<span>최고층</span>${fmt(S.tam.best)}층` : '<span>첫 탐험</span>') + (isFinite(tamCap()) ? `<small class="tm-cap">${tamCapped() ? '학년이 오르면 더 가요' : `이번 학기 ${fmt(tamCap())}층까지`}</small>` : '');   // 4.3.1
-    $('#tmPow').textContent = `탐험대 힘 ${fmt(tamPow())}`;
+    { const pw = tamPow(), el = $('#tmPow'), fu = tamI('ex_flag');   // 4.3.2 탐험대 힘 칸: 깃발 그림과 큰 숫자, 힘이 오르면 한 번 들썩
+      setH(el, `${fu ? `<img src="${fu}" alt="">` : ''}<span><small>탐험대 힘</small><b>${fmt(pw)}</b></span>`); el.setAttribute('aria-label', `탐험대 힘 ${fmt(pw)}`);
+      if (rt.tamPw && pw > rt.tamPw) { el.classList.remove('up'); void el.offsetWidth; el.classList.add('up'); }
+      rt.tamPw = pw; }
     tamAdDay();
     const sb = $('#tmSpd'); sb.classList.toggle('on', tamSpdOn());
     const left = TAM.adSpd.n - S.tam.ad.spd;
