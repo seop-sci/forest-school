@@ -15,7 +15,7 @@ async def main():
         await page.wait_for_timeout(1000)
         r = await page.evaluate(f"""(async()=>{{ const F={F}, S=F.S, sl=ms=>new Promise(r=>setTimeout(r,ms));
           document.querySelectorAll('.overlay').forEach(o=>{{o.hidden=true}}); F.rt4.modalOpen=null; F.rt4.modalQueue.length=0;
-          S.tam.seen=1; S.budget=1e7; F.setTab('tam'); await sl(300);
+          S.tam.seen=1; S.budget=1e7; F.setTab('tam'); await sl(300); document.querySelector('[data-tnav="mem"]').click(); await sl(200);
           const lv=()=>Object.fromEntries(S.tam.party.map(k=>[k,F.tamLvPlan(k,0)&&((S.tam.mem[k]||{{}}).lv||1)]));
           const sp=document.querySelector('.tm-mem [data-tlv]').dataset.tlv, l0=(S.tam.mem[sp]||{{}}).lv||1;
           const P=F.tamLvPlan(sp,10); document.querySelector('[data-tlvn="10"]').click(); await sl(80);
@@ -41,11 +41,11 @@ async def main():
         print('꾹', lv0, lv1, lv2)
         ok(lv1 - lv0 >= 5 and lv2 == lv1, '꾹 누르면 계속 오르고, 떼면 멈춰요')
         # 짧게 한 번 누르면 한 레벨
-        await page.evaluate(f"(()=>{{ const F={F}; F.S.budget=1e12; F.setTab('school'); F.setTab('tam'); }})()"); await page.wait_for_timeout(300)
+        await page.evaluate(f"(()=>{{ const F={F}; F.S.budget=1e12; F.setTab('school'); F.setTab('tam'); document.querySelector('[data-tnav=mem]').click(); }})()"); await page.wait_for_timeout(400)
         btn = await page.query_selector(f'.tm-mem [data-tlv="{sp}"]'); await btn.click(); await page.wait_for_timeout(200)
         lv3 = await page.evaluate(f"{F}.S.tam.mem['{sp}'].lv"); ok(lv3 == lv2 + 1, '짧게 누르면 한 레벨')
         # 4.3.2.1 추천 칸 꾹 누르기: 그때그때 추천된 대원이 오르고, 칸에 보이는 대원과 같아요
-        await page.evaluate(f"(()=>{{ const F={F}; F.S.budget=1e15; F.setTab('school'); F.setTab('tam'); }})()"); await page.wait_for_timeout(300)
+        await page.evaluate(f"(()=>{{ const F={F}; F.S.budget=1e15; F.setTab('school'); F.setTab('tam'); document.querySelector('[data-tnav=mem]').click(); }})()"); await page.wait_for_timeout(400)
         rb = await page.query_selector('.tm-rec [data-tlv]'); await rb.scroll_into_view_if_needed(); bb = await rb.bounding_box()
         before = await page.evaluate(f"(()=>{{ const S={F}.S; return Object.values(S.tam.mem).reduce((a,m)=>a+m.lv,0); }})()")
         await page.mouse.move(bb['x'] + bb['width'] / 2, bb['y'] + bb['height'] / 2); await page.mouse.down(); await page.wait_for_timeout(1200)

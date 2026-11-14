@@ -68,7 +68,8 @@
           "bt",
           "sp",
           "sk",
-          "tq"
+          "tq",
+          "hq"
         ],
         "$uid": {
           ".write": "auth != null && (auth.uid === $uid || (!newData.exists() && root.child('forest/adminUids').child(auth.uid).val() === true))",
@@ -129,6 +130,12 @@
           },
           "tq": {
             ".validate": "newData.isNumber() && newData.parent().child('week').isNumber() && newData.parent().child('tf').isNumber() && newData.val() === newData.parent().child('week').val() * 1000000 + newData.parent().child('tf').val()"
+          },
+          "hf": {
+            ".validate": "newData.isNumber() && newData.val() >= 0 && newData.val() <= 100000 && newData.val() % 1 === 0 && newData.parent().child('week').isNumber() && newData.val() <= (data.exists() && data.parent().child('week').val() === newData.parent().child('week').val() ? data.val() : 0) + (data.parent().child('at').isNumber() ? ((now - data.parent().child('at').val() >= 10000 ? 10 : 0) + (now - data.parent().child('at').val()) / 3000) : 10)"
+          },
+          "hq": {
+            ".validate": "newData.isNumber() && newData.parent().child('week').isNumber() && newData.parent().child('hf').isNumber() && newData.val() === newData.parent().child('week').val() * 1000000 + newData.parent().child('hf').val()"
           },
           "$other": {
             ".validate": false

@@ -2,6 +2,7 @@ package io.github.seopsci.forestschool;
 
 import android.os.Bundle;
 import android.webkit.WebSettings;
+import android.webkit.WebView;
 import androidx.activity.EdgeToEdge;
 import com.getcapacitor.BridgeActivity;
 
@@ -16,6 +17,12 @@ public class MainActivity extends BridgeActivity {
         // 2.1.20: 휴대폰에서 켜면 화면 전체가 작게 줄어들어서(지섭 제보), 짧은 쪽이 600dp 이상인 태블릿에서만 켠다.
         // 휴대폰은 2.1.0 때처럼 기본값 그대로 둔다
         // 3.2.1: 짧은 쪽이 440dp보다 넓은 휴대폰(화면 크기를 작게 한 기기 등)은 게임이 가운데에 작게 보여서, 이때도 켜고 게임이 412칸 너비로 그리게 한다
+        // 4.4.0 지섭 제보(숫자를 꾹 누르면 복사 창이 떠요): 웹 화면의 꾹 누르기(글자 고르기와 복사 창)를 앱에서 막아요.
+        // 게임 안의 꾹 누르기(레벨 올리기 등)는 손가락 이벤트로 따로 처리해서 그대로 돼요. 입력 칸 글쓰기도 그대로예요(꾹 눌러 붙여넣기만 안 돼요)
+        WebView wv = getBridge().getWebView();
+        wv.setLongClickable(false);
+        wv.setHapticFeedbackEnabled(false);
+        wv.setOnLongClickListener(v -> true);
         if (getResources().getConfiguration().smallestScreenWidthDp > 440) {
             WebSettings s = getBridge().getWebView().getSettings();
             s.setUseWideViewPort(true);
