@@ -1,4 +1,5 @@
 # 119번 시험(4.1.2): 학예회(학교 축제, 동아리 공연) 무대가 학생을 가리지 않아요
+# 4.3.1: 게임 시계를 낮 1시로 맞춰요(밤에는 대학교 학예회가 안 열려서 틀렸어요)
 # 무대, 조명 그늘, 환영회 줄 장식(.kfloor)이 학생 층 맨 아래에 있고, 학생 줄 세우기(0.5초마다)가 지나도 그대로인지 봐요
 import asyncio
 from playwright.async_api import async_playwright
@@ -13,7 +14,7 @@ async def main():
         fac = dict(classroom=14, cafeteria=12, library=11, playground=8, science=6)
         for t, fid in ((1, 'show'), (4, 'show'), (1, 'welcome')):
             ctx, page, errs = await ctxpage(b, 390, 780, 'light', base(tier=t, tg=4, f=fac, students=60))
-            await page.evaluate(f"(()=>{{document.querySelectorAll('.overlay').forEach(o=>{{o.hidden=true}}); const F={F}; F.rt.modalOpen=null; F.rt.modalQueue.length=0; F.S.fest.next={{}}; F.startFest('{fid}', true);}})()")
+            await page.evaluate(f"(()=>{{document.querySelectorAll('.overlay').forEach(o=>{{o.hidden=true}}); const F={F}; F.rt.modalOpen=null; F.rt.modalQueue.length=0; const n=new Date(), d=new Date(n); d.setHours(13,0,0,0); const off=d-n; Object.defineProperty(F.rt,'fakeNow',{{configurable:true,get:()=>Date.now()+off}}); F.S.fest.next={{}}; F.startFest('{fid}', true);}})()")
             await page.wait_for_timeout(8500)
             r = await page.evaluate(Q); print(t, fid, r)
             if not r['floor'] or max(r['floor']) > r['minKid'] or r['n'] < 5: bad.append(f'{t} {fid}: 장식이 학생 위에 있어요 {r}')

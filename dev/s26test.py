@@ -52,4 +52,11 @@ async def main():
     finally:
         srv.kill()
     print(json.dumps(out | r, ensure_ascii=False, indent=1))
+    # 4.3.1: PASS 줄. 미션을 받으면 리그 점수가 오르고, 리그와 전체 순위가 보이고, 서버에 이번 주 점수가 올라가고, 오류가 없어야 해요
+    a = out | r; bad = []
+    if a.get('errors') or a.get('errors2'): bad.append(f"오류 {(a.get('errors') or a.get('errors2'))[:2]}")
+    if not (a.get('after') and a['after'][2] > 0): bad.append(f"리그 점수가 오르지 않았어요 {a.get('after')}")
+    if not (a.get('rank') and a['rank'][3] and a.get('all') and a['all'][1]): bad.append('순위표가 비었어요')
+    if not any(v[2] and v[3] for v in a.get('server', {}).values()): bad.append(f"서버에 이번 주 점수가 없어요 {a.get('server')}")
+    print('\n'.join(bad)); print('PASS' if not bad else 'FAIL')
 asyncio.run(main())

@@ -6,7 +6,7 @@
 # (6) 개발자 메뉴: 정수 500, 합치기 에너지와 조각, 수료증 기금 쪽지, 다음 날로 넘기기(퍼즐 판과 부스터)
 # (7) 짓기와 업그레이드 효과(작업지시서 22 그림: 비계, 망치, 흙먼지, 반짝이, 완공 리본, 업그레이드 배지)
 # (8) 합치기 도감 칸마다 정수와 모은 개수 보상, (9) 판 두근거림은 새 단계만
-# (5) 화면: 미니게임 탭 퍼즐 카드 '보상 잔여 10/10', 360px 어두운 화면, 390px 밝은 화면에서 부스터 창과 아래 칸이 넘치지 않는지
+# (5) 화면(4.3.1 기대값 고침: 보상 잔여는 오른쪽 칸 '시작하기' 위): 미니게임 탭 퍼즐 카드 '보상 잔여 10/10', 360px 어두운 화면, 390px 밝은 화면에서 부스터 창과 아래 칸이 넘치지 않는지
 # 쓰는 법: python3 wrap.py && python3 s67test.py   (마지막 줄이 PASS면 통과)
 import asyncio, json, calendar
 from playwright.async_api import async_playwright
@@ -60,17 +60,17 @@ async def main():
         if r['a']['luck'] != 30: fails.append(f'저장 다시 읽기 {r}')
         if r['b'] != {'day': '', 'lucky': 0, 'energy': 0, 'luck': 0}: fails.append(f'옛 저장 {r}')
         if r['c'] != {'day': '', 'lucky': 0, 'energy': 0, 'luck': 30}: fails.append(f'망가진 저장 {r}')
-        # (6) 개발자 메뉴: 정수, 합치기 재화, 수료증 기금 쪽지, 다음 날(퍼즐 보상 판, 합치기 부스터)
+        # (6) 개발자 메뉴(4.3.1 기대값: 퍼즐 보상 판 하루 5번): 정수, 합치기 재화, 수료증 기금 쪽지, 다음 날(퍼즐 보상 판, 합치기 부스터)
         r = await pg.evaluate(f"""(()=>{{ const F={F}, S=F.S; document.querySelector('#devBox').hidden = false;
           S.ess = 0; S.mg.e = 0; S.mg.up = 0; S.mg.pieces = 0; const d0 = S.p.dip, f0 = S.fund, t0 = S.p.ticket;
           ['#devEss', '#devMg', '#devDip'].forEach(q => document.querySelector(q).click());
           const out = {{ ess: S.ess, e: S.mg.e, up: S.mg.up, pc: S.mg.pieces, dip: S.p.dip - d0, fund: S.fund - f0, tk: S.p.ticket - t0 }};
           S.pz.n = 10; S.mg.bst.energy = 3; document.querySelector('#devDay').click();
           out.pzLeft = F.pzLeft(); out.en = F.mgBstLeft('energy'); out.dev = S.u.dev; return out; }})()""")
-        if r != {'ess': 500, 'e': 100, 'up': 10, 'pc': 10, 'dip': 100, 'fund': 100, 'tk': 3, 'pzLeft': 10, 'en': 3, 'dev': True}: fails.append(f'개발자 메뉴 {r}')
+        if r != {'ess': 500, 'e': 100, 'up': 10, 'pc': 10, 'dip': 100, 'fund': 100, 'tk': 3, 'pzLeft': 5, 'en': 3, 'dev': True}: fails.append(f'개발자 메뉴 {r}')
         # (7) 짓기와 업그레이드 효과: 효과가 붙었다가 저절로 사라지는지, 건물 창이 열려 있으면 닫을 때 보여 주는지
         r = await pg.evaluate(f"""(async()=>{{ const F={F}, S=F.S; document.querySelector('.tab[data-tab=school]').click(); await new Promise(r=>setTimeout(r,300));
-          S.budget = 1e9; const k = ['cafeteria','library','playground'].find(k => !S.f[k]); F.buyFacility(k);
+          S.budget = 1e9; const k = ['cafeteria','library','playground'].find(k => !S.f[k]); F.buyFacility(k); if (S.bd && S.bd[k]) F.conFinish(k);   // 4.3.1: 2.1.0부터 새 건물은 공사를 거쳐요. 공사를 바로 끝내고 효과를 봐요
           const g = document.querySelector('#b-' + k), out = {{ k, fx: !!g.querySelector('.bfx'), rise: g.querySelector('.built').classList.contains('fx-rise'), site: g.classList.contains('fx-site'), dust: g.querySelectorAll('.bfx .dust').length, art: [...g.querySelectorAll('.bfx image')].every(i => (i.getAttribute('href') || '').startsWith('data:image')), scaf: !!g.querySelector('.bfx .scaf'), rib: !!g.querySelector('.bfx .rib-g') }};
           await new Promise(r=>setTimeout(r,3600)); out.gone = !g.querySelector('.bfx') && !g.classList.contains('fx-site');
           F.rt.sheetKey = 'classroom'; S.f.classroom += 1; F.bldFx('classroom', 'up'); out.wait = !!F.rt.bldFxWait && !document.querySelector('#b-classroom .bfx');
@@ -102,7 +102,7 @@ async def main():
             await c2.add_init_script("window.__FOREST_TEST = true; localStorage.clear();")
             pg2, e2 = await boot(c2)
             await pg2.evaluate("document.querySelector('.tab[data-tab=mini]').click()"); await pg2.wait_for_timeout(400)
-            r = await pg2.evaluate("""(()=>{ const t = document.querySelector('#pzLeftTxt'), c = document.querySelector('#pzOpen'), tr = t.getBoundingClientRect(), cr = c.getBoundingClientRect(); return { txt: t.textContent, inside: tr.right <= cr.right && tr.top >= cr.top, same: Math.abs((tr.top+tr.bottom)/2 - (()=>{ const b = document.querySelector('#pzOpen .mc-txt b').firstChild; const rg = document.createRange(); rg.selectNodeContents(b); const q = rg.getBoundingClientRect(); return (q.top+q.bottom)/2; })()) < 6, row: document.querySelector('#pzAdRow').hidden }; })()""")
+            r = await pg2.evaluate("""(()=>{ const t = document.querySelector('#pzLeftTxt'), c = document.querySelector('#pzOpen'), tr = t.getBoundingClientRect(), cr = c.getBoundingClientRect(); return { txt: t.textContent, inside: tr.right <= cr.right && tr.top >= cr.top, same: tr.bottom <= document.querySelector('#pzCardTag').getBoundingClientRect().top + 2, row: document.querySelector('#pzAdRow').hidden }; })()""")
             await pg2.screenshot(path=f's67_mini_{w}.png')
             if r != {'txt': '보상 5/5', 'inside': True, 'same': True, 'row': True}: fails.append(f'{w}px 퍼즐 카드 보상 잔여 {r}')
             await pg2.evaluate(f"(()=>{{ const F={F}, S=F.S; S.ess = 30; F.mgOpen(); S.mg.bst.luck = 12; F.mgRenderAll(); }})()")

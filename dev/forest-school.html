@@ -605,6 +605,7 @@ label.srow,button.srow{cursor:pointer}
 .tabs .tab.tab-tam .tic,.app.on-school .tabs > .tab.tab-tam .tic{width:30px;height:30px;filter:drop-shadow(0 2px 1px rgba(120,70,0,.35))}
 .tabs .tab.tab-tam[aria-selected="true"],.app.on-school .tabs > .tab.tab-tam[aria-selected="true"]{box-shadow:inset 0 2px 0 rgba(255,255,255,.9),inset 0 -4px 0 rgba(176,116,10,.35),0 0 0 3px #D99A1E,0 4px 0 #B07A12,0 0 16px rgba(243,197,82,.95)}
 .tabs .tab.tab-tam:active,.app.on-school .tabs > .tab.tab-tam:active{transform:translateY(3px);box-shadow:inset 0 2px 0 rgba(255,255,255,.9),inset 0 -2px 0 rgba(176,116,10,.35),0 0 0 2px #E2A92A,0 1px 0 #C68F14}
+.tabs .tab.tab-tam .dot,.app.on-school .tabs > .tab.tab-tam .dot{top:1px;left:auto;right:3px;width:12px;height:12px;box-shadow:0 0 0 2px #FFF8D8}   /* 4.3.1 금빛 단추 위 빨간 점 */
 @keyframes tmCoin{50%{filter:brightness(1.07) saturate(1.1)}}
 @media (prefers-reduced-motion:reduce){.tabs .tab.tab-tam,.app.on-school .tabs > .tab.tab-tam{animation:none}}
 
@@ -7904,7 +7905,7 @@ body.cam-scene #ffChip,body.cam-scene #plChip,body.cam-scene .b-ring{animation-p
     bd: {}, tk: { m5: 0, m30: 0, h1: 0, h3: 0 }, tka: { day: '', n: 0 }, tkd: { day: '', pz: 0, mg: 0 },   // 2.3.0.1 tkd: 오늘 퍼즐, 합치기로 받은 단축권   // 2.1.0 공사(건물마다 { L 오를 레벨, s 시작, e 끝 }), 시간 단축권 장수, 광고 단축권 오늘 횟수
     clk: { last: 0 },   // 게임 시계: 지금까지 본 가장 늦은 시각 (gameNow)
     fg: { day: '', got: [] },   // 1.7.2 학교 행사 황금 도토리: 행사마다 하루 한 번(got에 오늘 받은 행사 id)
-    es: { day: '', n: 0, week: -1, g: 0, x: 0, t: 0, bf: 0, ba: 0 },   // 2.1.0 t 오늘 산 단축권 묶음 수, bf ba 오늘 산 부스터(수업료 2배, 자리 비운 보상 2배)
+    es: { day: '', n: 0, week: -1, g: 0, x: 0, t: 0, bf: 0, ba: 0, ax: 0 },   // 2.1.0 t 오늘 산 단축권 묶음 수, bf ba 오늘 산 부스터(수업료 2배, 자리 비운 보상 2배)
     awx: 0,   // 2.1.0 자리 비운 보상 2배 부스터: 다음 받기에 2배(남은 번 수)
     zv: {},   // 4.0.0 들어가 본 구역({academic: 1, ...}). '캠퍼스 둘러보기' 퀘스트가 세요
     rp: { b: 0 },   // 되풀이 학년 종업식 조건: 지난 식 때의 건물 레벨 합(0이면 아직 안 셈)
@@ -8023,7 +8024,7 @@ body.cam-scene #ffChip,body.cam-scene #plChip,body.cam-scene .b-ring{animation-p
     if (d.es && typeof d.es === 'object') {
       s.es.day = typeof d.es.day === 'string' ? d.es.day.slice(0, 10) : ''; s.es.n = Math.floor(num(d.es.n, 0, 0, SAVE_CAP.count));
       s.es.week = Math.floor(num(d.es.week, -1, -1, SAVE_CAP.count)); s.es.g = Math.floor(num(d.es.g, 0, 0, SAVE_CAP.count));
-      s.es.x = Math.floor(num(d.es.x, 0, 0, SAVE_CAP.count));   // 1.7.4 도토리로 정수 바꾸기(오늘 바꾼 횟수)
+      s.es.x = Math.floor(num(d.es.x, 0, 0, SAVE_CAP.count)); s.es.ax = Math.min(99, Math.floor(num(d.es.ax, 0, 0)));   // 4.3.1 정수로 도토리 바꾸기(오늘 바꾼 횟수)   // 1.7.4 도토리로 정수 바꾸기(오늘 바꾼 횟수)
       s.es.t = Math.min(99, Math.floor(num(d.es.t, 0, 0))); s.es.bf = Math.min(99, Math.floor(num(d.es.bf, 0, 0))); s.es.ba = Math.min(99, Math.floor(num(d.es.ba, 0, 0)));   // 2.1.0 문방구
     }
     s.autoUntil = Math.min(num(d.autoUntil, 0, 0), Date.now() + 27 * 3600000);
@@ -10329,7 +10330,7 @@ body.cam-scene #ffChip,body.cam-scene #plChip,body.cam-scene .b-ring{animation-p
     renderCrest();
     renderYear();
     setTx($('#gradePill'), G[g].name);
-    let p = 1, txt = semFirst() ? (semLocked() ? `대도시예요! 퀘스트 ${semLeft()}개를 마치면 1학기 방학식` : '대도시예요! 1학기 방학식을 열 수 있어요') : finalYear() ? '대도시예요! 졸업식을 열 수 있어요' : yearLocked() ? `대도시예요! 퀘스트 ${yearLeft()}개를 마치면 종업식` : '대도시예요! 종업식을 열 수 있어요';
+    let p = 1, txt = semFirst() ? (semLocked() ? `1학기 방학식까지 퀘스트 ${semLeft()}개` : '1학기 방학식을 열 수 있어요') : finalYear() ? '졸업식을 열 수 있어요' : yearLocked() ? `종업식까지 퀘스트 ${yearLeft()}개` : '종업식을 열 수 있어요';   // 4.3.1 지섭: '대도시예요!'는 위 칸에 이미 보여서 뺐어요
     if (g < G.length - 1) {
       const lo = townRep(g), hi = townRep(g + 1);
       p = Math.max(0, Math.min(1, (r - lo) / (hi - lo)));
@@ -10693,6 +10694,8 @@ body.cam-scene #ffChip,body.cam-scene #plChip,body.cam-scene .b-ring{animation-p
     let any = false;
     for (const k of Object.keys(TEA)) if (!teaMaxed(k) && S.budget >= teaCost(k)) any = true;
     $('#tabDot').hidden = !any;
+    // 4.3.1 탐험 단추 빨간 점: 아직 한 번도 안 열었거나, 보고서가 쌓였을 때(탐험 화면을 보는 동안은 끔). 시계가 아직 없으면 tamIdle()을 부르지 않아요(첫 열기 전에 시계를 켜지 않게)
+    const td = $('#tamDot'); if (td) td.hidden = !(tamOn() && rt.tab !== 'tam' && (!S.tam.seen || (S.tam.it && tamIdle().sec >= TAM.idleMin)));
     renderRec();
     if (rt.sheetKey) renderSheet();
     if (rt.tab === 'teachers') renderTeachers();
@@ -15496,6 +15499,7 @@ body.cam-scene #ffChip,body.cam-scene #plChip,body.cam-scene .b-ring{animation-p
     const P = F ? F.P : tamTeam().map(s => ({ ...s, g: 0, hp: 1 }));
     if (!upd || box.children.length !== P.length) setH(box, P.map((p, i) => `<button type="button" class="tm-sk" data-tsk="${i}" aria-label="${esc(spName(p.sp))} 필살기 ${esc(TM_SK[p.ri].n)}"><img src="${IMG('chr_' + p.sp) || ''}" alt=""><i></i><small>${esc(TM_SK[p.ri].s)}</small></button>`).join(''));
     $$('.tm-sk', box).forEach((b, i) => { const p = P[i]; if (!p) return; const r = Math.min(1, p.g / TAM.gauge); b.style.setProperty('--g', (r * 100).toFixed(0) + '%'); b.classList.toggle('ready', r >= 1 && p.hp > 0); b.classList.toggle('out', p.hp <= 0); });
+    if (F && !rt.tamTip && S.tam.best < 2 && P.some(p => p.hp > 0 && p.g >= TAM.gauge)) { rt.tamTip = 1; tamToast('게이지가 다 찼어요!\n반짝이는 대원 얼굴을 눌러요'); }   // 4.3.1 처음 1~2층 안내(켤 때마다 한 번)
   }
   function tamCast(i) {
     const F = rt.tam && rt.tam.F; if (!F) return;
@@ -15595,13 +15599,15 @@ body.cam-scene #ffChip,body.cam-scene #plChip,body.cam-scene .b-ring{animation-p
   }
   function tamOpen() {
     if (!tamOn()) return;
-    if (!S.tam.seen) { S.tam.seen = 1; S.tam.it = S.tam.it || gameNow(); save(); tamToast('밤이면 학교에 숲의 장난꾸러기들이 와요!\n탐험대와 함께 달래 주러 가요'); }
+    if (!S.tam.seen) { S.tam.seen = 1; S.tam.it = S.tam.it || gameNow(); save();   // 4.3.1 처음 열면 소개 장면(자동 시험에서는 __TAM_INTRO일 때만)
+      const shown = !(window.__FOREST_TEST && !window.__TAM_INTRO) && stPlay('tam', false);
+      if (!shown) tamToast('밤이면 학교에 숲의 장난꾸러기들이 와요!\n탐험대와 함께 달래 주러 가요'); }
     tamRenderTop(); tamSync(); tamRenderBody();
     tamReport(true);
   }
   function tamClick(e) {
     const b = e.target.closest('button'); if (!b || !tamOn()) return;
-    if (b.getAttribute('aria-disabled') === 'true') { if (b.dataset.tlv) tamToast('도토리가 모자라요'); else if (b.dataset.tgear) tamToast('재료가 모자라요'); return; }
+    if (b.getAttribute('aria-disabled') === 'true') { if (b.dataset.tlv) tamToast('도토리가 모자라요\n정수 상점에서 숲의 정수로 바꿀 수 있어요'); else if (b.dataset.tgear) tamToast('재료가 모자라요'); return; }
     if (b.dataset.tsk) { tamCast(+b.dataset.tsk); return; }
     if (b.dataset.tev) { const T = rt.tam; if (T && T.ph === 'event') { sfx('tap'); tamEvPick(T, +b.dataset.tev); } return; }
     if (b.dataset.tauto) { S.tam.party = tamAutoTeam(); sfx('coin'); save(); tamRestart(); tamRenderTop(); tamRenderBody(); tamSkills(); tamToast('가장 힘센 조합으로 편성했어요'); return; }
@@ -15900,7 +15906,8 @@ body.cam-scene #ffChip,body.cam-scene #plChip,body.cam-scene .b-ring{animation-p
      한정 모자(hat)와 특별 가구(fur)는 꾸미기 가게에서 팔아요 */
   const ESHOP = {
     hat: 120, fur: 200,
-    ex: { n: 10, min: 60, perDay: 5 },   // 1.7.4 도토리 수업료 60분치로 숲의 정수 10개, 하루 5번(지섭 결정: 넘치는 도토리 쓸 곳). 거꾸로 바꿔도 남는 게 없어요(정수 20개 → 30분치)
+    ex: { n: 10, min: 60, perDay: 5 },
+    ax: { ess: 20, min: 30, perDay: 5 },   // 4.3.1 지섭 요청(숫자는 본부 제안): 숲의 정수 20개로 도토리 수업료 30분치, 하루 5번. 위 ex의 거꾸로라 오가며 남는 게 없어요   // 1.7.4 도토리 수업료 60분치로 숲의 정수 10개, 하루 5번(지섭 결정: 넘치는 도토리 쓸 곳). 거꾸로 바꿔도 남는 게 없어요(정수 20개 → 30분치)
     tk: { perDay: 5, list: [{ k: 'm5', n: 10, ess: 30 }, { k: 'm30', n: 1, ess: 20 }, { k: 'h1', n: 1, ess: 35 }, { k: 'h3', n: 1, ess: 90 }] },   // 시간 단축권, 네 가지 합쳐 하루 5번
     boost: { perDay: 3, feast: { ess: 8, min: 60 } },   // 수업료 부스터는 하루 3번
     night: 150   // 밤 모드(지도 밤 색과 창 불빛, 영구)
@@ -15908,13 +15915,15 @@ body.cam-scene #ffChip,body.cam-scene #plChip,body.cam-scene .b-ring{animation-p
   const ESS_ICON = () => `<span class="tic" style="background-image:${pzImg('ic_essence')}"></span>`;
   function esDay() {
     const t = gameToday(), w = gameWeek();
-    if (S.es.day !== t) { S.es.day = t; S.es.n = 0; S.es.x = 0; S.es.t = 0; S.es.bf = 0; S.es.ba = 0; }
+    if (S.es.day !== t) { S.es.day = t; S.es.n = 0; S.es.x = 0; S.es.t = 0; S.es.bf = 0; S.es.ba = 0; S.es.ax = 0; }
     if (w > S.es.week) { S.es.week = w; S.es.g = 0; }
   }
   const esExLeft = () => { esDay(); return Math.max(0, ESHOP.ex.perDay - S.es.x); };
   const esTkLeft = () => { esDay(); return Math.max(0, ESHOP.tk.perDay - S.es.t); };
   const esBfLeft = () => { esDay(); return Math.max(0, ESHOP.boost.perDay - S.es.bf); };
   const esExCost = () => Math.max(10, nice(rate() * 60 * ESHOP.ex.min));
+  const esAxLeft = () => { esDay(); return Math.max(0, ESHOP.ax.perDay - (S.es.ax || 0)); };
+  const esAxGain = () => Math.max(10, nice(rate() * 60 * ESHOP.ax.min));   // 4.3.1 정수로 받는 도토리
   const tkName = k => TK.find(x => x.k === k).name;
   function essItem(pick) {
     if (!pick) return null;
@@ -15926,6 +15935,7 @@ body.cam-scene #ffChip,body.cam-scene #plChip,body.cam-scene .b-ring{animation-p
     if (t === 'bf') { const nm = `수업료 +100% ${ESHOP.boost.feast.min / 60}시간`; return { kind: 'bf', name: nm, ga: eulOf(nm), price: ESHOP.boost.feast.ess }; }
     if (t === 'lunch') return { kind: 'lunch', name: '소풍 도시락', price: 0 };   // 2.1.0 소풍 창에서 싸요
     if (t === 'night') return { kind: 'night', name: '밤 모드', ga: '를', price: S.cos.own.includes(NIGHT_KEY) ? 0 : ESHOP.night };
+    if (t === 'ax') { const g = esAxGain(), nm = `도토리 ${fmt(g)}`; return { kind: 'ax', gain: g, name: nm, ga: eulOf(nm), price: ESHOP.ax.ess }; }   // 4.3.1
     if (t === 'ex') { const nm = `숲의 정수 ${ESHOP.ex.n}개`; return { kind: 'ex', name: nm, ga: eulOf(nm), price: esExCost(), acorn: true }; }   // 값이 도토리예요
     return null;
   }
@@ -15971,6 +15981,8 @@ body.cam-scene #ffChip,body.cam-scene #plChip,body.cam-scene .b-ring{animation-p
     { const xl = esExLeft(), xc = esExCost();
       h += `<div class="sb"><span class="pv">${ic}</span><span class="tx"><b>숲의 정수 ${ESHOP.ex.n}개</b><span>도토리로 바꿔요</span><small>${xl > 0 ? `오늘 ${xl}번 더 바꿀 수 있어요` : '오늘은 다 바꿨어요. 내일 다시 열려요'}</small></span>` +
         `<button class="buy${S.budget < xc ? ' poor' : ''}${xl > 0 ? '' : ' off'}" type="button" data-ebuy="ex" aria-label="숲의 정수 ${ESHOP.ex.n}개, 도토리 ${fmt(xc)}"><span data-acorn>${acornIcon()}</span>${fmt(xc)}</button></div>`; }
+    { const al = esAxLeft(), ag = esAxGain();   // 4.3.1 숲의 정수 → 도토리(탐험 대원 훈련에 쓸 도토리)
+      h += row(`<span data-acorn>${acornIcon()}</span>`, `도토리 ${fmt(ag)}`, '숲의 정수로 바꿔요', al > 0 ? `오늘 ${al}번 더 바꿀 수 있어요` : '오늘은 다 바꿨어요. 내일 다시 열려요', buy('ax', ESHOP.ax.ess, al <= 0, `도토리 ${fmt(ag)}`)); }
     const list = $('#essList'), top = list.scrollTop;
     list.innerHTML = h; list.scrollTop = top;
     $$('#essList [data-ic]').forEach(el => { const u = IMG(el.dataset.ic); if (u) el.style.backgroundImage = `url("${u}")`; });
@@ -15978,9 +15990,9 @@ body.cam-scene #ffChip,body.cam-scene #plChip,body.cam-scene .b-ring{animation-p
     ask.hidden = !it || !it.price;
     if (it && it.price) {
       const enough = it.acorn ? S.budget >= it.price : S.ess >= it.price;
-      $('#essAskText').textContent = it.acorn ? (enough ? `도토리 ${fmt(it.price)}로 ${it.name}${it.ga} 바꿀까요?` : `도토리가 ${fmt(it.price - S.budget)} 모자라요.`)
+      $('#essAskText').textContent = it.kind === 'ax' ? (enough ? `도토리 +${fmt(it.gain)}, 숲의 정수 ${it.price}개로 바꿀까요?` : `숲의 정수가 ${it.price - S.ess}개 모자라요.`) : it.acorn ? (enough ? `도토리 ${fmt(it.price)}로 ${it.name}${it.ga} 바꿀까요?` : `도토리가 ${fmt(it.price - S.budget)} 모자라요.`)
         : enough ? (it.kind === 'night' ? `밤 모드는 낮에도 지도를 밤 모습으로 바꿔요. 고등학교에서는 20시부터 6시까지 저절로 어두워져요. 그래도 숲의 정수 ${it.price}개로 살까요?` : `${it.name}${it.ga} 숲의 정수 ${it.price}개로 살까요?`) : `숲의 정수가 ${it.price - S.ess}개 모자라요. 공부 탭에서 모을 수 있어요.`;   // 2.3.0 밤 모드 안내(지섭)
-      $('#essYes').textContent = it.acorn ? (enough ? '바꾸기' : '닫기') : enough ? '사기' : '공부 가기';
+      $('#essYes').textContent = it.acorn || it.kind === 'ax' ? (enough ? '바꾸기' : '닫기') : enough ? '사기' : '공부 가기';
     }
   }
   // 한정 모자와 특별 가구(꾸미기 가게): 산 것은 바로 입고 벗거나 놓고 치워요. 바꿨으면 true
@@ -16013,6 +16025,7 @@ body.cam-scene #ffChip,body.cam-scene #plChip,body.cam-scene .b-ring{animation-p
       renderNight(true); save(); renderEssShop();
       toast(S.cos.night ? '밤 모드를 켰어요' : '밤 모드를 껐어요'); return;
     }
+    if (it.kind === 'ax' && esAxLeft() <= 0) { toast(`도토리 바꾸기는 하루 ${ESHOP.ax.perDay}번까지예요. 내일 다시 바꿀 수 있어요`); return; }
     if (it.kind === 'ex' && esExLeft() <= 0) { toast(`숲의 정수 바꾸기는 하루 ${ESHOP.ex.perDay}번까지예요. 내일 다시 바꿀 수 있어요`); return; }
     if (it.kind === 'tk' && esTkLeft() <= 0) { toast(`시간 단축권은 하루 ${ESHOP.tk.perDay}번까지 살 수 있어요. 내일 다시 열려요`); return; }
     if (it.kind === 'bf' && esBfLeft() <= 0) { toast(`수업료 +100%는 하루 ${ESHOP.boost.perDay}번까지예요. 내일 다시 살 수 있어요`); return; }
@@ -16027,11 +16040,13 @@ body.cam-scene #ffChip,body.cam-scene #plChip,body.cam-scene .b-ring{animation-p
       toast(`도토리 ${fmt(it.price)}로 숲의 정수 ${ESHOP.ex.n}개를 받았어요!`); sfx('quest'); buzz(15);
       save(); renderEss(); renderEssShop(); renderHUD(); renderAffordance(); return;
     }
+    if (it.kind === 'ax' && S.ess < it.price) { rt.essPick = ''; renderEssShop(); return; }   // 4.3.1 '닫기'
     if (S.ess < it.price) { rt.essPick = ''; setTab('mini'); return; }
-    if ((it.kind === 'tk' && esTkLeft() <= 0) || (it.kind === 'bf' && esBfLeft() <= 0)) { rt.essPick = ''; renderEssShop(); return; }
+    if ((it.kind === 'tk' && esTkLeft() <= 0) || (it.kind === 'bf' && esBfLeft() <= 0) || (it.kind === 'ax' && esAxLeft() <= 0)) { rt.essPick = ''; renderEssShop(); return; }
     S.ess -= it.price; S.st.esSpent = (S.st.esSpent || 0) + it.price;
     rt.essPick = '';
-    if (it.kind === 'tk') { S.tk[it.T.k] += it.T.n; S.es.t += 1; toast(`${it.name}${it.ga} 샀어요! 공사나 체험학습, 소풍, 책 읽기에 쓸 수 있어요`); }
+    if (it.kind === 'ax') { const g = esAxGain(); S.budget += g; S.es.ax = (S.es.ax || 0) + 1; toast(`도토리 +${fmt(g)}!\n숲의 정수 ${it.price}개로 바꿨어요`); }   // 수료증 셈(올해 번 도토리)에는 넣지 않아요
+    else if (it.kind === 'tk') { S.tk[it.T.k] += it.T.n; S.es.t += 1; toast(`${it.name}${it.ga} 샀어요! 공사나 체험학습, 소풍, 책 읽기에 쓸 수 있어요`); }
     else if (it.kind === 'bf') { S.hd.feastUntil = Math.max(gameNow(), S.hd.feastUntil) + ESHOP.boost.feast.min * 60000; S.es.bf += 1; toast(`${ESHOP.boost.feast.min / 60}시간 동안 수업료 +100%예요!`); }
     else if (it.kind === 'night') { S.cos.own.push(NIGHT_KEY); S.cos.night = true; renderNight(true); toast('밤 모드를 샀어요! 문방구에서 켜고 끌 수 있어요'); }
     sfx('quest'); buzz(15);
@@ -16538,7 +16553,9 @@ body.cam-scene #ffChip,body.cam-scene #plChip,body.cam-scene .b-ring{animation-p
     acGain(k, AC.book.xp);
     sfx('quest'); buzz(14);
     toast(`${AC.name[k]} 문제집을 풀었어요! ${AC.name[k]} XP +${AC.book.xp}`);
-    save(); renderEss(); renderMini(); renderHUD(); checkQuests(); return true;
+    save(); renderEss(); renderMini(); renderHUD(); checkQuests();
+    if (rt.tab === 'ess') renderEssShop();   // 4.3.1 지섭: 정수 상점에서 사면 남은 권수가 바로 줄게
+    return true;
   }
   // 공부 탭 위쪽 과목 5줄: 이름, Lv., 진행 막대, 문제집 단추
   function renderAc() {
@@ -22806,15 +22823,40 @@ body.cam-scene #ffChip,body.cam-scene #plChip,body.cam-scene .b-ring{animation-p
     : ST_WHO_IMG[w] && IMG(ST_WHO_IMG[w]) ? `<img src="${IMG(ST_WHO_IMG[w])}" alt="">` : DEX_STUDENTS.includes(w) ? kidAvatar(w) : `<span class="sy-em">${ST_FB[w] || '🌳'}</span>`;
   const stName = w => (w === 'hedgehog' && rt.st && rt.st.uni ? '부총장 고슴도치' : '') || ST_NM[w] || (TEA[w] && TEA[w].name) || spName(w);
   const stPicUrl = k => IMG_BASE() + 'story/' + k + '.webp?v=' + VERSION;
+  // 4.3.1 숲속 탐험대 처음 소개(그림 st_tam_1~5, 작업지시서 76). p는 그 줄에서 보여 줄 그림 번호예요. 그림이 없으면 대사만 나와요
+  const ST_TAM = [
+    { p: 1, t: '해가 지고 학교가 조용해지면…' },
+    { p: 1, t: '덤불 사이로 작은 눈들이 반짝여요.' },
+    { p: 2, w: 'hedgehog', t: '큰일이에요! 밤사이 텃밭 버섯이 다 뒤집혔어요.' },
+    { p: 2, w: 'somi', t: '운동장 공도 없어졌어요.\n숲의 장난꾸러기들이 왔다 갔나 봐요.' },
+    { p: 2, w: 'hedgehog', t: '나쁜 친구들은 아니에요.\n심심하고 외로워서 심술이 났을 뿐이에요.' },
+    { p: 3, w: 'somi', t: '그럼 우리가 찾아가서 달래 줄래요!\n탐험대를 꾸려요.' },
+    { p: 3, t: '가방을 메고, 모자를 쓰고, 학교 깃발을 높이 들었어요.' },
+    { p: 4, w: 'hedgehog', t: '노래하고, 그림 그리고, 함께 뛰어 놀면\n마음이 스르르 풀린대요.' },
+    { p: 4, t: '달래 준 장난꾸러기는 웃으며 반짝 사라져요.' },
+    { p: 5, w: 'somi', t: '길이 하늘까지 이어져 있어요!\n끝은 어디일까요?' },
+    { p: 5, w: 'hedgehog', t: '높이 오를수록 장난꾸러기도 세져요.\n대원들을 키우며 한 층씩 올라가 봐요.' },
+    { p: 5, t: '숲속 탐험대, 출발!' },
+  ];
+  // 4.3.1 탐험 소개: 줄마다 그림 번호가 바뀌면 그 그림으로 갈아 끼워요
+  function stTamPic() {
+    const R = rt.st; if (!R || R.id !== 'tam') return;
+    const L = R.lines[R.i], k = 'st_tam_' + ((L && L.p) || 1); if (R.tpk === k) return; R.tpk = k;
+    if (location.protocol === 'file:' && !window.FS_IMG_BASE) return;
+    const im = new Image(); im.alt = ''; im.decoding = 'async';
+    im.onload = () => { const pe = $('#stPic'); if (!rt.st || rt.st.tpk !== k) return; pe.innerHTML = ''; pe.appendChild(im); pe.hidden = false; };
+    im.src = stPicUrl(k);
+  }
   // 장면 틀기: id는 'o3', 'c3', 'recap', 곁가지는 'side:nap:0'. replay면 저장을 바꾸지 않아요
   function stPlay(id, replay) {
     const m = $('#mSt'); if (!m || rt.st) return false;
     let lines, head, pic = '', pic2 = '';
     let picB = '';   // 4.2.0 둘째 그림(작업지시서 71): 장면 가운데 줄부터 바꿔 보여요
-    if (id === 'recap') { lines = ST_RECAP[Math.min(S.tier, ST_RECAP.length - 1)].map(t => ({ t })); head = '지금까지의 이야기'; pic = 'st_head'; }
+    if (id === 'tam') { lines = ST_TAM; head = '숲속 탐험대'; }   // 4.3.1 그림은 stTamPic()이 줄마다 골라요
+    else if (id === 'recap') { lines = ST_RECAP[Math.min(S.tier, ST_RECAP.length - 1)].map(t => ({ t })); head = '지금까지의 이야기'; pic = 'st_head'; }
     else if (id.startsWith('side:')) { const [, sid, ep] = id.split(':'), X = SIDE.find(x => x.id === sid), L = (ST_SIDE[sid] || [])[+ep]; if (!X || !L) return false; lines = L; head = `${X.nm} ${+ep + 1}화`; pic = 'st_side_' + X.who; picB = `st_side_${sid}_${+ep + 1}`; }
     else { const D = ST[id]; if (!D) return false; lines = D.lines; head = `${D.ch + 1}장 ${CHAPTERS[D.ch]}`; pic2 = 'st_ch' + String(D.ch + 1).padStart(2, '0'); pic = pic2 + '_' + id[0]; picB = pic + '2'; }   // 그 장면만의 그림(st_ch05_o, st_ch01_c, 작업지시서 66)이 있으면 먼저, 없으면 장 그림
-    rt.st = { id, replay: !!replay, lines: lines.slice(), i: 0, uni: !!(ST[id] && ST[id].ch >= 19), mid: Math.floor(lines.length / 2), im2: null, sw: false };   // uni: 대학교 장면(20장부터)에서는 고슴도치 이름표가 '부총장 고슴도치'
+    rt.st = { id, replay: !!replay, lines: lines.slice(), i: 0, uni: !!(ST[id] && ST[id].ch >= 19) || (id === 'tam' && uniOn()), mid: Math.floor(lines.length / 2), im2: null, sw: false };   // uni: 대학교 장면(20장부터)에서는 고슴도치 이름표가 '부총장 고슴도치'
     setT($('#stCh'), head);
     const pe = $('#stPic'); pe.hidden = true; pe.innerHTML = '';
     if (pic && !(location.protocol === 'file:' && !window.FS_IMG_BASE)) {   // 그림은 게임 밖 파일이에요. 못 받으면 그림 없이 대사만 나와요
@@ -22839,7 +22881,7 @@ body.cam-scene #ffChip,body.cam-scene #plChip,body.cam-scene .b-ring{animation-p
   }
   function stLine() {
     const R = rt.st; if (!R) return;
-    stPic2();
+    stPic2(); stTamPic();
     const L = R.lines[R.i], pk = !!L.pick, nar = !pk && !L.w;
     $('#stSay').classList.toggle('nar', nar); $('#stSay').hidden = pk;
     const pb = $('#stPicks'); pb.hidden = !pk;
@@ -22872,6 +22914,7 @@ body.cam-scene #ffChip,body.cam-scene #plChip,body.cam-scene .b-ring{animation-p
   function stEnd() {
     const R = rt.st; if (!R) return; rt.st = null;
     closeModal($('#mSt'));
+    if (R.id === 'tam') { if (!R.replay) tamToast('필살기 게이지가 차면\n반짝이는 대원 얼굴을 눌러요'); return; }   // 4.3.1 탐험 소개는 이야기 저장(S.sto)에 남기지 않아요
     if (R.replay) return;
     const T = S.sto;
     if (R.id.startsWith('side:')) {
@@ -22940,6 +22983,7 @@ body.cam-scene #ffChip,body.cam-scene #plChip,body.cam-scene .b-ring{animation-p
         (n >= ST_TAG_CH.length ? `<img class="nb-map" src="${stPicUrl('st_tagmap')}" alt="나무패를 맞춘 지도" onerror="this.remove()">` : '');
       h += '<div class="nb-list">' + CHAPTERS.map((nm, c) => { const open = c <= T.ch, o = open && ST['o' + c], cl = c < T.ch && ST['c' + c];
         return `<div class="nb-ch${open ? '' : ' dim'}"><b>${c + 1}장 ${nm}</b><span>` + (o ? `<button class="btn-link" type="button" data-sb="play:o${c}">여는 장면</button>` : '') + (cl ? `<button class="btn-link" type="button" data-sb="play:c${c}">닫는 장면</button>` : '') + '</span></div>'; }).join('') + '</div>';
+      if (S.tam && S.tam.seen) h += '<div class="nb-list"><div class="nb-ch"><b>숲속 탐험대</b><span><button class="btn-link" type="button" data-sb="play:tam">소개 다시 보기</button></span></div></div>';   // 4.3.1
     } else if (tab === 'side') {
       h += '<div class="nb-list">' + SIDE.map(X => { const n = sideN(X.id), can = sideCan(X), known = n > 0 || can;
         return `<div class="nb-ch${known ? '' : ' dim'}"><b>${X.nm}</b><small>${n}/${X.n}화${n >= X.n ? `, 칭호 '${X.title}'` : ''}</small><span>` + (can ? `<button class="cta small" type="button" data-sb="side:${X.id}:${n}">${n + 1}화 보기</button>` : '') +
@@ -24716,7 +24760,7 @@ body.cam-scene #ffChip,body.cam-scene #plChip,body.cam-scene .b-ring{animation-p
     $('#panelQuests').hidden = t !== 'quests';
     $('#panelTeachers').hidden = t !== 'teachers';
     $('#panelGrad').hidden = t !== 'grad';
-    $('#panelTam').hidden = t !== 'tam'; if (t === 'tam') { tamOpen(); $('#panelTam').scrollTop = 0; }   // 4.3.0 숲속 탐험대
+    $('#panelTam').hidden = t !== 'tam'; if (t === 'tam') { tamOpen(); $('#panelTam').scrollTop = 0; const td = $('#tamDot'); if (td) td.hidden = true; }   // 4.3.0 숲속 탐험대
     $('#panelSettings').hidden = t !== 'settings';
     $('#panelRank').hidden = t !== 'rank';
     $('#panelShop').hidden = t !== 'shop';
@@ -27796,7 +27840,7 @@ body.cam-scene #ffChip,body.cam-scene #plChip,body.cam-scene .b-ring{animation-p
   }
 
   // 시험용 손잡이: 자동 시험(window.__FOREST_TEST)에서만 게임 속 함수를 꺼내 써요
-  if (window.__FOREST_TEST) window.__forest = { get S() { return S; }, get rt4() { return rt; }, musicWant, tamPh, tamEvPick, tamAutoTeam, tamUpRec, MAIN, startSports, GEO, claimAchAll, ACH, btMake, btBest, btRoster, btRoll, btWin, btOppCheer, BT, BT_LG, stPrev, get Rank() { return Rank; }, tamRankDoc, tamTf, tamAdSpd, tamReport, tamRepTake, tamAdRevive, renderRankPanel, TAM, tamSim, tamTeam, tamStat, tamMobs, tamWin, tamIdle, tamCollect, tamParty, tamShard, tamPow, tamFight, tamStep, TAM, tamSim, tamTeam, tamStat, tamMobs, tamWin, tamIdle, tamCollect, tamShard, tamParty, tamPow, tamLvCost, tamOpen, setZone, geo, stPlay, stNext, ST, ST_SIDE, SIDE, missionGo, MGO, MGO_MINI, MGO_Q, renderMissions, renderPass, BOOST, conLeft, gameToday, setTab, ADX, adStamp, adxDay, adxCan, adxMore, adPickNow, adPickGive, conNear, renderAdStamp, claimOfflineDouble, startBoost, openBoost, showOffline, fvBoothStart, bfFwStart, musicWant, renderCounsel, renderXg, renderFv, showCeremony, RX, rxPct, rxCost, rxUp, rxPart, renderDept, goldOr, goldRich, adGold, stampAtt, GOLD, BIG, BF_DECO, bfWin, bfNext, bfOn, bfFw, bfSync, bfStamp, bfFwStart, bfPart, bfNextTx, sanitizeBf, freshBf, fvBoothMax, bldBox, bldPick, bldWarm, DECO_SLOTS, XG, MK, ST, SIDE, ST_SIDE, wdMap, xgOn, xgGuest, xgSpots, xgGreet, xgVisit, xgLunch, openXg, mkOn, mkHot, mkSell, mkBuy, mkSur, openMk, wdBar, wdTick, stTick, stPlay, stNext, stPick, stEnd, stTags, openSb, renderSb, sideCan, sideMap, fvFlag, FV, FV_POS, fvOn, fvOpen, fvBonus, fvSync, fvStamp, fvGuests, openFv, renderFv, fvMeet, fvBoothStart, fvMap, fvTip, festDef, goTo, navInfo, openShop, gdReady, thPreview, thPreviewEnd, thOn, busScene, tripCrowd, openTrip, startTrip, claimTrip, TRIPS, mgPickMul, mgPickMode, mgUpOrder, mgFillOrders, mgAdAsk, sportsCon, festCon, btQuota, btCanAd, btAdMore, warmRooms, blobUrl, vdSize, vdBlock, pzSweep, pzSwGain, pzSwOpen, pzXpOf, mgMulMax, mgMulOk, mgMul, mgModeTap, acTip, kidDupIdx, trialSafe, closeAd,
+  if (window.__FOREST_TEST) window.__forest = { get S() { return S; }, get rt4() { return rt; }, esAxGain, esAxLeft, ESHOP, musicWant, tamPh, tamEvPick, tamAutoTeam, tamUpRec, MAIN, startSports, GEO, claimAchAll, ACH, btMake, btBest, btRoster, btRoll, btWin, btOppCheer, BT, BT_LG, stPrev, get Rank() { return Rank; }, tamRankDoc, tamTf, tamAdSpd, tamReport, tamRepTake, tamAdRevive, renderRankPanel, TAM, tamSim, tamTeam, tamStat, tamMobs, tamWin, tamIdle, tamCollect, tamParty, tamShard, tamPow, tamFight, tamStep, TAM, tamSim, tamTeam, tamStat, tamMobs, tamWin, tamIdle, tamCollect, tamShard, tamParty, tamPow, tamLvCost, tamOpen, setZone, geo, stPlay, stNext, ST, ST_SIDE, SIDE, missionGo, MGO, MGO_MINI, MGO_Q, renderMissions, renderPass, BOOST, conLeft, gameToday, setTab, ADX, adStamp, adxDay, adxCan, adxMore, adPickNow, adPickGive, conNear, renderAdStamp, claimOfflineDouble, startBoost, openBoost, showOffline, fvBoothStart, bfFwStart, musicWant, renderCounsel, renderXg, renderFv, showCeremony, RX, rxPct, rxCost, rxUp, rxPart, renderDept, goldOr, goldRich, adGold, stampAtt, GOLD, BIG, BF_DECO, bfWin, bfNext, bfOn, bfFw, bfSync, bfStamp, bfFwStart, bfPart, bfNextTx, sanitizeBf, freshBf, fvBoothMax, bldBox, bldPick, bldWarm, DECO_SLOTS, XG, MK, ST, SIDE, ST_SIDE, wdMap, xgOn, xgGuest, xgSpots, xgGreet, xgVisit, xgLunch, openXg, mkOn, mkHot, mkSell, mkBuy, mkSur, openMk, wdBar, wdTick, stTick, stPlay, stNext, stPick, stEnd, stTags, openSb, renderSb, sideCan, sideMap, fvFlag, FV, FV_POS, fvOn, fvOpen, fvBonus, fvSync, fvStamp, fvGuests, openFv, renderFv, fvMeet, fvBoothStart, fvMap, fvTip, festDef, goTo, navInfo, openShop, gdReady, thPreview, thPreviewEnd, thOn, busScene, tripCrowd, openTrip, startTrip, claimTrip, TRIPS, mgPickMul, mgPickMode, mgUpOrder, mgFillOrders, mgAdAsk, sportsCon, festCon, btQuota, btCanAd, btAdMore, warmRooms, blobUrl, vdSize, vdBlock, pzSweep, pzSwGain, pzSwOpen, pzXpOf, mgMulMax, mgMulOk, mgMul, mgModeTap, acTip, kidDupIdx, trialSafe, closeAd,
     TKE, TK_Q, tkDaily, nbAllDay, nbBuildAt, nbOn, conAdd, BX_SPOT, PERKS, offlineCapH, applyAway, pzFinish, mgClaimOrder,
     CS, JOBS, CS_WORRY, freshCs, csOpen, csLeft, csMax, csEnsure, csCands, csNeed, csMul, csOpenCards, csReady, csDone, csTalkMake, csAnswer, csChoose, csSettle, openCounsel, renderCounsel, renderHall, MAIN, qMeasure, qGoal, sanitize,   // 3.1.0 진로 상담
     NSL, nsStart, nsSettle, nsOpen, nsOn, nsOverlap, nsExtraH, isNight, nightDayOf, openNs, renderNs, bxSpots, renderNight,   // 3.0.0
