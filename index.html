@@ -2515,6 +2515,46 @@ body{background:radial-gradient(120% 60% at 50% 0%, color-mix(in srgb, var(--pap
 .app .board .hud-res .rep-pill small{font-size:11px}
 .app .board .hud-res .rep-pill svg{width:18px;height:18px}
 @media (max-width:380px){.app .board .hud-res .rep-pill b{font-size:16px}.app .board .hud-res .rep-pill svg{width:16px;height:16px}}
+/* ===== 4.4.1 지섭 요청: 현황판 배치를 웹, 안드로이드, 토스 모두 같게(작업지시서 79 받고 나서 할 일 4번) =====
+   학교 그림 빼기 / 1줄 학교 이름 / 2줄 학년과 학기 + 오른쪽 끝 단추(졸업, 출석부, 설정, 웹과 안드로이드는 ✕까지) / 3줄 칭호 리본 / 진행 줄 / 재화 띠 */
+.app .board .board-top{grid-template-columns:minmax(0,1fr) auto auto auto auto;grid-template-areas:"school . . . ." "school grad att gear exit" "title title title title title" "prog prog prog prog prog" "res res res res res";row-gap:0}
+.app .board .school-crest{display:none}
+.app .board .school{grid-area:school;align-self:stretch;display:flex;flex-direction:column;justify-content:space-between;gap:2px;padding:6px 0 4px 10px;margin:0}
+.app .board .xgrad{grid-area:grad}.app .board #btnAtt{grid-area:att}.app .board .xgear{grid-area:gear}.app .board #btnExit{grid-area:exit}
+.app .board .board-top .icon-btn{margin-top:2px;margin-bottom:4px}
+.app .board #btnExit{margin-right:6px}
+.app .board .school-row{min-height:24px}
+.app .board .school-year{flex-wrap:nowrap;white-space:nowrap;min-width:0;overflow:hidden}
+.app .board .school-year .ynote{min-width:0;overflow:hidden;text-overflow:ellipsis}
+.app .board .board-top::before{grid-area:1 / 1 / 4 / -1}
+.app .board .hud-title{grid-area:title;justify-self:start;position:relative;z-index:1;margin:0 0 6px 10px;max-width:calc(100% - 20px)}
+.app .board .hud-title[hidden]{display:none}
+@media (max-width:380px){.app .board .ydots i{width:5px;height:5px}.app .board .ydots{gap:2px}.app .board .school-year{gap:4px}}
+html.ait .app .board #btnExit{display:none}
+html.ait .app .board .board-top{grid-template-columns:minmax(0,1fr) auto auto auto;grid-template-areas:"school . . ." "school grad att gear" "title title title title" "prog prog prog prog" "res res res res"}
+html.ait .app .board .board-top{grid-template-rows:minmax(36px,auto) auto auto auto auto}
+html.ait .app .board .board-top .icon-btn{align-self:end}   /* 토스 단추(··· ✕) 바로 아래 */
+
+html.ait .app .board .xgear{margin-right:6px}
+.app.on-school .board.folded .board-top{grid-template-columns:minmax(0,1fr) auto;grid-template-areas:"school res";padding-bottom:6px}
+.app.on-school .board.folded .board-top::before{grid-area:school}
+.app.on-school .board.folded .hud-title{display:none}
+html.ait .app.on-school .board.folded .board-top{grid-template-columns:minmax(0,1fr) auto;grid-template-areas:"school res"}
+/* 4.4.1 현황판 새 그림(작업지시서 79). 그림을 다 받으면(html.hud-art) 9조각으로 붙이고, 못 받으면 예전 모습 그대로 */
+html.hud-art{--hud-card:var(--hud-card-l);--hud-pill:var(--hud-pill-l);--hud-track:var(--hud-track-l);--hud-btn:var(--hud-btn-l);--hud-fold:var(--hud-fold-l)}
+:root.hud-art[data-theme="dark"]{--hud-card:var(--hud-card-d);--hud-pill:var(--hud-pill-d);--hud-track:var(--hud-track-d);--hud-btn:var(--hud-btn-d);--hud-fold:var(--hud-fold-d)}
+@media (prefers-color-scheme: dark){:root.hud-art:not([data-theme="light"]){--hud-card:var(--hud-card-d);--hud-pill:var(--hud-pill-d);--hud-track:var(--hud-track-d);--hud-btn:var(--hud-btn-d);--hud-fold:var(--hud-fold-d)}}
+html.hud-art .app .board .board-top::after{content:"";position:absolute;inset:0;z-index:2;pointer-events:none;border:22px solid transparent;border-image:var(--hud-frame) 48 / 22px stretch}
+html.hud-art .app .board .board-top::before{background:none;border:0;border-image:var(--hud-card) 28 fill / 14px stretch}
+html.hud-art .app .board .progress .grade-pill{background:none;border:0;border-image:var(--hud-pill) 0 18 fill / 0 9px stretch;color:#FFF3DA;padding:1px 12px}
+html.hud-art .app .board .progress .bar{height:10px;border-radius:0;background:none;border-image:var(--hud-track) 0 12 fill / 0 6px stretch;overflow:visible}
+html.hud-art .app .board .progress .bar i{display:block;height:100%;border-radius:0;background:none;border-image:var(--hud-fill) 0 12 fill / 0 6px stretch}
+html.hud-art .app .board .board-top .icon-btn{background:var(--hud-btn) center/100% 100% no-repeat;border:0;box-shadow:none}
+html.hud-art .app .board .board-top .icon-btn:active{background-image:var(--hud-btn-p)}
+html.hud-art .app.on-school .bd-fold{background:var(--hud-fold) center/100% 100% no-repeat;border:0;box-shadow:none}
+html.hud-art .app .board .hud-res > * + *{border-left:0;background:var(--hud-div) left center/4px 78% no-repeat}
+html.hud-art .app .board .hud-res .rep-pill img{grid-row:1 / 3;width:22px;height:22px;object-fit:contain}
+@media (max-width:380px){html.hud-art .app .board .hud-res .rep-pill img{width:18px;height:18px}}
 /* 2) 퀘스트 카드: 위아래 여백과 받기 단추 높이를 줄이고, 학생 부탁은 한 줄 칩으로(모자라면 다음 줄로 넘어가요) */
 .app.on-school .home-qcard .quest{padding:5px 10px 6px;row-gap:1px}
 .app.on-school .home-qcard .q-top{min-height:34px}
@@ -3737,8 +3777,9 @@ body.cam-scene #ffChip,body.cam-scene #plChip,body.cam-scene .b-ring{animation-p
           <h1 class="school-name" id="schoolName">숲속 유치원</h1>
           <svg class="sc-chev" viewBox="0 0 24 24" aria-hidden="true"><path d="M6 9l6 6 6-6" fill="none" stroke="currentColor" stroke-width="2.6" stroke-linecap="round" stroke-linejoin="round"/></svg>
         </div>
-        <div class="school-year" id="schoolYear"><b id="yearNow">1년째</b><span class="ydots" id="yearDots" aria-hidden="true"></span><span class="ynote" id="yearNote"></span><button class="hud-title" type="button" id="hudTitle" hidden aria-label="내 칭호, 눌러서 업적 보기"></button></div>
+        <div class="school-year" id="schoolYear"><b id="yearNow">1년째</b><span class="ydots" id="yearDots" aria-hidden="true"></span><span class="ynote" id="yearNote"></span></div>
       </div>
+      <button class="hud-title" type="button" id="hudTitle" hidden aria-label="내 칭호, 눌러서 업적 보기"></button><!-- 4.4.1 칭호 리본은 따로 맨 아래 줄 -->
       <div class="progress" id="gradeRow">
           <span class="grade-pill" id="gradePill">분교</span>
       <div class="bar" id="gradeBar" role="progressbar" aria-label="다음 동네까지" aria-valuemin="0" aria-valuemax="100" aria-valuenow="0"><i id="barFill"></i></div>
@@ -6881,7 +6922,23 @@ body.cam-scene #ffChip,body.cam-scene #plChip,body.cam-scene .b-ring{animation-p
 "ex4_ui_sheet":"img/a/ex4_ui_sheet-878a03874b.webp",
 "ex4_ui_sk_frame":"img/a/ex4_ui_sk_frame-cce18a4755.webp",
 "ex4_ui_sk_ready":"img/a/ex4_ui_sk_ready-65d9935b09.webp",
-"ex4_ui_topbar":"img/a/ex4_ui_topbar-f7d4633e71.webp"
+"ex4_ui_topbar":"img/a/ex4_ui_topbar-f7d4633e71.webp",
+"hud_bar_fill":"img/a/hud_bar_fill-37c16b9231.webp",
+"hud_bar_track_dark":"img/a/hud_bar_track_dark-0080ea323c.webp",
+"hud_bar_track_light":"img/a/hud_bar_track_light-6a07d52490.webp",
+"hud_board_frame":"img/a/hud_board_frame-fd6e244ecf.webp",
+"hud_btn_dark":"img/a/hud_btn_dark-16db6b2143.webp",
+"hud_btn_light":"img/a/hud_btn_light-693ac31437.webp",
+"hud_btn_press":"img/a/hud_btn_press-48cbf8a5f7.webp",
+"hud_card_dark":"img/a/hud_card_dark-6fb0398a75.webp",
+"hud_card_light":"img/a/hud_card_light-57feecb595.webp",
+"hud_fold_dark":"img/a/hud_fold_dark-0c75e9e82a.webp",
+"hud_fold_light":"img/a/hud_fold_light-ac0964b71b.webp",
+"hud_ic_kids":"img/a/hud_ic_kids-76930aee59.webp",
+"hud_ic_star":"img/a/hud_ic_star-6b166bf799.webp",
+"hud_pill_dark":"img/a/hud_pill_dark-b90b549d65.webp",
+"hud_pill_light":"img/a/hud_pill_light-28d4b72315.webp",
+"hud_res_divider":"img/a/hud_res_divider-b8d6c4cbc5.webp"
 };</script>
 <!-- FS_IMG431:END -->
 <!-- FS_IMG174:BEGIN -->
@@ -9977,6 +10034,16 @@ body.cam-scene #ffChip,body.cam-scene #plChip,body.cam-scene .b-ring{animation-p
     const a = d < 0.05 ? Math.PI : Math.atan2(dy / ry, dx / rx);
     return [cx + Math.cos(a) * rx * 1.04, cy + Math.sin(a) * ry * 1.04, p[2]];
   }
+  // 4.4.1 현황판 새 그림(작업지시서 79)을 CSS 변수로. 하나라도 없으면 붙이지 않아요(예전 모습 그대로)
+  function hudArtInit() {
+    const K = { '--hud-frame': 'hud_board_frame', '--hud-card-l': 'hud_card_light', '--hud-card-d': 'hud_card_dark', '--hud-pill-l': 'hud_pill_light', '--hud-pill-d': 'hud_pill_dark',
+      '--hud-track-l': 'hud_bar_track_light', '--hud-track-d': 'hud_bar_track_dark', '--hud-fill': 'hud_bar_fill', '--hud-btn-l': 'hud_btn_light', '--hud-btn-d': 'hud_btn_dark', '--hud-btn-p': 'hud_btn_press',
+      '--hud-fold-l': 'hud_fold_light', '--hud-fold-d': 'hud_fold_dark', '--hud-div': 'hud_res_divider' };
+    if (document.documentElement.classList.contains('hud-art') || !Object.values(K).every(k => IMG(k))) return;
+    const R = document.documentElement; for (const [v, k] of Object.entries(K)) R.style.setProperty(v, `url("${IMG(k)}")`);
+    R.classList.add('hud-art');
+    [['#repPill', 'hud_ic_star'], ['#kidsPill', 'hud_ic_kids']].forEach(([q, k]) => { const el = $(q), sv = el && el.querySelector('svg'), u = IMG(k); if (sv && u) { const im = document.createElement('img'); im.src = u; im.alt = ''; sv.replaceWith(im); } });
+  }
   function renderTeachersOnMap() {
     for (const k of Object.keys(TEA)) {
       const g = $('#m-' + k);
@@ -10826,7 +10893,7 @@ body.cam-scene #ffChip,body.cam-scene #plChip,body.cam-scene .b-ring{animation-p
         const w = Math.ceil(tw) + 12; if (r.getAttribute('width') !== String(w)) { r.setAttribute('width', w); r.setAttribute('x', -w / 2); $('.can', pq).setAttribute('transform', `translate(${w / 2 + 1} -7)`); } }
       g.setAttribute('aria-label', L >= 1 ? `${FAC[k].name} 레벨 ${L}, 눌러서 업그레이드` : `${FAC[k].name}, 눌러서 짓기`);
     }
-    renderTeachersOnMap();
+    hudArtInit(); renderTeachersOnMap();   // 4.4.1 현황판 그림
     renderOak();
     renderDeco();
     if (S.bd) for (const k of Object.keys(FAC)) conMap(k);   // 2.1.0 공사 표시
