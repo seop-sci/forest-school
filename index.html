@@ -710,6 +710,8 @@ label.srow,button.srow{cursor:pointer}
 .tm-lvn button[aria-pressed="true"]{background:#F6C94F;color:#4A2E0A;box-shadow:inset 0 0 0 1.5px #E2A92A}
 .tm-hold{display:block;margin:-2px 2px 8px;font-size:11px;font-weight:600;color:#C06A1E}.tm-rec .tm-hold{margin:1px 0 0;font-size:10.5px}
 .tm-lvk{font-style:normal;font-weight:800;margin-right:3px;font-size:11px}
+/* 4.3.2.1 지섭 제보(안드로이드에서 레벨 단추를 꾹 누르면 복사 창이 떠요): 탐험 화면은 길게 눌러도 글 고르기, 그림 저장 창이 뜨지 않게 */
+#panelTam,#panelTam *{-webkit-user-select:none;user-select:none;-webkit-touch-callout:none}#panelTam [data-tlv]{touch-action:none}#panelTam [data-tlv] img,#panelTam [data-tlv] svg{pointer-events:none;-webkit-user-drag:none}
 @keyframes tmCoin{50%{filter:brightness(1.07) saturate(1.1)}}
 @media (prefers-reduced-motion:reduce){.tabs .tab.tab-tam,.app.on-school .tabs > .tab.tab-tam{animation:none}}
 
@@ -25237,6 +25239,7 @@ body.cam-scene #ffChip,body.cam-scene #plChip,body.cam-scene .b-ring{animation-p
       $('#panelTam').addEventListener('pointerdown', e => { const b = e.target.closest('[data-tlv]'); if (!b || S.budget < tamLvCost(b.dataset.tlv)) return;
         stop(); hold = { sp: b.dataset.tlv, n: 0, t: setTimeout(tick, 400) }; });
       ['pointerup', 'pointercancel', 'blur'].forEach(ev => window.addEventListener(ev, stop));
+      $('#panelTam').addEventListener('contextmenu', e => { if (e.target.closest('[data-tlv]')) e.preventDefault(); });   // 4.3.2.1 안드로이드 길게 누르기 메뉴를 막아요
       // 꾹 눌러서 올렸으면 손을 뗄 때 나오는 클릭은 버려요
       $('#panelTam').addEventListener('click', e => { if (hold && hold.n && e.target.closest('[data-tlv]')) { e.stopImmediatePropagation(); e.preventDefault(); } }, true); }
     $('#tmRepOk').addEventListener('click', () => tamRepTake(false)); $('#tmRepAd').addEventListener('click', () => tamRepTake(true));
