@@ -14904,7 +14904,7 @@ body.cam-scene #ffChip,body.cam-scene #plChip,body.cam-scene .b-ring{animation-p
       { k: 'yard', nm: '눈 내린 뒤뜰', mob: ['눈뭉치 꼬마', '고드름 요정', '얼음 반딧불'], boss: '눈보라 눈사람 대장', mat: 1 },
       { k: 'tower', nm: '별빛 천문대', mob: ['반짝 수정 꼬마', '그림자 솜뭉치', '졸린 박쥐'], boss: '수정 꼬마 용', mat: 3 }],
     regLen: 50, bossEvery: 10, limit: 30,
-    // 4.3.0 지섭 요청(한 과목만 쓰고 나머지는 버려져요): 지역마다 유리한 과목(힘과 체력 +30%), 모든 대원 레벨이 탐험대 전체에 주는 모음 힘(레벨 1마다 +0.3%). 숫자는 제안
+    // 4.3.0 지섭 요청(한 과목만 쓰고 나머지는 버려져요): 지역마다 유리한 과목(힘과 체력 +30%), 모든 대원 레벨이 탐험대 전체에 주는 보유 효과(레벨 1마다 +0.3%). 숫자는 제안
     adv: { ground: 1, garden: 3, pond: 0, library: 2, yard: 4, tower: 0 }, advG: 0.3, collG: 0.003, collMax: 3,
     mHp: 20, mAtk: 2.2, g: 1.07, bossHp: 7, bossAtk: 1.7, mobCd: 1.6,
     // 역할(능력 번호 0 과학, 1 체육, 2 국어, 3 미술, 4 수학)
@@ -14956,7 +14956,7 @@ body.cam-scene #ffChip,body.cam-scene #plChip,body.cam-scene .b-ring{animation-p
     const mul = Math.pow(TAM.lvG, m.lv - 1) * (1 + TAM.starG * (m.st - 1)) * (1 + TAM.acG * (acLv(AB_KEY[ri]) - 1)) * tamCollMul() * (tamAdvRi() === ri ? 1 + TAM.advG : 1);
     return { sp, ri, hp: TAM.pHp * r.hp * mul * (1 + TAM.gearPer * G.bag), atk: TAM.pAtk * r.atk * mul * (1 + TAM.gearPer * G.tool), cd: r.cd, gg: 1 + TAM.gearPer * G.hat };
   }
-  // 지금 탐험하는 지역에서 유리한 과목, 모든 대원 레벨의 모음 힘
+  // 지금 탐험하는 지역에서 유리한 과목, 모든 대원 레벨의 보유 효과
   const tamAdvRi = () => TAM.adv[tamReg(S.tam.best + 1).k];
   const tamCollLv = () => tamAvail().reduce((s, sp) => s + (tamMem(sp).lv - 1) + 5 * Math.max(0, tamMem(sp).st - 1), 0);
   const tamCollMul = () => Math.min(TAM.collMax, 1 + TAM.collG * tamCollLv());
@@ -15484,7 +15484,7 @@ body.cam-scene #ffChip,body.cam-scene #plChip,body.cam-scene .b-ring{animation-p
         const s = tamStat(sp); return `<div class="tm-slot" style="--rc:${TM_RC[TAM.role[s.ri].k]}"><img src="${tamPcPic(sp)}" alt=""><em>Lv.${tamMem(sp).lv}</em><small>${esc(spName(sp))}</small></div>`; }).join('')}</div>`;
       { const R0 = tamReg(S.tam.best + 1), ar = TAM.role[tamAdvRi()], cl = tamCollLv();
         h += `<div class="tm-tips"><p><b class="tm-role" style="--rc:${TM_RC[ar.k]}">${esc(ar.nm.split(' ')[0])}</b> ${esc(R0.nm)}에서는 ${esc(ar.nm.split(' ')[0])} 대원이 ${Math.round(TAM.advG * 100)}% 더 세요</p>` +
-          `<p><b class="tm-role">모음 힘</b> 모든 대원의 레벨 ${fmt(cl)}만큼 탐험대 힘 +${(Math.min(TAM.collMax, 1 + TAM.collG * cl) * 100 - 100).toFixed(1)}%</p></div>`; }
+          `<p><b class="tm-role">보유 효과</b> 모든 대원의 레벨 ${fmt(cl)}만큼 탐험대 힘 +${(Math.min(TAM.collMax, 1 + TAM.collG * cl) * 100 - 100).toFixed(1)}%</p></div>`; }
       h += `<div class="tm-prow"><span>대원 ${party.length}/${slots}명</span><button type="button" class="btn-sub small" data-tauto="1"${same ? ' aria-disabled="true"' : ''}>${same ? '가장 좋은 조합이에요' : '자동 편성'}</button></div>`;
       h += tamAvail().slice().sort((a, b) => (party.includes(b) - party.includes(a)) || (tamScore(tamStat(b)) - tamScore(tamStat(a)))).map(sp => {
         const m = tamMem(sp), on = party.includes(sp), s = tamStat(sp), r = TAM.role[s.ri], c = tamLvCost(sp), can = S.budget >= c, best = R && R.sp === sp, sug = !on && auto.includes(sp);
