@@ -606,6 +606,7 @@ label.srow,button.srow{cursor:pointer}
 .tabs .tab.tab-tam[aria-selected="true"],.app.on-school .tabs > .tab.tab-tam[aria-selected="true"]{box-shadow:inset 0 2px 0 rgba(255,255,255,.9),inset 0 -4px 0 rgba(176,116,10,.35),0 0 0 3px #D99A1E,0 4px 0 #B07A12,0 0 16px rgba(243,197,82,.95)}
 .tabs .tab.tab-tam:active,.app.on-school .tabs > .tab.tab-tam:active{transform:translateY(3px);box-shadow:inset 0 2px 0 rgba(255,255,255,.9),inset 0 -2px 0 rgba(176,116,10,.35),0 0 0 2px #E2A92A,0 1px 0 #C68F14}
 .tabs .tab.tab-tam .dot,.app.on-school .tabs > .tab.tab-tam .dot{top:1px;left:auto;right:3px;width:12px;height:12px;box-shadow:0 0 0 2px #FFF8D8}   /* 4.3.1 금빛 단추 위 빨간 점 */
+.tm-cap{display:block;margin-top:1px;font-size:10px;font-weight:600;opacity:.85;white-space:nowrap}   /* 4.3.1 학년 상한 */
 @keyframes tmCoin{50%{filter:brightness(1.07) saturate(1.1)}}
 @media (prefers-reduced-motion:reduce){.tabs .tab.tab-tam,.app.on-school .tabs > .tab.tab-tam{animation:none}}
 
@@ -15082,7 +15083,32 @@ body.cam-scene #ffChip,body.cam-scene #plChip,body.cam-scene .b-ring{animation-p
   }
   const tamSpdOn = () => S.tam.spd.sec > 0;
   function tamAdDay() { const t = gameToday(); if (S.tam.ad.day !== t) S.tam.ad = { day: t, spd: 0, rep: 0, rv: S.tam.ad.rv || 0 }; }
-  const tamLvCost = sp => minAcorns(TAM.lvMin * Math.pow(TAM.lvCost, tamMem(sp).lv - 1));
+  /* 4.3.1 지섭 요청(숫자는 본부가 정함): 학년과 학기마다 갈 수 있는 층에 상한을 두고, 대원 레벨 값은 지금 수업료 말고 그 학년 기준 수업료로 정해요.
+     상한: 유치원 1년째 10층, 2년째 20층 / 초등 1학년 1학기 25층부터 학기마다 +5(6학년 2학기 80층) / 중학교 90층부터 +10(140층)
+     / 고등학교 150층부터 +10(200층) / 대학교 215층부터 +15(4학년 1학기 305층), 대학교 4학년 2학기는 상한 없이 끝없이(대학원이 열리면 다시 정해요)
+     기준 수업료: 학생 60명, 대도시, 종업식으로 남은 배수(legacyMult)만. 부스터, 소풍, 선생님, 시설은 넣지 않아요(같은 학년 안에서는 늘 같은 값)
+     레벨 값: 기준 수업료 2분치 × 1.13^(레벨 - 기준 레벨). 기준 레벨은 앞 단계 상한을 넘는 데 드는 레벨(1층 + 1.5층/레벨로 셈). 학년이 오르면 지난 레벨이 싸져요 */
+  const TAM_CAP = [{ s: 10, d: 10, per: 'y' }, { s: 25, d: 5 }, { s: 90, d: 10 }, { s: 150, d: 10 }, { s: 215, d: 15 }];
+  const tamStageIn = () => { const T = TIERS[S.tier], y = Math.min(yearNo(), T.years) - 1; return S.tier === 0 ? y : y * 2 + (S.sem ? 1 : 0); };   // 학교급 안에서 몇째 단계(유치원은 해마다, 그 밖에는 학기마다)
+  const tamCapAt = (t, k) => { const C = TAM_CAP[Math.min(t, TAM_CAP.length - 1)]; return C.s + C.d * k; };
+  function tamCap() {
+    if (!S || !S.tam) return Infinity;
+    const k = tamStageIn(), T = TIERS[S.tier];
+    if (S.tier >= TAM_CAP.length - 1 && k >= T.years * 2 - 1) return Infinity;   // 대학교 4학년 2학기부터 끝없이
+    return tamCapAt(S.tier, k);
+  }
+  function tamCapPrev() {   // 앞 단계 상한(기준 레벨을 셀 때)
+    const k = tamStageIn();
+    if (k > 0) return tamCapAt(S.tier, k - 1);
+    if (S.tier === 0) return 0;
+    const P = TIERS[S.tier - 1]; return tamCapAt(S.tier - 1, S.tier - 1 === 0 ? P.years - 1 : P.years * 2 - 1);
+  }
+  const tamCapped = () => S.tam.best >= tamCap();
+  const tamCapMsg = () => `${fmt(tamCap())}층까지 왔어요!\n${S.tier === 0 ? '다음 해에' : '다음 학기에'} 더 올라가요`;
+  const tamLvRef = () => Math.max(0, Math.round((tamCapPrev() - 22) / 1.5));
+  const tamBaseRate = () => 60 * CFG.base * CFG.pace * incomeScale() * Math.pow(CFG.gradeMult, CFG.grades.length - 1) * legacyMult() * (S.sem ? 1.2 : 1);   // 초당 기준 수업료(2학기는 1.2배)
+  const tamAcorns = m => Math.max(10, nice(tamBaseRate() * 60 * tierMinutes(m)));
+  const tamLvCost = sp => tamAcorns(TAM.lvMin * Math.pow(TAM.lvCost, Math.max(-60, Math.min(200, tamMem(sp).lv - 1 - tamLvRef()))));
   const tamGearCost = (k, i) => { const L = S.tam.sg[i][k], G = TAM.gear.find(g => g.k === k); return { m: G.mat, n: 4 + 3 * L, star: L % 10 === 9 ? 3 * (1 + Math.floor(L / 10)) : 0 }; };
   const tamGrade = L => Math.min(3, 1 + Math.floor(L / 10));
   const tamStarNeed = st => st >= 5 ? 0 : TAM.star[st] - TAM.star[st - 1];
@@ -15110,6 +15136,13 @@ body.cam-scene #ffChip,body.cam-scene #plChip,body.cam-scene .b-ring{animation-p
     if (fl % 100 === 0) { addGold(1); got.push('황금 도토리 +1'); }
     if (got.length) tamToast(`${fl}층 통과!\n${got.join('\n')}`);
     if (fl % 10 === 0) save();
+    tamLiveDots();
+  }
+  // 4.3.1 지섭: 탐험 화면을 켜 둔 채 재료와 도토리를 얻으면 대원과 장비 칸의 빨간 점과 단추를 바로 바꿔요
+  function tamLiveDots() {
+    if (rt.tab !== 'tam' || !tamFxOn()) return;
+    const seg = rt.tamSeg || 'mem';
+    tamRenderBody();
   }
   function tamWeek() { const w = gameWeek(); if (S.tam.wk.w !== w) S.tam.wk = { w, best: 0 }; }
   // 자리 비운 동안의 탐험 보고서: 가장 깊은 층에서 계속 모아요(최대 12시간)
@@ -15156,6 +15189,7 @@ body.cam-scene #ffChip,body.cam-scene #plChip,body.cam-scene .b-ring{animation-p
   function tamPh(T, ph) {
     T.ph = ph; T.t = 0; if (rt.tab === 'tam') musicSync();
     const vis = tamFxOn(), fl = S.tam.best + 1;
+    if (ph === 'walk' && tamCapped()) { T.ph = 'cap'; T.F = null; if (vis) { tamWalk(fl); $('#tmP') && $('#tmP').classList.remove('walking'); tamRibbon('clear', tamCapMsg()); tamRenderTop(); } return; }   // 4.3.1 학년 상한
     if (ph === 'walk') { T.F = null; if (vis) tamWalk(fl); }
     else if (ph === 'meet') {
       T.F = tamFight(fl, tamTeam(), T.buff ? TAM.buff : 1, T.mod); T.buff = 0; T.mod = null;
@@ -15177,6 +15211,7 @@ body.cam-scene #ffChip,body.cam-scene #plChip,body.cam-scene .b-ring{animation-p
     if (!tamOn() || !tamParty().length) return;
     const T = rt.tam || (rt.tam = { ph: '', t: 0, F: null, buff: 0, lose: 0, nLose: 0, ev: null, mod: null });
     if (!T.ph) { tamPh(T, 'walk'); return; }
+    if (T.ph === 'cap') { if (!tamCapped()) tamPh(T, 'walk'); return; }   // 4.3.1 학년이 오르면 다시 걸어요
     const vis = tamFxOn(), d = dt * (tamSpdOn() ? 2 : 1), P = TAM.ph;
     if (tamSpdOn()) { const was = Math.ceil(S.tam.spd.sec); S.tam.spd.sec = Math.max(0, S.tam.spd.sec - dt); if (vis && Math.ceil(S.tam.spd.sec) !== was) tamRenderTop(); }   // 2배속은 켜 둔 동안만 줄어요
     T.t += d;
@@ -15210,7 +15245,7 @@ body.cam-scene #ffChip,body.cam-scene #plChip,body.cam-scene .b-ring{animation-p
     else if (E.k === 'spring') { T.mod = { hp: 1.3 }; msg = '다음 층에서 체력이 30% 많아요'; }
     else if (E.k === 'fork') { if (pick === 1) { T.mod = { hard: 1 }; msg = '숲길로 가요. 조심해요!'; } else msg = '큰길로 가요'; }
     else if (E.k === 'lost') { if (tamStarOn() && E.sp) { tamShard(E.sp, 1); msg = `${spName(E.sp)} 별 조각 +1`; } else { const a = minAcorns(1); S.budget += a; earn(a); msg = `도토리 +${fmt(a)}`; } }
-    T.ev = null; save();
+    T.ev = null; save(); tamLiveDots();
     const c = $('#tmEv'); if (c) c.hidden = true;
     if (msg && tamFxOn()) tamToast(msg);
     tamPh(T, 'climb');
@@ -15510,7 +15545,7 @@ body.cam-scene #ffChip,body.cam-scene #plChip,body.cam-scene .b-ring{animation-p
     const fl = S.tam.best + 1, R = tamReg(fl), lap = tamLap(fl);
     $('#tmReg').textContent = R.nm + (lap ? ` (깊은 밤 ${lap})` : '');
     $('#tmFl').textContent = `${fl}층`;
-    $('#tmBest').innerHTML = S.tam.best ? `<span>최고층</span>${fmt(S.tam.best)}층` : '<span>첫 탐험</span>';
+    $('#tmBest').innerHTML = (S.tam.best ? `<span>최고층</span>${fmt(S.tam.best)}층` : '<span>첫 탐험</span>') + (isFinite(tamCap()) ? `<small class="tm-cap">${tamCapped() ? '학년이 오르면 더 가요' : `이번 학기 ${fmt(tamCap())}층까지`}</small>` : '');   // 4.3.1
     $('#tmPow').textContent = `탐험대 힘 ${fmt(tamPow())}`;
     tamAdDay();
     const sb = $('#tmSpd'); sb.classList.toggle('on', tamSpdOn());
@@ -15923,7 +15958,7 @@ body.cam-scene #ffChip,body.cam-scene #plChip,body.cam-scene .b-ring{animation-p
   const esBfLeft = () => { esDay(); return Math.max(0, ESHOP.boost.perDay - S.es.bf); };
   const esExCost = () => Math.max(10, nice(rate() * 60 * ESHOP.ex.min));
   const esAxLeft = () => { esDay(); return Math.max(0, ESHOP.ax.perDay - (S.es.ax || 0)); };
-  const esAxGain = () => Math.max(10, nice(rate() * 60 * ESHOP.ax.min));   // 4.3.1 정수로 받는 도토리
+  const esAxGain = () => Math.max(10, nice(rate() / (feastOn() ? 2 : 1) * 60 * ESHOP.ax.min));   // 4.3.1 정수로 받는 도토리. 수업료 부스터는 빼요(부스터를 켜고 바꾸면 두 배가 되지 않게). ex의 거꾸로라 오가며 남는 게 없어요
   const tkName = k => TK.find(x => x.k === k).name;
   function essItem(pick) {
     if (!pick) return null;
@@ -27840,7 +27875,7 @@ body.cam-scene #ffChip,body.cam-scene #plChip,body.cam-scene .b-ring{animation-p
   }
 
   // 시험용 손잡이: 자동 시험(window.__FOREST_TEST)에서만 게임 속 함수를 꺼내 써요
-  if (window.__FOREST_TEST) window.__forest = { get S() { return S; }, get rt4() { return rt; }, esAxGain, esAxLeft, ESHOP, musicWant, tamPh, tamEvPick, tamAutoTeam, tamUpRec, MAIN, startSports, GEO, claimAchAll, ACH, btMake, btBest, btRoster, btRoll, btWin, btOppCheer, BT, BT_LG, stPrev, get Rank() { return Rank; }, tamRankDoc, tamTf, tamAdSpd, tamReport, tamRepTake, tamAdRevive, renderRankPanel, TAM, tamSim, tamTeam, tamStat, tamMobs, tamWin, tamIdle, tamCollect, tamParty, tamShard, tamPow, tamFight, tamStep, TAM, tamSim, tamTeam, tamStat, tamMobs, tamWin, tamIdle, tamCollect, tamShard, tamParty, tamPow, tamLvCost, tamOpen, setZone, geo, stPlay, stNext, ST, ST_SIDE, SIDE, missionGo, MGO, MGO_MINI, MGO_Q, renderMissions, renderPass, BOOST, conLeft, gameToday, setTab, ADX, adStamp, adxDay, adxCan, adxMore, adPickNow, adPickGive, conNear, renderAdStamp, claimOfflineDouble, startBoost, openBoost, showOffline, fvBoothStart, bfFwStart, musicWant, renderCounsel, renderXg, renderFv, showCeremony, RX, rxPct, rxCost, rxUp, rxPart, renderDept, goldOr, goldRich, adGold, stampAtt, GOLD, BIG, BF_DECO, bfWin, bfNext, bfOn, bfFw, bfSync, bfStamp, bfFwStart, bfPart, bfNextTx, sanitizeBf, freshBf, fvBoothMax, bldBox, bldPick, bldWarm, DECO_SLOTS, XG, MK, ST, SIDE, ST_SIDE, wdMap, xgOn, xgGuest, xgSpots, xgGreet, xgVisit, xgLunch, openXg, mkOn, mkHot, mkSell, mkBuy, mkSur, openMk, wdBar, wdTick, stTick, stPlay, stNext, stPick, stEnd, stTags, openSb, renderSb, sideCan, sideMap, fvFlag, FV, FV_POS, fvOn, fvOpen, fvBonus, fvSync, fvStamp, fvGuests, openFv, renderFv, fvMeet, fvBoothStart, fvMap, fvTip, festDef, goTo, navInfo, openShop, gdReady, thPreview, thPreviewEnd, thOn, busScene, tripCrowd, openTrip, startTrip, claimTrip, TRIPS, mgPickMul, mgPickMode, mgUpOrder, mgFillOrders, mgAdAsk, sportsCon, festCon, btQuota, btCanAd, btAdMore, warmRooms, blobUrl, vdSize, vdBlock, pzSweep, pzSwGain, pzSwOpen, pzXpOf, mgMulMax, mgMulOk, mgMul, mgModeTap, acTip, kidDupIdx, trialSafe, closeAd,
+  if (window.__FOREST_TEST) window.__forest = { get S() { return S; }, get rt4() { return rt; }, esAxGain, esAxLeft, ESHOP, tamCap, tamCapped, tamLvRef, tamBaseRate, tamLvCost, tamStageIn, musicWant, tamPh, tamEvPick, tamAutoTeam, tamUpRec, MAIN, startSports, GEO, claimAchAll, ACH, btMake, btBest, btRoster, btRoll, btWin, btOppCheer, BT, BT_LG, stPrev, get Rank() { return Rank; }, tamRankDoc, tamTf, tamAdSpd, tamReport, tamRepTake, tamAdRevive, renderRankPanel, TAM, tamSim, tamTeam, tamStat, tamMobs, tamWin, tamIdle, tamCollect, tamParty, tamShard, tamPow, tamFight, tamStep, TAM, tamSim, tamTeam, tamStat, tamMobs, tamWin, tamIdle, tamCollect, tamShard, tamParty, tamPow, tamLvCost, tamOpen, setZone, geo, stPlay, stNext, ST, ST_SIDE, SIDE, missionGo, MGO, MGO_MINI, MGO_Q, renderMissions, renderPass, BOOST, conLeft, gameToday, setTab, ADX, adStamp, adxDay, adxCan, adxMore, adPickNow, adPickGive, conNear, renderAdStamp, claimOfflineDouble, startBoost, openBoost, showOffline, fvBoothStart, bfFwStart, musicWant, renderCounsel, renderXg, renderFv, showCeremony, RX, rxPct, rxCost, rxUp, rxPart, renderDept, goldOr, goldRich, adGold, stampAtt, GOLD, BIG, BF_DECO, bfWin, bfNext, bfOn, bfFw, bfSync, bfStamp, bfFwStart, bfPart, bfNextTx, sanitizeBf, freshBf, fvBoothMax, bldBox, bldPick, bldWarm, DECO_SLOTS, XG, MK, ST, SIDE, ST_SIDE, wdMap, xgOn, xgGuest, xgSpots, xgGreet, xgVisit, xgLunch, openXg, mkOn, mkHot, mkSell, mkBuy, mkSur, openMk, wdBar, wdTick, stTick, stPlay, stNext, stPick, stEnd, stTags, openSb, renderSb, sideCan, sideMap, fvFlag, FV, FV_POS, fvOn, fvOpen, fvBonus, fvSync, fvStamp, fvGuests, openFv, renderFv, fvMeet, fvBoothStart, fvMap, fvTip, festDef, goTo, navInfo, openShop, gdReady, thPreview, thPreviewEnd, thOn, busScene, tripCrowd, openTrip, startTrip, claimTrip, TRIPS, mgPickMul, mgPickMode, mgUpOrder, mgFillOrders, mgAdAsk, sportsCon, festCon, btQuota, btCanAd, btAdMore, warmRooms, blobUrl, vdSize, vdBlock, pzSweep, pzSwGain, pzSwOpen, pzXpOf, mgMulMax, mgMulOk, mgMul, mgModeTap, acTip, kidDupIdx, trialSafe, closeAd,
     TKE, TK_Q, tkDaily, nbAllDay, nbBuildAt, nbOn, conAdd, BX_SPOT, PERKS, offlineCapH, applyAway, pzFinish, mgClaimOrder,
     CS, JOBS, CS_WORRY, freshCs, csOpen, csLeft, csMax, csEnsure, csCands, csNeed, csMul, csOpenCards, csReady, csDone, csTalkMake, csAnswer, csChoose, csSettle, openCounsel, renderCounsel, renderHall, MAIN, qMeasure, qGoal, sanitize,   // 3.1.0 진로 상담
     NSL, nsStart, nsSettle, nsOpen, nsOn, nsOverlap, nsExtraH, isNight, nightDayOf, openNs, renderNs, bxSpots, renderNight,   // 3.0.0
