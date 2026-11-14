@@ -2,7 +2,7 @@
 <html lang="ko">
 <head>
 <meta charset="utf-8">
-<meta name="forest-version" content="4.3.2.1">
+<meta name="forest-version" content="4.4.0">
 <meta name="viewport" content="width=device-width, initial-scale=1">
 <meta name="description" content="도토리를 모아 숲속 학교를 키우는 방치형 게임 테스트판이에요.">
 <style>html,body{margin:0}</style>
@@ -796,6 +796,78 @@ label.srow,button.srow{cursor:pointer}
 .tm-mode button{border:0;background:none;font:inherit;font-size:13px;font-weight:800;color:var(--muted);padding:5px 14px;border-radius:999px;cursor:pointer}
 .tm-mode button[aria-pressed="true"]{background:#FFC93C;color:#5A3A12}
 .tm-mode button[data-tmm="1"][aria-pressed="true"]{background:#9B6CF5;color:#fff}
+/* 4.4.0 탐험 전체 화면(지섭 요청: 따로 된 게임처럼, 위에는 도토리만). 그림은 작업지시서 77(ex4_ui_, ex4_ic_)을 --x4-* 변수로 받아요 */
+.app.tam-full .board,.app.tam-full .tabs{display:none}
+#panelTam{--x4t:calc(env(safe-area-inset-top,0px) + var(--ait-top,0px));position:fixed;left:0;right:0;top:0;bottom:0;margin-inline:auto;max-width:480px;z-index:18;padding:0;border:0;border-radius:0;box-shadow:none;overflow:hidden;background:#3B5A34}
+#panelTam>.ph{position:absolute;width:1px;height:1px;overflow:hidden;clip:rect(0 0 0 0);margin:0;padding:0}
+#panelTam .tm-stage{position:absolute;inset:0;aspect-ratio:auto;max-height:none;border:0;border-radius:0}
+#panelTam .tm-bg{background-position:center 60%}
+#panelTam .tm-fg{bottom:calc(var(--sab,0px) + 56px);width:120%;aspect-ratio:3/1;left:-4%}
+#panelTam .tm-flbig{display:none}
+#panelTam .tm-f{--w:27%}#panelTam .tm-mob.solo{--w:33%}#panelTam .tm-mob.boss{--w:48%}
+#panelTam .tm-tower{top:calc(var(--x4t) + 128px);left:22%;right:22%}
+#panelTam .tm-bossbar{top:calc(var(--x4t) + 124px)}
+#panelTam .tm-time{top:calc(var(--x4t) + 152px);left:24%;right:24%;height:4px}
+#panelTam .tm-cut{top:30%;height:26%}
+.tm-cut.x4{background:center/cover no-repeat;border-top:3px solid #FFF3C9;border-bottom:3px solid #FFF3C9;box-shadow:0 6px 18px rgba(0,0,0,.35)}
+.tm-cut.x4 b{color:#fff;-webkit-text-stroke:0;text-shadow:0 2px 0 rgba(60,30,10,.85),0 0 6px rgba(60,30,10,.6)}
+.tm-cut.x4 small{color:#fff;text-shadow:0 1px 0 rgba(60,30,10,.85)}
+.tm-bar{position:absolute;left:0;right:0;top:0;z-index:12;display:flex;align-items:center;gap:8px;padding:calc(8px + var(--x4t)) 10px 0}
+html.ait .tm-bar{padding-right:calc(var(--ait-capw,112px) + 2px)}
+.tm-rb{flex:none;width:44px;height:44px;border:0;border-radius:50%;padding:0;background:var(--x4-btn,#C98A4B) center/100% 100% no-repeat;display:grid;place-items:center;cursor:pointer}
+.tm-rb img{width:62%;height:62%;object-fit:contain}
+#panelTam .tm-bar .tm-mode{margin:0;flex:none;background:rgba(40,25,10,.45)}
+#panelTam .tm-bar .tm-mode button{color:#FFF3C9;font-size:12px;padding:5px 10px}
+.tm-ac{margin-left:auto;flex:none;display:flex;align-items:center;justify-content:flex-end;height:42px;min-width:132px;padding:0 16px 2px 46px;background:var(--x4-top,#A86A34) center/100% 100% no-repeat;border-radius:12px}
+.tm-ac b{font-family:var(--font-display);font-size:17px;color:#FFF8E1;text-shadow:0 1.5px 0 #5A3414,0 0 3px #5A3414;white-space:nowrap}
+.tm-ac.bump{animation:tmAcB .3s}@keyframes tmAcB{50%{transform:scale(1.06)}}
+#panelTam .tm-top{position:absolute;left:0;right:0;top:calc(var(--x4t) + 58px);z-index:11;margin:0;display:flex;flex-direction:column;align-items:center;gap:3px;pointer-events:none}
+#panelTam .tm-where{flex-direction:column;align-items:center;gap:3px}
+#panelTam #tmFl{display:inline-block;min-width:120px;text-align:center;padding:4px 30px 6px;background:var(--x4-floor,#F2B347) center/100% 100% no-repeat;color:#6B3B10;font-size:22px;text-shadow:0 1px 0 #FFF3C9}
+#panelTam #tmReg{font-family:var(--font-display);font-size:13px;color:#fff;text-shadow:0 1px 0 #4A2F14,0 0 3px #4A2F14}
+#panelTam .tm-where small{color:#fff}
+#panelTam .tm-best{font-size:11px;pointer-events:auto}
+#panelTam .tm-pow{position:absolute;left:10px;top:0;transform:scale(.88);transform-origin:left top}
+#panelTam .tm-acts{position:absolute;right:8px;top:calc(var(--x4t) + 176px);z-index:12;margin:0;flex-direction:column;flex-wrap:nowrap;gap:14px}
+#panelTam .tm-acts button{position:relative;width:56px;height:56px;min-height:0;border:0;border-radius:50%;padding:0;background:var(--x4-btn,#C98A4B) center/100% 100% no-repeat;box-shadow:none;display:grid;place-items:center;color:#fff;font-size:0}
+#panelTam .tm-acts button[hidden],#panelTam #tmRep{display:none}
+#panelTam .tm-acts button.on,#panelTam .tm-acts button[aria-pressed="true"]{background-image:var(--x4-btnon,none);filter:drop-shadow(0 0 6px #FFD76A)}
+#panelTam .tm-acts img{width:56%;height:56%;object-fit:contain;pointer-events:none}
+#panelTam .tm-acts small{position:absolute;left:50%;bottom:-9px;transform:translateX(-50%);white-space:nowrap;padding:0 6px;border-radius:8px;background:#FFF3C9;color:#6B3B10;font-size:10.5px;font-weight:800;line-height:16px;box-shadow:0 1px 0 #B9853E}
+#panelTam .tm-acts em{position:absolute;right:-4px;top:-4px;font-style:normal;font-size:10px;font-weight:800;color:#fff;background:#E2532F;border-radius:8px;padding:0 4px;line-height:15px}
+#panelTam .tm-acts .tm-adb{position:absolute;left:-4px;top:-4px;width:22px;height:22px}
+#panelTam .tm-sks{position:absolute;left:0;right:0;bottom:calc(var(--sab,0px) + 92px);z-index:12;margin:0;gap:8px}
+#panelTam .tm-sk{width:56px;height:56px}
+#panelTam .tm-sk::after{content:"";position:absolute;inset:-7px;background:var(--x4-skf,none) center/100% 100% no-repeat;pointer-events:none}
+#panelTam .tm-sk.ready::before{content:"";position:absolute;inset:-16px;background:var(--x4-skr,none) center/100% 100% no-repeat;pointer-events:none;animation:tmSkr 1s ease-in-out infinite alternate}
+@keyframes tmSkr{from{opacity:.55}to{opacity:1}}
+#panelTam .tm-sk small{color:#fff;text-shadow:0 1px 0 #4A2F14,0 0 3px #4A2F14;top:calc(100% + 4px)}
+.tm-nav{position:absolute;left:0;right:0;bottom:0;z-index:12;display:grid;grid-template-columns:repeat(5,1fr);padding:14px 10px calc(8px + var(--sab,0px));min-height:78px;background:var(--x4-bot,#A86A34) center top/100% 100% no-repeat}
+.tm-nav button{position:relative;display:flex;flex-direction:column;align-items:center;gap:1px;border:0;background:none;padding:0;cursor:pointer;font-family:var(--font-display);font-size:12px;color:#FFF8E1;text-shadow:0 1px 0 #5A3414}
+.tm-nav img{width:40px;height:40px;object-fit:contain;filter:drop-shadow(0 2px 0 rgba(60,30,10,.35))}
+.tm-nav button.dot::after{content:"";position:absolute;top:0;right:calc(50% - 22px);width:11px;height:11px;border-radius:50%;background:#FF4B3A;box-shadow:0 0 0 2px #fff}
+.tm-nav button[aria-pressed="true"] img{transform:translateY(-3px) scale(1.08)}
+.tm-sheet{position:absolute;left:6px;right:6px;bottom:0;height:68%;z-index:14;display:flex;flex-direction:column;padding:10px 12px calc(10px + var(--sab,0px));background:var(--paper);border:3px solid #C9893F;border-bottom:0;border-radius:22px 22px 0 0;box-shadow:0 -6px 22px rgba(0,0,0,.35);animation:tmShIn .28s cubic-bezier(.2,.9,.3,1)}
+.tm-sheet[hidden]{display:none}
+@keyframes tmShIn{from{transform:translateY(100%)}}
+.tm-shh{display:flex;align-items:center;justify-content:space-between;padding:2px 4px 4px}
+.tm-shh b{font-family:var(--font-display);font-size:19px}
+#panelTam .tm-sheet .tm-tabs{margin:4px 0 8px}
+#panelTam #tmBody{flex:1;min-height:0;overflow-y:auto;overscroll-behavior:contain}
+.tm-warn{position:absolute;inset:0;z-index:9;pointer-events:none}
+.tm-warn[hidden]{display:none}
+.tm-warn i{position:absolute;left:0;right:0;height:9%;background:var(--x4-warn,repeating-linear-gradient(-45deg,#FFB23B 0 14px,#FF5A3C 14px 28px)) 0 0/auto 100% repeat-x;animation:tmWarn 1.5s linear}
+.tm-warn i:first-child{top:24%}.tm-warn i:last-child{top:58%;animation-direction:reverse}
+@keyframes tmWarn{0%{opacity:0;background-position-x:0}15%,85%{opacity:1}100%{opacity:0;background-position-x:-300px}}
+.tm-enter{position:absolute;inset:0;z-index:20;display:flex;flex-direction:column;align-items:center;padding-top:calc(var(--x4t) + 16%);gap:4px;background:var(--x4-enter,#3B5A34) center/cover no-repeat;animation:tmEnterF 1.6s ease-in forwards;pointer-events:none}
+.tm-enter[hidden]{display:none}
+.tm-enter b{font-family:var(--font-display);font-size:34px;color:#FFF8E1;text-shadow:0 3px 0 #6B3B10,0 0 10px rgba(60,30,10,.6)}
+.tm-enter small{font-family:var(--font-display);font-size:16px;color:#fff;text-shadow:0 2px 0 #6B3B10}
+@keyframes tmEnterF{0%,70%{opacity:1}100%{opacity:0}}
+.tm-mob.boss .tm-body::before{content:"";position:absolute;left:-30%;right:-30%;top:-20%;bottom:-20%;z-index:-1;background:var(--x4-aura,none) center/contain no-repeat;opacity:.8;animation:tmAura 7s linear infinite;pointer-events:none}
+@keyframes tmAura{to{transform:rotate(360deg)}}
+.tm-x4fx{position:absolute;left:0;top:0;pointer-events:none;object-fit:contain}
+
 .tm-rib{position:absolute;left:4%;right:4%;top:28%;height:22%;display:grid;place-items:center;padding:0 14%;text-align:center;font-family:var(--font-display);font-size:clamp(16px,6.2cqw,24px);color:#5A3A12;background:center/100% 100% no-repeat;animation:tmRib 1.3s ease-out forwards;z-index:7;text-shadow:0 1px 0 #fff}
 .tm-rib:not([style*="url"]){background-color:rgba(255,226,140,.92);border-radius:12px}
 .tm-rib.boss{color:#fff;text-shadow:0 2px 0 #4B2A86}.tm-rib.lose{background-color:rgba(255,255,255,.88);color:var(--ink);font-size:16px;border-radius:12px}
@@ -888,6 +960,7 @@ label.srow,button.srow{cursor:pointer}
 .tm-fxl .tm-ghost{width:22%;aspect-ratio:1;object-fit:contain;filter:brightness(1.6) opacity(.7) blur(.5px)}
 .tm-fxl .tm-note{width:9%;aspect-ratio:1;object-fit:contain}
 .tm-fxl .tm-shot.big{width:22%}
+.tm-fxl .tm-ring{width:44%;aspect-ratio:1;object-fit:contain}.tm-fxl .tm-sweep4{width:70%;aspect-ratio:1;object-fit:contain}.tm-fxl .tm-arrow4{width:52%;aspect-ratio:1;object-fit:contain;filter:drop-shadow(0 0 8px #FFE98A)}.tm-fxl .tm-pillar{width:30%;aspect-ratio:1;object-fit:contain}.tm-fxl .tm-bigs.sm{width:34%}.tm-fxl .tm-shock{width:60%;aspect-ratio:1;object-fit:contain}.tm-fxl .tm-lvup{width:34%;aspect-ratio:1;object-fit:contain}   /* 4.4.0 */
 .tm-fxl .tm-aim{position:absolute;left:0;top:0;width:60px;height:60px;border-radius:50%;border:3px solid #E5533D;box-shadow:0 0 0 2px #fff,inset 0 0 0 2px #fff;animation:tmAim .7s ease-in forwards}
 .tm-fxl .tm-aim::before,.tm-fxl .tm-aim::after{content:"";position:absolute;left:50%;top:-8px;bottom:-8px;width:3px;margin-left:-1.5px;background:#E5533D}
 .tm-fxl .tm-aim::after{transform:rotate(90deg)}
@@ -3650,7 +3723,7 @@ body.cam-scene #ffChip,body.cam-scene #plChip,body.cam-scene .b-ring{animation-p
     <p class="boot-step" id="bootStep">학교 문을 여는 중...</p>
     <p class="boot-tip" id="bootTip">학교 문을 여는 중이에요</p>
   </div>
-  <span class="boot-ver" id="bootVer">v4.3.2.1</span>
+  <span class="boot-ver" id="bootVer">v4.4.0</span>
 </div>
 
 <div class="app on-school" id="app">
@@ -3948,8 +4021,7 @@ body.cam-scene #ffChip,body.cam-scene #plChip,body.cam-scene .b-ring{animation-p
 
     <section class="panel" id="panelTam" hidden aria-labelledby="ttlTam">
       <h2 id="ttlTam" class="ph"><span class="tic" data-ic="ic_tab_ex" aria-hidden="true"></span><span>숲속 탐험대</span></h2>
-      <div class="tm-top"><div class="tm-where"><b id="tmFl">1층</b><span id="tmReg"></span><b class="tm-best" id="tmBest"></b></div><span class="tm-pow" id="tmPow"></span></div>
-      <div class="tm-mode" id="tmMode" role="group" aria-label="탐험 고르기" hidden><button type="button" data-tmm="0" aria-pressed="true">일반 탐험</button><button type="button" data-tmm="1" aria-pressed="false">심화 탐험</button></div>
+      <!-- 4.4.0 지섭 요청: 탐험은 화면 전체를 쓰는 따로 된 게임 화면(위에는 도토리만, 진짜 게임처럼 단추) -->
       <div class="tm-stage" id="tmStage" data-reg="ground">
         <div class="tm-cam"><div class="tm-world" id="tmWorld">
           <div class="tm-bgs"><i class="tm-bg cur"></i><i class="tm-bg nx"></i></div>
@@ -3968,11 +4040,17 @@ body.cam-scene #ffChip,body.cam-scene #plChip,body.cam-scene .b-ring{animation-p
         <div class="tm-msg" id="tmMsg" role="status" aria-live="polite" hidden></div>
         <div class="tm-rib" id="tmRib" hidden></div>
         <i class="tm-time"><b id="tmTime"></b></i>
+        <div class="tm-warn" id="tmWarn" aria-hidden="true" hidden><i></i><i></i></div>
+        <div class="tm-enter" id="tmEnter" aria-hidden="true" hidden><b>숲속 탐험대</b><small>오늘도 출발!</small></div>
       </div>
-      <div class="tm-sks" id="tmSk"></div>
+      <div class="tm-bar"><button type="button" class="tm-rb" id="tmExit" aria-label="학교로 돌아가기"><img data-x4="ex4_ic_close" alt=""></button><div class="tm-mode" id="tmMode" role="group" aria-label="탐험 고르기" hidden><button type="button" data-tmm="0" aria-pressed="true">일반 탐험</button><button type="button" data-tmm="1" aria-pressed="false">심화 탐험</button></div><div class="tm-ac" id="tmAc" aria-label="가진 도토리"><b id="tmAcN">0</b></div></div>
+      <div class="tm-top"><div class="tm-where"><b id="tmFl">1층</b><span id="tmReg"></span><b class="tm-best" id="tmBest"></b></div><span class="tm-pow" id="tmPow"></span></div>
       <div class="tm-acts"><button type="button" class="btn-sub small" id="tmSpd"></button><button type="button" class="btn-sub small" id="tmAuto" aria-pressed="false" hidden></button><button type="button" class="btn-sub small" id="tmSkOff" aria-pressed="false" hidden></button><button type="button" class="cta small" id="tmRevive" hidden>📺 응원 받기</button><button type="button" class="btn-sub small" id="tmRep" hidden></button></div>
+      <div class="tm-sks" id="tmSk"></div>
+      <nav class="tm-nav" id="tmNav" aria-label="탐험대 메뉴"><button type="button" data-tnav="mem"><img data-x4="ex4_ic_member" alt=""><span>대원</span></button><button type="button" data-tnav="gear"><img data-x4="ex4_ic_gear" alt=""><span>장비</span></button><button type="button" data-tnav="mat"><img data-x4="ex4_ic_mat" alt=""><span>재료</span></button><button type="button" data-tnav="rank"><img data-x4="ex4_ic_rank" alt=""><span>랭킹</span></button><button type="button" data-tnav="rep"><img data-x4="ex4_ic_report" alt=""><span>보고서</span></button></nav>
+      <div class="tm-sheet" id="tmSheet" hidden><div class="tm-shh"><b id="tmShT">대원</b><button type="button" class="btn-sub small" id="tmShX">닫기</button></div>
       <div class="tm-tabs" id="tmSeg" role="group" aria-label="탐험대 보기"></div>
-      <div id="tmBody"></div>
+      <div id="tmBody"></div></div>
     </section>
     <section class="panel" id="panelGrad" hidden aria-labelledby="ttlGrad">
       <h2 id="ttlGrad" class="ph"><span class="tic" data-ic="ic_grad" aria-hidden="true"></span><span>졸업</span></h2>
@@ -4205,7 +4283,7 @@ body.cam-scene #ffChip,body.cam-scene #plChip,body.cam-scene .b-ring{animation-p
       </div>
       <h3 class="panel-sub">정보</h3>
       <dl class="info">
-        <div id="verRow"><dt>버전</dt><dd>v4.3.2.1</dd></div>
+        <div id="verRow"><dt>버전</dt><dd>v4.4.0</dd></div>
         <div id="pidRow" hidden><dt>학교 번호</dt><dd id="infoPid"></dd></div>
       </dl>
       <div id="devBox" hidden>
@@ -6670,7 +6748,140 @@ body.cam-scene #ffChip,body.cam-scene #plChip,body.cam-scene .b-ring{animation-p
 "ex3_pc_turtle_idle":"img/a/ex3_pc_turtle_idle-fea11a6256.webp",
 "ex3_pc_waterdeer_act":"img/a/ex3_pc_waterdeer_act-e6c1e3d13e.webp",
 "ex3_pc_waterdeer_hit":"img/a/ex3_pc_waterdeer_hit-c6524556a2.webp",
-"ex3_pc_waterdeer_idle":"img/a/ex3_pc_waterdeer_idle-7cea282973.webp"
+"ex3_pc_waterdeer_idle":"img/a/ex3_pc_waterdeer_idle-7cea282973.webp",
+"ex4_bg_garden":"img/a/ex4_bg_garden-462908cea2.webp",
+"ex4_bg_ground":"img/a/ex4_bg_ground-5dca232aa3.webp",
+"ex4_bg_library":"img/a/ex4_bg_library-f1254590f0.webp",
+"ex4_bg_pond":"img/a/ex4_bg_pond-565f282a19.webp",
+"ex4_bg_tower":"img/a/ex4_bg_tower-9db0c19b80.webp",
+"ex4_bg_yard":"img/a/ex4_bg_yard-83bdfb79bc.webp",
+"ex4_boss_aura":"img/a/ex4_boss_aura-566a4519ec.webp",
+"ex4_boss_warn":"img/a/ex4_boss_warn-f40087ec20.webp",
+"ex4_cut_art":"img/a/ex4_cut_art-a5c11537d4.webp",
+"ex4_cut_kor":"img/a/ex4_cut_kor-8866eb5ada.webp",
+"ex4_cut_math":"img/a/ex4_cut_math-f4db2e130d.webp",
+"ex4_cut_pe":"img/a/ex4_cut_pe-48dca52619.webp",
+"ex4_cut_sci":"img/a/ex4_cut_sci-e0b92d45f0.webp",
+"ex4_enter":"img/a/ex4_enter-38bda07861.webp",
+"ex4_fg_garden":"img/a/ex4_fg_garden-0584393b47.webp",
+"ex4_fg_ground":"img/a/ex4_fg_ground-97e4a8524f.webp",
+"ex4_fg_library":"img/a/ex4_fg_library-3b510ee069.webp",
+"ex4_fg_pond":"img/a/ex4_fg_pond-dbed5f8e83.webp",
+"ex4_fg_tower":"img/a/ex4_fg_tower-be5f420ade.webp",
+"ex4_fg_yard":"img/a/ex4_fg_yard-e953cd15df.webp",
+"ex4_fx_crit":"img/a/ex4_fx_crit-0864d1b9c2.webp",
+"ex4_fx_hit_big":"img/a/ex4_fx_hit_big-09e13cb615.webp",
+"ex4_fx_levelup":"img/a/ex4_fx_levelup-da29d326a9.webp",
+"ex4_fx_shock":"img/a/ex4_fx_shock-a57964d750.webp",
+"ex4_fx_spark":"img/a/ex4_fx_spark-6280b7a94b.webp",
+"ex4_ic_ad":"img/a/ex4_ic_ad-066cd100ec.webp",
+"ex4_ic_auto":"img/a/ex4_ic_auto-ad10faa39d.webp",
+"ex4_ic_cheer":"img/a/ex4_ic_cheer-96535ca2df.webp",
+"ex4_ic_close":"img/a/ex4_ic_close-23313b841e.webp",
+"ex4_ic_gear":"img/a/ex4_ic_gear-bab09d5fd0.webp",
+"ex4_ic_mat":"img/a/ex4_ic_mat-7a767ea3dc.webp",
+"ex4_ic_member":"img/a/ex4_ic_member-8527cdefba.webp",
+"ex4_ic_rank":"img/a/ex4_ic_rank-4b35786940.webp",
+"ex4_ic_report":"img/a/ex4_ic_report-d31d7a5523.webp",
+"ex4_ic_speed":"img/a/ex4_ic_speed-807cc32609.webp",
+"ex4_pc_bear_atk":"img/a/ex4_pc_bear_atk-49f644814e.webp",
+"ex4_pc_bear_hurt":"img/a/ex4_pc_bear_hurt-8fb9dc070e.webp",
+"ex4_pc_bear_sk":"img/a/ex4_pc_bear_sk-85a8096905.webp",
+"ex4_pc_capybara_atk":"img/a/ex4_pc_capybara_atk-ead3273aca.webp",
+"ex4_pc_capybara_hurt":"img/a/ex4_pc_capybara_hurt-1384bea977.webp",
+"ex4_pc_capybara_sk":"img/a/ex4_pc_capybara_sk-53c9e9d533.webp",
+"ex4_pc_cat_atk":"img/a/ex4_pc_cat_atk-30c81d115c.webp",
+"ex4_pc_cat_hurt":"img/a/ex4_pc_cat_hurt-4e90ab0f1b.webp",
+"ex4_pc_cat_sk":"img/a/ex4_pc_cat_sk-4bd93c9ec4.webp",
+"ex4_pc_chick_atk":"img/a/ex4_pc_chick_atk-dfc4286dbe.webp",
+"ex4_pc_chick_hurt":"img/a/ex4_pc_chick_hurt-2dfd9c4267.webp",
+"ex4_pc_chick_sk":"img/a/ex4_pc_chick_sk-8641948ec0.webp",
+"ex4_pc_chinchilla_atk":"img/a/ex4_pc_chinchilla_atk-b6f2969aed.webp",
+"ex4_pc_chinchilla_hurt":"img/a/ex4_pc_chinchilla_hurt-62b684979f.webp",
+"ex4_pc_chinchilla_sk":"img/a/ex4_pc_chinchilla_sk-56b9e85b75.webp",
+"ex4_pc_dog_atk":"img/a/ex4_pc_dog_atk-03f43fb0ab.webp",
+"ex4_pc_dog_hurt":"img/a/ex4_pc_dog_hurt-9dab728f05.webp",
+"ex4_pc_dog_sk":"img/a/ex4_pc_dog_sk-60fe7f5a20.webp",
+"ex4_pc_duck_atk":"img/a/ex4_pc_duck_atk-42b72a59d4.webp",
+"ex4_pc_duck_hurt":"img/a/ex4_pc_duck_hurt-e1d9cb1f2a.webp",
+"ex4_pc_duck_sk":"img/a/ex4_pc_duck_sk-37cafdba40.webp",
+"ex4_pc_fox_atk":"img/a/ex4_pc_fox_atk-2def49e878.webp",
+"ex4_pc_fox_hurt":"img/a/ex4_pc_fox_hurt-de0c75d973.webp",
+"ex4_pc_fox_sk":"img/a/ex4_pc_fox_sk-db1831cf32.webp",
+"ex4_pc_frog_atk":"img/a/ex4_pc_frog_atk-0289d2d2ed.webp",
+"ex4_pc_frog_hurt":"img/a/ex4_pc_frog_hurt-28da237c61.webp",
+"ex4_pc_frog_sk":"img/a/ex4_pc_frog_sk-3fabac44f2.webp",
+"ex4_pc_hamster_atk":"img/a/ex4_pc_hamster_atk-9fbba80f22.webp",
+"ex4_pc_hamster_hurt":"img/a/ex4_pc_hamster_hurt-d81aa69bcd.webp",
+"ex4_pc_hamster_sk":"img/a/ex4_pc_hamster_sk-9f8f428d07.webp",
+"ex4_pc_kangaroo_atk":"img/a/ex4_pc_kangaroo_atk-8c415109a0.webp",
+"ex4_pc_kangaroo_hurt":"img/a/ex4_pc_kangaroo_hurt-ce987d6884.webp",
+"ex4_pc_kangaroo_sk":"img/a/ex4_pc_kangaroo_sk-b274894e2e.webp",
+"ex4_pc_koala_atk":"img/a/ex4_pc_koala_atk-e424396977.webp",
+"ex4_pc_koala_hurt":"img/a/ex4_pc_koala_hurt-9b85865474.webp",
+"ex4_pc_koala_sk":"img/a/ex4_pc_koala_sk-974d9fec65.webp",
+"ex4_pc_meerkat_atk":"img/a/ex4_pc_meerkat_atk-b56cd35408.webp",
+"ex4_pc_meerkat_hurt":"img/a/ex4_pc_meerkat_hurt-445c9b9fcd.webp",
+"ex4_pc_meerkat_sk":"img/a/ex4_pc_meerkat_sk-ee8fdfca3a.webp",
+"ex4_pc_mole_atk":"img/a/ex4_pc_mole_atk-6afe34d7da.webp",
+"ex4_pc_mole_hurt":"img/a/ex4_pc_mole_hurt-7c9141bbc0.webp",
+"ex4_pc_mole_sk":"img/a/ex4_pc_mole_sk-2739897dd1.webp",
+"ex4_pc_otter_atk":"img/a/ex4_pc_otter_atk-8082890548.webp",
+"ex4_pc_otter_hurt":"img/a/ex4_pc_otter_hurt-c0ac7d97d0.webp",
+"ex4_pc_otter_sk":"img/a/ex4_pc_otter_sk-608e904f4c.webp",
+"ex4_pc_panda_atk":"img/a/ex4_pc_panda_atk-e75a55d4fb.webp",
+"ex4_pc_panda_hurt":"img/a/ex4_pc_panda_hurt-4c92ff7fae.webp",
+"ex4_pc_panda_sk":"img/a/ex4_pc_panda_sk-7ddae9b11f.webp",
+"ex4_pc_penguin_atk":"img/a/ex4_pc_penguin_atk-6dd0af5c0e.webp",
+"ex4_pc_penguin_hurt":"img/a/ex4_pc_penguin_hurt-9c1ecf5682.webp",
+"ex4_pc_penguin_sk":"img/a/ex4_pc_penguin_sk-03b2dda342.webp",
+"ex4_pc_rabbit_atk":"img/a/ex4_pc_rabbit_atk-e54f0a8ad0.webp",
+"ex4_pc_rabbit_hurt":"img/a/ex4_pc_rabbit_hurt-21911473d7.webp",
+"ex4_pc_rabbit_sk":"img/a/ex4_pc_rabbit_sk-de5c9d492c.webp",
+"ex4_pc_raccoon_atk":"img/a/ex4_pc_raccoon_atk-03c0594195.webp",
+"ex4_pc_raccoon_hurt":"img/a/ex4_pc_raccoon_hurt-c27a6dbb16.webp",
+"ex4_pc_raccoon_sk":"img/a/ex4_pc_raccoon_sk-ef8353f941.webp",
+"ex4_pc_redpanda_atk":"img/a/ex4_pc_redpanda_atk-635f7ae174.webp",
+"ex4_pc_redpanda_hurt":"img/a/ex4_pc_redpanda_hurt-539cb7d2c6.webp",
+"ex4_pc_redpanda_sk":"img/a/ex4_pc_redpanda_sk-618916e90f.webp",
+"ex4_pc_sloth_atk":"img/a/ex4_pc_sloth_atk-80f7f6b3ca.webp",
+"ex4_pc_sloth_hurt":"img/a/ex4_pc_sloth_hurt-ea60e15fa5.webp",
+"ex4_pc_sloth_sk":"img/a/ex4_pc_sloth_sk-cb70e99f27.webp",
+"ex4_pc_turtle_atk":"img/a/ex4_pc_turtle_atk-5f0dfaec78.webp",
+"ex4_pc_turtle_hurt":"img/a/ex4_pc_turtle_hurt-13fc813336.webp",
+"ex4_pc_turtle_sk":"img/a/ex4_pc_turtle_sk-9bc0b1f802.webp",
+"ex4_pc_waterdeer_atk":"img/a/ex4_pc_waterdeer_atk-79034c65f0.webp",
+"ex4_pc_waterdeer_hurt":"img/a/ex4_pc_waterdeer_hurt-79ca26991f.webp",
+"ex4_pc_waterdeer_sk":"img/a/ex4_pc_waterdeer_sk-78ced1da7d.webp",
+"ex4_sk_art_charge":"img/a/ex4_sk_art_charge-09a06c9ca9.webp",
+"ex4_sk_art_drop":"img/a/ex4_sk_art_drop-d3aab0cdcd.webp",
+"ex4_sk_art_splash":"img/a/ex4_sk_art_splash-8aac094c1b.webp",
+"ex4_sk_art_stroke":"img/a/ex4_sk_art_stroke-530a19f400.webp",
+"ex4_sk_kor_charge":"img/a/ex4_sk_kor_charge-badb1124d3.webp",
+"ex4_sk_kor_heal":"img/a/ex4_sk_kor_heal-5efaf46ebf.webp",
+"ex4_sk_kor_note":"img/a/ex4_sk_kor_note-23735601e0.webp",
+"ex4_sk_kor_ring":"img/a/ex4_sk_kor_ring-b9f9a0f94d.webp",
+"ex4_sk_math_arrow":"img/a/ex4_sk_math_arrow-f6658bfb9e.webp",
+"ex4_sk_math_burst":"img/a/ex4_sk_math_burst-ab882be1c8.webp",
+"ex4_sk_math_charge":"img/a/ex4_sk_math_charge-4fe0e2d987.webp",
+"ex4_sk_math_star":"img/a/ex4_sk_math_star-753bdc1157.webp",
+"ex4_sk_pe_charge":"img/a/ex4_sk_pe_charge-35ad8f1840.webp",
+"ex4_sk_pe_dash":"img/a/ex4_sk_pe_dash-f8609d79db.webp",
+"ex4_sk_pe_leaf":"img/a/ex4_sk_pe_leaf-818c787129.webp",
+"ex4_sk_pe_tornado":"img/a/ex4_sk_pe_tornado-b5fd5f4b12.webp",
+"ex4_sk_sci_boom":"img/a/ex4_sk_sci_boom-bbe5e5e051.webp",
+"ex4_sk_sci_bubble":"img/a/ex4_sk_sci_bubble-e596d3ded7.webp",
+"ex4_sk_sci_charge":"img/a/ex4_sk_sci_charge-d7a1a2a539.webp",
+"ex4_sk_sci_throw":"img/a/ex4_sk_sci_throw-0f54b744ac.webp",
+"ex4_ui_bottom":"img/a/ex4_ui_bottom-64c3f35e21.webp",
+"ex4_ui_btn_round":"img/a/ex4_ui_btn_round-53d7cb12d8.webp",
+"ex4_ui_btn_round_on":"img/a/ex4_ui_btn_round_on-77943c1c30.webp",
+"ex4_ui_floor":"img/a/ex4_ui_floor-0189d8ec53.webp",
+"ex4_ui_hp":"img/a/ex4_ui_hp-3418dce0f8.webp",
+"ex4_ui_sheet":"img/a/ex4_ui_sheet-878a03874b.webp",
+"ex4_ui_sk_frame":"img/a/ex4_ui_sk_frame-cce18a4755.webp",
+"ex4_ui_sk_ready":"img/a/ex4_ui_sk_ready-65d9935b09.webp",
+"ex4_ui_topbar":"img/a/ex4_ui_topbar-f7d4633e71.webp"
 };</script>
 <!-- FS_IMG431:END -->
 <!-- FS_IMG174:BEGIN -->
@@ -9757,15 +9968,24 @@ body.cam-scene #ffChip,body.cam-scene #plChip,body.cam-scene .b-ring{animation-p
     layerTeachers.innerHTML = `<g id="m-hedgehog"><g class="tinner">${AV.hedgehog}</g></g>` +
       Object.keys(TEA).map(k => `<g id="m-${k}"><g class="tinner">${AV[k]}</g></g>`).join('');
   }
+  // 4.4.0 지섭 요청(행사 때 선생님이 학생과 겹쳐요): 학교 행사가 열린 동안 학생들이 둘러서는 광장 둘레(가로 56, 세로 24 고리와 무대 줄)에
+  // 선생님 자리가 들어 있으면, 그 둘레 바깥으로 비켜 서게 해요(모든 학교급, 지도 자리 표는 그대로). 행사가 끝나면 제자리로
+  function teaOff(p) {
+    if (!p || !geo().plaza || !rt.fest) return p;   // 행사가 열린 동안만(평소 자리는 이름표와 겹치지 않게 골라 둔 그대로)
+    const [cx, cy0] = geo().plaza, cy = cy0 + 10, rx = 76, ry = 44, dx = p[0] - cx, dy = p[1] - cy, d = Math.sqrt((dx / rx) ** 2 + (dy / ry) ** 2);
+    if (d >= 1) return p;
+    const a = d < 0.05 ? Math.PI : Math.atan2(dy / ry, dx / rx);
+    return [cx + Math.cos(a) * rx * 1.04, cy + Math.sin(a) * ry * 1.04, p[2]];
+  }
   function renderTeachersOnMap() {
     for (const k of Object.keys(TEA)) {
       const g = $('#m-' + k);
       const T = geo().tea || {};   // 4.0.0 구역 지도에는 그 구역 선생님만 있어요(자리가 없으면 숨겨요)
-      const p = k === 'owl' && !(S.f.library > 0) ? T.owlAway : T[k];
+      const p = teaOff(k === 'owl' && !(S.f.library > 0) ? T.owlAway : T[k]);
       g.style.display = p && S.t[k] > 0 ? '' : 'none';
       if (p) g.setAttribute('transform', `translate(${p[0]} ${p[1]}) scale(${p[2]})`);
     }
-    const hh = (geo().tea || {}).hedgehog, mh = $('#m-hedgehog');
+    const hh = teaOff((geo().tea || {}).hedgehog), mh = $('#m-hedgehog');
     if (mh) { mh.style.display = hh ? '' : 'none'; if (hh) mh.setAttribute('transform', `translate(${hh[0]} ${hh[1]}) scale(${hh[2]})`); }
   }
 
@@ -13320,13 +13540,16 @@ body.cam-scene #ffChip,body.cam-scene #plChip,body.cam-scene .b-ring{animation-p
        forest/rank/<내 id>   랭킹 이름과 학교 점수
        forest/stats/<내 id>  테스트 현황 (어디까지 했는지, 얼마나 했는지)
      <내 id>는 Firebase 익명 로그인이 기기(브라우저)마다 만들어 줘요. */
-  const VERSION = '4.3.2.1';
+  const VERSION = '4.4.0';
   const NT_QUIET = ['2.1.20', '2.1.2.2', '2.3.0.1', '2.3.4', '3.2.3', '3.2.4', '3.2.5', '3.3.1', '3.3.2', '3.3.3'];   // 3.3.1, 3.3.2, 3.3.3(토스 먼저)도 공지 창 없이(지섭). 2.3.0.1도 공지 창 없이(공지는 그대로 2.3.0). 2.3.4도 조용히(지섭 결정). 3.2.3, 3.2.4, 3.2.5도 공지 창 없이(공지 줄을 고르지 않음)
     // 2.1.20 지섭 결정: 이 버전들은 업데이트해도 공지 창을 띄우지 않아요(공지는 그대로 2.1.2)
   /* 2.0.0 공지사항 (2026-10-27 지섭, 1.8.0은 이미 올려서 2.0.0부터): 설정 > 공지사항. 맨 위가 가장 새 공지예요.
      패치노트는 자동으로 넣지 않아요. 지섭이 검수한 글만 여기에 적어요(CHANGELOG.md는 자세한 기록용이라 따로 있어요).
      접속하면 새 공지 창을 띄워요(올라온 뒤 7일 동안, '일주일간 열지 않기'를 누르면 7일 쉬어요). 업데이트한 뒤 첫 접속에는 쉬는 중이어도 한 번 띄워요 */
   const NOTICES = [
+    // 4.4.0 공지(2026-11-15 지섭이 고른 세 줄)
+    { id: '2026-11-15-v440', date: '2026-11-15', tag: '업데이트', title: '4.4.0 업데이트',
+      lines: ['숲속 탐험대 전체 화면 개편', '심화 탐험과 심화 랭킹 추가', '편의 개선과 오류 수정'] },
     // 4.3.1 공지(2026-11-14 지섭이 고른 두 줄)
     { id: '2026-11-14-v431', date: '2026-11-14', tag: '업데이트', title: '4.3.1 업데이트',
       lines: ['숲속 탐험대 개편', '편의 개선과 오류 수정'] },
@@ -15165,7 +15388,7 @@ body.cam-scene #ffChip,body.cam-scene #plChip,body.cam-scene .b-ring{animation-p
     // 4.3.3 지섭 요청(스킬이 너무 빨리 사라져요): 필살기 세 박자. 모으기, 컷인, 큰 움직임(ms). '연출 건너뛰기'를 켜 두면 모으기와 컷인 없이 바로 큰 움직임
     skCharge: 300, skCut: 900, skTail: 150, skFx: 0.75,   // 4.3.3 지섭 요청(필살기 전체 2초쯤): 모으기 0.3초, 컷인 0.9초, 큰 움직임은 0.75배 빠르게, 끝난 뒤 바로 이어서
   };
-  function freshTam() { return { best: 0, party: ['bear', 'rabbit', 'fox'], mem: {}, gear: { tool: 0, bag: 0, hat: 0 }, sg: [0, 1, 2, 3, 4].map(() => ({ tool: 0, bag: 0, hat: 0 })), mat: [0, 0, 0, 0], it: 0, auto: 0, ad: { day: '', spd: 0, rep: 0, rv: 0, ch: 0 }, cheer: 0, spd: { sec: 0 }, wk: { w: -1, best: 0 }, seen: 0, hm: 0, hb: 0, hc: 0, hw: { w: -1, best: 0 }, skSeen: 0, skOff: 0 }; }
+  function freshTam() { return { best: 0, party: ['bear', 'rabbit', 'fox'], mem: {}, gear: { tool: 0, bag: 0, hat: 0 }, sg: [0, 1, 2, 3, 4].map(() => ({ tool: 0, bag: 0, hat: 0 })), mat: [0, 0, 0, 0], it: 0, auto: 0, ad: { day: '', spd: 0, rep: 0, rv: 0, ch: 0 }, cheer: 0, spd: { sec: 0 }, wk: { w: -1, best: 0 }, seen: 0, hm: 0, hb: 0, hc: 0, hw: { w: -1, best: 0 }, skSeen: 0, skOff: 0, ed: '' }; }
   function sanitizeTam(d, s) {
     const A = d && d.tam && typeof d.tam === 'object' ? d.tam : {}, f = freshTam(), n = (v, lo, hi, def) => typeof v === 'number' && isFinite(v) ? Math.max(lo, Math.min(hi, Math.floor(v))) : def;
     f.best = n(A.best, 0, 1e6, 0);
@@ -15181,7 +15404,7 @@ body.cam-scene #ffChip,body.cam-scene #plChip,body.cam-scene .b-ring{animation-p
     if (A.spd && typeof A.spd === 'object') f.spd = { sec: n(A.spd.sec, 0, TAM.adSpd.max * 60, 0) };   // 옛 시험판의 층 단위 2배속(fl, until)은 받지 않아요
     if (A.wk && typeof A.wk === 'object') f.wk = { w: n(A.wk.w, -1, 1e7, -1), best: n(A.wk.best, 0, 1e6, 0) };
     // 4.3.3 심화 탐험(hm 켬, hb 가장 높은 심화 층, hc 그 기록의 기준 상한, hw 이번 주 심화 층), 필살기 컷인을 본 과목(skSeen 비트)
-    f.hm = A.hm ? 1 : 0; f.hb = n(A.hb, 0, 1e6, 0); f.hc = n(A.hc, 0, 1e7, 0); f.skSeen = n(A.skSeen, 0, 31, 0); f.skOff = A.skOff ? 1 : 0;
+    f.hm = A.hm ? 1 : 0; f.hb = n(A.hb, 0, 1e6, 0); f.hc = n(A.hc, 0, 1e7, 0); f.skSeen = n(A.skSeen, 0, 31, 0); f.skOff = A.skOff ? 1 : 0; f.ed = typeof A.ed === 'string' ? A.ed.slice(0, 10) : '';   // 4.4.0 입장 장면을 본 날
     if (A.hw && typeof A.hw === 'object') f.hw = { w: n(A.hw.w, -1, 1e7, -1), best: n(A.hw.best, 0, 1e6, 0) };
     s.tam = f;
   }
@@ -15423,7 +15646,7 @@ body.cam-scene #ffChip,body.cam-scene #plChip,body.cam-scene .b-ring{animation-p
     if (ph === 'walk') { T.F = null; if (vis) tamWalk(fl); }
     else if (ph === 'meet') {
       T.F = tamFight(fl, tamTeam(), S.tam.cheer > 0 ? TAM.cheer.mul : 1, T.mod, hm); T.F.cheer = S.tam.cheer > 0 ? 1 : 0; T.mod = null;   // 4.3.1 응원
-      if (vis) { tamBuild(); tamAlert(); tamCam(true, T.F.M[0].boss); if (T.F.M[0].boss) tamRibbon('boss', '큰 장난꾸러기가 나타났어요!'); }
+      if (vis) { tamBuild(); tamAlert(); tamCam(true, T.F.M[0].boss); if (T.F.M[0].boss) { tamRibbon('boss', '큰 장난꾸러기가 나타났어요!'); const w = $('#tmWarn'); if (w && !rt.reduced) { w.hidden = false; $$('i', w).forEach(i => { i.style.animation = 'none'; void i.offsetWidth; i.style.animation = ''; }); clearTimeout(w._t); w._t = setTimeout(() => { w.hidden = true; }, 1500); } } }
     }
     else if (ph === 'win') {
       const f = T.F.fl, hard = T.F.hard; T.nLose = 0; T.lose = 0; if (T.F.cheer && S.tam.cheer > 0) S.tam.cheer -= 1; if (T.F.hm) tamWinH(f); else tamWin(f); if (hard) tamWinHard(f);
@@ -15441,6 +15664,7 @@ body.cam-scene #ffChip,body.cam-scene #plChip,body.cam-scene .b-ring{animation-p
     if (!tamOn() || !tamParty().length) return;
     const T = rt.tam || (rt.tam = { ph: '', t: 0, F: null, buff: 0, lose: 0, nLose: 0, ev: null, mod: null });
     if (!T.ph) { tamPh(T, 'walk'); return; }
+    if (tamFxOn() && (rt.tamAcT = (rt.tamAcT || 0) + dt) > 0.4) { rt.tamAcT = 0; tamAcorn(); }   // 4.4.0 위 칸 도토리
     if (T.ph === 'cap') { if (!tamCapped() || tamHOn()) tamPh(T, 'walk'); return; }   // 4.3.1 학년이 오르면 다시 걸어요
     const vis = tamFxOn(), d = dt * (tamSpdOn() ? 2 : 1), P = TAM.ph;
     if (tamSpdOn()) { const was = Math.ceil(S.tam.spd.sec); S.tam.spd.sec = Math.max(0, S.tam.spd.sec - dt); if (vis && Math.ceil(S.tam.spd.sec) !== was) tamRenderTop(); }   // 2배속은 켜 둔 동안만 줄어요
@@ -15496,7 +15720,7 @@ body.cam-scene #ffChip,body.cam-scene #plChip,body.cam-scene .b-ring{animation-p
   const tamMobPic = (fl, m) => m.boss ? tamPic(`ex_boss_${tamReg(fl).k}`, TAM.bossPh) : tamPic(`ex_mob_${tamReg(fl).k}_${m.i + 1}`, TAM.mobPh[(TAM.reg.indexOf(tamReg(fl)) + m.i) % TAM.mobPh.length]);
   // 4.3.0 지섭 요청: 탐험대가 층을 오르며 장난꾸러기를 만나는 화려한 화면. 자리(왼쪽 %, 바닥 %), 앞줄부터
   // 4.3.0 지섭 요청: 맨 앞 장식(풀과 꽃)에 가리지 않게 대원과 장난꾸러기를 14%만큼 위로(TM_UP, 체력 막대까지 보이게)
-  const TM_UP = 14, TM_PPOS = [[37, 5], [23, 14], [22, -1], [9, 8], [8, 20]];
+  const TM_UP = 26, TM_PPOS = [[37, 5], [23, 14], [22, -1], [9, 8], [8, 20]];
   const TM_MPOS = [[65, 5], [80, 15], [83, -1]], TM_MPOS1 = [[72, 5]], TM_MPOS2 = [[66, 3], [81, 12]], TM_BPOS = [[74, 2], [55, 17], [55, -2]];
   const TM_AMB = { ground: 14, garden: 12, pond: 12, library: 12, yard: 22, tower: 18 };
   // 깊이: 뒷줄(바닥 % 큼)일수록 조금 작고 어둡게
@@ -15509,7 +15733,7 @@ body.cam-scene #ffChip,body.cam-scene #plChip,body.cam-scene .b-ring{animation-p
   function tamPunch() { const st = $('#tmStage'); if (!st || rt.reduced) return; st.classList.add('punch'); clearTimeout(st._cp); st._cp = setTimeout(() => st.classList.remove('punch'), 110); }
   // 맞은 모습(ex3_..._hit)이 있으면 잠깐 바꿔 보여요
   function tamHitPic(el, k) {
-    const u = k && IMG(k.replace(/^ex_/, 'ex3_')), im = el && el.querySelector('img'); if (!u || !im) return;
+    const u = k && (/^ex4_/.test(k) ? IMG(k) : IMG(k.replace(/^ex_/, 'ex3_'))), im = el && el.querySelector('img'); if (!u || !im) return;
     if (!im.dataset.base) im.dataset.base = im.src; clearTimeout(im._h); im.src = u; im._h = setTimeout(() => { if (im.src === u) im.src = im.dataset.base; delete im.dataset.base; }, 340);
   }
   // 4.3.0 지섭 요청: 탐험에서 받은 것과 알림은 화면 맨 위가 아니라 탐험 무대 가운데에 띄워요(탐험 화면이 아니면 원래 알림)
@@ -15520,7 +15744,7 @@ body.cam-scene #ffChip,body.cam-scene #plChip,body.cam-scene .b-ring{animation-p
     clearTimeout(m._t); m._t = setTimeout(() => { m.hidden = true; }, 2600);
   }
   function tamFxOn() { return rt.tab === 'tam' && !rt.modalOpen && !document.hidden; }
-  function tamBg(fl) { return tamI('ex_bg_' + tamReg(fl).k); }
+  function tamBg(fl) { return IMG('ex4_bg_' + tamReg(fl).k) || tamI('ex_bg_' + tamReg(fl).k); }   // 4.4.0 세로 배경
   function tamAmb(k) {
     const a = $('#tmAmb'); if (!a || a.dataset.k === k) return; a.dataset.k = k;
     let h = ''; for (let i = 0; i < TM_AMB[k]; i++) { const r = (n => (Math.sin(i * 12.9898 + n * 78.233) * 43758.5453) % 1)(1), q = Math.abs(r);
@@ -15585,9 +15809,12 @@ body.cam-scene #ffChip,body.cam-scene #plChip,body.cam-scene .b-ring{animation-p
     const k = []; for (let i = 0; i <= 6; i++) { const f = (1 - i / 6) * px; k.push({ transform: `translate(${((i % 2 ? 1 : -1) * f).toFixed(1)}px,${((i % 3 - 1) * f * 0.6).toFixed(1)}px)` }); }
     w.animate(k, { duration: ms, easing: 'linear' });
   }
-  function tamHitFx(el, cr) {
+  function tamHitFx(el, cr, big) {
     const [x, y] = tamAt(el), rot = Math.round(Math.random() * 90);
-    tamFxImg('tm-spark', tamI('ex_fx_hit'), x + (Math.random() - 0.5) * 12, y, [{ t: `scale(.3) rotate(${rot}deg)`, opacity: 1 }, { t: `scale(${cr ? 1.7 : 1.1}) rotate(${rot + 30}deg)`, opacity: 1, offset: 0.4 }, { t: `scale(${cr ? 2 : 1.3}) rotate(${rot + 40}deg)`, opacity: 0 }], 360);
+    // 4.4.0 강한 한 방은 금빛 별(ex4_fx_crit), 필살기는 큰 불꽃(ex4_fx_hit_big)과 충격파(ex4_fx_shock)
+    const hs = (cr && IMG('ex4_fx_crit')) || (big && IMG('ex4_fx_hit_big')) || tamI('ex_fx_hit');
+    if (big && IMG('ex4_fx_shock')) tamFxImg('tm-shock', IMG('ex4_fx_shock'), x, y, [{ t: 'scale(.2)', opacity: 0.9 }, { t: 'scale(1.2)', opacity: 0 }], 520);
+    tamFxImg('tm-spark', hs, x + (Math.random() - 0.5) * 12, y, [{ t: `scale(.3) rotate(${rot}deg)`, opacity: 1 }, { t: `scale(${cr ? 1.7 : 1.1}) rotate(${rot + 30}deg)`, opacity: 1, offset: 0.4 }, { t: `scale(${cr ? 2 : 1.3}) rotate(${rot + 40}deg)`, opacity: 0 }], 360);
   }
   // 4.3.3 지섭 요청(공격이 다 똑같아요): 과목마다 다른 평소 공격. 과학은 포물선 플라스크와 거품, 국어는 물결 음표 셋, 미술은 물감 방울 셋, 수학은 빠른 별과 잔상(체육은 붙어서 들이받기)
   function tamShot(fromEl, toEl, ri, onHit) {
@@ -15621,19 +15848,19 @@ body.cam-scene #ffChip,body.cam-scene #plChip,body.cam-scene .b-ring{animation-p
     F.ev.forEach((e, ei) => {
       if (e.k === 'act' || e.k === 'big') {
         actor = e.p; sk = null; const el = P[e.p], im = el && el.querySelector('img'); if (!el) return;
-        if (e.k === 'big') { const nx = F.ev.slice(ei + 1).find(x => x.k === 'hit'); sk = tamSkillFx(F, e.p, nx ? nx.m : 0); const sp = F.P[e.p].sp; skAt(sk.hit - 900, () => { const a = tamI(`ex_pc_${sp}_act`); if (a && im) { im.src = a; clearTimeout(el._t); el._t = setTimeout(() => { im.src = tamPcPic(sp); }, 1400); } }); return; }
+        if (e.k === 'big') { const nx = F.ev.slice(ei + 1).find(x => x.k === 'hit'); sk = tamSkillFx(F, e.p, nx ? nx.m : 0); const sp = F.P[e.p].sp; skAt(sk.hit - 900, () => { const a = IMG(`ex4_pc_${sp}_sk`) || tamI(`ex_pc_${sp}_act`); if (a && im) { im.src = a; clearTimeout(el._t); el._t = setTimeout(() => { im.src = tamPcPic(sp); }, 1400); } }); return; }
         el.classList.remove('act', 'far'); void el.offsetWidth; el.classList.add('act'); if (e.ri !== 1) el.classList.add('far');
-        const a = tamI(`ex_pc_${F.P[e.p].sp}_act`); if (a && im) { im.src = a; clearTimeout(el._t); el._t = setTimeout(() => { im.src = tamPcPic(F.P[e.p].sp); }, 520); }
+        const a = IMG(`ex4_pc_${F.P[e.p].sp}_atk`) || tamI(`ex_pc_${F.P[e.p].sp}_act`); if (a && im) { im.src = a; clearTimeout(el._t); el._t = setTimeout(() => { im.src = tamPcPic(F.P[e.p].sp); }, 520); }   // 4.4.0 공격 자세(작업지시서 78)
       } else if (e.k === 'hit') {
         const el = M[e.m], d = fmt(Math.max(1, Math.round(e.d))), cr = e.cr, fromEl = actor >= 0 ? P[actor] : null, ri = actor >= 0 ? F.P[actor].ri : 1, bigHit = !!sk;
-        const land = () => { el.classList.remove('hurt'); void el.offsetWidth; el.classList.add('hurt'); tamHitPic(el, F.M[e.m] && !F.M[e.m].boss ? `ex_mob_${tamReg(F.fl).k}_${F.M[e.m].i + 1}_hit` : ''); tamHitFx(el, cr || bigHit); tamFloat(el, d, cr || bigHit ? 'cr' : ''); if (cr && !bigHit) { tamShake(5, 260); tamPunch(); } };
+        const land = () => { el.classList.remove('hurt'); void el.offsetWidth; el.classList.add('hurt'); tamHitPic(el, F.M[e.m] && !F.M[e.m].boss ? `ex_mob_${tamReg(F.fl).k}_${F.M[e.m].i + 1}_hit` : ''); tamHitFx(el, cr, bigHit); tamFloat(el, d, cr || bigHit ? 'cr' : ''); if (cr && !bigHit) { tamShake(5, 260); tamPunch(); } };
         if (bigHit) skAt(sk.hit, () => { land(); tamBars(F); }); else if (ri === 1 || !fromEl) land(); else tamShot(fromEl, el, ri, land);
       }
-      else if (e.k === 'heal') { const el = P[e.p], hf = f => sk ? skAt(sk.heal, f) : f(); hf(() => { tamFloat(el, '+' + fmt(Math.round(e.d)), 'heal'); const [x, y] = tamAt(el); tamFxImg('tm-spark', tamI('ex_fx_heal'), x, y, [{ t: 'scale(.4)', opacity: 0 }, { t: 'scale(1.2)', opacity: 1, offset: 0.4 }, { dy: -16, t: 'scale(1.4)', opacity: 0 }], 600); }); }
+      else if (e.k === 'heal') { const el = P[e.p], hf = f => sk ? skAt(sk.heal, f) : f(); hf(() => { if (sk && IMG('ex4_sk_kor_heal')) { const [hx, hy] = tamAt(el, 0.55); tamFxImg('tm-pillar', IMG('ex4_sk_kor_heal'), hx, hy, [{ t: 'scaleY(.2)', opacity: 0 }, { t: 'scaleY(1)', opacity: 1, offset: 0.35 }, { dy: -10, t: 'scaleY(1.05)', opacity: 0 }], 1000); } tamFloat(el, '+' + fmt(Math.round(e.d)), 'heal'); const [x, y] = tamAt(el); tamFxImg('tm-spark', tamI('ex_fx_heal'), x, y, [{ t: 'scale(.4)', opacity: 0 }, { t: 'scale(1.2)', opacity: 1, offset: 0.4 }, { dy: -16, t: 'scale(1.4)', opacity: 0 }], 600); }); }
       else if (e.k === 'hurt') {
         const el = P[e.p], mm = M[e.m];
         if (mm) { mm.classList.remove('act'); void mm.offsetWidth; mm.classList.add('act'); }
-        setTimeout(() => { el.classList.remove('hurt'); void el.offsetWidth; el.classList.add('hurt'); tamHitPic(el, `ex_pc_${F.P[e.p].sp}_hit`); tamFloat(el, fmt(Math.max(1, Math.round(e.d))), 'ouch'); }, 140);
+        setTimeout(() => { el.classList.remove('hurt'); void el.offsetWidth; el.classList.add('hurt'); tamHitPic(el, `ex4_pc_${F.P[e.p].sp}_hurt`); tamFloat(el, fmt(Math.max(1, Math.round(e.d))), 'ouch'); }, 140);
       }
       else if (e.k === 'poof') { const el = M[e.m], go = () => { el.classList.add('out'); tamDropFx(el, F.fl); }; if (sk || tamSkBusy()) skAt(Math.max(sk ? sk.hit : 0, SKQ.end - 600) + 300, go); else setTimeout(go, 300); }
       else if (e.k === 'ko') P[e.p].classList.add('out');
@@ -15683,8 +15910,9 @@ body.cam-scene #ffChip,body.cam-scene #plChip,body.cam-scene .b-ring{animation-p
   }
   const TM_GC = { sci: '#3FB8FF', pe: '#FF8A2A', kor: '#5CCB4A', art: '#FF5FB0', math: '#FFC21E' };   // 4.3.3 모으기 빛 색
   function tamCutIn(ri, sp) {
-    const c = $('#tmCut'), pic = tamI(`ex_pc_${sp}_act`) || IMG('chr_' + sp);
+    const c = $('#tmCut'), pic = IMG(`ex4_pc_${sp}_sk`) || tamI(`ex_pc_${sp}_act`) || IMG('chr_' + sp), cb = IMG(`ex4_cut_${TAM.role[ri].k}`);
     c.hidden = false; c.dataset.r = TAM.role[ri].k; c.style.setProperty('--cd', TAM.skCut + 'ms');
+    c.classList.toggle('x4', !!cb); c.style.backgroundImage = cb ? `url("${cb}")` : '';   // 4.4.0 과목 컷인 띠(작업지시서 77)
     setH(c, `${pic ? `<img src="${pic}" alt="">` : ''}<span><small>${esc(TAM.role[ri].nm.split(' ')[0])} 필살기</small><b>${esc(TM_SK[ri].n)}!</b></span>`);
     c.style.animation = 'none'; void c.offsetWidth; c.style.animation = '';
   }
@@ -15703,6 +15931,8 @@ body.cam-scene #ffChip,body.cam-scene #plChip,body.cam-scene .b-ring{animation-p
     else skAt(t0, () => {
       SKQ.cutEnd = cutEnd; SKQ.el = el; st.classList.add('skdim'); sfx('quest');
       if (!el) return; el.classList.add('charge'); el.style.setProperty('--cc', TM_GC[TAM.role[ri].k]);
+      { const im = el.querySelector('img'), u = IMG(`ex4_pc_${p.sp}_sk`); if (im && u) { im.src = u; clearTimeout(el._t); el._t = setTimeout(() => { im.src = tamPcPic(p.sp); }, TAM.skCharge + TAM.skCut + 900); } }   // 4.4.0 필살기 자세
+      { const cu = IMG(`ex4_sk_${TAM.role[ri].k}_charge`); if (cu) { const [cx, cy] = tamAt(el, 0.6); tamFxImg('tm-ring', cu, cx, cy, [{ t: 'scale(.3) rotate(0deg)', opacity: 0 }, { t: 'scale(1) rotate(60deg)', opacity: 1, offset: 0.4 }, { t: 'scale(1.15) rotate(120deg)', opacity: 0 }], TAM.skCharge + 500); } }
       const [x, y] = tamAt(el, 0.5), sm = tamI(`ex_fx_${TAM.role[ri].k}`), r = st.getBoundingClientRect().width * 0.2;
       for (let k = 0; k < 9; k++) { const a = k / 9 * Math.PI * 2; tamFxImg('tm-note', sm, x, y, [{ dx: Math.cos(a) * r, dy: Math.sin(a) * r, t: 'scale(1)', opacity: 0 }, { dx: Math.cos(a + 1) * r * 0.45, dy: Math.sin(a + 1) * r * 0.45, t: 'scale(.8)', opacity: 1, offset: 0.55 }, { t: 'scale(.2)', opacity: 0 }], TAM.skCharge, 'ease-in'); }
     });
@@ -15716,14 +15946,17 @@ body.cam-scene #ffChip,body.cam-scene #plChip,body.cam-scene .b-ring{animation-p
     at(0, () => { el.classList.remove('cast'); void el.offsetWidth; el.classList.add('cast'); setTimeout(() => el.classList.remove('cast'), 1100); });
     const fxr = () => $('#tmFx').getBoundingClientRect(), A = () => tamAt(el, 0.45);
     const MC = () => { const L = $$('#tmM .tm-f:not(.out)'), fx = fxr(); return L.length ? L.map(m => tamAt(m, 0.5)).reduce((a, b) => [a[0] + b[0] / L.length, a[1] + b[1] / L.length], [0, 0]) : [fx.width * 0.72, fx.height * 0.6]; };
-    const big = tamI(`ex_fx_${TAM.role[ri].k}_big`), small = tamI(`ex_fx_${TAM.role[ri].k}`);
+    // 4.4.0 새 필살기 조각(작업지시서 77)이 있으면 먼저: 과학 폭발과 거품, 체육 회오리와 잎, 국어 노래 고리와 음표, 미술 물감 튐과 방울, 수학 별 폭발과 별
+    const X4 = { sci: ['boom', 'bubble'], pe: ['tornado', 'leaf'], kor: ['ring', 'note'], art: ['splash', 'drop'], math: ['burst', 'star'] }[TAM.role[ri].k], x4 = n => IMG(`ex4_sk_${TAM.role[ri].k}_${n}`);
+    const big = x4(X4[0]) || tamI(`ex_fx_${TAM.role[ri].k}_big`), small = x4(X4[1]) || tamI(`ex_fx_${TAM.role[ri].k}`);
     if (ri === 0) {   // 과학: 플라스크가 높이 날아가 가운데에서 펑, 거품이 한 번 더
-      at(0, () => { const [ax, ay] = A(), mc = MC(), fx = fxr(); tamFxImg('tm-shot big', small, ax, ay, [{ t: 'scale(.6) rotate(0deg)' }, { dx: (mc[0] - ax) / 2, dy: -fx.height * 0.45, t: 'scale(1.3) rotate(300deg)', offset: 0.5 }, { dx: mc[0] - ax, dy: mc[1] - ay, t: 'scale(1) rotate(620deg)' }], 560, 'ease-in-out'); });
+      at(0, () => { const [ax, ay] = A(), mc = MC(), fx = fxr(); tamFxImg('tm-shot big', x4('throw') || small, ax, ay, [{ t: 'scale(.6) rotate(0deg)' }, { dx: (mc[0] - ax) / 2, dy: -fx.height * 0.45, t: 'scale(1.3) rotate(300deg)', offset: 0.5 }, { dx: mc[0] - ax, dy: mc[1] - ay, t: 'scale(1) rotate(620deg)' }], 560, 'ease-in-out'); });
       at(560, () => { const mc = MC(); tamFlash(); tamShake(10, 600); tamPunch(); tamBigImg(big, mc[0], mc[1], [{ t: 'scale(.2)', opacity: 1 }, { t: 'scale(1.25)', opacity: 1, offset: 0.3 }, { t: 'scale(1.35)', opacity: 1, offset: 0.7 }, { t: 'scale(1.6)', opacity: 0 }], 1500); });
       at(860, () => { const mc = MC(); tamBigImg(big, mc[0] + 20, mc[1] - 14, [{ t: 'scale(.2)', opacity: 1 }, { t: 'scale(.9)', opacity: 1, offset: 0.4 }, { t: 'scale(1.1)', opacity: 0 }], 1100); });
     } else if (ri === 1) {   // 체육: 빙글빙글 가로질러 달려가 세 번 들이받고 돌아와요(잔상)
       at(0, () => { const [ax] = A(), mc = MC(), dx = Math.max(40, mc[0] - ax + 10);
         el.animate([{ transform: 'translateX(-50%) scale(var(--dz,1))' }, { transform: `translateX(calc(-50% + ${dx}px)) scale(var(--dz,1))`, offset: 0.3 }, { transform: `translateX(calc(-50% + ${dx}px)) scale(var(--dz,1))`, offset: 0.75 }, { transform: 'translateX(-50%) scale(var(--dz,1))' }], { duration: 1300, easing: 'cubic-bezier(.5,0,.3,1)' });
+        { const d4 = x4('dash'); if (d4) { const [, ay] = A(); tamFxImg('tm-sweep4', d4, ax + dx / 2, ay, [{ t: 'scaleX(.2)', opacity: 0 }, { t: 'scaleX(1)', opacity: 1, offset: 0.3 }, { t: 'scaleX(1.1)', opacity: 0 }], 900); } }
         const im = el.querySelector('img'); for (let k = 1; k <= 4; k++) setTimeout(() => { const [gx, gy] = tamAt(el, 0.5); tamFxImg('tm-ghost', im.src, gx, gy, [{ opacity: 0.55, t: 'scale(1)' }, { opacity: 0, t: 'scale(1.05)' }], 380); }, k * 70); });
       for (let k = 0; k < 3; k++) at(400 + k * 240, () => { const mc = MC(); tamShake(7, 320); tamPunch(); tamBigImg(big, mc[0], mc[1], [{ t: `scale(.5) rotate(${-20 + k * 30}deg)`, opacity: 1 }, { t: `scale(1.25) rotate(${10 + k * 30}deg)`, opacity: 0 }], 900); $$('#tmM .tm-f:not(.out)').forEach(m => { m.classList.remove('kb'); void m.offsetWidth; m.classList.add('kb'); }); });
     } else if (ri === 2) {   // 국어: 노래 고리가 여러 번 퍼지고 음표가 장난꾸러기에게
@@ -15733,14 +15966,17 @@ body.cam-scene #ffChip,body.cam-scene #plChip,body.cam-scene .b-ring{animation-p
       at(560, () => { const pc = PC(); $$('#tmM .tm-f:not(.out)').forEach((m, k) => { const [x, y] = tamAt(m, 0.45); for (let j = 0; j < 3; j++) setTimeout(() => tamFxImg('tm-shot', small, pc[0], pc[1], [{ t: 'scale(.6)' }, { dx: (x - pc[0]) / 2, dy: (y - pc[1]) / 2 + (j - 1) * 18, t: 'scale(1)', offset: 0.5 }, { dx: x - pc[0], dy: y - pc[1], t: 'scale(1.1)' }], 380, 'linear'), k * 60 + j * 110); }); });
     } else if (ri === 3) {   // 미술: 물감 비가 내리고 무지개 붓이 화면을 쓸어요
       at(0, () => $$('#tmM .tm-f:not(.out)').forEach((m, k) => { const [x, y] = tamAt(m, 0.45); for (let j = 0; j < 4; j++) setTimeout(() => tamFxImg('tm-shot', small, x + (Math.random() - 0.5) * 40, y, [{ dy: -fxr().height * 0.5, t: 'scale(.6)' }, { t: 'scale(1)' }], 420, 'ease-in'), k * 110 + j * 90); }));
-      at(420, () => { const fx = fxr(), W = fx.width, mc = MC(), b2 = document.createElement('img'); b2.className = 'tm-sweep'; b2.src = big || ''; b2.alt = ''; $('#tmFx').appendChild(b2);
+      at(420, () => { const fx = fxr(), W = fx.width, mc = MC(), b2 = document.createElement('img'); b2.className = 'tm-sweep'; b2.src = x4('stroke') || big || ''; b2.alt = ''; $('#tmFx').appendChild(b2);
         b2.animate([{ transform: `translate(${-W * 0.6}px,${mc[1] - fx.height * 0.38}px) rotate(-8deg) scale(.9)`, opacity: 0 }, { transform: `translate(${W * 0.15}px,${mc[1] - fx.height * 0.38}px) rotate(-4deg) scale(1.05)`, opacity: 1, offset: 0.45 }, { transform: `translate(${W * 0.3}px,${mc[1] - fx.height * 0.39}px) rotate(-2deg) scale(1.08)`, opacity: 1, offset: 0.7 }, { transform: `translate(${W * 0.55}px,${mc[1] - fx.height * 0.4}px) rotate(0deg) scale(1.1)`, opacity: 0 }], { duration: 1300, easing: 'ease-out', fill: 'forwards' }).onfinish = () => b2.remove(); });
-      at(620, () => { tamShake(5, 300); $$('#tmM .tm-f:not(.out)').forEach(m => { m.classList.remove('paint'); void m.offsetWidth; m.classList.add('paint'); }); });
+      at(620, () => { tamShake(5, 300); $$('#tmM .tm-f:not(.out)').forEach(m => { m.classList.remove('paint'); void m.offsetWidth; m.classList.add('paint'); if (x4('splash')) { const [x, y] = tamAt(m, 0.5); tamBigImg(x4('splash'), x, y, [{ t: 'scale(.2) rotate(-20deg)', opacity: 1 }, { t: 'scale(.75) rotate(5deg)', opacity: 1, offset: 0.35 }, { t: 'scale(.85)', opacity: 0 }], 1100, 'tm-bigs sm'); } }); });
     } else {   // 수학: 별이 대원 둘레를 돌다가, 가장 약한 장난꾸러기에 과녁, 하늘에서 별 화살
       const T0 = () => $$('#tmM .tm-f')[tgt] || $$('#tmM .tm-f:not(.out)')[0];
       at(0, () => { const [ax, ay] = A(), r = fxr().width * 0.12; for (let k = 0; k < 10; k++) { const a = k / 10 * Math.PI * 2; tamFxImg('tm-note', small, ax, ay, [{ t: 'scale(.2)', opacity: 0 }, { dx: Math.cos(a) * r, dy: Math.sin(a) * r, t: 'scale(1)', opacity: 1, offset: 0.4 }, { dx: Math.cos(a + 1.6) * r, dy: Math.sin(a + 1.6) * r, t: 'scale(1)', opacity: 1, offset: 0.8 }, { t: 'scale(.2)', opacity: 0 }], 700); } });
       at(300, () => { const tg = T0(); if (!tg) return; const [tx, ty] = tamAt(tg, 0.5), r = document.createElement('i'); r.className = 'tm-aim'; $('#tmFx').appendChild(r); r.style.transform = `translate(${tx - 30}px,${ty - 30}px)`; setTimeout(() => r.remove(), 900); });
-      at(700, () => { const tg = T0(); if (!tg) return; const [tx, ty] = tamAt(tg, 0.5); tamBigImg(big, tx, ty, [{ dy: -fxr().height * 0.9, t: 'scale(.7) rotate(-30deg)', opacity: 1 }, { dy: 0, t: 'scale(1.1) rotate(0deg)', opacity: 1, offset: 0.7 }, { t: 'scale(1.6)', opacity: 0 }], 420, 'tm-bigs star'); });
+      at(700, () => { const tg = T0(); if (!tg) return; const [tx, ty] = tamAt(tg, 0.5), ar = x4('arrow');
+        if (ar) { const [ax, ay] = A(), ang = Math.atan2(ty - ay, tx - ax) * 180 / Math.PI; tamFxImg('tm-arrow4', ar, ax, ay, [{ t: `rotate(${ang}deg) scale(.6)`, opacity: 1 }, { dx: tx - ax, dy: ty - ay, t: `rotate(${ang}deg) scale(1)`, opacity: 1 }], 200, 'ease-in'); }
+        else tamBigImg(big, tx, ty, [{ dy: -fxr().height * 0.9, t: 'scale(.7) rotate(-30deg)', opacity: 1 }, { dy: 0, t: 'scale(1.1) rotate(0deg)', opacity: 1, offset: 0.7 }, { t: 'scale(1.6)', opacity: 0 }], 420, 'tm-bigs star'); });
+      at(880, () => { const tg = T0(); if (!tg || !x4('burst')) return; const [tx, ty] = tamAt(tg, 0.5); tamBigImg(big, tx, ty, [{ t: 'scale(.2)', opacity: 1 }, { t: 'scale(1.1)', opacity: 1, offset: 0.35 }, { t: 'scale(1.3)', opacity: 0 }], 900); });
       at(880, () => { tamFlash(); tamShake(9, 480); tamPunch(); });
     }
     // 잔상: 과목 조각이 천천히 흩어져 내려요(겨루기는 기다리지 않아요)
@@ -15771,7 +16007,7 @@ body.cam-scene #ffChip,body.cam-scene #plChip,body.cam-scene .b-ring{animation-p
     if (T.nLose) pp.classList.add('enter'); else pp.classList.remove('enter');
     pp.classList.add('walking'); clearTimeout(pp._t); const ms = TAM.ph.walk / tamSpdK() * 1000; pp._t = setTimeout(() => pp.classList.remove('walking', 'enter'), ms);
     if (!T.climbing && !rt.reduced) cur.animate([{ transform: 'translateX(0)' }, { transform: 'translateX(-16%)' }], { duration: ms, easing: 'cubic-bezier(.3,0,.6,1)', fill: 'forwards' });
-    { const fg = $('#tmFg'), fu = tamI('ex_fg_' + R.k); if (fg) { fg.getAnimations().forEach(a => a.cancel()); fg.style.backgroundImage = fu ? `url("${fu}")` : ''; if (fu && !rt.reduced) fg.animate([{ transform: 'translateX(0)' }, { transform: 'translateX(-24%)' }], { duration: ms, easing: 'cubic-bezier(.3,0,.6,1)', fill: 'forwards' }); } }
+    { const fg = $('#tmFg'), fu = IMG('ex4_fg_' + R.k) || tamI('ex_fg_' + R.k); if (fg) { fg.getAnimations().forEach(a => a.cancel()); fg.style.backgroundImage = fu ? `url("${fu}")` : ''; if (fu && !rt.reduced) fg.animate([{ transform: 'translateX(0)' }, { transform: 'translateX(-24%)' }], { duration: ms, easing: 'cubic-bezier(.3,0,.6,1)', fill: 'forwards' }); } }
     $('#tmTime').style.width = '100%'; tamCam(false);
     tamSkills();
   }
@@ -15845,13 +16081,16 @@ body.cam-scene #ffChip,body.cam-scene #plChip,body.cam-scene .b-ring{animation-p
       if (rt.tamPw && pw > rt.tamPw) { el.classList.remove('up'); void el.offsetWidth; el.classList.add('up'); }
       rt.tamPw = pw; }
     tamAdDay();
+    // 4.4.0 오른쪽 둥근 단추(그림, 짧은 이름, 남은 횟수). 읽어 주는 이름은 aria-label에 길게
+    const rb = (el, ic, nm, sub, ad, lab) => { const k = [ic, nm, sub, ad].join('|'); if (el._k !== k) { el._k = k; const u = IMG(ic), a = ad && IMG('ex4_ic_ad'); setH(el, `${a ? `<img class="tm-adb" src="${a}" alt="">` : ''}${u ? `<img src="${u}" alt="">` : ''}<small>${esc(nm)}</small>${sub ? `<em>${esc(sub)}</em>` : ''}`); } el.setAttribute('aria-label', lab); };
     const sb = $('#tmSpd'); sb.classList.toggle('on', tamSpdOn());
     const left = TAM.adSpd.n - S.tam.ad.spd;
-    sb.textContent = tamSpdOn() ? `2배속 ${hms(S.tam.spd.sec * 1000)}${left > 0 ? ` (📺 +${TAM.adSpd.min}분 ${left}/${TAM.adSpd.n})` : ''}` : `📺 2배속 ${TAM.adSpd.min}분 (${left}/${TAM.adSpd.n})`;
-    const ab = $('#tmAuto'); ab.hidden = !tamAutoOn(); ab.setAttribute('aria-pressed', S.tam.auto ? 'true' : 'false'); ab.textContent = S.tam.auto ? '필살기 자동 켬' : '필살기 자동 끔';
-    { const so = $('#tmSkOff'); so.hidden = !S.tam.skSeen; so.setAttribute('aria-pressed', S.tam.skOff ? 'true' : 'false'); so.textContent = S.tam.skOff ? '연출 건너뛰기 켬' : '연출 건너뛰기 끔'; }   // 4.3.3 필살기를 한 번 본 뒤에 생겨요
+    rb(sb, 'ex4_ic_speed', tamSpdOn() ? hms(S.tam.spd.sec * 1000) : '2배속', `${left}`, !tamSpdOn() || left > 0, tamSpdOn() ? `2배속 ${hms(S.tam.spd.sec * 1000)} 남음` : `광고 보고 2배속 ${TAM.adSpd.min}분, 오늘 ${left}번 남음`);
+    const ab = $('#tmAuto'); ab.hidden = !tamAutoOn(); ab.setAttribute('aria-pressed', S.tam.auto ? 'true' : 'false'); rb(ab, 'ex4_ic_auto', S.tam.auto ? '자동 켬' : '자동 끔', '', false, S.tam.auto ? '필살기 자동 켬' : '필살기 자동 끔');
+    { const so = $('#tmSkOff'); so.hidden = !S.tam.skSeen; so.setAttribute('aria-pressed', S.tam.skOff ? 'true' : 'false'); rb(so, 'ex4_ic_report', S.tam.skOff ? '연출 끔' : '연출 켬', '', false, S.tam.skOff ? '필살기 연출 건너뛰기 켬' : '필살기 연출 건너뛰기 끔'); }   // 4.3.3 필살기를 한 번 본 뒤에 생겨요
     const T = rt.tam, rv = $('#tmRevive'), cl = tamCheerLeft(); rv.hidden = !(S.tam.cheer > 0 || (T && T.lose && cl > 0));   // 4.3.1 지면 응원 단추, 응원 중에는 남은 층
-    rv.textContent = S.tam.cheer > 0 ? `💪 응원 ${S.tam.cheer}층 남음` : `📺 응원 받기 힘 +${Math.round((TAM.cheer.mul - 1) * 100)}% (${cl}/${TAM.cheer.n})`; rv.classList.toggle('on', S.tam.cheer > 0);
+    rb(rv, 'ex4_ic_cheer', S.tam.cheer > 0 ? `${S.tam.cheer}층` : '응원', S.tam.cheer > 0 ? '' : `${cl}`, S.tam.cheer <= 0, S.tam.cheer > 0 ? `응원 ${S.tam.cheer}층 남음` : `광고 보고 응원 받기 힘 +${Math.round((TAM.cheer.mul - 1) * 100)}%, 오늘 ${cl}번 남음`); rv.classList.toggle('on', S.tam.cheer > 0);
+    tamAcorn(true);
     const I = tamIdle(), rp = $('#tmRep'); rp.hidden = I.sec < 60; rp.textContent = `탐험 보고서 받기 (${Math.floor(I.sec / 60)}분)`;
   }
   // 4.3.0 지섭 요청: 강화 추천과 자동 편성
@@ -15883,6 +16122,9 @@ body.cam-scene #ffChip,body.cam-scene #plChip,body.cam-scene .b-ring{animation-p
     const ic = { mem: tamI(`ex_pc_${tamParty()[0] || 'bear'}_idle`) || IMG('chr_bear'), gear: IMG('ex_gear_tool_1'), mat: IMG('ex_mat_star') };
     setH($('#tmSeg'), [['mem', '대원', can], ['gear', '장비', gc], ['mat', '재료', false]].map(([k, n, dot]) =>
       `<button type="button" data-tseg="${k}" aria-pressed="${seg === k}">${ic[k] ? `<img src="${ic[k]}" alt="">` : ''}<span>${n}</span>${dot ? '<i class="tm-dot"></i>' : ''}</button>`).join(''));
+    const sh = $('#tmSheet'), open = sh && !sh.hidden;   // 4.4.0 아래 메뉴: 빨간 점, 열린 창 이름
+    $$('#tmNav [data-tnav]').forEach(b => { const k = b.dataset.tnav; b.classList.toggle('dot', k === 'mem' ? !!can : k === 'gear' ? gc : k === 'rep' ? tamIdle().sec >= 60 : false); b.setAttribute('aria-pressed', String(open && seg === k)); });
+    if (open) $('#tmShT').textContent = { mem: '대원', gear: '장비', mat: '재료' }[seg] || '대원';
   }
   function tamRenderBody() {
     const box = $('#tmBody'); if (!box || !tamOn()) return;
@@ -15940,14 +16182,42 @@ body.cam-scene #ffChip,body.cam-scene #plChip,body.cam-scene .b-ring{animation-p
     if (!S.tam.seen) { S.tam.seen = 1; S.tam.it = S.tam.it || gameNow(); save();   // 4.3.1 처음 열면 소개 장면(자동 시험에서는 __TAM_INTRO일 때만)
       const shown = !(window.__FOREST_TEST && !window.__TAM_INTRO) && stPlay('tam', false);
       if (!shown) tamToast('밤이면 학교에 숲의 장난꾸러기들이 와요!\n탐험대와 함께 달래 주러 가요'); }
-    tamSkStop(); tamRenderTop(); tamSync(); tamRenderBody();
+    tamUiInit(); tamSkStop(); tamRenderTop(); tamSync(); tamRenderBody();
+    { const today = gameToday(), en = $('#tmEnter'); if (en && S.tam.ed !== today && !window.__FOREST_TEST) { S.tam.ed = today; save(); en.hidden = false; en.style.animation = 'none'; void en.offsetWidth; en.style.animation = ''; clearTimeout(en._t); en._t = setTimeout(() => { en.hidden = true; }, 1600); } }   // 4.4.0 지섭 결정: 입장 장면은 하루 처음만
     tamReport(true);
+  }
+  // 4.4.0 화면 틀과 아이콘 그림(작업지시서 77)을 한 번만 CSS 변수와 img에 넣어요
+  function tamUiInit() {
+    if (rt.tamUi) return; rt.tamUi = 1;
+    const P = $('#panelTam'), v = (n, k) => { const u = IMG(k); if (u) P.style.setProperty(n, `url("${u}")`); };
+    v('--x4-btn', 'ex4_ui_btn_round'); v('--x4-btnon', 'ex4_ui_btn_round_on'); v('--x4-top', 'ex4_ui_topbar'); v('--x4-floor', 'ex4_ui_floor');
+    v('--x4-skf', 'ex4_ui_sk_frame'); v('--x4-skr', 'ex4_ui_sk_ready'); v('--x4-bot', 'ex4_ui_bottom'); v('--x4-aura', 'ex4_boss_aura'); v('--x4-warn', 'ex4_boss_warn'); v('--x4-enter', 'ex4_enter');
+    $$('#panelTam img[data-x4]').forEach(im => { const u = IMG(im.dataset.x4); if (u) im.src = u; });
+  }
+  // 4.4.0 위 칸 도토리(탐험 화면을 볼 때만 바꿔요)
+  function tamAcorn(force) {
+    const e = $('#tmAcN'); if (!e) return; const t = fmt(S.budget); if (!force && e.textContent === t) return;
+    const up = rt.tamAc != null && S.budget > rt.tamAc * 1.0001; e.textContent = t; rt.tamAc = S.budget;
+    if (up && !force) { const a = $('#tmAc'); a.classList.remove('bump'); void a.offsetWidth; a.classList.add('bump'); }
+  }
+  // 4.4.0 대원 레벨이 오르면 무대 위 그 대원 발밑에서 금빛 기둥(ex4_fx_levelup)
+  function tamLvFx(sps) {
+    const u = IMG('ex4_fx_levelup'), T = rt.tam, F = T && T.F; if (!u || !tamFxOn()) return;
+    const team = F ? F.P : tamTeam(), P = $$('#tmP .tm-f');
+    team.forEach((p, i) => { if (!sps.includes(p.sp) || !P[i]) return; const [x, y] = tamAt(P[i], 0.55); tamFxImg('tm-lvup', u, x, y, [{ t: 'scaleY(.2)', opacity: 0 }, { t: 'scaleY(1)', opacity: 1, offset: 0.3 }, { dy: -12, t: 'scaleY(1.05)', opacity: 0 }], 900); });
   }
   function tamClick(e) {
     const b = e.target.closest('button'); if (!b || !tamOn()) return;
     if (b.getAttribute('aria-disabled') === 'true' && !(b.dataset.tlv && S.budget >= tamLvCost(b.dataset.tlv))) { if (b.dataset.tlv) tamToast('도토리가 모자라요\n정수 상점에서 숲의 정수로 바꿀 수 있어요'); else if (b.dataset.tgear) tamToast('재료가 모자라요'); return; }
     if (b.dataset.tsk) { tamCast(+b.dataset.tsk); return; }
     if (b.dataset.tmm) { const v = +b.dataset.tmm; if ((v && !tamHOpen()) || (rt.tam && rt.tam.ph === 'event')) return; if ((S.tam.hm ? 1 : 0) === v) return; S.tam.hm = v; tamHSync(); sfx('tap'); save(); tamSkStop(); tamRestart(); tamRenderTop(); tamRenderBody(); musicSync(); return; }   // 4.3.3 심화 탐험
+    if (b.id === 'tmExit') { sfx('tap'); setTab('school'); return; }   // 4.4.0
+    if (b.id === 'tmShX') { sfx('tap'); $('#tmSheet').hidden = true; tamRenderBody(); return; }
+    if (b.dataset.tnav) { const k = b.dataset.tnav; sfx('tap');
+      if (k === 'rank') { rt.rankView = 'tam'; setTab('rank'); return; }
+      if (k === 'rep') { tamReport(false); return; }
+      const sh = $('#tmSheet'); if (!sh.hidden && rt.tamSeg === k) { sh.hidden = true; tamRenderBody(); return; }
+      rt.tamSeg = k; sh.hidden = false; $('#tmBody').scrollTop = 0; tamRenderBody(); return; }
     if (b.id === 'tmSkOff') { S.tam.skOff = S.tam.skOff ? 0 : 1; sfx('tap'); save(); tamRenderTop(); return; }   // 4.3.3 지섭 요청: 켜 두는 필살기 연출 건너뛰기
     if (b.dataset.tev) { const T = rt.tam; if (T && T.ph === 'event') { sfx('tap'); tamEvPick(T, +b.dataset.tev); } return; }
     if (b.dataset.tauto) { S.tam.party = tamAutoTeam(); sfx('coin'); save(); tamRestart(); tamRenderTop(); tamRenderBody(); tamSkills(); tamToast('가장 힘센 조합으로 편성했어요'); return; }
@@ -15959,8 +16229,8 @@ body.cam-scene #ffChip,body.cam-scene #plChip,body.cam-scene .b-ring{animation-p
       sfx('tap'); save(); tamRestart(); tamRenderTop(); tamRenderBody(); tamSkills(); return;
     }
     if (b.dataset.tlvn) { rt.tamLvN = b.dataset.tlvn === 'max' ? Infinity : +b.dataset.tlvn; sfx('tap'); tamRenderBody(); return; }   // 4.3.2
-    if (b.dataset.tlvall) { const n = tamLvAll(); if (!n) return; tamRestartStat(); sfx('coin'); buzz(14); save(); renderHUD(); tamRenderTop(); tamRenderBody(); tamToast(`출동 대원 레벨 +${n}`); return; }
-    if (b.dataset.tlv) { const sp = b.dataset.tlv, inRec = !!b.closest('.tm-rec'), n = tamLvBuy(sp, inRec ? 1 : (rt.tamLvN || 1)); if (!n) return; tamRestartStat(); sfx('coin'); buzz(10); save(); renderHUD(); tamRenderTop(); tamRenderBody(); if (n > 1) tamToast(`${spName(sp)} 레벨 +${n}`); return; }
+    if (b.dataset.tlvall) { const n = tamLvAll(); if (!n) return; tamLvFx(tamParty()); tamRestartStat(); sfx('coin'); buzz(14); save(); renderHUD(); tamRenderTop(); tamRenderBody(); tamToast(`출동 대원 레벨 +${n}`); return; }
+    if (b.dataset.tlv) { const sp = b.dataset.tlv, inRec = !!b.closest('.tm-rec'), n = tamLvBuy(sp, inRec ? 1 : (rt.tamLvN || 1)); if (!n) return; tamLvFx([sp]); tamRestartStat(); sfx('coin'); buzz(10); save(); renderHUD(); tamRenderTop(); tamRenderBody(); if (n > 1) tamToast(`${spName(sp)} 레벨 +${n}`); return; }
     if (b.dataset.tgear) { const [si, k] = b.dataset.tgear.split(':'), i = +si; if (!S.tam.sg[i] || !(k in S.tam.sg[i]) || i >= tamSlots()) return; const c = tamGearCost(k, i); if (S.tam.mat[c.m] < c.n || S.tam.mat[3] < c.star) return; S.tam.mat[c.m] -= c.n; S.tam.mat[3] -= c.star; S.tam.sg[i][k] += 1; tamRestartStat(); sfx('coin'); save(); tamRenderTop(); tamRenderBody(); return; }
     if (b.id === 'tmSpd') { tamAdSpd(); return; }
     if (b.id === 'tmAuto') { S.tam.auto = S.tam.auto ? 0 : 1; sfx('tap'); save(); tamRenderTop(); return; }
@@ -21628,7 +21898,7 @@ body.cam-scene #ffChip,body.cam-scene #plChip,body.cam-scene .b-ring{animation-p
       setTab('school'); closeSheet();
       const sc = $('#scroller'), top = F.form === 'free' ? 0 : $('#map').getBoundingClientRect().top - sc.getBoundingClientRect().top + sc.scrollTop - 60;
       sc.scrollTo({ top: Math.max(0, top), behavior: rt.reduced ? 'auto' : 'smooth' });
-      rt.fest = { id, t: F.sec, n: 0, spawn: 0.6, items: [], perf: 0, intro: 3 };
+      rt.fest = { id, t: F.sec, n: 0, spawn: 0.6, items: [], perf: 0, intro: 3 }; renderTeachersOnMap();
       feverOn(true);
       S.fest.next[id] = gameNow() + SPORTS.gap;
       festForm(F.form);
@@ -21809,7 +22079,7 @@ body.cam-scene #ffChip,body.cam-scene #plChip,body.cam-scene .b-ring{animation-p
   function endFest() {
     const R = rt.fest; if (!R) return;
     const F = festDef(R.id);
-    rt.fest = null;
+    rt.fest = null; renderTeachersOnMap();
     R.items.forEach(i => i.g.remove());
     festStage(false); festLighting(false);
     rt.kids.forEach(k => { if (k.hold) { k.hold = false; k.speed = rand(14, 22); pickTarget(k); } });
@@ -21984,7 +22254,7 @@ body.cam-scene #ffChip,body.cam-scene #plChip,body.cam-scene .b-ring{animation-p
     const go = () => {
       zoneGo('plaza'); setTab('school'); closeSheet();
       $('#scroller').scrollTo({ top: 0, behavior: rt.reduced ? 'auto' : 'smooth' });
-      rt.fest = { id: 'bf_fw', t: BIG.fwSec, n: 0, spawn: 0.6, items: [], perf: 0, intro: 3 };
+      rt.fest = { id: 'bf_fw', t: BIG.fwSec, n: 0, spawn: 0.6, items: [], perf: 0, intro: 3 }; renderTeachersOnMap();
       feverOn(true); festForm('ring');
       S.bf.fw = 1;   // 시작하면 오늘 한 것으로 쳐요
       $('#festBar').hidden = false;
@@ -22140,7 +22410,7 @@ body.cam-scene #ffChip,body.cam-scene #plChip,body.cam-scene .b-ring{animation-p
       zoneGo('plaza');
       setTab('school'); closeSheet();
       $('#scroller').scrollTo({ top: 0, behavior: rt.reduced ? 'auto' : 'smooth' });
-      rt.fest = { id: 'fv_' + k, t: FV.sec, n: 0, spawn: 0.6, items: [], perf: 0, intro: 3, ...(extra ? { adx: 1 } : {}) };
+      rt.fest = { id: 'fv_' + k, t: FV.sec, n: 0, spawn: 0.6, items: [], perf: 0, intro: 3, ...(extra ? { adx: 1 } : {}) }; renderTeachersOnMap();
       feverOn(true);
       S.fv.b[k] = (S.fv.b[k] || 0) + 1;   // 시작하면 오늘 한 것으로 쳐요(다시 하기 없음). 4.2.0 대축제에는 하루 두 번
       $('#festBar').hidden = false;
@@ -24335,7 +24605,7 @@ body.cam-scene #ffChip,body.cam-scene #plChip,body.cam-scene .b-ring{animation-p
       case 'tgrads': return S.tg;
       case 'semH': return S.tg + (S.sem ? 1 : 0);   // 2.1.0 그 학년 1학기 방학식을 열었는지
       case 'souv': return S.trip.souv.length;
-      case 'tripat': return S.trip.been[q.k] || 0;
+      case 'tripat': return (S.trip.been[q.k] || 0) + (S.trip.cur === q.k ? 1 : 0);   // 4.4.0 지섭 요청(11-5 졸업 여행): 보내면 바로 완료
       case 'fest': return (S.fest.n[q.k] || 0) + ((S.fest.sub && S.fest.sub[q.k]) || 0);
       case 'mgBest': return Math.max(0, ...Object.values(S.mg.best));   // 1.8.0 숲속 합치기에서 만든 가장 높은 단계
       case 'mgOrders': return S.mg.st.orders;
@@ -24487,7 +24757,7 @@ body.cam-scene #ffChip,body.cam-scene #plChip,body.cam-scene .b-ring{animation-p
       case 'souv': return `기념품 ${q.n}종 모으기`;
       case 'sports': return q.n === 1 ? '숲속 운동회 열기' : `숲속 운동회 ${q.n}번 열기`;
       case 'fest': return `${FEST[q.k].name} 열기`;
-      case 'tripat': return `${TRIP[q.k].name} 다녀오기`;
+      case 'tripat': return `${TRIP[q.k].name} 체험학습 보내기`;
       case 'club': return `동아리 ${q.n}자리 채우기`;
       case 'shows': return q.n === 1 ? '동아리 발표회 열기' : `동아리 발표회 ${q.n}번 열기`;
       case 'elects': return q.n === 1 ? '반장 뽑기' : `반장 ${q.n}번 뽑기`;   // 2.0.1
@@ -25102,6 +25372,7 @@ body.cam-scene #ffChip,body.cam-scene #plChip,body.cam-scene .b-ring{animation-p
     $('#panelQuests').hidden = t !== 'quests';
     $('#panelTeachers').hidden = t !== 'teachers';
     $('#panelGrad').hidden = t !== 'grad';
+    $('#app').classList.toggle('tam-full', t === 'tam'); if (t !== 'tam') { const sh = $('#tmSheet'); if (sh) sh.hidden = true; }   // 4.4.0 탐험 전체 화면
     $('#panelTam').hidden = t !== 'tam'; if (t === 'tam') { tamOpen(); $('#panelTam').scrollTop = 0; const td = $('#tamDot'); if (td) td.hidden = true; }   // 4.3.0 숲속 탐험대
     $('#panelSettings').hidden = t !== 'settings';
     $('#panelRank').hidden = t !== 'rank';
@@ -25385,7 +25656,7 @@ body.cam-scene #ffChip,body.cam-scene #plChip,body.cam-scene .b-ring{animation-p
       $('#panelTam').addEventListener('pointerdown', e => { const b = e.target.closest('[data-tlv]'); if (!b || S.budget < tamLvCost(b.dataset.tlv)) return;
         stop(); hold = { sp: b.dataset.tlv, rec: !!b.closest('.tm-rec'), n: 0, t: setTimeout(tick, 400) }; });
       ['pointerup', 'pointercancel', 'blur'].forEach(ev => window.addEventListener(ev, stop));
-      $('#panelTam').addEventListener('contextmenu', e => { if (e.target.closest('[data-tlv]')) e.preventDefault(); });   // 4.3.2.1 안드로이드 길게 누르기 메뉴를 막아요
+      $('#panelTam').addEventListener('contextmenu', e => e.preventDefault());   // 4.4.0 탐험 화면 어디든 길게 누르기 메뉴를 막아요(앱은 MainActivity에서도 막아요)   // 4.3.2.1 안드로이드 길게 누르기 메뉴를 막아요
       // 꾹 눌러서 올렸으면 손을 뗄 때 나오는 클릭은 버려요
       $('#panelTam').addEventListener('click', e => { if (hold && hold.n && e.target.closest('[data-tlv]')) { e.stopImmediatePropagation(); e.preventDefault(); } }, true); }
     $('#tmRepOk').addEventListener('click', () => tamRepTake(false)); $('#tmRepAd').addEventListener('click', () => tamRepTake(true));
@@ -28196,7 +28467,7 @@ body.cam-scene #ffChip,body.cam-scene #plChip,body.cam-scene .b-ring{animation-p
   }
 
   // 시험용 손잡이: 자동 시험(window.__FOREST_TEST)에서만 게임 속 함수를 꺼내 써요
-  if (window.__FOREST_TEST) window.__forest = { get S() { return S; }, get rt4() { return rt; }, tamHOn, tamHOpen, tamCurFl, tamWinH, tamHf, tamHRankDoc, tamSkBusy, tamReach, get SKQ() { return SKQ; }, esAxGain, esAxLeft, ESHOP, tamLvPlan, tamLvBuy, tamLvAll, mapUrl, mapBase, tamCheerLeft, tamAdRevive, tamCap, tamCapped, tamLvRef, tamBaseRate, tamLvCost, tamStageIn, musicWant, tamPh, tamEvPick, tamAutoTeam, tamUpRec, MAIN, startSports, GEO, claimAchAll, ACH, btMake, btBest, btRoster, btRoll, btWin, btOppCheer, BT, BT_LG, stPrev, get Rank() { return Rank; }, tamRankDoc, tamTf, tamAdSpd, tamReport, tamRepTake, tamAdRevive, renderRankPanel, TAM, tamSim, tamTeam, tamStat, tamMobs, tamWin, tamIdle, tamCollect, tamParty, tamShard, tamPow, tamFight, tamStep, TAM, tamSim, tamTeam, tamStat, tamMobs, tamWin, tamIdle, tamCollect, tamShard, tamParty, tamPow, tamLvCost, tamOpen, setZone, geo, stPlay, stNext, ST, ST_SIDE, SIDE, missionGo, MGO, MGO_MINI, MGO_Q, renderMissions, renderPass, BOOST, conLeft, gameToday, setTab, ADX, adStamp, adxDay, adxCan, adxMore, adPickNow, adPickGive, conNear, renderAdStamp, claimOfflineDouble, startBoost, openBoost, showOffline, fvBoothStart, bfFwStart, musicWant, renderCounsel, renderXg, renderFv, showCeremony, RX, rxPct, rxCost, rxUp, rxPart, renderDept, goldOr, goldRich, adGold, stampAtt, GOLD, BIG, BF_DECO, bfWin, bfNext, bfOn, bfFw, bfSync, bfStamp, bfFwStart, bfPart, bfNextTx, sanitizeBf, freshBf, fvBoothMax, bldBox, bldPick, bldWarm, DECO_SLOTS, XG, MK, ST, SIDE, ST_SIDE, wdMap, xgOn, xgGuest, xgSpots, xgGreet, xgVisit, xgLunch, openXg, mkOn, mkHot, mkSell, mkBuy, mkSur, openMk, wdBar, wdTick, stTick, stPlay, stNext, stPick, stEnd, stTags, openSb, renderSb, sideCan, sideMap, fvFlag, FV, FV_POS, fvOn, fvOpen, fvBonus, fvSync, fvStamp, fvGuests, openFv, renderFv, fvMeet, fvBoothStart, fvMap, fvTip, festDef, goTo, navInfo, openShop, gdReady, thPreview, thPreviewEnd, thOn, busScene, tripCrowd, openTrip, startTrip, claimTrip, TRIPS, mgPickMul, mgPickMode, mgUpOrder, mgFillOrders, mgAdAsk, sportsCon, festCon, btQuota, btCanAd, btAdMore, warmRooms, blobUrl, vdSize, vdBlock, pzSweep, pzSwGain, pzSwOpen, pzXpOf, mgMulMax, mgMulOk, mgMul, mgModeTap, acTip, kidDupIdx, trialSafe, closeAd,
+  if (window.__FOREST_TEST) window.__forest = { get S() { return S; }, get rt4() { return rt; }, tamBg, teaOff, geo, qMeasure, IMG, tamHOn, tamHOpen, tamCurFl, tamWinH, tamHf, tamHRankDoc, tamSkBusy, tamReach, get SKQ() { return SKQ; }, esAxGain, esAxLeft, ESHOP, tamLvPlan, tamLvBuy, tamLvAll, mapUrl, mapBase, tamCheerLeft, tamAdRevive, tamCap, tamCapped, tamLvRef, tamBaseRate, tamLvCost, tamStageIn, musicWant, tamPh, tamEvPick, tamAutoTeam, tamUpRec, MAIN, startSports, GEO, claimAchAll, ACH, btMake, btBest, btRoster, btRoll, btWin, btOppCheer, BT, BT_LG, stPrev, get Rank() { return Rank; }, tamRankDoc, tamTf, tamAdSpd, tamReport, tamRepTake, tamAdRevive, renderRankPanel, TAM, tamSim, tamTeam, tamStat, tamMobs, tamWin, tamIdle, tamCollect, tamParty, tamShard, tamPow, tamFight, tamStep, TAM, tamSim, tamTeam, tamStat, tamMobs, tamWin, tamIdle, tamCollect, tamShard, tamParty, tamPow, tamLvCost, tamOpen, setZone, geo, stPlay, stNext, ST, ST_SIDE, SIDE, missionGo, MGO, MGO_MINI, MGO_Q, renderMissions, renderPass, BOOST, conLeft, gameToday, setTab, ADX, adStamp, adxDay, adxCan, adxMore, adPickNow, adPickGive, conNear, renderAdStamp, claimOfflineDouble, startBoost, openBoost, showOffline, fvBoothStart, bfFwStart, musicWant, renderCounsel, renderXg, renderFv, showCeremony, RX, rxPct, rxCost, rxUp, rxPart, renderDept, goldOr, goldRich, adGold, stampAtt, GOLD, BIG, BF_DECO, bfWin, bfNext, bfOn, bfFw, bfSync, bfStamp, bfFwStart, bfPart, bfNextTx, sanitizeBf, freshBf, fvBoothMax, bldBox, bldPick, bldWarm, DECO_SLOTS, XG, MK, ST, SIDE, ST_SIDE, wdMap, xgOn, xgGuest, xgSpots, xgGreet, xgVisit, xgLunch, openXg, mkOn, mkHot, mkSell, mkBuy, mkSur, openMk, wdBar, wdTick, stTick, stPlay, stNext, stPick, stEnd, stTags, openSb, renderSb, sideCan, sideMap, fvFlag, FV, FV_POS, fvOn, fvOpen, fvBonus, fvSync, fvStamp, fvGuests, openFv, renderFv, fvMeet, fvBoothStart, fvMap, fvTip, festDef, goTo, navInfo, openShop, gdReady, thPreview, thPreviewEnd, thOn, busScene, tripCrowd, openTrip, startTrip, claimTrip, TRIPS, mgPickMul, mgPickMode, mgUpOrder, mgFillOrders, mgAdAsk, sportsCon, festCon, btQuota, btCanAd, btAdMore, warmRooms, blobUrl, vdSize, vdBlock, pzSweep, pzSwGain, pzSwOpen, pzXpOf, mgMulMax, mgMulOk, mgMul, mgModeTap, acTip, kidDupIdx, trialSafe, closeAd,
     TKE, TK_Q, tkDaily, nbAllDay, nbBuildAt, nbOn, conAdd, BX_SPOT, PERKS, offlineCapH, applyAway, pzFinish, mgClaimOrder,
     CS, JOBS, CS_WORRY, freshCs, csOpen, csLeft, csMax, csEnsure, csCands, csNeed, csMul, csOpenCards, csReady, csDone, csTalkMake, csAnswer, csChoose, csSettle, openCounsel, renderCounsel, renderHall, MAIN, qMeasure, qGoal, sanitize,   // 3.1.0 진로 상담
     NSL, nsStart, nsSettle, nsOpen, nsOn, nsOverlap, nsExtraH, isNight, nightDayOf, openNs, renderNs, bxSpots, renderNight,   // 3.0.0

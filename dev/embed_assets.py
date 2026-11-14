@@ -33,6 +33,11 @@ BLOCKS = {'170': ('<!-- FS_IMG170:BEGIN -->', '<!-- FS_IMG170:END -->', 'FS_IMG1
 
 # 열쇠 앞부분마다 줄일 크기(긴 변 픽셀)와 화질
 RULES = [
+    # 4.4.0 탐험 전체 화면(작업지시서 77, 78, python3 embed_assets.py --block 431 <폴더>)
+    ('ex4_bg_', 1280, 72), ('ex4_enter', 1280, 72), ('ex4_fg_', 720, 76), ('ex4_cut_', 720, 76), ('ex4_pc_', 220, 80),
+    ('ex4_sk_sci_bubble', 96, 82), ('ex4_sk_pe_leaf', 96, 82), ('ex4_sk_kor_note', 96, 82), ('ex4_sk_art_drop', 96, 82), ('ex4_sk_math_star', 96, 82),
+    ('ex4_sk_sci_throw', 160, 82), ('ex4_sk_', 512, 78), ('ex4_fx_spark', 96, 82), ('ex4_fx_', 384, 78), ('ex4_boss_warn', 720, 78), ('ex4_boss_aura', 512, 78),
+    ('ex4_ui_sheet', 720, 78), ('ex4_ui_bottom', 720, 80), ('ex4_ui_topbar', 480, 82), ('ex4_ui_floor', 360, 82), ('ex4_ui_hp', 360, 82), ('ex4_ui_', 200, 82), ('ex4_ic_', 128, 84),
     # 4.3.0 탐험 3D 그림(python3 embed_assets.py --block 431 <폴더>)
     ('ex3_bg_', 900, 74), ('ex3_fg_', 900, 76), ('ex3_boss_', 320, 80), ('ex3_mob_', 220, 80), ('ex3_pc_', 220, 80),
     ('ex3_fx_hit', 160, 80), ('ex3_fx_heal', 160, 80), ('ex3_fx_poof', 160, 80), ('ex3_fx_', 380, 78), ('ex3_chest_', 200, 80), ('ex3_flag', 140, 80),
