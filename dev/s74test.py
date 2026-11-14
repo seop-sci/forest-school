@@ -36,12 +36,12 @@ async def main():
                 await pg.evaluate(T.KG); await pg.evaluate(T.CLEAN); await pg.evaluate(f"{F}.rt.cereOn = false")
             else:
                 await pg.evaluate(T.EL); await pg.evaluate(T.CLEAN); await pg.evaluate(f"{F}.rt.cereOn = false")
-            mid = w == 360
+            mid = w == 360   # 4.3.1: 중학교 후보는 명부 학생이라 같은 동물이 여럿일 수 있어요(서로 다른 학생이면 돼요)
             r = await pg.evaluate(f"""(() => {{ const F = {F}, S = F.S; F.elSync();
               return {{ tier: S.tier, cand: S.el.cand, sp: new Set(S.el.cand.map(c => c.sp)).size, ps: new Set(S.el.cand.map(c => c.p)).size,
                 roster: S.roster.list.map(x => x.nm + ':' + x.sp), mults: ['tuition', 'fest', 'mission', 'pick'].map(F.elMult) }}; }})()""")
             print('후보', w, json.dumps(r, ensure_ascii=False))
-            if len(r['cand']) != 3 or r['sp'] != 3 or r['ps'] != 3 or any(m != 1 for m in r['mults']): bad.append(f'{w} 후보 {r}')
+            if len(r['cand']) != 3 or (len({c['nm'] + ':' + c['sp'] for c in r['cand']}) != 3 if mid else r['sp'] != 3) or r['ps'] != 3 or any(m != 1 for m in r['mults']): bad.append(f'{w} 후보 {r}')
             if mid and not all(f"{c['nm']}:{c['sp']}" in r['roster'] for c in r['cand']): bad.append(f'중학교 후보는 명부 학생 {r}')
             # 메인 퀘스트 goTo로 선거 창
             qid = 'jl1' if mid else 'el1'

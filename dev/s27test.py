@@ -28,4 +28,12 @@ async def main():
     finally:
         srv.kill()
     print(json.dumps(r, ensure_ascii=False, indent=1))
+    # 4.3.1: PASS 줄. 지우기 줄이 보이고, 옛 계정 칸이 서버에서 모두 사라지고, 오류가 없어야 해요
+    old = set(sum((v for v in r.get('before', {}).values()), []))
+    left = set(sum((v for v in r.get('after', {}).values()), []))
+    bad = []
+    if not r.get('row'): bad.append('설정에 지우기 줄이 없어요')
+    if not old or old & left: bad.append(f'옛 계정 칸이 남았어요 {old & left}')
+    if r.get('errors'): bad.append(f"오류 {r['errors'][:2]}")
+    print('\n'.join(bad)); print('PASS' if not bad else 'FAIL')
 asyncio.run(main())

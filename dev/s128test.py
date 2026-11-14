@@ -37,6 +37,7 @@ async def main():
         print('보상', r)
         ok(r['best'] == 100 and r['wk'] == 100, '가장 깊은 층과 이번 주 기록')
         ok(r['dg'] == 1, '100층에서 황금 도토리 1개')
+        await page.evaluate(f"{F}.S.tam.best = 0")   # 4.3.1 유치원 상한(10층) 밑으로 돌려서 아래 흐름을 봐요
         ok(0 < r['da'] < 1e15 and all(0 < v < 1e6 for v in r['mat']), '도토리와 재료가 유한하고 알맞아요')
         # 자리 비운 보고서: 12시간까지만
         r = await page.evaluate(f"""(()=>{{ const F={F}, S=F.S; S.tam.it = Date.now() - 30*3600e3; const a=F.tamIdle(); S.tam.it = Date.now() - 3600e3; const h=F.tamIdle();
