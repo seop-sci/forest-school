@@ -28,5 +28,8 @@
 
 반영이 끝나면 패치노트(CHANGELOG.md)를 GitHub에 적는 것과 함께 Claude 채팅창에도 파일로 보내고, 그 버전 내용을 답에 그대로 보여 줘요. 패치노트는 "1. 교감 선생님 지원량 오류 수정"처럼 번호 붙인 짧은 한 줄로 적어요.
 
-## 학생 걷는 길 (4.4.1.5)
-- `paths/dump.py`, `paths/gen.py`: 지도 그림의 길 색(흙, 보도블록)에서 자리(spots) 사이 이웃 길을 찾아 `forest-school.html`의 `const MAP_PATHS` 줄을 다시 써요. 지도 그림이나 자리 표(GEO, CAMPUS)를 바꾸면 `python3 wrap.py && python3 paths/dump.py && python3 paths/gen.py`로 다시 만들고 `s138test.py`, `s41test.py`를 돌려요. 확인 그림은 `/tmp/paths_pe*.png`. 캠퍼스 지도는 건물이 지도 그림에 그려져 있어서 건물 자리를 `gen.py`의 `CAMPUS_BLK`에 손으로 적어 두었어요.
+## 학생 걷는 길 (4.4.1)
+- `paths/chains.py`: 지도마다 길 가운데를 따라 찍은 점 줄(지도 그림을 3~4배로 키운 격자 그림을 보고 손으로 찍음). 지도 그림을 바꾸면 여기를 고쳐요.
+- `paths/bldmask.py`: 건물을 모두 지은 모습에서 건물 그림이 실제로 덮는 곳을 `paths/bld_<지도 줄>.png`로 그려요(학생 그림이 건물 위에 그려져서 건물 뒤쪽 길은 걷지 않아요).
+- `paths/dump.py`, `paths/gen.py`: 자리 표를 꺼내고, 점 줄을 갈림점 그래프로 묶어 건물과 분수에 닿는 조각을 빼고, 끊긴 무리는 70칸 안의 직선으로 이어 `forest-school.html`의 `const MAP_PATHS` 줄을 다시 써요. 확인 그림은 `/tmp/paths_pe*.png`.
+- 순서: `python3 wrap.py && python3 paths/dump.py && python3 paths/bldmask.py && python3 paths/gen.py && python3 wrap.py`, 그다음 `s138test.py`, `s41test.py`.

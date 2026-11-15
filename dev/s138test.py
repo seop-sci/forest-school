@@ -1,4 +1,4 @@
-# 4.4.2 시험: 평소에는 학생이 지도 그림의 길(MAP_PATHS)로만 걷고, 탐험 자동 편성이 더 센 조합이면 단추가 강조돼요
+# 4.4.1 시험: 평소에는 학생이 지도 그림의 길(MAP_PATHS)로만 걷고, 탐험 자동 편성이 더 센 조합이면 단추가 강조돼요
 # 쓰는 법: python3 wrap.py && python3 s138test.py   (마지막 줄이 PASS면 통과)
 import asyncio, math, sys
 from playwright.async_api import async_playwright
@@ -6,9 +6,9 @@ from s4test import base, ctxpage
 bad = []
 # 길 그래프의 선에서 얼마나 떨어졌는지(지도 칸). 자리 둘레 흩어짐(2.5)과 걸음 사이 여유를 더해 5칸까지 괜찮아요
 FAR = 5
-GRAPH = """() => { const F = window.__forest, G = F.geo(), gi = F.GEO.indexOf(G), E = F.MAP_PATHS[gi] || [], SP = G.spots, segs = [];
-  for (const [a, b, mid] of E) { const p = [SP[a]].concat(mid, [SP[b]]); for (let i = 1; i < p.length; i++) segs.push([p[i-1][0], p[i-1][1], p[i][0], p[i][1]]); }
-  return { gi, segs, kids: F.rt4.kids.length }; }"""
+GRAPH = """() => { const F = window.__forest, G = F.geo(), gi = F.GEO.indexOf(G), W = F.pathInfo(), N = W.N, segs = [];
+  W.adj.forEach((a, i) => a.forEach(([j]) => { if (i < j) segs.push([N[i][0], N[i][1], N[j][0], N[j][1]]); }));
+  return { gi, segs, kids: F.rt4.kids.length, on: W.on.length, n: N.length }; }"""
 def dseg(x, y, s):
     x0, y0, x1, y1 = s; dx, dy = x1 - x0, y1 - y0; L = dx * dx + dy * dy or 1
     t = max(0, min(1, ((x - x0) * dx + (y - y0) * dy) / L)); return math.hypot(x - x0 - t * dx, y - y0 - t * dy)
