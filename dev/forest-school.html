@@ -3787,7 +3787,7 @@ body.cam-scene #ffChip,body.cam-scene #plChip,body.cam-scene .b-ring{animation-p
     <p class="boot-step" id="bootStep">학교 문을 여는 중...</p>
     <p class="boot-tip" id="bootTip">학교 문을 여는 중이에요</p>
   </div>
-  <span class="boot-ver" id="bootVer">v4.4.1.4</span>
+  <span class="boot-ver" id="bootVer">v4.4.1</span>
 </div>
 
 <div class="app on-school" id="app">
@@ -4349,7 +4349,7 @@ body.cam-scene #ffChip,body.cam-scene #plChip,body.cam-scene .b-ring{animation-p
       </div>
       <h3 class="panel-sub">정보</h3>
       <dl class="info">
-        <div id="verRow"><dt>버전</dt><dd>v4.4.1.4</dd></div>
+        <div id="verRow"><dt>버전</dt><dd>v4.4.1</dd></div>
         <div id="pidRow" hidden><dt>학교 번호</dt><dd id="infoPid"></dd></div>
       </dl>
       <div id="devBox" hidden>
@@ -10993,7 +10993,9 @@ body.cam-scene #ffChip,body.cam-scene #plChip,body.cam-scene .b-ring{animation-p
     // 화면을 가득 채우되, 지도 가로 360칸이 다 보이게 해요. 긴 휴대폰에서는 위아래 끝이 UI 뒤로 조금 비어요
     // 1.7.3: 지도가 차분해져서 학교 전체가 더 잘 보이게 300칸 → 360칸(지도 가로 전체, woodani 결정). rt.viewW는 시험용
     if (reset) rt.zoom = 1;
-    const sc = Math.min(Math.max(W / 360, H / 540), W / (rt.viewW || 360)) * (rt.zoom || 1), old = rt.mapS;
+    const sc0 = Math.min(Math.max(W / 360, H / 540), W / (rt.viewW || 360));
+    // 4.4.1 위 칸과 아래 탭이 낮아져서, 긴 휴대폰에서 지도가 그 사이보다 조금 짧으면(5%까지) 조금 키워 빈틈을 메워요
+    const fill = (H - (rt.hudTop || 0) - (rt.hudBot || 0)) / 540, sc = (fill > sc0 && fill <= sc0 * 1.05 ? fill : sc0) * (rt.zoom || 1), old = rt.mapS;
     rt.mapS = sc; rt.mapW = 360 * sc; rt.mapH = 540 * sc;
     map.style.width = rt.mapW + 'px'; map.style.height = rt.mapH + 'px';
     if (reset || rt.panX == null || !old) {
@@ -13630,13 +13632,16 @@ body.cam-scene #ffChip,body.cam-scene #plChip,body.cam-scene .b-ring{animation-p
        forest/rank/<내 id>   랭킹 이름과 학교 점수
        forest/stats/<내 id>  테스트 현황 (어디까지 했는지, 얼마나 했는지)
      <내 id>는 Firebase 익명 로그인이 기기(브라우저)마다 만들어 줘요. */
-  const VERSION = '4.4.1.4';
-  const NT_QUIET = ['2.1.20', '2.1.2.2', '2.3.0.1', '2.3.4', '3.2.3', '3.2.4', '3.2.5', '3.3.1', '3.3.2', '3.3.3', '4.4.1', '4.4.1.1', '4.4.1.2', '4.4.1.3', '4.4.1.4'];   // 4.4.1도 공지 없이(woodani)   // 3.3.1, 3.3.2, 3.3.3(토스 먼저)도 공지 창 없이(woodani). 2.3.0.1도 공지 창 없이(공지는 그대로 2.3.0). 2.3.4도 조용히(woodani 결정). 3.2.3, 3.2.4, 3.2.5도 공지 창 없이(공지 줄을 고르지 않음)
+  const VERSION = '4.4.1';
+  const NT_QUIET = ['2.1.20', '2.1.2.2', '2.3.0.1', '2.3.4', '3.2.3', '3.2.4', '3.2.5', '3.3.1', '3.3.2', '3.3.3', '4.4.1.1', '4.4.1.2', '4.4.1.3', '4.4.1.4'];   // 4.4.1(앱과 함께 내는 판)은 공지를 띄워요   // 4.4.1도 공지 없이(woodani)   // 3.3.1, 3.3.2, 3.3.3(토스 먼저)도 공지 창 없이(woodani). 2.3.0.1도 공지 창 없이(공지는 그대로 2.3.0). 2.3.4도 조용히(woodani 결정). 3.2.3, 3.2.4, 3.2.5도 공지 창 없이(공지 줄을 고르지 않음)
     // 2.1.20 woodani 결정: 이 버전들은 업데이트해도 공지 창을 띄우지 않아요(공지는 그대로 2.1.2)
   /* 2.0.0 공지사항 (2026-10-27 woodani, 1.8.0은 이미 올려서 2.0.0부터): 설정 > 공지사항. 맨 위가 가장 새 공지예요.
      패치노트는 자동으로 넣지 않아요. woodani가 검수한 글만 여기에 적어요(CHANGELOG.md는 자세한 기록용이라 따로 있어요).
      접속하면 새 공지 창을 띄워요(올라온 뒤 7일 동안, '일주일간 열지 않기'를 누르면 7일 쉬어요). 업데이트한 뒤 첫 접속에는 쉬는 중이어도 한 번 띄워요 */
   const NOTICES = [
+    // 4.4.1 공지(2026-11-15 woodani가 고른 세 줄, 웹 4.4.1.1~4.4.1.4를 모아 앱과 함께)
+    { id: '2026-11-15-v441', date: '2026-11-15', tag: '업데이트', title: '4.4.1 업데이트',
+      lines: ['홈 현황판 새 단장', '탐험 화면 다듬기와 빠른 스킵', '편의 개선과 오류 수정'] },
     // 4.4.0 공지(2026-11-15 woodani가 고른 세 줄)
     { id: '2026-11-15-v440', date: '2026-11-15', tag: '업데이트', title: '4.4.0 업데이트',
       lines: ['숲속 탐험대 전체 화면 개편', '심화 탐험과 심화 랭킹 추가', '편의 개선과 오류 수정'] },
