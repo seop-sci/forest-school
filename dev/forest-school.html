@@ -630,7 +630,7 @@ label.srow,button.srow{cursor:pointer}
 .tm-top{display:flex;align-items:flex-end;justify-content:space-between;gap:8px;margin:2px 2px 6px}
 .tm-where{display:flex;align-items:baseline;gap:6px;flex-wrap:wrap}.tm-where b{font-family:var(--font-display);font-size:20px}.tm-where small{color:var(--muted);font-size:12px}
 .tm-stage{position:relative;aspect-ratio:5/4;max-height:360px;width:100%;border-radius:18px;overflow:hidden;background:#BFE3A8;border:2px solid var(--line);isolation:isolate;--shx:0px;--shy:0px}
-.tm-stage[data-reg="garden"]{background-color:#A9D3A0}.tm-stage[data-reg="pond"]{background-color:#BFDDE6}.tm-stage[data-reg="library"]{background-color:#E9C48F}.tm-stage[data-reg="yard"]{background-color:#E6EEF6}.tm-stage[data-reg="tower"]{background-color:#8F82C9}
+.tm-stage[data-reg="lab"]{background-color:#C9C2F0}.tm-stage[data-reg="garden"]{background-color:#A9D3A0}.tm-stage[data-reg="pond"]{background-color:#BFDDE6}.tm-stage[data-reg="library"]{background-color:#E9C48F}.tm-stage[data-reg="yard"]{background-color:#E6EEF6}.tm-stage[data-reg="tower"]{background-color:#8F82C9}
 .tm-world{position:absolute;inset:0;transform:translate(var(--shx),var(--shy))}
 .tm-bgs{position:absolute;inset:0;overflow:hidden}
 .tm-bg{position:absolute;inset:0;background:center 70%/cover no-repeat;will-change:transform}
@@ -15927,10 +15927,11 @@ body.cam-scene #ffChip,body.cam-scene #plChip,body.cam-scene .b-ring{animation-p
       { k: 'pond', nm: '안개 연못', mob: ['장난꾸러기 물방울', '안개 솜사탕 요정', '연잎 정령'], boss: '안개 구름 고래', mat: 1 },
       { k: 'library', nm: '단풍 도서관', mob: ['종이비행기 꼬마', '먼지 솜뭉치', '책갈피 나비'], boss: '잠꼬대하는 큰 책', mat: 0 },
       { k: 'yard', nm: '눈 내린 뒤뜰', mob: ['눈뭉치 꼬마', '고드름 요정', '얼음 반딧불'], boss: '눈보라 눈사람 대장', mat: 1 },
-      { k: 'tower', nm: '별빛 천문대', mob: ['반짝 수정 꼬마', '그림자 솜뭉치', '졸린 박쥐'], boss: '수정 꼬마 용', mat: 3 }],
+      { k: 'tower', nm: '별빛 천문대', mob: ['반짝 수정 꼬마', '그림자 솜뭉치', '졸린 박쥐'], boss: '수정 꼬마 용', mat: 3 },
+      { k: 'lab', nm: '구름 실험실', mob: ['번쩍 전구 꼬마', '톱니 굴렁쇠', '보글보글 플라스크'], boss: '꾸벅꾸벅 구름 로봇', mat: 2 }],   // 5.0.0 대학원에서만 끼는 일곱째 지역(작업지시서 86)
     regLen: 50, bossEvery: 10, limit: 30,
     // 4.3.0 woodani 요청(한 과목만 쓰고 나머지는 버려져요): 지역마다 유리한 과목(힘과 체력 +30%), 모든 대원 레벨이 탐험대 전체에 주는 보유 효과(레벨 1마다 +0.3%). 숫자는 제안
-    adv: { ground: 1, garden: 3, pond: 0, library: 2, yard: 4, tower: 0 }, advG: 0.3, collG: 0.003, collMax: 3,
+    adv: { ground: 1, garden: 3, pond: 0, library: 2, yard: 4, tower: 0, lab: 4 }, advG: 0.3, collG: 0.003, collMax: 3,
     mHp: 20, mAtk: 2.2, mobN: [2.4, 1.4, 1],   // 4.3.2 한 층에 1, 2, 3마리일 때 한 마리의 힘 배수
     g: 1.07, bossHp: 7, bossAtk: 1.7, mobCd: 1.6,
     // 역할(능력 번호 0 과학, 1 체육, 2 국어, 3 미술, 4 수학)
@@ -15951,7 +15952,7 @@ body.cam-scene #ffChip,body.cam-scene #plChip,body.cam-scene .b-ring{animation-p
     cheer: { n: 3, fl: 5, mul: 1.5 },   // 4.3.1 woodani 요청(숫자는 본부가 정함): 📺 응원 받기 = 다음 5층 동안 대원 힘과 체력 +50%, 하루 세 번
     // 4.3.0 woodani 요청(너무 빨라요, 탐험 느낌): 겨루기 속도와 한 층의 흐름(걷기, 만남, 이김, 사건, 오르기, 짐). 초 단위, 2배속이면 모두 반으로
     pace: 1.7, ph: { walk: 2.6, meet: 1.1, win: 1.5, climb: 1.3, lose: 3.6, ev: 8 }, evP: 0.3,
-    mobPh: ['chr_mouse', 'chr_crow', 'chr_goose', 'chr_sheep', 'chr_goat', 'chr_beaver'], bossPh: 'chr_boar',
+    mobPh: ['chr_mouse', 'chr_crow', 'chr_goose', 'chr_sheep', 'chr_goat', 'chr_beaver', 'chr_mouse'], bossPh: 'chr_boar',
     // 4.3.3 woodani 결정(상한에 너무 빨리 닿아요): 심화 탐험(하드모드). 그 학기 상한을 넘으면 열려요. 1층 힘은 상한 층의 hG배, 층마다 hG배(일반은 g). 도토리 대신 재료와 별 조각(숫자는 제안)
     hG: 1.1, hMat: 1.5,
     // 4.3.3 woodani 요청(스킬이 너무 빨리 사라져요): 필살기 세 박자. 모으기, 컷인, 큰 움직임(ms). '연출 건너뛰기'를 켜 두면 모으기와 컷인 없이 바로 큰 움직임
@@ -15978,8 +15979,9 @@ body.cam-scene #ffChip,body.cam-scene #plChip,body.cam-scene .b-ring{animation-p
     s.tam = f;
   }
   const tamOn = () => !!S && !!S.tam;
-  const tamReg = fl => TAM.reg[Math.floor((Math.max(1, fl) - 1) / TAM.regLen) % TAM.reg.length];
-  const tamLap = fl => Math.floor((Math.max(1, fl) - 1) / (TAM.regLen * TAM.reg.length));   // 300층마다 '깊은 밤' 한 단계
+  const tamRegN = () => gradOn() ? TAM.reg.length : TAM.reg.length - 1;   // 5.0.0 구름 실험실은 대학원에서만(50층 묶음마다 일곱 지역)
+  const tamReg = fl => TAM.reg[Math.floor((Math.max(1, fl) - 1) / TAM.regLen) % tamRegN()];
+  const tamLap = fl => Math.floor((Math.max(1, fl) - 1) / (TAM.regLen * tamRegN()));   // 300층마다 '깊은 밤' 한 단계
   const tamRole = sp => SP_ABIL[sp] !== undefined ? SP_ABIL[sp] : 1;
   const tamMem = sp => S.tam.mem[sp] || (S.tam.mem[sp] = { lv: 1, st: 1, sh: 0 });
   const tamSlots = () => S.tier <= 0 ? 3 : S.tier === 1 ? 4 : 5;
@@ -16068,7 +16070,7 @@ body.cam-scene #ffChip,body.cam-scene #plChip,body.cam-scene .b-ring{animation-p
   // 상한: 유치원 30, 40층 / 초등 50층부터 학기마다 +5(6학년 2학기 105층) / 중 120층부터 +10(170층) / 고 185층부터 +10(235층) / 대 255층부터 +15(4학년 1학기 345층), 4학년 2학기 끝없이
   // 4.4.1 woodani 결정(전 학교급 레벨로 상한이 바로 뚫려요): 학기마다 상한 오르는 폭을 두 배로, 학교급이 오르면 더 많이 열려요(숫자는 제안)
   // 유치원 30, 40층 / 초등 50층부터 학기마다 +10(160층) / 중 180층부터 +20(280층) / 고 300층부터 +20(400층) / 대 420층부터 +30, 4학년 2학기 끝없이
-  const TAM_CAP = [{ s: 30, d: 10 }, { s: 50, d: 10 }, { s: 180, d: 20 }, { s: 300, d: 20 }, { s: 420, d: 30 }], TAM_REACH = 24;
+  const TAM_CAP = [{ s: 30, d: 10 }, { s: 50, d: 10 }, { s: 180, d: 20 }, { s: 300, d: 20 }, { s: 420, d: 30 }, { s: 660, d: 30 }], TAM_REACH = 24;   // 5.0.0 대학원: 석사 1학기 660층(대학교 4학년 1학기 600층 + 60)부터 학기마다 +30, 박사 8학기 끝없이(woodani 결정)
   // 4.4.1 학기(유치원은 해)마다 장난꾸러기가 TAM_STG층치씩 세져요. 지난 학기에 올려 둔 레벨로 새 상한이 바로 뚫리지 않게(숫자는 제안)
   const TAM_STG = 15;
   const tamStageAll = () => { let n = 0; for (let t = 0; t < S.tier; t++) n += t === 0 ? TIERS[t].years : TIERS[t].years * 2; return n + tamStageIn(); };
@@ -16078,7 +16080,7 @@ body.cam-scene #ffChip,body.cam-scene #plChip,body.cam-scene .b-ring{animation-p
   function tamCap() {
     if (!S || !S.tam) return Infinity;
     const k = tamStageIn(), T = TIERS[S.tier];
-    if (S.tier >= TAM_CAP.length - 1 && k >= T.years * 2 - 1) return Infinity;   // 대학교 4학년 2학기부터 끝없이
+    if (S.tier >= TAM_CAP.length - 1 && k >= T.years * 2 - 1) return Infinity;   // 5.0.0 박사 8학기부터 끝없이(대학교 4학년 2학기는 이제 630층)
     return tamCapAt(S.tier, k);
   }
   function tamCapPrev() {   // 앞 단계 상한(기준 레벨을 셀 때)
@@ -29181,7 +29183,7 @@ body.cam-scene #ffChip,body.cam-scene #plChip,body.cam-scene .b-ring{animation-p
   }
 
   // 시험용 손잡이: 자동 시험(window.__FOREST_TEST)에서만 게임 속 함수를 꺼내 써요
-  if (window.__FOREST_TEST) window.__forest = { get S() { return S; }, get rt4() { return rt; }, THEME, applyCos, setZone, decoEditStart, decoEditEnd, tamSkipTo, tamSkipGo, tamWinRep, tamRepFl, tamRenderTop, tamBg, teaOff, geo, qMeasure, IMG, tamHOn, tamHOpen, tamCurFl, tamWinH, tamHf, tamHRankDoc, tamSkBusy, tamReach, get SKQ() { return SKQ; }, esAxGain, esAxLeft, ESHOP, tamLvPlan, tamLvBuy, tamLvAll, mapUrl, mapBase, tamCheerLeft, tamAdRevive, tamCap, tamCapped, tamLvRef, tamBaseRate, tamLvCost, tamStageIn, musicWant, tamPh, tamEvPick, tamAutoTeam, tamAutoGain, tamUpRec, MAIN, startSports, GEO, claimAchAll, ACH, btMake, btBest, btRoster, btRoll, btWin, btOppCheer, BT, BT_LG, stPrev, get Rank() { return Rank; }, tamRankDoc, tamTf, tamAdSpd, tamReport, tamRepTake, tamAdRevive, renderRankPanel, TAM, tamSim, tamTeam, tamStat, tamMobs, tamWin, tamIdle, tamCollect, tamParty, tamShard, tamPow, tamFight, tamStep, TAM, tamSim, tamTeam, tamStat, tamMobs, tamWin, tamIdle, tamCollect, tamShard, tamParty, tamPow, tamLvCost, tamOpen, setZone, geo, stPlay, stNext, ST, ST_SIDE, SIDE, missionGo, MGO, MGO_MINI, MGO_Q, renderMissions, renderPass, BOOST, conLeft, gameToday, setTab, ADX, adStamp, adxDay, adxCan, adxMore, adPickNow, adPickGive, conNear, renderAdStamp, claimOfflineDouble, startBoost, openBoost, showOffline, fvBoothStart, bfFwStart, musicWant, renderCounsel, renderXg, renderFv, showCeremony, RX, rxPct, rxCost, rxUp, rxPart, renderDept, goldOr, goldRich, adGold, stampAtt, GOLD, BIG, BF_DECO, bfWin, bfNext, bfOn, bfFw, bfSync, bfStamp, bfFwStart, bfPart, bfNextTx, sanitizeBf, freshBf, fvBoothMax, bldBox, bldPick, bldWarm, DECO_SLOTS, XG, MK, ST, SIDE, ST_SIDE, wdMap, xgOn, xgGuest, xgSpots, xgGreet, xgVisit, xgLunch, openXg, mkOn, mkHot, mkSell, mkBuy, mkSur, openMk, wdBar, wdTick, stTick, stPlay, stNext, stPick, stEnd, stTags, openSb, renderSb, sideCan, sideMap, fvFlag, FV, FV_POS, fvOn, fvOpen, fvBonus, fvSync, fvStamp, fvGuests, openFv, renderFv, fvMeet, fvBoothStart, fvMap, fvTip, festDef, goTo, navInfo, openShop, gdReady, thPreview, thPreviewEnd, thOn, busScene, tripCrowd, openTrip, startTrip, claimTrip, TRIPS, tripMult, openSheet, openRx, rtStart, rtLv, RT5, setZone, get rxTier() { return RX_TIER; }, set rxTier(v) { RX_TIER = v; }, tamLvAllPlan, tamLvAllAsk, decoPut, decoUsed, get ZONE0() { return ZONE0; }, mgPickMul, mgPickMode, mgUpOrder, mgFillOrders, mgAdAsk, sportsCon, festCon, btQuota, btCanAd, btAdMore, warmRooms, blobUrl, vdSize, vdBlock, pzSweep, pzSwGain, pzSwOpen, pzXpOf, mgMulMax, mgMulOk, mgMul, mgModeTap, acTip, kidDupIdx, trialSafe, closeAd,
+  if (window.__FOREST_TEST) window.__forest = { get S() { return S; }, get rt4() { return rt; }, THEME, applyCos, setZone, decoEditStart, decoEditEnd, tamSkipTo, tamSkipGo, tamWinRep, tamRepFl, tamRenderTop, tamBg, teaOff, geo, qMeasure, IMG, tamHOn, tamHOpen, tamCurFl, tamWinH, tamHf, tamHRankDoc, tamSkBusy, tamReach, get SKQ() { return SKQ; }, esAxGain, esAxLeft, ESHOP, tamLvPlan, tamLvBuy, tamLvAll, mapUrl, mapBase, tamCheerLeft, tamAdRevive, tamCap, tamCapped, tamLvRef, tamBaseRate, tamLvCost, tamStageIn, musicWant, tamPh, tamEvPick, tamAutoTeam, tamAutoGain, tamUpRec, MAIN, startSports, GEO, claimAchAll, ACH, btMake, btBest, btRoster, btRoll, btWin, btOppCheer, BT, BT_LG, stPrev, get Rank() { return Rank; }, tamRankDoc, tamTf, tamAdSpd, tamReport, tamRepTake, tamAdRevive, renderRankPanel, TAM, tamSim, tamTeam, tamStat, tamMobs, tamWin, tamIdle, tamCollect, tamParty, tamShard, tamPow, tamFight, tamStep, TAM, tamSim, tamTeam, tamStat, tamMobs, tamWin, tamIdle, tamCollect, tamShard, tamParty, tamPow, tamLvCost, tamOpen, setZone, geo, stPlay, stNext, ST, ST_SIDE, SIDE, missionGo, MGO, MGO_MINI, MGO_Q, renderMissions, renderPass, BOOST, conLeft, gameToday, setTab, ADX, adStamp, adxDay, adxCan, adxMore, adPickNow, adPickGive, conNear, renderAdStamp, claimOfflineDouble, startBoost, openBoost, showOffline, fvBoothStart, bfFwStart, musicWant, renderCounsel, renderXg, renderFv, showCeremony, RX, rxPct, rxCost, rxUp, rxPart, renderDept, goldOr, goldRich, adGold, stampAtt, GOLD, BIG, BF_DECO, bfWin, bfNext, bfOn, bfFw, bfSync, bfStamp, bfFwStart, bfPart, bfNextTx, sanitizeBf, freshBf, fvBoothMax, bldBox, bldPick, bldWarm, DECO_SLOTS, XG, MK, ST, SIDE, ST_SIDE, wdMap, xgOn, xgGuest, xgSpots, xgGreet, xgVisit, xgLunch, openXg, mkOn, mkHot, mkSell, mkBuy, mkSur, openMk, wdBar, wdTick, stTick, stPlay, stNext, stPick, stEnd, stTags, openSb, renderSb, sideCan, sideMap, fvFlag, FV, FV_POS, fvOn, fvOpen, fvBonus, fvSync, fvStamp, fvGuests, openFv, renderFv, fvMeet, fvBoothStart, fvMap, fvTip, festDef, goTo, navInfo, openShop, gdReady, thPreview, thPreviewEnd, thOn, busScene, tripCrowd, openTrip, startTrip, claimTrip, TRIPS, tripMult, openSheet, openRx, rtStart, rtLv, RT5, setZone, tamReg, get rxTier() { return RX_TIER; }, set rxTier(v) { RX_TIER = v; }, tamLvAllPlan, tamLvAllAsk, decoPut, decoUsed, get ZONE0() { return ZONE0; }, mgPickMul, mgPickMode, mgUpOrder, mgFillOrders, mgAdAsk, sportsCon, festCon, btQuota, btCanAd, btAdMore, warmRooms, blobUrl, vdSize, vdBlock, pzSweep, pzSwGain, pzSwOpen, pzXpOf, mgMulMax, mgMulOk, mgMul, mgModeTap, acTip, kidDupIdx, trialSafe, closeAd,
     TKE, TK_Q, tkDaily, nbAllDay, nbBuildAt, nbOn, conAdd, BX_SPOT, PERKS, offlineCapH, applyAway, pzFinish, mgClaimOrder,
     CS, JOBS, CS_WORRY, freshCs, csOpen, csLeft, csMax, csEnsure, csCands, csNeed, csMul, csOpenCards, csReady, csDone, csTalkMake, csAnswer, csChoose, csSettle, openCounsel, renderCounsel, renderHall, MAIN, qMeasure, qGoal, sanitize,   // 3.1.0 진로 상담
     NSL, nsStart, nsSettle, nsOpen, nsOn, nsOverlap, nsExtraH, isNight, nightDayOf, openNs, renderNs, bxSpots, renderNight,   // 3.0.0
