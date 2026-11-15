@@ -61,6 +61,12 @@ async def main():
             const fr=R.style.getPropertyValue('--hud-frame'); out.push([th,R.dataset.hudTh,fr===`url("${F.IMG(th?'hud_board_frame_'+th:'hud_board_frame')}")`,R.style.getPropertyValue('--hud-edge')]); }
           return out;})()""")
         print('테마 현황판:', r)
+        # 4.4.1 창(공지창, 보상 창, 아래에서 올라오는 창)도 배경 테마 색으로
+        m = await pg.evaluate("""(async()=>{const F=window.__forest,S=F.S,out=[]; const el=document.querySelector('#mReward .modal');
+          for(const th of ['spring','space','']){ S.cos.th=Object.assign({},S.cos.th,{bg:th}); F.applyCos(); await new Promise(r=>setTimeout(r,60));
+            out.push([th,document.documentElement.dataset.thUi,getComputedStyle(el).backgroundColor]); } return out;})()""")
+        print('테마 창:', m)
+        if not (m[0][1] == 'spring' and m[1][1] == 'space' and m[2][1] == '' and len({x[2] for x in m}) == 3): bad.append(f'창 색이 테마를 따라가지 않아요: {m}')
         for th, on, okf, edge in r:
             if on != th or not okf or (th and not edge) or (not th and edge): bad.append(f'테마 현황판이 안 바뀌어요: {th} {on} {okf} {edge}')
         await ctx.close(); await b.close()
