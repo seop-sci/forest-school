@@ -55,6 +55,14 @@ async def main():
         print('자동 편성 강조:', r)
         if not (r['gain'] > 0 and r['hot'] and '힘 +' in r['txt'] and not r['over']): bad.append(f'더 센 조합 강조가 안 보여요: {r}')
         if r['after'] or r['gain2']: bad.append(f'편성한 뒤에도 강조가 남아요: {r}')
+        # 4.4.1 테마마다 현황판 틀(작업지시서 80): 배경 테마를 바꾸면 그 테마 조각과 색으로, 기본으로 돌리면 기본 그림으로
+        r = await pg.evaluate("""(async()=>{const F=window.__forest,S=F.S,R=document.documentElement,out=[];
+          for(const th of ['spring','summer','autumn','winter','xmas','space','retro','']){ S.cos.th=Object.assign({},S.cos.th,{bg:th}); F.applyCos(); await new Promise(r=>setTimeout(r,80));
+            const fr=R.style.getPropertyValue('--hud-frame'); out.push([th,R.dataset.hudTh,fr===`url("${F.IMG(th?'hud_board_frame_'+th:'hud_board_frame')}")`,R.style.getPropertyValue('--hud-edge')]); }
+          return out;})()""")
+        print('테마 현황판:', r)
+        for th, on, okf, edge in r:
+            if on != th or not okf or (th and not edge) or (not th and edge): bad.append(f'테마 현황판이 안 바뀌어요: {th} {on} {okf} {edge}')
         await ctx.close(); await b.close()
 asyncio.run(main())
 print('\n'.join(bad) if bad else 'PASS'); sys.exit(1 if bad else 0)
