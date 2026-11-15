@@ -2,7 +2,7 @@
 <html lang="ko">
 <head>
 <meta charset="utf-8">
-<meta name="forest-version" content="4.4.1.1">
+<meta name="forest-version" content="4.4.1.2">
 <meta name="viewport" content="width=device-width, initial-scale=1">
 <meta name="description" content="도토리를 모아 숲속 학교를 키우는 방치형 게임 테스트판이에요.">
 <style>html,body{margin:0}</style>
@@ -806,8 +806,10 @@ label.srow,button.srow{cursor:pointer}
 #panelTam .tm-flbig{display:none}
 #panelTam .tm-f{--w:27%}#panelTam .tm-mob.solo{--w:33%}#panelTam .tm-mob.boss{--w:48%}
 #panelTam .tm-tower{top:calc(var(--x4t) + var(--x4d,0px) + 128px);left:22%;right:22%}
-#panelTam .tm-bossbar{top:calc(var(--x4t) + var(--x4d,0px) + 124px)}
-#panelTam .tm-time{top:calc(var(--x4t) + var(--x4d,0px) + 152px);left:24%;right:24%;height:4px}
+#panelTam .tm-bossbar{top:calc(var(--x4t) + var(--x4d,0px) + 152px)}   /* 4.4.1.2 지섭: 최고층 줄과 겹치지 않게 그 아래로 */
+#panelTam:has(#tmBossBar:not([hidden])) .tm-pow{top:calc(100% + 56px)}
+#panelTam:has(#tmBossBar:not([hidden])) .tm-acts{top:calc(var(--x4t) + var(--x4d,0px) + 200px)}
+#panelTam .tm-time{top:calc(var(--x4t) + var(--x4d,0px) + 180px);left:24%;right:24%;height:4px}
 #panelTam .tm-cut{top:30%;height:26%}
 .tm-cut.x4{background:center/cover no-repeat;border-top:3px solid #FFF3C9;border-bottom:3px solid #FFF3C9;box-shadow:0 6px 18px rgba(0,0,0,.35)}
 .tm-cut.x4 b{color:#fff;-webkit-text-stroke:0;text-shadow:0 2px 0 rgba(60,30,10,.85),0 0 6px rgba(60,30,10,.6)}
@@ -828,7 +830,7 @@ html.ait #panelTam .tm-bar .tm-ac{grid-column:auto;position:absolute;right:10px;
 .tm-ac b{flex:1;min-width:0;text-align:right;overflow:hidden;font-family:var(--font-display);font-size:17px;color:#FFF8E1;text-shadow:0 1.5px 0 #5A3414,0 0 3px #5A3414;white-space:nowrap}
 #panelTam .tm-top{position:absolute;left:0;right:0;top:calc(var(--x4t) + var(--x4d,0px) + 58px);z-index:11;margin:0;display:flex;flex-direction:column;align-items:center;gap:3px;pointer-events:none}
 #panelTam .tm-where{flex-direction:column;align-items:center;gap:3px}
-#panelTam #tmFl{display:inline-block;min-width:168px;white-space:nowrap;text-align:center;padding:4px 44px 6px;background:var(--x4-floor,#F2B347) center/100% 100% no-repeat;color:#6B3B10;font-size:22px;text-shadow:0 1px 0 #FFF3C9}
+#panelTam #tmFl{display:inline-block;min-width:204px;white-space:nowrap;text-align:center;padding:4px 58px 6px;background:var(--x4-floor,#F2B347) center/100% 100% no-repeat;color:#6B3B10;font-size:22px;text-shadow:0 1px 0 #FFF3C9}
 #panelTam #tmReg{font-family:var(--font-display);font-size:13px;color:#fff;text-shadow:0 1px 0 #4A2F14,0 0 3px #4A2F14}
 #panelTam .tm-where small{color:#fff}
 #panelTam .tm-best{font-size:11px;pointer-events:auto}
@@ -883,7 +885,7 @@ html.ait #panelTam .tm-bar .tm-ac{grid-column:auto;position:absolute;right:10px;
 
 .tm-rib{position:absolute;left:4%;right:4%;top:28%;height:22%;display:grid;place-items:center;padding:0 14%;text-align:center;font-family:var(--font-display);font-size:clamp(16px,6.2cqw,24px);color:#5A3A12;background:center/100% 100% no-repeat;animation:tmRib 1.3s ease-out forwards;z-index:7;text-shadow:0 1px 0 #fff}
 .tm-rib:not([style*="url"]){background-color:rgba(255,226,140,.92);border-radius:12px}
-.tm-rib.boss{color:#fff;text-shadow:0 2px 0 #4B2A86}.tm-rib.lose{background-color:rgba(255,255,255,.88);color:var(--ink);font-size:16px;border-radius:12px}
+.tm-rib.boss{color:#fff;text-shadow:0 2px 0 #4B2A86}.tm-rib.lose{background:linear-gradient(#6A4322,#43280F);color:#FFF1D2;font-size:clamp(15px,4.6cqw,19px);border-radius:16px;box-shadow:0 0 0 3px #E2A957,0 0 0 5px rgba(90,52,20,.55),0 8px 18px rgba(0,0,0,.35);text-shadow:0 2px 0 rgba(0,0,0,.35);left:10%;right:10%;height:auto;min-height:15%;padding:10px 18px}   /* 4.4.1.2 지섭: 진 때 알림도 나무 톤으로(하얀 칸이었어요) */
 @keyframes tmRib{0%{transform:scale(.7);opacity:0}14%{transform:scale(1.02);opacity:1}22%{transform:none}85%{opacity:1}100%{opacity:0;transform:translateY(-12%)}}
 .tm-time{position:absolute;left:12%;right:4%;top:3%;height:5px;border-radius:3px;background:rgba(0,0,0,.25);z-index:4}.tm-time b{display:block;height:100%;width:100%;border-radius:3px;background:#fff}
 .tm-flbig{position:absolute;left:50%;top:7%;transform:translateX(-50%);z-index:4;padding:0 12px;border-radius:20px;background:rgba(60,35,10,.42);font-family:var(--font-display);font-size:clamp(18px,7cqw,28px);color:#fff;-webkit-text-stroke:1px #6B3A1F;text-shadow:0 2px 0 #6B3A1F;white-space:nowrap;pointer-events:none}
@@ -2563,13 +2565,25 @@ html.ait .app .board .xgear{margin-right:6px}
 .app .board .school-row .school-year b{font-size:13px}
 .app .board .school-row .sc-chev{flex:none;align-self:center}
 .app .board .ydots{display:none}
+.th-veil{position:fixed;inset:0;z-index:9999;display:grid;place-items:center;background:color-mix(in srgb, var(--home-paper,#FFF3D8) 88%, transparent);backdrop-filter:blur(3px);opacity:1;transition:opacity .25s}
+.th-veil[hidden]{display:none}.th-veil.out{opacity:0}
+.th-veil-box{display:flex;align-items:center;gap:10px;padding:14px 22px;border-radius:999px;background:var(--home-paper,#FFF3D8);box-shadow:0 0 0 2px var(--home-paper-edge,#C98A4B),0 6px 16px rgba(60,30,0,.25);color:var(--home-ink,#3F2A14);font-family:var(--font-display);font-size:17px}
+.th-veil-spin{width:20px;height:20px;border-radius:50%;border:3px solid color-mix(in srgb, var(--home-paper-edge,#C98A4B) 35%, transparent);border-top-color:var(--home-paper-edge,#C98A4B);animation:thVeilSpin .8s linear infinite}
+@keyframes thVeilSpin{to{transform:rotate(360deg)}}
 .app .board .board-top .icon-btn{width:34px;height:34px;margin-top:5px;margin-bottom:5px}
 .app .board .board-top .icon-btn .tic{width:22px;height:22px}
 .app .board .hud-title{margin:0 0 5px 10px}
-html.ait .app .board .board-top{grid-template-columns:minmax(0,1fr) auto auto auto;grid-template-areas:"school . . ." "title grad att gear" "prog prog prog prog" "res res res res";grid-template-rows:minmax(36px,auto) auto auto auto}
+/* 4.4.1.2 지섭 요청: 토스도 단추를 학교 이름과 같은 줄로(4.4.0처럼 오른쪽 끝은 토스 단추 자리만큼 비워요). 좁아서 학년 학기는 이름 아래 작게 */
+html.ait .app .board #btnExit{display:inline-flex;visibility:hidden;pointer-events:none;width:calc(var(--ait-capw, 112px) - 22px);margin-right:0}
+html.ait .app .board .board-top{grid-template-columns:minmax(0,1fr) auto auto auto auto;grid-template-areas:"school grad att gear exit" "title title title title title" "prog prog prog prog prog" "res res res res res";grid-template-rows:auto}
 html.ait .app .board .board-top::before{grid-area:1 / 1 / 3 / -1}
-html.ait .app .board .hud-title{align-self:center;margin:0 6px 0 10px;max-width:100%}
 html.ait .app .board .board-top .icon-btn{align-self:center}
+html.ait .app .board .xgear{margin-right:0}
+html.ait .app .board .school-row{flex-direction:column;align-items:flex-start;gap:0;position:relative;padding-right:18px}
+html.ait .app .board .school-row .school-name{font-size:16px;line-height:1.2;max-width:100%;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+html.ait .app .board .school-row .school-year,html.ait .app .board .school-row .school-year b{font-size:11.5px;line-height:1.2}
+html.ait .app .board .school-row .sc-chev{position:absolute;right:0;top:50%;transform:translateY(-50%)}
+html.ait .app .board .hud-title{grid-column:1 / -1}
 @media (max-width:380px){.app .board .school-row .school-name{font-size:16.5px}.app .board .school-row{gap:5px}.app .board .school-row .school-year,.app .board .school-row .school-year b{font-size:12px}.app .board .board-top .icon-btn{width:32px;height:32px}}
 html.hud-art .app .board .board-top::after{border-width:15px;border-image-width:15px}
 html.hud-art .app .board .board-top::before{border-image-width:11px}
@@ -3822,7 +3836,7 @@ body.cam-scene #ffChip,body.cam-scene #plChip,body.cam-scene .b-ring{animation-p
     <p class="boot-step" id="bootStep">학교 문을 여는 중...</p>
     <p class="boot-tip" id="bootTip">학교 문을 여는 중이에요</p>
   </div>
-  <span class="boot-ver" id="bootVer">v4.4.1.1</span>
+  <span class="boot-ver" id="bootVer">v4.4.1.2</span>
 </div>
 
 <div class="app on-school" id="app">
@@ -4383,7 +4397,7 @@ body.cam-scene #ffChip,body.cam-scene #plChip,body.cam-scene .b-ring{animation-p
       </div>
       <h3 class="panel-sub">정보</h3>
       <dl class="info">
-        <div id="verRow"><dt>버전</dt><dd>v4.4.1.1</dd></div>
+        <div id="verRow"><dt>버전</dt><dd>v4.4.1.2</dd></div>
         <div id="pidRow" hidden><dt>학교 번호</dt><dd id="infoPid"></dd></div>
       </dl>
       <div id="devBox" hidden>
@@ -13663,8 +13677,8 @@ body.cam-scene #ffChip,body.cam-scene #plChip,body.cam-scene .b-ring{animation-p
        forest/rank/<내 id>   랭킹 이름과 학교 점수
        forest/stats/<내 id>  테스트 현황 (어디까지 했는지, 얼마나 했는지)
      <내 id>는 Firebase 익명 로그인이 기기(브라우저)마다 만들어 줘요. */
-  const VERSION = '4.4.1.1';
-  const NT_QUIET = ['2.1.20', '2.1.2.2', '2.3.0.1', '2.3.4', '3.2.3', '3.2.4', '3.2.5', '3.3.1', '3.3.2', '3.3.3', '4.4.1', '4.4.1.1'];   // 4.4.1도 공지 없이(지섭)   // 3.3.1, 3.3.2, 3.3.3(토스 먼저)도 공지 창 없이(지섭). 2.3.0.1도 공지 창 없이(공지는 그대로 2.3.0). 2.3.4도 조용히(지섭 결정). 3.2.3, 3.2.4, 3.2.5도 공지 창 없이(공지 줄을 고르지 않음)
+  const VERSION = '4.4.1.2';
+  const NT_QUIET = ['2.1.20', '2.1.2.2', '2.3.0.1', '2.3.4', '3.2.3', '3.2.4', '3.2.5', '3.3.1', '3.3.2', '3.3.3', '4.4.1', '4.4.1.1', '4.4.1.2'];   // 4.4.1도 공지 없이(지섭)   // 3.3.1, 3.3.2, 3.3.3(토스 먼저)도 공지 창 없이(지섭). 2.3.0.1도 공지 창 없이(공지는 그대로 2.3.0). 2.3.4도 조용히(지섭 결정). 3.2.3, 3.2.4, 3.2.5도 공지 창 없이(공지 줄을 고르지 않음)
     // 2.1.20 지섭 결정: 이 버전들은 업데이트해도 공지 창을 띄우지 않아요(공지는 그대로 2.1.2)
   /* 2.0.0 공지사항 (2026-10-27 지섭, 1.8.0은 이미 올려서 2.0.0부터): 설정 > 공지사항. 맨 위가 가장 새 공지예요.
      패치노트는 자동으로 넣지 않아요. 지섭이 검수한 글만 여기에 적어요(CHANGELOG.md는 자세한 기록용이라 따로 있어요).
@@ -15349,8 +15363,22 @@ body.cam-scene #ffChip,body.cam-scene #plChip,body.cam-scene .b-ring{animation-p
       return `<circle cx="${x}" cy="${y}" r="2.3" fill="${col}"/>`;
     }).join('');
   }
+  /* 4.4.1.2 지섭 요청: 저장 안 된 테마로 바꾸면 그림을 받는 동안 화면이 깨져 보여요.
+     테마가 바뀔 때만 '테마 적용 중' 창을 덮고, 지도 그림을 다 받으면 걷어요(적어도 1초, 길어도 3초) */
+  function themeVeil() {
+    let v = $('#thVeil');
+    if (!v) { v = document.createElement('div'); v.id = 'thVeil'; v.className = 'th-veil'; v.setAttribute('role', 'status'); v.innerHTML = '<div class="th-veil-box"><span class="th-veil-spin" aria-hidden="true"></span><b>테마 적용 중…</b></div>'; document.body.appendChild(v); }
+    clearTimeout(rt.thVeilT); v.hidden = false; v.classList.remove('out');
+    const t0 = Date.now(), done = () => { const w = Math.max(0, 1000 - (Date.now() - t0)); rt.thVeilT = setTimeout(() => { v.classList.add('out'); rt.thVeilT = setTimeout(() => { v.hidden = true; }, 260); }, w); };
+    requestAnimationFrame(() => {
+      const urls = [...new Set([...document.querySelectorAll('#map image')].map(e => e.getAttribute('href')).filter(u => u && !u.startsWith('data:')))];
+      const one = u => new Promise(r => { const i = new Image(); i.onload = i.onerror = () => r(); i.src = u; });
+      Promise.race([Promise.all(urls.map(one)), new Promise(r => setTimeout(r, 3000))]).then(done);
+    });
+  }
   function applyThemes() {
     const map = $('#map'), board = $('.board');
+    { const sig = JSON.stringify(thOn()); if (rt.thSig != null && rt.thSig !== sig && (!window.__FOREST_TEST || window.__THVEIL)) themeVeil(); rt.thSig = sig; }
     const bgT = THEME[thOn().bg];   // 3.0.0 미리 보기 중에는 미리 보는 테마
     // 지도 크기와 위치(fitMap)는 그대로 두고 테마 색만 지워요
     for (const T of THEMES) for (const k of Object.keys(T.bg)) map.style.removeProperty(k);
@@ -28653,7 +28681,7 @@ body.cam-scene #ffChip,body.cam-scene #plChip,body.cam-scene .b-ring{animation-p
   }
 
   // 시험용 손잡이: 자동 시험(window.__FOREST_TEST)에서만 게임 속 함수를 꺼내 써요
-  if (window.__FOREST_TEST) window.__forest = { get S() { return S; }, get rt4() { return rt; }, tamSkipTo, tamSkipGo, tamWinRep, tamRepFl, tamRenderTop, tamBg, teaOff, geo, qMeasure, IMG, tamHOn, tamHOpen, tamCurFl, tamWinH, tamHf, tamHRankDoc, tamSkBusy, tamReach, get SKQ() { return SKQ; }, esAxGain, esAxLeft, ESHOP, tamLvPlan, tamLvBuy, tamLvAll, mapUrl, mapBase, tamCheerLeft, tamAdRevive, tamCap, tamCapped, tamLvRef, tamBaseRate, tamLvCost, tamStageIn, musicWant, tamPh, tamEvPick, tamAutoTeam, tamUpRec, MAIN, startSports, GEO, claimAchAll, ACH, btMake, btBest, btRoster, btRoll, btWin, btOppCheer, BT, BT_LG, stPrev, get Rank() { return Rank; }, tamRankDoc, tamTf, tamAdSpd, tamReport, tamRepTake, tamAdRevive, renderRankPanel, TAM, tamSim, tamTeam, tamStat, tamMobs, tamWin, tamIdle, tamCollect, tamParty, tamShard, tamPow, tamFight, tamStep, TAM, tamSim, tamTeam, tamStat, tamMobs, tamWin, tamIdle, tamCollect, tamShard, tamParty, tamPow, tamLvCost, tamOpen, setZone, geo, stPlay, stNext, ST, ST_SIDE, SIDE, missionGo, MGO, MGO_MINI, MGO_Q, renderMissions, renderPass, BOOST, conLeft, gameToday, setTab, ADX, adStamp, adxDay, adxCan, adxMore, adPickNow, adPickGive, conNear, renderAdStamp, claimOfflineDouble, startBoost, openBoost, showOffline, fvBoothStart, bfFwStart, musicWant, renderCounsel, renderXg, renderFv, showCeremony, RX, rxPct, rxCost, rxUp, rxPart, renderDept, goldOr, goldRich, adGold, stampAtt, GOLD, BIG, BF_DECO, bfWin, bfNext, bfOn, bfFw, bfSync, bfStamp, bfFwStart, bfPart, bfNextTx, sanitizeBf, freshBf, fvBoothMax, bldBox, bldPick, bldWarm, DECO_SLOTS, XG, MK, ST, SIDE, ST_SIDE, wdMap, xgOn, xgGuest, xgSpots, xgGreet, xgVisit, xgLunch, openXg, mkOn, mkHot, mkSell, mkBuy, mkSur, openMk, wdBar, wdTick, stTick, stPlay, stNext, stPick, stEnd, stTags, openSb, renderSb, sideCan, sideMap, fvFlag, FV, FV_POS, fvOn, fvOpen, fvBonus, fvSync, fvStamp, fvGuests, openFv, renderFv, fvMeet, fvBoothStart, fvMap, fvTip, festDef, goTo, navInfo, openShop, gdReady, thPreview, thPreviewEnd, thOn, busScene, tripCrowd, openTrip, startTrip, claimTrip, TRIPS, mgPickMul, mgPickMode, mgUpOrder, mgFillOrders, mgAdAsk, sportsCon, festCon, btQuota, btCanAd, btAdMore, warmRooms, blobUrl, vdSize, vdBlock, pzSweep, pzSwGain, pzSwOpen, pzXpOf, mgMulMax, mgMulOk, mgMul, mgModeTap, acTip, kidDupIdx, trialSafe, closeAd,
+  if (window.__FOREST_TEST) window.__forest = { get S() { return S; }, get rt4() { return rt; }, THEME, applyCos, tamSkipTo, tamSkipGo, tamWinRep, tamRepFl, tamRenderTop, tamBg, teaOff, geo, qMeasure, IMG, tamHOn, tamHOpen, tamCurFl, tamWinH, tamHf, tamHRankDoc, tamSkBusy, tamReach, get SKQ() { return SKQ; }, esAxGain, esAxLeft, ESHOP, tamLvPlan, tamLvBuy, tamLvAll, mapUrl, mapBase, tamCheerLeft, tamAdRevive, tamCap, tamCapped, tamLvRef, tamBaseRate, tamLvCost, tamStageIn, musicWant, tamPh, tamEvPick, tamAutoTeam, tamUpRec, MAIN, startSports, GEO, claimAchAll, ACH, btMake, btBest, btRoster, btRoll, btWin, btOppCheer, BT, BT_LG, stPrev, get Rank() { return Rank; }, tamRankDoc, tamTf, tamAdSpd, tamReport, tamRepTake, tamAdRevive, renderRankPanel, TAM, tamSim, tamTeam, tamStat, tamMobs, tamWin, tamIdle, tamCollect, tamParty, tamShard, tamPow, tamFight, tamStep, TAM, tamSim, tamTeam, tamStat, tamMobs, tamWin, tamIdle, tamCollect, tamShard, tamParty, tamPow, tamLvCost, tamOpen, setZone, geo, stPlay, stNext, ST, ST_SIDE, SIDE, missionGo, MGO, MGO_MINI, MGO_Q, renderMissions, renderPass, BOOST, conLeft, gameToday, setTab, ADX, adStamp, adxDay, adxCan, adxMore, adPickNow, adPickGive, conNear, renderAdStamp, claimOfflineDouble, startBoost, openBoost, showOffline, fvBoothStart, bfFwStart, musicWant, renderCounsel, renderXg, renderFv, showCeremony, RX, rxPct, rxCost, rxUp, rxPart, renderDept, goldOr, goldRich, adGold, stampAtt, GOLD, BIG, BF_DECO, bfWin, bfNext, bfOn, bfFw, bfSync, bfStamp, bfFwStart, bfPart, bfNextTx, sanitizeBf, freshBf, fvBoothMax, bldBox, bldPick, bldWarm, DECO_SLOTS, XG, MK, ST, SIDE, ST_SIDE, wdMap, xgOn, xgGuest, xgSpots, xgGreet, xgVisit, xgLunch, openXg, mkOn, mkHot, mkSell, mkBuy, mkSur, openMk, wdBar, wdTick, stTick, stPlay, stNext, stPick, stEnd, stTags, openSb, renderSb, sideCan, sideMap, fvFlag, FV, FV_POS, fvOn, fvOpen, fvBonus, fvSync, fvStamp, fvGuests, openFv, renderFv, fvMeet, fvBoothStart, fvMap, fvTip, festDef, goTo, navInfo, openShop, gdReady, thPreview, thPreviewEnd, thOn, busScene, tripCrowd, openTrip, startTrip, claimTrip, TRIPS, mgPickMul, mgPickMode, mgUpOrder, mgFillOrders, mgAdAsk, sportsCon, festCon, btQuota, btCanAd, btAdMore, warmRooms, blobUrl, vdSize, vdBlock, pzSweep, pzSwGain, pzSwOpen, pzXpOf, mgMulMax, mgMulOk, mgMul, mgModeTap, acTip, kidDupIdx, trialSafe, closeAd,
     TKE, TK_Q, tkDaily, nbAllDay, nbBuildAt, nbOn, conAdd, BX_SPOT, PERKS, offlineCapH, applyAway, pzFinish, mgClaimOrder,
     CS, JOBS, CS_WORRY, freshCs, csOpen, csLeft, csMax, csEnsure, csCands, csNeed, csMul, csOpenCards, csReady, csDone, csTalkMake, csAnswer, csChoose, csSettle, openCounsel, renderCounsel, renderHall, MAIN, qMeasure, qGoal, sanitize,   // 3.1.0 진로 상담
     NSL, nsStart, nsSettle, nsOpen, nsOn, nsOverlap, nsExtraH, isNight, nightDayOf, openNs, renderNs, bxSpots, renderNight,   // 3.0.0
