@@ -23,7 +23,7 @@ async def main():
           const l1=S.tam.mem[sp].lv, spent=b0-S.budget;
           document.querySelector('[data-tlvn="max"]').click(); await sl(80); const PM=F.tamLvPlan(sp,Infinity);
           document.querySelector('[data-tlvn="1"]').click(); await sl(80);
-          const b1=S.budget; S.budget=b1; document.querySelector('[data-tlvall]').click(); await sl(80);
+          const b1=S.budget; S.budget=b1; document.querySelector('[data-tlvall]').click(); await sl(450); document.querySelector('#adAskYes').click(); await sl(450);   // 4.4.1.1 미리 보기 창에서 올리기
           const all=S.tam.party.map(k=>(S.tam.mem[k]||{{}}).lv||1);
           return {{ sp, l0, P, l1, spent, PM, all, budget: S.budget }}; }})()""")
         print('한 번에', json.dumps(r))
