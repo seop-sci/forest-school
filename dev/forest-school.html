@@ -765,6 +765,15 @@ html.ait #panelTam .tm-bar .tm-ac{grid-column:auto;position:absolute;right:10px;
 #panelTam .tm-sk.ready::before{content:"";position:absolute;inset:-16px;background:var(--x4-skr,none) center/100% 100% no-repeat;pointer-events:none;animation:tmSkr 1s ease-in-out infinite alternate}
 @keyframes tmSkr{from{opacity:.55}to{opacity:1}}
 #panelTam .tm-sk small{color:#fff;text-shadow:0 1px 0 #4A2F14,0 0 3px #4A2F14;top:calc(100% + 4px)}
+/* 5.0.0 woodani 요청: 필살기 단추를 오른쪽 2배속 단추와 같은 나무 판과 크림색 테두리로, 게이지는 굵은 금빛 고리와 얼굴 덮개로 또렷하게 */
+#panelTam .tm-sk,#panelTam .tm-sk:not(.ready){padding:5px;background:var(--x4-btn,#C98A4B) center/100% 100% no-repeat;box-shadow:0 0 0 2.5px #FFF3C9,0 4px 8px rgba(40,20,0,.45)}
+#panelTam .tm-sk::after{display:none}
+#panelTam .tm-sk img{background:transparent;position:relative;z-index:1}
+#panelTam .tm-sk>i{position:absolute;inset:-9px;border-radius:50%;z-index:0;pointer-events:none;background:conic-gradient(#FFD54A 0,#FF9E1C var(--g,0%),rgba(40,20,0,.6) var(--g,0%));-webkit-mask:radial-gradient(farthest-side,transparent calc(100% - 6px),#000 calc(100% - 5.5px));mask:radial-gradient(farthest-side,transparent calc(100% - 6px),#000 calc(100% - 5.5px))}
+#panelTam .tm-sk::before{content:"";position:absolute;inset:5px;border-radius:50%;z-index:2;pointer-events:none;background:conic-gradient(transparent var(--g,0%),rgba(30,15,0,.5) var(--g,0%))}
+#panelTam .tm-sk.ready::before{inset:-16px;border-radius:0;background:var(--x4-skr,none) center/100% 100% no-repeat;z-index:0}
+#panelTam .tm-sk.ready{box-shadow:0 0 0 3px #FFD54A,0 0 14px 3px rgba(255,214,90,.95),0 4px 8px rgba(40,20,0,.45)}
+#panelTam .tm-sk.ready>i{background:#FFD54A}
 .tm-nav{position:absolute;left:0;right:0;bottom:0;z-index:12;display:grid;grid-template-columns:repeat(5,1fr);padding:14px 10px calc(8px + var(--sab,0px));min-height:78px;background:var(--x4-bot,#A86A34) center top/100% 100% no-repeat}
 .tm-nav button{position:relative;display:flex;flex-direction:column;align-items:center;gap:1px;border:0;background:none;padding:0;cursor:pointer;font-family:var(--font-display);font-size:12px;color:#FFF8E1;text-shadow:0 1px 0 #5A3414}
 .tm-nav img{width:40px;height:40px;object-fit:contain;filter:drop-shadow(0 2px 0 rgba(60,30,10,.35))}
@@ -793,6 +802,7 @@ html.ait #panelTam .tm-bar .tm-ac{grid-column:auto;position:absolute;right:10px;
 
 .tm-rib{position:absolute;left:4%;right:4%;top:28%;height:22%;display:grid;place-items:center;padding:0 14%;text-align:center;font-family:var(--font-display);font-size:clamp(16px,6.2cqw,24px);color:#5A3A12;background:center/100% 100% no-repeat;animation:tmRib 1.3s ease-out forwards;z-index:7;text-shadow:0 1px 0 #fff}
 .tm-rib:not([style*="url"]){background-color:rgba(255,226,140,.92);border-radius:12px}
+.tm-rib{white-space:pre-line;line-height:1.2}   /* 5.0.0 woodani 제보: 'N층까지 왔어요!' 뒤 줄바꿈을 지켜요(한 줄로 붙어 잘렸어요) */
 .tm-rib.boss{color:#fff;text-shadow:0 2px 0 #4B2A86}.tm-rib.lose{background:linear-gradient(#6A4322,#43280F);color:#FFF1D2;font-size:clamp(15px,4.6cqw,19px);border-radius:16px;box-shadow:0 0 0 3px #E2A957,0 0 0 5px rgba(90,52,20,.55),0 8px 18px rgba(0,0,0,.35);text-shadow:0 2px 0 rgba(0,0,0,.35);left:10%;right:10%;height:auto;min-height:15%;padding:10px 18px}   /* 4.4.1.2 woodani: 진 때 알림도 나무 톤으로(하얀 칸이었어요) */
 @keyframes tmRib{0%{transform:scale(.7);opacity:0}14%{transform:scale(1.02);opacity:1}22%{transform:none}85%{opacity:1}100%{opacity:0;transform:translateY(-12%)}}
 .tm-time{position:absolute;left:12%;right:4%;top:3%;height:5px;border-radius:3px;background:rgba(0,0,0,.25);z-index:4}.tm-time b{display:block;height:100%;width:100%;border-radius:3px;background:#fff}
@@ -10416,6 +10426,9 @@ body.cam-scene #ffChip,body.cam-scene #plChip,body.cam-scene .b-ring{animation-p
     // 4.4.1 woodani 요청: 테마에서는 꺼진 단추(돈 모자람 등)를 테마 색이 없는 회색으로. 켜진 단추(테마 색)와 바로 구분돼요(여름, 겨울은 둘 다 하늘색이라 헷갈렸어요)
     const OFF_L = '--off-bg:#DEDEDA;--off-ink:#85857F;--off-shadow:#BEBEB8', OFF_D = '--off-bg:#3B3D3F;--off-ink:#8E9194;--off-shadow:#2A2C2E';
     let css = `:root[data-th-ui]:not([data-th-ui=""]){${OFF_L}}\n:root[data-th-ui]:not([data-th-ui=""])[data-theme="dark"]{${OFF_D}}\n@media (prefers-color-scheme: dark){:root[data-th-ui]:not([data-th-ui=""]):not([data-theme="light"]){${OFF_D}}}\n`;
+    { const T = ':root[data-th-ui]:not([data-th-ui=""])', B = `${T} .tabs .tab.tab-tam,${T} .app.on-school .tabs > .tab.tab-tam`;   // 5.0.0 woodani 요청: 아래 탭 탐험 단추도 테마 색
+      css += `${B}{background:radial-gradient(circle at 50% 28%,#FFFFFF,var(--accent) 62%,var(--accent-shadow));color:var(--accent-ink);box-shadow:inset 0 2px 0 rgba(255,255,255,.9),inset 0 -4px 0 rgba(0,0,0,.18),0 0 0 2px var(--accent-shadow),0 3px 0 var(--accent-shadow)}\n`;
+      css += `${T} .tabs .tab.tab-tam[aria-selected="true"],${T} .app.on-school .tabs > .tab.tab-tam[aria-selected="true"]{box-shadow:inset 0 2px 0 rgba(255,255,255,.9),inset 0 -4px 0 rgba(0,0,0,.18),0 0 0 3px var(--accent-shadow),0 4px 0 var(--accent-shadow),0 0 16px var(--accent)}\n`; }
     css += `:root[data-th-ui]:not([data-th-ui=""]) .sheet-elect:not(.todo) em{background:var(--accent);color:var(--accent-ink);box-shadow:0 2px 0 var(--accent-shadow)}\n`;   // 건물 창의 쓰다듬기, 가기 같은 작은 단추도 테마 단추 색(바탕색과 같아 묻혔어요)
     css += `:root[data-th-ui]:not([data-th-ui=""]) :is(.sb .buy.off,.ad-pk:disabled,.ac-bk.poor,.ac-bk.off,.pzb.poor,#bkBuy[aria-disabled="true"]){filter:grayscale(1)}\n`;   // 흐리게만 하던 꺼진 단추도 회색으로
     for (const [id, c] of Object.entries(MODAL_TH)) {
@@ -14690,7 +14703,7 @@ body.cam-scene #ffChip,body.cam-scene #plChip,body.cam-scene .b-ring{animation-p
     const g = googleUser();
     $('#acctTitle').textContent = g ? '구글 계정 연결됨' : '구글 계정 연결';
     if (!g) $('#acctMenu').hidden = true;
-    $('#acctSub').textContent = g ? `${g.email || '구글'} 계정에 학교가 저장돼요. 누르면 계정 바꾸기와 로그아웃` :
+    $('#acctSub').textContent = g ? `${g.email || '구글'} 계정에 학교가 저장돼요.` :   // 5.0.0 woodani 요청: '누르면 계정 바꾸기와 로그아웃' 글은 지움
       (S.acctGift ? '연결해 두면 휴대폰을 바꿔도 같은 학교를 이어 해요' : `연결하면 수료증 ${ACCT_GIFT.dip}장, 기금 ${ACCT_GIFT.fund}, 황금 도토리 ${ACCT_GIFT.gold}개를 선물로 줘요`);
   }
   // 1.7.1 광고와 구글 로그인이 실패한 까닭을 짧게 덧붙여요(문의할 때 알려 주면 원인을 찾기 쉬워요)
@@ -16595,7 +16608,8 @@ body.cam-scene #ffChip,body.cam-scene #plChip,body.cam-scene .b-ring{animation-p
     } else if (ri === 3) {   // 미술: 물감 비가 내리고 무지개 붓이 화면을 쓸어요
       at(0, () => $$('#tmM .tm-f:not(.out)').forEach((m, k) => { const [x, y] = tamAt(m, 0.45); for (let j = 0; j < 4; j++) setTimeout(() => tamFxImg('tm-shot', small, x + (Math.random() - 0.5) * 40, y, [{ dy: -fxr().height * 0.5, t: 'scale(.6)' }, { t: 'scale(1)' }], 420, 'ease-in'), k * 110 + j * 90); }));
       at(420, () => { const fx = fxr(), W = fx.width, mc = MC(), b2 = document.createElement('img'); b2.className = 'tm-sweep'; b2.src = x4('stroke') || big || ''; b2.alt = ''; $('#tmFx').appendChild(b2);
-        b2.animate([{ transform: `translate(${-W * 0.6}px,${mc[1] - fx.height * 0.38}px) rotate(-8deg) scale(.9)`, opacity: 0 }, { transform: `translate(${W * 0.15}px,${mc[1] - fx.height * 0.38}px) rotate(-4deg) scale(1.05)`, opacity: 1, offset: 0.45 }, { transform: `translate(${W * 0.3}px,${mc[1] - fx.height * 0.39}px) rotate(-2deg) scale(1.08)`, opacity: 1, offset: 0.7 }, { transform: `translate(${W * 0.55}px,${mc[1] - fx.height * 0.4}px) rotate(0deg) scale(1.1)`, opacity: 0 }], { duration: 1300, easing: 'ease-out', fill: 'forwards' }).onfinish = () => b2.remove(); });
+        const sh = W * 0.9 * ((b2.naturalHeight && b2.naturalWidth) ? b2.naturalHeight / b2.naturalWidth : 0.45), sy = mc[1] - sh / 2;   // 5.0.0 woodani 제보(무지개 폭탄이 위로 날아가요): 붓 가운데가 장난꾸러기 가운데를 지나가게
+        b2.animate([{ transform: `translate(${-W * 0.6}px,${sy}px) rotate(-8deg) scale(.9)`, opacity: 0 }, { transform: `translate(${W * 0.15}px,${sy}px) rotate(-4deg) scale(1.05)`, opacity: 1, offset: 0.45 }, { transform: `translate(${W * 0.3}px,${sy}px) rotate(-2deg) scale(1.08)`, opacity: 1, offset: 0.7 }, { transform: `translate(${W * 0.55}px,${sy}px) rotate(0deg) scale(1.1)`, opacity: 0 }], { duration: 1300, easing: 'ease-out', fill: 'forwards' }).onfinish = () => b2.remove(); });
       at(620, () => { tamShake(5, 300); $$('#tmM .tm-f:not(.out)').forEach(m => { m.classList.remove('paint'); void m.offsetWidth; m.classList.add('paint'); if (x4('splash')) { const [x, y] = tamAt(m, 0.5); tamBigImg(x4('splash'), x, y, [{ t: 'scale(.2) rotate(-20deg)', opacity: 1 }, { t: 'scale(.75) rotate(5deg)', opacity: 1, offset: 0.35 }, { t: 'scale(.85)', opacity: 0 }], 1100, 'tm-bigs sm'); } }); });
     } else {   // 수학: 별이 대원 둘레를 돌다가, 가장 약한 장난꾸러기에 과녁, 하늘에서 별 화살
       const T0 = () => $$('#tmM .tm-f')[tgt] || $$('#tmM .tm-f:not(.out)')[0];
