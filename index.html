@@ -2,7 +2,7 @@
 <html lang="ko">
 <head>
 <meta charset="utf-8">
-<meta name="forest-version" content="4.4.1">
+<meta name="forest-version" content="4.4.1.1">
 <meta name="viewport" content="width=device-width, initial-scale=1">
 <meta name="description" content="도토리를 모아 숲속 학교를 키우는 방치형 게임 테스트판이에요.">
 <style>html,body{margin:0}</style>
@@ -2551,6 +2551,31 @@ html.ait .app .board .board-top{grid-template-rows:minmax(36px,auto) auto auto a
 html.ait .app .board .board-top .icon-btn{align-self:end}   /* 토스 단추(··· ✕) 바로 아래 */
 
 html.ait .app .board .xgear{margin-right:6px}
+/* ===== 4.4.1.1 지섭 요청: 현황판을 더 낮고 가볍게 =====
+   1줄에 학교 이름과 학년 학기를 나란히(학년 점은 빼요), 단추도 같은 줄 오른쪽. 칭호 리본은 그 아래. 테두리와 글자도 조금 작게.
+   토스: 오른쪽 위는 토스 단추 자리라 1줄은 학교 이름만, 2줄에 칭호 리본(왼쪽)과 단추(오른쪽) */
+.app .board .board-top{grid-template-areas:"school grad att gear exit" "title title title title title" "prog prog prog prog prog" "res res res res res"}
+.app .board .board-top::before{grid-area:1 / 1 / 3 / -1}
+.app .board .school{flex-direction:row;align-items:center;justify-content:flex-start;padding:4px 0 4px 10px}
+.app .board .school-row{min-height:0;display:flex;align-items:baseline;gap:7px;min-width:0;flex-wrap:nowrap}
+.app .board .school-row .school-name{flex:none;font-size:18px}
+.app .board .school-row .school-year{flex:0 1 auto;gap:3px;font-size:13px;opacity:.85}
+.app .board .school-row .school-year b{font-size:13px}
+.app .board .school-row .sc-chev{flex:none;align-self:center}
+.app .board .ydots{display:none}
+.app .board .board-top .icon-btn{width:34px;height:34px;margin-top:5px;margin-bottom:5px}
+.app .board .board-top .icon-btn .tic{width:22px;height:22px}
+.app .board .hud-title{margin:0 0 5px 10px}
+html.ait .app .board .board-top{grid-template-columns:minmax(0,1fr) auto auto auto;grid-template-areas:"school . . ." "title grad att gear" "prog prog prog prog" "res res res res";grid-template-rows:minmax(36px,auto) auto auto auto}
+html.ait .app .board .board-top::before{grid-area:1 / 1 / 3 / -1}
+html.ait .app .board .hud-title{align-self:center;margin:0 6px 0 10px;max-width:100%}
+html.ait .app .board .board-top .icon-btn{align-self:center}
+@media (max-width:380px){.app .board .school-row .school-name{font-size:16.5px}.app .board .school-row{gap:5px}.app .board .school-row .school-year,.app .board .school-row .school-year b{font-size:12px}.app .board .board-top .icon-btn{width:32px;height:32px}}
+html.hud-art .app .board .board-top::after{border-width:15px;border-image-width:15px}
+html.hud-art .app .board .board-top::before{border-image-width:11px}
+.app .board .hud-res .stat-main b{font-size:20px;line-height:1.05}.app .board .hud-res .stat-main small{font-size:11px;line-height:1.15}
+.app .board .hud-res .stat-main .lab svg,.app .board .hud-res .stat-main [data-acorn] svg,html.hud-art .app .board .hud-res .stat-main [data-acorn] img{width:22px;height:22px}
+.app .board .hud-res .rep-pill b{font-size:16px;line-height:1.05}.app .board .hud-res .rep-pill small{font-size:10.5px;line-height:1.1}
 .app.on-school .board.folded .board-top{grid-template-columns:minmax(0,1fr) auto;grid-template-areas:"school res";padding-bottom:6px}
 .app.on-school .board.folded .board-top::before{grid-area:school}
 .app.on-school .board.folded .hud-title{display:none}
@@ -3797,7 +3822,7 @@ body.cam-scene #ffChip,body.cam-scene #plChip,body.cam-scene .b-ring{animation-p
     <p class="boot-step" id="bootStep">학교 문을 여는 중...</p>
     <p class="boot-tip" id="bootTip">학교 문을 여는 중이에요</p>
   </div>
-  <span class="boot-ver" id="bootVer">v4.4.1</span>
+  <span class="boot-ver" id="bootVer">v4.4.1.1</span>
 </div>
 
 <div class="app on-school" id="app">
@@ -3809,9 +3834,9 @@ body.cam-scene #ffChip,body.cam-scene #plChip,body.cam-scene .b-ring{animation-p
       <div class="school" id="schoolCard" role="button" tabindex="0" aria-expanded="false" aria-controls="stats" aria-label="학교 현황 펼치기">
         <div class="school-row">
           <h1 class="school-name" id="schoolName">숲속 유치원</h1>
+          <div class="school-year" id="schoolYear"><b id="yearNow">1년째</b><span class="ydots" id="yearDots" aria-hidden="true"></span><span class="ynote" id="yearNote"></span></div><!-- 4.4.1.1 학교 이름 옆으로 -->
           <svg class="sc-chev" viewBox="0 0 24 24" aria-hidden="true"><path d="M6 9l6 6 6-6" fill="none" stroke="currentColor" stroke-width="2.6" stroke-linecap="round" stroke-linejoin="round"/></svg>
         </div>
-        <div class="school-year" id="schoolYear"><b id="yearNow">1년째</b><span class="ydots" id="yearDots" aria-hidden="true"></span><span class="ynote" id="yearNote"></span></div>
       </div>
       <button class="hud-title" type="button" id="hudTitle" hidden aria-label="내 칭호, 눌러서 업적 보기"></button><!-- 4.4.1 칭호 리본은 따로 맨 아래 줄 -->
       <div class="progress" id="gradeRow">
@@ -4358,7 +4383,7 @@ body.cam-scene #ffChip,body.cam-scene #plChip,body.cam-scene .b-ring{animation-p
       </div>
       <h3 class="panel-sub">정보</h3>
       <dl class="info">
-        <div id="verRow"><dt>버전</dt><dd>v4.4.1</dd></div>
+        <div id="verRow"><dt>버전</dt><dd>v4.4.1.1</dd></div>
         <div id="pidRow" hidden><dt>학교 번호</dt><dd id="infoPid"></dd></div>
       </dl>
       <div id="devBox" hidden>
@@ -10816,8 +10841,9 @@ body.cam-scene #ffChip,body.cam-scene #plChip,body.cam-scene .b-ring{animation-p
     rt.yearKey = key;
     $('#yearNow').textContent = `${yn}${T.unit}`;
     $('#yearDots').innerHTML = Array.from({ length: T.years }, (_, i) => `<i class="${i < yn - 1 ? 'on' : i === yn - 1 ? 'now' : ''}"></i>`).join('');
-    $('#yearNote').textContent = (last ? '졸업반 ' : '') + semLabel();
-    $('#yearNote').classList.toggle('sem', !last);
+    const kLast = last && S.tier === 0;   // 4.4.1.1 지섭: 졸업반 표시는 2년짜리 유치원만(다른 학교급은 몇 년인지 다들 알아요)
+    $('#yearNote').textContent = (kLast ? '졸업반 ' : '') + semLabel();
+    $('#yearNote').classList.toggle('sem', !kLast);
   }
   // 가진 재화: 수료증은 처음 받았을 때부터, 기금은 졸업한 뒤부터 칠판에 보여요
   const dipShown = () => S.st.grads > 0 || S.tier > 0 || S.tdip > 0 || S.p.dip > 0;
@@ -13637,8 +13663,8 @@ body.cam-scene #ffChip,body.cam-scene #plChip,body.cam-scene .b-ring{animation-p
        forest/rank/<내 id>   랭킹 이름과 학교 점수
        forest/stats/<내 id>  테스트 현황 (어디까지 했는지, 얼마나 했는지)
      <내 id>는 Firebase 익명 로그인이 기기(브라우저)마다 만들어 줘요. */
-  const VERSION = '4.4.1';
-  const NT_QUIET = ['2.1.20', '2.1.2.2', '2.3.0.1', '2.3.4', '3.2.3', '3.2.4', '3.2.5', '3.3.1', '3.3.2', '3.3.3', '4.4.1'];   // 4.4.1도 공지 없이(지섭)   // 3.3.1, 3.3.2, 3.3.3(토스 먼저)도 공지 창 없이(지섭). 2.3.0.1도 공지 창 없이(공지는 그대로 2.3.0). 2.3.4도 조용히(지섭 결정). 3.2.3, 3.2.4, 3.2.5도 공지 창 없이(공지 줄을 고르지 않음)
+  const VERSION = '4.4.1.1';
+  const NT_QUIET = ['2.1.20', '2.1.2.2', '2.3.0.1', '2.3.4', '3.2.3', '3.2.4', '3.2.5', '3.3.1', '3.3.2', '3.3.3', '4.4.1', '4.4.1.1'];   // 4.4.1도 공지 없이(지섭)   // 3.3.1, 3.3.2, 3.3.3(토스 먼저)도 공지 창 없이(지섭). 2.3.0.1도 공지 창 없이(공지는 그대로 2.3.0). 2.3.4도 조용히(지섭 결정). 3.2.3, 3.2.4, 3.2.5도 공지 창 없이(공지 줄을 고르지 않음)
     // 2.1.20 지섭 결정: 이 버전들은 업데이트해도 공지 창을 띄우지 않아요(공지는 그대로 2.1.2)
   /* 2.0.0 공지사항 (2026-10-27 지섭, 1.8.0은 이미 올려서 2.0.0부터): 설정 > 공지사항. 맨 위가 가장 새 공지예요.
      패치노트는 자동으로 넣지 않아요. 지섭이 검수한 글만 여기에 적어요(CHANGELOG.md는 자세한 기록용이라 따로 있어요).
