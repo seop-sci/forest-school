@@ -174,7 +174,7 @@
     --board:#112019; --board-line:#1D3128; --chalk:#EDEFE4; --chalk-dim:#93A595;
     --wood:#7B5433; --wood-dark:#523720; --plaque:#5E3F22; --plaque-ink:#FFF0D2;
     --accent:#F3B92E; --accent-ink:#2B1E03; --accent-shadow:#9E7210;
-    --paper:#1D2A24; --card:#24342C; --ink:#E8EEDD; --muted:#A3B29D; --line:#33453B; --line-shadow:#26352E;
+    --paper:#1D2A24; --card:#24342C; --paper-d:#1D2A24; --card-d:#24342C; --ink:#E8EEDD; --muted:#A3B29D; --line:#33453B; --line-shadow:#26352E;
     --chip-bg:#2F4A36; --chip-ink:#D8EBC4; --scrim:rgba(0,0,0,.6); --shadow:rgba(0,0,0,.35);
     --roof:#8D3D2E; --roof-edge:#6C2D22; --roof-2:#2A5753; --wall:#BDB196; --wall-2:#A59A80;
     --window:#FFD27A; --clock-face:#E8E1CB; --bell:#C8902A; --awning:#C9952A; --awning-2:#D8CDB2;
@@ -200,7 +200,7 @@
   --board:#112019; --board-line:#1D3128; --chalk:#EDEFE4; --chalk-dim:#93A595;
   --wood:#7B5433; --wood-dark:#523720; --plaque:#5E3F22; --plaque-ink:#FFF0D2;
   --accent:#F3B92E; --accent-ink:#2B1E03; --accent-shadow:#9E7210;
-  --paper:#1D2A24; --card:#24342C; --ink:#E8EEDD; --muted:#A3B29D; --line:#33453B; --line-shadow:#26352E;
+  --paper:#1D2A24; --card:#24342C; --paper-d:#1D2A24; --card-d:#24342C; --ink:#E8EEDD; --muted:#A3B29D; --line:#33453B; --line-shadow:#26352E;
   --chip-bg:#2F4A36; --chip-ink:#D8EBC4; --scrim:rgba(0,0,0,.6); --shadow:rgba(0,0,0,.35);
   --roof:#8D3D2E; --roof-edge:#6C2D22; --roof-2:#2A5753; --wall:#BDB196; --wall-2:#A59A80;
   --window:#FFD27A; --clock-face:#E8E1CB; --bell:#C8902A; --awning:#C9952A; --awning-2:#D8CDB2;
@@ -10246,7 +10246,26 @@ body.cam-scene #ffChip,body.cam-scene #plChip,body.cam-scene .b-ring{animation-p
     '--hud-fill': 'hud_bar_fill', '--hud-btn-l': 'hud_btn_light', '--hud-btn-d': 'hud_btn_dark', '--hud-btn-p': 'hud_btn_press', '--hud-fold-l': 'hud_fold_light', '--hud-fold-d': 'hud_fold_dark' };
   const HUD_TH_COL = { spring: ['#F7D4DE', '#E5A1B9', '#B56C86'], summer: ['#E0F2F4', '#8CC5D8', '#6A9FB2'], autumn: ['#F7C88D', '#D78A49', '#95592F'], winter: ['#EBF4FC', '#B5D1E4', '#7F9CAF'],
     xmas: ['#F1DAB7', '#C98A5B', '#8B4C44'], space: ['#E1D9FF', '#9A8BCE', '#6961A2'], retro: ['#F5D899', '#D98B43', '#9B5F36'] };
+  // 4.4.1 woodani 요청: 공지창, 보상 창처럼 가운데 뜨는 창, 아래에서 올라오는 창, 탭 화면(선생님, 퀘스트 등)과 금빛 단추(업그레이드 등)도 배경 테마 색으로(그림 없이 색만).
+  // [종이, 카드, 테두리, 테두리 그림자, 단추, 단추 글자, 단추 그림자]. 어두운 화면은 바탕은 그대로 두고 테두리와 단추만 테마 색
+  const MODAL_TH = { spring: ['#FFF6F8', '#FBE6EC', '#EBC3D0', '#D7A3B5', '#E5A1B9', '#4A1F2E', '#B56C86'], summer: ['#F4FBFC', '#E2F2F5', '#BFDDE6', '#9CC5D3', '#8CC5D8', '#163A48', '#6A9FB2'],
+    autumn: ['#FFF6EA', '#F8E6CC', '#E8C79C', '#D3A874', '#E3974F', '#3A1E06', '#95592F'], winter: ['#F6FAFE', '#E6EFF6', '#C8D9E6', '#A9C0D1', '#B5D1E4', '#1E3446', '#7F9CAF'],
+    xmas: ['#FFF8EE', '#F5E6D0', '#E0C3A0', '#C9A27A', '#E06A5A', '#3A0E0A', '#8B4C44'], space: ['#F7F5FF', '#E9E5FA', '#CEC6EE', '#ACA2D8', '#A99BDB', '#1E1640', '#6961A2'],
+    retro: ['#FFF7E6', '#F8E7C2', '#E8CB8E', '#D2AC66', '#F0B347', '#3A2205', '#9B5F36'] };
+  function modalThemeCss() {
+    if (document.getElementById('thModalCss')) return;
+    const W = ':is(.modal,.sheet,.panel)', D = (id, c) => `--line:color-mix(in srgb, ${c[6]} 70%, var(--paper-d));--line-shadow:color-mix(in srgb, ${c[6]} 45%, #000);--chip-bg:color-mix(in srgb, ${c[6]} 35%, var(--paper-d));--accent:${c[4]};--accent-ink:${c[5]};--accent-shadow:${c[6]}`;
+    let css = '';
+    for (const [id, c] of Object.entries(MODAL_TH)) {
+      css += `:root[data-th-ui="${id}"]{--accent:${c[4]};--accent-ink:${c[5]};--accent-shadow:${c[6]}}\n`;   // 업그레이드 단추처럼 금빛 단추(--accent)는 화면 어디서나 테마 색
+      css += `:root[data-th-ui="${id}"] ${W}{--paper:${c[0]};--card:${c[1]};--line:${c[2]};--line-shadow:${c[3]};--accent:${c[4]};--accent-ink:${c[5]};--accent-shadow:${c[6]};--chip-bg:${c[1]}}\n`;
+      css += `:root[data-th-ui="${id}"][data-theme="dark"] ${W}{--paper:var(--paper-d);--card:var(--card-d);${D(id, c)}}\n`;
+      css += `@media (prefers-color-scheme: dark){:root[data-th-ui="${id}"]:not([data-theme="light"]) ${W}{--paper:var(--paper-d);--card:var(--card-d);${D(id, c)}}}\n`;
+    }
+    const st = document.createElement('style'); st.id = 'thModalCss'; st.textContent = css; document.head.appendChild(st);
+  }
   function hudTheme() {
+    { const bg = S && THEME[thOn().bg]; modalThemeCss(); document.documentElement.dataset.thUi = bg && MODAL_TH[bg.id] ? bg.id : ''; }   // 4.4.1 창 색은 현황판 그림이 없어도 바꿔요
     const R = document.documentElement; if (!R.classList.contains('hud-art')) return;
     const bgT = S && THEME[thOn().bg], id = bgT && Object.values(HUD_TH_KEYS).every(k => IMG(`${k}_${bgT.id}`)) ? bgT.id : '';
     if (rt.hudTh === id) return;
