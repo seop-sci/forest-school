@@ -28,7 +28,7 @@ async def main():
             await pg.evaluate(f"(()=>{{ const F={F}; F.S.students=40; F.syncKids(true); F.rt.kids.forEach(k=>k.wait=0); window.__bad=[]; window.__steps=0; }})()")
             await pg.evaluate(f"""(()=>{{ const F={F}, IN={INSIDE};
               window.__iv=setInterval(()=>{{ const nav=F.navInfo(); window.__steps++;
-                for(const k of F.rt.kids){{ if(k.ang!==undefined||k.board||k.hold) continue;
+                for(const k of F.rt.kids){{ if(k.ang!==undefined||k.board||k.hold) continue; if(k.pw&&k.pw[0]===k.tx&&k.pw[1]===k.ty) continue;   /* 4.4.1 길로 걷는 학생은 건물 그림이 실제로 덮는 곳을 뺀 길로 걸어요(네모 막힌 곳보다 좁아요). s138에서 봐요 */
                   nav.blocks.forEach((b,i)=>{{ if(IN(b,k.x,k.y)) window.__bad.push([i,Math.round(k.x),Math.round(k.y)]); }}); }} }},50); }})()""")
             await pg.wait_for_timeout(12000)
             # 새 친구가 교문에서 들어와요
