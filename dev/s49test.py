@@ -25,7 +25,7 @@ CHECK = r"""() => {
   rt.fakeNow = T; eq([F.gameNow(), F.gameToday(), S.clk.last], [T, '2026-11-05', T], '보통 때');
   rt.fakeNow = T - 2 * DAY; eq([F.gameNow(), F.gameToday(), S.clk.last], [T, '2026-11-05', T], '뒤로 돌리면 멈춤');
   rt.fakeNow = T + 1000; eq([F.gameNow(), S.clk.last], [T + 1000, T + 1000], '다시 앞으로 가면 따라감');
-  // 미래로 갔다 돌아오기, 서버 없음(토스): 미래 시각에 멈춰 있어요 (지섭 결정: 이건 막지 않음)
+  // 미래로 갔다 돌아오기, 서버 없음(토스): 미래 시각에 멈춰 있어요 (woodani 결정: 이건 막지 않음)
   rt.fakeNow = T + 10 * DAY; F.gameNow();
   rt.fakeNow = T; eq([F.gameNow(), F.gameToday()], [T + 10 * DAY, '2026-11-15'], '서버 없이 미래에서 돌아오면 멈춤');
   // 서버 시간이 오면(Firebase나 토스 getServerTime → setServerTime) 서버 시간을 믿고 S.clk.last를 바로잡아요 (기기는 아직 T, 서버도 T)

@@ -1,4 +1,4 @@
-# 2.0.0 시험(2026-10-27 지섭 요청 묶음)
+# 2.0.0 시험(2026-10-27 woodani 요청 묶음)
 # (1) 이벤트 중의 고치기 미션(2.0.0 전에 받은 것)이나 못 하게 된 미션은 할 수 있는 미션으로 바뀌고, 바뀐 미션은 지금부터 다시 세요
 # (1-2) 이벤트 미션에 고치기와 연수가 없어요. (2-2) 도장 7개째에 이벤트 한정 학생 모자
 # (2) 이벤트 정수: 도장 5개째 +5, 기념 상자 +10. 이벤트 한정 장식은 그림이 있을 때 그 이벤트 상자에서 처음 한 번만 받고, 가게에서는 살 수 없어요
@@ -56,7 +56,7 @@ async def main():
         if r['e5'] != 5 or r['e10'] != 10 or r['e10b'] != 10: fails.append(f'이벤트 정수 {r}')
         if r['own1'] != 1 or r['own2'] != 1 or r['fr'] != 0 or r['fr2'] != 1 or not r['real'] or r['bought'] is not False or r['lunch'] != 0 or not r['sec'] or r['n'] != 23: fails.append(f'이벤트 한정 장식 {r}')
 
-        # (1-2) 이벤트 미션 표에는 고치기와 연수가 없고(2026-10-27 지섭: 어려워서 빼요), 합치기 주문 미션은 S.mg.st.orders로 세요
+        # (1-2) 이벤트 미션 표에는 고치기와 연수가 없고(2026-10-27 woodani: 어려워서 빼요), 합치기 주문 미션은 S.mg.st.orders로 세요
         r = await pg.evaluate(f"""(()=>{{ const F={F}, S=F.S; const rows = [];
           for (let mo = 1; mo <= 12; mo++) for (const e of F.EV_WEEKLY) rows.push({{ def: e, start: `2026-${{String(mo).padStart(2,'0')}}-01` }});
           for (const e of F.EV_SPECIAL) rows.push({{ def: e, start: e.start || '2026-12-24' }});

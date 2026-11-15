@@ -8,7 +8,7 @@ const path = require('path');
 const rules = require(path.resolve(process.argv[2]));
 const T0 = Date.UTC(2026, 9, 1, 3, 0, 0);
 const WK = Math.floor((T0 + 32400000 - 1767571200000) / 604800000);
-const RANK = { name: '지섭 교장', score: 120, tier: 1, year: 2, test: false, pid: 'K7QM2XPA', week: WK, lp: 0, ws: WK * 1000000 };
+const RANK = { name: 'woodani 교장', score: 120, tier: 1, year: 2, test: false, pid: 'K7QM2XPA', week: WK, lp: 0, ws: WK * 1000000 };
 const LG = [1000, 1100, 1300, 1600, 2000, 2500];
 const lgOf = p => { let L = 0; LG.forEach((a, i) => { if (p >= a) L = i; }); return L; };
 const fails = []; let pass = 0;

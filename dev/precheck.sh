@@ -14,5 +14,7 @@ if ! cmp -s "$tmp/index.html" index.html; then echo "index.html이 원본과 달
 rm -rf "$tmp"
 # 4.4.1: 게임 스크립트 문법 검사(로딩이 멈추는 오류를 밀어 올리기 전에 잡아요)
 python3 dev/jscheck.py || { echo "게임 스크립트에 문법 오류가 있어요"; ok=1; }
+# 4.4.1.3: index.html이 부르는 그림 파일이 모두 git에 있는지
+python3 dev/imgcheck.py || { echo "올리지 않은 그림 파일이 있어요"; ok=1; }
 [ $ok -eq 0 ] && echo "점검 통과"
 exit $ok

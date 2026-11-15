@@ -119,7 +119,7 @@ DOC = f"""<!doctype html>
 </body>
 </html>
 """
-# 3.2.0 지섭 결정(무거움 줄이기): 게임 안 그림(base64 글자 약 1,200장)을 img/a 폴더 파일로 꺼내고, 게임에는 파일 주소만 남겨요.
+# 3.2.0 woodani 결정(무거움 줄이기): 게임 안 그림(base64 글자 약 1,200장)을 img/a 폴더 파일로 꺼내고, 게임에는 파일 주소만 남겨요.
 # 원본(dev/forest-school.html)은 그대로라 시험(test.html)과 그림 넣는 도구는 바뀌지 않아요. 같은 그림은 한 파일로 써요.
 import base64, hashlib
 IMGDIR = (HERE.parent if OUT.resolve() == HERE.parent.resolve() else OUT) / 'img' / 'a'
