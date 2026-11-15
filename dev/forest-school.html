@@ -4399,7 +4399,7 @@ body.cam-scene #ffChip,body.cam-scene #plChip,body.cam-scene .b-ring{animation-p
         <div class="slist">
           <button class="srow" type="button" id="optSkip"><span class="txt"><b>3시간 지난 것처럼 하기</b><small>자리 비운 보상과 +100% 받기를 바로 확인해요</small></span><svg viewBox="0 0 24 24" width="20" height="20" aria-hidden="true"><path d="M9 6l6 6-6 6" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"/></svg></button>
           <button class="srow" type="button" id="devCash"><span class="txt"><b>도토리 1시간치 받기</b><small>종업식까지 빨리 가 볼 때 써요</small></span><svg viewBox="0 0 24 24" width="20" height="20" aria-hidden="true"><path d="M9 6l6 6-6 6" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"/></svg></button>
-          <button class="srow" type="button" id="devTier"><span class="txt"><b>졸업 조건 채우기</b><small>마지막 해와 대도시를 채워서 졸업식을 바로 열어 봐요</small></span><svg viewBox="0 0 24 24" width="20" height="20" aria-hidden="true"><path d="M9 6l6 6-6 6" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"/></svg></button>
+          <button class="srow" type="button" id="devTier"><span class="txt"><b>졸업 조건 채우기</b><small>마지막 해, 대도시, 메인 퀘스트를 채워서 졸업식을 바로 열어 봐요</small></span><svg viewBox="0 0 24 24" width="20" height="20" aria-hidden="true"><path d="M9 6l6 6-6 6" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"/></svg></button>
           <button class="srow" type="button" id="devDeal"><span class="txt"><b>까치 핫딜 바로 부르기</b><small>다음 핫딜을 기다리지 않고 바로 불러요</small></span><svg viewBox="0 0 24 24" width="20" height="20" aria-hidden="true"><path d="M9 6l6 6-6 6" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"/></svg></button>
           <button class="srow" type="button" id="devGold"><span class="txt"><b>황금 도토리 100개 받기</b><small>상점과 테마 세트를 시험해 볼 때 써요</small></span><svg viewBox="0 0 24 24" width="20" height="20" aria-hidden="true"><path d="M9 6l6 6-6 6" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"/></svg></button>
           <button class="srow" type="button" id="devEss"><span class="txt"><b>숲의 정수 500개 받기</b><small>꾸미기 가게, 문방구를 시험해 볼 때 써요</small></span><svg viewBox="0 0 24 24" width="20" height="20" aria-hidden="true"><path d="M9 6l6 6-6 6" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"/></svg></button>
@@ -8960,7 +8960,7 @@ body.cam-scene #ffChip,body.cam-scene #plChip,body.cam-scene .b-ring{animation-p
   const yearGateIdx = () => S.tier >= 1 ? MAIN.findIndex(q => q.ye === S.tg + 1 && (q.yt || 1) === S.tier) : -1;
   // 예전 장(1~6장)에 머물러 있는 학교는 막지 않아요. 수료증이 있어야 하는 퀘스트가 종업식에 막혀 멈추지 않게요
   // 2.0.0: 장마다 어느 학교급의 장인지(0~4장 유치원, 5~10장 초등학교, 11~14장 중학교). 다른 학교급의 장에 머물러 있으면 막지 않아요
-  const chTier = ch => ch <= 4 ? 0 : ch <= 10 ? 1 : ch <= 14 ? 2 : ch <= 18 ? 3 : 4;   // 4.0.0 19~23장은 대학교   // 3.0.0 15~18장은 고등학교
+  const chTier = ch => ch <= 4 ? 0 : ch <= 10 ? 1 : ch <= 14 ? 2 : ch <= 18 ? 3 : ch <= 23 ? 4 : 5;   // 5.0.0 24~27장은 대학원   // 4.0.0 19~23장은 대학교   // 3.0.0 15~18장은 고등학교
   // 2.1.0: 1학년 장(5장)도 막아요(퀘스트 목표를 상한 가까이로 다시 잡아서 학년 길이를 퀘스트가 맡아요)
   const yearLocked = () => { const i = yearGateIdx(), q = MAIN[S.q.m]; return i >= 0 && S.q.m < i && !!q && q.ch >= 5 && chTier(q.ch) === S.tier; };
   // 2.1.0 1학기 방학식: 그 학년 장의 앞 절반을 마쳐야(sy 표시가 붙은 '1학기 방학식' 퀘스트까지 와야) 열려요
@@ -26587,6 +26587,7 @@ body.cam-scene #ffChip,body.cam-scene #plChip,body.cam-scene .b-ring{animation-p
       S.tg = Math.max(S.tg, tierInfo().grads); S.sem = 1;
       S.tdip = Math.max(S.tdip, 40);
       while (gradeOf(rep()) < GRAD_MIN) S.f.library += 1;   // 평판이 대도시에 닿을 때까지 도서관을 키워요
+      { const gi = promoteGateIdx(); if (gi >= 0 && S.q.m < gi) { S.q.m = gi; S.q.lat = ''; startMain(); } }   // 5.0.0 woodani 요청: 졸업식 퀘스트 앞의 메인 퀘스트도 모두 마친 것으로
       checkGrade();
       setTab('grad'); renderMap(); renderHUD(); renderAffordance(); save();
       toast('졸업 조건을 채웠어요 (테스트). 졸업 탭의 졸업식을 눌러 보세요');
