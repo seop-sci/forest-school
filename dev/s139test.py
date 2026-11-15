@@ -34,7 +34,7 @@ async def main():
             if r['full'] != 60: bad.append('다 모은 뒤 기념품 수가 바뀌었어요')
             if r['cards'] != 60 or r['over']: bad.append(f'모음 화면: {r["cards"]}칸, 넘침 {r["over"]}')
             if errs: bad.append(f'{w} 오류 {errs[:2]}')
-            await pg.evaluate("document.querySelector('.tr-souv .sv-h:nth-of-type(1)').scrollIntoView()")
+            await pg.evaluate("document.querySelector('.tr-souv .sv-h').scrollIntoView()")
             await pg.screenshot(path=f'/tmp/shot/souv_{w}.png'); await ctx.close()
     print('\n'.join(bad) if bad else 'PASS')
 asyncio.run(main())
