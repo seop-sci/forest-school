@@ -10154,17 +10154,19 @@ body.cam-scene #ffChip,body.cam-scene #plChip,body.cam-scene .b-ring{animation-p
   const HUD_TH_COL = { spring: ['#F7D4DE', '#E5A1B9', '#B56C86'], summer: ['#E0F2F4', '#8CC5D8', '#6A9FB2'], autumn: ['#F7C88D', '#D78A49', '#95592F'], winter: ['#EBF4FC', '#B5D1E4', '#7F9CAF'],
     xmas: ['#F1DAB7', '#C98A5B', '#8B4C44'], space: ['#E1D9FF', '#9A8BCE', '#6961A2'], retro: ['#F5D899', '#D98B43', '#9B5F36'] };
   // 4.4.1 woodani 요청: 공지창, 보상 창처럼 가운데 뜨는 창, 아래에서 올라오는 창, 탭 화면(선생님, 퀘스트 등)과 금빛 단추(업그레이드 등)도 배경 테마 색으로(그림 없이 색만).
+  // 4.4.1.1 woodani 요청(전수조사): 봄, 여름, 겨울, 우주 단추가 파스텔이라 바탕과 꺼진 단추에 묻혀서 단추 색만 더 진하고 쨍하게(바탕 대비 2배쯤, 글자 대비 5 넘게)
   // [종이, 카드, 테두리, 테두리 그림자, 단추, 단추 글자, 단추 그림자]. 어두운 화면은 바탕은 그대로 두고 테두리와 단추만 테마 색
-  const MODAL_TH = { spring: ['#FFF6F8', '#FBE6EC', '#EBC3D0', '#D7A3B5', '#E5A1B9', '#4A1F2E', '#B56C86'], summer: ['#F4FBFC', '#E2F2F5', '#BFDDE6', '#9CC5D3', '#8CC5D8', '#163A48', '#6A9FB2'],
-    autumn: ['#FFF6EA', '#F8E6CC', '#E8C79C', '#D3A874', '#E3974F', '#3A1E06', '#95592F'], winter: ['#F6FAFE', '#E6EFF6', '#C8D9E6', '#A9C0D1', '#B5D1E4', '#1E3446', '#7F9CAF'],
-    xmas: ['#FFF8EE', '#F5E6D0', '#E0C3A0', '#C9A27A', '#E06A5A', '#3A0E0A', '#8B4C44'], space: ['#F7F5FF', '#E9E5FA', '#CEC6EE', '#ACA2D8', '#A99BDB', '#1E1640', '#6961A2'],
-    retro: ['#FFF7E6', '#F8E7C2', '#E8CB8E', '#D2AC66', '#F0B347', '#3A2205', '#9B5F36'] };
+  const MODAL_TH = { spring: ['#FFF6F8', '#FBE6EC', '#EBC3D0', '#D7A3B5', '#E8789F', '#3E0F22', '#B24A72'], summer: ['#F4FBFC', '#E2F2F5', '#BFDDE6', '#9CC5D3', '#45B3DC', '#0B2A36', '#2A86A8'],
+    autumn: ['#FFF6EA', '#F8E6CC', '#E8C79C', '#D3A874', '#E3893F', '#3A1E06', '#95592F'], winter: ['#F6FAFE', '#E6EFF6', '#C8D9E6', '#A9C0D1', '#6FAEDB', '#0F2638', '#3F7FAD'],
+    xmas: ['#FFF8EE', '#F5E6D0', '#E0C3A0', '#C9A27A', '#E06A5A', '#3A0E0A', '#8B4C44'], space: ['#F7F5FF', '#E9E5FA', '#CEC6EE', '#ACA2D8', '#8E7BE0', '#140C33', '#5E4CB0'],
+    retro: ['#FFF7E6', '#F8E7C2', '#E8CB8E', '#D2AC66', '#F2A93A', '#3A2205', '#A9662A'] };
   function modalThemeCss() {
     if (document.getElementById('thModalCss')) return;
     const W = ':is(.modal,.sheet,.panel)', D = (id, c) => `--line:color-mix(in srgb, ${c[6]} 70%, var(--paper-d));--line-shadow:color-mix(in srgb, ${c[6]} 45%, #000);--chip-bg:color-mix(in srgb, ${c[6]} 35%, var(--paper-d));--accent:${c[4]};--accent-ink:${c[5]};--accent-shadow:${c[6]}`;
     // 4.4.1 woodani 요청: 테마에서는 꺼진 단추(돈 모자람 등)를 테마 색이 없는 회색으로. 켜진 단추(테마 색)와 바로 구분돼요(여름, 겨울은 둘 다 하늘색이라 헷갈렸어요)
     const OFF_L = '--off-bg:#DEDEDA;--off-ink:#85857F;--off-shadow:#BEBEB8', OFF_D = '--off-bg:#3B3D3F;--off-ink:#8E9194;--off-shadow:#2A2C2E';
     let css = `:root[data-th-ui]:not([data-th-ui=""]){${OFF_L}}\n:root[data-th-ui]:not([data-th-ui=""])[data-theme="dark"]{${OFF_D}}\n@media (prefers-color-scheme: dark){:root[data-th-ui]:not([data-th-ui=""]):not([data-theme="light"]){${OFF_D}}}\n`;
+    css += `:root[data-th-ui]:not([data-th-ui=""]) .sheet-elect:not(.todo) em{background:var(--accent);color:var(--accent-ink);box-shadow:0 2px 0 var(--accent-shadow)}\n`;   // 건물 창의 쓰다듬기, 가기 같은 작은 단추도 테마 단추 색(바탕색과 같아 묻혔어요)
     css += `:root[data-th-ui]:not([data-th-ui=""]) :is(.sb .buy.off,.ad-pk:disabled,.ac-bk.poor,.ac-bk.off,.pzb.poor,#bkBuy[aria-disabled="true"]){filter:grayscale(1)}\n`;   // 흐리게만 하던 꺼진 단추도 회색으로
     for (const [id, c] of Object.entries(MODAL_TH)) {
       css += `:root[data-th-ui="${id}"]{--accent:${c[4]};--accent-ink:${c[5]};--accent-shadow:${c[6]}}\n`;   // 업그레이드 단추처럼 금빛 단추(--accent)는 화면 어디서나 테마 색
@@ -15829,6 +15831,23 @@ body.cam-scene #ffChip,body.cam-scene #plChip,body.cam-scene .b-ring{animation-p
     while (n < 500) { let best = null, bc = Infinity; for (const sp of ps) { const c = tamLvCost(sp); if (c < bc) { bc = c; best = sp; } } if (!best || bc > S.budget) break; S.budget -= bc; tamMem(best).lv += 1; n++; }
     return n;
   }
+  // 4.4.1.1 woodani 요청: 고르게 올리기 전에 쓸 도토리와 결과를 미리 보여 줘요(도토리와 레벨은 그대로 두고 셈만 해요)
+  function tamLvAllPlan() {
+    const ps = tamParty(), b0 = S.budget, lv0 = ps.map(sp => tamMem(sp).lv), pw0 = tamPow();
+    let n = 0, b1 = b0, lv1 = lv0, pw1 = pw0;
+    try { n = tamLvAll(); b1 = S.budget; lv1 = ps.map(sp => tamMem(sp).lv); pw1 = tamPow(); }
+    finally { S.budget = b0; ps.forEach((sp, i) => { tamMem(sp).lv = lv0[i]; }); }
+    return { n, cost: b0 - b1, left: b1, up: ps.map((sp, i) => ({ sp, a: lv0[i], b: lv1[i] })), pw0, pw1 };
+  }
+  function tamLvAllAsk() {
+    const P = tamLvAllPlan(); if (!P.n) return;
+    const rows = P.up.filter(u => u.b > u.a).map(u => `${spName(u.sp)}  Lv.${u.a} → ${u.b} (+${u.b - u.a})`).join('\n');
+    askBox({ title: '출동 대원 고르게 올리기', yes: '올리기', no: '그만두기',
+      text: `도토리 ${fmt(P.cost)}개를 써요\n(남는 도토리 ${fmt(P.left)}개)\n\n${rows}\n\n탐험대 힘 ${fmt(P.pw0)} → ${fmt(P.pw1)}`,
+      onYes: () => { let n = 0;   // 보여 준 그대로 올려요(창을 보는 동안 들어온 도토리로 더 올리지 않아요)
+        if (S.budget >= P.cost && P.up.every(u => tamMem(u.sp).lv === u.a)) { S.budget -= P.cost; for (const u of P.up) tamMem(u.sp).lv = u.b; n = P.n; } else n = tamLvAll();
+        if (!n) return; tamLvFx(tamParty()); tamRestartStat(); sfx('coin'); buzz(14); save(); renderHUD(); tamRenderTop(); tamRenderBody(); tamToast(`출동 대원 레벨 +${n}`); } });
+  }
   /* 4.4.1.2 woodani 결정(도전과 도토리 소모처가 되게): 기준 레벨 아래는 1.13배씩 싸지되 기준 값의 1.13^-15(약 16%) 아래로는 안 내려가요.
      기준 레벨부터는 한 레벨마다 1.18배씩(전에는 1.13배) 비싸져요(숫자는 제안) */
   const tamLvCost = sp => { const d = tamMem(sp).lv - 1 - tamLvRef(); return tamAcorns(TAM.lvMin * (d < 0 ? Math.pow(TAM.lvCost, Math.max(-15, d)) : Math.pow(TAM.lvUp, Math.min(200, d)))); };
@@ -16561,7 +16580,7 @@ body.cam-scene #ffChip,body.cam-scene #plChip,body.cam-scene .b-ring{animation-p
       sfx('tap'); save(); tamRestart(); tamRenderTop(); tamRenderBody(); tamSkills(); return;
     }
     if (b.dataset.tlvn) { rt.tamLvN = b.dataset.tlvn === 'max' ? Infinity : +b.dataset.tlvn; sfx('tap'); tamRenderBody(); return; }   // 4.3.2
-    if (b.dataset.tlvall) { const n = tamLvAll(); if (!n) return; tamLvFx(tamParty()); tamRestartStat(); sfx('coin'); buzz(14); save(); renderHUD(); tamRenderTop(); tamRenderBody(); tamToast(`출동 대원 레벨 +${n}`); return; }
+    if (b.dataset.tlvall) { sfx('tap'); tamLvAllAsk(); return; }   // 4.4.1.1 미리 보기 창 뒤에 올려요
     if (b.dataset.tlv) { const sp = b.dataset.tlv, inRec = !!b.closest('.tm-rec'), n = tamLvBuy(sp, inRec ? 1 : (rt.tamLvN || 1)); if (!n) return; tamLvFx([sp]); tamRestartStat(); sfx('coin'); buzz(10); save(); renderHUD(); tamRenderTop(); tamRenderBody(); if (n > 1) tamToast(`${spName(sp)} 레벨 +${n}`); return; }
     if (b.dataset.tgear) { const [si, k] = b.dataset.tgear.split(':'), i = +si; if (!S.tam.sg[i] || !(k in S.tam.sg[i]) || i >= tamSlots()) return; const c = tamGearCost(k, i); if (S.tam.mat[c.m] < c.n || S.tam.mat[3] < c.star) return; S.tam.mat[c.m] -= c.n; S.tam.mat[3] -= c.star; S.tam.sg[i][k] += 1; tamRestartStat(); sfx('coin'); save(); tamRenderTop(); tamRenderBody(); return; }
     if (b.id === 'tmSpd') { tamAdSpd(); return; }
@@ -28824,7 +28843,7 @@ body.cam-scene #ffChip,body.cam-scene #plChip,body.cam-scene .b-ring{animation-p
   }
 
   // 시험용 손잡이: 자동 시험(window.__FOREST_TEST)에서만 게임 속 함수를 꺼내 써요
-  if (window.__FOREST_TEST) window.__forest = { get S() { return S; }, get rt4() { return rt; }, THEME, applyCos, setZone, decoEditStart, decoEditEnd, tamSkipTo, tamSkipGo, tamWinRep, tamRepFl, tamRenderTop, tamBg, teaOff, geo, qMeasure, IMG, tamHOn, tamHOpen, tamCurFl, tamWinH, tamHf, tamHRankDoc, tamSkBusy, tamReach, get SKQ() { return SKQ; }, esAxGain, esAxLeft, ESHOP, tamLvPlan, tamLvBuy, tamLvAll, mapUrl, mapBase, tamCheerLeft, tamAdRevive, tamCap, tamCapped, tamLvRef, tamBaseRate, tamLvCost, tamStageIn, musicWant, tamPh, tamEvPick, tamAutoTeam, tamAutoGain, tamUpRec, MAIN, startSports, GEO, claimAchAll, ACH, btMake, btBest, btRoster, btRoll, btWin, btOppCheer, BT, BT_LG, stPrev, get Rank() { return Rank; }, tamRankDoc, tamTf, tamAdSpd, tamReport, tamRepTake, tamAdRevive, renderRankPanel, TAM, tamSim, tamTeam, tamStat, tamMobs, tamWin, tamIdle, tamCollect, tamParty, tamShard, tamPow, tamFight, tamStep, TAM, tamSim, tamTeam, tamStat, tamMobs, tamWin, tamIdle, tamCollect, tamShard, tamParty, tamPow, tamLvCost, tamOpen, setZone, geo, stPlay, stNext, ST, ST_SIDE, SIDE, missionGo, MGO, MGO_MINI, MGO_Q, renderMissions, renderPass, BOOST, conLeft, gameToday, setTab, ADX, adStamp, adxDay, adxCan, adxMore, adPickNow, adPickGive, conNear, renderAdStamp, claimOfflineDouble, startBoost, openBoost, showOffline, fvBoothStart, bfFwStart, musicWant, renderCounsel, renderXg, renderFv, showCeremony, RX, rxPct, rxCost, rxUp, rxPart, renderDept, goldOr, goldRich, adGold, stampAtt, GOLD, BIG, BF_DECO, bfWin, bfNext, bfOn, bfFw, bfSync, bfStamp, bfFwStart, bfPart, bfNextTx, sanitizeBf, freshBf, fvBoothMax, bldBox, bldPick, bldWarm, DECO_SLOTS, XG, MK, ST, SIDE, ST_SIDE, wdMap, xgOn, xgGuest, xgSpots, xgGreet, xgVisit, xgLunch, openXg, mkOn, mkHot, mkSell, mkBuy, mkSur, openMk, wdBar, wdTick, stTick, stPlay, stNext, stPick, stEnd, stTags, openSb, renderSb, sideCan, sideMap, fvFlag, FV, FV_POS, fvOn, fvOpen, fvBonus, fvSync, fvStamp, fvGuests, openFv, renderFv, fvMeet, fvBoothStart, fvMap, fvTip, festDef, goTo, navInfo, openShop, gdReady, thPreview, thPreviewEnd, thOn, busScene, tripCrowd, openTrip, startTrip, claimTrip, TRIPS, mgPickMul, mgPickMode, mgUpOrder, mgFillOrders, mgAdAsk, sportsCon, festCon, btQuota, btCanAd, btAdMore, warmRooms, blobUrl, vdSize, vdBlock, pzSweep, pzSwGain, pzSwOpen, pzXpOf, mgMulMax, mgMulOk, mgMul, mgModeTap, acTip, kidDupIdx, trialSafe, closeAd,
+  if (window.__FOREST_TEST) window.__forest = { get S() { return S; }, get rt4() { return rt; }, THEME, applyCos, setZone, decoEditStart, decoEditEnd, tamSkipTo, tamSkipGo, tamWinRep, tamRepFl, tamRenderTop, tamBg, teaOff, geo, qMeasure, IMG, tamHOn, tamHOpen, tamCurFl, tamWinH, tamHf, tamHRankDoc, tamSkBusy, tamReach, get SKQ() { return SKQ; }, esAxGain, esAxLeft, ESHOP, tamLvPlan, tamLvBuy, tamLvAll, mapUrl, mapBase, tamCheerLeft, tamAdRevive, tamCap, tamCapped, tamLvRef, tamBaseRate, tamLvCost, tamStageIn, musicWant, tamPh, tamEvPick, tamAutoTeam, tamAutoGain, tamUpRec, MAIN, startSports, GEO, claimAchAll, ACH, btMake, btBest, btRoster, btRoll, btWin, btOppCheer, BT, BT_LG, stPrev, get Rank() { return Rank; }, tamRankDoc, tamTf, tamAdSpd, tamReport, tamRepTake, tamAdRevive, renderRankPanel, TAM, tamSim, tamTeam, tamStat, tamMobs, tamWin, tamIdle, tamCollect, tamParty, tamShard, tamPow, tamFight, tamStep, TAM, tamSim, tamTeam, tamStat, tamMobs, tamWin, tamIdle, tamCollect, tamShard, tamParty, tamPow, tamLvCost, tamOpen, setZone, geo, stPlay, stNext, ST, ST_SIDE, SIDE, missionGo, MGO, MGO_MINI, MGO_Q, renderMissions, renderPass, BOOST, conLeft, gameToday, setTab, ADX, adStamp, adxDay, adxCan, adxMore, adPickNow, adPickGive, conNear, renderAdStamp, claimOfflineDouble, startBoost, openBoost, showOffline, fvBoothStart, bfFwStart, musicWant, renderCounsel, renderXg, renderFv, showCeremony, RX, rxPct, rxCost, rxUp, rxPart, renderDept, goldOr, goldRich, adGold, stampAtt, GOLD, BIG, BF_DECO, bfWin, bfNext, bfOn, bfFw, bfSync, bfStamp, bfFwStart, bfPart, bfNextTx, sanitizeBf, freshBf, fvBoothMax, bldBox, bldPick, bldWarm, DECO_SLOTS, XG, MK, ST, SIDE, ST_SIDE, wdMap, xgOn, xgGuest, xgSpots, xgGreet, xgVisit, xgLunch, openXg, mkOn, mkHot, mkSell, mkBuy, mkSur, openMk, wdBar, wdTick, stTick, stPlay, stNext, stPick, stEnd, stTags, openSb, renderSb, sideCan, sideMap, fvFlag, FV, FV_POS, fvOn, fvOpen, fvBonus, fvSync, fvStamp, fvGuests, openFv, renderFv, fvMeet, fvBoothStart, fvMap, fvTip, festDef, goTo, navInfo, openShop, gdReady, thPreview, thPreviewEnd, thOn, busScene, tripCrowd, openTrip, startTrip, claimTrip, TRIPS, openSheet, tamLvAllPlan, tamLvAllAsk, mgPickMul, mgPickMode, mgUpOrder, mgFillOrders, mgAdAsk, sportsCon, festCon, btQuota, btCanAd, btAdMore, warmRooms, blobUrl, vdSize, vdBlock, pzSweep, pzSwGain, pzSwOpen, pzXpOf, mgMulMax, mgMulOk, mgMul, mgModeTap, acTip, kidDupIdx, trialSafe, closeAd,
     TKE, TK_Q, tkDaily, nbAllDay, nbBuildAt, nbOn, conAdd, BX_SPOT, PERKS, offlineCapH, applyAway, pzFinish, mgClaimOrder,
     CS, JOBS, CS_WORRY, freshCs, csOpen, csLeft, csMax, csEnsure, csCands, csNeed, csMul, csOpenCards, csReady, csDone, csTalkMake, csAnswer, csChoose, csSettle, openCounsel, renderCounsel, renderHall, MAIN, qMeasure, qGoal, sanitize,   // 3.1.0 진로 상담
     NSL, nsStart, nsSettle, nsOpen, nsOn, nsOverlap, nsExtraH, isNight, nightDayOf, openNs, renderNs, bxSpots, renderNight,   // 3.0.0
