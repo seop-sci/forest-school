@@ -6,10 +6,11 @@
 
 | 파일 | 하는 일 |
 | --- | --- |
-| `forest-school.html` | 게임 원본 (Claude 화면에 올리는 본문) |
+| `forest-school.html` | 게임 원본(코드와 글, 2.6MB). 그림은 주소(`img/a/열쇠-지문.webp`)만 있고 바이트는 저장소 맨 위 `img/a` 파일에 있어요(2026-11-17부터. 그 전에는 base64로 품어 40MB였어요) |
+| `imglib.py`, `img_out.py` | 그림을 원본 밖 파일로 두는 도구. `python3 img_out.py`(원본에 남은 base64 그림을 파일로 꺼냄, 여러 번 돌려도 같음), `--check`(주소마다 파일이 있고 이름의 지문이 내용과 맞는지), `--inline 파일`(그림을 품은 옛 꼴 한 파일로 만들기. 되돌리거나 한 파일로 건넬 때) |
 | `build_gh.py` | 원본으로 GitHub 판 만들기. `python3 build_gh.py ..` 하면 저장소 맨 위 `index.html`이 새로 생겨요 |
 | `gh_README.md`, `gh_database.rules.json` | GitHub 판의 README와 데이터베이스 규칙 원본 |
-| `wrap.py` | 시험용 `test.html` 만들기 |
+| `wrap.py` | 시험용 `test.html` 만들기. 시험판은 `file://` 주소라 그림(`img/a`)과 곡(`audio`)을 글 안에 base64로 다시 넣어요 |
 | `s*test.py`, `fbtest/` | Playwright 자동 시험 (가짜 Firebase 서버 포함) |
 | `testlib.py` | 자동 시험의 공통 모듈: `URL`, `base()`, `ctxpage()`, `F`, `CLEAN`, `OVER`, `Checker`(ok와 done), `skip()`. 불러오기만 해도 마지막 줄이 PASS나 SKIP이 아니면 끝 코드 1이 돼요 (예전에는 `s4test.py`가 겸했어요) |
 | `runall.py` | 시험을 한 번에 돌려요. `python3 runall.py quick` (묶음: `quick`, `ui`, `save`, `fb`, `all`, 번호도 돼요). 세 개씩 함께, 실패한 것은 한 번 다시, 마지막 줄 PASS와 끝 코드로 판정 |

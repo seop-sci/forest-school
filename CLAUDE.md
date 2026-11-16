@@ -15,6 +15,7 @@ Claude는 구현, 시험, 빌드, PR, 패치노트를 맡아요. 아래 공통 �
 
 ### 파일 체계 (바꾸지 않아요)
 - 게임 원본은 `dev/forest-school.html` 하나예요. 고칠 때는 이 파일만 고쳐요.
+- 그림은 저장소 맨 위 `img/a` 파일이 원본이에요(2026-11-17 woodani 결정). `dev/forest-school.html`에는 `"열쇠":"img/a/열쇠-지문.webp"` 같은 주소만 있어요. 그림은 `dev/embed_assets.py`로 넣고, 새 파일은 `git add img`로 함께 올려요. `img/a` 파일을 손으로 고치거나 이름을 바꾸지 않아요.
 - 저장소 맨 위 `index.html`은 `python3 dev/build_gh.py .`로 만든 결과물이에요. 손으로 고치지 않아요.
 - 안드로이드(`app/`)와 토스(`toss/`)는 `index.html`을 가져다 묶어요. `<!-- github-only -->` 표시 구간은 두 판에서 빠져요.
 - `config.js`(Firebase 설정), `database.rules.json`(서버 규칙), 안드로이드 앱 ID `io.github.seopsci.forestschool`, 애드몹 ID, 토스 광고 그룹 ID는 사용자가 따로 말하지 않으면 바꾸지 않아요.
