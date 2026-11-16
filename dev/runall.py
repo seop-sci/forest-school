@@ -30,10 +30,12 @@ def run_one(n, timeout=1200):
             if (pathlib.Path(cand) / 'targaryen').exists(): env['NODE_PATH'] = cand; break
     try:
         r = subprocess.run([sys.executable, f's{n}test.py'], cwd=HERE, capture_output=True, text=True, timeout=timeout, env=env)
-        out, code = (r.stdout or '') + (r.stderr or ''), r.returncode
+        so, out, code = r.stdout or '', (r.stdout or '') + (r.stderr or ''), r.returncode   # 판정은 표준 출력의 마지막 줄로(파이썬 경고는 표준 오류로 나와요)
     except subprocess.TimeoutExpired as e:
+        so = out = ''; code = 124
         out, code = ((e.stdout or b'').decode('utf-8', 'ignore') if isinstance(e.stdout, bytes) else (e.stdout or '')) + '\n시간 초과', 124
-    last = ([l.strip() for l in out.strip().split('\n') if l.strip()] or [''])[-1]
+    if code == 124: so = out
+    last = ([l.strip() for l in so.strip().split('\n') if l.strip()] or [''])[-1]
     res = 'SKIP' if last.startswith('SKIP') else 'PASS' if (last.startswith('PASS') and code == 0) else 'FAIL'
     return dict(n=n, res=res, code=code, sec=round(time.time() - t0), last=last[:90], out=out)
 
