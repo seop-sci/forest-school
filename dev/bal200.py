@@ -27,6 +27,7 @@ BOT = r"""(o) => {
     if (cfg.con === false) for (const k of Object.keys(F.CON)) F.CON[k] = [0, 0];
   }
   const now = () => W.t0 + W.t * 1000;
+  const UT = cfg.until === undefined ? 2 : cfg.until;   // 어느 학교급까지 잴지(기본 2 중학교). 5.0.2: '{"until": 3}'처럼 바꿀 수 있어요
   const SKIP = new Set(['pz', 'pzBest', 'rdBooks', 'xt', 'vp', 'deco', 'ach', 'acMax', 'acBook', 'labs', 'elects', 'elMid', 'btPlays', 'btLg', 'btMid', 'mgDex', 'star', 'clubMat', 'clubShown', 'clubSum', 'fpUp', 'acSum', 'btWins']);
   const buy = () => { for (let i = 0; i < 60; i++) {
       const r = F.recommend(); let ok = false;
@@ -61,7 +62,9 @@ BOT = r"""(o) => {
     if (q && q.t === 'mgBest') s.mg.best.a = Math.min(10, (s.mg.best.a || 0) + 1);
     if (q && q.t === 'mgOrders') s.mg.st.orders += 1;
     // 2.1.0 봇이 못 하는 공부, 꾸미기, 선거, 대결 같은 퀘스트는 사람이 하는 시간(qskip초, 기본 10분)을 기다린 뒤 마친 것으로 쳐요
-    if (q && SKIP.has(q.t) && !F.mainReady() && W.t - W.qt >= (cfg.qskip || 600)) s.q.lat = q.id;
+    // 5.0.2: 새로 생긴 퀘스트 종류(단짝 쓰다듬기, 소풍, 텃밭 등)에서 봇이 멈추던 것을 고쳤어요. 사서 끝나는 종류와 위에서 흉내 내는 종류가 아니면 모두 qskip초 뒤에 마친 것으로 쳐요
+    const DOES = new Set(['fac', 'fur', 'furAll', 'tea', 'teaAll', 'grade', 'ygrade', 'students', 'rate', 'grads', 'tgrads', 'semH', 'tier', 'perks', 'fperks', 'picks', 'trials', 'fest', 'sports', 'mgBest', 'mgOrders', 'trips', 'souv', 'tripat', 'club', 'shows', 'earned']);
+    if (q && (SKIP.has(q.t) || !DOES.has(q.t)) && !F.mainReady() && W.t - W.qt >= (cfg.qskip || 600)) s.q.lat = q.id;
     // 현장체험학습(bot.py와 같아요)
     if (s.trip && (s.trip.open || (s.tier >= 1 && s.tg >= 2) || s.tier >= 2)) {
       if (!s.trip.cur) {
@@ -82,9 +85,9 @@ BOT = r"""(o) => {
     for (let i = 0; i < 5 && F.mainReady(); i++) F.claimMain(null);
     if (F.canGraduate()) { yearSnap('종업식'); perks(); F.graduate(); fperks(); buy(); }
     else if (F.canPromote()) { yearSnap('졸업식'); F.promote(); if (!W.fundOff) fperks(); buy(); yearSnap('입학 직후'); }
-    else if (s.tier === 2 && s.tg >= 2 && !F.curMain()) { yearSnap('중학교 끝'); W.done = true; break; }
+    else if (s.tier === UT && s.tg >= F.TIERS[UT].years - 1 && !F.curMain()) { yearSnap('끝'); W.done = true; break; }
     F.rt.modalQueue.length = 0; F.rt.modalOpen = null;
-    if (s.tier === 2 && s.tg >= 3) { W.years[W.years.length - 1].what = '중학교 3학년 끝'; W.done = true; break; }
+    if (s.tier > UT || (s.tier === UT && s.tg >= F.TIERS[UT].years)) { W.years[W.years.length - 1].what = '끝'; W.done = true; break; }
     if (W.t > (o.maxH || 400) * 3600) { yearSnap('시간 끝'); W.done = true; break; }
   }
   const s = S();
