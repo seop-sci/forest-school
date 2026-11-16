@@ -11686,7 +11686,7 @@ body.cam-scene #ffChip,body.cam-scene #plChip,body.cam-scene .b-ring{animation-p
   const freshFu = () => { const o = {}; for (const k in FUR) o[k] = [0, 0, 0, 0]; return o; };
   const furDone = (k, i) => S.f[k] < 1 || S.fu[k][i] >= S.f[k];
   const furReady = k => S.f[k] < 1 || S.fu[k].every(n => n >= S.f[k]);
-  const furCost = (k, i) => furDone(k, i) ? Infinity : Math.ceil(softCost(FAC[k].cost, S.fu[k][i] + 1, SOFT.fac) * FUR_SHARE[i] * costScale());
+  const furCost = (k, i) => furDone(k, i) ? Infinity : Math.ceil(softCost(FAC[k].cost, S.fu[k][i] + 1 + (FAC[k].lvOff || 0), SOFT.fac) * FUR_SHARE[i] * costScale());   // 5.0.0 연구 건물 가구도 건물처럼 lvOff(빠져서 아주 쌌어요)
   const furAllCost = k => FUR[k].reduce((a, _, i) => a + (furDone(k, i) ? 0 : furCost(k, i)), 0);
   // 이 시설에서 다음에 살 수 있는 것: 가구가 덜 찼으면 가장 싼 가구, 다 찼으면 건물
   const facNextCost = k => furReady(k) ? facCost(k) : Math.min(...FUR[k].map((_, i) => furCost(k, i)));
@@ -11950,7 +11950,7 @@ body.cam-scene #ffChip,body.cam-scene #plChip,body.cam-scene .b-ring{animation-p
 
   /* 1.5.0 시설 안: 방 배경 그림 위에 가구 그림을 올려요. 바닥은 위에서 40%(y 92)부터예요.
      자리는 [가운데 x, 바닥에 닿는 y], 너비는 지도 단위. 뒤쪽(y가 작은 곳)일수록 조금 작게 그려요 */
-  const FUR_AR = { desk: 0.75, chair: 1.56, fan: 1.84, locker: 2.27, table: 0.53, counter: 0.43, water: 2.29, rack: 0.96, shelf: 1.28, rdesk: 0.39, sofa: 0.66, lamp: 2.40, lab: 0.87, scope: 1.72, chem: 0.91, globe: 1.41, slide: 1.00, swing: 0.70, bars: 0.46, bench: 0.57, snackrack: 1, fridge: 1.8, register: 0.75, snacktable: 0.8, bunk: 1.04, sdesk: 0.82, closet: 1.17, rug: 0.62, union_board: 1.06, union_sofa: 0.56, union_vend: 1.58, union_stage: 0.96 };   // 3.0.0 기숙사 가구(그림 테두리에 맞게 잘라 넣음)
+  const FUR_AR = { desk: 0.75, chair: 1.56, fan: 1.84, locker: 2.27, table: 0.53, counter: 0.43, water: 2.29, rack: 0.96, shelf: 1.28, rdesk: 0.39, sofa: 0.66, lamp: 2.40, lab: 0.87, scope: 1.72, chem: 0.91, globe: 1.41, slide: 1.00, swing: 0.70, bars: 0.46, bench: 0.57, snackrack: 1, fridge: 1.8, register: 0.75, snacktable: 0.8, bunk: 1.04, sdesk: 0.82, closet: 1.17, rug: 0.62, union_board: 1.06, union_sofa: 0.56, union_vend: 1.58, union_stage: 0.96, institute_bench: 0.85, institute_board: 1.06, institute_desk: 0.87, institute_coffee: 1.14, gradhall_table: 0.79, gradhall_screen: 1.01, gradhall_shelf: 1.17, gradhall_plant: 0.96 /* 5.0.0 연구소와 연구동 가구(빠져서 방에 안 보였어요) */ };   // 3.0.0 기숙사 가구(그림 테두리에 맞게 잘라 넣음)
   // 1.7.0 방 배치 다시 짜기(실제 모습처럼): 뒤쪽은 좁고 작게, 앞쪽은 넓고 크게 보이는 원근에 맞춰 놓아요.
   // furP(u, y): 바닥 y에서 가로 위치 u(-1 왼쪽 벽 ~ 1 오른쪽 벽)를 지도 단위 x로 바꿔요. 자리는 [x, 바닥에 닿는 y]이고 앞(위쪽 자리)부터 채워요.
   // on: 다른 가구 위에 올려요(현미경은 실험대 위, 지구본은 약품장 위). dx는 받침 가구 너비에 대한 가로 비율, dy는 받침 가구 높이에 대한 높이 비율
@@ -12260,7 +12260,7 @@ body.cam-scene #ffChip,body.cam-scene #plChip,body.cam-scene .b-ring{animation-p
     return base * (CFG.gradeMult - 1) * Math.min(1, dRep / need);
   }
   const furLeftCost = k => S.f[k] < 1 ? 0 : FUR[k].reduce((a, _, i) => {
-    let c = 0; for (let n = S.fu[k][i]; n < S.f[k]; n++) c += Math.ceil(softCost(FAC[k].cost, n + 1, SOFT.fac) * FUR_SHARE[i] * costScale());
+    let c = 0; for (let n = S.fu[k][i]; n < S.f[k]; n++) c += Math.ceil(softCost(FAC[k].cost, n + 1 + (FAC[k].lvOff || 0), SOFT.fac) * FUR_SHARE[i] * costScale());   // 5.0.0 lvOff
     return a + c;
   }, 0);
   const cheapestFur = k => FUR[k].map((_, i) => i).filter(i => !furDone(k, i)).sort((a, b) => furCost(k, a) - furCost(k, b))[0];
