@@ -25,9 +25,11 @@ EXTRA = {'quick': [['python3', 'jscheck.py'], ['python3', 'driftcheck.py']], 'al
 
 def run_one(n, timeout=1200):
     t0 = time.time(); env = dict(os.environ)
-    if n in FB and 'NODE_PATH' not in env:
-        for cand in ('/tmp/tg/node_modules', str(ROOT / 'node_modules')):
-            if (pathlib.Path(cand) / 'targaryen').exists(): env['NODE_PATH'] = cand; break
+    if n in FB:   # 가짜 Firebase 서버는 targaryen 꾸러미가 있어야 해요. NODE_PATH에 없으면 알 만한 곳에서 찾아 앞에 붙여요
+        dirs = [d for d in env.get('NODE_PATH', '').split(os.pathsep) if d] + ['/tmp/tg/node_modules', str(ROOT / 'node_modules'), str(HERE / 'node_modules')]
+        hit = next((d for d in dirs if (pathlib.Path(d) / 'targaryen').exists()), None)
+        if not hit: return dict(n=n, res='SKIP', code=0, sec=0, last='SKIP targaryen 꾸러미가 없어요(npm i targaryen 뒤 NODE_PATH로 알려 주세요)', out='')
+        env['NODE_PATH'] = os.pathsep.join([hit] + [d for d in env.get('NODE_PATH', '').split(os.pathsep) if d and d != hit])
     try:
         r = subprocess.run([sys.executable, f's{n}test.py'], cwd=HERE, capture_output=True, text=True, timeout=timeout, env=env)
         so, out, code = r.stdout or '', (r.stdout or '') + (r.stderr or ''), r.returncode   # 판정은 표준 출력의 마지막 줄로(파이썬 경고는 표준 오류로 나와요)
