@@ -135,6 +135,29 @@ def _out_img(m):
     _used.add(name)
     return f'"{key}":{m.group(2)}"img/a/{name}"'
 DOC = re.sub(r'"([A-Za-z0-9_]+)":(\s*)"data:image/(webp|png|jpeg|jpg|gif);base64,([A-Za-z0-9+/=]+)"', _out_img, DOC)
+# 5.0.2 웹판 첫 받기 줄이기: 위 정규식에 안 걸리는 큰 그림 두 곳도 파일로 꺼내요.
+# (1) 퍼즐과 합치기 배경 window.FS_MINI_BG={puzzle:"data:...",merge:"data:..."} (열쇠에 따옴표가 없어요)
+def _file_of(key, kind, b64):
+    raw = base64.b64decode(b64)
+    name = f"{key}-{hashlib.sha1(raw).hexdigest()[:10]}.{_EXT.get(kind, 'bin')}"
+    f = IMGDIR / name
+    if not f.exists(): f.write_bytes(raw)
+    _used.add(name)
+    return f'img/a/{name}'
+def _mini(m):
+    return m.group(1) + re.sub(r'([A-Za-z0-9_]+):"data:image/(webp|png|jpeg|jpg|gif);base64,([A-Za-z0-9+/=]+)"',
+                               lambda k: f'{k.group(1)}:"{_file_of("mini_bg_" + k.group(1), k.group(2), k.group(3))}"', m.group(2)) + m.group(3)
+DOC, n_mini = re.subn(r'(window\.FS_MINI_BG=\{)([^\n]*?)(\};)', _mini, DOC)
+assert n_mini == 1 and 'img/a/mini_bg_puzzle-' in DOC and 'img/a/mini_bg_merge-' in DOC, 'FS_MINI_BG를 찾지 못했어요'
+# (2) 로딩 화면 그림(.boot-pic의 배경). 파일로 빼면 늦게 뜰 수 있어서 첫머리에 미리 받기(preload) 줄을 넣어요
+_boot = []
+def _bootpic(m):
+    _boot.append(_file_of('boot_pic', m.group(2), m.group(3)))
+    return f'{m.group(1)}url({_boot[-1]})'
+DOC, n_boot = re.subn(r'(\.boot-pic\{[^}]*?)url\(data:image/(webp|png|jpeg|jpg|gif);base64,([A-Za-z0-9+/=]+)\)', _bootpic, DOC)
+assert n_boot == 1, '로딩 그림(.boot-pic)을 찾지 못했어요'
+DOC = DOC.replace('<style>html,body{margin:0}</style>\n', f'<style>html,body{{margin:0}}</style>\n<link rel="preload" as="image" href="{_boot[0]}">\n', 1)
+assert f'<link rel="preload" as="image" href="{_boot[0]}">' in DOC
 for f in IMGDIR.iterdir():
     if f.name not in _used: f.unlink()   # 더는 안 쓰는 옛 그림 파일은 지워요
 print('그림 파일', len(_used))

@@ -31,6 +31,16 @@ jobs:
           cp -r audio img _site/
           touch _site/.nojekyll
           ls -la _site
+      # 5.0.2 웹판 첫 받기 줄이기: 올릴 사본에서만 주석과 공백을 빼요(저장소의 index.html과 Build check는 그대로).
+      # 설치나 압축, 압축 뒤 확인이 하나라도 실패하면 줄이지 않은 index.html을 그대로 올려요(웹 배포는 멈추지 않아요)
+      - name: 웹판 index.html 줄이기(주석과 공백만)
+        run: |
+          if (cd app && npm ci --ignore-scripts --no-audit --no-fund) && node dev/minify_web.mjs _site/index.html "$PWD/app/node_modules"; then
+            ls -la _site/index.html
+          else
+            cp index.html _site/index.html
+            echo "::warning::웹판 압축을 건너뛰었어요. 줄이지 않은 index.html을 올려요"
+          fi
       - uses: actions/configure-pages@983d7736d9b0ae728b81ab479565c72886d7745b   # v5
       - uses: actions/upload-pages-artifact@56afc609e74202658d3ffba0e8f6dda462b719fa   # v3
         with:
