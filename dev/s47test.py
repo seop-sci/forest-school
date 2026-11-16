@@ -5,7 +5,7 @@ from playwright.async_api import async_playwright
 from testlib import URL, F
 CLEAN = "document.querySelectorAll('.overlay.center').forEach(o=>{o.hidden=true;o.classList.remove('open')}); window.__forest.rt.modalOpen=null; window.__forest.rt.modalQueue.length=0"
 FMT2 = [(0, '0'), (9999, '9,999'), (10000, '1만'), (25438, '2만 5438'), (254380000, '2억 5438만'), (254380123, '2억 5438만'),
-        (200000000, '2억'), (3340200000000, '3조 3402억'), (3340200000001, '3조 3402억'), (12345678901234567, '1경 2345조'), (1.5e30, '150양'), (2.5e33, '250,000양')]
+        (200000000, '2억'), (3340200000000, '3조 3402억'), (3340200000001, '3조 3402억'), (12345678901234567, '1경 2345조'), (1.5e30, '150양'), (2.5e33, '25구')]
 
 async def main():
     fails = []
