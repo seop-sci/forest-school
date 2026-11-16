@@ -2,7 +2,7 @@
 <html lang="ko">
 <head>
 <meta charset="utf-8">
-<meta name="forest-version" content="5.0.0">
+<meta name="forest-version" content="5.0.1">
 <meta name="viewport" content="width=device-width, initial-scale=1">
 <meta name="description" content="도토리를 모아 숲속 학교를 키우는 방치형 게임 테스트판이에요.">
 <style>html,body{margin:0}</style>
@@ -3900,7 +3900,7 @@ body.cam-scene #ffChip,body.cam-scene #plChip,body.cam-scene .b-ring{animation-p
     <p class="boot-step" id="bootStep">학교 문을 여는 중...</p>
     <p class="boot-tip" id="bootTip">학교 문을 여는 중이에요</p>
   </div>
-  <span class="boot-ver" id="bootVer">v5.0.0</span>
+  <span class="boot-ver" id="bootVer">v5.0.1</span>
 </div>
 
 <div class="app on-school" id="app">
@@ -4486,7 +4486,7 @@ body.cam-scene #ffChip,body.cam-scene #plChip,body.cam-scene .b-ring{animation-p
       </div>
       <h3 class="panel-sub">정보</h3>
       <dl class="info">
-        <div id="verRow"><dt>버전</dt><dd>v5.0.0</dd></div>
+        <div id="verRow"><dt>버전</dt><dd>v5.0.1</dd></div>
         <div id="pidRow" hidden><dt>학교 번호</dt><dd id="infoPid"></dd></div>
       </dl>
       <div id="devBox" hidden>
@@ -7751,7 +7751,7 @@ body.cam-scene #ffChip,body.cam-scene #plChip,body.cam-scene .b-ring{animation-p
      2. 한 판 더 광고(하루 한 번씩): 축제 부스, 대축제 불꽃놀이, 교환학생 학교 안내, 진로 상담
      3. 오늘의 광고 도장: 어느 광고든 끝까지 보면 하나(하루 6개). 3개 숲의 정수 10과 5분권 2장, 6개 숲의 정수 20과 30분권 1장 */
   const ADX = { tier: 3, conMin: 30, ess: 10, max: 6, st: [[3, 10, 'm5', 2], [6, 20, 'm30', 1]] };
-  const freshAdx = () => ({ day: '', n: 0, got: [0, 0], fv: 0, fw: 0, xg: 0, cs: 0 });   // 2.3.1 woodani 결정: 광고 한 편 = 30분(보충수업, 단축권, 체험학습이 같게)
+  const freshAdx = () => ({ day: '', n: 0, got: [0, 0], fv: 0, fw: 0, xg: 0, cs: 0, all: 0 });   // 5.0.1 all: 오늘 본 광고 수(도장 상한 없이, 관리자 지표용)   // 2.3.1 woodani 결정: 광고 한 편 = 30분(보충수업, 단축권, 체험학습이 같게)
   // 보충수업 버튼은 늘 떠 있지 않고 까치 핫딜처럼 가끔 1분 반 동안만 나타나요
   const BOOSTW = { life: 90, gap: [240, 420], first: 90 };
   const dropIntervalFor = L => L < 1 ? Infinity : Math.max(8, 24 / (1 + 0.15 * (L - 1)));
@@ -8907,6 +8907,7 @@ body.cam-scene #ffChip,body.cam-scene #plChip,body.cam-scene .b-ring{animation-p
       f.n = typeof A.n === 'number' && isFinite(A.n) ? Math.max(0, Math.min(ADX.max, Math.floor(A.n))) : 0;
       if (Array.isArray(A.got)) f.got = ADX.st.map((_, i) => A.got[i] ? 1 : 0);
       for (const k of ['fv', 'fw', 'xg', 'cs']) f[k] = A[k] ? 1 : 0;
+      f.all = typeof A.all === 'number' && isFinite(A.all) ? Math.max(0, Math.min(10000, Math.floor(A.all))) : 0;   // 5.0.1
       s.adx = f; }
     sanitizeTam(d, s);   // 4.3.0 숲속 탐험대
     sanitizeXg(d, s); sanitizeMk(d, s); sanitizeSto(d, s);   // 4.1.0 교환학생, 장터, 이야기
@@ -11779,7 +11780,7 @@ body.cam-scene #ffChip,body.cam-scene #plChip,body.cam-scene .b-ring{animation-p
   const freshFu = () => { const o = {}; for (const k in FUR) o[k] = [0, 0, 0, 0]; return o; };
   const furDone = (k, i) => S.f[k] < 1 || S.fu[k][i] >= S.f[k];
   const furReady = k => S.f[k] < 1 || S.fu[k].every(n => n >= S.f[k]);
-  const furCost = (k, i) => furDone(k, i) ? Infinity : Math.ceil(softCost(FAC[k].cost, S.fu[k][i] + 1, SOFT.fac) * FUR_SHARE[i] * costScale());
+  const furCost = (k, i) => furDone(k, i) ? Infinity : Math.ceil(softCost(FAC[k].cost, S.fu[k][i] + 1 + (FAC[k].lvOff || 0), SOFT.fac) * FUR_SHARE[i] * costScale());   // 5.0.0 연구 건물 가구도 건물처럼 lvOff(빠져서 아주 쌌어요)
   const furAllCost = k => FUR[k].reduce((a, _, i) => a + (furDone(k, i) ? 0 : furCost(k, i)), 0);
   // 이 시설에서 다음에 살 수 있는 것: 가구가 덜 찼으면 가장 싼 가구, 다 찼으면 건물
   const facNextCost = k => furReady(k) ? facCost(k) : Math.min(...FUR[k].map((_, i) => furCost(k, i)));
@@ -12043,7 +12044,7 @@ body.cam-scene #ffChip,body.cam-scene #plChip,body.cam-scene .b-ring{animation-p
 
   /* 1.5.0 시설 안: 방 배경 그림 위에 가구 그림을 올려요. 바닥은 위에서 40%(y 92)부터예요.
      자리는 [가운데 x, 바닥에 닿는 y], 너비는 지도 단위. 뒤쪽(y가 작은 곳)일수록 조금 작게 그려요 */
-  const FUR_AR = { desk: 0.75, chair: 1.56, fan: 1.84, locker: 2.27, table: 0.53, counter: 0.43, water: 2.29, rack: 0.96, shelf: 1.28, rdesk: 0.39, sofa: 0.66, lamp: 2.40, lab: 0.87, scope: 1.72, chem: 0.91, globe: 1.41, slide: 1.00, swing: 0.70, bars: 0.46, bench: 0.57, snackrack: 1, fridge: 1.8, register: 0.75, snacktable: 0.8, bunk: 1.04, sdesk: 0.82, closet: 1.17, rug: 0.62, union_board: 1.06, union_sofa: 0.56, union_vend: 1.58, union_stage: 0.96 };   // 3.0.0 기숙사 가구(그림 테두리에 맞게 잘라 넣음)
+  const FUR_AR = { desk: 0.75, chair: 1.56, fan: 1.84, locker: 2.27, table: 0.53, counter: 0.43, water: 2.29, rack: 0.96, shelf: 1.28, rdesk: 0.39, sofa: 0.66, lamp: 2.40, lab: 0.87, scope: 1.72, chem: 0.91, globe: 1.41, slide: 1.00, swing: 0.70, bars: 0.46, bench: 0.57, snackrack: 1, fridge: 1.8, register: 0.75, snacktable: 0.8, bunk: 1.04, sdesk: 0.82, closet: 1.17, rug: 0.62, union_board: 1.06, union_sofa: 0.56, union_vend: 1.58, union_stage: 0.96, institute_bench: 0.85, institute_board: 1.06, institute_desk: 0.87, institute_coffee: 1.14, gradhall_table: 0.79, gradhall_screen: 1.01, gradhall_shelf: 1.17, gradhall_plant: 0.96 /* 5.0.0 연구소와 연구동 가구(빠져서 방에 안 보였어요) */ };   // 3.0.0 기숙사 가구(그림 테두리에 맞게 잘라 넣음)
   // 1.7.0 방 배치 다시 짜기(실제 모습처럼): 뒤쪽은 좁고 작게, 앞쪽은 넓고 크게 보이는 원근에 맞춰 놓아요.
   // furP(u, y): 바닥 y에서 가로 위치 u(-1 왼쪽 벽 ~ 1 오른쪽 벽)를 지도 단위 x로 바꿔요. 자리는 [x, 바닥에 닿는 y]이고 앞(위쪽 자리)부터 채워요.
   // on: 다른 가구 위에 올려요(현미경은 실험대 위, 지구본은 약품장 위). dx는 받침 가구 너비에 대한 가로 비율, dy는 받침 가구 높이에 대한 높이 비율
@@ -12353,7 +12354,7 @@ body.cam-scene #ffChip,body.cam-scene #plChip,body.cam-scene .b-ring{animation-p
     return base * (CFG.gradeMult - 1) * Math.min(1, dRep / need);
   }
   const furLeftCost = k => S.f[k] < 1 ? 0 : FUR[k].reduce((a, _, i) => {
-    let c = 0; for (let n = S.fu[k][i]; n < S.f[k]; n++) c += Math.ceil(softCost(FAC[k].cost, n + 1, SOFT.fac) * FUR_SHARE[i] * costScale());
+    let c = 0; for (let n = S.fu[k][i]; n < S.f[k]; n++) c += Math.ceil(softCost(FAC[k].cost, n + 1 + (FAC[k].lvOff || 0), SOFT.fac) * FUR_SHARE[i] * costScale());   // 5.0.0 lvOff
     return a + c;
   }, 0);
   const cheapestFur = k => FUR[k].map((_, i) => i).filter(i => !furDone(k, i)).sort((a, b) => furCost(k, a) - furCost(k, b))[0];
@@ -14027,7 +14028,7 @@ body.cam-scene #ffChip,body.cam-scene #plChip,body.cam-scene .b-ring{animation-p
     ensureAudio(); musicSync();
     const ok = rt.adOk, no = rt.adNo, earned = rt.adEarned, noGold = rt.adNoGold;
     rt.adOk = rt.adNo = null; rt.adNoGold = false;
-    if (earned) { S.st.ads += 1; if (!noGold) adGold(); adStamp(); if (ok) ok(); }
+    if (earned) { S.st.ads += 1; adxDay(); S.adx.all = Math.min(10000, (S.adx.all || 0) + 1); if (!noGold) adGold(); adStamp(); if (ok) ok(); }   // 5.0.1 오늘 본 광고 수(관리자 지표)
     else if (no) no();
     else toast('광고를 끝까지 보지 않아서 보상이 없어요');
   }
@@ -14252,8 +14253,8 @@ body.cam-scene #ffChip,body.cam-scene #plChip,body.cam-scene .b-ring{animation-p
        forest/rank/<내 id>   랭킹 이름과 학교 점수
        forest/stats/<내 id>  테스트 현황 (어디까지 했는지, 얼마나 했는지)
      <내 id>는 Firebase 익명 로그인이 기기(브라우저)마다 만들어 줘요. */
-  const VERSION = '5.0.0';
-  const NT_QUIET = ['2.1.20', '2.1.2.2', '2.3.0.1', '2.3.4', '3.2.3', '3.2.4', '3.2.5', '3.3.1', '3.3.2', '3.3.3', '4.4.1.1', '4.4.1.2', '4.4.1.3', '4.4.1.4'];   // 5.0.0 공지는 2026-11-16 woodani가 정해서 NOTICES로 옮겼어요   // 4.4.1(앱과 함께 내는 판)은 공지를 띄워요   // 4.4.1도 공지 없이(woodani)   // 3.3.1, 3.3.2, 3.3.3(토스 먼저)도 공지 창 없이(woodani). 2.3.0.1도 공지 창 없이(공지는 그대로 2.3.0). 2.3.4도 조용히(woodani 결정). 3.2.3, 3.2.4, 3.2.5도 공지 창 없이(공지 줄을 고르지 않음)
+  const VERSION = '5.0.1';
+  const NT_QUIET = ['2.1.20', '2.1.2.2', '2.3.0.1', '2.3.4', '3.2.3', '3.2.4', '3.2.5', '3.3.1', '3.3.2', '3.3.3', '4.4.1.1', '4.4.1.2', '4.4.1.3', '4.4.1.4', '5.0.1'];   // 5.0.1 공지 줄은 woodani가 정할 때까지 조용히   // 5.0.0 공지는 2026-11-16 woodani가 정해서 NOTICES로 옮겼어요   // 4.4.1(앱과 함께 내는 판)은 공지를 띄워요   // 4.4.1도 공지 없이(woodani)   // 3.3.1, 3.3.2, 3.3.3(토스 먼저)도 공지 창 없이(woodani). 2.3.0.1도 공지 창 없이(공지는 그대로 2.3.0). 2.3.4도 조용히(woodani 결정). 3.2.3, 3.2.4, 3.2.5도 공지 창 없이(공지 줄을 고르지 않음)
     // 2.1.20 woodani 결정: 이 버전들은 업데이트해도 공지 창을 띄우지 않아요(공지는 그대로 2.1.2)
   /* 2.0.0 공지사항 (2026-10-27 woodani, 1.8.0은 이미 올려서 2.0.0부터): 설정 > 공지사항. 맨 위가 가장 새 공지예요.
      패치노트는 자동으로 넣지 않아요. woodani가 검수한 글만 여기에 적어요(CHANGELOG.md는 자세한 기록용이라 따로 있어요).
@@ -14744,7 +14745,9 @@ body.cam-scene #ffChip,body.cam-scene #plChip,body.cam-scene .b-ring{animation-p
         // 4.1.0 woodani(2026-11-11): 자동으로 움직이는 브라우저(AI가 시험하려고 연 판)는 테스트 현황에 기록을 남기지 않아요. 자동 시험(가짜 서버)은 그대로 올려요
         if (!(navigator.webdriver && !window.__FOREST_TEST) && (force || Date.now() - Cloud.lastStats >= STATS_PUSH)) {
           Cloud.lastStats = Date.now();
-          try { await db.ref('forest/stats/' + uid).set(statsDoc()); } catch (e2) { /* 4.1.1 테스트 현황을 못 올려도 학교 저장은 그대로예요(저장 위치를 오류로 바꾸지 않아요) */ }
+          try { await db.ref('forest/stats/' + uid).set(statsDoc()); } catch (e2) { /* 4.1.1 테스트 현황을 못 올려도 학교 저장은 그대로예요(저장 위치를 오류로 바꾸지 않아요) */
+            // 5.0.1 새 칸(adsT, adsD)을 받는 서버 규칙이 아직 게시되기 전이면 빼고 한 번 더 올려요
+            try { const d = statsDoc(); delete d.adsT; delete d.adsD; await db.ref('forest/stats/' + uid).set(d); } catch (e3) { /* 그대로 */ } }
         }
       }
     } catch (e) {
@@ -14799,11 +14802,12 @@ body.cam-scene #ffChip,body.cam-scene #plChip,body.cam-scene .b-ring{animation-p
   function statsDoc() {
     const cm = curMain(), ua = navigator.userAgent || '';
     return {
-      seen: Cloud.fb.database.ServerValue.TIMESTAMP, born: Math.floor(S.born), pid: S.pid, name: S.rank.name || '',
+      seen: Cloud.fb ? Cloud.fb.database.ServerValue.TIMESTAMP : Date.now(), born: Math.floor(S.born), pid: S.pid, name: S.rank.name || '',
       tier: S.tier, year: yearNo(), town: S.grade, q: cm ? qNo(S.q.m) : '끝', qt: cm ? cm.title : '',
       play: Math.floor(S.st.play), sess: S.st.sess, days: S.att.n, ads: S.st.ads, score: rankScore(),
       gold: S.gold, gearn: S.st.gold, gspent: S.st.gspent, cos: S.cos.own.length,
-      dev: !!S.u.dev, v: VERSION, env: /KAKAOTALK/i.test(ua) ? 'kakao' : (navigator.maxTouchPoints > 0 ? 'mobile' : 'pc')
+      dev: !!S.u.dev, v: VERSION, env: /KAKAOTALK/i.test(ua) ? 'kakao' : (navigator.maxTouchPoints > 0 ? 'mobile' : 'pc'),
+      adsT: S.adx && S.adx.day === gameToday() ? (S.adx.all || 0) : 0, adsD: gameToday()   // 5.0.1 woodani 요청: 관리자 지표에 오늘 본 광고 수(서버 규칙 adsT, adsD)
     };
   }
   function agoText(t) {
@@ -29354,7 +29358,7 @@ body.cam-scene #ffChip,body.cam-scene #plChip,body.cam-scene .b-ring{animation-p
   }
 
   // 시험용 손잡이: 자동 시험(window.__FOREST_TEST)에서만 게임 속 함수를 꺼내 써요
-  if (window.__FOREST_TEST) window.__forest = { get S() { return S; }, get rt4() { return rt; }, THEME, applyCos, setZone, decoEditStart, decoEditEnd, tamSkipTo, tamSkipGo, tamWinRep, tamRepFl, tamRenderTop, tamBg, teaOff, geo, qMeasure, IMG, tamHOn, tamHOpen, tamCurFl, tamWinH, tamHf, tamHRankDoc, tamSkBusy, tamReach, get SKQ() { return SKQ; }, esAxGain, esAxLeft, ESHOP, tamLvPlan, tamLvBuy, tamLvAll, mapUrl, mapBase, tamCheerLeft, tamAdRevive, tamCap, tamCapped, tamLvRef, tamBaseRate, tamLvCost, tamStageIn, musicWant, tamPh, tamEvPick, tamAutoTeam, tamAutoGain, tamUpRec, MAIN, startSports, GEO, claimAchAll, ACH, btMake, btBest, btRoster, btRoll, btWin, btOppCheer, BT, BT_LG, stPrev, get Rank() { return Rank; }, tamRankDoc, tamTf, tamAdSpd, tamReport, tamRepTake, tamAdRevive, renderRankPanel, TAM, tamSim, tamTeam, tamStat, tamMobs, tamWin, tamIdle, tamCollect, tamParty, tamShard, tamPow, tamFight, tamStep, TAM, tamSim, tamTeam, tamStat, tamMobs, tamWin, tamIdle, tamCollect, tamShard, tamParty, tamPow, tamLvCost, tamOpen, setZone, geo, stPlay, stNext, ST, ST_SIDE, SIDE, missionGo, MGO, MGO_MINI, MGO_Q, renderMissions, renderPass, BOOST, conLeft, gameToday, setTab, ADX, adStamp, adxDay, adxCan, adxMore, adPickNow, adPickGive, conNear, renderAdStamp, claimOfflineDouble, startBoost, openBoost, showOffline, fvBoothStart, bfFwStart, musicWant, renderCounsel, renderXg, renderFv, showCeremony, RX, rxPct, rxCost, rxUp, rxPart, renderDept, goldOr, goldRich, adGold, stampAtt, GOLD, BIG, BF_DECO, bfWin, bfNext, bfOn, bfFw, bfSync, bfStamp, bfFwStart, bfPart, bfNextTx, sanitizeBf, freshBf, fvBoothMax, bldBox, bldPick, bldWarm, DECO_SLOTS, XG, MK, ST, SIDE, ST_SIDE, wdMap, xgOn, xgGuest, xgSpots, xgGreet, xgVisit, xgLunch, openXg, mkOn, mkHot, mkSell, mkBuy, mkSur, openMk, wdBar, wdTick, stTick, stPlay, stNext, stPick, stEnd, stTags, openSb, renderSb, sideCan, sideMap, fvFlag, FV, FV_POS, fvOn, fvOpen, fvBonus, fvSync, fvStamp, fvGuests, openFv, renderFv, fvMeet, fvBoothStart, fvMap, fvTip, festDef, goTo, navInfo, openShop, gdReady, thPreview, thPreviewEnd, thOn, busScene, tripCrowd, openTrip, startTrip, claimTrip, TRIPS, tripMult, openSheet, openRx, rtStart, rtLv, RT5, setZone, tamReg, promote, canPromote, get rxTier() { return RX_TIER; }, set rxTier(v) { RX_TIER = v; }, tamLvAllPlan, tamLvAllAsk, decoPut, decoUsed, get ZONE0() { return ZONE0; }, mgPickMul, mgPickMode, mgUpOrder, mgFillOrders, mgAdAsk, sportsCon, festCon, btQuota, btCanAd, btAdMore, warmRooms, blobUrl, vdSize, vdBlock, pzSweep, pzSwGain, pzSwOpen, pzXpOf, mgMulMax, mgMulOk, mgMul, mgModeTap, acTip, kidDupIdx, trialSafe, closeAd,
+  if (window.__FOREST_TEST) window.__forest = { get S() { return S; }, statsDoc, get rt4() { return rt; }, THEME, applyCos, setZone, decoEditStart, decoEditEnd, tamSkipTo, tamSkipGo, tamWinRep, tamRepFl, tamRenderTop, tamBg, teaOff, geo, qMeasure, IMG, tamHOn, tamHOpen, tamCurFl, tamWinH, tamHf, tamHRankDoc, tamSkBusy, tamReach, get SKQ() { return SKQ; }, esAxGain, esAxLeft, ESHOP, tamLvPlan, tamLvBuy, tamLvAll, mapUrl, mapBase, tamCheerLeft, tamAdRevive, tamCap, tamCapped, tamLvRef, tamBaseRate, tamLvCost, tamStageIn, musicWant, tamPh, tamEvPick, tamAutoTeam, tamAutoGain, tamUpRec, MAIN, startSports, GEO, claimAchAll, ACH, btMake, btBest, btRoster, btRoll, btWin, btOppCheer, BT, BT_LG, stPrev, get Rank() { return Rank; }, tamRankDoc, tamTf, tamAdSpd, tamReport, tamRepTake, tamAdRevive, renderRankPanel, TAM, tamSim, tamTeam, tamStat, tamMobs, tamWin, tamIdle, tamCollect, tamParty, tamShard, tamPow, tamFight, tamStep, TAM, tamSim, tamTeam, tamStat, tamMobs, tamWin, tamIdle, tamCollect, tamShard, tamParty, tamPow, tamLvCost, tamOpen, setZone, geo, stPlay, stNext, ST, ST_SIDE, SIDE, missionGo, MGO, MGO_MINI, MGO_Q, renderMissions, renderPass, BOOST, conLeft, gameToday, setTab, ADX, adStamp, adxDay, adxCan, adxMore, adPickNow, adPickGive, conNear, renderAdStamp, claimOfflineDouble, startBoost, openBoost, showOffline, fvBoothStart, bfFwStart, musicWant, renderCounsel, renderXg, renderFv, showCeremony, RX, rxPct, rxCost, rxUp, rxPart, renderDept, goldOr, goldRich, adGold, stampAtt, GOLD, BIG, BF_DECO, bfWin, bfNext, bfOn, bfFw, bfSync, bfStamp, bfFwStart, bfPart, bfNextTx, sanitizeBf, freshBf, fvBoothMax, bldBox, bldPick, bldWarm, DECO_SLOTS, XG, MK, ST, SIDE, ST_SIDE, wdMap, xgOn, xgGuest, xgSpots, xgGreet, xgVisit, xgLunch, openXg, mkOn, mkHot, mkSell, mkBuy, mkSur, openMk, wdBar, wdTick, stTick, stPlay, stNext, stPick, stEnd, stTags, openSb, renderSb, sideCan, sideMap, fvFlag, FV, FV_POS, fvOn, fvOpen, fvBonus, fvSync, fvStamp, fvGuests, openFv, renderFv, fvMeet, fvBoothStart, fvMap, fvTip, festDef, goTo, navInfo, openShop, gdReady, thPreview, thPreviewEnd, thOn, busScene, tripCrowd, openTrip, startTrip, claimTrip, TRIPS, tripMult, openSheet, openRx, rtStart, rtLv, RT5, setZone, tamReg, promote, canPromote, get rxTier() { return RX_TIER; }, set rxTier(v) { RX_TIER = v; }, tamLvAllPlan, tamLvAllAsk, decoPut, decoUsed, get ZONE0() { return ZONE0; }, mgPickMul, mgPickMode, mgUpOrder, mgFillOrders, mgAdAsk, sportsCon, festCon, btQuota, btCanAd, btAdMore, warmRooms, blobUrl, vdSize, vdBlock, pzSweep, pzSwGain, pzSwOpen, pzXpOf, mgMulMax, mgMulOk, mgMul, mgModeTap, acTip, kidDupIdx, trialSafe, closeAd,
     TKE, TK_Q, tkDaily, nbAllDay, nbBuildAt, nbOn, conAdd, BX_SPOT, PERKS, offlineCapH, applyAway, pzFinish, mgClaimOrder,
     CS, JOBS, CS_WORRY, freshCs, csOpen, csLeft, csMax, csEnsure, csCands, csNeed, csMul, csOpenCards, csReady, csDone, csTalkMake, csAnswer, csChoose, csSettle, openCounsel, renderCounsel, renderHall, MAIN, qMeasure, qGoal, sanitize,   // 3.1.0 진로 상담
     NSL, nsStart, nsSettle, nsOpen, nsOn, nsOverlap, nsExtraH, isNight, nightDayOf, openNs, renderNs, bxSpots, renderNight,   // 3.0.0
