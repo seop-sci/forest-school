@@ -47,7 +47,7 @@ with sync_playwright() as p:
     print('보조 줄', r)
     check(r['n'] == 20 and r['names'] == 20, '순위표 20줄, 이름 겹침 없음')
     check(r['mono'], '주간 보조 줄 점수가 한 주 동안 줄지 않아요')
-    check(r['monTop'] < 10 and r['sunTop'] < 500, '3.2.6 월요일 0시 30분엔 보조 줄이 거의 0점, 일요일엔 가장 높은 보조 줄이 지난주 내 점수보다 낮아요')
+    check(r['monTop'] < 10 and r['sunTop'] <= 900 * 0.9 + 1, '3.2.6 월요일 0시 30분엔 보조 줄이 거의 0점, 일요일엔 가장 높은 보조 줄이 기준(5.0.1 모두에게 같은 RKF.wkRef 900)의 90% 아래')
     check(r['jump'] <= r['cap'], f"3.2.6 6시간 동안 늘어나는 점수가 하루 상한 안 {r['jump']} <= {r['cap']}")
     check(r['minF'] >= 0.3 * 0.92 - 1e-9 and r['maxF'] <= 1.1 + 1e-9, '학교 파워 보조 줄은 내 점수의 30~110%')
     r = pg.evaluate("""() => { const F = window.__forest, S = F.S; F.Rank.state = 'on'; F.Rank.uid = 'me'; F.Rank.rows = []; F.Rank.wrows = []; F.rt.rankView = 'all';
