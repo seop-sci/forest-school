@@ -7537,7 +7537,7 @@ body.cam-scene #ffChip,body.cam-scene #plChip,body.cam-scene .b-ring{animation-p
      2. 한 판 더 광고(하루 한 번씩): 축제 부스, 대축제 불꽃놀이, 교환학생 학교 안내, 진로 상담
      3. 오늘의 광고 도장: 어느 광고든 끝까지 보면 하나(하루 6개). 3개 숲의 정수 10과 5분권 2장, 6개 숲의 정수 20과 30분권 1장 */
   const ADX = { tier: 3, conMin: 30, ess: 10, max: 6, st: [[3, 10, 'm5', 2], [6, 20, 'm30', 1]] };
-  const freshAdx = () => ({ day: '', n: 0, got: [0, 0], fv: 0, fw: 0, xg: 0, cs: 0 });   // 2.3.1 woodani 결정: 광고 한 편 = 30분(보충수업, 단축권, 체험학습이 같게)
+  const freshAdx = () => ({ day: '', n: 0, got: [0, 0], fv: 0, fw: 0, xg: 0, cs: 0, all: 0 });   // 5.0.1 all: 오늘 본 광고 수(도장 상한 없이, 관리자 지표용)   // 2.3.1 woodani 결정: 광고 한 편 = 30분(보충수업, 단축권, 체험학습이 같게)
   // 보충수업 버튼은 늘 떠 있지 않고 까치 핫딜처럼 가끔 1분 반 동안만 나타나요
   const BOOSTW = { life: 90, gap: [240, 420], first: 90 };
   const dropIntervalFor = L => L < 1 ? Infinity : Math.max(8, 24 / (1 + 0.15 * (L - 1)));
@@ -8696,6 +8696,7 @@ body.cam-scene #ffChip,body.cam-scene #plChip,body.cam-scene .b-ring{animation-p
       f.n = typeof A.n === 'number' && isFinite(A.n) ? Math.max(0, Math.min(ADX.max, Math.floor(A.n))) : 0;
       if (Array.isArray(A.got)) f.got = ADX.st.map((_, i) => A.got[i] ? 1 : 0);
       for (const k of ['fv', 'fw', 'xg', 'cs']) f[k] = A[k] ? 1 : 0;
+      f.all = typeof A.all === 'number' && isFinite(A.all) ? Math.max(0, Math.min(10000, Math.floor(A.all))) : 0;   // 5.0.1
       s.adx = f; }
     sanitizeTam(d, s);   // 4.3.0 숲속 탐험대
     sanitizeXg(d, s); sanitizeMk(d, s); sanitizeSto(d, s);   // 4.1.0 교환학생, 장터, 이야기
@@ -13623,7 +13624,7 @@ body.cam-scene #ffChip,body.cam-scene #plChip,body.cam-scene .b-ring{animation-p
     ensureAudio(); musicSync();
     const ok = rt.adOk, no = rt.adNo, earned = rt.adEarned, noGold = rt.adNoGold;
     rt.adOk = rt.adNo = null; rt.adNoGold = false;
-    if (earned) { S.st.ads += 1; if (!noGold) adGold(); adStamp(); if (ok) ok(); }
+    if (earned) { S.st.ads += 1; adxDay(); S.adx.all = Math.min(10000, (S.adx.all || 0) + 1); if (!noGold) adGold(); adStamp(); if (ok) ok(); }   // 5.0.1 오늘 본 광고 수(관리자 지표)
     else if (no) no();
     else toast('광고를 끝까지 보지 않아서 보상이 없어요');
   }
@@ -14340,7 +14341,9 @@ body.cam-scene #ffChip,body.cam-scene #plChip,body.cam-scene .b-ring{animation-p
         // 4.1.0 woodani(2026-11-11): 자동으로 움직이는 브라우저(AI가 시험하려고 연 판)는 테스트 현황에 기록을 남기지 않아요. 자동 시험(가짜 서버)은 그대로 올려요
         if (!(navigator.webdriver && !window.__FOREST_TEST) && (force || Date.now() - Cloud.lastStats >= STATS_PUSH)) {
           Cloud.lastStats = Date.now();
-          try { await db.ref('forest/stats/' + uid).set(statsDoc()); } catch (e2) { /* 4.1.1 테스트 현황을 못 올려도 학교 저장은 그대로예요(저장 위치를 오류로 바꾸지 않아요) */ }
+          try { await db.ref('forest/stats/' + uid).set(statsDoc()); } catch (e2) { /* 4.1.1 테스트 현황을 못 올려도 학교 저장은 그대로예요(저장 위치를 오류로 바꾸지 않아요) */
+            // 5.0.1 새 칸(adsT, adsD)을 받는 서버 규칙이 아직 게시되기 전이면 빼고 한 번 더 올려요
+            try { const d = statsDoc(); delete d.adsT; delete d.adsD; await db.ref('forest/stats/' + uid).set(d); } catch (e3) { /* 그대로 */ } }
         }
       }
     } catch (e) {
@@ -14395,11 +14398,12 @@ body.cam-scene #ffChip,body.cam-scene #plChip,body.cam-scene .b-ring{animation-p
   function statsDoc() {
     const cm = curMain(), ua = navigator.userAgent || '';
     return {
-      seen: Cloud.fb.database.ServerValue.TIMESTAMP, born: Math.floor(S.born), pid: S.pid, name: S.rank.name || '',
+      seen: Cloud.fb ? Cloud.fb.database.ServerValue.TIMESTAMP : Date.now(), born: Math.floor(S.born), pid: S.pid, name: S.rank.name || '',
       tier: S.tier, year: yearNo(), town: S.grade, q: cm ? qNo(S.q.m) : '끝', qt: cm ? cm.title : '',
       play: Math.floor(S.st.play), sess: S.st.sess, days: S.att.n, ads: S.st.ads, score: rankScore(),
       gold: S.gold, gearn: S.st.gold, gspent: S.st.gspent, cos: S.cos.own.length,
-      dev: !!S.u.dev, v: VERSION, env: /KAKAOTALK/i.test(ua) ? 'kakao' : (navigator.maxTouchPoints > 0 ? 'mobile' : 'pc')
+      dev: !!S.u.dev, v: VERSION, env: /KAKAOTALK/i.test(ua) ? 'kakao' : (navigator.maxTouchPoints > 0 ? 'mobile' : 'pc'),
+      adsT: S.adx && S.adx.day === gameToday() ? (S.adx.all || 0) : 0, adsD: gameToday()   // 5.0.1 woodani 요청: 관리자 지표에 오늘 본 광고 수(서버 규칙 adsT, adsD)
     };
   }
   function agoText(t) {
@@ -15173,7 +15177,11 @@ body.cam-scene #ffChip,body.cam-scene #plChip,body.cam-scene .b-ring{animation-p
   const RKF = { fill: 20, lo: 0.3, hi: 1.1, endLo: 0.3, endHi: 0.9, start: 0.25, tierDrop: 0.04, floor: { week: 300, sea: 3000, bt: 60, all: 300 }, titled: 0.65,
     // 3.2.6 woodani 제보(월요일인데 이미 점수가 높음, 시즌 시작 전인데 시즌 점수): 주간과 시즌은 월요일 0점에서 시작해 사람처럼 요일과 시간대에 따라 올라가요.
     // 줄마다 요일별 노는 양이 다르고 쉬는 날(off)도 있어요. 하루에 오르는 점수는 dayCap을 넘지 않아요(오늘의 미션, 보너스, 행사, 체험학습, 대결을 열심히 한 하루쯤). 숫자는 본부 제안
-    off: 0.22, dayCap: 260, refCap: 1800 };
+    off: 0.22, dayCap: 260, refCap: 1800,
+    // 5.0.1 woodani 요청(2026-11-17): 보조 줄은 고등학교까지만(maxTier), 학교 파워는 고등학교 끝쯤(hsRef)을 넘는 기준으로 크지 않게. 숫자는 본부 제안
+    maxTier: 3, hsRef: 4500,
+    // 5.0.1 woodani 요청(2026-11-17): 보조 줄은 모두에게 똑같이 보여요(내 계정, 내 점수, 내 학교급과 상관없이). 대결 점수 900~1500, 주간 기준 900. 숫자는 본부 제안
+    btLo: 900, btHi: 1500, wkRef: 900 };
   // 하루 중 노는 양(0~23시). 새벽은 거의 없고 아침, 점심, 저녁에 몰려요
   const RKF_HOUR = [0.02, 0, 0, 0, 0, 0, 0.1, 0.5, 0.7, 0.35, 0.3, 0.35, 0.8, 0.6, 0.3, 0.3, 0.45, 0.7, 0.9, 1, 1, 0.9, 0.6, 0.25];
   const RKF_CUM = (() => { const c = [0]; RKF_HOUR.forEach(v => c.push(c[c.length - 1] + v)); return c.map(v => v / c[24]); })();
@@ -15203,28 +15211,29 @@ body.cam-scene #ffChip,body.cam-scene #plChip,body.cam-scene .b-ring{animation-p
   function rkFill(mode, rows, mine) {
     const need = RKF.fill - rows.length; if (need <= 0 || Rank.state !== 'on') return rows;
     if (mode === 'sea' && !rsOn()) return rows;   // 3.2.6 시즌이 시작하기 전에는 보조 줄도 없어요
-    const seed = `${mode}|${mode === 'sea' ? 's' + rsNum() : gameWeek()}|${Rank.uid || ''}`, timed = mode === 'week' || mode === 'sea';   // 3.2.6 주간과 시즌은 rkTimed가 셈
-    const shrink = 1 - RKF.tierDrop * Math.min(4, S.tier), memo = rt.rkMax || (rt.rkMax = {});
+    const seed = `${mode}|${mode === 'sea' ? 's' + rsNum() : gameWeek()}`, timed = mode === 'week' || mode === 'sea';   // 3.2.6 주간과 시즌은 rkTimed가 셈   // 5.0.1 모두에게 같게(계정 빼고)
+    const memo = rt.rkMax || (rt.rkMax = {});
     const taken = new Set(rows.map(r => nickKey(r.name))), out = rows.slice();
     const us = Array.from({ length: need }, (_, i) => rkRnd(seed, i)), uCut = us.slice().sort((a, b) => b - a)[Math.max(0, Math.round(need * RKF.titled) - 1)];   // 점수는 u가 클수록 높아요
     for (let i = 0; i < need; i++) {
       const u = us[i];
       let v;
       if (timed) v = rkTimed(mode, seed + '|' + i);
-      else v = Math.max(mine, RKF.floor[mode]) * (RKF.lo + (RKF.hi - RKF.lo) * u) * shrink;
+      else if (mode === 'bt') v = RKF.btLo + (RKF.btHi - RKF.btLo) * u;   // 5.0.1 모두에게 같게
+      else v = RKF.hsRef * (RKF.lo + (1 - RKF.lo) * u);   // 5.0.1 학교 파워는 고등학교 끝쯤(hsRef)의 30~100%, 모두에게 같게
       const mk = seed + '|' + i; v = Math.max(memo[mk] || 0, Math.max(1, Math.round(v))); memo[mk] = v;   // 한 번 보인 점수보다 내려가지 않아요
       let nm = NICK_ADJ[rkHash(seed + 'a' + i) % NICK_ADJ.length] + ' ' + NICK_NOUN[rkHash(seed + 'n' + i) % NICK_NOUN.length];
       if (taken.has(nickKey(nm))) nm = NICK_NOUN[rkHash(seed + 'n' + i) % NICK_NOUN.length] + ' ' + (10 + rkHash(seed + 'k' + i) % 90);
       taken.add(nickKey(nm));
-      const tier = Math.max(0, S.tier - (u < 0.4 ? 1 : 0)), T = TIERS[Math.min(TIERS.length - 1, tier)];
+      const tier = Math.min(RKF.maxTier, Math.floor(u * (RKF.maxTier + 1))), T = TIERS[Math.min(TIERS.length - 1, tier)];   // 5.0.1 보조 줄은 유치원~고등학교, 점수가 높을수록 위 학교급(모두에게 같게)
       const tis = Object.keys(RKF_TI).filter(id => RKF_TI[id] <= tier && achTitleName(id)), title = RKF.titled > 0 && u >= uCut && tis.length ? tis[rkHash(seed + 't' + i) % tis.length] : '';
-      out.push({ id: 'x' + i, nx: true, name: nm, score: v, lp: v, sp: v, bt: v, btm: Math.min(5, Math.max(0, (S.bt ? S.bt.lg : 0) - (u < 0.5 ? 1 : 0))), tier, year: 1 + rkHash(seed + 'y' + i) % T.years, sem: rkHash(seed + 's' + i) % 2, title });   // 3.0.1 학기도 줄마다(유치원은 rankSchool이 안 보여 줘요)
+      out.push({ id: 'x' + i, nx: true, name: nm, score: v, lp: v, sp: v, bt: v, btm: Math.min(5, Math.floor(u * 5)), tier, year: 1 + rkHash(seed + 'y' + i) % T.years, sem: rkHash(seed + 's' + i) % 2, title });   // 3.0.1 학기도 줄마다(유치원은 rankSchool이 안 보여 줘요)
     }
     const key = r => mode === 'sea' ? r.sp : mode === 'bt' ? r.bt : mode === 'week' ? r.lp : r.score;
     return out.sort((a, b) => (key(b) || 0) - (key(a) || 0));
   }
   // 3.2.6 주간: 이번 주 계획에서 지금까지. 시즌: 시즌 첫날부터 오늘까지 날마다 그 주 계획의 몫을 더해요(주간 줄과 같은 방식)
-  function rkRef() { const lastWk = S.lg && S.lg.last && S.lg.last.pts || 0; return Math.min(RKF.refCap, Math.max(RKF.floor.week, lastWk)); }
+  function rkRef() { return RKF.wkRef; }   // 5.0.1 모두에게 같게(예전에는 내 지난주 점수 기준)
   function rkTimed(mode, rs) {
     const ref = rkRef(), now = gameNow() + KST_MS, day = Math.floor(now / 86400000), h = (now % 86400000) / 3600000;
     const dowOf = dy => ((dy - 4) % 7 + 7) % 7, wkOf = dy => Math.floor((dy - 4) / 7);   // 1970-01-05가 월요일
@@ -28998,7 +29007,7 @@ body.cam-scene #ffChip,body.cam-scene #plChip,body.cam-scene .b-ring{animation-p
   }
 
   // 시험용 손잡이: 자동 시험(window.__FOREST_TEST)에서만 게임 속 함수를 꺼내 써요
-  if (window.__FOREST_TEST) window.__forest = { get S() { return S; }, get rt4() { return rt; }, claimables, claimAllNow, subReady, todoRows, todoGo, renderTodo, acBuyBookAll, frGiftAll, rdUnqueue, rdSettle, frGift, frGiftLeft, acBkLeft, bookCost, APP_PACK, mapLo, mapHidden, finalYear, stPicUrl, ST_PICS, webAud, webCacheOk, c3u, WEB_ROOT, THEME, applyCos, setZone, decoEditStart, decoEditEnd, tamSkipTo, tamSkipGo, tamWinRep, tamRepFl, tamRenderTop, tamBg, teaOff, geo, qMeasure, IMG, tamHOn, tamHOpen, tamCurFl, tamWinH, tamHf, tamHRankDoc, tamSkBusy, tamReach, get SKQ() { return SKQ; }, esAxGain, esAxLeft, ESHOP, tamLvPlan, tamLvBuy, tamLvAll, mapUrl, mapBase, tamCheerLeft, tamAdRevive, tamCap, tamCapped, tamLvRef, tamBaseRate, tamLvCost, tamStageIn, musicWant, tamPh, tamEvPick, tamAutoTeam, tamAutoGain, tamUpRec, MAIN, startSports, GEO, claimAchAll, ACH, btMake, btBest, btRoster, btRoll, btWin, btOppCheer, BT, BT_LG, stPrev, get Rank() { return Rank; }, tamRankDoc, tamTf, tamAdSpd, tamReport, tamRepTake, tamAdRevive, renderRankPanel, TAM, tamSim, tamTeam, tamStat, tamMobs, tamWin, tamIdle, tamCollect, tamParty, tamShard, tamPow, tamFight, tamStep, TAM, tamSim, tamTeam, tamStat, tamMobs, tamWin, tamIdle, tamCollect, tamShard, tamParty, tamPow, tamLvCost, tamOpen, setZone, geo, stPlay, stNext, ST, ST_SIDE, SIDE, missionGo, MGO, MGO_MINI, MGO_Q, renderMissions, renderPass, BOOST, conLeft, gameToday, setTab, ADX, adStamp, adxDay, adxCan, adxMore, adPickNow, adPickGive, conNear, renderAdStamp, claimOfflineDouble, startBoost, openBoost, showOffline, fvBoothStart, bfFwStart, musicWant, renderCounsel, renderXg, renderFv, showCeremony, RX, rxPct, rxCost, rxUp, rxPart, renderDept, goldOr, goldRich, adGold, stampAtt, GOLD, BIG, BF_DECO, bfWin, bfNext, bfOn, bfFw, bfSync, bfStamp, bfFwStart, bfPart, bfNextTx, sanitizeBf, freshBf, fvBoothMax, bldBox, bldPick, bldWarm, DECO_SLOTS, XG, MK, ST, SIDE, ST_SIDE, wdMap, xgOn, xgGuest, xgSpots, xgGreet, xgVisit, xgLunch, openXg, mkOn, mkHot, mkSell, mkBuy, mkSur, openMk, wdBar, wdTick, stTick, stPlay, stNext, stPick, stEnd, stTags, openSb, renderSb, sideCan, sideMap, fvFlag, FV, FV_POS, fvOn, fvOpen, fvBonus, fvSync, fvStamp, fvGuests, openFv, renderFv, fvMeet, fvBoothStart, fvMap, fvTip, festDef, goTo, navInfo, openShop, gdReady, thPreview, thPreviewEnd, thOn, busScene, tripCrowd, openTrip, startTrip, claimTrip, TRIPS, tripMult, openSheet, openRx, rtStart, rtLv, RT5, setZone, tamReg, promote, canPromote, get rxTier() { return RX_TIER; }, set rxTier(v) { RX_TIER = v; }, tamLvAllPlan, tamLvAllAsk, decoPut, decoUsed, get ZONE0() { return ZONE0; }, mgPickMul, mgPickMode, mgUpOrder, mgFillOrders, mgAdAsk, sportsCon, festCon, btQuota, btCanAd, btAdMore, warmRooms, blobUrl, vdSize, vdBlock, pzSweep, pzSwGain, pzSwOpen, pzXpOf, mgMulMax, mgMulOk, mgMul, mgModeTap, acTip, kidDupIdx, trialSafe, closeAd,
+  if (window.__FOREST_TEST) window.__forest = { get S() { return S; }, statsDoc, get rt4() { return rt; }, claimables, claimAllNow, subReady, todoRows, todoGo, renderTodo, acBuyBookAll, frGiftAll, rdUnqueue, rdSettle, frGift, frGiftLeft, acBkLeft, bookCost, APP_PACK, mapLo, mapHidden, finalYear, stPicUrl, ST_PICS, webAud, webCacheOk, c3u, WEB_ROOT, THEME, applyCos, setZone, decoEditStart, decoEditEnd, tamSkipTo, tamSkipGo, tamWinRep, tamRepFl, tamRenderTop, tamBg, teaOff, geo, qMeasure, IMG, tamHOn, tamHOpen, tamCurFl, tamWinH, tamHf, tamHRankDoc, tamSkBusy, tamReach, get SKQ() { return SKQ; }, esAxGain, esAxLeft, ESHOP, tamLvPlan, tamLvBuy, tamLvAll, mapUrl, mapBase, tamCheerLeft, tamAdRevive, tamCap, tamCapped, tamLvRef, tamBaseRate, tamLvCost, tamStageIn, musicWant, tamPh, tamEvPick, tamAutoTeam, tamAutoGain, tamUpRec, MAIN, startSports, GEO, claimAchAll, ACH, btMake, btBest, btRoster, btRoll, btWin, btOppCheer, BT, BT_LG, stPrev, get Rank() { return Rank; }, tamRankDoc, tamTf, tamAdSpd, tamReport, tamRepTake, tamAdRevive, renderRankPanel, TAM, tamSim, tamTeam, tamStat, tamMobs, tamWin, tamIdle, tamCollect, tamParty, tamShard, tamPow, tamFight, tamStep, TAM, tamSim, tamTeam, tamStat, tamMobs, tamWin, tamIdle, tamCollect, tamShard, tamParty, tamPow, tamLvCost, tamOpen, setZone, geo, stPlay, stNext, ST, ST_SIDE, SIDE, missionGo, MGO, MGO_MINI, MGO_Q, renderMissions, renderPass, BOOST, conLeft, gameToday, setTab, ADX, adStamp, adxDay, adxCan, adxMore, adPickNow, adPickGive, conNear, renderAdStamp, claimOfflineDouble, startBoost, openBoost, showOffline, fvBoothStart, bfFwStart, musicWant, renderCounsel, renderXg, renderFv, showCeremony, RX, rxPct, rxCost, rxUp, rxPart, renderDept, goldOr, goldRich, adGold, stampAtt, GOLD, BIG, BF_DECO, bfWin, bfNext, bfOn, bfFw, bfSync, bfStamp, bfFwStart, bfPart, bfNextTx, sanitizeBf, freshBf, fvBoothMax, bldBox, bldPick, bldWarm, DECO_SLOTS, XG, MK, ST, SIDE, ST_SIDE, wdMap, xgOn, xgGuest, xgSpots, xgGreet, xgVisit, xgLunch, openXg, mkOn, mkHot, mkSell, mkBuy, mkSur, openMk, wdBar, wdTick, stTick, stPlay, stNext, stPick, stEnd, stTags, openSb, renderSb, sideCan, sideMap, fvFlag, FV, FV_POS, fvOn, fvOpen, fvBonus, fvSync, fvStamp, fvGuests, openFv, renderFv, fvMeet, fvBoothStart, fvMap, fvTip, festDef, goTo, navInfo, openShop, gdReady, thPreview, thPreviewEnd, thOn, busScene, tripCrowd, openTrip, startTrip, claimTrip, TRIPS, tripMult, openSheet, openRx, rtStart, rtLv, RT5, setZone, tamReg, promote, canPromote, get rxTier() { return RX_TIER; }, set rxTier(v) { RX_TIER = v; }, tamLvAllPlan, tamLvAllAsk, decoPut, decoUsed, get ZONE0() { return ZONE0; }, mgPickMul, mgPickMode, mgUpOrder, mgFillOrders, mgAdAsk, sportsCon, festCon, btQuota, btCanAd, btAdMore, warmRooms, blobUrl, vdSize, vdBlock, pzSweep, pzSwGain, pzSwOpen, pzXpOf, mgMulMax, mgMulOk, mgMul, mgModeTap, acTip, kidDupIdx, trialSafe, closeAd,
     TKE, TK_Q, tkDaily, nbAllDay, nbBuildAt, nbOn, conAdd, BX_SPOT, PERKS, offlineCapH, applyAway, pzFinish, mgClaimOrder,
     CS, JOBS, CS_WORRY, freshCs, csOpen, csLeft, csMax, csEnsure, csCands, csNeed, csMul, csOpenCards, csReady, csDone, csTalkMake, csAnswer, csChoose, csSettle, openCounsel, renderCounsel, renderHall, MAIN, qMeasure, qGoal, sanitize,   // 3.1.0 진로 상담
     NSL, nsStart, nsSettle, nsOpen, nsOn, nsOverlap, nsExtraH, isNight, nightDayOf, openNs, renderNs, bxSpots, renderNight,   // 3.0.0

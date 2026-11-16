@@ -125,6 +125,11 @@ t('stats read other', R('B', '/forest/stats/A'), false);
 t('stats read anon', R(null, '/forest/stats'), false);
 t('stats write own', W('B', '/forest/stats/B', Object.assign({}, STAT, { seen: { '.sv': 'timestamp' } })), true);
 t('stats write other', W('B', '/forest/stats/A', STAT), false);
+// 5.0.1 오늘 본 광고 수(adsT, adsD)
+t('stats write adsT', W('A', '/forest/stats/A', Object.assign({}, STAT, { adsT: 7, adsD: '2026-11-16' })), true);
+t('stats write adsT too big', W('A', '/forest/stats/A', Object.assign({}, STAT, { adsT: 10001, adsD: '2026-11-16' })), false);
+t('stats write adsD too long', W('A', '/forest/stats/A', Object.assign({}, STAT, { adsT: 1, adsD: '2026-11-16-x' })), false);
+t('stats write unknown key', W('A', '/forest/stats/A', Object.assign({}, STAT, { zz: 1 })), false);
 t('stats no pid', W('B', '/forest/stats/B', { seen: 1 }), false);
 // 1.5.6: 이어하기 코드 자리(moves)는 없앴어요. 남은 기록도 아무도 읽거나 쓰지 못해요
 const MV = { d: 'y', at: { '.sv': 'timestamp' }, from: 'B', v: '1.0' };
