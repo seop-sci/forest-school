@@ -39,7 +39,7 @@ python3 build_gh.py ..   # 맨 위 index.html (config.js가 이미 있으면 건
 
 ## 3. 안드로이드 (구글 플레이)
 
-- `main`에 `index.html`이나 `app/**`가 바뀌어 합쳐지면 `.github/workflows/android.yml`이 돌아요. 직접 돌릴 때는 Actions에서 Run workflow.
+- '앱 내자' 때 `git push origin main:app-release`로 그 커밋을 `app-release` 가지에 올리면 `.github/workflows/android.yml`이 돌아요. `main`에 합칠 때는 돌지 않아요(2026-11-17 woodani 결정). Actions 화면의 Run workflow로도 돌릴 수 있어요.
 - 결과: Actions 실행 기록 > Artifacts > `forest-school-android-<실행 번호>` (`.aab`는 플레이 콘솔용, `.apk`는 휴대폰 설치용).
 - 업로드 키 비밀값(`ANDROID_KEYSTORE_BASE64`, `ANDROID_KEYSTORE_PASSWORD`)이 없으면 시험용 디버그 APK만 나와요.
 - 플레이 콘솔 업로드는 사용자가 해요. minSdk 24, targetSdk 36 (`app/android/variables.gradle`).
@@ -75,6 +75,6 @@ npm run build            # dist/ 만들고 forest-school.ait로 묶어요 (index
 ## 웹 먼저, 앱은 나중에 (2026-11-15부터)
 - "웹에 올려줘": PR을 `main`에 합쳐요. 웹(GitHub Pages)만 바로 바뀌어요. 버전은 4.4.1, 4.4.1.1, 4.4.1.2처럼 이어서 올려요.
 - 사용자가 실제 게임에서 확인하고 고칠 것을 말하면 같은 방식으로 웹에 다시 내요.
-- "앱 내자": 그때의 `main`으로 토스 판(`cd toss && npm ci && npm run build`)을 만들어 보내고, 그 커밋의 안드로이드 빌드(Actions 결과물) 위치를 알려요. 플레이 콘솔과 토스 콘솔 업로드는 사용자가 해요.
+- "앱 내자": 그때의 `main`으로 토스 판(`cd toss && npm ci && npm run build`)을 만들어 보내고, 그 커밋을 `app-release` 가지로 올려 안드로이드 빌드를 돌리고 그 Actions 결과물 위치를 알려요. 플레이 콘솔과 토스 콘솔 업로드는 사용자가 해요.
 - 앱 버전은 웹 버전 그대로 써요(versionCode는 올려요).
 - 시험: 웹에 낼 때는 꼭 필요한 것만(jscheck, s37, 바뀐 곳 시험, 화면이면 s42 s62 s107 s128, 버전이면 s68). 전체 시험은 "앱 내자" 때.

@@ -25,9 +25,9 @@ Claude는 구현, 시험, 빌드, PR, 패치노트를 맡아요. 아래 공통 �
 2. Claude가 `main`에서 작업 브랜치를 만들어 구현해요. 브랜치 이름은 `feat/…`, `fix/…`, `chore/…`, `docs/…`.
 3. Claude가 시험을 돌리고 PR을 열어요. PR 본문에 Issue 번호, 바뀐 파일, 시험 결과(돌린 것과 못 돌린 것), 버전과 패치노트를 적어요.
 4. ChatGPT가 PR을 검토해요(아래 필수 검토 기준).
-5. 사용자가 승인하면 `main`에 합쳐요. `main`에 합치는 순간 GitHub Pages(웹)가 바뀌고 안드로이드 빌드가 돌아가므로, 합치기가 곧 배포예요. 사용자가 "업데이트하자"(또는 "반영해 줘")라고 하면 그 작업의 PR을 `main`에 합치는 승인까지 포함해요. 그 밖에는 사용자 승인 없이 `main`에 합치거나 직접 올리지 않아요.
+5. 사용자가 승인하면 `main`에 합쳐요. `main`에 합치는 순간 GitHub Pages(웹)가 바뀌므로, 합치기가 곧 웹 배포예요. 안드로이드 빌드는 '앱 내자' 때 `main`의 그 커밋을 `app-release` 가지로 올릴 때만 돌아요(2026-11-17 woodani 결정). 사용자가 "업데이트하자"(또는 "반영해 줘")라고 하면 그 작업의 PR을 `main`에 합치는 승인까지 포함해요. 그 밖에는 사용자 승인 없이 `main`에 합치거나 직접 올리지 않아요.
 6. 플레이 콘솔 업로드와 토스 콘솔 업로드는 사용자가 해요. Claude 화면의 게임(아티팩트)도 사용자가 승인한 뒤에 바꿔요("업데이트하자"에 포함).
-7. (2026-11-15 woodani 결정) 웹 먼저, 앱은 나중에: "웹에 올려줘"(또는 "업데이트하자")는 `main`에 합쳐 웹만 내는 것이에요. 사용자가 실제 게임에서 확인하고, 고칠 것은 4.4.1.1처럼 웹으로 계속 내요. "앱 내자"라고 하면 그때 토스 판(`forest-school.ait`)을 만들어 보내고, 그 커밋의 안드로이드 빌드 위치를 알려요. 안드로이드 빌드는 합칠 때마다 저절로 돌지만, 플레이 콘솔에는 "앱 내자" 때의 것만 올려요.
+7. (2026-11-15 woodani 결정) 웹 먼저, 앱은 나중에: "웹에 올려줘"(또는 "업데이트하자")는 `main`에 합쳐 웹만 내는 것이에요. 사용자가 실제 게임에서 확인하고, 고칠 것은 4.4.1.1처럼 웹으로 계속 내요. "앱 내자"라고 하면 그때 토스 판(`forest-school.ait`)을 만들어 보내고, 그 커밋을 `app-release` 가지로 올려(`git push origin main:app-release`) 안드로이드 빌드를 돌리고 위치를 알려요. 웹만 합칠 때는 안드로이드 빌드가 돌지 않아요.
 
 ### 필수 검토 기준 (모든 PR)
 1. 재화 계산: 도토리, 황금 도토리, 수료증, 기금, 쪽지가 생기거나 줄어드는 곳이 바뀌었는지. 바뀌었다면 값이 유한하고 상식적인 크기인지(Infinity, NaN, 10^15 넘는 값이 없는지), 학교급마다 `costScale()`과 `incomeScale()`에 맞는지.
@@ -70,7 +70,7 @@ python3 runall.py all           # "앱 내자" 때 전부 (20분쯤)
 python3 build_gh.py ..          # 맨 위 index.html 다시 만들기
 cd ../toss && npm ci && npm run build   # 토스 판 forest-school.ait (사용자에게 보내요)
 ```
-- 안드로이드는 `main`에 합쳐지면 GitHub Actions(`.github/workflows/android.yml`)가 만들어요.
+- 안드로이드는 '앱 내자' 때 `git push origin main:app-release`로 그 커밋을 `app-release` 가지에 올리면 GitHub Actions(`.github/workflows/android.yml`)가 만들어요. 같은 커밋을 다시 빌드하려면 Actions 화면의 Run workflow(사용자)로 해요.
 - 가짜 Firebase 서버를 쓰는 시험(s7, s18, s26, s27, s34)은 `targaryen` npm 꾸러미가 필요해요(`NODE_PATH`로 잡아요).
 - 시험 하나만 볼 때는 `python3 wrap.py && python3 s37test.py`. 모든 시험은 마지막 줄 PASS와 끝 코드 0으로 판정해요(`dev/testlib.py`).
 - 서버 규칙의 원본은 `dev/gh_database.rules.json`이에요. 그곳을 고치고 맨 위 `database.rules.json`으로 복사해요. 밀어 올리기 전에 `sh dev/precheck.sh`(git hook pre-push)로 GitHub 검사와 같은 것을 먼저 봐요.

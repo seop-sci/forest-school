@@ -11,8 +11,8 @@ ROOT = HERE.parent
 ALL = sorted(int(re.fullmatch(r's(\d+)test\.py', f.name).group(1)) for f in HERE.glob('s*test.py') if re.fullmatch(r's(\d+)test\.py', f.name))
 FB = [7, 18, 26, 27, 34, 44, 97, 98, 116, 118]                    # 가짜 Firebase 서버(node, targaryen)가 있어야 해요
 GROUPS = {
-    'quick': [37, 68, 42, 62, 107, 128, 146, 147, 148],         # + jscheck, driftcheck (아래 EXTRA)
-    'ui': [42, 62, 107, 109, 128, 138, 41, 52, 73, 146, 147, 149],
+    'quick': [37, 68, 42, 62, 107, 128, 151, 147, 148],         # + jscheck, driftcheck (아래 EXTRA)
+    'ui': [42, 62, 107, 109, 128, 138, 41, 52, 73, 151, 147, 149],
     'save': [148, 117, 66, 54, 72, 100, 147],
     'fb': FB,
     'all': ALL,
