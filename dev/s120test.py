@@ -3,8 +3,7 @@
 # 다음 달 새 판, 다음 해 같은 달에 다시 받기, 옛 저장, 엉뚱한 저장, 360px에서 창이 넘치지 않는지
 import asyncio, json
 from playwright.async_api import async_playwright
-from s4test import ctxpage, base
-F = 'window.__forest'
+from testlib import ctxpage, base, F
 CLEAN = f"(()=>{{ document.querySelectorAll('.overlay').forEach(o=>{{o.hidden=true;o.classList.remove('open')}}); const F={F}; F.rt.modalOpen=null; F.rt.modalQueue.length=0; F.rt.talkSeq=null; F.rt.st=null; F.closeSheet&&F.closeSheet(); }})()"
 CLOCK = lambda day, h=10: f"(()=>{{ const F={F}; F.rt.fakeNow=Date.parse('{day}T00:00:00Z')-9*3600000+{h}*3600000; F.fvSync(); return F.gameToday(); }})()"
 async def main():

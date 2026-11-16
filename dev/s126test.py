@@ -2,8 +2,7 @@
 # 그림 71장이 img/story에 있고, 장면 가운데 줄부터 둘째 그림으로 바뀌어요(중심 이야기, 곁가지). 그림이 없는 장면은 첫 그림 그대로
 import asyncio, pathlib
 from playwright.async_api import async_playwright
-from s4test import ctxpage, base
-F = 'window.__forest'
+from testlib import ctxpage, base, F
 ROOT = pathlib.Path(__file__).resolve().parent.parent
 async def main():
     bad = []

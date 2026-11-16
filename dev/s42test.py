@@ -2,8 +2,7 @@
 # 쓰는 법: python3 wrap.py && python3 s42test.py   (마지막 줄이 PASS면 통과)
 import asyncio, sys
 from playwright.async_api import async_playwright
-from s4test import URL
-F = 'window.__forest'
+from testlib import URL, F
 
 async def main():
     fails = []

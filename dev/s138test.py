@@ -2,7 +2,7 @@
 # 쓰는 법: python3 wrap.py && python3 s138test.py   (마지막 줄이 PASS면 통과)
 import asyncio, math, sys
 from playwright.async_api import async_playwright
-from s4test import base, ctxpage
+from testlib import base, ctxpage
 bad = []
 # 길 그래프의 선에서 얼마나 떨어졌는지(지도 칸). 자리 둘레 흩어짐(2.5)과 걸음 사이 여유를 더해 5칸까지 괜찮아요
 FAR = 5

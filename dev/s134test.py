@@ -3,8 +3,7 @@
 # 3) 레벨 단추를 꾹 누르면 계속 오르고, 손을 떼면 멈춰요(뗄 때 클릭으로 한 번 더 오르지 않아요)  4) 도토리는 쓴 만큼만 줄고 모두 유한해요
 import asyncio, json
 from playwright.async_api import async_playwright
-from s4test import ctxpage, base
-F = 'window.__forest'
+from testlib import ctxpage, base, F
 async def main():
     bad = []
     def ok(c, msg):

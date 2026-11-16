@@ -2,8 +2,7 @@
 # 대축제 날에는 캠퍼스, 학술, 생활, 체육 구역에 만국기(광장은 축제 모습 그대로), 대축제가 아닌 축제 날과 다른 날에는 광장 말고 없음
 import asyncio
 from playwright.async_api import async_playwright
-from s4test import ctxpage, base
-F = 'window.__forest'
+from testlib import ctxpage, base, F
 CLOCK = lambda day, h=10: f"(()=>{{ const F={F}; F.rt.fakeNow=Date.parse('{day}T00:00:00Z')-9*3600000+{h}*3600000; F.fvSync(); return F.gameToday(); }})()"
 async def main():
     bad = []

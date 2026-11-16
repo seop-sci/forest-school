@@ -10,9 +10,8 @@
 # 쓰는 법: python3 wrap.py && python3 s80test.py   (마지막 줄이 PASS면 통과)
 import asyncio
 from playwright.async_api import async_playwright
-from s4test import URL
+from testlib import URL, F
 import s73test as T
-F = 'window.__forest'
 CITY = f"(() => {{ const F = {F}, S = F.S; let n = 0; while (F.gradeOf(F.rep()) < 4 && n < 200) {{ S.f.library += 1; n++; }} F.checkGrade(); return S.grade; }})()"
 SEMG = f"(() => {{ const F = {F}, S = F.S; const i = F.MAIN.findIndex(q => q.sy === S.tg + 1 && (q.yt || 1) === S.tier); if (i >= 0) S.q.m = i; return i; }})()"
 GATE = f"(() => {{ const F = {F}, S = F.S; const i = F.MAIN.findIndex(q => q.ye === S.tg + 1 && (q.yt || 1) === S.tier); if (i >= 0) S.q.m = i; return i; }})()"

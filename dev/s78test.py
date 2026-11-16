@@ -10,9 +10,8 @@
 # 쓰는 법: python3 wrap.py && python3 s78test.py   (마지막 줄이 PASS면 통과)
 import asyncio
 from playwright.async_api import async_playwright
-from s4test import URL
+from testlib import URL, F
 import s73test as T
-F = 'window.__forest'
 
 async def main():
     bad = []

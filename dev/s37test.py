@@ -3,7 +3,7 @@
 # 쓰는 법: python3 wrap.py && python3 s37test.py   (마지막 줄이 "PASS"면 통과, 아니면 실패한 검사를 적고 끝 코드 1)
 import asyncio, json, sys
 from playwright.async_api import async_playwright
-from s4test import URL
+from testlib import URL
 
 # 여러 시점의 학교를 만들어 놓고 모든 메인 퀘스트를 검사해요
 STATES = {

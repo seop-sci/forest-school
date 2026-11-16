@@ -1,7 +1,7 @@
 # 3.0.0 통합: 고등학교 자율학습 경계, 한 번 받기, 옛 저장, 휴대폰 창
 import asyncio, json
 from playwright.async_api import async_playwright
-from s4test import ctxpage, base
+from testlib import ctxpage, base
 
 async def main():
     async with async_playwright() as p:

@@ -10,9 +10,8 @@
 # 쓰는 법: python3 wrap.py && python3 s87test.py   (마지막 줄이 PASS면 통과)
 import asyncio
 from playwright.async_api import async_playwright
-from s4test import URL
+from testlib import URL, F
 import s73test as T
-F = 'window.__forest'
 OVER = """(sel => { const out = []; document.querySelectorAll(sel).forEach(el => { const r = el.getBoundingClientRect(); if (r.width && (r.right > innerWidth + 1 || r.left < -1 || el.scrollWidth > el.clientWidth + 2)) out.push((el.id || el.className) + ' ' + Math.round(r.left) + '~' + Math.round(r.right)); }); return out; })"""
 
 

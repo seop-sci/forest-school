@@ -2,6 +2,7 @@
 #  1) 서버 저장의 v가 더 큰 버전(9.9.0)이면: 묻는 창 없이 이 기기 학교 그대로, 서버 저장도 그대로, 설정에 업데이트 안내
 #  2) 끝자리만 다른 버전(같은 앞자리와 가운데 자리)은 예전처럼 받아요
 # 쓰는 법: python3 wrap.py && python3 build_gh.py gh && python3 s116test.py   (마지막 줄이 PASS면 통과)
+import testlib   # 5.0.2 실패하면 끝 코드 1(dev/testlib.py)
 import asyncio, json, time, subprocess, re
 from playwright.async_api import async_playwright
 import s7test

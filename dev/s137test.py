@@ -5,8 +5,7 @@
 # 4) 빠른 스킵: 한 번 공격으로 모두 쓰러지는 층까지만, 상한을 넘지 않고, 누르면 그 층까지 넘어가요
 import asyncio, json
 from playwright.async_api import async_playwright
-from s4test import ctxpage, base
-F = 'window.__forest'
+from testlib import ctxpage, base, F
 async def main():
     bad = []
     def ok(c, msg):

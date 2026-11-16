@@ -6,6 +6,7 @@
 #  4) 옛 기기: 이 기기에 초등 학교, 서버에 더 키운 중학교 학교(더 일찍 저장) → 덮어 올리지 않고 물어봐요
 #  5) 진행이 같으면 예전처럼 묻지 않아요(s7 newer, older와 같음). 페이지 오류 없음
 # 쓰는 법: python3 wrap.py && python3 build_gh.py gh && python3 s97test.py   (마지막 줄이 PASS면 통과, 가짜 서버 시험이라 다른 서버 시험과 따로 돌려요)
+import testlib   # 5.0.2 실패하면 끝 코드 1(dev/testlib.py)
 import asyncio, json, time, subprocess
 from playwright.async_api import async_playwright
 import s7test

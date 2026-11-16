@@ -2,7 +2,7 @@
 # 쓰는 법: python3 wrap.py && python3 s142test.py   (마지막 줄이 PASS면 통과)
 import asyncio
 from playwright.async_api import async_playwright
-from s4test import base, ctxpage
+from testlib import base, ctxpage
 bad = []
 JS = """(async (th) => { const F = window.__forest, S = F.S, sl = ms => new Promise(r => setTimeout(r, ms));
   document.querySelectorAll('.overlay').forEach(o => { o.hidden = true; }); F.rt4.modalOpen = null; F.rt4.modalQueue.length = 0;

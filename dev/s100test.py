@@ -2,10 +2,8 @@
 # 쓰는 법: python3 wrap.py && python3 s100test.py   (마지막 줄이 PASS면 통과)
 import asyncio, json, datetime
 from playwright.async_api import async_playwright
-from s4test import URL
+from testlib import URL, F, CLEAN
 from tclock import PAST
-F = 'window.__forest'
-CLEAN = "document.querySelectorAll('.overlay').forEach(o=>{o.hidden=true;o.classList.remove('open')}); window.__forest.rt.modalOpen=null; window.__forest.rt.modalQueue.length=0"
 SKIP = f"(()=>{{ const t=document.querySelector('#tut'); if(t) t.hidden=true; {F}.S.tut.st='skip'; {F}.rt.tut=null; {CLEAN}; }})()"
 def kst(y, m, d, h): return int(datetime.datetime(y, m, d, h, 0, 0, tzinfo=datetime.timezone(datetime.timedelta(hours=9))).timestamp() * 1000)
 

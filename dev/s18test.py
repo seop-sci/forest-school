@@ -1,3 +1,4 @@
+import testlib   # 5.0.2 실패하면 끝 코드 1(dev/testlib.py)
 import asyncio, json, subprocess, time
 from playwright.async_api import async_playwright
 import s7test as T

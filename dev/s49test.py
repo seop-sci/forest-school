@@ -3,9 +3,8 @@
 # 쓰는 법: python3 wrap.py && python3 s49test.py   (마지막 줄이 "PASS"면 통과)
 import asyncio, json, sys
 from playwright.async_api import async_playwright
-from s4test import URL
+from testlib import URL, F
 from tclock import PAST
-F = 'window.__forest'
 SKIPTUT = "const t=document.querySelector('#tut'); if(t && !t.hidden){ window.__forest.S.tut.st='skip'; t.hidden=true; window.__forest.rt.modalOpen=null; }"
 DAY = 86400000
 

@@ -3,7 +3,7 @@
 import asyncio, sys
 sys.path.insert(0, '.')
 from playwright.async_api import async_playwright
-from s4test import ctxpage, base
+from testlib import ctxpage, base
 async def main():
     async with async_playwright() as p:
         b = await p.chromium.launch()

@@ -1,10 +1,10 @@
 # 1.5.4 시험 (가짜 Firebase): 구글 계정 바꾸기가 끊겼을 때, 계정 지우기가 거절됐을 때
 # 쓰는 법: python3 build_gh.py gh && NODE_PATH=<targaryen 폴더> python3 s44test.py   (마지막 줄이 PASS면 통과)
+from testlib import F   # 5.0.2 공통 모듈(실패하면 끝 코드 1)
 import asyncio, json, sys, subprocess, time
 from playwright.async_api import async_playwright
 import s7test
 from s7test import HERE, PORT, ORIGIN, api, mode, dump, device, wait_cloud, elem, kinder, local, uid_of, toast, push_now
-F = 'window.__forest'
 fails = []
 def check(name, ok, info=''):
     if not ok: fails.append(f'{name} {info}')

@@ -8,9 +8,7 @@
 # 쓰는 법: python3 wrap.py && python3 s146test.py   (마지막 줄이 PASS면 통과)
 import asyncio, sys
 from playwright.async_api import async_playwright
-from s4test import ctxpage, base
-F = 'window.__forest'
-CLEAN = "document.querySelectorAll('.overlay').forEach(o=>{o.hidden=true;o.classList.remove('open')}); window.__forest.rt.modalOpen=null; window.__forest.rt.modalQueue.length=0"
+from testlib import ctxpage, base, F, CLEAN
 COUNT = """async (a) => { const [sel, opt, ms, pick] = a; const root = document.querySelector(sel); let n = 0;
   const mo = new MutationObserver(rs => { for (const r of rs) { if (pick && !(r.target.closest && r.target.closest(pick)) && !(r.target.parentElement && r.target.parentElement.closest(pick))) continue; n++; } });
   mo.observe(root, opt); const t0 = performance.now(); let frames = 0, busy = 0, last = t0;

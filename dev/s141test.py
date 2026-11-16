@@ -3,7 +3,7 @@
 # 쓰는 법: python3 wrap.py && python3 s141test.py   (마지막 줄이 PASS면 통과)
 import asyncio
 from playwright.async_api import async_playwright
-from s4test import base, ctxpage
+from testlib import base, ctxpage
 bad = []
 def ok(c, m):
     if not c: bad.append(m)

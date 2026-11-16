@@ -6,8 +6,7 @@
 # 쓰는 법: python3 wrap.py && python3 s69test.py   (마지막 줄이 PASS면 통과)
 import asyncio, json
 from playwright.async_api import async_playwright
-from s4test import URL
-F = 'window.__forest'
+from testlib import URL, F
 LIVE = 'https://live.test/live.json'
 GOOD = {'v': 3, 'cfg': {'pz.perDay': 12, 'mg.adE': 999, 'pace': 'x', 'bogus': 5, 'ev.scale': 1},
         'off': ['merge', 'hack'],

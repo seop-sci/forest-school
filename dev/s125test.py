@@ -2,8 +2,7 @@
 # 오늘의 미션, 이번 주 미션, 패스 미션, 이벤트 미션 줄에 '가기', 누르면 탭이나 창이 바뀌고 오류가 없어요. 받기나 끝난 미션에는 없어요
 import asyncio
 from playwright.async_api import async_playwright
-from s4test import ctxpage, base
-F = 'window.__forest'
+from testlib import ctxpage, base, F
 CLEAN = "document.querySelectorAll('.overlay.center').forEach(o=>{o.hidden=true;o.classList.remove('open')}); const RT=window.__forest.rt4; RT.modalOpen=null; RT.modalQueue.length=0; document.querySelectorAll('.pz').forEach(o=>o.hidden=true);"
 async def main():
     bad = []

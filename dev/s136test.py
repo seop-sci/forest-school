@@ -6,8 +6,7 @@
 # 5) 행사가 열린 동안 광장 둘레에 선 선생님은 바깥으로 비켜요(평소에는 제자리)
 import asyncio, json
 from playwright.async_api import async_playwright
-from s4test import ctxpage, base
-F = 'window.__forest'
+from testlib import ctxpage, base, F
 async def main():
     bad = []
     def ok(c, msg):

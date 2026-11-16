@@ -9,9 +9,7 @@
 # 쓰는 법: python3 wrap.py && python3 s66test.py   (마지막 줄이 PASS면 통과)
 import asyncio, json
 from playwright.async_api import async_playwright
-from s4test import URL
-F = 'window.__forest'
-CLEAN = "document.querySelectorAll('.overlay').forEach(o=>{o.hidden=true;o.classList.remove('open')}); window.__forest.rt.modalOpen=null; window.__forest.rt.modalQueue.length=0"
+from testlib import URL, F, CLEAN
 SKIP = f"(()=>{{ const t=document.querySelector('#tut'); if(t) t.hidden=true; {F}.S.tut.st='skip'; {F}.rt.tut=null; {CLEAN}; }})()"
 OVER = """(sel) => { const W = innerWidth; const r = document.querySelector(sel); if (!r) return -1;
   return [...r.querySelectorAll('*')].filter(e => { const q = e.getBoundingClientRect(); return q.width && e.offsetParent !== null && (q.right > W + 1 || q.left < -1); }).length; }"""

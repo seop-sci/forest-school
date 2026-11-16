@@ -8,11 +8,10 @@
 #  5) 고급 배경: 켜면 고급 지도와 건물 열쇠, 끄면 원래대로
 #  6) 페이지 오류 없음
 # 쓰는 법: python3 wrap.py && python3 s109test.py   (마지막 줄이 PASS면 통과)
+from testlib import F, CLEAN   # 5.0.2 공통 모듈(실패하면 끝 코드 1)
 import os, sys
 from playwright.sync_api import sync_playwright
 HERE = os.path.dirname(os.path.abspath(__file__))
-F = 'window.__forest'
-CLEAN = "document.querySelectorAll('.overlay').forEach(o=>{o.hidden=true;o.classList.remove('open')}); window.__forest.rt.modalOpen=null; window.__forest.rt.modalQueue.length=0"
 SKIP = f"(()=>{{ const t=document.querySelector('#tut'); if(t) t.hidden=true; {F}.S.tut.st='skip'; {F}.rt.tut=null; {CLEAN}; }})()"
 ok = True
 def check(c, m):

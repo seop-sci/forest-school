@@ -3,9 +3,7 @@
 # 쓰는 법: python3 wrap.py && python3 s101test.py   (마지막 줄이 PASS면 통과. 밤 8시부터 자정 사이에는 PYTHONPATH=/tmp/noon)
 import asyncio
 from playwright.async_api import async_playwright
-from s4test import URL
-F = 'window.__forest'
-CLEAN = "document.querySelectorAll('.overlay').forEach(o=>{o.hidden=true;o.classList.remove('open')}); window.__forest.rt.modalOpen=null; window.__forest.rt.modalQueue.length=0"
+from testlib import URL, F, CLEAN
 SKIP = f"(()=>{{ const t=document.querySelector('#tut'); if(t) t.hidden=true; {F}.S.tut.st='skip'; {F}.rt.tut=null; {CLEAN}; }})()"
 
 async def main():

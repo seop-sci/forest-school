@@ -1,34 +1,8 @@
 import asyncio, json, pathlib, time, datetime, sys
 from playwright.async_api import async_playwright
-URL = pathlib.Path('test.html').resolve().as_uri()
-TODAY = datetime.date.today().isoformat()
+from testlib import URL, TODAY, BIG, base, ctxpage   # 5.0.2 공통 부분은 testlib.py로 옮겼어요(다른 시험은 testlib에서 바로 가져와요)
 SEL = sys.argv[1:]
 want = lambda n: not SEL or n in SEL
-BIG = dict(classroom=14, cafeteria=12, library=11, playground=8)
-
-def base(**kw):
-    s = {'v':4,'budget':1e6,'students':60,'f':dict(BIG),'t':{'squirrel':5,'owl':5,'bear':5},'grade':4,'best':4,'sound':False,'vibrate':False,
-         'savedAt':int(time.time()*1000),'pending':0,'pendingSec':0,'certNo':5,'earned':9e7,'yearEarned':3e6,
-         'st':{'picks':40,'ups':90,'trains':20,'claims':3,'grads':0,'perks':0},
-         'p':{'dip':0,'species':0,'perk':{'schol':0,'rep':0,'start':0,'drop':0,'night':0}},'att':{'last':TODAY,'n':2},'ad':{'day':'','n':0},'u':{'boost':True},
-         'tier':0,'tg':0,'tdip':0,'fund':0,'fp':{'schol':0,'rep':0,'dip':0},
-         'q':{'init':True,'mid':'q22','m':22,'mb':0,'subs':[],'done':[],'gen':0,'subDone':5,'seen':22}}
-    s.setdefault('rank', {'name': '', 'joined': False, 'sent': -1, 'by': '', 'asked': True})
-    s.update(kw); return s
-
-async def ctxpage(b, w, h, scheme, save):
-    ctx = await b.new_context(viewport={'width':w,'height':h}, device_scale_factor=2, is_mobile=True, has_touch=True, color_scheme=scheme)
-    await ctx.add_init_script("window.__FOREST_TEST = true;")   # 2026-10-30: 업데이트 공지 창이 늦게 떠서 단추를 가려요. 시험 모드에서는 공지를 저절로 띄우지 않아요
-    await ctx.add_init_script("if(!sessionStorage.getItem('seeded')){localStorage.setItem('forest-school-v1', %s);sessionStorage.setItem('seeded','1');}" % json.dumps(json.dumps(save)))
-    page = await ctx.new_page(); errs = []
-    page.on('pageerror', lambda e: errs.append(str(e)))
-    page.on('console', lambda m: errs.append('console:'+m.text) if m.type=='error' and 'ERR_TUNNEL' not in m.text and 'ERR_FILE_NOT_FOUND' not in m.text else None)   # 3.3.0부터 졸업식 큰 그림(img/cere)은 게임 밖 파일이라 시험 폴더에는 없어요
-    await page.goto(URL); await page.wait_for_timeout(900)
-    # 2.0.0부터 업데이트 뒤 첫 접속에 공지 창이 떠요. 이 시험은 공지를 보지 않으니 닫아요(2026-10-29)
-    for _ in range(3):
-        if not await page.evaluate("!document.querySelector('#mNotice').hidden"): break
-        await page.evaluate("document.querySelector('#ntClose').click()"); await page.wait_for_timeout(300)
-    return ctx, page, errs
 
 BOARD = """(() => { const q = s => document.querySelector(s);
   const over = [...document.querySelectorAll('.stat')].filter(e => !e.hidden).map(e => e.scrollWidth > e.clientWidth + 1);

@@ -3,7 +3,7 @@
 # 쓰는 법: python3 wrap.py && python3 s110test.py   (마지막 줄이 PASS면 통과)
 import asyncio, sys
 from playwright.async_api import async_playwright
-from s4test import URL
+from testlib import URL
 
 SETUP = r"""(tier) => {
   const F = window.__forest, S = F.S;
