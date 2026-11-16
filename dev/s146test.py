@@ -35,7 +35,10 @@ async def main():
         # 2) 건물 창
         await page.evaluate(f"(()=>{{ const F={F}; F.S.t.squirrel = Math.max(1, F.S.t.squirrel); F.openSheet('classroom'); }})()"); await page.wait_for_timeout(900)
         n = await page.evaluate("document.querySelectorAll('#roomWalk .wk').length")
-        r = await page.evaluate(COUNT, ['#roomWalk', {'childList': True}, 2000, '']); print('건물 창: 걷는 친구', n, '명, 자식 바뀜', r)
+        # 방을 새로 그릴 때(레벨, 추천 가구가 바뀔 때) 걷는 친구를 새로 만드는 것은 세지 않고, 이미 있던 친구를 다시 붙이는 것(줄 세우기)만 세요
+        r = await page.evaluate("""async (ms) => { const g = document.querySelector('#roomWalk'); let seen = new Set(g.children), n = 0;
+          const mo = new MutationObserver(rs => { for (const r of rs) for (const x of r.addedNodes) { if (seen.has(x)) n++; else seen.add(x); } });
+          mo.observe(g, { childList: true }); await new Promise(res => setTimeout(res, ms)); mo.disconnect(); return { per: +(n / (ms / 1000)).toFixed(1) }; }""", 2500); print('건물 창: 걷는 친구', n, '명, 다시 붙임', r)
         ok(n >= 2 and r['per'] < 5, f"건물 창 #roomWalk 자식 바뀜 5회/초 아래 {r['per']}")
         r2 = await page.evaluate(COUNT, ['#roomWalk', {'attributes': True, 'subtree': True, 'attributeFilter': ['transform']}, 1000, '']); print('  걷기 transform', r2)
         ok(0 < r2['per'] <= 40 * n, '걷기는 1초에 30번쯤')
