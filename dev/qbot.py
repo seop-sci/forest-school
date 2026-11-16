@@ -14,7 +14,7 @@
 #   --until 학교급       그 학교급(0 유치원 ~ 5 대학원)을 마치면 멈춰요(기본 5)
 import asyncio, json, sys
 from playwright.async_api import async_playwright
-from s4test import URL
+from testlib import URL
 
 JS = r"""(cfg) => { const F = window.__forest, S = F.S, quests = [], years = [], notes = [], bad = [];
   const clean = () => { F.rt.modalQueue.length = 0; F.rt.modalOpen = null; if (F.rt.st) F.rt.st = null; };

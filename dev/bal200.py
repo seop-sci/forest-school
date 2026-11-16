@@ -8,7 +8,7 @@
 # 결과: 해마다 걸린 시간(분), 퀘스트마다 걸린 시간, 수업료 배수. dev/bal200_<이름>.json에도 적어요
 import asyncio, json, sys, time
 from playwright.async_api import async_playwright
-from s4test import URL
+from testlib import URL
 
 BOT = r"""(o) => {
   const F = window.__forest, cfg = o.cfg || {};

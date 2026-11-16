@@ -64,14 +64,15 @@ Claude는 구현, 시험, 빌드, PR, 패치노트를 맡아요. 아래 공통 �
 ### 시험하고 만들 때
 ```bash
 cd dev
-python3 wrap.py                 # 시험용 test.html
-python3 s37test.py              # 교감 선생님 지원 회귀 시험 (PASS여야 해요)
-python3 s86test.py              # 그 밖에 바뀐 곳에 맞는 시험 (docs/TESTING.md)
+python3 runall.py quick         # 웹에 먼저 낼 때 보는 묶음: 문법, 어긋남 검사, s37(교감 선생님 지원, PASS여야 해요), 화면, 저장 읽기. wrap.py도 함께 돌아요
+python3 runall.py 86 120        # 그 밖에 바뀐 곳에 맞는 시험을 번호로 (docs/TESTING.md). 묶음: quick, ui, save, fb, all
+python3 runall.py all           # "앱 내자" 때 전부 (20분쯤)
 python3 build_gh.py ..          # 맨 위 index.html 다시 만들기
 cd ../toss && npm ci && npm run build   # 토스 판 forest-school.ait (사용자에게 보내요)
 ```
 - 안드로이드는 `main`에 합쳐지면 GitHub Actions(`.github/workflows/android.yml`)가 만들어요.
 - 가짜 Firebase 서버를 쓰는 시험(s7, s18, s26, s27, s34)은 `targaryen` npm 꾸러미가 필요해요(`NODE_PATH`로 잡아요).
+- 시험 하나만 볼 때는 `python3 wrap.py && python3 s37test.py`. 모든 시험은 마지막 줄 PASS와 끝 코드 0으로 판정해요(`dev/testlib.py`).
 - 서버 규칙의 원본은 `dev/gh_database.rules.json`이에요. 그곳을 고치고 맨 위 `database.rules.json`으로 복사해요. 밀어 올리기 전에 `sh dev/precheck.sh`(git hook pre-push)로 GitHub 검사와 같은 것을 먼저 봐요.
 
 ### 끝낼 때
