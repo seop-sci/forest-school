@@ -113,7 +113,7 @@ async def main():
                 br = r['br']
                 if len(br) != 5 or any(s[0] != 'fox' for s in br) or sum(1 for s in br if s[3] == 1) != 3 or any('<' in s[1] for s in br) or any(not (1 <= v <= 100) for s in br for v in s[2]):
                     bad.append(f'망가진 명부 {br}')
-                if '5' in r['snap'] or r['snap'].get('1', {}).get('f', {}).get('classroom') != 999:   # 5.0.3 시설 레벨 상한 99 → 999 bad.append(f'망가진 사진 {r["snap"]}')
+                if '5' in r['snap'] or r['snap'].get('1', {}).get('f', {}).get('classroom') != 999: bad.append(f'망가진 사진 {r["snap"]}')   # 5.0.3 시설 레벨 상한 99 → 999
                 # fpUp 퀘스트: 학교급에 와서 고친 횟수
                 r = await pg.evaluate(f"""(() => {{ const F = {F}, S = F.S, q = F.MAIN.find(x => x.id === 'j29'); const a = F.qMeasure(q); S.fund = 100; F.buyFundPerk('schol', document.body); {CLEAN}; return [a, F.qMeasure(q)]; }})()""")
                 if r != [0, 1]: bad.append(f'장학재단 퀘스트 {r}')
