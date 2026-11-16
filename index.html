@@ -8955,6 +8955,9 @@ body.cam-scene #ffChip,body.cam-scene #plChip,body.cam-scene .b-ring{animation-p
   // 서버 시간을 받을 수 있는 판인지(웹과 구글 플레이는 Firebase, 토스는 Environment.getServerTime). Claude 화면과 옛 토스앱은 기기 시계를 써요
   const timeSrc = () => hasCloudBuild() || !!(AIT && AIT.serverTime);
   const gameToday = () => kstDay(gameNow());
+  // 하루가 바뀌었으면 o.day를 오늘로 바꾸고 true를 돌려줘요. 하루 횟수를 0으로 돌리는 곳에서 써요: if (dayRoll(S.rd)) { S.rd.n = 0; }
+  // 저장(save)은 부르지 않아요. 부르던 곳은 그 자리에서 그대로 불러요. 칸을 통째로 새로 만드는 곳(S.ffd = { day, n: 0 } 같은 곳)은 이 도우미를 쓰지 않아요
+  const dayRoll = (o, t = gameToday()) => o.day !== t && (o.day = t, true);
   const gameWeek = () => Math.floor((gameNow() + KST_MS - Date.UTC(2026, 0, 5)) / 604800000);
   const boostLeft = () => BOOST.perDay - (S.ad.day === gameToday() ? S.ad.n : 0);
   const boostAmount = () => Math.max(100, nice(rate() * 60 * BOOST.min));
@@ -9004,7 +9007,7 @@ body.cam-scene #ffChip,body.cam-scene #plChip,body.cam-scene .b-ring{animation-p
   // 2.3.0.1 퍼즐과 합치기 단축권: 하루 TKE.perDay장까지
   function tkDaily(key) {
     if (!S || !S.tkd) return null;
-    const t = gameToday(); if (S.tkd.day !== t) { S.tkd.day = t; S.tkd.pz = 0; S.tkd.mg = 0; }
+    const t = gameToday(); if (dayRoll(S.tkd, t)) { S.tkd.pz = 0; S.tkd.mg = 0; }
     if ((S.tkd[key] || 0) >= TKE.perDay) return null;
     const it = tkGive(key); if (it) S.tkd[key] = (S.tkd[key] || 0) + 1;
     return it;
@@ -12445,7 +12448,7 @@ body.cam-scene #ffChip,body.cam-scene #plChip,body.cam-scene .b-ring{animation-p
     .map(([k, nm, r]) => ({ id: 'snack_' + k, nm, rare: !!r }));
   const snOpen = () => !!S && !!S.sn && S.tier >= SN.tier && (S.f.store || 0) >= 1;
   const snCount = () => S && S.sn ? SN_ALL.filter(x => S.sn.got[x.id]).length : 0;
-  function snSync() { if (!S || !S.sn) return; const t = gameToday(); if (S.sn.day !== t) { S.sn.day = t; S.sn.mood = 0; } }
+  function snSync() { if (!S || !S.sn) return; const t = gameToday(); if (dayRoll(S.sn, t)) { S.sn.mood = 0; } }
   const snMult = () => S && S.sn && S.tier >= SN.tier ? 1 + S.sn.mood / 100 : 1;
   const snBase = () => Math.max(1, rate() / (feastOn() ? 2 : 1) / snMult() / gdMult());
   const snCost = ten => Math.max(1, Math.ceil(snBase() * 60 * (ten ? SN.tenMin : SN.min) * (1 - deptX('biz') / 100)));
@@ -13201,7 +13204,7 @@ body.cam-scene #ffChip,body.cam-scene #plChip,body.cam-scene .b-ring{animation-p
     if (tkAdLeft() <= 0) { toast('오늘 광고 단축권은 다 받았어요. 내일 다시 받아요'); return; }
     showAd(() => {
       const today = gameToday();
-      if (S.tka.day !== today) { S.tka.day = today; S.tka.n = 0; }
+      if (dayRoll(S.tka, today)) { S.tka.n = 0; }
       S.tka.n += 1; S.tk.m5 += TKAD.n;
       sfx('quest'); toast(`5분 단축권 ${TKAD.n}장을 받았어요!`);
       conRender(true); save();
@@ -13676,7 +13679,7 @@ body.cam-scene #ffChip,body.cam-scene #plChip,body.cam-scene .b-ring{animation-p
     closeModal($('#mBoost'), () => showAd(() => {
       const v = boostAmount();   // 광고를 다 본 순간의 수업료로 계산해요
       const today = gameToday();
-      if (S.ad.day !== today) { S.ad.day = today; S.ad.n = 0; }
+      if (dayRoll(S.ad, today)) { S.ad.n = 0; }
       S.ad.n += 1;
       if (pk !== 'acorn') { const tx = adPickGive(pk); sfx('quest'); buzz(15); toast(`보충수업 끝! ${tx}`); save(); renderHUD(); renderAffordance(); return; }   // 4.2.0
       S.budget += v; earn(v);
@@ -13819,7 +13822,7 @@ body.cam-scene #ffChip,body.cam-scene #plChip,body.cam-scene .b-ring{animation-p
     if (rt.deal === d) rt.deal = null;
     if (!dealValid(d)) { renderDeal(); toast('까치가 다른 소식을 찾으러 갔어요'); return; }
     const today = gameToday();
-    if (S.hd.day !== today) { S.hd.day = today; S.hd.n = 0; }
+    if (dayRoll(S.hd, today)) { S.hd.n = 0; }
     S.hd.n += 1;
     if (d.type === 'fac' || d.type === 'tea') {
       const isFac = d.type === 'fac';
@@ -15651,7 +15654,7 @@ body.cam-scene #ffChip,body.cam-scene #plChip,body.cam-scene .b-ring{animation-p
     (q.t === 'students' && q.n >= 50) || (q.t === 'fac' && q.n >= 10 && !q.step) || (q.t === 'picks' && q.n >= 15) ||
     (q.t === 'trips' && q.n >= 3) || q.t === 'souv' || q.t === 'tripat' || q.t === 'sports' || q.t === 'fest');
   const autoOn = () => !!S && gameNow() < S.autoUntil;
-  function goldDay() { const t = gameToday(); if (S.gd.day !== t) { S.gd.day = t; S.gd.n = 0; S.gd.shop = 0; } }
+  function goldDay() { const t = gameToday(); if (dayRoll(S.gd, t)) { S.gd.n = 0; S.gd.shop = 0; } }
   function addGold(n) {
     if (!(n > 0)) return;
     S.gold += n; S.st.gold += n;
@@ -16907,7 +16910,7 @@ body.cam-scene #ffChip,body.cam-scene #plChip,body.cam-scene .b-ring{animation-p
   const ESS_ICON = () => `<span class="tic" style="background-image:${pzImg('ic_essence')}"></span>`;
   function esDay() {
     const t = gameToday(), w = gameWeek();
-    if (S.es.day !== t) { S.es.day = t; S.es.n = 0; S.es.x = 0; S.es.t = 0; S.es.bf = 0; S.es.ba = 0; S.es.ax = 0; }
+    if (dayRoll(S.es, t)) { S.es.n = 0; S.es.x = 0; S.es.t = 0; S.es.bf = 0; S.es.ba = 0; S.es.ax = 0; }
     if (w > S.es.week) { S.es.week = w; S.es.g = 0; }
   }
   const esExLeft = () => { esDay(); return Math.max(0, ESHOP.ex.perDay - S.es.x); };
@@ -17536,7 +17539,7 @@ body.cam-scene #ffChip,body.cam-scene #plChip,body.cam-scene .b-ring{animation-p
     if (up) { const lv = S.ac[k].lv, capped = lv >= acCap(); setTimeout(() => toast(`${AC.name[k]} Lv.${lv}!${capped ? ` ${tierInfo().name}에서는 여기까지예요` : ''}`), 500); }
     checkQuests(true); return v;
   }
-  function acBkDay() { const t = gameToday(); if (S.ac.bk.day !== t) { S.ac.bk.day = t; for (const k of AC.keys) S.ac.bk.n[k] = 0; } }
+  function acBkDay() { const t = gameToday(); if (dayRoll(S.ac.bk, t)) { for (const k of AC.keys) S.ac.bk.n[k] = 0; } }
   const bookCost = k => AC.book.ess + AC.book.perLv * acLv(k);   // 2.1.0 문제집 값은 레벨을 따라 올라요
   const acBkLeft = k => { acBkDay(); return Math.max(0, AC.book.perDay - (S.ac.bk.n[k] || 0)); };
   // 5.0.2 문제집 남은 권 모두 사기: 한 권씩 살 때와 같은 값과 차례로 사고(레벨이 오르면 값도 따라 올라요), 정수가 모자라면 살 수 있는 만큼만 사요
@@ -17958,7 +17961,7 @@ body.cam-scene #ffChip,body.cam-scene #plChip,body.cam-scene .b-ring{animation-p
   const csPick = a => a[Math.floor(Math.random() * a.length)];
   const freshCs = () => ({ day: '', n: 0, talks: 0, picks: 0, won: 0, paid: -1, done: {}, met: 0 });
   const csOpen = () => !!S && !!S.cs && S.tier >= CS.tier && rosterOn() && S.roster.list.length > 0;
-  const csDay = () => { const t = gameToday(); if (S.cs.day !== t) { S.cs.day = t; S.cs.n = 0; } };
+  const csDay = () => { const t = gameToday(); if (dayRoll(S.cs, t)) { S.cs.n = 0; } };
   const csMax = () => CS.perDay + Math.floor(xtLv('cou') / 5) + (S.adx && S.adx.cs && S.adx.day === gameToday() ? 1 : 0);   // 4.2.0 광고로 한 번 더
   const csLeft = () => { if (!S || !S.cs) return 0; csDay(); return Math.max(0, csMax() - S.cs.n); };
   const csKid = i => S.roster.list[i] || null;
@@ -18433,7 +18436,7 @@ body.cam-scene #ffChip,body.cam-scene #plChip,body.cam-scene .b-ring{animation-p
   const RD = { min: 15, perDay: 3, xp: 25 };
   const freshRd = () => ({ day: '', n: 0, cur: '', at: 0, got: {}, st: 0, q: [] });   // 5.0.2 q: 예약한 책(읽는 책이 끝나면 이어서)
   const rdReady = () => !!S && S.f.library >= 1;
-  function rdDay() { const t = gameToday(); if (S.rd.day !== t) { S.rd.day = t; S.rd.n = 0; } }
+  function rdDay() { const t = gameToday(); if (dayRoll(S.rd, t)) { S.rd.n = 0; } }
   const rdLeft = () => { rdDay(); return Math.max(0, rdPerDay() - S.rd.n); };
   const rdEnd = () => S.rd.at + (S.rd.m || RD.min) * 60000;   // 2.1.3 m: 읽기 시작할 때 정한 분(비 오는 날 10분)
   const rdRemain = () => S.rd.cur ? Math.max(0, rdEnd() - gameNow()) : 0;
@@ -18666,7 +18669,7 @@ body.cam-scene #ffChip,body.cam-scene #plChip,body.cam-scene .b-ring{animation-p
   const skOpen = () => !!S && !!S.sk && S.tier >= SK.tier;
   const skMonth = () => Number(gameToday().slice(5, 7)) || 1;
   const skFull = () => S.sk.cur.length >= SK.full;
-  function skDay() { const t = gameToday(); if (S.sk.day !== t) { S.sk.day = t; S.sk.n = 0; } }
+  function skDay() { const t = gameToday(); if (dayRoll(S.sk, t)) { S.sk.n = 0; } }
   const skLeft = () => { skDay(); return Math.max(0, SK.perDay - S.sk.n); };
   // 스티커 한 장 붙이기. 붙였으면 보상 창에 넣을 줄을, 아니면 null
   function skAdd() {
@@ -18889,7 +18892,7 @@ body.cam-scene #ffChip,body.cam-scene #plChip,body.cam-scene .b-ring{animation-p
   // 선물: 숲의 정수 5, 하루 3번(친구 모두 합쳐). 생일인 친구에게는 두 배
   function frGiftLeft() {
     if (!S || !S.frg) return 0;
-    if (S.frg.day !== gameToday()) { S.frg.day = gameToday(); S.frg.n = 0; }
+    if (dayRoll(S.frg)) { S.frg.n = 0; }
     return Math.max(0, BF.giftDay - S.frg.n);
   }
   function frGift(sp) {
@@ -19437,7 +19440,7 @@ body.cam-scene #ffChip,body.cam-scene #plChip,body.cam-scene .b-ring{animation-p
   ];
   const freshBt = () => ({ pts: 1000, lg: 0, day: '', n: 0, adN: 0, won: false, streak: 0, grow: { day: '', m: {} }, last: -1, lp: { day: '', p: 0 }, st: { w: 0, l: 0, ev: 0, best: 0, wm: 0 } });
   const btOpen = () => !!S && (S.tier >= 2 || (S.tier === 1 && S.tg >= 2));
-  function btDay() { const t = gameToday(); if (S.bt.day !== t) { S.bt.day = t; S.bt.n = 0; S.bt.won = false; S.bt.adN = 0; } }
+  function btDay() { const t = gameToday(); if (dayRoll(S.bt, t)) { S.bt.n = 0; S.bt.won = false; S.bt.adN = 0; } }
   // 3.0.0 woodani 요청: 다 쓰면 광고를 보고 하루 한 번 2판 더(숲속 퍼즐과 같게)
   const btQuota = () => BT.perDay + (S.bt.adN || 0) * BT.adMore;
   const btLeft = () => { btDay(); return Math.max(0, btQuota() - S.bt.n); };
@@ -19497,7 +19500,7 @@ body.cam-scene #ffChip,body.cam-scene #plChip,body.cam-scene .b-ring{animation-p
     if (win) { S.bt.streak += 1; const bonus = S.bt.streak >= BT.streakFrom ? Math.min(BT.streakMax, BT.streakStep * (S.bt.streak - BT.streakFrom + 1)) : 0; S.bt.pts = Math.min(9999, S.bt.pts + BT.win + bonus); out.bonus = bonus;
       S.bt.st.w += 1; if (rosterOn()) S.bt.st.wm += 1; S.bt.st.best = Math.max(S.bt.st.best, S.bt.streak);
       if (!S.bt.won) { S.bt.won = true; const v = Math.round(minAcorns(BT.firstMin) * (1 + deptX('sports') / 100)); S.budget += v; earn(v); out.acorn = v; }
-      const t = gameToday(); if (S.bt.lp.day !== t) { S.bt.lp.day = t; S.bt.lp.p = 0; } const lp = Math.min(BT.lp, BT.lpDay - S.bt.lp.p); if (lp > 0) { S.bt.lp.p += lp; addLeague(lp); out.lp = lp; }
+      const t = gameToday(); if (dayRoll(S.bt.lp, t)) { S.bt.lp.p = 0; } const lp = Math.min(BT.lp, BT.lpDay - S.bt.lp.p); if (lp > 0) { S.bt.lp.p += lp; addLeague(lp); out.lp = lp; }
     } else { S.bt.streak = 0; S.bt.pts = Math.max(BT.floor, S.bt.pts - BT.lose); S.bt.st.l += 1; }
     out.d = S.bt.pts - before;
     // 이긴 종목(친선 포함): 과목 XP, 중학교 명부 학생 능력치
@@ -21283,7 +21286,7 @@ body.cam-scene #ffChip,body.cam-scene #plChip,body.cam-scene .b-ring{animation-p
     return cur;
   }
   // 오늘 남은 보상 판. 날이 바뀌면 다시 5판(2.3.1)
-  function pzDay() { const t = gameToday(); if (S.pz.day !== t) { S.pz.day = t; S.pz.n = 0; S.pz.adN = 0; } }
+  function pzDay() { const t = gameToday(); if (dayRoll(S.pz, t)) { S.pz.n = 0; S.pz.adN = 0; } }
   const pzQuota = () => PZ.perDay + S.pz.adN * PZ.adMore;
   const pzLeft = () => { pzDay(); return Math.max(0, pzQuota() - S.pz.n); };
   const pzCanAd = () => { pzDay(); return pzLeft() <= 0 && S.pz.adN < PZ.adMax; };
@@ -22643,7 +22646,7 @@ body.cam-scene #ffChip,body.cam-scene #plChip,body.cam-scene .b-ring{animation-p
     if (!S || !S.bf) return;
     const t = gameToday(), w = bfWin(t); let ch = false;
     if (w && S.bf.mon !== w.key) { S.bf.mon = w.key; S.bf.st = 0; S.bf.got = BIG.steps.map(() => 0); ch = true; }   // 새 달 대축제는 빈 도장판으로
-    if (S.bf.day !== t) { S.bf.day = t; S.bf.dn = 0; S.bf.o = 0; S.bf.g2 = 0; S.bf.fw = 0; ch = true; }
+    if (dayRoll(S.bf, t)) { S.bf.dn = 0; S.bf.o = 0; S.bf.g2 = 0; S.bf.fw = 0; ch = true; }
     if (ch) save();
   }
   const bfStampIc = px => { const u = IMG('ic_bf_stamp') || IMG('ic_fv_stamp'); return u ? `<img src="${u}" alt="" style="width:${px}px;height:${px}px">` : '🔖'; };
@@ -22737,7 +22740,7 @@ body.cam-scene #ffChip,body.cam-scene #plChip,body.cam-scene .b-ring{animation-p
     if (!S || !S.fv) return;
     const wk = gameWeek(), t = gameToday(); let ch = false;
     if (S.fv.wk !== wk) { S.fv.wk = wk; S.fv.st = 0; S.fv.got = FV.steps.map(() => 0); ch = true; }   // 도장판은 매주 월요일 0시에 새로
-    if (S.fv.day !== t) { S.fv.day = t; S.fv.b = {}; S.fv.g = [0, 0, 0, 0, 0]; S.fv.o = 0; ch = true; }
+    if (dayRoll(S.fv, t)) { S.fv.b = {}; S.fv.g = [0, 0, 0, 0, 0]; S.fv.o = 0; ch = true; }
     bfSync();
     if (ch) save();
   }
@@ -23000,7 +23003,7 @@ body.cam-scene #ffChip,body.cam-scene #plChip,body.cam-scene .b-ring{animation-p
   function xgSync() {
     if (!S || !S.xg) return;
     const t = gameToday();
-    if (S.xg.day !== t) { S.xg.day = t; S.xg.s = [0, 0, 0]; S.xg.n = 0; save(); }
+    if (dayRoll(S.xg, t)) { S.xg.s = [0, 0, 0]; S.xg.n = 0; save(); }
   }
   // 오늘 온 학생: 동물은 날짜로 한 종, 학교는 랭킹에서 날짜로 한 곳(없으면 꾸며 낸 이웃 학교)
   function xgGuest() {
@@ -23135,7 +23138,7 @@ body.cam-scene #ffChip,body.cam-scene #plChip,body.cam-scene .b-ring{animation-p
   function mkSync() {
     if (!S || !S.mk) return;
     const t = gameToday();
-    if (S.mk.day !== t) { S.mk.day = t; S.mk.sold = 0; S.mk.buy = {}; save(); }
+    if (dayRoll(S.mk, t)) { S.mk.sold = 0; S.mk.buy = {}; save(); }
   }
   const mkCrops = () => GD_CROPS.filter(c => c.tier <= S.tier);
   const mkHot = () => { const cs = mkCrops(); return cs[dayHash('mk' + gameToday()) % cs.length].k; };   // 오늘의 흥정: 쿠폰 두 배
@@ -27362,7 +27365,7 @@ body.cam-scene #ffChip,body.cam-scene #plChip,body.cam-scene .b-ring{animation-p
     }
     if (!psOpen()) return;
     const t = gameToday(), w = gameWeek();
-    if (S.ps.day !== t) { S.ps.day = t; S.ps.dl = psPick('psd' + t, PS.dN, 'd'); }
+    if (dayRoll(S.ps, t)) { S.ps.dl = psPick('psd' + t, PS.dN, 'd'); }
     if (S.ps.wk !== w) { S.ps.wk = w; S.ps.wl = psPick('psw' + w, PS.wN, 'w'); }
   }
   const psDayMul = () => S.ps.ad === gameToday() ? PS.adMul : 1;
@@ -28137,7 +28140,7 @@ body.cam-scene #ffChip,body.cam-scene #plChip,body.cam-scene .b-ring{animation-p
     energy: { e: 5, day: 3, add: 20, ic: 'boost_mg_energy', name: '에너지 +20', d: '에너지 20을 바로 채워요' }
   };
   const MGB_IDS = Object.keys(MGB);
-  function mgBstDay() { const b = S.mg.bst; if (b.day !== gameToday()) { b.day = gameToday(); b.lucky = 0; b.energy = 0; } return b; }
+  function mgBstDay() { const b = S.mg.bst; if (dayRoll(b)) { b.lucky = 0; b.energy = 0; } return b; }
   const mgBstLeft = id => Math.max(0, MGB[id].day - mgBstDay()[id]);
   function mgBuyBoost(id) {
     const B = MGB[id]; if (!B) return false;
