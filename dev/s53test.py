@@ -5,8 +5,7 @@
 # 쓰는 법: python3 wrap.py && python3 s53test.py   (마지막 줄이 PASS면 통과)
 import asyncio, sys
 from playwright.async_api import async_playwright
-from s4test import URL
-F = 'window.__forest'
+from testlib import URL, F
 CLEAN = "document.querySelectorAll('.overlay.center').forEach(o=>{o.hidden=true;o.classList.remove('open')}); window.__forest.rt.modalOpen=null; window.__forest.rt.modalQueue.length=0"
 FAKE = "window.__adReady = false; window.__adCalls = 0; window.FOREST_ADS = { adReady: () => window.__adReady, adState: () => window.__adReady ? '' : 'loading', preload: () => { window.__adCalls++; }, showAd: done => setTimeout(() => done({ earned: true }), 50) };"
 

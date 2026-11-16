@@ -4,8 +4,7 @@
 # 5) 랭킹 '탐험' 보기와 서버 규칙에 맞춘 층 올리기 폭
 import asyncio, json, pathlib
 from playwright.async_api import async_playwright
-from s4test import ctxpage, base
-F = 'window.__forest'
+from testlib import ctxpage, base, F
 OUT = pathlib.Path(__file__).resolve().parent / 'shots'
 AD = """const sl=ms=>new Promise(r=>setTimeout(r,ms)); const watch=async()=>{ for(let i=0;i<60;i++){ await sl(100); const d=document.querySelector('#adDone'); if(!document.querySelector('#mAd').hidden && !d.hidden){ d.click(); await sl(400); return true; } } return false; };"""
 async def main():

@@ -4,9 +4,8 @@
 # 쓰는 법: python3 wrap.py && python3 s48test.py   (마지막 줄이 PASS면 통과)
 import asyncio, json, sys
 from playwright.async_api import async_playwright
-from s4test import URL
+from testlib import URL, F
 from tclock import PAST
-F = 'window.__forest'
 CLEAN = "document.querySelectorAll('.overlay.center').forEach(o=>{o.hidden=true;o.classList.remove('open')}); window.__forest.rt.modalOpen=null; window.__forest.rt.modalQueue.length=0"
 # 기기 시간을 흉내 내요: Date.now만 바꿔요(게임 시계 gameNow는 서버 시간이 없으면 기기 시간을 써요).
 # 날짜는 앞으로만 돌려요. 1.6.0 공용 시계(gameNow, gameToday)는 시간이 뒤로 가면 막기 때문이에요

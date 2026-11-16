@@ -5,8 +5,7 @@
 # 쓰는 법: python3 wrap.py && python3 s52test.py [행사 이름...]
 import asyncio, sys, json
 from playwright.async_api import async_playwright
-from s4test import URL
-F = 'window.__forest'
+from testlib import URL, F
 CLEAN = "document.querySelectorAll('.overlay.center').forEach(o=>{o.hidden=true;o.classList.remove('open')}); window.__forest.rt.modalOpen=null; window.__forest.rt.modalQueue.length=0"
 ONLY = sys.argv[1:]
 FESTS = [f for f in ['picnic', 'welcome', 'sports', 'show', 'photo'] if not ONLY or f in ONLY]

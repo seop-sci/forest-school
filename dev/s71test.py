@@ -9,9 +9,8 @@
 # 쓰는 법: python3 wrap.py && python3 s71test.py   (마지막 줄이 PASS면 통과)
 import asyncio, json, time
 from playwright.async_api import async_playwright
-from s4test import URL
+from testlib import URL, F
 
-F = 'window.__forest'
 H = 3600 * 1000
 
 FAKE_FB = r"""

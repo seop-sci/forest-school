@@ -9,6 +9,7 @@
 #  6) 학교 공개 끄기: 서버에서 못 지우면 '지우지 못했어요'라고 알리고 표시를 남겨 다시 열면 지워요.
 #     다른 기기의 옛 저장(공개 켬)은 서버에 내 학교가 없으면 다시 올리지 않고 꺼요. 랭킹에서 빼면 공개 모습도 지워요
 # 쓰는 법: python3 wrap.py && python3 build_gh.py gh && python3 s98test.py   (마지막 줄이 PASS면 통과, 가짜 서버 시험이라 따로 돌려요)
+from testlib import F   # 5.0.2 공통 모듈(실패하면 끝 코드 1)
 import asyncio, json, time, subprocess
 from playwright.async_api import async_playwright
 import s7test
@@ -16,7 +17,6 @@ from s7test import HERE, PORT, ORIGIN, MOCK, NT_SEEN, api, dump, mode, elem, wai
 
 PICK = "(() => { const m = document.querySelector('#mPick'); return { open: !!m && !m.hidden, loc: document.querySelector('#pickLoc').textContent, srv: document.querySelector('#pickSrv').textContent }; })()"
 BAK = "JSON.parse(localStorage.getItem('forest-school-bak') || '[]').map(b => b.sum)"
-F = 'window.__forest'
 
 
 def fdata():

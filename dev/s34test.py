@@ -1,5 +1,6 @@
 # 34번 묶음(1.1.0) 시험: 관리자가 테스트 현황 기록을 골라 지우기 (가짜 Firebase 서버의 규칙 검사 포함)
 # 2.3.0: 비밀 글자 대신 forest/adminUids/<계정 번호>: true(콘솔에서만 넣어요)인 계정이 관리자예요
+import testlib   # 5.0.2 실패하면 끝 코드 1(dev/testlib.py)
 import asyncio, json, time, subprocess
 from playwright.async_api import async_playwright
 import s7test

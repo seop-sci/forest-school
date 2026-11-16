@@ -9,8 +9,7 @@
 # 쓰는 법: python3 wrap.py && python3 s63test.py   (마지막 줄이 PASS면 통과)
 import asyncio, json
 from playwright.async_api import async_playwright
-from s4test import URL
-F = 'window.__forest'
+from testlib import URL, F
 SKIP = f"(()=>{{ document.querySelectorAll('.overlay.center').forEach(o=>{{o.hidden=true;o.classList.remove('open')}}); {F}.rt.modalOpen=null; const t=document.querySelector('#tut'); if(t) t.hidden=true; {F}.S.tut.st='skip'; {F}.rt.tut=null; {F}.setTab('school'); }})()"
 ST = f"(() => {{ const r = {F}.rt; return {{ z: r.zoom || 1, s: r.mapS, x: r.panX, y: r.panY, w: r.mapW, h: r.mapH }}; }})()"
 

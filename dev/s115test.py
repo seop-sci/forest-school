@@ -6,10 +6,9 @@
 #    새 퀘스트를 더했으면 `python3 s115test.py --snap`으로 목록을 다시 적어요.
 import asyncio, json, re, sys, pathlib
 from playwright.async_api import async_playwright
-from s4test import URL
+from testlib import URL, F
 HERE = pathlib.Path(__file__).resolve().parent
 MOVED_OK = {'e6', 'gd2'}   # mainIndexFromSave가 따로 받아 주는 옛 id
-F = 'window.__forest'
 async def main():
     bad = []
     src = (HERE / 'forest-school.html').read_text(encoding='utf-8')

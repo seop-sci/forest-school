@@ -1,7 +1,7 @@
 # 3.0.0: 재화 개편과 야간 저장, 미니게임 판 회귀
 import asyncio
 from playwright.async_api import async_playwright
-from s4test import ctxpage, base
+from testlib import ctxpage, base
 
 async def main():
     async with async_playwright() as p:

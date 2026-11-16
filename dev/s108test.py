@@ -1,10 +1,9 @@
 # 2.3.5 비버 시설 선생님: 초등학교부터, 연수는 숲의 정수 20+10n, 한 레벨에 공사 시간 -2%
+from testlib import F, CLEAN   # 5.0.2 공통 모듈(실패하면 끝 코드 1)
 import os, sys
 from playwright.sync_api import sync_playwright
 HERE = os.path.dirname(os.path.abspath(__file__))
 ok = True
-F = 'window.__forest'
-CLEAN = "document.querySelectorAll('.overlay').forEach(o=>{o.hidden=true;o.classList.remove('open')}); window.__forest.rt.modalOpen=null; window.__forest.rt.modalQueue.length=0"
 SKIP = f"(()=>{{ const t=document.querySelector('#tut'); if(t) t.hidden=true; {F}.S.tut.st='skip'; {F}.rt.tut=null; {CLEAN}; }})()"
 def check(c, m):
     global ok

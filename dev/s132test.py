@@ -5,8 +5,7 @@
 # 4) 정수로 도토리 바꾸기는 수업료 부스터를 켜도 두 배가 되지 않아요  5) 탐험 화면에서 재료를 얻으면 장비 칸 점이 바로 떠요
 import asyncio, json
 from playwright.async_api import async_playwright
-from s4test import ctxpage, base
-F = 'window.__forest'
+from testlib import ctxpage, base, F
 async def main():
     bad = []
     def ok(c, msg):

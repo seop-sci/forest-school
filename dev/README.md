@@ -11,8 +11,13 @@
 | `gh_README.md`, `gh_database.rules.json` | GitHub 판의 README와 데이터베이스 규칙 원본 |
 | `wrap.py` | 시험용 `test.html` 만들기 |
 | `s*test.py`, `fbtest/` | Playwright 자동 시험 (가짜 Firebase 서버 포함) |
+| `testlib.py` | 자동 시험의 공통 모듈: `URL`, `base()`, `ctxpage()`, `F`, `CLEAN`, `OVER`, `Checker`(ok와 done), `skip()`. 불러오기만 해도 마지막 줄이 PASS나 SKIP이 아니면 끝 코드 1이 돼요 (예전에는 `s4test.py`가 겸했어요) |
+| `runall.py` | 시험을 한 번에 돌려요. `python3 runall.py quick` (묶음: `quick`, `ui`, `save`, `fb`, `all`, 번호도 돼요). 세 개씩 함께, 실패한 것은 한 번 다시, 마지막 줄 PASS와 끝 코드로 판정 |
+| `driftcheck.py` | 어긋남 검사: 메인 퀘스트 제목과 설명의 숫자가 조건 n과 같은지, 퀘스트 종류가 `qMeasure`, `qGoal`, `goTo`에 모두 있는지, `fresh()`와 새 학년 시작의 건물 처음 값이 같은지 |
+| `golden_make.py`, `golden/` | 저장 읽기 견줌 시험(`s148`)의 표본 40개와 기준. 저장 읽기를 일부러 바꾼 버전에서만 `python3 golden_make.py golden`으로 기준을 다시 적어요 |
 | `bot.py` | 자동 플레이로 학년마다 걸리는 시간 재기 |
-| `qbot.py` | 퀘스트를 따라 하는 자동 플레이로 퀘스트마다 걸리는 시간 재기 (막히는 곳 찾기) |
+| `qbot.py` | 퀘스트를 따라 하는 자동 플레이: 새 학교에서 박사 학위까지 퀘스트마다, 학기마다 도토리 시간, 공사 시간, 기다림을 재요. `--json 파일`, `--check [시간]`(오래 걸리는 퀘스트와 Infinity, NaN, 10^15 넘는 재화가 있으면 끝 코드 1), `--until 학교급` |
+| `balday.py` | qbot 결과를 접속 방식별(하루 1번, 3번, 자주, 광고 유무) 날 수 표로. `python3 qbot.py --json qbot.json && python3 balday.py qbot.json --md 표.md`. 잰 결과는 `docs/BALANCE-2026-11.md` |
 | `s37test.py` | 교감 선생님 도토리 지원 회귀 시험 (`needCost`, `prepTopUp`, `rate`, 유치원 진행) |
 | `check_rules.py` | `CLAUDE.md`와 `AGENTS.md`의 공통 규칙이 똑같은지 확인 |
 | `check_templates.py` | Issue 양식이 GitHub 규칙에 맞는지, 양식이 쓰는 라벨이 저장소에 있는지 확인 |

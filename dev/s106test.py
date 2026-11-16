@@ -7,9 +7,7 @@
 # 쓰는 법: python3 wrap.py && python3 s106test.py   (마지막 줄이 PASS면 통과)
 import asyncio
 from playwright.async_api import async_playwright
-from s4test import URL
-F = 'window.__forest'
-CLEAN = "document.querySelectorAll('.overlay').forEach(o=>{o.hidden=true;o.classList.remove('open')}); window.__forest.rt.modalOpen=null; window.__forest.rt.modalQueue.length=0"
+from testlib import URL, F, CLEAN
 SKIP = f"(()=>{{ const t=document.querySelector('#tut'); if(t) t.hidden=true; {F}.S.tut.st='skip'; {F}.rt.tut=null; {CLEAN}; }})()"
 MID = """S.tier = 2; S.tg = 0; for (const k of F.facKeys()) { S.f[k] = Math.max(S.f[k] || 0, 5); } F.rosterEnsure(true); F.clubAuto(true);"""
 

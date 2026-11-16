@@ -9,8 +9,7 @@
 # 쓰는 법: python3 wrap.py && python3 s57test.py   (마지막 줄이 PASS면 통과)
 import asyncio, sys, json, calendar
 from playwright.async_api import async_playwright
-from s4test import URL
-F = 'window.__forest'
+from testlib import URL, F
 CLEAN = "document.querySelectorAll('.overlay.center').forEach(o=>{o.hidden=true;o.classList.remove('open')}); window.__forest.rt.modalOpen=null; window.__forest.rt.modalQueue.length=0"
 FAKE_AD = "window.__adReady = true; window.FOREST_ADS = { adReady: () => window.__adReady, adState: () => '', preload: () => {}, showAd: done => setTimeout(() => done({ earned: true }), 30) };"
 NOON = calendar.timegm((2026, 11, 3, 3, 0, 0)) * 1000   # 한국 시간 2026-11-03 낮 12시

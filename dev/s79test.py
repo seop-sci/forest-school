@@ -7,9 +7,8 @@
 # 쓰는 법: python3 wrap.py && python3 s79test.py   (마지막 줄이 PASS면 통과)
 import asyncio
 from playwright.async_api import async_playwright
-from s4test import URL
+from testlib import URL, F
 import s73test as T
-F = 'window.__forest'
 J = "{ v: 2, notices: [], cfg: {}, off: [], maint: { title: '서버 점검', msg: '더 좋은 학교를 위해 점검하고 있어요.', until: '11월 6일 새벽 3시' } }"
 
 async def main():

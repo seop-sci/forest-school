@@ -2,8 +2,7 @@
 # 쓰는 법: python3 wrap.py && python3 s41test.py   (마지막 줄이 PASS면 통과)
 import asyncio, sys
 from playwright.async_api import async_playwright
-from s4test import URL
-F = 'window.__forest'
+from testlib import URL, F
 
 INSIDE = "((b,x,y)=>b[4]?((2*x-b[0]-b[2])/(b[2]-b[0]))**2+((2*y-b[1]-b[3])/(b[3]-b[1]))**2<1:x>b[0]&&x<b[2]&&y>b[1]&&y<b[3])"
 

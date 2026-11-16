@@ -9,14 +9,66 @@ Codex가 준 참나무 층(oak_<지도>_<판>.png)과 나무 지운 지도(map_<
 그림을 새로 그리지 않아요. 오리고 줄여 담기만 해요.
 
 쓰는 법: python3 -I oak_pack.py <그림 폴더> <deliverables json> <판 꼬리 예: _v7> [--out <img/maps 폴더>] [--keys a,b] [--no-table]
+        python3 oak_pack.py --repack [--check]   그림 없이 원본의 표만 다시 짧게 적어요(풀어낸 값이 같은지 견줘요)
+표는 5.0.2부터 바탕 지도와 다른 칸만 적어요(pack_table). 게임이 읽을 때 바탕 값을 채워요.
 좌표: 지도 그림 1024x1536 → 지도 좌표 가로 0~360, 세로 -60~480
 """
 import sys, os, json, re
 from PIL import Image, ImageFilter
 import numpy as np
 
+FIELDS = ['l', 'p', 'pv', 'tap', 'nuts', 'drop']
+def _fmt(o): return json.dumps(o, separators=(', ', ': ')).replace('"', '')
+
+def pack_table(rows):
+    """표의 줄을 만들어요. 5.0.2부터 테마 지도의 줄은 바탕 줄과 다른 칸만 적어요: map_elem_autumn: {_: 'map_elem', l: [...], ...}
+    바탕은 '온전히 적은 줄' 가운데 같은 칸이 가장 많은 것(이름이 앞부분으로 같으면 먼저). 게임은 읽을 때 바탕 값을 채워요(MAP_OAK 아래 한 줄)."""
+    out, full = [], []
+    for k, r in rows.items():
+        best, bs = None, 0
+        for b in full:
+            same = sum(1 for f in FIELDS if rows[b][f] == r[f]); sc = same * 2 + (1 if k.startswith(b + '_') else 0)
+            if same > 0 and sc > bs: bs, best = sc, b
+        whole = f"    {k}: " + _fmt(r) + ','
+        if best:
+            line = f"    {k}: " + _fmt({'_': best, **{f: r[f] for f in FIELDS if rows[best][f] != r[f]}}).replace('_: ' + best, "_: '" + best + "'", 1) + ','
+            if len(line) < len(whole) - 20: out.append(line); continue
+        full.append(k); out.append(whole)
+    assert unpack_table(out) == rows, '풀어낸 표가 처음 값과 달라요'
+    return out
+
+def parse_table(text):
+    """표 글(줄들)을 읽어 {열쇠: 줄}로. 바탕(_)은 아직 채우지 않아요"""
+    rows = {}
+    for m in re.finditer(r"^\s+(map_\w+): (\{.*\}),\s*$", text, re.M):
+        rows[m.group(1)] = json.loads(re.sub(r"(\w+):", r'"\1":', m.group(2).replace("'", '"')))
+    return rows
+
+def unpack_table(lines):
+    """줄들을 온전한 표로 풀어요(게임이 읽을 때 하는 일과 같아요)"""
+    raw = parse_table('\n'.join(lines) if isinstance(lines, list) else lines); out = {}
+    for k, r in raw.items():
+        if '_' in r:
+            o = json.loads(json.dumps(raw[r['_']])); assert '_' not in o, (k, '바탕 줄이 온전하지 않아요')
+            o.update({f: v for f, v in r.items() if f != '_'}); out[k] = o
+        else: out[k] = r
+    return out
+
+def repack():
+    """그림은 건드리지 않고 원본의 표만 다시 짧게 적어요. 풀어낸 값이 그대로인지 견줘요:  python3 oak_pack.py --repack [--check]"""
+    html = os.path.join(os.path.dirname(os.path.abspath(__file__)), 'forest-school.html')
+    s = open(html, encoding='utf-8').read()
+    m = re.search(r'/\*MAP_OAK_BEGIN\*/(.*?)/\*MAP_OAK_END\*/', s, re.S)
+    before = unpack_table(m.group(1)); lines = pack_table(before)
+    assert unpack_table(lines) == before and list(unpack_table(lines)) == list(before)
+    new = '/*MAP_OAK_BEGIN*/\n' + '\n'.join(lines) + '\n    /*MAP_OAK_END*/'
+    print(f'{len(before)}줄, 표 글자 {len(m.group(0))} → {len(new)}, 풀어낸 값은 같아요')
+    if '--check' in sys.argv: return
+    open(html, 'w', encoding='utf-8').write(s[:m.start()] + new + s[m.end():])
+
 def main():
     a = sys.argv[1:]
+    if '--repack' in a: return repack()
     src, dj, suf = a[0], a[1], a[2]
     out = a[a.index('--out') + 1] if '--out' in a else os.path.join(os.path.dirname(os.path.abspath(__file__)), '..', 'img', 'maps')
     keys = a[a.index('--keys') + 1].split(',') if '--keys' in a else None
@@ -25,7 +77,7 @@ def main():
     gx = lambda px: round(px * 360 / 1024, 1)
     gy = lambda py: round(py * 540 / 1536 - 60, 1)
     gs = lambda d: round(d * 360 / 1024, 1)
-    lines, total = [], 0
+    rows, total = {}, 0
     for key, e in ents.items():
         if keys and key not in keys: continue
         oak = Image.open(os.path.join(src, f'oak_{key}{suf}.png')).convert('RGBA')
@@ -69,7 +121,8 @@ def main():
             'pv': [gx(pv[0]), gy(pv[1])], 'tap': [gx(tap[0]), gy(tap[1]), min(gs(tap[2]), 48)],
             'nuts': [[gx(x), gy(y)] for x, y in nuts], 'drop': [[gx(x), gy(y)] for x, y in e['drop_px']],
         }
-        lines.append(f"    map_{key}: " + json.dumps(row, separators=(', ', ': ')).replace('"', '') + ',')
+        rows['map_' + key] = row
+    lines = pack_table(rows)
     print(f'{len(lines)}장, 그림 합계 {total / 1024:.0f}KB → {out}')
     if '--no-table' in a:
         print('\n'.join(lines)); return

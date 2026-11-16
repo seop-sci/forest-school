@@ -4,8 +4,7 @@
 # 쓰는 법: python3 wrap.py && python3 s56test.py   (마지막 줄이 PASS면 통과)
 import asyncio, sys, calendar
 from playwright.async_api import async_playwright
-from s4test import URL
-F = 'window.__forest'
+from testlib import URL, F
 CLEAN = "document.querySelectorAll('.overlay.center').forEach(o=>{o.hidden=true;o.classList.remove('open')}); window.__forest.rt.modalOpen=null; window.__forest.rt.modalQueue.length=0"
 kst_noon = lambda y, m, d: calendar.timegm((y, m, d, 3, 0, 0)) * 1000
 

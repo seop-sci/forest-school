@@ -5,8 +5,7 @@
 # 4) 숲속 대결: 가장 좋게 고르고 응원을 채우면 리그마다 이기는 판이 알맞게 많아요
 import asyncio, json
 from playwright.async_api import async_playwright
-from s4test import ctxpage, base
-F = 'window.__forest'
+from testlib import ctxpage, base, F
 async def main():
     bad = []
     def ok(c, msg):

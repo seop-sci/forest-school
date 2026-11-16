@@ -3,6 +3,33 @@
 Playwright(Python)로 `dev/test.html`을 열어 시험해요. 먼저 `cd dev && python3 wrap.py`.
 가짜 Firebase 서버 시험은 `dev/fbtest/fbserver.js`가 `targaryen` npm 꾸러미로 `dev/gh_database.rules.json` 규칙을 검사해요. 꾸러미가 없으면 `npm i targaryen` 한 폴더를 `NODE_PATH`로 잡아요.
 
+## 한 번에 돌리기 (2026-11-17, `dev/runall.py`)
+
+```bash
+cd dev
+python3 runall.py quick      # 웹에 먼저 낼 때: 문법(jscheck), 어긋남(driftcheck), s37, s68, s42, s62, s107, s128, s151, s147, s148. 2분 남짓
+python3 runall.py ui         # 화면 넘침과 겹침
+python3 runall.py save       # 저장 읽기와 옛 저장
+python3 runall.py fb         # 가짜 Firebase 서버 (targaryen 꾸러미가 없으면 SKIP으로 알려요)
+python3 runall.py all        # 전부. 20분쯤 ("앱 내자" 때)
+python3 runall.py 37 128     # 번호로 골라서
+python3 runall.py --list     # 묶음과 표시해 둔 시험 보기
+```
+
+- `wrap.py`는 runall이 먼저 돌려요. 세 개씩 함께 돌리고(`-j 3`), 실패한 것은 끝에 혼자 한 번 다시 돌려요.
+- 판정: 시험마다 "표준 출력의 마지막 줄이 PASS로 시작"하고 "끝 코드 0". 모든 시험이 `dev/testlib.py`를 불러와서, 마지막 줄이 PASS나 SKIP이 아니면 끝 코드가 1이에요.
+- runall의 끝 코드: 다시 돌려도 실패한 시험이 있으면 1. 실패한 시험의 출력은 `dev/runall_s<번호>.log`.
+- 표시만 해 둔 시험은 `runall.py` 맨 위에 있어요: 요일을 타는 시험(`DATE`), 가끔 흔들리는 시험(`SHAKY`), 알려진 실패(`KNOWN_FAIL`, 지금은 s76 하나). s52는 실패가 아니라 오래 걸려요(7분쯤). 표시는 결과 줄에 이름표로만 붙고, 시험이 보는 내용은 바꾸지 않았어요.
+- 새 시험은 `from testlib import ...`로 시작해요. 틀린 것을 모을 때는 `c = Checker(); c.ok(조건, '무엇'); c.done()`.
+
+## 개발 기반 시험 (2026-11-17)
+
+- `driftcheck.py`: 어긋남 검사. 메인 퀘스트 873개의 제목과 설명에 적힌 숫자(Lv.N, N명, N번 등 1,243곳)가 조건 n과 같은지, 퀘스트 종류 78가지가 `qMeasure`(또는 `S.st`), `qGoal`, `goTo`에 모두 있는지, `fresh()`와 새 학년 시작(`newYear`)의 건물과 선생님 처음 값이 같은지 봐요. 3초.
+- `s148test.py`: 저장 읽기 견줌. 옛 저장 표본 40개(빈 저장, 1.x 모양, 학교급마다, v2와 v3, 틀린 꼴, 너무 큰 값, 봇이 졸업식마다 찍은 저장과 그것에서 칸을 뺀 것, 모든 칸을 건드린 저장)를 `sanitize()`에 넣은 결과가 기준(`dev/golden/sanitize.json.gz`)과 글자까지 같은지 봐요. 시계와 무작위는 멈춰요. 저장 읽기를 일부러 바꾼 버전에서는 바뀐 곳을 본 뒤 `python3 golden_make.py golden`으로 기준을 다시 적어요.
+- `s149test.py`: 창을 닫기만 하는 단추와 바깥 누르기(`data-cm`) 57곳이 저마다 제 창을 닫는지 봐요.
+- `python3 oak_pack.py --repack --check`: 참나무 자리 표(`MAP_OAK`)를 풀어낸 값이 그대로인지 견줘요(Pillow와 numpy가 있어야 해요).
+- `python3 qbot.py --check 4`: 균형 검사. 지금은 FAIL이 맞아요(4시간 넘는 퀘스트 70개, `docs/BALANCE-2026-11.md`). 숫자를 정하기 전이라 묶음에는 넣지 않았어요.
+
 ## 한꺼번에 돌릴 때 (2026-11-11)
 
 - 시험은 **세 개까지만 함께** 돌려요. 2코어 기계에서 세 개씩은 여러 번 돌려도 모두 PASS였고, 열 개를 함께 돌리면 시간에 기대는 시험(s47, s98, s105 등)이 흔들려요. 게임 문제가 아니라 기계가 느려져서예요.

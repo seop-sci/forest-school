@@ -1,7 +1,7 @@
 # 자동 플레이: 가장 싼 것부터 사고, 대도시가 되면 명예 교장실을 고치고 종업식을 열어요. 해마다 걸린 시간과 레벨을 적어요
 import asyncio, json, sys
 from playwright.async_api import async_playwright
-from s4test import URL
+from testlib import URL
 BOT = r"""(maxH) => {
   const F = window.__forest; const W = window.__bot = window.__bot || { t: 0, yearT: 0, out: [], done: false, tripEnd: 0, trips: 0, pickT: 0 }; const out = W.out; let t = W.t, yearT = W.yearT; const dt = 5; const end = t + maxH * 3600; const t0 = performance.now();
   const S = () => F.S;

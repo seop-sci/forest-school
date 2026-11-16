@@ -1,7 +1,7 @@
 # 3.0.0 낮 자율학습 예약: 보상/저장/퀘스트/한국 시각 경계 회귀
 import asyncio, json
 from playwright.async_api import async_playwright
-from s4test import ctxpage, base
+from testlib import ctxpage, base
 
 async def main():
     async with async_playwright() as p:

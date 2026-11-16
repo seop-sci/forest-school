@@ -3,8 +3,7 @@
 # 값은 열린 때의 수업료로 정해지고 수업료가 올라도 그대로, 올리면 그때 수업료로 다음 값. 효과: 공부 경험치 +2%, 공사 시간 -0.5%, 받는 정수 +1%(상한). 옛 저장, 360px 창
 import asyncio
 from playwright.async_api import async_playwright
-from s4test import ctxpage, base
-F = 'window.__forest'
+from testlib import ctxpage, base, F
 async def main():
     bad = []
     def ok(c, msg):

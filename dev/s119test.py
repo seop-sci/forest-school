@@ -3,8 +3,7 @@
 # 무대, 조명 그늘, 환영회 줄 장식(.kfloor)이 학생 층 맨 아래에 있고, 학생 줄 세우기(0.5초마다)가 지나도 그대로인지 봐요
 import asyncio
 from playwright.async_api import async_playwright
-from s4test import ctxpage, base
-F = 'window.__forest'
+from testlib import ctxpage, base, F
 Q = f"""(()=>{{ const F={F}, L=document.querySelector('#kids'), ch=[...L.children], fl=[...L.querySelectorAll(':scope > .kfloor')].map(e=>ch.indexOf(e));
   const ki=F.rt.kids.map(k=>ch.indexOf(k.g)).filter(i=>i>=0); return {{ floor: fl, minKid: Math.min(...ki), n: ki.length, star: !!(F.rt.fest && F.rt.fest.star) }}; }})()"""
 async def main():

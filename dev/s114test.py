@@ -6,12 +6,11 @@
 #  4) 시즌 중(2027-01-20 수요일 21시): 시즌 보조 줄은 시즌 첫날부터 쌓여 주간 줄보다 크고, 하루씩 넘겨도 줄지 않고 하루에 하루 상한 넘게 늘지 않아요
 #  5) 페이지 오류 없음
 # 쓰는 법: python3 wrap.py && python3 s114test.py   (마지막 줄이 PASS면 통과)
+from testlib import F, CLEAN   # 5.0.2 공통 모듈(실패하면 끝 코드 1)
 import os
 from tclock import PAST
 from playwright.sync_api import sync_playwright
 HERE = os.path.dirname(os.path.abspath(__file__))
-F = 'window.__forest'
-CLEAN = "document.querySelectorAll('.overlay').forEach(o=>{o.hidden=true;o.classList.remove('open')}); window.__forest.rt.modalOpen=null; window.__forest.rt.modalQueue.length=0"
 SKIP = f"(()=>{{ const t=document.querySelector('#tut'); if(t) t.hidden=true; {F}.S.tut.st='skip'; {F}.rt.tut=null; {CLEAN}; }})()"
 ok = True
 def check(c, m):

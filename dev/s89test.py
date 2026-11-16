@@ -7,9 +7,7 @@
 # 쓰는 법: python3 wrap.py && python3 s89test.py   (마지막 줄이 PASS면 통과)
 import asyncio, json
 from playwright.async_api import async_playwright
-from s4test import URL
-F = 'window.__forest'
-CLEAN = "document.querySelectorAll('.overlay').forEach(o=>{o.hidden=true;o.classList.remove('open')}); window.__forest.rt.modalOpen=null; window.__forest.rt.modalQueue.length=0"
+from testlib import URL, F, CLEAN
 SKIP = f"(()=>{{ const t=document.querySelector('#tut'); if(t) t.hidden=true; {F}.S.tut.st='skip'; {F}.rt.tut=null; {CLEAN}; }})()"
 COLOR = ['검은', '검정', '흰 ', '하얀', '흰색', '까만', '갈색', '노란', '금빛', '색이 다른', '피부', '색깔']
 

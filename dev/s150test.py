@@ -7,11 +7,10 @@
 # 쓰는 법: python3 build_gh.py .. && (cd ../app && npm ci && node build-www.mjs) 뒤  python3 s150test.py   (묶음이 없으면 SKIP)
 import asyncio, functools, http.server, json, pathlib, re, sys, threading, time
 from playwright.async_api import async_playwright
-from s4test import base
+from testlib import base, F
 ROOT = pathlib.Path(__file__).resolve().parent.parent
 WWW = ROOT / 'app' / 'www'
 WEB = 'https://seop-sci.github.io/forest-school/'
-F = 'window.__forest'
 TH = re.compile(r'_(spring|summer|autumn|winter|xmas|space|retro)\.webp$')
 WEB_AUD = re.search(r"const WEB_AUD = new Set\(\[([^\]]+)\]\)", (ROOT / 'dev' / 'forest-school.html').read_text(encoding='utf-8')).group(1).replace("'", '').replace(' ', '').split(',')
 bad = []

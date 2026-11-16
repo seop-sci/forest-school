@@ -6,8 +6,7 @@
 # 5) 필살기: 모으기 뒤 컷인, 연출 동안 겨루기가 멈춰요. 한 번 본 뒤 생기는 '연출 건너뛰기'를 켜 두면 컷인 없이 빨리 끝나요
 import asyncio, json
 from playwright.async_api import async_playwright
-from s4test import ctxpage, base
-F = 'window.__forest'
+from testlib import ctxpage, base, F
 async def main():
     bad = []
     def ok(c, msg):

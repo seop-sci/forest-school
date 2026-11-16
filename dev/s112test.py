@@ -4,7 +4,7 @@
 import asyncio, sys
 sys.path.insert(0, '.')
 from playwright.async_api import async_playwright
-from s4test import ctxpage, base, URL
+from testlib import ctxpage, base, URL
 
 async def main():
     async with async_playwright() as p:

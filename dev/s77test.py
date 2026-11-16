@@ -9,9 +9,8 @@
 # 쓰는 법: python3 wrap.py && python3 s77test.py   (마지막 줄이 PASS면 통과)
 import asyncio
 from playwright.async_api import async_playwright
-from s4test import URL
+from testlib import URL, F
 import s73test as T
-F = 'window.__forest'
 # 시험 주로 시계 옮기기(최대 4주)
 TO_EX = f"(() => {{ const F = {F}; let n = 0; while (!F.exNow() && n < 5) {{ F.rt.fakeNow = F.gameNow() + 7 * 86400000; n++; }} return n; }})()"
 

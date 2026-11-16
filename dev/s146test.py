@@ -3,7 +3,7 @@
 # 쓰는 법: python3 wrap.py && python3 s146test.py   (마지막 줄이 PASS면 통과)
 import asyncio
 from playwright.async_api import async_playwright
-from s4test import base, ctxpage
+from testlib import base, ctxpage
 bad = []
 sigs, bsigs = set(), set()
 JS = """(mine => { const F = window.__forest; F.Rank.state = 'on'; F.Rank.uid = 'u' + Math.random(); F.rt.rkMax = {};

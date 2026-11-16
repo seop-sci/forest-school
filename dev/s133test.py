@@ -3,8 +3,7 @@
 # 2) 웹 판은 모두 img/  3) 앱 묶음(www, dist)에 테마 지도 파일이 없어요(만들어 둔 경우만 봐요)
 import asyncio, pathlib, re
 from playwright.async_api import async_playwright
-from s4test import ctxpage, base
-F = 'window.__forest'
+from testlib import ctxpage, base, F
 ROOT = pathlib.Path(__file__).resolve().parent.parent
 async def main():
     bad = []

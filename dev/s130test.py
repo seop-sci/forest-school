@@ -3,8 +3,7 @@
 # 3) 보고서가 10분 넘게 쌓이면 다른 탭에서 다시 점  4) 이야기 수첩에서 소개 다시 보기  5) 360px 밝은 화면과 어두운 화면 그림
 import asyncio, pathlib
 from playwright.async_api import async_playwright
-from s4test import ctxpage, base
-F = 'window.__forest'
+from testlib import ctxpage, base, F
 OUT = pathlib.Path(__file__).resolve().parent / 'shots'
 async def main():
     bad = []

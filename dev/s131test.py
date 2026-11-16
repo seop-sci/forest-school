@@ -4,8 +4,7 @@
 # 3) 옛 저장(es.ax 없음)도 받아요  4) 위 칸 글에 '대도시예요!'가 없어요  5) 360px 밝은 화면과 어두운 화면 그림
 import asyncio, pathlib
 from playwright.async_api import async_playwright
-from s4test import ctxpage, base
-F = 'window.__forest'
+from testlib import ctxpage, base, F
 OUT = pathlib.Path(__file__).resolve().parent / 'shots'
 async def main():
     bad = []

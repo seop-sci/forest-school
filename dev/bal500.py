@@ -5,7 +5,7 @@
 # 쓰는 법: python3 wrap.py && python3 bal500.py [설정 JSON]   설정 예: '{"extra": 0.3}' 학기마다 남는 도토리의 30%를 수입 올리기에 써요
 import asyncio, json, sys
 from playwright.async_api import async_playwright
-from s4test import URL
+from testlib import URL
 
 JS = r"""(cfg) => { const F = window.__forest, S = F.S, out = [], notes = [];
   F.rt.modalQueue.length = 0; F.rt.modalOpen = null;

@@ -1,5 +1,6 @@
 # 118번 시험(4.1.2): 관리자가 랭킹 화면에서 남의 줄을 지우기 (가짜 Firebase 서버의 규칙 검사 포함)
 # 관리자가 아니면 단추가 없고, 관리자는 두 번 눌러 지워요. 내 줄과 화면에만 있는 줄에는 단추가 없어요
+import testlib   # 5.0.2 실패하면 끝 코드 1(dev/testlib.py)
 import asyncio, json, time, subprocess
 from playwright.async_api import async_playwright
 import s7test

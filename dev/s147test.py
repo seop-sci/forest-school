@@ -8,9 +8,7 @@
 # 쓰는 법: python3 wrap.py && python3 s147test.py   (마지막 줄이 PASS면 통과)
 import asyncio, json, sys
 from playwright.async_api import async_playwright
-from s4test import ctxpage, base
-F = 'window.__forest'
-CLEAN = "document.querySelectorAll('.overlay').forEach(o=>{o.hidden=true;o.classList.remove('open')}); window.__forest.rt.modalOpen=null; window.__forest.rt.modalQueue.length=0"
+from testlib import ctxpage, base, F, CLEAN
 WAIT = """async (sel, title) => { const F = window.__forest, sl = ms => new Promise(r => setTimeout(r, ms));
   for (let i = 0; i < 40; i++) { const t = document.querySelector(sel); if (t && !t.hidden && (!title || document.querySelector('#rwTitle').textContent === title)) return true;
     const o = [...document.querySelectorAll('.overlay')].find(x => !x.hidden); if (o) { o.hidden = true; o.classList.remove('open'); F.rt.modalOpen = null; const fn = F.rt.modalQueue.shift(); if (fn) fn(); }

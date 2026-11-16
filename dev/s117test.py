@@ -11,8 +11,7 @@
 # 쓰는 법: python3 wrap.py && python3 s117test.py   (마지막 줄이 PASS면 통과)
 import asyncio, json
 from playwright.async_api import async_playwright
-from s4test import ctxpage, base
-F = 'window.__forest'
+from testlib import ctxpage, base, F
 CLEAN = f"(()=>{{ document.querySelectorAll('.overlay').forEach(o=>{{o.hidden=true;o.classList.remove('open')}}); const F={F}; F.rt.modalOpen=null; F.rt.modalQueue.length=0; F.rt.talkSeq=null; F.rt.st=null; F.closeSheet&&F.closeSheet(); const t=document.querySelector('#tut'); if(t) t.hidden=true; F.S.tut.st=F.S.tut.st||'skip'; F.rt.tut=null; }})()"
 # 다음 주 월요일 0시(한국 시간)에서 d일 h시간 뒤로 기기 시계를 꾸며요
 CLOCK = lambda d, h=10: f"(()=>{{ const F={F}; const now=Date.now()+9*3600000; const day=Math.floor(now/86400000); const wd=(new Date(day*86400000).getUTCDay()+6)%7; const mon=(day-wd+7)*86400000-9*3600000; F.rt.fakeNow=mon+{d}*86400000+{h}*3600000; return [F.gameToday(), F.fvWd? F.fvWd():-1]; }})()"

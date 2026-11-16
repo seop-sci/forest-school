@@ -2,8 +2,7 @@
 # '건네기' 줄이 생기고 사라질 때 주문 줄 높이와 판 위치가 그대로인지, 360px과 390px
 import asyncio
 from playwright.async_api import async_playwright
-from s4test import ctxpage, base
-F = 'window.__forest'
+from testlib import ctxpage, base, F
 async def main():
     bad = []
     def ok(c, msg):

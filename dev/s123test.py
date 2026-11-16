@@ -2,8 +2,7 @@
 # 오늘의 광고 도장(6개, 3개와 6개 보상), 고등학교부터 광고 보상 고르기(자리 비운 동안, 보충수업), 한 판 더(하루 한 번씩), 졸업식과 학위수여식 곡, 옛 저장
 import asyncio
 from playwright.async_api import async_playwright
-from s4test import ctxpage, base
-F = 'window.__forest'
+from testlib import ctxpage, base, F
 AD = """const sl=ms=>new Promise(r=>setTimeout(r,ms)); const watch=async()=>{ for(let i=0;i<40;i++){ await sl(100); const d=document.querySelector('#adDone'); if(!document.querySelector('#mAd').hidden && !d.hidden){ d.click(); await sl(400); return true; } } return false; };"""
 async def main():
     bad = []

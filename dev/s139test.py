@@ -2,7 +2,7 @@
 # 쓰는 법: python3 wrap.py && python3 s139test.py   (마지막 줄이 PASS면 통과)
 import asyncio
 from playwright.async_api import async_playwright
-from s4test import base, ctxpage
+from testlib import base, ctxpage
 bad = []
 JS = """(async()=>{const F=window.__forest,S=F.S,T=F.TRIPS,out={};
   out.n=T.map(D=>D.souv.length); out.names=new Set(T.flatMap(D=>D.souv)).size;

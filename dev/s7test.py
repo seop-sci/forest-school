@@ -1,7 +1,7 @@
 # GitHub 테스트판 시험: 가짜 Firebase 서버(규칙 검사 포함)와 가짜 SDK로 서버 저장, 복원, 이어하기, 랭킹, 테스트 현황, 오류를 확인해요
 import asyncio, json, time, sys, subprocess, urllib.request, pathlib
 from playwright.async_api import async_playwright
-from s4test import base, TODAY
+from testlib import base, TODAY
 HERE = pathlib.Path(__file__).resolve().parent
 def _free_port():
     # 2026-11-11: 가짜 서버 시험(s7 계열)을 한꺼번에 돌리면 모두 8765를 써서 서로 부딪혔어요. 시험마다 빈 포트를 하나 받아요(FS_PORT로 정할 수도 있어요)

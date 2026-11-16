@@ -2,8 +2,7 @@
 # 받은 황금 도토리가 60개 전이면 그대로, 뒤면 되풀이해 나오는 곳은 숲의 정수 20. 출석 7일째와 주간 마지막 상자는 황금 그대로. 광고를 보면 '광고 선물' 알림
 import asyncio
 from playwright.async_api import async_playwright
-from s4test import ctxpage, base
-F = 'window.__forest'
+from testlib import ctxpage, base, F
 async def main():
     bad = []
     def ok(c, msg):
