@@ -15489,7 +15489,9 @@ body.cam-scene #ffChip,body.cam-scene #plChip,body.cam-scene .b-ring{animation-p
   const RKF = { fill: 20, lo: 0.3, hi: 1.1, endLo: 0.3, endHi: 0.9, start: 0.25, tierDrop: 0.04, floor: { week: 300, sea: 3000, bt: 60, all: 300 }, titled: 0.65,
     // 3.2.6 woodani 제보(월요일인데 이미 점수가 높음, 시즌 시작 전인데 시즌 점수): 주간과 시즌은 월요일 0점에서 시작해 사람처럼 요일과 시간대에 따라 올라가요.
     // 줄마다 요일별 노는 양이 다르고 쉬는 날(off)도 있어요. 하루에 오르는 점수는 dayCap을 넘지 않아요(오늘의 미션, 보너스, 행사, 체험학습, 대결을 열심히 한 하루쯤). 숫자는 본부 제안
-    off: 0.22, dayCap: 260, refCap: 1800 };
+    off: 0.22, dayCap: 260, refCap: 1800,
+    // 5.0.1 woodani 요청(2026-11-17): 보조 줄은 고등학교까지만(maxTier), 학교 파워는 고등학교 끝쯤(hsRef)을 넘는 기준으로 크지 않게. 숫자는 본부 제안
+    maxTier: 3, hsRef: 4500 };
   // 하루 중 노는 양(0~23시). 새벽은 거의 없고 아침, 점심, 저녁에 몰려요
   const RKF_HOUR = [0.02, 0, 0, 0, 0, 0, 0.1, 0.5, 0.7, 0.35, 0.3, 0.35, 0.8, 0.6, 0.3, 0.3, 0.45, 0.7, 0.9, 1, 1, 0.9, 0.6, 0.25];
   const RKF_CUM = (() => { const c = [0]; RKF_HOUR.forEach(v => c.push(c[c.length - 1] + v)); return c.map(v => v / c[24]); })();
@@ -15520,19 +15522,19 @@ body.cam-scene #ffChip,body.cam-scene #plChip,body.cam-scene .b-ring{animation-p
     const need = RKF.fill - rows.length; if (need <= 0 || Rank.state !== 'on') return rows;
     if (mode === 'sea' && !rsOn()) return rows;   // 3.2.6 시즌이 시작하기 전에는 보조 줄도 없어요
     const seed = `${mode}|${mode === 'sea' ? 's' + rsNum() : gameWeek()}|${Rank.uid || ''}`, timed = mode === 'week' || mode === 'sea';   // 3.2.6 주간과 시즌은 rkTimed가 셈
-    const shrink = 1 - RKF.tierDrop * Math.min(4, S.tier), memo = rt.rkMax || (rt.rkMax = {});
+    const shrink = 1 - RKF.tierDrop * Math.min(RKF.maxTier, S.tier), memo = rt.rkMax || (rt.rkMax = {});
     const taken = new Set(rows.map(r => nickKey(r.name))), out = rows.slice();
     const us = Array.from({ length: need }, (_, i) => rkRnd(seed, i)), uCut = us.slice().sort((a, b) => b - a)[Math.max(0, Math.round(need * RKF.titled) - 1)];   // 점수는 u가 클수록 높아요
     for (let i = 0; i < need; i++) {
       const u = us[i];
       let v;
       if (timed) v = rkTimed(mode, seed + '|' + i);
-      else v = Math.max(mine, RKF.floor[mode]) * (RKF.lo + (RKF.hi - RKF.lo) * u) * shrink;
+      else v = Math.max(mode === 'all' ? Math.min(mine, RKF.hsRef) : mine, RKF.floor[mode]) * (RKF.lo + (RKF.hi - RKF.lo) * u) * shrink;   // 5.0.1 학교 파워는 고등학교 끝쯤을 넘는 기준으로 크지 않게
       const mk = seed + '|' + i; v = Math.max(memo[mk] || 0, Math.max(1, Math.round(v))); memo[mk] = v;   // 한 번 보인 점수보다 내려가지 않아요
       let nm = NICK_ADJ[rkHash(seed + 'a' + i) % NICK_ADJ.length] + ' ' + NICK_NOUN[rkHash(seed + 'n' + i) % NICK_NOUN.length];
       if (taken.has(nickKey(nm))) nm = NICK_NOUN[rkHash(seed + 'n' + i) % NICK_NOUN.length] + ' ' + (10 + rkHash(seed + 'k' + i) % 90);
       taken.add(nickKey(nm));
-      const tier = Math.max(0, S.tier - (u < 0.4 ? 1 : 0)), T = TIERS[Math.min(TIERS.length - 1, tier)];
+      const tier = Math.max(0, Math.min(RKF.maxTier, S.tier) - (u < 0.4 ? 1 : 0)), T = TIERS[Math.min(TIERS.length - 1, tier)];   // 5.0.1 보조 줄은 고등학교까지
       const tis = Object.keys(RKF_TI).filter(id => RKF_TI[id] <= tier && achTitleName(id)), title = RKF.titled > 0 && u >= uCut && tis.length ? tis[rkHash(seed + 't' + i) % tis.length] : '';
       out.push({ id: 'x' + i, nx: true, name: nm, score: v, lp: v, sp: v, bt: v, btm: Math.min(5, Math.max(0, (S.bt ? S.bt.lg : 0) - (u < 0.5 ? 1 : 0))), tier, year: 1 + rkHash(seed + 'y' + i) % T.years, sem: rkHash(seed + 's' + i) % 2, title });   // 3.0.1 학기도 줄마다(유치원은 rankSchool이 안 보여 줘요)
     }
