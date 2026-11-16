@@ -1,13 +1,12 @@
-# 안드로이드 판 만들기: index.html이나 app 폴더가 바뀌면 깃허브가 대신 빌드해요.
+# 안드로이드 판 만들기: '앱 내자' 때 main의 그 커밋을 app-release 가지로 올리면 깃허브가 대신 빌드해요(git push origin main:app-release).
+# 2026-11-17 woodani 결정: 웹만 낼 때(main에 합칠 때)는 돌지 않아요. 플레이 콘솔에는 '앱 내자' 때 만든 것만 올려요.
 # 저장소 비밀값 ANDROID_KEYSTORE_BASE64, ANDROID_KEYSTORE_PASSWORD가 있으면 구글 플레이에 올릴 .aab와 설치용 .apk를,
 # 없으면 휴대폰에서 시험해 볼 디버그 .apk만 만들어요. 결과는 Actions 화면의 Artifacts에서 내려받아요.
 name: Android build
 
 on:
   push:
-    branches: [main]
-    # 2026-11-11 (3.3.2 분석): 앱에는 지도 그림(img), 소리(audio), config.js도 들어가요. 그것만 바뀌어도 새로 만들어요
-    paths: ['index.html', 'app/**', 'img/**', 'audio/**', 'config.js', 'dev/minify_game.mjs', '.github/workflows/android.yml']
+    branches: [app-release]   # 2026-11-17: 태그는 이 작업 환경에서 못 올려서 가지로 해요
   workflow_dispatch:
 
 # 2.0.0 보안 점검(3-4): 저장소는 읽기만 해요. 액션은 태그가 아니라 커밋 값으로 고정해요(주석이 그 커밋의 태그)
