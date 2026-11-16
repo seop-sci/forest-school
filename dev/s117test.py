@@ -70,9 +70,9 @@ async def main():
         d = await page.evaluate(CLOCK(4)); print('금요일', d)
         # 주 번호를 먼저 맞춘 뒤 도장을 넣어요(게임의 1초 틱이 아직 안 돌았을 수 있어요)
         fv = await page.evaluate(f"""(()=>{{ const F={F}, S=F.S; S.tier=4; S.f.union=1; F.fvSync(); S.fv.st=5; F.fvSync(); const gs=F.fvGuests();
-          return {{on:F.fvOn(), show:F.fvBonus('show'), picnic:F.fvBonus('picnic'), sp:gs.map(g=>g.sp), real:gs.map(g=>g.real), st:S.fv.st, mk:F.mkOn()}}; }})()""")
+          return {{on:F.fvOn(), show:F.fvBonus('show'), picnic:F.fvBonus('picnic'), sp:gs.map(g=>g.sp), real:gs.map(g=>g.real), st:S.fv.st, mk:F.mkOn(), gn:F.bfOn()?F.BIG.guests:3}}; }})()""")
         print(' 축제', fv)
-        ok(fv['on'] and fv['show'] and not fv['picnic'] and not fv['mk'], '금요일은 축제와 발표회 보너스'); ok(len(fv['sp']) == 3 and all(fv['sp']), '손님 학교마다 대표 동물'); ok(fv['st'] == 5, '같은 주에는 도장이 남아요')
+        ok(fv['on'] and fv['show'] and not fv['picnic'] and not fv['mk'], '금요일은 축제와 발표회 보너스'); ok(len(fv['sp']) == fv['gn'] and all(fv['sp']), '손님 학교마다 대표 동물')   # 대축제 날(달 마지막 금토일)은 손님이 더 와요; ok(fv['st'] == 5, '같은 주에는 도장이 남아요')
         d = await page.evaluate(CLOCK(7)); wk = await page.evaluate(f"(()=>{{ const F={F}; F.fvSync(); return [F.S.fv.st, F.fvBonus('picnic')]; }})()")
         print('다음 주 월요일', d, wk); ok(wk == [0, True], '주가 바뀌면 도장판이 새로 시작하고 월요일은 소풍 보너스')
         d = await page.evaluate(CLOCK(10)); cp = await page.evaluate(f"(()=>{{ const F={F}; F.wdTick(); return [F.S.mk.cp, F.S.mk.sold, F.S.mk.buy.m5||0]; }})()")
@@ -96,7 +96,7 @@ async def main():
           return {{head, picks, stuck, after, pick:S.sto.pick.c0, seen:S.sto.seen.c0||0, q:S.sto.q.slice(), rows, btn, who, side, over, m:S.q.m===i}}; }})()""")
         print('1장 닫는 장면', s2)
         ok('1장' in s2['head'] and s2['picks'] == ['그럼요', '모레도 오렴'] and s2['stuck'], '닫는 장면 끝에 답 둘, 고르기 전에는 넘어가지 않아요'); ok(s2['pick'] == 1 and '모레' in s2['after'] and s2['seen'] == 1, '고른 답이 남고 대사가 달라져요')
-        ok(s2['m'], '장면은 퀘스트 진행을 바꾸지 않아요'); ok(s2['rows'] == 24 and s2['btn'] == 3 and s2['who'] >= 2 and s2['side'] == 6 and not s2['over'], f"수첩 세 쪽 {s2['rows']} {s2['btn']} {s2['who']} {s2['side']}")
+        ok(s2['m'], '장면은 퀘스트 진행을 바꾸지 않아요'); ok(s2['rows'] == 28 and s2['btn'] == 3 and s2['who'] >= 2 and s2['side'] == 6 and not s2['over'], f"수첩 세 쪽 {s2['rows']} {s2['btn']} {s2['who']} {s2['side']}")
         await ctx.close()
         # 옛 저장(새 칸 없음)과 엉뚱한 값
         ctx, page, errs3 = await ctxpage(b, 390, 800, 'light', base(tier=1, tg=1))
@@ -111,7 +111,7 @@ async def main():
         await page.evaluate('window.__STORY_AUTO = true')   # 장면이 저절로 뜨게(시험 모드에서는 꺼져 있어요)
         # 게임의 1초 틱이 먼저 돌면 이야기 칸이 옛 저장처럼 다시 맞춰져서, 읽은 직후의 값(sanitize)으로 봐요
         j = await page.evaluate(f"(d=>{{ const S={F}.sanitize(d); return [S.tier, S.xg.bd, S.xg.got, S.xg.log.length, S.mk.cp, S.mk.sold, S.sto.ch, S.sto.q.length, (S.sto.side.nap||{{}}).n, S.fv.st]; }})(" + json.dumps(junk) + ")")
-        print('엉뚱한 값', j); ok(j == [2, 9999, 0, 0, 200, 0, 24, 0, 4, 0], '엉뚱한 값이 든 저장도 읽어요')
+        print('엉뚱한 값', j); ok(j == [2, 9999, 0, 0, 200, 0, 28, 0, 4, 0], '엉뚱한 값이 든 저장도 읽어요')
         await ctx.close()
         # 8) 고등학교: 운동장과 기숙사가 겹친 자리에서 그림이 있는 건물이 열려요. 꾸미기 자리는 건물 그림 밖
         ctx, page, errs5 = await ctxpage(b, 390, 800, 'light', base(tier=3, tg=1, sto={'v': 1, 'ch': 23, 'q': [], 'seen': {}, 'pick': {}, 'side': {}}))
