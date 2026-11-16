@@ -3,7 +3,8 @@
 // 웹 테스트판(GitHub Pages)은 고쳐 보기 쉽게 그대로 둬요.
 // 쓰는 법 (빌드 스크립트): import { minifyGame } from '../dev/minify_game.mjs'; html = await minifyGame(html, esbuild);
 // 쓰는 법 (시험): node dev/minify_game.mjs <입력.html> <출력.html> <esbuild가 있는 node_modules 폴더>
-export async function minifyGame(html, esbuild) {
+// 5.0.2 웹판은 opt.light로 불러요: 주석과 공백만 빼고(함수와 변수 이름은 그대로라 오류 보고를 읽기 쉬워요) HTML 주석은 남겨요
+export async function minifyGame(html, esbuild, opt = {}) {
   const parts = [];
   let last = 0, before = html.length;
   const re = /<(script|style)(\s[^>]*)?>([\s\S]*?)<\/\1>/g;
@@ -14,12 +15,12 @@ export async function minifyGame(html, esbuild) {
     last = m.index + all.length;
     const skip = (tag === 'script' && /\ssrc=/.test(attrs)) || /^\s*window\.FS_IMG/.test(body) || !body.trim() || /type=["'](?!text\/javascript)/.test(attrs);
     if (skip) { parts.push(all); continue; }
-    const out = await esbuild.transform(body, { loader: tag === 'style' ? 'css' : 'js', minify: true, legalComments: 'none', charset: 'utf8' });
+    const out = await esbuild.transform(body, Object.assign({ loader: tag === 'style' ? 'css' : 'js', legalComments: 'none', charset: 'utf8' }, opt.light ? { minifyWhitespace: true } : { minify: true }));
     parts.push(`<${tag}${attrs}>${out.code.trim()}</${tag}>`);
   }
   parts.push(html.slice(last));
   // 남은 HTML 주석도 빼요(조건부 주석은 없어요)
-  const outHtml = parts.join('').replace(/<!--[\s\S]*?-->/g, '');
+  const outHtml = opt.light ? parts.join('') : parts.join('').replace(/<!--[\s\S]*?-->/g, '');
   return { html: outHtml, before, after: outHtml.length };
 }
 

@@ -3,6 +3,7 @@
 // ADMOB_TEST=1이면 구글 테스트 광고를 써요 (업로드 키가 없는 시험 빌드).
 import * as esbuild from 'esbuild';
 import { minifyGame } from '../dev/minify_game.mjs';
+import { packKeep } from '../dev/app_pack.mjs';
 const { build } = esbuild;
 import fs from 'node:fs';
 let html = fs.readFileSync('../index.html', 'utf8');
@@ -19,9 +20,9 @@ fs.mkdirSync('www');
 fs.writeFileSync('www/index.html', html);
 fs.copyFileSync('../config.js', 'www/config.js');
 // 1.8.0 배경음악 파일(audio 폴더)도 함께 담아요
-fs.cpSync('../audio', 'www/audio', { recursive: true });
+fs.cpSync('../audio', 'www/audio', { recursive: true, filter: packKeep });   // 5.0.2 웹에서 받는 곡은 빼요(dev/app_pack.mjs)
 // 2.0.0 고화질 지도 그림(img/maps)도 함께 담아요
-fs.cpSync('../img', 'www/img', { recursive: true, filter: f => !/[\\/]maps[\\/][^\\/]*_(spring|summer|autumn|winter|xmas|space|retro)\.webp$/.test(f) });   // 4.3.2 테마 지도와 테마 참나무 층은 앱에 넣지 않고 웹에서 받아요(게임의 mapBase)   // 3.0.1 고급 지도도 담아요(예시 학교)
+fs.cpSync('../img', 'www/img', { recursive: true, filter: packKeep });   // 4.3.2 테마 지도와 테마 참나무 층, 5.0.2 저화질 지도와 이야기, 졸업식 그림은 앱에 넣지 않아요(dev/app_pack.mjs). 3.0.1 고급 지도는 담아요
 const test = process.env.ADMOB_TEST === '1';
 for (const f of ['fb', 'google', 'app', 'update']) await build({ entryPoints: [`src/${f}.js`], bundle: true, format: 'iife', target: 'es2019', minify: true, outfile: `www/${f}.js`, logLevel: 'warning' });
 await build({ entryPoints: ['src/ads.js'], bundle: true, format: 'iife', target: 'es2019', minify: true, outfile: 'www/ads.js',
