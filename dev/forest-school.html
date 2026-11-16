@@ -1263,6 +1263,7 @@ html.ait .pz{padding-top:calc(var(--ait-top, 0px) + 54px)}
 .dm-tx span{display:inline-flex;align-items:center;gap:3px;font-size:12.5px;color:var(--muted)}
 .dm-tx span svg{width:13px;height:15px}
 .dm .qbar{margin:0}
+.rd-q{display:flex;align-items:center;justify-content:space-between;gap:8px;margin:4px 0;padding:6px 10px;border-radius:10px;background:var(--card);font-size:13.5px;color:var(--ink)}
 .dm-n{flex:none;font-size:13px;color:var(--chip-ink);font-variant-numeric:tabular-nums}
 .dm-ok{flex:none;width:22px;height:22px;color:var(--accent-shadow)}
 .dm .cta.small{flex:none;width:auto;min-height:38px;padding:0 14px}
@@ -1760,6 +1761,7 @@ body{background:radial-gradient(120% 60% at 50% 0%, color-mix(in srgb, var(--pap
 .bk-why{margin:0 0 10px;font-size:13px;line-height:1.5;color:var(--danger);text-align:center}
 #bkBuy{display:inline-flex;align-items:center;justify-content:center;gap:4px}#bkBuy .tic,#bkBuy svg,#bkBuy img{width:18px;height:18px}
 #bkBuy[aria-disabled="true"]{opacity:.5}
+.bk-all{width:100%;margin-top:8px}
 .ac-note{color:var(--muted);font-size:12px;margin-top:2px}
 .mini-card .mc-sub{display:table;margin:0 0 3px;line-height:1.3;padding:1px 7px;border-radius:999px;background:var(--chip-bg);color:var(--chip-ink);font-family:var(--font-body);font-size:12px;font-weight:700;white-space:nowrap}
 @media (max-width:380px){.ac-row{grid-template-columns:30px 40px 1fr auto;gap:6px}.ac-bk{padding:3px 7px;font-size:11px}}
@@ -3504,6 +3506,13 @@ body.cam-scene #ffChip,body.cam-scene #plChip,body.cam-scene .b-ring{animation-p
 /* 1.7.2: 학교 상세(펼침)에는 위쪽에 없는 정원과 학교 파워만 보여요. 평판은 위쪽 재화 줄에 늘 있어요 */
 .app .board .stats .rep-row{display:none}
 /* 1.7.2: 퀘스트 목록에서 이벤트 미션으로 가는 줄 */
+.dm-all{border-color:var(--gold);background:color-mix(in srgb, var(--gold) 16%, var(--card))}.dm-all .cta{flex:none;pointer-events:none}
+.td-h{margin-top:4px}.td-fold{display:flex;align-items:center;gap:6px;width:100%;padding:0;border:0;background:none;color:inherit;font:inherit;text-align:left;cursor:pointer}.td-fold svg{width:16px;height:16px;margin-left:auto;transition:transform .2s}.td-fold[aria-expanded="false"] svg{transform:rotate(-90deg)}
+.td-list{display:grid;gap:0;margin:0 0 8px;border:1px solid var(--line);border-radius:12px;overflow:hidden;background:var(--paper)}
+.td-row{display:flex;align-items:center;gap:8px;width:100%;min-height:40px;padding:6px 12px;border:0;border-top:1px solid var(--line);background:none;color:var(--ink);font:inherit;font-size:14px;text-align:left}
+.td-row:first-child{border-top:0}button.td-row{cursor:pointer}button.td-row:active{background:var(--card)}
+.td-row b{flex:1;min-width:0;font-weight:400;font-family:var(--font-display)}.td-row span{flex:none;font-size:13px;color:var(--chip-ink);font-variant-numeric:tabular-nums}.td-row em{flex:none;padding:0 7px;border-radius:999px;background:var(--chip-bg);color:var(--chip-ink);font-style:normal;font-size:11px;line-height:17px}
+.td-row.done{color:var(--muted)}.td-row.done span{display:inline-flex;align-items:center;gap:3px;color:var(--muted)}.td-row.done span svg{width:14px;height:14px}
 .dm-ev{display:flex;align-items:center;justify-content:space-between;gap:10px;width:100%;margin:0 0 10px;padding:10px 12px;border:2px solid var(--accent);border-radius:14px;background:color-mix(in srgb, var(--accent) 14%, var(--card));color:var(--ink);font:inherit;text-align:left;cursor:pointer}
 .dm-ev b{font-family:var(--font-display);font-weight:400;font-size:15px}
 .dm-ev small{display:block;font-size:12px;color:var(--muted)}
@@ -4960,6 +4969,7 @@ body.cam-scene #ffChip,body.cam-scene #plChip,body.cam-scene .b-ring{animation-p
     <div class="bk-rows"><div class="bk-row" id="bkLeft"></div><div class="bk-row" id="bkHave"></div></div>
     <p class="bk-why" id="bkWhy" hidden></p>
     <div class="btn-row"><button class="btn-sub" type="button" id="bkCancel">취소</button><button class="cta" type="button" id="bkBuy">구매하기</button></div>
+    <button class="btn-sub bk-all" type="button" id="bkAll" hidden>남은 권 모두 사기</button><!-- 5.0.2 -->
   </section>
 </div>
 
@@ -7613,7 +7623,7 @@ body.cam-scene #ffChip,body.cam-scene #plChip,body.cam-scene .b-ring{animation-p
       say: '큰일이에요! 학교에 아이들이 늘었다는 소문을 매와 뱀도 들었나 봐요. 톡톡 쳐서 쫓아내 주세요!' },
     { id: 'z1', ch: 1, t: 'pz', n: 1, r: 200, title: '수학 공부: 숲속 퍼즐 한 판', how: '공부 > 숲속 퍼즐에서 한 판을 끝까지 해요',
       say: '다람쥐 선생님이 수업에 쓰던 퍼즐 상자를 꺼내 오셨어요. 조각이 몇 개 없어진 것 같지만 괜찮대요.' },
-    { id: 'rd1', ch: 1, t: 'rdBooks', n: 1, r: 200, title: '국어 공부: 책 한 권 읽기', how: '도서관이나 공부 탭에서 책을 골라요. 15분 뒤 다 읽어요',
+    { id: 'rd1', ch: 1, t: 'rdBooks', n: 1, r: 200, title: '국어 공부: 책 한 권 읽기', how: '도서관이나 공부 탭에서 책을 골라요. 첫 책은 바로 다 읽어요',
       say: '부엉이 선생님이 오시면서 책을 한 보따리 가져오셨어요. 솜이가 벌써 한 권 골랐어요.' },
     { id: 'q8', ch: 1, t: 'students', n: 30, r: 250, title: '학생 30명 맞이하기', how: '교실을 Lv.6까지 넓히고 학생을 30명까지 모집해요',
       say: '여우가 동생을 데려오고, 동생이 친구를 데려왔어요. 교문 앞이 북적북적해요!' },
@@ -8312,7 +8322,7 @@ body.cam-scene #ffChip,body.cam-scene #plChip,body.cam-scene .b-ring{animation-p
     v: 4, pid: randCode(8), born: Date.now(), budget: 20, students: 4,
     f: { classroom: 1, cafeteria: 0, library: 0, playground: 0, science: 0, store: 0, dorm: 0, union: 0, institute: 0, gradhall: 0 },   // 5.0.0 연구소, 연구동   // 4.0.0 union: 학생회관
     fu: freshFu(),
-    fold: { b: 0, l: 0, r: 0, q: 0 },   // 3.0.0 홈 칸 접기(1이면 접음)
+    fold: { b: 0, l: 0, r: 0, q: 0, td: 0 },   // 5.0.2 td: 퀘스트 탭 '오늘 할 일' 접기   // 3.0.0 홈 칸 접기(1이면 접음)
     t: { squirrel: 1, owl: 0, bear: 0 },
     vp: 0,   // 1.7.0 고슴도치 교감 선생님 연수 레벨 (0~10)
     ach: { hit: {}, got: {}, title: '' },   // 1.7.1 업적: hit 이룬 등급(0~3), got 받은 등급, title 단 칭호(업적 종류 id)
@@ -8571,7 +8581,7 @@ body.cam-scene #ffChip,body.cam-scene #plChip,body.cam-scene .b-ring{animation-p
     sanitize180(d, s);   // 1.8.0 숲속 합치기
     s.vp = Math.min(VP.max, Math.floor(num(d.vp, 0, 0)));   // 1.7.0 교감 선생님
     for (const k of Object.keys(XT)) s.xt[k] = Math.min(XT[k].max, Math.floor(num(d.xt && d.xt[k], 0, 0)));
-    for (const k of ['b', 'l', 'r', 'q']) s.fold[k] = d.fold && d.fold[k] ? 1 : 0;   // 3.0.0 홈 칸 접기   // 1.7.1 새 선생님
+    for (const k of ['b', 'l', 'r', 'q', 'td']) s.fold[k] = d.fold && d.fold[k] ? 1 : 0;   // 3.0.0 홈 칸 접기   // 1.7.1 새 선생님
     sanitize171(d, s);   // 1.7.1 업적
     sanitize174(d, s);   // 1.7.4 꾸미기
     sanitize200(d, s);   // 2.0.0 명부, 동아리, 학교급 사진
@@ -9347,7 +9357,7 @@ body.cam-scene #ffChip,body.cam-scene #plChip,body.cam-scene .b-ring{animation-p
     }
   }
   function sfx(name) {
-    if (!S || !S.sound) return;
+    if (!S || !S.sound || rt.batch) return;   // 모두 받기 동안에는 소리를 겹쳐 내지 않아요
     ensureAudio();
     if (!actx) return;
     try {
@@ -17440,6 +17450,17 @@ body.cam-scene #ffChip,body.cam-scene #plChip,body.cam-scene .b-ring{animation-p
   function acBkDay() { const t = gameToday(); if (S.ac.bk.day !== t) { S.ac.bk.day = t; for (const k of AC.keys) S.ac.bk.n[k] = 0; } }
   const bookCost = k => AC.book.ess + AC.book.perLv * acLv(k);   // 2.1.0 문제집 값은 레벨을 따라 올라요
   const acBkLeft = k => { acBkDay(); return Math.max(0, AC.book.perDay - (S.ac.bk.n[k] || 0)); };
+  // 5.0.2 문제집 남은 권 모두 사기: 한 권씩 살 때와 같은 값과 차례로 사고(레벨이 오르면 값도 따라 올라요), 정수가 모자라면 살 수 있는 만큼만 사요
+  function acBuyBookAll(k) {
+    if (!AC.name[k] || rt.batch) return 0;
+    const e0 = S.ess, x0 = S.ac.st.bk; let n = 0;
+    rt.batch = { items: [], n: 0 };
+    try { while (acBkLeft(k) > 0 && S.ess >= bookCost(k) && n < 50 && acBuyBook(k)) n += 1; } finally { rt.batch = null; }
+    if (!n) { acBuyBook(k); return 0; }   // 한 권도 못 사면 까닭을 알려 줘요
+    sfx('quest'); buzz(14);
+    toast(`${AC.name[k]} 문제집 ${S.ac.st.bk - x0}권을 풀었어요! ${AC.name[k]} XP +${n * AC.book.xp}\n숲의 정수 ${e0 - S.ess}개를 썼어요`);
+    return n;
+  }
   function acBuyBook(k) {
     if (!AC.name[k]) return false;
     if (acBkLeft(k) <= 0) { toast(`${AC.name[k]} 문제집은 하루 ${AC.book.perDay}권까지예요. 내일 다시 살 수 있어요`); return false; }
@@ -17503,6 +17524,7 @@ body.cam-scene #ffChip,body.cam-scene #plChip,body.cam-scene .b-ring{animation-p
     $('#bkWhy').textContent = why; $('#bkWhy').hidden = !why;
     $('#bkBuy').setAttribute('aria-disabled', why ? 'true' : 'false');
     $('#bkBuy').innerHTML = `${ic}${need} 구매하기`;
+    { const a = $('#bkAll'); if (a) { a.hidden = !!why || left < 2 || have < need * 2; a.textContent = `남은 ${left}권 모두 사기 (정수가 되는 만큼)`; } }
   }
   // 옛 저장: 퍼즐 판 수와 합치기 주문 수로 수학과 미술 XP를 한 번 환산해요(2.0.1 테스트판 플레이어)
   function sanitizeAc(d, s) {
@@ -18321,7 +18343,7 @@ body.cam-scene #ffChip,body.cam-scene #plChip,body.cam-scene .b-ring{animation-p
     music: ['음악 이론', '쉼표도 음악이라는 걸 배웠어요.'], robot: ['인공지능 개론', '로봇도 틀리면서 배운대요.'] };
   for (const B of BOOKS) for (const [f, i] of [['name', 0], ['say', 1]]) { const t0 = B[f]; Object.defineProperty(B, f, { get: () => uniNow() && BOOKS_U[B.k] ? BOOKS_U[B.k][i] : t0, enumerable: true, configurable: true }); }
   const RD = { min: 15, perDay: 3, xp: 25 };
-  const freshRd = () => ({ day: '', n: 0, cur: '', at: 0, got: {}, st: 0 });
+  const freshRd = () => ({ day: '', n: 0, cur: '', at: 0, got: {}, st: 0, q: [] });   // 5.0.2 q: 예약한 책(읽는 책이 끝나면 이어서)
   const rdReady = () => !!S && S.f.library >= 1;
   function rdDay() { const t = gameToday(); if (S.rd.day !== t) { S.rd.day = t; S.rd.n = 0; } }
   const rdLeft = () => { rdDay(); return Math.max(0, rdPerDay() - S.rd.n); };
@@ -18332,25 +18354,50 @@ body.cam-scene #ffChip,body.cam-scene #plChip,body.cam-scene .b-ring{animation-p
   const bookCover = (b, cls) => IMG(bookKey(b)) ? `<img class="${cls || 'bk-img'}" src="${IMG(bookKey(b))}" alt="" draggable="false">` : `<span class="bk-fb ${cls || ''}" style="--bk:${b.c}"><i>${b.em}</i></span>`;
   function rdStart(k) {
     const b = bookOf(k); if (!b || !rdReady() || rt.paused) return false;
-    if (S.rd.cur) { toast(`지금 「${bookOf(S.rd.cur).name}」${batchim(bookOf(S.rd.cur).name) ? '을' : '를'} 읽고 있어요`); return false; }
-    if (rdLeft() <= 0) { toast(`책은 하루 ${rdPerDay()}권까지예요.\n내일 또 읽어요`); return false; }
+    if (rdLeft() <= 0) { toast(S.rd.cur ? `지금 「${bookOf(S.rd.cur).name}」${batchim(bookOf(S.rd.cur).name) ? '을' : '를'} 읽고 있어요.\n책은 하루 ${rdPerDay()}권까지예요` : `책은 하루 ${rdPerDay()}권까지예요.\n내일 또 읽어요`); return false; }
+    if (S.rd.cur) {   // 5.0.2 읽는 중에 고르면 예약: 지금 책이 끝난 때부터 이어서 읽어요. 하루 권수는 예약할 때 세요
+      S.rd.n += 1; S.rd.q.push(k);
+      sfx('tap'); save(); renderRead(); renderMini();
+      toast(`「${b.name}」${batchim(b.name) ? '을' : '를'} 예약했어요.\n지금 책을 다 읽으면 이어서 읽어요`);
+      return true;
+    }
+    const first = S.rd.st === 0;   // 5.0.2 처음 읽는 책은 기다리지 않고 바로 다 읽어요(1장 '책 한 권 읽기'가 15분 벽이 되지 않게, 텃밭의 무료 바로 자라기처럼)
     S.rd.n += 1; S.rd.cur = k; S.rd.at = gameNow(); S.rd.m = rdMinNow();
+    if (first) {
+      S.rd.at = gameNow() - S.rd.m * 60000;
+      sfx('quest'); rdSettle();
+      const t = rt.rdNews; rt.rdNews = ''; renderRead(); renderMini();
+      toast('첫 책은 바로 다 읽었어요!\n' + t);
+      return true;
+    }
     sfx('tap'); save(); renderRead(); renderMini();
     toast(`「${b.name}」${batchim(b.name) ? '을' : '를'} 읽기 시작했어요.\n${S.rd.m}분 뒤 다 읽어요${S.rd.m < RD.min ? ' (비 오는 날)' : ''}`);
     return true;
   }
   // 다 읽었으면 끝내요. 알림은 다른 알림이 없을 때(1초마다 rdTick)
   function rdSettle() {
-    if (!S.rd.cur || gameNow() < rdEnd()) return false;
-    const b = bookOf(S.rd.cur); S.rd.cur = ''; S.rd.at = 0; S.rd.m = 0;
-    if (!b) return false;
-    S.rd.got[b.k] = (S.rd.got[b.k] || 0) + 1; S.rd.st += 1;
-    const xp = acGain('kor', Math.round((RD.xp + (wxIs('rain') ? 5 : 0)) * (1 + XT.kor.per / 100 * xtLv('kor')) * (1 + deptX('human') / 100)));   // 2.1.3 비 오는 날 +5, 2.3.0 국어 선생님
-    const who = speciesList()[Math.floor(Math.random() * Math.max(1, speciesList().length))] || 'rabbit';
-    rt.rdNews = `「${b.name}」${batchim(b.name) ? '을' : '를'} 다 읽었어요! 국어 XP +${xp}\n${spName(who)}: "${b.say}"`;
+    let any = false;
+    for (let guard = 0; guard < 9; guard++) {   // 5.0.2 예약한 책이 있으면 앞 책이 끝난 때부터 이어서 읽어요(꺼 둔 동안 여러 권이 끝났을 수 있어요)
+      if (!S.rd.cur || gameNow() < rdEnd()) break;
+      const end = rdEnd(), b = bookOf(S.rd.cur); S.rd.cur = ''; S.rd.at = 0; S.rd.m = 0;
+      if (b) {
+        S.rd.got[b.k] = (S.rd.got[b.k] || 0) + 1; S.rd.st += 1;
+        const xp = acGain('kor', Math.round((RD.xp + (wxIs('rain') ? 5 : 0)) * (1 + XT.kor.per / 100 * xtLv('kor')) * (1 + deptX('human') / 100)));   // 2.1.3 비 오는 날 +5, 2.3.0 국어 선생님
+        const who = speciesList()[Math.floor(Math.random() * Math.max(1, speciesList().length))] || 'rabbit';
+        rt.rdNews = `「${b.name}」${batchim(b.name) ? '을' : '를'} 다 읽었어요! 국어 XP +${xp}\n${spName(who)}: "${b.say}"`;
+        any = true;
+      }
+      const nx = S.rd.q.shift(); if (nx && bookOf(nx)) { S.rd.cur = nx; S.rd.at = end; S.rd.m = rdMinNow(); }
+    }
+    if (!any) return false;
     save(); checkQuests(); renderMini();
     if (rt.modalOpen === $('#mRead')) renderRead();
     return true;
+  }
+  function rdUnqueue(i) {   // 예약 취소: 예약할 때 센 하루 권수를 돌려줘요
+    if (!S.rd.q[i]) return;
+    S.rd.q.splice(i, 1); rdDay(); S.rd.n = Math.max(0, S.rd.n - 1);
+    sfx('tap'); save(); renderRead(); renderMini();
   }
   function rdTick() {
     if (!S || !S.rd) return;
@@ -18383,11 +18430,12 @@ body.cam-scene #ffChip,body.cam-scene #plChip,body.cam-scene .b-ring{animation-p
   function renderRead() {
     if (!$('#mRead') || !S.rd) return;
     const left = rdLeft(), busy = !!S.rd.cur;
-    $('#rdLead').textContent = nl(busy ? `책은 한 권씩 읽어요. 다 읽으면 다음 책을 고를 수 있어요.` : left > 0 ? `읽을 책을 골라요. ${RD.min}분 뒤 다 읽고 국어 학력이 올라요. 앱을 꺼도 읽어요.` : `오늘은 책을 ${rdPerDay()}권 다 읽었어요. 내일 또 와요.`);
+    $('#rdLead').textContent = nl(busy ? (left > 0 ? `책은 한 권씩 읽어요. 읽는 중에 다른 책을 누르면 예약돼요.` : `책은 한 권씩 읽어요. 오늘 고를 수 있는 책은 모두 골랐어요.`) : left > 0 ? `읽을 책을 골라요. ${RD.min}분 뒤 다 읽고 국어 학력이 올라요. 앱을 꺼도 읽어요.` : `오늘은 책을 ${rdPerDay()}권 다 읽었어요. 내일 또 와요.`);
     renderReadBar();
-    $('#rdTickets').innerHTML = busy && rdRemain() > 0 ? waitTicketButtons('data-read-tk') : '';
+    $('#rdTickets').innerHTML = (busy && rdRemain() > 0 ? waitTicketButtons('data-read-tk') : '') +
+      S.rd.q.map((k, i) => { const qb = bookOf(k); return qb ? `<div class="rd-q"><span>다음: 「${esc(qb.name)}」 (예약)</span><button type="button" class="btn-sub small" data-rd-unq="${i}" aria-label="${esc(qb.name)} 예약 취소">취소</button></div>` : ''; }).join('');
     $('#rdBooks').innerHTML = BOOKS.map(b => { const n = S.rd.got[b.k] || 0, now = S.rd.cur === b.k;
-      return `<button class="rd-book${now ? ' now' : ''}" type="button" data-bk="${b.k}" aria-disabled="${!busy && left > 0 ? 'false' : 'true'}" aria-label="${b.name}${n ? `, ${n}번 읽음` : ''}">${bookCover(b)}<b>${b.name}</b><small>${now ? '읽는 중' : n ? `${n}번 읽음` : '새 책'}</small></button>`; }).join('');
+      return `<button class="rd-book${now ? ' now' : ''}" type="button" data-bk="${b.k}" aria-disabled="${left > 0 ? 'false' : 'true'}" aria-label="${b.name}${n ? `, ${n}번 읽음` : ''}${busy && left > 0 ? ', 눌러서 예약' : ''}">${bookCover(b)}<b>${b.name}</b><small>${now ? '읽는 중' : S.rd.q.includes(b.k) ? '예약함' : n ? `${n}번 읽음` : '새 책'}</small></button>`; }).join('');
     $('#rdNote').textContent = nl(`오늘 ${rdPerDay() - left}/${rdPerDay()}권. 지금까지 ${S.rd.st}권 읽었어요. 한 권에 국어 XP +${Math.round(RD.xp * (1 + XT.kor.per / 100 * xtLv('kor')) * (1 + deptX('human') / 100))}.`);
   }
   // 저장 읽기(2.0.1 공부 2단계)
@@ -18411,6 +18459,7 @@ body.cam-scene #ffChip,body.cam-scene #plChip,body.cam-scene .b-ring{animation-p
       if (typeof R.cur === 'string' && bookOf(R.cur)) { s.rd.cur = R.cur; s.rd.at = num(R.at, 0, Date.now() + 366 * 86400000); s.rd.m = R.m === 10 ? 10 : 0; if (!s.rd.at) s.rd.cur = ''; }   // 2.1.3 m
       if (R.got && typeof R.got === 'object') for (const b of BOOKS) { const v = Math.floor(num(R.got[b.k], 0, 1e6)); if (v > 0) s.rd.got[b.k] = v; }
       s.rd.st = Math.floor(num(R.st, 0, 1e7));
+      if (s.rd.cur && Array.isArray(R.q)) s.rd.q = R.q.filter(k => typeof k === 'string' && bookOf(k)).slice(0, 5);   // 5.0.2 예약한 책
     }
   }
   /* ---------- 2.1.0 숲속 소풍 (유치원 2, 로드맵 5절) ----------
@@ -18771,6 +18820,18 @@ body.cam-scene #ffChip,body.cam-scene #plChip,body.cam-scene .b-ring{animation-p
     save(); checkQuests(); frRefresh();
     return true;
   }
+  // 5.0.2 선물 남은 번 모두 주기: 한 번씩 줄 때와 같은 값으로 주고, 보상 창은 하나로 모아요
+  function frGiftAll(sp) {
+    const f = frOf(sp); if (!f || rt.paused || rt.batch) return 0;
+    const B = rt.batch = { items: [], n: 0 }; let n = 0;
+    try { while (frGiftLeft() > 0 && S.ess >= BF.giftEss && n < 20 && frGift(sp)) n += 1; } finally { rt.batch = null; }
+    if (!n) { frGift(sp); return 0; }
+    const hearts = B.items.filter(it => /^친밀도 \+/.test(it.t)), sum = hearts.reduce((a, it) => a + (+(/\+(\d+)/.exec(it.t) || [0, 0])[1]), 0);
+    showReward({ title: `선물을 ${n}번 줬어요!`, sub: `${iga(frFull(sp))} 정말 기뻐해요`,
+      art: IMG('bond_gift') ? `<img src="${IMG('bond_gift')}" alt="" style="width:96px;height:96px;object-fit:contain">` : '',
+      items: [{ ic: heartIc(), t: `친밀도 +${sum}` }].concat(psMergeItems(B.items.filter(it => !hearts.includes(it)))) });
+    return n;
+  }
   function frRename(sp, v) {
     const f = frOf(sp); if (!f) return false;
     const nm = String(v || '').trim();
@@ -18839,7 +18900,8 @@ body.cam-scene #ffChip,body.cam-scene #plChip,body.cam-scene .b-ring{animation-p
       `<span class="fr-hearts" aria-label="친밀도 하트 ${h}칸">${heartsHTML(f.p)}</span></div>` +
       `<small>생일 ${f.bm}월 ${f.bd}일. 함께한 기록: 소풍 ${f.n.pc}번, 생일 잔치 ${f.n.bd}번, 반장 ${f.n.el}번</small>` +
       `<div class="fr-act"><button class="btn-sub small" type="button" data-fr-pat="${sp}"${done ? ' aria-disabled="true"' : ''}>${pat}${done ? '오늘 쓰다듬었어요' : '쓰다듬기'}</button>` +
-      `<button class="btn-sub small" type="button" data-fr-gift="${sp}"${left <= 0 || S.ess < BF.giftEss ? ' aria-disabled="true"' : ''}>${gift}선물 (정수 ${BF.giftEss})</button></div>` +
+      `<button class="btn-sub small" type="button" data-fr-gift="${sp}"${left <= 0 || S.ess < BF.giftEss ? ' aria-disabled="true"' : ''}>${gift}선물 (정수 ${BF.giftEss})</button>` +
+      (left >= 2 && S.ess >= BF.giftEss * 2 ? `<button class="btn-sub small" type="button" data-fr-gift-all="${sp}">남은 ${Math.min(left, Math.floor(S.ess / BF.giftEss))}번 모두</button>` : '') + '</div>' +
       `<small>${next ? `다음 하트까지 친밀도 ${next - f.p}` : '하트를 모두 채웠어요!'}. 오늘 선물 ${left}번 남았어요</small></div>`;
   }
   const frDexKey = sp => { const f = frOf(sp); return f ? [f.nm, f.p, f.pat === gameToday() ? 1 : 0, frGiftLeft(), S.ess >= BF.giftEss ? 1 : 0, f.n.pc, f.n.bd, f.n.el].join(',') : ''; };
@@ -21750,6 +21812,7 @@ body.cam-scene #ffChip,body.cam-scene #plChip,body.cam-scene .b-ring{animation-p
   function pzWire() {
     $('#acList').addEventListener('click', e => { const b = e.target.closest('[data-book]'); if (b) { sfx('tap'); openBook(b.dataset.book); return; } const row = e.target.closest('[data-ac]'); if (row) acTip(row.dataset.ac, row); });   // 2.3.1 과목을 누르면 얻는 곳 말풍선   // 2.1.0 문제집 구매: 확인창부터
     $('#bkCancel').addEventListener('click', () => { sfx('tap'); closeModal($('#mBook')); });
+    $('#bkAll').addEventListener('click', () => { const k = rt.bookK; closeModal($('#mBook'), () => acBuyBookAll(k)); });
     $('#bkBuy').addEventListener('click', () => { if ($('#bkBuy').getAttribute('aria-disabled') === 'true') return; const k = rt.bookK; closeModal($('#mBook'), () => acBuyBook(k)); });
     $('#pzSwBtn').addEventListener('click', () => { sfx('tap'); openPzSw(); });   // 2.3.1 소탕
     $('#pzSwOpts').addEventListener('click', e => { const b = e.target.closest('[data-sw]'); if (!b) return; rt.pzSwN = +b.dataset.sw; renderPzSw(); });
@@ -21823,6 +21886,7 @@ body.cam-scene #ffChip,body.cam-scene #plChip,body.cam-scene .b-ring{animation-p
   /* ---------- 보상 창: 받은 것을 한 창에 크게 보여 줘요 ----------
      items: [{ ic: 'acorn'|'dip'|'gold'|'fund'|'ticket'|svg 문자열, t: '도토리 +1,234' }], art: 큰 그림(기념품), big: 그림 아래 이름 */
   function showReward(o) {
+    if (rt.batch) { rt.batch.items.push(...(o.items || []).filter(Boolean)); rt.batch.n += 1; return; }   // 5.0.2 모두 받기: 보상을 모았다가 창 하나로 보여 줘요
     queueModal(() => {
       const icon = ic => ic === 'acorn' ? acornIcon() : ic === 'dip' ? dipIcon() : ic === 'gold' ? GOLD_ICON : ic === 'fund' ? fundIcon() : ic === 'ticket' ? TICKET_SVG : ic === 'ess' ? ESS_ICON() : (ic || '');
       $('#rwTitle').textContent = headText(o.title);
@@ -23995,6 +24059,63 @@ body.cam-scene #ffChip,body.cam-scene #plChip,body.cam-scene .b-ring{animation-p
     showReward({ title: '보너스 상자를 열었어요!', sub: '오늘의 미션을 모두 마쳤어요', items: [gIt, { ic: '⚡', t: `합치기 에너지 +${MG.E.bonus}` }, { ic: 'dip', t: `수료증 +${DM.bonusDip}장` }, { ic: '★', t: `미션 포인트 +${MP.bonus}` }] });
     save(); renderMissions(); renderHUD(); updateQuestDot();
   }
+  /* 5.0.2 모두 받기: 오늘의 미션과 보너스 상자, 이번 주 미션과 상자, 패스 미션, 이벤트 미션, 학생 부탁 가운데 지금 받을 수 있는 것을 한 번에 받아요.
+     받는 양과 차례는 하나씩 누를 때와 같아요(같은 함수를 차례로 불러요). 보상 창만 하나로 모아요 */
+  function claimables() {
+    if (!S) return 0;
+    let n = S.dm.list.filter(dmReady).length + (dmAllDone() && !S.dm.bonus ? 1 : 0) + S.wk.list.filter(wkReady).length + MP_BOX.filter((_, i) => boxReady(i)).length + S.q.subs.filter(subReady).length;
+    try { if (psOpen()) n += S.ps.dl.filter(psReady).length + S.ps.wl.filter(psReady).length; } catch (e) { /* 패스가 아직 준비 전 */ }
+    try { if (evLive()) n += S.ev.list.filter(evReady).length; } catch (e) { /* 이벤트가 아직 준비 전 */ }
+    return n;
+  }
+  function claimAllNow() {
+    if (!S || rt.paused || rt.batch) return 0;
+    dmDay(); wkWeek();
+    const b0 = S.budget, B = rt.batch = { items: [], n: 0 };
+    try {
+      S.dm.list.forEach((m, i) => { if (dmReady(m)) claimMission(i); });
+      if (dmAllDone() && !S.dm.bonus) claimBonus();
+      S.wk.list.forEach((m, i) => { if (wkReady(m)) claimWeekMission(i); });
+      if (psOpen()) { psSync(); S.ps.dl.forEach((m, i) => { if (psReady(m)) psClaimMission('d', i); }); S.ps.wl.forEach((m, i) => { if (psReady(m)) psClaimMission('w', i); }); }
+      if (evLive()) S.ev.list.forEach((m, i) => { if (evReady(m)) claimEvMission(i); });
+      S.q.subs.filter(subReady).map(q => q.id).forEach(id => claimSub(id, null));
+      MP_BOX.forEach((_, i) => { if (boxReady(i)) claimBox(i); });   // 상자는 맨 뒤에(방금 받은 미션 포인트로 열리는 상자까지)
+    } finally { rt.batch = null; }
+    if (!B.n) return 0;
+    const ac = S.budget - b0, items = psMergeItems(B.items.filter(it => it && it.ic !== 'acorn').map(it => ({ ic: it.ic, t: String(it.t).replace(/ \(\d+\/\d+\)$/, '') })));   // '칭찬 스티커 +1장 (3/20)'처럼 뒤에 붙은 진행 숫자는 떼고 합쳐요
+    if (ac >= 1) items.unshift({ ic: 'acorn', t: `도토리 +${fmt(ac)}` });
+    showReward({ title: '모두 받았어요!', sub: `보상 ${B.n}개를 한 번에 받았어요`, items });
+    save(); renderMissions(); renderHUD(); updateQuestDot();
+    return B.n;
+  }
+  /* 5.0.2 오늘 할 일 판: 하루 횟수가 있는 활동의 남은 횟수와 바로 가기를 한 줄씩 보여 줘요(열린 것만). 새 저장 칸은 접기(S.fold.td)뿐이에요 */
+  const TODO = [
+    { k: 'rd', nm: '책 읽기', u: '권', on: () => rdReady(), left: () => rdLeft(), go: 'rdBooks' },
+    { k: 'bk', nm: '문제집', u: '권', on: () => !!S.ac, left: () => AC.keys.reduce((a, k) => a + acBkLeft(k), 0), go: 'acBook' },
+    { k: 'pz', nm: '숲속 퍼즐', u: '판', on: () => !liveOff('puzzle'), left: () => pzLeft(), go: 'pz' },
+    { k: 'bt', nm: '숲속 대결', u: '판', on: () => btOpen(), left: () => btLeft(), go: 'btPlays' },
+    { k: 'pc', nm: '숲속 소풍', u: '번', on: () => pcReady(), left: () => (S.pc.day === gameToday() ? 0 : 1), go: 'picnics' },
+    { k: 'cs', nm: '진로 상담', u: '번', on: () => hallOpen() && csOpen(), left: () => csLeft(), go: 'csTalk' },
+    { k: 'sk', nm: '칭찬 스티커', u: '장', on: () => skOpen(), left: () => skLeft(), go: 'stickers' },
+    { k: 'gift', nm: '단짝 선물', u: '번', on: () => frList().length > 0, left: () => frGiftLeft(), go: 'frGift' },
+    { k: 'boost', nm: '보충수업', u: '번', on: () => !!S.u.boost, left: () => Math.max(0, boostLeft()), go: 'home', tip: '홈에 있으면 지도 왼쪽 위에 가끔 나타나요' },
+    { k: 'deal', nm: '까치 핫딜', u: '번', on: () => dealUnlocked(), left: () => Math.max(0, dealLeft()), go: 'home', tip: '홈에 있으면 까치가 가끔 찾아와요' }
+  ];
+  function todoRows() { const out = []; for (const T of TODO) { let on = false, left = 0; try { on = !!T.on(); if (on) left = T.left(); } catch (e) { on = false; } if (on) out.push({ T, left }); } return out; }
+  function todoGo(k) {
+    const T = TODO.find(x => x.k === k); if (!T || rt.paused) return;
+    sfx('tap');
+    if (T.go === 'home') { setTab('school'); toast(T.tip); return; }
+    goTo({ t: T.go });
+  }
+  function renderTodo() {
+    const rows = todoRows(); if (!rows.length) return '';
+    const n = rows.filter(r => r.left > 0).length, fold = !!(S.fold && S.fold.td);
+    return `<h4 class="dm-h td-h"><button type="button" class="td-fold" data-td-fold aria-expanded="${fold ? 'false' : 'true'}">오늘 할 일 <small>${n ? `${n}가지 남음` : '모두 했어요'}</small><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M6 9l6 6 6-6" fill="none" stroke="currentColor" stroke-width="2.6" stroke-linecap="round" stroke-linejoin="round"/></svg></button></h4>` +
+      (fold ? '' : '<div class="td-list">' + rows.map(({ T, left }) => left > 0
+        ? `<button type="button" class="td-row" data-todo="${T.k}"><b>${T.nm}</b><span>${left}${T.u} 남음</span><em>가기 ›</em></button>`
+        : `<div class="td-row done"><b>${T.nm}</b><span>${CHECK}다 했어요</span></div>`).join('') + '</div>');
+  }
   function renderMissions() {
     const box = $('#qDaily');
     if (!box || !S) return;
@@ -24002,12 +24123,13 @@ body.cam-scene #ffChip,body.cam-scene #plChip,body.cam-scene .b-ring{animation-p
     const gi = `<svg viewBox="-8 -11 16 20" aria-hidden="true">${GOLD_ICON.slice(GOLD_ICON.indexOf('>') + 1, -6)}</svg>`;
     wkWeek();
     let evK = 0; try { evK = evClaimable() ? 1 : 0; } catch (e) { /* 무시 */ }
-    const key = evK + '|' + S.dm.day + '|' + S.dm.list.map(m => `${m.id}:${dmProg(m)}:${m.done ? 1 : 0}`).join(',') + '|' + S.dm.bonus + '|' + S.wk.week + ':' + S.wk.pts + ':' + S.wk.got.join('') + ':' + S.wk.list.map(m => `${m.id}:${wkProg(m)}:${m.done ? 1 : 0}`).join(',');
+    const cn = claimables(), td = renderTodo();
+    const key = cn + '|' + td + '|' + evK + '|' + S.dm.day + '|' + S.dm.list.map(m => `${m.id}:${dmProg(m)}:${m.done ? 1 : 0}`).join(',') + '|' + S.dm.bonus + '|' + S.wk.week + ':' + S.wk.pts + ':' + S.wk.got.join('') + ':' + S.wk.list.map(m => `${m.id}:${wkProg(m)}:${m.done ? 1 : 0}`).join(',');
     if (box.dataset.key === key) return;
     box.dataset.key = key;
     const all = dmAllDone();
     let evOn = false; try { evOn = evClaimable(); } catch (e) { /* 무시 */ }
-    box.innerHTML = (evOn ? '<button class="dm-ev" type="button" data-go="event"><span><b>이벤트에서 받을 선물이 있어요</b><small>이벤트 미션, 이벤트 도장, 기념 상자</small></span><span aria-hidden="true">›</span></button>' : '') + renderWeek() + '<h4 class="dm-h">오늘의 미션 <small>자정에 바뀌어요</small></h4>' + S.dm.list.map((m, i) => {
+    box.innerHTML = (cn >= 2 ? `<button class="dm-ev dm-all" type="button" data-claim-all><span><b>받을 보상 ${cn}개</b><small>미션, 상자, 패스와 이벤트 미션, 학생 부탁</small></span><span class="cta small" aria-hidden="true">모두 받기</span></button>` : '') + (evOn ? '<button class="dm-ev" type="button" data-go="event"><span><b>이벤트에서 받을 선물이 있어요</b><small>이벤트 미션, 이벤트 도장, 기념 상자</small></span><span aria-hidden="true">›</span></button>' : '') + renderWeek() + td + '<h4 class="dm-h">오늘의 미션 <small>자정에 바뀌어요</small></h4>' + S.dm.list.map((m, i) => {
       const M = MISSIONS[m.id], p = dmProg(m), ready = dmReady(m);
       return `<div class="dm${m.done ? ' done' : ''}"><div class="dm-tx"${goAt(m.id, !m.done && !ready)}><b>${M.name(M.n)} <em>+${MP.daily}점</em></b><div class="qbar"><i style="width:${(p / M.n * 100).toFixed(0)}%"></i></div></div>` +
         (m.done ? `<span class="dm-ok">${CHECK}</span>` : ready ? `<button class="cta small" type="button" data-dm="${i}">받기</button>` : `<span class="dm-n">${p}/${M.n}${!S.dm.swapped && !S.dm.bonus ? `<button type="button" class="btn-sub small" data-dmswap="${i}" aria-label="미션 바꾸기, 하루 한 번 무료">바꾸기</button>` : ''}</span>`) + '</div>';
@@ -24087,6 +24209,7 @@ body.cam-scene #ffChip,body.cam-scene #plChip,body.cam-scene .b-ring{animation-p
     const gIt = goldOr(MP.weekGold); addMP(MP.week); addLeague(LP.mission * 2);   // 4.2.0
     mgAddEnergy(MG.E.wk);   // 1.8.0
     sfx('quest'); buzz(15);
+    if (rt.batch) { rt.batch.items.push(gIt, { ic: '★', t: `미션 포인트 +${MP.week}` }, { ic: '⚡', t: `합치기 에너지 +${MG.E.wk}` }); rt.batch.n += 1; }
     toast(`이번 주 미션 완료! ${gIt.t}, 미션 포인트 +${MP.week}, 합치기 에너지 +${MG.E.wk}`);
     save(); renderMissions(); updateQuestDot();
   }
@@ -25234,7 +25357,7 @@ body.cam-scene #ffChip,body.cam-scene #plChip,body.cam-scene .b-ring{animation-p
     const s = S.q.subs[i];
     if (!subReady(s)) return;
     grant(s.r, fromEl);
-    if (hardQ(s, true)) { const it = goldOr(GOLD.hard); if (it) setTimeout(() => toast(it.t + ' (조금 어려운 부탁)'), 900); }   // 4.2.0
+    if (hardQ(s, true)) { const it = goldOr(GOLD.hard); if (it && !rt.batch) setTimeout(() => toast(it.t + ' (조금 어려운 부탁)'), 900); }   // 4.2.0
     addLeague(LP.quest);
     S.q.subs.splice(i, 1);
     if (s.id[0] === 's') S.q.done.push(s.id);
@@ -25668,6 +25791,7 @@ body.cam-scene #ffChip,body.cam-scene #plChip,body.cam-scene .b-ring{animation-p
     p.classList.add('nl');
   }
   function toast(msg) {
+    if (rt.batch) return;   // 5.0.2 모두 받기 동안의 낱개 알림은 보상 창에 모아요
     msg = nl(msg);
     if (rt.cereOn) { if (!rt.cereToasts.includes(msg)) rt.cereToasts.push(msg); return; }   // 2.0.1 졸업식 장면 동안 온 알림은 장면이 끝난 뒤에
     const el = $('#toast');
@@ -26028,6 +26152,9 @@ body.cam-scene #ffChip,body.cam-scene #plChip,body.cam-scene .b-ring{animation-p
     document.addEventListener('click', e => { const g = e.target.closest('[data-mgo]'); if (g && !e.target.closest('button')) missionGo(g.dataset.mgo); });
     document.addEventListener('keydown', e => { if (e.key !== 'Enter' && e.key !== ' ') return; const g = e.target.closest && e.target.closest('[data-mgo]'); if (g) { e.preventDefault(); missionGo(g.dataset.mgo); } });
     $('#qDaily').addEventListener('click', e => {
+      if (e.target.closest('[data-claim-all]')) { claimAllNow(); return; }   // 5.0.2 모두 받기
+      if (e.target.closest('[data-td-fold]')) { if (S.fold) { S.fold.td = S.fold.td ? 0 : 1; sfx('tap'); save(); renderMissions(); } return; }
+      { const t = e.target.closest('[data-todo]'); if (t) { todoGo(t.dataset.todo); return; } }
       const x = e.target.closest('[data-box]'); if (x) { if (boxReady(+x.dataset.box)) claimBox(+x.dataset.box); else toast(`미션 포인트 ${MP_BOX[+x.dataset.box].at}점이면 열 수 있어요`); return; }
       const w = e.target.closest('[data-wm]'); if (w) { claimWeekMission(+w.dataset.wm); return; }
       const sw = e.target.closest('[data-dmswap]'); if (sw) { swapDaily(+sw.dataset.dmswap); return; }
@@ -26489,7 +26616,7 @@ body.cam-scene #ffChip,body.cam-scene #plChip,body.cam-scene .b-ring{animation-p
     $('#labPrev').addEventListener('click', () => { rt.labPage -= 1; renderLab(); });
     $('#labNext').addEventListener('click', () => { rt.labPage += 1; renderLab(); });
     $('#rdClose').addEventListener('click', () => { sfx('tap'); closeModal($('#mRead')); });
-    $('#rdTickets').addEventListener('click', e => { const b = e.target.closest('[data-read-tk]'); if (b) readUseTicket(b.dataset.readTk); });
+    $('#rdTickets').addEventListener('click', e => { const u = e.target.closest('[data-rd-unq]'); if (u) { rdUnqueue(+u.dataset.rdUnq); return; } const b = e.target.closest('[data-read-tk]'); if (b) readUseTicket(b.dataset.readTk); });
     $('#rdBooks').addEventListener('click', e => { const b = e.target.closest('[data-bk]'); if (b && b.getAttribute('aria-disabled') !== 'true') rdStart(b.dataset.bk); });
 
     // 퀘스트 쪽지: 완료했으면 보상 받기, 아니면 해야 할 곳으로 바로 가기
@@ -27164,6 +27291,7 @@ body.cam-scene #ffChip,body.cam-scene #plChip,body.cam-scene .b-ring{animation-p
     const p = kind === 'w' ? PS.wP : PS.dP * psDayMul();
     const lv0 = psLv(); S.ps.pts += p;
     sfx('coin'); buzz(8);
+    if (rt.batch) { rt.batch.items.push({ ic: '★', t: `패스 점수 +${p}` }); rt.batch.n += 1; }
     toast(`패스 점수 +${p}` + (psLv() > lv0 ? `! ${psLv()}단계에 닿았어요` : ''));
     save(); renderPass(); checkQuests(true);
     return true;
@@ -27591,6 +27719,7 @@ body.cam-scene #ffChip,body.cam-scene #plChip,body.cam-scene .b-ring{animation-p
   }
   // 패널 안 버튼: 패널은 HTML에 있으니 지금 바로 이어 둬요
   $('#panelDex').addEventListener('click', e => {
+    { const ga = e.target.closest('[data-fr-gift-all]'); if (ga) { frGiftAll(ga.dataset.frGiftAll); return; } }   // 5.0.2
     const fb = e.target.closest('[data-fr-pat],[data-fr-gift],[data-fr-ren]');   // 2.1.1 단짝 칸
     if (fb) { if (fb.dataset.frPat) frPat(fb.dataset.frPat); else if (fb.dataset.frGift) frGift(fb.dataset.frGift); else openFrName(fb.dataset.frRen); return; }
     const b = e.target.closest('[data-dex]');
@@ -28784,7 +28913,7 @@ body.cam-scene #ffChip,body.cam-scene #plChip,body.cam-scene .b-ring{animation-p
   }
 
   // 시험용 손잡이: 자동 시험(window.__FOREST_TEST)에서만 게임 속 함수를 꺼내 써요
-  if (window.__FOREST_TEST) window.__forest = { get S() { return S; }, statsDoc, get rt4() { return rt; }, APP_PACK, mapLo, mapHidden, finalYear, stPicUrl, ST_PICS, webAud, webCacheOk, c3u, WEB_ROOT, THEME, applyCos, setZone, decoEditStart, decoEditEnd, tamSkipTo, tamSkipGo, tamWinRep, tamRepFl, tamRenderTop, tamBg, teaOff, geo, qMeasure, IMG, tamHOn, tamHOpen, tamCurFl, tamWinH, tamHf, tamHRankDoc, tamSkBusy, tamReach, get SKQ() { return SKQ; }, esAxGain, esAxLeft, ESHOP, tamLvPlan, tamLvBuy, tamLvAll, mapUrl, mapBase, tamCheerLeft, tamAdRevive, tamCap, tamCapped, tamLvRef, tamBaseRate, tamLvCost, tamStageIn, musicWant, tamPh, tamEvPick, tamAutoTeam, tamAutoGain, tamUpRec, MAIN, startSports, GEO, claimAchAll, ACH, btMake, btBest, btRoster, btRoll, btWin, btOppCheer, BT, BT_LG, stPrev, get Rank() { return Rank; }, tamRankDoc, tamTf, tamAdSpd, tamReport, tamRepTake, tamAdRevive, renderRankPanel, TAM, tamSim, tamTeam, tamStat, tamMobs, tamWin, tamIdle, tamCollect, tamParty, tamShard, tamPow, tamFight, tamStep, TAM, tamSim, tamTeam, tamStat, tamMobs, tamWin, tamIdle, tamCollect, tamShard, tamParty, tamPow, tamLvCost, tamOpen, setZone, geo, stPlay, stNext, ST, ST_SIDE, SIDE, missionGo, MGO, MGO_MINI, MGO_Q, renderMissions, renderPass, BOOST, conLeft, gameToday, setTab, ADX, adStamp, adxDay, adxCan, adxMore, adPickNow, adPickGive, conNear, renderAdStamp, claimOfflineDouble, startBoost, openBoost, showOffline, fvBoothStart, bfFwStart, musicWant, renderCounsel, renderXg, renderFv, showCeremony, RX, rxPct, rxCost, rxUp, rxPart, renderDept, goldOr, goldRich, adGold, stampAtt, GOLD, BIG, BF_DECO, bfWin, bfNext, bfOn, bfFw, bfSync, bfStamp, bfFwStart, bfPart, bfNextTx, sanitizeBf, freshBf, fvBoothMax, bldBox, bldPick, bldWarm, DECO_SLOTS, XG, MK, ST, SIDE, ST_SIDE, wdMap, xgOn, xgGuest, xgSpots, xgGreet, xgVisit, xgLunch, openXg, mkOn, mkHot, mkSell, mkBuy, mkSur, openMk, wdBar, wdTick, stTick, stPlay, stNext, stPick, stEnd, stTags, openSb, renderSb, sideCan, sideMap, fvFlag, FV, FV_POS, fvOn, fvOpen, fvBonus, fvSync, fvStamp, fvGuests, openFv, renderFv, fvMeet, fvBoothStart, fvMap, fvTip, festDef, goTo, navInfo, openShop, gdReady, thPreview, thPreviewEnd, thOn, busScene, tripCrowd, openTrip, startTrip, claimTrip, TRIPS, tripMult, openSheet, openRx, rtStart, rtLv, RT5, setZone, tamReg, promote, canPromote, get rxTier() { return RX_TIER; }, set rxTier(v) { RX_TIER = v; }, tamLvAllPlan, tamLvAllAsk, decoPut, decoUsed, get ZONE0() { return ZONE0; }, mgPickMul, mgPickMode, mgUpOrder, mgFillOrders, mgAdAsk, sportsCon, festCon, btQuota, btCanAd, btAdMore, warmRooms, blobUrl, vdSize, vdBlock, pzSweep, pzSwGain, pzSwOpen, pzXpOf, mgMulMax, mgMulOk, mgMul, mgModeTap, acTip, kidDupIdx, trialSafe, closeAd,
+  if (window.__FOREST_TEST) window.__forest = { get S() { return S; }, statsDoc, get rt4() { return rt; }, claimables, claimAllNow, subReady, todoRows, todoGo, renderTodo, acBuyBookAll, frGiftAll, rdUnqueue, rdSettle, frGift, frGiftLeft, acBkLeft, bookCost, APP_PACK, mapLo, mapHidden, finalYear, stPicUrl, ST_PICS, webAud, webCacheOk, c3u, WEB_ROOT, THEME, applyCos, setZone, decoEditStart, decoEditEnd, tamSkipTo, tamSkipGo, tamWinRep, tamRepFl, tamRenderTop, tamBg, teaOff, geo, qMeasure, IMG, tamHOn, tamHOpen, tamCurFl, tamWinH, tamHf, tamHRankDoc, tamSkBusy, tamReach, get SKQ() { return SKQ; }, esAxGain, esAxLeft, ESHOP, tamLvPlan, tamLvBuy, tamLvAll, mapUrl, mapBase, tamCheerLeft, tamAdRevive, tamCap, tamCapped, tamLvRef, tamBaseRate, tamLvCost, tamStageIn, musicWant, tamPh, tamEvPick, tamAutoTeam, tamAutoGain, tamUpRec, MAIN, startSports, GEO, claimAchAll, ACH, btMake, btBest, btRoster, btRoll, btWin, btOppCheer, BT, BT_LG, stPrev, get Rank() { return Rank; }, tamRankDoc, tamTf, tamAdSpd, tamReport, tamRepTake, tamAdRevive, renderRankPanel, TAM, tamSim, tamTeam, tamStat, tamMobs, tamWin, tamIdle, tamCollect, tamParty, tamShard, tamPow, tamFight, tamStep, TAM, tamSim, tamTeam, tamStat, tamMobs, tamWin, tamIdle, tamCollect, tamShard, tamParty, tamPow, tamLvCost, tamOpen, setZone, geo, stPlay, stNext, ST, ST_SIDE, SIDE, missionGo, MGO, MGO_MINI, MGO_Q, renderMissions, renderPass, BOOST, conLeft, gameToday, setTab, ADX, adStamp, adxDay, adxCan, adxMore, adPickNow, adPickGive, conNear, renderAdStamp, claimOfflineDouble, startBoost, openBoost, showOffline, fvBoothStart, bfFwStart, musicWant, renderCounsel, renderXg, renderFv, showCeremony, RX, rxPct, rxCost, rxUp, rxPart, renderDept, goldOr, goldRich, adGold, stampAtt, GOLD, BIG, BF_DECO, bfWin, bfNext, bfOn, bfFw, bfSync, bfStamp, bfFwStart, bfPart, bfNextTx, sanitizeBf, freshBf, fvBoothMax, bldBox, bldPick, bldWarm, DECO_SLOTS, XG, MK, ST, SIDE, ST_SIDE, wdMap, xgOn, xgGuest, xgSpots, xgGreet, xgVisit, xgLunch, openXg, mkOn, mkHot, mkSell, mkBuy, mkSur, openMk, wdBar, wdTick, stTick, stPlay, stNext, stPick, stEnd, stTags, openSb, renderSb, sideCan, sideMap, fvFlag, FV, FV_POS, fvOn, fvOpen, fvBonus, fvSync, fvStamp, fvGuests, openFv, renderFv, fvMeet, fvBoothStart, fvMap, fvTip, festDef, goTo, navInfo, openShop, gdReady, thPreview, thPreviewEnd, thOn, busScene, tripCrowd, openTrip, startTrip, claimTrip, TRIPS, tripMult, openSheet, openRx, rtStart, rtLv, RT5, setZone, tamReg, promote, canPromote, get rxTier() { return RX_TIER; }, set rxTier(v) { RX_TIER = v; }, tamLvAllPlan, tamLvAllAsk, decoPut, decoUsed, get ZONE0() { return ZONE0; }, mgPickMul, mgPickMode, mgUpOrder, mgFillOrders, mgAdAsk, sportsCon, festCon, btQuota, btCanAd, btAdMore, warmRooms, blobUrl, vdSize, vdBlock, pzSweep, pzSwGain, pzSwOpen, pzXpOf, mgMulMax, mgMulOk, mgMul, mgModeTap, acTip, kidDupIdx, trialSafe, closeAd,
     TKE, TK_Q, tkDaily, nbAllDay, nbBuildAt, nbOn, conAdd, BX_SPOT, PERKS, offlineCapH, applyAway, pzFinish, mgClaimOrder,
     CS, JOBS, CS_WORRY, freshCs, csOpen, csLeft, csMax, csEnsure, csCands, csNeed, csMul, csOpenCards, csReady, csDone, csTalkMake, csAnswer, csChoose, csSettle, openCounsel, renderCounsel, renderHall, MAIN, qMeasure, qGoal, sanitize,   // 3.1.0 진로 상담
     NSL, nsStart, nsSettle, nsOpen, nsOn, nsOverlap, nsExtraH, isNight, nightDayOf, openNs, renderNs, bxSpots, renderNight,   // 3.0.0
