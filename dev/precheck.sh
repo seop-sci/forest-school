@@ -16,5 +16,7 @@ rm -rf "$tmp"
 python3 dev/jscheck.py || { echo "게임 스크립트에 문법 오류가 있어요"; ok=1; }
 # 4.4.1.3: index.html이 부르는 그림 파일이 모두 git에 있는지
 python3 dev/imgcheck.py || { echo "올리지 않은 그림 파일이 있어요"; ok=1; }
+# 5.0.2: 이야기 장면 그림 이름표(ST_PICS)가 img/story 파일과 맞는지
+python3 dev/story_pack.py --check >/dev/null || { echo "이야기 그림 이름표가 파일과 달라요. python3 dev/story_pack.py 를 돌려 주세요"; ok=1; }
 [ $ok -eq 0 ] && echo "점검 통과"
 exit $ok

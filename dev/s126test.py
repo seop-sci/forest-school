@@ -10,14 +10,14 @@ async def main():
     def ok(c, msg):
         if not c: bad.append(msg); print('  틀림:', msg)
     names = [f'st_ch{c:02d}_{k}2' for c in range(1, 25) for k in 'oc'] + [f'st_side_{s}_{i}' for s, n in [('nap', 4), ('honey', 4), ('acorn', 4), ('sloth', 4), ('mole', 4), ('deer', 3)] for i in range(1, n + 1)]
-    miss = [n for n in names if not (ROOT / 'img/story' / (n + '.webp')).exists()]
+    miss = [n for n in names if not list((ROOT / 'img/story').glob(n + '-??????????.webp'))]   # 5.0.2부터 파일 이름 끝에 내용 해시가 붙어요
     ok(len(names) == 71 and not miss, f'그림 71장 {miss[:5]}')
     async with async_playwright() as p:
         b = await p.chromium.launch()
         ctx, page, errs = await ctxpage(b, 360, 740, 'light', base(tier=1, tg=1))
         async def run(id):
             return await page.evaluate(f"""(async()=>{{ const F={F}, sl=ms=>new Promise(r=>setTimeout(r,ms)); window.FS_IMG_BASE='../img/';
-              const pics=()=>[...document.querySelectorAll('#stPic img')].map(i=>i.src.split('/').pop().split('.')[0] + (i.classList.contains('on') ? '+' : ''));
+              const pics=()=>[...document.querySelectorAll('#stPic img')].map(i=>i.src.split('/').pop().split('.')[0].replace(/-[0-9a-f]{{10}}$/, '') + (i.classList.contains('on') ? '+' : ''));
               F.stPlay('{id}', true); await sl(700); const a=pics(), R=F.rt4.st, mid=R.mid, n=R.lines.length;
               while (F.rt4.st && F.rt4.st.i < mid - 1) F.stNext(); await sl(100); const b=pics();
               if (F.rt4.st && !F.rt4.st.lines[F.rt4.st.i].pick) F.stNext(); await sl(900); const c=pics();

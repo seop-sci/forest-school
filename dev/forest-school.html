@@ -7352,6 +7352,31 @@ body.cam-scene #ffChip,body.cam-scene #plChip,body.cam-scene .b-ring{animation-p
   const SAVE_KEY = 'forest-school-v1';
   // 토스 미니앱 판이면 toss/src/bridge.js가 window.AIT에 광고, 저장소, 게임센터 기능을 담아 둬요
   const AIT = window.AIT || null;
+  // 5.0.2 woodani 결정(앱 용량): 앱(안드로이드, 토스) 묶음에는 한 번 보는 것과 고르는 것(이야기 장면 그림, 테마 곡, 행사와 졸업 곡, 테마 지도, 졸업식 그림)을 넣지 않고 웹에서 받아요.
+  // 받는 곳은 여기 한 곳(WEB_ROOT)에서만 정해요. 웹 판은 지금처럼 게임 옆 폴더에서 받아요
+  const WEB_ROOT = 'https://seop-sci.github.io/forest-school/';
+  const APP_PACK = () => !!(AIT || window.FOREST_STORE) && !window.FS_IMG_BASE;   // 앱 묶음인지(시험에서 FS_IMG_BASE를 정하면 옆 폴더)
+  const webDir = dir => APP_PACK() ? WEB_ROOT + dir : dir === 'audio/' ? AUD_BASE() : IMG_BASE() + dir.replace(/^img\//, '');
+  // 받은 파일은 기기 저장(Cache Storage)에 남겨서 다음부터는 인터넷 없이도 써요. 저장을 못 쓰는 기기(안전하지 않은 주소, 옛 WebView)는 그냥 받아요
+  const WEB_CACHE = 'fs-web-1';
+  const webCacheOk = () => { try { return typeof caches !== 'undefined' && !!caches.open && window.isSecureContext !== false; } catch (e) { return false; } };
+  function webFetch(url) {
+    const net = () => fetch(url, { mode: 'cors' }).then(r => { if (!r.ok) throw new Error('파일 ' + r.status); return r; });
+    if (!webCacheOk()) return net();
+    return caches.open(WEB_CACHE).then(c => c.match(url).then(hit => hit || net().then(r => { c.put(url, r.clone()).catch(() => {}); return r; })), () => net());
+  }
+  const webSrcMap = {};   // 웹 주소 → 화면에 쓸 주소(기기 저장에서 꺼낸 blob 주소)
+  const webSrc = url => !/^https?:/.test(url) || !webCacheOk() ? Promise.resolve(url) : webSrcMap[url] ? Promise.resolve(webSrcMap[url])
+    : webFetch(url).then(r => r.blob()).then(b => webSrcMap[url] || (webSrcMap[url] = URL.createObjectURL(b)));
+  // 그림 하나 받기: 다 오면 ok(주소, 그림), 못 받으면 no()
+  function webImg(url, ok, no) {
+    webSrc(url).then(u => { const im = new Image(); im.alt = ''; im.decoding = 'async'; im.onload = () => ok(u, im); im.onerror = () => { if (no) no(); }; im.src = u; }, () => { if (no) no(); });
+  }
+  // 옛 판 지도처럼 주소가 바뀐 파일은 기기 저장에서 지워요(켤 때 한 번)
+  function webCachePrune(keep) {
+    if (!webCacheOk()) return;
+    caches.open(WEB_CACHE).then(c => c.keys().then(ks => ks.forEach(q => { if (!keep(q.url)) c.delete(q); }))).catch(() => {});
+  }
   const ADS_EXT = window.FOREST_ADS || null;   // 4.0.1 (3.3.2 분석): 광고 없이 보상을 주던 옛 스위치(FOREST_NOAD)는 켜는 판이 없어 지웠어요   // 2.0.0 보안 점검(2-8): 켤 때 한 번만 읽어요(나중에 바꿔 넣어도 소용없게)
   const motionMQ = window.matchMedia ? window.matchMedia('(prefers-reduced-motion: reduce)') : null;
 
@@ -9529,6 +9554,9 @@ body.cam-scene #ffChip,body.cam-scene #plChip,body.cam-scene .b-ring{animation-p
     exday: 'bgm_ex_day', excalm: 'bgm_ex_calm', exnight: 'bgm_ex_night', exboss: 'bgm_ex_boss' };
   // 1.8.0 곡은 게임 파일 밖의 따로 된 파일이에요(게임 파일이 너무 커지지 않게, woodani 결정). 웹, 안드로이드, 토스 판 모두 게임 옆 audio 폴더에 있어요
   const AUD_BASE = () => window.FS_AUD_BASE || 'audio/';
+  // 5.0.2 앱 용량: 테마 곡 7개와 행사, 졸업 곡 5개는 앱에 넣지 않고 웹에서 받아요. 못 받으면 홈 곡이 나와요. 곡 파일을 바꾸면 AUD_V를 올려요
+  const WEB_AUD = new Set(['bgm_spring', 'bgm_summer', 'bgm_autumn', 'bgm_winter', 'bgm_xmas', 'bgm_space', 'bgm_retro', 'bgm_festival', 'bgm_festnight', 'bgm_bigfest', 'bgm_grad', 'bgm_unigrad']), AUD_V = '1';
+  const webAud = key => APP_PACK() && !window.FS_AUD_BASE && WEB_AUD.has(key);
   const FILE_GAIN = 0.6;   // 파일 곡은 코드 곡보다 커서 조금 줄여요
   // 1.7.3: 테마 곡은 Suno 곡이 올 때(1.8.0)까지 쉬어요. 테마를 골라도 홈에서는 새 홈 곡이 나오고, 상점의 '테마 곡 듣기'도 숨겨요(woodani 결정). 1.8.0에서 true로
   const THEME_MUSIC = true;   // 1.8.0 테마 곡이 왔어요
@@ -9542,7 +9570,7 @@ body.cam-scene #ffChip,body.cam-scene #plChip,body.cam-scene .b-ring{animation-p
       const b64 = atob(url.slice(url.indexOf(',') + 1)), u8 = new Uint8Array(b64.length);
       for (let i = 0; i < b64.length; i++) u8[i] = b64.charCodeAt(i);
       return u8.buffer;
-    }) : fetch(AUD_BASE() + key + '.mp4').then(r => { if (!r.ok) throw new Error('곡 파일 ' + r.status); return r.arrayBuffer(); });
+    }) : (webAud(key) ? webFetch(WEB_ROOT + 'audio/' + key + '.mp4?v=' + AUD_V) : fetch(AUD_BASE() + key + '.mp4').then(r => { if (!r.ok) throw new Error('곡 파일 ' + r.status); return r; })).then(r => r.arrayBuffer());
     const p = bytes.then(buf => actx.decodeAudioData(buf)).catch(() => { bgmBuf.delete(key); return null; });
     bgmBuf.set(key, p);
     while (bgmBuf.size > 2) bgmBuf.delete(bgmBuf.keys().next().value);
@@ -9590,7 +9618,7 @@ body.cam-scene #ffChip,body.cam-scene #plChip,body.cam-scene .b-ring{animation-p
       const bus = actx.createGain();
       bus.gain.setValueAtTime(0, now); bus.connect(Music.out);
       Music.bus = bus; Music.track = null;
-      bgmLoad(fk).then(buf => {
+      bgmLoad(fk).then(buf => buf || !webAud(fk) ? buf : bgmLoad(FILE_SONG.home)).then(buf => {   // 5.0.2 웹에서 받는 곡을 못 받으면 홈 곡
         if (Music.bus !== bus || Music.cur !== w) return;   // 그사이 곡이 바뀌었어요
         if (!buf) { Music.cur = ''; Music.bus = null; try { bus.disconnect(); } catch (e) { /* 무시 */ } musicFallback(w); return; }
         const src = actx.createBufferSource(), t = actx.currentTime;
@@ -9897,8 +9925,9 @@ body.cam-scene #ffChip,body.cam-scene #plChip,body.cam-scene .b-ring{animation-p
     'map_campus_lab_spring', 'map_campus_lab_summer', 'map_campus_lab_autumn', 'map_campus_lab_winter', 'map_campus_lab_xmas', 'map_campus_lab_space', 'map_campus_lab_retro',   // 5.0.0 작업지시서 84
     'map_campus_winter', 'map_zone_academic_winter', 'map_zone_life_winter', 'map_zone_plaza_winter', 'map_zone_sports_winter',
     'map_campus_spring', 'map_zone_academic_spring', 'map_zone_life_spring', 'map_zone_plaza_spring', 'map_zone_sports_spring', 'map_campus_summer', 'map_zone_academic_summer', 'map_zone_life_summer', 'map_zone_plaza_summer', 'map_zone_sports_summer', 'map_campus_autumn', 'map_zone_academic_autumn', 'map_zone_life_autumn', 'map_zone_plaza_autumn', 'map_zone_sports_autumn', 'map_campus_xmas', 'map_zone_academic_xmas', 'map_zone_life_xmas', 'map_zone_plaza_xmas', 'map_zone_sports_xmas', 'map_campus_space', 'map_zone_academic_space', 'map_zone_life_space', 'map_zone_plaza_space', 'map_zone_sports_space', 'map_campus_retro', 'map_zone_academic_retro', 'map_zone_life_retro', 'map_zone_plaza_retro', 'map_zone_sports_retro']);   // 4.1.1 대학교 테마 지도 30장(작업지시서 68)   // 4.0.0 img/maps에 파일로만 있는 테마 지도(대학교는 기본과 겨울 먼저)
-  const mapKey = (base, lux) => { if (gradOn()) { if (base === 'map_campus') base = MAP_FILES.has('map_campus_grad') ? 'map_campus_grad' : 'map_campus_lab'; else if (MAP_FILES.has(base + '_grad')) base += '_grad'; }   // 5.0.0 대학원 캠퍼스   // 5.0.0 woodani 결정: 대학원이면 대학원판 지도(작업지시서 88, 89, 자리는 대학교와 같아요)
-    const id = S && S.cos && S.cos.th && thOn().bg; if (id && MAP_FILES.has(`${base}_${id}`)) return `${base}_${id}`; if (ART_FB[base] && !has170(base) && !IMG(base)) base = ART_FB[base]; if ((lux || luxOn()) && has170(`${base}_lux`)) return `${base}_lux`; return id && has170(`${base}_${id}`) ? `${base}_${id}` : base; };
+  const mapKey = (base, lux) => { const k = mapKey0(base, lux, false); return MAP_THEME_RE.test(k) && mapHi[k] === 'no' && APP_PACK() ? mapKey0(base, lux, true) : k; };   // 5.0.2 앱에서 테마 지도를 못 받았으면 기본 지도 열쇠(참나무 층도 기본 것)
+  const mapKey0 = (base, lux, plain) => { if (gradOn()) { if (base === 'map_campus') base = MAP_FILES.has('map_campus_grad') ? 'map_campus_grad' : 'map_campus_lab'; else if (MAP_FILES.has(base + '_grad')) base += '_grad'; }   // 5.0.0 대학원 캠퍼스   // 5.0.0 woodani 결정: 대학원이면 대학원판 지도(작업지시서 88, 89, 자리는 대학교와 같아요)
+    const id = !plain && S && S.cos && S.cos.th && thOn().bg; if (id && MAP_FILES.has(`${base}_${id}`)) return `${base}_${id}`; if (ART_FB[base] && !has170(base) && !IMG(base)) base = ART_FB[base]; if ((lux || luxOn()) && has170(`${base}_lux`)) return `${base}_lux`; return id && has170(`${base}_${id}`) ? `${base}_${id}` : base; };
   // 1.8.0 지도 고화질: 게임 안 지도는 480×720이라 확대하면 흐려요. 게임 옆 img/maps 폴더의 원본 크기(1024×1536) 그림을 받아 다 오면 바꿔 끼워요.
   // 파일이 없거나 늦으면 게임 안 그림을 그대로 써요(곡 파일과 같은 방식)
   const IMG_BASE = () => window.FS_IMG_BASE || 'img/';
@@ -9906,10 +9935,15 @@ body.cam-scene #ffChip,body.cam-scene #plChip,body.cam-scene .b-ring{animation-p
   const MAPS_V = '500';   // 5.0.0 연구 구역 지도
   // 4.3.2 woodani 결정(앱 용량): 안드로이드와 토스 앱에는 테마 지도(봄, 여름, 가을, 겨울, 크리스마스, 우주, 레트로)의 고화질 그림과 참나무 층을 넣지 않고,
   // 고른 테마만 웹(GitHub Pages)에서 받아요. 웹은 한 번 받으면 기기에 남아요. 못 받으면(인터넷 없음) 게임 안에 든 지도 그림을 그대로 써요
-  const MAP_WEB = 'https://seop-sci.github.io/forest-school/img/';
+  const MAP_WEB = WEB_ROOT + 'img/';
   const MAP_THEME_RE = /_(spring|summer|autumn|winter|xmas|space|retro)$/;
-  const mapBase = key => (AIT || window.FOREST_STORE) && !window.FS_IMG_BASE && MAP_THEME_RE.test(key) ? MAP_WEB : IMG_BASE();
-  const mapUrl = key => mapBase(key) + 'maps/' + key + '.webp?v=' + MAPS_V;
+  const mapBase = key => APP_PACK() && MAP_THEME_RE.test(key) ? MAP_WEB : IMG_BASE();
+  const mapRaw = key => mapBase(key) + 'maps/' + key + '.webp?v=' + MAPS_V;
+  const mapUrl = key => webSrcMap[mapRaw(key)] || mapRaw(key);   // 기기 저장에서 꺼낸 그림이 있으면 그 주소
+  const mapHi = {}, mapHiNo = {};   // 열쇠 → 'ok' | 'no' | 'wait', 못 받은 때
+  // 5.0.2 앱 용량: 앱에는 게임 안 저화질 지도(img/a의 map_*)를 넣지 않아요. 앱은 처음부터 묶음 안 고화질 지도를 쓰고, 테마 지도가 오기 전이나 못 받았을 때는 기본 지도를 보여요
+  const mapPlain = key => key.replace(MAP_THEME_RE, '');
+  const mapLo = key => APP_PACK() ? (mapHi[key] === 'ok' ? mapUrl(key) : mapUrl(mapPlain(key))) : IMG170(key);
   // 3.3.4 woodani: 지도마다 오른쪽 아래에 그려진 큰 참나무를 누르는 참나무로 써요(게임이 따로 올리던 참나무 그림 대신).
   // 지도 열쇠 → 참나무 층(l)과 나무 지운 조각(p)의 자리 [x, y, 너비, 높이], 흔드는 중심(pv), 누르는 자리(tap [x, y, 반지름]), 도토리 맺히는 자리(nuts), 떨어지는 자리(drop). 모두 지도 좌표.
   // 표는 dev/oak_pack.py가 작업지시서 54 그림에서 만들어요. 그림 파일(img/maps/oakl_*, oakp_*)이 없거나 못 받으면 예전 참나무 그림을 그대로 써요
@@ -10034,14 +10068,15 @@ body.cam-scene #ffChip,body.cam-scene #plChip,body.cam-scene .b-ring{animation-p
     /*MAP_OAK_END*/
   };
   const oakArt = {};   // 지도 열쇠 → 'ok' | 'no' | 'wait'
-  const oakUrl = (kind, key) => mapBase(key) + 'maps/oak' + kind + '_' + key.replace(/^map_/, '') + '.webp?v=' + MAPS_V;   // 4.3.2 테마 참나무 층도 웹에서
+  const oakRaw = (kind, key) => mapBase(key) + 'maps/oak' + kind + '_' + key.replace(/^map_/, '') + '.webp?v=' + MAPS_V;
+  const oakUrl = (kind, key) => webSrcMap[oakRaw(kind, key)] || oakRaw(kind, key);   // 4.3.2 테마 참나무 층도 웹에서
   function oakArtGet(key) {
     if (!MAP_OAK[key] || oakArt[key]) return;
     if (location.protocol === 'file:' && !window.FS_IMG_BASE) return;
     oakArt[key] = 'wait';
     let left = 2, bad = false;
     const fin = () => { if (--left) return; oakArt[key] = bad ? 'no' : 'ok'; if (!bad && S && mapKey(geo().map) === key) layoutOak(); };
-    for (const kind of ['l', 'p']) { const im = new Image(); im.onload = fin; im.onerror = () => { bad = true; fin(); }; im.src = oakUrl(kind, key); }
+    for (const kind of ['l', 'p']) webImg(oakRaw(kind, key), fin, () => { bad = true; fin(); });
   }
   // 지금 지도에서 지도 참나무를 쓸 수 있으면 그 표 줄, 아니면 null
   const mapOak = () => { if (!S) return null; const k = mapKey(geo().map); return MAP_OAK[k] && oakArt[k] === 'ok' ? MAP_OAK[k] : null; };
@@ -10073,33 +10108,33 @@ body.cam-scene #ffChip,body.cam-scene #plChip,body.cam-scene .b-ring{animation-p
     rt.oakN = -1;
     if (S) renderOak();
   }
-  const mapHi = {};   // 열쇠 → 'ok' | 'no' | 'wait'
   function mapHiGet(key, done) {
-    const st = mapHi[key], url = mapUrl(key);
-    if (st === 'ok') { done(url); return; }
+    const st = mapHi[key];
+    if (st === 'ok') { done(mapUrl(key)); return; }
     if (st) return;
     if (location.protocol === 'file:' && !window.FS_IMG_BASE) return;   // 자동 시험(test.html, file://)은 지도 파일 옆에 있지 않아요. 시험에서 볼 때는 FS_IMG_BASE를 정해요
     mapHi[key] = 'wait';
-    const im = new Image();
-    im.onload = () => { mapHi[key] = 'ok'; done(url); };
-    im.onerror = () => { mapHi[key] = 'no'; };
-    im.src = url;
+    webImg(mapRaw(key), () => { mapHi[key] = 'ok'; done(mapUrl(key)); },
+      () => { mapHi[key] = 'no'; mapHiNo[key] = Date.now(); if (APP_PACK() && MAP_THEME_RE.test(key) && S && $('#map')) { setMapArt(); layoutOak(); } });   // 앱: 테마 지도를 못 받으면 기본 지도로 다시 그려요
   }
   function setMapArt() {
+    // 앱: 못 받은 테마 지도는 1분이 지나면 다시 받아 봐요(인터넷이 돌아왔을 수 있어요)
+    if (APP_PACK() && navigator.onLine !== false) for (const k in mapHi) if (mapHi[k] === 'no' && MAP_THEME_RE.test(k) && Date.now() - (mapHiNo[k] || 0) > 60000) { delete mapHi[k]; delete oakArt[k]; }
     GEO.forEach((G, i) => {
       const el = $('#mapImg' + i); if (!el) return;
       const key = mapKey(G.map);
-      el.setAttribute('href', mapHi[key] === 'ok' ? mapUrl(key) : IMG170(key));
+      el.setAttribute('href', mapHi[key] === 'ok' ? mapUrl(key) : mapLo(key));
       el.dataset.key = key;
-      mapHiGet(key, u => { if (el.dataset.key === key) el.setAttribute('href', u); });
+      mapHiGet(key, u => { if (el.dataset.key === key) { el.setAttribute('href', u); if (APP_PACK() && G === geo()) mapBackdrop(); } });
     });
-    if (!rt.c3q) { rt.c3q = true; setTimeout(() => cere3Load(), 6000); }   // 3.3.0 새 졸업식 그림은 조금 뒤에 미리 받아 둬요
+    if (!rt.c3q) { rt.c3q = true; setTimeout(() => cere3Load(), 6000);
+      if (APP_PACK()) webCachePrune(u => /\/story\//.test(u) ? Object.keys(ST_PICS).some(k => u.endsWith('/' + k + '-' + ST_PICS[k] + '.webp')) : /\/maps\//.test(u) ? u.endsWith('?v=' + MAPS_V) : /\/audio\//.test(u) ? u.endsWith('?v=' + AUD_V) : true); }   // 5.0.2 주소가 바뀐 옛 파일은 기기 저장에서 지워요   // 3.3.0 새 졸업식 그림은 조금 뒤에 미리 받아 둬요
     mapBackdrop();
   }
   // 1.7.2: 지도를 아래로 끌어내리면 지도 위쪽에 빈 곳이 보여요. 하늘색 고정 배경 대신 지금 지도 그림(테마 지도 포함)을 흐리게 깔아서 어느 테마에서도 이어져 보이게 해요
   function mapBackdrop() {
     const fr = $('.frame'); if (!fr || !S) return;
-    const u = IMG170(mapKey(geo().map));
+    const u = mapLo(mapKey(geo().map));
     fr.style.setProperty('--map-bg', u ? `url("${u}")` : 'none');
   }
   const bpos = k => geo().b[k];
@@ -11202,7 +11237,7 @@ body.cam-scene #ffChip,body.cam-scene #plChip,body.cam-scene .b-ring{animation-p
     $('#zoneName').textContent = geo().zname;
     // 4.3.2 woodani 제보(캠퍼스 단추가 빈 동그라미): 캠퍼스 그림을 아직 안 받았거나 테마 지도일 때 비었어요. 지금 테마의 캠퍼스 지도를 받아서 넣고, 그동안은 기본 캠퍼스 그림
     const ic = $('#zoneHomeIc'), ck = mapKey(CAMPUS.map), put = u => { if (u && ic.dataset.u !== u) { ic.dataset.u = u; ic.style.backgroundImage = `url("${u}")`; } };
-    put(mapHi[ck] === 'ok' ? mapUrl(ck) : mapHi[CAMPUS.map] === 'ok' ? mapUrl(CAMPUS.map) : IMG170(ck) || IMG170(CAMPUS.map));
+    put(mapHi[ck] === 'ok' ? mapUrl(ck) : mapHi[CAMPUS.map] === 'ok' ? mapUrl(CAMPUS.map) : mapLo(ck) || mapLo(CAMPUS.map));
     if (mapHi[ck] !== 'ok') mapHiGet(ck, put); if (ck !== CAMPUS.map && mapHi[ck] === 'no') mapHiGet(CAMPUS.map, u => { if (mapHi[ck] !== 'ok') put(u); });
   }
   const zoneOpen = z => z !== 'lab' || gradOn();   // 5.0.0 연구 구역은 대학원부터
@@ -19242,7 +19277,7 @@ body.cam-scene #ffChip,body.cam-scene #plChip,body.cam-scene .b-ring{animation-p
   // 2.1.3 앨범 쪽 그림: 빈 지도 대신 그때 학교 모습(그때 건물 레벨로 지은 건물과 공사 자리). 학교급 모습 보기와 같은 그림 규칙(woodani 제보)
   function albSchool(pg) {
     const t = pg.t, G = GEO[geoIdx(t)]; if (!G) return '';
-    const mk = mapKey(G.map), mapU = IMG170(mk); if (!mapU) return '';
+    const mk = mapKey(G.map), mapU = mapLo(mk); if (!mapU) return '';
     const f = pg.f || {}, bs = pg.bs || {}, items = [];
     const keys = Object.keys(FAC).filter(k => (FAC[k].tier || 0) <= t && G.lot[k]);
     for (const k of keys) {
@@ -20827,7 +20862,7 @@ body.cam-scene #ffChip,body.cam-scene #plChip,body.cam-scene .b-ring{animation-p
     $('#tvMark').innerHTML = LD && LD.mk && markOk(LD.mk) ? markHTML(LD.mk, '') : '';
     if (!force && box.dataset.key === key) return; box.dataset.key = key;
     const lux = luxOn() || !!(LD && LD.model);   // 3.0.1 woodani: 예시 학교는 고급 배경을 켜지 않아도 고급 지도와 건물(그림이 있는 판에서만)
-    const mapU = IMG170(mapKey(G.map, lux));
+    const mapU = mapLo(mapKey(G.map, lux));
     box.style.setProperty('--map-bg', mapU ? `url("${mapU}")` : 'none');
     const mk = mapKey(G.map, lux); if (mapHi[mk] !== 'ok') mapHiGet(mk, () => { if (rt.viewTier === t) renderTierView(true); });   // 고화질 지도가 오면 다시 그려요
     let h = `<image x="0" y="-60" width="360" height="540" preserveAspectRatio="none" href="${mapHi[mk] === 'ok' ? mapUrl(mk) : mapU}"/>`;
@@ -24034,7 +24069,9 @@ body.cam-scene #ffChip,body.cam-scene #plChip,body.cam-scene .b-ring{animation-p
     : w === 'somi' ? (IMG('st_who_somi_' + (chTier(Math.min(Math.max(S.sto.ch, 0), CHAPTERS.length - 1)) + 1)) ? `<img src="${IMG('st_who_somi_' + (chTier(Math.min(Math.max(S.sto.ch, 0), CHAPTERS.length - 1)) + 1))}" alt="">` : kidAvatar('rabbit'))
     : ST_WHO_IMG[w] && IMG(ST_WHO_IMG[w]) ? `<img src="${IMG(ST_WHO_IMG[w])}" alt="">` : DEX_STUDENTS.includes(w) ? kidAvatar(w) : `<span class="sy-em">${ST_FB[w] || '🌳'}</span>`;
   const stName = w => (w === 'hedgehog' && rt.st && rt.st.uni ? '부총장 고슴도치' : '') || ST_NM[w] || (TEA[w] && TEA[w].name) || spName(w);
-  const stPicUrl = k => IMG_BASE() + 'story/' + k + '.webp?v=' + VERSION;
+  // 5.0.2: 있는 그림만 적은 이름표(열쇠 → 내용 해시, dev/story_pack.py가 써요). 없는 그림을 헛되이 찾지 않고, 이름에 해시가 있어 내용이 바뀐 그림만 다시 받아요. 앱은 웹에서 받아요
+  const ST_PICS = /* ST_PICS:BEGIN */{st_ch01:"83d4ae292f",st_ch01_c:"a82aa781b7",st_ch01_c2:"5b54ecd012",st_ch01_o2:"12c9e54f84",st_ch02:"aac3024b8d",st_ch02_c2:"7b7d97123a",st_ch02_o2:"079d3eac1f",st_ch03:"b82408e432",st_ch03_c2:"48d9b890d2",st_ch03_o2:"08291d755f",st_ch04:"e4aa4b9957",st_ch04_c2:"fb13fa0ccf",st_ch04_o2:"6da7a01456",st_ch05:"8e220ffae7",st_ch05_c2:"dec8204a66",st_ch05_o:"bf76a9697a",st_ch05_o2:"954988392f",st_ch06:"ed3cee04db",st_ch06_c2:"1e3f76adc3",st_ch06_o2:"8a7902d00e",st_ch07:"0f45474db9",st_ch07_c2:"dc90233af3",st_ch07_o2:"bff76394db",st_ch08:"b3efc9acc0",st_ch08_c2:"2914cb76dd",st_ch08_o:"dbb8a86eb9",st_ch08_o2:"16a11c4013",st_ch09:"55dc5ad210",st_ch09_c:"3a121ad7df",st_ch09_c2:"e77c4522d4",st_ch09_o2:"b569ed3379",st_ch10:"1323d208b0",st_ch10_c2:"885604a40f",st_ch10_o:"a0f64efa23",st_ch10_o2:"b843a6d42f",st_ch11:"b6894511ea",st_ch11_c:"9efdbf71c5",st_ch11_c2:"f546da8f8e",st_ch11_o2:"aeef4bee90",st_ch12:"1397cf6dce",st_ch12_c2:"06f5d6d3ba",st_ch12_o2:"0312f829bb",st_ch13:"71e41f1a69",st_ch13_c:"70fb38b0f9",st_ch13_c2:"445fe87801",st_ch13_o2:"76a4449481",st_ch14:"5bbb66484c",st_ch14_c:"41a07e86b6",st_ch14_c2:"8de17a5968",st_ch14_o2:"4df25272f9",st_ch15:"da2f6a00e0",st_ch15_c2:"b82adae672",st_ch15_o2:"2a0a745837",st_ch16:"768d4e6565",st_ch16_c2:"a051d15b0c",st_ch16_o2:"56479b20c6",st_ch17:"8d32828cb8",st_ch17_c2:"55b7a3183f",st_ch17_o2:"11717b463f",st_ch18:"4949e80c46",st_ch18_c2:"96fefdfd79",st_ch18_o:"743d58be1b",st_ch18_o2:"c95622fd31",st_ch19:"6b1a05fdb1",st_ch19_c:"40a8b96329",st_ch19_c2:"7a2edb52f4",st_ch19_o2:"2b4295d26e",st_ch20:"9d66c037da",st_ch20_c:"5882950434",st_ch20_c2:"7ba09244d6",st_ch20_o2:"2edde32b33",st_ch21:"528a70b4d9",st_ch21_c2:"b578d6dd70",st_ch21_o2:"31150089d5",st_ch22:"6ab9282c09",st_ch22_c2:"470f6694f3",st_ch22_o2:"8cc78eff73",st_ch23:"7c3362353c",st_ch23_c2:"a9e39a4e69",st_ch23_o:"9b647ff789",st_ch23_o2:"db2594844e",st_ch24:"c4d04925c9",st_ch24_c2:"925b09913f",st_ch24_o:"5d7007a191",st_ch24_o2:"90adadc9d6",st_side_acorn_1:"e6e409bf68",st_side_acorn_2:"16d1b0692d",st_side_acorn_3:"e64655f9cd",st_side_acorn_4:"cdc8db1079",st_side_bear:"2bcb94dea6",st_side_deer_1:"b27e59b190",st_side_deer_2:"daf12348d8",st_side_deer_3:"9af6ea3a56",st_side_honey_1:"ff9777b5cd",st_side_honey_2:"11607990e4",st_side_honey_3:"43fdbb8087",st_side_honey_4:"8cadae4386",st_side_mole:"bf20570b4c",st_side_mole_1:"07cb39f498",st_side_mole_2:"1dbcf0b553",st_side_mole_3:"1ca7dfb702",st_side_mole_4:"39576bdfba",st_side_nap_1:"b1f4cd4640",st_side_nap_2:"3bcaf34ad3",st_side_nap_3:"a25820ea22",st_side_nap_4:"65342badef",st_side_owl:"cc843fa8e8",st_side_sloth:"b11838a6f4",st_side_sloth_1:"d7ba28a6d7",st_side_sloth_2:"2ed1e8e506",st_side_sloth_3:"9cecf5c579",st_side_sloth_4:"1440fe545b",st_side_squirrel:"3d5ea7a0df",st_side_waterdeer:"0fce30acfb",st_tagmap:"fd82ef729b",st_tam_1:"3fbb70774d",st_tam_2:"92f28f42b6",st_tam_3:"fd439f975f",st_tam_4:"669acb69e2",st_tam_5:"d59a034db4"}/* ST_PICS:END */;
+  const stPicUrl = k => webDir('img/story/') + k + '-' + ST_PICS[k] + '.webp';
   // 4.3.1 숲속 탐험대 처음 소개(그림 st_tam_1~5, 작업지시서 76). p는 그 줄에서 보여 줄 그림 번호예요. 그림이 없으면 대사만 나와요
   const ST_TAM = [
     { p: 1, t: '해가 지고 학교가 조용해지면…' },
@@ -24054,10 +24091,8 @@ body.cam-scene #ffChip,body.cam-scene #plChip,body.cam-scene .b-ring{animation-p
   function stTamPic() {
     const R = rt.st; if (!R || R.id !== 'tam') return;
     const L = R.lines[R.i], k = 'st_tam_' + ((L && L.p) || 1); if (R.tpk === k) return; R.tpk = k;
-    if (location.protocol === 'file:' && !window.FS_IMG_BASE) return;
-    const im = new Image(); im.alt = ''; im.decoding = 'async';
-    im.onload = () => { const pe = $('#stPic'); if (!rt.st || rt.st.tpk !== k) return; pe.innerHTML = ''; pe.appendChild(im); pe.hidden = false; };
-    im.src = stPicUrl(k);
+    if ((location.protocol === 'file:' && !window.FS_IMG_BASE) || !ST_PICS[k]) return;
+    webImg(stPicUrl(k), (u, im) => { const pe = $('#stPic'); if (!rt.st || rt.st.tpk !== k) return; pe.innerHTML = ''; pe.appendChild(im); pe.hidden = false; });
   }
   // 장면 틀기: id는 'o3', 'c3', 'recap', 곁가지는 'side:nap:0'. replay면 저장을 바꾸지 않아요
   function stPlay(id, replay) {
@@ -24072,11 +24107,9 @@ body.cam-scene #ffChip,body.cam-scene #plChip,body.cam-scene .b-ring{animation-p
     setT($('#stCh'), head);
     const pe = $('#stPic'); pe.hidden = true; pe.innerHTML = '';
     if (pic && !(location.protocol === 'file:' && !window.FS_IMG_BASE)) {   // 그림은 게임 밖 파일이에요. 못 받으면 그림 없이 대사만 나와요
-      const im = new Image(); im.alt = ''; im.decoding = 'async';
-      im.onload = () => { if (rt.st && rt.st.id === id) { pe.appendChild(im); pe.hidden = false; } };
-      im.onerror = () => { if (pic2) { const u = stPicUrl(pic2); pic2 = ''; im.src = u; } };
-      im.src = stPicUrl(pic);
-      if (picB) { const b = new Image(); b.alt = ''; b.decoding = 'async'; b.className = 'sy-p2'; b.onload = () => { if (rt.st && rt.st.id === id) { rt.st.im2 = b; stPic2(); } }; b.src = stPicUrl(picB); }
+      const p1 = ST_PICS[pic] ? pic : ST_PICS[pic2] ? pic2 : '', R = rt.st;   // 5.0.2 그 장면만의 그림이 이름표에 없으면 바로 장 그림
+      if (p1) webImg(stPicUrl(p1), (u, im) => { if (rt.st === R) { pe.appendChild(im); pe.hidden = false; } });
+      if (ST_PICS[picB]) webImg(stPicUrl(picB), (u, b) => { b.className = 'sy-p2'; if (rt.st === R) { rt.st.im2 = b; stPic2(); } });
     }
     stLine(); openModal(m);
     return true;
@@ -25027,7 +25060,7 @@ body.cam-scene #ffChip,body.cam-scene #plChip,body.cam-scene .b-ring{animation-p
     const bg = CERE_BG[from.name] || 'elem';
     let h = '<defs><clipPath id="cereClip"><rect x="0" y="0" width="220" height="192" rx="10"/></clipPath></defs><g clip-path="url(#cereClip)">' +
       '<rect x="0" y="0" width="220" height="192" fill="#E9C98E"/>' +
-      `<image href="${IMG_BASE()}cere/cere_bg_${bg}.webp" x="0" y="-56" width="220" height="330" preserveAspectRatio="xMidYMid slice"/>` +
+      `<image href="${cereBgUrl(bg)}" x="0" y="-56" width="220" height="330" preserveAspectRatio="xMidYMid slice"/>` +
       im('cere_light', 60, -14, 100, 100, 'c2-fade', 'animation-delay:.4s;opacity:.8') +
       `<g class="c2-fade" style="animation-delay:2.4s">${im('cere_banner', 26, 4, 168, 42)}<text class="cere-ban" x="110" y="28.5" text-anchor="middle" style="font-size:10px">${esc(from.school)} 졸업식</text></g>` +
       im('cere_flower_stand', 18, 58, 30, 45, 'c2-fade', 'animation-delay:.9s') + im('cere_flower_stand', 172, 58, 30, 45, 'c2-fade', 'animation-delay:.9s');
@@ -25072,13 +25105,18 @@ body.cam-scene #ffChip,body.cam-scene #plChip,body.cam-scene .b-ring{animation-p
   const C3_FLOOR = [186, 170, 172, 180, 192];   // 강당 그림마다 무대 바닥 높이(360×640 기준)
   const C3_BAN = [76, 40, 40, 64, 34];        // 강당 그림 속 빈 현수막 가운데 높이
   const cere3 = { st: '' };
-  const c3u = k => IMG_BASE() + 'cere3/cere3_' + k + '.webp';
+  // 5.0.2 앱 용량: 졸업식 그림(img/cere, img/cere3)도 앱에 넣지 않고 웹에서 받아요. 못 받으면 예전 졸업식 장면이 나와요
+  const c3Raw = k => webDir('img/cere3/') + 'cere3_' + k + '.webp';
+  const c3u = k => webSrcMap[c3Raw(k)] || c3Raw(k);
+  const cereBgRaw = bg => webDir('img/cere/') + 'cere_bg_' + bg + '.webp';
+  const cereBgUrl = bg => webSrcMap[cereBgRaw(bg)] || cereBgRaw(bg);
   function cere3Load() {
     if (cere3.st) return;
     if (location.protocol === 'file:' && !window.FS_IMG_BASE) { cere3.st = 'no'; return; }   // 자동 시험(file://)은 그림 폴더 옆에 있지 않아요
     cere3.st = 'wait'; let n = CERE3_FILES.length, bad = false;
     const done = () => { if (--n === 0) cere3.st = bad ? 'no' : 'ok'; };
-    for (const k of CERE3_FILES) { const im = new Image(); im.onload = done; im.onerror = () => { bad = true; done(); }; im.src = c3u(k); }
+    for (const k of CERE3_FILES) webImg(c3Raw(k), done, () => { bad = true; done(); });
+    if (APP_PACK() && S) { const bg = CERE_BG[tierInfo().name]; if (bg) webSrc(cereBgRaw(bg)).catch(() => {}); if (uniOn()) { webSrc(c3Raw('hall_uni')).catch(() => {}); webSrc(c3Raw('prop_cap')).catch(() => {}); } }   // 예전 장면의 배경과 대학교 강당도 기기에 받아 둬요
   }
   // 졸업식 정보는 명부를 비우기 전에 모아요(이름, 숫자, 지도)
   function cere3Info() {
@@ -25088,7 +25126,7 @@ body.cam-scene #ffChip,body.cam-scene #plChip,body.cam-scene .b-ring{animation-p
     const bld = Object.keys(FAC).filter(k => (FAC[k].tier || 0) <= S.tier && G.lot[k] && (S.f[k] || 0) >= 1).sort((a, b) => G.lot[a][1] - G.lot[b][1]).map(k => {
       const key = seasonKey(bldImg(k)), R = lotRect(G.lot[k], key), [cx, cy, w] = R;
       return `<image href="${IMG170(key)}" x="${(cx - w / 2).toFixed(1)}" y="${(cy - w / 2).toFixed(1)}" width="${w.toFixed(1)}" height="${w.toFixed(1)}"${xfAt(R)}/>`; }).join('');
-    return { t: S.tier, nm, bld, map: mapHi[mk] === 'ok' ? mapUrl(mk) : IMG170(mk),
+    return { t: S.tier, nm, bld, map: mapHi[mk] === 'ok' ? mapUrl(mk) : mapLo(mk),
       stats: [['함께한 학생', fmt(Math.floor(S.students)) + '명'], ['건물 레벨 합', 'Lv.' + lv], ['체험학습', fmt(S.st.trips || 0) + '번'], ['모은 수료증', fmt(Math.floor(S.st.dips || 0)) + '장']] };
   }
   function cereArt3(from, crew, I) {
@@ -29095,7 +29133,7 @@ body.cam-scene #ffChip,body.cam-scene #plChip,body.cam-scene .b-ring{animation-p
   }
 
   // 시험용 손잡이: 자동 시험(window.__FOREST_TEST)에서만 게임 속 함수를 꺼내 써요
-  if (window.__FOREST_TEST) window.__forest = { get S() { return S; }, get rt4() { return rt; }, THEME, applyCos, setZone, decoEditStart, decoEditEnd, tamSkipTo, tamSkipGo, tamWinRep, tamRepFl, tamRenderTop, tamBg, teaOff, geo, qMeasure, IMG, tamHOn, tamHOpen, tamCurFl, tamWinH, tamHf, tamHRankDoc, tamSkBusy, tamReach, get SKQ() { return SKQ; }, esAxGain, esAxLeft, ESHOP, tamLvPlan, tamLvBuy, tamLvAll, mapUrl, mapBase, tamCheerLeft, tamAdRevive, tamCap, tamCapped, tamLvRef, tamBaseRate, tamLvCost, tamStageIn, musicWant, tamPh, tamEvPick, tamAutoTeam, tamAutoGain, tamUpRec, MAIN, startSports, GEO, claimAchAll, ACH, btMake, btBest, btRoster, btRoll, btWin, btOppCheer, BT, BT_LG, stPrev, get Rank() { return Rank; }, tamRankDoc, tamTf, tamAdSpd, tamReport, tamRepTake, tamAdRevive, renderRankPanel, TAM, tamSim, tamTeam, tamStat, tamMobs, tamWin, tamIdle, tamCollect, tamParty, tamShard, tamPow, tamFight, tamStep, TAM, tamSim, tamTeam, tamStat, tamMobs, tamWin, tamIdle, tamCollect, tamShard, tamParty, tamPow, tamLvCost, tamOpen, setZone, geo, stPlay, stNext, ST, ST_SIDE, SIDE, missionGo, MGO, MGO_MINI, MGO_Q, renderMissions, renderPass, BOOST, conLeft, gameToday, setTab, ADX, adStamp, adxDay, adxCan, adxMore, adPickNow, adPickGive, conNear, renderAdStamp, claimOfflineDouble, startBoost, openBoost, showOffline, fvBoothStart, bfFwStart, musicWant, renderCounsel, renderXg, renderFv, showCeremony, RX, rxPct, rxCost, rxUp, rxPart, renderDept, goldOr, goldRich, adGold, stampAtt, GOLD, BIG, BF_DECO, bfWin, bfNext, bfOn, bfFw, bfSync, bfStamp, bfFwStart, bfPart, bfNextTx, sanitizeBf, freshBf, fvBoothMax, bldBox, bldPick, bldWarm, DECO_SLOTS, XG, MK, ST, SIDE, ST_SIDE, wdMap, xgOn, xgGuest, xgSpots, xgGreet, xgVisit, xgLunch, openXg, mkOn, mkHot, mkSell, mkBuy, mkSur, openMk, wdBar, wdTick, stTick, stPlay, stNext, stPick, stEnd, stTags, openSb, renderSb, sideCan, sideMap, fvFlag, FV, FV_POS, fvOn, fvOpen, fvBonus, fvSync, fvStamp, fvGuests, openFv, renderFv, fvMeet, fvBoothStart, fvMap, fvTip, festDef, goTo, navInfo, openShop, gdReady, thPreview, thPreviewEnd, thOn, busScene, tripCrowd, openTrip, startTrip, claimTrip, TRIPS, tripMult, openSheet, openRx, rtStart, rtLv, RT5, setZone, tamReg, promote, canPromote, get rxTier() { return RX_TIER; }, set rxTier(v) { RX_TIER = v; }, tamLvAllPlan, tamLvAllAsk, decoPut, decoUsed, get ZONE0() { return ZONE0; }, mgPickMul, mgPickMode, mgUpOrder, mgFillOrders, mgAdAsk, sportsCon, festCon, btQuota, btCanAd, btAdMore, warmRooms, blobUrl, vdSize, vdBlock, pzSweep, pzSwGain, pzSwOpen, pzXpOf, mgMulMax, mgMulOk, mgMul, mgModeTap, acTip, kidDupIdx, trialSafe, closeAd,
+  if (window.__FOREST_TEST) window.__forest = { get S() { return S; }, get rt4() { return rt; }, APP_PACK, mapLo, stPicUrl, ST_PICS, webAud, webCacheOk, c3u, WEB_ROOT, THEME, applyCos, setZone, decoEditStart, decoEditEnd, tamSkipTo, tamSkipGo, tamWinRep, tamRepFl, tamRenderTop, tamBg, teaOff, geo, qMeasure, IMG, tamHOn, tamHOpen, tamCurFl, tamWinH, tamHf, tamHRankDoc, tamSkBusy, tamReach, get SKQ() { return SKQ; }, esAxGain, esAxLeft, ESHOP, tamLvPlan, tamLvBuy, tamLvAll, mapUrl, mapBase, tamCheerLeft, tamAdRevive, tamCap, tamCapped, tamLvRef, tamBaseRate, tamLvCost, tamStageIn, musicWant, tamPh, tamEvPick, tamAutoTeam, tamAutoGain, tamUpRec, MAIN, startSports, GEO, claimAchAll, ACH, btMake, btBest, btRoster, btRoll, btWin, btOppCheer, BT, BT_LG, stPrev, get Rank() { return Rank; }, tamRankDoc, tamTf, tamAdSpd, tamReport, tamRepTake, tamAdRevive, renderRankPanel, TAM, tamSim, tamTeam, tamStat, tamMobs, tamWin, tamIdle, tamCollect, tamParty, tamShard, tamPow, tamFight, tamStep, TAM, tamSim, tamTeam, tamStat, tamMobs, tamWin, tamIdle, tamCollect, tamShard, tamParty, tamPow, tamLvCost, tamOpen, setZone, geo, stPlay, stNext, ST, ST_SIDE, SIDE, missionGo, MGO, MGO_MINI, MGO_Q, renderMissions, renderPass, BOOST, conLeft, gameToday, setTab, ADX, adStamp, adxDay, adxCan, adxMore, adPickNow, adPickGive, conNear, renderAdStamp, claimOfflineDouble, startBoost, openBoost, showOffline, fvBoothStart, bfFwStart, musicWant, renderCounsel, renderXg, renderFv, showCeremony, RX, rxPct, rxCost, rxUp, rxPart, renderDept, goldOr, goldRich, adGold, stampAtt, GOLD, BIG, BF_DECO, bfWin, bfNext, bfOn, bfFw, bfSync, bfStamp, bfFwStart, bfPart, bfNextTx, sanitizeBf, freshBf, fvBoothMax, bldBox, bldPick, bldWarm, DECO_SLOTS, XG, MK, ST, SIDE, ST_SIDE, wdMap, xgOn, xgGuest, xgSpots, xgGreet, xgVisit, xgLunch, openXg, mkOn, mkHot, mkSell, mkBuy, mkSur, openMk, wdBar, wdTick, stTick, stPlay, stNext, stPick, stEnd, stTags, openSb, renderSb, sideCan, sideMap, fvFlag, FV, FV_POS, fvOn, fvOpen, fvBonus, fvSync, fvStamp, fvGuests, openFv, renderFv, fvMeet, fvBoothStart, fvMap, fvTip, festDef, goTo, navInfo, openShop, gdReady, thPreview, thPreviewEnd, thOn, busScene, tripCrowd, openTrip, startTrip, claimTrip, TRIPS, tripMult, openSheet, openRx, rtStart, rtLv, RT5, setZone, tamReg, promote, canPromote, get rxTier() { return RX_TIER; }, set rxTier(v) { RX_TIER = v; }, tamLvAllPlan, tamLvAllAsk, decoPut, decoUsed, get ZONE0() { return ZONE0; }, mgPickMul, mgPickMode, mgUpOrder, mgFillOrders, mgAdAsk, sportsCon, festCon, btQuota, btCanAd, btAdMore, warmRooms, blobUrl, vdSize, vdBlock, pzSweep, pzSwGain, pzSwOpen, pzXpOf, mgMulMax, mgMulOk, mgMul, mgModeTap, acTip, kidDupIdx, trialSafe, closeAd,
     TKE, TK_Q, tkDaily, nbAllDay, nbBuildAt, nbOn, conAdd, BX_SPOT, PERKS, offlineCapH, applyAway, pzFinish, mgClaimOrder,
     CS, JOBS, CS_WORRY, freshCs, csOpen, csLeft, csMax, csEnsure, csCands, csNeed, csMul, csOpenCards, csReady, csDone, csTalkMake, csAnswer, csChoose, csSettle, openCounsel, renderCounsel, renderHall, MAIN, qMeasure, qGoal, sanitize,   // 3.1.0 진로 상담
     NSL, nsStart, nsSettle, nsOpen, nsOn, nsOverlap, nsExtraH, isNight, nightDayOf, openNs, renderNs, bxSpots, renderNight,   // 3.0.0
