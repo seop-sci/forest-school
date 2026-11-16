@@ -113,7 +113,8 @@ td.wrap{white-space:normal}
         id: id, seen: cap(d.seen, 253402300799999), born: cap(d.born, 253402300799999), pid: typeof d.pid === 'string' && d.pid ? d.pid.slice(0, 16) : id, name: cut(d.name, 20, ''),
         tier: cap(d.tier, 10), year: cap(d.year, 100), q: d.q == null ? '' : String(d.q).slice(0, 16), qt: cut(d.qt, 60, ''),
         play: cap(d.play, 1e8), sess: cap(d.sess, 1e6), days: cap(d.days, 3650), ads: cap(d.ads, 1e5), score: cap(d.score, 1e9), gearn: cap(d.gearn, 1e7), gspent: cap(d.gspent, 1e7),
-        dev: !!d.dev, v: cut(d.v, 32, '?'), env: cut(d.env, 16, '?')
+        dev: !!d.dev, v: cut(d.v, 32, '?'), env: cut(d.env, 16, '?'),
+        adsT: cap(d.adsT, 1e4), adsD: cut(d.adsD, 10, '')   // 5.0.1 오늘 본 광고 수와 그 날짜(게임 날짜, 한국 시간)
       };
       var o = by[r.pid]; if (!o || r.seen > o.seen) by[r.pid] = r;
     });
@@ -154,6 +155,8 @@ td.wrap{white-space:normal}
     // 쉬는 중인 학교가 멈춘 메인 퀘스트
     var stuck = countBy(away, function (r) { return r.q === '끝' ? '메인 퀘스트 모두 끝' : (r.q ? r.q + ' ' : '') + (r.qt || '?'); }).slice(0, 12);
     var plays = list.map(function (r) { return r.play; }), sess = list.map(function (r) { return r.sess; });
+    var todayKey = (function () { var t = new Date(now + KST); return t.getUTCFullYear() + '-' + ('0' + (t.getUTCMonth() + 1)).slice(-2) + '-' + ('0' + t.getUTCDate()).slice(-2); })();
+    var adToday = list.filter(function (r) { return r.adsD === todayKey && r.adsT > 0; }), adTodaySum = adToday.reduce(function (a, r) { return a + r.adsT; }, 0);   // 5.0.1 woodani 요청
     var adsSum = list.reduce(function (a, r) { return a + r.ads; }, 0), adN = list.filter(function (r) { return r.ads > 0; }).length;
     var adTop = list.filter(function (r) { return r.ads > 0; }).sort(function (a, b) { return b.ads - a.ads; }).slice(0, 10).map(function (r) { return [(r.name || '(이름 없음)') + ' ' + school(r), r.ads]; });
     var vers = countBy(list, function (r) { return r.v; }).slice(0, 8);
@@ -168,6 +171,7 @@ td.wrap{white-space:normal}
         '<div class="tile live"><span>지금 접속 중 (' + LIVE_MIN + '분)</span><b>' + fmt(live.length) + '</b></div>' +
         '<div class="tile"><span>오늘 접속</span><b>' + fmt(d1.length) + '</b></div>' +
         '<div class="tile"><span>최근 7일 접속</span><b>' + fmt(d7.length) + '</b></div>' +
+        '<div class="tile"><span>오늘 본 광고</span><b>' + fmt(adTodaySum) + '</b></div>' +
         '<div class="tile"><span>오늘 새 학교</span><b>' + fmt(newToday.length) + '</b></div>' +
         '<div class="tile"><span>전체 학교</span><b>' + fmt(list.length) + '</b></div>' +
         '<div class="tile"><span>랭킹 참여</span><b>' + (rankN == null ? '-' : fmt(rankN)) + '</b></div>' +
@@ -186,7 +190,8 @@ td.wrap{white-space:normal}
           '<span>광고 본 수 합계</span><span>' + fmt(adsSum) + '편</span>' +
           '<span>광고 본 학교</span><span>' + fmt(adN) + '곳 (' + (list.length ? Math.round(adN / list.length * 100) : 0) + '%)</span>' +
           '<span>광고 본 학교의 평균</span><span>' + (adN ? (adsSum / adN).toFixed(1) : '0') + '편</span>' +
-          '<span>오늘 접속한 학교의 광고 합계</span><span>' + fmt(d1.reduce(function (a, r) { return a + r.ads; }, 0)) + '편</span>' +
+          '<span>오늘 본 광고</span><span>' + fmt(adTodaySum) + '편 (' + fmt(adToday.length) + '곳)</span>' +
+          '<span>오늘 접속한 학교의 광고 합계(지금까지 모두)</span><span>' + fmt(d1.reduce(function (a, r) { return a + r.ads; }, 0)) + '편</span>' +
           '<span>황금 도토리 쓴 양 합계</span><span>' + fmt(list.reduce(function (a, r) { return a + r.gspent; }, 0)) + '개</span>' +
           '<span>황금 도토리 번 양 중간값</span><span>' + fmt(median(list.map(function (r) { return r.gearn; }))) + '개</span>' +
         '</div></section>' +
@@ -249,7 +254,8 @@ td.wrap{white-space:normal}
       var t = Math.min(3, Math.floor(Math.random() * Math.random() * 5)), q = qs[Math.floor(Math.random() * qs.length)];
       var seen = now - Math.floor(Math.pow(Math.random(), 2.5) * 20 * DAY), born = seen - Math.floor(Math.random() * 12 * DAY);
       out['u' + i] = { seen: seen, born: born, pid: 'p' + i, name: ['졸린 다람쥐', '용감한 토끼', '수줍은 판다', '배고픈 곰'][i % 4] + ' ' + i, tier: t, year: 1 + Math.floor(Math.random() * 3), q: q[0], qt: q[1],
-        play: Math.floor(Math.random() * 40000), sess: Math.floor(Math.random() * 60), days: Math.floor(Math.random() * 14), ads: Math.floor(Math.random() * 30), gearn: Math.floor(Math.random() * 200), dev: i % 37 === 0, v: ['3.0.0', '3.1.0', '2.3.5'][i % 3], env: ['mobile', 'pc', 'kakao'][i % 5 === 0 ? 1 : i % 7 === 0 ? 2 : 0] };
+        play: Math.floor(Math.random() * 40000), sess: Math.floor(Math.random() * 60), days: Math.floor(Math.random() * 14), ads: Math.floor(Math.random() * 30), gearn: Math.floor(Math.random() * 200), dev: i % 37 === 0, v: ['3.0.0', '3.1.0', '2.3.5'][i % 3], env: ['mobile', 'pc', 'kakao'][i % 5 === 0 ? 1 : i % 7 === 0 ? 2 : 0],
+        adsT: Math.floor(Math.random() * 6), adsD: (function () { var d = new Date(seen + KST); return d.getUTCFullYear() + '-' + ('0' + (d.getUTCMonth() + 1)).slice(-2) + '-' + ('0' + d.getUTCDate()).slice(-2); })() };
     }
     return out;
   }
