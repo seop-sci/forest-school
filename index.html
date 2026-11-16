@@ -651,6 +651,10 @@ label.srow,button.srow{cursor:pointer}
 .fallfx i{position:absolute;top:-4%;width:7px;height:5px;border-radius:70% 0 70% 0;background:#F5B3C6;opacity:.9;animation:leafFall linear infinite}
 .fallfx.snow i{width:5px;height:5px;border-radius:50%;background:#FFFFFF;opacity:.9;box-shadow:0 0 2px rgba(120,140,160,.5)}
 @keyframes leafFall{0%{top:-4%;transform:translateX(0) rotate(0)}50%{transform:translateX(var(--dx)) rotate(160deg)}100%{top:104%;transform:translateX(0) rotate(320deg)}}
+/* 5.0.2 끊김 줄이기: 떨어지는 움직임을 top 대신 transform으로(배치를 다시 하지 않아요). 칸 높이 단위(cqh)를 아는 브라우저에서만 바꾸고 모습은 같아요 */
+@supports (height:1cqh){.fallfx,.fever-fx{container-type:size}
+@keyframes leafFall{0%{transform:translateY(0) translateX(0) rotate(0)}50%{transform:translateY(54cqh) translateX(var(--dx)) rotate(160deg)}100%{transform:translateY(108cqh) translateX(0) rotate(320deg)}}
+@keyframes confetti{0%{transform:translateY(0) rotate(0) translateX(0)}50%{transform:translateY(55cqh) rotate(200deg) translateX(10px)}100%{transform:translateY(110cqh) rotate(400deg) translateX(-6px)}}}
 .fallfx.leaf i{width:7px;height:6px;border-radius:60% 10% 60% 10%;background:#E3873A}
 .fallfx.leaf i:nth-child(3n){background:#C8452F} .fallfx.leaf i:nth-child(3n+1){background:#F0B04A}
 .fallfx.star i{top:var(--y);width:3px;height:3px;border-radius:50%;background:#FFE38A;box-shadow:0 0 4px #FFE38A;animation:twinkle ease-in-out infinite alternate}
@@ -10219,9 +10223,13 @@ body.cam-scene #ffChip,body.cam-scene #plChip,body.cam-scene .b-ring{animation-p
       const key = mapKey(G.map);
       el.setAttribute('href', mapHi[key] === 'ok' ? mapUrl(key) : mapLo(key));
       el.dataset.key = key;
+      // 5.0.2 끊김 줄이기: 고화질은 지금 보는 지도만 바로 받아요(예전에는 켤 때 모든 학교급 지도 12장 3.5MB). 다른 지도는 그 지도로 갈 때 받아요
+      if (G !== geo()) { if (mapHi[key] === 'ok') el.setAttribute('href', mapUrl(key)); return; }
       mapHiGet(key, u => { if (el.dataset.key === key) { el.setAttribute('href', u); if (APP_PACK() && G === geo()) mapBackdrop(); } });
     });
-    if (!rt.c3q) { rt.c3q = true; setTimeout(() => cere3Load(), 6000);
+    // 대학교부터는 구역을 오갈 때 빈 틈이 없게, 쉬는 틈에 나머지 구역 지도를 받아 둬요
+    if (S && S.tier >= UNI_TIER) { clearTimeout(rt.mapIdle); rt.mapIdle = setTimeout(() => { if (!S || S.tier < UNI_TIER) return; GEO.forEach((G, i) => { const el = $('#mapImg' + i); if (!el || i < ZONE0 || G === geo()) return; const key = mapKey(G.map); mapHiGet(key, u => { if (el.dataset.key === key) el.setAttribute('href', u); }); }); }, 4000); }
+    if (!rt.c3q) { rt.c3q = true;   // 5.0.2 졸업식 그림은 켜고 6초 뒤가 아니라 마지막 학년이 되면 받아요(loop의 cere3Soon)
       if (APP_PACK()) webCachePrune(u => /\/story\//.test(u) ? Object.keys(ST_PICS).some(k => u.endsWith('/' + k + '-' + ST_PICS[k] + '.webp')) : /\/maps\//.test(u) ? u.endsWith('?v=' + MAPS_V) : /\/audio\//.test(u) ? u.endsWith('?v=' + AUD_V) : true); }   // 5.0.2 주소가 바뀐 옛 파일은 기기 저장에서 지워요   // 3.3.0 새 졸업식 그림은 조금 뒤에 미리 받아 둬요
     mapBackdrop();
   }
@@ -10378,11 +10386,7 @@ body.cam-scene #ffChip,body.cam-scene #plChip,body.cam-scene .b-ring{animation-p
   const TOWN_ART = { mush: mushSVG, shop: shopSVG, lamp: lampSVG, apt: aptSVG, tower: towerSVG };
   // 나무와 동네 건물을 밑바닥 y 순서로 그려서 뒤에 있는 것이 먼저 깔리게 해요
   function buildForest() {
-    // 과학실이 들어설 자리(오른쪽 위)와 겹치는 것은 data-sci를 붙여서 초등학교부터 치워요
-    const items = TREES.map(([x, y, r, gone, sci]) => ({ y: y + r * 0.92, svg: `<g${gone ? ` data-gone="${gone}"` : ''}${sci ? ' data-sci="1"' : ''}>${treeSVG(x, y, r)}</g>` }))
-      .concat(TOWN.map(([st, type, x, y, sc, v, sci]) => ({ y, svg: `<g data-stage="${st}"${sci ? ' data-sci="1"' : ''} transform="translate(${x} ${y}) scale(${sc})" style="display:none"><g class="tw">${TOWN_ART[type](v)}</g></g>` })));
-    items.sort((a, b) => a.y - b.y);
-    $('#forest').innerHTML = items.map(i => i.svg).join('');
+    // 5.0.2 끊김 줄이기: #forest는 1.7.0부터 지도 그림에 가려 안 보여요(display:none). 요소 468개를 만들지 않아요. 동네 단계 셈(renderTown)은 그대로 돌아요
     rt.townStage = -1;
   }
   // 동네 단계에 맞춰 나무를 치우고 건물을 세워요. anim이면 새로 생긴 건물이 쑥 솟아올라요
@@ -12076,13 +12080,14 @@ body.cam-scene #ffChip,body.cam-scene #plChip,body.cam-scene .b-ring{animation-p
       }
       const a = o.path[o.i], b = o.path[o.i + o.dir] || a, t = o.t;
       const x = a[0] + (b[0] - a[0]) * t, y = a[1] + (b[1] - a[1]) * t, s = furDepth(y), bob = o.wait > 0 ? 0 : Math.abs(Math.sin(t * Math.PI * 6)) * 1.2;
-      o.el.setAttribute('transform', `translate(${x.toFixed(1)} ${(y - bob).toFixed(1)}) scale(${s.toFixed(3)})`);
+      o.y = y; o.el.setAttribute('transform', `translate(${x.toFixed(1)} ${(y - bob).toFixed(1)}) scale(${s.toFixed(3)})`);
       const left = b[0] < a[0] - 0.5; if (o.left !== left) { o.left = left; o.el.firstChild && o.el.querySelector('.wk-flip').setAttribute('transform', left ? 'scale(-1 1)' : ''); }
     }
     // 앞(아래)에 있는 친구가 위에 그려지게
-    if (W.list.length > 1) { const ys = W.list.map(o => +o.el.getAttribute('transform').split(' ')[1]); const ord = W.list.map((o, j) => [ys[j], o]).sort((p, q) => p[0] - q[0]); const g = $('#roomWalk'); ord.forEach(([, o]) => { if (o.el.nextSibling) g.appendChild(o.el); }); }
+    // 5.0.2 끊김 줄이기: 예전에는 순서가 같아도 프레임마다 모두 다시 붙였어요. 순서가 바뀔 때만 옮겨요
+    if (W.list.length > 1) { const ord = W.list.slice().sort((p, q) => p.y - q.y), key = ord.map(o => W.list.indexOf(o)).join(''); if (W.ord !== key) { W.ord = key; const g = $('#roomWalk'); ord.forEach(o => g.appendChild(o.el)); } }
   }
-  function tick171(dt) { if (rt.walk && rt.sheetKey === rt.walk.k) walkStep(dt); }
+  function tick171(dt) { if (!(rt.walk && rt.sheetKey === rt.walk.k)) { rt.wkT = 0; return; } rt.wkT = (rt.wkT || 0) + dt; if (rt.mf % MAP_DIV === 0) { walkStep(rt.wkT); rt.wkT = 0; } }   // 5.0.2 지도 학생처럼 1초에 30번
   /* ===== 1.7.1 방 꾸밈 소품과 걷는 친구들 END ===== */
   function furImg(id, x, y, w, st) {
     const s = furDepth(y), ww = w * s, hh = ww * FUR_AR[id];
@@ -13617,14 +13622,14 @@ body.cam-scene #ffChip,body.cam-scene #plChip,body.cam-scene .b-ring{animation-p
   function renderVpCard() {
     const card = $('.tcard[data-k="vp"]'); if (!card) return;
     const L = vpLv(), maxed = vpMaxed(), c = vpCost();
-    $('.tlv', card).textContent = `Lv.${L}`;
-    $('.now', card).textContent = VP.eff(L);
-    $('.next', card).textContent = maxed ? '최고 레벨이에요' : VP.eff(L + 1);
+    setT($('.tlv', card), `Lv.${L}`);
+    setT($('.now', card), VP.eff(L));
+    setT($('.next', card), maxed ? '최고 레벨이에요' : VP.eff(L + 1));
     const btn = $('button', card);
-    $('.lbl', btn).textContent = maxed ? '최고 레벨' : '연수 보내기';
-    $('.cost', btn).hidden = maxed;
-    $('.cost b', btn).textContent = fmt(c);
-    btn.setAttribute('aria-disabled', (maxed || S.budget < c) ? 'true' : 'false');
+    setT($('.lbl', btn), maxed ? '최고 레벨' : '연수 보내기');
+    setHid($('.cost', btn), maxed);
+    setT($('.cost b', btn), fmt(c));
+    setAt(btn, 'aria-disabled', (maxed || S.budget < c) ? 'true' : 'false');
   }
   function profTitles() {   // 4.0.0 카드 이름과 소개 글, 탭 이름을 지금 학교급 호칭으로
     const put = (k, o) => { const c = $(`.tcard[data-k="${k}"]`); if (!c) return; setT($('h3', c), o.name); const d = $('.tdesc', c); if (d) setT(d, o.desc); };
@@ -13643,15 +13648,15 @@ body.cam-scene #ffChip,body.cam-scene #plChip,body.cam-scene .b-ring{animation-p
       const card = $(`.tcard[data-k="${k}"]`); if (!card) continue;
       const X = XT[k], L = xtLv(k), here = xtHere(k), maxed = xtMaxed(k), c = xtCost(k);
       card.classList.toggle('away', !here);
-      $('.tlv', card).textContent = here ? `Lv.${L}` : '아직 안 오셨어요';
-      $('.now', card).textContent = X.eff(L);
-      $('.next', card).textContent = maxed ? '최고 레벨이에요' : X.eff(L + 1);
-      const note = $('.tnote', card); note.hidden = here; note.textContent = here ? '' : S.tier < (X.tier || 0) ? `${TIERS[X.tier].school}${X.fac === 'store' ? ' 매점' : X.fac === 'dorm' ? ' 기숙사' : X.fac === 'union' ? ' 학생회관' : X.fac === 'institute' ? ' 연구소' : ''}에서 오셔요.` : `${eul(FAC[X.fac].name)} 지으면 학교에 오셔요.`;
+      setT($('.tlv', card), here ? `Lv.${L}` : '아직 안 오셨어요');
+      setT($('.now', card), X.eff(L));
+      setT($('.next', card), maxed ? '최고 레벨이에요' : X.eff(L + 1));
+      const note = $('.tnote', card); setHid(note, here); setT(note, here ? '' : S.tier < (X.tier || 0) ? `${TIERS[X.tier].school}${X.fac === 'store' ? ' 매점' : X.fac === 'dorm' ? ' 기숙사' : X.fac === 'union' ? ' 학생회관' : X.fac === 'institute' ? ' 연구소' : ''}에서 오셔요.` : `${eul(FAC[X.fac].name)} 지으면 학교에 오셔요.`);
       const btn = $('button', card);
-      $('.lbl', btn).textContent = maxed ? '최고 레벨' : '연수 보내기';
-      $('.cost', btn).hidden = maxed || !here;
-      $('.cost b', btn).textContent = fmt(c);
-      btn.setAttribute('aria-disabled', (!here || maxed || xtHave(k) < c) ? 'true' : 'false');
+      setT($('.lbl', btn), maxed ? '최고 레벨' : '연수 보내기');
+      setHid($('.cost', btn), maxed || !here);
+      setT($('.cost b', btn), fmt(c));
+      setAt(btn, 'aria-disabled', (!here || maxed || xtHave(k) < c) ? 'true' : 'false');
     }
   }
   function xtAct(k, btn) {
@@ -13681,19 +13686,19 @@ body.cam-scene #ffChip,body.cam-scene #plChip,body.cam-scene .b-ring{animation-p
     for (const k of Object.keys(TEA)) {
       const card = $(`.tcard[data-k="${k}"]`), T = TEA[k], L = S.t[k], maxed = teaMaxed(k), c = teaCost(k);
       card.classList.toggle('away', L < 1);
-      $('.tlv', card).textContent = L < 1 ? '아직 안 오셨어요' : `Lv.${L}`;
-      $('.now', card).textContent = T.eff(L);
-      $('.k-next', card).textContent = L < 1 ? '모시면' : '연수 후';
-      $('.next', card).textContent = maxed ? '최고 레벨이에요' : T.eff(L + 1);
+      setT($('.tlv', card), L < 1 ? '아직 안 오셨어요' : `Lv.${L}`);
+      setT($('.now', card), T.eff(L));
+      setT($('.k-next', card), L < 1 ? '모시면' : '연수 후');
+      setT($('.next', card), maxed ? '최고 레벨이에요' : T.eff(L + 1));
       const note = $('.tnote', card);
       const needPg = k === 'bear' && S.f.playground < 1;
-      note.hidden = !needPg;
-      note.textContent = needPg ? `${eul(FAC.playground.name)} 지어야 효과가 나요.` : '';
+      setHid(note, !needPg);
+      setT(note, needPg ? `${eul(FAC.playground.name)} 지어야 효과가 나요.` : '');
       const btn = $('button', card);
-      $('.lbl', btn).textContent = maxed ? '최고 레벨' : (L < 1 ? '모셔 오기' : '연수 보내기');
-      $('.cost', btn).hidden = maxed;
-      $('.cost b', btn).textContent = fmt(c);
-      btn.setAttribute('aria-disabled', (maxed || S.budget < c) ? 'true' : 'false');
+      setT($('.lbl', btn), maxed ? '최고 레벨' : (L < 1 ? '모셔 오기' : '연수 보내기'));
+      setHid($('.cost', btn), maxed);
+      setT($('.cost b', btn), fmt(c));
+      setAt(btn, 'aria-disabled', (maxed || S.budget < c) ? 'true' : 'false');
     }
     renderVpCard(); renderXtCards();
   }
@@ -26292,7 +26297,9 @@ body.cam-scene #ffChip,body.cam-scene #plChip,body.cam-scene .b-ring{animation-p
   // 끝없이 도는 CSS 움직임(반딧불, 빛 번짐, 단추 흔들림, 비 등)은 멈춰 두고,
   // 학생 걸음과 같은 프레임에 시간만 옮겨 줘요. 1초마다 새로 생긴 움직임을 찾아요. 모습은 그대로예요
   const MAP_DIV = 2;
-  function slowAnimTick(now) {
+  // 5.0.2 끊김 줄이기: 지도가 통째로 가려진 동안(다른 탭, 탐험, 퍼즐과 합치기와 대결, 졸업식 장면)에는 지도 학생 걸음과 지도 속 끝없는 움직임을 쉬어요. 돌아오면 그 자리에서 이어 가요
+  function mapHidden() { try { return rt.tab !== 'school' || !!rt.cereOn || !!(pzUI.open || mgUI.open || btUI.open); } catch (e) { return rt.tab !== 'school'; } }
+  function slowAnimTick(now, noMap) {
     if (!document.getAnimations) return;
     if (!rt.saAt || now - rt.saAt > 1000) {
       rt.saAt = now;
@@ -26300,12 +26307,12 @@ body.cam-scene #ffChip,body.cam-scene #plChip,body.cam-scene .b-ring{animation-p
       for (const a of document.getAnimations()) {
         const e = a.effect, tg = e && e.target; if (!tg || !e.getTiming || e.getTiming().iterations !== Infinity) continue;
         // 휴대폰 WebView에서는 transform, opacity 움직임도 따로 돌지 못하고 매 프레임 다시 계산하는 경우가 있어서 끝없는 움직임은 모두 같은 프레임에 모아요
-        if (a.playState === 'running' && !a._slow) { a._slow = true; a._t0 = now - (a.currentTime || 0); a.pause(); }
+        if (a.playState === 'running' && !a._slow) { a._slow = true; a._t0 = now - (a.currentTime || 0); a._map = !!(tg.closest && tg.closest('#map')); a.pause(); }
         if (a._slow && a.playState === 'paused') keep.push(a);
       }
       rt.slowAnims = keep;
     }
-    for (const a of rt.slowAnims || []) { try { a.currentTime = now - a._t0; } catch (er) { /* 지워진 움직임 */ } }
+    for (const a of rt.slowAnims || []) { if (noMap && a._map) continue; try { a.currentTime = now - a._t0; } catch (er) { /* 지워진 움직임 */ } }
   }
   function loop(now) {
     const dt = Math.min(1, Math.max(0, (now - rt.lastT) / 1000));
@@ -26329,7 +26336,7 @@ body.cam-scene #ffChip,body.cam-scene #plChip,body.cam-scene .b-ring{animation-p
       // 같은 프레임에 모아 1초에 30번만 해요(MAP_DIV). 바뀌는 프레임이 반으로 줄어요
       rt.mf = (rt.mf || 0) + 1; rt.kdt = (rt.kdt || 0) + dt;
       const vis = rt.mf % MAP_DIV === 0;
-      if (vis) { if (!(rt.sheetAnimTo > now) && !rt.sheetKey) updateKids(rt.kdt, now); rt.kdt = 0; slowAnimTick(now); }   // 3.0.0 건물 창이 올라오는 0.3초 동안은 쉬어요   // 3.2.1 창이 열려 있는 동안 계속 쉬어요(지도 학생은 그 자리에 서 있어요)
+      if (vis) { const noMap = mapHidden(); if (!(rt.sheetAnimTo > now) && !rt.sheetKey && !noMap) updateKids(rt.kdt, now); rt.kdt = 0; slowAnimTick(now, noMap); }   // 3.0.0 건물 창이 올라오는 0.3초 동안은 쉬어요   // 3.2.1 창이 열려 있는 동안 계속 쉬어요(지도 학생은 그 자리에 서 있어요)
       updateDrops(now);
       updateTalk(dt);
       updateBoostWin(dt);
@@ -26346,7 +26353,7 @@ body.cam-scene #ffChip,body.cam-scene #plChip,body.cam-scene .b-ring{animation-p
       if (S.bd && Object.keys(S.bd).length) { conTick(); conRender(false); }   // 2.1.0 공사
       if (S.oak < OAK.max) { S.oak = Math.min(OAK.max, S.oak + dt / OAK.regen); renderOak(); }
       rt.uiT += dt; if (rt.uiT >= 0.1 && vis) { rt.uiT = 0; renderHUD(); }   // 글자 바꾸기도 같은 프레임에
-      rt.affT += dt; if (rt.affT >= 0.25 && vis) { rt.affT = 0; renderAffordance(); repTipCheck(); }
+      rt.affT += dt; if (rt.affT >= 0.25 && vis) { rt.affT = 0; renderAffordance(); repTipCheck(); if (!cere3.st && finalYear()) cere3Load(); }   // 5.0.2 졸업식 그림은 마지막 학년에 미리 받아 둬요
     }
     requestAnimationFrame(loop);
   }
@@ -28795,16 +28802,16 @@ body.cam-scene #ffChip,body.cam-scene #plChip,body.cam-scene .b-ring{animation-p
   function mgRenderTop() {
     mgTick();
     const m = S.mg;
-    $('#mgE').textContent = m.e; $('#mgEMax').textContent = `/${mgEMax()}`;
+    setT($('#mgE'), m.e); setT($('#mgEMax'), `/${mgEMax()}`);
     const sec = mgEnergyIn();
-    $('#mgETimer').textContent = sec ? ` ${sec}초` : '';   // 다음 1이 차기까지 남은 시간. 가득 차면 비워요
-    $('#mgPc').textContent = m.pieces; $('#mgUp').textContent = m.up;
+    setT($('#mgETimer'), sec ? ` ${sec}초` : '');   // 다음 1이 차기까지 남은 시간. 가득 차면 비워요
+    setT($('#mgPc'), m.pieces); setT($('#mgUp'), m.up);
     mgRenderMul();
     const ad = $('#mgAdBtn'), left = mgAdLeft();
     const energyIcon = IMG180('mg_ic_energy');
-    ad.innerHTML = `<span class="mg-ad-play" aria-hidden="true">▶</span>${energyIcon ? `<img class="mg-ad-icon" src="${energyIcon}" alt="">` : '<span aria-hidden="true">⚡</span>'}<span>+${MG.AD.e}</span><small>${left}/${MG.AD.n}</small>`;
-    ad.setAttribute('aria-label', `광고 보고 에너지 ${MG.AD.e} 받기, 오늘 ${left}회 남음`);
-    ad.setAttribute('aria-disabled', left > 0 ? 'false' : 'true');
+    setH(ad, `<span class="mg-ad-play" aria-hidden="true">▶</span>${energyIcon ? `<img class="mg-ad-icon" src="${energyIcon}" alt="">` : '<span aria-hidden="true">⚡</span>'}<span>+${MG.AD.e}</span><small>${left}/${MG.AD.n}</small>`);
+    setAt(ad, 'aria-label', `광고 보고 에너지 ${MG.AD.e} 받기, 오늘 ${left}회 남음`);
+    setAt(ad, 'aria-disabled', left > 0 ? 'false' : 'true');
   }
   function mgRenderOrders() {
     mgFillOrders();
@@ -29227,7 +29234,7 @@ body.cam-scene #ffChip,body.cam-scene #plChip,body.cam-scene .b-ring{animation-p
   }
 
   // 시험용 손잡이: 자동 시험(window.__FOREST_TEST)에서만 게임 속 함수를 꺼내 써요
-  if (window.__FOREST_TEST) window.__forest = { get S() { return S; }, get rt4() { return rt; }, APP_PACK, mapLo, stPicUrl, ST_PICS, webAud, webCacheOk, c3u, WEB_ROOT, THEME, applyCos, setZone, decoEditStart, decoEditEnd, tamSkipTo, tamSkipGo, tamWinRep, tamRepFl, tamRenderTop, tamBg, teaOff, geo, qMeasure, IMG, tamHOn, tamHOpen, tamCurFl, tamWinH, tamHf, tamHRankDoc, tamSkBusy, tamReach, get SKQ() { return SKQ; }, esAxGain, esAxLeft, ESHOP, tamLvPlan, tamLvBuy, tamLvAll, mapUrl, mapBase, tamCheerLeft, tamAdRevive, tamCap, tamCapped, tamLvRef, tamBaseRate, tamLvCost, tamStageIn, musicWant, tamPh, tamEvPick, tamAutoTeam, tamAutoGain, tamUpRec, MAIN, startSports, GEO, claimAchAll, ACH, btMake, btBest, btRoster, btRoll, btWin, btOppCheer, BT, BT_LG, stPrev, get Rank() { return Rank; }, tamRankDoc, tamTf, tamAdSpd, tamReport, tamRepTake, tamAdRevive, renderRankPanel, TAM, tamSim, tamTeam, tamStat, tamMobs, tamWin, tamIdle, tamCollect, tamParty, tamShard, tamPow, tamFight, tamStep, TAM, tamSim, tamTeam, tamStat, tamMobs, tamWin, tamIdle, tamCollect, tamShard, tamParty, tamPow, tamLvCost, tamOpen, setZone, geo, stPlay, stNext, ST, ST_SIDE, SIDE, missionGo, MGO, MGO_MINI, MGO_Q, renderMissions, renderPass, BOOST, conLeft, gameToday, setTab, ADX, adStamp, adxDay, adxCan, adxMore, adPickNow, adPickGive, conNear, renderAdStamp, claimOfflineDouble, startBoost, openBoost, showOffline, fvBoothStart, bfFwStart, musicWant, renderCounsel, renderXg, renderFv, showCeremony, RX, rxPct, rxCost, rxUp, rxPart, renderDept, goldOr, goldRich, adGold, stampAtt, GOLD, BIG, BF_DECO, bfWin, bfNext, bfOn, bfFw, bfSync, bfStamp, bfFwStart, bfPart, bfNextTx, sanitizeBf, freshBf, fvBoothMax, bldBox, bldPick, bldWarm, DECO_SLOTS, XG, MK, ST, SIDE, ST_SIDE, wdMap, xgOn, xgGuest, xgSpots, xgGreet, xgVisit, xgLunch, openXg, mkOn, mkHot, mkSell, mkBuy, mkSur, openMk, wdBar, wdTick, stTick, stPlay, stNext, stPick, stEnd, stTags, openSb, renderSb, sideCan, sideMap, fvFlag, FV, FV_POS, fvOn, fvOpen, fvBonus, fvSync, fvStamp, fvGuests, openFv, renderFv, fvMeet, fvBoothStart, fvMap, fvTip, festDef, goTo, navInfo, openShop, gdReady, thPreview, thPreviewEnd, thOn, busScene, tripCrowd, openTrip, startTrip, claimTrip, TRIPS, tripMult, openSheet, openRx, rtStart, rtLv, RT5, setZone, tamReg, promote, canPromote, get rxTier() { return RX_TIER; }, set rxTier(v) { RX_TIER = v; }, tamLvAllPlan, tamLvAllAsk, decoPut, decoUsed, get ZONE0() { return ZONE0; }, mgPickMul, mgPickMode, mgUpOrder, mgFillOrders, mgAdAsk, sportsCon, festCon, btQuota, btCanAd, btAdMore, warmRooms, blobUrl, vdSize, vdBlock, pzSweep, pzSwGain, pzSwOpen, pzXpOf, mgMulMax, mgMulOk, mgMul, mgModeTap, acTip, kidDupIdx, trialSafe, closeAd,
+  if (window.__FOREST_TEST) window.__forest = { get S() { return S; }, get rt4() { return rt; }, APP_PACK, mapLo, mapHidden, finalYear, stPicUrl, ST_PICS, webAud, webCacheOk, c3u, WEB_ROOT, THEME, applyCos, setZone, decoEditStart, decoEditEnd, tamSkipTo, tamSkipGo, tamWinRep, tamRepFl, tamRenderTop, tamBg, teaOff, geo, qMeasure, IMG, tamHOn, tamHOpen, tamCurFl, tamWinH, tamHf, tamHRankDoc, tamSkBusy, tamReach, get SKQ() { return SKQ; }, esAxGain, esAxLeft, ESHOP, tamLvPlan, tamLvBuy, tamLvAll, mapUrl, mapBase, tamCheerLeft, tamAdRevive, tamCap, tamCapped, tamLvRef, tamBaseRate, tamLvCost, tamStageIn, musicWant, tamPh, tamEvPick, tamAutoTeam, tamAutoGain, tamUpRec, MAIN, startSports, GEO, claimAchAll, ACH, btMake, btBest, btRoster, btRoll, btWin, btOppCheer, BT, BT_LG, stPrev, get Rank() { return Rank; }, tamRankDoc, tamTf, tamAdSpd, tamReport, tamRepTake, tamAdRevive, renderRankPanel, TAM, tamSim, tamTeam, tamStat, tamMobs, tamWin, tamIdle, tamCollect, tamParty, tamShard, tamPow, tamFight, tamStep, TAM, tamSim, tamTeam, tamStat, tamMobs, tamWin, tamIdle, tamCollect, tamShard, tamParty, tamPow, tamLvCost, tamOpen, setZone, geo, stPlay, stNext, ST, ST_SIDE, SIDE, missionGo, MGO, MGO_MINI, MGO_Q, renderMissions, renderPass, BOOST, conLeft, gameToday, setTab, ADX, adStamp, adxDay, adxCan, adxMore, adPickNow, adPickGive, conNear, renderAdStamp, claimOfflineDouble, startBoost, openBoost, showOffline, fvBoothStart, bfFwStart, musicWant, renderCounsel, renderXg, renderFv, showCeremony, RX, rxPct, rxCost, rxUp, rxPart, renderDept, goldOr, goldRich, adGold, stampAtt, GOLD, BIG, BF_DECO, bfWin, bfNext, bfOn, bfFw, bfSync, bfStamp, bfFwStart, bfPart, bfNextTx, sanitizeBf, freshBf, fvBoothMax, bldBox, bldPick, bldWarm, DECO_SLOTS, XG, MK, ST, SIDE, ST_SIDE, wdMap, xgOn, xgGuest, xgSpots, xgGreet, xgVisit, xgLunch, openXg, mkOn, mkHot, mkSell, mkBuy, mkSur, openMk, wdBar, wdTick, stTick, stPlay, stNext, stPick, stEnd, stTags, openSb, renderSb, sideCan, sideMap, fvFlag, FV, FV_POS, fvOn, fvOpen, fvBonus, fvSync, fvStamp, fvGuests, openFv, renderFv, fvMeet, fvBoothStart, fvMap, fvTip, festDef, goTo, navInfo, openShop, gdReady, thPreview, thPreviewEnd, thOn, busScene, tripCrowd, openTrip, startTrip, claimTrip, TRIPS, tripMult, openSheet, openRx, rtStart, rtLv, RT5, setZone, tamReg, promote, canPromote, get rxTier() { return RX_TIER; }, set rxTier(v) { RX_TIER = v; }, tamLvAllPlan, tamLvAllAsk, decoPut, decoUsed, get ZONE0() { return ZONE0; }, mgPickMul, mgPickMode, mgUpOrder, mgFillOrders, mgAdAsk, sportsCon, festCon, btQuota, btCanAd, btAdMore, warmRooms, blobUrl, vdSize, vdBlock, pzSweep, pzSwGain, pzSwOpen, pzXpOf, mgMulMax, mgMulOk, mgMul, mgModeTap, acTip, kidDupIdx, trialSafe, closeAd,
     TKE, TK_Q, tkDaily, nbAllDay, nbBuildAt, nbOn, conAdd, BX_SPOT, PERKS, offlineCapH, applyAway, pzFinish, mgClaimOrder,
     CS, JOBS, CS_WORRY, freshCs, csOpen, csLeft, csMax, csEnsure, csCands, csNeed, csMul, csOpenCards, csReady, csDone, csTalkMake, csAnswer, csChoose, csSettle, openCounsel, renderCounsel, renderHall, MAIN, qMeasure, qGoal, sanitize,   // 3.1.0 진로 상담
     NSL, nsStart, nsSettle, nsOpen, nsOn, nsOverlap, nsExtraH, isNight, nightDayOf, openNs, renderNs, bxSpots, renderNight,   // 3.0.0
