@@ -8,6 +8,13 @@ tracked = set(subprocess.run(['git', '-C', root, 'ls-files', 'img'], capture_out
 src = open(os.path.join(root, 'dev', 'forest-school.html'), encoding='utf-8').read()
 m = re.search(r'/\* ST_PICS:BEGIN \*/\{(.*?)\}/\* ST_PICS:END \*/', src)
 if m: refs |= {'img/story/%s-%s.webp' % kv for kv in re.findall(r'([A-Za-z0-9_]+):"([0-9a-f]{10})"', m.group(1))}
+# 2026-11-17: 원본도 그림 주소만 가져요. 원본이 부르는 파일이 있는지, 이름의 지문이 내용과 맞는지, 남은 base64 그림이 없는지 봐요
+sys.path.insert(0, os.path.dirname(os.path.abspath(__file__)))
+import imglib
+refs |= {'img/a/' + n for n in imglib.refs(src)}
+bad = imglib.check(src)
+if bad:
+    print('원본의 그림 주소가 맞지 않아요:'); print('\n'.join(bad[:20])); sys.exit(1)
 miss = sorted(r for r in refs if r not in tracked)
 if miss:
     print('git에 없는 그림 파일 %d개 (git add img 를 잊었어요):' % len(miss)); print('\n'.join(miss[:20])); sys.exit(1)

@@ -327,7 +327,7 @@ def main(dirs, block=''):
     old = {}
     if BEGIN in src:
         block = src[src.index(BEGIN):src.index(END)]
-        for k, v in re.findall(r'"([A-Za-z0-9_]+)":"(data:image/[^"]+)"', block):
+        for k, v in re.findall(r'"([A-Za-z0-9_]+)":\s*"(data:image/[^"]+|img/a/[^"]+)"', block):   # 2026-11-17 전에 넣은 그림은 이제 파일 주소(img/a/...)로 적혀 있어요
             old[k] = v
     old.update(imgs)   # 이번에 준 폴더의 그림만 바꾸고, 전에 넣은 그림은 그대로 둬요(webp가 아닌 SVG 같은 그림도, 2.2.0)
     body = ',\n'.join(f'"{k}":"{v}"' for k, v in sorted(old.items()))
@@ -339,9 +339,14 @@ def main(dirs, block=''):
     else:
         at = src.index('\n<script>\n') + 1
         src = src[:at] + new + '\n' + src[at:]
+    # 2026-11-17 woodani 결정(원본 구조 '가'): 원본에는 그림 주소만 둬요. 방금 넣은 base64 그림을 img/a 파일로 꺼내고 주소로 바꿔요
+    import imglib
+    src, _ = imglib.externalize(src)
+    bad = imglib.check(src)
+    if bad: sys.exit('그림 파일이 맞지 않아요: ' + ', '.join(bad[:5]))
     SRC.write_text(src, encoding='utf-8')
-    total = sum(len(v) for v in old.values())
-    print(f'그림 {len(old)}개 (이번에 {len(imgs)}개), 글자 크기 {total / 1024:.0f} KB')
+    total = sum(len(v) for v in old.values() if v.startswith('data:'))
+    print(f'그림 {len(old)}개 (이번에 {len(imgs)}개, {total / 1024:.0f} KB를 img/a 파일로 꺼냈어요). 새 파일은 git add img 로 함께 올려요')
 
 
 if __name__ == '__main__':
