@@ -20,6 +20,7 @@ JS = r"""(cfg) => { const F = window.__forest, S = F.S, quests = [], years = [],
   const clean = () => { F.rt.modalQueue.length = 0; F.rt.modalOpen = null; if (F.rt.st) F.rt.st = null; };
   clean();
   let fake = Date.now(); F.rt.fakeNow = fake;
+  const snaps = [];   // 졸업식마다 그때의 저장(dev/golden_make.py가 저장 표본으로 써요)
   let T = 0, C = 0, Wt = 0, Wd = 0, En = 0, buys = 0, effT = 0, capT = 0, ye = { e: 0, c: 0 };                       // 도토리 시간(초), 공사 시간(초), 기다림(초), 하루 횟수 때문에 드는 날
   let q0 = { T: 0, C: 0, Wt: 0, Wd: 0, En: 0, buys: 0 }, y0 = { T: 0, C: 0, Wt: 0, Wd: 0, En: 0, buys: 0 }, qid = '', maxCost = 0;
   // 재화 검사: 도토리, 황금 도토리, 수료증, 기금, 정수와 지금 살 것의 값
@@ -54,7 +55,7 @@ JS = r"""(cfg) => { const F = window.__forest, S = F.S, quests = [], years = [],
     if (S.tier > cfg.until || (S.tier >= 5 && S.tg >= 6)) break;
     const q = F.curMain(); qid = q ? q.id : 'none';
     if (F.canGraduate()) { yearRow(F.semFirst && F.semFirst() ? '방학식' : '종업식'); F.graduate(); clean(); S.grade = 0; F.checkGrade(); spendDips(); idle = 0; continue; }
-    if (F.canPromote()) { yearRow('졸업식'); if (S.tier >= cfg.until) break; F.promote(); clean(); S.grade = 0; F.checkGrade(); spendDips(); idle = 0; continue; }
+    if (F.canPromote()) { yearRow('졸업식'); snaps.push(JSON.stringify(S)); if (S.tier >= cfg.until) break; F.promote(); clean(); S.grade = 0; F.checkGrade(); spendDips(); idle = 0; continue; }
     if (q && q.t === 'xt' && F.xtLv(q.k) < q.n && pay(() => F.xtAct(q.k), F.xtCost(q.k), 'xt ' + q.k)) continue;
     if (q && q.t === 'vp' && pay(() => F.vpAct(), F.vpCost(), 'vp')) continue;
     // 사람처럼 살 수 있는 것 가운데 가장 싼 것부터(건물, 가구, 선생님)
@@ -72,7 +73,7 @@ JS = r"""(cfg) => { const F = window.__forest, S = F.S, quests = [], years = [],
     if (q && !F.mainReady() && idle++ < 3) { skip(q); notes.push('살 것이 없어 넘김 ' + q.id); continue; }
     notes.push('멈춤 ' + JSON.stringify({ q: q && q.id, t: q && q.t, tier: S.tier, tg: S.tg, sem: S.sem, grade: S.grade, cg: F.canGraduate(), cp: F.canPromote(), left: c.length })); break;
   }
-  return { quests, years, notes: notes.slice(0, 20), bad, guard, end: { tier: S.tier, tg: S.tg, sem: S.sem }, total: diff({ T: 0, C: 0, Wt: 0, Wd: 0, En: 0, buys: 0 }), maxCost }; }"""
+  return { snaps, quests, years, notes: notes.slice(0, 20), bad, guard, end: { tier: S.tier, tg: S.tg, sem: S.sem }, total: diff({ T: 0, C: 0, Wt: 0, Wd: 0, En: 0, buys: 0 }), maxCost }; }"""
 
 # 게임이 정한 기다림(초, 한 번마다)과 하루 횟수. 코드의 값을 옮겨 적은 어림이에요(RD.min 15분, 소풍과 텃밭 심기는 보낸 순간 세요, 대결 하루 5판, 책 하루 3권)
 WAITS = {'rdBooks': 900, 'trials': 60, 'pz': 180, 'mgBest': 120, 'mgOrders': 60, 'picks': 6, 'frPat': 5, 'frGift': 10, 'deco': 20, 'ach': 10, 'labs': 30, 'btPlays': 60, 'btWins': 90, 'stickers': 10, 'trips': 1800, 'fest': 120, 'sports': 120, 'shows': 120}
@@ -93,6 +94,7 @@ def main():
     a = sys.argv[1:]
     until = int(a[a.index('--until') + 1]) if '--until' in a else 5
     r = asyncio.run(run(until))
+    r.pop('snaps', None)
     if '--json' in a: json.dump(r, open(a[a.index('--json') + 1], 'w', encoding='utf-8'), ensure_ascii=False, indent=0)
     if '--check' in a:
         i = a.index('--check'); lim = float(a[i + 1]) if i + 1 < len(a) and a[i + 1].replace('.', '').isdigit() else 4.0
@@ -113,4 +115,4 @@ def main():
     for q in r['quests']: print('%-8s %s %d학년  도토리 %7.2f시간  공사 %6.2f시간  기다림 %5.1f분 %+.0f일  구매 %3d  %s' % (q['id'], TIER[q['tier']], q['tg'] + 1, q['h'], q['con'], q['wait'], q['days'], q['buys'], q['title']))
     for y in r['years']: print('== %s %d학년 %s학기 %s: 도토리 %.1f시간, 공사 %.1f시간, 기다림 %.0f분 +%.0f일, 구매 %d, 자리 비운 효율 %d%% 상한 %d시간' % (TIER[y['tier']], y['tg'] + 1, '2' if y['sem'] else '1', y['kind'], y['h'], y['con'], y['wait'], y['days'], y['buys'], round(y['eff'] * 100), y['capH']))
     print('합계', r['total'], '끝', r['end'], '메모', r['notes'][:6], '재화 이상', r['bad'][:6], '오류', r['errs'])
-main()
+if __name__ == '__main__': main()
