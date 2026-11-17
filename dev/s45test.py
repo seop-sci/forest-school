@@ -32,14 +32,14 @@ async def main():
         tst = await pg.evaluate(f"""(()=>{{ const F={F}, S=F.S; S.tier=1; S.hd.furNew=false; S.f.cafeteria=Math.max(1,S.f.cafeteria); S.fu.cafeteria=[0,0,0,0]; S.budget=1e12;
           F.buyFur('cafeteria',0); const a=document.querySelector('#toast').textContent; F.buyFur('cafeteria',1); const b=S.hd.furNew; return [a,b]; }})()""")
         if '튼튼한 모습' not in tst[0] or tst[1] is not True: fails.append(f'새 학교급 첫 가구 알림 {tst}')
-        # 2) 까치 핫딜: 특식 데이 20분, 반값은 수업료 30분치보다 많이 아낄 때만
+        # 2) 까치 핫딜: 특식 데이 30분(5.0.1.2부터), 반값은 수업료 30분치보다 많이 아낄 때만
         d = await pg.evaluate(f"""(()=>{{ const F={F}, S=F.S; S.tier=0; S.hd.feastUntil=0; S.f.classroom=3; S.fu.classroom=[3,3,3,3];
           const c=F.facCost('classroom'); const out={{feastMin: F.DEAL.feastMin}};
           // 도토리가 반값과 정가 사이이고, 반값이 수업료 30분치보다 작으면 반값 대신 특식이 나와요
           S.budget = c*0.75; S.students=F.capacity();
           const r = F.rate(); out.small = c/2 < r*1800; out.pick = (F.makeDeal()||{{}}).type; out.half = c/2; out.r30 = r*1800;
           return out; }})()""")
-        if d['feastMin'] != 20: fails.append(f"특식 데이가 20분이 아니에요 {d['feastMin']}")
+        if d['feastMin'] != 30: fails.append(f"특식 데이가 30분이 아니에요 {d['feastMin']}")
         if d['small'] and d['pick'] in ('fac', 'tea'): fails.append(f'아끼는 도토리가 30분치보다 작은데 반값 핫딜이 나왔어요 {d}')
         big = await pg.evaluate(f"""(()=>{{ const F={F}, S=F.S; S.hd.feastUntil=0; S.students=1; const c=F.facCost('classroom'); S.budget=c*0.75;
           const ok = c/2 >= F.rate()*1800; const k=F.makeDeal(); return [ok, k && k.type, k && k.k]; }})()""")
