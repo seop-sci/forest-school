@@ -52,14 +52,14 @@ async def main():
         for tier in (1, 2, 3):
             r = await pg.evaluate(f"""(() => {{ const F = {F}, S = F.S; {CLEAN}; S.tier = {tier}; S.f.science = 1; S.bx.m = {tier}; S.bx.sp = F.BX_SPOT[{tier}].map((s, i) => ({{ i, id: 'ladybug', t: Date.now() }})); F.renderMap(); F.renderDeco(true);
               const map = document.querySelector('#map').getBoundingClientRect(), bad = [];
-              document.querySelectorAll('#decoG .bx-hit').forEach(h => {{ const q = h.getBoundingClientRect(); let hit = 0;
+              document.querySelectorAll('#bxG .bx-hit').forEach(h => {{ const q = h.getBoundingClientRect(); let hit = 0;
                 for (const fx of [0.2, 0.5, 0.8]) for (const fy of [0.2, 0.5, 0.8]) if (document.elementFromPoint(q.left + q.width * fx, q.top + q.height * fy) === h) hit++;
                 if (hit < 5 || q.left < map.left - 1 || q.right > map.right + 1 || q.top < map.top - 1 || q.bottom > map.bottom + 1) bad.push([F.BX_SPOT[{tier}][+h.dataset.bx], hit]); }});
-              return {{ n: document.querySelectorAll('#decoG .bx-hit').length, bad }}; }})()""")
+              return {{ n: document.querySelectorAll('#bxG .bx-hit').length, bad }}; }})()""")
             if r['n'] != 6 or r['bad']: bad.append(f'숨은 생물 자리 {tier} {r}')
         await pg.evaluate(f"(() => {{ const S = {F}.S; S.tier = 0; S.bx.sp = []; }})()")
         r = await pg.evaluate(f"""(() => {{ const F = {F}, S = F.S; S.tier = 1; S.f.science = 1; F.renderMap(); S.bx.m = 1; S.bx.sp = [{{ i: 0, id: 'ladybug', t: Date.now() }}]; F.renderDeco(true);
-          return {{ glow: document.querySelectorAll('#decoG .bx-glow').length, hit: document.querySelectorAll('#decoG .bx-hit').length }}; }})()""")
+          return {{ glow: document.querySelectorAll('#bxG .bx-glow').length, hit: document.querySelectorAll('#bxG .bx-hit').length }}; }})()""")
         if r['glow'] != 1 or r['hit'] != 1: bad.append(f'숨은 생물 강조 {r}')
         # 6) 특별 이벤트 주말 하루 종일 건설 가속(2026 수능 주 11/16~22)
         r = await pg.evaluate(f"""(() => {{ const F = {F}; return {{
