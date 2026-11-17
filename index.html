@@ -675,6 +675,20 @@ label.srow,button.srow{cursor:pointer}
 .tm-lvn{display:inline-flex;align-items:center;gap:4px;font-size:12px;color:var(--muted)}
 .tm-lvn button{min-width:34px;padding:4px 8px;border:0;border-radius:999px;background:var(--chip,rgba(0,0,0,.06));color:inherit;font:inherit;font-weight:700;cursor:pointer}
 .tm-lvn button[aria-pressed="true"]{background:#F6C94F;color:#4A2E0A;box-shadow:inset 0 0 0 1.5px #E2A92A}
+/* 화면 고치기 모드(2026-11-17)(관리자, 웹판): 떠 있는 막대, 글 고치는 칸, 목록 */
+.ed-bar{position:fixed;left:50%;top:6px;transform:translateX(-50%);z-index:2147483000;display:flex;gap:4px;align-items:center;padding:5px 6px;border-radius:999px;background:#1F2A37;box-shadow:0 4px 14px rgba(0,0,0,.35);font:700 12.5px/1 system-ui,sans-serif;color:#fff;max-width:96vw}
+.ed-bar.low{top:auto;bottom:74px}
+.ed-bar button{appearance:none;border:0;border-radius:999px;padding:8px 10px;background:#374151;color:#fff;font:inherit;white-space:nowrap}
+.ed-bar button[aria-pressed="true"]{background:#F59E0B;color:#1F2A37}
+.ed-bar .ed-n{background:#2563EB}
+.ed-box{position:fixed;left:8px;right:8px;bottom:8px;z-index:2147483001;padding:10px;border-radius:14px;background:#fff;color:#111;box-shadow:0 6px 24px rgba(0,0,0,.4);font:14px/1.45 system-ui,sans-serif;max-height:70vh;overflow:auto}
+.ed-box h4{margin:0 0 6px;font-size:14px}.ed-box textarea{width:100%;box-sizing:border-box;min-height:74px;font:15px/1.45 system-ui,sans-serif;padding:8px;border:2px solid #2563EB;border-radius:10px}
+.ed-box .ed-old{margin:0 0 6px;padding:6px 8px;border-radius:8px;background:#F3F4F6;color:#4B5563;font-size:12.5px;white-space:pre-wrap;word-break:break-all}
+.ed-box .ed-row{display:flex;gap:6px;margin-top:8px}.ed-box .ed-row button{flex:1;appearance:none;border:0;border-radius:10px;padding:10px;font:700 14px system-ui,sans-serif;background:#E5E7EB;color:#111}.ed-box .ed-row .ok{background:#2563EB;color:#fff}
+.ed-box ol{margin:0;padding:0 0 0 20px}.ed-box li{margin:0 0 6px;font-size:12.5px;word-break:break-all}.ed-box li button{appearance:none;border:0;background:none;color:#DC2626;font:700 13px system-ui;padding:0 4px}
+.ed-dot{position:fixed;z-index:2147482999;width:26px;height:26px;margin:-13px 0 0 -13px;border-radius:50%;background:#DC2626;color:#fff;font:700 12px/26px system-ui,sans-serif;text-align:center;box-shadow:0 0 0 2px #fff,0 2px 6px rgba(0,0,0,.4);touch-action:none}
+.ed-dot.moved{background:#2563EB}
+.ed-pick{outline:2px dashed #F59E0B!important;outline-offset:1px}
 /* 5.0.4 확인 창 안의 줄 맞춘 내용(고르게 올리기) */
 #adAskText.ask-rich{white-space:normal;display:flex;flex-direction:column;gap:4px;align-items:stretch}
 .ask-sum{display:flex;align-items:center;justify-content:center;gap:5px;font-size:15.5px}.ask-sum svg{width:18px;height:18px;flex:none}.ask-sum b{font-size:17px}
@@ -4470,6 +4484,7 @@ body.cam-scene #ffChip,body.cam-scene #plChip,body.cam-scene .b-ring{animation-p
           <button class="srow" type="button" id="devDay"><span class="txt"><b>다음 날로 넘기기</b><small>출석 도장, 보충수업, 핫딜 횟수가 다시 열려요</small></span><svg viewBox="0 0 24 24" width="20" height="20" aria-hidden="true"><path d="M9 6l6 6-6 6" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"/></svg></button>
           <button class="srow" type="button" id="devUni"><span class="txt"><b>대학교 미리 보기 (개발 중)</b><small>저장하지 않고 이 탭에서만 대학교 캠퍼스와 퀘스트를 봐요. 누르면 다시 열려요. 한 번 더 누르거나 탭을 닫으면 원래 학교로 돌아와요</small></span></button>
           <button class="srow" type="button" id="devLux" hidden><span class="txt"><b>고급 배경 켜기 (관리자)</b><small id="devLuxTx">이 기기에서만 고급 지도와 건물을 써요(작업지시서 49 그림)</small></span></button>
+          <button class="srow" type="button" id="devEdit" hidden><span class="txt"><b>화면 고치기 모드 (관리자)</b><small>글을 눌러 고치고 자리를 끌어 옮겨요. 고친 목록을 복사해 본부에 보내요</small></span></button>
           <button class="srow" type="button" id="devStats" hidden><span class="txt"><b>테스트 현황 보기</b><small>테스터마다 어디까지 했는지 서버 기록을 봐요</small></span><svg viewBox="0 0 24 24" width="20" height="20" aria-hidden="true"><path d="M9 6l6 6-6 6" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"/></svg></button>
         </div>
       </div>
@@ -26454,11 +26469,181 @@ body.cam-scene #ffChip,body.cam-scene #plChip,body.cam-scene .b-ring{animation-p
       if (AIT || window.FOREST_STORE) return;   // 토스 판과 구글 플레이 판에는 개발자 메뉴를 열지 않아요
       if (verTaps >= 5 && $('#devBox').hidden) { $('#devBox').hidden = false; toast('개발자 테스트 메뉴가 열렸어요'); devLuxShow(); }
     });
+    // 화면 고치기 모드(2026-11-17) (woodani 요청, 관리자 계정으로 웹판에서만. 앱에서는 단추가 안 보여요)
+    //   글: 화면의 글을 누르면 고치는 칸이 떠요. 자리: 생물 자리(빨간 점)나 단추, 지도 그림을 끌어요.
+    //   고친 것은 그 자리에서만 보이고(새로 고치면 사라져요) 목록에 쌓여요. 목록을 복사해 본부(Claude)에 붙이면 원본에 넣어요.
+    //   게임 저장(forest-school-v1)은 건드리지 않아요. 목록은 이 기기의 forest-edit-v1에만 남아요.
+    const ED = { on: false, mode: 'view', list: [], bar: null, box: null, dots: [], timer: 0, drag: null };
+    const edKey = 'forest-edit-v1', edUI = el => !!(el && el.closest && el.closest('.ed-bar,.ed-box,.ed-dot'));
+    const edLoad = () => { try { const L = JSON.parse(localStorage.getItem(edKey) || '[]'); if (Array.isArray(L)) ED.list = L.filter(x => x && typeof x === 'object').slice(0, 300); } catch (e) { ED.list = []; } };
+    const edSave = () => { try { localStorage.setItem(edKey, JSON.stringify(ED.list)); } catch (e) { /* 이번만 */ } edBar(); };
+    // 어디 화면인지와 요소를 사람이 읽을 수 있게: "홈 > #homeQuest .q-how"
+    function edWhere() {
+      const m = rt.modalOpen; if (m) { const h = m.querySelector('h2,h3'); return `창 #${m.id}${h ? ' (' + h.textContent.trim().slice(0, 16) + ')' : ''}`; }
+      const nm = { school: '홈', teachers: '선생님', tam: '탐험', mini: '공부', street: '상점', quests: '퀘스트', grad: '졸업', rank: '랭킹', dex: '도감', event: '이벤트', settings: '설정' };
+      const z = rt.tab === 'school' ? ' 지도 ' + decoMap() + '번' : '';
+      return (nm[rt.tab] || rt.tab || '화면') + z;
+    }
+    function edPath(el) {
+      const parts = [];
+      for (let e = el, n = 0; e && e.nodeType === 1 && e !== document.body && n < 4; e = e.parentNode, n++) {
+        const d = Object.keys(e.dataset || {}).filter(k => !/^(ed|cm)/.test(k)).slice(0, 1).map(k => `[data-${k.replace(/[A-Z]/g, c => '-' + c.toLowerCase())}="${e.dataset[k]}"]`).join('');
+        const c = (typeof e.className === 'string' ? e.className : (e.className && e.className.baseVal) || '').split(/\s+/).filter(x => x && !/^(ed-|open$|on$|show$)/.test(x)).slice(0, 2).map(x => '.' + x).join('');
+        if (e.id) { parts.unshift('#' + e.id); break; }
+        parts.unshift(e.tagName.toLowerCase() + c + d);
+      }
+      return parts.join(' > ');
+    }
+    function edBar() {
+      if (!ED.bar) {
+        ED.bar = document.createElement('div'); ED.bar.className = 'ed-bar';
+        ED.bar.addEventListener('click', e => { const b = e.target.closest('button'); if (!b) return; const k = b.dataset.ed;
+          if (k === 'list') edList(); else if (k === 'off') edOff(); else if (k === 'pos') ED.bar.classList.toggle('low'); else { ED.mode = k; edBox(null); edDots(); edBar(); } });
+        document.body.appendChild(ED.bar);
+      }
+      const B = (k, t) => `<button type="button" data-ed="${k}" aria-pressed="${ED.mode === k}">${t}</button>`;
+      ED.bar.innerHTML = B('view', '보기') + B('text', '글') + B('move', '자리') + `<button type="button" class="ed-n" data-ed="list">목록 ${ED.list.length}</button><button type="button" data-ed="pos">↕</button><button type="button" data-ed="off">끄기</button>`;
+    }
+    function edBox(html) {
+      if (ED.box) { ED.box.remove(); ED.box = null; }
+      if (!html) return null;
+      ED.box = document.createElement('div'); ED.box.className = 'ed-box'; ED.box.innerHTML = html; document.body.appendChild(ED.box); return ED.box;
+    }
+    const edEsc = t => String(t).replace(/[&<>"]/g, c => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;' }[c]));
+    // ---- 글 고치기: 누른 자리의 글 조각(텍스트 노드)을 찾아요
+    function edTextAt(x, y, target) {
+      let node = null;
+      try { const r = document.caretRangeFromPoint ? document.caretRangeFromPoint(x, y) : null; if (r && r.startContainer && r.startContainer.nodeType === 3) node = r.startContainer;
+        else if (document.caretPositionFromPoint) { const c = document.caretPositionFromPoint(x, y); if (c && c.offsetNode && c.offsetNode.nodeType === 3) node = c.offsetNode; } } catch (e) { /* 아래에서 찾아요 */ }
+      if (node && !node.nodeValue.trim()) node = null;
+      if (node && target && !target.contains(node) && !node.parentNode.contains(target)) node = null;
+      if (!node && target) { const w = document.createTreeWalker(target, NodeFilter.SHOW_TEXT); let n; while ((n = w.nextNode())) if (n.nodeValue.trim()) { node = n; break; } }
+      return node;
+    }
+    function edEditText(node) {
+      const el = node.parentNode, old = node.nodeValue, prev = ED.list.find(x => x.k === 'text' && x.b === old.trim() && x.p === edPath(el));
+      el.classList.add('ed-pick');
+      const box = edBox(`<h4>글 고치기 <small style="font-weight:400;color:#6B7280">${edEsc(edWhere())}</small></h4><p class="ed-old">${edEsc(prev ? prev.a : old.trim())}</p><textarea></textarea><div class="ed-row"><button type="button" data-x="no">그만두기</button><button type="button" class="ok" data-x="ok">고치기</button></div>`);
+      const ta = box.querySelector('textarea'); ta.value = old.trim(); setTimeout(() => { try { ta.focus(); } catch (e) { /* 괜찮아요 */ } }, 30);
+      box.addEventListener('click', e => { const b = e.target.closest('button'); if (!b) return; el.classList.remove('ed-pick');
+        if (b.dataset.x === 'ok') { const v = ta.value.trim();
+          if (v && v !== old.trim()) {
+            if (prev) { prev.b = v; if (prev.a === v) ED.list.splice(ED.list.indexOf(prev), 1); }
+            else ED.list.push({ k: 'text', w: edWhere(), p: edPath(el), a: old.trim(), b: v });
+            node.nodeValue = old.replace(old.trim(), v); edSave(); } }
+        edBox(null); });
+    }
+    // ---- 자리 옮기기
+    function edPickMove(t) {
+      // 너무 큰 덩어리(화면 너비의 70% 넘는 것)는 고르지 않아요. id나 data 속성이 있는 가장 가까운 것을 골라요
+      const fit = e => { const r = e.getBoundingClientRect(); return r.width <= innerWidth * 0.7 && r.height <= innerHeight * 0.5; };
+      let best = t;
+      const btn = t.closest && t.closest('button,a,[role="button"],li'); if (btn && fit(btn)) return btn;   // 단추 안의 그림을 눌러도 단추째로 옮겨요
+      for (let e = t, n = 0; e && e !== document.body && n < 6; e = e.parentNode, n++) {
+        if (e.nodeType !== 1 || /^(svg|html|body)$/i.test(e.tagName) || !fit(e)) break;
+        best = e; if (e.id || Object.keys(e.dataset || {}).length) break;
+      }
+      return best;
+    }
+    function edMoveRec(el, dx, dy) {
+      const p = edPath(el), svg = !!(el.ownerSVGElement), w = edWhere(); let rec = ED.list.find(x => x.k === 'move' && x.p === p && x.w === w);
+      if (!rec) { rec = { k: 'move', w, p, dx: 0, dy: 0, u: svg ? '지도 칸' : 'px', t: (el.textContent || '').trim().slice(0, 14) }; ED.list.push(rec); }
+      rec.dx = Math.round((rec.dx + dx) * 10) / 10; rec.dy = Math.round((rec.dy + dy) * 10) / 10;
+      if (!rec.dx && !rec.dy) ED.list.splice(ED.list.indexOf(rec), 1);
+      edSave();
+    }
+    // 생물 자리(BX_SPOT): 지금 지도의 여섯 자리를 빨간 점으로 보여 주고 끌 수 있게
+    function edDots() {
+      ED.dots.forEach(d => d.remove()); ED.dots = [];
+      if (!ED.on || ED.mode !== 'move' || rt.tab !== 'school' || rt.modalOpen) return;
+      const L = typeof bxSpots === 'function' ? bxSpots() : null, svg = $('#map'); if (!L || !svg) return;
+      const m = decoMap(), ctm = svg.getScreenCTM(); if (!ctm) return;
+      L.forEach((q, i) => {
+        const rec = ED.list.find(x => x.k === 'bx' && x.m === m && x.i === i), cur = rec ? rec.b : [q[0], q[1]], v = pctXY(cur);
+        const d = document.createElement('div'); d.className = 'ed-dot' + (rec ? ' moved' : ''); d.textContent = i + 1; d.dataset.i = i;
+        d.style.left = (ctm.a * v[0] + ctm.e) + 'px'; d.style.top = (ctm.d * v[1] + ctm.f) + 'px';
+        document.body.appendChild(d); ED.dots.push(d);
+      });
+    }
+    function edDotDrop(d, x, y) {
+      const svg = $('#map'), ctm = svg.getScreenCTM(), m = decoMap(), i = +d.dataset.i, q = bxSpots()[i];
+      const vx = (x - ctm.e) / ctm.a, vy = (y - ctm.f) / ctm.d, b = [Math.round(vx / MAP_W * 100), Math.round((vy - MAP_Y) / MAP_H * 100)];
+      let rec = ED.list.find(r => r.k === 'bx' && r.m === m && r.i === i);
+      if (!rec) { rec = { k: 'bx', w: edWhere(), m, i, a: [q[0], q[1]], b }; ED.list.push(rec); } else rec.b = b;
+      if (rec.a[0] === b[0] && rec.a[1] === b[1]) ED.list.splice(ED.list.indexOf(rec), 1);
+      edSave(); edDots();
+    }
+    // ---- 누르기 가로채기: 글과 자리 모드에서는 게임 단추가 눌리지 않아요(보기 모드에서 화면을 옮겨 다녀요)
+    function edDown(e) {
+      if (!ED.on || ED.mode === 'view' || edUI(e.target) && !e.target.classList.contains('ed-dot')) return;
+      e.preventDefault(); e.stopPropagation();
+      if (ED.mode === 'text') { const n = edTextAt(e.clientX, e.clientY, e.target); if (n) edEditText(n); return; }
+      const dot = e.target.classList.contains('ed-dot') ? e.target : null, el = dot || edPickMove(e.target);
+      const svg = !dot && el.ownerSVGElement, ctm = svg ? svg.getScreenCTM() : null;
+      ED.drag = { el, dot, x0: e.clientX, y0: e.clientY, sx: ctm ? ctm.a : 1, sy: ctm ? ctm.d : 1, base: dot ? '' : (svg ? el.getAttribute('transform') || '' : el.style.transform || ''), svg: !!svg, dx: 0, dy: 0 };
+      if (!dot) el.classList.add('ed-pick');
+    }
+    function edMove(e) {
+      const g = ED.drag; if (!g) return; e.preventDefault(); e.stopPropagation();
+      g.dx = e.clientX - g.x0; g.dy = e.clientY - g.y0;
+      if (g.dot) { g.dot.style.left = e.clientX + 'px'; g.dot.style.top = e.clientY + 'px'; }
+      else if (g.svg) g.el.setAttribute('transform', `${g.base} translate(${(g.dx / g.sx).toFixed(1)} ${(g.dy / g.sy).toFixed(1)})`.trim());
+      else g.el.style.transform = `${g.base} translate(${g.dx}px, ${g.dy}px)`.trim();
+    }
+    function edUp(e) {
+      const g = ED.drag; if (!g) return; ED.drag = null; e.preventDefault(); e.stopPropagation();
+      if (g.dot) { edDotDrop(g.dot, e.clientX, e.clientY); return; }
+      g.el.classList.remove('ed-pick');
+      if (Math.abs(g.dx) + Math.abs(g.dy) < 3) { if (g.svg) { if (g.base) g.el.setAttribute('transform', g.base); else g.el.removeAttribute('transform'); } else g.el.style.transform = g.base; return; }
+      edMoveRec(g.el, g.svg ? g.dx / g.sx : g.dx, g.svg ? g.dy / g.sy : g.dy);
+    }
+    const edEat = e => { if (ED.on && ED.mode !== 'view' && !edUI(e.target)) { e.preventDefault(); e.stopPropagation(); } };
+    // ---- 목록
+    function edLine(x) {
+      if (x.k === 'text') return `글 [${x.w} / ${x.p}] "${x.a}" → "${x.b}"`;
+      if (x.k === 'bx') return `생물 자리 [${x.w} / 지도 ${x.m}번 ${x.i + 1}째] ${x.a.join(', ')} → ${x.b.join(', ')}`;
+      return `자리 [${x.w} / ${x.p}${x.t ? ' "' + x.t + '"' : ''}] 오른쪽 ${x.dx >= 0 ? '+' : ''}${x.dx}${x.u}, 아래 ${x.dy >= 0 ? '+' : ''}${x.dy}${x.u}`;
+    }
+    const edText = () => `[숲속 동물 학교 고치기 목록] 버전 ${VERSION}, 화면 ${innerWidth}x${innerHeight}\n` + ED.list.map((x, i) => `${i + 1}. ${edLine(x)}`).join('\n');
+    function edList() {
+      const box = edBox(`<h4>고친 목록 ${ED.list.length}개</h4>${ED.list.length ? '<ol>' + ED.list.map((x, i) => `<li>${edEsc(edLine(x))} <button type="button" data-del="${i}">✕</button></li>`).join('') + '</ol>' : '<p class="ed-old">아직 고친 것이 없어요. 위 막대에서 글이나 자리를 고르고 화면을 눌러 보세요.</p>'}<div class="ed-row"><button type="button" data-x="no">닫기</button><button type="button" data-x="clear">모두 지우기</button><button type="button" class="ok" data-x="copy">복사</button></div>`);
+      box.addEventListener('click', e => { const b = e.target.closest('button'); if (!b) return;
+        if (b.dataset.del) { ED.list.splice(+b.dataset.del, 1); edSave(); edList(); edDots(); return; }
+        if (b.dataset.x === 'clear') { ED.list = []; edSave(); edList(); edDots(); return; }
+        if (b.dataset.x === 'copy') { const t = edText(); const done = () => { b.textContent = '복사했어요'; };
+          const fb = () => { const ta = document.createElement('textarea'); ta.value = t; ta.className = 'ed-box'; ta.style.cssText = 'top:8px;bottom:auto;height:40vh'; document.body.appendChild(ta); ta.select(); try { document.execCommand('copy'); done(); } catch (e2) { /* 손으로 복사 */ } setTimeout(() => ta.remove(), 4000); };
+          try { navigator.clipboard.writeText(t).then(done, fb); } catch (e2) { fb(); } return; }
+        edBox(null); });
+    }
+    // 화면이 다시 그려지면 고친 글이 원래대로 돌아가서, 켜 둔 동안에는 같은 글을 찾아 다시 바꿔 보여 줘요
+    function edReapply() {
+      if (!ED.on) return; const T = ED.list.filter(x => x.k === 'text'); if (T.length && !ED.box) {
+        const w = document.createTreeWalker(document.body, NodeFilter.SHOW_TEXT); let n, c = 0;
+        while ((n = w.nextNode()) && c++ < 20000) { const v = n.nodeValue, t = v.trim(); if (!t) continue; const r = T.find(x => x.a === t); if (r && !edUI(n.parentNode)) n.nodeValue = v.replace(t, r.b); } }
+      if (!ED.drag) edDots();
+    }
+    function edOn() {
+      if (ED.on) return; ED.on = true; ED.mode = 'view'; edLoad(); edBar();
+      for (const ev of ['pointerdown', 'pointermove', 'pointerup']) document.addEventListener(ev, { pointerdown: edDown, pointermove: edMove, pointerup: edUp }[ev], true);
+      for (const ev of ['click', 'touchstart', 'mousedown']) document.addEventListener(ev, edEat, { capture: true, passive: false });
+      ED.timer = setInterval(edReapply, 700);
+      toast('화면 고치기 모드를 켰어요\n보기로 화면을 옮기고, 글이나 자리를 골라 고쳐요');
+    }
+    function edOff() {
+      if (!ED.on) return; ED.on = false; clearInterval(ED.timer); edBox(null); ED.dots.forEach(d => d.remove()); ED.dots = [];
+      for (const ev of ['pointerdown', 'pointermove', 'pointerup']) document.removeEventListener(ev, { pointerdown: edDown, pointermove: edMove, pointerup: edUp }[ev], true);
+      for (const ev of ['click', 'touchstart', 'mousedown']) document.removeEventListener(ev, edEat, { capture: true });
+      if (ED.bar) { ED.bar.remove(); ED.bar = null; }
+      toast('화면 고치기 모드를 껐어요\n고친 목록은 남아 있어요');
+    }
+    $('#devEdit').addEventListener('click', () => { if (ED.on) edOff(); else { if (rt.modalOpen) closeModal(rt.modalOpen); edOn(); } });
+    if (window.__FOREST_TEST) window.__forestEd = { ED, edOn, edOff, edText, edList, edDots };
     // 3.0.0 관리자 고급 배경: 관리자 계정(forest/adminUids)에만 단추가 보여요
     async function devLuxShow() {
       const b = $('#devLux'); if (!b) return;
       if (!window.__FOREST_TEST && cloudOn()) { try { await checkAdmin(); } catch (e) { /* 아니면 숨김 */ } }
       b.hidden = !(rt.isAdmin || window.__FOREST_TEST); devLuxText();
+      $('#devEdit').hidden = !((rt.isAdmin && window.FS_WEB_LOCK) || window.__FOREST_TEST);   // 화면 고치기 모드(2026-11-17)는 관리자 계정으로 웹판에서만
     }
     function devLuxText() {
       const n = GEO.filter(G => has170(G.map + '_lux')).length;
