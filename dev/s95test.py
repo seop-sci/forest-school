@@ -94,11 +94,11 @@ async def main():
                 ok(a['m'] == 1 and a['sp'] == [{'i': 0, 'id': 'bio_pine', 't': 5}] and a['next'] == 0 and a['got'] == {'bio_pine': 3} and a['g'] == 5 and a['st']['n'] == 0 and r['b'] == [-1, 0], f'저장 읽기 {a}')
             # 4) 지도와 도감
             r = await ev("""S.tier = 1; F.rt.fakeNow = K(11, 20, 9); S.bx.sp = [{ i: 0, id: 'bio_pine', t: 0 }, { i: 2, id: 'bio_waterstrider', t: 0 }]; S.bx.m = 1; S.bx.next = K(11, 20, 11);
-              F.renderDeco(true); return document.querySelectorAll('#decoG [data-bx]').length;""")
+              F.renderDeco(true); return document.querySelectorAll('#bxG [data-bx]').length;""")
             ok(r == 2, f'{w} 지도 표시 {r}')
             await pg.wait_for_timeout(400); await pg.screenshot(path=f's95_map_{w}.png')
-            await pg.dispatch_event('#decoG [data-bx="0"]', 'click'); await pg.wait_for_timeout(1500)
-            r = await ev("return { open: !document.querySelector('#mBx').hidden, left: S.bx.sp.length, map: document.querySelectorAll('#decoG [data-bx]').length };")
+            await pg.dispatch_event('#bxG [data-bx="0"]', 'click'); await pg.wait_for_timeout(1500)
+            r = await ev("return { open: !document.querySelector('#mBx').hidden, left: S.bx.sp.length, map: document.querySelectorAll('#bxG [data-bx]').length };")
             ok(r['open'] and r['left'] == 1 and r['map'] == 1, f'{w} 누르기 {r}')
             await pg.screenshot(path=f's95_card_{w}.png')
             o = await pg.evaluate(OVER + "('#mBx .modal, #mBx .modal *')"); ok(not o, f'{w} 관찰 카드가 넘쳐요 {o[:4]}')
