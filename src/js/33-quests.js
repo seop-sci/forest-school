@@ -302,7 +302,7 @@
     grant(rv, fromEl, q.rk);
     const items = [q.rk === 'dip' ? { ic: 'dip', t: `수료증 +${fmt(rv)}장` } : { ic: 'acorn', t: `도토리 +${fmt(rv)}` }];
     if (hardQ(q)) items.push(goldOr(GOLD.hard, '(조금 어려운 퀘스트)'));   // 4.2.0
-    addLeague(LP.quest);
+    addLeague(LP.quest, true);
     S.q.m += 1; S.q.md += 1;
     startMain();
     const prep = prepTopUp(true);
@@ -333,7 +333,7 @@
     if (!subReady(s)) return;
     grant(s.r, fromEl);
     if (hardQ(s, true)) { const it = goldOr(GOLD.hard); if (it && !rt.batch) setTimeout(() => toast(it.t + ' (조금 어려운 부탁)'), 900); }   // 4.2.0
-    addLeague(LP.quest);
+    addLeague(LP.quest, true);
     S.q.subs.splice(i, 1);
     if (s.id[0] === 's') S.q.done.push(s.id);
     S.q.subDone += 1;

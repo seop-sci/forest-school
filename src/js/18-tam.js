@@ -562,7 +562,7 @@
       else if (e.k === 'heal') { const el = P[e.p], hf = f => sk ? skAt(sk.heal, f) : f(); hf(() => { if (sk && IMG('ex4_sk_kor_heal')) { const [hx, hy] = tamAt(el, 0.55); tamFxImg('tm-pillar', IMG('ex4_sk_kor_heal'), hx, hy, [{ t: 'scaleY(.2)', opacity: 0 }, { t: 'scaleY(1)', opacity: 1, offset: 0.35 }, { dy: -10, t: 'scaleY(1.05)', opacity: 0 }], 1000); } tamFloat(el, '+' + fmt(Math.round(e.d)), 'heal'); const [x, y] = tamAt(el); tamFxImg('tm-spark', tamI('ex_fx_heal'), x, y, [{ t: 'scale(.4)', opacity: 0 }, { t: 'scale(1.2)', opacity: 1, offset: 0.4 }, { dy: -16, t: 'scale(1.4)', opacity: 0 }], 600); }); }
       else if (e.k === 'hurt') {
         const el = P[e.p], mm = M[e.m];
-        if (mm) { mm.classList.remove('act'); void mm.offsetWidth; mm.classList.add('act'); }
+        if (mm) { mm.classList.remove('act'); void mm.offsetWidth; mm.classList.add('act'); const fm = F.M[e.m]; if (fm) tamHitPic(mm, fm.boss ? `ex_boss_${tamReg(F.fl).k}_atk` : `ex_mob_${tamReg(F.fl).k}_${fm.i + 1}_atk`); }   /* 5.0.3 woodani: 장난꾸러기도 칠 때 공격 자세(작업지시서 92) */
         setTimeout(() => { el.classList.remove('hurt'); void el.offsetWidth; el.classList.add('hurt'); tamHitPic(el, `ex4_pc_${F.P[e.p].sp}_hurt`); tamFloat(el, fmt(Math.max(1, Math.round(e.d))), 'ouch'); }, 140);
       }
       else if (e.k === 'poof') { const el = M[e.m], go = () => { el.classList.add('out'); tamDropFx(el, F.fl); }; if (sk || tamSkBusy()) skAt(Math.max(sk ? sk.hit : 0, SKQ.end - 600) + 300, go); else setTimeout(go, 300); }

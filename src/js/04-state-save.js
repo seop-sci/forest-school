@@ -57,7 +57,7 @@
     tut: { st: '', step: 0, paid: false, nop: false }, tips: { rep: false, oak: false, left: false, tabs: false },   // 5.0.1.7 F-03 기능이 열릴 때 한 장 안내
     nt: { seen: '', ver: '', hide: 0 },   // 2.0.0 공지: 마지막으로 본 공지, 마지막으로 띄운 버전, 일주일간 열지 않기 끝
     wk: { week: -1, pts: 0, got: [false, false, false, false, false], list: [] },
-    lg: { week: -1, pts: 0, pos: 0, paid: false, last: null },
+    lg: { week: -1, pts: 0, pos: 0, paid: false, last: null, dq: { day: '', p: 0 } },   // 5.0.3 dq: 오늘 쌓인 진행 점수(퀘스트와 식)
     gold: 5, gd: { day: '', n: 0, shop: 0 }, cos: { own: [], hat: '', neck: '', mkx: '', night: false, th: { bg: '', classroom: '', cafeteria: '', library: '', science: '', playground: '' }, sp: { classroom: '', cafeteria: '', library: '', science: '', playground: '' } }, autoUntil: 0,
     rank: { name: '', joined: false, sent: -1, by: '', ren: 0, asked: false },
     bs: { classroom: 0, cafeteria: 0, library: 0, science: 0, playground: 0, store: 0, dorm: 0, union: 0, institute: 0, gradhall: 0 },   // 1.7.0 건물마다 지금 보이는 모습의 학교급
@@ -238,6 +238,7 @@
     if (d.lg && typeof d.lg === 'object') {
       s.lg.week = Math.floor(numFb(d.lg.week, -1, -1, SAVE_CAP.count)); s.lg.pts = Math.floor(numFb(d.lg.pts, 0, 0, SAVE_CAP.count)); s.lg.pos = Math.floor(numFb(d.lg.pos, 0, 0, SAVE_CAP.count)); s.lg.paid = !!d.lg.paid;
       if (d.lg.last && typeof d.lg.last === 'object') s.lg.last = { week: numFb(d.lg.last.week, 0, 0, SAVE_CAP.count), pts: numFb(d.lg.last.pts, 0, 0, SAVE_CAP.count), pos: numFb(d.lg.last.pos, 0, 0, SAVE_CAP.count), gold: numFb(d.lg.last.gold, 0, 0, SAVE_CAP.count) };
+      if (d.lg.dq && typeof d.lg.dq === 'object') s.lg.dq = { day: typeof d.lg.dq.day === 'string' ? d.lg.dq.day.slice(0, 12) : '', p: Math.min(1000, Math.floor(numFb(d.lg.dq.p, 0, 0, 1000))) };   // 5.0.3 옛 저장에는 없어요(기본값 그대로)
     }
     if (d.sports && typeof d.sports === 'object') s.sports.next = Math.min(numFb(d.sports.next, 0, 0), Math.max(Date.now(), Number(d.clk && d.clk.last) || 0) + 2 * 3600000);   // 4.0.1
     if (d.trip && typeof d.trip === 'object') {
