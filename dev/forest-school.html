@@ -25940,10 +25940,10 @@ body.cam-scene #ffChip,body.cam-scene #plChip,body.cam-scene .b-ring{animation-p
     if (rt.cereOn) { if (!rt.cereToasts.includes(msg)) rt.cereToasts.push(msg); return; }   // 2.0.1 졸업식 장면 동안 온 알림은 장면이 끝난 뒤에
     // 5.0.1.6 F-02: 가운데 창이 떠 있는 동안 저절로 온 알림(방금 누른 것의 대답이 아닌 것)은 창이 닫힌 뒤에 보여요
     const tapped = performance.now() - (rt.tapT || 0) < 700;
-    if (rt.modalOpen && !tapped) { if (!rt.mdToasts.includes(msg) && rt.mdToasts.length < 4) rt.mdToasts.push(msg); return; }
+    if (rt.modalOpen && !tapped) { if (!rt.mdToasts.includes(msg)) { rt.mdToasts.push(msg); if (rt.mdToasts.length > 4) rt.mdToasts.shift(); } return; }
     const el = $('#toast');
     // 5.0.1.6 F-02: 저절로 온 알림이 아직 떠 있는 알림을 곧바로 덮지 않고 차례를 기다려요(누른 것의 대답은 바로 보여요)
-    if (!tapped && !el.hidden && el.textContent !== msg && performance.now() - rt.toastAt < 1500) { if (!rt.toastQ.includes(msg) && rt.toastQ.length < 3) rt.toastQ.push(msg); return; }
+    if (!tapped && !el.hidden && el.textContent !== msg && performance.now() - rt.toastAt < 1500) { if (!rt.toastQ.includes(msg)) { rt.toastQ.push(msg); if (rt.toastQ.length > 4) rt.toastQ.shift(); } return; }   // 많이 밀리면 오래된 것부터 버려요
     toastShow(msg);
   }
   function toastShow(msg) {
