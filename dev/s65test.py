@@ -48,7 +48,7 @@ async def main():
                   for (let i = 0; i < L.length; i++) for (let j = i + 1; j < L.length; j++) {{ const a = L[i].c, b = L[j].c; if (a === b) continue; L[i].c = b; L[j].c = a; if (tot() > t0) better++; L[i].c = a; L[j].c = b; }}
                   const pct = [0, 1, 2, 3, 4].map(F.clubPct), show = [0, 1, 2, 3, 4].map(F.clubShow), stars = [0, 1, 2, 3, 4].map(F.clubStars);
                   const q1 = F.qMeasure(F.MAIN.find(q => q.id === 'j4')), qs = F.qMeasure(F.MAIN.find(q => q.id === 'j11'));
-                  const fest = F.festPrize(false), dc0 = F.decoCost0('bench'), dc = F.decoCost('bench');
+                  const fest = F.festPrize(false), dc0 = F.decoCost0('pond'), dc = F.decoCost('pond'); /* 5.0.2.2 벤치가 정수 10개라 할인이 반올림에 묻혀서 연못(100)으로 봐요 */
                   return {{ q0, q1, qs, r0, r1, per, t0, better, pct, show, stars, sum: F.clubSum(), tm: F.clubTuitionMult(), fm: F.clubFestMult(), off: F.clubDecoOff(), fest, dc0, dc }}; }})()""")
                 print('자동 추천', json.dumps(r))
                 if sum(r['per']) != 15 or max(r['per']) > 3 or r['q0'] != 0 or r['q1'] != 15: bad.append(f'나누기 {r}')   # 2.1.0 다섯 곳에 15명(자리 15)
