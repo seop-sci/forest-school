@@ -2,7 +2,7 @@
 <html lang="ko">
 <head>
 <meta charset="utf-8">
-<meta name="forest-version" content="5.0.2.1">
+<meta name="forest-version" content="5.0.2.3">
 <meta name="viewport" content="width=device-width, initial-scale=1">
 <meta name="description" content="도토리를 모아 숲속 학교를 키우는 방치형 게임 테스트판이에요.">
 <style>html,body{margin:0}</style>
@@ -2766,7 +2766,13 @@ html.hud-art .tier-dots .td.on{background:#E8A23E;color:#fff;border-color:#B8692
 .gd-plot button.go{background:#6BA23A;border-color:#4E7F25;color:#fff}.gd-plot small{opacity:.7}
 .gd-pick{margin-top:8px;padding:8px;border-radius:12px;background:rgba(226,162,28,.12)}.gd-pick b{font-size:13px}
 .gd-bulk{display:flex;flex-wrap:wrap;gap:4px;margin-top:10px}.gd-bulk:empty{display:none}
-.gd-ok{margin-top:8px;padding:8px 10px;border:2px dashed #6BA23A;border-radius:12px;font-size:13px}.gd-ok p{margin:0 0 6px}   /* 5.0.1.6 C-03 */
+.gd-ok{position:absolute;inset:0;z-index:6;display:flex;align-items:center;justify-content:center;padding:16px}   /* 5.0.1.6 C-03. 5.0.2.3 woodani: 텃밭 창 가운데 따로 띄워요 */
+.gd-ok-bg{position:absolute;inset:0;background:rgba(20,32,16,.5);animation:gdOkFade .15s ease-out}
+.gd-ok-card{position:relative;width:100%;max-width:290px;padding:16px 14px 14px;border:2px solid #6BA23A;border-radius:18px;background:var(--paper);color:var(--ink);text-align:center;box-shadow:0 5px 0 var(--line-shadow), 0 14px 30px rgba(0,0,0,.3);animation:gdOkPop .18s ease-out}
+.gd-ok-pic{width:64px;height:64px;margin:0 auto 6px;display:flex;align-items:center;justify-content:center;font-size:40px}.gd-ok-pic img{width:100%;height:100%;object-fit:contain}
+.gd-ok-card>b{display:block;font-family:var(--font-display);font-size:17px}.gd-ok-card p{margin:6px 0 12px;font-size:13px;line-height:1.5;color:var(--muted)}
+@keyframes gdOkFade{from{opacity:0}}@keyframes gdOkPop{from{opacity:0;transform:scale(.92)}}
+@media (prefers-reduced-motion: reduce){.gd-ok-bg,.gd-ok-card{animation:none}}
 @media (prefers-color-scheme: dark){:root:not([data-theme="light"]) .gd-bulk button{color:#CDEB9A;background:rgba(107,162,58,.22)}}:root[data-theme="dark"] .gd-bulk button{color:#CDEB9A;background:rgba(107,162,58,.22)}   /* 5.0.1.5 C-15 */
 .gd-bulk button{flex:1 1 30%;padding:7px 6px;border-radius:12px;border:1.5px solid #6BA23A;background:rgba(107,162,58,.12);font:inherit;font-size:12.5px;font-weight:700;color:#2F5A2A;white-space:nowrap}
 .gd-body .gd-pick{position:sticky;bottom:0;z-index:2;background:#FBEFCF;box-shadow:0 -6px 12px rgba(60,40,10,.14)}   /* 3.3.2 고르는 칸이 밭 아래로 밀려 안 보이지 않게 늘 아래에 붙어요 */
@@ -3886,7 +3892,7 @@ body.cam-scene #ffChip,body.cam-scene #plChip,body.cam-scene .b-ring{animation-p
     <p class="boot-step" id="bootStep">학교 문을 여는 중...</p>
     <p class="boot-tip" id="bootTip">학교 문을 여는 중이에요</p>
   </div>
-  <span class="boot-ver" id="bootVer">v5.0.2.1</span>
+  <span class="boot-ver" id="bootVer">v5.0.2.3</span>
 </div>
 
 <div class="app on-school" id="app">
@@ -4477,7 +4483,7 @@ body.cam-scene #ffChip,body.cam-scene #plChip,body.cam-scene .b-ring{animation-p
       </div>
       <h3 class="panel-sub">정보</h3>
       <dl class="info">
-        <div id="verRow"><dt>버전</dt><dd>v5.0.2.1</dd></div>
+        <div id="verRow"><dt>버전</dt><dd>v5.0.2.3</dd></div>
         <div id="pidRow" hidden><dt>학교 번호</dt><dd id="infoPid"></dd></div>
       </dl>
       <div id="devBox" hidden>
@@ -13060,7 +13066,7 @@ body.cam-scene #ffChip,body.cam-scene #plChip,body.cam-scene .b-ring{animation-p
   }
   function openGd() {
     if (!gdOpen()) { toast('급식실을 지으면 텃밭을 가꿀 수 있어요'); return; }
-    gdSync(); rt.gdPick = -1; rt.gdCutI = -1;
+    gdSync(); rt.gdPick = -1; rt.gdCutI = -1; rt.gdSel = '';   // 5.0.2.3 다시 열면 만들기 확인 창은 닫혀 있어요
     gdFreeGrant(curMain());   // 3.3.2 이미 그 퀘스트 중인 학교도 텃밭을 열면 무료 한 번
     const bg = IMG('garden_bg'); $('#gdHead').style.backgroundImage = bg ? `url("${bg}")` : ''; $('#gdHead').classList.toggle('noimg', !bg);   // 그림(작업지시서 37-A)이 오기 전에는 낮게
     gdRender(true); openModal($('#mGd')); sfx('tap');
@@ -13106,7 +13112,7 @@ body.cam-scene #ffChip,body.cam-scene #plChip,body.cam-scene .b-ring{animation-p
       const need = Object.entries(m.need).map(([c, k]) => `${GD_C[c].em}${k > 1 ? '×' + k : ''}`).join('');
       return `<button type="button" class="gd-menu${has ? '' : ' no'}${can ? ' can' : ''}${tm && tm.id === m.id ? ' on' : ''}" data-gd="cook" data-m="${m.id}" aria-disabled="${can ? 'false' : 'true'}">` +
         `${has ? gdImg(m.id, m.em) : gdImg('menu_frame', '🍽')}<span class="ell">${has || ok ? esc(m.nm) : '???'}</span><small>${can ? `만들기 +${gdPct(m)}%` : ok ? need : `${TIERS[Math.max(...Object.keys(m.need).map(c => GD_C[c].tier))].name}부터`}</small></button>`;
-    }).join('')}</div>` + (() => { const m = !tm && GD_M[rt.gdSel]; return m && gdCanCook(m) ? `<div class="gd-ok"><p>${eul(m.nm)} 만들까요? 오늘의 급식은 하루 한 번이라 바꿀 수 없어요. 오늘 수업료 +${gdPct(m)}%</p><div class="btn-row"><button class="btn-sub" type="button" data-gd="cooksel" data-m="">다시 고르기</button><button class="cta" type="button" data-gd="cookgo" data-m="${m.id}">만들기</button></div></div>` : ''; })();   // 5.0.1.6 C-03 누르면 먼저 물어봐요
+    }).join('')}</div>` + (() => { const m = !tm && GD_M[rt.gdSel]; return m && gdCanCook(m) ? `<div class="gd-ok" role="dialog" aria-label="오늘의 급식 만들기"><div class="gd-ok-bg" data-gd="cooksel" data-m=""></div><div class="gd-ok-card"><div class="gd-ok-pic">${gdImg(m.id, m.em)}</div><b>${eul(esc(m.nm))} 만들까요?</b><p>오늘 수업료 +${gdPct(m)}%<br>오늘의 급식은 하루 한 번이라 바꿀 수 없어요</p><div class="btn-row"><button class="btn-sub" type="button" data-gd="cooksel" data-m="">다시 고르기</button><button class="cta" type="button" data-gd="cookgo" data-m="${m.id}">만들기</button></div></div></div>` : ''; })();   // 5.0.1.6 C-03 누르면 먼저 물어봐요. 5.0.2.3 woodani: 아래에 붙던 확인 칸을 텃밭 창 가운데 따로 띄워요
   }
   /* 2.1.2 마을 기부(프로젝트 문서 '마을 기부 설계안 (2.1.2)', woodani 확정 2026-10-29): 도토리를 숲속 마을에 기부하면 기부 단계가 올라요.
      상한이 없고 힘(수입, 공사 속도)은 주지 않아요. 기념물, 칭호, 업적, 정수와 가끔 황금 도토리만. 졸업해도 남아요.
@@ -14015,8 +14021,8 @@ body.cam-scene #ffChip,body.cam-scene #plChip,body.cam-scene .b-ring{animation-p
        forest/rank/<내 id>   랭킹 이름과 학교 점수
        forest/stats/<내 id>  테스트 현황 (어디까지 했는지, 얼마나 했는지)
      <내 id>는 Firebase 익명 로그인이 기기(브라우저)마다 만들어 줘요. */
-  const VERSION = '5.0.2.1';   // 2026-11-17 woodani 결정: 웹에 5.0.2~5.0.5로 먼저 냈던 것을 앱과 함께 5.0.1 하나로 내요(버전 견줌은 앞 두 자리만 봐서 되돌아가도 괜찮아요)
-  const NT_QUIET = ['5.0.2.1', '2.1.20', '2.1.2.2', '2.3.0.1', '2.3.4', '3.2.3', '3.2.4', '3.2.5', '3.3.1', '3.3.2', '3.3.3', '4.4.1.1', '4.4.1.2', '4.4.1.3', '4.4.1.4', '5.0.1.1', '5.0.1.2', '5.0.1.3', '5.0.1.4', '5.0.1.5', '5.0.1.6', '5.0.1.7', '5.0.1.8'];   // 5.0.1.1 생물 탐사 고침은 공지 없이   // 5.0.3도 공지 없이(공지 줄은 woodani가 정하면 넣어요)   // 5.0.2 공지 없이(woodani 2026-11-16)   // 5.0.1 공지 줄은 woodani가 정할 때까지 조용히   // 5.0.0 공지는 2026-11-16 woodani가 정해서 NOTICES로 옮겼어요   // 4.4.1(앱과 함께 내는 판)은 공지를 띄워요   // 4.4.1도 공지 없이(woodani)   // 3.3.1, 3.3.2, 3.3.3(토스 먼저)도 공지 창 없이(woodani). 2.3.0.1도 공지 창 없이(공지는 그대로 2.3.0). 2.3.4도 조용히(woodani 결정). 3.2.3, 3.2.4, 3.2.5도 공지 창 없이(공지 줄을 고르지 않음)
+  const VERSION = '5.0.2.3';   // 2026-11-17 woodani 결정: 웹에 5.0.2~5.0.5로 먼저 냈던 것을 앱과 함께 5.0.1 하나로 내요(버전 견줌은 앞 두 자리만 봐서 되돌아가도 괜찮아요)
+  const NT_QUIET = ['5.0.2.3', '5.0.2.1', '2.1.20', '2.1.2.2', '2.3.0.1', '2.3.4', '3.2.3', '3.2.4', '3.2.5', '3.3.1', '3.3.2', '3.3.3', '4.4.1.1', '4.4.1.2', '4.4.1.3', '4.4.1.4', '5.0.1.1', '5.0.1.2', '5.0.1.3', '5.0.1.4', '5.0.1.5', '5.0.1.6', '5.0.1.7', '5.0.1.8'];   // 5.0.1.1 생물 탐사 고침은 공지 없이   // 5.0.3도 공지 없이(공지 줄은 woodani가 정하면 넣어요)   // 5.0.2 공지 없이(woodani 2026-11-16)   // 5.0.1 공지 줄은 woodani가 정할 때까지 조용히   // 5.0.0 공지는 2026-11-16 woodani가 정해서 NOTICES로 옮겼어요   // 4.4.1(앱과 함께 내는 판)은 공지를 띄워요   // 4.4.1도 공지 없이(woodani)   // 3.3.1, 3.3.2, 3.3.3(토스 먼저)도 공지 창 없이(woodani). 2.3.0.1도 공지 창 없이(공지는 그대로 2.3.0). 2.3.4도 조용히(woodani 결정). 3.2.3, 3.2.4, 3.2.5도 공지 창 없이(공지 줄을 고르지 않음)
     // 2.1.20 woodani 결정: 이 버전들은 업데이트해도 공지 창을 띄우지 않아요(공지는 그대로 2.1.2)
   /* 2.0.0 공지사항 (2026-10-27 woodani, 1.8.0은 이미 올려서 2.0.0부터): 설정 > 공지사항. 맨 위가 가장 새 공지예요.
      패치노트는 자동으로 넣지 않아요. woodani가 검수한 글만 여기에 적어요(CHANGELOG.md는 자세한 기록용이라 따로 있어요).
@@ -17265,9 +17271,9 @@ body.cam-scene #ffChip,body.cam-scene #plChip,body.cam-scene .b-ring{animation-p
   /* ===== 1.7.4 학교 꾸미기: 숲의 정수로 장식을 사서 지도의 정해진 자리(지도마다 11곳)에 놓아요. 보너스는 없고 졸업해도 남아요 ===== */
   // sm: 작은 장식(설계안: 벤치, 가로등, 새집, 이정표, 버섯 램프)은 36칸, 나머지는 46칸
   const DECO = [
-    { id: 'bench', name: '벤치', ess: 40, img: 'deco_bench', sm: 1 },
-    { id: 'flowerbed', name: '꽃밭', ess: 40, img: 'deco_flowerbed' },
-    { id: 'signpost', name: '이정표', ess: 40, img: 'deco_signpost', sm: 1 },
+    { id: 'bench', name: '벤치', ess: 10, img: 'deco_bench', sm: 1 },   // 5.0.2.3 woodani: 처음 장식 퀘스트(4-8)에서 막히지 않게 싼 장식 셋은 40 → 10
+    { id: 'flowerbed', name: '꽃밭', ess: 10, img: 'deco_flowerbed' },
+    { id: 'signpost', name: '이정표', ess: 10, img: 'deco_signpost', sm: 1 },
     { id: 'streetlamp', name: '가로등', ess: 60, img: 'deco_streetlamp', sm: 1 },
     { id: 'birdhouse', name: '새집', ess: 60, img: 'deco_birdhouse', sm: 1 },
     { id: 'mushroom', name: '버섯 램프', ess: 80, img: 'deco_mushroom_lamp', sm: 1 },
