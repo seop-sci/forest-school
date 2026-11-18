@@ -29,7 +29,7 @@ async def main():
         await pg.wait_for_timeout(300)
         if '다음 학교급에서 새 모습' not in hint or 'Lv.5에 새 모습' in hint: fails.append(f'가구 안내 문구 {hint[:80]}')
         # 학교급이 오른 뒤 처음 놓은 가구: 새 모습 알림 한 번
-        tst = await pg.evaluate(f"""(()=>{{ const F={F}, S=F.S; S.tier=1; S.hd.furNew=false; S.f.cafeteria=Math.max(1,S.f.cafeteria); S.fu.cafeteria=[0,0,0,0]; S.budget=1e12;
+        tst = await pg.evaluate(f"""(()=>{{ const F={F}, S=F.S; S.tier=1; S.hd.furNew=false; S.f.cafeteria=Math.max(1,S.f.cafeteria); S.fu.cafeteria=[0,0,0,0]; S.budget=1e12; F.rt.tapT=performance.now();
           F.buyFur('cafeteria',0); const a=document.querySelector('#toast').textContent; F.buyFur('cafeteria',1); const b=S.hd.furNew; return [a,b]; }})()""")
         if '튼튼한 모습' not in tst[0] or tst[1] is not True: fails.append(f'새 학교급 첫 가구 알림 {tst}')
         # 2) 까치 핫딜: 특식 데이 30분(5.0.1.2부터), 반값은 수업료 30분치보다 많이 아낄 때만
