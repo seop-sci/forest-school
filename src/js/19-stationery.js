@@ -212,7 +212,7 @@
   /* ===== 1.7.4 학교 꾸미기: 숲의 정수로 장식을 사서 지도의 정해진 자리(지도마다 11곳)에 놓아요. 보너스는 없고 졸업해도 남아요 ===== */
   // sm: 작은 장식(설계안: 벤치, 가로등, 새집, 이정표, 버섯 램프)은 36칸, 나머지는 46칸
   const DECO = [
-    { id: 'bench', name: '벤치', ess: 10, img: 'deco_bench', sm: 1 },   // 5.0.2.3 woodani: 처음 장식 퀘스트(4-8)에서 막히지 않게 싼 장식 셋은 40 → 10
+    { id: 'bench', name: '벤치', ess: 10, img: 'deco_bench', sm: 1 },   // 5.0.2.2 woodani: 처음 장식 퀘스트(4-8)에서 막히지 않게 싼 장식 셋은 40 → 10
     { id: 'flowerbed', name: '꽃밭', ess: 10, img: 'deco_flowerbed' },
     { id: 'signpost', name: '이정표', ess: 10, img: 'deco_signpost', sm: 1 },
     { id: 'streetlamp', name: '가로등', ess: 60, img: 'deco_streetlamp', sm: 1 },

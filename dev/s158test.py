@@ -1,4 +1,4 @@
-# 5.0.2.4 시험: 건물 한 번에 올리기 칩(woodani 결정). 싼 것부터 고르기, 공사 중과 최고 레벨 빼기, 칩 보이기, 확인 창, 가구 채우고 공사 시작, 도토리 쓴 양
+# 5.0.2.2 시험: 건물 한 번에 올리기 칩(woodani 결정). 싼 것부터 고르기, 공사 중과 최고 레벨 빼기, 칩 보이기, 확인 창, 가구 채우고 공사 시작, 도토리 쓴 양
 # 쓰는 법: python3 wrap.py && python3 s158test.py   (마지막 줄이 PASS면 통과)
 import asyncio
 from playwright.async_api import async_playwright

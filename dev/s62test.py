@@ -32,7 +32,7 @@ async def main():
                   const maxCost = Math.max(...F.DECO.map(d => {{ const n = S.deco.own[d.id]; S.deco.own[d.id] = 11; const c = F.decoCost(d.id); if (n === undefined) delete S.deco.own[d.id]; else S.deco.own[d.id] = n; return c; }}));
                   return {{ out, r0, r1, r2, poor, maxCost, own: S.deco.own }}; }})()""")
                 print('사기', json.dumps(r))
-                if [x[0] for x in r['out']] != [10, 15, 25] or any(a != b2 for a, b2 in r['out']): bad.append(f'일반 장식 값 {r["out"]}')   # 5.0.2.3 벤치 40 → 10(woodani)
+                if [x[0] for x in r['out']] != [10, 15, 25] or any(a != b2 for a, b2 in r['out']): bad.append(f'일반 장식 값 {r["out"]}')   # 5.0.2.2 벤치 40 → 10(woodani)
                 if r['r0'] != 250 or r['r1'] != 1 or r['r2'] != [1, 0, True]: bad.append(f'희귀 장식 {r}')
                 if r['poor'] != [0, 5]: bad.append(f'모자랄 때 {r["poor"]}')
                 if not (0 < r['maxCost'] < 1e6): bad.append(f'값이 너무 커요 {r["maxCost"]}')
