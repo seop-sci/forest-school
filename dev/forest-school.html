@@ -2816,6 +2816,7 @@ body.wl-on .toast{z-index:300}
 @keyframes wxFog{from{opacity:.75}to{opacity:1}}
 .app.on-school .wx-chip{color:var(--home-ink)}
 .wx-chip.off{opacity:.62}.wx-chip.off::after{content:'끔';margin-left:4px;font-size:11px;color:#7A8790}
+.wx-tip{position:fixed;z-index:34;padding:8px 12px;border-radius:14px;background:var(--board);color:var(--chalk);font-size:13px;line-height:1.4;box-shadow:0 6px 16px rgba(0,0,0,.28);pointer-events:none;opacity:0;transform:translateY(4px);transition:opacity .18s,transform .18s}.wx-tip.on{opacity:1;transform:none}.wx-tip b{display:block;font-weight:700}.wx-tip small{display:block;margin-top:2px;font-size:12px;opacity:.85}.wx-tip::after{content:"";position:absolute;left:50%;bottom:-6px;margin-left:-6px;border:6px solid transparent;border-bottom:0;border-top-color:var(--board)}   /* 5.0.1.8 H-18 */
 .wx-chip{position:absolute;left:50%;transform:translateX(-50%);bottom:calc(var(--bot-h, 70px) + 12px);z-index:6;display:flex;align-items:center;gap:4px;padding:3px 10px;border:0;border-radius:999px;background:rgba(255,249,233,.88);color:#3A4A5A;font:inherit;font-size:12px;box-shadow:0 1px 3px rgba(20,40,20,.25);cursor:pointer}
 @media (prefers-reduced-motion:reduce){.wx-fx,.wx-fx::before,.wx-fx i{animation:none!important}}
 /* 2.1.3 다른 학교 구경과 예시 학교 */
@@ -4151,7 +4152,7 @@ body.cam-scene #ffChip,body.cam-scene #plChip,body.cam-scene .b-ring{animation-p
       <button class="panel-x" type="button" aria-label="홈으로"><svg viewBox="0 0 24 24" width="18" height="18" aria-hidden="true"><path d="M6 6l12 12M18 6L6 18" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round"/></svg></button><!-- 5.0.1.5 T-07 -->
       <h2 id="ttlGrad" class="ph"><span class="tic" data-ic="ic_grad" aria-hidden="true"></span><span>졸업</span></h2>
       <button class="sheet-elect" id="gAlbum" type="button"><span class="se-ic" id="gAlbumIc" aria-hidden="true"></span><span class="se-tx"><b>졸업 앨범</b><small id="gAlbumTx"></small></span><em>보기</em></button>
-      <p class="lead" id="gLead" hidden>대도시가 되면 종업식을 열어요. 학교는 처음으로 돌아가고 수료증이 남아요.</p>
+      <p class="lead" id="gLead">대도시가 되면 종업식을 열어요. 학교는 처음으로 돌아가고 수료증이 남아요.</p>
       <div class="gyear" id="gCard">
         <div class="g-row"><span id="gYear">유치원 1년째</span><span>가진 수료증 <b id="gHave">0</b>장 (종업식을 열면 받아요)</span></div>
         <div class="g-big"><span data-dip></span><span id="gPreview">0장</span><small id="gPreviewSub">지금 종업식을 열면 받는 수료증</small></div>
@@ -26420,7 +26421,7 @@ body.cam-scene #ffChip,body.cam-scene #plChip,body.cam-scene .b-ring{animation-p
     $('#tierDots').addEventListener('click', e => { if (e.target.closest('[data-nl]')) { nlCycle(); return; } const b = e.target.closest('[data-td]'); if (!b) return; const t = +b.dataset.td; if (t > S.tier) { shake(b); toast(`${eun(TIER_ALL[t])} 아직 갈 수 없어요`); return; } if (t === S.tier) tierViewClose(); else tierViewOpen(t); });
     $('#tvBack').addEventListener('click', () => { sfx('tap'); tierViewClose(); });
     $('#wxChip').addEventListener('click', () => { const k = wxOf(); if (!k) return; sfx('tap'); S.wxOff = S.wxOff ? 0 : 1; save(); renderWeather();   // 2.1.3 날씨, 날씨 효과 켜고 끄기(woodani)
-      toast(`${WX[k].em} ${S.wxOff ? '날씨 효과를 껐어요. 다시 누르면 켜져요' : '날씨 효과를 켰어요'}\n${WX[k].tip}`); });
+      wxTipShow(`${WX[k].tip}`, S.wxOff ? '날씨 그림을 껐어요. 다시 누르면 켜져요(보너스는 그대로)' : '날씨 그림을 켰어요'); });   // 5.0.1.8 woodani 결정(H-18): 누르면 켜고 끄기 그대로, 설명은 칩 바로 위 말풍선으로
     $('#tvTabs').addEventListener('click', e => { const b = e.target.closest('[data-mt]'); if (!b || !rt.lookData || !rt.lookData.model) return; const t = +b.dataset.mt; if (t === rt.viewTier) return; sfx('tap'); rt.lookData = modelOf(t); rt.viewTier = t; renderTierView(true); renderTierDots(); });
     $('#tvEdit').addEventListener('click', () => { sfx('tap'); rt.viewEdit = !rt.viewEdit; renderTierView(true); if (!rt.viewEdit) save(); });
     $('#tvMap').addEventListener('click', e => { const h = e.target.closest('[data-tvslot]'); if (h && rt.viewEdit) openDecoPick(+h.dataset.tvslot);
@@ -27786,6 +27787,18 @@ body.cam-scene #ffChip,body.cam-scene #plChip,body.cam-scene .b-ring{animation-p
     if (show && chip.dataset.k !== k) { chip.dataset.k = k; chip.innerHTML = `<span aria-hidden="true">${WX[k].em}</span>${WX[k].name} 오는 날`.replace('안개 오는 날', '안개 낀 날'); }
     // 그날 처음 홈을 볼 때 한 번 알려 줘요
     if (show && S.wx !== gameToday() && !rt.modalOpen) { S.wx = gameToday(); save(); setTimeout(() => toast(`${WX[k].em} 오늘은 ${k === 'fog' ? '안개가 꼈어요' : iga(WX[k].name) + ' 와요'}.\n${WX[k].tip}`), 600); }
+  }
+  // 5.0.1.8 H-18 날씨 칩 바로 위에 잠깐 뜨는 말풍선(알림 칸을 쓰지 않아요)
+  function wxTipShow(main, sub) {
+    const chip = $('#wxChip'); if (!chip || chip.hidden) return;
+    let t = $('#wxTip'); if (!t) { t = document.createElement('div'); t.id = 'wxTip'; t.className = 'wx-tip'; t.setAttribute('role', 'status'); document.body.appendChild(t); }
+    t.innerHTML = `<b></b><small></small>`; t.querySelector('b').textContent = main; t.querySelector('small').textContent = sub || '';
+    const r = chip.getBoundingClientRect(); t.hidden = false;
+    const w = Math.min(260, innerWidth - 16); t.style.width = w + 'px';
+    t.style.left = Math.max(8, Math.min(innerWidth - w - 8, r.left + r.width / 2 - w / 2)) + 'px';
+    t.style.bottom = (innerHeight - r.top + 8) + 'px';
+    t.classList.remove('on'); void t.offsetWidth; t.classList.add('on');
+    clearTimeout(rt.wxTipT); rt.wxTipT = setTimeout(() => { t.classList.remove('on'); t.hidden = true; }, 3000);
   }
   /* ===== 2.1.3 날씨 END ===== */
   /* ===== 2.1.3 학부모 쪽지 이야기 BEGIN (로드맵 9절) =====
