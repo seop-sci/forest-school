@@ -1,5 +1,6 @@
 # GitHub Pages 판 만들기: forest-school.html(Claude 화면에 올리는 본문)을 완전한 웹 문서로 감싸고
 # config.js와 Firebase SDK를 부르는 짧은 코드를 앞에 붙여요. config.js는 이미 있으면 건드리지 않아요.
+import sys as _sys, pathlib as _pl; _sys.path.insert(0, str(_pl.Path(__file__).resolve().parent)); import srcbuild as _sb; _sb.build()   # 2026-11-18 src/ → forest-school.html 먼저
 import pathlib, sys
 HERE = pathlib.Path(__file__).resolve().parent
 OUT = pathlib.Path(sys.argv[1]) if len(sys.argv) > 1 else HERE / 'gh'

@@ -1,4 +1,5 @@
 # 4.4.1: 게임 원본의 <script> 안 글에 문법 오류가 있으면 알려요(로딩에서 멈추는 일을 막아요). node --check를 써요
+import sys as _sys, pathlib as _pl; _sys.path.insert(0, str(_pl.Path(__file__).resolve().parent)); import srcbuild as _sb; _sb.build()   # 2026-11-18 src/ → forest-school.html 먼저
 import re, subprocess, sys, tempfile, os
 src = open(os.path.join(os.path.dirname(__file__), 'forest-school.html'), encoding='utf-8').read()
 bad = 0

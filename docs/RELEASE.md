@@ -1,9 +1,9 @@
 # 빌드와 버전 관리 (웹, 안드로이드, 토스)
 
-세 판 모두 `dev/forest-school.html` 하나에서 나와요.
+세 판 모두 `dev/forest-school.html` 하나에서 나와요. 2026-11-18부터 그 파일은 `src/` 여러 파일을 이어 붙여 만들어요(`dev/srcbuild.py`, `dev/README.md`).
 
 ```
-dev/forest-school.html ──build_gh.py──▶ index.html ──┬─▶ GitHub Pages (웹 테스트판)
+src/ ──srcbuild.py──▶ dev/forest-school.html ──build_gh.py──▶ index.html ──┬─▶ GitHub Pages (웹 테스트판)
                                                     ├─▶ app/ (Capacitor) ─ GitHub Actions ─▶ .aab / .apk (구글 플레이)
                                                     └─▶ toss/ (앱인토스) ─ npm run build ─▶ forest-school.ait
 ```
@@ -12,7 +12,7 @@ dev/forest-school.html ──build_gh.py──▶ index.html ──┬─▶ Git
 
 | 곳 | 무엇 |
 | --- | --- |
-| `dev/forest-school.html` | `const VERSION = 'x.y.z'`, 로딩 화면 `bootVer`의 `vx.y.z`, 설정 정보 `verRow`의 `vx.y.z` (세 군데. `build_gh.py`가 VERSION을 읽어 `index.html` 첫머리에 `<meta name="forest-version">`을 저절로 넣어요. 안드로이드 판 업데이트 알림이 큰 업데이트인지 가릴 때 읽어요) |
+| `src/js/15-cloud-save.js`, `src/page/10-body.html` | `const VERSION = 'x.y.z'`(js), 로딩 화면 `bootVer`의 `vx.y.z`와 설정 정보 `verRow`의 `vx.y.z`(page) (세 군데. `build_gh.py`가 VERSION을 읽어 `index.html` 첫머리에 `<meta name="forest-version">`을 저절로 넣어요. 안드로이드 판 업데이트 알림이 큰 업데이트인지 가릴 때 읽어요) |
 | `app/android/app/build.gradle` | `versionName "x.y.z"` (`versionCode`는 Actions 실행 번호로 저절로 올라가요) |
 | `app/package.json` | `"version": "x.y.z"` |
 | `toss/package.json` | `"version": "x.y.z"` |

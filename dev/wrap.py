@@ -1,3 +1,4 @@
+import sys as _sys, pathlib as _pl; _sys.path.insert(0, str(_pl.Path(__file__).resolve().parent)); import srcbuild as _sb; _sb.build()   # 2026-11-18 src/ → forest-school.html 먼저
 import sys
 body=open('forest-school.html',encoding='utf-8').read()
 # 2026-11-17 원본에는 그림 주소(img/a/...)만 있어요. 시험판은 file:// 주소라 그림을 글 안에 base64로 다시 넣어요(아래 곡과 같아요). 넣은 결과는 예전 원본과 글자까지 같아요

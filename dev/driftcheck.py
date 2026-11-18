@@ -3,6 +3,7 @@
 #   2. 퀘스트 종류(t)가 qMeasure(재기), qGoal(목표 글), goTo(바로 가기)에 모두 있는지
 #   3. fresh()와 새 학년 시작(newYear: graduate()와 promote()가 불러요)의 건물, 선생님 처음 값이 같은지
 # 쓰는 법: python3 dev/driftcheck.py   (먼저 python3 wrap.py). 마지막 줄 PASS, 어긋나면 FAIL과 끝 코드 1.
+import sys as _sys, pathlib as _pl; _sys.path.insert(0, str(_pl.Path(__file__).resolve().parent)); import srcbuild as _sb; _sb.build()   # 2026-11-18 src/ → forest-school.html 먼저
 import re, sys, pathlib, json
 from testlib import URL
 from playwright.sync_api import sync_playwright

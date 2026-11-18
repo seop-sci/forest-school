@@ -4,9 +4,18 @@
 
 게임을 고칠 때 쓰는 원본과 도구예요. 저장소 맨 위 `index.html`은 여기 `forest-school.html`로 만든 결과물이에요.
 
+**2026-11-18 woodani 결정: 원본을 저장소 맨 위 `src/` 여러 파일로 나눴어요.** `src/page/`(머리, 화면 뼈대, 그림 주소표), `src/css/`(꾸밈 세 파일), `src/js/`(기능별 42파일: 퀘스트 표, 저장, 지도, 탐험, 퍼즐, 합치기 등). `forest-school.html`은 이 파일들을 차례대로 이어 붙인 결과물이고, 지금까지의 도구와 시험은 그대로 이 파일을 읽어요.
+
+- 고칠 때: `src/` 파일을 고치고 `python3 wrap.py`(또는 `build_gh.py`)를 돌리면 먼저 `forest-school.html`을 새로 만들어요.
+- `forest-school.html`을 직접 고쳤다면 `python3 srcbuild.py split`으로 `src/`에 옮겨요. 직접 고친 파일이 `src/`보다 새로우면 `build`가 덮어쓰지 않고 멈춰요.
+- 원본을 직접 고치는 도구(`embed_assets.py`, `img_out.py`, `story_pack.py`, `oak_pack.py`, `embed_audio.py`)는 처음에 `build`, 끝에 `split`을 저절로 불러요.
+- 나누는 곳은 `src_parts.txt`(한 줄에 "파일<탭>그 파일이 시작하는 줄의 앞부분"). 새 파일을 만들려면 한 줄을 더하고 `split`.
+- `src/`와 `forest-school.html`은 함께 커밋해요. `precheck.sh`와 GitHub Build check가 `python3 srcbuild.py check`로 둘이 같은지 봐요.
+
 | 파일 | 하는 일 |
 | --- | --- |
-| `forest-school.html` | 게임 원본(코드와 글, 2.6MB). 그림은 주소(`img/a/열쇠-지문.webp`)만 있고 바이트는 저장소 맨 위 `img/a` 파일에 있어요(2026-11-17부터. 그 전에는 base64로 품어 40MB였어요) |
+| `srcbuild.py`, `src_parts.txt` | 원본 나누기와 잇기. `build`(src/ → forest-school.html), `split`(거꾸로), `check`(같은지만) |
+| `forest-school.html` | `src/`를 이어 붙인 게임 전체(코드와 글, 2.6MB). 그림은 주소(`img/a/열쇠-지문.webp`)만 있고 바이트는 저장소 맨 위 `img/a` 파일에 있어요(2026-11-17부터. 그 전에는 base64로 품어 40MB였어요) |
 | `imglib.py`, `img_out.py` | 그림을 원본 밖 파일로 두는 도구. `python3 img_out.py`(원본에 남은 base64 그림을 파일로 꺼냄, 여러 번 돌려도 같음), `--check`(주소마다 파일이 있고 이름의 지문이 내용과 맞는지), `--inline 파일`(그림을 품은 옛 꼴 한 파일로 만들기. 되돌리거나 한 파일로 건넬 때) |
 | `build_gh.py` | 원본으로 GitHub 판 만들기. `python3 build_gh.py ..` 하면 저장소 맨 위 `index.html`이 새로 생겨요 |
 | `gh_README.md`, `gh_database.rules.json` | GitHub 판의 README와 데이터베이스 규칙 원본 |
@@ -31,7 +40,7 @@
 | `app_pack.mjs` | 앱 묶음(안드로이드 `www`, 토스 `dist`)에 넣지 않는 파일을 한 곳에서 정해요. 여기서 뺀 것은 게임이 앱 판에서 웹(`WEB_ROOT`)에서 받아요. 곡 목록은 원본의 `WEB_AUD`를 읽어요 |
 | `minify_web.mjs` | 웹판 압축(주석과 공백만). `pages.yml`이 올릴 사본에만 돌려요. 저장소의 `index.html`은 그대로예요 |
 
-순서: `forest-school.html` 고치기 → `python3 wrap.py` → 시험 → `python3 build_gh.py ..` → `cd ../toss && npm run build` → 커밋하고 올리기 (안드로이드는 GitHub Actions가 알아서 만들어요).
+순서: `src/` 고치기 → `python3 wrap.py`(forest-school.html을 먼저 새로 만들어요) → 시험 → `python3 build_gh.py ..` → `cd ../toss && npm run build` → 커밋하고 올리기 (안드로이드는 GitHub Actions가 알아서 만들어요).
 
 반영할 때마다: 저장소 맨 위 `CHANGELOG.md`에 패치노트를 적고 버전을 올려요(사소하면 끝자리, 꽤 중요하면 가운데, 새 학교급이면 앞자리). 버전은 `forest-school.html`의 `VERSION`, `app/android/app/build.gradle`의 `versionName`, `toss/package.json`과 `app/package.json`의 `version`을 함께 바꿔요.
 
