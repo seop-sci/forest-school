@@ -497,7 +497,7 @@
     return a + c;
   }, 0);
   const cheapestFur = k => FUR[k].map((_, i) => i).filter(i => !furDone(k, i)).sort((a, b) => furCost(k, a) - furCost(k, b))[0];
-  const facAllNext = n => CAMPUS8.filter(k => (S.f[k] || 0) < n && !facBusy(k)).sort((a, b) => facCost(a) - facCost(b))[0];   // 5.0.1.3 facAll 퀘스트에서 다음에 올릴 건물(가장 싼 것)
+  const facAllNext = (n, ks) => (ks || CAMPUS8).filter(k => (S.f[k] || 0) < n && !facBusy(k)).sort((a, b) => facCost(a) - facCost(b))[0];   // 5.0.1.3 facAll 퀘스트에서 다음에 올릴 건물(가장 싼 것)
   const facPick = k => furReady(k) ? { kind: 'fac', k } : { kind: 'fur', k, i: cheapestFur(k) };
   // mode: 'rep' 평판을 가장 싸게, 'rate' 수업료를 가장 싸게, 없으면 학교가 가장 크게 자라는 것
   function valuePick(mode) {
@@ -524,7 +524,7 @@
     if (q.t === 'fac' && facKeys().includes(q.k) && !facBusy(q.k)) return facPick(q.k);
     if (q.t === 'fur' && !furDone(q.k, q.i)) return { kind: 'fur', k: q.k, i: q.i };
     if (q.t === 'furAll' && !furReady(q.k)) return { kind: 'fur', k: q.k, i: cheapestFur(q.k) };
-    if (q.t === 'facAll') { const k = facAllNext(q.n); if (k) return facPick(k); }
+    if (q.t === 'facAll') { const k = facAllNext(q.n, q.ks); if (k) return facPick(k); }
     if (q.t === 'tea' && !teaMaxed(q.k)) return { kind: 'tea', k: q.k };
     if (q.t === 'teaAll') { const k = Object.keys(TEA).filter(x => S.t[x] < q.n && !teaMaxed(x)).sort((a, b) => teaCost(a) - teaCost(b))[0]; if (k) return { kind: 'tea', k }; }
     if (q.t === 'students' && capacity() < q.n && !facBusy('classroom')) return facPick('classroom');
