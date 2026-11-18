@@ -13,7 +13,7 @@ from testlib import URL, F
 CLEAN = "document.querySelectorAll('.overlay.center').forEach(o=>{o.hidden=true;o.classList.remove('open')}); window.__forest.rt.modalOpen=null; window.__forest.rt.modalQueue.length=0"
 SKIP = f"(()=>{{ const t=document.querySelector('#tut'); if(t) t.hidden=true; {F}.S.tut.st='skip'; {F}.rt.tut=null; {CLEAN}; }})()"
 kst = lambda y, m, d: calendar.timegm((y, m, d, 3, 0, 0)) * 1000
-NOTE = '도토리 양은 학교가 성장할수록 커져요'
+NOTE = '숲의 정수는 공부 탭에서 모아요'   # 5.0.1.5 T-05 '도토리 양은…' 줄은 뺐어요
 PROMOTE = f"""(() => {{ const F = {F}, S = F.S; S.tier = 1; S.tg = 5; S.sem = 1; S.p.species = 6; Object.assign(S.f, {{ classroom: 38, cafeteria: 30, library: 28, playground: 28, science: 18 }});
   for (const k in S.fu) S.fu[k] = S.fu[k].map(() => S.f[k]); S.students = 158; S.tdip = 250; S.grade = 4; S.best = 4;
   S.q.m = F.MAIN.findIndex(q => q.id === 'e39'); S.q.lat = ''; F.checkGrade(); F.promote(); {CLEAN}; F.clubAuto(true); return S.tier; }})()"""

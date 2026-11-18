@@ -2,7 +2,7 @@
 <html lang="ko">
 <head>
 <meta charset="utf-8">
-<meta name="forest-version" content="5.0.1.4">
+<meta name="forest-version" content="5.0.1.5">
 <meta name="viewport" content="width=device-width, initial-scale=1">
 <meta name="description" content="도토리를 모아 숲속 학교를 키우는 방치형 게임 테스트판이에요.">
 <style>html,body{margin:0}</style>
@@ -705,7 +705,7 @@ label.srow,button.srow{cursor:pointer}
 
 .xgrad{position:relative}.xgrad .tic{width:26px;height:26px;background-size:contain;background-repeat:no-repeat;background-position:center}
 .xgrad .dot{position:absolute;top:3px;right:3px;width:8px;height:8px;border-radius:50%;background:var(--seal)}
-.xgrad .tguide{top:auto;bottom:-24px;transform:rotate(180deg)}
+.xgrad .tguide{top:auto;bottom:-24px}.xgrad .tguide svg{transform:rotate(180deg)}   /* 5.0.1.5 H-01 움직임이 회전을 덮어써서 화살표가 아래를 봤어요 */
 .icon-btn.tab.guide .tguide{display:block}
 .tm-top{display:flex;align-items:flex-end;justify-content:space-between;gap:8px;margin:2px 2px 6px}
 .tm-where{display:flex;align-items:baseline;gap:6px;flex-wrap:wrap}.tm-where b{font-family:var(--font-display);font-size:20px}.tm-where small{color:var(--muted);font-size:12px}
@@ -1845,7 +1845,7 @@ body{background:radial-gradient(120% 60% at 50% 0%, color-mix(in srgb, var(--pap
 /* 창 머리띠와 홈으로 단추 */
 .panel{border-width:2px;border-radius:20px}
 .panel h2{color:var(--ink)}
-.panel-x{position:sticky;top:0;float:right;z-index:2;margin:-6px -4px 0 8px;width:36px;height:36px;border:0;border-radius:12px;background:var(--card);color:var(--ink);display:grid;place-items:center;cursor:pointer}
+.panel-x{position:relative;top:0;float:right;z-index:2;margin:-6px -4px 0 8px;width:36px;height:36px;border:0;border-radius:12px;background:var(--card);color:var(--ink);display:grid;place-items:center;cursor:pointer}
 .qsec{padding:7px 12px;border-radius:12px;background:var(--board);color:#FFF4D6}
 .qsec small{color:color-mix(in srgb, #FFF4D6 72%, transparent)}
 /* 공부 탭 (2.0.1, 옛 미니게임 탭) */
@@ -2071,7 +2071,7 @@ body{background:radial-gradient(120% 60% at 50% 0%, color-mix(in srgb, var(--pap
 .stats{display:flex;gap:6px;margin-top:6px}
 .stats .stat{flex:1 1 auto;flex-direction:row;align-items:center;gap:6px;min-width:0;padding:3px 10px 3px 7px;border-radius:999px;background:color-mix(in srgb, var(--board) 92%, transparent);border:1.5px solid color-mix(in srgb, #8FBF7C 45%, var(--board));box-shadow:0 2px 0 rgba(20,40,20,.25)}
 .stats .stat-main{flex:1.6 1 auto}
-.stats .lab{font-size:0;gap:0}
+.stats .lab{font-size:10.5px;gap:3px;white-space:nowrap}   /* 5.0.1.5 H-06 이름표 다시 보이기 */
 .stats .lab svg,.stats .lab [data-acorn] svg{width:17px;height:17px}
 .stats .stat b{font-size:19px;line-height:1.15}
 .stats .stat-main b{font-size:21px}
@@ -2683,7 +2683,7 @@ html.hud-art .tier-dots .td.on{background:#E8A23E;color:#fff;border-color:#B8692
 #decoG .deco-hit,#tvMap .deco-hit{fill:transparent;cursor:pointer}   /* 2.0.1 지난 학교급 모습(#tvMap)에도 같은 꾸미기 규칙(검은 네모와 밀린 간판 글자 수정) */
 /* 2.1.2 매점 간식 뽑기 */
 .nb-modal{max-width:380px;padding:0 0 14px;overflow:hidden}
-.ns-head{background-color:#1E2466}.ns-head b{color:#FFF3C8;text-shadow:0 1px 2px rgba(0,0,0,.6)}
+.ns-head{background-color:#1E2466}.ns-head b,.lab-head.ns-head b{color:#FFF3C8;text-shadow:0 1px 2px rgba(0,0,0,.6)}
 .ns-subs{display:flex;flex-wrap:wrap;justify-content:center;gap:6px;padding:0 14px 6px}
 .ns-subs button{padding:7px 12px;border:1.5px solid var(--line);border-radius:999px;background:var(--card);color:var(--ink);font-size:13.5px;cursor:pointer}
 .ns-subs button.on{border-color:#5B4A8A;background:#5B4A8A;color:#FFF9E9;font-weight:700}
@@ -2760,6 +2760,7 @@ html.hud-art .tier-dots .td.on{background:#E8A23E;color:#fff;border-color:#B8692
 .gd-plot button.go{background:#6BA23A;border-color:#4E7F25;color:#fff}.gd-plot small{opacity:.7}
 .gd-pick{margin-top:8px;padding:8px;border-radius:12px;background:rgba(226,162,28,.12)}.gd-pick b{font-size:13px}
 .gd-bulk{display:flex;flex-wrap:wrap;gap:4px;margin-top:10px}.gd-bulk:empty{display:none}
+@media (prefers-color-scheme: dark){:root:not([data-theme="light"]) .gd-bulk button{color:#CDEB9A;background:rgba(107,162,58,.22)}}:root[data-theme="dark"] .gd-bulk button{color:#CDEB9A;background:rgba(107,162,58,.22)}   /* 5.0.1.5 C-15 */
 .gd-bulk button{flex:1 1 30%;padding:7px 6px;border-radius:12px;border:1.5px solid #6BA23A;background:rgba(107,162,58,.12);font:inherit;font-size:12.5px;font-weight:700;color:#2F5A2A;white-space:nowrap}
 .gd-body .gd-pick{position:sticky;bottom:0;z-index:2;background:#FBEFCF;box-shadow:0 -6px 12px rgba(60,40,10,.14)}   /* 3.3.2 고르는 칸이 밭 아래로 밀려 안 보이지 않게 늘 아래에 붙어요 */
 .gd-plot .bed{width:68px!important;height:68px!important}
@@ -3633,7 +3634,8 @@ body.cam-scene #ffChip,body.cam-scene #plChip,body.cam-scene .b-ring{animation-p
 /* 1.7.2: 학교 상세(펼침)에는 위쪽에 없는 정원과 학교 파워만 보여요. 평판은 위쪽 재화 줄에 늘 있어요 */
 .app .board .stats .rep-row{display:none}
 /* 1.7.2: 퀘스트 목록에서 이벤트 미션으로 가는 줄 */
-.dm-all{border-color:var(--gold);background:color-mix(in srgb, var(--gold) 16%, var(--card))}.dm-all .cta{flex:none;pointer-events:none}
+.dm-all{border-color:var(--gold);background:color-mix(in srgb, var(--gold) 16%, var(--card))}#conFree .n{display:none}   /* 5.0.1.5 H-08 횟수는 글 안에만 */
+.dm-all .cta{flex:none;width:auto;pointer-events:none}.dm-all>span:first-child{flex:1;min-width:0}   /* 5.0.1.5 T-01 */
 .td-h{margin-top:4px}.td-fold{display:flex;align-items:center;gap:6px;width:100%;padding:0;border:0;background:none;color:inherit;font:inherit;text-align:left;cursor:pointer}.td-fold svg{width:16px;height:16px;margin-left:auto;transition:transform .2s}.td-fold[aria-expanded="false"] svg{transform:rotate(-90deg)}
 .td-list{display:grid;gap:0;margin:0 0 8px;border:1px solid var(--line);border-radius:12px;overflow:hidden;background:var(--paper)}
 .td-row{display:flex;align-items:center;gap:8px;width:100%;min-height:40px;padding:6px 12px;border:0;border-top:1px solid var(--line);background:none;color:var(--ink);font:inherit;font-size:14px;text-align:left}
@@ -3873,7 +3875,7 @@ body.cam-scene #ffChip,body.cam-scene #plChip,body.cam-scene .b-ring{animation-p
     <p class="boot-step" id="bootStep">학교 문을 여는 중...</p>
     <p class="boot-tip" id="bootTip">학교 문을 여는 중이에요</p>
   </div>
-  <span class="boot-ver" id="bootVer">v5.0.1.4</span>
+  <span class="boot-ver" id="bootVer">v5.0.1.5</span>
 </div>
 
 <div class="app on-school" id="app">
@@ -4160,7 +4162,7 @@ body.cam-scene #ffChip,body.cam-scene #plChip,body.cam-scene .b-ring{animation-p
         <button class="ui-fold side-fold" id="foldL" type="button" data-fold="l" aria-expanded="true" aria-label="왼쪽 단추 접기"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M6 15l6-6 6 6" fill="none" stroke="currentColor" stroke-width="2.6" stroke-linecap="round" stroke-linejoin="round"/></svg><i class="dot" hidden></i></button>
         <button class="shopbtn" id="btnShop" type="button" hidden aria-label="꾸미기 백화점"><svg viewBox="-8 -11 16 20" aria-hidden="true"><path d="M-4.6 -1 Q-4.9 5.4 0 7.4 Q4.9 5.4 4.6 -1 Z" class="c-gnut"/><ellipse cx="-1.8" cy="2" rx="0.9" ry="2.1" class="c-gshine"/><path d="M-5.8 -0.8 Q-5.8 -6.2 0 -6.6 Q5.8 -6.2 5.8 -0.8 Q0 0.8 -5.8 -0.8 Z" class="c-gcap"/><path d="M-4 -3.2 H4 M-2.8 -5 H2.8" class="s-gline"/><path d="M0 -6.6 L0.9 -9.2" class="s-gstem"/></svg><b id="goldN">0</b>상점</button>
         <button class="boost" id="btnBoost" type="button" hidden aria-label="부엉이 선생님 보충수업"><span class="b-ring"><span class="b-av" id="boostIc" aria-hidden="true"></span><span class="b-n" id="boostN">5</span></span><span class="b-lb">보충수업</span></button>
-        <button class="boost trip" id="btnTrip" type="button" hidden aria-label="현장체험학습"><span class="b-ring"><span class="b-av" id="tripIc" aria-hidden="true"></span><span class="b-n" id="tripN">출발</span></span><span class="b-lb">체험학습</span></button>
+        <button class="boost trip" id="btnTrip" type="button" hidden aria-label="체험학습"><span class="b-ring"><span class="b-av" id="tripIc" aria-hidden="true"></span><span class="b-n" id="tripN">출발</span></span><span class="b-lb">체험학습</span></button>
         <button class="boost trip tr2" id="btnTr2" type="button" hidden aria-label="수학여행"><span class="b-ring"><span class="b-av" id="tr2Ic" aria-hidden="true"></span><span class="b-n" id="tr2N">출발</span></span><span class="b-lb">수학여행</span></button>
         <button class="boost trip sports" id="btnSports" type="button" hidden aria-label="학교 행사"><span class="b-ring"><span class="b-av" id="sportsIc" aria-hidden="true"></span><span class="b-n" id="sportsN">열기</span></span><span class="b-lb">학교 행사</span></button>
         <button class="boost trip hall" id="btnHall" type="button" data-go="hall" hidden aria-label="학교 복도"><span class="b-ring"><span class="b-av" id="hallIc" aria-hidden="true"></span><span class="b-n" id="hallN">열기</span></span><span class="b-lb">복도</span><span class="h-dot" id="hallDot" hidden></span></button>
@@ -4230,11 +4232,12 @@ body.cam-scene #ffChip,body.cam-scene #plChip,body.cam-scene .b-ring{animation-p
       <div id="tmBody"></div></div>
     </section>
     <section class="panel" id="panelGrad" hidden aria-labelledby="ttlGrad">
+      <button class="panel-x" type="button" aria-label="홈으로"><svg viewBox="0 0 24 24" width="18" height="18" aria-hidden="true"><path d="M6 6l12 12M18 6L6 18" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round"/></svg></button><!-- 5.0.1.5 T-07 -->
       <h2 id="ttlGrad" class="ph"><span class="tic" data-ic="ic_grad" aria-hidden="true"></span><span>졸업</span></h2>
       <button class="sheet-elect" id="gAlbum" type="button"><span class="se-ic" id="gAlbumIc" aria-hidden="true"></span><span class="se-tx"><b>졸업 앨범</b><small id="gAlbumTx"></small></span><em>보기</em></button>
       <p class="lead" id="gLead" hidden>대도시가 되면 종업식을 열어요. 학교는 처음으로 돌아가고 수료증이 남아요.</p>
       <div class="gyear" id="gCard">
-        <div class="g-row"><span id="gYear">유치원 1년째</span><span>가진 수료증 <b id="gHave">0</b>장</span></div>
+        <div class="g-row"><span id="gYear">유치원 1년째</span><span>가진 수료증 <b id="gHave">0</b>장 (종업식을 열면 받아요)</span></div>
         <div class="g-big"><span data-dip></span><span id="gPreview">0장</span><small id="gPreviewSub">지금 종업식을 열면 받는 수료증</small></div>
         <div class="bar" role="progressbar" aria-label="다음 수료증까지" aria-valuemin="0" aria-valuemax="100" id="gBarWrap"><i id="gBar"></i></div>
         <p class="g-note" id="gNote"></p>
@@ -4248,7 +4251,7 @@ body.cam-scene #ffChip,body.cam-scene #plChip,body.cam-scene .b-ring{animation-p
       <div class="gyear" id="tierCard">
         <div class="tier-route"><span id="tierFrom">숲속 유치원</span><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M5 12h13M13 6l6 6-6 6" fill="none" stroke="currentColor" stroke-width="2.6" stroke-linecap="round" stroke-linejoin="round"/></svg><b id="tierTo">숲속 초등학교</b></div>
         <ul class="tier-reqs" id="tierReqs"></ul>
-        <div class="g-row tier-fund"><span>졸업하면 받는 장학재단 기금</span><b><span data-fund></span><span id="tierFund">1</span></b></div>
+        <div class="g-row tier-fund"><span>졸업하면 받는 기금 (아래 장학재단에서 써요)</span><b><span data-fund></span><span id="tierFund">1</span></b></div>
         <p class="g-note" id="tierNote"></p>
         <button class="cta" type="button" id="tierBtn">졸업식 열기</button>
         <div class="gconfirm" id="tierConfirm" hidden>
@@ -4262,7 +4265,7 @@ body.cam-scene #ffChip,body.cam-scene #plChip,body.cam-scene .b-ring{animation-p
       <h3 class="qsec second" id="fundHead">장학재단 <small>기금으로 고치면 졸업해도 효과가 남아요</small></h3>
       <p class="fund-have" id="fundHave"></p>
       <div class="perks" id="fundList"></div>
-      <h3 class="qsec second">전학 온 친구들 <small>한 명마다 수업료 +5%</small></h3>
+      <h3 class="qsec second">전학 온 친구들 <small>종업식이나 졸업식을 열 때마다 한 명. 한 명마다 수업료 +5%</small></h3>
       <p class="friend-note" id="friendNote" hidden></p>
       <div class="friends" id="friendList"></div>
     </section>
@@ -4318,7 +4321,7 @@ body.cam-scene #ffChip,body.cam-scene #plChip,body.cam-scene .b-ring{animation-p
     <button class="street-back" type="button" data-go="street">상점 거리로</button>
     <h2 id="essTitle" class="ph"><span class="tic" data-ic="ic_essence_shop" aria-hidden="true"></span><span>문방구</span></h2>
     <div class="shop-have ess-have" id="essHaveBox"><span class="ess-big" id="essBig" aria-hidden="true"></span><span class="tic" data-ic="ic_essence" aria-hidden="true"></span><span id="essHave2">0</span></div>
-    <p class="fine shop-adleft">숲의 정수는 공부 탭에서 모아요. 도토리 양은 학교가 성장할수록 커져요</p>
+    <p class="fine shop-adleft">숲의 정수는 공부 탭에서 모아요</p>
     <div class="shop-scroll" id="essList"></div>
     <div class="shop-ask" id="essAsk" hidden>
       <p id="essAskText"></p>
@@ -4355,7 +4358,7 @@ body.cam-scene #ffChip,body.cam-scene #plChip,body.cam-scene .b-ring{animation-p
     <section class="panel" id="panelRank" hidden aria-labelledby="ttlRank">
       <button class="panel-x" type="button" aria-label="홈으로"><svg viewBox="0 0 24 24" width="18" height="18" aria-hidden="true"><path d="M6 6l12 12M18 6L6 18" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round"/></svg></button>
       <h2 id="ttlRank" class="ph"><span class="tic" data-ic="ic_rank" aria-hidden="true"></span><span>랭킹</span></h2>
-      <div class="seg rank-seg" id="rankView" role="radiogroup" aria-label="랭킹 보기"><button type="button" role="radio" data-rv="week" aria-checked="true">주간 리그</button><button type="button" role="radio" data-rv="sea" aria-checked="false">시즌</button><button type="button" role="radio" data-rv="all" aria-checked="false">전체 순위</button><button type="button" role="radio" data-rv="bt" aria-checked="false">대결 순위</button><button type="button" role="radio" data-rv="tam" aria-checked="false">탐험</button></div>
+      <div class="seg rank-seg" id="rankView" role="radiogroup" aria-label="랭킹 보기"><button type="button" role="radio" data-rv="week" aria-checked="true">주간 리그</button><button type="button" role="radio" data-rv="sea" aria-checked="false">시즌</button><button type="button" role="radio" data-rv="all" aria-checked="false">학교 파워</button><button type="button" role="radio" data-rv="bt" aria-checked="false">대결 순위</button><button type="button" role="radio" data-rv="tam" aria-checked="false">탐험</button></div>
       <div class="seg rank-seg" id="rankTamSeg" role="radiogroup" aria-label="탐험 순위 보기" hidden><button type="button" role="radio" data-rth="0" aria-checked="true">일반 탐험</button><button type="button" role="radio" data-rth="1" aria-checked="false">심화 탐험</button></div>
       <p class="lead" id="rankLead">학교 파워로 순위를 매겨요.</p>
       <div class="rank-me" id="rankMe">
@@ -4372,8 +4375,8 @@ body.cam-scene #ffChip,body.cam-scene #plChip,body.cam-scene .b-ring{animation-p
     <!-- ===== 1.7.0 도감, 이벤트 BEGIN ===== (패널 두 개. 안쪽 내용은 renderDex(), renderEvent()가 그려요) -->
     <section class="panel" id="panelDex" hidden aria-labelledby="ttlDex">
       <button class="panel-x" type="button" aria-label="홈으로"><svg viewBox="0 0 24 24" width="18" height="18" aria-hidden="true"><path d="M6 6l12 12M18 6L6 18" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round"/></svg></button>
-      <h2 id="ttlDex" class="ph"><span class="tic" data-ic="ic_book" aria-hidden="true"></span><span>동물 도감</span></h2>
-      <div class="seg rank-seg" id="dexSeg" role="radiogroup" aria-label="도감과 업적"><button type="button" role="radio" data-dseg="dex" aria-checked="true">동물 도감</button><button type="button" role="radio" data-dseg="sn" aria-checked="false" id="dsegSn" hidden>간식</button><button type="button" role="radio" data-dseg="bx" aria-checked="false" id="dsegBx" hidden>생물</button><button type="button" role="radio" data-dseg="ach" aria-checked="false">업적<i class="seg-dot" id="achDot" hidden></i></button></div>
+      <h2 id="ttlDex" class="ph"><span class="tic" data-ic="ic_book" aria-hidden="true"></span><span>도감</span></h2>
+      <div class="seg rank-seg" id="dexSeg" role="radiogroup" aria-label="도감과 업적"><button type="button" role="radio" data-dseg="dex" aria-checked="true">동물</button><button type="button" role="radio" data-dseg="sn" aria-checked="false" id="dsegSn" hidden>간식</button><button type="button" role="radio" data-dseg="bx" aria-checked="false" id="dsegBx" hidden>생물</button><button type="button" role="radio" data-dseg="ach" aria-checked="false">업적<i class="seg-dot" id="achDot" hidden></i></button></div>
       <div id="dexPane">
       <p class="lead">처음 만나면 황금 도토리 1개를 받아요.</p>
       <div class="dex-head" id="dexHead"></div>
@@ -4407,14 +4410,14 @@ body.cam-scene #ffChip,body.cam-scene #plChip,body.cam-scene .b-ring{animation-p
       <button class="shopfront door hroom soon" id="hdCouncil" type="button" aria-disabled="true" data-soon="학생회실은 준비 중이에요. 업데이트를 기다려 주세요" style="left:58.79%;top:7.75%;width:41.21%;height:24.51%;--tx:-5.5%;--ty:94.3%" aria-label="학생회실, 준비 중"><span class="sf-tag"><b>학생회실</b><span class="sf-soon">준비 중</span></span></button>
       <button class="shopfront door hroom soon" id="hdBoard" type="button" aria-disabled="true" data-soon="칭찬 게시판은 준비 중이에요. 업데이트를 기다려 주세요" style="left:0.00%;top:27.60%;width:43.55%;height:24.19%;--tx:106.7%;--ty:75.1%" aria-label="칭찬 게시판, 준비 중"><span class="sf-tag"><b>칭찬 게시판</b><span class="sf-soon">준비 중</span></span></button>
       <button class="shopfront door hroom soon" id="hdOffice" type="button" aria-disabled="true" data-soon="교무실은 준비 중이에요. 업데이트를 기다려 주세요" style="left:58.69%;top:32.26%;width:41.31%;height:26.08%;--tx:-5.2%;--ty:88.2%" aria-label="교무실, 준비 중"><span class="sf-tag"><b>교무실</b><span class="sf-soon">준비 중</span></span></button>
-      <button class="shopfront door hroom soon" id="hdCounsel" type="button" aria-disabled="true" data-soon="상담실은 고등학교부터 열려요" style="left:0.00%;top:51.79%;width:43.16%;height:30.24%;--tx:108.8%;--ty:63.6%" aria-label="상담실, 준비 중"><span class="sf-tag"><b>상담실</b><span class="sf-soon">준비 중</span></span></button>
-      <button class="shopfront door hroom soon" id="hdDept" type="button" aria-disabled="true" data-soon="새 방은 공사 중이에요. 업데이트를 기다려 주세요" style="left:58.98%;top:58.34%;width:41.02%;height:28.90%;--tx:-5.9%;--ty:74.3%" aria-label="새 방, 준비 중"><span class="sf-tag"><b>새 방</b><span class="sf-soon">공사 중</span></span></button>
+      <button class="shopfront door hroom soon" id="hdCounsel" type="button" aria-disabled="true" data-soon="상담실은 고등학교부터 열려요" style="left:0.00%;top:51.79%;width:43.16%;height:30.24%;--tx:108.8%;--ty:63.6%" aria-label="상담실, 준비 중"><span class="sf-tag"><b>상담실</b><span class="sf-soon">고등학교부터</span></span></button>
+      <button class="shopfront door hroom soon" id="hdDept" type="button" aria-disabled="true" data-soon="이 방은 대학교에서 학과 사무실로 열려요" style="left:58.98%;top:58.34%;width:41.02%;height:28.90%;--tx:-5.9%;--ty:74.3%" aria-label="새 방, 준비 중"><span class="sf-tag"><b>새 방</b><span class="sf-soon">대학교부터</span></span></button>
     </div>
     </section>
     <section class="panel" id="panelClub" hidden aria-labelledby="clubTitle">
     <button class="street-back" type="button" data-go="hall">복도로</button>
     <h2 id="clubTitle" class="ph"><span>동아리실</span></h2>
-    <div class="club-head" id="clubHead"><div class="club-head-tx"><b>동아리</b><small>맞는 능력치 별 하나마다 2%, 최대 30%</small></div></div>
+    <div class="club-head" id="clubHead"><div class="club-head-tx"><b>동아리</b><small>부원의 맞는 능력치 별 하나마다 동아리 효과 +2%, 최대 +30%</small></div></div>
     <div id="cgBox"></div><!-- 2.2.0 동아리 대항전 -->
     <div class="club-tools"><span id="clubShowNote"></span><button class="btn-sub small" id="clubAutoBtn" type="button">자동 추천</button></div>
     <div id="clubBody"></div>
@@ -4449,20 +4452,20 @@ body.cam-scene #ffChip,body.cam-scene #plChip,body.cam-scene .b-ring{animation-p
         <button class="srow" type="button" id="optAdPrivacy" hidden><span class="txt"><b>광고 개인정보 설정</b></span></button>
         <button class="srow" type="button" id="optTut"><span class="txt"><b>튜토리얼</b><small id="tutSub">학교를 꾸려 가는 방법을 다시 봐요</small></span><svg viewBox="0 0 24 24" width="20" height="20" aria-hidden="true"><path d="M9 6l6 6-6 6" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"/></svg></button>
         <div class="srow" id="bakRow"><span class="txt"><b>예전 학교 되돌리기</b><small>바뀌거나 덮이기 전 학교를 3개까지 남겨 둬요</small></span><button class="btn-sub" type="button" id="optBak">보기</button></div><!-- 2.2.0 -->
-        <div class="srow" id="resetRow"><span class="txt"><b>처음부터 다시</b><small>수료증과 전학 온 친구들까지 모두 지워요</small></span><button class="btn-danger" type="button" id="optReset">초기화</button></div>
+        <div class="srow" id="resetRow"><span class="txt"><b>처음부터 다시</b><small>수료증과 전학 온 친구들까지 모두 지워요</small></span><button class="btn-danger" type="button" id="optReset">다시 시작</button></div>
         <div class="srow" id="delRow" hidden><span class="txt"><b>계정과 서버 기록 지우기</b><small>서버에 저장된 학교, 예전 학교, 랭킹, 공개한 학교 모습, 구글 계정 연결을 모두 지워요</small></span><button class="btn-danger" type="button" id="optDel">지우기</button></div>
         <div class="confirm" id="delConfirm" hidden>
           <p>서버의 학교 기록과 랭킹, 계정을 지울까요? 이 기기의 학교도 함께 지워지고 되돌릴 수 없어요.</p>
           <div class="btn-row"><button class="btn-sub" type="button" id="delNo">취소</button><button class="btn-danger solid" type="button" id="delYes">모두 지우기</button></div>
         </div>
         <div class="confirm" id="resetConfirm" hidden>
-          <p>저장된 학교를 지울까요? 되돌릴 수 없어요.</p>
-          <div class="btn-row"><button class="btn-sub" type="button" id="resetNo">취소</button><button class="btn-danger solid" type="button" id="resetYes">지우기</button></div>
+          <p>이 학교를 지우고 유치원부터 다시 시작할까요? 지금 학교는 '예전 학교 되돌리기'에 남겨 둬요.</p>
+          <div class="btn-row"><button class="btn-sub" type="button" id="resetNo">취소</button><button class="btn-danger solid" type="button" id="resetYes">처음부터 다시</button></div>
         </div>
       </div>
       <h3 class="panel-sub">정보</h3>
       <dl class="info">
-        <div id="verRow"><dt>버전</dt><dd>v5.0.1.4</dd></div>
+        <div id="verRow"><dt>버전</dt><dd>v5.0.1.5</dd></div>
         <div id="pidRow" hidden><dt>학교 번호</dt><dd id="infoPid"></dd></div>
       </dl>
       <div id="devBox" hidden>
@@ -4563,7 +4566,7 @@ body.cam-scene #ffChip,body.cam-scene #plChip,body.cam-scene .b-ring{animation-p
       <button class="ff-btn wide" type="button" id="conFree" hidden><span class="z" aria-hidden="true">⚡</span><span id="conFreeTx">즉시 완공 (오늘 3번 남음)</span><span class="n" aria-hidden="true">1</span></button>
       <div class="con-row"><button class="cta" type="button" id="conAll" aria-disabled="false"><span id="conAllLbl">단축권 자동 사용</span></button><button class="cta ghost" type="button" id="conNo" hidden>그만두기</button></div>
       <p class="con-plan" id="conPlan"></p>
-      <button class="con-ess" type="button" id="conEss"><span>숲의 정수로 즉시 완료</span><span class="p" id="conEssCost"></span></button>
+      <button class="con-ess" type="button" id="conEss"><span>숲의 정수로 즉시 완공</span><span class="p" id="conEssCost"></span></button>
       <div class="con-tks" id="conTks" role="group" aria-label="골라서 쓰기"></div>
       <button class="con-ad" type="button" id="conAd">광고 보고 5분권 받기</button>
       <div class="con-cb" id="conCb" hidden></div><!-- 2.1.1 건설 가속(도토리) -->
@@ -4584,7 +4587,7 @@ body.cam-scene #ffChip,body.cam-scene #plChip,body.cam-scene .b-ring{animation-p
   <div class="bt-pick" id="btPickPane">
     <div class="bt-rows" id="btRows"></div>
     <div class="bt-listw"><div class="bt-list-hd"><span id="btListHd"></span><button class="btn-sub small" type="button" id="btAuto">자동 배치</button></div><div class="bt-list" id="btList"></div></div>
-    <button class="cta bt-go" type="button" id="btGo">대결 시작!</button>
+    <p class="fine bt-rule" id="btRule">별이 많은 학생이 유리해요. 세 종목 가운데 둘을 이기면 승리예요</p><button class="cta bt-go" type="button" id="btGo">대결 시작!</button>
   </div>
   <div class="bt-play" id="btPlay" hidden>
     <div class="bt-play-ev" id="btPlayEv"></div>
@@ -4601,7 +4604,7 @@ body.cam-scene #ffChip,body.cam-scene #plChip,body.cam-scene .b-ring{animation-p
     <button class="pz-x" type="button" id="mgBack" aria-label="공부 탭으로 돌아가기"><svg viewBox="0 0 24 24" width="20" height="20" aria-hidden="true"><path d="M15 5l-7 7 7 7" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"/></svg></button>
     <div class="mg-stat" id="mgEnergy" aria-live="polite"><span class="mg-ic" data-mg="mg_ic_energy">⚡</span><b id="mgE">100</b><small id="mgEMax">/100</small><small id="mgETimer"></small></div>
     <div class="mg-seg mg-muls" id="mgMuls" role="group" aria-label="에너지 배수" hidden></div><!-- 3.0.0 woodani 요청: 위 칸을 두 줄로. 배수와 방식은 나란히 두고 바로 골라요 -->
-    <div class="mg-stat" id="mgPieces" title="장식 조각"><span class="mg-ic" data-mg="mg_ic_piece">💎</span><b id="mgPc">0</b></div>
+    <div class="mg-stat" id="mgPieces" title="장식 조각" role="button" tabindex="0"><span class="mg-ic" data-mg="mg_ic_piece">💎</span><b id="mgPc">0</b></div>
     <div class="mg-stat" id="mgUps" title="생산기 강화 조각" role="button" tabindex="0"><span class="mg-ic" data-mg="mg_ic_up">🔑</span><b id="mgUp">0</b></div>
     <button class="mg-ad" type="button" id="mgAdBtn" aria-label="광고 보고 에너지 50 받기">▷ ⚡ +50</button>
     <div class="mg-seg mg-modes" id="mgModes" role="group" aria-label="만드는 방식" hidden></div>
@@ -4616,7 +4619,7 @@ body.cam-scene #ffChip,body.cam-scene #plChip,body.cam-scene .b-ring{animation-p
   <div class="pz-sheet" id="mgHelp" hidden>
     <h3>숲속 합치기</h3>
     <div class="mg-help">
-      <div class="mh"><span class="mh-pic" data-mg="mg_help_1">👆</span><span><b>1. 생산기를 눌러요</b>에너지 1을 쓰고 조각이 하나 나와요. 에너지는 1분에 1씩 차요. 높은 단계를 만들면 에너지 옆 ×2 단추로 한 번에 여러 개</span></div>
+      <div class="mh"><span class="mh-pic" data-mg="mg_help_1">👆</span><span><b>1. 생산기를 눌러요</b>에너지 1을 쓰고 조각이 하나 나와요. 에너지는 1분에 1씩 차요</span></div>
       <div class="mh"><span class="mh-pic" data-mg="mg_help_2">🌰🌰</span><span><b>2. 같은 조각 둘을 겹쳐요</b>끌어다 놓으면 다음 단계가 돼요. 종류마다 10단계까지</span></div>
       <div class="mh"><span class="mh-pic" data-mg="mg_help_3">📜</span><span><b>3. 학생 주문을 채워요</b>위쪽 주문 쪽지를 누르면 도토리와 장식 조각, 큰 주문은 강화 조각도 받아요</span></div>
     </div>
@@ -4671,14 +4674,14 @@ body.cam-scene #ffChip,body.cam-scene #plChip,body.cam-scene .b-ring{animation-p
     </div>
   </div>
   <div class="pz-tray" id="pzTray" aria-label="놓을 조각"></div>
-  <p class="pz-teatip" id="pzTeaTip">선생님 블록이 든 줄을 지우면 도움을 받아요.<br>다람쥐는 3×3 폭탄, 부엉이는 조각 3개 바꾸기, 곰은 조각 돌리기</p>
+  <p class="pz-teatip" id="pzTeaTip">선생님 블록이 든 줄을 지우면 아래 도움을 받아요.</p>
   <div class="pz-foot">
     <div class="pz-helps" id="pzHelps" aria-label="선생님 도움">
       <button class="pz-tea" type="button" data-help="squirrel" aria-label="다람쥐 선생님 도움: 고른 칸에 폭탄을 떨어뜨려 3×3 제거"><span class="pz-teapic" data-tea="tea_squirrel"></span><small class="pz-tead">3×3 폭탄</small><b class="pz-tean">0</b></button>
       <button class="pz-tea" type="button" data-help="owl" aria-label="부엉이 선생님 도움: 조각 3개 새로 바꾸기"><span class="pz-teapic" data-tea="tea_owl"></span><small class="pz-tead">조각 바꾸기</small><b class="pz-tean">0</b></button>
       <button class="pz-tea" type="button" data-help="bear" aria-label="곰 선생님 도움: 고른 조각 돌리기"><span class="pz-teapic" data-tea="tea_bear"></span><small class="pz-tead">조각 돌리기</small><b class="pz-tean">0</b></button>
     </div>
-    <button class="pz-quit" type="button" id="pzQuit">나가기</button>
+    <button class="pz-quit" type="button" id="pzQuit">그만하기</button>
   </div>
   <p class="pz-hint" id="pzHint" hidden></p>
   <div class="pz-sheet" id="pzQuitAsk" hidden>
@@ -4690,7 +4693,7 @@ body.cam-scene #ffChip,body.cam-scene #plChip,body.cam-scene .b-ring{animation-p
   <!-- 1.7.2 부스터: 보상 판을 새로 시작할 때 도토리로 사서 들고 시작해요. 그 판 한 번만 -->
   <div class="pz-sheet pz-boost" id="pzBoost" hidden>
     <h3>부스터를 들고 시작할까요?</h3>
-    <p>도토리로 사요. 이번 판에만 써요</p>
+    <p>숲의 정수로 사요. 이번 판에만 써요</p><p class="fine" id="pzBoostRw"></p>
     <div class="pzb-list" id="pzbList"></div>
     <div class="btn-row"><button class="btn-sub" type="button" id="pzbSkip">그냥 시작</button><button class="cta" type="button" id="pzbGo">시작하기</button></div>
   </div>
@@ -4749,7 +4752,7 @@ body.cam-scene #ffChip,body.cam-scene #plChip,body.cam-scene .b-ring{animation-p
   <section class="modal" role="alertdialog" aria-modal="true" aria-labelledby="exitTitle" aria-describedby="exitText">
     <h2 id="exitTitle">학교 문을 닫을까요?</h2>
     <p id="exitText">진행은 저장돼요. 다시 오면 자리 비운 동안 모은 도토리를 받을 수 있어요.</p>
-    <div class="btn-row"><button class="btn-sub" type="button" id="exitNo" data-cm="mExit" data-autofocus>계속 하기</button><button class="cta" type="button" id="exitYes">닫기</button></div>
+    <div class="btn-row"><button class="btn-sub" type="button" id="exitYes">나가기</button><button class="cta" type="button" id="exitNo" data-cm="mExit" data-autofocus>계속 하기</button></div>
   </section>
 </div>
 
@@ -4778,7 +4781,7 @@ body.cam-scene #ffChip,body.cam-scene #plChip,body.cam-scene .b-ring{animation-p
 <div class="overlay center" id="mTrip" hidden>
   <div class="backdrop" data-close-trip data-cm="mTrip"></div>
   <section class="modal wide trip-modal" role="dialog" aria-modal="true" aria-labelledby="tripTitle">
-    <h2 id="tripTitle">현장체험학습</h2>
+    <h2 id="tripTitle">체험학습</h2>
     <div id="tripBody"></div>
     <button class="btn-sub tr-close" type="button" id="tripClose" data-cm="mTrip">닫기</button>
   </section>
@@ -4799,7 +4802,7 @@ body.cam-scene #ffChip,body.cam-scene #plChip,body.cam-scene .b-ring{animation-p
     <div class="tut-head"><span class="tut-av" id="tutAv"></span><span class="tut-step" id="tutStep"></span></div>
     <b class="tut-t" id="tutTitle"></b>
     <p class="tut-d" id="tutText"></p>
-    <div class="tut-btns"><button class="btn-link" type="button" id="tutSkip">건너뛰기</button><button class="btn-link" type="button" id="tutLater">나중에</button><button class="cta small" type="button" id="tutNext">다음</button></div>
+    <div class="tut-btns"><button class="btn-link" type="button" id="tutSkip">건너뛰기 (보상 없음)</button><button class="btn-link" type="button" id="tutLater">나중에</button><button class="cta small" type="button" id="tutNext">다음</button></div>
   </div>
 </div>
 
@@ -4831,7 +4834,7 @@ body.cam-scene #ffChip,body.cam-scene #plChip,body.cam-scene .b-ring{animation-p
   <div class="backdrop" data-close-att data-cm="mAtt"></div>
   <section class="modal" role="dialog" aria-modal="true" aria-labelledby="attTitle">
     <h2 id="attTitle">출석부</h2>
-    <p>날마다 황금 도토리 1개, 7일째에는 수료증 3장을 줘요.</p>
+    <p>날마다 칸의 보상과 황금 도토리 1개를 받아요. 수료증은 졸업의 명예 교장실에서 써요.</p>
     <div class="att-grid" id="attGrid"></div>
     <div class="btn-row"><button class="btn-sub" type="button" id="attNo" data-cm="mAtt">닫기</button><button class="cta" type="button" id="attGo">오늘 도장 받기</button></div>
     <p class="fine" id="attTotal" style="margin:12px 0 0"></p>
@@ -5142,7 +5145,7 @@ body.cam-scene #ffChip,body.cam-scene #plChip,body.cam-scene .b-ring{animation-p
 <div class="overlay center" id="mRx" hidden>
   <div class="backdrop"></div>
   <section class="modal lab-modal dp-modal" role="dialog" aria-modal="true" aria-labelledby="rxTitle">
-    <div class="dp-head"><b id="rxTitle">연구소</b></div>
+    <div class="dp-head"><b id="rxTitle">연구 투자와 연구 트리</b></div>
     <div class="seg rank-seg" id="rxSeg" role="radiogroup" aria-label="연구 투자와 연구 트리"><button type="button" role="radio" data-rseg="inv" aria-checked="true">연구 투자</button><button type="button" role="radio" data-rseg="tree" aria-checked="false">연구 트리</button></div>
     <div id="rxBody"></div>
     <div class="btn-row"><button class="btn-sub" type="button" id="rxClose" data-cm="mRx">닫기</button></div>
@@ -5184,7 +5187,7 @@ body.cam-scene #ffChip,body.cam-scene #plChip,body.cam-scene .b-ring{animation-p
     <h2 id="tmRepT">탐험 보고서</h2>
     <p class="fine" id="tmRepSub"></p>
     <ul class="tm-rep" id="tmRepList"></ul>
-    <div class="btn-row"><button class="btn-sub" type="button" id="tmRepAd">📺 광고 보고 두 배</button><button class="cta" type="button" id="tmRepOk" data-autofocus>받기</button></div>
+    <div class="btn-row"><button class="btn-sub" type="button" id="tmRepAd">광고 보고 +100%</button><button class="cta" type="button" id="tmRepOk" data-autofocus>받기</button></div>
   </section>
 </div>
 <div class="overlay center" id="mSt" hidden>
@@ -5247,7 +5250,7 @@ body.cam-scene #ffChip,body.cam-scene #plChip,body.cam-scene .b-ring{animation-p
     <p>랭킹에 오를 수 있어요! 이름과 학교 파워가 다른 교장 선생님들에게 보여요. 처음 한 번은 무료예요.</p>
     <form class="rank-form nick-form" id="nickForm"><input id="nickName" maxlength="10" autocomplete="off" enterkeyhint="done" placeholder="예: 졸린 다람쥐" aria-label="교장 선생님 이름"><button class="dice" type="button" id="nickDice" aria-label="다른 이름 추천받기"><svg viewBox="0 0 24 24" aria-hidden="true"><rect x="3.5" y="3.5" width="17" height="17" rx="4" fill="none" stroke="currentColor" stroke-width="2"/><circle cx="8.5" cy="8.5" r="1.6" fill="currentColor"/><circle cx="15.5" cy="15.5" r="1.6" fill="currentColor"/><circle cx="12" cy="12" r="1.6" fill="currentColor"/><circle cx="15.5" cy="8.5" r="1.6" fill="currentColor"/><circle cx="8.5" cy="15.5" r="1.6" fill="currentColor"/></svg></button></form>
     <button class="cta" type="submit" form="nickForm" id="nickOk">이 이름으로 정하기</button>
-    <p class="fine">주사위를 누르면 다른 이름이 나와요. 나중에 랭킹 탭에서 바꿀 수 있어요.</p>
+    <p class="fine">주사위를 누르면 다른 이름이 나와요. 나중에 지도 오른쪽 랭킹에서 바꿀 수 있어요.</p>
   </section>
 </div>
 
@@ -5257,7 +5260,7 @@ body.cam-scene #ffChip,body.cam-scene #plChip,body.cam-scene .b-ring{animation-p
     <h2 id="acctAskTitle">이 구글 계정에 학교가 있어요</h2>
     <div class="move-from"><b id="acctFrom"></b><span id="acctInfo"></span></div>
     <p>어느 학교로 이어 할까요? 고르지 않은 학교는 설정 &gt; 예전 학교 되돌리기에 남아요.</p>
-    <div class="btn-row"><button class="btn-sub" type="button" id="acctKeep">이 폰 학교</button><button class="cta" type="button" id="acctLoad">계정 학교</button></div>
+    <div class="btn-row"><button class="btn-sub" type="button" id="acctKeep">이 기기 학교</button><button class="cta" type="button" id="acctLoad">계정 학교</button></div>
   </section>
 </div>
 
@@ -5287,12 +5290,12 @@ body.cam-scene #ffChip,body.cam-scene #plChip,body.cam-scene .b-ring{animation-p
 <div class="overlay center" id="mCes" hidden>
   <div class="backdrop"></div>
   <section class="modal" role="dialog" aria-modal="true" aria-labelledby="cesTitle">
-    <h2 id="cesTitle">숲의 정수로 즉시 완료할까요?</h2>
+    <h2 id="cesTitle">숲의 정수로 즉시 완공할까요?</h2>
     <p class="fine" id="cesText"></p>
     <div class="ces-cost" id="cesCost"></div>
     <p class="fine" id="cesHave" style="margin:0"></p>
     <button class="chk" type="button" id="cesQuiet" role="checkbox" aria-checked="false"><i aria-hidden="true"></i>오늘은 다시 묻지 않기</button>
-    <div class="btn-row"><button class="btn-sub" type="button" id="cesNo" data-cm="mCes">취소</button><button class="cta" type="button" id="cesGo">즉시 완료</button></div>
+    <div class="btn-row"><button class="btn-sub" type="button" id="cesNo" data-cm="mCes">취소</button><button class="cta" type="button" id="cesGo">즉시 완공</button></div>
   </section>
 </div>
 <div class="overlay center" id="mBak" hidden>
@@ -7870,8 +7873,8 @@ body.cam-scene #ffChip,body.cam-scene #plChip,body.cam-scene .b-ring{animation-p
     // 6장: 초등학교 1학년. 도토리 보상은 rm(수업료 몇 분치)으로 정해서 학교급이 올라도 알맞은 크기가 돼요
     { id: 'e1', ch: 5, t: 'fperks', n: 1, r: 3, rk: 'dip', title: '장학재단 고치기', how: '졸업하며 받은 기금으로 장학재단을 고쳐요',
       say: '유치원 졸업식 날 마을에서 기금을 모아 줬어요. 먼지 쌓인 장학재단 문을 다시 열 때예요.' },
-    { id: 'al1', ch: 5, t: 'albOpen', n: 1, rm: 10, title: '졸업 앨범 펼쳐 보기', how: '졸업 탭에서 졸업 앨범을 열어요',
-      say: '유치원 졸업 사진이 앨범에 들어갔어요. 솜이 귀가 사진 밖으로 나갔네요. 졸업 탭에서 펼쳐 보세요.' },   // 2.1.1
+    { id: 'al1', ch: 5, t: 'albOpen', n: 1, rm: 10, title: '졸업 앨범 펼쳐 보기', how: '위쪽 졸업 단추에서 졸업 앨범을 열어요',
+      say: '유치원 졸업 사진이 앨범에 들어갔어요. 솜이 귀가 사진 밖으로 나갔네요. 위쪽 졸업 단추에서 펼쳐 보세요.' },   // 2.1.1
     { id: 'e2', ch: 5, t: 'fac', k: 'science', n: 1, rm: 10, title: '과학실 짓기', how: '과학실은 수료증과 평판을 올려 줘요',
       say: '부엉이 선생님이 그러세요. "나무패를 제대로 들여다보려면 과학실이 있어야 하오." 오른쪽 위 공사 자리예요.' },
     { id: 'el1', ch: 5, t: 'elects', n: 1, rm: 10, title: '첫 반장 뽑기', how: '교실을 눌러 반장 선거에서 후보 한 명을 뽑아요',
@@ -7892,7 +7895,7 @@ body.cam-scene #ffChip,body.cam-scene #plChip,body.cam-scene .b-ring{animation-p
       say: '과학실 아이들이 발표회를 열고 싶대요. 주제는 \'참나무는 왜 우리가 떠들 때 흔들릴까\'예요.' },
     { id: 'e8', ch: 5, t: 'students', n: 60, rm: 3, title: '학생 60명 맞이하기', how: '교실을 Lv.14까지 넓히고 학생을 60명까지 모집해요',
       say: '한 반에 친구가 많아졌어요. 솜이가 이름을 다 외우겠다고 출석부를 들고 다녀요.' },
-    { id: 'sb1', ch: 5, sy: 1, t: 'semH', n: 1, r: 3, rk: 'dip', title: '1학년 1학기 방학식', how: '대도시 학교가 되면 졸업 탭에서 1학기 방학식을 열어요',
+    { id: 'sb1', ch: 5, sy: 1, t: 'semH', n: 1, r: 3, rk: 'dip', title: '1학년 1학기 방학식', how: '대도시 학교가 되면 위쪽 졸업 단추에서 1학기 방학식을 열어요',
       say: '첫 방학이에요. 솜이가 "방학에도 학교 와도 돼요?" 하고 물어요. 방학식을 열어 주세요.' },   // 2.1.0 학기 나누기
     { id: 'e9', ch: 5, t: 'picks', n: 20, rm: 3, title: '참나무 도토리 줍기', how: '참나무를 눌러 떨어진 도토리를 20개 주워요',
       say: '방학 동안 참나무가 혼자 심심했나 봐요. 아이들이 돌아오자 도토리를 쏟아 내요.' },
@@ -7928,7 +7931,7 @@ body.cam-scene #ffChip,body.cam-scene #plChip,body.cam-scene .b-ring{animation-p
       say: '2학년은 강낭콩 관찰 일기를 써요. 솜이 강낭콩이 제일 먼저 싹을 냈어요.' },
     { id: 'e41', ch: 6, t: 'fest', k: 'welcome', n: 1, rm: 3, title: '환영회 열기', how: '학교 행사 > 새 친구 환영회',
       say: '새 친구들을 위한 환영회예요. 솜이가 사회를 보겠대요. 떨린다면서도요.' },
-    { id: 'sb2', ch: 6, sy: 2, t: 'semH', n: 2, r: 3, rk: 'dip', title: '2학년 1학기 방학식', how: '대도시 학교가 되면 졸업 탭에서 1학기 방학식을 열어요',
+    { id: 'sb2', ch: 6, sy: 2, t: 'semH', n: 2, r: 3, rk: 'dip', title: '2학년 1학기 방학식', how: '대도시 학교가 되면 위쪽 졸업 단추에서 1학기 방학식을 열어요',
       say: '새 친구들이 맞는 첫 방학이에요. 방학식 날엔 이제 아무도 안 울어요.' },   // 2.1.0 학기 나누기
     { id: 'e46', ch: 6, t: 'tea', k: 'squirrel', n: 15, rm: 3, title: '다람쥐 선생님 Lv.15', how: '선생님 탭에서 다람쥐 선생님을 연수 보내요',
       say: '2학년은 구구단을 배워요. 다람쥐 선생님이 "이번엔 도토리로 가르쳐 볼게요" 하세요.' },
@@ -7955,7 +7958,7 @@ body.cam-scene #ffChip,body.cam-scene #plChip,body.cam-scene .b-ring{animation-p
       say: '아이들이 보고서를 썼어요. 솜이 보고서 제목은 \'돌탑 맨 아래 돌\'이에요. 도서관에 꽂을 자리를 만들어요.' },
     { id: 'e14', ch: 7, t: 'fac', k: 'science', n: 18, rm: 4, title: '과학실 Lv.18', how: '과학실을 Lv.18까지 키워요',
       say: '시냇가에서 주운 조약돌을 현미경으로 봐요. 부엉이 선생님은 돌탑에서 떨어진 이끼를 보고 계세요.' },
-    { id: 'sb3', ch: 7, sy: 3, t: 'semH', n: 3, r: 4, rk: 'dip', title: '3학년 1학기 방학식', how: '대도시 학교가 되면 졸업 탭에서 1학기 방학식을 열어요',
+    { id: 'sb3', ch: 7, sy: 3, t: 'semH', n: 3, r: 4, rk: 'dip', title: '3학년 1학기 방학식', how: '대도시 학교가 되면 위쪽 졸업 단추에서 1학기 방학식을 열어요',
       say: '방학이에요. 솜이는 방학 숙제로 돌탑 그림을 그리겠대요.' },   // 2.1.0 학기 나누기
     { id: 'e48', ch: 7, t: 'fac', k: 'cafeteria', n: 30, rm: 4, title: '체험학습 도시락', how: '급식실을 Lv.30까지 키워요',
       say: '체험학습 날 도시락은 급식실에서 싸요. 양 선생님 말로는 곰 선생님 것만 세 칸이래요.' },
@@ -7980,7 +7983,7 @@ body.cam-scene #ffChip,body.cam-scene #plChip,body.cam-scene .b-ring{animation-p
       say: '이어달리기를 하려면 운동장이 더 넓어야 해요. 반짝 학원 아이들이 "옥상보다 넓다"며 부러워했어요.' },
     { id: 'e27', ch: 8, t: 'trips', n: 1, rm: 4, title: '체험학습 다녀오기', how: '체험학습을 한 번 다녀와요',   // 4.2.1 woodani: 세 번은 시간만 오래 걸려서 한 번으로
       say: '운동회 연습 사이사이 체험학습도 가요. 멀리 다녀온 아이가 더 잘 돌아오니까요.' },
-    { id: 'sb4', ch: 8, sy: 4, t: 'semH', n: 4, r: 4, rk: 'dip', title: '4학년 1학기 방학식', how: '대도시 학교가 되면 졸업 탭에서 1학기 방학식을 열어요',
+    { id: 'sb4', ch: 8, sy: 4, t: 'semH', n: 4, r: 4, rk: 'dip', title: '4학년 1학기 방학식', how: '대도시 학교가 되면 위쪽 졸업 단추에서 1학기 방학식을 열어요',
       say: '방학식이에요. 반짝 학원은 방학이 없대요. 솜이가 그 말을 듣고 한참 조용했어요.' },   // 2.1.0 학기 나누기
     { id: 'e50', ch: 8, t: 'tea', k: 'bear', n: 20, rm: 4, title: '곰 선생님 Lv.20', how: '선생님 탭에서 곰 선생님을 연수 보내요',
       say: '운동회 심판은 곰 선생님이에요. 호루라기가 작아서 새 걸 사 드려야겠어요.' },
@@ -8007,7 +8010,7 @@ body.cam-scene #ffChip,body.cam-scene #plChip,body.cam-scene .b-ring{animation-p
       say: '학예회 날엔 부모님도 오세요. 양 선생님이 "떡은 넉넉히"라고 세 번 말씀하셨어요.' },
     { id: 'e42', ch: 9, t: 'fest', k: 'show', n: 1, rm: 4, title: '학예회 열기', how: '학교 행사 > 학예회',
       say: '막이 올라요! 솜이는 올해 나무 역이에요. 대사는 없지만 제일 앞줄이에요. 음표를 눌러 박수를 보내 줘요.' },
-    { id: 'sb5', ch: 9, sy: 5, t: 'semH', n: 5, r: 5, rk: 'dip', title: '5학년 1학기 방학식', how: '대도시 학교가 되면 졸업 탭에서 1학기 방학식을 열어요',
+    { id: 'sb5', ch: 9, sy: 5, t: 'semH', n: 5, r: 5, rk: 'dip', title: '5학년 1학기 방학식', how: '대도시 학교가 되면 위쪽 졸업 단추에서 1학기 방학식을 열어요',
       say: '학예회 연습으로 한 학기가 금방 갔어요. 방학식을 열어 주세요.' },   // 2.1.0 학기 나누기
     { id: 'e52', ch: 9, t: 'students', n: 130, rm: 4, title: '학생 130명 맞이하기', how: '교실을 Lv.31까지 넓히고 학생을 130명까지 모집해요',
       say: '학예회를 보러 왔던 아이들이 입학하고 싶대요. 그중 몇은 번쩍이는 가방을 멨어요.' },
@@ -8038,7 +8041,7 @@ body.cam-scene #ffChip,body.cam-scene #plChip,body.cam-scene .b-ring{animation-p
       say: '졸업 여행 날이에요. 부엉이 선생님이 이렇게 신나신 건 처음 봐요. 밤 버스가 출발해요.' },
     { id: 'e43', ch: 10, t: 'fest', k: 'photo', n: 1, rm: 5, title: '졸업 사진 찍기', how: '학교 행사 > 졸업 사진 찍기',
       say: '단체 사진을 찍어요. 솜이는 맨 앞줄 가운데예요. 귀는 올해도 사진 밖으로 나갈 것 같아요.' },
-    { id: 'sb6', ch: 10, sy: 6, t: 'semH', n: 6, r: 8, rk: 'dip', title: '6학년 1학기 방학식', how: '대도시 학교가 되면 졸업 탭에서 1학기 방학식을 열어요',
+    { id: 'sb6', ch: 10, sy: 6, t: 'semH', n: 6, r: 8, rk: 'dip', title: '6학년 1학기 방학식', how: '대도시 학교가 되면 위쪽 졸업 단추에서 1학기 방학식을 열어요',
       say: '초등학교 마지막 여름 방학이에요. 솜이가 방학식 날 교문 기둥을 한참 쓰다듬었어요.' },   // 2.1.0 학기 나누기
     { id: 'e54', ch: 10, t: 'tea', k: 'squirrel', n: 25, rm: 5, title: '다람쥐 선생님 Lv.25', how: '선생님 탭에서 다람쥐 선생님을 연수 보내요',
       say: '다람쥐 선생님이 중학교 수학을 미리 가르쳐 주고 싶대요. 도토리로는 이제 모자란대요.' },
@@ -8052,14 +8055,14 @@ body.cam-scene #ffChip,body.cam-scene #plChip,body.cam-scene .b-ring{animation-p
       say: '마지막 학기 숙제예요. 맨 끝 줄은 \'후배에게 편지 쓰기\'예요.' },   // 2.1.0 학기 숙제(속도와 경제 재설계안 2-2)
     { id: 'e38', ch: 10, t: 'ygrade', n: 4, r: 15, rk: 'dip', title: '6학년 대도시 되기', how: '평판을 모아서 대도시가 되어요',
       say: '초등학교 마지막 해예요. 대도시 학교가 되면 졸업 준비가 끝나요.' },
-    { id: 'e39', ch: 10, t: 'tier', n: 2, r: 20, rk: 'dip', title: '초등학교 졸업식', how: '졸업 탭에서 졸업식을 열고 중학교에 입학해요',
+    { id: 'e39', ch: 10, t: 'tier', n: 2, r: 20, rk: 'dip', title: '초등학교 졸업식', how: '위쪽 졸업 단추에서 졸업식을 열고 중학교에 입학해요',
       say: '6학년들이 의젓해졌어요. 솜이가 졸업식 답사를 맡았는데, 종이를 열 번째 고쳐 쓰고 있어요. 졸업식을 열어 주세요.' },
 
     // 12장~15장 (2.0.0): 숲속 중학교. 입학 장 + 1, 2, 3학년. 목표 숫자는 균형 제안서(2.0.0)의 자동 플레이로 정해요. yt: 2는 중학교 학년 장이라는 뜻
     { id: 'j1', ch: 11, t: 'tier', n: 2, rm: 10, title: '중학교 입학식', how: '숲속 중학교에 입학했어요. 받기를 눌러요',
       say: '숲속 중학교 입학을 축하해요! 솜이 교복 소매가 벌써 짧아요. 중학교는 살림이 훨씬 커요. 마음 단단히 먹어요.' },
-    { id: 'j29', ch: 11, t: 'fpUp', n: 1, rm: 10, title: '장학재단 고치기', how: '졸업 탭 > 장학재단에서 기금을 써요',
-      say: '초등학교 졸업식 날 마을에서 또 기금을 모아 줬어요. 봉투에 "문 닫지 마세요"라고 적혀 있었어요. 졸업 탭의 장학재단이에요.' },
+    { id: 'j29', ch: 11, t: 'fpUp', n: 1, rm: 10, title: '장학재단 고치기', how: '위쪽 졸업 단추 > 장학재단에서 기금을 써요',
+      say: '초등학교 졸업식 날 마을에서 또 기금을 모아 줬어요. 봉투에 "문 닫지 마세요"라고 적혀 있었어요. 위쪽 졸업 단추의 장학재단이에요.' },
     { id: 'j2', ch: 11, t: 'fac', k: 'store', n: 1, rm: 10, title: '매점 짓기', how: '지도 가운데 아래 공사 자리를 눌러요',
       say: '중학생은 쉬는 시간에 배가 고파요. 저도 그랬어요. 아니, 그랬다고 들었어요. 매점을 지어요.' },
     { id: 'j3', ch: 11, t: 'furAll', k: 'store', n: 1, rm: 10, title: '매점 가구 갖추기', how: '매점을 눌러서 가구를 모두 올려요',
@@ -8085,7 +8088,7 @@ body.cam-scene #ffChip,body.cam-scene #plChip,body.cam-scene .b-ring{animation-p
       say: '중학교에서는 명부 학생들이 직접 대결에 나가요. 동아리에서 키운 학생을 세워 한 번 이겨 봐요.' },
     { id: 'sa4', ch: 12, t: 'clubMat', n: 1, rm: 4, title: '수학부 꾸리기', how: '동아리실에서 수학 별이 많은 친구를 수학부에 넣어요',
       say: '다람쥐 선생님이 수학부를 만드셨어요. 첫 문제가 "사진 속 꼬마는 지금 몇 살일까"라는데, 선생님까지 왜 그러세요.' },
-    { id: 'sj1', ch: 12, sy: 1, yt: 2, t: 'semH', n: 1, r: 3, rk: 'dip', title: '중학교 1학년 1학기 방학식', how: '대도시 학교가 되면 졸업 탭에서 1학기 방학식을 열어요',
+    { id: 'sj1', ch: 12, sy: 1, yt: 2, t: 'semH', n: 1, r: 3, rk: 'dip', title: '중학교 1학년 1학기 방학식', how: '대도시 학교가 되면 위쪽 졸업 단추에서 1학기 방학식을 열어요',
       say: '방학식이에요. 독서부는 방학에도 도서관에 나오겠대요. 옛 신문을 다 읽겠다고요.' },   // 2.1.0 학기 나누기
     { id: 'j8', ch: 12, t: 'fac', k: 'science', n: 8, rm: 4, title: '과학실 키우기', how: '과학실을 Lv.8까지 키워요',
       say: '과학부가 옛 사진 종이를 현미경으로 보고 싶대요. 몇 해 된 사진인지 알아낸다나요. 과학실을 키워 주세요.' },
@@ -8118,7 +8121,7 @@ body.cam-scene #ffChip,body.cam-scene #plChip,body.cam-scene .b-ring{animation-p
       say: '체육대회 예선전이에요. 운동회를 열어서 청팀을 응원해 줘요. 달릴 아이가 많다는 게 이렇게 좋은 일이에요.' },
     { id: 'sn2', ch: 13, t: 'snDex', n: 10, rm: 4, title: '간식 도감 10종', how: '매점 간식 뽑기에서 간식 10종을 모아요. 도토리를 모으는 동안 다른 시설 추천을 쉬어요',
       say: '매점 간식 이야기로 학교가 들썩여요. 제가 다닐 때는 매점이 없어서 도토리를 구워 먹었어요. 간식 10종을 모아 봐요.' },   // 2.1.2 매점 간식 뽑기
-    { id: 'sj2', ch: 13, sy: 2, yt: 2, t: 'semH', n: 2, r: 4, rk: 'dip', title: '중학교 2학년 1학기 방학식', how: '대도시 학교가 되면 졸업 탭에서 1학기 방학식을 열어요',
+    { id: 'sj2', ch: 13, sy: 2, yt: 2, t: 'semH', n: 2, r: 4, rk: 'dip', title: '중학교 2학년 1학기 방학식', how: '대도시 학교가 되면 위쪽 졸업 단추에서 1학기 방학식을 열어요',
       say: '방학식이에요. 저는 방학에도 종을 쳐요. 이제는 같이 치겠다는 아이들이 줄을 서요.' },   // 2.1.0 학기 나누기
     { id: 'j19', ch: 13, t: 'star', n: 4, rm: 4, title: '능력치 별 4개 학생', how: '동아리 건물을 키우고 발표회를 열면 능력치가 올라요',
       say: '동아리 아이들이 쑥쑥 자라요. 여우는 달리기에서 곰 선생님을 따라잡을 뻔했대요. 뻔했대요.' },
@@ -8139,7 +8142,7 @@ body.cam-scene #ffChip,body.cam-scene #plChip,body.cam-scene .b-ring{animation-p
       say: '3학년은 졸업 문집을 만들어요. 솜이 글 제목은 \'종 줄\'이에요. 도서관에 문집 꽂을 자리를 만들어 주세요.' },
     { id: 'j25', ch: 14, t: 'clubShown', n: 2, rm: 5, title: '동아리 두 곳 발표회', how: '서로 다른 동아리 두 곳이 무대에 올라요',
       say: '졸업 전에 여러 동아리가 무대에 서 봐요. 장학사님이 맨 뒷줄에서 수첩에 뭘 적으시는데, 박수도 치셨어요.' },
-    { id: 'sj3', ch: 14, sy: 3, yt: 2, t: 'semH', n: 3, r: 8, rk: 'dip', title: '중학교 3학년 1학기 방학식', how: '대도시 학교가 되면 졸업 탭에서 1학기 방학식을 열어요',
+    { id: 'sj3', ch: 14, sy: 3, yt: 2, t: 'semH', n: 3, r: 8, rk: 'dip', title: '중학교 3학년 1학기 방학식', how: '대도시 학교가 되면 위쪽 졸업 단추에서 1학기 방학식을 열어요',
       say: '방학식이에요. 장학사님이 "방학 중에도 심사는 이어집니다" 하셨어요. 도시락 싸 오실 핑계 같아요.' },   // 2.1.0 학기 나누기
     { id: 'sa5', ch: 14, t: 'acMax', n: 22, rm: 5, title: '과목 하나 Lv.22', how: '공부 탭에서 공부하고 문제집을 풀어요. 중학교 상한은 Lv.30이에요',
       say: '고등학교에 가기 전에 학력을 다져요. 장학사님이 아이들에게 문제를 내셨는데, 솜이가 되물어서 장학사님이 답을 찾고 계세요.' },
@@ -8152,13 +8155,13 @@ body.cam-scene #ffChip,body.cam-scene #plChip,body.cam-scene .b-ring{animation-p
     { id: 'j28', ch: 14, ye: 3, yt: 2, t: 'ygrade', n: 4, r: 15, rk: 'dip', title: '3학년 대도시 되기', how: '평판을 모아서 대도시가 되어요',
       say: '중학교의 마지막 해예요. 대도시 학교가 되면 졸업 준비가 끝나요. 장학사님 수첩이 거의 다 찼대요.' },
     // 3.0.0 중학교 졸업식: 초등학교 졸업식(e39)처럼 중학교 장을 모두 마쳐야 열려요
-    { id: 'j31', ch: 14, t: 'tier', n: 3, r: 20, rk: 'dip', title: '중학교 졸업식', how: '졸업 탭에서 졸업식을 열고 고등학교에 입학해요',
+    { id: 'j31', ch: 14, t: 'tier', n: 3, r: 20, rk: 'dip', title: '중학교 졸업식', how: '위쪽 졸업 단추에서 졸업식을 열고 고등학교에 입학해요',
       say: '중학교 3년을 마쳤어요. 솜이가 종을 치고 졸업식이 시작돼요. 졸업식을 열어 주세요.' },
     // ===== 3.0.0 고등학교 4장(15~18장, 3.0.0 설계안 2절). 목표 레벨은 중학교와 같은 자리(상한 1~2 아래), 숫자는 균형 제안서(3.0.0)에서 봇으로 다시 재요 =====
     { id: 'hs1', ch: 15, t: 'tier', n: 3, rm: 10, title: '고등학교 입학식', how: '숲속 고등학교에 입학했어요. 받기를 눌러요',
       say: '숲속 고등학교 입학을 축하해요! 솜이는 이제 저보다 키가 커요. 먼 숲에서 오는 아이들이 지낼 기숙사부터 지어 볼까요?' },
-    { id: 'hs2', ch: 15, t: 'fpUp', n: 1, rm: 10, title: '장학재단 고치기', how: '졸업 탭 > 장학재단에서 기금을 써요',
-      say: '중학교 졸업식 날 모인 기금이에요. 봉투 하나에 이름이 없고 번쩍이는 금박만 찍혀 있었어요. 누가 넣었을까요. 졸업 탭의 장학재단이에요.' },
+    { id: 'hs2', ch: 15, t: 'fpUp', n: 1, rm: 10, title: '장학재단 고치기', how: '위쪽 졸업 단추 > 장학재단에서 기금을 써요',
+      say: '중학교 졸업식 날 모인 기금이에요. 봉투 하나에 이름이 없고 번쩍이는 금박만 찍혀 있었어요. 누가 넣었을까요. 위쪽 졸업 단추의 장학재단이에요.' },
     { id: 'hs3', ch: 15, t: 'fac', k: 'dorm', n: 1, rm: 10, title: '기숙사 짓기', how: '지도 오른쪽 아래 공사 자리를 눌러요',
       say: '집이 먼 아이들이 밤길을 걸어 다녀요. 기숙사가 있으면 그럴 일이 없지요. 사감은 오소리 선생님이 맡아 주신대요.' },
     { id: 'hs4', ch: 15, t: 'furAll', k: 'dorm', n: 1, rm: 10, title: '기숙사 가구 갖추기', how: '기숙사를 눌러서 가구를 모두 올려요',
@@ -8185,7 +8188,7 @@ body.cam-scene #ffChip,body.cam-scene #plChip,body.cam-scene .b-ring{animation-p
       say: '코끼리 선생님 상담실이 열렸어요. 첫 손님은 솜이예요. 복도 상담실에서 학생의 고민을 들어 봐요.' },
     { id: 'tr2', ch: 16, t: 'tr2Back', n: 1, rm: 5, title: '수학여행에서 돌아오기', how: '단체 사진을 찍고 학생들이 돌아오면 기념품을 받아요',   // 3.2.0
       say: '수학여행 간 아이들이 돌아와요. 기념품을 하나 더 사 온 아이가 있어요. "창밖 친구 주려고요"래요.' },
-    { id: 'hs12', ch: 16, sy: 1, yt: 3, t: 'semH', n: 1, r: 3, rk: 'dip', title: '고등학교 1학년 1학기 방학식', how: '대도시 학교가 되면 졸업 탭에서 1학기 방학식을 열어요',
+    { id: 'hs12', ch: 16, sy: 1, yt: 3, t: 'semH', n: 1, r: 3, rk: 'dip', title: '고등학교 1학년 1학기 방학식', how: '대도시 학교가 되면 위쪽 졸업 단추에서 1학기 방학식을 열어요',
       say: '방학식이에요. 방학에도 자율학습실 불은 켜 두기로 했어요. 누가 올지 모르니까요.' },
     { id: 'hs13', ch: 16, t: 'fac', k: 'science', n: 8, rm: 4, title: '과학실 키우기', how: '과학실을 Lv.8까지 키워요',
       say: '고등학교 과학은 실험이 커요. 부엉이 선생님이 밤 실험 시간을 따로 만드셨어요. 창문은 열어 두시고요.' },
@@ -8213,7 +8216,7 @@ body.cam-scene #ffChip,body.cam-scene #plChip,body.cam-scene .b-ring{animation-p
       say: '수학여행 기념품을 학교에 놓아 볼까요? 아이들이 가로등 아래에도 하나 놓자고 해요. 누가 보라고요.' },
     { id: 'hs23', ch: 17, t: 'fac', k: 'playground', n: 22, rm: 4, title: '체육대회 운동장', how: '운동장을 Lv.22까지 넓혀요',
       say: '고등학교 체육대회는 규모가 커요. 올해는 맞대결할 학원이 없어서 아이들이 조금 심심해해요.' },
-    { id: 'hs24', ch: 17, sy: 2, yt: 3, t: 'semH', n: 2, r: 4, rk: 'dip', title: '고등학교 2학년 1학기 방학식', how: '대도시 학교가 되면 졸업 탭에서 1학기 방학식을 열어요',
+    { id: 'hs24', ch: 17, sy: 2, yt: 3, t: 'semH', n: 2, r: 4, rk: 'dip', title: '고등학교 2학년 1학기 방학식', how: '대도시 학교가 되면 위쪽 졸업 단추에서 1학기 방학식을 열어요',
       say: '방학식이에요. 가로등 아래 그림자가 오늘은 교문 기둥까지 왔다가 갔어요.' },
     { id: 'hs25', ch: 17, t: 'xt', k: 'dorm', n: 5, rm: 4, title: '사감 선생님 Lv.5', how: '선생님 탭에서 오소리 선생님을 Lv.5까지',
       say: '오소리 선생님이 밤 순찰 때 가로등 아래에 따뜻한 차를 한 잔 놓아두신대요. 아침이면 빈 잔이 있고요.' },
@@ -8229,7 +8232,7 @@ body.cam-scene #ffChip,body.cam-scene #plChip,body.cam-scene .b-ring{animation-p
       say: '3학년이에요. 족제비 원장님이 학원 문을 닫고 우리 학교 방과 후 선생님이 되셨어요. 수업 이름은 \'번쩍번쩍 발표법\'이에요.' },
     { id: 'hs31', ch: 18, t: 'fac', k: 'library', n: 26, rm: 5, title: '수능 준비 도서관', how: '도서관을 Lv.26까지 키워요',
       say: '3학년은 공부할 것이 많아요. 도서관 한쪽에 참나무 뿌리를 그린 옛 책이 있는지 사슴 선생님이 찾고 계세요.' },
-    { id: 'hs32', ch: 18, sy: 3, yt: 3, t: 'semH', n: 3, r: 8, rk: 'dip', title: '고등학교 3학년 1학기 방학식', how: '대도시 학교가 되면 졸업 탭에서 1학기 방학식을 열어요',
+    { id: 'hs32', ch: 18, sy: 3, yt: 3, t: 'semH', n: 3, r: 8, rk: 'dip', title: '고등학교 3학년 1학기 방학식', how: '대도시 학교가 되면 위쪽 졸업 단추에서 1학기 방학식을 열어요',
       say: '방학식이에요. 아이들이 참나무 아래를 조금 파 봤는데, 뿌리가 문처럼 단단히 얽혀 있었어요.' },
     { id: 'hs33', ch: 18, t: 'acMax', n: 30, rm: 5, title: '과목 하나 Lv.30', how: '공부 탭에서 공부하고 문제집을 풀어요. 고등학교 상한은 Lv.40이에요',
       say: '대학에 가려면 잘하는 과목이 하나는 있어야지요. 솜이는 국어래요. 편지를 잘 쓰고 싶대요.' },
@@ -8245,14 +8248,14 @@ body.cam-scene #ffChip,body.cam-scene #plChip,body.cam-scene .b-ring{animation-p
   // ===== 4.0.0 대학교 5장(19~23장, 4.0.0 설계안 2절). 고등학교 장과 같은 짜임(여는 장 + 학년 장). 목표 레벨은 상한(1학년 18, 2학기 +2, 학년마다 +5) 1~2 아래.
   // 숫자(목표, 보상, 대결 판 수)는 모두 본부 제안이고 균형 제안서(4.0.0)에서 봇으로 다시 재요. 단과대학 퀘스트(dp1~dp3)는 단과대학을 넣을 때 끼워요 =====
   MAIN.push(
-    { id: 'hs38', ch: 18, t: 'tier', n: 4, r: 25, rk: 'dip', title: '고등학교 졸업식', how: '졸업 탭에서 졸업식을 열고 대학교에 입학해요',
+    { id: 'hs38', ch: 18, t: 'tier', n: 4, r: 25, rk: 'dip', title: '고등학교 졸업식', how: '위쪽 졸업 단추에서 졸업식을 열고 대학교에 입학해요',
       say: '고등학교 3년을 마쳤어요. 솜이가 졸업해요. 교문에서 울던 그 아이가요. 졸업식을 열어 주세요.' },
     { id: 'un1', ch: 19, t: 'tier', n: 4, rm: 10, title: '대학교 입학식', how: '숲속 대학교에 입학했어요. 받기를 눌러요',
       say: '숲속 대학교 입학을 축하해요! 오늘부터 저는 부총장이에요. 명함도 팠어요. 종 치는 일은 그대로고요.' },
     { id: 'un2', ch: 19, t: 'zones', n: 4, rm: 8, title: '캠퍼스 둘러보기', how: '캠퍼스 지도에서 구역 이름표를 눌러 네 곳을 모두 들어가 봐요',
       say: '캠퍼스가 넓어서 구역이 네 곳이에요. 어느 구역에서 봐도 가운데 참나무가 보이게 지었어요. 구역 이름표를 눌러 한 번씩 둘러봐요.' },
-    { id: 'un3', ch: 19, t: 'fpUp', n: 1, rm: 10, title: '장학재단 고치기', how: '졸업 탭 > 장학재단에서 기금을 써요',
-      say: '고등학교 졸업식 날 모인 기금이에요. 이번에는 금박 봉투에 이름이 적혀 있었어요. \'졸업생 족제비\'라고요. 졸업 탭의 장학재단이에요.' },
+    { id: 'un3', ch: 19, t: 'fpUp', n: 1, rm: 10, title: '장학재단 고치기', how: '위쪽 졸업 단추 > 장학재단에서 기금을 써요',
+      say: '고등학교 졸업식 날 모인 기금이에요. 이번에는 금박 봉투에 이름이 적혀 있었어요. \'졸업생 족제비\'라고요. 위쪽 졸업 단추의 장학재단이에요.' },
     { id: 'un4', ch: 19, t: 'fac', k: 'union', n: 1, rm: 10, title: '학생회관 짓기', how: '광장 구역 위쪽 공사 자리를 눌러요',
       say: '대학교의 중심은 학생회관이에요. 광장 구역, 참나무가 가장 잘 보이는 자리에 지어요. 두루미 학장 교수님이 오신대요.' },
     { id: 'un5', ch: 19, t: 'furAll', k: 'union', n: 1, rm: 10, title: '학생회관 가구 갖추기', how: '학생회관을 눌러서 가구를 모두 올려요',
@@ -8269,7 +8272,7 @@ body.cam-scene #ffChip,body.cam-scene #plChip,body.cam-scene .b-ring{animation-p
       say: '전공을 정할 때예요. 솜이는 물어볼 것도 없이 사범대학이고요. 학생회관 학과 사무실에서 주전공을 골라 봐요.' },
     { id: 'un10', ch: 20, t: 'fac', k: 'cafeteria', n: 8, rm: 4, title: '급식실 키우기', how: '생활 구역 급식실을 Lv.8까지 키워요',
       say: '새내기는 밥심으로 공부해요. 양 선생님이 솜이를 보자마자 "유치원 때 그 꼬르륵 소리"를 말씀하셨어요. 그건 제 배였는데요.' },
-    { id: 'un11', ch: 20, sy: 1, yt: 4, t: 'semH', n: 1, r: 4, rk: 'dip', title: '대학교 1학년 1학기 방학식', how: '대도시 학교가 되면 졸업 탭에서 1학기 방학식을 열어요',
+    { id: 'un11', ch: 20, sy: 1, yt: 4, t: 'semH', n: 1, r: 4, rk: 'dip', title: '대학교 1학년 1학기 방학식', how: '대도시 학교가 되면 위쪽 졸업 단추에서 1학기 방학식을 열어요',
       say: '방학식이에요. 솜이는 방학 동안 유치원에 교육 봉사를 가겠대요. 우리 유치원이요.' },
     { id: 'un12', ch: 20, t: 'fac', k: 'science', n: 8, rm: 4, title: '과학실 키우기', how: '학술 구역 과학실을 Lv.8까지 키워요',
       say: '대학교 실험은 훨씬 커요. 자연과학 학생들이 참나무 잎을 한 장씩 얻어 갔어요. 뭘 알아내려는 걸까요.' },
@@ -8293,7 +8296,7 @@ body.cam-scene #ffChip,body.cam-scene #plChip,body.cam-scene .b-ring{animation-p
       say: '2학년부터는 복수전공을 할 수 있어요. 한 가지 눈으로는 참나무가 다 안 보인대요. 하나 더 골라 봐요.' },
     { id: 'un21', ch: 21, t: 'fac', k: 'playground', n: 22, rm: 4, title: '대운동장 넓히기', how: '체육 구역 운동장을 Lv.22까지 넓혀요',
       say: '체육 학생들은 운동회 날 함성과 도토리 수를 견줘 보겠대요. 그러려면 운동장이 넓어야 한다나요.' },
-    { id: 'un22', ch: 21, sy: 2, yt: 4, t: 'semH', n: 2, r: 5, rk: 'dip', title: '대학교 2학년 1학기 방학식', how: '대도시 학교가 되면 졸업 탭에서 1학기 방학식을 열어요',
+    { id: 'un22', ch: 21, sy: 2, yt: 4, t: 'semH', n: 2, r: 5, rk: 'dip', title: '대학교 2학년 1학기 방학식', how: '대도시 학교가 되면 위쪽 졸업 단추에서 1학기 방학식을 열어요',
       say: '방학식이에요. 방학 동안 나무를 지켜본 자연과학 학생 말로는, 학교가 조용하니 도토리가 덜 떨어졌대요.' },
     { id: 'un23', ch: 21, t: 'xt', k: 'dean', n: 5, rm: 4, title: '학장 교수님 Lv.5', how: '교직원 탭에서 두루미 학장 교수님을 Lv.5까지',
       say: '학장 교수님이 연구 중간 발표를 준비하세요. 한 다리로 선 지 사흘째예요. 연수를 보내 드리면 좀 앉으실까요.' },
@@ -8311,7 +8314,7 @@ body.cam-scene #ffChip,body.cam-scene #plChip,body.cam-scene .b-ring{animation-p
       say: '3학년부터는 복수전공을 하나 더 할 수 있고 의과대학도 열려요. 의과 학생들이 참나무 줄기에 귀를 대 보더니 "숨소리가 고르다"고 했어요.' },
     { id: 'un29', ch: 22, t: 'fac', k: 'library', n: 27, rm: 5, title: '도서관 Lv.27', how: '학술 구역 도서관을 Lv.27까지 키워요',
       say: '도서관에서 옛 교가 악보를 찾았어요. 사슴 선생님이 맨 아래 칸에서요. 제 기억과 두 마디가 달랐어요. 제가 틀렸더군요.' },
-    { id: 'un30', ch: 22, sy: 3, yt: 4, t: 'semH', n: 3, r: 8, rk: 'dip', title: '대학교 3학년 1학기 방학식', how: '대도시 학교가 되면 졸업 탭에서 1학기 방학식을 열어요',
+    { id: 'un30', ch: 22, sy: 3, yt: 4, t: 'semH', n: 3, r: 8, rk: 'dip', title: '대학교 3학년 1학기 방학식', how: '대도시 학교가 되면 위쪽 졸업 단추에서 1학기 방학식을 열어요',
       say: '방학식이에요. 방학에도 광장에서 노래 연습 소리가 나요. 참나무 가지가 박자를 맞추는 것 같아요.' },
     { id: 'un31', ch: 22, t: 'fac', k: 'union', n: 29, rm: 5, title: '학생회관 Lv.29', how: '광장 구역 학생회관을 Lv.29까지 키워요',
       say: '축제 무대는 학생회관이 맡아요. 손님 학교들이 답장을 보냈어요. 다들 온대요.' },
@@ -8325,7 +8328,7 @@ body.cam-scene #ffChip,body.cam-scene #plChip,body.cam-scene .b-ring{animation-p
       say: '4학년이에요. 솜이가 교생 실습 수업안을 열두 번째 고쳐 쓰고 있어요. 답사 쓸 때보다 더하네요.' },
     { id: 'un36', ch: 23, t: 'fac', k: 'science', n: 32, rm: 5, title: '과학실 Lv.32', how: '학술 구역 과학실을 Lv.32까지 키워요',
       say: '졸업 실험이 한창이에요. 자연과학 학생들의 졸업 작품은 참나무 도토리로 키운 어린 나무예요. 숲 여기저기에 심는대요.' },
-    { id: 'un37', ch: 23, sy: 4, yt: 4, t: 'semH', n: 4, r: 10, rk: 'dip', title: '대학교 4학년 1학기 방학식', how: '대도시 학교가 되면 졸업 탭에서 1학기 방학식을 열어요',
+    { id: 'un37', ch: 23, sy: 4, yt: 4, t: 'semH', n: 4, r: 10, rk: 'dip', title: '대학교 4학년 1학기 방학식', how: '대도시 학교가 되면 위쪽 졸업 단추에서 1학기 방학식을 열어요',
       say: '방학식이에요. 솜이가 실습 첫 주를 마치고 왔어요. 우는 아이가 있었는데 사흘째에 웃었대요.' },
     { id: 'un38', ch: 23, t: 'fac', k: 'dorm', n: 34, rm: 5, title: '기숙사 Lv.34', how: '생활 구역 기숙사를 Lv.34까지 키워요',
       say: '졸업 작품을 만드느라 기숙사 불이 꺼지지 않아요. 오소리 선생님도 올해만은 열 시 순찰을 건너뛰세요.' },
@@ -8336,14 +8339,14 @@ body.cam-scene #ffChip,body.cam-scene #plChip,body.cam-scene .b-ring{animation-p
     { id: 'un41', ch: 23, ye: 4, yt: 4, t: 'ygrade', n: 4, r: 20, rk: 'dip', title: '4학년 대도시 되기', how: '평판을 모아서 대도시가 되어요',
       say: '대학교의 마지막 해예요. 대도시 학교가 되면 졸업 준비가 끝나요. 그날 편지 뒷장을 읽기로 했어요.' },
     // 5.0.0 대학원(woodani 결정 2026-11-15): 석사 4학기 + 박사 8학기, 캠퍼스와 건물을 이어 가요. 장 이름은 본부 제안. 연구소와 연구동은 연구 구역에
-    { id: 'un42', ch: 23, t: 'tier', n: 5, r: 25, rk: 'dip', title: '대학교 학위수여식', how: '졸업 탭에서 학위수여식을 열고 대학원에 입학해요',
+    { id: 'un42', ch: 23, t: 'tier', n: 5, r: 25, rk: 'dip', title: '대학교 학위수여식', how: '위쪽 졸업 단추에서 학위수여식을 열고 대학원에 입학해요',
       say: '편지 뒷장에는 "연구 구역 열쇠는 첫 제자에게"라고 적혀 있었어요. 학위수여식을 열고 대학원으로 가요.' },
     { id: 'gr1', ch: 24, t: 'tier', n: 5, rm: 10, title: '대학원 입학식', how: '숲속 대학원에 입학했어요. 받기를 눌러요',
       say: '캠퍼스 오른쪽 위 연구 구역의 자물쇠가 풀렸어요. 교장 선생님, 이제 연구를 시작해요.' },
     { id: 'gr2', ch: 24, t: 'fac', k: 'institute', n: 1, rm: 10, title: '연구소 짓기', how: '연구 구역 큰 공사 자리를 눌러요',
       say: '연구소는 짓는 데 시간이 걸려요. 대학교에서 가장 큰 건물만큼이요.' },
     { id: 'gr3', ch: 24, t: 'fac', k: 'institute', n: 3, rm: 5, title: '연구소 키우기', how: '연구 구역 연구소를 Lv.3까지 키워요' },
-    { id: 'gr4', ch: 24, sy: 1, yt: 5, t: 'semH', n: 1, r: 6, rk: 'dip', title: '석사 1학기 세미나', how: '대도시 학교가 되면 졸업 탭에서 세미나를 열어요' },
+    { id: 'gr4', ch: 24, sy: 1, yt: 5, t: 'semH', n: 1, r: 6, rk: 'dip', title: '석사 1학기 세미나', how: '대도시 학교가 되면 위쪽 졸업 단추에서 세미나를 열어요' },
     { id: 'gc36', ch: 24, t: 'facAll', n: 36, rm: 5, title: '캠퍼스 건물 Lv.36', how: '대학교 때 지은 건물 여덟 채를 모두 Lv.36까지 키워요' },
     { id: 'gc37', ch: 24, t: 'facAll', n: 37, rm: 5, title: '캠퍼스 건물 Lv.37', how: '대학교 때 지은 건물 여덟 채를 모두 Lv.37까지 키워요' },
     { id: 'gr5', ch: 24, ye: 1, yt: 5, t: 'tgrads', n: 1, r: 8, rk: 'dip', title: '석사 2학기 세미나', how: '1학기 세미나를 열고, 2학기에 세미나를 또 열어요' },
@@ -8353,7 +8356,7 @@ body.cam-scene #ffChip,body.cam-scene #plChip,body.cam-scene .b-ring{animation-p
     { id: 'gc38', ch: 25, t: 'facAll', n: 38, rm: 5, title: '캠퍼스 건물 Lv.38', how: '대학교 때 지은 건물 여덟 채를 모두 Lv.38까지 키워요' },
     { id: 'gc39', ch: 25, t: 'facAll', n: 39, rm: 5, title: '캠퍼스 건물 Lv.39', how: '대학교 때 지은 건물 여덟 채를 모두 Lv.39까지 키워요' },
     { id: 'gc40', ch: 25, t: 'facAll', n: 40, rm: 5, title: '캠퍼스 건물 Lv.40', how: '대학교 때 지은 건물 여덟 채를 모두 Lv.40까지 키워요' },
-    { id: 'gr8', ch: 25, sy: 2, yt: 5, t: 'semH', n: 2, r: 7, rk: 'dip', title: '석사 3학기 세미나', how: '대도시 학교가 되면 졸업 탭에서 세미나를 열어요' },
+    { id: 'gr8', ch: 25, sy: 2, yt: 5, t: 'semH', n: 2, r: 7, rk: 'dip', title: '석사 3학기 세미나', how: '대도시 학교가 되면 위쪽 졸업 단추에서 세미나를 열어요' },
     { id: 'gc41', ch: 25, t: 'facAll', n: 41, rm: 5, title: '캠퍼스 건물 Lv.41', how: '대학교 때 지은 건물 여덟 채를 모두 Lv.41까지 키워요' },
     { id: 'gc42', ch: 25, t: 'facAll', n: 42, rm: 5, title: '캠퍼스 건물 Lv.42', how: '대학교 때 지은 건물 여덟 채를 모두 Lv.42까지 키워요' },
     { id: 'gc43', ch: 25, t: 'facAll', n: 43, rm: 5, title: '캠퍼스 건물 Lv.43', how: '대학교 때 지은 건물 여덟 채를 모두 Lv.43까지 키워요' },
@@ -8363,7 +8366,7 @@ body.cam-scene #ffChip,body.cam-scene #plChip,body.cam-scene .b-ring{animation-p
     { id: 'gc44', ch: 26, t: 'facAll', n: 44, rm: 5, title: '캠퍼스 건물 Lv.44', how: '대학교 때 지은 건물 여덟 채를 모두 Lv.44까지 키워요' },
     { id: 'gc45', ch: 26, t: 'facAll', n: 45, rm: 5, title: '캠퍼스 건물 Lv.45', how: '대학교 때 지은 건물 여덟 채를 모두 Lv.45까지 키워요' },
     { id: 'gc46', ch: 26, t: 'facAll', n: 46, rm: 5, title: '캠퍼스 건물 Lv.46', how: '대학교 때 지은 건물 여덟 채를 모두 Lv.46까지 키워요' },
-    { id: 'gsem3', ch: 26, sy: 3, yt: 5, t: 'semH', n: 3, r: 8, rk: 'dip', title: '박사 1학기 세미나', how: '대도시 학교가 되면 졸업 탭에서 세미나를 열어요' },
+    { id: 'gsem3', ch: 26, sy: 3, yt: 5, t: 'semH', n: 3, r: 8, rk: 'dip', title: '박사 1학기 세미나', how: '대도시 학교가 되면 위쪽 졸업 단추에서 세미나를 열어요' },
     { id: 'gc47', ch: 26, t: 'facAll', n: 47, rm: 5, title: '캠퍼스 건물 Lv.47', how: '대학교 때 지은 건물 여덟 채를 모두 Lv.47까지 키워요' },
     { id: 'gc48', ch: 26, t: 'facAll', n: 48, rm: 5, title: '캠퍼스 건물 Lv.48', how: '대학교 때 지은 건물 여덟 채를 모두 Lv.48까지 키워요' },
     { id: 'gc49', ch: 26, t: 'facAll', n: 49, rm: 5, title: '캠퍼스 건물 Lv.49', how: '대학교 때 지은 건물 여덟 채를 모두 Lv.49까지 키워요' },
@@ -8372,7 +8375,7 @@ body.cam-scene #ffChip,body.cam-scene #plChip,body.cam-scene .b-ring{animation-p
     { id: 'gc50', ch: 26, t: 'facAll', n: 50, rm: 5, title: '캠퍼스 건물 Lv.50', how: '대학교 때 지은 건물 여덟 채를 모두 Lv.50까지 키워요' },
     { id: 'gc51', ch: 26, t: 'facAll', n: 51, rm: 5, title: '캠퍼스 건물 Lv.51', how: '대학교 때 지은 건물 여덟 채를 모두 Lv.51까지 키워요' },
     { id: 'gc52', ch: 26, t: 'facAll', n: 52, rm: 5, title: '캠퍼스 건물 Lv.52', how: '대학교 때 지은 건물 여덟 채를 모두 Lv.52까지 키워요' },
-    { id: 'gsem4', ch: 26, sy: 4, yt: 5, t: 'semH', n: 4, r: 8, rk: 'dip', title: '박사 3학기 세미나', how: '대도시 학교가 되면 졸업 탭에서 세미나를 열어요' },
+    { id: 'gsem4', ch: 26, sy: 4, yt: 5, t: 'semH', n: 4, r: 8, rk: 'dip', title: '박사 3학기 세미나', how: '대도시 학교가 되면 위쪽 졸업 단추에서 세미나를 열어요' },
     { id: 'gc53', ch: 26, t: 'facAll', n: 53, rm: 5, title: '캠퍼스 건물 Lv.53', how: '대학교 때 지은 건물 여덟 채를 모두 Lv.53까지 키워요' },
     { id: 'gc54', ch: 26, t: 'facAll', n: 54, rm: 5, title: '캠퍼스 건물 Lv.54', how: '대학교 때 지은 건물 여덟 채를 모두 Lv.54까지 키워요' },
     { id: 'gc55', ch: 26, t: 'facAll', n: 55, rm: 5, title: '캠퍼스 건물 Lv.55', how: '대학교 때 지은 건물 여덟 채를 모두 Lv.55까지 키워요' },
@@ -8381,7 +8384,7 @@ body.cam-scene #ffChip,body.cam-scene #plChip,body.cam-scene .b-ring{animation-p
     { id: 'gc56', ch: 27, t: 'facAll', n: 56, rm: 5, title: '캠퍼스 건물 Lv.56', how: '대학교 때 지은 건물 여덟 채를 모두 Lv.56까지 키워요' },
     { id: 'gc57', ch: 27, t: 'facAll', n: 57, rm: 5, title: '캠퍼스 건물 Lv.57', how: '대학교 때 지은 건물 여덟 채를 모두 Lv.57까지 키워요' },
     { id: 'gc58', ch: 27, t: 'facAll', n: 58, rm: 5, title: '캠퍼스 건물 Lv.58', how: '대학교 때 지은 건물 여덟 채를 모두 Lv.58까지 키워요' },
-    { id: 'gsem5', ch: 27, sy: 5, yt: 5, t: 'semH', n: 5, r: 8, rk: 'dip', title: '박사 5학기 세미나', how: '대도시 학교가 되면 졸업 탭에서 세미나를 열어요' },
+    { id: 'gsem5', ch: 27, sy: 5, yt: 5, t: 'semH', n: 5, r: 8, rk: 'dip', title: '박사 5학기 세미나', how: '대도시 학교가 되면 위쪽 졸업 단추에서 세미나를 열어요' },
     { id: 'gc59', ch: 27, t: 'facAll', n: 59, rm: 5, title: '캠퍼스 건물 Lv.59', how: '대학교 때 지은 건물 여덟 채를 모두 Lv.59까지 키워요' },
     { id: 'gc60', ch: 27, t: 'facAll', n: 60, rm: 5, title: '캠퍼스 건물 Lv.60', how: '대학교 때 지은 건물 여덟 채를 모두 Lv.60까지 키워요' },
     { id: 'gc61', ch: 27, t: 'facAll', n: 61, rm: 5, title: '캠퍼스 건물 Lv.61', how: '대학교 때 지은 건물 여덟 채를 모두 Lv.61까지 키워요' },
@@ -8390,7 +8393,7 @@ body.cam-scene #ffChip,body.cam-scene #plChip,body.cam-scene .b-ring{animation-p
     { id: 'gc62', ch: 27, t: 'facAll', n: 62, rm: 5, title: '캠퍼스 건물 Lv.62', how: '대학교 때 지은 건물 여덟 채를 모두 Lv.62까지 키워요' },
     { id: 'gc63', ch: 27, t: 'facAll', n: 63, rm: 5, title: '캠퍼스 건물 Lv.63', how: '대학교 때 지은 건물 여덟 채를 모두 Lv.63까지 키워요' },
     { id: 'gc64', ch: 27, t: 'facAll', n: 64, rm: 5, title: '캠퍼스 건물 Lv.64', how: '대학교 때 지은 건물 여덟 채를 모두 Lv.64까지 키워요' },
-    { id: 'gsem6', ch: 27, sy: 6, yt: 5, t: 'semH', n: 6, r: 8, rk: 'dip', title: '박사 7학기 세미나', how: '대도시 학교가 되면 졸업 탭에서 세미나를 열어요' },
+    { id: 'gsem6', ch: 27, sy: 6, yt: 5, t: 'semH', n: 6, r: 8, rk: 'dip', title: '박사 7학기 세미나', how: '대도시 학교가 되면 위쪽 졸업 단추에서 세미나를 열어요' },
     { id: 'gc65', ch: 27, t: 'facAll', n: 65, rm: 5, title: '캠퍼스 건물 Lv.65', how: '대학교 때 지은 건물 여덟 채를 모두 Lv.65까지 키워요' },
     { id: 'gc66', ch: 27, t: 'facAll', n: 66, rm: 5, title: '캠퍼스 건물 Lv.66', how: '대학교 때 지은 건물 여덟 채를 모두 Lv.66까지 키워요' },
     { id: 'gr15', ch: 27, ye: 6, yt: 5, t: 'tgrads', n: 6, r: 20, rk: 'dip', title: '박사 학위수여식', how: '박사 8학기에 대도시가 되면 학위수여식을 열어요',
@@ -9300,7 +9303,7 @@ body.cam-scene #ffChip,body.cam-scene #plChip,body.cam-scene .b-ring{animation-p
       { k: 'event', nm: '행사', ic: 'ic_rt_event', eff: L => `학교 행사, 축제, 체험학습 도토리 +${10 * L}%` },
       { k: 'tam', nm: '탐험', ic: 'ic_rt_tam', eff: L => `탐험대 힘 +${5 * L}%` + (L >= 4 ? ', 보고서 +2시간' : '') },
       { k: 'time', nm: '시간', ic: 'ic_rt_time', eff: L => `자리 비운 동안 수입 +${L}시간` },
-      { k: 'ta', nm: '조교', ic: 'ic_rt_ta', lock: true, eff: () => '5.1.0 조교 파견에서 열려요' }],
+      { k: 'ta', nm: '조교', ic: 'ic_rt_ta', lock: true, eff: () => '조교 파견은 준비 중이에요' }],
     ess: [50, 100, 200, 400], hrs: [1, 2, 4, 8], time: [1, 3, 6, 12], max: 4 };
   const rtLv = k => (S && S.rt5 && S.rt5.lv[k]) || 0;
   const rtClassMul = () => 1 + 0.05 * rtLv('class');
@@ -9331,7 +9334,7 @@ body.cam-scene #ffChip,body.cam-scene #plChip,body.cam-scene .b-ring{animation-p
     const c = S.rt5.cur, now = gameNow();
     return '<p class="fine">한 번에 하나씩 연구해요. 졸업해도 남아요.</p><div class="dp-list">' + RT5.list.map(D => {
       const L = rtLv(D.k), u = IMG(D.ic), run = c && c.k === D.k, full = L >= RT5.max, k = rtCost(D.k);
-      const btn = D.lock ? '<span class="fe-lock">5.1.0</span>' : full ? '<span class="fe-lock">완성</span>' : run ? `<span class="fe-lock">${hms(c.end - now)}</span>`
+      const btn = D.lock ? '<span class="fe-lock">준비 중</span>' : full ? '<span class="fe-lock">완성</span>' : run ? `<span class="fe-lock">${hms(c.end - now)}</span>`
         : `<button class="${c || S.ess < k.ess || S.budget < k.ac ? 'btn-sub' : 'cta'} small" type="button" data-rt="${D.k}">정수 ${k.ess}</button>`;
       return `<div class="dp-row"><span class="dp-ic">${u ? `<img src="${u}" alt="">` : ''}</span><div class="dp-tx"><b>${D.nm} ${'●'.repeat(L)}${'○'.repeat(RT5.max - L)}</b><small>${L ? D.eff(L) : '아직 연구 전'}${D.lock || full ? '' : `, 다음 ${D.eff(L + 1)} (도토리 ${fmt(k.ac)}, ${rtHrs(k.sec)})`}</small></div>${btn}</div>`;
     }).join('') + '</div>';
@@ -9384,7 +9387,7 @@ body.cam-scene #ffChip,body.cam-scene #plChip,body.cam-scene .b-ring{animation-p
     const picks = deptPicks(), slots = deptSlots(), full = picks.length >= slots, sw = rt.dpSwap ? deptOf(rt.dpSwap) : null;
     const hd = $('#dpHead'), hu = (rt.dpRoom && IMG('room_dept')) || IMG('col_head'); hd.classList.toggle('art', !!hu); hd.style.backgroundImage = hu ? `url("${blobUrl(hu)}")` : '';
     setT($('#dpSlots'), `전공 ${picks.length} / ${slots}`);   // 4.5.0 woodani: 여러 곳을 다니는 대신 주전공과 복수전공으로
-    const note = sw ? `${sw.name}${batchim(sw.name) ? '과' : '와'} 바꿀 곳을 골라요` : full ? (S.dp.free ? '이번 한 번은 공짜로 바꿀 수 있어요' : `바꾸려면 숲의 정수 ${DEPT.ess}개가 들어요`) : picks.length ? '학년이 오르면 복수전공을 하나 더 할 수 있어요' : '주전공 단과대학을 골라요';
+    const note = sw ? `${sw.name}${batchim(sw.name) ? '과' : '와'} 바꿀 곳을 골라요` : full ? (S.dp.free ? '이번 한 번은 공짜로 바꿀 수 있어요' : `바꾸려면 숲의 정수 ${DEPT.ess}개가 들어요`) : picks.length ? '복수전공을 하나 더 고를 수 있어요' : '주전공 단과대학을 골라요';
     $('#dpBody').innerHTML = `<p class="dp-note">${note}</p><div class="dp-list">` + DEPT.list.map(D => {
       const on = picks.includes(D.k), lock = deptLocked(D), lv = deptLv(D);
       const subTx = D.avg ? '다섯 과목 평균' : D.low ? '과학과 체육 중 낮은 쪽' : AC.name[D.sub[0]];
@@ -9404,7 +9407,7 @@ body.cam-scene #ffChip,body.cam-scene #plChip,body.cam-scene .b-ring{animation-p
       S.dp.free = 0; picks = picks.map(x => x === out ? k : x);
     } else { if (picks.length >= deptSlots()) return false; picks.push(k); }
     S.dp.pick = picks; const first = !S.dp.own[k]; if (first) { S.dp.own[k] = 1; if (S.deco && S.deco.own) S.deco.own['deco_col_' + k] = 1; }
-    save(); renderHUD(); renderQuestBar(); sfx('tap'); toast(`${D.name}에 다니기 시작했어요. 수업료 +${Math.round(deptPct(D))}%` + (first ? '\n장식을 받았어요. 꾸미기에서 놓아요' : ''));
+    save(); renderHUD(); renderQuestBar(); sfx('tap'); toast(`${D.name}에 다니기 시작했어요. 수업료 +${Math.round(deptPct(D))}%` + (first ? '\n장식을 받았어요. 꾸미기 가게의 \'지도 꾸미기\'로 놓아요' : ''));
     return true;
   }
   function deptClick(e) {
@@ -9429,6 +9432,7 @@ body.cam-scene #ffChip,body.cam-scene #plChip,body.cam-scene .b-ring{animation-p
   const libMult = () => 1 + XT.lib.per / 100 * xtLv('lib');   // 퍼즐 점수 정수 배수
 
   // 큰 숫자 줄여 쓰기: 기본은 토스처럼 만, 억, 조. 설정에서 K, M, B로 바꿀 수 있어요
+  const fmtN = n => { const t = fmt(n); return /[0-9]$/.test(t) ? t + '개' : t; };   // 5.0.1.5 '1,200자개'처럼 단위 뒤 '개'를 빼요
   function fmt(n) {
     n = Math.floor(n + 1e-9);
     if (!isFinite(n)) return '0';   // 2.0.0 보안 점검(1-9): NaN, 무한대는 0으로 보여 줘요
@@ -11726,7 +11730,7 @@ body.cam-scene #ffChip,body.cam-scene #plChip,body.cam-scene .b-ring{animation-p
       '<rect x="138" y="70" width="44" height="10" rx="1.2" fill="#B07F45" stroke="#4E3D2C"/><rect x="138" y="80" width="44" height="12" rx="1.2" fill="#8C6440" stroke="#4E3D2C"/>',
     cafeteria: '<rect width="320" height="230" fill="#E8D7C2"/>' + Array.from({ length: 9 }, (_, i) => `<path d="M${i * 40} 64 V230" stroke="#D2BFA6"/>`).join('') + Array.from({ length: 5 }, (_, i) => `<path d="M0 ${96 + i * 34} H320" stroke="#D2BFA6"/>`).join('') +
       '<rect width="320" height="64" fill="#F6E3D3"/><rect y="60" width="320" height="5" fill="#B89B7A"/>' +
-      '<rect x="98" y="6" width="124" height="48" rx="5" fill="#FFFDF5" stroke="#C2533D" stroke-width="2.5"/><text x="160" y="22" text-anchor="middle" class="fur-menu-h">오늘의 급식</text><text x="160" y="37" text-anchor="middle" class="fur-menu">{M1}</text><text x="160" y="49" text-anchor="middle" class="fur-menu">{M2}</text>' +
+      '<rect x="98" y="6" width="124" height="48" rx="5" fill="#FFFDF5" stroke="#C2533D" stroke-width="2.5"/><text x="160" y="22" text-anchor="middle" class="fur-menu-h">이번 주 식단</text><text x="160" y="37" text-anchor="middle" class="fur-menu">{M1}</text><text x="160" y="49" text-anchor="middle" class="fur-menu">{M2}</text>' +
       '<rect x="20" y="10" width="62" height="36" rx="2" fill="#BEE0EA" stroke="#B89B7A" stroke-width="2.5"/><path d="M20 18 H82" stroke="#F3B92E" stroke-width="5"/><rect x="238" y="10" width="62" height="36" rx="2" fill="#BEE0EA" stroke="#B89B7A" stroke-width="2.5"/><path d="M238 18 H300" stroke="#F3B92E" stroke-width="5"/>',
     library: '<rect width="320" height="230" fill="#A97C55"/><rect x="40" y="186" width="240" height="40" rx="6" fill="#C2533D" opacity=".55"/>' + Array.from({ length: 8 }, (_, i) => `<path d="M0 ${84 + i * 20} H320" stroke="#966B47"/>`).join('') +
       '<rect width="320" height="64" fill="#EAD9BF"/><rect y="60" width="320" height="5" fill="#7A5A3C"/>' +
@@ -11935,7 +11939,7 @@ body.cam-scene #ffChip,body.cam-scene #plChip,body.cam-scene .b-ring{animation-p
   }
   const ROOM_TXT = {
     classroom: () => '<text x="250" y="55" text-anchor="end" class="fur-chalk room-chalk">떠든 사람: 토끼</text>',
-    cafeteria: () => { const m = MENU[new Date().getDay()]; return '<g class="room-menu"><rect x="10" y="14" width="88" height="48" rx="4" class="room-menu-bg"/><text x="54" y="28" text-anchor="middle" class="fur-menu-h">오늘의 급식</text>' +
+    cafeteria: () => { const m = MENU[new Date().getDay()]; return '<g class="room-menu"><rect x="10" y="14" width="88" height="48" rx="4" class="room-menu-bg"/><text x="54" y="28" text-anchor="middle" class="fur-menu-h">이번 주 식단</text>' +
       `<text x="54" y="42" text-anchor="middle" class="fur-menu">${m[0]}</text><text x="54" y="54" text-anchor="middle" class="fur-menu">${m[1]}</text></g>`; }
   };
   const SN_MACH = [40, 152, 62];   // 2.1.2 매점 방 뽑기 기계 자리(가운데 x, 바닥 y, 크기)
@@ -12218,11 +12222,11 @@ body.cam-scene #ffChip,body.cam-scene #plChip,body.cam-scene .b-ring{animation-p
     setT($('#sheetSub'), L >= 1 ? `Lv.${L} / Lv.${cap}` : '아직 짓지 않았어요');   // 지금 레벨 / 올해 올릴 수 있는 최고 레벨
     setT($('#sheetDesc'), F.desc);
     setT($('#effNow'), F.eff(L));
-    setT($('#effNextLabel'), maxed ? (semFirst() ? '2학기' : '다음 학년') : L >= 1 ? '다음 레벨' : '지으면');
-    setT($('#effNext'), maxed ? `Lv.${capNext()}까지 열려요` : F.eff(L + 1));
+    setT($('#effNextLabel'), maxed ? (semFirst() ? '2학기' : finalYear() ? '졸업 뒤' : '다음 학년') : L >= 1 ? '다음 레벨' : '지으면');
+    setT($('#effNext'), maxed ? (!semFirst() && finalYear() ? (S.tier === 4 ? '대학원에서 이어서 키워요' : '새 학교에서 다시 지어요') : `Lv.${capNext()}까지 열려요`) : F.eff(L + 1) === F.eff(L) && L >= 1 ? `${F.eff(L)}(가장 빨라요)` : F.eff(L + 1));
     setT($('#sheetRep'), k === 'library' ? '도서관은 평판을 가장 많이 올려요. 평판이 쌓이면 학교 등급이 올라가요.' : `레벨이 오를 때마다 평판도 ★${F.rep} 올라요.`);
     setT($('#sheetBuyLabel'), (maxed ? '최고 레벨' : L >= 1 ? '업그레이드' : '짓기') );   // 2.3.0 즉시 완공은 옆 ⚡ 단추로
-    { const fb = $('#sheetFree'), ok = ffCan(k) && !conOn(k); setT(fb.querySelector('.n'), ffLeft()); fb.hidden = !(S.tier >= 1 && !maxed && conFreeLeft(k) && conSec(k, L + 1) > 10); fb.setAttribute('aria-disabled', ok && furReady(k) && S.budget >= facCost(k) ? 'false' : 'true'); }
+    { const fb = $('#sheetFree'), ok = ffCan(k) && !conOn(k); setT(fb.querySelector('.n'), ffLeft()); fb.hidden = !(S.tier >= 1 && !maxed && !conOn(k) && conFreeLeft(k) && conSec(k, L + 1) > 10);   /* 5.0.1.5 H-08 공사 중에는 아래 단추만 */ fb.setAttribute('aria-disabled', ok && furReady(k) && S.budget >= facCost(k) ? 'false' : 'true'); }
     setT($('#sheetCost'), maxed ? '-' : fmt(c));
     $('#sheetBuy').setAttribute('aria-disabled', ok ? 'false' : 'true');
     $('#sheetBuy').classList.toggle('is-rec', !!rt.rec && rt.rec.kind === 'fac' && rt.rec.k === k && !maxed);
@@ -12338,7 +12342,7 @@ body.cam-scene #ffChip,body.cam-scene #plChip,body.cam-scene .b-ring{animation-p
       setT($('#sheetElectGo'), pres ? '보기' : '투표하기!');
       se.classList.toggle('todo', !pres);
     }
-    setT($('#sheetNeed'), conOn(k) ? ' ' : maxed ? (semFirst() ? `더 올리려면 1학기를 마쳐야 해요. 1학기 방학식을 열면 Lv.${capNext()}까지 키울 수 있어요` : `더 올리려면 학교가 다음 학년으로 올라가야 해요. ${semOn() ? '2학기 ' : ''}종업식을 열면 Lv.${capNext()}까지 키울 수 있어요`) : !fr ? `가구 네 개를 모두 Lv.${L}로 올리면 건물을 키울 수 있어요` : ok ? ' ' : `도토리 ${fmt(Math.ceil(c - S.budget))}개가 더 필요해요`);
+    setT($('#sheetNeed'), conOn(k) ? ' ' : maxed ? (semFirst() ? `더 올리려면 1학기를 마쳐야 해요. 1학기 방학식을 열면 Lv.${capNext()}까지 키울 수 있어요` : (finalYear() ? (S.tier === 4 ? `이 학년에서는 다 키웠어요. 학위수여식을 열면 대학원에서 더 키울 수 있어요` : `이 학교급에서는 다 키웠어요. 졸업식을 열면 ${TIERS[S.tier + 1].name}에서 새로 지어요`) : `더 올리려면 학교가 다음 학년으로 올라가야 해요. ${semOn() ? '2학기 ' : ''}종업식을 열면 Lv.${capNext()}까지 키울 수 있어요`)) : !fr ? `가구 네 개를 모두 ${euro('Lv.' + L)} 올리면 건물을 키울 수 있어요` : ok ? ' ' : `도토리 ${fmt(Math.ceil(c - S.budget))}개가 더 필요해요`);
     $('#sheetNeed').classList.toggle('soft', maxed || !fr);
   }
   // 1.8.0 짓기와 업그레이드 효과. kind 'build'(처음 지음) 또는 'up'. 건물 창이 열려 있으면 닫을 때 보여 줘요
@@ -12448,7 +12452,7 @@ body.cam-scene #ffChip,body.cam-scene #plChip,body.cam-scene .b-ring{animation-p
     if (ban && !rt.modalOpen) {   // 작업지시서 36 배너 창. 다른 창이 열려 있으면 토스트로만
       $('#nbBan').style.backgroundImage = `url("${ban}")`;
       $('#nbSub').textContent = all ? `주말 하루 종일 공사 +${nbAdd()}%` : `오늘 ${NB.h0}~${NB.h1}시 공사 +${nbAdd()}%`;
-      $('#nbLead').textContent = `${msg}. 건설 부스터를 같이 쓰면 효과가 더해져요.`;
+      $('#nbLead').textContent = `${nbAdd() > NB.add ? '학교 특별 이벤트 주간이에요. ' : ''}${cbOn() ? `건설 부스터와 함께 +${conAdd()}%예요.` : '건설 부스터를 같이 쓰면 효과가 더해져요.'}`;
       openModal($('#mNb'));
     } else toast(`야간 건설 이벤트 시작! ${msg}`);
     sfx('quest'); ffRender(true); save();
@@ -12486,7 +12490,7 @@ body.cam-scene #ffChip,body.cam-scene #plChip,body.cam-scene .b-ring{animation-p
     Object.assign(S.ns, { day, sub, got: 0, sec: 0, done: false, n: Math.min(SAVE_CAP.count, S.ns.n + 1), at: gameNow() });
     sfx('quest'); buzz(15);
     toast(nsPlanned() ? `오늘 밤 자율학습을 예약했어요.\n밤 ${NSL.h0 - 12}시부터 자동으로 시작해요.\n아침 ${NSL.h1}시 이후에 결과를 확인해요.` : `야간 자율학습을 켰어요!\n아침 ${NSL.h1}시까지 자리 비운 보상이 ${hm(nsExtraH() * 3600)} 더 쌓여요`);
-    save(); checkQuests(); renderNight(true); return true;
+    save(); checkQuests(); renderNight(true); try { renderNsRow(); } catch (e) { /* 공부 탭 줄 */ } return true;
   }
   // 켠 밤이 끝나면(6시) 결과를 한 번 알려요: 쌓인 시간과 도토리, 고른 과목 XP
   function nsSettle(quiet) {
@@ -12609,7 +12613,7 @@ body.cam-scene #ffChip,body.cam-scene #plChip,body.cam-scene .b-ring{animation-p
     const c1 = snCost(false), c10 = snCost(true), key = [S.sn.mood, S.sn.pity, c1, c10, S.budget >= c1, S.budget >= c10, rt.snRes ? rt.snRes.at : 0, S.sn.gold].join('|');
     if (!force && $('#snBtns').dataset.key === key) return; $('#snBtns').dataset.key = key;
     const mi = snMoodImg();
-    $('#snMood').innerHTML = `${mi ? `<img src="${mi}" alt="">` : ''}<span>학교 기분 ${S.sn.mood}/${snMoodMax()}칸, 오늘 수업료 +${S.sn.mood}%</span>`;
+    $('#snMood').innerHTML = `${mi ? `<img src="${mi}" alt="">` : ''}<span>학교 기분 ${S.sn.mood}/${snMoodMax()}칸, 오늘 수업료 +${S.sn.mood}%. 간식 하나에 1칸(희귀 3칸), 자정에 비워져요</span>`;
     const R = rt.snRes;
     if (force || !R || $('#snStage').dataset.at !== String(R ? R.at : 0)) {
       $('#snStage').dataset.at = String(R ? R.at : 0);
@@ -12904,7 +12908,7 @@ body.cam-scene #ffChip,body.cam-scene #plChip,body.cam-scene .b-ring{animation-p
       S.gn.plots.slice(0, gdN()).forEach(p => { if (p.c) return; p.c = c; p.s = now; p.e = now + GD_C[c].min * 60000; p.w = 0; if (wxIs('rain')) gdWet(p); k++; });
       if (!k) return false;
       S.gn.st.plant += k; rt.gdPick = -1;
-      sfx('tap'); toast(`${GD_C[c].nm}을(를) ${k}곳에 심었어요. ${hm(GD_C[c].min * 60)} 뒤에 거둬요`);
+      sfx('tap'); toast(`${eul(GD_C[c].nm)} ${k}곳에 심었어요. ${hm(GD_C[c].min * 60)} 뒤에 거둬요`);
       gdRender(true); gdMark(); save();
       return true;
     }
@@ -12935,7 +12939,7 @@ body.cam-scene #ffChip,body.cam-scene #plChip,body.cam-scene .b-ring{animation-p
     if (S.tk[tk] < 1) { toast(`${t.name}이 없어요. 광고를 보면 5분권 ${TKAD.n}장을 받아요`); return; }
     S.tk[tk] -= 1; S.st.tkUsed = (S.st.tkUsed || 0) + 1; sfx('tap');
     gdCut(i, t.sec);
-    toast(gdReady(p) ? `${GD_C[p.c].nm}이(가) 다 자랐어요!` : `${t.name}으로 ${hm(t.sec)} 당겼어요`);
+    toast(gdReady(p) ? `${iga(GD_C[p.c].nm)} 다 자랐어요!` : `${t.name}으로 ${hm(t.sec)} 당겼어요`);
   }
   function gdTkAll(i) {
     const p = S.gn.plots[i]; if (!p || !p.c || gdReady(p)) return;
@@ -12957,7 +12961,7 @@ body.cam-scene #ffChip,body.cam-scene #plChip,body.cam-scene .b-ring{animation-p
     const p = S.gn.plots[i]; if (!p || !p.c || gdReady(p) || !(S.gn.free > 0)) return;
     S.gn.free -= 1; sfx('quest');
     gdCut(i, 1e7);
-    toast(`${GD_C[p.c].nm}이(가) 바로 다 자랐어요!`);
+    toast(`${iga(GD_C[p.c].nm)} 바로 다 자랐어요!`);
   }
   function gdWater(i) {
     const p = S.gn.plots[i]; if (!p || !p.c || p.w || gdReady(p)) return false;
@@ -13028,7 +13032,7 @@ body.cam-scene #ffChip,body.cam-scene #plChip,body.cam-scene .b-ring{animation-p
       const bed = IMG(p.w && !ready ? 'plot_wet' : 'plot_dry'), crop = C ? gdImg(`crop_${p.c}_${st}`, st === 3 ? C.em : st === 2 ? '🌿' : '🌱', 'crop') : '';
       const tx = !C ? '빈 밭' : ready ? `${C.nm} 다 자람` : `${C.nm} ${hm(Math.max(1, Math.ceil((p.e - now) / 1000)))}`;
       const act = !C ? `<button type="button" data-gd="pick" data-i="${i}">심기</button>` : ready ? `<button type="button" class="go" data-gd="har" data-i="${i}">거두기</button>`
-        : (p.w ? '<small>물 줬어요</small>' : `<button type="button" data-gd="wat" data-i="${i}">💧 물 주기</button>`) + `<button type="button" data-gd="cut" data-i="${i}">⏱ 당기기</button>`;   // 3.3.2
+        : (p.w ? '<small>물 줬어요</small>' : `<button type="button" data-gd="wat" data-i="${i}">💧 물 주기</button>`) + `<button type="button" data-gd="cut" data-i="${i}">시간 줄이기</button>`;   // 3.3.2
       return `<div class="gd-plot${ready ? ' ready' : ''}${rt.gdPick === i || rt.gdCutI === i ? ' pick' : ''}"><span class="bed"${bed ? ` style="background-image:url('${bed}')"` : ''}>${crop}</span><span class="tx">${tx}</span>${act}</div>`;
     }).join('');
     { const cb = $('#gdCut'), ci = rt.gdCutI, cp = ci >= 0 ? S.gn.plots[ci] : null, ok = cp && cp.c && !gdReady(cp);
@@ -13038,7 +13042,7 @@ body.cam-scene #ffChip,body.cam-scene #plChip,body.cam-scene .b-ring{animation-p
         cb.innerHTML = `<b>${GD_C[cp.c].nm} 시간 당기기 <small>${hm(rem)} 남음</small></b>` +
           (S.gn.free > 0 ? `<button type="button" class="go free" data-gd="free" data-i="${ci}">🎁 무료로 바로 자라기 (${S.gn.free}번)</button>` : '') +
           `<div class="gd-tks">${TK.slice().reverse().map(t => `<button type="button" data-gd="tk" data-tk="${t.k}" data-i="${ci}" aria-disabled="${S.tk[t.k] > 0 ? 'false' : 'true'}">${t.name}<small>${S.tk[t.k]}장</small></button>`).join('')}</div>` +
-          `<div class="gd-tkrow"><button type="button" data-gd="tkall" data-i="${ci}" aria-disabled="${tkSum() > 0 ? 'false' : 'true'}">남은 시간만큼 쓰기</button>` +
+          `<div class="gd-tkrow"><button type="button" data-gd="tkall" data-i="${ci}" aria-disabled="${tkSum() > 0 ? 'false' : 'true'}">단축권 자동 사용</button>` +
           `<button type="button" data-gd="tkad" aria-disabled="${adL > 0 ? 'false' : 'true'}">📺 광고 보고 5분권 ${TKAD.n}장 (${adL}번 남음)</button></div>` +
           `<div class="gd-tkrow"><button type="button" data-gd="pull" data-i="${ci}">${rt.gdPullI === ci ? '한 번 더 누르면 뽑아요 (재료 없음)' : '🧤 작물 뽑기'}</button></div>`; } }   // 4.0.1 잘못 심은 작물 뽑기(두 번 눌러요)
     { const live = S.gn.plots.slice(0, n), em = live.filter(p => !p.c).length, rd = live.filter(p => p.c && gdReady(p)).length, wt = live.filter(p => p.c && !p.w && !gdReady(p)).length;
@@ -13057,7 +13061,7 @@ body.cam-scene #ffChip,body.cam-scene #plChip,body.cam-scene .b-ring{animation-p
       const has = S.gn.menu[m.id], ok = gdMenuOk(m), can = !tm && gdCanCook(m);
       const need = Object.entries(m.need).map(([c, k]) => `${GD_C[c].em}${k > 1 ? '×' + k : ''}`).join('');
       return `<button type="button" class="gd-menu${has ? '' : ' no'}${can ? ' can' : ''}${tm && tm.id === m.id ? ' on' : ''}" data-gd="cook" data-m="${m.id}" aria-disabled="${can ? 'false' : 'true'}">` +
-        `${has ? gdImg(m.id, m.em) : gdImg('menu_frame', '🍽')}<span class="ell">${has || ok ? esc(m.nm) : '???'}</span><small>${ok ? need : '나중에 열려요'}</small></button>`;
+        `${has ? gdImg(m.id, m.em) : gdImg('menu_frame', '🍽')}<span class="ell">${has || ok ? esc(m.nm) : '???'}</span><small>${ok ? need : `${TIERS[Math.max(...Object.keys(m.need).map(c => GD_C[c].tier))].name}부터`}</small></button>`;
     }).join('')}</div>`;
   }
   /* 2.1.2 마을 기부(프로젝트 문서 '마을 기부 설계안 (2.1.2)', woodani 확정 2026-10-29): 도토리를 숲속 마을에 기부하면 기부 단계가 올라요.
@@ -13133,7 +13137,7 @@ body.cam-scene #ffChip,body.cam-scene #plChip,body.cam-scene .b-ring{animation-p
     $('#vdLead').textContent = `${lv + 1}단계까지 도토리 ${fmt(left)}개가 더 필요해요\n${rw ? `${lv + 1}단계 보상: ${rw}` : `${lv + 1 > VD.art ? `${VD.goldEvery}단계마다 황금 도토리를 받아요` : ''}`}`;
     const b = (k, nm, a) => `<button type="button" data-vdk="${k}" aria-disabled="${S.budget >= a ? 'false' : 'true'}"><span>${nm}</span><em>${acornIcon()}${fmt(a)}</em></button>`;
     $('#vdBtns').innerHTML = short && S.budget >= 1 ? b('all', '있는 만큼', Math.min(left, Math.floor(S.budget))) : b('0.1', '10%', a1) + b('0.5', '50%', a5) + b('left', '남은 만큼', left);
-    $('#vdSum').textContent = `지금까지 기부한 도토리 ${fmt(S.vd.sum)}개\n졸업해도 기부 단계는 남아요`;
+    $('#vdSum').textContent = `지금까지 기부한 도토리 ${fmt(S.vd.sum)}개\n단계가 오르면 지도에 기념물이 서요. 수입은 늘지 않아요. 졸업해도 남아요`;
     { const lk = $('#vdLock'); if (lk) { lk.hidden = !vdLocked(); lk.textContent = '이 가격은 오늘 23:59까지예요. 지나면 그때 수입에 맞게 기부할 도토리가 다시 정해져요'; } }   // 2.3.1
   }
   // 지도의 기념물(renderDeco가 불러요): 지금 지도에 자리가 있을 때만
@@ -13153,7 +13157,8 @@ body.cam-scene #ffChip,body.cam-scene #plChip,body.cam-scene .b-ring{animation-p
   // 3.3.4 아래 한 줄 칩: 오른쪽부터 까치 핫딜, 새 편지, 즉시 완공 순서로 놓아요. 학교급 단추에 닿으면 한 줄 위로
   function chipRow() {
     const fr = $('#ffChip') && $('#ffChip').parentElement; if (!fr) return;
-    const dots = $('#tierDots'), W = fr.clientWidth, lim = dots && !dots.hidden && dots.offsetWidth ? dots.offsetLeft + dots.offsetWidth + 8 : 10;
+    const dots = $('#tierDots'), W = fr.clientWidth; let lim = dots && !dots.hidden && dots.offsetWidth ? dots.offsetLeft + dots.offsetWidth + 8 : 10;
+    { const wx = $('#wxChip'); if (wx && !wx.hidden && wx.offsetWidth) lim = Math.max(lim, wx.getBoundingClientRect().right - fr.getBoundingClientRect().left + 8); }   // 5.0.1.5 H-04 날씨 칩도 비켜요
     let r = 10, row = 0;
     for (const el of [$('#btnDeal'), $('#plChip'), $('#ffChip')]) {
       if (!el || el.hidden || !el.offsetWidth) continue;
@@ -13182,7 +13187,7 @@ body.cam-scene #ffChip,body.cam-scene #plChip,body.cam-scene .b-ring{animation-p
     // 3.3.4 작은 알약: ⚡남은 번, 건설 부스터, 야간 건설 아이콘(켜져 있을 때만 +n%). 자세한 말은 누르면 떠요
     c.innerHTML = (ks.length ? `<b>⚡${ffLeft()}/${FF.day}</b>` : '') + (on ? `<small>🔨+100%</small>` : '') +
       (nbShow ? `<small class="nb">${nbIc}${nb || sp ? ` +${nbAdd()}%` : ''}</small>` : '') + '<span class="ffx" role="button" aria-label="오늘은 이 알림 닫기">×</span>';
-    c.dataset.tip = [ks.length ? `오늘 즉시 완공 ${ffLeft()}/${FF.day}` : '', on ? `건설 부스터 +100%, ${hm(cbLeft())} 남음` : '', nbShow ? nbTx : ''].filter(Boolean).join(' / ');
+    c.dataset.tip = [ks.length ? `즉시 완공이 오늘 ${ffLeft()}번 남았어요. ${FAC[ks[0]].name}부터 보여 드려요` : '', on ? `건설 부스터 +100%, ${hm(cbLeft())} 남음` : '', nbShow ? nbTx : ''].filter(Boolean).join(' / ');
     c.setAttribute('aria-label', (ks.length ? `오늘 즉시 완공 ${FF.day}번 가운데 ${ffLeft()}번 남음, 눌러서 건물 창 열기` : '') + (on ? ` 건설 부스터 사용 중` : '') + (nbShow ? ` ${nbTx}` : ''));
     ffUp(c);
   }
@@ -13411,7 +13416,7 @@ body.cam-scene #ffChip,body.cam-scene #plChip,body.cam-scene .b-ring{animation-p
     { const c = conEssCost(left); setH($('#conEssCost'), `${ESS_ICON()}<b>${c}</b>`); $('#conEss').setAttribute('aria-disabled', S.ess >= c ? 'false' : 'true'); }
     $('#conNo').hidden = !(rt.conArm && p.n);
     setT($('#conPlan'), !p.n ? '시간 단축권이 없어요. 광고를 보거나 문방구에서 살 수 있어요'
-      : p.left ? `${tkPlanText(p)}을 써서 ${hm(p.cut)} 줄이고 ${hm(p.left)} 남아요` : `${tkPlanText(p)}을 써서 바로 끝나요`);
+      : p.left ? `${tkPlanText(p)}을 써서 ${hm(p.cut)} 줄이고 ${hm(p.left)} 남아요` : left < 60 ? `${hm(left)}면 끝나요. 단축권은 긴 공사에 아껴 두세요` : `${tkPlanText(p)}을 써서 바로 끝나요`);
     const arm = rt.conArm && p.n;   // 2.1.2 바로 줄이기를 누르면 쓸 권을 표시해요
     setH($('#conTks'), TK.slice().reverse().map(t => `<button type="button" class="con-tk${rt.conPick === t.k ? ' armed' : ''}${arm && p.use[t.k] ? ' plan' : ''}" data-tk="${t.k}" aria-disabled="${S.tk[t.k] > 0 ? 'false' : 'true'}">${IMG('ticket_' + t.k) ? `<img src="${IMG('ticket_' + t.k)}" alt="">` : '⌛'}<span>${t.name}</span><b>${fmt(S.tk[t.k])}장</b>${arm && p.use[t.k] ? `<em class="use">−${p.use[t.k]}장</em>` : ''}</button>`).join(''));
     cbSheet();   // 2.1.1 건설 가속
@@ -13488,6 +13493,7 @@ body.cam-scene #ffChip,body.cam-scene #plChip,body.cam-scene .b-ring{animation-p
       setT($('.tlv', card), here ? `Lv.${L}` : '아직 안 오셨어요');
       setT($('.now', card), X.eff(L));
       setT($('.next', card), maxed ? '최고 레벨이에요' : X.eff(L + 1));
+      setT($('.k-next', card), here ? '연수 후' : '오시면');   // 5.0.1.5 T-11 못 만난 선생님
       const note = $('.tnote', card); setHid(note, here); setT(note, here ? '' : S.tier < (X.tier || 0) ? `${TIERS[X.tier].school}${X.fac === 'store' ? ' 매점' : X.fac === 'dorm' ? ' 기숙사' : X.fac === 'union' ? ' 학생회관' : X.fac === 'institute' ? ' 연구소' : ''}에서 오셔요.` : `${eul(FAC[X.fac].name)} 지으면 학교에 오셔요.`);
       const btn = $('button', card);
       setT($('.lbl', btn), maxed ? '최고 레벨' : '연수 보내기');
@@ -13652,7 +13658,7 @@ body.cam-scene #ffChip,body.cam-scene #plChip,body.cam-scene .b-ring{animation-p
     if (S.pendingSec > offlineCapH() * 3600) fine += ` 도토리는 최대 ${offlineCapH()}시간까지 쌓여요.`;
     if (rt.nsAway) fine += ` 야간 자율학습으로 ${hm(nsExtraH() * 3600)} 더 쌓였어요.`;   // 3.0.0
     $('#offFine').textContent = fine;
-    renderAdPick('#offPick', '도토리 두 배'); $('#offDouble').textContent = adPickNow() === 'acorn' ? '광고 보고 +100%' : '광고 보고 함께 받기';   // 4.2.0
+    renderAdPick('#offPick', '도토리 +100%'); $('#offDouble').textContent = adPickNow() === 'acorn' ? '광고 보고 +100%' : '광고 보고 함께 받기';   // 4.2.0
   }
   function showOffline() {
     if (!(S.pending > 0)) return false;
@@ -13964,8 +13970,8 @@ body.cam-scene #ffChip,body.cam-scene #plChip,body.cam-scene .b-ring{animation-p
        forest/rank/<내 id>   랭킹 이름과 학교 점수
        forest/stats/<내 id>  테스트 현황 (어디까지 했는지, 얼마나 했는지)
      <내 id>는 Firebase 익명 로그인이 기기(브라우저)마다 만들어 줘요. */
-  const VERSION = '5.0.1.4';   // 2026-11-17 woodani 결정: 웹에 5.0.2~5.0.5로 먼저 냈던 것을 앱과 함께 5.0.1 하나로 내요(버전 견줌은 앞 두 자리만 봐서 되돌아가도 괜찮아요)
-  const NT_QUIET = ['2.1.20', '2.1.2.2', '2.3.0.1', '2.3.4', '3.2.3', '3.2.4', '3.2.5', '3.3.1', '3.3.2', '3.3.3', '4.4.1.1', '4.4.1.2', '4.4.1.3', '4.4.1.4', '5.0.1.1', '5.0.1.2', '5.0.1.3', '5.0.1.4'];   // 5.0.1.1 생물 탐사 고침은 공지 없이   // 5.0.3도 공지 없이(공지 줄은 woodani가 정하면 넣어요)   // 5.0.2 공지 없이(woodani 2026-11-16)   // 5.0.1 공지 줄은 woodani가 정할 때까지 조용히   // 5.0.0 공지는 2026-11-16 woodani가 정해서 NOTICES로 옮겼어요   // 4.4.1(앱과 함께 내는 판)은 공지를 띄워요   // 4.4.1도 공지 없이(woodani)   // 3.3.1, 3.3.2, 3.3.3(토스 먼저)도 공지 창 없이(woodani). 2.3.0.1도 공지 창 없이(공지는 그대로 2.3.0). 2.3.4도 조용히(woodani 결정). 3.2.3, 3.2.4, 3.2.5도 공지 창 없이(공지 줄을 고르지 않음)
+  const VERSION = '5.0.1.5';   // 2026-11-17 woodani 결정: 웹에 5.0.2~5.0.5로 먼저 냈던 것을 앱과 함께 5.0.1 하나로 내요(버전 견줌은 앞 두 자리만 봐서 되돌아가도 괜찮아요)
+  const NT_QUIET = ['2.1.20', '2.1.2.2', '2.3.0.1', '2.3.4', '3.2.3', '3.2.4', '3.2.5', '3.3.1', '3.3.2', '3.3.3', '4.4.1.1', '4.4.1.2', '4.4.1.3', '4.4.1.4', '5.0.1.1', '5.0.1.2', '5.0.1.3', '5.0.1.4', '5.0.1.5'];   // 5.0.1.1 생물 탐사 고침은 공지 없이   // 5.0.3도 공지 없이(공지 줄은 woodani가 정하면 넣어요)   // 5.0.2 공지 없이(woodani 2026-11-16)   // 5.0.1 공지 줄은 woodani가 정할 때까지 조용히   // 5.0.0 공지는 2026-11-16 woodani가 정해서 NOTICES로 옮겼어요   // 4.4.1(앱과 함께 내는 판)은 공지를 띄워요   // 4.4.1도 공지 없이(woodani)   // 3.3.1, 3.3.2, 3.3.3(토스 먼저)도 공지 창 없이(woodani). 2.3.0.1도 공지 창 없이(공지는 그대로 2.3.0). 2.3.4도 조용히(woodani 결정). 3.2.3, 3.2.4, 3.2.5도 공지 창 없이(공지 줄을 고르지 않음)
     // 2.1.20 woodani 결정: 이 버전들은 업데이트해도 공지 창을 띄우지 않아요(공지는 그대로 2.1.2)
   /* 2.0.0 공지사항 (2026-10-27 woodani, 1.8.0은 이미 올려서 2.0.0부터): 설정 > 공지사항. 맨 위가 가장 새 공지예요.
      패치노트는 자동으로 넣지 않아요. woodani가 검수한 글만 여기에 적어요(CHANGELOG.md는 자세한 기록용이라 따로 있어요).
@@ -15229,7 +15235,7 @@ body.cam-scene #ffChip,body.cam-scene #plChip,body.cam-scene .b-ring{animation-p
     rt.rankEdit = false;
     save();
     await submitRank(true);
-    if (!Rank.readOnly) { toast(price ? `'${name}'(으)로 이름을 바꿨어요` : `'${name}' 교장 선생님, 랭킹에 올렸어요!`); sfx('quest'); }
+    if (!Rank.readOnly) { toast(price ? `'${name}'${euro(name).slice(String(name).length)} 이름을 바꿨어요` : `'${name}' 교장 선생님, 랭킹에 올렸어요!`); sfx('quest'); }
     renderRankPanel();
     return true;
   }
@@ -15259,9 +15265,9 @@ body.cam-scene #ffChip,body.cam-scene #plChip,body.cam-scene .b-ring{animation-p
   }
   // 랭킹을 못 여는 까닭
   function rankOffText() {
-    if (!hasCloudBuild()) return '랭킹은 친구들과 함께 여는 게임 화면에서 열려요. 지금은 내 학교 파워만 볼 수 있어요.';
-    if (Cloud.state === 'error') return `서버에 연결하지 못해서 지금은 내 학교 파워만 볼 수 있어요. ${CLOUD_ERR[Cloud.err] || CLOUD_ERR.etc}.`;
-    return '서버를 연결하기 전 체험판이라서 지금은 내 학교 파워만 볼 수 있어요.';
+    if (!hasCloudBuild()) return '랭킹은 친구들과 함께 여는 게임 화면에서 열려요. 지금은 내 점수만 볼 수 있어요. 다른 학교 순위는 연결되면 보여요.';
+    if (Cloud.state === 'error') return `서버에 연결하지 못해서 지금은 내 점수만 볼 수 있어요. 다른 학교 순위는 연결되면 보여요. ${CLOUD_ERR[Cloud.err] || CLOUD_ERR.etc}.`;
+    return '서버를 연결하기 전 체험판이라서 지금은 내 점수만 볼 수 있어요. 다른 학교 순위는 연결되면 보여요.';
   }
   /* 3.0.0 순위표 보조 줄(woodani 결정 2026-11-03, 자세한 것은 본부 인수인계 문서). 서버에는 아무것도 올리지 않아요 */
   const RKF = { fill: 20, lo: 0.3, hi: 1.1, endLo: 0.3, endHi: 0.9, start: 0.25, tierDrop: 0.04, floor: { week: 300, sea: 3000, bt: 60, all: 300 }, titled: 0.65,
@@ -15706,7 +15712,7 @@ body.cam-scene #ffChip,body.cam-scene #plChip,body.cam-scene .b-ring{animation-p
   // 2.1.0 테마 세트는 한 번에만 사요(값 60, 그 테마 배경을 이미 샀으면 50). 이미 산 칸은 그대로 칸마다 쓰고 벗을 수 있어요
   const thSetPrice = t => GSHOP.theme - (thOwn(t, 'bg') ? GSHOP.themeBgOff : 0);
   function renderThemes(coin) {
-    let h = `<h3 class="shop-h">테마 세트 <small>지도, 지붕 색, 테마 곡을 한 벌로</small></h3>`;
+    let h = `<h3 class="shop-h">테마 세트 <small>지도, 지붕 색, 테마 곡 한 벌. 가지면 수업료 +3%</small></h3>`;
     for (const t of THEMES) {
       const n = thCount(t.id), done = n === TH_SLOTS.length;
       const playing = Music.preview === t.id;
@@ -15966,7 +15972,7 @@ body.cam-scene #ffChip,body.cam-scene #plChip,body.cam-scene .b-ring{animation-p
     // 5.0.4 woodani 요청: 쓰는 도토리, 대원마다 한 줄, 탐험대 힘을 나눠서 보여 줘요(예전에는 창을 열 때 줄바꿈이 지워져 한 덩어리로 보였어요)
     const rows = P.up.filter(u => u.b > u.a).map(u => `<span class="ask-row"><i>${esc(spName(u.sp))}</i><span>Lv.${u.a} → <b>${u.b}</b></span><em>+${u.b - u.a}</em></span>`).join('');
     askBox({ title: '출동 대원 고르게 올리기', yes: '올리기', no: '그만두기',
-      html: `<span class="ask-sum">${acornIcon()}<b>${fmt(P.cost)}</b>개를 써요</span><span class="ask-sub">남는 도토리 ${fmt(P.left)}개</span><span class="ask-rows">${rows}</span><span class="ask-sum">탐험대 힘 ${fmt(P.pw0)} → <b>${fmt(P.pw1)}</b></span>`,
+      html: `<span class="ask-sum">${acornIcon()}<b>${fmtN(P.cost)}</b>${eulOf(fmtN(P.cost))} 써요</span><span class="ask-sub">남는 도토리 ${fmtN(P.left)}</span><span class="ask-rows">${rows}</span><span class="ask-sum">탐험대 힘 ${fmt(P.pw0)} → <b>${fmt(P.pw1)}</b></span>`,
       onYes: () => { let n = 0;   // 보여 준 그대로 올려요(창을 보는 동안 들어온 도토리로 더 올리지 않아요)
         if (S.budget >= P.cost && P.up.every(u => tamMem(u.sp).lv === u.a)) { S.budget -= P.cost; for (const u of P.up) tamMem(u.sp).lv = u.b; n = P.n; } else n = tamLvAll();
         if (!n) return; tamLvFx(tamParty()); tamRestartStat(); sfx('coin'); buzz(14); save(); renderHUD(); tamRenderTop(); tamRenderBody(); tamToast(`출동 대원 레벨 +${n}`); } });
@@ -16203,7 +16209,7 @@ body.cam-scene #ffChip,body.cam-scene #plChip,body.cam-scene .b-ring{animation-p
   // 4.3.0 woodani 요청: 탐험에서 받은 것과 알림은 화면 맨 위가 아니라 탐험 무대 가운데에 띄워요(탐험 화면이 아니면 원래 알림)
   function tamToast(msg) {
     const st = $('#tmStage'), m = $('#tmMsg');
-    if (!st || !m || rt.tab !== 'tam' || $('#panelTam').hidden) { toast(msg); return; }
+    if (!st || !m || rt.tab !== 'tam' || $('#panelTam').hidden || !$('#tmSheet').hidden) { toast(msg); return; }   // 5.0.1.5 M-01 창이 열려 있으면 무대 알림이 창 뒤에 가려요
     m.textContent = msg; m.hidden = false; m.style.animation = 'none'; void m.offsetWidth; m.style.animation = '';
     clearTimeout(m._t); m._t = setTimeout(() => { m.hidden = true; }, 2600);
   }
@@ -16538,10 +16544,10 @@ body.cam-scene #ffChip,body.cam-scene #plChip,body.cam-scene .b-ring{animation-p
   function tamRenderTop() {
     if (!tamOn()) return;
     tamHSync(); const hm = tamHOn(), fl = tamCurFl(), R = tamReg(fl), lap = hm ? 0 : tamLap(fl);
-    $('#tmReg').textContent = R.nm + (lap ? ` (깊은 밤 ${lap})` : '');
+    $('#tmReg').textContent = R.nm + (lap ? ` (${lap + 1}바퀴째)` : '');
     $('#tmFl').textContent = tamFlTx(fl, hm);
     { const md = $('#tmMode'); md.hidden = !tamHOpen(); $$('[data-tmm]', md).forEach(b => b.setAttribute('aria-pressed', String(+b.dataset.tmm === (hm ? 1 : 0)))); }   // 4.3.3 심화 탐험
-    $('#tmBest').innerHTML = hm ? `<span>심화 최고</span>${fmt(S.tam.hb)}층` : (S.tam.best ? `<span>최고층</span>${fmt(S.tam.best)}층` : '<span>첫 탐험</span>') + (isFinite(tamCap()) ? `<small class="tm-cap">${tamCapped() ? '학년이 오르면 더 가요' : `이번 학기 ${fmt(tamCap())}층까지`}</small>` : '');   // 4.3.1
+    $('#tmBest').innerHTML = hm ? `<span>심화 최고</span>${fmt(S.tam.hb)}층` : (S.tam.best ? `<span>최고층</span>${fmt(S.tam.best)}층` : '<span>첫 탐험</span>') + (isFinite(tamCap()) ? `<small class="tm-cap">${tamCapped() ? '이번 학기 끝! 심화 탐험으로 가요' : `이번 학기 ${fmt(tamCap())}층까지`}</small>` : '');   // 4.3.1
     { const pw = tamPow(), el = $('#tmPow'), fu = tamI('ex_flag');   // 4.3.2 탐험대 힘 칸: 깃발 그림과 큰 숫자, 힘이 오르면 한 번 들썩
       setH(el, `${fu ? `<img src="${fu}" alt="">` : ''}<span><small>탐험대 힘</small><b>${fmt(pw)}</b></span>`); el.setAttribute('aria-label', `탐험대 힘 ${fmt(pw)}`);
       if (rt.tamPw && pw > rt.tamPw) { el.classList.remove('up'); void el.offsetWidth; el.classList.add('up'); }
@@ -16551,13 +16557,13 @@ body.cam-scene #ffChip,body.cam-scene #plChip,body.cam-scene .b-ring{animation-p
     const rb = (el, ic, nm, sub, ad, lab) => { const k = [ic, nm, sub, ad].join('|'); if (el._k !== k) { el._k = k; const u = IMG(ic), a = ad && IMG('ex4_ic_ad'); setH(el, `${a ? `<img class="tm-adb" src="${a}" alt="">` : ''}${u ? `<img src="${u}" alt="">` : ''}<small>${esc(nm)}</small>${sub ? `<em>${esc(sub)}</em>` : ''}`); } el.setAttribute('aria-label', lab); };
     const sb = $('#tmSpd'); sb.classList.toggle('on', tamSpdOn());
     const left = TAM.adSpd.n - S.tam.ad.spd;
-    rb(sb, 'ex4_ic_speed', tamSpdOn() ? hms(S.tam.spd.sec * 1000) : '2배속', `${left}`, !tamSpdOn() || left > 0, tamSpdOn() ? `2배속 ${hms(S.tam.spd.sec * 1000)} 남음` : `광고 보고 2배속 ${TAM.adSpd.min}분, 오늘 ${left}번 남음`);
-    const ab = $('#tmAuto'); ab.hidden = !tamAutoOn(); ab.setAttribute('aria-pressed', S.tam.auto ? 'true' : 'false'); rb(ab, 'ex4_ic_auto', S.tam.auto ? '자동 켬' : '자동 끔', '', false, S.tam.auto ? '필살기 자동 켬' : '필살기 자동 끔');
+    rb(sb, 'ex4_ic_speed', tamSpdOn() ? hms(S.tam.spd.sec * 1000) : '광고 2배속', `${left}`, !tamSpdOn() || left > 0, tamSpdOn() ? `2배속 ${hms(S.tam.spd.sec * 1000)} 남음` : `광고 보고 2배속 ${TAM.adSpd.min}분, 오늘 ${left}번 남음`);
+    const ab = $('#tmAuto'); ab.hidden = !tamAutoOn(); ab.setAttribute('aria-pressed', S.tam.auto ? 'true' : 'false'); rb(ab, 'ex4_ic_auto', S.tam.auto ? '필살기 자동' : '필살기 수동', '', false, S.tam.auto ? '필살기 자동 켬' : '필살기 자동 끔');
     { const so = $('#tmSkOff'); so.hidden = !S.tam.skSeen; so.setAttribute('aria-pressed', S.tam.skOff ? 'true' : 'false'); rb(so, 'ex4_ic_report', S.tam.skOff ? '연출 끔' : '연출 켬', '', false, S.tam.skOff ? '필살기 연출 건너뛰기 켬' : '필살기 연출 건너뛰기 끔'); }   // 4.3.3 필살기를 한 번 본 뒤에 생겨요
-    { const sk = $('#tmSkip'), to = tamSkipTo(); sk.hidden = !to; if (to) { rb(sk, 'ex_flag', '빠른 스킵', `${fmt(to)}층`, false, `빠른 스킵: ${fmt(to)}층까지 한 번에 넘어가요`);   // 4.4.1
-      if (rt.tamSkTo !== to && (!rt.tamSkTo || to > rt.tamSkTo + 9)) tamToast(`누르면 ${fmt(to)}층까지 빠른 스킵이 가능해요`); } rt.tamSkTo = to; }
+    { const sk = $('#tmSkip'), to = tamSkipTo(); sk.hidden = !to; if (to) { rb(sk, 'ex_flag', '빠르게 넘기', `${fmt(to)}층`, false, `빠르게 넘기: ${fmt(to)}층까지 한 번에 넘어가요`);   // 4.4.1
+      if (rt.tamSkTo !== to && (!rt.tamSkTo || to > rt.tamSkTo + 9)) tamToast(`누르면 ${fmt(to)}층까지 빠르게 넘길 수 있어요`); } rt.tamSkTo = to; }
     const T = rt.tam, rv = $('#tmRevive'), cl = tamCheerLeft(); rv.hidden = !(S.tam.cheer > 0 || (T && T.lose && cl > 0));   // 4.3.1 지면 응원 단추, 응원 중에는 남은 층
-    rb(rv, 'ex4_ic_cheer', S.tam.cheer > 0 ? `${S.tam.cheer}층` : '응원', S.tam.cheer > 0 ? '' : `${cl}`, S.tam.cheer <= 0, S.tam.cheer > 0 ? `응원 ${S.tam.cheer}층 남음` : `광고 보고 응원 받기 힘 +${Math.round((TAM.cheer.mul - 1) * 100)}%, 오늘 ${cl}번 남음`); rv.classList.toggle('on', S.tam.cheer > 0);
+    rb(rv, 'ex4_ic_cheer', S.tam.cheer > 0 ? `응원 ${S.tam.cheer}층` : '응원', S.tam.cheer > 0 ? '' : `${cl}`, S.tam.cheer <= 0, S.tam.cheer > 0 ? `응원 ${S.tam.cheer}층 남음` : `광고 보고 응원 받기 힘 +${Math.round((TAM.cheer.mul - 1) * 100)}%, 오늘 ${cl}번 남음`); rv.classList.toggle('on', S.tam.cheer > 0);
     tamAcorn(true);
     const I = tamIdle(), rp = $('#tmRep'); rp.hidden = I.sec < 60; rp.textContent = `탐험 보고서 받기 (${Math.floor(I.sec / 60)}분)`;
   }
@@ -16689,7 +16695,7 @@ body.cam-scene #ffChip,body.cam-scene #plChip,body.cam-scene .b-ring{animation-p
   }
   function tamClick(e) {
     const b = e.target.closest('button'); if (!b || !tamOn()) return;
-    if (b.getAttribute('aria-disabled') === 'true' && !(b.dataset.tlv && S.budget >= tamLvCost(b.dataset.tlv))) { if (b.dataset.tlv) tamToast('도토리가 모자라요\n정수 상점에서 숲의 정수로 바꿀 수 있어요'); else if (b.dataset.tgear) tamToast('재료가 모자라요'); return; }
+    if (b.getAttribute('aria-disabled') === 'true' && !(b.dataset.tlv && S.budget >= tamLvCost(b.dataset.tlv))) { if (b.dataset.tlv) tamToast('도토리가 모자라요\n문방구에서 숲의 정수로 도토리를 살 수 있어요'); else if (b.dataset.tgear) tamToast('재료가 모자라요'); return; }
     if (b.dataset.tsk) { tamCast(+b.dataset.tsk); return; }
     if (b.dataset.tmm) { const v = +b.dataset.tmm; if ((v && !tamHOpen()) || (rt.tam && rt.tam.ph === 'event')) return; if ((S.tam.hm ? 1 : 0) === v) return; S.tam.hm = v; tamHSync(); sfx('tap'); save(); tamSkStop(); tamRestart(); tamRenderTop(); tamRenderBody(); musicSync(); return; }   // 4.3.3 심화 탐험
     if (b.id === 'tmExit') { sfx('tap'); setTab('school'); return; }   // 4.4.0
@@ -16985,7 +16991,7 @@ body.cam-scene #ffChip,body.cam-scene #plChip,body.cam-scene .b-ring{animation-p
       toast(`${it.name}${it.ga} 샀어요! 바로 입혀 뒀어요`);
     } else if (it.kind === 'e') {
       S.deco.own[it.d.id] = 1;
-      toast(`${it.name}${it.ga} 샀어요! 꾸미기 가게의 '지도에 놓기'로 학교에 놓아 보세요`);
+      toast(`${it.name}${it.ga} 샀어요! 꾸미기 가게의 '지도 꾸미기'를 눌러 학교에 놓아 보세요`);
     } else if (it.kind === 'm') {
       S.cos.own.push('mkx:' + it.x); S.cos.mkx = it.x;
       renderCrest();
@@ -17071,12 +17077,12 @@ body.cam-scene #ffChip,body.cam-scene #plChip,body.cam-scene .b-ring{animation-p
       h += row(`<svg viewBox="-12 -12 24 24" aria-hidden="true"><path d="M3 -8 A8.5 8.5 0 1 0 8 4 A7 7 0 1 1 3 -8 Z" fill="#F2C230"/></svg>`, '밤 모드', '지도가 밤 색이 되고 건물 창에 불이 켜져요', own ? '' : '',
         own ? `<button class="buy${on ? ' on' : ''}" type="button" data-ebuy="night" aria-pressed="${on}">${on ? '끄기' : '켜기'}</button>` : buy('night', ESHOP.night, false, '밤 모드')); }
     // 바꾸기
-    h += '<h3 class="shop-h">바꾸기 <small>(횟수 제한)</small></h3>';
+    h += '<h3 class="shop-h">바꾸기 <small>(하루 5번씩)</small></h3>';
     { const xl = esExLeft(), xc = esExCost();
-      h += `<div class="sb"><span class="pv">${ic}</span><span class="tx"><b>숲의 정수 ${ESHOP.ex.n}개</b><span>도토리로 바꿔요</span><small>${xl > 0 ? `오늘 ${xl}번 더 바꿀 수 있어요` : '오늘은 다 바꿨어요. 내일 다시 열려요'}</small></span>` +
+      h += `<div class="sb"><span class="pv">${ic}</span><span class="tx"><b>숲의 정수 ${ESHOP.ex.n}개</b><span>도토리를 내고 받아요</span><small>${xl > 0 ? `오늘 ${xl}번 더 바꿀 수 있어요` : '오늘은 다 바꿨어요. 내일 다시 열려요'}</small></span>` +
         `<button class="buy${S.budget < xc ? ' poor' : ''}${xl > 0 ? '' : ' off'}" type="button" data-ebuy="ex" aria-label="숲의 정수 ${ESHOP.ex.n}개, 도토리 ${fmt(xc)}"><span data-acorn>${acornIcon()}</span>${fmt(xc)}</button></div>`; }
     { const al = esAxLeft(), ag = esAxGain();   // 4.3.1 숲의 정수 → 도토리(탐험 대원 훈련에 쓸 도토리)
-      h += row(`<span data-acorn>${acornIcon()}</span>`, `도토리 ${fmt(ag)}`, '숲의 정수로 바꿔요', al > 0 ? `오늘 ${al}번 더 바꿀 수 있어요` : '오늘은 다 바꿨어요. 내일 다시 열려요', buy('ax', ESHOP.ax.ess, al <= 0, `도토리 ${fmt(ag)}`)); }
+      h += row(`<span data-acorn>${acornIcon()}</span>`, `도토리 ${fmt(ag)}`, '숲의 정수를 내고 받아요', al > 0 ? `오늘 ${al}번 더 바꿀 수 있어요` : '오늘은 다 바꿨어요. 내일 다시 열려요', buy('ax', ESHOP.ax.ess, al <= 0, `도토리 ${fmt(ag)}`)); }
     const list = $('#essList'), top = list.scrollTop;
     list.innerHTML = h; list.scrollTop = top;
     $$('#essList [data-ic]').forEach(el => { const u = IMG(el.dataset.ic); if (u) el.style.backgroundImage = `url("${u}")`; });
@@ -17512,7 +17518,7 @@ body.cam-scene #ffChip,body.cam-scene #plChip,body.cam-scene .b-ring{animation-p
     }
     const d = DECO_BY[id]; if (!d) return;
     sfx('tap');
-    if (d.ev) { toast(decoOwn(id) ? `${d.name}${eulOf(d.name)} 가지고 있어요. '지도에 놓기'로 학교에 놓아 보세요` : d.cs ? `${eun(d.name)} 진로 도감 12칸을 다 채우면 받아요` : d.tr2 ? `${eun(d.name)} ${d.tr2} ${tr2Nm()}에서 가져와요` : d.fv ? `${eun(d.name)} 축제 부스 놀이를 ${FV.win}번 성공하면 받아요` : d.bf ? `${eun(d.name)} ${d.bf}월 대축제에서 도장 ${BIG.max}개를 모으면 받아요` : d.xg ? `${eun(d.name)} 교환학생 우정 배지 8개를 모으면 받아요` : d.mk ? `${eun(d.name)} 목요일 숲속 장터에서 쿠폰으로 사요` : `${eun(d.name)} 이벤트 기념 상자에서 받을 수 있어요`); return; }
+    if (d.ev) { toast(decoOwn(id) ? `${d.name}${eulOf(d.name)} 가지고 있어요. '지도 꾸미기'를 눌러 학교에 놓아 보세요` : d.cs ? `${eun(d.name)} 진로 도감 12칸을 다 채우면 받아요` : d.tr2 ? `${eun(d.name)} ${d.tr2} ${tr2Nm()}에서 가져와요` : d.fv ? `${eun(d.name)} 축제 부스 놀이를 ${FV.win}번 성공하면 받아요` : d.bf ? `${eun(d.name)} ${d.bf}월 대축제에서 도장 ${BIG.max}개를 모으면 받아요` : d.xg ? `${eun(d.name)} 교환학생 우정 배지 8개를 모으면 받아요` : d.mk ? `${eun(d.name)} 목요일 숲속 장터에서 쿠폰으로 사요` : `${eun(d.name)} 그 이벤트의 기념 상자에서 받아요. 지난 이벤트 것은 꾸미기 백화점에서 살 수 있어요`); return; }
     if (decoSoldOut(id)) { toast(d.rare ? `${eun(d.name)} 하나만 가질 수 있어요` : `${eun(d.name)} ${DECO_MAX}개까지 가질 수 있어요`); return; }
     rt.decoPick = id; renderDecoShop();
   }
@@ -17527,7 +17533,7 @@ body.cam-scene #ffChip,body.cam-scene #plChip,body.cam-scene .b-ring{animation-p
     const d = DECO_BY[rt.decoPick]; rt.decoPick = '';
     if (!d || d.rare || d.ev || decoSoldOut(d.id) || !(S.pc && S.pc.berry > 0)) { renderDecoShop(); return false; }
     S.pc.berry -= 1; S.deco.own[d.id] = decoOwn(d.id) + 1;
-    toast(`희귀 열매로 ${d.name}${eulOf(d.name)} 받았어요! '지도에 놓기'로 학교에 놓아 보세요`); sfx('quest'); buzz(15);
+    toast(`희귀 열매로 ${d.name}${eulOf(d.name)} 받았어요! '지도 꾸미기'를 눌러 학교에 놓아 보세요`); sfx('quest'); buzz(15);
     save(); renderDecoShop();
     return true;
   }
@@ -17545,7 +17551,7 @@ body.cam-scene #ffChip,body.cam-scene #plChip,body.cam-scene .b-ring{animation-p
     if (!(S.ess >= c)) { setTab('mini'); return false; }
     S.ess -= c; S.st.esSpent = (S.st.esSpent || 0) + c;
     S.deco.own[d.id] = decoOwn(d.id) + 1;
-    toast(`${d.name}${eulOf(d.name)} 샀어요! '지도에 놓기'로 학교에 놓아 보세요`); sfx('quest'); buzz(15);
+    toast(`${d.name}${eulOf(d.name)} 샀어요! '지도 꾸미기'를 눌러 학교에 놓아 보세요`); sfx('quest'); buzz(15);
     save(); renderEss(); renderDecoShop();
     return true;
   }
@@ -17676,8 +17682,8 @@ body.cam-scene #ffChip,body.cam-scene #plChip,body.cam-scene .b-ring{animation-p
       AC.keys.map(k => { const a = S.ac[k], need = AC.need(a.lv), capped = a.lv >= cap, left = acBkLeft(k), poor = S.ess < bookCost(k);
         return `<div class="ac-row" data-ac="${k}" role="button" tabindex="0" aria-label="${AC.name[k]} XP를 얻는 곳 보기"><span class="ac-nm">${AC.name[k]}</span><span class="ac-lv">Lv.${a.lv}</span>` +
           `<span class="ac-bar${capped ? ' cap' : ''}" role="progressbar" aria-label="${AC.name[k]} Lv.${a.lv}" aria-valuenow="${capped ? need : Math.min(need, a.xp)}" aria-valuemax="${need}"><i style="width:${capped ? 100 : Math.round(100 * Math.min(1, a.xp / need))}%"></i></span>` +
-          `<button class="ac-bk${left > 0 ? '' : ' off'}" type="button" data-book="${k}" aria-label="${AC.name[k]} 문제집 구매, 오늘 ${left}권 남음">문제집 구매</button></div>`; }).join('') +
-      `<div class="ac-note">${cap <= acLv('kor') && AC.keys.every(k => acLv(k) >= cap) ? `${tierInfo().name} 상한 Lv.${cap}이에요. 다음 학교급에서 더 배워요` : `문제집은 과목마다 하루 ${AC.book.perDay}권, 한 권에 XP +${AC.book.xp}. 값은 숲의 정수 ${AC.book.ess} + 그 과목 레벨이에요. ${tierInfo().name} 상한은 Lv.${cap}이에요`}</div>`;
+          `<button class="ac-bk${left > 0 ? '' : ' off'}" type="button" data-book="${k}" aria-label="${AC.name[k]} 문제집 구매, 오늘 ${left}권 남음">${left > 0 ? '문제집 구매' : '내일 또'}</button></div>`; }).join('') +
+      `<div class="ac-note">${cap <= acLv('kor') && AC.keys.every(k => acLv(k) >= cap) ? `${tierInfo().name} 상한 Lv.${cap}이에요. 다음 학교급에서 더 배워요` : `문제집은 과목마다 하루 ${AC.book.perDay}권, 한 권에 XP +${AC.book.xp}이에요. ${tierInfo().name}에서는 Lv.${cap}까지 올라요`}</div>`;
   }
   // 2.3.1 woodani 요청: 과목 줄을 누르면 그 과목 XP를 얻는 곳을 말풍선으로 잠깐 보여 줘요. 아직 열리지 않은 곳은 흐리게
   const AC_SRC = {
@@ -17961,7 +17967,7 @@ body.cam-scene #ffChip,body.cam-scene #plChip,body.cam-scene .b-ring{animation-p
       `<ol class="cg-tab">${t.map((r, i) => `<li class="${r.me ? 'me' : ''}"><span class="cg-rk">${i + 1}</span>${r.me ? ((S.deco.mk && markHTML(S.deco.mk)) || '🏫') : IMG('bmark_' + r.k) ? `<img src="${IMG('bmark_' + r.k)}" alt="">` : '🏫'}<span class="nm ell">${esc(r.nm)}</span><b>${fmt(r.pts)}</b></li>`).join('')}</ol>` +
       `<div class="cg-clubs">${CLUBS.map((C, c) => `<span>${clubBadge(c, 22)}${fmt(cgClubPts(c))}</span>`).join('')}</div>` +
       `<button class="cta small cg-prac" type="button" data-cg="prac" aria-disabled="${cgPracToday() ? 'true' : 'false'}">${cgPracToday() ? '오늘 연습 끝, 내일 또 해요' : `모두 연습 (동아리마다 +${CG.prac}점)`}</button>` +
-      `<small class="cg-note">점수: 부원 별 하나 ${CG.star}점, 연습 ${CG.prac}점, 발표회 ${CG.show}점. 1등 황금 도토리 ${CG.gold1}과 우승 깃발, 2~3등 황금 도토리 ${CG.gold23}${S.cg.res ? `. 지난주 ${S.cg.res.rank}등` : ''}</small></div>`;
+      `<small class="cg-note">점수: 부원 별 하나 ${CG.star}점, 연습 ${CG.prac}점, 발표회 ${CG.show}점. 1등 황금 도토리 ${CG.gold1}개와 우승 깃발, 2~3등 황금 도토리 ${CG.gold23}${S.cg.res ? `. 지난주 ${S.cg.res.rank}등` : ''}</small></div>`;
   }
   function sanitizeCg(d, s) {
     const G = d.cg && typeof d.cg === 'object' ? d.cg : {}, o = freshCg(), n = (v, hi) => Math.max(0, Math.min(hi, Math.floor(Number(v) || 0)));
@@ -18627,7 +18633,7 @@ body.cam-scene #ffChip,body.cam-scene #plChip,body.cam-scene .b-ring{animation-p
       S.rd.q.map((k, i) => { const qb = bookOf(k); return qb ? `<div class="rd-q"><span>다음: 「${esc(qb.name)}」 (예약)</span><button type="button" class="btn-sub small" data-rd-unq="${i}" aria-label="${esc(qb.name)} 예약 취소">취소</button></div>` : ''; }).join('');
     $('#rdBooks').innerHTML = BOOKS.map(b => { const n = S.rd.got[b.k] || 0, now = S.rd.cur === b.k;
       return `<button class="rd-book${now ? ' now' : ''}" type="button" data-bk="${b.k}" aria-disabled="${left > 0 ? 'false' : 'true'}" aria-label="${b.name}${n ? `, ${n}번 읽음` : ''}${busy && left > 0 ? ', 눌러서 예약' : ''}">${bookCover(b)}<b>${b.name}</b><small>${now ? '읽는 중' : S.rd.q.includes(b.k) ? '예약함' : n ? `${n}번 읽음` : '새 책'}</small></button>`; }).join('');
-    $('#rdNote').textContent = nl(`오늘 ${rdPerDay() - left}/${rdPerDay()}권. 지금까지 ${S.rd.st}권 읽었어요. 한 권에 국어 XP +${Math.round(RD.xp * (1 + XT.kor.per / 100 * xtLv('kor')) * (1 + deptX('human') / 100))}.`);
+    $('#rdNote').textContent = nl(`오늘 남은 책 ${left}/${rdPerDay()}권. 지금까지 ${S.rd.st}권 읽었어요. 한 권에 국어 XP +${Math.round(RD.xp * (1 + XT.kor.per / 100 * xtLv('kor')) * (1 + deptX('human') / 100))}.`);
   }
   // 저장 읽기(2.0.1 공부 2단계)
   function sanitizeStudy2(d, s) {
@@ -18727,7 +18733,7 @@ body.cam-scene #ffChip,body.cam-scene #plChip,body.cam-scene .b-ring{animation-p
     if (!$('#mPicnic') || !S.pc) return;
     const bg = IMG('picnic_trail'); $('#pcHead').style.backgroundImage = bg ? `url("${bg}")` : '';
     const busy = pcActive(), done = !busy && S.pc.day === gameToday(), can = !busy && !done;
-    $('#pcLead').textContent = nl(busy ? '친구들이 숲으로 소풍을 갔어요. 앱을 꺼도 시간은 가요.' : done ? '오늘 소풍은 다녀왔어요. 내일 또 가요.' : `소풍 갈 친구 ${PCN.kids}명을 골라요. ${PCN.min}분 동안 ${PCN.kids}명은 수업료를 내지 않아요.`);
+    $('#pcLead').textContent = nl(busy ? '친구들이 숲으로 소풍을 갔어요. 앱을 꺼도 시간은 가요.' : done ? '오늘 소풍은 다녀왔어요. 내일 또 가요.' : `하루 한 번, 친구 ${PCN.kids}명이 ${PCN.min}분 동안 다녀와요. 도토리 ${fmtN(minAcorns(PCN.acorn))}${batchim(fmtN(minAcorns(PCN.acorn))) ? '과' : '와'} 가끔 숲의 정수를 주워 와요. 그동안 ${PCN.kids}명은 수업료를 내지 않아요.`);
     renderPicnicNow();
     fvFlag($('#pcLead'), 'picnic', '축제 +100%');   // 4.1.0 축제 월요일
     $('#pcTickets').innerHTML = busy && pcRemain() > 0 ? waitTicketButtons('data-picnic-tk') : '';
@@ -19090,7 +19096,7 @@ body.cam-scene #ffChip,body.cam-scene #plChip,body.cam-scene .b-ring{animation-p
       `<small>생일 ${f.bm}월 ${f.bd}일. 함께한 기록: 소풍 ${f.n.pc}번, 생일 잔치 ${f.n.bd}번, 반장 ${f.n.el}번</small>` +
       `<div class="fr-act"><button class="btn-sub small" type="button" data-fr-pat="${sp}"${done ? ' aria-disabled="true"' : ''}>${pat}${done ? '오늘 쓰다듬었어요' : '쓰다듬기'}</button>` +
       `<button class="btn-sub small" type="button" data-fr-gift="${sp}"${left <= 0 || S.ess < BF.giftEss ? ' aria-disabled="true"' : ''}>${gift}선물 (정수 ${BF.giftEss})</button>` +
-      (left >= 2 && S.ess >= BF.giftEss * 2 ? `<button class="btn-sub small" type="button" data-fr-gift-all="${sp}">남은 ${Math.min(left, Math.floor(S.ess / BF.giftEss))}번 모두</button>` : '') + '</div>' +
+      (left >= 2 && S.ess >= BF.giftEss * 2 ? `<button class="btn-sub small" type="button" data-fr-gift-all="${sp}">선물 ${Math.min(left, Math.floor(S.ess / BF.giftEss))}번 모두 (정수 ${Math.min(left, Math.floor(S.ess / BF.giftEss)) * BF.giftEss})</button>` : '') + '</div>' +
       `<small>${next ? `다음 하트까지 친밀도 ${next - f.p}` : '하트를 모두 채웠어요!'}. 오늘 선물 ${left}번 남았어요</small></div>`;
   }
   const frDexKey = sp => { const f = frOf(sp); return f ? [f.nm, f.p, f.pat === gameToday() ? 1 : 0, frGiftLeft(), S.ess >= BF.giftEss ? 1 : 0, f.n.pc, f.n.bd, f.n.el].join(',') : ''; };
@@ -19476,7 +19482,7 @@ body.cam-scene #ffChip,body.cam-scene #plChip,body.cam-scene .b-ring{animation-p
     const sd = exStudyDone(), lib = S.f.library >= 1;
     $('#exStudy').hidden = !now || ready;
     if (now && !ready) {
-      $('#exStudyHd').textContent = !lib ? `${eul(FAC.library.name)} 지으면 자율학습을 할 수 있어요` : sd ? `오늘 자율학습은 끝났어요. 이번 주 ${S.ex.ss}번(성적 +${Math.round(100 * EX.ssStep * Math.min(EX.ssMax, S.ex.ss))}%)` : `자율학습할 과목을 골라요. 학생 ${fmt(exSeats())}명, XP +${exXp()}`;
+      $('#exStudyHd').textContent = !lib ? `${eul(FAC.library.name)} 지으면 자율학습을 할 수 있어요` : sd ? `오늘 자율학습은 끝났어요. 이번 주 ${S.ex.ss}번(성적 +${Math.round(100 * EX.ssStep * Math.min(EX.ssMax, S.ex.ss))}%)` : `자율학습할 과목을 골라요. 고른 과목 XP +${exXp()}`;
       $('#exSubj').innerHTML = AC.keys.map(k => `<button class="ex-sub" type="button" data-ex="${k}" aria-disabled="${lib && !sd ? 'false' : 'true'}"><span>${AC.name[k]}</span><small>Lv.${acLv(k)}</small>${gradeImg(exGrade(exScore(k)), 30)}</button>`).join('');
     }
     // 성적표: 받을 것이 있으면 그것, 없으면 마지막으로 받은 것
@@ -19492,7 +19498,7 @@ body.cam-scene #ffChip,body.cam-scene #plChip,body.cam-scene .b-ring{animation-p
       $('#exReportTx').textContent = show.got ? `${show.wk === exPrev() ? '지난' : '예전'} 시험 성적표예요. 자율학습 ${show.ss}번` : `받으면 도토리 ${fmt(minAcorns(show.pts * EX.minPer))}개${show.g.every(g => g === 'A') ? `와 황금 도토리 ${EX.goldAll}개` : show.pts >= EX.good ? `와 황금 도토리 ${EX.goldGood}개` : ''}를 받아요`;
     }
     $('#exClaim').hidden = !ready;
-    $('#exNote').textContent = nl(`시험은 4주마다 한 주예요. 지금까지 성적표 ${S.ex.st.n}장, 최고 ${S.ex.st.best}점, 모두 A ${S.ex.st.a}번.` + (rosterOn() ? ' 중학교부터는 명부 학생들의 평균 능력도 반영돼요.' : ''));
+    $('#exNote').textContent = nl(`등급은 과목 레벨이 ${tierInfo().name} 상한 Lv.${acCapOf(S.tier)}의 80% 이상이면 A, 60% B, 40% C예요. 시험은 4주마다 한 주예요. 지금까지 성적표 ${S.ex.st.n}장, 최고 ${S.ex.st.best}점, 모두 A ${S.ex.st.a}번.` + (rosterOn() ? ' 중학교부터는 명부 학생들의 평균 능력도 반영돼요.' : ''));
   }
   const exAwardTop = () => S && S.ex && S.ex.rep && S.ex.rep.got && S.ex.rep.wk === exPrev() ? S.ex.rep.top : null;   // 다음 시험 전까지 교실에 걸린 상장
   function sanitizeExam(d, s) {
@@ -19618,8 +19624,8 @@ body.cam-scene #ffChip,body.cam-scene #plChip,body.cam-scene .b-ring{animation-p
   const btSwOpen = () => { btDay(); return btOpen() && S.bt.n >= 1; };
   function openBtSw() {
     if (!btSwOpen()) { toast('오늘 1판을 직접 하면 소탕할 수 있어요'); return; }
-    const left = btLeft(); if (left <= 0) { toast('오늘 남은 판이 없어요'); return; }
-    $('#btSwText').textContent = `남은 ${left}판을 한 번에 끝내요. 응원과 연승 덤은 없어요. XP와 리그 점수는 ${Math.round(BT.sweep * 100)}%예요.`;
+    const left = btLeft(); if (left <= 0) { toast('오늘 판을 다 했어요. 내일 다시 열려요'); return; }
+    $('#btSwText').textContent = `남은 ${left}판을 응원 없이 바로 겨뤄요. 이기면 대결 점수가 오르고 지면 내려가요. XP와 리그 점수는 ${Math.round(BT.sweep * 100)}%만 받아요.`;
     openModal($('#mBtSw'));
   }
   function btSweep() {
@@ -20787,6 +20793,7 @@ body.cam-scene #ffChip,body.cam-scene #plChip,body.cam-scene .b-ring{animation-p
     const c = $('#wxChip'), d = $('#tierDots'); if (!c) return;
     if (c.hidden || !d || d.hidden || !d.offsetWidth) { c.style.left = ''; c.style.transform = ''; return; }
     c.style.left = (d.offsetLeft + d.offsetWidth + 6) + 'px'; c.style.transform = 'none';
+    chipRow();   // 5.0.1.5 H-04
   }
   function renderTierDots() {
     const box = $('#tierDots'); if (!box || !S) return;
@@ -20803,7 +20810,7 @@ body.cam-scene #ffChip,body.cam-scene #plChip,body.cam-scene .b-ring{animation-p
   }
   function tierViewOpen(t) {
     if (t === S.tier || t == null) { tierViewClose(); return; }
-    if (!(t >= 0 && t < S.tier)) { toast(`${TIER_ALL[t] || '그 학교급'}은 아직 갈 수 없어요`); return; }
+    if (!(t >= 0 && t < S.tier)) { toast(`${eun(TIER_ALL[t] || '그 학교급')} 아직 갈 수 없어요`); return; }
     if (rt.decoEdit) decoEditEnd();
     rt.viewTier = t; rt.viewEdit = false; rt.lookData = null; sfx('tap');
     renderTierView(true); renderTierDots();
@@ -21055,7 +21062,7 @@ body.cam-scene #ffChip,body.cam-scene #plChip,body.cam-scene .b-ring{animation-p
     rt.tr2View = !cur ? 'idle' : cur.st === 'go' ? (tr2Ready() ? 'back' : tr2Rsv() ? 'rsv' : 'go') : cur.st;
     if (!cur) {
       const used = !!T.done[tr2Key()];
-      h += `<p class="tr-lead">${used ? `${yearNo()}학년 ${tr2Nm()}은 다녀왔어요. 다음 학년에 또 떠나요.` : '학년마다 한 번 떠나요. 들를 곳 세 군데에서 활동을 골라요.'}\n${TR2.hours}시간 동안 떠나 있어도 수업료는 그대로 들어와요.</p>`;
+      h += `<p class="tr-lead">${used ? `${yearNo()}학년 ${tr2Nm()}은 다녀왔어요. 다음 학년에 또 떠나요.` : '학년마다 한 번, 한 곳을 골라 떠나요. 고르면 바꿀 수 없어요. 그곳 세 군데에서 활동을 골라요.'}\n${TR2.hours}시간 동안 떠나 있어도 수업료는 그대로 들어와요.</p>`;
       if (!used && !tr2Day()) h += '<p class="fine">지금은 출발 시간(아침 6시~오후 5시)이 아니에요. 미리 골라 단체 사진까지 찍어 두면 아침 6시에 떠나도록 예약돼요.</p>';
       h += '<div class="tr2-list">' + TR2_PL.map(Q => {
         const got = Q.souv.filter(v => T.souv.includes(v[0])).length, can = !used && !S.trip.cur && !festBusy();
@@ -21077,7 +21084,7 @@ body.cam-scene #ffChip,body.cam-scene #plChip,body.cam-scene .b-ring{animation-p
     } else if (!tr2Ready()) {
       const left = cur.back - gameNow();
       h += tr2Photo(cur.pl, cur.pk, cur.kids, 'small') + `<p class="tr-left" id="tr2Left">${hms(left)} 남았어요</p>` +
-        `<p class="fine">${P.name}에서 돌아오고 있어요. 학교 행사, 체험학습, 진로 상담은 돌아오면 할 수 있어요.</p>` +
+        `<p class="fine">${P.name}에 가 있어요. 학교 행사, 체험학습, 진로 상담은 돌아오면 할 수 있어요.</p>` +
         `<div class="btn-row" style="flex-wrap:wrap">${TK.filter(t => S.tk[t.k] > 0).map(t => `<button class="btn-sub small" type="button" data-tr2="t:${t.k}">${t.name} (${S.tk[t.k]}장)</button>`).join('')}</div>`;
     } else {
       h += `<p class="tr-lead">${P.name}에서 돌아왔어요! 기념품과 사진을 가져왔어요.</p>` + tr2Photo(cur.pl, cur.pk, cur.kids, 'small') +
@@ -21206,7 +21213,7 @@ body.cam-scene #ffChip,body.cam-scene #plChip,body.cam-scene .b-ring{animation-p
         `<p class="tr-left" id="tripLeft">${hms(tripLeft())} 남았어요</p>` +
         `<button class="cta" type="button" id="tripAd">광고 보고 ${minText(cut)} 당기기</button>` +
         `<div class="btn-row" style="flex-wrap:wrap">${TK.filter(t => S.tk[t.k] > 0).map(t => `<button class="btn-sub small" type="button" data-trip-tk="${t.k}">${t.name} (${S.tk[t.k]}장)</button>`).join('')}</div><p class="fine">남은 시간보다 긴 단축권을 쓰면 남는 시간은 사라져요.</p>` +
-        '<p class="fine">학교를 닫아 두어도 시간은 흘러요.</p>';
+        '<p class="fine">앱을 꺼도 시간은 가요.</p>';
     } else {
       const R = tripReward(T);
       h += `<div class="tr-now"><span class="tr-ic big${IMG('trip_dest_' + T.id) ? ' has-dest' : ''}" style="--tc:${T.c}">${tripIcon(T.id)}</span><b>${T.name}에서 돌아왔어요!</b><span>기념품 하나와 함께 이만큼 가져왔어요</span></div>` +
@@ -21648,6 +21655,7 @@ body.cam-scene #ffChip,body.cam-scene #plChip,body.cam-scene .b-ring{animation-p
     if (!pzFresh(cur)) { $('#pzBoost').hidden = true; return; }
     pzUI.pick = new Set();
     pzBoostRender();
+    setT($('#pzBoostRw'), `${PZ.essPer}점마다 숲의 정수 ${PZ.rw}개, ${PZ.minPer}점마다 수업료 ${PZ.rw}분치를 받아요`);   // 5.0.1.5 M-15
     $('#pzBoost').hidden = false;
   }
   function pzBoostRender() {
@@ -22044,7 +22052,7 @@ body.cam-scene #ffChip,body.cam-scene #plChip,body.cam-scene .b-ring{animation-p
     $('#pzQuit').addEventListener('click', () => { if (!S.pz.cur || !$('#pzEnd').hidden || !$('#pzBoost').hidden) return; sfx('tap'); $('#pzQuitAsk').hidden = false; });
     $('#pzQuitNo').addEventListener('click', () => { $('#pzQuitAsk').hidden = true; });
     // 1.8.0 잠시 나가기: 판을 끝내지 않고 닫아요(하던 판은 S.pz.cur에 남아요). 미니게임 탭에서 '이어하기'로 돌아와요
-    $('#pzQuitPause').addEventListener('click', () => { $('#pzQuitAsk').hidden = true; sfx('tap'); pzClose(); toast('하던 판은 그대로 남아요. 미니게임에서 이어하기를 누르세요'); });
+    $('#pzQuitPause').addEventListener('click', () => { $('#pzQuitAsk').hidden = true; sfx('tap'); pzClose(); toast('하던 판은 그대로 남아요. 공부 탭의 숲속 퍼즐에서 이어서 해요'); });
     $('#pzQuitYes').addEventListener('click', () => { $('#pzQuitAsk').hidden = true; pzGameOver(); });
     $('#pzEndAgain').addEventListener('click', () => { sfx('tap'); $('#pzEnd').hidden = true; pzStart(); pzUI.mode = ''; pzRenderAll(); pzBoostOpen(); });
     $('#pzbList').addEventListener('click', e => {
@@ -22085,7 +22093,7 @@ body.cam-scene #ffChip,body.cam-scene #plChip,body.cam-scene .b-ring{animation-p
     $('.pz-thumb').style.backgroundImage = ['acorn', 'leaf', 'berry', 'flower'].map(k => pzImg('pz_block_' + k)).join(',');   // 블록 넷을 2×2로(한 장을 꽉 채우면 잘려 보였어요)
     $('#pzCardSub').textContent = S.pz.cur ? `${S.pz.cur.rw ? '하던 판' : '연습 판'} 이어서 하기 (${fmt(S.pz.cur.score)}점)` : S.pz.best > 0 ? `최고 ${fmt(S.pz.best)}점` : '조각을 끌어다 놓고 줄을 지워요';
     $('#pzCardTag').textContent = S.pz.cur ? '이어하기' : '시작하기';
-    const lt = $('#pzLeftTxt'); lt.textContent = `보상 ${left}/${pzQuota()}`; lt.classList.toggle('none', left <= 0);   // 오늘 남은 보상 판 / 오늘 받을 수 있는 판
+    const lt = $('#pzLeftTxt'); lt.textContent = `오늘 ${left}/${pzQuota()}판`; lt.classList.toggle('none', left <= 0);   // 오늘 남은 보상 판 / 오늘 받을 수 있는 판
     $('#pzAdBtn').hidden = !pzCanAd(); $('#pzAdRow').hidden = $('#pzAdBtn').hidden;
     { const on = pzSwOpen(), can = on && left > 0;   // 2.3.1 소탕 안내 줄
       $('#pzSwTx').textContent = !on ? '1판 하면 소탕 가능' : can ? '' : '';   // 2.3.1 카드 안 시작하기 아래(좁아서 짧게)
@@ -23161,7 +23169,7 @@ body.cam-scene #ffChip,body.cam-scene #plChip,body.cam-scene .b-ring{animation-p
     const v = xgPay(XG.greetMin);
     save(); renderHUD();
     const go = () => {
-      rt.talkSeq = { n: { k: g.sp, name: nm, lab: `교환학생 ${nm}` }, i: 0, lines: say.map(t => ({ who: g.sp, t })).concat([{ who: 'hedgehog', t: `${g.who} 교장 선생님네 학교에서 온 ${nm}예요. 인사 선물로 도토리 ${fmt(v)}개를 받았어요. 이제 학교를 안내해 줄까요?`, last: true }]) };
+      rt.talkSeq = { n: { k: g.sp, name: nm, lab: `교환학생 ${nm}` }, i: 0, lines: say.map(t => ({ who: g.sp, t })).concat([{ who: 'hedgehog', t: `${g.who} 교장 선생님네 학교에서 온 ${nm}${batchim(nm) ? '이에요' : '예요'}. 인사 선물로 도토리 ${fmt(v)}개를 받았어요. 이제 학교를 안내해 줄까요?`, last: true }]) };
       talkLine(); openModal($('#mTalk'));
     };
     if (rt.modalOpen === $('#mXg')) closeModal($('#mXg'), go); else if (!rt.modalOpen) go();
@@ -24147,7 +24155,7 @@ body.cam-scene #ffChip,body.cam-scene #plChip,body.cam-scene .b-ring{animation-p
     let h = '';
     if (tab === 'main') {
       const n = stTags();
-      h += `<div class="nb-tags" aria-label="나무패 ${n}/${ST_TAG_CH.length}">` + ST_TAG_CH.map((_, i) => `<span class="${i < n ? 'on' : ''}">${i < n ? wdImg('st_tag_' + (i + 1), 34, '🪵') : ''}</span>`).join('') + `</div><p class="dp-note">나무패 ${n}/${ST_TAG_CH.length}${n >= ST_TAG_CH.length ? '. 여섯 조각이 지도가 됐어요' : ''}</p>` +
+      h += `<div class="nb-tags" aria-label="나무패 ${n}/${ST_TAG_CH.length}">` + ST_TAG_CH.map((_, i) => `<span class="${i < n ? 'on' : ''}">${i < n ? wdImg('st_tag_' + (i + 1), 34, '🪵') : ''}</span>`).join('') + `</div><p class="dp-note">나무패 ${n}/${ST_TAG_CH.length}${n >= ST_TAG_CH.length ? '. 여섯 조각이 지도가 됐어요' : '. 이야기를 따라가면 한 조각씩 받아요'}</p>` +
         (n ? '<p class="nb-poem">' + ST_TAG_TX.slice(0, n).map(esc).join('<br>') + '</p>' : '') +
         (n >= ST_TAG_CH.length ? `<img class="nb-map" src="${stPicUrl('st_tagmap')}" alt="나무패를 맞춘 지도" onerror="this.remove()">` : '');
       h += '<div class="nb-list">' + CHAPTERS.map((nm, c) => { const open = c <= T.ch, o = open && ST['o' + c], cl = c < T.ch && ST['c' + c];
@@ -24294,10 +24302,10 @@ body.cam-scene #ffChip,body.cam-scene #plChip,body.cam-scene .b-ring{animation-p
     { k: 'bt', nm: '숲속 대결', u: '판', on: () => btOpen(), left: () => btLeft(), go: 'btPlays' },
     { k: 'pc', nm: '숲속 소풍', u: '번', on: () => pcReady(), left: () => (S.pc.day === gameToday() ? 0 : 1), go: 'picnics' },
     { k: 'cs', nm: '진로 상담', u: '번', on: () => hallOpen() && csOpen(), left: () => csLeft(), go: 'csTalk' },
-    { k: 'sk', nm: '칭찬 스티커', u: '장', on: () => skOpen(), left: () => skLeft(), go: 'stickers' },
+    { k: 'sk', nm: '칭찬 스티커', u: '장', on: () => skOpen(), left: () => skLeft(), go: 'stickers', sub: '미션과 부탁을 끝내면 받아요' },
     { k: 'gift', nm: '단짝 선물', u: '번', on: () => frList().length > 0, left: () => frGiftLeft(), go: 'frGift' },
-    { k: 'boost', nm: '보충수업', u: '번', on: () => !!S.u.boost, left: () => Math.max(0, boostLeft()), go: 'home', tip: '홈에 있으면 지도 왼쪽 위에 가끔 나타나요' },
-    { k: 'deal', nm: '까치 핫딜', u: '번', on: () => dealUnlocked(), left: () => Math.max(0, dealLeft()), go: 'home', tip: '홈에 있으면 까치가 가끔 찾아와요' }
+    { k: 'boost', nm: '보충수업', u: '번', on: () => !!S.u.boost, left: () => Math.max(0, boostLeft()), go: 'home', tip: '홈에 있으면 지도 왼쪽 위에 가끔 나타나요', sub: '홈에서 기다리면 나와요' },
+    { k: 'deal', nm: '까치 핫딜', u: '번', on: () => dealUnlocked(), left: () => Math.max(0, dealLeft()), go: 'home', tip: '홈에 있으면 까치가 가끔 찾아와요', sub: '홈에서 기다리면 나와요' }
   ];
   function todoRows() { const out = []; for (const T of TODO) { let on = false, left = 0; try { on = !!T.on(); if (on) left = T.left(); } catch (e) { on = false; } if (on) out.push({ T, left }); } return out; }
   function todoGo(k) {
@@ -24311,7 +24319,7 @@ body.cam-scene #ffChip,body.cam-scene #plChip,body.cam-scene .b-ring{animation-p
     const n = rows.filter(r => r.left > 0).length, fold = !!(S.fold && S.fold.td);
     return `<h4 class="dm-h td-h"><button type="button" class="td-fold" data-td-fold aria-expanded="${fold ? 'false' : 'true'}">오늘 할 일 <small>${n ? `${n}가지 남음` : '모두 했어요'}</small><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M6 9l6 6 6-6" fill="none" stroke="currentColor" stroke-width="2.6" stroke-linecap="round" stroke-linejoin="round"/></svg></button></h4>` +
       (fold ? '' : '<div class="td-list">' + rows.map(({ T, left }) => left > 0
-        ? `<button type="button" class="td-row" data-todo="${T.k}"><b>${T.nm}</b><span>${left}${T.u} 남음</span><em>가기 ›</em></button>`
+        ? `<button type="button" class="td-row" data-todo="${T.k}"><b>${T.nm}</b><span>${left}${T.u} 남음${T.sub ? `, ${T.sub}` : ''}</span><em>가기 ›</em></button>`
         : `<div class="td-row done"><b>${T.nm}</b><span>${CHECK}다 했어요</span></div>`).join('') + '</div>');
   }
   function renderMissions() {
@@ -24521,12 +24529,12 @@ body.cam-scene #ffChip,body.cam-scene #plChip,body.cam-scene .b-ring{animation-p
   const TUT_GOLD = 1;
   const TUT = [
     { sel: null, t: '숲속 동물 학교에 온 걸 환영해요!', d: '저는 교감 선생님 고슴도치예요. 학교를 어떻게 꾸려 가는지 짧게 알려 드릴게요. 끝까지 보면 황금 도토리를 드려요.' },
-    { sel: '.board-top', t: '우리 학교 현황', d: '도토리는 수업료로 저절로 쌓여요. 학교 카드를 누르면 학생 수, 평판, 학교 파워가 펼쳐져요.' },
+    { sel: '.board-top', t: '우리 학교 현황', d: '도토리는 수업료로 저절로 쌓여요. 학교 카드를 누르면 학생 정원과 학교 파워가 펼쳐져요.' },
     { sel: '#questBar', t: '메인 퀘스트', d: '제가 할 일을 하나씩 알려 드려요. 다 하면 여기를 눌러 보상을 받아요. 막히면 눌러서 바로 가 보세요.' },
     { sel: '#b-classroom', t: '건물 키우기', d: '건물을 누르면 안이 보여요. 가구 네 개를 모두 건물 레벨까지 올리면 건물을 키울 수 있어요.', scroll: true },
     { sel: '#oak', t: '참나무 흔들기', d: '놀이터를 지으면 옆 참나무를 눌러 도토리를 떨어뜨릴 수 있어요. 떨어진 도토리를 눌러 주우면 도토리를 듬뿍 받아요.', scroll: true },
-    { sel: '.map-left', t: '지도 왼쪽 버튼', d: '보충수업, 체험학습, 학교 행사가 여기에 생겨요. 학년이 올라가면 하나씩 열려요.', scroll: true },
-    { sel: '.tabs', t: '아래 탭', d: '선생님, 공부, 졸업, 상점은 아래 탭에서 열어요. 퀘스트 목록과 랭킹은 지도 오른쪽 단추예요.' },
+    { sel: '.map-left', t: '지도 왼쪽 단추', d: '보충수업, 체험학습, 학교 행사가 여기에 생겨요. 학년이 올라가면 하나씩 열려요.', scroll: true },
+    { sel: '.tabs', t: '아래 탭', d: '선생님, 탐험, 공부, 상점은 아래 탭에서 열어요. 졸업과 설정은 맨 위 단추, 퀘스트 목록과 랭킹은 지도 오른쪽 단추예요.' },
     { sel: null, t: '준비 끝!', d: '이제 교실부터 키워 볼까요? 자리를 비워도 도토리는 계속 쌓여요. 약속한 황금 도토리를 드릴게요.' }
   ];
   function tutAuto() {
@@ -24601,8 +24609,8 @@ body.cam-scene #ffChip,body.cam-scene #plChip,body.cam-scene .b-ring{animation-p
     const reward = how === 'done' && !S.tut.paid && !S.tut.nop;
     if (how === 'skip') S.tut.nop = true;   // 건너뛰면 보상은 없어요
     S.tut.st = how; rt.tut = null;
-    if (how === 'later') toast('설정 탭에서 언제든 튜토리얼을 이어 할 수 있어요');
-    else if (how === 'skip') { S.tut.step = 0; toast('튜토리얼을 건너뛰었어요. 설정 탭에서 다시 볼 수 있어요'); }
+    if (how === 'later') toast('맨 위 톱니바퀴(설정)에서 언제든 튜토리얼을 이어 할 수 있어요');
+    else if (how === 'skip') { S.tut.step = 0; toast('튜토리얼을 건너뛰었어요. 맨 위 톱니바퀴(설정)에서 다시 볼 수 있어요'); }
     else { S.tut.step = 0; if (reward) { S.tut.paid = true; addGold(TUT_GOLD); sfx('quest'); toast(`튜토리얼 끝! 황금 도토리 +${TUT_GOLD}개`); } else toast('튜토리얼을 다시 봤어요'); }
     $('#scroller').scrollTop = 0;
     save(); syncSettingsUI(); nextModal();
@@ -24655,7 +24663,7 @@ body.cam-scene #ffChip,body.cam-scene #plChip,body.cam-scene .b-ring{animation-p
   function renderGradPanel(force) {
     if (rt.tab !== 'grad' && !force) return;
     const d = cereDip(), can = canGraduate(), T = tierInfo(), N = TIERS[S.tier + 1], sf = semFirst(), cer = sf ? '1학기 방학식' : '종업식';
-    $('#gYear').textContent = semOn() ? `${yearLabel()} ${semLabel()}` : yearLabel();
+    $('#gYear').textContent = semOn() && !gradOn() ? `${yearLabel()} ${semLabel()}` : yearLabel();   // 5.0.1.5 C-14 대학원은 학기가 이미 들어 있어요
     // 마지막 해에는 종업식 카드를 숨기고 바로 아래 졸업식 카드로 안내해요
     const last = finalYear() && !sf;
     $('#gCard').hidden = last;
@@ -24672,9 +24680,9 @@ body.cam-scene #ffChip,body.cam-scene #plChip,body.cam-scene .b-ring{animation-p
     $('#gBar').style.width = (p * 100).toFixed(1) + '%';
     $('#gBarWrap').setAttribute('aria-valuenow', Math.round(p * 100));
     const rl = !can && S.grade >= GRAD_MIN && repLocked(), locked = !rl && !can && S.grade >= GRAD_MIN && (sf ? semLocked() : yearLocked()), left = sf ? semLeft() : yearLeft();   // 2.1.0 1학기는 앞 절반 퀘스트
-    $('#gNote').textContent = rl ? `건물 레벨을 모두 합쳐 ${repLeft()}만큼 더 올리면 ${eul(cer)} 열 수 있어요.` : locked ? `${yearLabel()} ${sf ? '1학기 ' : ''}메인 퀘스트를 마쳐야 ${eul(cer)} 열 수 있어요. 남은 퀘스트 ${left}개는 퀘스트 탭에서 볼 수 있어요.` : can
+    $('#gNote').textContent = rl ? `건물 레벨을 모두 합쳐 ${repLeft()}만큼 더 올리면 ${eul(cer)} 열 수 있어요.` : locked ? `${yearLabel()} ${sf ? '1학기 ' : ''}메인 퀘스트를 마쳐야 ${eul(cer)} 열 수 있어요. 남은 퀘스트 ${left}개는 지도 오른쪽 퀘스트 단추에서 볼 수 있어요.` : can
       ? `${S.hd.album ? '단체 사진 덕분에 수료증 +50%예요. ' : ''}${sf ? '1학기 방학식은 수료증이 절반이에요. ' : ''}다음 수료증까지 도토리 ${fmt(Math.ceil(hi - S.yearEarned))}개 더 벌면 돼요.`
-      : `${CFG.grades[GRAD_MIN].title}가 되면 ${eul(cer)} 열 수 있어요. 지금은 ${CFG.grades[S.grade].title}예요.`;
+      : `평판 ★을 모아 ${CFG.grades[GRAD_MIN].title}가 되면 ${eul(cer)} 열 수 있어요. 지금은 ${CFG.grades[S.grade].title}예요. 건물과 선생님 레벨을 올리면 평판이 올라요.`;
     const btn = $('#gBtn');
     btn.textContent = can ? `${cer} 열기 (수료증 ${fmt(d)}장)` : rl ? `건물 레벨 ${repLeft()} 더 올리기` : locked ? `퀘스트 ${left}개를 먼저 마쳐요` : '아직 열 수 없어요';
     btn.setAttribute('aria-disabled', can ? 'false' : 'true');
@@ -24847,7 +24855,7 @@ body.cam-scene #ffChip,body.cam-scene #plChip,body.cam-scene .b-ring{animation-p
   function cereNewcomer() {
     let newcomer = null;
     if (S.p.species < ncMax()) { newcomer = NEWCOMERS[S.p.species]; S.p.species += 1; }
-    else { S.p.ticket = (S.p.ticket || 0) + 1; rt.tkReward = { title: '친구 성장 쪽지를 받았어요!', sub: '졸업 탭의 전학 온 친구들에서 키울 친구를 골라요', items: [{ ic: 'ticket', t: `친구 성장 쪽지 +1 (지금 ${S.p.ticket}장)` }] }; }   // 여섯 친구가 다 온 뒤에는 친구 성장 쪽지
+    else { S.p.ticket = (S.p.ticket || 0) + 1; rt.tkReward = { title: '친구 성장 쪽지를 받았어요!', sub: '위쪽 졸업 단추의 전학 온 친구들에서 키울 친구를 골라요', items: [{ ic: 'ticket', t: `친구 성장 쪽지 +1 (지금 ${S.p.ticket}장)` }] }; }   // 여섯 친구가 다 온 뒤에는 친구 성장 쪽지
     return newcomer;
   }
   // 새 학년이 된 뒤 평판, 학생, 지도, 위쪽 숫자, 졸업 탭을 다시 그리고 저장해요
@@ -24980,7 +24988,7 @@ body.cam-scene #ffChip,body.cam-scene #plChip,body.cam-scene .b-ring{animation-p
     $('#tierConfirm').hidden = true;
     queueModal(() => showCere(from, crew));   // 2.0.1 졸업식 장면 먼저
     queueModal(() => showEntrance(fund, leaving, from, newcomer, dipsIn));
-    if (S.tier === 4) queueModal(() => { toast(`새내기 장학금!\n1학년 동안 수업료가 ${UNI_FRESH.mult}배예요`); return false; });   // 4.0.0
+    if (S.tier === 4) queueModal(() => { toast(`새내기 장학금!\n1학년 동안 수업료 +${Math.round((UNI_FRESH.mult - 1) * 100)}%예요`); return false; });   // 4.0.0
     if (albPg.ltr) queueModal(() => openLetter(albPg));   // 2.1.1 졸업 편지
     if (newcomer) queueModal(() => showNewTalk(newcomer));   // 2.0.0 전학 대화
     cereAfter();
@@ -24995,7 +25003,7 @@ body.cam-scene #ffChip,body.cam-scene #plChip,body.cam-scene .b-ring{animation-p
     $('#tierArt').innerHTML = `<svg viewBox="-26 -19 52 38" aria-hidden="true">` +
       crew.map((sp, i) => `<g transform="translate(${(i - 1) * 15} ${i === 1 ? -2 : 1}) scale(${i === 1 ? 1.1 : 0.95})">${kidSVG(sp, i)}</g>`).join('') + '</svg>';
     $('#tierFine').textContent = `${from.name}에서 모은 수료증 ${fmt(dipsIn || 0)}장이 장학재단 기금이 됐어요. ` + (newcomer ? `새 친구 ${newcomer.name}${newcomer.ga} 함께 왔어요. ` : '') +
-      `새로 생긴 ${eul(T.newb || '건물')} 지어 보세요. 기금은 졸업 탭의 장학재단에서 써요. 졸업 선물로 황금 도토리 +${GOLD.promote}개를 받았어요.` +
+      `새로 생긴 ${eul(T.newb || '건물')} 지어 보세요. 기금은 위쪽 졸업 단추의 장학재단에서 써요. 졸업 선물로 황금 도토리 +${GOLD.promote}개를 받았어요.` +
       (S.tier < GRAD_TIER ? ` 자리 비운 동안의 수업은 ${TEA.owl.name}이 맡아요. 먼저 모셔 보세요.` : '');   // 5.0.3 새 학교급은 부엉이 선생님이 0에서 시작해 자리 비운 효율이 30%예요
     $('#tierOk').textContent = `${T.name} 입학하기`;
     openModal($('#mTier'));
@@ -25526,7 +25534,7 @@ body.cam-scene #ffChip,body.cam-scene #plChip,body.cam-scene .b-ring{animation-p
   function checkQuests(silent) {
     const q = curMain(), key = 'm' + S.q.m, mr = mainReady();
     if (mr && q) S.q.lat = q.id;
-    if (mr && !rt.qr[key] && !silent) { sfx('done'); toast(`퀘스트 완료! 받기를 누르면 ${rewardText(q.rk, qReward(q))}${q.rk === 'dip' ? '을' : '를'} 받아요`); }
+    if (mr && !rt.qr[key] && !silent) { sfx('done'); toast(rt.tab === 'school' ? `퀘스트 완료! 받기를 누르면 ${rewardText(q.rk, qReward(q))}${q.rk === 'dip' ? '을' : '를'} 받아요` : `퀘스트 완료! 홈의 퀘스트 칸에서 ${rewardText(q.rk, qReward(q))}${q.rk === 'dip' ? '을' : '를'} 받아요`); }
     rt.qr[key] = mr;
     for (const s of S.q.subs) {
       const r = subReady(s);
@@ -25555,7 +25563,7 @@ body.cam-scene #ffChip,body.cam-scene #plChip,body.cam-scene .b-ring{animation-p
     const unlocked = S.q.m === SUB_UNLOCK;
     const added = fillSubs();
     const nx = curMain();
-    if (unlocked && added) toast('학생들이 부탁을 하러 왔어요! 퀘스트 탭을 열어 보세요');
+    if (unlocked && added) toast('학생들이 부탁을 하러 왔어요! 지도 오른쪽 퀘스트 단추를 눌러 보세요');
     else if (S.q.m === CH1()) toast('출석부가 열렸어요!\n칠판 위 달력을 눌러 보세요');
     else if (nx) toast(`다음 퀘스트 ${qNo(S.q.m)} ${nx.title}`);
     else toast('메인 퀘스트를 모두 마쳤어요!');
@@ -26414,7 +26422,7 @@ body.cam-scene #ffChip,body.cam-scene #plChip,body.cam-scene .b-ring{animation-p
       sfx('buy'); closeModal($('#mSeat')); renderClub(); questChanged();
     });
     $('#seatOut').addEventListener('click', () => { if (rt.seatStudent != null) clubSet(rt.seatStudent, -1); closeModal($('#mSeat')); renderClub(); questChanged(); });
-    $('#tierDots').addEventListener('click', e => { if (e.target.closest('[data-nl]')) { nlCycle(); return; } const b = e.target.closest('[data-td]'); if (!b) return; const t = +b.dataset.td; if (t > S.tier) { shake(b); toast(`${TIER_ALL[t]}는 아직 갈 수 없어요`); return; } if (t === S.tier) tierViewClose(); else tierViewOpen(t); });
+    $('#tierDots').addEventListener('click', e => { if (e.target.closest('[data-nl]')) { nlCycle(); return; } const b = e.target.closest('[data-td]'); if (!b) return; const t = +b.dataset.td; if (t > S.tier) { shake(b); toast(`${eun(TIER_ALL[t])} 아직 갈 수 없어요`); return; } if (t === S.tier) tierViewClose(); else tierViewOpen(t); });
     $('#tvBack').addEventListener('click', () => { sfx('tap'); tierViewClose(); });
     $('#wxChip').addEventListener('click', () => { const k = wxOf(); if (!k) return; sfx('tap'); S.wxOff = S.wxOff ? 0 : 1; save(); renderWeather();   // 2.1.3 날씨, 날씨 효과 켜고 끄기(woodani)
       toast(`${WX[k].em} ${S.wxOff ? '날씨 효과를 껐어요. 다시 누르면 켜져요' : '날씨 효과를 켰어요'}\n${WX[k].tip}`); });
@@ -26511,7 +26519,7 @@ body.cam-scene #ffChip,body.cam-scene #plChip,body.cam-scene .b-ring{animation-p
       { const gi = promoteGateIdx(); if (gi >= 0 && S.q.m < gi) { S.q.m = gi; S.q.lat = ''; startMain(); } }   // 5.0.0 woodani 요청: 졸업식 퀘스트 앞의 메인 퀘스트도 모두 마친 것으로
       checkGrade();
       setTab('grad'); renderMap(); renderHUD(); renderAffordance(); save();
-      toast('졸업 조건을 채웠어요 (테스트). 졸업 탭의 졸업식을 눌러 보세요');
+      toast('졸업 조건을 채웠어요 (테스트). 위쪽 졸업 단추의 졸업식을 눌러 보세요');
     });
 
     // 숨긴 개발자 메뉴: 정보의 '버전' 줄을 빠르게 다섯 번 누르면 열려요
@@ -26778,7 +26786,7 @@ body.cam-scene #ffChip,body.cam-scene #plChip,body.cam-scene .b-ring{animation-p
     });
     $('#sheetBuy').addEventListener('click', () => {
       const k = rt.sheetKey; if (!k) return;
-      if (!furReady(k)) { shake($('#sheetBuy')); toast(`가구 네 개를 모두 Lv.${S.f[k]}로 올려 주세요`); return; }
+      if (!furReady(k)) { shake($('#sheetBuy')); toast(`가구 네 개를 모두 ${euro('Lv.' + S.f[k])} 올려 주세요`); return; }
       if (!buyFacility(k)) shake($('#sheetBuy'));
       renderSheet();
     });
@@ -26794,7 +26802,7 @@ body.cam-scene #ffChip,body.cam-scene #plChip,body.cam-scene .b-ring{animation-p
     // 2.3.0 즉시 완공 단추와 숲의 정수로 즉시 완료
     $('#sheetFree').addEventListener('click', () => {
       const k = rt.sheetKey; if (!k) return;
-      if (!furReady(k)) { shake($('#sheetFree')); toast(`가구 네 개를 모두 Lv.${S.f[k]}로 올려 주세요`); return; }
+      if (!furReady(k)) { shake($('#sheetFree')); toast(`가구 네 개를 모두 ${euro('Lv.' + S.f[k])} 올려 주세요`); return; }
       if (S.budget < facCost(k)) { shake($('#sheetFree')); toast('도토리가 모자라요'); return; }
       if (!conFree(k)) shake($('#sheetFree'));
       renderSheet();
@@ -26857,7 +26865,7 @@ body.cam-scene #ffChip,body.cam-scene #plChip,body.cam-scene .b-ring{animation-p
     $('#btCard').addEventListener('click', () => { sfx('tap'); btOpenScene(); });
     $('#btBack').addEventListener('click', () => { sfx('tap'); btClose(); });
     $('#btAuto').addEventListener('click', btAuto);
-    $('#btGo').addEventListener('click', () => { if ($('#btGo').getAttribute('aria-disabled') !== 'true') { if (btLeft() <= 0) btAdMore(); else btStart(); } });
+    $('#btGo').addEventListener('click', () => { if ($('#btGo').getAttribute('aria-disabled') !== 'true') { if (btLeft() <= 0) btAdMore(); else btStart(); } else if (btLeft() > 0) { shake($('#btGo')); toast('세 종목에 학생을 모두 세워 주세요'); } });
     $('#btRows').addEventListener('click', e => { const b = e.target.closest('[data-bslot]'); if (!b || !btUI.M || btUI.M.phase !== 'pick') return; btUI.M.sel = +b.dataset.bslot; sfx('tap'); btRender(); });
     $('#btList').addEventListener('click', e => { const b = e.target.closest('[data-bpick]'); if (b) btPick(b.dataset.bpick); });
     $('#btPlay').addEventListener('pointerdown', btTap);
@@ -27522,7 +27530,7 @@ body.cam-scene #ffChip,body.cam-scene #plChip,body.cam-scene .b-ring{animation-p
      정수와 소모품, 황금 도토리만 주고 도토리(학교 키우기 재화)는 주지 않아요 */
   const psSeason = day => { const d = dayDiff(PS.anchor, day || gameToday()); return d < 0 ? -1 : Math.floor(d / PS.len); };
   const psEnd = n => dayAdd(PS.anchor, n * PS.len + PS.len - 1);
-  const psDef = n => { const x = PS_SEASONS[n] || [`시즌 ${n + 1}`, '', '', '', '']; return { theme: x[0], deco: x[1], decoNm: x[2], fur: x[3], furNm: x[4] }; };
+  const psDef = n => { const x = PS_SEASONS[n] || ['', '', '', '', ''];   /* 5.0.1.5 T-02 표에 없으면 '시즌 N' 한 번만 */ return { theme: x[0], deco: x[1], decoNm: x[2], fur: x[3], furNm: x[4] }; };
   const psOpen = () => !!S && !!S.ps && S.tier >= PS.tier && psSeason() >= 0 && !liveOff('event');
   // 미션: 이벤트 미션처럼 이미 있는 횟수 기록이 시작 때보다 얼마나 늘었는지로 재요. d는 오늘 미션 목표, w는 이번 주 미션 목표
   const PS_M = {
@@ -27600,7 +27608,7 @@ body.cam-scene #ffChip,body.cam-scene #plChip,body.cam-scene .b-ring{animation-p
     const ex = psExtraReady(); if (ex > 0) { S.ps.ex += ex; addEss(ex * PS.extraEss); items.push({ ic: 'ess', t: `덤 상자 ${ex}개: 숲의 정수 +${ex * PS.extraEss}` }); }
     if (!items.length) return items;
     save(); checkQuests(true);
-    if (!quiet) { sfx('quest'); buzz(14); showReward({ title: '숲속 패스 보상을 받았어요!', sub: `시즌 ${n + 1} ${psDef(n).theme}, ${psLv()}단계`, items: psMergeItems(items) }); renderPass(); renderHUD(); }
+    if (!quiet) { sfx('quest'); buzz(14); showReward({ title: '숲속 패스 보상을 받았어요!', sub: `시즌 ${n + 1}${psDef(n).theme ? ' ' + psDef(n).theme : ''}, ${psLv()}단계`, items: psMergeItems(items) }); renderPass(); renderHUD(); }
     return items;
   }
   // 같은 종류 보상은 한 줄로 합쳐요(여러 단계를 한꺼번에 받을 때 지저분하지 않게)
@@ -27615,7 +27623,7 @@ body.cam-scene #ffChip,body.cam-scene #plChip,body.cam-scene .b-ring{animation-p
     const n = psSeason();
     if (n !== S.ps.s) {
       const old = S.ps.s >= 0 ? psClaimAll(true) : [];
-      if (old.length) showReward({ title: '지난 시즌 패스 보상', sub: `시즌 ${S.ps.s + 1} ${psDef(S.ps.s).theme}에서 받을 수 있었던 보상을 챙겨 왔어요`, items: psMergeItems(old) });
+      if (old.length) showReward({ title: '지난 시즌 패스 보상', sub: `시즌 ${S.ps.s + 1}${psDef(S.ps.s).theme ? ' ' + psDef(S.ps.s).theme : ''}에서 받을 수 있었던 보상을 챙겨 왔어요`, items: psMergeItems(old) });
       Object.assign(S.ps, { s: n, pts: 0, got: 0, ex: 0, day: '', dl: [], wk: -1, wl: [], ad: '' });
     }
     if (!psOpen()) return;
@@ -27661,7 +27669,7 @@ body.cam-scene #ffChip,body.cam-scene #plChip,body.cam-scene .b-ring{animation-p
     return `<g class="fur-it fur-sp"><ellipse cx="${x}" cy="${(y - 1).toFixed(1)}" rx="${(ww * 0.42).toFixed(1)}" ry="${(2 + ww * 0.04).toFixed(1)}" class="fur-shadow"/>` +
       `<image href="${u}" x="${(x - ww / 2).toFixed(1)}" y="${(y - ww).toFixed(1)}" width="${ww.toFixed(1)}" height="${ww.toFixed(1)}"/></g>`;
   }
-  const psIc = ic => ic === 'gold' ? GOLD_ICON : ic === 'ess' ? ESS_ICON() : ic.startsWith('tk:') ? (IMG('ticket_' + ic.slice(3)) ? `<img src="${IMG('ticket_' + ic.slice(3))}" alt="">` : '⏱') : IMG(ic) ? `<img src="${IMG(ic)}" alt="">` : esc(ic);
+  const psIc = ic => ic === 'gold' ? GOLD_ICON : ic === 'ess' ? ESS_ICON() : ic.startsWith('tk:') ? (IMG('ticket_' + ic.slice(3)) ? `<img src="${IMG('ticket_' + ic.slice(3))}" alt="">` : '⏱') : RW_PIC[ic] && rwPic(RW_PIC[ic]) ? `<img src="${rwPic(RW_PIC[ic])}" alt="">` : IMG(ic) ? `<img src="${IMG(ic)}" alt="">` : esc(ic);   // 5.0.1.5 T-02 합치기 에너지(mge) 그림
   function renderPass() {
     const body = $('#psBody'); if (!body || !S || !S.ps) return;
     psSync();
@@ -27681,7 +27689,7 @@ body.cam-scene #ffChip,body.cam-scene #plChip,body.cam-scene .b-ring{animation-p
       (m.done ? `<span class="dm-ok">${CHECK}</span>` : rd ? `<button class="cta small" type="button" data-ps="${kind}${i}">받기</button>` : `<span class="dm-n">${pr}/${m.n}</span>`) + '</div>'; }).join('');
     const bg = IMG('pass_bg');
     const furs = S.ps.fur.filter(id => IMG(psDef(Number(id.slice(4))).fur));
-    body.innerHTML = `<div class="ps-head${bg ? ' has-img' : ''}">${bg ? `<img src="${bg}" alt="">` : ''}<div class="ps-ttl"><b>숲속 패스</b><span>시즌 ${n + 1} ${esc(D.theme)}</span><small>${left > 0 ? `${left}일 남음` : '오늘까지'}</small></div></div>` +
+    body.innerHTML = `<div class="ps-head${bg ? ' has-img' : ''}">${bg ? `<img src="${bg}" alt="">` : ''}<div class="ps-ttl"><b>숲속 패스</b><span>시즌 ${n + 1}${D.theme ? ' ' + esc(D.theme) : ''}</span><small>${left > 0 ? `${left}일 남음` : '오늘까지'}</small></div></div>` +
       `<div class="ps-lv"><span><b>${lv}</b>/${PS.steps}단계</span><span class="ps-bar"><i style="width:${(lv >= PS.steps ? 100 : (S.ps.pts % PS.per) / PS.per * 100).toFixed(0)}%"></i></span><span>${lv >= PS.steps ? `덤 상자까지 ${PS.extra - (S.ps.pts - PS.steps * PS.per) % PS.extra}점` : `다음 단계까지 ${PS.per - S.ps.pts % PS.per}점`}</span></div>` +
       `<div class="ps-track" id="psTrack">${nodes.join('')}</div>` +
       (ready ? `<button class="cta" type="button" data-ps="all">보상 받기 (${ready})</button>` : '') +
@@ -27774,7 +27782,7 @@ body.cam-scene #ffChip,body.cam-scene #plChip,body.cam-scene .b-ring{animation-p
     if (chip.hidden !== !show) { chip.hidden = !show; wxPlace(); }   // 3.2.1 학교급 단추 옆에
     if (show && chip.dataset.k !== k) { chip.dataset.k = k; chip.innerHTML = `<span aria-hidden="true">${WX[k].em}</span>${WX[k].name} 오는 날`.replace('안개 오는 날', '안개 낀 날'); }
     // 그날 처음 홈을 볼 때 한 번 알려 줘요
-    if (show && S.wx !== gameToday() && !rt.modalOpen) { S.wx = gameToday(); save(); setTimeout(() => toast(`${WX[k].em} 오늘은 ${k === 'fog' ? '안개가 꼈어요' : WX[k].name + '가 와요'}.\n${WX[k].tip}`), 600); }
+    if (show && S.wx !== gameToday() && !rt.modalOpen) { S.wx = gameToday(); save(); setTimeout(() => toast(`${WX[k].em} 오늘은 ${k === 'fog' ? '안개가 꼈어요' : iga(WX[k].name) + ' 와요'}.\n${WX[k].tip}`), 600); }
   }
   /* ===== 2.1.3 날씨 END ===== */
   /* ===== 2.1.3 학부모 쪽지 이야기 BEGIN (로드맵 9절) =====
@@ -28215,7 +28223,7 @@ body.cam-scene #ffChip,body.cam-scene #plChip,body.cam-scene .b-ring{animation-p
       return `<div class="ach-row${can ? ' can' : ''}"><span class="ach-medal">${achMedal(a)}</span>` +
         `<span class="ach-tx"><b>${esc(head)}</b><small>${esc(sub)}</small><span class="ach-bar"><i style="width:${pct.toFixed(0)}%"></i></span>` +
         `<span class="ach-tiers" aria-label="받은 메달 ${g}개">${ACH_TIER.map((_, j) => `<i class="${j < g ? 't' + (j + 1) : ''}"></i>`).join('')}</span></span>` +
-        (can ? `<button class="ach-btn" type="button" data-ach="${a.id}">받기</button>` : `<span class="ach-done">${g >= ACH_N ? '완료' : ACH_TIER[next] + ' 메달'}</span>`) + '</div>';
+        (can ? `<button class="ach-btn" type="button" data-ach="${a.id}">받기</button>` : `<span class="ach-done">${g >= ACH_N ? '완료' : `다음: ${ACH_TIER[next]} 메달 (황금 도토리 +${ACH_GOLD[next]})`}</span>`) + '</div>';
     }).join('');
   }
   function setDexSeg(v) {
@@ -28491,7 +28499,7 @@ body.cam-scene #ffChip,body.cam-scene #plChip,body.cam-scene .b-ring{animation-p
     mgTick();
     const to = mgNearestEmpty(cells, i);
     if (to < 0) { mgShake(i); toast('판이 가득 찼어요. 조각을 합치거나 팔아서 자리를 비워요'); return false; }
-    if (S.mg.e < 1) { mgShake(i); toast(`에너지가 부족해요. ${mgEnergyIn()}초 뒤에 1 차요`); return false; }
+    if (S.mg.e < 1) { mgShake(i); toast(`에너지가 모자라요. ${mgEnergyIn()}초 뒤에 1 차요`); return false; }
     if (S.mg.e >= mgEMax()) S.mg.eAt = gameNow();   // 가득 찬 상태에서 처음 쓰면 이때부터 회복을 재요
     // 2.1.3 에너지 배수: 조각마다 에너지 1. 빈칸이나 에너지가 모자라면 되는 만큼만 만들어요
     const mul = mgMul(), made = [];
@@ -28629,7 +28637,7 @@ body.cam-scene #ffChip,body.cam-scene #plChip,body.cam-scene .b-ring{animation-p
     mgUI.sel = -1;
     mgFloat(i, `+${fmt(v)}`);
     sfx('coin');
-    toast(`${eul(MG.kinds[code[0]].st[n - 1])} 팔아 도토리 ${fmt(v)}개를 받았어요`);
+    toast(`${eul(MG.kinds[code[0]].st[n - 1])} 팔아 도토리 ${fmtN(v)}${eulOf(fmtN(v))} 받았어요`);
     mgRenderBoard(); mgRenderOrders(); mgRenderFoot(); renderHUD(); save();
     return true;
   }
@@ -28830,7 +28838,7 @@ body.cam-scene #ffChip,body.cam-scene #plChip,body.cam-scene .b-ring{animation-p
     const ad = $('#mgAdBtn'), left = mgAdLeft();
     const energyIcon = IMG180('mg_ic_energy');
     setH(ad, `<span class="mg-ad-play" aria-hidden="true">▶</span>${energyIcon ? `<img class="mg-ad-icon" src="${energyIcon}" alt="">` : '<span aria-hidden="true">⚡</span>'}<span>+${MG.AD.e}</span><small>${left}/${MG.AD.n}</small>`);
-    setAt(ad, 'aria-label', `광고 보고 에너지 ${MG.AD.e} 받기, 오늘 ${left}회 남음`);
+    setAt(ad, 'aria-label', `광고 보고 에너지 ${MG.AD.e} 받기, 오늘 ${left}번 남음`);
     setAt(ad, 'aria-disabled', left > 0 ? 'false' : 'true');
   }
   function mgRenderOrders() {
@@ -29069,7 +29077,8 @@ body.cam-scene #ffChip,body.cam-scene #plChip,body.cam-scene .b-ring{animation-p
     });
     $('#mgUpNo').addEventListener('click', () => { $('#mgUpSheet').hidden = true; });
     $('#mgUpYes').addEventListener('click', () => { if (mgUI.upSwap ? mgUpSwap() : mgUpgrade(mgUI.upAt)) $('#mgUpSheet').hidden = true; });
-    $('#mgUps').addEventListener('click', () => mgUpSwapAsk());   // 3.0.0 조정안 4
+    $('#mgUps').addEventListener('click', () => mgUpSwapAsk());
+    $('#mgPieces').addEventListener('click', () => { sfx('tap'); toast(`장식 조각 ${S.mg.pieces}개. 꾸미기 가게에서 5개로 장식 하나를 받아요`); });   // 5.0.1.5 M-20   // 3.0.0 조정안 4
   }
   /* ===== 1.8.0 숲속 합치기 END ===== */
 

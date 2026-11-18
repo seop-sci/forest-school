@@ -27,7 +27,7 @@ async def main():
           S.tg = 1; await sl(400); const ph2=T.ph; return {{ ph1, spd, txt, ph2 }}; }})()""")
         print('멈춤', r)
         ok(r['ph1'] == 'cap' and r['spd'] == 600, '상한에서 멈추고 2배속 시간은 그대로')
-        ok('학년이 오르면' in r['txt'], '위에 상한 안내')
+        ok('심화 탐험으로 가요' in r['txt'], '위에 상한 안내')   # 5.0.1.5 M-04 글
         ok(r['ph2'] != 'cap', '다음 해가 되면 다시 걸어요')
         # 레벨 값
         r = await page.evaluate(f"""(()=>{{ const F={F}, S=F.S, sp=S.tam.party[0]; S.tam.mem[sp]=Object.assign(S.tam.mem[sp]||{{}},{{lv:30,st:1,sh:0}});
