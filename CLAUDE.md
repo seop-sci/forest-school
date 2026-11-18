@@ -14,8 +14,8 @@ Claude는 구현, 시험, 빌드, PR, 패치노트를 맡아요. 아래 공통 �
 | 사용자(woodani) | 기능 결정, 최종 검수, 배포 승인 |
 
 ### 파일 체계 (바꾸지 않아요)
-- 게임 원본은 `dev/forest-school.html` 하나예요. 고칠 때는 이 파일만 고쳐요.
-- 그림은 저장소 맨 위 `img/a` 파일이 원본이에요(2026-11-17 woodani 결정). `dev/forest-school.html`에는 `"열쇠":"img/a/열쇠-지문.webp"` 같은 주소만 있어요. 그림은 `dev/embed_assets.py`로 넣고, 새 파일은 `git add img`로 함께 올려요. `img/a` 파일을 손으로 고치거나 이름을 바꾸지 않아요.
+- 게임 원본은 저장소 맨 위 `src/` 폴더의 여러 파일이에요(2026-11-18 woodani 결정: `src/page/` 머리와 화면 뼈대와 그림 주소표, `src/css/` 꾸밈, `src/js/` 기능별 코드). 고칠 때는 `src/` 파일을 고쳐요. `dev/forest-school.html`은 `python3 dev/srcbuild.py build`로 `src/`를 차례대로 이어 붙인 결과물이라 손으로 고치지 않아요(`wrap.py`와 `build_gh.py`가 먼저 만들어요). 나누는 곳은 `dev/src_parts.txt`, 둘이 같은지는 `python3 dev/srcbuild.py check`로 봐요. `src/`와 `dev/forest-school.html`은 함께 커밋해요.
+- 그림은 저장소 맨 위 `img/a` 파일이 원본이에요(2026-11-17 woodani 결정). 원본(`src/page/20-img-map.html`)에는 `"열쇠":"img/a/열쇠-지문.webp"` 같은 주소만 있어요. 그림은 `dev/embed_assets.py`로 넣고, 새 파일은 `git add img`로 함께 올려요. `img/a` 파일을 손으로 고치거나 이름을 바꾸지 않아요.
 - 저장소 맨 위 `index.html`은 `python3 dev/build_gh.py .`로 만든 결과물이에요. 손으로 고치지 않아요.
 - 안드로이드(`app/`)와 토스(`toss/`)는 `index.html`을 가져다 묶어요. `<!-- github-only -->` 표시 구간은 두 판에서 빠져요.
 - `config.js`(Firebase 설정), `database.rules.json`(서버 규칙), 안드로이드 앱 ID `io.github.seopsci.forestschool`, 애드몹 ID, 토스 광고 그룹 ID는 사용자가 따로 말하지 않으면 바꾸지 않아요.
@@ -58,7 +58,7 @@ Claude는 구현, 시험, 빌드, PR, 패치노트를 맡아요. 아래 공통 �
 - 사용자가 "메모해 줘"라고 하면 고치지 않고 `dev/memo.md`의 "아직 반영 안 함"에 적고 "적어 뒀어요(지금 n개)"라고만 답해요. "반영해 줘"라고 하면 모아 둔 것을 한 번에 구현해요.
 
 ### 고칠 때
-- `dev/forest-school.html`만 고쳐요. 시험용 손잡이는 `window.__forest`(`window.__FOREST_TEST`일 때만 생겨요)에 붙여요.
+- `src/` 파일만 고쳐요(`dev/forest-school.html`은 결과물). 원본을 직접 고치는 도구(`embed_assets.py`, `img_out.py`, `story_pack.py`, `oak_pack.py`, `embed_audio.py`)는 끝에 `src/`로 저절로 나눠 넣어요. 시험용 손잡이는 `window.__forest`(`window.__FOREST_TEST`일 때만 생겨요)에 붙여요.
 - 새 저장 필드: `fresh()` 기본값 → `sanitize()` 읽기 → 옛 저장 바로잡기 순서로 넣어요.
 - 큰 숫자는 `fmt()`, 한국어 조사는 `eul()`, `iga()`, `eun()`을 써요. 가운뎃점(·)은 되도록 쓰지 않아요.
 
