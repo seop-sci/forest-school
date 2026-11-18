@@ -44,6 +44,9 @@ async def main():
             await pg.evaluate(f"(() => {{ const F = {F}, S = F.S; F.rt.fakeNow = Date.parse('{days['rainDay']}T03:00:00Z'); S.clk = {{ last: 0 }}; S.wx = ''; F.setTab('school'); F.renderWeather(); }})()")
             await pg.wait_for_timeout(1200)
             r = await pg.evaluate("(() => ({ fx: !document.querySelector('#wxFx').hidden && document.querySelector('#wxFx').className, chip: !document.querySelector('#wxChip').hidden && document.querySelector('#wxChip').textContent, toast: document.querySelector('#toast').textContent }))()")
+            for _ in range(10):   # 5.0.1.7: 저절로 온 알림은 앞 알림이 끝난 뒤 차례로 떠요
+                if '책 읽기' in r['toast']: break
+                await pg.wait_for_timeout(600); r['toast'] = await pg.evaluate("document.querySelector('#toast').textContent")
             print('화면', r)
             if r['fx'] != 'wx-fx wx-rain' or '비 오는 날' not in (r['chip'] or '') or '책 읽기' not in r['toast']: bad.append(f'{w}: 비 화면 {r}')
             await pg.screenshot(path=f's91_rain_{w}.png')

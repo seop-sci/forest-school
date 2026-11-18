@@ -52,6 +52,10 @@ async def main():
         if r['science'] != ['bld_science_on', 'roof_science'] or r['playground'] != ['bld_field_on', 'roof_field']: fails.append(f"과학실, 운동장 모습 {r['science']} {r['playground']}")
         await pg.wait_for_timeout(1800)
         t = await pg.evaluate("(document.querySelector('.toast')||{}).textContent||''")
+        for _ in range(25):   # 5.0.1.6: 창이 떠 있는 동안 온 알림은 창을 닫은 뒤, 저절로 온 알림은 앞 알림이 끝난 뒤 차례로 떠요
+            if '새로 바뀌었어요' in t: break
+            await pg.evaluate("(()=>{ const b=document.querySelector('.overlay:not([hidden]) [data-cm]'); if (b) b.click(); })()")
+            await pg.wait_for_timeout(600); t = await pg.evaluate("(document.querySelector('.toast')||{}).textContent||''")
         if '새로 바뀌었어요' not in t: fails.append(f'건물 모습 알림 {t}')
         await pg.evaluate(f"(()=>{{ {CLEAN}; {F}.setTab('school'); {F}.festFocus(300, 420); }})()"); await pg.wait_for_timeout(400)
         await pg.screenshot(path='s54_elem_s2.png')
