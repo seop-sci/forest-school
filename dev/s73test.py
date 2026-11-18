@@ -109,6 +109,10 @@ async def main():
                 await pg.wait_for_timeout(6200)   # 2.3.0 새 졸업식 장면은 8.6초
                 m = await pg.evaluate(OPEN)
                 if m != 'mTier': bad.append(f'8.6초 뒤 입학 창으로 넘어가야 해요 {m}')
+                await pg.click('#tierOk'); await pg.wait_for_timeout(400)   # 5.0.1.6 F-02: 창이 떠 있는 동안 온 알림은 창을 닫은 뒤에 보여요
+                for _ in range(12):   # 이어 뜨는 대화 창도 넘겨요
+                    if await pg.evaluate(OPEN) != 'mTalk': break
+                    await pg.click('#talkNext'); await pg.wait_for_timeout(350)
                 seen = []
                 for _ in range(14):
                     seen.append(await pg.evaluate("document.querySelector('#toast').hidden ? '' : document.querySelector('#toast').textContent")); await pg.wait_for_timeout(800)
@@ -152,7 +156,7 @@ async def main():
             if r['key'] != 'store' or '먼저 지어야' not in r['toast']: bad.append(f'짓기 전 매점 가구 퀘스트 {r}')
             await pg.evaluate(f"(() => {{ const F = {F}, S = F.S; F.closeSheet(); S.f.store = 2; S.fu.store = [2, 0, 1, 2]; }})()")
             await pg.wait_for_timeout(400)
-            t0 = await pg.evaluate(f"(() => {{ {F}.goTo({F}.MAIN.find(q => q.id === 'j3')); return document.querySelector('#toast').textContent; }})()"); await pg.wait_for_timeout(900)
+            t0 = await pg.evaluate(f"(() => {{ {F}.rt.tapT = performance.now(); {F}.goTo({F}.MAIN.find(q => q.id === 'j3')); return document.querySelector('#toast').textContent; }})()"); await pg.wait_for_timeout(900)
             r = await pg.evaluate("""(() => { const F = window.__forest, box = document.querySelector('#furBox'), sh = document.querySelector('#sheetWrap .sheet');
               const a = box.getBoundingClientRect(), p = sh.getBoundingClientRect();
               return { key: F.rt.sheetKey, hidden: box.hidden, top: Math.round(a.top - p.top), ph: Math.round(p.height) }; })()"""); r['toast'] = t0
