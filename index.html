@@ -2,7 +2,7 @@
 <html lang="ko">
 <head>
 <meta charset="utf-8">
-<meta name="forest-version" content="5.0.2.1">
+<meta name="forest-version" content="5.0.2.2">
 <meta name="viewport" content="width=device-width, initial-scale=1">
 <meta name="description" content="도토리를 모아 숲속 학교를 키우는 방치형 게임 테스트판이에요.">
 <style>html,body{margin:0}</style>
@@ -2766,7 +2766,13 @@ html.hud-art .tier-dots .td.on{background:#E8A23E;color:#fff;border-color:#B8692
 .gd-plot button.go{background:#6BA23A;border-color:#4E7F25;color:#fff}.gd-plot small{opacity:.7}
 .gd-pick{margin-top:8px;padding:8px;border-radius:12px;background:rgba(226,162,28,.12)}.gd-pick b{font-size:13px}
 .gd-bulk{display:flex;flex-wrap:wrap;gap:4px;margin-top:10px}.gd-bulk:empty{display:none}
-.gd-ok{margin-top:8px;padding:8px 10px;border:2px dashed #6BA23A;border-radius:12px;font-size:13px}.gd-ok p{margin:0 0 6px}   /* 5.0.1.6 C-03 */
+.gd-ok{position:absolute;inset:0;z-index:6;display:flex;align-items:center;justify-content:center;padding:16px}   /* 5.0.1.6 C-03. 5.0.2.2 woodani: 텃밭 창 가운데 따로 띄워요 */
+.gd-ok-bg{position:absolute;inset:0;background:rgba(20,32,16,.5);animation:gdOkFade .15s ease-out}
+.gd-ok-card{position:relative;width:100%;max-width:290px;padding:16px 14px 14px;border:2px solid #6BA23A;border-radius:18px;background:var(--paper);color:var(--ink);text-align:center;box-shadow:0 5px 0 var(--line-shadow), 0 14px 30px rgba(0,0,0,.3);animation:gdOkPop .18s ease-out}
+.gd-ok-pic{width:64px;height:64px;margin:0 auto 6px;display:flex;align-items:center;justify-content:center;font-size:40px}.gd-ok-pic img{width:100%;height:100%;object-fit:contain}
+.gd-ok-card>b{display:block;font-family:var(--font-display);font-size:17px}.gd-ok-card p{margin:6px 0 12px;font-size:13px;line-height:1.5;color:var(--muted)}
+@keyframes gdOkFade{from{opacity:0}}@keyframes gdOkPop{from{opacity:0;transform:scale(.92)}}
+@media (prefers-reduced-motion: reduce){.gd-ok-bg,.gd-ok-card{animation:none}}
 @media (prefers-color-scheme: dark){:root:not([data-theme="light"]) .gd-bulk button{color:#CDEB9A;background:rgba(107,162,58,.22)}}:root[data-theme="dark"] .gd-bulk button{color:#CDEB9A;background:rgba(107,162,58,.22)}   /* 5.0.1.5 C-15 */
 .gd-bulk button{flex:1 1 30%;padding:7px 6px;border-radius:12px;border:1.5px solid #6BA23A;background:rgba(107,162,58,.12);font:inherit;font-size:12.5px;font-weight:700;color:#2F5A2A;white-space:nowrap}
 .gd-body .gd-pick{position:sticky;bottom:0;z-index:2;background:#FBEFCF;box-shadow:0 -6px 12px rgba(60,40,10,.14)}   /* 3.3.2 고르는 칸이 밭 아래로 밀려 안 보이지 않게 늘 아래에 붙어요 */
@@ -2885,7 +2891,8 @@ body.wl-on .toast{z-index:300}
    왼쪽 아래로 옮기는 안(A안)은 초등학교부터 기부함과 왼쪽 건물을 가려서 접었어요. 자리(right, bottom)는 chipRow()가 오른쪽부터 차례로 놓고, 학교급 단추에 닿으면 한 줄 위로 올려요 */
 .ff-chip,.pl-chip,.app.on-school .deal{bottom:calc(var(--bot-h, 70px) + 10px);height:30px;box-sizing:border-box;max-width:none;white-space:nowrap}
 .ff-chip{flex-direction:row;align-items:center;gap:5px;padding:0 9px;border-radius:999px;font-size:12px}
-.ff-chip b{font-size:13px}.ff-chip small{font-size:11.5px}.ff-chip small.nb{gap:2px}
+.ff-chip b{font-size:13px}.ff-chip small{font-size:11.5px}
+.up-chip{border-color:#6BA23A;background:rgba(236,248,222,.96)}.up-chip b{color:#3F6E2A}   /* 5.0.2.2 건물 한 번에 올리기 */.ff-chip small.nb{gap:2px}
 .ff-chip .ffx{left:-7px;top:-9px;width:18px;height:18px;font-size:12px;line-height:14px}
 .pl-chip{padding:0 9px;border-radius:999px;font-size:0;gap:0}.pl-chip span{font-size:16px}
 .app.on-school .deal{padding:1px 9px 1px 2px;gap:4px;font-size:0;border-radius:999px;box-shadow:0 2px 0 var(--wood-dark)}
@@ -3613,7 +3620,7 @@ span.bt-stamp{display:none}.bt-duel.done span.bt-stamp{display:grid}
 .ex-row-btn .ex-ic{flex:none;display:grid;place-items:center;width:36px;height:36px;font-size:22px}.ex-row-btn .ex-ic img{width:36px;height:36px;object-fit:contain}
 .ex-row-btn .ex-tx{flex:1;min-width:0;display:flex;flex-direction:column}.ex-row-btn b{font-size:14px}.ex-row-btn small{font-size:12px;color:var(--muted)}
 .ex-row-btn em{flex:none;padding:4px 10px;border-radius:999px;background:var(--chip-bg);color:var(--chip-ink);font-style:normal;font-size:12.5px;font-weight:700}
-body.cam-scene #ffChip,body.cam-scene #tierDots,body.cam-scene #plChip{opacity:0;pointer-events:none;transition:opacity .3s}
+body.cam-scene #ffChip,body.cam-scene #upChip,body.cam-scene #tierDots,body.cam-scene #plChip{opacity:0;pointer-events:none;transition:opacity .3s}
 /* 3.2.6 끊김: 체험학습 장면 동안 지도 안 장식 움직임(반딧불, 반짝임 등)과 숨긴 칩, 왼쪽 단추 고리 움직임을 멈춰요. 버스와 깃발, 풍선만 움직여요 */
 body.cam-scene #map .firefly,body.cam-scene #map .c-can,body.cam-scene #map [class^="bx-"],body.cam-scene #map .g-arrow,body.cam-scene #map .rec,body.cam-scene #map .t-rec,body.cam-scene #map .float,
 body.cam-scene #ffChip,body.cam-scene #plChip,body.cam-scene .b-ring{animation-play-state:paused}   /* 지도 전체(#map *)를 고르면 켜고 끌 때 지도 모든 칸의 스타일을 다시 세서, 움직이는 것만 골라요 */
@@ -3868,6 +3875,8 @@ body.cam-scene #ffChip,body.cam-scene #plChip,body.cam-scene .b-ring{animation-p
 .mg-order .mo-who{display:none}
 .mg-order .mo-rw{font-size:10.5px;line-height:1.15}
 .mg-foot{min-height:48px;padding:4px 8px;border-radius:13px}   /* 3.3.3 woodani: 조각을 고르면 아래 칸이 42→48로 커져 판이 줄었다 커졌다 해서 높이를 48로 고정 */
+body.mg-on .toast{top:auto;bottom:calc(10px + var(--sab, 0px));min-height:48px;display:flex;align-items:center;justify-content:center;max-width:min(456px, calc(100% - 24px))}   /* 5.0.2.2 woodani: 숲속 합치기에서는 위쪽 에너지와 주문서를 가리지 않게 아래 칸 위에 띄워요 */
+body.mg-on .toast[hidden]{display:none}
 .mg-foot .mf-tx span{display:none}
 .mg-foot .mf-btn{min-height:32px;font-size:13px;padding:0 10px}
 .mg-mid{overflow-x:hidden}
@@ -3886,7 +3895,7 @@ body.cam-scene #ffChip,body.cam-scene #plChip,body.cam-scene .b-ring{animation-p
     <p class="boot-step" id="bootStep">학교 문을 여는 중...</p>
     <p class="boot-tip" id="bootTip">학교 문을 여는 중이에요</p>
   </div>
-  <span class="boot-ver" id="bootVer">v5.0.2.1</span>
+  <span class="boot-ver" id="bootVer">v5.0.2.2</span>
 </div>
 
 <div class="app on-school" id="app">
@@ -4168,6 +4177,7 @@ body.cam-scene #ffChip,body.cam-scene #plChip,body.cam-scene .b-ring{animation-p
         <button type="button" class="zb-arr" id="zoneNext" aria-label="다음 구역으로"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M9 6l6 6-6 6" fill="none" stroke="currentColor" stroke-width="2.6" stroke-linecap="round" stroke-linejoin="round"/></svg></button>
       </div>
       <button class="ff-chip" id="ffChip" type="button" hidden></button><!-- 2.1.1 오늘 바로 완공, 건설 가속 -->
+      <button class="ff-chip up-chip" id="upChip" type="button" hidden></button><!-- 5.0.2.2 woodani: 올릴 수 있는 건물 한 번에 한 단계 -->
       <div class="deco-bar" id="decoBar" hidden><span><b>꾸미기 중</b><small>반짝이는 빈 자리를 누르면 장식을 놓아요</small></span><button class="cta small" type="button" id="decoDone">다 했어요</button></div>
       <div class="map-left">
         <button class="ui-fold side-fold" id="foldL" type="button" data-fold="l" aria-expanded="true" aria-label="왼쪽 단추 접기"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M6 15l6-6 6 6" fill="none" stroke="currentColor" stroke-width="2.6" stroke-linecap="round" stroke-linejoin="round"/></svg><i class="dot" hidden></i></button>
@@ -4477,7 +4487,7 @@ body.cam-scene #ffChip,body.cam-scene #plChip,body.cam-scene .b-ring{animation-p
       </div>
       <h3 class="panel-sub">정보</h3>
       <dl class="info">
-        <div id="verRow"><dt>버전</dt><dd>v5.0.2.1</dd></div>
+        <div id="verRow"><dt>버전</dt><dd>v5.0.2.2</dd></div>
         <div id="pidRow" hidden><dt>학교 번호</dt><dd id="infoPid"></dd></div>
       </dl>
       <div id="devBox" hidden>
@@ -10905,7 +10915,7 @@ body.cam-scene #ffChip,body.cam-scene #plChip,body.cam-scene .b-ring{animation-p
       const fb = fr.getBoundingClientRect(), sc = rt.mapS;
       let left = 0, right = fb.width, bottom = fb.height;
       for (const el of $$('#btnTrip, #btnSports, #btnHall, .boost:not([hidden])')) { if (el.hidden || !el.offsetParent) continue; const q = el.getBoundingClientRect(); if (q.left - fb.left < fb.width / 2) left = Math.max(left, q.right - fb.left); }
-      for (const el of $$('#ffChip, #plChip, #tierDots')) { if (el.hidden || !el.offsetParent) continue; const q = el.getBoundingClientRect(); bottom = Math.min(bottom, q.top - fb.top); }
+      for (const el of $$('#ffChip, #upChip, #plChip, #tierDots')) { if (el.hidden || !el.offsetParent) continue; const q = el.getBoundingClientRect(); bottom = Math.min(bottom, q.top - fb.top); }
       x0 = Math.max(x0, x0 + (left + 8) / sc); y1 = Math.min(y1, y0 + (bottom - (rt.hudTop || 0) - 8) / sc);
       x1 = Math.min(x1, x0 + (right - left - (rt.hudRight || 0) - 16) / sc);
     }
@@ -13060,7 +13070,7 @@ body.cam-scene #ffChip,body.cam-scene #plChip,body.cam-scene .b-ring{animation-p
   }
   function openGd() {
     if (!gdOpen()) { toast('급식실을 지으면 텃밭을 가꿀 수 있어요'); return; }
-    gdSync(); rt.gdPick = -1; rt.gdCutI = -1;
+    gdSync(); rt.gdPick = -1; rt.gdCutI = -1; rt.gdSel = '';   // 5.0.2.2 다시 열면 만들기 확인 창은 닫혀 있어요
     gdFreeGrant(curMain());   // 3.3.2 이미 그 퀘스트 중인 학교도 텃밭을 열면 무료 한 번
     const bg = IMG('garden_bg'); $('#gdHead').style.backgroundImage = bg ? `url("${bg}")` : ''; $('#gdHead').classList.toggle('noimg', !bg);   // 그림(작업지시서 37-A)이 오기 전에는 낮게
     gdRender(true); openModal($('#mGd')); sfx('tap');
@@ -13106,7 +13116,7 @@ body.cam-scene #ffChip,body.cam-scene #plChip,body.cam-scene .b-ring{animation-p
       const need = Object.entries(m.need).map(([c, k]) => `${GD_C[c].em}${k > 1 ? '×' + k : ''}`).join('');
       return `<button type="button" class="gd-menu${has ? '' : ' no'}${can ? ' can' : ''}${tm && tm.id === m.id ? ' on' : ''}" data-gd="cook" data-m="${m.id}" aria-disabled="${can ? 'false' : 'true'}">` +
         `${has ? gdImg(m.id, m.em) : gdImg('menu_frame', '🍽')}<span class="ell">${has || ok ? esc(m.nm) : '???'}</span><small>${can ? `만들기 +${gdPct(m)}%` : ok ? need : `${TIERS[Math.max(...Object.keys(m.need).map(c => GD_C[c].tier))].name}부터`}</small></button>`;
-    }).join('')}</div>` + (() => { const m = !tm && GD_M[rt.gdSel]; return m && gdCanCook(m) ? `<div class="gd-ok"><p>${eul(m.nm)} 만들까요? 오늘의 급식은 하루 한 번이라 바꿀 수 없어요. 오늘 수업료 +${gdPct(m)}%</p><div class="btn-row"><button class="btn-sub" type="button" data-gd="cooksel" data-m="">다시 고르기</button><button class="cta" type="button" data-gd="cookgo" data-m="${m.id}">만들기</button></div></div>` : ''; })();   // 5.0.1.6 C-03 누르면 먼저 물어봐요
+    }).join('')}</div>` + (() => { const m = !tm && GD_M[rt.gdSel]; return m && gdCanCook(m) ? `<div class="gd-ok" role="dialog" aria-label="오늘의 급식 만들기"><div class="gd-ok-bg" data-gd="cooksel" data-m=""></div><div class="gd-ok-card"><div class="gd-ok-pic">${gdImg(m.id, m.em)}</div><b>${eul(esc(m.nm))} 만들까요?</b><p>오늘 수업료 +${gdPct(m)}%<br>오늘의 급식은 하루 한 번이라 바꿀 수 없어요</p><div class="btn-row"><button class="btn-sub" type="button" data-gd="cooksel" data-m="">다시 고르기</button><button class="cta" type="button" data-gd="cookgo" data-m="${m.id}">만들기</button></div></div></div>` : ''; })();   // 5.0.1.6 C-03 누르면 먼저 물어봐요. 5.0.2.2 woodani: 아래에 붙던 확인 칸을 텃밭 창 가운데 따로 띄워요
   }
   /* 2.1.2 마을 기부(프로젝트 문서 '마을 기부 설계안 (2.1.2)', woodani 확정 2026-10-29): 도토리를 숲속 마을에 기부하면 기부 단계가 올라요.
      상한이 없고 힘(수입, 공사 속도)은 주지 않아요. 기념물, 칭호, 업적, 정수와 가끔 황금 도토리만. 졸업해도 남아요.
@@ -13204,7 +13214,7 @@ body.cam-scene #ffChip,body.cam-scene #plChip,body.cam-scene .b-ring{animation-p
     const dots = $('#tierDots'), W = fr.clientWidth; let lim = dots && !dots.hidden && dots.offsetWidth ? dots.offsetLeft + dots.offsetWidth + 8 : 10;
     { const wx = $('#wxChip'); if (wx && !wx.hidden && wx.offsetWidth) lim = Math.max(lim, wx.getBoundingClientRect().right - fr.getBoundingClientRect().left + 8); }   // 5.0.1.5 H-04 날씨 칩도 비켜요
     let r = 10, row = 0;
-    for (const el of [$('#btnDeal'), $('#plChip'), $('#ffChip')]) {
+    for (const el of [$('#btnDeal'), $('#plChip'), $('#ffChip'), $('#upChip')]) {
       if (!el || el.hidden || !el.offsetWidth) continue;
       const w = el.offsetWidth;
       if (r > 10 && W - r - w < lim) { row += 1; r = 10; }
@@ -13219,6 +13229,7 @@ body.cam-scene #ffChip,body.cam-scene #plChip,body.cam-scene .b-ring{animation-p
     const ks = ffList(), on = cbOn(), nb = nbOn(), nbShow = S.tier >= NB.tier && !liveOff('night');
     for (const k of Object.keys(FAC)) { const p = document.getElementById('pq-' + k); if (p) p.classList.toggle('ff-on', ks.includes(k)); }
     const c = $('#ffChip'); if (!c) return;
+    upRender(rt.tab === 'school' && rt.viewTier == null && !rt.decoEdit && !rt.fest && !rt.sports && !festBusy() && !rt.paused && S.tier >= 1);   // 5.0.2.2
     const show = S.ffx !== gameToday() && rt.tab === 'school' && rt.viewTier == null && !rt.decoEdit && !rt.fest && !rt.sports && !festBusy() && !rt.paused && S.tier >= 1 && (ks.length > 0 || on || nbShow);   // 학교 행사 중에는 숨겨요. 2.2.0 야간 건설 줄은 초등학교부터 늘 보여요
     const key = [show, S.ffx, ks.length, ffLeft(), on ? Math.floor(cbLeft() / 60) : -1, nbShow ? (nb ? Math.floor(nbLeft() / 60) : -2) : -1, nbAdd()].join('|');
     if (!force && c.dataset.key === key) return; c.dataset.key = key;
@@ -13234,6 +13245,42 @@ body.cam-scene #ffChip,body.cam-scene #plChip,body.cam-scene .b-ring{animation-p
     c.dataset.tip = [ks.length ? `즉시 완공이 오늘 ${ffLeft()}번 남았어요. ${FAC[ks[0]].name}부터 보여 드려요` : '', on ? `건설 부스터 +100%, ${hm(cbLeft())} 남음` : '', nbShow ? nbTx : ''].filter(Boolean).join(' / ');
     c.setAttribute('aria-label', (ks.length ? `오늘 즉시 완공 ${FF.day}번 가운데 ${ffLeft()}번 남음, 눌러서 건물 창 열기` : '') + (on ? ` 건설 부스터 사용 중` : '') + (nbShow ? ` ${nbTx}` : ''));
     ffUp(c);
+  }
+  /* 5.0.2.2 woodani 결정(2026-11-18): 건물을 하나씩 들어가 올리기 불편하다는 의견. 지금 도토리로 올릴 수 있는 건물을 싼 것부터 골라
+     가구를 채우고 공사까지 한 번에 시작해요. 이미 지은 건물만, 공사 중이거나 이 학기 최고 레벨이면 빼요. 두 채 이상일 때 홈 아래 칩으로 보여요 */
+  function upPlan() {
+    const opts = facKeys().filter(k => S.f[k] >= 1 && !conOn(k) && !facMaxed(k)).map(k => ({ k, c: furLeftCost(k) + facCost(k) })).filter(o => isFinite(o.c)).sort((a, b) => a.c - b.c);
+    const ks = []; let cost = 0;
+    for (const o of opts) { if (cost + o.c > S.budget) break; cost += o.c; ks.push(o.k); }
+    return { ks, cost };
+  }
+  function upRender(base) {
+    const c = $('#upChip'); if (!c) return;
+    const n = base ? upPlan().ks.length : 0, show = n >= 2, key = show ? String(n) : '';
+    if (c.dataset.key === key) return; c.dataset.key = key;
+    c.hidden = !show;
+    if (show) { c.innerHTML = `<b>🔨 한 번에 ${n}채</b>`; c.setAttribute('aria-label', `올릴 수 있는 건물 ${n}채를 한 번에 한 단계씩 올리기`); }
+    chipRow();
+  }
+  function upAsk() {
+    const P = upPlan(); if (P.ks.length < 1) { toast('지금 도토리로 올릴 수 있는 건물이 없어요'); return; }
+    const rows = P.ks.map(k => `<span class="ask-row"><i>${esc(FAC[k].name)}</i><span>Lv.${S.f[k]} → <b>${S.f[k] + 1}</b></span><em>+1</em></span>`).join('');
+    askBox({ title: '건물 한 번에 올리기', yes: '올리기', no: '그만두기',
+      html: `<span class="ask-sum">${acornIcon()}<b>${fmtN(P.cost)}</b>${eulOf(fmtN(P.cost))} 써요</span><span class="ask-sub">남는 도토리 ${fmtN(S.budget - P.cost)}. 가구를 채우고 공사를 시작해요</span><span class="ask-rows">${rows}</span>`,
+      onYes: () => upAll(P.ks) });
+  }
+  // 보여 준 건물만 올려요(창을 보는 동안 들어온 도토리로 더 올리지 않아요)
+  function upAll(ks) {
+    if (rt.paused) return 0;
+    ks = (ks || upPlan().ks).filter(k => facKeys().includes(k) && S.f[k] >= 1 && !conOn(k) && !facMaxed(k));
+    const done = [];
+    rt.batch = { items: [], n: 0 };   // 건물마다 뜨는 알림과 소리는 모아서 한 번
+    try { for (const k of ks) { if (!furReady(k)) buyFurAll(k); if (furReady(k) && buyFacility(k)) done.push(k); } } finally { rt.batch = null; }
+    if (!done.length) { toast('도토리가 모자라 올리지 못했어요'); return 0; }
+    sfx('buy'); buzz(14);
+    toast(`건물 ${done.length}채 공사 시작! ${done.map(k => FAC[k].name).join(', ')}`);
+    ffRender(true); save();
+    return done.length;
   }
   // 2.1.1 건물마다 하루 한 번 바로 완공 → 3.0.0 조정안 7(woodani 결정): 학교 전체 하루 3번, 고르는 건물은 마음대로. S.ffd = { 날, 쓴 횟수 }
   const FF = { day: 3 };
@@ -14015,8 +14062,8 @@ body.cam-scene #ffChip,body.cam-scene #plChip,body.cam-scene .b-ring{animation-p
        forest/rank/<내 id>   랭킹 이름과 학교 점수
        forest/stats/<내 id>  테스트 현황 (어디까지 했는지, 얼마나 했는지)
      <내 id>는 Firebase 익명 로그인이 기기(브라우저)마다 만들어 줘요. */
-  const VERSION = '5.0.2.1';   // 2026-11-17 woodani 결정: 웹에 5.0.2~5.0.5로 먼저 냈던 것을 앱과 함께 5.0.1 하나로 내요(버전 견줌은 앞 두 자리만 봐서 되돌아가도 괜찮아요)
-  const NT_QUIET = ['5.0.2.1', '2.1.20', '2.1.2.2', '2.3.0.1', '2.3.4', '3.2.3', '3.2.4', '3.2.5', '3.3.1', '3.3.2', '3.3.3', '4.4.1.1', '4.4.1.2', '4.4.1.3', '4.4.1.4', '5.0.1.1', '5.0.1.2', '5.0.1.3', '5.0.1.4', '5.0.1.5', '5.0.1.6', '5.0.1.7', '5.0.1.8'];   // 5.0.1.1 생물 탐사 고침은 공지 없이   // 5.0.3도 공지 없이(공지 줄은 woodani가 정하면 넣어요)   // 5.0.2 공지 없이(woodani 2026-11-16)   // 5.0.1 공지 줄은 woodani가 정할 때까지 조용히   // 5.0.0 공지는 2026-11-16 woodani가 정해서 NOTICES로 옮겼어요   // 4.4.1(앱과 함께 내는 판)은 공지를 띄워요   // 4.4.1도 공지 없이(woodani)   // 3.3.1, 3.3.2, 3.3.3(토스 먼저)도 공지 창 없이(woodani). 2.3.0.1도 공지 창 없이(공지는 그대로 2.3.0). 2.3.4도 조용히(woodani 결정). 3.2.3, 3.2.4, 3.2.5도 공지 창 없이(공지 줄을 고르지 않음)
+  const VERSION = '5.0.2.2';   // 2026-11-17 woodani 결정: 웹에 5.0.2~5.0.5로 먼저 냈던 것을 앱과 함께 5.0.1 하나로 내요(버전 견줌은 앞 두 자리만 봐서 되돌아가도 괜찮아요)
+  const NT_QUIET = ['5.0.2.2', '5.0.2.1', '2.1.20', '2.1.2.2', '2.3.0.1', '2.3.4', '3.2.3', '3.2.4', '3.2.5', '3.3.1', '3.3.2', '3.3.3', '4.4.1.1', '4.4.1.2', '4.4.1.3', '4.4.1.4', '5.0.1.1', '5.0.1.2', '5.0.1.3', '5.0.1.4', '5.0.1.5', '5.0.1.6', '5.0.1.7', '5.0.1.8'];   // 5.0.1.1 생물 탐사 고침은 공지 없이   // 5.0.3도 공지 없이(공지 줄은 woodani가 정하면 넣어요)   // 5.0.2 공지 없이(woodani 2026-11-16)   // 5.0.1 공지 줄은 woodani가 정할 때까지 조용히   // 5.0.0 공지는 2026-11-16 woodani가 정해서 NOTICES로 옮겼어요   // 4.4.1(앱과 함께 내는 판)은 공지를 띄워요   // 4.4.1도 공지 없이(woodani)   // 3.3.1, 3.3.2, 3.3.3(토스 먼저)도 공지 창 없이(woodani). 2.3.0.1도 공지 창 없이(공지는 그대로 2.3.0). 2.3.4도 조용히(woodani 결정). 3.2.3, 3.2.4, 3.2.5도 공지 창 없이(공지 줄을 고르지 않음)
     // 2.1.20 woodani 결정: 이 버전들은 업데이트해도 공지 창을 띄우지 않아요(공지는 그대로 2.1.2)
   /* 2.0.0 공지사항 (2026-10-27 woodani, 1.8.0은 이미 올려서 2.0.0부터): 설정 > 공지사항. 맨 위가 가장 새 공지예요.
      패치노트는 자동으로 넣지 않아요. woodani가 검수한 글만 여기에 적어요(CHANGELOG.md는 자세한 기록용이라 따로 있어요).
@@ -17265,9 +17312,9 @@ body.cam-scene #ffChip,body.cam-scene #plChip,body.cam-scene .b-ring{animation-p
   /* ===== 1.7.4 학교 꾸미기: 숲의 정수로 장식을 사서 지도의 정해진 자리(지도마다 11곳)에 놓아요. 보너스는 없고 졸업해도 남아요 ===== */
   // sm: 작은 장식(설계안: 벤치, 가로등, 새집, 이정표, 버섯 램프)은 36칸, 나머지는 46칸
   const DECO = [
-    { id: 'bench', name: '벤치', ess: 40, img: 'deco_bench', sm: 1 },
-    { id: 'flowerbed', name: '꽃밭', ess: 40, img: 'deco_flowerbed' },
-    { id: 'signpost', name: '이정표', ess: 40, img: 'deco_signpost', sm: 1 },
+    { id: 'bench', name: '벤치', ess: 10, img: 'deco_bench', sm: 1 },   // 5.0.2.2 woodani: 처음 장식 퀘스트(4-8)에서 막히지 않게 싼 장식 셋은 40 → 10
+    { id: 'flowerbed', name: '꽃밭', ess: 10, img: 'deco_flowerbed' },
+    { id: 'signpost', name: '이정표', ess: 10, img: 'deco_signpost', sm: 1 },
     { id: 'streetlamp', name: '가로등', ess: 60, img: 'deco_streetlamp', sm: 1 },
     { id: 'birdhouse', name: '새집', ess: 60, img: 'deco_birdhouse', sm: 1 },
     { id: 'mushroom', name: '버섯 램프', ess: 80, img: 'deco_mushroom_lamp', sm: 1 },
@@ -27012,6 +27059,7 @@ body.cam-scene #ffChip,body.cam-scene #plChip,body.cam-scene .b-ring{animation-p
     setTimeout(() => { for (const u of [IMG180('fx_scaffold'), IMG('timer_bar'), IMG('fx_lantern'), FSI('fix_beaver_1'), FSI('fix_beaver_2'), FSI('fix_beaver_3')]) if (u) { const im = new Image(); im.src = u; if (im.decode) im.decode().catch(() => {}); } }, 3000);
     for (const k of Object.keys(FAC)) { const p = document.getElementById('pq-' + k); if (p && !p.querySelector('.ffb')) p.insertAdjacentHTML('beforeend', '<g class="ffb" transform="translate(-38 -20)"><rect x="0" y="-6.5" width="76" height="13" rx="6.5"/><text x="38" y="3" text-anchor="middle">즉시 완공 가능!</text></g>'); }   // 2.1.1
     $('#decoPickShop').addEventListener('click', () => { sfx('tap'); closeModal($('#mDecoPick'), () => { decoEditEnd(); setTab('deco'); }); });   // 5.0.1.8 H-19
+    $('#upChip').addEventListener('click', () => { sfx('tap'); upAsk(); });   // 5.0.2.2
     $('#ffChip').addEventListener('click', e => { if (e.target.closest('.ffx')) { S.ffx = gameToday(); sfx('tap'); ffRender(true); save(); toast('오늘은 이 알림을 닫았어요. 내일 다시 보여요'); return; } const k = ffList()[0]; if (k) { sfx('tap'); openSheet(k); toast(e.currentTarget.dataset.tip || ''); } else toast(conAdd() > 0 ? `지금 모든 공사 +${conAdd()}%예요${cbOn() ? `. 건설 부스터 ${hm(cbLeft())} 남았어요` : ''}${nbOn() ? `. 야간 건설은 ${hm(nbLeft())} 남았어요` : ''}` : `매일 ${NB.h0}~${NB.h1}시에는 야간 건설 이벤트로 모든 공사 +${NB.add}%예요. 학교 특별 이벤트 주간에는 +${NB.addSp}%예요`); });   // 2.2.0
     $('#conCb').addEventListener('click', e => { const b = e.target.closest('[data-cb]'); if (b) cbBuy(b.dataset.cb); });
     $('#albPrev').addEventListener('click', () => { rt.albPage -= 1; sfx('tap'); renderAlbum(); });
@@ -29059,7 +29107,7 @@ body.cam-scene #ffChip,body.cam-scene #plChip,body.cam-scene .b-ring{animation-p
     if (!S.mg.board || S.mg.board.length !== MG_N * 2) mgSetCells(mgEmptyBoard());
     mgFillOrders();
     mgUI.open = true; mgUI.sel = -1; mgUI.got = { a: 0, pc: 0, up: 0 }; mgUI.idleAt = Date.now();
-    $('#mgScene').hidden = false;
+    $('#mgScene').hidden = false; document.body.classList.add('mg-on');   // 5.0.2.2 woodani: 합치기 안에서는 알림을 아래 칸 자리에 띄워요
     $('#mgUpSheet').hidden = true;
     $('#mgHelp').hidden = !!S.mg.seen;
     mgRenderAll();
@@ -29067,7 +29115,7 @@ body.cam-scene #ffChip,body.cam-scene #plChip,body.cam-scene .b-ring{animation-p
   }
   function mgClose() {
     mgUI.open = false; mgDragEnd(true); mgClearHint();
-    $('#mgScene').hidden = true;
+    $('#mgScene').hidden = true; document.body.classList.remove('mg-on');
     save(); renderMini(); musicSync();
   }
   function mgOpenUp(i) {
@@ -29393,6 +29441,7 @@ body.cam-scene #ffChip,body.cam-scene #plChip,body.cam-scene .b-ring{animation-p
     TKE, TK_Q, tkDaily, nbAllDay, nbBuildAt, nbOn, conAdd, BX_SPOT, PERKS, offlineCapH, applyAway, pzFinish, mgClaimOrder,
     CS, JOBS, CS_WORRY, freshCs, csOpen, csLeft, csMax, csEnsure, csCands, csNeed, csMul, csOpenCards, csReady, csDone, csTalkMake, csAnswer, csChoose, csSettle, openCounsel, renderCounsel, renderHall, MAIN, qMeasure, qGoal, sanitize,   // 3.1.0 진로 상담
     questPick, facAllNext, CAMPUS8,   // 5.0.1.3
+    upPlan, upAll, upAsk, upRender,   // 5.0.2.2
     termRep, termOn,   // 5.0.1.4
     NSL, nsStart, nsSettle, nsOpen, nsOn, nsOverlap, nsExtraH, isNight, nightDayOf, openNs, renderNs, bxSpots, renderNight,   // 3.0.0
    conOn, conLeft, conTick, conSec, conFinish, tkPlan, tkUse, tkUseAll, TK, CON, TKAD, capNext, yearCap,   // 2.1.0 공사

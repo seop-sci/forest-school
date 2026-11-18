@@ -372,7 +372,7 @@
   }
   function openGd() {
     if (!gdOpen()) { toast('급식실을 지으면 텃밭을 가꿀 수 있어요'); return; }
-    gdSync(); rt.gdPick = -1; rt.gdCutI = -1;
+    gdSync(); rt.gdPick = -1; rt.gdCutI = -1; rt.gdSel = '';   // 5.0.2.2 다시 열면 만들기 확인 창은 닫혀 있어요
     gdFreeGrant(curMain());   // 3.3.2 이미 그 퀘스트 중인 학교도 텃밭을 열면 무료 한 번
     const bg = IMG('garden_bg'); $('#gdHead').style.backgroundImage = bg ? `url("${bg}")` : ''; $('#gdHead').classList.toggle('noimg', !bg);   // 그림(작업지시서 37-A)이 오기 전에는 낮게
     gdRender(true); openModal($('#mGd')); sfx('tap');
@@ -418,7 +418,7 @@
       const need = Object.entries(m.need).map(([c, k]) => `${GD_C[c].em}${k > 1 ? '×' + k : ''}`).join('');
       return `<button type="button" class="gd-menu${has ? '' : ' no'}${can ? ' can' : ''}${tm && tm.id === m.id ? ' on' : ''}" data-gd="cook" data-m="${m.id}" aria-disabled="${can ? 'false' : 'true'}">` +
         `${has ? gdImg(m.id, m.em) : gdImg('menu_frame', '🍽')}<span class="ell">${has || ok ? esc(m.nm) : '???'}</span><small>${can ? `만들기 +${gdPct(m)}%` : ok ? need : `${TIERS[Math.max(...Object.keys(m.need).map(c => GD_C[c].tier))].name}부터`}</small></button>`;
-    }).join('')}</div>` + (() => { const m = !tm && GD_M[rt.gdSel]; return m && gdCanCook(m) ? `<div class="gd-ok"><p>${eul(m.nm)} 만들까요? 오늘의 급식은 하루 한 번이라 바꿀 수 없어요. 오늘 수업료 +${gdPct(m)}%</p><div class="btn-row"><button class="btn-sub" type="button" data-gd="cooksel" data-m="">다시 고르기</button><button class="cta" type="button" data-gd="cookgo" data-m="${m.id}">만들기</button></div></div>` : ''; })();   // 5.0.1.6 C-03 누르면 먼저 물어봐요
+    }).join('')}</div>` + (() => { const m = !tm && GD_M[rt.gdSel]; return m && gdCanCook(m) ? `<div class="gd-ok" role="dialog" aria-label="오늘의 급식 만들기"><div class="gd-ok-bg" data-gd="cooksel" data-m=""></div><div class="gd-ok-card"><div class="gd-ok-pic">${gdImg(m.id, m.em)}</div><b>${eul(esc(m.nm))} 만들까요?</b><p>오늘 수업료 +${gdPct(m)}%<br>오늘의 급식은 하루 한 번이라 바꿀 수 없어요</p><div class="btn-row"><button class="btn-sub" type="button" data-gd="cooksel" data-m="">다시 고르기</button><button class="cta" type="button" data-gd="cookgo" data-m="${m.id}">만들기</button></div></div></div>` : ''; })();   // 5.0.1.6 C-03 누르면 먼저 물어봐요. 5.0.2.2 woodani: 아래에 붙던 확인 칸을 텃밭 창 가운데 따로 띄워요
   }
   /* 2.1.2 마을 기부(프로젝트 문서 '마을 기부 설계안 (2.1.2)', woodani 확정 2026-10-29): 도토리를 숲속 마을에 기부하면 기부 단계가 올라요.
      상한이 없고 힘(수입, 공사 속도)은 주지 않아요. 기념물, 칭호, 업적, 정수와 가끔 황금 도토리만. 졸업해도 남아요.
@@ -516,7 +516,7 @@
     const dots = $('#tierDots'), W = fr.clientWidth; let lim = dots && !dots.hidden && dots.offsetWidth ? dots.offsetLeft + dots.offsetWidth + 8 : 10;
     { const wx = $('#wxChip'); if (wx && !wx.hidden && wx.offsetWidth) lim = Math.max(lim, wx.getBoundingClientRect().right - fr.getBoundingClientRect().left + 8); }   // 5.0.1.5 H-04 날씨 칩도 비켜요
     let r = 10, row = 0;
-    for (const el of [$('#btnDeal'), $('#plChip'), $('#ffChip')]) {
+    for (const el of [$('#btnDeal'), $('#plChip'), $('#ffChip'), $('#upChip')]) {
       if (!el || el.hidden || !el.offsetWidth) continue;
       const w = el.offsetWidth;
       if (r > 10 && W - r - w < lim) { row += 1; r = 10; }
@@ -531,6 +531,7 @@
     const ks = ffList(), on = cbOn(), nb = nbOn(), nbShow = S.tier >= NB.tier && !liveOff('night');
     for (const k of Object.keys(FAC)) { const p = document.getElementById('pq-' + k); if (p) p.classList.toggle('ff-on', ks.includes(k)); }
     const c = $('#ffChip'); if (!c) return;
+    upRender(rt.tab === 'school' && rt.viewTier == null && !rt.decoEdit && !rt.fest && !rt.sports && !festBusy() && !rt.paused && S.tier >= 1);   // 5.0.2.2
     const show = S.ffx !== gameToday() && rt.tab === 'school' && rt.viewTier == null && !rt.decoEdit && !rt.fest && !rt.sports && !festBusy() && !rt.paused && S.tier >= 1 && (ks.length > 0 || on || nbShow);   // 학교 행사 중에는 숨겨요. 2.2.0 야간 건설 줄은 초등학교부터 늘 보여요
     const key = [show, S.ffx, ks.length, ffLeft(), on ? Math.floor(cbLeft() / 60) : -1, nbShow ? (nb ? Math.floor(nbLeft() / 60) : -2) : -1, nbAdd()].join('|');
     if (!force && c.dataset.key === key) return; c.dataset.key = key;
@@ -546,6 +547,42 @@
     c.dataset.tip = [ks.length ? `즉시 완공이 오늘 ${ffLeft()}번 남았어요. ${FAC[ks[0]].name}부터 보여 드려요` : '', on ? `건설 부스터 +100%, ${hm(cbLeft())} 남음` : '', nbShow ? nbTx : ''].filter(Boolean).join(' / ');
     c.setAttribute('aria-label', (ks.length ? `오늘 즉시 완공 ${FF.day}번 가운데 ${ffLeft()}번 남음, 눌러서 건물 창 열기` : '') + (on ? ` 건설 부스터 사용 중` : '') + (nbShow ? ` ${nbTx}` : ''));
     ffUp(c);
+  }
+  /* 5.0.2.2 woodani 결정(2026-11-18): 건물을 하나씩 들어가 올리기 불편하다는 의견. 지금 도토리로 올릴 수 있는 건물을 싼 것부터 골라
+     가구를 채우고 공사까지 한 번에 시작해요. 이미 지은 건물만, 공사 중이거나 이 학기 최고 레벨이면 빼요. 두 채 이상일 때 홈 아래 칩으로 보여요 */
+  function upPlan() {
+    const opts = facKeys().filter(k => S.f[k] >= 1 && !conOn(k) && !facMaxed(k)).map(k => ({ k, c: furLeftCost(k) + facCost(k) })).filter(o => isFinite(o.c)).sort((a, b) => a.c - b.c);
+    const ks = []; let cost = 0;
+    for (const o of opts) { if (cost + o.c > S.budget) break; cost += o.c; ks.push(o.k); }
+    return { ks, cost };
+  }
+  function upRender(base) {
+    const c = $('#upChip'); if (!c) return;
+    const n = base ? upPlan().ks.length : 0, show = n >= 2, key = show ? String(n) : '';
+    if (c.dataset.key === key) return; c.dataset.key = key;
+    c.hidden = !show;
+    if (show) { c.innerHTML = `<b>🔨 한 번에 ${n}채</b>`; c.setAttribute('aria-label', `올릴 수 있는 건물 ${n}채를 한 번에 한 단계씩 올리기`); }
+    chipRow();
+  }
+  function upAsk() {
+    const P = upPlan(); if (P.ks.length < 1) { toast('지금 도토리로 올릴 수 있는 건물이 없어요'); return; }
+    const rows = P.ks.map(k => `<span class="ask-row"><i>${esc(FAC[k].name)}</i><span>Lv.${S.f[k]} → <b>${S.f[k] + 1}</b></span><em>+1</em></span>`).join('');
+    askBox({ title: '건물 한 번에 올리기', yes: '올리기', no: '그만두기',
+      html: `<span class="ask-sum">${acornIcon()}<b>${fmtN(P.cost)}</b>${eulOf(fmtN(P.cost))} 써요</span><span class="ask-sub">남는 도토리 ${fmtN(S.budget - P.cost)}. 가구를 채우고 공사를 시작해요</span><span class="ask-rows">${rows}</span>`,
+      onYes: () => upAll(P.ks) });
+  }
+  // 보여 준 건물만 올려요(창을 보는 동안 들어온 도토리로 더 올리지 않아요)
+  function upAll(ks) {
+    if (rt.paused) return 0;
+    ks = (ks || upPlan().ks).filter(k => facKeys().includes(k) && S.f[k] >= 1 && !conOn(k) && !facMaxed(k));
+    const done = [];
+    rt.batch = { items: [], n: 0 };   // 건물마다 뜨는 알림과 소리는 모아서 한 번
+    try { for (const k of ks) { if (!furReady(k)) buyFurAll(k); if (furReady(k) && buyFacility(k)) done.push(k); } } finally { rt.batch = null; }
+    if (!done.length) { toast('도토리가 모자라 올리지 못했어요'); return 0; }
+    sfx('buy'); buzz(14);
+    toast(`건물 ${done.length}채 공사 시작! ${done.map(k => FAC[k].name).join(', ')}`);
+    ffRender(true); save();
+    return done.length;
   }
   // 2.1.1 건물마다 하루 한 번 바로 완공 → 3.0.0 조정안 7(woodani 결정): 학교 전체 하루 3번, 고르는 건물은 마음대로. S.ffd = { 날, 쓴 횟수 }
   const FF = { day: 3 };

@@ -665,7 +665,7 @@
     if (!S.mg.board || S.mg.board.length !== MG_N * 2) mgSetCells(mgEmptyBoard());
     mgFillOrders();
     mgUI.open = true; mgUI.sel = -1; mgUI.got = { a: 0, pc: 0, up: 0 }; mgUI.idleAt = Date.now();
-    $('#mgScene').hidden = false;
+    $('#mgScene').hidden = false; document.body.classList.add('mg-on');   // 5.0.2.2 woodani: 합치기 안에서는 알림을 아래 칸 자리에 띄워요
     $('#mgUpSheet').hidden = true;
     $('#mgHelp').hidden = !!S.mg.seen;
     mgRenderAll();
@@ -673,7 +673,7 @@
   }
   function mgClose() {
     mgUI.open = false; mgDragEnd(true); mgClearHint();
-    $('#mgScene').hidden = true;
+    $('#mgScene').hidden = true; document.body.classList.remove('mg-on');
     save(); renderMini(); musicSync();
   }
   function mgOpenUp(i) {
