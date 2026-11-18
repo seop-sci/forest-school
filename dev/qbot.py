@@ -46,7 +46,7 @@ JS = r"""(cfg) => { const F = window.__forest, S = F.S, quests = [], years = [],
     S.q.lat = q.id; };
   const spendDips = () => { for (let i = 0; i < 200; i++) { const k = Object.keys(F.PERKS).filter(x => !F.perkMaxed(x)).sort((a, b) => F.perkCost(a) - F.perkCost(b))[0]; if (!k || F.perkCost(k) > S.p.dip) break; if (F.buyPerk(k, document.body) === false) break; clean(); }
     for (let i = 0; i < 200; i++) { const k = Object.keys(F.FPERKS).sort((a, b) => F.fpCost(a) - F.fpCost(b))[0]; if (!k || !(F.fpCost(k) <= S.fund)) break; const f0 = S.fund; F.buyFundPerk(k, document.body); clean(); if (S.fund >= f0) break; } };
-  const BUY_T = ['fac', 'fur', 'furAll', 'tea', 'teaAll', 'grade', 'ygrade', 'students', 'rate', 'xt', 'vp'];
+  const BUY_T = ['fac', 'facAll', 'fur', 'furAll', 'tea', 'teaAll', 'grade', 'ygrade', 'students', 'rate', 'xt', 'vp'];
   let guard = 0, idle = 0;
   while (guard++ < 400000) {
     for (let i = 0; i < 8 && F.mainReady(); i++) { const q = F.curMain(); F.claimMain(null); clean();
