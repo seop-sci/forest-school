@@ -176,7 +176,7 @@
     rt.yearRec = facKeys().filter(k => S.f[k] > 0).map(k => `${FAC[k].name} Lv.${S.f[k]}`).join(', ') + `, 학생 ${Math.floor(S.students)}명`;
     S.st.grads += 1; S.st.sems = (S.st.sems || 0) + 1; repMark();
     S.sem = 1; S.semDip = (S.semDip || 0) + dip;   // 2.1.0 종업식 수료증에서 뺄 몫
-    addLeague(Math.round(LP.grad / 2));
+    addLeague(Math.round(LP.grad / 2), true);
     cloudSoon();
     addGold(GOLD.grad);
     const ye = S.yearEarned;
@@ -221,7 +221,7 @@
     S.st.grads += 1; S.tg += 1; S.sem = 0; S.semDip = 0; repMark();
     if (S.dp) S.dp.free = 1;   // 4.0.0 종업식 뒤 단과대학 바꾸기 한 번은 공짜
     albAdd('y', { y: S.tg, st: leaving, dip, ph: albPh, el: albEl });   // 2.1.1 졸업 앨범 한 쪽
-    addLeague(LP.grad);
+    addLeague(LP.grad, true);
     cloudSoon();
     addGold(GOLD.grad);
     const newcomer = cereNewcomer();

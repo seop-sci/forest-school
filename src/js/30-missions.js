@@ -9,7 +9,7 @@
     shakes: { n: 20, name: n => `참나무 ${n}번 흔들기`, v: () => S.st.shakes, ok: () => S.f.playground >= 1 },
     ups: { n: 15, name: n => `시설이나 가구 ${n}번 고치기`, v: () => S.st.ups, ok: () => false },
     trains: { n: 2, name: n => `선생님 연수 ${n}번 보내기`, v: () => S.st.trains, ok: () => false },
-    subs: { n: 2, name: n => `학생 부탁 ${n}개 들어주기`, v: () => S.q.subDone, ok: () => S.q.m >= SUB_UNLOCK },
+    subs: { get n() { return S && S.tier >= 4 ? 1 : 2; }, name: n => `학생 부탁 ${n}개 들어주기`,   /* 5.0.3 woodani: 대학교부터는 부탁이 오래 걸려서 1개 */ v: () => S.q.subDone, ok: () => S.q.m >= SUB_UNLOCK },
     puzzle: { n: 1, name: () => '숲속 퍼즐 한 판 끝내기', v: () => S.st.pz || 0, ok: () => !liveOff('puzzle') },
     merge: { n: 2, name: n => `숲속 합치기 주문 ${n}개 채우기`, v: () => S.mg.st.orders, ok: () => !liveOff('merge') },
     fest: { n: 1, name: () => '학교 행사 한 번 열기', v: () => S.st.sports + Object.values(S.fest.n).reduce((a, b) => a + b, 0), ok: () => FEST_IDS.some(festOpen) },
@@ -182,8 +182,13 @@
     }
     S.lg = { week: w, pts: 0, pos: 0, paid: false, last: S.lg.last || null };
   }
-  function addLeague(p) {
+  // 5.0.3 woodani 결정(2026-11-19): 높은 학교급은 퀘스트와 식이 오래 걸려 리그 점수가 불리했어요. 퀘스트와 종업식, 방학식 점수(진행 점수)는 합쳐서 하루 LG_PROG점까지만 쌓여요.
+  // 봇으로 잰 하루 진행 점수: 초등 73, 중 128, 고 46, 대학교 35, 대학원 16 → 상한 30이면 초중고대 30, 대학원 16(주 합계 차이 2.2배 → 1.14배쯤)
+  const LG_PROG = 30;
+  const lgProgLeft = () => { const t = gameToday(); return S.lg.dq && S.lg.dq.day === t ? Math.max(0, LG_PROG - S.lg.dq.p) : LG_PROG; };
+  function addLeague(p, prog) {
     if (!(p > 0)) return;
+    if (prog) { const t = gameToday(); if (!S.lg.dq || S.lg.dq.day !== t) S.lg.dq = { day: t, p: 0 }; p = Math.min(p, LG_PROG - S.lg.dq.p); if (!(p > 0)) return; S.lg.dq.p += p; }
     lgWeek();
     S.lg.pts += Math.round(p);
     rsAdd(p);   // 2.1.3 랭킹 시즌 점수
@@ -203,7 +208,7 @@
     ups: { n: 100, name: n => `시설이나 가구 ${n}번 고치기`, v: () => S.st.ups, ok: () => false },
     trains: { n: 10, name: n => `선생님 연수 ${n}번 보내기`, v: () => S.st.trains, ok: () => false },
     daily: { n: 12, name: n => `오늘의 미션 ${n}개 마치기`, v: () => S.st.dmDone },
-    subs: { n: 10, name: n => `학생 부탁 ${n}개 들어주기`, v: () => S.q.subDone, ok: () => S.q.m >= SUB_UNLOCK },
+    subs: { get n() { return S && S.tier >= 4 ? 5 : 10; }, name: n => `학생 부탁 ${n}개 들어주기`,   /* 5.0.3 대학교부터 5개 */ v: () => S.q.subDone, ok: () => S.q.m >= SUB_UNLOCK },
     fest: { n: 4, name: n => `학교 행사 ${n}번 열기`, v: () => MISSIONS.fest.v(), ok: () => FEST_IDS.some(festOpen) },
     trip: { n: 3, name: n => `현장체험학습 ${n}번 다녀오기`, v: () => S.st.trips, ok: () => tripOpen() }
   };

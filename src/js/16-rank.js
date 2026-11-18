@@ -515,7 +515,7 @@
     $('#rankSub').textContent = bm ? (btOpen() ? `${BT_LG[S.bt.lg].n} 리그, 오늘 남은 대결 ${btLeft()}판` : '숲속 대결은 초등학교 3학년부터 열려요') : wk ? `월요일에 새 리그가 시작돼요 (${left}일 남음). 리그에 참여하면 순위와 상관없이 황금 도토리 1개`
       : rankSchool(S.tier, yearNo(), semOn() ? S.sem : null) + (Rank.state === 'on' && R.length ? `, 랭킹에 ${R.length}명` : '');
     if (!tm) $('#rankLead').hidden = false;
-    if (!sea && !tm) $('#rankLead').textContent = bm ? '숲속 대결 점수로 겨뤄요. 메달은 가장 높이 오른 리그예요.' : wk ? '이번 주에 한 일로 겨뤄요. 미션 10, 미션 보너스 20, 학교 행사 15, 체험학습 10(1시간마다 +5), 종업식 20, 퀘스트 3점.'
+    if (!sea && !tm) $('#rankLead').textContent = bm ? '숲속 대결 점수로 겨뤄요. 메달은 가장 높이 오른 리그예요.' : wk ? '이번 주에 한 일로 겨뤄요. 미션 10, 미션 보너스 20, 학교 행사 15, 체험학습 10(1시간마다 +5), 종업식 20, 퀘스트 3점(퀘스트와 식은 합쳐서 하루 30점까지).'
       : '학교 파워로 순위를 매겨요.';
     // 참여하기와 이름 바꾸기
     const join = $('#rankJoin'), key = `${Rank.state}|${Rank.readOnly}|${S.rank.joined}|${S.rank.name}|${rt.rankEdit ? 1 : 0}|${Cloud.state}|${Cloud.err}|${nickPrice()}|${S.gold >= nickPrice()}`;
