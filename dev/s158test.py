@@ -19,7 +19,7 @@ async def main():
               return out;}""")
             print(w, r)
             c.ok(r['p0'] == 0 and r['hid0'], f"{w}: 도토리가 없는데 칩이 떠요 {r}")
-            c.ok(not r['hid1'] and '5채' in r['txt'] and r['inView'], f"{w}: 칩이 안 떠요 {r}")
+            c.ok(not r['hid1'] and '건물 5채 올리기' in r['txt'] and r['inView'], f"{w}: 칩이 안 떠요 {r}")
             c.ok(len(r['ks']) == 5 and r['cost'] > 0, f"{w}: 고른 건물 {r['ks']}")
             await pg.click('#upChip'); await pg.wait_for_timeout(400)
             a = await pg.evaluate("()=>({open:!document.querySelector('#mAdAsk').hidden, t:document.querySelector('#adAskTitle').textContent, rows:document.querySelectorAll('#adAskText .ask-row').length})")

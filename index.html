@@ -2,7 +2,7 @@
 <html lang="ko">
 <head>
 <meta charset="utf-8">
-<meta name="forest-version" content="5.0.3">
+<meta name="forest-version" content="5.0.3.1">
 <meta name="viewport" content="width=device-width, initial-scale=1">
 <meta name="description" content="도토리를 모아 숲속 학교를 키우는 방치형 게임 테스트판이에요.">
 <style>html,body{margin:0}</style>
@@ -2892,7 +2892,11 @@ body.wl-on .toast{z-index:300}
 .ff-chip,.pl-chip,.app.on-school .deal{bottom:calc(var(--bot-h, 70px) + 10px);height:30px;box-sizing:border-box;max-width:none;white-space:nowrap}
 .ff-chip{flex-direction:row;align-items:center;gap:5px;padding:0 9px;border-radius:999px;font-size:12px}
 .ff-chip b{font-size:13px}.ff-chip small{font-size:11.5px}
-.up-chip{border-color:#6BA23A;background:rgba(236,248,222,.96)}.up-chip b{color:#3F6E2A}   /* 5.0.2.2 건물 한 번에 올리기 */.ff-chip small.nb{gap:2px}
+.up-chip{border-color:#6BA23A;background:rgba(236,248,222,.96);overflow:hidden;animation:upGlow 1.8s ease-in-out infinite}.up-chip b{position:relative;z-index:1;color:#3F6E2A}   /* 5.0.2.2 건물 한 번에 올리기 */
+.up-chip::after{content:'';position:absolute;top:0;bottom:0;left:-40%;width:30%;background:linear-gradient(100deg,transparent,rgba(255,255,255,.85),transparent);transform:skewX(-18deg);animation:upShine 2.6s ease-in-out infinite;pointer-events:none}   /* 5.0.3.1 woodani: 떠 있을 때 눈에 띄게(초록 빛 번짐과 반짝 지나가는 빛) */
+@keyframes upGlow{0%,100%{box-shadow:0 0 0 0 rgba(107,162,58,0),0 2px 4px rgba(0,0,0,.18);transform:scale(1)}50%{box-shadow:0 0 0 5px rgba(107,162,58,.38),0 2px 6px rgba(0,0,0,.2);transform:scale(1.05)}}
+@keyframes upShine{0%,55%{left:-40%}85%,100%{left:120%}}
+@media (prefers-reduced-motion: reduce){.up-chip,.up-chip::after{animation:none}.up-chip::after{display:none}}.ff-chip small.nb{gap:2px}
 .ff-chip .ffx{left:-7px;top:-9px;width:18px;height:18px;font-size:12px;line-height:14px}
 .pl-chip{padding:0 9px;border-radius:999px;font-size:0;gap:0}.pl-chip span{font-size:16px}
 .app.on-school .deal{padding:1px 9px 1px 2px;gap:4px;font-size:0;border-radius:999px;box-shadow:0 2px 0 var(--wood-dark)}
@@ -3258,6 +3262,7 @@ body.sheet-open #map, body.sheet-open .wx-fx::before, body.sheet-open .wx-fx i, 
 /* 3.3.0 새 졸업식: 화면 가득(cereArt3) */
 .overlay.cere.v3{padding:0;background:#2A2018}
 .overlay.cere.v3 .cere-svg{position:absolute;inset:0;width:100%;height:100%;max-width:none}
+@media (min-aspect-ratio: 3/4){.overlay.cere.v3 .cere-svg{left:50%;right:auto;width:calc(100vh * 9 / 16);width:calc(100dvh * 9 / 16);transform:translateX(-50%)}}   /* 5.0.3.1 woodani 제보: 컴퓨터 넓은 화면에서 세로 장면(360x640)이 가로를 꽉 채워 아주 크게 잘려 보였어요. 넓은 화면에서는 세로 비율 그대로 가운데에 */
 .overlay.cere.v3 .cere-h,.overlay.cere.v3 .cere-sub{display:none}
 .overlay.cere.v3 .cere-skip{color:#FFF3D6;text-shadow:0 1px 3px rgba(0,0,0,.6)}
 /* 4.4.1 woodani 요청: 건너뛰기를 더 잘 보이게. 오른쪽 아래 진한 알약 단추와 ≫ 표시 */
@@ -3623,7 +3628,7 @@ span.bt-stamp{display:none}.bt-duel.done span.bt-stamp{display:grid}
 body.cam-scene #ffChip,body.cam-scene #upChip,body.cam-scene #tierDots,body.cam-scene #plChip{opacity:0;pointer-events:none;transition:opacity .3s}
 /* 3.2.6 끊김: 체험학습 장면 동안 지도 안 장식 움직임(반딧불, 반짝임 등)과 숨긴 칩, 왼쪽 단추 고리 움직임을 멈춰요. 버스와 깃발, 풍선만 움직여요 */
 body.cam-scene #map .firefly,body.cam-scene #map .c-can,body.cam-scene #map [class^="bx-"],body.cam-scene #map .g-arrow,body.cam-scene #map .rec,body.cam-scene #map .t-rec,body.cam-scene #map .float,
-body.cam-scene #ffChip,body.cam-scene #plChip,body.cam-scene .b-ring{animation-play-state:paused}   /* 지도 전체(#map *)를 고르면 켜고 끌 때 지도 모든 칸의 스타일을 다시 세서, 움직이는 것만 골라요 */
+body.cam-scene #ffChip,body.cam-scene #upChip,body.cam-scene #upChip::after,body.cam-scene #plChip,body.cam-scene .b-ring{animation-play-state:paused}   /* 지도 전체(#map *)를 고르면 켜고 끌 때 지도 모든 칸의 스타일을 다시 세서, 움직이는 것만 골라요 */
 #map.cam-move{will-change:transform}   /* 3.0.0 체험학습 배웅과 마중 동안 아래 칩을 잠깐 숨겨요 */
 .ex-row-btn.todo{border-color:#E2A21C}.ex-row-btn.todo em{background:#D9534A;color:#FFFFFF}
 .sheet-award{cursor:default;margin:2px 0 10px;font-size:13px}.sheet-award img{flex:none;width:40px;height:40px;object-fit:contain}
@@ -3895,7 +3900,7 @@ body.mg-on .toast[hidden]{display:none}
     <p class="boot-step" id="bootStep">학교 문을 여는 중...</p>
     <p class="boot-tip" id="bootTip">학교 문을 여는 중이에요</p>
   </div>
-  <span class="boot-ver" id="bootVer">v5.0.3</span>
+  <span class="boot-ver" id="bootVer">v5.0.3.1</span>
 </div>
 
 <div class="app on-school" id="app">
@@ -4487,7 +4492,7 @@ body.mg-on .toast[hidden]{display:none}
       </div>
       <h3 class="panel-sub">정보</h3>
       <dl class="info">
-        <div id="verRow"><dt>버전</dt><dd>v5.0.3</dd></div>
+        <div id="verRow"><dt>버전</dt><dd>v5.0.3.1</dd></div>
         <div id="pidRow" hidden><dt>학교 번호</dt><dd id="infoPid"></dd></div>
       </dl>
       <div id="devBox" hidden>
@@ -13259,7 +13264,7 @@ body.mg-on .toast[hidden]{display:none}
     const n = base ? upPlan().ks.length : 0, show = n >= 2, key = show ? String(n) : '';
     if (c.dataset.key === key) return; c.dataset.key = key;
     c.hidden = !show;
-    if (show) { c.innerHTML = `<b>🔨 한 번에 ${n}채</b>`; c.setAttribute('aria-label', `올릴 수 있는 건물 ${n}채를 한 번에 한 단계씩 올리기`); }
+    if (show) { c.innerHTML = `<b>🔨 건물 ${n}채 올리기!</b>`; /* 5.0.3.1 woodani: '한 번에 n채'보다 알아보기 쉽게 */ c.setAttribute('aria-label', `올릴 수 있는 건물 ${n}채를 한 번에 한 단계씩 올리기`); }
     chipRow();
   }
   function upAsk() {
@@ -14062,8 +14067,8 @@ body.mg-on .toast[hidden]{display:none}
        forest/rank/<내 id>   랭킹 이름과 학교 점수
        forest/stats/<내 id>  테스트 현황 (어디까지 했는지, 얼마나 했는지)
      <내 id>는 Firebase 익명 로그인이 기기(브라우저)마다 만들어 줘요. */
-  const VERSION = '5.0.3';   // 2026-11-17 woodani 결정: 웹에 5.0.2~5.0.5로 먼저 냈던 것을 앱과 함께 5.0.1 하나로 내요(버전 견줌은 앞 두 자리만 봐서 되돌아가도 괜찮아요)
-  const NT_QUIET = ['5.0.3', '5.0.2.2', '5.0.2.1', '2.1.20', '2.1.2.2', '2.3.0.1', '2.3.4', '3.2.3', '3.2.4', '3.2.5', '3.3.1', '3.3.2', '3.3.3', '4.4.1.1', '4.4.1.2', '4.4.1.3', '4.4.1.4', '5.0.1.1', '5.0.1.2', '5.0.1.3', '5.0.1.4', '5.0.1.5', '5.0.1.6', '5.0.1.7', '5.0.1.8'];   // 5.0.1.1 생물 탐사 고침은 공지 없이   // 5.0.3도 공지 없이(공지 줄은 woodani가 정하면 넣어요)   // 5.0.2 공지 없이(woodani 2026-11-16)   // 5.0.1 공지 줄은 woodani가 정할 때까지 조용히   // 5.0.0 공지는 2026-11-16 woodani가 정해서 NOTICES로 옮겼어요   // 4.4.1(앱과 함께 내는 판)은 공지를 띄워요   // 4.4.1도 공지 없이(woodani)   // 3.3.1, 3.3.2, 3.3.3(토스 먼저)도 공지 창 없이(woodani). 2.3.0.1도 공지 창 없이(공지는 그대로 2.3.0). 2.3.4도 조용히(woodani 결정). 3.2.3, 3.2.4, 3.2.5도 공지 창 없이(공지 줄을 고르지 않음)
+  const VERSION = '5.0.3.1';   // 2026-11-17 woodani 결정: 웹에 5.0.2~5.0.5로 먼저 냈던 것을 앱과 함께 5.0.1 하나로 내요(버전 견줌은 앞 두 자리만 봐서 되돌아가도 괜찮아요)
+  const NT_QUIET = ['5.0.3.1', '5.0.3', '5.0.2.2', '5.0.2.1', '2.1.20', '2.1.2.2', '2.3.0.1', '2.3.4', '3.2.3', '3.2.4', '3.2.5', '3.3.1', '3.3.2', '3.3.3', '4.4.1.1', '4.4.1.2', '4.4.1.3', '4.4.1.4', '5.0.1.1', '5.0.1.2', '5.0.1.3', '5.0.1.4', '5.0.1.5', '5.0.1.6', '5.0.1.7', '5.0.1.8'];   // 5.0.1.1 생물 탐사 고침은 공지 없이   // 5.0.3도 공지 없이(공지 줄은 woodani가 정하면 넣어요)   // 5.0.2 공지 없이(woodani 2026-11-16)   // 5.0.1 공지 줄은 woodani가 정할 때까지 조용히   // 5.0.0 공지는 2026-11-16 woodani가 정해서 NOTICES로 옮겼어요   // 4.4.1(앱과 함께 내는 판)은 공지를 띄워요   // 4.4.1도 공지 없이(woodani)   // 3.3.1, 3.3.2, 3.3.3(토스 먼저)도 공지 창 없이(woodani). 2.3.0.1도 공지 창 없이(공지는 그대로 2.3.0). 2.3.4도 조용히(woodani 결정). 3.2.3, 3.2.4, 3.2.5도 공지 창 없이(공지 줄을 고르지 않음)
     // 2.1.20 woodani 결정: 이 버전들은 업데이트해도 공지 창을 띄우지 않아요(공지는 그대로 2.1.2)
   /* 2.0.0 공지사항 (2026-10-27 woodani, 1.8.0은 이미 올려서 2.0.0부터): 설정 > 공지사항. 맨 위가 가장 새 공지예요.
      패치노트는 자동으로 넣지 않아요. woodani가 검수한 글만 여기에 적어요(CHANGELOG.md는 자세한 기록용이라 따로 있어요).

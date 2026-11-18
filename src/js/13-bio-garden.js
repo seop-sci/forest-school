@@ -561,7 +561,7 @@
     const n = base ? upPlan().ks.length : 0, show = n >= 2, key = show ? String(n) : '';
     if (c.dataset.key === key) return; c.dataset.key = key;
     c.hidden = !show;
-    if (show) { c.innerHTML = `<b>🔨 한 번에 ${n}채</b>`; c.setAttribute('aria-label', `올릴 수 있는 건물 ${n}채를 한 번에 한 단계씩 올리기`); }
+    if (show) { c.innerHTML = `<b>🔨 건물 ${n}채 올리기!</b>`; /* 5.0.3.1 woodani: '한 번에 n채'보다 알아보기 쉽게 */ c.setAttribute('aria-label', `올릴 수 있는 건물 ${n}채를 한 번에 한 단계씩 올리기`); }
     chipRow();
   }
   function upAsk() {
