@@ -168,7 +168,7 @@
       case 'fperks': return `장학재단 ${q.n}번 고치기`;
       case 'trips': return q.n === 1 ? '현장체험학습 다녀오기' : `현장체험학습 ${q.n}번 다녀오기`;
       case 'souv': return `기념품 ${q.n}종 모으기`;
-      case 'sports': return q.n === 1 ? '숲속 운동회 열기' : `숲속 운동회 ${q.n}번 열기`;
+      case 'sports': return q.n === 1 ? `${FEST.sports.name} 열기` : `${FEST.sports.name} ${q.n}번 열기`;   // 5.0.3.1 중학교부터 체육대회
       case 'fest': return `${FEST[q.k].name} 열기`;
       case 'tripat': return `${TRIP[q.k].name} 체험학습 보내기`;
       case 'club': return `동아리 ${q.n}자리 채우기`;

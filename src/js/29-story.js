@@ -579,7 +579,7 @@
   };
   const SIDE_ESS = 2, SIDE_DAY = 2;
   const ST_TITLES = SIDE.map(x => ({ id: 'st_' + x.id, title: x.title }));
-  const stTitleGot = t => !!S && !!S.sto && ((S.sto.side[t.id.slice(3)] || {}).n || 0) >= SIDE.find(x => 'st_' + x.id === t.id).n;
+  const stTitleGot = (t, sto) => { sto = sto || (S && S.sto); const X = SIDE.find(x => 'st_' + x.id === t.id); return !!X && !!sto && !!sto.side && ((sto.side[X.id] || {}).n || 0) >= X.n; };   // 5.0.3.1 저장 읽기에서도 써요
   const freshSto = () => ({ v: 1, ch: -1, q: [], seen: {}, pick: {}, side: {} });
   function sanitizeSto(d, s) {
     const f = freshSto(), T = d && d.sto && typeof d.sto === 'object' ? d.sto : null; s.sto = f;

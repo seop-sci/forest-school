@@ -549,7 +549,7 @@
     ffUp(c);
   }
   /* 5.0.2.2 woodani 결정(2026-11-18): 건물을 하나씩 들어가 올리기 불편하다는 의견. 지금 도토리로 올릴 수 있는 건물을 싼 것부터 골라
-     가구를 채우고 공사까지 한 번에 시작해요. 이미 지은 건물만, 공사 중이거나 이 학기 최고 레벨이면 빼요. 두 채 이상일 때 홈 아래 칩으로 보여요 */
+     가구를 채우고 공사까지 한 번에 시작해요. 이미 지은 건물만, 공사 중이거나 이 학기 최고 레벨이면 빼요. 한 채 이상일 때 홈 아래 칩으로 보여요(5.0.3.1, 그 전에는 두 채부터) */
   function upPlan() {
     const opts = facKeys().filter(k => S.f[k] >= 1 && !conOn(k) && !facMaxed(k)).map(k => ({ k, c: furLeftCost(k) + facCost(k) })).filter(o => isFinite(o.c)).sort((a, b) => a.c - b.c);
     const ks = []; let cost = 0;
@@ -558,7 +558,7 @@
   }
   function upRender(base) {
     const c = $('#upChip'); if (!c) return;
-    const n = base ? upPlan().ks.length : 0, show = n >= 2, key = show ? String(n) : '';
+    const n = base ? upPlan().ks.length : 0, show = n >= 1,   /* 5.0.3.1 woodani: 한 채만 올릴 수 있어도 보여요 */ key = show ? String(n) : '';
     if (c.dataset.key === key) return; c.dataset.key = key;
     c.hidden = !show;
     if (show) { c.innerHTML = `<b>🔨 건물 ${n}채 올리기!</b>`; /* 5.0.3 woodani: '한 번에 n채'보다 알아보기 쉽게 */ c.setAttribute('aria-label', `올릴 수 있는 건물 ${n}채를 한 번에 한 단계씩 올리기`); }

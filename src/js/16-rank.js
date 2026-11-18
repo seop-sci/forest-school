@@ -289,7 +289,7 @@
       const sc = cap ? Math.min(score, cap.score) : score, lp = cap ? Math.min(S.lg.pts, cap.lp) : S.lg.pts;
       const ws = S.lg.week * 1000000 + lp;
       const doc = { name: S.rank.name, score: sc, tier: S.tier, year: yearNo(), test: !!S.u.dev, pid: S.pid, at: Date.now(), ws, lp, week: S.lg.week };
-      if (S.ach && S.ach.title) doc.title = S.ach.title;   // 1.7.1 칭호(서버 규칙을 게시한 뒤에 켜요)
+      if (S.ach && S.ach.title && /^[a-z]{1,12}$/.test(S.ach.title)) doc.title = S.ach.title;   /* 5.0.3.1 곁가지 이야기 칭호(st_)는 서버 규칙이 소문자만 받아서 보내지 않아요 */   // 1.7.1 칭호(서버 규칙을 게시한 뒤에 켜요)
       // 2.1.1 학기(woodani 요청: 랭킹에 학기도). 서버 규칙(sem)을 아직 게시하지 않아 거절되면 학기 없이 다시 올려요
       if (!Rank.noSem && semOn()) { doc.sem = S.sem; Rank.semSent = true; } else Rank.semSent = false;
       // 2.1.3 랭킹 시즌: 규칙(sk, sp)을 아직 게시하지 않아 거절되면 시즌 없이 다시 올려요. 규칙은 리그 점수처럼 10초에 1,000쯤까지 받아요
