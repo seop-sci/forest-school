@@ -2,6 +2,7 @@
 # 그림 파일 이름에 내용 해시를 붙이고(st_ch01-1a2b3c4d5e.webp), 원본의 ST_PICS 표(열쇠 → 해시)를 다시 써요.
 # 게임은 이 표에 있는 그림만 받아서 없는 그림을 헛되이 찾지 않고, 내용이 바뀐 그림만 다시 받아요.
 # 쓰는 법: 새 그림을 img/story/st_이름.webp로 넣고  python3 dev/story_pack.py  (--check면 고치지 않고 어긋남만 봐요)
+import sys as _sys, pathlib as _pl; _sys.path.insert(0, str(_pl.Path(__file__).resolve().parent)); import srcbuild as _sb; _sb.build()   # 2026-11-18 src/ → forest-school.html 먼저
 import hashlib, pathlib, re, sys
 HERE = pathlib.Path(__file__).resolve().parent
 DIR = HERE.parent / 'img' / 'story'
@@ -29,3 +30,6 @@ if src[m.start():m.end()] != f'{m.group(1)}{table}{m.group(2)}':
     if CHECK: print('ST_PICS 표가 img/story와 달라요. python3 dev/story_pack.py 를 돌려 주세요'); sys.exit(1)
     SRC.write_text(src[:m.start()] + f'{m.group(1)}{table}{m.group(2)}' + src[m.end():], encoding='utf-8')
 print('이야기 그림', len(pics))
+
+# 2026-11-18 원본(dev/forest-school.html)을 고쳤으면 src/에도 나눠 넣어요
+_sb.split()

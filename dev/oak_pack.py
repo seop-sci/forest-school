@@ -13,6 +13,7 @@ Codex가 준 참나무 층(oak_<지도>_<판>.png)과 나무 지운 지도(map_<
 표는 5.0.2부터 바탕 지도와 다른 칸만 적어요(pack_table). 게임이 읽을 때 바탕 값을 채워요.
 좌표: 지도 그림 1024x1536 → 지도 좌표 가로 0~360, 세로 -60~480
 """
+import sys as _sys, pathlib as _pl; _sys.path.insert(0, str(_pl.Path(__file__).resolve().parent)); import srcbuild as _sb; _sb.build()   # 2026-11-18 src/ → forest-school.html 먼저
 import sys, os, json, re
 from PIL import Image, ImageFilter
 import numpy as np
@@ -135,3 +136,6 @@ def main():
 
 if __name__ == '__main__':
     main()
+
+# 2026-11-18 원본(dev/forest-school.html)을 고쳤으면 src/에도 나눠 넣어요
+_sb.split()

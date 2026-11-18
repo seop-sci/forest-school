@@ -4,6 +4,7 @@
 #   (특별 손님 chr_은 chr_ 규칙, 테마 지도 map_kinder_spring 등은 map_ 규칙, 학교급별 건물 bld_*_s2와 지붕 roof_*_s2는 bld_, roof_ 규칙)
 #   폴더 안의 파일 이름(확장자 뺀 것)이 그대로 열쇠가 돼요. 예: map_kinder, bld_classroom_on, ic_home
 # 원본 PNG는 저장소에 넣지 않아요(1차 에셋 zip, art/v150-assets 브랜치). 게임은 한 파일로 돌아가야 해서 그림을 글자로 바꿔 넣어요.
+import sys as _sys, pathlib as _pl; _sys.path.insert(0, str(_pl.Path(__file__).resolve().parent)); import srcbuild as _sb; _sb.build()   # 2026-11-18 src/ → forest-school.html 먼저
 import base64, io, pathlib, re, sys
 from PIL import Image
 
@@ -359,3 +360,6 @@ if __name__ == '__main__':
     if not args:
         sys.exit('원본 폴더를 적어 주세요')
     main(args, block)
+
+# 2026-11-18 원본(dev/forest-school.html)을 고쳤으면 src/에도 나눠 넣어요
+_sb.split()

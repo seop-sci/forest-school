@@ -1,4 +1,5 @@
 # 4.4.1.3: index.html이 부르는 img/ 파일이 저장소에 모두 있는지 봐요(새 그림 파일을 빠뜨리고 올리면 웹에서 그림이 깨져요)
+import sys as _sys, pathlib as _pl; _sys.path.insert(0, str(_pl.Path(__file__).resolve().parent)); import srcbuild as _sb; _sb.build()   # 2026-11-18 src/ → forest-school.html 먼저
 import re, os, subprocess, sys
 root = os.path.join(os.path.dirname(__file__), '..')
 html = open(os.path.join(root, 'index.html'), encoding='utf-8').read()

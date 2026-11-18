@@ -2,6 +2,7 @@
 #   python3 dev/img_out.py           꺼내기(그림 넣는 도구 embed_assets.py가 끝에 저절로 불러요)
 #   python3 dev/img_out.py --check   검사만: 원본이 부르는 파일이 모두 있고 이름의 지문이 내용과 맞는지, 남은 base64가 없는지(끝 코드 1이면 틀림)
 #   python3 dev/img_out.py --inline 파일   옛 꼴(그림을 품은 한 파일)을 그 파일로 만들어요. 되돌릴 때나 한 파일로 건넬 때 써요
+import sys as _sys, pathlib as _pl; _sys.path.insert(0, str(_pl.Path(__file__).resolve().parent)); import srcbuild as _sb; _sb.build()   # 2026-11-18 src/ → forest-school.html 먼저
 import sys
 import imglib
 def main():
@@ -19,3 +20,6 @@ def main():
     for b in bad[:20]: print('  틀림:', b)
     sys.exit(1 if bad else 0)
 if __name__ == '__main__': main()
+
+# 2026-11-18 원본(dev/forest-school.html)을 고쳤으면 src/에도 나눠 넣어요
+_sb.split()

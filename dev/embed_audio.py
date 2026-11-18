@@ -6,6 +6,7 @@
 #   파일 이름(확장자 뺀 것)이 열쇠예요: bgm_home(홈), bgm_room(그 밖의 화면), bgm_festival(학교 행사), bgm_play(미니게임),
 #   bgm_spring, bgm_summer, bgm_autumn, bgm_winter, bgm_xmas, bgm_space, bgm_retro(배경 테마 곡, 1.8.0)
 #   곡 원본은 woodani가 Suno 유료 플랜으로 만든 mp3예요. 반복 구간 자르기는 dev/bgm_loop.py
+import sys as _sys, pathlib as _pl; _sys.path.insert(0, str(_pl.Path(__file__).resolve().parent)); import srcbuild as _sb; _sb.build()   # 2026-11-18 src/ → forest-school.html 먼저
 import pathlib, shutil, sys
 
 HERE = pathlib.Path(__file__).resolve().parent
@@ -24,3 +25,6 @@ if __name__ == '__main__':
     if len(sys.argv) < 2:
         sys.exit('m4a 폴더를 적어 주세요')
     main(sys.argv[1])
+
+# 2026-11-18 원본(dev/forest-school.html)을 고쳤으면 src/에도 나눠 넣어요
+_sb.split()
