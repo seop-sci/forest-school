@@ -14,8 +14,8 @@ ChatGPT는 기획, 디자인, 소스 분석, 오류 검토, 작업 명세를 맡
 | 사용자(woodani) | 기능 결정, 최종 검수, 배포 승인 |
 
 ### 파일 체계 (바꾸지 않아요)
-- 게임 원본은 `dev/forest-school.html` 하나예요. 고칠 때는 이 파일만 고쳐요.
-- 그림은 저장소 맨 위 `img/a` 파일이 원본이에요(2026-11-17 woodani 결정). `dev/forest-school.html`에는 `"열쇠":"img/a/열쇠-지문.webp"` 같은 주소만 있어요. 그림은 `dev/embed_assets.py`로 넣고, 새 파일은 `git add img`로 함께 올려요. `img/a` 파일을 손으로 고치거나 이름을 바꾸지 않아요.
+- 게임 원본은 저장소 맨 위 `src/` 폴더의 여러 파일이에요(2026-11-18 woodani 결정: `src/page/` 머리와 화면 뼈대와 그림 주소표, `src/css/` 꾸밈, `src/js/` 기능별 코드). 고칠 때는 `src/` 파일을 고쳐요. `dev/forest-school.html`은 `python3 dev/srcbuild.py build`로 `src/`를 차례대로 이어 붙인 결과물이라 손으로 고치지 않아요(`wrap.py`와 `build_gh.py`가 먼저 만들어요). 나누는 곳은 `dev/src_parts.txt`, 둘이 같은지는 `python3 dev/srcbuild.py check`로 봐요. `src/`와 `dev/forest-school.html`은 함께 커밋해요.
+- 그림은 저장소 맨 위 `img/a` 파일이 원본이에요(2026-11-17 woodani 결정). 원본(`src/page/20-img-map.html`)에는 `"열쇠":"img/a/열쇠-지문.webp"` 같은 주소만 있어요. 그림은 `dev/embed_assets.py`로 넣고, 새 파일은 `git add img`로 함께 올려요. `img/a` 파일을 손으로 고치거나 이름을 바꾸지 않아요.
 - 저장소 맨 위 `index.html`은 `python3 dev/build_gh.py .`로 만든 결과물이에요. 손으로 고치지 않아요.
 - 안드로이드(`app/`)와 토스(`toss/`)는 `index.html`을 가져다 묶어요. `<!-- github-only -->` 표시 구간은 두 판에서 빠져요.
 - `config.js`(Firebase 설정), `database.rules.json`(서버 규칙), 안드로이드 앱 ID `io.github.seopsci.forestschool`, 애드몹 ID, 토스 광고 그룹 ID는 사용자가 따로 말하지 않으면 바꾸지 않아요.
@@ -53,7 +53,7 @@ ChatGPT는 기획, 디자인, 소스 분석, 오류 검토, 작업 명세를 맡
 ## ChatGPT가 일하는 방법
 
 ### 소스를 읽을 때
-- 게임 로직은 모두 `dev/forest-school.html` 한 파일에 있어요. `index.html`은 결과물이라 읽기만 하고 고칠 곳을 가리킬 때는 원본 줄을 적어요.
+- 게임 로직은 `src/js/` 파일들에 기능별로 있어요(예: `03-quest-data.js` 퀘스트 표, `04-state-save.js` 저장, `18-tam.js` 탐험). `dev/forest-school.html`과 `index.html`은 결과물이라 읽기만 하고, 고칠 곳을 가리킬 때는 `src/` 파일 이름과 함수 이름을 적어요.
 - 자주 보는 곳: `CFG`(기본 수치), `FAC`, `FUR`(시설과 가구), `TEA`(선생님), `MAIN`(메인 퀘스트), `rate()`(초당 도토리), `needCost()`와 `prepTopUp()`(유치원 교감 선생님 지원), `recommend()`(추천), `fresh()`와 `sanitize()`(저장), `TRIPS`(체험학습).
 
 ### 작업 명세를 쓸 때
