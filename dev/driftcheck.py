@@ -27,7 +27,7 @@ br.close(); pw.stop()
 # ---- 1. 제목과 설명의 숫자
 # 제목: 'Lv.N', 'N명', 'N번', 'N개', 'N곳', 'N권', 'N마리', 'N종' 가운데 하나가 있으면 그 숫자는 n이어야 해요.
 # 설명(how): 다른 숫자(20%, ★3)가 섞이므로 'Lv.N'만 봐요. 종류가 fac, fur, furAll, tea, teaAll, vp, xt처럼 레벨을 재는 것일 때만.
-LV = {'fac', 'fur', 'furAll', 'tea', 'teaAll', 'vp', 'xt'}
+LV = {'fac', 'facAll', 'fur', 'furAll', 'tea', 'teaAll', 'vp', 'xt'}
 NOCHK = {'grade', 'ygrade', 'tier', 'rate', 'earned', 'dept', 'semH'}   # n이 번호이거나(등급, 학교급) 큰 수를 줄여 쓰는 종류
 OKAY = {}   # 일부러 다르게 쓴 것: id → 까닭
 def num(s): return float(s.replace(',', ''))

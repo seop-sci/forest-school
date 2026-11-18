@@ -3779,7 +3779,7 @@ body.cam-scene #ffChip,body.cam-scene #plChip,body.cam-scene .b-ring{animation-p
     <p class="boot-step" id="bootStep">학교 문을 여는 중...</p>
     <p class="boot-tip" id="bootTip">학교 문을 여는 중이에요</p>
   </div>
-  <span class="boot-ver" id="bootVer">v5.0.1.2</span>
+  <span class="boot-ver" id="bootVer">v5.0.1.3</span>
 </div>
 
 <div class="app on-school" id="app">
@@ -4368,7 +4368,7 @@ body.cam-scene #ffChip,body.cam-scene #plChip,body.cam-scene .b-ring{animation-p
       </div>
       <h3 class="panel-sub">정보</h3>
       <dl class="info">
-        <div id="verRow"><dt>버전</dt><dd>v5.0.1.2</dd></div>
+        <div id="verRow"><dt>버전</dt><dd>v5.0.1.3</dd></div>
         <div id="pidRow" hidden><dt>학교 번호</dt><dd id="infoPid"></dd></div>
       </dl>
       <div id="devBox" hidden>
@@ -7388,7 +7388,7 @@ body.cam-scene #ffChip,body.cam-scene #plChip,body.cam-scene .b-ring{animation-p
   // 학교급이 오르면 수업료는 1000배, 공사비는 2000배라서 숫자 단위가 껑충 커져요
   // 2.0.0: 학교급마다 수업료와 공사비 배수를 표로 적어요(균형 제안서에서 고르는 값). 표에 없는 학교급은 예전 규칙(1000배, 2000배)
   // 중학교 공사비는 균형 제안서(2.0.0) 제안값 5억 배(예전 규칙이면 400만 배). woodani 확정 전이에요
-  const TIER_SCALE = { inc: [4, 1e3, 1e6, 1e9, 1e12, 1e12], cost: [1, 2e3, 5e8, 2.5e11, 6e16, 6e16] };   // 5.0.0 대학원은 건물을 이어 가서 배수를 따로 올리지 않아요(woodani 결정)   // 4.0.0 대학교: 수업료 1e12, 공사비 6e16(woodani 결정 2026-11-11, bal400으로 한 학년 20시간쯤)
+  const TIER_SCALE = { inc: [4, 1e3, 1e6, 1e9, 1e12, 1e12], cost: [1, 2e3, 5e8, 2.5e11, 6e16, 2.4e17] };   // 5.0.1.3 woodani 결정(2026-11-18): 대학원 공사비만 4배(수업료 배수는 그대로). 건물 값이 수입보다 너무 싸서 12학기가 5일쯤이면 끝났어요   // 5.0.0 대학원은 건물을 이어 가서 배수를 따로 올리지 않아요(woodani 결정)   // 4.0.0 대학교: 수업료 1e12, 공사비 6e16(woodani 결정 2026-11-11, bal400으로 한 학년 20시간쯤)
   //   // 3.0.0 고등학교: 중학교가 초등학교의 1000배와 25만 배였던 비율 그대로(3.0.0 설계안 2절, 봇으로 다시 재요)
     // 2.1.0 유치원 수업료 4배: 유치원을 2시간 안에(속도와 경제 재설계안 1절)
   const incomeScale = () => TIER_SCALE.inc[S.tier] !== undefined ? TIER_SCALE.inc[S.tier] : Math.pow(1000, S.tier);
@@ -8243,18 +8243,55 @@ body.cam-scene #ffChip,body.cam-scene #plChip,body.cam-scene .b-ring{animation-p
       say: '연구소는 짓는 데 시간이 걸려요. 대학교에서 가장 큰 건물만큼이요.' },
     { id: 'gr3', ch: 24, t: 'fac', k: 'institute', n: 3, rm: 5, title: '연구소 키우기', how: '연구 구역 연구소를 Lv.3까지 키워요' },
     { id: 'gr4', ch: 24, sy: 1, yt: 5, t: 'semH', n: 1, r: 6, rk: 'dip', title: '석사 1학기 세미나', how: '대도시 학교가 되면 졸업 탭에서 세미나를 열어요' },
+    { id: 'gc36', ch: 24, t: 'facAll', n: 36, rm: 5, title: '캠퍼스 건물 Lv.36', how: '대학교 때 지은 건물 여덟 채를 모두 Lv.36까지 키워요' },
+    { id: 'gc37', ch: 24, t: 'facAll', n: 37, rm: 5, title: '캠퍼스 건물 Lv.37', how: '대학교 때 지은 건물 여덟 채를 모두 Lv.37까지 키워요' },
     { id: 'gr5', ch: 24, ye: 1, yt: 5, t: 'tgrads', n: 1, r: 8, rk: 'dip', title: '석사 2학기 세미나', how: '1학기 세미나를 열고, 2학기에 세미나를 또 열어요' },
     { id: 'gr6', ch: 25, t: 'fac', k: 'gradhall', n: 1, rm: 10, title: '대학원 연구동 짓기', how: '연구 구역 작은 공사 자리를 눌러요',
       say: '세미나실이 있는 연구동이에요. 발표할 자리가 생겨요.' },
     { id: 'gr7', ch: 25, t: 'fac', k: 'institute', n: 6, rm: 5, title: '연구소 넓히기', how: '연구 구역 연구소를 Lv.6까지 키워요' },
+    { id: 'gc38', ch: 25, t: 'facAll', n: 38, rm: 5, title: '캠퍼스 건물 Lv.38', how: '대학교 때 지은 건물 여덟 채를 모두 Lv.38까지 키워요' },
+    { id: 'gc39', ch: 25, t: 'facAll', n: 39, rm: 5, title: '캠퍼스 건물 Lv.39', how: '대학교 때 지은 건물 여덟 채를 모두 Lv.39까지 키워요' },
+    { id: 'gc40', ch: 25, t: 'facAll', n: 40, rm: 5, title: '캠퍼스 건물 Lv.40', how: '대학교 때 지은 건물 여덟 채를 모두 Lv.40까지 키워요' },
     { id: 'gr8', ch: 25, sy: 2, yt: 5, t: 'semH', n: 2, r: 7, rk: 'dip', title: '석사 3학기 세미나', how: '대도시 학교가 되면 졸업 탭에서 세미나를 열어요' },
+    { id: 'gc41', ch: 25, t: 'facAll', n: 41, rm: 5, title: '캠퍼스 건물 Lv.41', how: '대학교 때 지은 건물 여덟 채를 모두 Lv.41까지 키워요' },
+    { id: 'gc42', ch: 25, t: 'facAll', n: 42, rm: 5, title: '캠퍼스 건물 Lv.42', how: '대학교 때 지은 건물 여덟 채를 모두 Lv.42까지 키워요' },
+    { id: 'gc43', ch: 25, t: 'facAll', n: 43, rm: 5, title: '캠퍼스 건물 Lv.43', how: '대학교 때 지은 건물 여덟 채를 모두 Lv.43까지 키워요' },
     { id: 'gr9', ch: 25, ye: 2, yt: 5, t: 'tgrads', n: 2, r: 12, rk: 'dip', title: '석사 학위수여식', how: '석사 4학기에 대도시가 되면 학위수여식을 열어요' },
     { id: 'gr10', ch: 26, t: 'fac', k: 'gradhall', n: 5, rm: 5, title: '연구동 키우기', how: '연구 구역 연구동을 Lv.5까지 키워요' },
     { id: 'gr16', ch: 26, t: 'xt', k: 'adv', n: 1, rm: 5, title: '지도교수님 연수', how: '교직원 탭 > 펠리컨 지도교수님 연수' },   // 5.0.0 woodani 결정(2026-11-16). 이미 지나간 저장은 퀘스트 id로 이어서 건너뛰어요
+    { id: 'gc44', ch: 26, t: 'facAll', n: 44, rm: 5, title: '캠퍼스 건물 Lv.44', how: '대학교 때 지은 건물 여덟 채를 모두 Lv.44까지 키워요' },
+    { id: 'gc45', ch: 26, t: 'facAll', n: 45, rm: 5, title: '캠퍼스 건물 Lv.45', how: '대학교 때 지은 건물 여덟 채를 모두 Lv.45까지 키워요' },
+    { id: 'gc46', ch: 26, t: 'facAll', n: 46, rm: 5, title: '캠퍼스 건물 Lv.46', how: '대학교 때 지은 건물 여덟 채를 모두 Lv.46까지 키워요' },
+    { id: 'gsem3', ch: 26, sy: 3, yt: 5, t: 'semH', n: 3, r: 8, rk: 'dip', title: '박사 1학기 세미나', how: '대도시 학교가 되면 졸업 탭에서 세미나를 열어요' },
+    { id: 'gc47', ch: 26, t: 'facAll', n: 47, rm: 5, title: '캠퍼스 건물 Lv.47', how: '대학교 때 지은 건물 여덟 채를 모두 Lv.47까지 키워요' },
+    { id: 'gc48', ch: 26, t: 'facAll', n: 48, rm: 5, title: '캠퍼스 건물 Lv.48', how: '대학교 때 지은 건물 여덟 채를 모두 Lv.48까지 키워요' },
+    { id: 'gc49', ch: 26, t: 'facAll', n: 49, rm: 5, title: '캠퍼스 건물 Lv.49', how: '대학교 때 지은 건물 여덟 채를 모두 Lv.49까지 키워요' },
+    { id: 'gyr3', ch: 26, ye: 3, yt: 5, t: 'tgrads', n: 3, r: 10, rk: 'dip', title: '박사 2학기 세미나', how: '박사 2학기에 대도시가 되면 세미나를 열어요' },
     { id: 'gr11', ch: 26, t: 'fac', k: 'institute', n: 10, rm: 5, title: '연구소 Lv.10', how: '연구 구역 연구소를 Lv.10까지 키워요' },
+    { id: 'gc50', ch: 26, t: 'facAll', n: 50, rm: 5, title: '캠퍼스 건물 Lv.50', how: '대학교 때 지은 건물 여덟 채를 모두 Lv.50까지 키워요' },
+    { id: 'gc51', ch: 26, t: 'facAll', n: 51, rm: 5, title: '캠퍼스 건물 Lv.51', how: '대학교 때 지은 건물 여덟 채를 모두 Lv.51까지 키워요' },
+    { id: 'gc52', ch: 26, t: 'facAll', n: 52, rm: 5, title: '캠퍼스 건물 Lv.52', how: '대학교 때 지은 건물 여덟 채를 모두 Lv.52까지 키워요' },
+    { id: 'gsem4', ch: 26, sy: 4, yt: 5, t: 'semH', n: 4, r: 8, rk: 'dip', title: '박사 3학기 세미나', how: '대도시 학교가 되면 졸업 탭에서 세미나를 열어요' },
+    { id: 'gc53', ch: 26, t: 'facAll', n: 53, rm: 5, title: '캠퍼스 건물 Lv.53', how: '대학교 때 지은 건물 여덟 채를 모두 Lv.53까지 키워요' },
+    { id: 'gc54', ch: 26, t: 'facAll', n: 54, rm: 5, title: '캠퍼스 건물 Lv.54', how: '대학교 때 지은 건물 여덟 채를 모두 Lv.54까지 키워요' },
+    { id: 'gc55', ch: 26, t: 'facAll', n: 55, rm: 5, title: '캠퍼스 건물 Lv.55', how: '대학교 때 지은 건물 여덟 채를 모두 Lv.55까지 키워요' },
     { id: 'gr12', ch: 26, ye: 4, yt: 5, t: 'tgrads', n: 4, r: 12, rk: 'dip', title: '박사 4학기 세미나', how: '학기마다 세미나를 열어 박사 4학기를 마쳐요' },
     { id: 'gr13', ch: 27, t: 'fac', k: 'gradhall', n: 10, rm: 5, title: '연구동 Lv.10', how: '연구 구역 연구동을 Lv.10까지 키워요' },
+    { id: 'gc56', ch: 27, t: 'facAll', n: 56, rm: 5, title: '캠퍼스 건물 Lv.56', how: '대학교 때 지은 건물 여덟 채를 모두 Lv.56까지 키워요' },
+    { id: 'gc57', ch: 27, t: 'facAll', n: 57, rm: 5, title: '캠퍼스 건물 Lv.57', how: '대학교 때 지은 건물 여덟 채를 모두 Lv.57까지 키워요' },
+    { id: 'gc58', ch: 27, t: 'facAll', n: 58, rm: 5, title: '캠퍼스 건물 Lv.58', how: '대학교 때 지은 건물 여덟 채를 모두 Lv.58까지 키워요' },
+    { id: 'gsem5', ch: 27, sy: 5, yt: 5, t: 'semH', n: 5, r: 8, rk: 'dip', title: '박사 5학기 세미나', how: '대도시 학교가 되면 졸업 탭에서 세미나를 열어요' },
+    { id: 'gc59', ch: 27, t: 'facAll', n: 59, rm: 5, title: '캠퍼스 건물 Lv.59', how: '대학교 때 지은 건물 여덟 채를 모두 Lv.59까지 키워요' },
+    { id: 'gc60', ch: 27, t: 'facAll', n: 60, rm: 5, title: '캠퍼스 건물 Lv.60', how: '대학교 때 지은 건물 여덟 채를 모두 Lv.60까지 키워요' },
+    { id: 'gc61', ch: 27, t: 'facAll', n: 61, rm: 5, title: '캠퍼스 건물 Lv.61', how: '대학교 때 지은 건물 여덟 채를 모두 Lv.61까지 키워요' },
+    { id: 'gyr5', ch: 27, ye: 5, yt: 5, t: 'tgrads', n: 5, r: 10, rk: 'dip', title: '박사 6학기 세미나', how: '박사 6학기에 대도시가 되면 세미나를 열어요' },
     { id: 'gr14', ch: 27, t: 'fac', k: 'institute', n: 15, rm: 5, title: '연구소 Lv.15', how: '연구 구역 연구소를 Lv.15까지 키워요' },
+    { id: 'gc62', ch: 27, t: 'facAll', n: 62, rm: 5, title: '캠퍼스 건물 Lv.62', how: '대학교 때 지은 건물 여덟 채를 모두 Lv.62까지 키워요' },
+    { id: 'gc63', ch: 27, t: 'facAll', n: 63, rm: 5, title: '캠퍼스 건물 Lv.63', how: '대학교 때 지은 건물 여덟 채를 모두 Lv.63까지 키워요' },
+    { id: 'gc64', ch: 27, t: 'facAll', n: 64, rm: 5, title: '캠퍼스 건물 Lv.64', how: '대학교 때 지은 건물 여덟 채를 모두 Lv.64까지 키워요' },
+    { id: 'gsem6', ch: 27, sy: 6, yt: 5, t: 'semH', n: 6, r: 8, rk: 'dip', title: '박사 7학기 세미나', how: '대도시 학교가 되면 졸업 탭에서 세미나를 열어요' },
+    { id: 'gc65', ch: 27, t: 'facAll', n: 65, rm: 5, title: '캠퍼스 건물 Lv.65', how: '대학교 때 지은 건물 여덟 채를 모두 Lv.65까지 키워요' },
+    { id: 'gc66', ch: 27, t: 'facAll', n: 66, rm: 5, title: '캠퍼스 건물 Lv.66', how: '대학교 때 지은 건물 여덟 채를 모두 Lv.66까지 키워요' },
     { id: 'gr15', ch: 27, ye: 6, yt: 5, t: 'tgrads', n: 6, r: 20, rk: 'dip', title: '박사 학위수여식', how: '박사 8학기에 대도시가 되면 학위수여식을 열어요',
       say: '박사 학위를 받았어요. 큰 참나무 아래에서 거북 할아버지의 마지막 나무패를 찾았어요.' });
   // 2.1.1 woodani 요청: 공사에 시간이 들어서, 메인 퀘스트의 시설 목표를 직전 목표보다 한 단계씩만 올려요.
@@ -8931,6 +8968,7 @@ body.cam-scene #ffChip,body.cam-scene #plChip,body.cam-scene .b-ring{animation-p
   const facCap = () => yearCap() + (S.tier >= 1 && S.sem ? SEM_CAP : 0);
   const capNext = () => !semOn() ? facCap() + CAP_STEP : semFirst() ? facCap() + SEM_CAP : yearCap() + CAP_STEP;   // 다음 식을 열면 열리는 상한
   const facMaxed = k => S.f[k] >= facCap();
+  const CAMPUS8 = ['classroom', 'cafeteria', 'library', 'playground', 'science', 'store', 'dorm', 'union'];   // 5.0.1.3 대학원 퀘스트 facAll: 대학교 때 지은 건물 여덟 채
   // 학교가 계속 자라니까 높은 레벨은 값이 덜 가파르게 올라요: 시설은 Lv.15부터, 선생님은 Lv.12부터 한 레벨에 1.35배씩
   const SOFT = { fac: 15, tea: 12, g: 1.35 };
   const softCost = (fn, L, from) => fn(Math.min(L, from)) * Math.pow(SOFT.g, Math.max(0, L - from));
@@ -11927,6 +11965,7 @@ body.cam-scene #ffChip,body.cam-scene #plChip,body.cam-scene .b-ring{animation-p
     return a + c;
   }, 0);
   const cheapestFur = k => FUR[k].map((_, i) => i).filter(i => !furDone(k, i)).sort((a, b) => furCost(k, a) - furCost(k, b))[0];
+  const facAllNext = n => CAMPUS8.filter(k => (S.f[k] || 0) < n && !facBusy(k)).sort((a, b) => facCost(a) - facCost(b))[0];   // 5.0.1.3 facAll 퀘스트에서 다음에 올릴 건물(가장 싼 것)
   const facPick = k => furReady(k) ? { kind: 'fac', k } : { kind: 'fur', k, i: cheapestFur(k) };
   // mode: 'rep' 평판을 가장 싸게, 'rate' 수업료를 가장 싸게, 없으면 학교가 가장 크게 자라는 것
   function valuePick(mode) {
@@ -11953,6 +11992,7 @@ body.cam-scene #ffChip,body.cam-scene #plChip,body.cam-scene .b-ring{animation-p
     if (q.t === 'fac' && facKeys().includes(q.k) && !facBusy(q.k)) return facPick(q.k);
     if (q.t === 'fur' && !furDone(q.k, q.i)) return { kind: 'fur', k: q.k, i: q.i };
     if (q.t === 'furAll' && !furReady(q.k)) return { kind: 'fur', k: q.k, i: cheapestFur(q.k) };
+    if (q.t === 'facAll') { const k = facAllNext(q.n); if (k) return facPick(k); }
     if (q.t === 'tea' && !teaMaxed(q.k)) return { kind: 'tea', k: q.k };
     if (q.t === 'teaAll') { const k = Object.keys(TEA).filter(x => S.t[x] < q.n && !teaMaxed(x)).sort((a, b) => teaCost(a) - teaCost(b))[0]; if (k) return { kind: 'tea', k }; }
     if (q.t === 'students' && capacity() < q.n && !facBusy('classroom')) return facPick('classroom');
@@ -11980,7 +12020,7 @@ body.cam-scene #ffChip,body.cam-scene #plChip,body.cam-scene .b-ring{animation-p
      그래서 켜 놓고 퀘스트를 따라가면 막히지 않고, 초등학교 2학년부터 처음으로 끄고 쉬었다 와야 하는 때가 와요.
      다음 퀘스트에 드는 도토리는 추천과 같은 방법으로 사 가며 어림해요(가상으로만 사고 원래대로 돌려놓아요) */
   const prepPhase = () => S.tier === 0;   // 1.3.0: 교감 선생님 지원은 유치원까지만
-  const PREP_TYPES = new Set(['fac', 'fur', 'furAll', 'tea', 'teaAll', 'students', 'grade', 'ygrade', 'rate']);
+  const PREP_TYPES = new Set(['fac', 'facAll', 'fur', 'furAll', 'tea', 'teaAll', 'students', 'grade', 'ygrade', 'rate']);
   function needCost(q) {
     if (q && q.t === 'tier' && finalYear()) q = { t: 'ygrade', n: GRAD_MIN };   // 졸업식 퀘스트는 마지막 해 대도시가 되는 데 드는 도토리로 쳐요
     if (!q || !PREP_TYPES.has(q.t)) return 0;
@@ -13821,8 +13861,8 @@ body.cam-scene #ffChip,body.cam-scene #plChip,body.cam-scene .b-ring{animation-p
        forest/rank/<내 id>   랭킹 이름과 학교 점수
        forest/stats/<내 id>  테스트 현황 (어디까지 했는지, 얼마나 했는지)
      <내 id>는 Firebase 익명 로그인이 기기(브라우저)마다 만들어 줘요. */
-  const VERSION = '5.0.1.2';   // 2026-11-17 woodani 결정: 웹에 5.0.2~5.0.5로 먼저 냈던 것을 앱과 함께 5.0.1 하나로 내요(버전 견줌은 앞 두 자리만 봐서 되돌아가도 괜찮아요)
-  const NT_QUIET = ['2.1.20', '2.1.2.2', '2.3.0.1', '2.3.4', '3.2.3', '3.2.4', '3.2.5', '3.3.1', '3.3.2', '3.3.3', '4.4.1.1', '4.4.1.2', '4.4.1.3', '4.4.1.4', '5.0.1.1', '5.0.1.2'];   // 5.0.1.1 생물 탐사 고침은 공지 없이   // 5.0.3도 공지 없이(공지 줄은 woodani가 정하면 넣어요)   // 5.0.2 공지 없이(woodani 2026-11-16)   // 5.0.1 공지 줄은 woodani가 정할 때까지 조용히   // 5.0.0 공지는 2026-11-16 woodani가 정해서 NOTICES로 옮겼어요   // 4.4.1(앱과 함께 내는 판)은 공지를 띄워요   // 4.4.1도 공지 없이(woodani)   // 3.3.1, 3.3.2, 3.3.3(토스 먼저)도 공지 창 없이(woodani). 2.3.0.1도 공지 창 없이(공지는 그대로 2.3.0). 2.3.4도 조용히(woodani 결정). 3.2.3, 3.2.4, 3.2.5도 공지 창 없이(공지 줄을 고르지 않음)
+  const VERSION = '5.0.1.3';   // 2026-11-17 woodani 결정: 웹에 5.0.2~5.0.5로 먼저 냈던 것을 앱과 함께 5.0.1 하나로 내요(버전 견줌은 앞 두 자리만 봐서 되돌아가도 괜찮아요)
+  const NT_QUIET = ['2.1.20', '2.1.2.2', '2.3.0.1', '2.3.4', '3.2.3', '3.2.4', '3.2.5', '3.3.1', '3.3.2', '3.3.3', '4.4.1.1', '4.4.1.2', '4.4.1.3', '4.4.1.4', '5.0.1.1', '5.0.1.2', '5.0.1.3'];   // 5.0.1.1 생물 탐사 고침은 공지 없이   // 5.0.3도 공지 없이(공지 줄은 woodani가 정하면 넣어요)   // 5.0.2 공지 없이(woodani 2026-11-16)   // 5.0.1 공지 줄은 woodani가 정할 때까지 조용히   // 5.0.0 공지는 2026-11-16 woodani가 정해서 NOTICES로 옮겼어요   // 4.4.1(앱과 함께 내는 판)은 공지를 띄워요   // 4.4.1도 공지 없이(woodani)   // 3.3.1, 3.3.2, 3.3.3(토스 먼저)도 공지 창 없이(woodani). 2.3.0.1도 공지 창 없이(공지는 그대로 2.3.0). 2.3.4도 조용히(woodani 결정). 3.2.3, 3.2.4, 3.2.5도 공지 창 없이(공지 줄을 고르지 않음)
     // 2.1.20 woodani 결정: 이 버전들은 업데이트해도 공지 창을 띄우지 않아요(공지는 그대로 2.1.2)
   /* 2.0.0 공지사항 (2026-10-27 woodani, 1.8.0은 이미 올려서 2.0.0부터): 설정 > 공지사항. 맨 위가 가장 새 공지예요.
      패치노트는 자동으로 넣지 않아요. woodani가 검수한 글만 여기에 적어요(CHANGELOG.md는 자세한 기록용이라 따로 있어요).
@@ -25098,6 +25138,7 @@ body.cam-scene #ffChip,body.cam-scene #plChip,body.cam-scene .b-ring{animation-p
       case 'fac': return S.f[q.k];
       case 'fur': return S.fu[q.k][q.i];
       case 'furAll': return Math.min(...S.fu[q.k]);
+      case 'facAll': return Math.min(...CAMPUS8.map(k => S.f[k] || 0));   // 5.0.1.3 대학원: 캠퍼스 건물 여덟 채 가운데 가장 낮은 레벨
       case 'tea': return S.t[q.k];
       case 'teaAll': return Math.min(S.t.squirrel, S.t.owl, S.t.bear);
       case 'students': return Math.floor(S.students + 1e-6);
@@ -25239,6 +25280,7 @@ body.cam-scene #ffChip,body.cam-scene #plChip,body.cam-scene .b-ring{animation-p
       case 'fac': return q.n === 1 ? `${FAC[q.k].name} 짓기` : `${FAC[q.k].name} Lv.${q.n} 만들기`;
       case 'fur': return q.n === 1 ? `${FUR[q.k][q.i].name} 고치기` : `${FUR[q.k][q.i].name} Lv.${q.n}`;
       case 'furAll': return `${FAC[q.k].name} 가구 모두 Lv.${q.n}`;
+      case 'facAll': return `캠퍼스 건물 모두 Lv.${q.n}`;
       case 'tea': return q.n === 1 ? `${TEA[q.k].name} 모셔 오기` : `${TEA[q.k].name} Lv.${q.n}`;
       case 'teaAll': return `선생님 모두 Lv.${q.n}`;
       case 'students': return `학생 ${q.n}명 모으기`;
@@ -25759,6 +25801,7 @@ body.cam-scene #ffChip,body.cam-scene #plChip,body.cam-scene .b-ring{animation-p
       case 'fac': return goFac(q.k);
       case 'fur': return goFur(q.k, q.i);   // 2.0.1
       case 'furAll': return goFur(q.k, -1);
+      case 'facAll': { const k = facAllNext(q.n) || CAMPUS8.filter(x => (S.f[x] || 0) < q.n)[0]; return k ? goFac(k) : setTab('school'); }
       case 'tea': return goTeacher(q.k);
       case 'teaAll': { const k = lowestTeacher(q.n); return k ? goTeacher(k) : setTab('teachers'); }
       case 'students':
@@ -29107,6 +29150,7 @@ body.cam-scene #ffChip,body.cam-scene #plChip,body.cam-scene .b-ring{animation-p
   if (window.__FOREST_TEST) window.__forest = { get S() { return S; }, statsDoc, get rt4() { return rt; }, BX_SPOT, decoMap, tamGearBuy, zoneKids, setZone, claimMission, MISSIONS, adAskDone, tamRenderBody, tamMem, btSweep, btSwOpen, openBtSw, btLeft, btDay, renderBtCard, tamCap, SAVE_CAP, fmt, sanitize, showEntrance, claimables, claimAllNow, subReady, todoRows, offlineEff, qNeed, incomeScale, todoGo, renderTodo, acBuyBookAll, frGiftAll, rdUnqueue, rdSettle, frGift, frGiftLeft, acBkLeft, bookCost, APP_PACK, mapLo, mapHidden, finalYear, stPicUrl, ST_PICS, webAud, webCacheOk, c3u, WEB_ROOT, THEME, applyCos, setZone, decoEditStart, decoEditEnd, tamSkipTo, tamSkipGo, tamWinRep, tamRepFl, tamRenderTop, tamBg, teaOff, geo, qMeasure, IMG, tamHOn, tamHOpen, tamCurFl, tamWinH, tamHf, tamHRankDoc, tamSkBusy, tamReach, get SKQ() { return SKQ; }, esAxGain, esAxLeft, ESHOP, tamLvPlan, tamLvBuy, tamLvAll, mapUrl, mapBase, tamCheerLeft, tamAdRevive, tamCap, tamCapped, tamLvRef, tamBaseRate, tamLvCost, tamStageIn, musicWant, tamPh, tamEvPick, tamAutoTeam, tamAutoGain, tamUpRec, MAIN, startSports, GEO, claimAchAll, ACH, btMake, btBest, btRoster, btRoll, btWin, btOppCheer, BT, BT_LG, stPrev, get Rank() { return Rank; }, tamRankDoc, tamTf, tamAdSpd, tamReport, tamRepTake, tamAdRevive, renderRankPanel, TAM, tamSim, tamTeam, tamStat, tamMobs, tamWin, tamIdle, tamCollect, tamParty, tamShard, tamPow, tamFight, tamStep, TAM, tamSim, tamTeam, tamStat, tamMobs, tamWin, tamIdle, tamCollect, tamShard, tamParty, tamPow, tamLvCost, tamOpen, setZone, geo, stPlay, stNext, ST, ST_SIDE, SIDE, missionGo, MGO, MGO_MINI, MGO_Q, renderMissions, renderPass, BOOST, conLeft, gameToday, setTab, ADX, adStamp, adxDay, adxCan, adxMore, adPickNow, adPickGive, conNear, renderAdStamp, claimOfflineDouble, startBoost, openBoost, showOffline, fvBoothStart, bfFwStart, musicWant, renderCounsel, renderXg, renderFv, showCeremony, RX, rxPct, rxCost, rxUp, rxPart, renderDept, goldOr, goldRich, adGold, stampAtt, GOLD, BIG, BF_DECO, bfWin, bfNext, bfOn, bfFw, bfSync, bfStamp, bfFwStart, bfPart, bfNextTx, sanitizeBf, freshBf, fvBoothMax, bldBox, bldPick, bldWarm, DECO_SLOTS, XG, MK, ST, SIDE, ST_SIDE, wdMap, xgOn, xgGuest, xgSpots, xgGreet, xgVisit, xgLunch, openXg, mkOn, mkHot, mkSell, mkBuy, mkSur, openMk, wdBar, wdTick, stTick, stPlay, stNext, stPick, stEnd, stTags, openSb, renderSb, sideCan, sideMap, fvFlag, FV, FV_POS, fvOn, fvOpen, fvBonus, fvSync, fvStamp, fvGuests, openFv, renderFv, fvMeet, fvBoothStart, fvMap, fvTip, festDef, goTo, navInfo, openShop, gdReady, thPreview, thPreviewEnd, thOn, busScene, tripCrowd, openTrip, startTrip, claimTrip, TRIPS, tripMult, openSheet, openRx, rtStart, rtLv, RT5, setZone, tamReg, promote, canPromote, get rxTier() { return RX_TIER; }, set rxTier(v) { RX_TIER = v; }, tamLvAllPlan, tamLvAllAsk, decoPut, decoUsed, get ZONE0() { return ZONE0; }, mgPickMul, mgPickMode, mgUpOrder, mgFillOrders, mgAdAsk, sportsCon, festCon, btQuota, btCanAd, btAdMore, warmRooms, blobUrl, vdSize, vdBlock, pzSweep, pzSwGain, pzSwOpen, pzXpOf, mgMulMax, mgMulOk, mgMul, mgModeTap, acTip, kidDupIdx, trialSafe, closeAd,
     TKE, TK_Q, tkDaily, nbAllDay, nbBuildAt, nbOn, conAdd, BX_SPOT, PERKS, offlineCapH, applyAway, pzFinish, mgClaimOrder,
     CS, JOBS, CS_WORRY, freshCs, csOpen, csLeft, csMax, csEnsure, csCands, csNeed, csMul, csOpenCards, csReady, csDone, csTalkMake, csAnswer, csChoose, csSettle, openCounsel, renderCounsel, renderHall, MAIN, qMeasure, qGoal, sanitize,   // 3.1.0 진로 상담
+    questPick, facAllNext, CAMPUS8,   // 5.0.1.3
     NSL, nsStart, nsSettle, nsOpen, nsOn, nsOverlap, nsExtraH, isNight, nightDayOf, openNs, renderNs, bxSpots, renderNight,   // 3.0.0
    conOn, conLeft, conTick, conSec, conFinish, tkPlan, tkUse, tkUseAll, TK, CON, TKAD, capNext, yearCap,   // 2.1.0 공사
     semOn, semFirst, semLabel, cereDip, semBreak,   // 2.1.0 학기(s80)
