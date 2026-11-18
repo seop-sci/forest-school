@@ -3792,7 +3792,7 @@ body.cam-scene #ffChip,body.cam-scene #plChip,body.cam-scene .b-ring{animation-p
     <p class="boot-step" id="bootStep">학교 문을 여는 중...</p>
     <p class="boot-tip" id="bootTip">학교 문을 여는 중이에요</p>
   </div>
-  <span class="boot-ver" id="bootVer">v5.0.2</span>
+  <span class="boot-ver" id="bootVer">v5.0.2.1</span>
 </div>
 
 <div class="app on-school" id="app">
@@ -4383,7 +4383,7 @@ body.cam-scene #ffChip,body.cam-scene #plChip,body.cam-scene .b-ring{animation-p
       </div>
       <h3 class="panel-sub">정보</h3>
       <dl class="info">
-        <div id="verRow"><dt>버전</dt><dd>v5.0.2</dd></div>
+        <div id="verRow"><dt>버전</dt><dd>v5.0.2.1</dd></div>
         <div id="pidRow" hidden><dt>학교 번호</dt><dd id="infoPid"></dd></div>
       </dl>
       <div id="devBox" hidden>
@@ -8320,6 +8320,22 @@ body.cam-scene #ffChip,body.cam-scene #plChip,body.cam-scene .b-ring{animation-p
     { id: 'gc66', ch: 27, t: 'facAll', n: 66, rm: 5, title: '캠퍼스 건물 Lv.66', how: '대학교 때 지은 건물 여덟 채를 모두 Lv.66까지 키워요' },
     { id: 'gr15', ch: 27, ye: 6, yt: 5, t: 'tgrads', n: 6, r: 20, rk: 'dip', title: '박사 학위수여식', how: '박사 8학기에 대도시가 되면 학위수여식을 열어요',
       say: '박사 학위를 받았어요. 큰 참나무 아래에서 거북 할아버지의 마지막 나무패를 찾았어요.' });
+  // 5.0.2.1 woodani 결정(2026-11-18): 대학원 '캠퍼스 건물 모두 Lv.N'(gcN)을 두 채씩 네 조각으로 나눠요. 마지막 조각은 원래 id(gcN)라 옛 저장도 그 자리에서 이어요.
+  // 보상(수업료 몇 분치)은 원래 보상을 넷으로 나눠요. 과학실이 가장 비싸서 마지막 조각에 넣어요.
+  // 대학교 때 덜 키운 건물을 따라잡도록 Lv.36 앞에 'Lv.34', 'Lv.35' 퀘스트를 둬요(대학교 4학년 2학기 상한이 Lv.35예요)
+  (function gcSplit() {
+    const PAIRS = [['classroom', 'cafeteria', '교실과 급식실'], ['library', 'playground', '도서관과 운동장'], ['store', 'dorm', '매점과 기숙사']];
+    const out = [];
+    for (const q of MAIN) {
+      if (q.t !== 'facAll' || !/^gc\d+$/.test(q.id)) { out.push(q); continue; }
+      const share = Math.round(q.rm / 4 * 100) / 100;
+      if (q.id === 'gc36') for (const L of [34, 35]) out.push({ id: 'gc' + L, ch: q.ch, t: 'facAll', n: L, rm: share, title: `캠퍼스 건물 모두 Lv.${L}`, how: `대학교 때 덜 키운 건물을 Lv.${L}까지 따라잡아요` });
+      PAIRS.forEach(([a, b, nm], i) => out.push({ id: q.id + 'abc'[i], ch: q.ch, t: 'facAll', ks: [a, b], n: q.n, rm: share, title: `${nm} Lv.${q.n}`, how: `캠퍼스의 ${nm + ((nm.charCodeAt(nm.length - 1) - 0xAC00) % 28 ? '을' : '를')} Lv.${q.n}까지 키워요` }));
+      q.rm = share; q.how = `남은 학생회관과 과학실까지, 대학교 때 지은 건물 여덟 채를 모두 Lv.${q.n}까지 키워요`;
+      out.push(q);
+    }
+    MAIN.length = 0; MAIN.push(...out);
+  })();
   // 2.1.1 woodani 요청: 공사에 시간이 들어서, 메인 퀘스트의 시설 목표를 직전 목표보다 한 단계씩만 올려요.
   // 원래 퀘스트(id 그대로) 사이에 한 단계 퀘스트(id '원래id_레벨', step: 1)를 끼워 넣고, 보상은 원래 보상을 나눠요.
   // 학교급이 바뀌면 시설이 처음부터라 그 학교급 첫 퀘스트부터 세요. 그 학년(학기)의 최고 레벨을 넘는 단계는 그 학년(학기)이 열린 뒤에 놓아요
@@ -12002,7 +12018,7 @@ body.cam-scene #ffChip,body.cam-scene #plChip,body.cam-scene .b-ring{animation-p
     return a + c;
   }, 0);
   const cheapestFur = k => FUR[k].map((_, i) => i).filter(i => !furDone(k, i)).sort((a, b) => furCost(k, a) - furCost(k, b))[0];
-  const facAllNext = n => CAMPUS8.filter(k => (S.f[k] || 0) < n && !facBusy(k)).sort((a, b) => facCost(a) - facCost(b))[0];   // 5.0.1.3 facAll 퀘스트에서 다음에 올릴 건물(가장 싼 것)
+  const facAllNext = (n, ks) => (ks || CAMPUS8).filter(k => (S.f[k] || 0) < n && !facBusy(k)).sort((a, b) => facCost(a) - facCost(b))[0];   // 5.0.1.3 facAll 퀘스트에서 다음에 올릴 건물(가장 싼 것)
   const facPick = k => furReady(k) ? { kind: 'fac', k } : { kind: 'fur', k, i: cheapestFur(k) };
   // mode: 'rep' 평판을 가장 싸게, 'rate' 수업료를 가장 싸게, 없으면 학교가 가장 크게 자라는 것
   function valuePick(mode) {
@@ -12029,7 +12045,7 @@ body.cam-scene #ffChip,body.cam-scene #plChip,body.cam-scene .b-ring{animation-p
     if (q.t === 'fac' && facKeys().includes(q.k) && !facBusy(q.k)) return facPick(q.k);
     if (q.t === 'fur' && !furDone(q.k, q.i)) return { kind: 'fur', k: q.k, i: q.i };
     if (q.t === 'furAll' && !furReady(q.k)) return { kind: 'fur', k: q.k, i: cheapestFur(q.k) };
-    if (q.t === 'facAll') { const k = facAllNext(q.n); if (k) return facPick(k); }
+    if (q.t === 'facAll') { const k = facAllNext(q.n, q.ks); if (k) return facPick(k); }
     if (q.t === 'tea' && !teaMaxed(q.k)) return { kind: 'tea', k: q.k };
     if (q.t === 'teaAll') { const k = Object.keys(TEA).filter(x => S.t[x] < q.n && !teaMaxed(x)).sort((a, b) => teaCost(a) - teaCost(b))[0]; if (k) return { kind: 'tea', k }; }
     if (q.t === 'students' && capacity() < q.n && !facBusy('classroom')) return facPick('classroom');
@@ -13905,8 +13921,8 @@ body.cam-scene #ffChip,body.cam-scene #plChip,body.cam-scene .b-ring{animation-p
        forest/rank/<내 id>   랭킹 이름과 학교 점수
        forest/stats/<내 id>  테스트 현황 (어디까지 했는지, 얼마나 했는지)
      <내 id>는 Firebase 익명 로그인이 기기(브라우저)마다 만들어 줘요. */
-  const VERSION = '5.0.2';   // 2026-11-17 woodani 결정: 웹에 5.0.2~5.0.5로 먼저 냈던 것을 앱과 함께 5.0.1 하나로 내요(버전 견줌은 앞 두 자리만 봐서 되돌아가도 괜찮아요)
-  const NT_QUIET = ['2.1.20', '2.1.2.2', '2.3.0.1', '2.3.4', '3.2.3', '3.2.4', '3.2.5', '3.3.1', '3.3.2', '3.3.3', '4.4.1.1', '4.4.1.2', '4.4.1.3', '4.4.1.4', '5.0.1.1', '5.0.1.2', '5.0.1.3', '5.0.1.4', '5.0.1.5', '5.0.1.6', '5.0.1.7', '5.0.1.8'];   // 5.0.1.1 생물 탐사 고침은 공지 없이   // 5.0.3도 공지 없이(공지 줄은 woodani가 정하면 넣어요)   // 5.0.2 공지 없이(woodani 2026-11-16)   // 5.0.1 공지 줄은 woodani가 정할 때까지 조용히   // 5.0.0 공지는 2026-11-16 woodani가 정해서 NOTICES로 옮겼어요   // 4.4.1(앱과 함께 내는 판)은 공지를 띄워요   // 4.4.1도 공지 없이(woodani)   // 3.3.1, 3.3.2, 3.3.3(토스 먼저)도 공지 창 없이(woodani). 2.3.0.1도 공지 창 없이(공지는 그대로 2.3.0). 2.3.4도 조용히(woodani 결정). 3.2.3, 3.2.4, 3.2.5도 공지 창 없이(공지 줄을 고르지 않음)
+  const VERSION = '5.0.2.1';   // 2026-11-17 woodani 결정: 웹에 5.0.2~5.0.5로 먼저 냈던 것을 앱과 함께 5.0.1 하나로 내요(버전 견줌은 앞 두 자리만 봐서 되돌아가도 괜찮아요)
+  const NT_QUIET = ['5.0.2.1', '2.1.20', '2.1.2.2', '2.3.0.1', '2.3.4', '3.2.3', '3.2.4', '3.2.5', '3.3.1', '3.3.2', '3.3.3', '4.4.1.1', '4.4.1.2', '4.4.1.3', '4.4.1.4', '5.0.1.1', '5.0.1.2', '5.0.1.3', '5.0.1.4', '5.0.1.5', '5.0.1.6', '5.0.1.7', '5.0.1.8'];   // 5.0.1.1 생물 탐사 고침은 공지 없이   // 5.0.3도 공지 없이(공지 줄은 woodani가 정하면 넣어요)   // 5.0.2 공지 없이(woodani 2026-11-16)   // 5.0.1 공지 줄은 woodani가 정할 때까지 조용히   // 5.0.0 공지는 2026-11-16 woodani가 정해서 NOTICES로 옮겼어요   // 4.4.1(앱과 함께 내는 판)은 공지를 띄워요   // 4.4.1도 공지 없이(woodani)   // 3.3.1, 3.3.2, 3.3.3(토스 먼저)도 공지 창 없이(woodani). 2.3.0.1도 공지 창 없이(공지는 그대로 2.3.0). 2.3.4도 조용히(woodani 결정). 3.2.3, 3.2.4, 3.2.5도 공지 창 없이(공지 줄을 고르지 않음)
     // 2.1.20 woodani 결정: 이 버전들은 업데이트해도 공지 창을 띄우지 않아요(공지는 그대로 2.1.2)
   /* 2.0.0 공지사항 (2026-10-27 woodani, 1.8.0은 이미 올려서 2.0.0부터): 설정 > 공지사항. 맨 위가 가장 새 공지예요.
      패치노트는 자동으로 넣지 않아요. woodani가 검수한 글만 여기에 적어요(CHANGELOG.md는 자세한 기록용이라 따로 있어요).
@@ -25219,7 +25235,7 @@ body.cam-scene #ffChip,body.cam-scene #plChip,body.cam-scene .b-ring{animation-p
       case 'fac': return S.f[q.k];
       case 'fur': return S.fu[q.k][q.i];
       case 'furAll': return Math.min(...S.fu[q.k]);
-      case 'facAll': return Math.min(...CAMPUS8.map(k => S.f[k] || 0));   // 5.0.1.3 대학원: 캠퍼스 건물 여덟 채 가운데 가장 낮은 레벨
+      case 'facAll': return Math.min(...(q.ks || CAMPUS8).map(k => S.f[k] || 0));   // 5.0.1.3 대학원: 캠퍼스 건물 여덟 채 가운데 가장 낮은 레벨. 5.0.2.1 ks가 있으면 그 건물만
       case 'tea': return S.t[q.k];
       case 'teaAll': return Math.min(S.t.squirrel, S.t.owl, S.t.bear);
       case 'students': return Math.floor(S.students + 1e-6);
@@ -25361,7 +25377,7 @@ body.cam-scene #ffChip,body.cam-scene #plChip,body.cam-scene .b-ring{animation-p
       case 'fac': return q.n === 1 ? `${FAC[q.k].name} 짓기` : `${FAC[q.k].name} Lv.${q.n} 만들기`;
       case 'fur': return q.n === 1 ? `${FUR[q.k][q.i].name} 고치기` : `${FUR[q.k][q.i].name} Lv.${q.n}`;
       case 'furAll': return `${FAC[q.k].name} 가구 모두 Lv.${q.n}`;
-      case 'facAll': return `캠퍼스 건물 모두 Lv.${q.n}`;
+      case 'facAll': return q.ks ? q.title : `캠퍼스 건물 모두 Lv.${q.n}`;
       case 'tea': return q.n === 1 ? `${TEA[q.k].name} 모셔 오기` : `${TEA[q.k].name} Lv.${q.n}`;
       case 'teaAll': return `선생님 모두 Lv.${q.n}`;
       case 'students': return `학생 ${q.n}명 모으기`;
@@ -25885,7 +25901,7 @@ body.cam-scene #ffChip,body.cam-scene #plChip,body.cam-scene .b-ring{animation-p
       case 'fac': return goFac(q.k);
       case 'fur': return goFur(q.k, q.i);   // 2.0.1
       case 'furAll': return goFur(q.k, -1);
-      case 'facAll': { const k = facAllNext(q.n) || CAMPUS8.filter(x => (S.f[x] || 0) < q.n)[0]; return k ? goFac(k) : setTab('school'); }
+      case 'facAll': { const k = facAllNext(q.n, q.ks) || (q.ks || CAMPUS8).filter(x => (S.f[x] || 0) < q.n)[0]; return k ? goFac(k) : setTab('school'); }
       case 'tea': return goTeacher(q.k);
       case 'teaAll': { const k = lowestTeacher(q.n); return k ? goTeacher(k) : setTab('teachers'); }
       case 'students':

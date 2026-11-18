@@ -663,6 +663,22 @@
     { id: 'gc66', ch: 27, t: 'facAll', n: 66, rm: 5, title: '캠퍼스 건물 Lv.66', how: '대학교 때 지은 건물 여덟 채를 모두 Lv.66까지 키워요' },
     { id: 'gr15', ch: 27, ye: 6, yt: 5, t: 'tgrads', n: 6, r: 20, rk: 'dip', title: '박사 학위수여식', how: '박사 8학기에 대도시가 되면 학위수여식을 열어요',
       say: '박사 학위를 받았어요. 큰 참나무 아래에서 거북 할아버지의 마지막 나무패를 찾았어요.' });
+  // 5.0.2.1 woodani 결정(2026-11-18): 대학원 '캠퍼스 건물 모두 Lv.N'(gcN)을 두 채씩 네 조각으로 나눠요. 마지막 조각은 원래 id(gcN)라 옛 저장도 그 자리에서 이어요.
+  // 보상(수업료 몇 분치)은 원래 보상을 넷으로 나눠요. 과학실이 가장 비싸서 마지막 조각에 넣어요.
+  // 대학교 때 덜 키운 건물을 따라잡도록 Lv.36 앞에 'Lv.34', 'Lv.35' 퀘스트를 둬요(대학교 4학년 2학기 상한이 Lv.35예요)
+  (function gcSplit() {
+    const PAIRS = [['classroom', 'cafeteria', '교실과 급식실'], ['library', 'playground', '도서관과 운동장'], ['store', 'dorm', '매점과 기숙사']];
+    const out = [];
+    for (const q of MAIN) {
+      if (q.t !== 'facAll' || !/^gc\d+$/.test(q.id)) { out.push(q); continue; }
+      const share = Math.round(q.rm / 4 * 100) / 100;
+      if (q.id === 'gc36') for (const L of [34, 35]) out.push({ id: 'gc' + L, ch: q.ch, t: 'facAll', n: L, rm: share, title: `캠퍼스 건물 모두 Lv.${L}`, how: `대학교 때 덜 키운 건물을 Lv.${L}까지 따라잡아요` });
+      PAIRS.forEach(([a, b, nm], i) => out.push({ id: q.id + 'abc'[i], ch: q.ch, t: 'facAll', ks: [a, b], n: q.n, rm: share, title: `${nm} Lv.${q.n}`, how: `캠퍼스의 ${nm + ((nm.charCodeAt(nm.length - 1) - 0xAC00) % 28 ? '을' : '를')} Lv.${q.n}까지 키워요` }));
+      q.rm = share; q.how = `남은 학생회관과 과학실까지, 대학교 때 지은 건물 여덟 채를 모두 Lv.${q.n}까지 키워요`;
+      out.push(q);
+    }
+    MAIN.length = 0; MAIN.push(...out);
+  })();
   // 2.1.1 woodani 요청: 공사에 시간이 들어서, 메인 퀘스트의 시설 목표를 직전 목표보다 한 단계씩만 올려요.
   // 원래 퀘스트(id 그대로) 사이에 한 단계 퀘스트(id '원래id_레벨', step: 1)를 끼워 넣고, 보상은 원래 보상을 나눠요.
   // 학교급이 바뀌면 시설이 처음부터라 그 학교급 첫 퀘스트부터 세요. 그 학년(학기)의 최고 레벨을 넘는 단계는 그 학년(학기)이 열린 뒤에 놓아요

@@ -4,7 +4,7 @@
       case 'fac': return S.f[q.k];
       case 'fur': return S.fu[q.k][q.i];
       case 'furAll': return Math.min(...S.fu[q.k]);
-      case 'facAll': return Math.min(...CAMPUS8.map(k => S.f[k] || 0));   // 5.0.1.3 대학원: 캠퍼스 건물 여덟 채 가운데 가장 낮은 레벨
+      case 'facAll': return Math.min(...(q.ks || CAMPUS8).map(k => S.f[k] || 0));   // 5.0.1.3 대학원: 캠퍼스 건물 여덟 채 가운데 가장 낮은 레벨. 5.0.2.1 ks가 있으면 그 건물만
       case 'tea': return S.t[q.k];
       case 'teaAll': return Math.min(S.t.squirrel, S.t.owl, S.t.bear);
       case 'students': return Math.floor(S.students + 1e-6);
@@ -146,7 +146,7 @@
       case 'fac': return q.n === 1 ? `${FAC[q.k].name} 짓기` : `${FAC[q.k].name} Lv.${q.n} 만들기`;
       case 'fur': return q.n === 1 ? `${FUR[q.k][q.i].name} 고치기` : `${FUR[q.k][q.i].name} Lv.${q.n}`;
       case 'furAll': return `${FAC[q.k].name} 가구 모두 Lv.${q.n}`;
-      case 'facAll': return `캠퍼스 건물 모두 Lv.${q.n}`;
+      case 'facAll': return q.ks ? q.title : `캠퍼스 건물 모두 Lv.${q.n}`;
       case 'tea': return q.n === 1 ? `${TEA[q.k].name} 모셔 오기` : `${TEA[q.k].name} Lv.${q.n}`;
       case 'teaAll': return `선생님 모두 Lv.${q.n}`;
       case 'students': return `학생 ${q.n}명 모으기`;
@@ -670,7 +670,7 @@
       case 'fac': return goFac(q.k);
       case 'fur': return goFur(q.k, q.i);   // 2.0.1
       case 'furAll': return goFur(q.k, -1);
-      case 'facAll': { const k = facAllNext(q.n) || CAMPUS8.filter(x => (S.f[x] || 0) < q.n)[0]; return k ? goFac(k) : setTab('school'); }
+      case 'facAll': { const k = facAllNext(q.n, q.ks) || (q.ks || CAMPUS8).filter(x => (S.f[x] || 0) < q.n)[0]; return k ? goFac(k) : setTab('school'); }
       case 'tea': return goTeacher(q.k);
       case 'teaAll': { const k = lowestTeacher(q.n); return k ? goTeacher(k) : setTab('teachers'); }
       case 'students':
