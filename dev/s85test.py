@@ -39,7 +39,7 @@ async def main():
               return { n0, t0, on0, lv: S.f.classroom, con: F.conOn('classroom'), n1: F.facKeys().filter(F.ffCan).length, t1: chip.textContent, on1: document.querySelector('#pq-classroom').classList.contains('ff-on'), vis: !chip.hidden };""")
             print(w, '바로 완공', r)
             ok(r['n0'] == 5 and '3/3' in r['t0'] and r['on0'], f'처음 칩과 배지 {r}')   # 3.0.0 학교 전체 하루 3번
-            ok(r['lv'] == 9 and not r['con'] and r['n1'] == 5 and '2/3' in r['t1'] and r['on1'] and r['vis'], f'바로 완공 뒤 {r}')   # 3.0.0 남은 2번은 어느 건물이든
+            ok(r['lv'] == 9 and not r['con'] and r['n1'] == 4 and '2/3' in r['t1'] and not r['on1'] and r['vis'], f'바로 완공 뒤 {r}')   # 3.0.0 남은 2번은 어느 건물이든. 5.0.1.8 H-03: 교실은 가구를 Lv.9로 올려야 다시 배지가 떠요
             await pg.evaluate(T.CLEAN); await pg.wait_for_timeout(1200)
             await pg.screenshot(path=f's85_chip_{w}.png')
             o = await pg.evaluate(OVER + "('#ffChip, #ffChip *')"); ok(not o, f'{w} 칩이 넘쳐요 {o}')
