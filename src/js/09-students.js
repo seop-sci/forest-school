@@ -417,7 +417,7 @@
       const fb = fr.getBoundingClientRect(), sc = rt.mapS;
       let left = 0, right = fb.width, bottom = fb.height;
       for (const el of $$('#btnTrip, #btnSports, #btnHall, .boost:not([hidden])')) { if (el.hidden || !el.offsetParent) continue; const q = el.getBoundingClientRect(); if (q.left - fb.left < fb.width / 2) left = Math.max(left, q.right - fb.left); }
-      for (const el of $$('#ffChip, #plChip, #tierDots')) { if (el.hidden || !el.offsetParent) continue; const q = el.getBoundingClientRect(); bottom = Math.min(bottom, q.top - fb.top); }
+      for (const el of $$('#ffChip, #upChip, #plChip, #tierDots')) { if (el.hidden || !el.offsetParent) continue; const q = el.getBoundingClientRect(); bottom = Math.min(bottom, q.top - fb.top); }
       x0 = Math.max(x0, x0 + (left + 8) / sc); y1 = Math.min(y1, y0 + (bottom - (rt.hudTop || 0) - 8) / sc);
       x1 = Math.min(x1, x0 + (right - left - (rt.hudRight || 0) - 16) / sc);
     }
