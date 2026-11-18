@@ -21,7 +21,7 @@ async def main():
             c.ok(r['p0'] == 0 and r['hid0'], f"{w}: 도토리가 없는데 칩이 떠요 {r}")
             c.ok(not r['hid1'] and '건물 5채 올리기' in r['txt'] and r['inView'], f"{w}: 칩이 안 떠요 {r}")
             c.ok(len(r['ks']) == 5 and r['cost'] > 0, f"{w}: 고른 건물 {r['ks']}")
-            await pg.click('#upChip'); await pg.wait_for_timeout(400)
+            await pg.click('#upChip', force=True); await pg.wait_for_timeout(400)
             a = await pg.evaluate("()=>({open:!document.querySelector('#mAdAsk').hidden, t:document.querySelector('#adAskTitle').textContent, rows:document.querySelectorAll('#adAskText .ask-row').length})")
             c.ok(a['open'] and a['t'] == '건물 한 번에 올리기' and a['rows'] == 5, f"{w}: 확인 창 {a}")
             await pg.screenshot(path=f'/tmp/up{w}.png')
@@ -35,6 +35,11 @@ async def main():
             # 공사 중인 건물과 최고 레벨은 빼요
             e = await pg.evaluate("()=>{const F=window.__forest,S=F.S; return F.upPlan().ks.length}")
             c.ok(e == 0, f"{w}: 공사 중인 건물을 또 골라요 {e}")
+            # 5.0.3 유치원: 1장을 마치기 전에는 숨고, 마친 뒤에는 보여요
+            k = await pg.evaluate("""()=>{const F=window.__forest,S=F.S; const t0=S.tier,m0=S.q.m; S.tier=0; for(const k of Object.keys(S.bd)) delete S.bd[k]; S.budget=1e12;
+              const ch1=F.MAIN.findIndex(q=>q.ch===1); S.q.m=0; F.ffRender(true); const a=document.querySelector('#upChip').hidden;
+              S.q.m=ch1; F.ffRender(true); const b=document.querySelector('#upChip').hidden; S.tier=t0; S.q.m=m0; return {a,b,n:F.upPlan().ks.length};}""")
+            c.ok(k['a'] and (not k['b'] or k['n'] < 2), f"{w}: 유치원 1장 전후 칩 {k}")
             c.ok(not errs, f'{w}: 오류 {errs[:2]}')
             await ctx.close()
 asyncio.run(main())
