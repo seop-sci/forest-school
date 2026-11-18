@@ -33,7 +33,7 @@ async def main():
         if r != {'dot0': True, 'open': True, 'li': n_lines, 'hide': False, 'seen': True, 'dot1': False, 'closed': True}: fails.append(f'설정에서 열기 {r}')
         # (2)(3)
         r = await pg.evaluate(f"""(async()=>{{ const F={F}, S=F.S, out={{}}; window.__NOTICE_AUTO = true; S.tut.st = 'done'; S.q.m = 10;
-          S.nt = {{ seen: F.NOTICES[0].id, ver: '1.7.4', hide: 0 }};
+          S.born = 0; S.nt = {{ seen: 'old', ver: '1.7.4', hide: 0 }};   // 5.0.1.7 F-06: 아직 안 본 공지만 저절로 열려요
           out.want1 = F.noticeWant(); F.rt.ntAuto = false; F.noticeAuto(); await new Promise(r=>setTimeout(r,400));
           out.open = !document.querySelector('#mNotice').hidden; out.hideBtn = !document.querySelector('#ntHide').hidden;
           document.querySelector('#ntHide').click(); await new Promise(r=>setTimeout(r,300));
@@ -47,7 +47,7 @@ async def main():
           out.newbie = [document.querySelector('#mNotice').hidden, S.nt.seen === F.NOTICES[0].id, S.nt.ver];
           window.__NOTICE_AUTO = false; S.tut.st = 'skip'; return out; }})()""")
         ver = await pg.evaluate("document.querySelector('#verRow dd').textContent.slice(1)")
-        exp = {'want1': True, 'open': True, 'hideBtn': True, 'days': 7, 'ver': ver, 'want2': False, 'want3': ver not in ('2.1.20', '2.1.2.2', '2.3.0.1', '2.3.4', '3.2.3', '3.2.4', '3.2.5', '3.3.1', '3.3.2', '3.3.3', '4.4.1.1', '4.4.1.2', '4.4.1.3', '4.4.1.4', '5.0.1.1', '5.0.1.2', '5.0.1.3', '5.0.1.4', '5.0.1.5', '5.0.1.6'), 'want4': True, 'want5': False, 'newbie': [True, True, ver]}   # 5.0.0은 2026-11-16부터 공지를 띄워요
+        exp = {'want1': True, 'open': True, 'hideBtn': True, 'days': 7, 'ver': ver, 'want2': False, 'want3': False, 'want4': True, 'want5': False, 'newbie': [True, True, ver]}   # 5.0.0은 2026-11-16부터 공지를 띄워요
         if r != exp: fails.append(f'접속할 때 공지 {r}')
         # (5)
         r = await pg.evaluate(f"""(()=>{{ const F={F}, S=F.S; const d = JSON.parse(JSON.stringify(S)); delete d.nt; const a = F.sanitize(d).nt;
