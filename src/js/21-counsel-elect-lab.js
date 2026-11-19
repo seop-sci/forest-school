@@ -179,11 +179,20 @@
     if (!csOpen()) { toast(S.tier < CS.tier ? '상담실은 고등학교부터 열려요' : '명부 학생이 있으면 상담할 수 있어요'); return; }
     if (rt.paused || rt.modalOpen) return;
     if (csEnsure()) save();
-    rt.csTalk = null; rt.csView = S.cs.met ? 'list' : 'hi';
+    rt.csTalk = null; rt.csView = S.cs.met ? 'list' : 'hi'; rt.csLastView = '';   // 5.1.1 새로 열 때는 맨 위부터
     renderCounsel(); openModal($('#mCounsel')); sfx('tap');
   }
   const csFace = how => IMG(how === 'good' ? 'cou_smile' : how === 'off' ? 'cou_tilt' : 'cou_listen') || IMG('tea_elephant');
+  /* 5.1.1 woodani 제보: 직업 카드를 누르면 목록을 새로 그리면서 맨 위로 올라갔어요(휴대폰). 같은 화면을 다시 그릴 때는 스크롤 자리를 지켜요 */
   function renderCounsel() {
+    const m = $('#mCounsel'), b = $('#csBody'), keep = !!b && rt.csView === rt.csLastView, ys = [];
+    if (keep) for (let el = b; el && el !== document.body; el = el.parentElement) { if (el.scrollTop) ys.push([el, el.scrollTop]); if (el === m) break; }
+    renderCounsel0();
+    for (const [el, y] of ys) el.scrollTop = y;
+    if (ys.length) requestAnimationFrame(() => { for (const [el, y] of ys) if (el.scrollTop < y - 2) el.scrollTop = y; });   // 휴대폰 브라우저는 누른 단추가 지워지면 다음 그리기에 맨 위로 튕겨서 한 번 더
+    rt.csLastView = rt.csView;
+  }
+  function renderCounsel0() {
     const m = $('#mCounsel'); if (!m || !S.cs) return;
     const bg = IMG('room_counsel'); $('#csHead').style.backgroundImage = bg ? `url("${bg}")` : '';
     const left = csLeft(), T = rt.csTalk;
