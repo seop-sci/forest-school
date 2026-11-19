@@ -18315,7 +18315,9 @@ body.mg-on .toast[hidden]{display:none}
     x.jb = x.jb === j ? -1 : j;
     if (x.jb >= 0 && !x.jf) { x.jf = 1; S.cs.picks += 1; }   // jf: 처음 진로를 정한 학생(퀘스트 수는 한 번만)
     sfx('tap'); toast(x.jb >= 0 ? `${x.nm}의 꿈은 ${JOBS[j].name}! 그 꿈을 응원할게요.` + (csDone(x) ? ' 벌써 준비가 다 됐어요!' : '') : `${x.nm}의 진로를 다시 고민해요`);
-    checkQuests(); save(); renderCounsel();
+    checkQuests(); save();
+    const row = rt.csView === 'list' && !rt.csTalk && document.querySelector(`#csBody [data-csrow="${i}"]`);   // 5.1.1 woodani: 목록을 다시 그리지 않고 누른 학생 줄만 바꿔요
+    if (row) row.outerHTML = csRowHTML(x, i, csLeft()); else renderCounsel();
   }
   // 고등학교 3학년 졸업식(대학교가 열리기 전에는 3학년을 다시 해요): 명부마다 한 번 수료증 보너스와 황금, 진로 도감은 졸업식마다 채워요
   function csSettle() {
@@ -18349,6 +18351,13 @@ body.mg-on .toast[hidden]{display:none}
     renderCounsel(); openModal($('#mCounsel')); sfx('tap');
   }
   const csFace = how => IMG(how === 'good' ? 'cou_smile' : how === 'off' ? 'cou_tilt' : 'cou_listen') || IMG('tea_elephant');
+  function csRowHTML(x, i, left) {   // 5.1.1 학생 한 줄(진로 카드를 누르면 이 줄만 바꿔요)
+    const r = csReady(x), J = x.jb >= 0 ? JOBS[x.jb] : null;
+    const cards = x.jc.map(j => x.jo.includes(j) ? `<button class="cs-chip${x.jb === j ? ' on' : ''}" type="button" data-cs="p${i}_${j}"><img src="${IMG('badge_' + JOBS[j].k) || ''}" alt="">${JOBS[j].name}</button>` : `<span class="cs-chip back">?</span>`).join('');
+    return `<div class="cs-row${csDone(x) ? ' done' : ''}" data-csrow="${i}"><span class="cs-av">${kidAvatar(x.sp)}</span><div class="cs-tx"><b>${esc(x.nm)}${J ? ` <em>${J.name}</em>` : ''}</b>` +
+      `<div class="cs-chips">${cards}</div>${J ? `<div class="qbar cs-bar"><i style="width:${r}%"></i></div><small>준비도 ${r}%${csDone(x) ? ` 완료! ${esc(x.nm)}, 이제 ${J.name}${batchim(J.name) ? '이' : '가'} 될 준비가 다 됐구나.` : ` (${STAT_NAME(J.ab)} 별과 ${FAC[J.fac].name} 레벨)`}</small>` : `<small>${x.jo.length ? '열린 카드를 눌러 진로로 정해요' : '상담하면 진로 카드가 열려요'}</small>`}</div>` +
+      `<button class="cta small" type="button" data-cs="t${i}"${left ? '' : ' disabled'}>상담</button></div>`;
+  }
   /* 5.1.1 woodani 제보: 직업 카드를 누르면 목록을 새로 그리면서 맨 위로 올라갔어요(휴대폰). 같은 화면을 다시 그릴 때는 스크롤 자리를 지켜요 */
   function renderCounsel() {
     const m = $('#mCounsel'), b = $('#csBody'), keep = !!b && rt.csView === rt.csLastView, ys = [];
@@ -18390,13 +18399,7 @@ body.mg-on .toast[hidden]{display:none}
     }
     const L = S.roster.list;
     body.innerHTML = `<p class="cs-lead">${left ? `오늘 ${left}번 더 상담할 수 있어요.` : '오늘 상담은 여기까지예요.'} 카드가 열리면 진로로 정하고, 준비도 ${CS.ready}%를 넘기면 3학년 졸업식에서 수료증이 늘어요.</p>` +
-      `<div class="cs-list">` + L.map((x, i) => {
-        const r = csReady(x), J = x.jb >= 0 ? JOBS[x.jb] : null;
-        const cards = x.jc.map(j => x.jo.includes(j) ? `<button class="cs-chip${x.jb === j ? ' on' : ''}" type="button" data-cs="p${i}_${j}"><img src="${IMG('badge_' + JOBS[j].k) || ''}" alt="">${JOBS[j].name}</button>` : `<span class="cs-chip back">?</span>`).join('');
-        return `<div class="cs-row${csDone(x) ? ' done' : ''}"><span class="cs-av">${kidAvatar(x.sp)}</span><div class="cs-tx"><b>${esc(x.nm)}${J ? ` <em>${J.name}</em>` : ''}</b>` +
-          `<div class="cs-chips">${cards}</div>${J ? `<div class="qbar cs-bar"><i style="width:${r}%"></i></div><small>준비도 ${r}%${csDone(x) ? ` 완료! ${esc(x.nm)}, 이제 ${J.name}${batchim(J.name) ? '이' : '가'} 될 준비가 다 됐구나.` : ` (${STAT_NAME(J.ab)} 별과 ${FAC[J.fac].name} 레벨)`}</small>` : `<small>${x.jo.length ? '열린 카드를 눌러 진로로 정해요' : '상담하면 진로 카드가 열려요'}</small>`}</div>` +
-          `<button class="cta small" type="button" data-cs="t${i}"${left ? '' : ' disabled'}>상담</button></div>`;
-      }).join('') + `</div><div class="btn-row">${!left && adxCan('cs') ? adxBtn('data-cs="adm"', '광고 보고 한 번 더') : ''}<button class="btn-sub" type="button" data-cs="dex">진로 도감 ${Object.keys(S.cs.done).length}/${JOBS.length}</button></div>`;
+      `<div class="cs-list">` + L.map((x, i) => csRowHTML(x, i, left)).join('') + `</div><div class="btn-row">${!left && adxCan('cs') ? adxBtn('data-cs="adm"', '광고 보고 한 번 더') : ''}<button class="btn-sub" type="button" data-cs="dex">진로 도감 ${Object.keys(S.cs.done).length}/${JOBS.length}</button></div>`;
   }
   const STAT_NAME = ab => ABIL[ab];
   function csClick(e) {

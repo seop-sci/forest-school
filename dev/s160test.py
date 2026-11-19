@@ -56,10 +56,10 @@ async def main():
           let sc = null; for (let el = b; el && el !== document.body; el = el.parentElement) { if (el.scrollHeight > el.clientHeight + 40 && getComputedStyle(el).overflowY !== 'visible') { sc = el; break; } }
           if (!sc) { const a = []; for (let el = b; el; el = el.parentElement) a.push([el.id || el.className, el.scrollHeight, el.clientHeight, getComputedStyle(el).overflowY]); return ['no scroller', S.roster.list.length, a]; }
           sc.scrollTop = 300; const y0 = sc.scrollTop; const chip = [...document.querySelectorAll('#csBody .cs-chip')].find(e => e.getBoundingClientRect().top > 200);
-          F.rt4.csLastView = 'x'; chip.click(); const yNo = sc.scrollTop; sc.scrollTop = 300; F.rt4.csLastView = 'list'; const chip2 = [...document.querySelectorAll('#csBody .cs-chip')].find(e => e.getBoundingClientRect().top > 200); chip2.click(); const y1 = sc.scrollTop; F.renderCounsel(); const y2 = sc.scrollTop;
+          const keepNode = document.querySelector('#csBody .cs-row'); F.rt4.csLastView = 'x'; chip.click(); const yNo = sc.scrollTop; const same = document.querySelector('#csBody .cs-row') === keepNode || chip.closest('.cs-row') === null; sc.scrollTop = 300; F.rt4.csLastView = 'list'; const chip2 = [...document.querySelectorAll('#csBody .cs-chip')].find(e => e.getBoundingClientRect().top > 200); chip2.click(); const y1 = sc.scrollTop; F.renderCounsel(); const y2 = sc.scrollTop;
           F.rt4.modalOpen = null; document.querySelector('#mCounsel').hidden = true; F.openCounsel(); const y3 = sc.scrollTop;
-          return [y0, y1, y2, y3, yNo];""")
-        c.ok(len(r) == 5 and r[0] > 0 and r[1] == r[0] and r[2] == r[0], f'진로 상담 스크롤 {r}')
+          return [y0, y1, y2, y3, yNo, same, document.querySelectorAll('#csBody .cs-chip.on').length];""")
+        c.ok(len(r) == 7 and r[0] > 0 and abs(r[1] - r[0]) < 40 and abs(r[2] - r[1]) < 1 and abs(r[4] - r[0]) < 40 and r[5], f'진로 상담 스크롤(그 줄 높이만큼만 달라져요) {r}')
         c.ok(not errs, f'오류 {errs[:2]}')
         await ctx.close()
 asyncio.run(main())
