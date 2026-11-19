@@ -635,11 +635,13 @@
     save(); renderHUD();
   }
 
+  // 5.1.1.2 woodani 제보: 소풍 간 친구(지도에서 숨김)에게 '!' 말풍선이 붙어 그림 없이 '!'만 돌아다녔어요
+  const kidSeen = k => !!k && !!k.g && !k.gone && k.g.style.display !== 'none';
   function updateTalk(dt) {
     const T = rt.talk;
     if (T && kidsAway()) { endTalk(); return; }   // 3.1.1 woodani 제보: 학생은 안 보이는데 '!' 말풍선만 떠 있었어요
     if (T) {
-      if (T.k.g.isConnected && rt.kids.includes(T.k) && !T.k.board) {
+      if (T.k.g.isConnected && rt.kids.includes(T.k) && !T.k.board && kidSeen(T.k)) {
         T.age += dt;
         if (T.age > TALK.life) endTalk();
         else T.g.setAttribute('transform', `translate(${T.k.x.toFixed(1)} ${(T.k.y - 15).toFixed(1)})`);
@@ -650,7 +652,7 @@
     rt.talkT -= dt;
     if (rt.talkT > 0) return;
     rt.talkT = rand(TALK.every[0], TALK.every[1]);
-    const ks = rt.kids.filter(k => !k.board && !k.hold && k.ang === undefined);
+    const ks = rt.kids.filter(k => !k.board && !k.hold && k.ang === undefined && kidSeen(k));
     if (ks.length) startTalk(ks[Math.floor(Math.random() * ks.length)]);
   }
   function startTalk(k) {

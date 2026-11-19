@@ -738,7 +738,7 @@
     if (ok) for (const X of SIDE) if (sideCan(X)) want[X.id] = X;
     $$('#map .sd-bub').forEach(b => { const X = want[b.dataset.side]; if (!X || !b.isConnected) b.remove(); else delete want[b.dataset.side]; });
     for (const X of Object.values(want)) {
-      const tea = !!TEA[X.who], host = tea ? $('#m-' + X.who) : (rt.kids.find(k => k.sp === X.who && k.g && k.g.isConnected && !k.gone) || {}).g;
+      const tea = !!TEA[X.who], host = tea ? $('#m-' + X.who) : (rt.kids.find(k => k.sp === X.who && k.g && k.g.isConnected && kidSeen(k)) || {}).g;
       if (!host || (tea && getComputedStyle(host).display === 'none')) continue;
       // 인물 그림마다 크기 배율이 달라서, 그 그림의 위쪽 끝과 배율을 재서 지도에서 늘 같은 크기(지름 20)로 머리 위에 띄워요
       let sc = 1, top = -24; try { const m = host.getCTM(), m0 = $('#map').getCTM(); sc = (m && m0 && m0.a ? m.a / m0.a : 1) || 1; top = host.getBBox().y; } catch (e) { /* 못 재면 기본값 */ }
