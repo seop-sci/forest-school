@@ -2663,7 +2663,7 @@ html.hud-art .tier-dots .td.on{background:#E8A23E;color:#fff;border-color:#B8692
 .gd-head{background-color:#E3EFC9}
 .gd-head.noimg{height:58px}.gd-head.noimg b{right:0;width:100%}
 .gd-body{max-height:min(62vh,560px);overflow-y:auto;padding:0 12px}
-.overlay.center > .gd-modal{display:flex;flex-direction:column;overflow:hidden}.gd-modal > .gd-head{flex:none}.gd-modal > .gd-body{flex:1 1 auto;min-height:0;max-height:none}.gd-modal > .btn-row{flex:none;margin-top:10px}.gd-modal #gdClose{border:2px solid var(--line);font-weight:800}   /* 5.1.1.3 woodani 제보: 화면이 짧으면 닫기 단추가 창 아래에 잘렸어요. 밭 칸만 줄어들어 밀리고 닫기는 늘 보여요 */
+.overlay.center > .gd-modal{display:flex;flex-direction:column;overflow:hidden}.gd-modal > .gd-head{flex:none}.gd-modal > .gd-body{flex:1 1 auto;min-height:0;max-height:none}.gd-head{position:relative}.gd-x{position:absolute;top:8px;right:8px;z-index:3;width:38px;height:38px;border-radius:50%;border:2px solid rgba(60,40,10,.25);background:rgba(255,250,236,.92);color:#4A3517;display:grid;place-items:center;cursor:pointer;box-shadow:0 2px 6px rgba(0,0,0,.18)}   /* 5.1.1.3 woodani 제보: 화면이 짧으면 닫기 단추가 창 아래에 잘렸어요. 닫기는 머리 그림 위 X로, 밭 칸만 줄어들어 밀려요 */
 .gd-plots{display:grid;grid-template-columns:repeat(auto-fit,minmax(90px,1fr));gap:6px;margin-top:8px}
 .gd-plot{display:grid;justify-items:center;gap:3px;padding:6px 4px;border-radius:12px;background:rgba(139,94,52,.08);border:1.5px solid var(--line);font-size:11.5px;text-align:center;min-width:0}
 .gd-plot.ready{border-color:#6BA23A;background:rgba(107,162,58,.12)}.gd-plot.pick{border-color:#E2A21C}
@@ -5013,7 +5013,7 @@ body.mg-on .toast[hidden]{display:none}
 <div class="overlay center" id="mGd" hidden>
   <div class="backdrop" data-cm="mGd"></div>
   <section class="modal lab-modal gd-modal" role="dialog" aria-modal="true" aria-labelledby="gdTitle">
-    <div class="lab-head gd-head" id="gdHead"><b id="gdTitle">학교 텃밭</b></div>
+    <div class="lab-head gd-head" id="gdHead"><b id="gdTitle">학교 텃밭</b><button class="gd-x" type="button" id="gdClose" data-cm="mGd" data-cm-tap aria-label="닫기"><svg viewBox="0 0 24 24" width="18" height="18" aria-hidden="true"><path d="M6 6l12 12M18 6L6 18" fill="none" stroke="currentColor" stroke-width="2.6" stroke-linecap="round"/></svg></button></div><!-- 5.1.1.3 woodani: 닫기는 위 오른쪽 X로(아래 닫기 단추가 화면을 차지해서) -->
     <div class="gd-body">
       <div class="gd-bulk" id="gdBulk"></div><!-- 3.3.2 모두 심기, 모두 거두기, 모두 물 주기 -->
       <div class="gd-plots" id="gdPlots"></div>
@@ -5023,7 +5023,6 @@ body.mg-on .toast[hidden]{display:none}
       <div class="gd-today" id="gdToday"></div>
       <div class="gd-menus" id="gdMenus"></div>
     </div>
-    <div class="btn-row" style="padding:0 16px"><button class="btn-sub" type="button" id="gdClose" data-cm="mGd" data-cm-tap>닫기</button></div>
   </section>
 </div>
 
@@ -12950,10 +12949,12 @@ body.mg-on .toast[hidden]{display:none}
     const now = gameNow(), m = decoMap();
     if (S.bx.m !== m) { S.bx.m = m; S.bx.sp = []; }
     if (!S.bx.next) S.bx.next = now;
+    if (bxCount() < 2 && !S.bx.sp.length && S.bx.next > now) S.bx.next = now;   // 5.1.1.3 woodani: 처음 두 종(퀘스트 6-27)은 2시간을 기다리지 않고 바로 다음 생물이 나와요
     for (let k = 0; k < 40 && S.bx.next <= now; k++) {
       if (S.bx.sp.length >= BX.max) { S.bx.next = now + BX.every; break; }
       const free = L.map((_, i) => i).filter(i => !S.bx.sp.some(x => x.i === i));
-      const i = free[Math.floor(Math.random() * free.length)], b = bxPick(S.bx.next, L[i][2]);
+      const i = free[Math.floor(Math.random() * free.length)]; let b = bxPick(S.bx.next, L[i][2]);
+      for (let r = 0; r < 8 && b && bxCount() < 2 && (S.bx.got[b.id] || S.bx.sp.some(x => x.id === b.id)); r++) b = bxPick(S.bx.next, L[i][2]);   // 처음 두 종은 아직 못 본 생물로
       if (b) S.bx.sp.push({ i, id: b.id, t: S.bx.next });
       S.bx.next += BX.every;
     }

@@ -45,7 +45,7 @@ async def main():
           S.budget = hi; const n1 = F.upPlan().ks.length; F.upRender(true); return { n0, n1, hid: document.querySelector('#upChip').hidden, t: document.querySelector('#upChip').textContent };""")
         c.ok(r['n1'] == 1 and not r['hid'] and '1채' in r['t'], f'한 채만 올릴 수 있어도 칩이 떠요 {r}')
         # 5.1.0.1 주간 상자 보상 그림: 정수와 단축권이 도시락(🍱)으로 나오지 않아요
-        r = await ev("""S.tier = 5; S.gold = 999; S.wk.mp = 1e6; S.wk.got = S.wk.got.map(() => false); document.querySelectorAll('.overlay').forEach(o => o.hidden = true); F.rt4.modalOpen = null; F.rt4.modalQueue.length = 0;
+        r = await ev("""S.tier = 5; S.gold = 999; S.wk.pts = 1e6; S.wk.got = S.wk.got.map(() => false); document.querySelectorAll('.overlay').forEach(o => o.hidden = true); F.rt4.modalOpen = null; F.rt4.modalQueue.length = 0;
           F.claimBox(0); return [...document.querySelectorAll('#rwList li')].map(li => [li.querySelector('.rw-ic').innerHTML.includes('🍱'), li.textContent]);""")
         c.ok(len(r) >= 2 and not any(x[0] and ('정수' in x[1] or '단축권' in x[1]) for x in r), f'주간 상자 그림 {r}')
         # 5.1.1 진로 상담: 직업 카드를 눌러도 스크롤 자리를 지켜요
@@ -71,12 +71,17 @@ async def main():
         r = await ev("""const q = F.MAIN.find(x => F.hardQ(x)); S.q.m = F.MAIN.indexOf(q); S.q.mid = q.id; S.st.gold = 0; F.rt4.qKey = ''; F.renderAffordance(); const g0 = document.querySelector('#qbGold').innerHTML;
           S.st.gold = 999; F.rt4.qKey = ''; F.renderAffordance(); const g1 = document.querySelector('#qbGold').innerHTML; return [g0.includes('ic_essence') || g0.includes('tic'), g1.includes('tic'), !document.querySelector('#qbGold').hidden];""")
         c.ok(r == [False, True, True], f'어려운 퀘스트 보상 그림 {r}')
+        # 5.1.1.3 생물 처음 두 종은 2시간을 기다리지 않고 바로 이어서 나와요(퀘스트 6-27)
+        r = await ev("""S.tier = 1; S.tg = 0; F.setTab('school'); S.bx.got = {}; S.bx.sp = []; S.bx.next = 0; S.bx.m = '';
+          const out = []; for (let k = 0; k < 3; k++) { F.bxSync(); out.push(S.bx.sp.length); if (S.bx.sp.length) F.bxTap(S.bx.sp[0].i); }
+          return [out, Object.keys(S.bx.got).length];""")
+        c.ok(r == [[1, 1, 0], 2], f'생물 처음 두 종 {r}')
         # 5.1.1.3 학교 텃밭 닫기 단추가 창 안에 보여요(창은 화면보다 길지 않게)
         await pg.set_viewport_size({'width': 360, 'height': 520})
         r = await ev("""document.querySelectorAll('.overlay').forEach(o => o.hidden = true); F.rt4.modalOpen = null; F.rt4.modalQueue.length = 0; F.openGd();
           const m = document.querySelector('#mGd .modal'), c = document.querySelector('#gdClose').getBoundingClientRect(), a = m.getBoundingClientRect();
-          return [c.bottom <= a.bottom + 1, c.bottom <= innerHeight, m.scrollHeight <= m.clientHeight + 1];""")
-        c.ok(r == [True, True, True], f'텃밭 닫기 {r}')
+          return [c.top >= a.top - 1 && c.right <= a.right + 1, c.top < a.top + 60, m.scrollHeight <= m.clientHeight + 1];""")
+        c.ok(r == [True, True, True], f'텃밭 닫기 X {r}')
         await pg.set_viewport_size({'width': 390, 'height': 844})
         c.ok(not errs, f'오류 {errs[:2]}')
         await ctx.close()
