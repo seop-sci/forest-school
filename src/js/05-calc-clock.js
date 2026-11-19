@@ -7,7 +7,7 @@
   // 친구 성장 쪽지 고르기: 전학생을 다 만났거나, 이미 쪽지를 받아 키우기 시작한 학교(2.0.0에 전학생이 12종으로 늘기 전에 6종을 다 만난 학교)
   const growOn = () => S.p.species >= ncMax() || (S.p.ticket || 0) > 0 || nlSum() > 0;
   const legacyMult = () => Math.pow(1.3, S.p.perk.schol) * (1 + 0.05 * S.p.species + 0.02 * nlSum()) * Math.pow(2, S.fp.schol);
-  const tuitionMult = () => (1 + 0.2 * S.f.cafeteria) * (1 + 0.15 * S.t.squirrel) * (1 + FAC.store.per / 100 * (S.f.store || 0)) * (1 + FAC.dorm.per / 100 * (S.f.dorm || 0)) * (1 + FAC.union.per / 100 * (S.f.union || 0)) * (1 + FAC.institute.per / 100 * (S.f.institute || 0)) * (1 + FAC.gradhall.per / 100 * (S.f.gradhall || 0)) * rtClassMul() * deptMult() * legacyMult() * setBonusMult() * tripMult() * clubTuitionMult() * elMult('tuition') * acMult() * snMult() * gdMult() * freshMult();   // 2.2.0 오늘의 급식, 4.0.0 새내기 장학금
+  const tuitionMult = () => (1 + 0.2 * S.f.cafeteria) * (1 + 0.15 * S.t.squirrel) * (1 + FAC.store.per / 100 * (S.f.store || 0)) * (1 + FAC.dorm.per / 100 * (S.f.dorm || 0)) * (1 + FAC.union.per / 100 * (S.f.union || 0)) * (1 + FAC.institute.per / 100 * (S.f.institute || 0)) * (1 + FAC.gradhall.per / 100 * (S.f.gradhall || 0)) * rtClassMul() * taMult() * deptMult() * legacyMult() * setBonusMult() * tripMult() * clubTuitionMult() * elMult('tuition') * acMult() * snMult() * gdMult() * freshMult();   // 2.2.0 오늘의 급식, 4.0.0 새내기 장학금
   // 4.0.0 새내기 장학금(woodani 결정 2026-11-11: 대학교 1학년이 다른 학년의 두 배쯤 걸려서 줄여요): 대학교 1학년 동안만 수업료에 곱해요. 숫자는 bal400으로 잰 제안값
   const UNI_FRESH = { mult: 2.5 };
   const freshMult = () => (S && S.tier === 4 && S.tg === 0) ? UNI_FRESH.mult : 1;
