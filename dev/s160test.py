@@ -44,6 +44,10 @@ async def main():
           let lo = 0, hi = 1e300; for (let k = 0; k < 2000; k++) { const m = (lo + hi) / 2; S.budget = m; if (F.upPlan().ks.length >= 1) hi = m; else lo = m; }
           S.budget = hi; const n1 = F.upPlan().ks.length; F.upRender(true); return { n0, n1, hid: document.querySelector('#upChip').hidden, t: document.querySelector('#upChip').textContent };""")
         c.ok(r['n1'] == 1 and not r['hid'] and '1채' in r['t'], f'한 채만 올릴 수 있어도 칩이 떠요 {r}')
+        # 5.1.0.1 주간 상자 보상 그림: 정수와 단축권이 도시락(🍱)으로 나오지 않아요
+        r = await ev("""S.tier = 5; S.gold = 999; S.wk.mp = 1e6; S.wk.got = S.wk.got.map(() => false); document.querySelectorAll('.overlay').forEach(o => o.hidden = true); F.rt4.modalOpen = null; F.rt4.modalQueue.length = 0;
+          F.claimBox(0); return [...document.querySelectorAll('#rwList li')].map(li => [li.querySelector('.rw-ic').innerHTML.includes('🍱'), li.textContent]);""")
+        c.ok(len(r) >= 2 and not any(x[0] and ('정수' in x[1] or '단축권' in x[1]) for x in r), f'주간 상자 그림 {r}')
         c.ok(not errs, f'오류 {errs[:2]}')
         await ctx.close()
 asyncio.run(main())

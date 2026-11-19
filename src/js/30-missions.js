@@ -253,17 +253,17 @@
     const got = [];
     // 1.4.0: 상자마다 도토리도 수업료 몇 분치(min)로 넣어요. 학교급이 올라도 알맞은 양이 나와요
     if (B.min) { const v = Math.max(10, nice(rate() * 60 * B.min)); S.budget += v; earn(v); got.push(`도토리 +${fmt(v)}`); }
-    if (B.gold) { if (i === MP_BOX.length - 1) { addGold(B.gold); got.push(`황금 도토리 +${B.gold}`); } else got.push(goldOr(B.gold).t); }   // 4.2.0 60개 뒤에는 마지막 상자만 황금
+    if (B.gold) { if (i === MP_BOX.length - 1) { addGold(B.gold); got.push(`황금 도토리 +${B.gold}`); } else { const g = goldOr(B.gold); if (g) got.push(g); } }   // 4.2.0 60개 뒤에는 마지막 상자만 황금
     if (B.dip) { addDip(B.dip); got.push(`수료증 +${B.dip}장`); }
     if (B.feast) { useBooster('feast'); got.push('특식 데이 10분'); }
-    if (i === MP_BOX.length - 1) { const it = mgAddUp(1); if (it) got.push(it.t); }   // 1.8.0: 마지막 주간 상자(3.0.0 생산기가 모두 최고면 정수)
-    { const tk = tkGive('wk'); if (tk) got.push(tk.t); }   // 2.1.1 단축권
+    if (i === MP_BOX.length - 1) { const it = mgAddUp(1); if (it) got.push(it); }   // 1.8.0: 마지막 주간 상자(3.0.0 생산기가 모두 최고면 정수)
+    { const tk = tkGive('wk'); if (tk) got.push(tk); }   // 2.1.1 단축권
     if (B.crown) {
       if (!S.cos.own.includes('hat:crown')) { S.cos.own.push('hat:crown'); S.cos.hat = 'crown'; applyCos(); got.push('금빛 왕관 (학생들이 바로 썼어요!)'); }
       else { addGold(1); got.push('황금 도토리 +1 더'); }
     }
     sfx('quest'); buzz(20);
-    showReward({ title: `${i + 1}번째 주간 상자를 열었어요!`, items: got.map(t => ({ ic: /황금/.test(t) ? 'gold' : /^도토리/.test(t) ? 'acorn' : /수료증/.test(t) ? 'dip' : /왕관/.test(t) ? '👑' : '🍱', t })) });
+    showReward({ title: `${i + 1}번째 주간 상자를 열었어요!`, items: got.map(t => typeof t === 'object' ? t : ({ ic: /황금/.test(t) ? 'gold' : /^도토리/.test(t) ? 'acorn' : /수료증/.test(t) ? 'dip' : /왕관/.test(t) ? '👑' : /정수/.test(t) ? 'ess' : '🍱', t })) });   // 5.1.0.1 woodani 제보: 정수와 단축권이 도시락 그림으로 나왔어요. 정수, 단축권, 생산기 조각은 주는 곳의 그림 그대로
     save(); renderMissions(); renderHUD(); updateQuestDot();
   }
   function renderWeek() {
