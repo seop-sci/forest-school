@@ -213,11 +213,12 @@
       if (roof) roof.style.display = t ? '' : 'none';
       if (!t) continue;
       // 1.6.0: 겨울 테마 운동장은 트랙을 하늘색으로 칠하거나 고드름을 달지 않아요(얼음판처럼 보여 어색해요). 사도 운동장은 원래 모습이에요
-      if (slot === 'playground' && t.id === 'winter') { if (roof) roof.style.display = 'none'; continue; }
+      const thr = !!thrKey(slot);   // 5.1.1.4 새로 그린 테마 지붕: 처마 띠는 끄고(지붕 그림에 장식이 있어요), 겨울 운동장도 켜요
+      if (slot === 'playground' && t.id === 'winter' && !thr) { if (roof) roof.style.display = 'none'; continue; }
       if (roof) $(`#rt-${slot} feFlood`).setAttribute('flood-color', slot === 'playground' && S.tier >= 1 ? t.play['--track'] : t.bld['--roof']);
       const vars = slot === 'library' ? t.lib : slot === 'playground' ? Object.assign({}, t.bld, t.play) : t.bld;
       for (const [k, v] of Object.entries(vars)) g.style.setProperty(k, v);
-      deco.innerHTML = thMotif(t, ...thEaves(slot));
+      deco.innerHTML = thr ? '' : thMotif(t, ...thEaves(slot));
     }
     rt.thBonus = thSetsDone();
     renderNight(true);   // 2.1.0 밤 모드

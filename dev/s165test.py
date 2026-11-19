@@ -1,4 +1,4 @@
-# 5.1.1.4 시험: 연구 트리 나무 화면과 랭킹 네 칸
+# 5.1.1.4 시험: 연구 트리 나무 화면과 랭킹 네 칸, 테마마다 새로 그린 지붕과 트랙(thr_)
 # 연구 트리 탭이 가지 5개 × 칸 4개 나무로 보이고, 칸을 누르면 아래 칸 창이 바뀌고, '연구하기'로 연구가 시작되고 끝나면 칸이 차요.
 # 랭킹은 리그, 학교, 대결, 탐험 네 칸이고 리그 안에 이번 주와 시즌. 360px과 390px, 밝은 화면과 어두운 화면에서 넘치지 않아요
 # 쓰는 법: python3 wrap.py && python3 s165test.py   (마지막 줄이 PASS면 통과)
@@ -77,6 +77,37 @@ async def main():
             c.ok(r3['wrap'] and not r3['over'], f'랭킹 칸이 넘쳐요: {r3}')
             c.ok(not errs, f'오류 {errs[:2]}')
             await ctx.close()
+        # 테마 지붕: 유치원 교실 봄은 새 그림을 색 곱하기 없이, 처마 띠 없음. 그림이 없는 급식실은 지금 방식 그대로
+        for w, th in ((390, 'light'),):
+            ctx, pg, errs = await ctxpage(b, w, 800, th, base())
+            await pg.wait_for_timeout(1200)
+            await pg.evaluate(CLEAN)
+            r = await pg.evaluate("""(async()=>{ const F = window.__forest, S = F.S, sl = ms => new Promise(r => setTimeout(r, ms)), out = {};
+              const ro = (k, want) => { const im = document.querySelector('#b-' + k + ' .roofimg'); return { href: (im.getAttribute('href') || '') === F.IMG170(want), want, f: im.getAttribute('filter') || '', on: im.style.display !== 'none', deco: document.querySelector('#b-' + k + ' .th-deco').innerHTML.length }; };
+              Object.assign(S.cos.th, { classroom: 'spring', cafeteria: 'spring' }); F.applyThemes(); await sl(200);
+              out.k = F.thrKey('classroom'); out.cl = ro('classroom', out.k); out.cfk = F.thrKey('cafeteria'); out.cf = ro('cafeteria', F.roofArtKey('cafeteria'));
+              S.cos.th.classroom = 'winter'; F.applyThemes(); await sl(200); out.w = ro('classroom', F.thrKey('classroom'));
+              S.cos.th.classroom = ''; F.applyThemes(); await sl(200); out.off = ro('classroom', '');
+              return out; })()""")
+            print('지붕', r)
+            c.ok(r['k'] == 'thr_classroom_on_spring' and r['cl']['href'] and r['cl']['f'] == 'none' and r['cl']['on'] and r['cl']['deco'] == 0, f'새 테마 지붕: {r["cl"]}')
+            c.ok(r['cfk'] == '' and r['cf']['want'] == 'roof_cafeteria' and r['cf']['href'] and 'rt-cafeteria' in r['cf']['f'] and r['cf']['deco'] > 0, f'그림 없는 건물은 지금 방식: {r["cf"]}')
+            c.ok(r['w']['want'] == 'thr_classroom_on_winter' and r['w']['href'] and r['w']['f'] == 'none', f'겨울 새 지붕: {r["w"]}')
+            c.ok(not r['off']['on'], f'테마를 빼면 지붕 조각을 숨겨요: {r["off"]}')
+            c.ok(not errs, f'오류 {errs[:2]}')
+            await ctx.close()
+        # 겨울 운동장: 새 트랙이 있으면 겨울에도 켜요(중학교 운동장 3단계)
+        ctx, pg, errs = await ctxpage(b, 390, 800, 'light', base(tier=2))
+        await pg.wait_for_timeout(1200)
+        await pg.evaluate(CLEAN)
+        r = await pg.evaluate("""(async()=>{ const F = window.__forest, S = F.S, sl = ms => new Promise(r => setTimeout(r, ms)), out = {};
+          S.bs = Object.assign(S.bs || {}, { playground: 2 }); S.cos.th.playground = 'winter'; F.applyThemes(); await sl(200);
+          const im = document.querySelector('#b-playground .roofimg'); out.b = F.bldImg('playground'); out.k = F.thrKey('playground'); out.href = (im.getAttribute('href') || '') === F.IMG170(out.k); out.on = im.style.display !== 'none';
+          return out; })()""")
+        print('운동장', r)
+        c.ok(r['k'] == 'thr_field_s3_winter' and r['href'] and r['on'], f'겨울 운동장 새 트랙: {r}')
+        c.ok(not errs, f'오류 {errs[:2]}')
+        await ctx.close()
         await b.close()
     c.done()
 asyncio.run(main())

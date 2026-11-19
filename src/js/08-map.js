@@ -178,14 +178,19 @@
     const wk = rk + '_winter';
     return has170(wk) ? wk : '';
   };
+  // 5.1.1.4 woodani 결정(2026-11-19): 테마마다 새로 그린 지붕과 트랙(작업지시서 95, 97, 98, thr_<건물 그림>_<테마>). 있으면 색을 곱하지 않고 그대로 겹쳐요. 없으면 지금 방식(roof 조각에 테마 색)
+  const thrKey = k => {
+    const t = S && S.cos && S.cos.th && THEME[thOn()[k]], b = bldImg(k); if (!t || /_lux$/.test(b)) return '';
+    const key = `thr_${b.replace(/^bld_/, '')}_${t.id}`; return has170(key) ? key : '';
+  };
   const oakKey = () => { const id = S && S.cos && S.cos.th && thOn().bg; return id && has170('oak_' + id) ? 'oak_' + id : 'oak'; };
   function setBldArt(k) {
     const g = $('#b-' + k); if (!g || !geo().lot[k]) return;
     const key = seasonKey(bldImg(k)), G = geo(), [bx, by, bw, tf] = lotRect(G.lot[k], key);
     $$('.built .bimg, .built .roofimg', g).forEach(im => setA(im, { x: bx - bw / 2, y: by - bw / 2, width: bw, height: bw, transform: tf }));
     $('.built .bimg', g).setAttribute('href', IMG170(key));
-    const rk = roofArtKey(k);
-    setA($('.roofimg', g), { href: rk ? IMG170(rk) : '', filter: `url(#rt-${k})` });
+    const tk = thrKey(k), rk = tk || roofArtKey(k);
+    setA($('.roofimg', g), { href: rk ? IMG170(rk) : '', filter: tk ? 'none' : `url(#rt-${k})` });
   }
   // 테마를 바꾸면 건물, 공사 자리, 다음 학교급 자리, 참나무 그림을 다시 골라요
   function setSeasonArt() {

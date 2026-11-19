@@ -6712,7 +6712,23 @@ body.mg-on .toast[hidden]{display:none}
 "st_who_stork":"img/a/st_who_stork-750b838776.webp",
 "st_who_turtle":"img/a/st_who_turtle-72e5a17082.webp",
 "st_who_weasel":"img/a/st_who_weasel-b85fb54b5a.webp",
-"tea_crane":"img/a/tea_crane-57a704bd6b.webp"
+"tea_crane":"img/a/tea_crane-57a704bd6b.webp",
+"thr_classroom_on_autumn":"img/a/thr_classroom_on_autumn-54423aaf53.webp",
+"thr_classroom_on_retro":"img/a/thr_classroom_on_retro-bc42391205.webp",
+"thr_classroom_on_space":"img/a/thr_classroom_on_space-ffb8bf5166.webp",
+"thr_classroom_on_spring":"img/a/thr_classroom_on_spring-8731385d5c.webp",
+"thr_classroom_on_summer":"img/a/thr_classroom_on_summer-3bef85ce22.webp",
+"thr_classroom_on_winter":"img/a/thr_classroom_on_winter-ff279e28de.webp",
+"thr_classroom_on_xmas":"img/a/thr_classroom_on_xmas-fe6453006b.webp",
+"thr_classroom_s5_spring":"img/a/thr_classroom_s5_spring-91d543d46f.webp",
+"thr_classroom_s5_xmas":"img/a/thr_classroom_s5_xmas-5acf36ab97.webp",
+"thr_field_s3_autumn":"img/a/thr_field_s3_autumn-749b71d9b1.webp",
+"thr_field_s3_retro":"img/a/thr_field_s3_retro-63995680d7.webp",
+"thr_field_s3_space":"img/a/thr_field_s3_space-2838a06c2e.webp",
+"thr_field_s3_spring":"img/a/thr_field_s3_spring-1970e189e5.webp",
+"thr_field_s3_summer":"img/a/thr_field_s3_summer-761042da48.webp",
+"thr_field_s3_winter":"img/a/thr_field_s3_winter-dcb49229df.webp",
+"thr_field_s3_xmas":"img/a/thr_field_s3_xmas-41183e6547.webp"
 };</script>
 <!-- FS_IMG400:END -->
 <!-- FS_IMG430:BEGIN -->
@@ -9473,18 +9489,19 @@ body.mg-on .toast[hidden]{display:none}
   }
   /* 5.1.1.4 woodani 결정(2026-11-19): 연구 트리를 목록 대신 한 그루 나무로. 밑동에서 가지 다섯 개가 위로 뻗고, 가지마다 칸이 아래에서 위로 이어져요.
      칸 자리는 720x960 판 기준(그림 작업지시서 96의 rt_tree_bg와 같은 좌표). 칸을 누르면 아래 칸 창에 효과, 값, '연구하기'. 효과와 값은 그대로 */
-  const RT_X = [96, 228, 360, 492, 624], RT_Y = i => 800 - 150 * i, RT_W = 720, RT_H = 960;
+  const RT_PT = [[160, 141, 125, 109, 96], [260, 250, 242, 235, 228], [360, 360, 360, 360, 360], [460, 470, 478, 485, 492], [560, 579, 595, 611, 624]];   // 가지마다 줄 1~5의 x(작업지시서 96-2, 위로 갈수록 퍼지는 부채꼴)
+  const RT_X = (j, i) => RT_PT[j][i], RT_Y = i => 800 - 150 * i, RT_W = 720, RT_H = 960;
   const rtTop = () => RT5.max >= 5 ? 0 : RT_Y(RT5.max - 1) - 130;   // 칸이 네 줄이면 빈 위쪽을 잘라요(다섯째 칸은 5.2.0 논문 심화 칸)
   function rtTreeSvg() {
     const bg = IMG('rt_tree_bg'), c = S.rt5.cur;
     let s = '';
     if (!bg) s += `<path d="M330 960 Q336 905 360 880 Q384 905 390 960 Z" fill="#9A6B43"/>`;
     RT5.list.forEach((D, j) => {
-      const x = RT_X[j], L = rtLv(D.k), top = RT_Y(RT5.max - 1), run = c && c.k === D.k;
+      const x = RT_X(j, 0), L = rtLv(D.k), run = c && c.k === D.k, seg = i => `M${RT_X(j, i - 1)} ${RT_Y(i - 1)} L${RT_X(j, i)} ${RT_Y(i)}`;
       const stem = `M360 885 C360 850 ${x} 860 ${x} ${RT_Y(0)}`;
-      if (!bg) s += `<path d="${stem} L${x} ${top}" stroke="#B98A5E" stroke-width="16" fill="none" stroke-linecap="round"/>`;
+      if (!bg) { s += `<path d="${stem}" stroke="#B98A5E" stroke-width="16" fill="none" stroke-linecap="round"/>`; for (let i = 1; i < RT5.max; i++) s += `<path d="${seg(i)}" stroke="#B98A5E" stroke-width="14" fill="none" stroke-linecap="round"/>`; }
       if (L > 0 || run) s += `<path d="${stem}" class="rt-done" fill="none"/>`;
-      for (let i = 1; i < RT5.max; i++) if (L > i || (L === i && run)) s += `<path d="M${x} ${RT_Y(i - 1)} L${x} ${RT_Y(i)}" class="rt-done${L === i ? ' rt-run' : ''}" fill="none"/>`;
+      for (let i = 1; i < RT5.max; i++) if (L > i || (L === i && run)) s += `<path d="${seg(i)}" class="rt-done${L === i ? ' rt-run' : ''}" fill="none"/>`;
     });
     return `<svg class="rt-lines" viewBox="0 ${rtTop()} ${RT_W} ${RT_H - rtTop()}" preserveAspectRatio="none" aria-hidden="true">${s}</svg>`;
   }
@@ -9497,10 +9514,10 @@ body.mg-on .toast[hidden]{display:none}
       for (let i = 0; i < RT5.max; i++) {
         const st = i < L ? 'done' : i === L && run ? 'run' : i === L && !D.lock ? 'next' : 'lock', sel = rt.rtSel === D.k && (i === Math.min(L, RT5.max - 1));
         const pop = st === 'done' && rt.rtPop && rt.rtPop.k === D.k && rt.rtPop.i === i;
-        nodes += `<button class="rt-node ${st}${sel ? ' sel' : ''}${pop ? ' pop' : ''}" type="button" data-rts="${D.k}" style="left:${(RT_X[j] / RT_W * 100).toFixed(2)}%;top:${((RT_Y(i) - rtTop()) / (RT_H - rtTop()) * 100).toFixed(2)}%" aria-label="${D.nm} ${i + 1}칸${st === 'done' ? ' 완성' : st === 'run' ? ' 연구 중' : st === 'lock' ? ' 잠김' : ''}">` +
+        nodes += `<button class="rt-node ${st}${sel ? ' sel' : ''}${pop ? ' pop' : ''}" type="button" data-rts="${D.k}" style="left:${(RT_X(j, i) / RT_W * 100).toFixed(2)}%;top:${((RT_Y(i) - rtTop()) / (RT_H - rtTop()) * 100).toFixed(2)}%" aria-label="${D.nm} ${i + 1}칸${st === 'done' ? ' 완성' : st === 'run' ? ' 연구 중' : st === 'lock' ? ' 잠김' : ''}">` +
           (u ? `<img src="${u}" alt="">` : `<b>${i + 1}</b>`) + (st === 'lock' ? '<i class="rt-lk">🔒</i>' : st === 'done' ? '<i class="rt-leaf"></i>' : '') + '</button>';
       }
-      nodes += `<span class="rt-nm" style="left:${(RT_X[j] / RT_W * 100).toFixed(2)}%">${D.nm}</span>`;
+      nodes += `<span class="rt-nm" style="left:${(RT_X(j, 0) / RT_W * 100).toFixed(2)}%">${D.nm}</span>`;
     });
     rt.rtPop = null;
     const D = RT5.list.find(x => x.k === rt.rtSel), L = rtLv(D.k), run = c && c.k === D.k, full = L >= RT5.max, k = rtCost(D.k);
@@ -10310,14 +10327,19 @@ body.mg-on .toast[hidden]{display:none}
     const wk = rk + '_winter';
     return has170(wk) ? wk : '';
   };
+  // 5.1.1.4 woodani 결정(2026-11-19): 테마마다 새로 그린 지붕과 트랙(작업지시서 95, 97, 98, thr_<건물 그림>_<테마>). 있으면 색을 곱하지 않고 그대로 겹쳐요. 없으면 지금 방식(roof 조각에 테마 색)
+  const thrKey = k => {
+    const t = S && S.cos && S.cos.th && THEME[thOn()[k]], b = bldImg(k); if (!t || /_lux$/.test(b)) return '';
+    const key = `thr_${b.replace(/^bld_/, '')}_${t.id}`; return has170(key) ? key : '';
+  };
   const oakKey = () => { const id = S && S.cos && S.cos.th && thOn().bg; return id && has170('oak_' + id) ? 'oak_' + id : 'oak'; };
   function setBldArt(k) {
     const g = $('#b-' + k); if (!g || !geo().lot[k]) return;
     const key = seasonKey(bldImg(k)), G = geo(), [bx, by, bw, tf] = lotRect(G.lot[k], key);
     $$('.built .bimg, .built .roofimg', g).forEach(im => setA(im, { x: bx - bw / 2, y: by - bw / 2, width: bw, height: bw, transform: tf }));
     $('.built .bimg', g).setAttribute('href', IMG170(key));
-    const rk = roofArtKey(k);
-    setA($('.roofimg', g), { href: rk ? IMG170(rk) : '', filter: `url(#rt-${k})` });
+    const tk = thrKey(k), rk = tk || roofArtKey(k);
+    setA($('.roofimg', g), { href: rk ? IMG170(rk) : '', filter: tk ? 'none' : `url(#rt-${k})` });
   }
   // 테마를 바꾸면 건물, 공사 자리, 다음 학교급 자리, 참나무 그림을 다시 골라요
   function setSeasonArt() {
@@ -16045,11 +16067,12 @@ body.mg-on .toast[hidden]{display:none}
       if (roof) roof.style.display = t ? '' : 'none';
       if (!t) continue;
       // 1.6.0: 겨울 테마 운동장은 트랙을 하늘색으로 칠하거나 고드름을 달지 않아요(얼음판처럼 보여 어색해요). 사도 운동장은 원래 모습이에요
-      if (slot === 'playground' && t.id === 'winter') { if (roof) roof.style.display = 'none'; continue; }
+      const thr = !!thrKey(slot);   // 5.1.1.4 새로 그린 테마 지붕: 처마 띠는 끄고(지붕 그림에 장식이 있어요), 겨울 운동장도 켜요
+      if (slot === 'playground' && t.id === 'winter' && !thr) { if (roof) roof.style.display = 'none'; continue; }
       if (roof) $(`#rt-${slot} feFlood`).setAttribute('flood-color', slot === 'playground' && S.tier >= 1 ? t.play['--track'] : t.bld['--roof']);
       const vars = slot === 'library' ? t.lib : slot === 'playground' ? Object.assign({}, t.bld, t.play) : t.bld;
       for (const [k, v] of Object.entries(vars)) g.style.setProperty(k, v);
-      deco.innerHTML = thMotif(t, ...thEaves(slot));
+      deco.innerHTML = thr ? '' : thMotif(t, ...thEaves(slot));
     }
     rt.thBonus = thSetsDone();
     renderNight(true);   // 2.1.0 밤 모드
@@ -29768,7 +29791,7 @@ body.mg-on .toast[hidden]{display:none}
     fmt, fmt2, graduate, promote, buyPerk, perkCost, perkMaxed, buyFundPerk, fpCost, claimMain, mainReady, curMain, qNo, earn, CFG, TEA, teaMaxed, PERKS, FPERKS, MAIN, finalYear, startTrip, claimTrip, TRIPS, yearLocked, endSports, rtSports: () => rt.sports, rtFest: () => rt.fest, facCap, addLeague, addMP, tutStart, endFest, claimBox, musicWant, askBox, festWait, setTab,
     RARE, modelOf, rareRoll, rareGot, showRareTalk, rareDexHTML, kidSVG, rosterKid, WX, wxOf, wxIs, rdMinNow, renderWeather, PL, plSync, plUnread, openPLetter, renderPLetter, RS, rsNum, rsSync, rsAdd, rsLabel, lookDoc, lookRead, lookPush, lookSet, openLook, MODEL_SCHOOL, joinRank, PS, PS_M, PS_SEASONS, psSeason, psOpen, psSync, psLv, psGot, psReward, psClaimAll, psClaimMission, psWatchAd, psClaimable, psStepReady, psExtraReady, psChooseFur, psFurImg, renderPass, setEvSeg, xtGot, achTitles,   // 2.1.3 숲속 패스
     MAP_OAK, oakArt, layoutOak, mapOak, oakAt, tapOak, dropSpot,
-    dexMeet, dexSync, dexPending, dexGift, renderDex, evCurrent, evNext, evUpcoming, evSync, evFix, evVal, EV_FALLBACK, EV_DECO, EV_HAT, COS, DECO_BY, decoOwn, perkRec, fpRec, BOOST_ALL, buyShop, pickShop, showNote, showOkOn, showWd, renderGradPanel, renderShop, renderDecoShop, EV_WEEKLY, EV_WEEK_BASE, weekMon, claimStamp, claimEvMission, claimEvBox, renderEvent, evMissions, evOk, evSkipped, EV_MONTHS, EV_MEASURE, tierMinutes, minAcorns, IMG, sanitize171, ACH, achSync, claimAch, setTitle, renderAch, setDexSeg, achClaimable, XT, xtAct, xtCost, xtLv, feastMins, libMult, propInstances, walkBuild, festItemSvg, guestArt, adErrText, googleErrText, openSheet, closeSheet, startFest, startSports, sanitize170, EV_STAMPS, EV_SPECIAL, EV_MONTHLY, EV_BOX, DEX_KEYS, DEX_REWARD, DEX_GUEST_KEYS, seasonKey, roofArtKey, oakKey, setSeasonArt, VP, vpLv, vpCost, vpMult, vpAct, renderVpCard, sportsPrize, festPrize, renderTeachers, buildTeacherCards, bldImg, roofKey, bldStage, mapKey, setMapArt, applyThemes, buyFacility, bldFx, setBldFx, mapHi, Live, liveApply, liveLoad, liveOff, LIVE_KEYS, EVC, NOTICES, openNotice, noticeAuto, noticeWant, ntUnread, startTrial, endTrial: () => rt.trial && (rt.trial.left = 0), spawnDeal, startVisit, IMG170, MG, mgCells, mgSetCells, mgTick, mgAddEnergy, mgAddUp, mgTapGen, mgDrop, mgSell, mgUpgrade, mgAddUp, mgUpSwap, mgGensMax, MG_UP_ESS, mgClaimOrder, mgSwapOrder, mgOrderOk, mgFillOrders, mgOpen, mgClose, mgRenderAll, mgSpawnLevel, mgNearestEmpty, mgEmptyBoard, mgOrderReward, mgUI, sanitize180, mgWatchAd, mgNewOrder, mgHintPick, mgShowHint, mgClearHint, mgTouch, mgOrderGuide, mgDexN, mgDexCan, mgDexClaim, mgOpenDex, MG_DEX, MG_DEX_MS, mgDexEss, mgDexEssCan, mgDexEssN, mgDexMsCan, mgDexMsClaim, MGB, mgBuyBoost, mgBstLeft, mgOpenBoost, nice, claimMission, claimBonus, claimWeekMission, MP_BOX, swapDaily, repairMissions, MISSIONS, WMISSIONS, dmDay, wkWeek,   // 1.7.0 도감, 이벤트
+    dexMeet, dexSync, dexPending, dexGift, renderDex, evCurrent, evNext, evUpcoming, evSync, evFix, evVal, EV_FALLBACK, EV_DECO, EV_HAT, COS, DECO_BY, decoOwn, perkRec, fpRec, BOOST_ALL, buyShop, pickShop, showNote, showOkOn, showWd, renderGradPanel, renderShop, renderDecoShop, EV_WEEKLY, EV_WEEK_BASE, weekMon, claimStamp, claimEvMission, claimEvBox, renderEvent, evMissions, evOk, evSkipped, EV_MONTHS, EV_MEASURE, tierMinutes, minAcorns, IMG, sanitize171, ACH, achSync, claimAch, setTitle, renderAch, setDexSeg, achClaimable, XT, xtAct, xtCost, xtLv, feastMins, libMult, propInstances, walkBuild, festItemSvg, guestArt, adErrText, googleErrText, openSheet, closeSheet, startFest, startSports, sanitize170, EV_STAMPS, EV_SPECIAL, EV_MONTHLY, EV_BOX, DEX_KEYS, DEX_REWARD, DEX_GUEST_KEYS, seasonKey, roofArtKey, thrKey, oakKey, setSeasonArt, VP, vpLv, vpCost, vpMult, vpAct, renderVpCard, sportsPrize, festPrize, renderTeachers, buildTeacherCards, bldImg, roofKey, bldStage, mapKey, setMapArt, applyThemes, buyFacility, bldFx, setBldFx, mapHi, Live, liveApply, liveLoad, liveOff, LIVE_KEYS, EVC, NOTICES, openNotice, noticeAuto, noticeWant, ntUnread, startTrial, endTrial: () => rt.trial && (rt.trial.left = 0), spawnDeal, startVisit, IMG170, MG, mgCells, mgSetCells, mgTick, mgAddEnergy, mgAddUp, mgTapGen, mgDrop, mgSell, mgUpgrade, mgAddUp, mgUpSwap, mgGensMax, MG_UP_ESS, mgClaimOrder, mgSwapOrder, mgOrderOk, mgFillOrders, mgOpen, mgClose, mgRenderAll, mgSpawnLevel, mgNearestEmpty, mgEmptyBoard, mgOrderReward, mgUI, sanitize180, mgWatchAd, mgNewOrder, mgHintPick, mgShowHint, mgClearHint, mgTouch, mgOrderGuide, mgDexN, mgDexCan, mgDexClaim, mgOpenDex, MG_DEX, MG_DEX_MS, mgDexEss, mgDexEssCan, mgDexEssN, mgDexMsCan, mgDexMsClaim, MGB, mgBuyBoost, mgBstLeft, mgOpenBoost, nice, claimMission, claimBonus, claimWeekMission, MP_BOX, swapDaily, repairMissions, MISSIONS, WMISSIONS, dmDay, wkWeek,   // 1.7.0 도감, 이벤트
     PZ, PZ_SHAPES, pzFits, pzAnyFit, pzStuck, pzFullLines, pzPlace, pzFreshGame, pzStart, PZB, pzbCost, pzApplyBoost, pzBoostOpen, pzBoostGo, festGoldLeft, festGoldTake, claimSports, TR2, TR2_PL, openTr2, tr2Act, tr2Away, tr2Ready, tr2Rsv, tr2Tick, renderAlbum, FEST, FEST_IDS, festNight, festShown, festTimeLock, festOpen, startFest, openFest, endFest, renderStreet, pzFinish, pzLeft, pzCanAd, pzEssOf, pzMinOf, pzHelpSquirrel, pzHelpOwl, pzHelpBear, fillSubs, mapRoofTop, showAd, claimOfflineDouble, startBoost, tripAd, festFocus, festRange, visMap, renderMissions, pzHasHelp, pzRot, pzNewPiece, pzOpen, pzClose, pzGameOver, pzRenderAll, renderMini, addEss, ESHOP, SP_FUR, applyCos, essItem, pickEss, buyEss, renderEssShop, hatSVG, spFurImg, gameNow, gameToday, gameWeek, kstDay, setServerTime, SVR, dmDay, weekIdx, lgWeek, wkWeek, lgKey, pzDay, goldDay, boostLeft, dealLeft, canStamp };
   if (window.__FOREST_TEST) Object.assign(window.__forest, { uniTerm, utSync, tripUseTicket, readUseTicket, picnicUseTicket, buyDecoPieces, adGold, claimBonus, cloudPush, cloudClash, syncGet, revOf, deleteAccount, lookDel: () => lookDelNow(), lookSet, lookPush, leaveRank, sanitizeCg, freshCg });   // 시험 손잡이
   if (window.claude && window.claude.hot && window.claude.hot.snapshot) {
