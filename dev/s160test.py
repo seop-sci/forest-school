@@ -67,6 +67,17 @@ async def main():
           const tt = [...document.querySelectorAll('.toast, #toast, [class*=toast]')].map(e => e.textContent).join(' / ');
           return [ov.hidden, F.rt4.modalQueue.length, S.budget > b0, tt.includes('고마워해요'), JSON.stringify(F.rt4.batch), document.querySelector('#rwTitle').textContent, (F.rt4.toastQ || []).join('|'), (F.rt4.mdToasts || []).join('|')];""")
         c.ok(r[:4] == [True, 0, True, True], f'부탁 받기 알림 {r}')
+        # 5.1.1.2 조금 어려운 퀘스트 보상 표시: 황금을 넉넉히 모은 뒤에는 정수 그림과 정수 수
+        r = await ev("""const q = F.MAIN.find(x => F.hardQ(x)); S.q.m = F.MAIN.indexOf(q); S.q.mid = q.id; S.st.gold = 0; F.rt4.qKey = ''; F.renderAffordance(); const g0 = document.querySelector('#qbGold').innerHTML;
+          S.st.gold = 999; F.rt4.qKey = ''; F.renderAffordance(); const g1 = document.querySelector('#qbGold').innerHTML; return [g0.includes('ic_essence') || g0.includes('tic'), g1.includes('tic'), !document.querySelector('#qbGold').hidden];""")
+        c.ok(r == [False, True, True], f'어려운 퀘스트 보상 그림 {r}')
+        # 5.1.1.3 학교 텃밭 닫기 단추가 창 안에 보여요(창은 화면보다 길지 않게)
+        await pg.set_viewport_size({'width': 360, 'height': 520})
+        r = await ev("""document.querySelectorAll('.overlay').forEach(o => o.hidden = true); F.rt4.modalOpen = null; F.rt4.modalQueue.length = 0; F.openGd();
+          const m = document.querySelector('#mGd .modal'), c = document.querySelector('#gdClose').getBoundingClientRect(), a = m.getBoundingClientRect();
+          return [c.bottom <= a.bottom + 1, c.bottom <= innerHeight, m.scrollHeight <= m.clientHeight + 1];""")
+        c.ok(r == [True, True, True], f'텃밭 닫기 {r}')
+        await pg.set_viewport_size({'width': 390, 'height': 844})
         c.ok(not errs, f'오류 {errs[:2]}')
         await ctx.close()
 asyncio.run(main())

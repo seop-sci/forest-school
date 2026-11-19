@@ -259,7 +259,7 @@
     const cur = S.trip.cur, T = cur && TRIP[cur], back = tripBack();
     rt.tripView = cur ? (back ? 'back' : 'go') : 'idle';
     const ac = acornIcon(), di = dipIcon(), gi = `<svg viewBox="-8 -11 16 20" aria-hidden="true">${GOLD_ICON.slice(GOLD_ICON.indexOf('>') + 1, -6)}</svg>`;
-    const rw = (R, x) => `<span class="tr-rw">${ac}<b>${fmt(R.acorns * x)}</b></span><span class="tr-rw">${di}<b>${R.dip * x}</b></span>${R.gold ? `<span class="tr-rw">${gi}<b>${R.gold}</b></span>` : ''}`;
+    const rw = (R, x) => `<span class="tr-rw">${ac}<b>${fmt(R.acorns * x)}</b></span><span class="tr-rw">${di}<b>${R.dip * x}</b></span>${R.gold ? (goldRich() ? `<span class="tr-rw">${ESS_ICON()}<b>${R.gold * GOLD.essPer}</b></span>` : `<span class="tr-rw">${gi}<b>${R.gold}</b></span>`) : ''}`;
     let h = (IMG('trip_head') ? `<div class="tr-head" style="background-image:url('${blobUrl(IMG('trip_head'))}')" aria-hidden="true"></div>` : '') + (rt.tripGot ? `<p class="tr-got">${esc(rt.tripGot)}</p>` : '');   // 3.0.0 창 맨 위 그림
     if (!cur) {
       h += '<p class="tr-lead">돌아오면 도토리, 수료증, 그곳 기념품을 가져와요.</p><div class="tr-list">';
