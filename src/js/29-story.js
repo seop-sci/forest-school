@@ -748,8 +748,14 @@
       host.appendChild(g);
     }
   }
+  // 5.1.1.2 woodani 제보: 잎사귀가 건물 이름표나 학생 그림 아래에 깔리면(특히 체육 선생님) 건물 창이 열렸어요. 누른 자리 아래에 잎사귀가 있으면 잎사귀가 먼저예요
+  function sideBubAt(e) {
+    const b = e.target.closest && e.target.closest('.sd-bub'); if (b || e.type === 'keydown' || e.clientX == null || !document.elementsFromPoint) return b;
+    try { for (const el of document.elementsFromPoint(e.clientX, e.clientY)) { const x = el.closest && el.closest('.sd-bub'); if (x) return x; if (el.closest && el.closest('#fx .trial, #fx .talk, #fx .drop, #fx .visit')) return null; } } catch (err) { /* 못 찾으면 그대로 */ }
+    return null;
+  }
   function sideMapTap(e) {
-    const b = e.target.closest && e.target.closest('.sd-bub'); if (!b) return;
+    const b = sideBubAt(e); if (!b) return;
     if (e.type === 'keydown') { if (e.key !== 'Enter' && e.key !== ' ') return; e.preventDefault(); }
     e.stopPropagation();
     if (rt.paused || rt.modalOpen || festBusy() || rt.decoEdit || rt.st) return;
