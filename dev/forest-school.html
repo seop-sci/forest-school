@@ -6827,9 +6827,16 @@ body.mg-on .toast[hidden]{display:none}
 "chr_ta_lemur":"img/a/chr_ta_lemur-81a00ad01c.webp",
 "chr_ta_quokka":"img/a/chr_ta_quokka-bbbb3c6016.webp",
 "conf_bg":"img/a/conf_bg-ee1fd031c4.webp",
+"conf_med_1":"img/a/conf_med_1-1472cf7e3e.webp",
+"conf_med_2":"img/a/conf_med_2-9201b578d9.webp",
+"conf_med_3":"img/a/conf_med_3-520bbc4479.webp",
 "deco_alma_1":"img/a/deco_alma_1-d66aa85cdb.webp",
 "deco_alma_2":"img/a/deco_alma_2-ad9e735815.webp",
 "deco_alma_3":"img/a/deco_alma_3-5e0b5f14e9.webp",
+"deco_pp_board":"img/a/deco_pp_board-ba7a21372c.webp",
+"deco_pp_chair":"img/a/deco_pp_chair-f8d7b0a90e.webp",
+"deco_pp_tower":"img/a/deco_pp_tower-bf7e38fd8f.webp",
+"deco_vd20":"img/a/deco_vd20-b679a5c3e0.webp",
 "ex3_boss_garden":"img/a/ex3_boss_garden-ad19b4b9c6.webp",
 "ex3_boss_garden_atk":"img/a/ex3_boss_garden_atk-326a98806a.webp",
 "ex3_boss_ground":"img/a/ex3_boss_ground-b633955254.webp",
@@ -9704,6 +9711,15 @@ body.mg-on .toast[hidden]{display:none}
   const ppLeft = () => { const end = Date.UTC(2026, 0, 5) + (ppPer() + 1) * PP.weeks * 604800000 - KST_MS; return Math.max(0, Math.ceil((end - gameNow()) / 86400000)); };
   const rtMax = k => (S && S.pp && S.pp.n >= (PP.deep[k] || Infinity)) ? RT5.top : RT5.max;   // 5.2.0 심화 칸이 열린 가지는 다섯 칸
   const ppMedOf = v => PP.med.reduce((a, m, i) => v >= m.at ? i + 1 : a, 0);
+  // 5.2.0.1 학회 메달 그림(작업지시서 100, conf_med_1~3). 그림이 없으면 이모지
+  const ppMedIc = (m, px) => { const u = IMG('conf_med_' + m); return u ? `<img class="pp-med" src="${u}" alt="" style="width:${px || 24}px;height:${px || 24}px;object-fit:contain;vertical-align:middle">` : PP.med[m - 1].ic; };
+  // 5.2.0.1 칭호 덤 장식(설계안 5절, 작업지시서 100): 세미나 10번, 20번, 논문 30편, 마을 기부 20단계. 얻으면 꾸미기 장식으로 지도에 놓아요(힘 없음)
+  const PP_DECO = [['deco_pp_board', () => !!S.pp && S.pp.sem >= 10], ['deco_pp_chair', () => !!S.pp && S.pp.sem >= 20], ['deco_pp_tower', () => !!S.pp && S.pp.n >= 30], ['deco_vd20', () => !!S.vd && S.vd.lv >= 20]];
+  function ppDecoSync() {
+    const got = []; if (!S || !S.deco || !S.deco.own) return got;
+    for (const [id, ok] of PP_DECO) if (DECO_BY[id] && !S.deco.own[id] && ok()) { S.deco.own[id] = 1; got.push(DECO_BY[id].name); }
+    return got;
+  }
   const ppScore = k => { const v = PP.base + PP.per * rtLv(k); return ((S.pp.ck[k] || 0) >= PP.halfAt) ? Math.floor(v / 2) : v; };
   function ppData(n, why) {   // 연구 자료 얻기(대학원에서만)
     if (!ppOpen() || !(n > 0)) return 0;
@@ -9715,13 +9731,15 @@ body.mg-on .toast[hidden]{display:none}
   // 학회가 바뀌면 지난 학회 메달을 주고 점수를 0부터. 켤 때와 1초마다 봐요
   function ppSync() {
     if (!S || !S.pp) return;
+    if (ppDecoSync().length) save();   // 이미 조건을 넘은 저장도 받아요
     const p = ppPer(); if (S.pp.cm === p) return;
     const old = S.pp.cm, v = S.pp.cf, m = old >= 0 && v > 0 ? ppMedOf(v) : 0;
     S.pp.cm = p; S.pp.cf = 0; S.pp.ck = {};
     if (m) {
       const M = PP.med[m - 1]; S.pp.med.push([old, m]); if (S.pp.med.length > 60) S.pp.med = S.pp.med.slice(-60);
       addEss(M.ess); if (M.gold) addGold(M.gold);
-      showReward({ title: `숲속 학회 ${M.nm}`, sub: `지난 학회 점수 ${fmt(v)}점`, items: [{ ic: '🏅', t: `${M.ic} ${M.nm}` }, { ic: 'ess', t: `숲의 정수 +${M.ess}` }, M.gold ? { ic: 'gold', t: `황금 도토리 +${M.gold}` } : null] });
+      const mu = IMG('conf_med_' + m);
+      showReward({ title: `숲속 학회 ${M.nm}`, sub: `지난 학회 점수 ${fmt(v)}점`, art: mu ? `<img src="${mu}" alt="" style="width:96px;height:96px;object-fit:contain">` : undefined, items: [{ ic: ppMedIc(m), t: M.nm }, { ic: 'ess', t: `숲의 정수 +${M.ess}` }, M.gold ? { ic: 'gold', t: `황금 도토리 +${M.gold}` } : null] });
     }
     save();
   }
@@ -9746,20 +9764,21 @@ body.mg-on .toast[hidden]{display:none}
     const sc = ppScore(c.k);
     S.pp.cur = null; S.pp.n += 1; S.pp.by[c.k] = (S.pp.by[c.k] || 0) + 1; S.pp.ck[c.k] = (S.pp.ck[c.k] || 0) + 1;
     S.pp.cf = Math.min(99999, S.pp.cf + sc); S.pp.cb = Math.max(S.pp.cb, S.pp.cf);
-    addEss(PP.ess); rankDirty(); save();
+    addEss(PP.ess); rankDirty();
+    const newD = ppDecoSync(); save();
     const newT = PP_TITLES.filter(t => t.got(S) && !before.has(t.id)), deep = RT5.list.filter(x => rtMax(x.k) > RT5.max);
     showReward({ title: `논문 ${S.pp.n}편째 완성!`, sub: `${D ? D.nm : ''} 논문, 학회 점수 +${sc}`, items: [{ ic: 'ess', t: `숲의 정수 +${PP.ess}` }, { ic: '📜', t: `이번 학회 ${fmt(S.pp.cf)}점` },
-      deep.length > deep0 ? { ic: '🌿', t: `${deep[deep.length - 1].nm} 가지에 다섯째 칸이 열렸어요` } : null, ...newT.map(t => ({ ic: '🎖️', t: `칭호 "${t.title}"` }))] });
+      deep.length > deep0 ? { ic: '🌿', t: `${deep[deep.length - 1].nm} 가지에 다섯째 칸이 열렸어요` } : null, ...newT.map(t => ({ ic: '🎖️', t: `칭호 "${t.title}"` })), ...newD.map(n => ({ ic: '🎁', t: `장식 '${n}' (꾸미기 모드에서 지도에 놓아요)` }))] });
     sfx('quest'); checkQuests(true);
     if (!$('#mRx').hidden) renderRx();
   }
-  function ppSemDone() { if (S && S.pp && gradOn()) { S.pp.sem += 1; ppData(PP.dat.sem); } }   // 세미나와 학위수여식
+  function ppSemDone() { if (S && S.pp && gradOn()) { S.pp.sem += 1; ppData(PP.dat.sem); for (const n of ppDecoSync()) toast(`'${n}' 장식을 받았어요\n꾸미기 모드에서 지도에 놓아요`); } }   // 세미나와 학위수여식
   function ppPart() {
     if (!ppOpen()) return `<p class="fine">${gradOn() ? '연구 구역 연구소를 지으면 열려요' : '대학교를 졸업하고 대학원에 가면 열려요'}</p>`;
     ppSync();
     const P = S.pp, c = P.cur, now = gameNow(), m = ppMedOf(P.cf), nx = PP.med[m], u = IMG('ic_rdata'), up = IMG('ic_paper'), dayDone = P.day === gameToday();
     const nextDeep = RT5.list.filter(D => P.n < PP.deep[D.k]).sort((a, b) => PP.deep[a.k] - PP.deep[b.k])[0];
-    let h = `<div class="pp-conf"><b>이번 숲속 학회 ${fmt(P.cf)}점</b><small>${ppLeft()}일 남음. ${m ? `지금 ${PP.med[m - 1].ic} ${PP.med[m - 1].nm}` : '아직 메달 없음'}${nx ? `, ${nx.at}점이면 ${nx.ic} ${nx.nm}` : ''}</small></div>`;
+    let h = `<div class="pp-conf"><b>이번 숲속 학회 ${fmt(P.cf)}점</b><small>${ppLeft()}일 남음. ${m ? `지금 ${ppMedIc(m, 18)} ${PP.med[m - 1].nm}` : '아직 메달 없음'}${nx ? `, ${nx.at}점이면 ${ppMedIc(m + 1, 18)} ${nx.nm}` : ''}</small></div>`;
     h += `<div class="dp-row"><span class="dp-ic">${u ? `<img src="${u}" alt="">` : '🔎'}</span><div class="dp-tx"><b>연구 자료 ${fmt(P.dat)}개</b><small>논문 한 편에 ${PP.need}개. 세미나 ${PP.dat.sem}, 연구 트리 칸 ${PP.dat.rt}, 조교 파견 4시간 이상, 심화 탐험 큰 장난꾸러기</small></div>` +
       (dayDone ? '<span class="fe-lock">오늘 정리함</span>' : `<button class="cta small" type="button" data-pp="day">자료 정리 +${PP.dat.day}</button>`) + '</div>';
     if (c) { const D = RT5.list.find(x => x.k === c.k); h += `<div class="dp-row on"><span class="dp-ic">${up ? `<img src="${up}" alt="">` : '📜'}</span><div class="dp-tx"><b>${D ? D.nm : ''} 논문 쓰는 중</b><small>끝나면 학회 점수 +${ppScore(c.k)}</small></div><span class="fe-lock">${hms(c.end - now)}</span></div>`; }
@@ -13623,6 +13642,7 @@ body.mg-on .toast[hidden]{display:none}
     if (r.g) { addGold(r.g); items.push({ ic: 'gold', t: `황금 도토리 +${r.g}` }); }
     const tt = VD.titles.find(t => t.lv === lv);
     if (tt) { if (!S.ach.title) { S.ach.title = tt.id; rankDirty(); } items.push({ ic: '🎖️', t: `칭호 "${tt.title}"${S.ach.title === tt.id ? '를 달았어요' : '를 받았어요'}` }); }
+    for (const n of ppDecoSync()) items.push({ ic: '🎁', t: `장식 '${n}' (꾸미기 모드에서 지도에 놓아요)` });   // 5.2.0.1 20단계 마을 감사 아치
     rt.vdPop = true; closeModal($('#mVd'));
     sfx('quest');
     showReward({ title: `마을 기부 ${lv}단계!`, sub: lv <= VD.art ? '마을에 새 기념물이 생겼어요' : '황금 나무가 더 반짝여요', art: vdPic(lv, 110),
@@ -17887,6 +17907,7 @@ body.mg-on .toast[hidden]{display:none}
   DECO.push({ id: 'deco_career_tree', name: '진로 나무', ess: 0, img: 'deco_career_tree', rare: 1, ev: 1, cs: 1 });   // 3.1.0 진로 도감 12칸을 다 채우면   // 2.3.5 생물 60종, 90종   // 2.2.0 생물 30종을 다 모으면
   for (const P of TR2_PL) for (const [id, name] of P.souv) DECO.push({ id, name, ess: 0, img: id, rare: 1, ev: 1, tr2: P.name, sm: 1 });   // 3.2.0 수학여행 기념품
   for (const [k, name, sm] of EV_DECO) DECO.push({ id: 'ev_' + k, name, ess: 0, img: 'evd_' + k, rare: 1, ev: 1, ...(sm ? { sm: 1 } : {}) });
+  DECO.push({ id: 'deco_pp_board', name: '세미나 칠판', ess: 0, img: 'deco_pp_board', rare: 1, ev: 1, pp: '세미나 10번' }, { id: 'deco_pp_chair', name: '명예의 의자', ess: 0, img: 'deco_pp_chair', rare: 1, ev: 1, pp: '세미나 20번' }, { id: 'deco_pp_tower', name: '논문 탑', ess: 0, img: 'deco_pp_tower', rare: 1, ev: 1, pp: '논문 30편' }, { id: 'deco_vd20', name: '마을 감사 아치', ess: 0, img: 'deco_vd20', rare: 1, ev: 1, pp: '마을 기부 20단계' });   // 5.2.0.1 칭호 덤 장식(작업지시서 100, ppDecoSync)
   const evDecoArt = d => !!(d && d.ev && IMG(d.img));
   const DECO_BY = Object.fromEntries(DECO.map(d => [d.id, d]));
   const DECO_GROW = 1.5, DECO_MAX = 11;   // 일반 장식은 하나 더 살 때마다 1.5배(지도 한 장을 다 채우는 11개까지), 희귀 장식은 하나씩만
@@ -18047,7 +18068,7 @@ body.mg-on .toast[hidden]{display:none}
       h += `<h3 class="shop-h">${title}</h3><div class="shop-grid">`;
       for (const d of list) {
         const n = decoOwn(d.id), out = decoSoldOut(d.id), c = decoCost(d.id), poor = !out && S.ess < c;
-        const pr = d.ev ? (n ? '가졌어요' : d.ps ? '패스 보상' : d.rs ? '시즌 기념' : d.bio ? `생물 ${d.bio}종` : d.cs ? '진로 도감' : d.col ? '단과대학' : d.fv ? '축제 기념품' : d.bf ? `${d.bf}월 대축제` : d.xg ? '우정 배지' : d.mk ? '숲속 장터' : d.tr2 ? tr2Nm() : d.cg ? '대항전 우승' : '이벤트 선물') : out ? (d.rare ? '가졌어요' : '더 살 수 없어요') : `${ic}${c}`;
+        const pr = d.ev ? (n ? '가졌어요' : d.ps ? '패스 보상' : d.rs ? '시즌 기념' : d.bio ? `생물 ${d.bio}종` : d.cs ? '진로 도감' : d.pp ? d.pp : d.col ? '단과대학' : d.fv ? '축제 기념품' : d.bf ? `${d.bf}월 대축제` : d.xg ? '우정 배지' : d.mk ? '숲속 장터' : d.tr2 ? tr2Nm() : d.cg ? '대항전 우승' : '이벤트 선물') : out ? (d.rare ? '가졌어요' : '더 살 수 없어요') : `${ic}${c}`;
         h += `<button class="si${n ? ' own' : ''}${poor ? ' poor' : ''}" type="button" data-dbuy="${d.id}" aria-label="${d.name}${out ? '' : `, 숲의 정수 ${c}개`}">` +
           (d.rare ? '<span class="rare-mark" aria-hidden="true">★</span>' : '') +
           `<span class="pv deco"><img src="${IMG(d.img)}" alt="" draggable="false"></span><span class="nm">${d.name}${!d.rare && n ? ` <small>${n}개</small>` : ''}</span><span class="pr">${pr}</span></button>`;
@@ -18111,7 +18132,7 @@ body.mg-on .toast[hidden]{display:none}
     }
     const d = DECO_BY[id]; if (!d) return;
     sfx('tap');
-    if (d.ev) { toast(decoOwn(id) ? `${d.name}${eulOf(d.name)} 가지고 있어요. '지도 꾸미기'를 눌러 학교에 놓아 보세요` : d.cs ? `${eun(d.name)} 진로 도감 12칸을 다 채우면 받아요` : d.tr2 ? `${eun(d.name)} ${d.tr2} ${tr2Nm()}에서 가져와요` : d.fv ? `${eun(d.name)} 축제 부스 놀이를 ${FV.win}번 성공하면 받아요` : d.bf ? `${eun(d.name)} ${d.bf}월 대축제에서 도장 ${BIG.max}개를 모으면 받아요` : d.xg ? `${eun(d.name)} 교환학생 우정 배지 8개를 모으면 받아요` : d.mk ? `${eun(d.name)} 목요일 숲속 장터에서 쿠폰으로 사요` : `${eun(d.name)} 그 이벤트의 기념 상자에서 받아요. 지난 이벤트 것은 꾸미기 백화점에서 살 수 있어요`); return; }
+    if (d.ev) { toast(decoOwn(id) ? `${d.name}${eulOf(d.name)} 가지고 있어요. '지도 꾸미기'를 눌러 학교에 놓아 보세요` : d.pp ? `${eun(d.name)} ${d.pp}이면 받아요` : d.cs ? `${eun(d.name)} 진로 도감 12칸을 다 채우면 받아요` : d.tr2 ? `${eun(d.name)} ${d.tr2} ${tr2Nm()}에서 가져와요` : d.fv ? `${eun(d.name)} 축제 부스 놀이를 ${FV.win}번 성공하면 받아요` : d.bf ? `${eun(d.name)} ${d.bf}월 대축제에서 도장 ${BIG.max}개를 모으면 받아요` : d.xg ? `${eun(d.name)} 교환학생 우정 배지 8개를 모으면 받아요` : d.mk ? `${eun(d.name)} 목요일 숲속 장터에서 쿠폰으로 사요` : `${eun(d.name)} 그 이벤트의 기념 상자에서 받아요. 지난 이벤트 것은 꾸미기 백화점에서 살 수 있어요`); return; }
     if (decoSoldOut(id)) { toast(d.rare ? `${eun(d.name)} 하나만 가질 수 있어요` : `${eun(d.name)} ${DECO_MAX}개까지 가질 수 있어요`); return; }
     rt.decoPick = id; renderDecoShop();
   }
@@ -24647,7 +24668,7 @@ body.mg-on .toast[hidden]{display:none}
     : ST_WHO_IMG[w] && IMG(ST_WHO_IMG[w]) ? `<img src="${IMG(ST_WHO_IMG[w])}" alt="">` : DEX_STUDENTS.includes(w) ? kidAvatar(w) : `<span class="sy-em">${ST_FB[w] || '🌳'}</span>`;
   const stName = w => (w === 'hedgehog' && rt.st && rt.st.uni ? '부총장 고슴도치' : '') || ST_NM[w] || (TEA[w] && TEA[w].name) || spName(w);
   // 5.0.2: 있는 그림만 적은 이름표(열쇠 → 내용 해시, dev/story_pack.py가 써요). 없는 그림을 헛되이 찾지 않고, 이름에 해시가 있어 내용이 바뀐 그림만 다시 받아요. 앱은 웹에서 받아요
-  const ST_PICS = /* ST_PICS:BEGIN */{st_ch01:"83d4ae292f",st_ch01_c:"a82aa781b7",st_ch01_c2:"5b54ecd012",st_ch01_o2:"12c9e54f84",st_ch02:"aac3024b8d",st_ch02_c2:"7b7d97123a",st_ch02_o2:"079d3eac1f",st_ch03:"b82408e432",st_ch03_c2:"48d9b890d2",st_ch03_o2:"08291d755f",st_ch04:"e4aa4b9957",st_ch04_c2:"fb13fa0ccf",st_ch04_o2:"6da7a01456",st_ch05:"8e220ffae7",st_ch05_c2:"dec8204a66",st_ch05_o:"bf76a9697a",st_ch05_o2:"954988392f",st_ch06:"ed3cee04db",st_ch06_c2:"1e3f76adc3",st_ch06_o2:"8a7902d00e",st_ch07:"0f45474db9",st_ch07_c2:"dc90233af3",st_ch07_o2:"bff76394db",st_ch08:"b3efc9acc0",st_ch08_c2:"2914cb76dd",st_ch08_o:"dbb8a86eb9",st_ch08_o2:"16a11c4013",st_ch09:"55dc5ad210",st_ch09_c:"3a121ad7df",st_ch09_c2:"e77c4522d4",st_ch09_o2:"b569ed3379",st_ch10:"1323d208b0",st_ch10_c2:"885604a40f",st_ch10_o:"a0f64efa23",st_ch10_o2:"b843a6d42f",st_ch11:"b6894511ea",st_ch11_c:"9efdbf71c5",st_ch11_c2:"f546da8f8e",st_ch11_o2:"aeef4bee90",st_ch12:"1397cf6dce",st_ch12_c2:"06f5d6d3ba",st_ch12_o2:"0312f829bb",st_ch13:"71e41f1a69",st_ch13_c:"70fb38b0f9",st_ch13_c2:"445fe87801",st_ch13_o2:"76a4449481",st_ch14:"5bbb66484c",st_ch14_c:"41a07e86b6",st_ch14_c2:"8de17a5968",st_ch14_o2:"4df25272f9",st_ch15:"da2f6a00e0",st_ch15_c2:"b82adae672",st_ch15_o2:"2a0a745837",st_ch16:"768d4e6565",st_ch16_c2:"a051d15b0c",st_ch16_o2:"56479b20c6",st_ch17:"8d32828cb8",st_ch17_c2:"55b7a3183f",st_ch17_o2:"11717b463f",st_ch18:"4949e80c46",st_ch18_c2:"96fefdfd79",st_ch18_o:"743d58be1b",st_ch18_o2:"c95622fd31",st_ch19:"6b1a05fdb1",st_ch19_c:"40a8b96329",st_ch19_c2:"7a2edb52f4",st_ch19_o2:"2b4295d26e",st_ch20:"9d66c037da",st_ch20_c:"5882950434",st_ch20_c2:"7ba09244d6",st_ch20_o2:"2edde32b33",st_ch21:"528a70b4d9",st_ch21_c2:"b578d6dd70",st_ch21_o2:"31150089d5",st_ch22:"6ab9282c09",st_ch22_c2:"470f6694f3",st_ch22_o2:"8cc78eff73",st_ch23:"7c3362353c",st_ch23_c2:"a9e39a4e69",st_ch23_o:"9b647ff789",st_ch23_o2:"db2594844e",st_ch24:"c4d04925c9",st_ch24_c2:"925b09913f",st_ch24_o:"5d7007a191",st_ch24_o2:"90adadc9d6",st_side_acorn_1:"e6e409bf68",st_side_acorn_2:"16d1b0692d",st_side_acorn_3:"e64655f9cd",st_side_acorn_4:"cdc8db1079",st_side_bear:"2bcb94dea6",st_side_deer_1:"b27e59b190",st_side_deer_2:"daf12348d8",st_side_deer_3:"9af6ea3a56",st_side_honey_1:"ff9777b5cd",st_side_honey_2:"11607990e4",st_side_honey_3:"43fdbb8087",st_side_honey_4:"8cadae4386",st_side_mole:"bf20570b4c",st_side_mole_1:"07cb39f498",st_side_mole_2:"1dbcf0b553",st_side_mole_3:"1ca7dfb702",st_side_mole_4:"39576bdfba",st_side_nap_1:"b1f4cd4640",st_side_nap_2:"3bcaf34ad3",st_side_nap_3:"a25820ea22",st_side_nap_4:"65342badef",st_side_owl:"cc843fa8e8",st_side_sloth:"b11838a6f4",st_side_sloth_1:"d7ba28a6d7",st_side_sloth_2:"2ed1e8e506",st_side_sloth_3:"9cecf5c579",st_side_sloth_4:"1440fe545b",st_side_squirrel:"3d5ea7a0df",st_side_waterdeer:"0fce30acfb",st_tagmap:"fd82ef729b",st_tam_1:"3fbb70774d",st_tam_2:"92f28f42b6",st_tam_3:"fd439f975f",st_tam_4:"669acb69e2",st_tam_5:"d59a034db4"}/* ST_PICS:END */;
+  const ST_PICS = /* ST_PICS:BEGIN */{st_ch01:"83d4ae292f",st_ch01_c:"a82aa781b7",st_ch01_c2:"5b54ecd012",st_ch01_o2:"12c9e54f84",st_ch02:"aac3024b8d",st_ch02_c2:"7b7d97123a",st_ch02_o2:"079d3eac1f",st_ch03:"b82408e432",st_ch03_c2:"48d9b890d2",st_ch03_o2:"08291d755f",st_ch04:"e4aa4b9957",st_ch04_c2:"fb13fa0ccf",st_ch04_o2:"6da7a01456",st_ch05:"8e220ffae7",st_ch05_c2:"dec8204a66",st_ch05_o:"bf76a9697a",st_ch05_o2:"954988392f",st_ch06:"ed3cee04db",st_ch06_c2:"1e3f76adc3",st_ch06_o2:"8a7902d00e",st_ch07:"0f45474db9",st_ch07_c2:"dc90233af3",st_ch07_o2:"bff76394db",st_ch08:"b3efc9acc0",st_ch08_c2:"2914cb76dd",st_ch08_o:"dbb8a86eb9",st_ch08_o2:"16a11c4013",st_ch09:"55dc5ad210",st_ch09_c:"3a121ad7df",st_ch09_c2:"e77c4522d4",st_ch09_o2:"b569ed3379",st_ch10:"1323d208b0",st_ch10_c2:"885604a40f",st_ch10_o:"a0f64efa23",st_ch10_o2:"b843a6d42f",st_ch11:"b6894511ea",st_ch11_c:"9efdbf71c5",st_ch11_c2:"f546da8f8e",st_ch11_o2:"aeef4bee90",st_ch12:"1397cf6dce",st_ch12_c2:"06f5d6d3ba",st_ch12_o2:"0312f829bb",st_ch13:"71e41f1a69",st_ch13_c:"70fb38b0f9",st_ch13_c2:"445fe87801",st_ch13_o2:"76a4449481",st_ch14:"5bbb66484c",st_ch14_c:"41a07e86b6",st_ch14_c2:"8de17a5968",st_ch14_o2:"4df25272f9",st_ch15:"da2f6a00e0",st_ch15_c2:"b82adae672",st_ch15_o2:"2a0a745837",st_ch16:"768d4e6565",st_ch16_c2:"a051d15b0c",st_ch16_o2:"56479b20c6",st_ch17:"8d32828cb8",st_ch17_c2:"55b7a3183f",st_ch17_o2:"11717b463f",st_ch18:"4949e80c46",st_ch18_c2:"96fefdfd79",st_ch18_o:"743d58be1b",st_ch18_o2:"c95622fd31",st_ch19:"6b1a05fdb1",st_ch19_c:"40a8b96329",st_ch19_c2:"7a2edb52f4",st_ch19_o2:"2b4295d26e",st_ch20:"9d66c037da",st_ch20_c:"5882950434",st_ch20_c2:"7ba09244d6",st_ch20_o2:"2edde32b33",st_ch21:"528a70b4d9",st_ch21_c2:"b578d6dd70",st_ch21_o2:"31150089d5",st_ch22:"6ab9282c09",st_ch22_c2:"470f6694f3",st_ch22_o2:"8cc78eff73",st_ch23:"7c3362353c",st_ch23_c2:"a9e39a4e69",st_ch23_o:"9b647ff789",st_ch23_o2:"db2594844e",st_ch24:"c4d04925c9",st_ch24_c2:"925b09913f",st_ch24_o:"5d7007a191",st_ch24_o2:"90adadc9d6",st_side_acorn_1:"e6e409bf68",st_side_acorn_2:"16d1b0692d",st_side_acorn_3:"e64655f9cd",st_side_acorn_4:"cdc8db1079",st_side_alumni_1:"4011aa5620",st_side_alumni_2:"2844f3f6c5",st_side_alumni_3:"7e9199a79c",st_side_bear:"2bcb94dea6",st_side_deer_1:"b27e59b190",st_side_deer_2:"daf12348d8",st_side_deer_3:"9af6ea3a56",st_side_honey_1:"ff9777b5cd",st_side_honey_2:"11607990e4",st_side_honey_3:"43fdbb8087",st_side_honey_4:"8cadae4386",st_side_mole:"bf20570b4c",st_side_mole_1:"07cb39f498",st_side_mole_2:"1dbcf0b553",st_side_mole_3:"1ca7dfb702",st_side_mole_4:"39576bdfba",st_side_nap_1:"b1f4cd4640",st_side_nap_2:"3bcaf34ad3",st_side_nap_3:"a25820ea22",st_side_nap_4:"65342badef",st_side_owl:"cc843fa8e8",st_side_sloth:"b11838a6f4",st_side_sloth_1:"d7ba28a6d7",st_side_sloth_2:"2ed1e8e506",st_side_sloth_3:"9cecf5c579",st_side_sloth_4:"1440fe545b",st_side_squirrel:"3d5ea7a0df",st_side_waterdeer:"0fce30acfb",st_tagmap:"fd82ef729b",st_tam_1:"3fbb70774d",st_tam_2:"92f28f42b6",st_tam_3:"fd439f975f",st_tam_4:"669acb69e2",st_tam_5:"d59a034db4"}/* ST_PICS:END */;
   const stPicUrl = k => webDir('img/story/') + k + '-' + ST_PICS[k] + '.webp';
   // 4.3.1 숲속 탐험대 처음 소개(그림 st_tam_1~5, 작업지시서 76). p는 그 줄에서 보여 줄 그림 번호예요. 그림이 없으면 대사만 나와요
   const ST_TAM = [
@@ -24678,7 +24699,7 @@ body.mg-on .toast[hidden]{display:none}
     let picB = '';   // 4.2.0 둘째 그림(작업지시서 71): 장면 가운데 줄부터 바꿔 보여요
     if (id === 'tam') { lines = ST_TAM; head = '숲속 탐험대'; }   // 4.3.1 그림은 stTamPic()이 줄마다 골라요
     else if (id === 'recap') { lines = ST_RECAP[Math.min(S.tier, ST_RECAP.length - 1)].map(t => ({ t })); head = '지금까지의 이야기'; pic = 'st_head'; }
-    else if (id.startsWith('side:')) { const [, sid, ep] = id.split(':'), X = SIDE.find(x => x.id === sid), L = (ST_SIDE[sid] || [])[+ep]; if (!X || !L) return false; lines = L; head = `${X.nm} ${+ep + 1}화`; pic = 'st_side_' + X.who; picB = `st_side_${sid}_${+ep + 1}`; }
+    else if (id.startsWith('side:')) { const [, sid, ep] = id.split(':'), X = SIDE.find(x => x.id === sid), L = (ST_SIDE[sid] || [])[+ep]; if (!X || !L) return false; lines = L; head = `${X.nm} ${+ep + 1}화`; pic = 'st_side_' + X.who; picB = `st_side_${sid}_${+ep + 1}`; if (!ST_PICS[pic] && ST_PICS[picB]) { pic = picB; picB = ''; } }   // 5.2.0.1 후일담처럼 화 그림만 있으면 처음부터 그 그림
     else { const D = ST[id]; if (!D) return false; lines = D.lines; head = `${D.ch + 1}장 ${CHAPTERS[D.ch]}`; pic2 = 'st_ch' + String(D.ch + 1).padStart(2, '0'); pic = pic2 + '_' + id[0]; picB = pic + '2'; }   // 그 장면만의 그림(st_ch05_o, st_ch01_c, 작업지시서 66)이 있으면 먼저, 없으면 장 그림
     if (!replay) { if (id[0] === 'c') { rt.stAfterC = true; rt.qTap = false; } else if (id[0] === 'o') rt.stAfterC = false; }   // 5.0.1.7 F-03
     rt.st = { id, replay: !!replay, lines: lines.slice(), i: 0, uni: !!(ST[id] && ST[id].ch >= 19) || (id === 'tam' && uniOn()), mid: Math.floor(lines.length / 2), im2: null, sw: false };   // uni: 대학교 장면(20장부터)에서는 고슴도치 이름표가 '부총장 고슴도치'
@@ -30039,7 +30060,7 @@ body.mg-on .toast[hidden]{display:none}
     GSHOP, OUTFITS, evPastIds, renderNight, shopItem, essItem, buyEss, pickEss, nickPrice, grantOffline, thSetPrice, pickDeco, buyDeco, buyDecoBerry,   // 2.1.0 소풍, 스티커판, 상점
     LAB, LAB_IN, LAB_KEYS, LAB_CARDS, LAB_MIX, LAB_DBL, labOf, labRun, labCount, labReady, labDone, openLab, renderLab, labTap, labGo, RD, BOOKS, rdStart, rdSettle, rdTick, rdLeft, rdRemain, openRead, renderRead, renderStudy2, sanitizeStudy2, maintSync, maintTap, openBook, renderBook, BT, BT_EV, BT_LG, BT_SCH, btOpen, btLeft, btRoster, btBest, btMake, btScore, btWin, btFinish, btOpenScene, btClose, btRankDoc, readRow, btAuto, btPick, btStart, btRender, renderBtCard, sanitizeBt, get btUI() { return btUI; }, EX, exIsWeek, exNow, exPrev, exDays, exScore, exGrade, exStudy, exClaim, exTick, exMake, openExam, renderExam, exAwardTop, exReportReady, sanitizeExam, renderSheet, openSheet,   // 2.0.1 공부 2단계(s76)
     AC, AC_GAME, AB_KEY, ABIL, acLv, acSum, acMult, acRepOf, acGain, acSettle, acAll, acCap, acBkLeft, acBuyBook, renderAc, sanitizeAc, freshAc, rankRows, awayStart, awaySettle, timeSrc, save, awayHold, rankCap, cloudVerify, liveApply, liveLoad, openNotice, NOTICES, get Live() { return Live; }, get Rank() { return Rank; }, liveOff,   // 2.0.0 보안 점검 시험(s71), Codex 검토 시험(s72)
-    rosterEnsure, rosterMake, rosterAdd, clubAuto, clubSet, clubPct, clubShow, clubSum, clubStars, clubMembers, clubShowGo, showReady, showReadyC, showQuestFree, showWait, showDay, clubWeekTick, clubFacUp, CLUBS, CLUB, star, clubTuitionMult, clubFestMult, clubDecoOff, renderClub, renderHall, openSeatPick, openClubPick,
+    rosterEnsure, rosterMake, rosterAdd, clubAuto, clubSet, clubPct, clubShow, clubSum, clubStars, clubMembers, clubShowGo, ppDecoSync, ppMedIc, PP_DECO, showReady, showReadyC, showQuestFree, showWait, showDay, clubWeekTick, clubFacUp, CLUBS, CLUB, star, clubTuitionMult, clubFestMult, clubDecoOff, renderClub, renderHall, openSeatPick, openClubPick,
     TIER_SCALE, renderCampus, zoneBadge, uniPreview, setZone, DEPT, openDept, renderDept, deptSet, deptPct, deptOf, deptPicks, deptSlots, deptMult, zoneKey, uniOn, zoneOf, ZONE_GEO, CAMPUS, GEO, geoIdx, legacyMult, tuitionMult, snapTake, snapOf, showCere, cereCrew, cere3Info, cere3Load, cere3, tierViewOpen, tierViewClose, renderTierView, renderTierDots, nlCycle, viewMap, showNewTalk, talkNext, showCere, cereEnd, cereCrew, cereAsk, cereKeep, goFur, updateQuestDot, openElect, renderElect, elVote, elSync, elMult, elClub, elPres, elBadge, elMake, EL_PLEDGES, clubPct, festPrize, dropValue, claimMission, gameWeek, NEWCOMERS, TIERS, GEO, geoIdx, decoCost0, qMeasure, qDone, qGoal, kidArt: kidSVG, newYear, checkGrade, gradeOf, townRep, FAC, sanitize200, trialHunt, updateTrial, TRIAL, zoomAt, fitMap, ZOOM_MAX, DECO, DECO_SLOTS, DECO_SIGN, decoCost, decoSoldOut, pickDeco, buyDeco, decoPut, decoEditStart, decoEditEnd, openDecoPick, renderDeco, setSchoolNm, setMark, schoolTitle, markHTML, decoPlacedAll, esExLeft, esExCost, get Cloud() { return Cloud; }, get actx() { return actx; }, Music, musicSync, ensureAudio, bgmLoad, pzUI, rt, makeDeal, furStage, DEAL, navInfo, navRoute, hudTheme, HUD_TH_COL, pathInfo, pathRoute, MAP_PATHS, spawnDrop, repTipCheck, linkGoogle, retryCloud, sanitize, acctPending, renderMap, renderHUD, renderAffordance, syncKids, layoutMap, geo, hitTrial, endVisit, showReward, recommend, needCost, prepTopUp, qReward, prepPhase, rankScore, pwOf, previewDip, dipMult, costScale, buyFur, buyFurAll, furCost, furReady, furDone, FUR, startTalk, endTalk, teacherAct, facCost, teaCost, facKeys, rate, rep, capacity, canGraduate, canPromote,
     fmt, fmt2, graduate, promote, buyPerk, perkCost, perkMaxed, buyFundPerk, fpCost, claimMain, mainReady, curMain, qNo, earn, CFG, TEA, teaMaxed, PERKS, FPERKS, MAIN, finalYear, startTrip, claimTrip, TRIPS, yearLocked, endSports, rtSports: () => rt.sports, rtFest: () => rt.fest, facCap, addLeague, addMP, tutStart, endFest, claimBox, musicWant, askBox, festWait, setTab,
     RARE, modelOf, rareRoll, rareGot, showRareTalk, rareDexHTML, kidSVG, rosterKid, WX, wxOf, wxIs, rdMinNow, renderWeather, PL, plSync, plUnread, openPLetter, renderPLetter, RS, rsNum, rsSync, rsAdd, rsLabel, lookDoc, lookRead, lookPush, lookSet, openLook, MODEL_SCHOOL, joinRank, PS, PS_M, PS_SEASONS, psSeason, psOpen, psSync, psLv, psGot, psReward, psClaimAll, psClaimMission, psWatchAd, psClaimable, psStepReady, psExtraReady, psChooseFur, psFurImg, renderPass, setEvSeg, xtGot, achTitles,   // 2.1.3 숲속 패스

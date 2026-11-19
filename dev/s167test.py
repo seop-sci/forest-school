@@ -5,6 +5,7 @@
 #  3) j25가 아닐 때는 예전처럼 하루 한 번(다른 동아리도 못 열어요)
 #  4) 공사 중 비버 선생님 크기는 건물 그림 너비(110까지)의 0.30, 건물 오른쪽 아래 모서리
 #  5) 페이지 오류 없음
+#  6) 작업지시서 100 그림: 학회 메달 그림, 세미나 10, 20번, 논문 30편, 마을 기부 20단계 장식(한 번만), 후일담 장면 3장
 # 쓰는 법: python3 wrap.py && python3 s167test.py   (마지막 줄이 PASS면 통과)
 import asyncio, json, time
 from playwright.async_api import async_playwright
@@ -47,6 +48,15 @@ async def main():
           const ok = F.clubShowGo(3); {CLEAN}; return {{ ok, c4: F.showReadyC(4), go4: F.clubShowGo(4) }}; }})()""")
         print('다른 퀘스트', json.dumps(r))
         if not r['ok'] or r['c4'] or r['go4']: bad.append(f'j25가 아니면 하루 한 번 {r}')
+        # 6) 작업지시서 100 그림: 메달, 칭호 덤 장식 넷, 후일담 장면
+        r = await pg.evaluate(f"""(() => {{ const F = {F}, S = F.S; S.pp.sem = 9; S.pp.n = 29; S.vd.lv = 19;
+          const g0 = F.ppDecoSync(); S.pp.sem = 20; S.pp.n = 30; S.vd.lv = 20; const g1 = F.ppDecoSync(), g2 = F.ppDecoSync();
+          const own = F.PP_DECO.map(([id]) => S.deco.own[id] || 0), imgs = F.PP_DECO.map(([id]) => !!F.IMG(id)), inDeco = F.PP_DECO.map(([id]) => F.DECO.some(d => d.id === id));
+          const med = [1, 2, 3].map(m => /<img/.test(F.ppMedIc(m))), pics = [1, 2, 3].map(n => !!F.ST_PICS['st_side_alumni_' + n]);
+          return {{ g0, g1, g2, own, imgs, inDeco, med, pics }}; }})()""")
+        print('그림 100', json.dumps(r, ensure_ascii=False))
+        if r['g0'] or len(r['g1']) != 4 or r['g2'] or r['own'] != [1, 1, 1, 1]: bad.append(f'칭호 덤 장식 {r}')
+        if not all(r['imgs'] + r['inDeco'] + r['med'] + r['pics']): bad.append(f'그림 연결 {r}')
         await ctx.close()
         # 4) 비버 선생님 크기
         now = int(time.time() * 1000)

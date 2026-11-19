@@ -293,6 +293,7 @@
   DECO.push({ id: 'deco_career_tree', name: '진로 나무', ess: 0, img: 'deco_career_tree', rare: 1, ev: 1, cs: 1 });   // 3.1.0 진로 도감 12칸을 다 채우면   // 2.3.5 생물 60종, 90종   // 2.2.0 생물 30종을 다 모으면
   for (const P of TR2_PL) for (const [id, name] of P.souv) DECO.push({ id, name, ess: 0, img: id, rare: 1, ev: 1, tr2: P.name, sm: 1 });   // 3.2.0 수학여행 기념품
   for (const [k, name, sm] of EV_DECO) DECO.push({ id: 'ev_' + k, name, ess: 0, img: 'evd_' + k, rare: 1, ev: 1, ...(sm ? { sm: 1 } : {}) });
+  DECO.push({ id: 'deco_pp_board', name: '세미나 칠판', ess: 0, img: 'deco_pp_board', rare: 1, ev: 1, pp: '세미나 10번' }, { id: 'deco_pp_chair', name: '명예의 의자', ess: 0, img: 'deco_pp_chair', rare: 1, ev: 1, pp: '세미나 20번' }, { id: 'deco_pp_tower', name: '논문 탑', ess: 0, img: 'deco_pp_tower', rare: 1, ev: 1, pp: '논문 30편' }, { id: 'deco_vd20', name: '마을 감사 아치', ess: 0, img: 'deco_vd20', rare: 1, ev: 1, pp: '마을 기부 20단계' });   // 5.2.0.1 칭호 덤 장식(작업지시서 100, ppDecoSync)
   const evDecoArt = d => !!(d && d.ev && IMG(d.img));
   const DECO_BY = Object.fromEntries(DECO.map(d => [d.id, d]));
   const DECO_GROW = 1.5, DECO_MAX = 11;   // 일반 장식은 하나 더 살 때마다 1.5배(지도 한 장을 다 채우는 11개까지), 희귀 장식은 하나씩만
@@ -453,7 +454,7 @@
       h += `<h3 class="shop-h">${title}</h3><div class="shop-grid">`;
       for (const d of list) {
         const n = decoOwn(d.id), out = decoSoldOut(d.id), c = decoCost(d.id), poor = !out && S.ess < c;
-        const pr = d.ev ? (n ? '가졌어요' : d.ps ? '패스 보상' : d.rs ? '시즌 기념' : d.bio ? `생물 ${d.bio}종` : d.cs ? '진로 도감' : d.col ? '단과대학' : d.fv ? '축제 기념품' : d.bf ? `${d.bf}월 대축제` : d.xg ? '우정 배지' : d.mk ? '숲속 장터' : d.tr2 ? tr2Nm() : d.cg ? '대항전 우승' : '이벤트 선물') : out ? (d.rare ? '가졌어요' : '더 살 수 없어요') : `${ic}${c}`;
+        const pr = d.ev ? (n ? '가졌어요' : d.ps ? '패스 보상' : d.rs ? '시즌 기념' : d.bio ? `생물 ${d.bio}종` : d.cs ? '진로 도감' : d.pp ? d.pp : d.col ? '단과대학' : d.fv ? '축제 기념품' : d.bf ? `${d.bf}월 대축제` : d.xg ? '우정 배지' : d.mk ? '숲속 장터' : d.tr2 ? tr2Nm() : d.cg ? '대항전 우승' : '이벤트 선물') : out ? (d.rare ? '가졌어요' : '더 살 수 없어요') : `${ic}${c}`;
         h += `<button class="si${n ? ' own' : ''}${poor ? ' poor' : ''}" type="button" data-dbuy="${d.id}" aria-label="${d.name}${out ? '' : `, 숲의 정수 ${c}개`}">` +
           (d.rare ? '<span class="rare-mark" aria-hidden="true">★</span>' : '') +
           `<span class="pv deco"><img src="${IMG(d.img)}" alt="" draggable="false"></span><span class="nm">${d.name}${!d.rare && n ? ` <small>${n}개</small>` : ''}</span><span class="pr">${pr}</span></button>`;
@@ -517,7 +518,7 @@
     }
     const d = DECO_BY[id]; if (!d) return;
     sfx('tap');
-    if (d.ev) { toast(decoOwn(id) ? `${d.name}${eulOf(d.name)} 가지고 있어요. '지도 꾸미기'를 눌러 학교에 놓아 보세요` : d.cs ? `${eun(d.name)} 진로 도감 12칸을 다 채우면 받아요` : d.tr2 ? `${eun(d.name)} ${d.tr2} ${tr2Nm()}에서 가져와요` : d.fv ? `${eun(d.name)} 축제 부스 놀이를 ${FV.win}번 성공하면 받아요` : d.bf ? `${eun(d.name)} ${d.bf}월 대축제에서 도장 ${BIG.max}개를 모으면 받아요` : d.xg ? `${eun(d.name)} 교환학생 우정 배지 8개를 모으면 받아요` : d.mk ? `${eun(d.name)} 목요일 숲속 장터에서 쿠폰으로 사요` : `${eun(d.name)} 그 이벤트의 기념 상자에서 받아요. 지난 이벤트 것은 꾸미기 백화점에서 살 수 있어요`); return; }
+    if (d.ev) { toast(decoOwn(id) ? `${d.name}${eulOf(d.name)} 가지고 있어요. '지도 꾸미기'를 눌러 학교에 놓아 보세요` : d.pp ? `${eun(d.name)} ${d.pp}이면 받아요` : d.cs ? `${eun(d.name)} 진로 도감 12칸을 다 채우면 받아요` : d.tr2 ? `${eun(d.name)} ${d.tr2} ${tr2Nm()}에서 가져와요` : d.fv ? `${eun(d.name)} 축제 부스 놀이를 ${FV.win}번 성공하면 받아요` : d.bf ? `${eun(d.name)} ${d.bf}월 대축제에서 도장 ${BIG.max}개를 모으면 받아요` : d.xg ? `${eun(d.name)} 교환학생 우정 배지 8개를 모으면 받아요` : d.mk ? `${eun(d.name)} 목요일 숲속 장터에서 쿠폰으로 사요` : `${eun(d.name)} 그 이벤트의 기념 상자에서 받아요. 지난 이벤트 것은 꾸미기 백화점에서 살 수 있어요`); return; }
     if (decoSoldOut(id)) { toast(d.rare ? `${eun(d.name)} 하나만 가질 수 있어요` : `${eun(d.name)} ${DECO_MAX}개까지 가질 수 있어요`); return; }
     rt.decoPick = id; renderDecoShop();
   }

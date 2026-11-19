@@ -472,6 +472,7 @@
     if (r.g) { addGold(r.g); items.push({ ic: 'gold', t: `황금 도토리 +${r.g}` }); }
     const tt = VD.titles.find(t => t.lv === lv);
     if (tt) { if (!S.ach.title) { S.ach.title = tt.id; rankDirty(); } items.push({ ic: '🎖️', t: `칭호 "${tt.title}"${S.ach.title === tt.id ? '를 달았어요' : '를 받았어요'}` }); }
+    for (const n of ppDecoSync()) items.push({ ic: '🎁', t: `장식 '${n}' (꾸미기 모드에서 지도에 놓아요)` });   // 5.2.0.1 20단계 마을 감사 아치
     rt.vdPop = true; closeModal($('#mVd'));
     sfx('quest');
     showReward({ title: `마을 기부 ${lv}단계!`, sub: lv <= VD.art ? '마을에 새 기념물이 생겼어요' : '황금 나무가 더 반짝여요', art: vdPic(lv, 110),

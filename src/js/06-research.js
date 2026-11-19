@@ -210,6 +210,15 @@
   const ppLeft = () => { const end = Date.UTC(2026, 0, 5) + (ppPer() + 1) * PP.weeks * 604800000 - KST_MS; return Math.max(0, Math.ceil((end - gameNow()) / 86400000)); };
   const rtMax = k => (S && S.pp && S.pp.n >= (PP.deep[k] || Infinity)) ? RT5.top : RT5.max;   // 5.2.0 심화 칸이 열린 가지는 다섯 칸
   const ppMedOf = v => PP.med.reduce((a, m, i) => v >= m.at ? i + 1 : a, 0);
+  // 5.2.0.1 학회 메달 그림(작업지시서 100, conf_med_1~3). 그림이 없으면 이모지
+  const ppMedIc = (m, px) => { const u = IMG('conf_med_' + m); return u ? `<img class="pp-med" src="${u}" alt="" style="width:${px || 24}px;height:${px || 24}px;object-fit:contain;vertical-align:middle">` : PP.med[m - 1].ic; };
+  // 5.2.0.1 칭호 덤 장식(설계안 5절, 작업지시서 100): 세미나 10번, 20번, 논문 30편, 마을 기부 20단계. 얻으면 꾸미기 장식으로 지도에 놓아요(힘 없음)
+  const PP_DECO = [['deco_pp_board', () => !!S.pp && S.pp.sem >= 10], ['deco_pp_chair', () => !!S.pp && S.pp.sem >= 20], ['deco_pp_tower', () => !!S.pp && S.pp.n >= 30], ['deco_vd20', () => !!S.vd && S.vd.lv >= 20]];
+  function ppDecoSync() {
+    const got = []; if (!S || !S.deco || !S.deco.own) return got;
+    for (const [id, ok] of PP_DECO) if (DECO_BY[id] && !S.deco.own[id] && ok()) { S.deco.own[id] = 1; got.push(DECO_BY[id].name); }
+    return got;
+  }
   const ppScore = k => { const v = PP.base + PP.per * rtLv(k); return ((S.pp.ck[k] || 0) >= PP.halfAt) ? Math.floor(v / 2) : v; };
   function ppData(n, why) {   // 연구 자료 얻기(대학원에서만)
     if (!ppOpen() || !(n > 0)) return 0;
@@ -221,13 +230,15 @@
   // 학회가 바뀌면 지난 학회 메달을 주고 점수를 0부터. 켤 때와 1초마다 봐요
   function ppSync() {
     if (!S || !S.pp) return;
+    if (ppDecoSync().length) save();   // 이미 조건을 넘은 저장도 받아요
     const p = ppPer(); if (S.pp.cm === p) return;
     const old = S.pp.cm, v = S.pp.cf, m = old >= 0 && v > 0 ? ppMedOf(v) : 0;
     S.pp.cm = p; S.pp.cf = 0; S.pp.ck = {};
     if (m) {
       const M = PP.med[m - 1]; S.pp.med.push([old, m]); if (S.pp.med.length > 60) S.pp.med = S.pp.med.slice(-60);
       addEss(M.ess); if (M.gold) addGold(M.gold);
-      showReward({ title: `숲속 학회 ${M.nm}`, sub: `지난 학회 점수 ${fmt(v)}점`, items: [{ ic: '🏅', t: `${M.ic} ${M.nm}` }, { ic: 'ess', t: `숲의 정수 +${M.ess}` }, M.gold ? { ic: 'gold', t: `황금 도토리 +${M.gold}` } : null] });
+      const mu = IMG('conf_med_' + m);
+      showReward({ title: `숲속 학회 ${M.nm}`, sub: `지난 학회 점수 ${fmt(v)}점`, art: mu ? `<img src="${mu}" alt="" style="width:96px;height:96px;object-fit:contain">` : undefined, items: [{ ic: ppMedIc(m), t: M.nm }, { ic: 'ess', t: `숲의 정수 +${M.ess}` }, M.gold ? { ic: 'gold', t: `황금 도토리 +${M.gold}` } : null] });
     }
     save();
   }
@@ -252,20 +263,21 @@
     const sc = ppScore(c.k);
     S.pp.cur = null; S.pp.n += 1; S.pp.by[c.k] = (S.pp.by[c.k] || 0) + 1; S.pp.ck[c.k] = (S.pp.ck[c.k] || 0) + 1;
     S.pp.cf = Math.min(99999, S.pp.cf + sc); S.pp.cb = Math.max(S.pp.cb, S.pp.cf);
-    addEss(PP.ess); rankDirty(); save();
+    addEss(PP.ess); rankDirty();
+    const newD = ppDecoSync(); save();
     const newT = PP_TITLES.filter(t => t.got(S) && !before.has(t.id)), deep = RT5.list.filter(x => rtMax(x.k) > RT5.max);
     showReward({ title: `논문 ${S.pp.n}편째 완성!`, sub: `${D ? D.nm : ''} 논문, 학회 점수 +${sc}`, items: [{ ic: 'ess', t: `숲의 정수 +${PP.ess}` }, { ic: '📜', t: `이번 학회 ${fmt(S.pp.cf)}점` },
-      deep.length > deep0 ? { ic: '🌿', t: `${deep[deep.length - 1].nm} 가지에 다섯째 칸이 열렸어요` } : null, ...newT.map(t => ({ ic: '🎖️', t: `칭호 "${t.title}"` }))] });
+      deep.length > deep0 ? { ic: '🌿', t: `${deep[deep.length - 1].nm} 가지에 다섯째 칸이 열렸어요` } : null, ...newT.map(t => ({ ic: '🎖️', t: `칭호 "${t.title}"` })), ...newD.map(n => ({ ic: '🎁', t: `장식 '${n}' (꾸미기 모드에서 지도에 놓아요)` }))] });
     sfx('quest'); checkQuests(true);
     if (!$('#mRx').hidden) renderRx();
   }
-  function ppSemDone() { if (S && S.pp && gradOn()) { S.pp.sem += 1; ppData(PP.dat.sem); } }   // 세미나와 학위수여식
+  function ppSemDone() { if (S && S.pp && gradOn()) { S.pp.sem += 1; ppData(PP.dat.sem); for (const n of ppDecoSync()) toast(`'${n}' 장식을 받았어요\n꾸미기 모드에서 지도에 놓아요`); } }   // 세미나와 학위수여식
   function ppPart() {
     if (!ppOpen()) return `<p class="fine">${gradOn() ? '연구 구역 연구소를 지으면 열려요' : '대학교를 졸업하고 대학원에 가면 열려요'}</p>`;
     ppSync();
     const P = S.pp, c = P.cur, now = gameNow(), m = ppMedOf(P.cf), nx = PP.med[m], u = IMG('ic_rdata'), up = IMG('ic_paper'), dayDone = P.day === gameToday();
     const nextDeep = RT5.list.filter(D => P.n < PP.deep[D.k]).sort((a, b) => PP.deep[a.k] - PP.deep[b.k])[0];
-    let h = `<div class="pp-conf"><b>이번 숲속 학회 ${fmt(P.cf)}점</b><small>${ppLeft()}일 남음. ${m ? `지금 ${PP.med[m - 1].ic} ${PP.med[m - 1].nm}` : '아직 메달 없음'}${nx ? `, ${nx.at}점이면 ${nx.ic} ${nx.nm}` : ''}</small></div>`;
+    let h = `<div class="pp-conf"><b>이번 숲속 학회 ${fmt(P.cf)}점</b><small>${ppLeft()}일 남음. ${m ? `지금 ${ppMedIc(m, 18)} ${PP.med[m - 1].nm}` : '아직 메달 없음'}${nx ? `, ${nx.at}점이면 ${ppMedIc(m + 1, 18)} ${nx.nm}` : ''}</small></div>`;
     h += `<div class="dp-row"><span class="dp-ic">${u ? `<img src="${u}" alt="">` : '🔎'}</span><div class="dp-tx"><b>연구 자료 ${fmt(P.dat)}개</b><small>논문 한 편에 ${PP.need}개. 세미나 ${PP.dat.sem}, 연구 트리 칸 ${PP.dat.rt}, 조교 파견 4시간 이상, 심화 탐험 큰 장난꾸러기</small></div>` +
       (dayDone ? '<span class="fe-lock">오늘 정리함</span>' : `<button class="cta small" type="button" data-pp="day">자료 정리 +${PP.dat.day}</button>`) + '</div>';
     if (c) { const D = RT5.list.find(x => x.k === c.k); h += `<div class="dp-row on"><span class="dp-ic">${up ? `<img src="${up}" alt="">` : '📜'}</span><div class="dp-tx"><b>${D ? D.nm : ''} 논문 쓰는 중</b><small>끝나면 학회 점수 +${ppScore(c.k)}</small></div><span class="fe-lock">${hms(c.end - now)}</span></div>`; }
