@@ -495,7 +495,8 @@
     $('#rankView').hidden = tossRank();
     const th = tm && !!rt.rkH;   // 4.3.3 심화 탐험 순위
     $('#rankTamSeg').hidden = !tm; $$('#rankTamSeg [data-rth]').forEach(b => b.setAttribute('aria-checked', String((b.dataset.rth === '1') === th)));
-    $$('#rankView [data-rv]').forEach(b => b.setAttribute('aria-checked', String(b.dataset.rv === mode)));
+    $$('#rankView [data-rv]').forEach(b => b.setAttribute('aria-checked', String(b.dataset.rv === (sea ? 'week' : mode))));   // 5.1.1.4 랭킹 네 칸: 리그 안에 이번 주와 시즌
+    $('#rankLgSeg').hidden = tossRank() || !(wk || sea); $$('#rankLgSeg [data-rlg]').forEach(b => b.setAttribute('aria-checked', String(b.dataset.rlg === (sea ? 'sea' : 'week'))));
     const score = th ? tamHf() : tm ? tamTf() : sea ? S.rs.p : bm ? S.bt.pts : wk ? S.lg.pts : rankScore();
     const R = th ? (Rank.hrows || []) : tm ? (Rank.trows || []) : tossRank() || (bm && !btOpen()) ? (sea ? (Rank.srows || []) : bm ? (Rank.brows || []) : wk ? Rank.wrows : Rank.rows) : rkFill(mode, sea ? (Rank.srows || []) : bm ? (Rank.brows || []) : wk ? Rank.wrows : Rank.rows, score), mine = R.findIndex(r => r.id === Rank.uid);   // 3.0.0 보조 줄
     if (wk && mine >= 0 && S.lg.pos !== mine + 1) { S.lg.pos = mine + 1; }

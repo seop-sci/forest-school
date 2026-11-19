@@ -73,18 +73,49 @@
   }
   function rtTick() {
     const c = S && S.rt5 && S.rt5.cur; if (!c || gameNow() < c.end) return;
-    const D = RT5.list.find(x => x.k === c.k); S.rt5.lv[c.k] = Math.min(RT5.max, rtLv(c.k) + 1); S.rt5.cur = null; save();
+    const D = RT5.list.find(x => x.k === c.k); S.rt5.lv[c.k] = Math.min(RT5.max, rtLv(c.k) + 1); S.rt5.cur = null; save(); rt.rtPop = { k: c.k, i: rtLv(c.k) - 1 };   // 5.1.1.4 나무 칸이 막 자란 움직임
     toast(`${D ? D.nm : ''} 연구 ${rtLv(c.k)}칸 완성!\n${D ? D.eff(rtLv(c.k)) : ''}`); sfx('quest');
     if (!$('#mRx').hidden) renderRx();
   }
+  /* 5.1.1.4 woodani 결정(2026-11-19): 연구 트리를 목록 대신 한 그루 나무로. 밑동에서 가지 다섯 개가 위로 뻗고, 가지마다 칸이 아래에서 위로 이어져요.
+     칸 자리는 720x960 판 기준(그림 작업지시서 96의 rt_tree_bg와 같은 좌표). 칸을 누르면 아래 칸 창에 효과, 값, '연구하기'. 효과와 값은 그대로 */
+  const RT_X = [96, 228, 360, 492, 624], RT_Y = i => 800 - 150 * i, RT_W = 720, RT_H = 960;
+  const rtTop = () => RT5.max >= 5 ? 0 : RT_Y(RT5.max - 1) - 130;   // 칸이 네 줄이면 빈 위쪽을 잘라요(다섯째 칸은 5.2.0 논문 심화 칸)
+  function rtTreeSvg() {
+    const bg = IMG('rt_tree_bg'), c = S.rt5.cur;
+    let s = '';
+    if (!bg) s += `<path d="M330 960 Q336 905 360 880 Q384 905 390 960 Z" fill="#9A6B43"/>`;
+    RT5.list.forEach((D, j) => {
+      const x = RT_X[j], L = rtLv(D.k), top = RT_Y(RT5.max - 1), run = c && c.k === D.k;
+      const stem = `M360 885 C360 850 ${x} 860 ${x} ${RT_Y(0)}`;
+      if (!bg) s += `<path d="${stem} L${x} ${top}" stroke="#B98A5E" stroke-width="16" fill="none" stroke-linecap="round"/>`;
+      if (L > 0 || run) s += `<path d="${stem}" class="rt-done" fill="none"/>`;
+      for (let i = 1; i < RT5.max; i++) if (L > i || (L === i && run)) s += `<path d="M${x} ${RT_Y(i - 1)} L${x} ${RT_Y(i)}" class="rt-done${L === i ? ' rt-run' : ''}" fill="none"/>`;
+    });
+    return `<svg class="rt-lines" viewBox="0 ${rtTop()} ${RT_W} ${RT_H - rtTop()}" preserveAspectRatio="none" aria-hidden="true">${s}</svg>`;
+  }
   function rtPart() {
-    const c = S.rt5.cur, now = gameNow();
-    return '<p class="fine">한 번에 하나씩 연구해요. 졸업해도 남아요.</p><div class="dp-list">' + RT5.list.map(D => {
-      const L = rtLv(D.k), u = IMG(D.ic), run = c && c.k === D.k, full = L >= RT5.max, k = rtCost(D.k);
-      const btn = D.lock ? '<span class="fe-lock">준비 중</span>' : full ? '<span class="fe-lock">완성</span>' : run ? `<span class="fe-lock">${hms(c.end - now)}</span>`
-        : `<button class="${c || S.ess < k.ess || S.budget < k.ac ? 'btn-sub' : 'cta'} small" type="button" data-rt="${D.k}">정수 ${k.ess}</button>`;
-      return `<div class="dp-row"><span class="dp-ic">${u ? `<img src="${u}" alt="">` : ''}</span><div class="dp-tx"><b>${D.nm} ${'●'.repeat(L)}${'○'.repeat(RT5.max - L)}</b><small>${L ? D.eff(L) : '아직 연구 전'}${D.lock || full ? '' : `, 다음 ${D.eff(L + 1)} (도토리 ${fmt(k.ac)}, ${rtHrs(k.sec)})`}</small></div>${btn}</div>`;
-    }).join('') + '</div>';
+    const c = S.rt5.cur, now = gameNow(), bg = IMG('rt_tree_bg');
+    if (!RT5.list.some(D => D.k === rt.rtSel)) rt.rtSel = c ? c.k : (RT5.list.find(D => !D.lock && rtLv(D.k) < RT5.max) || RT5.list[0]).k;
+    let nodes = '';
+    RT5.list.forEach((D, j) => {
+      const L = rtLv(D.k), u = IMG(D.ic), run = c && c.k === D.k;
+      for (let i = 0; i < RT5.max; i++) {
+        const st = i < L ? 'done' : i === L && run ? 'run' : i === L && !D.lock ? 'next' : 'lock', sel = rt.rtSel === D.k && (i === Math.min(L, RT5.max - 1));
+        const pop = st === 'done' && rt.rtPop && rt.rtPop.k === D.k && rt.rtPop.i === i;
+        nodes += `<button class="rt-node ${st}${sel ? ' sel' : ''}${pop ? ' pop' : ''}" type="button" data-rts="${D.k}" style="left:${(RT_X[j] / RT_W * 100).toFixed(2)}%;top:${((RT_Y(i) - rtTop()) / (RT_H - rtTop()) * 100).toFixed(2)}%" aria-label="${D.nm} ${i + 1}칸${st === 'done' ? ' 완성' : st === 'run' ? ' 연구 중' : st === 'lock' ? ' 잠김' : ''}">` +
+          (u ? `<img src="${u}" alt="">` : `<b>${i + 1}</b>`) + (st === 'lock' ? '<i class="rt-lk">🔒</i>' : st === 'done' ? '<i class="rt-leaf"></i>' : '') + '</button>';
+      }
+      nodes += `<span class="rt-nm" style="left:${(RT_X[j] / RT_W * 100).toFixed(2)}%">${D.nm}</span>`;
+    });
+    rt.rtPop = null;
+    const D = RT5.list.find(x => x.k === rt.rtSel), L = rtLv(D.k), run = c && c.k === D.k, full = L >= RT5.max, k = rtCost(D.k);
+    const btn = D.lock ? '<span class="fe-lock">준비 중</span>' : full ? '<span class="fe-lock">완성</span>' : run ? `<span class="fe-lock">${hms(c.end - now)}</span>`
+      : c ? '<span class="fe-lock">다른 연구 중</span>'
+      : `<button class="${S.ess < k.ess || S.budget < k.ac ? 'btn-sub' : 'cta'} small" type="button" data-rt="${D.k}">연구하기 (정수 ${k.ess})</button>`;
+    const info = `<div class="rt-card"><span class="dp-ic">${IMG(D.ic) ? `<img src="${IMG(D.ic)}" alt="">` : ''}</span><div class="dp-tx"><b>${D.nm} ${Math.min(L + (full ? 0 : 1), RT5.max)}칸${full ? ' (완성)' : ''}</b>` +
+      `<small>${L ? `지금 ${D.eff(L)}` : '아직 연구 전'}${D.lock || full ? '' : `<br>다음 ${D.eff(L + 1)}<br>도토리 ${fmt(k.ac)}, ${rtHrs(k.sec)}`}</small></div>${btn}</div>`;
+    return `<p class="fine">한 번에 하나씩 연구해요. 졸업해도 남아요.</p><div class="rt-tree${bg ? ' art' : ''}" style="aspect-ratio:${RT_W}/${RT_H - rtTop()}${bg ? `;background-image:url('${blobUrl(bg)}')` : ''}">${rtTreeSvg()}${nodes}</div>${info}`;
   }
   function renderRx() {
     const tab = ['tree', 'ta'].includes(rt.rxTab) ? rt.rxTab : 'inv';

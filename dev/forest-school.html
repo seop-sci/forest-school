@@ -3280,6 +3280,29 @@ body.sheet-open #map, body.sheet-open .wx-fx::before, body.sheet-open .wx-fx i, 
 .cs-list{display:flex;flex-direction:column;gap:6px;padding:0 10px;text-align:left;max-height:54vh;overflow:auto;overscroll-behavior:contain}   /* 5.0.1.6 C-02 목록만 스크롤 */
 .dp-head{position:relative;display:flex;align-items:center;justify-content:space-between;min-height:54px;padding:10px 14px;background:#F3E2C2 center/cover no-repeat;border-radius:14px 14px 0 0}
 .dp-head.art{min-height:118px;align-items:flex-end}
+.rt-tree{position:relative;width:100%;max-width:400px;margin:4px auto 8px;border-radius:16px;overflow:hidden;background:radial-gradient(120% 70% at 50% 0%,#DDEFD0 0%,#EEF6E4 55%,#F6F0DE 100%);background-size:100% auto;background-position:center bottom;border:1.5px solid var(--line)}
+:root[data-theme="dark"] .rt-tree:not(.art){background:radial-gradient(120% 70% at 50% 0%,#2E4A33 0%,#25382A 60%,#2B2A20 100%)}
+.rt-lines{position:absolute;inset:0;width:100%;height:100%}
+.rt-lines .rt-done{stroke:#7FC25E;stroke-width:9;stroke-linecap:round;filter:drop-shadow(0 0 4px rgba(150,230,110,.8))}
+.rt-lines .rt-run{stroke-dasharray:14 12;animation:rtFlow 1s linear infinite}
+@keyframes rtFlow{to{stroke-dashoffset:-26}}
+.rt-node{position:absolute;width:12.2%;aspect-ratio:1;transform:translate(-50%,-50%);border-radius:50%;padding:0;border:3px solid #B98A5E;background:#FFF8EA;display:grid;place-items:center;box-shadow:0 2px 0 rgba(90,58,22,.25);cursor:pointer}
+.rt-node img{width:88%;height:88%;border-radius:50%}
+.rt-node b{font-size:14px;color:#7A5530}
+.rt-node.lock{filter:grayscale(1);opacity:.5}
+.rt-node.next{border-color:#F3C04B;box-shadow:0 0 0 3px rgba(243,192,75,.45),0 0 12px rgba(243,192,75,.9);animation:rtGlow 1.6s ease-in-out infinite}
+.rt-node.run{border-color:#5BB3D9;box-shadow:0 0 0 3px rgba(91,179,217,.4)}
+.rt-node.done{border-color:#5E9E45;background:#E6F5D8}
+.rt-node.sel{outline:3px solid #fff;outline-offset:1px}
+.rt-node.pop{animation:rtPop .6s ease-out}
+.rt-lk{position:absolute;right:-4px;bottom:-4px;font-style:normal;font-size:11px}
+.rt-leaf{position:absolute;right:-5px;top:-5px;width:13px;height:9px;border-radius:0 9px 0 9px;background:#5E9E45;transform:rotate(-20deg)}
+.rt-nm{position:absolute;bottom:4.5%;transform:translateX(-50%);padding:1px 6px;border-radius:9px;background:rgba(255,248,234,.92);font-size:11px;font-weight:700;color:#5A3A16;white-space:nowrap}
+@keyframes rtGlow{50%{box-shadow:0 0 0 5px rgba(243,192,75,.25),0 0 18px rgba(243,192,75,1)}}
+@keyframes rtPop{0%{transform:translate(-50%,-50%) scale(.6)}60%{transform:translate(-50%,-50%) scale(1.18)}100%{transform:translate(-50%,-50%) scale(1)}}
+.rt-card{display:flex;align-items:center;gap:8px;padding:8px;border:1.5px solid var(--line);border-radius:12px;background:var(--card)}
+.rt-card .cta.small,.rt-card .btn-sub.small,.rt-card .fe-lock{flex:none;width:auto;margin:0;padding:7px 10px;font-size:12px;min-height:0}
+@media (prefers-reduced-motion:reduce){.rt-node.next,.rt-lines .rt-run,.rt-node.pop{animation:none}}
 .dp-head.art b{padding:2px 14px;border-radius:14px;background:rgba(255,249,232,.92)}
 .dp-head b{font-family:var(--font-display);font-weight:400;font-size:21px;color:#5A3A16;text-shadow:0 1px 0 rgba(255,255,255,.8)}
 .dp-note{margin:8px 2px 6px;font-size:12px;color:var(--muted);text-align:center}
@@ -4307,7 +4330,8 @@ body.mg-on .toast[hidden]{display:none}
     <section class="panel" id="panelRank" hidden aria-labelledby="ttlRank">
       <button class="panel-x" type="button" aria-label="홈으로"><svg viewBox="0 0 24 24" width="18" height="18" aria-hidden="true"><path d="M6 6l12 12M18 6L6 18" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round"/></svg></button>
       <h2 id="ttlRank" class="ph"><span class="tic" data-ic="ic_rank" aria-hidden="true"></span><span>랭킹</span></h2>
-      <div class="seg rank-seg" id="rankView" role="radiogroup" aria-label="랭킹 보기"><button type="button" role="radio" data-rv="week" aria-checked="true">주간 리그</button><button type="button" role="radio" data-rv="sea" aria-checked="false">시즌</button><button type="button" role="radio" data-rv="all" aria-checked="false">학교 파워</button><button type="button" role="radio" data-rv="bt" aria-checked="false">대결 순위</button><button type="button" role="radio" data-rv="tam" aria-checked="false">탐험</button></div>
+      <div class="seg rank-seg" id="rankView" role="radiogroup" aria-label="랭킹 보기"><button type="button" role="radio" data-rv="week" aria-checked="true">리그</button><button type="button" role="radio" data-rv="all" aria-checked="false">학교</button><button type="button" role="radio" data-rv="bt" aria-checked="false">대결</button><button type="button" role="radio" data-rv="tam" aria-checked="false">탐험</button></div>
+      <div class="seg rank-seg" id="rankLgSeg" role="radiogroup" aria-label="리그 순위 보기"><button type="button" role="radio" data-rlg="week" aria-checked="true">이번 주</button><button type="button" role="radio" data-rlg="sea" aria-checked="false">시즌</button></div>
       <div class="seg rank-seg" id="rankTamSeg" role="radiogroup" aria-label="탐험 순위 보기" hidden><button type="button" role="radio" data-rth="0" aria-checked="true">일반 탐험</button><button type="button" role="radio" data-rth="1" aria-checked="false">심화 탐험</button></div>
       <p class="lead" id="rankLead">학교 파워로 순위를 매겨요.</p>
       <div class="rank-me" id="rankMe">
@@ -4415,7 +4439,7 @@ body.mg-on .toast[hidden]{display:none}
       </div>
       <h3 class="panel-sub">정보</h3>
       <dl class="info">
-        <div id="verRow"><dt>버전</dt><dd>v5.1.1.3</dd></div>
+        <div id="verRow"><dt>버전</dt><dd>v5.1.1.4</dd></div>
         <div id="pidRow" hidden><dt>학교 번호</dt><dd id="infoPid"></dd></div>
       </dl>
       <div id="devBox" hidden>
@@ -9348,18 +9372,49 @@ body.mg-on .toast[hidden]{display:none}
   }
   function rtTick() {
     const c = S && S.rt5 && S.rt5.cur; if (!c || gameNow() < c.end) return;
-    const D = RT5.list.find(x => x.k === c.k); S.rt5.lv[c.k] = Math.min(RT5.max, rtLv(c.k) + 1); S.rt5.cur = null; save();
+    const D = RT5.list.find(x => x.k === c.k); S.rt5.lv[c.k] = Math.min(RT5.max, rtLv(c.k) + 1); S.rt5.cur = null; save(); rt.rtPop = { k: c.k, i: rtLv(c.k) - 1 };   // 5.1.1.4 나무 칸이 막 자란 움직임
     toast(`${D ? D.nm : ''} 연구 ${rtLv(c.k)}칸 완성!\n${D ? D.eff(rtLv(c.k)) : ''}`); sfx('quest');
     if (!$('#mRx').hidden) renderRx();
   }
+  /* 5.1.1.4 woodani 결정(2026-11-19): 연구 트리를 목록 대신 한 그루 나무로. 밑동에서 가지 다섯 개가 위로 뻗고, 가지마다 칸이 아래에서 위로 이어져요.
+     칸 자리는 720x960 판 기준(그림 작업지시서 96의 rt_tree_bg와 같은 좌표). 칸을 누르면 아래 칸 창에 효과, 값, '연구하기'. 효과와 값은 그대로 */
+  const RT_X = [96, 228, 360, 492, 624], RT_Y = i => 800 - 150 * i, RT_W = 720, RT_H = 960;
+  const rtTop = () => RT5.max >= 5 ? 0 : RT_Y(RT5.max - 1) - 130;   // 칸이 네 줄이면 빈 위쪽을 잘라요(다섯째 칸은 5.2.0 논문 심화 칸)
+  function rtTreeSvg() {
+    const bg = IMG('rt_tree_bg'), c = S.rt5.cur;
+    let s = '';
+    if (!bg) s += `<path d="M330 960 Q336 905 360 880 Q384 905 390 960 Z" fill="#9A6B43"/>`;
+    RT5.list.forEach((D, j) => {
+      const x = RT_X[j], L = rtLv(D.k), top = RT_Y(RT5.max - 1), run = c && c.k === D.k;
+      const stem = `M360 885 C360 850 ${x} 860 ${x} ${RT_Y(0)}`;
+      if (!bg) s += `<path d="${stem} L${x} ${top}" stroke="#B98A5E" stroke-width="16" fill="none" stroke-linecap="round"/>`;
+      if (L > 0 || run) s += `<path d="${stem}" class="rt-done" fill="none"/>`;
+      for (let i = 1; i < RT5.max; i++) if (L > i || (L === i && run)) s += `<path d="M${x} ${RT_Y(i - 1)} L${x} ${RT_Y(i)}" class="rt-done${L === i ? ' rt-run' : ''}" fill="none"/>`;
+    });
+    return `<svg class="rt-lines" viewBox="0 ${rtTop()} ${RT_W} ${RT_H - rtTop()}" preserveAspectRatio="none" aria-hidden="true">${s}</svg>`;
+  }
   function rtPart() {
-    const c = S.rt5.cur, now = gameNow();
-    return '<p class="fine">한 번에 하나씩 연구해요. 졸업해도 남아요.</p><div class="dp-list">' + RT5.list.map(D => {
-      const L = rtLv(D.k), u = IMG(D.ic), run = c && c.k === D.k, full = L >= RT5.max, k = rtCost(D.k);
-      const btn = D.lock ? '<span class="fe-lock">준비 중</span>' : full ? '<span class="fe-lock">완성</span>' : run ? `<span class="fe-lock">${hms(c.end - now)}</span>`
-        : `<button class="${c || S.ess < k.ess || S.budget < k.ac ? 'btn-sub' : 'cta'} small" type="button" data-rt="${D.k}">정수 ${k.ess}</button>`;
-      return `<div class="dp-row"><span class="dp-ic">${u ? `<img src="${u}" alt="">` : ''}</span><div class="dp-tx"><b>${D.nm} ${'●'.repeat(L)}${'○'.repeat(RT5.max - L)}</b><small>${L ? D.eff(L) : '아직 연구 전'}${D.lock || full ? '' : `, 다음 ${D.eff(L + 1)} (도토리 ${fmt(k.ac)}, ${rtHrs(k.sec)})`}</small></div>${btn}</div>`;
-    }).join('') + '</div>';
+    const c = S.rt5.cur, now = gameNow(), bg = IMG('rt_tree_bg');
+    if (!RT5.list.some(D => D.k === rt.rtSel)) rt.rtSel = c ? c.k : (RT5.list.find(D => !D.lock && rtLv(D.k) < RT5.max) || RT5.list[0]).k;
+    let nodes = '';
+    RT5.list.forEach((D, j) => {
+      const L = rtLv(D.k), u = IMG(D.ic), run = c && c.k === D.k;
+      for (let i = 0; i < RT5.max; i++) {
+        const st = i < L ? 'done' : i === L && run ? 'run' : i === L && !D.lock ? 'next' : 'lock', sel = rt.rtSel === D.k && (i === Math.min(L, RT5.max - 1));
+        const pop = st === 'done' && rt.rtPop && rt.rtPop.k === D.k && rt.rtPop.i === i;
+        nodes += `<button class="rt-node ${st}${sel ? ' sel' : ''}${pop ? ' pop' : ''}" type="button" data-rts="${D.k}" style="left:${(RT_X[j] / RT_W * 100).toFixed(2)}%;top:${((RT_Y(i) - rtTop()) / (RT_H - rtTop()) * 100).toFixed(2)}%" aria-label="${D.nm} ${i + 1}칸${st === 'done' ? ' 완성' : st === 'run' ? ' 연구 중' : st === 'lock' ? ' 잠김' : ''}">` +
+          (u ? `<img src="${u}" alt="">` : `<b>${i + 1}</b>`) + (st === 'lock' ? '<i class="rt-lk">🔒</i>' : st === 'done' ? '<i class="rt-leaf"></i>' : '') + '</button>';
+      }
+      nodes += `<span class="rt-nm" style="left:${(RT_X[j] / RT_W * 100).toFixed(2)}%">${D.nm}</span>`;
+    });
+    rt.rtPop = null;
+    const D = RT5.list.find(x => x.k === rt.rtSel), L = rtLv(D.k), run = c && c.k === D.k, full = L >= RT5.max, k = rtCost(D.k);
+    const btn = D.lock ? '<span class="fe-lock">준비 중</span>' : full ? '<span class="fe-lock">완성</span>' : run ? `<span class="fe-lock">${hms(c.end - now)}</span>`
+      : c ? '<span class="fe-lock">다른 연구 중</span>'
+      : `<button class="${S.ess < k.ess || S.budget < k.ac ? 'btn-sub' : 'cta'} small" type="button" data-rt="${D.k}">연구하기 (정수 ${k.ess})</button>`;
+    const info = `<div class="rt-card"><span class="dp-ic">${IMG(D.ic) ? `<img src="${IMG(D.ic)}" alt="">` : ''}</span><div class="dp-tx"><b>${D.nm} ${Math.min(L + (full ? 0 : 1), RT5.max)}칸${full ? ' (완성)' : ''}</b>` +
+      `<small>${L ? `지금 ${D.eff(L)}` : '아직 연구 전'}${D.lock || full ? '' : `<br>다음 ${D.eff(L + 1)}<br>도토리 ${fmt(k.ac)}, ${rtHrs(k.sec)}`}</small></div>${btn}</div>`;
+    return `<p class="fine">한 번에 하나씩 연구해요. 졸업해도 남아요.</p><div class="rt-tree${bg ? ' art' : ''}" style="aspect-ratio:${RT_W}/${RT_H - rtTop()}${bg ? `;background-image:url('${blobUrl(bg)}')` : ''}">${rtTreeSvg()}${nodes}</div>${info}`;
   }
   function renderRx() {
     const tab = ['tree', 'ta'].includes(rt.rxTab) ? rt.rxTab : 'inv';
@@ -14173,8 +14228,8 @@ body.mg-on .toast[hidden]{display:none}
        forest/rank/<내 id>   랭킹 이름과 학교 점수
        forest/stats/<내 id>  테스트 현황 (어디까지 했는지, 얼마나 했는지)
      <내 id>는 Firebase 익명 로그인이 기기(브라우저)마다 만들어 줘요. */
-  const VERSION = '5.1.1.3';   // 2026-11-17 woodani 결정: 웹에 5.0.2~5.0.5로 먼저 냈던 것을 앱과 함께 5.0.1 하나로 내요(버전 견줌은 앞 두 자리만 봐서 되돌아가도 괜찮아요)
-  const NT_QUIET = ['5.1.1.3', '5.1.1.2', '5.1.1.1', '5.1.1', '5.0.3.1', '5.0.3', '5.0.2.2', '5.0.2.1', '2.1.20', '2.1.2.2', '2.3.0.1', '2.3.4', '3.2.3', '3.2.4', '3.2.5', '3.3.1', '3.3.2', '3.3.3', '4.4.1.1', '4.4.1.2', '4.4.1.3', '4.4.1.4', '5.0.1.1', '5.0.1.2', '5.0.1.3', '5.0.1.4', '5.0.1.5', '5.0.1.6', '5.0.1.7', '5.0.1.8'];   // 5.0.1.1 생물 탐사 고침은 공지 없이   // 5.0.3도 공지 없이(공지 줄은 woodani가 정하면 넣어요)   // 5.0.2 공지 없이(woodani 2026-11-16)   // 5.0.1 공지 줄은 woodani가 정할 때까지 조용히   // 5.0.0 공지는 2026-11-16 woodani가 정해서 NOTICES로 옮겼어요   // 4.4.1(앱과 함께 내는 판)은 공지를 띄워요   // 4.4.1도 공지 없이(woodani)   // 3.3.1, 3.3.2, 3.3.3(토스 먼저)도 공지 창 없이(woodani). 2.3.0.1도 공지 창 없이(공지는 그대로 2.3.0). 2.3.4도 조용히(woodani 결정). 3.2.3, 3.2.4, 3.2.5도 공지 창 없이(공지 줄을 고르지 않음)
+  const VERSION = '5.1.1.4';   // 2026-11-17 woodani 결정: 웹에 5.0.2~5.0.5로 먼저 냈던 것을 앱과 함께 5.0.1 하나로 내요(버전 견줌은 앞 두 자리만 봐서 되돌아가도 괜찮아요)
+  const NT_QUIET = ['5.1.1.4', '5.1.1.3', '5.1.1.2', '5.1.1.1', '5.1.1', '5.0.3.1', '5.0.3', '5.0.2.2', '5.0.2.1', '2.1.20', '2.1.2.2', '2.3.0.1', '2.3.4', '3.2.3', '3.2.4', '3.2.5', '3.3.1', '3.3.2', '3.3.3', '4.4.1.1', '4.4.1.2', '4.4.1.3', '4.4.1.4', '5.0.1.1', '5.0.1.2', '5.0.1.3', '5.0.1.4', '5.0.1.5', '5.0.1.6', '5.0.1.7', '5.0.1.8'];   // 5.0.1.1 생물 탐사 고침은 공지 없이   // 5.0.3도 공지 없이(공지 줄은 woodani가 정하면 넣어요)   // 5.0.2 공지 없이(woodani 2026-11-16)   // 5.0.1 공지 줄은 woodani가 정할 때까지 조용히   // 5.0.0 공지는 2026-11-16 woodani가 정해서 NOTICES로 옮겼어요   // 4.4.1(앱과 함께 내는 판)은 공지를 띄워요   // 4.4.1도 공지 없이(woodani)   // 3.3.1, 3.3.2, 3.3.3(토스 먼저)도 공지 창 없이(woodani). 2.3.0.1도 공지 창 없이(공지는 그대로 2.3.0). 2.3.4도 조용히(woodani 결정). 3.2.3, 3.2.4, 3.2.5도 공지 창 없이(공지 줄을 고르지 않음)
     // 2.1.20 woodani 결정: 이 버전들은 업데이트해도 공지 창을 띄우지 않아요(공지는 그대로 2.1.2)
   /* 2.0.0 공지사항 (2026-10-27 woodani, 1.8.0은 이미 올려서 2.0.0부터): 설정 > 공지사항. 맨 위가 가장 새 공지예요.
      패치노트는 자동으로 넣지 않아요. woodani가 검수한 글만 여기에 적어요(CHANGELOG.md는 자세한 기록용이라 따로 있어요).
@@ -15575,7 +15630,8 @@ body.mg-on .toast[hidden]{display:none}
     $('#rankView').hidden = tossRank();
     const th = tm && !!rt.rkH;   // 4.3.3 심화 탐험 순위
     $('#rankTamSeg').hidden = !tm; $$('#rankTamSeg [data-rth]').forEach(b => b.setAttribute('aria-checked', String((b.dataset.rth === '1') === th)));
-    $$('#rankView [data-rv]').forEach(b => b.setAttribute('aria-checked', String(b.dataset.rv === mode)));
+    $$('#rankView [data-rv]').forEach(b => b.setAttribute('aria-checked', String(b.dataset.rv === (sea ? 'week' : mode))));   // 5.1.1.4 랭킹 네 칸: 리그 안에 이번 주와 시즌
+    $('#rankLgSeg').hidden = tossRank() || !(wk || sea); $$('#rankLgSeg [data-rlg]').forEach(b => b.setAttribute('aria-checked', String(b.dataset.rlg === (sea ? 'sea' : 'week'))));
     const score = th ? tamHf() : tm ? tamTf() : sea ? S.rs.p : bm ? S.bt.pts : wk ? S.lg.pts : rankScore();
     const R = th ? (Rank.hrows || []) : tm ? (Rank.trows || []) : tossRank() || (bm && !btOpen()) ? (sea ? (Rank.srows || []) : bm ? (Rank.brows || []) : wk ? Rank.wrows : Rank.rows) : rkFill(mode, sea ? (Rank.srows || []) : bm ? (Rank.brows || []) : wk ? Rank.wrows : Rank.rows, score), mine = R.findIndex(r => r.id === Rank.uid);   // 3.0.0 보조 줄
     if (wk && mine >= 0 && S.lg.pos !== mine + 1) { S.lg.pos = mine + 1; }
@@ -26639,7 +26695,8 @@ body.mg-on .toast[hidden]{display:none}
       S.units = b.dataset.units; save(); syncSettingsUI(); refreshNumbers();
       toast(S.units === 'en' ? '큰 숫자를 K, M, B로 줄여 써요' : '큰 숫자를 만, 억, 조로 줄여 써요');
     });
-    $('#rankView').addEventListener('click', e => { const b = e.target.closest('[data-rv]'); if (!b) return; rt.rankView = b.dataset.rv; sfx('tap'); renderRankPanel(); });
+    $('#rankView').addEventListener('click', e => { const b = e.target.closest('[data-rv]'); if (!b) return; rt.rankView = b.dataset.rv === 'week' ? (rt.rkLg || 'week') : b.dataset.rv; sfx('tap'); renderRankPanel(); });
+    $('#rankLgSeg').addEventListener('click', e => { const b = e.target.closest('[data-rlg]'); if (!b) return; rt.rankView = rt.rkLg = b.dataset.rlg === 'sea' ? 'sea' : 'week'; sfx('tap'); renderRankPanel(); });   // 5.1.1.4 리그 안의 이번 주와 시즌
     $('#rankTamSeg').addEventListener('click', e => { const b = e.target.closest('[data-rth]'); if (!b) return; rt.rkH = b.dataset.rth === '1' ? 1 : 0; sfx('tap'); renderRankPanel(); });   // 4.3.3
     $('#rankLook').addEventListener('click', e => { const b = e.target.closest('[data-look]'); if (b) openLook(b.dataset.look); });   // 2.1.3 예시 학교
     $('#rankLook').addEventListener('change', e => { if (e.target.id === 'lookOn') lookSet(e.target.checked); });
@@ -27214,7 +27271,8 @@ body.mg-on .toast[hidden]{display:none}
     $('#sheetDept').addEventListener('click', () => viaSheet(openDept));   // 4.0.0
     $('#sheetRx').addEventListener('click', () => viaSheet(openRx));   // 5.0.0
     $('#rxSeg').addEventListener('click', e => { const b = e.target.closest('[data-rseg]'); if (!b) return; rt.rxTab = b.dataset.rseg; sfx('tap'); renderRx(); });
-    $('#rxBody').addEventListener('click', e => { const b = e.target.closest('[data-rt],[data-dp^="rx:"],[data-ta]'); if (!b) return;
+    $('#rxBody').addEventListener('click', e => { const b = e.target.closest('[data-rt],[data-rts],[data-dp^="rx:"],[data-ta]'); if (!b) return;
+      if (b.dataset.rts) { rt.rtSel = b.dataset.rts; sfx('tap'); renderRx(); return; }   // 5.1.1.4 연구 나무 칸 고르기
       if (b.dataset.ta) { const [a, x, y, z] = b.dataset.ta.split(':'); const i = +x;   // 5.1.0 조교
         if (a === 'pick') { rt.taPick = rt.taPick === i ? -1 : i; rt.taGo = -1; sfx('tap'); }
         else if (a === 'go') { rt.taGo = rt.taGo === i ? -1 : i; rt.taPick = -1; sfx('tap'); }
