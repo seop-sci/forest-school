@@ -90,6 +90,7 @@
     const tab = ['tree', 'ta'].includes(rt.rxTab) ? rt.rxTab : 'inv';
     $$('#rxSeg [data-rseg]').forEach(b => b.setAttribute('aria-checked', String(b.dataset.rseg === tab)));
     setH($('#rxBody'), tab === 'tree' ? rtPart() : tab === 'ta' ? taPart() : rxPart(true));
+    { const hd = $('#rxTitle').parentElement, u = tab === 'ta' && taOpen() ? IMG('ta_bg') : ''; hd.classList.toggle('art', !!u); hd.style.backgroundImage = u ? `url("${blobUrl(u)}")` : ''; }   // 5.1.0 조교 탭 머리 그림
   }
   /* ---------- 5.1.0 조교 파견 (프로젝트 문서 '5.1.0 설계안 (조교 파견) 초안', woodani 결정 2026-11-19: 숫자는 제안대로) ----------
      조교 자리: 대학원생 조교를 캠퍼스 건물에 한 명씩 앉혀요. 앉아 있는 조교 한 명마다 수업료 +10%, 그 건물 가구 값 -10%.
@@ -116,14 +117,14 @@
     for (let j = 0; j < S.ta.seat.length; j++) if (j !== i && S.ta.seat[j] && S.ta.seat[j].b === k && k) S.ta.seat[j] = { b: '' };   // 한 건물에 한 명: 앉아 있던 조교는 비켜요
     while (S.ta.seat.length <= i) S.ta.seat.push({ b: '' });
     S.ta.seat[i] = { b: k || '' }; rt.taPick = -1;
-    save(); renderHUD(); checkQuests(true); sfx('tap');
+    save(); renderHUD(); renderDeco(); checkQuests(true); sfx('tap');
     if (k) toast(`${TA.whoNm[taWho(i)]} 조교가\n${FAC[k].name}에서 일해요`);
     return true;
   }
   function taSend(i, to, h) {
     if (!taOpen() || i < 0 || i >= taSeats() || taOut(i) || !(to >= 0 && to <= 4) || !(h >= 0 && h <= 2)) return false;
     S.ta.out.push({ i, to, h, end: gameNow() + taSec(h) * 1000 }); S.ta.n = Math.min(1e9, S.ta.n + 1);   // 파견 횟수는 보낼 때 세요
-    save(); renderHUD(); checkQuests(true); sfx('coin'); rt.taGo = -1;
+    save(); renderHUD(); renderDeco(); checkQuests(true); sfx('coin'); rt.taGo = -1;
     toast(`${TA.whoNm[taWho(i)]} 조교가\n숲속 ${TA.school[to]}에 다녀와요\n${rtHrs(taSec(h))} 뒤에 돌아와요`);
     return true;
   }
@@ -141,7 +142,7 @@
     S.ta.out = S.ta.out.filter(o => !due.includes(o));
     S.ta.mem = Math.min(1e9, S.ta.mem + mem);
     addEss(ess); if (ac > 0) { S.budget += ac; earn(ac); got.push(`도토리 ${fmt(ac)}`); }
-    save(); renderHUD(); checkQuests(true); sfx('quest'); buzz(15);
+    save(); renderHUD(); renderDeco(); checkQuests(true); sfx('quest'); buzz(15);
     toast(`조교 ${due.length}명이 돌아왔어요\n숲의 정수 ${ess}, 추억 조각 ${mem}` + (got.length ? `\n${[...new Set(got)].join(', ')}` : ''));
     if (!$('#mRx').hidden) renderRx();
     return true;
@@ -151,7 +152,7 @@
     const c = TA.mon[S.ta.mon];
     if (S.ta.mem < c) { toast(`추억 조각이 ${c - S.ta.mem}개 모자라요`); return false; }
     S.ta.mem -= c; S.ta.mon += 1;
-    save(); renderHUD(); checkQuests(true); sfx('quest'); buzz(20);
+    save(); renderHUD(); renderDeco(); checkQuests(true); sfx('quest'); buzz(20);
     toast(`모교 기념비 ${S.ta.mon}단계!\n수업료 +${TA.monPct * S.ta.mon}%` + (S.ta.mon >= TA.mon.length ? `\n칭호 '모교의 자랑'을 받았어요` : ''));
     return true;
   }
@@ -173,6 +174,24 @@
     const mn = S.ta.mon, full = mn >= TA.mon.length, mc = full ? 0 : TA.mon[mn];
     h += `<h3 class="fv-h">모교 기념비 ${mn}단계</h3><div class="dp-list"><div class="dp-row"><span class="dp-ic">${IMG('deco_alma_' + Math.max(1, mn)) ? `<img src="${IMG('deco_alma_' + Math.max(1, mn))}" alt=""${mn ? '' : ' class="ta-dim"'}>` : ''}</span><div class="dp-tx"><b>추억 조각 ${memIc}${fmt(S.ta.mem)}</b><small>${mn ? `수업료 +${TA.monPct * mn}%` : '아직 세우지 않았어요'}${full ? ', 칭호 \'모교의 자랑\'' : `, 다음 수업료 +${TA.monPct * (mn + 1)}%${mn + 1 === TA.mon.length ? '와 칭호' : ''}`}</small></div>` +
       (full ? '<span class="fe-lock">완성</span>' : `<button class="${S.ta.mem < mc ? 'btn-sub' : 'cta'} small" type="button" data-ta="mon">조각 ${mc}</button>`) + '</div></div>';
+    return h;
+  }
+  // 지도: 일하는 조교는 그 건물 앞 오른쪽에 작게, 기념비는 연구 구역 왼쪽 풀밭에(renderDeco가 불러요, 학생 위 층 #vdTop)
+  const TA_MON_AT = [222, 300];   // 길과 참나무 사이 풀밭(왼쪽 풀밭은 옆 단추에 가려요)
+  const taMapKey = () => !S || !S.ta || !taOpen() ? '' : [S.ta.mon, taSeats(), S.ta.seat.map(x => x ? x.b : '').join(), S.ta.out.map(o => o.i).join()].join('/');
+  function taMapHTML() {
+    if (!S || !S.ta || !taOpen()) return '';
+    const G = geo(); let h = '';
+    if (G.zone === 'lab' && S.ta.mon >= 1) {
+      const u = IMG('deco_alma_' + Math.min(3, S.ta.mon)), w = 46 + 6 * (S.ta.mon - 1), [x, y] = TA_MON_AT;
+      if (u) h += `<ellipse class="vd-sh" cx="${x}" cy="${y - 1}" rx="${(w * 0.4).toFixed(1)}" ry="${(w * 0.1).toFixed(1)}"/><image class="ta-mon" x="${x - w / 2}" y="${(y - w * 0.86).toFixed(1)}" width="${w}" height="${w}" href="${u}"/>`;
+    }
+    S.ta.seat.forEach((s, i) => {
+      if (i >= taSeats() || !s || !s.b || taOut(i) || !G.lot || !G.lot[s.b] || !G.b || !G.b[s.b]) return;
+      const u = IMG('chr_ta_' + taWho(i)); if (!u) return;
+      const L = G.lot[s.b], bw = G.b[s.b][2], fx = L[0] / 100 * MAP_W + bw * 0.34, fy = L[1] / 100 * MAP_H + MAP_Y + bw * 0.16, fw = 17, fh = fw * 220 / 150;
+      h += `<ellipse class="vd-sh" cx="${fx.toFixed(1)}" cy="${fy.toFixed(1)}" rx="6" ry="1.8"/><image class="ta-fig" x="${(fx - fw / 2).toFixed(1)}" y="${(fy - fh).toFixed(1)}" width="${fw}" height="${fh.toFixed(1)}" href="${u}"/>`;
+    });
     return h;
   }
   function taRender(base) {   // 홈 칩: 돌아온 조교가 있으면

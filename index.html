@@ -3896,6 +3896,7 @@ body.mg-on .toast[hidden]{display:none}
 .ta-go b{font-size:13px;line-height:1.2;text-align:left}.ta-go b small{display:block;font-weight:500;font-size:11px;opacity:.75}
 .ta-mem{width:18px;height:18px;vertical-align:-4px;margin:0 2px}
 .dp-ic img.ta-dim{opacity:.35;filter:grayscale(1)}
+.ta-fig,.ta-mon{pointer-events:none}
 </style>
 </head>
 <body>
@@ -6715,8 +6716,12 @@ body.mg-on .toast[hidden]{display:none}
 "chr_armadillo":"img/a/chr_armadillo-89be390bf5.webp",
 "chr_lemur":"img/a/chr_lemur-e62c77d3d9.webp",
 "chr_quokka":"img/a/chr_quokka-2b0d86270a.webp",
+"chr_ta_armadillo":"img/a/chr_ta_armadillo-48e03965fa.webp",
 "chr_ta_lemur":"img/a/chr_ta_lemur-81a00ad01c.webp",
+"chr_ta_quokka":"img/a/chr_ta_quokka-bbbb3c6016.webp",
 "deco_alma_1":"img/a/deco_alma_1-d66aa85cdb.webp",
+"deco_alma_2":"img/a/deco_alma_2-ad9e735815.webp",
+"deco_alma_3":"img/a/deco_alma_3-5e0b5f14e9.webp",
 "ex3_boss_garden":"img/a/ex3_boss_garden-ad19b4b9c6.webp",
 "ex3_boss_garden_atk":"img/a/ex3_boss_garden_atk-326a98806a.webp",
 "ex3_boss_ground":"img/a/ex3_boss_ground-b633955254.webp",
@@ -7173,6 +7178,7 @@ body.mg-on .toast[hidden]{display:none}
 "souv_star_7":"img/a/souv_star_7-e813340a8a.webp",
 "souv_star_8":"img/a/souv_star_8-819086204e.webp",
 "souv_star_9":"img/a/souv_star_9-016a83b51d.webp",
+"ta_bg":"img/a/ta_bg-664fff5ac0.webp",
 "tea_pelican":"img/a/tea_pelican-bda58e49e9.webp"
 };</script>
 <!-- FS_IMG431:END -->
@@ -9447,6 +9453,7 @@ body.mg-on .toast[hidden]{display:none}
     const tab = ['tree', 'ta'].includes(rt.rxTab) ? rt.rxTab : 'inv';
     $$('#rxSeg [data-rseg]').forEach(b => b.setAttribute('aria-checked', String(b.dataset.rseg === tab)));
     setH($('#rxBody'), tab === 'tree' ? rtPart() : tab === 'ta' ? taPart() : rxPart(true));
+    { const hd = $('#rxTitle').parentElement, u = tab === 'ta' && taOpen() ? IMG('ta_bg') : ''; hd.classList.toggle('art', !!u); hd.style.backgroundImage = u ? `url("${blobUrl(u)}")` : ''; }   // 5.1.0 조교 탭 머리 그림
   }
   /* ---------- 5.1.0 조교 파견 (프로젝트 문서 '5.1.0 설계안 (조교 파견) 초안', woodani 결정 2026-11-19: 숫자는 제안대로) ----------
      조교 자리: 대학원생 조교를 캠퍼스 건물에 한 명씩 앉혀요. 앉아 있는 조교 한 명마다 수업료 +10%, 그 건물 가구 값 -10%.
@@ -9473,14 +9480,14 @@ body.mg-on .toast[hidden]{display:none}
     for (let j = 0; j < S.ta.seat.length; j++) if (j !== i && S.ta.seat[j] && S.ta.seat[j].b === k && k) S.ta.seat[j] = { b: '' };   // 한 건물에 한 명: 앉아 있던 조교는 비켜요
     while (S.ta.seat.length <= i) S.ta.seat.push({ b: '' });
     S.ta.seat[i] = { b: k || '' }; rt.taPick = -1;
-    save(); renderHUD(); checkQuests(true); sfx('tap');
+    save(); renderHUD(); renderDeco(); checkQuests(true); sfx('tap');
     if (k) toast(`${TA.whoNm[taWho(i)]} 조교가\n${FAC[k].name}에서 일해요`);
     return true;
   }
   function taSend(i, to, h) {
     if (!taOpen() || i < 0 || i >= taSeats() || taOut(i) || !(to >= 0 && to <= 4) || !(h >= 0 && h <= 2)) return false;
     S.ta.out.push({ i, to, h, end: gameNow() + taSec(h) * 1000 }); S.ta.n = Math.min(1e9, S.ta.n + 1);   // 파견 횟수는 보낼 때 세요
-    save(); renderHUD(); checkQuests(true); sfx('coin'); rt.taGo = -1;
+    save(); renderHUD(); renderDeco(); checkQuests(true); sfx('coin'); rt.taGo = -1;
     toast(`${TA.whoNm[taWho(i)]} 조교가\n숲속 ${TA.school[to]}에 다녀와요\n${rtHrs(taSec(h))} 뒤에 돌아와요`);
     return true;
   }
@@ -9498,7 +9505,7 @@ body.mg-on .toast[hidden]{display:none}
     S.ta.out = S.ta.out.filter(o => !due.includes(o));
     S.ta.mem = Math.min(1e9, S.ta.mem + mem);
     addEss(ess); if (ac > 0) { S.budget += ac; earn(ac); got.push(`도토리 ${fmt(ac)}`); }
-    save(); renderHUD(); checkQuests(true); sfx('quest'); buzz(15);
+    save(); renderHUD(); renderDeco(); checkQuests(true); sfx('quest'); buzz(15);
     toast(`조교 ${due.length}명이 돌아왔어요\n숲의 정수 ${ess}, 추억 조각 ${mem}` + (got.length ? `\n${[...new Set(got)].join(', ')}` : ''));
     if (!$('#mRx').hidden) renderRx();
     return true;
@@ -9508,7 +9515,7 @@ body.mg-on .toast[hidden]{display:none}
     const c = TA.mon[S.ta.mon];
     if (S.ta.mem < c) { toast(`추억 조각이 ${c - S.ta.mem}개 모자라요`); return false; }
     S.ta.mem -= c; S.ta.mon += 1;
-    save(); renderHUD(); checkQuests(true); sfx('quest'); buzz(20);
+    save(); renderHUD(); renderDeco(); checkQuests(true); sfx('quest'); buzz(20);
     toast(`모교 기념비 ${S.ta.mon}단계!\n수업료 +${TA.monPct * S.ta.mon}%` + (S.ta.mon >= TA.mon.length ? `\n칭호 '모교의 자랑'을 받았어요` : ''));
     return true;
   }
@@ -9530,6 +9537,24 @@ body.mg-on .toast[hidden]{display:none}
     const mn = S.ta.mon, full = mn >= TA.mon.length, mc = full ? 0 : TA.mon[mn];
     h += `<h3 class="fv-h">모교 기념비 ${mn}단계</h3><div class="dp-list"><div class="dp-row"><span class="dp-ic">${IMG('deco_alma_' + Math.max(1, mn)) ? `<img src="${IMG('deco_alma_' + Math.max(1, mn))}" alt=""${mn ? '' : ' class="ta-dim"'}>` : ''}</span><div class="dp-tx"><b>추억 조각 ${memIc}${fmt(S.ta.mem)}</b><small>${mn ? `수업료 +${TA.monPct * mn}%` : '아직 세우지 않았어요'}${full ? ', 칭호 \'모교의 자랑\'' : `, 다음 수업료 +${TA.monPct * (mn + 1)}%${mn + 1 === TA.mon.length ? '와 칭호' : ''}`}</small></div>` +
       (full ? '<span class="fe-lock">완성</span>' : `<button class="${S.ta.mem < mc ? 'btn-sub' : 'cta'} small" type="button" data-ta="mon">조각 ${mc}</button>`) + '</div></div>';
+    return h;
+  }
+  // 지도: 일하는 조교는 그 건물 앞 오른쪽에 작게, 기념비는 연구 구역 왼쪽 풀밭에(renderDeco가 불러요, 학생 위 층 #vdTop)
+  const TA_MON_AT = [222, 300];   // 길과 참나무 사이 풀밭(왼쪽 풀밭은 옆 단추에 가려요)
+  const taMapKey = () => !S || !S.ta || !taOpen() ? '' : [S.ta.mon, taSeats(), S.ta.seat.map(x => x ? x.b : '').join(), S.ta.out.map(o => o.i).join()].join('/');
+  function taMapHTML() {
+    if (!S || !S.ta || !taOpen()) return '';
+    const G = geo(); let h = '';
+    if (G.zone === 'lab' && S.ta.mon >= 1) {
+      const u = IMG('deco_alma_' + Math.min(3, S.ta.mon)), w = 46 + 6 * (S.ta.mon - 1), [x, y] = TA_MON_AT;
+      if (u) h += `<ellipse class="vd-sh" cx="${x}" cy="${y - 1}" rx="${(w * 0.4).toFixed(1)}" ry="${(w * 0.1).toFixed(1)}"/><image class="ta-mon" x="${x - w / 2}" y="${(y - w * 0.86).toFixed(1)}" width="${w}" height="${w}" href="${u}"/>`;
+    }
+    S.ta.seat.forEach((s, i) => {
+      if (i >= taSeats() || !s || !s.b || taOut(i) || !G.lot || !G.lot[s.b] || !G.b || !G.b[s.b]) return;
+      const u = IMG('chr_ta_' + taWho(i)); if (!u) return;
+      const L = G.lot[s.b], bw = G.b[s.b][2], fx = L[0] / 100 * MAP_W + bw * 0.34, fy = L[1] / 100 * MAP_H + MAP_Y + bw * 0.16, fw = 17, fh = fw * 220 / 150;
+      h += `<ellipse class="vd-sh" cx="${fx.toFixed(1)}" cy="${fy.toFixed(1)}" rx="6" ry="1.8"/><image class="ta-fig" x="${(fx - fw / 2).toFixed(1)}" y="${(fy - fh).toFixed(1)}" width="${fw}" height="${fh.toFixed(1)}" href="${u}"/>`;
+    });
     return h;
   }
   function taRender(base) {   // 홈 칩: 돌아온 조교가 있으면
@@ -17612,11 +17637,11 @@ body.mg-on .toast[hidden]{display:none}
     renderNight();   // 2.1.0 밤 모드: 건물이 늘면 창 불빛도
     const g = $('#decoG'); if (!g || !S) return;
     const m = decoMap(), L = S.deco.lay[m], edit = !!rt.decoEdit;
-    const key = [m, L.join(), S.deco.nm, S.tier, edit, S.vd ? S.vd.lv : 0, S.bx ? S.bx.m + ':' + S.bx.sp.map(x => x.i).join() : ''].join('|');
+    const key = [m, L.join(), S.deco.nm, S.tier, edit, S.vd ? S.vd.lv : 0, S.bx ? S.bx.m + ':' + S.bx.sp.map(x => x.i).join() : '', taMapKey()].join('|');   /* 5.1.0 조교와 기념비 */
     if (!force && g.dataset.key === key) return; g.dataset.key = key;
     let h = edit ? '<rect class="deco-dim" x="-200" y="-200" width="760" height="940"/>' : '';
     { const bg = $('#bxG'); if (bg) bg.innerHTML = edit ? '' : bxMapHTML(m); }   // 5.0.1.1 woodani 제보: 숨은 생물은 건물 위 층(#bxG)에 그려요
-    { const vt = $('#vdTop'); if (vt) vt.innerHTML = edit ? '' : vdMapHTML(m); }   // 2.3.1 마을 기부는 학생 위 층   // 2.2.0 숨은 생물. 2.1.2 마을 기부 기념물(꾸미기 중에는 숨겨요). 2.1.3 꾸미기 중에는 지도를 살짝 어둡게 해서 빈 자리가 잘 보여요
+    { const vt = $('#vdTop'); if (vt) vt.innerHTML = edit ? '' : vdMapHTML(m) + taMapHTML(); }   // 2.3.1 마을 기부는 학생 위 층   // 2.2.0 숨은 생물. 2.1.2 마을 기부 기념물(꾸미기 중에는 숨겨요). 2.1.3 꾸미기 중에는 지도를 살짝 어둡게 해서 빈 자리가 잘 보여요
     const [sx, sy] = DECO_SIGN[m] || [0, 0], sw = 96, sh = 48, nm = S.deco.nm || '숲속', tn = tierInfo().name;
     if (DECO_SIGN[m] && IMG('sign_board')) {
       // 글자는 간판 안쪽 판(그림 높이의 27%~71%) 가운데에 두 줄로. 판이 낮아서 글자를 작게 해요(1.7.4 woodani: 위로 삐져나감)

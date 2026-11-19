@@ -42,8 +42,15 @@ async def main():
               out.rows = document.querySelectorAll('#rxBody .dp-row').length; out.goBtns = document.querySelectorAll('#rxBody [data-ta^="send:0:"]').length;
               out.over = [...m.querySelectorAll('#rxBody *')].filter(el => { const r = el.getBoundingClientRect(); return r.width && (r.right > mr.right + 1 || r.left < mr.left - 1); }).map(el => el.className || el.tagName).slice(0, 3);
               document.querySelector('#rxBody [data-ta="send:0:2:0"]').click(); await sl(200); out.uiSend = S.ta.out.length === 1 && S.ta.out[0].to === 2;
+              // 지도: 연구 구역에 조교 둘과 기념비
+              S.ta.out = []; S.f.gradhall = 3; F.taSit(0, 'institute'); F.taSit(1, 'gradhall'); document.querySelectorAll('.overlay').forEach(o => { o.hidden = true; }); F.rt4.modalOpen = null;
+              F.setZone('lab'); await sl(800); F.renderDeco(true); await sl(200);
+              out.figs = document.querySelectorAll('#vdTop .ta-fig').length; out.monMap = document.querySelectorAll('#vdTop .ta-mon').length;
+              F.taSend(1, 3, 0); await sl(100); out.figs2 = document.querySelectorAll('#vdTop .ta-fig').length;
               return out; })()""")
             print(w, r)
+            await pg.screenshot(path=f's161_map_{w}.png')
+            c.ok(r['figs'] == 2 and r['monMap'] == 1 and r['figs2'] == 1, f'지도 조교와 기념비 {r}')
             c.ok(not r['open0'] and r['open1'] and r['seats'] == 2, f'열리는 때 {r}')
             c.ok(r['sit'] and abs(r['r1'] - 1.1) < 1e-6 and abs(r['f1'] - 0.9) < 0.01 and r['fOther'], f'자리 효과 {r}')
             c.ok(r['sit2'] and r['seat0'] == '' and abs(r['r2'] - 1.1) < 1e-6 and abs(r['r3'] - 1.2) < 1e-6, f'한 건물에 한 명 {r}')
@@ -54,7 +61,6 @@ async def main():
             c.ok(r['q'] == [2, 2, 3], f'퀘스트 {r["q"]}')
             c.ok(r['sv'][:8] == [3, 4, '', 'library', 1, 0, 3, 0] and '"mon":0' in r['sv'][8], f'저장 읽기 {r["sv"]}')
             c.ok(r['rows'] >= 3 and r['goBtns'] == 15 and not r['over'] and r['uiSend'], f'조교 탭 {r}')
-            await pg.screenshot(path=f's161_{w}.png')
             c.ok(not errs, f'{w}px 오류 {errs[:2]}')
             await ctx.close()
 asyncio.run(main())

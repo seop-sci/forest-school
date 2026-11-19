@@ -58,6 +58,11 @@ JS = r"""(cfg) => { const F = window.__forest, S = F.S, quests = [], years = [],
     if (F.canPromote()) { yearRow('졸업식'); snaps.push(JSON.stringify(S)); if (S.tier >= cfg.until) break; F.promote(); clean(); S.grade = 0; F.checkGrade(); spendDips(); idle = 0; continue; }
     if (q && q.t === 'xt' && F.xtLv(q.k) < q.n && pay(() => F.xtAct(q.k), F.xtCost(q.k), 'xt ' + q.k)) continue;
     if (q && q.t === 'vp' && pay(() => F.vpAct(), F.vpCost(), 'vp')) continue;
+    // 5.1.0 --ta: 조교 자리를 늘 채우고, 조교 퀘스트(파견, 기념비)는 8시간 파견을 바로 끝내 셈해요(조교를 쓰는 사람의 위쪽 끝)
+    if (cfg.ta && F.taOpen()) {
+      for (let i = 0; i < F.taSeats(); i++) { const x = S.ta.seat[i]; if (!x || !x.b) { const k = F.facKeys().filter(k => S.f[k] >= 1 && !S.ta.seat.some(y => y && y.b === k))[0]; if (k) F.taSit(i, k); } }
+      if (q && q.t === 'ta' && F.qMeasure(q) < q.n) { if (q.k === 'mon' && S.ta.mem >= F.TA.mon[S.ta.mon]) F.taMonUp(); else if (q.k !== 'seat') { F.taSend(F.taSeats() - 1, 0, 2); S.ta.out.forEach(o => { o.end = 0; }); F.taClaim(); } clean(); if (F.qMeasure(q) >= q.n || q.k !== 'seat') continue; }
+    }
     // 사람처럼 살 수 있는 것 가운데 가장 싼 것부터(건물, 가구, 선생님)
     const c = [];
     for (const k of F.facKeys()) { if (!F.furReady(k)) { const j = F.FUR[k].map((_, j) => j).filter(j => !F.furDone(k, j)).sort((a, b) => F.furCost(k, a) - F.furCost(k, b))[0]; if (j !== undefined) c.push([F.furCost(k, j), () => F.buyFur(k, j, true), 'fur ' + k]); } else if (S.f[k] < F.facCap()) c.push([F.facCost(k), () => F.buyFacility(k), 'fac ' + k]); }
@@ -80,20 +85,20 @@ WAITS = {'rdBooks': 900, 'trials': 60, 'pz': 180, 'mgBest': 120, 'mgOrders': 60,
 PERDAY = {'rdBooks': 3, 'btPlays': 5, 'btWins': 3, 'labs': 1, 'picnics': 1, 'stickers': 5, 'elects': 1 / 7}
 TIER = ['유치원', '초등학교', '중학교', '고등학교', '대학교', '대학원']
 
-async def run(until=5):
+async def run(until=5, ta=False):
     async with async_playwright() as p:
         b = await p.chromium.launch(); ctx = await b.new_context(viewport={'width': 390, 'height': 800})
         await ctx.add_init_script("window.__FOREST_TEST = true; localStorage.clear();")
         pg = await ctx.new_page(); errs = []; pg.on('pageerror', lambda e: errs.append(str(e)))
         await pg.goto(URL); await pg.wait_for_timeout(1500)
         await pg.evaluate("const t=document.querySelector('#tut'); if(t && !t.hidden){ window.__forest.S.tut.st='skip'; t.hidden=true; window.__forest.rt.modalOpen=null; }")
-        r = await pg.evaluate(JS, {'until': until, 'waits': WAITS, 'perDay': PERDAY, 'maxH': 300})
+        r = await pg.evaluate(JS, {'until': until, 'waits': WAITS, 'perDay': PERDAY, 'maxH': 300, 'ta': ta})
         r['errs'] = errs[:5]; await b.close(); return r
 
 def main():
     a = sys.argv[1:]
     until = int(a[a.index('--until') + 1]) if '--until' in a else 5
-    r = asyncio.run(run(until))
+    r = asyncio.run(run(until, '--ta' in a))
     r.pop('snaps', None)
     if '--json' in a: json.dump(r, open(a[a.index('--json') + 1], 'w', encoding='utf-8'), ensure_ascii=False, indent=0)
     if '--check' in a:
