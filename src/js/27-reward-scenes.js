@@ -170,8 +170,8 @@
   function startSports(viaAd) {
     if (rt.sports || !sportsOpen()) return;
     if (tr2Busy()) { toast(tr2Busy()); return; }   // 3.2.0
-    if (festNight()) { toast('운동회는 아침 6시부터 열 수 있어요'); return; }   // 3.1.1
-    if (sportsCon()) { toast(`${FAC.playground.name} 공사가 끝나면 운동회를 열 수 있어요`); return; }   // 3.0.0
+    if (festNight()) { toast(`${FEST.sports.name}는 아침 6시부터 열 수 있어요`); return; }   // 3.1.1
+    if (sportsCon()) { toast(`${FAC.playground.name} 공사가 끝나면 ${FEST.sports.name}를 열 수 있어요`); return; }   // 3.0.0
     const go = () => {
       setTab('school'); closeSheet(); zoneGo('sports');   // 4.0.0 운동회는 체육 구역에서
       $('#scroller').scrollTo({ top: $('#scroller').scrollHeight, behavior: rt.reduced ? 'auto' : 'smooth' });
@@ -202,7 +202,7 @@
     const R = rt.sports;
     if (!R) return;
     renderSportsBar();
-    if (feverIntro(R, dt, '숲속 운동회', '굴러오는 공을 주워서 청팀을 응원해요')) return;
+    if (feverIntro(R, dt, FEST.sports.name, '굴러오는 공을 주워서 청팀을 응원해요')) return;
     if (R.ending) return;
     R.t -= dt;
     R.spawn += dt;

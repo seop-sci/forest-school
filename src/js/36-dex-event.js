@@ -241,7 +241,7 @@
     picks: { name: n => `떨어진 도토리 ${n}개 줍기`, ok: () => S.f.playground >= 1 }, shakes: { name: n => `참나무 ${n}번 흔들기`, ok: () => S.f.playground >= 1 },
     ups: { name: n => `시설이나 가구 ${n}번 고치기`, ok: () => facKeys().some(k => !facMaxed(k) || FUR[k].some((_, i) => !furDone(k, i))) },
     trains: { name: n => `선생님 연수 ${n}번 보내기`, ok: () => DEX_TEACHERS.some(k => S.t[k] >= 1 && !teaMaxed(k)) || !vpMaxed() }, claims: { name: n => `자리 비운 도토리 ${n}번 받기` }, dmDone: { name: n => `오늘의 미션 ${n}개 끝내기` },
-    sports: { name: n => `숲속 운동회 ${n}번 열기`, ok: () => festOpen('sports') }, trips: { name: n => `체험학습 ${n}번 다녀오기`, ok: () => tripOpen() },
+    sports: { name: n => `${FEST.sports.name} ${n}번 열기`, ok: () => festOpen('sports') }, trips: { name: n => `체험학습 ${n}번 다녀오기`, ok: () => tripOpen() },
     pz: { name: n => `숲속 퍼즐 ${n}판 끝내기`, ok: () => !liveOff('puzzle') },   // 2.0.0 책 읽는 주간
     mgOrd: { name: n => `숲속 합치기 주문 ${n}개 채우기`, v: () => (S.mg && S.mg.st && S.mg.st.orders) || 0, ok: () => !liveOff('merge') }   // 2.0.0 (woodani: 고치기와 연수는 어려워서 빼요)
   };

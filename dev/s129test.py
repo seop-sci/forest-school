@@ -22,7 +22,7 @@ async def main():
         # 2) 퀘스트
         r = await page.evaluate(f"(()=>{{ const M={F}.MAIN; return Object.fromEntries(['e27','j18','e31','e36','hs26'].map(id=>{{ const q=M.find(q=>q.id===id); return [id, [q.n, q.title]]; }})); }})()")
         print('퀘스트', r)
-        ok(r == {'e27': [1, '체험학습 다녀오기'], 'j18': [1, '숲속 운동회 열기'], 'e31': [3, '기념품 3종 모으기'], 'e36': [5, '기념품 5종 모으기'], 'hs26': [2, '자율학습 두 번 준비']}, '시간 허들 퀘스트 낮춤')
+        ok(r == {'e27': [1, '체험학습 다녀오기'], 'j18': [1, '체육대회 열기'], 'e31': [3, '기념품 3종 모으기'], 'e36': [5, '기념품 5종 모으기'], 'hs26': [2, '자율학습 두 번 준비']}, '시간 허들 퀘스트 낮춤')
         # 3) 업적 모두 받기
         r = await page.evaluate(f"""(async()=>{{ const F={F}, S=F.S, sl=ms=>new Promise(r=>setTimeout(r,ms)); F.setTab('dex'); await sl(200); document.querySelector('[data-dseg=ach]').click(); await sl(300);
           const ids=F.ACH.slice(0,3).map(a=>a.id); ids.forEach(id=>{{ S.ach.hit[id]=2; S.ach.got[id]=0; }}); F.ACH.slice(3).forEach(a=>{{ S.ach.hit[a.id]=S.ach.got[a.id]||0; }});
