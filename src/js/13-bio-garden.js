@@ -143,10 +143,12 @@
     const now = gameNow(), m = decoMap();
     if (S.bx.m !== m) { S.bx.m = m; S.bx.sp = []; }
     if (!S.bx.next) S.bx.next = now;
+    if (bxCount() < 2 && !S.bx.sp.length && S.bx.next > now) S.bx.next = now;   // 5.1.1.3 woodani: 처음 두 종(퀘스트 6-27)은 2시간을 기다리지 않고 바로 다음 생물이 나와요
     for (let k = 0; k < 40 && S.bx.next <= now; k++) {
       if (S.bx.sp.length >= BX.max) { S.bx.next = now + BX.every; break; }
       const free = L.map((_, i) => i).filter(i => !S.bx.sp.some(x => x.i === i));
-      const i = free[Math.floor(Math.random() * free.length)], b = bxPick(S.bx.next, L[i][2]);
+      const i = free[Math.floor(Math.random() * free.length)]; let b = bxPick(S.bx.next, L[i][2]);
+      for (let r = 0; r < 8 && b && bxCount() < 2 && (S.bx.got[b.id] || S.bx.sp.some(x => x.id === b.id)); r++) b = bxPick(S.bx.next, L[i][2]);   // 처음 두 종은 아직 못 본 생물로
       if (b) S.bx.sp.push({ i, id: b.id, t: S.bx.next });
       S.bx.next += BX.every;
     }

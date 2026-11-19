@@ -416,7 +416,7 @@
     const p = qProg(q, base);
     setTx($('#qbRew'), fmt(qReward(q)));   // 3.2.6 바뀐 때만
     setHid($('#qbGold'), !hardQ(q));
-    if (!$('#qbGold').firstChild) $('#qbGold').innerHTML = GOLD_ICON;
+    { const g = $('#qbGold'), k = goldRich() ? 'ess' : 'gold'; if (g.dataset.k !== k) { g.dataset.k = k; g.innerHTML = k === 'ess' ? ESS_ICON() : GOLD_ICON; } }   // 5.1.1.2 황금을 넉넉히 모은 뒤에는 정수로 받으니 정수 그림
     setTx($('#qbCnt'), p.done ? '완료' : p.text);
     { const fw = (p.frac * 100).toFixed(1) + '%', qf = $('#qbFill'); if (qf.style.width !== fw) qf.style.width = fw; }
     if (bar.classList.contains('ready') !== !!p.done) bar.classList.toggle('ready', p.done);
@@ -490,7 +490,7 @@
       `<p class="qsay">${esc(nl(repTxt(q, o.say)))}</p>` +   // 2.0.1 문장마다 줄바꿈
       `<div class="qgoal"><b>${esc(qGoal(q))}</b><span class="qp">${p.done ? '완료' : p.text}</span></div>` +
       `<div class="qbar"><i style="width:${(p.frac * 100).toFixed(1)}%"></i></div>` +
-      `<div class="qfoot"><span class="qrew">보상 ${rewardIcon(q.rk)}<b>${fmt(qReward(q))}</b>${hardQ(q, o.ref !== 'main') ? `<span class="qgold" aria-label="황금 도토리 ${GOLD.hard}개">+${GOLD_ICON}<b>${GOLD.hard}</b></span>` : ''}${o.ref === 'main' && TK_Q.has(q.id) ? `<span class="qgold qtk" aria-label="5분 단축권 ${TKE.n}장">+${IMG('ticket_m5') ? `<img src="${IMG('ticket_m5')}" alt="">` : '⏱'}<b>${TKE.n}</b></span>` : ''}</span>${act}</div></div>`;
+      `<div class="qfoot"><span class="qrew">보상 ${rewardIcon(q.rk)}<b>${fmt(qReward(q))}</b>${hardQ(q, o.ref !== 'main') ? (goldRich() ? `<span class="qgold" aria-label="숲의 정수 ${GOLD.hard * GOLD.essPer}">+${ESS_ICON()}<b>${GOLD.hard * GOLD.essPer}</b></span>` : `<span class="qgold" aria-label="황금 도토리 ${GOLD.hard}개">+${GOLD_ICON}<b>${GOLD.hard}</b></span>`) : ''}${o.ref === 'main' && TK_Q.has(q.id) ? `<span class="qgold qtk" aria-label="5분 단축권 ${TKE.n}장">+${IMG('ticket_m5') ? `<img src="${IMG('ticket_m5')}" alt="">` : '⏱'}<b>${TKE.n}</b></span>` : ''}</span>${act}</div></div>`;
   }
   function buildQuestPanel() {
     const i = S.q.m, q = MAIN[i];
