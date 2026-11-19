@@ -1,4 +1,4 @@
-# 5.0.3.1과 5.1.1 시험: 곁가지 이야기 칭호(낮잠 지킴이, 꿀단지 탐정 등)를 눌러서 달 수 있어요. 중학교부터 행사 이름(체육대회, 졸업 앨범 촬영)이 퀘스트와 미션에도 맞아요
+# 5.0.3.1과 5.1.1 시험(부탁 받기는 알림 한 줄): 곁가지 이야기 칭호(낮잠 지킴이, 꿀단지 탐정 등)를 눌러서 달 수 있어요. 중학교부터 행사 이름(체육대회, 졸업 앨범 촬영)이 퀘스트와 미션에도 맞아요
 # 보는 것: 칭호 칩을 누르면 바뀌어요, 다시 누르면 떼요, 저장 읽기에서 남아요, 랭킹에는 보내지 않아요(서버 규칙이 소문자만 받아요)
 # 쓰는 법: python3 wrap.py && python3 s160test.py   (마지막 줄이 PASS면 통과)
 import asyncio
@@ -60,6 +60,13 @@ async def main():
           F.rt4.modalOpen = null; document.querySelector('#mCounsel').hidden = true; F.openCounsel(); const y3 = sc.scrollTop;
           return [y0, y1, y2, y3, yNo, same, document.querySelectorAll('#csBody .cs-chip.on').length];""")
         c.ok(len(r) == 7 and r[0] > 0 and abs(r[1] - r[0]) < 40 and abs(r[2] - r[1]) < 1 and abs(r[4] - r[0]) < 40 and r[5], f'진로 상담 스크롤(그 줄 높이만큼만 달라져요) {r}')
+        # 5.1.1 부탁(서브 퀘스트)은 창 없이 알림 한 줄로 받아요
+        r = await ev("""S.tier = 2; document.querySelectorAll('.overlay').forEach(o => o.hidden = true); F.rt4.modalOpen = null; F.rt4.modalQueue.length = 0;
+          S.students = 999; S.q.subs.unshift({ id: 'x160', who: 'raccoon', t: 'students', n: 20, r: 60 }); const b0 = S.budget;
+          F.claimSub('x160'); const ov = document.querySelector('#rwTitle').closest('.overlay');
+          const tt = [...document.querySelectorAll('.toast, #toast, [class*=toast]')].map(e => e.textContent).join(' / ');
+          return [ov.hidden, F.rt4.modalQueue.length, S.budget > b0, tt.includes('고마워해요'), JSON.stringify(F.rt4.batch), document.querySelector('#rwTitle').textContent, (F.rt4.toastQ || []).join('|'), (F.rt4.mdToasts || []).join('|')];""")
+        c.ok(r[:4] == [True, 0, True, True], f'부탁 받기 알림 {r}')
         c.ok(not errs, f'오류 {errs[:2]}')
         await ctx.close()
 asyncio.run(main())
