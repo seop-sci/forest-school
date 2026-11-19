@@ -334,14 +334,17 @@
     const s = S.q.subs[i];
     if (!subReady(s)) return;
     grant(s.r, fromEl);
-    if (hardQ(s, true)) { const it = goldOr(GOLD.hard); if (it && !rt.batch) setTimeout(() => toast(it.t + ' (조금 어려운 부탁)'), 900); }   // 4.2.0
+    const hIt = hardQ(s, true) ? goldOr(GOLD.hard) : null;   // 4.2.0 조금 어려운 부탁
     addLeague(LP.quest, true);
     S.q.subs.splice(i, 1);
     if (s.id[0] === 's') S.q.done.push(s.id);
     S.q.subDone += 1;
     delete rt.qr[s.id];
     const added = fillSubs();
-    showReward({ title: `${iga(WHO[s.who])} 고마워해요!`, sub: added ? '새 부탁이 들어왔어요' : '', items: [{ ic: 'acorn', t: `도토리 +${fmt(s.r)}` }, hardQ(s, true) ? { ic: 'gold', t: `황금 도토리 +${GOLD.hard}` } : null, skAdd()] });   // 2.1.0 칭찬 스티커
+    const items = [{ ic: 'acorn', t: `도토리 +${fmt(s.r)}` }, hIt ? { ic: hIt.ic, t: hIt.t + ' (조금 어려운 부탁)' } : null, skAdd()].filter(Boolean);
+    // 5.1.1 woodani 결정: 부탁도 메인 퀘스트처럼 창 없이 알림 한 줄로 받아요. 창은 황금 도토리를 받을 때와 모두 받기에만
+    if (rt.batch || items.some(it => it.ic === 'gold')) showReward({ title: `${iga(WHO[s.who])} 고마워해요!`, sub: added ? '새 부탁이 들어왔어요' : '', items });
+    else toast(`${iga(WHO[s.who])} 고마워해요!\n${items.map(it => it.t).join(', ')}` + (added ? '\n새 부탁이 들어왔어요' : ''));// 2.1.0 칭찬 스티커
     questChanged();
   }
   function grant(v, fromEl, kind) {
