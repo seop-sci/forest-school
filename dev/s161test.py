@@ -39,9 +39,10 @@ async def main():
               S.ta.out = []; F.openRx(); await sl(300); document.querySelector('#rxSeg [data-rseg="ta"]').click(); await sl(200);
               document.querySelector('#rxBody [data-ta="go:0"]').click(); await sl(200);
               const m = document.querySelector('#mRx .modal'), mr = m.getBoundingClientRect();
-              out.rows = document.querySelectorAll('#rxBody .dp-row').length; out.goBtns = document.querySelectorAll('#rxBody [data-ta^="send:0:"]').length;
+              out.rows = document.querySelectorAll('#rxBody .dp-row').length; out.goBtns = document.querySelectorAll('#rxBody [data-ta^="send:0:"]').length; out.hrBtns = document.querySelectorAll('#rxBody [data-ta^="hr:0:"]').length;
               out.over = [...m.querySelectorAll('#rxBody *')].filter(el => { const r = el.getBoundingClientRect(); return r.width && (r.right > mr.right + 1 || r.left < mr.left - 1); }).map(el => el.className || el.tagName).slice(0, 3);
-              document.querySelector('#rxBody [data-ta="send:0:2:0"]').click(); await sl(200); out.uiSend = S.ta.out.length === 1 && S.ta.out[0].to === 2;
+              document.querySelector('#rxBody [data-ta="hr:0:1"]').click(); await sl(150); out.hrOn = !!document.querySelector('#rxBody .ta-hr.on[data-ta="hr:0:1"]');
+              document.querySelector('#rxBody [data-ta="send:0:2:1"]').click(); await sl(200); out.uiSend = S.ta.out.length === 1 && S.ta.out[0].to === 2 && S.ta.out[0].h === 1;
               // 지도: 연구 구역에 조교 둘과 기념비
               S.ta.out = []; S.f.gradhall = 3; F.taSit(0, 'institute'); F.taSit(1, 'gradhall'); document.querySelectorAll('.overlay').forEach(o => { o.hidden = true; }); F.rt4.modalOpen = null;
               F.setZone('lab'); await sl(800); F.renderDeco(true); await sl(200);
@@ -60,7 +61,7 @@ async def main():
             c.ok(r['seats3'] == 4, f'연구 트리 조교 가지 {r}')
             c.ok(r['q'] == [2, 2, 3], f'퀘스트 {r["q"]}')
             c.ok(r['sv'][:8] == [3, 4, '', 'library', 1, 0, 3, 0] and '"mon":0' in r['sv'][8], f'저장 읽기 {r["sv"]}')
-            c.ok(r['rows'] >= 3 and r['goBtns'] == 15 and not r['over'] and r['uiSend'], f'조교 탭 {r}')
+            c.ok(r['rows'] >= 3 and r['goBtns'] == 5 and r['hrBtns'] == 3 and r['hrOn'] and not r['over'] and r['uiSend'], f'조교 탭 {r}')
             c.ok(not errs, f'{w}px 오류 {errs[:2]}')
             await ctx.close()
 asyncio.run(main())

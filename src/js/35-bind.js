@@ -224,7 +224,7 @@
     window.addEventListener('resize', refit);
     if (document.fonts && document.fonts.ready) document.fonts.ready.then(() => { rt.fitGen += 1; refit(); }).catch(() => {});
     const nextTap = () => { const G = geo().next; if (!G) return; toast(`${eun(G.name)} ${G.tag}`); sfx('tap'); };
-    $('#b-next').addEventListener('click', nextTap);
+    $('#b-next').addEventListener('click', () => { if (!rt.trial) nextTap(); });
     $('#b-next').addEventListener('keydown', e => { if (e.key === 'Enter' || e.key === ' ') { e.preventDefault(); nextTap(); } });
     $('#oak').addEventListener('click', tapOak);
     $('#oak').addEventListener('keydown', e => { if (e.key === 'Enter' || e.key === ' ') { e.preventDefault(); tapOak(); } });
@@ -458,7 +458,7 @@
       rt.lux = !luxOn(); try { localStorage.setItem('forest-lux', rt.lux ? '1' : '0'); } catch (e) { /* 이번만 */ }
       applyThemes(); renderMap(); devLuxText(); toast(rt.lux ? '고급 배경을 켰어요' : '고급 배경을 껐어요');
     });
-    $('#campusG').addEventListener('click', e => { const el = e.target.closest('.cz'); if (el) campusTap(el); });
+    $('#campusG').addEventListener('click', e => { const el = e.target.closest('.cz'); if (el && !rt.trial) campusTap(el); });
     $('#campusG').addEventListener('keydown', e => { const el = e.target.closest('.cz'); if (el && (e.key === 'Enter' || e.key === ' ')) { e.preventDefault(); campusTap(el); } });
     $('#zoneHome').addEventListener('click', () => { sfx('tap'); setZone(''); });
     $('#zonePrev').addEventListener('click', () => zoneStep(-1));
@@ -514,14 +514,14 @@
       const k = g.getAttribute('data-k'), pq = $('#pq-' + k);
       if (pq) {
         $('#plaques').appendChild(pq);
-        pq.addEventListener('click', () => openSheet(k));
+        pq.addEventListener('click', () => { if (!rt.trial) openSheet(k); });   // 5.1.1.2 매나 뱀이 들어온 동안에는 건물이 열리지 않아요
         pq.addEventListener('pointerdown', () => g.classList.add('press'));
         ['pointerup', 'pointerleave', 'pointercancel'].forEach(ev => pq.addEventListener(ev, () => g.classList.remove('press')));
       }
     });
     $$('.bld').forEach(g => {
       const k = g.getAttribute('data-k');
-      g.addEventListener('click', e => openSheet(bldPick(e, k)));   // 4.1.0 겹친 자리에서는 그림이 실제로 있는 건물을 골라요
+      g.addEventListener('click', e => { if (!rt.trial) openSheet(bldPick(e, k)); });   // 4.1.0 겹친 자리에서는 그림이 실제로 있는 건물을 골라요
       g.addEventListener('keydown', e => { if (e.key === 'Enter' || e.key === ' ') { e.preventDefault(); openSheet(k); } });
       g.addEventListener('pointerdown', () => g.classList.add('press'));
       ['pointerup', 'pointerleave', 'pointercancel'].forEach(ev => g.addEventListener(ev, () => g.classList.remove('press')));
@@ -665,6 +665,7 @@
       if (b.dataset.ta) { const [a, x, y, z] = b.dataset.ta.split(':'); const i = +x;   // 5.1.0 조교
         if (a === 'pick') { rt.taPick = rt.taPick === i ? -1 : i; rt.taGo = -1; sfx('tap'); }
         else if (a === 'go') { rt.taGo = rt.taGo === i ? -1 : i; rt.taPick = -1; sfx('tap'); }
+        else if (a === 'hr') { rt.taHr = +y; sfx('tap'); }
         else if (a === 'sit') taSit(i, y);
         else if (a === 'send') taSend(i, +y, +z);
         else if (a === 'claim') taClaim();

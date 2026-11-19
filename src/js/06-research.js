@@ -159,21 +159,25 @@
   function taPart() {
     if (!taOpen()) return '<p class="fine">조교는 석사 2학기에 열려요.</p>';
     const now = gameNow(), n = taSeats(), memIc = IMG('ic_ta_mem') ? `<img class="ta-mem" src="${IMG('ic_ta_mem')}" alt="">` : '💠';
-    let h = `<p class="fine">조교 한 명이 일할 때마다 수업료 +${TA.pct}%, 그 건물 가구 값 -${TA.fur}%.<br>모교에 보내면 그동안 자리 효과가 꺼져요.</p><div class="dp-list">`;
+    const mul = rtLv('ta') >= 4 ? 1.25 : 1, hr = Math.max(0, Math.min(2, rt.taHr | 0));
+    let h = `<p class="fine ta-info">일하는 조교 한 명마다<br><b>수업료 +${TA.pct}%</b>, 그 건물 <b>가구 값 -${TA.fur}%</b><br>파견 가면 숲의 정수와 추억 조각을 가져와요<br>파견 중에는 자리 효과가 꺼져요</p><div class="dp-list">`;
     for (let i = 0; i < n; i++) {
       const x = S.ta.seat[i] || { b: '' }, o = S.ta.out.find(y => y.i === i), w = taWho(i), u = IMG('chr_ta_' + w) || IMG('chr_' + w);
-      const st = o ? (now >= o.end ? `숲속 ${TA.school[o.to]}에서 돌아왔어요` : `숲속 ${TA.school[o.to]} 파견 중, ${hms(o.end - now)}`) : x.b && FAC[x.b] ? `${FAC[x.b].name}에서 일해요` : '빈자리예요';
+      const st = o ? (now >= o.end ? `숲속 ${TA.school[o.to]}에서 돌아왔어요` : `숲속 ${TA.school[o.to]}에 가 있어요<br>${hms(o.end - now)} 뒤에 돌아와요`) : x.b && FAC[x.b] ? `${FAC[x.b].name}에서 일해요` : '빈자리예요';
       const btn = o ? (now >= o.end ? `<button class="cta small" type="button" data-ta="claim">받기</button>` : '<span class="fe-lock">파견 중</span>')
         : `<button class="btn-sub small" type="button" data-ta="pick:${i}">자리</button><button class="cta small" type="button" data-ta="go:${i}">파견</button>`;
       h += `<div class="dp-row"><span class="dp-ic">${u ? `<img src="${u}" alt="">` : ''}</span><div class="dp-tx"><b>${TA.whoNm[w]} 조교</b><small>${st}</small></div><span class="ta-btns">${btn}</span></div>`;
       if (rt.taPick === i && !o) h += '<div class="ta-pick">' + taB().map(k => `<button class="${x.b === k ? 'cta' : 'btn-sub'} small" type="button" data-ta="sit:${i}:${k}">${FAC[k].name}</button>`).join('') + (x.b ? `<button class="btn-sub small" type="button" data-ta="sit:${i}:">비우기</button>` : '') + '</div>';
-      if (rt.taGo === i && !o) h += '<div class="ta-pick ta-go">' + TA.school.map((nm, t) => `<b>숲속 ${nm}<small>${TA.bonus[t]}</small></b>` + TA.hrs.map((hr, k) => `<button class="btn-sub small" type="button" data-ta="send:${i}:${t}:${k}">${rtHrs(taSec(k))}</button>`).join('')).join('') + '</div>';
+      if (rt.taGo === i && !o) h += '<div class="ta-go"><p class="ta-go-h">1. 얼마나 다녀올까요?</p><div class="ta-hrs">'
+        + TA.hrs.map((_, k) => `<button class="ta-hr${k === hr ? ' on' : ''}" type="button" data-ta="hr:${i}:${k}" aria-pressed="${k === hr}"><b>${rtHrs(taSec(k))}</b><small>정수 ${Math.round(TA.ess[k] * mul)}<br>추억 조각 ${Math.round(TA.mem[k] * mul)}</small></button>`).join('')
+        + '</div><p class="ta-go-h">2. 어느 모교에 보낼까요?</p>'
+        + TA.school.map((nm, t) => `<div class="ta-sch"><span><b>숲속 ${nm}</b><small>덤: ${TA.bonus[t]}</small></span><button class="cta small" type="button" data-ta="send:${i}:${t}:${hr}">보내기</button></div>`).join('') + '</div>';
     }
     h += '</div>';
-    h += `<p class="fine">파견 보상: 2시간 정수 ${TA.ess[0]}과 조각 ${TA.mem[0]}, 4시간 ${TA.ess[1]}과 ${TA.mem[1]}, 8시간 ${TA.ess[2]}과 ${TA.mem[2]}${rtLv('ta') >= 4 ? ' (+25%)' : ''}</p>`;
     const mn = S.ta.mon, full = mn >= TA.mon.length, mc = full ? 0 : TA.mon[mn];
-    h += `<h3 class="fv-h">모교 기념비 ${mn}단계</h3><div class="dp-list"><div class="dp-row"><span class="dp-ic">${IMG('deco_alma_' + Math.max(1, mn)) ? `<img src="${IMG('deco_alma_' + Math.max(1, mn))}" alt=""${mn ? '' : ' class="ta-dim"'}>` : ''}</span><div class="dp-tx"><b>추억 조각 ${memIc}${fmt(S.ta.mem)}</b><small>${mn ? `수업료 +${TA.monPct * mn}%` : '아직 세우지 않았어요'}${full ? ', 칭호 \'모교의 자랑\'' : `, 다음 수업료 +${TA.monPct * (mn + 1)}%${mn + 1 === TA.mon.length ? '와 칭호' : ''}`}</small></div>` +
-      (full ? '<span class="fe-lock">완성</span>' : `<button class="${S.ta.mem < mc ? 'btn-sub' : 'cta'} small" type="button" data-ta="mon">조각 ${mc}</button>`) + '</div></div>';
+    const monTx = full ? `완성! 수업료 +${TA.monPct * mn}%, 칭호 '모교의 자랑'` : (mn ? `지금 수업료 +${TA.monPct * mn}%<br>` : '') + `조각 ${mc}개로 ${mn ? '올리면' : '세우면'} 수업료 +${TA.monPct * (mn + 1)}%${mn + 1 === TA.mon.length ? '와 칭호' : ''}`;
+    h += `<h3 class="fv-h">모교 기념비 <small>${mn}/${TA.mon.length}단계</small></h3><div class="dp-list"><div class="dp-row"><span class="dp-ic">${IMG('deco_alma_' + Math.max(1, mn)) ? `<img src="${IMG('deco_alma_' + Math.max(1, mn))}" alt=""${mn ? '' : ' class="ta-dim"'}>` : ''}</span><div class="dp-tx"><b>추억 조각 ${memIc}${fmt(S.ta.mem)}${full ? '' : ` / ${mc}`}</b><small>${monTx}</small></div>` +
+      (full ? '<span class="fe-lock">완성</span>' : `<button class="${S.ta.mem < mc ? 'btn-sub' : 'cta'} small" type="button" data-ta="mon">${mn ? '올리기' : '세우기'}</button>`) + '</div></div>';
     return h;
   }
   // 지도: 일하는 조교는 그 건물 앞 오른쪽에 작게, 기념비는 연구 구역 왼쪽 풀밭에(renderDeco가 불러요, 학생 위 층 #vdTop)

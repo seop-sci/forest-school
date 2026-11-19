@@ -3799,8 +3799,15 @@ body.mg-on .toast[hidden]{display:none}
 .ta-chip{border-color:#C9963A;background:rgba(255,244,214,.97)}.ta-chip b{color:#7A5212}
 .ta-btns{display:flex;gap:4px;flex-shrink:0}
 .ta-pick{display:flex;flex-wrap:wrap;gap:6px;justify-content:center;padding:8px 6px 10px;margin:-2px 0 6px;border-radius:12px;background:var(--panel-2,rgba(0,0,0,.04))}
-.ta-go{display:grid;grid-template-columns:1fr auto auto auto;align-items:center;gap:6px 4px}
-.ta-go b{font-size:13px;line-height:1.2;text-align:left}.ta-go b small{display:block;font-weight:500;font-size:11px;opacity:.75}
+.ta-info{word-break:keep-all;line-height:1.6}.ta-info b{color:var(--ink);font-weight:700}
+.ta-go{padding:10px 10px 12px;margin:-2px 0 6px;border-radius:12px;background:var(--panel-2,rgba(0,0,0,.04))}
+.ta-go-h{margin:2px 2px 6px;font-size:13px;font-weight:700;color:var(--ink);text-align:left}
+.ta-hrs{display:grid;grid-template-columns:repeat(3,1fr);gap:6px;margin-bottom:10px}
+.ta-hr{display:flex;flex-direction:column;align-items:center;gap:2px;padding:8px 4px;border-radius:12px;border:2px solid transparent;background:var(--card,#fff);color:var(--ink);font:inherit;cursor:pointer;word-break:keep-all}
+.ta-hr b{font-size:14px;line-height:1.2}.ta-hr small{font-size:11px;line-height:1.35;color:var(--muted)}
+.ta-hr.on{border-color:var(--gold,#E8B020);box-shadow:0 2px 0 rgba(0,0,0,.08)}
+.ta-sch{display:flex;align-items:center;justify-content:space-between;gap:8px;padding:7px 4px;border-top:1px dashed rgba(0,0,0,.1)}
+.ta-sch .cta{flex:0 0 auto;width:auto;min-width:72px}.ta-sch span{flex:1;min-width:0;text-align:left;word-break:keep-all}.ta-sch b{display:block;font-size:13.5px;line-height:1.25}.ta-sch small{display:block;font-size:11.5px;color:var(--muted)}
 .ta-mem{width:18px;height:18px;vertical-align:-4px;margin:0 2px}
 .dp-ic img.ta-dim{opacity:.35;filter:grayscale(1)}
 .ta-fig,.ta-mon{pointer-events:none}
@@ -4407,7 +4414,7 @@ body.mg-on .toast[hidden]{display:none}
       </div>
       <h3 class="panel-sub">정보</h3>
       <dl class="info">
-        <div id="verRow"><dt>버전</dt><dd>v5.1.1.1</dd></div>
+        <div id="verRow"><dt>버전</dt><dd>v5.1.1.2</dd></div>
         <div id="pidRow" hidden><dt>학교 번호</dt><dd id="infoPid"></dd></div>
       </dl>
       <div id="devBox" hidden>
@@ -9427,21 +9434,25 @@ body.mg-on .toast[hidden]{display:none}
   function taPart() {
     if (!taOpen()) return '<p class="fine">조교는 석사 2학기에 열려요.</p>';
     const now = gameNow(), n = taSeats(), memIc = IMG('ic_ta_mem') ? `<img class="ta-mem" src="${IMG('ic_ta_mem')}" alt="">` : '💠';
-    let h = `<p class="fine">조교 한 명이 일할 때마다 수업료 +${TA.pct}%, 그 건물 가구 값 -${TA.fur}%.<br>모교에 보내면 그동안 자리 효과가 꺼져요.</p><div class="dp-list">`;
+    const mul = rtLv('ta') >= 4 ? 1.25 : 1, hr = Math.max(0, Math.min(2, rt.taHr | 0));
+    let h = `<p class="fine ta-info">일하는 조교 한 명마다<br><b>수업료 +${TA.pct}%</b>, 그 건물 <b>가구 값 -${TA.fur}%</b><br>파견 가면 숲의 정수와 추억 조각을 가져와요<br>파견 중에는 자리 효과가 꺼져요</p><div class="dp-list">`;
     for (let i = 0; i < n; i++) {
       const x = S.ta.seat[i] || { b: '' }, o = S.ta.out.find(y => y.i === i), w = taWho(i), u = IMG('chr_ta_' + w) || IMG('chr_' + w);
-      const st = o ? (now >= o.end ? `숲속 ${TA.school[o.to]}에서 돌아왔어요` : `숲속 ${TA.school[o.to]} 파견 중, ${hms(o.end - now)}`) : x.b && FAC[x.b] ? `${FAC[x.b].name}에서 일해요` : '빈자리예요';
+      const st = o ? (now >= o.end ? `숲속 ${TA.school[o.to]}에서 돌아왔어요` : `숲속 ${TA.school[o.to]}에 가 있어요<br>${hms(o.end - now)} 뒤에 돌아와요`) : x.b && FAC[x.b] ? `${FAC[x.b].name}에서 일해요` : '빈자리예요';
       const btn = o ? (now >= o.end ? `<button class="cta small" type="button" data-ta="claim">받기</button>` : '<span class="fe-lock">파견 중</span>')
         : `<button class="btn-sub small" type="button" data-ta="pick:${i}">자리</button><button class="cta small" type="button" data-ta="go:${i}">파견</button>`;
       h += `<div class="dp-row"><span class="dp-ic">${u ? `<img src="${u}" alt="">` : ''}</span><div class="dp-tx"><b>${TA.whoNm[w]} 조교</b><small>${st}</small></div><span class="ta-btns">${btn}</span></div>`;
       if (rt.taPick === i && !o) h += '<div class="ta-pick">' + taB().map(k => `<button class="${x.b === k ? 'cta' : 'btn-sub'} small" type="button" data-ta="sit:${i}:${k}">${FAC[k].name}</button>`).join('') + (x.b ? `<button class="btn-sub small" type="button" data-ta="sit:${i}:">비우기</button>` : '') + '</div>';
-      if (rt.taGo === i && !o) h += '<div class="ta-pick ta-go">' + TA.school.map((nm, t) => `<b>숲속 ${nm}<small>${TA.bonus[t]}</small></b>` + TA.hrs.map((hr, k) => `<button class="btn-sub small" type="button" data-ta="send:${i}:${t}:${k}">${rtHrs(taSec(k))}</button>`).join('')).join('') + '</div>';
+      if (rt.taGo === i && !o) h += '<div class="ta-go"><p class="ta-go-h">1. 얼마나 다녀올까요?</p><div class="ta-hrs">'
+        + TA.hrs.map((_, k) => `<button class="ta-hr${k === hr ? ' on' : ''}" type="button" data-ta="hr:${i}:${k}" aria-pressed="${k === hr}"><b>${rtHrs(taSec(k))}</b><small>정수 ${Math.round(TA.ess[k] * mul)}<br>추억 조각 ${Math.round(TA.mem[k] * mul)}</small></button>`).join('')
+        + '</div><p class="ta-go-h">2. 어느 모교에 보낼까요?</p>'
+        + TA.school.map((nm, t) => `<div class="ta-sch"><span><b>숲속 ${nm}</b><small>덤: ${TA.bonus[t]}</small></span><button class="cta small" type="button" data-ta="send:${i}:${t}:${hr}">보내기</button></div>`).join('') + '</div>';
     }
     h += '</div>';
-    h += `<p class="fine">파견 보상: 2시간 정수 ${TA.ess[0]}과 조각 ${TA.mem[0]}, 4시간 ${TA.ess[1]}과 ${TA.mem[1]}, 8시간 ${TA.ess[2]}과 ${TA.mem[2]}${rtLv('ta') >= 4 ? ' (+25%)' : ''}</p>`;
     const mn = S.ta.mon, full = mn >= TA.mon.length, mc = full ? 0 : TA.mon[mn];
-    h += `<h3 class="fv-h">모교 기념비 ${mn}단계</h3><div class="dp-list"><div class="dp-row"><span class="dp-ic">${IMG('deco_alma_' + Math.max(1, mn)) ? `<img src="${IMG('deco_alma_' + Math.max(1, mn))}" alt=""${mn ? '' : ' class="ta-dim"'}>` : ''}</span><div class="dp-tx"><b>추억 조각 ${memIc}${fmt(S.ta.mem)}</b><small>${mn ? `수업료 +${TA.monPct * mn}%` : '아직 세우지 않았어요'}${full ? ', 칭호 \'모교의 자랑\'' : `, 다음 수업료 +${TA.monPct * (mn + 1)}%${mn + 1 === TA.mon.length ? '와 칭호' : ''}`}</small></div>` +
-      (full ? '<span class="fe-lock">완성</span>' : `<button class="${S.ta.mem < mc ? 'btn-sub' : 'cta'} small" type="button" data-ta="mon">조각 ${mc}</button>`) + '</div></div>';
+    const monTx = full ? `완성! 수업료 +${TA.monPct * mn}%, 칭호 '모교의 자랑'` : (mn ? `지금 수업료 +${TA.monPct * mn}%<br>` : '') + `조각 ${mc}개로 ${mn ? '올리면' : '세우면'} 수업료 +${TA.monPct * (mn + 1)}%${mn + 1 === TA.mon.length ? '와 칭호' : ''}`;
+    h += `<h3 class="fv-h">모교 기념비 <small>${mn}/${TA.mon.length}단계</small></h3><div class="dp-list"><div class="dp-row"><span class="dp-ic">${IMG('deco_alma_' + Math.max(1, mn)) ? `<img src="${IMG('deco_alma_' + Math.max(1, mn))}" alt=""${mn ? '' : ' class="ta-dim"'}>` : ''}</span><div class="dp-tx"><b>추억 조각 ${memIc}${fmt(S.ta.mem)}${full ? '' : ` / ${mc}`}</b><small>${monTx}</small></div>` +
+      (full ? '<span class="fe-lock">완성</span>' : `<button class="${S.ta.mem < mc ? 'btn-sub' : 'cta'} small" type="button" data-ta="mon">${mn ? '올리기' : '세우기'}</button>`) + '</div></div>';
     return h;
   }
   // 지도: 일하는 조교는 그 건물 앞 오른쪽에 작게, 기념비는 연구 구역 왼쪽 풀밭에(renderDeco가 불러요, 학생 위 층 #vdTop)
@@ -10015,7 +10026,7 @@ body.mg-on .toast[hidden]{display:none}
       oak: [332, 440], plaza: [194.4, 183], gate: [187, 492], bus: [234, 447], drop: [194.4, 205, 36, 12],
       spots: [[176.4, 415.2], [158.4, 382.8], [122.4, 345], [180, 318], [234, 323.4], [169.2, 291], [145.4, 274.8], [198, 253.2], [212.4, 231.6], [195.2, 201], [175, 195], [194.4, 158.7], [220.8, 183], [194.4, 145.2], [187.2, 107.4], [183.6, 91.2], [259.2, 156], [139.6, 130.2], [125.8, 252.8], [262.8, 231.6]],
       fount: [194.4, 183, 22, 14],
-      tea: { hedgehog: [216, 199.2, 0.57], squirrel: [201.6, 102, 0.6], bear: [172.8, 274.8, 0.72], owl: [43.2, 145.2, 0.69], owlAway: [158.4, 307.2, 0.63] },
+      tea: { hedgehog: [216, 199.2, 0.57], squirrel: [201.6, 102, 0.6], bear: [172.8, 274.8, 0.72], owl: [144, 142, 0.69], owlAway: [158.4, 307.2, 0.63] },   // 5.1.1.2 woodani 결정: 부엉이 선생님이 왼쪽 단추(복도, 학교 행사)에 가려서 도서관 오른쪽 풀밭으로
       deco: [[56, 66], [312, 70], [22, 312], [338, 196], [60, 420], [302, 424], [29, 383], [252, 437]],
       sports: [104.5, 207, 53.4, 21.4], eaves: { classroom: 0.02, cafeteria: 0.0, library: 0.0, science: -0.06, playground: -0.14, store: 0 } },
     // 3.0.0 고등학교: 지도와 빈터는 작업지시서 41(art/v300h/maps/lots_high.md). 과학실 위 가운데, 학생회관 공사 자리(대학교에서 열려요) 오른쪽 위,
@@ -10847,22 +10858,37 @@ body.mg-on .toast[hidden]{display:none}
   }
   // 떨어질 자리: 이미 떨어진 도토리와 겹치지 않게 몇 군데 골라 보고 가장 떨어진 곳에 놓아요
   // near: 참나무를 눌러 떨어뜨린 도토리는 나무 가까이에 떨어져요
+  // 5.1.1.2 woodani 제보: 참나무 도토리가 '건물 n채 올리기' 같은 지도 위 단추 밑에 떨어져 줍기 불편했어요. 단추 자리(지도 좌표)를 피해요
+  function dropAvoid() {   // 지도 위에 떠 있는 단추와 칩(편지, 부스트, 건물 올리기, 날씨 등). 지도 그림(svg) 안의 것은 빼요
+    const fr = $('.frame'); if (!fr || !rt.mapS || rt.tab !== 'school') return [];
+    const F = fr.getBoundingClientRect(), sc = rt.mapS, px = rt.panX || 0, py = rt.panY || 0, M = 12, out = [];
+    for (const el of $$('.frame button, .frame [role="button"]')) {
+      if (el.hidden || !el.offsetWidth || el.closest('svg') || el.closest('[hidden]')) continue;
+      const r = el.getBoundingClientRect(); if (!r.width || r.bottom < F.top || r.top > F.bottom) continue;
+      out.push([(r.left - F.left - px) / sc - M, (r.top - F.top - py) / sc - 60 - M, (r.right - F.left - px) / sc + M, (r.bottom - F.top - py) / sc - 60 + M]);
+    }
+    return out;
+  }
+  const inAvoid = (A, x, y) => A.some(b => x >= b[0] && x <= b[2] && y >= b[1] && y <= b[3]);
   function dropSpot(near) {
-    let best = null, bestD = -1;
-    for (let i = 0; i < 8; i++) {
+    let best = null, bestD = -Infinity;
+    const A = dropAvoid();
+    for (let i = 0; i < 16; i++) {
       const a = Math.random() * Math.PI * 2, r = Math.sqrt(Math.random());
       // 1.5.5: 숲속 운동회 동안에는 운동장 트랙 안 잔디에 떨어져요 (평소에는 광장)
       const [ox, oy] = geo().oak, [dcx, dcy, drx, dry] = rt.sports ? [SPORTS.cx, SPORTS.cy, SPORTS.rx * 0.55, SPORTS.ry * 0.5] : geo().drop;
       const MO = near && mapOak(), md = MO && MO.drop[Math.floor(Math.random() * MO.drop.length)];   // 3.3.4 지도 참나무는 정해 둔 풀밭 자리 둘레에 떨어져요
       const x = md ? md[0] + Math.cos(a) * 7 * r : near ? ox + (ox < 180 ? 36 : -36) + Math.cos(a) * 26 * r : dcx + Math.cos(a) * drx * r;
       const y = md ? md[1] + Math.sin(a) * 4 * r : near ? oy + 18 + Math.sin(a) * 12 * r : dcy + Math.sin(a) * dry * r;
-      const d = rt.drops.reduce((m, o) => Math.min(m, Math.hypot(o.x - x, o.y - y)), 99);
+      const d = rt.drops.reduce((m, o) => Math.min(m, Math.hypot(o.x - x, o.y - y)), 99) - (inAvoid(A, x, y) ? 1000 : 0);
       if (d > bestD) { bestD = d; best = [x, y]; }
       if (d >= 26) break;
     }
     // 위쪽 UI와 아래 탭 막대에 가려지지 않는 곳으로 옮겨요
     const v = visMap();
     if (v) { best[0] = Math.min(v[2] - 14, Math.max(v[0] + 14, best[0])); best[1] = Math.min(v[3] - 14, Math.max(v[1] + 14, best[1])); }
+    // 화면 안으로 옮긴 뒤에도 단추 밑이면 단추 위쪽(참나무 쪽)으로 올려요
+    for (let t = 0; t < 6; t++) { const B = A.filter(q => inAvoid([q], best[0], best[1])); if (!B.length) break; best[1] = Math.min(best[1], ...B.map(q => q[1])) - 2; }
     return best;
   }
   function spawnDrop(near) {
@@ -11213,11 +11239,13 @@ body.mg-on .toast[hidden]{display:none}
     save(); renderHUD();
   }
 
+  // 5.1.1.2 woodani 제보: 소풍 간 친구(지도에서 숨김)에게 '!' 말풍선이 붙어 그림 없이 '!'만 돌아다녔어요
+  const kidSeen = k => !!k && !!k.g && !k.gone && k.g.style.display !== 'none';
   function updateTalk(dt) {
     const T = rt.talk;
     if (T && kidsAway()) { endTalk(); return; }   // 3.1.1 woodani 제보: 학생은 안 보이는데 '!' 말풍선만 떠 있었어요
     if (T) {
-      if (T.k.g.isConnected && rt.kids.includes(T.k) && !T.k.board) {
+      if (T.k.g.isConnected && rt.kids.includes(T.k) && !T.k.board && kidSeen(T.k)) {
         T.age += dt;
         if (T.age > TALK.life) endTalk();
         else T.g.setAttribute('transform', `translate(${T.k.x.toFixed(1)} ${(T.k.y - 15).toFixed(1)})`);
@@ -11228,7 +11256,7 @@ body.mg-on .toast[hidden]{display:none}
     rt.talkT -= dt;
     if (rt.talkT > 0) return;
     rt.talkT = rand(TALK.every[0], TALK.every[1]);
-    const ks = rt.kids.filter(k => !k.board && !k.hold && k.ang === undefined);
+    const ks = rt.kids.filter(k => !k.board && !k.hold && k.ang === undefined && kidSeen(k));
     if (ks.length) startTalk(ks[Math.floor(Math.random() * ks.length)]);
   }
   function startTalk(k) {
@@ -14143,8 +14171,8 @@ body.mg-on .toast[hidden]{display:none}
        forest/rank/<내 id>   랭킹 이름과 학교 점수
        forest/stats/<내 id>  테스트 현황 (어디까지 했는지, 얼마나 했는지)
      <내 id>는 Firebase 익명 로그인이 기기(브라우저)마다 만들어 줘요. */
-  const VERSION = '5.1.1.1';   // 2026-11-17 woodani 결정: 웹에 5.0.2~5.0.5로 먼저 냈던 것을 앱과 함께 5.0.1 하나로 내요(버전 견줌은 앞 두 자리만 봐서 되돌아가도 괜찮아요)
-  const NT_QUIET = ['5.1.1.1', '5.1.1', '5.0.3.1', '5.0.3', '5.0.2.2', '5.0.2.1', '2.1.20', '2.1.2.2', '2.3.0.1', '2.3.4', '3.2.3', '3.2.4', '3.2.5', '3.3.1', '3.3.2', '3.3.3', '4.4.1.1', '4.4.1.2', '4.4.1.3', '4.4.1.4', '5.0.1.1', '5.0.1.2', '5.0.1.3', '5.0.1.4', '5.0.1.5', '5.0.1.6', '5.0.1.7', '5.0.1.8'];   // 5.0.1.1 생물 탐사 고침은 공지 없이   // 5.0.3도 공지 없이(공지 줄은 woodani가 정하면 넣어요)   // 5.0.2 공지 없이(woodani 2026-11-16)   // 5.0.1 공지 줄은 woodani가 정할 때까지 조용히   // 5.0.0 공지는 2026-11-16 woodani가 정해서 NOTICES로 옮겼어요   // 4.4.1(앱과 함께 내는 판)은 공지를 띄워요   // 4.4.1도 공지 없이(woodani)   // 3.3.1, 3.3.2, 3.3.3(토스 먼저)도 공지 창 없이(woodani). 2.3.0.1도 공지 창 없이(공지는 그대로 2.3.0). 2.3.4도 조용히(woodani 결정). 3.2.3, 3.2.4, 3.2.5도 공지 창 없이(공지 줄을 고르지 않음)
+  const VERSION = '5.1.1.2';   // 2026-11-17 woodani 결정: 웹에 5.0.2~5.0.5로 먼저 냈던 것을 앱과 함께 5.0.1 하나로 내요(버전 견줌은 앞 두 자리만 봐서 되돌아가도 괜찮아요)
+  const NT_QUIET = ['5.1.1.2', '5.1.1.1', '5.1.1', '5.0.3.1', '5.0.3', '5.0.2.2', '5.0.2.1', '2.1.20', '2.1.2.2', '2.3.0.1', '2.3.4', '3.2.3', '3.2.4', '3.2.5', '3.3.1', '3.3.2', '3.3.3', '4.4.1.1', '4.4.1.2', '4.4.1.3', '4.4.1.4', '5.0.1.1', '5.0.1.2', '5.0.1.3', '5.0.1.4', '5.0.1.5', '5.0.1.6', '5.0.1.7', '5.0.1.8'];   // 5.0.1.1 생물 탐사 고침은 공지 없이   // 5.0.3도 공지 없이(공지 줄은 woodani가 정하면 넣어요)   // 5.0.2 공지 없이(woodani 2026-11-16)   // 5.0.1 공지 줄은 woodani가 정할 때까지 조용히   // 5.0.0 공지는 2026-11-16 woodani가 정해서 NOTICES로 옮겼어요   // 4.4.1(앱과 함께 내는 판)은 공지를 띄워요   // 4.4.1도 공지 없이(woodani)   // 3.3.1, 3.3.2, 3.3.3(토스 먼저)도 공지 창 없이(woodani). 2.3.0.1도 공지 창 없이(공지는 그대로 2.3.0). 2.3.4도 조용히(woodani 결정). 3.2.3, 3.2.4, 3.2.5도 공지 창 없이(공지 줄을 고르지 않음)
     // 2.1.20 woodani 결정: 이 버전들은 업데이트해도 공지 창을 띄우지 않아요(공지는 그대로 2.1.2)
   /* 2.0.0 공지사항 (2026-10-27 woodani, 1.8.0은 이미 올려서 2.0.0부터): 설정 > 공지사항. 맨 위가 가장 새 공지예요.
      패치노트는 자동으로 넣지 않아요. woodani가 검수한 글만 여기에 적어요(CHANGELOG.md는 자세한 기록용이라 따로 있어요).
@@ -24321,7 +24349,7 @@ body.mg-on .toast[hidden]{display:none}
     if (ok) for (const X of SIDE) if (sideCan(X)) want[X.id] = X;
     $$('#map .sd-bub').forEach(b => { const X = want[b.dataset.side]; if (!X || !b.isConnected) b.remove(); else delete want[b.dataset.side]; });
     for (const X of Object.values(want)) {
-      const tea = !!TEA[X.who], host = tea ? $('#m-' + X.who) : (rt.kids.find(k => k.sp === X.who && k.g && k.g.isConnected && !k.gone) || {}).g;
+      const tea = !!TEA[X.who], host = tea ? $('#m-' + X.who) : (rt.kids.find(k => k.sp === X.who && k.g && k.g.isConnected && kidSeen(k)) || {}).g;
       if (!host || (tea && getComputedStyle(host).display === 'none')) continue;
       // 인물 그림마다 크기 배율이 달라서, 그 그림의 위쪽 끝과 배율을 재서 지도에서 늘 같은 크기(지름 20)로 머리 위에 띄워요
       let sc = 1, top = -24; try { const m = host.getCTM(), m0 = $('#map').getCTM(); sc = (m && m0 && m0.a ? m.a / m0.a : 1) || 1; top = host.getBBox().y; } catch (e) { /* 못 재면 기본값 */ }
@@ -24331,8 +24359,14 @@ body.mg-on .toast[hidden]{display:none}
       host.appendChild(g);
     }
   }
+  // 5.1.1.2 woodani 제보: 잎사귀가 건물 이름표나 학생 그림 아래에 깔리면(특히 체육 선생님) 건물 창이 열렸어요. 누른 자리 아래에 잎사귀가 있으면 잎사귀가 먼저예요
+  function sideBubAt(e) {
+    const b = e.target.closest && e.target.closest('.sd-bub'); if (b || e.type === 'keydown' || e.clientX == null || !document.elementsFromPoint) return b;
+    try { for (const el of document.elementsFromPoint(e.clientX, e.clientY)) { const x = el.closest && el.closest('.sd-bub'); if (x) return x; if (el.closest && el.closest('#fx .trial, #fx .talk, #fx .drop, #fx .visit')) return null; } } catch (err) { /* 못 찾으면 그대로 */ }
+    return null;
+  }
   function sideMapTap(e) {
-    const b = e.target.closest && e.target.closest('.sd-bub'); if (!b) return;
+    const b = sideBubAt(e); if (!b) return;
     if (e.type === 'keydown') { if (e.key !== 'Enter' && e.key !== ' ') return; e.preventDefault(); }
     e.stopPropagation();
     if (rt.paused || rt.modalOpen || festBusy() || rt.decoEdit || rt.st) return;
@@ -26741,7 +26775,7 @@ body.mg-on .toast[hidden]{display:none}
     window.addEventListener('resize', refit);
     if (document.fonts && document.fonts.ready) document.fonts.ready.then(() => { rt.fitGen += 1; refit(); }).catch(() => {});
     const nextTap = () => { const G = geo().next; if (!G) return; toast(`${eun(G.name)} ${G.tag}`); sfx('tap'); };
-    $('#b-next').addEventListener('click', nextTap);
+    $('#b-next').addEventListener('click', () => { if (!rt.trial) nextTap(); });
     $('#b-next').addEventListener('keydown', e => { if (e.key === 'Enter' || e.key === ' ') { e.preventDefault(); nextTap(); } });
     $('#oak').addEventListener('click', tapOak);
     $('#oak').addEventListener('keydown', e => { if (e.key === 'Enter' || e.key === ' ') { e.preventDefault(); tapOak(); } });
@@ -26975,7 +27009,7 @@ body.mg-on .toast[hidden]{display:none}
       rt.lux = !luxOn(); try { localStorage.setItem('forest-lux', rt.lux ? '1' : '0'); } catch (e) { /* 이번만 */ }
       applyThemes(); renderMap(); devLuxText(); toast(rt.lux ? '고급 배경을 켰어요' : '고급 배경을 껐어요');
     });
-    $('#campusG').addEventListener('click', e => { const el = e.target.closest('.cz'); if (el) campusTap(el); });
+    $('#campusG').addEventListener('click', e => { const el = e.target.closest('.cz'); if (el && !rt.trial) campusTap(el); });
     $('#campusG').addEventListener('keydown', e => { const el = e.target.closest('.cz'); if (el && (e.key === 'Enter' || e.key === ' ')) { e.preventDefault(); campusTap(el); } });
     $('#zoneHome').addEventListener('click', () => { sfx('tap'); setZone(''); });
     $('#zonePrev').addEventListener('click', () => zoneStep(-1));
@@ -27031,14 +27065,14 @@ body.mg-on .toast[hidden]{display:none}
       const k = g.getAttribute('data-k'), pq = $('#pq-' + k);
       if (pq) {
         $('#plaques').appendChild(pq);
-        pq.addEventListener('click', () => openSheet(k));
+        pq.addEventListener('click', () => { if (!rt.trial) openSheet(k); });   // 5.1.1.2 매나 뱀이 들어온 동안에는 건물이 열리지 않아요
         pq.addEventListener('pointerdown', () => g.classList.add('press'));
         ['pointerup', 'pointerleave', 'pointercancel'].forEach(ev => pq.addEventListener(ev, () => g.classList.remove('press')));
       }
     });
     $$('.bld').forEach(g => {
       const k = g.getAttribute('data-k');
-      g.addEventListener('click', e => openSheet(bldPick(e, k)));   // 4.1.0 겹친 자리에서는 그림이 실제로 있는 건물을 골라요
+      g.addEventListener('click', e => { if (!rt.trial) openSheet(bldPick(e, k)); });   // 4.1.0 겹친 자리에서는 그림이 실제로 있는 건물을 골라요
       g.addEventListener('keydown', e => { if (e.key === 'Enter' || e.key === ' ') { e.preventDefault(); openSheet(k); } });
       g.addEventListener('pointerdown', () => g.classList.add('press'));
       ['pointerup', 'pointerleave', 'pointercancel'].forEach(ev => g.addEventListener(ev, () => g.classList.remove('press')));
@@ -27182,6 +27216,7 @@ body.mg-on .toast[hidden]{display:none}
       if (b.dataset.ta) { const [a, x, y, z] = b.dataset.ta.split(':'); const i = +x;   // 5.1.0 조교
         if (a === 'pick') { rt.taPick = rt.taPick === i ? -1 : i; rt.taGo = -1; sfx('tap'); }
         else if (a === 'go') { rt.taGo = rt.taGo === i ? -1 : i; rt.taPick = -1; sfx('tap'); }
+        else if (a === 'hr') { rt.taHr = +y; sfx('tap'); }
         else if (a === 'sit') taSit(i, y);
         else if (a === 'send') taSend(i, +y, +z);
         else if (a === 'claim') taClaim();
