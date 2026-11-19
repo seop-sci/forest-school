@@ -50,19 +50,19 @@
       { k: 'event', nm: '행사', ic: 'ic_rt_event', eff: L => `학교 행사, 축제, 체험학습 도토리 +${10 * L}%` },
       { k: 'tam', nm: '탐험', ic: 'ic_rt_tam', eff: L => `탐험대 힘 +${5 * L}%` + (L >= 4 ? ', 보고서 +2시간' : '') },
       { k: 'time', nm: '시간', ic: 'ic_rt_time', eff: L => `자리 비운 동안 수입 +${L}시간` },
-      { k: 'ta', nm: '조교', ic: 'ic_rt_ta', eff: L => ['', '조교 자리 +1', '조교 자리 +1, 파견 시간 -15%', '조교 자리 +2, 파견 시간 -15%', '조교 자리 +2, 파견 시간 -15%, 파견 보상 +25%'][L] }],   // 5.1.0 조교 가지 열림
-    ess: [50, 100, 200, 400], hrs: [1, 2, 4, 8], time: [1, 3, 6, 12], max: 4 };
+      { k: 'ta', nm: '조교', ic: 'ic_rt_ta', eff: L => ['', '조교 자리 +1', '조교 자리 +1, 파견 시간 -15%', '조교 자리 +2, 파견 시간 -15%', '조교 자리 +2, 파견 시간 -15%, 파견 보상 +25%', '조교 자리 +2, 파견 시간 -15%, 파견 보상 +50%'][L] }],   // 5.1.0 조교 가지 열림
+    ess: [50, 100, 200, 400, 800], hrs: [1, 2, 4, 8, 16], time: [1, 3, 6, 12, 24], max: 4, top: 5 };   // 5.2.0 다섯째 칸(심화 칸)은 논문으로 열려요(rtMax)
   const rtLv = k => (S && S.rt5 && S.rt5.lv[k]) || 0;
   const rtClassMul = () => 1 + 0.05 * rtLv('class');
   const rtEvt = () => 1 + 0.1 * rtLv('event');
   const rtTamMul = () => 1 + 0.05 * rtLv('tam');
-  const rtCost = k => { const L = Math.min(RT5.max - 1, rtLv(k)); return { ess: RT5.ess[L], ac: nice(rate() * 3600 * RT5.hrs[L]), sec: Math.round(RT5.time[L] * 3600 * (1 - XT.adv.per / 100 * xtLv('adv'))) }; };   // 5.0.0 펠리컨 지도교수님 연수만큼 짧아져요
+  const rtCost = k => { const L = Math.min(RT5.top - 1, rtLv(k)); return { ess: RT5.ess[L], ac: nice(rate() * 3600 * RT5.hrs[L]), sec: Math.round(RT5.time[L] * 3600 * (1 - XT.adv.per / 100 * xtLv('adv'))) }; };   // 5.0.0 펠리컨 지도교수님 연수만큼 짧아져요
   const rtOpen = () => gradOn() && (S.f.institute || 0) >= 1;
   const rtHrs = sec => { const m = Math.round(sec / 60), h = Math.floor(m / 60); return h && m % 60 ? `${h}시간 ${m % 60}분` : h ? `${h}시간` : `${m}분`; };   // 5.0.0 연구 시간 글자(지도교수님 연수로 분 단위가 생겨요)
   function rtStart(k) {
     const D = RT5.list.find(x => x.k === k); if (!D || D.lock || !rtOpen()) return false;
     if (S.rt5.cur) { toast('연구는 한 번에 하나씩 해요'); return false; }
-    if (rtLv(k) >= RT5.max) return false;
+    if (rtLv(k) >= rtMax(k)) { if (rtLv(k) < RT5.top) toast(`논문 ${PP.deep[k]}편을 쓰면 다섯째 칸이 열려요`); return false; }
     const c = rtCost(k);
     if (S.ess < c.ess) { toast(essShort(c.ess - S.ess)); return false; }
     if (S.budget < c.ac) { toast(`도토리가 ${fmt(c.ac - S.budget)}개 모자라요`); return false; }
@@ -73,7 +73,7 @@
   }
   function rtTick() {
     const c = S && S.rt5 && S.rt5.cur; if (!c || gameNow() < c.end) return;
-    const D = RT5.list.find(x => x.k === c.k); S.rt5.lv[c.k] = Math.min(RT5.max, rtLv(c.k) + 1); S.rt5.cur = null; save(); rt.rtPop = { k: c.k, i: rtLv(c.k) - 1 };   // 5.1.1.4 나무 칸이 막 자란 움직임
+    const D = RT5.list.find(x => x.k === c.k); S.rt5.lv[c.k] = Math.min(RT5.top, rtLv(c.k) + 1); S.rt5.cur = null; ppData(PP.dat.rt); save(); rt.rtPop = { k: c.k, i: rtLv(c.k) - 1 };   // 5.1.1.4 나무 칸이 막 자란 움직임
     toast(`${D ? D.nm : ''} 연구 ${rtLv(c.k)}칸 완성!\n${D ? D.eff(rtLv(c.k)) : ''}`); sfx('quest');
     if (!$('#mRx').hidden) renderRx();
   }
@@ -81,7 +81,7 @@
      칸 자리는 720x960 판 기준(그림 작업지시서 96의 rt_tree_bg와 같은 좌표). 칸을 누르면 아래 칸 창에 효과, 값, '연구하기'. 효과와 값은 그대로 */
   const RT_PT = [[160, 141, 125, 109, 96], [260, 250, 242, 235, 228], [360, 360, 360, 360, 360], [460, 470, 478, 485, 492], [560, 579, 595, 611, 624]];   // 가지마다 줄 1~5의 x(작업지시서 96-2, 위로 갈수록 퍼지는 부채꼴)
   const RT_X = (j, i) => RT_PT[j][i], RT_Y = i => 800 - 150 * i, RT_W = 720, RT_H = 960;
-  const rtTop = () => RT5.max >= 5 ? 0 : RT_Y(RT5.max - 1) - 130;   // 칸이 네 줄이면 빈 위쪽을 잘라요(다섯째 칸은 5.2.0 논문 심화 칸)
+  const rtTop = () => RT5.top >= 5 ? 0 : RT_Y(RT5.top - 1) - 130;   // 칸 줄 수가 다섯보다 적으면 빈 위쪽을 잘라요
   function rtTreeSvg() {
     const bg = IMG('rt_tree_bg'), c = S.rt5.cur;
     let s = '';
@@ -89,20 +89,20 @@
     RT5.list.forEach((D, j) => {
       const x = RT_X(j, 0), L = rtLv(D.k), run = c && c.k === D.k, seg = i => `M${RT_X(j, i - 1)} ${RT_Y(i - 1)} L${RT_X(j, i)} ${RT_Y(i)}`;
       const stem = `M360 885 C360 850 ${x} 860 ${x} ${RT_Y(0)}`;
-      if (!bg) { s += `<path d="${stem}" stroke="#B98A5E" stroke-width="16" fill="none" stroke-linecap="round"/>`; for (let i = 1; i < RT5.max; i++) s += `<path d="${seg(i)}" stroke="#B98A5E" stroke-width="14" fill="none" stroke-linecap="round"/>`; }
+      if (!bg) { s += `<path d="${stem}" stroke="#B98A5E" stroke-width="16" fill="none" stroke-linecap="round"/>`; for (let i = 1; i < RT5.top; i++) s += `<path d="${seg(i)}" stroke="#B98A5E" stroke-width="14" fill="none" stroke-linecap="round"/>`; }
       if (L > 0 || run) s += `<path d="${stem}" class="rt-done" fill="none"/>`;
-      for (let i = 1; i < RT5.max; i++) if (L > i || (L === i && run)) s += `<path d="${seg(i)}" class="rt-done${L === i ? ' rt-run' : ''}" fill="none"/>`;
+      for (let i = 1; i < RT5.top; i++) if (L > i || (L === i && run)) s += `<path d="${seg(i)}" class="rt-done${L === i ? ' rt-run' : ''}" fill="none"/>`;
     });
     return `<svg class="rt-lines" viewBox="0 ${rtTop()} ${RT_W} ${RT_H - rtTop()}" preserveAspectRatio="none" aria-hidden="true">${s}</svg>`;
   }
   function rtPart() {
     const c = S.rt5.cur, now = gameNow(), bg = IMG('rt_tree_bg');
-    if (!RT5.list.some(D => D.k === rt.rtSel)) rt.rtSel = c ? c.k : (RT5.list.find(D => !D.lock && rtLv(D.k) < RT5.max) || RT5.list[0]).k;
+    if (!RT5.list.some(D => D.k === rt.rtSel)) rt.rtSel = c ? c.k : (RT5.list.find(D => !D.lock && rtLv(D.k) < rtMax(D.k)) || RT5.list[0]).k;
     let nodes = '';
     RT5.list.forEach((D, j) => {
       const L = rtLv(D.k), u = IMG(D.ic), run = c && c.k === D.k;
-      for (let i = 0; i < RT5.max; i++) {
-        const st = i < L ? 'done' : i === L && run ? 'run' : i === L && !D.lock ? 'next' : 'lock', sel = rt.rtSel === D.k && (i === Math.min(L, RT5.max - 1));
+      for (let i = 0; i < RT5.top; i++) {
+        const st = i < L ? 'done' : i === L && run ? 'run' : i === L && !D.lock && i < rtMax(D.k) ? 'next' : 'lock', sel = rt.rtSel === D.k && (i === Math.min(L, RT5.top - 1));
         const pop = st === 'done' && rt.rtPop && rt.rtPop.k === D.k && rt.rtPop.i === i;
         nodes += `<button class="rt-node ${st}${sel ? ' sel' : ''}${pop ? ' pop' : ''}" type="button" data-rts="${D.k}" style="left:${(RT_X(j, i) / RT_W * 100).toFixed(2)}%;top:${((RT_Y(i) - rtTop()) / (RT_H - rtTop()) * 100).toFixed(2)}%" aria-label="${D.nm} ${i + 1}칸${st === 'done' ? ' 완성' : st === 'run' ? ' 연구 중' : st === 'lock' ? ' 잠김' : ''}">` +
           (u ? `<img src="${u}" alt="">` : `<b>${i + 1}</b>`) + (st === 'lock' ? '<i class="rt-lk">🔒</i>' : st === 'done' ? '<i class="rt-leaf"></i>' : '') + '</button>';
@@ -110,19 +110,19 @@
       nodes += `<span class="rt-nm" style="left:${(RT_X(j, 0) / RT_W * 100).toFixed(2)}%">${D.nm}</span>`;
     });
     rt.rtPop = null;
-    const D = RT5.list.find(x => x.k === rt.rtSel), L = rtLv(D.k), run = c && c.k === D.k, full = L >= RT5.max, k = rtCost(D.k);
+    const D = RT5.list.find(x => x.k === rt.rtSel), L = rtLv(D.k), run = c && c.k === D.k, full = L >= RT5.top, shut = !full && L >= rtMax(D.k), k = rtCost(D.k);
     const btn = D.lock ? '<span class="fe-lock">준비 중</span>' : full ? '<span class="fe-lock">완성</span>' : run ? `<span class="fe-lock">${hms(c.end - now)}</span>`
-      : c ? '<span class="fe-lock">다른 연구 중</span>'
+      : shut ? `<span class="fe-lock">논문 ${PP.deep[D.k]}편</span>` : c ? '<span class="fe-lock">다른 연구 중</span>'
       : `<button class="${S.ess < k.ess || S.budget < k.ac ? 'btn-sub' : 'cta'} small" type="button" data-rt="${D.k}">연구하기 (정수 ${k.ess})</button>`;
-    const info = `<div class="rt-card"><span class="dp-ic">${IMG(D.ic) ? `<img src="${IMG(D.ic)}" alt="">` : ''}</span><div class="dp-tx"><b>${D.nm} ${Math.min(L + (full ? 0 : 1), RT5.max)}칸${full ? ' (완성)' : ''}</b>` +
+    const info = `<div class="rt-card"><span class="dp-ic">${IMG(D.ic) ? `<img src="${IMG(D.ic)}" alt="">` : ''}</span><div class="dp-tx"><b>${D.nm} ${Math.min(L + (full ? 0 : 1), RT5.top)}칸${full ? ' (완성)' : ''}</b>` +
       `<small>${L ? `지금 ${D.eff(L)}` : '아직 연구 전'}${D.lock || full ? '' : `<br>다음 ${D.eff(L + 1)}<br>도토리 ${fmt(k.ac)}, ${rtHrs(k.sec)}`}</small></div>${btn}</div>`;
     return `<p class="fine">한 번에 하나씩 연구해요. 졸업해도 남아요.</p><div class="rt-tree${bg ? ' art' : ''}" style="aspect-ratio:${RT_W}/${RT_H - rtTop()}${bg ? `;background-image:url('${blobUrl(bg)}')` : ''}">${rtTreeSvg()}${nodes}</div>${info}`;
   }
   function renderRx() {
-    const tab = ['tree', 'ta'].includes(rt.rxTab) ? rt.rxTab : 'inv';
+    const tab = ['tree', 'ta', 'paper'].includes(rt.rxTab) ? rt.rxTab : 'inv';
     $$('#rxSeg [data-rseg]').forEach(b => b.setAttribute('aria-checked', String(b.dataset.rseg === tab)));
-    setH($('#rxBody'), tab === 'tree' ? rtPart() : tab === 'ta' ? taPart() : rxPart(true));
-    { const hd = $('#rxTitle').parentElement, u = tab === 'ta' && taOpen() ? IMG('ta_bg') : ''; hd.classList.toggle('art', !!u); hd.style.backgroundImage = u ? `url("${blobUrl(u)}")` : ''; }   // 5.1.0 조교 탭 머리 그림
+    setH($('#rxBody'), tab === 'tree' ? rtPart() : tab === 'ta' ? taPart() : tab === 'paper' ? ppPart() : rxPart(true));
+    { const hd = $('#rxTitle').parentElement, u = tab === 'ta' && taOpen() ? IMG('ta_bg') : tab === 'paper' && ppOpen() ? IMG('conf_bg') : ''; hd.classList.toggle('art', !!u); hd.style.backgroundImage = u ? `url("${blobUrl(u)}")` : ''; }   // 5.1.0 조교 탭 머리 그림, 5.2.0 논문 탭은 학회장 그림
   }
   /* ---------- 5.1.0 조교 파견 (프로젝트 문서 '5.1.0 설계안 (조교 파견) 초안', woodani 결정 2026-11-19: 숫자는 제안대로) ----------
      조교 자리: 대학원생 조교를 캠퍼스 건물에 한 명씩 앉혀요. 앉아 있는 조교 한 명마다 수업료 +10%, 그 건물 가구 값 -10%.
@@ -162,7 +162,7 @@
   }
   function taClaim() {
     const due = taDue(); if (!due.length) return false;
-    const mul = rtLv('ta') >= 4 ? 1.25 : 1; let ess = 0, mem = 0, ac = 0; const got = [];
+    const mul = rtLv('ta') >= 5 ? 1.5 : rtLv('ta') >= 4 ? 1.25 : 1; let ess = 0, mem = 0, ac = 0; const got = [];   // 5.2.0 조교 심화 칸 +25% 더
     for (const o of due) {
       const f = TA.hrs[o.h] / 2;   // 덤은 2시간을 1배로 시간만큼
       ess += Math.round(TA.ess[o.h] * mul * (o.to === 0 ? 1.5 : 1)); mem += Math.round(TA.mem[o.h] * mul);
@@ -173,6 +173,7 @@
     }
     S.ta.out = S.ta.out.filter(o => !due.includes(o));
     S.ta.mem = Math.min(1e9, S.ta.mem + mem);
+    ppData(due.reduce((t, o) => t + (PP.dat.ta[o.h] || 0), 0));   // 5.2.0 4시간 1, 8시간 2
     addEss(ess); if (ac > 0) { S.budget += ac; earn(ac); got.push(`도토리 ${fmt(ac)}`); }
     save(); renderHUD(); renderDeco(); checkQuests(true); sfx('quest'); buzz(15);
     toast(`조교 ${due.length}명이 돌아왔어요\n숲의 정수 ${ess}, 추억 조각 ${mem}` + (got.length ? `\n${[...new Set(got)].join(', ')}` : ''));
@@ -187,6 +188,94 @@
     save(); renderHUD(); renderDeco(); checkQuests(true); sfx('quest'); buzz(20);
     toast(`모교 기념비 ${S.ta.mon}단계!\n수업료 +${TA.monPct * S.ta.mon}%` + (S.ta.mon >= TA.mon.length ? `\n칭호 '모교의 자랑'을 받았어요` : ''));
     return true;
+  }
+  /* ---------- 5.2.0 논문과 숲속 학회 (프로젝트 문서 '5.2.0 설계안 (논문과 숲속 학회) 초안', woodani 결정 2026-11-19: 숫자는 제안대로, 대학원부터) ----------
+     연구 자료: 하루 첫 자료 정리 1, 세미나 3, 조교 파견 4시간 1과 8시간 2, 연구 트리 칸 2, 심화 탐험 큰 장난꾸러기 처음 넘기 1.
+     논문: 주제(연구 트리 가지)를 골라 자료 3개로 4시간. 점수 = 10 + 그 가지 칸 수 × 5, 한 학회에서 같은 주제 3편째부터 절반. 다 쓰면 정수 10.
+     숲속 학회: 4주(주간 리그 4주)마다. 그 학회에 쓴 논문 점수를 더하고, 끝나면 100점 동, 300점 은, 600점 금메달. 서버 랭킹 cf(점수), cq(학회 × 1,000,000 + 점수).
+     심화 칸: 논문 3, 6, 10, 15, 20편마다 수업, 행사, 탐험, 시간, 조교 가지에 다섯째 칸 */
+  const PP = { need: 3, sec: 4 * 3600, ess: 10, base: 10, per: 5, halfAt: 2, weeks: 4,
+    dat: { day: 1, sem: 3, ta: [0, 1, 2], rt: 2, boss: 1 },
+    med: [{ at: 100, nm: '동메달', ic: '🥉', ess: 20, gold: 0 }, { at: 300, nm: '은메달', ic: '🥈', ess: 40, gold: 0 }, { at: 600, nm: '금메달', ic: '🥇', ess: 60, gold: 1 }],
+    deep: { class: 3, event: 6, tam: 10, time: 15, ta: 20 } };
+  const PP_TITLES = [
+    { id: 'semfive', title: '발표왕', got: s => !!s.pp && s.pp.sem >= 5 },
+    { id: 'semten', title: '숲속 석학', got: s => !!s.pp && s.pp.sem >= 10 },
+    { id: 'semtwenty', title: '명예 교수', got: s => !!s.pp && s.pp.sem >= 20 },
+    { id: 'paperone', title: '첫 논문', got: s => !!s.pp && s.pp.n >= 1 },
+    { id: 'paperthirty', title: '논문 부자', got: s => !!s.pp && s.pp.n >= 30 },
+    { id: 'confgold', title: '학회 금메달', got: s => !!s.pp && (s.pp.med || []).some(m => m[1] >= 3) }];
+  const ppOpen = () => !!S && !!S.pp && rtOpen();   // 대학원 연구소를 지으면(석사 1학기부터)
+  const ppPer = () => Math.floor(gameWeek() / PP.weeks);
+  const ppLeft = () => { const end = Date.UTC(2026, 0, 5) + (ppPer() + 1) * PP.weeks * 604800000 - KST_MS; return Math.max(0, Math.ceil((end - gameNow()) / 86400000)); };
+  const rtMax = k => (S && S.pp && S.pp.n >= (PP.deep[k] || Infinity)) ? RT5.top : RT5.max;   // 5.2.0 심화 칸이 열린 가지는 다섯 칸
+  const ppMedOf = v => PP.med.reduce((a, m, i) => v >= m.at ? i + 1 : a, 0);
+  const ppScore = k => { const v = PP.base + PP.per * rtLv(k); return ((S.pp.ck[k] || 0) >= PP.halfAt) ? Math.floor(v / 2) : v; };
+  function ppData(n, why) {   // 연구 자료 얻기(대학원에서만)
+    if (!ppOpen() || !(n > 0)) return 0;
+    S.pp.dat = Math.min(9999, S.pp.dat + n);
+    if (why) rt.ppWhy = why;
+    if (!$('#mRx').hidden && rt.rxTab === 'paper') renderRx();
+    return n;
+  }
+  // 학회가 바뀌면 지난 학회 메달을 주고 점수를 0부터. 켤 때와 1초마다 봐요
+  function ppSync() {
+    if (!S || !S.pp) return;
+    const p = ppPer(); if (S.pp.cm === p) return;
+    const old = S.pp.cm, v = S.pp.cf, m = old >= 0 && v > 0 ? ppMedOf(v) : 0;
+    S.pp.cm = p; S.pp.cf = 0; S.pp.ck = {};
+    if (m) {
+      const M = PP.med[m - 1]; S.pp.med.push([old, m]); if (S.pp.med.length > 60) S.pp.med = S.pp.med.slice(-60);
+      addEss(M.ess); if (M.gold) addGold(M.gold);
+      showReward({ title: `숲속 학회 ${M.nm}`, sub: `지난 학회 점수 ${fmt(v)}점`, items: [{ ic: '🏅', t: `${M.ic} ${M.nm}` }, { ic: 'ess', t: `숲의 정수 +${M.ess}` }, M.gold ? { ic: 'gold', t: `황금 도토리 +${M.gold}` } : null] });
+    }
+    save();
+  }
+  function ppDay() {   // 하루 첫 자료 정리
+    if (!ppOpen()) return false;
+    const d = gameToday(); if (S.pp.day === d) { toast('오늘 자료 정리는 끝났어요\n내일 다시 해요'); return false; }
+    S.pp.day = d; ppData(PP.dat.day); save(); sfx('coin'); toast(`연구 자료 +${PP.dat.day}`); return true;
+  }
+  function ppWrite(k) {
+    const D = RT5.list.find(x => x.k === k); if (!D || !ppOpen()) return false;
+    if (S.pp.cur) { toast('논문은 한 번에 한 편씩 써요'); return false; }
+    if (S.pp.dat < PP.need) { toast(`연구 자료가 ${PP.need - S.pp.dat}개 모자라요`); return false; }
+    S.pp.dat -= PP.need; S.pp.cur = { k, end: gameNow() + PP.sec * 1000 };
+    save(); sfx('tap'); toast(`${D.nm} 논문을 쓰기 시작했어요\n${rtHrs(PP.sec)} 뒤에 끝나요`); checkQuests(true);
+    return true;
+  }
+  function ppTick() {
+    if (!S || !S.pp) return;
+    ppSync();
+    const c = S.pp.cur; if (!c || gameNow() < c.end) return;
+    const D = RT5.list.find(x => x.k === c.k), before = new Set(PP_TITLES.filter(t => t.got(S)).map(t => t.id)), deep0 = RT5.list.filter(x => rtMax(x.k) > RT5.max).length;
+    const sc = ppScore(c.k);
+    S.pp.cur = null; S.pp.n += 1; S.pp.by[c.k] = (S.pp.by[c.k] || 0) + 1; S.pp.ck[c.k] = (S.pp.ck[c.k] || 0) + 1;
+    S.pp.cf = Math.min(99999, S.pp.cf + sc); S.pp.cb = Math.max(S.pp.cb, S.pp.cf);
+    addEss(PP.ess); rankDirty(); save();
+    const newT = PP_TITLES.filter(t => t.got(S) && !before.has(t.id)), deep = RT5.list.filter(x => rtMax(x.k) > RT5.max);
+    showReward({ title: `논문 ${S.pp.n}편째 완성!`, sub: `${D ? D.nm : ''} 논문, 학회 점수 +${sc}`, items: [{ ic: 'ess', t: `숲의 정수 +${PP.ess}` }, { ic: '📜', t: `이번 학회 ${fmt(S.pp.cf)}점` },
+      deep.length > deep0 ? { ic: '🌿', t: `${deep[deep.length - 1].nm} 가지에 다섯째 칸이 열렸어요` } : null, ...newT.map(t => ({ ic: '🎖️', t: `칭호 "${t.title}"` }))] });
+    sfx('quest'); checkQuests(true);
+    if (!$('#mRx').hidden) renderRx();
+  }
+  function ppSemDone() { if (S && S.pp && gradOn()) { S.pp.sem += 1; ppData(PP.dat.sem); } }   // 세미나와 학위수여식
+  function ppPart() {
+    if (!ppOpen()) return `<p class="fine">${gradOn() ? '연구 구역 연구소를 지으면 열려요' : '대학교를 졸업하고 대학원에 가면 열려요'}</p>`;
+    ppSync();
+    const P = S.pp, c = P.cur, now = gameNow(), m = ppMedOf(P.cf), nx = PP.med[m], u = IMG('ic_rdata'), up = IMG('ic_paper'), dayDone = P.day === gameToday();
+    const nextDeep = RT5.list.filter(D => P.n < PP.deep[D.k]).sort((a, b) => PP.deep[a.k] - PP.deep[b.k])[0];
+    let h = `<div class="pp-conf"><b>이번 숲속 학회 ${fmt(P.cf)}점</b><small>${ppLeft()}일 남음. ${m ? `지금 ${PP.med[m - 1].ic} ${PP.med[m - 1].nm}` : '아직 메달 없음'}${nx ? `, ${nx.at}점이면 ${nx.ic} ${nx.nm}` : ''}</small></div>`;
+    h += `<div class="dp-row"><span class="dp-ic">${u ? `<img src="${u}" alt="">` : '🔎'}</span><div class="dp-tx"><b>연구 자료 ${fmt(P.dat)}개</b><small>논문 한 편에 ${PP.need}개. 세미나 ${PP.dat.sem}, 연구 트리 칸 ${PP.dat.rt}, 조교 파견 4시간 이상, 심화 탐험 큰 장난꾸러기</small></div>` +
+      (dayDone ? '<span class="fe-lock">오늘 정리함</span>' : `<button class="cta small" type="button" data-pp="day">자료 정리 +${PP.dat.day}</button>`) + '</div>';
+    if (c) { const D = RT5.list.find(x => x.k === c.k); h += `<div class="dp-row on"><span class="dp-ic">${up ? `<img src="${up}" alt="">` : '📜'}</span><div class="dp-tx"><b>${D ? D.nm : ''} 논문 쓰는 중</b><small>끝나면 학회 점수 +${ppScore(c.k)}</small></div><span class="fe-lock">${hms(c.end - now)}</span></div>`; }
+    h += '<div class="dp-list">' + RT5.list.map(D => {
+      const sc = ppScore(D.k), half = (P.ck[D.k] || 0) >= PP.halfAt, U = IMG(D.ic), can = !c && P.dat >= PP.need;
+      return `<div class="dp-row"><span class="dp-ic">${U ? `<img src="${U}" alt="">` : ''}</span><div class="dp-tx"><b>${D.nm} 논문</b><small>학회 점수 ${sc}${half ? ' (이번 학회 같은 주제 3편째부터 절반)' : ` (연구 트리 ${rtLv(D.k)}칸)`}</small></div>` +
+        `<button class="${can ? 'cta' : 'btn-sub'} small" type="button" data-pp="w:${D.k}">쓰기</button></div>`;
+    }).join('') + '</div>';
+    h += `<p class="fine">쓴 논문 ${P.n}편${nextDeep ? `. ${PP.deep[nextDeep.k]}편이면 연구 트리 ${nextDeep.nm} 가지에 다섯째 칸이 열려요` : '. 연구 트리 심화 칸이 모두 열렸어요'}. 4주마다 학회가 새로 열려요.</p>`;
+    return h;
   }
   function taPart() {
     if (!taOpen()) return '<p class="fine">조교는 석사 2학기에 열려요.</p>';

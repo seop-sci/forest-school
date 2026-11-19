@@ -39,7 +39,7 @@ async def main():
               out.done = document.querySelectorAll('#rxBody .rt-node.done').length;
               return out; })()""")
             print(w, th, r, r2)
-            c.ok(r['nodes'] == 20 and r['names'] == 5, f'칸 수: {r}')
+            c.ok(r['nodes'] == 25 and r['names'] == 5, f'칸 수: {r}')
             c.ok(r['done'] == 6 and r['next'] == 4, f'칸 상태(완성 6, 열 수 있음 4): {r}')
             c.ok(r['fit'] and r['inTree'] and not r['over'], f'나무가 넘쳐요: {r}')
             c.ok(r['card0'].startswith('수업') and r['card1'].startswith('탐험'), f'칸 창: {r}')
@@ -77,7 +77,7 @@ async def main():
             c.ok(r3['wrap'] and not r3['over'], f'랭킹 칸이 넘쳐요: {r3}')
             c.ok(not errs, f'오류 {errs[:2]}')
             await ctx.close()
-        # 테마 지붕: 유치원 교실 봄은 새 그림을 색 곱하기 없이, 처마 띠 없음. 그림이 없는 급식실은 지금 방식 그대로
+        # 테마 지붕: 유치원 교실과 급식실 봄은 새 그림을 색 곱하기 없이, 처마 띠 없음
         for w, th in ((390, 'light'),):
             ctx, pg, errs = await ctxpage(b, w, 800, th, base())
             await pg.wait_for_timeout(1200)
@@ -85,13 +85,13 @@ async def main():
             r = await pg.evaluate("""(async()=>{ const F = window.__forest, S = F.S, sl = ms => new Promise(r => setTimeout(r, ms)), out = {};
               const ro = (k, want) => { const im = document.querySelector('#b-' + k + ' .roofimg'); return { href: (im.getAttribute('href') || '') === F.IMG170(want), want, f: im.getAttribute('filter') || '', on: im.style.display !== 'none', deco: document.querySelector('#b-' + k + ' .th-deco').innerHTML.length }; };
               Object.assign(S.cos.th, { classroom: 'spring', cafeteria: 'spring' }); F.applyThemes(); await sl(200);
-              out.k = F.thrKey('classroom'); out.cl = ro('classroom', out.k); out.cfk = F.thrKey('cafeteria'); out.cf = ro('cafeteria', F.roofArtKey('cafeteria'));
+              out.k = F.thrKey('classroom'); out.cl = ro('classroom', out.k); out.cfk = F.thrKey('cafeteria'); out.cf = ro('cafeteria', out.cfk);
               S.cos.th.classroom = 'winter'; F.applyThemes(); await sl(200); out.w = ro('classroom', F.thrKey('classroom'));
               S.cos.th.classroom = ''; F.applyThemes(); await sl(200); out.off = ro('classroom', '');
               return out; })()""")
             print('지붕', r)
             c.ok(r['k'] == 'thr_classroom_on_spring' and r['cl']['href'] and r['cl']['f'] == 'none' and r['cl']['on'] and r['cl']['deco'] == 0, f'새 테마 지붕: {r["cl"]}')
-            c.ok(r['cfk'] == '' and r['cf']['want'] == 'roof_cafeteria' and r['cf']['href'] and 'rt-cafeteria' in r['cf']['f'] and r['cf']['deco'] > 0, f'그림 없는 건물은 지금 방식: {r["cf"]}')
+            c.ok(r['cfk'] == 'thr_cafeteria_on_spring' and r['cf']['href'] and r['cf']['f'] == 'none' and r['cf']['deco'] == 0, f'급식실도 새 테마 지붕(작업지시서 97): {r["cf"]}')
             c.ok(r['w']['want'] == 'thr_classroom_on_winter' and r['w']['href'] and r['w']['f'] == 'none', f'겨울 새 지붕: {r["w"]}')
             c.ok(not r['off']['on'], f'테마를 빼면 지붕 조각을 숨겨요: {r["off"]}')
             c.ok(not errs, f'오류 {errs[:2]}')

@@ -252,8 +252,9 @@
   function tamHWeek() { const w = gameWeek(); if (S.tam.hw.w !== w) S.tam.hw = { w, best: 0 }; }
   // 4.3.3 심화 탐험에서 이긴 층: 도토리, 정수, 황금 도토리는 없고 재료(일반의 1.5배)와 별 조각(숫자는 제안)
   function tamWinH(fl) {
-    const R = tamReg(fl), got = [], add = (i, v) => { S.tam.mat[i] = Math.min(1e12, S.tam.mat[i] + v); };
+    const R = tamReg(fl), got = [], add = (i, v) => { S.tam.mat[i] = Math.min(1e12, S.tam.mat[i] + v); }, first = fl > S.tam.hb;
     S.tam.hb = Math.max(S.tam.hb, fl);
+    if (first && fl % TAM.bossEvery === 0 && ppData(PP.dat.boss)) got.push(`연구 자료 +${PP.dat.boss}`);   // 5.2.0 심화 큰 장난꾸러기 처음 넘기
     tamHWeek(); if (fl > S.tam.hw.best) { S.tam.hw.best = fl; rankDirty(); }
     add(R.mat, Math.round(TAM.hMat * (2 + Math.floor((S.tam.hc + fl) / 40)))); if (fl % 5 === 0) add(3, 1);
     if (fl % TAM.bossEvery === 0) { const ps = tamParty(); if (tamStarOn() && ps.length) { const sp = ps[Math.floor(Math.random() * ps.length)]; tamShard(sp, 1); got.push(`${spName(sp)} 별 조각 +1`); } else { add(3, 2); got.push(`${TAM.mats[3]} +2`); } }

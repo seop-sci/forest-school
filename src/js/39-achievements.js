@@ -45,8 +45,8 @@
   const achClaimable = () => !!S && !!S.ach && ACH.some(a => achGot(a.id) < achHit(a.id));
   // 2.1.2 업적 말고 받는 칭호(마을 기부 3단계, 8단계)
   const xtGot = t => !!S && (t.got ? !!t.got(S) : (!!S.vd && S.vd.lv >= t.lv));   // 2.1.3 got(저장)으로 재는 칭호도(숲속 패스, 반짝 친구, 랭킹 시즌)
-  const achTitles = () => [...ACH.filter(a => achGot(a.id) >= ACH_N), ...VD.titles.filter(xtGot), ...ST_TITLES.filter(t => stTitleGot(t))];   // 4.1.0 곁가지 이야기 칭호
-  const achTitleName = id => { const a = achById(id) || VD.titles.find(t => t.id === id) || ST_TITLES.find(t => t.id === id); return a ? a.title : ''; };
+  const achTitles = () => [...ACH.filter(a => achGot(a.id) >= ACH_N), ...VD.titles.filter(xtGot), ...ST_TITLES.filter(t => stTitleGot(t)), ...PP_TITLES.filter(t => !!S && t.got(S))];   // 5.2.0 논문과 학회 칭호   // 4.1.0 곁가지 이야기 칭호
+  const achTitleName = id => { const a = achById(id) || VD.titles.find(t => t.id === id) || ST_TITLES.find(t => t.id === id) || PP_TITLES.find(t => t.id === id); return a ? a.title : ''; };
   const achVal = a => { try { return Number(a.v()) || 0; } catch (e) { return 0; } };
   // 1초마다 이룬 등급을 기록해요. 새로 이루면 알려 줘요(보상은 업적 화면에서 받아요)
   function achSync(quiet) {
@@ -94,7 +94,7 @@
     return ids.length;
   }
   function setTitle(id) {
-    if (id && achGot(id) < ACH_N && !VD.titles.some(t => t.id === id && xtGot(t)) && !ST_TITLES.some(t => t.id === id && stTitleGot(t))) return false;   // 5.0.3.1 곁가지 이야기 칭호도 달 수 있게
+    if (id && achGot(id) < ACH_N && !VD.titles.some(t => t.id === id && xtGot(t)) && !ST_TITLES.some(t => t.id === id && stTitleGot(t)) && !PP_TITLES.some(t => t.id === id && t.got(S))) return false;   // 5.0.3.1 곁가지 이야기 칭호도 달 수 있게
     S.ach.title = S.ach.title === id ? '' : id;
     toast(S.ach.title ? `칭호 "${achTitleName(S.ach.title)}"를 달았어요` : '칭호를 뗐어요');
     rankDirty(); save(); renderAch(true); renderHudTitle();

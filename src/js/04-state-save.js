@@ -99,6 +99,7 @@
     adx: freshAdx(),   // 4.2.0 광고: day 날짜, n 오늘 광고 도장, got 받은 단계, fv fw xg cs 오늘 쓴 '한 판 더'(축제 부스, 불꽃놀이, 교환학생 안내, 진로 상담)
     rx: { lv: {}, c: {} },
     rt5: { lv: {}, cur: null },
+    pp: { dat: 0, cur: null, n: 0, by: {}, day: '', cm: -1, cf: 0, cb: 0, ck: {}, med: [], sem: 0 },   // 5.2.0 논문: dat 연구 자료, cur 쓰는 논문 { k 주제, end }, n 편수, by 주제마다 편수, day 자료 정리한 날, cm 학회 번호(4주), cf 이번 학회 점수, cb 가장 높았던 학회 점수, ck 이번 학회 주제마다 편수, med [학회, 메달 1~3], sem 대학원 세미나와 학위수여식 횟수
     ta: { seat: [], out: [], mem: 0, mon: 0, n: 0 },   // 5.1.0 조교: seat 자리마다 { b 건물 }, out 파견 { i 자리, to 모교 0~4, h 시간 0~2, end }, mem 추억 조각, mon 기념비 단계, n 파견 횟수   // 5.0.0 연구 트리: lv 가지마다 칸 수(0~4), cur 지금 연구 { k, end }   // 4.2.0 연구 투자: lv 연구마다 레벨, c 그 레벨에 정해 둔 값(열린 때의 수업료로 정하고 올릴 때까지 그대로)
     fv: freshFv(),   // 4.1.0 대학 축제: wk 이번 주, st 도장 수, got 받은 단계, day 날짜, b 그날 한 부스, g 그날 만난 손님, o 그날 창을 열었는지, win 부스마다 성공 횟수, own 받은 기념품, tip 띠를 닫은 주, td 띠를 본 날
     xg: freshXg(), mk: freshMk(), sto: freshSto(),   // 4.1.0 교환학생의 날, 숲속 장터, 이야기(본 장면, 고른 답, 곁가지)
@@ -310,7 +311,7 @@
         if (typeof c === 'number' && isFinite(c) && c > 0) f.c[x.k] = Math.min(SAVE_CAP.acorn, Math.floor(c)); }
       s.rx = f; }
     if (d.rt5 && typeof d.rt5 === 'object') {   // 5.0.0 연구 트리
-      const lv = {}; for (const D of RT5.list) { const v = d.rt5.lv && d.rt5.lv[D.k]; if (Number.isFinite(v) && v > 0) lv[D.k] = Math.min(RT5.max, Math.floor(v)); }
+      const lv = {}; for (const D of RT5.list) { const v = d.rt5.lv && d.rt5.lv[D.k]; if (Number.isFinite(v) && v > 0) lv[D.k] = Math.min(RT5.top, Math.floor(v)); }
       const c = d.rt5.cur; s.rt5 = { lv, cur: c && RT5.list.some(D => D.k === c.k && !D.lock) && Number.isFinite(c.end) ? { k: c.k, end: c.end } : null }; }
     if (d.ta && typeof d.ta === 'object') {   // 5.1.0 조교
       const T = d.ta, num = (v, mx) => Number.isFinite(v) && v > 0 ? Math.min(mx, Math.floor(v)) : 0;
@@ -318,6 +319,14 @@
       const out = (Array.isArray(T.out) ? T.out : []).filter(o => o && Number.isInteger(o.i) && o.i >= 0 && o.i < 4 && Number.isInteger(o.to) && o.to >= 0 && o.to <= 4 && Number.isInteger(o.h) && o.h >= 0 && o.h <= 2 && Number.isFinite(o.end))
         .filter((o, j, a) => a.findIndex(y => y.i === o.i) === j).map(o => ({ i: o.i, to: o.to, h: o.h, end: o.end }));
       s.ta = { seat, out, mem: num(T.mem, 1e9), mon: num(T.mon, 3), n: num(T.n, 1e9) }; }
+    if (d.pp && typeof d.pp === 'object') {   // 5.2.0 논문과 학회
+      const P = d.pp, num = (v, mx) => Number.isFinite(v) && v > 0 ? Math.min(mx, Math.floor(v)) : 0, keys = new Set(RT5.list.map(D => D.k));
+      const map = o => { const r = {}; if (o && typeof o === 'object') for (const k of Object.keys(o)) if (keys.has(k)) r[k] = num(o[k], 1e6); return r; };
+      const c = P.cur && keys.has(P.cur.k) && Number.isFinite(P.cur.end) ? { k: P.cur.k, end: P.cur.end } : null;
+      const med = Array.isArray(P.med) ? P.med.filter(m => Array.isArray(m) && Number.isFinite(m[0]) && [1, 2, 3].includes(m[1])).slice(-60).map(m => [Math.floor(m[0]), m[1]]) : [];
+      s.pp = { dat: num(P.dat, 9999), cur: c, n: num(P.n, 1e6), by: map(P.by), day: typeof P.day === 'string' ? P.day.slice(0, 10) : '', cm: Number.isFinite(P.cm) ? Math.max(-1, Math.floor(P.cm)) : -1,
+        cf: num(P.cf, 99999), cb: num(P.cb, 99999), ck: map(P.ck), med, sem: num(P.sem, 1e6) };
+    } else if (s.tier >= GRAD_TIER) s.pp.sem = Math.max(0, Math.floor((s.tg || 0) * 2 + (s.sem || 0)));   // 5.2.0 앞 저장: 지난 세미나 수를 학기로 어림
     { const A = d && d.adx && typeof d.adx === 'object' ? d.adx : {}, f = freshAdx();   // 4.2.0 광고 도장과 한 판 더
       f.day = typeof A.day === 'string' ? A.day.slice(0, 10) : '';
       f.n = typeof A.n === 'number' && isFinite(A.n) ? Math.max(0, Math.min(ADX.max, Math.floor(A.n))) : 0;

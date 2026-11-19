@@ -86,7 +86,8 @@
       S.units = b.dataset.units; save(); syncSettingsUI(); refreshNumbers();
       toast(S.units === 'en' ? '큰 숫자를 K, M, B로 줄여 써요' : '큰 숫자를 만, 억, 조로 줄여 써요');
     });
-    $('#rankView').addEventListener('click', e => { const b = e.target.closest('[data-rv]'); if (!b) return; rt.rankView = b.dataset.rv === 'week' ? (rt.rkLg || 'week') : b.dataset.rv; sfx('tap'); renderRankPanel(); });
+    $('#rankView').addEventListener('click', e => { const b = e.target.closest('[data-rv]'); if (!b) return; rt.rankView = b.dataset.rv === 'week' ? (rt.rkLg || 'week') : b.dataset.rv === 'all' ? (rt.rkSch || 'all') : b.dataset.rv; sfx('tap'); renderRankPanel(); });
+    $('#rankSchSeg').addEventListener('click', e => { const b = e.target.closest('[data-rsc]'); if (!b) return; rt.rankView = rt.rkSch = b.dataset.rsc === 'conf' ? 'conf' : 'all'; sfx('tap'); renderRankPanel(); });   // 5.2.0 학교 안의 학교 파워와 학회
     $('#rankLgSeg').addEventListener('click', e => { const b = e.target.closest('[data-rlg]'); if (!b) return; rt.rankView = rt.rkLg = b.dataset.rlg === 'sea' ? 'sea' : 'week'; sfx('tap'); renderRankPanel(); });   // 5.1.1.4 리그 안의 이번 주와 시즌
     $('#rankTamSeg').addEventListener('click', e => { const b = e.target.closest('[data-rth]'); if (!b) return; rt.rkH = b.dataset.rth === '1' ? 1 : 0; sfx('tap'); renderRankPanel(); });   // 4.3.3
     $('#rankLook').addEventListener('click', e => { const b = e.target.closest('[data-look]'); if (b) openLook(b.dataset.look); });   // 2.1.3 예시 학교
@@ -662,7 +663,8 @@
     $('#sheetDept').addEventListener('click', () => viaSheet(openDept));   // 4.0.0
     $('#sheetRx').addEventListener('click', () => viaSheet(openRx));   // 5.0.0
     $('#rxSeg').addEventListener('click', e => { const b = e.target.closest('[data-rseg]'); if (!b) return; rt.rxTab = b.dataset.rseg; sfx('tap'); renderRx(); });
-    $('#rxBody').addEventListener('click', e => { const b = e.target.closest('[data-rt],[data-rts],[data-dp^="rx:"],[data-ta]'); if (!b) return;
+    $('#rxBody').addEventListener('click', e => { const b = e.target.closest('[data-rt],[data-rts],[data-pp],[data-dp^="rx:"],[data-ta]'); if (!b) return;
+      if (b.dataset.pp) { const v = b.dataset.pp; if (v === 'day') ppDay(); else if (v.startsWith('w:')) ppWrite(v.slice(2)); renderRx(); return; }   // 5.2.0 논문
       if (b.dataset.rts) { rt.rtSel = b.dataset.rts; sfx('tap'); renderRx(); return; }   // 5.1.1.4 연구 나무 칸 고르기
       if (b.dataset.ta) { const [a, x, y, z] = b.dataset.ta.split(':'); const i = +x;   // 5.1.0 조교
         if (a === 'pick') { rt.taPick = rt.taPick === i ? -1 : i; rt.taGo = -1; sfx('tap'); }
