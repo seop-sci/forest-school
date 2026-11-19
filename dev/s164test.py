@@ -52,5 +52,15 @@ async def main():
                 c.ok(after == 'library', f'{w}px {kind} 쫓아낸 뒤 건물이 열려요 {after}')
                 c.ok(not errs, f'{w}px 오류 {errs[:2]}')
                 await ctx.close()
+        # 3) 중학교 부엉이 잎사귀가 지도 밖 단추(복도, 학교 행사)에 가려지지 않아요
+        for w in (360, 390):
+            ctx, pg, errs = await ctxpage(b, w, 800, 'light', base(tier=2, students=40))
+            await pg.wait_for_timeout(1500); await pg.evaluate(CLEAN)
+            await pg.evaluate(SETUP % 'owl')
+            cov = await pg.evaluate("""(()=>{ const b = document.querySelector('#m-owl .sd-bub .sd-hit'); if (!b) return -1; const r = b.getBoundingClientRect(), cx = (r.left + r.right) / 2, cy = (r.top + r.bottom) / 2, rr = r.width / 2 * 0.8; let n = 0;
+              for (const [dx, dy] of [[0,0],[rr,0],[-rr,0],[0,rr],[0,-rr]]) { const el = document.elementFromPoint(cx + dx, cy + dy); if (!el || !el.closest('#map')) n++; } return n; })()""")
+            print(w, '중학교 부엉이 가림', cov)
+            c.ok(cov == 0, f'{w}px 중학교 부엉이 잎사귀가 단추에 가려지지 않아요 {cov}')
+            await ctx.close()
 asyncio.run(main())
 c.done()
