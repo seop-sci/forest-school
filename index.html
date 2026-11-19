@@ -2,7 +2,7 @@
 <html lang="ko">
 <head>
 <meta charset="utf-8">
-<meta name="forest-version" content="5.2.0">
+<meta name="forest-version" content="5.2.0.1">
 <meta name="viewport" content="width=device-width, initial-scale=1">
 <meta name="description" content="도토리를 모아 숲속 학교를 키우는 방치형 게임 테스트판이에요.">
 <style>html,body{margin:0}</style>
@@ -3942,7 +3942,7 @@ body.mg-on .toast[hidden]{display:none}
     <p class="boot-step" id="bootStep">학교 문을 여는 중...</p>
     <p class="boot-tip" id="bootTip">학교 문을 여는 중이에요</p>
   </div>
-  <span class="boot-ver" id="bootVer">v5.2.0</span>
+  <span class="boot-ver" id="bootVer">v5.2.0.1</span>
 </div>
 
 <div class="app on-school" id="app">
@@ -4537,7 +4537,7 @@ body.mg-on .toast[hidden]{display:none}
       </div>
       <h3 class="panel-sub">정보</h3>
       <dl class="info">
-        <div id="verRow"><dt>버전</dt><dd>v5.2.0</dd></div>
+        <div id="verRow"><dt>버전</dt><dd>v5.2.0.1</dd></div>
         <div id="pidRow" hidden><dt>학교 번호</dt><dd id="infoPid"></dd></div>
       </dl>
       <div id="devBox" hidden>
@@ -14022,12 +14022,13 @@ body.mg-on .toast[hidden]{display:none}
   }
   // 2.3.5 비버 선생님이 공사장에서 망치질해요(초등학교부터). 그림 1, 2를 0.35초마다 번갈아, 가끔 3(먼지)
   const BV_LINES = ['뚝딱뚝딱! 튼튼하게 짓는 중이에요', '못 하나도 꼼꼼하게 박아요', '조금만 기다려 주세요, 금방 끝나요', '연수를 받으면 더 빨리 지을 수 있어요'];
+  const BV_S = 0.30;   // 비버 선생님 크기(건물 그림 너비에 견준 몫, 110 넘는 건물은 110으로 쳐요)
   function conBeaver(el, x, y, w) {
     const has = xtHere('fix') && FSI('fix_beaver_1') && FSI('fix_beaver_2');
     let bv = el.querySelector('.con-bv');
     if (!has) { if (bv) bv.remove(); return; }
     if (bv) return;
-    const s = Math.min(w, 110) * 0.44, bx = x + w * 0.8 - s / 2, by = y + w * 0.8 - s;
+    const s = Math.min(w, 110) * BV_S, bx = x + w * 0.9 - s / 2, by = y + w * 0.84 - s;   // 5.2.0.1 woodani 요청: 건물을 덜 가리게 0.44 → 0.30, 공사 막대에 가리지 않게 오른쪽 아래 모서리로
     const im = (k, c) => FSI(k) ? `<image class="${c}" href="${FSI(k)}" x="${bx.toFixed(1)}" y="${by.toFixed(1)}" width="${s.toFixed(1)}" height="${s.toFixed(1)}"/>` : '';
     bv = document.createElementNS('http://www.w3.org/2000/svg', 'g'); bv.setAttribute('class', 'con-bv');
     bv.setAttribute('role', 'button'); bv.setAttribute('aria-label', XT.fix.name);
@@ -14613,8 +14614,8 @@ body.mg-on .toast[hidden]{display:none}
        forest/rank/<내 id>   랭킹 이름과 학교 점수
        forest/stats/<내 id>  테스트 현황 (어디까지 했는지, 얼마나 했는지)
      <내 id>는 Firebase 익명 로그인이 기기(브라우저)마다 만들어 줘요. */
-  const VERSION = '5.2.0';   // 2026-11-17 woodani 결정: 웹에 5.0.2~5.0.5로 먼저 냈던 것을 앱과 함께 5.0.1 하나로 내요(버전 견줌은 앞 두 자리만 봐서 되돌아가도 괜찮아요)
-  const NT_QUIET = ['5.1.1.3', '5.1.1.2', '5.1.1.1', '5.1.1', '5.0.3.1', '5.0.3', '5.0.2.2', '5.0.2.1', '2.1.20', '2.1.2.2', '2.3.0.1', '2.3.4', '3.2.3', '3.2.4', '3.2.5', '3.3.1', '3.3.2', '3.3.3', '4.4.1.1', '4.4.1.2', '4.4.1.3', '4.4.1.4', '5.0.1.1', '5.0.1.2', '5.0.1.3', '5.0.1.4', '5.0.1.5', '5.0.1.6', '5.0.1.7', '5.0.1.8'];   // 5.0.1.1 생물 탐사 고침은 공지 없이   // 5.0.3도 공지 없이(공지 줄은 woodani가 정하면 넣어요)   // 5.0.2 공지 없이(woodani 2026-11-16)   // 5.0.1 공지 줄은 woodani가 정할 때까지 조용히   // 5.0.0 공지는 2026-11-16 woodani가 정해서 NOTICES로 옮겼어요   // 4.4.1(앱과 함께 내는 판)은 공지를 띄워요   // 4.4.1도 공지 없이(woodani)   // 3.3.1, 3.3.2, 3.3.3(토스 먼저)도 공지 창 없이(woodani). 2.3.0.1도 공지 창 없이(공지는 그대로 2.3.0). 2.3.4도 조용히(woodani 결정). 3.2.3, 3.2.4, 3.2.5도 공지 창 없이(공지 줄을 고르지 않음)
+  const VERSION = '5.2.0.1';   // 2026-11-17 woodani 결정: 웹에 5.0.2~5.0.5로 먼저 냈던 것을 앱과 함께 5.0.1 하나로 내요(버전 견줌은 앞 두 자리만 봐서 되돌아가도 괜찮아요)
+  const NT_QUIET = ['5.2.0.1', '5.1.1.3', '5.1.1.2', '5.1.1.1', '5.1.1', '5.0.3.1', '5.0.3', '5.0.2.2', '5.0.2.1', '2.1.20', '2.1.2.2', '2.3.0.1', '2.3.4', '3.2.3', '3.2.4', '3.2.5', '3.3.1', '3.3.2', '3.3.3', '4.4.1.1', '4.4.1.2', '4.4.1.3', '4.4.1.4', '5.0.1.1', '5.0.1.2', '5.0.1.3', '5.0.1.4', '5.0.1.5', '5.0.1.6', '5.0.1.7', '5.0.1.8'];   // 5.0.1.1 생물 탐사 고침은 공지 없이   // 5.0.3도 공지 없이(공지 줄은 woodani가 정하면 넣어요)   // 5.0.2 공지 없이(woodani 2026-11-16)   // 5.0.1 공지 줄은 woodani가 정할 때까지 조용히   // 5.0.0 공지는 2026-11-16 woodani가 정해서 NOTICES로 옮겼어요   // 4.4.1(앱과 함께 내는 판)은 공지를 띄워요   // 4.4.1도 공지 없이(woodani)   // 3.3.1, 3.3.2, 3.3.3(토스 먼저)도 공지 창 없이(woodani). 2.3.0.1도 공지 창 없이(공지는 그대로 2.3.0). 2.3.4도 조용히(woodani 결정). 3.2.3, 3.2.4, 3.2.5도 공지 창 없이(공지 줄을 고르지 않음)
     // 2.1.20 woodani 결정: 이 버전들은 업데이트해도 공지 창을 띄우지 않아요(공지는 그대로 2.1.2)
   /* 2.0.0 공지사항 (2026-10-27 woodani, 1.8.0은 이미 올려서 2.0.0부터): 설정 > 공지사항. 맨 위가 가장 새 공지예요.
      패치노트는 자동으로 넣지 않아요. woodani가 검수한 글만 여기에 적어요(CHANGELOG.md는 자세한 기록용이라 따로 있어요).
@@ -18554,14 +18555,24 @@ body.mg-on .toast[hidden]{display:none}
   const showWeekendNow = () => showWd(showDay()) >= 5;
   function showNote() {
     const w = showWait(), d = showDay();
+    if (w > 0 && showQuestFree()) return '퀘스트: 아직 무대에 안 선 동아리는 오늘 바로 열 수 있어요';
     if (w <= 0) { if (!showWeekendNow()) return '오늘 발표회를 열 수 있어요'; const same = S.club.wk === d - showWd(d), left = Math.min(CLUB.weekend - (same ? S.club.we : 0), 5 - (same ? S.club.wd + S.club.we : 0)); return `오늘 보충 발표회를 열 수 있어요 (이번 주말 ${left}번)`; }
     if (w === 1) return showWd(d + 1) === 0 ? '월요일에 다시 발표회를 열 수 있어요' : '내일 다시 발표회를 열 수 있어요';
     return showWd(d + w) === 0 ? '월요일에 다시 발표회를 열 수 있어요' : `다음 발표회까지 ${w}일`;
   }
   const showReady = () => rosterOn() && showWait() <= 0;
+  // 5.2.0.1 woodani 결정(2026-11-20): 메인 퀘스트 '동아리 두 곳 발표회'(clubShown)를 하는 동안에는 아직 무대에 안 선 동아리는 오늘 이미 열었어도 바로 열 수 있어요(하루 기다림 없애기)
+  //   c가 없으면 그런 동아리(부원이 있는)가 하나라도 있는지
+  function showQuestFree(c) {
+    if (!rosterOn() || !S.club) return false;
+    const q = curMain(); if (!q || q.t !== 'clubShown' || mainReady()) return false;
+    if (c === undefined) return S.club.shown.some((v, i) => !v && clubMembers(i).length > 0);
+    return !!CLUBS[c] && !S.club.shown[c];
+  }
+  const showReadyC = c => showReady() || showQuestFree(c);
   const showPrize = () => Math.max(10, nice(rate() * 60 * CLUB.showMin));
   function clubShowGo(c) {
-    if (!showReady() || !CLUBS[c]) return false;
+    if (!showReadyC(c) || !CLUBS[c]) return false;
     const mem = clubMembers(c); if (!mem.length) { toast(`${eun(CLUBS[c].name)} 아직 부원이 없어요`); return false; }
     const C = CLUBS[c], fvb = fvBonus('show'), v = showPrize() * (fvb ? 2 : 1);   // 4.1.0 축제 금요일: 발표회 보상 +100%
     mem.forEach(s => abUp(s, C.ab, CLUB.show));
@@ -21355,7 +21366,7 @@ body.mg-on .toast[hidden]{display:none}
     fvFlag($('#clubShowNote').parentElement, 'show', '축제: 발표회 보상 +100%');   // 4.1.0 축제 금요일
     box.innerHTML = CLUBS.map((C, c) => `<div class="club-card c${c}"><div class="club-top">${clubBadge(c, 40)}<span class="club-nm"><b>${C.name}</b><small>${ABIL[C.ab]} 별 ${clubStars(c)}개</small></span>` +
       `<span class="club-eff">${C.eff(clubShow(c))}</span></div><div class="club-seats">${clubSeatHTML(c)}</div>` +
-      `<button class="cta small club-show" type="button" data-show="${c}" aria-disabled="${showReady() && clubMembers(c).length ? 'false' : 'true'}">${S.club.shown[c] ? '발표회 또 열기' : '발표회 열기'}</button></div>`).join('') +
+      `<button class="cta small club-show" type="button" data-show="${c}" aria-disabled="${showReadyC(c) && clubMembers(c).length ? 'false' : 'true'}">${S.club.shown[c] ? '발표회 또 열기' : '발표회 열기'}</button></div>`).join('') +
       `<h3 class="qsec">학생 명부 <small>${yearLabel()} 대표 학생 ${S.roster.list.length}명</small></h3>` +
       `<div class="roster">${S.roster.list.map((s, i) => `<button class="rs-row${rt.clubPick === i ? ' pick' : ''}" type="button" data-ri="${i}">${kidFace(s.sp, s.r)}` +
         `<span class="rs-nm"><b>${esc(s.nm)}</b><small>${s.c >= 0 ? CLUBS[s.c].name : '동아리 없음'}</small></span>` +
@@ -21381,7 +21392,7 @@ body.mg-on .toast[hidden]{display:none}
       const u = IMG(el.dataset.front);
       el.classList.toggle('fb', !u); el.style.backgroundImage = u ? `url("${u}")` : '';
     });
-    $('#hallClubN').textContent = showReady() ? '발표회!' : `${clubSum()}%`;
+    $('#hallClubN').textContent = showReady() || showQuestFree() ? '발표회!' : `${clubSum()}%`;
     // 2.0.1 학생회실: 반장 선거가 열리면 문이 열려요
     const hc = $('#hdCouncil');
     if (hc && elOpen()) {
@@ -21430,7 +21441,7 @@ body.mg-on .toast[hidden]{display:none}
     const b = $('#btnHall'); if (!b) return;
     b.hidden = !hallOpen();
     if (b.hidden) return;
-    const ready = showReady();
+    const ready = showReady() || showQuestFree();
     $('#hallN').textContent = ready ? '발표회!' : '열기';
     $('#hallDot').hidden = !ready;
     b.setAttribute('aria-label', ready ? '학교 복도, 동아리 발표회를 열 수 있어요' : '학교 복도');
@@ -27215,7 +27226,7 @@ body.mg-on .toast[hidden]{display:none}
     $('#clubBody').addEventListener('click', e => {
       if (e.target.closest('[data-cg="prac"]')) { cgPractice(); return; }   // 2.2.0 동아리 대항전
       const seat = e.target.closest('[data-seat]'), show = e.target.closest('[data-show]'), row = e.target.closest('.rs-row[data-ri]');
-      if (show) { const c = +show.dataset.show; if (show.getAttribute('aria-disabled') === 'true') { shake(show); toast(!showReady() ? `발표회는 월~금 하루에 한 번이고, 못 연 날은 주말에 ${CLUB.weekend}번까지 보충해요. ${showNote()}` : '부원이 있어야 발표회를 열 수 있어요'); return; } clubShowGo(c); return; }
+      if (show) { const c = +show.dataset.show; if (show.getAttribute('aria-disabled') === 'true') { shake(show); toast(!showReadyC(c) ? `발표회는 월~금 하루에 한 번이고, 못 연 날은 주말에 ${CLUB.weekend}번까지 보충해요. ${showNote()}` : '부원이 있어야 발표회를 열 수 있어요'); return; } clubShowGo(c); return; }
       if (seat) { openSeatPick(+seat.dataset.seat); sfx('tap'); return; }
       if (row) { openClubPick(+row.dataset.ri); sfx('tap'); }
     });
@@ -30123,7 +30134,7 @@ body.mg-on .toast[hidden]{display:none}
     GSHOP, OUTFITS, evPastIds, renderNight, shopItem, essItem, buyEss, pickEss, nickPrice, grantOffline, thSetPrice, pickDeco, buyDeco, buyDecoBerry,   // 2.1.0 소풍, 스티커판, 상점
     LAB, LAB_IN, LAB_KEYS, LAB_CARDS, LAB_MIX, LAB_DBL, labOf, labRun, labCount, labReady, labDone, openLab, renderLab, labTap, labGo, RD, BOOKS, rdStart, rdSettle, rdTick, rdLeft, rdRemain, openRead, renderRead, renderStudy2, sanitizeStudy2, maintSync, maintTap, openBook, renderBook, BT, BT_EV, BT_LG, BT_SCH, btOpen, btLeft, btRoster, btBest, btMake, btScore, btWin, btFinish, btOpenScene, btClose, btRankDoc, readRow, btAuto, btPick, btStart, btRender, renderBtCard, sanitizeBt, get btUI() { return btUI; }, EX, exIsWeek, exNow, exPrev, exDays, exScore, exGrade, exStudy, exClaim, exTick, exMake, openExam, renderExam, exAwardTop, exReportReady, sanitizeExam, renderSheet, openSheet,   // 2.0.1 공부 2단계(s76)
     AC, AC_GAME, AB_KEY, ABIL, acLv, acSum, acMult, acRepOf, acGain, acSettle, acAll, acCap, acBkLeft, acBuyBook, renderAc, sanitizeAc, freshAc, rankRows, awayStart, awaySettle, timeSrc, save, awayHold, rankCap, cloudVerify, liveApply, liveLoad, openNotice, NOTICES, get Live() { return Live; }, get Rank() { return Rank; }, liveOff,   // 2.0.0 보안 점검 시험(s71), Codex 검토 시험(s72)
-    rosterEnsure, rosterMake, rosterAdd, clubAuto, clubSet, clubPct, clubShow, clubSum, clubStars, clubMembers, clubShowGo, showReady, showWait, showDay, clubWeekTick, clubFacUp, CLUBS, CLUB, star, clubTuitionMult, clubFestMult, clubDecoOff, renderClub, renderHall, openSeatPick, openClubPick,
+    rosterEnsure, rosterMake, rosterAdd, clubAuto, clubSet, clubPct, clubShow, clubSum, clubStars, clubMembers, clubShowGo, showReady, showReadyC, showQuestFree, showWait, showDay, clubWeekTick, clubFacUp, CLUBS, CLUB, star, clubTuitionMult, clubFestMult, clubDecoOff, renderClub, renderHall, openSeatPick, openClubPick,
     TIER_SCALE, renderCampus, zoneBadge, uniPreview, setZone, DEPT, openDept, renderDept, deptSet, deptPct, deptOf, deptPicks, deptSlots, deptMult, zoneKey, uniOn, zoneOf, ZONE_GEO, CAMPUS, GEO, geoIdx, legacyMult, tuitionMult, snapTake, snapOf, showCere, cereCrew, cere3Info, cere3Load, cere3, tierViewOpen, tierViewClose, renderTierView, renderTierDots, nlCycle, viewMap, showNewTalk, talkNext, showCere, cereEnd, cereCrew, cereAsk, cereKeep, goFur, updateQuestDot, openElect, renderElect, elVote, elSync, elMult, elClub, elPres, elBadge, elMake, EL_PLEDGES, clubPct, festPrize, dropValue, claimMission, gameWeek, NEWCOMERS, TIERS, GEO, geoIdx, decoCost0, qMeasure, qDone, qGoal, kidArt: kidSVG, newYear, checkGrade, gradeOf, townRep, FAC, sanitize200, trialHunt, updateTrial, TRIAL, zoomAt, fitMap, ZOOM_MAX, DECO, DECO_SLOTS, DECO_SIGN, decoCost, decoSoldOut, pickDeco, buyDeco, decoPut, decoEditStart, decoEditEnd, openDecoPick, renderDeco, setSchoolNm, setMark, schoolTitle, markHTML, decoPlacedAll, esExLeft, esExCost, get Cloud() { return Cloud; }, get actx() { return actx; }, Music, musicSync, ensureAudio, bgmLoad, pzUI, rt, makeDeal, furStage, DEAL, navInfo, navRoute, hudTheme, HUD_TH_COL, pathInfo, pathRoute, MAP_PATHS, spawnDrop, repTipCheck, linkGoogle, retryCloud, sanitize, acctPending, renderMap, renderHUD, renderAffordance, syncKids, layoutMap, geo, hitTrial, endVisit, showReward, recommend, needCost, prepTopUp, qReward, prepPhase, rankScore, pwOf, previewDip, dipMult, costScale, buyFur, buyFurAll, furCost, furReady, furDone, FUR, startTalk, endTalk, teacherAct, facCost, teaCost, facKeys, rate, rep, capacity, canGraduate, canPromote,
     fmt, fmt2, graduate, promote, buyPerk, perkCost, perkMaxed, buyFundPerk, fpCost, claimMain, mainReady, curMain, qNo, earn, CFG, TEA, teaMaxed, PERKS, FPERKS, MAIN, finalYear, startTrip, claimTrip, TRIPS, yearLocked, endSports, rtSports: () => rt.sports, rtFest: () => rt.fest, facCap, addLeague, addMP, tutStart, endFest, claimBox, musicWant, askBox, festWait, setTab,
     RARE, modelOf, rareRoll, rareGot, showRareTalk, rareDexHTML, kidSVG, rosterKid, WX, wxOf, wxIs, rdMinNow, renderWeather, PL, plSync, plUnread, openPLetter, renderPLetter, RS, rsNum, rsSync, rsAdd, rsLabel, lookDoc, lookRead, lookPush, lookSet, openLook, MODEL_SCHOOL, joinRank, PS, PS_M, PS_SEASONS, psSeason, psOpen, psSync, psLv, psGot, psReward, psClaimAll, psClaimMission, psWatchAd, psClaimable, psStepReady, psExtraReady, psChooseFur, psFurImg, renderPass, setEvSeg, xtGot, achTitles,   // 2.1.3 숲속 패스

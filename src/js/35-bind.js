@@ -154,7 +154,7 @@
     $('#clubBody').addEventListener('click', e => {
       if (e.target.closest('[data-cg="prac"]')) { cgPractice(); return; }   // 2.2.0 동아리 대항전
       const seat = e.target.closest('[data-seat]'), show = e.target.closest('[data-show]'), row = e.target.closest('.rs-row[data-ri]');
-      if (show) { const c = +show.dataset.show; if (show.getAttribute('aria-disabled') === 'true') { shake(show); toast(!showReady() ? `발표회는 월~금 하루에 한 번이고, 못 연 날은 주말에 ${CLUB.weekend}번까지 보충해요. ${showNote()}` : '부원이 있어야 발표회를 열 수 있어요'); return; } clubShowGo(c); return; }
+      if (show) { const c = +show.dataset.show; if (show.getAttribute('aria-disabled') === 'true') { shake(show); toast(!showReadyC(c) ? `발표회는 월~금 하루에 한 번이고, 못 연 날은 주말에 ${CLUB.weekend}번까지 보충해요. ${showNote()}` : '부원이 있어야 발표회를 열 수 있어요'); return; } clubShowGo(c); return; }
       if (seat) { openSeatPick(+seat.dataset.seat); sfx('tap'); return; }
       if (row) { openClubPick(+row.dataset.ri); sfx('tap'); }
     });

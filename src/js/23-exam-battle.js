@@ -1264,7 +1264,7 @@
     fvFlag($('#clubShowNote').parentElement, 'show', '축제: 발표회 보상 +100%');   // 4.1.0 축제 금요일
     box.innerHTML = CLUBS.map((C, c) => `<div class="club-card c${c}"><div class="club-top">${clubBadge(c, 40)}<span class="club-nm"><b>${C.name}</b><small>${ABIL[C.ab]} 별 ${clubStars(c)}개</small></span>` +
       `<span class="club-eff">${C.eff(clubShow(c))}</span></div><div class="club-seats">${clubSeatHTML(c)}</div>` +
-      `<button class="cta small club-show" type="button" data-show="${c}" aria-disabled="${showReady() && clubMembers(c).length ? 'false' : 'true'}">${S.club.shown[c] ? '발표회 또 열기' : '발표회 열기'}</button></div>`).join('') +
+      `<button class="cta small club-show" type="button" data-show="${c}" aria-disabled="${showReadyC(c) && clubMembers(c).length ? 'false' : 'true'}">${S.club.shown[c] ? '발표회 또 열기' : '발표회 열기'}</button></div>`).join('') +
       `<h3 class="qsec">학생 명부 <small>${yearLabel()} 대표 학생 ${S.roster.list.length}명</small></h3>` +
       `<div class="roster">${S.roster.list.map((s, i) => `<button class="rs-row${rt.clubPick === i ? ' pick' : ''}" type="button" data-ri="${i}">${kidFace(s.sp, s.r)}` +
         `<span class="rs-nm"><b>${esc(s.nm)}</b><small>${s.c >= 0 ? CLUBS[s.c].name : '동아리 없음'}</small></span>` +
@@ -1290,7 +1290,7 @@
       const u = IMG(el.dataset.front);
       el.classList.toggle('fb', !u); el.style.backgroundImage = u ? `url("${u}")` : '';
     });
-    $('#hallClubN').textContent = showReady() ? '발표회!' : `${clubSum()}%`;
+    $('#hallClubN').textContent = showReady() || showQuestFree() ? '발표회!' : `${clubSum()}%`;
     // 2.0.1 학생회실: 반장 선거가 열리면 문이 열려요
     const hc = $('#hdCouncil');
     if (hc && elOpen()) {
@@ -1339,7 +1339,7 @@
     const b = $('#btnHall'); if (!b) return;
     b.hidden = !hallOpen();
     if (b.hidden) return;
-    const ready = showReady();
+    const ready = showReady() || showQuestFree();
     $('#hallN').textContent = ready ? '발표회!' : '열기';
     $('#hallDot').hidden = !ready;
     b.setAttribute('aria-label', ready ? '학교 복도, 동아리 발표회를 열 수 있어요' : '학교 복도');

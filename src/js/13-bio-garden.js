@@ -776,12 +776,13 @@
   }
   // 2.3.5 비버 선생님이 공사장에서 망치질해요(초등학교부터). 그림 1, 2를 0.35초마다 번갈아, 가끔 3(먼지)
   const BV_LINES = ['뚝딱뚝딱! 튼튼하게 짓는 중이에요', '못 하나도 꼼꼼하게 박아요', '조금만 기다려 주세요, 금방 끝나요', '연수를 받으면 더 빨리 지을 수 있어요'];
+  const BV_S = 0.30;   // 비버 선생님 크기(건물 그림 너비에 견준 몫, 110 넘는 건물은 110으로 쳐요)
   function conBeaver(el, x, y, w) {
     const has = xtHere('fix') && FSI('fix_beaver_1') && FSI('fix_beaver_2');
     let bv = el.querySelector('.con-bv');
     if (!has) { if (bv) bv.remove(); return; }
     if (bv) return;
-    const s = Math.min(w, 110) * 0.44, bx = x + w * 0.8 - s / 2, by = y + w * 0.8 - s;
+    const s = Math.min(w, 110) * BV_S, bx = x + w * 0.9 - s / 2, by = y + w * 0.84 - s;   // 5.2.0.1 woodani 요청: 건물을 덜 가리게 0.44 → 0.30, 공사 막대에 가리지 않게 오른쪽 아래 모서리로
     const im = (k, c) => FSI(k) ? `<image class="${c}" href="${FSI(k)}" x="${bx.toFixed(1)}" y="${by.toFixed(1)}" width="${s.toFixed(1)}" height="${s.toFixed(1)}"/>` : '';
     bv = document.createElementNS('http://www.w3.org/2000/svg', 'g'); bv.setAttribute('class', 'con-bv');
     bv.setAttribute('role', 'button'); bv.setAttribute('aria-label', XT.fix.name);
