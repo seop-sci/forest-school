@@ -1,4 +1,4 @@
-# 5.0.3.1 시험: 곁가지 이야기 칭호(낮잠 지킴이, 꿀단지 탐정 등)를 눌러서 달 수 있어요. 중학교부터 행사 이름(체육대회, 졸업 앨범 촬영)이 퀘스트와 미션에도 맞아요
+# 5.0.3.1과 5.1.1 시험: 곁가지 이야기 칭호(낮잠 지킴이, 꿀단지 탐정 등)를 눌러서 달 수 있어요. 중학교부터 행사 이름(체육대회, 졸업 앨범 촬영)이 퀘스트와 미션에도 맞아요
 # 보는 것: 칭호 칩을 누르면 바뀌어요, 다시 누르면 떼요, 저장 읽기에서 남아요, 랭킹에는 보내지 않아요(서버 규칙이 소문자만 받아요)
 # 쓰는 법: python3 wrap.py && python3 s160test.py   (마지막 줄이 PASS면 통과)
 import asyncio
@@ -48,6 +48,18 @@ async def main():
         r = await ev("""S.tier = 5; S.gold = 999; S.wk.mp = 1e6; S.wk.got = S.wk.got.map(() => false); document.querySelectorAll('.overlay').forEach(o => o.hidden = true); F.rt4.modalOpen = null; F.rt4.modalQueue.length = 0;
           F.claimBox(0); return [...document.querySelectorAll('#rwList li')].map(li => [li.querySelector('.rw-ic').innerHTML.includes('🍱'), li.textContent]);""")
         c.ok(len(r) >= 2 and not any(x[0] and ('정수' in x[1] or '단축권' in x[1]) for x in r), f'주간 상자 그림 {r}')
+        # 5.1.1 진로 상담: 직업 카드를 눌러도 스크롤 자리를 지켜요
+        r = await ev("""S.tier = 3; S.tg = 2; S.students = 400; S.xt.cou = Math.max(1, S.xt.cou); S.roster = { list: [], wk: -1, gen: 0, v: 2 }; F.rosterEnsure();
+          F.csEnsure(); S.roster.list.forEach(x => { if (x.jc) x.jo = x.jc.slice(); }); S.cs.met = 1;
+          document.querySelectorAll('.overlay').forEach(o => o.hidden = true); F.rt4.modalOpen = null; F.rt4.modalQueue.length = 0;
+          F.openCounsel(); document.querySelector('#mCounsel .modal').style.maxHeight = '420px'; const b = document.querySelector('#csBody');   /* 작은 휴대폰처럼 창이 스크롤되게 */
+          let sc = null; for (let el = b; el && el !== document.body; el = el.parentElement) { if (el.scrollHeight > el.clientHeight + 40 && getComputedStyle(el).overflowY !== 'visible') { sc = el; break; } }
+          if (!sc) { const a = []; for (let el = b; el; el = el.parentElement) a.push([el.id || el.className, el.scrollHeight, el.clientHeight, getComputedStyle(el).overflowY]); return ['no scroller', S.roster.list.length, a]; }
+          sc.scrollTop = 300; const y0 = sc.scrollTop; const chip = [...document.querySelectorAll('#csBody .cs-chip')].find(e => e.getBoundingClientRect().top > 200);
+          F.rt4.csLastView = 'x'; chip.click(); const yNo = sc.scrollTop; sc.scrollTop = 300; F.rt4.csLastView = 'list'; const chip2 = [...document.querySelectorAll('#csBody .cs-chip')].find(e => e.getBoundingClientRect().top > 200); chip2.click(); const y1 = sc.scrollTop; F.renderCounsel(); const y2 = sc.scrollTop;
+          F.rt4.modalOpen = null; document.querySelector('#mCounsel').hidden = true; F.openCounsel(); const y3 = sc.scrollTop;
+          return [y0, y1, y2, y3, yNo];""")
+        c.ok(len(r) == 5 and r[0] > 0 and r[1] == r[0] and r[2] == r[0], f'진로 상담 스크롤 {r}')
         c.ok(not errs, f'오류 {errs[:2]}')
         await ctx.close()
 asyncio.run(main())
