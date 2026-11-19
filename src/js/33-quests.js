@@ -75,7 +75,12 @@
   }
   const qNeed = q => (q.t === 'grade' || q.t === 'ygrade') ? townRep(q.n) : q.n;
   // 퀘스트 보상: rm이 있으면 지금 수업료 몇 분치
-  const qReward = q => q.rm ? Math.max(10, nice(rate() * 60 * q.rm)) : q.r;
+  const qReward = q => {
+    const b = q.rm ? Math.max(10, nice(rate() * 60 * q.rm)) : q.r;
+    if (q.t !== 'fac' || q.rk || q.ch > EARLY.ch || !FAC[q.k]) return b;
+    const c = Math.ceil(softCost(FAC[q.k].cost, q.n - 1 + (FAC[q.k].lvOff || 0), SOFT.fac) * costScale());   // 5.2.0 3안: 그 레벨 공사비의 30%
+    return isFinite(c) && c > 0 ? Math.max(b, nice(c * EARLY.back)) : b;
+  };
   /* 2.1.0 woodani 결정(2026-10-29): 하루에 한 번이거나 기다리는 시간이 긴 행동(체험학습, 숲속 운동회, 학교 행사)은
      퀘스트가 오기 전이라도 그날(게임 시계) 이미 했으면 퀘스트에 쳐요. 하루를 시작할 때의 횟수를 S.dsn에 적어 두고 그보다 늘어난 만큼을 세요 */
   const TODAY_TYPES = new Set(['trips', 'sports', 'fest']);
