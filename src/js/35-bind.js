@@ -665,6 +665,7 @@
       if (b.dataset.ta) { const [a, x, y, z] = b.dataset.ta.split(':'); const i = +x;   // 5.1.0 조교
         if (a === 'pick') { rt.taPick = rt.taPick === i ? -1 : i; rt.taGo = -1; sfx('tap'); }
         else if (a === 'go') { rt.taGo = rt.taGo === i ? -1 : i; rt.taPick = -1; sfx('tap'); }
+        else if (a === 'hr') { rt.taHr = +y; sfx('tap'); }
         else if (a === 'sit') taSit(i, y);
         else if (a === 'send') taSend(i, +y, +z);
         else if (a === 'claim') taClaim();
