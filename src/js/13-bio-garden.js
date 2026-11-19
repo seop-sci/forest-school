@@ -730,12 +730,15 @@
     for (const k of Object.keys(FAC)) conMap(k);
     if (rt.sheetKey) conSheet();
   }
+  const CON_ALT = { con_field_on: 'con_field_s3', con_science_on: 'con_science_s3' };   // 초등학교 트랙과 과학실(1단계 그림)은 덧그림이 아직 없어 모양이 비슷한 3단계 덧그림을 빌려요
+  const conArtKey = k => { if (!(S.f[k] >= 1)) return ''; let key = 'con_' + bldImg(k).replace(/^bld_/, ''); if (!IMG(key) && CON_ALT[key]) key = CON_ALT[key]; return IMG(key) ? key : ''; };
   function conMap(k) {
     const g = $('#b-' + k); if (!g) return;
     let el = g.querySelector('.con'), ui = document.getElementById('cu-' + k);
     if (!conOn(k) || !facKeys().includes(k) || (uniOn() && !geo().lot[k])) { if (el) el.remove(); if (ui) ui.remove(); g.classList.remove('is-con'); ffbAt(k, 0, false); return; }   // 4.1.1 woodani 제보: 대학교에서 구역을 옮기면 다른 구역 건물의 공사 막대와 비버 선생님이 그대로 남았어요. 이 지도에 없는 건물은 지워요
     const bi = g.querySelector(S.f[k] >= 1 ? '.built .bimg' : '.site .bimg') || g.querySelector('.bimg'); if (!bi) return;
-    if (el && el.dataset.lay !== String(rt.mapLaid)) { el.remove(); el = null; if (ui) { ui.remove(); ui = null; } }   // 3.2.3 학교급이 바뀌어 지도 배치가 달라지면 막대 자리를 다시 잡아요
+    if (el && el.dataset.lay !== String(rt.mapLaid)) { el.remove(); el = null; if (ui) { ui.remove(); ui = null; } }
+    if (el && el.dataset.art !== (conArtKey(k) || '')) { el.remove(); el = null; if (ui) { ui.remove(); ui = null; } }   // 5.2.0.1 건물 모습(단계, 고급)이 바뀌면 덧그림도 다시   // 3.2.3 학교급이 바뀌어 지도 배치가 달라지면 막대 자리를 다시 잡아요
     const num = a => Number(bi.getAttribute(a)) || 0, x = num('x'), y = num('y'), w = num('width'); if (!w) return;
     const b = S.bd[k], left = conLeft(k), pr = Math.min(1, Math.max(0, 1 - left * 1000 / Math.max(1, b.e - b.s)));
     if (!el) {
@@ -747,7 +750,10 @@
       el.dataset.bh = bh.toFixed(2); el.dataset.lay = String(rt.mapLaid);
       // 3.3.0 woodani 요청: 비계가 건물 그림 전체 크기라 너무 복잡해 보여요. 건물 가운데에 절반쯤 크기로(아래쪽은 바닥 섬 위)
       const sw = w * 0.5, sx = x + (w - sw) / 2, sy = y + w * 0.3;
-      el.innerHTML = (IMG180('fx_scaffold') ? `<image class="con-scaf" href="${IMG180('fx_scaffold')}" x="${sx.toFixed(1)}" y="${sy.toFixed(1)}" width="${sw.toFixed(1)}" height="${sw.toFixed(1)}"/>` : '') +
+      // 5.2.0.1 woodani 요청: 건물마다 그 건물에 맞는 공사 덧그림(작업지시서 99, 101, con_<건물 그림>). 건물 그림과 같은 캔버스라 같은 자리와 크기로 겹쳐요. 없으면(처음 짓는 자리, 고급 건물) 예전 비계
+      const ck = conArtKey(k), cu = ck && IMG(ck), at = a => bi.getAttribute(a) ? ` ${a}="${bi.getAttribute(a)}"` : '';
+      el.dataset.art = ck || '';
+      el.innerHTML = (cu ? `<image class="con-scaf con-art" href="${cu}"${at('x')}${at('y')}${at('width')}${at('height')}${at('transform')}/>` : IMG180('fx_scaffold') ? `<image class="con-scaf" href="${IMG180('fx_scaffold')}" x="${sx.toFixed(1)}" y="${sy.toFixed(1)}" width="${sw.toFixed(1)}" height="${sw.toFixed(1)}"/>` : '') +
         (IMG('fx_lantern') ? `<image class="con-lan" href="${IMG('fx_lantern')}" x="${(sx + sw * 0.02).toFixed(1)}" y="${(sy + sw * 0.3).toFixed(1)}" width="${(sw * 0.3).toFixed(1)}" height="${(sw * 0.3).toFixed(1)}"/>` : '') +   // 2.2.0 야간 건설 때만 보이는 등불
         `<rect class="con-back" x="${(bx + bw * 0.06).toFixed(1)}" y="${(by + bh * 0.2).toFixed(1)}" width="${(bw * 0.88).toFixed(1)}" height="${(bh * 0.6).toFixed(1)}" rx="${(bh * 0.3).toFixed(1)}"/>` +
         `<rect class="con-fill" x="${(bx + bw * 0.06).toFixed(1)}" y="${(by + bh * 0.2).toFixed(1)}" width="0" height="${(bh * 0.6).toFixed(1)}" rx="${(bh * 0.3).toFixed(1)}" data-w="${(bw * 0.88).toFixed(1)}"/>` +
