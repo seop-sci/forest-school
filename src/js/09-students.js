@@ -269,22 +269,37 @@
   }
   // 떨어질 자리: 이미 떨어진 도토리와 겹치지 않게 몇 군데 골라 보고 가장 떨어진 곳에 놓아요
   // near: 참나무를 눌러 떨어뜨린 도토리는 나무 가까이에 떨어져요
+  // 5.1.1.2 woodani 제보: 참나무 도토리가 '건물 n채 올리기' 같은 지도 위 단추 밑에 떨어져 줍기 불편했어요. 단추 자리(지도 좌표)를 피해요
+  function dropAvoid() {   // 지도 위에 떠 있는 단추와 칩(편지, 부스트, 건물 올리기, 날씨 등). 지도 그림(svg) 안의 것은 빼요
+    const fr = $('.frame'); if (!fr || !rt.mapS || rt.tab !== 'school') return [];
+    const F = fr.getBoundingClientRect(), sc = rt.mapS, px = rt.panX || 0, py = rt.panY || 0, M = 12, out = [];
+    for (const el of $$('.frame button, .frame [role="button"]')) {
+      if (el.hidden || !el.offsetWidth || el.closest('svg') || el.closest('[hidden]')) continue;
+      const r = el.getBoundingClientRect(); if (!r.width || r.bottom < F.top || r.top > F.bottom) continue;
+      out.push([(r.left - F.left - px) / sc - M, (r.top - F.top - py) / sc - 60 - M, (r.right - F.left - px) / sc + M, (r.bottom - F.top - py) / sc - 60 + M]);
+    }
+    return out;
+  }
+  const inAvoid = (A, x, y) => A.some(b => x >= b[0] && x <= b[2] && y >= b[1] && y <= b[3]);
   function dropSpot(near) {
-    let best = null, bestD = -1;
-    for (let i = 0; i < 8; i++) {
+    let best = null, bestD = -Infinity;
+    const A = dropAvoid();
+    for (let i = 0; i < 16; i++) {
       const a = Math.random() * Math.PI * 2, r = Math.sqrt(Math.random());
       // 1.5.5: 숲속 운동회 동안에는 운동장 트랙 안 잔디에 떨어져요 (평소에는 광장)
       const [ox, oy] = geo().oak, [dcx, dcy, drx, dry] = rt.sports ? [SPORTS.cx, SPORTS.cy, SPORTS.rx * 0.55, SPORTS.ry * 0.5] : geo().drop;
       const MO = near && mapOak(), md = MO && MO.drop[Math.floor(Math.random() * MO.drop.length)];   // 3.3.4 지도 참나무는 정해 둔 풀밭 자리 둘레에 떨어져요
       const x = md ? md[0] + Math.cos(a) * 7 * r : near ? ox + (ox < 180 ? 36 : -36) + Math.cos(a) * 26 * r : dcx + Math.cos(a) * drx * r;
       const y = md ? md[1] + Math.sin(a) * 4 * r : near ? oy + 18 + Math.sin(a) * 12 * r : dcy + Math.sin(a) * dry * r;
-      const d = rt.drops.reduce((m, o) => Math.min(m, Math.hypot(o.x - x, o.y - y)), 99);
+      const d = rt.drops.reduce((m, o) => Math.min(m, Math.hypot(o.x - x, o.y - y)), 99) - (inAvoid(A, x, y) ? 1000 : 0);
       if (d > bestD) { bestD = d; best = [x, y]; }
       if (d >= 26) break;
     }
     // 위쪽 UI와 아래 탭 막대에 가려지지 않는 곳으로 옮겨요
     const v = visMap();
     if (v) { best[0] = Math.min(v[2] - 14, Math.max(v[0] + 14, best[0])); best[1] = Math.min(v[3] - 14, Math.max(v[1] + 14, best[1])); }
+    // 화면 안으로 옮긴 뒤에도 단추 밑이면 단추 위쪽(참나무 쪽)으로 올려요
+    for (let t = 0; t < 6; t++) { const B = A.filter(q => inAvoid([q], best[0], best[1])); if (!B.length) break; best[1] = Math.min(best[1], ...B.map(q => q[1])) - 2; }
     return best;
   }
   function spawnDrop(near) {
