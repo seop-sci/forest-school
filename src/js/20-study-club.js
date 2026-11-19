@@ -267,14 +267,24 @@
   const showWeekendNow = () => showWd(showDay()) >= 5;
   function showNote() {
     const w = showWait(), d = showDay();
+    if (w > 0 && showQuestFree()) return '퀘스트: 아직 무대에 안 선 동아리는 오늘 바로 열 수 있어요';
     if (w <= 0) { if (!showWeekendNow()) return '오늘 발표회를 열 수 있어요'; const same = S.club.wk === d - showWd(d), left = Math.min(CLUB.weekend - (same ? S.club.we : 0), 5 - (same ? S.club.wd + S.club.we : 0)); return `오늘 보충 발표회를 열 수 있어요 (이번 주말 ${left}번)`; }
     if (w === 1) return showWd(d + 1) === 0 ? '월요일에 다시 발표회를 열 수 있어요' : '내일 다시 발표회를 열 수 있어요';
     return showWd(d + w) === 0 ? '월요일에 다시 발표회를 열 수 있어요' : `다음 발표회까지 ${w}일`;
   }
   const showReady = () => rosterOn() && showWait() <= 0;
+  // 5.2.0.1 woodani 결정(2026-11-20): 메인 퀘스트 '동아리 두 곳 발표회'(clubShown)를 하는 동안에는 아직 무대에 안 선 동아리는 오늘 이미 열었어도 바로 열 수 있어요(하루 기다림 없애기)
+  //   c가 없으면 그런 동아리(부원이 있는)가 하나라도 있는지
+  function showQuestFree(c) {
+    if (!rosterOn() || !S.club) return false;
+    const q = curMain(); if (!q || q.t !== 'clubShown' || mainReady()) return false;
+    if (c === undefined) return S.club.shown.some((v, i) => !v && clubMembers(i).length > 0);
+    return !!CLUBS[c] && !S.club.shown[c];
+  }
+  const showReadyC = c => showReady() || showQuestFree(c);
   const showPrize = () => Math.max(10, nice(rate() * 60 * CLUB.showMin));
   function clubShowGo(c) {
-    if (!showReady() || !CLUBS[c]) return false;
+    if (!showReadyC(c) || !CLUBS[c]) return false;
     const mem = clubMembers(c); if (!mem.length) { toast(`${eun(CLUBS[c].name)} 아직 부원이 없어요`); return false; }
     const C = CLUBS[c], fvb = fvBonus('show'), v = showPrize() * (fvb ? 2 : 1);   // 4.1.0 축제 금요일: 발표회 보상 +100%
     mem.forEach(s => abUp(s, C.ab, CLUB.show));
