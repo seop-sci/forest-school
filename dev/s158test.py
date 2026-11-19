@@ -39,7 +39,7 @@ async def main():
             k = await pg.evaluate("""()=>{const F=window.__forest,S=F.S; const t0=S.tier,m0=S.q.m; S.tier=0; for(const k of Object.keys(S.bd)) delete S.bd[k]; S.budget=1e12;
               const ch1=F.MAIN.findIndex(q=>q.ch===1); S.q.m=0; F.ffRender(true); const a=document.querySelector('#upChip').hidden;
               S.q.m=ch1; F.ffRender(true); const b=document.querySelector('#upChip').hidden; S.tier=t0; S.q.m=m0; return {a,b,n:F.upPlan().ks.length};}""")
-            c.ok(k['a'] and (not k['b'] or k['n'] < 2), f"{w}: 유치원 1장 전후 칩 {k}")
+            c.ok(k['a'] and (not k['b'] or k['n'] < 1), f"{w}: 유치원 1장 전후 칩 {k}")
             c.ok(not errs, f'{w}: 오류 {errs[:2]}')
             await ctx.close()
 asyncio.run(main())

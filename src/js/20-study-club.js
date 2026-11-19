@@ -91,7 +91,7 @@
     math: [['숲속 퍼즐', 0], ['동아리 수학부', 2]],
     sci: [['과학 탐구 실험(과학실)', 1], ['숲속 생물 탐사', 1]],
     art: [['숲속 합치기', 0], ['공작 선생님 연수', 1]],
-    pe: [['숲속 대결', () => btOpen(), '초등 3학년부터'], ['숲속 운동회', () => S.tier >= 2 || (S.tier === 1 && S.tg >= 3), '초등 4학년부터']]
+    pe: [['숲속 대결', () => btOpen(), '초등 3학년부터'], ['운동회와 체육대회', () => S.tier >= 2 || (S.tier === 1 && S.tg >= 3), '초등 4학년부터']]
   };
   function acTip(k, row) {
     const box = $('#acList'), old = box.querySelector('.ac-tip'); if (old) { const same = old.dataset.k === k; old.remove(); clearTimeout(rt.acTipT); if (same) return; }
