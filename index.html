@@ -2,7 +2,7 @@
 <html lang="ko">
 <head>
 <meta charset="utf-8">
-<meta name="forest-version" content="5.1.1.3">
+<meta name="forest-version" content="5.2.0">
 <meta name="viewport" content="width=device-width, initial-scale=1">
 <meta name="description" content="도토리를 모아 숲속 학교를 키우는 방치형 게임 테스트판이에요.">
 <style>html,body{margin:0}</style>
@@ -3373,6 +3373,31 @@ body.sheet-open #map, body.sheet-open .wx-fx::before, body.sheet-open .wx-fx i, 
 .cs-list{display:flex;flex-direction:column;gap:6px;padding:0 10px;text-align:left;max-height:54vh;overflow:auto;overscroll-behavior:contain}   /* 5.0.1.6 C-02 목록만 스크롤 */
 .dp-head{position:relative;display:flex;align-items:center;justify-content:space-between;min-height:54px;padding:10px 14px;background:#F3E2C2 center/cover no-repeat;border-radius:14px 14px 0 0}
 .dp-head.art{min-height:118px;align-items:flex-end}
+.rt-tree{position:relative;width:100%;max-width:400px;margin:4px auto 8px;border-radius:16px;overflow:hidden;background:radial-gradient(120% 70% at 50% 0%,#DDEFD0 0%,#EEF6E4 55%,#F6F0DE 100%);background-size:100% auto;background-position:center bottom;border:1.5px solid var(--line)}
+:root[data-theme="dark"] .rt-tree:not(.art){background:radial-gradient(120% 70% at 50% 0%,#2E4A33 0%,#25382A 60%,#2B2A20 100%)}
+.rt-lines{position:absolute;inset:0;width:100%;height:100%}
+.rt-lines .rt-done{stroke:#7FC25E;stroke-width:9;stroke-linecap:round;filter:drop-shadow(0 0 4px rgba(150,230,110,.8))}
+.rt-lines .rt-run{stroke-dasharray:14 12;animation:rtFlow 1s linear infinite}
+@keyframes rtFlow{to{stroke-dashoffset:-26}}
+.rt-node{position:absolute;width:12.2%;aspect-ratio:1;transform:translate(-50%,-50%);border-radius:50%;padding:0;border:3px solid #B98A5E;background:#FFF8EA;display:grid;place-items:center;box-shadow:0 2px 0 rgba(90,58,22,.25);cursor:pointer}
+.rt-node img{width:88%;height:88%;border-radius:50%}
+.rt-node b{font-size:14px;color:#7A5530}
+.rt-node.lock{filter:grayscale(1);opacity:.5}
+.rt-node.next{border-color:#F3C04B;box-shadow:0 0 0 3px rgba(243,192,75,.45),0 0 12px rgba(243,192,75,.9);animation:rtGlow 1.6s ease-in-out infinite}
+.rt-node.run{border-color:#5BB3D9;box-shadow:0 0 0 3px rgba(91,179,217,.4)}
+.rt-node.done{border-color:#5E9E45;background:#E6F5D8}
+.rt-node.sel{outline:3px solid #fff;outline-offset:1px}
+.rt-node.pop{animation:rtPop .6s ease-out}
+.rt-lk{position:absolute;right:-4px;bottom:-4px;font-style:normal;font-size:11px}
+.rt-leaf{position:absolute;right:-5px;top:-5px;width:13px;height:9px;border-radius:0 9px 0 9px;background:#5E9E45;transform:rotate(-20deg)}
+.rt-nm{position:absolute;bottom:4.5%;transform:translateX(-50%);padding:1px 6px;border-radius:9px;background:rgba(255,248,234,.92);font-size:11px;font-weight:700;color:#5A3A16;white-space:nowrap}
+@keyframes rtGlow{50%{box-shadow:0 0 0 5px rgba(243,192,75,.25),0 0 18px rgba(243,192,75,1)}}
+@keyframes rtPop{0%{transform:translate(-50%,-50%) scale(.6)}60%{transform:translate(-50%,-50%) scale(1.18)}100%{transform:translate(-50%,-50%) scale(1)}}
+.pp-conf{display:flex;flex-direction:column;gap:2px;margin:2px 0 8px;padding:9px 12px;border-radius:12px;border:1.5px solid #E2B84A;background:linear-gradient(180deg,rgba(255,236,170,.55),rgba(255,248,226,.4));text-align:center}
+.pp-conf b{font-size:15px}.pp-conf small{font-size:12px;color:var(--muted)}
+.rt-card{display:flex;align-items:center;gap:8px;padding:8px;border:1.5px solid var(--line);border-radius:12px;background:var(--card)}
+.rt-card .cta.small,.rt-card .btn-sub.small,.rt-card .fe-lock{flex:none;width:auto;margin:0;padding:7px 10px;font-size:12px;min-height:0}
+@media (prefers-reduced-motion:reduce){.rt-node.next,.rt-lines .rt-run,.rt-node.pop{animation:none}}
 .dp-head.art b{padding:2px 14px;border-radius:14px;background:rgba(255,249,232,.92)}
 .dp-head b{font-family:var(--font-display);font-weight:400;font-size:21px;color:#5A3A16;text-shadow:0 1px 0 rgba(255,255,255,.8)}
 .dp-note{margin:8px 2px 6px;font-size:12px;color:var(--muted);text-align:center}
@@ -3917,7 +3942,7 @@ body.mg-on .toast[hidden]{display:none}
     <p class="boot-step" id="bootStep">학교 문을 여는 중...</p>
     <p class="boot-tip" id="bootTip">학교 문을 여는 중이에요</p>
   </div>
-  <span class="boot-ver" id="bootVer">v5.1.1</span>
+  <span class="boot-ver" id="bootVer">v5.2.0</span>
 </div>
 
 <div class="app on-school" id="app">
@@ -4402,7 +4427,9 @@ body.mg-on .toast[hidden]{display:none}
     <section class="panel" id="panelRank" hidden aria-labelledby="ttlRank">
       <button class="panel-x" type="button" aria-label="홈으로"><svg viewBox="0 0 24 24" width="18" height="18" aria-hidden="true"><path d="M6 6l12 12M18 6L6 18" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round"/></svg></button>
       <h2 id="ttlRank" class="ph"><span class="tic" data-ic="ic_rank" aria-hidden="true"></span><span>랭킹</span></h2>
-      <div class="seg rank-seg" id="rankView" role="radiogroup" aria-label="랭킹 보기"><button type="button" role="radio" data-rv="week" aria-checked="true">주간 리그</button><button type="button" role="radio" data-rv="sea" aria-checked="false">시즌</button><button type="button" role="radio" data-rv="all" aria-checked="false">학교 파워</button><button type="button" role="radio" data-rv="bt" aria-checked="false">대결 순위</button><button type="button" role="radio" data-rv="tam" aria-checked="false">탐험</button></div>
+      <div class="seg rank-seg" id="rankView" role="radiogroup" aria-label="랭킹 보기"><button type="button" role="radio" data-rv="week" aria-checked="true">리그</button><button type="button" role="radio" data-rv="all" aria-checked="false">학교</button><button type="button" role="radio" data-rv="bt" aria-checked="false">대결</button><button type="button" role="radio" data-rv="tam" aria-checked="false">탐험</button></div>
+      <div class="seg rank-seg" id="rankSchSeg" role="radiogroup" aria-label="학교 순위 보기" hidden><button type="button" role="radio" data-rsc="all" aria-checked="true">학교 파워</button><button type="button" role="radio" data-rsc="conf" aria-checked="false">학회</button></div>
+      <div class="seg rank-seg" id="rankLgSeg" role="radiogroup" aria-label="리그 순위 보기"><button type="button" role="radio" data-rlg="week" aria-checked="true">이번 주</button><button type="button" role="radio" data-rlg="sea" aria-checked="false">시즌</button></div>
       <div class="seg rank-seg" id="rankTamSeg" role="radiogroup" aria-label="탐험 순위 보기" hidden><button type="button" role="radio" data-rth="0" aria-checked="true">일반 탐험</button><button type="button" role="radio" data-rth="1" aria-checked="false">심화 탐험</button></div>
       <p class="lead" id="rankLead">학교 파워로 순위를 매겨요.</p>
       <div class="rank-me" id="rankMe">
@@ -4510,7 +4537,7 @@ body.mg-on .toast[hidden]{display:none}
       </div>
       <h3 class="panel-sub">정보</h3>
       <dl class="info">
-        <div id="verRow"><dt>버전</dt><dd>v5.1.1.3</dd></div>
+        <div id="verRow"><dt>버전</dt><dd>v5.2.0</dd></div>
         <div id="pidRow" hidden><dt>학교 번호</dt><dd id="infoPid"></dd></div>
       </dl>
       <div id="devBox" hidden>
@@ -5197,7 +5224,7 @@ body.mg-on .toast[hidden]{display:none}
   <div class="backdrop" data-cm="mRx"></div>
   <section class="modal lab-modal dp-modal" role="dialog" aria-modal="true" aria-labelledby="rxTitle">
     <div class="dp-head"><b id="rxTitle">연구소</b></div>
-    <div class="seg rank-seg" id="rxSeg" role="radiogroup" aria-label="연구 투자, 연구 트리, 조교"><button type="button" role="radio" data-rseg="inv" aria-checked="true">연구 투자</button><button type="button" role="radio" data-rseg="tree" aria-checked="false">연구 트리</button><button type="button" role="radio" data-rseg="ta" aria-checked="false">조교</button></div>
+    <div class="seg rank-seg" id="rxSeg" role="radiogroup" aria-label="연구 투자, 연구 트리, 조교, 논문"><button type="button" role="radio" data-rseg="inv" aria-checked="true">연구 투자</button><button type="button" role="radio" data-rseg="tree" aria-checked="false">연구 트리</button><button type="button" role="radio" data-rseg="ta" aria-checked="false">조교</button><button type="button" role="radio" data-rseg="paper" aria-checked="false">논문</button></div>
     <div id="rxBody"></div>
     <div class="btn-row"><button class="btn-sub" type="button" id="rxClose" data-cm="mRx">닫기</button></div>
   </section>
@@ -6688,7 +6715,175 @@ body.mg-on .toast[hidden]{display:none}
 "st_who_stork":"img/a/st_who_stork-750b838776.webp",
 "st_who_turtle":"img/a/st_who_turtle-72e5a17082.webp",
 "st_who_weasel":"img/a/st_who_weasel-b85fb54b5a.webp",
-"tea_crane":"img/a/tea_crane-57a704bd6b.webp"
+"tea_crane":"img/a/tea_crane-57a704bd6b.webp",
+"thr_cafeteria_on_autumn":"img/a/thr_cafeteria_on_autumn-5755c625e8.webp",
+"thr_cafeteria_on_retro":"img/a/thr_cafeteria_on_retro-713c6b187a.webp",
+"thr_cafeteria_on_space":"img/a/thr_cafeteria_on_space-7c1dc9011b.webp",
+"thr_cafeteria_on_spring":"img/a/thr_cafeteria_on_spring-cb62a8d122.webp",
+"thr_cafeteria_on_summer":"img/a/thr_cafeteria_on_summer-d393a590eb.webp",
+"thr_cafeteria_on_winter":"img/a/thr_cafeteria_on_winter-01e6a0090d.webp",
+"thr_cafeteria_on_xmas":"img/a/thr_cafeteria_on_xmas-4fcf9c5bb1.webp",
+"thr_cafeteria_s2_autumn":"img/a/thr_cafeteria_s2_autumn-efd7e6911e.webp",
+"thr_cafeteria_s2_retro":"img/a/thr_cafeteria_s2_retro-391fb82620.webp",
+"thr_cafeteria_s2_space":"img/a/thr_cafeteria_s2_space-47534d10e9.webp",
+"thr_cafeteria_s2_spring":"img/a/thr_cafeteria_s2_spring-12d36a77a6.webp",
+"thr_cafeteria_s2_summer":"img/a/thr_cafeteria_s2_summer-6d407f121f.webp",
+"thr_cafeteria_s2_winter":"img/a/thr_cafeteria_s2_winter-a4e248369d.webp",
+"thr_cafeteria_s2_xmas":"img/a/thr_cafeteria_s2_xmas-99bc3ff156.webp",
+"thr_cafeteria_s3_autumn":"img/a/thr_cafeteria_s3_autumn-88bb20b264.webp",
+"thr_cafeteria_s3_retro":"img/a/thr_cafeteria_s3_retro-d06973d47c.webp",
+"thr_cafeteria_s3_space":"img/a/thr_cafeteria_s3_space-e28da9b89a.webp",
+"thr_cafeteria_s3_spring":"img/a/thr_cafeteria_s3_spring-050ea8e684.webp",
+"thr_cafeteria_s3_summer":"img/a/thr_cafeteria_s3_summer-501f975581.webp",
+"thr_cafeteria_s3_winter":"img/a/thr_cafeteria_s3_winter-6e3da5a8ce.webp",
+"thr_cafeteria_s3_xmas":"img/a/thr_cafeteria_s3_xmas-4ae44a90ec.webp",
+"thr_cafeteria_s4_autumn":"img/a/thr_cafeteria_s4_autumn-2110c58b6d.webp",
+"thr_cafeteria_s4_retro":"img/a/thr_cafeteria_s4_retro-24680f7490.webp",
+"thr_cafeteria_s4_space":"img/a/thr_cafeteria_s4_space-998739cd30.webp",
+"thr_cafeteria_s4_spring":"img/a/thr_cafeteria_s4_spring-13a9f491fd.webp",
+"thr_cafeteria_s4_summer":"img/a/thr_cafeteria_s4_summer-3bf534846f.webp",
+"thr_cafeteria_s4_winter":"img/a/thr_cafeteria_s4_winter-711899e18d.webp",
+"thr_cafeteria_s4_xmas":"img/a/thr_cafeteria_s4_xmas-98a94c56c2.webp",
+"thr_cafeteria_s5_autumn":"img/a/thr_cafeteria_s5_autumn-e100ba94d9.webp",
+"thr_cafeteria_s5_retro":"img/a/thr_cafeteria_s5_retro-f3455c2345.webp",
+"thr_cafeteria_s5_space":"img/a/thr_cafeteria_s5_space-66214d567c.webp",
+"thr_cafeteria_s5_spring":"img/a/thr_cafeteria_s5_spring-f66dde881f.webp",
+"thr_cafeteria_s5_summer":"img/a/thr_cafeteria_s5_summer-e694c8030a.webp",
+"thr_cafeteria_s5_winter":"img/a/thr_cafeteria_s5_winter-2bcc7cbf96.webp",
+"thr_cafeteria_s5_xmas":"img/a/thr_cafeteria_s5_xmas-479b1f8581.webp",
+"thr_classroom_on_autumn":"img/a/thr_classroom_on_autumn-54423aaf53.webp",
+"thr_classroom_on_retro":"img/a/thr_classroom_on_retro-bc42391205.webp",
+"thr_classroom_on_space":"img/a/thr_classroom_on_space-ffb8bf5166.webp",
+"thr_classroom_on_spring":"img/a/thr_classroom_on_spring-8731385d5c.webp",
+"thr_classroom_on_summer":"img/a/thr_classroom_on_summer-3bef85ce22.webp",
+"thr_classroom_on_winter":"img/a/thr_classroom_on_winter-ff279e28de.webp",
+"thr_classroom_on_xmas":"img/a/thr_classroom_on_xmas-fe6453006b.webp",
+"thr_classroom_s2_autumn":"img/a/thr_classroom_s2_autumn-b827435b79.webp",
+"thr_classroom_s2_retro":"img/a/thr_classroom_s2_retro-78fc69e15a.webp",
+"thr_classroom_s2_space":"img/a/thr_classroom_s2_space-d3061e7472.webp",
+"thr_classroom_s2_spring":"img/a/thr_classroom_s2_spring-a8c5ea0bbe.webp",
+"thr_classroom_s2_summer":"img/a/thr_classroom_s2_summer-5db5f18c8d.webp",
+"thr_classroom_s2_winter":"img/a/thr_classroom_s2_winter-15b94691b0.webp",
+"thr_classroom_s2_xmas":"img/a/thr_classroom_s2_xmas-d2c182bb86.webp",
+"thr_classroom_s3_autumn":"img/a/thr_classroom_s3_autumn-6a2ec03bfd.webp",
+"thr_classroom_s3_retro":"img/a/thr_classroom_s3_retro-c28a92add0.webp",
+"thr_classroom_s3_space":"img/a/thr_classroom_s3_space-39c8828eab.webp",
+"thr_classroom_s3_spring":"img/a/thr_classroom_s3_spring-3fb48e5e3e.webp",
+"thr_classroom_s3_summer":"img/a/thr_classroom_s3_summer-119c8a8800.webp",
+"thr_classroom_s3_winter":"img/a/thr_classroom_s3_winter-e0f5ff00a3.webp",
+"thr_classroom_s3_xmas":"img/a/thr_classroom_s3_xmas-878ff9e3d1.webp",
+"thr_classroom_s4_autumn":"img/a/thr_classroom_s4_autumn-0ba0ace9d2.webp",
+"thr_classroom_s4_retro":"img/a/thr_classroom_s4_retro-92b6f41733.webp",
+"thr_classroom_s4_space":"img/a/thr_classroom_s4_space-c3e087e129.webp",
+"thr_classroom_s4_spring":"img/a/thr_classroom_s4_spring-090f45c2cb.webp",
+"thr_classroom_s4_summer":"img/a/thr_classroom_s4_summer-7b3d6e891e.webp",
+"thr_classroom_s4_winter":"img/a/thr_classroom_s4_winter-2c24a44818.webp",
+"thr_classroom_s4_xmas":"img/a/thr_classroom_s4_xmas-d942e13b7c.webp",
+"thr_classroom_s5_autumn":"img/a/thr_classroom_s5_autumn-80267a8f63.webp",
+"thr_classroom_s5_retro":"img/a/thr_classroom_s5_retro-e89456e4f4.webp",
+"thr_classroom_s5_space":"img/a/thr_classroom_s5_space-e6c999c83c.webp",
+"thr_classroom_s5_spring":"img/a/thr_classroom_s5_spring-91d543d46f.webp",
+"thr_classroom_s5_summer":"img/a/thr_classroom_s5_summer-0d7296da2b.webp",
+"thr_classroom_s5_winter":"img/a/thr_classroom_s5_winter-2ed17c9a52.webp",
+"thr_classroom_s5_xmas":"img/a/thr_classroom_s5_xmas-5acf36ab97.webp",
+"thr_field_on_autumn":"img/a/thr_field_on_autumn-b0c3db2659.webp",
+"thr_field_on_retro":"img/a/thr_field_on_retro-41ff3cdbcb.webp",
+"thr_field_on_space":"img/a/thr_field_on_space-1670b3a489.webp",
+"thr_field_on_spring":"img/a/thr_field_on_spring-732db8021e.webp",
+"thr_field_on_summer":"img/a/thr_field_on_summer-8f39bb25ba.webp",
+"thr_field_on_winter":"img/a/thr_field_on_winter-5ddaa8ea47.webp",
+"thr_field_on_xmas":"img/a/thr_field_on_xmas-1a1a226e1e.webp",
+"thr_field_s3_autumn":"img/a/thr_field_s3_autumn-749b71d9b1.webp",
+"thr_field_s3_retro":"img/a/thr_field_s3_retro-63995680d7.webp",
+"thr_field_s3_space":"img/a/thr_field_s3_space-2838a06c2e.webp",
+"thr_field_s3_spring":"img/a/thr_field_s3_spring-1970e189e5.webp",
+"thr_field_s3_summer":"img/a/thr_field_s3_summer-761042da48.webp",
+"thr_field_s3_winter":"img/a/thr_field_s3_winter-dcb49229df.webp",
+"thr_field_s3_xmas":"img/a/thr_field_s3_xmas-41183e6547.webp",
+"thr_field_s4_autumn":"img/a/thr_field_s4_autumn-6745c66804.webp",
+"thr_field_s4_retro":"img/a/thr_field_s4_retro-ea610079de.webp",
+"thr_field_s4_space":"img/a/thr_field_s4_space-7ccd09dbc1.webp",
+"thr_field_s4_spring":"img/a/thr_field_s4_spring-dba07539b0.webp",
+"thr_field_s4_summer":"img/a/thr_field_s4_summer-adb1205832.webp",
+"thr_field_s4_winter":"img/a/thr_field_s4_winter-9a506dea7e.webp",
+"thr_field_s4_xmas":"img/a/thr_field_s4_xmas-198f354487.webp",
+"thr_field_s5_autumn":"img/a/thr_field_s5_autumn-4153875c39.webp",
+"thr_field_s5_retro":"img/a/thr_field_s5_retro-7bf0c137de.webp",
+"thr_field_s5_space":"img/a/thr_field_s5_space-74c6680a58.webp",
+"thr_field_s5_spring":"img/a/thr_field_s5_spring-8c1747f6d2.webp",
+"thr_field_s5_summer":"img/a/thr_field_s5_summer-10c29fc910.webp",
+"thr_field_s5_winter":"img/a/thr_field_s5_winter-24f20c4932.webp",
+"thr_field_s5_xmas":"img/a/thr_field_s5_xmas-1ad9e1ac7e.webp",
+"thr_library_on_autumn":"img/a/thr_library_on_autumn-db71714106.webp",
+"thr_library_on_retro":"img/a/thr_library_on_retro-49aa35bb95.webp",
+"thr_library_on_space":"img/a/thr_library_on_space-0530333e1e.webp",
+"thr_library_on_spring":"img/a/thr_library_on_spring-ba9098fbc7.webp",
+"thr_library_on_summer":"img/a/thr_library_on_summer-591b011dfc.webp",
+"thr_library_on_winter":"img/a/thr_library_on_winter-65fc70b8de.webp",
+"thr_library_on_xmas":"img/a/thr_library_on_xmas-d56384c37a.webp",
+"thr_library_s2_autumn":"img/a/thr_library_s2_autumn-3e681dec09.webp",
+"thr_library_s2_retro":"img/a/thr_library_s2_retro-b3d3b8aa73.webp",
+"thr_library_s2_space":"img/a/thr_library_s2_space-34e7b86b06.webp",
+"thr_library_s2_spring":"img/a/thr_library_s2_spring-a3cc57fcf4.webp",
+"thr_library_s2_summer":"img/a/thr_library_s2_summer-31db70f487.webp",
+"thr_library_s2_winter":"img/a/thr_library_s2_winter-39a4904f50.webp",
+"thr_library_s2_xmas":"img/a/thr_library_s2_xmas-b892f07a79.webp",
+"thr_library_s3_autumn":"img/a/thr_library_s3_autumn-6bc54af09c.webp",
+"thr_library_s3_retro":"img/a/thr_library_s3_retro-b73e0f5974.webp",
+"thr_library_s3_space":"img/a/thr_library_s3_space-091faf69be.webp",
+"thr_library_s3_spring":"img/a/thr_library_s3_spring-dfccca0181.webp",
+"thr_library_s3_summer":"img/a/thr_library_s3_summer-f470a1b030.webp",
+"thr_library_s3_winter":"img/a/thr_library_s3_winter-02b73001f5.webp",
+"thr_library_s3_xmas":"img/a/thr_library_s3_xmas-2701d5007d.webp",
+"thr_library_s4_autumn":"img/a/thr_library_s4_autumn-f323c3e3be.webp",
+"thr_library_s4_retro":"img/a/thr_library_s4_retro-e010af8ca2.webp",
+"thr_library_s4_space":"img/a/thr_library_s4_space-0044b6ce92.webp",
+"thr_library_s4_spring":"img/a/thr_library_s4_spring-d9afb7ca12.webp",
+"thr_library_s4_summer":"img/a/thr_library_s4_summer-f7f583e6e8.webp",
+"thr_library_s4_winter":"img/a/thr_library_s4_winter-f5269a9d7b.webp",
+"thr_library_s4_xmas":"img/a/thr_library_s4_xmas-195c443884.webp",
+"thr_library_s5_autumn":"img/a/thr_library_s5_autumn-58415aacb1.webp",
+"thr_library_s5_retro":"img/a/thr_library_s5_retro-af2f04c7b1.webp",
+"thr_library_s5_space":"img/a/thr_library_s5_space-d4dd05af39.webp",
+"thr_library_s5_spring":"img/a/thr_library_s5_spring-73fb2ebacf.webp",
+"thr_library_s5_summer":"img/a/thr_library_s5_summer-1b24dbc688.webp",
+"thr_library_s5_winter":"img/a/thr_library_s5_winter-09e309fd93.webp",
+"thr_library_s5_xmas":"img/a/thr_library_s5_xmas-640f607342.webp",
+"thr_playground_on_autumn":"img/a/thr_playground_on_autumn-c991144c91.webp",
+"thr_playground_on_retro":"img/a/thr_playground_on_retro-e8bf3ce3bd.webp",
+"thr_playground_on_space":"img/a/thr_playground_on_space-551d5f3d79.webp",
+"thr_playground_on_spring":"img/a/thr_playground_on_spring-715724488f.webp",
+"thr_playground_on_summer":"img/a/thr_playground_on_summer-23d6fc45fc.webp",
+"thr_playground_on_winter":"img/a/thr_playground_on_winter-69a9585c3c.webp",
+"thr_playground_on_xmas":"img/a/thr_playground_on_xmas-f00045fee6.webp",
+"thr_science_on_autumn":"img/a/thr_science_on_autumn-fd851c8208.webp",
+"thr_science_on_retro":"img/a/thr_science_on_retro-232b713162.webp",
+"thr_science_on_space":"img/a/thr_science_on_space-7c684360c4.webp",
+"thr_science_on_spring":"img/a/thr_science_on_spring-bcdd736827.webp",
+"thr_science_on_summer":"img/a/thr_science_on_summer-224e760606.webp",
+"thr_science_on_winter":"img/a/thr_science_on_winter-a970265931.webp",
+"thr_science_on_xmas":"img/a/thr_science_on_xmas-69dddcb78b.webp",
+"thr_science_s3_autumn":"img/a/thr_science_s3_autumn-ac0ead4ef3.webp",
+"thr_science_s3_retro":"img/a/thr_science_s3_retro-9de88f89d7.webp",
+"thr_science_s3_space":"img/a/thr_science_s3_space-ccca932dc4.webp",
+"thr_science_s3_spring":"img/a/thr_science_s3_spring-6154eb2d10.webp",
+"thr_science_s3_summer":"img/a/thr_science_s3_summer-d9365bd7bd.webp",
+"thr_science_s3_winter":"img/a/thr_science_s3_winter-2c8b0e1e05.webp",
+"thr_science_s3_xmas":"img/a/thr_science_s3_xmas-5a9d8017e7.webp",
+"thr_science_s4_autumn":"img/a/thr_science_s4_autumn-0bfb03a0b1.webp",
+"thr_science_s4_retro":"img/a/thr_science_s4_retro-109e863e21.webp",
+"thr_science_s4_space":"img/a/thr_science_s4_space-f53dcc2389.webp",
+"thr_science_s4_spring":"img/a/thr_science_s4_spring-5837340dd2.webp",
+"thr_science_s4_summer":"img/a/thr_science_s4_summer-8d94560733.webp",
+"thr_science_s4_winter":"img/a/thr_science_s4_winter-8121ef008d.webp",
+"thr_science_s4_xmas":"img/a/thr_science_s4_xmas-d911440800.webp",
+"thr_science_s5_autumn":"img/a/thr_science_s5_autumn-712f55b221.webp",
+"thr_science_s5_retro":"img/a/thr_science_s5_retro-df2e3fc0b0.webp",
+"thr_science_s5_space":"img/a/thr_science_s5_space-fc7a3731b3.webp",
+"thr_science_s5_spring":"img/a/thr_science_s5_spring-5aa3d00976.webp",
+"thr_science_s5_summer":"img/a/thr_science_s5_summer-c5f6d3059f.webp",
+"thr_science_s5_winter":"img/a/thr_science_s5_winter-4597f11d60.webp",
+"thr_science_s5_xmas":"img/a/thr_science_s5_xmas-bec30eb279.webp"
 };</script>
 <!-- FS_IMG400:END -->
 <!-- FS_IMG430:BEGIN -->
@@ -6726,6 +6921,7 @@ body.mg-on .toast[hidden]{display:none}
 "chr_ta_armadillo":"img/a/chr_ta_armadillo-48e03965fa.webp",
 "chr_ta_lemur":"img/a/chr_ta_lemur-81a00ad01c.webp",
 "chr_ta_quokka":"img/a/chr_ta_quokka-bbbb3c6016.webp",
+"conf_bg":"img/a/conf_bg-ee1fd031c4.webp",
 "deco_alma_1":"img/a/deco_alma_1-d66aa85cdb.webp",
 "deco_alma_2":"img/a/deco_alma_2-ad9e735815.webp",
 "deco_alma_3":"img/a/deco_alma_3-5e0b5f14e9.webp",
@@ -7128,6 +7324,8 @@ body.mg-on .toast[hidden]{display:none}
 "hud_pill_light_winter":"img/a/hud_pill_light_winter-17c033ab07.webp",
 "hud_pill_light_xmas":"img/a/hud_pill_light_xmas-96c43ced70.webp",
 "hud_res_divider":"img/a/hud_res_divider-b8d6c4cbc5.webp",
+"ic_paper":"img/a/ic_paper-1302c63db9.webp",
+"ic_rdata":"img/a/ic_rdata-54694791d9.webp",
 "ic_rt_class":"img/a/ic_rt_class-2ac79e1493.webp",
 "ic_rt_event":"img/a/ic_rt_event-03e81239c2.webp",
 "ic_rt_ta":"img/a/ic_rt_ta-6a1c01e710.webp",
@@ -7140,6 +7338,7 @@ body.mg-on .toast[hidden]{display:none}
 "roof_institute_winter":"img/a/roof_institute_winter-45205ac76f.webp",
 "room_gradhall":"img/a/room_gradhall-245abda717.webp",
 "room_institute":"img/a/room_institute-640f876d10.webp",
+"rt_tree_bg":"img/a/rt_tree_bg-ff0f6eb0d8.webp",
 "souv_beach_10":"img/a/souv_beach_10-ff38bb4132.webp",
 "souv_beach_11":"img/a/souv_beach_11-f22703b59a.webp",
 "souv_beach_3":"img/a/souv_beach_3-33275a8264.webp",
@@ -8433,6 +8632,8 @@ body.mg-on .toast[hidden]{display:none}
     { id: 'gr4', ch: 24, sy: 1, yt: 5, t: 'semH', n: 1, r: 6, rk: 'dip', title: '석사 1학기 세미나', how: '대도시 학교가 되면 위쪽 졸업 단추에서 세미나를 열어요' },
     { id: 'ta1', ch: 24, t: 'ta', k: 'seat', n: 1, rm: 5, title: '첫 조교 앉히기', how: '연구소 > 조교 탭에서 자리를 눌러 건물을 골라요' },   // 5.1.0 조교 파견(석사 2학기부터)
     { id: 'ta2', ch: 24, t: 'ta', k: 'trip', n: 1, rm: 5, title: '첫 모교 파견', how: '연구소 > 조교 탭에서 파견을 눌러 모교와 시간을 골라요' },
+    { id: 'pp1', ch: 24, t: 'pp', k: 'n', n: 1, rm: 5, title: '첫 논문 쓰기', how: '연구소 > 논문 탭에서 연구 자료 3개로 논문을 써요',
+      say: '세미나에서 모은 자료를 묶어 논문을 써 봐요. 숲속 학회에 내면 다른 학교와 겨뤄요.' },   // 5.2.0 논문과 학회
     { id: 'gc36', ch: 24, t: 'facAll', n: 36, rm: 5, title: '캠퍼스 건물 Lv.36', how: '대학교 때 지은 건물 여덟 채를 모두 Lv.36까지 키워요' },
     { id: 'gc37', ch: 24, t: 'facAll', n: 37, rm: 5, title: '캠퍼스 건물 Lv.37', how: '대학교 때 지은 건물 여덟 채를 모두 Lv.37까지 키워요' },
     { id: 'gr5', ch: 24, ye: 1, yt: 5, t: 'tgrads', n: 1, r: 8, rk: 'dip', title: '석사 2학기 세미나', how: '1학기 세미나를 열고, 2학기에 세미나를 또 열어요' },
@@ -8445,12 +8646,16 @@ body.mg-on .toast[hidden]{display:none}
     { id: 'gc40', ch: 25, t: 'facAll', n: 40, rm: 5, title: '캠퍼스 건물 Lv.40', how: '대학교 때 지은 건물 여덟 채를 모두 Lv.40까지 키워요' },
     { id: 'gr8', ch: 25, sy: 2, yt: 5, t: 'semH', n: 2, r: 7, rk: 'dip', title: '석사 3학기 세미나', how: '대도시 학교가 되면 위쪽 졸업 단추에서 세미나를 열어요' },
     { id: 'ta4', ch: 25, t: 'ta', k: 'trip', n: 5, rm: 5, title: '모교 파견 5번', how: '조교를 모교에 다섯 번 보내요' },
+    { id: 'pp2', ch: 25, t: 'pp', k: 'n', n: 3, rm: 5, title: '논문 3편 쓰기', how: '연구소 > 논문 탭에서 논문을 세 편 써요' },
+    { id: 'pp3', ch: 25, t: 'pp', k: 'cb', n: 30, rm: 5, title: '학회 점수 30점', how: '한 학회(4주) 동안 논문으로 학회 점수 30점을 모아요' },
     { id: 'gc41', ch: 25, t: 'facAll', n: 41, rm: 5, title: '캠퍼스 건물 Lv.41', how: '대학교 때 지은 건물 여덟 채를 모두 Lv.41까지 키워요' },
     { id: 'gc42', ch: 25, t: 'facAll', n: 42, rm: 5, title: '캠퍼스 건물 Lv.42', how: '대학교 때 지은 건물 여덟 채를 모두 Lv.42까지 키워요' },
     { id: 'gc43', ch: 25, t: 'facAll', n: 43, rm: 5, title: '캠퍼스 건물 Lv.43', how: '대학교 때 지은 건물 여덟 채를 모두 Lv.43까지 키워요' },
     { id: 'gr9', ch: 25, ye: 2, yt: 5, t: 'tgrads', n: 2, r: 12, rk: 'dip', title: '석사 학위수여식', how: '석사 4학기에 대도시가 되면 학위수여식을 열어요' },
     { id: 'gr10', ch: 26, t: 'fac', k: 'gradhall', n: 5, rm: 5, title: '연구동 키우기', how: '연구 구역 연구동을 Lv.5까지 키워요' },
     { id: 'ta5', ch: 26, t: 'ta', k: 'mon', n: 1, rm: 5, title: '모교 기념비 세우기', how: '연구소 > 조교 탭에서 추억 조각으로 기념비를 세워요' },
+    { id: 'pp4', ch: 26, t: 'pp', k: 'deep', b: 'class', n: 5, rm: 5, title: '수업 심화 칸 연구', how: '논문 3편을 쓰면 열리는 연구 트리 수업 가지 다섯째 칸을 연구해요' },
+    { id: 'pp5', ch: 26, t: 'pp', k: 'cb', n: 100, rm: 5, title: '학회 동메달', how: '한 학회 동안 학회 점수 100점을 모아요' },
     { id: 'gr16', ch: 26, t: 'xt', k: 'adv', n: 1, rm: 5, title: '지도교수님 연수', how: '교직원 탭 > 펠리컨 지도교수님 연수' },   // 5.0.0 woodani 결정(2026-11-16). 이미 지나간 저장은 퀘스트 id로 이어서 건너뛰어요
     { id: 'gc44', ch: 26, t: 'facAll', n: 44, rm: 5, title: '캠퍼스 건물 Lv.44', how: '대학교 때 지은 건물 여덟 채를 모두 Lv.44까지 키워요' },
     { id: 'gc45', ch: 26, t: 'facAll', n: 45, rm: 5, title: '캠퍼스 건물 Lv.45', how: '대학교 때 지은 건물 여덟 채를 모두 Lv.45까지 키워요' },
@@ -8471,6 +8676,8 @@ body.mg-on .toast[hidden]{display:none}
     { id: 'gr12', ch: 26, ye: 4, yt: 5, t: 'tgrads', n: 4, r: 12, rk: 'dip', title: '박사 4학기 세미나', how: '학기마다 세미나를 열어 박사 4학기를 마쳐요' },
     { id: 'gr13', ch: 27, t: 'fac', k: 'gradhall', n: 10, rm: 5, title: '연구동 Lv.10', how: '연구 구역 연구동을 Lv.10까지 키워요' },
     { id: 'ta6', ch: 27, t: 'ta', k: 'mon', n: 2, rm: 5, title: '모교 기념비 2단계', how: '추억 조각을 모아 기념비를 2단계로 올려요' },
+    { id: 'pp6', ch: 27, t: 'pp', k: 'n', n: 10, rm: 5, title: '논문 10편 쓰기', how: '연구소 > 논문 탭에서 논문을 열 편 써요' },
+    { id: 'pp7', ch: 27, t: 'pp', k: 'sem', n: 10, rm: 5, title: '세미나 10번', how: '대학원에서 세미나와 학위수여식을 모두 열 번 열어요' },
     { id: 'gc56', ch: 27, t: 'facAll', n: 56, rm: 5, title: '캠퍼스 건물 Lv.56', how: '대학교 때 지은 건물 여덟 채를 모두 Lv.56까지 키워요' },
     { id: 'gc57', ch: 27, t: 'facAll', n: 57, rm: 5, title: '캠퍼스 건물 Lv.57', how: '대학교 때 지은 건물 여덟 채를 모두 Lv.57까지 키워요' },
     { id: 'gc58', ch: 27, t: 'facAll', n: 58, rm: 5, title: '캠퍼스 건물 Lv.58', how: '대학교 때 지은 건물 여덟 채를 모두 Lv.58까지 키워요' },
@@ -8690,6 +8897,7 @@ body.mg-on .toast[hidden]{display:none}
     adx: freshAdx(),   // 4.2.0 광고: day 날짜, n 오늘 광고 도장, got 받은 단계, fv fw xg cs 오늘 쓴 '한 판 더'(축제 부스, 불꽃놀이, 교환학생 안내, 진로 상담)
     rx: { lv: {}, c: {} },
     rt5: { lv: {}, cur: null },
+    pp: { dat: 0, cur: null, n: 0, by: {}, day: '', cm: -1, cf: 0, cb: 0, ck: {}, med: [], sem: 0 },   // 5.2.0 논문: dat 연구 자료, cur 쓰는 논문 { k 주제, end }, n 편수, by 주제마다 편수, day 자료 정리한 날, cm 학회 번호(4주), cf 이번 학회 점수, cb 가장 높았던 학회 점수, ck 이번 학회 주제마다 편수, med [학회, 메달 1~3], sem 대학원 세미나와 학위수여식 횟수
     ta: { seat: [], out: [], mem: 0, mon: 0, n: 0 },   // 5.1.0 조교: seat 자리마다 { b 건물 }, out 파견 { i 자리, to 모교 0~4, h 시간 0~2, end }, mem 추억 조각, mon 기념비 단계, n 파견 횟수   // 5.0.0 연구 트리: lv 가지마다 칸 수(0~4), cur 지금 연구 { k, end }   // 4.2.0 연구 투자: lv 연구마다 레벨, c 그 레벨에 정해 둔 값(열린 때의 수업료로 정하고 올릴 때까지 그대로)
     fv: freshFv(),   // 4.1.0 대학 축제: wk 이번 주, st 도장 수, got 받은 단계, day 날짜, b 그날 한 부스, g 그날 만난 손님, o 그날 창을 열었는지, win 부스마다 성공 횟수, own 받은 기념품, tip 띠를 닫은 주, td 띠를 본 날
     xg: freshXg(), mk: freshMk(), sto: freshSto(),   // 4.1.0 교환학생의 날, 숲속 장터, 이야기(본 장면, 고른 답, 곁가지)
@@ -8901,7 +9109,7 @@ body.mg-on .toast[hidden]{display:none}
         if (typeof c === 'number' && isFinite(c) && c > 0) f.c[x.k] = Math.min(SAVE_CAP.acorn, Math.floor(c)); }
       s.rx = f; }
     if (d.rt5 && typeof d.rt5 === 'object') {   // 5.0.0 연구 트리
-      const lv = {}; for (const D of RT5.list) { const v = d.rt5.lv && d.rt5.lv[D.k]; if (Number.isFinite(v) && v > 0) lv[D.k] = Math.min(RT5.max, Math.floor(v)); }
+      const lv = {}; for (const D of RT5.list) { const v = d.rt5.lv && d.rt5.lv[D.k]; if (Number.isFinite(v) && v > 0) lv[D.k] = Math.min(RT5.top, Math.floor(v)); }
       const c = d.rt5.cur; s.rt5 = { lv, cur: c && RT5.list.some(D => D.k === c.k && !D.lock) && Number.isFinite(c.end) ? { k: c.k, end: c.end } : null }; }
     if (d.ta && typeof d.ta === 'object') {   // 5.1.0 조교
       const T = d.ta, num = (v, mx) => Number.isFinite(v) && v > 0 ? Math.min(mx, Math.floor(v)) : 0;
@@ -8909,6 +9117,14 @@ body.mg-on .toast[hidden]{display:none}
       const out = (Array.isArray(T.out) ? T.out : []).filter(o => o && Number.isInteger(o.i) && o.i >= 0 && o.i < 4 && Number.isInteger(o.to) && o.to >= 0 && o.to <= 4 && Number.isInteger(o.h) && o.h >= 0 && o.h <= 2 && Number.isFinite(o.end))
         .filter((o, j, a) => a.findIndex(y => y.i === o.i) === j).map(o => ({ i: o.i, to: o.to, h: o.h, end: o.end }));
       s.ta = { seat, out, mem: num(T.mem, 1e9), mon: num(T.mon, 3), n: num(T.n, 1e9) }; }
+    if (d.pp && typeof d.pp === 'object') {   // 5.2.0 논문과 학회
+      const P = d.pp, num = (v, mx) => Number.isFinite(v) && v > 0 ? Math.min(mx, Math.floor(v)) : 0, keys = new Set(RT5.list.map(D => D.k));
+      const map = o => { const r = {}; if (o && typeof o === 'object') for (const k of Object.keys(o)) if (keys.has(k)) r[k] = num(o[k], 1e6); return r; };
+      const c = P.cur && keys.has(P.cur.k) && Number.isFinite(P.cur.end) ? { k: P.cur.k, end: P.cur.end } : null;
+      const med = Array.isArray(P.med) ? P.med.filter(m => Array.isArray(m) && Number.isFinite(m[0]) && [1, 2, 3].includes(m[1])).slice(-60).map(m => [Math.floor(m[0]), m[1]]) : [];
+      s.pp = { dat: num(P.dat, 9999), cur: c, n: num(P.n, 1e6), by: map(P.by), day: typeof P.day === 'string' ? P.day.slice(0, 10) : '', cm: Number.isFinite(P.cm) ? Math.max(-1, Math.floor(P.cm)) : -1,
+        cf: num(P.cf, 99999), cb: num(P.cb, 99999), ck: map(P.ck), med, sem: num(P.sem, 1e6) };
+    } else if (s.tier >= GRAD_TIER) s.pp.sem = Math.max(0, Math.floor((s.tg || 0) * 2 + (s.sem || 0)));   // 5.2.0 앞 저장: 지난 세미나 수를 학기로 어림
     { const A = d && d.adx && typeof d.adx === 'object' ? d.adx : {}, f = freshAdx();   // 4.2.0 광고 도장과 한 판 더
       f.day = typeof A.day === 'string' ? A.day.slice(0, 10) : '';
       f.n = typeof A.n === 'number' && isFinite(A.n) ? Math.max(0, Math.min(ADX.max, Math.floor(A.n))) : 0;
@@ -9420,19 +9636,19 @@ body.mg-on .toast[hidden]{display:none}
       { k: 'event', nm: '행사', ic: 'ic_rt_event', eff: L => `학교 행사, 축제, 체험학습 도토리 +${10 * L}%` },
       { k: 'tam', nm: '탐험', ic: 'ic_rt_tam', eff: L => `탐험대 힘 +${5 * L}%` + (L >= 4 ? ', 보고서 +2시간' : '') },
       { k: 'time', nm: '시간', ic: 'ic_rt_time', eff: L => `자리 비운 동안 수입 +${L}시간` },
-      { k: 'ta', nm: '조교', ic: 'ic_rt_ta', eff: L => ['', '조교 자리 +1', '조교 자리 +1, 파견 시간 -15%', '조교 자리 +2, 파견 시간 -15%', '조교 자리 +2, 파견 시간 -15%, 파견 보상 +25%'][L] }],   // 5.1.0 조교 가지 열림
-    ess: [50, 100, 200, 400], hrs: [1, 2, 4, 8], time: [1, 3, 6, 12], max: 4 };
+      { k: 'ta', nm: '조교', ic: 'ic_rt_ta', eff: L => ['', '조교 자리 +1', '조교 자리 +1, 파견 시간 -15%', '조교 자리 +2, 파견 시간 -15%', '조교 자리 +2, 파견 시간 -15%, 파견 보상 +25%', '조교 자리 +2, 파견 시간 -15%, 파견 보상 +50%'][L] }],   // 5.1.0 조교 가지 열림
+    ess: [50, 100, 200, 400, 800], hrs: [1, 2, 4, 8, 16], time: [1, 3, 6, 12, 24], max: 4, top: 5 };   // 5.2.0 다섯째 칸(심화 칸)은 논문으로 열려요(rtMax)
   const rtLv = k => (S && S.rt5 && S.rt5.lv[k]) || 0;
   const rtClassMul = () => 1 + 0.05 * rtLv('class');
   const rtEvt = () => 1 + 0.1 * rtLv('event');
   const rtTamMul = () => 1 + 0.05 * rtLv('tam');
-  const rtCost = k => { const L = Math.min(RT5.max - 1, rtLv(k)); return { ess: RT5.ess[L], ac: nice(rate() * 3600 * RT5.hrs[L]), sec: Math.round(RT5.time[L] * 3600 * (1 - XT.adv.per / 100 * xtLv('adv'))) }; };   // 5.0.0 펠리컨 지도교수님 연수만큼 짧아져요
+  const rtCost = k => { const L = Math.min(RT5.top - 1, rtLv(k)); return { ess: RT5.ess[L], ac: nice(rate() * 3600 * RT5.hrs[L]), sec: Math.round(RT5.time[L] * 3600 * (1 - XT.adv.per / 100 * xtLv('adv'))) }; };   // 5.0.0 펠리컨 지도교수님 연수만큼 짧아져요
   const rtOpen = () => gradOn() && (S.f.institute || 0) >= 1;
   const rtHrs = sec => { const m = Math.round(sec / 60), h = Math.floor(m / 60); return h && m % 60 ? `${h}시간 ${m % 60}분` : h ? `${h}시간` : `${m}분`; };   // 5.0.0 연구 시간 글자(지도교수님 연수로 분 단위가 생겨요)
   function rtStart(k) {
     const D = RT5.list.find(x => x.k === k); if (!D || D.lock || !rtOpen()) return false;
     if (S.rt5.cur) { toast('연구는 한 번에 하나씩 해요'); return false; }
-    if (rtLv(k) >= RT5.max) return false;
+    if (rtLv(k) >= rtMax(k)) { if (rtLv(k) < RT5.top) toast(`논문 ${PP.deep[k]}편을 쓰면 다섯째 칸이 열려요`); return false; }
     const c = rtCost(k);
     if (S.ess < c.ess) { toast(essShort(c.ess - S.ess)); return false; }
     if (S.budget < c.ac) { toast(`도토리가 ${fmt(c.ac - S.budget)}개 모자라요`); return false; }
@@ -9443,24 +9659,56 @@ body.mg-on .toast[hidden]{display:none}
   }
   function rtTick() {
     const c = S && S.rt5 && S.rt5.cur; if (!c || gameNow() < c.end) return;
-    const D = RT5.list.find(x => x.k === c.k); S.rt5.lv[c.k] = Math.min(RT5.max, rtLv(c.k) + 1); S.rt5.cur = null; save();
+    const D = RT5.list.find(x => x.k === c.k); S.rt5.lv[c.k] = Math.min(RT5.top, rtLv(c.k) + 1); S.rt5.cur = null; ppData(PP.dat.rt); save(); rt.rtPop = { k: c.k, i: rtLv(c.k) - 1 };   // 5.1.1.4 나무 칸이 막 자란 움직임
     toast(`${D ? D.nm : ''} 연구 ${rtLv(c.k)}칸 완성!\n${D ? D.eff(rtLv(c.k)) : ''}`); sfx('quest');
     if (!$('#mRx').hidden) renderRx();
   }
+  /* 5.1.1.4 woodani 결정(2026-11-19): 연구 트리를 목록 대신 한 그루 나무로. 밑동에서 가지 다섯 개가 위로 뻗고, 가지마다 칸이 아래에서 위로 이어져요.
+     칸 자리는 720x960 판 기준(그림 작업지시서 96의 rt_tree_bg와 같은 좌표). 칸을 누르면 아래 칸 창에 효과, 값, '연구하기'. 효과와 값은 그대로 */
+  const RT_PT = [[160, 141, 125, 109, 96], [260, 250, 242, 235, 228], [360, 360, 360, 360, 360], [460, 470, 478, 485, 492], [560, 579, 595, 611, 624]];   // 가지마다 줄 1~5의 x(작업지시서 96-2, 위로 갈수록 퍼지는 부채꼴)
+  const RT_X = (j, i) => RT_PT[j][i], RT_Y = i => 800 - 150 * i, RT_W = 720, RT_H = 960;
+  const rtTop = () => RT5.top >= 5 ? 0 : RT_Y(RT5.top - 1) - 130;   // 칸 줄 수가 다섯보다 적으면 빈 위쪽을 잘라요
+  function rtTreeSvg() {
+    const bg = IMG('rt_tree_bg'), c = S.rt5.cur;
+    let s = '';
+    if (!bg) s += `<path d="M330 960 Q336 905 360 880 Q384 905 390 960 Z" fill="#9A6B43"/>`;
+    RT5.list.forEach((D, j) => {
+      const x = RT_X(j, 0), L = rtLv(D.k), run = c && c.k === D.k, seg = i => `M${RT_X(j, i - 1)} ${RT_Y(i - 1)} L${RT_X(j, i)} ${RT_Y(i)}`;
+      const stem = `M360 885 C360 850 ${x} 860 ${x} ${RT_Y(0)}`;
+      if (!bg) { s += `<path d="${stem}" stroke="#B98A5E" stroke-width="16" fill="none" stroke-linecap="round"/>`; for (let i = 1; i < RT5.top; i++) s += `<path d="${seg(i)}" stroke="#B98A5E" stroke-width="14" fill="none" stroke-linecap="round"/>`; }
+      if (L > 0 || run) s += `<path d="${stem}" class="rt-done" fill="none"/>`;
+      for (let i = 1; i < RT5.top; i++) if (L > i || (L === i && run)) s += `<path d="${seg(i)}" class="rt-done${L === i ? ' rt-run' : ''}" fill="none"/>`;
+    });
+    return `<svg class="rt-lines" viewBox="0 ${rtTop()} ${RT_W} ${RT_H - rtTop()}" preserveAspectRatio="none" aria-hidden="true">${s}</svg>`;
+  }
   function rtPart() {
-    const c = S.rt5.cur, now = gameNow();
-    return '<p class="fine">한 번에 하나씩 연구해요. 졸업해도 남아요.</p><div class="dp-list">' + RT5.list.map(D => {
-      const L = rtLv(D.k), u = IMG(D.ic), run = c && c.k === D.k, full = L >= RT5.max, k = rtCost(D.k);
-      const btn = D.lock ? '<span class="fe-lock">준비 중</span>' : full ? '<span class="fe-lock">완성</span>' : run ? `<span class="fe-lock">${hms(c.end - now)}</span>`
-        : `<button class="${c || S.ess < k.ess || S.budget < k.ac ? 'btn-sub' : 'cta'} small" type="button" data-rt="${D.k}">정수 ${k.ess}</button>`;
-      return `<div class="dp-row"><span class="dp-ic">${u ? `<img src="${u}" alt="">` : ''}</span><div class="dp-tx"><b>${D.nm} ${'●'.repeat(L)}${'○'.repeat(RT5.max - L)}</b><small>${L ? D.eff(L) : '아직 연구 전'}${D.lock || full ? '' : `, 다음 ${D.eff(L + 1)} (도토리 ${fmt(k.ac)}, ${rtHrs(k.sec)})`}</small></div>${btn}</div>`;
-    }).join('') + '</div>';
+    const c = S.rt5.cur, now = gameNow(), bg = IMG('rt_tree_bg');
+    if (!RT5.list.some(D => D.k === rt.rtSel)) rt.rtSel = c ? c.k : (RT5.list.find(D => !D.lock && rtLv(D.k) < rtMax(D.k)) || RT5.list[0]).k;
+    let nodes = '';
+    RT5.list.forEach((D, j) => {
+      const L = rtLv(D.k), u = IMG(D.ic), run = c && c.k === D.k;
+      for (let i = 0; i < RT5.top; i++) {
+        const st = i < L ? 'done' : i === L && run ? 'run' : i === L && !D.lock && i < rtMax(D.k) ? 'next' : 'lock', sel = rt.rtSel === D.k && (i === Math.min(L, RT5.top - 1));
+        const pop = st === 'done' && rt.rtPop && rt.rtPop.k === D.k && rt.rtPop.i === i;
+        nodes += `<button class="rt-node ${st}${sel ? ' sel' : ''}${pop ? ' pop' : ''}" type="button" data-rts="${D.k}" style="left:${(RT_X(j, i) / RT_W * 100).toFixed(2)}%;top:${((RT_Y(i) - rtTop()) / (RT_H - rtTop()) * 100).toFixed(2)}%" aria-label="${D.nm} ${i + 1}칸${st === 'done' ? ' 완성' : st === 'run' ? ' 연구 중' : st === 'lock' ? ' 잠김' : ''}">` +
+          (u ? `<img src="${u}" alt="">` : `<b>${i + 1}</b>`) + (st === 'lock' ? '<i class="rt-lk">🔒</i>' : st === 'done' ? '<i class="rt-leaf"></i>' : '') + '</button>';
+      }
+      nodes += `<span class="rt-nm" style="left:${(RT_X(j, 0) / RT_W * 100).toFixed(2)}%">${D.nm}</span>`;
+    });
+    rt.rtPop = null;
+    const D = RT5.list.find(x => x.k === rt.rtSel), L = rtLv(D.k), run = c && c.k === D.k, full = L >= RT5.top, shut = !full && L >= rtMax(D.k), k = rtCost(D.k);
+    const btn = D.lock ? '<span class="fe-lock">준비 중</span>' : full ? '<span class="fe-lock">완성</span>' : run ? `<span class="fe-lock">${hms(c.end - now)}</span>`
+      : shut ? `<span class="fe-lock">논문 ${PP.deep[D.k]}편</span>` : c ? '<span class="fe-lock">다른 연구 중</span>'
+      : `<button class="${S.ess < k.ess || S.budget < k.ac ? 'btn-sub' : 'cta'} small" type="button" data-rt="${D.k}">연구하기 (정수 ${k.ess})</button>`;
+    const info = `<div class="rt-card"><span class="dp-ic">${IMG(D.ic) ? `<img src="${IMG(D.ic)}" alt="">` : ''}</span><div class="dp-tx"><b>${D.nm} ${Math.min(L + (full ? 0 : 1), RT5.top)}칸${full ? ' (완성)' : ''}</b>` +
+      `<small>${L ? `지금 ${D.eff(L)}` : '아직 연구 전'}${D.lock || full ? '' : `<br>다음 ${D.eff(L + 1)}<br>도토리 ${fmt(k.ac)}, ${rtHrs(k.sec)}`}</small></div>${btn}</div>`;
+    return `<p class="fine">한 번에 하나씩 연구해요. 졸업해도 남아요.</p><div class="rt-tree${bg ? ' art' : ''}" style="aspect-ratio:${RT_W}/${RT_H - rtTop()}${bg ? `;background-image:url('${blobUrl(bg)}')` : ''}">${rtTreeSvg()}${nodes}</div>${info}`;
   }
   function renderRx() {
-    const tab = ['tree', 'ta'].includes(rt.rxTab) ? rt.rxTab : 'inv';
+    const tab = ['tree', 'ta', 'paper'].includes(rt.rxTab) ? rt.rxTab : 'inv';
     $$('#rxSeg [data-rseg]').forEach(b => b.setAttribute('aria-checked', String(b.dataset.rseg === tab)));
-    setH($('#rxBody'), tab === 'tree' ? rtPart() : tab === 'ta' ? taPart() : rxPart(true));
-    { const hd = $('#rxTitle').parentElement, u = tab === 'ta' && taOpen() ? IMG('ta_bg') : ''; hd.classList.toggle('art', !!u); hd.style.backgroundImage = u ? `url("${blobUrl(u)}")` : ''; }   // 5.1.0 조교 탭 머리 그림
+    setH($('#rxBody'), tab === 'tree' ? rtPart() : tab === 'ta' ? taPart() : tab === 'paper' ? ppPart() : rxPart(true));
+    { const hd = $('#rxTitle').parentElement, u = tab === 'ta' && taOpen() ? IMG('ta_bg') : tab === 'paper' && ppOpen() ? IMG('conf_bg') : ''; hd.classList.toggle('art', !!u); hd.style.backgroundImage = u ? `url("${blobUrl(u)}")` : ''; }   // 5.1.0 조교 탭 머리 그림, 5.2.0 논문 탭은 학회장 그림
   }
   /* ---------- 5.1.0 조교 파견 (프로젝트 문서 '5.1.0 설계안 (조교 파견) 초안', woodani 결정 2026-11-19: 숫자는 제안대로) ----------
      조교 자리: 대학원생 조교를 캠퍼스 건물에 한 명씩 앉혀요. 앉아 있는 조교 한 명마다 수업료 +10%, 그 건물 가구 값 -10%.
@@ -9500,7 +9748,7 @@ body.mg-on .toast[hidden]{display:none}
   }
   function taClaim() {
     const due = taDue(); if (!due.length) return false;
-    const mul = rtLv('ta') >= 4 ? 1.25 : 1; let ess = 0, mem = 0, ac = 0; const got = [];
+    const mul = rtLv('ta') >= 5 ? 1.5 : rtLv('ta') >= 4 ? 1.25 : 1; let ess = 0, mem = 0, ac = 0; const got = [];   // 5.2.0 조교 심화 칸 +25% 더
     for (const o of due) {
       const f = TA.hrs[o.h] / 2;   // 덤은 2시간을 1배로 시간만큼
       ess += Math.round(TA.ess[o.h] * mul * (o.to === 0 ? 1.5 : 1)); mem += Math.round(TA.mem[o.h] * mul);
@@ -9511,6 +9759,7 @@ body.mg-on .toast[hidden]{display:none}
     }
     S.ta.out = S.ta.out.filter(o => !due.includes(o));
     S.ta.mem = Math.min(1e9, S.ta.mem + mem);
+    ppData(due.reduce((t, o) => t + (PP.dat.ta[o.h] || 0), 0));   // 5.2.0 4시간 1, 8시간 2
     addEss(ess); if (ac > 0) { S.budget += ac; earn(ac); got.push(`도토리 ${fmt(ac)}`); }
     save(); renderHUD(); renderDeco(); checkQuests(true); sfx('quest'); buzz(15);
     toast(`조교 ${due.length}명이 돌아왔어요\n숲의 정수 ${ess}, 추억 조각 ${mem}` + (got.length ? `\n${[...new Set(got)].join(', ')}` : ''));
@@ -9525,6 +9774,94 @@ body.mg-on .toast[hidden]{display:none}
     save(); renderHUD(); renderDeco(); checkQuests(true); sfx('quest'); buzz(20);
     toast(`모교 기념비 ${S.ta.mon}단계!\n수업료 +${TA.monPct * S.ta.mon}%` + (S.ta.mon >= TA.mon.length ? `\n칭호 '모교의 자랑'을 받았어요` : ''));
     return true;
+  }
+  /* ---------- 5.2.0 논문과 숲속 학회 (프로젝트 문서 '5.2.0 설계안 (논문과 숲속 학회) 초안', woodani 결정 2026-11-19: 숫자는 제안대로, 대학원부터) ----------
+     연구 자료: 하루 첫 자료 정리 1, 세미나 3, 조교 파견 4시간 1과 8시간 2, 연구 트리 칸 2, 심화 탐험 큰 장난꾸러기 처음 넘기 1.
+     논문: 주제(연구 트리 가지)를 골라 자료 3개로 4시간. 점수 = 10 + 그 가지 칸 수 × 5, 한 학회에서 같은 주제 3편째부터 절반. 다 쓰면 정수 10.
+     숲속 학회: 4주(주간 리그 4주)마다. 그 학회에 쓴 논문 점수를 더하고, 끝나면 100점 동, 300점 은, 600점 금메달. 서버 랭킹 cf(점수), cq(학회 × 1,000,000 + 점수).
+     심화 칸: 논문 3, 6, 10, 15, 20편마다 수업, 행사, 탐험, 시간, 조교 가지에 다섯째 칸 */
+  const PP = { need: 3, sec: 4 * 3600, ess: 10, base: 10, per: 5, halfAt: 2, weeks: 4,
+    dat: { day: 1, sem: 3, ta: [0, 1, 2], rt: 2, boss: 1 },
+    med: [{ at: 100, nm: '동메달', ic: '🥉', ess: 20, gold: 0 }, { at: 300, nm: '은메달', ic: '🥈', ess: 40, gold: 0 }, { at: 600, nm: '금메달', ic: '🥇', ess: 60, gold: 1 }],
+    deep: { class: 3, event: 6, tam: 10, time: 15, ta: 20 } };
+  const PP_TITLES = [
+    { id: 'semfive', title: '발표왕', got: s => !!s.pp && s.pp.sem >= 5 },
+    { id: 'semten', title: '숲속 석학', got: s => !!s.pp && s.pp.sem >= 10 },
+    { id: 'semtwenty', title: '명예 교수', got: s => !!s.pp && s.pp.sem >= 20 },
+    { id: 'paperone', title: '첫 논문', got: s => !!s.pp && s.pp.n >= 1 },
+    { id: 'paperthirty', title: '논문 부자', got: s => !!s.pp && s.pp.n >= 30 },
+    { id: 'confgold', title: '학회 금메달', got: s => !!s.pp && (s.pp.med || []).some(m => m[1] >= 3) }];
+  const ppOpen = () => !!S && !!S.pp && rtOpen();   // 대학원 연구소를 지으면(석사 1학기부터)
+  const ppPer = () => Math.floor(gameWeek() / PP.weeks);
+  const ppLeft = () => { const end = Date.UTC(2026, 0, 5) + (ppPer() + 1) * PP.weeks * 604800000 - KST_MS; return Math.max(0, Math.ceil((end - gameNow()) / 86400000)); };
+  const rtMax = k => (S && S.pp && S.pp.n >= (PP.deep[k] || Infinity)) ? RT5.top : RT5.max;   // 5.2.0 심화 칸이 열린 가지는 다섯 칸
+  const ppMedOf = v => PP.med.reduce((a, m, i) => v >= m.at ? i + 1 : a, 0);
+  const ppScore = k => { const v = PP.base + PP.per * rtLv(k); return ((S.pp.ck[k] || 0) >= PP.halfAt) ? Math.floor(v / 2) : v; };
+  function ppData(n, why) {   // 연구 자료 얻기(대학원에서만)
+    if (!ppOpen() || !(n > 0)) return 0;
+    S.pp.dat = Math.min(9999, S.pp.dat + n);
+    if (why) rt.ppWhy = why;
+    if (!$('#mRx').hidden && rt.rxTab === 'paper') renderRx();
+    return n;
+  }
+  // 학회가 바뀌면 지난 학회 메달을 주고 점수를 0부터. 켤 때와 1초마다 봐요
+  function ppSync() {
+    if (!S || !S.pp) return;
+    const p = ppPer(); if (S.pp.cm === p) return;
+    const old = S.pp.cm, v = S.pp.cf, m = old >= 0 && v > 0 ? ppMedOf(v) : 0;
+    S.pp.cm = p; S.pp.cf = 0; S.pp.ck = {};
+    if (m) {
+      const M = PP.med[m - 1]; S.pp.med.push([old, m]); if (S.pp.med.length > 60) S.pp.med = S.pp.med.slice(-60);
+      addEss(M.ess); if (M.gold) addGold(M.gold);
+      showReward({ title: `숲속 학회 ${M.nm}`, sub: `지난 학회 점수 ${fmt(v)}점`, items: [{ ic: '🏅', t: `${M.ic} ${M.nm}` }, { ic: 'ess', t: `숲의 정수 +${M.ess}` }, M.gold ? { ic: 'gold', t: `황금 도토리 +${M.gold}` } : null] });
+    }
+    save();
+  }
+  function ppDay() {   // 하루 첫 자료 정리
+    if (!ppOpen()) return false;
+    const d = gameToday(); if (S.pp.day === d) { toast('오늘 자료 정리는 끝났어요\n내일 다시 해요'); return false; }
+    S.pp.day = d; ppData(PP.dat.day); save(); sfx('coin'); toast(`연구 자료 +${PP.dat.day}`); return true;
+  }
+  function ppWrite(k) {
+    const D = RT5.list.find(x => x.k === k); if (!D || !ppOpen()) return false;
+    if (S.pp.cur) { toast('논문은 한 번에 한 편씩 써요'); return false; }
+    if (S.pp.dat < PP.need) { toast(`연구 자료가 ${PP.need - S.pp.dat}개 모자라요`); return false; }
+    S.pp.dat -= PP.need; S.pp.cur = { k, end: gameNow() + PP.sec * 1000 };
+    save(); sfx('tap'); toast(`${D.nm} 논문을 쓰기 시작했어요\n${rtHrs(PP.sec)} 뒤에 끝나요`); checkQuests(true);
+    return true;
+  }
+  function ppTick() {
+    if (!S || !S.pp) return;
+    ppSync();
+    const c = S.pp.cur; if (!c || gameNow() < c.end) return;
+    const D = RT5.list.find(x => x.k === c.k), before = new Set(PP_TITLES.filter(t => t.got(S)).map(t => t.id)), deep0 = RT5.list.filter(x => rtMax(x.k) > RT5.max).length;
+    const sc = ppScore(c.k);
+    S.pp.cur = null; S.pp.n += 1; S.pp.by[c.k] = (S.pp.by[c.k] || 0) + 1; S.pp.ck[c.k] = (S.pp.ck[c.k] || 0) + 1;
+    S.pp.cf = Math.min(99999, S.pp.cf + sc); S.pp.cb = Math.max(S.pp.cb, S.pp.cf);
+    addEss(PP.ess); rankDirty(); save();
+    const newT = PP_TITLES.filter(t => t.got(S) && !before.has(t.id)), deep = RT5.list.filter(x => rtMax(x.k) > RT5.max);
+    showReward({ title: `논문 ${S.pp.n}편째 완성!`, sub: `${D ? D.nm : ''} 논문, 학회 점수 +${sc}`, items: [{ ic: 'ess', t: `숲의 정수 +${PP.ess}` }, { ic: '📜', t: `이번 학회 ${fmt(S.pp.cf)}점` },
+      deep.length > deep0 ? { ic: '🌿', t: `${deep[deep.length - 1].nm} 가지에 다섯째 칸이 열렸어요` } : null, ...newT.map(t => ({ ic: '🎖️', t: `칭호 "${t.title}"` }))] });
+    sfx('quest'); checkQuests(true);
+    if (!$('#mRx').hidden) renderRx();
+  }
+  function ppSemDone() { if (S && S.pp && gradOn()) { S.pp.sem += 1; ppData(PP.dat.sem); } }   // 세미나와 학위수여식
+  function ppPart() {
+    if (!ppOpen()) return `<p class="fine">${gradOn() ? '연구 구역 연구소를 지으면 열려요' : '대학교를 졸업하고 대학원에 가면 열려요'}</p>`;
+    ppSync();
+    const P = S.pp, c = P.cur, now = gameNow(), m = ppMedOf(P.cf), nx = PP.med[m], u = IMG('ic_rdata'), up = IMG('ic_paper'), dayDone = P.day === gameToday();
+    const nextDeep = RT5.list.filter(D => P.n < PP.deep[D.k]).sort((a, b) => PP.deep[a.k] - PP.deep[b.k])[0];
+    let h = `<div class="pp-conf"><b>이번 숲속 학회 ${fmt(P.cf)}점</b><small>${ppLeft()}일 남음. ${m ? `지금 ${PP.med[m - 1].ic} ${PP.med[m - 1].nm}` : '아직 메달 없음'}${nx ? `, ${nx.at}점이면 ${nx.ic} ${nx.nm}` : ''}</small></div>`;
+    h += `<div class="dp-row"><span class="dp-ic">${u ? `<img src="${u}" alt="">` : '🔎'}</span><div class="dp-tx"><b>연구 자료 ${fmt(P.dat)}개</b><small>논문 한 편에 ${PP.need}개. 세미나 ${PP.dat.sem}, 연구 트리 칸 ${PP.dat.rt}, 조교 파견 4시간 이상, 심화 탐험 큰 장난꾸러기</small></div>` +
+      (dayDone ? '<span class="fe-lock">오늘 정리함</span>' : `<button class="cta small" type="button" data-pp="day">자료 정리 +${PP.dat.day}</button>`) + '</div>';
+    if (c) { const D = RT5.list.find(x => x.k === c.k); h += `<div class="dp-row on"><span class="dp-ic">${up ? `<img src="${up}" alt="">` : '📜'}</span><div class="dp-tx"><b>${D ? D.nm : ''} 논문 쓰는 중</b><small>끝나면 학회 점수 +${ppScore(c.k)}</small></div><span class="fe-lock">${hms(c.end - now)}</span></div>`; }
+    h += '<div class="dp-list">' + RT5.list.map(D => {
+      const sc = ppScore(D.k), half = (P.ck[D.k] || 0) >= PP.halfAt, U = IMG(D.ic), can = !c && P.dat >= PP.need;
+      return `<div class="dp-row"><span class="dp-ic">${U ? `<img src="${U}" alt="">` : ''}</span><div class="dp-tx"><b>${D.nm} 논문</b><small>학회 점수 ${sc}${half ? ' (이번 학회 같은 주제 3편째부터 절반)' : ` (연구 트리 ${rtLv(D.k)}칸)`}</small></div>` +
+        `<button class="${can ? 'cta' : 'btn-sub'} small" type="button" data-pp="w:${D.k}">쓰기</button></div>`;
+    }).join('') + '</div>';
+    h += `<p class="fine">쓴 논문 ${P.n}편${nextDeep ? `. ${PP.deep[nextDeep.k]}편이면 연구 트리 ${nextDeep.nm} 가지에 다섯째 칸이 열려요` : '. 연구 트리 심화 칸이 모두 열렸어요'}. 4주마다 학회가 새로 열려요.</p>`;
+    return h;
   }
   function taPart() {
     if (!taOpen()) return '<p class="fine">조교는 석사 2학기에 열려요.</p>';
@@ -10255,14 +10592,19 @@ body.mg-on .toast[hidden]{display:none}
     const wk = rk + '_winter';
     return has170(wk) ? wk : '';
   };
+  // 5.1.1.4 woodani 결정(2026-11-19): 테마마다 새로 그린 지붕과 트랙(작업지시서 95, 97, 98, thr_<건물 그림>_<테마>). 있으면 색을 곱하지 않고 그대로 겹쳐요. 없으면 지금 방식(roof 조각에 테마 색)
+  const thrKey = k => {
+    const t = S && S.cos && S.cos.th && THEME[thOn()[k]], b = bldImg(k); if (!t || /_lux$/.test(b)) return '';
+    const key = `thr_${b.replace(/^bld_/, '')}_${t.id}`; return has170(key) ? key : '';
+  };
   const oakKey = () => { const id = S && S.cos && S.cos.th && thOn().bg; return id && has170('oak_' + id) ? 'oak_' + id : 'oak'; };
   function setBldArt(k) {
     const g = $('#b-' + k); if (!g || !geo().lot[k]) return;
     const key = seasonKey(bldImg(k)), G = geo(), [bx, by, bw, tf] = lotRect(G.lot[k], key);
     $$('.built .bimg, .built .roofimg', g).forEach(im => setA(im, { x: bx - bw / 2, y: by - bw / 2, width: bw, height: bw, transform: tf }));
     $('.built .bimg', g).setAttribute('href', IMG170(key));
-    const rk = roofArtKey(k);
-    setA($('.roofimg', g), { href: rk ? IMG170(rk) : '', filter: `url(#rt-${k})` });
+    const tk = thrKey(k), rk = tk || roofArtKey(k);
+    setA($('.roofimg', g), { href: rk ? IMG170(rk) : '', filter: tk ? 'none' : `url(#rt-${k})` });
   }
   // 테마를 바꾸면 건물, 공사 자리, 다음 학교급 자리, 참나무 그림을 다시 골라요
   function setSeasonArt() {
@@ -13349,7 +13691,7 @@ body.mg-on .toast[hidden]{display:none}
     const [x0, y0, x1, y1] = VD_BOX[Math.min(VD.art, Math.max(0, lv))], side = Math.max(x1 - x0, y1 - y0) * 1.08, cx = (x0 + x1) / 2, cy = (y0 + y1) / 2;
     return `<svg viewBox="${(cx - side / 2).toFixed(0)} ${(cy - side / 2).toFixed(0)} ${side.toFixed(0)} ${side.toFixed(0)}" width="${px}" height="${px}" aria-hidden="true"><image href="${u}" width="512" height="512"/></svg>`;
   }
-  const vdReward = lv => lv <= VD.art ? { e: VD.ess * lv, g: 0 } : { e: 0, g: lv % VD.goldEvery === 0 ? 1 : 0 };
+  const vdReward = lv => lv <= VD.art ? { e: VD.ess * lv, g: 0 } : { e: VD.ess, g: lv % VD.goldEvery === 0 ? 1 : 0 };   // 5.2.0 9단계부터 단계마다 숲의 정수 5(5단계마다 황금 도토리는 그대로)
   const vdAmt = k => { const need = vdNeed(), left = vdLeft(); return k === 'left' ? left : Math.min(left, Math.ceil(need * k)); };
   // 기부: k는 0.1, 0.5, 'left'(다음 단계까지 남은 만큼), 'all'(가진 만큼, 모자랄 때). 이번 단계를 넘겨서 내지는 않아요
   function vdGive(k) {
@@ -13393,7 +13735,7 @@ body.mg-on .toast[hidden]{display:none}
     $('#vdFill').style.width = pct + '%'; $('#vdPct').textContent = `${pct}%`; $('#vdBar').setAttribute('aria-valuenow', pct);
     const r = vdReward(lv + 1), tt = VD.titles.find(t => t.lv === lv + 1) || (lv + 1 === 20 ? { title: achTitleName('donate') } : null);
     const rw = [r.e ? `숲의 정수 ${r.e}` : '', r.g ? `황금 도토리 ${r.g}` : '', tt ? `칭호 "${tt.title}"` : ''].filter(Boolean).join(', ');
-    $('#vdLead').textContent = `${lv + 1}단계까지 도토리 ${fmt(left)}개가 더 필요해요\n${rw ? `${lv + 1}단계 보상: ${rw}` : `${lv + 1 > VD.art ? `${VD.goldEvery}단계마다 황금 도토리를 받아요` : ''}`}`;
+    $('#vdLead').textContent = `${lv + 1}단계까지 도토리 ${fmt(left)}개가 더 필요해요\n${rw ? `${lv + 1}단계 보상: ${rw}` : `${lv + 1 > VD.art ? `단계마다 숲의 정수 ${VD.ess}, ${VD.goldEvery}단계마다 황금 도토리를 받아요` : ''}`}`;
     const b = (k, nm, a) => `<button type="button" data-vdk="${k}" aria-disabled="${S.budget >= a ? 'false' : 'true'}"><span>${nm}</span><em>${acornIcon()}${fmt(a)}</em></button>`;
     $('#vdBtns').innerHTML = short && S.budget >= 1 ? b('all', '있는 만큼', Math.min(left, Math.floor(S.budget))) : b('0.1', '10%', a1) + b('0.5', '50%', a5) + b('left', '남은 만큼', left);
     $('#vdSum').textContent = `지금까지 기부한 도토리 ${fmt(S.vd.sum)}개\n단계가 오르면 지도에 기념물이 서요. 수입은 늘지 않아요. 졸업해도 남아요`;
@@ -14268,13 +14610,16 @@ body.mg-on .toast[hidden]{display:none}
        forest/rank/<내 id>   랭킹 이름과 학교 점수
        forest/stats/<내 id>  테스트 현황 (어디까지 했는지, 얼마나 했는지)
      <내 id>는 Firebase 익명 로그인이 기기(브라우저)마다 만들어 줘요. */
-  const VERSION = '5.1.1.3';   // 2026-11-17 woodani 결정: 웹에 5.0.2~5.0.5로 먼저 냈던 것을 앱과 함께 5.0.1 하나로 내요(버전 견줌은 앞 두 자리만 봐서 되돌아가도 괜찮아요)
+  const VERSION = '5.2.0';   // 2026-11-17 woodani 결정: 웹에 5.0.2~5.0.5로 먼저 냈던 것을 앱과 함께 5.0.1 하나로 내요(버전 견줌은 앞 두 자리만 봐서 되돌아가도 괜찮아요)
   const NT_QUIET = ['5.1.1.3', '5.1.1.2', '5.1.1.1', '5.1.1', '5.0.3.1', '5.0.3', '5.0.2.2', '5.0.2.1', '2.1.20', '2.1.2.2', '2.3.0.1', '2.3.4', '3.2.3', '3.2.4', '3.2.5', '3.3.1', '3.3.2', '3.3.3', '4.4.1.1', '4.4.1.2', '4.4.1.3', '4.4.1.4', '5.0.1.1', '5.0.1.2', '5.0.1.3', '5.0.1.4', '5.0.1.5', '5.0.1.6', '5.0.1.7', '5.0.1.8'];   // 5.0.1.1 생물 탐사 고침은 공지 없이   // 5.0.3도 공지 없이(공지 줄은 woodani가 정하면 넣어요)   // 5.0.2 공지 없이(woodani 2026-11-16)   // 5.0.1 공지 줄은 woodani가 정할 때까지 조용히   // 5.0.0 공지는 2026-11-16 woodani가 정해서 NOTICES로 옮겼어요   // 4.4.1(앱과 함께 내는 판)은 공지를 띄워요   // 4.4.1도 공지 없이(woodani)   // 3.3.1, 3.3.2, 3.3.3(토스 먼저)도 공지 창 없이(woodani). 2.3.0.1도 공지 창 없이(공지는 그대로 2.3.0). 2.3.4도 조용히(woodani 결정). 3.2.3, 3.2.4, 3.2.5도 공지 창 없이(공지 줄을 고르지 않음)
     // 2.1.20 woodani 결정: 이 버전들은 업데이트해도 공지 창을 띄우지 않아요(공지는 그대로 2.1.2)
   /* 2.0.0 공지사항 (2026-10-27 woodani, 1.8.0은 이미 올려서 2.0.0부터): 설정 > 공지사항. 맨 위가 가장 새 공지예요.
      패치노트는 자동으로 넣지 않아요. woodani가 검수한 글만 여기에 적어요(CHANGELOG.md는 자세한 기록용이라 따로 있어요).
      접속하면 새 공지 창을 띄워요(올라온 뒤 7일 동안, '일주일간 열지 않기'를 누르면 7일 쉬어요). 업데이트한 뒤 첫 접속에는 쉬는 중이어도 한 번 띄워요 */
   const NOTICES = [
+    // 5.2.0 공지(2026-11-19 woodani가 고른 세 줄). 웹 5.1.1.1~5.1.1.4와 앱 5.1.1 뒤 고침을 함께
+    { id: '2026-11-19-v520', date: '2026-11-19', tag: '업데이트', title: '5.2.0 업데이트',
+      lines: ['논문과 숲속 학회 추가', '연구 나무와 테마 지붕 새 단장', '편의 개선과 오류 수정'] },
     // 5.1.0 공지(2026-11-19 woodani가 고른 세 줄)
     { id: '2026-11-19-v510', date: '2026-11-19', tag: '업데이트', title: '5.1.0 업데이트',
       lines: ['대학원 조교 파견 추가', '모교 기념비 추가', '편의 개선과 오류 수정'] },
@@ -15234,6 +15579,7 @@ body.mg-on .toast[hidden]{display:none}
       listenSea: (ok, no) => col.orderBy('sp', 'desc').limit(RANK_MAX).onSnapshot(snap => ok(snap.docs.map(d => [d.id, d.data()])), no),   // 2.1.3 랭킹 시즌
       listenTam: (ok, no) => col.orderBy('tq', 'desc').limit(RANK_MAX).onSnapshot(snap => ok(snap.docs.map(d => [d.id, d.data()])), no),   // 4.3.0 탐험 순위
       listenTamH: (ok, no) => col.orderBy('hq', 'desc').limit(RANK_MAX).onSnapshot(snap => ok(snap.docs.map(d => [d.id, d.data()])), no),   // 4.3.3 심화 탐험 순위
+      listenConf: (ok, no) => col.orderBy('cq', 'desc').limit(RANK_MAX).onSnapshot(snap => ok(snap.docs.map(d => [d.id, d.data()])), no),   // 5.2.0 학회 순위
       put: doc => col.doc(uid).set(doc),
       remove: () => col.doc(uid).delete(),
       // 2.1.3 다른 학교 구경
@@ -15255,11 +15601,11 @@ body.mg-on .toast[hidden]{display:none}
       q.on('value', cb, no);
       return () => q.off('value', cb);
     };
-    const week = child => (ok, no) => {
+    const week = (child, idx = weekIdx) => (ok, no) => {
       let q = null, wk = null;
       const cb = rowsOf(ok);
       const sync = () => {
-        const next = weekIdx(); if (next === wk) return;
+        const next = idx(); if (next === wk) return;
         if (q) q.off('value', cb);
         wk = next; q = ref.orderByChild(child).startAt(wk * 1000000).endAt(wk * 1000000 + 999999).limitToLast(RANK_MAX + 10); q.on('value', cb, no);
       };
@@ -15285,6 +15631,7 @@ body.mg-on .toast[hidden]{display:none}
       },
       listenTam: week('tq'),   // 4.3.0 탐험 순위: 주간 리그처럼 이번 주 범위(tq = 주 × 1,000,000 + 층)만 받아요(서버 규칙 indexOn tq)
       listenTamH: week('hq'),   // 4.3.3 심화 탐험 순위(hq = 주 × 1,000,000 + 심화 층, 서버 규칙 indexOn hq)
+      listenConf: week('cq', ppPer),   // 5.2.0 학회 순위(cq = 학회 × 1,000,000 + 학회 점수, 서버 규칙 indexOn cq)
       put: doc => ref.child(uid).set(Object.assign({}, doc, { at: Cloud.fb.database.ServerValue.TIMESTAMP })),
       remove: () => ref.child(uid).remove(),
       removeOther: id => ref.child(id).remove(),   // 4.1.2 관리자만(서버 규칙이 forest/adminUids 계정의 지우기만 받아 줘요)
@@ -15337,6 +15684,12 @@ body.mg-on .toast[hidden]{display:none}
         Rank.hrows = rankRows(pairs, r => r.week === w && r.hf > 0, (a, b) => b.hf - a.hf || a.at - b.at);
         renderRankPanel();
       }, () => {});
+      if (be.listenConf) Rank.unsubC = be.listenConf(pairs => {   // 5.2.0 학회 순위: 이번 학회 줄만
+        if (g !== Rank.gen) return;
+        const p = ppPer();
+        Rank.crows = rankRows(pairs, r => Math.floor(r.cq / 1000000) === p && r.cf > 0, (a, b) => b.cf - a.cf || a.at - b.at);
+        renderRankPanel();
+      }, () => {});
       if (be.listenBt) Rank.unsubB = be.listenBt(pairs => {
         if (g !== Rank.gen) return;
         Rank.brows = rankRows(pairs, r => r.bt > 0, (a, b) => b.bt - a.bt || a.at - b.at);
@@ -15356,8 +15709,9 @@ body.mg-on .toast[hidden]{display:none}
     if (Rank.unsubS) { try { Rank.unsubS(); } catch (e) { /* 무시 */ } }
     if (Rank.unsubT) { try { Rank.unsubT(); } catch (e) { /* 무시 */ } }
     if (Rank.unsubH) { try { Rank.unsubH(); } catch (e) { /* 무시 */ } }
+    if (Rank.unsubC) { try { Rank.unsubC(); } catch (e) { /* 무시 */ } }
     clearTimeout(Rank.timer);
-    Object.assign(Rank, { state: 'idle', be: null, uid: null, rows: [], wrows: [], brows: [], srows: [], trows: [], hrows: [], readOnly: false, writing: false, unsub: null, unsubW: null, unsubB: null, unsubS: null, unsubT: null, unsubH: null, sbt: 0, sbtq: null, sbtm: 0, stf: 0, stfW: null, stfAt: 0 });
+    Object.assign(Rank, { state: 'idle', be: null, uid: null, rows: [], wrows: [], brows: [], srows: [], trows: [], hrows: [], crows: [], readOnly: false, writing: false, unsubC: null, unsub: null, unsubW: null, unsubB: null, unsubS: null, unsubT: null, unsubH: null, sbt: 0, sbtq: null, sbtm: 0, stf: 0, stfW: null, stfAt: 0 });
   }
   function rankAfterCloud() {
     if (Rank.state === 'loading') return;   // 이미 서버 연결을 기다리는 중이면 알아서 이어져요
@@ -15374,7 +15728,7 @@ body.mg-on .toast[hidden]{display:none}
       pid: typeof d.pid === 'string' ? d.pid.slice(0, 16) : '', week: Number.isInteger(d.week) ? d.week : -2 /* 보안 보강: 소수 주를 정수로 바꿔 이번 주로 세지 않아요 */, lp: Math.max(0, Math.floor(Number(d.lp) || 0)),
       title: typeof d.title === 'string' && achTitleName(d.title) ? d.title : '',   // 2.1.3 업적 말고 받는 칭호도
       bt: typeof d.bt === 'number' && isFinite(d.bt) ? Math.max(1000, Math.min(9999, Math.floor(d.bt))) : 0, btm: typeof d.btm === 'number' ? Math.max(0, Math.min(5, Math.floor(d.btm))) : 0, btq: typeof d.btq === 'number' && isFinite(d.btq) ? d.btq : null, sem: d.sem === 0 || d.sem === 1 ? d.sem : null,
-      sk: Math.max(0, Math.floor(Number(d.sk) || 0)), sp: Math.max(0, Math.min(1e9, Math.floor(Number(d.sp) || 0))), tf: Math.max(0, Math.min(100000, Math.floor(Number(d.tf) || 0))), hf: Math.max(0, Math.min(100000, Math.floor(Number(d.hf) || 0))) };   // 4.3.3 심화 층   // 4.3.0 탐험 이번 주 가장 깊은 층   // 2.0.1 대결, 2.1.1 학기, 2.1.3 랭킹 시즌
+      sk: Math.max(0, Math.floor(Number(d.sk) || 0)), sp: Math.max(0, Math.min(1e9, Math.floor(Number(d.sp) || 0))), tf: Math.max(0, Math.min(100000, Math.floor(Number(d.tf) || 0))), hf: Math.max(0, Math.min(100000, Math.floor(Number(d.hf) || 0))), cf: Math.max(0, Math.min(99999, Math.floor(Number(d.cf) || 0))), cq: Math.max(0, Math.floor(Number(d.cq) || 0)) };   // 4.3.3 심화 층   // 4.3.0 탐험 이번 주 가장 깊은 층   // 2.0.1 대결, 2.1.1 학기, 2.1.3 랭킹 시즌
   }
   // 같은 학교(학교 번호)가 기기를 옮겨서 두 번 있으면 내 것이나 가장 최근 것 하나만 남겨요
   function rankRows(pairs, keep, order) {
@@ -15443,7 +15797,17 @@ body.mg-on .toast[hidden]{display:none}
   // 4.3.3 심화 탐험 순위: 일반 탐험(tf)과 같은 규칙 모양(3초마다 1층, 10초가 지나면 10층 더)
   function tamHf() { if (!S.tam) return 0; tamHWeek(); return S.tam.hw.w === S.lg.week ? Math.max(0, Math.min(100000, S.tam.hw.best | 0)) : 0; }
   function tamHRankDoc() { const v = tamRankStep(tamHf(), Rank.hrows, Rank.shfAt, Rank.shfW, Rank.shf, 'hf'); return { hf: v, hq: S.lg.week * 1000000 + v }; }
-  const tamRankBehind = () => !tossRank() && Rank.state === 'on' && ((!Rank.noTam && tamTf() > (Rank.stfW === S.lg.week ? Rank.stf : 0)) || (!Rank.noTamH && tamHf() > (Rank.shfW === S.lg.week ? Rank.shf : 0)));
+  // 5.2.0 학회 순위에 올릴 점수: 서버 규칙이 받는 만큼(지난 쓰기 뒤 35점에 10분마다 35점 더)만 올려요
+  function ppRankDoc() {
+    const p = ppPer(), mine = (Rank.crows || []).find(r => r.id === Rank.uid), row = (Rank.rows || []).find(r => r.id === Rank.uid);
+    let prev = 0, dt = null;
+    if (Rank.scfAt && Rank.scfP === p) prev = Rank.scf; else if (mine && Math.floor(mine.cq / 1000000) === p) prev = mine.cf;
+    if (Rank.lastPerf != null && S.rank.by === Rank.uid) dt = perfNow() - Rank.lastPerf; else if (row) dt = gameNow() - row.at;
+    const room = 35 + (dt == null ? 0 : Math.max(0, dt - 1500) / 600000 * 35), v = Math.max(0, Math.min(S.pp.cf, Math.floor(prev + room)));
+    return { cf: v, cq: p * 1000000 + v };
+  }
+  const ppRankOn = () => !!S && !!S.pp && S.pp.cm === ppPer() && S.pp.cf > 0 && S.lg.week >= 0 && Math.floor(S.lg.week / PP.weeks) === ppPer();
+  const tamRankBehind = () => !tossRank() && Rank.state === 'on' && ((!Rank.noTam && tamTf() > (Rank.stfW === S.lg.week ? Rank.stf : 0)) || (!Rank.noTamH && tamHf() > (Rank.shfW === S.lg.week ? Rank.shf : 0)) || (!Rank.noConf && ppRankOn() && S.pp.cf > (Rank.scfP === ppPer() ? Rank.scf : 0)));
   async function submitRank(force) {
     if (Rank.state !== 'on' || Rank.readOnly || !Rank.uid || !(S.rank.joined || tossRank()) || Rank.writing || (hasCloudBuild() && (Cloud.deleting || Cloud.delLeft))) return;   // 2.2.0 검토 3
     if (S.u.dev) {   // 2.0.0 보안 점검(2-7): 개발자 메뉴로 재화를 받은 학교는 랭킹에 올리지 않아요
@@ -15479,13 +15843,18 @@ body.mg-on .toast[hidden]{display:none}
       // 4.3.3 심화 탐험 순위: 규칙(hf, hq)을 게시하기 전에 거절되면 심화 칸 없이 다시 올려요
       const hfo = !be.toss && !Rank.noTamH && tamHf() > 0 ? tamHRankDoc() : null;
       if (hfo) { doc.hf = hfo.hf; doc.hq = hfo.hq; Rank.tamHSent = true; } else Rank.tamHSent = false;
+      // 5.2.0 학회 순위: 규칙(cf, cq)을 게시하기 전에 거절되면 학회 칸 없이 다시 올려요
+      const cfo = !be.toss && !Rank.noConf && ppRankOn() ? ppRankDoc() : null;
+      if (cfo) { doc.cf = cfo.cf; doc.cq = cfo.cq; Rank.confSent = true; } else Rank.confSent = false;
       await be.put(doc);
       Rank.lastPut = Date.now(); Rank.lastPerf = perfNow(); Rank.denied = 0;
       if (tfo && g === Rank.gen) { Rank.stf = tfo.tf; Rank.stfW = doc.week; Rank.stfAt = perfNow(); }
       if (hfo && g === Rank.gen) { Rank.shf = hfo.hf; Rank.shfW = doc.week; Rank.shfAt = perfNow(); }
+      if (cfo && g === Rank.gen) { Rank.scf = cfo.cf; Rank.scfP = ppPer(); Rank.scfAt = perfNow(); }
       if (g === Rank.gen) { S.rank.sent = sc; S.rank.by = Rank.uid; S.rank.sws = ws; if (bto) { Rank.sbt = bto.bt; Rank.sbtq = bto.btq; Rank.sbtm = bto.btm; } if (Rank.skSent) { Rank.ssp = doc.sp; Rank.ssk = doc.sk; Rank.sspAt = perfNow(); } save(); lookPush(); }
     } catch (e) {
       const c = String((e && (e.code || e.message)) || '');
+      if (g === Rank.gen && Rank.confSent && /permission/i.test(c) && !Rank.noConf) { Rank.noConf = true; Rank.writing = false; rankDirty(); renderRankPanel(); return; }   // 5.2.0 학회 칸 규칙이 아직 없어요
       if (g === Rank.gen && Rank.tamHSent && /permission/i.test(c) && !Rank.noTamH) { Rank.noTamH = true; Rank.writing = false; rankDirty(); renderRankPanel(); return; }   // 4.3.3 심화 칸 규칙이 아직 없어요
       if (g === Rank.gen && Rank.tamSent && /permission/i.test(c) && !Rank.noTam) { Rank.noTam = true; Rank.writing = false; rankDirty(); renderRankPanel(); return; }   // 4.3.0 탐험 칸 규칙이 아직 없어요
       if (g === Rank.gen && Rank.btqSent && /permission/i.test(c) && !Rank.noBtq) { Rank.noBtq = true; Rank.writing = false; rankDirty(); renderRankPanel(); return; }   // 2.2.0 검토 1 btq 칸 규칙이 아직 없어요
@@ -15666,20 +16035,25 @@ body.mg-on .toast[hidden]{display:none}
     rsSync();
     // 4.1.2 관리자 랭킹 줄 지우기: 개발자 메뉴가 있는 판(웹)에서만, 켠 뒤 한 번만 관리자인지 물어봐요
     if (!rt.admChk && !AIT && !window.FOREST_STORE && cloudOn()) { rt.admChk = true; checkAdmin().then(() => { if (rt.isAdmin) renderRankPanel(); }).catch(() => {}); }
-    const mode = tossRank() ? 'all' : (['all', 'bt', 'sea', 'tam'].includes(rt.rankView) ? rt.rankView : 'week'), wk = mode === 'week', bm = mode === 'bt', sea = mode === 'sea', tm = mode === 'tam';   // 4.3.0 탐험 순위   // 2.0.1 대결 순위, 2.1.3 시즌
+    const mode = tossRank() ? 'all' : (['all', 'bt', 'sea', 'tam', 'conf'].includes(rt.rankView) ? rt.rankView : 'week'), wk = mode === 'week', bm = mode === 'bt', sea = mode === 'sea', tm = mode === 'tam', cf = mode === 'conf';   // 5.2.0 학회   // 4.3.0 탐험 순위   // 2.0.1 대결 순위, 2.1.3 시즌
     $('#rankView').hidden = tossRank();
     const th = tm && !!rt.rkH;   // 4.3.3 심화 탐험 순위
     $('#rankTamSeg').hidden = !tm; $$('#rankTamSeg [data-rth]').forEach(b => b.setAttribute('aria-checked', String((b.dataset.rth === '1') === th)));
-    $$('#rankView [data-rv]').forEach(b => b.setAttribute('aria-checked', String(b.dataset.rv === mode)));
-    const score = th ? tamHf() : tm ? tamTf() : sea ? S.rs.p : bm ? S.bt.pts : wk ? S.lg.pts : rankScore();
-    const R = th ? (Rank.hrows || []) : tm ? (Rank.trows || []) : tossRank() || (bm && !btOpen()) ? (sea ? (Rank.srows || []) : bm ? (Rank.brows || []) : wk ? Rank.wrows : Rank.rows) : rkFill(mode, sea ? (Rank.srows || []) : bm ? (Rank.brows || []) : wk ? Rank.wrows : Rank.rows, score), mine = R.findIndex(r => r.id === Rank.uid);   // 3.0.0 보조 줄
+    $$('#rankView [data-rv]').forEach(b => b.setAttribute('aria-checked', String(b.dataset.rv === (sea ? 'week' : cf ? 'all' : mode))));
+    $('#rankSchSeg').hidden = tossRank() || !(mode === 'all' || cf) || !(gradOn() || (S.pp && S.pp.n > 0)); $$('#rankSchSeg [data-rsc]').forEach(b => b.setAttribute('aria-checked', String(b.dataset.rsc === (cf ? 'conf' : 'all'))));   // 5.2.0 학교 안의 학교 파워와 학회   // 5.1.1.4 랭킹 네 칸: 리그 안에 이번 주와 시즌
+    $('#rankLgSeg').hidden = tossRank() || !(wk || sea); $$('#rankLgSeg [data-rlg]').forEach(b => b.setAttribute('aria-checked', String(b.dataset.rlg === (sea ? 'sea' : 'week'))));
+    const score = cf ? (S.pp ? S.pp.cf : 0) : th ? tamHf() : tm ? tamTf() : sea ? S.rs.p : bm ? S.bt.pts : wk ? S.lg.pts : rankScore();
+    const R = cf ? (Rank.crows || []) : th ? (Rank.hrows || []) : tm ? (Rank.trows || []) : tossRank() || (bm && !btOpen()) ? (sea ? (Rank.srows || []) : bm ? (Rank.brows || []) : wk ? Rank.wrows : Rank.rows) : rkFill(mode, sea ? (Rank.srows || []) : bm ? (Rank.brows || []) : wk ? Rank.wrows : Rank.rows, score), mine = R.findIndex(r => r.id === Rank.uid);   // 3.0.0 보조 줄
     if (wk && mine >= 0 && S.lg.pos !== mine + 1) { S.lg.pos = mine + 1; }
     if (sea && mine >= 0 && S.rs.pos !== mine + 1) { S.rs.pos = mine + 1; save(); }   // 2.1.3 시즌이 끝날 때 칭호를 정하는 순위
-    $('#rankScoreLab').textContent = th ? '이번 주 가장 높은 심화 층' : tm ? '이번 주 가장 높은 층' : sea ? '이번 시즌 점수' : bm ? '내 대결 점수' : wk ? '이번 주 리그 점수' : '내 학교 파워';
+    $('#rankScoreLab').textContent = cf ? '이번 학회 점수' : th ? '이번 주 가장 높은 심화 층' : tm ? '이번 주 가장 높은 층' : sea ? '이번 시즌 점수' : bm ? '내 대결 점수' : wk ? '이번 주 리그 점수' : '내 학교 파워';
     $('#rankScore').textContent = tm ? `${fmt(score)}층` : fmt(score);
     $('#rankPos').textContent = mine >= 0 ? `${mine + 1}위` : '-';
     const left = 7 - ((new Date(gameNow() + KST_MS).getUTCDay() + 6) % 7);   // 2.0.0 보안 점검(1-5): 한국 시간 요일
-    if (tm) {   // 4.3.0 탐험 순위
+    if (cf) {   // 5.2.0 학회 순위
+      $('#rankSub').textContent = `4주마다 새 학회가 열려요 (${ppLeft()}일 남음)`;
+      $('#rankLead').textContent = '논문으로 모은 학회 점수로 겨뤄요. 대학원 연구소에서 논문을 써요.'; $('#rankLead').hidden = false;
+    } else if (tm) {   // 4.3.0 탐험 순위
       $('#rankSub').textContent = `월요일에 새로 시작해요 (${left}일 남음)`;
       $('#rankLead').textContent = th ? '' : '이번 주에 탐험대가 오른 가장 높은 층으로 겨뤄요.'; $('#rankLead').hidden = th;
     } else if (sea) {   // 2.1.3 랭킹 시즌
@@ -15690,7 +16064,7 @@ body.mg-on .toast[hidden]{display:none}
     $('#rankSub').textContent = bm ? (btOpen() ? `${BT_LG[S.bt.lg].n} 리그, 오늘 남은 대결 ${btLeft()}판` : '숲속 대결은 초등학교 3학년부터 열려요') : wk ? `월요일에 새 리그가 시작돼요 (${left}일 남음). 리그에 참여하면 순위와 상관없이 황금 도토리 1개`
       : rankSchool(S.tier, yearNo(), semOn() ? S.sem : null) + (Rank.state === 'on' && R.length ? `, 랭킹에 ${R.length}명` : '');
     if (!tm) $('#rankLead').hidden = false;
-    if (!sea && !tm) $('#rankLead').textContent = bm ? '숲속 대결 점수로 겨뤄요. 메달은 가장 높이 오른 리그예요.' : wk ? '이번 주에 한 일로 겨뤄요. 미션 10, 미션 보너스 20, 학교 행사 15, 체험학습 10(1시간마다 +5), 종업식 20, 퀘스트 3점(퀘스트와 식은 합쳐서 하루 30점까지).'
+    if (!sea && !tm && !cf) $('#rankLead').textContent = bm ? '숲속 대결 점수로 겨뤄요. 메달은 가장 높이 오른 리그예요.' : wk ? '이번 주에 한 일로 겨뤄요. 미션 10, 미션 보너스 20, 학교 행사 15, 체험학습 10(1시간마다 +5), 종업식 20, 퀘스트 3점(퀘스트와 식은 합쳐서 하루 30점까지).'
       : '학교 파워로 순위를 매겨요.';
     // 참여하기와 이름 바꾸기
     const join = $('#rankJoin'), key = `${Rank.state}|${Rank.readOnly}|${S.rank.joined}|${S.rank.name}|${rt.rankEdit ? 1 : 0}|${Cloud.state}|${Cloud.err}|${nickPrice()}|${S.gold >= nickPrice()}`;
@@ -15727,7 +16101,7 @@ body.mg-on .toast[hidden]{display:none}
           `<button class="btn-sub rl-model" type="button" data-look="model">예시 학교 구경하기</button><p class="fine">랭킹의 학교 이름을 누르면 그 학교를 구경해요(보여 주기를 켠 학교만)</p>`; } }
     // 순위표: 이름은 다른 사람이 적은 글이라 textContent로만 넣어요
     const list = $('#rankList'), rows = Rank.state === 'on' ? R : [];
-    const lkey = mode + rows.map(r => `${r.id}:${r.score}:${r.lp}:${r.sp}:${r.bt}:${r.btm}:${r.tf}:${r.name}:${r.tier}:${r.year}:${r.test ? 1 : 0}:${r.title}`).join('|') + `|${Rank.uid}|${S.units}|${S.ach ? S.ach.title : ''}|${rt.isAdmin ? 1 : 0}|${rt.rkDel || ''}`;
+    const lkey = mode + rows.map(r => `${r.id}:${r.score}:${r.lp}:${r.sp}:${r.bt}:${r.btm}:${r.tf}:${r.cf}:${r.name}:${r.tier}:${r.year}:${r.test ? 1 : 0}:${r.title}`).join('|') + `|${Rank.uid}|${S.units}|${S.ach ? S.ach.title : ''}|${rt.isAdmin ? 1 : 0}|${rt.rkDel || ''}`;
     const canDel = !!(rt.isAdmin && Rank.be && Rank.be.removeOther && !Rank.readOnly);
     if (list.dataset.key !== lkey) {
       list.dataset.key = lkey;
@@ -15762,16 +16136,16 @@ body.mg-on .toast[hidden]{display:none}
         }
         const b = document.createElement('b');
         b.className = 'rk-score';
-        b.textContent = th ? `${fmt(r.hf)}층` : tm ? `${fmt(r.tf)}층` : fmt(sea ? r.sp : bm ? r.bt : wk ? r.lp : r.score);
+        b.textContent = cf ? `${fmt(r.cf)}점` : th ? `${fmt(r.hf)}층` : tm ? `${fmt(r.tf)}층` : fmt(sea ? r.sp : bm ? r.bt : wk ? r.lp : r.score);
         if (!r.nx) { li.dataset.look = r.id; li.dataset.who = r.name; li.classList.add('can-look'); }   // 2.1.3 누르면 그 학교 구경(3.0.0 보조 줄은 구경 안 돼요)
         li.append(no, txt, b);
-        li.setAttribute('aria-label', `${i + 1}위 ${r.name}, ${rankSchool(r.tier, r.year, r.sem)}, ${th ? '심화 탐험 가장 높은 층' : tm ? '탐험 가장 높은 층' : bm ? `대결 점수, ${BT_LG[Math.max(0, Math.min(5, r.btm | 0))].n} 리그` : wk ? '리그 점수' : '학교 파워'} ${fmt(th ? r.hf : tm ? r.tf : bm ? r.bt : wk ? r.lp : r.score)}`);
+        li.setAttribute('aria-label', `${i + 1}위 ${r.name}, ${rankSchool(r.tier, r.year, r.sem)}, ${cf ? '학회 점수' : th ? '심화 탐험 가장 높은 층' : tm ? '탐험 가장 높은 층' : bm ? `대결 점수, ${BT_LG[Math.max(0, Math.min(5, r.btm | 0))].n} 리그` : wk ? '리그 점수' : '학교 파워'} ${fmt(th ? r.hf : tm ? r.tf : bm ? r.bt : wk ? r.lp : r.score)}`);
         list.appendChild(li);
       });
     }
     const empty = $('#rankEmpty');
     empty.hidden = tossRank() || !(Rank.state === 'on' && rows.length === 0);
-    if (!empty.hidden) empty.textContent = th ? (Rank.noTamH ? '심화 탐험 순위는 서버 준비 중이에요.' : '아직 이번 주 심화 탐험 순위에 오른 학교가 없어요.') : tm ? (Rank.noTam ? '탐험 순위는 서버 준비 중이에요. 탐험 기록은 지금도 모이고 있어요.' : '아직 이번 주 탐험 순위에 오른 학교가 없어요. 탐험대를 보내 첫 번째가 되어 보세요!') : sea ? (Rank.noSk ? '시즌 순위는 서버 준비 중이에요. 시즌 점수는 지금도 모이고 있어요.' : '아직 이번 시즌 순위에 오른 학교가 없어요. 주간 리그 점수를 모아 첫 번째가 되어 보세요!') : bm ? '아직 대결 순위에 오른 학교가 없어요. 숲속 대결에서 첫 번째가 되어 보세요!' : '아직 랭킹에 이름을 올린 교장 선생님이 없어요. 첫 번째가 되어 보세요!';
+    if (!empty.hidden) empty.textContent = cf ? (Rank.noConf ? '학회 순위는 서버 준비 중이에요. 학회 점수는 지금도 모이고 있어요.' : '아직 이번 학회 순위에 오른 학교가 없어요.') : th ? (Rank.noTamH ? '심화 탐험 순위는 서버 준비 중이에요.' : '아직 이번 주 심화 탐험 순위에 오른 학교가 없어요.') : tm ? (Rank.noTam ? '탐험 순위는 서버 준비 중이에요. 탐험 기록은 지금도 모이고 있어요.' : '아직 이번 주 탐험 순위에 오른 학교가 없어요. 탐험대를 보내 첫 번째가 되어 보세요!') : sea ? (Rank.noSk ? '시즌 순위는 서버 준비 중이에요. 시즌 점수는 지금도 모이고 있어요.' : '아직 이번 시즌 순위에 오른 학교가 없어요. 주간 리그 점수를 모아 첫 번째가 되어 보세요!') : bm ? '아직 대결 순위에 오른 학교가 없어요. 숲속 대결에서 첫 번째가 되어 보세요!' : '아직 랭킹에 이름을 올린 교장 선생님이 없어요. 첫 번째가 되어 보세요!';
   }
 
   /* ---------- 황금 도토리와 꾸미기 상점 ----------
@@ -15989,11 +16363,12 @@ body.mg-on .toast[hidden]{display:none}
       if (roof) roof.style.display = t ? '' : 'none';
       if (!t) continue;
       // 1.6.0: 겨울 테마 운동장은 트랙을 하늘색으로 칠하거나 고드름을 달지 않아요(얼음판처럼 보여 어색해요). 사도 운동장은 원래 모습이에요
-      if (slot === 'playground' && t.id === 'winter') { if (roof) roof.style.display = 'none'; continue; }
+      const thr = !!thrKey(slot);   // 5.1.1.4 새로 그린 테마 지붕: 처마 띠는 끄고(지붕 그림에 장식이 있어요), 겨울 운동장도 켜요
+      if (slot === 'playground' && t.id === 'winter' && !thr) { if (roof) roof.style.display = 'none'; continue; }
       if (roof) $(`#rt-${slot} feFlood`).setAttribute('flood-color', slot === 'playground' && S.tier >= 1 ? t.play['--track'] : t.bld['--roof']);
       const vars = slot === 'library' ? t.lib : slot === 'playground' ? Object.assign({}, t.bld, t.play) : t.bld;
       for (const [k, v] of Object.entries(vars)) g.style.setProperty(k, v);
-      deco.innerHTML = thMotif(t, ...thEaves(slot));
+      deco.innerHTML = thr ? '' : thMotif(t, ...thEaves(slot));
     }
     rt.thBonus = thSetsDone();
     renderNight(true);   // 2.1.0 밤 모드
@@ -16326,8 +16701,9 @@ body.mg-on .toast[hidden]{display:none}
   function tamHWeek() { const w = gameWeek(); if (S.tam.hw.w !== w) S.tam.hw = { w, best: 0 }; }
   // 4.3.3 심화 탐험에서 이긴 층: 도토리, 정수, 황금 도토리는 없고 재료(일반의 1.5배)와 별 조각(숫자는 제안)
   function tamWinH(fl) {
-    const R = tamReg(fl), got = [], add = (i, v) => { S.tam.mat[i] = Math.min(1e12, S.tam.mat[i] + v); };
+    const R = tamReg(fl), got = [], add = (i, v) => { S.tam.mat[i] = Math.min(1e12, S.tam.mat[i] + v); }, first = fl > S.tam.hb;
     S.tam.hb = Math.max(S.tam.hb, fl);
+    if (first && fl % TAM.bossEvery === 0 && ppData(PP.dat.boss)) got.push(`연구 자료 +${PP.dat.boss}`);   // 5.2.0 심화 큰 장난꾸러기 처음 넘기
     tamHWeek(); if (fl > S.tam.hw.best) { S.tam.hw.best = fl; rankDirty(); }
     add(R.mat, Math.round(TAM.hMat * (2 + Math.floor((S.tam.hc + fl) / 40)))); if (fl % 5 === 0) add(3, 1);
     if (fl % TAM.bossEvery === 0) { const ps = tamParty(); if (tamStarOn() && ps.length) { const sp = ps[Math.floor(Math.random() * ps.length)]; tamShard(sp, 1); got.push(`${spName(sp)} 별 조각 +1`); } else { add(3, 2); got.push(`${TAM.mats[3]} +2`); } }
@@ -24131,7 +24507,32 @@ body.mg-on .toast[hidden]{display:none}
     { id: 'acorn', nm: '잃어버린 도토리', who: 'squirrel', n: 4, ok: () => (S.t.squirrel || 0) >= 10, title: '보물찾기 대장' },
     { id: 'sloth', nm: '나무늘보의 달리기', who: 'sloth', n: 4, ok: () => uniNow() && !!S.dex.got.sloth, title: '끝까지 응원단' },
     { id: 'mole', nm: '두더지의 별자리', who: 'mole', n: 4, ok: () => !!S.dex.got.mole && (S.f.science || 0) >= 1, title: '별자리 지기' },
-    { id: 'deer', nm: '고라니의 그림', who: 'waterdeer', n: 3, ok: () => !!S.dex.got.waterdeer, title: '복도 미술관장' }];
+    { id: 'deer', nm: '고라니의 그림', who: 'waterdeer', n: 3, ok: () => !!S.dex.got.waterdeer, title: '복도 미술관장' },
+    { id: 'alumni', nm: '졸업생 후일담', who: 'hedgehog', n: 3, ok: () => S.tier >= GRAD_TIER && S.tg >= TIERS[GRAD_TIER].years, title: '숲속 동물 학교 교장' }];   // 5.2.0 박사 학위를 받은 뒤(설계안 6절, 글은 본부 초안)
+  // 5.2.0 졸업생 후일담: 진로 도감에서 먼저 이룬 졸업생 셋을 찾아가요(모자라면 솜이). 글은 그때 저장을 보고 만들어요
+  function alumniLines() {
+    const done = (S && S.cs && S.cs.done) || {}, pick = Object.keys(done).filter(k => JOBS.some(J => J.k === k)).slice(0, 3).map(k => ({ nm: done[k].nm, w: DEX_STUDENTS.includes(done[k].sp) ? done[k].sp : 'rabbit', job: JOBS.find(J => J.k === k).name }));
+    while (pick.length < 3) pick.push({ nm: '솜이', w: 'somi', job: '선생님' });
+    const [A, B, C] = pick, ro = w => { const c = w.charCodeAt(w.length - 1) - 0xAC00; return w + (c >= 0 && c < 11172 && c % 28 && c % 28 !== 8 ? '으로' : '로'); };
+    return [
+      [{ t: '박사 학위수여식이 끝난 다음 날, 교문 우편함에 편지 세 통이 꽂혀 있어요.' },
+       { w: 'hedgehog', t: '교장 선생님, 졸업생들이 보낸 편지예요. 하나씩 찾아가 볼까요?' },
+       { t: `첫 편지는 ${A.nm}에게서 왔어요. 지금은 ${iga(A.job)} 되었대요.` },
+       { w: A.w, t: '교장 선생님! 유치원 교문에서 처음 인사하던 날이 아직도 생생해요.' },
+       { w: A.w, t: `이제는 제가 ${ro(A.job)} 일하면서 처음 온 친구들을 맞이해요. 그때 선생님들이 하던 말을 똑같이 하고 있더라고요.` },
+       { w: 'hedgehog', t: '종을 쳐 온 보람이 있네요. 우리 학교 종소리가 마을까지 들린다니까요.' }],
+      [{ t: `둘째 편지를 따라 마을 일터에 왔어요. ${iga(B.nm)} 바쁘게 일하고 있어요.` },
+       { w: B.w, t: '어, 교장 선생님이 여기까지 오셨어요?' },
+       { w: B.w, t: `진로 상담 때 ${iga(B.job)} 되고 싶다고 했잖아요. 그때는 저도 반쯤 농담이었어요.` },
+       { w: 'hedgehog', t: '농담이 아니었던 걸, 상담실 코끼리 선생님은 알고 계셨지요.' },
+       { w: B.w, t: '힘들 때마다 학교 텃밭이랑 도서관 생각이 나요. 다음에 후배들 데리고 꼭 놀러 갈게요.' }],
+      [{ t: '저녁 무렵, 셋째 편지에 적힌 대로 큰 참나무 아래로 가요.' },
+       { t: `${C.nm}, 그리고 다른 졸업생들이 참나무 둘레에 모여 있어요. 모두 손에 작은 나무패를 들고 있어요.` },
+       { w: C.w, t: `저는 ${iga(C.job)} 됐어요. 그리고 오늘은 다 같이 드릴 게 있어서 모였어요.` },
+       { w: C.w, t: "나무패에는 '숲속 동물 학교 교장 선생님께'라고 새겼어요. 첫 졸업생 일동 나무패처럼요." },
+       { w: 'hedgehog', t: '문 닫을 날을 받아 두었던 학교였는데. 이제 졸업생이 이렇게 많아요.' },
+       { t: '참나무 잎이 바람에 흔들려요. 잎 하나하나가 졸업생 이름처럼 반짝여요.' }]];
+  }
   // 곁가지 글(woodani 확인 2026-11-11 밤, 프로젝트 문서 '이야기 글 초안 4'): 화마다 줄 목록
   const ST_SIDE = {
     nap: [
@@ -24285,6 +24686,7 @@ body.mg-on .toast[hidden]{display:none}
        { w: 'peacock', t: '그런데 첫 그림은 누가 걸었을까요? 액자가 제 것이랑 똑같긴 한데, 저는 모르는 일이에요.' },
        { t: '공작 선생님이 꼬리를 펴고 지나가요. 꼬리 끝에 물감이 묻어 있어요.' }]]
   };
+  Object.defineProperty(ST_SIDE, 'alumni', { get: alumniLines, enumerable: true });   // 5.2.0 졸업생 후일담
   const SIDE_ESS = 2, SIDE_DAY = 2;
   const ST_TITLES = SIDE.map(x => ({ id: 'st_' + x.id, title: x.title }));
   const stTitleGot = (t, sto) => { sto = sto || (S && S.sto); const X = SIDE.find(x => 'st_' + x.id === t.id); return !!X && !!sto && !!sto.side && ((sto.side[X.id] || {}).n || 0) >= X.n; };   // 5.0.3.1 저장 읽기에서도 써요
@@ -25192,7 +25594,7 @@ body.mg-on .toast[hidden]{display:none}
     addDip(dip);
     S.hd.album = false;
     rt.yearRec = facKeys().filter(k => S.f[k] > 0).map(k => `${FAC[k].name} Lv.${S.f[k]}`).join(', ') + `, 학생 ${Math.floor(S.students)}명`;
-    S.st.grads += 1; S.st.sems = (S.st.sems || 0) + 1; repMark();
+    S.st.grads += 1; S.st.sems = (S.st.sems || 0) + 1; repMark(); ppSemDone();   // 5.2.0 대학원 세미나 횟수와 연구 자료
     S.sem = 1; S.semDip = (S.semDip || 0) + dip;   // 2.1.0 종업식 수료증에서 뺄 몫
     addLeague(Math.round(LP.grad / 2), true);
     cloudSoon();
@@ -25236,7 +25638,7 @@ body.mg-on .toast[hidden]{display:none}
     addDip(dip);
     S.hd.album = false;
     rt.yearRec = facKeys().filter(k => S.f[k] > 0).map(k => `${FAC[k].name} Lv.${S.f[k]}`).join(', ') + `, 학생 ${Math.floor(S.students)}명`;
-    S.st.grads += 1; S.tg += 1; S.sem = 0; S.semDip = 0; repMark();
+    S.st.grads += 1; S.tg += 1; S.sem = 0; S.semDip = 0; repMark(); ppSemDone();   // 5.2.0
     if (S.dp) S.dp.free = 1;   // 4.0.0 종업식 뒤 단과대학 바꾸기 한 번은 공짜
     albAdd('y', { y: S.tg, st: leaving, dip, ph: albPh, el: albEl });   // 2.1.1 졸업 앨범 한 쪽
     addLeague(LP.grad, true);
@@ -25631,6 +26033,7 @@ body.mg-on .toast[hidden]{display:none}
       case 'star': return rosterOn() && S.roster.list.length ? Math.max(...S.roster.list.map(s => Math.max(...s.a.map(star)))) : 0;
       case 'clubShown': return S.club.shown.reduce((a, b) => a + b, 0);
       case 'fpUp': return Math.max(0, S.st.fperks - (S.tfp || 0));   // 2.0.0 이 학교급에 와서 장학재단을 고친 횟수(퀘스트 전에 고쳤어도 쳐요)
+      case 'pp': return !S.pp ? 0 : q.k === 'n' ? S.pp.n : q.k === 'cb' ? Math.max(S.pp.cb, S.pp.cf) : q.k === 'deep' ? rtLv(q.b) : S.pp.sem;   // 5.2.0 논문 편수, 가장 높은 학회 점수, 심화 칸, 세미나 횟수
       case 'ta': return !S.ta ? 0 : q.k === 'seat' ? S.ta.seat.filter(x => x && x.b).length : q.k === 'trip' ? S.ta.n : S.ta.mon;   // 5.1.0 조교 자리, 파견 횟수, 기념비 단계
       case 'xt': return xtLv(q.k);   // 1.8.0 영양, 사서 선생님 연수 레벨
       case 'vp': return vpLv();   // 1.8.0 교감 선생님 연수 레벨
@@ -25788,6 +26191,7 @@ body.mg-on .toast[hidden]{display:none}
       case 'mgOrders': return `합치기 주문 ${q.n}개 채우기`;
       case 'pz': return q.n === 1 ? '숲속 퍼즐 한 판 끝내기' : `숲속 퍼즐 ${q.n}판 끝내기`;
       case 'ta': return q.title || '';
+      case 'pp': return q.title || '';
       case 'xt': return `${XT[q.k].name} Lv.${q.n}`;
       case 'vp': return `${VP.name} Lv.${q.n}`;
       case 'deco': return `지도에 장식 ${q.n}개 놓기`;
@@ -26323,6 +26727,7 @@ body.mg-on .toast[hidden]{display:none}
       case 'psGot': rt.evSeg = 'ps'; return setTab('event');   // 2.1.3
       // 1.8.0 보강 퀘스트
       case 'ta': if (!rtOpen()) return toast('연구 구역 연구소를 지으면 열려요'); rt.rxTab = 'ta'; return openRx();   // 5.1.0
+      case 'pp': if (!rtOpen()) return toast('연구 구역 연구소를 지으면 열려요'); rt.rxTab = q.k === 'deep' ? 'tree' : 'paper'; if (q.k === 'deep') rt.rtSel = q.b; return openRx();   // 5.2.0
       case 'xt': return xtHere(q.k) ? goTeacher(q.k) : goFac(XT[q.k].fac, `${eul(FAC[XT[q.k].fac].name)} 지으면 오셔요`);
       case 'vp': return goTeacher('vp');
       case 'bxSeen': case 'bxKinds': if (bxOpen()) { if (S.bx.sp.length) { setTab('school'); return toast('지도에서 흔들리는 풀숲이나 물가를 눌러 봐요'); } return toast(`지금은 숨은 생물이 없어요. ${hm(Math.max(60, Math.ceil((S.bx.next - gameNow()) / 1000)))} 뒤에 새 생물이 숨어요`); } return toast('생물 탐사는 초등학교부터 열려요');   // 2.2.0
@@ -26734,7 +27139,9 @@ body.mg-on .toast[hidden]{display:none}
       S.units = b.dataset.units; save(); syncSettingsUI(); refreshNumbers();
       toast(S.units === 'en' ? '큰 숫자를 K, M, B로 줄여 써요' : '큰 숫자를 만, 억, 조로 줄여 써요');
     });
-    $('#rankView').addEventListener('click', e => { const b = e.target.closest('[data-rv]'); if (!b) return; rt.rankView = b.dataset.rv; sfx('tap'); renderRankPanel(); });
+    $('#rankView').addEventListener('click', e => { const b = e.target.closest('[data-rv]'); if (!b) return; rt.rankView = b.dataset.rv === 'week' ? (rt.rkLg || 'week') : b.dataset.rv === 'all' ? (rt.rkSch || 'all') : b.dataset.rv; sfx('tap'); renderRankPanel(); });
+    $('#rankSchSeg').addEventListener('click', e => { const b = e.target.closest('[data-rsc]'); if (!b) return; rt.rankView = rt.rkSch = b.dataset.rsc === 'conf' ? 'conf' : 'all'; sfx('tap'); renderRankPanel(); });   // 5.2.0 학교 안의 학교 파워와 학회
+    $('#rankLgSeg').addEventListener('click', e => { const b = e.target.closest('[data-rlg]'); if (!b) return; rt.rankView = rt.rkLg = b.dataset.rlg === 'sea' ? 'sea' : 'week'; sfx('tap'); renderRankPanel(); });   // 5.1.1.4 리그 안의 이번 주와 시즌
     $('#rankTamSeg').addEventListener('click', e => { const b = e.target.closest('[data-rth]'); if (!b) return; rt.rkH = b.dataset.rth === '1' ? 1 : 0; sfx('tap'); renderRankPanel(); });   // 4.3.3
     $('#rankLook').addEventListener('click', e => { const b = e.target.closest('[data-look]'); if (b) openLook(b.dataset.look); });   // 2.1.3 예시 학교
     $('#rankLook').addEventListener('change', e => { if (e.target.id === 'lookOn') lookSet(e.target.checked); });
@@ -27309,7 +27716,9 @@ body.mg-on .toast[hidden]{display:none}
     $('#sheetDept').addEventListener('click', () => viaSheet(openDept));   // 4.0.0
     $('#sheetRx').addEventListener('click', () => viaSheet(openRx));   // 5.0.0
     $('#rxSeg').addEventListener('click', e => { const b = e.target.closest('[data-rseg]'); if (!b) return; rt.rxTab = b.dataset.rseg; sfx('tap'); renderRx(); });
-    $('#rxBody').addEventListener('click', e => { const b = e.target.closest('[data-rt],[data-dp^="rx:"],[data-ta]'); if (!b) return;
+    $('#rxBody').addEventListener('click', e => { const b = e.target.closest('[data-rt],[data-rts],[data-pp],[data-dp^="rx:"],[data-ta]'); if (!b) return;
+      if (b.dataset.pp) { const v = b.dataset.pp; if (v === 'day') ppDay(); else if (v.startsWith('w:')) ppWrite(v.slice(2)); renderRx(); return; }   // 5.2.0 논문
+      if (b.dataset.rts) { rt.rtSel = b.dataset.rts; sfx('tap'); renderRx(); return; }   // 5.1.1.4 연구 나무 칸 고르기
       if (b.dataset.ta) { const [a, x, y, z] = b.dataset.ta.split(':'); const i = +x;   // 5.1.0 조교
         if (a === 'pick') { rt.taPick = rt.taPick === i ? -1 : i; rt.taGo = -1; sfx('tap'); }
         else if (a === 'go') { rt.taGo = rt.taGo === i ? -1 : i; rt.taPick = -1; sfx('tap'); }
@@ -28425,6 +28834,7 @@ body.mg-on .toast[hidden]{display:none}
   // loop()에서 매 프레임 불러요. 1초마다 도감 기록과 이벤트 회차를 맞추고 버튼 점을 갱신해요
   function tick170(dt) {
     rtTick();   // 5.0.0 연구 트리 연구 시간
+    ppTick();   // 5.2.0 논문 쓰기와 학회
     rt.t170 = (rt.t170 || 0) + dt;
     if (rt.t170 < 1) return;
     rt.t170 = 0;
@@ -28563,8 +28973,8 @@ body.mg-on .toast[hidden]{display:none}
   const achClaimable = () => !!S && !!S.ach && ACH.some(a => achGot(a.id) < achHit(a.id));
   // 2.1.2 업적 말고 받는 칭호(마을 기부 3단계, 8단계)
   const xtGot = t => !!S && (t.got ? !!t.got(S) : (!!S.vd && S.vd.lv >= t.lv));   // 2.1.3 got(저장)으로 재는 칭호도(숲속 패스, 반짝 친구, 랭킹 시즌)
-  const achTitles = () => [...ACH.filter(a => achGot(a.id) >= ACH_N), ...VD.titles.filter(xtGot), ...ST_TITLES.filter(t => stTitleGot(t))];   // 4.1.0 곁가지 이야기 칭호
-  const achTitleName = id => { const a = achById(id) || VD.titles.find(t => t.id === id) || ST_TITLES.find(t => t.id === id); return a ? a.title : ''; };
+  const achTitles = () => [...ACH.filter(a => achGot(a.id) >= ACH_N), ...VD.titles.filter(xtGot), ...ST_TITLES.filter(t => stTitleGot(t)), ...PP_TITLES.filter(t => !!S && t.got(S))];   // 5.2.0 논문과 학회 칭호   // 4.1.0 곁가지 이야기 칭호
+  const achTitleName = id => { const a = achById(id) || VD.titles.find(t => t.id === id) || ST_TITLES.find(t => t.id === id) || PP_TITLES.find(t => t.id === id); return a ? a.title : ''; };
   const achVal = a => { try { return Number(a.v()) || 0; } catch (e) { return 0; } };
   // 1초마다 이룬 등급을 기록해요. 새로 이루면 알려 줘요(보상은 업적 화면에서 받아요)
   function achSync(quiet) {
@@ -28612,7 +29022,7 @@ body.mg-on .toast[hidden]{display:none}
     return ids.length;
   }
   function setTitle(id) {
-    if (id && achGot(id) < ACH_N && !VD.titles.some(t => t.id === id && xtGot(t)) && !ST_TITLES.some(t => t.id === id && stTitleGot(t))) return false;   // 5.0.3.1 곁가지 이야기 칭호도 달 수 있게
+    if (id && achGot(id) < ACH_N && !VD.titles.some(t => t.id === id && xtGot(t)) && !ST_TITLES.some(t => t.id === id && stTitleGot(t)) && !PP_TITLES.some(t => t.id === id && t.got(S))) return false;   // 5.0.3.1 곁가지 이야기 칭호도 달 수 있게
     S.ach.title = S.ach.title === id ? '' : id;
     toast(S.ach.title ? `칭호 "${achTitleName(S.ach.title)}"를 달았어요` : '칭호를 뗐어요');
     rankDirty(); save(); renderAch(true); renderHudTitle();
@@ -29710,7 +30120,7 @@ body.mg-on .toast[hidden]{display:none}
     fmt, fmt2, graduate, promote, buyPerk, perkCost, perkMaxed, buyFundPerk, fpCost, claimMain, mainReady, curMain, qNo, earn, CFG, TEA, teaMaxed, PERKS, FPERKS, MAIN, finalYear, startTrip, claimTrip, TRIPS, yearLocked, endSports, rtSports: () => rt.sports, rtFest: () => rt.fest, facCap, addLeague, addMP, tutStart, endFest, claimBox, musicWant, askBox, festWait, setTab,
     RARE, modelOf, rareRoll, rareGot, showRareTalk, rareDexHTML, kidSVG, rosterKid, WX, wxOf, wxIs, rdMinNow, renderWeather, PL, plSync, plUnread, openPLetter, renderPLetter, RS, rsNum, rsSync, rsAdd, rsLabel, lookDoc, lookRead, lookPush, lookSet, openLook, MODEL_SCHOOL, joinRank, PS, PS_M, PS_SEASONS, psSeason, psOpen, psSync, psLv, psGot, psReward, psClaimAll, psClaimMission, psWatchAd, psClaimable, psStepReady, psExtraReady, psChooseFur, psFurImg, renderPass, setEvSeg, xtGot, achTitles,   // 2.1.3 숲속 패스
     MAP_OAK, oakArt, layoutOak, mapOak, oakAt, tapOak, dropSpot,
-    dexMeet, dexSync, dexPending, dexGift, renderDex, evCurrent, evNext, evUpcoming, evSync, evFix, evVal, EV_FALLBACK, EV_DECO, EV_HAT, COS, DECO_BY, decoOwn, perkRec, fpRec, BOOST_ALL, buyShop, pickShop, showNote, showOkOn, showWd, renderGradPanel, renderShop, renderDecoShop, EV_WEEKLY, EV_WEEK_BASE, weekMon, claimStamp, claimEvMission, claimEvBox, renderEvent, evMissions, evOk, evSkipped, EV_MONTHS, EV_MEASURE, tierMinutes, minAcorns, IMG, sanitize171, ACH, achSync, claimAch, setTitle, renderAch, setDexSeg, achClaimable, XT, xtAct, xtCost, xtLv, feastMins, libMult, propInstances, walkBuild, festItemSvg, guestArt, adErrText, googleErrText, openSheet, closeSheet, startFest, startSports, sanitize170, EV_STAMPS, EV_SPECIAL, EV_MONTHLY, EV_BOX, DEX_KEYS, DEX_REWARD, DEX_GUEST_KEYS, seasonKey, roofArtKey, oakKey, setSeasonArt, VP, vpLv, vpCost, vpMult, vpAct, renderVpCard, sportsPrize, festPrize, renderTeachers, buildTeacherCards, bldImg, roofKey, bldStage, mapKey, setMapArt, applyThemes, buyFacility, bldFx, setBldFx, mapHi, Live, liveApply, liveLoad, liveOff, LIVE_KEYS, EVC, NOTICES, openNotice, noticeAuto, noticeWant, ntUnread, startTrial, endTrial: () => rt.trial && (rt.trial.left = 0), spawnDeal, startVisit, IMG170, MG, mgCells, mgSetCells, mgTick, mgAddEnergy, mgAddUp, mgTapGen, mgDrop, mgSell, mgUpgrade, mgAddUp, mgUpSwap, mgGensMax, MG_UP_ESS, mgClaimOrder, mgSwapOrder, mgOrderOk, mgFillOrders, mgOpen, mgClose, mgRenderAll, mgSpawnLevel, mgNearestEmpty, mgEmptyBoard, mgOrderReward, mgUI, sanitize180, mgWatchAd, mgNewOrder, mgHintPick, mgShowHint, mgClearHint, mgTouch, mgOrderGuide, mgDexN, mgDexCan, mgDexClaim, mgOpenDex, MG_DEX, MG_DEX_MS, mgDexEss, mgDexEssCan, mgDexEssN, mgDexMsCan, mgDexMsClaim, MGB, mgBuyBoost, mgBstLeft, mgOpenBoost, nice, claimMission, claimBonus, claimWeekMission, MP_BOX, swapDaily, repairMissions, MISSIONS, WMISSIONS, dmDay, wkWeek,   // 1.7.0 도감, 이벤트
+    dexMeet, dexSync, dexPending, dexGift, renderDex, evCurrent, evNext, evUpcoming, evSync, evFix, evVal, EV_FALLBACK, EV_DECO, EV_HAT, COS, DECO_BY, decoOwn, perkRec, fpRec, BOOST_ALL, buyShop, pickShop, showNote, showOkOn, showWd, renderGradPanel, renderShop, renderDecoShop, EV_WEEKLY, EV_WEEK_BASE, weekMon, claimStamp, claimEvMission, claimEvBox, renderEvent, evMissions, evOk, evSkipped, EV_MONTHS, EV_MEASURE, tierMinutes, minAcorns, IMG, sanitize171, ACH, achSync, claimAch, setTitle, renderAch, setDexSeg, achClaimable, XT, xtAct, xtCost, xtLv, feastMins, libMult, propInstances, walkBuild, festItemSvg, guestArt, adErrText, googleErrText, openSheet, closeSheet, startFest, startSports, sanitize170, EV_STAMPS, EV_SPECIAL, EV_MONTHLY, EV_BOX, DEX_KEYS, DEX_REWARD, DEX_GUEST_KEYS, seasonKey, roofArtKey, thrKey, PP, PP_TITLES, ppOpen, ppPer, ppData, ppDay, ppWrite, ppTick, ppSync, ppScore, ppSemDone, rtMax, alumniLines, SIDE, vdReward, oakKey, setSeasonArt, VP, vpLv, vpCost, vpMult, vpAct, renderVpCard, sportsPrize, festPrize, renderTeachers, buildTeacherCards, bldImg, roofKey, bldStage, mapKey, setMapArt, applyThemes, buyFacility, bldFx, setBldFx, mapHi, Live, liveApply, liveLoad, liveOff, LIVE_KEYS, EVC, NOTICES, openNotice, noticeAuto, noticeWant, ntUnread, startTrial, endTrial: () => rt.trial && (rt.trial.left = 0), spawnDeal, startVisit, IMG170, MG, mgCells, mgSetCells, mgTick, mgAddEnergy, mgAddUp, mgTapGen, mgDrop, mgSell, mgUpgrade, mgAddUp, mgUpSwap, mgGensMax, MG_UP_ESS, mgClaimOrder, mgSwapOrder, mgOrderOk, mgFillOrders, mgOpen, mgClose, mgRenderAll, mgSpawnLevel, mgNearestEmpty, mgEmptyBoard, mgOrderReward, mgUI, sanitize180, mgWatchAd, mgNewOrder, mgHintPick, mgShowHint, mgClearHint, mgTouch, mgOrderGuide, mgDexN, mgDexCan, mgDexClaim, mgOpenDex, MG_DEX, MG_DEX_MS, mgDexEss, mgDexEssCan, mgDexEssN, mgDexMsCan, mgDexMsClaim, MGB, mgBuyBoost, mgBstLeft, mgOpenBoost, nice, claimMission, claimBonus, claimWeekMission, MP_BOX, swapDaily, repairMissions, MISSIONS, WMISSIONS, dmDay, wkWeek,   // 1.7.0 도감, 이벤트
     PZ, PZ_SHAPES, pzFits, pzAnyFit, pzStuck, pzFullLines, pzPlace, pzFreshGame, pzStart, PZB, pzbCost, pzApplyBoost, pzBoostOpen, pzBoostGo, festGoldLeft, festGoldTake, claimSports, TR2, TR2_PL, openTr2, tr2Act, tr2Away, tr2Ready, tr2Rsv, tr2Tick, renderAlbum, FEST, FEST_IDS, festNight, festShown, festTimeLock, festOpen, startFest, openFest, endFest, renderStreet, pzFinish, pzLeft, pzCanAd, pzEssOf, pzMinOf, pzHelpSquirrel, pzHelpOwl, pzHelpBear, fillSubs, mapRoofTop, showAd, claimOfflineDouble, startBoost, tripAd, festFocus, festRange, visMap, renderMissions, pzHasHelp, pzRot, pzNewPiece, pzOpen, pzClose, pzGameOver, pzRenderAll, renderMini, addEss, ESHOP, SP_FUR, applyCos, essItem, pickEss, buyEss, renderEssShop, hatSVG, spFurImg, gameNow, gameToday, gameWeek, kstDay, setServerTime, SVR, dmDay, weekIdx, lgWeek, wkWeek, lgKey, pzDay, goldDay, boostLeft, dealLeft, canStamp };
   if (window.__FOREST_TEST) Object.assign(window.__forest, { uniTerm, utSync, tripUseTicket, readUseTicket, picnicUseTicket, buyDecoPieces, adGold, claimBonus, cloudPush, cloudClash, syncGet, revOf, deleteAccount, lookDel: () => lookDelNow(), lookSet, lookPush, leaveRank, sanitizeCg, freshCg });   // 시험 손잡이
   if (window.claude && window.claude.hot && window.claude.hot.snapshot) {

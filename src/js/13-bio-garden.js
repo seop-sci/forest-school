@@ -448,7 +448,7 @@
     const [x0, y0, x1, y1] = VD_BOX[Math.min(VD.art, Math.max(0, lv))], side = Math.max(x1 - x0, y1 - y0) * 1.08, cx = (x0 + x1) / 2, cy = (y0 + y1) / 2;
     return `<svg viewBox="${(cx - side / 2).toFixed(0)} ${(cy - side / 2).toFixed(0)} ${side.toFixed(0)} ${side.toFixed(0)}" width="${px}" height="${px}" aria-hidden="true"><image href="${u}" width="512" height="512"/></svg>`;
   }
-  const vdReward = lv => lv <= VD.art ? { e: VD.ess * lv, g: 0 } : { e: 0, g: lv % VD.goldEvery === 0 ? 1 : 0 };
+  const vdReward = lv => lv <= VD.art ? { e: VD.ess * lv, g: 0 } : { e: VD.ess, g: lv % VD.goldEvery === 0 ? 1 : 0 };   // 5.2.0 9단계부터 단계마다 숲의 정수 5(5단계마다 황금 도토리는 그대로)
   const vdAmt = k => { const need = vdNeed(), left = vdLeft(); return k === 'left' ? left : Math.min(left, Math.ceil(need * k)); };
   // 기부: k는 0.1, 0.5, 'left'(다음 단계까지 남은 만큼), 'all'(가진 만큼, 모자랄 때). 이번 단계를 넘겨서 내지는 않아요
   function vdGive(k) {
@@ -492,7 +492,7 @@
     $('#vdFill').style.width = pct + '%'; $('#vdPct').textContent = `${pct}%`; $('#vdBar').setAttribute('aria-valuenow', pct);
     const r = vdReward(lv + 1), tt = VD.titles.find(t => t.lv === lv + 1) || (lv + 1 === 20 ? { title: achTitleName('donate') } : null);
     const rw = [r.e ? `숲의 정수 ${r.e}` : '', r.g ? `황금 도토리 ${r.g}` : '', tt ? `칭호 "${tt.title}"` : ''].filter(Boolean).join(', ');
-    $('#vdLead').textContent = `${lv + 1}단계까지 도토리 ${fmt(left)}개가 더 필요해요\n${rw ? `${lv + 1}단계 보상: ${rw}` : `${lv + 1 > VD.art ? `${VD.goldEvery}단계마다 황금 도토리를 받아요` : ''}`}`;
+    $('#vdLead').textContent = `${lv + 1}단계까지 도토리 ${fmt(left)}개가 더 필요해요\n${rw ? `${lv + 1}단계 보상: ${rw}` : `${lv + 1 > VD.art ? `단계마다 숲의 정수 ${VD.ess}, ${VD.goldEvery}단계마다 황금 도토리를 받아요` : ''}`}`;
     const b = (k, nm, a) => `<button type="button" data-vdk="${k}" aria-disabled="${S.budget >= a ? 'false' : 'true'}"><span>${nm}</span><em>${acornIcon()}${fmt(a)}</em></button>`;
     $('#vdBtns').innerHTML = short && S.budget >= 1 ? b('all', '있는 만큼', Math.min(left, Math.floor(S.budget))) : b('0.1', '10%', a1) + b('0.5', '50%', a5) + b('left', '남은 만큼', left);
     $('#vdSum').textContent = `지금까지 기부한 도토리 ${fmt(S.vd.sum)}개\n단계가 오르면 지도에 기념물이 서요. 수입은 늘지 않아요. 졸업해도 남아요`;

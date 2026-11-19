@@ -59,6 +59,7 @@
       listenSea: (ok, no) => col.orderBy('sp', 'desc').limit(RANK_MAX).onSnapshot(snap => ok(snap.docs.map(d => [d.id, d.data()])), no),   // 2.1.3 랭킹 시즌
       listenTam: (ok, no) => col.orderBy('tq', 'desc').limit(RANK_MAX).onSnapshot(snap => ok(snap.docs.map(d => [d.id, d.data()])), no),   // 4.3.0 탐험 순위
       listenTamH: (ok, no) => col.orderBy('hq', 'desc').limit(RANK_MAX).onSnapshot(snap => ok(snap.docs.map(d => [d.id, d.data()])), no),   // 4.3.3 심화 탐험 순위
+      listenConf: (ok, no) => col.orderBy('cq', 'desc').limit(RANK_MAX).onSnapshot(snap => ok(snap.docs.map(d => [d.id, d.data()])), no),   // 5.2.0 학회 순위
       put: doc => col.doc(uid).set(doc),
       remove: () => col.doc(uid).delete(),
       // 2.1.3 다른 학교 구경
@@ -80,11 +81,11 @@
       q.on('value', cb, no);
       return () => q.off('value', cb);
     };
-    const week = child => (ok, no) => {
+    const week = (child, idx = weekIdx) => (ok, no) => {
       let q = null, wk = null;
       const cb = rowsOf(ok);
       const sync = () => {
-        const next = weekIdx(); if (next === wk) return;
+        const next = idx(); if (next === wk) return;
         if (q) q.off('value', cb);
         wk = next; q = ref.orderByChild(child).startAt(wk * 1000000).endAt(wk * 1000000 + 999999).limitToLast(RANK_MAX + 10); q.on('value', cb, no);
       };
@@ -110,6 +111,7 @@
       },
       listenTam: week('tq'),   // 4.3.0 탐험 순위: 주간 리그처럼 이번 주 범위(tq = 주 × 1,000,000 + 층)만 받아요(서버 규칙 indexOn tq)
       listenTamH: week('hq'),   // 4.3.3 심화 탐험 순위(hq = 주 × 1,000,000 + 심화 층, 서버 규칙 indexOn hq)
+      listenConf: week('cq', ppPer),   // 5.2.0 학회 순위(cq = 학회 × 1,000,000 + 학회 점수, 서버 규칙 indexOn cq)
       put: doc => ref.child(uid).set(Object.assign({}, doc, { at: Cloud.fb.database.ServerValue.TIMESTAMP })),
       remove: () => ref.child(uid).remove(),
       removeOther: id => ref.child(id).remove(),   // 4.1.2 관리자만(서버 규칙이 forest/adminUids 계정의 지우기만 받아 줘요)
@@ -162,6 +164,12 @@
         Rank.hrows = rankRows(pairs, r => r.week === w && r.hf > 0, (a, b) => b.hf - a.hf || a.at - b.at);
         renderRankPanel();
       }, () => {});
+      if (be.listenConf) Rank.unsubC = be.listenConf(pairs => {   // 5.2.0 학회 순위: 이번 학회 줄만
+        if (g !== Rank.gen) return;
+        const p = ppPer();
+        Rank.crows = rankRows(pairs, r => Math.floor(r.cq / 1000000) === p && r.cf > 0, (a, b) => b.cf - a.cf || a.at - b.at);
+        renderRankPanel();
+      }, () => {});
       if (be.listenBt) Rank.unsubB = be.listenBt(pairs => {
         if (g !== Rank.gen) return;
         Rank.brows = rankRows(pairs, r => r.bt > 0, (a, b) => b.bt - a.bt || a.at - b.at);
@@ -181,8 +189,9 @@
     if (Rank.unsubS) { try { Rank.unsubS(); } catch (e) { /* 무시 */ } }
     if (Rank.unsubT) { try { Rank.unsubT(); } catch (e) { /* 무시 */ } }
     if (Rank.unsubH) { try { Rank.unsubH(); } catch (e) { /* 무시 */ } }
+    if (Rank.unsubC) { try { Rank.unsubC(); } catch (e) { /* 무시 */ } }
     clearTimeout(Rank.timer);
-    Object.assign(Rank, { state: 'idle', be: null, uid: null, rows: [], wrows: [], brows: [], srows: [], trows: [], hrows: [], readOnly: false, writing: false, unsub: null, unsubW: null, unsubB: null, unsubS: null, unsubT: null, unsubH: null, sbt: 0, sbtq: null, sbtm: 0, stf: 0, stfW: null, stfAt: 0 });
+    Object.assign(Rank, { state: 'idle', be: null, uid: null, rows: [], wrows: [], brows: [], srows: [], trows: [], hrows: [], crows: [], readOnly: false, writing: false, unsubC: null, unsub: null, unsubW: null, unsubB: null, unsubS: null, unsubT: null, unsubH: null, sbt: 0, sbtq: null, sbtm: 0, stf: 0, stfW: null, stfAt: 0 });
   }
   function rankAfterCloud() {
     if (Rank.state === 'loading') return;   // 이미 서버 연결을 기다리는 중이면 알아서 이어져요
@@ -199,7 +208,7 @@
       pid: typeof d.pid === 'string' ? d.pid.slice(0, 16) : '', week: Number.isInteger(d.week) ? d.week : -2 /* 보안 보강: 소수 주를 정수로 바꿔 이번 주로 세지 않아요 */, lp: Math.max(0, Math.floor(Number(d.lp) || 0)),
       title: typeof d.title === 'string' && achTitleName(d.title) ? d.title : '',   // 2.1.3 업적 말고 받는 칭호도
       bt: typeof d.bt === 'number' && isFinite(d.bt) ? Math.max(1000, Math.min(9999, Math.floor(d.bt))) : 0, btm: typeof d.btm === 'number' ? Math.max(0, Math.min(5, Math.floor(d.btm))) : 0, btq: typeof d.btq === 'number' && isFinite(d.btq) ? d.btq : null, sem: d.sem === 0 || d.sem === 1 ? d.sem : null,
-      sk: Math.max(0, Math.floor(Number(d.sk) || 0)), sp: Math.max(0, Math.min(1e9, Math.floor(Number(d.sp) || 0))), tf: Math.max(0, Math.min(100000, Math.floor(Number(d.tf) || 0))), hf: Math.max(0, Math.min(100000, Math.floor(Number(d.hf) || 0))) };   // 4.3.3 심화 층   // 4.3.0 탐험 이번 주 가장 깊은 층   // 2.0.1 대결, 2.1.1 학기, 2.1.3 랭킹 시즌
+      sk: Math.max(0, Math.floor(Number(d.sk) || 0)), sp: Math.max(0, Math.min(1e9, Math.floor(Number(d.sp) || 0))), tf: Math.max(0, Math.min(100000, Math.floor(Number(d.tf) || 0))), hf: Math.max(0, Math.min(100000, Math.floor(Number(d.hf) || 0))), cf: Math.max(0, Math.min(99999, Math.floor(Number(d.cf) || 0))), cq: Math.max(0, Math.floor(Number(d.cq) || 0)) };   // 4.3.3 심화 층   // 4.3.0 탐험 이번 주 가장 깊은 층   // 2.0.1 대결, 2.1.1 학기, 2.1.3 랭킹 시즌
   }
   // 같은 학교(학교 번호)가 기기를 옮겨서 두 번 있으면 내 것이나 가장 최근 것 하나만 남겨요
   function rankRows(pairs, keep, order) {
@@ -268,7 +277,17 @@
   // 4.3.3 심화 탐험 순위: 일반 탐험(tf)과 같은 규칙 모양(3초마다 1층, 10초가 지나면 10층 더)
   function tamHf() { if (!S.tam) return 0; tamHWeek(); return S.tam.hw.w === S.lg.week ? Math.max(0, Math.min(100000, S.tam.hw.best | 0)) : 0; }
   function tamHRankDoc() { const v = tamRankStep(tamHf(), Rank.hrows, Rank.shfAt, Rank.shfW, Rank.shf, 'hf'); return { hf: v, hq: S.lg.week * 1000000 + v }; }
-  const tamRankBehind = () => !tossRank() && Rank.state === 'on' && ((!Rank.noTam && tamTf() > (Rank.stfW === S.lg.week ? Rank.stf : 0)) || (!Rank.noTamH && tamHf() > (Rank.shfW === S.lg.week ? Rank.shf : 0)));
+  // 5.2.0 학회 순위에 올릴 점수: 서버 규칙이 받는 만큼(지난 쓰기 뒤 35점에 10분마다 35점 더)만 올려요
+  function ppRankDoc() {
+    const p = ppPer(), mine = (Rank.crows || []).find(r => r.id === Rank.uid), row = (Rank.rows || []).find(r => r.id === Rank.uid);
+    let prev = 0, dt = null;
+    if (Rank.scfAt && Rank.scfP === p) prev = Rank.scf; else if (mine && Math.floor(mine.cq / 1000000) === p) prev = mine.cf;
+    if (Rank.lastPerf != null && S.rank.by === Rank.uid) dt = perfNow() - Rank.lastPerf; else if (row) dt = gameNow() - row.at;
+    const room = 35 + (dt == null ? 0 : Math.max(0, dt - 1500) / 600000 * 35), v = Math.max(0, Math.min(S.pp.cf, Math.floor(prev + room)));
+    return { cf: v, cq: p * 1000000 + v };
+  }
+  const ppRankOn = () => !!S && !!S.pp && S.pp.cm === ppPer() && S.pp.cf > 0 && S.lg.week >= 0 && Math.floor(S.lg.week / PP.weeks) === ppPer();
+  const tamRankBehind = () => !tossRank() && Rank.state === 'on' && ((!Rank.noTam && tamTf() > (Rank.stfW === S.lg.week ? Rank.stf : 0)) || (!Rank.noTamH && tamHf() > (Rank.shfW === S.lg.week ? Rank.shf : 0)) || (!Rank.noConf && ppRankOn() && S.pp.cf > (Rank.scfP === ppPer() ? Rank.scf : 0)));
   async function submitRank(force) {
     if (Rank.state !== 'on' || Rank.readOnly || !Rank.uid || !(S.rank.joined || tossRank()) || Rank.writing || (hasCloudBuild() && (Cloud.deleting || Cloud.delLeft))) return;   // 2.2.0 검토 3
     if (S.u.dev) {   // 2.0.0 보안 점검(2-7): 개발자 메뉴로 재화를 받은 학교는 랭킹에 올리지 않아요
@@ -304,13 +323,18 @@
       // 4.3.3 심화 탐험 순위: 규칙(hf, hq)을 게시하기 전에 거절되면 심화 칸 없이 다시 올려요
       const hfo = !be.toss && !Rank.noTamH && tamHf() > 0 ? tamHRankDoc() : null;
       if (hfo) { doc.hf = hfo.hf; doc.hq = hfo.hq; Rank.tamHSent = true; } else Rank.tamHSent = false;
+      // 5.2.0 학회 순위: 규칙(cf, cq)을 게시하기 전에 거절되면 학회 칸 없이 다시 올려요
+      const cfo = !be.toss && !Rank.noConf && ppRankOn() ? ppRankDoc() : null;
+      if (cfo) { doc.cf = cfo.cf; doc.cq = cfo.cq; Rank.confSent = true; } else Rank.confSent = false;
       await be.put(doc);
       Rank.lastPut = Date.now(); Rank.lastPerf = perfNow(); Rank.denied = 0;
       if (tfo && g === Rank.gen) { Rank.stf = tfo.tf; Rank.stfW = doc.week; Rank.stfAt = perfNow(); }
       if (hfo && g === Rank.gen) { Rank.shf = hfo.hf; Rank.shfW = doc.week; Rank.shfAt = perfNow(); }
+      if (cfo && g === Rank.gen) { Rank.scf = cfo.cf; Rank.scfP = ppPer(); Rank.scfAt = perfNow(); }
       if (g === Rank.gen) { S.rank.sent = sc; S.rank.by = Rank.uid; S.rank.sws = ws; if (bto) { Rank.sbt = bto.bt; Rank.sbtq = bto.btq; Rank.sbtm = bto.btm; } if (Rank.skSent) { Rank.ssp = doc.sp; Rank.ssk = doc.sk; Rank.sspAt = perfNow(); } save(); lookPush(); }
     } catch (e) {
       const c = String((e && (e.code || e.message)) || '');
+      if (g === Rank.gen && Rank.confSent && /permission/i.test(c) && !Rank.noConf) { Rank.noConf = true; Rank.writing = false; rankDirty(); renderRankPanel(); return; }   // 5.2.0 학회 칸 규칙이 아직 없어요
       if (g === Rank.gen && Rank.tamHSent && /permission/i.test(c) && !Rank.noTamH) { Rank.noTamH = true; Rank.writing = false; rankDirty(); renderRankPanel(); return; }   // 4.3.3 심화 칸 규칙이 아직 없어요
       if (g === Rank.gen && Rank.tamSent && /permission/i.test(c) && !Rank.noTam) { Rank.noTam = true; Rank.writing = false; rankDirty(); renderRankPanel(); return; }   // 4.3.0 탐험 칸 규칙이 아직 없어요
       if (g === Rank.gen && Rank.btqSent && /permission/i.test(c) && !Rank.noBtq) { Rank.noBtq = true; Rank.writing = false; rankDirty(); renderRankPanel(); return; }   // 2.2.0 검토 1 btq 칸 규칙이 아직 없어요
@@ -491,20 +515,25 @@
     rsSync();
     // 4.1.2 관리자 랭킹 줄 지우기: 개발자 메뉴가 있는 판(웹)에서만, 켠 뒤 한 번만 관리자인지 물어봐요
     if (!rt.admChk && !AIT && !window.FOREST_STORE && cloudOn()) { rt.admChk = true; checkAdmin().then(() => { if (rt.isAdmin) renderRankPanel(); }).catch(() => {}); }
-    const mode = tossRank() ? 'all' : (['all', 'bt', 'sea', 'tam'].includes(rt.rankView) ? rt.rankView : 'week'), wk = mode === 'week', bm = mode === 'bt', sea = mode === 'sea', tm = mode === 'tam';   // 4.3.0 탐험 순위   // 2.0.1 대결 순위, 2.1.3 시즌
+    const mode = tossRank() ? 'all' : (['all', 'bt', 'sea', 'tam', 'conf'].includes(rt.rankView) ? rt.rankView : 'week'), wk = mode === 'week', bm = mode === 'bt', sea = mode === 'sea', tm = mode === 'tam', cf = mode === 'conf';   // 5.2.0 학회   // 4.3.0 탐험 순위   // 2.0.1 대결 순위, 2.1.3 시즌
     $('#rankView').hidden = tossRank();
     const th = tm && !!rt.rkH;   // 4.3.3 심화 탐험 순위
     $('#rankTamSeg').hidden = !tm; $$('#rankTamSeg [data-rth]').forEach(b => b.setAttribute('aria-checked', String((b.dataset.rth === '1') === th)));
-    $$('#rankView [data-rv]').forEach(b => b.setAttribute('aria-checked', String(b.dataset.rv === mode)));
-    const score = th ? tamHf() : tm ? tamTf() : sea ? S.rs.p : bm ? S.bt.pts : wk ? S.lg.pts : rankScore();
-    const R = th ? (Rank.hrows || []) : tm ? (Rank.trows || []) : tossRank() || (bm && !btOpen()) ? (sea ? (Rank.srows || []) : bm ? (Rank.brows || []) : wk ? Rank.wrows : Rank.rows) : rkFill(mode, sea ? (Rank.srows || []) : bm ? (Rank.brows || []) : wk ? Rank.wrows : Rank.rows, score), mine = R.findIndex(r => r.id === Rank.uid);   // 3.0.0 보조 줄
+    $$('#rankView [data-rv]').forEach(b => b.setAttribute('aria-checked', String(b.dataset.rv === (sea ? 'week' : cf ? 'all' : mode))));
+    $('#rankSchSeg').hidden = tossRank() || !(mode === 'all' || cf) || !(gradOn() || (S.pp && S.pp.n > 0)); $$('#rankSchSeg [data-rsc]').forEach(b => b.setAttribute('aria-checked', String(b.dataset.rsc === (cf ? 'conf' : 'all'))));   // 5.2.0 학교 안의 학교 파워와 학회   // 5.1.1.4 랭킹 네 칸: 리그 안에 이번 주와 시즌
+    $('#rankLgSeg').hidden = tossRank() || !(wk || sea); $$('#rankLgSeg [data-rlg]').forEach(b => b.setAttribute('aria-checked', String(b.dataset.rlg === (sea ? 'sea' : 'week'))));
+    const score = cf ? (S.pp ? S.pp.cf : 0) : th ? tamHf() : tm ? tamTf() : sea ? S.rs.p : bm ? S.bt.pts : wk ? S.lg.pts : rankScore();
+    const R = cf ? (Rank.crows || []) : th ? (Rank.hrows || []) : tm ? (Rank.trows || []) : tossRank() || (bm && !btOpen()) ? (sea ? (Rank.srows || []) : bm ? (Rank.brows || []) : wk ? Rank.wrows : Rank.rows) : rkFill(mode, sea ? (Rank.srows || []) : bm ? (Rank.brows || []) : wk ? Rank.wrows : Rank.rows, score), mine = R.findIndex(r => r.id === Rank.uid);   // 3.0.0 보조 줄
     if (wk && mine >= 0 && S.lg.pos !== mine + 1) { S.lg.pos = mine + 1; }
     if (sea && mine >= 0 && S.rs.pos !== mine + 1) { S.rs.pos = mine + 1; save(); }   // 2.1.3 시즌이 끝날 때 칭호를 정하는 순위
-    $('#rankScoreLab').textContent = th ? '이번 주 가장 높은 심화 층' : tm ? '이번 주 가장 높은 층' : sea ? '이번 시즌 점수' : bm ? '내 대결 점수' : wk ? '이번 주 리그 점수' : '내 학교 파워';
+    $('#rankScoreLab').textContent = cf ? '이번 학회 점수' : th ? '이번 주 가장 높은 심화 층' : tm ? '이번 주 가장 높은 층' : sea ? '이번 시즌 점수' : bm ? '내 대결 점수' : wk ? '이번 주 리그 점수' : '내 학교 파워';
     $('#rankScore').textContent = tm ? `${fmt(score)}층` : fmt(score);
     $('#rankPos').textContent = mine >= 0 ? `${mine + 1}위` : '-';
     const left = 7 - ((new Date(gameNow() + KST_MS).getUTCDay() + 6) % 7);   // 2.0.0 보안 점검(1-5): 한국 시간 요일
-    if (tm) {   // 4.3.0 탐험 순위
+    if (cf) {   // 5.2.0 학회 순위
+      $('#rankSub').textContent = `4주마다 새 학회가 열려요 (${ppLeft()}일 남음)`;
+      $('#rankLead').textContent = '논문으로 모은 학회 점수로 겨뤄요. 대학원 연구소에서 논문을 써요.'; $('#rankLead').hidden = false;
+    } else if (tm) {   // 4.3.0 탐험 순위
       $('#rankSub').textContent = `월요일에 새로 시작해요 (${left}일 남음)`;
       $('#rankLead').textContent = th ? '' : '이번 주에 탐험대가 오른 가장 높은 층으로 겨뤄요.'; $('#rankLead').hidden = th;
     } else if (sea) {   // 2.1.3 랭킹 시즌
@@ -515,7 +544,7 @@
     $('#rankSub').textContent = bm ? (btOpen() ? `${BT_LG[S.bt.lg].n} 리그, 오늘 남은 대결 ${btLeft()}판` : '숲속 대결은 초등학교 3학년부터 열려요') : wk ? `월요일에 새 리그가 시작돼요 (${left}일 남음). 리그에 참여하면 순위와 상관없이 황금 도토리 1개`
       : rankSchool(S.tier, yearNo(), semOn() ? S.sem : null) + (Rank.state === 'on' && R.length ? `, 랭킹에 ${R.length}명` : '');
     if (!tm) $('#rankLead').hidden = false;
-    if (!sea && !tm) $('#rankLead').textContent = bm ? '숲속 대결 점수로 겨뤄요. 메달은 가장 높이 오른 리그예요.' : wk ? '이번 주에 한 일로 겨뤄요. 미션 10, 미션 보너스 20, 학교 행사 15, 체험학습 10(1시간마다 +5), 종업식 20, 퀘스트 3점(퀘스트와 식은 합쳐서 하루 30점까지).'
+    if (!sea && !tm && !cf) $('#rankLead').textContent = bm ? '숲속 대결 점수로 겨뤄요. 메달은 가장 높이 오른 리그예요.' : wk ? '이번 주에 한 일로 겨뤄요. 미션 10, 미션 보너스 20, 학교 행사 15, 체험학습 10(1시간마다 +5), 종업식 20, 퀘스트 3점(퀘스트와 식은 합쳐서 하루 30점까지).'
       : '학교 파워로 순위를 매겨요.';
     // 참여하기와 이름 바꾸기
     const join = $('#rankJoin'), key = `${Rank.state}|${Rank.readOnly}|${S.rank.joined}|${S.rank.name}|${rt.rankEdit ? 1 : 0}|${Cloud.state}|${Cloud.err}|${nickPrice()}|${S.gold >= nickPrice()}`;
@@ -552,7 +581,7 @@
           `<button class="btn-sub rl-model" type="button" data-look="model">예시 학교 구경하기</button><p class="fine">랭킹의 학교 이름을 누르면 그 학교를 구경해요(보여 주기를 켠 학교만)</p>`; } }
     // 순위표: 이름은 다른 사람이 적은 글이라 textContent로만 넣어요
     const list = $('#rankList'), rows = Rank.state === 'on' ? R : [];
-    const lkey = mode + rows.map(r => `${r.id}:${r.score}:${r.lp}:${r.sp}:${r.bt}:${r.btm}:${r.tf}:${r.name}:${r.tier}:${r.year}:${r.test ? 1 : 0}:${r.title}`).join('|') + `|${Rank.uid}|${S.units}|${S.ach ? S.ach.title : ''}|${rt.isAdmin ? 1 : 0}|${rt.rkDel || ''}`;
+    const lkey = mode + rows.map(r => `${r.id}:${r.score}:${r.lp}:${r.sp}:${r.bt}:${r.btm}:${r.tf}:${r.cf}:${r.name}:${r.tier}:${r.year}:${r.test ? 1 : 0}:${r.title}`).join('|') + `|${Rank.uid}|${S.units}|${S.ach ? S.ach.title : ''}|${rt.isAdmin ? 1 : 0}|${rt.rkDel || ''}`;
     const canDel = !!(rt.isAdmin && Rank.be && Rank.be.removeOther && !Rank.readOnly);
     if (list.dataset.key !== lkey) {
       list.dataset.key = lkey;
@@ -587,15 +616,15 @@
         }
         const b = document.createElement('b');
         b.className = 'rk-score';
-        b.textContent = th ? `${fmt(r.hf)}층` : tm ? `${fmt(r.tf)}층` : fmt(sea ? r.sp : bm ? r.bt : wk ? r.lp : r.score);
+        b.textContent = cf ? `${fmt(r.cf)}점` : th ? `${fmt(r.hf)}층` : tm ? `${fmt(r.tf)}층` : fmt(sea ? r.sp : bm ? r.bt : wk ? r.lp : r.score);
         if (!r.nx) { li.dataset.look = r.id; li.dataset.who = r.name; li.classList.add('can-look'); }   // 2.1.3 누르면 그 학교 구경(3.0.0 보조 줄은 구경 안 돼요)
         li.append(no, txt, b);
-        li.setAttribute('aria-label', `${i + 1}위 ${r.name}, ${rankSchool(r.tier, r.year, r.sem)}, ${th ? '심화 탐험 가장 높은 층' : tm ? '탐험 가장 높은 층' : bm ? `대결 점수, ${BT_LG[Math.max(0, Math.min(5, r.btm | 0))].n} 리그` : wk ? '리그 점수' : '학교 파워'} ${fmt(th ? r.hf : tm ? r.tf : bm ? r.bt : wk ? r.lp : r.score)}`);
+        li.setAttribute('aria-label', `${i + 1}위 ${r.name}, ${rankSchool(r.tier, r.year, r.sem)}, ${cf ? '학회 점수' : th ? '심화 탐험 가장 높은 층' : tm ? '탐험 가장 높은 층' : bm ? `대결 점수, ${BT_LG[Math.max(0, Math.min(5, r.btm | 0))].n} 리그` : wk ? '리그 점수' : '학교 파워'} ${fmt(th ? r.hf : tm ? r.tf : bm ? r.bt : wk ? r.lp : r.score)}`);
         list.appendChild(li);
       });
     }
     const empty = $('#rankEmpty');
     empty.hidden = tossRank() || !(Rank.state === 'on' && rows.length === 0);
-    if (!empty.hidden) empty.textContent = th ? (Rank.noTamH ? '심화 탐험 순위는 서버 준비 중이에요.' : '아직 이번 주 심화 탐험 순위에 오른 학교가 없어요.') : tm ? (Rank.noTam ? '탐험 순위는 서버 준비 중이에요. 탐험 기록은 지금도 모이고 있어요.' : '아직 이번 주 탐험 순위에 오른 학교가 없어요. 탐험대를 보내 첫 번째가 되어 보세요!') : sea ? (Rank.noSk ? '시즌 순위는 서버 준비 중이에요. 시즌 점수는 지금도 모이고 있어요.' : '아직 이번 시즌 순위에 오른 학교가 없어요. 주간 리그 점수를 모아 첫 번째가 되어 보세요!') : bm ? '아직 대결 순위에 오른 학교가 없어요. 숲속 대결에서 첫 번째가 되어 보세요!' : '아직 랭킹에 이름을 올린 교장 선생님이 없어요. 첫 번째가 되어 보세요!';
+    if (!empty.hidden) empty.textContent = cf ? (Rank.noConf ? '학회 순위는 서버 준비 중이에요. 학회 점수는 지금도 모이고 있어요.' : '아직 이번 학회 순위에 오른 학교가 없어요.') : th ? (Rank.noTamH ? '심화 탐험 순위는 서버 준비 중이에요.' : '아직 이번 주 심화 탐험 순위에 오른 학교가 없어요.') : tm ? (Rank.noTam ? '탐험 순위는 서버 준비 중이에요. 탐험 기록은 지금도 모이고 있어요.' : '아직 이번 주 탐험 순위에 오른 학교가 없어요. 탐험대를 보내 첫 번째가 되어 보세요!') : sea ? (Rank.noSk ? '시즌 순위는 서버 준비 중이에요. 시즌 점수는 지금도 모이고 있어요.' : '아직 이번 시즌 순위에 오른 학교가 없어요. 주간 리그 점수를 모아 첫 번째가 되어 보세요!') : bm ? '아직 대결 순위에 오른 학교가 없어요. 숲속 대결에서 첫 번째가 되어 보세요!' : '아직 랭킹에 이름을 올린 교장 선생님이 없어요. 첫 번째가 되어 보세요!';
   }
 

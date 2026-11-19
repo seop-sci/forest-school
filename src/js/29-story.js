@@ -423,7 +423,32 @@
     { id: 'acorn', nm: '잃어버린 도토리', who: 'squirrel', n: 4, ok: () => (S.t.squirrel || 0) >= 10, title: '보물찾기 대장' },
     { id: 'sloth', nm: '나무늘보의 달리기', who: 'sloth', n: 4, ok: () => uniNow() && !!S.dex.got.sloth, title: '끝까지 응원단' },
     { id: 'mole', nm: '두더지의 별자리', who: 'mole', n: 4, ok: () => !!S.dex.got.mole && (S.f.science || 0) >= 1, title: '별자리 지기' },
-    { id: 'deer', nm: '고라니의 그림', who: 'waterdeer', n: 3, ok: () => !!S.dex.got.waterdeer, title: '복도 미술관장' }];
+    { id: 'deer', nm: '고라니의 그림', who: 'waterdeer', n: 3, ok: () => !!S.dex.got.waterdeer, title: '복도 미술관장' },
+    { id: 'alumni', nm: '졸업생 후일담', who: 'hedgehog', n: 3, ok: () => S.tier >= GRAD_TIER && S.tg >= TIERS[GRAD_TIER].years, title: '숲속 동물 학교 교장' }];   // 5.2.0 박사 학위를 받은 뒤(설계안 6절, 글은 본부 초안)
+  // 5.2.0 졸업생 후일담: 진로 도감에서 먼저 이룬 졸업생 셋을 찾아가요(모자라면 솜이). 글은 그때 저장을 보고 만들어요
+  function alumniLines() {
+    const done = (S && S.cs && S.cs.done) || {}, pick = Object.keys(done).filter(k => JOBS.some(J => J.k === k)).slice(0, 3).map(k => ({ nm: done[k].nm, w: DEX_STUDENTS.includes(done[k].sp) ? done[k].sp : 'rabbit', job: JOBS.find(J => J.k === k).name }));
+    while (pick.length < 3) pick.push({ nm: '솜이', w: 'somi', job: '선생님' });
+    const [A, B, C] = pick, ro = w => { const c = w.charCodeAt(w.length - 1) - 0xAC00; return w + (c >= 0 && c < 11172 && c % 28 && c % 28 !== 8 ? '으로' : '로'); };
+    return [
+      [{ t: '박사 학위수여식이 끝난 다음 날, 교문 우편함에 편지 세 통이 꽂혀 있어요.' },
+       { w: 'hedgehog', t: '교장 선생님, 졸업생들이 보낸 편지예요. 하나씩 찾아가 볼까요?' },
+       { t: `첫 편지는 ${A.nm}에게서 왔어요. 지금은 ${iga(A.job)} 되었대요.` },
+       { w: A.w, t: '교장 선생님! 유치원 교문에서 처음 인사하던 날이 아직도 생생해요.' },
+       { w: A.w, t: `이제는 제가 ${ro(A.job)} 일하면서 처음 온 친구들을 맞이해요. 그때 선생님들이 하던 말을 똑같이 하고 있더라고요.` },
+       { w: 'hedgehog', t: '종을 쳐 온 보람이 있네요. 우리 학교 종소리가 마을까지 들린다니까요.' }],
+      [{ t: `둘째 편지를 따라 마을 일터에 왔어요. ${iga(B.nm)} 바쁘게 일하고 있어요.` },
+       { w: B.w, t: '어, 교장 선생님이 여기까지 오셨어요?' },
+       { w: B.w, t: `진로 상담 때 ${iga(B.job)} 되고 싶다고 했잖아요. 그때는 저도 반쯤 농담이었어요.` },
+       { w: 'hedgehog', t: '농담이 아니었던 걸, 상담실 코끼리 선생님은 알고 계셨지요.' },
+       { w: B.w, t: '힘들 때마다 학교 텃밭이랑 도서관 생각이 나요. 다음에 후배들 데리고 꼭 놀러 갈게요.' }],
+      [{ t: '저녁 무렵, 셋째 편지에 적힌 대로 큰 참나무 아래로 가요.' },
+       { t: `${C.nm}, 그리고 다른 졸업생들이 참나무 둘레에 모여 있어요. 모두 손에 작은 나무패를 들고 있어요.` },
+       { w: C.w, t: `저는 ${iga(C.job)} 됐어요. 그리고 오늘은 다 같이 드릴 게 있어서 모였어요.` },
+       { w: C.w, t: "나무패에는 '숲속 동물 학교 교장 선생님께'라고 새겼어요. 첫 졸업생 일동 나무패처럼요." },
+       { w: 'hedgehog', t: '문 닫을 날을 받아 두었던 학교였는데. 이제 졸업생이 이렇게 많아요.' },
+       { t: '참나무 잎이 바람에 흔들려요. 잎 하나하나가 졸업생 이름처럼 반짝여요.' }]];
+  }
   // 곁가지 글(woodani 확인 2026-11-11 밤, 프로젝트 문서 '이야기 글 초안 4'): 화마다 줄 목록
   const ST_SIDE = {
     nap: [
@@ -577,6 +602,7 @@
        { w: 'peacock', t: '그런데 첫 그림은 누가 걸었을까요? 액자가 제 것이랑 똑같긴 한데, 저는 모르는 일이에요.' },
        { t: '공작 선생님이 꼬리를 펴고 지나가요. 꼬리 끝에 물감이 묻어 있어요.' }]]
   };
+  Object.defineProperty(ST_SIDE, 'alumni', { get: alumniLines, enumerable: true });   // 5.2.0 졸업생 후일담
   const SIDE_ESS = 2, SIDE_DAY = 2;
   const ST_TITLES = SIDE.map(x => ({ id: 'st_' + x.id, title: x.title }));
   const stTitleGot = (t, sto) => { sto = sto || (S && S.sto); const X = SIDE.find(x => 'st_' + x.id === t.id); return !!X && !!sto && !!sto.side && ((sto.side[X.id] || {}).n || 0) >= X.n; };   // 5.0.3.1 저장 읽기에서도 써요
