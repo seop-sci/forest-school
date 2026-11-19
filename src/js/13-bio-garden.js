@@ -516,7 +516,7 @@
     const dots = $('#tierDots'), W = fr.clientWidth; let lim = dots && !dots.hidden && dots.offsetWidth ? dots.offsetLeft + dots.offsetWidth + 8 : 10;
     { const wx = $('#wxChip'); if (wx && !wx.hidden && wx.offsetWidth) lim = Math.max(lim, wx.getBoundingClientRect().right - fr.getBoundingClientRect().left + 8); }   // 5.0.1.5 H-04 날씨 칩도 비켜요
     let r = 10, row = 0;
-    for (const el of [$('#btnDeal'), $('#plChip'), $('#ffChip'), $('#upChip')]) {
+    for (const el of [$('#btnDeal'), $('#plChip'), $('#ffChip'), $('#upChip'), $('#taChip')]) {
       if (!el || el.hidden || !el.offsetWidth) continue;
       const w = el.offsetWidth;
       if (r > 10 && W - r - w < lim) { row += 1; r = 10; }
@@ -532,6 +532,7 @@
     for (const k of Object.keys(FAC)) { const p = document.getElementById('pq-' + k); if (p) p.classList.toggle('ff-on', ks.includes(k)); }
     const c = $('#ffChip'); if (!c) return;
     upRender(rt.tab === 'school' && rt.viewTier == null && !rt.decoEdit && !rt.fest && !rt.sports && !festBusy() && !rt.paused && (S.tier >= 1 || S.q.m >= CH1()));   // 5.0.2.2. 5.0.3 woodani: 유치원은 1장(튜토리얼)을 마친 뒤부터
+    taRender(rt.tab === 'school' && rt.viewTier == null && !rt.decoEdit && !rt.fest && !rt.sports && !festBusy() && !rt.paused);   // 5.1.0
     const show = S.ffx !== gameToday() && rt.tab === 'school' && rt.viewTier == null && !rt.decoEdit && !rt.fest && !rt.sports && !festBusy() && !rt.paused && S.tier >= 1 && (ks.length > 0 || on || nbShow);   // 학교 행사 중에는 숨겨요. 2.2.0 야간 건설 줄은 초등학교부터 늘 보여요
     const key = [show, S.ffx, ks.length, ffLeft(), on ? Math.floor(cbLeft() / 60) : -1, nbShow ? (nb ? Math.floor(nbLeft() / 60) : -2) : -1, nbAdd()].join('|');
     if (!force && c.dataset.key === key) return; c.dataset.key = key;

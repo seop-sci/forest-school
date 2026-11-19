@@ -361,11 +361,11 @@
     renderNight();   // 2.1.0 밤 모드: 건물이 늘면 창 불빛도
     const g = $('#decoG'); if (!g || !S) return;
     const m = decoMap(), L = S.deco.lay[m], edit = !!rt.decoEdit;
-    const key = [m, L.join(), S.deco.nm, S.tier, edit, S.vd ? S.vd.lv : 0, S.bx ? S.bx.m + ':' + S.bx.sp.map(x => x.i).join() : ''].join('|');
+    const key = [m, L.join(), S.deco.nm, S.tier, edit, S.vd ? S.vd.lv : 0, S.bx ? S.bx.m + ':' + S.bx.sp.map(x => x.i).join() : '', taMapKey()].join('|');   /* 5.1.0 조교와 기념비 */
     if (!force && g.dataset.key === key) return; g.dataset.key = key;
     let h = edit ? '<rect class="deco-dim" x="-200" y="-200" width="760" height="940"/>' : '';
     { const bg = $('#bxG'); if (bg) bg.innerHTML = edit ? '' : bxMapHTML(m); }   // 5.0.1.1 woodani 제보: 숨은 생물은 건물 위 층(#bxG)에 그려요
-    { const vt = $('#vdTop'); if (vt) vt.innerHTML = edit ? '' : vdMapHTML(m); }   // 2.3.1 마을 기부는 학생 위 층   // 2.2.0 숨은 생물. 2.1.2 마을 기부 기념물(꾸미기 중에는 숨겨요). 2.1.3 꾸미기 중에는 지도를 살짝 어둡게 해서 빈 자리가 잘 보여요
+    { const vt = $('#vdTop'); if (vt) vt.innerHTML = edit ? '' : vdMapHTML(m) + taMapHTML(); }   // 2.3.1 마을 기부는 학생 위 층   // 2.2.0 숨은 생물. 2.1.2 마을 기부 기념물(꾸미기 중에는 숨겨요). 2.1.3 꾸미기 중에는 지도를 살짝 어둡게 해서 빈 자리가 잘 보여요
     const [sx, sy] = DECO_SIGN[m] || [0, 0], sw = 96, sh = 48, nm = S.deco.nm || '숲속', tn = tierInfo().name;
     if (DECO_SIGN[m] && IMG('sign_board')) {
       // 글자는 간판 안쪽 판(그림 높이의 27%~71%) 가운데에 두 줄로. 판이 낮아서 글자를 작게 해요(1.7.4 woodani: 위로 삐져나감)

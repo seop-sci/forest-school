@@ -27,7 +27,7 @@
   const freshFu = () => { const o = {}; for (const k in FUR) o[k] = [0, 0, 0, 0]; return o; };
   const furDone = (k, i) => S.f[k] < 1 || S.fu[k][i] >= S.f[k];
   const furReady = k => S.f[k] < 1 || S.fu[k].every(n => n >= S.f[k]);
-  const furCost = (k, i) => furDone(k, i) ? Infinity : Math.ceil(softCost(FAC[k].cost, S.fu[k][i] + 1 + (FAC[k].lvOff || 0), SOFT.fac) * FUR_SHARE[i] * costScale());   // 5.0.0 연구 건물 가구도 건물처럼 lvOff(빠져서 아주 쌌어요)
+  const furCost = (k, i) => furDone(k, i) ? Infinity : Math.ceil(softCost(FAC[k].cost, S.fu[k][i] + 1 + (FAC[k].lvOff || 0), SOFT.fac) * FUR_SHARE[i] * costScale() * taFurMul(k));   /* 5.1.0 조교가 일하는 건물은 가구 -10% */   // 5.0.0 연구 건물 가구도 건물처럼 lvOff(빠져서 아주 쌌어요)
   const furAllCost = k => FUR[k].reduce((a, _, i) => a + (furDone(k, i) ? 0 : furCost(k, i)), 0);
   // 이 시설에서 다음에 살 수 있는 것: 가구가 덜 찼으면 가장 싼 가구, 다 찼으면 건물
   const facNextCost = k => furReady(k) ? facCost(k) : Math.min(...FUR[k].map((_, i) => furCost(k, i)));
@@ -493,7 +493,7 @@
     return base * (CFG.gradeMult - 1) * Math.min(1, dRep / need);
   }
   const furLeftCost = k => S.f[k] < 1 ? 0 : FUR[k].reduce((a, _, i) => {
-    let c = 0; for (let n = S.fu[k][i]; n < S.f[k]; n++) c += Math.ceil(softCost(FAC[k].cost, n + 1 + (FAC[k].lvOff || 0), SOFT.fac) * FUR_SHARE[i] * costScale());   // 5.0.0 lvOff
+    let c = 0; for (let n = S.fu[k][i]; n < S.f[k]; n++) c += Math.ceil(softCost(FAC[k].cost, n + 1 + (FAC[k].lvOff || 0), SOFT.fac) * FUR_SHARE[i] * costScale() * taFurMul(k));   /* 5.1.0 */   // 5.0.0 lvOff
     return a + c;
   }, 0);
   const cheapestFur = k => FUR[k].map((_, i) => i).filter(i => !furDone(k, i)).sort((a, b) => furCost(k, a) - furCost(k, b))[0];

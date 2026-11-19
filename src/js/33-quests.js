@@ -27,6 +27,7 @@
       case 'star': return rosterOn() && S.roster.list.length ? Math.max(...S.roster.list.map(s => Math.max(...s.a.map(star)))) : 0;
       case 'clubShown': return S.club.shown.reduce((a, b) => a + b, 0);
       case 'fpUp': return Math.max(0, S.st.fperks - (S.tfp || 0));   // 2.0.0 이 학교급에 와서 장학재단을 고친 횟수(퀘스트 전에 고쳤어도 쳐요)
+      case 'ta': return !S.ta ? 0 : q.k === 'seat' ? S.ta.seat.filter(x => x && x.b).length : q.k === 'trip' ? S.ta.n : S.ta.mon;   // 5.1.0 조교 자리, 파견 횟수, 기념비 단계
       case 'xt': return xtLv(q.k);   // 1.8.0 영양, 사서 선생님 연수 레벨
       case 'vp': return vpLv();   // 1.8.0 교감 선생님 연수 레벨
       case 'deco': return decoPlacedAll();   // 1.8.0 지도에 놓은 장식 수
@@ -182,6 +183,7 @@
       case 'mgBest': return `숲속 합치기 ${q.n}단계 만들기`;
       case 'mgOrders': return `합치기 주문 ${q.n}개 채우기`;
       case 'pz': return q.n === 1 ? '숲속 퍼즐 한 판 끝내기' : `숲속 퍼즐 ${q.n}판 끝내기`;
+      case 'ta': return q.title || '';
       case 'xt': return `${XT[q.k].name} Lv.${q.n}`;
       case 'vp': return `${VP.name} Lv.${q.n}`;
       case 'deco': return `지도에 장식 ${q.n}개 놓기`;
@@ -713,6 +715,7 @@
       case 'btPlays': case 'btLg': case 'btWins': case 'btMid': setTab('mini'); return toast('공부 탭의 숲속 대결을 눌러요');
       case 'psGot': rt.evSeg = 'ps'; return setTab('event');   // 2.1.3
       // 1.8.0 보강 퀘스트
+      case 'ta': if (!rtOpen()) return toast('연구 구역 연구소를 지으면 열려요'); rt.rxTab = 'ta'; return openRx();   // 5.1.0
       case 'xt': return xtHere(q.k) ? goTeacher(q.k) : goFac(XT[q.k].fac, `${eul(FAC[XT[q.k].fac].name)} 지으면 오셔요`);
       case 'vp': return goTeacher('vp');
       case 'bxSeen': case 'bxKinds': if (bxOpen()) { if (S.bx.sp.length) { setTab('school'); return toast('지도에서 흔들리는 풀숲이나 물가를 눌러 봐요'); } return toast(`지금은 숨은 생물이 없어요. ${hm(Math.max(60, Math.ceil((S.bx.next - gameNow()) / 1000)))} 뒤에 새 생물이 숨어요`); } return toast('생물 탐사는 초등학교부터 열려요');   // 2.2.0
