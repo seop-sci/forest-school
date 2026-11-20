@@ -8,12 +8,14 @@
     nlModal(el);   // 2.0.1
     rt.modalOpen = el;
     el.hidden = false;
+    try { uiRwOpen(el); } catch (e) { /* 연출만 */ }   // 5.3.0.1 보상 창 빛살
     musicSync();   // 4.2.0 졸업식과 학위수여식 곡은 창에 따라 바뀌어요
     requestAnimationFrame(() => el.classList.add('open'));
     const b = el.querySelector('[data-autofocus]') || el.querySelector('.cta') || el.querySelector('button');
     if (b) b.focus({ preventScroll: true });
   }
   function closeModal(el, then) {
+    if (el.classList.contains('open')) { try { uiRwClose(el); } catch (e) { /* 연출만 */ } }   // 5.3.0.1 도토리가 위 칸으로
     el.classList.remove('open');
     if (rt.modalOpen === el) rt.modalOpen = null;
     setTimeout(() => { if (rt.modalOpen !== el) el.hidden = true; if (then) then(); nextModal(); musicSync(); setTimeout(toastFlush, 60); sheetBackCheck(el); }, 180);
@@ -104,6 +106,7 @@
     { const bd = $('.board'), scd = $('#schoolCard'); if (bd && bd.classList.contains('open')) { bd.classList.remove('open'); if (scd) scd.setAttribute('aria-expanded', 'false'); } }
     if (t !== 'shop') Music.preview = '';
     musicSync();
+    try { trTab(t, prev); } catch (e) { /* 연출만 */ }   // 5.3.0.1 탭 넘김
   }
   function syncSettingsUI() {
     $('#optSound').checked = S.sound; $('#optBgm').checked = S.bgm; $('#optVibe').checked = S.vibrate;
