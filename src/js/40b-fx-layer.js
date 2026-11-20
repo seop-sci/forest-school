@@ -514,3 +514,72 @@
     if (FXG.run > 0) FXG.raf = requestAnimationFrame(fxgFrame);
   }
   function fxgHide() { if (FXG.app) FXG.app.canvas.hidden = true; const st = $('#tmStage'); if (st) st.classList.remove('g6'); }
+  /* ---------- 5.3.0.3 미니게임 터지는 효과(효과층 7단계) ----------
+     숲속 퍼즐: 줄이 지워지면 블록 그림이 네 조각으로 깨져 떨어져요. 숲속 합치기: 합쳐지면 빛 고리와 별 조각이 퍼져요.
+     그림판 하나(canvas.fxo)를 퍼즐 판이나 합치기 판에 옮겨 붙여 써요. 값과 저장은 그대로, 엔진이 없거나 움직임 줄이기면 예전 효과 그대로 */
+  const FXO = { st: '', app: null, w: null, g: null, parts: [], rings: [], raf: 0, last: 0, tex: {}, star: null, dot: null };
+  const fxoOn = () => FXL.st === 'ok' && FXO.st === 'ok' && !rt.reduced;
+  async function fxoInit() {
+    if (FXO.st || FXL.st !== 'ok') return; FXO.st = 'load';
+    try {
+      const P = window.PIXI, app = new P.Application();
+      await app.init({ width: 4, height: 4, backgroundAlpha: 0, antialias: true, resolution: Math.min(2, window.devicePixelRatio || 1), autoDensity: true, autoStart: false });
+      app.ticker.stop(); app.canvas.className = 'fxo'; app.canvas.setAttribute('aria-hidden', 'true');
+      FXO.app = app; FXO.w = new P.Container(); FXO.g = new P.Graphics(); app.stage.addChild(FXO.g, FXO.w);
+      FXO.star = app.renderer.generateTexture(new P.Graphics().star(0, 0, 5, 10, 4).fill(0xffffff)); FXO.dot = app.renderer.generateTexture(new P.Graphics().circle(0, 0, 6).fill(0xffffff));
+      FXO.st = 'ok';
+    } catch (e) { FXO.st = 'no'; }
+  }
+  function fxoHost(host) {
+    if (!fxoOn() || !host) return false; const cv = FXO.app.canvas;
+    if (cv.parentElement !== host) { fxoClear(); host.appendChild(cv); }
+    const w = Math.max(1, host.clientWidth), h = Math.max(1, host.clientHeight);
+    if (FXO.app.screen.width !== w || FXO.app.screen.height !== h) FXO.app.renderer.resize(w, h);
+    return true;
+  }
+  // 칸 그림 주소(url('...'))로 그림을 받아 둬요. 처음 한 번은 받는 동안 점 조각으로
+  function fxoUrlTex(css) {
+    const m = /url\(['"]?([^'")]+)['"]?\)/.exec(css || ''); if (!m) return null; const u = m[1];
+    if (FXO.tex[u] !== undefined) return FXO.tex[u]; FXO.tex[u] = null;
+    const im = new Image(); im.onload = () => { try { FXO.tex[u] = window.PIXI.Texture.from(im); } catch (e) { /* 점 조각 */ } }; im.src = u; return null;
+  }
+  function fxoPart(tex, x, y, sz, o) {
+    const s = new window.PIXI.Sprite(tex); s.anchor.set(0.5); s.x = x; s.y = y; s.scale.set(sz / (tex.frame ? tex.frame.width : tex.width || 1)); if (o.tint) s.tint = o.tint; s.rotation = o.r0 || 0; FXO.w.addChild(s);
+    FXO.parts.push({ s, vx: o.vx || 0, vy: o.vy || 0, g: o.g || 0, rot: o.rot || 0, life: o.life, max: o.life, k0: s.scale.x, shrink: !!o.shrink });
+  }
+  // 블록 하나가 네 조각으로 깨져 떨어져요(그림이 아직 없으면 색 점)
+  function fxoShatter(cx, cy, cw, css, tint, delay) {
+    const tex = fxoUrlTex(css), P = window.PIXI;
+    const go = () => {
+      if (tex && tex.source) { const fw = tex.frame.width / 2, fh = tex.frame.height / 2;
+        for (let q = 0; q < 4; q++) { const qx = q % 2, qy = q >> 1, t = new P.Texture({ source: tex.source, frame: new P.Rectangle(tex.frame.x + qx * fw, tex.frame.y + qy * fh, fw, fh) });
+          const dx = qx ? 1 : -1, dy = qy ? 1 : -1;
+          fxoPart(t, cx + dx * cw * 0.25, cy + dy * cw * 0.25, cw * 0.5, { vx: dx * fxRnd(40, 110), vy: dy * fxRnd(20, 60) - fxRnd(160, 260), g: 900, rot: dx * fxRnd(4, 9), life: fxRnd(0.6, 0.8) }); } }
+      else for (let q = 0; q < 4; q++) fxoPart(FXO.dot, cx, cy, cw * 0.3, { vx: fxRnd(-110, 110), vy: -fxRnd(150, 250), g: 900, life: 0.6, tint: tint || 0xffe08a, shrink: true });
+      fxoKick();
+    };
+    if (delay) setTimeout(go, delay); else go();
+  }
+  // 빛 고리와 별 조각(색은 그 조각 색)
+  function fxoBurst(cx, cy, r, col, big) {
+    const c = typeof col === 'string' && /^#/.test(col) ? parseInt(col.slice(1).padEnd(6, '0').slice(0, 6), 16) : (col || 0xffe08a);
+    FXO.rings.push({ x: cx, y: cy, r0: r * 0.3, r1: r * (big ? 1.9 : 1.4), t: 0, d: big ? 0.55 : 0.4, c, w: big ? 5 : 3 });
+    const n = big ? 16 : 9;
+    for (let i = 0; i < n; i++) { const a = i / n * Math.PI * 2 + fxRnd(-0.2, 0.2), v = fxRnd(90, big ? 260 : 180);
+      fxoPart(i % 3 ? FXO.star : FXO.dot, cx, cy, fxRnd(7, big ? 14 : 10), { vx: Math.cos(a) * v, vy: Math.sin(a) * v - 40, g: 260, rot: fxRnd(-6, 6), life: fxRnd(0.45, 0.7), tint: i % 2 ? c : 0xfff6c8, shrink: true }); }
+    fxoKick();
+  }
+  function fxoKick() { if (FXO.st === 'ok' && !FXO.raf) { FXO.last = performance.now(); FXO.raf = requestAnimationFrame(fxoFrame); } }
+  function fxoClear() { for (const p of FXO.parts) if (!p.s.destroyed) p.s.destroy(); FXO.parts.length = 0; FXO.rings.length = 0; if (FXO.g) FXO.g.clear(); if (FXO.app) FXO.app.render(); }
+  function fxoFrame(now) {
+    FXO.raf = 0; const dt = Math.min(0.05, Math.max(0, (now - FXO.last) / 1000)); FXO.last = now;
+    const cv = FXO.app.canvas; if (!cv.isConnected || !cv.offsetParent) { fxoClear(); return; }
+    for (let i = FXO.parts.length - 1; i >= 0; i--) { const p = FXO.parts[i], s = p.s; p.life -= dt;
+      if (p.life <= 0) { s.destroy(); FXO.parts.splice(i, 1); continue; }
+      p.vy += p.g * dt; s.x += p.vx * dt; s.y += p.vy * dt; s.rotation += p.rot * dt; const k = p.life / p.max; s.alpha = Math.min(1, k * 3); if (p.shrink) s.scale.set(p.k0 * (0.4 + 0.6 * k)); }
+    const g = FXO.g; g.clear();
+    for (let i = FXO.rings.length - 1; i >= 0; i--) { const R = FXO.rings[i]; R.t += dt; const k = R.t / R.d; if (k >= 1) { FXO.rings.splice(i, 1); continue; }
+      const e = 1 - Math.pow(1 - k, 3); g.circle(R.x, R.y, R.r0 + (R.r1 - R.r0) * e).stroke({ width: R.w * (1 - k) + 0.5, color: R.c, alpha: 0.9 * (1 - k) }); }
+    FXO.app.render();
+    if (FXO.parts.length || FXO.rings.length) FXO.raf = requestAnimationFrame(fxoFrame);
+  }

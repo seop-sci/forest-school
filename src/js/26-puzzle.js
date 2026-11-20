@@ -351,6 +351,8 @@
   }
   function pzOpen(asked) {
     pzInitArt();
+    if (FXL.st === 'ok' && !FXO.st) fxoInit();   // 5.3.0.3 깨지는 조각 그림판
+    setTimeout(() => { try { if (FXO.st === 'ok' || FXL.st === 'ok') new Set([...document.querySelectorAll('#pzBoard [style*="url"], #pzTray [style*="url"]')].map(e => e.style.backgroundImage)).forEach(fxoUrlTex); } catch (e) { /* 다음에 */ } }, 600);
     pzDay();
     // 3.0.0 woodani 요청: 보상 없는 연습 판이 남아 있는데 오늘 보상 판이 있으면 이어 할지 새 보상 판으로 할지 물어요(뒤로 가기는 이어 하기)
     if (!asked && S.pz.cur && !S.pz.cur.rw && pzLeft() > 0) {
@@ -576,7 +578,12 @@
         el.classList.add(monoSet.has(i) ? 'mono' : 'pop');
       });
       setTimeout(() => { res.cleared.forEach(i => { pzUI.cells[i].style.animationDelay = ''; }); pzRenderBoard(); }, rt.reduced ? 0 : 420 + 28 * 8);
-      pzLeaves(res.cleared, res.lines.mono.length ? 'mono' : '');
+      if (FXL.st === 'ok' && !FXO.st) fxoInit();
+      if (fxoHost($('#pzPop'))) {   // 5.3.0.3 블록이 네 조각으로 깨져 떨어져요(문양 줄과 여러 줄이면 빛 고리)
+        const rect = pzGridRect(); res.cleared.slice(0, 32).forEach(i => { const x = rect.ox + (i % PZ.N + 0.5) * rect.cell, y = rect.oy + (Math.floor(i / PZ.N) + 0.5) * rect.cellY, dist = Math.abs(Math.floor(i / PZ.N) - pr) + Math.abs(i % PZ.N - pc);
+          fxoShatter(x, y, rect.cell, pzCellImg(res.filled[i], res.filledT[i]), 0, dist * 28 + 60); });
+        if (res.lines.mono.length || res.n >= 2) { const m = res.cleared[Math.floor(res.cleared.length / 2)]; setTimeout(() => fxoBurst(rect.ox + (m % PZ.N + 0.5) * rect.cell, rect.oy + (Math.floor(m / PZ.N) + 0.5) * rect.cellY, rect.cell * 1.6, res.lines.mono.length ? 0xffd34d : 0xfff2b0, true), 140); }
+      } else pzLeaves(res.cleared, res.lines.mono.length ? 'mono' : '');
       if (res.n >= 2 && !rt.reduced) { const b = $('#pzBoard'); b.classList.remove('shake'); void b.offsetWidth; b.classList.add('shake'); }
       const mid = res.cleared[Math.floor(res.cleared.length / 2)];
       pzFx('+' + res.gain, res.lines.mono.length || res.n >= 2 ? 'big' : '', mid);
