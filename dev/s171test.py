@@ -1,6 +1,6 @@
 # 5.3.0.1 시험: 탐험 겹 배경, 전환과 보상, 졸업 연출(설계안 '5.3.0 효과층 마무리')
 # 보는 것
-#  1) 탐험 들꽃 운동장은 겹 배경(.tm-lay 하늘, 먼 풍경, 바닥)과 앞 장식(#tmFg.lay), 겹 그림이 없는 지역은 예전 한 장
+#  1) 탐험은 겹 배경(.tm-lay 하늘, 먼 풍경, 바닥)과 앞 장식(#tmFg.lay), 대학원 밖 여섯 지역 모두 겹 그림(작업지시서 104-2)
 #  2) 체력 막대에 흰 꼬리(s)가 있고 막대와 같은 너비로 따라가요
 #  3) 탭을 빨리 열 번 바꿔도 오류가 없고, 날아가는 잎사귀는 1.5초 안에 모두 사라져요. 탐험 들어갈 때 잎사귀 무리가 쓸려 나가요
 #  4) 보상 창: 빛살이 생기고, 받기로 닫으면 도토리가 날아가요. 도토리 값은 연출과 상관없이 그대로
@@ -44,10 +44,10 @@ async def main():
         await pg.evaluate(f"{F}.setTab('tam')")
         w = await pg.evaluate("!!document.querySelector('#uiFx .ui-wipe')")
         await pg.wait_for_timeout(1500)
-        r = await pg.evaluate(f"""(() => {{ const st = document.querySelector('#tmStage'), c = st.querySelector('.tm-bg.cur'); return {{ wipe: {str(w).lower()}, lay: st.classList.contains('lay'), ly: c.querySelectorAll('.tm-lay .ly').length, fg: document.querySelector('#tmFg').classList.contains('lay'), g: !!{F}.tamLay(1), garden: !!{F}.tamLay(60), hp: document.querySelectorAll('#tmP .tm-hp s').length }}; }})()""")
+        r = await pg.evaluate(f"""(() => {{ const st = document.querySelector('#tmStage'), c = st.querySelector('.tm-bg.cur'); return {{ wipe: {str(w).lower()}, lay: st.classList.contains('lay'), ly: c.querySelectorAll('.tm-lay .ly').length, fg: document.querySelector('#tmFg').classList.contains('lay'), g: !!{F}.tamLay(1), all6: [60, 110, 160, 210, 260].every(f => !!{F}.tamLay(f)), hp: document.querySelectorAll('#tmP .tm-hp s').length }}; }})()""")
         print('탐험', r)
         if not (r['wipe'] and r['lay'] and r['ly'] == 3 and r['fg'] and r['g']): bad.append(f'탐험 겹 배경 {r}')
-        if r['garden']: bad.append('겹 그림이 없는 지역이 겹 배경으로 나옴')
+        if not r['all6']: bad.append('다른 지역 겹 그림이 빠짐')
         if r['hp'] < 1: bad.append(f'체력 흰 꼬리 {r}')
         # 2) 체력 막대와 꼬리 너비(겨루기 중)
         for _ in range(40):
