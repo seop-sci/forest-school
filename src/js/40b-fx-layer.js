@@ -32,7 +32,7 @@
     if (!FXL.tex.ic_acorn) { FXL.st = 'no'; cv.remove(); return; }
     FXL.st = 'ok';
   }
-  const fxRnd = (a, b) => a + Math.random() * (b - a);
+  const fxRnd = (a, b) => a + Math.random() * (b - a);   // 반짝이는 보통 섞기로 그려요(그림판 바탕이 투명이라 더하기 섞기는 거의 안 보여요)
   // 화면 자리(px) ↔ 지도 자리. 지도는 viewBox 0 -60 360 540이라 왼쪽 위가 (0, -60)
   function fxMapPt(cx, cy) { const R = $('#map').getBoundingClientRect(), k = R.width / 360 || 1; return [(cx - R.left) / k, (cy - R.top) / k - 60]; }
   function fxKick() { if (FXL.st === 'ok' && !FXL.raf) { FXL.last = performance.now(); FXL.raf = requestAnimationFrame(fxFrame); } }
@@ -84,7 +84,7 @@
   function fxBurst(x, y, n, o) {
     if (!o.tex) return;
     for (let i = 0; i < n; i++) { const s = fxSprite(o.tex, x, y, o.sz * fxRnd(0.7, 1.25)), a = o.ang != null ? o.ang + fxRnd(-o.spread, o.spread) : fxRnd(0, Math.PI * 2), sp = o.sp * fxRnd(0.5, 1.3);
-      if (o.tint) s.tint = Array.isArray(o.tint) ? o.tint[(Math.random() * o.tint.length) | 0] : o.tint; if (o.add) s.blendMode = 'add';
+      if (o.tint) s.tint = Array.isArray(o.tint) ? o.tint[(Math.random() * o.tint.length) | 0] : o.tint; 
       FXL.parts.push({ s, vx: Math.cos(a) * sp, vy: Math.sin(a) * sp * 0.6 - (o.up || 0), rot: fxRnd(-3, 3), life: o.life * fxRnd(0.8, 1.2), max: o.life, g: o.g || 0, flut: o.flut || 0, ph: fxRnd(0, 6) }); }
   }
   // 참나무를 흔들었어요(누를 때마다). 연타하면 더 크게(최대 oakMax)
@@ -123,3 +123,80 @@
   document.addEventListener('visibilitychange', () => { if (document.hidden && FXL.st === 'ok') fxClear(); });
   if (motionMQ && motionMQ.addEventListener) motionMQ.addEventListener('change', e => { if (e.matches && FXL.st === 'ok') fxClear(); });
   window.addEventListener('load', () => setTimeout(fxLoad, 1500));
+
+  /* ---------- 5.2.2 탐험 효과층(2026-11-20 woodani '탐험도 인게임에서'): 탐험 무대(#tmFx) 안에 그림판(canvas.fxt)을 한 장 더 ----------
+     지금 탐험 연출(대원 공격 자세, 날아가는 기술 그림, 숫자, 흔들림, 필살기 장면)은 그대로 두고 그 위에 더해요.
+     맞을 때 과목 색 반짝이와 먼지, 강한 한 방은 더 크게, 필살기는 충격 고리, 날아가는 기술 그림 뒤 반짝이 꼬리, 쓰러지면 도토리와 재료가 튀어 바닥에 굴러요.
+     재화, 전투 결과, 저장은 그대로예요. 탐험 탭이 아니거나 창이 열리면 지워요 */
+  const FXT = { st: '', app: null, w: null, parts: [], rings: [], raf: 0, last: 0, sc: 1 };
+  const fxTamOn = () => FXL.st === 'ok' && !rt.reduced && tamFxOn();
+  const FXT_COL = { sci: [0x9df0ff, 0x6fd3ff, 0xffffff], kor: [0xffe27a, 0xfff6c8, 0xffffff], art: [0xff8ac4, 0xffd36b, 0x8ad8ff], math: [0xfff27a, 0xffffff, 0xffc94a], pe: [0xffa45a, 0xffe27a, 0xffffff] };
+  async function fxTamInit() {
+    if (FXT.st || FXL.st !== 'ok') return; const box = $('#tmFx'); if (!box) return;
+    FXT.st = 'load';
+    try {
+      const P = window.PIXI, app = new P.Application();
+      await app.init({ width: Math.max(1, box.clientWidth), height: Math.max(1, box.clientHeight), backgroundAlpha: 0, antialias: true, resolution: Math.min(2, window.devicePixelRatio || 1), autoDensity: true, autoStart: false, sharedTicker: false, preference: 'webgl' });
+      app.ticker.stop(); const cv = app.canvas; cv.className = 'fxt'; cv.setAttribute('aria-hidden', 'true'); box.prepend(cv);
+      FXT.app = app; FXT.w = new P.Container(); app.stage.addChild(FXT.w);
+      const tx = k => new Promise(r => { const u = IMG(k); if (!u) { r(null); return; } const im = new Image(); im.onload = () => { try { r(P.Texture.from(im)); } catch (e) { r(null); } }; im.onerror = () => r(null); im.src = u; });
+      for (const k of ['ex_mat_twig', 'ex_mat_stone', 'ex_mat_petal', 'ex_mat_star']) FXL.tex[k] = FXL.tex[k] || await tx(k);
+      // 그려 만든 그림(RenderTexture)은 그 그림판에서만 써요. 탐험 그림판 것을 따로 만들어요
+      FXT.star = app.renderer.generateTexture(new P.Graphics().star(0, 0, 4, 8, 3).fill(0xffffff)); FXT.dot = app.renderer.generateTexture(new P.Graphics().circle(0, 0, 4).fill(0xffffff));
+      FXT.st = 'ok';
+    } catch (e) { FXT.st = 'no'; }
+  }
+  // 무대 자리: tamAt은 화면에서 잰 값(카메라 확대가 들어 있음)이라 그림판 칸으로 바꿔요
+  function fxTamAt(el, fy) { const box = $('#tmFx'); if (!box || !el) return null; const [x, y] = tamAt(el, fy), r = box.getBoundingClientRect(), k = box.clientWidth / (r.width || 1); return [x * k, y * k]; }
+  function fxTamKick() { if (FXT.st === 'ok' && !FXT.raf) { FXT.last = performance.now(); FXT.raf = requestAnimationFrame(fxTamFrame); } }
+  function fxTamClear() { for (const p of FXT.parts) if (!p.s.destroyed) p.s.destroy(); FXT.parts.length = 0; for (const g of FXT.rings) if (!g.g.destroyed) g.g.destroy(); FXT.rings.length = 0; if (FXT.app) FXT.app.render(); }
+  function fxTamPart(tex, x, y, sz, o) {
+    if (!tex) return; const s = new window.PIXI.Sprite(tex); s.anchor.set(0.5); s.x = x; s.y = y; s.scale.set(sz / (tex.width || 1)); if (o.tint) s.tint = o.tint;  FXT.w.addChild(s);
+    FXT.parts.push({ s, vx: o.vx || 0, vy: o.vy || 0, g: o.g || 0, rot: o.rot || 0, life: o.life, max: o.life, floor: o.floor, bounce: o.bounce || 0, n: 0, shrink: !!o.shrink, k0: s.scale.x });
+  }
+  function fxTamBurst(x, y, n, o) { for (let i = 0; i < n; i++) { const a = o.ang != null ? o.ang + fxRnd(-o.spread, o.spread) : fxRnd(0, Math.PI * 2), sp = o.sp * fxRnd(0.45, 1.25), cs = o.cols;
+    fxTamPart(o.tex, x, y, o.sz * fxRnd(0.6, 1.3), { vx: Math.cos(a) * sp, vy: Math.sin(a) * sp * (o.flat || 1) - (o.up || 0), g: o.g, rot: fxRnd(-6, 6), life: o.life * fxRnd(0.75, 1.25), tint: cs ? cs[(Math.random() * cs.length) | 0] : o.tint, add: o.add, shrink: o.shrink, floor: o.floor, bounce: o.bounce }); } }
+  // 맞았어요: el 맞은 장난꾸러기, cr 강한 한 방, big 필살기, ri 과목 번호(TAM.role)
+  function fxTamHit(el, cr, big, ri) {
+    if (!fxTamOn()) return; if (FXT.st !== 'ok') { fxTamInit(); return; }
+    const at = fxTamAt(el, 0.45), ft = fxTamAt(el, 0.98); if (!at) return;
+    const k = TAM.role[ri] ? TAM.role[ri].k : '', cols = FXT_COL[k] || [0xfff2a0, 0xffd36b, 0xffffff], W = FXT.app.screen.width;
+    fxTamBurst(at[0], at[1], big ? 34 : cr ? 20 : 10, { tex: FXT.star, sz: W * (big ? 0.05 : cr ? 0.045 : 0.038), sp: W * (big ? 0.9 : cr ? 0.7 : 0.45), up: W * 0.12, g: W * 1.4, life: big ? 0.8 : 0.55, cols, add: true, shrink: true });
+    if (ft) fxTamBurst(ft[0], ft[1], big ? 10 : 5, { tex: FXL.tex.fx_dust_1 || FXT.dot, sz: W * 0.05, sp: W * 0.18, flat: 0.25, up: W * 0.03, life: 0.6, tint: FXL.tex.fx_dust_1 ? 0xffffff : 0xd9c39a });
+    if (big || cr) { const g = new window.PIXI.Graphics(); g.x = at[0]; g.y = at[1]; FXT.w.addChild(g); FXT.rings.push({ g, t: 0, max: big ? 0.5 : 0.32, r: W * (big ? 0.42 : 0.2), col: big ? 0xfff2a0 : 0xffffff }); }
+    fxTamKick();
+  }
+  // 대원이 뛰어나가요: 발밑 먼지
+  function fxTamDust(el) {
+    if (!fxTamOn()) return; if (FXT.st !== 'ok') { fxTamInit(); return; }
+    const ft = fxTamAt(el, 0.98); if (!ft) return; const W = FXT.app.screen.width;
+    fxTamBurst(ft[0], ft[1], 4, { tex: FXL.tex.fx_dust_1 || FXT.dot, sz: W * 0.045, sp: W * 0.12, ang: Math.PI, spread: 0.5, flat: 0.3, up: W * 0.02, life: 0.5, tint: FXL.tex.fx_dust_1 ? 0xffffff : 0xd9c39a }); fxTamKick();
+  }
+  // 쓰러졌어요: 도토리와 그 지역 재료가 튀어 바닥에서 통통 굴러요(받는 양은 그대로, 그림만)
+  function fxTamDrop(el, fl) {
+    if (!fxTamOn()) return; if (FXT.st !== 'ok') { fxTamInit(); return; }
+    const at = fxTamAt(el, 0.5), ft = fxTamAt(el, 0.98); if (!at || !ft) return; const W = FXT.app.screen.width;
+    const mt = FXL.tex[['ex_mat_twig', 'ex_mat_stone', 'ex_mat_petal'][tamReg(fl).mat] || 'ex_mat_star'] || FXL.tex.ex_mat_star;
+    for (let i = 0; i < 9; i++) { const a = -Math.PI / 2 + fxRnd(-1.1, 1.1), sp = W * fxRnd(0.35, 0.7), tex = i % 3 === 0 && mt ? mt : FXL.tex.ic_acorn;
+      fxTamPart(tex, at[0], at[1], W * (tex === mt ? 0.06 : 0.05), { vx: Math.cos(a) * sp, vy: Math.sin(a) * sp, g: W * 2.6, rot: fxRnd(-8, 8), life: 1.1, floor: ft[1] + fxRnd(-W * 0.02, W * 0.02), bounce: 0.42 }); }
+    fxTamBurst(at[0], at[1], 14, { tex: FXT.star, sz: W * 0.03, sp: W * 0.5, up: W * 0.1, g: W, life: 0.6, cols: [0xffffff, 0xfff2a0, 0xffd36b], add: true, shrink: true });
+    fxTamKick();
+  }
+  function fxTamFrame(now) {
+    FXT.raf = 0; const dt = Math.min(0.05, Math.max(0, (now - FXT.last) / 1000)); FXT.last = now;
+    const app = FXT.app, box = $('#tmFx');
+    if (!fxTamOn() || !box) { fxTamClear(); return; }
+    if (app.screen.width !== box.clientWidth || app.screen.height !== box.clientHeight) app.renderer.resize(Math.max(1, box.clientWidth), Math.max(1, box.clientHeight));
+    // 날아가는 기술 그림(DOM .tm-shot) 뒤에 반짝이 꼬리
+    const shots = $$('#tmFx .tm-shot'), br = box.getBoundingClientRect(), kk = box.clientWidth / (br.width || 1), W = app.screen.width;
+    for (const sh of shots) { const r = sh.getBoundingClientRect(); if (!r.width || Math.random() < 0.35) continue;
+      fxTamPart(FXT.star, (r.left - br.left + r.width / 2) * kk, (r.top - br.top + r.height / 2) * kk, W * 0.022, { vx: fxRnd(-20, 20), vy: fxRnd(-20, 20), life: 0.35, tint: 0xfff2a0, add: true, shrink: true }); }
+    for (let i = FXT.parts.length - 1; i >= 0; i--) { const p = FXT.parts[i], s = p.s; p.life -= dt; p.vy += p.g * dt; s.x += p.vx * dt; s.y += p.vy * dt; s.rotation += p.rot * dt;
+      if (p.floor != null && s.y > p.floor && p.vy > 0) { s.y = p.floor; p.n++; p.vy = -p.vy * p.bounce; p.vx *= 0.6; p.rot *= 0.5; if (p.n > 3) { p.vy = 0; p.g = 0; p.vx *= 0.8; } }
+      const u = Math.max(0, p.life / p.max); s.alpha = p.floor != null ? Math.min(1, u * 3) : Math.min(1, u * 1.8); if (p.shrink) s.scale.set(p.k0 * (0.4 + 0.6 * u));
+      if (p.life <= 0) { s.destroy(); FXT.parts.splice(i, 1); } }
+    for (let i = FXT.rings.length - 1; i >= 0; i--) { const R = FXT.rings[i]; R.t += dt; const u = Math.min(1, R.t / R.max);
+      R.g.clear().circle(0, 0, R.r * (0.15 + 0.85 * u)).stroke({ color: R.col, width: Math.max(1, R.r * 0.12 * (1 - u)), alpha: 1 - u }); if (u >= 1) { R.g.destroy(); FXT.rings.splice(i, 1); } }
+    app.render();
+    if (FXT.parts.length || FXT.rings.length || shots.length) FXT.raf = requestAnimationFrame(fxTamFrame);
+  }
