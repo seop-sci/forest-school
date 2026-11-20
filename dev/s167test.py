@@ -5,7 +5,7 @@
 #  3) j25가 아닐 때는 예전처럼 하루 한 번(다른 동아리도 못 열어요)
 #  4) 공사 중 비버 선생님 크기는 건물 그림 너비(110까지)의 0.30, 건물 오른쪽 아래 모서리
 #  5) 페이지 오류 없음
-#  7) 건물마다 공사 덧그림(작업지시서 99, 101): 건물 그림과 같은 자리와 크기, 30장
+#  7) 건물마다 공사 덧그림(작업지시서 99, 101): 건물 그림과 같은 자리와 크기, 32장
 #  6) 작업지시서 100 그림: 학회 메달 그림, 세미나 10, 20번, 논문 30편, 마을 기부 20단계 장식(한 번만), 후일담 장면 3장
 # 쓰는 법: python3 wrap.py && python3 s167test.py   (마지막 줄이 PASS면 통과)
 import asyncio, json, time
@@ -72,13 +72,13 @@ async def main():
         for k, v in r.items():
             if not v: bad.append(f'{k} 비버가 없어요'); continue
             if abs(v['s'] - v['want']) > 0.2 or abs(v['cx'] - 0.9) > 0.01 or abs(v['foot'] - 0.84) > 0.01: bad.append(f'{k} 비버 크기와 자리 {v}')
-        # 7) 건물마다 공사 덧그림(작업지시서 99, 101): 건물 그림과 같은 자리와 크기, 초등 트랙은 3단계 덧그림을 빌려요, 30장이 다 들어 있어요
+        # 7) 건물마다 공사 덧그림(작업지시서 99, 101): 건물 그림과 같은 자리와 크기, 초등 트랙도 제 덧그림, 32장이 다 들어 있어요
         r = await page.evaluate(f"""(() => {{ const F = {F}, out = {{}}; for (const k of ['classroom', 'playground']) {{ const g = document.querySelector('#b-' + k), bi = g.querySelector('.built .bimg'), ca = g.querySelector('.con-art');
             out[k] = {{ key: g.querySelector('.con').dataset.art, same: !!ca && ['x', 'y', 'width', 'height'].every(a => ca.getAttribute(a) === bi.getAttribute(a)), scaf: g.querySelectorAll('.con-scaf').length }}; }}
-          const names = ['classroom_on', 'classroom_s2', 'classroom_s3', 'classroom_s4', 'classroom_s5', 'cafeteria_on', 'cafeteria_s2', 'cafeteria_s3', 'cafeteria_s4', 'cafeteria_s5', 'library_on', 'library_s2', 'library_s3', 'library_s4', 'library_s5', 'science_s3', 'science_s4', 'science_s5', 'store_on', 'store_s4', 'store_s5', 'dorm_on', 'dorm_s5', 'field_s3', 'field_s4', 'field_s5', 'playground_on', 'union_on', 'institute_on', 'gradhall_on'];
+          const names = ['classroom_on', 'classroom_s2', 'classroom_s3', 'classroom_s4', 'classroom_s5', 'cafeteria_on', 'cafeteria_s2', 'cafeteria_s3', 'cafeteria_s4', 'cafeteria_s5', 'library_on', 'library_s2', 'library_s3', 'library_s4', 'library_s5', 'science_on', 'science_s3', 'science_s4', 'science_s5', 'store_on', 'store_s4', 'store_s5', 'dorm_on', 'dorm_s5', 'field_on', 'field_s3', 'field_s4', 'field_s5', 'playground_on', 'union_on', 'institute_on', 'gradhall_on'];
           out.missing = names.filter(n => !F.IMG('con_' + n)); return out; }})()""")
         print('공사 덧그림', json.dumps(r))
-        if r['classroom'] != {'key': 'con_classroom_on', 'same': True, 'scaf': 1} or r['playground'] != {'key': 'con_field_s3', 'same': True, 'scaf': 1} or r['missing']: bad.append(f'공사 덧그림 {r}')
+        if r['classroom'] != {'key': 'con_classroom_on', 'same': True, 'scaf': 1} or r['playground'] != {'key': 'con_field_on', 'same': True, 'scaf': 1} or r['missing']: bad.append(f'공사 덧그림 {r}')
         errs += errs2
         await b.close()
     if errs: bad.append(f'페이지 오류 {errs[:3]}')
