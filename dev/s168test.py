@@ -5,6 +5,7 @@
 #  3) 도토리가 다 떨어지면 SVG 도토리가 다시 보이고, 주우면 값은 예전과 같고 날아가는 도토리가 끝나면 그리기를 멈춰요(raf 0)
 #  4) 학교 탭을 떠나면 효과를 지우고, '움직임 줄이기'면 효과층을 켜지 않아요
 #  5) 페이지 오류 없음
+#  6) 5.3.0.2 겨울 테마면 잎 대신 흰 눈가루
 # 쓰는 법: python3 wrap.py && python3 s168test.py   (마지막 줄이 PASS면 통과)
 import asyncio, json, pathlib
 from playwright.async_api import async_playwright
@@ -66,6 +67,16 @@ async def main():
         r = await pg.evaluate(f"(() => ({{ falls: {F}.FXL.falls.length, parts: {F}.FXL.parts.length, tr: document.querySelector('#oakCanopy').style.transform, op: [...document.querySelectorAll('.drop .drop-fall')].map(e => e.style.opacity) }}))()")
         print('탭 떠남', r)
         if r['falls'] or r['parts'] or r['tr'] or any(o for o in r['op']): bad.append(f'탭을 떠나면 지우기 {r}')
+        # 5.3.0.2 겨울 테마: 잎 대신 흰 눈가루 다섯 알
+        await pg.evaluate(f"{F}.setTab('school')"); await pg.wait_for_timeout(300)
+        await pg.evaluate(f"(() => {{ const F = {F}; F.S.cos.th.bg = 'winter'; F.applyThemes(); }})()"); await pg.wait_for_timeout(1500)
+        for _ in range(30):
+            if not await pg.evaluate(f"{F}.FXL.parts.length"): break
+            await pg.wait_for_timeout(200)
+        await pg.evaluate(TAP); await pg.wait_for_timeout(60)
+        r = await pg.evaluate(f"(() => {{ const P = {F}.FXL.parts; return {{ n: P.filter(q => q.s.tint === 0xffffff).length, green: P.filter(q => q.s.texture === {F}.FXL.tex.fx_leaf_1 || q.s.texture === {F}.FXL.tex.fx_leaf_2).length }}; }})()")   # 떨어진 도토리 먼지는 빼고 세요
+        print('겨울', r)
+        if r != {'n': 5, 'green': 0}: bad.append(f'겨울 테마는 잎 대신 눈가루 {r}')
         bad += [f'(엔진 있음) {e}' for e in errs[:3]]; await ctx.close()
         # 움직임 줄이기
         ctx, pg, errs = await open_page(b, True, reduced=True)

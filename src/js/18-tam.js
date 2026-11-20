@@ -424,11 +424,12 @@
   const tamMobPic = (fl, m) => m.boss ? tamPic(`ex_boss_${tamReg(fl).k}`, TAM.bossPh) : tamPic(`ex_mob_${tamReg(fl).k}_${m.i + 1}`, TAM.mobPh[(TAM.reg.indexOf(tamReg(fl)) + m.i) % TAM.mobPh.length]);
   // 4.3.0 woodani 요청: 탐험대가 층을 오르며 장난꾸러기를 만나는 화려한 화면. 자리(왼쪽 %, 바닥 %), 앞줄부터
   // 4.3.0 woodani 요청: 맨 앞 장식(풀과 꽃)에 가리지 않게 대원과 장난꾸러기를 14%만큼 위로(TM_UP, 체력 막대까지 보이게)
-  const TM_UP = 26, TM_PPOS = [[37, 5], [23, 14], [22, -1], [9, 8], [8, 20]];
-  const TM_MPOS = [[65, 5], [80, 15], [83, -1]], TM_MPOS1 = [[72, 5]], TM_MPOS2 = [[66, 3], [81, 12]], TM_BPOS = [[74, 2], [55, 17], [55, -2]];
+  // 5.3.0.2 woodani 요청: 사선 배치(탐험대는 왼쪽 아래, 장난꾸러기는 오른쪽 위). [가로 %, 바닥에서 % (TM_UP 더함)]
+  const TM_UP = 26, TM_PPOS = [[35, 6], [21, 10], [27, -4], [9, 4], [12, 16]];
+  const TM_MPOS = [[59, 21], [71, 30], [75, 12]], TM_MPOS1 = [[66, 22]], TM_MPOS2 = [[59, 20], [72, 28]], TM_BPOS = [[67, 18], [50, 35], [53, 12]];   // 오른쪽 단추에 가리지 않게 가운데 쪽으로
   const TM_AMB = { ground: 14, garden: 12, pond: 12, library: 12, yard: 22, tower: 18 };
   // 깊이: 뒷줄(바닥 % 큼)일수록 조금 작고 어둡게
-  const tamDz = y => `--dz:${(1.02 - y * 0.012).toFixed(3)};--db:${(1 - Math.max(0, y) * 0.006).toFixed(3)};`;
+  const tamDz = y => `--dz:${(1.02 - y * 0.007).toFixed(3)};--db:${(1 - Math.max(0, y) * 0.004).toFixed(3)};`;
   // 카메라: 겨룰 때 다가가고, 큰 장난꾸러기가 나오면 그쪽으로 확대했다가 돌아와요
   function tamCam(fight, boss) {
     const st = $('#tmStage'); if (!st) return; st.classList.toggle('fight', !!fight);
