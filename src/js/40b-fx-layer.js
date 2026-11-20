@@ -360,16 +360,14 @@
   const uiOn = () => !rt.reduced && !document.hidden;
   function uiLayer() { let L = $('#uiFx'); if (!L) { L = document.createElement('div'); L.id = 'uiFx'; L.className = 'ui-fx'; L.setAttribute('aria-hidden', 'true'); document.body.appendChild(L); } return L; }
   function uiImg(k, cls) { const u = IMG(k); if (!u) return null; const im = document.createElement('img'); im.src = u; im.alt = ''; im.className = cls || 'ui-p'; uiLayer().appendChild(im); return im; }
-  // 탭 넘김: 새 화면이 살짝 떠오르고 잎사귀 두 장이 휙(0.25초, 빨리 눌러도 앞 움직임을 지우고 새로)
+  // 탭 넘김: 새 화면이 살짝 떠올라요(0.25초, 빨리 눌러도 앞 움직임을 지우고 새로)
   function trTab(t, prev) {
     if (!uiOn() || t === prev) return;
-    if (t === 'tam' && prev !== 'tam') { trWipe(); return; }
+    // 5.3.0.2 woodani: 탐험에 들어갈 때 잎사귀 무리(trWipe)도 쓰지 않아요
     const el = t === 'school' ? $('.frame') : document.querySelector('.panel:not([hidden])');
     if (UIFX.tabA) { try { UIFX.tabA.cancel(); } catch (e) { /* 이미 끝남 */ } }
     if (el && el.animate) UIFX.tabA = el.animate([{ opacity: 0.55, transform: 'translateY(10px)' }, { opacity: 1, transform: 'none' }], { duration: 250, easing: 'cubic-bezier(.2,.8,.3,1)' });
-    const W = window.innerWidth, H = window.innerHeight;
-    for (let i = 0; i < 2; i++) { const im = uiImg(i ? 'tr_leaf_2' : 'tr_leaf_1'); if (!im) break; const y = H * (0.25 + Math.random() * 0.45), s = 26 + Math.random() * 10;
-      im.style.width = s + 'px'; const a = im.animate([{ transform: `translate(${W + 20}px,${y}px) rotate(0deg)`, opacity: 0.95 }, { transform: `translate(${W * 0.45}px,${y + 30}px) rotate(-160deg)`, opacity: 0.95, offset: 0.5 }, { transform: `translate(-60px,${y + 70}px) rotate(-320deg)`, opacity: 0 }], { duration: 520 + i * 90, delay: i * 50, easing: 'ease-in-out', fill: 'backwards' }); a.onfinish = () => im.remove(); }
+    // 5.3.0.2 woodani: 탭 넘김 때 날아가는 잎사귀는 뺐어요
   }
   // 큰 장면 넘김: 잎사귀 무리가 화면을 덮은 채 시작해 왼쪽으로 쓸려 나가며 새 화면이 보여요(화면은 이미 바뀐 뒤라 누르기를 막지 않아요)
   function trWipe() {
@@ -380,13 +378,8 @@
   }
   // 보상 창: 뒤에서 빛살이 천천히 돌아요(받는 값이 보이는 창만)
   const UI_RW = ['mReward', 'mSportsEnd', 'mFestEnd', 'mOffline'];
-  function uiRwOpen(el) {
-    if (!el || !uiOn()) return; const u = IMG('rw_burst'); if (!u) return;
-    if (!(UI_RW.includes(el.id) || el.querySelector('.amount'))) return;
-    let b = el.querySelector('.rw-burst'); if (!b) { b = document.createElement('i'); b.className = 'rw-burst'; b.setAttribute('aria-hidden', 'true'); b.style.setProperty('--rwu', `url("${u}")`); const bd = el.querySelector('.backdrop'); if (bd) bd.after(b); else el.prepend(b); }
-    const gold = !!el.querySelector('.amount [data-gold], .rw-list .gold');
-    b.style.setProperty('--rwc', gold ? '#FFC93C' : '#FFD978');
-  }
+  function uiRwOpen(el) { }   // 5.3.0.2 woodani: 보상 창 뒤 빛살은 뺐어요(받으면 도토리가 날아가는 것은 그대로)
+
   // 받기: 받은 자리에서 도토리가 위쪽 도토리 칸으로 날아가요(최대 8개)
   function uiRwClose(el) {
     if (!el || !uiOn() || !(UI_RW.includes(el.id) || el.querySelector('.amount')) || !el.querySelector('[data-acorn], .amount svg, .amount img, .rw-list svg, .rw-big svg')) return;   // 도토리를 받는 창만
