@@ -2,7 +2,7 @@
 <html lang="ko">
 <head>
 <meta charset="utf-8">
-<meta name="forest-version" content="5.2.0.1">
+<meta name="forest-version" content="5.2.0.2">
 <meta name="viewport" content="width=device-width, initial-scale=1">
 <meta name="description" content="도토리를 모아 숲속 학교를 키우는 방치형 게임 테스트판이에요.">
 <style>html,body{margin:0}</style>
@@ -3943,7 +3943,7 @@ body.mg-on .toast[hidden]{display:none}
     <p class="boot-step" id="bootStep">학교 문을 여는 중...</p>
     <p class="boot-tip" id="bootTip">학교 문을 여는 중이에요</p>
   </div>
-  <span class="boot-ver" id="bootVer">v5.2.0.1</span>
+  <span class="boot-ver" id="bootVer">v5.2.0.2</span>
 </div>
 
 <div class="app on-school" id="app">
@@ -4538,7 +4538,7 @@ body.mg-on .toast[hidden]{display:none}
       </div>
       <h3 class="panel-sub">정보</h3>
       <dl class="info">
-        <div id="verRow"><dt>버전</dt><dd>v5.2.0.1</dd></div>
+        <div id="verRow"><dt>버전</dt><dd>v5.2.0.2</dd></div>
         <div id="pidRow" hidden><dt>학교 번호</dt><dd id="infoPid"></dd></div>
       </dl>
       <div id="devBox" hidden>
@@ -6934,6 +6934,7 @@ body.mg-on .toast[hidden]{display:none}
 "con_classroom_s5":"img/a/con_classroom_s5-216af817bb.webp",
 "con_dorm_on":"img/a/con_dorm_on-f7146c6bc5.webp",
 "con_dorm_s5":"img/a/con_dorm_s5-a8e9275f65.webp",
+"con_field_on":"img/a/con_field_on-eef6877a6f.webp",
 "con_field_s3":"img/a/con_field_s3-5e48a0dcb7.webp",
 "con_field_s4":"img/a/con_field_s4-0ea5229813.webp",
 "con_field_s5":"img/a/con_field_s5-beab84129c.webp",
@@ -6945,6 +6946,7 @@ body.mg-on .toast[hidden]{display:none}
 "con_library_s4":"img/a/con_library_s4-7f6c68f142.webp",
 "con_library_s5":"img/a/con_library_s5-04da50b464.webp",
 "con_playground_on":"img/a/con_playground_on-8ee8f0ef5a.webp",
+"con_science_on":"img/a/con_science_on-b973f54fa6.webp",
 "con_science_s3":"img/a/con_science_s3-17be01a50b.webp",
 "con_science_s4":"img/a/con_science_s4-c5c79c2aa1.webp",
 "con_science_s5":"img/a/con_science_s5-c5e2d11dcb.webp",
@@ -14026,8 +14028,7 @@ body.mg-on .toast[hidden]{display:none}
     for (const k of Object.keys(FAC)) conMap(k);
     if (rt.sheetKey) conSheet();
   }
-  const CON_ALT = { con_field_on: 'con_field_s3', con_science_on: 'con_science_s3' };   // 초등학교 트랙과 과학실(1단계 그림)은 덧그림이 아직 없어 모양이 비슷한 3단계 덧그림을 빌려요
-  const conArtKey = k => { if (!(S.f[k] >= 1)) return ''; let key = 'con_' + bldImg(k).replace(/^bld_/, ''); if (!IMG(key) && CON_ALT[key]) key = CON_ALT[key]; return IMG(key) ? key : ''; };
+  const conArtKey = k => { if (!(S.f[k] >= 1)) return ''; const key = 'con_' + bldImg(k).replace(/^bld_/, ''); return IMG(key) ? key : ''; };   // 5.2.0.2 초등 트랙과 과학실 덧그림(작업지시서 102)이 들어와 빌려 쓰기(CON_ALT)를 없앴어요
   function conMap(k) {
     const g = $('#b-' + k); if (!g) return;
     let el = g.querySelector('.con'), ui = document.getElementById('cu-' + k);
@@ -14671,8 +14672,8 @@ body.mg-on .toast[hidden]{display:none}
        forest/rank/<내 id>   랭킹 이름과 학교 점수
        forest/stats/<내 id>  테스트 현황 (어디까지 했는지, 얼마나 했는지)
      <내 id>는 Firebase 익명 로그인이 기기(브라우저)마다 만들어 줘요. */
-  const VERSION = '5.2.0.1';   // 2026-11-17 woodani 결정: 웹에 5.0.2~5.0.5로 먼저 냈던 것을 앱과 함께 5.0.1 하나로 내요(버전 견줌은 앞 두 자리만 봐서 되돌아가도 괜찮아요)
-  const NT_QUIET = ['5.2.0.1', '5.1.1.3', '5.1.1.2', '5.1.1.1', '5.1.1', '5.0.3.1', '5.0.3', '5.0.2.2', '5.0.2.1', '2.1.20', '2.1.2.2', '2.3.0.1', '2.3.4', '3.2.3', '3.2.4', '3.2.5', '3.3.1', '3.3.2', '3.3.3', '4.4.1.1', '4.4.1.2', '4.4.1.3', '4.4.1.4', '5.0.1.1', '5.0.1.2', '5.0.1.3', '5.0.1.4', '5.0.1.5', '5.0.1.6', '5.0.1.7', '5.0.1.8'];   // 5.0.1.1 생물 탐사 고침은 공지 없이   // 5.0.3도 공지 없이(공지 줄은 woodani가 정하면 넣어요)   // 5.0.2 공지 없이(woodani 2026-11-16)   // 5.0.1 공지 줄은 woodani가 정할 때까지 조용히   // 5.0.0 공지는 2026-11-16 woodani가 정해서 NOTICES로 옮겼어요   // 4.4.1(앱과 함께 내는 판)은 공지를 띄워요   // 4.4.1도 공지 없이(woodani)   // 3.3.1, 3.3.2, 3.3.3(토스 먼저)도 공지 창 없이(woodani). 2.3.0.1도 공지 창 없이(공지는 그대로 2.3.0). 2.3.4도 조용히(woodani 결정). 3.2.3, 3.2.4, 3.2.5도 공지 창 없이(공지 줄을 고르지 않음)
+  const VERSION = '5.2.0.2';   // 2026-11-17 woodani 결정: 웹에 5.0.2~5.0.5로 먼저 냈던 것을 앱과 함께 5.0.1 하나로 내요(버전 견줌은 앞 두 자리만 봐서 되돌아가도 괜찮아요)
+  const NT_QUIET = ['5.2.0.2', '5.2.0.1', '5.1.1.3', '5.1.1.2', '5.1.1.1', '5.1.1', '5.0.3.1', '5.0.3', '5.0.2.2', '5.0.2.1', '2.1.20', '2.1.2.2', '2.3.0.1', '2.3.4', '3.2.3', '3.2.4', '3.2.5', '3.3.1', '3.3.2', '3.3.3', '4.4.1.1', '4.4.1.2', '4.4.1.3', '4.4.1.4', '5.0.1.1', '5.0.1.2', '5.0.1.3', '5.0.1.4', '5.0.1.5', '5.0.1.6', '5.0.1.7', '5.0.1.8'];   // 5.0.1.1 생물 탐사 고침은 공지 없이   // 5.0.3도 공지 없이(공지 줄은 woodani가 정하면 넣어요)   // 5.0.2 공지 없이(woodani 2026-11-16)   // 5.0.1 공지 줄은 woodani가 정할 때까지 조용히   // 5.0.0 공지는 2026-11-16 woodani가 정해서 NOTICES로 옮겼어요   // 4.4.1(앱과 함께 내는 판)은 공지를 띄워요   // 4.4.1도 공지 없이(woodani)   // 3.3.1, 3.3.2, 3.3.3(토스 먼저)도 공지 창 없이(woodani). 2.3.0.1도 공지 창 없이(공지는 그대로 2.3.0). 2.3.4도 조용히(woodani 결정). 3.2.3, 3.2.4, 3.2.5도 공지 창 없이(공지 줄을 고르지 않음)
     // 2.1.20 woodani 결정: 이 버전들은 업데이트해도 공지 창을 띄우지 않아요(공지는 그대로 2.1.2)
   /* 2.0.0 공지사항 (2026-10-27 woodani, 1.8.0은 이미 올려서 2.0.0부터): 설정 > 공지사항. 맨 위가 가장 새 공지예요.
      패치노트는 자동으로 넣지 않아요. woodani가 검수한 글만 여기에 적어요(CHANGELOG.md는 자세한 기록용이라 따로 있어요).

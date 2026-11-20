@@ -730,8 +730,7 @@
     for (const k of Object.keys(FAC)) conMap(k);
     if (rt.sheetKey) conSheet();
   }
-  const CON_ALT = { con_field_on: 'con_field_s3', con_science_on: 'con_science_s3' };   // 초등학교 트랙과 과학실(1단계 그림)은 덧그림이 아직 없어 모양이 비슷한 3단계 덧그림을 빌려요
-  const conArtKey = k => { if (!(S.f[k] >= 1)) return ''; let key = 'con_' + bldImg(k).replace(/^bld_/, ''); if (!IMG(key) && CON_ALT[key]) key = CON_ALT[key]; return IMG(key) ? key : ''; };
+  const conArtKey = k => { if (!(S.f[k] >= 1)) return ''; const key = 'con_' + bldImg(k).replace(/^bld_/, ''); return IMG(key) ? key : ''; };   // 5.2.0.2 초등 트랙과 과학실 덧그림(작업지시서 102)이 들어와 빌려 쓰기(CON_ALT)를 없앴어요
   function conMap(k) {
     const g = $('#b-' + k); if (!g) return;
     let el = g.querySelector('.con'), ui = document.getElementById('cu-' + k);
