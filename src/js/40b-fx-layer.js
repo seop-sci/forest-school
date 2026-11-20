@@ -420,3 +420,97 @@
     L._stop = () => { timers.forEach(clearTimeout); L.remove(); };
     return L;
   }
+  /* ---------- 5.3.0.3 탐험 오르는 길(효과층 6단계, 작업지시서 105, 105-2) ----------
+     탐험 무대 바닥을 엔진으로 그려요: 바닥 조각(ex6_<지역>_tile)을 세로로 눌러 원근을 주고, 그 위에 사선 길 한 줄(ex6_<지역>_path)을 깔아요.
+     다 처치하면 대원들이 길을 따라 오른쪽 위로 달리고, 화면이 따라가며 바닥이 왼쪽 아래로 흘러요. 10층마다 아치문(ex6_<지역>_gate)을 지나요.
+     높이 오를수록(지역 안 50층) 먼 풍경이 내려가고 발아래로 구름(ex6_cloud)이 지나가요.
+     하늘, 먼 풍경, 앞 장식은 그대로 HTML 겹(작업지시서 104-2). 엔진이 없거나 움직임 줄이기면 예전 오르기 그대로. 겨루기 계산과 값은 바꾸지 않아요 */
+  const FXG = { st: '', app: null, root: null, sq: null, floor: null, path: null, cloud: null, gate: null, gs: 0, reg: '', tex: {}, raf: 0, last: 0, run: 0, sp: 0, ang: 0, ux: 0, uy: 0, mid: [0, 0], top: 0, W: 0, H: 0, h: 0 };
+  const FXG_SQ = 0.6;   // 바닥을 세로로 누르는 정도(원근 어림)
+  const fxgOn = fl => fxTamOn() && FXG.st === 'ok' && !!fxgTexOk(tamReg(fl).k);
+  function fxgTexOk(k) { return !!(IMG(`ex6_${k}_tile`) && IMG(`ex6_${k}_path`)); }
+  function fxgTex(k) {
+    if (FXG.tex[k] !== undefined) return FXG.tex[k];
+    FXG.tex[k] = null; const u = IMG(k); if (!u) return null;
+    const im = new Image(); im.onload = () => { try { FXG.tex[k] = window.PIXI.Texture.from(im); fxgRefresh(); } catch (e) { /* 없으면 예전 바닥 */ } }; im.src = u;
+    return null;
+  }
+  // 엔진이나 그림이 늦게 준비되면 지금 탐험 화면에 바로 깔아요(처음 연 뒤 첫 오르기부터 새 길로)
+  function fxgRefresh() { try { if (rt.tab === 'tam' && rt.tam && !rt.tam.climbing) { const fl = (rt.tam.F && rt.tam.F.fl) || tamCurFl(); if (FXG.reg && FXG.reg !== tamReg(fl).k) FXG.reg = ''; tamG6(fl); } } catch (e) { /* 다음 걷기에서 */ } }
+  async function fxgInit() {
+    if (FXG.st || FXL.st !== 'ok') return; const world = $('#tmWorld'); if (!world) return;
+    FXG.st = 'load';
+    try {
+      const P = window.PIXI, app = new P.Application();
+      await app.init({ width: Math.max(1, world.clientWidth), height: Math.max(1, world.clientHeight), backgroundAlpha: 0, antialias: true, resolution: Math.min(2, window.devicePixelRatio || 1), autoDensity: true, autoStart: false });
+      app.ticker.stop(); const cv = app.canvas; cv.className = 'fxg'; cv.setAttribute('aria-hidden', 'true');
+      const bgs = world.querySelector('.tm-bgs'); if (bgs) bgs.after(cv); else world.prepend(cv);
+      FXG.app = app; FXG.root = new P.Container(); app.stage.addChild(FXG.root);
+      FXG.sq = new P.Container(); FXG.root.addChild(FXG.sq);
+      ['ex6_cloud'].forEach(fxgTex);
+      FXG.st = 'ok'; cv.hidden = true; fxgRefresh();
+    } catch (e) { FXG.st = 'no'; }
+  }
+  // 대원 무리 가운데와 장난꾸러기 무리 가운데(무대 칸)를 이어 길 방향을 정해요
+  function fxgGeom() {
+    const world = $('#tmWorld'), W = world.clientWidth, H = world.clientHeight, fl = $('.tm-bg.cur .ly.floor');
+    const wr = world.getBoundingClientRect(), k = W / (wr.width || W);
+    let top = H * 0.36; if (fl) { const r = fl.getBoundingClientRect(); if (r.height) top = (r.top - wr.top) * k + r.height * k * 0.1; }
+    const pt = L => { const n = Math.min(3, L.length); let x = 0, y = 0; for (let i = 0; i < n; i++) { x += L[i][0]; y += L[i][1]; } return [W * x / n / 100, H * (1 - (y / n + TM_UP) / 100)]; };
+    const a = pt(TM_PPOS), b = pt(TM_MPOS), loc = ([x, y]) => [x - W / 2, (y - top) / FXG_SQ];
+    const la = loc(a), lb = loc(b), dx = lb[0] - la[0], dy = lb[1] - la[1], d = Math.hypot(dx, dy) || 1;
+    Object.assign(FXG, { W, H, top, ux: dx / d, uy: dy / d, ang: Math.atan2(dy, dx), mid: [(la[0] + lb[0]) / 2, (la[1] + lb[1]) / 2] });
+  }
+  // 지역 바닥과 길을 깔아요(force면 그림이 늦게 받아졌을 때 다시)
+  function fxgSet(k, force) {
+    if (FXG.st !== 'ok') return false; const P = window.PIXI, app = FXG.app, world = $('#tmWorld'); if (!world) return false;
+    const tile = fxgTex(`ex6_${k}_tile`), path = fxgTex(`ex6_${k}_path`); fxgTex(`ex6_${k}_gate`);   // 문은 미리 받아 둬요
+    if (!tile || !path) { app.canvas.hidden = true; FXG.reg = k; return false; }
+    if (app.screen.width !== world.clientWidth || app.screen.height !== world.clientHeight) { app.renderer.resize(Math.max(1, world.clientWidth), Math.max(1, world.clientHeight)); force = true; }
+    if (FXG.reg === k && FXG.floor && !force) { app.canvas.hidden = false; return true; }
+    FXG.reg = k; fxgGeom();
+    const { W, H, top } = FXG, sq = FXG.sq;
+    sq.removeChildren().forEach(c => c.destroy()); FXG.gate = null;
+    sq.position.set(W / 2, top); sq.scale.set(1, FXG_SQ);
+    const ts = Math.max(0.3, W * 0.8 / 720), LH = (H - top) / FXG_SQ + 40;
+    const floor = new P.TilingSprite({ texture: tile, width: W * 3, height: LH + 80 }); floor.position.set(-W * 1.5, -40); floor.tileScale.set(ts); sq.addChild(floor); FXG.floor = floor;
+    const len = Math.hypot(W, LH) * 2.2, pw = 256 * ts * 1.05;
+    const pa = new P.TilingSprite({ texture: path, width: pw, height: len }); pa.anchor.set(0.5); pa.tileScale.set(ts * 1.05); pa.rotation = FXG.ang + Math.PI / 2; pa.position.set(FXG.mid[0], FXG.mid[1]); sq.addChild(pa); FXG.path = pa;
+    // 위쪽 가장자리는 HTML 바닥(풀숲 가장자리)과 이어지게 흐리게
+    if (!FXG.fade) { const c = document.createElement('canvas'); c.width = 4; c.height = 64; const g = c.getContext('2d'), gr = g.createLinearGradient(0, 0, 0, 64); gr.addColorStop(0, 'rgba(255,255,255,0)'); gr.addColorStop(1, 'rgba(255,255,255,1)'); g.fillStyle = gr; g.fillRect(0, 0, 4, 64); FXG.fade = P.Texture.from(c); }
+    if (FXG.mask) FXG.mask.destroy(); const m = new P.Container(), m1 = new P.Sprite(FXG.fade), m2 = new P.Sprite(P.Texture.WHITE);
+    m1.position.set(0, top - 10); m1.width = W; m1.height = 46; m2.position.set(0, top + 36); m2.width = W; m2.height = H; m.addChild(m1, m2); FXG.root.addChild(m); sq.mask = m; FXG.mask = m;
+    const ct = fxgTex('ex6_cloud');
+    if (ct && !FXG.cloud) { const cl = new P.TilingSprite({ texture: ct, width: W, height: H * 0.3 }); cl.tileScale.set(H * 0.3 / 512); cl.position.set(0, H * 0.72); cl.alpha = 0; FXG.root.addChild(cl); FXG.cloud = cl; }
+    if (FXG.cloud) { FXG.cloud.width = W; FXG.cloud.height = H * 0.3; FXG.cloud.position.set(0, H * 0.72); FXG.root.addChild(FXG.cloud); }
+    app.canvas.hidden = false; app.render(); return true;
+  }
+  // 높이: 지역 안 50층 가운데 어디쯤인지(0~1). 먼 풍경이 내려가고 구름이 짙어져요
+  function fxgHeight(fl) {
+    const h = ((Math.max(1, fl) - 1) % TAM.regLen) / (TAM.regLen - 1); FXG.h = h;
+    const far = $('.tm-bg.cur .ly.far'); if (far) far.style.translate = `0 ${(h * 9).toFixed(1)}%`;
+    if (FXG.cloud) { FXG.cloud.alpha = h < 0.3 ? 0 : Math.min(0.75, (h - 0.3) * 1.3); FXG.cloud.tint = { lab: 0xf3e6ff, tower: 0xc9c2f0, yard: 0xffffff }[FXG.reg] || 0xffffff; }
+  }
+  // 길을 따라 ms 동안 d만큼 흘러요(대원이 오른쪽 위로 가는 만큼 바닥은 왼쪽 아래로)
+  function fxgRun(ms, d, gate) {
+    if (FXG.st !== 'ok' || !FXG.floor) return;
+    FXG.run = ms / 1000; FXG.sp = d / Math.max(0.1, FXG.run);
+    if (gate) { const g = fxgTex(`ex6_${FXG.reg}_gate`); if (g) { if (FXG.gate) FXG.gate.destroy(); const s = new window.PIXI.Sprite(g); s.anchor.set(0.5, 0.96); const gh = FXG.H * 0.24; s.scale.set(gh / (g.height || 1)); FXG.root.addChildAt(s, FXG.root.children.indexOf(FXG.mask) + 1); FXG.gate = s; FXG.gs = FXG.W * 0.45; fxgGatePos(); } }
+    fxgKick();
+  }
+  function fxgKick() { if (FXG.st === 'ok' && !FXG.raf) { FXG.last = performance.now(); FXG.raf = requestAnimationFrame(fxgFrame); } }
+  function fxgGatePos() { const g = FXG.gate; if (!g) return; const lx = FXG.mid[0] + FXG.ux * FXG.gs, ly = FXG.mid[1] + FXG.uy * FXG.gs; g.position.set(FXG.W / 2 + lx, FXG.top + ly * FXG_SQ); }
+  function fxgFrame(now) {
+    FXG.raf = 0; const dt = Math.min(0.05, Math.max(0, (now - FXG.last) / 1000)); FXG.last = now;
+    if (!fxTamOn() || !FXG.floor) { FXG.run = 0; return; }
+    if (FXG.run > 0) {
+      const e = Math.min(1, FXG.run / 0.25), v = FXG.sp * e * dt; FXG.run -= dt;   // 끝 0.25초는 천천히 멈춰요
+      FXG.floor.tilePosition.x -= FXG.ux * v; FXG.floor.tilePosition.y -= FXG.uy * v;
+      FXG.path.tilePosition.y += v;
+      if (FXG.cloud && FXG.cloud.alpha > 0) FXG.cloud.tilePosition.x -= v * 0.35;
+      if (FXG.gate) { FXG.gs -= v; fxgGatePos(); if (FXG.gs < -Math.hypot(FXG.W, FXG.H) * 0.8) { FXG.gate.destroy(); FXG.gate = null; } }
+    }
+    FXG.app.render();
+    if (FXG.run > 0) FXG.raf = requestAnimationFrame(fxgFrame);
+  }
+  function fxgHide() { if (FXG.app) FXG.app.canvas.hidden = true; const st = $('#tmStage'); if (st) st.classList.remove('g6'); }
