@@ -551,7 +551,9 @@
       el.classList.toggle('want', want.has(code));
       el.classList.remove('new', 'merge', 'over');
       if (i === mgUI.pop) { void el.offsetWidth; el.classList.add('new'); }
-      if (mgUI.merged && mgUI.merged.includes(i)) { void el.offsetWidth; el.classList.add('merge'); const K = MG.kinds[code[0]]; mgDust(i, mgLvOf(code[1]) >= 5 ? 14 : 8, K ? K.c : ''); }
+      if (mgUI.merged && mgUI.merged.includes(i)) { void el.offsetWidth; el.classList.add('merge'); const K = MG.kinds[code[0]], lv = mgLvOf(code[1]);
+        if (FXL.st === 'ok' && !FXO.st) fxoInit();
+        const c = mgCenter(i); if (c && fxoHost($('#mgGrid'))) fxoBurst(c.x, c.y, c.w * 0.55, K ? K.r : '', lv >= 5); else mgDust(i, lv >= 5 ? 14 : 8, K ? K.c : ''); }   // 5.3.0.3 빛 고리와 별 조각
       if (i === mgUI.land) { void el.offsetWidth; el.classList.add('land'); setTimeout(() => el.classList.remove('land'), 400); }
     });
     if (mgUI.merged && mgUI.merged.length && mgUI.thumpNew) mgThump();   // 1.8.0 woodani: 판 두근거림은 처음 만든 단계일 때만
@@ -662,6 +664,7 @@
   }
   function mgOpen() {
     mgTick();
+    if (FXL.st === 'ok' && !FXO.st) fxoInit();   // 5.3.0.3 빛 고리 그림판
     if (!S.mg.board || S.mg.board.length !== MG_N * 2) mgSetCells(mgEmptyBoard());
     mgFillOrders();
     mgUI.open = true; mgUI.sel = -1; mgUI.got = { a: 0, pc: 0, up: 0 }; mgUI.idleAt = Date.now();

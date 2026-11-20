@@ -160,9 +160,10 @@
   const CAMPUS8 = ['classroom', 'cafeteria', 'library', 'playground', 'science', 'store', 'dorm', 'union'];   // 5.0.1.3 대학원 퀘스트 facAll: 대학교 때 지은 건물 여덟 채
   // 학교가 계속 자라니까 높은 레벨은 값이 덜 가파르게 올라요: 시설은 Lv.15부터, 선생님은 Lv.12부터 한 레벨에 1.35배씩
   const SOFT = { fac: 15, tea: 12, g: 1.35 };
-  const EARLY = { g: 1.30, ch: 7, back: 0.3 };   // 5.2.0 3안: 유치원과 초등 비용 곡선, 1~8장(유치원~초등 3학년) 건물 퀘스트는 그 레벨 공사비의 30%를 돌려받아요
+  const EARLY = { g: 1.27, ch: 7, back: 0.3 };   // 5.2.0 3안: 유치원과 초등 비용 곡선, 1~8장(유치원~초등 3학년) 건물 퀘스트는 그 레벨 공사비의 30%를 돌려받아요
   const softCost = (fn, L, from) => fn(Math.min(L, from)) * Math.pow(softG(), Math.max(0, L - from));
   // 5.2.0 woodani 결정(2026-11-20, '초반 성장 속도 조정안' 3안): 유치원과 초등학교는 레벨마다 1.35배 대신 1.30배
+  // 5.3.0 woodani 결정(2026-11-20 저녁): 1.30배를 1.27배로(초등 4~6학년 도서관 퀘스트가 수업료로 19.5시간 걸리던 것, qbot 초등 전체 158시간 → 118시간)
   const softG = () => (S && S.tier <= 1) ? EARLY.g : SOFT.g;
   const facCost = k => facMaxed(k) ? Infinity : Math.ceil(softCost(FAC[k].cost, S.f[k] + (FAC[k].lvOff || 0), SOFT.fac) * costScale());   // 5.0.0 lvOff: 대학원 연구 건물
   /* ---------- 2.1.0 공사 시간과 시간 단축권 (속도와 경제 재설계안 2-1, 2-1-1) ----------
