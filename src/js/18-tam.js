@@ -449,6 +449,14 @@
   }
   function tamFxOn() { return rt.tab === 'tam' && !rt.modalOpen && !document.hidden; }
   function tamBg(fl) { return IMG('ex4_bg_' + tamReg(fl).k) || tamI('ex_bg_' + tamReg(fl).k); }   // 4.4.0 세로 배경
+  // 5.3.0.1 겹 배경(작업지시서 104): 하늘, 먼 풍경, 바닥 세 겹(앞 장식은 #tmFg). 그림이 다 있는 지역만, 없으면 예전 한 장
+  function tamLay(fl) { const k = tamReg(fl).k, u = n => IMG(`ex5_${k}_${n}`), L = { k, sky: u('sky'), far: u('far'), floor: u('floor'), front: u('front') }; return L.sky && L.far && L.floor ? L : null; }
+  function tamBgPaint(el, fl) {
+    if (!el) return; const L = tamLay(fl);
+    if (!L) { if (el.dataset.lay) { el.innerHTML = ''; el.dataset.lay = ''; } const bg = tamBg(fl); el.style.backgroundImage = bg ? `url("${bg}")` : ''; return; }
+    el.style.backgroundImage = '';
+    if (el.dataset.lay !== L.k) { el.innerHTML = `<i class="tm-lay"><i class="ly sky" style="background-image:url('${L.sky}')"></i><i class="ly far" style="background-image:url('${L.far}')"></i><i class="ly floor" style="background-image:url('${L.floor}')"></i></i>`; el.dataset.lay = L.k; }
+  }
   function tamAmb(k) {
     const a = $('#tmAmb'); if (!a || a.dataset.k === k) return; a.dataset.k = k;
     let h = ''; for (let i = 0; i < TM_AMB[k]; i++) { const r = (n => (Math.sin(i * 12.9898 + n * 78.233) * 43758.5453) % 1)(1), q = Math.abs(r);
@@ -471,18 +479,19 @@
     const T = rt.tam, F = T && T.F, st = $('#tmStage'); if (!st) return;
     const fl = F ? F.fl : tamCurFl(), R = tamReg(fl), bg = tamBg(fl);
     st.dataset.reg = R.k; st.classList.toggle('hm', F ? !!F.hm : tamHOn()); st.classList.toggle('deep', tamLap(fl) > 0);
-    if (!T || !T.climbing) { const c = $('.tm-bg.cur', st); c.style.backgroundImage = bg ? `url("${bg}")` : ''; }
+    if (!T || !T.climbing) tamBgPaint($('.tm-bg.cur', st), fl);
+    st.classList.toggle('lay', !!tamLay(fl));
     tamAmb(R.k); tamTower(fl); tamFl(fl);
     const boss = !!(F && F.M[0] && F.M[0].boss); st.classList.toggle('boss', boss);
     const bb = $('#tmBossBar'); bb.hidden = !boss; if (boss) bb.querySelector('span').textContent = F.M[0].nm;
     const party = F ? F.P : tamTeam();
     $('#tmP').dataset.fid = F ? F.id : ''; $('#tmM').dataset.fid = F ? F.id : ''; $('#tmP').classList.remove('walking', 'enter', 'jump');
     setH($('#tmP'), party.map((p, i) => { const [x, y] = TM_PPOS[i] || TM_PPOS[0];
-      return `<div class="tm-f" data-i="${i}" style="left:${x}%;bottom:${y + TM_UP}%;z-index:${30 - y};${tamDz(y)}--bd:-${(i * 0.37).toFixed(2)}s;--bd2:${(i * 0.06).toFixed(2)}s"><div class="tm-body"><img src="${tamPcPic(p.sp)}" alt="${esc(spName(p.sp))}"></div><i class="tm-hp"><b></b></i></div>`; }).join(''));
+      return `<div class="tm-f" data-i="${i}" style="left:${x}%;bottom:${y + TM_UP}%;z-index:${30 - y};${tamDz(y)}--bd:-${(i * 0.37).toFixed(2)}s;--bd2:${(i * 0.06).toFixed(2)}s"><div class="tm-body"><img src="${tamPcPic(p.sp)}" alt="${esc(spName(p.sp))}"></div><i class="tm-hp"><s></s><b></b></i></div>`; }).join(''));
     if (!F) { setH($('#tmM'), ''); return; }
     const pos = boss ? TM_BPOS : F.M.length === 1 ? TM_MPOS1 : F.M.length === 2 ? TM_MPOS2 : TM_MPOS;   // 4.3.2 마리 수에 맞춘 자리
     setH($('#tmM'), F.M.map((m, i) => { const [x, y] = pos[i] || pos[0];
-      return `<div class="tm-f tm-mob in${m.boss ? ' boss' : ''}${m.solo ? ' solo' : ''}" data-i="${i}" style="left:${x}%;bottom:${y + TM_UP}%;z-index:${30 - y};${tamDz(y)}--bd:-${(i * 0.5).toFixed(2)}s;--id:${(i * 0.12).toFixed(2)}s"><div class="tm-body"><img src="${tamMobPic(F.fl, m)}" alt="${esc(m.nm)}"></div><i class="tm-hp"><b></b></i></div>`; }).join(''));
+      return `<div class="tm-f tm-mob in${m.boss ? ' boss' : ''}${m.solo ? ' solo' : ''}" data-i="${i}" style="left:${x}%;bottom:${y + TM_UP}%;z-index:${30 - y};${tamDz(y)}--bd:-${(i * 0.5).toFixed(2)}s;--id:${(i * 0.12).toFixed(2)}s"><div class="tm-body"><img src="${tamMobPic(F.fl, m)}" alt="${esc(m.nm)}"></div><i class="tm-hp"><s></s><b></b></i></div>`; }).join(''));
     if (boss) tamShake(7, 420);
     tamSkills(); tamDraw(F);
   }
@@ -579,8 +588,9 @@
   }
   function tamBars(F) {
     const P = $$('#tmP .tm-f'), M = $$('#tmM .tm-f'); if (P.length !== F.P.length || M.length !== F.M.length) return;
-    F.P.forEach((p, i) => { P[i].querySelector('.tm-hp b').style.width = Math.max(0, p.hp / p.mx * 100) + '%'; });
-    F.M.forEach((m, i) => { M[i].querySelector('.tm-hp b').style.width = Math.max(0, m.hp / m.mx * 100) + '%'; M[i].classList.toggle('weak', m.wk > 0); });
+    const hw = (el, v) => { const w = Math.max(0, v) * 100 + '%', b = el.querySelector('.tm-hp b'), t = el.querySelector('.tm-hp s'); b.style.width = w; if (t) t.style.width = w; };   // 5.3.0.1 흰 꼬리가 조금 늦게 따라 줄어요
+    F.P.forEach((p, i) => hw(P[i], p.hp / p.mx));
+    F.M.forEach((m, i) => { hw(M[i], m.hp / m.mx); M[i].classList.toggle('weak', m.wk > 0); });
     if (F.M[0] && F.M[0].boss) $('#tmBossBar b').style.width = Math.max(0, F.M[0].hp / F.M[0].mx * 100) + '%';
   }
   // 4.3.1 woodani 요청(기술이 무엇인지 안 보여요): 과목마다 이름 있는 필살기와 따로 짠 움직임. 맞는 숫자는 움직임이 닿는 순간에 떠요
@@ -614,7 +624,7 @@
     if (SKQ.raf) cancelAnimationFrame(SKQ.raf);
     Object.assign(SKQ, { list: [], t0: performance.now(), shift: 0, end: 0, cutEnd: 0, raf: 0 });
     const c = $('#tmCut'), st = $('#tmStage'); if (c) c.hidden = true; $('#panelTam').classList.remove('tm-cutting');
-    if (st) st.classList.remove('skdim'); if (SKQ.el) { SKQ.el.classList.remove('charge'); SKQ.el = null; }
+    if (st) st.classList.remove('skdim', 'skcam'); if (SKQ.el) { SKQ.el.classList.remove('charge'); SKQ.el = null; }
   }
   const TM_GC = { sci: '#3FB8FF', pe: '#FF8A2A', kor: '#5CCB4A', art: '#FF5FB0', math: '#FFC21E' };   // 4.3.3 모으기 빛 색
   function tamCutIn(ri, sp) {
@@ -639,7 +649,9 @@
     if (off) skAt(t0, () => { SKQ.cutEnd = cutEnd; st.classList.add('skdim'); sfx('quest'); if (!seen) { S.tam.skSeen |= 1 << ri; save(); } });
     else skAt(t0, () => {
       SKQ.cutEnd = cutEnd; SKQ.el = el; st.classList.add('skdim'); sfx('quest');
-      if (!el) return; el.classList.add('charge'); el.style.setProperty('--cc', TM_GC[TAM.role[ri].k]);
+      if (!el) return;
+      if (!rt.reduced) { const a = st.getBoundingClientRect(), r = el.getBoundingClientRect(), cam = st.querySelector('.tm-cam');   // 5.3.0.1 필살기: 쓰는 대원 쪽으로 다가가요(2배 빠르기면 절반)
+        if (cam && a.width) { cam.style.transformOrigin = `${((r.left + r.width / 2 - a.left) / a.width * 100).toFixed(1)}% ${((r.top + r.height * 0.6 - a.top) / a.height * 100).toFixed(1)}%`; st.style.setProperty('--skz', tamSpdOn() ? 1.07 : 1.14); st.classList.add('skcam'); setTimeout(() => st.classList.remove('skcam'), Math.max(400, cutEnd - t0 + 250)); } } el.classList.add('charge'); el.style.setProperty('--cc', TM_GC[TAM.role[ri].k]);
       { const im = el.querySelector('img'), u = IMG(`ex4_pc_${p.sp}_sk`); if (im && u) { im.src = u; clearTimeout(el._t); el._t = setTimeout(() => { im.src = tamPcPic(p.sp); }, TAM.skCharge + TAM.skCut + 900); } }   // 4.4.0 필살기 자세
       { const cu = IMG(`ex4_sk_${TAM.role[ri].k}_charge`); if (cu) { const [cx, cy] = tamAt(el, 0.6); tamFxImg('tm-ring', cu, cx, cy, [{ t: 'scale(.3) rotate(0deg)', opacity: 0 }, { t: 'scale(1) rotate(60deg)', opacity: 1, offset: 0.4 }, { t: 'scale(1.15) rotate(120deg)', opacity: 0 }], TAM.skCharge + 500); } }
       const [x, y] = tamAt(el, 0.5), sm = tamI(`ex_fx_${TAM.role[ri].k}`), r = st.getBoundingClientRect().width * 0.2;
@@ -649,7 +661,7 @@
     if (!off) { skAt(t0 + TAM.skCharge, () => { tamCutIn(ri, p.sp); buzz(25); });
       skAt(cutEnd, () => { $('#tmCut').hidden = true; $('#panelTam').classList.remove('tm-cutting'); if (el) el.classList.remove('charge');
         if (!seen) { S.tam.skSeen |= 1 << ri; save(); tamRenderTop(); } }); }
-    skAt(SKQ.end, () => { if (skNow() >= SKQ.end - 5) st.classList.remove('skdim'); });
+    skAt(SKQ.end, () => { if (skNow() >= SKQ.end - 5) st.classList.remove('skdim', 'skcam'); });
     if (!el) return { hit: hitAt, heal: healAt };
     // 3. 큰 움직임
     at(0, () => { el.classList.remove('cast'); void el.offsetWidth; el.classList.add('cast'); setTimeout(() => el.classList.remove('cast'), 1100); });
@@ -706,18 +718,26 @@
   function tamWalk(fl) {
     const st = $('#tmStage'), T = rt.tam; if (!st || !T) return;
     const R = tamReg(fl), cur = $('.tm-bg.cur', st), bg = tamBg(fl);
-    if (!T.climbing) { cur.getAnimations().forEach(a => a.cancel()); cur.style.backgroundImage = bg ? `url("${bg}")` : ''; }
+    if (!T.climbing) { cur.getAnimations().forEach(a => a.cancel()); tamBgPaint(cur, fl); }
     st.dataset.reg = R.k; st.classList.toggle('hm', tamHOn()); st.classList.toggle('deep', tamLap(fl) > 0); st.classList.remove('boss'); $('#tmBossBar').hidden = true;
     tamAmb(R.k); tamTower(fl); tamFl(fl);
     const team = tamTeam(), pp = $('#tmP');
     pp.dataset.fid = 'walk';
     setH(pp, team.map((p, i) => { const [x, y] = TM_PPOS[i] || TM_PPOS[0];
-      return `<div class="tm-f" data-i="${i}" style="left:${x}%;bottom:${y + TM_UP}%;z-index:${30 - y};${tamDz(y)}--bd:-${(i * 0.13).toFixed(2)}s"><div class="tm-body"><img src="${tamPcPic(p.sp)}" alt="${esc(spName(p.sp))}"></div><i class="tm-hp"><b style="width:100%"></b></i></div>`; }).join(''));
+      return `<div class="tm-f" data-i="${i}" style="left:${x}%;bottom:${y + TM_UP}%;z-index:${30 - y};${tamDz(y)}--bd:-${(i * 0.13).toFixed(2)}s"><div class="tm-body"><img src="${tamPcPic(p.sp)}" alt="${esc(spName(p.sp))}"></div><i class="tm-hp"><s></s><b style="width:100%"></b></i></div>`; }).join(''));
     setH($('#tmM'), ''); $('#tmM').dataset.fid = '';
     if (T.nLose) pp.classList.add('enter'); else pp.classList.remove('enter');
     pp.classList.add('walking'); clearTimeout(pp._t); const ms = TAM.ph.walk / tamSpdK() * 1000; pp._t = setTimeout(() => pp.classList.remove('walking', 'enter'), ms);
-    if (!T.climbing && !rt.reduced) cur.animate([{ transform: 'translateX(0)' }, { transform: 'translateX(-16%)' }], { duration: ms, easing: 'cubic-bezier(.3,0,.6,1)', fill: 'forwards' });
-    { const fg = $('#tmFg'), fu = IMG('ex4_fg_' + R.k) || tamI('ex_fg_' + R.k); if (fg) { fg.getAnimations().forEach(a => a.cancel()); fg.style.backgroundImage = fu ? `url("${fu}")` : ''; if (fu && !rt.reduced) fg.animate([{ transform: 'translateX(0)' }, { transform: 'translateX(-24%)' }], { duration: ms, easing: 'cubic-bezier(.3,0,.6,1)', fill: 'forwards' }); } }
+    st.classList.toggle('lay', !!tamLay(fl)); { const lu = IMG('ex5_light'); if (lu) st.style.setProperty('--ex5-light', `url("${lu}")`); }
+    const L = tamLay(fl), wo = { duration: ms, easing: 'cubic-bezier(.3,0,.6,1)', fill: 'forwards' };
+    if (!T.climbing && !rt.reduced) {
+      if (L) {   // 5.3.0.1 겹마다 다른 빠르기: 먼 풍경은 천천히, 바닥은 조금 빠르게, 앞 장식은 가장 빠르게
+        const far = cur.querySelector('.ly.far'), flo = cur.querySelector('.ly.floor');
+        if (far) { far.getAnimations().forEach(a => a.cancel()); far.animate([{ transform: 'translateX(0)' }, { transform: 'translateX(-12%)' }], wo); }
+        if (flo) { flo.getAnimations().forEach(a => a.cancel()); flo.animate([{ transform: 'translateX(0)' }, { transform: 'translateX(-9%)' }], wo); }
+      } else cur.animate([{ transform: 'translateX(0)' }, { transform: 'translateX(-16%)' }], wo);
+    }
+    { const fg = $('#tmFg'), fu = (L && L.front) || IMG('ex4_fg_' + R.k) || tamI('ex_fg_' + R.k); if (fg) { fg.getAnimations().forEach(a => a.cancel()); fg.classList.toggle('lay', !!(L && L.front)); fg.style.backgroundImage = fu ? `url("${fu}")` : ''; if (fu && !rt.reduced) fg.animate([{ transform: 'translateX(0)' }, { transform: L && L.front ? 'translateX(-7%)' : 'translateX(-24%)' }], wo); } }
     $('#tmTime').style.width = '100%'; tamCam(false);
     tamSkills();
   }
@@ -755,14 +775,14 @@
     const st = $('#tmStage'), T = rt.tam; if (!st || !T) return;
     const next = best + 1, cur = $('.tm-bg.cur', st), nx = $('.tm-bg.nx', st), bg = tamBg(next);
     cur.getAnimations().forEach(a => a.commitStyles && a.commitStyles()); cur.getAnimations().forEach(a => a.cancel());
-    nx.style.backgroundImage = bg ? `url("${bg}")` : ''; T.climbing = true;
+    tamBgPaint(nx, next); T.climbing = true; st.classList.toggle('lay', !!tamLay(next));
     $('#tmP').classList.remove('jump'); void st.offsetWidth; $('#tmP').classList.add('jump');
     st.classList.remove('climb'); void st.offsetWidth; st.classList.add('climb');
     const o = { duration: TAM.ph.climb / tamSpdK() * 900, easing: 'cubic-bezier(.5,0,.3,1)', fill: 'forwards' }, x0 = cur.style.transform || 'translateX(0)';
     cur.animate([{ transform: x0 }, { transform: x0 + ' translateY(100%)' }], o);
     const a = nx.animate([{ transform: 'translateY(-100%)' }, { transform: 'translateY(0)' }], o);
     { const fg = $('#tmFg'); if (fg) { const x = getComputedStyle(fg).transform; fg.animate([{ transform: x === 'none' ? 'none' : x, opacity: 1 }, { transform: (x === 'none' ? '' : x + ' ') + 'translateY(120%)', opacity: 0 }], { duration: o.duration, easing: o.easing, fill: 'forwards' }); } }
-    a.onfinish = () => { cur.style.transform = ''; cur.style.backgroundImage = nx.style.backgroundImage; cur.getAnimations().forEach(x => x.cancel()); a.cancel(); T.climbing = false; st.classList.remove('climb'); $('#tmP').classList.remove('jump'); };
+    a.onfinish = () => { cur.style.transform = ''; cur.style.backgroundImage = nx.style.backgroundImage; cur.innerHTML = nx.innerHTML; cur.dataset.lay = nx.dataset.lay || ''; cur.getAnimations().forEach(x => x.cancel()); a.cancel(); T.climbing = false; st.classList.remove('climb'); $('#tmP').classList.remove('jump'); };
     tamFl(next, true); tamTower(next); st.dataset.reg = tamReg(next).k; tamAmb(tamReg(next).k); st.classList.remove('boss'); $('#tmBossBar').hidden = true;
     setH($('#tmM'), ''); sfx('tap');
   }

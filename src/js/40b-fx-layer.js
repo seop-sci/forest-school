@@ -31,6 +31,7 @@
     FXL.tex.dot = app.renderer.generateTexture(new P.Graphics().circle(0, 0, 4).fill(0xffffff));
     if (!FXL.tex.ic_acorn) { FXL.st = 'no'; cv.remove(); return; }
     FXL.st = 'ok';
+    setTimeout(() => { try { ['fxe_conf_1', 'fxe_conf_2', 'fxe_conf_3', 'fxe_conf_4', 'fxe_bit', 'fxe_spark', 'fxe_cap', 'fxe_tape_l', 'fxe_tape_r', 'fxe_beam', 'fxe_petal_1', 'fxe_petal_2', 'fxe_petal_3'].forEach(fxeTex); } catch (e) { /* 없으면 코드 모양 */ } }, 2000);   // 5.3.0.1 행사 그림(작업지시서 103) 미리 받기
   }
   const fxRnd = (a, b) => a + Math.random() * (b - a);   // 반짝이는 보통 섞기로 그려요(그림판 바탕이 투명이라 더하기 섞기는 거의 안 보여요)
   // 화면 자리(px) ↔ 지도 자리. 지도는 viewBox 0 -60 360 540이라 왼쪽 위가 (0, -60)
@@ -85,7 +86,7 @@
     app.render();
     if (busy) FXL.raf = requestAnimationFrame(fxFrame);
   }
-  function fxSprite(tex, x, y, sz) { const s = new window.PIXI.Sprite(tex); s.anchor.set(0.5); s.x = x; s.y = y; s.scale.set(sz / (tex.width || 1)); FXL.w.addChild(s); return s; }
+  function fxSprite(tex, x, y, sz) { const s = new window.PIXI.Sprite(tex); s.anchor.set(0.5); s.x = x; s.y = y; s.scale.set(sz * (tex._fxK || 1) / (tex.width || 1)); FXL.w.addChild(s); return s; }
   function fxBurst(x, y, n, o) {
     if (!o.tex) return;
     for (let i = 0; i < n; i++) { const s = fxSprite(o.tex, x, y, o.sz * fxRnd(0.7, 1.25)), a = o.ang != null ? o.ang + fxRnd(-o.spread, o.spread) : fxRnd(0, Math.PI * 2), sp = o.sp * fxRnd(0.5, 1.3);
@@ -212,10 +213,12 @@
   const FXE = { tex: {}, beams: null, sprint: 0, end: null };
   const FXE_TEAM = { b: [0x3f78c2, 0x7fb2ff, 0xffffff], w: [0xffffff, 0xe9eef5, 0xffe27a] };
   const hexN = c => parseInt(String(c || '#ffffff').replace('#', ''), 16) || 0xffffff;
+  // 그림은 둘레에 빈 곳이 있어서 코드 모양보다 조금 크게 그려요
+  const FXE_K = k => k === 'fxe_spark' ? 2.4 : /^fxe_conf_/.test(k) ? 1.7 : k === 'fxe_bit' ? 1.5 : /^fxe_petal_/.test(k) ? 1.3 : k === 'fxe_cap' ? 1.25 : 1;
   function fxeTex(k) {
     if (FXE.tex[k] !== undefined) return FXE.tex[k];
     const u = IMG(k);
-    if (u) { FXE.tex[k] = null; const im = new Image(); im.onload = () => { try { FXE.tex[k] = window.PIXI.Texture.from(im); } catch (e) { /* 코드 모양 그대로 */ } }; im.src = u; }
+    if (u) { FXE.tex[k] = null; const im = new Image(); im.onload = () => { try { const t = window.PIXI.Texture.from(im); t._fxK = FXE_K(k); FXE.tex[k] = t; } catch (e) { /* 코드 모양 그대로 */ } }; im.src = u; }
     const P = window.PIXI, r = FXL.app.renderer, G = () => new P.Graphics();
     let g;
     if (k === 'fxe_conf_1') g = G().rect(-8, -3, 16, 6).fill(0xe04848);
