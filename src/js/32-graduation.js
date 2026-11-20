@@ -535,6 +535,8 @@
     openModal(m);
     sfx('bell'); rt.cereRang = true;
     rt.cereAt = performance.now();
+    if (rt.cereFx) { rt.cereFx._stop(); rt.cereFx = null; }
+    if (v3) { try { rt.cereFx = cereFx(m) || null; } catch (e) { rt.cereFx = null; } }   // 5.3.0.1 꽃잎, 학사모, 불꽃
     rt.cereRun = { dur: rt.reduced ? 2600 : v3 ? CERE3_MS : v2 ? CERE2_MS : CERE_MS, used: 0, from: rt.cereAt, fan: false, fanAt: v3 ? 17100 : v2 && !rt.reduced ? 5100 : 2000 };
     cereTimers();
     return true;
@@ -550,6 +552,7 @@
   // 묻는 동안 졸업식 그림 속 움직임을 멈췄다가 이어요(멈춘 것만 다시 재생)
   function cerePause(on) {
     const sv = document.querySelector('#mCere .cere-svg'); if (!sv || !sv.getAnimations) return;
+    if (on && rt.cereFx) { rt.cereFx._stop(); rt.cereFx = null; }   // 묻는 동안 연출은 멈추고 다시 이어 하지 않아요
     if (on) { rt.cerePaused = sv.getAnimations({ subtree: true }).filter(a => a.playState === 'running'); rt.cerePaused.forEach(a => a.pause()); }
     else { (rt.cerePaused || []).forEach(a => { try { a.play(); } catch (e) { /* 무시 */ } }); rt.cerePaused = null; }
   }
@@ -573,6 +576,7 @@
     if (!rt.cereOn) return;
     if (!force && performance.now() - (rt.cereAt || 0) < 350) return;
     rt.cereOn = false; rt.cereAsking = false; rt.cereRun = null;
+    if (rt.cereFx) { rt.cereFx._stop(); rt.cereFx = null; }
     clearTimeout(rt.cereT1); clearTimeout(rt.cereT2);
     closeModal($('#mCere'));
     rt.cereToasts.splice(0).forEach((t, i) => setTimeout(() => toast(t), 450 + i * 2400));   // 미뤄 둔 알림을 차례로

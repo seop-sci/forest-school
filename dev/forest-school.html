@@ -1051,7 +1051,29 @@ html.ait .pz{padding-top:calc(var(--ait-top, 0px) + 54px)}
 .info div{display:flex;justify-content:space-between;gap:12px;padding:10px 0;border-bottom:1px solid var(--line);font-size:14px}
 .info div:last-child{border-bottom:0}
 .info dt{color:var(--muted)} .dev-info{margin-bottom:10px} .info dd{margin:0;text-align:right}
-
+/* 5.3.0.1 탐험 겹 배경(작업지시서 104): 하늘, 먼 풍경, 바닥은 .tm-bg 안, 앞 장식은 #tmFg.lay. 무대를 덮는 720x1280 상자(세로 60% 자리) */
+.tm-lay{position:absolute;top:calc((100cqh - max(100cqw,56.25cqh)*1.7778)*.6);left:calc((100cqw - max(100cqw,56.25cqh))/2);width:max(100cqw,56.25cqh);aspect-ratio:720/1280}
+.tm-lay .ly{position:absolute;background:no-repeat 0 0/100% 100%;will-change:transform}
+.tm-lay .ly.sky{inset:0}
+.tm-lay .ly.far{left:-50%;width:200%;top:-12.5%;height:43.75%}
+.tm-lay .ly.floor{left:-6%;width:112%;top:29.7%;height:70.3%}
+#panelTam .tm-fg.lay{top:calc((100cqh - max(100cqw,56.25cqh)*1.7778)*.6);bottom:auto;left:calc((100cqw - max(100cqw,56.25cqh))/2);width:max(100cqw,56.25cqh);aspect-ratio:720/1280;background-size:100% 100%}
+.tm-stage.lay .tm-rays{left:0;top:0;width:100%;height:100%;background:var(--ex5-light,none) -4% -2%/62% auto no-repeat;-webkit-mask:none;mask:none;mix-blend-mode:screen;opacity:.5;animation:none}
+#panelTam .tm-f{--w:31%}#panelTam .tm-mob.solo{--w:37%}#panelTam .tm-mob.boss{--w:52%}
+.tm-stage.skcam .tm-cam{transform:scale(var(--skz,1.14));transition-duration:.6s}
+.tm-hp{position:relative}.tm-hp b{position:relative}.tm-hp s{position:absolute;left:0;top:0;bottom:0;width:100%;background:#FFF6D8;transition:width .5s ease-in .35s}
+@keyframes tmBob{50%{transform:translateY(-1.2%) scale(1.012,.988)}}
+/* 5.3.0.1 전환과 보상, 졸업 연출 */
+.ui-fx{position:fixed;inset:0;pointer-events:none;z-index:9000;overflow:hidden}
+.ui-fx img{position:absolute;left:0;top:0;will-change:transform}
+.ui-fx .ui-acorn{width:24px}
+.ui-fx .ui-wipe{left:0;top:0;height:100%;width:auto;min-width:150%;object-fit:cover}
+.overlay .rw-burst{position:absolute;left:50%;top:46%;width:min(150vw,640px);aspect-ratio:1;margin:calc(min(150vw,640px)/-2) 0 0 calc(min(150vw,640px)/-2);background:var(--rwu) center/contain no-repeat,var(--rwu) center/contain no-repeat,var(--rwu) center/contain no-repeat;filter:sepia(1) saturate(12) hue-rotate(-14deg);pointer-events:none;opacity:0}
+.overlay.open .rw-burst{animation:rwBurstIn .5s ease-out .05s forwards,rwSpin 14s linear infinite}
+@keyframes rwBurstIn{to{opacity:1}}@keyframes rwSpin{to{rotate:360deg}}
+.cere-fx{position:absolute;inset:0;pointer-events:none;overflow:hidden;z-index:2}
+.cere-fx img{position:absolute;left:0;top:0;will-change:transform}
+@media (prefers-reduced-motion:reduce){.overlay .rw-burst,.ui-fx,.cere-fx{display:none}}
 /* 탭 */
 .tabs{flex:none;display:grid;grid-template-columns:repeat(7,1fr);gap:1px;padding-block:8px}
 /* 학교 탭은 위아래로 넘겨 보고, 지도는 화면 너비에 맞춰 크게 그려요 */
@@ -3850,7 +3872,7 @@ body.mg-on .toast[hidden]{display:none}
     <p class="boot-step" id="bootStep">학교 문을 여는 중...</p>
     <p class="boot-tip" id="bootTip">학교 문을 여는 중이에요</p>
   </div>
-  <span class="boot-ver" id="bootVer">v5.3.0</span>
+  <span class="boot-ver" id="bootVer">v5.3.0.1</span>
 </div>
 
 <div class="app on-school" id="app">
@@ -4445,7 +4467,7 @@ body.mg-on .toast[hidden]{display:none}
       </div>
       <h3 class="panel-sub">정보</h3>
       <dl class="info">
-        <div id="verRow"><dt>버전</dt><dd>v5.3.0</dd></div>
+        <div id="verRow"><dt>버전</dt><dd>v5.3.0.1</dd></div>
         <div id="pidRow" hidden><dt>학교 번호</dt><dd id="infoPid"></dd></div>
       </dl>
       <div id="devBox" hidden>
@@ -7166,6 +7188,35 @@ body.mg-on .toast[hidden]{display:none}
 "ex4_ui_sk_frame":"img/a/ex4_ui_sk_frame-cce18a4755.webp",
 "ex4_ui_sk_ready":"img/a/ex4_ui_sk_ready-65d9935b09.webp",
 "ex4_ui_topbar":"img/a/ex4_ui_topbar-f7d4633e71.webp",
+"ex5_garden_far":"img/a/ex5_garden_far-2f19ec599d.webp",
+"ex5_garden_floor":"img/a/ex5_garden_floor-7cac5eda9b.webp",
+"ex5_garden_front":"img/a/ex5_garden_front-723b7f80c6.webp",
+"ex5_garden_sky":"img/a/ex5_garden_sky-2d517ebd88.webp",
+"ex5_ground_far":"img/a/ex5_ground_far-7075e7eff4.webp",
+"ex5_ground_floor":"img/a/ex5_ground_floor-7b812de48f.webp",
+"ex5_ground_front":"img/a/ex5_ground_front-0e60774019.webp",
+"ex5_ground_sky":"img/a/ex5_ground_sky-0f7d9bf0dd.webp",
+"ex5_lab_far":"img/a/ex5_lab_far-c1a1efb27d.webp",
+"ex5_lab_floor":"img/a/ex5_lab_floor-4d8a826216.webp",
+"ex5_lab_front":"img/a/ex5_lab_front-ef77044cc6.webp",
+"ex5_lab_sky":"img/a/ex5_lab_sky-7aff275996.webp",
+"ex5_library_far":"img/a/ex5_library_far-d891f379d7.webp",
+"ex5_library_floor":"img/a/ex5_library_floor-418c28099a.webp",
+"ex5_library_front":"img/a/ex5_library_front-c1eae0d85c.webp",
+"ex5_library_sky":"img/a/ex5_library_sky-1ded6cc9e3.webp",
+"ex5_light":"img/a/ex5_light-cd51116768.webp",
+"ex5_pond_far":"img/a/ex5_pond_far-76b4c55c1a.webp",
+"ex5_pond_floor":"img/a/ex5_pond_floor-8bf5042cd8.webp",
+"ex5_pond_front":"img/a/ex5_pond_front-31d2cac915.webp",
+"ex5_pond_sky":"img/a/ex5_pond_sky-951844ee8f.webp",
+"ex5_tower_far":"img/a/ex5_tower_far-ba708aa5fa.webp",
+"ex5_tower_floor":"img/a/ex5_tower_floor-2d927d69d6.webp",
+"ex5_tower_front":"img/a/ex5_tower_front-c5de8a2a03.webp",
+"ex5_tower_sky":"img/a/ex5_tower_sky-4283e36e4e.webp",
+"ex5_yard_far":"img/a/ex5_yard_far-48e1b4b1ee.webp",
+"ex5_yard_floor":"img/a/ex5_yard_floor-9d582fd323.webp",
+"ex5_yard_front":"img/a/ex5_yard_front-c42030bb01.webp",
+"ex5_yard_sky":"img/a/ex5_yard_sky-d37e6b097a.webp",
 "fur_gradhall_plant_shiny":"img/a/fur_gradhall_plant_shiny-b938dd53c8.webp",
 "fur_gradhall_screen_shiny":"img/a/fur_gradhall_screen_shiny-9753de3353.webp",
 "fur_gradhall_shelf_shiny":"img/a/fur_gradhall_shelf_shiny-07fce015fb.webp",
@@ -7174,6 +7225,19 @@ body.mg-on .toast[hidden]{display:none}
 "fur_institute_board_shiny":"img/a/fur_institute_board_shiny-51ec7b720b.webp",
 "fur_institute_coffee_shiny":"img/a/fur_institute_coffee_shiny-0d72291ca5.webp",
 "fur_institute_desk_shiny":"img/a/fur_institute_desk_shiny-61ddb008c6.webp",
+"fxe_beam":"img/a/fxe_beam-19f98c3b68.webp",
+"fxe_bit":"img/a/fxe_bit-c2d67333f9.webp",
+"fxe_cap":"img/a/fxe_cap-f83f27f92a.webp",
+"fxe_conf_1":"img/a/fxe_conf_1-ed0d64fe7f.webp",
+"fxe_conf_2":"img/a/fxe_conf_2-6d2f600b4c.webp",
+"fxe_conf_3":"img/a/fxe_conf_3-14e4977cf9.webp",
+"fxe_conf_4":"img/a/fxe_conf_4-3c6b803f9e.webp",
+"fxe_petal_1":"img/a/fxe_petal_1-134daffe4a.webp",
+"fxe_petal_2":"img/a/fxe_petal_2-54592b1beb.webp",
+"fxe_petal_3":"img/a/fxe_petal_3-d659332e7a.webp",
+"fxe_spark":"img/a/fxe_spark-029a2247d4.webp",
+"fxe_tape_l":"img/a/fxe_tape_l-523a9fbc91.webp",
+"fxe_tape_r":"img/a/fxe_tape_r-258f2042c1.webp",
 "glow_gradhall_on":"img/a/glow_gradhall_on-b190f31d1e.webp",
 "glow_gradhall_on_winter":"img/a/glow_gradhall_on_winter-bb0b635068.webp",
 "glow_institute_on":"img/a/glow_institute_on-b48d105cb3.webp",
@@ -7286,6 +7350,7 @@ body.mg-on .toast[hidden]{display:none}
 "room_gradhall":"img/a/room_gradhall-245abda717.webp",
 "room_institute":"img/a/room_institute-640f876d10.webp",
 "rt_tree_bg":"img/a/rt_tree_bg-ff0f6eb0d8.webp",
+"rw_burst":"img/a/rw_burst-afd32df35c.webp",
 "souv_beach_10":"img/a/souv_beach_10-ff38bb4132.webp",
 "souv_beach_11":"img/a/souv_beach_11-f22703b59a.webp",
 "souv_beach_3":"img/a/souv_beach_3-33275a8264.webp",
@@ -7332,7 +7397,10 @@ body.mg-on .toast[hidden]{display:none}
 "souv_star_8":"img/a/souv_star_8-819086204e.webp",
 "souv_star_9":"img/a/souv_star_9-016a83b51d.webp",
 "ta_bg":"img/a/ta_bg-664fff5ac0.webp",
-"tea_pelican":"img/a/tea_pelican-bda58e49e9.webp"
+"tea_pelican":"img/a/tea_pelican-bda58e49e9.webp",
+"tr_leaf_1":"img/a/tr_leaf_1-20522702e2.webp",
+"tr_leaf_2":"img/a/tr_leaf_2-41a8e92fbb.webp",
+"tr_leaves":"img/a/tr_leaves-b74f5f8151.webp"
 };</script>
 <!-- FS_IMG431:END -->
 <!-- FS_IMG174:BEGIN -->
@@ -14586,8 +14654,8 @@ body.mg-on .toast[hidden]{display:none}
        forest/rank/<내 id>   랭킹 이름과 학교 점수
        forest/stats/<내 id>  테스트 현황 (어디까지 했는지, 얼마나 했는지)
      <내 id>는 Firebase 익명 로그인이 기기(브라우저)마다 만들어 줘요. */
-  const VERSION = '5.3.0';   // 2026-11-17 woodani 결정: 웹에 5.0.2~5.0.5로 먼저 냈던 것을 앱과 함께 5.0.1 하나로 내요(버전 견줌은 앞 두 자리만 봐서 되돌아가도 괜찮아요)
-  const NT_QUIET = ['5.3.0', '5.2.2', '5.2.1', '5.2.0.2', '5.2.0.1', '5.1.1.3', '5.1.1.2', '5.1.1.1', '5.1.1', '5.0.3.1', '5.0.3', '5.0.2.2', '5.0.2.1', '2.1.20', '2.1.2.2', '2.3.0.1', '2.3.4', '3.2.3', '3.2.4', '3.2.5', '3.3.1', '3.3.2', '3.3.3', '4.4.1.1', '4.4.1.2', '4.4.1.3', '4.4.1.4', '5.0.1.1', '5.0.1.2', '5.0.1.3', '5.0.1.4', '5.0.1.5', '5.0.1.6', '5.0.1.7', '5.0.1.8'];   // 5.0.1.1 생물 탐사 고침은 공지 없이   // 5.0.3도 공지 없이(공지 줄은 woodani가 정하면 넣어요)   // 5.0.2 공지 없이(woodani 2026-11-16)   // 5.0.1 공지 줄은 woodani가 정할 때까지 조용히   // 5.0.0 공지는 2026-11-16 woodani가 정해서 NOTICES로 옮겼어요   // 4.4.1(앱과 함께 내는 판)은 공지를 띄워요   // 4.4.1도 공지 없이(woodani)   // 3.3.1, 3.3.2, 3.3.3(토스 먼저)도 공지 창 없이(woodani). 2.3.0.1도 공지 창 없이(공지는 그대로 2.3.0). 2.3.4도 조용히(woodani 결정). 3.2.3, 3.2.4, 3.2.5도 공지 창 없이(공지 줄을 고르지 않음)
+  const VERSION = '5.3.0.1';   // 2026-11-17 woodani 결정: 웹에 5.0.2~5.0.5로 먼저 냈던 것을 앱과 함께 5.0.1 하나로 내요(버전 견줌은 앞 두 자리만 봐서 되돌아가도 괜찮아요)
+  const NT_QUIET = ['5.3.0.1', '5.3.0', '5.2.2', '5.2.1', '5.2.0.2', '5.2.0.1', '5.1.1.3', '5.1.1.2', '5.1.1.1', '5.1.1', '5.0.3.1', '5.0.3', '5.0.2.2', '5.0.2.1', '2.1.20', '2.1.2.2', '2.3.0.1', '2.3.4', '3.2.3', '3.2.4', '3.2.5', '3.3.1', '3.3.2', '3.3.3', '4.4.1.1', '4.4.1.2', '4.4.1.3', '4.4.1.4', '5.0.1.1', '5.0.1.2', '5.0.1.3', '5.0.1.4', '5.0.1.5', '5.0.1.6', '5.0.1.7', '5.0.1.8'];   // 5.0.1.1 생물 탐사 고침은 공지 없이   // 5.0.3도 공지 없이(공지 줄은 woodani가 정하면 넣어요)   // 5.0.2 공지 없이(woodani 2026-11-16)   // 5.0.1 공지 줄은 woodani가 정할 때까지 조용히   // 5.0.0 공지는 2026-11-16 woodani가 정해서 NOTICES로 옮겼어요   // 4.4.1(앱과 함께 내는 판)은 공지를 띄워요   // 4.4.1도 공지 없이(woodani)   // 3.3.1, 3.3.2, 3.3.3(토스 먼저)도 공지 창 없이(woodani). 2.3.0.1도 공지 창 없이(공지는 그대로 2.3.0). 2.3.4도 조용히(woodani 결정). 3.2.3, 3.2.4, 3.2.5도 공지 창 없이(공지 줄을 고르지 않음)
     // 2.1.20 woodani 결정: 이 버전들은 업데이트해도 공지 창을 띄우지 않아요(공지는 그대로 2.1.2)
   /* 2.0.0 공지사항 (2026-10-27 woodani, 1.8.0은 이미 올려서 2.0.0부터): 설정 > 공지사항. 맨 위가 가장 새 공지예요.
      패치노트는 자동으로 넣지 않아요. woodani가 검수한 글만 여기에 적어요(CHANGELOG.md는 자세한 기록용이라 따로 있어요).
@@ -16874,6 +16942,14 @@ body.mg-on .toast[hidden]{display:none}
   }
   function tamFxOn() { return rt.tab === 'tam' && !rt.modalOpen && !document.hidden; }
   function tamBg(fl) { return IMG('ex4_bg_' + tamReg(fl).k) || tamI('ex_bg_' + tamReg(fl).k); }   // 4.4.0 세로 배경
+  // 5.3.0.1 겹 배경(작업지시서 104): 하늘, 먼 풍경, 바닥 세 겹(앞 장식은 #tmFg). 그림이 다 있는 지역만, 없으면 예전 한 장
+  function tamLay(fl) { const k = tamReg(fl).k, u = n => IMG(`ex5_${k}_${n}`), L = { k, sky: u('sky'), far: u('far'), floor: u('floor'), front: u('front') }; return L.sky && L.far && L.floor ? L : null; }
+  function tamBgPaint(el, fl) {
+    if (!el) return; const L = tamLay(fl);
+    if (!L) { if (el.dataset.lay) { el.innerHTML = ''; el.dataset.lay = ''; } const bg = tamBg(fl); el.style.backgroundImage = bg ? `url("${bg}")` : ''; return; }
+    el.style.backgroundImage = '';
+    if (el.dataset.lay !== L.k) { el.innerHTML = `<i class="tm-lay"><i class="ly sky" style="background-image:url('${L.sky}')"></i><i class="ly far" style="background-image:url('${L.far}')"></i><i class="ly floor" style="background-image:url('${L.floor}')"></i></i>`; el.dataset.lay = L.k; }
+  }
   function tamAmb(k) {
     const a = $('#tmAmb'); if (!a || a.dataset.k === k) return; a.dataset.k = k;
     let h = ''; for (let i = 0; i < TM_AMB[k]; i++) { const r = (n => (Math.sin(i * 12.9898 + n * 78.233) * 43758.5453) % 1)(1), q = Math.abs(r);
@@ -16896,18 +16972,19 @@ body.mg-on .toast[hidden]{display:none}
     const T = rt.tam, F = T && T.F, st = $('#tmStage'); if (!st) return;
     const fl = F ? F.fl : tamCurFl(), R = tamReg(fl), bg = tamBg(fl);
     st.dataset.reg = R.k; st.classList.toggle('hm', F ? !!F.hm : tamHOn()); st.classList.toggle('deep', tamLap(fl) > 0);
-    if (!T || !T.climbing) { const c = $('.tm-bg.cur', st); c.style.backgroundImage = bg ? `url("${bg}")` : ''; }
+    if (!T || !T.climbing) tamBgPaint($('.tm-bg.cur', st), fl);
+    st.classList.toggle('lay', !!tamLay(fl));
     tamAmb(R.k); tamTower(fl); tamFl(fl);
     const boss = !!(F && F.M[0] && F.M[0].boss); st.classList.toggle('boss', boss);
     const bb = $('#tmBossBar'); bb.hidden = !boss; if (boss) bb.querySelector('span').textContent = F.M[0].nm;
     const party = F ? F.P : tamTeam();
     $('#tmP').dataset.fid = F ? F.id : ''; $('#tmM').dataset.fid = F ? F.id : ''; $('#tmP').classList.remove('walking', 'enter', 'jump');
     setH($('#tmP'), party.map((p, i) => { const [x, y] = TM_PPOS[i] || TM_PPOS[0];
-      return `<div class="tm-f" data-i="${i}" style="left:${x}%;bottom:${y + TM_UP}%;z-index:${30 - y};${tamDz(y)}--bd:-${(i * 0.37).toFixed(2)}s;--bd2:${(i * 0.06).toFixed(2)}s"><div class="tm-body"><img src="${tamPcPic(p.sp)}" alt="${esc(spName(p.sp))}"></div><i class="tm-hp"><b></b></i></div>`; }).join(''));
+      return `<div class="tm-f" data-i="${i}" style="left:${x}%;bottom:${y + TM_UP}%;z-index:${30 - y};${tamDz(y)}--bd:-${(i * 0.37).toFixed(2)}s;--bd2:${(i * 0.06).toFixed(2)}s"><div class="tm-body"><img src="${tamPcPic(p.sp)}" alt="${esc(spName(p.sp))}"></div><i class="tm-hp"><s></s><b></b></i></div>`; }).join(''));
     if (!F) { setH($('#tmM'), ''); return; }
     const pos = boss ? TM_BPOS : F.M.length === 1 ? TM_MPOS1 : F.M.length === 2 ? TM_MPOS2 : TM_MPOS;   // 4.3.2 마리 수에 맞춘 자리
     setH($('#tmM'), F.M.map((m, i) => { const [x, y] = pos[i] || pos[0];
-      return `<div class="tm-f tm-mob in${m.boss ? ' boss' : ''}${m.solo ? ' solo' : ''}" data-i="${i}" style="left:${x}%;bottom:${y + TM_UP}%;z-index:${30 - y};${tamDz(y)}--bd:-${(i * 0.5).toFixed(2)}s;--id:${(i * 0.12).toFixed(2)}s"><div class="tm-body"><img src="${tamMobPic(F.fl, m)}" alt="${esc(m.nm)}"></div><i class="tm-hp"><b></b></i></div>`; }).join(''));
+      return `<div class="tm-f tm-mob in${m.boss ? ' boss' : ''}${m.solo ? ' solo' : ''}" data-i="${i}" style="left:${x}%;bottom:${y + TM_UP}%;z-index:${30 - y};${tamDz(y)}--bd:-${(i * 0.5).toFixed(2)}s;--id:${(i * 0.12).toFixed(2)}s"><div class="tm-body"><img src="${tamMobPic(F.fl, m)}" alt="${esc(m.nm)}"></div><i class="tm-hp"><s></s><b></b></i></div>`; }).join(''));
     if (boss) tamShake(7, 420);
     tamSkills(); tamDraw(F);
   }
@@ -17004,8 +17081,9 @@ body.mg-on .toast[hidden]{display:none}
   }
   function tamBars(F) {
     const P = $$('#tmP .tm-f'), M = $$('#tmM .tm-f'); if (P.length !== F.P.length || M.length !== F.M.length) return;
-    F.P.forEach((p, i) => { P[i].querySelector('.tm-hp b').style.width = Math.max(0, p.hp / p.mx * 100) + '%'; });
-    F.M.forEach((m, i) => { M[i].querySelector('.tm-hp b').style.width = Math.max(0, m.hp / m.mx * 100) + '%'; M[i].classList.toggle('weak', m.wk > 0); });
+    const hw = (el, v) => { const w = Math.max(0, v) * 100 + '%', b = el.querySelector('.tm-hp b'), t = el.querySelector('.tm-hp s'); b.style.width = w; if (t) t.style.width = w; };   // 5.3.0.1 흰 꼬리가 조금 늦게 따라 줄어요
+    F.P.forEach((p, i) => hw(P[i], p.hp / p.mx));
+    F.M.forEach((m, i) => { hw(M[i], m.hp / m.mx); M[i].classList.toggle('weak', m.wk > 0); });
     if (F.M[0] && F.M[0].boss) $('#tmBossBar b').style.width = Math.max(0, F.M[0].hp / F.M[0].mx * 100) + '%';
   }
   // 4.3.1 woodani 요청(기술이 무엇인지 안 보여요): 과목마다 이름 있는 필살기와 따로 짠 움직임. 맞는 숫자는 움직임이 닿는 순간에 떠요
@@ -17039,7 +17117,7 @@ body.mg-on .toast[hidden]{display:none}
     if (SKQ.raf) cancelAnimationFrame(SKQ.raf);
     Object.assign(SKQ, { list: [], t0: performance.now(), shift: 0, end: 0, cutEnd: 0, raf: 0 });
     const c = $('#tmCut'), st = $('#tmStage'); if (c) c.hidden = true; $('#panelTam').classList.remove('tm-cutting');
-    if (st) st.classList.remove('skdim'); if (SKQ.el) { SKQ.el.classList.remove('charge'); SKQ.el = null; }
+    if (st) st.classList.remove('skdim', 'skcam'); if (SKQ.el) { SKQ.el.classList.remove('charge'); SKQ.el = null; }
   }
   const TM_GC = { sci: '#3FB8FF', pe: '#FF8A2A', kor: '#5CCB4A', art: '#FF5FB0', math: '#FFC21E' };   // 4.3.3 모으기 빛 색
   function tamCutIn(ri, sp) {
@@ -17064,7 +17142,9 @@ body.mg-on .toast[hidden]{display:none}
     if (off) skAt(t0, () => { SKQ.cutEnd = cutEnd; st.classList.add('skdim'); sfx('quest'); if (!seen) { S.tam.skSeen |= 1 << ri; save(); } });
     else skAt(t0, () => {
       SKQ.cutEnd = cutEnd; SKQ.el = el; st.classList.add('skdim'); sfx('quest');
-      if (!el) return; el.classList.add('charge'); el.style.setProperty('--cc', TM_GC[TAM.role[ri].k]);
+      if (!el) return;
+      if (!rt.reduced) { const a = st.getBoundingClientRect(), r = el.getBoundingClientRect(), cam = st.querySelector('.tm-cam');   // 5.3.0.1 필살기: 쓰는 대원 쪽으로 다가가요(2배 빠르기면 절반)
+        if (cam && a.width) { cam.style.transformOrigin = `${((r.left + r.width / 2 - a.left) / a.width * 100).toFixed(1)}% ${((r.top + r.height * 0.6 - a.top) / a.height * 100).toFixed(1)}%`; st.style.setProperty('--skz', tamSpdOn() ? 1.07 : 1.14); st.classList.add('skcam'); setTimeout(() => st.classList.remove('skcam'), Math.max(400, cutEnd - t0 + 250)); } } el.classList.add('charge'); el.style.setProperty('--cc', TM_GC[TAM.role[ri].k]);
       { const im = el.querySelector('img'), u = IMG(`ex4_pc_${p.sp}_sk`); if (im && u) { im.src = u; clearTimeout(el._t); el._t = setTimeout(() => { im.src = tamPcPic(p.sp); }, TAM.skCharge + TAM.skCut + 900); } }   // 4.4.0 필살기 자세
       { const cu = IMG(`ex4_sk_${TAM.role[ri].k}_charge`); if (cu) { const [cx, cy] = tamAt(el, 0.6); tamFxImg('tm-ring', cu, cx, cy, [{ t: 'scale(.3) rotate(0deg)', opacity: 0 }, { t: 'scale(1) rotate(60deg)', opacity: 1, offset: 0.4 }, { t: 'scale(1.15) rotate(120deg)', opacity: 0 }], TAM.skCharge + 500); } }
       const [x, y] = tamAt(el, 0.5), sm = tamI(`ex_fx_${TAM.role[ri].k}`), r = st.getBoundingClientRect().width * 0.2;
@@ -17074,7 +17154,7 @@ body.mg-on .toast[hidden]{display:none}
     if (!off) { skAt(t0 + TAM.skCharge, () => { tamCutIn(ri, p.sp); buzz(25); });
       skAt(cutEnd, () => { $('#tmCut').hidden = true; $('#panelTam').classList.remove('tm-cutting'); if (el) el.classList.remove('charge');
         if (!seen) { S.tam.skSeen |= 1 << ri; save(); tamRenderTop(); } }); }
-    skAt(SKQ.end, () => { if (skNow() >= SKQ.end - 5) st.classList.remove('skdim'); });
+    skAt(SKQ.end, () => { if (skNow() >= SKQ.end - 5) st.classList.remove('skdim', 'skcam'); });
     if (!el) return { hit: hitAt, heal: healAt };
     // 3. 큰 움직임
     at(0, () => { el.classList.remove('cast'); void el.offsetWidth; el.classList.add('cast'); setTimeout(() => el.classList.remove('cast'), 1100); });
@@ -17131,18 +17211,26 @@ body.mg-on .toast[hidden]{display:none}
   function tamWalk(fl) {
     const st = $('#tmStage'), T = rt.tam; if (!st || !T) return;
     const R = tamReg(fl), cur = $('.tm-bg.cur', st), bg = tamBg(fl);
-    if (!T.climbing) { cur.getAnimations().forEach(a => a.cancel()); cur.style.backgroundImage = bg ? `url("${bg}")` : ''; }
+    if (!T.climbing) { cur.getAnimations().forEach(a => a.cancel()); tamBgPaint(cur, fl); }
     st.dataset.reg = R.k; st.classList.toggle('hm', tamHOn()); st.classList.toggle('deep', tamLap(fl) > 0); st.classList.remove('boss'); $('#tmBossBar').hidden = true;
     tamAmb(R.k); tamTower(fl); tamFl(fl);
     const team = tamTeam(), pp = $('#tmP');
     pp.dataset.fid = 'walk';
     setH(pp, team.map((p, i) => { const [x, y] = TM_PPOS[i] || TM_PPOS[0];
-      return `<div class="tm-f" data-i="${i}" style="left:${x}%;bottom:${y + TM_UP}%;z-index:${30 - y};${tamDz(y)}--bd:-${(i * 0.13).toFixed(2)}s"><div class="tm-body"><img src="${tamPcPic(p.sp)}" alt="${esc(spName(p.sp))}"></div><i class="tm-hp"><b style="width:100%"></b></i></div>`; }).join(''));
+      return `<div class="tm-f" data-i="${i}" style="left:${x}%;bottom:${y + TM_UP}%;z-index:${30 - y};${tamDz(y)}--bd:-${(i * 0.13).toFixed(2)}s"><div class="tm-body"><img src="${tamPcPic(p.sp)}" alt="${esc(spName(p.sp))}"></div><i class="tm-hp"><s></s><b style="width:100%"></b></i></div>`; }).join(''));
     setH($('#tmM'), ''); $('#tmM').dataset.fid = '';
     if (T.nLose) pp.classList.add('enter'); else pp.classList.remove('enter');
     pp.classList.add('walking'); clearTimeout(pp._t); const ms = TAM.ph.walk / tamSpdK() * 1000; pp._t = setTimeout(() => pp.classList.remove('walking', 'enter'), ms);
-    if (!T.climbing && !rt.reduced) cur.animate([{ transform: 'translateX(0)' }, { transform: 'translateX(-16%)' }], { duration: ms, easing: 'cubic-bezier(.3,0,.6,1)', fill: 'forwards' });
-    { const fg = $('#tmFg'), fu = IMG('ex4_fg_' + R.k) || tamI('ex_fg_' + R.k); if (fg) { fg.getAnimations().forEach(a => a.cancel()); fg.style.backgroundImage = fu ? `url("${fu}")` : ''; if (fu && !rt.reduced) fg.animate([{ transform: 'translateX(0)' }, { transform: 'translateX(-24%)' }], { duration: ms, easing: 'cubic-bezier(.3,0,.6,1)', fill: 'forwards' }); } }
+    st.classList.toggle('lay', !!tamLay(fl)); { const lu = IMG('ex5_light'); if (lu) st.style.setProperty('--ex5-light', `url("${lu}")`); }
+    const L = tamLay(fl), wo = { duration: ms, easing: 'cubic-bezier(.3,0,.6,1)', fill: 'forwards' };
+    if (!T.climbing && !rt.reduced) {
+      if (L) {   // 5.3.0.1 겹마다 다른 빠르기: 먼 풍경은 천천히, 바닥은 조금 빠르게, 앞 장식은 가장 빠르게
+        const far = cur.querySelector('.ly.far'), flo = cur.querySelector('.ly.floor');
+        if (far) { far.getAnimations().forEach(a => a.cancel()); far.animate([{ transform: 'translateX(0)' }, { transform: 'translateX(-12%)' }], wo); }
+        if (flo) { flo.getAnimations().forEach(a => a.cancel()); flo.animate([{ transform: 'translateX(0)' }, { transform: 'translateX(-9%)' }], wo); }
+      } else cur.animate([{ transform: 'translateX(0)' }, { transform: 'translateX(-16%)' }], wo);
+    }
+    { const fg = $('#tmFg'), fu = (L && L.front) || IMG('ex4_fg_' + R.k) || tamI('ex_fg_' + R.k); if (fg) { fg.getAnimations().forEach(a => a.cancel()); fg.classList.toggle('lay', !!(L && L.front)); fg.style.backgroundImage = fu ? `url("${fu}")` : ''; if (fu && !rt.reduced) fg.animate([{ transform: 'translateX(0)' }, { transform: L && L.front ? 'translateX(-7%)' : 'translateX(-24%)' }], wo); } }
     $('#tmTime').style.width = '100%'; tamCam(false);
     tamSkills();
   }
@@ -17180,14 +17268,14 @@ body.mg-on .toast[hidden]{display:none}
     const st = $('#tmStage'), T = rt.tam; if (!st || !T) return;
     const next = best + 1, cur = $('.tm-bg.cur', st), nx = $('.tm-bg.nx', st), bg = tamBg(next);
     cur.getAnimations().forEach(a => a.commitStyles && a.commitStyles()); cur.getAnimations().forEach(a => a.cancel());
-    nx.style.backgroundImage = bg ? `url("${bg}")` : ''; T.climbing = true;
+    tamBgPaint(nx, next); T.climbing = true; st.classList.toggle('lay', !!tamLay(next));
     $('#tmP').classList.remove('jump'); void st.offsetWidth; $('#tmP').classList.add('jump');
     st.classList.remove('climb'); void st.offsetWidth; st.classList.add('climb');
     const o = { duration: TAM.ph.climb / tamSpdK() * 900, easing: 'cubic-bezier(.5,0,.3,1)', fill: 'forwards' }, x0 = cur.style.transform || 'translateX(0)';
     cur.animate([{ transform: x0 }, { transform: x0 + ' translateY(100%)' }], o);
     const a = nx.animate([{ transform: 'translateY(-100%)' }, { transform: 'translateY(0)' }], o);
     { const fg = $('#tmFg'); if (fg) { const x = getComputedStyle(fg).transform; fg.animate([{ transform: x === 'none' ? 'none' : x, opacity: 1 }, { transform: (x === 'none' ? '' : x + ' ') + 'translateY(120%)', opacity: 0 }], { duration: o.duration, easing: o.easing, fill: 'forwards' }); } }
-    a.onfinish = () => { cur.style.transform = ''; cur.style.backgroundImage = nx.style.backgroundImage; cur.getAnimations().forEach(x => x.cancel()); a.cancel(); T.climbing = false; st.classList.remove('climb'); $('#tmP').classList.remove('jump'); };
+    a.onfinish = () => { cur.style.transform = ''; cur.style.backgroundImage = nx.style.backgroundImage; cur.innerHTML = nx.innerHTML; cur.dataset.lay = nx.dataset.lay || ''; cur.getAnimations().forEach(x => x.cancel()); a.cancel(); T.climbing = false; st.classList.remove('climb'); $('#tmP').classList.remove('jump'); };
     tamFl(next, true); tamTower(next); st.dataset.reg = tamReg(next).k; tamAmb(tamReg(next).k); st.classList.remove('boss'); $('#tmBossBar').hidden = true;
     setH($('#tmM'), ''); sfx('tap');
   }
@@ -25951,6 +26039,8 @@ body.mg-on .toast[hidden]{display:none}
     openModal(m);
     sfx('bell'); rt.cereRang = true;
     rt.cereAt = performance.now();
+    if (rt.cereFx) { rt.cereFx._stop(); rt.cereFx = null; }
+    if (v3) { try { rt.cereFx = cereFx(m) || null; } catch (e) { rt.cereFx = null; } }   // 5.3.0.1 꽃잎, 학사모, 불꽃
     rt.cereRun = { dur: rt.reduced ? 2600 : v3 ? CERE3_MS : v2 ? CERE2_MS : CERE_MS, used: 0, from: rt.cereAt, fan: false, fanAt: v3 ? 17100 : v2 && !rt.reduced ? 5100 : 2000 };
     cereTimers();
     return true;
@@ -25966,6 +26056,7 @@ body.mg-on .toast[hidden]{display:none}
   // 묻는 동안 졸업식 그림 속 움직임을 멈췄다가 이어요(멈춘 것만 다시 재생)
   function cerePause(on) {
     const sv = document.querySelector('#mCere .cere-svg'); if (!sv || !sv.getAnimations) return;
+    if (on && rt.cereFx) { rt.cereFx._stop(); rt.cereFx = null; }   // 묻는 동안 연출은 멈추고 다시 이어 하지 않아요
     if (on) { rt.cerePaused = sv.getAnimations({ subtree: true }).filter(a => a.playState === 'running'); rt.cerePaused.forEach(a => a.pause()); }
     else { (rt.cerePaused || []).forEach(a => { try { a.play(); } catch (e) { /* 무시 */ } }); rt.cerePaused = null; }
   }
@@ -25989,6 +26080,7 @@ body.mg-on .toast[hidden]{display:none}
     if (!rt.cereOn) return;
     if (!force && performance.now() - (rt.cereAt || 0) < 350) return;
     rt.cereOn = false; rt.cereAsking = false; rt.cereRun = null;
+    if (rt.cereFx) { rt.cereFx._stop(); rt.cereFx = null; }
     clearTimeout(rt.cereT1); clearTimeout(rt.cereT2);
     closeModal($('#mCere'));
     rt.cereToasts.splice(0).forEach((t, i) => setTimeout(() => toast(t), 450 + i * 2400));   // 미뤄 둔 알림을 차례로
@@ -26756,12 +26848,14 @@ body.mg-on .toast[hidden]{display:none}
     nlModal(el);   // 2.0.1
     rt.modalOpen = el;
     el.hidden = false;
+    try { uiRwOpen(el); } catch (e) { /* 연출만 */ }   // 5.3.0.1 보상 창 빛살
     musicSync();   // 4.2.0 졸업식과 학위수여식 곡은 창에 따라 바뀌어요
     requestAnimationFrame(() => el.classList.add('open'));
     const b = el.querySelector('[data-autofocus]') || el.querySelector('.cta') || el.querySelector('button');
     if (b) b.focus({ preventScroll: true });
   }
   function closeModal(el, then) {
+    if (el.classList.contains('open')) { try { uiRwClose(el); } catch (e) { /* 연출만 */ } }   // 5.3.0.1 도토리가 위 칸으로
     el.classList.remove('open');
     if (rt.modalOpen === el) rt.modalOpen = null;
     setTimeout(() => { if (rt.modalOpen !== el) el.hidden = true; if (then) then(); nextModal(); musicSync(); setTimeout(toastFlush, 60); sheetBackCheck(el); }, 180);
@@ -26852,6 +26946,7 @@ body.mg-on .toast[hidden]{display:none}
     { const bd = $('.board'), scd = $('#schoolCard'); if (bd && bd.classList.contains('open')) { bd.classList.remove('open'); if (scd) scd.setAttribute('aria-expanded', 'false'); } }
     if (t !== 'shop') Music.preview = '';
     musicSync();
+    try { trTab(t, prev); } catch (e) { /* 연출만 */ }   // 5.3.0.1 탭 넘김
   }
   function syncSettingsUI() {
     $('#optSound').checked = S.sound; $('#optBgm').checked = S.bgm; $('#optVibe').checked = S.vibrate;
@@ -29951,6 +30046,7 @@ body.mg-on .toast[hidden]{display:none}
     FXL.tex.dot = app.renderer.generateTexture(new P.Graphics().circle(0, 0, 4).fill(0xffffff));
     if (!FXL.tex.ic_acorn) { FXL.st = 'no'; cv.remove(); return; }
     FXL.st = 'ok';
+    setTimeout(() => { try { ['fxe_conf_1', 'fxe_conf_2', 'fxe_conf_3', 'fxe_conf_4', 'fxe_bit', 'fxe_spark', 'fxe_cap', 'fxe_tape_l', 'fxe_tape_r', 'fxe_beam', 'fxe_petal_1', 'fxe_petal_2', 'fxe_petal_3'].forEach(fxeTex); } catch (e) { /* 없으면 코드 모양 */ } }, 2000);   // 5.3.0.1 행사 그림(작업지시서 103) 미리 받기
   }
   const fxRnd = (a, b) => a + Math.random() * (b - a);   // 반짝이는 보통 섞기로 그려요(그림판 바탕이 투명이라 더하기 섞기는 거의 안 보여요)
   // 화면 자리(px) ↔ 지도 자리. 지도는 viewBox 0 -60 360 540이라 왼쪽 위가 (0, -60)
@@ -30005,7 +30101,7 @@ body.mg-on .toast[hidden]{display:none}
     app.render();
     if (busy) FXL.raf = requestAnimationFrame(fxFrame);
   }
-  function fxSprite(tex, x, y, sz) { const s = new window.PIXI.Sprite(tex); s.anchor.set(0.5); s.x = x; s.y = y; s.scale.set(sz / (tex.width || 1)); FXL.w.addChild(s); return s; }
+  function fxSprite(tex, x, y, sz) { const s = new window.PIXI.Sprite(tex); s.anchor.set(0.5); s.x = x; s.y = y; s.scale.set(sz * (tex._fxK || 1) / (tex.width || 1)); FXL.w.addChild(s); return s; }
   function fxBurst(x, y, n, o) {
     if (!o.tex) return;
     for (let i = 0; i < n; i++) { const s = fxSprite(o.tex, x, y, o.sz * fxRnd(0.7, 1.25)), a = o.ang != null ? o.ang + fxRnd(-o.spread, o.spread) : fxRnd(0, Math.PI * 2), sp = o.sp * fxRnd(0.5, 1.3);
@@ -30132,10 +30228,12 @@ body.mg-on .toast[hidden]{display:none}
   const FXE = { tex: {}, beams: null, sprint: 0, end: null };
   const FXE_TEAM = { b: [0x3f78c2, 0x7fb2ff, 0xffffff], w: [0xffffff, 0xe9eef5, 0xffe27a] };
   const hexN = c => parseInt(String(c || '#ffffff').replace('#', ''), 16) || 0xffffff;
+  // 그림은 둘레에 빈 곳이 있어서 코드 모양보다 조금 크게 그려요
+  const FXE_K = k => k === 'fxe_spark' ? 2.4 : /^fxe_conf_/.test(k) ? 1.7 : k === 'fxe_bit' ? 1.5 : /^fxe_petal_/.test(k) ? 1.3 : k === 'fxe_cap' ? 1.25 : 1;
   function fxeTex(k) {
     if (FXE.tex[k] !== undefined) return FXE.tex[k];
     const u = IMG(k);
-    if (u) { FXE.tex[k] = null; const im = new Image(); im.onload = () => { try { FXE.tex[k] = window.PIXI.Texture.from(im); } catch (e) { /* 코드 모양 그대로 */ } }; im.src = u; }
+    if (u) { FXE.tex[k] = null; const im = new Image(); im.onload = () => { try { const t = window.PIXI.Texture.from(im); t._fxK = FXE_K(k); FXE.tex[k] = t; } catch (e) { /* 코드 모양 그대로 */ } }; im.src = u; }
     const P = window.PIXI, r = FXL.app.renderer, G = () => new P.Graphics();
     let g;
     if (k === 'fxe_conf_1') g = G().rect(-8, -3, 16, 6).fill(0xe04848);
@@ -30269,6 +30367,71 @@ body.mg-on .toast[hidden]{display:none}
   function fxeReset() {   // 행사가 끝나면 학생 몸을 원래대로
     for (const k of rt.kids) { k.lean = 0; k.jY = 0; k.sq = 0; k.jT = null; if (k.spd0) { k.spd = k.spd0; k.spd0 = 0; } k.sprT = 0; }
     if (FXE.beams) { FXE.beams.forEach(b => { if (!b.s.destroyed) b.s.destroy(); }); FXE.beams = null; }
+  }
+  /* ---------- 5.3.0.1 전환과 보상, 졸업 연출(효과층 5단계, 설계안 '5.3.0 효과층 마무리' 2, 3절) ----------
+     모두 HTML 위에 얹는 움직임이에요(누르기 통과, 값과 저장 그대로). 움직임 줄이기면 하지 않아요.
+     그림(작업지시서 104: tr_leaf_1, tr_leaf_2, tr_leaves, rw_burst, fxe_petal_1~3)이 없으면 그 움직임만 빼요. */
+  const UIFX = { tabA: null, wipe: null };
+  const uiOn = () => !rt.reduced && !document.hidden;
+  function uiLayer() { let L = $('#uiFx'); if (!L) { L = document.createElement('div'); L.id = 'uiFx'; L.className = 'ui-fx'; L.setAttribute('aria-hidden', 'true'); document.body.appendChild(L); } return L; }
+  function uiImg(k, cls) { const u = IMG(k); if (!u) return null; const im = document.createElement('img'); im.src = u; im.alt = ''; im.className = cls || 'ui-p'; uiLayer().appendChild(im); return im; }
+  // 탭 넘김: 새 화면이 살짝 떠오르고 잎사귀 두 장이 휙(0.25초, 빨리 눌러도 앞 움직임을 지우고 새로)
+  function trTab(t, prev) {
+    if (!uiOn() || t === prev) return;
+    if (t === 'tam' && prev !== 'tam') { trWipe(); return; }
+    const el = t === 'school' ? $('.frame') : document.querySelector('.panel:not([hidden])');
+    if (UIFX.tabA) { try { UIFX.tabA.cancel(); } catch (e) { /* 이미 끝남 */ } }
+    if (el && el.animate) UIFX.tabA = el.animate([{ opacity: 0.55, transform: 'translateY(10px)' }, { opacity: 1, transform: 'none' }], { duration: 250, easing: 'cubic-bezier(.2,.8,.3,1)' });
+    const W = window.innerWidth, H = window.innerHeight;
+    for (let i = 0; i < 2; i++) { const im = uiImg(i ? 'tr_leaf_2' : 'tr_leaf_1'); if (!im) break; const y = H * (0.25 + Math.random() * 0.45), s = 26 + Math.random() * 10;
+      im.style.width = s + 'px'; const a = im.animate([{ transform: `translate(${W + 20}px,${y}px) rotate(0deg)`, opacity: 0.95 }, { transform: `translate(${W * 0.45}px,${y + 30}px) rotate(-160deg)`, opacity: 0.95, offset: 0.5 }, { transform: `translate(-60px,${y + 70}px) rotate(-320deg)`, opacity: 0 }], { duration: 520 + i * 90, delay: i * 50, easing: 'ease-in-out', fill: 'backwards' }); a.onfinish = () => im.remove(); }
+  }
+  // 큰 장면 넘김: 잎사귀 무리가 화면을 덮은 채 시작해 왼쪽으로 쓸려 나가며 새 화면이 보여요(화면은 이미 바뀐 뒤라 누르기를 막지 않아요)
+  function trWipe() {
+    if (!uiOn()) return; const im = uiImg('tr_leaves', 'ui-wipe'); if (!im) return;
+    if (UIFX.wipe) UIFX.wipe.remove(); UIFX.wipe = im;
+    const a = im.animate([{ transform: 'translateX(-12%)' }, { transform: 'translateX(-12%)', offset: 0.15 }, { transform: 'translateX(-115%)' }], { duration: 620, easing: 'cubic-bezier(.5,0,.6,1)', fill: 'forwards' });
+    a.onfinish = () => { im.remove(); if (UIFX.wipe === im) UIFX.wipe = null; };
+  }
+  // 보상 창: 뒤에서 빛살이 천천히 돌아요(받는 값이 보이는 창만)
+  const UI_RW = ['mReward', 'mSportsEnd', 'mFestEnd', 'mOffline'];
+  function uiRwOpen(el) {
+    if (!el || !uiOn()) return; const u = IMG('rw_burst'); if (!u) return;
+    if (!(UI_RW.includes(el.id) || el.querySelector('.amount'))) return;
+    let b = el.querySelector('.rw-burst'); if (!b) { b = document.createElement('i'); b.className = 'rw-burst'; b.setAttribute('aria-hidden', 'true'); b.style.setProperty('--rwu', `url("${u}")`); const bd = el.querySelector('.backdrop'); if (bd) bd.after(b); else el.prepend(b); }
+    const gold = !!el.querySelector('.amount [data-gold], .rw-list .gold');
+    b.style.setProperty('--rwc', gold ? '#FFC93C' : '#FFD978');
+  }
+  // 받기: 받은 자리에서 도토리가 위쪽 도토리 칸으로 날아가요(최대 8개)
+  function uiRwClose(el) {
+    if (!el || !uiOn() || !(UI_RW.includes(el.id) || el.querySelector('.amount')) || !el.querySelector('[data-acorn], .amount svg, .amount img, .rw-list svg, .rw-big svg')) return;   // 도토리를 받는 창만
+    const from = el.querySelector('.amount') || el.querySelector('.rw-list li') || el.querySelector('.rw-big'), to = $('#vBudget'), u = IMG('ic_acorn');
+    if (!from || !to || !u) return; const A = from.getBoundingClientRect(), B = to.getBoundingClientRect(); if (!A.width || !B.width) return;
+    const n = 6;
+    for (let i = 0; i < n; i++) { const im = uiImg('ic_acorn', 'ui-p ui-acorn'); if (!im) return; const x0 = A.left + A.width / 2 + (Math.random() - 0.5) * 60, y0 = A.top + A.height / 2 + (Math.random() - 0.5) * 20, x1 = B.left + B.width / 2 - 12, y1 = B.top + B.height / 2 - 12, mx = (x0 + x1) / 2 + (Math.random() - 0.5) * 120, my = Math.min(y0, y1) - 40 - Math.random() * 60;
+      const a = im.animate([{ transform: `translate(${x0 - 12}px,${y0 - 12}px) scale(.6)`, opacity: 0 }, { transform: `translate(${mx}px,${my}px) scale(1.15)`, opacity: 1, offset: 0.45 }, { transform: `translate(${x1}px,${y1}px) scale(.7)`, opacity: 1 }], { duration: 620, delay: i * 55, easing: 'cubic-bezier(.4,0,.6,1)', fill: 'backwards' });
+      a.onfinish = () => { im.remove(); if (i === n - 1 && to.animate) to.animate([{ transform: 'scale(1)' }, { transform: 'scale(1.25)' }, { transform: 'scale(1)' }], { duration: 260 }); }; }
+  }
+  // 졸업식(cereArt3, 21초) 위에 꽃잎, 학사모 따로따로, 색종이, 마지막 불꽃 세 번
+  function cereFx(host) {
+    if (!host || !uiOn() || !IMG('fxe_petal_1')) return;
+    const L = document.createElement('div'); L.className = 'cere-fx'; L.setAttribute('aria-hidden', 'true'); host.appendChild(L);
+    const R = () => host.getBoundingClientRect(), add = (k, w) => { const u = IMG(k); if (!u) return null; const im = document.createElement('img'); im.src = u; im.alt = ''; im.style.width = w + 'px'; L.appendChild(im); return im; };
+    const timers = [], at = (ms, f) => timers.push(setTimeout(() => { if (L.isConnected) f(); }, ms));
+    const petals = (n, t0, dur) => { for (let i = 0; i < n; i++) at(t0 + Math.random() * dur, () => { const r = R(), im = add('fxe_petal_' + (1 + (i % 3)), 12 + Math.random() * 10); if (!im) return; const x = Math.random() * r.width * 1.1 - r.width * 0.05, sw = 30 + Math.random() * 50, d = 3800 + Math.random() * 2200;
+      const a = im.animate([{ transform: `translate(${x}px,-30px) rotate(0deg)` }, { transform: `translate(${x + sw}px,${r.height * 0.5}px) rotate(${180 + Math.random() * 180}deg)`, offset: 0.5 }, { transform: `translate(${x - sw * 0.3}px,${r.height + 30}px) rotate(${400 + Math.random() * 200}deg)` }], { duration: d, easing: 'linear' }); a.onfinish = () => im.remove(); }); };
+    petals(14, 200, 3200);   // 1 학교 전경
+    petals(10, 11600, 4400);   // 4 졸업장
+    at(17500, () => { const r = R(); for (let i = 0; i < 7; i++) { const im = add('fxe_cap', 34 + Math.random() * 10); if (!im) break; const x = r.width * (0.2 + i * 0.1), h = r.height * (0.35 + Math.random() * 0.15), d = 1700 + Math.random() * 400, sp = (Math.random() - 0.5) * 900;   // 5 학사모가 따로따로
+      const a = im.animate([{ transform: `translate(${x}px,${r.height * 0.62}px) rotate(0deg)` }, { transform: `translate(${x + (Math.random() - 0.5) * 60}px,${r.height * 0.62 - h}px) rotate(${sp}deg)`, offset: 0.45, easing: 'ease-in' }, { transform: `translate(${x + (Math.random() - 0.5) * 90}px,${r.height + 40}px) rotate(${sp * 1.8}deg)` }], { duration: d, delay: i * 70, easing: 'ease-out', fill: 'backwards' }); a.onfinish = () => im.remove(); } });
+    at(17600, () => { const r = R(); for (let i = 0; i < 26; i++) { const im = add('fxe_conf_' + (1 + (i % 4)), 12 + Math.random() * 6); if (!im) break; const x = Math.random() * r.width, d = 2200 + Math.random() * 1200;
+      const a = im.animate([{ transform: `translate(${r.width / 2}px,${r.height * 0.4}px) rotate(0deg)` }, { transform: `translate(${x}px,${r.height * (0.1 + Math.random() * 0.2)}px) rotate(${Math.random() * 360}deg)`, offset: 0.3, easing: 'ease-in' }, { transform: `translate(${x + (Math.random() - 0.5) * 40}px,${r.height + 20}px) rotate(${Math.random() * 720}deg)` }], { duration: d, easing: 'ease-out' }); a.onfinish = () => im.remove(); } });
+    petals(16, 16700, 3600);
+    [18600, 19300, 19900].forEach((t, j) => at(t, () => { const r = R(), cx = r.width * [0.28, 0.72, 0.5][j], cy = r.height * [0.2, 0.17, 0.12][j], cols = ['#FFD36B', '#FF9BC4', '#9FD3FF'];   // 마지막 불꽃 세 번
+      for (let i = 0; i < 22; i++) { const im = add('fxe_spark', 15); if (!im) break; im.style.filter = `drop-shadow(0 0 5px ${cols[j]}) drop-shadow(0 0 2px ${cols[j]})`; const an = i / 22 * Math.PI * 2, d = r.width * (0.13 + Math.random() * 0.05);
+        const a = im.animate([{ transform: `translate(${cx}px,${cy}px) scale(.6)`, opacity: 1 }, { transform: `translate(${cx + Math.cos(an) * d}px,${cy + Math.sin(an) * d}px) scale(1)`, opacity: 1, offset: 0.55 }, { transform: `translate(${cx + Math.cos(an) * d * 1.1}px,${cy + Math.sin(an) * d * 1.1 + 24}px) scale(.5)`, opacity: 0 }], { duration: 1200, easing: 'cubic-bezier(.1,.8,.3,1)' }); a.onfinish = () => im.remove(); } }));
+    L._stop = () => { timers.forEach(clearTimeout); L.remove(); };
+    return L;
   }
   /* ---------- 2.0.0 핫픽스(원격 설정, 2026-10-27 woodani) ----------
      웹 주소의 live.json을 켤 때 읽어요(웹, 안드로이드, 토스 모두). 코드는 받지 않고 숫자, 공지, 기능 끄기만 받아요.
@@ -30468,7 +30631,7 @@ body.mg-on .toast[hidden]{display:none}
     GSHOP, OUTFITS, evPastIds, renderNight, shopItem, essItem, buyEss, pickEss, nickPrice, grantOffline, thSetPrice, pickDeco, buyDeco, buyDecoBerry,   // 2.1.0 소풍, 스티커판, 상점
     LAB, LAB_IN, LAB_KEYS, LAB_CARDS, LAB_MIX, LAB_DBL, labOf, labRun, labCount, labReady, labDone, openLab, renderLab, labTap, labGo, RD, BOOKS, rdStart, rdSettle, rdTick, rdLeft, rdRemain, openRead, renderRead, renderStudy2, sanitizeStudy2, maintSync, maintTap, openBook, renderBook, BT, BT_EV, BT_LG, BT_SCH, btOpen, btLeft, btRoster, btBest, btMake, btScore, btWin, btFinish, btOpenScene, btClose, btRankDoc, readRow, btAuto, btPick, btStart, btRender, renderBtCard, sanitizeBt, get btUI() { return btUI; }, EX, exIsWeek, exNow, exPrev, exDays, exScore, exGrade, exStudy, exClaim, exTick, exMake, openExam, renderExam, exAwardTop, exReportReady, sanitizeExam, renderSheet, openSheet,   // 2.0.1 공부 2단계(s76)
     AC, AC_GAME, AB_KEY, ABIL, acLv, acSum, acMult, acRepOf, acGain, acSettle, acAll, acCap, acBkLeft, acBuyBook, renderAc, sanitizeAc, freshAc, rankRows, awayStart, awaySettle, timeSrc, save, awayHold, rankCap, cloudVerify, liveApply, liveLoad, openNotice, NOTICES, get Live() { return Live; }, get Rank() { return Rank; }, liveOff,   // 2.0.0 보안 점검 시험(s71), Codex 검토 시험(s72)
-    rosterEnsure, rosterMake, rosterAdd, clubAuto, clubSet, clubPct, clubShow, clubSum, clubStars, clubMembers, clubShowGo, conArtKey, FXL, FXT, FXE, fxeFirework, fxeSportsEnd, fxTamHitT: (...a) => fxTamHit(...a), fxTamDropT: (...a) => fxTamDrop(...a), fxOn, fxTamOn, fxTamInit, fxLoad, fxOak, dropValue, ppDecoSync, ppMedIc, PP_DECO, showReady, showReadyC, showQuestFree, showWait, showDay, clubWeekTick, clubFacUp, CLUBS, CLUB, star, clubTuitionMult, clubFestMult, clubDecoOff, renderClub, renderHall, openSeatPick, openClubPick,
+    rosterEnsure, rosterMake, rosterAdd, clubAuto, clubSet, clubPct, clubShow, clubSum, clubStars, clubMembers, clubShowGo, conArtKey, FXL, FXT, FXE, fxeFirework, fxeSportsEnd, fxTamHitT: (...a) => fxTamHit(...a), fxTamDropT: (...a) => fxTamDrop(...a), fxOn, fxTamOn, fxTamInit, fxLoad, fxOak, dropValue, UIFX, trTab, trWipe, uiRwOpen, uiRwClose, cereFx, tamLay, openModalT: el => openModal(el), closeModalT: (el, f) => closeModal(el, f), ppDecoSync, ppMedIc, PP_DECO, showReady, showReadyC, showQuestFree, showWait, showDay, clubWeekTick, clubFacUp, CLUBS, CLUB, star, clubTuitionMult, clubFestMult, clubDecoOff, renderClub, renderHall, openSeatPick, openClubPick,
     TIER_SCALE, renderCampus, zoneBadge, uniPreview, setZone, DEPT, openDept, renderDept, deptSet, deptPct, deptOf, deptPicks, deptSlots, deptMult, zoneKey, uniOn, zoneOf, ZONE_GEO, CAMPUS, GEO, geoIdx, legacyMult, tuitionMult, snapTake, snapOf, showCere, cereCrew, cere3Info, cere3Load, cere3, tierViewOpen, tierViewClose, renderTierView, renderTierDots, nlCycle, viewMap, showNewTalk, talkNext, showCere, cereEnd, cereCrew, cereAsk, cereKeep, goFur, updateQuestDot, openElect, renderElect, elVote, elSync, elMult, elClub, elPres, elBadge, elMake, EL_PLEDGES, clubPct, festPrize, dropValue, claimMission, gameWeek, NEWCOMERS, TIERS, GEO, geoIdx, decoCost0, qMeasure, qDone, qGoal, kidArt: kidSVG, newYear, checkGrade, gradeOf, townRep, FAC, sanitize200, trialHunt, updateTrial, TRIAL, zoomAt, fitMap, ZOOM_MAX, DECO, DECO_SLOTS, DECO_SIGN, decoCost, decoSoldOut, pickDeco, buyDeco, decoPut, decoEditStart, decoEditEnd, openDecoPick, renderDeco, setSchoolNm, setMark, schoolTitle, markHTML, decoPlacedAll, esExLeft, esExCost, get Cloud() { return Cloud; }, get actx() { return actx; }, Music, musicSync, ensureAudio, bgmLoad, pzUI, rt, makeDeal, furStage, DEAL, navInfo, navRoute, hudTheme, HUD_TH_COL, pathInfo, pathRoute, MAP_PATHS, spawnDrop, repTipCheck, linkGoogle, retryCloud, sanitize, acctPending, renderMap, renderHUD, renderAffordance, syncKids, layoutMap, geo, hitTrial, endVisit, showReward, recommend, needCost, prepTopUp, qReward, prepPhase, rankScore, pwOf, previewDip, dipMult, costScale, buyFur, buyFurAll, furCost, furReady, furDone, FUR, startTalk, endTalk, teacherAct, facCost, teaCost, facKeys, rate, rep, capacity, canGraduate, canPromote,
     fmt, fmt2, graduate, promote, buyPerk, perkCost, perkMaxed, buyFundPerk, fpCost, claimMain, mainReady, curMain, qNo, earn, CFG, TEA, teaMaxed, PERKS, FPERKS, MAIN, finalYear, startTrip, claimTrip, TRIPS, yearLocked, endSports, rtSports: () => rt.sports, rtFest: () => rt.fest, facCap, addLeague, addMP, tutStart, endFest, claimBox, musicWant, askBox, festWait, setTab,
     RARE, modelOf, rareRoll, rareGot, showRareTalk, rareDexHTML, kidSVG, rosterKid, WX, wxOf, wxIs, rdMinNow, renderWeather, PL, plSync, plUnread, openPLetter, renderPLetter, RS, rsNum, rsSync, rsAdd, rsLabel, lookDoc, lookRead, lookPush, lookSet, openLook, MODEL_SCHOOL, joinRank, PS, PS_M, PS_SEASONS, psSeason, psOpen, psSync, psLv, psGot, psReward, psClaimAll, psClaimMission, psWatchAd, psClaimable, psStepReady, psExtraReady, psChooseFur, psFurImg, renderPass, setEvSeg, xtGot, achTitles,   // 2.1.3 숲속 패스

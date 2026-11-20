@@ -31,6 +31,7 @@
     FXL.tex.dot = app.renderer.generateTexture(new P.Graphics().circle(0, 0, 4).fill(0xffffff));
     if (!FXL.tex.ic_acorn) { FXL.st = 'no'; cv.remove(); return; }
     FXL.st = 'ok';
+    setTimeout(() => { try { ['fxe_conf_1', 'fxe_conf_2', 'fxe_conf_3', 'fxe_conf_4', 'fxe_bit', 'fxe_spark', 'fxe_cap', 'fxe_tape_l', 'fxe_tape_r', 'fxe_beam', 'fxe_petal_1', 'fxe_petal_2', 'fxe_petal_3'].forEach(fxeTex); } catch (e) { /* 없으면 코드 모양 */ } }, 2000);   // 5.3.0.1 행사 그림(작업지시서 103) 미리 받기
   }
   const fxRnd = (a, b) => a + Math.random() * (b - a);   // 반짝이는 보통 섞기로 그려요(그림판 바탕이 투명이라 더하기 섞기는 거의 안 보여요)
   // 화면 자리(px) ↔ 지도 자리. 지도는 viewBox 0 -60 360 540이라 왼쪽 위가 (0, -60)
@@ -85,7 +86,7 @@
     app.render();
     if (busy) FXL.raf = requestAnimationFrame(fxFrame);
   }
-  function fxSprite(tex, x, y, sz) { const s = new window.PIXI.Sprite(tex); s.anchor.set(0.5); s.x = x; s.y = y; s.scale.set(sz / (tex.width || 1)); FXL.w.addChild(s); return s; }
+  function fxSprite(tex, x, y, sz) { const s = new window.PIXI.Sprite(tex); s.anchor.set(0.5); s.x = x; s.y = y; s.scale.set(sz * (tex._fxK || 1) / (tex.width || 1)); FXL.w.addChild(s); return s; }
   function fxBurst(x, y, n, o) {
     if (!o.tex) return;
     for (let i = 0; i < n; i++) { const s = fxSprite(o.tex, x, y, o.sz * fxRnd(0.7, 1.25)), a = o.ang != null ? o.ang + fxRnd(-o.spread, o.spread) : fxRnd(0, Math.PI * 2), sp = o.sp * fxRnd(0.5, 1.3);
@@ -212,10 +213,12 @@
   const FXE = { tex: {}, beams: null, sprint: 0, end: null };
   const FXE_TEAM = { b: [0x3f78c2, 0x7fb2ff, 0xffffff], w: [0xffffff, 0xe9eef5, 0xffe27a] };
   const hexN = c => parseInt(String(c || '#ffffff').replace('#', ''), 16) || 0xffffff;
+  // 그림은 둘레에 빈 곳이 있어서 코드 모양보다 조금 크게 그려요
+  const FXE_K = k => k === 'fxe_spark' ? 2.4 : /^fxe_conf_/.test(k) ? 1.7 : k === 'fxe_bit' ? 1.5 : /^fxe_petal_/.test(k) ? 1.3 : k === 'fxe_cap' ? 1.25 : 1;
   function fxeTex(k) {
     if (FXE.tex[k] !== undefined) return FXE.tex[k];
     const u = IMG(k);
-    if (u) { FXE.tex[k] = null; const im = new Image(); im.onload = () => { try { FXE.tex[k] = window.PIXI.Texture.from(im); } catch (e) { /* 코드 모양 그대로 */ } }; im.src = u; }
+    if (u) { FXE.tex[k] = null; const im = new Image(); im.onload = () => { try { const t = window.PIXI.Texture.from(im); t._fxK = FXE_K(k); FXE.tex[k] = t; } catch (e) { /* 코드 모양 그대로 */ } }; im.src = u; }
     const P = window.PIXI, r = FXL.app.renderer, G = () => new P.Graphics();
     let g;
     if (k === 'fxe_conf_1') g = G().rect(-8, -3, 16, 6).fill(0xe04848);
@@ -349,4 +352,69 @@
   function fxeReset() {   // 행사가 끝나면 학생 몸을 원래대로
     for (const k of rt.kids) { k.lean = 0; k.jY = 0; k.sq = 0; k.jT = null; if (k.spd0) { k.spd = k.spd0; k.spd0 = 0; } k.sprT = 0; }
     if (FXE.beams) { FXE.beams.forEach(b => { if (!b.s.destroyed) b.s.destroy(); }); FXE.beams = null; }
+  }
+  /* ---------- 5.3.0.1 전환과 보상, 졸업 연출(효과층 5단계, 설계안 '5.3.0 효과층 마무리' 2, 3절) ----------
+     모두 HTML 위에 얹는 움직임이에요(누르기 통과, 값과 저장 그대로). 움직임 줄이기면 하지 않아요.
+     그림(작업지시서 104: tr_leaf_1, tr_leaf_2, tr_leaves, rw_burst, fxe_petal_1~3)이 없으면 그 움직임만 빼요. */
+  const UIFX = { tabA: null, wipe: null };
+  const uiOn = () => !rt.reduced && !document.hidden;
+  function uiLayer() { let L = $('#uiFx'); if (!L) { L = document.createElement('div'); L.id = 'uiFx'; L.className = 'ui-fx'; L.setAttribute('aria-hidden', 'true'); document.body.appendChild(L); } return L; }
+  function uiImg(k, cls) { const u = IMG(k); if (!u) return null; const im = document.createElement('img'); im.src = u; im.alt = ''; im.className = cls || 'ui-p'; uiLayer().appendChild(im); return im; }
+  // 탭 넘김: 새 화면이 살짝 떠오르고 잎사귀 두 장이 휙(0.25초, 빨리 눌러도 앞 움직임을 지우고 새로)
+  function trTab(t, prev) {
+    if (!uiOn() || t === prev) return;
+    if (t === 'tam' && prev !== 'tam') { trWipe(); return; }
+    const el = t === 'school' ? $('.frame') : document.querySelector('.panel:not([hidden])');
+    if (UIFX.tabA) { try { UIFX.tabA.cancel(); } catch (e) { /* 이미 끝남 */ } }
+    if (el && el.animate) UIFX.tabA = el.animate([{ opacity: 0.55, transform: 'translateY(10px)' }, { opacity: 1, transform: 'none' }], { duration: 250, easing: 'cubic-bezier(.2,.8,.3,1)' });
+    const W = window.innerWidth, H = window.innerHeight;
+    for (let i = 0; i < 2; i++) { const im = uiImg(i ? 'tr_leaf_2' : 'tr_leaf_1'); if (!im) break; const y = H * (0.25 + Math.random() * 0.45), s = 26 + Math.random() * 10;
+      im.style.width = s + 'px'; const a = im.animate([{ transform: `translate(${W + 20}px,${y}px) rotate(0deg)`, opacity: 0.95 }, { transform: `translate(${W * 0.45}px,${y + 30}px) rotate(-160deg)`, opacity: 0.95, offset: 0.5 }, { transform: `translate(-60px,${y + 70}px) rotate(-320deg)`, opacity: 0 }], { duration: 520 + i * 90, delay: i * 50, easing: 'ease-in-out', fill: 'backwards' }); a.onfinish = () => im.remove(); }
+  }
+  // 큰 장면 넘김: 잎사귀 무리가 화면을 덮은 채 시작해 왼쪽으로 쓸려 나가며 새 화면이 보여요(화면은 이미 바뀐 뒤라 누르기를 막지 않아요)
+  function trWipe() {
+    if (!uiOn()) return; const im = uiImg('tr_leaves', 'ui-wipe'); if (!im) return;
+    if (UIFX.wipe) UIFX.wipe.remove(); UIFX.wipe = im;
+    const a = im.animate([{ transform: 'translateX(-12%)' }, { transform: 'translateX(-12%)', offset: 0.15 }, { transform: 'translateX(-115%)' }], { duration: 620, easing: 'cubic-bezier(.5,0,.6,1)', fill: 'forwards' });
+    a.onfinish = () => { im.remove(); if (UIFX.wipe === im) UIFX.wipe = null; };
+  }
+  // 보상 창: 뒤에서 빛살이 천천히 돌아요(받는 값이 보이는 창만)
+  const UI_RW = ['mReward', 'mSportsEnd', 'mFestEnd', 'mOffline'];
+  function uiRwOpen(el) {
+    if (!el || !uiOn()) return; const u = IMG('rw_burst'); if (!u) return;
+    if (!(UI_RW.includes(el.id) || el.querySelector('.amount'))) return;
+    let b = el.querySelector('.rw-burst'); if (!b) { b = document.createElement('i'); b.className = 'rw-burst'; b.setAttribute('aria-hidden', 'true'); b.style.setProperty('--rwu', `url("${u}")`); const bd = el.querySelector('.backdrop'); if (bd) bd.after(b); else el.prepend(b); }
+    const gold = !!el.querySelector('.amount [data-gold], .rw-list .gold');
+    b.style.setProperty('--rwc', gold ? '#FFC93C' : '#FFD978');
+  }
+  // 받기: 받은 자리에서 도토리가 위쪽 도토리 칸으로 날아가요(최대 8개)
+  function uiRwClose(el) {
+    if (!el || !uiOn() || !(UI_RW.includes(el.id) || el.querySelector('.amount')) || !el.querySelector('[data-acorn], .amount svg, .amount img, .rw-list svg, .rw-big svg')) return;   // 도토리를 받는 창만
+    const from = el.querySelector('.amount') || el.querySelector('.rw-list li') || el.querySelector('.rw-big'), to = $('#vBudget'), u = IMG('ic_acorn');
+    if (!from || !to || !u) return; const A = from.getBoundingClientRect(), B = to.getBoundingClientRect(); if (!A.width || !B.width) return;
+    const n = 6;
+    for (let i = 0; i < n; i++) { const im = uiImg('ic_acorn', 'ui-p ui-acorn'); if (!im) return; const x0 = A.left + A.width / 2 + (Math.random() - 0.5) * 60, y0 = A.top + A.height / 2 + (Math.random() - 0.5) * 20, x1 = B.left + B.width / 2 - 12, y1 = B.top + B.height / 2 - 12, mx = (x0 + x1) / 2 + (Math.random() - 0.5) * 120, my = Math.min(y0, y1) - 40 - Math.random() * 60;
+      const a = im.animate([{ transform: `translate(${x0 - 12}px,${y0 - 12}px) scale(.6)`, opacity: 0 }, { transform: `translate(${mx}px,${my}px) scale(1.15)`, opacity: 1, offset: 0.45 }, { transform: `translate(${x1}px,${y1}px) scale(.7)`, opacity: 1 }], { duration: 620, delay: i * 55, easing: 'cubic-bezier(.4,0,.6,1)', fill: 'backwards' });
+      a.onfinish = () => { im.remove(); if (i === n - 1 && to.animate) to.animate([{ transform: 'scale(1)' }, { transform: 'scale(1.25)' }, { transform: 'scale(1)' }], { duration: 260 }); }; }
+  }
+  // 졸업식(cereArt3, 21초) 위에 꽃잎, 학사모 따로따로, 색종이, 마지막 불꽃 세 번
+  function cereFx(host) {
+    if (!host || !uiOn() || !IMG('fxe_petal_1')) return;
+    const L = document.createElement('div'); L.className = 'cere-fx'; L.setAttribute('aria-hidden', 'true'); host.appendChild(L);
+    const R = () => host.getBoundingClientRect(), add = (k, w) => { const u = IMG(k); if (!u) return null; const im = document.createElement('img'); im.src = u; im.alt = ''; im.style.width = w + 'px'; L.appendChild(im); return im; };
+    const timers = [], at = (ms, f) => timers.push(setTimeout(() => { if (L.isConnected) f(); }, ms));
+    const petals = (n, t0, dur) => { for (let i = 0; i < n; i++) at(t0 + Math.random() * dur, () => { const r = R(), im = add('fxe_petal_' + (1 + (i % 3)), 12 + Math.random() * 10); if (!im) return; const x = Math.random() * r.width * 1.1 - r.width * 0.05, sw = 30 + Math.random() * 50, d = 3800 + Math.random() * 2200;
+      const a = im.animate([{ transform: `translate(${x}px,-30px) rotate(0deg)` }, { transform: `translate(${x + sw}px,${r.height * 0.5}px) rotate(${180 + Math.random() * 180}deg)`, offset: 0.5 }, { transform: `translate(${x - sw * 0.3}px,${r.height + 30}px) rotate(${400 + Math.random() * 200}deg)` }], { duration: d, easing: 'linear' }); a.onfinish = () => im.remove(); }); };
+    petals(14, 200, 3200);   // 1 학교 전경
+    petals(10, 11600, 4400);   // 4 졸업장
+    at(17500, () => { const r = R(); for (let i = 0; i < 7; i++) { const im = add('fxe_cap', 34 + Math.random() * 10); if (!im) break; const x = r.width * (0.2 + i * 0.1), h = r.height * (0.35 + Math.random() * 0.15), d = 1700 + Math.random() * 400, sp = (Math.random() - 0.5) * 900;   // 5 학사모가 따로따로
+      const a = im.animate([{ transform: `translate(${x}px,${r.height * 0.62}px) rotate(0deg)` }, { transform: `translate(${x + (Math.random() - 0.5) * 60}px,${r.height * 0.62 - h}px) rotate(${sp}deg)`, offset: 0.45, easing: 'ease-in' }, { transform: `translate(${x + (Math.random() - 0.5) * 90}px,${r.height + 40}px) rotate(${sp * 1.8}deg)` }], { duration: d, delay: i * 70, easing: 'ease-out', fill: 'backwards' }); a.onfinish = () => im.remove(); } });
+    at(17600, () => { const r = R(); for (let i = 0; i < 26; i++) { const im = add('fxe_conf_' + (1 + (i % 4)), 12 + Math.random() * 6); if (!im) break; const x = Math.random() * r.width, d = 2200 + Math.random() * 1200;
+      const a = im.animate([{ transform: `translate(${r.width / 2}px,${r.height * 0.4}px) rotate(0deg)` }, { transform: `translate(${x}px,${r.height * (0.1 + Math.random() * 0.2)}px) rotate(${Math.random() * 360}deg)`, offset: 0.3, easing: 'ease-in' }, { transform: `translate(${x + (Math.random() - 0.5) * 40}px,${r.height + 20}px) rotate(${Math.random() * 720}deg)` }], { duration: d, easing: 'ease-out' }); a.onfinish = () => im.remove(); } });
+    petals(16, 16700, 3600);
+    [18600, 19300, 19900].forEach((t, j) => at(t, () => { const r = R(), cx = r.width * [0.28, 0.72, 0.5][j], cy = r.height * [0.2, 0.17, 0.12][j], cols = ['#FFD36B', '#FF9BC4', '#9FD3FF'];   // 마지막 불꽃 세 번
+      for (let i = 0; i < 22; i++) { const im = add('fxe_spark', 15); if (!im) break; im.style.filter = `drop-shadow(0 0 5px ${cols[j]}) drop-shadow(0 0 2px ${cols[j]})`; const an = i / 22 * Math.PI * 2, d = r.width * (0.13 + Math.random() * 0.05);
+        const a = im.animate([{ transform: `translate(${cx}px,${cy}px) scale(.6)`, opacity: 1 }, { transform: `translate(${cx + Math.cos(an) * d}px,${cy + Math.sin(an) * d}px) scale(1)`, opacity: 1, offset: 0.55 }, { transform: `translate(${cx + Math.cos(an) * d * 1.1}px,${cy + Math.sin(an) * d * 1.1 + 24}px) scale(.5)`, opacity: 0 }], { duration: 1200, easing: 'cubic-bezier(.1,.8,.3,1)' }); a.onfinish = () => im.remove(); } }));
+    L._stop = () => { timers.forEach(clearTimeout); L.remove(); };
+    return L;
   }
