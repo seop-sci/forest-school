@@ -239,6 +239,7 @@
     S.budget += v; earn(v);
     floatText(it.x, it.y - 10, '+' + fmt(v), 'gold');
     if (festDef(R.id).bf) bfBurst(it.x, it.y);   // 4.2.0 불꽃이 펴져요(그림이 있을 때)
+    fxeHit(it, festDef(R.id));   // 5.3.0 행사 효과층: 풍선 조각, 음표 반짝이, 불꽃, 박수 파도
     sfx('coin'); buzz(10);
     if (!rt.reduced && it.g.animate) it.g.animate([{ transform: `translate(${it.x}px, ${it.y}px) scale(1)`, opacity: 1 }, { transform: `translate(${it.x}px, ${it.y}px) scale(1.8)`, opacity: 0 }], { duration: 220 }).onfinish = () => it.g.remove();
     else it.g.remove();
@@ -248,6 +249,7 @@
     const R = rt.fest;
     if (!R) return;
     const F = festDef(R.id);
+    fxeTick();   // 5.3.0 행사 효과층 깨우기
     renderFestBar();
     if (feverIntro(R, dt, F.name, F.hint ? F.hint : F.item === 'meteor' ? '떨어지는 별똥별을 눌러요' : F.item === 'lantern' ? '떠오르는 등불을 눌러요' : F.item === 'firefly' ? '깜빡이는 반딧불을 눌러요' : F.item === 'paper' ? '곳곳에 반짝이는 쪽지를 눌러요' : F.item === 'balloon' ? '날아오르는 풍선을 눌러요' : F.item === 'note' ? '떠오르는 음표를 눌러요' : '반짝이는 웃음 별을 눌러요')) return;
     if (R.ending) return;
@@ -260,7 +262,7 @@
       if (it.drop) { it.y += dt * 62; it.x += Math.sin(age / 300) * 0.3; it.g.setAttribute('transform', `translate(${it.x.toFixed(1)} ${it.y.toFixed(1)})`); }   // 4.1.0 축제 부스
       if (it.roll) { it.x += dt * 70; it.g.setAttribute('transform', `translate(${it.x.toFixed(1)} ${it.y.toFixed(1)}) rotate(${(it.x * 4 % 360).toFixed(0)})`); }
       const vf = (it.fall || it.drop || it.roll) && visMap(); if (vf && (it.x > vf[2] - 10 || it.y > vf[3] - 10)) it.born = -1e9;   // 화면 밖으로 나가면 사라져요
-      if (it.rise) { it.y -= dt * 30; it.x += Math.sin(age / 400) * 0.25; it.g.setAttribute('transform', `translate(${it.x.toFixed(1)} ${it.y.toFixed(1)})`); }
+      if (it.rise) { it.y -= dt * 30; it.x += Math.sin(age / 400) * 0.25; it.g.setAttribute('transform', `translate(${it.x.toFixed(1)} ${it.y.toFixed(1)})` + (fxOn() ? ` rotate(${(Math.sin(age / 500) * 9).toFixed(1)})` : '')); }   // 5.3.0 풍선, 등불, 음표가 좌우로 살랑
       const vt = it.rise && visMap();   // 1.6.0: 떠오르는 음표와 풍선은 위쪽 칸에 닿기 전에 사라져요(가려져서 못 누르는 일이 없게)
       if (age > it.life || (vt && it.y < vt[1] + 12)) { it.dead = true; if (!rt.reduced && it.g.animate) it.g.animate([{ opacity: 1 }, { opacity: 0 }], { duration: 200 }).onfinish = () => it.g.remove(); else it.g.remove(); }
     }
@@ -282,6 +284,7 @@
   function endFest() {
     const R = rt.fest; if (!R) return;
     const F = festDef(R.id);
+    fxeReset(); fxeEnd(F, R.n >= F.goal);   // 5.3.0 학사모 던지기, 색종이
     rt.fest = null; renderTeachersOnMap();
     R.items.forEach(i => i.g.remove());
     festStage(false); festLighting(false);

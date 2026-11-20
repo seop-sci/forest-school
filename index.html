@@ -2,7 +2,7 @@
 <html lang="ko">
 <head>
 <meta charset="utf-8">
-<meta name="forest-version" content="5.2.2">
+<meta name="forest-version" content="5.3.0">
 <meta name="viewport" content="width=device-width, initial-scale=1">
 <meta name="description" content="도토리를 모아 숲속 학교를 키우는 방치형 게임 테스트판이에요.">
 <style>html,body{margin:0}</style>
@@ -3945,7 +3945,7 @@ body.mg-on .toast[hidden]{display:none}
     <p class="boot-step" id="bootStep">학교 문을 여는 중...</p>
     <p class="boot-tip" id="bootTip">학교 문을 여는 중이에요</p>
   </div>
-  <span class="boot-ver" id="bootVer">v5.2.2</span>
+  <span class="boot-ver" id="bootVer">v5.3.0</span>
 </div>
 
 <div class="app on-school" id="app">
@@ -4540,7 +4540,7 @@ body.mg-on .toast[hidden]{display:none}
       </div>
       <h3 class="panel-sub">정보</h3>
       <dl class="info">
-        <div id="verRow"><dt>버전</dt><dd>v5.2.2</dd></div>
+        <div id="verRow"><dt>버전</dt><dd>v5.3.0</dd></div>
         <div id="pidRow" hidden><dt>학교 번호</dt><dd id="infoPid"></dd></div>
       </dl>
       <div id="devBox" hidden>
@@ -11253,7 +11253,8 @@ body.mg-on .toast[hidden]{display:none}
     k.pw = null;
   }
   function placeKid(k, bob) {
-    const tf = `translate(${k.x.toFixed(1)} ${(k.y + bob).toFixed(1)}) scale(${geo().campus ? 0.72 : 1.1})`;   // 4.0.0 캠퍼스 지도는 건물이 작게 그려져 있어 학생도 작게
+    const sc = geo().campus ? 0.72 : 1.1, ln = k.lean || 0, jy = k.jY || 0, sq = k.sq || 0;   // 5.3.0 행사 효과: 기울기(도), 점프 높이, 찌그러짐(fxeStep)
+    const tf = `translate(${k.x.toFixed(1)} ${(k.y + bob - jy).toFixed(1)})` + (ln ? ` rotate(${ln.toFixed(1)})` : '') + (sq ? ` scale(${(sc * (1 + sq)).toFixed(3)} ${(sc * (1 - sq)).toFixed(3)})` : ` scale(${sc})`);   // 4.0.0 캠퍼스 지도는 건물이 작게 그려져 있어 학생도 작게
     if (k.tf === tf) return;   // 3.2.6 끊김: 서 있는 학생은 같은 값을 다시 쓰지 않아요(지도 전체를 다시 그리게 돼서)
     k.tf = tf; k.g.setAttribute('transform', tf);
   }
@@ -11403,6 +11404,7 @@ body.mg-on .toast[hidden]{display:none}
     rt.drops.push(d);
     const fall = g.querySelector('.drop-fall');
     if (rt.sports) {   // 운동회 공은 참나무에서 떨어지지 않고 트랙 바깥에서 통통 튀며 굴러 들어와요(나무도 흔들지 않아요)
+      if (fxeBall(d, (x < SPORTS.cx ? -1 : 1) * rand(70, 110))) return;   // 5.3.0 효과층: 실제로 튀며 굴러 들어와 멈춰요
       if (!rt.reduced && fall.animate) {
         const dx = (x < SPORTS.cx ? -1 : 1) * rand(70, 110);
         fall.animate([
@@ -11464,7 +11466,7 @@ body.mg-on .toast[hidden]{display:none}
     S.st.picks += 1;
     if (rt.sports) { rt.sports.blue += 1; feverCombo(rt.sports, d.x, d.y); renderSportsBar(); }
     floatText(d.x, d.y - 12, '+' + fmt(v), 'gold');
-    if (!rt.sports) fxPick(d);   // 5.2.1 효과층: 반짝이와 도토리가 위쪽 도토리 숫자로 날아가요(운동회 공은 그대로)
+    if (!rt.sports) fxPick(d); else fxeBlue(d);   // 5.3.0 운동회: 청팀 색종이와 점프   // 5.2.1 효과층: 반짝이와 도토리가 위쪽 도토리 숫자로 날아가요(운동회 공은 그대로)
     sfx('coin'); buzz(12);
     removeDrop(d);
     renderHUD(); renderAffordance();
@@ -14679,8 +14681,8 @@ body.mg-on .toast[hidden]{display:none}
        forest/rank/<내 id>   랭킹 이름과 학교 점수
        forest/stats/<내 id>  테스트 현황 (어디까지 했는지, 얼마나 했는지)
      <내 id>는 Firebase 익명 로그인이 기기(브라우저)마다 만들어 줘요. */
-  const VERSION = '5.2.2';   // 2026-11-17 woodani 결정: 웹에 5.0.2~5.0.5로 먼저 냈던 것을 앱과 함께 5.0.1 하나로 내요(버전 견줌은 앞 두 자리만 봐서 되돌아가도 괜찮아요)
-  const NT_QUIET = ['5.2.2', '5.2.1', '5.2.0.2', '5.2.0.1', '5.1.1.3', '5.1.1.2', '5.1.1.1', '5.1.1', '5.0.3.1', '5.0.3', '5.0.2.2', '5.0.2.1', '2.1.20', '2.1.2.2', '2.3.0.1', '2.3.4', '3.2.3', '3.2.4', '3.2.5', '3.3.1', '3.3.2', '3.3.3', '4.4.1.1', '4.4.1.2', '4.4.1.3', '4.4.1.4', '5.0.1.1', '5.0.1.2', '5.0.1.3', '5.0.1.4', '5.0.1.5', '5.0.1.6', '5.0.1.7', '5.0.1.8'];   // 5.0.1.1 생물 탐사 고침은 공지 없이   // 5.0.3도 공지 없이(공지 줄은 woodani가 정하면 넣어요)   // 5.0.2 공지 없이(woodani 2026-11-16)   // 5.0.1 공지 줄은 woodani가 정할 때까지 조용히   // 5.0.0 공지는 2026-11-16 woodani가 정해서 NOTICES로 옮겼어요   // 4.4.1(앱과 함께 내는 판)은 공지를 띄워요   // 4.4.1도 공지 없이(woodani)   // 3.3.1, 3.3.2, 3.3.3(토스 먼저)도 공지 창 없이(woodani). 2.3.0.1도 공지 창 없이(공지는 그대로 2.3.0). 2.3.4도 조용히(woodani 결정). 3.2.3, 3.2.4, 3.2.5도 공지 창 없이(공지 줄을 고르지 않음)
+  const VERSION = '5.3.0';   // 2026-11-17 woodani 결정: 웹에 5.0.2~5.0.5로 먼저 냈던 것을 앱과 함께 5.0.1 하나로 내요(버전 견줌은 앞 두 자리만 봐서 되돌아가도 괜찮아요)
+  const NT_QUIET = ['5.3.0', '5.2.2', '5.2.1', '5.2.0.2', '5.2.0.1', '5.1.1.3', '5.1.1.2', '5.1.1.1', '5.1.1', '5.0.3.1', '5.0.3', '5.0.2.2', '5.0.2.1', '2.1.20', '2.1.2.2', '2.3.0.1', '2.3.4', '3.2.3', '3.2.4', '3.2.5', '3.3.1', '3.3.2', '3.3.3', '4.4.1.1', '4.4.1.2', '4.4.1.3', '4.4.1.4', '5.0.1.1', '5.0.1.2', '5.0.1.3', '5.0.1.4', '5.0.1.5', '5.0.1.6', '5.0.1.7', '5.0.1.8'];   // 5.0.1.1 생물 탐사 고침은 공지 없이   // 5.0.3도 공지 없이(공지 줄은 woodani가 정하면 넣어요)   // 5.0.2 공지 없이(woodani 2026-11-16)   // 5.0.1 공지 줄은 woodani가 정할 때까지 조용히   // 5.0.0 공지는 2026-11-16 woodani가 정해서 NOTICES로 옮겼어요   // 4.4.1(앱과 함께 내는 판)은 공지를 띄워요   // 4.4.1도 공지 없이(woodani)   // 3.3.1, 3.3.2, 3.3.3(토스 먼저)도 공지 창 없이(woodani). 2.3.0.1도 공지 창 없이(공지는 그대로 2.3.0). 2.3.4도 조용히(woodani 결정). 3.2.3, 3.2.4, 3.2.5도 공지 창 없이(공지 줄을 고르지 않음)
     // 2.1.20 woodani 결정: 이 버전들은 업데이트해도 공지 창을 띄우지 않아요(공지는 그대로 2.1.2)
   /* 2.0.0 공지사항 (2026-10-27 woodani, 1.8.0은 이미 올려서 2.0.0부터): 설정 > 공지사항. 맨 위가 가장 새 공지예요.
      패치노트는 자동으로 넣지 않아요. woodani가 검수한 글만 여기에 적어요(CHANGELOG.md는 자세한 기록용이라 따로 있어요).
@@ -23094,6 +23096,7 @@ body.mg-on .toast[hidden]{display:none}
   function updateSports(dt) {
     const R = rt.sports;
     if (!R) return;
+    fxeTick();   // 5.3.0 행사 효과층 깨우기
     renderSportsBar();
     if (feverIntro(R, dt, FEST.sports.name, '굴러오는 공을 주워서 청팀을 응원해요')) return;
     if (R.ending) return;
@@ -23101,7 +23104,7 @@ body.mg-on .toast[hidden]{display:none}
     R.spawn += dt;
     if (R.spawn >= SPORTS.every) { R.spawn = 0; if (rt.drops.length < SPORTS.ground) spawnDrop(false); }
     R.foe -= dt;
-    if (R.foe <= 0) { R.foe = rand(1.1, 2.1); R.white += 1; }
+    if (R.foe <= 0) { R.foe = rand(1.1, 2.1); R.white += 1; fxeWhite(); }
     for (const k of rt.kids) {
       if (k.board || k.ang === undefined) continue;
       k.ang += dt * k.spd;
@@ -23110,11 +23113,11 @@ body.mg-on .toast[hidden]{display:none}
       k.wait = 0; k.speed = 80;
     }
     renderSportsBar();
-    if (R.t <= 0 && !R.ending) { R.ending = true; feverEnd(endSports); }
+    if (R.t <= 0 && !R.ending) { R.ending = true; fxeSportsEnd(R.blue > R.white); feverEnd(endSports); }
   }
   function endSports() {
     const R = rt.sports; if (!R) return;
-    rt.sports = null;
+    rt.sports = null; fxeReset();
     rt.kids.forEach(k => { delete k.ang; delete k.team; k.speed = rand(14, 22); pickTarget(k); const b = k.g.querySelector('.band'); if (b) b.remove(); });
     $('#sportsBar').hidden = true;
     S.st.sports += 1;
@@ -23388,6 +23391,7 @@ body.mg-on .toast[hidden]{display:none}
     S.budget += v; earn(v);
     floatText(it.x, it.y - 10, '+' + fmt(v), 'gold');
     if (festDef(R.id).bf) bfBurst(it.x, it.y);   // 4.2.0 불꽃이 펴져요(그림이 있을 때)
+    fxeHit(it, festDef(R.id));   // 5.3.0 행사 효과층: 풍선 조각, 음표 반짝이, 불꽃, 박수 파도
     sfx('coin'); buzz(10);
     if (!rt.reduced && it.g.animate) it.g.animate([{ transform: `translate(${it.x}px, ${it.y}px) scale(1)`, opacity: 1 }, { transform: `translate(${it.x}px, ${it.y}px) scale(1.8)`, opacity: 0 }], { duration: 220 }).onfinish = () => it.g.remove();
     else it.g.remove();
@@ -23397,6 +23401,7 @@ body.mg-on .toast[hidden]{display:none}
     const R = rt.fest;
     if (!R) return;
     const F = festDef(R.id);
+    fxeTick();   // 5.3.0 행사 효과층 깨우기
     renderFestBar();
     if (feverIntro(R, dt, F.name, F.hint ? F.hint : F.item === 'meteor' ? '떨어지는 별똥별을 눌러요' : F.item === 'lantern' ? '떠오르는 등불을 눌러요' : F.item === 'firefly' ? '깜빡이는 반딧불을 눌러요' : F.item === 'paper' ? '곳곳에 반짝이는 쪽지를 눌러요' : F.item === 'balloon' ? '날아오르는 풍선을 눌러요' : F.item === 'note' ? '떠오르는 음표를 눌러요' : '반짝이는 웃음 별을 눌러요')) return;
     if (R.ending) return;
@@ -23409,7 +23414,7 @@ body.mg-on .toast[hidden]{display:none}
       if (it.drop) { it.y += dt * 62; it.x += Math.sin(age / 300) * 0.3; it.g.setAttribute('transform', `translate(${it.x.toFixed(1)} ${it.y.toFixed(1)})`); }   // 4.1.0 축제 부스
       if (it.roll) { it.x += dt * 70; it.g.setAttribute('transform', `translate(${it.x.toFixed(1)} ${it.y.toFixed(1)}) rotate(${(it.x * 4 % 360).toFixed(0)})`); }
       const vf = (it.fall || it.drop || it.roll) && visMap(); if (vf && (it.x > vf[2] - 10 || it.y > vf[3] - 10)) it.born = -1e9;   // 화면 밖으로 나가면 사라져요
-      if (it.rise) { it.y -= dt * 30; it.x += Math.sin(age / 400) * 0.25; it.g.setAttribute('transform', `translate(${it.x.toFixed(1)} ${it.y.toFixed(1)})`); }
+      if (it.rise) { it.y -= dt * 30; it.x += Math.sin(age / 400) * 0.25; it.g.setAttribute('transform', `translate(${it.x.toFixed(1)} ${it.y.toFixed(1)})` + (fxOn() ? ` rotate(${(Math.sin(age / 500) * 9).toFixed(1)})` : '')); }   // 5.3.0 풍선, 등불, 음표가 좌우로 살랑
       const vt = it.rise && visMap();   // 1.6.0: 떠오르는 음표와 풍선은 위쪽 칸에 닿기 전에 사라져요(가려져서 못 누르는 일이 없게)
       if (age > it.life || (vt && it.y < vt[1] + 12)) { it.dead = true; if (!rt.reduced && it.g.animate) it.g.animate([{ opacity: 1 }, { opacity: 0 }], { duration: 200 }).onfinish = () => it.g.remove(); else it.g.remove(); }
     }
@@ -23431,6 +23436,7 @@ body.mg-on .toast[hidden]{display:none}
   function endFest() {
     const R = rt.fest; if (!R) return;
     const F = festDef(R.id);
+    fxeReset(); fxeEnd(F, R.n >= F.goal);   // 5.3.0 학사모 던지기, 색종이
     rt.fest = null; renderTeachersOnMap();
     R.items.forEach(i => i.g.remove());
     festStage(false); festLighting(false);
@@ -30048,6 +30054,7 @@ body.mg-on .toast[hidden]{display:none}
   function fxClear() {
     for (const L of [FXL.parts, FXL.falls, FXL.flys]) { for (const p of L) { if (p.s && !p.s.destroyed) p.s.destroy(); if (p.d && p.d.g) { const f = p.d.g.querySelector('.drop-fall'); if (f) f.style.opacity = ''; } } L.length = 0; }
     const cv = $('#oakCanopy'); if (cv) cv.style.transform = ''; FXL.oak.a = FXL.oak.v = 0;
+    fxeReset(); FXE.end = null;
     if (FXL.app) FXL.app.render();
   }
   function fxFrame(now) {
@@ -30066,16 +30073,19 @@ body.mg-on .toast[hidden]{display:none}
       if (cvs) cvs.style.transform = `rotate(${o.a.toFixed(2)}deg) skewX(${(o.a * 0.35).toFixed(2)}deg)`; busy = true;
     } else if (cvs && cvs.style.transform) { cvs.style.transform = ''; o.a = o.v = 0; }
     // 잎과 반짝이
-    for (let i = FXL.parts.length - 1; i >= 0; i--) { const p = FXL.parts[i]; p.life -= dt; p.vy += p.g * dt; p.s.x += (p.vx + (p.flut ? Math.sin(now / 200 + p.ph) * p.flut : 0)) * dt; p.s.y += p.vy * dt; p.s.rotation += p.rot * dt;
-      p.s.alpha = Math.min(1, p.life / p.max * 1.8); if (p.life <= 0) { p.s.destroy(); FXL.parts.splice(i, 1); } }
+    for (let i = FXL.parts.length - 1; i >= 0; i--) { const p = FXL.parts[i]; p.life -= dt; p.vy += p.g * dt; if (p.drag) { const f = Math.max(0, 1 - p.drag * dt); p.vx *= f; p.vy *= f; }
+      p.s.x += (p.vx + (p.flut ? Math.sin(now / 200 + p.ph) * p.flut : 0)) * dt; p.s.y += p.vy * dt; p.s.rotation += p.rot * dt;
+      const u = Math.max(0, p.life / p.max); p.s.alpha = Math.min(1, u * 1.8); if (p.shrink) p.s.scale.set(p.k0 * (0.35 + 0.65 * u)); if (p.life <= 0) { p.s.destroy(); FXL.parts.splice(i, 1); } }
     // 떨어지는 도토리: 돌면서 떨어지고 바닥에서 두세 번 튀어요. 다 서면 SVG 도토리를 다시 보이고 그림판 것은 지워요
     for (let i = FXL.falls.length - 1; i >= 0; i--) { const f = FXL.falls[i], s = f.s;
       if (f.d.dead) { s.destroy(); FXL.falls.splice(i, 1); continue; }
-      f.vy += FXC.g * dt; s.y += f.vy * dt; s.x += f.vx * dt; s.rotation += f.vr * dt; s.scale.set(f.k0 + (f.k1 - f.k0) * Math.min(1, Math.max(0, (s.y - f.sy) / Math.max(1, f.ty - f.sy))));   // 가지의 작은 도토리(13)가 바닥 도토리 크기(22)로
-      if (f.vx && (f.vx > 0 ? s.x >= f.tx : s.x <= f.tx)) { s.x = f.tx; f.vx = 0; }
-      if (s.y >= f.ty) { s.y = f.ty; f.n++; f.vy = -Math.abs(f.vy) * FXC.bounce; f.vr *= 0.5; s.x = f.tx; f.vx = 0;
+      f.vy += FXC.g * dt; s.y += f.vy * dt;
+      if (f.ball) { const dx = (f.tx - s.x) * Math.min(1, dt * 3.2); s.x += dx; s.rotation += dx / 11; }   // 5.3.0 운동회 공: 굴러 들어와 마찰로 멈춰요
+      else { s.x += f.vx * dt; s.rotation += f.vr * dt; } s.scale.set(f.k0 + (f.k1 - f.k0) * Math.min(1, Math.max(0, (s.y - f.sy) / Math.max(1, f.ty - f.sy))));   // 가지의 작은 도토리(13)가 바닥 도토리 크기(22)로
+      if (!f.ball && f.vx && (f.vx > 0 ? s.x >= f.tx : s.x <= f.tx)) { s.x = f.tx; f.vx = 0; }
+      if (s.y >= f.ty) { s.y = f.ty; f.n++; f.vy = -Math.abs(f.vy) * FXC.bounce; f.vr *= 0.5; if (!f.ball) { s.x = f.tx; f.vx = 0; }
         fxBurst(f.tx, f.ty + 8, 3, { tex: FXL.tex.fx_dust_1 || FXL.tex.dot, sz: 7, sp: 22, up: 6, life: 0.5, tint: FXL.tex.fx_dust_1 ? 0xffffff : 0xd9c39a });
-        if (f.n >= 3 || Math.abs(f.vy) < 45) { s.rotation = 0; const fall = f.d.g.querySelector('.drop-fall'); if (fall) fall.style.opacity = ''; s.destroy(); FXL.falls.splice(i, 1); continue; } }
+        if ((f.n >= 3 || Math.abs(f.vy) < 45) && (!f.ball || Math.abs(f.tx - s.x) < 1.5)) { s.rotation = 0; const fall = f.d.g.querySelector('.drop-fall'); if (fall) fall.style.opacity = ''; s.destroy(); FXL.falls.splice(i, 1); continue; } }
       busy = true; }
     // 주운 도토리: 반짝이 꼬리를 그리며 위쪽 도토리 숫자로
     const to = $('#vBudget'), tb = to && to.getBoundingClientRect();
@@ -30085,6 +30095,7 @@ body.mg-on .toast[hidden]{display:none}
       s.x = a * a * f.sx + 2 * a * e * f.mx + e * e * ex; s.y = a * a * f.sy + 2 * a * e * f.my + e * e * ey; s.rotation += dt * 9; s.scale.set(f.sc * (1 - 0.35 * e));
       if (Math.random() < 0.7) fxBurst(s.x, s.y, 1, { tex: FXL.tex.star, sz: 5, sp: 8, life: 0.35, tint: 0xfff2a0, add: true });
       if (u >= 1) { s.destroy(); FXL.flys.splice(i, 1); if (to && to.animate) to.animate([{ transform: 'scale(1)' }, { transform: 'scale(1.22)' }, { transform: 'scale(1)' }], { duration: 300, easing: 'ease-out' }); } }
+    if (fxeStep(dt, now)) busy = true;   // 5.3.0 학교 행사
     if (FXL.parts.length || FXL.falls.length || FXL.flys.length) busy = true;
     app.render();
     if (busy) FXL.raf = requestAnimationFrame(fxFrame);
@@ -30208,6 +30219,151 @@ body.mg-on .toast[hidden]{display:none}
       R.g.clear().circle(0, 0, R.r * (0.15 + 0.85 * u)).stroke({ color: R.col, width: Math.max(1, R.r * 0.12 * (1 - u)), alpha: 1 - u }); if (u >= 1) { R.g.destroy(); FXT.rings.splice(i, 1); } }
     app.render();
     if (FXT.parts.length || FXT.rings.length || shots.length) FXT.raf = requestAnimationFrame(fxTamFrame);
+  }
+
+  /* ---------- 5.3.0 학교 행사 효과(2026-11-20 woodani '행사 열 가지 한 번에', 설계안 '5.3.0 설계안 (학교 행사 실제 움직임, 효과층 3단계)') ----------
+     규칙(시간, 목표, 값, 운동회 점수)은 그대로이고 그림과 움직임만 더해요. 학생 몸(기울기, 점프, 찌그러짐)은 학생 SVG에(placeKid의 k.lean, k.jY, k.sq),
+     색종이, 불꽃, 먼지, 빛줄기는 지도 효과층(canvas.fxl)에 그려요. 그림(작업지시서 103 fxe_*)이 있으면 그림을, 없으면 코드로 그린 모양을 써요 */
+  const FXE = { tex: {}, beams: null, sprint: 0, end: null };
+  const FXE_TEAM = { b: [0x3f78c2, 0x7fb2ff, 0xffffff], w: [0xffffff, 0xe9eef5, 0xffe27a] };
+  const hexN = c => parseInt(String(c || '#ffffff').replace('#', ''), 16) || 0xffffff;
+  function fxeTex(k) {
+    if (FXE.tex[k] !== undefined) return FXE.tex[k];
+    const u = IMG(k);
+    if (u) { FXE.tex[k] = null; const im = new Image(); im.onload = () => { try { FXE.tex[k] = window.PIXI.Texture.from(im); } catch (e) { /* 코드 모양 그대로 */ } }; im.src = u; }
+    const P = window.PIXI, r = FXL.app.renderer, G = () => new P.Graphics();
+    let g;
+    if (k === 'fxe_conf_1') g = G().rect(-8, -3, 16, 6).fill(0xe04848);
+    else if (k === 'fxe_conf_2') g = G().rect(-7, -3, 14, 6).fill(0x3f78c2);
+    else if (k === 'fxe_conf_3') g = G().circle(0, 0, 4.5).fill(0xf3c04b);
+    else if (k === 'fxe_conf_4') g = G().star(0, 0, 5, 6, 3).fill(0x3fa45b);
+    else if (k === 'fxe_bit') g = G().poly([-6, -2, -1, -6, 6, -3, 4, 4, -3, 5]).fill(0xffffff);
+    else if (k === 'fxe_spark') { g = G(); for (let i = 4; i >= 1; i--) g.circle(0, 0, i * 2).fill({ color: 0xffffff, alpha: i === 1 ? 1 : 0.22 }); }
+    else if (k === 'fxe_cap') g = G().poly([-12, 0, 0, -6, 12, 0, 0, 6]).fill(0x2b2b33).rect(-6, 1, 12, 6).fill(0x2b2b33).moveTo(0, 0).lineTo(9, 7).stroke({ color: 0xf3c04b, width: 1.6 });
+    else if (k === 'fxe_tape_l' || k === 'fxe_tape_r') { g = G(); for (let i = 0; i < 8; i++) g.rect(i * 6, 0, 6, 5).fill(i % 2 ? 0xffffff : 0xe04848); }
+    else if (k === 'fxe_beam') { g = G(); for (let i = 0; i < 6; i++) g.poly([-4 - i * 2, 0, 4 + i * 2, 0, 30 + i * 6, 160, -30 - i * 6, 160]).fill({ color: 0xffffff, alpha: 0.05 }); }
+    else g = G().circle(0, 0, 4).fill(0xffffff);
+    const t = r.generateTexture(g); if (FXE.tex[k] === undefined || FXE.tex[k] === null) FXE.tex[k] = FXE.tex[k] || t;
+    return FXE.tex[k] || t;
+  }
+  const FXE_CONF = ['fxe_conf_1', 'fxe_conf_2', 'fxe_conf_3', 'fxe_conf_4'];
+  function fxeConfetti(x, y, n, o) {
+    o = o || {};
+    for (let i = 0; i < n; i++) { const tex = fxeTex(FXE_CONF[i % 4]), a = (o.ang != null ? o.ang : -Math.PI / 2) + fxRnd(-(o.spread || 1.2), o.spread || 1.2), sp = (o.sp || 120) * fxRnd(0.5, 1.2);
+      const s = fxSprite(tex, x, y, (o.sz || 6) * fxRnd(0.8, 1.3)); if (o.cols) s.tint = o.cols[(Math.random() * o.cols.length) | 0];
+      FXL.parts.push({ s, vx: Math.cos(a) * sp, vy: Math.sin(a) * sp, rot: fxRnd(-8, 8), life: o.life || 2, max: o.life || 2, g: o.g != null ? o.g : 160, flut: 26, ph: fxRnd(0, 6), drag: 1.6 }); }
+  }
+  function fxeSparks(x, y, n, o) {
+    for (let i = 0; i < n; i++) { const a = fxRnd(0, Math.PI * 2), sp = (o.sp || 80) * (o.ring ? fxRnd(0.85, 1.05) : fxRnd(0.3, 1.1));
+      const s = fxSprite(fxeTex('fxe_spark'), x, y, (o.sz || 5) * fxRnd(0.7, 1.2)); s.tint = o.cols ? o.cols[(Math.random() * o.cols.length) | 0] : 0xffffff;
+      FXL.parts.push({ s, vx: Math.cos(a) * sp, vy: Math.sin(a) * sp - (o.up || 0), rot: 0, life: (o.life || 1) * fxRnd(0.75, 1.2), max: o.life || 1, g: o.g || 0, drag: o.drag || 0, shrink: true, k0: s.scale.x }); }
+  }
+  // 학생 점프(지연 dl초 뒤, 높이 h), 박수 파도는 왼쪽부터 차례로
+  function fxeJump(k, dl, h) { if (!k || k.jT > 0) return; k.jT = -(dl || 0); k.jH = h || 7; }
+  function fxeWave(ks, step, h) { [...ks].sort((a, b) => a.x - b.x).forEach((k, i) => fxeJump(k, i * (step || 0.05), h)); }
+  const fxeHold = () => rt.kids.filter(k => k.hold && !k.board);
+  const fxeNear = (x, y, list) => (list || rt.kids).reduce((b, k) => { const d = (k.x - x) ** 2 + (k.y - y) ** 2; return !b || d < b.d ? { k, d } : b; }, null);
+  // 행사 하나가 시작될 때와 놀이 루프에서(updateFest, updateSports) 불러요: 효과층 그리기를 깨워요
+  function fxeTick() { if (fxOn()) fxKick(); }
+  // 효과층 한 장면마다(fxFrame에서): 학생 몸, 운동회 달리기, 빛줄기, 떠오르는 것 꼬리
+  function fxeStep(dt, now) {
+    let busy = false;
+    for (const k of rt.kids) {   // 점프와 찌그러짐
+      if (k.jT == null) continue;
+      k.jT += dt; busy = true;
+      if (k.jT < 0) continue;
+      const T = 0.42, t = k.jT;
+      if (t < T) { k.jY = Math.sin(t / T * Math.PI) * k.jH; k.sq = t < 0.06 ? 0.12 * (1 - t / 0.06) : -0.06 * Math.sin(t / T * Math.PI); }
+      else if (t < T + 0.12) { k.jY = 0; k.sq = 0.14 * Math.sin((t - T) / 0.12 * Math.PI); }
+      else { k.jY = 0; k.sq = 0; k.jT = null; }
+    }
+    const R = rt.sports;
+    if (R && !R.ending && !(R.intro > 0)) {   // 운동회: 앞으로 기울고, 굽은 곳에서 안쪽으로, 가끔 전력 질주, 발밑 흙먼지
+      busy = true; FXE.sprint -= dt;
+      const run = rt.kids.filter(k => k.ang !== undefined && !k.board);
+      if (FXE.sprint <= 0 && run.length) { FXE.sprint = fxRnd(2, 4); const k = run[(Math.random() * run.length) | 0]; if (!k.spd0) { k.spd0 = k.spd; k.spd *= 1.8; k.sprT = 1.5; } }
+      for (const k of run) {
+        if (k.sprT > 0) { k.sprT -= dt; if (k.sprT <= 0 && k.spd0) { k.spd = k.spd0; k.spd0 = 0; } }
+        const vx = -Math.sin(k.ang) * k.spd, vy = Math.cos(k.ang) * k.spd * 0.33;
+        k.lean = Math.max(-16, Math.min(16, vx * 10 + vy * 4)) * (k.spd0 ? 1.4 : 1);
+        if (Math.random() < dt * (k.spd0 ? 9 : 4)) { const s = fxSprite(FXL.tex.fx_dust_1 || FXL.tex.dot, k.x - Math.sign(vx) * 4, k.y + 1, fxRnd(3, 5)); s.tint = FXL.tex.fx_dust_1 ? 0xf0dcc0 : 0xd9a77a; s.alpha = 0.8; FXL.parts.push({ s, vx: -vx * 12, vy: -fxRnd(4, 10), rot: 0, life: 0.45, max: 0.45, g: 0 }); }
+      }
+    }
+    const F = rt.fest && festDef(rt.fest.id);
+    if (F && !rt.fest.ending) {
+      busy = true;
+      if (F.form === 'stage' && !FXE.beams) {   // 학예회: 무대 위 빛줄기 둘이 천천히 흔들려요
+        FXE.beams = [-1, 1].map(sd => { const s = new window.PIXI.Sprite(fxeTex('fxe_beam')); s.anchor.set(0.5, 0); s.x = pzx() + sd * 34; s.y = pzy() - 120; s.scale.set(60 / (s.texture.width || 60)); s.alpha = 0.5; s.tint = sd < 0 ? 0xfff2b0 : 0xd8ecff; FXL.w.addChildAt(s, 0); return { s, sd }; });
+      }
+      if (FXE.beams) FXE.beams.forEach(b => { b.s.rotation = b.sd * 0.25 + Math.sin(now / 900 + b.sd) * 0.22; });
+      for (const it of rt.fest.items) {   // 떠오르는 것, 떨어지는 것 꼬리
+        if (it.dead || Math.random() > dt * 14) continue;
+        if (F.bf) fxeSparks(it.x + fxRnd(-2, 2), it.y + 8, 1, { sz: 4, sp: 12, life: 0.5, g: 30, cols: [0xffd36b, 0xff9a4a] });
+        else if (it.fall) fxeSparks(it.x - 4, it.y - 3, 2, { sz: 4, sp: 6, life: 0.6, cols: [0xffffff, 0xfff2a0] });
+        else if (F.item === 'lantern') fxeSparks(it.x + fxRnd(-4, 4), it.y + 4, 1, { sz: 3, sp: 8, up: 16, life: 0.9, cols: [0xffc46b, 0xff8a4a] });
+        else if (F.item === 'firefly') fxeSparks(it.x + fxRnd(-6, 6), it.y + fxRnd(-6, 6), 1, { sz: 4, sp: 4, life: 0.7, cols: [0xe8ff9a, 0xc6ff6b] });
+      }
+    }
+    if (FXE.end) { FXE.end.t -= dt; busy = true; if (FXE.end.t <= 0) FXE.end = null; }
+    return busy;
+  }
+  // 누른 것마다
+  function fxeHit(it, F) {
+    if (!fxOn() || !it) return;
+    const x = it.x, y = it.y, bc = hexN(it.g && it.g.style.getPropertyValue('--bc'));
+    if (F.bf) fxeFirework(x, y);
+    else if (F.item === 'balloon') { for (let i = 0; i < 8; i++) { const s = fxSprite(fxeTex('fxe_bit'), x, y, fxRnd(4, 7)); s.tint = bc; const a = fxRnd(0, Math.PI * 2), sp = fxRnd(40, 110); FXL.parts.push({ s, vx: Math.cos(a) * sp, vy: Math.sin(a) * sp - 30, rot: fxRnd(-10, 10), life: 0.9, max: 0.9, g: 260 }); }
+      fxeConfetti(x, y, 6, { sp: 70, life: 1.2, sz: 5 }); fxeWave(fxeHold(), 0.04, 6); }
+    else if (F.item === 'note') { fxeSparks(x, y, 10, { sz: 5, sp: 60, life: 0.7, cols: [0xfff2a0, 0xffffff, 0xffc0d6] }); fxeWave(fxeHold(), 0.035, 5); }
+    else if (F.item === 'smile') { const n = fxeNear(x, y + 20, fxeHold()); if (n) fxeJump(n.k, 0, 5); fxeSparks(x, y, 10, { sz: 5, sp: 55, life: 0.6, cols: [0xfff27a, 0xffffff] }); }
+    else if (F.item === 'paper' || (F.fv && F.how === 'pop')) { fxeSparks(x, y, 12, { sz: 5, sp: 70, up: 20, g: 90, life: 0.7, cols: [0xffe27a, 0xffffff, 0xffc46b] }); fxeConfetti(x, y, 5, { sp: 60, life: 1, sz: 4 }); }
+    else if (F.item === 'meteor') fxeSparks(x, y, 16, { sz: 4, sp: 90, life: 0.7, cols: [0xffffff, 0xfff2a0, 0xbfe0ff] });
+    else if (F.item === 'lantern') fxeSparks(x, y, 14, { sz: 4, sp: 50, up: 40, life: 1, cols: [0xffc46b, 0xff8a4a, 0xfff2a0] });
+    else if (F.item === 'firefly') fxeSparks(x, y, 12, { sz: 6, sp: 40, life: 0.6, cols: [0xe8ff9a, 0xffffff] });
+    else fxeSparks(x, y, 10, { sz: 5, sp: 60, up: 10, g: 60, life: 0.6, cols: [bc, 0xffffff] });
+    fxKick();
+  }
+  // 불꽃놀이: 둥글게 퍼져 처지며 사그라들어요. 가끔 겹꽃
+  const FXE_FW = [[0xffd36b, 0xfff2a0, 0xffffff], [0xff7ab0, 0xffc0d6, 0xffffff], [0x6fc3ff, 0xbfe0ff, 0xffffff], [0x8ae06b, 0xd6ff9a, 0xffffff], [0xc08aff, 0xe6ccff, 0xffffff]];
+  function fxeFirework(x, y, small) {
+    const cols = FXE_FW[(Math.random() * FXE_FW.length) | 0], n = small ? 36 : Math.round(fxRnd(60, 90));
+    fxeSparks(x, y, n, { ring: true, sz: small ? 4 : 5, sp: small ? 55 : 95, g: 45, drag: 1.1, life: small ? 0.9 : 1.4, cols });
+    fxeSparks(x, y, 10, { sz: 7, sp: 20, life: 0.35, cols: [0xffffff] });
+    if (!small && Math.random() < 0.3) setTimeout(() => { if (fxOn()) { fxeFirework(x + fxRnd(-25, 25), y + fxRnd(-25, 5), true); fxKick(); } }, 320);
+    fxKick();
+  }
+  // 운동회
+  function fxeBall(d, dx) {   // 트랙 밖에서 튀며 굴러 들어와 마찰로 멈춰요. 그동안 SVG 공은 숨겨요
+    if (!fxOn()) return false; const fall = d.g.querySelector('.drop-fall'), u = IMG('fest_ball_blue'); if (!fall || !u) return false;
+    if (FXE.tex.ball === undefined) { FXE.tex.ball = null; const im = new Image(); im.onload = () => { try { FXE.tex.ball = window.PIXI.Texture.from(im); } catch (e) { /* 없으면 예전 공 */ } }; im.src = u; }
+    if (!FXE.tex.ball) return false;
+    fall.style.opacity = '0';
+    const s = fxSprite(FXE.tex.ball, d.x + dx, d.y - 1, 22);
+    FXL.falls.push({ d, s, ball: true, tx: d.x, ty: d.y - 1, sy: d.y - 30, k0: s.scale.x, k1: s.scale.x, vx: -dx * 1.6, vy: -120, vr: -Math.sign(dx) * 14, n: 0 });
+    fxKick(); return true;
+  }
+  function fxeBlue(d) { if (!fxOn()) return; fxeConfetti(d.x, d.y, 10, { sp: 90, life: 1.3, sz: 5, cols: FXE_TEAM.b }); const b = rt.kids.filter(k => k.team === 'b'); if (b.length) fxeJump(b[(Math.random() * b.length) | 0], 0, 7); fxKick(); }
+  function fxeWhite() { if (!fxOn()) return; const w = rt.kids.filter(k => k.team === 'w'); if (!w.length) return; const k = w[(Math.random() * w.length) | 0]; fxeSparks(k.x, k.y - 16, 8, { sz: 4, sp: 40, life: 0.6, cols: FXE_TEAM.w }); fxeJump(k, 0, 6); fxKick(); }
+  function fxeSportsEnd(win) {   // 결승 테이프가 끊기고 이긴 팀 색종이와 점프
+    if (!fxOn()) return;
+    const x = SPORTS.cx + SPORTS.rx, y = SPORTS.cy, team = win ? 'b' : 'w';
+    for (const sd of [-1, 1]) { const s = fxSprite(fxeTex(sd < 0 ? 'fxe_tape_l' : 'fxe_tape_r'), x + sd * 10, y - 12, 22); FXL.parts.push({ s, vx: sd * 60, vy: -20, rot: sd * 5, life: 1.2, max: 1.2, g: 140 }); }
+    for (let i = 0; i < 3; i++) setTimeout(() => { if (fxOn()) { fxeConfetti(SPORTS.cx + fxRnd(-80, 80), SPORTS.cy - 60, 22, { ang: Math.PI / 2, spread: 0.6, sp: 40, g: 70, life: 2.4, sz: 6, cols: FXE_TEAM[team] }); fxKick(); } }, i * 220);
+    fxeWave(rt.kids.filter(k => k.team === team), 0.05, 9);
+    FXE.end = { t: 1.4 }; fxKick();
+  }
+  // 행사가 끝날 때: 졸업 사진 성공이면 학사모 던지기, 다른 행사 성공이면 색종이
+  function fxeEnd(F, win) {
+    if (FXE.beams) { FXE.beams.forEach(b => b.s.destroy()); FXE.beams = null; }
+    if (!fxOn() || !F) return;
+    if (F.form === 'rows' && win) { for (const k of fxeHold().slice(0, 12)) { const s = fxSprite(fxeTex('fxe_cap'), k.x, k.y - 14, 13); FXL.parts.push({ s, vx: fxRnd(-25, 25), vy: -fxRnd(150, 210), rot: fxRnd(-9, 9), life: 1.6, max: 1.6, g: 230 }); fxeJump(k, fxRnd(0, 0.1), 7); }
+      fxeConfetti(pzx(), pzy() - 40, 24, { sp: 120, life: 2, sz: 5 }); }
+    else if (win) fxeConfetti(pzx(), pzy() - 30, 26, { sp: 130, life: 2, sz: 5 });
+    FXE.end = { t: 1.8 }; fxKick();
+  }
+  function fxeReset() {   // 행사가 끝나면 학생 몸을 원래대로
+    for (const k of rt.kids) { k.lean = 0; k.jY = 0; k.sq = 0; k.jT = null; if (k.spd0) { k.spd = k.spd0; k.spd0 = 0; } k.sprT = 0; }
+    if (FXE.beams) { FXE.beams.forEach(b => { if (!b.s.destroyed) b.s.destroy(); }); FXE.beams = null; }
   }
   /* ---------- 2.0.0 핫픽스(원격 설정, 2026-10-27 woodani) ----------
      웹 주소의 live.json을 켤 때 읽어요(웹, 안드로이드, 토스 모두). 코드는 받지 않고 숫자, 공지, 기능 끄기만 받아요.
@@ -30407,7 +30563,7 @@ body.mg-on .toast[hidden]{display:none}
     GSHOP, OUTFITS, evPastIds, renderNight, shopItem, essItem, buyEss, pickEss, nickPrice, grantOffline, thSetPrice, pickDeco, buyDeco, buyDecoBerry,   // 2.1.0 소풍, 스티커판, 상점
     LAB, LAB_IN, LAB_KEYS, LAB_CARDS, LAB_MIX, LAB_DBL, labOf, labRun, labCount, labReady, labDone, openLab, renderLab, labTap, labGo, RD, BOOKS, rdStart, rdSettle, rdTick, rdLeft, rdRemain, openRead, renderRead, renderStudy2, sanitizeStudy2, maintSync, maintTap, openBook, renderBook, BT, BT_EV, BT_LG, BT_SCH, btOpen, btLeft, btRoster, btBest, btMake, btScore, btWin, btFinish, btOpenScene, btClose, btRankDoc, readRow, btAuto, btPick, btStart, btRender, renderBtCard, sanitizeBt, get btUI() { return btUI; }, EX, exIsWeek, exNow, exPrev, exDays, exScore, exGrade, exStudy, exClaim, exTick, exMake, openExam, renderExam, exAwardTop, exReportReady, sanitizeExam, renderSheet, openSheet,   // 2.0.1 공부 2단계(s76)
     AC, AC_GAME, AB_KEY, ABIL, acLv, acSum, acMult, acRepOf, acGain, acSettle, acAll, acCap, acBkLeft, acBuyBook, renderAc, sanitizeAc, freshAc, rankRows, awayStart, awaySettle, timeSrc, save, awayHold, rankCap, cloudVerify, liveApply, liveLoad, openNotice, NOTICES, get Live() { return Live; }, get Rank() { return Rank; }, liveOff,   // 2.0.0 보안 점검 시험(s71), Codex 검토 시험(s72)
-    rosterEnsure, rosterMake, rosterAdd, clubAuto, clubSet, clubPct, clubShow, clubSum, clubStars, clubMembers, clubShowGo, conArtKey, FXL, FXT, fxTamHitT: (...a) => fxTamHit(...a), fxTamDropT: (...a) => fxTamDrop(...a), fxOn, fxTamOn, fxTamInit, fxLoad, fxOak, dropValue, ppDecoSync, ppMedIc, PP_DECO, showReady, showReadyC, showQuestFree, showWait, showDay, clubWeekTick, clubFacUp, CLUBS, CLUB, star, clubTuitionMult, clubFestMult, clubDecoOff, renderClub, renderHall, openSeatPick, openClubPick,
+    rosterEnsure, rosterMake, rosterAdd, clubAuto, clubSet, clubPct, clubShow, clubSum, clubStars, clubMembers, clubShowGo, conArtKey, FXL, FXT, FXE, fxeFirework, fxeSportsEnd, fxTamHitT: (...a) => fxTamHit(...a), fxTamDropT: (...a) => fxTamDrop(...a), fxOn, fxTamOn, fxTamInit, fxLoad, fxOak, dropValue, ppDecoSync, ppMedIc, PP_DECO, showReady, showReadyC, showQuestFree, showWait, showDay, clubWeekTick, clubFacUp, CLUBS, CLUB, star, clubTuitionMult, clubFestMult, clubDecoOff, renderClub, renderHall, openSeatPick, openClubPick,
     TIER_SCALE, renderCampus, zoneBadge, uniPreview, setZone, DEPT, openDept, renderDept, deptSet, deptPct, deptOf, deptPicks, deptSlots, deptMult, zoneKey, uniOn, zoneOf, ZONE_GEO, CAMPUS, GEO, geoIdx, legacyMult, tuitionMult, snapTake, snapOf, showCere, cereCrew, cere3Info, cere3Load, cere3, tierViewOpen, tierViewClose, renderTierView, renderTierDots, nlCycle, viewMap, showNewTalk, talkNext, showCere, cereEnd, cereCrew, cereAsk, cereKeep, goFur, updateQuestDot, openElect, renderElect, elVote, elSync, elMult, elClub, elPres, elBadge, elMake, EL_PLEDGES, clubPct, festPrize, dropValue, claimMission, gameWeek, NEWCOMERS, TIERS, GEO, geoIdx, decoCost0, qMeasure, qDone, qGoal, kidArt: kidSVG, newYear, checkGrade, gradeOf, townRep, FAC, sanitize200, trialHunt, updateTrial, TRIAL, zoomAt, fitMap, ZOOM_MAX, DECO, DECO_SLOTS, DECO_SIGN, decoCost, decoSoldOut, pickDeco, buyDeco, decoPut, decoEditStart, decoEditEnd, openDecoPick, renderDeco, setSchoolNm, setMark, schoolTitle, markHTML, decoPlacedAll, esExLeft, esExCost, get Cloud() { return Cloud; }, get actx() { return actx; }, Music, musicSync, ensureAudio, bgmLoad, pzUI, rt, makeDeal, furStage, DEAL, navInfo, navRoute, hudTheme, HUD_TH_COL, pathInfo, pathRoute, MAP_PATHS, spawnDrop, repTipCheck, linkGoogle, retryCloud, sanitize, acctPending, renderMap, renderHUD, renderAffordance, syncKids, layoutMap, geo, hitTrial, endVisit, showReward, recommend, needCost, prepTopUp, qReward, prepPhase, rankScore, pwOf, previewDip, dipMult, costScale, buyFur, buyFurAll, furCost, furReady, furDone, FUR, startTalk, endTalk, teacherAct, facCost, teaCost, facKeys, rate, rep, capacity, canGraduate, canPromote,
     fmt, fmt2, graduate, promote, buyPerk, perkCost, perkMaxed, buyFundPerk, fpCost, claimMain, mainReady, curMain, qNo, earn, CFG, TEA, teaMaxed, PERKS, FPERKS, MAIN, finalYear, startTrip, claimTrip, TRIPS, yearLocked, endSports, rtSports: () => rt.sports, rtFest: () => rt.fest, facCap, addLeague, addMP, tutStart, endFest, claimBox, musicWant, askBox, festWait, setTab,
     RARE, modelOf, rareRoll, rareGot, showRareTalk, rareDexHTML, kidSVG, rosterKid, WX, wxOf, wxIs, rdMinNow, renderWeather, PL, plSync, plUnread, openPLetter, renderPLetter, RS, rsNum, rsSync, rsAdd, rsLabel, lookDoc, lookRead, lookPush, lookSet, openLook, MODEL_SCHOOL, joinRank, PS, PS_M, PS_SEASONS, psSeason, psOpen, psSync, psLv, psGot, psReward, psClaimAll, psClaimMission, psWatchAd, psClaimable, psStepReady, psExtraReady, psChooseFur, psFurImg, renderPass, setEvSeg, xtGot, achTitles,   // 2.1.3 숲속 패스

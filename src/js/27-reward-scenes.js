@@ -201,6 +201,7 @@
   function updateSports(dt) {
     const R = rt.sports;
     if (!R) return;
+    fxeTick();   // 5.3.0 행사 효과층 깨우기
     renderSportsBar();
     if (feverIntro(R, dt, FEST.sports.name, '굴러오는 공을 주워서 청팀을 응원해요')) return;
     if (R.ending) return;
@@ -208,7 +209,7 @@
     R.spawn += dt;
     if (R.spawn >= SPORTS.every) { R.spawn = 0; if (rt.drops.length < SPORTS.ground) spawnDrop(false); }
     R.foe -= dt;
-    if (R.foe <= 0) { R.foe = rand(1.1, 2.1); R.white += 1; }
+    if (R.foe <= 0) { R.foe = rand(1.1, 2.1); R.white += 1; fxeWhite(); }
     for (const k of rt.kids) {
       if (k.board || k.ang === undefined) continue;
       k.ang += dt * k.spd;
@@ -217,11 +218,11 @@
       k.wait = 0; k.speed = 80;
     }
     renderSportsBar();
-    if (R.t <= 0 && !R.ending) { R.ending = true; feverEnd(endSports); }
+    if (R.t <= 0 && !R.ending) { R.ending = true; fxeSportsEnd(R.blue > R.white); feverEnd(endSports); }
   }
   function endSports() {
     const R = rt.sports; if (!R) return;
-    rt.sports = null;
+    rt.sports = null; fxeReset();
     rt.kids.forEach(k => { delete k.ang; delete k.team; k.speed = rand(14, 22); pickTarget(k); const b = k.g.querySelector('.band'); if (b) b.remove(); });
     $('#sportsBar').hidden = true;
     S.st.sports += 1;
