@@ -31,7 +31,7 @@
     FXL.tex.dot = app.renderer.generateTexture(new P.Graphics().circle(0, 0, 4).fill(0xffffff));
     if (!FXL.tex.ic_acorn) { FXL.st = 'no'; cv.remove(); return; }
     FXL.st = 'ok';
-    setTimeout(() => { try { ['fxe_conf_1', 'fxe_conf_2', 'fxe_conf_3', 'fxe_conf_4', 'fxe_bit', 'fxe_spark', 'fxe_cap', 'fxe_tape_l', 'fxe_tape_r', 'fxe_beam', 'fxe_petal_1', 'fxe_petal_2', 'fxe_petal_3'].forEach(fxeTex); } catch (e) { /* 없으면 코드 모양 */ } }, 2000);   // 5.3.0.1 행사 그림(작업지시서 103) 미리 받기
+    setTimeout(() => { try { ['fxe_conf_1', 'fxe_conf_2', 'fxe_conf_3', 'fxe_conf_4', 'fxe_bit', 'fxe_spark', 'fxe_cap', 'fxe_tape_l', 'fxe_tape_r', 'fxe_beam', 'fxe_petal_1', 'fxe_petal_2', 'fxe_petal_3', 'tr_leaf_2'].forEach(fxeTex); } catch (e) { /* 없으면 코드 모양 */ } }, 2000);   // 5.3.0.1 행사 그림(작업지시서 103) 미리 받기
   }
   const fxRnd = (a, b) => a + Math.random() * (b - a);   // 반짝이는 보통 섞기로 그려요(그림판 바탕이 투명이라 더하기 섞기는 거의 안 보여요)
   // 화면 자리(px) ↔ 지도 자리. 지도는 viewBox 0 -60 360 540이라 왼쪽 위가 (0, -60)
@@ -94,13 +94,22 @@
       FXL.parts.push({ s, vx: Math.cos(a) * sp, vy: Math.sin(a) * sp * 0.6 - (o.up || 0), rot: fxRnd(-3, 3), life: o.life * fxRnd(0.8, 1.2), max: o.life, g: o.g || 0, flut: o.flut || 0, ph: fxRnd(0, 6) }); }
   }
   // 참나무를 흔들었어요(누를 때마다). 연타하면 더 크게(최대 oakMax)
+  const fxOakTh = () => { try { return (S && S.cos && S.cos.th && thOn().bg) || ''; } catch (e) { return ''; } };
   function fxOak() {
     if (!fxOn()) return false;
     const o = FXL.oak; o.s = -o.s || 1; const w = Math.sqrt(FXC.oakW);
     o.v = o.s * Math.min(FXC.oakMax * w * 1.6, Math.abs(o.v) + FXC.oakDeg * w * 1.6);   // 감쇠 때문에 1.6배를 줘야 처음 꼭대기가 oakDeg쯤
-    const [x, y, r] = oakAt(), lt = [FXL.tex.fx_leaf_1, FXL.tex.fx_leaf_2].filter(Boolean), n = Math.round(fxRnd(FXC.leaves[0], FXC.leaves[1]));
+    // 5.3.0.2 woodani: 잎 색을 테마에 맞춰요. 봄은 벚꽃잎, 가을은 노랗고 붉은 잎, 겨울과 크리스마스는 앙상한 가지라 잎 대신 가지에 쌓인 눈가루만
+    const [x, y, r] = oakAt(), bg = fxOakTh(), n = Math.round(fxRnd(FXC.leaves[0], FXC.leaves[1]));
+    if (bg === 'winter' || bg === 'xmas') {
+      for (let i = 0; i < 5; i++) { const a = fxRnd(0, Math.PI * 2), d = Math.sqrt(Math.random()) * r * 0.7;
+        fxBurst(x + Math.cos(a) * d, y - r * 0.4 + Math.sin(a) * d * 0.5, 1, { tex: FXL.tex.dot, sz: fxRnd(2.5, 4), sp: 12, up: 4, life: fxRnd(1.2, 1.8), g: 22, flut: 10, tint: 0xffffff }); }
+      fxKick(); return true;
+    }
+    const lt = bg === 'spring' ? ['fxe_petal_1', 'fxe_petal_2', 'fxe_petal_3'].map(fxeTex) : bg === 'autumn' ? [fxeTex('tr_leaf_2'), fxeTex('tr_leaf_2'), FXL.tex.fx_leaf_1].filter(Boolean) : [FXL.tex.fx_leaf_1, FXL.tex.fx_leaf_2].filter(Boolean);
+    const tn = i => bg === 'autumn' ? [0xffffff, 0xffa060, 0xe0602a][i % 3] : 0;
     for (let i = 0; i < n; i++) { const a = fxRnd(0, Math.PI * 2), d = Math.sqrt(Math.random()) * r * 0.75;
-      fxBurst(x + Math.cos(a) * d, y - r * 0.35 + Math.sin(a) * d * 0.6, 1, { tex: lt.length ? lt[i % lt.length] : FXL.tex.dot, sz: fxRnd(9, 13), sp: 26, up: 10, life: fxRnd(1.6, 2.4), g: 26, flut: 22, tint: lt.length ? 0 : 0x8fbf4a }); }
+      fxBurst(x + Math.cos(a) * d, y - r * 0.35 + Math.sin(a) * d * 0.6, 1, { tex: lt.length ? lt[i % lt.length] : FXL.tex.dot, sz: fxRnd(9, 13) * (bg === 'spring' ? 0.75 : 1), sp: 26, up: 10, life: fxRnd(1.6, 2.4), g: 26, flut: 22, tint: lt.length ? tn(i) : 0x8fbf4a }); }
     fxKick(); return true;
   }
   // 떨어진 도토리(d)를 가지 자리(sx, sy)에서 떨어뜨려요. 그동안 SVG 도토리는 숨겨요
@@ -360,16 +369,14 @@
   const uiOn = () => !rt.reduced && !document.hidden;
   function uiLayer() { let L = $('#uiFx'); if (!L) { L = document.createElement('div'); L.id = 'uiFx'; L.className = 'ui-fx'; L.setAttribute('aria-hidden', 'true'); document.body.appendChild(L); } return L; }
   function uiImg(k, cls) { const u = IMG(k); if (!u) return null; const im = document.createElement('img'); im.src = u; im.alt = ''; im.className = cls || 'ui-p'; uiLayer().appendChild(im); return im; }
-  // 탭 넘김: 새 화면이 살짝 떠오르고 잎사귀 두 장이 휙(0.25초, 빨리 눌러도 앞 움직임을 지우고 새로)
+  // 탭 넘김: 새 화면이 살짝 떠올라요(0.25초, 빨리 눌러도 앞 움직임을 지우고 새로)
   function trTab(t, prev) {
     if (!uiOn() || t === prev) return;
-    if (t === 'tam' && prev !== 'tam') { trWipe(); return; }
+    // 5.3.0.2 woodani: 탐험에 들어갈 때 잎사귀 무리(trWipe)도 쓰지 않아요
     const el = t === 'school' ? $('.frame') : document.querySelector('.panel:not([hidden])');
     if (UIFX.tabA) { try { UIFX.tabA.cancel(); } catch (e) { /* 이미 끝남 */ } }
     if (el && el.animate) UIFX.tabA = el.animate([{ opacity: 0.55, transform: 'translateY(10px)' }, { opacity: 1, transform: 'none' }], { duration: 250, easing: 'cubic-bezier(.2,.8,.3,1)' });
-    const W = window.innerWidth, H = window.innerHeight;
-    for (let i = 0; i < 2; i++) { const im = uiImg(i ? 'tr_leaf_2' : 'tr_leaf_1'); if (!im) break; const y = H * (0.25 + Math.random() * 0.45), s = 26 + Math.random() * 10;
-      im.style.width = s + 'px'; const a = im.animate([{ transform: `translate(${W + 20}px,${y}px) rotate(0deg)`, opacity: 0.95 }, { transform: `translate(${W * 0.45}px,${y + 30}px) rotate(-160deg)`, opacity: 0.95, offset: 0.5 }, { transform: `translate(-60px,${y + 70}px) rotate(-320deg)`, opacity: 0 }], { duration: 520 + i * 90, delay: i * 50, easing: 'ease-in-out', fill: 'backwards' }); a.onfinish = () => im.remove(); }
+    // 5.3.0.2 woodani: 탭 넘김 때 날아가는 잎사귀는 뺐어요
   }
   // 큰 장면 넘김: 잎사귀 무리가 화면을 덮은 채 시작해 왼쪽으로 쓸려 나가며 새 화면이 보여요(화면은 이미 바뀐 뒤라 누르기를 막지 않아요)
   function trWipe() {
@@ -380,13 +387,8 @@
   }
   // 보상 창: 뒤에서 빛살이 천천히 돌아요(받는 값이 보이는 창만)
   const UI_RW = ['mReward', 'mSportsEnd', 'mFestEnd', 'mOffline'];
-  function uiRwOpen(el) {
-    if (!el || !uiOn()) return; const u = IMG('rw_burst'); if (!u) return;
-    if (!(UI_RW.includes(el.id) || el.querySelector('.amount'))) return;
-    let b = el.querySelector('.rw-burst'); if (!b) { b = document.createElement('i'); b.className = 'rw-burst'; b.setAttribute('aria-hidden', 'true'); b.style.setProperty('--rwu', `url("${u}")`); const bd = el.querySelector('.backdrop'); if (bd) bd.after(b); else el.prepend(b); }
-    const gold = !!el.querySelector('.amount [data-gold], .rw-list .gold');
-    b.style.setProperty('--rwc', gold ? '#FFC93C' : '#FFD978');
-  }
+  function uiRwOpen(el) { }   // 5.3.0.2 woodani: 보상 창 뒤 빛살은 뺐어요(받으면 도토리가 날아가는 것은 그대로)
+
   // 받기: 받은 자리에서 도토리가 위쪽 도토리 칸으로 날아가요(최대 8개)
   function uiRwClose(el) {
     if (!el || !uiOn() || !(UI_RW.includes(el.id) || el.querySelector('.amount')) || !el.querySelector('[data-acorn], .amount svg, .amount img, .rw-list svg, .rw-big svg')) return;   // 도토리를 받는 창만
@@ -418,3 +420,97 @@
     L._stop = () => { timers.forEach(clearTimeout); L.remove(); };
     return L;
   }
+  /* ---------- 5.3.0.3 탐험 오르는 길(효과층 6단계, 작업지시서 105, 105-2) ----------
+     탐험 무대 바닥을 엔진으로 그려요: 바닥 조각(ex6_<지역>_tile)을 세로로 눌러 원근을 주고, 그 위에 사선 길 한 줄(ex6_<지역>_path)을 깔아요.
+     다 처치하면 대원들이 길을 따라 오른쪽 위로 달리고, 화면이 따라가며 바닥이 왼쪽 아래로 흘러요. 10층마다 아치문(ex6_<지역>_gate)을 지나요.
+     높이 오를수록(지역 안 50층) 먼 풍경이 내려가고 발아래로 구름(ex6_cloud)이 지나가요.
+     하늘, 먼 풍경, 앞 장식은 그대로 HTML 겹(작업지시서 104-2). 엔진이 없거나 움직임 줄이기면 예전 오르기 그대로. 겨루기 계산과 값은 바꾸지 않아요 */
+  const FXG = { st: '', app: null, root: null, sq: null, floor: null, path: null, cloud: null, gate: null, gs: 0, reg: '', tex: {}, raf: 0, last: 0, run: 0, sp: 0, ang: 0, ux: 0, uy: 0, mid: [0, 0], top: 0, W: 0, H: 0, h: 0 };
+  const FXG_SQ = 0.6;   // 바닥을 세로로 누르는 정도(원근 어림)
+  const fxgOn = fl => fxTamOn() && FXG.st === 'ok' && !!fxgTexOk(tamReg(fl).k);
+  function fxgTexOk(k) { return !!(IMG(`ex6_${k}_tile`) && IMG(`ex6_${k}_path`)); }
+  function fxgTex(k) {
+    if (FXG.tex[k] !== undefined) return FXG.tex[k];
+    FXG.tex[k] = null; const u = IMG(k); if (!u) return null;
+    const im = new Image(); im.onload = () => { try { FXG.tex[k] = window.PIXI.Texture.from(im); fxgRefresh(); } catch (e) { /* 없으면 예전 바닥 */ } }; im.src = u;
+    return null;
+  }
+  // 엔진이나 그림이 늦게 준비되면 지금 탐험 화면에 바로 깔아요(처음 연 뒤 첫 오르기부터 새 길로)
+  function fxgRefresh() { try { if (rt.tab === 'tam' && rt.tam && !rt.tam.climbing) { const fl = (rt.tam.F && rt.tam.F.fl) || tamCurFl(); if (FXG.reg && FXG.reg !== tamReg(fl).k) FXG.reg = ''; tamG6(fl); } } catch (e) { /* 다음 걷기에서 */ } }
+  async function fxgInit() {
+    if (FXG.st || FXL.st !== 'ok') return; const world = $('#tmWorld'); if (!world) return;
+    FXG.st = 'load';
+    try {
+      const P = window.PIXI, app = new P.Application();
+      await app.init({ width: Math.max(1, world.clientWidth), height: Math.max(1, world.clientHeight), backgroundAlpha: 0, antialias: true, resolution: Math.min(2, window.devicePixelRatio || 1), autoDensity: true, autoStart: false });
+      app.ticker.stop(); const cv = app.canvas; cv.className = 'fxg'; cv.setAttribute('aria-hidden', 'true');
+      const bgs = world.querySelector('.tm-bgs'); if (bgs) bgs.after(cv); else world.prepend(cv);
+      FXG.app = app; FXG.root = new P.Container(); app.stage.addChild(FXG.root);
+      FXG.sq = new P.Container(); FXG.root.addChild(FXG.sq);
+      ['ex6_cloud'].forEach(fxgTex);
+      FXG.st = 'ok'; cv.hidden = true; fxgRefresh();
+    } catch (e) { FXG.st = 'no'; }
+  }
+  // 대원 무리 가운데와 장난꾸러기 무리 가운데(무대 칸)를 이어 길 방향을 정해요
+  function fxgGeom() {
+    const world = $('#tmWorld'), W = world.clientWidth, H = world.clientHeight, fl = $('.tm-bg.cur .ly.floor');
+    const wr = world.getBoundingClientRect(), k = W / (wr.width || W);
+    let top = H * 0.36; if (fl) { const r = fl.getBoundingClientRect(); if (r.height) top = (r.top - wr.top) * k + r.height * k * 0.1; }
+    const pt = L => { const n = Math.min(3, L.length); let x = 0, y = 0; for (let i = 0; i < n; i++) { x += L[i][0]; y += L[i][1]; } return [W * x / n / 100, H * (1 - (y / n + TM_UP) / 100)]; };
+    const a = pt(TM_PPOS), b = pt(TM_MPOS), loc = ([x, y]) => [x - W / 2, (y - top) / FXG_SQ];
+    const la = loc(a), lb = loc(b), dx = lb[0] - la[0], dy = lb[1] - la[1], d = Math.hypot(dx, dy) || 1;
+    Object.assign(FXG, { W, H, top, ux: dx / d, uy: dy / d, ang: Math.atan2(dy, dx), mid: [(la[0] + lb[0]) / 2, (la[1] + lb[1]) / 2] });
+  }
+  // 지역 바닥과 길을 깔아요(force면 그림이 늦게 받아졌을 때 다시)
+  function fxgSet(k, force) {
+    if (FXG.st !== 'ok') return false; const P = window.PIXI, app = FXG.app, world = $('#tmWorld'); if (!world) return false;
+    const tile = fxgTex(`ex6_${k}_tile`), path = fxgTex(`ex6_${k}_path`); fxgTex(`ex6_${k}_gate`);   // 문은 미리 받아 둬요
+    if (!tile || !path) { app.canvas.hidden = true; FXG.reg = k; return false; }
+    if (app.screen.width !== world.clientWidth || app.screen.height !== world.clientHeight) { app.renderer.resize(Math.max(1, world.clientWidth), Math.max(1, world.clientHeight)); force = true; }
+    if (FXG.reg === k && FXG.floor && !force) { app.canvas.hidden = false; return true; }
+    FXG.reg = k; fxgGeom();
+    const { W, H, top } = FXG, sq = FXG.sq;
+    sq.removeChildren().forEach(c => c.destroy()); FXG.gate = null;
+    sq.position.set(W / 2, top); sq.scale.set(1, FXG_SQ);
+    const ts = Math.max(0.3, W * 0.8 / 720), LH = (H - top) / FXG_SQ + 40;
+    const floor = new P.TilingSprite({ texture: tile, width: W * 3, height: LH + 80 }); floor.position.set(-W * 1.5, -40); floor.tileScale.set(ts); sq.addChild(floor); FXG.floor = floor;
+    const len = Math.hypot(W, LH) * 2.2, pw = 256 * ts * 1.05;
+    const pa = new P.TilingSprite({ texture: path, width: pw, height: len }); pa.anchor.set(0.5); pa.tileScale.set(ts * 1.05); pa.rotation = FXG.ang + Math.PI / 2; pa.position.set(FXG.mid[0], FXG.mid[1]); sq.addChild(pa); FXG.path = pa;
+    // 위쪽 가장자리는 HTML 바닥(풀숲 가장자리)과 이어지게 흐리게
+    if (!FXG.fade) { const c = document.createElement('canvas'); c.width = 4; c.height = 64; const g = c.getContext('2d'), gr = g.createLinearGradient(0, 0, 0, 64); gr.addColorStop(0, 'rgba(255,255,255,0)'); gr.addColorStop(1, 'rgba(255,255,255,1)'); g.fillStyle = gr; g.fillRect(0, 0, 4, 64); FXG.fade = P.Texture.from(c); }
+    if (FXG.mask) FXG.mask.destroy(); const m = new P.Container(), m1 = new P.Sprite(FXG.fade), m2 = new P.Sprite(P.Texture.WHITE);
+    m1.position.set(0, top - 10); m1.width = W; m1.height = 46; m2.position.set(0, top + 36); m2.width = W; m2.height = H; m.addChild(m1, m2); FXG.root.addChild(m); sq.mask = m; FXG.mask = m;
+    const ct = fxgTex('ex6_cloud');
+    if (ct && !FXG.cloud) { const cl = new P.TilingSprite({ texture: ct, width: W, height: H * 0.3 }); cl.tileScale.set(H * 0.3 / 512); cl.position.set(0, H * 0.72); cl.alpha = 0; FXG.root.addChild(cl); FXG.cloud = cl; }
+    if (FXG.cloud) { FXG.cloud.width = W; FXG.cloud.height = H * 0.3; FXG.cloud.position.set(0, H * 0.72); FXG.root.addChild(FXG.cloud); }
+    app.canvas.hidden = false; app.render(); return true;
+  }
+  // 높이: 지역 안 50층 가운데 어디쯤인지(0~1). 먼 풍경이 내려가고 구름이 짙어져요
+  function fxgHeight(fl) {
+    const h = ((Math.max(1, fl) - 1) % TAM.regLen) / (TAM.regLen - 1); FXG.h = h;
+    const far = $('.tm-bg.cur .ly.far'); if (far) far.style.translate = `0 ${(h * 9).toFixed(1)}%`;
+    if (FXG.cloud) { FXG.cloud.alpha = h < 0.3 ? 0 : Math.min(0.75, (h - 0.3) * 1.3); FXG.cloud.tint = { lab: 0xf3e6ff, tower: 0xc9c2f0, yard: 0xffffff }[FXG.reg] || 0xffffff; }
+  }
+  // 길을 따라 ms 동안 d만큼 흘러요(대원이 오른쪽 위로 가는 만큼 바닥은 왼쪽 아래로)
+  function fxgRun(ms, d, gate) {
+    if (FXG.st !== 'ok' || !FXG.floor) return;
+    FXG.run = ms / 1000; FXG.sp = d / Math.max(0.1, FXG.run);
+    if (gate) { const g = fxgTex(`ex6_${FXG.reg}_gate`); if (g) { if (FXG.gate) FXG.gate.destroy(); const s = new window.PIXI.Sprite(g); s.anchor.set(0.5, 0.96); const gh = FXG.H * 0.24; s.scale.set(gh / (g.height || 1)); FXG.root.addChildAt(s, FXG.root.children.indexOf(FXG.mask) + 1); FXG.gate = s; FXG.gs = FXG.W * 0.45; fxgGatePos(); } }
+    fxgKick();
+  }
+  function fxgKick() { if (FXG.st === 'ok' && !FXG.raf) { FXG.last = performance.now(); FXG.raf = requestAnimationFrame(fxgFrame); } }
+  function fxgGatePos() { const g = FXG.gate; if (!g) return; const lx = FXG.mid[0] + FXG.ux * FXG.gs, ly = FXG.mid[1] + FXG.uy * FXG.gs; g.position.set(FXG.W / 2 + lx, FXG.top + ly * FXG_SQ); }
+  function fxgFrame(now) {
+    FXG.raf = 0; const dt = Math.min(0.05, Math.max(0, (now - FXG.last) / 1000)); FXG.last = now;
+    if (!fxTamOn() || !FXG.floor) { FXG.run = 0; return; }
+    if (FXG.run > 0) {
+      const e = Math.min(1, FXG.run / 0.25), v = FXG.sp * e * dt; FXG.run -= dt;   // 끝 0.25초는 천천히 멈춰요
+      FXG.floor.tilePosition.x -= FXG.ux * v; FXG.floor.tilePosition.y -= FXG.uy * v;
+      FXG.path.tilePosition.y += v;
+      if (FXG.cloud && FXG.cloud.alpha > 0) FXG.cloud.tilePosition.x -= v * 0.35;
+      if (FXG.gate) { FXG.gs -= v; fxgGatePos(); if (FXG.gs < -Math.hypot(FXG.W, FXG.H) * 0.8) { FXG.gate.destroy(); FXG.gate = null; } }
+    }
+    FXG.app.render();
+    if (FXG.run > 0) FXG.raf = requestAnimationFrame(fxgFrame);
+  }
+  function fxgHide() { if (FXG.app) FXG.app.canvas.hidden = true; const st = $('#tmStage'); if (st) st.classList.remove('g6'); }

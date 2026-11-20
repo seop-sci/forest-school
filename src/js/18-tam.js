@@ -424,11 +424,12 @@
   const tamMobPic = (fl, m) => m.boss ? tamPic(`ex_boss_${tamReg(fl).k}`, TAM.bossPh) : tamPic(`ex_mob_${tamReg(fl).k}_${m.i + 1}`, TAM.mobPh[(TAM.reg.indexOf(tamReg(fl)) + m.i) % TAM.mobPh.length]);
   // 4.3.0 woodani 요청: 탐험대가 층을 오르며 장난꾸러기를 만나는 화려한 화면. 자리(왼쪽 %, 바닥 %), 앞줄부터
   // 4.3.0 woodani 요청: 맨 앞 장식(풀과 꽃)에 가리지 않게 대원과 장난꾸러기를 14%만큼 위로(TM_UP, 체력 막대까지 보이게)
-  const TM_UP = 26, TM_PPOS = [[37, 5], [23, 14], [22, -1], [9, 8], [8, 20]];
-  const TM_MPOS = [[65, 5], [80, 15], [83, -1]], TM_MPOS1 = [[72, 5]], TM_MPOS2 = [[66, 3], [81, 12]], TM_BPOS = [[74, 2], [55, 17], [55, -2]];
+  // 5.3.0.2 woodani 요청: 사선 배치(탐험대는 왼쪽 아래, 장난꾸러기는 오른쪽 위). [가로 %, 바닥에서 % (TM_UP 더함)]
+  const TM_UP = 26, TM_PPOS = [[35, 6], [21, 10], [27, -4], [9, 4], [12, 16]];
+  const TM_MPOS = [[59, 21], [71, 30], [75, 12]], TM_MPOS1 = [[66, 22]], TM_MPOS2 = [[59, 20], [72, 28]], TM_BPOS = [[67, 18], [50, 35], [53, 12]];   // 오른쪽 단추에 가리지 않게 가운데 쪽으로
   const TM_AMB = { ground: 14, garden: 12, pond: 12, library: 12, yard: 22, tower: 18 };
   // 깊이: 뒷줄(바닥 % 큼)일수록 조금 작고 어둡게
-  const tamDz = y => `--dz:${(1.02 - y * 0.012).toFixed(3)};--db:${(1 - Math.max(0, y) * 0.006).toFixed(3)};`;
+  const tamDz = y => `--dz:${(1.02 - y * 0.007).toFixed(3)};--db:${(1 - Math.max(0, y) * 0.004).toFixed(3)};`;
   // 카메라: 겨룰 때 다가가고, 큰 장난꾸러기가 나오면 그쪽으로 확대했다가 돌아와요
   function tamCam(fight, boss) {
     const st = $('#tmStage'); if (!st) return; st.classList.toggle('fight', !!fight);
@@ -451,6 +452,8 @@
   function tamBg(fl) { return IMG('ex4_bg_' + tamReg(fl).k) || tamI('ex_bg_' + tamReg(fl).k); }   // 4.4.0 세로 배경
   // 5.3.0.1 겹 배경(작업지시서 104): 하늘, 먼 풍경, 바닥 세 겹(앞 장식은 #tmFg). 그림이 다 있는 지역만, 없으면 예전 한 장
   function tamLay(fl) { const k = tamReg(fl).k, u = n => IMG(`ex5_${k}_${n}`), L = { k, sky: u('sky'), far: u('far'), floor: u('floor'), front: u('front') }; return L.sky && L.far && L.floor ? L : null; }
+  // 5.3.0.3 오르는 길: 엔진 바닥이 되는 지역이면 켜요
+  function tamG6(fl) { const st = $('#tmStage'), on = !!(st && tamLay(fl) && fxgOn(fl) && fxgSet(tamReg(fl).k)); if (st) st.classList.toggle('g6', on); if (!on) fxgHide(); else fxgHeight(fl); return on; }
   function tamBgPaint(el, fl) {
     if (!el) return; const L = tamLay(fl);
     if (!L) { if (el.dataset.lay) { el.innerHTML = ''; el.dataset.lay = ''; } const bg = tamBg(fl); el.style.backgroundImage = bg ? `url("${bg}")` : ''; return; }
@@ -481,6 +484,7 @@
     st.dataset.reg = R.k; st.classList.toggle('hm', F ? !!F.hm : tamHOn()); st.classList.toggle('deep', tamLap(fl) > 0);
     if (!T || !T.climbing) tamBgPaint($('.tm-bg.cur', st), fl);
     st.classList.toggle('lay', !!tamLay(fl));
+    tamG6(fl);
     tamAmb(R.k); tamTower(fl); tamFl(fl);
     const boss = !!(F && F.M[0] && F.M[0].boss); st.classList.toggle('boss', boss);
     const bb = $('#tmBossBar'); bb.hidden = !boss; if (boss) bb.querySelector('span').textContent = F.M[0].nm;
@@ -737,6 +741,7 @@
         if (flo) { flo.getAnimations().forEach(a => a.cancel()); flo.animate([{ transform: 'translateX(0)' }, { transform: 'translateX(-9%)' }], wo); }
       } else cur.animate([{ transform: 'translateX(0)' }, { transform: 'translateX(-16%)' }], wo);
     }
+    if (tamG6(fl) && !T.climbing) fxgRun(ms, FXG.W * 0.55);   // 걷는 동안 길을 따라 조금씩
     { const fg = $('#tmFg'), fu = (L && L.front) || IMG('ex4_fg_' + R.k) || tamI('ex_fg_' + R.k); if (fg) { fg.getAnimations().forEach(a => a.cancel()); fg.classList.toggle('lay', !!(L && L.front)); fg.style.backgroundImage = fu ? `url("${fu}")` : ''; if (fu && !rt.reduced) fg.animate([{ transform: 'translateX(0)' }, { transform: L && L.front ? 'translateX(-7%)' : 'translateX(-24%)' }], wo); } }
     $('#tmTime').style.width = '100%'; tamCam(false);
     tamSkills();
@@ -771,8 +776,22 @@
     else { tamWalk(tamCurFl()); $('#tmP').classList.remove('walking'); }
   }
   // 오르기: 탐험대가 뛰어오르고 무대가 아래로 흘러 다음 층이 위에서 내려와요
+  // 5.3.0.3 오르는 길: 같은 지역 안에서는 대원이 사선 길을 따라 오른쪽 위로 달리고 바닥이 왼쪽 아래로 흘러요(10층마다 아치문)
+  function tamClimbG6(best) {
+    const st = $('#tmStage'), T = rt.tam, next = best + 1, pp = $('#tmP'), ms = TAM.ph.climb / tamSpdK() * 900;
+    T.climbing = true; pp.classList.remove('jump', 'enter'); pp.classList.add('walking', 'runup');
+    st.classList.remove('climb'); void st.offsetWidth; st.classList.add('climb');
+    fxgRun(ms, Math.hypot(FXG.W, FXG.H / FXG_SQ) * 0.6, next % TAM.bossEvery === 0);
+    fxgHeight(next);
+    { const fg = $('#tmFg'); if (fg && fg.animate) { fg.getAnimations().forEach(x => x.cancel()); fg.animate([{ transform: 'none', opacity: 1 }, { transform: 'translate(-12%,7%)', opacity: 0, offset: 0.6 }, { transform: 'translate(10%,-6%)', opacity: 0, offset: 0.61 }, { transform: 'none', opacity: 1 }], { duration: ms, easing: 'ease-in-out' }); } }
+    setTimeout(() => { T.climbing = false; st.classList.remove('climb'); pp.classList.remove('walking', 'runup'); }, ms);
+    tamFl(next, true); tamTower(next); st.classList.remove('boss'); $('#tmBossBar').hidden = true;
+    setH($('#tmM'), ''); sfx('tap');
+  }
   function tamClimb(best) {
     const st = $('#tmStage'), T = rt.tam; if (!st || !T) return;
+    if (!rt.reduced && st.classList.contains('g6') && tamReg(best + 1).k === tamReg(best).k && fxgOn(best + 1) && FXG.floor) { tamClimbG6(best); return; }
+    fxgHide();   // 지역이 바뀌는 오르기는 예전처럼 무대가 통째로 바뀌어요(새 지역 바닥은 다음 걷기에서)
     const next = best + 1, cur = $('.tm-bg.cur', st), nx = $('.tm-bg.nx', st), bg = tamBg(next);
     cur.getAnimations().forEach(a => a.commitStyles && a.commitStyles()); cur.getAnimations().forEach(a => a.cancel());
     tamBgPaint(nx, next); T.climbing = true; st.classList.toggle('lay', !!tamLay(next));
@@ -919,6 +938,7 @@
   }
   function tamOpen() {
     if (FXL.st === 'ok' && !FXT.st) fxTamInit();   // 5.2.2 탐험 효과층을 미리 준비
+    if (FXL.st === 'ok' && !FXG.st) fxgInit();   // 5.3.0.3 오르는 길 바닥
     if (!tamOn()) return;
     if (!S.tam.seen) { S.tam.seen = 1; S.tam.it = S.tam.it || gameNow(); save();   // 4.3.1 처음 열면 소개 장면(자동 시험에서는 __TAM_INTRO일 때만)
       const shown = !(window.__FOREST_TEST && !window.__TAM_INTRO) && stPlay('tam', false);
