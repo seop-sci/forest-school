@@ -263,6 +263,7 @@
 
   /* ---------- 도토리 떨어지기 ---------- */
   function shakeOak() {
+    if (fxOak()) return;   // 5.2.1 효과층이 켜져 있으면 용수철 흔들림과 잎(40b-fx-layer.js)
     const c = $('#oakCanopy');
     c.classList.remove('shake'); void c.getBBox(); c.classList.add('shake');
     // 2.3.1 woodani: 참나무를 흔들 때 곰 선생님이 같이 뛰던 것(어색해서) 뺌
@@ -331,6 +332,8 @@
       }
       return;
     }
+    if (near && fxNutFall(d, rt.nutFrom)) { rt.nutFrom = null; return; }   // 5.2.1 효과층: 가지에 달린 도토리 자리에서 떨어져 바닥에 튀어요(흔들림은 tapOak의 shakeOak가 이미 했어요)
+    rt.nutFrom = null;
     if (!rt.reduced && fall.animate) {
       const oa = oakAt(), dx = oa[0] - x, dy = oa[1] - 18 - y;
       fall.animate([
@@ -348,6 +351,7 @@
     if (S.oak < 1) { oakHint(`참나무가 도토리를 다시 맺는 중이에요. ${Math.ceil((1 - S.oak) * OAK.regen)}초만 기다려요`); return; }
     if (rt.drops.length >= OAK.ground) { oakHint('떨어진 도토리를 먼저 주워 주세요'); return; }
     S.oak -= 1; S.st.shakes += 1;
+    { const vis = $$('.oak-nut:not(.off)'); rt.nutFrom = vis[vis.length - 1] || null; }   // 5.2.1 떨어지는 도토리가 시작하는 가지 자리
     spawnDrop(true);
     renderOak();
   }
@@ -377,6 +381,7 @@
     S.st.picks += 1;
     if (rt.sports) { rt.sports.blue += 1; feverCombo(rt.sports, d.x, d.y); renderSportsBar(); }
     floatText(d.x, d.y - 12, '+' + fmt(v), 'gold');
+    if (!rt.sports) fxPick(d);   // 5.2.1 효과층: 반짝이와 도토리가 위쪽 도토리 숫자로 날아가요(운동회 공은 그대로)
     sfx('coin'); buzz(12);
     removeDrop(d);
     renderHUD(); renderAffordance();
