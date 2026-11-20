@@ -30047,7 +30047,7 @@ body.mg-on .toast[hidden]{display:none}
     FXL.tex.dot = app.renderer.generateTexture(new P.Graphics().circle(0, 0, 4).fill(0xffffff));
     if (!FXL.tex.ic_acorn) { FXL.st = 'no'; cv.remove(); return; }
     FXL.st = 'ok';
-    setTimeout(() => { try { ['fxe_conf_1', 'fxe_conf_2', 'fxe_conf_3', 'fxe_conf_4', 'fxe_bit', 'fxe_spark', 'fxe_cap', 'fxe_tape_l', 'fxe_tape_r', 'fxe_beam', 'fxe_petal_1', 'fxe_petal_2', 'fxe_petal_3'].forEach(fxeTex); } catch (e) { /* 없으면 코드 모양 */ } }, 2000);   // 5.3.0.1 행사 그림(작업지시서 103) 미리 받기
+    setTimeout(() => { try { ['fxe_conf_1', 'fxe_conf_2', 'fxe_conf_3', 'fxe_conf_4', 'fxe_bit', 'fxe_spark', 'fxe_cap', 'fxe_tape_l', 'fxe_tape_r', 'fxe_beam', 'fxe_petal_1', 'fxe_petal_2', 'fxe_petal_3', 'tr_leaf_2'].forEach(fxeTex); } catch (e) { /* 없으면 코드 모양 */ } }, 2000);   // 5.3.0.1 행사 그림(작업지시서 103) 미리 받기
   }
   const fxRnd = (a, b) => a + Math.random() * (b - a);   // 반짝이는 보통 섞기로 그려요(그림판 바탕이 투명이라 더하기 섞기는 거의 안 보여요)
   // 화면 자리(px) ↔ 지도 자리. 지도는 viewBox 0 -60 360 540이라 왼쪽 위가 (0, -60)
@@ -30110,13 +30110,22 @@ body.mg-on .toast[hidden]{display:none}
       FXL.parts.push({ s, vx: Math.cos(a) * sp, vy: Math.sin(a) * sp * 0.6 - (o.up || 0), rot: fxRnd(-3, 3), life: o.life * fxRnd(0.8, 1.2), max: o.life, g: o.g || 0, flut: o.flut || 0, ph: fxRnd(0, 6) }); }
   }
   // 참나무를 흔들었어요(누를 때마다). 연타하면 더 크게(최대 oakMax)
+  const fxOakTh = () => { try { return (S && S.cos && S.cos.th && thOn().bg) || ''; } catch (e) { return ''; } };
   function fxOak() {
     if (!fxOn()) return false;
     const o = FXL.oak; o.s = -o.s || 1; const w = Math.sqrt(FXC.oakW);
     o.v = o.s * Math.min(FXC.oakMax * w * 1.6, Math.abs(o.v) + FXC.oakDeg * w * 1.6);   // 감쇠 때문에 1.6배를 줘야 처음 꼭대기가 oakDeg쯤
-    const [x, y, r] = oakAt(), lt = [FXL.tex.fx_leaf_1, FXL.tex.fx_leaf_2].filter(Boolean), n = Math.round(fxRnd(FXC.leaves[0], FXC.leaves[1]));
+    // 5.3.0.2 woodani: 잎 색을 테마에 맞춰요. 봄은 벚꽃잎, 가을은 노랗고 붉은 잎, 겨울과 크리스마스는 앙상한 가지라 잎 대신 가지에 쌓인 눈가루만
+    const [x, y, r] = oakAt(), bg = fxOakTh(), n = Math.round(fxRnd(FXC.leaves[0], FXC.leaves[1]));
+    if (bg === 'winter' || bg === 'xmas') {
+      for (let i = 0; i < 5; i++) { const a = fxRnd(0, Math.PI * 2), d = Math.sqrt(Math.random()) * r * 0.7;
+        fxBurst(x + Math.cos(a) * d, y - r * 0.4 + Math.sin(a) * d * 0.5, 1, { tex: FXL.tex.dot, sz: fxRnd(2.5, 4), sp: 12, up: 4, life: fxRnd(1.2, 1.8), g: 22, flut: 10, tint: 0xffffff }); }
+      fxKick(); return true;
+    }
+    const lt = bg === 'spring' ? ['fxe_petal_1', 'fxe_petal_2', 'fxe_petal_3'].map(fxeTex) : bg === 'autumn' ? [fxeTex('tr_leaf_2'), fxeTex('tr_leaf_2'), FXL.tex.fx_leaf_1].filter(Boolean) : [FXL.tex.fx_leaf_1, FXL.tex.fx_leaf_2].filter(Boolean);
+    const tn = i => bg === 'autumn' ? [0xffffff, 0xffa060, 0xe0602a][i % 3] : 0;
     for (let i = 0; i < n; i++) { const a = fxRnd(0, Math.PI * 2), d = Math.sqrt(Math.random()) * r * 0.75;
-      fxBurst(x + Math.cos(a) * d, y - r * 0.35 + Math.sin(a) * d * 0.6, 1, { tex: lt.length ? lt[i % lt.length] : FXL.tex.dot, sz: fxRnd(9, 13), sp: 26, up: 10, life: fxRnd(1.6, 2.4), g: 26, flut: 22, tint: lt.length ? 0 : 0x8fbf4a }); }
+      fxBurst(x + Math.cos(a) * d, y - r * 0.35 + Math.sin(a) * d * 0.6, 1, { tex: lt.length ? lt[i % lt.length] : FXL.tex.dot, sz: fxRnd(9, 13) * (bg === 'spring' ? 0.75 : 1), sp: 26, up: 10, life: fxRnd(1.6, 2.4), g: 26, flut: 22, tint: lt.length ? tn(i) : 0x8fbf4a }); }
     fxKick(); return true;
   }
   // 떨어진 도토리(d)를 가지 자리(sx, sy)에서 떨어뜨려요. 그동안 SVG 도토리는 숨겨요
