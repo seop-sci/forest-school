@@ -513,15 +513,18 @@
     const k = []; for (let i = 0; i <= 6; i++) { const f = (1 - i / 6) * px; k.push({ transform: `translate(${((i % 2 ? 1 : -1) * f).toFixed(1)}px,${((i % 3 - 1) * f * 0.6).toFixed(1)}px)` }); }
     w.animate(k, { duration: ms, easing: 'linear' });
   }
-  function tamHitFx(el, cr, big) {
+  function tamHitFx(el, cr, big, ri) {
+    fxTamHit(el, cr, big, ri);   // 5.2.2 탐험 효과층(40b-fx-layer.js): 과목 색 반짝이, 먼지, 충격 고리
     const [x, y] = tamAt(el), rot = Math.round(Math.random() * 90);
     // 4.4.0 강한 한 방은 금빛 별(ex4_fx_crit), 필살기는 큰 불꽃(ex4_fx_hit_big)과 충격파(ex4_fx_shock)
     const hs = (cr && IMG('ex4_fx_crit')) || (big && IMG('ex4_fx_hit_big')) || tamI('ex_fx_hit');
+    if (fxTamOn()) fxTamKick();
     if (big && IMG('ex4_fx_shock')) tamFxImg('tm-shock', IMG('ex4_fx_shock'), x, y, [{ t: 'scale(.2)', opacity: 0.9 }, { t: 'scale(1.2)', opacity: 0 }], 520);
     tamFxImg('tm-spark', hs, x + (Math.random() - 0.5) * 12, y, [{ t: `scale(.3) rotate(${rot}deg)`, opacity: 1 }, { t: `scale(${cr ? 1.7 : 1.1}) rotate(${rot + 30}deg)`, opacity: 1, offset: 0.4 }, { t: `scale(${cr ? 2 : 1.3}) rotate(${rot + 40}deg)`, opacity: 0 }], 360);
   }
   // 4.3.3 woodani 요청(공격이 다 똑같아요): 과목마다 다른 평소 공격. 과학은 포물선 플라스크와 거품, 국어는 물결 음표 셋, 미술은 물감 방울 셋, 수학은 빠른 별과 잔상(체육은 붙어서 들이받기)
   function tamShot(fromEl, toEl, ri, onHit) {
+    if (fxTamOn()) { if (FXT.st !== 'ok') fxTamInit(); else fxTamKick(); }   // 5.2.2 날아가는 기술 그림 뒤 반짝이 꼬리
     const src = tamI(`ex_fx_${TAM.role[ri].k}`); if (!src || !fromEl || !toEl) { if (onHit) onHit(); return; }
     const [x0, y0] = tamAt(fromEl, 0.4), [x1, y1] = tamAt(toEl, 0.45), dx = x1 - x0, dy = y1 - y0;
     const fly = (ms, arc, spin, sc, ox, oy, ease) => tamFxImg('tm-shot', src, x0, y0, [{ t: `scale(${0.5 * sc}) rotate(0deg)`, opacity: 0.3 }, { dx: dx * 0.5 + (ox || 0) / 2, dy: dy * 0.5 + arc + (oy || 0) / 2, t: `scale(${sc}) rotate(${spin / 2}deg)`, opacity: 1, offset: 0.5 }, { dx: dx + (ox || 0), dy: dy + (oy || 0), t: `scale(${1.1 * sc}) rotate(${spin}deg)`, opacity: 1 }], ms, ease || 'linear');
@@ -540,6 +543,7 @@
     }
   }
   function tamDropFx(el, fl) {
+    fxTamDrop(el, fl);   // 5.2.2 탐험 효과층: 도토리와 재료가 튀어 바닥에 굴러요(그림만)
     const [x, y] = tamAt(el, 0.5), src = IMG(['ex_mat_twig', 'ex_mat_stone', 'ex_mat_petal'][tamReg(fl).mat] || 'ex_mat_star') || IMG('ex_mat_star');
     tamFxImg('tm-poof', tamI('ex_fx_poof'), x, y, [{ t: 'scale(.4)', opacity: 1 }, { t: 'scale(1.3)', opacity: 0 }], 520);
     const st = $('#tmFx').getBoundingClientRect();
@@ -553,11 +557,11 @@
       if (e.k === 'act' || e.k === 'big') {
         actor = e.p; sk = null; const el = P[e.p], im = el && el.querySelector('img'); if (!el) return;
         if (e.k === 'big') { const nx = F.ev.slice(ei + 1).find(x => x.k === 'hit'); sk = tamSkillFx(F, e.p, nx ? nx.m : 0); const sp = F.P[e.p].sp; skAt(sk.hit - 900, () => { const a = IMG(`ex4_pc_${sp}_sk`) || tamI(`ex_pc_${sp}_act`); if (a && im) { im.src = a; clearTimeout(el._t); el._t = setTimeout(() => { im.src = tamPcPic(sp); }, 1400); } }); return; }
-        el.classList.remove('act', 'far'); void el.offsetWidth; el.classList.add('act'); if (e.ri !== 1) el.classList.add('far');
+        el.classList.remove('act', 'far'); void el.offsetWidth; el.classList.add('act'); if (e.ri !== 1) el.classList.add('far'); fxTamDust(el);
         const a = IMG(`ex4_pc_${F.P[e.p].sp}_atk`) || tamI(`ex_pc_${F.P[e.p].sp}_act`); if (a && im) { im.src = a; clearTimeout(el._t); el._t = setTimeout(() => { im.src = tamPcPic(F.P[e.p].sp); }, 520); }   // 4.4.0 공격 자세(작업지시서 78)
       } else if (e.k === 'hit') {
         const el = M[e.m], d = fmt(Math.max(1, Math.round(e.d))), cr = e.cr, fromEl = actor >= 0 ? P[actor] : null, ri = actor >= 0 ? F.P[actor].ri : 1, bigHit = !!sk;
-        const land = () => { el.classList.remove('hurt'); void el.offsetWidth; el.classList.add('hurt'); tamHitPic(el, F.M[e.m] && !F.M[e.m].boss ? `ex_mob_${tamReg(F.fl).k}_${F.M[e.m].i + 1}_hit` : ''); tamHitFx(el, cr, bigHit); tamFloat(el, d, cr || bigHit ? 'cr' : ''); if (cr && !bigHit) { tamShake(5, 260); tamPunch(); } };
+        const land = () => { el.classList.remove('hurt'); void el.offsetWidth; el.classList.add('hurt'); tamHitPic(el, F.M[e.m] && !F.M[e.m].boss ? `ex_mob_${tamReg(F.fl).k}_${F.M[e.m].i + 1}_hit` : ''); tamHitFx(el, cr, bigHit, ri); tamFloat(el, d, cr || bigHit ? 'cr' : ''); if (cr && !bigHit) { tamShake(5, 260); tamPunch(); } };
         if (bigHit) skAt(sk.hit, () => { land(); tamBars(F); }); else if (ri === 1 || !fromEl) land(); else tamShot(fromEl, el, ri, land);
       }
       else if (e.k === 'heal') { const el = P[e.p], hf = f => sk ? skAt(sk.heal, f) : f(); hf(() => { if (sk && IMG('ex4_sk_kor_heal')) { const [hx, hy] = tamAt(el, 0.55); tamFxImg('tm-pillar', IMG('ex4_sk_kor_heal'), hx, hy, [{ t: 'scaleY(.2)', opacity: 0 }, { t: 'scaleY(1)', opacity: 1, offset: 0.35 }, { dy: -10, t: 'scaleY(1.05)', opacity: 0 }], 1000); } tamFloat(el, '+' + fmt(Math.round(e.d)), 'heal'); const [x, y] = tamAt(el); tamFxImg('tm-spark', tamI('ex_fx_heal'), x, y, [{ t: 'scale(.4)', opacity: 0 }, { t: 'scale(1.2)', opacity: 1, offset: 0.4 }, { dy: -16, t: 'scale(1.4)', opacity: 0 }], 600); }); }
@@ -894,6 +898,7 @@
     }
   }
   function tamOpen() {
+    if (FXL.st === 'ok' && !FXT.st) fxTamInit();   // 5.2.2 탐험 효과층을 미리 준비
     if (!tamOn()) return;
     if (!S.tam.seen) { S.tam.seen = 1; S.tam.it = S.tam.it || gameNow(); save();   // 4.3.1 처음 열면 소개 장면(자동 시험에서는 __TAM_INTRO일 때만)
       const shown = !(window.__FOREST_TEST && !window.__TAM_INTRO) && stPlay('tam', false);

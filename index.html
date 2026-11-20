@@ -2,7 +2,7 @@
 <html lang="ko">
 <head>
 <meta charset="utf-8">
-<meta name="forest-version" content="5.2.1">
+<meta name="forest-version" content="5.2.2">
 <meta name="viewport" content="width=device-width, initial-scale=1">
 <meta name="description" content="도토리를 모아 숲속 학교를 키우는 방치형 게임 테스트판이에요.">
 <style>html,body{margin:0}</style>
@@ -758,6 +758,7 @@ label.srow,button.srow{cursor:pointer}
 @keyframes tmJump{0%{transform:none}30%{transform:translateY(-26%)}60%{transform:translateY(-18%)}100%{transform:none}}
 .tm-fxl{position:absolute;inset:0;pointer-events:none;overflow:hidden}
 .tm-fxl img,.tm-fxl span{position:absolute;left:0;top:0;pointer-events:none}
+.tm-fxl canvas.fxt{position:absolute;left:0;top:0;pointer-events:none}   /* 5.2.2 탐험 효과층(PixiJS) */
 .tm-shot{width:15%;aspect-ratio:1;object-fit:contain;filter:drop-shadow(0 0 6px rgba(255,255,255,.9))}
 .tm-spark{width:17%;aspect-ratio:1;object-fit:contain}
 .tm-poof{width:26%;aspect-ratio:1;object-fit:contain}
@@ -3944,7 +3945,7 @@ body.mg-on .toast[hidden]{display:none}
     <p class="boot-step" id="bootStep">학교 문을 여는 중...</p>
     <p class="boot-tip" id="bootTip">학교 문을 여는 중이에요</p>
   </div>
-  <span class="boot-ver" id="bootVer">v5.2.1</span>
+  <span class="boot-ver" id="bootVer">v5.2.2</span>
 </div>
 
 <div class="app on-school" id="app">
@@ -4539,7 +4540,7 @@ body.mg-on .toast[hidden]{display:none}
       </div>
       <h3 class="panel-sub">정보</h3>
       <dl class="info">
-        <div id="verRow"><dt>버전</dt><dd>v5.2.1</dd></div>
+        <div id="verRow"><dt>버전</dt><dd>v5.2.2</dd></div>
         <div id="pidRow" hidden><dt>학교 번호</dt><dd id="infoPid"></dd></div>
       </dl>
       <div id="devBox" hidden>
@@ -14678,8 +14679,8 @@ body.mg-on .toast[hidden]{display:none}
        forest/rank/<내 id>   랭킹 이름과 학교 점수
        forest/stats/<내 id>  테스트 현황 (어디까지 했는지, 얼마나 했는지)
      <내 id>는 Firebase 익명 로그인이 기기(브라우저)마다 만들어 줘요. */
-  const VERSION = '5.2.1';   // 2026-11-17 woodani 결정: 웹에 5.0.2~5.0.5로 먼저 냈던 것을 앱과 함께 5.0.1 하나로 내요(버전 견줌은 앞 두 자리만 봐서 되돌아가도 괜찮아요)
-  const NT_QUIET = ['5.2.1', '5.2.0.2', '5.2.0.1', '5.1.1.3', '5.1.1.2', '5.1.1.1', '5.1.1', '5.0.3.1', '5.0.3', '5.0.2.2', '5.0.2.1', '2.1.20', '2.1.2.2', '2.3.0.1', '2.3.4', '3.2.3', '3.2.4', '3.2.5', '3.3.1', '3.3.2', '3.3.3', '4.4.1.1', '4.4.1.2', '4.4.1.3', '4.4.1.4', '5.0.1.1', '5.0.1.2', '5.0.1.3', '5.0.1.4', '5.0.1.5', '5.0.1.6', '5.0.1.7', '5.0.1.8'];   // 5.0.1.1 생물 탐사 고침은 공지 없이   // 5.0.3도 공지 없이(공지 줄은 woodani가 정하면 넣어요)   // 5.0.2 공지 없이(woodani 2026-11-16)   // 5.0.1 공지 줄은 woodani가 정할 때까지 조용히   // 5.0.0 공지는 2026-11-16 woodani가 정해서 NOTICES로 옮겼어요   // 4.4.1(앱과 함께 내는 판)은 공지를 띄워요   // 4.4.1도 공지 없이(woodani)   // 3.3.1, 3.3.2, 3.3.3(토스 먼저)도 공지 창 없이(woodani). 2.3.0.1도 공지 창 없이(공지는 그대로 2.3.0). 2.3.4도 조용히(woodani 결정). 3.2.3, 3.2.4, 3.2.5도 공지 창 없이(공지 줄을 고르지 않음)
+  const VERSION = '5.2.2';   // 2026-11-17 woodani 결정: 웹에 5.0.2~5.0.5로 먼저 냈던 것을 앱과 함께 5.0.1 하나로 내요(버전 견줌은 앞 두 자리만 봐서 되돌아가도 괜찮아요)
+  const NT_QUIET = ['5.2.2', '5.2.1', '5.2.0.2', '5.2.0.1', '5.1.1.3', '5.1.1.2', '5.1.1.1', '5.1.1', '5.0.3.1', '5.0.3', '5.0.2.2', '5.0.2.1', '2.1.20', '2.1.2.2', '2.3.0.1', '2.3.4', '3.2.3', '3.2.4', '3.2.5', '3.3.1', '3.3.2', '3.3.3', '4.4.1.1', '4.4.1.2', '4.4.1.3', '4.4.1.4', '5.0.1.1', '5.0.1.2', '5.0.1.3', '5.0.1.4', '5.0.1.5', '5.0.1.6', '5.0.1.7', '5.0.1.8'];   // 5.0.1.1 생물 탐사 고침은 공지 없이   // 5.0.3도 공지 없이(공지 줄은 woodani가 정하면 넣어요)   // 5.0.2 공지 없이(woodani 2026-11-16)   // 5.0.1 공지 줄은 woodani가 정할 때까지 조용히   // 5.0.0 공지는 2026-11-16 woodani가 정해서 NOTICES로 옮겼어요   // 4.4.1(앱과 함께 내는 판)은 공지를 띄워요   // 4.4.1도 공지 없이(woodani)   // 3.3.1, 3.3.2, 3.3.3(토스 먼저)도 공지 창 없이(woodani). 2.3.0.1도 공지 창 없이(공지는 그대로 2.3.0). 2.3.4도 조용히(woodani 결정). 3.2.3, 3.2.4, 3.2.5도 공지 창 없이(공지 줄을 고르지 않음)
     // 2.1.20 woodani 결정: 이 버전들은 업데이트해도 공지 창을 띄우지 않아요(공지는 그대로 2.1.2)
   /* 2.0.0 공지사항 (2026-10-27 woodani, 1.8.0은 이미 올려서 2.0.0부터): 설정 > 공지사항. 맨 위가 가장 새 공지예요.
      패치노트는 자동으로 넣지 않아요. woodani가 검수한 글만 여기에 적어요(CHANGELOG.md는 자세한 기록용이라 따로 있어요).
@@ -17030,15 +17031,18 @@ body.mg-on .toast[hidden]{display:none}
     const k = []; for (let i = 0; i <= 6; i++) { const f = (1 - i / 6) * px; k.push({ transform: `translate(${((i % 2 ? 1 : -1) * f).toFixed(1)}px,${((i % 3 - 1) * f * 0.6).toFixed(1)}px)` }); }
     w.animate(k, { duration: ms, easing: 'linear' });
   }
-  function tamHitFx(el, cr, big) {
+  function tamHitFx(el, cr, big, ri) {
+    fxTamHit(el, cr, big, ri);   // 5.2.2 탐험 효과층(40b-fx-layer.js): 과목 색 반짝이, 먼지, 충격 고리
     const [x, y] = tamAt(el), rot = Math.round(Math.random() * 90);
     // 4.4.0 강한 한 방은 금빛 별(ex4_fx_crit), 필살기는 큰 불꽃(ex4_fx_hit_big)과 충격파(ex4_fx_shock)
     const hs = (cr && IMG('ex4_fx_crit')) || (big && IMG('ex4_fx_hit_big')) || tamI('ex_fx_hit');
+    if (fxTamOn()) fxTamKick();
     if (big && IMG('ex4_fx_shock')) tamFxImg('tm-shock', IMG('ex4_fx_shock'), x, y, [{ t: 'scale(.2)', opacity: 0.9 }, { t: 'scale(1.2)', opacity: 0 }], 520);
     tamFxImg('tm-spark', hs, x + (Math.random() - 0.5) * 12, y, [{ t: `scale(.3) rotate(${rot}deg)`, opacity: 1 }, { t: `scale(${cr ? 1.7 : 1.1}) rotate(${rot + 30}deg)`, opacity: 1, offset: 0.4 }, { t: `scale(${cr ? 2 : 1.3}) rotate(${rot + 40}deg)`, opacity: 0 }], 360);
   }
   // 4.3.3 woodani 요청(공격이 다 똑같아요): 과목마다 다른 평소 공격. 과학은 포물선 플라스크와 거품, 국어는 물결 음표 셋, 미술은 물감 방울 셋, 수학은 빠른 별과 잔상(체육은 붙어서 들이받기)
   function tamShot(fromEl, toEl, ri, onHit) {
+    if (fxTamOn()) { if (FXT.st !== 'ok') fxTamInit(); else fxTamKick(); }   // 5.2.2 날아가는 기술 그림 뒤 반짝이 꼬리
     const src = tamI(`ex_fx_${TAM.role[ri].k}`); if (!src || !fromEl || !toEl) { if (onHit) onHit(); return; }
     const [x0, y0] = tamAt(fromEl, 0.4), [x1, y1] = tamAt(toEl, 0.45), dx = x1 - x0, dy = y1 - y0;
     const fly = (ms, arc, spin, sc, ox, oy, ease) => tamFxImg('tm-shot', src, x0, y0, [{ t: `scale(${0.5 * sc}) rotate(0deg)`, opacity: 0.3 }, { dx: dx * 0.5 + (ox || 0) / 2, dy: dy * 0.5 + arc + (oy || 0) / 2, t: `scale(${sc}) rotate(${spin / 2}deg)`, opacity: 1, offset: 0.5 }, { dx: dx + (ox || 0), dy: dy + (oy || 0), t: `scale(${1.1 * sc}) rotate(${spin}deg)`, opacity: 1 }], ms, ease || 'linear');
@@ -17057,6 +17061,7 @@ body.mg-on .toast[hidden]{display:none}
     }
   }
   function tamDropFx(el, fl) {
+    fxTamDrop(el, fl);   // 5.2.2 탐험 효과층: 도토리와 재료가 튀어 바닥에 굴러요(그림만)
     const [x, y] = tamAt(el, 0.5), src = IMG(['ex_mat_twig', 'ex_mat_stone', 'ex_mat_petal'][tamReg(fl).mat] || 'ex_mat_star') || IMG('ex_mat_star');
     tamFxImg('tm-poof', tamI('ex_fx_poof'), x, y, [{ t: 'scale(.4)', opacity: 1 }, { t: 'scale(1.3)', opacity: 0 }], 520);
     const st = $('#tmFx').getBoundingClientRect();
@@ -17070,11 +17075,11 @@ body.mg-on .toast[hidden]{display:none}
       if (e.k === 'act' || e.k === 'big') {
         actor = e.p; sk = null; const el = P[e.p], im = el && el.querySelector('img'); if (!el) return;
         if (e.k === 'big') { const nx = F.ev.slice(ei + 1).find(x => x.k === 'hit'); sk = tamSkillFx(F, e.p, nx ? nx.m : 0); const sp = F.P[e.p].sp; skAt(sk.hit - 900, () => { const a = IMG(`ex4_pc_${sp}_sk`) || tamI(`ex_pc_${sp}_act`); if (a && im) { im.src = a; clearTimeout(el._t); el._t = setTimeout(() => { im.src = tamPcPic(sp); }, 1400); } }); return; }
-        el.classList.remove('act', 'far'); void el.offsetWidth; el.classList.add('act'); if (e.ri !== 1) el.classList.add('far');
+        el.classList.remove('act', 'far'); void el.offsetWidth; el.classList.add('act'); if (e.ri !== 1) el.classList.add('far'); fxTamDust(el);
         const a = IMG(`ex4_pc_${F.P[e.p].sp}_atk`) || tamI(`ex_pc_${F.P[e.p].sp}_act`); if (a && im) { im.src = a; clearTimeout(el._t); el._t = setTimeout(() => { im.src = tamPcPic(F.P[e.p].sp); }, 520); }   // 4.4.0 공격 자세(작업지시서 78)
       } else if (e.k === 'hit') {
         const el = M[e.m], d = fmt(Math.max(1, Math.round(e.d))), cr = e.cr, fromEl = actor >= 0 ? P[actor] : null, ri = actor >= 0 ? F.P[actor].ri : 1, bigHit = !!sk;
-        const land = () => { el.classList.remove('hurt'); void el.offsetWidth; el.classList.add('hurt'); tamHitPic(el, F.M[e.m] && !F.M[e.m].boss ? `ex_mob_${tamReg(F.fl).k}_${F.M[e.m].i + 1}_hit` : ''); tamHitFx(el, cr, bigHit); tamFloat(el, d, cr || bigHit ? 'cr' : ''); if (cr && !bigHit) { tamShake(5, 260); tamPunch(); } };
+        const land = () => { el.classList.remove('hurt'); void el.offsetWidth; el.classList.add('hurt'); tamHitPic(el, F.M[e.m] && !F.M[e.m].boss ? `ex_mob_${tamReg(F.fl).k}_${F.M[e.m].i + 1}_hit` : ''); tamHitFx(el, cr, bigHit, ri); tamFloat(el, d, cr || bigHit ? 'cr' : ''); if (cr && !bigHit) { tamShake(5, 260); tamPunch(); } };
         if (bigHit) skAt(sk.hit, () => { land(); tamBars(F); }); else if (ri === 1 || !fromEl) land(); else tamShot(fromEl, el, ri, land);
       }
       else if (e.k === 'heal') { const el = P[e.p], hf = f => sk ? skAt(sk.heal, f) : f(); hf(() => { if (sk && IMG('ex4_sk_kor_heal')) { const [hx, hy] = tamAt(el, 0.55); tamFxImg('tm-pillar', IMG('ex4_sk_kor_heal'), hx, hy, [{ t: 'scaleY(.2)', opacity: 0 }, { t: 'scaleY(1)', opacity: 1, offset: 0.35 }, { dy: -10, t: 'scaleY(1.05)', opacity: 0 }], 1000); } tamFloat(el, '+' + fmt(Math.round(e.d)), 'heal'); const [x, y] = tamAt(el); tamFxImg('tm-spark', tamI('ex_fx_heal'), x, y, [{ t: 'scale(.4)', opacity: 0 }, { t: 'scale(1.2)', opacity: 1, offset: 0.4 }, { dy: -16, t: 'scale(1.4)', opacity: 0 }], 600); }); }
@@ -17411,6 +17416,7 @@ body.mg-on .toast[hidden]{display:none}
     }
   }
   function tamOpen() {
+    if (FXL.st === 'ok' && !FXT.st) fxTamInit();   // 5.2.2 탐험 효과층을 미리 준비
     if (!tamOn()) return;
     if (!S.tam.seen) { S.tam.seen = 1; S.tam.it = S.tam.it || gameNow(); save();   // 4.3.1 처음 열면 소개 장면(자동 시험에서는 __TAM_INTRO일 때만)
       const shown = !(window.__FOREST_TEST && !window.__TAM_INTRO) && stPlay('tam', false);
@@ -30035,7 +30041,7 @@ body.mg-on .toast[hidden]{display:none}
     if (!FXL.tex.ic_acorn) { FXL.st = 'no'; cv.remove(); return; }
     FXL.st = 'ok';
   }
-  const fxRnd = (a, b) => a + Math.random() * (b - a);
+  const fxRnd = (a, b) => a + Math.random() * (b - a);   // 반짝이는 보통 섞기로 그려요(그림판 바탕이 투명이라 더하기 섞기는 거의 안 보여요)
   // 화면 자리(px) ↔ 지도 자리. 지도는 viewBox 0 -60 360 540이라 왼쪽 위가 (0, -60)
   function fxMapPt(cx, cy) { const R = $('#map').getBoundingClientRect(), k = R.width / 360 || 1; return [(cx - R.left) / k, (cy - R.top) / k - 60]; }
   function fxKick() { if (FXL.st === 'ok' && !FXL.raf) { FXL.last = performance.now(); FXL.raf = requestAnimationFrame(fxFrame); } }
@@ -30087,7 +30093,7 @@ body.mg-on .toast[hidden]{display:none}
   function fxBurst(x, y, n, o) {
     if (!o.tex) return;
     for (let i = 0; i < n; i++) { const s = fxSprite(o.tex, x, y, o.sz * fxRnd(0.7, 1.25)), a = o.ang != null ? o.ang + fxRnd(-o.spread, o.spread) : fxRnd(0, Math.PI * 2), sp = o.sp * fxRnd(0.5, 1.3);
-      if (o.tint) s.tint = Array.isArray(o.tint) ? o.tint[(Math.random() * o.tint.length) | 0] : o.tint; if (o.add) s.blendMode = 'add';
+      if (o.tint) s.tint = Array.isArray(o.tint) ? o.tint[(Math.random() * o.tint.length) | 0] : o.tint; 
       FXL.parts.push({ s, vx: Math.cos(a) * sp, vy: Math.sin(a) * sp * 0.6 - (o.up || 0), rot: fxRnd(-3, 3), life: o.life * fxRnd(0.8, 1.2), max: o.life, g: o.g || 0, flut: o.flut || 0, ph: fxRnd(0, 6) }); }
   }
   // 참나무를 흔들었어요(누를 때마다). 연타하면 더 크게(최대 oakMax)
@@ -30126,6 +30132,83 @@ body.mg-on .toast[hidden]{display:none}
   document.addEventListener('visibilitychange', () => { if (document.hidden && FXL.st === 'ok') fxClear(); });
   if (motionMQ && motionMQ.addEventListener) motionMQ.addEventListener('change', e => { if (e.matches && FXL.st === 'ok') fxClear(); });
   window.addEventListener('load', () => setTimeout(fxLoad, 1500));
+
+  /* ---------- 5.2.2 탐험 효과층(2026-11-20 woodani '탐험도 인게임에서'): 탐험 무대(#tmFx) 안에 그림판(canvas.fxt)을 한 장 더 ----------
+     지금 탐험 연출(대원 공격 자세, 날아가는 기술 그림, 숫자, 흔들림, 필살기 장면)은 그대로 두고 그 위에 더해요.
+     맞을 때 과목 색 반짝이와 먼지, 강한 한 방은 더 크게, 필살기는 충격 고리, 날아가는 기술 그림 뒤 반짝이 꼬리, 쓰러지면 도토리와 재료가 튀어 바닥에 굴러요.
+     재화, 전투 결과, 저장은 그대로예요. 탐험 탭이 아니거나 창이 열리면 지워요 */
+  const FXT = { st: '', app: null, w: null, parts: [], rings: [], raf: 0, last: 0, sc: 1 };
+  const fxTamOn = () => FXL.st === 'ok' && !rt.reduced && tamFxOn();
+  const FXT_COL = { sci: [0x9df0ff, 0x6fd3ff, 0xffffff], kor: [0xffe27a, 0xfff6c8, 0xffffff], art: [0xff8ac4, 0xffd36b, 0x8ad8ff], math: [0xfff27a, 0xffffff, 0xffc94a], pe: [0xffa45a, 0xffe27a, 0xffffff] };
+  async function fxTamInit() {
+    if (FXT.st || FXL.st !== 'ok') return; const box = $('#tmFx'); if (!box) return;
+    FXT.st = 'load';
+    try {
+      const P = window.PIXI, app = new P.Application();
+      await app.init({ width: Math.max(1, box.clientWidth), height: Math.max(1, box.clientHeight), backgroundAlpha: 0, antialias: true, resolution: Math.min(2, window.devicePixelRatio || 1), autoDensity: true, autoStart: false, sharedTicker: false, preference: 'webgl' });
+      app.ticker.stop(); const cv = app.canvas; cv.className = 'fxt'; cv.setAttribute('aria-hidden', 'true'); box.prepend(cv);
+      FXT.app = app; FXT.w = new P.Container(); app.stage.addChild(FXT.w);
+      const tx = k => new Promise(r => { const u = IMG(k); if (!u) { r(null); return; } const im = new Image(); im.onload = () => { try { r(P.Texture.from(im)); } catch (e) { r(null); } }; im.onerror = () => r(null); im.src = u; });
+      for (const k of ['ex_mat_twig', 'ex_mat_stone', 'ex_mat_petal', 'ex_mat_star']) FXL.tex[k] = FXL.tex[k] || await tx(k);
+      // 그려 만든 그림(RenderTexture)은 그 그림판에서만 써요. 탐험 그림판 것을 따로 만들어요
+      FXT.star = app.renderer.generateTexture(new P.Graphics().star(0, 0, 4, 8, 3).fill(0xffffff)); FXT.dot = app.renderer.generateTexture(new P.Graphics().circle(0, 0, 4).fill(0xffffff));
+      FXT.st = 'ok';
+    } catch (e) { FXT.st = 'no'; }
+  }
+  // 무대 자리: tamAt은 화면에서 잰 값(카메라 확대가 들어 있음)이라 그림판 칸으로 바꿔요
+  function fxTamAt(el, fy) { const box = $('#tmFx'); if (!box || !el) return null; const [x, y] = tamAt(el, fy), r = box.getBoundingClientRect(), k = box.clientWidth / (r.width || 1); return [x * k, y * k]; }
+  function fxTamKick() { if (FXT.st === 'ok' && !FXT.raf) { FXT.last = performance.now(); FXT.raf = requestAnimationFrame(fxTamFrame); } }
+  function fxTamClear() { for (const p of FXT.parts) if (!p.s.destroyed) p.s.destroy(); FXT.parts.length = 0; for (const g of FXT.rings) if (!g.g.destroyed) g.g.destroy(); FXT.rings.length = 0; if (FXT.app) FXT.app.render(); }
+  function fxTamPart(tex, x, y, sz, o) {
+    if (!tex) return; const s = new window.PIXI.Sprite(tex); s.anchor.set(0.5); s.x = x; s.y = y; s.scale.set(sz / (tex.width || 1)); if (o.tint) s.tint = o.tint;  FXT.w.addChild(s);
+    FXT.parts.push({ s, vx: o.vx || 0, vy: o.vy || 0, g: o.g || 0, rot: o.rot || 0, life: o.life, max: o.life, floor: o.floor, bounce: o.bounce || 0, n: 0, shrink: !!o.shrink, k0: s.scale.x });
+  }
+  function fxTamBurst(x, y, n, o) { for (let i = 0; i < n; i++) { const a = o.ang != null ? o.ang + fxRnd(-o.spread, o.spread) : fxRnd(0, Math.PI * 2), sp = o.sp * fxRnd(0.45, 1.25), cs = o.cols;
+    fxTamPart(o.tex, x, y, o.sz * fxRnd(0.6, 1.3), { vx: Math.cos(a) * sp, vy: Math.sin(a) * sp * (o.flat || 1) - (o.up || 0), g: o.g, rot: fxRnd(-6, 6), life: o.life * fxRnd(0.75, 1.25), tint: cs ? cs[(Math.random() * cs.length) | 0] : o.tint, add: o.add, shrink: o.shrink, floor: o.floor, bounce: o.bounce }); } }
+  // 맞았어요: el 맞은 장난꾸러기, cr 강한 한 방, big 필살기, ri 과목 번호(TAM.role)
+  function fxTamHit(el, cr, big, ri) {
+    if (!fxTamOn()) return; if (FXT.st !== 'ok') { fxTamInit(); return; }
+    const at = fxTamAt(el, 0.45), ft = fxTamAt(el, 0.98); if (!at) return;
+    const k = TAM.role[ri] ? TAM.role[ri].k : '', cols = FXT_COL[k] || [0xfff2a0, 0xffd36b, 0xffffff], W = FXT.app.screen.width;
+    fxTamBurst(at[0], at[1], big ? 34 : cr ? 20 : 10, { tex: FXT.star, sz: W * (big ? 0.05 : cr ? 0.045 : 0.038), sp: W * (big ? 0.9 : cr ? 0.7 : 0.45), up: W * 0.12, g: W * 1.4, life: big ? 0.8 : 0.55, cols, add: true, shrink: true });
+    if (ft) fxTamBurst(ft[0], ft[1], big ? 10 : 5, { tex: FXL.tex.fx_dust_1 || FXT.dot, sz: W * 0.05, sp: W * 0.18, flat: 0.25, up: W * 0.03, life: 0.6, tint: FXL.tex.fx_dust_1 ? 0xffffff : 0xd9c39a });
+    if (big || cr) { const g = new window.PIXI.Graphics(); g.x = at[0]; g.y = at[1]; FXT.w.addChild(g); FXT.rings.push({ g, t: 0, max: big ? 0.5 : 0.32, r: W * (big ? 0.42 : 0.2), col: big ? 0xfff2a0 : 0xffffff }); }
+    fxTamKick();
+  }
+  // 대원이 뛰어나가요: 발밑 먼지
+  function fxTamDust(el) {
+    if (!fxTamOn()) return; if (FXT.st !== 'ok') { fxTamInit(); return; }
+    const ft = fxTamAt(el, 0.98); if (!ft) return; const W = FXT.app.screen.width;
+    fxTamBurst(ft[0], ft[1], 4, { tex: FXL.tex.fx_dust_1 || FXT.dot, sz: W * 0.045, sp: W * 0.12, ang: Math.PI, spread: 0.5, flat: 0.3, up: W * 0.02, life: 0.5, tint: FXL.tex.fx_dust_1 ? 0xffffff : 0xd9c39a }); fxTamKick();
+  }
+  // 쓰러졌어요: 도토리와 그 지역 재료가 튀어 바닥에서 통통 굴러요(받는 양은 그대로, 그림만)
+  function fxTamDrop(el, fl) {
+    if (!fxTamOn()) return; if (FXT.st !== 'ok') { fxTamInit(); return; }
+    const at = fxTamAt(el, 0.5), ft = fxTamAt(el, 0.98); if (!at || !ft) return; const W = FXT.app.screen.width;
+    const mt = FXL.tex[['ex_mat_twig', 'ex_mat_stone', 'ex_mat_petal'][tamReg(fl).mat] || 'ex_mat_star'] || FXL.tex.ex_mat_star;
+    for (let i = 0; i < 9; i++) { const a = -Math.PI / 2 + fxRnd(-1.1, 1.1), sp = W * fxRnd(0.35, 0.7), tex = i % 3 === 0 && mt ? mt : FXL.tex.ic_acorn;
+      fxTamPart(tex, at[0], at[1], W * (tex === mt ? 0.06 : 0.05), { vx: Math.cos(a) * sp, vy: Math.sin(a) * sp, g: W * 2.6, rot: fxRnd(-8, 8), life: 1.1, floor: ft[1] + fxRnd(-W * 0.02, W * 0.02), bounce: 0.42 }); }
+    fxTamBurst(at[0], at[1], 14, { tex: FXT.star, sz: W * 0.03, sp: W * 0.5, up: W * 0.1, g: W, life: 0.6, cols: [0xffffff, 0xfff2a0, 0xffd36b], add: true, shrink: true });
+    fxTamKick();
+  }
+  function fxTamFrame(now) {
+    FXT.raf = 0; const dt = Math.min(0.05, Math.max(0, (now - FXT.last) / 1000)); FXT.last = now;
+    const app = FXT.app, box = $('#tmFx');
+    if (!fxTamOn() || !box) { fxTamClear(); return; }
+    if (app.screen.width !== box.clientWidth || app.screen.height !== box.clientHeight) app.renderer.resize(Math.max(1, box.clientWidth), Math.max(1, box.clientHeight));
+    // 날아가는 기술 그림(DOM .tm-shot) 뒤에 반짝이 꼬리
+    const shots = $$('#tmFx .tm-shot'), br = box.getBoundingClientRect(), kk = box.clientWidth / (br.width || 1), W = app.screen.width;
+    for (const sh of shots) { const r = sh.getBoundingClientRect(); if (!r.width || Math.random() < 0.35) continue;
+      fxTamPart(FXT.star, (r.left - br.left + r.width / 2) * kk, (r.top - br.top + r.height / 2) * kk, W * 0.022, { vx: fxRnd(-20, 20), vy: fxRnd(-20, 20), life: 0.35, tint: 0xfff2a0, add: true, shrink: true }); }
+    for (let i = FXT.parts.length - 1; i >= 0; i--) { const p = FXT.parts[i], s = p.s; p.life -= dt; p.vy += p.g * dt; s.x += p.vx * dt; s.y += p.vy * dt; s.rotation += p.rot * dt;
+      if (p.floor != null && s.y > p.floor && p.vy > 0) { s.y = p.floor; p.n++; p.vy = -p.vy * p.bounce; p.vx *= 0.6; p.rot *= 0.5; if (p.n > 3) { p.vy = 0; p.g = 0; p.vx *= 0.8; } }
+      const u = Math.max(0, p.life / p.max); s.alpha = p.floor != null ? Math.min(1, u * 3) : Math.min(1, u * 1.8); if (p.shrink) s.scale.set(p.k0 * (0.4 + 0.6 * u));
+      if (p.life <= 0) { s.destroy(); FXT.parts.splice(i, 1); } }
+    for (let i = FXT.rings.length - 1; i >= 0; i--) { const R = FXT.rings[i]; R.t += dt; const u = Math.min(1, R.t / R.max);
+      R.g.clear().circle(0, 0, R.r * (0.15 + 0.85 * u)).stroke({ color: R.col, width: Math.max(1, R.r * 0.12 * (1 - u)), alpha: 1 - u }); if (u >= 1) { R.g.destroy(); FXT.rings.splice(i, 1); } }
+    app.render();
+    if (FXT.parts.length || FXT.rings.length || shots.length) FXT.raf = requestAnimationFrame(fxTamFrame);
+  }
   /* ---------- 2.0.0 핫픽스(원격 설정, 2026-10-27 woodani) ----------
      웹 주소의 live.json을 켤 때 읽어요(웹, 안드로이드, 토스 모두). 코드는 받지 않고 숫자, 공지, 기능 끄기만 받아요.
      바꿀 수 있는 숫자는 LIVE_KEYS에 적은 것만이고, 값마다 최소와 최대 안으로 맞춰요. 받은 것은 이 기기에 남겨 두고 인터넷이 없을 때 써요.
@@ -30324,7 +30407,7 @@ body.mg-on .toast[hidden]{display:none}
     GSHOP, OUTFITS, evPastIds, renderNight, shopItem, essItem, buyEss, pickEss, nickPrice, grantOffline, thSetPrice, pickDeco, buyDeco, buyDecoBerry,   // 2.1.0 소풍, 스티커판, 상점
     LAB, LAB_IN, LAB_KEYS, LAB_CARDS, LAB_MIX, LAB_DBL, labOf, labRun, labCount, labReady, labDone, openLab, renderLab, labTap, labGo, RD, BOOKS, rdStart, rdSettle, rdTick, rdLeft, rdRemain, openRead, renderRead, renderStudy2, sanitizeStudy2, maintSync, maintTap, openBook, renderBook, BT, BT_EV, BT_LG, BT_SCH, btOpen, btLeft, btRoster, btBest, btMake, btScore, btWin, btFinish, btOpenScene, btClose, btRankDoc, readRow, btAuto, btPick, btStart, btRender, renderBtCard, sanitizeBt, get btUI() { return btUI; }, EX, exIsWeek, exNow, exPrev, exDays, exScore, exGrade, exStudy, exClaim, exTick, exMake, openExam, renderExam, exAwardTop, exReportReady, sanitizeExam, renderSheet, openSheet,   // 2.0.1 공부 2단계(s76)
     AC, AC_GAME, AB_KEY, ABIL, acLv, acSum, acMult, acRepOf, acGain, acSettle, acAll, acCap, acBkLeft, acBuyBook, renderAc, sanitizeAc, freshAc, rankRows, awayStart, awaySettle, timeSrc, save, awayHold, rankCap, cloudVerify, liveApply, liveLoad, openNotice, NOTICES, get Live() { return Live; }, get Rank() { return Rank; }, liveOff,   // 2.0.0 보안 점검 시험(s71), Codex 검토 시험(s72)
-    rosterEnsure, rosterMake, rosterAdd, clubAuto, clubSet, clubPct, clubShow, clubSum, clubStars, clubMembers, clubShowGo, conArtKey, FXL, fxOn, fxLoad, fxOak, dropValue, ppDecoSync, ppMedIc, PP_DECO, showReady, showReadyC, showQuestFree, showWait, showDay, clubWeekTick, clubFacUp, CLUBS, CLUB, star, clubTuitionMult, clubFestMult, clubDecoOff, renderClub, renderHall, openSeatPick, openClubPick,
+    rosterEnsure, rosterMake, rosterAdd, clubAuto, clubSet, clubPct, clubShow, clubSum, clubStars, clubMembers, clubShowGo, conArtKey, FXL, FXT, fxTamHitT: (...a) => fxTamHit(...a), fxTamDropT: (...a) => fxTamDrop(...a), fxOn, fxTamOn, fxTamInit, fxLoad, fxOak, dropValue, ppDecoSync, ppMedIc, PP_DECO, showReady, showReadyC, showQuestFree, showWait, showDay, clubWeekTick, clubFacUp, CLUBS, CLUB, star, clubTuitionMult, clubFestMult, clubDecoOff, renderClub, renderHall, openSeatPick, openClubPick,
     TIER_SCALE, renderCampus, zoneBadge, uniPreview, setZone, DEPT, openDept, renderDept, deptSet, deptPct, deptOf, deptPicks, deptSlots, deptMult, zoneKey, uniOn, zoneOf, ZONE_GEO, CAMPUS, GEO, geoIdx, legacyMult, tuitionMult, snapTake, snapOf, showCere, cereCrew, cere3Info, cere3Load, cere3, tierViewOpen, tierViewClose, renderTierView, renderTierDots, nlCycle, viewMap, showNewTalk, talkNext, showCere, cereEnd, cereCrew, cereAsk, cereKeep, goFur, updateQuestDot, openElect, renderElect, elVote, elSync, elMult, elClub, elPres, elBadge, elMake, EL_PLEDGES, clubPct, festPrize, dropValue, claimMission, gameWeek, NEWCOMERS, TIERS, GEO, geoIdx, decoCost0, qMeasure, qDone, qGoal, kidArt: kidSVG, newYear, checkGrade, gradeOf, townRep, FAC, sanitize200, trialHunt, updateTrial, TRIAL, zoomAt, fitMap, ZOOM_MAX, DECO, DECO_SLOTS, DECO_SIGN, decoCost, decoSoldOut, pickDeco, buyDeco, decoPut, decoEditStart, decoEditEnd, openDecoPick, renderDeco, setSchoolNm, setMark, schoolTitle, markHTML, decoPlacedAll, esExLeft, esExCost, get Cloud() { return Cloud; }, get actx() { return actx; }, Music, musicSync, ensureAudio, bgmLoad, pzUI, rt, makeDeal, furStage, DEAL, navInfo, navRoute, hudTheme, HUD_TH_COL, pathInfo, pathRoute, MAP_PATHS, spawnDrop, repTipCheck, linkGoogle, retryCloud, sanitize, acctPending, renderMap, renderHUD, renderAffordance, syncKids, layoutMap, geo, hitTrial, endVisit, showReward, recommend, needCost, prepTopUp, qReward, prepPhase, rankScore, pwOf, previewDip, dipMult, costScale, buyFur, buyFurAll, furCost, furReady, furDone, FUR, startTalk, endTalk, teacherAct, facCost, teaCost, facKeys, rate, rep, capacity, canGraduate, canPromote,
     fmt, fmt2, graduate, promote, buyPerk, perkCost, perkMaxed, buyFundPerk, fpCost, claimMain, mainReady, curMain, qNo, earn, CFG, TEA, teaMaxed, PERKS, FPERKS, MAIN, finalYear, startTrip, claimTrip, TRIPS, yearLocked, endSports, rtSports: () => rt.sports, rtFest: () => rt.fest, facCap, addLeague, addMP, tutStart, endFest, claimBox, musicWant, askBox, festWait, setTab,
     RARE, modelOf, rareRoll, rareGot, showRareTalk, rareDexHTML, kidSVG, rosterKid, WX, wxOf, wxIs, rdMinNow, renderWeather, PL, plSync, plUnread, openPLetter, renderPLetter, RS, rsNum, rsSync, rsAdd, rsLabel, lookDoc, lookRead, lookPush, lookSet, openLook, MODEL_SCHOOL, joinRank, PS, PS_M, PS_SEASONS, psSeason, psOpen, psSync, psLv, psGot, psReward, psClaimAll, psClaimMission, psWatchAd, psClaimable, psStepReady, psExtraReady, psChooseFur, psFurImg, renderPass, setEvSeg, xtGot, achTitles,   // 2.1.3 숲속 패스
