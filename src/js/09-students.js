@@ -170,7 +170,8 @@
     k.pw = null;
   }
   function placeKid(k, bob) {
-    const tf = `translate(${k.x.toFixed(1)} ${(k.y + bob).toFixed(1)}) scale(${geo().campus ? 0.72 : 1.1})`;   // 4.0.0 캠퍼스 지도는 건물이 작게 그려져 있어 학생도 작게
+    const sc = geo().campus ? 0.72 : 1.1, ln = k.lean || 0, jy = k.jY || 0, sq = k.sq || 0;   // 5.3.0 행사 효과: 기울기(도), 점프 높이, 찌그러짐(fxeStep)
+    const tf = `translate(${k.x.toFixed(1)} ${(k.y + bob - jy).toFixed(1)})` + (ln ? ` rotate(${ln.toFixed(1)})` : '') + (sq ? ` scale(${(sc * (1 + sq)).toFixed(3)} ${(sc * (1 - sq)).toFixed(3)})` : ` scale(${sc})`);   // 4.0.0 캠퍼스 지도는 건물이 작게 그려져 있어 학생도 작게
     if (k.tf === tf) return;   // 3.2.6 끊김: 서 있는 학생은 같은 값을 다시 쓰지 않아요(지도 전체를 다시 그리게 돼서)
     k.tf = tf; k.g.setAttribute('transform', tf);
   }
@@ -320,6 +321,7 @@
     rt.drops.push(d);
     const fall = g.querySelector('.drop-fall');
     if (rt.sports) {   // 운동회 공은 참나무에서 떨어지지 않고 트랙 바깥에서 통통 튀며 굴러 들어와요(나무도 흔들지 않아요)
+      if (fxeBall(d, (x < SPORTS.cx ? -1 : 1) * rand(70, 110))) return;   // 5.3.0 효과층: 실제로 튀며 굴러 들어와 멈춰요
       if (!rt.reduced && fall.animate) {
         const dx = (x < SPORTS.cx ? -1 : 1) * rand(70, 110);
         fall.animate([
@@ -381,7 +383,7 @@
     S.st.picks += 1;
     if (rt.sports) { rt.sports.blue += 1; feverCombo(rt.sports, d.x, d.y); renderSportsBar(); }
     floatText(d.x, d.y - 12, '+' + fmt(v), 'gold');
-    if (!rt.sports) fxPick(d);   // 5.2.1 효과층: 반짝이와 도토리가 위쪽 도토리 숫자로 날아가요(운동회 공은 그대로)
+    if (!rt.sports) fxPick(d); else fxeBlue(d);   // 5.3.0 운동회: 청팀 색종이와 점프   // 5.2.1 효과층: 반짝이와 도토리가 위쪽 도토리 숫자로 날아가요(운동회 공은 그대로)
     sfx('coin'); buzz(12);
     removeDrop(d);
     renderHUD(); renderAffordance();
