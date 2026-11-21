@@ -4,13 +4,13 @@
   const NS = 'http://www.w3.org/2000/svg';
   const $ = (s, r = document) => r.querySelector(s);
   const $$ = (s, r = document) => Array.from(r.querySelectorAll(s));
-  // 3.2.1 woodani 제보(안드로이드 건물 창 끊김): 건물 창은 0.25초마다 다시 그려서, 같은 글과 그림도 매번 새로 넣느라 휴대폰이 다시 칠했어요. 바뀐 것만 넣어요
+  // 건물 창은 0.25초마다 다시 그려서, 같은 글과 그림도 매번 새로 넣느라 휴대폰이 다시 칠했어요. 바뀐 것만 넣어요
   const setT = (el, v) => { if (!el) return; v = v == null ? '' : String(v); if (el.textContent !== v) el.textContent = v; };
   const setH = (el, v) => { if (!el) return; v = v == null ? '' : String(v); if (el._h !== v) { el._h = v; el.innerHTML = v; } };
   const SAVE_KEY = 'forest-school-v1';
   // 토스 미니앱 판이면 toss/src/bridge.js가 window.AIT에 광고, 저장소, 게임센터 기능을 담아 둬요
   const AIT = window.AIT || null;
-  // 5.0.2 woodani 결정(앱 용량): 앱(안드로이드, 토스) 묶음에는 한 번 보는 것과 고르는 것(이야기 장면 그림, 테마 곡, 행사와 졸업 곡, 테마 지도, 졸업식 그림)을 넣지 않고 웹에서 받아요.
+  // 앱(안드로이드, 토스) 묶음에는 한 번 보는 것과 고르는 것(이야기 장면 그림, 테마 곡, 행사와 졸업 곡, 테마 지도, 졸업식 그림)을 넣지 않고 웹에서 받아요
   // 받는 곳은 여기 한 곳(WEB_ROOT)에서만 정해요. 웹 판은 지금처럼 게임 옆 폴더에서 받아요
   const WEB_ROOT = 'https://seop-sci.github.io/forest-school/';
   const APP_PACK = () => !!(AIT || window.FOREST_STORE) && !window.FS_IMG_BASE;   // 앱 묶음인지(시험에서 FS_IMG_BASE를 정하면 옆 폴더)
@@ -35,6 +35,6 @@
     if (!webCacheOk()) return;
     caches.open(WEB_CACHE).then(c => c.keys().then(ks => ks.forEach(q => { if (!keep(q.url)) c.delete(q); }))).catch(() => {});
   }
-  const ADS_EXT = window.FOREST_ADS || null;   // 4.0.1 (3.3.2 분석): 광고 없이 보상을 주던 옛 스위치(FOREST_NOAD)는 켜는 판이 없어 지웠어요   // 2.0.0 보안 점검(2-8): 켤 때 한 번만 읽어요(나중에 바꿔 넣어도 소용없게)
+  const ADS_EXT = window.FOREST_ADS || null;   // 광고 없이 보상을 주던 옛 스위치(FOREST_NOAD)는 켜는 판이 없어 지웠어요. 보안 점검(2-8): 켤 때 한 번만 읽어요(나중에 바꿔 넣어도 소용없게)
   const motionMQ = window.matchMedia ? window.matchMedia('(prefers-reduced-motion: reduce)') : null;
 

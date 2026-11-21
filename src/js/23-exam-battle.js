@@ -24,7 +24,7 @@
   // 과목마다 점수(0~1)와 등급
   function exScore(k) {
     const cap = acCap(); let v = Math.min(1, acLv(k) / cap);
-    if (rosterOn() && S.roster.list.length) { const j = AB_KEY.indexOf(k); if (j >= 0) v = v * 0.6 + S.roster.list.reduce((a, s) => a + (s.a[j] || 0), 0) / S.roster.list.length / 100 * 0.4; }   // 2.1.0 학력 0.6 + 명부 평균 0.4
+    if (rosterOn() && S.roster.list.length) { const j = AB_KEY.indexOf(k); if (j >= 0) v = v * 0.6 + S.roster.list.reduce((a, s) => a + (s.a[j] || 0), 0) / S.roster.list.length / 100 * 0.4; }   // 학력 0.6 + 명부 평균 0.4
     return Math.min(1, v + EX.ssStep * Math.min(EX.ssMax, S.ex.ss));
   }
   const exGrade = v => v >= 0.8 ? 'A' : v >= 0.6 ? 'B' : v >= 0.4 ? 'C' : 'D';
@@ -65,7 +65,7 @@
     r.got = true;
     const v = minAcorns(r.pts * EX.minPer); S.budget += v; earn(v);
     const allA = r.g.every(g => g === 'A'), gold = allA ? EX.goldAll : r.pts >= EX.good ? EX.goldGood : 0;
-    const gIt = gold ? goldOr(gold) : null;   // 4.2.0
+    const gIt = gold ? goldOr(gold) : null;
     S.ex.st.n += 1; S.ex.st.best = Math.max(S.ex.st.best, r.pts); if (allA) S.ex.st.a += 1;
     save(); renderHUD(); checkQuests(); renderExam(); renderMini();
     sfx('quest'); buzz([20, 40, 20]);
@@ -122,19 +122,19 @@
     }
     if (E.st && typeof E.st === 'object') { s.ex.st.n = Math.floor(numIn(E.st.n, 0, 1e5)); s.ex.st.best = Math.floor(numIn(E.st.best, 0, 20)); s.ex.st.a = Math.min(s.ex.st.n, Math.floor(numIn(E.st.a, 0, 1e5))); }
   }
-  /* ---------- 2.0.1 공부 4단계: 숲속 대결 (미니게임 3, 체육 공부) (2026-10-28 woodani 확정, 설계안 "숲속 대결 설계안") ----------
-     초등학교 3학년부터. 컴퓨터 학교 8곳과 학생 셋이 세 종목(다섯 과목 가운데 셋)으로 겨루는 2선승 승부. 하루 5판(게임 시계).
-     종목 점수 = 별 × 20 + 주사위(0~60) + 응원(0~10). 별은 초등학교에서 과목 레벨 ÷ 4(올림, 1~5) + 잘하는 과목 1, 중학교부터 명부 능력치.
-     승 +25(3연승부터 +5씩, 최대 +15 더), 패 −10(1000 아래로 안 내려가요). 리그 6단계(내려가지 않아요), 승급마다 황금 도토리 1~5.
-     오늘 첫 승리만 수업료 10분치. 이긴 종목(친선 포함)마다 그 과목 XP 10, 중학교 명부 학생은 능력치 +1(하루 학생마다 2번까지).
+  /* ---------- 공부 4단계: 숲속 대결 (미니게임 3, 체육 공부) (설계안 "숲속 대결 설계안") ----------
+     초등학교 3학년부터. 컴퓨터 학교 8곳과 학생 셋이 세 종목(다섯 과목 가운데 셋)으로 겨루는 2선승 승부. 하루 5판(게임 시계)
+     종목 점수 = 별 × 20 + 주사위(0~60) + 응원(0~10). 별은 초등학교에서 과목 레벨 ÷ 4(올림, 1~5) + 잘하는 과목 1, 중학교부터 명부 능력치
+     승 +25(3연승부터 +5씩, 최대 +15 더), 패 −10(1000 아래로 안 내려가요). 리그 6단계(내려가지 않아요), 승급마다 황금 도토리 1~5
+     오늘 첫 승리만 수업료 10분치. 이긴 종목(친선 포함)마다 그 과목 XP 10, 중학교 명부 학생은 능력치 +1(하루 학생마다 2번까지)
      주간 리그 승리마다 5점(하루 25점까지). 그림은 작업지시서 29, 29-1 */
-  // 2.1.0 퍼즐, 합치기, 대결 화면에 있는 동안은 홈 알림(반장 선거, 시험 주, 책 다 읽음)을 미뤄요
+  // 퍼즐, 합치기, 대결 화면에 있는 동안은 홈 알림(반장 선거, 시험 주, 책 다 읽음)을 미뤄요
   const gameSceneOpen = () => { try { return !!((pzUI && pzUI.open) || (mgUI && mgUI.open) || (btUI && btUI.open)); } catch (e) { return false; } };
-  const BT = { perDay: 5, adMore: 2, adMax: 1, win: 25, lose: 10, floor: 1000, streakFrom: 3, streakStep: 5, streakMax: 15, firstMin: 10, xp: 12, play: 5, grow: 2, lp: 5, lpDay: 25, cheerMs: 4000, cheerMax: 10, cheerTaps: 50, dice: 60, sweep: 0.7 };   // 2.1.0 응원: 4초 동안 50번까지 두드려요(5번마다 1점, 최대 10점, woodani 요청)   // 주사위 0~60: 설계안의 승률(별 하나 차이 뒤집기 약 20~30%, 두 별 약 5%)에 맞춘 값. 0~30이면 별 하나 차이도 6%라 거의 못 뒤집어요
+  const BT = { perDay: 5, adMore: 2, adMax: 1, win: 25, lose: 10, floor: 1000, streakFrom: 3, streakStep: 5, streakMax: 15, firstMin: 10, xp: 12, play: 5, grow: 2, lp: 5, lpDay: 25, cheerMs: 4000, cheerMax: 10, cheerTaps: 50, dice: 60, sweep: 0.7 };   // 응원: 4초 동안 50번까지 두드려요(5번마다 1점, 최대 10점). 주사위 0~60: 설계안의 승률(별 하나 차이 뒤집기 약 20~30%, 두 별 약 5%)에 맞춘 값. 0~30이면 별 하나 차이도 6%라 거의 못 뒤집어요
   const BT_EV = { kor: { name: '책 읽기', ic: 'bev_read', em: '📖' }, math: { name: '수학 퀴즈', ic: 'bev_math', em: '➗' }, sci: { name: '과학 퀴즈', ic: 'bev_science', em: '🧪' },
     art: { name: '그리기', ic: 'bev_draw', em: '🎨' }, pe: { name: '달리기', ic: 'bev_run', em: '👟' } };
   const BT_LG = [
-    // 4.2.1 woodani 요청(잘 골라도 너무 자주 져요): 상대 별(off)과 상대 응원(cheer)을 낮췄어요. 가장 좋게 고르고 응원을 꽉 채우면
+    // 상대 별(off)과 상대 응원(cheer)을 낮췄어요. 가장 좋게 고르고 응원을 꽉 채우면
     // 이기는 판이 새싹 87→91%, 동 77→87%, 은 64→77%, 금 62→75%, 백금 48→64%, 무지개 44→60%(dev 시뮬레이션 3,000판)
     { n: '새싹', at: 1000, gold: 0, medal: 'medal_sprout', off: -3, cheer: 1 }, { n: '동', at: 1100, gold: 1, medal: 'medal_bronze', off: -2, cheer: 2 },
     { n: '은', at: 1300, gold: 2, medal: 'medal_silver', off: -1, cheer: 3 }, { n: '금', at: 1600, gold: 3, medal: 'medal_gold', off: -1, cheer: 4 },
@@ -155,7 +155,7 @@
   const freshBt = () => ({ pts: 1000, lg: 0, day: '', n: 0, adN: 0, won: false, streak: 0, grow: { day: '', m: {} }, last: -1, lp: { day: '', p: 0 }, st: { w: 0, l: 0, ev: 0, best: 0, wm: 0 } });
   const btOpen = () => !!S && (S.tier >= 2 || (S.tier === 1 && S.tg >= 2));
   function btDay() { const t = gameToday(); if (dayRoll(S.bt, t)) { S.bt.n = 0; S.bt.won = false; S.bt.adN = 0; } }
-  // 3.0.0 woodani 요청: 다 쓰면 광고를 보고 하루 한 번 2판 더(숲속 퍼즐과 같게)
+  // 다 쓰면 광고를 보고 하루 한 번 2판 더(숲속 퍼즐과 같게)
   const btQuota = () => BT.perDay + (S.bt.adN || 0) * BT.adMore;
   const btLeft = () => { btDay(); return Math.max(0, btQuota() - S.bt.n); };
   const btCanAd = () => btOpen() && btLeft() <= 0 && (S.bt.adN || 0) < BT.adMax && BT.adMore > 0;
@@ -207,7 +207,7 @@
   const btWin = (r, mc) => { const a = btScore(r.ms, r.md, mc), b = btScore(r.os, r.od, r.oc); return a > b || (a === b && r.ms >= r.os); };
   function btOppCheer() { const m = BT_LG[S.bt.lg].cheer; return Math.max(0, Math.min(BT.cheerMax, Math.round(m - 2 + Math.random() * 4))); }
   // 판 끝: 점수, 리그, 보상(한 번만)
-  function btFinish(M, sw) {   // 5.0.3 sw: 소탕(연승 덤 없음, 과목 XP와 리그 점수는 BT.sweep배)
+  function btFinish(M, sw) {   // sw: 소탕(연승 덤 없음, 과목 XP와 리그 점수는 BT.sweep배)
     if (M.done) return M.out; M.done = true; btDay();   // 날짜를 먼저 맞춰요(뒤에서 btDay가 오늘 첫 승리 표시를 지우지 않게)
     const wins = M.res.filter(r => r.win).length, win = M.res.slice(0, 3).filter(r => r.win).length >= 2;
     const before = S.bt.pts, lg0 = S.bt.lg, out = { win, wins, pts0: before, items: [] };
@@ -219,7 +219,7 @@
     out.d = S.bt.pts - before;
     // 이긴 종목(친선 포함): 과목 XP, 중학교 명부 학생 능력치
     const t = gameToday(); if (S.bt.grow.day !== t) S.bt.grow = { day: t, m: {} };
-    acGain('pe', sw ? Math.round(BT.play * BT.sweep) : BT.play);   // 2.1.0 한 판 뛰면 이기든 지든 체육 XP
+    acGain('pe', sw ? Math.round(BT.play * BT.sweep) : BT.play);   // 한 판 뛰면 이기든 지든 체육 XP
     M.res.forEach((r, i) => { if (!r.win) return; S.bt.st.ev += 1; acGain(M.evs[i], sw ? Math.round(BT.xp * BT.sweep) : BT.xp);
       const p = M.me[i]; if (p && p.ri !== undefined && rosterOn()) { const s = S.roster.list[p.ri], key = s && s.nm; const j = AB_KEY.indexOf(M.evs[i]);
         if (s && j >= 0 && (S.bt.grow.m[key] || 0) < BT.grow && s.a[j] < 100) { s.a[j] += 1; S.bt.grow.m[key] = (S.bt.grow.m[key] || 0) + 1; } } });
@@ -228,7 +228,7 @@
     if (lg > lg0) { let g = 0; for (let i = lg0 + 1; i <= lg; i++) g += BT_LG[i].gold; S.bt.lg = lg; if (g) addGold(g); out.up = lg; out.gold = g; }
     M.out = out; save(); renderHUD(); checkQuests(); renderMini(); rankDirty(); return out;
   }
-  // 5.0.3 소탕: 오늘 1판을 직접 하면 남은 판을 한 번에 끝내요. 승패 셈은 그대로(내 응원 0점), 연승 덤은 없고 과목 XP와 리그 점수는 70%
+  // 소탕: 오늘 1판을 직접 하면 남은 판을 한 번에 끝내요. 승패 셈은 그대로(내 응원 0점), 연승 덤은 없고 과목 XP와 리그 점수는 70%
   const btSwOpen = () => { btDay(); return btOpen() && S.bt.n >= 1; };
   function openBtSw() {
     if (!btSwOpen()) { toast('오늘 1판을 직접 하면 소탕할 수 있어요'); return; }
@@ -284,12 +284,12 @@
     S.bt.n += 1; M.phase = 'play'; M.i = 0;
     M.rolls = M.evs.map((e, i) => btRoll(M.me[i].st[e], M.opp[i].st, btOppCheer()));
     save(); M.intro = true; btRender(); sfx('quest');
-    btUI.timer = setTimeout(() => { if (btUI.M !== M) return; M.intro = false; btPlayEv(); }, rt.reduced ? 300 : 1400);   // 2.1.0 시작 연출: 두 학교 마크와 VS
+    btUI.timer = setTimeout(() => { if (btUI.M !== M) return; M.intro = false; btPlayEv(); }, rt.reduced ? 300 : 1400);   // 시작 연출: 두 학교 마크와 VS
     return true;
   }
-  /* ---------- 2.1.1 숲속 대결 종목 문제 (2026-10-29 woodani 결정) ----------
-     달리기만 지금처럼 두드리기. 수학 퀴즈는 한 자리 수 사칙연산(중학교부터 더하기, 빼기는 두 자리 수 + 한 자리 수), 과학 퀴즈는 기초 상식,
-     책 읽기는 낱말 문제, 그리기는 색 순서 기억 놀이. 응원 점수(0~10) 자리에 들어가서 점수 계산과 승률은 그대로예요.
+  /* ---------- 숲속 대결 종목 문제 ----------
+     달리기만 지금처럼 두드리기. 수학 퀴즈는 한 자리 수 사칙연산(중학교부터 더하기, 빼기는 두 자리 수 + 한 자리 수), 과학 퀴즈는 기초 상식
+     책 읽기는 낱말 문제, 그리기는 색 순서 기억 놀이. 응원 점수(0~10) 자리에 들어가서 점수 계산과 승률은 그대로예요
      퀴즈는 3문제(보기 3개, 한 문제 7초), 맞힌 수 0, 1, 2, 3 → 0, 3, 7, 10점. 기억 놀이는 맞게 누른 칸 비율 × 10점 */
   const BTQ = { n: 3, qMs: 7000, fbMs: 650, pts: [0, 3, 7, 10], memShow: 750, memGap: 200, memMs: 9000 };
   // 과학 퀴즈: [문제, 정답, 오답, 오답]. 보기는 섞어서 보여 줘요
@@ -446,8 +446,8 @@
     ["'빠르다'와 뜻이 비슷한 말은?", '재빠르다', '느리다', '늦다'], ["'걱정하다'와 뜻이 비슷한 말은?", '염려하다', '웃다', '뽐내다'],
     ["'시작하다'와 뜻이 비슷한 말은?", '출발하다', '끝내다', '멈추다'], ["'고맙다'와 뜻이 비슷한 말은?", '감사하다', '미안하다', '심심하다']
   ];
-  /* 3.0.1 woodani: 숲속 대결 문제를 한 주마다 바꿔요. 새로 쓴 세 주치(A, B, C)를 한국 시간 월요일마다 돌리고, 기존 문제도 세 몫으로 나눠 그 주에 함께 내요.
-     A주 과학은 동물과 식물, 국어는 반대말과 속담. B주 과학은 날씨와 땅과 우주, 국어는 맞춤법과 높임말. C주 과학은 우리 몸과 물질과 안전, 국어는 흉내 내는 말과 끝말잇기.
+  /* 숲속 대결 문제를 한 주마다 바꿔요. 새로 쓴 세 주치(A, B, C)를 한국 시간 월요일마다 돌리고, 기존 문제도 세 몫으로 나눠 그 주에 함께 내요
+     A주 과학은 동물과 식물, 국어는 반대말과 속담. B주 과학은 날씨와 땅과 우주, 국어는 맞춤법과 높임말. C주 과학은 우리 몸과 물질과 안전, 국어는 흉내 내는 말과 끝말잇기
      수학은 A주 사칙연산, B주 빈칸 채우기, C주 뛰어 세기. 그리기(색 기억)는 B주만 거꾸로 누르기 */
   const BTQ_SCI_W = [
     [
@@ -972,7 +972,7 @@
     for (const d of btqMix([1, 2, -1, -2, 3, -3])) { const v = ans + d; if (v >= 0 && v !== ans) w.add(v); if (w.size >= 2) break; }
     return { q: `${a} ${t} ${b} = ?`, a: String(ans), opts: btqMix([ans, ...w]).map(String), math: true };
   }
-  // 3.0.1 B주 수학: 빈칸 채우기(앞이나 뒤 수가 빈칸), C주 수학: 뛰어 세기
+  // B주 수학: 빈칸 채우기(앞이나 뒤 수가 빈칸), C주 수학: 뛰어 세기
   const btqNear = ans => { const w = new Set(); for (const d of btqMix([1, 2, -1, -2, 3, -3])) { const v = ans + d; if (v >= 0 && v !== ans) w.add(v); if (w.size >= 2) break; } return btqMix([ans, ...w]).map(String); };
   function btqMathBlank() {
     const m = btqMath(), [x, t, y] = m.q.replace(' = ?', '').split(' '), ans = Number(m.a), left = Math.random() < 0.5;
@@ -985,13 +985,13 @@
     return { q: `${L.join(', ')}, ?`, a: String(ans), opts: btqNear(ans), math: true };
   }
   function btqMake(e) {
-    const wk = btqWeek();   // 3.0.1 한 주마다 바뀌는 문제 묶음
+    const wk = btqWeek();   // 한 주마다 바뀌는 문제 묶음
     if (e === 'math') return { kind: 'q', qs: Array.from({ length: BTQ.n }, [btqMath, btqMathBlank, btqMathSeq][wk]), k: 0, got: 0, fb: null };
     if (e === 'sci') return { kind: 'q', qs: btqPick(btqBank(BTQ_SCI_W, BTQ_SCI, wk), 'sci' + wk, BTQ.n), k: 0, got: 0, fb: null };
     if (e === 'kor') return { kind: 'q', qs: btqPick(btqBank(BTQ_KOR_W, BTQ_KOR, wk), 'kor' + wk, BTQ.n), k: 0, got: 0, fb: null };
     const len = S.tier >= 2 ? 4 : 3, seq = [];
     for (let i = 0; i < len; i++) { let c; do { c = Math.floor(Math.random() * BTQ_COL.length); } while (seq.length && c === seq[seq.length - 1]); seq.push(c); }
-    return { kind: 'mem', seq, show: -1, input: [], phase: 'show', ok: true, rev: wk === 1 };   // 3.0.1 B주는 거꾸로 눌러요
+    return { kind: 'mem', seq, show: -1, input: [], phase: 'show', ok: true, rev: wk === 1 };   // B주는 거꾸로 눌러요
   }
   const btqPts = Z => Z.kind === 'q' ? BTQ.pts[Math.min(BTQ.n, Z.got)] : Math.round(10 * (Z.ok ? Z.input.length : Math.max(0, Z.input.length - 1)) / Z.seq.length);
   function btqHTML(Z) {
@@ -1052,9 +1052,9 @@
     btUI.timer = setTimeout(() => { if (btUI.M === M && M.quiz === Z) btReveal(M, btqPts(Z)); }, BTQ.fbMs + 150);
   }
   const btCheerPts = n => Math.min(BT.cheerMax, Math.round(Math.min(BT.cheerTaps, n) / (BT.cheerTaps / BT.cheerMax)));
-  // 2.1.0 점수가 0부터 차오르는 연출
+  // 점수가 0부터 차오르는 연출
   function btCount(el, to, ms) { if (!el) return; if (rt.reduced) { el.textContent = to + '점'; return; } const t0 = performance.now(); const step = t => { const k = Math.min(1, (t - t0) / ms); el.textContent = Math.round(to * (1 - Math.pow(1 - k, 3))) + '점'; if (k < 1) requestAnimationFrame(step); }; requestAnimationFrame(step); }
-  /* 3.0.0 woodani 요청: 달리기는 트랙을 달리는 모습. 두드릴 때마다 우리 선수가 앞으로 뛰고(통통) 트랙 줄이 뒤로 흘러요.
+  /* 달리기는 트랙을 달리는 모습. 두드릴 때마다 우리 선수가 앞으로 뛰고(통통) 트랙 줄이 뒤로 흘러요
      상대 선수는 정해진 응원 점수만큼 일정하게 달려요. 그림 bt_track(작업지시서 48)이 없으면 CSS 트랙 */
   function btTrackHTML(me, o) {
     const tr = IMG('bt_track');
@@ -1067,12 +1067,12 @@
     if (!rt.reduced) { r.classList.remove('hop'); void r.offsetWidth; r.classList.add('hop'); }
     if (tk) tk.style.setProperty('--off', (-btUI.taps * 14) + 'px');
   }
-  // 종목 하나: 달리기는 4초 동안 두드리면 응원, 다른 종목은 문제(2.1.1). 그다음 점수 공개
+  // 종목 하나: 달리기는 4초 동안 두드리면 응원, 다른 종목은 문제. 그다음 점수 공개
   function btPlayEv() {
     const M = btUI.M; if (!M || M.phase !== 'play') return;
     const e = M.evs[M.i];
     btUI.taps = 0; M.reveal = false;
-    if (e !== 'pe') {   // 2.1.1 수학, 과학, 책 읽기는 퀴즈, 그리기는 색 기억 놀이
+    if (e !== 'pe') {   // 수학, 과학, 책 읽기는 퀴즈, 그리기는 색 기억 놀이
       M.cheering = false; M.quiz = btqMake(e); btRender();
       if (M.quiz.kind === 'q') btqAsk(M); else btqMemShow(M);
       return;
@@ -1081,7 +1081,7 @@
     const ms = rt.reduced ? 2000 : BT.cheerMs;
     $('#btPlay').style.setProperty('--bt-t', ms + 'ms');
     requestAnimationFrame(() => $('#btPlay').classList.add('go'));
-    { const ro = $('#btRunOpp'), oc = (M.rolls[M.i] && M.rolls[M.i].oc) || 0; if (ro) { ro.style.transition = `left ${ms}ms linear`; requestAnimationFrame(() => { ro.style.left = (4 + 78 * Math.min(1, oc / BT.cheerMax)) + '%'; }); } }   // 3.0.0 상대는 일정하게
+    { const ro = $('#btRunOpp'), oc = (M.rolls[M.i] && M.rolls[M.i].oc) || 0; if (ro) { ro.style.transition = `left ${ms}ms linear`; requestAnimationFrame(() => { ro.style.left = (4 + 78 * Math.min(1, oc / BT.cheerMax)) + '%'; }); } }   // 상대는 일정하게
     btUI.timer = setTimeout(() => {
       if (!btUI.M || btUI.M !== M) return;
       M.cheering = false; $('#btPlay').classList.remove('go');
@@ -1104,14 +1104,14 @@
   }
   function btTap(e) {
     const M = btUI.M; if (!M || M.phase !== 'play' || !M.cheering) return;
-    if (e && e.cancelable) e.preventDefault();   // 2.1.0 두드려도 글자가 파랗게 잡히지 않게
+    if (e && e.cancelable) e.preventDefault();   // 두드려도 글자가 파랗게 잡히지 않게
     if (btUI.taps >= BT.cheerTaps) return;
     btUI.taps += 1; buzz(5);
     const n = $('#btCheerN'); if (n) n.textContent = `${btUI.taps} / ${BT.cheerTaps}`;
     const mi = $('#btMeterI'); if (mi) mi.style.width = (100 * btUI.taps / BT.cheerTaps) + '%';
     const pt = $('#btCheerPt'); if (pt) pt.textContent = `응원 점수 +${btCheerPts(btUI.taps)}`;
     const me = $('#btDuel .bt-side.me'); if (me && !rt.reduced) { me.classList.remove('hit'); void me.offsetWidth; me.classList.add('hit'); }
-    btTrackStep();   // 3.0.0 달리기 트랙
+    btTrackStep();   // 달리기 트랙
     if (btUI.taps === BT.cheerTaps) { sfx('quest'); const c = $('#btCheer'); if (c) c.classList.add('full'); }
     if (!rt.reduced && e && e.clientX !== undefined) {
       if (IMG('bfx_cheer')) { const f = document.createElement('img'); f.className = 'bt-spark'; f.src = IMG('bfx_cheer'); f.style.left = e.clientX + 'px'; f.style.top = e.clientY + 'px'; document.body.appendChild(f); setTimeout(() => f.remove(), 700); }
@@ -1143,12 +1143,12 @@
       $('#btList').innerHTML = list.map(p => { const at = M.me.findIndex(x => x && x.id === p.id);
         return `<button class="bt-cand${at >= 0 ? ' used' : ''}" type="button" data-bpick="${p.id}">${btChr(p.sp)}<b>${esc(p.nm)}</b><small class="stars">${starTxt(p.st[e])}</small>${at >= 0 ? `<i>${BT_EV[M.evs[at]].name}</i>` : ''}</button>`; }).join('');
       const ready = !M.me.some(x => !x);
-      const ad = left <= 0 && btCanAd();   // 3.0.0 광고 보고 2판 더
+      const ad = left <= 0 && btCanAd();   // 광고 보고 2판 더
       $('#btGo').setAttribute('aria-disabled', (ready && left > 0) || ad ? 'false' : 'true');
       $('#btGo').textContent = left > 0 ? '대결 시작!' : ad ? `광고 보고 ${BT.adMore}판 더` : '오늘은 다 했어요';
     } else if (M.phase === 'play') {
       const sch2 = BT_SCH[M.si];
-      if (M.intro) {   // 2.1.0 시작 연출
+      if (M.intro) {   // 시작 연출
         $('#btPlayEv').innerHTML = ''; $('#btScoreLine').innerHTML = ''; $('#btCheer').innerHTML = ''; $('#btCheer').className = 'bt-cheer';
         $('#btDuel').className = 'bt-duel'; $('#btDuel').innerHTML = `<div class="bt-intro"><span class="bt-in me">${(S.deco.mk && markHTML(S.deco.mk)) || '<span style="font-size:46px">🏫</span>'}<b>${esc(schoolTitle())}</b></span><em>VS</em><span class="bt-in opp">${IMG('bmark_' + sch2.k) ? `<img src="${IMG('bmark_' + sch2.k)}" alt="">` : '🏫'}<b>${esc(sch2.name)}</b></span></div>`;
         return;
@@ -1177,9 +1177,9 @@
         (o.up !== undefined ? `<div class="bt-up">${btMedal(o.up, 56)}<b>${BT_LG[o.up].n} 리그 승급!</b>${o.gold ? `<small>황금 도토리 +${o.gold}</small>` : ''}</div>` : '') +
         `<div class="bt-lgbar">${btMedal(L, 28)}<span class="ac-bar"><i style="width:${nx ? Math.round(100 * Math.min(1, (S.bt.pts - BT_LG[L].at) / (nx.at - BT_LG[L].at))) : 100}%"></i></span><small>${nx ? `${nx.n} 리그까지 ${fmt(Math.max(0, nx.at - S.bt.pts))}점` : '가장 높은 리그예요'}</small></div>` +
         `<p class="fine">이긴 종목마다 그 과목 XP +${BT.xp}${rosterOn() ? ', 이긴 학생은 능력치가 자라요' : ''}. 오늘 남은 대결 ${btLeft()}판.</p>` +
-        (o.win ? '' : `<p class="fine bt-why">점수 = 별 × 20 + 주사위(0~${BT.dice}) + 퀴즈와 응원\n별이 높은 학생을 세우면 유리해요</p>`) +   // 3.0.0 woodani 요청: 다 맞혀도 지는 까닭
+        (o.win ? '' : `<p class="fine bt-why">점수 = 별 × 20 + 주사위(0~${BT.dice}) + 퀴즈와 응원\n별이 높은 학생을 세우면 유리해요</p>`) +   // 다 맞혀도 지는 까닭
         `<div class="btn-row">${btLeft() > 0 ? '<button class="cta" type="button" id="btAgain">한 판 더</button>' : btCanAd() ? `<button class="cta" type="button" id="btAdMore">광고 보고 ${BT.adMore}판 더</button>` : ''}<button class="btn-sub" type="button" id="btDone">닫기</button></div></div>`;
-      if (o.win && !rt.reduced && !M.confetti) { M.confetti = true; btConfetti(); }   // 2.1.0 승리 꽃가루
+      if (o.win && !rt.reduced && !M.confetti) { M.confetti = true; btConfetti(); }   // 승리 꽃가루
     }
   }
   function renderBtCard() {
@@ -1189,14 +1189,14 @@
     $('#btCardSub').innerHTML = on ? `${btMedal(S.bt.lg, 18)} ${BT_LG[S.bt.lg].n} 리그, 대결 점수 ${fmt(S.bt.pts)}` : '초등학교 3학년부터 열려요';
     const lt = $('#btLeftTxt'); lt.textContent = on ? `오늘 ${btLeft()}/${btQuota()}판` : '잠김'; lt.classList.toggle('none', on && btLeft() <= 0);
     $('#btCardTag').textContent = on ? '시작하기' : '잠김';
-    { const sw = on && btSwOpen(), can = sw && btLeft() > 0, show = on && (!sw || can);   // 5.0.3 소탕 줄(숲속 퍼즐과 같은 자리)
+    { const sw = on && btSwOpen(), can = sw && btLeft() > 0, show = on && (!sw || can);   // 소탕 줄(숲속 퍼즐과 같은 자리)
       $('#btSwTx').hidden = sw; $('#btSwBtn').hidden = !can; if (can) $('#btSwBtn').textContent = `소탕 ${btLeft()}판`;
       $('#btSwRow').hidden = !show; $('#btCardW').classList.toggle('sw-on', show); }
   }
   function sanitizeBt(d, s) {
     s.bt = freshBt(); const B = d.bt && typeof d.bt === 'object' ? d.bt : null; if (!B) return;
     s.bt.pts = Math.floor(numIn(B.pts, 1000, 9999)); s.bt.lg = Math.max(Math.floor(numIn(B.lg, 0, 5)), 0);
-    s.bt.day = typeof B.day === 'string' ? B.day.slice(0, 10) : ''; s.bt.adN = Math.floor(numIn(B.adN, 0, BT.adMax)); s.bt.n = Math.floor(numIn(B.n, 0, BT.perDay + BT.adMore * BT.adMax)); s.bt.won = !!B.won;   // 3.0.0 광고로 더 받은 판
+    s.bt.day = typeof B.day === 'string' ? B.day.slice(0, 10) : ''; s.bt.adN = Math.floor(numIn(B.adN, 0, BT.adMax)); s.bt.n = Math.floor(numIn(B.n, 0, BT.perDay + BT.adMore * BT.adMax)); s.bt.won = !!B.won;   // 광고로 더 받은 판
     s.bt.streak = Math.floor(numIn(B.streak, 0, 1e4)); s.bt.last = Number.isInteger(B.last) && B.last >= 0 && B.last < BT_SCH.length ? B.last : -1;
     if (B.grow && typeof B.grow === 'object') { s.bt.grow.day = typeof B.grow.day === 'string' ? B.grow.day.slice(0, 10) : ''; if (B.grow.m && typeof B.grow.m === 'object') for (const k of Object.keys(B.grow.m).slice(0, 40)) s.bt.grow.m[String(k).slice(0, 12)] = Math.floor(numIn(B.grow.m[k], 0, BT.grow)); }
     if (B.lp && typeof B.lp === 'object') { s.bt.lp.day = typeof B.lp.day === 'string' ? B.lp.day.slice(0, 10) : ''; s.bt.lp.p = Math.floor(numIn(B.lp.p, 0, BT.lpDay)); }
@@ -1212,7 +1212,7 @@
     $('#exRowGo').textContent = ready ? '받기' : now && !exStudyDone() ? '자율학습' : '보기';
     b.classList.toggle('todo', ready || (now && !exStudyDone() && S.f.library >= 1));
   }
-  // 3.0.0 공부 탭의 야간 자율학습 줄(기숙사를 지으면 보여요, woodani 결정 2026-11-02)
+  // 공부 탭의 야간 자율학습 줄(기숙사를 지으면 보여요)
   function renderNsRow() {
     const b = $('#nsRowBtn'); if (!b) return;
     b.hidden = !nsOpen(); if (b.hidden) return;
@@ -1242,7 +1242,7 @@
   // 동아리 배지: 그림(작업지시서 19)이 있으면 그림, 없으면 그림 문자
   const clubBadge = (c, px) => IMG(CLUBS[c].img) ? `<img class="club-badge" src="${IMG(CLUBS[c].img)}" alt="" draggable="false"${px ? ` style="width:${px}px;height:${px}px"` : ''}>`
     : `<span class="club-badge em c${c}"${px ? ` style="width:${px}px;height:${px}px;font-size:${Math.round(px * 0.55)}px"` : ''}>${CLUBS[c].em}</span>`;
-  const kidFace = (sp, r) => `<span class="rs-av">${kidAvatar(r ? sp + '_rare' : sp)}</span>`;   // 2.1.3 r: 반짝 친구 모습
+  const kidFace = (sp, r) => `<span class="rs-av">${kidAvatar(r ? sp + '_rare' : sp)}</span>`;   // r: 반짝 친구 모습
   function clubSeatHTML(c) {
     const mem = clubMembers(c), C = CLUBS[c];
     return Array.from({ length: CLUB.seats }, (_, j) => {
@@ -1259,9 +1259,9 @@
     const bg = IMG('club_bg'); $('#clubHead').style.backgroundImage = bg ? `url("${bg}")` : '';
     $('#clubHead').classList.toggle('fb', !bg);
     const wait = showWait();
-    $('#cgBox').innerHTML = cgHTML();   // 2.2.0 동아리 대항전
+    $('#cgBox').innerHTML = cgHTML();   // 동아리 대항전
     $('#clubShowNote').textContent = showNote();
-    fvFlag($('#clubShowNote').parentElement, 'show', '축제: 발표회 보상 +100%');   // 4.1.0 축제 금요일
+    fvFlag($('#clubShowNote').parentElement, 'show', '축제: 발표회 보상 +100%');   // 축제 금요일
     box.innerHTML = CLUBS.map((C, c) => `<div class="club-card c${c}"><div class="club-top">${clubBadge(c, 40)}<span class="club-nm"><b>${C.name}</b><small>${ABIL[C.ab]} 별 ${clubStars(c)}개</small></span>` +
       `<span class="club-eff">${C.eff(clubShow(c))}</span></div><div class="club-seats">${clubSeatHTML(c)}</div>` +
       `<button class="cta small club-show" type="button" data-show="${c}" aria-disabled="${showReadyC(c) && clubMembers(c).length ? 'false' : 'true'}">${S.club.shown[c] ? '발표회 또 열기' : '발표회 열기'}</button></div>`).join('') +
@@ -1280,10 +1280,10 @@
       `<p class="note">다른 동아리 학생을 고르면 이 동아리로 옮겨요. 자리가 차 있으면 별이 가장 적은 부원과 바꿔요.<br>바꾼 학생은 이번 주 능력치 오름을 다시 세요.</p>`;
     openModal($('#mSeat'));
   }
-  // 학교 복도(2.0.0): 상점 거리처럼 복도 배경 위에 방문. 동아리실이 먼저 열리고 나머지 방은 앞으로 들어와요
+  // 학교 복도: 상점 거리처럼 복도 배경 위에 방문. 동아리실이 먼저 열리고 나머지 방은 앞으로 들어와요
   const hallOpen = () => rosterOn();
   function renderHall() {
-    const bg = (uniNow() && IMG('hall_bg_uni')) || IMG('hall_bg');   // 4.0.0 대학교 복도 그림(작업지시서 62)이 들어오면 그것을 써요
+    const bg = (uniNow() && IMG('hall_bg_uni')) || IMG('hall_bg');   // 대학교 복도 그림(작업지시서 62)이 들어오면 그것을 써요
     $('#hallScene').style.backgroundImage = bg ? `url("${bg}")` : '';
     $('#hallScene').classList.toggle('fb', !bg);
     $$('#panelHall .sf-pic').forEach(el => {
@@ -1291,28 +1291,28 @@
       el.classList.toggle('fb', !u); el.style.backgroundImage = u ? `url("${u}")` : '';
     });
     $('#hallClubN').textContent = showReady() || showQuestFree() ? '발표회!' : `${clubSum()}%`;
-    // 2.0.1 학생회실: 반장 선거가 열리면 문이 열려요
+    // 학생회실: 반장 선거가 열리면 문이 열려요
     const hc = $('#hdCouncil');
     if (hc && elOpen()) {
       hc.classList.remove('soon'); hc.setAttribute('aria-disabled', 'false'); hc.removeAttribute('data-soon'); hc.setAttribute('aria-label', '학생회실, 반장 선거');
       const chip = hc.querySelector('.sf-soon'); if (chip) chip.className = 'sf-have';
       const pres = elPres(); hc.querySelector('.sf-have').textContent = pres ? `반장 ${pres.nm}` : '투표하기!';
     }
-    // 2.1.0 칭찬 게시판: 칭찬 스티커판이 열리면 문이 열려요
+    // 칭찬 게시판: 칭찬 스티커판이 열리면 문이 열려요
     const hb = $('#hdBoard');
     if (hb && skOpen()) {
       hb.classList.remove('soon'); hb.setAttribute('aria-disabled', 'false'); hb.removeAttribute('data-soon'); hb.setAttribute('aria-label', '칭찬 게시판, 칭찬 스티커판');
       const chip = hb.querySelector('.sf-soon'); if (chip) chip.className = 'sf-have';
       hb.querySelector('.sf-have').textContent = skFull() ? '상 받기!' : `${S.sk.cur.length}/${SK.full}장`;
     }
-    // 2.0.1 교무실: 시험 기간
+    // 교무실: 시험 기간
     const ho = $('#hdOffice');
     if (ho && exOpen()) {
       ho.classList.remove('soon'); ho.setAttribute('aria-disabled', 'false'); ho.removeAttribute('data-soon'); ho.setAttribute('aria-label', '교무실, 시험 기간');
       const chip = ho.querySelector('.sf-soon'); if (chip) chip.className = 'sf-have';
       ho.querySelector('.sf-have').textContent = exReportReady() ? '성적표!' : exNow() ? '시험 주' : `시험 ${exDays()}일 뒤`;
     }
-    // 4.0.0 복도의 새 방: 대학교에서는 학과 사무실(학생회관을 지어야 열려요). 다른 학교급에서는 그대로 '새 방, 공사 중'
+    // 복도의 새 방: 대학교에서는 학과 사무실(학생회관을 지어야 열려요). 다른 학교급에서는 그대로 '새 방, 공사 중'
     const hp = $('#hdDept');
     if (hp && uniNow()) {
       const on = deptOpen(); setT($('b', hp), '학과 사무실');
@@ -1320,7 +1320,7 @@
       if (on) hp.removeAttribute('data-soon'); else hp.setAttribute('data-soon', '학생회관을 지으면 학과 사무실이 열려요');
       const chip = hp.querySelector('.sf-soon, .sf-have'); if (chip) { chip.className = on ? 'sf-have' : 'sf-soon'; chip.textContent = on ? `${deptPicks().length}/${deptSlots()}곳` : '준비 중'; }
     }
-    // 3.1.0 상담실: 고등학교부터 진로 상담
+    // 상담실: 고등학교부터 진로 상담
     const hs = $('#hdCounsel');
     if (hs && S.tier >= CS.tier) {
       hs.classList.remove('soon'); hs.setAttribute('aria-disabled', 'false'); hs.removeAttribute('data-soon'); hs.setAttribute('aria-label', '상담실, 진로 상담');
@@ -1328,7 +1328,7 @@
       const left = csLeft(); hs.querySelector('.sf-have').textContent = left ? `상담 ${left}번` : `꿈 ${S.roster.list.filter(csDone).length}명`;
     }
   }
-  // 2.0.1 복도 버튼 그림: 초록 틀의 교실 문(창문, 손잡이, 이름표)
+  // 복도 버튼 그림: 초록 틀의 교실 문(창문, 손잡이, 이름표)
   const HALL_DOOR = '<svg viewBox="-12 -12 24 24" aria-hidden="true"><rect x="-11" y="9.4" width="22" height="2.2" rx="1.1" fill="#C9A06A"/>' +
     '<rect x="-8.2" y="-10.4" width="16.4" height="20.4" rx="2.4" fill="#4F7A3A"/><rect x="-6.4" y="-8.6" width="12.8" height="18.4" rx="1.4" fill="#D69A55"/>' +
     '<rect x="-4.6" y="-6.8" width="9.2" height="6.6" rx="1.6" fill="#BFE3F2" stroke="#8A5D2B" stroke-width=".8"/><path d="M0 -6.8 v6.6 M-4.6 -3.5 h9.2" stroke="#8A5D2B" stroke-width=".7"/>' +

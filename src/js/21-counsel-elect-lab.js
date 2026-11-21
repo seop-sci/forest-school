@@ -55,8 +55,8 @@
       ans: ['손님을 반기고 셈을 잘하면 멋진 가게를 꾸릴 수 있어.', '반갑게 맞는 웃음이 가게를 살린단다. 너는 그걸 벌써 알고 있구나.'],
       alt: ['가게 사장은 어떠니? 손님을 반기고 가게를 꾸리는 일이란다.'] }
   ];
-  // 3.1.1 woodani 제보: 고민을 과목에서 고르니 절반쯤 진로와 안 맞았어요. 고민은 이번 진로(JOBS[t].worry)에서, 다른 길 답은 권하는 말(alt)로
-  // 4.1.1 woodani 결정(2026-11-12): 대학교 상담실은 대학생 고민과 높임말 답으로(프로젝트 문서 '대학교 재정비 글 초안 1'). 직업, 숫자, 규칙은 그대로예요
+  // 고민을 과목에서 고르니 절반쯤 진로와 안 맞았어요. 고민은 이번 진로(JOBS[t].worry)에서, 다른 길 답은 권하는 말(alt)로
+  // 대학교 상담실은 대학생 고민과 높임말 답으로(프로젝트 문서 '대학교 재정비 글 초안 1'). 직업, 숫자, 규칙은 그대로예요
   const JOBS_U = {
     scientist: { worry: ['실험실에서 밤을 새워도 시간 가는 줄 몰라요. 대학원에 가도 될까요?', '논문을 읽다 보면 질문이 더 늘어나요. 이게 맞는 건가요?', '제 가설이 틀렸어요. 석 달을 썼는데요.'], ans: ['질문이 늘어나는 건 잘 가고 있다는 뜻이에요. 그게 연구예요.', '틀린 가설도 기록해 두면 다음 사람의 길이 돼요.'], alt: ['연구원은 어때요? 궁금한 걸 끝까지 파는 일이에요.'] },
     doctor: { worry: ['실습 나가서 처음으로 환자 손을 잡아 봤어요. 손이 떨렸어요.', '외울 게 산더미예요. 제가 해낼 수 있을까요?', '아픈 친구 얘기를 들으면 저까지 마음이 무거워져요.'], ans: ['손이 떨렸다는 건 그 일이 무겁다는 걸 안다는 거예요. 좋은 시작이에요.', '하루에 한 장씩이면 돼요. 산도 한 걸음씩 오르는 거니까요.'], alt: ['숲속 의사는 어때요? 아픈 친구 곁을 지키는 일이에요.'] },
@@ -85,7 +85,7 @@
   const freshCs = () => ({ day: '', n: 0, talks: 0, picks: 0, won: 0, paid: -1, done: {}, met: 0 });
   const csOpen = () => !!S && !!S.cs && S.tier >= CS.tier && rosterOn() && S.roster.list.length > 0;
   const csDay = () => { const t = gameToday(); if (dayRoll(S.cs, t)) { S.cs.n = 0; } };
-  const csMax = () => CS.perDay + Math.floor(xtLv('cou') / 5) + (S.adx && S.adx.cs && S.adx.day === gameToday() ? 1 : 0);   // 4.2.0 광고로 한 번 더
+  const csMax = () => CS.perDay + Math.floor(xtLv('cou') / 5) + (S.adx && S.adx.cs && S.adx.day === gameToday() ? 1 : 0);   // 광고로 한 번 더
   const csLeft = () => { if (!S || !S.cs) return 0; csDay(); return Math.max(0, csMax() - S.cs.n); };
   const csKid = i => S.roster.list[i] || null;
   // 진로 후보: 잘하는 과목(능력치가 가장 큰 칸)에서 둘, 다른 과목에서 하나
@@ -94,7 +94,7 @@
     const mix = a => { a = a.slice(); for (let i = a.length - 1; i > 0; i--) { const j = Math.floor(Math.random() * (i + 1)); [a[i], a[j]] = [a[j], a[i]]; } return a; };
     return mix(mine).slice(0, 2).concat(mix(rest).slice(0, 1));
   }
-  // 고등학교 명부 학생마다 후보를 정해요(옛 저장, 3.1.0 전 고등학교, 학년 중 전학생도)
+  // 고등학교 명부 학생마다 후보를 정해요(옛 저장, 전 고등학교, 학년 중 전학생도)
   function csEnsure() {
     if (!S || !S.cs || S.tier < CS.tier || !rosterOn()) return false;
     let ch = false;
@@ -150,7 +150,7 @@
     if (x.jb >= 0 && !x.jf) { x.jf = 1; S.cs.picks += 1; }   // jf: 처음 진로를 정한 학생(퀘스트 수는 한 번만)
     sfx('tap'); toast(x.jb >= 0 ? `${x.nm}의 꿈은 ${JOBS[j].name}! 그 꿈을 응원할게요.` + (csDone(x) ? ' 벌써 준비가 다 됐어요!' : '') : `${x.nm}의 진로를 다시 고민해요`);
     checkQuests(); save();
-    const row = rt.csView === 'list' && !rt.csTalk && document.querySelector(`#csBody [data-csrow="${i}"]`);   // 5.1.1 woodani: 목록을 다시 그리지 않고 누른 학생 줄만 바꿔요
+    const row = rt.csView === 'list' && !rt.csTalk && document.querySelector(`#csBody [data-csrow="${i}"]`);   // 목록을 다시 그리지 않고 누른 학생 줄만 바꿔요
     if (row) row.outerHTML = csRowHTML(x, i, csLeft()); else renderCounsel();
   }
   // 고등학교 3학년 졸업식(대학교가 열리기 전에는 3학년을 다시 해요): 명부마다 한 번 수료증 보너스와 황금, 진로 도감은 졸업식마다 채워요
@@ -165,7 +165,7 @@
     rt.csRw = [];
     if (S.cs.paid === S.roster.gen) { if (newDex) rt.csRw.push({ title: '진로 도감', sub: `새 진로 ${newDex}칸을 채웠어요`, items: [{ ic: 'ess', t: `숲의 정수 +${CS.dexEss * newDex}` }] }); return 0; }
     S.cs.paid = S.roster.gen; S.cs.won += won.length;
-    const gold = Math.floor(won.length / 5) * CS.gold5, gIt = gold ? goldOr(gold) : null;   // 4.2.0
+    const gold = Math.floor(won.length / 5) * CS.gold5, gIt = gold ? goldOr(gold) : null;
     if (won.length) {
       const best = won.slice().sort((a, b) => csHearts(b) - csHearts(a))[0];
       const art = IMG('letter_career') ? `<img src="${IMG('letter_career')}" alt="">` : '';
@@ -177,22 +177,22 @@
     return won.length * CS.dipPer;
   }
   function openCounsel() {
-    if (tr2Busy()) { toast(tr2Busy()); return; }   // 3.2.0 수학여행 중에는 학생이 없어요
+    if (tr2Busy()) { toast(tr2Busy()); return; }   // 수학여행 중에는 학생이 없어요
     if (!csOpen()) { toast(S.tier < CS.tier ? '상담실은 고등학교부터 열려요' : '명부 학생이 있으면 상담할 수 있어요'); return; }
     if (rt.paused || rt.modalOpen) return;
     if (csEnsure()) save();
-    rt.csTalk = null; rt.csView = S.cs.met ? 'list' : 'hi'; rt.csLastView = '';   // 5.1.1 새로 열 때는 맨 위부터
+    rt.csTalk = null; rt.csView = S.cs.met ? 'list' : 'hi'; rt.csLastView = '';   // 새로 열 때는 맨 위부터
     renderCounsel(); openModal($('#mCounsel')); sfx('tap');
   }
   const csFace = how => IMG(how === 'good' ? 'cou_smile' : how === 'off' ? 'cou_tilt' : 'cou_listen') || IMG('tea_elephant');
-  function csRowHTML(x, i, left) {   // 5.1.1 학생 한 줄(진로 카드를 누르면 이 줄만 바꿔요)
+  function csRowHTML(x, i, left) {   // 학생 한 줄(진로 카드를 누르면 이 줄만 바꿔요)
     const r = csReady(x), J = x.jb >= 0 ? JOBS[x.jb] : null;
     const cards = x.jc.map(j => x.jo.includes(j) ? `<button class="cs-chip${x.jb === j ? ' on' : ''}" type="button" data-cs="p${i}_${j}"><img src="${IMG('badge_' + JOBS[j].k) || ''}" alt="">${JOBS[j].name}</button>` : `<span class="cs-chip back">?</span>`).join('');
     return `<div class="cs-row${csDone(x) ? ' done' : ''}" data-csrow="${i}"><span class="cs-av">${kidAvatar(x.sp)}</span><div class="cs-tx"><b>${esc(x.nm)}${J ? ` <em>${J.name}</em>` : ''}</b>` +
       `<div class="cs-chips">${cards}</div>${J ? `<div class="qbar cs-bar"><i style="width:${r}%"></i></div><small>준비도 ${r}%${csDone(x) ? ` 완료! ${esc(x.nm)}, 이제 ${J.name}${batchim(J.name) ? '이' : '가'} 될 준비가 다 됐구나.` : ` (${STAT_NAME(J.ab)} 별과 ${FAC[J.fac].name} 레벨)`}</small>` : `<small>${x.jo.length ? '열린 카드를 눌러 진로로 정해요' : '상담하면 진로 카드가 열려요'}</small>`}</div>` +
       `<button class="cta small" type="button" data-cs="t${i}"${left ? '' : ' disabled'}>상담</button></div>`;
   }
-  /* 5.1.1 woodani 제보: 직업 카드를 누르면 목록을 새로 그리면서 맨 위로 올라갔어요(휴대폰). 같은 화면을 다시 그릴 때는 스크롤 자리를 지켜요 */
+  /* 직업 카드를 누르면 목록을 새로 그리면서 맨 위로 올라갔어요(휴대폰). 같은 화면을 다시 그릴 때는 스크롤 자리를 지켜요 */
   function renderCounsel() {
     const m = $('#mCounsel'), b = $('#csBody'), keep = !!b && rt.csView === rt.csLastView, ys = [];
     if (keep) for (let el = b; el && el !== document.body; el = el.parentElement) { if (el.scrollTop) ys.push([el, el.scrollTop]); if (el === m) break; }
@@ -243,7 +243,7 @@
     else if (v === 'met') { S.cs.met = 1; save(); rt.csView = 'list'; sfx('tap'); }
     else if (v === 'dex') { rt.csView = 'dex'; }
     else if (v[0] === 't') { if (csLeft() <= 0) { toast('오늘 상담은 여기까지예요. 내일 또 이야기 들어 볼게요'); return; } rt.csTalk = csTalkMake(+v.slice(1)); rt.csView = 'talk'; sfx('tap'); }
-    else if (v === 'adm') { if (csOpen() && csLeft() <= 0) adxMore('cs', () => { renderCounsel(); toast('오늘 상담을 한 번 더 할 수 있어요'); return true; }); return; }   // 4.2.0 한 번 더
+    else if (v === 'adm') { if (csOpen() && csLeft() <= 0) adxMore('cs', () => { renderCounsel(); toast('오늘 상담을 한 번 더 할 수 있어요'); return true; }); return; }   // 한 번 더
     else if (v[0] === 'a') { csAnswer(+v.slice(1)); return; }
     else if (v[0] === 'p') { const [i, j] = v.slice(1).split('_').map(Number); csChoose(i, j); return; }
     renderCounsel();
@@ -257,8 +257,8 @@
     const dn = c.done && typeof c.done === 'object' ? c.done : {};
     for (const J of JOBS) { const v = dn[J.k]; if (v && typeof v === 'object') s.cs.done[J.k] = { nm: typeof v.nm === 'string' ? v.nm.replace(/[<>&"'`\\]/g, '').slice(0, 8) : '친구', sp: typeof v.sp === 'string' ? v.sp.slice(0, 20) : '' }; }
   }
-  /* ===== 3.1.0 진로 상담 END ===== */
-  // 3.1.0 진로 상담: 명부 학생의 진로 칸(후보 jc, 연 카드 jo, 관심 ji, 고른 진로 jb, 지난 고민 jl). 없거나 틀리면 빼서 csEnsure가 다시 정해요
+  /* ===== 진로 상담 END ===== */
+  // 진로 상담: 명부 학생의 진로 칸(후보 jc, 연 카드 jo, 관심 ji, 고른 진로 jb, 지난 고민 jl). 없거나 틀리면 빼서 csEnsure가 다시 정해요
   function csSanKid(x) {
     const ok = j => Number.isInteger(j) && j >= 0 && j < JOBS.length;
     if (!Array.isArray(x.jc) || x.jc.length !== 3 || !x.jc.every(ok) || new Set(x.jc).size !== 3) return {};
@@ -272,11 +272,11 @@
     s.roster.gen = Math.max(0, Math.floor(num(r.gen)) || 0);
     s.roster.list = (Array.isArray(r.list) ? r.list : []).slice(0, ROSTER_MAX).filter(x => x && typeof x.sp === 'string' && (BASE_SPECIES.includes(x.sp) || NEWCOMERS.some(n => n.k === x.sp)))
       .map(x => ({ sp: x.sp, nm: typeof x.nm === 'string' ? x.nm.replace(/[<>&"'`\\]/g, '').slice(0, 8) : '친구',
-        a: ABIL.map((_, i) => Math.max(1, Math.min(100, Math.floor(Array.isArray(x.a) ? (i === 4 && x.a.length < 5 ? 8 + Math.floor(Math.random() * 20) : num(x.a[i]) || 1) : 1)))),   // 2.0.1 옛 저장(네 칸)은 수학 칸을 채워요
-        c: Number.isInteger(x.c) && x.c >= 0 && x.c < CLUBS.length ? x.c : -1, cw: Math.floor(num(x.cw)) || 0, ...(x.r === true ? { r: true } : {}), ...csSanKid(x) }));   // r: 2.1.3 반짝 친구 모습, jc/jo/ji/jb/jl: 3.1.0 진로 상담
+        a: ABIL.map((_, i) => Math.max(1, Math.min(100, Math.floor(Array.isArray(x.a) ? (i === 4 && x.a.length < 5 ? 8 + Math.floor(Math.random() * 20) : num(x.a[i]) || 1) : 1)))),   // 옛 저장(네 칸)은 수학 칸을 채워요
+        c: Number.isInteger(x.c) && x.c >= 0 && x.c < CLUBS.length ? x.c : -1, cw: Math.floor(num(x.cw)) || 0, ...(x.r === true ? { r: true } : {}), ...csSanKid(x) }));   // r: 반짝 친구 모습, jc/jo/ji/jb/jl: 진로 상담
     // 한 동아리에 3명보다 많으면 넘치는 학생은 동아리 밖으로
     CLUBS.forEach((_, c) => s.roster.list.filter(x => x.c === c).slice(CLUB.seats).forEach(x => { x.c = -1; }));
-    // 2.1.0 학력과 능력치 균형: 옛 명부(v 없음)는 한 번만 능력치를 0.6배로(100 → 60). 그 뒤로는 v: 2라 다시 줄지 않아요
+    // 학력과 능력치 균형: 옛 명부(v 없음)는 한 번만 능력치를 0.6배로(100 → 60). 그 뒤로는 v: 2라 다시 줄지 않아요
     if (r.v !== 2) s.roster.list.forEach(x => { x.a = x.a.map(v => Math.max(1, Math.round(v * 0.6))); });
     s.roster.v = 2;
     const k = d.club && typeof d.club === 'object' ? d.club : {};
@@ -285,7 +285,7 @@
     s.club.shown = CLUBS.map((_, i) => Array.isArray(k.shown) && k.shown[i] ? 1 : 0);
     s.club.wk = Math.floor(num(k.wk)) >= 0 ? Math.floor(num(k.wk)) : -1;   // 옛 저장에는 없어서 -1(이번 주 기록 없음)
     s.club.wd = Math.max(0, Math.min(5, Math.floor(num(k.wd)) || 0)); s.club.we = Math.max(0, Math.min(CLUB.weekend, Math.floor(num(k.we)) || 0));
-    // 2.0.1 반장 선거: 후보는 그 주 것만 써요(망가진 값은 새 선거로)
+    // 반장 선거: 후보는 그 주 것만 써요(망가진 값은 새 선거로)
     { const e = d.el && typeof d.el === 'object' ? d.el : {}, ok = sp => typeof sp === 'string' && (BASE_SPECIES.includes(sp) || NEWCOMERS.some(n => n.k === sp));
       const cand = (Array.isArray(e.cand) ? e.cand : []).slice(0, 3).filter(x => x && ok(x.sp) && EL_PLEDGES[x.p])
         .map(x => ({ sp: x.sp, nm: typeof x.nm === 'string' ? x.nm.replace(/[<>&"'`\\]/g, '').slice(0, 8) : '친구', p: x.p }));
@@ -300,9 +300,9 @@
         roster: (Array.isArray(x.roster) ? x.roster : []).slice(0, ROSTER_MAX).filter(o => o && typeof o.sp === 'string').map(o => ({ sp: String(o.sp).slice(0, 12), nm: typeof o.nm === 'string' ? o.nm.replace(/[<>&"'`\\]/g, '').slice(0, 8) : '' })) };
     }
   }
-  /* ---------- 2.0.1 학급 반장 선거 (로드맵 옛 2.0.1, 그림 작업지시서 11) ----------
-     초등학교부터 열려요. 게임 시계로 매주 월요일에 후보 세 명이 공약을 하나씩 들고 나오고, 한 명을 뽑으면 그 공약이 일요일까지 이어져요.
-     초등학교는 교실 창에서, 중학교부터는 복도 학생회실에서도 열어요. 반장은 지도에서 머리 위에 배지를 달아요.
+  /* ---------- 학급 반장 선거 (로드맵 옛, 그림 작업지시서 11) ----------
+     초등학교부터 열려요. 게임 시계로 매주 월요일에 후보 세 명이 공약을 하나씩 들고 나오고, 한 명을 뽑으면 그 공약이 일요일까지 이어져요
+     초등학교는 교실 창에서, 중학교부터는 복도 학생회실에서도 열어요. 반장은 지도에서 머리 위에 배지를 달아요
      중학교부터는 명부 학생이 후보로 나오고, 반장이 속한 동아리의 보너스가 두 배가 돼요 */
   const EL_TIER = 1;
   const EL_PLEDGES = {
@@ -311,7 +311,7 @@
     mission: { ic: 'elect_ic_mission', em: '📝', t: '오늘의 미션 도토리 +100%', v: 2, say: '오늘의 미션을 다 같이 끝내요!' },
     pick: { ic: 'elect_ic_pick', em: '🧺', t: '줍기 도토리 +100%', v: 2, say: '떨어진 도토리를 하나도 남기지 않고 주울게요!' }
   };
-  // 4.1.1 대학교 학생회장 선거 공약 말(효과와 숫자는 그대로)
+  // 대학교 학생회장 선거 공약 말(효과와 숫자는 그대로)
   const EL_SAY_U = { tuition: '스터디 모임을 늘려서 수업료를 올리겠습니다!', fest: '학교 행사를 더 크게, 더 신나게 열겠습니다!', mission: '오늘의 미션, 다 같이 끝내는 캠퍼스를 만들겠습니다!', pick: '캠퍼스에 떨어진 도토리, 한 알도 놓치지 않겠습니다!' };
   for (const k of Object.keys(EL_PLEDGES)) { const s0 = EL_PLEDGES[k].say; Object.defineProperty(EL_PLEDGES[k], 'say', { get: () => uniNow() && EL_SAY_U[k] ? EL_SAY_U[k] : s0, enumerable: true, configurable: true }); }
   function freshEl() { return { wk: -1, pick: -1, cand: [], tier: -1 }; }
@@ -323,7 +323,7 @@
     const ps = mix(Object.keys(EL_PLEDGES)).slice(0, 3);
     let who;
     if (rosterOn() && S.roster.list.length >= 3) who = mix(S.roster.list).sort((a, b) => (b.c >= 0) - (a.c >= 0)).slice(0, 3).map(x => ({ sp: x.sp, nm: x.nm }));
-    else who = frRank(mix([...new Set(speciesList())])).slice(0, 3).map(sp => ({ sp, nm: frNm(sp) }));   // 2.1.1 초등학교 후보는 하트가 높은 단짝부터
+    else who = frRank(mix([...new Set(speciesList())])).slice(0, 3).map(sp => ({ sp, nm: frNm(sp) }));   // 초등학교 후보는 하트가 높은 단짝부터
     while (who.length < 3) who.push({ sp: 'rabbit', nm: spName('rabbit') });
     return who.map((w, i) => ({ sp: w.sp, nm: w.nm, p: ps[i] }));
   }
@@ -380,7 +380,7 @@
     S.el.pick = i;
     S.st.elects += 1; if (S.tier >= 2) S.st.elMid += 1;
     const c = S.el.cand[i];
-    { const f = frOf(c.sp); if (f) { f.n.el += 1; const it = frAddP(c.sp, BF.elect, true); if (it.length) setTimeout(() => toast(it.map(x => x.t).join('\n')), 1600); } }   // 2.1.1
+    { const f = frOf(c.sp); if (f) { f.n.el += 1; const it = frAddP(c.sp, BF.elect, true); if (it.length) setTimeout(() => toast(it.map(x => x.t).join('\n')), 1600); } }
     sfx('quest'); buzz([20, 40, 20]);
     save(); renderElect(); elBadge(); renderHUD();
     if (rt.tab === 'club') renderClub();
@@ -406,10 +406,10 @@
     if (rt.elNews && $('#toast').hidden && !rt.modalOpen && !rt.cereOn && !rt.paused && !gameSceneOpen()) { rt.elNews = false; toast(S.tier >= 2 ? '새 반장 선거가 열렸어요!\n교실이나 복도의 학생회실에서 후보를 만나 보세요' : '새 반장 선거가 열렸어요!\n교실을 눌러 후보를 만나 보세요'); }
     if (rt.elBadgeT !== S.el.pick + ':' + rt.kids.length) { rt.elBadgeT = S.el.pick + ':' + rt.kids.length; elBadge(); }
   }
-  /* ---------- 2.0.1 공부 2단계: 과학 탐구 실험(과학 공부), 책 읽기(국어 공부) (2026-10-28 woodani 결정) ----------
-     과학 탐구 실험: 초등학교부터, 과학실에서 하루 한 번. 재료 둘을 골라 섞으면 결과 카드(20종)나 실패 카드(4종)가 나와 실험 노트에 모여요.
-       성공하면 수업료 15분치와 과학 XP 30, 실패는 과학 XP 10, 새 카드면 황금 도토리 1. 재료는 처음 4개, 과학실 Lv.5, 10, 15에 하나씩.
-       같은 재료 둘은 늘 실패하고, 무지개 깃털과 버섯 포자도 실패예요(짝은 본부 제안, 그림은 작업지시서 18)
+  /* ---------- 공부 2단계: 과학 탐구 실험(과학 공부), 책 읽기(국어 공부) ----------
+     과학 탐구 실험: 초등학교부터, 과학실에서 하루 한 번. 재료 둘을 골라 섞으면 결과 카드(20종)나 실패 카드(4종)가 나와 실험 노트에 모여요
+       성공하면 수업료 15분치와 과학 XP 30, 실패는 과학 XP 10, 새 카드면 황금 도토리 1. 재료는 처음 4개, 과학실 Lv.5, 10, 15에 하나씩
+       같은 재료 둘은 늘 실패하고, 무지개 깃털과 버섯 포자도 실패예요(짝은, 그림은 작업지시서 18)
      책 읽기: 유치원부터, 도서관에서. 책 한 권 고르면 15분 뒤 다 읽어요(앱을 꺼도 가요). 국어 XP 20과 한 줄 감상. 하루 3권(작업지시서 29-1 책 그림) */
   const LAB = { tier: 1, xp: 45, xpF: 15, min: 15, gold: 1 };
   const LAB_IN = [
@@ -457,7 +457,7 @@
     S.lab.st.n += 1; if (ok) S.lab.st.ok += 1;
     let v = 0;
     if (ok) { v = Math.round(minAcorns(LAB.min) * (1 + deptX('science') / 100)); S.budget += v; earn(v); }
-    const xp = acGain('sci', ok ? LAB.xp + (wxIs('fog') ? 15 : 0) : LAB.xpF);   // 2.1.3 안개 낀 날 성공 +15
+    const xp = acGain('sci', ok ? LAB.xp + (wxIs('fog') ? 15 : 0) : LAB.xpF);   // 안개 낀 날 성공 +15
     if (isNew) addGold(LAB.gold);
     save(); renderHUD(); checkQuests(); renderMini();
     return { r, ok, isNew, v, xp };
@@ -559,7 +559,7 @@
     { k: 'music', name: '숲속 음악회', em: '🎻', c: '#E7C03A', say: '책에서 노랫소리가 들리는 것 같아요.' },
     { k: 'robot', name: '친절한 로봇', em: '🤖', c: '#8E969E', say: '로봇도 꽃을 좋아한대요.' }
   ];
-  // 4.1.1 woodani 결정(2026-11-12): 대학교에서는 책 12권이 전공 서적이에요. 열쇠(k)와 저장은 그대로이고 이름과 한마디만 바뀌어요. 표지 그림(book_u_<k>, 작업지시서 69)이 오면 그 그림을 써요
+  // 대학교에서는 책 12권이 전공 서적이에요. 열쇠(k)와 저장은 그대로이고 이름과 한마디만 바뀌어요. 표지 그림(book_u_<k>, 작업지시서 69)이 오면 그 그림을 써요
   const BOOKS_U = {
     acorn: ['도토리 경제학 원론', '도토리 한 알에도 값이 매겨지는 까닭을 알았어요.'], rabbit: ['달과 행성', '달의 뒷면은 생각보다 울퉁불퉁하대요.'],
     seasons: ['숲 생태학', '나무 한 그루에 천 가지 생물이 기대어 살아요.'], sea: ['해양 생물학', '고래의 노래에도 사투리가 있대요.'],
@@ -569,11 +569,11 @@
     music: ['음악 이론', '쉼표도 음악이라는 걸 배웠어요.'], robot: ['인공지능 개론', '로봇도 틀리면서 배운대요.'] };
   for (const B of BOOKS) for (const [f, i] of [['name', 0], ['say', 1]]) { const t0 = B[f]; Object.defineProperty(B, f, { get: () => uniNow() && BOOKS_U[B.k] ? BOOKS_U[B.k][i] : t0, enumerable: true, configurable: true }); }
   const RD = { min: 15, perDay: 3, xp: 25 };
-  const freshRd = () => ({ day: '', n: 0, cur: '', at: 0, got: {}, st: 0, q: [] });   // 5.0.2 q: 예약한 책(읽는 책이 끝나면 이어서)
+  const freshRd = () => ({ day: '', n: 0, cur: '', at: 0, got: {}, st: 0, q: [] });   // q: 예약한 책(읽는 책이 끝나면 이어서)
   const rdReady = () => !!S && S.f.library >= 1;
   function rdDay() { const t = gameToday(); if (dayRoll(S.rd, t)) { S.rd.n = 0; } }
   const rdLeft = () => { rdDay(); return Math.max(0, rdPerDay() - S.rd.n); };
-  const rdEnd = () => S.rd.at + (S.rd.m || RD.min) * 60000;   // 2.1.3 m: 읽기 시작할 때 정한 분(비 오는 날 10분)
+  const rdEnd = () => S.rd.at + (S.rd.m || RD.min) * 60000;   // m: 읽기 시작할 때 정한 분(비 오는 날 10분)
   const rdRemain = () => S.rd.cur ? Math.max(0, rdEnd() - gameNow()) : 0;
   const bookOf = k => BOOKS.find(b => b.k === k);
   const bookKey = b => uniNow() && IMG('book_u_' + b.k) ? 'book_u_' + b.k : 'book_' + b.k;
@@ -581,13 +581,13 @@
   function rdStart(k) {
     const b = bookOf(k); if (!b || !rdReady() || rt.paused) return false;
     if (rdLeft() <= 0) { toast(S.rd.cur ? `지금 「${bookOf(S.rd.cur).name}」${batchim(bookOf(S.rd.cur).name) ? '을' : '를'} 읽고 있어요.\n책은 하루 ${rdPerDay()}권까지예요` : `책은 하루 ${rdPerDay()}권까지예요.\n내일 또 읽어요`); return false; }
-    if (S.rd.cur) {   // 5.0.2 읽는 중에 고르면 예약: 지금 책이 끝난 때부터 이어서 읽어요. 하루 권수는 예약할 때 세요
+    if (S.rd.cur) {   // 읽는 중에 고르면 예약: 지금 책이 끝난 때부터 이어서 읽어요. 하루 권수는 예약할 때 세요
       S.rd.n += 1; S.rd.q.push(k);
       sfx('tap'); save(); renderRead(); renderMini();
       toast(`「${b.name}」${batchim(b.name) ? '을' : '를'} 예약했어요.\n지금 책을 다 읽으면 이어서 읽어요`);
       return true;
     }
-    const first = S.rd.st === 0;   // 5.0.2 처음 읽는 책은 기다리지 않고 바로 다 읽어요(1장 '책 한 권 읽기'가 15분 벽이 되지 않게, 텃밭의 무료 바로 자라기처럼)
+    const first = S.rd.st === 0;   // 처음 읽는 책은 기다리지 않고 바로 다 읽어요(1장 '책 한 권 읽기'가 15분 벽이 되지 않게, 텃밭의 무료 바로 자라기처럼)
     S.rd.n += 1; S.rd.cur = k; S.rd.at = gameNow(); S.rd.m = rdMinNow();
     if (first) {
       S.rd.at = gameNow() - S.rd.m * 60000;
@@ -603,12 +603,12 @@
   // 다 읽었으면 끝내요. 알림은 다른 알림이 없을 때(1초마다 rdTick)
   function rdSettle() {
     let any = false;
-    for (let guard = 0; guard < 9; guard++) {   // 5.0.2 예약한 책이 있으면 앞 책이 끝난 때부터 이어서 읽어요(꺼 둔 동안 여러 권이 끝났을 수 있어요)
+    for (let guard = 0; guard < 9; guard++) {   // 예약한 책이 있으면 앞 책이 끝난 때부터 이어서 읽어요(꺼 둔 동안 여러 권이 끝났을 수 있어요)
       if (!S.rd.cur || gameNow() < rdEnd()) break;
       const end = rdEnd(), b = bookOf(S.rd.cur); S.rd.cur = ''; S.rd.at = 0; S.rd.m = 0;
       if (b) {
         S.rd.got[b.k] = (S.rd.got[b.k] || 0) + 1; S.rd.st += 1;
-        const xp = acGain('kor', Math.round((RD.xp + (wxIs('rain') ? 5 : 0)) * (1 + XT.kor.per / 100 * xtLv('kor')) * (1 + deptX('human') / 100)));   // 2.1.3 비 오는 날 +5, 2.3.0 국어 선생님
+        const xp = acGain('kor', Math.round((RD.xp + (wxIs('rain') ? 5 : 0)) * (1 + XT.kor.per / 100 * xtLv('kor')) * (1 + deptX('human') / 100)));   // 비 오는 날 +5, 국어 선생님
         const who = speciesList()[Math.floor(Math.random() * Math.max(1, speciesList().length))] || 'rabbit';
         rt.rdNews = `「${b.name}」${batchim(b.name) ? '을' : '를'} 다 읽었어요! 국어 XP +${xp}\n${spName(who)}: "${b.say}"`;
         any = true;
@@ -664,7 +664,7 @@
       return `<button class="rd-book${now ? ' now' : ''}" type="button" data-bk="${b.k}" aria-disabled="${left > 0 ? 'false' : 'true'}" aria-label="${b.name}${n ? `, ${n}번 읽음` : ''}${busy && left > 0 ? ', 눌러서 예약' : ''}">${bookCover(b)}<b>${b.name}</b><small>${now ? '읽는 중' : S.rd.q.includes(b.k) ? '예약함' : n ? `${n}번 읽음` : '새 책'}</small></button>`; }).join('');
     $('#rdNote').textContent = nl(`오늘 남은 책 ${left}/${rdPerDay()}권. 지금까지 ${S.rd.st}권 읽었어요. 한 권에 국어 XP +${Math.round(RD.xp * (1 + XT.kor.per / 100 * xtLv('kor')) * (1 + deptX('human') / 100))}.`);
   }
-  // 저장 읽기(2.0.1 공부 2단계)
+  // 저장 읽기(공부 2단계)
   function sanitizeStudy2(d, s) {
     s.lab = freshLab();
     const L = d.lab && typeof d.lab === 'object' ? d.lab : null;
@@ -680,10 +680,10 @@
     const R = d.rd && typeof d.rd === 'object' ? d.rd : null;
     if (R) {
       s.rd.day = typeof R.day === 'string' ? R.day.slice(0, 10) : '';
-      s.rd.n = Math.floor(numIn(R.n, 0, RD.perDay + 2));   // 2.3.0 국어 선생님이면 하루 2권 더
-      if (typeof R.cur === 'string' && bookOf(R.cur)) { s.rd.cur = R.cur; s.rd.at = numIn(R.at, 0, Date.now() + 366 * 86400000); s.rd.m = R.m === 10 ? 10 : 0; if (!s.rd.at) s.rd.cur = ''; }   // 2.1.3 m
+      s.rd.n = Math.floor(numIn(R.n, 0, RD.perDay + 2));   // 국어 선생님이면 하루 2권 더
+      if (typeof R.cur === 'string' && bookOf(R.cur)) { s.rd.cur = R.cur; s.rd.at = numIn(R.at, 0, Date.now() + 366 * 86400000); s.rd.m = R.m === 10 ? 10 : 0; if (!s.rd.at) s.rd.cur = ''; }   // m
       if (R.got && typeof R.got === 'object') for (const b of BOOKS) { const v = Math.floor(numIn(R.got[b.k], 0, 1e6)); if (v > 0) s.rd.got[b.k] = v; }
       s.rd.st = Math.floor(numIn(R.st, 0, 1e7));
-      if (s.rd.cur && Array.isArray(R.q)) s.rd.q = R.q.filter(k => typeof k === 'string' && bookOf(k)).slice(0, 5);   // 5.0.2 예약한 책
+      if (s.rd.cur && Array.isArray(R.q)) s.rd.q = R.q.filter(k => typeof k === 'string' && bookOf(k)).slice(0, 5);   // 예약한 책
     }
   }

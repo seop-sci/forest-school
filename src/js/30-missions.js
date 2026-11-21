@@ -4,24 +4,24 @@
      미션 하나 10점, 보너스 상자 20점, 학교 행사 성공 15점(실패 5점), 체험학습 10점 + 1시간마다 5점, 종업식 20점, 퀘스트 하나 3점.
      지난주 리그가 끝나면 마지막으로 본 순위로 보상을 받아요: 1위 30개, 2~3위 20개, 10위 안 10개, 참여만 해도 3개 */
   const MISSIONS = {
-    // 1.6.0: 줍기와 흔들기는 놀이터(참나무)가 있어야 해요. 놀이터를 짓기 전에는 고르지 않아요
+    // 줍기와 흔들기는 놀이터(참나무)가 있어야 해요. 놀이터를 짓기 전에는 고르지 않아요
     picks: { n: 15, name: n => `떨어진 도토리 ${n}개 줍기`, v: () => S.st.picks, ok: () => S.f.playground >= 1 },
     shakes: { n: 20, name: n => `참나무 ${n}번 흔들기`, v: () => S.st.shakes, ok: () => S.f.playground >= 1 },
     ups: { n: 15, name: n => `시설이나 가구 ${n}번 고치기`, v: () => S.st.ups, ok: () => false },
     trains: { n: 2, name: n => `선생님 연수 ${n}번 보내기`, v: () => S.st.trains, ok: () => false },
-    subs: { get n() { return S && S.tier >= 4 ? 1 : 2; }, name: n => `학생 부탁 ${n}개 들어주기`,   /* 5.0.3 woodani: 대학교부터는 부탁이 오래 걸려서 1개 */ v: () => S.q.subDone, ok: () => S.q.m >= SUB_UNLOCK },
+    subs: { get n() { return S && S.tier >= 4 ? 1 : 2; }, name: n => `학생 부탁 ${n}개 들어주기`,   /* 대학교부터는 부탁이 오래 걸려서 1개 */ v: () => S.q.subDone, ok: () => S.q.m >= SUB_UNLOCK },
     puzzle: { n: 1, name: () => '숲속 퍼즐 한 판 끝내기', v: () => S.st.pz || 0, ok: () => !liveOff('puzzle') },
     merge: { n: 2, name: n => `숲속 합치기 주문 ${n}개 채우기`, v: () => S.mg.st.orders, ok: () => !liveOff('merge') },
     fest: { n: 1, name: () => '학교 행사 한 번 열기', v: () => S.st.sports + Object.values(S.fest.n).reduce((a, b) => a + b, 0), ok: () => FEST_IDS.some(festOpen) },
     trip: { n: 1, name: () => '현장체험학습 다녀오기', v: () => S.st.trips, ok: () => tripOpen() },
-    ns: { n: 1, name: () => '야간 자율학습 켜거나 예약하기', v: () => S.ns ? S.ns.n : 0, ok: () => nsOpen() && !nsUsedTonight() },   // 3.0.0 고등학교 기숙사부터(woodani 결정 2026-11-02)
-    cs: { n: 1, name: () => '진로 상담 한 번 하기', v: () => S.cs ? S.cs.talks : 0, ok: () => csOpen() && csLeft() > 0 }   // 3.1.0 고등학교부터
+    ns: { n: 1, name: () => '야간 자율학습 켜거나 예약하기', v: () => S.ns ? S.ns.n : 0, ok: () => nsOpen() && !nsUsedTonight() },   // 고등학교 기숙사부터
+    cs: { n: 1, name: () => '진로 상담 한 번 하기', v: () => S.cs ? S.cs.talks : 0, ok: () => csOpen() && csLeft() > 0 }   // 고등학교부터
   };
   const DM = { min: 5, bonusGold: 1, bonusDip: 1 };
   const LP = { mission: 10, bonus: 20, festWin: 15, festLose: 5, trip: 10, tripHour: 5, grad: 20, quest: 3 };
-  const LG_PRIZE = r => 1;   // 1.1.0: 광고가 아닌 보상은 모두 1개
+  const LG_PRIZE = r => 1;   // 광고가 아닌 보상은 모두 1개
   // 주는 월요일에 시작해요. 2026년 1월 5일(월)부터 몇 번째 주인지
-  // 주 번호: 게임 시계의 gameWeek()(한국 시간 월요일 0시 시작, 2026-01-05이 0). 1.6.0 전에는 기기 시간대의 월요일이었는데 번호 체계는 같아요
+  // 주 번호: 게임 시계의 gameWeek(한국 시간 월요일 0시 시작, 이 0). 전에는 기기 시간대의 월요일이었는데 번호 체계는 같아요
   const weekIdx = () => gameWeek();
   function dayHash(str) { let h = 2166136261; for (let i = 0; i < str.length; i++) { h ^= str.charCodeAt(i); h = Math.imul(h, 16777619); } return h >>> 0; }
   // 날이 바뀌면 오늘의 미션 3개를 새로 골라요 (열려 있는 것 가운데에서, 날짜와 학교 번호로 섞어요)
@@ -62,12 +62,12 @@
     if (!m || !dmReady(m)) return;
     m.done = true;
     S.st.dmDone += 1; addMP(MP.daily);
-    mgAddEnergy(MG.E.dm);   // 1.8.0 숲속 합치기 에너지
-    const v = Math.max(10, nice(rate() * 60 * DM.min * elMult('mission')));   // 2.0.1 반장 공약
+    mgAddEnergy(MG.E.dm);   // 숲속 합치기 에너지
+    const v = Math.max(10, nice(rate() * 60 * DM.min * elMult('mission')));   // 반장 공약
     S.budget += v; earn(v);
     addLeague(LP.mission);
     sfx('quest'); buzz(12);
-    const skIt = skAdd(), tkIt = tkGive('dm');   // 2.1.0 칭찬 스티커, 2.1.1 단축권
+    const skIt = skAdd(), tkIt = tkGive('dm');   // 칭찬 스티커, 단축권
     showReward({ title: '미션 완료!', sub: MISSIONS[m.id].name(MISSIONS[m.id].n), items: [skIt, tkIt].filter(Boolean).concat([{ ic: 'acorn', t: `도토리 +${fmt(v)}` }, { ic: 'mge', t: `합치기 에너지 +${MG.E.dm}` }, { ic: 'mp', t: `미션 포인트 +${MP.daily}` }]) });
     save(); renderMissions(); renderHUD(); updateQuestDot();
   }
@@ -75,14 +75,14 @@
     if (!dmAllDone() || S.dm.bonus) return;
     S.dm.bonus = true;
     addMP(MP.bonus);
-    mgAddEnergy(MG.E.bonus);   // 1.8.0
-    const gIt = goldOr(DM.bonusGold); addDip(DM.bonusDip);   // 4.2.0
+    mgAddEnergy(MG.E.bonus);
+    const gIt = goldOr(DM.bonusGold); addDip(DM.bonusDip);
     addLeague(LP.bonus);
     sfx('quest'); buzz(20);
     showReward({ title: '보너스 상자를 열었어요!', sub: '오늘의 미션을 모두 마쳤어요', items: [gIt, { ic: 'mge', t: `합치기 에너지 +${MG.E.bonus}` }, { ic: 'dip', t: `수료증 +${DM.bonusDip}장` }, { ic: 'mp', t: `미션 포인트 +${MP.bonus}` }] });
     save(); renderMissions(); renderHUD(); updateQuestDot();
   }
-  /* 5.0.2 모두 받기: 오늘의 미션과 보너스 상자, 이번 주 미션과 상자, 패스 미션, 이벤트 미션, 학생 부탁 가운데 지금 받을 수 있는 것을 한 번에 받아요.
+  /* 모두 받기: 오늘의 미션과 보너스 상자, 이번 주 미션과 상자, 패스 미션, 이벤트 미션, 학생 부탁 가운데 지금 받을 수 있는 것을 한 번에 받아요
      받는 양과 차례는 하나씩 누를 때와 같아요(같은 함수를 차례로 불러요). 보상 창만 하나로 모아요 */
   function claimables() {
     if (!S) return 0;
@@ -111,7 +111,7 @@
     save(); renderMissions(); renderHUD(); updateQuestDot();
     return B.n;
   }
-  /* 5.0.2 오늘 할 일 판: 하루 횟수가 있는 활동의 남은 횟수와 바로 가기를 한 줄씩 보여 줘요(열린 것만). 새 저장 칸은 접기(S.fold.td)뿐이에요 */
+  /* 오늘 할 일 판: 하루 횟수가 있는 활동의 남은 횟수와 바로 가기를 한 줄씩 보여 줘요(열린 것만). 새 저장 칸은 접기(S.fold.td)뿐이에요 */
   const TODO = [
     { k: 'rd', nm: '책 읽기', u: '권', on: () => rdReady(), left: () => rdLeft(), go: 'rdBooks' },
     { k: 'bk', nm: '문제집', u: '권', on: () => !!S.ac, left: () => AC.keys.reduce((a, k) => a + acBkLeft(k), 0), go: 'acBook' },
@@ -130,11 +130,11 @@
     sfx('tap');
     if (T.go === 'home') { setTab('school'); toast(T.tip); return; }
     goTo({ t: T.go });
-    if (k === 'bk') setTimeout(() => toast("과목 옆 '문제집 구매'를 눌러요"), 300);   // 5.0.1.8 T-08
+    if (k === 'bk') setTimeout(() => toast("과목 옆 '문제집 구매'를 눌러요"), 300);
   }
   function renderTodo() {
     const rows = todoRows(); if (!rows.length) return '';
-    const pas = r => r.T.go === 'home' || r.T.k === 'sk';   // 5.0.1.8 T-08 기다리면 오는 것(보충수업, 핫딜, 스티커)은 '가기' 없이 맨 아래에
+    const pas = r => r.T.go === 'home' || r.T.k === 'sk';   // 기다리면 오는 것(보충수업, 핫딜, 스티커)은 '가기' 없이 맨 아래에
     rows.sort((a, b) => (pas(a) ? 1 : 0) - (pas(b) ? 1 : 0));
     const n = rows.filter(r => r.left > 0 && !pas(r)).length, fold = !!(S.fold && S.fold.td);
     return `<h4 class="dm-h td-h"><button type="button" class="td-fold" data-td-fold aria-expanded="${fold ? 'false' : 'true'}">오늘 할 일 <small>${n ? `${n}가지 남음` : '모두 했어요'}</small><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M6 9l6 6 6-6" fill="none" stroke="currentColor" stroke-width="2.6" stroke-linecap="round" stroke-linejoin="round"/></svg></button></h4>` +
@@ -177,12 +177,12 @@
       const r = S.lg.pos || 99, g = LG_PRIZE(r);
       S.lg.last = { week: S.lg.week, pts: S.lg.pts, pos: S.lg.pos || 0, gold: g };
       const pos = S.lg.pos || 0;
-      const gIt = goldOr(g);   // 2.0.0 보안 점검(1-4): 보상은 바로 주고 안내만 늦게(창을 닫아도 사라지지 않게). 4.2.0 60개 뒤에는 정수
+      const gIt = goldOr(g);   // 보안 점검(1-4): 보상은 바로 주고 안내만 늦게(창을 닫아도 사라지지 않게). 60개 뒤에는 정수
       setTimeout(() => toast(`지난주 리그 ${pos ? pos + '위' : '참여'} 보상! ${gIt ? gIt.t : ''}`), 1500);
     }
     S.lg = { week: w, pts: 0, pos: 0, paid: false, last: S.lg.last || null };
   }
-  // 5.0.3 woodani 결정(2026-11-19): 높은 학교급은 퀘스트와 식이 오래 걸려 리그 점수가 불리했어요. 퀘스트와 종업식, 방학식 점수(진행 점수)는 합쳐서 하루 LG_PROG점까지만 쌓여요.
+  // 높은 학교급은 퀘스트와 식이 오래 걸려 리그 점수가 불리했어요. 퀘스트와 종업식, 방학식 점수(진행 점수)는 합쳐서 하루 LG_PROG점까지만 쌓여요
   // 봇으로 잰 하루 진행 점수: 초등 73, 중 128, 고 46, 대학교 35, 대학원 16 → 상한 30이면 초중고대 30, 대학원 16(주 합계 차이 2.2배 → 1.14배쯤)
   const LG_PROG = 30;
   const lgProgLeft = () => { const t = gameToday(); return S.lg.dq && S.lg.dq.day === t ? Math.max(0, LG_PROG - S.lg.dq.p) : LG_PROG; };
@@ -191,7 +191,7 @@
     if (prog) { const t = gameToday(); if (!S.lg.dq || S.lg.dq.day !== t) S.lg.dq = { day: t, p: 0 }; p = Math.min(p, LG_PROG - S.lg.dq.p); if (!(p > 0)) return; S.lg.dq.p += p; }
     lgWeek();
     S.lg.pts += Math.round(p);
-    rsAdd(p);   // 2.1.3 랭킹 시즌 점수
+    rsAdd(p);   // 랭킹 시즌 점수
     rankDirty();
   }
   const lgKey = () => weekIdx() * 1e6 + Math.min(999999, S.lg.pts);
@@ -204,11 +204,11 @@
     puzzle: { n: 5, name: n => `숲속 퍼즐 ${n}판 끝내기`, v: () => S.st.pz || 0, ok: () => !liveOff('puzzle') },
     merge: { n: 10, name: n => `숲속 합치기 주문 ${n}개 채우기`, v: () => S.mg.st.orders, ok: () => !liveOff('merge') },
     shakes: { n: 60, name: n => `참나무 ${n}번 흔들기`, v: () => S.st.shakes, ok: () => S.f.playground >= 1 },
-    picks: { n: 150, name: n => `떨어진 도토리 ${n}개 줍기`, v: () => S.st.picks, ok: () => S.f.playground >= 1 },   // 1.6.0: 놀이터가 있어야 해요
+    picks: { n: 150, name: n => `떨어진 도토리 ${n}개 줍기`, v: () => S.st.picks, ok: () => S.f.playground >= 1 },   // 놀이터가 있어야 해요
     ups: { n: 100, name: n => `시설이나 가구 ${n}번 고치기`, v: () => S.st.ups, ok: () => false },
     trains: { n: 10, name: n => `선생님 연수 ${n}번 보내기`, v: () => S.st.trains, ok: () => false },
     daily: { n: 12, name: n => `오늘의 미션 ${n}개 마치기`, v: () => S.st.dmDone },
-    subs: { get n() { return S && S.tier >= 4 ? 5 : 10; }, name: n => `학생 부탁 ${n}개 들어주기`,   /* 5.0.3 대학교부터 5개 */ v: () => S.q.subDone, ok: () => S.q.m >= SUB_UNLOCK },
+    subs: { get n() { return S && S.tier >= 4 ? 5 : 10; }, name: n => `학생 부탁 ${n}개 들어주기`,   /* 대학교부터 5개 */ v: () => S.q.subDone, ok: () => S.q.m >= SUB_UNLOCK },
     fest: { n: 4, name: n => `학교 행사 ${n}번 열기`, v: () => MISSIONS.fest.v(), ok: () => FEST_IDS.some(festOpen) },
     trip: { n: 3, name: n => `현장체험학습 ${n}번 다녀오기`, v: () => S.st.trips, ok: () => tripOpen() }
   };
@@ -239,8 +239,8 @@
     const m = S.wk.list[i];
     if (!m || !wkReady(m)) return;
     m.done = true;
-    const gIt = goldOr(MP.weekGold); addMP(MP.week); addLeague(LP.mission * 2);   // 4.2.0
-    mgAddEnergy(MG.E.wk);   // 1.8.0
+    const gIt = goldOr(MP.weekGold); addMP(MP.week); addLeague(LP.mission * 2);
+    mgAddEnergy(MG.E.wk);
     sfx('quest'); buzz(15);
     if (rt.batch) { rt.batch.items.push(gIt, { ic: 'mp', t: `미션 포인트 +${MP.week}` }, { ic: 'mge', t: `합치기 에너지 +${MG.E.wk}` }); rt.batch.n += 1; }
     toast(`이번 주 미션 완료! ${gIt.t}, 미션 포인트 +${MP.week}, 합치기 에너지 +${MG.E.wk}`);
@@ -251,25 +251,25 @@
     const B = MP_BOX[i];
     S.wk.got[i] = true;
     const got = [];
-    // 1.4.0: 상자마다 도토리도 수업료 몇 분치(min)로 넣어요. 학교급이 올라도 알맞은 양이 나와요
+    // 상자마다 도토리도 수업료 몇 분치(min)로 넣어요. 학교급이 올라도 알맞은 양이 나와요
     if (B.min) { const v = Math.max(10, nice(rate() * 60 * B.min)); S.budget += v; earn(v); got.push(`도토리 +${fmt(v)}`); }
-    if (B.gold) { if (i === MP_BOX.length - 1) { addGold(B.gold); got.push(`황금 도토리 +${B.gold}`); } else { const g = goldOr(B.gold); if (g) got.push(g); } }   // 4.2.0 60개 뒤에는 마지막 상자만 황금
+    if (B.gold) { if (i === MP_BOX.length - 1) { addGold(B.gold); got.push(`황금 도토리 +${B.gold}`); } else { const g = goldOr(B.gold); if (g) got.push(g); } }   // 60개 뒤에는 마지막 상자만 황금
     if (B.dip) { addDip(B.dip); got.push(`수료증 +${B.dip}장`); }
     if (B.feast) { useBooster('feast'); got.push('특식 데이 10분'); }
-    if (i === MP_BOX.length - 1) { const it = mgAddUp(1); if (it) got.push(it); }   // 1.8.0: 마지막 주간 상자(3.0.0 생산기가 모두 최고면 정수)
-    { const tk = tkGive('wk'); if (tk) got.push(tk); }   // 2.1.1 단축권
+    if (i === MP_BOX.length - 1) { const it = mgAddUp(1); if (it) got.push(it); }   // 마지막 주간 상자(생산기가 모두 최고면 정수)
+    { const tk = tkGive('wk'); if (tk) got.push(tk); }   // 단축권
     if (B.crown) {
       if (!S.cos.own.includes('hat:crown')) { S.cos.own.push('hat:crown'); S.cos.hat = 'crown'; applyCos(); got.push('금빛 왕관 (학생들이 바로 썼어요!)'); }
       else { addGold(1); got.push('황금 도토리 +1 더'); }
     }
     sfx('quest'); buzz(20);
-    showReward({ title: `${i + 1}번째 주간 상자를 열었어요!`, items: got.map(t => typeof t === 'object' ? t : ({ ic: /황금/.test(t) ? 'gold' : /^도토리/.test(t) ? 'acorn' : /수료증/.test(t) ? 'dip' : /왕관/.test(t) ? '👑' : /정수/.test(t) ? 'ess' : '🍱', t })) });   // 5.1.0.1 woodani 제보: 정수와 단축권이 도시락 그림으로 나왔어요. 정수, 단축권, 생산기 조각은 주는 곳의 그림 그대로
+    showReward({ title: `${i + 1}번째 주간 상자를 열었어요!`, items: got.map(t => typeof t === 'object' ? t : ({ ic: /황금/.test(t) ? 'gold' : /^도토리/.test(t) ? 'acorn' : /수료증/.test(t) ? 'dip' : /왕관/.test(t) ? '👑' : /정수/.test(t) ? 'ess' : '🍱', t })) });   // 정수와 단축권이 도시락 그림으로 나왔어요. 정수, 단축권, 생산기 조각은 주는 곳의 그림 그대로
     save(); renderMissions(); renderHUD(); updateQuestDot();
   }
   function renderWeek() {
     wkWeek();
     const top = MP_BOX[MP_BOX.length - 1].at, pct = Math.min(1, S.wk.pts / top) * 100;
-    const left = 7 - ((new Date(gameNow() + KST_MS).getUTCDay() + 6) % 7);   // 2.0.0 보안 점검(1-5): 한국 시간 요일
+    const left = 7 - ((new Date(gameNow() + KST_MS).getUTCDay() + 6) % 7);   // 보안 점검(1-5): 한국 시간 요일
     const box = (i) => {
       const B = MP_BOX[i], got = S.wk.got[i], ready = boxReady(i);
       const ic = `<svg viewBox="-11 -11 22 22" aria-hidden="true"><rect x="-8" y="-3" width="16" height="10" rx="2" class="${got ? 'mb-open' : 'mb-b'}"/><path d="M-9 -7 H9 V-2 H-9 Z" class="${got ? 'mb-open' : 'mb-l'}"/><rect x="-1.6" y="-7" width="3.2" height="14" class="mb-r"/></svg>`;
@@ -293,7 +293,7 @@
     $('#feverFx').hidden = !on || rt.reduced;
   }
   let feverTimer = 0;
-  // 1.5.6: 카운트다운 알림판이 행사 자리(광장, 운동장)를 가리지 않게 행사 자리 아래에 띄워요. 아래에 자리가 없으면 위에 띄워요
+  // 카운트다운 알림판이 행사 자리(광장, 운동장)를 가리지 않게 행사 자리 아래에 띄워요. 아래에 자리가 없으면 위에 띄워요
   function banSpot() {
     let top, bot;
     if (rt.sports) { top = SPORTS.cy - SPORTS.ry - 24; bot = SPORTS.cy + SPORTS.ry + 8; }
@@ -334,7 +334,7 @@
     const before = Math.ceil(R.intro);
     R.intro -= dt;
     const now = Math.ceil(R.intro);
-    if (R.intro <= 0) { feverBanner('시작!', how, 900); sfx('tap'); buzz(30); }   // 2.3.1 종소리 대신 가벼운 소리
+    if (R.intro <= 0) { feverBanner('시작!', how, 900); sfx('tap'); buzz(30); }   // 종소리 대신 가벼운 소리
     else if (now !== before || !R.shown) { R.shown = true; feverBanner(String(now), title, 0); sfx('tap'); buzz(10); }
     return true;
   }
@@ -346,7 +346,7 @@
   }
   function feverEnd(then) {
     feverBanner('끝!', '', 1000);
-    buzz(40);   // 2.3.1 woodani: 행사 끝 종소리 뺌
+    buzz(40);   // 행사 끝 종소리 뺌
     setTimeout(() => { feverOn(false); then(); }, 1000);
   }
 

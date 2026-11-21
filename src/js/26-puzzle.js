@@ -5,14 +5,14 @@
      - 선생님 도움: 조각에 가끔 선생님 블록이 끼어 나와요. 그 블록이 든 줄을 지우면 다람쥐(3×3 치우기), 부엉이(조각 바꾸기), 곰(조각 돌리기) 도움을 받아요
      하루에 5판까지 보상을 주고(2.3.1 woodani: 10판에서 5판, 대신 한 판 보상 +100%), 광고를 보면 2판 더 받아요. 그 뒤에도 연습으로는 계속 할 수 있어요. 하던 판은 저장돼요 */
   const PZ = {
-    N: 8, perDay: 5, adMore: 2, adMax: 1, rw: 2, sweep: 0.7,   // 2.3.1 rw: 한 판 보상 배수, sweep: 소탕 점수(3.0.0부터 오늘 직접 한 판 점수의 70%, 화면에는 쓰지 않아요)
-    comboGrace: 4,   // 1.8.0: 줄을 못 지운 놓기가 이만큼 이어져야 콤보가 끊겨요
+    N: 8, perDay: 5, adMore: 2, adMax: 1, rw: 2, sweep: 0.7,   // rw: 한 판 보상 배수, sweep: 소탕 점수(부터 오늘 직접 한 판 점수의 70%, 화면에는 쓰지 않아요)
+    comboGrace: 4,   // 줄을 못 지운 놓기가 이만큼 이어져야 콤보가 끊겨요
     pats: ['acorn', 'leaf', 'flower', 'mushroom', 'berry', 'water'],
     patName: { acorn: '도토리', leaf: '잎', flower: '꽃', mushroom: '버섯', berry: '산딸기', water: '물방울' },
     teas: ['squirrel', 'owl', 'bear'], teaName: { squirrel: '다람쥐', owl: '부엉이', bear: '곰' },
-    teaRate: 1 / 8, teaMax: 5, teaBonus: 15,   // 조각 8개 중 1개꼴로 선생님 블록. 2.1.1부터 선생님마다 5개까지 쌓여요(woodani 요청: 여러 개, 5는 본부 제안), 다 차 있으면 점수 15점
+    teaRate: 1 / 8, teaMax: 5, teaBonus: 15,   // 조각 8개 중 1개꼴로 선생님 블록
     essPer: 150, essMax: 25,        // 점수 150점마다 숲의 정수 1개, 한 판에 25개까지
-    minPer: 100, minMax: 15,        // 점수 100점마다 수업료 1분치, 한 판에 15분치까지 (2026-10-26 균형 제안서, woodani 확정)
+    minPer: 100, minMax: 15,        // 점수 100점마다 수업료 1분치, 한 판에 15분치까지 (균형 제안서)
     askN: [8, 12, 16, 20, 24], askEss: [2, 3, 4, 5, 5],
     askers: [['rabbit', '토끼'], ['fox', '여우'], ['raccoon', '너구리'], ['chick', '병아리'], ['bear', '아기곰'], ['cat', '고양이'], ['dog', '강아지'], ['penguin', '펭귄'], ['panda', '판다'], ['koala', '코알라'], ['otter', '수달']]
   };
@@ -82,15 +82,15 @@
     if (d.helps && typeof d.helps === 'object') for (const t of PZ.teas) helps[t] = Math.min(PZ.teaMax, Math.floor(numFb(d.helps[t], 0, 0)));
     const cur = { b, tb, tray, score: Math.min(1e9, Math.floor(numFb(d.score, 0, 0))), combo: Math.floor(numFb(d.combo, 0, 0, SAVE_CAP.count)), miss: Math.floor(numFb(d.miss, 0, 0, SAVE_CAP.count)), lines: Math.floor(numFb(d.lines, 0, 0, SAVE_CAP.count)),
       helps, askI: Math.floor(numFb(d.askI, 0, 0, SAVE_CAP.count)), ask: null, ess: Math.floor(numFb(d.ess, 0, 0, SAVE_CAP.count)), rw: d.rw !== false, mode: '' };
-    if (d.bst && typeof d.bst === 'object') cur.bst = { teacher: !!d.bst.teacher, small: !!d.bst.small, combo: !!d.bst.combo };   // 1.7.2 부스터
+    if (d.bst && typeof d.bst === 'object') cur.bst = { teacher: !!d.bst.teacher, small: !!d.bst.small, combo: !!d.bst.combo };   // 부스터
     if (d.ask && typeof d.ask === 'object' && cell(d.ask.k)) {
       const who = PZ.askers.find(a => a[0] === d.ask.who) || PZ.askers[0];
       cur.ask = { k: cell(d.ask.k), n: Math.max(1, Math.floor(numFb(d.ask.n, 1, 8, SAVE_CAP.count))), got: Math.floor(numFb(d.ask.got, 0, 0, SAVE_CAP.count)), who: who[0], name: who[1] };
     } else pzNewAsk(cur);
-    cur.tray = cur.tray.map(p => p || pzNewPiece(cur));   // 1.8.0 빈 자리는 바로 채워요(옛 저장의 빈 자리도)
+    cur.tray = cur.tray.map(p => p || pzNewPiece(cur));   // 빈 자리는 바로 채워요(옛 저장의 빈 자리도)
     return cur;
   }
-  // 오늘 남은 보상 판. 날이 바뀌면 다시 5판(2.3.1)
+  // 오늘 남은 보상 판. 날이 바뀌면 다시 5판
   function pzDay() { const t = gameToday(); if (dayRoll(S.pz, t)) { S.pz.n = 0; S.pz.adN = 0; } }
   const pzQuota = () => PZ.perDay + S.pz.adN * PZ.adMore;
   const pzLeft = () => { pzDay(); return Math.max(0, pzQuota() - S.pz.n); };
@@ -145,9 +145,9 @@
     let gain = p.c.length;
     if (n > 0) {
       cur.combo += 1; cur.miss = 0; cur.lines += n;
-      const mult = Math.min(4, 1 + 0.5 * (cur.combo - 1) + (cur.bst && cur.bst.combo ? 0.5 : 0));   // 1.7.2 콤보 부스터: 첫 줄부터 ×1.5
+      const mult = Math.min(4, 1 + 0.5 * (cur.combo - 1) + (cur.bst && cur.bst.combo ? 0.5 : 0));   // 콤보 부스터: 첫 줄부터 ×1.5
       gain += Math.round((10 * n + 5 * n * (n - 1) + 20 * L.mono.length) * mult) + PZ.teaBonus * teas.filter(x => !x.got).length;
-    } else { cur.miss = (cur.miss || 0) + 1; if (cur.miss >= PZ.comboGrace) { cur.combo = 0; cur.miss = 0; } }   // 1.8.0: 네 번 연달아 못 지우면 끊겨요
+    } else { cur.miss = (cur.miss || 0) + 1; if (cur.miss >= PZ.comboGrace) { cur.combo = 0; cur.miss = 0; } }   // 네 번 연달아 못 지우면 끊겨요
     cur.score += gain;
     // 학생 부탁 진행
     const asks = [];
@@ -161,7 +161,7 @@
         cur.askI += 1; pzNewAsk(cur);
       }
     }
-    cur.tray[slot] = pzNewPiece(cur);   // 1.8.0 woodani: 셋을 다 쓰기 전에, 쓴 자리에 바로 새 조각
+    cur.tray[slot] = pzNewPiece(cur);   // 셋을 다 쓰기 전에, 쓴 자리에 바로 새 조각
     return { placed: p.c.map(([dr, dc]) => (r + dr) * PZ.N + c + dc), lines: L, n, cleared, gain, pats, asks, teas, filled, filledT, over: pzStuck(cur) };
   }
   // 선생님 도움
@@ -176,7 +176,7 @@
     }
     cur.helps.squirrel -= 1; return out;
   }
-  /* 4.4.1 woodani 요청: 부엉이 조각 바꾸기는 되도록 꼭 필요한 조각으로. 조각마다 후보 여러 개를 놓아 보고
+  /* 부엉이 조각 바꾸기는 되도록 꼭 필요한 조각으로. 조각마다 후보 여러 개를 놓아 보고
      줄을 가장 많이 지우는 조각, 없으면 놓을 자리가 있는 조각을 골라요. 세 조각이 같은 모양만 나오지 않게 겹치면 다음 후보 */
   function pzBestLines(b, c) {
     let best = -1;
@@ -207,29 +207,29 @@
     cur.helps.bear -= 1; return true;
   }
   // 보상: 숲의 정수는 점수로, 도토리는 수업료 몇 분치로(학교급이 올라가도 알맞은 양)
-  const pzEssOf = score => Math.min(PZ.essMax, Math.floor(score / PZ.essPer)) * PZ.rw;   // 2.3.1 한 판 보상 두 배(하루 판 수는 절반)
+  const pzEssOf = score => Math.min(PZ.essMax, Math.floor(score / PZ.essPer)) * PZ.rw;   // 한 판 보상 두 배(하루 판 수는 절반)
   const pzMinOf = score => Math.min(PZ.minMax, Math.floor(score / PZ.minPer)) * PZ.rw;
   const pzXpOf = score => Math.min(AC.pzMax, Math.floor(score / AC.pzPer)) * PZ.rw;
-  function addEss(n) { if (!(n > 0)) return; S.ess = Math.min(1e9, S.ess + Math.floor(n * (1 + rxPct('ess') / 100))); renderEss(); }   // 4.2.0 정수 연구
+  function addEss(n) { if (!(n > 0)) return; S.ess = Math.min(1e9, S.ess + Math.floor(n * (1 + rxPct('ess') / 100))); renderEss(); }   // 정수 연구
   function renderEss() { const e = $('#essHave'); if (e) e.textContent = fmt(S.ess); const et = $('#vEssTop'); if (et) et.textContent = fmt(S.ess); const e2 = $('#essHave2'); if (e2) e2.textContent = fmt(S.ess); }
   // 판 끝내기(다 막혔거나 그만하기). 정수와 도토리를 주고 최고 점수를 남겨요
   function pzFinish(cur) {
     const rw = cur.rw, score = cur.score;
-    const ess = rw ? Math.floor(pzEssOf(score) * libMult()) : 0, mins = rw ? pzMinOf(score) : 0;   // 1.7.1 사서 선생님 레벨만큼 더
+    const ess = rw ? Math.floor(pzEssOf(score) * libMult()) : 0, mins = rw ? pzMinOf(score) : 0;   // 사서 선생님 레벨만큼 더
     const acorns = mins > 0 ? nice(rate() * 60 * mins) : 0;
     if (ess > 0) addEss(ess);
     if (acorns > 0) { S.budget += acorns; earn(acorns); }
     const newBest = score > S.pz.best;
     if (newBest) S.pz.best = score;
     S.st.pz = (S.st.pz || 0) + 1;
-    const xp = rw ? acGain('math', pzXpOf(score)) : 0;   // 2.0.1 공부: 보상 판은 수학 XP(2.1.0 100점마다 1, 판당 12까지. 2.3.1 두 배)
-    if (rw && cur.hand !== false) { const t = gameToday(); S.pz.tb = S.pz.hand === t ? Math.max(S.pz.tb || 0, score) : score; S.pz.hand = t; }   // 2.3.1 오늘 직접 한 판이 있으면 소탕이 열려요(3.0.0 그날 직접 한 판의 최고 점수를 남겨요)
-    const tk = rw ? tkDaily('pz') : null;   // 2.3.0.1 보상 판마다 5분권 1장(하루 3장)
+    const xp = rw ? acGain('math', pzXpOf(score)) : 0;   // 공부: 보상 판은 수학 XP(100점마다 1, 판당 12까지. 두 배)
+    if (rw && cur.hand !== false) { const t = gameToday(); S.pz.tb = S.pz.hand === t ? Math.max(S.pz.tb || 0, score) : score; S.pz.hand = t; }   // 오늘 직접 한 판이 있으면 소탕이 열려요(그날 직접 한 판의 최고 점수를 남겨요)
+    const tk = rw ? tkDaily('pz') : null;   // 보상 판마다 5분권 1장(하루 3장)
     S.pz.cur = null;
     save();
     return { score, ess, askEss: rw ? cur.ess : 0, mins, acorns, newBest, rw, xp, tk };
   }
-  /* 2.3.1 숲속 퍼즐 소탕(woodani 결정): 그날 보상 판을 1판 직접 하면 열려요. 판마다 오늘 직접 한 판 점수의 70%(PZ.sweep, 3.0.0 조정안 5. 예전에는 역대 최고 점수)로 친 보상을 바로 받아요.
+  /* 숲속 퍼즐 소탕: 그날 보상 판을 1판 직접 하면 열려요. 판마다 오늘 직접 한 판 점수의 70%(PZ.sweep, 조정안 5. 예전에는 역대 최고 점수)로 친 보상을 바로 받아요
      비율은 화면에 쓰지 않고 받을 양만 보여 줘요. 학생 부탁은 소탕으로 채우지 않아요. 오늘의 미션, 이벤트의 '퍼즐 n판'에는 쳐요 */
   const pzSwOpen = () => { pzDay(); return S.pz.hand === gameToday() && (S.pz.tb || 0) > 0; };
   const pzSwScore = () => S.pz.hand === gameToday() ? Math.floor((S.pz.tb || 0) * PZ.sweep) : 0;
@@ -266,14 +266,14 @@
     save(); renderMini(); renderEss(); renderHUD(); checkQuests(); if (typeof evSync === 'function') evSync();
     return g;
   }
-  // 1.7.2 숲속 퍼즐 부스터 (2026-10-26 woodani 결정). 값은 수업료 몇 분치라 학교급이 올라가도 알맞아요. 보상 상한(정수 25, 도토리 15분치)은 그대로
+  // 숲속 퍼즐 부스터. 값은 수업료 몇 분치라 학교급이 올라가도 알맞아요. 보상 상한(정수 25, 도토리 15분치)은 그대로
   const PZB = {
     teacher: { m: 5, e: 4, ic: 'boost_pz_teacher', name: '선생님 도움', d: '선생님 도움 하나를 들고 시작' },
     small: { m: 3, e: 3, ic: 'boost_pz_small', name: '작은 조각', d: '처음 조각 3개를 작은 조각으로' },
     combo: { m: 10, e: 6, ic: 'boost_pz_combo', name: '콤보 ×1.5', d: '첫 줄부터 콤보 ×1.5로 시작' },
   };
   const PZB_IDS = Object.keys(PZB);
-  // 1.8.0 재화 원칙(2026-10-27 woodani 결정): 부스터는 숲의 정수로 값을 고정해요(e). m은 1.7.x 도토리 값(수업료 분치) 기록
+  // 재화 원칙: 부스터는 숲의 정수로 값을 고정해요(e). m은 1.7.x 도토리 값(수업료 분치) 기록
   const pzbCost = id => PZB[id].e;
   // 아직 아무것도 놓지 않은 보상 판에만 부스터를 쓸 수 있어요
   const pzFresh = cur => !!(cur && cur.rw && !cur.score && !cur.lines && !cur.bst && cur.b.every(v => !v));
@@ -317,13 +317,13 @@
   const pzTeaArt = t => !!(t && IMG('pz_tea_' + t));
   const pzTeaStyle = (t, k) => !t ? '' : pzTeaArt(t) ? `--tea:${pzBlockImg(k)}` : `--tea:${pzImg('tea_' + t)}`;
   const pzCellImg = (k, t) => pzTeaArt(t) ? pzImg('pz_tea_' + t) : pzBlockImg(k);
-  // 1.7.2 부스터 시트
+  // 부스터 시트
   function pzBoostOpen() {
     const cur = S.pz.cur;
     if (!pzFresh(cur)) { $('#pzBoost').hidden = true; return; }
     pzUI.pick = new Set();
     pzBoostRender();
-    setT($('#pzBoostRw'), `${PZ.essPer}점마다 숲의 정수 ${PZ.rw}개, ${PZ.minPer}점마다 수업료 ${PZ.rw}분치를 받아요`);   // 5.0.1.5 M-15
+    setT($('#pzBoostRw'), `${PZ.essPer}점마다 숲의 정수 ${PZ.rw}개, ${PZ.minPer}점마다 수업료 ${PZ.rw}분치를 받아요`);
     $('#pzBoost').hidden = false;
   }
   function pzBoostRender() {
@@ -351,10 +351,10 @@
   }
   function pzOpen(asked) {
     pzInitArt();
-    if (FXL.st === 'ok' && !FXO.st) fxoInit();   // 5.3.0.3 깨지는 조각 그림판
+    if (FXL.st === 'ok' && !FXO.st) fxoInit();   // 깨지는 조각 그림판
     setTimeout(() => { try { if (FXO.st === 'ok' || FXL.st === 'ok') new Set([...document.querySelectorAll('#pzBoard [style*="url"], #pzTray [style*="url"]')].map(e => e.style.backgroundImage)).forEach(fxoUrlTex); } catch (e) { /* 다음에 */ } }, 600);
     pzDay();
-    // 3.0.0 woodani 요청: 보상 없는 연습 판이 남아 있는데 오늘 보상 판이 있으면 이어 할지 새 보상 판으로 할지 물어요(뒤로 가기는 이어 하기)
+    // 보상 없는 연습 판이 남아 있는데 오늘 보상 판이 있으면 이어 할지 새 보상 판으로 할지 물어요(뒤로 가기는 이어 하기)
     if (!asked && S.pz.cur && !S.pz.cur.rw && pzLeft() > 0) {
       askBox({ title: '새 보상 판이 있어요', text: `하던 연습 판(${fmt(S.pz.cur.score)}점)이 남아 있어요.\n연습 판은 끝까지 해도 보상이 없어요.\n오늘 보상 판 ${pzLeft()}판이 남았어요.`,
         yes: '새 보상 판 시작', no: '연습 판 이어 하기', onYes: () => { S.pz.cur = null; pzStart(); pzOpen(true); }, onNo: () => pzOpen(true) });
@@ -370,7 +370,7 @@
   }
   function pzClose() {
     pzUI.open = false; pzUI.mode = '';
-    if (pzUI.holdEl) { pzUI.holdEl.remove(); pzUI.holdEl = null; }   // 3.0.0 들고 있던 폭탄
+    if (pzUI.holdEl) { pzUI.holdEl.remove(); pzUI.holdEl = null; }   // 들고 있던 폭탄
     pzDragEnd(true);
     $('#pzScene').hidden = true;
     save();
@@ -435,12 +435,12 @@
   }
   // 선생님 도움 단추: 갖고 있으면 밝게, 쓰는 중이면 테두리
   function pzRenderHelp() {
-    if (pzUI.mode !== 'squirrel') pzAim(null);   // 2.1.1 다람쥐 모드를 나가면 3×3 미리 보기를 지워요
+    if (pzUI.mode !== 'squirrel') pzAim(null);   // 다람쥐 모드를 나가면 3×3 미리 보기를 지워요
     const cur = S.pz.cur; if (!cur) return;
     $$('#pzHelps .pz-tea').forEach(b => {
       const t = b.dataset.help, n = cur.helps[t] || 0;
       b.classList.toggle('has', n > 0); b.classList.toggle('on', pzUI.mode === t);
-      b.querySelector('.pz-tean').textContent = `${n}/${PZ.teaMax}`; b.classList.toggle('full', n >= PZ.teaMax);   // 2.3.1 보유/최대
+      b.querySelector('.pz-tean').textContent = `${n}/${PZ.teaMax}`; b.classList.toggle('full', n >= PZ.teaMax);   // 보유/최대
     });
   }
   function pzHint(msg, ms) {
@@ -467,7 +467,7 @@
         const el = document.createElement('i');
         const art = kind === 'mono' ? 'fx_sparkle' : Math.random() < 0.4 ? 'fx_leaf_3' : (Math.random() < 0.5 ? 'fx_leaf_1' : 'fx_leaf_2');
         el.className = 'pz-leaf' + (kind === 'mono' ? ' s' : art === 'fx_leaf_3' ? ' p' : '');
-        if (IMG(art)) { el.classList.add('img'); el.style.backgroundImage = pzImg(art); }   // 1.6.0 그림이 있으면 그림 잎과 반짝이
+        if (IMG(art)) { el.classList.add('img'); el.style.backgroundImage = pzImg(art); }   // 그림이 있으면 그림 잎과 반짝이
         el.style.left = x + 'px'; el.style.top = y + 'px';
         el.style.setProperty('--dx', (Math.random() * 80 - 40) + 'px'); el.style.setProperty('--dy', (-30 - Math.random() * 60) + 'px'); el.style.setProperty('--rot', (Math.random() * 300 - 150) + 'deg');
         pop.appendChild(el); setTimeout(() => el.remove(), 900);
@@ -514,7 +514,7 @@
     const rect = pzGridRect();
     const fc = (x - rect.gl) / rect.cell, fr = (y - rect.gt) / rect.cellY;
     const cur = S.pz.cur;
-    // 4.4.1 woodani 요청(조작이 불편해요): 딱 맞는 칸이 아니어도 한 칸 남짓 안에서 가장 가까운 놓을 자리로 붙어요
+    // 딱 맞는 칸이 아니어도 한 칸 남짓 안에서 가장 가까운 놓을 자리로 붙어요
     let r = Math.round(fr), c = Math.round(fc), ok = pzFits(cur.b, dg.p.c, r, c);
     if (!ok) { let bd = 0.95 * 0.95; for (let rr = Math.floor(fr) - 1; rr <= Math.ceil(fr) + 1; rr++) for (let cc = Math.floor(fc) - 1; cc <= Math.ceil(fc) + 1; cc++) { const d = (rr - fr) ** 2 + (cc - fc) ** 2; if (d < bd && pzFits(cur.b, dg.p.c, rr, cc)) { bd = d; r = rr; c = cc; ok = true; } } }
     const at = ok ? r * PZ.N + c : -1;
@@ -579,7 +579,7 @@
       });
       setTimeout(() => { res.cleared.forEach(i => { pzUI.cells[i].style.animationDelay = ''; }); pzRenderBoard(); }, rt.reduced ? 0 : 420 + 28 * 8);
       if (FXL.st === 'ok' && !FXO.st) fxoInit();
-      if (fxoHost($('#pzPop'))) {   // 5.3.0.3 블록이 네 조각으로 깨져 떨어져요(문양 줄과 여러 줄이면 빛 고리)
+      if (fxoHost($('#pzPop'))) {   // 블록이 네 조각으로 깨져 떨어져요(문양 줄과 여러 줄이면 빛 고리)
         const rect = pzGridRect(); res.cleared.slice(0, 32).forEach(i => { const x = rect.ox + (i % PZ.N + 0.5) * rect.cell, y = rect.oy + (Math.floor(i / PZ.N) + 0.5) * rect.cellY, dist = Math.abs(Math.floor(i / PZ.N) - pr) + Math.abs(i % PZ.N - pc);
           fxoShatter(x, y, rect.cell, pzCellImg(res.filled[i], res.filledT[i]), 0, dist * 28 + 60); });
         if (res.lines.mono.length || res.n >= 2) { const m = res.cleared[Math.floor(res.cleared.length / 2)]; setTimeout(() => fxoBurst(rect.ox + (m % PZ.N + 0.5) * rect.cell, rect.oy + (Math.floor(m / PZ.N) + 0.5) * rect.cellY, rect.cell * 1.6, res.lines.mono.length ? 0xffd34d : 0xfff2b0, true), 140); }
@@ -620,8 +620,8 @@
     if (r.ess > 0) items.push(`<li><span class="tic" style="background-image:${pzImg('ic_essence')}"></span>숲의 정수<b>+${r.ess}</b></li>`);
     if (r.askEss > 0) items.push(`<li><span class="tic" style="background-image:${pzImg('ic_essence')}"></span>학생 부탁 보상<b>+${r.askEss}</b></li>`);
     if (r.acorns > 0) items.push(`<li><span data-acorn>${acornIcon()}</span>도토리<b>+${fmt(r.acorns)}</b></li>`);
-    if (r.xp > 0) items.push(`<li><span class="tic" style="background-image:${pzImg('ic_study')}"></span>수학 XP<b>+${r.xp}</b></li>`);   // 2.0.1 공부
-    if (r.tk) items.push(`<li><span class="tic" style="background-image:${pzImg('ticket_m5')}"></span>5분 단축권<b>+${TK_REW.pz[1]}</b></li>`);   // 2.3.0.1
+    if (r.xp > 0) items.push(`<li><span class="tic" style="background-image:${pzImg('ic_study')}"></span>수학 XP<b>+${r.xp}</b></li>`);   // 공부
+    if (r.tk) items.push(`<li><span class="tic" style="background-image:${pzImg('ticket_m5')}"></span>5분 단축권<b>+${TK_REW.pz[1]}</b></li>`);
     $('#pzEndList').innerHTML = items.join('');
     const ea = $('#pzEndArt'), gotEss = r.ess > 0 || r.askEss > 0;   // 정수를 받았으면 정수 무더기 그림
     ea.hidden = !(gotEss && IMG('essence_pile')); if (!ea.hidden) ea.style.backgroundImage = pzImg('essence_pile');
@@ -642,11 +642,11 @@
     sfx('tap');
     if (kind === 'owl') { pzHelpOwl(cur); sfx('leaf'); buzz(12); pzHint(profText('부엉이 선생님이 조각을 바꿔 줬어요')); save(); pzRenderTray(); pzRenderHelp(); if (pzStuck(cur)) pzGameOver(); return; }
     pzUI.mode = kind;
-    if (kind === 'squirrel') setTimeout(() => { if (pzUI.mode === 'squirrel') pzAim((PZ.N >> 1) * PZ.N + (PZ.N >> 1)); }, 0);   // 2.1.1 3×3 크기를 먼저 보여 줘요
+    if (kind === 'squirrel') setTimeout(() => { if (pzUI.mode === 'squirrel') pzAim((PZ.N >> 1) * PZ.N + (PZ.N >> 1)); }, 0);   // 3×3 크기를 먼저 보여 줘요
     pzHint(kind === 'squirrel' ? '폭탄을 끌어서 터뜨릴 곳에 놓아요(손을 떼면 3×3이 터져요)' : '돌릴 조각을 눌러 주세요', 2500);
     pzRenderTray(); pzRenderHelp();
   }
-  // 2.1.1 다람쥐 선생님 3×3 미리 보기(woodani 요청: 마우스를 가져가면 잘 보이게). i가 없으면 지워요
+  // 다람쥐 선생님 3×3 미리 보기(마우스를 가져가면 잘 보이게). i가 없으면 지워요
   function pzAim(i) {
     const g = $('#pzGrid'); if (!g || !pzUI.cells) return;
     const on = pzUI.mode === 'squirrel' && i != null && i >= 0;
@@ -656,7 +656,7 @@
     pzUI.aimI = on ? i : -1;
     pzBombHold(on ? i : -1);
   }
-  /* 3.0.0 woodani 요청: 폭탄을 손에 들고 끌어서 놓아요. 다람쥐 모드에서는 3×3 미리 보기 가운데에 폭탄이 떠 있고,
+  /* 폭탄을 손에 들고 끌어서 놓아요. 다람쥐 모드에서는 3×3 미리 보기 가운데에 폭탄이 떠 있고
      손가락(마우스)을 따라 움직여요. 손을 떼면 그 자리에서 부르르 떨다 터져요. 그림 pz_bomb(작업지시서 48)이 없으면 💣 */
   function pzBombEl() {
     let b = pzUI.holdEl;
@@ -674,7 +674,7 @@
     b.style.cssText = `left:${r.left + r.width / 2 - w / 2}px;top:${r.top + r.height / 2 - w / 2}px;width:${w}px;height:${w}px`;
     const sp = b.querySelector('span'); if (sp) sp.style.fontSize = Math.round(w * 0.8) + 'px';
   }
-  // 3.0.0 놓은 자리에서 폭탄이 부르르 떨다 '쾅'. 줄이기 설정이면 바로 지워요
+  // 놓은 자리에서 폭탄이 부르르 떨다 '쾅'. 줄이기 설정이면 바로 지워요
   function pzBombDrop(i, then) {
     const cell = pzUI.cells[i]; if (rt.reduced || !cell || !document.body.animate) { if (pzUI.holdEl) { pzUI.holdEl.remove(); pzUI.holdEl = null; } then(); return; }
     const r = cell.getBoundingClientRect(), cx = r.left + r.width / 2, cy = r.top + r.height / 2;
@@ -709,16 +709,16 @@
     });
   }
   function pzWire() {
-    $('#acList').addEventListener('click', e => { const b = e.target.closest('[data-book]'); if (b) { sfx('tap'); openBook(b.dataset.book); return; } const row = e.target.closest('[data-ac]'); if (row) acTip(row.dataset.ac, row); });   // 2.3.1 과목을 누르면 얻는 곳 말풍선   // 2.1.0 문제집 구매: 확인창부터
+    $('#acList').addEventListener('click', e => { const b = e.target.closest('[data-book]'); if (b) { sfx('tap'); openBook(b.dataset.book); return; } const row = e.target.closest('[data-ac]'); if (row) acTip(row.dataset.ac, row); });   // 과목을 누르면 얻는 곳 말풍선. 문제집 구매: 확인창부터
     $('#bkAll').addEventListener('click', () => { const k = rt.bookK; closeModal($('#mBook'), () => acBuyBookAll(k)); });
     $('#bkBuy').addEventListener('click', () => { if ($('#bkBuy').getAttribute('aria-disabled') === 'true') return; const k = rt.bookK; closeModal($('#mBook'), () => acBuyBook(k)); });
-    $('#pzSwBtn').addEventListener('click', () => { sfx('tap'); openPzSw(); });   // 2.3.1 소탕
-    $('#btSwBtn').addEventListener('click', () => { sfx('tap'); openBtSw(); });   // 5.0.3 대결 소탕
+    $('#pzSwBtn').addEventListener('click', () => { sfx('tap'); openPzSw(); });   // 소탕
+    $('#btSwBtn').addEventListener('click', () => { sfx('tap'); openBtSw(); });   // 대결 소탕
     $('#btSwGo').addEventListener('click', () => closeModal($('#mBtSw'), () => btSweep()));
     $('#pzSwOpts').addEventListener('click', e => { const b = e.target.closest('[data-sw]'); if (!b) return; rt.pzSwN = +b.dataset.sw; renderPzSw(); });
     $('#pzSwGo').addEventListener('click', () => { const n = rt.pzSwN || 1; closeModal($('#mPzSw'), () => pzSweep(n)); });
     $('#pzOpen').addEventListener('click', () => { sfx('tap'); if (liveOff('puzzle')) { toast('숲속 퍼즐은 잠시 점검 중이에요. 조금만 기다려 주세요'); return; } pzOpen(); });
-    bind180();   // 1.8.0 숲속 합치기
+    bind180();   // 숲속 합치기
     $('#pzAdBtn').addEventListener('click', () => {
       if (!pzCanAd()) return;
       showAd(() => { pzDay(); S.pz.adN += 1; save(); renderMini(); toast(`오늘 보상 판 ${PZ.adMore}번을 더 받았어요`); }, r => { if (r !== 'noad') toast('광고를 끝까지 보지 않아서 보상이 없어요'); });
@@ -726,7 +726,7 @@
     $('#pzBack').addEventListener('click', () => { sfx('tap'); pzClose(); });
     $('#pzQuit').addEventListener('click', () => { if (!S.pz.cur || !$('#pzEnd').hidden || !$('#pzBoost').hidden) return; sfx('tap'); $('#pzQuitAsk').hidden = false; });
     $('#pzQuitNo').addEventListener('click', () => { $('#pzQuitAsk').hidden = true; });
-    // 1.8.0 잠시 나가기: 판을 끝내지 않고 닫아요(하던 판은 S.pz.cur에 남아요). 미니게임 탭에서 '이어하기'로 돌아와요
+    // 잠시 나가기: 판을 끝내지 않고 닫아요(하던 판은 S.pz.cur에 남아요). 미니게임 탭에서 '이어하기'로 돌아와요
     $('#pzQuitPause').addEventListener('click', () => { $('#pzQuitAsk').hidden = true; sfx('tap'); pzClose(); toast('하던 판은 그대로 남아요. 공부 탭의 숲속 퍼즐에서 이어서 해요'); });
     $('#pzQuitYes').addEventListener('click', () => { $('#pzQuitAsk').hidden = true; pzGameOver(); });
     $('#pzEndAgain').addEventListener('click', () => { sfx('tap'); $('#pzEnd').hidden = true; pzStart(); pzUI.mode = ''; pzRenderAll(); pzBoostOpen(); });
@@ -741,8 +741,8 @@
     $('#pzbGo').addEventListener('click', () => pzBoostGo(false));
     $('#pzEndOut').addEventListener('click', () => { sfx('tap'); $('#pzEnd').hidden = true; pzClose(); });
     $$('#pzHelps [data-help]').forEach(b => b.addEventListener('click', () => pzUseHelp(b.dataset.help)));
-    // 2.1.1 다람쥐 선생님: 마우스를 올리거나 손가락을 대면 3×3을 미리 보여 줘요.
-    // 3.0.0 폭탄을 끌어서 놓기: 판 위를 누르면 폭탄을 집고, 끄는 동안 폭탄과 3×3이 따라오고, 손을 떼면 그 자리에서 터져요(판 밖에서 떼면 마지막 자리)
+    // 다람쥐 선생님: 마우스를 올리거나 손가락을 대면 3×3을 미리 보여 줘요
+    // 폭탄을 끌어서 놓기: 판 위를 누르면 폭탄을 집고, 끄는 동안 폭탄과 3×3이 따라오고, 손을 떼면 그 자리에서 터져요(판 밖에서 떼면 마지막 자리)
     const aimAt = e => { if (pzUI.mode !== 'squirrel' || pzUI.bombing) return; const el = document.elementFromPoint(e.clientX, e.clientY), c = el && el.closest && el.closest('#pzGrid .pz-cell'); if (c) pzAim(+c.dataset.i); };
     const grid = $('#pzGrid');
     grid.addEventListener('pointermove', aimAt);
@@ -770,15 +770,15 @@
     $('#pzCardTag').textContent = S.pz.cur ? '이어하기' : '시작하기';
     const lt = $('#pzLeftTxt'); lt.textContent = `오늘 ${left}/${pzQuota()}판`; lt.classList.toggle('none', left <= 0);   // 오늘 남은 보상 판 / 오늘 받을 수 있는 판
     $('#pzAdBtn').hidden = !pzCanAd(); $('#pzAdRow').hidden = $('#pzAdBtn').hidden;
-    { const on = pzSwOpen(), can = on && left > 0;   // 2.3.1 소탕 안내 줄
-      $('#pzSwTx').textContent = !on ? '1판 하면 소탕 가능' : can ? '' : '';   // 2.3.1 카드 안 시작하기 아래(좁아서 짧게)
+    { const on = pzSwOpen(), can = on && left > 0;   // 소탕 안내 줄
+      $('#pzSwTx').textContent = !on ? '1판 하면 소탕 가능' : can ? '' : '';   // 카드 안 시작하기 아래(좁아서 짧게)
       $('#pzSwTx').hidden = on; $('#pzSwBtn').hidden = !can; $('#pzSwBtn').textContent = `소탕 ${left}판`;
       const show = !on || can; $('#pzSwRow').hidden = !show; $('#pzCardW').classList.toggle('sw-on', show); }
-    renderAc();   // 2.0.1 공부
-    renderStudy2();   // 2.0.1 국어, 과학 카드
-    renderExRow();   // 2.0.1 시험 기간 줄
-    renderNsRow();   // 3.0.0 야간 자율학습 줄
-    renderBtCard();   // 2.0.1 숲속 대결 카드
-    renderMiniMg();   // 1.8.0
+    renderAc();   // 공부
+    renderStudy2();   // 국어, 과학 카드
+    renderExRow();   // 시험 기간 줄
+    renderNsRow();   // 야간 자율학습 줄
+    renderBtCard();   // 숲속 대결 카드
+    renderMiniMg();
   }
 

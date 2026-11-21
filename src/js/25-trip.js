@@ -20,7 +20,7 @@
       souv: ['별자리 지도', '망원경 배지', '운석 조각',
         '달 지도 포스터', '혜성 열쇠고리', '야광 별 스티커', '토성 팽이', '북두칠성 손전등', '별똥별 소원 병', '천문대 저금통', '은하수 엽서', '우주 비행사 배지'] }
   ];
-  // 4.1.1 대학교 현장 답사: 갈 곳 이름과 설명을 조사하는 말투로(시간, 보상, 기념품은 그대로)
+  // 대학교 현장 답사: 갈 곳 이름과 설명을 조사하는 말투로(시간, 보상, 기념품은 그대로)
   const TRIPS_U = { hill: ['뒷산 식생 답사', '캠퍼스 뒷산을 돌며 나무와 풀을 조사해요'], creek: ['시냇가 수질 답사', '시냇물 수질을 재고 송사리를 기록해요'], museum: ['숲속 박물관', '옛 숲의 기록과 공룡 화석을 조사해요'],
     beach: ['푸른 바닷가', '갯벌 생물을 조사하고 표본을 모아요'], star: ['별빛 천문대', '산꼭대기 천문대에서 밤새 별을 관측해요'] };
   for (const T of TRIPS) for (const [f, i] of [['name', 0], ['say', 1]]) { const t0 = T[f]; Object.defineProperty(T, f, { get: () => uniNow() && TRIPS_U[T.id] ? TRIPS_U[T.id][i] : t0, enumerable: true, configurable: true }); }
@@ -33,36 +33,36 @@
     beach: '<path d="M-8 6 Q-8 -6 0 -7 Q8 -6 8 6 Z" fill="#F4D6B0"/><path d="M-4 5 Q-3 -3 0 -6 M0 5 V-6 M4 5 Q3 -3 0 -6" fill="none" stroke="#D9A066" stroke-width="1.2"/>',
     star: '<path d="M0 -9 L2.4 -2.6 L9 -2.6 L3.6 1.6 L5.6 8 L0 4 L-5.6 8 L-3.6 1.6 L-9 -2.6 L-2.4 -2.6 Z" fill="#F3C04B"/>'
   };
-  const tripIcon = (id, cls) => IMG('trip_dest_' + id) ? `<img class="tr-dest${cls ? ' ' + cls : ''}" src="${blobUrl(IMG('trip_dest_' + id))}" alt="" aria-hidden="true" decoding="async">` : `<svg viewBox="-11 -11 22 22" aria-hidden="true"${cls ? ` class="${cls}"` : ''}>${TRIP_ART[id]}</svg>`;   // 3.0.0 목적지 그림(작업지시서 45)
+  const tripIcon = (id, cls) => IMG('trip_dest_' + id) ? `<img class="tr-dest${cls ? ' ' + cls : ''}" src="${blobUrl(IMG('trip_dest_' + id))}" alt="" aria-hidden="true" decoding="async">` : `<svg viewBox="-11 -11 22 22" aria-hidden="true"${cls ? ` class="${cls}"` : ''}>${TRIP_ART[id]}</svg>`;   // 목적지 그림(작업지시서 45)
   const BUS = '<svg viewBox="-12 -12 24 24" aria-hidden="true"><rect x="-10" y="-7" width="20" height="12" rx="3" fill="#F3C04B"/><rect x="-8" y="-5" width="4.5" height="4" rx="1" fill="#BFE3F2"/><rect x="-2.2" y="-5" width="4.5" height="4" rx="1" fill="#BFE3F2"/><rect x="3.6" y="-5" width="4.4" height="4" rx="1" fill="#BFE3F2"/><rect x="-10" y="1" width="20" height="1.6" fill="#D9A23A"/><circle cx="-5.5" cy="5.5" r="2.4" fill="#3B3B2D"/><circle cx="5.5" cy="5.5" r="2.4" fill="#3B3B2D"/></svg>';
   const tripOpen = () => !!S && (S.trip.open || S.tier >= 2 || (S.tier >= 1 && S.tg >= 2));
   const souvN = () => S.trip.souv.length;
-  // 4.4.2 woodani 결정(2026-11-15): 기념품을 곳마다 3종에서 12종으로. 다 모으면 겹친 기념품 몫으로 정수만 계속 나오던 것을 늦춰요.
+  // 기념품을 곳마다 3종에서 12종으로. 다 모으면 겹친 기념품 몫으로 정수만 계속 나오던 것을 늦춰요
   // 처음 세 가지(SOUV_OLD)는 예전 그대로 하나에 +2%, 세 가지를 다 모으면 +10%. 새 아홉 가지는 하나에 +1%, 열두 가지를 다 모으면 +5% 더. 처음 세 가지부터 먼저 나와요
   const SOUV_OLD = 3;
   const souvOld = () => S.trip.souv.filter(k => +k.split(':')[1] < SOUV_OLD).length;
   const tripSetsDone = () => TRIPS.filter(t => t.souv.slice(0, SOUV_OLD).every((_, i) => S.trip.souv.includes(`${t.id}:${i}`))).length;
   const tripSetsAll = () => TRIPS.filter(t => t.souv.every((_, i) => S.trip.souv.includes(`${t.id}:${i}`))).length;
   const tripMult = () => { const o = souvOld(); return 1 + 0.02 * o + 0.01 * (souvN() - o) + 0.1 * tripSetsDone() + 0.05 * tripSetsAll(); };
-  const tripLeft = () => Math.max(0, S.trip.end - gameNow());   // 2.0.0 보안 점검(1-6): 게임 시계
+  const tripLeft = () => Math.max(0, S.trip.end - gameNow());   // 보안 점검(1-6): 게임 시계
   const tripBack = () => !!S.trip.cur && tripLeft() <= 0;
-  const tripCut = T => Math.max(30, Math.round(T.min / 4));   // 광고 한 편에 줄어드는 분(2.3.1 woodani 결정: 적어도 30분)
+  const tripCut = T => Math.max(30, Math.round(T.min / 4));   // 광고 한 편에 줄어드는 분(적어도 30분)
   function tripReward(T) {
-    return { acorns: Math.max(10, nice(rate() * T.min * 60 * 0.5 * rtEvt())), dip: T.dip, gold: T.gold };   // 5.0.0 연구 트리 행사
+    return { acorns: Math.max(10, nice(rate() * T.min * 60 * 0.5 * rtEvt())), dip: T.dip, gold: T.gold };   // 연구 트리 행사
   }
   function hms(ms) {
     const s = Math.ceil(ms / 1000), h = Math.floor(s / 3600), m = Math.floor(s % 3600 / 60), x = s % 60;
     return h ? `${h}:${String(m).padStart(2, '0')}:${String(x).padStart(2, '0')}` : `${m}:${String(x).padStart(2, '0')}`;
   }
   const minText = m => m >= 60 ? `${m / 60}시간` : `${m}분`;
-  /* ===== 3.2.0 수학여행(설계안 "3.2.0 설계안 (수학여행)", 2026-11-05 woodani 결정): 고등학교부터 학년마다 한 번.
-     옛 도시, 섬 마을, 큰 도시 중 한 곳 → 들를 곳 세 군데에서 활동을 하나씩 고르고 → 단체 사진 → 학생들이 3시간 동안 떠나 있어요(수업료는 그대로).
+  /* ===== 수학여행(설계안 " 설계안 (수학여행)"): 고등학교부터 학년마다 한 번
+     옛 도시, 섬 마을, 큰 도시 중 한 곳 → 들를 곳 세 군데에서 활동을 하나씩 고르고 → 단체 사진 → 학생들이 3시간 동안 떠나 있어요(수업료는 그대로)
      돌아오면 도토리(수업료 2시간치), 숲의 정수, 그곳 기념품(지도 장식), 앨범에 사진 한 쪽. 숫자는 본부 제안 ===== */
-  const tr2Nm = () => uniOn() ? '배낭여행' : '수학여행';   // 4.1.1 woodani: 대학교에서는 배낭여행이라고 불러요(이름만, 규칙과 저장은 그대로)
+  const tr2Nm = () => uniOn() ? '배낭여행' : '수학여행';   // 대학교에서는 배낭여행이라고 불러요(이름만, 규칙과 저장은 그대로)
   const tr2Key = () => `${S.tier}-${S.tg}`;
   const tr2Open = () => !!S && !!S.tr2 && S.tier >= TR2.tier;
   const tr2Away = () => !!(S && S.tr2 && S.tr2.cur && S.tr2.cur.st === 'go' && gameNow() >= (S.tr2.cur.dep || 0) && gameNow() < S.tr2.cur.back);
-  // 3.2.1 woodani 요청: 출발 시간(6~17시) 밖에서도 미리 골라 사진까지 찍으면 다음 아침 6시에 떠나요(야간 자율학습 예약처럼)
+  // 출발 시간(6~17시) 밖에서도 미리 골라 사진까지 찍으면 다음 아침 6시에 떠나요(야간 자율학습 예약처럼)
   const tr2Rsv = () => !!(S && S.tr2 && S.tr2.cur && S.tr2.cur.st === 'go' && gameNow() < (S.tr2.cur.dep || 0));
   const tr2NextDep = () => { const t = gameNow(), h = kstHour(t); return t + Math.round(((TR2.h0 - h + 24) % 24) * 3600000); };
   const tr2Ready = () => !!(S && S.tr2 && S.tr2.cur && S.tr2.cur.st === 'go' && gameNow() >= S.tr2.cur.back);
@@ -80,7 +80,7 @@
     if (u && typeof u === 'object' && TR2_BY[u.pl] && /^\d-\d$/.test(u.k)) {
       const pk = (Array.isArray(u.pk) ? u.pk : []).filter(v => v === 0 || v === 1).slice(0, 3);
       const st = u.st === 'go' ? 'go' : pk.length >= 3 ? 'photo' : 'pick';
-      s.tr2.cur = { pl: u.pl, k: u.k, st, pk, start: n(u.start), back: n(u.back), dep: st === 'go' ? n(u.dep) : 0, kids: (Array.isArray(u.kids) ? u.kids : []).filter(sp => DEX_STUDENTS.includes(sp)).slice(0, 11) };   // 3.2.1 dep: 예약한 출발 시각
+      s.tr2.cur = { pl: u.pl, k: u.k, st, pk, start: n(u.start), back: n(u.back), dep: st === 'go' ? n(u.dep) : 0, kids: (Array.isArray(u.kids) ? u.kids : []).filter(sp => DEX_STUDENTS.includes(sp)).slice(0, 11) };   // dep: 예약한 출발 시각
       if (st === 'go' && !(s.tr2.cur.back > 0)) s.tr2.cur.back = Date.now();
       if (s.tr2.cur.dep > s.tr2.cur.back) s.tr2.cur.dep = 0;
     }
@@ -97,7 +97,7 @@
   function renderTr2Btn() {
     const b = $('#btnTr2'); if (!b) return;
     const cur = S.tr2 && S.tr2.cur, on = tr2Open() && (!!cur || !S.tr2.done[tr2Key()]);
-    setHid(b, !on); if (!on) return;   // 3.2.6 바뀐 때만
+    setHid(b, !on); if (!on) return;   // 바뀐 때만
     const txt = !cur ? (tr2Day() ? '출발' : '예약') : cur.st !== 'go' ? '여행 중' : tr2Rsv() ? '6시 출발' : tr2Ready() ? '도착!' : hms(Math.max(0, cur.back - gameNow()));
     if (rt.tr2Txt !== txt) { rt.tr2Txt = txt; $('#tr2N').textContent = txt; b.classList.toggle('ready', !cur || tr2Ready() || cur.st !== 'go'); b.setAttribute('aria-label', `${tr2Nm()}, ${txt}`); }
     { const lb = b.querySelector('.b-lb'); if (lb && lb.textContent !== tr2Nm()) { lb.textContent = tr2Nm(); b.setAttribute('aria-label', `${tr2Nm()}, ${txt}`); } }
@@ -129,7 +129,7 @@
       if (!used && !tr2Day()) h += '<p class="fine">지금은 출발 시간(아침 6시~오후 5시)이 아니에요. 미리 골라 단체 사진까지 찍어 두면 아침 6시에 떠나도록 예약돼요.</p>';
       h += '<div class="tr2-list">' + TR2_PL.map(Q => {
         const got = Q.souv.filter(v => T.souv.includes(v[0])).length, can = !used && !S.trip.cur && !festBusy();
-        const sel = can && rt.tr2Sel === Q.id;   // 5.0.1.6 C-01 누르면 먼저 물어봐요
+        const sel = can && rt.tr2Sel === Q.id;   // 누르면 먼저 물어봐요
         return `<button class="tr2-pl${sel ? ' sel' : ''}" type="button" data-tr2="sel:${Q.id}"${can ? '' : ' aria-disabled="true"'} style="--tc:${Q.c}">` +
           (IMG(Q.img) ? `<img src="${IMG(Q.img)}" alt="">` : '') + `<b>${Q.name}</b><span>${Q.say}</span><small>기념품 ${got}/3${can ? ', 여기로 가기 ›' : ''}</small></button>` +
           (sel ? `<div class="tr2-ok" style="--tc:${Q.c}"><p>${euro(Q.name)} 떠날까요? 이번 학년에는 바꿀 수 없어요. ${TR2.hours}시간 동안 학교 행사, 체험학습, 진로 상담은 쉬어요.</p><div class="btn-row"><button class="btn-sub" type="button" data-tr2="sel:">다시 고르기</button><button class="cta" type="button" data-tr2="p:${Q.id}">떠나기</button></div></div>` : '');
@@ -143,7 +143,7 @@
     } else if (cur.st === 'photo') {
       h += `<p class="tr-lead">${P.name}에서 단체 사진을 찍어요. 모두 웃어요!</p>` + tr2Photo(cur.pl, cur.pk, cur.kids) +
         `<div class="btn-row"><button class="cta" type="button" data-tr2="snap">찰칵!</button></div>`;
-    } else if (tr2Rsv()) {   // 3.2.1 예약
+    } else if (tr2Rsv()) {   // 예약
       h += tr2Photo(cur.pl, cur.pk, cur.kids, 'small') + `<p class="tr-left" id="tr2Left">떠나기까지 ${hms(cur.dep - gameNow())}</p>` +
         `<p class="fine">${P.name} ${tr2Nm()}을 예약했어요. 아침 ${TR2.h0}시에 떠나서 ${TR2.h0 + TR2.hours}시에 돌아와요.</p>`;
     } else if (!tr2Ready()) {
@@ -164,7 +164,7 @@
   }
   function tr2Act(v) {
     const T = S.tr2, cur = T.cur;
-    if (v.startsWith('sel:')) { rt.tr2Sel = v.slice(4); sfx('tap'); renderTr2(); return; }   // 5.0.1.6 C-01
+    if (v.startsWith('sel:')) { rt.tr2Sel = v.slice(4); sfx('tap'); renderTr2(); return; }
     if (v.startsWith('p:')) {
       const P = TR2_BY[v.slice(2)];
       if (!P || cur || T.done[tr2Key()]) return;
@@ -195,7 +195,7 @@
         const subj = new Set(cur.pk.map((j, i) => P.stops[i].acts[j][1]));
         for (const x of S.roster.list) if (Array.isArray(x.jc) && x.jo.length < 3 && x.jc.some(j => subj.has(AB_KEY[JOBS[j].ab]))) { x.ji = Math.round((x.ji + 1) * 100) / 100; opened += csOpenCards(x).length; }
       }
-      const dep = tr2Day() ? 0 : tr2NextDep();   // 3.2.1 출발 시간 밖이면 다음 아침 6시에 떠나요
+      const dep = tr2Day() ? 0 : tr2NextDep();   // 출발 시간 밖이면 다음 아침 6시에 떠나요
       cur.st = 'go'; cur.dep = dep; cur.back = (dep || gameNow()) + TR2.hours * 3600000;
       sfx('done'); buzz(15);
       rt.tr2Msg = (dep ? `찰칵! ${tr2Nm()}을 예약했어요. 아침 ${TR2.h0}시에 떠나서 ${TR2.h0 + TR2.hours}시에 돌아와요.` : `찰칵! 멋진 사진이 나왔어요. 학생들은 ${TR2.hours}시간 뒤에 돌아와요.`) + (opened ? `\n여행 덕분에 진로 카드가 ${opened}장 열렸어요!` : '');
@@ -260,7 +260,7 @@
     rt.tripView = cur ? (back ? 'back' : 'go') : 'idle';
     const ac = acornIcon(), di = dipIcon(), gi = `<svg viewBox="-8 -11 16 20" aria-hidden="true">${GOLD_ICON.slice(GOLD_ICON.indexOf('>') + 1, -6)}</svg>`;
     const rw = (R, x) => `<span class="tr-rw">${ac}<b>${fmt(R.acorns * x)}</b></span><span class="tr-rw">${di}<b>${R.dip * x}</b></span>${R.gold ? (goldRich() ? `<span class="tr-rw">${ESS_ICON()}<b>${R.gold * GOLD.essPer}</b></span>` : `<span class="tr-rw">${gi}<b>${R.gold}</b></span>`) : ''}`;
-    let h = (IMG('trip_head') ? `<div class="tr-head" style="background-image:url('${blobUrl(IMG('trip_head'))}')" aria-hidden="true"></div>` : '') + (rt.tripGot ? `<p class="tr-got">${esc(rt.tripGot)}</p>` : '');   // 3.0.0 창 맨 위 그림
+    let h = (IMG('trip_head') ? `<div class="tr-head" style="background-image:url('${blobUrl(IMG('trip_head'))}')" aria-hidden="true"></div>` : '') + (rt.tripGot ? `<p class="tr-got">${esc(rt.tripGot)}</p>` : '');   // 창 맨 위 그림
     if (!cur) {
       h += '<p class="tr-lead">돌아오면 도토리, 수료증, 그곳 기념품을 가져와요.</p><div class="tr-list">';
       for (const D of TRIPS) {
@@ -284,11 +284,11 @@
       const R = tripReward(T);
       h += `<div class="tr-now"><span class="tr-ic big${IMG('trip_dest_' + T.id) ? ' has-dest' : ''}" style="--tc:${T.c}">${tripIcon(T.id)}</span><b>${T.name}에서 돌아왔어요!</b><span>기념품 하나와 함께 이만큼 가져왔어요</span></div>` +
         `<div class="tr-gift">${rw(R, 1)}</div>` +
-        `<div class="btn-row"><button class="cta" type="button" id="tripGet">받기</button></div>`;   // 1.4.0: 광고가 너무 많다는 의견으로 2배 받기를 뺐어요
+        `<div class="btn-row"><button class="cta" type="button" id="tripGet">받기</button></div>`;   // 광고가 너무 많다는 의견으로 2배 받기를 뺐어요
     }
     // 기념품 모음
-    h += `<details class="tr-souv-d"${rt.trSvOpen ? ' open' : ''}><summary><h3 class="tr-h">기념품 모음 <small>${souvN()}/${SOUV_IDS.size}종, 수업료 +${Math.round((tripMult() - 1) * 100)}%</small></h3></summary><div class="tr-souv">`;   // 5.0.1.6 C-04 접어 둬요
-    for (const D of TRIPS) {   // 4.4.2 곳마다 12종이라 곳마다 줄을 나눠요
+    h += `<details class="tr-souv-d"${rt.trSvOpen ? ' open' : ''}><summary><h3 class="tr-h">기념품 모음 <small>${souvN()}/${SOUV_IDS.size}종, 수업료 +${Math.round((tripMult() - 1) * 100)}%</small></h3></summary><div class="tr-souv">`;   // 접어 둬요
+    for (const D of TRIPS) {   // 곳마다 12종이라 곳마다 줄을 나눠요
       const got = D.souv.filter((_, i) => S.trip.souv.includes(`${D.id}:${i}`)).length;
       h += `<b class="sv-h" style="--tc:${D.c}">${D.name} <small>${got}/${D.souv.length}</small></b>`;
       D.souv.forEach((nm, i) => {
@@ -302,7 +302,7 @@
   function startTrip(id) {
     const D = TRIP[id];
     if (!D || S.trip.cur || S.st.trips < D.need) return;
-    if (tr2Busy()) { toast(tr2Busy()); return; }   // 3.2.0 수학여행 중
+    if (tr2Busy()) { toast(tr2Busy()); return; }   // 수학여행 중
     const now = gameNow();
     rt.tripGot = '';
     S.trip.cur = id; S.trip.start = now; S.trip.end = now + D.min * 60000;
@@ -340,9 +340,9 @@
     const D = TRIP[S.trip.cur], R = tripReward(D);
     S.budget += R.acorns * x; earn(R.acorns * x);
     addDip(R.dip * x);
-    const gIt = R.gold ? goldOr(R.gold) : null;   // 4.2.0
+    const gIt = R.gold ? goldOr(R.gold) : null;
     const left0 = D.souv.map((_, i) => `${D.id}:${i}`).filter(k => !S.trip.souv.includes(k)), leftOld = left0.filter(k => +k.split(':')[1] < SOUV_OLD);
-    const left = leftOld.length ? leftOld : left0, isOld = leftOld.length > 0;   // 4.4.2 처음 세 가지부터
+    const left = leftOld.length ? leftOld : left0, isOld = leftOld.length > 0;   // 처음 세 가지부터
     let msg = `${D.name}에서 도토리 +${fmt(R.acorns * x)}, 수료증 +${R.dip * x}장`;
     const rw = { title: `${D.name}에서 돌아왔어요!`, items: [{ ic: 'acorn', t: `도토리 +${fmt(R.acorns * x)}` }, R.dip ? { ic: 'dip', t: `수료증 +${R.dip * x}장` } : null, gIt] };
     if (left.length) {
@@ -357,8 +357,8 @@
         rw.bigSub = left.length === 1 ? `${D.name} 기념품 ${D.souv.length}가지를 모두 모았어요! 수업료 +1%에 +5% 더` : '새 기념품 하나에 수업료 +1%';
         if (left.length === 1) msg += `까지! ${D.name} 기념품 ${D.souv.length}가지를 모두 모아서 수업료가 5% 더 올랐어요`;
       }
-    } else { const it = goldOr(1, '(기념품이 겹쳐서)'); msg += ', ' + it.t; rw.items.push(it); }   // 4.2.0
-    // 3.2.5 woodani 제보(돌아올 때 끊김): 보상 창이 버스 장면과 같은 순간에 열려 겹쳤어요. 학생들이 다 내린 뒤에 보여요
+    } else { const it = goldOr(1, '(기념품이 겹쳐서)'); msg += ', ' + it.t; rw.items.push(it); }
+    // 보상 창이 버스 장면과 같은 순간에 열려 겹쳤어요. 학생들이 다 내린 뒤에 보여요
     const n0 = S.trip.kids, rwNow = rt.reduced || !n0 || !layerFx.animate;
     if (rwNow) showReward(rw);
     S.trip.been[D.id] = (S.trip.been[D.id] || 0) + 1;
@@ -394,5 +394,5 @@
     'star:1': `<circle r="14" fill="#5B4FA8" ${SV_O}/><rect x="-8" y="-3" width="13" height="6" rx="2" transform="rotate(-25)" fill="#E4EBEF" ${SV_O}/><path d="M-1 4 l-3 7 M2 3 l3 8" ${SV_O}/><circle cx="8" cy="-8" r="1.4" fill="#FFE27A"/>`,
     'star:2': `<path d="M-12 4 Q-14 -8 -2 -12 Q12 -14 13 -2 Q14 10 2 12 Q-10 14 -12 4 Z" fill="#5E5A66" ${SV_O}/><circle cx="-4" cy="-3" r="2.4" fill="#45414D"/><circle cx="5" cy="3" r="3" fill="#45414D"/><path d="M8 -12 l1 3 l3 1 l-3 1 l-1 3 l-1 -3 l-3 -1 l3 -1 Z" fill="#FFE27A"/>`
   };
-  const souvIcon = (k, c) => { const u = IMG('souv_' + k.replace(':', '_')); return u ? `<img class="sv-img" src="${u}" alt="" aria-hidden="true">` : `<svg viewBox="-20 -20 40 40" aria-hidden="true">${SOUV_ART[k] || TRIP_ART[k.split(':')[0]] || ''}</svg>`; };   // 3.0.0 기념품 그림
+  const souvIcon = (k, c) => { const u = IMG('souv_' + k.replace(':', '_')); return u ? `<img class="sv-img" src="${u}" alt="" aria-hidden="true">` : `<svg viewBox="-20 -20 40 40" aria-hidden="true">${SOUV_ART[k] || TRIP_ART[k.split(':')[0]] || ''}</svg>`; };   // 기념품 그림
 

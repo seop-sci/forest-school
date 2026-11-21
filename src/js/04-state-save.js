@@ -7,7 +7,242 @@
     qr: {}, qKey: '', guideKey: null,
     adOpen: false, adTimer: 0, adOk: null, adNo: null, adEarned: false, gKey: '', townStage: -1, townTier: -1,
     deal: null, dealT: DEAL.first, boostUntil: 0, boostT: BOOSTW.first, fitKey: '', fitGen: 0, yearKey: '', oakN: -1, oakHintAt: 0, rankEdit: false,
-    adopting: false, adNoGold: false, shopPick: ''
+    adopting: false, adNoGold: false, shopPick: '',
+    // 아래는 쓰는 곳에서 처음 값을 정해요. 이름만 모아 두고 값은 넣지 않아요(처음 값을 만드는 if (!rt.이름) rt.이름 = … 줄이 그대로 돌아요)
+    // 시계, 시작, 점검
+    clk0: undefined,   // 게임 시계 기준점(마지막 시각과 그때의 흐른 시간)
+    fakeNow: undefined,   // 자동 시험이 꾸며 넣는 기기 시각
+    fakePerf: undefined,   // 자동 시험이 꾸며 넣는 흐른 시간
+    awayWait: undefined,   // 자리 비운 보상 계산을 미뤄 둔 정보(돌아온 때, 건너뛸 횟수)
+    brokenSave: undefined,   // 읽지 못한 저장을 따로 남겼는지
+    uniPrev: undefined,   // 개발자 메뉴의 대학교 미리 보기 중인지
+    utOn: undefined,   // 대학교 낱말 바꾸기를 켰는지
+    utObs: undefined,   // 대학교 낱말 바꾸기 감시자
+    ntAuto: undefined,   // 업데이트 공지를 저절로 띄웠는지
+    maintTimer: undefined,   // 점검 화면에서 원격 설정을 다시 읽는 시계
+    maintTaps: undefined,   // 점검 화면을 누른 시각들(다섯 번이면 들어가요)
+    maintPass: undefined,   // 점검 중이지만 이번만 들어왔는지
+    deleting: undefined,   // 계정과 서버 기록을 지우는 중인지
+    t170: undefined,   // 방 안 그리기 1초 주기 시계
+    saAt: undefined,   // 느린 움직임을 마지막으로 맞춘 시각
+    slowAnims: undefined,   // 느리게 돌리는 움직임 목록
+    mf: undefined,   // 프레임 수(지도 그리기를 나눠요)
+    kdt: undefined,   // 지도 학생 걸음에 모인 시간
+    // 지도와 화면 배치
+    zoom: undefined,   // 지도 확대 배율
+    panX: undefined,   // 지도를 옮긴 가로 자리
+    panY: undefined,   // 지도를 옮긴 세로 자리
+    panMoved: undefined,   // 지도를 마지막으로 끈 시각(누르기와 끌기를 가려요)
+    mapS: undefined,   // 지도 배율
+    mapW: undefined,   // 그려진 지도 너비
+    mapH: undefined,   // 그려진 지도 높이
+    viewW: undefined,   // 지도 가로 칸 수(자동 시험이 바꿔요)
+    camHold: undefined,   // 행사 카메라가 키운 채 멈춘 상태
+    camId: undefined,   // 카메라 움직임 번호(새 움직임이 옛것을 멈춰요)
+    hudTop: undefined,   // 현황판이 가리는 높이
+    hudBot: undefined,   // 아래 칸이 가리는 높이
+    hudRight: undefined,   // 오른쪽 메뉴가 가리는 너비
+    hudTh: undefined,   // 현황판에 적용한 테마
+    foldS: undefined,   // 접기 상태를 적용한 저장
+    mapLaid: undefined,   // 지금 깔린 지도 열쇠
+    mapIdle: undefined,   // 대학교 구역 지도를 쉬는 틈에 받는 시계
+    c3q: undefined,   // 졸업식 그림 받기를 시작했는지
+    lux: undefined,   // 고급 배경을 켰는지(처음 볼 때 이 기기에서 읽어요)
+    zoneLast: undefined,   // 마지막으로 들어간 구역
+    viewZone: undefined,   // 학교급 모습 보기에서 보는 구역
+    viewTier: undefined,   // 학교급 모습 보기에서 보는 학교급
+    viewEdit: undefined,   // 지난 학교급을 꾸미는 중인지
+    lookData: undefined,   // 다른 학교 구경 자료
+    decoEdit: undefined,   // 꾸미기 모드인지
+    backTab: undefined,   // 패널을 닫으면 돌아갈 탭
+    wxTipT: undefined,   // 날씨 설명이 사라지는 시계
+    // 지도 위 학생과 손님
+    nav: undefined,   // 학생 길 찾기 자료
+    mpath: undefined,   // 지도마다 학생 길 그래프
+    kidSpN: undefined,   // 지도에 나온 학생 종류 수
+    kidsAway: undefined,   // 학생들이 자리를 비웠는지(체험학습 등)
+    busHold: undefined,   // 체험학습 버스에 탈 때까지 지도에 남길 친구 수
+    bus: undefined,   // 체험학습 버스 그림
+    elBadgeT: undefined,   // 반장 배지를 단 학생(다시 달 때 비워요)
+    bdHatK: undefined,   // 생일 고깔을 단 학생
+    nutFrom: undefined,   // 떨어질 도토리가 달린 가지 자리
+    trial: undefined,   // 지금 나타난 매나 뱀
+    trialT: undefined,   // 다음 매나 뱀까지 남은 초
+    trialWasHunt: undefined,   // 지난 매나 뱀이 사냥형이었는지
+    visit: undefined,   // 지금 놀러 온 손님
+    visitT: undefined,   // 다음 손님까지 남은 초
+    frBub: undefined,   // 단짝 말풍선 요소
+    // 건물 창, 가구, 공사
+    sheetAnimTo: undefined,   // 건물 창이 다 올라오는 시각
+    sheetBack: undefined,   // 건물 창에서 연 창을 닫으면 돌아갈 건물
+    sheetShape: undefined,   // 건물 창 모양(다시 그릴지 가려요)
+    bldFxWait: undefined,   // 창을 닫으면 지도에서 보여 줄 업그레이드 효과
+    furTag: undefined,   // 가구 이름표 자리
+    rec: undefined,   // 추천 업그레이드 계산 결과
+    recKey: undefined,   // 추천을 계산한 열쇠
+    recAt: undefined,   // 추천을 계산한 시각
+    walk: undefined,   // 건물 창 안에서 걷는 친구들
+    wkT: undefined,   // 건물 창 안 걷기 시간
+    conArm: undefined,   // 공사 칸 단축권 조합을 한 번 눌러 확인하는 중인지
+    conPick: undefined,   // 공사 칸에서 고른 단축권 조합
+    conSec: undefined,   // 공사 칸에 보인 남은 초
+    cesK: undefined,   // 숲의 정수로 즉시 완공할 건물
+    bvN: undefined,   // 비버 선생님 대사 차례
+    // 학교생활 창
+    snRes: undefined,   // 간식 뽑기 결과
+    bxRes: undefined,   // 생물 관찰 결과
+    gdPick: undefined,   // 텃밭에서 고른 밭
+    gdSel: undefined,   // 오늘의 급식에서 고른 메뉴
+    gdCutI: undefined,   // 텃밭 시간 줄이기를 고른 밭
+    gdPullI: undefined,   // 텃밭 작물 뽑기를 고른 밭
+    gdFull: undefined,   // 거둔 재료가 가득 차 덜 들어갔는지
+    vdPop: undefined,   // 마을 기부 창을 닫고 기념물 효과를 보여 줄지
+    nsSub: undefined,   // 자율학습 과목 표시
+    nsT: undefined,   // 자율학습 정산 1초 시계
+    nsAway: undefined,   // 자리 비운 동안 자율학습 보상이 붙었는지
+    pcSel: undefined,   // 소풍 보낼 친구
+    pcLunch: undefined,   // 소풍 도시락을 고르는 중인지
+    pcNews: undefined,   // 소풍에서 돌아온 소식
+    skNew: undefined,   // 방금 붙은 칭찬 스티커 칸
+    skPage: undefined,   // 스티커판 쪽
+    skView: undefined,   // 스티커판 보기(지금, 지난 판)
+    albPage: undefined,   // 졸업 앨범 쪽
+    bdKey: undefined,   // 생일 표시를 그린 열쇠
+    bdMemo: undefined,   // 오늘 생일인 학생 계산 메모
+    frNameSp: undefined,   // 이름을 바꿀 학생 종류
+    ltBack: undefined,   // 편지 창에서 뒤로 가기를 보여 줄지
+    plAt: undefined,   // 학부모 편지함에서 보는 편지 번호
+    talkSeq: undefined,   // 전학 대화 진행
+    trSvOpen: undefined,   // 체험학습 기념품 칸을 펼쳤는지
+    tripGot: undefined,   // 체험학습에서 받은 것
+    tripTxt: undefined,   // 체험학습 단추에 보인 글
+    tripView: undefined,   // 체험학습 창 화면(가기, 돌아옴, 쉼)
+    tr2Msg: undefined,   // 수학여행 창 안내 글
+    tr2Sel: undefined,   // 수학여행에서 고른 여행지
+    tr2Txt: undefined,   // 수학여행 단추에 보인 글
+    tr2View: undefined,   // 수학여행 창 화면
+    fest: undefined,   // 진행 중인 학교 행사
+    sports: undefined,   // 진행 중인 운동회
+    sportsWin: undefined,   // 운동회 결과
+    prizeId: undefined,   // 행사 상품 종류
+    prizeName: undefined,   // 행사 상품 창 제목
+    festKey: undefined,   // 학교 행사 목록을 그린 열쇠
+    festTxt: undefined,   // 학교 행사 단추에 보인 글
+    fvGs: undefined,   // 대학 축제 손님 목록
+    fvKey: undefined,   // 대학 축제 창을 그린 날
+    fvTipK: undefined,   // 대축제 띠 종류
+    xgG: undefined,   // 교환학생의 날 손님
+    xgKey: undefined,   // 교환학생 창을 그린 날
+    mkKey: undefined,   // 장터 창을 그린 날
+    wdX: undefined,   // 요일 행사 띠를 닫은 날
+    csView: undefined,   // 진로 상담 창 화면
+    csLastView: undefined,   // 진로 상담 창이 지난번 보인 화면
+    csTalk: undefined,   // 진로 상담 중인 학생
+    csRw: undefined,   // 진로 상담에서 모은 보상
+    elNews: undefined,   // 반장 선거 소식을 알릴지
+    labSel: undefined,   // 실험에서 고른 재료
+    labView: undefined,   // 실험 창 화면
+    labPage: undefined,   // 실험 노트 쪽
+    labBusy: undefined,   // 실험 장면이 도는 중인지
+    rdNews: undefined,   // 책을 다 읽은 소식
+    bookK: undefined,   // 문제집 창의 과목
+    acTipT: undefined,   // 공부 탭 설명이 사라지는 시계
+    exNews: undefined,   // 시험 기간 소식
+    btqSeen: undefined,   // 숲속 대결에서 이미 낸 문제
+    pzSwN: undefined,   // 숲속 퍼즐 소탕 창에서 고른 판 수
+    clubPick: undefined,   // 동아리실에서 고른 동아리
+    seatClub: undefined,   // 부원을 넣을 동아리
+    seatStudent: undefined,   // 동아리에 넣을 학생
+    dpRoom: undefined,   // 학과 사무실을 건물 창에서 열었는지
+    dpSwap: undefined,   // 전공을 바꾸려고 고른 학과
+    // 연구와 조교
+    rxTab: undefined,   // 연구소 창의 탭
+    rtSel: undefined,   // 연구 트리에서 고른 연구
+    rtPop: undefined,   // 막 자란 연구 칸(움직임)
+    ppWhy: undefined,   // 논문 자료가 늘어난 까닭(알림)
+    taPick: undefined,   // 조교를 넣을 자리
+    taHr: undefined,   // 조교 파견 시간
+    taGo: undefined,   // 조교 파견 결과를 보여 줄 자리
+    // 탐험
+    tam: undefined,   // 탐험 화면 진행 상태
+    tamQ: undefined,   // 층을 넘으며 모은 알림
+    tamSeg: undefined,   // 탐험 아래 메뉴에서 연 칸
+    tamLvN: undefined,   // 대원 한 번에 올리기 수(1, 10, 최대)
+    tamPw: undefined,   // 탐험대 힘 칸에 보인 값
+    tamAc: undefined,   // 탐험 위 칸에 보인 도토리
+    tamAcT: undefined,   // 탐험 위 칸 도토리 갱신 시계
+    tamSkTo: undefined,   // 빠른 스킵으로 갈 층
+    tamTip: undefined,   // 필살기 안내를 보였는지
+    tamUi: undefined,   // 탐험 화면 단추를 연결했는지
+    // 상점과 꾸미기
+    thPrev: undefined,   // 테마 미리 보기 중인 테마
+    thScroll: undefined,   // 미리 보기 전 상점 스크롤 자리
+    thSig: undefined,   // 적용한 테마 표시(바뀌면 덮개를 띄워요)
+    thVeilT: undefined,   // 테마 적용 중 덮개 시계
+    thBonus: undefined,   // 테마 세트 효과(%)
+    essPick: undefined,   // 문방구에서 고른 물건
+    decoPick: undefined,   // 꾸미기 가게에서 고른 물건
+    decoSlot: undefined,   // 장식을 놓을 자리
+    mkDraft: undefined,   // 학교 마크 고치는 중인 값
+    // 서버, 계정, 랭킹
+    isAdmin: undefined,   // 관리자 계정인지
+    admChk: undefined,   // 관리자 확인을 했는지
+    wlT: undefined,   // 웹판 잠금 확인 시계
+    netT: undefined,   // 서버 연결 쉬기 시계
+    netAct: undefined,   // 마지막으로 화면을 만진 시각
+    acctBusy: undefined,   // 계정 연결 중인지
+    acctPick: undefined,   // 계정 학교와 이 기기 학교 가운데 고를 자료
+    acctOutArm: undefined,   // 로그아웃을 한 번 눌러 확인하는 중인지
+    pickSave: undefined,   // 학교 두 개 고르기 자료
+    bakArm: undefined,   // 예전 학교 되돌리기를 한 번 눌러 확인하는 중인 번호
+    bakL: undefined,   // 예전 학교 목록
+    stPick: undefined,   // 테스트 현황에서 고른 학교
+    stIds: undefined,   // 테스트 현황 학교별 기록 번호
+    stConfirm: undefined,   // 테스트 현황 지우기 확인 중인지
+    nickAsked: undefined,   // 랭킹 이름을 물어봤는지
+    rankView: undefined,   // 랭킹 보기
+    rkSch: undefined,   // 학교 순위 보기(전체, 학회)
+    rkLg: undefined,   // 리그 보기(이번 주, 시즌)
+    rkH: undefined,   // 탐험 순위 보기(일반, 심화)
+    rkMax: undefined,   // 랭킹 값 상한 메모
+    rkDel: undefined,   // 관리자가 지우려고 한 번 누른 줄
+    rkDelT: undefined,   // 랭킹 지우기 확인 시계
+    pwShown: undefined,   // 학교 파워 칸에 보인 값
+    pwStep: undefined,   // 학교 파워 칸 단계
+    // 광고
+    adTok: undefined,   // 광고 요청 번호
+    adGuard: undefined,   // 광고가 끝나지 않을 때를 대비한 시계
+    adAsk: undefined,   // 광고 확인 창 설정
+    adPick: undefined,   // 광고 보상 고르기에서 고른 것
+    // 이야기, 튜토리얼, 졸업식
+    st: undefined,   // 이야기 장면 진행
+    stAfterC: undefined,   // 장 끝 장면을 본 뒤인지
+    qTap: undefined,   // 퀘스트 칸을 눌렀는지(여는 장면은 이때)
+    sbTab: undefined,   // 이야기 수첩 탭
+    tut: undefined,   // 튜토리얼 진행
+    tutAsked: undefined,   // 튜토리얼을 물어봤는지
+    tutPlace: undefined,   // 튜토리얼 말풍선 자리 맞추기
+    cereRun: undefined,   // 졸업식 장면 진행
+    cereAt: undefined,   // 졸업식 장면 시작 시각
+    cereFx: undefined,   // 졸업식 효과
+    cereT1: undefined,   // 졸업식 장면 시계 1
+    cereT2: undefined,   // 졸업식 장면 시계 2
+    cerePaused: undefined,   // 졸업식 장면에서 멈춘 움직임
+    cereAsking: undefined,   // 졸업식 건너뛰기를 묻는 중인지
+    cereRang: undefined,   // 졸업식 장면에서 종을 울렸는지
+    uniGrad: undefined,   // 이번 식이 학위수여식인지(곡 고르기)
+    yearGift: undefined,   // 종업식 선물 도토리
+    yearRec: undefined,   // 종업식 기록 줄
+    tkReward: undefined,   // 친구 성장 쪽지 보상 창
+    // 퀘스트, 미션, 도감, 업적
+    batch: undefined,   // 모두 받기 동안 모은 알림과 보상
+    qOpen: undefined,   // 퀘스트 탭 메인 퀘스트를 펼쳤는지
+    dexPick: undefined,   // 도감에서 고른 동물
+    dexSeg: undefined,   // 도감 탭
+    dexNew: undefined,   // 도감에 새로 생긴 칸
+    evSeg: undefined,   // 이벤트 탭
+    evInit: undefined,   // 이벤트 탭을 처음 그렸는지
+    achNote: undefined   // 쌓인 업적 달성 알림
   };
   if (motionMQ && motionMQ.addEventListener) motionMQ.addEventListener('change', e => { rt.reduced = e.matches; });
   // 헷갈리는 0, O, 1, I, L을 뺀 글자로 학교 번호를 만들어요
@@ -29,98 +264,98 @@
   // tier: 학교급(0 유치원, 1 초등학교), tg: 이 학교급에서 연 종업식, tdip: 이 학교급에서 모은 수료증, fund와 fp: 장학재단 기금과 강화
   const fresh = () => ({
     v: 4, pid: randCode(8), born: Date.now(), budget: 20, students: 4,
-    f: { classroom: 1, cafeteria: 0, library: 0, playground: 0, science: 0, store: 0, dorm: 0, union: 0, institute: 0, gradhall: 0 },   // 5.0.0 연구소, 연구동   // 4.0.0 union: 학생회관
+    f: { classroom: 1, cafeteria: 0, library: 0, playground: 0, science: 0, store: 0, dorm: 0, union: 0, institute: 0, gradhall: 0 },   // 연구소, 연구동. union: 학생회관
     fu: freshFu(),
-    fold: { b: 0, l: 0, r: 0, q: 0, td: 0 },   // 5.0.2 td: 퀘스트 탭 '오늘 할 일' 접기   // 3.0.0 홈 칸 접기(1이면 접음)
+    fold: { b: 0, l: 0, r: 0, q: 0, td: 0 },   // td: 퀘스트 탭 '오늘 할 일' 접기. 홈 칸 접기(1이면 접음)
     t: { squirrel: 1, owl: 0, bear: 0 },
-    vp: 0,   // 1.7.0 고슴도치 교감 선생님 연수 레벨 (0~10)
-    ach: { hit: {}, got: {}, title: '' },   // 1.7.1 업적: hit 이룬 등급(0~3), got 받은 등급, title 단 칭호(업적 종류 id)
-    xt: { diet: 0, lib: 0, kor: 0, art: 0, snack: 0, dorm: 0, fix: 0, cou: 0, dean: 0, adv: 0 },   // 5.0.0 adv: 펠리컨 지도교수님   // 4.0.0 dean: 두루미 학장 교수님   // 3.1.0 cou: 코끼리 선생님(진로 상담)
-      // 2.3.0 국어, 미술, 매점 선생님   // 1.7.1 양 선생님, 사슴 선생님 연수 레벨 (0~10, 그 건물을 지으면 오셔요)
+    vp: 0,   // 고슴도치 교감 선생님 연수 레벨 (0~10)
+    ach: { hit: {}, got: {}, title: '' },   // 업적: hit 이룬 등급(0~3), got 받은 등급, title 단 칭호(업적 종류 id)
+    xt: { diet: 0, lib: 0, kor: 0, art: 0, snack: 0, dorm: 0, fix: 0, cou: 0, dean: 0, adv: 0 },   // adv: 펠리컨 지도교수님. dean: 두루미 학장 교수님. cou: 코끼리 선생님(진로 상담)
+      // 국어, 미술, 매점 선생님. 양 선생님, 사슴 선생님 연수 레벨 (0~10, 그 건물을 지으면 오셔요)
     grade: 0, best: 0, sound: true, bgm: true, vibrate: true, savedAt: Date.now(),
     pending: 0, pendingSec: 0, away: { from: 0, skip: 0 }, certNo: 0, earned: 0, yearEarned: 0, pwBank: 0,
     tier: 0, tg: 0, sem: 0, semDip: 0, tdip: 0, fund: 0, fp: { schol: 0, rep: 0, dip: 0 },
     hd: { day: '', n: 0, feastUntil: 0, album: false, seen: false, furNew: true },
     oak: OAK.max,
-    st: { picks: 0, ups: 0, trains: 0, claims: 0, grads: 0, perks: 0, fperks: 0, shakes: 0, dips: 0, play: 0, sess: 0, ads: 0, gold: 0, gspent: 0, trips: 0, sports: 0, dmDone: 0, pz: 0, trials: 0, shows: 0, visits: 0, esSpent: 0, rxSpent: 0, pzb: 0, elects: 0, elMid: 0, sems: 0, cons: 0, tkUsed: 0, cbBuy: 0, nsAway: 0 },   // 2026-11-11 cons, tkUsed, cbBuy, nsAway: 쓰기만 하고 저장에서 빠지던 칸(패스 미션 '시설 공사'가 0으로 돌아가던 문제)   // 2.1.0 sems: 1학기 방학식. 2.0.1 elects: 반장을 뽑은 횟수, elMid: 그 가운데 중학교부터
-      // 2.0.0: trials(1.7.4 침입자)가 저장에서 빠지던 것을 고치고 shows(동아리 발표회)를 더해요
+    st: { picks: 0, ups: 0, trains: 0, claims: 0, grads: 0, perks: 0, fperks: 0, shakes: 0, dips: 0, play: 0, sess: 0, ads: 0, gold: 0, gspent: 0, trips: 0, sports: 0, dmDone: 0, pz: 0, trials: 0, shows: 0, visits: 0, esSpent: 0, rxSpent: 0, pzb: 0, elects: 0, elMid: 0, sems: 0, cons: 0, tkUsed: 0, cbBuy: 0, nsAway: 0 },   // cons, tkUsed, cbBuy, nsAway: 쓰기만 하고 저장에서 빠지던 칸(패스 미션 '시설 공사'가 0으로 돌아가던 문제). sems: 1학기 방학식. elects: 반장을 뽑은 횟수, elMid: 그 가운데 중학교부터
+      // trials(침입자)가 저장에서 빠지던 것을 고치고 shows(동아리 발표회)를 더해요
     p: { dip: 0, species: 0, ticket: 0, nl: NEWCOMERS.map(() => 0), perk: { schol: 0, rep: 0, start: 0, drop: 0, night: 0 } },
     att: { last: '', n: 0 },
     ad: { day: '', n: 0 },
     u: { boost: false, dev: false },
     units: 'ko',
-    uiz: 0,   // 5.0.1.7 화면 크기(0 보통 0.9배, 1 크게 1배, woodani 결정 X-01)
+    uiz: 0,   // 화면 크기(0 보통 0.9배, 1 크게 1배)
     trip: { open: false, cur: '', start: 0, end: 0, souv: [], been: {}, kids: 0 },
     sports: { next: 0 },
     fest: { next: {}, n: {}, sub: {} },   // sub: 밤이라 낮 행사가 잠겼을 때 밤 행사로 대신 채운 메인 퀘스트 횟수
     dm: { day: '', list: [], bonus: false, swapped: false },
-    tut: { st: '', step: 0, paid: false, nop: false }, tips: { rep: false, oak: false, left: false, tabs: false },   // 5.0.1.7 F-03 기능이 열릴 때 한 장 안내
-    nt: { seen: '', ver: '', hide: 0 },   // 2.0.0 공지: 마지막으로 본 공지, 마지막으로 띄운 버전, 일주일간 열지 않기 끝
+    tut: { st: '', step: 0, paid: false, nop: false }, tips: { rep: false, oak: false, left: false, tabs: false },   // 기능이 열릴 때 한 장 안내
+    nt: { seen: '', ver: '', hide: 0 },   // 공지: 마지막으로 본 공지, 마지막으로 띄운 버전, 일주일간 열지 않기 끝
     wk: { week: -1, pts: 0, got: [false, false, false, false, false], list: [] },
-    lg: { week: -1, pts: 0, pos: 0, paid: false, last: null, dq: { day: '', p: 0 } },   // 5.0.3 dq: 오늘 쌓인 진행 점수(퀘스트와 식)
+    lg: { week: -1, pts: 0, pos: 0, paid: false, last: null, dq: { day: '', p: 0 } },   // dq: 오늘 쌓인 진행 점수(퀘스트와 식)
     gold: 5, gd: { day: '', n: 0, shop: 0 }, cos: { own: [], hat: '', neck: '', mkx: '', night: false, th: { bg: '', classroom: '', cafeteria: '', library: '', science: '', playground: '' }, sp: { classroom: '', cafeteria: '', library: '', science: '', playground: '' } }, autoUntil: 0,
     rank: { name: '', joined: false, sent: -1, by: '', ren: 0, asked: false },
-    bs: { classroom: 0, cafeteria: 0, library: 0, science: 0, playground: 0, store: 0, dorm: 0, union: 0, institute: 0, gradhall: 0 },   // 1.7.0 건물마다 지금 보이는 모습의 학교급
-    mg: mgFresh(),   // 1.8.0 숲속 합치기
-    dex: { got: {}, paid: [] }, ev: { cur: '', start: 0, stamp: { n: 0, last: '' }, list: [], box: false },   // 1.7.0 도감, 이벤트
-    // 1.6.0 숲의 정수(미니게임에서만 얻어요)와 블록 퍼즐: 오늘 보상 판 수, 광고로 더한 횟수, 최고 점수, 하던 판
-    ess: 0, pz: { day: '', n: 0, adN: 0, best: 0, cur: null, hand: '', tb: 0 },   // 2.3.1 hand: 보상 판을 직접 한 날(소탕), 3.0.0 tb: 그날 직접 한 보상 판의 최고 점수
-    ac: freshAc(),   // 2.0.1 공부: 과목 5개 학교 학력(lv, xp), 문제집 bk(day, n), 통계 st
-    pc: freshPc(), sk: freshSk(),   // 2.1.0 숲속 소풍, 칭찬 스티커판
-    ff: {},   // 2.1.1 건물마다 바로 완공을 쓴 날(3.0.0부터는 기록만, 횟수는 ffd)
-    ffd: { day: '', n: 0 },   // 3.0.0 조정안 7: 오늘 학교 전체에서 쓴 무료 즉시 완공 횟수
-    ces: '',   // 2.3.0 숲의 정수로 즉시 완료 '오늘은 다시 묻지 않기'를 고른 날
-    ffx: '',   // 2.3.0 홈 지도 칩을 닫은 날
-    sn: { got: {}, day: '', mood: 0, pity: 0, n: 0, gold: false },   // 2.1.2 매점 간식 뽑기: 간식마다 뽑은 수, 기분 날짜와 칸, 희귀 없이 뽑은 수, 모두 뽑은 수, 다 모아 받은 황금 기계
-    vd: { lv: 0, p: 0, sum: 0, n: 0, lk: { day: '', lv: 0, need: 0 } },   // 2.3.1 lk: 그날 처음 기부한 단계의 가격(그날 23:59까지 그대로)
-      // 2.1.2 마을 기부: 단계, 이번 단계 채운 비율(0~1), 모두 낸 도토리, 낸 횟수
-    cb: { until: 0, at: 0 },   // 2.1.1 건설 가속(도토리): until까지 공사 +100%, at은 마지막으로 셈한 때
+    bs: { classroom: 0, cafeteria: 0, library: 0, science: 0, playground: 0, store: 0, dorm: 0, union: 0, institute: 0, gradhall: 0 },   // 건물마다 지금 보이는 모습의 학교급
+    mg: mgFresh(),   // 숲속 합치기
+    dex: { got: {}, paid: [] }, ev: { cur: '', start: 0, stamp: { n: 0, last: '' }, list: [], box: false },   // 도감, 이벤트
+    // 숲의 정수(미니게임에서만 얻어요)와 블록 퍼즐: 오늘 보상 판 수, 광고로 더한 횟수, 최고 점수, 하던 판
+    ess: 0, pz: { day: '', n: 0, adN: 0, best: 0, cur: null, hand: '', tb: 0 },   // hand: 보상 판을 직접 한 날(소탕), tb: 그날 직접 한 보상 판의 최고 점수
+    ac: freshAc(),   // 공부: 과목 5개 학교 학력(lv, xp), 문제집 bk(day, n), 통계 st
+    pc: freshPc(), sk: freshSk(),   // 숲속 소풍, 칭찬 스티커판
+    ff: {},   // 건물마다 바로 완공을 쓴 날(부터는 기록만, 횟수는 ffd)
+    ffd: { day: '', n: 0 },   // 조정안 7: 오늘 학교 전체에서 쓴 무료 즉시 완공 횟수
+    ces: '',   // 숲의 정수로 즉시 완료 '오늘은 다시 묻지 않기'를 고른 날
+    ffx: '',   // 홈 지도 칩을 닫은 날
+    sn: { got: {}, day: '', mood: 0, pity: 0, n: 0, gold: false },   // 매점 간식 뽑기: 간식마다 뽑은 수, 기분 날짜와 칸, 희귀 없이 뽑은 수, 모두 뽑은 수, 다 모아 받은 황금 기계
+    vd: { lv: 0, p: 0, sum: 0, n: 0, lk: { day: '', lv: 0, need: 0 } },   // lk: 그날 처음 기부한 단계의 가격(그날 23:59까지 그대로)
+      // 마을 기부: 단계, 이번 단계 채운 비율(0~1), 모두 낸 도토리, 낸 횟수
+    cb: { until: 0, at: 0 },   // 건설 가속(도토리): until까지 공사 +100%, at은 마지막으로 셈한 때
     nb: { at: 0, seen: '' },
-    ns: { day: '', sub: 'kor', got: 0, sec: 0, done: true, n: 0, at: 0, fin: 0 },   // 3.0.0 야간 자율학습: 켠 밤의 시작 날짜, 고른 과목, 그 밤에 쌓인 도토리와 시간, 결과 받음, 준비 횟수, 예약/시작 시각, 마친 횟수
-    cg: freshCg(),   // 2.2.0 동아리 대항전(숲속 대결 주간 순위 lg와 다른 칸): 주, 상대 학교 한 주 점수, 동아리마다 연습과 발표회 수, 오늘 연습한 날, 지난주 결과, 우승 수, 3등 안 수, 기록
-    bx: freshBx(),   // 2.2.0 숲속 생물 탐사(시험 기간 ex와 다른 칸): 지도, 숨은 생물(자리, 생물, 나타난 때), 다음 나타날 때, 관찰 수, 받은 단계 보상, 기록
-    gn: freshGd(),   // 2.2.0 학교 텃밭(황금 도토리 상점 gd와 다른 칸): 밭(작물, 심은 때, 다 자라는 때, 물), 재료, 만든 메뉴, 오늘의 급식, 메뉴 8가지 황금, 비로 물 준 날, 기록   // 2.2.0 야간 건설 이벤트: at 마지막으로 셈한 때, seen 시작 알림을 본 날
-    fr: {}, frg: { day: '', n: 0 }, frc: { pat: 0, gift: 0, cake: 0, alb: 0 }, bday: { day: '', done: false }, alb: [],   // 2.1.1 단짝 친구, 오늘 선물, 횟수, 오늘 생일 잔치, 졸업 앨범
-    dsn: { day: '', trips: 0, sports: 0, fest: {} },   // 2.1.0 오늘 시작할 때의 체험학습, 운동회, 행사 횟수(오늘 한 것도 퀘스트에 쳐요)
-    lab: freshLab(), rd: freshRd(), ex: freshEx(), bt: freshBt(), ps: freshPs(), rare: { got: [], miss: 0 }, rs: { n: 0, p: 0, pos: 0, king: 0 }, lk: { on: false, at: 0, h: '', pub: false, del: false }, wx: '', pl: { got: 0, read: 0, wk: -1 },   // pl: 2.1.3 학부모 편지(받은 통, 읽은 통, 받은 주)
-      // wx: 2.1.3 날씨 알림을 본 날. ps: 2.1.3 숲속 패스, rs: 랭킹 시즌(번호, 점수, 마지막으로 본 순위, 시즌 왕 횟수), lk: 내 학교 보여 주기(pub 서버에 올린 적 있음, del 끄기를 서버에 아직 못 지움. 2.2.0 검토 6), rare: 2.1.3 반짝 친구(만난 종, 연속 못 만난 횟수)
-      // ex: 2.0.1 시험 기간(본 시험 주, 자율학습, 성적표, 기록)
-    // 2.0.1 공부 2단계: 과학 탐구 실험(오늘 한 날, 모은 카드, 해 본 짝), 책 읽기(오늘 권수, 읽는 책과 시작 시각, 읽은 횟수)
-    bd: {}, tk: { m5: 0, m30: 0, h1: 0, h3: 0 }, tka: { day: '', n: 0 }, tkd: { day: '', pz: 0, mg: 0 },   // 2.3.0.1 tkd: 오늘 퍼즐, 합치기로 받은 단축권   // 2.1.0 공사(건물마다 { L 오를 레벨, s 시작, e 끝 }), 시간 단축권 장수, 광고 단축권 오늘 횟수
+    ns: { day: '', sub: 'kor', got: 0, sec: 0, done: true, n: 0, at: 0, fin: 0 },   // 야간 자율학습: 켠 밤의 시작 날짜, 고른 과목, 그 밤에 쌓인 도토리와 시간, 결과 받음, 준비 횟수, 예약/시작 시각, 마친 횟수
+    cg: freshCg(),   // 동아리 대항전(숲속 대결 주간 순위 lg와 다른 칸): 주, 상대 학교 한 주 점수, 동아리마다 연습과 발표회 수, 오늘 연습한 날, 지난주 결과, 우승 수, 3등 안 수, 기록
+    bx: freshBx(),   // 숲속 생물 탐사(시험 기간 ex와 다른 칸): 지도, 숨은 생물(자리, 생물, 나타난 때), 다음 나타날 때, 관찰 수, 받은 단계 보상, 기록
+    gn: freshGd(),   // 학교 텃밭(황금 도토리 상점 gd와 다른 칸): 밭(작물, 심은 때, 다 자라는 때, 물), 재료, 만든 메뉴, 오늘의 급식, 메뉴 8가지 황금, 비로 물 준 날, 기록. 야간 건설 이벤트: at 마지막으로 셈한 때, seen 시작 알림을 본 날
+    fr: {}, frg: { day: '', n: 0 }, frc: { pat: 0, gift: 0, cake: 0, alb: 0 }, bday: { day: '', done: false }, alb: [],   // 단짝 친구, 오늘 선물, 횟수, 오늘 생일 잔치, 졸업 앨범
+    dsn: { day: '', trips: 0, sports: 0, fest: {} },   // 오늘 시작할 때의 체험학습, 운동회, 행사 횟수(오늘 한 것도 퀘스트에 쳐요)
+    lab: freshLab(), rd: freshRd(), ex: freshEx(), bt: freshBt(), ps: freshPs(), rare: { got: [], miss: 0 }, rs: { n: 0, p: 0, pos: 0, king: 0 }, lk: { on: false, at: 0, h: '', pub: false, del: false }, wx: '', pl: { got: 0, read: 0, wk: -1 },   // pl: 학부모 편지(받은 통, 읽은 통, 받은 주)
+      // wx: 날씨 알림을 본 날. ps: 숲속 패스, rs: 랭킹 시즌(번호, 점수, 마지막으로 본 순위, 시즌 왕 횟수), lk: 내 학교 보여 주기(pub 서버에 올린 적 있음, del 끄기를 서버에 아직 못 지움. 6), rare: 반짝 친구(만난 종, 연속 못 만난 횟수)
+      // ex: 시험 기간(본 시험 주, 자율학습, 성적표, 기록)
+    // 공부 2단계: 과학 탐구 실험(오늘 한 날, 모은 카드, 해 본 짝), 책 읽기(오늘 권수, 읽는 책과 시작 시각, 읽은 횟수)
+    bd: {}, tk: { m5: 0, m30: 0, h1: 0, h3: 0 }, tka: { day: '', n: 0 }, tkd: { day: '', pz: 0, mg: 0 },   // tkd: 오늘 퍼즐, 합치기로 받은 단축권. 공사(건물마다 { L 오를 레벨, s 시작, e 끝 }), 시간 단축권 장수, 광고 단축권 오늘 횟수
     clk: { last: 0 },   // 게임 시계: 지금까지 본 가장 늦은 시각 (gameNow)
-    fg: { day: '', got: [] },   // 1.7.2 학교 행사 황금 도토리: 행사마다 하루 한 번(got에 오늘 받은 행사 id)
-    es: { day: '', n: 0, week: -1, g: 0, x: 0, t: 0, bf: 0, ba: 0, ax: 0 },   // 2.1.0 t 오늘 산 단축권 묶음 수, bf ba 오늘 산 부스터(수업료 2배, 자리 비운 보상 2배)
-    awx: 0,   // 2.1.0 자리 비운 보상 2배 부스터: 다음 받기에 2배(남은 번 수)
-    zv: {},   // 4.0.0 들어가 본 구역({academic: 1, ...}). '캠퍼스 둘러보기' 퀘스트가 세요
-    gr0: -1,   // 5.0.1.4 이번 학기를 시작할 때의 평판(동네 등급을 이 위로 올린 만큼으로 정해요). -1이면 옛 기준
+    fg: { day: '', got: [] },   // 학교 행사 황금 도토리: 행사마다 하루 한 번(got에 오늘 받은 행사 id)
+    es: { day: '', n: 0, week: -1, g: 0, x: 0, t: 0, bf: 0, ba: 0, ax: 0 },   // t 오늘 산 단축권 묶음 수, bf ba 오늘 산 부스터(수업료 2배, 자리 비운 보상 2배)
+    awx: 0,   // 자리 비운 보상 2배 부스터: 다음 받기에 2배(남은 번 수)
+    zv: {},   // 들어가 본 구역({academic: 1,...}). '캠퍼스 둘러보기' 퀘스트가 세요
+    gr0: -1,   // 이번 학기를 시작할 때의 평판(동네 등급을 이 위로 올린 만큼으로 정해요). -1이면 옛 기준
     rp: { b: 0 },   // 되풀이 학년 종업식 조건: 지난 식 때의 건물 레벨 합(0이면 아직 안 셈)
-    bf: freshBf(),   // 4.2.0 대축제: mon 그 달, st 도장, got 받은 단계, day 날짜, dn 그날 도장, o 창 열기, g2 손님 다섯 곳, fw 불꽃놀이, own 받은 달 장식, eve 전날 띠, tip 다른 학교 띠, auto 첫날 창
-    tam: freshTam(),   // 4.3.0 숲속 탐험대: best 가장 깊은 층, party 대원, mem 동물마다 { lv, st 별, sh 별 조각 }, gear 장비 레벨, mat 재료 넷, it 보고서 마지막 받은 때, auto, ad, spd 2배속, wk 주간 최고, seen
-    adx: freshAdx(),   // 4.2.0 광고: day 날짜, n 오늘 광고 도장, got 받은 단계, fv fw xg cs 오늘 쓴 '한 판 더'(축제 부스, 불꽃놀이, 교환학생 안내, 진로 상담)
+    bf: freshBf(),   // 대축제: mon 그 달, st 도장, got 받은 단계, day 날짜, dn 그날 도장, o 창 열기, g2 손님 다섯 곳, fw 불꽃놀이, own 받은 달 장식, eve 전날 띠, tip 다른 학교 띠, auto 첫날 창
+    tam: freshTam(),   // 숲속 탐험대: best 가장 깊은 층, party 대원, mem 동물마다 { lv, st 별, sh 별 조각 }, gear 장비 레벨, mat 재료 넷, it 보고서 마지막 받은 때, auto, ad, spd 2배속, wk 주간 최고, seen
+    adx: freshAdx(),   // 광고: day 날짜, n 오늘 광고 도장, got 받은 단계, fv fw xg cs 오늘 쓴 '한 판 더'(축제 부스, 불꽃놀이, 교환학생 안내, 진로 상담)
     rx: { lv: {}, c: {} },
     rt5: { lv: {}, cur: null },
-    pp: { dat: 0, cur: null, n: 0, by: {}, day: '', cm: -1, cf: 0, cb: 0, ck: {}, med: [], sem: 0 },   // 5.2.0 논문: dat 연구 자료, cur 쓰는 논문 { k 주제, end }, n 편수, by 주제마다 편수, day 자료 정리한 날, cm 학회 번호(4주), cf 이번 학회 점수, cb 가장 높았던 학회 점수, ck 이번 학회 주제마다 편수, med [학회, 메달 1~3], sem 대학원 세미나와 학위수여식 횟수
-    ta: { seat: [], out: [], mem: 0, mon: 0, n: 0 },   // 5.1.0 조교: seat 자리마다 { b 건물 }, out 파견 { i 자리, to 모교 0~4, h 시간 0~2, end }, mem 추억 조각, mon 기념비 단계, n 파견 횟수   // 5.0.0 연구 트리: lv 가지마다 칸 수(0~4), cur 지금 연구 { k, end }   // 4.2.0 연구 투자: lv 연구마다 레벨, c 그 레벨에 정해 둔 값(열린 때의 수업료로 정하고 올릴 때까지 그대로)
-    fv: freshFv(),   // 4.1.0 대학 축제: wk 이번 주, st 도장 수, got 받은 단계, day 날짜, b 그날 한 부스, g 그날 만난 손님, o 그날 창을 열었는지, win 부스마다 성공 횟수, own 받은 기념품, tip 띠를 닫은 주, td 띠를 본 날
-    xg: freshXg(), mk: freshMk(), sto: freshSto(),   // 4.1.0 교환학생의 날, 숲속 장터, 이야기(본 장면, 고른 답, 곁가지)
-    dp: { pick: [], own: {}, free: 0 },   // 4.0.0 단과대학: pick 다니는 곳(열쇠), own 한 번이라도 고른 곳, free 1이면 다음 바꾸기가 공짜(종업식 뒤)
-    zone: '',   // 4.0.0 대학교에서 지금 보는 구역('' = 캠퍼스 화면, 'academic' | 'life' | 'plaza' | 'sports')
-    deco: freshDeco(),   // 1.7.4 꾸미기: own 가진 장식 수, lay 지도별 자리(유치원, 초등학교)마다 놓인 장식 id, nm 학교 이름 앞부분('' = 숲속), mk 학교 마크 [모양, 문양, 바탕 색, 문양 색] 또는 null   // 1.6.0 정수 상점: 오늘 산 도토리 묶음 수, 이번 주 산 황금 도토리 묶음 수
+    pp: { dat: 0, cur: null, n: 0, by: {}, day: '', cm: -1, cf: 0, cb: 0, ck: {}, med: [], sem: 0 },   // 논문: dat 연구 자료, cur 쓰는 논문 { k 주제, end }, n 편수, by 주제마다 편수, day 자료 정리한 날, cm 학회 번호(4주), cf 이번 학회 점수, cb 가장 높았던 학회 점수, ck 이번 학회 주제마다 편수, med [학회, 메달 1~3], sem 대학원 세미나와 학위수여식 횟수
+    ta: { seat: [], out: [], mem: 0, mon: 0, n: 0 },   // 조교: seat 자리마다 { b 건물 }, out 파견 { i 자리, to 모교 0~4, h 시간 0~2, end }, mem 추억 조각, mon 기념비 단계, n 파견 횟수. 연구 트리: lv 가지마다 칸 수(0~4), cur 지금 연구 { k, end }. 연구 투자: lv 연구마다 레벨, c 그 레벨에 정해 둔 값(열린 때의 수업료로 정하고 올릴 때까지 그대로)
+    fv: freshFv(),   // 대학 축제: wk 이번 주, st 도장 수, got 받은 단계, day 날짜, b 그날 한 부스, g 그날 만난 손님, o 그날 창을 열었는지, win 부스마다 성공 횟수, own 받은 기념품, tip 띠를 닫은 주, td 띠를 본 날
+    xg: freshXg(), mk: freshMk(), sto: freshSto(),   // 교환학생의 날, 숲속 장터, 이야기(본 장면, 고른 답, 곁가지)
+    dp: { pick: [], own: {}, free: 0 },   // 단과대학: pick 다니는 곳(열쇠), own 한 번이라도 고른 곳, free 1이면 다음 바꾸기가 공짜(종업식 뒤)
+    zone: '',   // 대학교에서 지금 보는 구역('' = 캠퍼스 화면, 'academic' | 'life' | 'plaza' | 'sports')
+    deco: freshDeco(),   // 꾸미기: own 가진 장식 수, lay 지도별 자리(유치원, 초등학교)마다 놓인 장식 id, nm 학교 이름 앞부분('' = 숲속), mk 학교 마크 [모양, 문양, 바탕 색, 문양 색] 또는 null. 정수 상점: 오늘 산 도토리 묶음 수, 이번 주 산 황금 도토리 묶음 수
     cs: freshCs(),
     wxOff: 0,   // 날씨 효과 끄기(칩을 눌러 켜고 꺼요)
-    nl: 0,   // 3.2.1 고등학교 밤 모습: 0 밤(어둡게), 1 저녁(조금 어둡게), 2 밝게(woodani 요청, 보이는 모습만 바뀌고 밤 규칙은 그대로)
-    tr2: freshTr2(),   // 3.2.0 수학여행: 다녀온 학년, 지금 여행, 떠난 수, 돌아온 수, 기념품   // 3.1.0 진로 상담: 오늘 날짜와 횟수, 모든 상담 수, 진로를 고른 수, 이룬 학생 수, 정산한 명부 번호, 진로 도감
-    roster: freshRoster(), club: freshClub(), el: freshEl(), snap: {}, tfp: 0,   // 2.0.1 el: 반장 선거
-      // tfp: 이 학교급에 들어올 때까지 장학재단을 고친 횟수   // 2.0.0 학생 명부, 동아리, 학교급 사진(졸업식 때 남긴 모습)
+    nl: 0,   // 고등학교 밤 모습: 0 밤(어둡게), 1 저녁(조금 어둡게), 2 밝게(보이는 모습만 바뀌고 밤 규칙은 그대로)
+    tr2: freshTr2(),   // 수학여행: 다녀온 학년, 지금 여행, 떠난 수, 돌아온 수, 기념품. 진로 상담: 오늘 날짜와 횟수, 모든 상담 수, 진로를 고른 수, 이룬 학생 수, 정산한 명부 번호, 진로 도감
+    roster: freshRoster(), club: freshClub(), el: freshEl(), snap: {}, tfp: 0,   // el: 반장 선거
+      // tfp: 이 학교급에 들어올 때까지 장학재단을 고친 횟수. 학생 명부, 동아리, 학교급 사진(졸업식 때 남긴 모습)
     q: freshQ()
   });
-  const repOf = s => s.f.classroom + s.f.cafeteria + s.f.playground + 3 * s.f.library + s.f.science + 2 * (s.t.squirrel + s.t.owl + s.t.bear) + 5 * s.p.perk.rep + 10 * s.fp.rep + acRepOf(s);   // 2.0.1 학력 10레벨마다 +1
+  const repOf = s => s.f.classroom + s.f.cafeteria + s.f.playground + 3 * s.f.library + s.f.science + 2 * (s.t.squirrel + s.t.owl + s.t.bear) + 5 * s.p.perk.rep + 10 * s.fp.rep + acRepOf(s);   // 학력 10레벨마다 +1
   const gradeOf = r => { let g = 0; CFG.grades.forEach((x, i) => { if (r >= townRep(i)) g = i; }); return g; };
 
   function sanitize(d) {
     const s = fresh();
     if (!d || typeof d !== 'object') return s;
-    // 1.5.4: 손상되거나 고친 저장이 계산을 무한대로 만들거나 시작을 멈추지 않게 칸마다 넉넉한 상한을 둬요.
+    // 손상되거나 고친 저장이 계산을 무한대로 만들거나 시작을 멈추지 않게 칸마다 넉넉한 상한을 둬요
     // 실제 놀이로는 닿을 수 없는 값이라 정상 저장은 그대로예요 (SAVE_CAP)
     const cap = (v, max) => Math.min(max, v);
     s.budget = cap(numFb(d.budget, 0, s.budget, SAVE_CAP.acorn), SAVE_CAP.acorn);
@@ -149,28 +384,28 @@
       if (Array.isArray(d.p.nl)) s.p.nl = s.p.nl.map((_, i) => Math.min(99, Math.floor(numFb(d.p.nl[i], 0, 0))));
       s.p.species = Math.min(NEWCOMERS.length, Math.floor(numFb(d.p.species, 0, 0)));
       if (d.p.perk && typeof d.p.perk === 'object') for (const k in s.p.perk) s.p.perk[k] = Math.floor(cap(numFb(d.p.perk[k], 0, 0), PERKS[k].max || SAVE_CAP.perk));
-      s.p.perk.night = Math.min(s.p.perk.night, PERKS.night.max) || 0;   // 2.3.0.1 NaN으로 저장된 학교도 0부터
+      s.p.perk.night = Math.min(s.p.perk.night, PERKS.night.max) || 0;   // NaN으로 저장된 학교도 0부터
     }
     if (d.att && typeof d.att === 'object') { s.att.last = typeof d.att.last === 'string' ? d.att.last.slice(0, 10) : ''; s.att.n = Math.floor(numFb(d.att.n, 0, 0, SAVE_CAP.count)); }
     if (d.ad && typeof d.ad === 'object') { s.ad.day = typeof d.ad.day === 'string' ? d.ad.day.slice(0, 10) : ''; s.ad.n = Math.floor(numFb(d.ad.n, 0, 0, SAVE_CAP.count)); }
     // 학교급과 장학재단. 졸업식이 없던 저장은 지금까지의 종업식이 모두 유치원에서 열린 것으로 쳐요
     s.tier = Math.min(Math.floor(numFb(d.tier, 0, 0)), TIER_OPEN - 1);
-    s.zone = typeof d.zone === 'string' && ZONE_KEYS.includes(d.zone) ? d.zone : '';   // 4.0.0
+    s.zone = typeof d.zone === 'string' && ZONE_KEYS.includes(d.zone) ? d.zone : '';
     s.zv = {}; if (d.zv && typeof d.zv === 'object') for (const z of ZONE_KEYS) if (d.zv[z]) s.zv[z] = 1;
-    s.gr0 = Math.floor(cap(numFb(d.gr0, -1, -1), SAVE_CAP.count));   // 5.0.1.4 옛 저장은 -1(지금 학기는 옛 기준, 다음 학기부터 새 기준)
+    s.gr0 = Math.floor(cap(numFb(d.gr0, -1, -1), SAVE_CAP.count));   // 옛 저장은 -1(지금 학기는 옛 기준, 다음 학기부터 새 기준)
     s.rp = { b: Math.floor(cap(numFb(d.rp && d.rp.b, 0, 0), SAVE_CAP.count)) };
-    s.dp = { pick: [], own: {}, free: 0 };   // 4.0.0 단과대학
+    s.dp = { pick: [], own: {}, free: 0 };   // 단과대학
     if (d.dp && typeof d.dp === 'object') { const ks = ['science', 'sports', 'human', 'art', 'biz', 'eng', 'edu', 'med']; if (Array.isArray(d.dp.pick)) for (const k of d.dp.pick) if (ks.includes(k) && !s.dp.pick.includes(k) && s.dp.pick.length < 3) s.dp.pick.push(k); if (d.dp.own && typeof d.dp.own === 'object') for (const k of ks) if (d.dp.own[k]) s.dp.own[k] = 1; s.dp.free = d.dp.free ? 1 : 0; }
     s.tg = Math.floor(numFb(d.tg, 0, s.tier === 0 ? s.st.grads : 0));
-    // 2.1.0 학기: 0은 1학기, 1은 2학기. 학기가 없던 저장은 지금 학년을 2학기로 쳐서, 다음 종업식에 원래대로 학년이 올라가요
+    // 학기: 0은 1학기, 1은 2학기. 학기가 없던 저장은 지금 학년을 2학기로 쳐서, 다음 종업식에 원래대로 학년이 올라가요
     s.sem = d.sem === 0 || d.sem === 1 ? d.sem : (s.tier >= 1 ? 1 : 0);
-    s.semDip = s.sem ? Math.min(SAVE_CAP.count, Math.floor(numFb(d.semDip, 0, 0))) : 0;   // 2.1.0 1학기 방학식에 준 수료증
+    s.semDip = s.sem ? Math.min(SAVE_CAP.count, Math.floor(numFb(d.semDip, 0, 0))) : 0;   // 1학기 방학식에 준 수료증
     s.fund = Math.floor(cap(numFb(d.fund, 0, 0), SAVE_CAP.count));
     if (d.fp && typeof d.fp === 'object') for (const k in s.fp) s.fp[k] = Math.floor(cap(numFb(d.fp[k], 0, 0), SAVE_CAP.fperk));
     if (d.hd && typeof d.hd === 'object') {
       s.hd.day = typeof d.hd.day === 'string' ? d.hd.day.slice(0, 10) : '';
       s.hd.n = Math.floor(numFb(d.hd.n, 0, 0, SAVE_CAP.count));
-      s.hd.feastUntil = Math.min(numFb(d.hd.feastUntil, 0, 0), Date.now() + 27 * 3600000);   // 2.0.0: 게임 시계 기준이라 하루 여유
+      s.hd.feastUntil = Math.min(numFb(d.hd.feastUntil, 0, 0), Date.now() + 27 * 3600000);   // 게임 시계 기준이라 하루 여유
       s.hd.furNew = d.hd.furNew !== false;
       s.hd.album = !!d.hd.album; s.hd.seen = !!d.hd.seen;
     }
@@ -181,7 +416,7 @@
     s.u.boost = !!(d.u && d.u.boost) || s.t.owl >= 1;
     s.u.dev = !!(d.u && d.u.dev);
     s.units = d.units === 'en' ? 'en' : 'ko';
-    s.uiz = d.uiz === 1 ? 1 : 0;   // 5.0.1.7
+    s.uiz = d.uiz === 1 ? 1 : 0;
     // 학교 번호는 기기를 옮겨도 그대로예요. 예전 저장에는 없어서 새로 만들고, 처음 연 날은 마지막 저장 때로 어림해요
     if (typeof d.pid === 'string' && /^[0-9A-Z]{6,16}$/.test(d.pid)) s.pid = d.pid;
     s.born = Math.min(numFb(d.born, 0, s.savedAt), Date.now());
@@ -197,28 +432,28 @@
       for (const k of Object.keys(COS)) { const v = d.cos[k]; s.cos[k] = typeof v === 'string' && s.cos.own.includes(k + ':' + v) ? v : ''; }
       const th = d.cos.th && typeof d.cos.th === 'object' ? d.cos.th : {};
       for (const [slot] of TH_SLOTS) { const v = th[slot]; s.cos.th[slot] = typeof v === 'string' && s.cos.own.includes(`th:${v}:${slot}`) ? v : ''; }
-      // 1.6.0 특별 가구: 산 것만 방에 놓여요 (sp 칸이 없는 옛 저장은 산 가구를 바로 놓아요)
+      // 특별 가구: 산 것만 방에 놓여요 (sp 칸이 없는 옛 저장은 산 가구를 바로 놓아요)
       const sp = d.cos.sp && typeof d.cos.sp === 'object' ? d.cos.sp : null;
       for (const k of Object.keys(SP_FUR)) { const own = s.cos.own.includes('sp:' + SP_FUR[k].id); s.cos.sp[k] = own && (!sp || sp[k] === SP_FUR[k].id) ? SP_FUR[k].id : ''; }
-      // 2.1.0 학교 마크 특별판과 밤 모드: 산 것만 써요
+      // 학교 마크 특별판과 밤 모드: 산 것만 써요
       s.cos.mkx = typeof d.cos.mkx === 'string' && s.cos.own.includes('mkx:' + d.cos.mkx) ? d.cos.mkx : '';
       s.cos.night = d.cos.night === true && s.cos.own.includes(NIGHT_KEY);
     }
-    // 1.7.2 학교 행사 황금 도토리 하루 한 번
+    // 학교 행사 황금 도토리 하루 한 번
     if (d.fg && typeof d.fg === 'object') {
       s.fg.day = typeof d.fg.day === 'string' ? d.fg.day.slice(0, 10) : '';
       s.fg.got = Array.isArray(d.fg.got) ? d.fg.got.filter(x => typeof x === 'string' && x.length < 20).slice(0, 10) : [];
     }
-    // 1.6.0 정수 상점 구매 횟수
+    // 정수 상점 구매 횟수
     if (d.es && typeof d.es === 'object') {
       s.es.day = typeof d.es.day === 'string' ? d.es.day.slice(0, 10) : ''; s.es.n = Math.floor(numFb(d.es.n, 0, 0, SAVE_CAP.count));
       s.es.week = Math.floor(numFb(d.es.week, -1, -1, SAVE_CAP.count)); s.es.g = Math.floor(numFb(d.es.g, 0, 0, SAVE_CAP.count));
-      s.es.x = Math.floor(numFb(d.es.x, 0, 0, SAVE_CAP.count)); s.es.ax = Math.min(99, Math.floor(numFb(d.es.ax, 0, 0)));   // 4.3.1 정수로 도토리 바꾸기(오늘 바꾼 횟수)   // 1.7.4 도토리로 정수 바꾸기(오늘 바꾼 횟수)
-      s.es.t = Math.min(99, Math.floor(numFb(d.es.t, 0, 0))); s.es.bf = Math.min(99, Math.floor(numFb(d.es.bf, 0, 0))); s.es.ba = Math.min(99, Math.floor(numFb(d.es.ba, 0, 0)));   // 2.1.0 문방구
+      s.es.x = Math.floor(numFb(d.es.x, 0, 0, SAVE_CAP.count)); s.es.ax = Math.min(99, Math.floor(numFb(d.es.ax, 0, 0)));   // 정수로 도토리 바꾸기(오늘 바꾼 횟수). 도토리로 정수 바꾸기(오늘 바꾼 횟수)
+      s.es.t = Math.min(99, Math.floor(numFb(d.es.t, 0, 0))); s.es.bf = Math.min(99, Math.floor(numFb(d.es.bf, 0, 0))); s.es.ba = Math.min(99, Math.floor(numFb(d.es.ba, 0, 0)));   // 문방구
     }
     s.autoUntil = Math.min(numFb(d.autoUntil, 0, 0), Date.now() + 27 * 3600000);
     if (d.fest && typeof d.fest === 'object') for (const id of FEST_IDS) {
-      if (d.fest.next && d.fest.next[id]) s.fest.next[id] = Math.min(numFb(d.fest.next[id], 0, 0), Math.max(Date.now(), Number(d.clk && d.clk.last) || 0) + 2 * 3600000);   // 4.0.1 기기 시계를 뒤로 돌려 다시 열어도 대기가 줄지 않게, 마지막 게임 시계와 견줘요
+      if (d.fest.next && d.fest.next[id]) s.fest.next[id] = Math.min(numFb(d.fest.next[id], 0, 0), Math.max(Date.now(), Number(d.clk && d.clk.last) || 0) + 2 * 3600000);   // 기기 시계를 뒤로 돌려 다시 열어도 대기가 줄지 않게, 마지막 게임 시계와 견줘요
       if (d.fest.n && d.fest.n[id]) s.fest.n[id] = Math.floor(numFb(d.fest.n[id], 0, 0, SAVE_CAP.count));
       if (d.fest.sub && d.fest.sub[id] && !FEST[id].night) s.fest.sub[id] = Math.floor(cap(numFb(d.fest.sub[id], 0, 0), SAVE_CAP.count));
     }
@@ -230,8 +465,8 @@
       s.tut.st = ['later', 'done', 'skip'].includes(d.tut.st) ? d.tut.st : ''; s.tut.step = Math.floor(numFb(d.tut.step, 0, 0, SAVE_CAP.count));
       s.tut.paid = !!d.tut.paid; s.tut.nop = !!d.tut.nop;
     }
-    if (d.tips && typeof d.tips === 'object') { s.tips.rep = !!d.tips.rep; for (const k of ['oak', 'left', 'tabs']) s.tips[k] = !!d.tips[k]; }   // 5.0.1.7
-    if (d.nt && typeof d.nt === 'object') s.nt = { seen: typeof d.nt.seen === 'string' ? d.nt.seen.slice(0, 40) : '', ver: typeof d.nt.ver === 'string' ? d.nt.ver.slice(0, 12) : '', hide: Math.min(typeof d.nt.hide === 'number' && isFinite(d.nt.hide) && d.nt.hide > 0 ? d.nt.hide : 0, Date.now() + 8 * 86400000) };   // 2.0.0 공지
+    if (d.tips && typeof d.tips === 'object') { s.tips.rep = !!d.tips.rep; for (const k of ['oak', 'left', 'tabs']) s.tips[k] = !!d.tips[k]; }
+    if (d.nt && typeof d.nt === 'object') s.nt = { seen: typeof d.nt.seen === 'string' ? d.nt.seen.slice(0, 40) : '', ver: typeof d.nt.ver === 'string' ? d.nt.ver.slice(0, 12) : '', hide: Math.min(typeof d.nt.hide === 'number' && isFinite(d.nt.hide) && d.nt.hide > 0 ? d.nt.hide : 0, Date.now() + 8 * 86400000) };   // 공지
     if (d.wk && typeof d.wk === 'object') {
       s.wk.week = Math.floor(numFb(d.wk.week, -1, -1, SAVE_CAP.count)); s.wk.pts = Math.floor(numFb(d.wk.pts, 0, 0, SAVE_CAP.count));
       s.wk.got = MP_BOX.map((_, i) => !!(Array.isArray(d.wk.got) && d.wk.got[i]));
@@ -240,9 +475,9 @@
     if (d.lg && typeof d.lg === 'object') {
       s.lg.week = Math.floor(numFb(d.lg.week, -1, -1, SAVE_CAP.count)); s.lg.pts = Math.floor(numFb(d.lg.pts, 0, 0, SAVE_CAP.count)); s.lg.pos = Math.floor(numFb(d.lg.pos, 0, 0, SAVE_CAP.count)); s.lg.paid = !!d.lg.paid;
       if (d.lg.last && typeof d.lg.last === 'object') s.lg.last = { week: numFb(d.lg.last.week, 0, 0, SAVE_CAP.count), pts: numFb(d.lg.last.pts, 0, 0, SAVE_CAP.count), pos: numFb(d.lg.last.pos, 0, 0, SAVE_CAP.count), gold: numFb(d.lg.last.gold, 0, 0, SAVE_CAP.count) };
-      if (d.lg.dq && typeof d.lg.dq === 'object') s.lg.dq = { day: typeof d.lg.dq.day === 'string' ? d.lg.dq.day.slice(0, 12) : '', p: Math.min(1000, Math.floor(numFb(d.lg.dq.p, 0, 0, 1000))) };   // 5.0.3 옛 저장에는 없어요(기본값 그대로)
+      if (d.lg.dq && typeof d.lg.dq === 'object') s.lg.dq = { day: typeof d.lg.dq.day === 'string' ? d.lg.dq.day.slice(0, 12) : '', p: Math.min(1000, Math.floor(numFb(d.lg.dq.p, 0, 0, 1000))) };   // 옛 저장에는 없어요(기본값 그대로)
     }
-    if (d.sports && typeof d.sports === 'object') s.sports.next = Math.min(numFb(d.sports.next, 0, 0), Math.max(Date.now(), Number(d.clk && d.clk.last) || 0) + 2 * 3600000);   // 4.0.1
+    if (d.sports && typeof d.sports === 'object') s.sports.next = Math.min(numFb(d.sports.next, 0, 0), Math.max(Date.now(), Number(d.clk && d.clk.last) || 0) + 2 * 3600000);
     if (d.trip && typeof d.trip === 'object') {
       const t = d.trip;
       s.trip.open = !!t.open;
@@ -251,11 +486,11 @@
       if (t.been && typeof t.been === 'object') for (const k of Object.keys(TRIP)) if (t.been[k]) s.trip.been[k] = Math.floor(numFb(t.been[k], 0, 0, SAVE_CAP.count));
       if (typeof t.cur === 'string' && TRIP[t.cur]) {
         const len = TRIP[t.cur].min * 60000, end = numFb(t.end, 0, 0), start = numFb(t.start, 0, 0);
-        if (end > 0 && end - Math.max(Date.now(), Number(d.clk && d.clk.last) || 0) <= len + 86400000) {   // 4.0.1: 기기 시계가 하루 넘게 느려도 가던 체험학습이 사라지지 않게 마지막 게임 시계와 견줘요
-          s.trip.cur = t.cur; s.trip.end = end; s.trip.start = Math.min(start || end - len, end - 1); }   // 2.0.0: 끝나는 시각은 게임 시계라 기기 시계와 어긋날 수 있어 하루 여유
+        if (end > 0 && end - Math.max(Date.now(), Number(d.clk && d.clk.last) || 0) <= len + 86400000) {   // 기기 시계가 하루 넘게 느려도 가던 체험학습이 사라지지 않게 마지막 게임 시계와 견줘요
+          s.trip.cur = t.cur; s.trip.end = end; s.trip.start = Math.min(start || end - len, end - 1); }   // 끝나는 시각은 게임 시계라 기기 시계와 어긋날 수 있어 하루 여유
       }
     }
-    // 2.1.0: 토스 사용자 키는 옛 저장의 tk(글자)에서 tkey로 옮겨요. tk는 이제 시간 단축권 장수예요
+    // 토스 사용자 키는 옛 저장의 tk(글자)에서 tkey로 옮겨요. tk는 이제 시간 단축권 장수예요
     if (typeof d.tkey === 'string') s.tkey = d.tkey.slice(0, 200); else if (typeof d.tk === 'string') s.tkey = d.tk.slice(0, 200);
     s.awx = Math.min(3, Math.floor(numFb(d.awx, 0, 0)));
     s.acctGift = !!d.acctGift;
@@ -284,86 +519,86 @@
     // 아직 유치원인데 초등학교 장의 퀘스트에 와 있으면 유치원 졸업식 퀘스트로 되돌려요 (0.4에서는 전학생 퀘스트가 5장에 있었어요)
     const k1 = MAIN.findIndex(m => m.id === 'k1');
     if (s.tier === 0 && MAIN[s.q.m] && MAIN[s.q.m].ch > MAIN[k1].ch) { s.q.m = k1; s.q.mb = 0; }
-    // 2.3.0 woodani 제보: 유치원 퀘스트를 남긴 채 초등학교에 온 저장은 '유치원 졸업식'(바로 완료)부터 이어서 초등학교 장으로 가요
+    // 유치원 퀘스트를 남긴 채 초등학교에 온 저장은 '유치원 졸업식'(바로 완료)부터 이어서 초등학교 장으로 가요
     if (s.tier >= 1 && MAIN[s.q.m] && s.q.m < k1) { s.q.m = k1; s.q.mb = 0; s.q.lat = ''; }
-    // 2.0.0: 초등학교 퀘스트를 다 마친 저장(end:e38)은 새 '초등학교 졸업식'(e39)에서 이어가요. 아직 초등학교면 중학교 장으로 넘어가지 않아요
+    // 초등학교 퀘스트를 다 마친 저장(end:e38)은 새 '초등학교 졸업식'(e39)에서 이어가요. 아직 초등학교면 중학교 장으로 넘어가지 않아요
     const e39 = MAIN.findIndex(m => m.id === 'e39');
     if (s.tier === 1 && (s.q.m >= MAIN.length || (MAIN[s.q.m] && MAIN[s.q.m].ch > MAIN[e39].ch))) { s.q.m = e39; s.q.mb = 0; }
-    // 1.3.0: 개발자 '졸업 조건 채우기'로 건너뛴 해가 종업식 횟수와 전학생에 빠져 있으면 학년에 맞춰 채워요
+    // 개발자 '졸업 조건 채우기'로 건너뛴 해가 종업식 횟수와 전학생에 빠져 있으면 학년에 맞춰 채워요
     const yearsDone = s.tier === 0 ? s.tg : TIERS[0].grads + 1 + s.tg;
     if (s.st.grads < yearsDone) s.st.grads = yearsDone;
     if (s.p.species < Math.min(NEWCOMERS_OLD, yearsDone)) s.p.species = Math.min(NEWCOMERS_OLD, yearsDone);
-    sanitize170(d, s);   // 1.7.0 도감, 이벤트
-    sanitize180(d, s);   // 1.8.0 숲속 합치기
-    s.vp = Math.min(VP.max, Math.floor(numFb(d.vp, 0, 0)));   // 1.7.0 교감 선생님
+    sanitize170(d, s);   // 도감, 이벤트
+    sanitize180(d, s);   // 숲속 합치기
+    s.vp = Math.min(VP.max, Math.floor(numFb(d.vp, 0, 0)));   // 교감 선생님
     for (const k of Object.keys(XT)) s.xt[k] = Math.min(XT[k].max, Math.floor(numFb(d.xt && d.xt[k], 0, 0)));
-    for (const k of ['b', 'l', 'r', 'q', 'td']) s.fold[k] = d.fold && d.fold[k] ? 1 : 0;   // 3.0.0 홈 칸 접기   // 1.7.1 새 선생님
-    sanitize171(d, s);   // 1.7.1 업적
-    sanitize174(d, s);   // 1.7.4 꾸미기
-    sanitize200(d, s);   // 2.0.0 명부, 동아리, 학교급 사진
-    sanitizeCs(d, s);   // 3.1.0 진로 상담
-    sanitizeTr2(d, s);   // 3.2.0 수학여행
-    sanitizeFv(d, s);   // 4.1.0 대학 축제
-    sanitizeBf(d, s);   // 4.2.0 대축제
-    { const R = d && d.rx && typeof d.rx === 'object' ? d.rx : {}, f = { lv: {}, c: {} };   // 4.2.0 연구 투자
+    for (const k of ['b', 'l', 'r', 'q', 'td']) s.fold[k] = d.fold && d.fold[k] ? 1 : 0;   // 홈 칸 접기. 새 선생님
+    sanitize171(d, s);   // 업적
+    sanitize174(d, s);   // 꾸미기
+    sanitize200(d, s);   // 명부, 동아리, 학교급 사진
+    sanitizeCs(d, s);   // 진로 상담
+    sanitizeTr2(d, s);   // 수학여행
+    sanitizeFv(d, s);   // 대학 축제
+    sanitizeBf(d, s);   // 대축제
+    { const R = d && d.rx && typeof d.rx === 'object' ? d.rx : {}, f = { lv: {}, c: {} };   // 연구 투자
       for (const x of RX.list) { const lv = R.lv && R.lv[x.k], c = R.c && R.c[x.k];
         if (typeof lv === 'number' && isFinite(lv) && lv > 0) f.lv[x.k] = Math.min(1000, Math.floor(lv));
         if (typeof c === 'number' && isFinite(c) && c > 0) f.c[x.k] = Math.min(SAVE_CAP.acorn, Math.floor(c)); }
       s.rx = f; }
-    if (d.rt5 && typeof d.rt5 === 'object') {   // 5.0.0 연구 트리
+    if (d.rt5 && typeof d.rt5 === 'object') {   // 연구 트리
       const lv = {}; for (const D of RT5.list) { const v = d.rt5.lv && d.rt5.lv[D.k]; if (Number.isFinite(v) && v > 0) lv[D.k] = Math.min(RT5.top, Math.floor(v)); }
       const c = d.rt5.cur; s.rt5 = { lv, cur: c && RT5.list.some(D => D.k === c.k && !D.lock) && Number.isFinite(c.end) ? { k: c.k, end: c.end } : null }; }
-    if (d.ta && typeof d.ta === 'object') {   // 5.1.0 조교
+    if (d.ta && typeof d.ta === 'object') {   // 조교
       const T = d.ta, num = (v, mx) => Number.isFinite(v) && v > 0 ? Math.min(mx, Math.floor(v)) : 0;
       const seat = (Array.isArray(T.seat) ? T.seat : []).slice(0, 4).map(x => ({ b: x && typeof x.b === 'string' && FAC[x.b] ? x.b : '' }));
       const out = (Array.isArray(T.out) ? T.out : []).filter(o => o && Number.isInteger(o.i) && o.i >= 0 && o.i < 4 && Number.isInteger(o.to) && o.to >= 0 && o.to <= 4 && Number.isInteger(o.h) && o.h >= 0 && o.h <= 2 && Number.isFinite(o.end))
         .filter((o, j, a) => a.findIndex(y => y.i === o.i) === j).map(o => ({ i: o.i, to: o.to, h: o.h, end: o.end }));
       s.ta = { seat, out, mem: num(T.mem, 1e9), mon: num(T.mon, 3), n: num(T.n, 1e9) }; }
-    if (d.pp && typeof d.pp === 'object') {   // 5.2.0 논문과 학회
+    if (d.pp && typeof d.pp === 'object') {   // 논문과 학회
       const P = d.pp, num = (v, mx) => Number.isFinite(v) && v > 0 ? Math.min(mx, Math.floor(v)) : 0, keys = new Set(RT5.list.map(D => D.k));
       const map = o => { const r = {}; if (o && typeof o === 'object') for (const k of Object.keys(o)) if (keys.has(k)) r[k] = num(o[k], 1e6); return r; };
       const c = P.cur && keys.has(P.cur.k) && Number.isFinite(P.cur.end) ? { k: P.cur.k, end: P.cur.end } : null;
       const med = Array.isArray(P.med) ? P.med.filter(m => Array.isArray(m) && Number.isFinite(m[0]) && [1, 2, 3].includes(m[1])).slice(-60).map(m => [Math.floor(m[0]), m[1]]) : [];
       s.pp = { dat: num(P.dat, 9999), cur: c, n: num(P.n, 1e6), by: map(P.by), day: typeof P.day === 'string' ? P.day.slice(0, 10) : '', cm: Number.isFinite(P.cm) ? Math.max(-1, Math.floor(P.cm)) : -1,
         cf: num(P.cf, 99999), cb: num(P.cb, 99999), ck: map(P.ck), med, sem: num(P.sem, 1e6) };
-    } else if (s.tier >= GRAD_TIER) s.pp.sem = Math.max(0, Math.floor((s.tg || 0) * 2 + (s.sem || 0)));   // 5.2.0 앞 저장: 지난 세미나 수를 학기로 어림
-    { const A = d && d.adx && typeof d.adx === 'object' ? d.adx : {}, f = freshAdx();   // 4.2.0 광고 도장과 한 판 더
+    } else if (s.tier >= GRAD_TIER) s.pp.sem = Math.max(0, Math.floor((s.tg || 0) * 2 + (s.sem || 0)));   // 앞 저장: 지난 세미나 수를 학기로 어림
+    { const A = d && d.adx && typeof d.adx === 'object' ? d.adx : {}, f = freshAdx();   // 광고 도장과 한 판 더
       f.day = typeof A.day === 'string' ? A.day.slice(0, 10) : '';
       f.n = typeof A.n === 'number' && isFinite(A.n) ? Math.max(0, Math.min(ADX.max, Math.floor(A.n))) : 0;
       if (Array.isArray(A.got)) f.got = ADX.st.map((_, i) => A.got[i] ? 1 : 0);
       for (const k of ['fv', 'fw', 'xg', 'cs']) f[k] = A[k] ? 1 : 0;
-      f.all = typeof A.all === 'number' && isFinite(A.all) ? Math.max(0, Math.min(10000, Math.floor(A.all))) : 0;   // 5.0.1
+      f.all = typeof A.all === 'number' && isFinite(A.all) ? Math.max(0, Math.min(10000, Math.floor(A.all))) : 0;
       s.adx = f; }
-    sanitizeTam(d, s);   // 4.3.0 숲속 탐험대
-    sanitizeXg(d, s); sanitizeMk(d, s); sanitizeSto(d, s);   // 4.1.0 교환학생, 장터, 이야기
-    s.nl = [0, 1, 2].includes(d.nl) ? d.nl : 0;   // 3.2.1 고등학교 밤 모습
+    sanitizeTam(d, s);   // 숲속 탐험대
+    sanitizeXg(d, s); sanitizeMk(d, s); sanitizeSto(d, s);   // 교환학생, 장터, 이야기
+    s.nl = [0, 1, 2].includes(d.nl) ? d.nl : 0;   // 고등학교 밤 모습
     s.tfp = Math.min(s.st.fperks, Math.floor(numFb(d.tfp, 0, s.st.fperks)));
-    // 1.7.0 학교급별 건물 외관: 예전 저장은 지금 보이는 모습 그대로(유치원 모습, 과학실과 운동장은 초등학교 모습) 시작해서 다음 업그레이드 때 바뀌어요
+    // 학교급별 건물 외관: 예전 저장은 지금 보이는 모습 그대로(유치원 모습, 과학실과 운동장은 초등학교 모습) 시작해서 다음 업그레이드 때 바뀌어요
     if (d.bs && typeof d.bs === 'object') { for (const k of Object.keys(s.bs)) s.bs[k] = Math.min(s.tier, Math.floor(numFb(d.bs[k], 0, 0))); }
     else { s.bs.science = Math.min(1, s.tier); s.bs.playground = Math.min(1, s.tier); }
-    // 1.6.0: 숲의 정수와 블록 퍼즐. 예전 저장에는 없으니 0에서 시작하고, 하던 판은 모양이 맞을 때만 이어요
-    s.ess = Math.min(1e9, Math.floor(numFb(d.ess, 0, 0)));   // 2.2.0 검토(추가 1): addEss와 같은 상한 10억(예전에는 읽을 때 상한이 없어 1e308도 받았어요)
-    sanitizeAc(d, s);   // 2.0.1 공부
-    sanitizeStudy2(d, s);   // 2.0.1 공부 2단계: 실험, 책 읽기
-    sanitize210(d, s);   // 2.1.0 숲속 소풍, 칭찬 스티커판
-    sanitize211(d, s);   // 2.1.1 단짝 친구, 생일 잔치, 졸업 앨범
+    // 숲의 정수와 블록 퍼즐. 예전 저장에는 없으니 0에서 시작하고, 하던 판은 모양이 맞을 때만 이어요
+    s.ess = Math.min(1e9, Math.floor(numFb(d.ess, 0, 0)));   // addEss와 같은 상한 10억(예전에는 읽을 때 상한이 없어 1e308도 받았어요)
+    sanitizeAc(d, s);   // 공부
+    sanitizeStudy2(d, s);   // 공부 2단계: 실험, 책 읽기
+    sanitize210(d, s);   // 숲속 소풍, 칭찬 스티커판
+    sanitize211(d, s);   // 단짝 친구, 생일 잔치, 졸업 앨범
     if (d.dsn && typeof d.dsn === 'object' && typeof d.dsn.day === 'string') {
       s.dsn.day = d.dsn.day.slice(0, 10); s.dsn.trips = Math.min(s.st.trips, Math.floor(numFb(d.dsn.trips, 0, 0))); s.dsn.sports = Math.min(s.st.sports, Math.floor(numFb(d.dsn.sports, 0, 0)));
       if (d.dsn.fest && typeof d.dsn.fest === 'object') for (const k of Object.keys(s.fest.n)) s.dsn.fest[k] = Math.min(s.fest.n[k] || 0, Math.floor(numFb(d.dsn.fest[k], 0, 0)));
     }
-    sanitizeExam(d, s);   // 2.0.1 공부 3단계: 시험 기간
-    sanitizeBt(d, s);   // 2.0.1 공부 4단계: 숲속 대결
-    sanitizePs(d, s);   // 2.1.3 숲속 패스
-    sanitizeGd(d, s);   // 2.2.0 학교 텃밭
-    sanitizeBx(d, s);   // 2.2.0 숲속 생물 탐사
-    sanitizeCg(d, s);   // 2.2.0 동아리 대항전
-    s.wx = typeof d.wx === 'string' ? d.wx.slice(0, 10) : '';   // 2.1.3 날씨 알림 본 날
-    s.wxOff = d.wxOff ? 1 : 0;   // 보안 보강 판(2026-11-06 woodani): 날씨 칩을 눌러 비, 눈, 안개 효과 끄기(날씨 자체와 보너스는 그대로)
-    { const P = d.pl && typeof d.pl === 'object' ? d.pl : {}, got = Math.max(0, Math.min(PL.list.length, Math.floor(Number(P.got) || 0))); s.pl = { got, read: Math.max(0, Math.min(got, Math.floor(Number(P.read) || 0))), wk: Math.floor(Number(P.wk)) || -1 }; }   // 2.1.3 학부모 편지
-    { const R = d.rs && typeof d.rs === 'object' ? d.rs : {}, n = (v, hi) => Math.max(0, Math.min(hi, Math.floor(Number(v) || 0))); s.rs = { n: n(R.n, 1e4), p: n(R.p, 1e9), pos: n(R.pos, 1e4), king: n(R.king, 1e4) }; }   // 2.1.3 랭킹 시즌
-    { const L = d.lk && typeof d.lk === 'object' ? d.lk : {}; s.lk = { on: L.on === true, at: Math.max(0, Math.min(Date.now() + 864e5, Number(L.at) || 0)), h: '', pub: L.pub === true, del: L.del === true }; }   // 2.1.3 내 학교 보여 주기(처음에는 꺼짐)
-    { const R = d.rare && typeof d.rare === 'object' ? d.rare : {}; s.rare = { got: [...new Set((Array.isArray(R.got) ? R.got : []).filter(sp => RARE.list.some(x => x.sp === sp)))], miss: Math.min(RARE.pity, Math.max(0, Math.floor(Number(R.miss) || 0))) }; }   // 2.1.3 반짝 친구
-    // 2.1.0 공사와 시간 단축권: 예전 저장에는 없으니 공사 없음, 단축권 0장. 지금 레벨 다음 칸이 아닌 공사는 버려요
+    sanitizeExam(d, s);   // 공부 3단계: 시험 기간
+    sanitizeBt(d, s);   // 공부 4단계: 숲속 대결
+    sanitizePs(d, s);   // 숲속 패스
+    sanitizeGd(d, s);   // 학교 텃밭
+    sanitizeBx(d, s);   // 숲속 생물 탐사
+    sanitizeCg(d, s);   // 동아리 대항전
+    s.wx = typeof d.wx === 'string' ? d.wx.slice(0, 10) : '';   // 날씨 알림 본 날
+    s.wxOff = d.wxOff ? 1 : 0;   // 보안 보강 판: 날씨 칩을 눌러 비, 눈, 안개 효과 끄기(날씨 자체와 보너스는 그대로)
+    { const P = d.pl && typeof d.pl === 'object' ? d.pl : {}, got = Math.max(0, Math.min(PL.list.length, Math.floor(Number(P.got) || 0))); s.pl = { got, read: Math.max(0, Math.min(got, Math.floor(Number(P.read) || 0))), wk: Math.floor(Number(P.wk)) || -1 }; }   // 학부모 편지
+    { const R = d.rs && typeof d.rs === 'object' ? d.rs : {}, n = (v, hi) => Math.max(0, Math.min(hi, Math.floor(Number(v) || 0))); s.rs = { n: n(R.n, 1e4), p: n(R.p, 1e9), pos: n(R.pos, 1e4), king: n(R.king, 1e4) }; }   // 랭킹 시즌
+    { const L = d.lk && typeof d.lk === 'object' ? d.lk : {}; s.lk = { on: L.on === true, at: Math.max(0, Math.min(Date.now() + 864e5, Number(L.at) || 0)), h: '', pub: L.pub === true, del: L.del === true }; }   // 내 학교 보여 주기(처음에는 꺼짐)
+    { const R = d.rare && typeof d.rare === 'object' ? d.rare : {}; s.rare = { got: [...new Set((Array.isArray(R.got) ? R.got : []).filter(sp => RARE.list.some(x => x.sp === sp)))], miss: Math.min(RARE.pity, Math.max(0, Math.floor(Number(R.miss) || 0))) }; }   // 반짝 친구
+    // 공사와 시간 단축권: 예전 저장에는 없으니 공사 없음, 단축권 0장. 지금 레벨 다음 칸이 아닌 공사는 버려요
     if (d.bd && typeof d.bd === 'object') for (const k of Object.keys(FAC)) {
       const b = d.bd[k];
       if (b && typeof b === 'object' && Math.floor(numFb(b.L, 0, 0, SAVE_CAP.count)) === s.f[k] + 1 && s.f[k] + 1 <= SAVE_CAP.lv) {
@@ -372,19 +607,19 @@
       }
     }
     if (d.tk && typeof d.tk === 'object') for (const k of Object.keys(s.tk)) s.tk[k] = Math.min(SAVE_CAP.count, Math.floor(numFb(d.tk[k], 0, 0)));
-    if (d.tkd && typeof d.tkd === 'object') { s.tkd.day = typeof d.tkd.day === 'string' ? d.tkd.day.slice(0, 10) : ''; s.tkd.pz = Math.min(TKE.perDay, Math.floor(numFb(d.tkd.pz, 0, 0))); s.tkd.mg = Math.min(TKE.perDay, Math.floor(numFb(d.tkd.mg, 0, 0))); }   // 2.3.0.1
+    if (d.tkd && typeof d.tkd === 'object') { s.tkd.day = typeof d.tkd.day === 'string' ? d.tkd.day.slice(0, 10) : ''; s.tkd.pz = Math.min(TKE.perDay, Math.floor(numFb(d.tkd.pz, 0, 0))); s.tkd.mg = Math.min(TKE.perDay, Math.floor(numFb(d.tkd.mg, 0, 0))); }
     if (d.tka && typeof d.tka === 'object') { s.tka.day = typeof d.tka.day === 'string' ? d.tka.day.slice(0, 10) : ''; s.tka.n = Math.min(TKAD.perDay, Math.floor(numFb(d.tka.n, 0, 0))); }
     if (d.pz && typeof d.pz === 'object') {
       s.pz.day = typeof d.pz.day === 'string' ? d.pz.day.slice(0, 10) : '';
       s.pz.n = Math.floor(numFb(d.pz.n, 0, 0, SAVE_CAP.count)); s.pz.adN = Math.floor(numFb(d.pz.adN, 0, 0, SAVE_CAP.count));
       s.pz.best = Math.min(1e9, Math.floor(numFb(d.pz.best, 0, 0)));
-      s.pz.hand = typeof d.pz.hand === 'string' ? d.pz.hand.slice(0, 10) : '';   // 2.3.1 소탕
-      s.pz.tb = d.pz.tb === undefined ? s.pz.best : Math.min(1e9, Math.floor(numFb(d.pz.tb, 0, 0)));   // 3.0.0 옛 저장은 업데이트한 날만 예전처럼 최고 점수로
+      s.pz.hand = typeof d.pz.hand === 'string' ? d.pz.hand.slice(0, 10) : '';   // 소탕
+      s.pz.tb = d.pz.tb === undefined ? s.pz.best : Math.min(1e9, Math.floor(numFb(d.pz.tb, 0, 0)));   // 옛 저장은 업데이트한 날만 예전처럼 최고 점수로
       s.pz.cur = pzSanitize(d.pz.cur);
     }
     // 게임 시계: 망가진 값으로 영영 멈추지 않게 기기 시간 + 1년까지만 받아요
-    s.clk.last = timeSrc() ? numFb(d.clk && d.clk.last, 0, 0) : Math.min(numFb(d.clk && d.clk.last, 0, 0), Date.now() + 366 * 86400000);   // 4.0.1 (3.3.2 분석 H3): 서버 시간을 받는 판은 기기 시계로 깎지 않아요. 기기 날짜를 1년 넘게 과거로 돌려 다시 켜면 게임 날짜가 뒤로 가서 하루 제한이 풀렸어요. 앞서간 시계는 서버 시간이 바로잡아요
-    // 2.0.0 보안 점검: 서버 시간을 기다리던 자리 비움(from은 저장 시각보다 늦을 수 없어요, skip은 하루까지)
+    s.clk.last = timeSrc() ? numFb(d.clk && d.clk.last, 0, 0) : Math.min(numFb(d.clk && d.clk.last, 0, 0), Date.now() + 366 * 86400000);   // 서버 시간을 받는 판은 기기 시계로 깎지 않아요. 기기 날짜를 1년 넘게 과거로 돌려 다시 켜면 게임 날짜가 뒤로 가서 하루 제한이 풀렸어요. 앞서간 시계는 서버 시간이 바로잡아요
+    // 보안 점검: 서버 시간을 기다리던 자리 비움(from은 저장 시각보다 늦을 수 없어요, skip은 하루까지)
     if (d.away && typeof d.away === 'object') { s.away.from = Math.min(numFb(d.away.from, 0, 0), s.savedAt || 0); s.away.skip = Math.min(numFb(d.away.skip, 0, 0), 86400000); }
     return s;
   }
@@ -394,7 +629,7 @@
     out.init = true;
     out.m = mainIndexFromSave(q);
     out.mb = numFb(q.mb, 0, 0);
-    out.md = Math.floor(numFb(q.md, 0, out.m));   // 2.0.0 보안 점검(1-7): 끝낸 메인 퀘스트 수. 옛 저장은 지금 번호로 시작해요
+    out.md = Math.floor(numFb(q.md, 0, out.m));   // 보안 점검(1-7): 끝낸 메인 퀘스트 수. 옛 저장은 지금 번호로 시작해요
     out.lat = typeof q.lat === 'string' ? q.lat.slice(0, 12) : '';
     out.seen = Math.min(out.m, Math.floor(typeof q.seen === 'number' && isFinite(q.seen) ? q.seen : -1));
     out.gen = Math.floor(numFb(q.gen, 0, 0, SAVE_CAP.count));
@@ -413,7 +648,7 @@
     // 7장을 학년마다 나누면서 빠진 퀘스트: '6학년 되기'(e6)는 새 6학년 장의 첫 퀘스트로 이어요
     const MOVED = { e6: 'e15' };
     if (typeof q.mid === 'string' && MOVED[q.mid]) return idx(MOVED[q.mid]);
-    // 2.2.1 3장 '오늘의 급식'(gd2)은 4장 gd4로 옮겼어요. 그 자리였으면 3장 '텃밭에 작물 심기'(gd1) 바로 다음부터 이어가요(이미 지은 건물 레벨은 바로 완료로 보여요)
+    // 3장 '오늘의 급식'(gd2)은 4장 gd4로 옮겼어요. 그 자리였으면 3장 '텃밭에 작물 심기'(gd1) 바로 다음부터 이어가요(이미 지은 건물 레벨은 바로 완료로 보여요)
     if (q.mid === 'gd2' || q.mid === 'end:gd2') return idx('gd1') + 1;
     if (typeof q.mid === 'string' && q.mid === 'end:e6') return idx('e15');
     if (typeof q.mid === 'string' && q.mid) {
@@ -434,14 +669,14 @@
     let raw = null;
     try { raw = localStorage.getItem(SAVE_KEY); return raw ? sanitize(JSON.parse(raw)) : null; }
     catch (e) {
-      // 1.5.4: 읽지 못한 저장을 새 학교로 조용히 덮어쓰기 전에 따로 남겨 둬요 (설정 > 정보에서 알려요)
+      // 읽지 못한 저장을 새 학교로 조용히 덮어쓰기 전에 따로 남겨 둬요 (설정 > 정보에서 알려요)
       if (raw) try { localStorage.setItem(SAVE_KEY + '-broken', raw); rt.brokenSave = true; } catch (er) { /* 저장소가 막혀 있어요 */ }
       return null;
     }
   }
   function save(at) {
-    if (!S || rt.adopting || rt.uniPrev) return;   // 다른 학교로 바꾸며 다시 여는 중에는 지금 학교를 저장하지 않아요. 4.0.0 대학교 미리 보기 동안도 저장하지 않아요
-    S.savedAt = at || (rt.paused ? rt.closedAt : gameNow());   // 2.0.0 보안 점검(2-5): 기기 시계 대신 게임 시계
+    if (!S || rt.adopting || rt.uniPrev) return;   // 다른 학교로 바꾸며 다시 여는 중에는 지금 학교를 저장하지 않아요. 대학교 미리 보기 동안도 저장하지 않아요
+    S.savedAt = at || (rt.paused ? rt.closedAt : gameNow());   // 보안 점검(2-5): 기기 시계 대신 게임 시계
     if (rt.awayWait) S.away = { from: rt.awayWait.from, skip: awaySkip(rt.awayWait) };   // 서버 시간을 아직 못 받았으면 다음에 이어서 계산해요
     syncMid();
     const json = JSON.stringify(S);
