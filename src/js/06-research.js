@@ -7,7 +7,7 @@
     { k: 'build', nm: '건축 연구', per: 0.5, cap: 30, unit: '공사 시간', sign: '-', ic: '🏗️' },
     { k: 'ess', nm: '정수 연구', per: 1, cap: 30, unit: '받는 숲의 정수', sign: '+', ic: '✨' }] };
   function rxPct(k) { if (!RX || !S || !S.rx) return 0; const R = RX.list.find(x => x.k === k); return R ? Math.min(R.cap, (S.rx.lv[k] || 0) * R.per) : 0; }
-  // 4.5.0 woodani 결정(2026-11-15): 대학교에서는 빼고 대학원 연구소 창에서 연구 트리와 함께 열어요(5.0.0). 올린 레벨의 효과(rxPct)는 그대로 남아요
+  // 대학교에서는 빼고 대학원 연구소 창에서 연구 트리와 함께 열어요. 올린 레벨의 효과(rxPct)는 그대로 남아요
   let RX_TIER = 5;   // 시험(s122)만 window.__forest.rxTier로 바꿔 셈을 확인해요
   const rxOpen = () => deptOpen() && S.tier >= RX_TIER;
   const rxFull = R => rxPct(R.k) >= R.cap;
@@ -29,8 +29,8 @@
   }
   const fmtPct = v => (Math.round(v * 10) / 10).toString();
   function rxPart(inLab) {
-    if (rxOpen() && !inLab && gradOn()) return '<h3 class="fv-h">연구 투자</h3><p class="fine">연구 투자는 연구 구역 연구소에서 해요.</p>';   // 5.0.0
-    if (!rxOpen()) {   // 4.5.0 대학교: 올린 연구가 있으면 효과만 보여 주고, 대학원으로 옮긴다고 알려요
+    if (rxOpen() && !inLab && gradOn()) return '<h3 class="fv-h">연구 투자</h3><p class="fine">연구 투자는 연구 구역 연구소에서 해요.</p>';
+    if (!rxOpen()) {   // 대학교: 올린 연구가 있으면 효과만 보여 주고, 대학원으로 옮긴다고 알려요
       if (!deptOpen()) return '';
       const got = RX.list.filter(R => S.rx.lv[R.k] > 0).map(R => `${R.nm} Lv.${S.rx.lv[R.k]} (${R.unit} ${R.sign}${fmtPct(rxPct(R.k))}%)`);
       return '<h3 class="fv-h">연구 투자</h3><p class="fine">연구 투자는 대학원 연구소로 옮겨요. 대학원이 열리면 연구 트리와 함께 다시 할 수 있어요.' +
@@ -42,7 +42,7 @@
         (full ? '<span class="fe-lock">완성</span>' : `<button class="${poor ? 'btn-sub' : 'cta'} small" type="button" data-dp="rx:${R.k}">${acornIcon()}${fmt(c)}</button>`) + '</div>';
     }).join('') + '</div>';
   }
-  /* ---------- 5.0.0 연구소 창: 연구 투자와 연구 트리 (설계안 '5.0.0 설계안 (대학원, 연구 구역) 초안' 3절, woodani 결정 2026-11-15) ----------
+  /* ---------- 연구소 창: 연구 투자와 연구 트리 (설계안 ' 설계안 (대학원, 연구 구역) 초안' 3절) ----------
      연구 트리: 가지 다섯 개 × 칸 네 개. 칸마다 숲의 정수와 그때 수업료 몇 시간치 도토리를 쓰고, 연구 시간이 지나야 올라요(한 번에 하나). 졸업해도 남아요. 숫자는 본부 제안 */
   const RT5 = {
     list: [
@@ -50,15 +50,15 @@
       { k: 'event', nm: '행사', ic: 'ic_rt_event', eff: L => `학교 행사, 축제, 체험학습 도토리 +${10 * L}%` },
       { k: 'tam', nm: '탐험', ic: 'ic_rt_tam', eff: L => `탐험대 힘 +${5 * L}%` + (L >= 4 ? ', 보고서 +2시간' : '') },
       { k: 'time', nm: '시간', ic: 'ic_rt_time', eff: L => `자리 비운 동안 수입 +${L}시간` },
-      { k: 'ta', nm: '조교', ic: 'ic_rt_ta', eff: L => ['', '조교 자리 +1', '조교 자리 +1, 파견 시간 -15%', '조교 자리 +2, 파견 시간 -15%', '조교 자리 +2, 파견 시간 -15%, 파견 보상 +25%', '조교 자리 +2, 파견 시간 -15%, 파견 보상 +50%'][L] }],   // 5.1.0 조교 가지 열림
-    ess: [50, 100, 200, 400, 800], hrs: [1, 2, 4, 8, 16], time: [1, 3, 6, 12, 24], max: 4, top: 5 };   // 5.2.0 다섯째 칸(심화 칸)은 논문으로 열려요(rtMax)
+      { k: 'ta', nm: '조교', ic: 'ic_rt_ta', eff: L => ['', '조교 자리 +1', '조교 자리 +1, 파견 시간 -15%', '조교 자리 +2, 파견 시간 -15%', '조교 자리 +2, 파견 시간 -15%, 파견 보상 +25%', '조교 자리 +2, 파견 시간 -15%, 파견 보상 +50%'][L] }],   // 조교 가지 열림
+    ess: [50, 100, 200, 400, 800], hrs: [1, 2, 4, 8, 16], time: [1, 3, 6, 12, 24], max: 4, top: 5 };   // 다섯째 칸(심화 칸)은 논문으로 열려요(rtMax)
   const rtLv = k => (S && S.rt5 && S.rt5.lv[k]) || 0;
   const rtClassMul = () => 1 + 0.05 * rtLv('class');
   const rtEvt = () => 1 + 0.1 * rtLv('event');
   const rtTamMul = () => 1 + 0.05 * rtLv('tam');
-  const rtCost = k => { const L = Math.min(RT5.top - 1, rtLv(k)); return { ess: RT5.ess[L], ac: nice(rate() * 3600 * RT5.hrs[L]), sec: Math.round(RT5.time[L] * 3600 * (1 - XT.adv.per / 100 * xtLv('adv'))) }; };   // 5.0.0 펠리컨 지도교수님 연수만큼 짧아져요
+  const rtCost = k => { const L = Math.min(RT5.top - 1, rtLv(k)); return { ess: RT5.ess[L], ac: nice(rate() * 3600 * RT5.hrs[L]), sec: Math.round(RT5.time[L] * 3600 * (1 - XT.adv.per / 100 * xtLv('adv'))) }; };   // 펠리컨 지도교수님 연수만큼 짧아져요
   const rtOpen = () => gradOn() && (S.f.institute || 0) >= 1;
-  const rtHrs = sec => { const m = Math.round(sec / 60), h = Math.floor(m / 60); return h && m % 60 ? `${h}시간 ${m % 60}분` : h ? `${h}시간` : `${m}분`; };   // 5.0.0 연구 시간 글자(지도교수님 연수로 분 단위가 생겨요)
+  const rtHrs = sec => { const m = Math.round(sec / 60), h = Math.floor(m / 60); return h && m % 60 ? `${h}시간 ${m % 60}분` : h ? `${h}시간` : `${m}분`; };   // 연구 시간 글자(지도교수님 연수로 분 단위가 생겨요)
   function rtStart(k) {
     const D = RT5.list.find(x => x.k === k); if (!D || D.lock || !rtOpen()) return false;
     if (S.rt5.cur) { toast('연구는 한 번에 하나씩 해요'); return false; }
@@ -73,11 +73,11 @@
   }
   function rtTick() {
     const c = S && S.rt5 && S.rt5.cur; if (!c || gameNow() < c.end) return;
-    const D = RT5.list.find(x => x.k === c.k); S.rt5.lv[c.k] = Math.min(RT5.top, rtLv(c.k) + 1); S.rt5.cur = null; ppData(PP.dat.rt); save(); rt.rtPop = { k: c.k, i: rtLv(c.k) - 1 };   // 5.1.1.4 나무 칸이 막 자란 움직임
+    const D = RT5.list.find(x => x.k === c.k); S.rt5.lv[c.k] = Math.min(RT5.top, rtLv(c.k) + 1); S.rt5.cur = null; ppData(PP.dat.rt); save(); rt.rtPop = { k: c.k, i: rtLv(c.k) - 1 };   // 나무 칸이 막 자란 움직임
     toast(`${D ? D.nm : ''} 연구 ${rtLv(c.k)}칸 완성!\n${D ? D.eff(rtLv(c.k)) : ''}`); sfx('quest');
     if (!$('#mRx').hidden) renderRx();
   }
-  /* 5.1.1.4 woodani 결정(2026-11-19): 연구 트리를 목록 대신 한 그루 나무로. 밑동에서 가지 다섯 개가 위로 뻗고, 가지마다 칸이 아래에서 위로 이어져요.
+  /* 연구 트리를 목록 대신 한 그루 나무로. 밑동에서 가지 다섯 개가 위로 뻗고, 가지마다 칸이 아래에서 위로 이어져요
      칸 자리는 720x960 판 기준(그림 작업지시서 96의 rt_tree_bg와 같은 좌표). 칸을 누르면 아래 칸 창에 효과, 값, '연구하기'. 효과와 값은 그대로 */
   const RT_PT = [[160, 141, 125, 109, 96], [260, 250, 242, 235, 228], [360, 360, 360, 360, 360], [460, 470, 478, 485, 492], [560, 579, 595, 611, 624]];   // 가지마다 줄 1~5의 x(작업지시서 96-2, 위로 갈수록 퍼지는 부채꼴)
   const RT_X = (j, i) => RT_PT[j][i], RT_Y = i => 800 - 150 * i, RT_W = 720, RT_H = 960;
@@ -122,11 +122,11 @@
     const tab = ['tree', 'ta', 'paper'].includes(rt.rxTab) ? rt.rxTab : 'inv';
     $$('#rxSeg [data-rseg]').forEach(b => b.setAttribute('aria-checked', String(b.dataset.rseg === tab)));
     setH($('#rxBody'), tab === 'tree' ? rtPart() : tab === 'ta' ? taPart() : tab === 'paper' ? ppPart() : rxPart(true));
-    { const hd = $('#rxTitle').parentElement, u = tab === 'ta' && taOpen() ? IMG('ta_bg') : tab === 'paper' && ppOpen() ? IMG('conf_bg') : ''; hd.classList.toggle('art', !!u); hd.style.backgroundImage = u ? `url("${blobUrl(u)}")` : ''; }   // 5.1.0 조교 탭 머리 그림, 5.2.0 논문 탭은 학회장 그림
+    { const hd = $('#rxTitle').parentElement, u = tab === 'ta' && taOpen() ? IMG('ta_bg') : tab === 'paper' && ppOpen() ? IMG('conf_bg') : ''; hd.classList.toggle('art', !!u); hd.style.backgroundImage = u ? `url("${blobUrl(u)}")` : ''; }   // 조교 탭 머리 그림, 논문 탭은 학회장 그림
   }
-  /* ---------- 5.1.0 조교 파견 (프로젝트 문서 '5.1.0 설계안 (조교 파견) 초안', woodani 결정 2026-11-19: 숫자는 제안대로) ----------
-     조교 자리: 대학원생 조교를 캠퍼스 건물에 한 명씩 앉혀요. 앉아 있는 조교 한 명마다 수업료 +10%, 그 건물 가구 값 -10%.
-     모교 파견: 조교를 졸업한 학교(유치원~대학교)에 2, 4, 8시간 보내 숲의 정수와 추억 조각, 모교마다 다른 덤을 받아요. 파견 중에는 자리 효과가 꺼져요.
+  /* ---------- 조교 파견 (프로젝트 문서 ' 설계안 (조교 파견) 초안', : 숫자는 제안대로) ----------
+     조교 자리: 대학원생 조교를 캠퍼스 건물에 한 명씩 앉혀요. 앉아 있는 조교 한 명마다 수업료 +10%, 그 건물 가구 값 -10%
+     모교 파견: 조교를 졸업한 학교(유치원~대학교)에 2, 4, 8시간 보내 숲의 정수와 추억 조각, 모교마다 다른 덤을 받아요. 파견 중에는 자리 효과가 꺼져요
      모교 기념비: 추억 조각 30, 80, 160개로 3단계. 단계마다 수업료 +3%, 3단계에 칭호 '모교의 자랑'. 졸업해도 남아요 */
   const TA = { seat0: 2, pct: 10, fur: 10, hrs: [2, 4, 8], ess: [5, 10, 20], mem: [1, 2, 4], mon: [30, 80, 160], monPct: 3,
     who: ['lemur', 'armadillo', 'quokka'], whoNm: { lemur: '여우원숭이', armadillo: '아르마딜로', quokka: '쿼카' },
@@ -162,7 +162,7 @@
   }
   function taClaim() {
     const due = taDue(); if (!due.length) return false;
-    const mul = rtLv('ta') >= 5 ? 1.5 : rtLv('ta') >= 4 ? 1.25 : 1; let ess = 0, mem = 0, ac = 0; const got = [];   // 5.2.0 조교 심화 칸 +25% 더
+    const mul = rtLv('ta') >= 5 ? 1.5 : rtLv('ta') >= 4 ? 1.25 : 1; let ess = 0, mem = 0, ac = 0; const got = [];   // 조교 심화 칸 +25% 더
     for (const o of due) {
       const f = TA.hrs[o.h] / 2;   // 덤은 2시간을 1배로 시간만큼
       ess += Math.round(TA.ess[o.h] * mul * (o.to === 0 ? 1.5 : 1)); mem += Math.round(TA.mem[o.h] * mul);
@@ -173,7 +173,7 @@
     }
     S.ta.out = S.ta.out.filter(o => !due.includes(o));
     S.ta.mem = Math.min(1e9, S.ta.mem + mem);
-    ppData(due.reduce((t, o) => t + (PP.dat.ta[o.h] || 0), 0));   // 5.2.0 4시간 1, 8시간 2
+    ppData(due.reduce((t, o) => t + (PP.dat.ta[o.h] || 0), 0));   // 4시간 1, 8시간 2
     addEss(ess); if (ac > 0) { S.budget += ac; earn(ac); got.push(`도토리 ${fmt(ac)}`); }
     save(); renderHUD(); renderDeco(); checkQuests(true); sfx('quest'); buzz(15);
     toast(`조교 ${due.length}명이 돌아왔어요\n숲의 정수 ${ess}, 추억 조각 ${mem}` + (got.length ? `\n${[...new Set(got)].join(', ')}` : ''));
@@ -189,10 +189,10 @@
     toast(`모교 기념비 ${S.ta.mon}단계!\n수업료 +${TA.monPct * S.ta.mon}%` + (S.ta.mon >= TA.mon.length ? `\n칭호 '모교의 자랑'을 받았어요` : ''));
     return true;
   }
-  /* ---------- 5.2.0 논문과 숲속 학회 (프로젝트 문서 '5.2.0 설계안 (논문과 숲속 학회) 초안', woodani 결정 2026-11-19: 숫자는 제안대로, 대학원부터) ----------
-     연구 자료: 하루 첫 자료 정리 1, 세미나 3, 조교 파견 4시간 1과 8시간 2, 연구 트리 칸 2, 심화 탐험 큰 장난꾸러기 처음 넘기 1.
-     논문: 주제(연구 트리 가지)를 골라 자료 3개로 4시간. 점수 = 10 + 그 가지 칸 수 × 5, 한 학회에서 같은 주제 3편째부터 절반. 다 쓰면 정수 10.
-     숲속 학회: 4주(주간 리그 4주)마다. 그 학회에 쓴 논문 점수를 더하고, 끝나면 100점 동, 300점 은, 600점 금메달. 서버 랭킹 cf(점수), cq(학회 × 1,000,000 + 점수).
+  /* ---------- 논문과 숲속 학회 (프로젝트 문서 ' 설계안 (논문과 숲속 학회) 초안', : 숫자는 제안대로, 대학원부터) ----------
+     연구 자료: 하루 첫 자료 정리 1, 세미나 3, 조교 파견 4시간 1과 8시간 2, 연구 트리 칸 2, 심화 탐험 큰 장난꾸러기 처음 넘기 1
+     논문: 주제(연구 트리 가지)를 골라 자료 3개로 4시간. 점수 = 10 + 그 가지 칸 수 × 5, 한 학회에서 같은 주제 3편째부터 절반. 다 쓰면 정수 10
+     숲속 학회: 4주(주간 리그 4주)마다. 그 학회에 쓴 논문 점수를 더하고, 끝나면 100점 동, 300점 은, 600점 금메달. 서버 랭킹 cf(점수), cq(학회 × 1,000,000 + 점수)
      심화 칸: 논문 3, 6, 10, 15, 20편마다 수업, 행사, 탐험, 시간, 조교 가지에 다섯째 칸 */
   const PP = { need: 3, sec: 4 * 3600, ess: 10, base: 10, per: 5, halfAt: 2, weeks: 4,
     dat: { day: 1, sem: 3, ta: [0, 1, 2], rt: 2, boss: 1 },
@@ -208,11 +208,11 @@
   const ppOpen = () => !!S && !!S.pp && rtOpen();   // 대학원 연구소를 지으면(석사 1학기부터)
   const ppPer = () => Math.floor(gameWeek() / PP.weeks);
   const ppLeft = () => { const end = Date.UTC(2026, 0, 5) + (ppPer() + 1) * PP.weeks * 604800000 - KST_MS; return Math.max(0, Math.ceil((end - gameNow()) / 86400000)); };
-  const rtMax = k => (S && S.pp && S.pp.n >= (PP.deep[k] || Infinity)) ? RT5.top : RT5.max;   // 5.2.0 심화 칸이 열린 가지는 다섯 칸
+  const rtMax = k => (S && S.pp && S.pp.n >= (PP.deep[k] || Infinity)) ? RT5.top : RT5.max;   // 심화 칸이 열린 가지는 다섯 칸
   const ppMedOf = v => PP.med.reduce((a, m, i) => v >= m.at ? i + 1 : a, 0);
-  // 5.2.0.1 학회 메달 그림(작업지시서 100, conf_med_1~3). 그림이 없으면 이모지
+  // 학회 메달 그림(작업지시서 100, conf_med_1~3). 그림이 없으면 이모지
   const ppMedIc = (m, px) => { const u = IMG('conf_med_' + m); return u ? `<img class="pp-med" src="${u}" alt="" style="width:${px || 24}px;height:${px || 24}px;object-fit:contain;vertical-align:middle">` : PP.med[m - 1].ic; };
-  // 5.2.0.1 칭호 덤 장식(설계안 5절, 작업지시서 100): 세미나 10번, 20번, 논문 30편, 마을 기부 20단계. 얻으면 꾸미기 장식으로 지도에 놓아요(힘 없음)
+  // 칭호 덤 장식(설계안 5절, 작업지시서 100): 세미나 10번, 20번, 논문 30편, 마을 기부 20단계. 얻으면 꾸미기 장식으로 지도에 놓아요(힘 없음)
   const PP_DECO = [['deco_pp_board', () => !!S.pp && S.pp.sem >= 10], ['deco_pp_chair', () => !!S.pp && S.pp.sem >= 20], ['deco_pp_tower', () => !!S.pp && S.pp.n >= 30], ['deco_vd20', () => !!S.vd && S.vd.lv >= 20]];
   function ppDecoSync() {
     const got = []; if (!S || !S.deco || !S.deco.own) return got;
@@ -359,7 +359,7 @@
   function deptPct(D) {   // 수업료 보너스 %: 기본 10, 학력이 상한에 가까울수록 30까지, 진로 보너스를 더한 뒤 학장 교수님 보너스를 곱해요
     return (DEPT.base + (DEPT.max - DEPT.base) * deptF(D) + deptJobPct(D)) * deanMult();
   }
-  // 4.0.0 단과대학마다 따로 받는 보너스(woodani 결정 2026-11-11, 제안표 그대로): [기본, 학력이 상한일 때]. 다니는 곳만 받아요. 학장 교수님은 곱하지 않아요
+  // 단과대학마다 따로 받는 보너스(제안표 그대로): [기본, 학력이 상한일 때]. 다니는 곳만 받아요. 학장 교수님은 곱하지 않아요
   const DEPT_X = {
     science: { v: [50, 100], t: n => `실험 성공 도토리 +${n}%` }, sports: { v: [50, 100], t: n => `대결 첫 승 도토리 +${n}%` },
     human: { v: [20, 40], t: n => `책 읽기 국어 XP +${n}%` }, art: { v: [10, 20], t: n => `합치기 에너지 상한 +${n}` },
@@ -380,7 +380,7 @@
     const m = $('#mDept'); if (!m || !S.dp) return;
     const picks = deptPicks(), slots = deptSlots(), full = picks.length >= slots, sw = rt.dpSwap ? deptOf(rt.dpSwap) : null;
     const hd = $('#dpHead'), hu = (rt.dpRoom && IMG('room_dept')) || IMG('col_head'); hd.classList.toggle('art', !!hu); hd.style.backgroundImage = hu ? `url("${blobUrl(hu)}")` : '';
-    setT($('#dpSlots'), `전공 ${picks.length} / ${slots}`);   // 4.5.0 woodani: 여러 곳을 다니는 대신 주전공과 복수전공으로
+    setT($('#dpSlots'), `전공 ${picks.length} / ${slots}`);   // 여러 곳을 다니는 대신 주전공과 복수전공으로
     const note = sw ? `${sw.name}${batchim(sw.name) ? '과' : '와'} 바꿀 곳을 골라요` : full ? (S.dp.free ? '이번 한 번은 공짜로 바꿀 수 있어요' : `바꾸려면 숲의 정수 ${DEPT.ess}개가 들어요`) : picks.length ? '복수전공을 하나 더 고를 수 있어요' : '주전공 단과대학을 골라요';
     $('#dpBody').innerHTML = `<p class="dp-note">${note}</p><div class="dp-list">` + DEPT.list.map(D => {
       const on = picks.includes(D.k), lock = deptLocked(D), lv = deptLv(D);
@@ -390,7 +390,7 @@
         : on ? `<span class="fe-lock">${picks[0] === D.k ? '주전공' : '복수전공'}</span>`
         : `<button class="${full ? 'btn-sub' : 'cta'} small" type="button" data-dp="pick:${D.k}">${full ? '바꾸기' : '고르기'}</button>`;
       return `<div class="dp-row${on ? ' on' : ''}${lock ? ' lock' : ''}"><span class="dp-ic">${deptIc(D)}</span><div class="dp-tx"><b>${D.name}</b><small>${subTx} Lv.${Math.floor(lv)}, ${FAC[D.fac].name}</small><em>수업료 +${Math.round(deptPct(D))}%</em><em class="dp-x">${DEPT_X[D.k].t(deptXOf(D))}</em></div>${btn}</div>`;
-    }).join('') + '</div>' + rxPart();   // 4.2.0 연구 투자
+    }).join('') + '</div>' + rxPart();   // 연구 투자
   }
   function deptSet(k, out) {   // out: 바꿀 때 빼는 곳('' = 빈 자리에 넣기)
     const D = deptOf(k); if (!D || deptLocked(D) || !deptOpen()) return false;
@@ -410,35 +410,35 @@
     if (v === 'cancel') rt.dpSwap = '';
     else if (v === 'pick') { if (deptPicks().length >= deptSlots()) rt.dpSwap = k; else deptSet(k, ''); }
     else if (v === 'swap') { if (deptSet(rt.dpSwap, k)) rt.dpSwap = ''; }
-    else if (v === 'rx') rxUp(k);   // 4.2.0
+    else if (v === 'rx') rxUp(k);
     renderDept();
   }
   const xtLv = k => (S && S.xt && S.xt[k]) || 0;
-  const xtHere = k => !!S && S.tier >= (XT[k].tier || 0) && S.f[XT[k].fac] >= 1;   // 2.3.0 tier: 그 학교급부터
-  const rdPerDay = () => RD.perDay + Math.floor(xtLv('kor') / 5);   // 2.3.0 고니 선생님
-  const mgEMax = () => MG.EMAX + 10 * Math.floor(xtLv('art') / 5) + deptX('art');   // 2.3.0 공작 선생님
-  const snRareP = () => SN.rare + XT.snack.per / 100 * xtLv('snack');   // 2.3.0 알파카 선생님
+  const xtHere = k => !!S && S.tier >= (XT[k].tier || 0) && S.f[XT[k].fac] >= 1;   // tier: 그 학교급부터
+  const rdPerDay = () => RD.perDay + Math.floor(xtLv('kor') / 5);   // 고니 선생님
+  const mgEMax = () => MG.EMAX + 10 * Math.floor(xtLv('art') / 5) + deptX('art');   // 공작 선생님
+  const snRareP = () => SN.rare + XT.snack.per / 100 * xtLv('snack');   // 알파카 선생님
   const xtMaxed = k => xtLv(k) >= XT[k].max;
-  const xtCost = k => XT[k].ess ? 20 + 10 * (xtLv(k) + 1) : Math.ceil(softCost(TEA.bear.cost, xtLv(k) + 1, SOFT.tea) * costScale() * (1 - deptX('edu') / 100));   // 2.3.5 정수로 연수하는 선생님
+  const xtCost = k => XT[k].ess ? 20 + 10 * (xtLv(k) + 1) : Math.ceil(softCost(TEA.bear.cost, xtLv(k) + 1, SOFT.tea) * costScale() * (1 - deptX('edu') / 100));   // 정수로 연수하는 선생님
   const xtHave = k => XT[k].ess ? S.ess : S.budget;
-  const fixMult = () => 1 - XT.fix.per / 100 * xtLv('fix');   // 2.3.5 비버 선생님
+  const fixMult = () => 1 - XT.fix.per / 100 * xtLv('fix');   // 비버 선생님
   const feastMins = () => DEAL.feastMin + XT.diet.per * xtLv('diet');   // 까치 특식 데이 길이
   const libMult = () => 1 + XT.lib.per / 100 * xtLv('lib');   // 퍼즐 점수 정수 배수
 
   // 큰 숫자 줄여 쓰기: 기본은 토스처럼 만, 억, 조. 설정에서 K, M, B로 바꿀 수 있어요
-  const multTx = m => m < 10 ? `수업료 +${Math.round((m - 1) * 100).toLocaleString('ko-KR')}%` : `수업료 ×${fmt(m)}`;   // 5.0.1.7 T-16
-  const essShort = n => `숲의 정수가 ${fmt(Math.max(1, Math.ceil(n)))}개 모자라요. 공부 탭에서 모아요`;   // 5.0.1.8 W-09 모자랄 때 한 가지 꼴
-  const acornShort = n => `도토리가 ${fmt(Math.max(1, Math.ceil(n)))}개 모자라요`;   // 5.0.1.8 W-03 흔들기만 하던 단추에 까닭을
-  const fmtN = n => { const t = fmt(n); return /[0-9]$/.test(t) ? t + '개' : t; };   // 5.0.1.5 '1,200자개'처럼 단위 뒤 '개'를 빼요
+  const multTx = m => m < 10 ? `수업료 +${Math.round((m - 1) * 100).toLocaleString('ko-KR')}%` : `수업료 ×${fmt(m)}`;
+  const essShort = n => `숲의 정수가 ${fmt(Math.max(1, Math.ceil(n)))}개 모자라요. 공부 탭에서 모아요`;   // 모자랄 때 한 가지 꼴
+  const acornShort = n => `도토리가 ${fmt(Math.max(1, Math.ceil(n)))}개 모자라요`;   // 흔들기만 하던 단추에 까닭을
+  const fmtN = n => { const t = fmt(n); return /[0-9]$/.test(t) ? t + '개' : t; };   // '1,200자개'처럼 단위 뒤 '개'를 빼요
   function fmt(n) {
     n = Math.floor(n + 1e-9);
-    if (!isFinite(n)) return '0';   // 2.0.0 보안 점검(1-9): NaN, 무한대는 0으로 보여 줘요
+    if (!isFinite(n)) return '0';   // 보안 점검(1-9): NaN, 무한대는 0으로 보여 줘요
     if (S && S.units === 'en') return fmtEn(n);
     if (n < 10000) return n.toLocaleString('ko-KR');
     const U = [['극', 1e48], ['재', 1e44], ['정', 1e40], ['간', 1e36], ['구', 1e32], ['양', 1e28], ['자', 1e24], ['해', 1e20], ['경', 1e16], ['조', 1e12], ['억', 1e8], ['만', 1e4]];
     for (const [u, v] of U) {
       if (n >= v) {
-        const x = n / v * (1 + 1e-12);   // 5.0.4 큰 수에서 나눗셈 끝자리 때문에 15구가 14.9구로 보이던 것
+        const x = n / v * (1 + 1e-12);   // 큰 수에서 나눗셈 끝자리 때문에 15구가 14.9구로 보이던 것
         let s;
         if (x >= 100) s = Math.floor(x).toLocaleString('ko-KR');
         else if (x >= 10) s = (Math.floor(x * 10) / 10).toFixed(1).replace(/\.0$/, '');
@@ -448,7 +448,7 @@
     }
     return String(n);
   }
-  // 1.5.6: 위쪽 줄 도토리 칸은 두 단위까지 보여 줘요 (2억 5438만, 3조 3402억). 다른 곳은 fmt처럼 짧게
+  // 위쪽 줄 도토리 칸은 두 단위까지 보여 줘요 (2억 5438만, 3조 3402억). 다른 곳은 fmt처럼 짧게
   function fmt2(n) {
     n = Math.floor(n + 1e-9);
     if (!isFinite(n) || n < 0) return fmt(n);
@@ -456,7 +456,7 @@
     if (n < 10000) return n.toLocaleString('ko-KR');
     const U = [['극', 1e48], ['재', 1e44], ['정', 1e40], ['간', 1e36], ['구', 1e32], ['양', 1e28], ['자', 1e24], ['해', 1e20], ['경', 1e16], ['조', 1e12], ['억', 1e8], ['만', 1e4]];
     const [u, v] = U.find(([, x]) => n >= x);
-    const tot = Math.floor(n / (v / 1e4) * (1 + 1e-12)), hi = Math.floor(tot / 1e4), lo = Math.max(0, tot - hi * 1e4);   // 5.0.4 나눗셈 끝자리 보정(25구가 24구 9999양으로 보이던 것)
+    const tot = Math.floor(n / (v / 1e4) * (1 + 1e-12)), hi = Math.floor(tot / 1e4), lo = Math.max(0, tot - hi * 1e4);   // 나눗셈 끝자리 보정(25구가 24구 9999양으로 보이던 것)
     const i = U.findIndex(([x]) => x === u), u2 = i + 1 < U.length ? U[i + 1][0] : '';
     const head = (hi >= 1e4 ? hi.toLocaleString('ko-KR') : String(hi)) + u;
     return lo > 0 ? `${head} ${Math.min(9999, lo)}${u2}` : head;

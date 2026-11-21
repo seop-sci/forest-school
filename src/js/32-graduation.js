@@ -2,7 +2,7 @@
   function renderGradPanel(force) {
     if (rt.tab !== 'grad' && !force) return;
     const d = cereDip(), can = canGraduate(), T = tierInfo(), N = TIERS[S.tier + 1], sf = semFirst(), cer = sf ? '1학기 방학식' : '종업식';
-    $('#gYear').textContent = semOn() && !gradOn() ? `${yearLabel()} ${semLabel()}` : yearLabel();   // 5.0.1.5 C-14 대학원은 학기가 이미 들어 있어요
+    $('#gYear').textContent = semOn() && !gradOn() ? `${yearLabel()} ${semLabel()}` : yearLabel();   // 대학원은 학기가 이미 들어 있어요
     // 마지막 해에는 종업식 카드를 숨기고 바로 아래 졸업식 카드로 안내해요
     const last = finalYear() && !sf;
     $('#gCard').hidden = last;
@@ -18,7 +18,7 @@
     const p = Math.max(0, Math.min(1, (S.yearEarned - lo) / (hi - lo)));
     $('#gBar').style.width = (p * 100).toFixed(1) + '%';
     $('#gBarWrap').setAttribute('aria-valuenow', Math.round(p * 100));
-    const rl = !can && S.grade >= GRAD_MIN && repLocked(), locked = !rl && !can && S.grade >= GRAD_MIN && (sf ? semLocked() : yearLocked()), left = sf ? semLeft() : yearLeft();   // 2.1.0 1학기는 앞 절반 퀘스트
+    const rl = !can && S.grade >= GRAD_MIN && repLocked(), locked = !rl && !can && S.grade >= GRAD_MIN && (sf ? semLocked() : yearLocked()), left = sf ? semLeft() : yearLeft();   // 1학기는 앞 절반 퀘스트
     $('#gNote').textContent = rl ? `건물 레벨을 모두 합쳐 ${repLeft()}만큼 더 올리면 ${eul(cer)} 열 수 있어요.` : locked ? `${yearLabel()} ${sf ? '1학기 ' : ''}메인 퀘스트를 마쳐야 ${eul(cer)} 열 수 있어요. 남은 퀘스트 ${left}개는 지도 오른쪽 퀘스트 단추에서 볼 수 있어요.` : can
       ? `${S.hd.album ? '단체 사진 덕분에 수료증 +50%예요. ' : ''}${sf ? '1학기 방학식은 수료증이 절반이에요. ' : ''}다음 수료증까지 도토리 ${fmt(Math.ceil(hi - S.yearEarned))}개 더 벌면 돼요.`
       : `평판 ★을 모아 ${CFG.grades[GRAD_MIN].title}가 되면 ${eul(cer)} 열 수 있어요. 지금은 ${CFG.grades[S.grade].title}예요. 건물과 선생님 레벨을 올리면 평판이 올라요.`;
@@ -37,7 +37,7 @@
         return `<div class="perk${rec ? ' rec' : ''}"><span class="p-ic">${P.icon}</span>` +
           `<div><b>${P.name} <span class="p-lv">Lv.${L}</span></b><small>${P.desc}</small>${rec ? `<span class="p-why">${pr.why}</span>` : ''}` +
           `<span class="p-eff">${maxed ? P.eff(L) + ' (최고)' : `${P.eff(L)} → ${P.eff(L + 1)}`}</span></div>` +
-          `<span class="p-act">${rec ? '<span class="p-rec">추천</span>' : ''}` +   // 2.0.1 추천 표시를 버튼 위로(woodani)
+          `<span class="p-act">${rec ? '<span class="p-rec">추천</span>' : ''}` +   // 추천 표시를 버튼 위로
           (maxed ? '<button class="btn-perk" type="button" aria-disabled="true">최고</button>'
             : `<button class="btn-perk" type="button" data-perk="${k}" aria-disabled="${S.p.dip >= c ? 'false' : 'true'}" aria-label="${P.name} 고치기, 수료증 ${c}장${rec ? ', 추천' : ''}">${dipIcon()}${c}</button>`) +
           '</span></div>';
@@ -75,15 +75,15 @@
   }
   // 졸업식 카드: 다음 학교급, 조건 두 가지, 받게 될 기금
   function renderTierCard() {
-    const T = tierInfo(), N = TIERS[S.tier + 1] || { name: TIER_ALL[S.tier + 1] || '다음 학교', school: '숲속 ' + (TIER_ALL[S.tier + 1] || '다음 학교') }   /* 4.1.1 대학교에서는 다음이 대학원이에요(예전에는 '대학교 준비 중'으로 나왔어요) */, open = nextTierOpen(), can = canPromote(), f = previewFund();
+    const T = tierInfo(), N = TIERS[S.tier + 1] || { name: TIER_ALL[S.tier + 1] || '다음 학교', school: '숲속 ' + (TIER_ALL[S.tier + 1] || '다음 학교') }   /* 대학교에서는 다음이 대학원이에요(예전에는 '대학교 준비 중'으로 나왔어요) */, open = nextTierOpen(), can = canPromote(), f = previewFund();
     $('#tierFrom').textContent = T.school;
     $('#tierTo').textContent = N ? N.school : '';
     const reqs = [
       { ok: S.tg >= T.grads, txt: `${T.name} ${T.years}${T.unit} 되기 (지금 ${yearNo()}${T.unit})` },
       { ok: S.grade >= GRAD_MIN, txt: `대도시 학교 되기 (지금 ${CFG.grades[S.grade].name})` }
     ];
-    if (semOn() && open) reqs.splice(1, 0, { ok: finalYear() && !semFirst(), txt: `${T.years}${T.unit} 1학기 방학식 열기` });   // 2.1.0 졸업식은 2학기에
-    if (promoteGateIdx() >= 0 && open) reqs.push({ ok: !promoteLocked(), txt: promoteLocked() ? `${T.years}${T.unit} 메인 퀘스트 마치기 (남은 퀘스트 ${promoteLeft()}개)` : `${T.years}${T.unit} 메인 퀘스트 마치기` });   // 2.0.0
+    if (semOn() && open) reqs.splice(1, 0, { ok: finalYear() && !semFirst(), txt: `${T.years}${T.unit} 1학기 방학식 열기` });   // 졸업식은 2학기에
+    if (promoteGateIdx() >= 0 && open) reqs.push({ ok: !promoteLocked(), txt: promoteLocked() ? `${T.years}${T.unit} 메인 퀘스트 마치기 (남은 퀘스트 ${promoteLeft()}개)` : `${T.years}${T.unit} 메인 퀘스트 마치기` });
     const html = reqs.map(r => `<li class="${r.ok ? 'ok' : ''}"><span class="mk2">${r.ok ? CHECK : ''}</span>${r.txt}</li>`).join('');
     if ($('#tierReqs').innerHTML !== html) $('#tierReqs').innerHTML = html;
     $('#tierFund').textContent = fmt(f);
@@ -131,7 +131,7 @@
       ? `1학기 방학식을 열면 ${yearLabel()} 2학기가 시작돼요. 수료증 ${fmt(d)}장(종업식의 절반)을 받고, 학교(시설, 선생님, 도토리)는 그대로 남아요. 시설은 Lv.${capNext()}까지 더 키울 수 있고 동네는 다시 키워요. 학년과 전학생은 2학기 ${finalYear() ? '졸업식' : '종업식'}에서 올라가요.`
       : `종업식을 열면 ${begins} 시작돼요. 수료증 ${fmt(d)}장을 받고, 학교(시설, 선생님, 도토리)는 그대로 남아요. 시설은 Lv.${capNext()}까지 더 키울 수 있고, 동네는 다시 키워요.`;
     if (mainReady()) txt += ' 받지 않은 메인 퀘스트 보상이 있으니 먼저 받아 주세요.';
-    $('#gConfirmText').textContent = txt;   // 2.1.0 1학기 방학식 문구는 위에서 골라요
+    $('#gConfirmText').textContent = txt;   // 1학기 방학식 문구는 위에서 골라요
     $('#gConfirm').hidden = false;
     $('#gNo').focus({ preventScroll: true });
   }
@@ -141,7 +141,7 @@
       // 종업식: 학교는 그대로, 동네만 다시 키워요. 새 학기 준비물이 있으면 수업료 몇 분치를 선물로 받아요
       const gift = S.p.perk.start > 0 ? nice(rate() * 60 * 30 * S.p.perk.start) : 0;
       if (gift) { S.budget += gift; rt.yearGift = gift; } else rt.yearGift = 0;
-      S.gr0 = S.tier >= 1 ? rep() : -1;   // 5.0.1.4 새 학기의 동네 등급은 지금 평판 위로 올린 만큼으로
+      S.gr0 = S.tier >= 1 ? rep() : -1;   // 새 학기의 동네 등급은 지금 평판 위로 올린 만큼으로
       S.grade = 0; S.pending = 0; S.pendingSec = 0; S.yearEarned = 0;
       fillSubs();
       const mq = curMain();
@@ -151,7 +151,7 @@
       prepTopUp();
       return;
     }
-    S.gr0 = -1;   // 5.0.1.4 새 학교급 첫 학기는 옛 기준
+    S.gr0 = -1;   // 새 학교급 첫 학기는 옛 기준
     S.budget = startBudget(S.p.perk.start) * costScale();
     S.students = 4;
     S.pwBank = (S.pwBank || 0) + pwLive(S);   // 졸업해서 시설이 처음으로 돌아가도 학교 파워는 줄지 않게 넣어 둬요
@@ -168,20 +168,20 @@
     rt.deal = null;   // 학교가 새로 시작하면 까치도 새 소식을 찾아와요
     prepTopUp();
   }
-  // 2.1.0 1학기 방학식: 수료증과 리그 점수는 절반(황금 도토리는 1개라 그대로), 학년과 전학생, 시설 최고 레벨은 그대로예요
+  // 1학기 방학식: 수료증과 리그 점수는 절반(황금 도토리는 1개라 그대로), 학년과 전학생, 시설 최고 레벨은 그대로예요
   function semBreak() {
     const dip = cereDip(), leaving = Math.floor(S.students);
     addDip(dip);
     S.hd.album = false;
     rt.yearRec = facKeys().filter(k => S.f[k] > 0).map(k => `${FAC[k].name} Lv.${S.f[k]}`).join(', ') + `, 학생 ${Math.floor(S.students)}명`;
-    S.st.grads += 1; S.st.sems = (S.st.sems || 0) + 1; repMark(); ppSemDone();   // 5.2.0 대학원 세미나 횟수와 연구 자료
-    S.sem = 1; S.semDip = (S.semDip || 0) + dip;   // 2.1.0 종업식 수료증에서 뺄 몫
+    S.st.grads += 1; S.st.sems = (S.st.sems || 0) + 1; repMark(); ppSemDone();   // 대학원 세미나 횟수와 연구 자료
+    S.sem = 1; S.semDip = (S.semDip || 0) + dip;   // 종업식 수료증에서 뺄 몫
     addLeague(Math.round(LP.grad / 2), true);
     cloudSoon();
     addGold(GOLD.grad);
     const ye = S.yearEarned;
     newYear(false);
-    S.yearEarned = ye;   // 2.1.0 한 해 수입은 2학기 종업식까지 이어서 세요
+    S.yearEarned = ye;   // 한 해 수입은 2학기 종업식까지 이어서 세요
     $('#gConfirm').hidden = true;
     checkGrade();
     syncKids(false);
@@ -204,7 +204,7 @@
     renderMap(); renderHUD(); renderAffordance(); renderGradPanel(true);
     save();
   }
-  // 식 창 다음에 줄 세울 것: 반짝 친구(2.1.3), 친구 성장 쪽지
+  // 식 창 다음에 줄 세울 것: 반짝 친구, 친구 성장 쪽지
   function cereAfter() {
     rareAfterCere();
     if (rt.tkReward) { showReward(rt.tkReward); rt.tkReward = null; }
@@ -212,34 +212,34 @@
   function graduate() {
     if (!canGraduate() || rt.paused) return;
     if (semFirst()) { semBreak(); return; }
-    const csB = csSettle();   // 3.1.0 진로 상담: 고등학교 3학년 졸업식에서 진로를 이룬 학생마다 수료증 +4%
+    const csB = csSettle();   // 진로 상담: 고등학교 3학년 졸업식에서 진로를 이룬 학생마다 수료증 +4%
     const dip = csB ? Math.floor(yearDip() * (1 + csB)) : yearDip(), leaving = Math.floor(S.students);
-    const albPh = S.hd.album, albEl = (elPres() || {}).sp || '';   // 2.1.1 앨범: 사진사 까치, 반장
+    const albPh = S.hd.album, albEl = (elPres() || {}).sp || '';   // 앨범: 사진사 까치, 반장
     addDip(dip);
     S.hd.album = false;
     rt.yearRec = facKeys().filter(k => S.f[k] > 0).map(k => `${FAC[k].name} Lv.${S.f[k]}`).join(', ') + `, 학생 ${Math.floor(S.students)}명`;
-    S.st.grads += 1; S.tg += 1; S.sem = 0; S.semDip = 0; repMark(); ppSemDone();   // 5.2.0
-    if (S.dp) S.dp.free = 1;   // 4.0.0 종업식 뒤 단과대학 바꾸기 한 번은 공짜
-    albAdd('y', { y: S.tg, st: leaving, dip, ph: albPh, el: albEl });   // 2.1.1 졸업 앨범 한 쪽
+    S.st.grads += 1; S.tg += 1; S.sem = 0; S.semDip = 0; repMark(); ppSemDone();
+    if (S.dp) S.dp.free = 1;   // 종업식 뒤 단과대학 바꾸기 한 번은 공짜
+    albAdd('y', { y: S.tg, st: leaving, dip, ph: albPh, el: albEl });   // 졸업 앨범 한 쪽
     addLeague(LP.grad, true);
     cloudSoon();
     addGold(GOLD.grad);
     const newcomer = cereNewcomer();
     newYear(false);
-    if (newcomer) { rt.kidSeq = BASE_SPECIES.length + S.p.species - 1; rosterAdd(newcomer.k); }   // 새 친구가 맨 먼저 교문으로 들어와요. 2.0.0 명부에도
+    if (newcomer) { rt.kidSeq = BASE_SPECIES.length + S.p.species - 1; rosterAdd(newcomer.k); }   // 새 친구가 맨 먼저 교문으로 들어와요. 명부에도
     $('#gConfirm').hidden = true;
     cereRefresh();
     queueModal(() => showCeremony(dip, leaving, newcomer));
-    if (S.tier === 4 && S.tg === 1) queueModal(() => { toast(`새내기 장학금이 끝났어요.\n2학년부터는 수업료가 평소대로예요`); return false; });   // 4.0.0
-    if (newcomer) queueModal(() => showNewTalk(newcomer));   // 2.0.0 전학 대화(식 창 다음에)
+    if (S.tier === 4 && S.tg === 1) queueModal(() => { toast(`새내기 장학금이 끝났어요.\n2학년부터는 수업료가 평소대로예요`); return false; });
+    if (newcomer) queueModal(() => showNewTalk(newcomer));   // 전학 대화(식 창 다음에)
     cereAfter();
-    if (rt.csRw) { rt.csRw.forEach(showReward); rt.csRw = null; }   // 3.1.0 진로 편지도 식이 끝난 뒤에
+    if (rt.csRw) { rt.csRw.forEach(showReward); rt.csRw = null; }   // 진로 편지도 식이 끝난 뒤에
   }
   function showCeremony(dip, leaving, newcomer, half) {
     // 방금 마친 해와 새로 시작하는 해 (다음 학교급이 아직 닫혀 있으면 마지막 해를 다시 해요)
     const T = tierInfo(), N = TIERS[S.tier + 1], ended = Math.min(S.tg, T.years), n = S.tg + 1;
-    rt.uniGrad = !half && uniNow() && ended >= T.years;   // 4.2.0 대학교 4학년을 마치는 식은 학위수여식 곡
-    if (gradOn()) {   // 5.0.0 대학원: 학기를 마칠 때는 '세미나', 석사 4학기와 박사 8학기 끝은 학위수여식(woodani 결정)
+    rt.uniGrad = !half && uniNow() && ended >= T.years;   // 대학교 4학년을 마치는 식은 학위수여식 곡
+    if (gradOn()) {   // 대학원: 학기를 마칠 때는 '세미나', 석사 4학기와 박사 8학기 끝은 학위수여식
       const y = half ? yearNo() : ended, done = gradSemTxt(y, half ? 0 : 1), deg = !half && ended === 2 ? '석사' : !half && ended >= T.years ? '박사' : '';
       const next = half ? gradSemTxt(y, 1) : n <= T.years ? gradSemTxt(n, 0) : '';
       rt.uniGrad = !!deg;
@@ -253,14 +253,14 @@
       openModal($('#mGrad')); sfx('bell'); setTimeout(() => sfx('quest'), 900);
       return true;
     }
-    if (half) {   // 2.1.0 1학기 방학식
+    if (half) {   // 1학기 방학식
       $('#gradTitle').textContent = `${yearLabel()} 1학기 방학식`;
       $('#gradText').textContent = `학생 ${leaving}명이 1학기를 마쳤어요. 신나는 방학을 보내고 이제 2학기가 시작돼요. 동네는 다시 키워야 해요.`;
       $('#gradOk').textContent = '2학기 시작하기';
       $('#gradDip').textContent = '+' + fmt(dip);
       $('#gradArt').innerHTML = `<svg viewBox="-10 -10 20 20" aria-hidden="true">${DIP}</svg>`;
       $('#gradNew').textContent = `황금 도토리 +${GOLD.grad}개도 받았어요. 2학기 ${finalYear() ? '졸업식' : '종업식'}을 열면 학년이 올라가${finalYear() ? '요.' : `고, 시설을 Lv.${capNext()}까지 키울 수 있어요. 2학기에는 시설을 Lv.${facCap()}까지 키울 수 있어요.`}` + (rt.yearGift ? ` 새 학기 준비물로 도토리 +${fmt(rt.yearGift)}!` : '');
-      $('#gradRec').hidden = true;   // 2.3.1 woodani: 창 글이 길어서 키운 기록 줄은 빼요
+      $('#gradRec').hidden = true;   // 창 글이 길어서 키운 기록 줄은 빼요
       openModal($('#mGrad'));
       sfx('bell'); setTimeout(() => sfx('quest'), 900);
       return true;
@@ -278,7 +278,7 @@
       ? `새 친구 ${newcomer.name}${newcomer.ga} 전학 왔어요! 앞으로 수업료 +5%.`
       : '전학 올 친구를 모두 만났어요. 수료증으로 명예 교장실을 고쳐 보세요.';
     $('#gradNew').textContent += ` 황금 도토리 +${GOLD.grad}개도 받았어요. 이제 시설을 Lv.${facCap()}까지 키울 수 있어요.` + (rt.yearGift ? ` 새 학기 준비물로 도토리 +${fmt(rt.yearGift)}!` : '');
-    $('#gradRec').hidden = true;   // 2.3.1 woodani: 창 글이 길어서 키운 기록 줄은 빼요
+    $('#gradRec').hidden = true;   // 창 글이 길어서 키운 기록 줄은 빼요
     openModal($('#mGrad'));
     sfx('bell'); setTimeout(() => sfx('quest'), 900);
     return true;
@@ -287,7 +287,7 @@
   function askPromote() {
     if (!canPromote()) { shake($('#tierBtn')); return; }
     const f = previewFund();
-    if (S.tier + 1 >= GRAD_TIER) {   // 5.0.0 대학원은 캠퍼스를 이어 가요
+    if (S.tier + 1 >= GRAD_TIER) {   // 대학원은 캠퍼스를 이어 가요
       $('#tierConfirmText').textContent = `학위수여식을 열면 ${TIERS[S.tier + 1].school} 석사 과정이 시작돼요. 캠퍼스와 건물, 도토리, 선생님, 수료증과 명예 교장실은 그대로 이어 가고, 장학재단 기금 ${fmt(f)}${numEul(f)} 받아요. 연구 구역이 열려요.` + (mainReady() ? ' 받지 않은 메인 퀘스트 보상이 있으니 먼저 받아 주세요.' : '');
       $('#tierConfirm').hidden = false; $('#tierNo').focus({ preventScroll: true }); return;
     }
@@ -304,32 +304,32 @@
     S.fund += fund;
     S.st.dips += yearDip();   // 마지막 해 수료증은 기금이 되지만 학교 점수에는 더해요
     rankDirty();
-    const albPg = albAdd('g', { y: from.years, st: leaving, dip: dipsIn, ph: S.hd.album, ltr: frLetter(from) });   // 2.1.1 졸업 쪽과 단짝 편지
+    const albPg = albAdd('g', { y: from.years, st: leaving, dip: dipsIn, ph: S.hd.album, ltr: frLetter(from) });   // 졸업 쪽과 단짝 편지
     S.hd.album = false;
     S.st.grads += 1;   // 졸업식도 종업식과 함께 행사 횟수로 쳐요
     cloudSoon();
     addGold(GOLD.promote);
-    const crew = cereCrew();   // 2.0.1 졸업식 장면의 졸업생(명부를 비우기 전에)
-    crew.c3 = cere3Info();   // 3.3.0 새 졸업식: 이름, 숫자, 지도도 명부를 비우기 전에
+    const crew = cereCrew();   // 졸업식 장면의 졸업생(명부를 비우기 전에)
+    crew.c3 = cere3Info();   // 새 졸업식: 이름, 숫자, 지도도 명부를 비우기 전에
     const newcomer = cereNewcomer();
-    snapTake();   // 2.0.0 졸업식 사진: 이 학교급의 마지막 모습
+    snapTake();   // 졸업식 사진: 이 학교급의 마지막 모습
     S.tfp = S.st.fperks;
-    const keep = S.tier + 1 >= GRAD_TIER;   // 5.0.0 대학원: 캠퍼스, 건물, 공사, 도토리, 선생님, 명부, 수료증과 명예 교장실을 이어 가요(woodani 결정)
+    const keep = S.tier + 1 >= GRAD_TIER;   // 대학원: 캠퍼스, 건물, 공사, 도토리, 선생님, 명부, 수료증과 명예 교장실을 이어 가요
     if (!keep) { S.roster = freshRoster(); S.club = freshClub(); }
     S.tier += 1; S.tg = 0; S.sem = 0; S.semDip = 0; S.tdip = 0; S.best = 0; S.hd.furNew = false;
-    if (!keep) S.bd = {};   // 2.1.0 새 학교급은 처음부터 지어요(하던 공사는 없어져요)
-    acAll();   // 2.0.1 공부: 학교급 상한이 풀려요
+    if (!keep) S.bd = {};   // 새 학교급은 처음부터 지어요(하던 공사는 없어져요)
+    acAll();   // 공부: 학교급 상한이 풀려요
     if (!keep) { S.p.dip = 0; for (const k in S.p.perk) S.p.perk[k] = 0; }
     newYear(!keep);
-    rosterEnsure(newcomer && newcomer.k);   // 2.0.0 중학교부터 새 명부(방금 전학 온 친구도 함께)
-    { const gate = MAIN.findIndex(q => q.t === 'tier' && q.n === S.tier); if (S.tier >= 1 && gate >= 0 && S.q.m < gate) { S.q.m = gate; S.q.lat = ''; startMain(); } }   // 2.3.0 초등학교 입학도 같게   // 졸업식 퀘스트(바로 완료)에서 이어가요
+    rosterEnsure(newcomer && newcomer.k);   // 중학교부터 새 명부(방금 전학 온 친구도 함께)
+    { const gate = MAIN.findIndex(q => q.t === 'tier' && q.n === S.tier); if (S.tier >= 1 && gate >= 0 && S.q.m < gate) { S.q.m = gate; S.q.lat = ''; startMain(); } }   // 초등학교 입학도 같게. 졸업식 퀘스트(바로 완료)에서 이어가요
     if (newcomer) rt.kidSeq = BASE_SPECIES.length + S.p.species - 1;
     $('#tierConfirm').hidden = true;
-    queueModal(() => showCere(from, crew));   // 2.0.1 졸업식 장면 먼저
+    queueModal(() => showCere(from, crew));   // 졸업식 장면 먼저
     queueModal(() => showEntrance(fund, leaving, from, newcomer, dipsIn));
-    if (S.tier === 4) queueModal(() => { toast(`새내기 장학금!\n1학년 동안 수업료 +${Math.round((UNI_FRESH.mult - 1) * 100)}%예요`); return false; });   // 4.0.0
-    if (albPg.ltr) queueModal(() => openLetter(albPg));   // 2.1.1 졸업 편지
-    if (newcomer) queueModal(() => showNewTalk(newcomer));   // 2.0.0 전학 대화
+    if (S.tier === 4) queueModal(() => { toast(`새내기 장학금!\n1학년 동안 수업료 +${Math.round((UNI_FRESH.mult - 1) * 100)}%예요`); return false; });
+    if (albPg.ltr) queueModal(() => openLetter(albPg));   // 졸업 편지
+    if (newcomer) queueModal(() => showNewTalk(newcomer));   // 전학 대화
     cereAfter();
     cereRefresh();
   }
@@ -343,15 +343,15 @@
       crew.map((sp, i) => `<g transform="translate(${(i - 1) * 15} ${i === 1 ? -2 : 1}) scale(${i === 1 ? 1.1 : 0.95})">${kidSVG(sp, i)}</g>`).join('') + '</svg>';
     $('#tierFine').textContent = `${from.name}에서 모은 수료증 ${fmt(dipsIn || 0)}장이 장학재단 기금이 됐어요. ` + (newcomer ? `새 친구 ${newcomer.name}${newcomer.ga} 함께 왔어요. ` : '') +
       `새로 생긴 ${eul(T.newb || '건물')} 지어 보세요. 기금은 위쪽 졸업 단추의 장학재단에서 써요. 졸업 선물로 황금 도토리 +${GOLD.promote}개를 받았어요.` +
-      (S.tier < GRAD_TIER ? ` 자리 비운 동안의 수업은 ${TEA.owl.name}이 맡아요. 먼저 모셔 보세요.` : '');   // 5.0.3 새 학교급은 부엉이 선생님이 0에서 시작해 자리 비운 효율이 30%예요
+      (S.tier < GRAD_TIER ? ` 자리 비운 동안의 수업은 ${TEA.owl.name}이 맡아요. 먼저 모셔 보세요.` : '');   // 새 학교급은 부엉이 선생님이 0에서 시작해 자리 비운 효율이 30%예요
     $('#tierOk').textContent = `${T.name} 입학하기`;
     openModal($('#mTier'));
-    if (rt.cereRang) { rt.cereRang = false; sfx('done'); }   // 2.0.1 졸업식 장면에서 종을 울렸으면 짧게만
+    if (rt.cereRang) { rt.cereRang = false; sfx('done'); }   // 졸업식 장면에서 종을 울렸으면 짧게만
     else { sfx('bell'); setTimeout(() => sfx('quest'), 900); }
     return true;
   }
-  /* ---------- 2.0.1 졸업식 장면 ----------
-     유치원과 초등학교 졸업식(학교급이 오르는 식)에서 입학 창 앞에 5초쯤 보여요. 졸업생이 하나씩 무대에 서고, 학사모를 던지면 꽃가루가 내려요.
+  /* ---------- 졸업식 장면 ----------
+     유치원과 초등학교 졸업식(학교급이 오르는 식)에서 입학 창 앞에 5초쯤 보여요. 졸업생이 하나씩 무대에 서고, 학사모를 던지면 꽃가루가 내려요
      화면 아무 곳이나 누르면 바로 입학 창으로 넘어가요. 동작 줄이기 설정이면 움직이지 않는 그림으로 보여요 */
   const GRAD_CAP = '<path d="M-5.2 -3 L-5.2 -6.6 Q0 -8 5.2 -6.6 L5.2 -3 Q0 -4.4 -5.2 -3 Z" fill="#2E2A3A"/>' +
     '<path d="M-10.4 -7.4 L0 -11 L10.4 -7.4 L0 -3.8 Z" fill="#3D3852" stroke="#25212F" stroke-width=".5"/>' +
@@ -390,8 +390,8 @@
     }
     return h;
   }
-  /* 2.3.0 졸업식 장면 새 단장(작업지시서 40, 메모 8): 강당 배경 위에 장면 셋.
-     1 입장(0~2.6초): 커튼이 열리고 졸업생이 줄지어 들어와요. 2 축사(2.6~5초): 단상 뒤 교감 선생님, 현수막, 졸업장이 반짝.
+  /* 졸업식 장면 새 단장(작업지시서 40, 메모 8): 강당 배경 위에 장면 셋
+     1 입장(0~2.6초): 커튼이 열리고 졸업생이 줄지어 들어와요. 2 축사(2.6~5초): 단상 뒤 교감 선생님, 현수막, 졸업장이 반짝
      3 마무리(5~8.6초): 학사모를 던지면 불꽃, 꽃잎, 풍선, 색종이가 터지고 사진기 플래시와 함께 액자 속 단체 사진. 그림이 없으면 예전 장면 */
   const CERE2_MS = 8600;
   const CERE_BG = { '유치원': 'kinder', '초등학교': 'elem', '중학교': 'middle', '고등학교': 'high' };
@@ -433,20 +433,20 @@
     return h;
   }
 
-  /* 3.3.0 새 졸업식(작업지시서 58, woodani: 졸업식이 초라해요): 화면 가득 다섯 장면, 약 21초. 언제든 눌러서 건너뛰기는 그대로.
+  /* 새 졸업식(작업지시서 58, : 졸업식이 초라해요): 화면 가득 다섯 장면, 약 21초. 언제든 눌러서 건너뛰기는 그대로
      1 학교 전경(0~3.4초): 졸업하는 학교 지도를 천천히 훑고 현수막에 '숲속 ○○학교 졸업식'
      2 입장(3.2~7.4초): 학교급 강당, 조명, 졸업생이 통로로 걸어 들어와 앞줄에 서요(명부 이름표)
      3 축사(7.4~11.4초): 단상 뒤 교감 선생님 한마디, 우리 학교 이야기 숫자 넷이 하나씩
      4 졸업장 수여(11.4~16.2초): 세 친구가 차례로 단상 앞에서 졸업장을 받고 학교급 졸업 소품(유 꽃왕관, 초 꽃다발, 중 꽃 리본, 고 넥타이)
      5 단체 사진(16.2~21초): 학교 앞 계단 사진 액자, 모자 던지기, 꽃잎, 찰칵
-     그림은 img/cere3(큰 그림이라 파일로). 다 받아지지 않았거나 움직임 줄이기면 3.0.0 장면(cereArt2) */
+     그림은 img/cere3(큰 그림이라 파일로). 다 받아지지 않았거나 움직임 줄이기면 장면(cereArt2) */
   const CERE3_MS = 21000;
   const CERE3_FILES = ['hall_kinder', 'hall_elem', 'hall_middle', 'hall_high', 'photo_bg', 'frame', 'petals', 'spot', 'podium', 'banner', 'diploma', 'prop_crown', 'prop_bouquet', 'prop_ribbon', 'prop_tie', 'cap_toss'];
   const C3_HALL = ['kinder', 'elem', 'middle', 'high', 'uni'], C3_PROP = ['prop_crown', 'prop_bouquet', 'prop_ribbon', 'prop_tie', 'prop_cap'];
   const C3_FLOOR = [186, 170, 172, 180, 192];   // 강당 그림마다 무대 바닥 높이(360×640 기준)
   const C3_BAN = [76, 40, 40, 64, 34];        // 강당 그림 속 빈 현수막 가운데 높이
   const cere3 = { st: '' };
-  // 5.0.2 앱 용량: 졸업식 그림(img/cere, img/cere3)도 앱에 넣지 않고 웹에서 받아요. 못 받으면 예전 졸업식 장면이 나와요
+  // 용량: 졸업식 그림(img/cere, img/cere3)도 앱에 넣지 않고 웹에서 받아요. 못 받으면 예전 졸업식 장면이 나와요
   const c3Raw = k => webDir('img/cere3/') + 'cere3_' + k + '.webp';
   const c3u = k => webSrcMap[c3Raw(k)] || c3Raw(k);
   const cereBgRaw = bg => webDir('img/cere/') + 'cere_bg_' + bg + '.webp';
@@ -494,7 +494,7 @@
       hall += win(d, 11.4 - d, `<g class="c3-pop" style="animation-delay:${d}s"><g class="c3-stat"><rect x="${x}" y="${y}" width="144" height="48" rx="14"/><text x="${x + 72}" y="${y + 18}" class="s">${a}</text><text x="${x + 72}" y="${y + 39}">${b}</text></g></g>`); });
     // 2 입장과 4 졸업장: 졸업생
     let kids = '';
-    // 3.3.3 woodani: 의자 위에 서 보이지 않게 가운데 통로에 2열 종대로(뒤 줄부터 그려서 앞 줄이 위에 겹쳐요)
+    // 의자 위에 서 보이지 않게 가운데 통로에 2열 종대로(뒤 줄부터 그려서 앞 줄이 위에 겹쳐요)
     crew.forEach((sp, i) => {
       const r = i >> 1, solo = i === n - 1 && i % 2 === 0, x = 180 + (solo ? 0 : (i % 2 ? 1 : -1) * (21 + r * 4)), y = rowY + r * 54, ks = sc * (1 + r * 0.07);
       const aw = i < 3, ad = 11.6 + i * 1.5, nmK = I.nm[sp] || '';
@@ -536,7 +536,7 @@
     sfx('bell'); rt.cereRang = true;
     rt.cereAt = performance.now();
     if (rt.cereFx) { rt.cereFx._stop(); rt.cereFx = null; }
-    if (v3) { try { rt.cereFx = cereFx(m) || null; } catch (e) { rt.cereFx = null; } }   // 5.3.0.1 꽃잎, 학사모, 불꽃
+    if (v3) { try { rt.cereFx = cereFx(m) || null; } catch (e) { rt.cereFx = null; } }   // 꽃잎, 학사모, 불꽃
     rt.cereRun = { dur: rt.reduced ? 2600 : v3 ? CERE3_MS : v2 ? CERE2_MS : CERE_MS, used: 0, from: rt.cereAt, fan: false, fanAt: v3 ? 17100 : v2 && !rt.reduced ? 5100 : 2000 };
     cereTimers();
     return true;
@@ -548,7 +548,7 @@
     if (!R.fan) rt.cereT1 = setTimeout(() => { if (rt.cereOn && !rt.cereAsking) { R.fan = true; sfx('quest'); buzz([30, 60, 30]); } }, Math.max(0, (R.fanAt || 2000) - R.used));
     rt.cereT2 = setTimeout(() => cereEnd(true), Math.max(300, R.dur - R.used));
   }
-  // 2.0.1 장면을 누르면 바로 넘기지 않고 건너뛸지 물어요(woodani)
+  // 장면을 누르면 바로 넘기지 않고 건너뛸지 물어요
   // 묻는 동안 졸업식 그림 속 움직임을 멈췄다가 이어요(멈춘 것만 다시 재생)
   function cerePause(on) {
     const sv = document.querySelector('#mCere .cere-svg'); if (!sv || !sv.getAnimations) return;
@@ -581,7 +581,7 @@
     closeModal($('#mCere'));
     rt.cereToasts.splice(0).forEach((t, i) => setTimeout(() => toast(t), 450 + i * 2400));   // 미뤄 둔 알림을 차례로
   }
-  function goRep(msg) { const b = bestPick('rep'); return b.f ? goFac(b.f, msg) : goTeacher(b.t, '연수를 보내면 평판이 ★2 올라요'); }   // 3.3.3 평판 추천
+  function goRep(msg) { const b = bestPick('rep'); return b.f ? goFac(b.f, msg) : goTeacher(b.t, '연수를 보내면 평판이 ★2 올라요'); }   // 평판 추천
   function goGrad(where) {
     setTab('grad');
     const el = where === 'perks' ? $('#perkHead') : where === 'tier' ? $('#tierCard') : where === 'fund' ? $('#fundHead') : null;

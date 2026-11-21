@@ -1,7 +1,7 @@
   /* ---------- 시설 안 가구 ---------- */
   // 시설마다 가구가 네 개 있어요. 가구는 건물 레벨까지 올릴 수 있고, 네 개가 모두 건물 레벨에 닿아야 건물을 한 단계 키울 수 있어요.
   // 가구값은 건물값과 따로 내요 (네 개를 합치면 다음 건물값의 60%). 레벨이 오를수록 방 안 가구 수가 늘어요. 가구는 따로 효과가 없어요
-  // 1.5.4: 가구 모습은 학교급마다 한 단계씩 바뀌어요 (유치원 낡은, 초등학교 튼튼한, 중학교 산뜻한, 고등학교부터 반짝이는). 학교급이 오른 뒤 처음 올린 가구부터 새 모습이에요
+  // 가구 모습은 학교급마다 한 단계씩 바뀌어요 (유치원 낡은, 초등학교 튼튼한, 중학교 산뜻한, 고등학교부터 반짝이는). 학교급이 오른 뒤 처음 올린 가구부터 새 모습이에요
   const FUR_SHARE = [0.12, 0.14, 0.16, 0.18];
   const FUR_STAGE = ['', '낡은', '튼튼한', '산뜻한', '반짝이는'];
   const furStage = n => n <= 0 ? 0 : Math.min(4, (S ? S.tier : 0) + 1);
@@ -14,20 +14,20 @@
     store: [{ id: 'snackrack', name: '간식 진열대' }, { id: 'fridge', name: '음료 냉장고' }, { id: 'register', name: '계산대' }, { id: 'snacktable', name: '간식 탁자' }],
     dorm: [{ id: 'bunk', name: '2층 침대' }, { id: 'sdesk', name: '공부 책상' }, { id: 'closet', name: '옷장' }, { id: 'rug', name: '러그' }],
     union: [{ id: 'union_board', name: '동아리 게시판' }, { id: 'union_sofa', name: '소파' }, { id: 'union_vend', name: '자판기' }, { id: 'union_stage', name: '무대' }],
-    institute: [{ id: 'institute_bench', name: '실험대' }, { id: 'institute_board', name: '화이트보드' }, { id: 'institute_desk', name: '연구 책상' }, { id: 'institute_coffee', name: '커피 머신' }],   // 5.0.0 연구소(작업지시서 85)
-    gradhall: [{ id: 'gradhall_table', name: '세미나 탁자' }, { id: 'gradhall_screen', name: '발표 스크린' }, { id: 'gradhall_shelf', name: '논문 서가' }, { id: 'gradhall_plant', name: '큰 화분' }]   // 5.0.0 연구동 세미나실   // 4.0.0 학생회관(작업지시서 54)   // 3.0.0 기숙사(작업지시서 35)   // 2.0.0
+    institute: [{ id: 'institute_bench', name: '실험대' }, { id: 'institute_board', name: '화이트보드' }, { id: 'institute_desk', name: '연구 책상' }, { id: 'institute_coffee', name: '커피 머신' }],   // 연구소(작업지시서 85)
+    gradhall: [{ id: 'gradhall_table', name: '세미나 탁자' }, { id: 'gradhall_screen', name: '발표 스크린' }, { id: 'gradhall_shelf', name: '논문 서가' }, { id: 'gradhall_plant', name: '큰 화분' }]   // 연구동 세미나실. 학생회관(작업지시서 54). 기숙사(작업지시서 35)
   };
-  // 4.1.1 대학교 가구 이름(그림도 바뀌어요). 열쇠와 저장은 그대로
+  // 대학교 가구 이름(그림도 바뀌어요). 열쇠와 저장은 그대로
   const FUR_NM_U = { fan: '빔 프로젝터', locker: '사물함', rack: '식판 반납대', shelf: '서가', rdesk: '열람석', slide: '농구 골대', swing: '축구 골대', bars: '허들', chem: '시약장', globe: '분자 모형', snackrack: '진열대', snacktable: '탁자', bunk: '침대', sdesk: '책상' };
   for (const k in FUR) for (const F of FUR[k]) { const n0 = F.name; Object.defineProperty(F, 'name', { get: () => { try { return uniNow() && FUR_NM_U[F.id] ? FUR_NM_U[F.id] : n0; } catch (e) { return n0; } }, enumerable: true, configurable: true }); }
   const batchim = w => { const c = w.charCodeAt(w.length - 1); return c >= 0xAC00 && c <= 0xD7A3 && (c - 0xAC00) % 28 > 0; };
   const iga = w => w + (batchim(w) ? '이' : '가'), eun = w => w + (batchim(w) ? '은' : '는');
-  // 4.1.1 '로/으로': 받침이 없거나 ㄹ 받침이면 '로'. 숫자로 끝나면 읽는 소리로(0 영, 3 삼, 6 육은 '으로')
+  // '로/으로': 받침이 없거나 ㄹ 받침이면 '로'. 숫자로 끝나면 읽는 소리로(0 영, 3 삼, 6 육은 '으로')
   const euro = w => { w = String(w); const ch = w.charAt(w.length - 1), c = ch.charCodeAt(0); if (/[0-9]/.test(ch)) return w + ('036'.includes(ch) ? '으로' : '로'); if (c < 0xAC00 || c > 0xD7A3) return w + '로'; const j = (c - 0xAC00) % 28; return w + (j === 0 || j === 8 ? '로' : '으로'); };
   const freshFu = () => { const o = {}; for (const k in FUR) o[k] = [0, 0, 0, 0]; return o; };
   const furDone = (k, i) => S.f[k] < 1 || S.fu[k][i] >= S.f[k];
   const furReady = k => S.f[k] < 1 || S.fu[k].every(n => n >= S.f[k]);
-  const furCost = (k, i) => furDone(k, i) ? Infinity : Math.ceil(softCost(FAC[k].cost, S.fu[k][i] + 1 + (FAC[k].lvOff || 0), SOFT.fac) * FUR_SHARE[i] * costScale() * taFurMul(k));   /* 5.1.0 조교가 일하는 건물은 가구 -10% */   // 5.0.0 연구 건물 가구도 건물처럼 lvOff(빠져서 아주 쌌어요)
+  const furCost = (k, i) => furDone(k, i) ? Infinity : Math.ceil(softCost(FAC[k].cost, S.fu[k][i] + 1 + (FAC[k].lvOff || 0), SOFT.fac) * FUR_SHARE[i] * costScale() * taFurMul(k));   /* 조교가 일하는 건물은 가구 -10% */   // 연구 건물 가구도 건물처럼 lvOff(빠져서 아주 쌌어요)
   const furAllCost = k => FUR[k].reduce((a, _, i) => a + (furDone(k, i) ? 0 : furCost(k, i)), 0);
   // 이 시설에서 다음에 살 수 있는 것: 가구가 덜 찼으면 가장 싼 가구, 다 찼으면 건물
   const facNextCost = k => furReady(k) ? facCost(k) : Math.min(...FUR[k].map((_, i) => furCost(k, i)));
@@ -112,31 +112,31 @@
       chem: { cnt: n => furCnt(n, 1, 9, 2), at: [[262, 100], [290, 100]] },
       globe: { cnt: n => furCnt(n, 1, 99, 1), at: [[208, 90]] }
     },
-    store: {   // 2.0.0 매점: 진열대는 뒷벽, 냉장고는 오른쪽 벽, 계산대는 앞 왼쪽, 간식 탁자는 가운데
+    store: {   // 매점: 진열대는 뒷벽, 냉장고는 오른쪽 벽, 계산대는 앞 왼쪽, 간식 탁자는 가운데
       snackrack: { cnt: n => furCnt(n, 1, 6, 3) },
       fridge: { cnt: n => furCnt(n, 1, 9, 2) },
       register: { cnt: n => furCnt(n, 1, 99, 1) },
       snacktable: { cnt: n => furCnt(n, 1, 5, 4) }
     },
-    dorm: {   // 3.0.0 기숙사: 2층 침대는 뒷벽, 공부 책상은 앞 양옆, 옷장은 뒷벽 오른쪽(신발장 옆), 러그는 가운데 바닥
+    dorm: {   // 기숙사: 2층 침대는 뒷벽, 공부 책상은 앞 양옆, 옷장은 뒷벽 오른쪽(신발장 옆), 러그는 가운데 바닥
       bunk: { cnt: n => furCnt(n, 1, 6, 3) },
       sdesk: { cnt: n => furCnt(n, 1, 5, 4) },
       closet: { cnt: n => furCnt(n, 1, 9, 2) },
       rug: { cnt: n => furCnt(n, 1, 99, 1) }
     },
-    union: {   // 4.0.0 학생회관: 게시판은 뒷벽 앞, 소파는 왼쪽, 자판기는 뒷벽 가운데, 무대는 오른쪽 앞
+    union: {   // 학생회관: 게시판은 뒷벽 앞, 소파는 왼쪽, 자판기는 뒷벽 가운데, 무대는 오른쪽 앞
       union_board: { cnt: n => furCnt(n, 1, 9, 2) },
       union_sofa: { cnt: n => furCnt(n, 1, 9, 2) },
       union_vend: { cnt: n => furCnt(n, 1, 9, 2) },
       union_stage: { cnt: n => furCnt(n, 1, 99, 1) }
     },
-    institute: {   // 5.0.0 연구소: 실험대는 가운데, 화이트보드는 뒷벽, 책상은 왼쪽 앞, 커피 머신은 오른쪽 뒤
+    institute: {   // 연구소: 실험대는 가운데, 화이트보드는 뒷벽, 책상은 왼쪽 앞, 커피 머신은 오른쪽 뒤
       institute_bench: { cnt: n => furCnt(n, 1, 9, 2) },
       institute_board: { cnt: n => furCnt(n, 1, 99, 1) },
       institute_desk: { cnt: n => furCnt(n, 1, 9, 2) },
       institute_coffee: { cnt: n => furCnt(n, 1, 99, 1) }
     },
-    gradhall: {   // 5.0.0 연구동 세미나실: 탁자는 가운데, 스크린은 뒷벽, 서가는 왼쪽, 화분은 오른쪽 앞
+    gradhall: {   // 연구동 세미나실: 탁자는 가운데, 스크린은 뒷벽, 서가는 왼쪽, 화분은 오른쪽 앞
       gradhall_table: { cnt: n => furCnt(n, 1, 9, 2) },
       gradhall_screen: { cnt: n => furCnt(n, 1, 99, 1) },
       gradhall_shelf: { cnt: n => furCnt(n, 1, 9, 2) },
@@ -173,7 +173,7 @@
       // 시범 실험대
       '<rect x="104" y="70" width="112" height="9" rx="1.2" fill="#3E4A52" stroke="#4E3D2C"/><rect x="104" y="79" width="112" height="12" rx="1.2" fill="#D6A46A" stroke="#4E3D2C"/>'
   };
-  // 2.0.0 매점 방(그림 room_store가 오기 전 임시)
+  // 매점 방(그림 room_store가 오기 전 임시)
   FUR_ROOM.store = '<rect x="-12.5" width="345" height="230" fill="#E7D3B4"/>' + Array.from({ length: 8 }, (_, i) => `<path d="M-12 ${84 + i * 20} H332" stroke="#D4BC98"/>`).join('') +
     '<rect x="-12.5" width="345" height="64" fill="#F4E6CC"/><rect x="-12.5" y="60" width="345" height="5" fill="#A9845C"/>' +
     '<path d="M60 8 h200 l-10 16 h-180 z" fill="#E9806E"/><path d="M80 8 v16 M100 8 v16 M120 8 v16 M140 8 v16 M160 8 v16 M180 8 v16 M200 8 v16 M220 8 v16 M240 8 v16" stroke="#FFF6E6" stroke-width="5"/>' +
@@ -182,10 +182,10 @@
   const MENU = [['오늘은 급식이 없어요', '월요일에 만나요'], ['도토리밥 버섯국', '산딸기 푸딩'], ['당근 볶음밥', '클로버 샐러드'], ['밤 카레라이스', '꿀 호떡'],
     ['연어 주먹밥', '블루베리 요거트'], ['호박 수프', '솔방울 쿠키'], ['오늘은 급식이 없어요', '월요일에 만나요']];
 
-  /* 1.5.0 시설 안: 방 배경 그림 위에 가구 그림을 올려요. 바닥은 위에서 40%(y 92)부터예요.
+  /* 시설 안: 방 배경 그림 위에 가구 그림을 올려요. 바닥은 위에서 40%(y 92)부터예요
      자리는 [가운데 x, 바닥에 닿는 y], 너비는 지도 단위. 뒤쪽(y가 작은 곳)일수록 조금 작게 그려요 */
-  const FUR_AR = { desk: 0.75, chair: 1.56, fan: 1.84, locker: 2.27, table: 0.53, counter: 0.43, water: 2.29, rack: 0.96, shelf: 1.28, rdesk: 0.39, sofa: 0.66, lamp: 2.40, lab: 0.87, scope: 1.72, chem: 0.91, globe: 1.41, slide: 1.00, swing: 0.70, bars: 0.46, bench: 0.57, snackrack: 1, fridge: 1.8, register: 0.75, snacktable: 0.8, bunk: 1.04, sdesk: 0.82, closet: 1.17, rug: 0.62, union_board: 1.06, union_sofa: 0.56, union_vend: 1.58, union_stage: 0.96, institute_bench: 0.85, institute_board: 1.06, institute_desk: 0.87, institute_coffee: 1.14, gradhall_table: 0.79, gradhall_screen: 1.01, gradhall_shelf: 1.17, gradhall_plant: 0.96 /* 5.0.0 연구소와 연구동 가구(빠져서 방에 안 보였어요) */ };   // 3.0.0 기숙사 가구(그림 테두리에 맞게 잘라 넣음)
-  // 1.7.0 방 배치 다시 짜기(실제 모습처럼): 뒤쪽은 좁고 작게, 앞쪽은 넓고 크게 보이는 원근에 맞춰 놓아요.
+  const FUR_AR = { desk: 0.75, chair: 1.56, fan: 1.84, locker: 2.27, table: 0.53, counter: 0.43, water: 2.29, rack: 0.96, shelf: 1.28, rdesk: 0.39, sofa: 0.66, lamp: 2.40, lab: 0.87, scope: 1.72, chem: 0.91, globe: 1.41, slide: 1.00, swing: 0.70, bars: 0.46, bench: 0.57, snackrack: 1, fridge: 1.8, register: 0.75, snacktable: 0.8, bunk: 1.04, sdesk: 0.82, closet: 1.17, rug: 0.62, union_board: 1.06, union_sofa: 0.56, union_vend: 1.58, union_stage: 0.96, institute_bench: 0.85, institute_board: 1.06, institute_desk: 0.87, institute_coffee: 1.14, gradhall_table: 0.79, gradhall_screen: 1.01, gradhall_shelf: 1.17, gradhall_plant: 0.96 /* 연구소와 연구동 가구(빠져서 방에 안 보였어요) */ };   // 기숙사 가구(그림 테두리에 맞게 잘라 넣음)
+  // 방 배치 다시 짜기(실제 모습처럼): 뒤쪽은 좁고 작게, 앞쪽은 넓고 크게 보이는 원근에 맞춰 놓아요
   // furP(u, y): 바닥 y에서 가로 위치 u(-1 왼쪽 벽 ~ 1 오른쪽 벽)를 지도 단위 x로 바꿔요. 자리는 [x, 바닥에 닿는 y]이고 앞(위쪽 자리)부터 채워요.
   // on: 다른 가구 위에 올려요(현미경은 실험대 위, 지구본은 약품장 위). dx는 받침 가구 너비에 대한 가로 비율, dy는 받침 가구 높이에 대한 높이 비율
   const furPersp = y => 0.62 + 0.38 * Math.max(0, Math.min(1, (y - 92) / 138));
@@ -216,31 +216,31 @@
       bars: { w: 74, at: [[262, 174]] },
       bench: { w: 50, at: [[38, 226], [114, 228], [206, 228], [282, 226]] }
     },
-    store: {   // 2.0.0 매점(가구 그림이 오면 자리를 다시 맞춰요)
+    store: {   // 매점(가구 그림이 오면 자리를 다시 맞춰요)
       snackrack: { w: 58, at: [furP(-0.3, 114), furP(0.3, 114), furP(-0.78, 114)] },
       fridge: { w: 30, at: [[296, 150], [300, 192]] },
       register: { w: 56, at: [furP(-0.62, 226)] },
       snacktable: { w: 50, at: furGrid([-0.1, 0.5], [164, 204]) }
     },
-    dorm: {   // 3.0.0 기숙사 방(room_dorm): 창은 왼쪽 벽, 문과 신발장은 뒷벽 오른쪽
+    dorm: {   // 기숙사 방(room_dorm): 창은 왼쪽 벽, 문과 신발장은 뒷벽 오른쪽
       bunk: { w: 64, at: [furP(-0.42, 118), furP(0.02, 118), furP(-0.84, 132)] },
       sdesk: { w: 58, at: furGrid([-0.66, 0.66], [178, 222]) },
       closet: { w: 40, at: [furP(0.42, 114), [312, 160]] },
       rug: { w: 84, at: [[160, 206]] }
     },
-    union: {   // 4.0.0 학생회관 방(room_union): 창은 왼쪽 벽, 그려진 작은 무대는 뒷벽 오른쪽
+    union: {   // 학생회관 방(room_union): 창은 왼쪽 벽, 그려진 작은 무대는 뒷벽 오른쪽
       union_board: { w: 50, at: [[40, 122], [30, 162]] },
       union_sofa: { w: 74, at: [[171, 114], [218, 194]] },
       union_vend: { w: 34, at: [[208, 97], [230, 97]] },
       union_stage: { w: 112, at: [[284, 102]] }
     },
-    institute: {   // 5.0.0 연구소 방(room_institute, 작업지시서 82). 자리는 본부 어림(학생회관 방과 같은 바닥 높이)
+    institute: {   // 연구소 방(room_institute, 작업지시서 82). 자리는 본부 어림(학생회관 방과 같은 바닥 높이)
       institute_bench: { w: 92, at: [[150, 150], [150, 200]] },
       institute_board: { w: 70, at: [[160, 72]] },
       institute_desk: { w: 70, at: [[42, 170], [42, 214]] },
       institute_coffee: { w: 38, at: [[284, 104]] }
     },
-    gradhall: {   // 5.0.0 연구동 세미나실(room_gradhall, 작업지시서 85)
+    gradhall: {   // 연구동 세미나실(room_gradhall, 작업지시서 85)
       gradhall_table: { w: 110, at: [[160, 170], [160, 214]] },
       gradhall_screen: { w: 80, at: [[164, 80]] },
       gradhall_shelf: { w: 50, at: [[34, 120], [34, 170]] },
@@ -254,7 +254,7 @@
     }
   };
   const FUR_SUF = ['', '_old', '', '_fresh', '_shiny'];
-  // 1.6.0 특별 가구(정수 상점): 방마다 하나, 사면 그 방에 놓여요. [가운데 x, 바닥 y], 너비, 그림 세로 비율
+  // 특별 가구(정수 상점): 방마다 하나, 사면 그 방에 놓여요. [가운데 x, 바닥 y], 너비, 그림 세로 비율
   const SP_FUR = {
     classroom: { id: 'aquarium', name: '교실 어항', at: [300, 182], w: 42, ar: 1.46 },
     cafeteria: { id: 'cake', name: '케이크 진열장', at: [270, 118], w: 54, ar: 1.01 },
@@ -270,9 +270,9 @@
       `<image href="${IMG('fur_sp_' + F.id)}" x="${(x - ww / 2).toFixed(1)}" y="${(y - hh).toFixed(1)}" width="${ww.toFixed(1)}" height="${hh.toFixed(1)}"/>` +
       `<g class="fur-spark">${sparkle(x + ww * 0.3, y - hh * 0.9, 0.9)}</g></g>`;
   }
-  const furDepth = y => 0.72 + 0.32 * Math.max(0, Math.min(1, (y - 92) / 138));   // 1.7.0: 원근을 조금 더 세게(뒤 0.72배, 앞 1.04배)
-  /* ===== 1.7.1 방 꾸밈 소품과 방 안을 걷는 선생님, 학생 BEGIN =====
-     소품은 사지 않아요. 건물이 Lv.1, 5, 10, 15, 20이 되면 하나씩 나타나요(PROP_AT). 자리는 [가운데 x, 아래 끝 y, 너비], 그림 세로 비율은 PROP_AR.
+  const furDepth = y => 0.72 + 0.32 * Math.max(0, Math.min(1, (y - 92) / 138));   // 원근을 조금 더 세게(뒤 0.72배, 앞 1.04배)
+  /* ===== 방 꾸밈 소품과 방 안을 걷는 선생님, 학생 BEGIN =====
+     소품은 사지 않아요. 건물이 Lv.1, 5, 10, 15, 20이 되면 하나씩 나타나요(PROP_AT). 자리는 [가운데 x, 아래 끝 y, 너비], 그림 세로 비율은 PROP_AR
      wall: 벽에 걸려서 가구보다 먼저(뒤에) 그려요. flat: 바닥에 깔리는 것(러그). 천장 등은 위 끝을 천장에 붙여요 */
   const PROP_AT = [1, 5, 10, 15, 20];
   const PROP_AR = { classroom_teacherdesk: 1.12, classroom_clock: 1, classroom_board: 0.32, classroom_cubby: 0.28, classroom_plant: 0.61,
@@ -282,19 +282,19 @@
     science_poster: 0.77, science_sink: 1.07, science_shelf: 0.38, science_plants: 0.69, science_rocket: 2.26,
     store_basket: 0.79, store_lamp: 1.43, store_menu: 0.83, store_plant: 1.1, store_poster: 1.23,
     dorm_clock: 1.07, dorm_lamp: 1.23, dorm_plant: 1.13, dorm_poster: 1.41, dorm_slippers: 0.79,
-    union_poster: 1.43, union_guitar: 2.22, union_lamp: 1.01, union_plant: 1.06, union_cushion: 0.73 };   // 4.0.0 학생회관 소품(작업지시서 61)   // 3.0.0 기숙사 소품(작업지시서 35)   // 2.0.0 매점 소품(작업지시서 19)
+    union_poster: 1.43, union_guitar: 2.22, union_lamp: 1.01, union_plant: 1.06, union_cushion: 0.73 };   // 학생회관 소품(작업지시서 61). 기숙사 소품(작업지시서 35). 매점 소품(작업지시서 19)
   const PROP_LAY = {
     classroom: [['teacherdesk', 180, 115, 29], ['clock', 267, 45, 17, 'wall'], ['cubby', 102, 104, 69], ['board', 229, 92, 59, 'wall'], ['plant', 15, 158, 27]],
     cafeteria: [['return', 14, 128, 22], ['bins', 296, 216, 44], ['poster', 260, 59, 21, 'wall'], ['plant', 10, 213, 29], ['lamp', 160, 62, 39, 'wall']],
     library: [['rug', 160, 180, 54, 'flat'], ['cart', 33, 133, 26], ['ladder', 260, 115, 13], ['books', 41, 170, 32], ['poster', 159, 61, 28, 'wall']],
     playground: [['seesaw', 152, 193, 59], ['sandbox', 305, 189, 38], ['flowerbed', 89, 92, 74, 'wall'], ['fountain', 10, 171, 20], ['tree', 240, 100, 59, 'wall']],
     science: [['poster', 145, 55, 54, 'wall'], ['sink', 19, 150, 31], ['shelf', 152, 94, 62, 'wall'], ['plants', 20, 207, 39], ['rocket', 293, 209, 18]],
-    store: [['menu', 170, 48, 36, 'wall'], ['plant', 14, 206, 26], ['poster', 92, 56, 17, 'wall'], ['basket', 274, 224, 26], ['lamp', 240, 34, 18, 'wall']],   // 2.0.0 매점
-    dorm: [['poster', 150, 60, 22, 'wall'], ['slippers', 268, 222, 24], ['clock', 196, 42, 18, 'wall'], ['plant', 16, 210, 26], ['lamp', 104, 30, 18, 'wall']],   // 3.0.0 기숙사
+    store: [['menu', 170, 48, 36, 'wall'], ['plant', 14, 206, 26], ['poster', 92, 56, 17, 'wall'], ['basket', 274, 224, 26], ['lamp', 240, 34, 18, 'wall']],   // 매점
+    dorm: [['poster', 150, 60, 22, 'wall'], ['slippers', 268, 222, 24], ['clock', 196, 42, 18, 'wall'], ['plant', 16, 210, 26], ['lamp', 104, 30, 18, 'wall']],   // 기숙사
     union: [['poster', 282, 62, 22, 'wall'], ['plant', 14, 204, 30], ['lamp', 133, 40, 16, 'wall'], ['cushion', 150, 214, 36], ['guitar', 272, 198, 13]],
-    institute: [['plant', 14, 206, 26], ['lamp', 240, 34, 18, 'wall']], gradhall: [['clock', 250, 42, 18, 'wall'], ['plant', 300, 208, 24]]   // 5.0.0   // 4.0.0 학생회관
+    institute: [['plant', 14, 206, 26], ['lamp', 240, 34, 18, 'wall']], gradhall: [['clock', 250, 42, 18, 'wall'], ['plant', 300, 208, 24]]   // 학생회관
   };
-  // 4.1.1 대학교 방(작업지시서 69): 새 배경에 벽 그림이 이미 있어서 벽 소품과 어린 소품(시소, 모래밭, 로켓, 사물함 칸)은 그리지 않아요
+  // 대학교 방(작업지시서 69): 새 배경에 벽 그림이 이미 있어서 벽 소품과 어린 소품(시소, 모래밭, 로켓, 사물함 칸)은 그리지 않아요
   const PROP_SKIP_U = { classroom: ['cubby', 'board', 'clock'], cafeteria: ['poster', 'lamp'], library: ['poster'], playground: ['seesaw', 'sandbox', 'flowerbed', 'tree', 'fountain'], science: ['poster', 'shelf', 'rocket'], store: ['menu', 'poster', 'lamp'], dorm: ['poster', 'clock', 'lamp'] };
   const propSkip = (k, id) => uniNow() && IMG('room_u_' + k) && (PROP_SKIP_U[k] || []).includes(id);
   // 대학교에서 자리가 달라지는 가구: 빔 프로젝터 스크린은 칠판 양옆, 농구 골대는 왼쪽 뒤, 축구 골대는 오른쪽 뒤, 허들은 트랙 앞
@@ -321,7 +321,7 @@
   };
   const walkTeaHere = k => { const t = WALK[k] && WALK[k].tea; return !!t && (t === 'dietitian' ? xtHere('diet') : t === 'librarian' ? xtHere('lib') : S.t[t] > 0); };
   function walkSprite(key, h) {
-    const ar = CHR_AR[key] || 0.7, u = blobUrl(FSI(key)); if (!u) return null;   // 3.0.0 Blob 주소
+    const ar = CHR_AR[key] || 0.7, u = blobUrl(FSI(key)); if (!u) return null;   // Blob 주소
     const w = h * ar;
     return `<ellipse cx="0" cy="-0.5" rx="${(w * 0.36).toFixed(1)}" ry="${(1.6 + w * 0.05).toFixed(1)}" class="fur-shadow"/><g class="wk-flip"><image href="${u}" x="${(-w / 2).toFixed(1)}" y="${(-h).toFixed(1)}" width="${w.toFixed(1)}" height="${h.toFixed(1)}"/></g>`;
   }
@@ -351,11 +351,11 @@
       const left = b[0] < a[0] - 0.5; if (o.left !== left) { o.left = left; o.el.firstChild && o.el.querySelector('.wk-flip').setAttribute('transform', left ? 'scale(-1 1)' : ''); }
     }
     // 앞(아래)에 있는 친구가 위에 그려지게
-    // 5.0.2 끊김 줄이기: 예전에는 순서가 같아도 프레임마다 모두 다시 붙였어요. 순서가 바뀔 때만 옮겨요
+    // 끊김 줄이기: 예전에는 순서가 같아도 프레임마다 모두 다시 붙였어요. 순서가 바뀔 때만 옮겨요
     if (W.list.length > 1) { const ord = W.list.slice().sort((p, q) => p.y - q.y), key = ord.map(o => W.list.indexOf(o)).join(''); if (W.ord !== key) { W.ord = key; const g = $('#roomWalk'); ord.forEach(o => g.appendChild(o.el)); } }
   }
-  function tick171(dt) { if (!(rt.walk && rt.sheetKey === rt.walk.k)) { rt.wkT = 0; return; } rt.wkT = (rt.wkT || 0) + dt; if (rt.mf % MAP_DIV === 0) { walkStep(rt.wkT); rt.wkT = 0; } }   // 5.0.2 지도 학생처럼 1초에 30번
-  /* ===== 1.7.1 방 꾸밈 소품과 걷는 친구들 END ===== */
+  function tick171(dt) { if (!(rt.walk && rt.sheetKey === rt.walk.k)) { rt.wkT = 0; return; } rt.wkT = (rt.wkT || 0) + dt; if (rt.mf % MAP_DIV === 0) { walkStep(rt.wkT); rt.wkT = 0; } }   // 지도 학생처럼 1초에 30번
+  /* ===== 방 꾸밈 소품과 걷는 친구들 END ===== */
   function furImg(id, x, y, w, st) {
     const s = furDepth(y), ww = w * s, hh = ww * FUR_AR[id];
     return `<ellipse cx="${x}" cy="${(y - 1).toFixed(1)}" rx="${(ww * 0.42).toFixed(1)}" ry="${(2 + ww * 0.04).toFixed(1)}" class="fur-shadow"/>` +
@@ -367,8 +367,8 @@
     cafeteria: () => { const m = MENU[new Date().getDay()]; return '<g class="room-menu"><rect x="10" y="14" width="88" height="48" rx="4" class="room-menu-bg"/><text x="54" y="28" text-anchor="middle" class="fur-menu-h">이번 주 식단</text>' +
       `<text x="54" y="42" text-anchor="middle" class="fur-menu">${m[0]}</text><text x="54" y="54" text-anchor="middle" class="fur-menu">${m[1]}</text></g>`; }
   };
-  const SN_MACH = [40, 152, 62];   // 2.1.2 매점 방 뽑기 기계 자리(가운데 x, 바닥 y, 크기)
-  /* 3.0.0 woodani 제보(건물을 눌러 안이 나올 때 살짝 끊김): 방 그림, 가구, 건물 그림이 data: 글자(수백 KB)로 들어 있어서 창을 열 때마다
+  const SN_MACH = [40, 152, 62];   // 매점 방 뽑기 기계 자리(가운데 x, 바닥 y, 크기)
+  /* 방 그림, 가구, 건물 그림이 data: 글자(수백 KB)로 들어 있어서 창을 열 때마다
      긴 글자를 다시 읽고 그림을 다시 풀었어요. 한 번 Blob 주소로 바꿔 두면 짧은 주소만 넣고, 풀어 둔 그림을 다시 써요 */
   const BLOB = new Map(), BLOB_KEEP = [];
   function blobUrl(u) {
@@ -383,7 +383,7 @@
   }
   const blobHtml = h => h.indexOf('"data:') < 0 ? h : h.replace(/(href|src)="(data:[^"]+)"/g, (m, a, u) => `${a}="${blobUrl(u)}"`);
   // 그림을 미리 풀어 둬요(풀린 그림을 잡아 두려고 Image를 남겨요)
-  function blobWarm(u) { const b = blobUrl(u); if (!b || BLOB_KEEP.some(x => x.src === b || x.dataset.u === b)) return;   // 3.2.0 그림이 파일 주소여도 미리 불러 둬요
+  function blobWarm(u) { const b = blobUrl(u); if (!b || BLOB_KEEP.some(x => x.src === b || x.dataset.u === b)) return;   // 그림이 파일 주소여도 미리 불러 둬요
     if (b === u && !/^(img\/|https?:|blob:)/.test(u)) return; const im = new Image(); im.decoding = 'async'; im.dataset.u = b; im.src = b; BLOB_KEEP.push(im); if (im.decode) im.decode().catch(() => {}); }
   function warmRooms() {
     if (!S) return;
@@ -391,7 +391,7 @@
     const job = () => { const k = ks.shift(); if (!k) return; try { blobWarm(IMG(roomKey(k))); blobWarm(IMG170(seasonKey(bldImg(k)))); if (!rt.sheetKey) { const ft = rt.furTag; blobHtml(renderFurScene(k)); rt.furTag = ft; } } catch (e) { /* 미리 풀기는 실패해도 괜찮아요 */ } (window.requestIdleCallback || (f => setTimeout(f, 200)))(job); };
     (window.requestIdleCallback || (f => setTimeout(f, 1500)))(job);
   }
-  // 4.1.1 대학교 방 배경과 가구(작업지시서 69): 대학교에서는 room_u_<건물>, fur_u_<가구>가 있으면 그 그림을 써요
+  // 대학교 방 배경과 가구(작업지시서 69): 대학교에서는 room_u_<건물>, fur_u_<가구>가 있으면 그 그림을 써요
   const roomKey = k => uniNow() && IMG('room_u_' + k) ? 'room_u_' + k : 'room_' + k;
   const furKey = (id, st) => uniNow() && IMG('fur_u_' + id) ? 'fur_u_' + id : 'fur_' + id + FUR_SUF[st || 2];
   const roomImg = k => (IMG(roomKey(k)) || !FUR_ROOM[k] ? `<image href="${IMG(roomKey(k))}" x="-12.5" y="0" width="345" height="230" preserveAspectRatio="none"/>` : FUR_ROOM[k]) + (ROOM_TXT[k] ? ROOM_TXT[k]() : '');
@@ -416,9 +416,9 @@
       at.forEach(([x, y], j) => out.push({ i, j, x, y, top: false, ghost: n < 1, svg: furImg(F.id, x, y, lay.w, st) }));
     });
     if (SP_FUR[k]) { const sv = spFurImg(k); if (sv) out.push({ sp: true, y: SP_FUR[k].at[1], svg: sv }); }
-    { const sv = psFurImg(k); if (sv) out.push({ sp: true, y: PS_FUR_AT[1], svg: sv }); }   // 2.1.3 시즌 가구
-    if (k === 'store' && S.tier >= SN.tier && IMG('snack_machine')) out.push({ sp: true, y: SN_MACH[1], svg: `<image class="sn-mach${S.sn && S.sn.gold ? ' gold' : ''}" href="${IMG('snack_machine')}" x="${SN_MACH[0] - SN_MACH[2] / 2}" y="${(SN_MACH[1] - SN_MACH[2] * 0.95).toFixed(1)}" width="${SN_MACH[2]}" height="${SN_MACH[2]}" pointer-events="none"/>` });   // 2.1.2 간식 뽑기 기계   // 1.6.0 특별 가구도 깊이 순서에 끼워요
-    propInstances(k).forEach(o => out.push(o));   // 1.7.1 꾸밈 소품
+    { const sv = psFurImg(k); if (sv) out.push({ sp: true, y: PS_FUR_AT[1], svg: sv }); }   // 시즌 가구
+    if (k === 'store' && S.tier >= SN.tier && IMG('snack_machine')) out.push({ sp: true, y: SN_MACH[1], svg: `<image class="sn-mach${S.sn && S.sn.gold ? ' gold' : ''}" href="${IMG('snack_machine')}" x="${SN_MACH[0] - SN_MACH[2] / 2}" y="${(SN_MACH[1] - SN_MACH[2] * 0.95).toFixed(1)}" width="${SN_MACH[2]}" height="${SN_MACH[2]}" pointer-events="none"/>` });   // 간식 뽑기 기계. 특별 가구도 깊이 순서에 끼워요
+    propInstances(k).forEach(o => out.push(o));   // 꾸밈 소품
     out.sort((a, b) => (a.z || a.y) - (b.z || b.y));
     return out;
   }
@@ -434,13 +434,13 @@
     rt.furTag = {};
     const tagSvg = tags.map(([o, n, done, can]) => {
       // 책상 이름표는 책상 위에 달아서, 바로 앞 의자 이름표와 겹치지 않게 해요
-      const id = FUR[k][o.i].id, lay = furLay(k, id), up = (id === 'desk' || lay.on) ? lay.w * furDepth(o.y) * FUR_AR[id] + 10 : 0;   // 1.7.0: 다른 가구 위에 올린 것도 이름표를 위에
+      const id = FUR[k][o.i].id, lay = furLay(k, id), up = (id === 'desk' || lay.on) ? lay.w * furDepth(o.y) * FUR_AR[id] + 10 : 0;   // 다른 가구 위에 올린 것도 이름표를 위에
       const tx = Math.max(20, Math.min(300, o.x)), ty = Math.min(221, Math.max(14, o.y + 6 - up));
       rt.furTag[o.i] = [tx, ty];
       const isRec = rt.rec && rt.rec.kind === 'fur' && rt.rec.k === k && rt.rec.i === o.i;
       return `<g class="fur-tagg${isRec ? ' rec' : done ? ' done' : can ? ' can' : ''}" data-fur="${o.i}"><rect x="${tx - 19}" y="${ty - 8}" width="38" height="15" rx="7.5" class="fur-tag"/><text x="${tx}" y="${ty + 3.2}" text-anchor="middle" class="fur-tag-t">${n ? 'Lv.' + n : '없음'}</text></g>`;
     }).join('');
-    return roomImg(k) + body + '<g id="roomWalk" class="room-walk" aria-hidden="true"></g>' + tagSvg;   // 1.7.1 방 안을 걷는 선생님과 학생은 가구 위, 이름표 아래
+    return roomImg(k) + body + '<g id="roomWalk" class="room-walk" aria-hidden="true"></g>' + tagSvg;   // 방 안을 걷는 선생님과 학생은 가구 위, 이름표 아래
   }
   function renderFur() {
     const k = rt.sheetKey, box = $('#furBox');
@@ -448,7 +448,7 @@
     box.hidden = false;
     const L = S.f[k];
     const rec = rt.rec && rt.rec.kind === 'fur' && rt.rec.k === k ? rt.rec.i : -1;
-    // 2.3.1 woodani 제보(업그레이드, 공사 단추를 누를 때 화면이 깜빡임): 도토리가 바뀌어 '올릴 수 있음' 표시만 달라질 때도 방 그림 전체(큰 방 그림과 걷는 친구)를
+    // 도토리가 바뀌어 '올릴 수 있음' 표시만 달라질 때도 방 그림 전체(큰 방 그림과 걷는 친구)를
     // 다시 그려서 깜빡였어요. 방은 건물, 레벨, 가구가 바뀔 때만 다시 그리고, 살 수 있는지는 이름표 색만 바꿔요
     const aff = FUR[k].map((_, i) => S.budget >= furCost(k, i) ? 1 : 0).join('');
     const sk = [k, L, rec, new Date().getDay(), S.fu[k].join(',')].join('|'), key = sk + '|' + aff;
@@ -456,7 +456,7 @@
     const same = !!rt.furKey && rt.furKey.startsWith(sk + '|');
     rt.furKey = key;
     if (same) $$('#furScene .fur-tagg').forEach(t => { const i = +t.dataset.fur, n = S.fu[k][i], done = n >= L; if (!t.classList.contains('rec')) t.classList.toggle('can', !done && S.budget >= furCost(k, i)); });
-    else { $('#furScene').innerHTML = blobHtml(renderFurScene(k)); walkBuild(k); }   // 1.7.1   // 3.0.0 Blob 주소로
+    else { $('#furScene').innerHTML = blobHtml(renderFurScene(k)); walkBuild(k); }   // Blob 주소로
     $('#furScene').setAttribute('aria-label', `${FAC[k].name} 안`);
     $('#furList').innerHTML = FUR[k].map((F, i) => {
       const n = S.fu[k][i], done = n >= L, c = furCost(k, i), ok = !done && S.budget >= c, st = furStage(n);
@@ -493,18 +493,18 @@
     return base * (CFG.gradeMult - 1) * Math.min(1, dRep / need);
   }
   const furLeftCost = k => S.f[k] < 1 ? 0 : FUR[k].reduce((a, _, i) => {
-    let c = 0; for (let n = S.fu[k][i]; n < S.f[k]; n++) c += Math.ceil(softCost(FAC[k].cost, n + 1 + (FAC[k].lvOff || 0), SOFT.fac) * FUR_SHARE[i] * costScale() * taFurMul(k));   /* 5.1.0 */   // 5.0.0 lvOff
+    let c = 0; for (let n = S.fu[k][i]; n < S.f[k]; n++) c += Math.ceil(softCost(FAC[k].cost, n + 1 + (FAC[k].lvOff || 0), SOFT.fac) * FUR_SHARE[i] * costScale() * taFurMul(k));       // lvOff
     return a + c;
   }, 0);
   const cheapestFur = k => FUR[k].map((_, i) => i).filter(i => !furDone(k, i)).sort((a, b) => furCost(k, a) - furCost(k, b))[0];
-  const facAllNext = (n, ks) => (ks || CAMPUS8).filter(k => (S.f[k] || 0) < n && !facBusy(k)).sort((a, b) => facCost(a) - facCost(b))[0];   // 5.0.1.3 facAll 퀘스트에서 다음에 올릴 건물(가장 싼 것)
+  const facAllNext = (n, ks) => (ks || CAMPUS8).filter(k => (S.f[k] || 0) < n && !facBusy(k)).sort((a, b) => facCost(a) - facCost(b))[0];   // facAll 퀘스트에서 다음에 올릴 건물(가장 싼 것)
   const facPick = k => furReady(k) ? { kind: 'fac', k } : { kind: 'fur', k, i: cheapestFur(k) };
   // mode: 'rep' 평판을 가장 싸게, 'rate' 수업료를 가장 싸게, 없으면 학교가 가장 크게 자라는 것
   function valuePick(mode) {
     const base = potRate(), r0 = rep(), opts = [];
     const worth = (pr, rp) => mode === 'rep' ? rp - r0 : mode === 'rate' ? pr - base : pr - base + repWorth(rp - r0, base);
     for (const k of facKeys()) {
-      if (facBusy(k)) continue;   // 2.1.0 공사 중인 건물은 빼요
+      if (facBusy(k)) continue;   // 공사 중인 건물은 빼요
       const cost = furLeftCost(k) + facCost(k);
       const [pr, rp] = withTry(() => { S.f[k] += 1; S.students = capacity(); }, () => [rate(), rep()]);
       opts.push({ v: worth(pr, rp) / Math.max(1, cost), pick: facPick(k) });
@@ -551,7 +551,7 @@
   /* 초반 준비물: 초등학교 1학년까지는 메인 퀘스트를 받을 때 교감 선생님이 다음 퀘스트에 드는 도토리가 모자라면 채워 줘요.
      그래서 켜 놓고 퀘스트를 따라가면 막히지 않고, 초등학교 2학년부터 처음으로 끄고 쉬었다 와야 하는 때가 와요.
      다음 퀘스트에 드는 도토리는 추천과 같은 방법으로 사 가며 어림해요(가상으로만 사고 원래대로 돌려놓아요) */
-  const prepPhase = () => S.tier === 0;   // 1.3.0: 교감 선생님 지원은 유치원까지만
+  const prepPhase = () => S.tier === 0;   // 교감 선생님 지원은 유치원까지만
   const PREP_TYPES = new Set(['fac', 'facAll', 'fur', 'furAll', 'tea', 'teaAll', 'students', 'grade', 'ygrade', 'rate']);
   function needCost(q) {
     if (q && q.t === 'tier' && finalYear()) q = { t: 'ygrade', n: GRAD_MIN };   // 졸업식 퀘스트는 마지막 해 대도시가 되는 데 드는 도토리로 쳐요

@@ -4,7 +4,7 @@
      쓰는 곳은 꾸미기와 테마 세트(계속 남아요), 부스터(1회 사용 가능). 뽑기 없이 정해진 값으로만 팔아요.
      토스 미니앱에서는 광고 그룹의 보상 이름을 '황금 도토리', 수량을 3으로 맞춰 두면 광고 화면에도 똑같이 보여요. */
   const GOLD = { hard: 1, adDay: 3, ad: 1, shopAd: 3, shopAdN: 3, att: 1, att7: 1, chapter: 1, grad: 1, promote: 1, rich: 60, essPer: 20 };
-  // 4.2.0 woodani 결정(2026-11-13): 지금까지 받은 황금 도토리가 60개(테마를 체험할 만큼)를 넘으면, 매일 매주 되풀이해 나오는 곳은 황금 도토리 1개 대신 숲의 정수 20을 줘요.
+  // 지금까지 받은 황금 도토리가 60개(테마를 체험할 만큼)를 넘으면, 매일 매주 되풀이해 나오는 곳은 황금 도토리 1개 대신 숲의 정수 20을 줘요
   // 광고, 상점 광고, 축제와 대축제 도장판, 이벤트 기념 상자, 장 끝, 졸업, 학교급 올라가기, 마을 기부, 한 번만 나오는 보상은 그대로예요
   const goldRich = () => !!S && (S.st.gold || 0) >= GOLD.rich;
   function goldOr(n, why) {
@@ -18,17 +18,17 @@
     cap: '<path d="M-6.2 -3.2 Q-6.4 -9.6 0 -9.8 Q6.4 -9.6 6.2 -3.2 Z" class="h-cap"/><path d="M-2 -3.6 Q4.6 -5.2 9.6 -3 Q4.8 -1.9 -2 -2.5 Z" class="h-cap2"/><circle cx="0" cy="-9.6" r="0.9" class="h-cap2"/>',
     beanie: '<path d="M-6.4 -2.6 Q-6.6 -10.2 0 -10.4 Q6.6 -10.2 6.4 -2.6 Z" class="h-bean"/><rect x="-6.9" y="-4.4" width="13.8" height="2.8" rx="1.3" class="h-bean2"/><circle cx="0" cy="-10.8" r="2" class="h-bean2"/>',
     straw: '<ellipse cx="0" cy="-4.2" rx="9.4" ry="2.1" class="h-straw"/><path d="M-4.9 -4.2 Q-5.1 -9.6 0 -9.8 Q5.1 -9.6 4.9 -4.2 Z" class="h-straw"/><path d="M-4.9 -5.4 Q0 -4.4 4.9 -5.4" class="s-hband"/>',
-    beret: '<ellipse cx="0.6" cy="-5.8" rx="7" ry="3.4" class="h-beret"/><path d="M-6 -4.4 Q0 -2.8 6.6 -4.6" class="s-beret"/><circle cx="1.4" cy="-9.4" r="0.9" class="h-beret2"/>',   // 2.1.0 옷 세트
+    beret: '<ellipse cx="0.6" cy="-5.8" rx="7" ry="3.4" class="h-beret"/><path d="M-6 -4.4 Q0 -2.8 6.6 -4.6" class="s-beret"/><circle cx="1.4" cy="-9.4" r="0.9" class="h-beret2"/>',   // 옷 세트
     bucket: '<path d="M-5 -3.8 L-4.4 -9 Q0 -10.4 4.4 -9 L5 -3.8 Z" class="h-bucket"/><path d="M-8.4 -3.4 Q0 -5.6 8.4 -3.4 Q0 -1.4 -8.4 -3.4 Z" class="h-bucket2"/>',
     flower: '<path d="M-5.8 -2.8 Q0 -9 5.8 -2.8" class="s-band"/><circle cx="-3.4" cy="-6.3" r="1.7" class="h-fl"/><circle cx="0" cy="-7.4" r="1.9" class="h-fl"/><circle cx="3.4" cy="-6.3" r="1.7" class="h-fl"/><circle cx="0" cy="-7.4" r="0.8" class="h-fl2"/>'
   };
-  // 1.6.0 그림 모자(cos_hat_*): 작업지시서 3의 자리 안내(512칸, 아랫단 가운데가 y 360)에 맞춰 머리 위에 올려요
-  const hatSVG = id => (HATS[id] && IMG('cos_hat_' + id) ? `<image href="${IMG('cos_hat_' + id)}" x="-8" y="-17.6" width="16" height="16"/>` : '') || HATS[id] ||   // 3.1.2 그림 모자(작업지시서 52)
+  // 그림 모자(cos_hat_*): 작업지시서 3의 자리 안내(512칸, 아랫단 가운데가 y 360)에 맞춰 머리 위에 올려요
+  const hatSVG = id => (HATS[id] && IMG('cos_hat_' + id) ? `<image href="${IMG('cos_hat_' + id)}" x="-8" y="-17.6" width="16" height="16"/>` : '') || HATS[id] ||   // 그림 모자(작업지시서 52)
     (IMG('cos_hat_' + id) ? `<image href="${IMG('cos_hat_' + id)}" x="-11.2" y="-18.75" width="22.4" height="22.4"/>` : '');
   const NECKS = {
     scarf: '<path d="M-4.8 5 Q0 7.2 4.8 5 L4.8 7 Q0 9.2 -4.8 7 Z" class="n-scarf"/><rect x="1.6" y="6.6" width="2.4" height="4.6" rx="1" class="n-scarf2"/>',
     bow: '<path d="M0 6.6 L-3.4 4.8 L-3.4 8.4 Z M0 6.6 L3.4 4.8 L3.4 8.4 Z" class="n-bow"/><circle cx="0" cy="6.6" r="1.1" class="n-bow2"/>',
-    // 2.1.0 학생 옷 세트의 새 목 장식(그림 없이 그려요)
+    // 학생 옷 세트의 새 목 장식(그림 없이 그려요)
     bandana: '<path d="M-4.8 5 Q0 6.6 4.8 5 L0 10.4 Z" class="n-band"/><circle cx="0" cy="5.9" r="0.9" class="n-band2"/>',
     lei: '<circle cx="-4.4" cy="5.3" r="1.3" class="n-lei1"/><circle cx="-2.3" cy="6.7" r="1.3" class="n-lei2"/><circle cx="0" cy="7.2" r="1.3" class="n-lei1"/><circle cx="2.3" cy="6.7" r="1.3" class="n-lei2"/><circle cx="4.4" cy="5.3" r="1.3" class="n-lei1"/>',
     tie: '<path d="M-1.3 5.2 H1.3 L0.8 6.6 L1.7 10.6 L0 11.9 L-1.7 10.6 L-0.8 6.6 Z" class="n-tie"/><path d="M-1.3 5.2 H1.3 L0.8 6.6 H-0.8 Z" class="n-tie2"/>',
@@ -39,18 +39,18 @@
       { id: 'cap', name: '파란 야구모자', price: 8 }, { id: 'beanie', name: '빨간 털모자', price: 10 },
       { id: 'straw', name: '밀짚모자', price: 10 }, { id: 'flower', name: '꽃 머리띠', price: 12 },
       { id: 'crown', name: '금빛 왕관', price: 0, ex: true },
-      // 1.6.0 한정 모자: 정수 상점에서 숲의 정수로만 사요(ess). 그림(cos_hat_*)으로 그려요
+      // 한정 모자: 정수 상점에서 숲의 정수로만 사요(ess). 그림(cos_hat_*)으로 그려요
       { id: 'grad', name: '졸업모', price: 0, ess: 1, img: 1 }, { id: 'santa', name: '산타 모자', price: 0, ess: 1, img: 1 },
       { id: 'wizard', name: '마법사 모자', price: 0, ess: 1, img: 1 }, { id: 'mushroom', name: '버섯 모자', price: 0, ess: 1, img: 1 },
       { id: 'laurel', name: '월계관', price: 0, ess: 1, img: 1 },
-      // 2.1.0 학생 옷 세트로만 사요(out). price는 옛 값(1.x 황금 상점)이라 이미 산 조각만큼 세트 값을 빼는 데 써요
+      // 학생 옷 세트로만 사요(out). price는 옛 값(1.x 황금 상점)이라 이미 산 조각만큼 세트 값을 빼는 데 써요
       { id: 'beret', name: '보라 베레모', price: 0, out: 1 }, { id: 'bucket', name: '초록 벙거지', price: 0, out: 1 }] },
     neck: { name: '학생 목 장식', items: [
       { id: 'scarf', name: '빨간 목도리', price: 8 }, { id: 'bow', name: '나비넥타이', price: 8 },
       { id: 'bandana', name: '노란 손수건', price: 0, out: 1 }, { id: 'lei', name: '꽃 목걸이', price: 0, out: 1 },
       { id: 'tie', name: '빨간 넥타이', price: 0, out: 1 }, { id: 'bell', name: '방울 목걸이', price: 0, out: 1 }] }
   };
-  /* 2.1.0 꾸미기 백화점 값(속도와 경제 재설계안 3절, Fable). 황금 도토리는 큰 꾸미기에만 써요(힘은 사지 않아요).
+  /* 꾸미기 백화점 값(속도와 경제 재설계안 3절, Fable). 황금 도토리는 큰 꾸미기에만 써요(힘은 사지 않아요)
      테마 세트는 한 번에만 사요(이미 그 테마 배경을 샀으면 10 빼요). 옷 세트는 이미 산 조각의 옛 값만큼 빼요 */
   const GSHOP = { theme: 60, themeBgOff: 10, outfit: 25, outfitMin: 5, evDeco: 20, mark: 30 };
   const OUTFITS = [
@@ -70,8 +70,8 @@
     ribbon: '<path d="M8 76 H24 V94 L16 88 L8 94 Z M76 76 H92 V94 L84 88 L76 94 Z" fill="#B13F38"/><path d="M14 72 H86 V88 H14 Z" fill="#D9534A"/><path d="M18 76 H82" stroke="#FFF1E6" stroke-width="1.4" opacity=".8"/>',
     star: '<path d="M14 6 l3 7 7 1 -5 5 1.5 7 -6.5 -3.5 -6.5 3.5 1.5 -7 -5 -5 7 -1z" fill="#F2C230"/><path d="M86 6 l3 7 7 1 -5 5 1.5 7 -6.5 -3.5 -6.5 3.5 1.5 -7 -5 -5 7 -1z" fill="#F2C230"/><path d="M86 74 l2 4.6 4.6 .6 -3.4 3.2 1 4.6 -4.2 -2.3 -4.2 2.3 1 -4.6 -3.4 -3.2 4.6 -.6z" fill="#FFE38A"/>'
   };
-  const NIGHT_KEY = 'night:map';   // 2.1.0 밤 모드(문방구, 숲의 정수) 소유 열쇠
-  // 2.0.0 이벤트 한정 학생 모자(작업지시서 27, 2026-10-27 woodani): 그 이벤트 도장 7개를 다 모으면 받아요. 상점에서는 팔지 않고 받은 뒤에만 보여요. 그림(cos_hat_ev_*)이 들어오기 전에는 나오지 않아요
+  const NIGHT_KEY = 'night:map';   // 밤 모드(문방구, 숲의 정수) 소유 열쇠
+  // 이벤트 한정 학생 모자(작업지시서 27): 그 이벤트 도장 7개를 다 모으면 받아요. 상점에서는 팔지 않고 받은 뒤에만 보여요. 그림(cos_hat_ev_*)이 들어오기 전에는 나오지 않아요
   const EV_HAT = [['harvest', '도토리 모자'], ['friends', '무지개 리본 머리띠'], ['books', '책 핀 베레모'], ['lunch', '요리사 모자'], ['exam', '응원 머리띠'], ['xmas', '루돌프 머리띠'],
     ['newyear', '해님 머리띠'], ['winter1', '하늘색 귀마개'], ['winter2', '눈송이 털모자'], ['seollal', '조바위'], ['grad', '꽃 화관'], ['spring', '벚꽃 머리핀'], ['trip_spring', '노란 소풍 모자'],
     ['science', '실험 고글'], ['children', '바람개비 모자'], ['buddha', '연꽃 머리 장식'], ['final', '연필 머리띠'], ['vacation', '물안경'], ['liberation', '무궁화 머리핀'],
@@ -79,13 +79,13 @@
   for (const [k, name] of EV_HAT) COS.hat.items.push({ id: 'ev_' + k, name, price: 0, evh: 1, img: 1 });
   const evHatArt = id => !!IMG('cos_hat_' + id);
   const COS_IDS = new Set(Object.keys(COS).flatMap(k => COS[k].items.map(it => k + ':' + it.id)));
-  MARKX.forEach(([x]) => COS_IDS.add('mkx:' + x)); COS_IDS.add(NIGHT_KEY);   // 2.1.0
-  const SP_IDS = new Set(['aquarium', 'cake', 'globelamp', 'dino', 'carousel'].map(id => 'sp:' + id));   // 1.6.0 특별 가구(정수 상점) 소유 열쇠
-  /* 테마 세트: 테마마다 배경, 교실, 급식실, 도서관, 과학실, 운동장을 따로 사서 꾸며요.
-     여섯 개를 모두 모으면 세트 효과로 수업료가 올라요. 3.0.0 조정안 3: 모든 세트가 같은 값이라 효과도 세트마다 +3%, 일곱 벌 모두 +21%예요(세트마다 더해져요).
-     색은 건물 그룹에 CSS 변수로 덮어쓰고, 처마에는 테마 장식(가랜드, 전구, 고드름...)을 달아요 */
+  MARKX.forEach(([x]) => COS_IDS.add('mkx:' + x)); COS_IDS.add(NIGHT_KEY);
+  const SP_IDS = new Set(['aquarium', 'cake', 'globelamp', 'dino', 'carousel'].map(id => 'sp:' + id));   // 특별 가구(정수 상점) 소유 열쇠
+  /* 테마 세트: 테마마다 배경, 교실, 급식실, 도서관, 과학실, 운동장을 따로 사서 꾸며요
+     여섯 개를 모두 모으면 세트 효과로 수업료가 올라요. 조정안 3: 모든 세트가 같은 값이라 효과도 세트마다 +3%, 일곱 벌 모두 +21%예요(세트마다 더해져요)
+     색은 건물 그룹에 CSS 변수로 덮어쓰고, 처마에는 테마 장식(가랜드, 전구, 고드름)을 달아요 */
   const TH_SLOTS = [['bg', '배경'], ['classroom', '교실'], ['cafeteria', '급식실'], ['library', '도서관'], ['science', '과학실'], ['playground', '운동장']];
-  const TH_SET_PER = 3;   // 3.0.0 조정안 3: 완성한 세트 하나의 수업료 효과(%). 예전에는 가장 비싼 세트 +30%, 합계 +162%
+  const TH_SET_PER = 3;   // 조정안 3: 완성한 세트 하나의 수업료 효과(%). 예전에는 가장 비싼 세트 +30%, 합계 +162%
   const THEMES = [
     { id: 'spring', page: '#F3DDE4', board: '#5A3846', boardLine: '#74495B', name: '봄 벚꽃', price: 10, bgPrice: 15, fx: 'petal', motif: 'flowers', deco: ['#F5B3C6', '#FFFFFF', '#E796AE'],
       bg: { '--grass': '#D3E6B2', '--grass-deep': '#C1DA9A', '--leaf-1': '#F2B8C9', '--leaf-2': '#E89BB3', '--leaf-3': '#F7D3DE', '--path': '#F2E4CC' },
@@ -127,7 +127,7 @@
   const setBonusMult = () => 1 + (rt.thBonus || 0) / 100;
   // 처마 장식
   function thMotif(t, x1, x2, y) {
-    if (IMG('th_eave_' + t.id)) { const w = x2 - x1 + 6; return `<image href="${IMG('th_eave_' + t.id)}" x="${(x1 - 3).toFixed(1)}" y="${(y - 1.5).toFixed(1)}" width="${w.toFixed(1)}" height="${(w * 96 / 512).toFixed(1)}" preserveAspectRatio="none"/>`; }   // 3.1.2 그림 처마 띠
+    if (IMG('th_eave_' + t.id)) { const w = x2 - x1 + 6; return `<image href="${IMG('th_eave_' + t.id)}" x="${(x1 - 3).toFixed(1)}" y="${(y - 1.5).toFixed(1)}" width="${w.toFixed(1)}" height="${(w * 96 / 512).toFixed(1)}" preserveAspectRatio="none"/>`; }   // 그림 처마 띠
     const [a, b, c] = t.deco, n = Math.max(4, Math.round((x2 - x1) / 13)), step = (x2 - x1) / n;
     let h = '';
     if (t.motif === 'bunting' || t.motif === 'flowers' || t.motif === 'leaves') {
@@ -159,7 +159,7 @@
     }
     return h;
   }
-  /* 4.4.1.2 woodani 요청: 저장 안 된 테마로 바꾸면 그림을 받는 동안 화면이 깨져 보여요.
+  /* 저장 안 된 테마로 바꾸면 그림을 받는 동안 화면이 깨져 보여요
      테마가 바뀔 때만 '테마 적용 중' 창을 덮고, 지도 그림을 다 받으면 걷어요(적어도 1초, 길어도 3초) */
   function themeVeil() {
     let v = $('#thVeil');
@@ -175,26 +175,26 @@
   function applyThemes() {
     const map = $('#map'), board = $('.board');
     { const sig = JSON.stringify(thOn()); if (rt.thSig != null && rt.thSig !== sig && (!window.__FOREST_TEST || window.__THVEIL)) themeVeil(); rt.thSig = sig; }
-    const bgT = THEME[thOn().bg];   // 3.0.0 미리 보기 중에는 미리 보는 테마
-    hudTheme();   // 4.4.1 현황판 틀도 테마 색으로
+    const bgT = THEME[thOn().bg];   // 미리 보기 중에는 미리 보는 테마
+    hudTheme();   // 현황판 틀도 테마 색으로
     // 지도 크기와 위치(fitMap)는 그대로 두고 테마 색만 지워요
     for (const T of THEMES) for (const k of Object.keys(T.bg)) map.style.removeProperty(k);
     board.removeAttribute('style'); board.removeAttribute('data-thf');
     document.body.classList.toggle('th-bg', !!bgT);
     document.body.style.setProperty('--th-bg', bgT ? bgT.page : '');
-    setMapArt(); setSeasonArt();   // 1.7.0 테마 지도와 겨울 건물, 계절 참나무
+    setMapArt(); setSeasonArt();   // 테마 지도와 겨울 건물, 계절 참나무
     const dz = $('#thDeco');
     if (dz) {
-      const tint = bgT && (has170(`${geo().map}_${bgT.id}`) || MAP_FILES.has(`${geo().map}_${bgT.id}`)) ? null :   /* 4.1.1 파일로만 있는 테마 지도(대학교)도 덮는 색을 꺼요 */ { space: ['#1B1F45', 0.45], retro: ['#B98A3E', 0.22] }[bgT && bgT.id];   // 3.0.0 작업지시서 46: 테마 지도 그림이 있으면 덮는 색을 꺼요(2.3.3은 그림 위에 또 덮었어요)
+      const tint = bgT && (has170(`${geo().map}_${bgT.id}`) || MAP_FILES.has(`${geo().map}_${bgT.id}`)) ? null :   /* 파일로만 있는 테마 지도(대학교)도 덮는 색을 꺼요 */ { space: ['#1B1F45', 0.45], retro: ['#B98A3E', 0.22] }[bgT && bgT.id];   // 작업지시서 46: 테마 지도 그림이 있으면 덮는 색을 꺼요(은 그림 위에 또 덮었어요)
       const own = bgT && IMG(`deco_${bgT.id}_1`);
       dz.innerHTML = (tint ? `<rect x="-300" y="-300" width="960" height="1020" fill="${tint[0]}" opacity="${tint[1]}" style="mix-blend-mode:multiply"/>` : '') +
         (own ? geo().deco.map(([x, y], i) => `<image x="${x - 24}" y="${y - 30}" width="48" height="48" href="${IMG(`deco_${bgT.id}_${i % 3 + 1}`)}"/>`).join('') : '');
-      renderDeco(true);   // 1.7.4 장식과 간판 가까이의 스티커는 숨겨요
+      renderDeco(true);   // 장식과 간판 가까이의 스티커는 숨겨요
     }
     if (bgT) {
       for (const [k, v] of Object.entries(bgT.bg)) map.style.setProperty(k, v);
       board.style.setProperty('--board', bgT.board); board.style.setProperty('--board-line', bgT.boardLine);
-      // 3.0.0 woodani 요청: 위쪽 도토리 칸(초록 고정)도 테마 칠판 색으로
+      // 위쪽 도토리 칸(초록 고정)도 테마 칠판 색으로
       board.style.setProperty('--th-forest', bgT.board); board.style.setProperty('--th-forest-deep', `color-mix(in srgb, ${bgT.board} 75%, #000)`); board.setAttribute('data-thf', '');
     }
     for (const [slot] of TH_SLOTS) {
@@ -212,8 +212,8 @@
       const roof = $('.roofimg', g);
       if (roof) roof.style.display = t ? '' : 'none';
       if (!t) continue;
-      // 1.6.0: 겨울 테마 운동장은 트랙을 하늘색으로 칠하거나 고드름을 달지 않아요(얼음판처럼 보여 어색해요). 사도 운동장은 원래 모습이에요
-      const thr = !!thrKey(slot);   // 5.1.1.4 새로 그린 테마 지붕: 처마 띠는 끄고(지붕 그림에 장식이 있어요), 겨울 운동장도 켜요
+      // 겨울 테마 운동장은 트랙을 하늘색으로 칠하거나 고드름을 달지 않아요(얼음판처럼 보여 어색해요). 사도 운동장은 원래 모습이에요
+      const thr = !!thrKey(slot);   // 새로 그린 테마 지붕: 처마 띠는 끄고(지붕 그림에 장식이 있어요), 겨울 운동장도 켜요
       if (slot === 'playground' && t.id === 'winter' && !thr) { if (roof) roof.style.display = 'none'; continue; }
       if (roof) $(`#rt-${slot} feFlood`).setAttribute('flood-color', slot === 'playground' && S.tier >= 1 ? t.play['--track'] : t.bld['--roof']);
       const vars = slot === 'library' ? t.lib : slot === 'playground' ? Object.assign({}, t.bld, t.play) : t.bld;
@@ -221,11 +221,11 @@
       deco.innerHTML = thr ? '' : thMotif(t, ...thEaves(slot));
     }
     rt.thBonus = thSetsDone();
-    renderNight(true);   // 2.1.0 밤 모드
+    renderNight(true);   // 밤 모드
   }
   // 상점 그림: 칸마다 작은 건물 모양을 그 테마 색으로 그려요
   function thArt(t, slot) {
-    if (IMG('th_slot_' + slot)) return `<svg viewBox="0 0 40 40" aria-hidden="true"><rect width="40" height="40" rx="7" fill="${t.page}"/><image href="${IMG('th_slot_' + slot)}" x="2" y="2" width="36" height="36"/></svg>`;   // 3.1.2 그림 칸 아이콘, 바탕은 테마 색
+    if (IMG('th_slot_' + slot)) return `<svg viewBox="0 0 40 40" aria-hidden="true"><rect width="40" height="40" rx="7" fill="${t.page}"/><image href="${IMG('th_slot_' + slot)}" x="2" y="2" width="36" height="36"/></svg>`;   // 그림 칸 아이콘, 바탕은 테마 색
     const B = t.bld, BG = t.bg, P = t.play, L = t.lib;
     const ground = `<rect x="0" y="0" width="40" height="40" fill="${BG['--grass']}"/>`;
     if (slot === 'bg') {
@@ -241,7 +241,7 @@
     if (slot === 'science') return `<svg viewBox="0 0 40 40" aria-hidden="true">${ground}<path d="M12 19 Q12 9 20 9 Q28 9 28 19 Z" fill="${B['--roof-2']}"/><rect x="10" y="19" width="20" height="15" rx="1.5" fill="${B['--wall']}"/><rect x="9" y="18" width="22" height="2.4" rx="1" fill="${B['--roof-edge']}"/><circle cx="20" cy="25" r="3" fill="${B['--window'] || '#BEE0EA'}"/><path d="M28 11 l5 -4" stroke="#6E4A2E" stroke-width="1"/></svg>`;
     return `<svg viewBox="0 0 40 40" aria-hidden="true">${ground}<rect x="9" y="19" width="22" height="15" fill="${B['--wall']}"/><path d="M5 21 L20 8 L35 21 Z" fill="${B['--roof']}"/><rect x="6" y="20" width="28" height="2" fill="${B['--roof-edge']}"/><rect x="12" y="24" width="5" height="4" rx="1" fill="${B['--window'] || '#BEE0EA'}"/><rect x="23" y="24" width="5" height="4" rx="1" fill="${B['--window'] || '#BEE0EA'}"/><rect x="18" y="27" width="4" height="7" fill="#8A5D3B"/><path d="M9 21 Q20 25 31 21" stroke="${t.deco[0]}" stroke-width="1.4" fill="none"/></svg>`;
   }
-  // 2.1.0 테마 세트는 한 번에만 사요(값 60, 그 테마 배경을 이미 샀으면 50). 이미 산 칸은 그대로 칸마다 쓰고 벗을 수 있어요
+  // 테마 세트는 한 번에만 사요(값 60, 그 테마 배경을 이미 샀으면 50). 이미 산 칸은 그대로 칸마다 쓰고 벗을 수 있어요
   const thSetPrice = t => GSHOP.theme - (thOwn(t, 'bg') ? GSHOP.themeBgOff : 0);
   function renderThemes(coin) {
     let h = `<h3 class="shop-h">테마 세트 <small>지도, 지붕 색, 테마 곡 한 벌. 가지면 수업료 +3%</small></h3>`;
@@ -276,7 +276,7 @@
     skip: '<svg viewBox="-12 -12 24 24" aria-hidden="true"><circle r="9" class="c-clock"/><path d="M0 -5.6 V0 L4 2.6" fill="none" stroke="#6D4828" stroke-width="1.8" stroke-linecap="round"/></svg>',
     auto: '<svg viewBox="-12 -13 24 24" aria-hidden="true"><g transform="scale(1.25)">' + ACORN + '</g><path d="M6 -10 l1.2 2.6 2.6 1.2 -2.6 1.2 -1.2 2.6 -1.2 -2.6 -2.6 -1.2 2.6 -1.2 Z" class="c-gnut"/></svg>'
   };
-  for (const k of Object.keys(BOOST_ART)) if (IMG('boost_' + k)) BOOST_ART[k] = `<svg viewBox="-12 -12 24 24" aria-hidden="true"><image href="${IMG('boost_' + k)}" x="-12" y="-12" width="24" height="24"/></svg>`;   // 3.1.2 작업지시서 52
+  for (const k of Object.keys(BOOST_ART)) if (IMG('boost_' + k)) BOOST_ART[k] = `<svg viewBox="-12 -12 24 24" aria-hidden="true"><image href="${IMG('boost_' + k)}" x="-12" y="-12" width="24" height="24"/></svg>`;   // 작업지시서 52
   const GOLD_ICON = IMG('ic_gold_acorn') ? `<svg viewBox="-8 -11 16 20" aria-hidden="true"><image href="${IMG('ic_gold_acorn')}" x="-8" y="-9" width="16" height="16"/></svg>` : '<svg viewBox="-8 -11 16 20" aria-hidden="true"><path d="M-4.6 -1 Q-4.9 5.4 0 7.4 Q4.9 5.4 4.6 -1 Z" class="c-gnut"/><ellipse cx="-1.8" cy="2" rx="0.9" ry="2.1" class="c-gshine"/><path d="M-5.8 -0.8 Q-5.8 -6.2 0 -6.6 Q5.8 -6.2 5.8 -0.8 Q0 0.8 -5.8 -0.8 Z" class="c-gcap"/><path d="M-4 -3.2 H4 M-2.8 -5 H2.8" class="s-gline"/><path d="M0 -6.6 L0.9 -9.2" class="s-gstem"/></svg>';
   // 조금 어려운 퀘스트: 선생님 모두 키우기, 초당 도토리, 학생 50명 넘게, 시설 Lv.10 넘게, 도토리 15개 넘게 줍기.
   // 학생 부탁은 처음 한 번만 오는 이야기 부탁(s로 시작)만 쳐요. 반복 부탁은 끝없이 와서 넣지 않아요
@@ -295,5 +295,5 @@
     if (rt.tab === 'street') renderStreet();
   }
   // 광고를 끝까지 보면 덤으로 3개 (상점 광고와 합쳐 하루 3번까지)
-  // 4.2.0 woodani 제보: 광고를 끝까지 보면 받는 황금 도토리가 보이지 않았어요. 보상 창 뒤에 한 줄로 알려요
+  // 광고를 끝까지 보면 받는 황금 도토리가 보이지 않았어요. 보상 창 뒤에 한 줄로 알려요
   function adGold() { goldDay(); if (S.gd.n >= GOLD.adDay) return; S.gd.n += 1; addGold(GOLD.ad); setTimeout(() => toast(`광고 선물! 황금 도토리 +${GOLD.ad} (오늘 ${S.gd.n}/${GOLD.adDay})`), 1300); }

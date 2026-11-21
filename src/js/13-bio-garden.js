@@ -6,17 +6,17 @@
      2.3.5: 90종으로. 60종 황금 도토리 3과 곤충 호텔, 90종 숲의 정수 50과 생태 연못, 칭호 숲속 박사 */
   const BX = { tier: 1, every: 2 * 3600000, max: 3, rare0: 4, rareMax: 8, xpNew: 10, xpDup: 3, essNew: 1, dupMin: 3, gold10: 1, ess20: 20, gold60: 3, ess90: 50 };
   // 지도(geoIdx)마다 [가로 %, 세로 %, 물가면 1]. 장식 자리, 건물 빈터(울타리 안), 길을 피했어요
-  // 2.3.0.1 woodani 제보(학교 행사 단추가 청설모를 가림): 왼쪽 단추 줄, 오른쪽 단추 줄, 아래 칩, 화면 밖(가장자리 11%)에 걸리던 자리를 안쪽 풀숲과 물가로 옮겼어요
-  // 3.0.0 woodani 제보(중학교 과학실 뒤 생물을 누르기 힘듦): 건물 누르는 칸과 이름표에 가리던 자리를 손가락이 다 닿는 풀밭과 호수로 옮겼어요(390px, 360px에서 잼)
-  const BX_SPOT = [null,   // 3.3.0 새 단장: 빈 풀밭과 길가에서 서로 멀리 6곳(첫째는 물가)
+  // 왼쪽 단추 줄, 오른쪽 단추 줄, 아래 칩, 화면 밖(가장자리 11%)에 걸리던 자리를 안쪽 풀숲과 물가로 옮겼어요
+  // 건물 누르는 칸과 이름표에 가리던 자리를 손가락이 다 닿는 풀밭과 호수로 옮겼어요(390px, 360px에서 잼)
+  const BX_SPOT = [null,   // 새 단장: 빈 풀밭과 길가에서 서로 멀리 6곳(첫째는 물가)
     [[10, 78, 1], [79, 18, 0], [85, 64, 0], [46, 76, 0], [49, 18, 0], [28, 76, 0]],
     [[79, 20, 1], [10, 82, 0], [62, 46, 0], [49, 64, 0], [49, 80, 0], [28, 24, 0]],
-    [[80, 19.5, 1], [24, 81, 0], [52, 49.5, 0], [10, 62, 0], [56, 72, 0], [48, 27, 0]]];   // 3.3.0 건물을 빈터에 꽉 맞춘 뒤 다시 골랐어요(가장자리 단추와 건물 누르는 칸에 안 가리게, 390px와 360px 모두)   // 3.0.0 고등학교   // 4.4.1 현황판이 낮아져 왼쪽 단추가 올라와서 [10, 62]로 옮김(예전 [10, 54])
-  // 4.0.0 구역 지도마다 6곳(구역 그림의 빈 풀밭, 첫째는 물가. 광장 구역에는 물가가 없어요). 캠퍼스 지도에는 없어요
-  BX_SPOT.push([[94, 46, 1], [65, 28, 0], [61, 74, 0], [86, 62, 0], [80, 85, 0], [56, 62, 0]],   // 5.0.1.2 넷째 자리: 아래 구역 단추에 가려서 옮김
-    [[80, 30, 1], [20, 52, 0], [66, 40, 0], [86, 50, 0], [64, 66, 0], [13, 62, 0]],   // 5.0.1.2 넷째, 다섯째 자리: 아래 구역 단추에 가려서 옮김
+    [[80, 19.5, 1], [24, 81, 0], [52, 49.5, 0], [10, 62, 0], [56, 72, 0], [48, 27, 0]]];   // 건물을 빈터에 꽉 맞춘 뒤 다시 골랐어요(가장자리 단추와 건물 누르는 칸에 안 가리게, 390px와 360px 모두). 고등학교. 현황판이 낮아져 왼쪽 단추가 올라와서 [10, 62]로 옮김(예전 [10, 54])
+  // 구역 지도마다 6곳(구역 그림의 빈 풀밭, 첫째는 물가. 광장 구역에는 물가가 없어요). 캠퍼스 지도에는 없어요
+  BX_SPOT.push([[94, 46, 1], [65, 28, 0], [61, 74, 0], [86, 62, 0], [80, 85, 0], [56, 62, 0]],   // 넷째 자리: 아래 구역 단추에 가려서 옮김
+    [[80, 30, 1], [20, 52, 0], [66, 40, 0], [86, 50, 0], [64, 66, 0], [13, 62, 0]],   // 넷째, 다섯째 자리: 아래 구역 단추에 가려서 옮김
     [[19, 28, 0], [78, 27, 0], [17, 47, 0], [87, 49, 0], [22, 74, 0], [80, 77, 0]],
-    [[94, 40, 1], [84, 55, 0], [56, 58, 0], [80, 69, 0], [56, 70, 0], [15, 79, 0]]);   // 5.0.1.2 체육 구역 둘째 자리(왼쪽 메뉴 수학여행 단추에 가림)와 다섯째 자리(아래 구역 단추에 가림)를 옮김
+    [[94, 40, 1], [84, 55, 0], [56, 58, 0], [80, 69, 0], [56, 70, 0], [15, 79, 0]]);   // 체육 구역 둘째 자리(왼쪽 메뉴 수학여행 단추에 가림)와 다섯째 자리(아래 구역 단추에 가림)를 옮김
   const SPR = [3, 4, 5], SUM = [6, 7, 8], AUT = [9, 10, 11], WIN = [12, 1, 2];
   // [열쇠, 이름, 무리(0 곤충, 1 식물, 2 새와 작은 동물), 조건, 설명]. 조건: s 달, n 밤, r 비, w 물가, rare 희귀, en 멸종위기
   const BIO = [
@@ -50,7 +50,7 @@
     ['otter', '수달', 2, { w: 1, rare: 1, en: 'Ⅰ급' }, '헤엄을 아주 잘 치는 물가의 동물이에요. 천연기념물이에요.'],
     ['redbat', '붉은박쥐', 2, { n: 1, rare: 1, en: 'Ⅰ급' }, '주황빛 털 때문에 황금박쥐라고도 불러요. 천연기념물이에요.'],
     ['pitta', '팔색조', 2, { s: [5, 6, 7, 8], rare: 1, en: 'Ⅱ급' }, '여덟 가지 빛깔 깃털을 가진 여름 철새예요. 천연기념물이에요.'],
-    // 2.3.5 생물 60종 더하기(작업지시서 48, woodani 결정 2026-11-03). WIN 겨울 12~2월
+    // 생물 60종 더하기(작업지시서 48). WIN 겨울 12~2월
     ['cabbagewhite', '배추흰나비', 0, { s: [...SPR, ...SUM] }, '하얀 날개에 까만 점이 있는 나비예요. 애벌레는 배추와 양배추 잎을 먹고 자라요.'],
     ['sulphur', '노랑나비', 0, { s: SPR }, '봄 들판을 노랗게 나는 나비예요. 토끼풀 같은 콩과 식물에 알을 낳아요.'],
     ['mantis', '사마귀', 0, { s: AUT }, '낫처럼 생긴 앞다리로 벌레를 잡아요. 고개를 돌려 뒤도 볼 수 있어요.'],
@@ -143,7 +143,7 @@
     const now = gameNow(), m = decoMap();
     if (S.bx.m !== m) { S.bx.m = m; S.bx.sp = []; }
     if (!S.bx.next) S.bx.next = now;
-    if (bxCount() < 2 && !S.bx.sp.length && S.bx.next > now) S.bx.next = now;   // 5.1.1.3 woodani: 처음 두 종(퀘스트 6-27)은 2시간을 기다리지 않고 바로 다음 생물이 나와요
+    if (bxCount() < 2 && !S.bx.sp.length && S.bx.next > now) S.bx.next = now;   // 처음 두 종(퀘스트 6-27)은 2시간을 기다리지 않고 바로 다음 생물이 나와요
     for (let k = 0; k < 40 && S.bx.next <= now; k++) {
       if (S.bx.sp.length >= BX.max) { S.bx.next = now + BX.every; break; }
       const free = L.map((_, i) => i).filter(i => !S.bx.sp.some(x => x.i === i));
@@ -180,7 +180,7 @@
     if (n >= 10 && S.bx.g < 1) { S.bx.g = 1; addGold(BX.gold10); got.push(`생물 10종! 황금 도토리 +${BX.gold10}`); }
     if (n >= 20 && S.bx.g < 2) { S.bx.g = 2; addEss(BX.ess20); got.push(`생물 20종! 숲의 정수 +${BX.ess20}`); }
     if (n >= 30 && S.bx.g < 3) { S.bx.g = 3; S.deco.own.bio_hut = 1; got.push('생물 30종! 지도 장식 관찰 오두막'); }
-    // 2.3.5 woodani 결정: 60종 황금 도토리 3과 곤충 호텔, 90종 숲의 정수 50과 생태 연못, 칭호 숲속 박사
+    // 60종 황금 도토리 3과 곤충 호텔, 90종 숲의 정수 50과 생태 연못, 칭호 숲속 박사
     if (n >= 60 && S.bx.g < 4) { S.bx.g = 4; addGold(BX.gold60); S.deco.own.deco_bug_hotel = 1; got.push(`생물 60종! 황금 도토리 +${BX.gold60}, 지도 장식 곤충 호텔`); }
     if (n >= BIO.length && S.bx.g < 5) { S.bx.g = 5; addEss(BX.ess90); S.deco.own.deco_eco_pond = 1; got.push(`생물 ${BIO.length}종을 다 모았어요! 숲의 정수 +${BX.ess90}, 지도 장식 생태 연못, 칭호 숲속 박사`); }
     rt.bxRes = { b, nw, got };
@@ -215,9 +215,9 @@
     o.g = n(X.g, 5); o.st.n = n(X.st && X.st.n, 1e9);
     s.bx = o;
   }
-  /* ---------- 2.2.0 학교 텃밭 (프로젝트 문서 '2.2.0 설계안' 3절, woodani 확정 2026-10-30) ----------
-     유치원부터 급식실 창에서 열어요. 씨앗은 공짜, 작물마다 자라는 시간이 있고 물을 주면 남은 시간 -20%(비 오는 날은 저절로).
-     거두면 재료 1개(물 준 작물은 2개). 하루 한 번 재료로 '오늘의 급식'을 만들면 그날 수업료 +5%(재료 3가지 메뉴는 +8%),
+  /* ---------- 학교 텃밭 (프로젝트 문서 ' 설계안' 3절) ----------
+     유치원부터 급식실 창에서 열어요. 씨앗은 공짜, 작물마다 자라는 시간이 있고 물을 주면 남은 시간 -20%(비 오는 날은 저절로)
+     거두면 재료 1개(물 준 작물은 2개). 하루 한 번 재료로 '오늘의 급식'을 만들면 그날 수업료 +5%(재료 3가지 메뉴는 +8%)
      영양 선생님 Lv.5마다 +1%p(최대 +3%p). 처음 만든 메뉴는 숲의 정수 3, 메뉴 8가지에 황금 도토리 1 */
   const GD = { plots: [2, 3, 4, 5, 5, 5], water: 0.2, ess: 3, gold8: 1, p2: 5, p3: 8, dietPer: 5, dietMax: 3, invMax: 99 };
   const GD_CROPS = [
@@ -227,7 +227,7 @@
     { k: 'strawberry', nm: '딸기', em: '🍓', min: 480, tier: 2 }, { k: 'sweetpotato', nm: '고구마', em: '🍠', min: 600, tier: 2 }];
   const GD_C = Object.fromEntries(GD_CROPS.map(c => [c.k, c]));
   const GD_MENU = [
-    ['17', '상추 샐러드', '🥗', { lettuce: 2 }],   // 2.3.0 상추만으로 만드는 첫 메뉴(유치원 gd4에서 당근을 기다리지 않게)
+    ['17', '상추 샐러드', '🥗', { lettuce: 2 }],   // 상추만으로 만드는 첫 메뉴(유치원 gd4에서 당근을 기다리지 않게)
     ['01', '상추 비빔밥', '🍚', { lettuce: 1, carrot: 1 }], ['02', '당근 수프', '🥣', { carrot: 1, potato: 1 }], ['03', '감자전', '🥞', { potato: 1, lettuce: 1 }],
     ['04', '옥수수 수프', '🥣', { corn: 1, potato: 1 }], ['05', '토마토 스파게티', '🍝', { tomato: 1, lettuce: 1 }], ['06', '호박죽', '🥣', { pumpkin: 1, corn: 1 }],
     ['07', '딸기 우유', '🥛', { strawberry: 2 }], ['08', '고구마 맛탕', '🍠', { sweetpotato: 2 }], ['09', '감자 샐러드', '🥗', { potato: 1, carrot: 1, lettuce: 1 }],
@@ -236,7 +236,7 @@
     ['15', '숲속 채소 피자', '🍕', { tomato: 1, corn: 1, pumpkin: 1 }], ['16', '무지개 채소 김밥', '🍙', { lettuce: 1, carrot: 1, sweetpotato: 1 }]]
     .map(([n, nm, em, need]) => ({ id: 'menu_' + n, nm, em, need, kinds: Object.keys(need).length }));
   const GD_M = Object.fromEntries(GD_MENU.map(m => [m.id, m]));
-  const freshGd = () => ({ plots: [], inv: {}, menu: {}, today: { day: '', id: '' }, g8: false, wx: '', st: { h: 0, cook: 0, plant: 0 }, free: 0, fq: [] });   // 3.3.2 free: 텃밭 바로 자라기 무료 횟수, fq: 그 기회를 준 퀘스트
+  const freshGd = () => ({ plots: [], inv: {}, menu: {}, today: { day: '', id: '' }, g8: false, wx: '', st: { h: 0, cook: 0, plant: 0 }, free: 0, fq: [] });   // free: 텃밭 바로 자라기 무료 횟수, fq: 그 기회를 준 퀘스트
   const gdOpen = () => !!S && !!S.gn && (S.f.cafeteria || 0) >= 1;
   const gdN = () => GD.plots[Math.max(0, Math.min(GD.plots.length - 1, S.tier))];
   const gdCropOk = c => !!GD_C[c] && GD_C[c].tier <= S.tier;
@@ -260,7 +260,7 @@
   function gdWet(p) { const now = gameNow(); p.w = 1; p.e = Math.max(now, p.e - Math.max(0, p.e - now) * GD.water); }
   function gdPlant(i, c) {
     if (!gdOpen() || rt.paused) return false;
-    if (i === -2) {   // 3.3.2 빈 밭 모두 같은 작물로
+    if (i === -2) {   // 빈 밭 모두 같은 작물로
       gdSync(); if (!gdCropOk(c)) return false;
       const now = gameNow(); let k = 0;
       S.gn.plots.slice(0, gdN()).forEach(p => { if (p.c) return; p.c = c; p.s = now; p.e = now + GD_C[c].min * 60000; p.w = 0; if (wxIs('rain')) gdWet(p); k++; });
@@ -279,7 +279,7 @@
     gdRender(true); gdMark(); save();
     return true;
   }
-  /* 3.3.2 woodani 요청: 텃밭도 시간 단축권과 광고로 당겨요(공사와 같은 단축권). 그리고 텃밭 퀘스트(첫 작물 거두기, 오늘의 급식 만들기)가
+  /* 텃밭도 시간 단축권과 광고로 당겨요(공사와 같은 단축권). 그리고 텃밭 퀘스트(첫 작물 거두기, 오늘의 급식 만들기)가
      시작될 때 '바로 자라기' 무료 한 번(미리 오래 걸리는 작물을 심어 두면 퀘스트가 막혀서) */
   const GD_FREE_Q = ['gd3', 'gd4'];
   function gdFreeGrant(q) {
@@ -308,7 +308,7 @@
     gdCut(i, pl.cut + (pl.left ? 0 : 1));
     toast(pl.left ? `${tkPlanText(pl)}을 써서 ${hm(pl.cut)} 당겼어요. ${hm(pl.left)} 남아요` : `${tkPlanText(pl)}을 써서 다 자랐어요!`);
   }
-  function gdPull(i) {   // 4.0.1 (woodani 결정): 자라는 작물을 뽑아 밭을 비워요. 재료와 통계는 그대로예요
+  function gdPull(i) {   // 자라는 작물을 뽑아 밭을 비워요. 재료와 통계는 그대로예요
     const p = S.gn.plots[i]; rt.gdPullI = -1; if (!p || !p.c || gdReady(p)) return false;
     const nm = GD_C[p.c].nm; S.gn.plots[i] = { c: '', s: 0, e: 0, w: 0 }; rt.gdCutI = -1;
     sfx('tap'); toast(`${eul(nm)} 뽑았어요. 밭이 비었어요`);
@@ -331,9 +331,9 @@
     const p = S.gn.plots[i]; if (!p || !gdReady(p)) return false;
     const c = p.c, n = p.w ? 2 : 1, had = S.gn.inv[c] || 0;
     S.gn.inv[c] = Math.min(GD.invMax, had + n);
-    const got = S.gn.inv[c] - had; if (got < n) rt.gdFull = true;   // 4.0.1: 재료가 가득 차서 덜 들어간 것을 알려요
+    const got = S.gn.inv[c] - had; if (got < n) rt.gdFull = true;   // 재료가 가득 차서 덜 들어간 것을 알려요
     S.gn.plots[i] = { c: '', s: 0, e: 0, w: 0 }; S.gn.st.h += 1;
-    if (quiet) return true;   // 3.3.2 모두 거두기는 한 번에 알려요
+    if (quiet) return true;   // 모두 거두기는 한 번에 알려요
     rt.gdFull = false; sfx('coin'); toast(got >= n ? `${GD_C[c].nm} ${n}개를 거뒀어요!` : got > 0 ? `${GD_C[c].nm} ${got}개만 거뒀어요\n재료가 가득 찼어요(${GD.invMax}개)` : `${GD_C[c].nm} 재료가 가득 찼어요(${GD.invMax}개)\n거둔 작물은 넣지 못했어요`);
     gdRender(true); gdMark(); save();
     return true;
@@ -374,8 +374,8 @@
   }
   function openGd() {
     if (!gdOpen()) { toast('급식실을 지으면 텃밭을 가꿀 수 있어요'); return; }
-    gdSync(); rt.gdPick = -1; rt.gdCutI = -1; rt.gdSel = '';   // 5.0.2.2 다시 열면 만들기 확인 창은 닫혀 있어요
-    gdFreeGrant(curMain());   // 3.3.2 이미 그 퀘스트 중인 학교도 텃밭을 열면 무료 한 번
+    gdSync(); rt.gdPick = -1; rt.gdCutI = -1; rt.gdSel = '';   // 다시 열면 만들기 확인 창은 닫혀 있어요
+    gdFreeGrant(curMain());   // 이미 그 퀘스트 중인 학교도 텃밭을 열면 무료 한 번
     const bg = IMG('garden_bg'); $('#gdHead').style.backgroundImage = bg ? `url("${bg}")` : ''; $('#gdHead').classList.toggle('noimg', !bg);   // 그림(작업지시서 37-A)이 오기 전에는 낮게
     gdRender(true); openModal($('#mGd')); sfx('tap');
   }
@@ -390,7 +390,7 @@
       const bed = IMG(p.w && !ready ? 'plot_wet' : 'plot_dry'), crop = C ? gdImg(`crop_${p.c}_${st}`, st === 3 ? C.em : st === 2 ? '🌿' : '🌱', 'crop') : '';
       const tx = !C ? '빈 밭' : ready ? `${C.nm} 다 자람` : `${C.nm} ${hm(Math.max(1, Math.ceil((p.e - now) / 1000)))}`;
       const act = !C ? `<button type="button" data-gd="pick" data-i="${i}">심기</button>` : ready ? `<button type="button" class="go" data-gd="har" data-i="${i}">거두기</button>`
-        : (p.w ? '<small>물 줬어요</small>' : `<button type="button" data-gd="wat" data-i="${i}">물 주기</button>`) + `<button type="button" data-gd="cut" data-i="${i}">시간 줄이기</button>`;   // 3.3.2
+        : (p.w ? '<small>물 줬어요</small>' : `<button type="button" data-gd="wat" data-i="${i}">물 주기</button>`) + `<button type="button" data-gd="cut" data-i="${i}">시간 줄이기</button>`;
       return `<div class="gd-plot${ready ? ' ready' : ''}${rt.gdPick === i || rt.gdCutI === i ? ' pick' : ''}"><span class="bed"${bed ? ` style="background-image:url('${bed}')"` : ''}>${crop}</span><span class="tx">${tx}</span>${act}</div>`;
     }).join('');
     { const cb = $('#gdCut'), ci = rt.gdCutI, cp = ci >= 0 ? S.gn.plots[ci] : null, ok = cp && cp.c && !gdReady(cp);
@@ -402,7 +402,7 @@
           `<div class="gd-tks">${TK.slice().reverse().map(t => `<button type="button" data-gd="tk" data-tk="${t.k}" data-i="${ci}" aria-disabled="${S.tk[t.k] > 0 ? 'false' : 'true'}">${t.name}<small>${S.tk[t.k]}장</small></button>`).join('')}</div>` +
           `<div class="gd-tkrow"><button type="button" data-gd="tkall" data-i="${ci}" aria-disabled="${tkSum() > 0 ? 'false' : 'true'}">단축권 자동 사용</button>` +
           `<button type="button" data-gd="tkad" aria-disabled="${adL > 0 ? 'false' : 'true'}">광고 보고 5분권 ${TKAD.n}장 받기 (오늘 ${adL}번 남음)</button></div>` +
-          `<div class="gd-tkrow"><button type="button" data-gd="pull" data-i="${ci}">${rt.gdPullI === ci ? '한 번 더 누르면 뽑아요 (재료 없음)' : '작물 뽑기'}</button></div>`; } }   // 4.0.1 잘못 심은 작물 뽑기(두 번 눌러요)
+          `<div class="gd-tkrow"><button type="button" data-gd="pull" data-i="${ci}">${rt.gdPullI === ci ? '한 번 더 누르면 뽑아요 (재료 없음)' : '작물 뽑기'}</button></div>`; } }   // 잘못 심은 작물 뽑기(두 번 눌러요)
     { const live = S.gn.plots.slice(0, n), em = live.filter(p => !p.c).length, rd = live.filter(p => p.c && gdReady(p)).length, wt = live.filter(p => p.c && !p.w && !gdReady(p)).length;
       if (rt.gdPick === -2 && !em) rt.gdPick = -1;
       $('#gdBulk').innerHTML = n < 2 ? '' : (em ? `<button type="button" data-gd="pickall">빈 밭 모두 심기 (${em})</button>` : '') +
@@ -420,25 +420,25 @@
       const need = Object.entries(m.need).map(([c, k]) => `${GD_C[c].em}${k > 1 ? '×' + k : ''}`).join('');
       return `<button type="button" class="gd-menu${has ? '' : ' no'}${can ? ' can' : ''}${tm && tm.id === m.id ? ' on' : ''}" data-gd="cook" data-m="${m.id}" aria-disabled="${can ? 'false' : 'true'}">` +
         `${has ? gdImg(m.id, m.em) : gdImg('menu_frame', '🍽')}<span class="ell">${has || ok ? esc(m.nm) : '???'}</span><small>${can ? `만들기 +${gdPct(m)}%` : ok ? need : `${TIERS[Math.max(...Object.keys(m.need).map(c => GD_C[c].tier))].name}부터`}</small></button>`;
-    }).join('')}</div>` + (() => { const m = !tm && GD_M[rt.gdSel]; return m && gdCanCook(m) ? `<div class="gd-ok" role="dialog" aria-label="오늘의 급식 만들기"><div class="gd-ok-bg" data-gd="cooksel" data-m=""></div><div class="gd-ok-card"><div class="gd-ok-pic">${gdImg(m.id, m.em)}</div><b>${eul(esc(m.nm))} 만들까요?</b><p>오늘 수업료 +${gdPct(m)}%<br>오늘의 급식은 하루 한 번이라 바꿀 수 없어요</p><div class="btn-row"><button class="btn-sub" type="button" data-gd="cooksel" data-m="">다시 고르기</button><button class="cta" type="button" data-gd="cookgo" data-m="${m.id}">만들기</button></div></div></div>` : ''; })();   // 5.0.1.6 C-03 누르면 먼저 물어봐요. 5.0.2.2 woodani: 아래에 붙던 확인 칸을 텃밭 창 가운데 따로 띄워요
+    }).join('')}</div>` + (() => { const m = !tm && GD_M[rt.gdSel]; return m && gdCanCook(m) ? `<div class="gd-ok" role="dialog" aria-label="오늘의 급식 만들기"><div class="gd-ok-bg" data-gd="cooksel" data-m=""></div><div class="gd-ok-card"><div class="gd-ok-pic">${gdImg(m.id, m.em)}</div><b>${eul(esc(m.nm))} 만들까요?</b><p>오늘 수업료 +${gdPct(m)}%<br>오늘의 급식은 하루 한 번이라 바꿀 수 없어요</p><div class="btn-row"><button class="btn-sub" type="button" data-gd="cooksel" data-m="">다시 고르기</button><button class="cta" type="button" data-gd="cookgo" data-m="${m.id}">만들기</button></div></div></div>` : ''; })();   // 누르면 먼저 물어봐요. 아래에 붙던 확인 칸을 텃밭 창 가운데 따로 띄워요
   }
-  /* 2.1.2 마을 기부(프로젝트 문서 '마을 기부 설계안 (2.1.2)', woodani 확정 2026-10-29): 도토리를 숲속 마을에 기부하면 기부 단계가 올라요.
-     상한이 없고 힘(수입, 공사 속도)은 주지 않아요. 기념물, 칭호, 업적, 정수와 가끔 황금 도토리만. 졸업해도 남아요.
+  /* 마을 기부(프로젝트 문서 '마을 기부 설계안 '): 도토리를 숲속 마을에 기부하면 기부 단계가 올라요
+     상한이 없고 힘(수입, 공사 속도)은 주지 않아요. 기념물, 칭호, 업적, 정수와 가끔 황금 도토리만. 졸업해도 남아요
      단계마다 필요한 양 = 지금 수업료(초당, 특식 데이 2배는 빼고) × H(n)시간. 진행은 이번 단계 비율 p로 저장해서 수업료가 올라도 채운 만큼은 그대로예요 */
   const VD = { tier: 1, H: [1, 2, 3, 5, 8, 12, 18, 24], after: 6, ess: 5, goldEvery: 5, art: 8, w: 62, box: 46,
-    fr: [0.9, 0.34, 0.4, 0.45, 0.43, 0.43, 0.54, 0.65, 0.66],   // 3.0.0 그림 캔버스에서 실제 그림이 차지하는 너비(기부함, 1~8단계). 1, 2단계는 그림이 작게 그려져서 이걸로 키워요
-    spot: [null, [12, 90], [12, 91], [12, 90]],   // 3.3.0 woodani: '새 편지' 단추에 가려서 아래로. 오른쪽 아래는 체험학습 버스 자리라 간판 왼쪽 아래 풀밭으로
+    fr: [0.9, 0.34, 0.4, 0.45, 0.43, 0.43, 0.54, 0.65, 0.66],   // 그림 캔버스에서 실제 그림이 차지하는 너비(기부함, 1~8단계). 1, 2단계는 그림이 작게 그려져서 이걸로 키워요
+    spot: [null, [12, 90], [12, 91], [12, 90]],   // '새 편지' 단추에 가려서 아래로. 오른쪽 아래는 체험학습 버스 자리라 간판 왼쪽 아래 풀밭으로
     titles: [{ id: 'vdpatron', lv: 3, title: '마을 후원자' }, { id: 'vdgold', lv: 8, title: '황금 나무 주인' }] };   // 20단계 '숲속 기부왕'은 업적 줄의 칭호
-  ZONE_GEO.forEach(Z => VD.spot.push(Z.vd ? [Z.vd[0] / MAP_W * 100, (Z.vd[1] - MAP_Y) / MAP_H * 100] : null));   // 4.0.0 기념물은 광장 구역에만(작업지시서 54 자리 표)
+  ZONE_GEO.forEach(Z => VD.spot.push(Z.vd ? [Z.vd[0] / MAP_W * 100, (Z.vd[1] - MAP_Y) / MAP_H * 100] : null));   // 기념물은 광장 구역에만(작업지시서 54 자리 표)
   const vdH = n => n <= VD.H.length ? VD.H[n - 1] : VD.H[VD.H.length - 1] + VD.after * (n - VD.H.length);
   const vdOpen = () => !!S && !!S.vd && S.tier >= VD.tier;
   const vdRate = () => Math.max(1, rate() / (feastOn() ? 2 : 1) / snMult() / gdMult());   // 특식 데이와 간식 기분, 오늘의 급식은 빼요
   const vdLive = () => Math.max(1, Math.ceil(vdRate() * 3600 * vdH(S.vd.lv + 1)));
-  // 2.3.1 woodani 결정: 그날 한 번 기부한 단계는 그날(23:59까지) 그 가격으로 나머지를 채워요. 날이 바뀌면 그때 수입으로 다시 정해요
+  // 그날 한 번 기부한 단계는 그날(23:59까지) 그 가격으로 나머지를 채워요. 날이 바뀌면 그때 수입으로 다시 정해요
   const vdLocked = () => { const k = S.vd.lk; return !!k && k.day === gameToday() && k.lv === S.vd.lv && k.need >= 1; };
   const vdNeed = () => vdLocked() ? S.vd.lk.need : vdLive();
   const vdLeft = () => Math.max(1, Math.ceil(vdNeed() * (1 - S.vd.p)));
-  // 3.0.0 지도 기념물 크기: 실제 그림 너비 cw(기부함 41, 1단계 38에서 8단계 52까지), 캔버스 w
+  // 지도 기념물 크기: 실제 그림 너비 cw(기부함 41, 1단계 38에서 8단계 52까지), 캔버스 w
   const vdSize = lv => { const L = Math.min(VD.art, Math.max(0, lv)), cw = L ? 36 + 2 * L : VD.box * VD.fr[0]; return { cw, w: L ? Math.min(130, cw / VD.fr[L]) : VD.box }; };
   const vdImg = lv => lv <= 0 ? IMG('donate_box') : IMG('donate_m' + Math.min(VD.art, lv));
   // 그림(512 캔버스)마다 보이는 부분. 창과 보상 그림에서는 이만큼만 잘라 크게 보여요(앞 단계 기념물은 캔버스에 작게 그려져 있어요)
@@ -448,7 +448,7 @@
     const [x0, y0, x1, y1] = VD_BOX[Math.min(VD.art, Math.max(0, lv))], side = Math.max(x1 - x0, y1 - y0) * 1.08, cx = (x0 + x1) / 2, cy = (y0 + y1) / 2;
     return `<svg viewBox="${(cx - side / 2).toFixed(0)} ${(cy - side / 2).toFixed(0)} ${side.toFixed(0)} ${side.toFixed(0)}" width="${px}" height="${px}" aria-hidden="true"><image href="${u}" width="512" height="512"/></svg>`;
   }
-  const vdReward = lv => lv <= VD.art ? { e: VD.ess * lv, g: 0 } : { e: VD.ess, g: lv % VD.goldEvery === 0 ? 1 : 0 };   // 5.2.0 9단계부터 단계마다 숲의 정수 5(5단계마다 황금 도토리는 그대로)
+  const vdReward = lv => lv <= VD.art ? { e: VD.ess * lv, g: 0 } : { e: VD.ess, g: lv % VD.goldEvery === 0 ? 1 : 0 };   // 9단계부터 단계마다 숲의 정수 5(5단계마다 황금 도토리는 그대로)
   const vdAmt = k => { const need = vdNeed(), left = vdLeft(); return k === 'left' ? left : Math.min(left, Math.ceil(need * k)); };
   // 기부: k는 0.1, 0.5, 'left'(다음 단계까지 남은 만큼), 'all'(가진 만큼, 모자랄 때). 이번 단계를 넘겨서 내지는 않아요
   function vdGive(k) {
@@ -457,7 +457,7 @@
     let a = k === 'all' ? Math.min(left, Math.floor(S.budget)) : vdAmt(k);
     if (!(a >= 1)) { toast('기부할 도토리가 없어요'); return false; }
     if (S.budget < a) { toast(`도토리가 ${fmt(a - S.budget)}개 모자라요`); return false; }
-    if (!vdLocked()) S.vd.lk = { day: gameToday(), lv: S.vd.lv, need };   // 2.3.1 오늘 이 가격으로 묶어요
+    if (!vdLocked()) S.vd.lk = { day: gameToday(), lv: S.vd.lv, need };   // 오늘 이 가격으로 묶어요
     S.budget -= a; S.vd.sum += a; S.vd.n += 1;
     S.vd.p = a >= left ? 1 : Math.min(0.999999, S.vd.p + a / need);
     if (S.vd.p >= 1) vdUp();
@@ -472,7 +472,7 @@
     if (r.g) { addGold(r.g); items.push({ ic: 'gold', t: `황금 도토리 +${r.g}` }); }
     const tt = VD.titles.find(t => t.lv === lv);
     if (tt) { if (!S.ach.title) { S.ach.title = tt.id; rankDirty(); } items.push({ ic: '🎖️', t: `칭호 "${tt.title}"${S.ach.title === tt.id ? '를 달았어요' : '를 받았어요'}` }); }
-    for (const n of ppDecoSync()) items.push({ ic: '🎁', t: `장식 '${n}' (꾸미기 모드에서 지도에 놓아요)` });   // 5.2.0.1 20단계 마을 감사 아치
+    for (const n of ppDecoSync()) items.push({ ic: '🎁', t: `장식 '${n}' (꾸미기 모드에서 지도에 놓아요)` });   // 20단계 마을 감사 아치
     rt.vdPop = true; closeModal($('#mVd'));
     sfx('quest');
     showReward({ title: `마을 기부 ${lv}단계!`, sub: lv <= VD.art ? '마을에 새 기념물이 생겼어요' : '황금 나무가 더 반짝여요', art: vdPic(lv, 110),
@@ -497,27 +497,27 @@
     const b = (k, nm, a) => `<button type="button" data-vdk="${k}" aria-disabled="${S.budget >= a ? 'false' : 'true'}"><span>${nm}</span><em>${acornIcon()}${fmt(a)}</em></button>`;
     $('#vdBtns').innerHTML = short && S.budget >= 1 ? b('all', '있는 만큼', Math.min(left, Math.floor(S.budget))) : b('0.1', '10%', a1) + b('0.5', '50%', a5) + b('left', '남은 만큼', left);
     $('#vdSum').textContent = `지금까지 기부한 도토리 ${fmt(S.vd.sum)}개\n단계가 오르면 지도에 기념물이 서요. 수입은 늘지 않아요. 졸업해도 남아요`;
-    { const lk = $('#vdLock'); if (lk) { lk.hidden = !vdLocked(); lk.textContent = '이 가격은 오늘 23:59까지예요. 지나면 그때 수입에 맞게 기부할 도토리가 다시 정해져요'; } }   // 2.3.1
+    { const lk = $('#vdLock'); if (lk) { lk.hidden = !vdLocked(); lk.textContent = '이 가격은 오늘 23:59까지예요. 지나면 그때 수입에 맞게 기부할 도토리가 다시 정해져요'; } }
   }
   // 지도의 기념물(renderDeco가 불러요): 지금 지도에 자리가 있을 때만
   function vdMapHTML(m) {
     if (!vdOpen() || !VD.spot[m]) return '';
-    const [x, y] = pctXY(VD.spot[m]), lv = S.vd.lv, { w, cw } = vdSize(lv), u = vdImg(lv);   // 3.0.0 woodani: 그래도 잘 안 보여서 그림 실제 크기로 맞춰 키워요
+    const [x, y] = pctXY(VD.spot[m]), lv = S.vd.lv, { w, cw } = vdSize(lv), u = vdImg(lv);   // 그래도 잘 안 보여서 그림 실제 크기로 맞춰 키워요
     if (!u) return '';   // 기부함은 캔버스를 꽉 채워서 작게
     const pop = rt.vdPop ? ' pop' : ''; rt.vdPop = false;
     const t = lv ? `마을 기부 ${lv}단계` : '마을 기부', tw = t.length * 6.2 + 10;
     const hw = Math.max(cw + 6, 44);   // 누르는 칸은 손가락 크기 이상
-    return `<ellipse class="vd-sh" cx="${x}" cy="${(y - 1).toFixed(1)}" rx="${(cw * 0.56).toFixed(1)}" ry="${(cw * 0.15).toFixed(1)}"/>` +   // 3.0.0 바닥 그림자
+    return `<ellipse class="vd-sh" cx="${x}" cy="${(y - 1).toFixed(1)}" rx="${(cw * 0.56).toFixed(1)}" ry="${(cw * 0.15).toFixed(1)}"/>` +   // 바닥 그림자
       `<image class="vd-it${pop}" x="${x - w / 2}" y="${(y - w * 472 / 512).toFixed(1)}" width="${w}" height="${w}" href="${u}"/>` +
       `<g class="vd-tag"><rect x="${(x - tw / 2).toFixed(1)}" y="${(y + 1).toFixed(1)}" width="${tw.toFixed(1)}" height="11" rx="5.5"/><text x="${x}" y="${(y + 9).toFixed(1)}">${t}</text></g>` +
       `<rect class="vd-hit" data-vd="1" x="${x - hw / 2}" y="${(y - hw * 0.85).toFixed(1)}" width="${hw}" height="${(hw * 0.85 + 13).toFixed(1)}"/>`;
   }
-  // 2.2.0 칩이 두세 줄이 되면 위의 '새 편지' 칩을 그만큼 올려요
-  // 3.3.4 아래 한 줄 칩: 오른쪽부터 까치 핫딜, 새 편지, 즉시 완공 순서로 놓아요. 학교급 단추에 닿으면 한 줄 위로
+  // 칩이 두세 줄이 되면 위의 '새 편지' 칩을 그만큼 올려요
+  // 아래 한 줄 칩: 오른쪽부터 까치 핫딜, 새 편지, 즉시 완공 순서로 놓아요. 학교급 단추에 닿으면 한 줄 위로
   function chipRow() {
     const fr = $('#ffChip') && $('#ffChip').parentElement; if (!fr) return;
     const dots = $('#tierDots'), W = fr.clientWidth; let lim = dots && !dots.hidden && dots.offsetWidth ? dots.offsetLeft + dots.offsetWidth + 8 : 10;
-    { const wx = $('#wxChip'); if (wx && !wx.hidden && wx.offsetWidth) lim = Math.max(lim, wx.getBoundingClientRect().right - fr.getBoundingClientRect().left + 8); }   // 5.0.1.5 H-04 날씨 칩도 비켜요
+    { const wx = $('#wxChip'); if (wx && !wx.hidden && wx.offsetWidth) lim = Math.max(lim, wx.getBoundingClientRect().right - fr.getBoundingClientRect().left + 8); }   // 날씨 칩도 비켜요
     let r = 10, row = 0;
     for (const el of [$('#btnDeal'), $('#plChip'), $('#ffChip'), $('#upChip'), $('#taChip')]) {
       if (!el || el.hidden || !el.offsetWidth) continue;
@@ -526,7 +526,7 @@
       el.style.right = r + 'px'; el.style.bottom = `calc(var(--bot-h, 70px) + ${10 + row * 35}px)`;
       r += w + 6;
     }
-    { const zb = $('#zoneBar'); if (zb) { zb.dataset.bot = `calc(var(--bot-h, 70px) + ${46 + row * 35}px)`; zb.style.bottom = rt.decoEdit ? 'calc(var(--bot-h, 70px) + 80px)' : zb.dataset.bot; } }   // 4.0.0 구역 막대는 칩 줄 바로 위
+    { const zb = $('#zoneBar'); if (zb) { zb.dataset.bot = `calc(var(--bot-h, 70px) + ${46 + row * 35}px)`; zb.style.bottom = rt.decoEdit ? 'calc(var(--bot-h, 70px) + 80px)' : zb.dataset.bot; } }   // 구역 막대는 칩 줄 바로 위
   }
   function ffUp() { chipRow(); }
   function ffRender(force) {
@@ -534,9 +534,9 @@
     const ks = ffList(), on = cbOn(), nb = nbOn(), nbShow = S.tier >= NB.tier && !liveOff('night');
     for (const k of Object.keys(FAC)) { const p = document.getElementById('pq-' + k); if (p) p.classList.toggle('ff-on', ks.includes(k)); }
     const c = $('#ffChip'); if (!c) return;
-    upRender(rt.tab === 'school' && rt.viewTier == null && !rt.decoEdit && !rt.fest && !rt.sports && !festBusy() && !rt.paused && (S.tier >= 1 || S.q.m >= CH1()));   // 5.0.2.2. 5.0.3 woodani: 유치원은 1장(튜토리얼)을 마친 뒤부터
-    taRender(rt.tab === 'school' && rt.viewTier == null && !rt.decoEdit && !rt.fest && !rt.sports && !festBusy() && !rt.paused);   // 5.1.0
-    const show = S.ffx !== gameToday() && rt.tab === 'school' && rt.viewTier == null && !rt.decoEdit && !rt.fest && !rt.sports && !festBusy() && !rt.paused && S.tier >= 1 && (ks.length > 0 || on || nbShow);   // 학교 행사 중에는 숨겨요. 2.2.0 야간 건설 줄은 초등학교부터 늘 보여요
+    upRender(rt.tab === 'school' && rt.viewTier == null && !rt.decoEdit && !rt.fest && !rt.sports && !festBusy() && !rt.paused && (S.tier >= 1 || S.q.m >= CH1()));   // 유치원은 1장(튜토리얼)을 마친 뒤부터
+    taRender(rt.tab === 'school' && rt.viewTier == null && !rt.decoEdit && !rt.fest && !rt.sports && !festBusy() && !rt.paused);
+    const show = S.ffx !== gameToday() && rt.tab === 'school' && rt.viewTier == null && !rt.decoEdit && !rt.fest && !rt.sports && !festBusy() && !rt.paused && S.tier >= 1 && (ks.length > 0 || on || nbShow);   // 학교 행사 중에는 숨겨요. 야간 건설 줄은 초등학교부터 늘 보여요
     const key = [show, S.ffx, ks.length, ffLeft(), on ? Math.floor(cbLeft() / 60) : -1, nbShow ? (nb ? Math.floor(nbLeft() / 60) : -2) : -1, nbAdd()].join('|');
     if (!force && c.dataset.key === key) return; c.dataset.key = key;
     c.hidden = !show; if (!show) { ffUp(c); return; }
@@ -544,16 +544,16 @@
     const nbIc = IMG('ic_nightbuild') ? `<img class="nb-ic" src="${IMG('ic_nightbuild')}" alt="">` : '🌙';
     const sp = nbAdd() > NB.add, nbTx = !nbShow ? '' : nb ? `${nbAllDay(gameToday()) ? '주말 건설 가속' : '야간 건설'} +${nbAdd()}%, ${hm(nbLeft())} 남음` : sp ? (nbAllDay(gameToday()) ? `오늘 하루 종일 건설 가속 +${nbAdd()}%(특별 이벤트 주말)` : `오늘 ${NB.h0}~${NB.h1}시 건설 가속 +${nbAdd()}%(특별 이벤트)`) : `매일 ${NB.h0}~${NB.h1}시 건설 가속 이벤트`;
     c.classList.toggle('nb-on', nb && nbShow);
-    const mp = $('#map'); if (mp) mp.classList.toggle('nb-night', nb);   // 2.2.0 비계에 등불
-    // 3.3.4 작은 알약: ⚡남은 번, 건설 부스터, 야간 건설 아이콘(켜져 있을 때만 +n%). 자세한 말은 누르면 떠요
+    const mp = $('#map'); if (mp) mp.classList.toggle('nb-night', nb);   // 비계에 등불
+    // 작은 알약: ⚡남은 번, 건설 부스터, 야간 건설 아이콘(켜져 있을 때만 +n%). 자세한 말은 누르면 떠요
     c.innerHTML = (ks.length ? `<b>⚡${ffLeft()}/${FF.day}</b>` : '') + (on ? `<small>🔨+100%</small>` : '') +
       (nbShow ? `<small class="nb">${nbIc}${nb || sp ? ` +${nbAdd()}%` : ''}</small>` : '') + '<span class="ffx" role="button" aria-label="오늘은 이 알림 닫기">×</span>';
     c.dataset.tip = [ks.length ? `즉시 완공이 오늘 ${ffLeft()}번 남았어요. ${FAC[ks[0]].name}부터 보여 드려요` : '', on ? `건설 부스터 +100%, ${hm(cbLeft())} 남음` : '', nbShow ? nbTx : ''].filter(Boolean).join(' / ');
     c.setAttribute('aria-label', (ks.length ? `오늘 즉시 완공 ${FF.day}번 가운데 ${ffLeft()}번 남음, 눌러서 건물 창 열기` : '') + (on ? ` 건설 부스터 사용 중` : '') + (nbShow ? ` ${nbTx}` : ''));
     ffUp(c);
   }
-  /* 5.0.2.2 woodani 결정(2026-11-18): 건물을 하나씩 들어가 올리기 불편하다는 의견. 지금 도토리로 올릴 수 있는 건물을 싼 것부터 골라
-     가구를 채우고 공사까지 한 번에 시작해요. 이미 지은 건물만, 공사 중이거나 이 학기 최고 레벨이면 빼요. 한 채 이상일 때 홈 아래 칩으로 보여요(5.0.3.1, 그 전에는 두 채부터) */
+  /* 건물을 하나씩 들어가 올리기 불편하다는 의견. 지금 도토리로 올릴 수 있는 건물을 싼 것부터 골라
+     가구를 채우고 공사까지 한 번에 시작해요. 이미 지은 건물만, 공사 중이거나 이 학기 최고 레벨이면 빼요. 한 채 이상일 때 홈 아래 칩으로 보여요(그 전에는 두 채부터) */
   function upPlan() {
     const opts = facKeys().filter(k => S.f[k] >= 1 && !conOn(k) && !facMaxed(k)).map(k => ({ k, c: furLeftCost(k) + facCost(k) })).filter(o => isFinite(o.c)).sort((a, b) => a.c - b.c);
     const ks = []; let cost = 0;
@@ -562,10 +562,10 @@
   }
   function upRender(base) {
     const c = $('#upChip'); if (!c) return;
-    const n = base ? upPlan().ks.length : 0, show = n >= 1,   /* 5.0.3.1 woodani: 한 채만 올릴 수 있어도 보여요 */ key = show ? String(n) : '';
+    const n = base ? upPlan().ks.length : 0, show = n >= 1,   /* 한 채만 올릴 수 있어도 보여요 */ key = show ? String(n) : '';
     if (c.dataset.key === key) return; c.dataset.key = key;
     c.hidden = !show;
-    if (show) { c.innerHTML = `<b>🔨 건물 ${n}채 올리기!</b>`; /* 5.0.3 woodani: '한 번에 n채'보다 알아보기 쉽게 */ c.setAttribute('aria-label', `올릴 수 있는 건물 ${n}채를 한 번에 한 단계씩 올리기`); }
+    if (show) { c.innerHTML = `<b>🔨 건물 ${n}채 올리기!</b>`; /* '한 번에 n채'보다 알아보기 쉽게 */ c.setAttribute('aria-label', `올릴 수 있는 건물 ${n}채를 한 번에 한 단계씩 올리기`); }
     chipRow();
   }
   function upAsk() {
@@ -588,11 +588,11 @@
     ffRender(true); save();
     return done.length;
   }
-  // 2.1.1 건물마다 하루 한 번 바로 완공 → 3.0.0 조정안 7(woodani 결정): 학교 전체 하루 3번, 고르는 건물은 마음대로. S.ffd = { 날, 쓴 횟수 }
+  // 건물마다 하루 한 번 바로 완공 → 조정안 7: 학교 전체 하루 3번, 고르는 건물은 마음대로. S.ffd = { 날, 쓴 횟수 }
   const FF = { day: 3 };
   const ffLeft = () => !S || !S.ffd ? 0 : S.ffd.day === gameToday() ? Math.max(0, FF.day - S.ffd.n) : FF.day;
   const conFreeLeft = k => ffLeft() > 0;
-  // 2.3.0 즉시 완공 단추: 공사 중인 건물을 바로 끝내요(3.0.0 학교 전체 하루 3번). 공사 중이 아니면 먼저 공사를 시작하고 바로 끝내요
+  // 즉시 완공 단추: 공사 중인 건물을 바로 끝내요(학교 전체 하루 3번). 공사 중이 아니면 먼저 공사를 시작하고 바로 끝내요
   function conFree(k) {
     if (!S || S.tier < 1 || !facKeys().includes(k) || !conFreeLeft(k) || rt.paused) return false;
     if (!conOn(k)) { if (!furReady(k) || facMaxed(k) || S.budget < facCost(k)) return false; if (!buyFacility(k)) return false; }
@@ -604,7 +604,7 @@
     renderMap(); conRender(true); ffRender(true); save();
     return true;
   }
-  // 2.3.0 숲의 정수로 즉시 완료(woodani 확정): 남은 시간 5분 이하는 정수 2, 그 위로는 10분마다 4(올림)
+  // 숲의 정수로 즉시 완료: 남은 시간 5분 이하는 정수 2, 그 위로는 10분마다 4(올림)
   const CESS = { min5: 2, per10: 4 };
   const conEssCost = sec => sec <= 0 ? 0 : sec <= 300 ? CESS.min5 : CESS.per10 * Math.ceil(sec / 600);
   const conEssQuiet = () => !!S && S.ces === gameToday();
@@ -639,10 +639,10 @@
     const L = S.f[k] + 1, now = gameNow(), sec = conSec(k, L);
     S.bd[k] = { L, s: now, e: now + sec * 1000 };
     S.st.cons = (S.st.cons || 0) + 1;
-    // 2.3.0 woodani 결정: 하루 한 번 즉시 완공은 저절로 쓰지 않고, 건물 창의 ⚡ 즉시 완공 단추로 원할 때 써요(conFree)
+    // 하루 한 번 즉시 완공은 저절로 쓰지 않고, 건물 창의 ⚡ 즉시 완공 단추로 원할 때 써요(conFree)
     toast(sec <= 10 ? `${FAC[k].name} 공사 시작! 금방 끝나요` : `${FAC[k].name} 공사 시작! ${hm(sec)} 뒤에 Lv.${L}`);
     sfx('tap');
-    afterPurchase();   // 3.2.3 끊김 줄이기: 여기서 지도를 그리므로 아래에서 한 번 더 그리지 않아요
+    afterPurchase();   // 끊김 줄이기: 여기서 지도를 그리므로 아래에서 한 번 더 그리지 않아요
     conRender(true);
     return true;
   }
@@ -654,8 +654,8 @@
     const was = S.f[k], wasReady = mainReady();
     S.f[k] = was + 1;
     S.st.ups += 1;
-    clubFacUp(k);   // 2.0.0
-    // 1.7.0: 학교급이 오른 뒤 처음 키우면 건물 모습이 그 학교급으로 바뀌어요
+    clubFacUp(k);
+    // 학교급이 오른 뒤 처음 키우면 건물 모습이 그 학교급으로 바뀌어요
     let newLook = false;
     if (S.bs && (S.bs[k] || 0) < S.tier) { const before = bldImg(k); S.bs[k] = S.tier; if (bldImg(k) !== before) { newLook = true; setBldArt(k); } }
     if (was === 0 && rt.sheetKey === k) closeSheet();   // 처음 지을 때는 안을 보여 주지 않고 지도로 돌아가요
@@ -675,13 +675,13 @@
     else if (!quiet) toast(`${n} Lv.${L}! ${FAC[k].eff(L)}`);
     if (newLook && !quiet) setTimeout(() => toast(`${n} 모습이 ${tierInfo().name}답게 새로 바뀌었어요!`), 1600);
     afterPurchase();
-    if (!quiet) bldFx(k, was === 0 ? 'build' : 'up');   // 1.8.0
+    if (!quiet) bldFx(k, was === 0 ? 'build' : 'up');
     return true;
   }
   // 게임 시계로 끝난 공사를 마쳐요. 한 번에 둘 이상 끝났으면(자리 비운 뒤 켤 때) 하나로 묶어 알려요
   function conTick() {
     if (!S || !S.bd) return 0;
-    cbApply(); nbApply();   // 2.1.1 건설 가속, 2.2.0 야간 건설
+    cbApply(); nbApply();   // 건설 가속, 야간 건설
     const now = gameNow(), done = Object.keys(S.bd).filter(k => S.bd[k].e <= now);
     if (!done.length) return 0;
     const many = done.length >= 2, names = [];
@@ -700,7 +700,7 @@
     const rem = conLeft(k); if (!rem) return false;
     const p = tkPlan(rem); if (!p.n) { toast(`시간 단축권이 없어요. 광고를 보면 5분권 ${TKAD.n}장을 받아요`); return false; }
     for (const t of TK) S.tk[t.k] -= p.use[t.k];
-    S.st.tkUsed = (S.st.tkUsed || 0) + p.n;   // 4.0.1: 자동 사용도 쓴 장수를 세요
+    S.st.tkUsed = (S.st.tkUsed || 0) + p.n;   // 자동 사용도 쓴 장수를 세요
     toast(p.left ? `${tkPlanText(p)}을 써서 ${hm(p.cut)} 줄였어요. ${hm(p.left)} 남아요` : `${tkPlanText(p)}을 써서 공사가 끝났어요!`);
     conCut(k, p.cut + (p.left ? 0 : 1));
     return true;
@@ -730,57 +730,57 @@
     for (const k of Object.keys(FAC)) conMap(k);
     if (rt.sheetKey) conSheet();
   }
-  const conArtKey = k => { if (!(S.f[k] >= 1)) return ''; const key = 'con_' + bldImg(k).replace(/^bld_/, ''); return IMG(key) ? key : ''; };   // 5.2.0.2 초등 트랙과 과학실 덧그림(작업지시서 102)이 들어와 빌려 쓰기(CON_ALT)를 없앴어요
+  const conArtKey = k => { if (!(S.f[k] >= 1)) return ''; const key = 'con_' + bldImg(k).replace(/^bld_/, ''); return IMG(key) ? key : ''; };   // 초등 트랙과 과학실 덧그림(작업지시서 102)이 들어와 빌려 쓰기(CON_ALT)를 없앴어요
   function conMap(k) {
     const g = $('#b-' + k); if (!g) return;
     let el = g.querySelector('.con'), ui = document.getElementById('cu-' + k);
-    if (!conOn(k) || !facKeys().includes(k) || (uniOn() && !geo().lot[k])) { if (el) el.remove(); if (ui) ui.remove(); g.classList.remove('is-con'); ffbAt(k, 0, false); return; }   // 4.1.1 woodani 제보: 대학교에서 구역을 옮기면 다른 구역 건물의 공사 막대와 비버 선생님이 그대로 남았어요. 이 지도에 없는 건물은 지워요
+    if (!conOn(k) || !facKeys().includes(k) || (uniOn() && !geo().lot[k])) { if (el) el.remove(); if (ui) ui.remove(); g.classList.remove('is-con'); ffbAt(k, 0, false); return; }   // 대학교에서 구역을 옮기면 다른 구역 건물의 공사 막대와 비버 선생님이 그대로 남았어요. 이 지도에 없는 건물은 지워요
     const bi = g.querySelector(S.f[k] >= 1 ? '.built .bimg' : '.site .bimg') || g.querySelector('.bimg'); if (!bi) return;
     if (el && el.dataset.lay !== String(rt.mapLaid)) { el.remove(); el = null; if (ui) { ui.remove(); ui = null; } }
-    if (el && el.dataset.art !== (conArtKey(k) || '')) { el.remove(); el = null; if (ui) { ui.remove(); ui = null; } }   // 5.2.0.1 건물 모습(단계, 고급)이 바뀌면 덧그림도 다시   // 3.2.3 학교급이 바뀌어 지도 배치가 달라지면 막대 자리를 다시 잡아요
+    if (el && el.dataset.art !== (conArtKey(k) || '')) { el.remove(); el = null; if (ui) { ui.remove(); ui = null; } }   // 건물 모습(단계, 고급)이 바뀌면 덧그림도 다시. 학교급이 바뀌어 지도 배치가 달라지면 막대 자리를 다시 잡아요
     const num = a => Number(bi.getAttribute(a)) || 0, x = num('x'), y = num('y'), w = num('width'); if (!w) return;
     const b = S.bd[k], left = conLeft(k), pr = Math.min(1, Math.max(0, 1 - left * 1000 / Math.max(1, b.e - b.s)));
     if (!el) {
       el = document.createElementNS('http://www.w3.org/2000/svg', 'g'); el.setAttribute('class', 'con'); g.appendChild(el);
-      const bw = Math.min(w, 104) * 0.74, bh = bw * 56 / 256,   // 2.1.2: 넓은 그림(운동장, 과학실)도 막대와 글씨는 다른 건물과 같은 크기
+      const bw = Math.min(w, 104) * 0.74, bh = bw * 56 / 256,   // 넓은 그림(운동장, 과학실)도 막대와 글씨는 다른 건물과 같은 크기
         bx = x + (w - bw) / 2,
-        // 3.2.3 woodani 요청: 막대가 건물 꼭대기에 있으면 촘촘한 지도(고등학교)에서 위 건물 이름판과 겹쳐요. 이름판 바로 위로 내리고, ⚡ 배지는 막대 위, '즉시 완공 가능!'은 그 위
+        // 막대가 건물 꼭대기에 있으면 촘촘한 지도(고등학교)에서 위 건물 이름판과 겹쳐요. 이름판 바로 위로 내리고, ⚡ 배지는 막대 위, '즉시 완공 가능!'은 그 위
         G0 = geo().b[k], by = G0 ? G0[1] + G0[2] * 0.36 - 12 - bh * 0.82 : y + w * 0.02;
       el.dataset.bh = bh.toFixed(2); el.dataset.lay = String(rt.mapLaid);
-      // 3.3.0 woodani 요청: 비계가 건물 그림 전체 크기라 너무 복잡해 보여요. 건물 가운데에 절반쯤 크기로(아래쪽은 바닥 섬 위)
+      // 비계가 건물 그림 전체 크기라 너무 복잡해 보여요. 건물 가운데에 절반쯤 크기로(아래쪽은 바닥 섬 위)
       const sw = w * 0.5, sx = x + (w - sw) / 2, sy = y + w * 0.3;
-      // 5.2.0.1 woodani 요청: 건물마다 그 건물에 맞는 공사 덧그림(작업지시서 99, 101, con_<건물 그림>). 건물 그림과 같은 캔버스라 같은 자리와 크기로 겹쳐요. 없으면(처음 짓는 자리, 고급 건물) 예전 비계
+      // 건물마다 그 건물에 맞는 공사 덧그림(작업지시서 99, 101, con_<건물 그림>). 건물 그림과 같은 캔버스라 같은 자리와 크기로 겹쳐요. 없으면(처음 짓는 자리, 고급 건물) 예전 비계
       const ck = conArtKey(k), cu = ck && IMG(ck), at = a => bi.getAttribute(a) ? ` ${a}="${bi.getAttribute(a)}"` : '';
       el.dataset.art = ck || '';
       el.innerHTML = (cu ? `<image class="con-scaf con-art" href="${cu}"${at('x')}${at('y')}${at('width')}${at('height')}${at('transform')}/>` : IMG180('fx_scaffold') ? `<image class="con-scaf" href="${IMG180('fx_scaffold')}" x="${sx.toFixed(1)}" y="${sy.toFixed(1)}" width="${sw.toFixed(1)}" height="${sw.toFixed(1)}"/>` : '') +
-        (IMG('fx_lantern') ? `<image class="con-lan" href="${IMG('fx_lantern')}" x="${(sx + sw * 0.02).toFixed(1)}" y="${(sy + sw * 0.3).toFixed(1)}" width="${(sw * 0.3).toFixed(1)}" height="${(sw * 0.3).toFixed(1)}"/>` : '') +   // 2.2.0 야간 건설 때만 보이는 등불
+        (IMG('fx_lantern') ? `<image class="con-lan" href="${IMG('fx_lantern')}" x="${(sx + sw * 0.02).toFixed(1)}" y="${(sy + sw * 0.3).toFixed(1)}" width="${(sw * 0.3).toFixed(1)}" height="${(sw * 0.3).toFixed(1)}"/>` : '') +   // 야간 건설 때만 보이는 등불
         `<rect class="con-back" x="${(bx + bw * 0.06).toFixed(1)}" y="${(by + bh * 0.2).toFixed(1)}" width="${(bw * 0.88).toFixed(1)}" height="${(bh * 0.6).toFixed(1)}" rx="${(bh * 0.3).toFixed(1)}"/>` +
         `<rect class="con-fill" x="${(bx + bw * 0.06).toFixed(1)}" y="${(by + bh * 0.2).toFixed(1)}" width="0" height="${(bh * 0.6).toFixed(1)}" rx="${(bh * 0.3).toFixed(1)}" data-w="${(bw * 0.88).toFixed(1)}"/>` +
         (IMG('timer_bar') ? `<image class="con-bar" href="${IMG('timer_bar')}" x="${bx.toFixed(1)}" y="${by.toFixed(1)}" width="${bw.toFixed(1)}" height="${bh.toFixed(1)}"/>` : '') +
         `<text class="con-t" x="${(x + w / 2).toFixed(1)}" y="${(by + bh * 0.66).toFixed(1)}" font-size="${(bh * 0.5).toFixed(1)}" stroke-width="${(bh * 0.12).toFixed(1)}"></text>` +
         `<g class="con-sp"><rect x="${(bx + bw / 2 - bh * 1.6).toFixed(1)}" y="${(by - bh * 0.75 - 1).toFixed(1)}" width="${(bh * 3.2).toFixed(1)}" height="${(bh * 0.95).toFixed(1)}" rx="${(bh * 0.47).toFixed(1)}"/>` +
-        `<text x="${(bx + bw / 2).toFixed(1)}" y="${(by - bh * 0.08 - 1).toFixed(1)}" font-size="${(bh * 0.58).toFixed(1)}" textLength="${(bh * 2.6).toFixed(1)}" lengthAdjust="spacingAndGlyphs"></text></g>`;   // 2.3.0.2 휴대폰에서 글자가 배지 밖으로 넘쳐서 배지를 넓히고 글자를 배지 안에 맞춰요   // 2.3.0.1 빠르기 배지(막대 바로 아래)
+        `<text x="${(bx + bw / 2).toFixed(1)}" y="${(by - bh * 0.08 - 1).toFixed(1)}" font-size="${(bh * 0.58).toFixed(1)}" textLength="${(bh * 2.6).toFixed(1)}" lengthAdjust="spacingAndGlyphs"></text></g>`;   // 휴대폰에서 글자가 배지 밖으로 넘쳐서 배지를 넓히고 글자를 배지 안에 맞춰요. 빠르기 배지(막대 바로 아래)
     }
-    if (!ui) {   // 2.3.1 막대와 글씨, 배지는 학생 위 층(#conUi)으로 옮겨요. 비계 그림은 건물에 그대로
+    if (!ui) {   // 막대와 글씨, 배지는 학생 위 층(#conUi)으로 옮겨요. 비계 그림은 건물에 그대로
       ui = document.createElementNS('http://www.w3.org/2000/svg', 'g'); ui.setAttribute('class', 'con con-ui'); ui.id = 'cu-' + k;
       const lay = $('#conUi'); if (lay) lay.appendChild(ui); else el.appendChild(ui);
       for (const c of ['.con-back', '.con-fill', '.con-bar', '.con-t', '.con-sp']) { const n = el.querySelector(c); if (n) ui.appendChild(n); }
     }
-    conBeaver(ui, x, y, w);   // 2.3.5 비버는 학생 위 층(건물 누르는 칸에 가리지 않게)
-    { const bv = ui.querySelector('.con-bv'); if (bv && ui.firstChild !== bv) ui.insertBefore(bv, ui.firstChild); }   // 3.2.3 막대와 배지가 비버 앞에 보여요(글씨가 가리지 않게)
+    conBeaver(ui, x, y, w);   // 비버는 학생 위 층(건물 누르는 칸에 가리지 않게)
+    { const bv = ui.querySelector('.con-bv'); if (bv && ui.firstChild !== bv) ui.insertBefore(bv, ui.firstChild); }   // 막대와 배지가 비버 앞에 보여요(글씨가 가리지 않게)
     ui.classList.toggle('fast', conAdd() > 0);
     { const add = conAdd(), sp = ui.querySelector('.con-sp text'); el.classList.toggle('fast', add > 0); const st = `⚡+${add}%`; if (add > 0 && sp && sp.textContent !== st) sp.textContent = st; }
     g.classList.add('is-con'); ffbAt(k, Number(el.dataset.bh) || 0, conAdd() > 0);
     const f = ui.querySelector('.con-fill'); if (f) f.setAttribute('width', (Number(f.dataset.w) * pr).toFixed(1));
     const t = ui.querySelector('.con-t'), tx = hm(left); if (t && t.textContent !== tx) t.textContent = tx;
   }
-  // 3.2.3 '즉시 완공 가능!' 배지 자리: 공사 중이면 이름판 위 막대(와 ⚡ 배지) 위로 올려요
+  // '즉시 완공 가능!' 배지 자리: 공사 중이면 이름판 위 막대(와 ⚡ 배지) 위로 올려요
   function ffbAt(k, bh, fast) {
     const b = document.querySelector('#pq-' + k + ' .ffb'); if (!b) return;
     const ty = !bh ? -20 : fast ? -21.5 - bh * 1.57 - 2 : -20.5 - bh * 0.62, tr = `translate(-38 ${ty.toFixed(1)})`;
     if (b.getAttribute('transform') !== tr) b.setAttribute('transform', tr);
   }
-  // 2.3.5 비버 선생님이 공사장에서 망치질해요(초등학교부터). 그림 1, 2를 0.35초마다 번갈아, 가끔 3(먼지)
+  // 비버 선생님이 공사장에서 망치질해요(초등학교부터). 그림 1, 2를 0.35초마다 번갈아, 가끔 3(먼지)
   const BV_LINES = ['뚝딱뚝딱! 튼튼하게 짓는 중이에요', '못 하나도 꼼꼼하게 박아요', '조금만 기다려 주세요, 금방 끝나요', '연수를 받으면 더 빨리 지을 수 있어요'];
   const BV_S = 0.30;   // 비버 선생님 크기(건물 그림 너비에 견준 몫, 110 넘는 건물은 110으로 쳐요)
   function conBeaver(el, x, y, w) {
@@ -788,7 +788,7 @@
     let bv = el.querySelector('.con-bv');
     if (!has) { if (bv) bv.remove(); return; }
     if (bv) return;
-    const s = Math.min(w, 110) * BV_S, bx = x + w * 0.9 - s / 2, by = y + w * 0.84 - s;   // 5.2.0.1 woodani 요청: 건물을 덜 가리게 0.44 → 0.30, 공사 막대에 가리지 않게 오른쪽 아래 모서리로
+    const s = Math.min(w, 110) * BV_S, bx = x + w * 0.9 - s / 2, by = y + w * 0.84 - s;   // 건물을 덜 가리게 0.44 → 0.30, 공사 막대에 가리지 않게 오른쪽 아래 모서리로
     const im = (k, c) => FSI(k) ? `<image class="${c}" href="${FSI(k)}" x="${bx.toFixed(1)}" y="${by.toFixed(1)}" width="${s.toFixed(1)}" height="${s.toFixed(1)}"/>` : '';
     bv = document.createElementNS('http://www.w3.org/2000/svg', 'g'); bv.setAttribute('class', 'con-bv');
     bv.setAttribute('role', 'button'); bv.setAttribute('aria-label', XT.fix.name);
@@ -813,16 +813,16 @@
     $('#conFill').style.width = (pr * 100).toFixed(1) + '%';
     const p = tkPlan(left);
     $('#conAll').setAttribute('aria-disabled', p.n ? 'false' : 'true');
-    setT($('#conAllLbl'), rt.conArm && p.n ? '이대로 쓸게요' : '단축권 자동 사용');   // 2.3.0 이름(woodani)
+    setT($('#conAllLbl'), rt.conArm && p.n ? '이대로 쓸게요' : '단축권 자동 사용');   // 이름
     $('#conFree').hidden = !(S.tier >= 1 && conFreeLeft(k));
-    if (!$('#conFree').hidden) { setT($('#conFreeTx'), `즉시 완공 (오늘 ${ffLeft()}번 남음)`); setT($('#conFree .n'), ffLeft()); }   // 3.0.0 학교 전체 하루 3번
+    if (!$('#conFree').hidden) { setT($('#conFreeTx'), `즉시 완공 (오늘 ${ffLeft()}번 남음)`); setT($('#conFree .n'), ffLeft()); }   // 학교 전체 하루 3번
     { const c = conEssCost(left); setH($('#conEssCost'), `${ESS_ICON()}<b>${c}</b>`); $('#conEss').setAttribute('aria-disabled', S.ess >= c ? 'false' : 'true'); }
     $('#conNo').hidden = !(rt.conArm && p.n);
     setT($('#conPlan'), !p.n ? '시간 단축권이 없어요. 광고를 보거나 문방구에서 살 수 있어요'
       : p.left ? `${tkPlanText(p)}을 써서 ${hm(p.cut)} 줄이고 ${hm(p.left)} 남아요` : left < 60 ? `${hm(left)}면 끝나요. 단축권은 긴 공사에 아껴 두세요` : `${tkPlanText(p)}을 써서 바로 끝나요`);
-    const arm = rt.conArm && p.n;   // 2.1.2 바로 줄이기를 누르면 쓸 권을 표시해요
+    const arm = rt.conArm && p.n;   // 바로 줄이기를 누르면 쓸 권을 표시해요
     setH($('#conTks'), TK.slice().reverse().map(t => `<button type="button" class="con-tk${rt.conPick === t.k ? ' armed' : ''}${arm && p.use[t.k] ? ' plan' : ''}" data-tk="${t.k}" aria-disabled="${S.tk[t.k] > 0 ? 'false' : 'true'}">${IMG('ticket_' + t.k) ? `<img src="${IMG('ticket_' + t.k)}" alt="">` : '⌛'}<span>${t.name}</span><b>${fmt(S.tk[t.k])}장</b>${arm && p.use[t.k] ? `<em class="use">−${p.use[t.k]}장</em>` : ''}</button>`).join(''));
-    cbSheet();   // 2.1.1 건설 가속
+    cbSheet();   // 건설 가속
     const al = tkAdLeft();
     $('#conAd').setAttribute('aria-disabled', al > 0 ? 'false' : 'true');
     setT($('#conAd'), al > 0 ? `광고 보고 5분권 ${TKAD.n}장 받기 (오늘 ${al}번 남음)` : '오늘 광고 단축권을 다 받았어요');
