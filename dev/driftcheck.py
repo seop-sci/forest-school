@@ -1,6 +1,6 @@
 # 어긋남 막는 검사 (5.0.2 개발 기반 정리). 게임 원본에서 '한 곳만 고치고 다른 곳을 잊기 쉬운' 세 가지를 봐요.
 #   1. 메인 퀘스트(MAIN) 제목과 설명에 적힌 숫자가 조건 n과 같은지 (Lv.3이라 쓰고 n은 4인 것)
-#   2. 퀘스트 종류(t)가 qMeasure(재기), qGoal(목표 글), goTo(바로 가기)에 모두 있는지
+#   2. 퀘스트 종류(t)마다 종류 표 QT에 measure(재기, 없으면 S.st 칸), goal(목표 글), go(바로 가기)가 있는지
 #   3. fresh()와 새 학년 시작(newYear: graduate()와 promote()가 불러요)의 건물, 선생님 처음 값이 같은지
 # 쓰는 법: python3 dev/driftcheck.py   (먼저 python3 wrap.py). 마지막 줄 PASS, 어긋나면 FAIL과 끝 코드 1.
 import sys as _sys, pathlib as _pl; _sys.path.insert(0, str(_pl.Path(__file__).resolve().parent)); import srcbuild as _sb; _sb.build()   # 2026-11-18 src/ → forest-school.html 먼저
@@ -17,6 +17,16 @@ def body(name):
     j = src.index('\n  }\n', i)
     return src[i:j]
 def cases(name): return set(re.findall(r"case '(\w+)'", body(name)))
+def qt_table():
+    # 퀘스트 종류 표 QT(src/js/33-quests.js): 종류마다 measure, goal, go 가운데 무엇이 있는지
+    i = src.index('\n  const QT = {'); j = src.index('\n  };', i)
+    out, cur = {}, None
+    for line in src[i:j].split('\n'):
+        m = re.match(r'    (\w+): \{', line)
+        if m: cur = out.setdefault(m.group(1), set()); continue
+        m = re.match(r'      (measure|goal|go): ', line)
+        if m and cur is not None: cur.add(m.group(1))
+    return out
 
 # ---- 브라우저에서 MAIN과 처음 값 읽기
 pw = sync_playwright().start(); br = pw.chromium.launch()
@@ -50,14 +60,19 @@ if seen < 50: bad.append(f'숫자를 {seen}곳밖에 못 봤어요. 이 검사�
 i0 = src.index('\n  const SUBS = ['); i1 = src.index('\n  const freshQ', i0)
 sub_t = set(re.findall(r"\bt: '(\w+)'", src[i0:i1]))
 types = {q['t'] for q in MAIN} | sub_t
-cm, cg, ct = cases('qMeasure'), cases('qGoal'), cases('goTo')
-GOAL_OK = {}   # qGoal이 없어도 되는 종류: 까닭
+QT = qt_table()
+GOAL_OK = {}   # goal이 없어도 되는 종류: 까닭
 GOTO_OK = {}
-for t in sorted(types):
-    if t not in cm and t not in ST: bad.append(f"종류 '{t}': qMeasure에 없고 S.st에도 없어요(늘 0으로 재요)")
-    if t not in cg and t not in GOAL_OK: bad.append(f"종류 '{t}': qGoal에 없어요(목표 글이 비어요)")
-    if t not in ct and t not in GOTO_OK: bad.append(f"종류 '{t}': goTo에 없어요(바로 가기를 눌러도 아무 일이 없어요)")
-note.append(f'퀘스트 종류 {len(types)}가지(메인 {len({q["t"] for q in MAIN})}, 학생 부탁 {len(sub_t)})')
+if len(QT) < 50: bad.append(f'퀘스트 종류 표 QT에서 종류를 {len(QT)}개밖에 못 읽었어요. 이 검사를 고쳐야 해요')
+for t in sorted(types | set(QT)):
+    e = QT.get(t)
+    if e is None: bad.append(f"종류 '{t}': 퀘스트 종류 표 QT에 없어요(재기, 목표 글, 바로 가기가 모두 비어요)"); continue
+    if 'measure' not in e and t not in ST: bad.append(f"종류 '{t}': QT에 measure가 없고 S.st에도 없어요(늘 0으로 재요)")
+    if 'goal' not in e and t not in GOAL_OK: bad.append(f"종류 '{t}': QT에 goal이 없어요(목표 글이 비어요)")
+    if 'go' not in e and t not in GOTO_OK: bad.append(f"종류 '{t}': QT에 go가 없어요(바로 가기를 눌러도 아무 일이 없어요)")
+for name in ('qMeasure', 'qGoal', 'goTo'):
+    if 'switch (q.t)' in body(name): bad.append(f'{name}에 종류별 switch가 다시 생겼어요. 퀘스트 종류 표 QT에 적어 주세요')
+note.append(f'퀘스트 종류 {len(types)}가지(메인 {len({q["t"] for q in MAIN})}, 학생 부탁 {len(sub_t)}), 표 QT {len(QT)}가지(measure {sum(1 for e in QT.values() if "measure" in e)}, 나머지는 S.st)')
 
 # ---- 3. fresh()와 graduate()의 처음 값
 def obj(text):
