@@ -6,6 +6,7 @@
 #  4) 사진 모드: 글과 단추가 숨고 시간과 날씨를 고를 수 있고, 닫으면 돌아와요. 다른 탭으로 가면 저절로 닫혀요
 #  5) 학생 뒷모습: 위로 걷는 학생은 chb_ 그림, 멈추면 앞모습
 #  6) 학교급 구름 막(wldCurtain)이 잠깐 떴다 사라져요
+#  6-1) 밤: 모든 학교급에 밤 밝기 단추, 학생은 셋 중 하나만 돌아다녀요
 #  7) 페이지 오류 없음
 # 쓰는 법: python3 wrap.py && python3 s175test.py   (마지막 줄이 PASS면 통과)
 import asyncio, json, pathlib
@@ -74,6 +75,18 @@ async def main():
         print('뒷모습', best, '멈췄는데 뒷모습', r)
         if not best: bad.append('위로 걷는 학생의 뒷모습이 없어요')
         if r: bad.append(f'멈춘 학생 {r}명이 뒷모습')
+        # 밤: 유치원부터 중학교도 밤 밝기 단추(밤, 저녁, 밝게), 학생은 셋 중 하나만 돌아다녀요
+        await pg.evaluate(f"(() => {{ {F}.S.nl = 0; {F}.rt4.wldPh = 'night'; {F}.wldSync(); }})()"); await pg.wait_for_timeout(300)
+        r = await pg.evaluate(f"(() => {{ const ks = {F}.rt4.kids, off = ks.filter(k => k.g.classList.contains('nt-off')).length; return [ks.length, off, !!document.querySelector('#tierDots [data-nl]'), document.querySelector('.wld-tint').className]; }})()")
+        print('밤', r)
+        if not r[2] or r[1] != r[0] - (r[0] + 2) // 3 or 'ph-night' not in r[3]: bad.append(f'밤 학생과 밝기 단추 {r}')
+        await pg.click('#tierDots [data-nl]'); await pg.wait_for_timeout(200)
+        r = await pg.evaluate(f"[{F}.S.nl, document.querySelector('.wld-tint').className.includes('nl1')]")
+        if r != [1, True]: bad.append(f'밤 밝기 저녁 {r}')
+        await pg.evaluate(f"(() => {{ {F}.S.nl = 0; {F}.rt4.wldPh = 'day'; {F}.wldSync(); }})()"); await pg.wait_for_timeout(200)
+        r = await pg.evaluate(f"[{F}.rt4.kids.filter(k => k.g.classList.contains('nt-off')).length, !!document.querySelector('#tierDots [data-nl]')]")
+        if r != [0, False]: bad.append(f'낮이 되면 학생이 다 나와요 {r}')
+        await pg.evaluate(f"{F}.rt4.wldPh = undefined")
         # 구름 막
         await pg.evaluate(f"{F}.wldCurtain()"); await pg.wait_for_timeout(200)
         a = await pg.evaluate("document.querySelectorAll('.wld-cur img').length")

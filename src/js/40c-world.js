@@ -40,7 +40,8 @@
     const lv = wldLv(), home = rt.tab === 'school' && !document.hidden, ph = lv ? wldPhase() : '', wx = lv ? wldWeather() : '';
     WLD.lv = lv; WLD.ph = ph; WLD.wx = wx;
     const hsN = $('#map') && $('#map').classList.contains('hs-night');   // 고등학교부터의 밤은 예전 밤 화면(창문 불빛)이 맡아요
-    WLD.tint.className = 'wld-tint' + (lv && ph ? ' ph-' + ph : '') + (hsN ? ' hs' : '') + (wx ? ' wx-' + wx : '');
+    WLD.tint.className = 'wld-tint' + (lv && ph ? ' ph-' + ph : '') + (hsN ? ' hs' : '') + (wx ? ' wx-' + wx : '') + (S.nl && !rt.photo ? ' nl' + S.nl : '');
+    kidsNightSync(); renderTierDots();   // 밤에는 학생 셋 중 하나만, 밤 밝기 단추
     WLD.vig.className = 'wld-vig' + (lv >= 2 ? ' on' : '');
     rt.ambWx = home ? wx : '';
     const key = (geo().map || '').replace(/_(spring|summer|autumn|winter|xmas|space|retro|lux)$/, '');

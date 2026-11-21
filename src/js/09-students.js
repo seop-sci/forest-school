@@ -201,7 +201,7 @@
     if (fromGate && !rt.reduced) { const [gx, gy] = geo().gate; k.x = gx + rand(-8, 8); k.y = gy; k.wait = 0; }
     else { k.x = k.tx; k.y = k.ty; pickTarget(k); }
     placeKid(k, 0);
-    rt.kids.push(k);
+    rt.kids.push(k); kidNight(k, rt.kids.length - 1);
   }
   // 지도 학생은 만난 종류가 모두 한 번씩 보이게. 만난 종류가 16종보다 많으면 그만큼 더 걸어 다녀요(학생 수 안에서)
   // 줄일 때는 같은 종류가 겹친 학생부터 빼요. 새 친구가 오면 겹치는 학생 하나를 그 친구로 바꿔요
@@ -241,6 +241,13 @@
     else if (k.frontU) im.setAttribute('href', k.frontU);
     k.back = back;
   }
+  // 밤(유치원부터 중학교까지, 마을 층 밤)에는 학생 셋 중 하나만 돌아다니고 나머지는 집에 가요(고등학교부터의 밤은 모두 기숙사)
+  function kidsNightOn() { try { return wldLv() > 0 && WLD.ph === 'night' && !rt.photo && !(map && map.classList.contains('hs-night')); } catch (e) { return false; } }
+  function kidNight(k, i, on = kidsNightOn()) {
+    const off = on && i % 3 !== 0; if (!!k.ntOff === off) return;
+    k.ntOff = off; k.g.classList.toggle('nt-off', off);
+  }
+  function kidsNightSync() { const on = kidsNightOn(); rt.kids.forEach((k, i) => kidNight(k, i, on)); }
   function updateKids(dt, now) {
     if (rt.reduced) return;
     const away = kidsAway();   // 고등학교 밤에는 학생층이 숨어 있어서 걷기 계산만 하고 그리기(매 프레임 16명 setAttribute)와 줄 세우기는 쉬어요

@@ -2,7 +2,7 @@
 <html lang="ko">
 <head>
 <meta charset="utf-8">
-<meta name="forest-version" content="5.3.1">
+<meta name="forest-version" content="5.3.1.1">
 <meta name="viewport" content="width=device-width, initial-scale=1">
 <meta name="description" content="도토리를 모아 숲속 학교를 키우는 방치형 게임 테스트판이에요.">
 <style>html,body{margin:0}</style>
@@ -2127,6 +2127,9 @@ body{background:radial-gradient(120% 60% at 50% 0%, color-mix(in srgb, var(--pap
 .wld-tint.ph-evening{background:rgba(255,128,64,.2)}
 .wld-tint.ph-night{background:rgba(16,22,70,.46)}
 .wld-tint.ph-night.hs{background:rgba(0,0,0,0)}
+.wld-tint.ph-night.nl1{background:rgba(16,22,70,.22)}
+.wld-tint.ph-night.nl2,.wld-tint.ph-night.nl2.wx-rain{background:rgba(0,0,0,0)}
+#kids .nt-off{opacity:0;pointer-events:none;transition:opacity 1.2s}
 .wld-tint.wx-rain{background:rgba(70,86,112,.18)}
 .wld-tint.wx-snow{background:rgba(214,226,246,.14)}
 .wld-tint.ph-night.wx-rain{background:rgba(22,32,70,.36)}
@@ -4008,7 +4011,7 @@ body.mg-on .toast[hidden]{display:none}
     <p class="boot-step" id="bootStep">학교 문을 여는 중...</p>
     <p class="boot-tip" id="bootTip">학교 문을 여는 중이에요</p>
   </div>
-  <span class="boot-ver" id="bootVer">v5.3.1</span>
+  <span class="boot-ver" id="bootVer">v5.3.1.1</span>
 </div>
 
 <div class="app on-school" id="app">
@@ -4606,7 +4609,7 @@ body.mg-on .toast[hidden]{display:none}
       </div>
       <h3 class="panel-sub">정보</h3>
       <dl class="info">
-        <div id="verRow"><dt>버전</dt><dd>v5.3.1</dd></div>
+        <div id="verRow"><dt>버전</dt><dd>v5.3.1.1</dd></div>
         <div id="pidRow" hidden><dt>학교 번호</dt><dd id="infoPid"></dd></div>
       </dl>
       <div id="devBox" hidden>
@@ -11808,7 +11811,7 @@ body.mg-on .toast[hidden]{display:none}
     if (fromGate && !rt.reduced) { const [gx, gy] = geo().gate; k.x = gx + rand(-8, 8); k.y = gy; k.wait = 0; }
     else { k.x = k.tx; k.y = k.ty; pickTarget(k); }
     placeKid(k, 0);
-    rt.kids.push(k);
+    rt.kids.push(k); kidNight(k, rt.kids.length - 1);
   }
   // 지도 학생은 만난 종류가 모두 한 번씩 보이게. 만난 종류가 16종보다 많으면 그만큼 더 걸어 다녀요(학생 수 안에서)
   // 줄일 때는 같은 종류가 겹친 학생부터 빼요. 새 친구가 오면 겹치는 학생 하나를 그 친구로 바꿔요
@@ -11848,6 +11851,13 @@ body.mg-on .toast[hidden]{display:none}
     else if (k.frontU) im.setAttribute('href', k.frontU);
     k.back = back;
   }
+  // 밤(유치원부터 중학교까지, 마을 층 밤)에는 학생 셋 중 하나만 돌아다니고 나머지는 집에 가요(고등학교부터의 밤은 모두 기숙사)
+  function kidsNightOn() { try { return wldLv() > 0 && WLD.ph === 'night' && !rt.photo && !(map && map.classList.contains('hs-night')); } catch (e) { return false; } }
+  function kidNight(k, i, on = kidsNightOn()) {
+    const off = on && i % 3 !== 0; if (!!k.ntOff === off) return;
+    k.ntOff = off; k.g.classList.toggle('nt-off', off);
+  }
+  function kidsNightSync() { const on = kidsNightOn(); rt.kids.forEach((k, i) => kidNight(k, i, on)); }
   function updateKids(dt, now) {
     if (rt.reduced) return;
     const away = kidsAway();   // 고등학교 밤에는 학생층이 숨어 있어서 걷기 계산만 하고 그리기(매 프레임 16명 setAttribute)와 줄 세우기는 쉬어요
@@ -15233,7 +15243,7 @@ body.mg-on .toast[hidden]{display:none}
        forest/rank/<내 id>   랭킹 이름과 학교 점수
        forest/stats/<내 id>  테스트 현황 (어디까지 했는지, 얼마나 했는지)
      <내 id>는 Firebase 익명 로그인이 기기(브라우저)마다 만들어 줘요. */
-  const VERSION = '5.3.1';
+  const VERSION = '5.3.1.1';
   const NT_QUIET = ['5.3.0.3', '5.3.0.2', '5.3.0.1', '5.2.2', '5.2.1', '5.2.0.2', '5.2.0.1', '5.1.1.3', '5.1.1.2', '5.1.1.1', '5.1.1', '5.0.3.1', '5.0.3', '5.0.2.2', '5.0.2.1', '2.1.20', '2.1.2.2', '2.3.0.1', '2.3.4', '3.2.3', '3.2.4', '3.2.5', '3.3.1', '3.3.2', '3.3.3', '4.4.1.1', '4.4.1.2', '4.4.1.3', '4.4.1.4', '5.0.1.1', '5.0.1.2', '5.0.1.3', '5.0.1.4', '5.0.1.5', '5.0.1.6', '5.0.1.7', '5.0.1.8'];   // 생물 탐사 고침은 공지 없이. 도 공지 없이(공지 줄은 정하면 넣어요). 공지 없이. 공지 줄은 woodani가 정할 때까지 조용히. 공지는 2026-11-16 woodani가 정해서 NOTICES로 옮겼어요. 은 공지를 띄워요. 도 공지 없이. 도 공지 창 없이. 도 공지 창 없이(공지는 그대로). 도 조용히. 도 공지 창 없이(공지 줄을 고르지 않음)
     // 이 버전들은 업데이트해도 공지 창을 띄우지 않아요(공지는 그대로)
   /* 공지사항 (은 이미 올려서 부터): 설정 > 공지사항. 맨 위가 가장 새 공지예요
@@ -22162,12 +22172,13 @@ body.mg-on .toast[hidden]{display:none}
     return stageKey('bld_' + k, n, 2) || BLD_IMG[k];
   }
   const viewMap = () => rt.viewTier == null ? decoMap() : geoIdx(rt.viewTier);
-  // 고등학교 밤(20~6시)에도 밝기를 고를 수 있어요. 학생은 그대로 기숙사에서 쉬어요
+  // 밤(20~6시)에는 밝기를 고를 수 있어요(모든 학교급). 고등학교부터는 학생이 그대로 기숙사에서 쉬어요
   const NL_NAME = ['밤', '저녁', '밝게'], NL_EM = ['🌙', '🌆', '☀️'];
   function nlCycle() {
     S.nl = ((S.nl || 0) + 1) % 3; sfx('tap'); save();
-    renderNight(true); renderTierDots();
-    toast(S.nl === 2 ? '밤에도 밝게 보여요.\n학생들은 그대로 기숙사에서 쉬어요' : S.nl === 1 ? '밤 화면을 조금 어둡게 보여요' : '밤 화면을 어둡게 보여요');
+    renderNight(true); wldSync(); renderTierDots();
+    const hs = !!map && map.classList.contains('hs-night');
+    toast(S.nl === 2 ? '밤에도 밝게 보여요' + (hs ? '.\n학생들은 그대로 기숙사에서 쉬어요' : '') : S.nl === 1 ? '밤 화면을 조금 어둡게 보여요' : '밤 화면을 어둡게 보여요');
   }
   // 날씨 칩이 가운데에 있어서 좁은 화면이나 밤 모습 단추가 있을 때 학교급 단추와 겹쳤어요. 학교급 단추 오른쪽에 붙여요
   function wxPlace() {
@@ -22179,7 +22190,8 @@ body.mg-on .toast[hidden]{display:none}
   function renderTierDots() {
     const box = $('#tierDots'); if (!box || !S) return;
     box.hidden = S.tier < 1 || rt.tab !== 'school' || !!rt.decoEdit;
-    const nlOn = !!map && map.classList.contains('hs-night') && rt.viewTier == null;   // 고등학교 밤 모습 단추
+    let wn = false; try { wn = wldLv() > 0 && WLD.ph === 'night' && !rt.photo; } catch (e) { /* 마을 층 준비 전 */ }
+    const nlOn = rt.viewTier == null && (!!map && map.classList.contains('hs-night') || wn);   // 밤 밝기 단추(고등학교 밤, 그 아래 학교급은 마을 층 밤)
     const key = [S.tier, rt.viewTier, nlOn, S.nl || 0, box.hidden].join('|');
     if (box.dataset.key === key) return; box.dataset.key = key;
     setTimeout(wxPlace, 0); renderCampus();   // 구역 막대도 같은 때에
@@ -31597,7 +31609,8 @@ body.mg-on .toast[hidden]{display:none}
     const lv = wldLv(), home = rt.tab === 'school' && !document.hidden, ph = lv ? wldPhase() : '', wx = lv ? wldWeather() : '';
     WLD.lv = lv; WLD.ph = ph; WLD.wx = wx;
     const hsN = $('#map') && $('#map').classList.contains('hs-night');   // 고등학교부터의 밤은 예전 밤 화면(창문 불빛)이 맡아요
-    WLD.tint.className = 'wld-tint' + (lv && ph ? ' ph-' + ph : '') + (hsN ? ' hs' : '') + (wx ? ' wx-' + wx : '');
+    WLD.tint.className = 'wld-tint' + (lv && ph ? ' ph-' + ph : '') + (hsN ? ' hs' : '') + (wx ? ' wx-' + wx : '') + (S.nl && !rt.photo ? ' nl' + S.nl : '');
+    kidsNightSync(); renderTierDots();   // 밤에는 학생 셋 중 하나만, 밤 밝기 단추
     WLD.vig.className = 'wld-vig' + (lv >= 2 ? ' on' : '');
     rt.ambWx = home ? wx : '';
     const key = (geo().map || '').replace(/_(spring|summer|autumn|winter|xmas|space|retro|lux)$/, '');
