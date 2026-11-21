@@ -21,7 +21,7 @@
   async function fxInit() {
     const fr = $('.frame'); if (!fr || !window.PIXI || !window.PIXI.Application) { FXL.st = 'no'; return; }
     const P = window.PIXI, app = new P.Application();
-    await app.init({ width: Math.max(1, fr.clientWidth), height: Math.max(1, fr.clientHeight), backgroundAlpha: 0, antialias: true, resolution: Math.min(2, window.devicePixelRatio || 1), autoDensity: true, autoStart: false, sharedTicker: false, preference: 'webgl' });
+    await app.init({ width: Math.max(1, fr.clientWidth), height: Math.max(1, fr.clientHeight), backgroundAlpha: 0, antialias: true, resolution: Math.min(wldLv() >= 2 ? 3 : 2, window.devicePixelRatio || 1), autoDensity: true, autoStart: false, sharedTicker: false, preference: 'webgl' });
     app.ticker.stop();
     const cv = app.canvas; cv.className = 'fxl'; cv.setAttribute('aria-hidden', 'true'); $('#map').after(cv);
     FXL.app = app; FXL.w = new P.Container(); app.stage.addChild(FXL.w);

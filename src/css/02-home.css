@@ -943,7 +943,20 @@ body{background:radial-gradient(120% 60% at 50% 0%, color-mix(in srgb, var(--pap
 .app.on-school .stage{position:absolute;inset:0;z-index:auto;min-height:0}
 .app.on-school .frame{z-index:auto;border:0;border-radius:0;box-shadow:none;background:linear-gradient(#86C3E8 0, #BFE0EE 14%, #6F9A57 24%, #3E6B3A 60%)}
 .app.on-school #map{position:absolute;left:0;top:0;touch-action:none;transform-origin:0 0}
-.frame canvas.fxl{position:absolute;left:0;top:0;pointer-events:none}   /* 5.2.1 효과층(PixiJS): 지도 바로 위, 누르기는 통과 */
+.frame canvas.fxl{position:absolute;left:0;top:0;pointer-events:none;z-index:2}
+/* 마을 층: 하루의 빛과 날씨 막, 가장자리 그늘(높음). 누르기는 통과 */
+.wld-tint,.wld-vig{position:absolute;inset:0;pointer-events:none;z-index:1}
+.wld-tint{background:rgba(0,0,0,0);transition:background-color 2.5s}
+.wld-tint.ph-morning{background:rgba(255,214,160,.10)}
+.wld-tint.ph-evening{background:rgba(255,128,64,.2)}
+.wld-tint.ph-night{background:rgba(16,22,70,.46)}
+.wld-tint.ph-night.hs{background:rgba(0,0,0,0)}
+.wld-tint.wx-rain{background:rgba(70,86,112,.18)}
+.wld-tint.wx-snow{background:rgba(214,226,246,.14)}
+.wld-tint.ph-night.wx-rain{background:rgba(22,32,70,.36)}
+.wld-vig{display:none;background:radial-gradient(ellipse 75% 70% at 50% 48%,rgba(0,0,0,0) 60%,rgba(34,26,10,.2) 100%)}
+.wld-vig.on{display:block}
+body.photo .wld-vig.on{display:none}   /* 5.2.1 효과층(PixiJS): 지도 바로 위, 누르기는 통과 */
 .app.on-school .frame.panning{cursor:grabbing}
 .app.on-school .fallfx,.app.on-school .fever-fx{border-radius:0}
 .app.on-school .qrow,.app.on-school .subbar{position:relative;z-index:3}
