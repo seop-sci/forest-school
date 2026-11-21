@@ -68,6 +68,7 @@
   // 패널 안 버튼: 패널은 HTML에 있으니 지금 바로 이어 둬요
   $('#panelDex').addEventListener('click', e => {
     { const ga = e.target.closest('[data-fr-gift-all]'); if (ga) { frGiftAll(ga.dataset.frGiftAll); return; } }
+    if (e.target.closest('[data-fr-pat-all]')) { frPatAll(); return; }
     const fb = e.target.closest('[data-fr-pat],[data-fr-gift],[data-fr-ren]');   // 단짝 칸
     if (fb) { if (fb.dataset.frPat) frPat(fb.dataset.frPat); else if (fb.dataset.frGift) frGift(fb.dataset.frGift); else openFrName(fb.dataset.frRen); return; }
     const b = e.target.closest('[data-dex]');
