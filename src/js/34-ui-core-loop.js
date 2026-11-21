@@ -112,6 +112,7 @@
     $('#optSound').checked = S.sound; $('#optBgm').checked = S.bgm; $('#optVibe').checked = S.vibrate;
     $('#tutSub').textContent = S.tut.paid || S.tut.nop ? '학교를 꾸려 가는 방법을 다시 봐요' : `끝까지 보면 황금 도토리 ${TUT_GOLD}개` + (S.tut.st === 'later' ? ' (이어서 보기)' : '');
     $$('#optUnits [data-units]').forEach(b => b.setAttribute('aria-checked', b.dataset.units === S.units ? 'true' : 'false'));
+    $$('#optAmb [data-amb]').forEach(b => b.setAttribute('aria-checked', +b.dataset.amb === S.ambV ? 'true' : 'false'));
     $$('#optUiz [data-uiz]').forEach(b => b.setAttribute('aria-checked', +b.dataset.uiz === S.uiz ? 'true' : 'false'));
     applyUiz();
   }

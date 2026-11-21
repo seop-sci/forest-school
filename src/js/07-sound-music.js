@@ -1,7 +1,7 @@
   /* ---------- 소리와 진동 ---------- */
   let actx = null, master = null;
   function ensureAudio(force) {
-    if (!S || !(S.sound || S.bgm || force)) return;
+    if (!S || !(S.sound || S.bgm || S.ambV || force)) return;
     if (!actx) {
       const AC = window.AudioContext || window.webkitAudioContext;
       if (!AC) return;
@@ -179,13 +179,19 @@
   // 1.8.0 곡은 게임 파일 밖의 따로 된 파일이에요(게임 파일이 너무 커지지 않게, woodani 결정). 웹, 안드로이드, 토스 판 모두 게임 옆 audio 폴더에 있어요
   const AUD_BASE = () => window.FS_AUD_BASE || 'audio/';
   // 5.0.2 앱 용량: 테마 곡 7개와 행사, 졸업 곡 5개는 앱에 넣지 않고 웹에서 받아요. 못 받으면 홈 곡이 나와요. 곡 파일을 바꾸면 AUD_V를 올려요
-  const WEB_AUD = new Set(['bgm_spring', 'bgm_summer', 'bgm_autumn', 'bgm_winter', 'bgm_xmas', 'bgm_space', 'bgm_retro', 'bgm_festival', 'bgm_festnight', 'bgm_bigfest', 'bgm_grad', 'bgm_unigrad']), AUD_V = '1';
+  const WEB_AUD = new Set(['bgm_spring', 'bgm_summer', 'bgm_autumn', 'bgm_winter', 'bgm_xmas', 'bgm_space', 'bgm_retro', 'bgm_festival', 'bgm_festnight', 'bgm_bigfest', 'bgm_grad', 'bgm_unigrad', 'amb_day', 'amb_morning', 'amb_evening', 'amb_night', 'amb_rain', 'amb_snow', 'amb_water']), AUD_V = '1';
   const webAud = key => APP_PACK() && !window.FS_AUD_BASE && WEB_AUD.has(key);
   const FILE_GAIN = 0.6;   // 파일 곡은 코드 곡보다 커서 조금 줄여요
   const bgmBuf = new Map();   // 풀어 둔 곡. 한 곡이 30MB쯤 메모리를 써서 두 곡까지만 들고 있어요
   function bgmLoad(key) {
     if (bgmBuf.has(key)) { const p = bgmBuf.get(key); bgmBuf.delete(key); bgmBuf.set(key, p); return p; }
     if (!actx) return Promise.resolve(null);
+    const p = audBytes(key).then(buf => actx.decodeAudioData(buf)).catch(() => { bgmBuf.delete(key); return null; });
+    bgmBuf.set(key, p);
+    while (bgmBuf.size > 2) bgmBuf.delete(bgmBuf.keys().next().value);
+    return p;
+  }
+  function audBytes(key) {
     const url = window.FS_AUD && window.FS_AUD[key];   // 자동 시험판은 글자로 넣은 곡
     // fetch(data:)는 앱 보안 설정(CSP)에 막힐 수 있어서 글자를 직접 바이트로 바꿔요. 보통은 audio 폴더의 파일을 받아요
     const bytes = url ? new Promise(res => setTimeout(res, 0)).then(() => {
@@ -193,10 +199,7 @@
       for (let i = 0; i < b64.length; i++) u8[i] = b64.charCodeAt(i);
       return u8.buffer;
     }) : (webAud(key) ? webFetch(WEB_ROOT + 'audio/' + key + '.mp4?v=' + AUD_V) : fetch(AUD_BASE() + key + '.mp4').then(r => { if (!r.ok) throw new Error('곡 파일 ' + r.status); return r; })).then(r => r.arrayBuffer());
-    const p = bytes.then(buf => actx.decodeAudioData(buf)).catch(() => { bgmBuf.delete(key); return null; });
-    bgmBuf.set(key, p);
-    while (bgmBuf.size > 2) bgmBuf.delete(bgmBuf.keys().next().value);
-    return p;
+    return bytes;
   }
   const HOME_MUSIC_TABS = new Set(['school', 'teachers', 'quests', 'rank', 'dex', 'event', 'hall', 'club', 'settings', 'mini', 'grad']);   // 2.3.1 woodani: 공부 탭과 졸업 탭도 홈 곡, 쉬는 시간 곡은 상점에서만   // 2.0.0 학교 복도와 동아리실, 설정(2026-10-27 woodani)도 홈 곡
   // 3.0.0 테마 세트 미리 보기: 저장(S.cos.th)은 그대로 두고 화면만 미리 보는 테마로 그려요
@@ -225,6 +228,7 @@
   // 곡을 바꿀 때는 지금 곡을 살짝 줄이고 새 곡을 키워요
   function musicSync() {
     if (!actx) return;
+    ambSync();
     const w = musicWant();
     if (w === Music.cur) return;
     Music.cur = w;
@@ -252,6 +256,58 @@
     }
     musicSynth(SONGS[w] ? w : 'room', now);
   }
+  /* 자연 소리: 홈 지도에서만 배경음악 밑에 깔리는 새소리, 풀벌레, 빗소리. 파일은 audio/amb_*.mp4(끝과 처음이 이어지게 다듬어 둠, 앱은 웹에서 받아요).
+     바탕 한 겹(아침, 낮, 노을, 밤) 위에 날씨(rt.ambWx: 'rain', 'snow')와 물가(rt.ambWater 0~1)가 겹쳐요. 바뀔 때는 2~3초에 걸쳐 서서히 */
+  const AMB = { out: null, lay: {}, buf: new Map() };
+  const AMB_LV = [0, 0.22, 0.4, 0.65];   // 설정 끄기, 작게, 보통, 크게(제안 값)
+  function ambWant() {
+    const w = {};
+    if (!S || !S.ambV || rt.paused || rt.adOpen || document.hidden || rt.tab !== 'school' || rt.cereOn) return w;
+    let play = false; try { play = !!((pzUI && pzUI.open) || (mgUI && mgUI.open) || (btUI && btUI.open)); } catch (e) { /* 아직 준비 전 */ }
+    if (play) return w;
+    const h = kstHour(gameNow()), base = isNight() ? 'amb_night' : h < 9 ? 'amb_morning' : h >= 17 ? 'amb_evening' : 'amb_day';
+    let bv = rt.fest || rt.sports ? 0.5 : 1;   // 행사 곡이 나올 때는 반쯤
+    if (rt.ambWx === 'rain') { w.amb_rain = 1; bv *= 0.45; }
+    else if (rt.ambWx === 'snow') { w.amb_snow = 1; bv *= base === 'amb_night' ? 0.3 : 0.6; }
+    w[base] = bv;
+    const wa = +rt.ambWater || 0; if (wa > 0) w.amb_water = Math.min(1, wa) * 0.8;
+    return w;
+  }
+  function ambLoad(key) {
+    if (AMB.buf.has(key)) return AMB.buf.get(key);
+    const p = audBytes(key).then(b => actx.decodeAudioData(b)).catch(() => null);   // 못 받으면 그 소리만 조용히 빠져요
+    AMB.buf.set(key, p);
+    return p;
+  }
+  function ambSync() {
+    if (!actx) return;
+    const want = ambWant(), now = actx.currentTime, lv = AMB_LV[S && S.ambV] || 0;
+    if (!AMB.out) { AMB.out = actx.createGain(); AMB.out.gain.value = 0; AMB.out.connect(actx.destination); }
+    AMB.out.gain.setTargetAtTime(lv, now, 0.4);
+    for (const k of new Set([...Object.keys(want), ...Object.keys(AMB.lay)])) {
+      const v = want[k] || 0, L = AMB.lay[k];
+      if (L) { if (L.v !== v) { L.v = v; L.g.gain.cancelScheduledValues(now); L.g.gain.setTargetAtTime(v, now, 0.8); } if (!v && !L.off) L.off = now; if (v) L.off = 0; continue; }
+      if (!v) continue;
+      const g = actx.createGain(), N = { g, v, src: null, off: 0 }; g.gain.value = 0; g.connect(AMB.out); AMB.lay[k] = N;
+      ambLoad(k).then(buf => {
+        if (AMB.lay[k] !== N || !buf) return;
+        const src = actx.createBufferSource(), t = actx.currentTime; src.buffer = buf; src.loop = true; src.connect(g);
+        src.start(t, Math.random() * buf.duration);   // 매번 같은 곳부터 나오지 않게
+        N.src = src; g.gain.setTargetAtTime(N.v, t, 0.8);
+      });
+    }
+    for (const k in AMB.lay) {   // 다 줄어든 겹은 멈추고 떼어 내요
+      const L = AMB.lay[k];
+      if (L.off && now - L.off > 5) { try { if (L.src) L.src.stop(); L.g.disconnect(); } catch (e) { /* 이미 멈춤 */ } delete AMB.lay[k]; }
+    }
+    while (AMB.buf.size > 4) { const k = [...AMB.buf.keys()].find(x => !AMB.lay[x]); if (!k) break; AMB.buf.delete(k); }   // 풀어 둔 소리는 넷까지
+  }
+  setInterval(() => { try { if (actx && S) ambSync(); } catch (e) { /* 다음에 */ } }, 15000);   // 시간이 바뀌면(아침에서 낮으로) 바탕 소리도
+  document.addEventListener('click', e => {
+    const b = e.target.closest && e.target.closest('#optAmb [data-amb]'); if (!b || !S) return;
+    const v = +b.dataset.amb; if (v === S.ambV) return;
+    S.ambV = v; save(); syncSettingsUI(); sfx('tap'); ensureAudio(true); ambSync();
+  });
   // 파일 곡을 못 풀면 코드 곡으로(미니게임 곡은 쉬는 시간 곡으로)
   function musicFallback(w) { if (!actx) return; Music.cur = w; musicSynth(SONGS[w] ? w : 'room', actx.currentTime); }
   function musicSynth(w, now) {

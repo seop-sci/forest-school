@@ -37,7 +37,7 @@
     ach: { hit: {}, got: {}, title: '' },   // 1.7.1 업적: hit 이룬 등급(0~3), got 받은 등급, title 단 칭호(업적 종류 id)
     xt: { diet: 0, lib: 0, kor: 0, art: 0, snack: 0, dorm: 0, fix: 0, cou: 0, dean: 0, adv: 0 },   // 5.0.0 adv: 펠리컨 지도교수님   // 4.0.0 dean: 두루미 학장 교수님   // 3.1.0 cou: 코끼리 선생님(진로 상담)
       // 2.3.0 국어, 미술, 매점 선생님   // 1.7.1 양 선생님, 사슴 선생님 연수 레벨 (0~10, 그 건물을 지으면 오셔요)
-    grade: 0, best: 0, sound: true, bgm: true, vibrate: true, savedAt: Date.now(),
+    grade: 0, best: 0, sound: true, bgm: true, vibrate: true, ambV: 2, savedAt: Date.now(),
     pending: 0, pendingSec: 0, away: { from: 0, skip: 0 }, certNo: 0, earned: 0, yearEarned: 0, pwBank: 0,
     tier: 0, tg: 0, sem: 0, semDip: 0, tdip: 0, fund: 0, fp: { schol: 0, rep: 0, dip: 0 },
     hd: { day: '', n: 0, feastUntil: 0, album: false, seen: false, furNew: true },
@@ -135,6 +135,7 @@
     s.t.owl = Math.min(s.t.owl, TEA.owl.max);
     s.grade = Math.min(Math.floor(numFb(d.grade, 0, 0)), CFG.grades.length - 1);
     s.sound = d.sound !== false; s.bgm = d.bgm !== false; s.vibrate = d.vibrate !== false;
+    s.ambV = [0, 1, 2, 3].includes(d.ambV) ? d.ambV : (s.sound || s.bgm ? 2 : 0);   // 자연 소리 크기(0 끄기~3 크게). 옛 저장은 소리를 다 꺼 둔 사람만 끄기
     s.savedAt = numFb(d.savedAt, 0, Date.now());
     s.pending = cap(numFb(d.pending, 0, 0, SAVE_CAP.acorn), SAVE_CAP.acorn); s.pendingSec = cap(numFb(d.pendingSec, 0, 0), SAVE_CAP.count);
     s.certNo = Math.floor(cap(numFb(d.certNo, 0, 0), SAVE_CAP.count)); s.earned = cap(numFb(d.earned, 0, 0, SAVE_CAP.acorn), SAVE_CAP.acorn); s.pwBank = cap(numFb(d.pwBank, 0, 0), SAVE_CAP.big);
