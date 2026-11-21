@@ -105,7 +105,7 @@
     if (t === 'school') requestAnimationFrame(() => fitMap(prev !== 'school' && rt.panX == null));
     { const bd = $('.board'), scd = $('#schoolCard'); if (bd && bd.classList.contains('open')) { bd.classList.remove('open'); if (scd) scd.setAttribute('aria-expanded', 'false'); } }
     if (t !== 'shop') Music.preview = '';
-    musicSync(); try { wldSync(); } catch (e) { /* 마을 층은 다음에 */ }
+    musicSync(); try { wldSync(); if (t !== 'tam') { if (FXT.app) FXT.app.canvas.hidden = true; if (FXG.app) FXG.app.canvas.hidden = true; } } catch (e) { /* 마을 층은 다음에 */ }   // 탐험을 떠나면 탐험 그림판을 숨겨요
     try { trTab(t, prev); } catch (e) { /* 연출만 */ }   // 탭 넘김
   }
   function syncSettingsUI() {

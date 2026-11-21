@@ -154,7 +154,7 @@
   function renderDex() {
     const body = $('#dexBody');
     if (!body || !S) return;
-    const n = dexCount('all'), key = [n, S.rare ? S.rare.got.join() : '', DEX_GUEST_KEYS.filter(k => S.dex.got[k]).length, rt.dexPick, Object.keys(rt.dexNew || {}).join(''), S.dex.paid.length, frDexKey(rt.dexPick)].join('|');
+    const n = dexCount('all'), key = [n, S.rare ? S.rare.got.join() : '', DEX_GUEST_KEYS.filter(k => S.dex.got[k]).length, rt.dexPick, Object.keys(rt.dexNew || {}).join(''), S.dex.paid.length, frDexKey(rt.dexPick), frPatLeft().length].join('|');
     $('#dexHead').innerHTML = `<span>만난 친구</span><b>${n} / ${DEX_KEYS.length}종</b>`;
     if (body.dataset.key === key) return;
     body.dataset.key = key;
@@ -163,7 +163,7 @@
     const detail = pk ? `<div class="dex-detail"><span class="dex-pic">${got ? pic7(dexPicKey(pk)) : pic7('dex_unknown')}</span><div><b>${got ? esc(dexName(pk)) : '???'}</b>` +
       `<p>${got ? esc(DEX_LINES[pk] || (dexGuest(pk) || {}).line || '') : '아직 만나지 못했어요.'}</p><small>${got ? dexDate(got) : esc(dexHow(pk))}</small>${got ? frDexBox(pk) : ''}</div></div>` : '';
     body.innerHTML = detail +
-      `<h4 class="dex-h">학생 <small>${dexCount('students')} / ${DEX_STUDENTS.length}</small></h4><div class="dex-grid">${DEX_STUDENTS.map(dexCard).join('')}</div>` +
+      `<h4 class="dex-h">학생 <small>${dexCount('students')} / ${DEX_STUDENTS.length}</small>${(pl => pl ? `<button class="btn-sub small dex-patall" type="button" data-fr-pat-all="1">${IMG('bond_pat') ? `<img src="${IMG('bond_pat')}" alt="">` : ''}모두 쓰다듬기 ${pl}명</button>` : '')(frPatLeft().length)}</h4><div class="dex-grid">${DEX_STUDENTS.map(dexCard).join('')}</div>` +
       rareDexHTML() +   // 반짝 친구는 학생 줄 바로 아래, 같은 카드 크기
       `<h4 class="dex-h">선생님 <small>${DEX_TEA.filter(k => S.dex.got['tea_' + k]).length} / ${DEX_TEA.length}</small></h4><div class="dex-grid">${DEX_TEA.map(k => dexCard('tea_' + k)).join('')}</div>` +
       `<h4 class="dex-h">특별 손님 <small>${DEX_GUEST_KEYS.filter(k => S.dex.got[k]).length} / ${DEX_GUESTS.length}</small></h4><div class="dex-grid">${DEX_GUEST_KEYS.map(dexCard).join('')}</div>` +

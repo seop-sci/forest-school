@@ -17,10 +17,24 @@
     // 처음 시작한 학교(메인 퀘스트 3개 전)에만 저절로 열어요. '나중에'를 눌렀으면 다음에 열 때 한 번 더 물어봐요
     if (!S || S.tut.st === 'done' || S.tut.st === 'skip' || rt.tutAsked) return;
     if (S.tut.st !== 'later' && S.q.m >= 3) return;
+    if (S.q.m < 1 && S.tut.st !== 'later') { setTimeout(tutAuto, 1500); return; }   // 첫 퀘스트(책상 고치기)를 마친 뒤에 안내 세 장. 처음에는 손가락 표시만(firstHint)
     if (!(window.__FOREST_TEST && !window.__STORY_AUTO) && (rt.st || (S.sto && ((!S.sto.v && S.q.m === 0) || (S.sto.q && S.sto.q[0] === 'o0'))))) { setTimeout(tutAuto, 1200); return; }   // 이야기 '첫 출근'이 먼저
     rt.tutAsked = true;
     queueModal(() => { tutStart(S.tut.step || 0); return true; });
   }
+  // 처음 켠 학교: 안내 카드 대신 교실 위에 손가락과 한 줄. 교실 창이 열리면 책상 단추를 가리켜요. 첫 퀘스트를 마치면 사라져요
+  function firstHint() {
+    let h = $('#firstHint');
+    const busy = !S || S.q.m !== 0 || rt.modalOpen || rt.paused || rt.st || rt.tut || rt.tab !== 'school' || document.hidden;
+    const rd = !busy && mainReady(), tg = busy ? null : rd ? (rt.sheetKey ? null : $('#questBar')) : rt.sheetKey === 'classroom' ? $('#furList [data-fur="0"]') : rt.sheetKey ? null : $('#b-classroom');
+    const r = tg && !tg.hidden ? tg.getBoundingClientRect() : null;
+    if (!r || r.width < 8) { if (h) h.hidden = true; if (S && S.q.m > 0 && h) h.remove(); return; }
+    if (!h) { h = document.createElement('div'); h.id = 'firstHint'; h.className = 'first-hint'; h.setAttribute('aria-hidden', 'true'); h.innerHTML = '<span class="fh-tx"></span><span class="fh-f">👆</span>'; document.body.appendChild(h); }
+    const tx = rd ? '눌러서 보상을 받아요' : rt.sheetKey === 'classroom' ? '책상을 눌러 올려요' : '교실을 눌러 보세요';
+    if (h.firstChild.textContent !== tx) h.firstChild.textContent = tx;
+    h.hidden = false; h.style.left = (r.left + r.width / 2) + 'px'; h.style.top = (rd || rt.sheetKey ? r.bottom - 6 : r.top + r.height * 0.62) + 'px';
+  }
+  setInterval(() => { try { firstHint(); } catch (e) { /* 다음에 */ } }, 400);
   function tutStart(i) {
     rt.tut = { i: Math.max(0, Math.min(TUT.length - 1, i | 0)), confirm: false };
     rt.modalOpen = $('#tut');

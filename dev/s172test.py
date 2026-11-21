@@ -17,6 +17,7 @@ ARGS = ['--use-gl=swiftshader', '--enable-webgl', '--ignore-gpu-blocklist', '--a
 
 async def open_page(b, pixi, reduced=False):
     s = base(tier=4, tg=1); s['tam'] = {'best': 5, 'party': ['bear', 'rabbit', 'fox'], 'mem': {k: {'lv': 20, 'st': 2, 'sh': 0} for k in ['bear', 'rabbit', 'fox']}, 'seen': 1}
+    s['gfx'] = 1   # 5.3.2: 그래픽 낮음이면 엔진을 받지 않아요(이 기계는 코어 2개라 자동이 낮음)
     ctx = await b.new_context(viewport={'width': 390, 'height': 844}, device_scale_factor=1, is_mobile=True, has_touch=True, reduced_motion='reduce' if reduced else 'no-preference')
     await ctx.add_init_script("window.__FOREST_TEST = true;" + (("window.FS_IMG_BASE = %s;" % json.dumps((ROOT / 'img').as_uri() + '/')) + f"window.FS_PIXI_SRC = {json.dumps(PIXI)};" if pixi else ''))   # 그림 폴더를 주면 엔진 파일도 받아져서, 엔진 없음은 주지 않아요
     await ctx.add_init_script("if(!sessionStorage.getItem('seeded')){localStorage.setItem('forest-school-v1', %s);sessionStorage.setItem('seeded','1');}" % json.dumps(json.dumps(s)))

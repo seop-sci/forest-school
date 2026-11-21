@@ -17,6 +17,7 @@ TABS = ['quests', 'teachers', 'school', 'mini', 'school', 'quests', 'street', 's
 
 async def open_page(b, reduced=False):
     s = base(tier=1, tg=5); s['q']['m'] = 120; s['q']['seen'] = 120
+    s['gfx'] = 1   # 5.3.2: 그래픽 낮음이면 엔진을 받지 않아요(이 기계는 코어 2개라 자동이 낮음)
     s['tam'] = {'best': 3, 'party': ['bear', 'rabbit', 'fox'], 'mem': {k: {'lv': 20, 'st': 2, 'sh': 0} for k in ['bear', 'rabbit', 'fox']}, 'seen': 1}
     ctx = await b.new_context(viewport={'width': 390, 'height': 844}, device_scale_factor=1, is_mobile=True, has_touch=True, reduced_motion='reduce' if reduced else 'no-preference')
     await ctx.add_init_script("window.__FOREST_TEST = true; window.FS_IMG_BASE = %s;" % json.dumps((ROOT / 'img').as_uri() + '/'))

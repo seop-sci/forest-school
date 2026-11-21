@@ -327,6 +327,18 @@
     save(); checkQuests(); frRefresh();
     return true;
   }
+  // 도감에서 모두 쓰다듬기: 오늘 아직 안 쓰다듬은 단짝을 한 번에(하나씩 쓰다듬기와 같은 값)
+  const frPatLeft = () => frList().filter(sp => { const f = frOf(sp); return f && !frToday(f); });
+  function frPatAll() {
+    if (rt.paused) return 0;
+    const L = frPatLeft(); if (!L.length) { toast('오늘은 모두 쓰다듬었어요'); return 0; }
+    const items = [];
+    for (const sp of L) { const f = frOf(sp); f.pat = gameToday(); S.frc.pat += 1; items.push(...frAddP(sp, BF.pat, true)); }
+    sfx(items.length ? 'quest' : 'tap'); buzz(8);
+    toast([`단짝 ${L.length}명을 쓰다듬었어요 ♥`, ...items.map(i => i.t)].join('\n'));
+    save(); checkQuests(); frRefresh();
+    return L.length;
+  }
   function frHeartFx(x, y) {
     const t = document.createElementNS(NS, 'text');
     t.setAttribute('x', x.toFixed(1)); t.setAttribute('y', y.toFixed(1)); t.setAttribute('text-anchor', 'middle'); t.setAttribute('class', 'fr-heart');

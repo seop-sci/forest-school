@@ -351,6 +351,7 @@
   }
   function pzOpen(asked) {
     pzInitArt();
+    if (!FXL.st && wldLv() > 0) { FXL.touched = true; fxLoad(); }   // 엔진을 아직 안 받았으면 지금
     if (FXL.st === 'ok' && !FXO.st) fxoInit();   // 깨지는 조각 그림판
     setTimeout(() => { try { if (FXO.st === 'ok' || FXL.st === 'ok') new Set([...document.querySelectorAll('#pzBoard [style*="url"], #pzTray [style*="url"]')].map(e => e.style.backgroundImage)).forEach(fxoUrlTex); } catch (e) { /* 다음에 */ } }, 600);
     pzDay();

@@ -937,8 +937,10 @@
     }
   }
   function tamOpen() {
+    if (!FXL.st && wldLv() > 0) { FXL.touched = true; fxLoad(); }   // 엔진을 아직 안 받았으면 지금
     if (FXL.st === 'ok' && !FXT.st) fxTamInit();   // 탐험 효과층을 미리 준비
     if (FXL.st === 'ok' && !FXG.st) fxgInit();   // 오르는 길 바닥
+    else if (FXG.st === 'ok') fxgRefresh();   // 다시 들어오면 숨겨 둔 바닥 그림판을 다시 깔아요
     if (!tamOn()) return;
     if (!S.tam.seen) { S.tam.seen = 1; S.tam.it = S.tam.it || gameNow(); save();   // 처음 열면 소개 장면(자동 시험에서는 __TAM_INTRO일 때만)
       const shown = !(window.__FOREST_TEST && !window.__TAM_INTRO) && stPlay('tam', false);
