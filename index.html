@@ -27304,7 +27304,36 @@ body.mg-on .toast[hidden]{display:none}
   }
 
   /* ---------- 이벤트 ---------- */
-  function wire() {
+  function wire() {   // 단추와 창 연결. 차례가 듣는 이 순서를 정하니 바꾸지 않아요
+    wireArt();
+    wireHomeLeft();
+    wireTam();
+    wireAdsAtt();
+    wireGrad();
+    wireUnits();
+    wireRank();
+    wireMissions();
+    wireDeco();
+    wireClubView();
+    wireStreet();
+    wireCloudAcct();
+    wireWindow();
+    wireDev();
+    wireCampus();
+    wireDevTools();
+    wireBuildings();
+    wireCommon();
+    wireStudy();
+    wireSchoolLife();
+    wireSnackFest();
+    wireCare();
+    wireQuests();
+    wireSettings();
+    wireExitBack();
+    wireAppLife();
+  }
+  // 그림 아이콘과 보충수업 그림
+  function wireArt() {
     pzWire();
     $$('.plaque').forEach(pq => pq.insertAdjacentHTML('beforeend', '<g class="rec" transform="translate(0 -17)"><rect x="-15" y="-7" width="30" height="13" rx="6.5" class="c-rec"/><text y="3" text-anchor="middle" class="t-rec">추천</text></g>'));
     $$('[data-acorn]').forEach(el => { el.outerHTML = acornIcon(); });
@@ -27313,7 +27342,9 @@ body.mg-on .toast[hidden]{display:none}
     const owlFace = `<svg viewBox="-24 -24 48 48" aria-hidden="true"><g transform="translate(0 3) scale(.95)">${AV.owl}</g></svg>`;
     $('#boostIc').innerHTML = owlFace;
     $('#boostArt').innerHTML = IMG('art_boost_night') ? `<img src="${IMG('art_boost_night')}" alt="" style="width:100%;height:100%;object-fit:contain">` : `<svg viewBox="-30 -30 60 60" aria-hidden="true"><circle cx="14" cy="-15" r="8" class="c-moon"/><circle cx="18" cy="-18" r="7" class="c-boardfill"/><g transform="translate(-3 6) scale(.62)">${AV.owl}</g><g transform="translate(16 14) scale(1.1)">${ACORN}</g></svg>`;
-
+  }
+  // 홈 왼쪽 단추: 보충수업, 체험학습, 학교 행사, 수학여행, 자리 비운 보상
+  function wireHomeLeft() {
     // 테스트 광고, 보충수업, 출석부
     $('#btnBoost').addEventListener('click', openBoost);
     $('#tripIc').innerHTML = IMG('ic_trip') ? `<img src="${IMG('ic_trip')}" alt="" style="width:100%;height:100%;object-fit:contain">` : BUS;   // 3.0.0
@@ -27336,6 +27367,9 @@ body.mg-on .toast[hidden]{display:none}
     });
     $('#boostGo').addEventListener('click', startBoost);
     $('#offDouble').addEventListener('click', claimOfflineDouble);
+  }
+  // 숲속 탐험대
+  function wireTam() {
     $('#panelTam').addEventListener('click', tamClick);   // 4.3.0
     // 5.0.1.8 M-05 탐험 화면의 칸을 누르면 한 줄 설명
     { const tip = (sel, f) => { const el = $(sel); if (el) el.addEventListener('click', e => { e.stopPropagation(); sfx('tap'); tamToast(f()); }); };
@@ -27365,12 +27399,17 @@ body.mg-on .toast[hidden]{display:none}
       // 꾹 눌러서 올렸으면 손을 뗄 때 나오는 클릭은 버려요
       $('#panelTam').addEventListener('click', e => { if (hold && hold.n && e.target.closest('[data-tlv],[data-tgear]')) { e.stopImmediatePropagation(); e.preventDefault(); } }, true); }
     $('#tmRepOk').addEventListener('click', () => tamRepTake(false)); $('#tmRepAd').addEventListener('click', () => tamRepTake(true));
+  }
+  // 광고 창과 출석부
+  function wireAdsAtt() {
     for (const sel of ['#offPick', '#boostPick']) $(sel).addEventListener('click', e => { const b = e.target.closest('[data-adpk]'); if (!b || b.disabled) return; rt.adPick = b.dataset.adpk; sfx('tap'); adPickSync(); });   // 4.2.0 광고 보상 고르기
     $('#adDone').addEventListener('click', closeAd);
     $('#adSkip').addEventListener('click', closeAd);
     $('#btnAtt').addEventListener('click', openAtt);
     $('#attGo').addEventListener('click', stampAtt);
-
+  }
+  // 졸업 탭: 종업식, 졸업식, 명예 교장실, 장학재단
+  function wireGrad() {
     // 졸업식과 명예 교장실
     $('#gBtn').addEventListener('click', askGraduate);
     $('#gNo').addEventListener('click', () => { $('#gConfirm').hidden = true; });
@@ -27384,6 +27423,9 @@ body.mg-on .toast[hidden]{display:none}
       const b = e.target.closest('button[data-fperk]');
       if (b) buyFundPerk(b.dataset.fperk, b);
     });
+  }
+  // 설정의 화면 크기와 숫자 단위
+  function wireUnits() {
     $('#optUiz').addEventListener('click', e => { const b = e.target.closest('[data-uiz]'); if (!b || +b.dataset.uiz === S.uiz) return; S.uiz = +b.dataset.uiz; save(); syncSettingsUI(); sfx('tap'); setTimeout(() => { try { chipRow(); wxPlace(); } catch (er) { /* 다음 틱에 */ } }, 60); toast(S.uiz ? '화면 글자와 단추를 크게 보여요' : '화면을 보통 크기로 보여요'); });   // 5.0.1.7 X-01
     $('#optUnits').addEventListener('click', e => {
       const b = e.target.closest('[data-units]');
@@ -27391,6 +27433,9 @@ body.mg-on .toast[hidden]{display:none}
       S.units = b.dataset.units; save(); syncSettingsUI(); refreshNumbers();
       toast(S.units === 'en' ? '큰 숫자를 K, M, B로 줄여 써요' : '큰 숫자를 만, 억, 조로 줄여 써요');
     });
+  }
+  // 랭킹과 참가
+  function wireRank() {
     $('#rankView').addEventListener('click', e => { const b = e.target.closest('[data-rv]'); if (!b) return; rt.rankView = b.dataset.rv === 'week' ? (rt.rkLg || 'week') : b.dataset.rv === 'all' ? (rt.rkSch || 'all') : b.dataset.rv; sfx('tap'); renderRankPanel(); });
     $('#rankSchSeg').addEventListener('click', e => { const b = e.target.closest('[data-rsc]'); if (!b) return; rt.rankView = rt.rkSch = b.dataset.rsc === 'conf' ? 'conf' : 'all'; sfx('tap'); renderRankPanel(); });   // 5.2.0 학교 안의 학교 파워와 학회
     $('#rankLgSeg').addEventListener('click', e => { const b = e.target.closest('[data-rlg]'); if (!b) return; rt.rankView = rt.rkLg = b.dataset.rlg === 'sea' ? 'sea' : 'week'; sfx('tap'); renderRankPanel(); });   // 5.1.1.4 리그 안의 이번 주와 시즌
@@ -27414,6 +27459,9 @@ body.mg-on .toast[hidden]{display:none}
       joinRank(i ? i.value : '');
     });
     $('#nickDice').addEventListener('click', () => rollNick($('#nickName')));
+  }
+  // 미션 바로 가기, 퀘스트 탭 일과, 이름 정하기
+  function wireMissions() {
     // 4.2.0 미션을 누르면 그 일을 하는 곳으로(퀘스트 탭, 패스, 이벤트 탭 모두)
     document.addEventListener('click', e => { const g = e.target.closest('[data-mgo]'); if (g && !e.target.closest('button')) missionGo(g.dataset.mgo); });
     document.addEventListener('keydown', e => { if (e.key !== 'Enter' && e.key !== ' ') return; const g = e.target.closest && e.target.closest('[data-mgo]'); if (g) { e.preventDefault(); missionGo(g.dataset.mgo); } });
@@ -27435,6 +27483,9 @@ body.mg-on .toast[hidden]{display:none}
       btn.disabled = false;
       if (ok) closeModal($('#mNick'));
     });
+  }
+  // 꾸미기 가게와 꾸미기 모드
+  function wireDeco() {
     // 황금 도토리 상점
     // 1.7.4 꾸미기 가게와 꾸미기 모드
     $('#decoList').addEventListener('click', e => { const b = e.target.closest('[data-dbuy]'); if (b) pickDeco(b.dataset.dbuy); });
@@ -27453,6 +27504,9 @@ body.mg-on .toast[hidden]{display:none}
     $('#decoDone').addEventListener('click', () => { sfx('tap'); decoEditEnd(); toast('학교 꾸미기를 마쳤어요'); });
     $('#decoPickList').addEventListener('click', e => { const b = e.target.closest('[data-dput]'); if (!b) return; if (decoPut(rt.decoSlot, b.dataset.dput)) { sfx('quest'); achSync(); closeModal($('#mDecoPick')); } });
     $('#decoPickClear').addEventListener('click', () => { decoPut(rt.decoSlot, ''); sfx('tap'); closeModal($('#mDecoPick')); });
+  }
+  // 동아리, 날씨, 학교급 모습 보기, 전학 대화
+  function wireClubView() {
     // 2.0.0 동아리, 학교급 모습 보기, 전학 대화
     $('#clubAutoBtn').addEventListener('click', () => { if (clubAuto()) { sfx('quest'); toast('능력치에 맞게 동아리를 나눴어요'); questChanged(); } });
     $('#cgBox').addEventListener('click', e => { if (e.target.closest('[data-cg="prac"]')) cgPractice(); });   // 2.3.4 대항전 '모두 연습'은 #cgBox 안에 있어요(#clubBody 밖이라 눌러도 반응이 없었어요)
@@ -27481,6 +27535,9 @@ body.mg-on .toast[hidden]{display:none}
       const z = e.target.closest('[data-tvzone]'); if (z && z.dataset.tvzone) { sfx('tap'); rt.viewZone = z.dataset.tvzone; rt.viewEdit = false; renderTierView(true); } });   // 4.0.0
     $('#tvCampus').addEventListener('click', () => { sfx('tap'); rt.viewZone = ''; rt.viewEdit = false; renderTierView(true); });
     $('#mTalk').addEventListener('click', () => talkNext());
+  }
+  // 상점 거리와 꾸미기 백화점, 문방구
+  function wireStreet() {
     $('#btnShop').addEventListener('click', () => { if (!rt.paused && !rt.modalOpen) { sfx('tap'); openShop(); } });
     $('#thPrevBack').addEventListener('click', () => { sfx('tap'); thPreviewEnd(false); });   // 3.0.0
     $('#shopList').addEventListener('click', e => {
@@ -27509,6 +27566,9 @@ body.mg-on .toast[hidden]{display:none}
     $('#essYes').addEventListener('click', buyEss);
     $('#shopYes').addEventListener('click', buyShop);
     $('#shopAd').addEventListener('click', shopAd);
+  }
+  // 서버 저장, 구글 계정, 예전 학교 되돌리기
+  function wireCloudAcct() {
     // 서버 저장: 구글 계정 연결, 테스트 현황
     $('#optAcct').addEventListener('click', () => { sfx('tap'); if (googleUser()) { const m = $('#acctMenu'); m.hidden = !m.hidden; rt.acctOutArm = false; $('#acctOut').textContent = '로그아웃'; } else linkGoogle(); });   // 3.1.0 연결돼 있으면 바꾸기와 로그아웃
     $('#acctMenuNo').addEventListener('click', () => { $('#acctMenu').hidden = true; });
@@ -27527,6 +27587,9 @@ body.mg-on .toast[hidden]{display:none}
     $('#devStats').addEventListener('click', openStats);
     $('#statsReload').addEventListener('click', loadStats);
     $('#statsDel').addEventListener('click', deleteStats);
+  }
+  // 창 크기와 글꼴, 다음 건물, 서브 퀘스트, 핫딜, 학교급 확인, 졸업식 장면
+  function wireWindow() {
     window.addEventListener('online', () => { if (Cloud.state === 'error' && (Cloud.err === 'net' || Cloud.err === 'load' || Cloud.err === 'acct')) retryCloud(); });
     window.addEventListener('resize', refit);
     if (document.fonts && document.fonts.ready) document.fonts.ready.then(() => { rt.fitGen += 1; refit(); }).catch(() => {});
@@ -27555,6 +27618,9 @@ body.mg-on .toast[hidden]{display:none}
     $('#mCere').addEventListener('click', e => { if (!e.target.closest('#cereAsk')) cereAsk(); });   // 2.0.1 졸업식 장면을 누르면 건너뛸지 물어요
     $('#cereKeep').addEventListener('click', () => { sfx('tap'); cereKeep(); });
     $('#cereGo').addEventListener('click', () => { sfx('tap'); cereEnd(true); });
+  }
+  // 개발자 메뉴와 화면 고치기 모드
+  function wireDev() {
     $('#devTier').addEventListener('click', () => {
       S.u.dev = true;
       if (!nextTierOpen()) { toast(`${TIERS[S.tier + 1].name}는 아직 준비 중이에요`); return; }
@@ -27765,11 +27831,17 @@ body.mg-on .toast[hidden]{display:none}
       rt.lux = !luxOn(); try { localStorage.setItem('forest-lux', rt.lux ? '1' : '0'); } catch (e) { /* 이번만 */ }
       applyThemes(); renderMap(); devLuxText(); toast(rt.lux ? '고급 배경을 켰어요' : '고급 배경을 껐어요');
     });
+  }
+  // 캠퍼스와 구역 옮기기
+  function wireCampus() {
     $('#campusG').addEventListener('click', e => { const el = e.target.closest('.cz'); if (el && !rt.trial) campusTap(el); });
     $('#campusG').addEventListener('keydown', e => { const el = e.target.closest('.cz'); if (el && (e.key === 'Enter' || e.key === ' ')) { e.preventDefault(); campusTap(el); } });
     $('#zoneHome').addEventListener('click', () => { sfx('tap'); setZone(''); });
     $('#zonePrev').addEventListener('click', () => zoneStep(-1));
     $('#zoneNext').addEventListener('click', () => zoneStep(1));
+  }
+  // 개발자 메뉴의 시험 단추
+  function wireDevTools() {
     $('#devUni').addEventListener('click', () => {
       if (rt.uniPrev) { try { sessionStorage.removeItem('fs-uni-prev'); } catch (e) {} location.reload(); return; }   // 한 번 더 누르면 미리 보기를 끝내고 원래 학교로
       if (uniPreview()) toast('대학교 미리 보기예요. 저장되지 않아요 (테스트)');
@@ -27815,7 +27887,9 @@ body.mg-on .toast[hidden]{display:none}
       renderAffordance(); save();
     });
     $('#offArt').innerHTML = IMG('art_offline') ? `<img src="${IMG('art_offline')}" alt="" style="width:100%;height:100%;object-fit:contain">` : `<svg viewBox="-30 -30 60 60" aria-hidden="true"><circle cx="14" cy="-15" r="8" class="c-moon"/><circle cx="18" cy="-18" r="7" class="c-boardfill"/><circle cx="-18" cy="-12" r="1" class="c-moon"/><circle cx="-10" cy="-20" r="0.8" class="c-moon"/><g transform="translate(-3 6) scale(.62)">${AV.owl}</g></svg>`;
-
+  }
+  // 건물, 공사 칸, 가구, 선생님 카드
+  function wireBuildings() {
     // 1.5.3: 건물 이름표는 학생과 선생님 위 층(#plaques)으로 옮겨서 업그레이드 표시가 가려지지 않게 해요. 이름표를 눌러도 건물이 열려요
     $$('.bld').forEach(g => {
       const k = g.getAttribute('data-k'), pq = $('#pq-' + k);
@@ -27883,6 +27957,9 @@ body.mg-on .toast[hidden]{display:none}
       const b = e.target.closest('button[data-k]');
       if (b) { const k = b.getAttribute('data-k'); if (k === 'vp') vpAct(b); else if (XT[k]) xtAct(k, b); else teacherAct(k, b); }
     });
+  }
+  // 아래 탭, 창 닫기, 그림 아이콘, 학교 카드, 반장 선거
+  function wireCommon() {
     $$('.tab').forEach(b => b.addEventListener('click', () => { setTab(b.dataset.tab); sfx('tap'); }));
     // 창을 닫기만 하는 단추와 바깥 누르기 57곳: 요소에 data-cm="창 id"를 달면 여기서 닫아요. data-cm-tap이 함께 있으면 누르는 소리도 내요
     // (예전에는 단추마다 closeModal만 부르는 연결이 따로 있었어요. 닫으면서 다른 일도 하는 단추는 그대로 따로 연결해요)
@@ -27906,6 +27983,9 @@ body.mg-on .toast[hidden]{display:none}
     $('#hdBoard').addEventListener('click', () => { if (skOpen()) openSticker(); });   // 2.1.0
     $('#elCands').addEventListener('click', e => { const b = e.target.closest('[data-el]'); if (b) elVote(+b.dataset.el); });
     $('#sheetElect').addEventListener('click', () => viaSheet(openElect));
+  }
+  // 공부: 실험, 책, 숲속 대결, 시험 기간, 복도, 진로 상담
+  function wireStudy() {
     // 2.0.1 공부 2단계: 과학 탐구 실험, 책 읽기
     $('#sheetLab').addEventListener('click', () => { const note = labDone(); closeSheet(); setTimeout(() => { openLab(); if (note && rt.modalOpen === $('#mLab')) { rt.labView = 'note'; renderLab(); } }, 240); });
     $('#sheetRead').addEventListener('click', () => viaSheet(openRead));
@@ -27936,6 +28016,9 @@ body.mg-on .toast[hidden]{display:none}
     $('#csClose').addEventListener('click', () => { sfx('tap'); closeModal($('#mCounsel')); renderHall(); });
     $('#csBack').addEventListener('click', () => $('#csClose').click());   // 5.0.1.6 C-05 바깥을 눌러도 닫혀요
     $('#labClose').addEventListener('click', () => { if (rt.labBusy) return; sfx('tap'); closeModal($('#mLab')); });
+  }
+  // 소풍, 스티커판, 앨범, 공사 그림 미리 풀기
+  function wireSchoolLife() {
     // 2.1.0 숲속 소풍, 칭찬 스티커판
     $('#sheetPicnic').addEventListener('click', () => viaSheet(openPicnic));
     $('#sheetSticker').addEventListener('click', () => viaSheet(openSticker));
@@ -27962,6 +28045,9 @@ body.mg-on .toast[hidden]{display:none}
     $('#conCb').addEventListener('click', e => { const b = e.target.closest('[data-cb]'); if (b) cbBuy(b.dataset.cb); });
     $('#albPrev').addEventListener('click', () => { rt.albPage -= 1; sfx('tap'); renderAlbum(); });
     $('#albNext').addEventListener('click', () => { rt.albPage += 1; sfx('tap'); renderAlbum(); });
+  }
+  // 매점, 자율학습, 연구소, 대학 축제, 교환학생, 이야기, 텃밭
+  function wireSnackFest() {
     // 2.1.2 매점 간식 뽑기 창
     $('#sheetSnack').addEventListener('click', () => viaSheet(openSn));
     $('#sheetNs').addEventListener('click', () => viaSheet(openNs));   // 3.0.0
@@ -28026,6 +28112,9 @@ body.mg-on .toast[hidden]{display:none}
       else if (g === 'cookgo') { rt.gdSel = ''; gdCook(b.dataset.m); }   // 5.0.1.6 C-03
     });
     $('#snDexBtn').addEventListener('click', () => { sfx('tap'); closeModal($('#mSn')); setTimeout(() => { setTab('dex'); setDexSeg('sn'); rt.backTab = 'sn'; }, 240); });   // 5.0.1.6 C-22 도감을 닫으면 뽑기 창으로
+  }
+  // 마을 기부, 편지, 이름 바꾸기, 실험 노트, 책 고르기
+  function wireCare() {
     // 2.1.2 마을 기부 창
     $('#vdBtns').addEventListener('click', e => { const b = e.target.closest('[data-vdk]'); if (!b) return; const k = b.dataset.vdk; vdGive(k === 'left' || k === 'all' ? k : Number(k)); });
     $('#albLetter').addEventListener('click', () => { const pg = S.alb[rt.albPage]; if (pg && pg.ltr) { closeModal($('#mAlbum')); setTimeout(() => openLetter(pg, true), 240); } });
@@ -28043,7 +28132,9 @@ body.mg-on .toast[hidden]{display:none}
     $('#labNext').addEventListener('click', () => { rt.labPage += 1; renderLab(); });
     $('#rdTickets').addEventListener('click', e => { const u = e.target.closest('[data-rd-unq]'); if (u) { rdUnqueue(+u.dataset.rdUnq); return; } const b = e.target.closest('[data-read-tk]'); if (b) readUseTicket(b.dataset.readTk); });
     $('#rdBooks').addEventListener('click', e => { const b = e.target.closest('[data-bk]'); if (b && b.getAttribute('aria-disabled') !== 'true') rdStart(b.dataset.bk); });
-
+  }
+  // 퀘스트 쪽지와 퀘스트 탭
+  function wireQuests() {
     // 퀘스트 쪽지: 완료했으면 보상 받기, 아니면 해야 할 곳으로 바로 가기
     $('#questBar').addEventListener('click', () => {
       rt.qTap = true;   // 5.0.1.7 F-03 여는 장면은 이때
@@ -28062,7 +28153,9 @@ body.mg-on .toast[hidden]{display:none}
       if (b.dataset.act === 'claim') { if (ref === 'main') claimMain(b); else claimSub(ref, b); return; }
       goTo(ref === 'main' ? curMain() : S.q.subs.find(s => s.id === ref));
     });
-
+  }
+  // 설정과 튜토리얼
+  function wireSettings() {
     $('#optBgm').addEventListener('change', e => {
       S.bgm = e.target.checked;
       if (S.bgm) ensureAudio(); else musicSync();
@@ -28096,7 +28189,9 @@ body.mg-on .toast[hidden]{display:none}
     $('#optDel').addEventListener('click', () => { $('#delConfirm').hidden = false; $('#delNo').focus(); });
     $('#delNo').addEventListener('click', () => { $('#delConfirm').hidden = true; });
     $('#delYes').addEventListener('click', deleteAccount);
-
+  }
+  // 자리 비운 보상, 나가기, 광고 확인, 전학생, 뒤로 가기
+  function wireExitBack() {
     $('#offClaim').addEventListener('click', claimOffline);
     $('#btnExit').addEventListener('click', () => { if (!rt.modalOpen) { sfx('tap'); openModal($('#mExit')); } });
     $('#adAskYes').addEventListener('click', () => adAskDone(true));
@@ -28130,7 +28225,9 @@ body.mg-on .toast[hidden]{display:none}
       if (!rt.paused) { if (rt.tab !== 'school') setTab('school'); else { sfx('tap'); openModal($('#mExit')); } }
     };
     $('#reopen').addEventListener('click', reopenSchool);
-
+  }
+  // 소리 켜기, 화면 숨김과 돌아옴, 저장 주기
+  function wireAppLife() {
     document.addEventListener('pointerdown', ensureAudio, { capture: true });
     document.addEventListener('keydown', e => {
       if (e.key !== 'Escape') return;
