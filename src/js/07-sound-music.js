@@ -174,7 +174,7 @@
     // 배경 테마 곡 7개(Suno로 만듦)
     spring: 'bgm_spring', summer: 'bgm_summer', autumn: 'bgm_autumn', winter: 'bgm_winter', xmas: 'bgm_xmas', space: 'bgm_space', retro: 'bgm_retro',
     // 숲속 탐험대 곡 넷(Suno): 운동장과 텃밭은 낮, 연못과 도서관은 잔잔, 뒤뜰과 천문대는 밤, 큰 장난꾸러기 층은 보스
-    exday: 'bgm_ex_day', excalm: 'bgm_ex_calm', exnight: 'bgm_ex_night', exboss: 'bgm_ex_boss' };
+    exday: 'bgm_ex_day', exnight: 'bgm_ex_night' };   // 탐험은 기본(낮)과 심화(밤) 두 곡만. 쓰지 않던 쉼 곡과 큰 장난꾸러기 곡은 앱 용량 때문에 뺐어요
   // 곡은 게임 파일 밖의 따로 된 파일이에요(게임 파일이 너무 커지지 않게). 웹, 안드로이드, 토스 판 모두 게임 옆 audio 폴더에 있어요
   const AUD_BASE = () => window.FS_AUD_BASE || 'audio/';
   // 용량: 테마 곡 7개와 행사, 졸업 곡 5개, 자연 소리 7개는 앱에 넣지 않고 웹에서 받아요. 못 받으면 홈 곡이 나와요. 곡 파일을 바꾸면 AUD_V를 올려요

@@ -483,7 +483,7 @@
     const pt = L => { const n = Math.min(3, L.length); let x = 0, y = 0; for (let i = 0; i < n; i++) { x += L[i][0]; y += L[i][1]; } return [W * x / n / 100, H * (1 - (y / n + TM_UP) / 100)]; };
     const a = pt(TM_PPOS), b = pt(TM_MPOS), loc = ([x, y]) => [x - W / 2, (y - top) / FXG_SQ];
     const la = loc(a), lb = loc(b), dx = lb[0] - la[0], dy = lb[1] - la[1], d = Math.hypot(dx, dy) || 1;
-    Object.assign(FXG, { W, H, top, ux: dx / d, uy: dy / d, ang: Math.atan2(dy, dx), mid: [(la[0] + lb[0]) / 2, (la[1] + lb[1]) / 2] });
+    Object.assign(FXG, { W, H, top, ux: dx / d, uy: dy / d, ang: Math.atan2(dy, dx), mid: [(la[0] + lb[0]) / 2, (la[1] + lb[1]) / 2], pa: a });
   }
   // 지역 바닥과 길을 깔아요(force면 그림이 늦게 받아졌을 때 다시)
   function fxgSet(k, force) {
@@ -494,7 +494,7 @@
     if (FXG.reg === k && FXG.floor && !force) { app.canvas.hidden = false; if (!FXG.decs.length && fxgDecs(k)) app.render(); return true; }
     FXG.reg = k; fxgGeom();
     const { W, H, top } = FXG, sq = FXG.sq;
-    sq.removeChildren().forEach(c => c.destroy()); FXG.gate = null;
+    sq.removeChildren().forEach(c => c.destroy()); FXG.gate = null; fxgGateFront(null);
     sq.position.set(W / 2, top); sq.scale.set(1, FXG_SQ);
     const ts = Math.max(0.3, W * 0.8 / 720), LH = (H - top) / FXG_SQ + 40;
     const floor = new P.TilingSprite({ texture: tile, width: W * 3, height: LH + 80 }); floor.position.set(-W * 1.5, -40); floor.tileScale.set(ts); sq.addChild(floor); FXG.floor = floor;
@@ -524,7 +524,22 @@
     fxgKick();
   }
   function fxgKick() { if (FXG.st === 'ok' && !FXG.raf) { FXG.last = performance.now(); FXG.raf = requestAnimationFrame(fxgFrame); } }
-  function fxgGatePos() { const g = FXG.gate; if (!g) return; const lx = FXG.mid[0] + FXG.ux * FXG.gs, ly = FXG.mid[1] + FXG.uy * FXG.gs; g.position.set(FXG.W / 2 + lx, FXG.top + ly * FXG_SQ); }
+  function fxgGatePos() {
+    const g = FXG.gate; if (!g) { fxgGateFront(null); return; }
+    const lx = FXG.mid[0] + FXG.ux * FXG.gs, ly = FXG.mid[1] + FXG.uy * FXG.gs; g.position.set(FXG.W / 2 + lx, FXG.top + ly * FXG_SQ);
+    fxgGateFront(FXG.pa && g.y > FXG.pa[1] - 6 ? g : null);
+  }
+  // 문 통과: 문 밑동이 대원 발보다 앞(아래)으로 오면 대원 위에 그려요. 대원은 HTML이라 같은 그림을 무대 위 그림(img.tm-gatef)으로 옮겨 보여요
+  function fxgGateFront(g) {
+    let im = $('#tmGateF');
+    if (!g) { if (im && !im.hidden) im.hidden = true; if (FXG.gate) FXG.gate.visible = true; return; }
+    const world = $('#tmWorld'); if (!world) return;
+    if (!im) { im = document.createElement('img'); im.id = 'tmGateF'; im.className = 'tm-gatef'; im.alt = ''; im.setAttribute('aria-hidden', 'true'); world.appendChild(im); }
+    const u = IMG(`ex6_${FXG.reg}_gate`); if (u && im.getAttribute('src') !== u) im.src = u;
+    const w = g.texture.width * g.scale.x, h = g.texture.height * g.scale.y;
+    im.style.cssText = `left:${(g.x - w / 2).toFixed(1)}px;top:${(g.y - h * 0.96).toFixed(1)}px;width:${w.toFixed(1)}px;height:${h.toFixed(1)}px`;
+    im.hidden = false; g.visible = false;
+  }
   // 바닥 장식(작업지시서 107 ex6_<지역>_dec1~4): 바닥 위에 흩어 놓고 바닥과 함께 흘러요. 길 위에는 놓지 않아요. 그래픽 낮음은 없음
   function fxgDecs(k) {
     const lv = wldLv(), nd = lv >= 2 ? 16 : lv ? 9 : 0; if (!nd || !FXG.sq || !FXG.path) return false;
@@ -554,12 +569,12 @@
       FXG.floor.tilePosition.x -= FXG.ux * v; FXG.floor.tilePosition.y -= FXG.uy * v;
       FXG.path.tilePosition.y += v; fxgDecMove(-FXG.ux * v, -FXG.uy * v);
       if (FXG.cloud && FXG.cloud.alpha > 0) FXG.cloud.tilePosition.x -= v * 0.35;
-      if (FXG.gate) { FXG.gs -= v; fxgGatePos(); if (FXG.gs < -Math.hypot(FXG.W, FXG.H) * 0.8) { FXG.gate.destroy(); FXG.gate = null; } }
+      if (FXG.gate) { FXG.gs -= v; fxgGatePos(); if (FXG.gs < -Math.hypot(FXG.W, FXG.H) * 0.8) { FXG.gate.destroy(); FXG.gate = null; fxgGateFront(null); } }
     }
     FXG.app.render();
     if (FXG.run > 0) FXG.raf = requestAnimationFrame(fxgFrame);
   }
-  function fxgHide() { if (FXG.app) FXG.app.canvas.hidden = true; const st = $('#tmStage'); if (st) st.classList.remove('g6'); }
+  function fxgHide() { fxgGateFront(null); if (FXG.app) FXG.app.canvas.hidden = true; const st = $('#tmStage'); if (st) st.classList.remove('g6'); }
   /* ---------- 미니게임 터지는 효과(효과층 7단계) ----------
      숲속 퍼즐: 줄이 지워지면 블록 그림이 네 조각으로 깨져 떨어져요. 숲속 합치기: 합쳐지면 빛 고리와 별 조각이 퍼져요
      그림판 하나(canvas.fxo)를 퍼즐 판이나 합치기 판에 옮겨 붙여 써요. 값과 저장은 그대로, 엔진이 없거나 움직임 줄이기면 예전 효과 그대로 */
