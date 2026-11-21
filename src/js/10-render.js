@@ -4,6 +4,9 @@
   const setAt = (el, a, v) => { if (el && el.getAttribute(a) !== String(v)) el.setAttribute(a, v); };
   const setHid = (el, h) => { if (el && el.hidden !== !!h) el.hidden = !!h; };
   const earlyDay = () => !!S && S.tier === 0 && S.q.m < 3 && !(S.st && S.st.grads > 0);   // 처음 세 메인 퀘스트
+  // 졸업 탭 빨간 점: 명예 교장실과 기금은 '추천' 칸을 올릴 수 있을 때만(다른 칸이 되어도 추천을 모으는 사람이 많아요)
+  function gradRecReady() { const p = perkRec(), f = fpRec(); return !!(p && S.p.dip >= perkCost(p.k)) || !!(f && (S.fund > 0 || S.tier > 0) && S.fund >= fpCost(f.k)); }
+  function teaRecReady() { const r = rt.rec; return !!(r && r.kind === 'tea' && TEA[r.k] && !teaMaxed(r.k) && S.budget >= teaCost(r.k)); }
   function renderHUD() {
     document.body.classList.toggle('early', earlyDay());
     setTx($('#vBudget'), fmt2(S.budget));
@@ -404,12 +407,10 @@
   function renderAffordance() {
     if (S && S.fold && rt.foldS !== S) { rt.foldS = S; foldApply(); } else foldDots();   // 불러온 저장마다 한 번
     for (const k of facKeys()) $('#pq-' + k).classList.toggle('can-buy', S.budget >= facNextCost(k));
-    let any = false;
-    for (const k of Object.keys(TEA)) if (!teaMaxed(k) && S.budget >= teaCost(k)) any = true;
-    $('#tabDot').hidden = !any;
     // 탐험 단추 빨간 점: 아직 한 번도 안 열었거나, 보고서가 쌓였을 때(탐험 화면을 보는 동안은 끔). 시계가 아직 없으면 tamIdle을 부르지 않아요(첫 열기 전에 시계를 켜지 않게)
     const td = $('#tamDot'); if (td) td.hidden = !(tamOn() && rt.tab !== 'tam' && (!S.tam.seen || (S.tam.it && tamIdle().sec >= TAM.idleMin)));
     renderRec();
+    setHid($('#tabDot'), !teaRecReady());   // 선생님 탭 빨간 점: 추천 선생님을 지금 올릴 수 있을 때만
     if (rt.sheetKey) renderSheet();
     if (rt.tab === 'teachers') renderTeachers();
     checkQuests(false);
@@ -428,7 +429,7 @@
     if (rt.tab === 'quests') renderMissions();
     setHid($('#btnAtt'), !attUnlocked());
     setHid($('#attDot'), !attUnlocked() || !canStamp());
-    setHid($('#gDot'), rt.tab === 'grad' || !(canGraduate() || canPromote() || (S.p.ticket > 0 && growOn()) || Object.keys(PERKS).some(k => !perkMaxed(k) && S.p.dip >= perkCost(k)) || Object.keys(FPERKS).some(k => S.fund >= fpCost(k))));
+    setHid($('#gDot'), rt.tab === 'grad' || !(canGraduate() || canPromote() || (S.p.ticket > 0 && growOn()) || gradRecReady()));
     renderGradPanel(false);
   }
 
