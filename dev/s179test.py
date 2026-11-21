@@ -1,4 +1,5 @@
 # 5.3.2 졸업 탭 빨간 점: 명예 교장실(수료증)과 기금은 '추천' 칸을 올릴 수 있을 때만(다른 칸만 되면 점 없음)
+# 선생님 탭 빨간 점도 같아요: 추천이 선생님이고 그 선생님을 올릴 수 있을 때만
 # 쓰는 법: python3 wrap.py && python3 s179test.py   (마지막 줄이 PASS면 통과)
 import asyncio, json
 from playwright.async_api import async_playwright
@@ -30,6 +31,16 @@ async def main():
         if r.get('otherOnly') is True: bad.append(f'추천이 아닌 칸만 될 때도 빨간 점 {r}')
         if not r['recOk']: bad.append(f'추천 칸을 올릴 수 있는데 빨간 점이 없어요 {r}')
         if not r['fundRec']: bad.append(f'기금 추천을 올릴 수 있는데 빨간 점이 없어요 {r}')
+        t = await pg.evaluate(f"""(() => {{ const F = {F}, S = F.S, rt = F.rt4, ks = Object.keys(F.TEA).filter(k => !F.teaMaxed(k)), out = {{}};
+          const k = ks[0], o = ks[1];
+          rt.rec = {{ kind: 'tea', k }}; S.budget = F.teaCost(k); out.recOk = F.teaRecReady();
+          S.budget = F.teaCost(k) - 1; out.recPoor = F.teaRecReady();
+          rt.rec = {{ kind: 'fac', k: 'classroom' }}; S.budget = 1e12; out.facRec = F.teaRecReady();
+          rt.rec = null; out.none = F.teaRecReady();
+          return out; }})()""")
+        print('선생님', t)
+        if not t['recOk']: bad.append(f'추천 선생님을 올릴 수 있는데 선생님 점이 없어요 {t}')
+        if t['recPoor'] or t['facRec'] or t['none']: bad.append(f'추천 선생님이 아니거나 모자란데 선생님 점 {t}')
         bad += [f'오류 {e}' for e in errs[:3]]
         await b.close()
     print('\n'.join(bad) if bad else '')

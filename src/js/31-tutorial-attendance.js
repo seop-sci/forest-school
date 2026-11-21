@@ -23,16 +23,27 @@
     queueModal(() => { tutStart(S.tut.step || 0); return true; });
   }
   // 처음 켠 학교: 안내 카드 대신 교실 위에 손가락과 한 줄. 교실 창이 열리면 책상 단추를 가리켜요. 첫 퀘스트를 마치면 사라져요
+  // 처음 메인 퀘스트 다섯 개(책상 고치기부터 급식실 가구까지)는 누를 곳을 손가락으로 가리켜요
+  const FH_MAX = 5;
+  function firstHintAim() {
+    if (mainReady()) return rt.sheetKey ? null : [$('#questBar'), '눌러서 보상을 받아요', 1];
+    const q = curMain(); if (!q || !q.k || !FAC[q.k]) return null;
+    const k = q.k, pick = questPick(q);
+    if (!pick || conOn(k)) return null;   // 공사 중이면 기다려요
+    if (rt.sheetKey && rt.sheetKey !== k) return null;
+    if (!rt.sheetKey) return [$('#b-' + k), eul(FAC[k].name) + ' 눌러 보세요', 0];
+    if (pick.kind === 'fur') return [$(`#furList [data-fur="${pick.i}"]`), (S.q.m === 0 ? '책상을' : '가구를') + ' 눌러 올려요', 1];
+    return [$('#sheetBuy'), (S.f[k] >= 1 ? '눌러서 넓혀요' : '눌러서 지어요'), 1];
+  }
   function firstHint() {
     let h = $('#firstHint');
-    const busy = !S || S.q.m !== 0 || rt.modalOpen || rt.paused || rt.st || rt.tut || rt.tab !== 'school' || document.hidden;
-    const rd = !busy && mainReady(), tg = busy ? null : rd ? (rt.sheetKey ? null : $('#questBar')) : rt.sheetKey === 'classroom' ? $('#furList [data-fur="0"]') : rt.sheetKey ? null : $('#b-classroom');
+    const busy = !S || S.q.m >= FH_MAX || rt.modalOpen || rt.paused || rt.st || rt.tut || rt.tab !== 'school' || document.hidden;
+    const aim = busy ? null : firstHintAim(), tg = aim && aim[0];
     const r = tg && !tg.hidden ? tg.getBoundingClientRect() : null;
-    if (!r || r.width < 8) { if (h) h.hidden = true; if (S && S.q.m > 0 && h) h.remove(); return; }
+    if (!r || r.width < 8) { if (h) h.hidden = true; if (S && S.q.m >= FH_MAX && h) h.remove(); return; }
     if (!h) { h = document.createElement('div'); h.id = 'firstHint'; h.className = 'first-hint'; h.setAttribute('aria-hidden', 'true'); h.innerHTML = '<span class="fh-tx"></span><span class="fh-f">👆</span>'; document.body.appendChild(h); }
-    const tx = rd ? '눌러서 보상을 받아요' : rt.sheetKey === 'classroom' ? '책상을 눌러 올려요' : '교실을 눌러 보세요';
-    if (h.firstChild.textContent !== tx) h.firstChild.textContent = tx;
-    h.hidden = false; h.style.left = (r.left + r.width / 2) + 'px'; h.style.top = (rd || rt.sheetKey ? r.bottom - 6 : r.top + r.height * 0.62) + 'px';
+    if (h.firstChild.textContent !== aim[1]) h.firstChild.textContent = aim[1];
+    h.hidden = false; h.style.left = (r.left + r.width / 2) + 'px'; h.style.top = (aim[2] ? r.bottom - 6 : r.top + r.height * 0.62) + 'px';
   }
   setInterval(() => { try { firstHint(); } catch (e) { /* 다음에 */ } }, 400);
   function tutStart(i) {

@@ -12412,6 +12412,7 @@ body.mg-on .toast[hidden]{display:none}
   const earlyDay = () => !!S && S.tier === 0 && S.q.m < 3 && !(S.st && S.st.grads > 0);   // 처음 세 메인 퀘스트
   // 졸업 탭 빨간 점: 명예 교장실과 기금은 '추천' 칸을 올릴 수 있을 때만(다른 칸이 되어도 추천을 모으는 사람이 많아요)
   function gradRecReady() { const p = perkRec(), f = fpRec(); return !!(p && S.p.dip >= perkCost(p.k)) || !!(f && (S.fund > 0 || S.tier > 0) && S.fund >= fpCost(f.k)); }
+  function teaRecReady() { const r = rt.rec; return !!(r && r.kind === 'tea' && TEA[r.k] && !teaMaxed(r.k) && S.budget >= teaCost(r.k)); }
   function renderHUD() {
     document.body.classList.toggle('early', earlyDay());
     setTx($('#vBudget'), fmt2(S.budget));
@@ -12812,12 +12813,10 @@ body.mg-on .toast[hidden]{display:none}
   function renderAffordance() {
     if (S && S.fold && rt.foldS !== S) { rt.foldS = S; foldApply(); } else foldDots();   // 불러온 저장마다 한 번
     for (const k of facKeys()) $('#pq-' + k).classList.toggle('can-buy', S.budget >= facNextCost(k));
-    let any = false;
-    for (const k of Object.keys(TEA)) if (!teaMaxed(k) && S.budget >= teaCost(k)) any = true;
-    $('#tabDot').hidden = !any;
     // 탐험 단추 빨간 점: 아직 한 번도 안 열었거나, 보고서가 쌓였을 때(탐험 화면을 보는 동안은 끔). 시계가 아직 없으면 tamIdle을 부르지 않아요(첫 열기 전에 시계를 켜지 않게)
     const td = $('#tamDot'); if (td) td.hidden = !(tamOn() && rt.tab !== 'tam' && (!S.tam.seen || (S.tam.it && tamIdle().sec >= TAM.idleMin)));
     renderRec();
+    setHid($('#tabDot'), !teaRecReady());   // 선생님 탭 빨간 점: 추천 선생님을 지금 올릴 수 있을 때만
     if (rt.sheetKey) renderSheet();
     if (rt.tab === 'teachers') renderTeachers();
     checkQuests(false);
@@ -26060,16 +26059,27 @@ body.mg-on .toast[hidden]{display:none}
     queueModal(() => { tutStart(S.tut.step || 0); return true; });
   }
   // 처음 켠 학교: 안내 카드 대신 교실 위에 손가락과 한 줄. 교실 창이 열리면 책상 단추를 가리켜요. 첫 퀘스트를 마치면 사라져요
+  // 처음 메인 퀘스트 다섯 개(책상 고치기부터 급식실 가구까지)는 누를 곳을 손가락으로 가리켜요
+  const FH_MAX = 5;
+  function firstHintAim() {
+    if (mainReady()) return rt.sheetKey ? null : [$('#questBar'), '눌러서 보상을 받아요', 1];
+    const q = curMain(); if (!q || !q.k || !FAC[q.k]) return null;
+    const k = q.k, pick = questPick(q);
+    if (!pick || conOn(k)) return null;   // 공사 중이면 기다려요
+    if (rt.sheetKey && rt.sheetKey !== k) return null;
+    if (!rt.sheetKey) return [$('#b-' + k), eul(FAC[k].name) + ' 눌러 보세요', 0];
+    if (pick.kind === 'fur') return [$(`#furList [data-fur="${pick.i}"]`), (S.q.m === 0 ? '책상을' : '가구를') + ' 눌러 올려요', 1];
+    return [$('#sheetBuy'), (S.f[k] >= 1 ? '눌러서 넓혀요' : '눌러서 지어요'), 1];
+  }
   function firstHint() {
     let h = $('#firstHint');
-    const busy = !S || S.q.m !== 0 || rt.modalOpen || rt.paused || rt.st || rt.tut || rt.tab !== 'school' || document.hidden;
-    const rd = !busy && mainReady(), tg = busy ? null : rd ? (rt.sheetKey ? null : $('#questBar')) : rt.sheetKey === 'classroom' ? $('#furList [data-fur="0"]') : rt.sheetKey ? null : $('#b-classroom');
+    const busy = !S || S.q.m >= FH_MAX || rt.modalOpen || rt.paused || rt.st || rt.tut || rt.tab !== 'school' || document.hidden;
+    const aim = busy ? null : firstHintAim(), tg = aim && aim[0];
     const r = tg && !tg.hidden ? tg.getBoundingClientRect() : null;
-    if (!r || r.width < 8) { if (h) h.hidden = true; if (S && S.q.m > 0 && h) h.remove(); return; }
+    if (!r || r.width < 8) { if (h) h.hidden = true; if (S && S.q.m >= FH_MAX && h) h.remove(); return; }
     if (!h) { h = document.createElement('div'); h.id = 'firstHint'; h.className = 'first-hint'; h.setAttribute('aria-hidden', 'true'); h.innerHTML = '<span class="fh-tx"></span><span class="fh-f">👆</span>'; document.body.appendChild(h); }
-    const tx = rd ? '눌러서 보상을 받아요' : rt.sheetKey === 'classroom' ? '책상을 눌러 올려요' : '교실을 눌러 보세요';
-    if (h.firstChild.textContent !== tx) h.firstChild.textContent = tx;
-    h.hidden = false; h.style.left = (r.left + r.width / 2) + 'px'; h.style.top = (rd || rt.sheetKey ? r.bottom - 6 : r.top + r.height * 0.62) + 'px';
+    if (h.firstChild.textContent !== aim[1]) h.firstChild.textContent = aim[1];
+    h.hidden = false; h.style.left = (r.left + r.width / 2) + 'px'; h.style.top = (aim[2] ? r.bottom - 6 : r.top + r.height * 0.62) + 'px';
   }
   setInterval(() => { try { firstHint(); } catch (e) { /* 다음에 */ } }, 400);
   function tutStart(i) {
@@ -32148,7 +32158,7 @@ body.mg-on .toast[hidden]{display:none}
     MAP_OAK, oakArt, layoutOak, mapOak, oakAt, tapOak, dropSpot,
     dexMeet, dexSync, dexPending, dexGift, renderDex, evCurrent, evNext, evUpcoming, evSync, evFix, evVal, EV_FALLBACK, EV_DECO, EV_HAT, COS, DECO_BY, decoOwn, perkRec, fpRec, BOOST_ALL, buyShop, pickShop, showNote, showOkOn, showWd, renderGradPanel, renderShop, renderDecoShop, EV_WEEKLY, EV_WEEK_BASE, weekMon, claimStamp, claimEvMission, claimEvBox, renderEvent, evMissions, evOk, evSkipped, EV_MONTHS, EV_MEASURE, tierMinutes, minAcorns, IMG, sanitize171, ACH, achSync, claimAch, setTitle, renderAch, setDexSeg, achClaimable, XT, xtAct, xtCost, xtLv, feastMins, libMult, propInstances, walkBuild, festItemSvg, guestArt, adErrText, googleErrText, openSheet, closeSheet, startFest, startSports, sanitize170, EV_STAMPS, EV_SPECIAL, EV_MONTHLY, EV_BOX, DEX_KEYS, DEX_REWARD, DEX_GUEST_KEYS, seasonKey, roofArtKey, thrKey, PP, PP_TITLES, ppOpen, ppPer, ppData, ppDay, ppWrite, ppTick, ppSync, ppScore, ppSemDone, rtMax, alumniLines, SIDE, vdReward, oakKey, setSeasonArt, VP, vpLv, vpCost, vpMult, vpAct, renderVpCard, sportsPrize, festPrize, renderTeachers, buildTeacherCards, bldImg, roofKey, bldStage, mapKey, setMapArt, applyThemes, buyFacility, bldFx, setBldFx, mapHi, Live, liveApply, liveLoad, liveOff, LIVE_KEYS, EVC, NOTICES, openNotice, noticeAuto, noticeWant, ntUnread, startTrial, endTrial: () => rt.trial && (rt.trial.left = 0), spawnDeal, startVisit, IMG170, MG, mgCells, mgSetCells, mgTick, mgAddEnergy, mgAddUp, mgTapGen, mgDrop, mgSell, mgUpgrade, mgAddUp, mgUpSwap, mgGensMax, MG_UP_ESS, mgClaimOrder, mgSwapOrder, mgOrderOk, mgFillOrders, mgOpen, mgClose, mgRenderAll, mgSpawnLevel, mgNearestEmpty, mgEmptyBoard, mgOrderReward, mgUI, sanitize180, mgWatchAd, mgNewOrder, mgHintPick, mgShowHint, mgClearHint, mgTouch, mgOrderGuide, mgDexN, mgDexCan, mgDexClaim, mgOpenDex, MG_DEX, MG_DEX_MS, mgDexEss, mgDexEssCan, mgDexEssN, mgDexMsCan, mgDexMsClaim, MGB, mgBuyBoost, mgBstLeft, mgOpenBoost, nice, claimMission, claimBonus, claimWeekMission, MP_BOX, swapDaily, repairMissions, MISSIONS, WMISSIONS, dmDay, wkWeek,   // 도감, 이벤트
     PZ, PZ_SHAPES, pzFits, pzAnyFit, pzStuck, pzFullLines, pzPlace, pzFreshGame, pzStart, PZB, pzbCost, pzApplyBoost, pzBoostOpen, pzBoostGo, festGoldLeft, festGoldTake, claimSports, TR2, TR2_PL, openTr2, tr2Act, tr2Away, tr2Ready, tr2Rsv, tr2Tick, renderAlbum, FEST, FEST_IDS, festNight, festShown, festTimeLock, festOpen, startFest, openFest, endFest, renderStreet, pzFinish, pzLeft, pzCanAd, pzEssOf, pzMinOf, pzHelpSquirrel, pzHelpOwl, pzHelpBear, fillSubs, mapRoofTop, showAd, claimOfflineDouble, startBoost, tripAd, festFocus, festRange, visMap, renderMissions, pzHasHelp, pzRot, pzNewPiece, pzOpen, pzClose, pzGameOver, pzRenderAll, renderMini, addEss, ESHOP, SP_FUR, applyCos, essItem, pickEss, buyEss, renderEssShop, hatSVG, spFurImg, gameNow, gameToday, gameWeek, kstDay, setServerTime, SVR, dmDay, weekIdx, lgWeek, wkWeek, lgKey, pzDay, goldDay, boostLeft, dealLeft, canStamp };
-  if (window.__FOREST_TEST) Object.assign(window.__forest, { uniTerm, utSync, tripUseTicket, readUseTicket, picnicUseTicket, buyDecoPieces, adGold, claimBonus, cloudPush, cloudClash, syncGet, revOf, deleteAccount, lookDel: () => lookDelNow(), lookSet, lookPush, leaveRank, sanitizeCg, freshCg, ambWant, ambSync, AMB, AMB_LV, WLD, wldSync, wldLv, wldPhase, wldWeather, wldAuto, WLD_WATER, wldCurtain, photoOpen, photoClose, oakBend, oakBands, frPatAll, frPatLeft, fpsToggle, fxRes, fxWant, gradRecReady });   // 시험 손잡이
+  if (window.__FOREST_TEST) Object.assign(window.__forest, { uniTerm, utSync, tripUseTicket, readUseTicket, picnicUseTicket, buyDecoPieces, adGold, claimBonus, cloudPush, cloudClash, syncGet, revOf, deleteAccount, lookDel: () => lookDelNow(), lookSet, lookPush, leaveRank, sanitizeCg, freshCg, ambWant, ambSync, AMB, AMB_LV, WLD, wldSync, wldLv, wldPhase, wldWeather, wldAuto, WLD_WATER, wldCurtain, photoOpen, photoClose, oakBend, oakBands, frPatAll, frPatLeft, fpsToggle, fxRes, fxWant, gradRecReady, teaRecReady });   // 시험 손잡이
   if (window.claude && window.claude.hot && window.claude.hot.snapshot) {
     try { window.claude.hot.snapshot(() => { if (S) syncMid(); return { save: S }; }); } catch (e) { /* 무시 */ }
   }
