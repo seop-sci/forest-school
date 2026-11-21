@@ -7,7 +7,242 @@
     qr: {}, qKey: '', guideKey: null,
     adOpen: false, adTimer: 0, adOk: null, adNo: null, adEarned: false, gKey: '', townStage: -1, townTier: -1,
     deal: null, dealT: DEAL.first, boostUntil: 0, boostT: BOOSTW.first, fitKey: '', fitGen: 0, yearKey: '', oakN: -1, oakHintAt: 0, rankEdit: false,
-    adopting: false, adNoGold: false, shopPick: ''
+    adopting: false, adNoGold: false, shopPick: '',
+    // 아래는 쓰는 곳에서 처음 값을 정해요. 이름만 모아 두고 값은 넣지 않아요(처음 값을 만드는 if (!rt.이름) rt.이름 = … 줄이 그대로 돌아요)
+    // 시계, 시작, 점검
+    clk0: undefined,   // 게임 시계 기준점(마지막 시각과 그때의 흐른 시간)
+    fakeNow: undefined,   // 자동 시험이 꾸며 넣는 기기 시각
+    fakePerf: undefined,   // 자동 시험이 꾸며 넣는 흐른 시간
+    awayWait: undefined,   // 자리 비운 보상 계산을 미뤄 둔 정보(돌아온 때, 건너뛸 횟수)
+    brokenSave: undefined,   // 읽지 못한 저장을 따로 남겼는지
+    uniPrev: undefined,   // 개발자 메뉴의 대학교 미리 보기 중인지
+    utOn: undefined,   // 대학교 낱말 바꾸기를 켰는지
+    utObs: undefined,   // 대학교 낱말 바꾸기 감시자
+    ntAuto: undefined,   // 업데이트 공지를 저절로 띄웠는지
+    maintTimer: undefined,   // 점검 화면에서 원격 설정을 다시 읽는 시계
+    maintTaps: undefined,   // 점검 화면을 누른 시각들(다섯 번이면 들어가요)
+    maintPass: undefined,   // 점검 중이지만 이번만 들어왔는지
+    deleting: undefined,   // 계정과 서버 기록을 지우는 중인지
+    t170: undefined,   // 방 안 그리기 1초 주기 시계
+    saAt: undefined,   // 느린 움직임을 마지막으로 맞춘 시각
+    slowAnims: undefined,   // 느리게 돌리는 움직임 목록
+    mf: undefined,   // 프레임 수(지도 그리기를 나눠요)
+    kdt: undefined,   // 지도 학생 걸음에 모인 시간
+    // 지도와 화면 배치
+    zoom: undefined,   // 지도 확대 배율
+    panX: undefined,   // 지도를 옮긴 가로 자리
+    panY: undefined,   // 지도를 옮긴 세로 자리
+    panMoved: undefined,   // 지도를 마지막으로 끈 시각(누르기와 끌기를 가려요)
+    mapS: undefined,   // 지도 배율
+    mapW: undefined,   // 그려진 지도 너비
+    mapH: undefined,   // 그려진 지도 높이
+    viewW: undefined,   // 지도 가로 칸 수(자동 시험이 바꿔요)
+    camHold: undefined,   // 행사 카메라가 키운 채 멈춘 상태
+    camId: undefined,   // 카메라 움직임 번호(새 움직임이 옛것을 멈춰요)
+    hudTop: undefined,   // 현황판이 가리는 높이
+    hudBot: undefined,   // 아래 칸이 가리는 높이
+    hudRight: undefined,   // 오른쪽 메뉴가 가리는 너비
+    hudTh: undefined,   // 현황판에 적용한 테마
+    foldS: undefined,   // 접기 상태를 적용한 저장
+    mapLaid: undefined,   // 지금 깔린 지도 열쇠
+    mapIdle: undefined,   // 대학교 구역 지도를 쉬는 틈에 받는 시계
+    c3q: undefined,   // 졸업식 그림 받기를 시작했는지
+    lux: undefined,   // 고급 배경을 켰는지(처음 볼 때 이 기기에서 읽어요)
+    zoneLast: undefined,   // 마지막으로 들어간 구역
+    viewZone: undefined,   // 학교급 모습 보기에서 보는 구역
+    viewTier: undefined,   // 학교급 모습 보기에서 보는 학교급
+    viewEdit: undefined,   // 지난 학교급을 꾸미는 중인지
+    lookData: undefined,   // 다른 학교 구경 자료
+    decoEdit: undefined,   // 꾸미기 모드인지
+    backTab: undefined,   // 패널을 닫으면 돌아갈 탭
+    wxTipT: undefined,   // 날씨 설명이 사라지는 시계
+    // 지도 위 학생과 손님
+    nav: undefined,   // 학생 길 찾기 자료
+    mpath: undefined,   // 지도마다 학생 길 그래프
+    kidSpN: undefined,   // 지도에 나온 학생 종류 수
+    kidsAway: undefined,   // 학생들이 자리를 비웠는지(체험학습 등)
+    busHold: undefined,   // 체험학습 버스에 탈 때까지 지도에 남길 친구 수
+    bus: undefined,   // 체험학습 버스 그림
+    elBadgeT: undefined,   // 반장 배지를 단 학생(다시 달 때 비워요)
+    bdHatK: undefined,   // 생일 고깔을 단 학생
+    nutFrom: undefined,   // 떨어질 도토리가 달린 가지 자리
+    trial: undefined,   // 지금 나타난 매나 뱀
+    trialT: undefined,   // 다음 매나 뱀까지 남은 초
+    trialWasHunt: undefined,   // 지난 매나 뱀이 사냥형이었는지
+    visit: undefined,   // 지금 놀러 온 손님
+    visitT: undefined,   // 다음 손님까지 남은 초
+    frBub: undefined,   // 단짝 말풍선 요소
+    // 건물 창, 가구, 공사
+    sheetAnimTo: undefined,   // 건물 창이 다 올라오는 시각
+    sheetBack: undefined,   // 건물 창에서 연 창을 닫으면 돌아갈 건물
+    sheetShape: undefined,   // 건물 창 모양(다시 그릴지 가려요)
+    bldFxWait: undefined,   // 창을 닫으면 지도에서 보여 줄 업그레이드 효과
+    furTag: undefined,   // 가구 이름표 자리
+    rec: undefined,   // 추천 업그레이드 계산 결과
+    recKey: undefined,   // 추천을 계산한 열쇠
+    recAt: undefined,   // 추천을 계산한 시각
+    walk: undefined,   // 건물 창 안에서 걷는 친구들
+    wkT: undefined,   // 건물 창 안 걷기 시간
+    conArm: undefined,   // 공사 칸 단축권 조합을 한 번 눌러 확인하는 중인지
+    conPick: undefined,   // 공사 칸에서 고른 단축권 조합
+    conSec: undefined,   // 공사 칸에 보인 남은 초
+    cesK: undefined,   // 숲의 정수로 즉시 완공할 건물
+    bvN: undefined,   // 비버 선생님 대사 차례
+    // 학교생활 창
+    snRes: undefined,   // 간식 뽑기 결과
+    bxRes: undefined,   // 생물 관찰 결과
+    gdPick: undefined,   // 텃밭에서 고른 밭
+    gdSel: undefined,   // 오늘의 급식에서 고른 메뉴
+    gdCutI: undefined,   // 텃밭 시간 줄이기를 고른 밭
+    gdPullI: undefined,   // 텃밭 작물 뽑기를 고른 밭
+    gdFull: undefined,   // 거둔 재료가 가득 차 덜 들어갔는지
+    vdPop: undefined,   // 마을 기부 창을 닫고 기념물 효과를 보여 줄지
+    nsSub: undefined,   // 자율학습 과목 표시
+    nsT: undefined,   // 자율학습 정산 1초 시계
+    nsAway: undefined,   // 자리 비운 동안 자율학습 보상이 붙었는지
+    pcSel: undefined,   // 소풍 보낼 친구
+    pcLunch: undefined,   // 소풍 도시락을 고르는 중인지
+    pcNews: undefined,   // 소풍에서 돌아온 소식
+    skNew: undefined,   // 방금 붙은 칭찬 스티커 칸
+    skPage: undefined,   // 스티커판 쪽
+    skView: undefined,   // 스티커판 보기(지금, 지난 판)
+    albPage: undefined,   // 졸업 앨범 쪽
+    bdKey: undefined,   // 생일 표시를 그린 열쇠
+    bdMemo: undefined,   // 오늘 생일인 학생 계산 메모
+    frNameSp: undefined,   // 이름을 바꿀 학생 종류
+    ltBack: undefined,   // 편지 창에서 뒤로 가기를 보여 줄지
+    plAt: undefined,   // 학부모 편지함에서 보는 편지 번호
+    talkSeq: undefined,   // 전학 대화 진행
+    trSvOpen: undefined,   // 체험학습 기념품 칸을 펼쳤는지
+    tripGot: undefined,   // 체험학습에서 받은 것
+    tripTxt: undefined,   // 체험학습 단추에 보인 글
+    tripView: undefined,   // 체험학습 창 화면(가기, 돌아옴, 쉼)
+    tr2Msg: undefined,   // 수학여행 창 안내 글
+    tr2Sel: undefined,   // 수학여행에서 고른 여행지
+    tr2Txt: undefined,   // 수학여행 단추에 보인 글
+    tr2View: undefined,   // 수학여행 창 화면
+    fest: undefined,   // 진행 중인 학교 행사
+    sports: undefined,   // 진행 중인 운동회
+    sportsWin: undefined,   // 운동회 결과
+    prizeId: undefined,   // 행사 상품 종류
+    prizeName: undefined,   // 행사 상품 창 제목
+    festKey: undefined,   // 학교 행사 목록을 그린 열쇠
+    festTxt: undefined,   // 학교 행사 단추에 보인 글
+    fvGs: undefined,   // 대학 축제 손님 목록
+    fvKey: undefined,   // 대학 축제 창을 그린 날
+    fvTipK: undefined,   // 대축제 띠 종류
+    xgG: undefined,   // 교환학생의 날 손님
+    xgKey: undefined,   // 교환학생 창을 그린 날
+    mkKey: undefined,   // 장터 창을 그린 날
+    wdX: undefined,   // 요일 행사 띠를 닫은 날
+    csView: undefined,   // 진로 상담 창 화면
+    csLastView: undefined,   // 진로 상담 창이 지난번 보인 화면
+    csTalk: undefined,   // 진로 상담 중인 학생
+    csRw: undefined,   // 진로 상담에서 모은 보상
+    elNews: undefined,   // 반장 선거 소식을 알릴지
+    labSel: undefined,   // 실험에서 고른 재료
+    labView: undefined,   // 실험 창 화면
+    labPage: undefined,   // 실험 노트 쪽
+    labBusy: undefined,   // 실험 장면이 도는 중인지
+    rdNews: undefined,   // 책을 다 읽은 소식
+    bookK: undefined,   // 문제집 창의 과목
+    acTipT: undefined,   // 공부 탭 설명이 사라지는 시계
+    exNews: undefined,   // 시험 기간 소식
+    btqSeen: undefined,   // 숲속 대결에서 이미 낸 문제
+    pzSwN: undefined,   // 숲속 퍼즐 소탕 창에서 고른 판 수
+    clubPick: undefined,   // 동아리실에서 고른 동아리
+    seatClub: undefined,   // 부원을 넣을 동아리
+    seatStudent: undefined,   // 동아리에 넣을 학생
+    dpRoom: undefined,   // 학과 사무실을 건물 창에서 열었는지
+    dpSwap: undefined,   // 전공을 바꾸려고 고른 학과
+    // 연구와 조교
+    rxTab: undefined,   // 연구소 창의 탭
+    rtSel: undefined,   // 연구 트리에서 고른 연구
+    rtPop: undefined,   // 막 자란 연구 칸(움직임)
+    ppWhy: undefined,   // 논문 자료가 늘어난 까닭(알림)
+    taPick: undefined,   // 조교를 넣을 자리
+    taHr: undefined,   // 조교 파견 시간
+    taGo: undefined,   // 조교 파견 결과를 보여 줄 자리
+    // 탐험
+    tam: undefined,   // 탐험 화면 진행 상태
+    tamQ: undefined,   // 층을 넘으며 모은 알림
+    tamSeg: undefined,   // 탐험 아래 메뉴에서 연 칸
+    tamLvN: undefined,   // 대원 한 번에 올리기 수(1, 10, 최대)
+    tamPw: undefined,   // 탐험대 힘 칸에 보인 값
+    tamAc: undefined,   // 탐험 위 칸에 보인 도토리
+    tamAcT: undefined,   // 탐험 위 칸 도토리 갱신 시계
+    tamSkTo: undefined,   // 빠른 스킵으로 갈 층
+    tamTip: undefined,   // 필살기 안내를 보였는지
+    tamUi: undefined,   // 탐험 화면 단추를 연결했는지
+    // 상점과 꾸미기
+    thPrev: undefined,   // 테마 미리 보기 중인 테마
+    thScroll: undefined,   // 미리 보기 전 상점 스크롤 자리
+    thSig: undefined,   // 적용한 테마 표시(바뀌면 덮개를 띄워요)
+    thVeilT: undefined,   // 테마 적용 중 덮개 시계
+    thBonus: undefined,   // 테마 세트 효과(%)
+    essPick: undefined,   // 문방구에서 고른 물건
+    decoPick: undefined,   // 꾸미기 가게에서 고른 물건
+    decoSlot: undefined,   // 장식을 놓을 자리
+    mkDraft: undefined,   // 학교 마크 고치는 중인 값
+    // 서버, 계정, 랭킹
+    isAdmin: undefined,   // 관리자 계정인지
+    admChk: undefined,   // 관리자 확인을 했는지
+    wlT: undefined,   // 웹판 잠금 확인 시계
+    netT: undefined,   // 서버 연결 쉬기 시계
+    netAct: undefined,   // 마지막으로 화면을 만진 시각
+    acctBusy: undefined,   // 계정 연결 중인지
+    acctPick: undefined,   // 계정 학교와 이 기기 학교 가운데 고를 자료
+    acctOutArm: undefined,   // 로그아웃을 한 번 눌러 확인하는 중인지
+    pickSave: undefined,   // 학교 두 개 고르기 자료
+    bakArm: undefined,   // 예전 학교 되돌리기를 한 번 눌러 확인하는 중인 번호
+    bakL: undefined,   // 예전 학교 목록
+    stPick: undefined,   // 테스트 현황에서 고른 학교
+    stIds: undefined,   // 테스트 현황 학교별 기록 번호
+    stConfirm: undefined,   // 테스트 현황 지우기 확인 중인지
+    nickAsked: undefined,   // 랭킹 이름을 물어봤는지
+    rankView: undefined,   // 랭킹 보기
+    rkSch: undefined,   // 학교 순위 보기(전체, 학회)
+    rkLg: undefined,   // 리그 보기(이번 주, 시즌)
+    rkH: undefined,   // 탐험 순위 보기(일반, 심화)
+    rkMax: undefined,   // 랭킹 값 상한 메모
+    rkDel: undefined,   // 관리자가 지우려고 한 번 누른 줄
+    rkDelT: undefined,   // 랭킹 지우기 확인 시계
+    pwShown: undefined,   // 학교 파워 칸에 보인 값
+    pwStep: undefined,   // 학교 파워 칸 단계
+    // 광고
+    adTok: undefined,   // 광고 요청 번호
+    adGuard: undefined,   // 광고가 끝나지 않을 때를 대비한 시계
+    adAsk: undefined,   // 광고 확인 창 설정
+    adPick: undefined,   // 광고 보상 고르기에서 고른 것
+    // 이야기, 튜토리얼, 졸업식
+    st: undefined,   // 이야기 장면 진행
+    stAfterC: undefined,   // 장 끝 장면을 본 뒤인지
+    qTap: undefined,   // 퀘스트 칸을 눌렀는지(여는 장면은 이때)
+    sbTab: undefined,   // 이야기 수첩 탭
+    tut: undefined,   // 튜토리얼 진행
+    tutAsked: undefined,   // 튜토리얼을 물어봤는지
+    tutPlace: undefined,   // 튜토리얼 말풍선 자리 맞추기
+    cereRun: undefined,   // 졸업식 장면 진행
+    cereAt: undefined,   // 졸업식 장면 시작 시각
+    cereFx: undefined,   // 졸업식 효과
+    cereT1: undefined,   // 졸업식 장면 시계 1
+    cereT2: undefined,   // 졸업식 장면 시계 2
+    cerePaused: undefined,   // 졸업식 장면에서 멈춘 움직임
+    cereAsking: undefined,   // 졸업식 건너뛰기를 묻는 중인지
+    cereRang: undefined,   // 졸업식 장면에서 종을 울렸는지
+    uniGrad: undefined,   // 이번 식이 학위수여식인지(곡 고르기)
+    yearGift: undefined,   // 종업식 선물 도토리
+    yearRec: undefined,   // 종업식 기록 줄
+    tkReward: undefined,   // 친구 성장 쪽지 보상 창
+    // 퀘스트, 미션, 도감, 업적
+    batch: undefined,   // 모두 받기 동안 모은 알림과 보상
+    qOpen: undefined,   // 퀘스트 탭 메인 퀘스트를 펼쳤는지
+    dexPick: undefined,   // 도감에서 고른 동물
+    dexSeg: undefined,   // 도감 탭
+    dexNew: undefined,   // 도감에 새로 생긴 칸
+    evSeg: undefined,   // 이벤트 탭
+    evInit: undefined,   // 이벤트 탭을 처음 그렸는지
+    achNote: undefined   // 쌓인 업적 달성 알림
   };
   if (motionMQ && motionMQ.addEventListener) motionMQ.addEventListener('change', e => { rt.reduced = e.matches; });
   // 헷갈리는 0, O, 1, I, L을 뺀 글자로 학교 번호를 만들어요
