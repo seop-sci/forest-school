@@ -94,6 +94,16 @@ async def main():
         c = await pg.evaluate("document.querySelectorAll('.wld-cur').length")
         if a != 3 or c != 0: bad.append(f'구름 막 {a} {c}')
         bad += [f'(엔진 없음) {e}' for e in errs[:3]]; await ctx.close()
+        # 유치원 밤: 학교급 단추 없이 밤 밝기 단추만
+        s0 = base(tier=0); s0['gfx'] = 1
+        ctx, pg, errs = await open_page(b, s0, False)
+        await pg.evaluate(f"(() => {{ {F}.rt4.wldPh = 'night'; {F}.wldSync(); }})()"); await pg.wait_for_timeout(300)
+        r = await pg.evaluate("(() => { const d = document.querySelector('#tierDots'); return [d.hidden, d.querySelectorAll('[data-td]').length, d.querySelectorAll('[data-nl]').length, d.offsetWidth > 0]; })()")
+        print('유치원 밤', r)
+        if r != [False, 0, 1, True]: bad.append(f'유치원 밤 밝기 단추 {r}')
+        await pg.evaluate(f"(() => {{ {F}.rt4.wldPh = 'day'; {F}.wldSync(); }})()"); await pg.wait_for_timeout(200)
+        if not await pg.evaluate("document.querySelector('#tierDots').hidden"): bad.append('유치원 낮에도 단추 줄이 보여요')
+        bad += [f'(유치원) {e}' for e in errs[:3]]; await ctx.close()
         # 엔진 있음: 비
         s = base(tier=1); s['gfx'] = 2
         ctx, pg, errs = await open_page(b, s, True)
