@@ -2155,6 +2155,12 @@ body.photo .board,body.photo .home-qcard,body.photo .map-left,body.photo .map-ri
 .photo-bar .btn-sub{padding:6px 14px}
 /* 초당 장수 보기(재기 도구) */
 .fps-meter{position:fixed;left:6px;top:calc(6px + env(safe-area-inset-top));z-index:9999;padding:2px 6px;border-radius:6px;background:rgba(0,0,0,.6);color:#fff;font:600 11px/1.4 system-ui,sans-serif;pointer-events:none}
+/* 처음 켠 학교: 교실을 가리키는 손가락과 한 줄(누르기는 통과) */
+.first-hint{position:fixed;z-index:70;transform:translate(-50%,0);display:flex;flex-direction:column-reverse;align-items:center;gap:2px;pointer-events:none}
+.first-hint .fh-f{font-size:30px;line-height:1;animation:fhBob 1s ease-in-out infinite}
+.first-hint .fh-tx{padding:5px 11px;border-radius:12px;background:rgba(40,52,32,.9);color:#fff;font-size:13px;font-weight:700;white-space:nowrap;box-shadow:0 2px 6px rgba(0,0,0,.25)}
+@keyframes fhBob{0%,100%{transform:translateY(0)}50%{transform:translateY(-6px)}}
+@media (prefers-reduced-motion: reduce){.first-hint .fh-f{animation:none}}
 /* ===== 1.5.0 탭 화면 정돈 ===== */
 .app:not(.on-school) .qrow,.app:not(.on-school) .subbar{display:none}
 .app:not(.on-school) .board{margin-bottom:8px}
@@ -3921,7 +3927,7 @@ body.mg-on .toast[hidden]{display:none}
     <p class="boot-step" id="bootStep">학교 문을 여는 중...</p>
     <p class="boot-tip" id="bootTip">학교 문을 여는 중이에요</p>
   </div>
-  <span class="boot-ver" id="bootVer">v5.3.1</span>
+  <span class="boot-ver" id="bootVer">v5.3.1.1</span>
 </div>
 
 <div class="app on-school" id="app">
@@ -4519,7 +4525,7 @@ body.mg-on .toast[hidden]{display:none}
       </div>
       <h3 class="panel-sub">정보</h3>
       <dl class="info">
-        <div id="verRow"><dt>버전</dt><dd>v5.3.1</dd></div>
+        <div id="verRow"><dt>버전</dt><dd>v5.3.1.1</dd></div>
         <div id="pidRow" hidden><dt>학교 번호</dt><dd id="infoPid"></dd></div>
       </dl>
       <div id="devBox" hidden>
@@ -15186,7 +15192,7 @@ body.mg-on .toast[hidden]{display:none}
        forest/rank/<내 id>   랭킹 이름과 학교 점수
        forest/stats/<내 id>  테스트 현황 (어디까지 했는지, 얼마나 했는지)
      <내 id>는 Firebase 익명 로그인이 기기(브라우저)마다 만들어 줘요. */
-  const VERSION = '5.3.1';
+  const VERSION = '5.3.1.1';
   const NT_QUIET = ['5.3.0.3', '5.3.0.2', '5.3.0.1', '5.2.2', '5.2.1', '5.2.0.2', '5.2.0.1', '5.1.1.3', '5.1.1.2', '5.1.1.1', '5.1.1', '5.0.3.1', '5.0.3', '5.0.2.2', '5.0.2.1', '2.1.20', '2.1.2.2', '2.3.0.1', '2.3.4', '3.2.3', '3.2.4', '3.2.5', '3.3.1', '3.3.2', '3.3.3', '4.4.1.1', '4.4.1.2', '4.4.1.3', '4.4.1.4', '5.0.1.1', '5.0.1.2', '5.0.1.3', '5.0.1.4', '5.0.1.5', '5.0.1.6', '5.0.1.7', '5.0.1.8'];   // 생물 탐사 고침은 공지 없이. 도 공지 없이(공지 줄은 정하면 넣어요). 공지 없이. 공지 줄은 woodani가 정할 때까지 조용히. 공지는 2026-11-16 woodani가 정해서 NOTICES로 옮겼어요. 은 공지를 띄워요. 도 공지 없이. 도 공지 창 없이. 도 공지 창 없이(공지는 그대로). 도 조용히. 도 공지 창 없이(공지 줄을 고르지 않음)
     // 이 버전들은 업데이트해도 공지 창을 띄우지 않아요(공지는 그대로)
   /* 공지사항 (은 이미 올려서 부터): 설정 > 공지사항. 맨 위가 가장 새 공지예요
@@ -25951,10 +25957,24 @@ body.mg-on .toast[hidden]{display:none}
     // 처음 시작한 학교(메인 퀘스트 3개 전)에만 저절로 열어요. '나중에'를 눌렀으면 다음에 열 때 한 번 더 물어봐요
     if (!S || S.tut.st === 'done' || S.tut.st === 'skip' || rt.tutAsked) return;
     if (S.tut.st !== 'later' && S.q.m >= 3) return;
+    if (S.q.m < 1 && S.tut.st !== 'later') { setTimeout(tutAuto, 1500); return; }   // 첫 퀘스트(책상 고치기)를 마친 뒤에 안내 세 장. 처음에는 손가락 표시만(firstHint)
     if (!(window.__FOREST_TEST && !window.__STORY_AUTO) && (rt.st || (S.sto && ((!S.sto.v && S.q.m === 0) || (S.sto.q && S.sto.q[0] === 'o0'))))) { setTimeout(tutAuto, 1200); return; }   // 이야기 '첫 출근'이 먼저
     rt.tutAsked = true;
     queueModal(() => { tutStart(S.tut.step || 0); return true; });
   }
+  // 처음 켠 학교: 안내 카드 대신 교실 위에 손가락과 한 줄. 교실 창이 열리면 책상 단추를 가리켜요. 첫 퀘스트를 마치면 사라져요
+  function firstHint() {
+    let h = $('#firstHint');
+    const busy = !S || S.q.m !== 0 || rt.modalOpen || rt.paused || rt.st || rt.tut || rt.tab !== 'school' || document.hidden;
+    const rd = !busy && mainReady(), tg = busy ? null : rd ? (rt.sheetKey ? null : $('#questBar')) : rt.sheetKey === 'classroom' ? $('#furList [data-fur="0"]') : rt.sheetKey ? null : $('#b-classroom');
+    const r = tg && !tg.hidden ? tg.getBoundingClientRect() : null;
+    if (!r || r.width < 8) { if (h) h.hidden = true; if (S && S.q.m > 0 && h) h.remove(); return; }
+    if (!h) { h = document.createElement('div'); h.id = 'firstHint'; h.className = 'first-hint'; h.setAttribute('aria-hidden', 'true'); h.innerHTML = '<span class="fh-tx"></span><span class="fh-f">👆</span>'; document.body.appendChild(h); }
+    const tx = rd ? '눌러서 보상을 받아요' : rt.sheetKey === 'classroom' ? '책상을 눌러 올려요' : '교실을 눌러 보세요';
+    if (h.firstChild.textContent !== tx) h.firstChild.textContent = tx;
+    h.hidden = false; h.style.left = (r.left + r.width / 2) + 'px'; h.style.top = (rd || rt.sheetKey ? r.bottom - 6 : r.top + r.height * 0.62) + 'px';
+  }
+  setInterval(() => { try { firstHint(); } catch (e) { /* 다음에 */ } }, 400);
   function tutStart(i) {
     rt.tut = { i: Math.max(0, Math.min(TUT.length - 1, i | 0)), confirm: false };
     rt.modalOpen = $('#tut');
@@ -31574,7 +31594,7 @@ body.mg-on .toast[hidden]{display:none}
   const WLD = { st: '', lv: -1, ph: '', wx: '', key: '', tint: null, vig: null, mc: null, sc: null, tex: {}, parts: [], next: {}, timer: 0, last: 0, water: [], wv: 0, tier0: null, curWait: false };
   const WLD_FPS = [0, 20, 30];
   // 제안 숫자: 빗방울 수, 눈송이 수, 반딧불 수, 나비 수(보통, 높음)
-  const WLD_N = { rain: [45, 90], snow: [35, 70], fly: [7, 14], bfly: [2, 3], cloud: [0, 3] };
+  const WLD_N = { rain: [30, 60], snow: [35, 70], fly: [5, 10], bfly: [2, 3], cloud: [0, 3] };
   const WLD_WATER = {"map_elem":[[18,186],[2,230],[18,258],[14,294],[26,358],[2,382]],"map_high":[[338,66],[358,94],[338,122],[354,150],[346,182],[186,206],[350,214],[354,246]],"map_kinder":[[22,126],[186,218],[2,350],[34,366],[42,398]]};   // dev/water_spots.py로 고른 물 자리
   // 자동은 '높음'을 고르지 않아요(안드로이드 웹뷰는 중급 폰도 메모리를 8로 알려요). 홈에서 느리면 그 기기에서 한 단계 낮춰요(wldFpsWatch)
   function wldAuto() {

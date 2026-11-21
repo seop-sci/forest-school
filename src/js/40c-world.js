@@ -5,7 +5,7 @@
   const WLD = { st: '', lv: -1, ph: '', wx: '', key: '', tint: null, vig: null, mc: null, sc: null, tex: {}, parts: [], next: {}, timer: 0, last: 0, water: [], wv: 0, tier0: null, curWait: false };
   const WLD_FPS = [0, 20, 30];
   // 제안 숫자: 빗방울 수, 눈송이 수, 반딧불 수, 나비 수(보통, 높음)
-  const WLD_N = { rain: [45, 90], snow: [35, 70], fly: [7, 14], bfly: [2, 3], cloud: [0, 3] };
+  const WLD_N = { rain: [30, 60], snow: [35, 70], fly: [5, 10], bfly: [2, 3], cloud: [0, 3] };
   const WLD_WATER = {"map_elem":[[18,186],[2,230],[18,258],[14,294],[26,358],[2,382]],"map_high":[[338,66],[358,94],[338,122],[354,150],[346,182],[186,206],[350,214],[354,246]],"map_kinder":[[22,126],[186,218],[2,350],[34,366],[42,398]]};   // dev/water_spots.py로 고른 물 자리
   // 자동은 '높음'을 고르지 않아요(안드로이드 웹뷰는 중급 폰도 메모리를 8로 알려요). 홈에서 느리면 그 기기에서 한 단계 낮춰요(wldFpsWatch)
   function wldAuto() {
