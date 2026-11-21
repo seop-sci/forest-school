@@ -1,7 +1,7 @@
 # 5.2.1 시험: 효과층(PixiJS, src/js/40b-fx-layer.js)
 # 보는 것
 #  1) 엔진 파일을 못 받으면(시험판 기본) 효과층이 꺼지고 예전 참나무 흔들기(.shake)와 도토리 줍기가 그대로
-#  2) 엔진이 있으면 지도 바로 뒤에 canvas.fxl(누르기 통과)이 생기고, 참나무를 누르면 용수철 흔들림(transform), 잎, 떨어지는 도토리(그동안 SVG 도토리 숨김)
+#  2) 엔진이 있으면 지도 바로 뒤에 canvas.fxl(누르기 통과)이 생기고, 참나무를 누르면 용수철 흔들림(가로 띠마다 위쪽일수록 많이 휘어요, 밑동 띠는 그대로), 잎, 떨어지는 도토리(그동안 SVG 도토리 숨김)
 #  3) 도토리가 다 떨어지면 SVG 도토리가 다시 보이고, 주우면 값은 예전과 같고 날아가는 도토리가 끝나면 그리기를 멈춰요(raf 0)
 #  4) 학교 탭을 떠나면 효과를 지우고, '움직임 줄이기'면 효과층을 켜지 않아요
 #  5) 페이지 오류 없음
@@ -46,13 +46,13 @@ async def main():
         print('엔진 있음', r)
         if r != {'st': 'ok', 'on': True, 'cv': True, 'after': True, 'pe': 'none'}: bad.append(f'효과층 켜기 {r}')
         await pg.evaluate(TAP); await pg.wait_for_timeout(90)
-        r = await pg.evaluate(f"""(() => ({{ tr: document.querySelector('#oakCanopy').style.transform, shake: document.querySelector('#oakCanopy').classList.contains('shake'), falls: {F}.FXL.falls.length, leaves: {F}.FXL.parts.length, drops: {F}.rt.drops.length, hid: document.querySelector('.drop .drop-fall').style.opacity }}))()""")
+        r = await pg.evaluate(f"""(() => ({{ tr: (u => (u.length ? (u[0].getAttribute('transform') || '') + '/' + (u[u.length - 1].getAttribute('transform') || '') : 'X'))([...document.querySelectorAll('#oakBandG > use')]), shake: document.querySelector('#oakCanopy').classList.contains('shake'), falls: {F}.FXL.falls.length, leaves: {F}.FXL.parts.length, drops: {F}.rt.drops.length, hid: document.querySelector('.drop .drop-fall').style.opacity }}))()""")
         print('누른 뒤', r)
-        if not r['tr'].startswith('rotate(') or r['shake'] or r['falls'] != 1 or r['leaves'] < 6 or r['drops'] != 1 or r['hid'] != '0': bad.append(f'흔들림과 떨어지기 {r}')
+        if not r['tr'].startswith('translate(') or not r['tr'].endswith('/') or r['shake'] or r['falls'] != 1 or r['leaves'] < 6 or r['drops'] != 1 or r['hid'] != '0': bad.append(f'흔들림과 떨어지기 {r}')
         await pg.wait_for_timeout(1500)
-        r = await pg.evaluate(f"""(() => ({{ falls: {F}.FXL.falls.length, hid: document.querySelector('.drop .drop-fall').style.opacity, tr: document.querySelector('#oakCanopy').style.transform }}))()""")
+        r = await pg.evaluate(f"""(() => ({{ falls: {F}.FXL.falls.length, hid: document.querySelector('.drop .drop-fall').style.opacity, tr: (u => (u.length ? (u[0].getAttribute('transform') || '') + '/' + (u[u.length - 1].getAttribute('transform') || '') : 'X'))([...document.querySelectorAll('#oakBandG > use')]) }}))()""")
         print('떨어진 뒤', r)
-        if r['falls'] or r['hid'] != '' or r['tr']: bad.append(f'다 떨어지면 SVG 도토리 보이기와 흔들림 멈춤 {r}')
+        if r['falls'] or r['hid'] != '' or r['tr'] != '/': bad.append(f'다 떨어지면 SVG 도토리 보이기와 흔들림 멈춤 {r}')
         v, b0, b1 = await pg.evaluate(f"(() => {{ const v = {F}.dropValue(), a = {F}.S.budget; document.querySelector('.drop').dispatchEvent(new MouseEvent('click', {{ bubbles: true }})); return [v, a, {F}.S.budget]; }})()")
         r = await pg.evaluate(f"(() => ({{ flys: {F}.FXL.flys.length, sparks: {F}.FXL.parts.length }}))()")
         print('주운 뒤', r)
@@ -64,9 +64,9 @@ async def main():
         # 학교 탭을 떠나면 지워요
         await pg.evaluate(TAP); await pg.wait_for_timeout(60)
         await pg.evaluate(f"{F}.setTab('teachers')"); await pg.wait_for_timeout(200)
-        r = await pg.evaluate(f"(() => ({{ falls: {F}.FXL.falls.length, parts: {F}.FXL.parts.length, tr: document.querySelector('#oakCanopy').style.transform, op: [...document.querySelectorAll('.drop .drop-fall')].map(e => e.style.opacity) }}))()")
+        r = await pg.evaluate(f"(() => ({{ falls: {F}.FXL.falls.length, parts: {F}.FXL.parts.length, tr: (u => (u.length ? (u[0].getAttribute('transform') || '') + '/' + (u[u.length - 1].getAttribute('transform') || '') : 'X'))([...document.querySelectorAll('#oakBandG > use')]), op: [...document.querySelectorAll('.drop .drop-fall')].map(e => e.style.opacity) }}))()")
         print('탭 떠남', r)
-        if r['falls'] or r['parts'] or r['tr'] or any(o for o in r['op']): bad.append(f'탭을 떠나면 지우기 {r}')
+        if r['falls'] or r['parts'] or r['tr'] != '/' or any(o for o in r['op']): bad.append(f'탭을 떠나면 지우기 {r}')
         # 5.3.0.2 겨울 테마: 잎 대신 흰 눈가루 다섯 알
         await pg.evaluate(f"{F}.setTab('school')"); await pg.wait_for_timeout(300)
         await pg.evaluate(f"(() => {{ const F = {F}; F.S.cos.th.bg = 'winter'; F.applyThemes(); }})()"); await pg.wait_for_timeout(1500)

@@ -39,7 +39,7 @@
   function fxKick() { if (FXL.st === 'ok' && !FXL.raf) { FXL.last = performance.now(); FXL.raf = requestAnimationFrame(fxFrame); } }
   function fxClear() {
     for (const L of [FXL.parts, FXL.falls, FXL.flys]) { for (const p of L) { if (p.s && !p.s.destroyed) p.s.destroy(); if (p.d && p.d.g) { const f = p.d.g.querySelector('.drop-fall'); if (f) f.style.opacity = ''; } } L.length = 0; }
-    const cv = $('#oakCanopy'); if (cv) cv.style.transform = ''; FXL.oak.a = FXL.oak.v = 0;
+    oakBend(0); FXL.oak.a = FXL.oak.v = 0;
     fxeReset(); FXE.end = null;
     if (FXL.app) FXL.app.render();
   }
@@ -53,11 +53,11 @@
     FXL.k = k; FXL.w.scale.set(k); FXL.w.x = R.left - F.left - fr.clientLeft; FXL.w.y = R.top - F.top - fr.clientTop + 60 * k;
     let busy = false;
     // 참나무: 줄기 밑동을 축으로 용수철처럼(감쇠 진동)
-    const o = FXL.oak, cvs = $('#oakCanopy');
+    const o = FXL.oak;
     if (Math.abs(o.a) > 0.05 || Math.abs(o.v) > 0.5) {
       o.v += (-o.a * FXC.oakW - o.v * FXC.oakDamp) * dt; o.a += o.v * dt;
-      if (cvs) cvs.style.transform = `rotate(${o.a.toFixed(2)}deg) skewX(${(o.a * 0.35).toFixed(2)}deg)`; busy = true;
-    } else if (cvs && cvs.style.transform) { cvs.style.transform = ''; o.a = o.v = 0; }
+      oakBend(o.a); busy = true;
+    } else if (o.a || o.v) { oakBend(0); o.a = o.v = 0; }
     // 잎과 반짝이
     for (let i = FXL.parts.length - 1; i >= 0; i--) { const p = FXL.parts[i]; p.life -= dt; p.vy += p.g * dt; if (p.drag) { const f = Math.max(0, 1 - p.drag * dt); p.vx *= f; p.vy *= f; }
       p.s.x += (p.vx + (p.flut ? Math.sin(now / 200 + p.ph) * p.flut : 0)) * dt; p.s.y += p.vy * dt; p.s.rotation += p.rot * dt;

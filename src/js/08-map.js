@@ -391,7 +391,38 @@
     }
     $('.oak-nuts').innerHTML = nuts.map(([x, y]) => `<image class="oak-nut" x="${(x - 5).toFixed(1)}" y="${(y - 5).toFixed(1)}" width="10" height="10" href="${IMG('ic_acorn')}"/>`).join('');
     rt.oakN = -1;
+    oakBands();
     if (S) renderOak();
+  }
+  // 참나무 흔들기는 나무를 가로 띠 여럿으로 나눠 위쪽일수록 많이 휘게 해요(fxFrame). 통째로 돌리면 밑동 둘레 땅과 꽃까지 움직였어요
+  // 그림은 하나(.oak-img, defs 안)이고 띠마다 <use>로 같은 그림을 잘라 보여요. 그림 주소가 바뀌어도 띠는 그대로 따라가요
+  const OAK_BANDS = 10;
+  function oakBands() {
+    const cv = $('#oakCanopy'), img = $('.oak-img'); if (!cv || !img) return;
+    const NS = 'http://www.w3.org/2000/svg';
+    if (!img.id) {
+      const d = document.createElementNS(NS, 'defs'); img.id = 'oakImg'; d.appendChild(img); cv.insertBefore(d, cv.firstChild);
+      const bd = document.createElementNS(NS, 'g'); bd.id = 'oakBandG'; cv.insertBefore(bd, d.nextSibling);
+      for (let i = 0; i < OAK_BANDS; i++) {
+        const c = document.createElementNS(NS, 'clipPath'); c.id = 'oakBc' + i; c.appendChild(document.createElementNS(NS, 'rect')); d.appendChild(c);
+        const u = document.createElementNS(NS, 'use'); u.setAttribute('href', '#oakImg'); u.setAttribute('clip-path', `url(#oakBc${i})`); bd.appendChild(u);
+      }
+    }
+    const x = +img.getAttribute('x'), y = +img.getAttribute('y'), w = +img.getAttribute('width'), h = +img.getAttribute('height'); if (!(w > 0 && h > 0)) return;
+    rt.oakBand = { y0: y, h, top: Math.max(1, -y), ys: [] };
+    for (let i = 0; i < OAK_BANDS; i++) {
+      const a = y + h * i / OAK_BANDS, b = y + h * (i + 1) / OAK_BANDS;
+      setA($('#oakBc' + i + ' rect'), { x: x - 30, y: (a - 0.4).toFixed(2), width: w + 60, height: (b - a + 0.8).toFixed(2) });
+      rt.oakBand.ys.push((a + b) / 2);
+    }
+    oakBend(0);
+  }
+  // a도(°)만큼 휘어요. 밑동(y 0) 아래는 그대로, 위로 갈수록 제곱으로 더(꼭대기는 a도 돌린 만큼)
+  function oakBend(a) {
+    const B = rt.oakBand, us = $$('#oakBandG > use'); if (!B || !us.length) return;
+    const t = Math.tan(a * Math.PI / 180), dx = y => { const hh = Math.max(0, -y); return t * hh * hh / B.top; };
+    us.forEach((u, i) => { const v = dx(B.ys[i]); if (Math.abs(v) < 0.005) u.removeAttribute('transform'); else u.setAttribute('transform', `translate(${v.toFixed(2)} 0)`); });
+    const nu = $('.oak-nuts'); if (nu) { const v = dx(-B.top * 0.6); if (Math.abs(v) < 0.005) nu.removeAttribute('transform'); else nu.setAttribute('transform', `translate(${v.toFixed(2)} 0)`); }
   }
   function mapHiGet(key, done) {
     const st = mapHi[key];
