@@ -201,7 +201,7 @@
     }) : (webAud(key) ? webFetch(WEB_ROOT + 'audio/' + key + '.mp4?v=' + AUD_V) : fetch(AUD_BASE() + key + '.mp4').then(r => { if (!r.ok) throw new Error('곡 파일 ' + r.status); return r; })).then(r => r.arrayBuffer());
     return bytes;
   }
-  const HOME_MUSIC_TABS = new Set(['school', 'teachers', 'quests', 'rank', 'dex', 'event', 'hall', 'club', 'settings', 'mini', 'grad']);   // 2.3.1 woodani: 공부 탭과 졸업 탭도 홈 곡, 쉬는 시간 곡은 상점에서만   // 2.0.0 학교 복도와 동아리실, 설정(2026-10-27 woodani)도 홈 곡
+  const HOME_MUSIC_TABS = new Set(['shop', 'school', 'teachers', 'quests', 'rank', 'dex', 'event', 'hall', 'club', 'settings', 'mini', 'grad']);   // 2.3.1 woodani: 공부 탭과 졸업 탭도 홈 곡, 쉬는 시간 곡은 상점에서만   // 2.0.0 학교 복도와 동아리실, 설정(2026-10-27 woodani)도 홈 곡
   // 3.0.0 테마 세트 미리 보기: 저장(S.cos.th)은 그대로 두고 화면만 미리 보는 테마로 그려요
   const thOn = () => (rt.thPrev ? rt.thPrev.th : S.cos.th);
   function musicWant() {
@@ -216,10 +216,7 @@
     if (rt.fest || rt.sports) return rt.fest && festDef(rt.fest.id) && festDef(rt.fest.id).night ? 'festnight' : 'festival';   // 3.2.0 고등학교 밤 행사는 조용한 곡
     let play = false; try { play = !!((pzUI && pzUI.open) || (mgUI && mgUI.open) || (btUI && btUI.open)); } catch (e) { /* 퍼즐과 합치기가 아직 준비 전 */ }   // 1.8.0: 숲속 합치기도 미니게임 곡
     if (play) return 'play';
-    if (rt.tab === 'tam' && S.tam) {   // 4.3.0 탐험 화면
-      const T = rt.tam; if (T && T.F && T.F.M[0] && T.F.M[0].boss && (T.ph === 'meet' || T.ph === 'fight')) return 'exboss';
-      const k = tamReg(tamCurFl()).k; return k === 'pond' || k === 'library' ? 'excalm' : k === 'yard' || k === 'tower' ? 'exnight' : 'exday';
-    }
+    if (rt.tab === 'tam' && S.tam) return tamHOn() ? 'exnight' : 'exday';   // 탐험은 기본과 심화 두 곡만(지역과 큰 장난꾸러기로 바꾸지 않아요)
     // 1.7.4 woodani 결정: 곡이 자주 바뀌지 않게 홈에서 여는 탭(선생님, 퀘스트, 랭킹, 도감, 이벤트)도 홈 곡 그대로
     if (HOME_MUSIC_TABS.has(rt.tab) && bfOn()) return 'bigfest';   // 4.2.0 대축제 사흘 동안 대학교 홈 곡
     if (HOME_MUSIC_TABS.has(rt.tab)) return SONGS[thOn().bg] ? thOn().bg : 'home';
