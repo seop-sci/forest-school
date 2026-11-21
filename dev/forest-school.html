@@ -622,7 +622,7 @@ label.srow,button.srow{cursor:pointer}
 .tm-bgs{position:absolute;inset:0;overflow:hidden}
 .tm-bg{position:absolute;inset:0;background:center 70%/cover no-repeat;will-change:transform}
 .tm-bg.nx{transform:translateY(-100%)}
-.tm-stage.deep .tm-bg{filter:hue-rotate(25deg) saturate(1.15) brightness(.92)}
+.tm-stage.deep .tm-bg,.tm-stage.deep canvas.fxg{filter:hue-rotate(25deg) saturate(1.15) brightness(.92)}
 .tm-stage.boss .tm-bgs::after{content:"";position:absolute;inset:0;background:radial-gradient(ellipse at 70% 60%,transparent 30%,rgba(40,20,70,.45) 100%);animation:tmBossV 2.4s ease-in-out infinite}
 @keyframes tmBossV{50%{opacity:.6}}
 .tm-amb{position:absolute;inset:0;pointer-events:none;overflow:hidden}
@@ -683,9 +683,9 @@ label.srow,button.srow{cursor:pointer}
 /* 4.3.3 필살기 모으기, 건너뛰기, 연출 동안 배경 어둡게, 심화 탐험 */
 .tm-f.charge img{animation:tmCharge .8s ease-in-out infinite alternate}
 @keyframes tmCharge{from{filter:drop-shadow(0 0 2px var(--cc,#FFC21E)) brightness(1.05)}to{filter:drop-shadow(0 0 12px var(--cc,#FFC21E)) drop-shadow(0 0 4px #fff) brightness(1.25)}}
-.tm-stage.skdim .tm-bgs{filter:brightness(.55) saturate(.85);transition:filter .3s}
-.tm-stage.hm .tm-bgs{filter:hue-rotate(225deg) saturate(.8) brightness(.8)}
-.tm-stage.hm.skdim .tm-bgs{filter:hue-rotate(225deg) saturate(.7) brightness(.48)}
+.tm-stage.skdim .tm-bgs,.tm-stage.skdim canvas.fxg{filter:brightness(.55) saturate(.85);transition:filter .3s}
+.tm-stage.hm .tm-bgs,.tm-stage.hm canvas.fxg{filter:hue-rotate(225deg) saturate(.8) brightness(.8)}
+.tm-stage.hm.skdim .tm-bgs,.tm-stage.hm.skdim canvas.fxg{filter:hue-rotate(225deg) saturate(.7) brightness(.48)}
 .tm-mode{display:flex;justify-content:center;gap:0;margin:0 auto 6px;width:max-content;padding:3px;border-radius:999px;background:rgba(74,46,10,.12)}
 .tm-mode[hidden]{display:none}
 .tm-mode button{border:0;background:none;font:inherit;font-size:13px;font-weight:800;color:var(--muted);padding:5px 14px;border-radius:999px;cursor:pointer}
@@ -5221,7 +5221,7 @@ body.mg-on .toast[hidden]{display:none}
   <div class="backdrop" data-cm="mSb"></div>
   <section class="modal lab-modal dp-modal" role="dialog" aria-modal="true" aria-labelledby="sbTitle">
     <div class="dp-head" id="sbHead"><b id="sbTitle">이야기 수첩</b></div>
-    <div class="nb-tabs" id="sbTabs" role="tablist"><button type="button" role="tab" data-sbt="main">중심 이야기</button><button type="button" role="tab" data-sbt="side">곁가지</button><button type="button" role="tab" data-sbt="who">인물</button></div>
+    <div class="nb-tabs" id="sbTabs" role="tablist"><button type="button" role="tab" data-sbt="main">중심 이야기</button><button type="button" role="tab" data-sbt="side">작은 이야기</button><button type="button" role="tab" data-sbt="who">인물</button></div>
     <div id="sbBody" class="nb-body"></div>
     <div class="btn-row"><button class="btn-sub" type="button" id="sbClose" data-cm="mSb" data-cm-tap>닫기</button></div>
   </section>
@@ -30544,7 +30544,7 @@ body.mg-on .toast[hidden]{display:none}
   function fxgSet(k, force) {
     if (FXG.st !== 'ok') return false; const P = window.PIXI, app = FXG.app, world = $('#tmWorld'); if (!world) return false;
     const tile = fxgTex(`ex6_${k}_tile`), path = fxgTex(`ex6_${k}_path`); fxgTex(`ex6_${k}_gate`);   // 문은 미리 받아 둬요
-    if (!tile || !path) { app.canvas.hidden = true; FXG.reg = k; return false; }
+    if (!tile || !path) { app.canvas.hidden = true; FXG.reg = ''; return false; }   // 그림이 오면 fxgRefresh가 이 지역으로 새로 깔아요(앞 지역 바닥이 남지 않게)
     if (app.screen.width !== world.clientWidth || app.screen.height !== world.clientHeight) { app.renderer.resize(Math.max(1, world.clientWidth), Math.max(1, world.clientHeight)); force = true; }
     if (FXG.reg === k && FXG.floor && !force) { app.canvas.hidden = false; return true; }
     FXG.reg = k; fxgGeom();
@@ -30555,10 +30555,11 @@ body.mg-on .toast[hidden]{display:none}
     const floor = new P.TilingSprite({ texture: tile, width: W * 3, height: LH + 80 }); floor.position.set(-W * 1.5, -40); floor.tileScale.set(ts); sq.addChild(floor); FXG.floor = floor;
     const len = Math.hypot(W, LH) * 2.2, pw = 256 * ts * 1.05;
     const pa = new P.TilingSprite({ texture: path, width: pw, height: len }); pa.anchor.set(0.5); pa.tileScale.set(ts * 1.05); pa.rotation = FXG.ang + Math.PI / 2; pa.position.set(FXG.mid[0], FXG.mid[1]); sq.addChild(pa); FXG.path = pa;
-    // 위쪽 가장자리는 HTML 바닥(풀숲 가장자리)과 이어지게 흐리게
-    if (!FXG.fade) { const c = document.createElement('canvas'); c.width = 4; c.height = 64; const g = c.getContext('2d'), gr = g.createLinearGradient(0, 0, 0, 64); gr.addColorStop(0, 'rgba(255,255,255,0)'); gr.addColorStop(1, 'rgba(255,255,255,1)'); g.fillStyle = gr; g.fillRect(0, 0, 4, 64); FXG.fade = P.Texture.from(c); }
-    if (FXG.mask) FXG.mask.destroy(); const m = new P.Container(), m1 = new P.Sprite(FXG.fade), m2 = new P.Sprite(P.Texture.WHITE);
-    m1.position.set(0, top - 10); m1.width = W; m1.height = 46; m2.position.set(0, top + 36); m2.width = W; m2.height = H; m.addChild(m1, m2); FXG.root.addChild(m); sq.mask = m; FXG.mask = m;
+    // 위쪽 가장자리는 HTML 바닥(풀숲 가장자리)과 이어지게 흐리게. 엔진 8은 여러 조각을 묶은 가림이 투명도를 무시해서(딱 잘림) 그림 한 장으로 가려요
+    const mh = H - top + 24, ff = Math.min(0.9, 110 / Math.max(1, mh)), c = document.createElement('canvas'); c.width = 4; c.height = 256;
+    { const g = c.getContext('2d'), gr = g.createLinearGradient(0, 0, 0, 256); gr.addColorStop(0, 'rgba(255,255,255,0)'); gr.addColorStop(ff, 'rgba(255,255,255,1)'); gr.addColorStop(1, 'rgba(255,255,255,1)'); g.fillStyle = gr; g.fillRect(0, 0, 4, 256); }
+    if (FXG.mask) FXG.mask.destroy({ texture: true, textureSource: true }); const m = new P.Sprite(P.Texture.from(c));
+    m.position.set(0, top - 24); m.width = W; m.height = mh; FXG.root.addChild(m); sq.mask = m; FXG.mask = m;
     const ct = fxgTex('ex6_cloud');
     if (ct && !FXG.cloud) { const cl = new P.TilingSprite({ texture: ct, width: W, height: H * 0.3 }); cl.tileScale.set(H * 0.3 / 512); cl.position.set(0, H * 0.72); cl.alpha = 0; FXG.root.addChild(cl); FXG.cloud = cl; }
     if (FXG.cloud) { FXG.cloud.width = W; FXG.cloud.height = H * 0.3; FXG.cloud.position.set(0, H * 0.72); FXG.root.addChild(FXG.cloud); }
