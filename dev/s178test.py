@@ -37,6 +37,7 @@ async def main():
             if await pg.evaluate("!document.querySelector('#tut').hidden"): break
             await pg.evaluate(f"(() => {{ const F = {F}; if (F.rt4.modalOpen && F.rt4.modalOpen.id !== 'tut') {{ F.rt4.modalOpen.hidden = true; F.rt4.modalOpen.classList.remove('open'); F.rt4.modalOpen = null; }} }})()")
             await pg.wait_for_timeout(500)
+        await pg.wait_for_timeout(900)   # 손가락은 0.4초마다 다시 봐요
         r = await pg.evaluate(f"[{F}.S.q.m, !document.querySelector('#tut').hidden, !!(document.querySelector('#firstHint') && !document.querySelector('#firstHint').hidden)]")
         print('보상 뒤', r)
         if r[0] < 1 or not r[1] or r[2]: bad.append(f'보상 받은 뒤 안내 카드와 손가락 {r}')
