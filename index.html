@@ -22189,13 +22189,13 @@ body.mg-on .toast[hidden]{display:none}
   }
   function renderTierDots() {
     const box = $('#tierDots'); if (!box || !S) return;
-    box.hidden = S.tier < 1 || rt.tab !== 'school' || !!rt.decoEdit;
     let wn = false; try { wn = wldLv() > 0 && WLD.ph === 'night' && !rt.photo; } catch (e) { /* 마을 층 준비 전 */ }
     const nlOn = rt.viewTier == null && (!!map && map.classList.contains('hs-night') || wn);   // 밤 밝기 단추(고등학교 밤, 그 아래 학교급은 마을 층 밤)
+    box.hidden = (S.tier < 1 && !nlOn) || rt.tab !== 'school' || !!rt.decoEdit;   // 유치원은 학교급 단추 없이 밤 밝기 단추만
     const key = [S.tier, rt.viewTier, nlOn, S.nl || 0, box.hidden].join('|');
     if (box.dataset.key === key) return; box.dataset.key = key;
     setTimeout(wxPlace, 0); renderCampus();   // 구역 막대도 같은 때에
-    box.innerHTML = TIER_SHORT.map((c, t) => {
+    box.innerHTML = (S.tier < 1 ? [] : TIER_SHORT).map((c, t) => {
       const cur = t === S.tier, past = t < S.tier, on = rt.viewTier === t || (rt.viewTier == null && cur);
       return `<button type="button" class="td${cur ? ' cur' : ''}${past ? ' past' : ''}${on ? ' on' : ''}${t > S.tier ? ' lock' : ''}" data-td="${t}" aria-label="${TIER_ALL[t]}${cur ? ', 지금 학교' : past ? ', 그때 모습 보기' : ', 아직 못 가요'}"${t > S.tier ? ' aria-disabled="true"' : ''}>` +
         (t > S.tier ? '<svg viewBox="0 0 16 16" aria-hidden="true"><path d="M5 7V5.6a3 3 0 0 1 6 0V7M4.4 7h7.2v6H4.4z" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linejoin="round"/></svg>' : c) + '</button>';
