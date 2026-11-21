@@ -9,7 +9,7 @@
     SELL: 0.1, ORDER: 0.2, MIXED: 0.5, HINT_AFTER: 7000, HINT_SHOW: 3000,                           // 에너지 1당 수업료 분치 (팔기, 주문)
     PIECES: [[10, 3], [8, 2], [6, 1]], UPAT: 8,        // 주문 단계별 장식 조각, 강화 조각이 나오는 단계
     SWAP: 30 * 60000, AD: { n: 2, e: 50 },           // 주문 바꾸기 간격, 광고 하루 2번 +50
-    E: { dm: 10, bonus: 15, wk: 30, stamp: 7, stamp5: 20, box: 35 },   // 2.0.0 이벤트가 매주라서 도장과 상자 에너지를 줄임(1.8.0: 10, 30, 50)
+    E: { dm: 10, bonus: 15, wk: 30, stamp: 7, stamp5: 20, box: 35 },   // 이벤트가 매주라서 도장과 상자 에너지를 줄임(10, 30, 50)
     LV: [[100], [95, 5], [90, 8, 2], [85, 11, 3.5, 0.5], [80, 14, 5, 1]],   // 생산기 레벨마다 1~4단계가 나올 확률(%)
     UPCOST: [0, 1, 1, 2, 2],                         // Lv.n+1로 올릴 때 드는 강화 조각 (index = 지금 레벨)
     kinds: {
@@ -24,12 +24,12 @@
     },
     gens: { A: { name: '참나무', em: '🌳', kinds: ['a', 'm'] }, F: { name: '급식 냄비', em: '🍲', kinds: ['f', 'd'] }, S: { name: '문구함', em: '🧰', kinds: ['s', 'c'] }, G: { name: '화분', em: '🪴', kinds: ['g', 'v'] } },
     genAt: [0, 2, 5, 7],                              // 처음 생산기 자리(맨 위 줄)
-    UP_EVERY: 20,   // 3.0.0 woodani 결정: 주문 20개마다 한 단계 위 주문
-    MUL: [[3, 2], [5, 3], [7, 4]]   // 2.3.1 woodani: ×2 3단계, ×3 5단계, ×4 7단계로 앞당김(2.1.3은 4, 6, 8)
-                        // 2.1.3 에너지 배수(woodani 요청): 어느 종류든 이 단계를 처음 만들면 ×2, ×3, ×4가 열려요(주문이 그 단계쯤부터 나와요)
+    UP_EVERY: 20,   // 주문 20개마다 한 단계 위 주문
+    MUL: [[3, 2], [5, 3], [7, 4]]   // ×2 3단계, ×3 5단계, ×4 7단계로 앞당김(은 4, 6, 8)
+                        // 에너지 배수: 어느 종류든 이 단계를 처음 만들면 ×2, ×3, ×4가 열려요(주문이 그 단계쯤부터 나와요)
   };
   const MG_KINDS = Object.keys(MG.kinds), MG_GENS = Object.keys(MG.gens), MG_N = MG.W * MG.H;
-  // 1.8.0 woodani: 합치기 도감 모은 개수 보상(10칸마다, 업적처럼). min은 수업료 분치
+  // 합치기 도감 모은 개수 보상(10칸마다, 업적처럼). min은 수업료 분치
   const MG_DEX_MS = [[10, { ess: 5 }], [20, { min: 30 }], [30, { ess: 10 }], [40, { min: 60 }], [50, { ess: 15 }], [60, { min: 90 }], [70, { ess: 20 }], [80, { ess: 30, gold: 5 }]];
   const mgFresh = () => ({ mul: 1, mulSeen: 1, mm: 0, mulNew: false, upq: 0, xr: 0, xd: { day: '', n: 0 }, e: MG.EMAX, eAt: 0, board: '', last: {}, orders: [], swapAt: 0, best: {}, pieces: 0, up: 0, ad: { day: '', n: 0 }, bst: { day: '', lucky: 0, energy: 0, luck: 0 }, seen: false, dexPaid: [], dexE: {}, dexMs: 0, st: { merges: 0, orders: 0, made10: 0, ups: 0, taps: 0 } });
   // 칸 글자: 조각은 종류 소문자 + 단계(1~9, 10은 x), 생산기는 대문자 + 레벨(1~5), 빈칸은 '..'
@@ -80,12 +80,12 @@
     s.mg.dexPaid = Array.isArray(m.dexPaid) ? [...new Set(m.dexPaid.filter(k => MG_KINDS.includes(k) || k === 'all'))] : [];   // 합치기 도감 받은 보상
     s.mg.up = Math.min(MG.UPCAP, Math.floor(numFb(m.up, 0, 0)));
     if (m.ad && typeof m.ad === 'object') s.mg.ad = { day: typeof m.ad.day === 'string' ? m.ad.day.slice(0, 10) : '', n: Math.floor(numFb(m.ad.n, 0, 0, SAVE_CAP.count)) };
-    if (m.bst && typeof m.bst === 'object') s.mg.bst = { day: typeof m.bst.day === 'string' ? m.bst.day.slice(0, 10) : '', lucky: Math.floor(numFb(m.bst.lucky, 0, 0, SAVE_CAP.count)), energy: Math.floor(numFb(m.bst.energy, 0, 0, SAVE_CAP.count)), luck: Math.min(MGB.lucky.taps, Math.floor(numFb(m.bst.luck, 0, 0))) };   // 1.8.0 부스터
-    if (m.dexE && typeof m.dexE === 'object') for (const k of MG_KINDS) { const v = Math.floor(numFb(m.dexE[k], 0, 0, SAVE_CAP.count)); if (v) s.mg.dexE[k] = v & 1023; }   // 1.8.0 도감 칸마다 받은 정수(10칸 비트)
-    s.mg.dexMs = Math.min(MG_DEX_MS.length, Math.floor(numFb(m.dexMs, 0, 0)));   // 1.8.0 모은 개수 보상 받은 단계
+    if (m.bst && typeof m.bst === 'object') s.mg.bst = { day: typeof m.bst.day === 'string' ? m.bst.day.slice(0, 10) : '', lucky: Math.floor(numFb(m.bst.lucky, 0, 0, SAVE_CAP.count)), energy: Math.floor(numFb(m.bst.energy, 0, 0, SAVE_CAP.count)), luck: Math.min(MGB.lucky.taps, Math.floor(numFb(m.bst.luck, 0, 0))) };   // 부스터
+    if (m.dexE && typeof m.dexE === 'object') for (const k of MG_KINDS) { const v = Math.floor(numFb(m.dexE[k], 0, 0, SAVE_CAP.count)); if (v) s.mg.dexE[k] = v & 1023; }   // 도감 칸마다 받은 정수(10칸 비트)
+    s.mg.dexMs = Math.min(MG_DEX_MS.length, Math.floor(numFb(m.dexMs, 0, 0)));   // 모은 개수 보상 받은 단계
     s.mg.seen = !!m.seen;
-    s.mg.mul = Math.min(4, Math.max(1, Math.floor(numFb(m.mul, 1, 1, SAVE_CAP.count)))); s.mg.mulSeen = Math.min(4, Math.max(1, Math.floor(numFb(m.mulSeen, 1, 1, SAVE_CAP.count)))); s.mg.mm = m.mm ? 1 : 0; s.mg.mulNew = !!m.mulNew; s.mg.upq = Math.min(3, Math.floor(numFb(m.upq, 0, 0)));   // 3.0.0 한 단계 위 주문을 기다리는 수   // 2.3.1 만드는 방식, 새 배수 강조   // 2.1.3 에너지 배수
-    s.mg.xr = Math.min(1, numFb(m.xr, 0, 0)); if (m.xd && typeof m.xd === 'object') s.mg.xd = { day: typeof m.xd.day === 'string' ? m.xd.day.slice(0, 10) : '', n: Math.floor(numFb(m.xd.n, 0, 0, SAVE_CAP.count)) };   // 2.1.3 미술 XP 남은 몫과 오늘 받은 양
+    s.mg.mul = Math.min(4, Math.max(1, Math.floor(numFb(m.mul, 1, 1, SAVE_CAP.count)))); s.mg.mulSeen = Math.min(4, Math.max(1, Math.floor(numFb(m.mulSeen, 1, 1, SAVE_CAP.count)))); s.mg.mm = m.mm ? 1 : 0; s.mg.mulNew = !!m.mulNew; s.mg.upq = Math.min(3, Math.floor(numFb(m.upq, 0, 0)));   // 한 단계 위 주문을 기다리는 수. 만드는 방식, 새 배수 강조. 에너지 배수
+    s.mg.xr = Math.min(1, numFb(m.xr, 0, 0)); if (m.xd && typeof m.xd === 'object') s.mg.xd = { day: typeof m.xd.day === 'string' ? m.xd.day.slice(0, 10) : '', n: Math.floor(numFb(m.xd.n, 0, 0, SAVE_CAP.count)) };   // 미술 XP 남은 몫과 오늘 받은 양
     if (m.st && typeof m.st === 'object') for (const k of Object.keys(s.mg.st)) s.mg.st[k] = Math.floor(numFb(m.st[k], 0, 0, SAVE_CAP.count));
   }
   /* ---- 에너지 ---- */
@@ -100,7 +100,7 @@
   }
   // 보상으로 받는 에너지는 100을 넘어도 돼요(회복만 100에서 멈춰요)
   function mgAddEnergy(n) { mgTick(); S.mg.e = Math.min(MG.ECAP, S.mg.e + n); if (S.mg.e >= mgEMax()) S.mg.eAt = gameNow(); }
-  /* 3.0.0 조정안 4: 생산기 넷이 모두 Lv.5면 더 쓸 곳이 없으니, 그 뒤 받는 강화 조각 하나는 숲의 정수 5개로 바꿔 줘요.
+  /* 조정안 4: 생산기 넷이 모두 Lv.5면 더 쓸 곳이 없으니, 그 뒤 받는 강화 조각 하나는 숲의 정수 5개로 바꿔 줘요
      받은 것을 보상 칸 모양({ ic, t })으로 돌려줘요 */
   const MG_UP_ESS = 5;
   const mgGensMax = () => { const c = mgCells(); return MG_GENS.every(G => c.some(x => x[0] === G && mgLvOf(x[1]) >= 5)); };
@@ -126,7 +126,7 @@
   }
   const mgEnergyIn = () => { mgTick(); const m = S.mg; if (m.e >= mgEMax()) return 0; return Math.max(1, Math.ceil((MG.REGEN - (gameNow() - m.eAt)) / 1000)); };
   const mgAdLeft = () => { if (S.mg.ad.day !== gameToday()) S.mg.ad = { day: gameToday(), n: 0 }; return Math.max(0, MG.AD.n - S.mg.ad.n); };
-  /* ---- 부스터 (1.8.0, 재화 원칙: 숲의 정수 고정값, 2026-10-27 woodani 결정) ----
+  /* ---- 부스터 (재화 원칙: 숲의 정수 고정값) ----
      행운의 생산기: 정수 8, 하루 1번. 다음 30번 누르기는 한 단계 높은 조각이 나와요(에너지 30만큼 이득)
      에너지 +20: 정수 5, 하루 3번 */
   const MGB = {
@@ -184,13 +184,13 @@
     cells.forEach((c, i) => { if (c !== '..') return; const d = Math.abs(Math.floor(i / MG.W) - fr) + Math.abs(i % MG.W - fc); if (d < bd) { bd = d; best = i; } });
     return best;
   }
-  // 2.1.3 에너지 배수: 만든 가장 높은 단계로 ×2, ×3, ×4가 열려요. 단추를 누를 때마다 ×1 → ×2 → … → 열린 최대 → ×1
+  // 에너지 배수: 만든 가장 높은 단계로 ×2, ×3, ×4가 열려요. 단추를 누를 때마다 ×1 → ×2 → … → 열린 최대 → ×1
   const mgBestMax = () => MG_KINDS.reduce((a, k) => Math.max(a, S.mg.best[k] || 0), 0);
   const mgMulMax = () => MG.MUL.reduce((a, [lv, x]) => mgBestMax() >= lv ? Math.max(a, x) : a, 1);
-  // 2.3.1 woodani 결정: '합쳐서 1개'(S.mg.mm = 1)면 같은 에너지로 단계가 높은 조각 하나. ×3은 나누어떨어지지 않아서 건너뛰어요(×1, ×2, ×4)
+  // '합쳐서 1개'(S.mg.mm = 1)면 같은 에너지로 단계가 높은 조각 하나. ×3은 나누어떨어지지 않아서 건너뛰어요(×1, ×2, ×4)
   const mgMulOk = x => !(S.mg.mm && x === 3);
   const mgMul = () => { let m = Math.max(1, Math.min(S.mg.mul || 1, mgMulMax())); if (!mgMulOk(m)) m = 2; return m; };
-  // 3.0.0 woodani 요청: 배수와 방식은 단추를 나란히 두고 바로 골라요. 고를 때마다 뜨던 안내 글은 빼고, 처음 열릴 때만 NEW와 설명 창
+  // 배수와 방식은 단추를 나란히 두고 바로 골라요. 고를 때마다 뜨던 안내 글은 빼고, 처음 열릴 때만 NEW와 설명 창
   function mgPickMul(x) {
     const mx = mgMulMax(); x = Math.max(1, Math.min(mx, x | 0));
     if (!mgMulOk(x)) { toast('×3은 따로만 만들 수 있어요'); return; }
@@ -216,11 +216,11 @@
     }
     if (mx > (S.mg.mulSeen || 1)) { S.mg.mulSeen = mx; S.mg.mulNew = true; save(); mgMulSheet(mx); }
   }
-  // 2.3.1 woodani 요청: 배수가 처음 열리면 토스트 대신 설명 창(잘 안 보여서)
+  // 배수가 처음 열리면 토스트 대신 설명 창(잘 안 보여서)
   function mgMulSheet(mx) {
     const sh = $('#mgMulSheet'); if (!sh) return;
     $('#mgMulTitle').textContent = `에너지 ×${mx}가 열렸어요!`;
-    $('#mgMulLead').textContent = `에너지 옆 ×${mx}를 고르면\n생산기를 한 번 누를 때 에너지를 ${mx}까지 써요.\n아래 줄에서 만드는 방식을 골라요.\n따로: 조각이 여러 개 나와요\n합쳐서 1개: 단계가 높은 조각 하나(×2, ×4)`;   // 3.0.0 두 줄
+    $('#mgMulLead').textContent = `에너지 옆 ×${mx}를 고르면\n생산기를 한 번 누를 때 에너지를 ${mx}까지 써요.\n아래 줄에서 만드는 방식을 골라요.\n따로: 조각이 여러 개 나와요\n합쳐서 1개: 단계가 높은 조각 하나(×2, ×4)`;   // 두 줄
     $('.mg-mul-pic', sh).textContent = '×' + mx;
     sh.hidden = false; sfx('quest');
   }
@@ -232,9 +232,9 @@
     if (to < 0) { mgShake(i); toast('판이 가득 찼어요. 조각을 합치거나 팔아서 자리를 비워요'); return false; }
     if (S.mg.e < 1) { mgShake(i); toast(`에너지가 모자라요. ${mgEnergyIn()}초 뒤에 1 차요`); return false; }
     if (S.mg.e >= mgEMax()) S.mg.eAt = gameNow();   // 가득 찬 상태에서 처음 쓰면 이때부터 회복을 재요
-    // 2.1.3 에너지 배수: 조각마다 에너지 1. 빈칸이나 에너지가 모자라면 되는 만큼만 만들어요
+    // 에너지 배수: 조각마다 에너지 1. 빈칸이나 에너지가 모자라면 되는 만큼만 만들어요
     const mul = mgMul(), made = [];
-    if (S.mg.mm && mul > 1) {   // 2.3.1 합쳐서 1개: 에너지 mul을 쓰고 log2(mul)단계 높은 조각 하나. 에너지가 모자라면 되는 만큼(×4 → ×2)
+    if (S.mg.mm && mul > 1) {   // 합쳐서 1개: 에너지 mul을 쓰고 log2(mul)단계 높은 조각 하나. 에너지가 모자라면 되는 만큼(×4 → ×2)
       let m = S.mg.e >= mul ? mul : S.mg.e >= 2 ? 2 : 1;
       if (S.mg.bst.luck > 0 && S.mg.bst.luck < m) m = S.mg.bst.luck >= 2 ? 2 : 1;
       S.mg.e -= m;
@@ -274,7 +274,7 @@
   const MG_DEX = { kind: { ess: 30, pc: 5 }, all: { ess: 100, gold: 10 } };
   const mgDexN = () => MG_KINDS.reduce((a, k) => a + Math.min(10, S.mg.best[k] || 0), 0);
   const mgDexCan = k => k === 'all' ? MG_KINDS.every(x => (S.mg.best[x] || 0) >= 10) && !S.mg.dexPaid.includes('all') : (S.mg.best[k] || 0) >= 10 && !S.mg.dexPaid.includes(k);
-  // 1.8.0 woodani: 처음 만든 칸마다 숲의 정수 1개(눌러서 받기, 전에 만든 칸도), 모은 개수 10, 20 … 80마다 보상(업적처럼)
+  // 처음 만든 칸마다 숲의 정수 1개(눌러서 받기, 전에 만든 칸도), 모은 개수 10, 20 … 80마다 보상(업적처럼)
   const mgDexEssCan = (k, n) => n <= Math.min(10, S.mg.best[k] || 0) && !((S.mg.dexE[k] || 0) & (1 << (n - 1)));
   const mgDexEssN = () => MG_KINDS.reduce((a, k) => { let c = 0; for (let n = 1; n <= 10; n++) if (mgDexEssCan(k, n)) c++; return a + c; }, 0);
   const mgDexMsCan = () => S.mg.dexMs < MG_DEX_MS.length && mgDexN() >= MG_DEX_MS[S.mg.dexMs][0];
@@ -396,7 +396,7 @@
     const pool = MG_KINDS.filter(k => !avoid.includes(k));
     return (pool.length ? pool : MG_KINDS)[Math.floor(Math.random() * (pool.length ? pool.length : MG_KINDS.length))];
   }
-  // 3.0.0 woodani 요청: 높은 단계 주문(새 단계 주문 포함)은 한 번에 하나만, 나머지는 낮은 단계로(퀘스트의 '주문 n개 채우기'가 막히지 않게)
+  // 높은 단계 주문(새 단계 주문 포함)은 한 번에 하나만, 나머지는 낮은 단계로(퀘스트의 '주문 n개 채우기'가 막히지 않게)
   const mgIsHigh = o => !!o && (!!o.up || o.it.some(x => x.n >= Math.max(4, (S.mg.best[x.k] || 0) - 2)));
   function mgOrderItem(k, mixed, low) {
     const best = Math.max(2, S.mg.best[k] || 0), lowMax = Math.max(2, Math.min(best - 3, Math.ceil(best / 2) + 1));
@@ -411,7 +411,7 @@
     if (mixed) it.push(mgOrderItem(mgPickKind(avoid.concat([k1])), true, low));
     const who = MG_WHO(); return { it, who: who[Math.floor(Math.random() * who.length)] };
   }
-  // 3.0.0 woodani 요청: 주문을 따라가다 보면 위 단계가 열리게. 주문 MG.UP_EVERY개를 채울 때마다 지금 만든 가장 높은 단계보다 한 단계 위 주문 하나
+  // 주문을 따라가다 보면 위 단계가 열리게. 주문 MG.UP_EVERY개를 채울 때마다 지금 만든 가장 높은 단계보다 한 단계 위 주문 하나
   function mgUpOrder(avoid) {
     const ks = MG_KINDS.filter(k => (S.mg.best[k] || 0) < 10); if (!ks.length) return null;
     const top = Math.max(...ks.map(k => S.mg.best[k] || 0)), tops = ks.filter(k => (S.mg.best[k] || 0) === top);
@@ -438,7 +438,7 @@
     }
     return { a: minAcorns(m), pc, up };
   }
-  // 2.1.3 woodani 확정: 미술 XP = 주문 조각을 만드는 데 드는 에너지(단계 n은 2^(n-1)) ÷ 6. 남는 몫은 모아 다음 주문에 더하고, 하루 100까지.
+  // 미술 XP = 주문 조각을 만드는 데 드는 에너지(단계 n은 2^(n-1)) ÷ 6. 남는 몫은 모아 다음 주문에 더하고, 하루 100까지
   // 예전(단계 × 개수, 주문당 20)은 처음 며칠 하루 150~300으로 다른 과목의 3~5배였고, 8단계부터는 35 아래로 느려졌어요
   function mgArtXp(o) {
     const t = gameToday(); if (S.mg.xd.day !== t) S.mg.xd = { day: t, n: 0 };
@@ -446,7 +446,7 @@
     const v = S.mg.xr + o.it.reduce((a, x) => a + mgEnergyOf(x.n) * x.c, 0) / AC.mgE;
     const g = Math.min(left, Math.floor(v)); S.mg.xr = Math.min(0.999, v - Math.floor(v));
     S.mg.xd.n += g;
-    return acGain('art', Math.round(g * (1 + XT.art.per / 100 * xtLv('art'))));   // 2.3.0 미술 선생님
+    return acGain('art', Math.round(g * (1 + XT.art.per / 100 * xtLv('art'))));   // 미술 선생님
   }
   function mgClaimOrder(i) {
     const o = S.mg.orders[i];
@@ -456,14 +456,14 @@
     mgSetCells(cells);
     const r = mgOrderReward(o);
     S.budget += r.a; earn(r.a);
-    const upIt = r.up ? mgAddUp(r.up) : null, upKey = !!(upIt && upIt.ic === '🔑');   // 3.0.0 생산기가 모두 최고면 정수로
+    const upIt = r.up ? mgAddUp(r.up) : null, upKey = !!(upIt && upIt.ic === '🔑');   // 생산기가 모두 최고면 정수로
     mgUI.got.a += r.a; mgUI.got.pc += r.pc; if (upKey) mgUI.got.up += r.up;
     S.mg.pieces = Math.min(MG.PCAP, S.mg.pieces + r.pc);
     if (r.pc) mgBump('#mgPc'); if (upKey) mgBump('#mgUp');
     S.mg.st.orders += 1;
-    if (S.mg.st.orders % MG.UP_EVERY === 0) S.mg.upq = Math.min(3, (S.mg.upq || 0) + 1);   // 3.0.0 한 단계 위 주문
-    const tk = S.mg.st.orders % TKE.mgEvery === 0 ? tkDaily('mg') : null;   // 2.3.0.1 주문 5개마다 5분권 1장(하루 3장)
-    const xp = mgArtXp(o);   // 2.1.3 미술 XP는 주문에 든 에너지로(에너지 6마다 1, 하루 100까지)
+    if (S.mg.st.orders % MG.UP_EVERY === 0) S.mg.upq = Math.min(3, (S.mg.upq || 0) + 1);   // 한 단계 위 주문
+    const tk = S.mg.st.orders % TKE.mgEvery === 0 ? tkDaily('mg') : null;   // 주문 5개마다 5분권 1장(하루 3장)
+    const xp = mgArtXp(o);   // 미술 XP는 주문에 든 에너지로(에너지 6마다 1, 하루 100까지)
     S.mg.orders.splice(i, 1); mgFillOrders();
     mgUI.sel = -1;
     sfx('quest'); buzz(14);
@@ -478,7 +478,7 @@
     if (!S.mg.orders[i]) return false;
     if (mgSwapLeft() > 0) { toast(`${Math.ceil(mgSwapLeft() / 60000)}분 뒤에 바꿀 수 있어요`); return false; }
     S.mg.swapAt = gameNow();
-    if (S.mg.orders[i].up) S.mg.upq = Math.min(3, (S.mg.upq || 0) + 1);   // 3.0.0 한 단계 위 주문을 바꿔도 다음에 다시 와요
+    if (S.mg.orders[i].up) S.mg.upq = Math.min(3, (S.mg.upq || 0) + 1);   // 한 단계 위 주문을 바꿔도 다음에 다시 와요
     S.mg.orders[i] = mgNewOrder(S.mg.orders.flatMap(mgOrderKinds), S.mg.orders.some((o, j) => j !== i && mgIsHigh(o)));   // 지금 주문의 종류도 피해서 다른 것이 나오게
     sfx('tap');
     mgRenderOrders(); mgRenderBoard(); save();
@@ -553,10 +553,10 @@
       if (i === mgUI.pop) { void el.offsetWidth; el.classList.add('new'); }
       if (mgUI.merged && mgUI.merged.includes(i)) { void el.offsetWidth; el.classList.add('merge'); const K = MG.kinds[code[0]], lv = mgLvOf(code[1]);
         if (FXL.st === 'ok' && !FXO.st) fxoInit();
-        const c = mgCenter(i); if (c && fxoHost($('#mgGrid'))) fxoBurst(c.x, c.y, c.w * 0.55, K ? K.r : '', lv >= 5); else mgDust(i, lv >= 5 ? 14 : 8, K ? K.c : ''); }   // 5.3.0.3 빛 고리와 별 조각
+        const c = mgCenter(i); if (c && fxoHost($('#mgGrid'))) fxoBurst(c.x, c.y, c.w * 0.55, K ? K.r : '', lv >= 5); else mgDust(i, lv >= 5 ? 14 : 8, K ? K.c : ''); }   // 빛 고리와 별 조각
       if (i === mgUI.land) { void el.offsetWidth; el.classList.add('land'); setTimeout(() => el.classList.remove('land'), 400); }
     });
-    if (mgUI.merged && mgUI.merged.length && mgUI.thumpNew) mgThump();   // 1.8.0 woodani: 판 두근거림은 처음 만든 단계일 때만
+    if (mgUI.merged && mgUI.merged.length && mgUI.thumpNew) mgThump();   // 판 두근거림은 처음 만든 단계일 때만
     mgUI.thumpNew = false;
     mgUI.pop = -1; mgUI.merged = null; mgUI.land = -1;
   }
@@ -579,7 +579,7 @@
     const cells = mgCells(), can = mgSwapLeft() <= 0;
     $('#mgOrders').innerHTML = S.mg.orders.map((o, i) => {
       const ok = mgOrderOk(o), r = mgOrderReward(o), img = IMG('chr_' + o.who);
-      // 2.1.0: 그림 아래는 그 조각의 레벨, 필요한 개수는 그림 위 따로(woodani 요청: 숫자가 헷갈리지 않게)
+      // 그림 아래는 그 조각의 레벨, 필요한 개수는 그림 위 따로(숫자가 헷갈리지 않게)
       const its = o.it.map(x => { const h = Math.min(x.c, mgCount(cells, x.k, x.n)), got = h >= x.c; return `<span class="mo-one${got ? ' got' : ''}">${mgTileHtml(x.k + mgLvCh(x.n))}<small>Lv.${x.n}</small><em class="mo-cnt" aria-label="${x.c}개 필요, ${h}개 있음">${got ? '✔ ' : ''}${x.c}개</em></span>`; }).join('<i class="mo-plus">+</i>');
       return `<button class="mg-order${ok ? ' ok' : ''}${o.it.length > 1 ? ' two' : ''}${o.up ? ' up' : ''}" type="button" data-order="${i}" aria-label="${o.up ? '새 단계 ' : ''}${mgOrderText(o)} 주문${ok ? ', 눌러서 건네기' : ''}">` +
         `<span class="mo-who" style="${img ? `--mo-img:url('${img}')` : ''}"></span><span class="mo-it">${its}</span>` +
@@ -620,7 +620,7 @@
     const cell = e.target.closest('.mg-cell'); if (!cell || mgUI.drag) return;
     const i = +cell.dataset.i, code = mgCells()[i];
     const selected = mgUI.sel, cells = mgCells();
-    if (selected >= 0 && selected !== i && mgIsItem(cells[selected]) && code === '..') {   // 3.1.0 woodani: 눌러서 합치기는 없애고(끌어야 합쳐져요), 빈칸으로 옮기기만 남겨요
+    if (selected >= 0 && selected !== i && mgIsItem(cells[selected]) && code === '..') {   // 눌러서 합치기는 없애고(끌어야 합쳐져요), 빈칸으로 옮기기만 남겨요
       const result = mgDrop(selected, i);
       if (result) { mgRenderBoard(); mgRenderOrders(); mgRenderFoot(); if (result === 'merge') checkQuests(); save(); return; }
     }
@@ -664,11 +664,11 @@
   }
   function mgOpen() {
     mgTick();
-    if (FXL.st === 'ok' && !FXO.st) fxoInit();   // 5.3.0.3 빛 고리 그림판
+    if (FXL.st === 'ok' && !FXO.st) fxoInit();   // 빛 고리 그림판
     if (!S.mg.board || S.mg.board.length !== MG_N * 2) mgSetCells(mgEmptyBoard());
     mgFillOrders();
     mgUI.open = true; mgUI.sel = -1; mgUI.got = { a: 0, pc: 0, up: 0 }; mgUI.idleAt = Date.now();
-    $('#mgScene').hidden = false; document.body.classList.add('mg-on');   // 5.0.2.2 woodani: 합치기 안에서는 알림을 아래 칸 자리에 띄워요
+    $('#mgScene').hidden = false; document.body.classList.add('mg-on');   // 합치기 안에서는 알림을 아래 칸 자리에 띄워요
     $('#mgUpSheet').hidden = true;
     $('#mgHelp').hidden = !!S.mg.seen;
     mgRenderAll();
@@ -687,7 +687,7 @@
     $('#mgUpRow').innerHTML = `${mgTileHtml(code)}<span>Lv.${lv}${lv < 5 ? ` → Lv.${lv + 1}` : ' (최고)'}</span><span>🔑 ${S.mg.up}${lv < 5 ? ` / ${cost}` : ''}</span>`;
     $('#mgUpTable').innerHTML = '<tr><th>레벨</th><th>1단계</th><th>2단계</th><th>3단계</th><th>4단계</th></tr>' + MG.LV.map((row, j) => `<tr class="${j + 1 === lv ? 'now' : ''}"><td>Lv.${j + 1}</td>${[0, 1, 2, 3].map(c => `<td>${row[c] != null ? row[c] + '%' : '-'}</td>`).join('')}</tr>`).join('');
     $('#mgUpNote').textContent = lv >= 5 ? '최고 레벨이에요. 높은 단계가 가장 자주 나와요' : S.mg.up >= cost ? `강화 조각 ${cost}개를 써서 Lv.${lv + 1}로 올려요` : `강화 조각이 ${cost - S.mg.up}개 더 있어야 해요. 이벤트 기념 상자, 주간 상자, 출석 도장 7개, 8단계 이상 주문에서 받아요`;
-    mgUI.upSwap = lv >= 5 && mgGensMax() && S.mg.up > 0;   // 3.0.0 조정안 4: 남은 조각을 정수로
+    mgUI.upSwap = lv >= 5 && mgGensMax() && S.mg.up > 0;   // 조정안 4: 남은 조각을 정수로
     if (mgUI.upSwap) $('#mgUpNote').textContent = `생산기가 모두 최고 레벨이에요. 남은 강화 조각 ${S.mg.up}개를 숲의 정수 ${S.mg.up * MG_UP_ESS}개로 바꿀 수 있어요`;
     $('#mgUpYes').textContent = mgUI.upSwap ? '정수로 바꾸기' : '강화하기';
     $('#mgUpYes').hidden = lv >= 5 && !mgUI.upSwap;
@@ -708,7 +708,7 @@
     mgTick();
     const ok = S.mg.orders.filter(mgOrderOk).length;
     sub.textContent = ok ? `건넬 수 있는 주문 ${ok}개` : '조각을 만들고 겹쳐요';
-    { const e = $('#mgEnergyTxt'); if (e) { e.textContent = `에너지 ${S.mg.e}/${mgEMax()}`; e.classList.toggle('none', S.mg.e <= 0); } }   // 2.0.1 시작하기 위 에너지 표(퍼즐 보상 판과 같은 자리)
+    { const e = $('#mgEnergyTxt'); if (e) { e.textContent = `에너지 ${S.mg.e}/${mgEMax()}`; e.classList.toggle('none', S.mg.e <= 0); } }   // 시작하기 위 에너지 표(퍼즐 보상 판과 같은 자리)
     const th = $('.mg-thumb'); if (th) { const u = IMG180('mg_card'); if (u) { th.style.setProperty('--mg-card', `url('${u}')`); th.classList.add('has-img'); } }
   }
   function tick180() {
@@ -785,10 +785,10 @@
     $('#mgOpen').addEventListener('click', () => { sfx('tap'); if (liveOff('merge')) { toast('숲속 합치기는 잠시 점검 중이에요. 조금만 기다려 주세요'); return; } mgOpen(); });
     $('#mgBack').addEventListener('click', () => { sfx('tap'); mgClose(); });
     $('#mgHelpOk').addEventListener('click', () => { S.mg.seen = true; $('#mgHelp').hidden = true; save(); });
-    $('#mgMuls').addEventListener('click', e => { const t = e.target.closest('[data-mul]'); if (t) mgPickMul(+t.dataset.mul); });   // 3.0.0
+    $('#mgMuls').addEventListener('click', e => { const t = e.target.closest('[data-mul]'); if (t) mgPickMul(+t.dataset.mul); });
     $('#mgModes').addEventListener('click', e => { const t = e.target.closest('[data-mm]'); if (t) mgPickMode(+t.dataset.mm); });
     $('#mgMulOk').addEventListener('click', () => { $('#mgMulSheet').hidden = true; });
-    $('#mgAdBtn').addEventListener('click', () => { sfx('tap'); mgAdAsk(); });   // 3.0.0 woodani 요청: 바로 광고 대신 확인 창 먼저
+    $('#mgAdBtn').addEventListener('click', () => { sfx('tap'); mgAdAsk(); });   // 바로 광고 대신 확인 창 먼저
     $('#mgOrders').addEventListener('click', e => {
       const sw = e.target.closest('[data-swap]'); if (sw) { e.stopPropagation(); mgSwapOrder(+sw.dataset.swap); return; }
       const b = e.target.closest('[data-order]'); if (!b) return;
@@ -796,7 +796,7 @@
       if (!mgClaimOrder(i)) mgOrderGuide(i);
     });
     $('#mgFoot').addEventListener('click', e => {
-      const s = e.target.closest('[data-mgsell]'); if (s) {   // 5.0.1.6 M-13 5단계부터는 한 번 더 눌러야 팔아요
+      const s = e.target.closest('[data-mgsell]'); if (s) {   // 5단계부터는 한 번 더 눌러야 팔아요
         const i = +s.dataset.mgsell, code = mgCells()[i], hi = mgIsItem(code) && mgLvOf(code[1]) >= 5;
         if (hi && mgUI.sellArm !== i) { mgUI.sellArm = i; clearTimeout(mgUI.sellT); mgUI.sellT = setTimeout(() => { mgUI.sellArm = -1; if (s.isConnected) s.textContent = s.dataset.tx; }, 3000); s.dataset.tx = s.textContent; s.textContent = '한 번 더 누르면 팔아요'; sfx('tap'); return; }
         mgUI.sellArm = -1; clearTimeout(mgUI.sellT); mgSell(i); return; }
@@ -815,7 +815,7 @@
     $('#mgUpNo').addEventListener('click', () => { $('#mgUpSheet').hidden = true; });
     $('#mgUpYes').addEventListener('click', () => { if (mgUI.upSwap ? mgUpSwap() : mgUpgrade(mgUI.upAt)) $('#mgUpSheet').hidden = true; });
     $('#mgUps').addEventListener('click', () => mgUpSwapAsk());
-    $('#mgPieces').addEventListener('click', () => { sfx('tap'); toast(`장식 조각 ${S.mg.pieces}개. 꾸미기 가게에서 5개로 장식 하나를 받아요`); });   // 5.0.1.5 M-20   // 3.0.0 조정안 4
+    $('#mgPieces').addEventListener('click', () => { sfx('tap'); toast(`장식 조각 ${S.mg.pieces}개. 꾸미기 가게에서 5개로 장식 하나를 받아요`); });   // 조정안 4
   }
-  /* ===== 1.8.0 숲속 합치기 END ===== */
+  /* ===== 숲속 합치기 END ===== */
 

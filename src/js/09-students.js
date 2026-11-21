@@ -3,23 +3,23 @@
   // 종업식과 졸업식마다 전학 온 친구가 학생 무리에 섞여요
   const speciesList = () => BASE_SPECIES.concat(NEWCOMERS.slice(0, S.p.species).map(n => n.k));
   // 학생 옷차림은 학교급마다 달라요. 유치원은 노란 모자와 이름표, 초등학교는 책가방과 실내화 주머니
-  // 1.5.0: 학생은 그림(PNG). 발은 y 11.5에 닿고, 모자와 목도리 꾸미기는 머리 자리에 겹쳐 그려요
-  // 3.1.2 동물마다 모자와 목 장식 자리(woodani 요청): [머리 꼭대기, 빨간 목수건 윗선(그림 높이 비율), 이마 높이 머리 너비(그림 너비 비율), 눈으로 다듬은 모자 아래로(그림 높이 비율)와 크기 배수, 모자 옆으로(그림 너비 비율)]. 그림에서 재고 눈으로 다듬었어요
+  // 학생은 그림(PNG). 발은 y 11.5에 닿고, 모자와 목도리 꾸미기는 머리 자리에 겹쳐 그려요
+  // 동물마다 모자와 목 장식 자리: [머리 꼭대기, 빨간 목수건 윗선(그림 높이 비율), 이마 높이 머리 너비(그림 너비 비율), 눈으로 다듬은 모자 아래로(그림 높이 비율)와 크기 배수, 모자 옆으로(그림 너비 비율)]. 그림에서 재고 눈으로 다듬었어요
   const HAT_FIT = { w: 0.9, y: 0.3 };   // 모자 너비(머리 너비 대비), 모자 챙 높이(머리 꼭대기에서 목수건까지 중)
   const KID_FIT = { rabbit: [0.209, 0.673, 0.655], fox: [0.182, 0.609, 0.739], raccoon: [0.118, 0.55, 0.66], chick: [0.018, 0.568, 0.601, 0.02, 1.05], bear: [0.059, 0.573, 0.855], cat: [0.105, 0.577, 0.744], dog: [0.018, 0.541, 0.681], penguin: [0.023, 0.518, 0.716, 0.05, 1.2], panda: [0.064, 0.55, 0.813], koala: [0.168, 0.614, 0.945], otter: [0.018, 0.527, 0.569, 0.03, 1.05], squirrel: [0.064, 0.523, 0.547, 0.04, 1.3, 0.1], hamster: [0.014, 0.527, 0.833], duck: [0.005, 0.523, 0.614, 0.06, 1.2], turtle: [0.0, 0.464, 0.735], mole: [0.005, 0.505, 0.741], frog: [0.064, 0.459, 0.899], waterdeer: [0.141, 0.559, 0.908], redpanda: [0.082, 0.523, 0.853], capybara: [0.018, 0.473, 0.705], kangaroo: [0.177, 0.541, 0.781], meerkat: [0.03, 0.45, 0.6], sloth: [0.04, 0.47, 0.72], chinchilla: [0.12, 0.53, 0.58, 0, 1, 0.06] };
   const HEAD_Y = { rabbit: 0.5, fox: 0.36, raccoon: 0.33, chick: 0.34, bear: 0.31, cat: 0.35, dog: 0.32, penguin: 0.3, panda: 0.31, koala: 0.33, otter: 0.33 };
-  // 2.0.0 새 전학생 그림(작업지시서 20)이 오기 전에는 그림 문자로 보여 줘요
+  // 새 전학생 그림(작업지시서 20)이 오기 전에는 그림 문자로 보여 줘요
   const KID_EMOJI = { hamster: '🐹', duck: '🦆', turtle: '🐢', mole: '🐭', frog: '🐸', waterdeer: '🦌' };
   function kidSVG(sp0, bag, look) {
-    // 2.1.3 반짝 친구: 'rabbit_rare'처럼 받으면 반짝 친구 그림(같은 캔버스)과 둘레 반짝임
+    // 반짝 친구: 'rabbit_rare'처럼 받으면 반짝 친구 그림(같은 캔버스)과 둘레 반짝임
     const rare = typeof sp0 === 'string' && sp0.endsWith('_rare') && !!FSI('chr_' + sp0), sp = rare ? sp0.slice(0, -5) : (typeof sp0 === 'string' ? sp0.replace(/_rare$/, '') : sp0);
-    const hat = look ? look.hat : (S ? S.cos.hat : ''), neck = look ? look.neck : (S ? S.cos.neck : ''), cap = look && look.cap;   // 2.0.1 cap: 졸업식 학사모(던지기 시작 초)
+    const hat = look ? look.hat : (S ? S.cos.hat : ''), neck = look ? look.neck : (S ? S.cos.neck : ''), cap = look && look.cap;   // cap: 졸업식 학사모(던지기 시작 초)
     const ar = CHR_AR['chr_' + sp] || 0.75, h = Math.min(24, 21 / ar), w = h * ar, top = 11.5 - h;
     const hy = top + h * (HEAD_Y[sp] || 0.33), r = h * 0.2, pic = FSI('chr_' + (rare ? sp0 : sp));
     return `<ellipse cx="0" cy="11.6" rx="${(w * 0.32).toFixed(1)}" ry="1.6" class="c-shadow"/>` +
       (pic || !KID_EMOJI[sp] ? `<image href="${pic}" x="${(-w / 2).toFixed(2)}" y="${top.toFixed(2)}" width="${w.toFixed(2)}" height="${h.toFixed(2)}"/>`
         : `<text x="0" y="9.5" text-anchor="middle" font-size="15">${KID_EMOJI[sp]}</text>`) +
-      (hat || neck || cap ? (() => { const F = KID_FIT[sp], sc = r / 6, s3 = sc.toFixed(3);   // 3.1.2 표가 있으면 동물마다 자리
+      (hat || neck || cap ? (() => { const F = KID_FIT[sp], sc = r / 6, s3 = sc.toFixed(3);   // 표가 있으면 동물마다 자리
         const k = F ? Math.max(0.9, Math.min(1.9, Math.min(F[2], 0.8) * w * HAT_FIT.w / (14 * sc))) * (F[4] || 1) : 1;   // 모자를 머리 너비에 맞춰 키워요
         const yh = F ? top + h * (F[0] + HAT_FIT.y * (F[1] - F[0]) + (F[3] || 0)) + 2.6 * sc * k : hy, yn = F ? top + h * F[1] - 6.4 * sc : hy;
         return (neck ? `<g transform="translate(${F && F[5] ? (F[5] * w * 0.8).toFixed(2) : 0} ${yn.toFixed(2)}) scale(${s3})">${neck ? (IMG('cos_neck_' + neck) ? `<image href="${IMG('cos_neck_' + neck)}" x="-6" y="6.2" width="12" height="6"/>` : NECKS[neck] || '') : ''}</g>` : '') +
@@ -33,10 +33,10 @@
     if (!L) return '';
     return `<g transform="translate(6.2 -7.4) scale(${L >= 5 ? 1.25 : 1})"><path d="M0 -3.4 L1 -1 L3.4 -1 L1.5 .6 L2.1 3 L0 1.6 L-2.1 3 L-1.5 .6 L-3.4 -1 L-1 -1 Z" fill="${L >= 5 ? '#F3C04B' : '#FFFFFF'}" stroke="${L >= 5 ? '#A97A16' : '#7A8186'}" stroke-width=".6"/></g>`;
   }
-  /* 1.5.1 학생 길 찾기: 건물, 공사 자리, 분수를 막힌 곳으로 보고 그 둘레 길로만 다녀요.
+  /* 학생 길 찾기: 건물, 공사 자리, 분수를 막힌 곳으로 보고 그 둘레 길로만 다녀요
      막힌 곳은 건물 그림의 바닥 둘레(누르는 자리보다 조금 좁게)와 분수(타원)예요. 길이 끊긴 곳(초등학교 매점 공사 자리 아래)으로는
      걸어가지 않고 살짝 사라졌다가 나타나요 */
-  // 3.0.0 woodani 제보: 학생이 마을 기부 기념물을 뚫고 지나가서, 기념물 바닥(이름표까지)도 막힌 곳으로 봐요
+  // 학생이 마을 기부 기념물을 뚫고 지나가서, 기념물 바닥(이름표까지)도 막힌 곳으로 봐요
   function vdBlock() {
     if (!vdOpen() || rt.viewTier != null) return null;
     const m = decoMap(); if (!VD.spot[m]) return null;
@@ -49,7 +49,7 @@
     const M = 2, box = ([cx, cy, w]) => [cx - w * 0.38 - M, cy - w * 0.38 - M, cx + w * 0.38 + M, cy + w * 0.3 + M];
     const blocks = Object.values(G.b).map(box).concat(G.next ? [box(G.next.at)] : []);
     if (G.fount) { const [fx, fy, rx, ry] = G.fount; blocks.push([fx - rx, fy - ry, fx + rx, fy + ry, 1]); }
-    if (vb) blocks.push(vb);   // 3.0.0 마을 기부 기념물
+    if (vb) blocks.push(vb);   // 마을 기부 기념물
     // 기념물이 원래 걷는 점을 덮으면 그 점을 빼고 네 모서리에 우회점을 더해요.
     const N = G.spots.filter(([x, y]) => !blocks.some(b => inBlock(b, x, y, 1))).map(p => p.slice());
     if (vb) {
@@ -95,9 +95,9 @@
     for (let u = best; u >= 0; u = prev[u]) out.unshift([N[u][0], N[u][1]]);
     return out;
   }
-  /* 4.4.1 woodani 요청: 평소에는 지도 그림의 길(흙, 보도블록)로만, 그리고 모든 길로 걸어요. 대학교 캠퍼스에서 건물을 뚫고 지나가던 것도 고쳐요.
-     MAP_PATHS[지도 줄]은 { n: 갈림점과 길 위 점, e: 이어진 두 점 }이에요. dev/paths/chains.py(지도 그림을 보고 길 가운데를 따라 찍은 점)에서 만들고,
-     건물 그림이 실제로 덮는 곳(paths/bldmask.py)과 분수는 빼요. 학생 그림은 건물 위에 그려져서 건물 뒤쪽 길은 걷지 않아요.
+  /* 평소에는 지도 그림의 길(흙, 보도블록)로만, 그리고 모든 길로 걸어요. 대학교 캠퍼스에서 건물을 뚫고 지나가던 것도 고쳐요
+     MAP_PATHS[지도 줄]은 { n: 갈림점과 길 위 점, e: 이어진 두 점 }이에요. dev/paths/chains.py(지도 그림을 보고 길 가운데를 따라 찍은 점)에서 만들고
+     건물 그림이 실제로 덮는 곳(paths/bldmask.py)과 분수는 빼요. 학생 그림은 건물 위에 그려져서 건물 뒤쪽 길은 걷지 않아요
      행사, 운동회, 체험학습처럼 다른 코드가 정해 준 곳으로 갈 때는 예전처럼 막힌 곳만 돌아서 곧장 가요(k.pw가 갈 곳과 다를 때) */
   const MAP_PATHS = [{"n":[[175,410],[173,392],[171,375],[170,360],[171,348],[174,340],[182,330],[192,314],[195,300],[192,290],[185,277],[179,262],[177,248],[176,239],[157,234],[150,222],[157,206],[178,202],[200,205],[210,221],[200,236],[145,244],[128,247],[105,243],[83,231],[60,229],[40,226],[22,215],[143,256],[138,267],[135,224],[120,218],[118,210],[126,203],[170,190],[162,178],[150,163],[142,145],[145,125],[156,110],[82,40],[70,48],[70,62],[70,72],[60,82],[45,92],[38,105],[40,115],[55,125],[75,135],[87,145],[212,195],[225,188],[240,184],[256,180],[266,176],[204,185],[203,165],[205,145],[208,130],[215,122],[232,115],[255,112],[280,108],[305,106],[325,105],[337,112],[342,128],[345,150],[215,230],[232,235],[248,243],[157,347],[133,350],[100,353],[77,357],[62,363],[45,370],[25,375],[8,378],[48,348],[32,333],[15,318]],"e":[[0,1],[1,2],[2,3],[3,4],[4,5],[4,72],[5,6],[6,7],[7,8],[8,9],[9,10],[10,11],[11,12],[12,13],[13,14],[13,20],[14,15],[14,21],[15,16],[15,30],[16,17],[17,18],[17,34],[18,19],[18,51],[19,20],[19,69],[21,22],[21,28],[22,23],[23,24],[24,25],[25,26],[26,27],[28,29],[30,31],[34,35],[35,36],[36,37],[37,38],[38,50],[40,41],[41,42],[42,43],[43,44],[44,45],[45,46],[46,47],[47,48],[48,49],[49,50],[51,52],[51,56],[52,53],[53,54],[56,57],[57,58],[58,59],[59,60],[60,61],[61,62],[62,63],[72,73],[73,74],[74,75],[75,76],[76,77],[76,80],[77,78],[78,79],[80,81],[81,82]]},{"n":[[177,410],[173,392],[167,378],[147,367],[137,353],[137,340],[150,330],[167,321],[183,310],[193,297],[192,283],[180,270],[163,257],[151,248],[131,243],[122,229],[130,215],[151,210],[172,215],[181,229],[171,243],[180,325],[190,327],[127,250],[117,257],[113,213],[103,203],[187,230],[170,205],[173,183],[167,170],[153,160],[140,147],[133,137],[140,127],[137,117],[160,123],[187,113],[200,100],[200,87],[187,80],[173,77],[187,170],[207,160],[227,153]],"e":[[0,1],[1,2],[2,3],[3,4],[4,5],[5,6],[6,7],[7,8],[7,21],[8,9],[9,10],[10,11],[11,12],[12,13],[13,14],[13,20],[14,15],[14,23],[15,16],[16,17],[16,25],[17,18],[18,19],[18,28],[19,20],[23,24],[28,29],[29,30],[29,42],[30,31],[31,32],[32,33],[33,34],[34,36],[36,37],[37,38],[38,39],[39,40],[40,41],[42,43]]},{"n":[[178,412],[177,398],[163,390],[147,383],[137,370],[137,357],[150,347],[173,337],[183,327],[180,310],[167,300],[143,290],[133,277],[140,263],[153,255],[177,250],[200,247],[213,237],[200,220],[193,207],[196,202],[171,195],[165,182],[174,169],[195,164],[216,170],[224,182],[217,195],[197,153],[192,137],[197,123],[203,110],[197,103],[183,100],[183,92],[150,105],[117,103],[97,97],[90,87],[100,77],[97,67],[107,50],[117,43],[127,40],[150,37],[160,163],[140,160],[123,155],[120,151],[157,185],[140,190],[130,193],[227,160],[247,155],[257,149],[128,253],[233,237],[260,235],[207,333],[233,328],[237,322],[127,345],[120,338]],"e":[[0,1],[1,2],[2,3],[3,4],[4,5],[5,6],[6,7],[6,61],[7,8],[8,9],[8,58],[9,10],[10,11],[11,12],[12,13],[13,14],[14,15],[15,16],[16,17],[17,18],[17,56],[18,19],[19,20],[20,27],[23,24],[23,45],[24,25],[24,28],[25,26],[25,52],[26,27],[28,29],[29,30],[30,31],[31,32],[32,33],[33,35],[35,39],[38,39],[39,40],[40,41],[41,42],[42,43],[52,53],[53,54],[56,57],[58,59],[59,60]]},{"n":[[178,412],[178,403],[180,380],[182,363],[180,347],[170,330],[163,313],[167,297],[177,283],[190,270],[200,257],[203,240],[191,229],[170,223],[161,210],[170,197],[191,191],[212,197],[220,210],[212,223],[173,177],[163,160],[160,143],[167,127],[180,113],[190,97],[187,80],[173,67],[160,57],[147,50],[137,103],[150,110],[163,120],[180,137],[197,143],[213,145],[225,141],[150,170],[133,177],[120,173],[50,78],[40,80],[27,93],[27,107],[40,120],[55,128],[227,202],[232,200],[213,262],[227,263],[150,313],[187,337],[200,333],[213,335]],"e":[[0,1],[1,2],[2,3],[3,4],[4,5],[5,6],[5,51],[6,7],[6,50],[7,8],[8,9],[9,10],[10,11],[10,48],[11,12],[12,19],[14,15],[15,16],[15,20],[16,17],[17,18],[18,19],[20,21],[21,22],[21,37],[22,23],[23,24],[23,32],[23,33],[24,25],[25,26],[26,27],[27,28],[28,29],[31,32],[33,34],[37,38],[51,52],[52,53]]},{"n":[[113,52],[127,57],[140,63],[143,80],[150,97],[173,110],[190,127],[192,147],[180,160],[163,173],[157,187],[163,207],[177,223],[178,235],[167,250],[157,267],[153,287],[163,303],[177,320],[177,337],[170,357],[163,377],[167,397],[167,417],[165,438],[50,440],[100,440],[220,440],[262,440],[117,157],[133,167],[150,172],[195,233],[213,227],[227,217],[150,250],[128,254],[108,248],[147,337],[162,342]],"e":[[0,1],[1,2],[2,5],[5,6],[6,8],[8,9],[9,10],[9,31],[10,11],[11,12],[12,13],[13,14],[13,32],[14,15],[14,35],[15,16],[16,17],[17,18],[18,19],[19,20],[19,39],[20,21],[21,22],[22,23],[23,24],[24,26],[24,27],[25,26],[27,28],[29,30],[30,31],[32,33],[33,34],[35,36],[36,37],[38,39]]},{"n":[[253,78],[227,83],[207,90],[193,103],[193,117],[203,130],[200,147],[183,163],[167,173],[157,187],[150,207],[153,227],[160,240],[165,252],[150,258],[142,270],[150,283],[172,290],[193,283],[202,270],[193,257],[172,252],[187,300],[197,310],[200,327],[190,347],[173,363],[170,380],[173,403],[173,423],[172,438],[45,440],[100,440],[230,440],[270,440],[133,160],[147,168],[190,243],[207,234],[128,280],[157,340],[172,345]],"e":[[0,1],[1,2],[2,3],[3,4],[4,5],[5,6],[5,8],[7,8],[8,9],[8,36],[9,10],[10,11],[11,12],[12,13],[13,14],[13,21],[14,15],[15,16],[16,17],[17,18],[17,22],[18,19],[19,20],[20,21],[20,37],[22,23],[23,24],[24,25],[25,26],[25,41],[26,27],[27,28],[28,29],[29,30],[30,32],[30,33],[31,32],[33,34],[35,36],[37,38],[40,41]]},{"n":[[177,113],[173,87],[170,67],[160,60],[145,52],[183,60],[198,52],[140,186],[130,200],[117,213],[115,228],[108,250],[105,282],[173,186],[173,205],[177,224],[207,186],[220,200],[237,217],[240,232],[243,255],[245,282],[150,232],[146,243],[150,255],[177,262],[204,255],[208,243],[204,231],[177,285],[177,305],[175,330],[175,355],[175,380],[175,405],[175,430],[175,455],[175,472],[140,290],[210,290]],"e":[[7,8],[8,9],[9,10],[10,11],[10,23],[11,12],[12,38],[13,14],[14,15],[15,22],[15,28],[16,17],[17,18],[18,19],[19,20],[19,27],[20,21],[21,39],[22,23],[23,24],[24,25],[25,26],[25,29],[26,27],[27,28],[29,30],[29,38],[29,39],[30,31],[31,32],[32,33],[33,34],[34,35],[35,36],[36,37]]},{"n":[[13,105],[27,80],[50,73],[87,70],[110,67],[133,58],[160,57],[187,63],[207,77],[233,83],[267,80],[300,82],[323,93],[333,110],[330,125],[173,232],[173,243],[160,260],[133,273],[113,287],[103,307],[107,327],[120,343],[140,363],[160,380],[167,397],[170,417],[172,438],[50,440],[100,440],[230,440],[270,440]],"e":[[15,16],[16,17],[17,18],[18,19],[19,20],[20,21],[21,22],[22,23],[23,24],[24,25],[25,26],[26,27],[27,29],[27,30],[28,29],[30,31]]},{"n":[[165,429],[163,419],[161,408],[160,398],[162,388],[166,378],[170,368],[174,358],[176,347],[178,337],[178,327],[175,317],[170,307],[164,298],[157,290],[150,282],[144,274],[143,264],[153,262],[163,260],[172,255],[175,246],[167,238],[158,234],[155,224],[155,214],[157,203],[161,193],[167,185],[173,176],[180,168],[187,160],[193,152],[199,143],[204,134],[206,124],[206,113],[202,103],[198,94],[192,84],[185,77],[176,71],[166,67],[156,64],[146,61],[158,198],[150,191],[140,186],[130,182],[121,177],[116,167],[175,244],[184,240],[193,234],[202,230],[211,225],[218,218]],"e":[[0,1],[1,2],[2,3],[3,4],[4,5],[5,6],[6,7],[7,8],[8,9],[9,10],[10,11],[11,12],[12,13],[13,14],[14,15],[15,16],[16,17],[17,18],[18,19],[19,20],[20,21],[21,22],[22,23],[23,24],[24,25],[25,26],[26,27],[27,28],[28,29],[29,30],[30,31],[31,32],[32,33],[33,34],[34,35],[35,36],[36,37],[37,38],[38,39],[39,40],[40,41],[41,42],[42,43],[43,44],[45,46],[46,47],[47,48],[48,49],[49,50],[26,45],[51,52],[52,53],[53,54],[54,55],[55,56],[21,51]]},{"n":[[182,210],[160,215],[152,229],[160,243],[182,248],[204,243],[212,229],[204,215],[176,262],[173,272],[150,280],[133,284],[112,296],[101,320],[110,343],[133,363],[153,377],[160,390],[172,400],[197,280],[217,284],[235,293],[258,315],[263,340],[253,363],[227,373],[200,383],[185,398],[177,417],[177,437],[70,437],[120,437],[235,437],[290,437],[170,197],[160,182],[157,165],[167,147],[180,132],[187,110],[183,90],[173,77],[160,67],[157,55],[140,180],[107,173],[67,163],[40,147],[20,130],[17,117],[205,127],[222,122],[240,117],[262,110],[215,235],[250,235],[293,226],[307,207],[199,198],[200,182]],"e":[[0,1],[0,7],[0,34],[1,2],[2,3],[3,4],[4,5],[4,8],[5,6],[6,7],[6,54],[7,58],[8,9],[9,10],[9,19],[10,11],[11,12],[12,13],[13,14],[14,15],[15,16],[16,17],[17,18],[18,27],[18,28],[19,20],[20,21],[21,22],[22,23],[23,24],[24,25],[25,26],[26,27],[28,29],[29,31],[29,32],[30,31],[32,33],[34,35],[35,36],[35,44],[36,37],[37,38],[38,39],[38,50],[39,40],[40,41],[41,42],[42,43],[44,45],[45,46],[46,47],[47,48],[48,49],[50,51],[51,52],[52,53],[54,55],[55,56],[56,57],[58,59]]}];   // dev/paths/gen.py가 만들어요(손으로 고치지 않아요)
   function pathInfo() {
@@ -139,7 +139,7 @@
   }
   function planRoute(k) {
     k.rx = k.tx; k.ry = k.ty;
-    if (k.pw && k.pw[0] === k.tx && k.pw[1] === k.ty) { const w = pathRoute(k); if (w) { k.route = w; return; } }   // 4.4.1 평소에는 길로만
+    if (k.pw && k.pw[0] === k.tx && k.pw[1] === k.ty) { const w = pathRoute(k); if (w) { k.route = w; return; } }   // 평소에는 길로만
     const r = navRoute(k.x, k.y, k.tx, k.ty);
     k.route = r || [];
     if (r) return;
@@ -152,9 +152,9 @@
     const SP = geo().spots;
     let i;
     const nav = navInfo(), vb = vdBlock();
-    for (let t = 0; t < 12; t++) { i = Math.floor(Math.random() * SP.length); if ((i !== k.spot || SP.length < 2) && !(vb && inBlock(vb, SP[i][0], SP[i][1], 2))) break; }   // 3.0.0 기념물 자리에 선 자리는 피해요
+    for (let t = 0; t < 12; t++) { i = Math.floor(Math.random() * SP.length); if ((i !== k.spot || SP.length < 2) && !(vb && inBlock(vb, SP[i][0], SP[i][1], 2))) break; }   // 기념물 자리에 선 자리는 피해요
     const W = pathInfo();
-    if (W.on.length > 1) {   // 4.4.1 길 자료가 있는 지도에서는 모든 길 점 가운데 하나를 골라 길 위에 서요(길 폭 안에서 조금 흩어져요)
+    if (W.on.length > 1) {   // 길 자료가 있는 지도에서는 모든 길 점 가운데 하나를 골라 길 위에 서요(길 폭 안에서 조금 흩어져요)
       let j = W.on[Math.floor(Math.random() * W.on.length)];
       if (j === k.pn) j = W.on[(W.on.indexOf(j) + 1) % W.on.length];
       k.pn = j; k.spot = i;
@@ -170,9 +170,9 @@
     k.pw = null;
   }
   function placeKid(k, bob) {
-    const sc = geo().campus ? 0.72 : 1.1, ln = k.lean || 0, jy = k.jY || 0, sq = k.sq || 0;   // 5.3.0 행사 효과: 기울기(도), 점프 높이, 찌그러짐(fxeStep)
-    const tf = `translate(${k.x.toFixed(1)} ${(k.y + bob - jy).toFixed(1)})` + (ln ? ` rotate(${ln.toFixed(1)})` : '') + (sq ? ` scale(${(sc * (1 + sq)).toFixed(3)} ${(sc * (1 - sq)).toFixed(3)})` : ` scale(${sc})`);   // 4.0.0 캠퍼스 지도는 건물이 작게 그려져 있어 학생도 작게
-    if (k.tf === tf) return;   // 3.2.6 끊김: 서 있는 학생은 같은 값을 다시 쓰지 않아요(지도 전체를 다시 그리게 돼서)
+    const sc = geo().campus ? 0.72 : 1.1, ln = k.lean || 0, jy = k.jY || 0, sq = k.sq || 0;   // 행사 효과: 기울기(도), 점프 높이, 찌그러짐(fxeStep)
+    const tf = `translate(${k.x.toFixed(1)} ${(k.y + bob - jy).toFixed(1)})` + (ln ? ` rotate(${ln.toFixed(1)})` : '') + (sq ? ` scale(${(sc * (1 + sq)).toFixed(3)} ${(sc * (1 - sq)).toFixed(3)})` : ` scale(${sc})`);   // 캠퍼스 지도는 건물이 작게 그려져 있어 학생도 작게
+    if (k.tf === tf) return;   // 끊김: 서 있는 학생은 같은 값을 다시 쓰지 않아요(지도 전체를 다시 그리게 돼서)
     k.tf = tf; k.g.setAttribute('transform', tf);
   }
   // 같은 종류가 가장 많이 겹친 학생의 자리(뒤쪽부터). 겹치는 학생이 없으면 -1
@@ -184,16 +184,16 @@
   }
   function addKid(fromGate, want) {
     const list = speciesList();
-    // 2.3.1 아직 지도에 없는 종류를 먼저, 다 있으면 가장 적은 종류
+    // 아직 지도에 없는 종류를 먼저, 다 있으면 가장 적은 종류
     const n = {}; rt.kids.forEach(k => { n[k.sp] = (n[k.sp] || 0) + 1; });
     let sp = want && list.includes(want) ? want : null;
     if (!sp) { let min = Infinity; for (let j = 0; j < list.length; j++) { const c = list[(rt.kidSeq + j) % list.length], v = n[c] || 0; if (v < min) { min = v; sp = c; } } }
     const bag = Math.floor(rt.kidSeq / list.length) % 3;
     rt.kidSeq++;
-    dexMeet(sp);   // 1.7.0 도감
+    dexMeet(sp);   // 도감
     const g = document.createElementNS(NS, 'g');
     g.setAttribute('class', 'kid');
-    const rare = rareGot(sp) && Math.random() < RARE.walk;   // 2.1.3 반짝 친구는 그 종 학생 가운데 가끔
+    const rare = rareGot(sp) && Math.random() < RARE.walk;   // 반짝 친구는 그 종 학생 가운데 가끔
     g.innerHTML = kidSVG(rare ? sp + '_rare' : sp, bag);
     layerKids.appendChild(g);
     const k = { g, sp, bag, rare, x: 0, y: 0, tx: 0, ty: 0, spot: -1, wait: rand(0, 2), speed: rand(14, 22), phase: rand(0, 6), moving: false };
@@ -203,9 +203,9 @@
     placeKid(k, 0);
     rt.kids.push(k);
   }
-  // 2.3.1 woodani 결정: 지도 학생은 만난 종류가 모두 한 번씩 보이게. 만난 종류가 16종보다 많으면 그만큼 더 걸어 다녀요(학생 수 안에서).
+  // 지도 학생은 만난 종류가 모두 한 번씩 보이게. 만난 종류가 16종보다 많으면 그만큼 더 걸어 다녀요(학생 수 안에서)
   // 줄일 때는 같은 종류가 겹친 학생부터 빼요. 새 친구가 오면 겹치는 학생 하나를 그 친구로 바꿔요
-  // 5.0.4 woodani 요청: 대학교와 대학원은 학생이 구역에 나뉘어 있어요(예전에는 구역마다 모든 학생이 다 보였어요). 좁은 체육 구역은 몫이 작아요. 몫은 제안값
+  // 대학교와 대학원은 학생이 구역에 나뉘어 있어요(예전에는 구역마다 모든 학생이 다 보였어요). 좁은 체육 구역은 몫이 작아요. 몫은 제안값
   const ZONE_KID_W = { academic: 1.2, life: 1.2, plaza: 1, sports: 0.7, lab: 1 };
   function zoneKids(total) {
     const z = geo().zone; if (!z || !uniOn() || rt.fest) return total;   // 광장 행사 동안은 모두 모여요
@@ -214,10 +214,10 @@
   }
   function syncKids(initial) {
     const list = speciesList();
-    // 3.2.5 체험학습 출발 장면 동안은 떠날 친구(rt.busHold명)가 버스에 탈 때까지 지도에 남아 있어요
+    // 체험학습 출발 장면 동안은 떠날 친구(rt.busHold명)가 버스에 탈 때까지 지도에 남아 있어요
     let want = Math.max(0, Math.min(Math.max(CFG.maxKids, list.length), Math.floor(S.students)) - Math.max(0, (S.trip.kids || 0) - (rt.busHold || 0)));
-    if (geo().campus) want = Math.min(want, 6);   // 4.0.0 캠퍼스 지도에는 몇 명만 걸어요
-    else want = zoneKids(want);   // 5.0.4 구역 지도에는 그 구역 몫만
+    if (geo().campus) want = Math.min(want, 6);   // 캠퍼스 지도에는 몇 명만 걸어요
+    else want = zoneKids(want);   // 구역 지도에는 그 구역 몫만
     if (!rt.kids.length && geo().zone && uniOn()) rt.kidSeq = ZONE_KEYS.indexOf(geo().zone) * 5;   // 구역마다 다른 친구부터 나와요
     while (rt.kids.length < want) addKid(!initial);
     while (rt.kids.length > want) { const i = kidDupIdx(); const k = rt.kids.splice(i, 1)[0]; k.g.remove(); }
@@ -229,13 +229,13 @@
         const k = rt.kids.splice(i, 1)[0]; k.g.remove(); addKid(true, sp);
       }
     }
-    rt.elBadgeT = '';   // 2.0.1 반장 배지는 다음 틱에 다시 달아요
+    rt.elBadgeT = '';   // 반장 배지는 다음 틱에 다시 달아요
   }
   function updateKids(dt, now) {
     if (rt.reduced) return;
-    const away = kidsAway();   // 3.1.1 고등학교 밤에는 학생층이 숨어 있어서 걷기 계산만 하고 그리기(매 프레임 16명 setAttribute)와 줄 세우기는 쉬어요
+    const away = kidsAway();   // 고등학교 밤에는 학생층이 숨어 있어서 걷기 계산만 하고 그리기(매 프레임 16명 setAttribute)와 줄 세우기는 쉬어요
     for (const k of rt.kids) {
-      if (k.frz) continue;   // 3.2.6 체험학습 장면 동안 장면에 나오지 않는 친구는 잠깐 멈춰요(busScene)
+      if (k.frz) continue;   // 체험학습 장면 동안 장면에 나오지 않는 친구는 잠깐 멈춰요(busScene)
       if (k.wait > 0) { k.wait -= dt; k.moving = false; }
       else {
         // 운동회 달리기(k.ang)는 운동장 트랙을 그대로 돌고, 그 밖에는 막힌 곳을 돌아서 가요
@@ -253,9 +253,9 @@
     rt.sortT += dt;
     if (rt.sortT > 0.5) {
       rt.sortT = 0;
-      // 3.2.6 끊김: 예전에는 순서가 그대로여도 0.5초마다 학생 그림을 모두 빼서 다시 넣었어요(화면 배치를 다시 셈). 순서가 바뀐 때만 옮겨요
+      // 끊김: 예전에는 순서가 그대로여도 0.5초마다 학생 그림을 모두 빼서 다시 넣었어요(화면 배치를 다시 셈). 순서가 바뀐 때만 옮겨요
       const ord = rt.kids.slice().sort((a, b) => a.y - b.y);
-      // 4.1.2 woodani 제보: 학예회 무대, 조명 그늘, 환영회 줄 장식(.kfloor)은 학생 층 맨 아래에 있어요. 학생은 그 뒤부터 줄 세워요(전에는 맨 앞에 끼워 넣어 무대가 학생을 가렸어요)
+      // 학예회 무대, 조명 그늘, 환영회 줄 장식(kfloor)은 학생 층 맨 아래에 있어요. 학생은 그 뒤부터 줄 세워요(전에는 맨 앞에 끼워 넣어 무대가 학생을 가렸어요)
       const fl = layerKids.querySelectorAll(':scope > .kfloor'), floor = fl.length ? fl[fl.length - 1] : null;
       let prev = null;
       for (const k of ord) { const want = prev ? prev.g.nextSibling : floor ? floor.nextSibling : layerKids.firstChild; if (k.g !== want) layerKids.insertBefore(k.g, want); prev = k; }
@@ -264,14 +264,14 @@
 
   /* ---------- 도토리 떨어지기 ---------- */
   function shakeOak() {
-    if (fxOak()) return;   // 5.2.1 효과층이 켜져 있으면 용수철 흔들림과 잎(40b-fx-layer.js)
+    if (fxOak()) return;   // 효과층이 켜져 있으면 용수철 흔들림과 잎(40b-fx-layer.js)
     const c = $('#oakCanopy');
     c.classList.remove('shake'); void c.getBBox(); c.classList.add('shake');
-    // 2.3.1 woodani: 참나무를 흔들 때 곰 선생님이 같이 뛰던 것(어색해서) 뺌
+    // 참나무를 흔들 때 곰 선생님이 같이 뛰던 것(어색해서) 뺌
   }
   // 떨어질 자리: 이미 떨어진 도토리와 겹치지 않게 몇 군데 골라 보고 가장 떨어진 곳에 놓아요
   // near: 참나무를 눌러 떨어뜨린 도토리는 나무 가까이에 떨어져요
-  // 5.1.1.2 woodani 제보: 참나무 도토리가 '건물 n채 올리기' 같은 지도 위 단추 밑에 떨어져 줍기 불편했어요. 단추 자리(지도 좌표)를 피해요
+  // 참나무 도토리가 '건물 n채 올리기' 같은 지도 위 단추 밑에 떨어져 줍기 불편했어요. 단추 자리(지도 좌표)를 피해요
   function dropAvoid() {   // 지도 위에 떠 있는 단추와 칩(편지, 부스트, 건물 올리기, 날씨 등). 지도 그림(svg) 안의 것은 빼요
     const fr = $('.frame'); if (!fr || !rt.mapS || rt.tab !== 'school') return [];
     const F = fr.getBoundingClientRect(), sc = rt.mapS, px = rt.panX || 0, py = rt.panY || 0, M = 12, out = [];
@@ -288,9 +288,9 @@
     const A = dropAvoid();
     for (let i = 0; i < 16; i++) {
       const a = Math.random() * Math.PI * 2, r = Math.sqrt(Math.random());
-      // 1.5.5: 숲속 운동회 동안에는 운동장 트랙 안 잔디에 떨어져요 (평소에는 광장)
+      // 숲속 운동회 동안에는 운동장 트랙 안 잔디에 떨어져요 (평소에는 광장)
       const [ox, oy] = geo().oak, [dcx, dcy, drx, dry] = rt.sports ? [SPORTS.cx, SPORTS.cy, SPORTS.rx * 0.55, SPORTS.ry * 0.5] : geo().drop;
-      const MO = near && mapOak(), md = MO && MO.drop[Math.floor(Math.random() * MO.drop.length)];   // 3.3.4 지도 참나무는 정해 둔 풀밭 자리 둘레에 떨어져요
+      const MO = near && mapOak(), md = MO && MO.drop[Math.floor(Math.random() * MO.drop.length)];   // 지도 참나무는 정해 둔 풀밭 자리 둘레에 떨어져요
       const x = md ? md[0] + Math.cos(a) * 7 * r : near ? ox + (ox < 180 ? 36 : -36) + Math.cos(a) * 26 * r : dcx + Math.cos(a) * drx * r;
       const y = md ? md[1] + Math.sin(a) * 4 * r : near ? oy + 18 + Math.sin(a) * 12 * r : dcy + Math.sin(a) * dry * r;
       const d = rt.drops.reduce((m, o) => Math.min(m, Math.hypot(o.x - x, o.y - y)), 99) - (inAvoid(A, x, y) ? 1000 : 0);
@@ -312,7 +312,7 @@
     g.setAttribute('role', 'button');
     g.setAttribute('aria-label', '떨어진 도토리 줍기');
     g.setAttribute('transform', `translate(${x.toFixed(1)} ${y.toFixed(1)})`);
-    const ball = rt.sports && IMG('fest_ball_blue') ? festArtSvg('fest_ball_blue', 17) : '';   // 1.7.1 운동회 중에는 청팀 공이 굴러와요
+    const ball = rt.sports && IMG('fest_ball_blue') ? festArtSvg('fest_ball_blue', 17) : '';   // 운동회 중에는 청팀 공이 굴러와요
     g.innerHTML = `<circle r="18" class="drop-hit"/><circle r="13" class="drop-ring"/><ellipse cx="0" cy="9" rx="6" ry="1.8" class="c-shadow"/><g class="drop-bob"><g class="drop-fall">${ball || `<g transform="scale(${IMG0('ic_acorn') ? 1.6 : 1.3})" filter="url(#nutLine)">${ACORN}</g>`}</g></g>`;
     layerFx.appendChild(g);
     const d = { g, x, y, born: performance.now(), dead: false };
@@ -321,7 +321,7 @@
     rt.drops.push(d);
     const fall = g.querySelector('.drop-fall');
     if (rt.sports) {   // 운동회 공은 참나무에서 떨어지지 않고 트랙 바깥에서 통통 튀며 굴러 들어와요(나무도 흔들지 않아요)
-      if (fxeBall(d, (x < SPORTS.cx ? -1 : 1) * rand(70, 110))) return;   // 5.3.0 효과층: 실제로 튀며 굴러 들어와 멈춰요
+      if (fxeBall(d, (x < SPORTS.cx ? -1 : 1) * rand(70, 110))) return;   // 효과층: 실제로 튀며 굴러 들어와 멈춰요
       if (!rt.reduced && fall.animate) {
         const dx = (x < SPORTS.cx ? -1 : 1) * rand(70, 110);
         fall.animate([
@@ -334,7 +334,7 @@
       }
       return;
     }
-    if (near && fxNutFall(d, rt.nutFrom)) { rt.nutFrom = null; return; }   // 5.2.1 효과층: 가지에 달린 도토리 자리에서 떨어져 바닥에 튀어요(흔들림은 tapOak의 shakeOak가 이미 했어요)
+    if (near && fxNutFall(d, rt.nutFrom)) { rt.nutFrom = null; return; }   // 효과층: 가지에 달린 도토리 자리에서 떨어져 바닥에 튀어요(흔들림은 tapOak의 shakeOak가 이미 했어요)
     rt.nutFrom = null;
     if (!rt.reduced && fall.animate) {
       const oa = oakAt(), dx = oa[0] - x, dy = oa[1] - 18 - y;
@@ -347,13 +347,13 @@
     shakeOak();
   }
   function tapOak() {
-    if (rt.paused || rt.decoEdit || rt.fest) return;   // 3.3.1 학교 행사와 꾸미기 중에는 참나무를 흔들지 않아요(운동회는 공 놀이라 그대로)
+    if (rt.paused || rt.decoEdit || rt.fest) return;   // 학교 행사와 꾸미기 중에는 참나무를 흔들지 않아요(운동회는 공 놀이라 그대로)
     shakeOak(); sfx('leaf');
     if (S.f.playground < 1) { oakHint(`${eul(FAC.playground.name)} 지으면 참나무 도토리를 주울 수 있어요`); return; }
     if (S.oak < 1) { oakHint(`참나무가 도토리를 다시 맺는 중이에요. ${Math.ceil((1 - S.oak) * OAK.regen)}초만 기다려요`); return; }
     if (rt.drops.length >= OAK.ground) { oakHint('떨어진 도토리를 먼저 주워 주세요'); return; }
     S.oak -= 1; S.st.shakes += 1;
-    { const vis = $$('.oak-nut:not(.off)'); rt.nutFrom = vis[vis.length - 1] || null; }   // 5.2.1 떨어지는 도토리가 시작하는 가지 자리
+    { const vis = $$('.oak-nut:not(.off)'); rt.nutFrom = vis[vis.length - 1] || null; }   // 떨어지는 도토리가 시작하는 가지 자리
     spawnDrop(true);
     renderOak();
   }
@@ -383,7 +383,7 @@
     S.st.picks += 1;
     if (rt.sports) { rt.sports.blue += 1; feverCombo(rt.sports, d.x, d.y); renderSportsBar(); }
     floatText(d.x, d.y - 12, '+' + fmt(v), 'gold');
-    if (!rt.sports) fxPick(d); else fxeBlue(d);   // 5.3.0 운동회: 청팀 색종이와 점프   // 5.2.1 효과층: 반짝이와 도토리가 위쪽 도토리 숫자로 날아가요(운동회 공은 그대로)
+    if (!rt.sports) fxPick(d); else fxeBlue(d);   // 운동회: 청팀 색종이와 점프. 효과층: 반짝이와 도토리가 위쪽 도토리 숫자로 날아가요(운동회 공은 그대로)
     sfx('coin'); buzz(12);
     removeDrop(d);
     renderHUD(); renderAffordance();
@@ -406,7 +406,7 @@
     '선생님이 칭찬해 주셨어요!', '운동장에서 놀고 싶어요!', '어제 책 한 권 다 읽었어요!', '우리 학교가 제일 좋아요!',
     '친구랑 화해했어요!', '내일도 일찍 올게요!', '받아쓰기 100점 받았어요!', '교장 선생님 최고예요!',
     '참나무에 도토리가 많아요!', '이거 길에서 주웠어요!', '오늘 발표 잘했어요!', '청소 깨끗이 했어요!'];
-  // 4.1.1 woodani 결정(2026-11-12): 학생 말풍선은 학교급 나이에 맞게(유치원과 초등학교는 예전 글, 중학교, 고등학교, 대학교는 따로)
+  // 학생 말풍선은 학교급 나이에 맞게(유치원과 초등학교는 예전 글, 중학교, 고등학교, 대학교는 따로)
   const TALK_TIER = { 2: ['안녕하세요, 교장 선생님.', '오늘 급식 두 번 받았어요.', '수행평가 내일까지래요…', '동아리 시간만 기다려요.', '쉬는 시간이 너무 짧아요.', '체육복 또 놓고 왔어요.', '시험 범위가 왜 이렇게 넓어요?', '매점 줄이 교문까지예요.', '친구랑 화해했어요.', '키가 또 컸어요!', '이거 주웠어요. 드릴게요.', '우리 학교가 제일 나아요.'], 3: ['안녕하세요, 교장 선생님.', '모의고사 봤어요. 묻지 마세요.', '야자 끝나고 본 별이 예뻤어요.', '급식이 하루의 낙이에요.', '기숙사 점호 시간이에요.', '졸려요… 십 분만요.', '진로 상담 받고 왔어요.', '수학여행 언제 가요?', '친구가 문제집을 빌려줬어요.', '이거 주웠어요. 드릴게요.', '커피 우유로 버텨요.', '졸업하면 꼭 놀러 올게요.'], 4: ['안녕하세요, 총장님.', '과제가 세 개 겹쳤어요.', '공강이라 잔디밭에 누워 있었어요.', '학생 식당 오늘 메뉴 괜찮아요.', '조별 과제 조원이 연락이 안 돼요.', '수강 신청에 성공했어요!', '도서관 자리 맡아 놨어요.', '축제 언제 해요?', '교수님이 제 이름을 외우셨어요.', '이거 주웠어요. 드릴게요.', '아르바이트 가는 길이에요.', '이 학교 오길 잘했어요.'] };
   const talkLines = () => TALK_TIER[S.tier] || TALK_LINES;
   const talkValue = () => dropValue() * 2;
@@ -414,9 +414,9 @@
      1장을 마친 뒤 가끔(12~25분마다) 나타나요. 20초 안에 여러 번 눌러서 쫓아내면 상품, 못 쫓아내면 도토리를 조금 물고 가요.
      곰 선생님이 함께 막아 줘서 곰 선생님 레벨이 높을수록 덜 눌러도 돼요 */
   const TRIAL = { every: [720, 1500], first: 360, time: 20, win: 8, lose: 5, hunt: [20, 40], huntFirst: 3 };
-  // 1.7.4 메인 퀘스트 '침입자 쫓아내기'를 하는 동안: 퀘스트가 나오면 3초 뒤 바로, 그 뒤로도 20~40초마다 와요
+  // 메인 퀘스트 '침입자 쫓아내기'를 하는 동안: 퀘스트가 나오면 3초 뒤 바로, 그 뒤로도 20~40초마다 와요
   const trialHunt = () => { const q = curMain(); return !!q && q.t === 'trials' && !mainReady(); };
-  // 1.7.1 지도에 오는 뱀, 매, 까치도 도감 그림으로 그려요(그림이 없으면 예전 도형)
+  // 지도에 오는 뱀, 매, 까치도 도감 그림으로 그려요(그림이 없으면 예전 도형)
   const guestArt = kind => { const u = IMG170('chr_' + kind); if (!u) return kind === 'snake' ? SNAKE : kind === 'hawk' ? HAWK : MAGPIE;
     const w = kind === 'magpie' ? 40 : 38; return `<g class="tr-body"><image href="${u}" x="${-w / 2}" y="${-w / 2}" width="${w}" height="${w}"/></g>`; };
   const SNAKE = '<g class="tr-body"><path d="M-22 6 Q-14 -2 -6 6 T10 6 T22 2" fill="none" stroke="#5E8C3A" stroke-width="7" stroke-linecap="round"/><path d="M-22 6 Q-14 -2 -6 6 T10 6 T22 2" fill="none" stroke="#8DBE5A" stroke-width="2.4" stroke-dasharray="2 4" stroke-linecap="round"/>' +
@@ -425,10 +425,10 @@
     '<circle cx="0" cy="-6" r="5" fill="#F3E3C7"/><circle cx="-1.8" cy="-7" r="1" fill="#2A2520"/><circle cx="1.8" cy="-7" r="1" fill="#2A2520"/><path d="M-1.6 -4.4 L0 -1.6 L1.6 -4.4 Z" fill="#E7A92A"/><path d="M-4 12 l2 4 M4 12 l-2 4" stroke="#E7A92A" stroke-width="1.4" stroke-linecap="round"/></g>';
   const trialOpen = () => S.q.m >= CH1() || S.st.grads > 0 || S.tier > 0;
   const trialNeed = () => Math.max(6, 14 - Math.floor(S.t.bear / 3));
-  /* 2.3.1 뱀과 매 침입자 액션(작업지시서 44 그림, woodani 확인한 시안 '침입자 액션 시안'):
-     뱀은 꿈틀대며 기어 오고(두 자세 번갈아) 멈추면 혀를 날름, 매는 그림자가 먼저 지나간 뒤 내려와 날갯짓하며 빙빙 돌아요.
-     누르면 놀란 그림으로 바뀌고 빨갛게 번쩍, 뱀은 뒤로 밀려나고 풀잎, 매는 깃털이 흩날려요. 빠르게 누르면 '퍽! ×n'.
-     체력이 반이면 화나서 빨라지고 매는 한 번 급강하. 쫓아내면 뱀은 굴러 도망, 매는 날아가고 곰 선생님이 '이겼다!'. 못 쫓아내면 도토리를 물고 사라져요.
+  /* 뱀과 매 침입자 액션(작업지시서 44 그림, 한 시안 '침입자 액션 시안')
+     뱀은 꿈틀대며 기어 오고(두 자세 번갈아) 멈추면 혀를 날름, 매는 그림자가 먼저 지나간 뒤 내려와 날갯짓하며 빙빙 돌아요
+     누르면 놀란 그림으로 바뀌고 빨갛게 번쩍, 뱀은 뒤로 밀려나고 풀잎, 매는 깃털이 흩날려요. 빠르게 누르면 '퍽! ×n'
+     체력이 반이면 화나서 빨라지고 매는 한 번 급강하. 쫓아내면 뱀은 굴러 도망, 매는 날아가고 곰 선생님이 '이겼다!'. 못 쫓아내면 도토리를 물고 사라져요
      다니는 길은 지금 화면에서 보이는 안전한 칸 안(위쪽 칸, 아래 탭, 왼쪽과 오른쪽 단추 줄, 아래 칩을 피해요). 그림이 없으면 예전 그림(chr_snake, chr_hawk) */
   const TRL = { snake: { sp: 26, angry: 2, frame: 0.22 }, hawk: { spA: 1.3, frame: 0.18 }, hurt: 0.28, kb: 18, combo: 0.55 };
   const trlImg = k => IMG(k) || '';
@@ -519,7 +519,7 @@
   }
   function startTrial(kind) {
     if (rt.trial) return;
-    dexMeet('g_' + kind);   // 1.7.0 도감 특별 손님
+    dexMeet('g_' + kind);   // 도감 특별 손님
     const g = document.createElementNS(NS, 'g');
     g.setAttribute('class', 'trial ' + kind);
     g.setAttribute('role', 'button'); g.setAttribute('tabindex', '0');
@@ -541,7 +541,7 @@
     g.addEventListener('pointerdown', e => { e.stopPropagation(); e.preventDefault(); hitTrial(); });
     g.addEventListener('keydown', e => { if (e.key === 'Enter' || e.key === ' ') { e.preventDefault(); hitTrial(); } });
     rt.trial = T;
-    $('.stage').classList.add('danger');   // 1.7.2 위기: 화면 테두리를 빨갛게(2.3.1 그동안 아래 칩과 새 편지는 흐리게)
+    $('.stage').classList.add('danger');   // 위기: 화면 테두리를 빨갛게(그동안 아래 칩과 새 편지는 흐리게)
     sfx('magpie');
     toast(kind === 'snake' ? '뱀이 학교로 기어 와요! 여러 번 눌러서 쫓아내요' : '매가 학교 위를 맴돌아요! 여러 번 눌러서 쫓아내요');
   }
@@ -586,7 +586,7 @@
     const at = `translate(${T.x.toFixed(1)}px, ${T.y.toFixed(1)}px)`;
     T.g.removeAttribute('transform'); T.g.style.transform = at;
     S.st.trials = (S.st.trials || 0) + (win ? 1 : 0);
-    if (rt.trialWasHunt && !trialHunt()) { rt.trialWasHunt = false; rt.trialT = rand(TRIAL.every[0], TRIAL.every[1]); }   // 2.3.1 물러나는 장면 동안에도 퀘스트를 마쳤으면 다시 드문드문
+    if (rt.trialWasHunt && !trialHunt()) { rt.trialWasHunt = false; rt.trialT = rand(TRIAL.every[0], TRIAL.every[1]); }   // 물러나는 장면 동안에도 퀘스트를 마쳤으면 다시 드문드문
     if (win) {
       if (T.kind === 'snake') { trlSet(T, 'trl_snake_run'); anim([{ transform: `${at} rotate(0deg)` }, { transform: `translate(${(T.safe[2] + 120).toFixed(1)}px, ${(T.y + 6).toFixed(1)}px) rotate(900deg)` }], 1100, fin); }
       else { trlBurst(T.x, T.y, 'trl_fx_feather', 5); let n = 0; const fl = setInterval(() => { trlSet(T, n++ % 2 ? 'trl_hawk_up' : 'trl_hawk_down'); if (n > 14) clearInterval(fl); }, 80); anim([{ transform: at }, { transform: `translate(${(T.x + 40).toFixed(1)}px, ${(T.safe[1] - 160).toFixed(1)}px) scale(.7)` }], 1100, fin); }
@@ -625,7 +625,7 @@
     startVisit();
   }
   function startVisit() {
-    dexMeet('g_alumni');   // 1.7.0 도감 특별 손님
+    dexMeet('g_alumni');   // 도감 특별 손님
     const list = speciesList(), sp = list[Math.floor(Math.random() * list.length)];
     const g = document.createElementNS(NS, 'g');
     g.setAttribute('class', 'visit'); g.setAttribute('role', 'button'); g.setAttribute('tabindex', '0');
@@ -639,7 +639,7 @@
     g.addEventListener('click', e => { e.stopPropagation(); endVisit(true); });
     g.addEventListener('keydown', e => { if (e.key === 'Enter' || e.key === ' ') { e.preventDefault(); endVisit(true); } });
     rt.visit = V;
-    toast(S.alb && S.alb.length ? `${S.alb.length}기 졸업생이 선물을 들고 학교에 찾아왔어요!` : '졸업생이 선물을 들고 학교에 찾아왔어요!');   // 2.1.1 앨범 쪽 수가 기수
+    toast(S.alb && S.alb.length ? `${S.alb.length}기 졸업생이 선물을 들고 학교에 찾아왔어요!` : '졸업생이 선물을 들고 학교에 찾아왔어요!');   // 앨범 쪽 수가 기수
   }
   function endVisit(take) {
     const V = rt.visit; if (!V) return;
@@ -648,20 +648,20 @@
     V.g.remove();
     if (!take) return;
     const roll = Math.random(), items = [];
-    if (roll < 0.15) items.push(goldOr(1));   // 4.2.0
+    if (roll < 0.15) items.push(goldOr(1));
     else if (roll < 0.4 && (S.tier > 0 || S.st.grads > 0)) { addDip(1); items.push({ ic: 'dip', t: '수료증 +1장' }); }
     else { const v = Math.max(20, nice(rate() * 60 * 10)); S.budget += v; earn(v); items.push({ ic: 'acorn', t: `도토리 +${fmt(v)}` }); }
     S.st.visits = (S.st.visits || 0) + 1;
-    if (S.alb && S.alb.length) { const pg = S.alb[Math.floor(Math.random() * S.alb.length)]; pg.v = Math.min(999, (pg.v || 0) + 1); }   // 2.1.1 앨범에 발자국 도장
+    if (S.alb && S.alb.length) { const pg = S.alb[Math.floor(Math.random() * S.alb.length)]; pg.v = Math.min(999, (pg.v || 0) + 1); }   // 앨범에 발자국 도장
     showReward({ title: '졸업생이 선물을 주고 갔어요', sub: `"${VISIT_LINES[Math.floor(Math.random() * VISIT_LINES.length)]}"`, art: `<svg viewBox="-12 -16 24 30" aria-hidden="true">${kidSVG(V.sp, 1, { hat: 'cap', neck: '' })}</svg>`, big: '착한 졸업생', items });
     save(); renderHUD();
   }
 
-  // 5.1.1.2 woodani 제보: 소풍 간 친구(지도에서 숨김)에게 '!' 말풍선이 붙어 그림 없이 '!'만 돌아다녔어요
+  // 소풍 간 친구(지도에서 숨김)에게 '!' 말풍선이 붙어 그림 없이 '!'만 돌아다녔어요
   const kidSeen = k => !!k && !!k.g && !k.gone && k.g.style.display !== 'none';
   function updateTalk(dt) {
     const T = rt.talk;
-    if (T && kidsAway()) { endTalk(); return; }   // 3.1.1 woodani 제보: 학생은 안 보이는데 '!' 말풍선만 떠 있었어요
+    if (T && kidsAway()) { endTalk(); return; }   // 학생은 안 보이는데 '!' 말풍선만 떠 있었어요
     if (T) {
       if (T.k.g.isConnected && rt.kids.includes(T.k) && !T.k.board && kidSeen(T.k)) {
         T.age += dt;

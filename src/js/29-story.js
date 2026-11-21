@@ -3,7 +3,7 @@
      장면은 다른 창이나 놀이가 없을 때만 나오고, 건너뛴 장면도 수첩에서 다시 볼 수 있어요. 고르기는 보상과 진행에 영향이 없어요.
      글은 학교급 묶음마다 woodani가 읽고 고친 뒤 ST에 넣어요. 글이 없는 장면은 나오지 않아요. 24장 모두 woodani가 읽고 좋다고 했어요(2026-11-11 밤, 프로젝트 문서 '이야기 글 초안 1', 2, 3, 5, 6) */
   const ST_TAG_CH = [4, 7, 9, 13, 17, 22];   // 나무패 여섯 조각: 5, 8, 10, 14, 18, 23장의 닫는 장면
-  // 나무패 뒷면 글귀: 여섯 조각을 차례로 읽으면 거북 할아버지가 남긴 글 한 편이 돼요(woodani 결정 2026-11-11 밤). 수첩에 얻은 만큼 보여요
+  // 나무패 뒷면 글귀: 여섯 조각을 차례로 읽으면 거북 할아버지가 남긴 글 한 편이 돼요(밤). 수첩에 얻은 만큼 보여요
   const ST_TAG_TX = ['울며 온 아이가 웃으며 나간다.', '멀리 다녀온 아이가 더 잘 돌아온다.', '가만히 서 있는 것도 배움이다.', '남아서 지킨 아이가 종을 울린다.', '떠났던 아이도 이 나무의 열매다.', '배우는 소리가 들리면 나무는 다시 열매를 맺는다.'];
   const ST_NM = { hedgehog: '교감 고슴도치', somi: '솜이', stork: '황새 장학사', weasel: '족제비 원장', elder: '거북 할아버지' };   // elder: 거북 할아버지(학생 동물 거북 turtle과 열쇠가 겹치지 않게)
   const ST_FB = { somi: '🐰', stork: '🕊', weasel: '🦦', elder: '🐢' };
@@ -416,7 +416,7 @@
     { k: 'weasel', at: 2, tx: [[2, "옆 숲 '반짝 학원' 원장. 미워할 수 없는 허풍쟁이예요."], [17, '사실은 이 학교 졸업생이에요.']] },
     { k: 'stork', at: 3, tx: [[3, '숲속 교육청의 깐깐한 장학사예요.'], [14, '도시락을 싸 와서 급식실에서 함께 먹는 사이가 됐어요.']] },
     { k: 'elder', at: 4, tx: [[4, '첫 교장 선생님. 큰 참나무를 심은 분이에요.']] }];
-  // 곁가지 이야기: n 화 수, ok 여는 조건, title 끝내면 받는 칭호(이름은 본부 제안). 글(ST_SIDE)은 중심 이야기 유치원 묶음 다음에 써요
+  // 곁가지 이야기: n 화 수, ok 여는 조건, title 끝내면 받는 칭호(이름은). 글(ST_SIDE)은 중심 이야기 유치원 묶음 다음에 써요
   const SIDE = [
     { id: 'nap', nm: '낮잠 작전', who: 'owl', n: 4, ok: () => (S.t.owl || 0) >= 3, title: '낮잠 지킴이' },
     { id: 'honey', nm: '꿀단지', who: 'bear', n: 4, ok: () => (S.t.bear || 0) >= 5, title: '꿀단지 탐정' },
@@ -424,8 +424,8 @@
     { id: 'sloth', nm: '나무늘보의 달리기', who: 'sloth', n: 4, ok: () => uniNow() && !!S.dex.got.sloth, title: '끝까지 응원단' },
     { id: 'mole', nm: '두더지의 별자리', who: 'mole', n: 4, ok: () => !!S.dex.got.mole && (S.f.science || 0) >= 1, title: '별자리 지기' },
     { id: 'deer', nm: '고라니의 그림', who: 'waterdeer', n: 3, ok: () => !!S.dex.got.waterdeer, title: '복도 미술관장' },
-    { id: 'alumni', nm: '졸업생 후일담', who: 'hedgehog', n: 3, ok: () => S.tier >= GRAD_TIER && S.tg >= TIERS[GRAD_TIER].years, title: '숲속 동물 학교 교장' }];   // 5.2.0 박사 학위를 받은 뒤(설계안 6절, 글은 본부 초안)
-  // 5.2.0 졸업생 후일담: 진로 도감에서 먼저 이룬 졸업생 셋을 찾아가요(모자라면 솜이). 글은 그때 저장을 보고 만들어요
+    { id: 'alumni', nm: '졸업생 후일담', who: 'hedgehog', n: 3, ok: () => S.tier >= GRAD_TIER && S.tg >= TIERS[GRAD_TIER].years, title: '숲속 동물 학교 교장' }];   // 박사 학위를 받은 뒤(설계안 6절, 글은 초안)
+  // 졸업생 후일담: 진로 도감에서 먼저 이룬 졸업생 셋을 찾아가요(모자라면 솜이). 글은 그때 저장을 보고 만들어요
   function alumniLines() {
     const done = (S && S.cs && S.cs.done) || {}, pick = Object.keys(done).filter(k => JOBS.some(J => J.k === k)).slice(0, 3).map(k => ({ nm: done[k].nm, w: DEX_STUDENTS.includes(done[k].sp) ? done[k].sp : 'rabbit', job: JOBS.find(J => J.k === k).name }));
     while (pick.length < 3) pick.push({ nm: '솜이', w: 'somi', job: '선생님' });
@@ -449,7 +449,7 @@
        { w: 'hedgehog', t: '문 닫을 날을 받아 두었던 학교였는데. 이제 졸업생이 이렇게 많아요.' },
        { t: '참나무 잎이 바람에 흔들려요. 잎 하나하나가 졸업생 이름처럼 반짝여요.' }]];
   }
-  // 곁가지 글(woodani 확인 2026-11-11 밤, 프로젝트 문서 '이야기 글 초안 4'): 화마다 줄 목록
+  // 곁가지 글(밤, 프로젝트 문서 '이야기 글 초안 4'): 화마다 줄 목록
   const ST_SIDE = {
     nap: [
       [{ t: '과학 시간. 칠판 앞에서 부엉이 선생님 고개가 천천히 내려가요.' },
@@ -602,10 +602,10 @@
        { w: 'peacock', t: '그런데 첫 그림은 누가 걸었을까요? 액자가 제 것이랑 똑같긴 한데, 저는 모르는 일이에요.' },
        { t: '공작 선생님이 꼬리를 펴고 지나가요. 꼬리 끝에 물감이 묻어 있어요.' }]]
   };
-  Object.defineProperty(ST_SIDE, 'alumni', { get: alumniLines, enumerable: true });   // 5.2.0 졸업생 후일담
+  Object.defineProperty(ST_SIDE, 'alumni', { get: alumniLines, enumerable: true });   // 졸업생 후일담
   const SIDE_ESS = 2, SIDE_DAY = 2;
   const ST_TITLES = SIDE.map(x => ({ id: 'st_' + x.id, title: x.title }));
-  const stTitleGot = (t, sto) => { sto = sto || (S && S.sto); const X = SIDE.find(x => 'st_' + x.id === t.id); return !!X && !!sto && !!sto.side && ((sto.side[X.id] || {}).n || 0) >= X.n; };   // 5.0.3.1 저장 읽기에서도 써요
+  const stTitleGot = (t, sto) => { sto = sto || (S && S.sto); const X = SIDE.find(x => 'st_' + x.id === t.id); return !!X && !!sto && !!sto.side && ((sto.side[X.id] || {}).n || 0) >= X.n; };   // 저장 읽기에서도 써요
   const freshSto = () => ({ v: 1, ch: -1, q: [], seen: {}, pick: {}, side: {} });
   function sanitizeSto(d, s) {
     const f = freshSto(), T = d && d.sto && typeof d.sto === 'object' ? d.sto : null; s.sto = f;
@@ -620,7 +620,7 @@
   }
   const stCur = () => { const q = curMain(); return q ? q.ch : CHAPTERS.length; };
   const stTags = () => !S || !S.sto ? 0 : ST_TAG_CH.filter(c => S.sto.ch > c).length;
-  const stIdle = () => !rt.modalOpen && !rt.paused && !festBusy() && !rt.modalQueue.length && !rt.sheetKey && !rt.decoEdit && !rt.tut && (!!S.tut.st || !!(S.sto && S.sto.q && S.sto.q[0] === 'o0')) && rt.viewTier == null;   // 5.0.1.7 F-03 첫 장면은 튜토리얼보다 먼저
+  const stIdle = () => !rt.modalOpen && !rt.paused && !festBusy() && !rt.modalQueue.length && !rt.sheetKey && !rt.decoEdit && !rt.tut && (!!S.tut.st || !!(S.sto && S.sto.q && S.sto.q[0] === 'o0')) && rt.viewTier == null;   // 첫 장면은 튜토리얼보다 먼저
   // 1초마다: 장이 바뀌었는지 보고 장면을 줄 세워요. 한가할 때 맨 앞 장면을 보여 줘요
   function stTick() {
     if (!S || !S.sto) return;
@@ -636,17 +636,17 @@
     if (window.__FOREST_TEST && !window.__STORY_AUTO) return;   // 자동 시험에서는 장면을 저절로 띄우지 않아요(공지 창과 같은 방식). s117은 __STORY_AUTO를 켜요
     if (!T.q.length || rt.st || !stIdle()) return;
     if (T.q[0][0] === 'o' && yearLocked()) return;   // 다음 장이 아직 잠겨 있으면 여는 장면은 열릴 때까지 기다려요
-    if (T.q[0][0] === 'o' && T.q[0] !== 'o0' && rt.stAfterC && !rt.qTap) return;   // 5.0.1.7 F-03 장 끝에는 닫는 장면만 바로, 여는 장면은 다음 퀘스트를 누를 때
+    if (T.q[0][0] === 'o' && T.q[0] !== 'o0' && rt.stAfterC && !rt.qTap) return;   // 장 끝에는 닫는 장면만 바로, 여는 장면은 다음 퀘스트를 누를 때
     stPlay(T.q[0], false);
   }
   const stAv = w => w === 'hedgehog' ? hedgehogAvatar() : AV[w] ? `<svg viewBox="-24 -24 48 48" aria-hidden="true">${AV[w]}</svg>`
     : w === 'somi' ? (IMG('st_who_somi_' + (chTier(Math.min(Math.max(S.sto.ch, 0), CHAPTERS.length - 1)) + 1)) ? `<img src="${IMG('st_who_somi_' + (chTier(Math.min(Math.max(S.sto.ch, 0), CHAPTERS.length - 1)) + 1))}" alt="">` : kidAvatar('rabbit'))
     : ST_WHO_IMG[w] && IMG(ST_WHO_IMG[w]) ? `<img src="${IMG(ST_WHO_IMG[w])}" alt="">` : DEX_STUDENTS.includes(w) ? kidAvatar(w) : `<span class="sy-em">${ST_FB[w] || '🌳'}</span>`;
   const stName = w => (w === 'hedgehog' && rt.st && rt.st.uni ? '부총장 고슴도치' : '') || ST_NM[w] || (TEA[w] && TEA[w].name) || spName(w);
-  // 5.0.2: 있는 그림만 적은 이름표(열쇠 → 내용 해시, dev/story_pack.py가 써요). 없는 그림을 헛되이 찾지 않고, 이름에 해시가 있어 내용이 바뀐 그림만 다시 받아요. 앱은 웹에서 받아요
+  // 있는 그림만 적은 이름표(열쇠 → 내용 해시, dev/story_pack.py가 써요). 없는 그림을 헛되이 찾지 않고, 이름에 해시가 있어 내용이 바뀐 그림만 다시 받아요. 앱은 웹에서 받아요
   const ST_PICS = /* ST_PICS:BEGIN */{st_ch01:"83d4ae292f",st_ch01_c:"a82aa781b7",st_ch01_c2:"5b54ecd012",st_ch01_o2:"12c9e54f84",st_ch02:"aac3024b8d",st_ch02_c2:"7b7d97123a",st_ch02_o2:"079d3eac1f",st_ch03:"b82408e432",st_ch03_c2:"48d9b890d2",st_ch03_o2:"08291d755f",st_ch04:"e4aa4b9957",st_ch04_c2:"fb13fa0ccf",st_ch04_o2:"6da7a01456",st_ch05:"8e220ffae7",st_ch05_c2:"dec8204a66",st_ch05_o:"bf76a9697a",st_ch05_o2:"954988392f",st_ch06:"ed3cee04db",st_ch06_c2:"1e3f76adc3",st_ch06_o2:"8a7902d00e",st_ch07:"0f45474db9",st_ch07_c2:"dc90233af3",st_ch07_o2:"bff76394db",st_ch08:"b3efc9acc0",st_ch08_c2:"2914cb76dd",st_ch08_o:"dbb8a86eb9",st_ch08_o2:"16a11c4013",st_ch09:"55dc5ad210",st_ch09_c:"3a121ad7df",st_ch09_c2:"e77c4522d4",st_ch09_o2:"b569ed3379",st_ch10:"1323d208b0",st_ch10_c2:"885604a40f",st_ch10_o:"a0f64efa23",st_ch10_o2:"b843a6d42f",st_ch11:"b6894511ea",st_ch11_c:"9efdbf71c5",st_ch11_c2:"f546da8f8e",st_ch11_o2:"aeef4bee90",st_ch12:"1397cf6dce",st_ch12_c2:"06f5d6d3ba",st_ch12_o2:"0312f829bb",st_ch13:"71e41f1a69",st_ch13_c:"70fb38b0f9",st_ch13_c2:"445fe87801",st_ch13_o2:"76a4449481",st_ch14:"5bbb66484c",st_ch14_c:"41a07e86b6",st_ch14_c2:"8de17a5968",st_ch14_o2:"4df25272f9",st_ch15:"da2f6a00e0",st_ch15_c2:"b82adae672",st_ch15_o2:"2a0a745837",st_ch16:"768d4e6565",st_ch16_c2:"a051d15b0c",st_ch16_o2:"56479b20c6",st_ch17:"8d32828cb8",st_ch17_c2:"55b7a3183f",st_ch17_o2:"11717b463f",st_ch18:"4949e80c46",st_ch18_c2:"96fefdfd79",st_ch18_o:"743d58be1b",st_ch18_o2:"c95622fd31",st_ch19:"6b1a05fdb1",st_ch19_c:"40a8b96329",st_ch19_c2:"7a2edb52f4",st_ch19_o2:"2b4295d26e",st_ch20:"9d66c037da",st_ch20_c:"5882950434",st_ch20_c2:"7ba09244d6",st_ch20_o2:"2edde32b33",st_ch21:"528a70b4d9",st_ch21_c2:"b578d6dd70",st_ch21_o2:"31150089d5",st_ch22:"6ab9282c09",st_ch22_c2:"470f6694f3",st_ch22_o2:"8cc78eff73",st_ch23:"7c3362353c",st_ch23_c2:"a9e39a4e69",st_ch23_o:"9b647ff789",st_ch23_o2:"db2594844e",st_ch24:"c4d04925c9",st_ch24_c2:"925b09913f",st_ch24_o:"5d7007a191",st_ch24_o2:"90adadc9d6",st_side_acorn_1:"e6e409bf68",st_side_acorn_2:"16d1b0692d",st_side_acorn_3:"e64655f9cd",st_side_acorn_4:"cdc8db1079",st_side_alumni_1:"4011aa5620",st_side_alumni_2:"2844f3f6c5",st_side_alumni_3:"7e9199a79c",st_side_bear:"2bcb94dea6",st_side_deer_1:"b27e59b190",st_side_deer_2:"daf12348d8",st_side_deer_3:"9af6ea3a56",st_side_honey_1:"ff9777b5cd",st_side_honey_2:"11607990e4",st_side_honey_3:"43fdbb8087",st_side_honey_4:"8cadae4386",st_side_mole:"bf20570b4c",st_side_mole_1:"07cb39f498",st_side_mole_2:"1dbcf0b553",st_side_mole_3:"1ca7dfb702",st_side_mole_4:"39576bdfba",st_side_nap_1:"b1f4cd4640",st_side_nap_2:"3bcaf34ad3",st_side_nap_3:"a25820ea22",st_side_nap_4:"65342badef",st_side_owl:"cc843fa8e8",st_side_sloth:"b11838a6f4",st_side_sloth_1:"d7ba28a6d7",st_side_sloth_2:"2ed1e8e506",st_side_sloth_3:"9cecf5c579",st_side_sloth_4:"1440fe545b",st_side_squirrel:"3d5ea7a0df",st_side_waterdeer:"0fce30acfb",st_tagmap:"fd82ef729b",st_tam_1:"3fbb70774d",st_tam_2:"92f28f42b6",st_tam_3:"fd439f975f",st_tam_4:"669acb69e2",st_tam_5:"d59a034db4"}/* ST_PICS:END */;
   const stPicUrl = k => webDir('img/story/') + k + '-' + ST_PICS[k] + '.webp';
-  // 4.3.1 숲속 탐험대 처음 소개(그림 st_tam_1~5, 작업지시서 76). p는 그 줄에서 보여 줄 그림 번호예요. 그림이 없으면 대사만 나와요
+  // 숲속 탐험대 처음 소개(그림 st_tam_1~5, 작업지시서 76). p는 그 줄에서 보여 줄 그림 번호예요. 그림이 없으면 대사만 나와요
   const ST_TAM = [
     { p: 1, t: '해가 지고 학교가 조용해지면…' },
     { p: 1, t: '덤불 사이로 작은 눈들이 반짝여요.' },
@@ -661,7 +661,7 @@
     { p: 5, w: 'hedgehog', t: '높이 오를수록 장난꾸러기도 세져요.\n대원들을 키우며 한 층씩 올라가 봐요.' },
     { p: 5, t: '숲속 탐험대, 출발!' },
   ];
-  // 4.3.1 탐험 소개: 줄마다 그림 번호가 바뀌면 그 그림으로 갈아 끼워요
+  // 탐험 소개: 줄마다 그림 번호가 바뀌면 그 그림으로 갈아 끼워요
   function stTamPic() {
     const R = rt.st; if (!R || R.id !== 'tam') return;
     const L = R.lines[R.i], k = 'st_tam_' + ((L && L.p) || 1); if (R.tpk === k) return; R.tpk = k;
@@ -672,27 +672,27 @@
   function stPlay(id, replay) {
     const m = $('#mSt'); if (!m || rt.st) return false;
     let lines, head, pic = '', pic2 = '';
-    let picB = '';   // 4.2.0 둘째 그림(작업지시서 71): 장면 가운데 줄부터 바꿔 보여요
-    if (id === 'tam') { lines = ST_TAM; head = '숲속 탐험대'; }   // 4.3.1 그림은 stTamPic()이 줄마다 골라요
+    let picB = '';   // 둘째 그림(작업지시서 71): 장면 가운데 줄부터 바꿔 보여요
+    if (id === 'tam') { lines = ST_TAM; head = '숲속 탐험대'; }   // 그림은 stTamPic이 줄마다 골라요
     else if (id === 'recap') { lines = ST_RECAP[Math.min(S.tier, ST_RECAP.length - 1)].map(t => ({ t })); head = '지금까지의 이야기'; pic = 'st_head'; }
-    else if (id.startsWith('side:')) { const [, sid, ep] = id.split(':'), X = SIDE.find(x => x.id === sid), L = (ST_SIDE[sid] || [])[+ep]; if (!X || !L) return false; lines = L; head = `${X.nm} ${+ep + 1}화`; pic = 'st_side_' + X.who; picB = `st_side_${sid}_${+ep + 1}`; if (!ST_PICS[pic] && ST_PICS[picB]) { pic = picB; picB = ''; } }   // 5.2.0.1 후일담처럼 화 그림만 있으면 처음부터 그 그림
+    else if (id.startsWith('side:')) { const [, sid, ep] = id.split(':'), X = SIDE.find(x => x.id === sid), L = (ST_SIDE[sid] || [])[+ep]; if (!X || !L) return false; lines = L; head = `${X.nm} ${+ep + 1}화`; pic = 'st_side_' + X.who; picB = `st_side_${sid}_${+ep + 1}`; if (!ST_PICS[pic] && ST_PICS[picB]) { pic = picB; picB = ''; } }   // 후일담처럼 화 그림만 있으면 처음부터 그 그림
     else { const D = ST[id]; if (!D) return false; lines = D.lines; head = `${D.ch + 1}장 ${CHAPTERS[D.ch]}`; pic2 = 'st_ch' + String(D.ch + 1).padStart(2, '0'); pic = pic2 + '_' + id[0]; picB = pic + '2'; }   // 그 장면만의 그림(st_ch05_o, st_ch01_c, 작업지시서 66)이 있으면 먼저, 없으면 장 그림
-    if (!replay) { if (id[0] === 'c') { rt.stAfterC = true; rt.qTap = false; } else if (id[0] === 'o') rt.stAfterC = false; }   // 5.0.1.7 F-03
+    if (!replay) { if (id[0] === 'c') { rt.stAfterC = true; rt.qTap = false; } else if (id[0] === 'o') rt.stAfterC = false; }
     rt.st = { id, replay: !!replay, lines: lines.slice(), i: 0, uni: !!(ST[id] && ST[id].ch >= 19) || (id === 'tam' && uniOn()), mid: Math.floor(lines.length / 2), im2: null, sw: false };   // uni: 대학교 장면(20장부터)에서는 고슴도치 이름표가 '부총장 고슴도치'
     setT($('#stCh'), head);
     const pe = $('#stPic'); pe.hidden = true; pe.innerHTML = '';
     if (pic && !(location.protocol === 'file:' && !window.FS_IMG_BASE)) {   // 그림은 게임 밖 파일이에요. 못 받으면 그림 없이 대사만 나와요
-      const p1 = ST_PICS[pic] ? pic : ST_PICS[pic2] ? pic2 : '', R = rt.st;   // 5.0.2 그 장면만의 그림이 이름표에 없으면 바로 장 그림
+      const p1 = ST_PICS[pic] ? pic : ST_PICS[pic2] ? pic2 : '', R = rt.st;   // 그 장면만의 그림이 이름표에 없으면 바로 장 그림
       if (p1) webImg(stPicUrl(p1), (u, im) => { if (rt.st === R) { pe.appendChild(im); pe.hidden = false; } });
       if (ST_PICS[picB]) webImg(stPicUrl(picB), (u, b) => { b.className = 'sy-p2'; if (rt.st === R) { rt.st.im2 = b; stPic2(); } });
     }
     stLine(); openModal(m);
     return true;
   }
-  // 4.2.0 장면이 가운데 줄을 넘으면 둘째 그림으로 부드럽게 바꿔요. 그림이 없으면 첫 그림 그대로
+  // 장면이 가운데 줄을 넘으면 둘째 그림으로 부드럽게 바꿔요. 그림이 없으면 첫 그림 그대로
   function stPic2() {
     const R = rt.st; if (!R || !R.im2) return;
-    if (R.sw) { if (!R.im2.classList.contains('solo')) R.im2.classList.toggle('on', R.i >= R.mid); return; }   // 4.2.1 이전으로 넘기면 첫 그림으로 돌아가요
+    if (R.sw) { if (!R.im2.classList.contains('solo')) R.im2.classList.toggle('on', R.i >= R.mid); return; }   // 이전으로 넘기면 첫 그림으로 돌아가요
     if (R.i < R.mid) return;
     R.sw = true;
     const pe = $('#stPic'), b = R.im2;
@@ -708,7 +708,7 @@
     if (pk) pb.innerHTML = L.pick.map((t, i) => `<button class="cta" type="button" data-stp="${i}">${esc(t)}</button>`).join('');
     else { setH($('#stAv'), nar ? '' : stAv(L.w)); $('#stAv').hidden = nar; setT($('#stWho'), nar ? '' : stName(L.w)); $('#stText').textContent = nl(L.t); }
     $('#stNext').hidden = pk; $('#stNext').textContent = R.i >= R.lines.length - 1 ? '닫기' : '다음';
-    $('#stPrev').hidden = R.i <= 0;   // 4.2.1 woodani: 앞 줄을 다시 읽을 수 있게
+    $('#stPrev').hidden = R.i <= 0;   // 앞 줄을 다시 읽을 수 있게
     setT($('#stStep'), `${R.i + 1} / ${R.lines.length}`);
   }
   function stNext() {
@@ -718,7 +718,7 @@
     if (R.i < R.lines.length - 1) { R.i += 1; stLine(); return; }
     stEnd();
   }
-  // 4.2.1 앞 줄로 돌아가요. 고른 답은 이미 그 뒤 대사로 바뀌어 있어서 다시 고르지는 않아요
+  // 앞 줄로 돌아가요. 고른 답은 이미 그 뒤 대사로 바뀌어 있어서 다시 고르지는 않아요
   function stPrev() {
     const R = rt.st; if (!R || R.i <= 0) return;
     sfx('tap'); R.i -= 1; stLine();
@@ -734,7 +734,7 @@
   function stEnd() {
     const R = rt.st; if (!R) return; rt.st = null;
     closeModal($('#mSt'));
-    if (R.id === 'tam') { if (!R.replay) tamToast('필살기 게이지가 차면\n반짝이는 대원 얼굴을 눌러요'); return; }   // 4.3.1 탐험 소개는 이야기 저장(S.sto)에 남기지 않아요
+    if (R.id === 'tam') { if (!R.replay) tamToast('필살기 게이지가 차면\n반짝이는 대원 얼굴을 눌러요'); return; }   // 탐험 소개는 이야기 저장(S.sto)에 남기지 않아요
     if (R.replay) return;
     const T = S.sto;
     if (R.id.startsWith('side:')) {
@@ -774,7 +774,7 @@
       host.appendChild(g);
     }
   }
-  // 5.1.1.2 woodani 제보: 잎사귀가 건물 이름표나 학생 그림 아래에 깔리면(특히 체육 선생님) 건물 창이 열렸어요. 누른 자리 아래에 잎사귀가 있으면 잎사귀가 먼저예요
+  // 잎사귀가 건물 이름표나 학생 그림 아래에 깔리면(특히 체육 선생님) 건물 창이 열렸어요. 누른 자리 아래에 잎사귀가 있으면 잎사귀가 먼저예요
   function sideBubAt(e) {
     const b = e.target.closest && e.target.closest('.sd-bub'); if (b || e.type === 'keydown' || e.clientX == null || !document.elementsFromPoint) return b;
     try { for (const el of document.elementsFromPoint(e.clientX, e.clientY)) { const x = el.closest && el.closest('.sd-bub'); if (x) return x; if (el.closest && el.closest('#fx .trial, #fx .talk, #fx .drop, #fx .visit')) return null; } } catch (err) { /* 못 찾으면 그대로 */ }
@@ -809,7 +809,7 @@
         (n >= ST_TAG_CH.length ? `<img class="nb-map" src="${stPicUrl('st_tagmap')}" alt="나무패를 맞춘 지도" onerror="this.remove()">` : '');
       h += '<div class="nb-list">' + CHAPTERS.map((nm, c) => { const open = c <= T.ch, o = open && ST['o' + c], cl = c < T.ch && ST['c' + c];
         return `<div class="nb-ch${open ? '' : ' dim'}"><b>${c + 1}장 ${nm}</b><span>` + (o ? `<button class="btn-link" type="button" data-sb="play:o${c}">여는 장면</button>` : '') + (cl ? `<button class="btn-link" type="button" data-sb="play:c${c}">닫는 장면</button>` : '') + '</span></div>'; }).join('') + '</div>';
-      if (S.tam && S.tam.seen) h += '<div class="nb-list"><div class="nb-ch"><b>숲속 탐험대</b><span><button class="btn-link" type="button" data-sb="play:tam">소개 다시 보기</button></span></div></div>';   // 4.3.1
+      if (S.tam && S.tam.seen) h += '<div class="nb-list"><div class="nb-ch"><b>숲속 탐험대</b><span><button class="btn-link" type="button" data-sb="play:tam">소개 다시 보기</button></span></div></div>';
     } else if (tab === 'side') {
       h += '<div class="nb-list">' + SIDE.map(X => { const n = sideN(X.id), can = sideCan(X), known = n > 0 || can;
         return `<div class="nb-ch${known ? '' : ' dim'}"><b>${X.nm}</b><small>${n}/${X.n}화${n >= X.n ? `, 칭호 '${X.title}'` : ''}</small><span>` + (can ? `<button class="cta small" type="button" data-sb="side:${X.id}:${n}">${n + 1}화 보기</button>` : '') +

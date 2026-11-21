@@ -2,7 +2,7 @@
      처음 시작한 학교에 고슴도치 교감 선생님이 화면 곳곳을 비추며 안내해요. 끝까지 보면 황금 도토리 1개.
      '나중에'를 누르면 다음에 열 때 다시 물어보고, 설정에서 언제든 이어 할 수 있어요. '건너뛰기'를 하면 보상은 없어요 */
   const TUT_GOLD = 1;
-  // 5.0.1.7 woodani 결정(F-03): 이야기 '첫 출근'을 먼저 보여 주고 튜토리얼은 세 장만. 참나무, 왼쪽 단추, 아래 탭은 그 기능이 처음 열릴 때 한 장씩(featTipCheck)
+  // 이야기 '첫 출근'을 먼저 보여 주고 튜토리얼은 세 장만. 참나무, 왼쪽 단추, 아래 탭은 그 기능이 처음 열릴 때 한 장씩(featTipCheck)
   const TUT = [
     { sel: '.board-top', t: '우리 학교 현황', d: '도토리는 수업료로 저절로 쌓여요. 학교 카드를 누르면 학생 정원과 학교 파워가 펼쳐져요. 세 장만 보면 황금 도토리를 드려요.' },
     { sel: '#questBar', t: '메인 퀘스트', d: '제가 할 일을 하나씩 알려 드려요. 다 하면 여기를 눌러 보상을 받아요. 막히면 눌러서 바로 가 보세요.' },
@@ -17,7 +17,7 @@
     // 처음 시작한 학교(메인 퀘스트 3개 전)에만 저절로 열어요. '나중에'를 눌렀으면 다음에 열 때 한 번 더 물어봐요
     if (!S || S.tut.st === 'done' || S.tut.st === 'skip' || rt.tutAsked) return;
     if (S.tut.st !== 'later' && S.q.m >= 3) return;
-    if (!(window.__FOREST_TEST && !window.__STORY_AUTO) && (rt.st || (S.sto && ((!S.sto.v && S.q.m === 0) || (S.sto.q && S.sto.q[0] === 'o0'))))) { setTimeout(tutAuto, 1200); return; }   // 5.0.1.7 F-03 이야기 '첫 출근'이 먼저
+    if (!(window.__FOREST_TEST && !window.__STORY_AUTO) && (rt.st || (S.sto && ((!S.sto.v && S.q.m === 0) || (S.sto.q && S.sto.q[0] === 'o0'))))) { setTimeout(tutAuto, 1200); return; }   // 이야기 '첫 출근'이 먼저
     rt.tutAsked = true;
     queueModal(() => { tutStart(S.tut.step || 0); return true; });
   }
@@ -28,7 +28,7 @@
     setTab('school');
     tutShow();
   }
-  // 1.5.3 한 번만 보여 주는 안내: 튜토리얼 상자를 빌려 한 장만 보여 줘요 (보상, 건너뛰기, 나중에 없음)
+  // 한 번만 보여 주는 안내: 튜토리얼 상자를 빌려 한 장만 보여 줘요 (보상, 건너뛰기, 나중에 없음)
   function tipStart(T) {
     rt.tut = { i: 0, confirm: false, one: T };
     rt.modalOpen = $('#tut');
@@ -37,10 +37,10 @@
     tutShow();
   }
   // 평판을 모으는 퀘스트를 처음 만나면, 퀘스트 칸을 누르면 올릴 곳을 알려 준다고 안내해요
-  // 5.0.1.7 F-03 기능이 처음 열릴 때 한 장 안내. 튜토리얼을 마친(또는 건너뛴) 학교에만, 한 번에 하나씩
+  // 기능이 처음 열릴 때 한 장 안내. 튜토리얼을 마친(또는 건너뛴) 학교에만, 한 번에 하나씩
   function featTipCheck() {
-    { const hd = $('#homeDot'); if (hd && S) { const on = rt.tab !== 'school' && !!curMain() && mainReady(); if (hd.hidden === on) hd.hidden = !on; } }   // 5.0.1.8 F-09 홈 밖에서 메인 퀘스트를 마치면 홈 탭에 빨간 점
-    { const fl = $('#foldL'); if (fl && S) { const any = [...$$('.map-left > :not(.side-fold)')].some(b => !b.hidden); if (fl.hidden === any) fl.hidden = !any; } }   // 5.0.1.7 F-18 왼쪽 단추가 하나도 없으면 접기 단추도 숨겨요
+    { const hd = $('#homeDot'); if (hd && S) { const on = rt.tab !== 'school' && !!curMain() && mainReady(); if (hd.hidden === on) hd.hidden = !on; } }   // 홈 밖에서 메인 퀘스트를 마치면 홈 탭에 빨간 점
+    { const fl = $('#foldL'); if (fl && S) { const any = [...$$('.map-left > :not(.side-fold)')].some(b => !b.hidden); if (fl.hidden === any) fl.hidden = !any; } }   // 왼쪽 단추가 하나도 없으면 접기 단추도 숨겨요
     if (!S || rt.tut || rt.modalOpen || rt.paused || rt.st || rt.tab !== 'school' || rt.sheetKey || rt.modalQueue.length || !S.tut.st || S.tut.st === 'later') return;
     if (window.__FOREST_TEST && !window.__STORY_AUTO) return;
     const vis = sel => { const e = $(sel); if (!e || e.hidden) return false; const r = e.getBoundingClientRect(); return r.width > 0 && r.height > 0; };
@@ -142,7 +142,7 @@
     if (!canStamp()) { shake($('#attGo')); return; }
     const i = S.att.n % 7, r = attValue(i), g = i === 6 ? GOLD.att7 : GOLD.att;
     S.att.n += 1; S.att.last = gameToday();
-    const gIt = i === 6 ? (addGold(g), { t: `황금 도토리 +${g}` }) : goldOr(g);   // 4.2.0 60개 뒤에는 7일째만 황금
+    const gIt = i === 6 ? (addGold(g), { t: `황금 도토리 +${g}` }) : goldOr(g);   // 60개 뒤에는 7일째만 황금
     if (r.kind === 'dip') { addDip(r.v); toast(`출석 도장 쾅! 수료증 +${r.v}장, ${gIt.t}`); }
     else { S.budget += r.v; earn(r.v); toast(`출석 도장 쾅! 도토리 +${fmt(r.v)}, ${gIt.t}`); }
     sfx('quest'); buzz(20);

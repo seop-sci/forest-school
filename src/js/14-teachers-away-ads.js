@@ -19,7 +19,7 @@
           <div class="teff"><span class="k">지금</span><span class="v now"></span><span class="k k-next">연수 후</span><span class="v next"></span></div>
           <button class="cta split small" type="button" data-k="vp"><span class="lbl"></span><span class="cost">${acornIcon()}<b></b></span></button>
         </div>
-      </article>` + xtCards(Object.keys(XT).filter(k => !XT[k].sub));   // 1.7.0 고슴도치 교감 선생님은 기존 선생님 밑에, 1.7.1 새 선생님은 그 밑에(2.3.0 과목 선생님은 교감 위에)
+      </article>` + xtCards(Object.keys(XT).filter(k => !XT[k].sub));   // 고슴도치 교감 선생님은 기존 선생님 밑에, 새 선생님은 그 밑에(과목 선생님은 교감 위에)
   }
   function xtCards(keys) {
     return keys.map(k => `
@@ -46,12 +46,12 @@
     setT($('.cost b', btn), fmt(c));
     setAt(btn, 'aria-disabled', (maxed || S.budget < c) ? 'true' : 'false');
   }
-  function profTitles() {   // 4.0.0 카드 이름과 소개 글, 탭 이름을 지금 학교급 호칭으로
+  function profTitles() {   // 카드 이름과 소개 글, 탭 이름을 지금 학교급 호칭으로
     const put = (k, o) => { const c = $(`.tcard[data-k="${k}"]`); if (!c) return; setT($('h3', c), o.name); const d = $('.tdesc', c); if (d) setT(d, o.desc); };
     for (const k of Object.keys(TEA)) put(k, TEA[k]);
     for (const k of Object.keys(XT)) put(k, XT[k]);
     put('vp', VP); { const c = $('.tcard[data-k="vp"]'); if (c) setT($('.chip', c), VP.subject); }
-    const nm = uniNow() ? '교직원' : '선생님';   // woodani 결정(2026-11-11): 유치원~고등학교는 선생님, 대학교부터 교직원
+    const nm = uniNow() ? '교직원' : '선생님';   // 유치원~고등학교는 선생님, 대학교부터 교직원
     { const t = $('#ttlTeachers span:last-child'); if (t) setT(t, nm); }
     { const t = $('#tabTeaTx'); if (t) setT(t, nm); }
     { const t = $('#qsecVp'); if (t) setT(t, profText('교감 선생님의 안내')); }
@@ -66,7 +66,7 @@
       setT($('.tlv', card), here ? `Lv.${L}` : '아직 안 오셨어요');
       setT($('.now', card), X.eff(L));
       setT($('.next', card), maxed ? '최고 레벨이에요' : X.eff(L + 1));
-      setT($('.k-next', card), here ? '연수 후' : '오시면');   // 5.0.1.5 T-11 못 만난 선생님
+      setT($('.k-next', card), here ? '연수 후' : '오시면');   // 못 만난 선생님
       const note = $('.tnote', card); setHid(note, here); setT(note, here ? '' : S.tier < (X.tier || 0) ? `${TIERS[X.tier].school}${X.fac === 'store' ? ' 매점' : X.fac === 'dorm' ? ' 기숙사' : X.fac === 'union' ? ' 학생회관' : X.fac === 'institute' ? ' 연구소' : ''}에서 오셔요.` : `${eul(FAC[X.fac].name)} 지으면 학교에 오셔요.`);
       const btn = $('button', card);
       setT($('.lbl', btn), maxed ? '최고 레벨' : '연수 보내기');
@@ -179,8 +179,8 @@
   }
 
   /* ---------- 자리 비운 동안 ---------- */
-  /* 2.0.0 보안 점검(1-8, 2-5): 켤 때의 자리 비운 시간은 서버 시간으로 재요.
-     서버 시간을 받을 수 있는 판은 서버 시간이 올 때까지 기다렸다가 계산하고(못 받고 끄면 S.away에 남겨 다음에 이어요),
+  /* 보안 점검(1-8, 2-5): 켤 때의 자리 비운 시간은 서버 시간으로 재요
+     서버 시간을 받을 수 있는 판은 서버 시간이 올 때까지 기다렸다가 계산하고(못 받고 끄면 S.away에 남겨 다음에 이어요)
      켠 뒤 놀던 시간(skip)은 빼요. 받지 않은 보상이 있어도 그 뒤 흐른 시간을 버리지 않아요 */
   function awayStart() {
     const from = S.away && S.away.from > 0 ? S.away.from : S.savedAt;
@@ -188,7 +188,7 @@
     rt.awayWait = { from, skip: (S.away && S.away.skip) || 0, perf: (document.hidden || rt.paused) ? null : perfNow() };
     if (serverTimeOk()) awaySettle();
   }
-  // 2.0.0 Codex 검토(6): 켠 뒤 논 시간(skip)은 화면이 보이고 학교가 열려 있는 동안만 세요. 앱을 내리거나 학교를 닫으면 멈췄다가, 다시 열면 이어 세요
+  // 켠 뒤 논 시간(skip)은 화면이 보이고 학교가 열려 있는 동안만 세요. 앱을 내리거나 학교를 닫으면 멈췄다가, 다시 열면 이어 세요
   function awaySkip(w) { return w.skip + (w.perf == null ? 0 : perfNow() - w.perf); }
   function awayHold(stop) {
     const w = rt.awayWait;
@@ -211,13 +211,13 @@
     S.oak = Math.min(OAK.max, S.oak + sec / OAK.regen);
     S.students = Math.min(capacity(), S.students + CFG.enroll * sec);
     if (sec < CFG.awayModalSec) { const g = rate() * sec; S.budget += g; earn(g); return; }
-    const ov = nsOverlap(gameNow() - sec * 1000, gameNow());   // 3.0.0 야간 자율학습을 켠 밤과 겹친 시간
-    const used = Math.min(sec, Math.max(0, (offlineCapH() + (ov > 0 ? nsExtraH() : 0)) * 3600 - S.pendingSec));   // 2.0.0 보안 점검(1-3): 받지 않은 보상과 합쳐 상한까지만
+    const ov = nsOverlap(gameNow() - sec * 1000, gameNow());   // 야간 자율학습을 켠 밤과 겹친 시간
+    const used = Math.min(sec, Math.max(0, (offlineCapH() + (ov > 0 ? nsExtraH() : 0)) * 3600 - S.pendingSec));   // 보안 점검(1-3): 받지 않은 보상과 합쳐 상한까지만
     const nsUsed = Math.min(used, ov), base = rate() * offlineEff();
     S.pending += base * (used + nsUsed * nsBonus());
     if (nsUsed > 0) { S.ns.got += base * nsUsed * (1 + nsBonus()); S.ns.sec += nsUsed; rt.nsAway = true; S.st.nsAway = (S.st.nsAway || 0) + 1; }
     S.pendingSec += sec;
-    if (sec < CFG.awayQuietSec && S.pendingSec === sec && !rt.nsAway && rt.modalOpen !== $('#mOffline')) { const v = S.pending; grantOffline(1); toast(`자리 비운 ${fmtDur(sec)} 동안 도토리 +${fmt(v)}`); return; }   // 5.0.1.7 F-14
+    if (sec < CFG.awayQuietSec && S.pendingSec === sec && !rt.nsAway && rt.modalOpen !== $('#mOffline')) { const v = S.pending; grantOffline(1); toast(`자리 비운 ${fmtDur(sec)} 동안 도토리 +${fmt(v)}`); return; }
     save();
     if (rt.modalOpen === $('#mOffline')) fillOffline();
     else queueModal(showOffline);
@@ -230,9 +230,9 @@
       ? profText(`부엉이 선생님이 밤에도 수업해서 수업료의 ${pct}%가 쌓였어요.`)
       : `자리 비운 동안은 수업료의 ${pct}%가 쌓여요.`;
     if (S.pendingSec > offlineCapH() * 3600) fine += ` 도토리는 최대 ${offlineCapH()}시간까지 쌓여요.`;
-    if (rt.nsAway) fine += ` 야간 자율학습으로 ${hm(nsExtraH() * 3600)} 더 쌓였어요.`;   // 3.0.0
+    if (rt.nsAway) fine += ` 야간 자율학습으로 ${hm(nsExtraH() * 3600)} 더 쌓였어요.`;
     $('#offFine').textContent = fine;
-    renderAdPick('#offPick', '도토리 +100%'); $('#offDouble').textContent = adPickNow() === 'acorn' ? '광고 보고 +100%' : '광고 보고 함께 받기';   // 4.2.0
+    renderAdPick('#offPick', '도토리 +100%'); $('#offDouble').textContent = adPickNow() === 'acorn' ? '광고 보고 +100%' : '광고 보고 함께 받기';
   }
   function showOffline() {
     if (!(S.pending > 0)) return false;
@@ -253,10 +253,10 @@
   function claimOffline() { grantOffline(1); closeModal($('#mOffline')); }
   // 광고를 끝까지 보면 2배, 중간에 닫으면 기본 보상만
   function claimOfflineDouble() {
-    const pk = adPickNow();   // 4.2.0 고등학교부터: 두 배 대신 공사 단축이나 숲의 정수를 함께 받을 수 있어요
+    const pk = adPickNow();   // 고등학교부터: 두 배 대신 공사 단축이나 숲의 정수를 함께 받을 수 있어요
     closeModal($('#mOffline'), () => showAd(
       () => { if (pk === 'acorn') { grantOffline(2); toast('+100%로 받았어요!'); } else { grantOffline(1); toast('광고 보상! ' + adPickGive(pk)); } },
-      r => {   // 2026-11-11: 광고가 아직 준비 안 됐으면 보상을 주지 않고 창을 다시 열어요(2배 기회를 잃지 않게). 보상은 S.pending에 그대로 있어요
+      r => {   // 광고가 아직 준비 안 됐으면 보상을 주지 않고 창을 다시 열어요(2배 기회를 잃지 않게). 보상은 S.pending에 그대로 있어요
         if (r === 'noad') { setTimeout(() => { if (S.pending > 0 && !rt.modalOpen) showOffline(); }, 350); return; }
         grantOffline(1); toast('광고를 끝까지 보지 않아서 기본 보상만 받았어요'); }
     ));
@@ -270,11 +270,11 @@
     const EXT = AIT && AIT.ads ? AIT : ADS_EXT;   // 토스 광고나 안드로이드 애드몹 광고
     if (EXT) {
       // 토스 리워드 광고: 끝까지 봤다는 신호(userEarnedReward)가 왔을 때만 보상을 줘요
-      // 1.6.0: 광고가 아직 없으면 알려 주고, 광고를 못 봤을 때의 처리(onSkip)를 '광고 없음'으로 불러요. 기본 보상이나 버튼이 사라지지 않게요
+      // 광고가 아직 없으면 알려 주고, 광고를 못 봤을 때의 처리(onSkip)를 '광고 없음'으로 불러요. 기본 보상이나 버튼이 사라지지 않게요
       if (!EXT.adReady()) { EXT.preload(); rt.adNoGold = false; toast('광고를 불러오지 못했어요. 잠시 뒤에 다시 눌러 주세요' + adErrText(EXT)); if (onSkip) onSkip('noad'); return; }
       rt.adOpen = true;
       if (actx && actx.state === 'running') actx.suspend().catch(() => {});   // 광고 중에는 게임 소리를 멈춰요
-      // 4.0.1 (3.3.2 분석): 광고가 끝났다는 신호가 3분 동안 안 오면 풀어 줘요(광고 단추가 영영 막히지 않게). 늦게 온 신호는 받지 않아요
+      // 광고가 끝났다는 신호가 3분 동안 안 오면 풀어 줘요(광고 단추가 영영 막히지 않게). 늦게 온 신호는 받지 않아요
       const tok = rt.adTok = (rt.adTok || 0) + 1;
       clearTimeout(rt.adGuard);
       rt.adGuard = setTimeout(() => {
@@ -287,7 +287,7 @@
       EXT.showAd(r => { if (rt.adTok !== tok) return; clearTimeout(rt.adGuard); rt.adOk = onReward; rt.adNo = onSkip || null; rt.adEarned = !!(r && r.earned); closeAd(); });
       return;
     }
-    // 4.0.1 woodani 결정(2026-11-11): 토스 판에서 광고를 쓸 수 없으면 시험 광고 창 대신 알림만 띄워요(보상 없음)
+    // 토스 판에서 광고를 쓸 수 없으면 시험 광고 창 대신 알림만 띄워요(보상 없음)
     if (AIT) { rt.adNoGold = false; toast('지금은 광고를 볼 수 없어요\n잠시 뒤에 다시 눌러 주세요'); if (onSkip) onSkip('noad'); return; }
     rt.adOpen = true; rt.adOk = onReward; rt.adNo = onSkip || null; rt.adEarned = false;
     let left = BOOST.adSec;
@@ -319,17 +319,17 @@
     ensureAudio(); musicSync();
     const ok = rt.adOk, no = rt.adNo, earned = rt.adEarned, noGold = rt.adNoGold;
     rt.adOk = rt.adNo = null; rt.adNoGold = false;
-    if (earned) { S.st.ads += 1; adxDay(); S.adx.all = Math.min(10000, (S.adx.all || 0) + 1); if (!noGold) adGold(); adStamp(); if (ok) ok(); }   // 5.0.1 오늘 본 광고 수(관리자 지표)
+    if (earned) { S.st.ads += 1; adxDay(); S.adx.all = Math.min(10000, (S.adx.all || 0) + 1); if (!noGold) adGold(); adStamp(); if (ok) ok(); }   // 오늘 본 광고 수(관리자 지표)
     else if (no) no();
     else toast('광고를 끝까지 보지 않아서 보상이 없어요');
   }
 
-  /* 부엉이 선생님 보충수업: 광고 1편에 수업료 30분치(2.3.1, 그전 10분치), 하루 5번 */
+  /* 부엉이 선생님 보충수업: 광고 1편에 수업료 30분치(그전 10분치), 하루 5번 */
   const boostShown = () => S.u.boost && boostLeft() > 0 && (Date.now() < rt.boostUntil || rt.modalOpen === $('#mBoost'));
   function updateBoostWin(dt) {
     if (!S.u.boost || boostLeft() <= 0 || Date.now() < rt.boostUntil) return;
     if (festBusy()) return;
-    rt.boostT = Math.max(0, rt.boostT - dt);   // 5.0.1.2 다른 탭에 있어도 기다리는 시간이 줄어요(예전에는 홈에 있어야만 줄었어요). 나오는 것은 홈에서만
+    rt.boostT = Math.max(0, rt.boostT - dt);   // 다른 탭에 있어도 기다리는 시간이 줄어요(예전에는 홈에 있어야만 줄었어요). 나오는 것은 홈에서만
     if (rt.boostT > 0 || rt.tab !== 'school' || rt.modalOpen) return;
     rt.boostT = rand(BOOSTW.gap[0], BOOSTW.gap[1]);
     rt.boostUntil = Date.now() + BOOSTW.life * 1000;
@@ -354,7 +354,7 @@
     sfx('tap');
     openModal($('#mBoost'));
   }
-  function boostPickSync() {   // 4.2.0 고등학교부터 보상 고르기
+  function boostPickSync() {   // 고등학교부터 보상 고르기
     renderAdPick('#boostPick', '도토리 받기');
     const a = adPickNow() === 'acorn';
     $('#boostAmtBox').hidden = !a;
@@ -370,14 +370,14 @@
       const today = gameToday();
       if (dayRoll(S.ad, today)) { S.ad.n = 0; }
       S.ad.n += 1;
-      if (pk !== 'acorn') { const tx = adPickGive(pk); sfx('quest'); buzz(15); toast(`보충수업 끝! ${tx}`); save(); renderHUD(); renderAffordance(); return; }   // 4.2.0
+      if (pk !== 'acorn') { const tx = adPickGive(pk); sfx('quest'); buzz(15); toast(`보충수업 끝! ${tx}`); save(); renderHUD(); renderAffordance(); return; }
       S.budget += v; earn(v);
       floatText(180, 40, '+' + fmt(v), 'gold');
       sfx('quest'); buzz(15);
       toast(`보충수업 끝! 도토리 +${fmt(v)}`);
       save(); renderHUD(); renderAffordance();
     }, r => {
-      if (r === 'noad') { rt.boostUntil = keep; renderBoostBtn(); }   // 1.6.0: 광고가 없었으면 부엉이 버튼을 그대로 둬요
+      if (r === 'noad') { rt.boostUntil = keep; renderBoostBtn(); }   // 광고가 없었으면 부엉이 버튼을 그대로 둬요
       else toast('광고를 끝까지 보지 않아서 보상이 없어요');
     }));
   }
@@ -413,7 +413,7 @@
   function updateDeal(dt) {
     if (rt.deal) { if ((Date.now() > rt.deal.exp || (festBusy() && rt.modalOpen !== $('#mDeal'))) && !rt.adOpen && !rt.deal.taken) expireDeal(); return; }
     if (!dealUnlocked() || dealLeft() <= 0 || festBusy()) return;   // 학교 행사 중에는 까치가 오지 않아요
-    rt.dealT = Math.max(0, rt.dealT - dt);   // 5.0.1.2 다른 탭에 있어도 기다리는 시간이 줄어요. 까치는 홈에 돌아오면 와요
+    rt.dealT = Math.max(0, rt.dealT - dt);   // 다른 탭에 있어도 기다리는 시간이 줄어요. 까치는 홈에 돌아오면 와요
     if (rt.dealT > 0 || rt.tab !== 'school') return;
     if (!spawnDeal()) rt.dealT = DEAL.retry;
   }
@@ -423,7 +423,7 @@
     d.exp = Date.now() + DEAL.life * 1000;
     rt.deal = d;
     rt.dealT = rand(DEAL.gap[0], DEAL.gap[1]);
-    dexMeet('g_magpie');   // 1.7.0 도감 특별 손님
+    dexMeet('g_magpie');   // 도감 특별 손님
     if (!S.hd.seen) { S.hd.seen = true; toast('까치가 소식을 물어 왔어요!\n지도 오른쪽 아래 까치를 눌러 보세요'); save(); }
     sfx('magpie');
     renderDeal();
@@ -437,7 +437,7 @@
   const clock = sec => `${Math.floor(sec / 60)}:${String(sec % 60).padStart(2, '0')}`;
   function renderDeal() {
     const b = $('#btnDeal'), d = rt.deal;
-    if (b.hidden !== !d) { setHid(b, !d); chipRow(); }   // 3.2.6 바뀐 때만, 3.3.4 아래 줄 맞추기
+    if (b.hidden !== !d) { setHid(b, !d); chipRow(); }   // 바뀐 때만, 아래 줄 맞추기
     if (d) {
       const t = clock(Math.max(0, Math.ceil((d.exp - Date.now()) / 1000)));
       if (b.dataset.t !== t) { b.dataset.t = t; $('#dealTime').textContent = t; b.setAttribute('aria-label', `까치 핫딜, ${t} 남았어요`); }
@@ -520,7 +520,7 @@
       if (!ok) { S.hd.n -= 1; save(); renderDeal(); toast('도토리가 모자라서 핫딜을 쓰지 못했어요. 횟수는 그대로예요'); return; }
       // 산 건물이나 오신 선생님 위로 아낀 도토리가 떠올라요
       const T = geo().tea || {}, tq = (d.k === 'owl' && !(S.f.library > 0) ? T.owlAway : T[d.k]) || geo().plaza;
-      const bp = bpos(d.k) || [geo().plaza[0], geo().plaza[1], 0];   // 4.0.0 다른 구역 건물이면 광장 위에 띄워요
+      const bp = bpos(d.k) || [geo().plaza[0], geo().plaza[1], 0];   // 다른 구역 건물이면 광장 위에 띄워요
       const tp = isFac ? [bp[0], bp[1] - bp[2] * 0.3] : [tq[0], tq[1] - 20];
       setTimeout(() => floatText(tp[0], tp[1], `반값! ${fmt(full - half)} 아낌`, 'gold'), 250);
     } else if (d.type === 'feast') {

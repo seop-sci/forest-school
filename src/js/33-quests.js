@@ -6,22 +6,22 @@
   const qtGoalGrade = q => `${CFG.grades[q.n].title} 되기`;   // grade, ygrade
   const qtMeasureGrade = q => rep();   // grade, ygrade
   const qtGoGrade = q => goRep('지금 평판을 올리기 좋은 곳이에요');   // grade, ygrade
-  // 3.3.3 woodani: 아직 대도시가 아니면 평판 올릴 곳으로, 대도시가 되어 열 수 있으면 졸업 탭으로
+  // 아직 대도시가 아니면 평판 올릴 곳으로, 대도시가 되어 열 수 있으면 졸업 탭으로
   const qtGoGrads = q => canGraduate() || S.grade >= GRAD_MIN ? goGrad() : goRep(`대도시가 되어야 ${semFirst() ? '방학식' : '종업식'}을 열 수 있어요. 지금 평판을 올리기 좋은 곳이에요`);   // grads, tgrads, semH
   const qtGoFperks = q => goGrad('fund');   // fperks, fpUp
   const qtGoTrips = q => openTrip();   // trips, souv, tripat
   const qtGoSports = q => openFest();   // sports, fest
-  const qtGoClub = q => setTab('club');   // 2.0.0, 2.2.0 대항전   // club, shows, clubSum, star, clubShown, clubMat, cgPrac, cgShow
-  const qtGoAcMax = q => setTab('mini');   // 2.0.1 공부 탭   // acMax, acBook, acSum
-  const qtGoElects = q => openElect();   // 2.0.1   // elects, elMid
+  const qtGoClub = q => setTab('club');   // 대항전. club, shows, clubSum, star, clubShown, clubMat, cgPrac, cgShow
+  const qtGoAcMax = q => setTab('mini');   // 공부 탭. acMax, acBook, acSum
+  const qtGoElects = q => openElect();   // elects, elMid
   const qtGoBtPlays = q => { setTab('mini'); return toast('공부 탭의 숲속 대결을 눌러요'); };   // btPlays, btLg, btWins, btMid
-  const qtGoBxSeen = q => { if (bxOpen()) { if (S.bx.sp.length) { setTab('school'); return toast('지도에서 흔들리는 풀숲이나 물가를 눌러 봐요'); } return toast(`지금은 숨은 생물이 없어요. ${hm(Math.max(60, Math.ceil((S.bx.next - gameNow()) / 1000)))} 뒤에 새 생물이 숨어요`); } return toast('생물 탐사는 초등학교부터 열려요'); };   // 2.2.0   // bxSeen, bxKinds
-  const qtGoGdHarvest = q => { if (gdOpen()) return openGd(); return goFac('cafeteria', '급식실을 지으면 텃밭을 가꿀 수 있어요'); };   // 2.2.0   // gdHarvest, gdPlant, gdCook
-  const qtGoSnDraw = q => { if (snOpen()) return openSn(); return goFac('store', '매점을 지으면 간식 뽑기를 할 수 있어요'); };   // 2.1.2   // snDraw, snDex
-  const qtGoTr2Go = q => openTr2();   // 3.2.0   // tr2Go, tr2Back
-  const qtGoCsTalk = q => { if (hallOpen() && csOpen()) return openCounsel(); return xtHere('cou') ? goTeacher('cou') : toast('상담실은 고등학교부터 열려요'); };   // 3.1.0   // csTalk, csPick
-  const qtGoNsOn = q => { if (nsOpen()) return openNs(); return goFac('dorm', '기숙사를 지으면 야간 자율학습을 켤 수 있어요'); };   // 3.0.0   // nsOn, nsGot, nsFinished
-  const qtGoVdGive = q => { setTab('school'); if (vdOpen()) return openVd(); return toast('마을 기부는 초등학교부터 열려요'); };   // 2.1.2   // vdGive, vdLv
+  const qtGoBxSeen = q => { if (bxOpen()) { if (S.bx.sp.length) { setTab('school'); return toast('지도에서 흔들리는 풀숲이나 물가를 눌러 봐요'); } return toast(`지금은 숨은 생물이 없어요. ${hm(Math.max(60, Math.ceil((S.bx.next - gameNow()) / 1000)))} 뒤에 새 생물이 숨어요`); } return toast('생물 탐사는 초등학교부터 열려요'); };   // bxSeen, bxKinds
+  const qtGoGdHarvest = q => { if (gdOpen()) return openGd(); return goFac('cafeteria', '급식실을 지으면 텃밭을 가꿀 수 있어요'); };   // gdHarvest, gdPlant, gdCook
+  const qtGoSnDraw = q => { if (snOpen()) return openSn(); return goFac('store', '매점을 지으면 간식 뽑기를 할 수 있어요'); };   // snDraw, snDex
+  const qtGoTr2Go = q => openTr2();   // tr2Go, tr2Back
+  const qtGoCsTalk = q => { if (hallOpen() && csOpen()) return openCounsel(); return xtHere('cou') ? goTeacher('cou') : toast('상담실은 고등학교부터 열려요'); };   // csTalk, csPick
+  const qtGoNsOn = q => { if (nsOpen()) return openNs(); return goFac('dorm', '기숙사를 지으면 야간 자율학습을 켤 수 있어요'); };   // nsOn, nsGot, nsFinished
+  const qtGoVdGive = q => { setTab('school'); if (vdOpen()) return openVd(); return toast('마을 기부는 초등학교부터 열려요'); };   // vdGive, vdLv
   const qtGoPz = q => { setTab('mini'); return toast('숲속 퍼즐의 시작하기를 눌러요'); };   // pz, pzBest
   const qtGoMgBest = q => { setTab('mini'); return toast('숲속 합치기의 시작하기를 눌러요'); };   // mgBest, mgOrders, mgDex
   const QT = {
@@ -33,7 +33,7 @@
     fur: {
       measure: q => S.fu[q.k][q.i],
       goal: q => q.n === 1 ? `${FUR[q.k][q.i].name} 고치기` : `${FUR[q.k][q.i].name} Lv.${q.n}`,
-      go: q => goFur(q.k, q.i)   // 2.0.1
+      go: q => goFur(q.k, q.i)
     },
     furAll: {
       measure: q => Math.min(...S.fu[q.k]),
@@ -41,7 +41,7 @@
       go: q => goFur(q.k, -1)
     },
     facAll: {
-      measure: q => Math.min(...(q.ks || CAMPUS8).map(k => S.f[k] || 0)),   // 5.0.1.3 대학원: 캠퍼스 건물 여덟 채 가운데 가장 낮은 레벨. 5.0.2.1 ks가 있으면 그 건물만
+      measure: q => Math.min(...(q.ks || CAMPUS8).map(k => S.f[k] || 0)),   // 대학원: 캠퍼스 건물 여덟 채 가운데 가장 낮은 레벨. ks가 있으면 그 건물만
       goal: q => q.ks ? q.title : `캠퍼스 건물 모두 Lv.${q.n}`,
       go: q => { const k = facAllNext(q.n, q.ks) || (q.ks || CAMPUS8).filter(x => (S.f[x] || 0) < q.n)[0]; return k ? goFac(k) : setTab('school'); }
     },
@@ -82,14 +82,14 @@
         setTab('school'); return toast(`참나무를 누르면 도토리가 떨어져요\n떨어진 도토리를 눌러서 주워요`); }
     },
     zones: {
-      measure: q => ZONE_KEYS.filter(z => z !== 'lab' && S.zv && S.zv[z]).length,   // 5.0.0 연구 구역은 세지 않아요(대학교 퀘스트 그대로)   // 4.0.0 들어가 본 구역 수
+      measure: q => ZONE_KEYS.filter(z => z !== 'lab' && S.zv && S.zv[z]).length,   // 연구 구역은 세지 않아요(대학교 퀘스트 그대로). 들어가 본 구역 수
       goal: q => `구역 ${q.n}곳 둘러보기`,
-      go: q => { setTab('school'); const z = ZONE_KEYS.find(z => zoneOpen(z) && !(S.zv && S.zv[z])); if (zoneKey()) setZone(''); return toast(z ? `캠퍼스 지도에서 ${ZONE_GEO[ZONE_KEYS.indexOf(z)].zname} 이름표를 눌러 봐요` : '구역을 모두 둘러봤어요'); }   // 4.0.0
+      go: q => { setTab('school'); const z = ZONE_KEYS.find(z => zoneOpen(z) && !(S.zv && S.zv[z])); if (zoneKey()) setZone(''); return toast(z ? `캠퍼스 지도에서 ${ZONE_GEO[ZONE_KEYS.indexOf(z)].zname} 이름표를 눌러 봐요` : '구역을 모두 둘러봤어요'); }
     },
     dept: {
-      measure: q => deptPicks().length,   // 4.0.0 다니는 단과대학 수
+      measure: q => deptPicks().length,   // 다니는 단과대학 수
       goal: q => q.n > 1 ? `복수전공 ${q.n - 1}개 하기` : '주전공 고르기',
-      go: q => { if (deptOpen()) return openDept(); return goFac('union', '학생회관을 지으면 학과 사무실이 열려요'); }   // 4.0.0
+      go: q => { if (deptOpen()) return openDept(); return goFac('union', '학생회관을 지으면 학과 사무실이 열려요'); }
     },
     trials: {
       goal: q => q.n === 1 ? '매나 뱀 쫓아내기' : `매나 뱀 ${q.n}번 쫓아내기`,
@@ -135,7 +135,7 @@
       go: qtGoGrads
     },
     semH: {
-      measure: q => S.tg + (S.sem ? 1 : 0),   // 2.1.0 그 학년 1학기 방학식을 열었는지
+      measure: q => S.tg + (S.sem ? 1 : 0),   // 그 학년 1학기 방학식을 열었는지
       goal: q => gradOn() ? `${gradSemTxt(q.n, 0)} 세미나 열기` : `${q.n}${tierInfo().unit} 1학기 방학식 열기`,
       go: qtGoGrads
     },
@@ -153,7 +153,7 @@
       go: qtGoTrips
     },
     sports: {
-      goal: q => q.n === 1 ? `${FEST.sports.name} 열기` : `${FEST.sports.name} ${q.n}번 열기`,   // 5.0.3.1 중학교부터 체육대회
+      goal: q => q.n === 1 ? `${FEST.sports.name} 열기` : `${FEST.sports.name} ${q.n}번 열기`,   // 중학교부터 체육대회
       go: qtGoSports
     },
     fest: {
@@ -162,12 +162,12 @@
       go: qtGoSports
     },
     tripat: {
-      measure: q => (S.trip.been[q.k] || 0) + (S.trip.cur === q.k ? 1 : 0),   // 4.4.0 woodani 요청(11-5 졸업 여행): 보내면 바로 완료
+      measure: q => (S.trip.been[q.k] || 0) + (S.trip.cur === q.k ? 1 : 0),   // 보내면 바로 완료
       goal: q => `${TRIP[q.k].name} 체험학습 보내기`,
       go: qtGoTrips
     },
     club: {
-      // 2.0.0 동아리 퀘스트
+      // 동아리 퀘스트
       measure: q => rosterOn() ? Math.min(ROSTER_N, S.roster.list.filter(s => s.c >= 0).length) : 0,
       goal: q => `동아리 ${q.n}자리 채우기`,
       go: qtGoClub
@@ -177,7 +177,7 @@
       go: qtGoClub
     },
     elects: {
-      goal: q => q.n === 1 ? '반장 뽑기' : `반장 ${q.n}번 뽑기`,   // 2.0.1
+      goal: q => q.n === 1 ? '반장 뽑기' : `반장 ${q.n}번 뽑기`,
       go: qtGoElects
     },
     elMid: {
@@ -200,12 +200,12 @@
       go: qtGoClub
     },
     fpUp: {
-      measure: q => Math.max(0, S.st.fperks - (S.tfp || 0)),   // 2.0.0 이 학교급에 와서 장학재단을 고친 횟수(퀘스트 전에 고쳤어도 쳐요)
+      measure: q => Math.max(0, S.st.fperks - (S.tfp || 0)),   // 이 학교급에 와서 장학재단을 고친 횟수(퀘스트 전에 고쳤어도 쳐요)
       goal: q => `장학재단 ${q.n}번 고치기`,
       go: qtGoFperks
     },
     mgBest: {
-      measure: q => Math.max(0, ...Object.values(S.mg.best)),   // 1.8.0 숲속 합치기에서 만든 가장 높은 단계
+      measure: q => Math.max(0, ...Object.values(S.mg.best)),   // 숲속 합치기에서 만든 가장 높은 단계
       goal: q => `숲속 합치기 ${q.n}단계 만들기`,
       go: qtGoMgBest
     },
@@ -219,90 +219,90 @@
       go: qtGoPz
     },
     ta: {
-      measure: q => !S.ta ? 0 : q.k === 'seat' ? S.ta.seat.filter(x => x && x.b).length : q.k === 'trip' ? S.ta.n : S.ta.mon,   // 5.1.0 조교 자리, 파견 횟수, 기념비 단계
+      measure: q => !S.ta ? 0 : q.k === 'seat' ? S.ta.seat.filter(x => x && x.b).length : q.k === 'trip' ? S.ta.n : S.ta.mon,   // 조교 자리, 파견 횟수, 기념비 단계
       goal: q => q.title || '',
-      // 1.8.0 보강 퀘스트
-      go: q => { if (!rtOpen()) return toast('연구 구역 연구소를 지으면 열려요'); rt.rxTab = 'ta'; return openRx(); }   // 5.1.0
+      // 보강 퀘스트
+      go: q => { if (!rtOpen()) return toast('연구 구역 연구소를 지으면 열려요'); rt.rxTab = 'ta'; return openRx(); }
     },
     pp: {
-      measure: q => !S.pp ? 0 : q.k === 'n' ? S.pp.n : q.k === 'cb' ? Math.max(S.pp.cb, S.pp.cf) : q.k === 'deep' ? rtLv(q.b) : S.pp.sem,   // 5.2.0 논문 편수, 가장 높은 학회 점수, 심화 칸, 세미나 횟수
+      measure: q => !S.pp ? 0 : q.k === 'n' ? S.pp.n : q.k === 'cb' ? Math.max(S.pp.cb, S.pp.cf) : q.k === 'deep' ? rtLv(q.b) : S.pp.sem,   // 논문 편수, 가장 높은 학회 점수, 심화 칸, 세미나 횟수
       goal: q => q.title || '',
-      go: q => { if (!rtOpen()) return toast('연구 구역 연구소를 지으면 열려요'); rt.rxTab = q.k === 'deep' ? 'tree' : 'paper'; if (q.k === 'deep') rt.rtSel = q.b; return openRx(); }   // 5.2.0
+      go: q => { if (!rtOpen()) return toast('연구 구역 연구소를 지으면 열려요'); rt.rxTab = q.k === 'deep' ? 'tree' : 'paper'; if (q.k === 'deep') rt.rtSel = q.b; return openRx(); }
     },
     xt: {
-      measure: q => xtLv(q.k),   // 1.8.0 영양, 사서 선생님 연수 레벨
+      measure: q => xtLv(q.k),   // 영양, 사서 선생님 연수 레벨
       goal: q => `${XT[q.k].name} Lv.${q.n}`,
       go: q => xtHere(q.k) ? goTeacher(q.k) : goFac(XT[q.k].fac, `${eul(FAC[XT[q.k].fac].name)} 지으면 오셔요`)
     },
     vp: {
-      measure: q => vpLv(),   // 1.8.0 교감 선생님 연수 레벨
+      measure: q => vpLv(),   // 교감 선생님 연수 레벨
       goal: q => `${VP.name} Lv.${q.n}`,
       go: q => goTeacher('vp')
     },
     deco: {
-      measure: q => decoPlacedAll(),   // 1.8.0 지도에 놓은 장식 수
+      measure: q => decoPlacedAll(),   // 지도에 놓은 장식 수
       goal: q => `지도에 장식 ${q.n}개 놓기`,
       go: q => setTab('deco')
     },
     ach: {
-      measure: q => ACH.reduce((a, x) => a + achGot(x.id), 0),   // 1.8.0 받은 업적 메달 수
+      measure: q => ACH.reduce((a, x) => a + achGot(x.id), 0),   // 받은 업적 메달 수
       goal: q => `업적 메달 ${q.n}개 받기`,
       go: q => { setTab('dex'); return setDexSeg('ach'); }
     },
     mgDex: {
-      measure: q => mgDexN(),   // 1.8.0 합치기 도감 칸
+      measure: q => mgDexN(),   // 합치기 도감 칸
       goal: q => `합치기 도감 ${q.n}칸 채우기`,
       go: qtGoMgBest
     },
     pzBest: {
-      measure: q => S.pz.best,   // 1.8.0 숲속 퍼즐 최고 점수
+      measure: q => S.pz.best,   // 숲속 퍼즐 최고 점수
       goal: q => `숲속 퍼즐 ${fmt(q.n)}점 넘기기`,
       go: qtGoPz
     },
     acMax: {
-      measure: q => Math.max(...AC.keys.map(acLv)),   // 2.0.1 공부: 가장 높은 과목 레벨
-      goal: q => `과목 하나 Lv.${q.n} 만들기`,   // 2.0.1 공부
+      measure: q => Math.max(...AC.keys.map(acLv)),   // 공부: 가장 높은 과목 레벨
+      goal: q => `과목 하나 Lv.${q.n} 만들기`,   // 공부
       go: qtGoAcMax
     },
     acSum: {
-      measure: q => acSum(),   // 2.1.0 학기 숙제: 다섯 과목 레벨 합
+      measure: q => acSum(),   // 학기 숙제: 다섯 과목 레벨 합
       goal: q => `다섯 과목 레벨 합 ${q.n} 만들기`,
       go: qtGoAcMax
     },
     acBook: {
-      measure: q => S.ac.st.bk,   // 2.0.1 산 문제집 수
+      measure: q => S.ac.st.bk,   // 산 문제집 수
       goal: q => q.n === 1 ? '문제집 한 권 풀기' : `문제집 ${q.n}권 풀기`,
       go: qtGoAcMax
     },
     clubMat: {
-      measure: q => clubMembers(4).length,   // 2.0.1 수학부 부원 수
+      measure: q => clubMembers(4).length,   // 수학부 부원 수
       goal: q => `수학부 부원 ${q.n}명`,
       go: qtGoClub
     },
     rdBooks: {
-      measure: q => S.rd.st,   // 2.0.1 다 읽은 책 수
+      measure: q => S.rd.st,   // 다 읽은 책 수
       goal: q => q.n === 1 ? '책 한 권 다 읽기' : `책 ${q.n}권 다 읽기`,
       go: q => rdReady() ? openRead() : goFac('library', `${eul(FAC.library.name)} 먼저 지어야 해요`)
     },
     labs: {
-      measure: q => S.lab.st.n,   // 2.0.1 실험 횟수
+      measure: q => S.lab.st.n,   // 실험 횟수
       goal: q => q.n === 1 ? '과학 실험 한 번 하기' : `과학 실험 ${q.n}번 하기`,
       go: q => labReady() ? openLab() : goFac('science', `${eul(FAC.science.name)} 먼저 지어야 해요`)
     },
     picnics: {
-      measure: q => S.pc.st.n + (pcActive() ? 1 : 0),   // 2.1.0 소풍 횟수. 보낸 순간부터 한 번으로 쳐요(woodani 제보: 미리 보낸 소풍이 퀘스트에 안 쳐짐)
-      goal: q => q.n === 1 ? '숲속 소풍 보내기' : `숲속 소풍 ${q.n}번 보내기`,   // 2.1.0
-      go: q => pcReady() ? openPicnic() : goFac('playground', `${eul(FAC.playground.name)} 먼저 지어야 해요`)   // 2.1.0
+      measure: q => S.pc.st.n + (pcActive() ? 1 : 0),   // 소풍 횟수. 보낸 순간부터 한 번으로 쳐요(미리 보낸 소풍이 퀘스트에 안 쳐짐)
+      goal: q => q.n === 1 ? '숲속 소풍 보내기' : `숲속 소풍 ${q.n}번 보내기`,
+      go: q => pcReady() ? openPicnic() : goFac('playground', `${eul(FAC.playground.name)} 먼저 지어야 해요`)
     },
     stickers: {
-      measure: q => S.sk.st.all,   // 2.1.0 받은 칭찬 스티커 수
+      measure: q => S.sk.st.all,   // 받은 칭찬 스티커 수
       goal: q => `칭찬 스티커 ${q.n}장 모으기`,
       go: q => openSticker()
     },
     frPat: {
-      measure: q => S.frc ? S.frc.pat : 0,   // 2.1.1 단짝 쓰다듬기, 선물, 앨범 열기(지금까지 한 횟수)
-      goal: q => '단짝 친구 쓰다듬기',   // 2.1.1
-      go: q => { setTab('school'); return toast('지도에서 걷는 학생을 눌러 보세요'); }   // 2.1.1
+      measure: q => S.frc ? S.frc.pat : 0,   // 단짝 쓰다듬기, 선물, 앨범 열기(지금까지 한 횟수)
+      goal: q => '단짝 친구 쓰다듬기',
+      go: q => { setTab('school'); return toast('지도에서 걷는 학생을 눌러 보세요'); }
     },
     frGift: {
       measure: q => S.frc ? S.frc.gift : 0,
@@ -315,87 +315,87 @@
       go: q => openAlbum()
     },
     btPlays: {
-      measure: q => S.bt.st.w + S.bt.st.l,   // 2.0.1 숲속 대결 판 수
+      measure: q => S.bt.st.w + S.bt.st.l,   // 숲속 대결 판 수
       goal: q => `숲속 대결 ${q.n}판 하기`,
       go: qtGoBtPlays
     },
     psGot: {
-      measure: q => psOpen() ? (S.ps.tot || 0) : q.n,   // 2.1.3 숲속 패스에서 받은 단계 수(패스가 닫혀 있으면 멈추지 않게 마친 것으로)
+      measure: q => psOpen() ? (S.ps.tot || 0) : q.n,   // 숲속 패스에서 받은 단계 수(패스가 닫혀 있으면 멈추지 않게 마친 것으로)
       goal: q => `숲속 패스 ${q.n}단계 받기`,
-      go: q => { rt.evSeg = 'ps'; return setTab('event'); }   // 2.1.3
+      go: q => { rt.evSeg = 'ps'; return setTab('event'); }
     },
     btLg: {
-      measure: q => S.bt.lg,   // 2.0.1 대결 메달 리그
+      measure: q => S.bt.lg,   // 대결 메달 리그
       goal: q => `숲속 대결 ${BT_LG[q.n].n} 리그`,
       go: qtGoBtPlays
     },
     btWins: {
-      measure: q => S.bt.st.w,   // 2.1.0 대결에서 이긴 판 수
+      measure: q => S.bt.st.w,   // 대결에서 이긴 판 수
       goal: q => `숲속 대결 ${q.n}번 이기기`,
       go: qtGoBtPlays
     },
     btMid: {
-      measure: q => S.bt.st.wm + (S.tier >= 2 && S.bt.day === gameToday() && S.bt.n > 0 ? 1 : 0),   // 2.0.1 명부 학생으로 이긴 판. 3.0.0 오늘 중학교부터 한 판이라도 했으면 쳐요
+      measure: q => S.bt.st.wm + (S.tier >= 2 && S.bt.day === gameToday() && S.bt.n > 0 ? 1 : 0),   // 명부 학생으로 이긴 판. 오늘 중학교부터 한 판이라도 했으면 쳐요
       goal: q => '명부 학생으로 대결하기',
       go: qtGoBtPlays
     },
     vdGive: {
-      measure: q => S.vd.n,   // 2.1.2 마을 기부 횟수
+      measure: q => S.vd.n,   // 마을 기부 횟수
       goal: q => '마을에 기부하기',
       go: qtGoVdGive
     },
     snDraw: {
-      measure: q => S.sn.n,   // 2.1.2 간식 뽑은 수
+      measure: q => S.sn.n,   // 간식 뽑은 수
       goal: q => '간식 뽑기',
       go: qtGoSnDraw
     },
     snDex: {
-      measure: q => snCount(),   // 2.1.2 간식 도감 종류
+      measure: q => snCount(),   // 간식 도감 종류
       goal: q => `간식 도감 ${q.n}종`,
       go: qtGoSnDraw
     },
     gdPlant: {
-      measure: q => S.gn.st.plant,   // 2.2.1 텃밭에 심은 수
+      measure: q => S.gn.st.plant,   // 텃밭에 심은 수
       goal: q => q.n === 1 ? '텃밭에 작물 심기' : `텃밭에 작물 ${q.n}번 심기`,
       go: qtGoGdHarvest
     },
     gdHarvest: {
-      measure: q => S.gn.st.h,   // 2.2.0 텃밭 거둔 수
+      measure: q => S.gn.st.h,   // 텃밭 거둔 수
       goal: q => q.n === 1 ? '텃밭 작물 거두기' : `텃밭 작물 ${q.n}번 거두기`,
       go: qtGoGdHarvest
     },
     bxSeen: {
-      measure: q => S.bx.st.n,   // 2.2.0 생물 관찰 수
+      measure: q => S.bx.st.n,   // 생물 관찰 수
       goal: q => q.n === 1 ? '생물 관찰하기' : `생물 ${q.n}번 관찰하기`,
       go: qtGoBxSeen
     },
     cgPrac: {
-      measure: q => S.cg.st.p,   // 2.2.0 대항전 연습 수
+      measure: q => S.cg.st.p,   // 대항전 연습 수
       goal: q => q.n === 1 ? '대항전 연습하기' : `대항전 연습 ${q.n}번`,
       go: qtGoClub
     },
     cgShow: {
-      measure: q => S.cg.st.s || 0,   // 2.2.0 대항전 중 발표회 수
+      measure: q => S.cg.st.s || 0,   // 대항전 중 발표회 수
       goal: q => '대항전 발표회 열기',
       go: qtGoClub
     },
     bxKinds: {
-      measure: q => bxCount(),   // 2.2.0 생물 도감 종류
+      measure: q => bxCount(),   // 생물 도감 종류
       goal: q => `생물 도감 ${q.n}종`,
       go: qtGoBxSeen
     },
     gdCook: {
-      measure: q => S.gn.st.cook,   // 2.2.0 오늘의 급식 만든 수
+      measure: q => S.gn.st.cook,   // 오늘의 급식 만든 수
       goal: q => q.n === 1 ? '오늘의 급식 만들기' : `오늘의 급식 ${q.n}번 만들기`,
       go: qtGoGdHarvest
     },
     vdLv: {
-      measure: q => S.vd.lv,   // 2.1.2 마을 기부 단계
+      measure: q => S.vd.lv,   // 마을 기부 단계
       goal: q => `마을 기부 ${q.n}단계`,
       go: qtGoVdGive
     },
     nsOn: {
-      measure: q => S.ns ? S.ns.n : 0,   // 3.0.0 자율학습 준비 횟수(낮 예약 또는 밤 시작)
+      measure: q => S.ns ? S.ns.n : 0,   // 자율학습 준비 횟수(낮 예약 또는 밤 시작)
       goal: q => q.n === 1 ? '오늘 밤 자율학습 준비' : `자율학습 ${q.n}번 준비`,
       go: qtGoNsOn
     },
@@ -405,17 +405,17 @@
       go: qtGoNsOn
     },
     csTalk: {
-      measure: q => S.cs ? S.cs.talks : 0,   // 3.1.0 진로 상담 횟수
+      measure: q => S.cs ? S.cs.talks : 0,   // 진로 상담 횟수
       goal: q => q.n === 1 ? '첫 진로 상담' : `진로 상담 ${q.n}번`,
       go: qtGoCsTalk
     },
     csPick: {
-      measure: q => S.cs ? S.cs.picks : 0,   // 3.1.0 진로를 처음 정한 학생 수
+      measure: q => S.cs ? S.cs.picks : 0,   // 진로를 처음 정한 학생 수
       goal: q => q.n === 1 ? '학생 한 명 진로 정하기' : `학생 ${q.n}명 진로 정하기`,
       go: qtGoCsTalk
     },
     tr2Go: {
-      measure: q => S.tr2 ? S.tr2.go : 0,   // 3.2.0 수학여행
+      measure: q => S.tr2 ? S.tr2.go : 0,   // 수학여행
       goal: q => '수학여행 떠나기',
       go: qtGoTr2Go
     },
@@ -430,7 +430,7 @@
       go: q => setTab('deco')
     },
     nsGot: {
-      measure: q => S.st.nsAway || 0,   // 3.0.0 자율학습을 켠 밤에 자리 비운 보상이 쌓인 횟수
+      measure: q => S.st.nsAway || 0,   // 자율학습을 켠 밤에 자리 비운 보상이 쌓인 횟수
       goal: q => '자율학습한 밤의 도토리 받기',
       go: qtGoNsOn
     }
@@ -444,10 +444,10 @@
   const qReward = q => {
     const b = q.rm ? Math.max(10, nice(rate() * 60 * q.rm)) : q.r;
     if (q.t !== 'fac' || q.rk || q.ch > EARLY.ch || !FAC[q.k]) return b;
-    const c = Math.ceil(softCost(FAC[q.k].cost, q.n - 1 + (FAC[q.k].lvOff || 0), SOFT.fac) * costScale());   // 5.2.0 3안: 그 레벨 공사비의 30%
+    const c = Math.ceil(softCost(FAC[q.k].cost, q.n - 1 + (FAC[q.k].lvOff || 0), SOFT.fac) * costScale());   // 3안: 그 레벨 공사비의 30%
     return isFinite(c) && c > 0 ? Math.max(b, nice(c * EARLY.back)) : b;
   };
-  /* 2.1.0 woodani 결정(2026-10-29): 하루에 한 번이거나 기다리는 시간이 긴 행동(체험학습, 숲속 운동회, 학교 행사)은
+  /* 하루에 한 번이거나 기다리는 시간이 긴 행동(체험학습, 숲속 운동회, 학교 행사)은
      퀘스트가 오기 전이라도 그날(게임 시계) 이미 했으면 퀘스트에 쳐요. 하루를 시작할 때의 횟수를 S.dsn에 적어 두고 그보다 늘어난 만큼을 세요 */
   const TODAY_TYPES = new Set(['trips', 'sports', 'fest']);
   function dsnSync() {
@@ -476,7 +476,7 @@
       // 졸업식 퀘스트: 마지막 해 전까지는 몇 년째인지, 마지막 해에는 대도시까지 남은 평판으로 막대를 채워요
       const T = tierInfo(), need = townRep(GRAD_MIN), r = Math.min(rep(), need);
       if (canPromote()) { frac = 0.96; text = '준비 끝'; }
-      else if (finalYear() && semFirst()) { frac = (T.grads + 0.4 * r / need) / (T.grads + 1); text = '1학기'; }   // 2.1.0 졸업반 1학기
+      else if (finalYear() && semFirst()) { frac = (T.grads + 0.4 * r / need) / (T.grads + 1); text = '1학기'; }   // 졸업반 1학기
       else if (finalYear()) { frac = (T.grads + r / need) / (T.grads + 1); text = `★${r}/${need}`; }
       else { frac = Math.min(S.tg, T.grads) / (T.grads + 1); text = `${yearNo()}${T.unit}`; }
     } else {
@@ -487,20 +487,20 @@
       else if (q.t === 'rate') text = `${fmtRate(shown)}/${fmt(need)}`;
       else if ((q.t === 'fac' || q.t === 'tea') && need === 1) text = `${shown}/1`;
       else if (q.t === 'students') text = `${shown}/${need}명`;
-      else if (q.t === 'tgrads' && semOn() && shown < need) { frac = need > from ? (shown - from + 0.5 * S.sem) / (need - from) : 1; text = semLabel(); }   // 2.1.0 1학기 방학식을 마치면 막대가 반쯤 차요
+      else if (q.t === 'tgrads' && semOn() && shown < need) { frac = need > from ? (shown - from + 0.5 * S.sem) / (need - from) : 1; text = semLabel(); }   // 1학기 방학식을 마치면 막대가 반쯤 차요
       else if (q.t === 'semH') text = shown >= need ? '방학' : '1학기';
-      else if (q.t === 'grads' || q.t === 'perks' || q.t === 'tgrads' || q.t === 'fperks' || q.t === 'tripat' || q.t === 'nsOn' || q.t === 'nsGot' || q.t === 'nsFinished' || q.t === 'csTalk' || q.t === 'csPick') text = `${shown}/${need}번`;   // 3.0.0 자율학습
+      else if (q.t === 'grads' || q.t === 'perks' || q.t === 'tgrads' || q.t === 'fperks' || q.t === 'tripat' || q.t === 'nsOn' || q.t === 'nsGot' || q.t === 'nsFinished' || q.t === 'csTalk' || q.t === 'csPick') text = `${shown}/${need}번`;   // 자율학습
       else if (q.t === 'souv') text = `${shown}/${need}종`;
       else if (q.t === 'club') text = `${shown}/${need}자리`;
       else if (q.t === 'clubSum') text = `${shown}/${need}%`;
       else if (q.t === 'star') text = `★${shown}/${need}`;
       else if (q.t === 'clubShown') text = `${shown}/${need}곳`;
-      else if (q.t === 'pz') text = `${shown}/${need}판`;   // 1.8.0 보강 퀘스트
+      else if (q.t === 'pz') text = `${shown}/${need}판`;   // 보강 퀘스트
       else if (q.t === 'deco' || q.t === 'ach' || q.t === 'mgOrders') text = `${shown}/${need}개`;
       else if (q.t === 'mgDex') text = `${shown}/${need}칸`;
       else if (q.t === 'mgBest') text = `${shown}/${need}단계`;
       else if (q.t === 'pzBest') text = `${fmt(shown)}/${fmt(need)}점`;
-      else if (q.t === 'acBook') text = `${shown}/${need}권`;   // 2.0.1 공부
+      else if (q.t === 'acBook') text = `${shown}/${need}권`;   // 공부
       else if (q.t === 'clubMat') text = `${shown}/${need}명`;
       else if (q.t === 'rdBooks') text = `${shown}/${need}권`;
       else if (q.t === 'labs' || q.t === 'picnics' || q.t === 'frPat' || q.t === 'frGift' || q.t === 'albOpen') text = `${shown}/${need}번`;
@@ -558,7 +558,7 @@
     const active = new Set(S.q.subs.map(s => s.id));
     for (const d of SUBS) {
       if (S.q.done.includes(d.id) || active.has(d.id)) continue;
-      return S.q.m >= mainNewIdx(d.after) ? d : null;   // 2.1.1 after는 한 단계 퀘스트를 넣기 전 번호예요
+      return S.q.m >= mainNewIdx(d.after) ? d : null;   // after는 한 단계 퀘스트를 넣기 전 번호예요
     }
     const c = S.q.gen, tpl = GEN[c % GEN.length];
     S.q.gen = c + 1;
@@ -593,7 +593,7 @@
     const rv = qReward(q), no = qNo(S.q.m);
     grant(rv, fromEl, q.rk);
     const items = [q.rk === 'dip' ? { ic: 'dip', t: `수료증 +${fmt(rv)}장` } : { ic: 'acorn', t: `도토리 +${fmt(rv)}` }];
-    if (hardQ(q)) items.push(goldOr(GOLD.hard, '(조금 어려운 퀘스트)'));   // 4.2.0
+    if (hardQ(q)) items.push(goldOr(GOLD.hard, '(조금 어려운 퀘스트)'));
     addLeague(LP.quest, true);
     S.q.m += 1; S.q.md += 1;
     startMain();
@@ -601,10 +601,10 @@
     if (prep) items.push({ ic: 'acorn', t: `교감 선생님 준비물 +${fmt(prep)}` });
     const chEnd = !curMain() || curMain().ch !== q.ch;
     if (chEnd) { addGold(GOLD.chapter); items.push({ ic: 'gold', t: `황금 도토리 +${GOLD.chapter} (${q.ch + 1}장 끝)` }); }   // 한 장을 마치면 황금 도토리
-    if (chEnd && chTier(q.ch) >= 1) { S.tk.m5 += TK_CH; items.push({ ic: 'acorn', t: `5분 단축권 +${TK_CH}장` }); }   // 2.1.0 초등학교부터 장 끝에 5분권
-    if (TK_Q.has(q.id)) { S.tk.m5 += TKE.n; items.push({ ic: IMG('ticket_m5') ? `<img src="${IMG('ticket_m5')}" alt="" style="width:22px;height:22px;object-fit:contain">` : '⏱', t: `5분 단축권 +${TKE.n}장` }); }   // 2.3.0.1
-    { const skIt = skAdd(); if (skIt) items.push(skIt); }   // 2.1.0 칭찬 스티커
-    // 5.0.1.7 woodani 결정(F-10): 보통 퀘스트는 창 없이 알림 한 줄로 받아요. 창은 장 끝과 특별 보상(황금 도토리, 단축권)에만
+    if (chEnd && chTier(q.ch) >= 1) { S.tk.m5 += TK_CH; items.push({ ic: 'acorn', t: `5분 단축권 +${TK_CH}장` }); }   // 초등학교부터 장 끝에 5분권
+    if (TK_Q.has(q.id)) { S.tk.m5 += TKE.n; items.push({ ic: IMG('ticket_m5') ? `<img src="${IMG('ticket_m5')}" alt="" style="width:22px;height:22px;object-fit:contain">` : '⏱', t: `5분 단축권 +${TKE.n}장` }); }
+    { const skIt = skAdd(); if (skIt) items.push(skIt); }   // 칭찬 스티커
+    // 보통 퀘스트는 창 없이 알림 한 줄로 받아요. 창은 장 끝과 특별 보상(황금 도토리, 단축권)에만
     const special = chEnd || items.some(it => it.ic === 'gold' || /단축권/.test(it.t));
     { const n2 = curMain(); if (special) showReward({ title: chEnd ? `${q.ch + 1}장을 마쳤어요!` : '퀘스트 완료!', sub: `${no} ${q.title}`, items: items.concat(n2 ? [{ ic: hedgehogAvatar(), t: `다음: ${qNo(S.q.m)} ${n2.title}` }] : []) }); }
     const unlocked = S.q.m === SUB_UNLOCK;
@@ -624,7 +624,7 @@
     const s = S.q.subs[i];
     if (!subReady(s)) return;
     grant(s.r, fromEl);
-    const hIt = hardQ(s, true) ? goldOr(GOLD.hard) : null;   // 4.2.0 조금 어려운 부탁
+    const hIt = hardQ(s, true) ? goldOr(GOLD.hard) : null;   // 조금 어려운 부탁
     addLeague(LP.quest, true);
     S.q.subs.splice(i, 1);
     if (s.id[0] === 's') S.q.done.push(s.id);
@@ -632,9 +632,9 @@
     delete rt.qr[s.id];
     const added = fillSubs();
     const items = [{ ic: 'acorn', t: `도토리 +${fmt(s.r)}` }, hIt ? { ic: hIt.ic, t: hIt.t + ' (조금 어려운 부탁)' } : null, skAdd()].filter(Boolean);
-    // 5.1.1 woodani 결정: 부탁도 메인 퀘스트처럼 창 없이 알림 한 줄로 받아요. 창은 황금 도토리를 받을 때와 모두 받기에만
+    // 부탁도 메인 퀘스트처럼 창 없이 알림 한 줄로 받아요. 창은 황금 도토리를 받을 때와 모두 받기에만
     if (rt.batch || items.some(it => it.ic === 'gold')) showReward({ title: `${iga(WHO[s.who])} 고마워해요!`, sub: added ? '새 부탁이 들어왔어요' : '', items });
-    else toast(`${iga(WHO[s.who])} 고마워해요!\n${items.map(it => it.t).join(', ')}` + (added ? '\n새 부탁이 들어왔어요' : ''));// 2.1.0 칭찬 스티커
+    else toast(`${iga(WHO[s.who])} 고마워해요!\n${items.map(it => it.t).join(', ')}` + (added ? '\n새 부탁이 들어왔어요' : ''));// 칭찬 스티커
     questChanged();
   }
   function grant(v, fromEl, kind) {
@@ -704,9 +704,9 @@
       if (!first && !rt.reduced && bar.animate) bar.animate([{ opacity: 0.3, transform: 'translateY(-6px)' }, { opacity: 1, transform: 'none' }], { duration: 300, easing: 'ease-out' });
     }
     const p = qProg(q, base);
-    setTx($('#qbRew'), fmt(qReward(q)));   // 3.2.6 바뀐 때만
+    setTx($('#qbRew'), fmt(qReward(q)));   // 바뀐 때만
     setHid($('#qbGold'), !hardQ(q));
-    { const g = $('#qbGold'), k = goldRich() ? 'ess' : 'gold'; if (g.dataset.k !== k) { g.dataset.k = k; g.innerHTML = k === 'ess' ? ESS_ICON() : GOLD_ICON; } }   // 5.1.1.2 황금을 넉넉히 모은 뒤에는 정수로 받으니 정수 그림
+    { const g = $('#qbGold'), k = goldRich() ? 'ess' : 'gold'; if (g.dataset.k !== k) { g.dataset.k = k; g.innerHTML = k === 'ess' ? ESS_ICON() : GOLD_ICON; } }   // 황금을 넉넉히 모은 뒤에는 정수로 받으니 정수 그림
     setTx($('#qbCnt'), p.done ? '완료' : p.text);
     { const fw = (p.frac * 100).toFixed(1) + '%', qf = $('#qbFill'); if (qf.style.width !== fw) qf.style.width = fw; }
     if (bar.classList.contains('ready') !== !!p.done) bar.classList.toggle('ready', p.done);
@@ -777,7 +777,7 @@
       : `<button class="btn-go" type="button" data-act="go" data-q="${o.ref}">바로 가기</button>`;
     return `<div class="qcard${p.done ? ' is-done' : ''}" data-qp="${o.ref}">` +
       `<div class="qwho"><span class="qav${o.kid ? ' kid' : ''}" aria-hidden="true">${o.av}</span><span class="qname">${esc(o.name)}</span>${o.badge ? `<span class="qnew">${o.badge}</span>` : ''}</div>` +
-      `<p class="qsay">${esc(nl(repTxt(q, o.say)))}</p>` +   // 2.0.1 문장마다 줄바꿈
+      `<p class="qsay">${esc(nl(repTxt(q, o.say)))}</p>` +   // 문장마다 줄바꿈
       `<div class="qgoal"><b>${esc(qGoal(q))}</b><span class="qp">${p.done ? '완료' : p.text}</span></div>` +
       `<div class="qbar"><i style="width:${(p.frac * 100).toFixed(1)}%"></i></div>` +
       `<div class="qfoot"><span class="qrew">보상 ${rewardIcon(q.rk)}<b>${fmt(qReward(q))}</b>${hardQ(q, o.ref !== 'main') ? (goldRich() ? `<span class="qgold" aria-label="숲의 정수 ${GOLD.hard * GOLD.essPer}">+${ESS_ICON()}<b>${GOLD.hard * GOLD.essPer}</b></span>` : `<span class="qgold" aria-label="황금 도토리 ${GOLD.hard}개">+${GOLD_ICON}<b>${GOLD.hard}</b></span>`) : ''}${o.ref === 'main' && TK_Q.has(q.id) ? `<span class="qgold qtk" aria-label="5분 단축권 ${TKE.n}장">+${IMG('ticket_m5') ? `<img src="${IMG('ticket_m5')}" alt="">` : '⏱'}<b>${TKE.n}</b></span>` : ''}</span>${act}</div></div>`;
@@ -798,7 +798,7 @@
       }).join('');
       const nx = CHAPTERS[ch + 1];
       const next = nx ? `<p class="ch-next">${CH_NEXT[ch]} ${ch + 2}장 「${nx}」 퀘스트가 열려요.</p>` : '';
-      // 2.3.0.1 woodani 요청: 퀘스트가 많아서 기본은 접어 두고 지금 진행 중인 것만. 단추를 누르면 이 장 전체가 펼쳐져요
+      // 퀘스트가 많아서 기본은 접어 두고 지금 진행 중인 것만. 단추를 누르면 이 장 전체가 펼쳐져요
       const open = !!rt.qOpen, more = list.length - 1;
       const fold = more > 0 ? `<button type="button" class="ch-fold" data-act="fold" aria-expanded="${open}">${open ? '접기' : `이 장 퀘스트 모두 보기 (${list.length}개)`}<svg viewBox="0 0 24 24" aria-hidden="true"><path d="M6 9l6 6 6-6" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"/></svg></button>` : '';
       $('#qMain').innerHTML = `<div class="chapter"><div class="ch-head"><span class="ch-no">${ch + 1}장</span><b>${CHAPTERS[ch]}</b><span class="ch-count">${doneN}/${list.length}</span></div><ol class="qsteps${open ? '' : ' fold'}">${items}</ol>${fold}${next}</div>`;
@@ -824,8 +824,8 @@
   }
   function updateQuestDot() {
     dmDay(); lgWeek(); wkWeek();
-    // 2.0.1 이벤트에서 받을 것은 이벤트 버튼의 점(#evDot)으로만 알려요(woodani: 받을 퀘스트가 없는데 퀘스트 점이 남아요)
-    const on = rt.tab !== 'quests' && (mainReady() || S.q.subs.some(s => subReady(s)) || dmClaimable() || wkClaimable());   // 2.3.1 woodani: 새 부탁만으로는 점을 켜지 않아요
+    // 이벤트에서 받을 것은 이벤트 버튼의 점(#evDot)으로만 알려요(받을 퀘스트가 없는데 퀘스트 점이 남아요)
+    const on = rt.tab !== 'quests' && (mainReady() || S.q.subs.some(s => subReady(s)) || dmClaimable() || wkClaimable());   // 새 부탁만으로는 점을 켜지 않아요
     $('#qDot').hidden = !on;
   }
   function markQuestsSeen() { S.q.seen = S.q.m; S.q.subs.forEach(s => { s.nw = false; }); }
@@ -850,7 +850,7 @@
     const g = $('#guide');
     { const zh = $('#zoneHome'); if (zh) zh.classList.remove('guide'); }
     if (!t) { g.innerHTML = ''; return; }
-    // 4.0.0 대학교: 가리킬 건물(도토리 줍기는 참나무가 있는 체육 구역)이 지금 지도에 없으면 그 구역으로 안내해요.
+    // 대학교: 가리킬 건물(도토리 줍기는 참나무가 있는 체육 구역)이 지금 지도에 없으면 그 구역으로 안내해요
     // 캠퍼스 지도에서는 구역 이름표를 가리키고, 다른 구역 안에서는 '캠퍼스' 단추를 반짝여요
     if (uniOn()) {
       const tz = t === 'picks' ? zoneOf('playground') : zoneOf(t);
@@ -899,7 +899,7 @@
 
   /* 바로 가기: 퀘스트에 필요한 곳을 열어 줘요 */
   function goFac(k, msg) { setTab('school'); zoneGo(zoneOf(k)); openSheet(k); if (msg) toast(msg); }
-  // 2.0.1 가구 퀘스트: 건물 창을 열고 가구 칸까지 내려가요(전에는 건물 창도 열리지 않았어요)
+  // 가구 퀘스트: 건물 창을 열고 가구 칸까지 내려가요(전에는 건물 창도 열리지 않았어요)
   function goFur(k, i) {
     if (!FAC[k] || !FUR[k]) return setTab('school');
     if (S.f[k] < 1) return goFac(k, `${eul(FAC[k].name)} 먼저 지어야 가구를 둘 수 있어요`);
@@ -921,7 +921,7 @@
     if (card) {
       // 선생님 탭은 탭 안에서 따로 스크롤돼요. 탭을 연 다음 그 칸으로 직접 내려가요
       requestAnimationFrame(() => {
-        // 1.7.3: 탭 화면을 CSS zoom으로 줄여서, 화면에서 잰 길이를 탭 안 길이로 바꿔요(z)
+        // 탭 화면을 CSS zoom으로 줄여서, 화면에서 잰 길이를 탭 안 길이로 바꿔요(z)
         const box = card.closest('.panel'), a = card.getBoundingClientRect(), p = box.getBoundingClientRect(), z = (p.height / box.offsetHeight) || 1;
         box.scrollTo({ top: Math.max(0, box.scrollTop + (a.top - p.top - (p.height - a.height) / 2) / z), behavior: rt.reduced ? 'auto' : 'smooth' });
       });
@@ -942,7 +942,7 @@
     c.sort((a, b) => a.cost - b.cost);
     return c[0];
   }
-  /* 4.2.0 woodani: 오늘의 미션, 이번 주 미션, 패스 미션, 이벤트 미션을 누르면 그 일을 하는 곳으로 가요(찾아다니지 않게).
+  /* 오늘의 미션, 이번 주 미션, 패스 미션, 이벤트 미션을 누르면 그 일을 하는 곳으로 가요(찾아다니지 않게)
      미션 이름(id)을 퀘스트 바로 가기(goTo)의 종류로 바꿔요. 퍼즐과 합치기는 그 화면을 바로 열어요 */
   const MGO = { picks: 'picks', shakes: 'picks', ups: 'ups', con: 'ups', trains: 'trains', claims: 'claims', fest: 'fest', sports: 'fest',
     trip: 'trips', trips: 'trips', out: 'trips', ns: 'nsOn', cs: 'csTalk', rd: 'rdBooks', bt: 'btPlays', sk: 'stickers', lab: 'labs',
