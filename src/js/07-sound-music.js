@@ -5,15 +5,15 @@
     if (!actx) {
       const AC = window.AudioContext || window.webkitAudioContext;
       if (!AC) return;
-      // 1.7.2: 같은 창에서 게임이 다시 시작되면(Claude 화면 게임이 새 판으로 바뀔 때 등) 앞 판의 소리가 계속 남아 음악이 겹쳤어요. 앞 판 소리는 닫고 시작해요
+      // 같은 창에서 게임이 다시 시작되면(Claude 화면 게임이 새 판으로 바뀔 때 등) 앞 판의 소리가 계속 남아 음악이 겹쳤어요. 앞 판 소리는 닫고 시작해요
       try { if (window.__fsAudio && window.__fsAudio !== actx) { window.__fsAudio.close().catch(() => {}); } } catch (e) { /* 무시 */ }
       try { actx = new AC(); master = actx.createGain(); master.gain.value = 0.5; master.connect(actx.destination); window.__fsAudio = actx; } catch (e) { actx = null; return; }
     }
-    if (actx.state === 'suspended' && !document.hidden && !rt.paused && !rt.adOpen) actx.resume().catch(() => {});   // 2.3.1 광고 중에 화면을 다시 보거나 눌러도 소리를 되살리지 않아요
+    if (actx.state === 'suspended' && !document.hidden && !rt.paused && !rt.adOpen) actx.resume().catch(() => {});   // 광고 중에 화면을 다시 보거나 눌러도 소리를 되살리지 않아요
     musicSync();
   }
-  /* 2.1.1 소리 지킴이(2026-10-29 woodani 제보: 웹판 숲속 퍼즐 중 배경음악이 '삐~' 소리로 바뀌어 퍼즐을 나갈 때까지 이어짐).
-     기기의 소리 출력이 걸리면 마지막 소리 조각이 되풀이되어 '삐~' 하고 들리고, 그동안 소리 시계(actx.currentTime)가 거의 가지 않아요.
+  /* 소리 지킴이(웹판 숲속 퍼즐 중 배경음악이 '삐~' 소리로 바뀌어 퍼즐을 나갈 때까지 이어짐)
+     기기의 소리 출력이 걸리면 마지막 소리 조각이 되풀이되어 '삐~' 하고 들리고, 그동안 소리 시계(actx.currentTime)가 거의 가지 않아요
      켜져 있는데 2초 넘게 소리 시계가 거의 멈춰 있으면 소리를 닫고 새로 열어 곡을 처음부터 다시 틀어요(풀어 둔 곡은 그대로 써요). 1초마다 봐요 */
   const AW = { wall: 0, at: 0, bad: 0, resets: 0 };
   function audioWatch() {
@@ -68,7 +68,7 @@
       else if (name === 'magpie') { note(1480, 0, 0.07, 'square', 0.03); note(1320, 0.13, 0.08, 'square', 0.03); }
       else if (name === 'done') { note(783.99, 0, 0.18, 'sine', 0.14, 2); note(1174.66, 0.12, 0.32, 'sine', 0.14, 2); }
       else if (name === 'quest') [1046.5, 1318.51, 1567.98, 2093].forEach((f, i) => note(f, i * 0.07, 0.22 + i * 0.05, 'triangle', 0.11));
-      else if (name === 'bell') { /* 4.4.1 woodani 요청: 학교 종소리(딩동댕동)는 이제 어디서도 울리지 않아요 */ }
+      else if (name === 'bell') { /* 학교 종소리(딩동댕동)는 이제 어디서도 울리지 않아요 */ }
     } catch (e) { /* 소리 실패는 무시 */ }
   }
   function buzz(ms) {   // 숫자 하나나 [켜짐, 꺼짐, 켜짐] 패턴
@@ -77,13 +77,12 @@
   }
 
   /* ---------- 배경음악 ----------
-     1.7.3부터 홈, 그 밖의 화면, 학교 행사, 미니게임은 음악 파일 곡(FS_AUD, Suno로 woodani가 만든 곡)을 틀어요.
-     배경 테마 곡과 파일이 없을 때는 Web Audio로 직접 연주해요. 코드 곡은 모두 이 게임을 위해 새로 쓴 곡이에요.
-     학교 탭은 배경 테마마다 곡이 바뀌고(테마가 없으면 홈 곡), 다른 탭은 모두 같은 곡, 학교 행사 중에는 행사 곡이 나와요.
-     악보: 한 칸은 8분음표예요. 음 이름(C5, F#4, Bb4), 쉼표 '.', 앞 음 늘이기 '-'. 마디는 '|'로 나눠요(읽기 편하려고만).
+     배경 테마 곡과 파일이 없을 때는 Web Audio로 직접 연주해요. 코드 곡은 모두 이 게임을 위해 새로 쓴 곡이에요
+     학교 탭은 배경 테마마다 곡이 바뀌고(테마가 없으면 홈 곡), 다른 탭은 모두 같은 곡, 학교 행사 중에는 행사 곡이 나와요
+     악보: 한 칸은 8분음표예요. 음 이름(C5, F#4, Bb4), 쉼표 '.', 앞 음 늘이기 '-'. 마디는 '|'로 나눠요(읽기 편하려고만)
      반주와 베이스는 마디마다 적은 화음(chords)으로 정해진 모양(style)에 맞춰 저절로 만들어요 */
   const SONGS = {
-    // 1.4.0: 곡을 줄였어요. 홈(학교 탭) 1곡, 그 밖의 화면 1곡, 학교 행사 1곡. 상점에서 산 배경이 있으면 홈에서는 그 배경 곡이 나와요
+    // 곡을 줄였어요. 홈(학교 탭) 1곡, 그 밖의 화면 1곡, 학교 행사 1곡. 상점에서 산 배경이 있으면 홈에서는 그 배경 곡이 나와요
     home: { name: '숲속 아침', bpm: 96, chords: 'G D Em C G Bm C D',
       mel: { i: 'mar', v: 0.15, n: 'D5 - B4 - G4 - B4 D5|F#5 - E5 - D5 - A4 -|G5 - E5 - B4 - E5 G5|E5 - - - D5 C5 B4 -|B4 - D5 - G5 - F#5 G5|F#5 - D5 - B4 - D5 -|E5 - G5 - E5 - C5 -|D5 - - - A4 - . .' },
       acc: [{ i: 'pluck', v: 0.05, style: 'broken' }], bass: { i: 'bass', v: 0.1, style: 'root' }, dr: { h: '..x...x.' }, dv: 0.35 },
@@ -168,17 +167,17 @@
     return T;
   }
   const Music = { cur: '', track: null, bus: null, out: null, step: 0, next: 0, timer: 0, preview: '', noise: null, src: null };
-  // 1.7.3 음악 파일 곡(Suno 유료 플랜으로 woodani가 만든 곡). 1.8.0부터 저장소 맨 위 audio 폴더의 mp4(소리만) 파일이에요(dev/embed_audio.py가 넣어요).
+  // 음악 파일 곡(Suno 유료 플랜으로 만든 곡)
   // 파일이 없거나 풀기에 실패하면 예전처럼 코드로 연주하는 곡(SONGS)으로 돌아가요. 'play'(미니게임)는 코드 곡이 없어서 'room' 곡으로 돌아가요
-  const FILE_SONG = { grad: 'bgm_grad', unigrad: 'bgm_unigrad', bigfest: 'bgm_bigfest', home: 'bgm_home', room: 'bgm_room', festival: 'bgm_festival', festnight: 'bgm_festnight', play: 'bgm_play',   // 3.2.0 밤 행사 곡(woodani Suno)
+  const FILE_SONG = { grad: 'bgm_grad', unigrad: 'bgm_unigrad', bigfest: 'bgm_bigfest', home: 'bgm_home', room: 'bgm_room', festival: 'bgm_festival', festnight: 'bgm_festnight', play: 'bgm_play',   // 밤 행사 곡(Suno)
    
-    // 1.8.0 배경 테마 곡 7개(woodani가 Suno로 만듦)
+    // 배경 테마 곡 7개(Suno로 만듦)
     spring: 'bgm_spring', summer: 'bgm_summer', autumn: 'bgm_autumn', winter: 'bgm_winter', xmas: 'bgm_xmas', space: 'bgm_space', retro: 'bgm_retro',
-    // 4.3.0 숲속 탐험대 곡 넷(woodani Suno, 2026-11-14): 운동장과 텃밭은 낮, 연못과 도서관은 잔잔, 뒤뜰과 천문대는 밤, 큰 장난꾸러기 층은 보스
+    // 숲속 탐험대 곡 넷(Suno): 운동장과 텃밭은 낮, 연못과 도서관은 잔잔, 뒤뜰과 천문대는 밤, 큰 장난꾸러기 층은 보스
     exday: 'bgm_ex_day', excalm: 'bgm_ex_calm', exnight: 'bgm_ex_night', exboss: 'bgm_ex_boss' };
-  // 1.8.0 곡은 게임 파일 밖의 따로 된 파일이에요(게임 파일이 너무 커지지 않게, woodani 결정). 웹, 안드로이드, 토스 판 모두 게임 옆 audio 폴더에 있어요
+  // 곡은 게임 파일 밖의 따로 된 파일이에요(게임 파일이 너무 커지지 않게). 웹, 안드로이드, 토스 판 모두 게임 옆 audio 폴더에 있어요
   const AUD_BASE = () => window.FS_AUD_BASE || 'audio/';
-  // 5.0.2 앱 용량: 테마 곡 7개와 행사, 졸업 곡 5개는 앱에 넣지 않고 웹에서 받아요. 못 받으면 홈 곡이 나와요. 곡 파일을 바꾸면 AUD_V를 올려요
+  // 용량: 테마 곡 7개와 행사, 졸업 곡 5개는 앱에 넣지 않고 웹에서 받아요. 못 받으면 홈 곡이 나와요. 곡 파일을 바꾸면 AUD_V를 올려요
   const WEB_AUD = new Set(['bgm_spring', 'bgm_summer', 'bgm_autumn', 'bgm_winter', 'bgm_xmas', 'bgm_space', 'bgm_retro', 'bgm_festival', 'bgm_festnight', 'bgm_bigfest', 'bgm_grad', 'bgm_unigrad']), AUD_V = '1';
   const webAud = key => APP_PACK() && !window.FS_AUD_BASE && WEB_AUD.has(key);
   const FILE_GAIN = 0.6;   // 파일 곡은 코드 곡보다 커서 조금 줄여요
@@ -198,27 +197,27 @@
     while (bgmBuf.size > 2) bgmBuf.delete(bgmBuf.keys().next().value);
     return p;
   }
-  const HOME_MUSIC_TABS = new Set(['school', 'teachers', 'quests', 'rank', 'dex', 'event', 'hall', 'club', 'settings', 'mini', 'grad']);   // 2.3.1 woodani: 공부 탭과 졸업 탭도 홈 곡, 쉬는 시간 곡은 상점에서만   // 2.0.0 학교 복도와 동아리실, 설정(2026-10-27 woodani)도 홈 곡
-  // 3.0.0 테마 세트 미리 보기: 저장(S.cos.th)은 그대로 두고 화면만 미리 보는 테마로 그려요
+  const HOME_MUSIC_TABS = new Set(['school', 'teachers', 'quests', 'rank', 'dex', 'event', 'hall', 'club', 'settings', 'mini', 'grad']);   // 공부 탭과 졸업 탭도 홈 곡, 쉬는 시간 곡은 상점에서만. 학교 복도와 동아리실, 설정도 홈 곡
+  // 테마 세트 미리 보기: 저장(S.cos.th)은 그대로 두고 화면만 미리 보는 테마로 그려요
   const thOn = () => (rt.thPrev ? rt.thPrev.th : S.cos.th);
   function musicWant() {
-    if (!S || rt.paused || rt.adOpen) return '';   // 2.3.1 광고 중에는 배경음악을 틀지 않아요
+    if (!S || rt.paused || rt.adOpen) return '';   // 광고 중에는 배경음악을 틀지 않아요
     if (Music.preview && rt.tab === 'shop') return Music.preview;
-    if (rt.thPrev && SONGS[rt.thPrev.id]) return rt.thPrev.id;   // 3.0.0 미리 보기 중에는 그 테마 곡
+    if (rt.thPrev && SONGS[rt.thPrev.id]) return rt.thPrev.id;   // 미리 보기 중에는 그 테마 곡
     if (!S.bgm) return '';
-    // 4.2.0 졸업식 곡: 졸업식 장면과 이어지는 입학 창. 학위수여식 곡: 대학교에서 4학년을 마치는 식 창(woodani Suno 곡, 2026-11-13)
+    // 졸업식 곡: 졸업식 장면과 이어지는 입학 창. 학위수여식 곡: 대학교에서 4학년을 마치는 식 창(Suno 곡)
     if (rt.cereOn || (rt.modalOpen && rt.modalOpen === $('#mTier'))) return 'grad';
     if (rt.uniGrad && rt.modalOpen && rt.modalOpen === $('#mGrad')) return 'unigrad';
-    if (rt.fest && festDef(rt.fest.id) && (festDef(rt.fest.id).bf || festDef(rt.fest.id).fv) && bfOn()) return 'bigfest';   // 4.2.0 대축제 곡
-    if (rt.fest || rt.sports) return rt.fest && festDef(rt.fest.id) && festDef(rt.fest.id).night ? 'festnight' : 'festival';   // 3.2.0 고등학교 밤 행사는 조용한 곡
-    let play = false; try { play = !!((pzUI && pzUI.open) || (mgUI && mgUI.open) || (btUI && btUI.open)); } catch (e) { /* 퍼즐과 합치기가 아직 준비 전 */ }   // 1.8.0: 숲속 합치기도 미니게임 곡
+    if (rt.fest && festDef(rt.fest.id) && (festDef(rt.fest.id).bf || festDef(rt.fest.id).fv) && bfOn()) return 'bigfest';   // 대축제 곡
+    if (rt.fest || rt.sports) return rt.fest && festDef(rt.fest.id) && festDef(rt.fest.id).night ? 'festnight' : 'festival';   // 고등학교 밤 행사는 조용한 곡
+    let play = false; try { play = !!((pzUI && pzUI.open) || (mgUI && mgUI.open) || (btUI && btUI.open)); } catch (e) { /* 퍼즐과 합치기가 아직 준비 전 */ }   // 숲속 합치기도 미니게임 곡
     if (play) return 'play';
-    if (rt.tab === 'tam' && S.tam) {   // 4.3.0 탐험 화면
+    if (rt.tab === 'tam' && S.tam) {   // 탐험 화면
       const T = rt.tam; if (T && T.F && T.F.M[0] && T.F.M[0].boss && (T.ph === 'meet' || T.ph === 'fight')) return 'exboss';
       const k = tamReg(tamCurFl()).k; return k === 'pond' || k === 'library' ? 'excalm' : k === 'yard' || k === 'tower' ? 'exnight' : 'exday';
     }
-    // 1.7.4 woodani 결정: 곡이 자주 바뀌지 않게 홈에서 여는 탭(선생님, 퀘스트, 랭킹, 도감, 이벤트)도 홈 곡 그대로
-    if (HOME_MUSIC_TABS.has(rt.tab) && bfOn()) return 'bigfest';   // 4.2.0 대축제 사흘 동안 대학교 홈 곡
+    // 곡이 자주 바뀌지 않게 홈에서 여는 탭(선생님, 퀘스트, 랭킹, 도감, 이벤트)도 홈 곡 그대로
+    if (HOME_MUSIC_TABS.has(rt.tab) && bfOn()) return 'bigfest';   // 대축제 사흘 동안 대학교 홈 곡
     if (HOME_MUSIC_TABS.has(rt.tab)) return SONGS[thOn().bg] ? thOn().bg : 'home';
     return 'room';
   }
@@ -240,7 +239,7 @@
       const bus = actx.createGain();
       bus.gain.setValueAtTime(0, now); bus.connect(Music.out);
       Music.bus = bus; Music.track = null;
-      bgmLoad(fk).then(buf => buf || !webAud(fk) ? buf : bgmLoad(FILE_SONG.home)).then(buf => {   // 5.0.2 웹에서 받는 곡을 못 받으면 홈 곡
+      bgmLoad(fk).then(buf => buf || !webAud(fk) ? buf : bgmLoad(FILE_SONG.home)).then(buf => {
         if (Music.bus !== bus || Music.cur !== w) return;   // 그사이 곡이 바뀌었어요
         if (!buf) { Music.cur = ''; Music.bus = null; try { bus.disconnect(); } catch (e) { /* 무시 */ } musicFallback(w); return; }
         const src = actx.createBufferSource(), t = actx.currentTime;
