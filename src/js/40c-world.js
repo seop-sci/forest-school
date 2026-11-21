@@ -1,18 +1,17 @@
   /* ---------- 마을 층(5.3.1 살아 있는 숲속 마을): 하루의 빛, 날씨, 구름 그림자, 작은 생물, 물결 ----------
      홈 지도에서만 움직여요. 빛과 가장자리 그늘은 지도 위 얇은 막(.wld-tint, .wld-vig), 나머지는 효과층(FXL) 그림판에 같이 그려요.
      그래픽 품질(S.gfx): 0 낮음(지금까지 화면 그대로), 1 보통(초당 20장, 적게), 2 높음(초당 30장). -1은 자동(폰 성능으로)
-     값과 규칙과 저장은 건드리지 않아요. 날씨는 두 시간마다 바뀌는 정해진 순서(모두 같은 날씨)이고, 학교 일에는 영향이 없어요 */
-  const WLD = { st: '', lv: -1, ph: '', wx: '', key: '', tint: null, vig: null, mc: null, sc: null, tex: {}, parts: [], next: {}, timer: 0, last: 0, water: [], wv: 0 };
+     값과 규칙과 저장은 건드리지 않아요. 비와 눈은 그날의 게임 날씨를 엔진으로 더 곱게 그리는 것이에요(예전 CSS 비와 눈은 이때 숨겨요) */
+  const WLD = { st: '', lv: -1, ph: '', wx: '', key: '', tint: null, vig: null, mc: null, sc: null, tex: {}, parts: [], next: {}, timer: 0, last: 0, water: [], wv: 0, tier0: null, curWait: false };
   const WLD_FPS = [0, 20, 30];
   // 제안 숫자: 빗방울 수, 눈송이 수, 반딧불 수, 나비 수(보통, 높음)
   const WLD_N = { rain: [45, 90], snow: [35, 70], fly: [7, 14], bfly: [2, 3], cloud: [0, 3] };
-  const WLD_RAIN = 0.14;   // 두 시간 칸마다 비나 눈이 올 몫(제안)
   const WLD_WATER = {"map_elem":[[18,186],[2,230],[18,258],[14,294],[26,358],[2,382]],"map_high":[[338,66],[358,94],[338,122],[354,150],[346,182],[186,206],[350,214],[354,246]],"map_kinder":[[22,126],[186,218],[2,350],[34,366],[42,398]]};   // dev/water_spots.py로 고른 물 자리
   function wldAuto() {
     const c = navigator.hardwareConcurrency || 4, m = navigator.deviceMemory || 4;
     return c >= 8 && m >= 6 ? 2 : c >= 4 ? 1 : 0;
   }
-  const wldLv = () => rt.reduced || !S ? 0 : (S.gfx >= 0 ? S.gfx : wldAuto());
+  const wldLv = () => rt.reduced || !S ? 0 : rt.photo ? 2 : (S.gfx >= 0 ? S.gfx : wldAuto());
   const wldMonth = () => new Date(gameNow() + KST_MS).getUTCMonth() + 1;
   const wldBg = () => { try { return thOn().bg || ''; } catch (e) { return ''; } };
   function wldPhase() {
@@ -20,12 +19,11 @@
     const h = kstHour(gameNow());
     return isNight() ? 'night' : h < 9 ? 'morning' : h >= 17 ? 'evening' : 'day';
   }
+  // 날씨는 그날 정해지는 게임 날씨(wxOf, 37-season.js)를 따라요. 날씨 효과를 끈 사람(S.wxOff)은 맑음처럼
   function wldWeather() {
     if (rt.wldWx != null) return rt.wldWx;   // 사진 모드에서 고른 날씨('' 맑음)
-    const bg = wldBg(); if (bg === 'space' || geo().campus) return '';
-    const b = Math.floor((gameNow() + KST_MS) / 7200000), x = Math.sin(b * 12.9898 + 78.233) * 43758.5453, r = x - Math.floor(x);
-    if (r >= WLD_RAIN) return '';
-    const m = wldMonth(); return bg === 'winter' || bg === 'xmas' || m === 12 || m <= 2 ? 'snow' : 'rain';
+    if (!S || S.wxOff || rt.viewTier != null) return '';
+    const k = wxOf(); return k === 'rain' || k === 'snow' ? k : '';
   }
   function wldDom() {
     if (WLD.tint) return true;
@@ -38,6 +36,7 @@
   // 날씨, 시간, 품질을 다시 보고 막과 소리와 움직임을 맞춰요(탭을 바꿀 때와 15초마다)
   function wldSync() {
     if (!S || !wldDom()) return;
+    if (rt.photo && rt.tab !== 'school') photoClose();
     const lv = wldLv(), home = rt.tab === 'school' && !document.hidden, ph = lv ? wldPhase() : '', wx = lv ? wldWeather() : '';
     WLD.lv = lv; WLD.ph = ph; WLD.wx = wx;
     const hsN = $('#map') && $('#map').classList.contains('hs-night');   // 고등학교부터의 밤은 예전 밤 화면(창문 불빛)이 맡아요
@@ -66,9 +65,9 @@
     return null;
   }
   function wldReset() { for (const p of WLD.parts) if (p.s && !p.s.destroyed) p.s.destroy(); WLD.parts.length = 0; WLD.next = {}; }
-  function wldStart() { if (!wldPixi()) return; WLD.mc.visible = WLD.sc.visible = true; if (!WLD.timer) { WLD.last = performance.now(); WLD.timer = setTimeout(wldTick, 0); } }
+  function wldStart() { if (!wldPixi()) return; WLD.mc.visible = WLD.sc.visible = true; const fr = $('.frame'); if (fr) fr.classList.add('wld-on'); if (!WLD.timer) { WLD.last = performance.now(); WLD.timer = setTimeout(wldTick, 0); } }
   function wldStop() {
-    clearTimeout(WLD.timer); WLD.timer = 0;
+    clearTimeout(WLD.timer); WLD.timer = 0; const fr = $('.frame'); if (fr) fr.classList.remove('wld-on');
     if (WLD.st === 'ok') { wldReset(); WLD.mc.visible = WLD.sc.visible = false; if (!FXL.raf && FXL.app) FXL.app.render(); }
   }
   function wldTick() {
@@ -164,4 +163,48 @@
     const b = e.target.closest && e.target.closest('#optGfx [data-gfx]'); if (!b || !S) return;
     const v = +b.dataset.gfx; if (v === S.gfx) return;
     S.gfx = v; save(); syncSettingsUI(); sfx('tap'); wldSync();
+  });
+  // 조용한 손맛: 앱에서 단추를 누르면 아주 짧게 떨려요(진동을 켠 사람만, 그래픽 낮음은 빼요)
+  let wldTapT = 0;
+  document.addEventListener('pointerdown', e => {
+    if (!S || !S.vibrate || !APP_PACK() || wldLv() < 1) return;
+    if (!e.target.closest || !e.target.closest('button, [role="button"], .tab')) return;
+    const t = performance.now(); if (t - wldTapT < 80) return; wldTapT = t;
+    buzz(6);
+  }, { capture: true, passive: true });
+  // 학교급이 오르면(졸업식이 끝나고 홈 지도로 돌아오면) 구름 막이 걷히며 새 학교가 보여요
+  function wldCurtain() {
+    const fr = $('.frame'), u = [1, 2, 3].map(i => IMG('tr_cloud_' + i)); if (!fr || u.some(x => !x)) return;
+    const c = document.createElement('div'); c.className = 'wld-cur'; c.setAttribute('aria-hidden', 'true');
+    c.innerHTML = `<img class="c1" src="${u[0]}" alt=""><img class="c2" src="${u[1]}" alt=""><img class="c3" src="${u[2]}" alt="">`;
+    fr.appendChild(c); setTimeout(() => c.remove(), 3000);
+  }
+  setInterval(() => {
+    if (!S) return;
+    if (WLD.tier0 == null) { WLD.tier0 = S.tier; return; }
+    if (S.tier > WLD.tier0) { WLD.tier0 = S.tier; WLD.curWait = true; }
+    if (WLD.curWait && rt.tab === 'school' && !rt.modalOpen && !rt.cereOn && !document.hidden) { WLD.curWait = false; if (wldLv() >= 1) wldCurtain(); }
+  }, 400);
+  // 사진 모드: 글과 단추를 숨기고 마을만. 시간과 날씨를 골라 볼 수 있어요(저장은 휴대폰 화면 캡처로)
+  const PH_T = [['morning', '아침'], ['day', '낮'], ['evening', '노을'], ['night', '밤']], PH_W = [['', '맑음'], ['rain', '비'], ['snow', '눈']];
+  function photoOpen() {
+    if (!S) return;
+    if (rt.modalOpen) closeModal(rt.modalOpen);
+    setTab('school'); rt.photo = true; rt.wldPh = wldPhase(); rt.wldWx = wldWeather(); document.body.classList.add('photo');
+    const b = document.createElement('div'); b.className = 'photo-bar'; b.id = 'photoBar';
+    const seg = (id, L, cur, k) => `<div class="seg" id="${id}" role="radiogroup">${L.map(([v, t]) => `<button type="button" role="radio" data-${k}="${v}" aria-checked="${v === cur}">${t}</button>`).join('')}</div>`;
+    b.innerHTML = seg('phT', PH_T, rt.wldPh, 'pht') + seg('phW', PH_W, rt.wldWx, 'phw') + '<button type="button" class="btn-sub" id="phX">닫기</button>';
+    document.body.appendChild(b); wldSync();
+    requestAnimationFrame(() => { const fr = $('.frame'); if (!fr || !rt.mapS) return; const z = Math.min(ZOOM_MAX, Math.max(1, fr.clientHeight / (rt.mapH / (rt.zoom || 1)))); rt.zoom = z; fitMap(false); panTo((fr.clientWidth - rt.mapW) / 2, (fr.clientHeight - rt.mapH) / 2); });   // 지도가 화면 위아래를 다 채우게
+  }
+  function photoClose() {
+    rt.photo = false; rt.wldPh = undefined; rt.wldWx = undefined; document.body.classList.remove('photo');
+    const b = $('#photoBar'); if (b) b.remove(); wldSync(); if (rt.tab === 'school') fitMap(true);
+  }
+  document.addEventListener('click', e => {
+    const t = e.target.closest && e.target.closest('#optPhoto, #photoBar button'); if (!t) return;
+    if (t.id === 'optPhoto') { sfx('tap'); photoOpen(); return; }
+    if (t.id === 'phX') { sfx('tap'); photoClose(); return; }
+    if (t.dataset.pht != null) rt.wldPh = t.dataset.pht; else if (t.dataset.phw != null) rt.wldWx = t.dataset.phw; else return;
+    t.parentNode.querySelectorAll('button').forEach(x => x.setAttribute('aria-checked', x === t ? 'true' : 'false')); sfx('tap'); wldSync();
   });

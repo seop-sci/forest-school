@@ -249,7 +249,8 @@
     // 마을 층
     wldPh: undefined,   // 사진 모드에서 고른 시간('morning', 'day', 'evening', 'night')
     wldWx: undefined,   // 사진 모드에서 고른 날씨('' 맑음, 'rain', 'snow')
-    photo: undefined   // 사진 모드 중
+    photo: undefined,   // 사진 모드 중
+    glideId: undefined   // 지도 미끄러짐 차례(새로 잡으면 앞 것을 멈춰요)
   };
   if (motionMQ && motionMQ.addEventListener) motionMQ.addEventListener('change', e => { rt.reduced = e.matches; });
   // 헷갈리는 0, O, 1, I, L을 뺀 글자로 학교 번호를 만들어요

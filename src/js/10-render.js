@@ -309,6 +309,22 @@
       requestAnimationFrame(step);
     });
   }
+  // 지도를 밀다 손을 떼면 그 빠르기로 조금 더 미끄러지다 멈춰요(그래픽 낮음과 움직임 줄이기는 바로 멈춤)
+  function panGlide(h) {
+    rt.glideId = (rt.glideId || 0) + 1;
+    if (!h || h.length < 2 || wldLv() < 1 || rt.reduced) return;
+    const now = performance.now(), a = h.find(p => now - p[0] < 90) || h[h.length - 2], b = h[h.length - 1], dt = Math.max(8, b[0] - a[0]);
+    if (now - b[0] > 60) return;   // 멈췄다가 뗐어요
+    let vx = (b[1] - a[1]) / dt, vy = (b[2] - a[2]) / dt; if (Math.hypot(vx, vy) < 0.25) return;
+    const id = rt.glideId; let last = now;
+    const step = t => {
+      if (rt.glideId !== id || rt.tab !== 'school') return;
+      const d = Math.min(40, t - last); last = t; const f = Math.exp(-d / 260);
+      const x0 = rt.panX, y0 = rt.panY; panTo(x0 + vx * d, y0 + vy * d); vx *= f; vy *= f;
+      if (Math.hypot(vx, vy) > 0.02 && (Math.abs(rt.panX - x0) > 0.05 || Math.abs(rt.panY - y0) > 0.05)) requestAnimationFrame(step);
+    };
+    requestAnimationFrame(step);
+  }
   function setupPan() {
     const fr = $('.frame');
     let st = null, pinch = null;
@@ -324,6 +340,7 @@
         return;
       }
       if (pts.size > 2) return;
+      rt.glideId = (rt.glideId || 0) + 1;   // 미끄러지던 지도를 다시 잡으면 멈춰요
       st = { id: e.pointerId, x: e.clientX, y: e.clientY, px: rt.panX || 0, py: rt.panY || 0, moved: false };
     });
     fr.addEventListener('pointermove', e => {
@@ -340,8 +357,9 @@
       if (!st.moved && Math.hypot(dx, dy) < 8) return;
       if (!st.moved) { st.moved = true; try { fr.setPointerCapture(e.pointerId); } catch (er) { /* 무시 */ } fr.classList.add('panning'); }
       panTo(st.px + dx, st.py + dy);
+      (st.hist || (st.hist = [])).push([performance.now(), e.clientX, e.clientY]); if (st.hist.length > 6) st.hist.shift();   // 손을 뗄 때 미끄러지는 빠르기
     });
-    const end = e => { pts.delete(e.pointerId); if (pinch && pts.size < 2) { pinch = null; rt.panMoved = performance.now(); return; } if (!st || e.pointerId !== st.id) return; if (st.moved) { rt.panMoved = performance.now(); fr.classList.remove('panning'); } st = null; };
+    const end = e => { pts.delete(e.pointerId); if (pinch && pts.size < 2) { pinch = null; rt.panMoved = performance.now(); return; } if (!st || e.pointerId !== st.id) return; if (st.moved) { rt.panMoved = performance.now(); fr.classList.remove('panning'); panGlide(st.hist); } st = null; };
     fr.addEventListener('pointerup', end); fr.addEventListener('pointercancel', end);
     // 지도 판은 스크롤하지 않아요 (키보드로 건물을 옮겨 다닐 때 브라우저가 밀어 두는 것도 되돌려요)
     fr.addEventListener('wheel', e => {   // 컴퓨터: 휠로 확대, 축소 (트랙패드 두 손가락 벌리기는 ctrlKey 휠로 와요)

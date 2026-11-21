@@ -2128,6 +2128,26 @@ body.photo .wld-vig.on{display:none}   /* 5.2.1 효과층(PixiJS): 지도 바로
 .board.open .stats{padding:7px;border-radius:16px;background:var(--board);border:2px solid color-mix(in srgb, #8FBF7C 55%, var(--board));box-shadow:0 6px 16px rgba(10,25,15,.35)}
 .board.open .stats .stat{background:color-mix(in srgb, #000 16%, transparent);box-shadow:none}
 
+/* 조용한 손맛: 누르는 동안 살짝 눌려요(빛이나 날아가는 효과는 없어요) */
+.btn-sub,.seg button,.icon-btn,.tabs .tab:not(.tab-tam){transition:transform .08s ease-out}
+.btn-sub:active,.seg button:active,.icon-btn:active,.tabs .tab:not(.tab-tam):active{transform:scale(.95)}
+@media (prefers-reduced-motion: reduce){.btn-sub:active,.seg button:active,.icon-btn:active,.tabs .tab:not(.tab-tam):active{transform:none}}
+/* 학교급 변신 구름 막(작업지시서 107 tr_cloud) */
+.wld-cur{position:absolute;inset:0;pointer-events:none;z-index:3;overflow:hidden;animation:wldCurIn .25s ease-out}
+.wld-cur img{position:absolute;width:150%;max-width:none;top:50%}
+.wld-cur .c1{left:-30%;transform:translateY(-70%);animation:wldCurL 1.9s .35s cubic-bezier(.5,0,.3,1) forwards}
+.wld-cur .c2{right:-30%;transform:translateY(-20%);animation:wldCurR 1.9s .35s cubic-bezier(.5,0,.3,1) forwards}
+.wld-cur .c3{left:-25%;width:150%;transform:translateY(-45%) scale(1.3);animation:wldCurM 1.6s .35s ease-in forwards}
+@keyframes wldCurIn{from{opacity:0}to{opacity:1}}
+@keyframes wldCurL{to{transform:translate(-80%,-70%);opacity:.2}}
+@keyframes wldCurR{to{transform:translate(80%,-20%);opacity:.2}}
+@keyframes wldCurM{to{transform:translateY(-45%) scale(1.8);opacity:0}}
+/* 사진 모드 */
+body.photo .board,body.photo .home-qcard,body.photo .map-left,body.photo .map-right,body.photo .tabs,body.photo .ui-fold,body.photo .wx-chip,body.photo .pl-chip,body.photo .tier-dots,body.photo .zone-bar,body.photo .ff-chip,body.photo .deco-bar,body.photo .deal,body.photo .sportsbar,body.photo .th-prevbar,body.photo .toast{visibility:hidden}
+.frame.wld-on .wx-fx.wx-rain,.frame.wld-on .wx-fx.wx-snow{display:none}
+.photo-bar{position:fixed;left:50%;bottom:calc(14px + env(safe-area-inset-bottom));transform:translateX(-50%);z-index:60;display:flex;flex-wrap:wrap;justify-content:center;gap:6px;max-width:calc(100% - 16px);padding:8px;border-radius:16px;background:rgba(255,250,238,.92);box-shadow:0 2px 10px rgba(0,0,0,.18)}
+.photo-bar .seg button{padding:6px 9px}
+.photo-bar .btn-sub{padding:6px 14px}
 /* ===== 1.5.0 탭 화면 정돈 ===== */
 .app:not(.on-school) .qrow,.app:not(.on-school) .subbar{display:none}
 .app:not(.on-school) .board{margin-bottom:8px}
@@ -4463,6 +4483,7 @@ body.mg-on .toast[hidden]{display:none}
         <label class="srow" for="optVibe"><span class="txt"><b>진동</b></span><input type="checkbox" class="switch" id="optVibe"></label>
         <div class="srow"><span class="txt"><b>화면 크기</b></span><div class="seg" id="optUiz" role="radiogroup" aria-label="화면 크기"><button type="button" role="radio" data-uiz="0" aria-checked="true">보통</button><button type="button" role="radio" data-uiz="1" aria-checked="false">크게</button></div></div><!-- 5.0.1.7 X-01 -->
         <div class="srow"><span class="txt"><b>숫자 단위</b></span><div class="seg" id="optUnits" role="radiogroup" aria-label="숫자 단위"><button type="button" role="radio" data-units="ko" aria-checked="true">1.2만</button><button type="button" role="radio" data-units="en" aria-checked="false">12K</button></div></div>
+        <button class="srow" type="button" id="optPhoto"><span class="txt"><b>사진 모드</b><small>화면의 글과 단추를 숨기고 마을만 봐요</small></span></button>
       </div>
       <h3 class="panel-sub">학교 기록</h3>
       <div class="slist">
@@ -9200,7 +9221,8 @@ body.mg-on .toast[hidden]{display:none}
     // 마을 층
     wldPh: undefined,   // 사진 모드에서 고른 시간('morning', 'day', 'evening', 'night')
     wldWx: undefined,   // 사진 모드에서 고른 날씨('' 맑음, 'rain', 'snow')
-    photo: undefined   // 사진 모드 중
+    photo: undefined,   // 사진 모드 중
+    glideId: undefined   // 지도 미끄러짐 차례(새로 잡으면 앞 것을 멈춰요)
   };
   if (motionMQ && motionMQ.addEventListener) motionMQ.addEventListener('change', e => { rt.reduced = e.matches; });
   // 헷갈리는 0, O, 1, I, L을 뺀 글자로 학교 번호를 만들어요
@@ -11721,6 +11743,16 @@ body.mg-on .toast[hidden]{display:none}
     }
     rt.elBadgeT = '';   // 반장 배지는 다음 틱에 다시 달아요
   }
+  // 위쪽(건물 쪽)으로 걸을 때는 뒷모습(chb_). 그래픽 낮음이나 그림이 없으면 앞모습 그대로
+  function kidLook(k, back) {
+    back = back && wldLv() > 0;
+    if (k.im && !k.im.isConnected) { k.im = null; k.back = false; }   // 모자를 바꾸는 등으로 그림을 새로 그렸어요
+    if (!!k.back === back) return;
+    const im = k.im || (k.im = k.g.querySelector('image')); if (!im) return;
+    if (back) { const bu = IMG('chb_' + (k.rare ? k.sp + '_rare' : k.sp)); if (!bu) return; k.frontU = im.getAttribute('href'); im.setAttribute('href', bu); }
+    else if (k.frontU) im.setAttribute('href', k.frontU);
+    k.back = back;
+  }
   function updateKids(dt, now) {
     if (rt.reduced) return;
     const away = kidsAway();   // 고등학교 밤에는 학생층이 숨어 있어서 걷기 계산만 하고 그리기(매 프레임 16명 setAttribute)와 줄 세우기는 쉬어요
@@ -11733,8 +11765,8 @@ body.mg-on .toast[hidden]{display:none}
         const wp = k.ang === undefined && k.route && k.route.length ? k.route[0] : null;
         const dx = (wp ? wp[0] : k.tx) - k.x, dy = (wp ? wp[1] : k.ty) - k.y, d = Math.hypot(dx, dy);
         if (wp && d < 0.8) { k.route.shift(); k.moving = true; }
-        else if (d < 0.8) { k.moving = false; if (k.propU) tripProp(k); if (!k.board && !k.hold && !k.rider && k.ang === undefined) { k.wait = rand(1, 4.5); pickTarget(k); } }
-        else { const st = Math.min(d, k.speed * dt); k.x += dx / d * st; k.y += dy / d * st; k.moving = true; }
+        else if (d < 0.8) { k.moving = false; kidLook(k, false); if (k.propU) tripProp(k); if (!k.board && !k.hold && !k.rider && k.ang === undefined) { k.wait = rand(1, 4.5); pickTarget(k); } }
+        else { const st = Math.min(d, k.speed * dt); k.x += dx / d * st; k.y += dy / d * st; k.moving = true; kidLook(k, dy / d < -0.5); }
       }
       if (!away) placeKid(k, k.moving ? -Math.abs(Math.sin(now / 110 + k.phase)) * 1.6 : k.hold ? -Math.abs(Math.sin(now / 260 + k.cheer)) * 2.4 : 0);
     }
@@ -12534,6 +12566,22 @@ body.mg-on .toast[hidden]{display:none}
       requestAnimationFrame(step);
     });
   }
+  // 지도를 밀다 손을 떼면 그 빠르기로 조금 더 미끄러지다 멈춰요(그래픽 낮음과 움직임 줄이기는 바로 멈춤)
+  function panGlide(h) {
+    rt.glideId = (rt.glideId || 0) + 1;
+    if (!h || h.length < 2 || wldLv() < 1 || rt.reduced) return;
+    const now = performance.now(), a = h.find(p => now - p[0] < 90) || h[h.length - 2], b = h[h.length - 1], dt = Math.max(8, b[0] - a[0]);
+    if (now - b[0] > 60) return;   // 멈췄다가 뗐어요
+    let vx = (b[1] - a[1]) / dt, vy = (b[2] - a[2]) / dt; if (Math.hypot(vx, vy) < 0.25) return;
+    const id = rt.glideId; let last = now;
+    const step = t => {
+      if (rt.glideId !== id || rt.tab !== 'school') return;
+      const d = Math.min(40, t - last); last = t; const f = Math.exp(-d / 260);
+      const x0 = rt.panX, y0 = rt.panY; panTo(x0 + vx * d, y0 + vy * d); vx *= f; vy *= f;
+      if (Math.hypot(vx, vy) > 0.02 && (Math.abs(rt.panX - x0) > 0.05 || Math.abs(rt.panY - y0) > 0.05)) requestAnimationFrame(step);
+    };
+    requestAnimationFrame(step);
+  }
   function setupPan() {
     const fr = $('.frame');
     let st = null, pinch = null;
@@ -12549,6 +12597,7 @@ body.mg-on .toast[hidden]{display:none}
         return;
       }
       if (pts.size > 2) return;
+      rt.glideId = (rt.glideId || 0) + 1;   // 미끄러지던 지도를 다시 잡으면 멈춰요
       st = { id: e.pointerId, x: e.clientX, y: e.clientY, px: rt.panX || 0, py: rt.panY || 0, moved: false };
     });
     fr.addEventListener('pointermove', e => {
@@ -12565,8 +12614,9 @@ body.mg-on .toast[hidden]{display:none}
       if (!st.moved && Math.hypot(dx, dy) < 8) return;
       if (!st.moved) { st.moved = true; try { fr.setPointerCapture(e.pointerId); } catch (er) { /* 무시 */ } fr.classList.add('panning'); }
       panTo(st.px + dx, st.py + dy);
+      (st.hist || (st.hist = [])).push([performance.now(), e.clientX, e.clientY]); if (st.hist.length > 6) st.hist.shift();   // 손을 뗄 때 미끄러지는 빠르기
     });
-    const end = e => { pts.delete(e.pointerId); if (pinch && pts.size < 2) { pinch = null; rt.panMoved = performance.now(); return; } if (!st || e.pointerId !== st.id) return; if (st.moved) { rt.panMoved = performance.now(); fr.classList.remove('panning'); } st = null; };
+    const end = e => { pts.delete(e.pointerId); if (pinch && pts.size < 2) { pinch = null; rt.panMoved = performance.now(); return; } if (!st || e.pointerId !== st.id) return; if (st.moved) { rt.panMoved = performance.now(); fr.classList.remove('panning'); panGlide(st.hist); } st = null; };
     fr.addEventListener('pointerup', end); fr.addEventListener('pointercancel', end);
     // 지도 판은 스크롤하지 않아요 (키보드로 건물을 옮겨 다닐 때 브라우저가 밀어 두는 것도 되돌려요)
     fr.addEventListener('wheel', e => {   // 컴퓨터: 휠로 확대, 축소 (트랙패드 두 손가락 벌리기는 ctrlKey 휠로 와요)
@@ -31227,7 +31277,7 @@ body.mg-on .toast[hidden]{display:none}
      다 처치하면 대원들이 길을 따라 오른쪽 위로 달리고, 화면이 따라가며 바닥이 왼쪽 아래로 흘러요. 10층마다 아치문(ex6_<지역>_gate)을 지나요
      높이 오를수록(지역 안 50층) 먼 풍경이 내려가고 발아래로 구름(ex6_cloud)이 지나가요
      하늘, 먼 풍경, 앞 장식은 그대로 HTML 겹(작업지시서 104-2). 엔진이 없거나 움직임 줄이기면 예전 오르기 그대로. 겨루기 계산과 값은 바꾸지 않아요 */
-  const FXG = { st: '', app: null, root: null, sq: null, floor: null, path: null, cloud: null, gate: null, gs: 0, reg: '', tex: {}, raf: 0, last: 0, run: 0, sp: 0, ang: 0, ux: 0, uy: 0, mid: [0, 0], top: 0, W: 0, H: 0, h: 0 };
+  const FXG = { decs: [], decBox: null, decPw: 0, st: '', app: null, root: null, sq: null, floor: null, path: null, cloud: null, gate: null, gs: 0, reg: '', tex: {}, raf: 0, last: 0, run: 0, sp: 0, ang: 0, ux: 0, uy: 0, mid: [0, 0], top: 0, W: 0, H: 0, h: 0 };
   const FXG_SQ = 0.6;   // 바닥을 세로로 누르는 정도(원근 어림)
   const fxgOn = fl => fxTamOn() && FXG.st === 'ok' && !!fxgTexOk(tamReg(fl).k);
   function fxgTexOk(k) { return !!(IMG(`ex6_${k}_tile`) && IMG(`ex6_${k}_path`)); }
@@ -31269,7 +31319,7 @@ body.mg-on .toast[hidden]{display:none}
     const tile = fxgTex(`ex6_${k}_tile`), path = fxgTex(`ex6_${k}_path`); fxgTex(`ex6_${k}_gate`);   // 문은 미리 받아 둬요
     if (!tile || !path) { app.canvas.hidden = true; FXG.reg = ''; return false; }   // 그림이 오면 fxgRefresh가 이 지역으로 새로 깔아요(앞 지역 바닥이 남지 않게)
     if (app.screen.width !== world.clientWidth || app.screen.height !== world.clientHeight) { app.renderer.resize(Math.max(1, world.clientWidth), Math.max(1, world.clientHeight)); force = true; }
-    if (FXG.reg === k && FXG.floor && !force) { app.canvas.hidden = false; return true; }
+    if (FXG.reg === k && FXG.floor && !force) { app.canvas.hidden = false; if (!FXG.decs.length && fxgDecs(k)) app.render(); return true; }
     FXG.reg = k; fxgGeom();
     const { W, H, top } = FXG, sq = FXG.sq;
     sq.removeChildren().forEach(c => c.destroy()); FXG.gate = null;
@@ -31277,7 +31327,7 @@ body.mg-on .toast[hidden]{display:none}
     const ts = Math.max(0.3, W * 0.8 / 720), LH = (H - top) / FXG_SQ + 40;
     const floor = new P.TilingSprite({ texture: tile, width: W * 3, height: LH + 80 }); floor.position.set(-W * 1.5, -40); floor.tileScale.set(ts); sq.addChild(floor); FXG.floor = floor;
     const len = Math.hypot(W, LH) * 2.2, pw = 256 * ts * 1.05;
-    const pa = new P.TilingSprite({ texture: path, width: pw, height: len }); pa.anchor.set(0.5); pa.tileScale.set(ts * 1.05); pa.rotation = FXG.ang + Math.PI / 2; pa.position.set(FXG.mid[0], FXG.mid[1]); sq.addChild(pa); FXG.path = pa;
+    const pa = new P.TilingSprite({ texture: path, width: pw, height: len }); pa.anchor.set(0.5); pa.tileScale.set(ts * 1.05); pa.rotation = FXG.ang + Math.PI / 2; pa.position.set(FXG.mid[0], FXG.mid[1]); sq.addChild(pa); FXG.path = pa; FXG.decs = []; fxgDecs(k);
     // 위쪽 가장자리는 HTML 바닥(풀숲 가장자리)과 이어지게 흐리게. 엔진 8은 여러 조각을 묶은 가림이 투명도를 무시해서(딱 잘림) 그림 한 장으로 가려요
     const mh = H - top + 24, ff = Math.min(0.9, 110 / Math.max(1, mh)), c = document.createElement('canvas'); c.width = 4; c.height = 256;
     { const g = c.getContext('2d'), gr = g.createLinearGradient(0, 0, 0, 256); gr.addColorStop(0, 'rgba(255,255,255,0)'); gr.addColorStop(ff, 'rgba(255,255,255,1)'); gr.addColorStop(1, 'rgba(255,255,255,1)'); g.fillStyle = gr; g.fillRect(0, 0, 4, 256); }
@@ -31303,13 +31353,34 @@ body.mg-on .toast[hidden]{display:none}
   }
   function fxgKick() { if (FXG.st === 'ok' && !FXG.raf) { FXG.last = performance.now(); FXG.raf = requestAnimationFrame(fxgFrame); } }
   function fxgGatePos() { const g = FXG.gate; if (!g) return; const lx = FXG.mid[0] + FXG.ux * FXG.gs, ly = FXG.mid[1] + FXG.uy * FXG.gs; g.position.set(FXG.W / 2 + lx, FXG.top + ly * FXG_SQ); }
+  // 바닥 장식(작업지시서 107 ex6_<지역>_dec1~4): 바닥 위에 흩어 놓고 바닥과 함께 흘러요. 길 위에는 놓지 않아요. 그래픽 낮음은 없음
+  function fxgDecs(k) {
+    const lv = wldLv(), nd = lv >= 2 ? 16 : lv ? 9 : 0; if (!nd || !FXG.sq || !FXG.path) return false;
+    const ts = [1, 2, 3, 4].map(i => fxgTex(`ex6_${k}_dec${i}`)).filter(Boolean); if (ts.length < 4) return false;
+    const { W, H, top } = FXG, LH = (H - top) / FXG_SQ + 40, sc = Math.max(0.3, W * 0.8 / 720), pw = 256 * sc * 1.05;
+    FXG.decBox = [-W * 0.62, W * 0.62, -10, LH]; FXG.decPw = pw;
+    for (let i = 0; i < nd; i++) {
+      const s = new window.PIXI.Sprite(ts[i % 4]); s.anchor.set(0.5); s.scale.set(sc * fxRnd(0.75, 1.1), sc * fxRnd(0.75, 1.1) / FXG_SQ * 0.75);   // 세로로 눌린 바닥이라 장식은 덜 눌리게
+      for (let t = 0; t < 12; t++) { s.x = fxRnd(FXG.decBox[0], FXG.decBox[1]); s.y = fxRnd(FXG.decBox[2], FXG.decBox[3]); if (fxgOffPath(s, pw)) break; }
+      FXG.sq.addChildAt(s, 1); FXG.decs.push(s);
+    }
+    return true;
+  }
+  const fxgOffPath = (s, pw) => Math.abs((s.x - FXG.mid[0]) * FXG.uy - (s.y - FXG.mid[1]) * FXG.ux) > pw * 0.62;
+  function fxgDecMove(dx, dy) {
+    const B = FXG.decBox; if (!B) return;
+    for (const s of FXG.decs) { s.x += dx; s.y += dy; let w = false;
+      if (s.x < B[0]) { s.x += B[1] - B[0]; w = true; } else if (s.x > B[1]) { s.x -= B[1] - B[0]; w = true; }
+      if (s.y < B[2]) { s.y += B[3] - B[2]; w = true; } else if (s.y > B[3]) { s.y -= B[3] - B[2]; w = true; }
+      if (w && !fxgOffPath(s, FXG.decPw)) { s.x += FXG.uy * FXG.decPw; s.y -= FXG.ux * FXG.decPw; } }
+  }
   function fxgFrame(now) {
     FXG.raf = 0; const dt = Math.min(0.05, Math.max(0, (now - FXG.last) / 1000)); FXG.last = now;
     if (!fxTamOn() || !FXG.floor) { FXG.run = 0; return; }
     if (FXG.run > 0) {
       const e = Math.min(1, FXG.run / 0.25), v = FXG.sp * e * dt; FXG.run -= dt;   // 끝 0.25초는 천천히 멈춰요
       FXG.floor.tilePosition.x -= FXG.ux * v; FXG.floor.tilePosition.y -= FXG.uy * v;
-      FXG.path.tilePosition.y += v;
+      FXG.path.tilePosition.y += v; fxgDecMove(-FXG.ux * v, -FXG.uy * v);
       if (FXG.cloud && FXG.cloud.alpha > 0) FXG.cloud.tilePosition.x -= v * 0.35;
       if (FXG.gate) { FXG.gs -= v; fxgGatePos(); if (FXG.gs < -Math.hypot(FXG.W, FXG.H) * 0.8) { FXG.gate.destroy(); FXG.gate = null; } }
     }
@@ -31389,18 +31460,17 @@ body.mg-on .toast[hidden]{display:none}
   /* ---------- 마을 층(5.3.1 살아 있는 숲속 마을): 하루의 빛, 날씨, 구름 그림자, 작은 생물, 물결 ----------
      홈 지도에서만 움직여요. 빛과 가장자리 그늘은 지도 위 얇은 막(.wld-tint, .wld-vig), 나머지는 효과층(FXL) 그림판에 같이 그려요.
      그래픽 품질(S.gfx): 0 낮음(지금까지 화면 그대로), 1 보통(초당 20장, 적게), 2 높음(초당 30장). -1은 자동(폰 성능으로)
-     값과 규칙과 저장은 건드리지 않아요. 날씨는 두 시간마다 바뀌는 정해진 순서(모두 같은 날씨)이고, 학교 일에는 영향이 없어요 */
-  const WLD = { st: '', lv: -1, ph: '', wx: '', key: '', tint: null, vig: null, mc: null, sc: null, tex: {}, parts: [], next: {}, timer: 0, last: 0, water: [], wv: 0 };
+     값과 규칙과 저장은 건드리지 않아요. 비와 눈은 그날의 게임 날씨를 엔진으로 더 곱게 그리는 것이에요(예전 CSS 비와 눈은 이때 숨겨요) */
+  const WLD = { st: '', lv: -1, ph: '', wx: '', key: '', tint: null, vig: null, mc: null, sc: null, tex: {}, parts: [], next: {}, timer: 0, last: 0, water: [], wv: 0, tier0: null, curWait: false };
   const WLD_FPS = [0, 20, 30];
   // 제안 숫자: 빗방울 수, 눈송이 수, 반딧불 수, 나비 수(보통, 높음)
   const WLD_N = { rain: [45, 90], snow: [35, 70], fly: [7, 14], bfly: [2, 3], cloud: [0, 3] };
-  const WLD_RAIN = 0.14;   // 두 시간 칸마다 비나 눈이 올 몫(제안)
   const WLD_WATER = {"map_elem":[[18,186],[2,230],[18,258],[14,294],[26,358],[2,382]],"map_high":[[338,66],[358,94],[338,122],[354,150],[346,182],[186,206],[350,214],[354,246]],"map_kinder":[[22,126],[186,218],[2,350],[34,366],[42,398]]};   // dev/water_spots.py로 고른 물 자리
   function wldAuto() {
     const c = navigator.hardwareConcurrency || 4, m = navigator.deviceMemory || 4;
     return c >= 8 && m >= 6 ? 2 : c >= 4 ? 1 : 0;
   }
-  const wldLv = () => rt.reduced || !S ? 0 : (S.gfx >= 0 ? S.gfx : wldAuto());
+  const wldLv = () => rt.reduced || !S ? 0 : rt.photo ? 2 : (S.gfx >= 0 ? S.gfx : wldAuto());
   const wldMonth = () => new Date(gameNow() + KST_MS).getUTCMonth() + 1;
   const wldBg = () => { try { return thOn().bg || ''; } catch (e) { return ''; } };
   function wldPhase() {
@@ -31408,12 +31478,11 @@ body.mg-on .toast[hidden]{display:none}
     const h = kstHour(gameNow());
     return isNight() ? 'night' : h < 9 ? 'morning' : h >= 17 ? 'evening' : 'day';
   }
+  // 날씨는 그날 정해지는 게임 날씨(wxOf, 37-season.js)를 따라요. 날씨 효과를 끈 사람(S.wxOff)은 맑음처럼
   function wldWeather() {
     if (rt.wldWx != null) return rt.wldWx;   // 사진 모드에서 고른 날씨('' 맑음)
-    const bg = wldBg(); if (bg === 'space' || geo().campus) return '';
-    const b = Math.floor((gameNow() + KST_MS) / 7200000), x = Math.sin(b * 12.9898 + 78.233) * 43758.5453, r = x - Math.floor(x);
-    if (r >= WLD_RAIN) return '';
-    const m = wldMonth(); return bg === 'winter' || bg === 'xmas' || m === 12 || m <= 2 ? 'snow' : 'rain';
+    if (!S || S.wxOff || rt.viewTier != null) return '';
+    const k = wxOf(); return k === 'rain' || k === 'snow' ? k : '';
   }
   function wldDom() {
     if (WLD.tint) return true;
@@ -31426,6 +31495,7 @@ body.mg-on .toast[hidden]{display:none}
   // 날씨, 시간, 품질을 다시 보고 막과 소리와 움직임을 맞춰요(탭을 바꿀 때와 15초마다)
   function wldSync() {
     if (!S || !wldDom()) return;
+    if (rt.photo && rt.tab !== 'school') photoClose();
     const lv = wldLv(), home = rt.tab === 'school' && !document.hidden, ph = lv ? wldPhase() : '', wx = lv ? wldWeather() : '';
     WLD.lv = lv; WLD.ph = ph; WLD.wx = wx;
     const hsN = $('#map') && $('#map').classList.contains('hs-night');   // 고등학교부터의 밤은 예전 밤 화면(창문 불빛)이 맡아요
@@ -31454,9 +31524,9 @@ body.mg-on .toast[hidden]{display:none}
     return null;
   }
   function wldReset() { for (const p of WLD.parts) if (p.s && !p.s.destroyed) p.s.destroy(); WLD.parts.length = 0; WLD.next = {}; }
-  function wldStart() { if (!wldPixi()) return; WLD.mc.visible = WLD.sc.visible = true; if (!WLD.timer) { WLD.last = performance.now(); WLD.timer = setTimeout(wldTick, 0); } }
+  function wldStart() { if (!wldPixi()) return; WLD.mc.visible = WLD.sc.visible = true; const fr = $('.frame'); if (fr) fr.classList.add('wld-on'); if (!WLD.timer) { WLD.last = performance.now(); WLD.timer = setTimeout(wldTick, 0); } }
   function wldStop() {
-    clearTimeout(WLD.timer); WLD.timer = 0;
+    clearTimeout(WLD.timer); WLD.timer = 0; const fr = $('.frame'); if (fr) fr.classList.remove('wld-on');
     if (WLD.st === 'ok') { wldReset(); WLD.mc.visible = WLD.sc.visible = false; if (!FXL.raf && FXL.app) FXL.app.render(); }
   }
   function wldTick() {
@@ -31552,6 +31622,50 @@ body.mg-on .toast[hidden]{display:none}
     const b = e.target.closest && e.target.closest('#optGfx [data-gfx]'); if (!b || !S) return;
     const v = +b.dataset.gfx; if (v === S.gfx) return;
     S.gfx = v; save(); syncSettingsUI(); sfx('tap'); wldSync();
+  });
+  // 조용한 손맛: 앱에서 단추를 누르면 아주 짧게 떨려요(진동을 켠 사람만, 그래픽 낮음은 빼요)
+  let wldTapT = 0;
+  document.addEventListener('pointerdown', e => {
+    if (!S || !S.vibrate || !APP_PACK() || wldLv() < 1) return;
+    if (!e.target.closest || !e.target.closest('button, [role="button"], .tab')) return;
+    const t = performance.now(); if (t - wldTapT < 80) return; wldTapT = t;
+    buzz(6);
+  }, { capture: true, passive: true });
+  // 학교급이 오르면(졸업식이 끝나고 홈 지도로 돌아오면) 구름 막이 걷히며 새 학교가 보여요
+  function wldCurtain() {
+    const fr = $('.frame'), u = [1, 2, 3].map(i => IMG('tr_cloud_' + i)); if (!fr || u.some(x => !x)) return;
+    const c = document.createElement('div'); c.className = 'wld-cur'; c.setAttribute('aria-hidden', 'true');
+    c.innerHTML = `<img class="c1" src="${u[0]}" alt=""><img class="c2" src="${u[1]}" alt=""><img class="c3" src="${u[2]}" alt="">`;
+    fr.appendChild(c); setTimeout(() => c.remove(), 3000);
+  }
+  setInterval(() => {
+    if (!S) return;
+    if (WLD.tier0 == null) { WLD.tier0 = S.tier; return; }
+    if (S.tier > WLD.tier0) { WLD.tier0 = S.tier; WLD.curWait = true; }
+    if (WLD.curWait && rt.tab === 'school' && !rt.modalOpen && !rt.cereOn && !document.hidden) { WLD.curWait = false; if (wldLv() >= 1) wldCurtain(); }
+  }, 400);
+  // 사진 모드: 글과 단추를 숨기고 마을만. 시간과 날씨를 골라 볼 수 있어요(저장은 휴대폰 화면 캡처로)
+  const PH_T = [['morning', '아침'], ['day', '낮'], ['evening', '노을'], ['night', '밤']], PH_W = [['', '맑음'], ['rain', '비'], ['snow', '눈']];
+  function photoOpen() {
+    if (!S) return;
+    if (rt.modalOpen) closeModal(rt.modalOpen);
+    setTab('school'); rt.photo = true; rt.wldPh = wldPhase(); rt.wldWx = wldWeather(); document.body.classList.add('photo');
+    const b = document.createElement('div'); b.className = 'photo-bar'; b.id = 'photoBar';
+    const seg = (id, L, cur, k) => `<div class="seg" id="${id}" role="radiogroup">${L.map(([v, t]) => `<button type="button" role="radio" data-${k}="${v}" aria-checked="${v === cur}">${t}</button>`).join('')}</div>`;
+    b.innerHTML = seg('phT', PH_T, rt.wldPh, 'pht') + seg('phW', PH_W, rt.wldWx, 'phw') + '<button type="button" class="btn-sub" id="phX">닫기</button>';
+    document.body.appendChild(b); wldSync();
+    requestAnimationFrame(() => { const fr = $('.frame'); if (!fr || !rt.mapS) return; const z = Math.min(ZOOM_MAX, Math.max(1, fr.clientHeight / (rt.mapH / (rt.zoom || 1)))); rt.zoom = z; fitMap(false); panTo((fr.clientWidth - rt.mapW) / 2, (fr.clientHeight - rt.mapH) / 2); });   // 지도가 화면 위아래를 다 채우게
+  }
+  function photoClose() {
+    rt.photo = false; rt.wldPh = undefined; rt.wldWx = undefined; document.body.classList.remove('photo');
+    const b = $('#photoBar'); if (b) b.remove(); wldSync(); if (rt.tab === 'school') fitMap(true);
+  }
+  document.addEventListener('click', e => {
+    const t = e.target.closest && e.target.closest('#optPhoto, #photoBar button'); if (!t) return;
+    if (t.id === 'optPhoto') { sfx('tap'); photoOpen(); return; }
+    if (t.id === 'phX') { sfx('tap'); photoClose(); return; }
+    if (t.dataset.pht != null) rt.wldPh = t.dataset.pht; else if (t.dataset.phw != null) rt.wldWx = t.dataset.phw; else return;
+    t.parentNode.querySelectorAll('button').forEach(x => x.setAttribute('aria-checked', x === t ? 'true' : 'false')); sfx('tap'); wldSync();
   });
   /* ---------- 2.0.0 핫픽스(원격 설정, 2026-10-27 woodani) ----------
      웹 주소의 live.json을 켤 때 읽어요(웹, 안드로이드, 토스 모두). 코드는 받지 않고 숫자, 공지, 기능 끄기만 받아요.
@@ -31758,7 +31872,7 @@ body.mg-on .toast[hidden]{display:none}
     MAP_OAK, oakArt, layoutOak, mapOak, oakAt, tapOak, dropSpot,
     dexMeet, dexSync, dexPending, dexGift, renderDex, evCurrent, evNext, evUpcoming, evSync, evFix, evVal, EV_FALLBACK, EV_DECO, EV_HAT, COS, DECO_BY, decoOwn, perkRec, fpRec, BOOST_ALL, buyShop, pickShop, showNote, showOkOn, showWd, renderGradPanel, renderShop, renderDecoShop, EV_WEEKLY, EV_WEEK_BASE, weekMon, claimStamp, claimEvMission, claimEvBox, renderEvent, evMissions, evOk, evSkipped, EV_MONTHS, EV_MEASURE, tierMinutes, minAcorns, IMG, sanitize171, ACH, achSync, claimAch, setTitle, renderAch, setDexSeg, achClaimable, XT, xtAct, xtCost, xtLv, feastMins, libMult, propInstances, walkBuild, festItemSvg, guestArt, adErrText, googleErrText, openSheet, closeSheet, startFest, startSports, sanitize170, EV_STAMPS, EV_SPECIAL, EV_MONTHLY, EV_BOX, DEX_KEYS, DEX_REWARD, DEX_GUEST_KEYS, seasonKey, roofArtKey, thrKey, PP, PP_TITLES, ppOpen, ppPer, ppData, ppDay, ppWrite, ppTick, ppSync, ppScore, ppSemDone, rtMax, alumniLines, SIDE, vdReward, oakKey, setSeasonArt, VP, vpLv, vpCost, vpMult, vpAct, renderVpCard, sportsPrize, festPrize, renderTeachers, buildTeacherCards, bldImg, roofKey, bldStage, mapKey, setMapArt, applyThemes, buyFacility, bldFx, setBldFx, mapHi, Live, liveApply, liveLoad, liveOff, LIVE_KEYS, EVC, NOTICES, openNotice, noticeAuto, noticeWant, ntUnread, startTrial, endTrial: () => rt.trial && (rt.trial.left = 0), spawnDeal, startVisit, IMG170, MG, mgCells, mgSetCells, mgTick, mgAddEnergy, mgAddUp, mgTapGen, mgDrop, mgSell, mgUpgrade, mgAddUp, mgUpSwap, mgGensMax, MG_UP_ESS, mgClaimOrder, mgSwapOrder, mgOrderOk, mgFillOrders, mgOpen, mgClose, mgRenderAll, mgSpawnLevel, mgNearestEmpty, mgEmptyBoard, mgOrderReward, mgUI, sanitize180, mgWatchAd, mgNewOrder, mgHintPick, mgShowHint, mgClearHint, mgTouch, mgOrderGuide, mgDexN, mgDexCan, mgDexClaim, mgOpenDex, MG_DEX, MG_DEX_MS, mgDexEss, mgDexEssCan, mgDexEssN, mgDexMsCan, mgDexMsClaim, MGB, mgBuyBoost, mgBstLeft, mgOpenBoost, nice, claimMission, claimBonus, claimWeekMission, MP_BOX, swapDaily, repairMissions, MISSIONS, WMISSIONS, dmDay, wkWeek,   // 도감, 이벤트
     PZ, PZ_SHAPES, pzFits, pzAnyFit, pzStuck, pzFullLines, pzPlace, pzFreshGame, pzStart, PZB, pzbCost, pzApplyBoost, pzBoostOpen, pzBoostGo, festGoldLeft, festGoldTake, claimSports, TR2, TR2_PL, openTr2, tr2Act, tr2Away, tr2Ready, tr2Rsv, tr2Tick, renderAlbum, FEST, FEST_IDS, festNight, festShown, festTimeLock, festOpen, startFest, openFest, endFest, renderStreet, pzFinish, pzLeft, pzCanAd, pzEssOf, pzMinOf, pzHelpSquirrel, pzHelpOwl, pzHelpBear, fillSubs, mapRoofTop, showAd, claimOfflineDouble, startBoost, tripAd, festFocus, festRange, visMap, renderMissions, pzHasHelp, pzRot, pzNewPiece, pzOpen, pzClose, pzGameOver, pzRenderAll, renderMini, addEss, ESHOP, SP_FUR, applyCos, essItem, pickEss, buyEss, renderEssShop, hatSVG, spFurImg, gameNow, gameToday, gameWeek, kstDay, setServerTime, SVR, dmDay, weekIdx, lgWeek, wkWeek, lgKey, pzDay, goldDay, boostLeft, dealLeft, canStamp };
-  if (window.__FOREST_TEST) Object.assign(window.__forest, { uniTerm, utSync, tripUseTicket, readUseTicket, picnicUseTicket, buyDecoPieces, adGold, claimBonus, cloudPush, cloudClash, syncGet, revOf, deleteAccount, lookDel: () => lookDelNow(), lookSet, lookPush, leaveRank, sanitizeCg, freshCg, ambWant, ambSync, AMB, AMB_LV, WLD, wldSync, wldLv, wldPhase, wldWeather, wldAuto, WLD_WATER });   // 시험 손잡이
+  if (window.__FOREST_TEST) Object.assign(window.__forest, { uniTerm, utSync, tripUseTicket, readUseTicket, picnicUseTicket, buyDecoPieces, adGold, claimBonus, cloudPush, cloudClash, syncGet, revOf, deleteAccount, lookDel: () => lookDelNow(), lookSet, lookPush, leaveRank, sanitizeCg, freshCg, ambWant, ambSync, AMB, AMB_LV, WLD, wldSync, wldLv, wldPhase, wldWeather, wldAuto, WLD_WATER, wldCurtain, photoOpen, photoClose });   // 시험 손잡이
   if (window.claude && window.claude.hot && window.claude.hot.snapshot) {
     try { window.claude.hot.snapshot(() => { if (S) syncMid(); return { save: S }; }); } catch (e) { /* 무시 */ }
   }

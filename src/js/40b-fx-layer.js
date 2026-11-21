@@ -425,7 +425,7 @@
      다 처치하면 대원들이 길을 따라 오른쪽 위로 달리고, 화면이 따라가며 바닥이 왼쪽 아래로 흘러요. 10층마다 아치문(ex6_<지역>_gate)을 지나요
      높이 오를수록(지역 안 50층) 먼 풍경이 내려가고 발아래로 구름(ex6_cloud)이 지나가요
      하늘, 먼 풍경, 앞 장식은 그대로 HTML 겹(작업지시서 104-2). 엔진이 없거나 움직임 줄이기면 예전 오르기 그대로. 겨루기 계산과 값은 바꾸지 않아요 */
-  const FXG = { st: '', app: null, root: null, sq: null, floor: null, path: null, cloud: null, gate: null, gs: 0, reg: '', tex: {}, raf: 0, last: 0, run: 0, sp: 0, ang: 0, ux: 0, uy: 0, mid: [0, 0], top: 0, W: 0, H: 0, h: 0 };
+  const FXG = { decs: [], decBox: null, decPw: 0, st: '', app: null, root: null, sq: null, floor: null, path: null, cloud: null, gate: null, gs: 0, reg: '', tex: {}, raf: 0, last: 0, run: 0, sp: 0, ang: 0, ux: 0, uy: 0, mid: [0, 0], top: 0, W: 0, H: 0, h: 0 };
   const FXG_SQ = 0.6;   // 바닥을 세로로 누르는 정도(원근 어림)
   const fxgOn = fl => fxTamOn() && FXG.st === 'ok' && !!fxgTexOk(tamReg(fl).k);
   function fxgTexOk(k) { return !!(IMG(`ex6_${k}_tile`) && IMG(`ex6_${k}_path`)); }
@@ -467,7 +467,7 @@
     const tile = fxgTex(`ex6_${k}_tile`), path = fxgTex(`ex6_${k}_path`); fxgTex(`ex6_${k}_gate`);   // 문은 미리 받아 둬요
     if (!tile || !path) { app.canvas.hidden = true; FXG.reg = ''; return false; }   // 그림이 오면 fxgRefresh가 이 지역으로 새로 깔아요(앞 지역 바닥이 남지 않게)
     if (app.screen.width !== world.clientWidth || app.screen.height !== world.clientHeight) { app.renderer.resize(Math.max(1, world.clientWidth), Math.max(1, world.clientHeight)); force = true; }
-    if (FXG.reg === k && FXG.floor && !force) { app.canvas.hidden = false; return true; }
+    if (FXG.reg === k && FXG.floor && !force) { app.canvas.hidden = false; if (!FXG.decs.length && fxgDecs(k)) app.render(); return true; }
     FXG.reg = k; fxgGeom();
     const { W, H, top } = FXG, sq = FXG.sq;
     sq.removeChildren().forEach(c => c.destroy()); FXG.gate = null;
@@ -475,7 +475,7 @@
     const ts = Math.max(0.3, W * 0.8 / 720), LH = (H - top) / FXG_SQ + 40;
     const floor = new P.TilingSprite({ texture: tile, width: W * 3, height: LH + 80 }); floor.position.set(-W * 1.5, -40); floor.tileScale.set(ts); sq.addChild(floor); FXG.floor = floor;
     const len = Math.hypot(W, LH) * 2.2, pw = 256 * ts * 1.05;
-    const pa = new P.TilingSprite({ texture: path, width: pw, height: len }); pa.anchor.set(0.5); pa.tileScale.set(ts * 1.05); pa.rotation = FXG.ang + Math.PI / 2; pa.position.set(FXG.mid[0], FXG.mid[1]); sq.addChild(pa); FXG.path = pa;
+    const pa = new P.TilingSprite({ texture: path, width: pw, height: len }); pa.anchor.set(0.5); pa.tileScale.set(ts * 1.05); pa.rotation = FXG.ang + Math.PI / 2; pa.position.set(FXG.mid[0], FXG.mid[1]); sq.addChild(pa); FXG.path = pa; FXG.decs = []; fxgDecs(k);
     // 위쪽 가장자리는 HTML 바닥(풀숲 가장자리)과 이어지게 흐리게. 엔진 8은 여러 조각을 묶은 가림이 투명도를 무시해서(딱 잘림) 그림 한 장으로 가려요
     const mh = H - top + 24, ff = Math.min(0.9, 110 / Math.max(1, mh)), c = document.createElement('canvas'); c.width = 4; c.height = 256;
     { const g = c.getContext('2d'), gr = g.createLinearGradient(0, 0, 0, 256); gr.addColorStop(0, 'rgba(255,255,255,0)'); gr.addColorStop(ff, 'rgba(255,255,255,1)'); gr.addColorStop(1, 'rgba(255,255,255,1)'); g.fillStyle = gr; g.fillRect(0, 0, 4, 256); }
@@ -501,13 +501,34 @@
   }
   function fxgKick() { if (FXG.st === 'ok' && !FXG.raf) { FXG.last = performance.now(); FXG.raf = requestAnimationFrame(fxgFrame); } }
   function fxgGatePos() { const g = FXG.gate; if (!g) return; const lx = FXG.mid[0] + FXG.ux * FXG.gs, ly = FXG.mid[1] + FXG.uy * FXG.gs; g.position.set(FXG.W / 2 + lx, FXG.top + ly * FXG_SQ); }
+  // 바닥 장식(작업지시서 107 ex6_<지역>_dec1~4): 바닥 위에 흩어 놓고 바닥과 함께 흘러요. 길 위에는 놓지 않아요. 그래픽 낮음은 없음
+  function fxgDecs(k) {
+    const lv = wldLv(), nd = lv >= 2 ? 16 : lv ? 9 : 0; if (!nd || !FXG.sq || !FXG.path) return false;
+    const ts = [1, 2, 3, 4].map(i => fxgTex(`ex6_${k}_dec${i}`)).filter(Boolean); if (ts.length < 4) return false;
+    const { W, H, top } = FXG, LH = (H - top) / FXG_SQ + 40, sc = Math.max(0.3, W * 0.8 / 720), pw = 256 * sc * 1.05;
+    FXG.decBox = [-W * 0.62, W * 0.62, -10, LH]; FXG.decPw = pw;
+    for (let i = 0; i < nd; i++) {
+      const s = new window.PIXI.Sprite(ts[i % 4]); s.anchor.set(0.5); s.scale.set(sc * fxRnd(0.75, 1.1), sc * fxRnd(0.75, 1.1) / FXG_SQ * 0.75);   // 세로로 눌린 바닥이라 장식은 덜 눌리게
+      for (let t = 0; t < 12; t++) { s.x = fxRnd(FXG.decBox[0], FXG.decBox[1]); s.y = fxRnd(FXG.decBox[2], FXG.decBox[3]); if (fxgOffPath(s, pw)) break; }
+      FXG.sq.addChildAt(s, 1); FXG.decs.push(s);
+    }
+    return true;
+  }
+  const fxgOffPath = (s, pw) => Math.abs((s.x - FXG.mid[0]) * FXG.uy - (s.y - FXG.mid[1]) * FXG.ux) > pw * 0.62;
+  function fxgDecMove(dx, dy) {
+    const B = FXG.decBox; if (!B) return;
+    for (const s of FXG.decs) { s.x += dx; s.y += dy; let w = false;
+      if (s.x < B[0]) { s.x += B[1] - B[0]; w = true; } else if (s.x > B[1]) { s.x -= B[1] - B[0]; w = true; }
+      if (s.y < B[2]) { s.y += B[3] - B[2]; w = true; } else if (s.y > B[3]) { s.y -= B[3] - B[2]; w = true; }
+      if (w && !fxgOffPath(s, FXG.decPw)) { s.x += FXG.uy * FXG.decPw; s.y -= FXG.ux * FXG.decPw; } }
+  }
   function fxgFrame(now) {
     FXG.raf = 0; const dt = Math.min(0.05, Math.max(0, (now - FXG.last) / 1000)); FXG.last = now;
     if (!fxTamOn() || !FXG.floor) { FXG.run = 0; return; }
     if (FXG.run > 0) {
       const e = Math.min(1, FXG.run / 0.25), v = FXG.sp * e * dt; FXG.run -= dt;   // 끝 0.25초는 천천히 멈춰요
       FXG.floor.tilePosition.x -= FXG.ux * v; FXG.floor.tilePosition.y -= FXG.uy * v;
-      FXG.path.tilePosition.y += v;
+      FXG.path.tilePosition.y += v; fxgDecMove(-FXG.ux * v, -FXG.uy * v);
       if (FXG.cloud && FXG.cloud.alpha > 0) FXG.cloud.tilePosition.x -= v * 0.35;
       if (FXG.gate) { FXG.gs -= v; fxgGatePos(); if (FXG.gs < -Math.hypot(FXG.W, FXG.H) * 0.8) { FXG.gate.destroy(); FXG.gate = null; } }
     }
