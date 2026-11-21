@@ -25,12 +25,13 @@
     return stageKey('bld_' + k, n, 2) || BLD_IMG[k];
   }
   const viewMap = () => rt.viewTier == null ? decoMap() : geoIdx(rt.viewTier);
-  // 고등학교 밤(20~6시)에도 밝기를 고를 수 있어요. 학생은 그대로 기숙사에서 쉬어요
+  // 밤(20~6시)에는 밝기를 고를 수 있어요(모든 학교급). 고등학교부터는 학생이 그대로 기숙사에서 쉬어요
   const NL_NAME = ['밤', '저녁', '밝게'], NL_EM = ['🌙', '🌆', '☀️'];
   function nlCycle() {
     S.nl = ((S.nl || 0) + 1) % 3; sfx('tap'); save();
-    renderNight(true); renderTierDots();
-    toast(S.nl === 2 ? '밤에도 밝게 보여요.\n학생들은 그대로 기숙사에서 쉬어요' : S.nl === 1 ? '밤 화면을 조금 어둡게 보여요' : '밤 화면을 어둡게 보여요');
+    renderNight(true); wldSync(); renderTierDots();
+    const hs = !!map && map.classList.contains('hs-night');
+    toast(S.nl === 2 ? '밤에도 밝게 보여요' + (hs ? '.\n학생들은 그대로 기숙사에서 쉬어요' : '') : S.nl === 1 ? '밤 화면을 조금 어둡게 보여요' : '밤 화면을 어둡게 보여요');
   }
   // 날씨 칩이 가운데에 있어서 좁은 화면이나 밤 모습 단추가 있을 때 학교급 단추와 겹쳤어요. 학교급 단추 오른쪽에 붙여요
   function wxPlace() {
@@ -42,7 +43,8 @@
   function renderTierDots() {
     const box = $('#tierDots'); if (!box || !S) return;
     box.hidden = S.tier < 1 || rt.tab !== 'school' || !!rt.decoEdit;
-    const nlOn = !!map && map.classList.contains('hs-night') && rt.viewTier == null;   // 고등학교 밤 모습 단추
+    let wn = false; try { wn = wldLv() > 0 && WLD.ph === 'night' && !rt.photo; } catch (e) { /* 마을 층 준비 전 */ }
+    const nlOn = rt.viewTier == null && (!!map && map.classList.contains('hs-night') || wn);   // 밤 밝기 단추(고등학교 밤, 그 아래 학교급은 마을 층 밤)
     const key = [S.tier, rt.viewTier, nlOn, S.nl || 0, box.hidden].join('|');
     if (box.dataset.key === key) return; box.dataset.key = key;
     setTimeout(wxPlace, 0); renderCampus();   // 구역 막대도 같은 때에
