@@ -4,6 +4,7 @@
 #  3) 쉬는 홈(그릴 생물과 효과가 없음)에서 지도 그림판(canvas.fxl)은 숨어 있어요. 반딧불이 나오면 보이고, 다른 탭으로 가면 숨어요
 #  4) 탐험을 나가면 탐험 그림판(fxt, fxg)이 숨어요
 #  5) 자동 품질은 '높음'을 고르지 않아요
+#  5-1) 초당 장수 보기(fpsToggle)가 켜지고 꺼져요
 #  6) 페이지 오류 없음
 # 쓰는 법: python3 wrap.py && python3 s177test.py   (마지막 줄이 PASS면 통과)
 import asyncio, json, pathlib
@@ -36,6 +37,12 @@ async def main():
         if r != ['', 'undefined', False]: bad.append(f'낮음에서 엔진을 받았어요 {r}')
         r = await pg.evaluate(f"(() => {{ try {{ localStorage.removeItem('forest-school-gfxcap'); }} catch (e) {{}} return {F}.wldAuto(); }})()")
         if r > 1: bad.append(f'자동 품질이 높음 {r}')
+        await pg.evaluate(f"{F}.fpsToggle()"); await pg.wait_for_timeout(1200)
+        r = await pg.evaluate("(() => { const m = document.querySelector('#fpsMeter'); return m ? m.textContent : ''; })()")
+        print('초당 장수 보기', r)
+        if 'fps' not in r: bad.append(f'초당 장수 보기 {r!r}')
+        await pg.evaluate(f"{F}.fpsToggle()")
+        if await pg.evaluate("!!document.querySelector('#fpsMeter')"): bad.append('초당 장수 보기가 안 꺼져요')
         bad += [f'(낮음) {e}' for e in errs[:3]]; await ctx.close()
         # 2) 3) 높음과 보통, 쉬는 홈
         s = base(tier=1); s['gfx'] = 2
