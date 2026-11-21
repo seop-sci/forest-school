@@ -622,7 +622,7 @@ label.srow,button.srow{cursor:pointer}
 .tm-bgs{position:absolute;inset:0;overflow:hidden}
 .tm-bg{position:absolute;inset:0;background:center 70%/cover no-repeat;will-change:transform}
 .tm-bg.nx{transform:translateY(-100%)}
-.tm-stage.deep .tm-bg{filter:hue-rotate(25deg) saturate(1.15) brightness(.92)}
+.tm-stage.deep .tm-bg,.tm-stage.deep canvas.fxg{filter:hue-rotate(25deg) saturate(1.15) brightness(.92)}
 .tm-stage.boss .tm-bgs::after{content:"";position:absolute;inset:0;background:radial-gradient(ellipse at 70% 60%,transparent 30%,rgba(40,20,70,.45) 100%);animation:tmBossV 2.4s ease-in-out infinite}
 @keyframes tmBossV{50%{opacity:.6}}
 .tm-amb{position:absolute;inset:0;pointer-events:none;overflow:hidden}
@@ -683,9 +683,9 @@ label.srow,button.srow{cursor:pointer}
 /* 4.3.3 필살기 모으기, 건너뛰기, 연출 동안 배경 어둡게, 심화 탐험 */
 .tm-f.charge img{animation:tmCharge .8s ease-in-out infinite alternate}
 @keyframes tmCharge{from{filter:drop-shadow(0 0 2px var(--cc,#FFC21E)) brightness(1.05)}to{filter:drop-shadow(0 0 12px var(--cc,#FFC21E)) drop-shadow(0 0 4px #fff) brightness(1.25)}}
-.tm-stage.skdim .tm-bgs{filter:brightness(.55) saturate(.85);transition:filter .3s}
-.tm-stage.hm .tm-bgs{filter:hue-rotate(225deg) saturate(.8) brightness(.8)}
-.tm-stage.hm.skdim .tm-bgs{filter:hue-rotate(225deg) saturate(.7) brightness(.48)}
+.tm-stage.skdim .tm-bgs,.tm-stage.skdim canvas.fxg{filter:brightness(.55) saturate(.85);transition:filter .3s}
+.tm-stage.hm .tm-bgs,.tm-stage.hm canvas.fxg{filter:hue-rotate(225deg) saturate(.8) brightness(.8)}
+.tm-stage.hm.skdim .tm-bgs,.tm-stage.hm.skdim canvas.fxg{filter:hue-rotate(225deg) saturate(.7) brightness(.48)}
 .tm-mode{display:flex;justify-content:center;gap:0;margin:0 auto 6px;width:max-content;padding:3px;border-radius:999px;background:rgba(74,46,10,.12)}
 .tm-mode[hidden]{display:none}
 .tm-mode button{border:0;background:none;font:inherit;font-size:13px;font-weight:800;color:var(--muted);padding:5px 14px;border-radius:999px;cursor:pointer}
@@ -2026,7 +2026,20 @@ body{background:radial-gradient(120% 60% at 50% 0%, color-mix(in srgb, var(--pap
 .app.on-school .stage{position:absolute;inset:0;z-index:auto;min-height:0}
 .app.on-school .frame{z-index:auto;border:0;border-radius:0;box-shadow:none;background:linear-gradient(#86C3E8 0, #BFE0EE 14%, #6F9A57 24%, #3E6B3A 60%)}
 .app.on-school #map{position:absolute;left:0;top:0;touch-action:none;transform-origin:0 0}
-.frame canvas.fxl{position:absolute;left:0;top:0;pointer-events:none}   /* 5.2.1 효과층(PixiJS): 지도 바로 위, 누르기는 통과 */
+.frame canvas.fxl{position:absolute;left:0;top:0;pointer-events:none;z-index:2}
+/* 마을 층: 하루의 빛과 날씨 막, 가장자리 그늘(높음). 누르기는 통과 */
+.wld-tint,.wld-vig{position:absolute;inset:0;pointer-events:none;z-index:1}
+.wld-tint{background:rgba(0,0,0,0);transition:background-color 2.5s}
+.wld-tint.ph-morning{background:rgba(255,214,160,.10)}
+.wld-tint.ph-evening{background:rgba(255,128,64,.2)}
+.wld-tint.ph-night{background:rgba(16,22,70,.46)}
+.wld-tint.ph-night.hs{background:rgba(0,0,0,0)}
+.wld-tint.wx-rain{background:rgba(70,86,112,.18)}
+.wld-tint.wx-snow{background:rgba(214,226,246,.14)}
+.wld-tint.ph-night.wx-rain{background:rgba(22,32,70,.36)}
+.wld-vig{display:none;background:radial-gradient(ellipse 75% 70% at 50% 48%,rgba(0,0,0,0) 60%,rgba(34,26,10,.2) 100%)}
+.wld-vig.on{display:block}
+body.photo .wld-vig.on{display:none}   /* 5.2.1 효과층(PixiJS): 지도 바로 위, 누르기는 통과 */
 .app.on-school .frame.panning{cursor:grabbing}
 .app.on-school .fallfx,.app.on-school .fever-fx{border-radius:0}
 .app.on-school .qrow,.app.on-school .subbar{position:relative;z-index:3}
@@ -2115,6 +2128,26 @@ body{background:radial-gradient(120% 60% at 50% 0%, color-mix(in srgb, var(--pap
 .board.open .stats{padding:7px;border-radius:16px;background:var(--board);border:2px solid color-mix(in srgb, #8FBF7C 55%, var(--board));box-shadow:0 6px 16px rgba(10,25,15,.35)}
 .board.open .stats .stat{background:color-mix(in srgb, #000 16%, transparent);box-shadow:none}
 
+/* 조용한 손맛: 누르는 동안 살짝 눌려요(빛이나 날아가는 효과는 없어요) */
+.btn-sub,.seg button,.icon-btn,.tabs .tab:not(.tab-tam){transition:transform .08s ease-out}
+.btn-sub:active,.seg button:active,.icon-btn:active,.tabs .tab:not(.tab-tam):active{transform:scale(.95)}
+@media (prefers-reduced-motion: reduce){.btn-sub:active,.seg button:active,.icon-btn:active,.tabs .tab:not(.tab-tam):active{transform:none}}
+/* 학교급 변신 구름 막(작업지시서 107 tr_cloud) */
+.wld-cur{position:absolute;inset:0;pointer-events:none;z-index:3;overflow:hidden;animation:wldCurIn .25s ease-out}
+.wld-cur img{position:absolute;width:150%;max-width:none;top:50%}
+.wld-cur .c1{left:-30%;transform:translateY(-70%);animation:wldCurL 1.9s .35s cubic-bezier(.5,0,.3,1) forwards}
+.wld-cur .c2{right:-30%;transform:translateY(-20%);animation:wldCurR 1.9s .35s cubic-bezier(.5,0,.3,1) forwards}
+.wld-cur .c3{left:-25%;width:150%;transform:translateY(-45%) scale(1.3);animation:wldCurM 1.6s .35s ease-in forwards}
+@keyframes wldCurIn{from{opacity:0}to{opacity:1}}
+@keyframes wldCurL{to{transform:translate(-80%,-70%);opacity:.2}}
+@keyframes wldCurR{to{transform:translate(80%,-20%);opacity:.2}}
+@keyframes wldCurM{to{transform:translateY(-45%) scale(1.8);opacity:0}}
+/* 사진 모드 */
+body.photo .board,body.photo .home-qcard,body.photo .map-left,body.photo .map-right,body.photo .tabs,body.photo .ui-fold,body.photo .wx-chip,body.photo .pl-chip,body.photo .tier-dots,body.photo .zone-bar,body.photo .ff-chip,body.photo .deco-bar,body.photo .deal,body.photo .sportsbar,body.photo .th-prevbar,body.photo .toast{visibility:hidden}
+.frame.wld-on .wx-fx.wx-rain,.frame.wld-on .wx-fx.wx-snow{display:none}
+.photo-bar{position:fixed;left:50%;bottom:calc(14px + env(safe-area-inset-bottom));transform:translateX(-50%);z-index:60;display:flex;flex-wrap:wrap;justify-content:center;gap:6px;max-width:calc(100% - 16px);padding:8px;border-radius:16px;background:rgba(255,250,238,.92);box-shadow:0 2px 10px rgba(0,0,0,.18)}
+.photo-bar .seg button{padding:6px 9px}
+.photo-bar .btn-sub{padding:6px 14px}
 /* ===== 1.5.0 탭 화면 정돈 ===== */
 .app:not(.on-school) .qrow,.app:not(.on-school) .subbar{display:none}
 .app:not(.on-school) .board{margin-bottom:8px}
@@ -3880,7 +3913,7 @@ body.mg-on .toast[hidden]{display:none}
     <p class="boot-step" id="bootStep">학교 문을 여는 중...</p>
     <p class="boot-tip" id="bootTip">학교 문을 여는 중이에요</p>
   </div>
-  <span class="boot-ver" id="bootVer">v5.3.0</span>
+  <span class="boot-ver" id="bootVer">v5.3.1</span>
 </div>
 
 <div class="app on-school" id="app">
@@ -4445,9 +4478,12 @@ body.mg-on .toast[hidden]{display:none}
       <div class="slist">
         <label class="srow" for="optBgm"><span class="txt"><b>배경음악</b></span><input type="checkbox" class="switch" id="optBgm"></label>
         <label class="srow" for="optSound"><span class="txt"><b>효과음</b></span><input type="checkbox" class="switch" id="optSound"></label>
+        <div class="srow"><span class="txt"><b>자연 소리</b></span><div class="seg" id="optAmb" role="radiogroup" aria-label="자연 소리"><button type="button" role="radio" data-amb="0" aria-checked="false">끄기</button><button type="button" role="radio" data-amb="1" aria-checked="false">작게</button><button type="button" role="radio" data-amb="2" aria-checked="true">보통</button><button type="button" role="radio" data-amb="3" aria-checked="false">크게</button></div></div>
+        <div class="srow"><span class="txt"><b>그래픽</b></span><div class="seg" id="optGfx" role="radiogroup" aria-label="그래픽 품질"><button type="button" role="radio" data-gfx="0" aria-checked="false">낮음</button><button type="button" role="radio" data-gfx="1" aria-checked="false">보통</button><button type="button" role="radio" data-gfx="2" aria-checked="false">높음</button></div></div>
         <label class="srow" for="optVibe"><span class="txt"><b>진동</b></span><input type="checkbox" class="switch" id="optVibe"></label>
         <div class="srow"><span class="txt"><b>화면 크기</b></span><div class="seg" id="optUiz" role="radiogroup" aria-label="화면 크기"><button type="button" role="radio" data-uiz="0" aria-checked="true">보통</button><button type="button" role="radio" data-uiz="1" aria-checked="false">크게</button></div></div><!-- 5.0.1.7 X-01 -->
         <div class="srow"><span class="txt"><b>숫자 단위</b></span><div class="seg" id="optUnits" role="radiogroup" aria-label="숫자 단위"><button type="button" role="radio" data-units="ko" aria-checked="true">1.2만</button><button type="button" role="radio" data-units="en" aria-checked="false">12K</button></div></div>
+        <button class="srow" type="button" id="optPhoto"><span class="txt"><b>사진 모드</b><small>화면의 글과 단추를 숨기고 마을만 봐요</small></span></button>
       </div>
       <h3 class="panel-sub">학교 기록</h3>
       <div class="slist">
@@ -4475,7 +4511,7 @@ body.mg-on .toast[hidden]{display:none}
       </div>
       <h3 class="panel-sub">정보</h3>
       <dl class="info">
-        <div id="verRow"><dt>버전</dt><dd>v5.3.0</dd></div>
+        <div id="verRow"><dt>버전</dt><dd>v5.3.1</dd></div>
         <div id="pidRow" hidden><dt>학교 번호</dt><dd id="infoPid"></dd></div>
       </dl>
       <div id="devBox" hidden>
@@ -5221,7 +5257,7 @@ body.mg-on .toast[hidden]{display:none}
   <div class="backdrop" data-cm="mSb"></div>
   <section class="modal lab-modal dp-modal" role="dialog" aria-modal="true" aria-labelledby="sbTitle">
     <div class="dp-head" id="sbHead"><b id="sbTitle">이야기 수첩</b></div>
-    <div class="nb-tabs" id="sbTabs" role="tablist"><button type="button" role="tab" data-sbt="main">중심 이야기</button><button type="button" role="tab" data-sbt="side">곁가지</button><button type="button" role="tab" data-sbt="who">인물</button></div>
+    <div class="nb-tabs" id="sbTabs" role="tablist"><button type="button" role="tab" data-sbt="main">중심 이야기</button><button type="button" role="tab" data-sbt="side">작은 이야기</button><button type="button" role="tab" data-sbt="who">인물</button></div>
     <div id="sbBody" class="nb-body"></div>
     <div class="btn-row"><button class="btn-sub" type="button" id="sbClose" data-cm="mSb" data-cm-tap>닫기</button></div>
   </section>
@@ -6853,6 +6889,50 @@ body.mg-on .toast[hidden]{display:none}
 "bld_gradhall_on_winter":"img/a/bld_gradhall_on_winter-b507b4f11b.webp",
 "bld_institute_on":"img/a/bld_institute_on-62508c2375.webp",
 "bld_institute_on_winter":"img/a/bld_institute_on_winter-93fa47d843.webp",
+"chb_armadillo":"img/a/chb_armadillo-8112f99ebd.webp",
+"chb_bear":"img/a/chb_bear-deba747ae5.webp",
+"chb_bear_rare":"img/a/chb_bear_rare-90115734b8.webp",
+"chb_beaver":"img/a/chb_beaver-eb39e578cc.webp",
+"chb_boar":"img/a/chb_boar-55d306c585.webp",
+"chb_capybara":"img/a/chb_capybara-04ba9420f1.webp",
+"chb_cat":"img/a/chb_cat-1a365bcd72.webp",
+"chb_chick":"img/a/chb_chick-bb680040cc.webp",
+"chb_chick_rare":"img/a/chb_chick_rare-f706f98521.webp",
+"chb_chinchilla":"img/a/chb_chinchilla-89f026cc96.webp",
+"chb_crane":"img/a/chb_crane-d33e54b7e3.webp",
+"chb_crow":"img/a/chb_crow-3c88c9c6b2.webp",
+"chb_deer":"img/a/chb_deer-3e92f35a6d.webp",
+"chb_dog":"img/a/chb_dog-930bc4c476.webp",
+"chb_dog_rare":"img/a/chb_dog_rare-65bc0c5506.webp",
+"chb_duck":"img/a/chb_duck-4b72e87d68.webp",
+"chb_fox":"img/a/chb_fox-6df97ff413.webp",
+"chb_fox_rare":"img/a/chb_fox_rare-f5eb03105e.webp",
+"chb_frog":"img/a/chb_frog-e935e653ff.webp",
+"chb_goat":"img/a/chb_goat-ae45ed741c.webp",
+"chb_goose":"img/a/chb_goose-3f6351151b.webp",
+"chb_hamster":"img/a/chb_hamster-b15012321a.webp",
+"chb_kangaroo":"img/a/chb_kangaroo-deff73ed63.webp",
+"chb_koala":"img/a/chb_koala-1ded3a2d49.webp",
+"chb_lemur":"img/a/chb_lemur-7e3ca31aec.webp",
+"chb_meerkat":"img/a/chb_meerkat-d8b4ac650d.webp",
+"chb_mole":"img/a/chb_mole-a426ce8b73.webp",
+"chb_mouse":"img/a/chb_mouse-c84ef6c012.webp",
+"chb_otter":"img/a/chb_otter-5f8f0f82e1.webp",
+"chb_panda":"img/a/chb_panda-5678e551fc.webp",
+"chb_panda_rare":"img/a/chb_panda_rare-597ff8ff2a.webp",
+"chb_penguin":"img/a/chb_penguin-ea9f5e4b3c.webp",
+"chb_quokka":"img/a/chb_quokka-1c31055ccf.webp",
+"chb_rabbit":"img/a/chb_rabbit-b8bc043850.webp",
+"chb_rabbit_rare":"img/a/chb_rabbit_rare-ebfd1b4a5d.webp",
+"chb_raccoon":"img/a/chb_raccoon-8438368d87.webp",
+"chb_redpanda":"img/a/chb_redpanda-330a0f8d7a.webp",
+"chb_sheep":"img/a/chb_sheep-654cc7f9c5.webp",
+"chb_sloth":"img/a/chb_sloth-deec0eac91.webp",
+"chb_sparrow":"img/a/chb_sparrow-af5d980dcd.webp",
+"chb_squirrel":"img/a/chb_squirrel-2990ace8c0.webp",
+"chb_turtle":"img/a/chb_turtle-531fd7ccba.webp",
+"chb_waterdeer":"img/a/chb_waterdeer-ea357feb34.webp",
+"chb_wolf":"img/a/chb_wolf-4e4aafe269.webp",
 "chr_armadillo":"img/a/chr_armadillo-89be390bf5.webp",
 "chr_lemur":"img/a/chr_lemur-e62c77d3d9.webp",
 "chr_quokka":"img/a/chr_quokka-2b0d86270a.webp",
@@ -7226,24 +7306,52 @@ body.mg-on .toast[hidden]{display:none}
 "ex5_yard_front":"img/a/ex5_yard_front-c42030bb01.webp",
 "ex5_yard_sky":"img/a/ex5_yard_sky-d37e6b097a.webp",
 "ex6_cloud":"img/a/ex6_cloud-c1e87be37f.webp",
+"ex6_garden_dec1":"img/a/ex6_garden_dec1-7f18081e46.webp",
+"ex6_garden_dec2":"img/a/ex6_garden_dec2-6534898d36.webp",
+"ex6_garden_dec3":"img/a/ex6_garden_dec3-572c38ed23.webp",
+"ex6_garden_dec4":"img/a/ex6_garden_dec4-fbc3ba2509.webp",
 "ex6_garden_gate":"img/a/ex6_garden_gate-6a9326ba13.webp",
 "ex6_garden_path":"img/a/ex6_garden_path-067cf4ff8f.webp",
 "ex6_garden_tile":"img/a/ex6_garden_tile-759192c727.webp",
+"ex6_ground_dec1":"img/a/ex6_ground_dec1-f8d7a4d465.webp",
+"ex6_ground_dec2":"img/a/ex6_ground_dec2-567d1cc498.webp",
+"ex6_ground_dec3":"img/a/ex6_ground_dec3-d61f90d279.webp",
+"ex6_ground_dec4":"img/a/ex6_ground_dec4-261fa7802c.webp",
 "ex6_ground_gate":"img/a/ex6_ground_gate-ad853d7865.webp",
 "ex6_ground_path":"img/a/ex6_ground_path-c63465cd1e.webp",
 "ex6_ground_tile":"img/a/ex6_ground_tile-343540fb40.webp",
+"ex6_lab_dec1":"img/a/ex6_lab_dec1-9293603635.webp",
+"ex6_lab_dec2":"img/a/ex6_lab_dec2-c68972cdf8.webp",
+"ex6_lab_dec3":"img/a/ex6_lab_dec3-689d75c8a7.webp",
+"ex6_lab_dec4":"img/a/ex6_lab_dec4-f043ef6d43.webp",
 "ex6_lab_gate":"img/a/ex6_lab_gate-6f4b928a89.webp",
 "ex6_lab_path":"img/a/ex6_lab_path-7ffc7afb0b.webp",
 "ex6_lab_tile":"img/a/ex6_lab_tile-7db53d3ca6.webp",
+"ex6_library_dec1":"img/a/ex6_library_dec1-0ae79de1eb.webp",
+"ex6_library_dec2":"img/a/ex6_library_dec2-ab6c4d61ac.webp",
+"ex6_library_dec3":"img/a/ex6_library_dec3-b6ea7c3451.webp",
+"ex6_library_dec4":"img/a/ex6_library_dec4-4b34ade6b7.webp",
 "ex6_library_gate":"img/a/ex6_library_gate-3528d2c7e1.webp",
 "ex6_library_path":"img/a/ex6_library_path-22b7e69321.webp",
 "ex6_library_tile":"img/a/ex6_library_tile-72f3876a48.webp",
+"ex6_pond_dec1":"img/a/ex6_pond_dec1-cd2adda8b4.webp",
+"ex6_pond_dec2":"img/a/ex6_pond_dec2-4bcf6abc58.webp",
+"ex6_pond_dec3":"img/a/ex6_pond_dec3-28bf590568.webp",
+"ex6_pond_dec4":"img/a/ex6_pond_dec4-90412e8e46.webp",
 "ex6_pond_gate":"img/a/ex6_pond_gate-736bc9e36b.webp",
 "ex6_pond_path":"img/a/ex6_pond_path-420a80eef1.webp",
 "ex6_pond_tile":"img/a/ex6_pond_tile-0436433fd8.webp",
+"ex6_tower_dec1":"img/a/ex6_tower_dec1-6e21b2457e.webp",
+"ex6_tower_dec2":"img/a/ex6_tower_dec2-25d9a09945.webp",
+"ex6_tower_dec3":"img/a/ex6_tower_dec3-637489ba61.webp",
+"ex6_tower_dec4":"img/a/ex6_tower_dec4-f5d2c6b311.webp",
 "ex6_tower_gate":"img/a/ex6_tower_gate-382f944644.webp",
 "ex6_tower_path":"img/a/ex6_tower_path-2218e1d0cf.webp",
 "ex6_tower_tile":"img/a/ex6_tower_tile-43ccba128c.webp",
+"ex6_yard_dec1":"img/a/ex6_yard_dec1-2d0e56a014.webp",
+"ex6_yard_dec2":"img/a/ex6_yard_dec2-9eb52b83ff.webp",
+"ex6_yard_dec3":"img/a/ex6_yard_dec3-f789529d03.webp",
+"ex6_yard_dec4":"img/a/ex6_yard_dec4-8fca18ecc6.webp",
 "ex6_yard_gate":"img/a/ex6_yard_gate-3f38862d89.webp",
 "ex6_yard_path":"img/a/ex6_yard_path-3ce5cca9ee.webp",
 "ex6_yard_tile":"img/a/ex6_yard_tile-956e92e0b4.webp",
@@ -7255,6 +7363,16 @@ body.mg-on .toast[hidden]{display:none}
 "fur_institute_board_shiny":"img/a/fur_institute_board_shiny-51ec7b720b.webp",
 "fur_institute_coffee_shiny":"img/a/fur_institute_coffee_shiny-0d72291ca5.webp",
 "fur_institute_desk_shiny":"img/a/fur_institute_desk_shiny-61ddb008c6.webp",
+"fx_bfly_b_1":"img/a/fx_bfly_b_1-9197797dd9.webp",
+"fx_bfly_b_2":"img/a/fx_bfly_b_2-c50ce5b0ed.webp",
+"fx_bfly_w_1":"img/a/fx_bfly_w_1-6791854667.webp",
+"fx_bfly_w_2":"img/a/fx_bfly_w_2-3e6a45a960.webp",
+"fx_bfly_y_1":"img/a/fx_bfly_y_1-ce7b1709c0.webp",
+"fx_bfly_y_2":"img/a/fx_bfly_y_2-9d25f1e508.webp",
+"fx_bird_1":"img/a/fx_bird_1-64685d7727.webp",
+"fx_bird_2":"img/a/fx_bird_2-f7a81455cf.webp",
+"fx_dfly_1":"img/a/fx_dfly_1-483543fb47.webp",
+"fx_dfly_2":"img/a/fx_dfly_2-b882efcd76.webp",
 "fxe_beam":"img/a/fxe_beam-19f98c3b68.webp",
 "fxe_bit":"img/a/fxe_bit-c2d67333f9.webp",
 "fxe_cap":"img/a/fxe_cap-f83f27f92a.webp",
@@ -7268,10 +7386,18 @@ body.mg-on .toast[hidden]{display:none}
 "fxe_spark":"img/a/fxe_spark-029a2247d4.webp",
 "fxe_tape_l":"img/a/fxe_tape_l-523a9fbc91.webp",
 "fxe_tape_r":"img/a/fxe_tape_r-258f2042c1.webp",
+"glow_cafeteria_lux":"img/a/glow_cafeteria_lux-ec7f1d3224.webp",
+"glow_classroom_lux":"img/a/glow_classroom_lux-fd7913f45d.webp",
+"glow_dorm_lux":"img/a/glow_dorm_lux-c6b7bd6c31.webp",
+"glow_field_lux":"img/a/glow_field_lux-2d44e74f8b.webp",
 "glow_gradhall_on":"img/a/glow_gradhall_on-b190f31d1e.webp",
 "glow_gradhall_on_winter":"img/a/glow_gradhall_on_winter-bb0b635068.webp",
 "glow_institute_on":"img/a/glow_institute_on-b48d105cb3.webp",
 "glow_institute_on_winter":"img/a/glow_institute_on_winter-bbd9895290.webp",
+"glow_library_lux":"img/a/glow_library_lux-b9e0981cac.webp",
+"glow_playground_lux":"img/a/glow_playground_lux-fb0890427c.webp",
+"glow_science_lux":"img/a/glow_science_lux-d158cdb8f6.webp",
+"glow_store_lux":"img/a/glow_store_lux-760dd73c13.webp",
 "hud_bar_fill":"img/a/hud_bar_fill-37c16b9231.webp",
 "hud_bar_fill_autumn":"img/a/hud_bar_fill_autumn-8f69247760.webp",
 "hud_bar_fill_retro":"img/a/hud_bar_fill_retro-5948ba9c78.webp",
@@ -7428,6 +7554,9 @@ body.mg-on .toast[hidden]{display:none}
 "souv_star_9":"img/a/souv_star_9-016a83b51d.webp",
 "ta_bg":"img/a/ta_bg-664fff5ac0.webp",
 "tea_pelican":"img/a/tea_pelican-bda58e49e9.webp",
+"tr_cloud_1":"img/a/tr_cloud_1-bf34bc9bf4.webp",
+"tr_cloud_2":"img/a/tr_cloud_2-c4abd84726.webp",
+"tr_cloud_3":"img/a/tr_cloud_3-d1808f4ddb.webp",
 "tr_leaf_1":"img/a/tr_leaf_1-20522702e2.webp",
 "tr_leaf_2":"img/a/tr_leaf_2-41a8e92fbb.webp",
 "tr_leaves":"img/a/tr_leaves-b74f5f8151.webp"
@@ -9085,7 +9214,15 @@ body.mg-on .toast[hidden]{display:none}
     dexNew: undefined,   // 도감에 새로 생긴 칸
     evSeg: undefined,   // 이벤트 탭
     evInit: undefined,   // 이벤트 탭을 처음 그렸는지
-    achNote: undefined   // 쌓인 업적 달성 알림
+    achNote: undefined,   // 쌓인 업적 달성 알림
+    // 자연 소리
+    ambWx: undefined,   // 날씨 소리('rain', 'snow')
+    ambWater: undefined,   // 물가 소리 크기(0~1)
+    // 마을 층
+    wldPh: undefined,   // 사진 모드에서 고른 시간('morning', 'day', 'evening', 'night')
+    wldWx: undefined,   // 사진 모드에서 고른 날씨('' 맑음, 'rain', 'snow')
+    photo: undefined,   // 사진 모드 중
+    glideId: undefined   // 지도 미끄러짐 차례(새로 잡으면 앞 것을 멈춰요)
   };
   if (motionMQ && motionMQ.addEventListener) motionMQ.addEventListener('change', e => { rt.reduced = e.matches; });
   // 헷갈리는 0, O, 1, I, L을 뺀 글자로 학교 번호를 만들어요
@@ -9115,7 +9252,7 @@ body.mg-on .toast[hidden]{display:none}
     ach: { hit: {}, got: {}, title: '' },   // 업적: hit 이룬 등급(0~3), got 받은 등급, title 단 칭호(업적 종류 id)
     xt: { diet: 0, lib: 0, kor: 0, art: 0, snack: 0, dorm: 0, fix: 0, cou: 0, dean: 0, adv: 0 },   // adv: 펠리컨 지도교수님. dean: 두루미 학장 교수님. cou: 코끼리 선생님(진로 상담)
       // 국어, 미술, 매점 선생님. 양 선생님, 사슴 선생님 연수 레벨 (0~10, 그 건물을 지으면 오셔요)
-    grade: 0, best: 0, sound: true, bgm: true, vibrate: true, savedAt: Date.now(),
+    grade: 0, best: 0, sound: true, bgm: true, vibrate: true, ambV: 2, gfx: -1, savedAt: Date.now(),
     pending: 0, pendingSec: 0, away: { from: 0, skip: 0 }, certNo: 0, earned: 0, yearEarned: 0, pwBank: 0,
     tier: 0, tg: 0, sem: 0, semDip: 0, tdip: 0, fund: 0, fp: { schol: 0, rep: 0, dip: 0 },
     hd: { day: '', n: 0, feastUntil: 0, album: false, seen: false, furNew: true },
@@ -9213,6 +9350,8 @@ body.mg-on .toast[hidden]{display:none}
     s.t.owl = Math.min(s.t.owl, TEA.owl.max);
     s.grade = Math.min(Math.floor(numFb(d.grade, 0, 0)), CFG.grades.length - 1);
     s.sound = d.sound !== false; s.bgm = d.bgm !== false; s.vibrate = d.vibrate !== false;
+    s.ambV = [0, 1, 2, 3].includes(d.ambV) ? d.ambV : (s.sound || s.bgm ? 2 : 0);
+    s.gfx = [0, 1, 2].includes(d.gfx) ? d.gfx : -1;   // 그래픽 품질(-1 자동)   // 자연 소리 크기(0 끄기~3 크게). 옛 저장은 소리를 다 꺼 둔 사람만 끄기
     s.savedAt = numFb(d.savedAt, 0, Date.now());
     s.pending = cap(numFb(d.pending, 0, 0, SAVE_CAP.acorn), SAVE_CAP.acorn); s.pendingSec = cap(numFb(d.pendingSec, 0, 0), SAVE_CAP.count);
     s.certNo = Math.floor(cap(numFb(d.certNo, 0, 0), SAVE_CAP.count)); s.earned = cap(numFb(d.earned, 0, 0, SAVE_CAP.acorn), SAVE_CAP.acorn); s.pwBank = cap(numFb(d.pwBank, 0, 0), SAVE_CAP.big);
@@ -10370,7 +10509,7 @@ body.mg-on .toast[hidden]{display:none}
   /* ---------- 소리와 진동 ---------- */
   let actx = null, master = null;
   function ensureAudio(force) {
-    if (!S || !(S.sound || S.bgm || force)) return;
+    if (!S || !(S.sound || S.bgm || S.ambV || force)) return;
     if (!actx) {
       const AC = window.AudioContext || window.webkitAudioContext;
       if (!AC) return;
@@ -10546,14 +10685,20 @@ body.mg-on .toast[hidden]{display:none}
     exday: 'bgm_ex_day', excalm: 'bgm_ex_calm', exnight: 'bgm_ex_night', exboss: 'bgm_ex_boss' };
   // 곡은 게임 파일 밖의 따로 된 파일이에요(게임 파일이 너무 커지지 않게). 웹, 안드로이드, 토스 판 모두 게임 옆 audio 폴더에 있어요
   const AUD_BASE = () => window.FS_AUD_BASE || 'audio/';
-  // 용량: 테마 곡 7개와 행사, 졸업 곡 5개는 앱에 넣지 않고 웹에서 받아요. 못 받으면 홈 곡이 나와요. 곡 파일을 바꾸면 AUD_V를 올려요
-  const WEB_AUD = new Set(['bgm_spring', 'bgm_summer', 'bgm_autumn', 'bgm_winter', 'bgm_xmas', 'bgm_space', 'bgm_retro', 'bgm_festival', 'bgm_festnight', 'bgm_bigfest', 'bgm_grad', 'bgm_unigrad']), AUD_V = '1';
+  // 용량: 테마 곡 7개와 행사, 졸업 곡 5개, 자연 소리 7개는 앱에 넣지 않고 웹에서 받아요. 못 받으면 홈 곡이 나와요. 곡 파일을 바꾸면 AUD_V를 올려요
+  const WEB_AUD = new Set(['bgm_spring', 'bgm_summer', 'bgm_autumn', 'bgm_winter', 'bgm_xmas', 'bgm_space', 'bgm_retro', 'bgm_festival', 'bgm_festnight', 'bgm_bigfest', 'bgm_grad', 'bgm_unigrad', 'amb_day', 'amb_morning', 'amb_evening', 'amb_night', 'amb_rain', 'amb_snow', 'amb_water']), AUD_V = '1';
   const webAud = key => APP_PACK() && !window.FS_AUD_BASE && WEB_AUD.has(key);
   const FILE_GAIN = 0.6;   // 파일 곡은 코드 곡보다 커서 조금 줄여요
   const bgmBuf = new Map();   // 풀어 둔 곡. 한 곡이 30MB쯤 메모리를 써서 두 곡까지만 들고 있어요
   function bgmLoad(key) {
     if (bgmBuf.has(key)) { const p = bgmBuf.get(key); bgmBuf.delete(key); bgmBuf.set(key, p); return p; }
     if (!actx) return Promise.resolve(null);
+    const p = audBytes(key).then(buf => actx.decodeAudioData(buf)).catch(() => { bgmBuf.delete(key); return null; });
+    bgmBuf.set(key, p);
+    while (bgmBuf.size > 2) bgmBuf.delete(bgmBuf.keys().next().value);
+    return p;
+  }
+  function audBytes(key) {
     const url = window.FS_AUD && window.FS_AUD[key];   // 자동 시험판은 글자로 넣은 곡
     // fetch(data:)는 앱 보안 설정(CSP)에 막힐 수 있어서 글자를 직접 바이트로 바꿔요. 보통은 audio 폴더의 파일을 받아요
     const bytes = url ? new Promise(res => setTimeout(res, 0)).then(() => {
@@ -10561,12 +10706,9 @@ body.mg-on .toast[hidden]{display:none}
       for (let i = 0; i < b64.length; i++) u8[i] = b64.charCodeAt(i);
       return u8.buffer;
     }) : (webAud(key) ? webFetch(WEB_ROOT + 'audio/' + key + '.mp4?v=' + AUD_V) : fetch(AUD_BASE() + key + '.mp4').then(r => { if (!r.ok) throw new Error('곡 파일 ' + r.status); return r; })).then(r => r.arrayBuffer());
-    const p = bytes.then(buf => actx.decodeAudioData(buf)).catch(() => { bgmBuf.delete(key); return null; });
-    bgmBuf.set(key, p);
-    while (bgmBuf.size > 2) bgmBuf.delete(bgmBuf.keys().next().value);
-    return p;
+    return bytes;
   }
-  const HOME_MUSIC_TABS = new Set(['school', 'teachers', 'quests', 'rank', 'dex', 'event', 'hall', 'club', 'settings', 'mini', 'grad']);   // 공부 탭과 졸업 탭도 홈 곡, 쉬는 시간 곡은 상점에서만. 학교 복도와 동아리실, 설정도 홈 곡
+  const HOME_MUSIC_TABS = new Set(['shop', 'school', 'teachers', 'quests', 'rank', 'dex', 'event', 'hall', 'club', 'settings', 'mini', 'grad']);   // 공부 탭, 졸업 탭, 상점, 학교 복도와 동아리실, 설정도 홈 곡
   // 테마 세트 미리 보기: 저장(S.cos.th)은 그대로 두고 화면만 미리 보는 테마로 그려요
   const thOn = () => (rt.thPrev ? rt.thPrev.th : S.cos.th);
   function musicWant() {
@@ -10581,10 +10723,7 @@ body.mg-on .toast[hidden]{display:none}
     if (rt.fest || rt.sports) return rt.fest && festDef(rt.fest.id) && festDef(rt.fest.id).night ? 'festnight' : 'festival';   // 고등학교 밤 행사는 조용한 곡
     let play = false; try { play = !!((pzUI && pzUI.open) || (mgUI && mgUI.open) || (btUI && btUI.open)); } catch (e) { /* 퍼즐과 합치기가 아직 준비 전 */ }   // 숲속 합치기도 미니게임 곡
     if (play) return 'play';
-    if (rt.tab === 'tam' && S.tam) {   // 탐험 화면
-      const T = rt.tam; if (T && T.F && T.F.M[0] && T.F.M[0].boss && (T.ph === 'meet' || T.ph === 'fight')) return 'exboss';
-      const k = tamReg(tamCurFl()).k; return k === 'pond' || k === 'library' ? 'excalm' : k === 'yard' || k === 'tower' ? 'exnight' : 'exday';
-    }
+    if (rt.tab === 'tam' && S.tam) return tamHOn() ? 'exnight' : 'exday';   // 탐험은 기본과 심화 두 곡만(지역과 큰 장난꾸러기로 바꾸지 않아요)
     // 곡이 자주 바뀌지 않게 홈에서 여는 탭(선생님, 퀘스트, 랭킹, 도감, 이벤트)도 홈 곡 그대로
     if (HOME_MUSIC_TABS.has(rt.tab) && bfOn()) return 'bigfest';   // 대축제 사흘 동안 대학교 홈 곡
     if (HOME_MUSIC_TABS.has(rt.tab)) return SONGS[thOn().bg] ? thOn().bg : 'home';
@@ -10593,6 +10732,7 @@ body.mg-on .toast[hidden]{display:none}
   // 곡을 바꿀 때는 지금 곡을 살짝 줄이고 새 곡을 키워요
   function musicSync() {
     if (!actx) return;
+    ambSync();
     const w = musicWant();
     if (w === Music.cur) return;
     Music.cur = w;
@@ -10620,6 +10760,58 @@ body.mg-on .toast[hidden]{display:none}
     }
     musicSynth(SONGS[w] ? w : 'room', now);
   }
+  /* 자연 소리: 홈 지도에서만 배경음악 밑에 깔리는 새소리, 풀벌레, 빗소리. 파일은 audio/amb_*.mp4(끝과 처음이 이어지게 다듬어 둠, 앱은 웹에서 받아요).
+     바탕 한 겹(아침, 낮, 노을, 밤) 위에 날씨(rt.ambWx: 'rain', 'snow')와 물가(rt.ambWater 0~1)가 겹쳐요. 바뀔 때는 2~3초에 걸쳐 서서히 */
+  const AMB = { out: null, lay: {}, buf: new Map() };
+  const AMB_LV = [0, 0.22, 0.4, 0.65];   // 설정 끄기, 작게, 보통, 크게(제안 값)
+  function ambWant() {
+    const w = {};
+    if (!S || !S.ambV || rt.paused || rt.adOpen || document.hidden || rt.tab !== 'school' || rt.cereOn) return w;
+    let play = false; try { play = !!((pzUI && pzUI.open) || (mgUI && mgUI.open) || (btUI && btUI.open)); } catch (e) { /* 아직 준비 전 */ }
+    if (play) return w;
+    const h = kstHour(gameNow()), base = isNight() ? 'amb_night' : h < 9 ? 'amb_morning' : h >= 17 ? 'amb_evening' : 'amb_day';
+    let bv = rt.fest || rt.sports ? 0.5 : 1;   // 행사 곡이 나올 때는 반쯤
+    if (rt.ambWx === 'rain') { w.amb_rain = 1; bv *= 0.45; }
+    else if (rt.ambWx === 'snow') { w.amb_snow = 1; bv *= base === 'amb_night' ? 0.3 : 0.6; }
+    w[base] = bv;
+    const wa = +rt.ambWater || 0; if (wa > 0) w.amb_water = Math.min(1, wa) * 0.8;
+    return w;
+  }
+  function ambLoad(key) {
+    if (AMB.buf.has(key)) return AMB.buf.get(key);
+    const p = audBytes(key).then(b => actx.decodeAudioData(b)).catch(() => null);   // 못 받으면 그 소리만 조용히 빠져요
+    AMB.buf.set(key, p);
+    return p;
+  }
+  function ambSync() {
+    if (!actx) return;
+    const want = ambWant(), now = actx.currentTime, lv = AMB_LV[S && S.ambV] || 0;
+    if (!AMB.out) { AMB.out = actx.createGain(); AMB.out.gain.value = 0; AMB.out.connect(actx.destination); }
+    AMB.out.gain.setTargetAtTime(lv, now, 0.4);
+    for (const k of new Set([...Object.keys(want), ...Object.keys(AMB.lay)])) {
+      const v = want[k] || 0, L = AMB.lay[k];
+      if (L) { if (L.v !== v) { L.v = v; L.g.gain.cancelScheduledValues(now); L.g.gain.setTargetAtTime(v, now, 0.8); } if (!v && !L.off) L.off = now; if (v) L.off = 0; continue; }
+      if (!v) continue;
+      const g = actx.createGain(), N = { g, v, src: null, off: 0 }; g.gain.value = 0; g.connect(AMB.out); AMB.lay[k] = N;
+      ambLoad(k).then(buf => {
+        if (AMB.lay[k] !== N || !buf) return;
+        const src = actx.createBufferSource(), t = actx.currentTime; src.buffer = buf; src.loop = true; src.connect(g);
+        src.start(t, Math.random() * buf.duration);   // 매번 같은 곳부터 나오지 않게
+        N.src = src; g.gain.setTargetAtTime(N.v, t, 0.8);
+      });
+    }
+    for (const k in AMB.lay) {   // 다 줄어든 겹은 멈추고 떼어 내요
+      const L = AMB.lay[k];
+      if (L.off && now - L.off > 5) { try { if (L.src) L.src.stop(); L.g.disconnect(); } catch (e) { /* 이미 멈춤 */ } delete AMB.lay[k]; }
+    }
+    while (AMB.buf.size > 4) { const k = [...AMB.buf.keys()].find(x => !AMB.lay[x]); if (!k) break; AMB.buf.delete(k); }   // 풀어 둔 소리는 넷까지
+  }
+  setInterval(() => { try { if (actx && S) ambSync(); } catch (e) { /* 다음에 */ } }, 15000);   // 시간이 바뀌면(아침에서 낮으로) 바탕 소리도
+  document.addEventListener('click', e => {
+    const b = e.target.closest && e.target.closest('#optAmb [data-amb]'); if (!b || !S) return;
+    const v = +b.dataset.amb; if (v === S.ambV) return;
+    S.ambV = v; save(); syncSettingsUI(); sfx('tap'); ensureAudio(true); ambSync();
+  });
   // 파일 곡을 못 풀면 코드 곡으로(미니게임 곡은 쉬는 시간 곡으로)
   function musicFallback(w) { if (!actx) return; Music.cur = w; musicSynth(SONGS[w] ? w : 'room', actx.currentTime); }
   function musicSynth(w, now) {
@@ -11551,6 +11743,16 @@ body.mg-on .toast[hidden]{display:none}
     }
     rt.elBadgeT = '';   // 반장 배지는 다음 틱에 다시 달아요
   }
+  // 위쪽(건물 쪽)으로 걸을 때는 뒷모습(chb_). 그래픽 낮음이나 그림이 없으면 앞모습 그대로
+  function kidLook(k, back) {
+    back = back && wldLv() > 0;
+    if (k.im && !k.im.isConnected) { k.im = null; k.back = false; }   // 모자를 바꾸는 등으로 그림을 새로 그렸어요
+    if (!!k.back === back) return;
+    const im = k.im || (k.im = k.g.querySelector('image')); if (!im) return;
+    if (back) { const bu = IMG('chb_' + (k.rare ? k.sp + '_rare' : k.sp)); if (!bu) return; k.frontU = im.getAttribute('href'); im.setAttribute('href', bu); }
+    else if (k.frontU) im.setAttribute('href', k.frontU);
+    k.back = back;
+  }
   function updateKids(dt, now) {
     if (rt.reduced) return;
     const away = kidsAway();   // 고등학교 밤에는 학생층이 숨어 있어서 걷기 계산만 하고 그리기(매 프레임 16명 setAttribute)와 줄 세우기는 쉬어요
@@ -11563,8 +11765,8 @@ body.mg-on .toast[hidden]{display:none}
         const wp = k.ang === undefined && k.route && k.route.length ? k.route[0] : null;
         const dx = (wp ? wp[0] : k.tx) - k.x, dy = (wp ? wp[1] : k.ty) - k.y, d = Math.hypot(dx, dy);
         if (wp && d < 0.8) { k.route.shift(); k.moving = true; }
-        else if (d < 0.8) { k.moving = false; if (k.propU) tripProp(k); if (!k.board && !k.hold && !k.rider && k.ang === undefined) { k.wait = rand(1, 4.5); pickTarget(k); } }
-        else { const st = Math.min(d, k.speed * dt); k.x += dx / d * st; k.y += dy / d * st; k.moving = true; }
+        else if (d < 0.8) { k.moving = false; kidLook(k, false); if (k.propU) tripProp(k); if (!k.board && !k.hold && !k.rider && k.ang === undefined) { k.wait = rand(1, 4.5); pickTarget(k); } }
+        else { const st = Math.min(d, k.speed * dt); k.x += dx / d * st; k.y += dy / d * st; k.moving = true; kidLook(k, dy / d < -0.5); }
       }
       if (!away) placeKid(k, k.moving ? -Math.abs(Math.sin(now / 110 + k.phase)) * 1.6 : k.hold ? -Math.abs(Math.sin(now / 260 + k.cheer)) * 2.4 : 0);
     }
@@ -12364,6 +12566,22 @@ body.mg-on .toast[hidden]{display:none}
       requestAnimationFrame(step);
     });
   }
+  // 지도를 밀다 손을 떼면 그 빠르기로 조금 더 미끄러지다 멈춰요(그래픽 낮음과 움직임 줄이기는 바로 멈춤)
+  function panGlide(h) {
+    rt.glideId = (rt.glideId || 0) + 1;
+    if (!h || h.length < 2 || wldLv() < 1 || rt.reduced) return;
+    const now = performance.now(), a = h.find(p => now - p[0] < 90) || h[h.length - 2], b = h[h.length - 1], dt = Math.max(8, b[0] - a[0]);
+    if (now - b[0] > 60) return;   // 멈췄다가 뗐어요
+    let vx = (b[1] - a[1]) / dt, vy = (b[2] - a[2]) / dt; if (Math.hypot(vx, vy) < 0.25) return;
+    const id = rt.glideId; let last = now;
+    const step = t => {
+      if (rt.glideId !== id || rt.tab !== 'school') return;
+      const d = Math.min(40, t - last); last = t; const f = Math.exp(-d / 260);
+      const x0 = rt.panX, y0 = rt.panY; panTo(x0 + vx * d, y0 + vy * d); vx *= f; vy *= f;
+      if (Math.hypot(vx, vy) > 0.02 && (Math.abs(rt.panX - x0) > 0.05 || Math.abs(rt.panY - y0) > 0.05)) requestAnimationFrame(step);
+    };
+    requestAnimationFrame(step);
+  }
   function setupPan() {
     const fr = $('.frame');
     let st = null, pinch = null;
@@ -12379,6 +12597,7 @@ body.mg-on .toast[hidden]{display:none}
         return;
       }
       if (pts.size > 2) return;
+      rt.glideId = (rt.glideId || 0) + 1;   // 미끄러지던 지도를 다시 잡으면 멈춰요
       st = { id: e.pointerId, x: e.clientX, y: e.clientY, px: rt.panX || 0, py: rt.panY || 0, moved: false };
     });
     fr.addEventListener('pointermove', e => {
@@ -12395,8 +12614,9 @@ body.mg-on .toast[hidden]{display:none}
       if (!st.moved && Math.hypot(dx, dy) < 8) return;
       if (!st.moved) { st.moved = true; try { fr.setPointerCapture(e.pointerId); } catch (er) { /* 무시 */ } fr.classList.add('panning'); }
       panTo(st.px + dx, st.py + dy);
+      (st.hist || (st.hist = [])).push([performance.now(), e.clientX, e.clientY]); if (st.hist.length > 6) st.hist.shift();   // 손을 뗄 때 미끄러지는 빠르기
     });
-    const end = e => { pts.delete(e.pointerId); if (pinch && pts.size < 2) { pinch = null; rt.panMoved = performance.now(); return; } if (!st || e.pointerId !== st.id) return; if (st.moved) { rt.panMoved = performance.now(); fr.classList.remove('panning'); } st = null; };
+    const end = e => { pts.delete(e.pointerId); if (pinch && pts.size < 2) { pinch = null; rt.panMoved = performance.now(); return; } if (!st || e.pointerId !== st.id) return; if (st.moved) { rt.panMoved = performance.now(); fr.classList.remove('panning'); panGlide(st.hist); } st = null; };
     fr.addEventListener('pointerup', end); fr.addEventListener('pointercancel', end);
     // 지도 판은 스크롤하지 않아요 (키보드로 건물을 옮겨 다닐 때 브라우저가 밀어 두는 것도 되돌려요)
     fr.addEventListener('wheel', e => {   // 컴퓨터: 휠로 확대, 축소 (트랙패드 두 손가락 벌리기는 ctrlKey 휠로 와요)
@@ -14918,13 +15138,16 @@ body.mg-on .toast[hidden]{display:none}
        forest/rank/<내 id>   랭킹 이름과 학교 점수
        forest/stats/<내 id>  테스트 현황 (어디까지 했는지, 얼마나 했는지)
      <내 id>는 Firebase 익명 로그인이 기기(브라우저)마다 만들어 줘요. */
-  const VERSION = '5.3.0';   // 웹에 5.0.2~5.0.5로 먼저 냈던 것을 앱과 함께 하나로 내요(버전 견줌은 앞 두 자리만 봐서 되돌아가도 괜찮아요)
+  const VERSION = '5.3.1';
   const NT_QUIET = ['5.3.0.3', '5.3.0.2', '5.3.0.1', '5.2.2', '5.2.1', '5.2.0.2', '5.2.0.1', '5.1.1.3', '5.1.1.2', '5.1.1.1', '5.1.1', '5.0.3.1', '5.0.3', '5.0.2.2', '5.0.2.1', '2.1.20', '2.1.2.2', '2.3.0.1', '2.3.4', '3.2.3', '3.2.4', '3.2.5', '3.3.1', '3.3.2', '3.3.3', '4.4.1.1', '4.4.1.2', '4.4.1.3', '4.4.1.4', '5.0.1.1', '5.0.1.2', '5.0.1.3', '5.0.1.4', '5.0.1.5', '5.0.1.6', '5.0.1.7', '5.0.1.8'];   // 생물 탐사 고침은 공지 없이. 도 공지 없이(공지 줄은 정하면 넣어요). 공지 없이. 공지 줄은 woodani가 정할 때까지 조용히. 공지는 2026-11-16 woodani가 정해서 NOTICES로 옮겼어요. 은 공지를 띄워요. 도 공지 없이. 도 공지 창 없이. 도 공지 창 없이(공지는 그대로). 도 조용히. 도 공지 창 없이(공지 줄을 고르지 않음)
     // 이 버전들은 업데이트해도 공지 창을 띄우지 않아요(공지는 그대로)
   /* 공지사항 (은 이미 올려서 부터): 설정 > 공지사항. 맨 위가 가장 새 공지예요
      패치노트는 자동으로 넣지 않아요. woodani가 검수한 글만 여기에 적어요(CHANGELOG.md는 자세한 기록용이라 따로 있어요)
      접속하면 새 공지 창을 띄워요(올라온 뒤 7일 동안, '일주일간 열지 않기'를 누르면 7일 쉬어요). 업데이트한 뒤 첫 접속에는 쉬는 중이어도 한 번 띄워요 */
   const NOTICES = [
+    // 공지(고른 세 줄). 5.3.1 살아 있는 숲속 마을
+    { id: '2026-11-21-v531', date: '2026-11-21', tag: '업데이트', title: '5.3.1 업데이트',
+      lines: ['살아 있는 숲속 마을 업데이트', '자연 소리와 사진 모드 추가', '편의 개선과 오류 수정'] },
     // 공지(한 줄). 웹 5.2.0.1~5.3.0.3을 앱으로 묶음
     { id: '2026-11-20-v530', date: '2026-11-20', tag: '업데이트', title: '5.3.0 업데이트',
       lines: ['학교 행사와 탐험 그래픽 개선'] },
@@ -26981,7 +27204,7 @@ body.mg-on .toast[hidden]{display:none}
     const rv = qReward(q), no = qNo(S.q.m);
     grant(rv, fromEl, q.rk);
     const items = [q.rk === 'dip' ? { ic: 'dip', t: `수료증 +${fmt(rv)}장` } : { ic: 'acorn', t: `도토리 +${fmt(rv)}` }];
-    if (hardQ(q)) items.push(goldOr(GOLD.hard, '(조금 어려운 퀘스트)'));
+    if (hardQ(q)) items.push(goldOr(GOLD.hard));
     addLeague(LP.quest, true);
     S.q.m += 1; S.q.md += 1;
     startMain();
@@ -27460,13 +27683,15 @@ body.mg-on .toast[hidden]{display:none}
     if (t === 'school') requestAnimationFrame(() => fitMap(prev !== 'school' && rt.panX == null));
     { const bd = $('.board'), scd = $('#schoolCard'); if (bd && bd.classList.contains('open')) { bd.classList.remove('open'); if (scd) scd.setAttribute('aria-expanded', 'false'); } }
     if (t !== 'shop') Music.preview = '';
-    musicSync();
+    musicSync(); try { wldSync(); } catch (e) { /* 마을 층은 다음에 */ }
     try { trTab(t, prev); } catch (e) { /* 연출만 */ }   // 탭 넘김
   }
   function syncSettingsUI() {
     $('#optSound').checked = S.sound; $('#optBgm').checked = S.bgm; $('#optVibe').checked = S.vibrate;
     $('#tutSub').textContent = S.tut.paid || S.tut.nop ? '학교를 꾸려 가는 방법을 다시 봐요' : `끝까지 보면 황금 도토리 ${TUT_GOLD}개` + (S.tut.st === 'later' ? ' (이어서 보기)' : '');
     $$('#optUnits [data-units]').forEach(b => b.setAttribute('aria-checked', b.dataset.units === S.units ? 'true' : 'false'));
+    $$('#optGfx [data-gfx]').forEach(b => b.setAttribute('aria-checked', +b.dataset.gfx === wldLv() ? 'true' : 'false'));
+    $$('#optAmb [data-amb]').forEach(b => b.setAttribute('aria-checked', +b.dataset.amb === S.ambV ? 'true' : 'false'));
     $$('#optUiz [data-uiz]').forEach(b => b.setAttribute('aria-checked', +b.dataset.uiz === S.uiz ? 'true' : 'false'));
     applyUiz();
   }
@@ -30651,7 +30876,7 @@ body.mg-on .toast[hidden]{display:none}
   async function fxInit() {
     const fr = $('.frame'); if (!fr || !window.PIXI || !window.PIXI.Application) { FXL.st = 'no'; return; }
     const P = window.PIXI, app = new P.Application();
-    await app.init({ width: Math.max(1, fr.clientWidth), height: Math.max(1, fr.clientHeight), backgroundAlpha: 0, antialias: true, resolution: Math.min(2, window.devicePixelRatio || 1), autoDensity: true, autoStart: false, sharedTicker: false, preference: 'webgl' });
+    await app.init({ width: Math.max(1, fr.clientWidth), height: Math.max(1, fr.clientHeight), backgroundAlpha: 0, antialias: true, resolution: Math.min(wldLv() >= 2 ? 3 : 2, window.devicePixelRatio || 1), autoDensity: true, autoStart: false, sharedTicker: false, preference: 'webgl' });
     app.ticker.stop();
     const cv = app.canvas; cv.className = 'fxl'; cv.setAttribute('aria-hidden', 'true'); $('#map').after(cv);
     FXL.app = app; FXL.w = new P.Container(); app.stage.addChild(FXL.w);
@@ -31055,7 +31280,7 @@ body.mg-on .toast[hidden]{display:none}
      다 처치하면 대원들이 길을 따라 오른쪽 위로 달리고, 화면이 따라가며 바닥이 왼쪽 아래로 흘러요. 10층마다 아치문(ex6_<지역>_gate)을 지나요
      높이 오를수록(지역 안 50층) 먼 풍경이 내려가고 발아래로 구름(ex6_cloud)이 지나가요
      하늘, 먼 풍경, 앞 장식은 그대로 HTML 겹(작업지시서 104-2). 엔진이 없거나 움직임 줄이기면 예전 오르기 그대로. 겨루기 계산과 값은 바꾸지 않아요 */
-  const FXG = { st: '', app: null, root: null, sq: null, floor: null, path: null, cloud: null, gate: null, gs: 0, reg: '', tex: {}, raf: 0, last: 0, run: 0, sp: 0, ang: 0, ux: 0, uy: 0, mid: [0, 0], top: 0, W: 0, H: 0, h: 0 };
+  const FXG = { decs: [], decBox: null, decPw: 0, st: '', app: null, root: null, sq: null, floor: null, path: null, cloud: null, gate: null, gs: 0, reg: '', tex: {}, raf: 0, last: 0, run: 0, sp: 0, ang: 0, ux: 0, uy: 0, mid: [0, 0], top: 0, W: 0, H: 0, h: 0 };
   const FXG_SQ = 0.6;   // 바닥을 세로로 누르는 정도(원근 어림)
   const fxgOn = fl => fxTamOn() && FXG.st === 'ok' && !!fxgTexOk(tamReg(fl).k);
   function fxgTexOk(k) { return !!(IMG(`ex6_${k}_tile`) && IMG(`ex6_${k}_path`)); }
@@ -31095,9 +31320,9 @@ body.mg-on .toast[hidden]{display:none}
   function fxgSet(k, force) {
     if (FXG.st !== 'ok') return false; const P = window.PIXI, app = FXG.app, world = $('#tmWorld'); if (!world) return false;
     const tile = fxgTex(`ex6_${k}_tile`), path = fxgTex(`ex6_${k}_path`); fxgTex(`ex6_${k}_gate`);   // 문은 미리 받아 둬요
-    if (!tile || !path) { app.canvas.hidden = true; FXG.reg = k; return false; }
+    if (!tile || !path) { app.canvas.hidden = true; FXG.reg = ''; return false; }   // 그림이 오면 fxgRefresh가 이 지역으로 새로 깔아요(앞 지역 바닥이 남지 않게)
     if (app.screen.width !== world.clientWidth || app.screen.height !== world.clientHeight) { app.renderer.resize(Math.max(1, world.clientWidth), Math.max(1, world.clientHeight)); force = true; }
-    if (FXG.reg === k && FXG.floor && !force) { app.canvas.hidden = false; return true; }
+    if (FXG.reg === k && FXG.floor && !force) { app.canvas.hidden = false; if (!FXG.decs.length && fxgDecs(k)) app.render(); return true; }
     FXG.reg = k; fxgGeom();
     const { W, H, top } = FXG, sq = FXG.sq;
     sq.removeChildren().forEach(c => c.destroy()); FXG.gate = null;
@@ -31105,11 +31330,12 @@ body.mg-on .toast[hidden]{display:none}
     const ts = Math.max(0.3, W * 0.8 / 720), LH = (H - top) / FXG_SQ + 40;
     const floor = new P.TilingSprite({ texture: tile, width: W * 3, height: LH + 80 }); floor.position.set(-W * 1.5, -40); floor.tileScale.set(ts); sq.addChild(floor); FXG.floor = floor;
     const len = Math.hypot(W, LH) * 2.2, pw = 256 * ts * 1.05;
-    const pa = new P.TilingSprite({ texture: path, width: pw, height: len }); pa.anchor.set(0.5); pa.tileScale.set(ts * 1.05); pa.rotation = FXG.ang + Math.PI / 2; pa.position.set(FXG.mid[0], FXG.mid[1]); sq.addChild(pa); FXG.path = pa;
-    // 위쪽 가장자리는 HTML 바닥(풀숲 가장자리)과 이어지게 흐리게
-    if (!FXG.fade) { const c = document.createElement('canvas'); c.width = 4; c.height = 64; const g = c.getContext('2d'), gr = g.createLinearGradient(0, 0, 0, 64); gr.addColorStop(0, 'rgba(255,255,255,0)'); gr.addColorStop(1, 'rgba(255,255,255,1)'); g.fillStyle = gr; g.fillRect(0, 0, 4, 64); FXG.fade = P.Texture.from(c); }
-    if (FXG.mask) FXG.mask.destroy(); const m = new P.Container(), m1 = new P.Sprite(FXG.fade), m2 = new P.Sprite(P.Texture.WHITE);
-    m1.position.set(0, top - 10); m1.width = W; m1.height = 46; m2.position.set(0, top + 36); m2.width = W; m2.height = H; m.addChild(m1, m2); FXG.root.addChild(m); sq.mask = m; FXG.mask = m;
+    const pa = new P.TilingSprite({ texture: path, width: pw, height: len }); pa.anchor.set(0.5); pa.tileScale.set(ts * 1.05); pa.rotation = FXG.ang + Math.PI / 2; pa.position.set(FXG.mid[0], FXG.mid[1]); sq.addChild(pa); FXG.path = pa; FXG.decs = []; fxgDecs(k);
+    // 위쪽 가장자리는 HTML 바닥(풀숲 가장자리)과 이어지게 흐리게. 엔진 8은 여러 조각을 묶은 가림이 투명도를 무시해서(딱 잘림) 그림 한 장으로 가려요
+    const mh = H - top + 24, ff = Math.min(0.9, 110 / Math.max(1, mh)), c = document.createElement('canvas'); c.width = 4; c.height = 256;
+    { const g = c.getContext('2d'), gr = g.createLinearGradient(0, 0, 0, 256); gr.addColorStop(0, 'rgba(255,255,255,0)'); gr.addColorStop(ff, 'rgba(255,255,255,1)'); gr.addColorStop(1, 'rgba(255,255,255,1)'); g.fillStyle = gr; g.fillRect(0, 0, 4, 256); }
+    if (FXG.mask) FXG.mask.destroy({ texture: true, textureSource: true }); const m = new P.Sprite(P.Texture.from(c));
+    m.position.set(0, top - 24); m.width = W; m.height = mh; FXG.root.addChild(m); sq.mask = m; FXG.mask = m;
     const ct = fxgTex('ex6_cloud');
     if (ct && !FXG.cloud) { const cl = new P.TilingSprite({ texture: ct, width: W, height: H * 0.3 }); cl.tileScale.set(H * 0.3 / 512); cl.position.set(0, H * 0.72); cl.alpha = 0; FXG.root.addChild(cl); FXG.cloud = cl; }
     if (FXG.cloud) { FXG.cloud.width = W; FXG.cloud.height = H * 0.3; FXG.cloud.position.set(0, H * 0.72); FXG.root.addChild(FXG.cloud); }
@@ -31130,13 +31356,34 @@ body.mg-on .toast[hidden]{display:none}
   }
   function fxgKick() { if (FXG.st === 'ok' && !FXG.raf) { FXG.last = performance.now(); FXG.raf = requestAnimationFrame(fxgFrame); } }
   function fxgGatePos() { const g = FXG.gate; if (!g) return; const lx = FXG.mid[0] + FXG.ux * FXG.gs, ly = FXG.mid[1] + FXG.uy * FXG.gs; g.position.set(FXG.W / 2 + lx, FXG.top + ly * FXG_SQ); }
+  // 바닥 장식(작업지시서 107 ex6_<지역>_dec1~4): 바닥 위에 흩어 놓고 바닥과 함께 흘러요. 길 위에는 놓지 않아요. 그래픽 낮음은 없음
+  function fxgDecs(k) {
+    const lv = wldLv(), nd = lv >= 2 ? 16 : lv ? 9 : 0; if (!nd || !FXG.sq || !FXG.path) return false;
+    const ts = [1, 2, 3, 4].map(i => fxgTex(`ex6_${k}_dec${i}`)).filter(Boolean); if (ts.length < 4) return false;
+    const { W, H, top } = FXG, LH = (H - top) / FXG_SQ + 40, sc = Math.max(0.3, W * 0.8 / 720), pw = 256 * sc * 1.05;
+    FXG.decBox = [-W * 0.62, W * 0.62, -10, LH]; FXG.decPw = pw;
+    for (let i = 0; i < nd; i++) {
+      const s = new window.PIXI.Sprite(ts[i % 4]); s.anchor.set(0.5); s.scale.set(sc * fxRnd(0.75, 1.1), sc * fxRnd(0.75, 1.1) / FXG_SQ * 0.75);   // 세로로 눌린 바닥이라 장식은 덜 눌리게
+      for (let t = 0; t < 12; t++) { s.x = fxRnd(FXG.decBox[0], FXG.decBox[1]); s.y = fxRnd(FXG.decBox[2], FXG.decBox[3]); if (fxgOffPath(s, pw)) break; }
+      FXG.sq.addChildAt(s, 1); FXG.decs.push(s);
+    }
+    return true;
+  }
+  const fxgOffPath = (s, pw) => Math.abs((s.x - FXG.mid[0]) * FXG.uy - (s.y - FXG.mid[1]) * FXG.ux) > pw * 0.62;
+  function fxgDecMove(dx, dy) {
+    const B = FXG.decBox; if (!B) return;
+    for (const s of FXG.decs) { s.x += dx; s.y += dy; let w = false;
+      if (s.x < B[0]) { s.x += B[1] - B[0]; w = true; } else if (s.x > B[1]) { s.x -= B[1] - B[0]; w = true; }
+      if (s.y < B[2]) { s.y += B[3] - B[2]; w = true; } else if (s.y > B[3]) { s.y -= B[3] - B[2]; w = true; }
+      if (w && !fxgOffPath(s, FXG.decPw)) { s.x += FXG.uy * FXG.decPw; s.y -= FXG.ux * FXG.decPw; } }
+  }
   function fxgFrame(now) {
     FXG.raf = 0; const dt = Math.min(0.05, Math.max(0, (now - FXG.last) / 1000)); FXG.last = now;
     if (!fxTamOn() || !FXG.floor) { FXG.run = 0; return; }
     if (FXG.run > 0) {
       const e = Math.min(1, FXG.run / 0.25), v = FXG.sp * e * dt; FXG.run -= dt;   // 끝 0.25초는 천천히 멈춰요
       FXG.floor.tilePosition.x -= FXG.ux * v; FXG.floor.tilePosition.y -= FXG.uy * v;
-      FXG.path.tilePosition.y += v;
+      FXG.path.tilePosition.y += v; fxgDecMove(-FXG.ux * v, -FXG.uy * v);
       if (FXG.cloud && FXG.cloud.alpha > 0) FXG.cloud.tilePosition.x -= v * 0.35;
       if (FXG.gate) { FXG.gs -= v; fxgGatePos(); if (FXG.gs < -Math.hypot(FXG.W, FXG.H) * 0.8) { FXG.gate.destroy(); FXG.gate = null; } }
     }
@@ -31213,6 +31460,216 @@ body.mg-on .toast[hidden]{display:none}
     FXO.app.render();
     if (FXO.parts.length || FXO.rings.length) FXO.raf = requestAnimationFrame(fxoFrame);
   }
+  /* ---------- 마을 층(5.3.1 살아 있는 숲속 마을): 하루의 빛, 날씨, 구름 그림자, 작은 생물, 물결 ----------
+     홈 지도에서만 움직여요. 빛과 가장자리 그늘은 지도 위 얇은 막(.wld-tint, .wld-vig), 나머지는 효과층(FXL) 그림판에 같이 그려요.
+     그래픽 품질(S.gfx): 0 낮음(지금까지 화면 그대로), 1 보통(초당 20장, 적게), 2 높음(초당 30장). -1은 자동(폰 성능으로)
+     값과 규칙과 저장은 건드리지 않아요. 비와 눈은 그날의 게임 날씨를 엔진으로 더 곱게 그리는 것이에요(예전 CSS 비와 눈은 이때 숨겨요) */
+  const WLD = { st: '', lv: -1, ph: '', wx: '', key: '', tint: null, vig: null, mc: null, sc: null, tex: {}, parts: [], next: {}, timer: 0, last: 0, water: [], wv: 0, tier0: null, curWait: false };
+  const WLD_FPS = [0, 20, 30];
+  // 제안 숫자: 빗방울 수, 눈송이 수, 반딧불 수, 나비 수(보통, 높음)
+  const WLD_N = { rain: [45, 90], snow: [35, 70], fly: [7, 14], bfly: [2, 3], cloud: [0, 3] };
+  const WLD_WATER = {"map_elem":[[18,186],[2,230],[18,258],[14,294],[26,358],[2,382]],"map_high":[[338,66],[358,94],[338,122],[354,150],[346,182],[186,206],[350,214],[354,246]],"map_kinder":[[22,126],[186,218],[2,350],[34,366],[42,398]]};   // dev/water_spots.py로 고른 물 자리
+  function wldAuto() {
+    const c = navigator.hardwareConcurrency || 4, m = navigator.deviceMemory || 4;
+    return c >= 8 && m >= 6 ? 2 : c >= 4 ? 1 : 0;
+  }
+  const wldLv = () => rt.reduced || !S ? 0 : rt.photo ? 2 : (S.gfx >= 0 ? S.gfx : wldAuto());
+  const wldMonth = () => new Date(gameNow() + KST_MS).getUTCMonth() + 1;
+  const wldBg = () => { try { return thOn().bg || ''; } catch (e) { return ''; } };
+  function wldPhase() {
+    if (rt.wldPh) return rt.wldPh;   // 사진 모드에서 고른 시간
+    const h = kstHour(gameNow());
+    return isNight() ? 'night' : h < 9 ? 'morning' : h >= 17 ? 'evening' : 'day';
+  }
+  // 날씨는 그날 정해지는 게임 날씨(wxOf, 37-season.js)를 따라요. 날씨 효과를 끈 사람(S.wxOff)은 맑음처럼
+  function wldWeather() {
+    if (rt.wldWx != null) return rt.wldWx;   // 사진 모드에서 고른 날씨('' 맑음)
+    if (!S || S.wxOff || rt.viewTier != null) return '';
+    const k = wxOf(); return k === 'rain' || k === 'snow' ? k : '';
+  }
+  function wldDom() {
+    if (WLD.tint) return true;
+    const mp = $('#map'); if (!mp) return false;
+    WLD.tint = document.createElement('div'); WLD.tint.className = 'wld-tint'; WLD.tint.setAttribute('aria-hidden', 'true');
+    WLD.vig = document.createElement('div'); WLD.vig.className = 'wld-vig'; WLD.vig.setAttribute('aria-hidden', 'true');
+    ($('.frame canvas.fxl') || mp).after(WLD.tint, WLD.vig);   // 효과층 그림판은 늘 지도 바로 뒤(겹치는 차례는 z-index)
+    return true;
+  }
+  // 날씨, 시간, 품질을 다시 보고 막과 소리와 움직임을 맞춰요(탭을 바꿀 때와 15초마다)
+  function wldSync() {
+    if (!S || !wldDom()) return;
+    if (rt.photo && rt.tab !== 'school') photoClose();
+    const lv = wldLv(), home = rt.tab === 'school' && !document.hidden, ph = lv ? wldPhase() : '', wx = lv ? wldWeather() : '';
+    WLD.lv = lv; WLD.ph = ph; WLD.wx = wx;
+    const hsN = $('#map') && $('#map').classList.contains('hs-night');   // 고등학교부터의 밤은 예전 밤 화면(창문 불빛)이 맡아요
+    WLD.tint.className = 'wld-tint' + (lv && ph ? ' ph-' + ph : '') + (hsN ? ' hs' : '') + (wx ? ' wx-' + wx : '');
+    WLD.vig.className = 'wld-vig' + (lv >= 2 ? ' on' : '');
+    rt.ambWx = home ? wx : '';
+    const key = (geo().map || '').replace(/_(spring|summer|autumn|winter|xmas|space|retro|lux)$/, '');
+    if (key !== WLD.key) { WLD.key = key; WLD.water = WLD_WATER[key] || []; wldReset(); }
+    if (home && lv && FXL.st === 'ok') wldStart(); else wldStop();
+  }
+  function wldPixi() {
+    if (WLD.st) return WLD.st === 'ok';
+    if (FXL.st !== 'ok') return false;
+    const P = window.PIXI, r = FXL.app.renderer, cv = (w, h, f) => { const c = document.createElement('canvas'); c.width = w; c.height = h; f(c.getContext('2d')); return P.Texture.from(c); };
+    WLD.mc = new P.Container(); FXL.w.addChildAt(WLD.mc, 0);   // 지도 자리: 구름 그림자, 물결, 생물(효과 밑)
+    WLD.sc = new P.Container(); FXL.app.stage.addChild(WLD.sc);   // 화면 자리: 비와 눈(맨 위)
+    WLD.tex.soft = cv(128, 128, g => { const gr = g.createRadialGradient(64, 64, 0, 64, 64, 64); gr.addColorStop(0, 'rgba(255,255,255,1)'); gr.addColorStop(0.6, 'rgba(255,255,255,.55)'); gr.addColorStop(1, 'rgba(255,255,255,0)'); g.fillStyle = gr; g.fillRect(0, 0, 128, 128); });
+    WLD.tex.drop = cv(4, 40, g => { const gr = g.createLinearGradient(0, 0, 0, 40); gr.addColorStop(0, 'rgba(255,255,255,0)'); gr.addColorStop(1, 'rgba(255,255,255,.75)'); g.fillStyle = gr; g.fillRect(1, 0, 2, 40); });
+    WLD.tex.ring = r.generateTexture(new P.Graphics().ellipse(0, 0, 20, 8).stroke({ width: 1.6, color: 0xffffff, alpha: 0.9 }));
+    WLD.st = 'ok'; return true;
+  }
+  function wldTex(k) {
+    if (WLD.tex[k] !== undefined) return WLD.tex[k];
+    WLD.tex[k] = null; const u = IMG(k); if (!u) return null;
+    const im = new Image(); im.onload = () => { try { WLD.tex[k] = window.PIXI.Texture.from(im); } catch (e) { /* 없으면 그 생물만 빠져요 */ } }; im.src = u;
+    return null;
+  }
+  function wldReset() { for (const p of WLD.parts) if (p.s && !p.s.destroyed) p.s.destroy(); WLD.parts.length = 0; WLD.next = {}; }
+  function wldStart() { if (!wldPixi()) return; WLD.mc.visible = WLD.sc.visible = true; const fr = $('.frame'); if (fr) fr.classList.add('wld-on'); if (!WLD.timer) { WLD.last = performance.now(); WLD.timer = setTimeout(wldTick, 0); } }
+  function wldStop() {
+    clearTimeout(WLD.timer); WLD.timer = 0; const fr = $('.frame'); if (fr) fr.classList.remove('wld-on');
+    if (WLD.st === 'ok') { wldReset(); WLD.mc.visible = WLD.sc.visible = false; if (!FXL.raf && FXL.app) FXL.app.render(); }
+  }
+  function wldTick() {
+    WLD.timer = 0;
+    if (!WLD.lv || rt.tab !== 'school' || document.hidden || FXL.st !== 'ok') { wldStop(); return; }
+    requestAnimationFrame(now => {
+      const dt = Math.min(0.1, Math.max(0, (now - WLD.last) / 1000)); WLD.last = now;
+      try { wldStep(dt, now); } catch (e) { /* 한 장 실패는 넘어가요 */ }
+      if (WLD.lv) WLD.timer = setTimeout(wldTick, 1000 / WLD_FPS[WLD.lv]);
+    });
+  }
+  const wldRnd = (a, b) => a + Math.random() * (b - a);
+  function wldAdd(tex, x, y, sz, o, screen) {
+    const s = new window.PIXI.Sprite(tex); s.anchor.set(0.5); s.x = x; s.y = y; s.scale.set(sz / (tex.width || 1));
+    if (o.add) s.blendMode = 'add'; if (o.alpha != null) s.alpha = o.alpha; if (o.tint) s.tint = o.tint;
+    (screen ? WLD.sc : WLD.mc).addChild(s); const p = Object.assign({ s, k0: s.scale.x, t: 0 }, o); WLD.parts.push(p); return p;
+  }
+  const wldCount = kind => WLD.parts.reduce((n, p) => n + (p.kind === kind), 0);
+  // 지금 화면에 보이는 지도 칸(지도 좌표)
+  function wldView() {
+    const fr = $('.frame'), mp = $('#map'); if (!fr || !mp) return [0, -60, 360, 480];
+    const F = fr.getBoundingClientRect(), R = mp.getBoundingClientRect(), k = R.width / 360 || 1;
+    return [(F.left - R.left) / k, (F.top - R.top) / k - 60, (F.right - R.left) / k, (F.bottom - R.top) / k - 60];
+  }
+  function wldStep(dt, now) {
+    const app = FXL.app, fr = $('.frame'), mp = $('#map'); if (!fr || !mp) return;
+    if (!FXL.raf) {   // 효과층이 쉬고 있으면 지도 자리를 여기서 맞춰요(움직이는 중이면 효과층이 맞춰요)
+      if (app.screen.width !== fr.clientWidth || app.screen.height !== fr.clientHeight) app.renderer.resize(Math.max(1, fr.clientWidth), Math.max(1, fr.clientHeight));
+      const F = fr.getBoundingClientRect(), R = mp.getBoundingClientRect(), k = R.width / 360 || 1;
+      FXL.k = k; FXL.w.scale.set(k); FXL.w.x = R.left - F.left - fr.clientLeft; FXL.w.y = R.top - F.top - fr.clientTop + 60 * k;
+    }
+    const lv = WLD.lv, hi = lv >= 2 ? 1 : 0, ph = WLD.ph, wx = WLD.wx, W = app.screen.width, H = app.screen.height, V = wldView(), m = wldMonth(), bg = wldBg();
+    const wint = bg === 'winter' || bg === 'xmas' || m === 12 || m <= 2, dayish = ph === 'day' || ph === 'morning';
+    WLD.mc.tint = ph === 'night' ? 0x8a93c8 : ph === 'evening' ? 0xffd2b0 : 0xffffff;
+    const due = (k, a, b) => { if (!WLD.next[k]) WLD.next[k] = now + wldRnd(a, b) * 500; if (now < WLD.next[k]) return false; WLD.next[k] = now + wldRnd(a, b) * 1000; return true; };
+    // 비와 눈(화면 자리)
+    const nR = wx === 'rain' ? WLD_N.rain[hi] : 0, nS = wx === 'snow' ? WLD_N.snow[hi] : 0;
+    for (let c = wldCount('rain'); c < nR; c++) wldAdd(WLD.tex.drop, wldRnd(-40, W + 40), wldRnd(-H, 0), wldRnd(2.2, 3), { kind: 'rain', vy: wldRnd(520, 680), alpha: wldRnd(0.5, 0.8) }, true).s.rotation = 0.18;
+    for (let c = wldCount('snow'); c < nS; c++) wldAdd(WLD.tex.soft, wldRnd(0, W), wldRnd(-H, 0), wldRnd(5, 10), { kind: 'snow', vy: wldRnd(28, 55), ph: wldRnd(0, 6), alpha: wldRnd(0.6, 0.95) }, true);
+    // 구름 그림자(맑은 낮, 높음만)
+    const nC = dayish && !wx ? WLD_N.cloud[hi] : 0;
+    for (let c = wldCount('cloud'); c < nC; c++) { const p = wldAdd(WLD.tex.soft, wldRnd(-140, 300), wldRnd(0, 420), 200, { kind: 'cloud', vx: wldRnd(4, 7), alpha: 0, a1: wldRnd(0.07, 0.11), tint: 0x23402a }); p.s.scale.y = p.k0 * 0.55; }
+    // 반딧불(노을과 밤, 비나 눈이 없을 때)
+    const nF = (ph === 'night' || ph === 'evening') && !wx && !wint ? WLD_N.fly[hi] : 0;
+    for (let c = wldCount('fly'); c < nF; c++) wldAdd(WLD.tex.soft, wldRnd(V[0], V[2]), wldRnd(Math.max(40, V[1]), V[3]), wldRnd(8, 11), { kind: 'fly', add: true, tint: 0xe8ff8a, alpha: 0, ph: wldRnd(0, 6), vx: wldRnd(-6, 6), vy: wldRnd(-5, 5) });
+    // 나비와 잠자리(맑은 낮, 봄부터 가을까지)
+    const nB = dayish && !wx && !wint && m >= 3 && m <= 10 ? WLD_N.bfly[hi] : 0;
+    if (wldCount('bfly') < nB && due('bfly', 2, 6)) {
+      const dragon = m >= 7 && Math.random() < 0.35, c = ['y', 'w', 'b'][(Math.random() * 3) | 0], k1 = dragon ? 'fx_dfly_1' : `fx_bfly_${c}_1`, t1 = wldTex(k1), t2 = wldTex(dragon ? 'fx_dfly_2' : `fx_bfly_${c}_2`);
+      if (t1 && t2) { const x = wldRnd(V[0] + 20, V[2] - 20), y = wldRnd(Math.max(60, V[1] + 40), V[3] - 40); wldAdd(t1, x, y, dragon ? 15 : 11, { kind: 'bfly', t1, t2, dragon, tx: x, ty: y, life: wldRnd(14, 26), alpha: 0 }); }
+    }
+    // 새 떼(맑을 때 가끔, 지도 위쪽 하늘을 가로질러요)
+    if (!wx && ph !== 'night' && due('bird', 30, 70)) {
+      const t1 = wldTex('fx_bird_1'), t2 = wldTex('fx_bird_2');
+      if (t1 && t2) { const dir = Math.random() < 0.5 ? 1 : -1, y0 = wldRnd(-40, 70), n = 3 + ((Math.random() * 3) | 0);
+        for (let i = 0; i < n; i++) { const p = wldAdd(t1, (dir > 0 ? -30 : 390) - dir * i * wldRnd(10, 16), y0 + wldRnd(-10, 10) + i * 3, wldRnd(8, 10), { kind: 'bird', t1, t2, vx: dir * wldRnd(36, 44), vy: wldRnd(-2, 2), ph: wldRnd(0, 6) }); p.s.scale.x *= -dir; } }
+    }
+    // 바람에 날리는 잎(맑은 낮, 가끔)
+    if (dayish && !wx && due('leaf', 7, 16)) {
+      const ks = bg === 'spring' ? ['fxe_petal_1', 'fxe_petal_2', 'fxe_petal_3'] : bg === 'autumn' || (m >= 9 && m <= 11) ? ['tr_leaf_2', 'fx_leaf_1'] : wint ? [] : ['fx_leaf_1', 'fx_leaf_2', 'fx_leaf_3'];
+      const y0 = wldRnd(Math.max(40, V[1]), V[3] - 60);
+      for (let i = 0; i < 3 + ((Math.random() * 3) | 0); i++) { const t = wldTex(ks[i % (ks.length || 1)]); if (t) wldAdd(t, V[0] - 20 - i * wldRnd(15, 30), y0 + wldRnd(-30, 30), wldRnd(7, 10), { kind: 'leaf', vx: wldRnd(45, 70), vy: wldRnd(4, 14), rot: wldRnd(-3, 3), ph: wldRnd(0, 6), life: 12 }); }
+    }
+    // 물결(물이 보이는 지도만, 비가 오면 자주)
+    let wv = 0; for (const [x, y] of WLD.water) if (x >= V[0] - 10 && x <= V[2] + 10 && y >= V[1] && y <= V[3]) wv++;
+    const wa = Math.min(1, wv / 3); if (Math.abs(wa - WLD.wv) > 0.05) { WLD.wv = wa; rt.ambWater = wa; }
+    if (wv && due('ring', wx === 'rain' ? 0.25 : 0.9, wx === 'rain' ? 0.6 : 2)) { const [x, y] = WLD.water[(Math.random() * WLD.water.length) | 0]; wldAdd(WLD.tex.ring, x + wldRnd(-6, 6), y + wldRnd(-5, 5), 8, { kind: 'ring', life: 1.6, alpha: 0.7 }); }
+    // 움직이기
+    for (let i = WLD.parts.length - 1; i >= 0; i--) {
+      const p = WLD.parts[i], s = p.s; p.t += dt; let dead = false;
+      if (p.kind === 'rain') { s.y += p.vy * dt; s.x += p.vy * 0.18 * dt; if (s.y > H + 30) { if (wldCount('rain') > nR) dead = true; else { s.y = wldRnd(-60, -20); s.x = wldRnd(-40, W); } } }
+      else if (p.kind === 'snow') { s.y += p.vy * dt; s.x += Math.sin(now / 900 + p.ph) * 14 * dt; if (s.y > H + 10) { if (wldCount('snow') > nS) dead = true; else { s.y = -10; s.x = wldRnd(0, W); } } }
+      else if (p.kind === 'cloud') { s.x += p.vx * dt; s.alpha = Math.min(p.a1, s.alpha + dt * 0.02); if (s.x > 480 || nC === 0) { s.alpha -= dt * 0.05; if (s.x > 480 || s.alpha <= 0) dead = true; } }
+      else if (p.kind === 'fly') { p.vx += wldRnd(-8, 8) * dt; p.vy += wldRnd(-8, 8) * dt; p.vx *= 0.99; p.vy *= 0.99; s.x += p.vx * dt; s.y += p.vy * dt; s.alpha = nF ? 0.35 + 0.65 * Math.max(0, Math.sin(now / 700 + p.ph)) : s.alpha - dt; if (!nF && s.alpha <= 0) dead = true; }
+      else if (p.kind === 'bfly') {
+        if (Math.hypot(p.tx - s.x, p.ty - s.y) < 4) { p.tx = s.x + wldRnd(-60, 60); p.ty = s.y + wldRnd(-40, 40); }
+        const dx = p.tx - s.x, dy = p.ty - s.y, d = Math.hypot(dx, dy) || 1, sp = p.dragon ? 34 : 16;
+        s.x += dx / d * sp * dt; s.y += dy / d * sp * dt + (p.dragon ? 0 : Math.sin(now / 160) * 6 * dt);
+        s.texture = (now / (p.dragon ? 60 : 130)) % 2 < 1 ? p.t1 : p.t2; s.scale.x = Math.abs(s.scale.x) * (dx < 0 ? -1 : 1);
+        p.life -= dt; s.alpha = Math.min(1, p.t, Math.max(0, p.life)); if (p.life <= 0 || nB === 0) dead = true;
+      }
+      else if (p.kind === 'bird') { s.x += p.vx * dt; s.y += p.vy * dt + Math.sin(now / 400 + p.ph) * 4 * dt; s.texture = (now / 180 + p.ph) % 2 < 1 ? p.t1 : p.t2; if (s.x < -60 || s.x > 420) dead = true; }
+      else if (p.kind === 'leaf') { s.x += p.vx * dt; s.y += (p.vy + Math.sin(now / 300 + p.ph) * 18) * dt; s.rotation += p.rot * dt; p.life -= dt; if (p.life <= 0 || s.x > V[2] + 30) dead = true; }
+      else if (p.kind === 'ring') { const u = p.t / p.life; s.scale.set(p.k0 * (0.4 + u * 1.2)); s.alpha = 0.7 * (1 - u); if (u >= 1) dead = true; }
+      if (dead) { s.destroy(); WLD.parts.splice(i, 1); }
+    }
+    if (!FXL.raf) app.render();
+  }
+  setInterval(() => { try { wldSync(); } catch (e) { /* 다음에 */ } }, 15000);
+  document.addEventListener('visibilitychange', () => { try { wldSync(); } catch (e) { /* 다음에 */ } });
+  window.addEventListener('load', () => setTimeout(() => { try { wldSync(); } catch (e) { /* 다음에 */ } }, 2600));   // 효과층(1.5초 뒤 받기) 다음에
+  document.addEventListener('click', e => {
+    const b = e.target.closest && e.target.closest('#optGfx [data-gfx]'); if (!b || !S) return;
+    const v = +b.dataset.gfx; if (v === S.gfx) return;
+    S.gfx = v; save(); syncSettingsUI(); sfx('tap'); wldSync();
+  });
+  // 조용한 손맛: 앱에서 단추를 누르면 아주 짧게 떨려요(진동을 켠 사람만, 그래픽 낮음은 빼요)
+  let wldTapT = 0;
+  document.addEventListener('pointerdown', e => {
+    if (!S || !S.vibrate || !APP_PACK() || wldLv() < 1) return;
+    if (!e.target.closest || !e.target.closest('button, [role="button"], .tab')) return;
+    const t = performance.now(); if (t - wldTapT < 80) return; wldTapT = t;
+    buzz(6);
+  }, { capture: true, passive: true });
+  // 학교급이 오르면(졸업식이 끝나고 홈 지도로 돌아오면) 구름 막이 걷히며 새 학교가 보여요
+  function wldCurtain() {
+    const fr = $('.frame'), u = [1, 2, 3].map(i => IMG('tr_cloud_' + i)); if (!fr || u.some(x => !x)) return;
+    const c = document.createElement('div'); c.className = 'wld-cur'; c.setAttribute('aria-hidden', 'true');
+    c.innerHTML = `<img class="c1" src="${u[0]}" alt=""><img class="c2" src="${u[1]}" alt=""><img class="c3" src="${u[2]}" alt="">`;
+    fr.appendChild(c); setTimeout(() => c.remove(), 3000);
+  }
+  setInterval(() => {
+    if (!S) return;
+    if (WLD.tier0 == null) { WLD.tier0 = S.tier; return; }
+    if (S.tier > WLD.tier0) { WLD.tier0 = S.tier; WLD.curWait = true; }
+    if (WLD.curWait && rt.tab === 'school' && !rt.modalOpen && !rt.cereOn && !document.hidden) { WLD.curWait = false; if (wldLv() >= 1) wldCurtain(); }
+  }, 400);
+  // 사진 모드: 글과 단추를 숨기고 마을만. 시간과 날씨를 골라 볼 수 있어요(저장은 휴대폰 화면 캡처로)
+  const PH_T = [['morning', '아침'], ['day', '낮'], ['evening', '노을'], ['night', '밤']], PH_W = [['', '맑음'], ['rain', '비'], ['snow', '눈']];
+  function photoOpen() {
+    if (!S) return;
+    if (rt.modalOpen) closeModal(rt.modalOpen);
+    setTab('school'); rt.photo = true; rt.wldPh = wldPhase(); rt.wldWx = wldWeather(); document.body.classList.add('photo');
+    const b = document.createElement('div'); b.className = 'photo-bar'; b.id = 'photoBar';
+    const seg = (id, L, cur, k) => `<div class="seg" id="${id}" role="radiogroup">${L.map(([v, t]) => `<button type="button" role="radio" data-${k}="${v}" aria-checked="${v === cur}">${t}</button>`).join('')}</div>`;
+    b.innerHTML = seg('phT', PH_T, rt.wldPh, 'pht') + seg('phW', PH_W, rt.wldWx, 'phw') + '<button type="button" class="btn-sub" id="phX">닫기</button>';
+    document.body.appendChild(b); wldSync();
+    requestAnimationFrame(() => { const fr = $('.frame'); if (!fr || !rt.mapS) return; const z = Math.min(ZOOM_MAX, Math.max(1, fr.clientHeight / (rt.mapH / (rt.zoom || 1)))); rt.zoom = z; fitMap(false); panTo((fr.clientWidth - rt.mapW) / 2, (fr.clientHeight - rt.mapH) / 2); });   // 지도가 화면 위아래를 다 채우게
+  }
+  function photoClose() {
+    rt.photo = false; rt.wldPh = undefined; rt.wldWx = undefined; document.body.classList.remove('photo');
+    const b = $('#photoBar'); if (b) b.remove(); wldSync(); if (rt.tab === 'school') fitMap(true);
+  }
+  document.addEventListener('click', e => {
+    const t = e.target.closest && e.target.closest('#optPhoto, #photoBar button'); if (!t) return;
+    if (t.id === 'optPhoto') { sfx('tap'); photoOpen(); return; }
+    if (t.id === 'phX') { sfx('tap'); photoClose(); return; }
+    if (t.dataset.pht != null) rt.wldPh = t.dataset.pht; else if (t.dataset.phw != null) rt.wldWx = t.dataset.phw; else return;
+    t.parentNode.querySelectorAll('button').forEach(x => x.setAttribute('aria-checked', x === t ? 'true' : 'false')); sfx('tap'); wldSync();
+  });
   /* ---------- 2.0.0 핫픽스(원격 설정, 2026-10-27 woodani) ----------
      웹 주소의 live.json을 켤 때 읽어요(웹, 안드로이드, 토스 모두). 코드는 받지 않고 숫자, 공지, 기능 끄기만 받아요.
      바꿀 수 있는 숫자는 LIVE_KEYS에 적은 것만이고, 값마다 최소와 최대 안으로 맞춰요. 받은 것은 이 기기에 남겨 두고 인터넷이 없을 때 써요.
@@ -31418,7 +31875,7 @@ body.mg-on .toast[hidden]{display:none}
     MAP_OAK, oakArt, layoutOak, mapOak, oakAt, tapOak, dropSpot,
     dexMeet, dexSync, dexPending, dexGift, renderDex, evCurrent, evNext, evUpcoming, evSync, evFix, evVal, EV_FALLBACK, EV_DECO, EV_HAT, COS, DECO_BY, decoOwn, perkRec, fpRec, BOOST_ALL, buyShop, pickShop, showNote, showOkOn, showWd, renderGradPanel, renderShop, renderDecoShop, EV_WEEKLY, EV_WEEK_BASE, weekMon, claimStamp, claimEvMission, claimEvBox, renderEvent, evMissions, evOk, evSkipped, EV_MONTHS, EV_MEASURE, tierMinutes, minAcorns, IMG, sanitize171, ACH, achSync, claimAch, setTitle, renderAch, setDexSeg, achClaimable, XT, xtAct, xtCost, xtLv, feastMins, libMult, propInstances, walkBuild, festItemSvg, guestArt, adErrText, googleErrText, openSheet, closeSheet, startFest, startSports, sanitize170, EV_STAMPS, EV_SPECIAL, EV_MONTHLY, EV_BOX, DEX_KEYS, DEX_REWARD, DEX_GUEST_KEYS, seasonKey, roofArtKey, thrKey, PP, PP_TITLES, ppOpen, ppPer, ppData, ppDay, ppWrite, ppTick, ppSync, ppScore, ppSemDone, rtMax, alumniLines, SIDE, vdReward, oakKey, setSeasonArt, VP, vpLv, vpCost, vpMult, vpAct, renderVpCard, sportsPrize, festPrize, renderTeachers, buildTeacherCards, bldImg, roofKey, bldStage, mapKey, setMapArt, applyThemes, buyFacility, bldFx, setBldFx, mapHi, Live, liveApply, liveLoad, liveOff, LIVE_KEYS, EVC, NOTICES, openNotice, noticeAuto, noticeWant, ntUnread, startTrial, endTrial: () => rt.trial && (rt.trial.left = 0), spawnDeal, startVisit, IMG170, MG, mgCells, mgSetCells, mgTick, mgAddEnergy, mgAddUp, mgTapGen, mgDrop, mgSell, mgUpgrade, mgAddUp, mgUpSwap, mgGensMax, MG_UP_ESS, mgClaimOrder, mgSwapOrder, mgOrderOk, mgFillOrders, mgOpen, mgClose, mgRenderAll, mgSpawnLevel, mgNearestEmpty, mgEmptyBoard, mgOrderReward, mgUI, sanitize180, mgWatchAd, mgNewOrder, mgHintPick, mgShowHint, mgClearHint, mgTouch, mgOrderGuide, mgDexN, mgDexCan, mgDexClaim, mgOpenDex, MG_DEX, MG_DEX_MS, mgDexEss, mgDexEssCan, mgDexEssN, mgDexMsCan, mgDexMsClaim, MGB, mgBuyBoost, mgBstLeft, mgOpenBoost, nice, claimMission, claimBonus, claimWeekMission, MP_BOX, swapDaily, repairMissions, MISSIONS, WMISSIONS, dmDay, wkWeek,   // 도감, 이벤트
     PZ, PZ_SHAPES, pzFits, pzAnyFit, pzStuck, pzFullLines, pzPlace, pzFreshGame, pzStart, PZB, pzbCost, pzApplyBoost, pzBoostOpen, pzBoostGo, festGoldLeft, festGoldTake, claimSports, TR2, TR2_PL, openTr2, tr2Act, tr2Away, tr2Ready, tr2Rsv, tr2Tick, renderAlbum, FEST, FEST_IDS, festNight, festShown, festTimeLock, festOpen, startFest, openFest, endFest, renderStreet, pzFinish, pzLeft, pzCanAd, pzEssOf, pzMinOf, pzHelpSquirrel, pzHelpOwl, pzHelpBear, fillSubs, mapRoofTop, showAd, claimOfflineDouble, startBoost, tripAd, festFocus, festRange, visMap, renderMissions, pzHasHelp, pzRot, pzNewPiece, pzOpen, pzClose, pzGameOver, pzRenderAll, renderMini, addEss, ESHOP, SP_FUR, applyCos, essItem, pickEss, buyEss, renderEssShop, hatSVG, spFurImg, gameNow, gameToday, gameWeek, kstDay, setServerTime, SVR, dmDay, weekIdx, lgWeek, wkWeek, lgKey, pzDay, goldDay, boostLeft, dealLeft, canStamp };
-  if (window.__FOREST_TEST) Object.assign(window.__forest, { uniTerm, utSync, tripUseTicket, readUseTicket, picnicUseTicket, buyDecoPieces, adGold, claimBonus, cloudPush, cloudClash, syncGet, revOf, deleteAccount, lookDel: () => lookDelNow(), lookSet, lookPush, leaveRank, sanitizeCg, freshCg });   // 시험 손잡이
+  if (window.__FOREST_TEST) Object.assign(window.__forest, { uniTerm, utSync, tripUseTicket, readUseTicket, picnicUseTicket, buyDecoPieces, adGold, claimBonus, cloudPush, cloudClash, syncGet, revOf, deleteAccount, lookDel: () => lookDelNow(), lookSet, lookPush, leaveRank, sanitizeCg, freshCg, ambWant, ambSync, AMB, AMB_LV, WLD, wldSync, wldLv, wldPhase, wldWeather, wldAuto, WLD_WATER, wldCurtain, photoOpen, photoClose });   // 시험 손잡이
   if (window.claude && window.claude.hot && window.claude.hot.snapshot) {
     try { window.claude.hot.snapshot(() => { if (S) syncMid(); return { save: S }; }); } catch (e) { /* 무시 */ }
   }

@@ -231,6 +231,16 @@
     }
     rt.elBadgeT = '';   // 반장 배지는 다음 틱에 다시 달아요
   }
+  // 위쪽(건물 쪽)으로 걸을 때는 뒷모습(chb_). 그래픽 낮음이나 그림이 없으면 앞모습 그대로
+  function kidLook(k, back) {
+    back = back && wldLv() > 0;
+    if (k.im && !k.im.isConnected) { k.im = null; k.back = false; }   // 모자를 바꾸는 등으로 그림을 새로 그렸어요
+    if (!!k.back === back) return;
+    const im = k.im || (k.im = k.g.querySelector('image')); if (!im) return;
+    if (back) { const bu = IMG('chb_' + (k.rare ? k.sp + '_rare' : k.sp)); if (!bu) return; k.frontU = im.getAttribute('href'); im.setAttribute('href', bu); }
+    else if (k.frontU) im.setAttribute('href', k.frontU);
+    k.back = back;
+  }
   function updateKids(dt, now) {
     if (rt.reduced) return;
     const away = kidsAway();   // 고등학교 밤에는 학생층이 숨어 있어서 걷기 계산만 하고 그리기(매 프레임 16명 setAttribute)와 줄 세우기는 쉬어요
@@ -243,8 +253,8 @@
         const wp = k.ang === undefined && k.route && k.route.length ? k.route[0] : null;
         const dx = (wp ? wp[0] : k.tx) - k.x, dy = (wp ? wp[1] : k.ty) - k.y, d = Math.hypot(dx, dy);
         if (wp && d < 0.8) { k.route.shift(); k.moving = true; }
-        else if (d < 0.8) { k.moving = false; if (k.propU) tripProp(k); if (!k.board && !k.hold && !k.rider && k.ang === undefined) { k.wait = rand(1, 4.5); pickTarget(k); } }
-        else { const st = Math.min(d, k.speed * dt); k.x += dx / d * st; k.y += dy / d * st; k.moving = true; }
+        else if (d < 0.8) { k.moving = false; kidLook(k, false); if (k.propU) tripProp(k); if (!k.board && !k.hold && !k.rider && k.ang === undefined) { k.wait = rand(1, 4.5); pickTarget(k); } }
+        else { const st = Math.min(d, k.speed * dt); k.x += dx / d * st; k.y += dy / d * st; k.moving = true; kidLook(k, dy / d < -0.5); }
       }
       if (!away) placeKid(k, k.moving ? -Math.abs(Math.sin(now / 110 + k.phase)) * 1.6 : k.hold ? -Math.abs(Math.sin(now / 260 + k.cheer)) * 2.4 : 0);
     }

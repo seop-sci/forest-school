@@ -61,11 +61,11 @@ async def main():
         ok({'walk', 'meet', 'fight'} <= set(r['seen']), '걷기, 만남, 겨루기 차례')
         ok(r['card'] and r['mod'] == {'hard': 1} and r['ph'] == 'climb', '갈림길에서 숲길을 고르면 다음 층이 어려워요')
         ok(len(r['auto']) >= 3 and r['rec'] and r['tabs'] == ['mem', 'gear', 'mat'], '자동 편성과 강화 추천, 대원 장비 재료 탭')
-        # 곡: 탐험 화면이면 지역에 맞는 곡, 큰 장난꾸러기 층이면 보스 곡
+        # 곡: 기본 탐험은 낮 곡 하나, 심화 탐험은 밤 곡 하나(지역과 큰 장난꾸러기 층에서 바뀌지 않아요)
         r = await page.evaluate(f"""(async()=>{{ const F={F}, S=F.S, sl=ms=>new Promise(r=>setTimeout(r,ms)); S.bgm=true; F.setTab('tam'); await sl(100); const T=F.rt4.tam;
           const out=[]; for (const b of [0, 60, 160, 260]) {{ S.tam.best=b; F.tamPh(T,'walk'); out.push(F.musicWant()); }}
-          S.tam.best=9; F.tamPh(T,'meet'); out.push(F.musicWant()); S.tam.best=100; F.tamPh(T,'walk'); return out; }})()""")
-        print('곡', r); ok(r == ['exday', 'exday', 'excalm', 'exnight', 'exboss'], '탐험 곡 고르기')
+          S.tam.best=9; F.tamPh(T,'meet'); out.push(F.musicWant()); const hm=S.tam.hm, b0=S.tam.best; S.tam.best=Math.max(b0, isFinite(F.tamCap()) ? F.tamCap() : b0); S.tam.hm=1; const open=F.tamHOpen(); out.push(F.musicWant()); S.tam.hm=hm; S.tam.best=b0; S.tam.best=100; F.tamPh(T,'walk'); return {{ out, open }}; }})()""")
+        print('곡', r); ok(r['out'][:5] == ['exday'] * 5 and r['open'] and r['out'][5] == 'exnight', '탐험 곡 고르기')
         # 랭킹: 서버 규칙 폭에 맞춰 올려요
         r = await page.evaluate(f"""(()=>{{ const F={F}, S=F.S, R=F.Rank; S.tam.wk.best=500;
           R.stf=0; R.stfW=null; R.stfAt=0; R.lastPerf=null; S.rank.by=''; S.rank.sent=-1; const first=F.tamRankDoc();
