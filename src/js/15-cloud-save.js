@@ -6,127 +6,127 @@
        forest/rank/<내 id>   랭킹 이름과 학교 점수
        forest/stats/<내 id>  테스트 현황 (어디까지 했는지, 얼마나 했는지)
      <내 id>는 Firebase 익명 로그인이 기기(브라우저)마다 만들어 줘요. */
-  const VERSION = '5.3.0';   // 2026-11-17 woodani 결정: 웹에 5.0.2~5.0.5로 먼저 냈던 것을 앱과 함께 5.0.1 하나로 내요(버전 견줌은 앞 두 자리만 봐서 되돌아가도 괜찮아요)
-  const NT_QUIET = ['5.3.0.3', '5.3.0.2', '5.3.0.1', '5.2.2', '5.2.1', '5.2.0.2', '5.2.0.1', '5.1.1.3', '5.1.1.2', '5.1.1.1', '5.1.1', '5.0.3.1', '5.0.3', '5.0.2.2', '5.0.2.1', '2.1.20', '2.1.2.2', '2.3.0.1', '2.3.4', '3.2.3', '3.2.4', '3.2.5', '3.3.1', '3.3.2', '3.3.3', '4.4.1.1', '4.4.1.2', '4.4.1.3', '4.4.1.4', '5.0.1.1', '5.0.1.2', '5.0.1.3', '5.0.1.4', '5.0.1.5', '5.0.1.6', '5.0.1.7', '5.0.1.8'];   // 5.0.1.1 생물 탐사 고침은 공지 없이   // 5.0.3도 공지 없이(공지 줄은 woodani가 정하면 넣어요)   // 5.0.2 공지 없이(woodani 2026-11-16)   // 5.0.1 공지 줄은 woodani가 정할 때까지 조용히   // 5.0.0 공지는 2026-11-16 woodani가 정해서 NOTICES로 옮겼어요   // 4.4.1(앱과 함께 내는 판)은 공지를 띄워요   // 4.4.1도 공지 없이(woodani)   // 3.3.1, 3.3.2, 3.3.3(토스 먼저)도 공지 창 없이(woodani). 2.3.0.1도 공지 창 없이(공지는 그대로 2.3.0). 2.3.4도 조용히(woodani 결정). 3.2.3, 3.2.4, 3.2.5도 공지 창 없이(공지 줄을 고르지 않음)
-    // 2.1.20 woodani 결정: 이 버전들은 업데이트해도 공지 창을 띄우지 않아요(공지는 그대로 2.1.2)
-  /* 2.0.0 공지사항 (2026-10-27 woodani, 1.8.0은 이미 올려서 2.0.0부터): 설정 > 공지사항. 맨 위가 가장 새 공지예요.
-     패치노트는 자동으로 넣지 않아요. woodani가 검수한 글만 여기에 적어요(CHANGELOG.md는 자세한 기록용이라 따로 있어요).
+  const VERSION = '5.3.0';   // 웹에 5.0.2~5.0.5로 먼저 냈던 것을 앱과 함께 하나로 내요(버전 견줌은 앞 두 자리만 봐서 되돌아가도 괜찮아요)
+  const NT_QUIET = ['5.3.0.3', '5.3.0.2', '5.3.0.1', '5.2.2', '5.2.1', '5.2.0.2', '5.2.0.1', '5.1.1.3', '5.1.1.2', '5.1.1.1', '5.1.1', '5.0.3.1', '5.0.3', '5.0.2.2', '5.0.2.1', '2.1.20', '2.1.2.2', '2.3.0.1', '2.3.4', '3.2.3', '3.2.4', '3.2.5', '3.3.1', '3.3.2', '3.3.3', '4.4.1.1', '4.4.1.2', '4.4.1.3', '4.4.1.4', '5.0.1.1', '5.0.1.2', '5.0.1.3', '5.0.1.4', '5.0.1.5', '5.0.1.6', '5.0.1.7', '5.0.1.8'];   // 생물 탐사 고침은 공지 없이. 도 공지 없이(공지 줄은 정하면 넣어요). 공지 없이. 공지 줄은 woodani가 정할 때까지 조용히. 공지는 2026-11-16 woodani가 정해서 NOTICES로 옮겼어요. 은 공지를 띄워요. 도 공지 없이. 도 공지 창 없이. 도 공지 창 없이(공지는 그대로). 도 조용히. 도 공지 창 없이(공지 줄을 고르지 않음)
+    // 이 버전들은 업데이트해도 공지 창을 띄우지 않아요(공지는 그대로)
+  /* 공지사항 (은 이미 올려서 부터): 설정 > 공지사항. 맨 위가 가장 새 공지예요
+     패치노트는 자동으로 넣지 않아요. woodani가 검수한 글만 여기에 적어요(CHANGELOG.md는 자세한 기록용이라 따로 있어요)
      접속하면 새 공지 창을 띄워요(올라온 뒤 7일 동안, '일주일간 열지 않기'를 누르면 7일 쉬어요). 업데이트한 뒤 첫 접속에는 쉬는 중이어도 한 번 띄워요 */
   const NOTICES = [
-    // 5.3.0 공지(2026-11-20 woodani가 정한 한 줄). 웹 5.2.0.1~5.3.0.3을 앱으로 묶음
+    // 공지(한 줄). 웹 5.2.0.1~5.3.0.3을 앱으로 묶음
     { id: '2026-11-20-v530', date: '2026-11-20', tag: '업데이트', title: '5.3.0 업데이트',
       lines: ['학교 행사와 탐험 그래픽 개선'] },
-    // 5.2.0 공지(2026-11-19 woodani가 고른 세 줄). 웹 5.1.1.1~5.1.1.4와 앱 5.1.1 뒤 고침을 함께
+    // 공지(고른 세 줄). 웹 5.1.1.1~5.1.1.4와 앱 뒤 고침을 함께
     { id: '2026-11-19-v520', date: '2026-11-19', tag: '업데이트', title: '5.2.0 업데이트',
       lines: ['논문과 숲속 학회 추가', '연구 나무와 테마 지붕 새 단장', '편의 개선과 오류 수정'] },
-    // 5.1.0 공지(2026-11-19 woodani가 고른 세 줄)
+    // 공지(고른 세 줄)
     { id: '2026-11-19-v510', date: '2026-11-19', tag: '업데이트', title: '5.1.0 업데이트',
       lines: ['대학원 조교 파견 추가', '모교 기념비 추가', '편의 개선과 오류 수정'] },
-    // 5.0.2 공지(2026-11-18 woodani가 고른 세 줄). 웹 5.0.1.1~5.0.1.8을 앱과 함께 5.0.2 하나로
+    // 공지(고른 세 줄). 웹 5.0.1.1~5.0.1.8을 앱과 함께 하나로
     { id: '2026-11-18-v502', date: '2026-11-18', tag: '업데이트', title: '5.0.2 업데이트',
       lines: ['화면과 안내 새 단장', '설정에 화면 크기 추가', '대학원 균형 조정과 편의 개선'] },
-    // 5.0.1 공지(2026-11-17 woodani가 정한 한 줄)
+    // 공지(한 줄)
     { id: '2026-11-17-v501', date: '2026-11-17', tag: '업데이트', title: '5.0.1 업데이트',
       lines: ['게임성 개선 및 최적화'] },
-    // 5.0.0 공지(2026-11-16 woodani가 정한 세 줄)
+    // 공지(세 줄)
     { id: '2026-11-16-v500', date: '2026-11-16', tag: '업데이트', title: '5.0.0 업데이트',
       lines: ['숲속 대학원 오픈', '탐험 새 지역 오픈', '오류 수정 및 편의성 개선'] },
-    // 4.5.0 공지(2026-11-15 woodani가 본부 후보로 정했다가 저녁에 '연구 투자는 대학원으로 이동' 줄을 뺌)
+    // 공지(후보로 정했다가 저녁에 '연구 투자는 대학원으로 이동' 줄을 뺌)
     { id: '2026-11-15-v450', date: '2026-11-15', tag: '업데이트', title: '4.5.0 업데이트',
       lines: ['테마 단추와 편의 개선', '체험학습 기념품 확대'] },
-    // 4.4.1 공지(2026-11-15 woodani가 고른 세 줄, 웹 4.4.1.1~4.4.1.4를 모아 앱과 함께)
+    // 공지(고른 세 줄, 웹 ~를 모아 앱과 함께)
     { id: '2026-11-15-v441', date: '2026-11-15', tag: '업데이트', title: '4.4.1 업데이트',
       lines: ['홈 현황판 새 단장', '탐험 화면 다듬기와 빠른 스킵', '편의 개선과 오류 수정'] },
-    // 4.4.0 공지(2026-11-15 woodani가 고른 세 줄)
+    // 공지(고른 세 줄)
     { id: '2026-11-15-v440', date: '2026-11-15', tag: '업데이트', title: '4.4.0 업데이트',
       lines: ['숲속 탐험대 전체 화면 개편', '심화 탐험과 심화 랭킹 추가', '편의 개선과 오류 수정'] },
-    // 4.3.1 공지(2026-11-14 woodani가 고른 두 줄)
+    // 공지(고른 두 줄)
     { id: '2026-11-14-v431', date: '2026-11-14', tag: '업데이트', title: '4.3.1 업데이트',
       lines: ['숲속 탐험대 개편', '편의 개선과 오류 수정'] },
-    // 4.3.0 공지(2026-11-14 woodani: 괄호 안 설명은 빼고 본문만)
+    // 공지(괄호 안 설명은 빼고 본문만)
     { id: '2026-11-14-v430', date: '2026-11-14', tag: '업데이트', title: '4.3.0 업데이트',
       lines: ['숲속 탐험대 업데이트', '탐험 랭킹', '편의 개선과 오류 수정'] },
-    // 4.2.0 공지(2026-11-13 woodani가 고른 세 줄)
+    // 공지(고른 세 줄)
     { id: '2026-11-13-v420', date: '2026-11-13', tag: '업데이트', title: '4.2.0 업데이트',
       lines: ['대축제 업데이트(월 1회 진행)', '연구 투자 업데이트', '편의 개선과 오류 수정'] },
-    // 4.1.1 공지(2026-11-12 woodani가 고른 한 줄)
+    // 공지(고른 한 줄)
     { id: '2026-11-12-v411', date: '2026-11-12', tag: '업데이트', title: '4.1.1 업데이트',
       lines: ['편의 개선과 오류 수정'] },
-    // 4.1.0 공지(2026-11-12 woodani가 고른 세 줄)
+    // 공지(고른 세 줄)
     { id: '2026-11-12-v410', date: '2026-11-12', tag: '업데이트', title: '4.1.0 업데이트',
       lines: ['숲속 학교 이야기 추가', '대학 축제, 교환학생의 날, 숲속 장터', '편의 개선과 오류 수정'] },
-    // 4.0.0 공지(2026-11-11 woodani가 정한 세 줄)
+    // 공지(세 줄)
     { id: '2026-11-11-v400', date: '2026-11-11', tag: '업데이트', title: '4.0.0 업데이트',
       lines: ['숲속 대학교 개교', '단과대학 추가', '각종 안내 글 정돈'] },
-    // 3.3.4 공지(2026-11-10 woodani가 고른 한 줄)
+    // 공지(고른 한 줄)
     { id: '2026-11-10-v334', date: '2026-11-10', tag: '업데이트', title: '3.3.4 업데이트',
       lines: ['지도 참나무 새 단장과 편의 개선'] },
-    // 3.3.0 공지(2026-11-09 woodani가 고른 B안 두 줄)
+    // 공지(고른 B안 두 줄)
     { id: '2026-11-09-v330', date: '2026-11-09', tag: '업데이트', title: '3.3.0 업데이트',
       lines: ['학교 건물, 지도, 졸업식 새 단장', '편의 개선과 오류 수정'] },
-    // 3.2.2 공지(2026-11-06 woodani: 가장 간단한 것)
+    // 공지(가장 간단한 것)
     { id: '2026-11-06-v322', date: '2026-11-06', tag: '업데이트', title: '3.2.2 업데이트',
       lines: ['게임 최적화와 편의 개선'] },
-    // 3.2.0 공지(2026-11-06 woodani가 고른 A안 세 줄)
+    // 공지(고른 A안 세 줄)
     { id: '2026-11-06-v320', date: '2026-11-06', tag: '업데이트', title: '3.2.0 업데이트',
       lines: ['고등학교 수학여행 오픈', '밤 행사 새 배경음악', '게임 최적화와 편의 개선'] },
-    // 3.1.2 공지(2026-11-05 woodani가 고른 A안 두 줄)
+    // 공지(고른 A안 두 줄)
     { id: '2026-11-05-v312', date: '2026-11-05', tag: '업데이트', title: '3.1.2 업데이트',
       lines: ['학생 모자와 꾸미기 그림 새 단장', '홈 화면 정리와 편의 개선'] },
-    // 3.1.1 공지(2026-11-05 woodani가 고른 A안 세 줄)
+    // 공지(고른 A안 세 줄)
     { id: '2026-11-05-v311', date: '2026-11-05', tag: '업데이트', title: '3.1.1 업데이트',
       lines: ['고등학교 밤 행사 3종 추가', '진로 상담 대사 개선', '학교 행사 보상 조정과 오류 수정'] },
-    // 3.1.0 공지(2026-11-04 woodani가 고른 세 줄)
+    // 공지(고른 세 줄)
     { id: '2026-11-04-v310', date: '2026-11-04', tag: '업데이트', title: '3.1.0 업데이트',
       lines: ['진로 상담실 오픈', '숲속 대결 문제 업데이트', '편의 기능 추가와 오류 수정'] },
-    // 3.0.0 공지(2026-11-03 woodani 확인: 세 줄)
+    // 공지(세 줄)
     { id: '2026-11-03-v300', date: '2026-11-03', tag: '업데이트', title: '3.0.0 업데이트',
       lines: ['숲속 고등학교 개교', '기숙사와 야간 자율학습 추가', '보상 조정과 오류 수정'] },
-    // 2.3.5 공지(2026-11-03 woodani 확인: 세 줄)
+    // 공지(세 줄)
     { id: '2026-11-03-v235', date: '2026-11-03', tag: '업데이트', title: '2.3.5 업데이트',
       lines: ['비버 선생님 등장', '생물 도감 60종 추가 (90종)', '보상 조정과 오류 수정'] },
     { id: '2026-11-02-v233', date: '2026-11-02', tag: '업데이트', title: '2.3.3 업데이트',
       lines: ['일일 보상과 시간 단축권 정리', '숲속 퍼즐과 숲속 합치기 화면 개선', '게임 이용 편의와 오류 수정'] },
-    // 2.3.2 공지(2026-11-01 woodani 확인: A안 네 줄)
+    // 공지(A안 네 줄)
     { id: '2026-11-01-v232', date: '2026-11-01', tag: '업데이트', title: '2.3.2 업데이트',
       lines: ['체험학습 새 단장 (배웅과 마중)', '테마 세트 미리 보기 추가', '숲속 합치기 화면 정리와 새 단계 주문', '오류 수정과 최적화'] },
-    // 2.3.1 공지(2026-10-31 woodani 확인: B안 세 줄)
+    // 공지(B안 세 줄)
     { id: '2026-10-31-v231', date: '2026-10-31', tag: '업데이트', title: '2.3.1 업데이트',
       lines: ['뱀과 매 침입자 액션 추가', '숲속 퍼즐과 숲속 합치기 보상 개선', '오류 수정과 화면 다듬기'] },
-    // 2.2.0 공지(2026-10-30 woodani 확인: B안 다섯 줄). 2.2.0부터는 실제 날짜. 그 앞 공지 날짜는 업데이트 간격이 너무 가까워 보여서 woodani 요청으로 3~5일 간격으로 고쳐 적었어요(id는 그대로라 다시 뜨지 않아요)
+    // 공지(B안 다섯 줄). 부터는 실제 날짜. 그 앞 공지 날짜는 업데이트 간격이 너무 가까워 보여서 woodani 요청으로 3~5일 간격으로 고쳐 적었어요(id는 그대로라 다시 뜨지 않아요)
     { id: '2026-10-30-v230', date: '2026-10-30', tag: '업데이트', title: '2.3.0 업데이트',
       lines: ['졸업식 장면 새 단장', '새 선생님 3명 추가 (고니 국어, 공작 미술, 알파카 매점)', '숲의 정수로 공사 즉시 완료 추가', '건물 공사 시간 단축', '원할 때 쓰는 즉시 완공 단추 추가', '오류 수정과 안정성 개선'] },
     { id: '2026-10-30-v220', date: '2026-10-30', tag: '업데이트', title: '2.2.0 업데이트',
       lines: ['야간 건물 건설 이벤트 추가', '학교 텃밭 추가', '숲속 생물 탐사 추가', '동아리 대항전 추가', '예전 학교 되돌리기 추가'] },
-    // 2.1.3 공지(2026-10-30 woodani 확인: A안 일곱 줄)
+    // 공지(A안 일곱 줄)
     { id: '2026-10-30-v213', date: '2026-10-25', tag: '업데이트', title: '2.1.3 업데이트',
       lines: ['숲속 패스 추가', '반짝 친구 추가', '랭킹 시즌 추가', '다른 학교 구경과 예시 학교 추가', '날씨 추가', '학부모 쪽지 이야기 추가', '숲속 합치기 에너지 배수와 그림 개선'] },
-    // 2.1.1 공지(2026-10-29 woodani 확인: 일곱 줄)
+    // 공지(일곱 줄)
     { id: '2026-10-29-v212', date: '2026-10-22', tag: '업데이트', title: '2.1.2 업데이트',
-      lines: ['마을 기부 추가', '매점 간식 뽑기 추가', '간식 도감과 학교 기분 추가', '마을 기부, 간식 도감 업적과 칭호 추가'] },   // 2.1.2 woodani가 고른 네 줄
+      lines: ['마을 기부 추가', '매점 간식 뽑기 추가', '간식 도감과 학교 기분 추가', '마을 기부, 간식 도감 업적과 칭호 추가'] },   // 가 고른 네 줄
     { id: '2026-10-29-v211', date: '2026-10-19', tag: '업데이트', title: '2.1.1 업데이트',
       lines: ['단짝 친구, 친밀도, 생일 잔치 추가', '졸업 앨범, 졸업 편지 추가', '유치원, 초등학교, 중학교 건물 외형 변경', '건물마다 하루 1회 즉시 완공, 건설 부스터 추가', '공사 시간 단축', '숲속 대결 종목별 놀이 개선', '메인 퀘스트와 보상 개선'] },
-    // 2.1.0 공지(2026-10-29 woodani 확인: 일곱 줄)
+    // 공지(일곱 줄)
     { id: '2026-10-29-v210', date: '2026-10-15', tag: '업데이트', title: '2.1.0 업데이트',
       lines: ['공사 시간과 시간 단축권 추가', '초등학교부터 한 학년이 두 학기로 변경', '숲속 소풍 추가', '초등학교 칭찬 스티커판 추가', '상점 리모델링: 꾸미기 백화점, 문방구, 꾸미기 가게', '밤 모드 추가', '숲속 대결 연출 개선'] },
-    // 2.0.1 공지(2026-10-28 woodani 확인: 열한 줄). id를 v201s로 바꿔 공부 시스템을 더한 뒤 한 번 더 띄워요
+    // 공지(열한 줄). id를 v201s로 바꿔 공부 시스템을 더한 뒤 한 번 더 띄워요
     { id: '2026-10-28-v201s', date: '2026-10-11', tag: '업데이트', title: '2.0.1 업데이트',
       lines: ['초등학교 학급 반장 선거 추가', '반장 공약으로 한 주 동안 보너스', '중학교 반장은 동아리 보너스 두 배', '졸업식 장면 추가', '이벤트 예정에 다가오는 이벤트 4개 표시',
         '미니게임 탭이 공부 탭으로, 다섯 과목 학교 학력 추가', '과학 탐구 실험과 실험 노트 추가', '도서관 책 읽기 추가', '4주마다 시험 기간과 성적표 추가', "새 미니게임 '숲속 대결'과 대결 순위 추가", '동아리 수학부 추가'] },
-    // 2.0.0 공지(2026-10-28 woodani가 확인): 반영하는 날 date를 그날로 맞춰요. 공지는 올라온 날부터 7일간 띄워요
+    // 공지: 반영하는 날 date를 그날로 맞춰요. 공지는 올라온 날부터 7일간 띄워요
     { id: '2026-10-28-v200', date: '2026-10-06', tag: '업데이트', title: '2.0.0 업데이트',
       lines: ['새 학교급 중학교 추가', '매점 추가', '학생 명부와 학생 능력치 추가', '동아리와 동아리 발표회 추가', '학교 복도 추가', '전학 오는 새 학생 6명과 인사 장면 추가', '지난 학교급 모습 보기 추가', '중학교 메인 퀘스트 추가', '매주 이벤트와 학교 특별 이벤트 추가', '이벤트 보상에 숲의 정수 추가', '이벤트 한정 장식 추가', '이벤트 미션을 더 쉽게 바꿈', '공지사항 추가', '황금 도토리 상점 부스터 묶음 10% 할인', '명예 교장실과 장학재단 업그레이드 추천 표시 추가'] },
     { id: '2026-10-27-v180', date: '2026-10-01', tag: '업데이트', title: '1.8.0 업데이트',
       lines: ["새 미니게임 '숲속 합치기'", '숲속 퍼즐 부스터 추가', '건물 업그레이드 애니메이션 추가', '메인 퀘스트 추가', '테마 배경음악 추가', '메인화면 지도 개선', '학교 마크, 간판 추가'] }
   ];
-  const NT_RECENT = 7 * 86400000, NT_HIDE = 7 * 86400000;   // 공지는 올라온 뒤 7일만 띄워요(2026-10-27 woodani)
+  const NT_RECENT = 7 * 86400000, NT_HIDE = 7 * 86400000;   // 공지는 올라온 뒤 7일만 띄워요
   const ntTime = n => Date.parse(n.date + 'T00:00:00+09:00') || 0;
   const ntUnread = () => !!NOTICES[0] && S.nt.seen !== NOTICES[0].id;
   function renderNotice(auto) {
     $('#ntList').innerHTML = NOTICES.map((n, i) => `<details class="nt-item"${i === 0 ? ' open' : ''}><summary><span class="nt-tag">${esc(n.tag)}</span><b>${esc(n.title)}</b><small>${n.date.replace(/-/g, '.')}</small></summary>` +
       `<div class="nt-body">${n.tag === '업데이트' ? `<ol>${n.lines.map(l => `<li>${esc(l)}</li>`).join('')}</ol>` : n.lines.map(l => `<p>${esc(l)}</p>`).join('')}</div></details>`).join('') || '<p class="fine">아직 공지가 없어요</p>';
     $('#ntHide').hidden = !auto;
-    const hd = IMG('notice_head'), he = $('#ntHead');   // 2.0.0 공지 창 맨 위 그림(작업지시서 23)
+    const hd = IMG('notice_head'), he = $('#ntHead');   // 공지 창 맨 위 그림(작업지시서 23)
     he.classList.toggle('has-img', !!hd); he.style.backgroundImage = hd ? `url("${hd}")` : '';
   }
   function openNotice(auto) {
@@ -143,7 +143,7 @@
   // 접속할 때: 업데이트한 뒤 첫 접속이면 한 번, 아니면 최근 공지가 있고 쉬는 중이 아닐 때. 새 공지가 올라오면 쉬기도 풀려요
   function noticeWant() {
     const N = NOTICES[0]; if (!S || !N) return false;
-    // 5.0.1.7 woodani 결정(2026-11-18, F-06): 한 번 닫은 공지는 다시 저절로 열지 않아요(설정의 빨간 점으로만). 공지 날짜보다 늦게 시작한 학교에는 띄우지 않아요
+    // 한 번 닫은 공지는 다시 저절로 열지 않아요(설정의 빨간 점으로만). 공지 날짜보다 늦게 시작한 학교에는 띄우지 않아요
     if (S.nt.seen === N.id) return false;
     if ((S.born || 0) > ntTime(N) + 86400000) return false;
     return true;
@@ -153,12 +153,12 @@
     if (window.__FOREST_TEST && !window.__NOTICE_AUTO) return;   // 자동 시험에서는 저절로 띄우지 않아요
     // 처음 시작한 학교는 튜토리얼이 먼저예요. 이번 공지는 본 것으로 쳐요
     if (S.tut.st !== 'done' && S.tut.st !== 'skip' && S.q.m < 3) { S.nt.ver = VERSION; S.nt.seen = NOTICES[0].id; save(); renderNoticeDot(); return; }
-    if ((S.born || 0) > ntTime(NOTICES[0]) + 86400000 && S.nt.seen !== NOTICES[0].id) { S.nt.ver = VERSION; S.nt.seen = NOTICES[0].id; save(); renderNoticeDot(); return; }   // 5.0.1.7 F-06 공지보다 늦게 시작한 학교
+    if ((S.born || 0) > ntTime(NOTICES[0]) + 86400000 && S.nt.seen !== NOTICES[0].id) { S.nt.ver = VERSION; S.nt.seen = NOTICES[0].id; save(); renderNoticeDot(); return; }   // 공지보다 늦게 시작한 학교
     if (!noticeWant()) return;
     S.nt.ver = VERSION; rt.ntAuto = true;
     queueModal(() => openNotice(true));
   }
-  const CLOUD_PUSH = 60000;   // 바뀐 게 있으면 60초마다 올려요(4.1.1: 20초에서 늘림, 서버 내려받기 줄이기). 화면을 내리거나 닫을 때, 큰 일(cloudSoon)은 바로 올려요
+  const CLOUD_PUSH = 60000;   // 바뀐 게 있으면 60초마다 올려요(20초에서 늘림, 서버 내려받기 줄이기). 화면을 내리거나 닫을 때, 큰 일(cloudSoon)은 바로 올려요
   const STATS_PUSH = 60000;   // 테스트 현황은 1분마다
   const CLOUD_WAIT = 15000;   // 서버가 이만큼 답이 없으면 이 기기에만 저장해요
   const hasCloudBuild = () => typeof window.FOREST_FB !== 'undefined';
@@ -166,7 +166,7 @@
   const waitFor = (p, ms) => Promise.race([p, new Promise((_, no) => setTimeout(() => no({ code: 'timeout' }), ms))]);
   // 서버에 못 붙을 때 설정 화면의 '저장 위치'에 보여 줄 까닭
   const CLOUD_ERR = {
-    // 5.0.1.8 W-12 이용자에게는 쉬운 말과 짧은 오류 이름만(문의할 때 알려 주면 원인을 찾아요)
+    // 이용자에게는 쉬운 말과 짧은 오류 이름만(문의할 때 알려 주면 원인을 찾아요)
     anon: '서버에 연결하지 못했어요. 잠시 뒤에 다시 해 보세요(오류 anon)',
     key: '서버에 연결하지 못했어요. 잠시 뒤에 다시 해 보세요(오류 key)',
     nourl: '서버에 연결하지 못했어요. 잠시 뒤에 다시 해 보세요(오류 url)',
@@ -219,7 +219,7 @@
       Cloud.fb = fb; Cloud.db = db; Cloud.uid = user.uid;
       // 지난번에 계정을 다 못 지웠으면, 이 계정으로 다시 저장하기 전에 먼저 지워요
       Cloud.delLeft = false;
-      // 2.2.0 검토 3: 서버 기록을 다 못 지운 채 꺼졌으면 그 계정이면 이어서 지워요(못 지우면 올리지 않고 기다려요)
+      // 3: 서버 기록을 다 못 지운 채 꺼졌으면 그 계정이면 이어서 지워요(못 지우면 올리지 않고 기다려요)
       if (delData() && delData() === user.uid) {
         Cloud.deleting = true;
         if (await delResume(user.uid)) return;
@@ -237,7 +237,7 @@
       if (!Cloud.listening) {
         Cloud.listening = true;
         db.ref('.info/serverTimeOffset').on('value', snap => { Cloud.offset = Number(snap.val()) || 0; setServerTime(devNow() + Cloud.offset); });
-        // 2.0.0 Codex 검토(1): 시계가 어긋나 보이면 다시 접속해서 서버 시간을 새로 받아요(서버 보정값은 접속할 때 정해져요)
+        // 시계가 어긋나 보이면 다시 접속해서 서버 시간을 새로 받아요(서버 보정값은 접속할 때 정해져요)
         SVR.resync = () => { if (!Cloud.db || Cloud.resyncing) return; Cloud.resyncing = true; Cloud.db.goOffline(); Cloud.db.goOnline(); };
         db.ref('.info/connected').on('value', snap => {
           Cloud.online = !!snap.val();
@@ -249,19 +249,19 @@
       // 서버 저장과 이 기기 저장 중에서 이어 할 쪽을 골라요
       const srv = (await waitFor(db.ref('forest/saves/' + user.uid).once('value'), CLOUD_WAIT)).val();
       if (g !== Cloud.gen) return;
-      if (srvTooNew(srv)) { Cloud.state = 'on'; renderCloudInfo(); return; }   // 4.0.1
-      Cloud.lastAt = srv ? Number(srv.at) || 0 : 0; Cloud.fresh = true;   // 2.0.0 Codex 검토(3): 서버에서 마지막으로 본 저장 시각
-      Cloud.rev = revOf(srv);   // 2.2.0 검토 2: 이 기기가 본 서버 저장 리비전. 올릴 때 서버가 이 값 그대로일 때만 덮어써요
-      // 1.5.4: 구글 계정으로 바꾸다 끊겼으면, 그 계정의 학교를 덮어쓰지 않고 어느 학교로 할지 다시 물어봐요
+      if (srvTooNew(srv)) { Cloud.state = 'on'; renderCloudInfo(); return; }
+      Cloud.lastAt = srv ? Number(srv.at) || 0 : 0; Cloud.fresh = true;   // 서버에서 마지막으로 본 저장 시각
+      Cloud.rev = revOf(srv);   // 2: 이 기기가 본 서버 저장 리비전. 올릴 때 서버가 이 값 그대로일 때만 덮어써요
+      // 구글 계정으로 바꾸다 끊겼으면, 그 계정의 학교를 덮어쓰지 않고 어느 학교로 할지 다시 물어봐요
       if (acctPending()) {
         if (srv && typeof srv.d === 'string') { rt.adopting = true; askAcct(srv.d, JSON.stringify(S)); return; }
         acctPending(false);
         if (!S.acctGift) giveAcctGift();
       }
       if (srv && typeof srv.d === 'string') {
-        // 2.2.0 저장 안전 장치: 진행이 줄어드는 쪽으로 바뀌면(서버가 더 늦게 저장했지만 덜 키운 학교이거나, 이 기기 학교가 서버보다 덜 키운 학교) 물어봐요
+        // 저장 안전 장치: 진행이 줄어드는 쪽으로 바뀌면(서버가 더 늦게 저장했지만 덜 키운 학교이거나, 이 기기 학교가 서버보다 덜 키운 학교) 물어봐요
         const ss = parseSave(srv.d), sp = progOf(ss), lp = progOf(S), how = Cloud.skipRestore ? 'keep' : cloudBootPick(srv), restore = how === 'restore';
-        // 2.2.0 검토 2: 지난번 이 기기가 맞춘 뒤로 서버(다른 기기)와 이 기기가 둘 다 바뀌었으면, 어느 쪽도 덮지 않고 물어봐요
+        // 2: 지난번 이 기기가 맞춘 뒤로 서버(다른 기기)와 이 기기가 둘 다 바뀌었으면, 어느 쪽도 덮지 않고 물어봐요
         if (ss && how === 'clash' && askPick(srv.d, '다른 기기가 저장한 학교', Cloud.rev)) return;
         if (ss && ((restore && sp < lp) || (!restore && sp > lp)) && askPick(srv.d, restore ? '서버가 덜 키운 학교' : '이 기기가 덜 키운 학교', Cloud.rev)) return;
         if (restore) {
@@ -273,7 +273,7 @@
       }
       Cloud.state = 'on';
       renderCloudInfo();
-      cloudPush(true); bakPush();   // 2.2.0 이 기기에 남긴 학교도 서버에
+      cloudPush(true); bakPush();   // 이 기기에 남긴 학교도 서버에
       rankAfterCloud();
     } catch (e) {
       if (g !== Cloud.gen) return;
@@ -282,13 +282,13 @@
       rankAfterCloud();
     }
   }
-  /* 2.2.0 검토 2: 저장 리비전(r). 서버 저장에 1, 2, 3…을 붙이고, 올릴 때는 트랜잭션으로 '내가 본 리비전 그대로일 때만' 덮어써요.
-     다른 기기가 그사이 저장했으면 덮지 않고 자동 올리기를 멈춘 뒤 두 학교를 보여 주고 물어요(고르지 않은 쪽은 예전 학교 되돌리기에 남아요).
-     기기 시계로 최신 저장을 가리지 않아요. 이 기기가 마지막으로 서버와 맞춘 리비전과 그때 저장 시각(sv)을 기기에 남겨 켤 때 비교해요.
-     리비전이 없는 옛 저장(2.2.0까지, 또는 옛 앱이 올린 저장)은 0으로 읽어요 */
+  /* 2: 저장 리비전(r). 서버 저장에 1, 2, 3…을 붙이고, 올릴 때는 트랜잭션으로 '내가 본 리비전 그대로일 때만' 덮어써요
+     다른 기기가 그사이 저장했으면 덮지 않고 자동 올리기를 멈춘 뒤 두 학교를 보여 주고 물어요(고르지 않은 쪽은 예전 학교 되돌리기에 남아요)
+     기기 시계로 최신 저장을 가리지 않아요. 이 기기가 마지막으로 서버와 맞춘 리비전과 그때 저장 시각(sv)을 기기에 남겨 켤 때 비교해요
+     리비전이 없는 옛 저장(까지, 또는 옛 앱이 올린 저장)은 0으로 읽어요 */
   const SYNC_KEY = 'forest-cloud-sync';
   const revOf = v => v && typeof v === 'object' && Number.isInteger(v.r) && v.r > 0 ? v.r : 0;
-  // 4.0.1 (3.3.2 분석): 서버 학교가 이 앱보다 큰 버전(앞자리나 가운데 자리)에서 저장됐으면 받지도 덮지도 않아요.
+  // 서버 학교가 이 앱보다 큰 버전(앞자리나 가운데 자리)에서 저장됐으면 받지도 덮지도 않아요
   // 옛 앱이 새 학교급 저장을 읽으면 모르는 칸이 빠지고, 그대로 다시 올리면 서버 학교가 망가져요. 이 기기에서는 계속 할 수 있고, 앱을 업데이트하면 이어져요
   const verMM = v => { const a = String(v || '').split('.'); return (+a[0] || 0) * 1000 + (+a[1] || 0); };
   function srvTooNew(srv) {
@@ -307,7 +307,7 @@
     if (k && k.u === Cloud.uid && Cloud.bootHadSave) {   // 이 기기 저장이 없으면(새 화면, 지워짐) 예전처럼 서버 학교를 받아요
       Cloud.syncSv = k.sv;
       if (revOf(srv) === k.r) return 'keep';   // 서버는 지난번 맞춘 그대로예요. 이 기기 학교가 같거나 더 나중이에요
-      if ((Cloud.bootSavedAt || S.savedAt) === k.sv) return 'restore';   // 이 기기는 맞춘 뒤로 바뀌지 않았어요. 다른 기기가 이어 한 학교를 받아요. 4.0.1: 켤 때 저장 시각으로 견줘요(서버 답을 기다리는 사이 저장이 생기면 '학교가 두 개' 창이 떴어요)
+      if ((Cloud.bootSavedAt || S.savedAt) === k.sv) return 'restore';   // 이 기기는 맞춘 뒤로 바뀌지 않았어요. 다른 기기가 이어 한 학교를 받아요. 켤 때 저장 시각으로 견줘요(서버 답을 기다리는 사이 저장이 생기면 '학교가 두 개' 창이 떴어요)
       return 'clash';
     }
     return cloudShouldRestore(srv) ? 'restore' : 'keep';   // 맞춘 기록이 없으면(옛 판에서 올렸거나 새 기기) 예전 방식
@@ -317,14 +317,14 @@
   function cloudShouldRestore(srv) {
     const at = Number(srv.at) || 0;
     if (!Cloud.bootHadSave) return performance.now() < 10 * 60000;
-    // 2.0.0 Codex 검토(4): 이 기기 저장 시각이 서버 시간보다 1분 넘게 미래면(기기 시계가 앞서 있었어요) 믿지 않고 서버 학교를 불러와요
+    // 이 기기 저장 시각이 서버 시간보다 1분 넘게 미래면(기기 시계가 앞서 있었어요) 믿지 않고 서버 학교를 불러와요
     if (serverTimeOk() && (Cloud.bootSavedAt || 0) > gameNow() + 60000) return at > 0;
-    return at > (Cloud.bootSavedAt || 0) + 5000;   // 2.0.0 보안 점검(1-1): 켠 뒤 이 기기에서 저장한 시각이 아니라 켤 때 저장 시각과 비교해요
+    return at > (Cloud.bootSavedAt || 0) + 5000;   // 보안 점검(1-1): 켠 뒤 이 기기에서 저장한 시각이 아니라 켤 때 저장 시각과 비교해요
   }
-  /* ---------- 2.2.0 저장 안전 장치 (2026-10-30 woodani 결정) ----------
-     계정 하나에 서버 저장이 한 칸이라, 다른 기기의 옛 학교(초등 4학년 2학기)가 중학교 3학년 학교를 묻지 않고 덮은 일이 있었어요.
+  /* ---------- 저장 안전 장치 ----------
+     계정 하나에 서버 저장이 한 칸이라, 다른 기기의 옛 학교(초등 4학년 2학기)가 중학교 3학년 학교를 묻지 않고 덮은 일이 있었어요
      1) 진행(학교급, 학년, 학기)이 줄어드는 쪽으로 학교가 바뀔 때는 꼭 두 학교를 보여 주고 물어요. 고르기 전에는 서버에 올리지 않아요
-     2) 학교가 바뀌거나 덮이기 직전 학교를 이 기기(forest-school-bak)와 서버(forest/bak/<id>/0~2)에 3개까지 남겨요.
+     2) 학교가 바뀌거나 덮이기 직전 학교를 이 기기(forest-school-bak)와 서버(forest/bak/<id>/0~2)에 3개까지 남겨요
         설정 > 예전 학교 되돌리기에서 골라 되돌려요(되돌리기 전 지금 학교도 남겨요) */
   const BAK_KEY = 'forest-school-bak', BAK_MAX = 3;
   const progOf = s => s && typeof s === 'object' ? (Number(s.tier) || 0) * 10000 + (Number(s.tg) || 0) * 10 + (s.sem ? 5 : 0) : 0;
@@ -335,7 +335,7 @@
       return `${T.school} ${y}${T.unit}${s.tier >= 1 ? (s.sem ? ' 2학기' : ' 1학기') : ''}, 학교 파워 ${fmt(pwOf(s))}`;
     } catch (e) { return '학교'; }
   }
-  // 4.0.1 하루 한 번 자동 백업(woodani 결정 2026-11-11): 그날 처음 켤 때의 학교를 이 기기에 두 날치 남겨요. 예전 학교 되돌리기 목록에 함께 보여요. 서버에는 올리지 않아요
+  // 하루 한 번 자동 백업: 그날 처음 켤 때의 학교를 이 기기에 두 날치 남겨요. 예전 학교 되돌리기 목록에 함께 보여요. 서버에는 올리지 않아요
   const BAKD_KEY = 'forest-school-bak-day';
   function bakDayList() { try { const L = JSON.parse(localStorage.getItem(BAKD_KEY) || '[]'); return Array.isArray(L) ? L.filter(b => b && typeof b.d === 'string' && typeof b.pid === 'string' && typeof b.day === 'string').slice(0, 2) : []; } catch (e) { return []; } }
   function bakDaily() {
@@ -356,7 +356,7 @@
     let raw = null; try { raw = typeof d === 'string' ? JSON.parse(d) : d; } catch (er) { raw = null; }
     const pid = raw && typeof raw.pid === 'string' && raw.pid ? raw.pid.slice(0, 16) : 'b' + (Number(raw && raw.born) || 0);   // 원래 저장의 학교 번호(읽을 때 새로 만든 번호가 아니라)
     const e = { pid, prog: progOf(s), sum: saveSum(s), sv: Number(s.savedAt) || 0, at: Date.now(), why: String(why || '').slice(0, 40), d: typeof d === 'string' ? d : JSON.stringify(d) };
-    const L = [e, ...bakList().filter(b => !bakSame(b, e) && !(b.pid === e.pid && b.why === e.why))].slice(0, BAK_MAX);   // 4.0.1 (3.3.2 분석 M15): 같은 학교의 같은 까닭 백업은 새것 한 칸만 써요. 두 기기를 번갈아 쓸 때 평소 백업이 세 칸을 다 차지해 다른 학교 백업이 밀려났어요
+    const L = [e, ...bakList().filter(b => !bakSame(b, e) && !(b.pid === e.pid && b.why === e.why))].slice(0, BAK_MAX);   // 같은 학교의 같은 까닭 백업은 새것 한 칸만 써요. 두 기기를 번갈아 쓸 때 평소 백업이 세 칸을 다 차지해 다른 학교 백업이 밀려났어요
     try { localStorage.setItem(BAK_KEY, JSON.stringify(L)); } catch (er) {
       try { localStorage.setItem(BAK_KEY, JSON.stringify(L.slice(0, 1))); } catch (er2) { /* 저장소가 가득 찼어요 */ }
     }
@@ -365,7 +365,7 @@
   }
   // 이 기기에 남긴 학교를 서버 칸 0~2에도 올려요(서버에 이미 같은 학교가 있으면 그 칸에). 켤 때와 남길 때 불러요
   async function bakPush() {
-    if (!cloudOn() || !Cloud.db || !Cloud.uid || Cloud.bakBusy || Cloud.deleting || Cloud.delLeft || Cloud.hold) return;   // 2.2.0 검토 3: 지우는 동안이나 지우기가 남았으면 올리지 않아요
+    if (!cloudOn() || !Cloud.db || !Cloud.uid || Cloud.bakBusy || Cloud.deleting || Cloud.delLeft || Cloud.hold) return;   // 3: 지우는 동안이나 지우기가 남았으면 올리지 않아요
     const L = bakList(); if (!L.length) return;
     Cloud.bakBusy = true;
     try {
@@ -373,7 +373,7 @@
       const srv = (await waitFor(ref.once('value'), CLOUD_WAIT)).val() || {};
       const slots = [0, 1, 2].map(i => srv[i] && typeof srv[i].d === 'string' ? srv[i] : null);
       for (const b of L.slice().reverse()) {
-        if (typeof b.d !== 'string' || b.d.length >= 100000) continue;   // 4.1.1 서버 규칙의 예전 학교 칸 크기(이 기기에는 그대로 남아요)
+        if (typeof b.d !== 'string' || b.d.length >= 100000) continue;   // 서버 규칙의 예전 학교 칸 크기(이 기기에는 그대로 남아요)
         let i = slots.findIndex(x => x && x.pid === b.pid && x.prog === b.prog);
         if (i >= 0 && slots[i].at >= b.at) continue;
         if (i < 0) i = slots.findIndex(x => !x);
@@ -392,7 +392,7 @@
         for (const i of [0, 1, 2]) { const x = srv[i]; if (x && typeof x.d === 'string' && !L.some(b => b.pid === x.pid && b.prog === x.prog)) L.push({ pid: x.pid, prog: x.prog, sum: x.sum, sv: x.sv, at: x.at, why: x.why || '', d: x.d, srv: true }); }
       } catch (e) { /* 이 기기 것만 보여요 */ }
     }
-    for (const x of bakDayList()) L.push(Object.assign({}, x, { auto: true }));   // 4.0.1 자동 백업도 함께 보여요
+    for (const x of bakDayList()) L.push(Object.assign({}, x, { auto: true }));   // 자동 백업도 함께 보여요
     return L.sort((a, b) => b.at - a.at);
   }
   // 두 학교 중 하나를 골라요. 고르기 전에는 서버에 올리지 않아요(Cloud.hold)
@@ -412,7 +412,7 @@
     const P = rt.pickSave; if (!P) return;
     rt.pickSave = null;
     Cloud.hold = false; Cloud.state = 'on'; Cloud.fresh = true;
-    Cloud.rev = P.r || 0;   // 2.2.0 검토 2: 본 서버 리비전 위에 이 기기 학교를 올려요(그사이 또 바뀌면 다시 물어요)
+    Cloud.rev = P.r || 0;   // 2: 본 서버 리비전 위에 이 기기 학교를 올려요(그사이 또 바뀌면 다시 물어요)
     bakAdd(P.d, '고르지 않은 서버 학교');
     closeModal($('#mPick'));
     renderCloudInfo(); cloudPush(true); rankAfterCloud();
@@ -459,7 +459,7 @@
     let obj = null;
     try { obj = JSON.parse(d); } catch (e) { obj = null; }
     if (!obj || typeof obj !== 'object') return 'bad';
-    if (S && S.pid && !rt.adopting) bakAdd(JSON.stringify(S), '바꾸기 전 이 기기 학교');   // 2.2.0 저장 안전 장치
+    if (S && S.pid && !rt.adopting) bakAdd(JSON.stringify(S), '바꾸기 전 이 기기 학교');   // 저장 안전 장치
     try { localStorage.setItem(SAVE_KEY, JSON.stringify(obj)); sessionStorage.setItem('forest-adopt', msg || ''); } catch (e) { return 'storage'; }
     acctPending(false);
     rt.adopting = true;   // 다시 여는 동안 지금 학교가 저장을 덮어쓰지 않게 막아요
@@ -484,16 +484,16 @@
     initCloud();
   }
   async function cloudPush(force) {
-    if (!cloudOn() || rt.adopting || rt.uniPrev || Cloud.pushing || !S || Cloud.delLeft || Cloud.hold || Cloud.deleting || Cloud.old) return;   // 2.2.0 고르는 동안, 검토 3 계정을 지우는 동안은 올리지 않아요. 4.0.1 서버 학교가 더 새 버전일 때도
+    if (!cloudOn() || rt.adopting || rt.uniPrev || Cloud.pushing || !S || Cloud.delLeft || Cloud.hold || Cloud.deleting || Cloud.old) return;   // 고르는 동안, 검토 3 계정을 지우는 동안은 올리지 않아요. 서버 학교가 더 새 버전일 때도
     if (!force && !Cloud.dirty) return;
-    if (!Cloud.fresh) { Cloud.dirty = true; cloudVerify(); return; }   // 2.0.0 Codex 검토(3): 다시 켠 뒤에는 서버 저장을 먼저 확인해요
+    if (!Cloud.fresh) { Cloud.dirty = true; cloudVerify(); return; }   // 다시 켠 뒤에는 서버 저장을 먼저 확인해요
     Cloud.pushing = true; Cloud.dirty = false;
     syncMid();
     const db = Cloud.db, uid = Cloud.uid, g = Cloud.gen, at = S.savedAt, base = Cloud.rev || 0;
     const doc = { d: JSON.stringify(S), at, v: VERSION };
     let clash = null;
     try {
-      // 2.2.0 검토 2: 읽고 set하는 사이 다른 기기가 끼어들지 못하게 트랜잭션으로 '서버 리비전이 내가 본 값일 때만' 써요.
+      // 2: 읽고 set하는 사이 다른 기기가 끼어들지 못하게 트랜잭션으로 '서버 리비전이 내가 본 값일 때만' 써요
       // 서버가 비었으면(처음, 지운 뒤) 그대로 써요. SDK가 아직 서버 값을 모를 때 null로 한 번 부르고 진짜 값으로 다시 불러요
       const res = await db.ref('forest/saves/' + uid).transaction(cur => {
         clash = null;
@@ -513,11 +513,11 @@
         syncSet(revOf(res.snapshot.val()) || base + 1, at);
         Cloud.lastAt = Math.max(Cloud.lastAt || 0, at);
         Cloud.lastPush = Date.now();
-        // 4.1.0 woodani(2026-11-11): 자동으로 움직이는 브라우저(AI가 시험하려고 연 판)는 테스트 현황에 기록을 남기지 않아요. 자동 시험(가짜 서버)은 그대로 올려요
+        // 자동으로 움직이는 브라우저(AI가 시험하려고 연 판)는 테스트 현황에 기록을 남기지 않아요. 자동 시험(가짜 서버)은 그대로 올려요
         if (!(navigator.webdriver && !window.__FOREST_TEST) && (force || Date.now() - Cloud.lastStats >= STATS_PUSH)) {
           Cloud.lastStats = Date.now();
-          try { await db.ref('forest/stats/' + uid).set(statsDoc()); } catch (e2) { /* 4.1.1 테스트 현황을 못 올려도 학교 저장은 그대로예요(저장 위치를 오류로 바꾸지 않아요) */
-            // 5.0.1 새 칸(adsT, adsD)을 받는 서버 규칙이 아직 게시되기 전이면 빼고 한 번 더 올려요
+          try { await db.ref('forest/stats/' + uid).set(statsDoc()); } catch (e2) { /* 테스트 현황을 못 올려도 학교 저장은 그대로예요(저장 위치를 오류로 바꾸지 않아요) */
+            // 새 칸(adsT, adsD)을 받는 서버 규칙이 아직 게시되기 전이면 빼고 한 번 더 올려요
             try { const d = statsDoc(); delete d.adsT; delete d.adsD; await db.ref('forest/stats/' + uid).set(d); } catch (e3) { /* 그대로 */ } }
         }
       }
@@ -527,20 +527,20 @@
     } finally { Cloud.pushing = false; }
     renderCloudInfo();
   }
-  // 2.2.0 검토 2: 올리려는데 다른 기기가 먼저 저장했어요. 자동 올리기를 멈추고 두 학교를 보여 주며 물어요.
+  // 2: 올리려는데 다른 기기가 먼저 저장했어요. 자동 올리기를 멈추고 두 학교를 보여 주며 물어요
   // 서버 저장이 망가졌으면(읽을 수 없으면) 그 리비전 위에 이 기기 학교를 다시 올려요
   function cloudClash(v) {
     const r = revOf(v);
     if (v && typeof v.d === 'string' && askPick(v.d, '다른 기기가 저장한 학교', r)) return;
     Cloud.rev = r; Cloud.pushing = false; setTimeout(() => cloudPush(true), 0);
   }
-  // 2.0.0 Codex 검토(3): 앱을 내렸다 다시 켜면, 그사이 다른 기기가 서버에 더 나중 학교를 올렸는지 먼저 봐요.
-  // 2.2.0 검토 2: 저장 시각(기기 시계) 대신 리비전으로 봐요. 바뀌었으면 이 기기가 맞춘 뒤로 그대로일 때만 서버 학교를 불러오고,
+  // 앱을 내렸다 다시 켜면, 그사이 다른 기기가 서버에 더 나중 학교를 올렸는지 먼저 봐요
+  // 2: 저장 시각(기기 시계) 대신 리비전으로 봐요. 바뀌었으면 이 기기가 맞춘 뒤로 그대로일 때만 서버 학교를 불러오고
   // 이 기기도 그사이 바뀌었으면 묻는 창을 띄워요. 아니면 확인됐다고 표시하고 밀린 저장을 올려요
   async function cloudVerify() {
     if (!cloudOn() || Cloud.verifying || rt.adopting || !S || document.hidden || Cloud.hold) return;   // 내려 둔 동안에는 확인하지 않아요(그동안 올리지도 않아요)
     Cloud.verifying = true;
-    const db = Cloud.db, uid = Cloud.uid, g = Cloud.gen, mine = S.savedAt === Cloud.syncSv || (Cloud.hideSv != null && Cloud.hideSv === Cloud.syncSv && performance.now() - (Cloud.wakeT || 0) < 15000);   // 4.0.1 (3.3.2 분석 M13): '내릴 때 올린 그대로'는 다시 켠 직후 15초만 믿어요. 그 뒤(오프라인으로 더 한 뒤)에는 묻지 않고 바꾸지 않아요   // 켜는 순간 이 기기 학교가 맞춘 그대로인지(내릴 때 올린 그대로인지)
+    const db = Cloud.db, uid = Cloud.uid, g = Cloud.gen, mine = S.savedAt === Cloud.syncSv || (Cloud.hideSv != null && Cloud.hideSv === Cloud.syncSv && performance.now() - (Cloud.wakeT || 0) < 15000);   // '내릴 때 올린 그대로'는 다시 켠 직후 15초만 믿어요. 그 뒤(오프라인으로 더 한 뒤)에는 묻지 않고 바꾸지 않아요. 켜는 순간 이 기기 학교가 맞춘 그대로인지(내릴 때 올린 그대로인지)
     try {
       const r = Number((await waitFor(db.ref('forest/saves/' + uid + '/r').once('value'), CLOUD_WAIT)).val()) || 0;
       if (g !== Cloud.gen) return;
@@ -548,16 +548,16 @@
         const srv = (await waitFor(db.ref('forest/saves/' + uid).once('value'), CLOUD_WAIT)).val();
         if (g !== Cloud.gen) return;
         const rr = revOf(srv);
-        if (srvTooNew(srv)) return;   // 4.0.1
+        if (srvTooNew(srv)) return;
         if (srv && typeof srv.d === 'string' && rr !== (Cloud.rev || 0)) {
-          if (progOf(parseSave(srv.d)) < progOf(S) && askPick(srv.d, '다른 기기가 덜 키운 학교', rr)) return;   // 2.2.0 저장 안전 장치
+          if (progOf(parseSave(srv.d)) < progOf(S) && askPick(srv.d, '다른 기기가 덜 키운 학교', rr)) return;   // 저장 안전 장치
           if (!mine && askPick(srv.d, '다른 기기가 저장한 학교', rr)) return;
           if (adoptSave(srv.d, '다른 기기에서 이어 한 학교를 불러왔어요') === 'ok') return;
         }
         if (!srv) Cloud.rev = 0;   // 서버 저장이 지워졌어요(계정 지우기 등). 다음 올리기가 새로 써요
       }
       if (document.hidden) return;   // 확인하는 사이 다시 내렸으면 다음에 켤 때 다시 확인해요
-      Cloud.fresh = true; Cloud.hideSv = null;   // 4.0.1: 확인이 끝났으면 내릴 때 값은 지워요
+      Cloud.fresh = true; Cloud.hideSv = null;   // 확인이 끝났으면 내릴 때 값은 지워요
     } catch (e) { /* 다음에 다시 확인해요(그때까지 서버에 올리지 않아요) */ }
     finally { Cloud.verifying = false; }
     if (Cloud.fresh && Cloud.dirty) cloudPush();
@@ -578,7 +578,7 @@
       play: Math.floor(S.st.play), sess: S.st.sess, days: S.att.n, ads: S.st.ads, score: rankScore(),
       gold: S.gold, gearn: S.st.gold, gspent: S.st.gspent, cos: S.cos.own.length,
       dev: !!S.u.dev, v: VERSION, env: /KAKAOTALK/i.test(ua) ? 'kakao' : (navigator.maxTouchPoints > 0 ? 'mobile' : 'pc'),
-      adsT: S.adx && S.adx.day === gameToday() ? (S.adx.all || 0) : 0, adsD: gameToday()   // 5.0.1 woodani 요청: 관리자 지표에 오늘 본 광고 수(서버 규칙 adsT, adsD)
+      adsT: S.adx && S.adx.day === gameToday() ? (S.adx.all || 0) : 0, adsD: gameToday()   // 관리자 지표에 오늘 본 광고 수(서버 규칙 adsT, adsD)
     };
   }
   function agoText(t) {
@@ -595,9 +595,9 @@
     if (AIT) $('#infoAd').textContent = AIT.ads ? (AIT.testAd ? '토스 리워드 광고 (테스트 광고)' : '토스 리워드 광고') : '이 토스 앱에서는 광고가 안 나와요';
     if (hasCloudBuild()) {
       if (Cloud.state === 'on' && Cloud.delLeft) t = '이 기기의 브라우저 (지난번 계정 지우기가 끝나지 않았어요. 아래 계정 지우기를 다시 눌러 주세요)';
-      else if (Cloud.state === 'on' && Cloud.old) t = `이 기기의 브라우저 (서버의 학교가 더 새 버전 ${Cloud.old}에서 저장됐어요. 앱을 업데이트해 주세요)`;   // 4.0.1
+      else if (Cloud.state === 'on' && Cloud.old) t = `이 기기의 브라우저 (서버의 학교가 더 새 버전 ${Cloud.old}에서 저장됐어요. 앱을 업데이트해 주세요)`;
       else if (Cloud.state === 'on') t = !Cloud.online ? '서버 (인터넷이 끊겼어요. 다시 이어지면 저장해요)' : Cloud.lastPush ? `서버 (${agoText(Cloud.lastPush)} 저장)` : '서버';
-      else if (Cloud.state === 'hold') t = '서버에 학교가 하나 더 있어요. 어느 학교로 이어 할지 골라 주세요';   // 2.2.0
+      else if (Cloud.state === 'hold') t = '서버에 학교가 하나 더 있어요. 어느 학교로 이어 할지 골라 주세요';
       else if (Cloud.state === 'idle' || Cloud.state === 'wait') t = '서버에 연결하는 중이에요';
       else if (Cloud.state === 'error') t = `이 기기의 브라우저 (${CLOUD_ERR[Cloud.err] || CLOUD_ERR.etc})`;
       else t = '이 기기의 브라우저 (서버를 연결하기 전 체험판)';
@@ -633,10 +633,10 @@
     const g = googleUser();
     $('#acctTitle').textContent = g ? '구글 계정 연결됨' : '구글 계정 연결';
     if (!g) $('#acctMenu').hidden = true;
-    $('#acctSub').textContent = g ? `${g.email || '구글'} 계정에 학교가 저장돼요.` :   // 5.0.0 woodani 요청: '누르면 계정 바꾸기와 로그아웃' 글은 지움
+    $('#acctSub').textContent = g ? `${g.email || '구글'} 계정에 학교가 저장돼요.` :   // '누르면 계정 바꾸기와 로그아웃' 글은 지움
       (S.acctGift ? '연결해 두면 휴대폰을 바꿔도 같은 학교를 이어 해요' : `연결하면 수료증 ${ACCT_GIFT.dip}장, 기금 ${ACCT_GIFT.fund}, 황금 도토리 ${ACCT_GIFT.gold}개를 선물로 줘요`);
   }
-  // 1.7.1 광고와 구글 로그인이 실패한 까닭을 짧게 덧붙여요(문의할 때 알려 주면 원인을 찾기 쉬워요)
+  // 광고와 구글 로그인이 실패한 까닭을 짧게 덧붙여요(문의할 때 알려 주면 원인을 찾기 쉬워요)
   const AD_ERR = { 0: '광고를 불러오지 못했어요', 1: '광고 요청 오류', 2: '인터넷 연결', 3: '지금 줄 광고가 없어요' };
   function adErrText(EXT) {
     const e = EXT && EXT.adError ? String(EXT.adError() || '') : ''; if (!e) return '';
@@ -644,8 +644,8 @@
     return ` (오류 ${e.replace(/^consent:/, '')}${why ? ', ' + why : ''})`;
   }
   function googleErrText(c) {
-    if (/\b10\b|DEVELOPER_ERROR/i.test(c)) return ' (오류 10. 잠시 뒤에 다시 해 보세요)';   // 5.0.1.8 W-12 자세한 까닭(앱 서명 키 SHA-1 등록)은 개발 문서에
-    if (/28444|Developer console/i.test(c)) return ' (오류 28444. 잠시 뒤에 다시 해 보세요)';   // 5.0.1.8 W-12 앱 서명 키 SHA-1과 패키지 이름, 구글 클라우드 Android 클라이언트
+    if (/\b10\b|DEVELOPER_ERROR/i.test(c)) return ' (오류 10. 잠시 뒤에 다시 해 보세요)';   // 자세한 까닭(앱 서명 키 SHA-1 등록)은 개발 문서에
+    if (/28444|Developer console/i.test(c)) return ' (오류 28444. 잠시 뒤에 다시 해 보세요)';   // 앱 서명 키 SHA-1과 패키지 이름, 구글 클라우드 Android 클라이언트
     if (/No credentials|NoCredential/i.test(c)) return ' (이 휴대폰에 구글 계정이 없거나 고를 수 있는 계정이 없어요)';
     if (/\b7\b|network/i.test(c)) return ' (인터넷 연결을 확인해 주세요)';
     return c && c !== 'undefined' ? ` (오류 ${c.slice(0, 40)})` : '';
@@ -680,10 +680,10 @@
         // 이 구글 계정은 이미 다른 학교를 갖고 있어요. 지금 학교의 랭킹과 테스트 기록은 정리하고 그 계정으로 들어가요
         save();
         const local = JSON.stringify(S), old = Cloud.uid;
-        // 4.0.1 (3.3.2 분석 M14): 지우기 전에 올리기부터 멈춰요(지운 칸에 옛 계정 저장이 다시 올라가지 않게). 하던 올리기는 3초까지 기다려요
+        // 지우기 전에 올리기부터 멈춰요(지운 칸에 옛 계정 저장이 다시 올라가지 않게). 하던 올리기는 3초까지 기다려요
         Cloud.gen += 1; rt.adopting = true; clearTimeout(Cloud.timer);
         for (let i = 0; i < 30 && Cloud.pushing; i++) await new Promise(r => setTimeout(r, 100));
-        try { await delServer(old); } catch (er) { /* 무시 */ }   // 4.0.1 예전 학교 칸과 공개 모습까지 서버 칸 여섯 곳을 모두 지워요   // 2.0.0 보안 점검(2-12): 다시 못 쓰는 옛 익명 계정의 저장도 지워요(이 학교는 local로 가져가요)
+        try { await delServer(old); } catch (er) { /* 무시 */ }   // 예전 학교 칸과 공개 모습까지 서버 칸 여섯 곳을 모두 지워요. 보안 점검(2-12): 다시 못 쓰는 옛 익명 계정의 저장도 지워요(이 학교는 local로 가져가요)
         let u = null;
         try { u = (await auth.signInWithCredential(cred)).user; }
         catch (er) { rt.adopting = false; Cloud.dirty = true; save(); cloudPush(true); throw er; }   // 들어가지 못했으면 지금 계정으로 다시 저장해요
@@ -703,7 +703,7 @@
     }
     rt.acctBusy = false;
   }
-  /* 3.1.0 woodani: 구글 계정 바꾸기와 로그아웃. 먼저 지금 학교를 지금 계정에 저장하고, 이 기기 저장(학교, 예전 학교, 동기화 표시)을 비운 뒤 다시 열어요.
+  /* 구글 계정 바꾸기와 로그아웃. 먼저 지금 학교를 지금 계정에 저장하고, 이 기기 저장(학교, 예전 학교, 동기화 표시)을 비운 뒤 다시 열어요
      이 기기 저장을 비우지 않으면 새 계정에 같은 학교가 또 올라가서 랭킹에 같은 학교가 둘 생겨요 */
   const inAppBrowser = () => /KAKAOTALK|NAVER|Instagram|FBAN|FBAV|Line\//i.test(navigator.userAgent || '');
   async function acctSaveFirst() {
@@ -753,12 +753,12 @@
       toast('로그아웃하지 못했어요. 잠시 뒤에 다시 해 보세요');
     } finally { rt.acctBusy = false; }
   }
-  // 2.3.0 웹판 잠금: 구글 계정이고 forest/webOk/<계정 번호>가 true면 열려요. 앱(안드로이드, 토스) 판에는 FS_WEB_LOCK이 없어요
+  // 판 잠금: 구글 계정이고 forest/webOk/<계정 번호>가 true면 열려요. 앱(안드로이드, 토스) 판에는 FS_WEB_LOCK이 없어요
   async function webLockCheck() {
     if (!window.FS_WEB_LOCK || !/(github\.io|web\.app|firebaseapp\.com)$/.test(location.hostname)) return;   // 자동 시험(localhost)과 앱 판은 잠그지 않아요
     const el = $('#webLock'), tx = $('#wlTx'), go = $('#wlGo'), id = $('#wlId'), cp = $('#wlCopy');
     clearTimeout(rt.wlT);
-    // 2.3.0 고침: 켜자마자 부르면 서버에 붙는 중('wait')이라 연결 실패로 보였어요. 붙을 때까지 다시 봐요.
+    // 고침: 켜자마자 부르면 서버에 붙는 중('wait')이라 연결 실패로 보였어요. 붙을 때까지 다시 봐요
     // 서버 학교와 이 기기 학교 중 고르는 창이 떠 있으면 그 창을 먼저 고를 수 있게 잠깐 비켜 줘요
     if (Cloud.state !== 'on' && Cloud.state !== 'off' && Cloud.state !== 'error') {
       el.hidden = !!rt.modalOpen; document.body.classList.toggle('wl-on', !rt.modalOpen);
@@ -797,7 +797,7 @@
     openModal($('#mStats'));
     checkAdmin().then(loadStats);
   }
-  /* 2.3.0 관리자(woodani 결정): 비밀 글자 대신 구글 계정. Firebase 콘솔에서 forest/adminUids/<계정 번호>에 true를 넣은 계정만
+  /* 관리자: 비밀 글자 대신 구글 계정. Firebase 콘솔에서 forest/adminUids/<계정 번호>에 true를 넣은 계정만
      다른 테스터의 테스트 현황을 보고 지울 수 있어요(규칙이 막아 줘요). 규칙에 이메일은 적지 않아요(공개 저장소) */
   async function checkAdmin() {
     rt.isAdmin = false;
@@ -835,7 +835,7 @@
       score: Math.floor(n(d.score, 1e12)), gearn: Math.floor(n(d.gearn, 1e9)), gspent: Math.floor(n(d.gspent, 1e9)), cos: Math.floor(n(d.cos, 999)), dev: !!d.dev, v: typeof d.v === 'string' ? d.v.slice(0, 10) : '', env: ENV_NAME[d.env] || ''
     };
   }
-  /* 3.0.0 woodani 요청: 관리자는 테스트 현황에서 그 테스터의 학교를 구경해요(다른 학교 구경과 같은 보기 전용 화면).
+  /* 관리자는 테스트 현황에서 그 테스터의 학교를 구경해요(다른 학교 구경과 같은 보기 전용 화면)
      서버 규칙이 forest/saves/<id> 읽기를 관리자(forest/adminUids)에게만 열어 줘요. 저장을 읽어 학교 모습만 만들고, 내 학교는 건드리지 않아요 */
   function adminLookData(raw) {
     const st = parseSave(raw); if (!st) return null;
@@ -897,7 +897,7 @@
       tag('#' + r.pid.slice(0, 4));
       if (r.id === Cloud.uid) tag('나', true);
       if (r.dev) tag('테스트 도구');
-      if (rt.isAdmin && r.id !== Cloud.uid) {   // 3.0.0 woodani 요청: 관리자는 그 학교 구경
+      if (rt.isAdmin && r.id !== Cloud.uid) {   // 관리자는 그 학교 구경
         const lk = document.createElement('button'); lk.type = 'button'; lk.className = 'btn-sub small st-look'; lk.textContent = '학교 보기';
         lk.addEventListener('click', () => adminLook(r.id, r.name)); top.appendChild(lk);
       }

@@ -5,7 +5,7 @@
   const ESHOP = {
     hat: 120, fur: 200,
     ex: { n: 10, min: 60, perDay: 5 },
-    ax: { ess: 20, min: 30, perDay: 5 },   // 4.3.1 woodani 요청(숫자는 본부 제안): 숲의 정수 20개로 도토리 수업료 30분치, 하루 5번. 위 ex의 거꾸로라 오가며 남는 게 없어요   // 1.7.4 도토리 수업료 60분치로 숲의 정수 10개, 하루 5번(woodani 결정: 넘치는 도토리 쓸 곳). 거꾸로 바꿔도 남는 게 없어요(정수 20개 → 30분치)
+    ax: { ess: 20, min: 30, perDay: 5 },   // 숲의 정수 20개로 도토리 수업료 30분치, 하루 5번. 위 ex의 거꾸로라 오가며 남는 게 없어요. 도토리 수업료 60분치로 숲의 정수 10개, 하루 5번(넘치는 도토리 쓸 곳). 거꾸로 바꿔도 남는 게 없어요(정수 20개 → 30분치)
     tk: { perDay: 5, list: [{ k: 'm5', n: 10, ess: 30 }, { k: 'm30', n: 1, ess: 20 }, { k: 'h1', n: 1, ess: 35 }, { k: 'h3', n: 1, ess: 90 }] },   // 시간 단축권, 네 가지 합쳐 하루 5번
     boost: { perDay: 3, feast: { ess: 8, min: 60 } },   // 수업료 부스터는 하루 3번
     night: 150   // 밤 모드(지도 밤 색과 창 불빛, 영구)
@@ -21,7 +21,7 @@
   const esBfLeft = () => { esDay(); return Math.max(0, ESHOP.boost.perDay - S.es.bf); };
   const esExCost = () => Math.max(10, nice(rate() * 60 * ESHOP.ex.min));
   const esAxLeft = () => { esDay(); return Math.max(0, ESHOP.ax.perDay - (S.es.ax || 0)); };
-  const esAxGain = () => Math.max(10, nice(rate() / (feastOn() ? 2 : 1) * 60 * ESHOP.ax.min));   // 4.3.1 정수로 받는 도토리. 수업료 부스터는 빼요(부스터를 켜고 바꾸면 두 배가 되지 않게). ex의 거꾸로라 오가며 남는 게 없어요
+  const esAxGain = () => Math.max(10, nice(rate() / (feastOn() ? 2 : 1) * 60 * ESHOP.ax.min));   // 정수로 받는 도토리. 수업료 부스터는 빼요(부스터를 켜고 바꾸면 두 배가 되지 않게). ex의 거꾸로라 오가며 남는 게 없어요
   const tkName = k => TK.find(x => x.k === k).name;
   function essItem(pick) {
     if (!pick) return null;
@@ -31,9 +31,9 @@
     if (t === 'book' && AC.keys.includes(id)) return { kind: 'book', k: id };
     if (t === 'tk') { const T = ESHOP.tk.list.find(x => x.k === id); if (!T) return null; const nm = `${tkName(id)} ${T.n}장`; return { kind: 'tk', T, name: nm, ga: eulOf(nm), price: T.ess }; }
     if (t === 'bf') { const nm = `수업료 +100% ${ESHOP.boost.feast.min / 60}시간`; return { kind: 'bf', name: nm, ga: eulOf(nm), price: ESHOP.boost.feast.ess }; }
-    if (t === 'lunch') return { kind: 'lunch', name: '소풍 도시락', price: 0 };   // 2.1.0 소풍 창에서 싸요
+    if (t === 'lunch') return { kind: 'lunch', name: '소풍 도시락', price: 0 };   // 소풍 창에서 싸요
     if (t === 'night') return { kind: 'night', name: '밤 모드', ga: '를', price: S.cos.own.includes(NIGHT_KEY) ? 0 : ESHOP.night };
-    if (t === 'ax') { const g = esAxGain(), nm = `도토리 ${fmt(g)}`; return { kind: 'ax', gain: g, name: nm, ga: eulOf(nm), price: ESHOP.ax.ess }; }   // 4.3.1
+    if (t === 'ax') { const g = esAxGain(), nm = `도토리 ${fmt(g)}`; return { kind: 'ax', gain: g, name: nm, ga: eulOf(nm), price: ESHOP.ax.ess }; }
     if (t === 'ex') { const nm = `숲의 정수 ${ESHOP.ex.n}개`; return { kind: 'ex', name: nm, ga: eulOf(nm), price: esExCost(), acorn: true }; }   // 값이 도토리예요
     return null;
   }
@@ -79,7 +79,7 @@
     { const xl = esExLeft(), xc = esExCost();
       h += `<div class="sb"><span class="pv">${ic}</span><span class="tx"><b>숲의 정수 ${ESHOP.ex.n}개</b><span>도토리를 내고 받아요</span><small>${xl > 0 ? `오늘 ${xl}번 더 바꿀 수 있어요` : '오늘은 다 바꿨어요. 내일 다시 열려요'}</small></span>` +
         `<button class="buy${S.budget < xc ? ' poor' : ''}${xl > 0 ? '' : ' off'}" type="button" data-ebuy="ex" aria-label="숲의 정수 ${ESHOP.ex.n}개, 도토리 ${fmt(xc)}"><span data-acorn>${acornIcon()}</span>${fmt(xc)}</button></div>`; }
-    { const al = esAxLeft(), ag = esAxGain();   // 4.3.1 숲의 정수 → 도토리(탐험 대원 훈련에 쓸 도토리)
+    { const al = esAxLeft(), ag = esAxGain();   // 숲의 정수 → 도토리(탐험 대원 훈련에 쓸 도토리)
       h += row(`<span data-acorn>${acornIcon()}</span>`, `도토리 ${fmt(ag)}`, '숲의 정수를 내고 받아요', al > 0 ? `오늘 ${al}번 더 바꿀 수 있어요` : '오늘은 다 바꿨어요. 내일 다시 열려요', buy('ax', ESHOP.ax.ess, al <= 0, `도토리 ${fmt(ag)}`)); }
     const list = $('#essList'), top = list.scrollTop;
     list.innerHTML = h; list.scrollTop = top;
@@ -89,7 +89,7 @@
     if (it && it.price) {
       const enough = it.acorn ? S.budget >= it.price : S.ess >= it.price;
       $('#essAskText').textContent = it.kind === 'ax' ? (enough ? `도토리 +${fmt(it.gain)}, 숲의 정수 ${it.price}개로 바꿀까요?` : `숲의 정수가 ${it.price - S.ess}개 모자라요.`) : it.acorn ? (enough ? `도토리 ${fmt(it.price)}로 ${it.name}${it.ga} 바꿀까요?` : `도토리가 ${fmt(it.price - S.budget)} 모자라요.`)
-        : enough ? (it.kind === 'night' ? `밤 모드는 낮에도 지도를 밤 모습으로 바꿔요. 고등학교에서는 20시부터 6시까지 저절로 어두워져요. 그래도 숲의 정수 ${it.price}개로 살까요?` : `${it.name}${it.ga} 숲의 정수 ${it.price}개로 살까요?`) : `숲의 정수가 ${it.price - S.ess}개 모자라요. 공부 탭에서 모을 수 있어요.`;   // 2.3.0 밤 모드 안내(woodani)
+        : enough ? (it.kind === 'night' ? `밤 모드는 낮에도 지도를 밤 모습으로 바꿔요. 고등학교에서는 20시부터 6시까지 저절로 어두워져요. 그래도 숲의 정수 ${it.price}개로 살까요?` : `${it.name}${it.ga} 숲의 정수 ${it.price}개로 살까요?`) : `숲의 정수가 ${it.price - S.ess}개 모자라요. 공부 탭에서 모을 수 있어요.`;   // 밤 모드 안내
       $('#essYes').textContent = it.acorn || it.kind === 'ax' ? (enough ? '바꾸기' : '닫기') : enough ? '사기' : '공부 가기';
     }
   }
@@ -117,7 +117,7 @@
     const it = essItem(pick); if (!it) return;
     sfx('tap');
     if (it.kind === 'book') { rt.essPick = ''; openBook(it.k); return; }
-    if (it.kind === 'lunch') { rt.essPick = ''; openPicnic(); if (rt.modalOpen === $('#mPicnic') && S.ess >= PCN.lunch) { rt.pcLunch = true; renderPicnic(); } return; }   // 2.1.0   // 문제집은 공부 탭과 같은 확인창으로
+    if (it.kind === 'lunch') { rt.essPick = ''; openPicnic(); if (rt.modalOpen === $('#mPicnic') && S.ess >= PCN.lunch) { rt.pcLunch = true; renderPicnic(); } return; }   // 문제집은 공부 탭과 같은 확인창으로
     if (it.kind === 'night' && !it.price) {
       S.cos.night = !S.cos.night; rt.essPick = '';
       renderNight(true); save(); renderEssShop();
@@ -131,14 +131,14 @@
   }
   function buyEss() {
     const it = essItem(rt.essPick); if (!it || !it.price) { rt.essPick = ''; renderEssShop(); return; }
-    if (it.kind === 'ex') {   // 1.7.4 도토리 → 숲의 정수
+    if (it.kind === 'ex') {   // 도토리 → 숲의 정수
       rt.essPick = '';
       if (S.budget < it.price || esExLeft() <= 0) { renderEssShop(); return; }
       S.budget -= it.price; S.es.x += 1; addEss(ESHOP.ex.n);
       toast(`도토리 ${fmt(it.price)}로 숲의 정수 ${ESHOP.ex.n}개를 받았어요!`); sfx('quest'); buzz(15);
       save(); renderEss(); renderEssShop(); renderHUD(); renderAffordance(); return;
     }
-    if (it.kind === 'ax' && S.ess < it.price) { rt.essPick = ''; renderEssShop(); return; }   // 4.3.1 '닫기'
+    if (it.kind === 'ax' && S.ess < it.price) { rt.essPick = ''; renderEssShop(); return; }   // '닫기'
     if (S.ess < it.price) { rt.essPick = ''; setTab('mini'); return; }
     if ((it.kind === 'tk' && esTkLeft() <= 0) || (it.kind === 'bf' && esBfLeft() <= 0) || (it.kind === 'ax' && esAxLeft() <= 0)) { rt.essPick = ''; renderEssShop(); return; }
     S.ess -= it.price; S.st.esSpent = (S.st.esSpent || 0) + it.price;
@@ -150,18 +150,18 @@
     sfx('quest'); buzz(15);
     save(); renderEss(); renderEssShop(); renderShopBtn(); renderHUD(); renderAffordance(); renderDeal();
   }
-  // 2.1.0 밤 모드: 지도에 밤 색을 덮고 지은 건물 창에 불빛을 켜요(이름표는 위에 그대로)
+  // 밤 모드: 지도에 밤 색을 덮고 지은 건물 창에 불빛을 켜요(이름표는 위에 그대로)
   function renderNight(force) {
     const g = $('#nightG'); if (!g || !S) return;
     const bought = !!(S.cos && S.cos.night && S.cos.own.includes(NIGHT_KEY));
-    const hsN = S.tier >= NSL.tier && geoIdx() >= 3 && rt.viewTier == null && isNight();   // 4.0.0 대학교 구역과 캠퍼스 지도도 밤이 와요
-    //   // 3.0.0 고등학교부터 밤(20~6시)이면 저절로(A안)
-    const on = bought || hsN, look = hsN ? (S.nl || 0) : 0;   // 3.2.1 고등학교 밤 모습(0 밤, 1 저녁, 2 밝게)
+    const hsN = S.tier >= NSL.tier && geoIdx() >= 3 && rt.viewTier == null && isNight();   // 대학교 구역과 캠퍼스 지도도 밤이 와요
+    // 고등학교부터 밤(20~6시)이면 저절로(A안)
+    const on = bought || hsN, look = hsN ? (S.nl || 0) : 0;   // 고등학교 밤 모습(0 밤, 1 저녁, 2 밝게)
     map.classList.toggle('hs-night', hsN);
     map.classList.toggle('nl-light', hsN && look === 2);
-    // 2.3.0 창문 불빛 조각(작업지시서 42): 건물 그림마다 glow_ 조각이 있으면 같은 자리에 겹치고, 없으면 예전처럼 둥근 빛
-    const gk = k => seasonKey(bldImg(k)).replace(/^bld_/, 'glow_').replace(/^glow_dorm_on/, 'glow_dorm');   // 3.0.0 기숙사 불빛은 glow_dorm(_winter)
-    // 3.2.1 woodani 제보: 공사 중(비계)인 건물에는 창문 불빛을 켜지 않아요. 밝게 보기에서는 불빛과 밤하늘 없이 학생만 기숙사에
+    // 창문 불빛 조각(작업지시서 42): 건물 그림마다 glow_ 조각이 있으면 같은 자리에 겹치고, 없으면 예전처럼 둥근 빛
+    const gk = k => seasonKey(bldImg(k)).replace(/^bld_/, 'glow_').replace(/^glow_dorm_on/, 'glow_dorm');   // 기숙사 불빛은 glow_dorm(_winter)
+    // 공사 중(비계)인 건물에는 창문 불빛을 켜지 않아요. 밝게 보기에서는 불빛과 밤하늘 없이 학생만 기숙사에
     const ks = on && look < 2 ? Object.keys(FAC).filter(k => S.f[k] >= 1 && !conOn(k) && bpos(k) && geo().lot[k] && (k !== 'playground' || IMG(gk(k)))) : [];
     const key = on ? geoIdx() + '|' + hsN + '|' + look + '|' + (hsN && S.f.dorm >= 1) + '|' + ks.map(k => k + ':' + gk(k)).join() : '';
     if (!force && g.dataset.key === key) return;
@@ -169,13 +169,13 @@
     if (!on) { g.innerHTML = ''; return; }
     g.innerHTML = '<defs><radialGradient id="nmGlow"><stop offset="0" stop-color="#FFE29A" stop-opacity=".95"/><stop offset=".55" stop-color="#FFD36B" stop-opacity=".35"/><stop offset="1" stop-color="#FFD36B" stop-opacity="0"/></radialGradient></defs>' +
       (hsN ? nsSleepers() : '') +
-      (look === 2 ? '' : `<rect x="-300" y="-300" width="960" height="1020" fill="#141C3E" opacity="${look === 1 ? '.24' : '.46'}"/>`) +   // 2.3.0 multiply는 지도 그림(svg 밖)과 섞이지 않아 거의 안 어두워져서 그냥 덮어요
-      '<g class="nb-src">' + (look < 2 && geoIdx() >= 3 && IMG('night_sky') ? `<image href="${IMG('night_sky')}" x="0" y="${MAP_Y}" width="${MAP_W}" height="${MAP_H}" preserveAspectRatio="none"/>` : '') +   // 3.0.0 달, 별, 반딧불(고등학교 지도만)
+      (look === 2 ? '' : `<rect x="-300" y="-300" width="960" height="1020" fill="#141C3E" opacity="${look === 1 ? '.24' : '.46'}"/>`) +   // multiply는 지도 그림(svg 밖)과 섞이지 않아 거의 안 어두워져서 그냥 덮어요
+      '<g class="nb-src">' + (look < 2 && geoIdx() >= 3 && IMG('night_sky') ? `<image href="${IMG('night_sky')}" x="0" y="${MAP_Y}" width="${MAP_W}" height="${MAP_H}" preserveAspectRatio="none"/>` : '') +   // 달, 별, 반딧불(고등학교 지도만)
       ks.map(k => { const gi = IMG(gk(k)); if (gi) { const R = lotRect(geo().lot[k], seasonKey(bldImg(k))), [bx, by, bw] = R; return `<image href="${gi}" x="${(bx - bw / 2).toFixed(1)}" y="${(by - bw / 2).toFixed(1)}" width="${bw.toFixed(1)}" height="${bw.toFixed(1)}"${xfAt(R)}/>`; }
         const [cx, cy, w] = bpos(k); return `<ellipse cx="${cx.toFixed(1)}" cy="${(cy - w * 0.3).toFixed(1)}" rx="${(w * 0.42).toFixed(1)}" ry="${(w * 0.3).toFixed(1)}" fill="url(#nmGlow)" style="mix-blend-mode:screen"/>`; }).join('') + '</g>';
     nightBake(g, key);
   }
-  /* 3.2.0 woodani 제보(고등학교 밤 끊김): 밤하늘과 건물 불빛 조각(큰 그림 여러 장)이 지도 안에 겹쳐 있어서, 조금만 움직여도 휴대폰이 전부 다시 칠했어요.
+  /* 밤하늘과 건물 불빛 조각(큰 그림 여러 장)이 지도 안에 겹쳐 있어서, 조금만 움직여도 휴대폰이 전부 다시 칠했어요
      처음 한 번 캔버스에 합쳐 그림 한 장으로 바꿔 끼워요. 합치는 동안과 실패하면 예전 그림들을 그대로 써요 */
   const NBK = { key: "", url: "" };
   function nightBake(g, key) {
@@ -195,7 +195,7 @@
         cv.toBlob(b => { if (!b || g.dataset.key !== key) return; if (NBK.url) URL.revokeObjectURL(NBK.url); NBK.url = URL.createObjectURL(b); NBK.key = key; swap(); }, 'image/webp', 0.92);
       }).catch(() => { /* 실패하면 예전처럼 여러 장 */ });
   }
-  // 3.0.0 밤에는 학생이 걷지 않고 기숙사 앞(기숙사가 없으면 분수 옆)에 셋이 앉아 졸아요. 나머지는 기숙사 안
+  // 밤에는 학생이 걷지 않고 기숙사 앞(기숙사가 없으면 분수 옆)에 셋이 앉아 졸아요. 나머지는 기숙사 안
   function nsSleepers() {
     const sp = speciesList(); if (!sp.length) return '';
     const n = Math.min(3, Math.max(1, Math.floor(S.students) || 0));
@@ -209,10 +209,10 @@
         (z ? `<image class="ns-z" href="${z}" x="${(x + 3).toFixed(1)}" y="${(y - 24).toFixed(1)}" width="11" height="11" style="animation-delay:${(i * 0.8).toFixed(1)}s"/>` : '');
     }).join('');
   }
-  /* ===== 1.7.4 학교 꾸미기: 숲의 정수로 장식을 사서 지도의 정해진 자리(지도마다 11곳)에 놓아요. 보너스는 없고 졸업해도 남아요 ===== */
+  /* ===== 학교 꾸미기: 숲의 정수로 장식을 사서 지도의 정해진 자리(지도마다 11곳)에 놓아요. 보너스는 없고 졸업해도 남아요 ===== */
   // sm: 작은 장식(설계안: 벤치, 가로등, 새집, 이정표, 버섯 램프)은 36칸, 나머지는 46칸
   const DECO = [
-    { id: 'bench', name: '벤치', ess: 10, img: 'deco_bench', sm: 1 },   // 5.0.2.2 woodani: 처음 장식 퀘스트(4-8)에서 막히지 않게 싼 장식 셋은 40 → 10
+    { id: 'bench', name: '벤치', ess: 10, img: 'deco_bench', sm: 1 },   // 처음 장식 퀘스트(4-8)에서 막히지 않게 싼 장식 셋은 40 → 10
     { id: 'flowerbed', name: '꽃밭', ess: 10, img: 'deco_flowerbed' },
     { id: 'signpost', name: '이정표', ess: 10, img: 'deco_signpost', sm: 1 },
     { id: 'streetlamp', name: '가로등', ess: 60, img: 'deco_streetlamp', sm: 1 },
@@ -229,12 +229,12 @@
     { id: 'clock', name: '시계탑', ess: 250, img: 'deco_rare_clocktower', rare: 1 },
     { id: 'owl', name: '부엉이 동상', ess: 250, img: 'deco_rare_owl_statue', rare: 1 }
   ];
-  // 2.0.0 이벤트 한정 장식(작업지시서 26, 2026-10-27 woodani): 가게에서 팔지 않고 그 이벤트의 기념 상자에서 하나 받아요. 그림(evd_*)이 들어오기 전에는 상자에서 나오지 않아요
+  // 이벤트 한정 장식(작업지시서 26): 가게에서 팔지 않고 그 이벤트의 기념 상자에서 하나 받아요. 그림(evd_*)이 들어오기 전에는 상자에서 나오지 않아요
   const EV_DECO = [['harvest', '도토리 수레'], ['friends', '우정 바람개비', 1], ['books', '야외 책장'], ['lunch', '급식 수레', 1], ['exam', '응원 엿 바구니', 1], ['xmas', '크리스마스트리'],
     ['newyear', '해님 연', 1], ['winter1', '눈사람', 1], ['winter2', '이글루와 눈썰매'], ['seollal', '윷놀이 멍석'], ['grad', '졸업 사진 아치'], ['spring', '벚나무'], ['trip_spring', '나비 꽃 정원'],
     ['science', '물로켓 발사대', 1], ['children', '바람개비 꽃밭'], ['buddha', '연등 기둥', 1], ['final', '모래시계 석상', 1], ['vacation', '물놀이 파라솔'], ['liberation', '무궁화 화단'],
     ['fall', '해바라기 화단'], ['chuseok', '송편 상과 달 등불'], ['hangul', '붓과 벼루 탁자', 1], ['trip_fall', '사과나무']];
-  // 2.1.3 숲속 패스 시즌 표(장식 목록을 만들 때 써서 여기 둬요. 나머지는 '숲속 패스' 묶음)
+  // 숲속 패스 시즌 표(장식 목록을 만들 때 써서 여기 둬요. 나머지는 '숲속 패스' 묶음)
   const PS = { anchor: '2026-11-02', len: 28, steps: 30, per: 100, dN: 3, dP: 30, wN: 5, wP: 60, extra: 300, extraEss: 10, tier: 1, adMul: 2 };
   // 시즌마다 주제와 한정 그림(작업지시서 23, 34). 0은 받은 가을 그림, 12(2027년 10월)는 둘째 해 주문 때 그려요. 그림이 없는 시즌은 황금 도토리로 대신 줘요
   const PS_SEASONS = [
@@ -277,51 +277,51 @@
   ];
   const TR2_BY = Object.fromEntries(TR2_PL.map(P => [P.id, P]));
   const freshTr2 = () => ({ done: {}, cur: null, go: 0, back: 0, souv: [] });
-  [['winter', '눈꽃 트로피'], ['spring', '벚꽃 트로피'], ['summer', '파도 분수 트로피'], ['autumn', '단풍 도토리 조각상']].forEach(([q, nm]) => DECO.push({ id: 'rs_' + q, name: nm, ess: 0, img: 'season_' + q, rare: 1, ev: 1, rs: 1 }));   // 2.1.3 랭킹 시즌 기념 장식
-  PS_SEASONS.forEach((x, n) => { if (x[1]) DECO.push({ id: psDecoId(n), name: x[2], ess: 0, img: x[1], rare: 1, ev: 1, ps: 1 }); });   // 2.1.3 숲속 패스 한정 장식
-  [['cg_flag_b', '동메달 우승 깃발', 'flag_bronze'], ['cg_flag_s', '은메달 우승 깃발', 'flag_silver'], ['cg_flag_g', '금메달 우승 깃발', 'flag_gold']].forEach(([id, name, img]) => DECO.push({ id, name, ess: 0, img, rare: 1, ev: 1, cg: 1 }));   // 2.2.0 대항전 우승 깃발(CG_FLAGS와 같아요)
+  [['winter', '눈꽃 트로피'], ['spring', '벚꽃 트로피'], ['summer', '파도 분수 트로피'], ['autumn', '단풍 도토리 조각상']].forEach(([q, nm]) => DECO.push({ id: 'rs_' + q, name: nm, ess: 0, img: 'season_' + q, rare: 1, ev: 1, rs: 1 }));   // 랭킹 시즌 기념 장식
+  PS_SEASONS.forEach((x, n) => { if (x[1]) DECO.push({ id: psDecoId(n), name: x[2], ess: 0, img: x[1], rare: 1, ev: 1, ps: 1 }); });   // 숲속 패스 한정 장식
+  [['cg_flag_b', '동메달 우승 깃발', 'flag_bronze'], ['cg_flag_s', '은메달 우승 깃발', 'flag_silver'], ['cg_flag_g', '금메달 우승 깃발', 'flag_gold']].forEach(([id, name, img]) => DECO.push({ id, name, ess: 0, img, rare: 1, ev: 1, cg: 1 }));   // 대항전 우승 깃발(CG_FLAGS와 같아요)
   DECO.push({ id: 'bio_hut', name: '관찰 오두막', ess: 0, img: 'bio_hut', rare: 1, ev: 1, bio: 30 });
-  DECO.push({ id: 'deco_col_science', name: '온실 화분대', ess: 0, img: 'deco_col_science', rare: 1, ev: 1, col: 1 }, { id: 'deco_col_sports', name: '공 조형물', ess: 0, img: 'deco_col_sports', rare: 1, ev: 1, col: 1 }, { id: 'deco_col_human', name: '책 더미 벤치', ess: 0, img: 'deco_col_human', rare: 1, ev: 1, col: 1 }, { id: 'deco_col_art', name: '이젤과 조각', ess: 0, img: 'deco_col_art', rare: 1, ev: 1, col: 1 }, { id: 'deco_col_biz', name: '도토리 저울', ess: 0, img: 'deco_col_biz', rare: 1, ev: 1, col: 1 }, { id: 'deco_col_eng', name: '톱니 시계탑', ess: 0, img: 'deco_col_eng', rare: 1, ev: 1, col: 1 }, { id: 'deco_col_edu', name: '칠판 표지판', ess: 0, img: 'deco_col_edu', rare: 1, ev: 1, col: 1 }, { id: 'deco_col_med', name: '약초 화단', ess: 0, img: 'deco_col_med', rare: 1, ev: 1, col: 1 });   // 4.0.0 단과대학 장식(작업지시서 55): 처음 고르면 받아요
+  DECO.push({ id: 'deco_col_science', name: '온실 화분대', ess: 0, img: 'deco_col_science', rare: 1, ev: 1, col: 1 }, { id: 'deco_col_sports', name: '공 조형물', ess: 0, img: 'deco_col_sports', rare: 1, ev: 1, col: 1 }, { id: 'deco_col_human', name: '책 더미 벤치', ess: 0, img: 'deco_col_human', rare: 1, ev: 1, col: 1 }, { id: 'deco_col_art', name: '이젤과 조각', ess: 0, img: 'deco_col_art', rare: 1, ev: 1, col: 1 }, { id: 'deco_col_biz', name: '도토리 저울', ess: 0, img: 'deco_col_biz', rare: 1, ev: 1, col: 1 }, { id: 'deco_col_eng', name: '톱니 시계탑', ess: 0, img: 'deco_col_eng', rare: 1, ev: 1, col: 1 }, { id: 'deco_col_edu', name: '칠판 표지판', ess: 0, img: 'deco_col_edu', rare: 1, ev: 1, col: 1 }, { id: 'deco_col_med', name: '약초 화단', ess: 0, img: 'deco_col_med', rare: 1, ev: 1, col: 1 });   // 단과대학 장식(작업지시서 55): 처음 고르면 받아요
   const FV_SV = { science: '표본 진열대', sports: '우승컵 받침대', human: '시화 이젤', art: '작은 조각상', biz: '장터 수레', eng: '바람개비 풍차', edu: '사과 교탁', med: '약초차 수레' };
-  // 4.2.0 대축제 달 한정 장식 12종(작업지시서 70): 그 달 대축제 도장 24개를 모으면 받아요. 살 수 없어요
+  // 대축제 달 한정 장식 12종(작업지시서 70): 그 달 대축제 도장 24개를 모으면 받아요. 살 수 없어요
   const BF_DECO = ['눈꽃 등불', '연날리기 연', '벚꽃 아치', '튤립 수레', '카네이션 화분 탑', '수국 우산', '수박 그네', '해바라기 풍차', '보름달 토끼 등불', '단풍 허수아비', '도토리 탑', '별 장식 트리'];
   DECO.push(...BF_DECO.map((nm, i) => ({ id: 'deco_bf_' + String(i + 1).padStart(2, '0'), name: nm, ess: 0, img: 'deco_bf_' + String(i + 1).padStart(2, '0'), rare: 1, ev: 1, bf: i + 1 })));
-  DECO.push(...Object.keys(FV_SV).map(k => ({ id: 'deco_fv_' + k, name: FV_SV[k], ess: 0, img: 'deco_fv_' + k, rare: 1, ev: 1, fv: 1 })));   // 4.1.0 축제 부스 기념품 8종(작업지시서 63): 그 부스 놀이를 여섯 번 성공하면 받아요
-  // 4.1.0 교환학생 우정 배지 8개 보상과 장터 장식 3종(작업지시서 64). 초등학교부터라 대학교 조건이 없어요
+  DECO.push(...Object.keys(FV_SV).map(k => ({ id: 'deco_fv_' + k, name: FV_SV[k], ess: 0, img: 'deco_fv_' + k, rare: 1, ev: 1, fv: 1 })));   // 축제 부스 기념품 8종(작업지시서 63): 그 부스 놀이를 여섯 번 성공하면 받아요
+  // 교환학생 우정 배지 8개 보상과 장터 장식 3종(작업지시서 64). 초등학교부터라 대학교 조건이 없어요
   DECO.push({ id: 'deco_ex_sign', name: '방향 이정표', ess: 0, img: 'deco_ex_sign', rare: 1, ev: 1, xg: 1 }, { id: 'deco_mk_lamp', name: '장터 등불', ess: 0, img: 'deco_mk_lamp', rare: 1, ev: 1, mk: 1 }, { id: 'deco_mk_cart', name: '채소 수레', ess: 0, img: 'deco_mk_cart', rare: 1, ev: 1, mk: 1 }, { id: 'deco_mk_pack', name: '보부상 봇짐', ess: 0, img: 'deco_mk_pack', rare: 1, ev: 1, mk: 1 });
   DECO.push({ id: 'deco_bug_hotel', name: '곤충 호텔', ess: 0, img: 'deco_bug_hotel', rare: 1, ev: 1, bio: 60 }, { id: 'deco_eco_pond', name: '생태 연못', ess: 0, img: 'deco_eco_pond', rare: 1, ev: 1, bio: 90 });
-  DECO.push({ id: 'deco_career_tree', name: '진로 나무', ess: 0, img: 'deco_career_tree', rare: 1, ev: 1, cs: 1 });   // 3.1.0 진로 도감 12칸을 다 채우면   // 2.3.5 생물 60종, 90종   // 2.2.0 생물 30종을 다 모으면
-  for (const P of TR2_PL) for (const [id, name] of P.souv) DECO.push({ id, name, ess: 0, img: id, rare: 1, ev: 1, tr2: P.name, sm: 1 });   // 3.2.0 수학여행 기념품
+  DECO.push({ id: 'deco_career_tree', name: '진로 나무', ess: 0, img: 'deco_career_tree', rare: 1, ev: 1, cs: 1 });   // 진로 도감 12칸을 다 채우면. 생물 60종, 90종. 생물 30종을 다 모으면
+  for (const P of TR2_PL) for (const [id, name] of P.souv) DECO.push({ id, name, ess: 0, img: id, rare: 1, ev: 1, tr2: P.name, sm: 1 });   // 수학여행 기념품
   for (const [k, name, sm] of EV_DECO) DECO.push({ id: 'ev_' + k, name, ess: 0, img: 'evd_' + k, rare: 1, ev: 1, ...(sm ? { sm: 1 } : {}) });
-  DECO.push({ id: 'deco_pp_board', name: '세미나 칠판', ess: 0, img: 'deco_pp_board', rare: 1, ev: 1, pp: '세미나 10번' }, { id: 'deco_pp_chair', name: '명예의 의자', ess: 0, img: 'deco_pp_chair', rare: 1, ev: 1, pp: '세미나 20번' }, { id: 'deco_pp_tower', name: '논문 탑', ess: 0, img: 'deco_pp_tower', rare: 1, ev: 1, pp: '논문 30편' }, { id: 'deco_vd20', name: '마을 감사 아치', ess: 0, img: 'deco_vd20', rare: 1, ev: 1, pp: '마을 기부 20단계' });   // 5.2.0.1 칭호 덤 장식(작업지시서 100, ppDecoSync)
+  DECO.push({ id: 'deco_pp_board', name: '세미나 칠판', ess: 0, img: 'deco_pp_board', rare: 1, ev: 1, pp: '세미나 10번' }, { id: 'deco_pp_chair', name: '명예의 의자', ess: 0, img: 'deco_pp_chair', rare: 1, ev: 1, pp: '세미나 20번' }, { id: 'deco_pp_tower', name: '논문 탑', ess: 0, img: 'deco_pp_tower', rare: 1, ev: 1, pp: '논문 30편' }, { id: 'deco_vd20', name: '마을 감사 아치', ess: 0, img: 'deco_vd20', rare: 1, ev: 1, pp: '마을 기부 20단계' });   // 칭호 덤 장식(작업지시서 100, ppDecoSync)
   const evDecoArt = d => !!(d && d.ev && IMG(d.img));
   const DECO_BY = Object.fromEntries(DECO.map(d => [d.id, d]));
   const DECO_GROW = 1.5, DECO_MAX = 11;   // 일반 장식은 하나 더 살 때마다 1.5배(지도 한 장을 다 채우는 11개까지), 희귀 장식은 하나씩만
   // 장식 자리(지도 그림의 %). 건물(Lv.5 크기)과 이름표, 호수를 피해서 지도마다 11곳. 간판 자리는 따로
   const pctXY = ([x, y]) => [Math.round(x * MAP_W / 100), Math.round(y * MAP_H / 100 + MAP_Y)];
-  const DECO_SLOTS = [   // 3.3.0 새 단장: 작업지시서 57 자리 표의 꾸미기 11곳(D01~D11)
-    // 4.1.0 woodani 제보(2026-11-11): 건물 뒤에 가려지거나 서로 겹치던 자리를 옮겼어요. 유치원 4, 10번, 초등학교 4, 5, 11번, 고등학교 2, 4, 5, 7, 8, 10번(장식은 건물보다 먼저 그려져서 건물 그림과 겹치면 안 보여요)
+  const DECO_SLOTS = [   // 새 단장: 작업지시서 57 자리 표의 꾸미기 11곳(D01~D11)
+    // 건물 뒤에 가려지거나 서로 겹치던 자리를 옮겼어요. 유치원 4, 10번, 초등학교 4, 5, 11번, 고등학교 2, 4, 5, 7, 8, 10번(장식은 건물보다 먼저 그려져서 건물 그림과 겹치면 안 보여요)
     [[78.1, 23], [83.1, 29.1], [51.9, 39.1], [66.7, 73.7], [30, 35.6], [16.9, 60], [61.9, 83], [26.9, 80.9], [10, 60], [38.9, 75.9], [70, 28]].map(pctXY),
     [[61.9, 25], [76.1, 27], [15, 35.9], [9.4, 24.8], [70, 80], [13.1, 55], [26.9, 55], [88.9, 65], [31.1, 77], [23.9, 83], [56.9, 83.7]].map(pctXY),
     [[77, 28], [46.5, 33.3], [13, 79.5], [19, 79.5], [49, 81], [63, 80], [66, 84], [26.5, 86.5], [60, 84], [20, 28], [21.5, 83.5]].map(pctXY),
     [[53.1, 20.9], [78.1, 22.8], [56.9, 40.6], [61.7, 87], [8.3, 81.1], [23.1, 82.6], [92.2, 75], [55.6, 67.8], [63.9, 80], [65.6, 19.3], [21.1, 86.5]].map(pctXY),
   ];
-  ZONE_GEO.forEach(Z => DECO_SLOTS.push(Z.deco.map(p => p.slice()))); DECO_SLOTS.push([]);   // 4.0.0 구역 지도마다 꾸미기 6곳(작업지시서 54 자리 표)
-  const DECO_SIGN = [[124.2, 424.3], [124.2, 416.2], [126.0, 421.6], [124.2, 424.3]];   // 3.3.0 woodani: 지도 그림의 정문 옆 나무 팻말 위에 덮어요(작업지시서 57 자리 표의 간판 가운데)
-  ZONE_GEO.forEach(Z => DECO_SIGN.push(Z.sign || null)); DECO_SIGN.push(null);   // 4.0.0 학교 간판은 정문이 있는 광장 구역에만
+  ZONE_GEO.forEach(Z => DECO_SLOTS.push(Z.deco.map(p => p.slice()))); DECO_SLOTS.push([]);   // 구역 지도마다 꾸미기 6곳(작업지시서 54 자리 표)
+  const DECO_SIGN = [[124.2, 424.3], [124.2, 416.2], [126.0, 421.6], [124.2, 424.3]];   // 지도 그림의 정문 옆 나무 팻말 위에 덮어요(작업지시서 57 자리 표의 간판 가운데)
+  ZONE_GEO.forEach(Z => DECO_SIGN.push(Z.sign || null)); DECO_SIGN.push(null);   // 학교 간판은 정문이 있는 광장 구역에만
   const MARK_BASE = ['shield', 'circle', 'flag'], MARK_SYM = ['acorn', 'leaf', 'star', 'book', 'sun', 'owl'];
   const MARK_COL = ['#D9534A', '#E8913A', '#F2C230', '#4E9A4A', '#3E78C2', '#8A5BC2', '#E77FA8', '#9A6A43'];
   const MARK_COL_NM = ['빨강', '주황', '노랑', '초록', '파랑', '보라', '분홍', '갈색'];
   const freshDeco = () => ({ own: {}, lay: DECO_SLOTS.map(L => L.map(() => '')), nm: '', mk: null });
   const decoMap = () => geoIdx();
   const decoOwn = id => (S.deco.own[id] || 0);
-  // 4.4.1.1 woodani 제보: 대학교 구역 지도 네 장은 한 학교라서, 장식 개수를 구역끼리 함께 세요(한 구역에 놓은 장식을 다른 구역에 또 놓을 수 없어요)
+  // 대학교 구역 지도 네 장은 한 학교라서, 장식 개수를 구역끼리 함께 세요(한 구역에 놓은 장식을 다른 구역에 또 놓을 수 없어요)
   const decoGroup = m => m >= ZONE0 && m < ZONE0 + ZONE_KEYS.length ? ZONE_KEYS.map((_, z) => ZONE0 + z) : [m];
   const decoUsed = (m, id, skip) => decoGroup(m).reduce((a, g) => a + (S.deco.lay[g] || []).filter((x, i) => x === id && !(g === m && i === skip)).length, 0);
   const decoPlaced = m => S.deco.lay[m].filter(Boolean).length;
   const decoPlacedAll = () => S.deco.lay.reduce((a, L) => a + L.filter(Boolean).length, 0);
   const decoCost0 = id => { const d = DECO_BY[id]; if (!d) return Infinity; return d.rare ? d.ess : Math.ceil(d.ess * Math.pow(DECO_GROW, Math.min(DECO_MAX, decoOwn(id))) / 5) * 5; };
-  // 2.0.0 미술부 할인(최대 15%). 할인한 값은 1 단위로 반올림해요
+  // 미술부 할인(최대 15%). 할인한 값은 1 단위로 반올림해요
   const decoCost = id => { const c = decoCost0(id); if (!isFinite(c)) return c; const off = typeof clubDecoOff === 'function' ? clubDecoOff() : 0; return off > 0 ? Math.max(1, Math.round(c * (1 - off / 100))) : c; };
   const decoSoldOut = id => { const d = DECO_BY[id]; return !d || decoOwn(id) >= (d.rare ? 1 : DECO_MAX); };
   const cleanSchoolNm = v => typeof v === 'string' ? v.replace(/[\s<>&"'`\\]/g, '').slice(0, 6) : '';
@@ -330,7 +330,7 @@
   function sanitize174(d, s) {
     const x = d.deco && typeof d.deco === 'object' ? d.deco : {};
     if (x.own && typeof x.own === 'object') for (const it of DECO) { const n = Math.floor(Number(x.own[it.id]) || 0); if (n > 0) s.deco.own[it.id] = Math.min(it.rare ? 1 : DECO_MAX, n); }
-    const usedZ = {};   // 4.4.1.1 대학교 구역끼리는 함께 세요(옛 저장에서 넘치게 놓인 것은 앞 구역부터 남기고 나머지는 가진 장식으로 돌아가요)
+    const usedZ = {};   // 대학교 구역끼리는 함께 세요(옛 저장에서 넘치게 놓인 것은 앞 구역부터 남기고 나머지는 가진 장식으로 돌아가요)
     for (let m = 0; m < DECO_SLOTS.length; m++) {
       const L = Array.isArray(x.lay) && Array.isArray(x.lay[m]) ? x.lay[m] : [], used = m >= ZONE0 && m < ZONE0 + ZONE_KEYS.length ? usedZ : {};
       for (let i = 0; i < DECO_SLOTS[m].length; i++) {
@@ -344,7 +344,7 @@
   // 학교 마크: 회색 바탕과 문양 그림에 고른 색을 곱해서 칠해요
   function markHTML(mk, x) {
     if (!markOk(mk)) return '';
-    if (x === undefined) x = S && S.cos ? S.cos.mkx : '';   // 2.1.0 꾸미기 백화점 마크 특별판
+    if (x === undefined) x = S && S.cos ? S.cos.mkx : '';   // 꾸미기 백화점 마크 특별판
     const b = IMG('mark_base_' + MARK_BASE[mk[0]]), y = IMG('mark_sym_' + MARK_SYM[mk[1]]);
     if (!b || !y) return '';
     const lay = (u, c) => `<img src="${u}" alt="" draggable="false"><i style="background:${c};-webkit-mask-image:url('${u}');mask-image:url('${u}')"></i>`;
@@ -359,17 +359,17 @@
   }
   // 지도: 놓인 장식, 학교 간판, 꾸미기 중이면 빈 자리 표시
   function renderDeco(force) {
-    renderNight();   // 2.1.0 밤 모드: 건물이 늘면 창 불빛도
+    renderNight();   // 밤 모드: 건물이 늘면 창 불빛도
     const g = $('#decoG'); if (!g || !S) return;
     const m = decoMap(), L = S.deco.lay[m], edit = !!rt.decoEdit;
-    const key = [m, L.join(), S.deco.nm, S.tier, edit, S.vd ? S.vd.lv : 0, S.bx ? S.bx.m + ':' + S.bx.sp.map(x => x.i).join() : '', taMapKey()].join('|');   /* 5.1.0 조교와 기념비 */
+    const key = [m, L.join(), S.deco.nm, S.tier, edit, S.vd ? S.vd.lv : 0, S.bx ? S.bx.m + ':' + S.bx.sp.map(x => x.i).join() : '', taMapKey()].join('|');   /* 조교와 기념비 */
     if (!force && g.dataset.key === key) return; g.dataset.key = key;
     let h = edit ? '<rect class="deco-dim" x="-200" y="-200" width="760" height="940"/>' : '';
-    { const bg = $('#bxG'); if (bg) bg.innerHTML = edit ? '' : bxMapHTML(m); }   // 5.0.1.1 woodani 제보: 숨은 생물은 건물 위 층(#bxG)에 그려요
-    { const vt = $('#vdTop'); if (vt) vt.innerHTML = edit ? '' : vdMapHTML(m) + taMapHTML(); }   // 2.3.1 마을 기부는 학생 위 층   // 2.2.0 숨은 생물. 2.1.2 마을 기부 기념물(꾸미기 중에는 숨겨요). 2.1.3 꾸미기 중에는 지도를 살짝 어둡게 해서 빈 자리가 잘 보여요
+    { const bg = $('#bxG'); if (bg) bg.innerHTML = edit ? '' : bxMapHTML(m); }   // 숨은 생물은 건물 위 층(#bxG)에 그려요
+    { const vt = $('#vdTop'); if (vt) vt.innerHTML = edit ? '' : vdMapHTML(m) + taMapHTML(); }   // 마을 기부는 학생 위 층. 숨은 생물. 마을 기부 기념물(꾸미기 중에는 숨겨요). 꾸미기 중에는 지도를 살짝 어둡게 해서 빈 자리가 잘 보여요
     const [sx, sy] = DECO_SIGN[m] || [0, 0], sw = 96, sh = 48, nm = S.deco.nm || '숲속', tn = tierInfo().name;
     if (DECO_SIGN[m] && IMG('sign_board')) {
-      // 글자는 간판 안쪽 판(그림 높이의 27%~71%) 가운데에 두 줄로. 판이 낮아서 글자를 작게 해요(1.7.4 woodani: 위로 삐져나감)
+      // 글자는 간판 안쪽 판(그림 높이의 27%~71%) 가운데에 두 줄로. 판이 낮아서 글자를 작게 해요(위로 삐져나감)
       const fs1 = Math.min(8.5, 50 / Math.max(1, nm.length)), fs2 = Math.min(7.5, 50 / Math.max(1, tn.length)), mid = sy - sh * 0.477;
       h += `<g class="deco-sign"><image x="${sx - sw / 2}" y="${sy - sh * 0.97}" width="${sw}" height="${sh}" href="${IMG('sign_board')}"/>` +
         `<text class="deco-sign-t" x="${sx}" y="${(mid - sh * 0.105).toFixed(1)}" style="font-size:${fs1.toFixed(1)}px"></text><text class="deco-sign-t" x="${sx}" y="${(mid + sh * 0.115).toFixed(1)}" style="font-size:${fs2.toFixed(1)}px"></text></g>`;
@@ -378,7 +378,7 @@
       const d = DECO_BY[L[i]];
       if (d && IMG(d.img)) { const w = d.sm ? 36 : 46; h += `<image class="deco-it" x="${x - w / 2}" y="${y - w * 0.975}" width="${w}" height="${w}" href="${IMG(d.img)}"/>`; }
       if (edit) {
-        if (!d) h += decoEmptyMark(x, y, i);   // 2.1.3 빈 자리를 크게, 반짝이게(woodani: 지도에서 잘 안 보여요)
+        if (!d) h += decoEmptyMark(x, y, i);   // 빈 자리를 크게, 반짝이게(지도에서 잘 안 보여요)
         else h += `<g class="deco-on"><ellipse class="deco-ring" cx="${x}" cy="${y - 4}" rx="22" ry="8"/></g>`;
         h += `<rect class="deco-hit" data-slot="${i}" x="${x - 22}" y="${y - 40}" width="44" height="46"/>`;
       }
@@ -409,12 +409,12 @@
     });
     const bar = $('#decoBar'); if (bar) bar.hidden = !(edit && rt.tab === 'school');
     if (typeof renderZoneBar === 'function') renderZoneBar();
-    map.classList.toggle('deco-on', edit);   // 3.3.1 woodani: 꾸미기 중에는 꾸미기만(건물, 참나무, 도토리, 선생님, 학생을 누르지 않아요)
+    map.classList.toggle('deco-on', edit);   // 꾸미기 중에는 꾸미기만(건물, 참나무, 도토리, 선생님, 학생을 누르지 않아요)
   }
-  // 2.1.3 빈 장식 자리 표시: 금빛 테 흰 동그라미에 + , 둘레가 숨 쉬듯 반짝여요. 차례 번호는 애니메이션이 한꺼번에 깜빡이지 않게 늦춤에 써요
+  // 빈 장식 자리 표시: 금빛 테 흰 동그라미에 +, 둘레가 숨 쉬듯 반짝여요. 차례 번호는 애니메이션이 한꺼번에 깜빡이지 않게 늦춤에 써요
   const decoEmptyMark = (x, y, i) => `<g class="deco-empty" transform="translate(${x} ${y - 10})" style="--d:${(i % 4) * 0.3}s"><circle class="de-halo" r="17"/><circle class="de-dot" r="11.5"/><path class="de-plus" d="M-5 0H5M0 -5V5"/></g>`;
   function decoEditStart() {
-    if (uniOn() && geo().campus) setZone('plaza', true);   // 4.0.0 캠퍼스 지도에는 꾸미기 자리가 없어서 광장 구역으로(다른 구역은 그 구역에서 꾸며요)
+    if (uniOn() && geo().campus) setZone('plaza', true);   // 캠퍼스 지도에는 꾸미기 자리가 없어서 광장 구역으로(다른 구역은 그 구역에서 꾸며요)
     rt.decoEdit = true; sfx('tap');
     setTab('school'); renderDeco(true);
     const m = decoMap(), i = S.deco.lay[m].indexOf('');
@@ -431,7 +431,7 @@
       return `<button class="si${on ? ' on' : ''}${left > 0 ? '' : ' dis'}" type="button" data-dput="${d.id}" aria-pressed="${on}"><span class="pv deco"><img src="${IMG(d.img)}" alt="" draggable="false"></span><span class="nm">${d.name}</span><span class="pr">${on ? '놓는 중' : left > 0 ? `${left}개 남음` : '다 놓았어요'}</span></button>`;
     }).join('');
     $('#decoPickNote').textContent = own.length ? '' : '아직 가진 장식이 없어요. 상점 거리의 꾸미기 가게에서 살 수 있어요';
-    $('#decoPickShop').hidden = own.length > 0;   // 5.0.1.8 H-19
+    $('#decoPickShop').hidden = own.length > 0;
     $('#decoPickClear').hidden = !cur;
     openModal($('#mDecoPick'));
   }
@@ -447,7 +447,7 @@
     const m = decoMap(), ic = ESS_ICON();
     $('#decoHave').innerHTML = `${ic}<span>${fmt(S.ess)}</span>`;
     { const all = DECO_SLOTS[m].length, used = decoPlaced(m); $('#decoSlotsTxt').textContent = used >= all ? `자리 ${all}곳을 모두 꾸몄어요. 바꾸기도 돼요` : `빈 자리 ${all - used}곳, 놓은 장식 ${used}개`;
-      const pic = $('#decoModePic'); if (pic && !pic.firstChild && IMG('deco_flowerbed')) pic.innerHTML = `<img src="${IMG('deco_flowerbed')}" alt="">`; }   // 2.1.3 꾸미기 모드 카드
+      const pic = $('#decoModePic'); if (pic && !pic.firstChild && IMG('deco_flowerbed')) pic.innerHTML = `<img src="${IMG('deco_flowerbed')}" alt="">`; }   // 꾸미기 모드 카드
     let h = '';
     const evList = DECO.filter(evDecoArt);
     for (const [title, list] of [['장식 <small>(사면 지도에 놓을 수 있어요)</small>', DECO.filter(d => !d.rare)], ['희귀 장식 <small>(하나씩만)</small>', DECO.filter(d => d.rare && !d.ev)], ...(evList.length ? [['이벤트 한정 장식 <small>(이벤트 기념 상자에서 받아요)</small>', evList]] : [])]) {
@@ -461,7 +461,7 @@
       }
       h += '</div>';
     }
-    // 2.1.0 한정 모자와 특별 가구(옛 정수 상점에서 옮겨 왔어요)
+    // 한정 모자와 특별 가구(옛 정수 상점에서 옮겨 왔어요)
     h += '<h3 class="shop-h">한정 모자 <small>(학생들이 써요)</small></h3><div class="shop-grid">';
     for (const it of COS.hat.items) {
       if (!it.ess) continue;
@@ -485,7 +485,7 @@
       $('#decoAskText').textContent = enough ? `${nm}${eulOf(nm)} 숲의 정수 ${c}개로 살까요?` : `숲의 정수가 ${c - S.ess}개 모자라요. 공부 탭에서 모으거나 문방구에서 바꿀 수 있어요.`;
       $('#decoYes').textContent = enough ? '사기' : '공부 가기';
     }
-    // 2.1.0 소풍에서 주워 온 희귀 열매 하나로 일반 장식 하나
+    // 소풍에서 주워 온 희귀 열매 하나로 일반 장식 하나
     const berryOk = !!(d && !d.rare && !d.ev && !decoSoldOut(d.id) && S.pc && S.pc.berry > 0);
     $('#decoBerry').hidden = !berryOk;
     if (berryOk) $('#decoBerry').textContent = `희귀 열매로 받기 (${S.pc.berry}개)`;
@@ -510,7 +510,7 @@
     $('#markOff').hidden = !S.deco.mk;
   }
   function pickDeco(id) {
-    if (id.includes(':')) {   // 2.1.0 한정 모자와 특별 가구
+    if (id.includes(':')) {   // 한정 모자와 특별 가구
       const it = essItem(id); if (!it) return;
       sfx('tap');
       if (essCosToggle(it)) { rt.decoPick = ''; renderDecoShop(); return; }
@@ -529,7 +529,7 @@
     toast(`장식 조각으로 ${d.name}${eulOf(d.name)} 받았어요!`);
     sfx('quest'); buzz(15); save(); renderDecoShop(); return true;
   }
-  function buyDecoBerry() {   // 2.1.0 희귀 열매 하나로 일반 장식 하나
+  function buyDecoBerry() {   // 희귀 열매 하나로 일반 장식 하나
     const d = DECO_BY[rt.decoPick]; rt.decoPick = '';
     if (!d || d.rare || d.ev || decoSoldOut(d.id) || !(S.pc && S.pc.berry > 0)) { renderDecoShop(); return false; }
     S.pc.berry -= 1; S.deco.own[d.id] = decoOwn(d.id) + 1;
@@ -538,7 +538,7 @@
     return true;
   }
   function buyDeco() {
-    if (rt.decoPick.includes(':')) {   // 2.1.0 한정 모자와 특별 가구
+    if (rt.decoPick.includes(':')) {   // 한정 모자와 특별 가구
       const it = essItem(rt.decoPick); rt.decoPick = '';
       if (!it || S.cos.own.includes(it.kind + ':' + it.id)) { renderDecoShop(); return false; }
       if (!(S.ess >= it.price)) { setTab('mini'); return false; }

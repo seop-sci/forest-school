@@ -2,15 +2,15 @@
      1.7.0 코드는 모두 이 구역(자바스크립트)과 같은 표시가 붙은 CSS 구역, HTML 구역에 있어요.
      기존 코드에는 한두 줄씩만 들어가요. 그 위치 목록은 dev/v170-notes.md에 있어요 */
 
-  // 1.6.0 공용 함수로 바꾸기: 1.6.0(가장 늦게 본 시각 저장, 시간이 뒤로 가면 날짜 안 넘기기)이 합쳐지면 아래 두 줄만 지워요.
+  // 공용 함수로 바꾸기: 1.6.0(가장 늦게 본 시각 저장, 시간이 뒤로 가면 날짜 안 넘기기)이 합쳐지면 아래 두 줄만 지워요
   // 임시 함수는 기기 시간만 돌려주고 저장 칸을 만들지 않아요
 
-  // 1.7.0 보상용 분치 보정(공용): 학교급이 오르면 수업료는 1000배, 공사비는 2000배라서 "수업료 몇 분치"의 실제 가치가 학교급마다 절반이 돼요.
+  // 보상용 분치 보정(공용): 학교급이 오르면 수업료는 1000배, 공사비는 2000배라서 "수업료 몇 분치"의 실제 가치가 학교급마다 절반이 돼요
   // 분치 × 학교급 배수로 공사비 기준 가치를 맞춰요. 기존 퀘스트와 행사 보상에는 쓰지 않아요(수업료 n분치 = rate × 60 × n 그대로).
-  // 3.0.0 조정안 6(2026-11-02): 숨은 2^학교급 대신 이름 있는 표. 건물 한 레벨 값을 수업료 분으로 재면(같은 상한 비율에서)
+  // 조정안 6: 숨은 2^학교급 대신 이름 있는 표. 건물 한 레벨 값을 수업료 분으로 재면(같은 상한 비율에서)
   // 고등학교는 중학교의 약 4분의 1~3분의 1이라(공사비 배수 2.5e11 ÷ 수업료 1e9 = 250, 중학교 500), 고등학교는 8배가 아니라 중학교와 같은 4배예요.
   // 이 배수를 쓰는 곳: 합치기 주문과 팔기, 대결 첫 승리, 실험, 소풍, 생일, 스티커판, 시험 성적표, 대항전 참가, 생물 중복, 이벤트, 도감, 건설 부스터 값
-  const TIER_X = [1, 2, 4, 4, 4, 4];   // 유치원, 초등, 중학교, 고등학교, 대학교(4.0.0 woodani 결정 2026-11-11: 고등학교와 같게)
+  const TIER_X = [1, 2, 4, 4, 4, 4];   // 유치원, 초등, 중학교, 고등학교, 대학교(고등학교와 같게)
   const tierMinutes = m => m * TIER_X[Math.min(S.tier, TIER_X.length - 1)];
   const minAcorns = m => Math.max(10, nice(rate() * 60 * tierMinutes(m)));
 
@@ -24,7 +24,7 @@
     ev_stamp_on: '<svg viewBox="0 0 40 40" aria-hidden="true"><circle cx="20" cy="20" r="17" fill="#C2453A"/><circle cx="20" cy="20" r="12" fill="none" stroke="#FFF6DC" stroke-width="2"/><path d="M13 20l5 5 9-10" fill="none" stroke="#FFF6DC" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"/></svg>',
     ev_stamp_off: '<svg viewBox="0 0 40 40" aria-hidden="true"><circle cx="20" cy="20" r="17" fill="none" stroke="#8A8A7A" stroke-width="2" stroke-dasharray="4 3"/></svg>'
   };
-  // 2.0.0 새 전학생 6종: 그림(작업지시서 20)이 오기 전에는 그림 문자
+  // 새 전학생 6종: 그림(작업지시서 20)이 오기 전에는 그림 문자
   for (const k of Object.keys(KID_EMOJI)) PLACE170['chr_' + k] = `<svg viewBox="0 0 64 64" aria-hidden="true"><text x="32" y="46" text-anchor="middle" font-size="40">${KID_EMOJI[k]}</text></svg>`;
   // 그림이 있으면 <img>, 없으면 임시 도형이나 기존 그림을 그려요. fb는 대신 쓸 기존 그림 열쇠
   const pic7 = (k, fb) => {
@@ -34,13 +34,13 @@
   // 도감 카드 틀과 책 배경은 밝은 판과 어두운 판 두 가지 그림 자리가 있어요(dex_card_light, dex_card_dark, dex_book_light, dex_book_dark).
   // 그림이 있을 때만 CSS 변수로 넣고, 없으면 CSS의 기본 색이 보여요
   ['dex_card_light', 'dex_card_dark', 'dex_book_light', 'dex_book_dark'].forEach(k => { const u = IMG7(k); if (u) document.documentElement.style.setProperty('--' + k.replace(/_/g, '-'), `url("${u}")`); });
-  [['bond_bubble_light', '--fr-bub-l'], ['bond_bubble_dark', '--fr-bub-d']].forEach(([k, v]) => { const u = IMG(k); if (u) document.documentElement.style.setProperty(v, `url("${u}")`); });   // 2.1.1 친구 말풍선
+  [['bond_bubble_light', '--fr-bub-l'], ['bond_bubble_dark', '--fr-bub-d']].forEach(([k, v]) => { const u = IMG(k); if (u) document.documentElement.style.setProperty(v, `url("${u}")`); });   // 친구 말풍선
 
   /* ---------- 동물 도감 ---------- */
   // 학생 11종(기본 5 + 전학생 6)과 선생님 3명. 선생님 열쇠는 학생과 겹치지 않게 tea_를 붙여요(아기곰 학생과 곰 선생님)
   const DEX_TEACHERS = ['squirrel', 'owl', 'bear'];
   const DEX_STUDENTS = BASE_SPECIES.concat(NEWCOMERS.map(n => n.k));
-  const DEX_TEA = DEX_TEACHERS.concat(['hedgehog', 'dietitian', 'librarian', 'swan', 'peacock', 'alpaca', 'badger', 'elephant', 'crane', 'pelican']);   // 5.0.0 펠리컨 지도교수님   // 4.0.0 두루미 학장 교수님   // 3.1.0 코끼리 진로 선생님   // 3.0.0 오소리 사감   // 2.3.0 새 선생님 셋   // 1.7.0: 고슴도치 교감 선생님은 처음부터 등록돼요. 1.7.1: 영양, 사서 선생님은 오시면
+  const DEX_TEA = DEX_TEACHERS.concat(['hedgehog', 'dietitian', 'librarian', 'swan', 'peacock', 'alpaca', 'badger', 'elephant', 'crane', 'pelican']);   // 펠리컨 지도교수님. 두루미 학장 교수님. 코끼리 진로 선생님. 오소리 사감. 새 선생님 셋. 고슴도치 교감 선생님은 처음부터 등록돼요. 영양, 사서 선생님은 오시면
   const DEX_KEYS = DEX_STUDENTS.concat(DEX_TEA.map(k => 'tea_' + k));
   const DEX_NAMES = { rabbit: '토끼', fox: '여우', raccoon: '너구리', chick: '병아리', bear: '아기곰' };
   const DEX_LINES = {
@@ -86,10 +86,10 @@
     { k: 'hawk', name: '매', hint: '하늘에서 가끔 오는 손님', line: '하늘 높이 맴돌며 학교를 내려다봐요. 눈이 아주 밝아요.' },
     { k: 'magpie', name: '까치', hint: '소식을 물어 오는 손님', line: '반가운 소식과 반값 핫딜을 물어 와요. 숲에서 가장 빠른 우체부예요.' },
     { k: 'alumni', name: '졸업생', hint: '모교를 찾아오는 손님', line: '이 학교를 졸업한 선배예요. 가끔 선물을 들고 모교를 찾아와요.' }];
-  // 1.7.0: 특별 손님은 나타나면 기록만 해요(선물과 '만난 친구' 수에는 넣지 않아요)
+  // 특별 손님은 나타나면 기록만 해요(선물과 '만난 친구' 수에는 넣지 않아요)
   const DEX_GUEST_KEYS = DEX_GUESTS.map(g => 'g_' + g.k);
   const dexGuest = k => DEX_GUESTS.find(g => 'g_' + g.k === k);
-  const DEX_FUTURE = 1;   // 1.7.1: 세 칸 중 두 칸은 영양, 사서 선생님이 채웠어요
+  const DEX_FUTURE = 1;   // 세 칸 중 두 칸은 영양, 사서 선생님이 채웠어요
   // 등록 1종마다 황금 도토리 1개. 모으기 보상: 학생 5종 수업료 30분치, 학생 11종 황금 3개, 모두(17종, 열쇠 이름은 예전 그대로 s14) 황금 5개와 기념 그림
   const DEX_REWARD = { each: 1, goals: [{ key: 's5', who: 'students', need: 5, m: 30, t: '기본 친구 5종 모으기' }, { key: 's11', who: 'students', need: 11, g: 3, t: '학생 11종 모으기' }, { key: 's14', who: 'all', need: DEX_KEYS.length, g: 5, t: '도감 완성' }] };
   const DEX_PAY_KEYS = new Set(DEX_KEYS.concat(DEX_REWARD.goals.map(x => x.key)));
@@ -98,7 +98,7 @@
   const dexPicKey = k => k.startsWith('tea_') ? k : 'chr_' + (k.startsWith('g_') ? k.slice(2) : k);
   const dexHow = k => {
     if (k === 'tea_hedgehog') return '처음부터 학교에 계셔요';
-    if (XT_DEX[k] && XT[XT_DEX[k]].tier && S.tier < XT[XT_DEX[k]].tier) return `${TIERS[XT[XT_DEX[k]].tier].name}부터 오셔요`;   // 3.1.0
+    if (XT_DEX[k] && XT[XT_DEX[k]].tier && S.tier < XT[XT_DEX[k]].tier) return `${TIERS[XT[XT_DEX[k]].tier].name}부터 오셔요`;
     if (XT_DEX[k]) return `${eul(FAC[XT[XT_DEX[k]].fac].name)} 지으면 오셔요`;
     if (k.startsWith('g_')) return (dexGuest(k) || {}).hint || '';
     if (k.startsWith('tea_')) return `${TEA[k.slice(4)].name}을 모시면 등록돼요`;
@@ -118,7 +118,7 @@
     NEWCOMERS.slice(0, S.p.species).forEach(n => dexMeet(n.k));
     DEX_TEACHERS.forEach(k => { if (S.t[k] > 0) dexMeet('tea_' + k); });
     dexMeet('tea_hedgehog');
-    for (const t of Object.keys(XT_DEX)) if (xtHere(XT_DEX[t])) dexMeet(t);   // 1.7.1
+    for (const t of Object.keys(XT_DEX)) if (xtHere(XT_DEX[t])) dexMeet(t);
   }
   // 아직 받지 않은 선물 목록(등록 보상과 모으기 보상)
   function dexPending() {
@@ -164,7 +164,7 @@
       `<p>${got ? esc(DEX_LINES[pk] || (dexGuest(pk) || {}).line || '') : '아직 만나지 못했어요.'}</p><small>${got ? dexDate(got) : esc(dexHow(pk))}</small>${got ? frDexBox(pk) : ''}</div></div>` : '';
     body.innerHTML = detail +
       `<h4 class="dex-h">학생 <small>${dexCount('students')} / ${DEX_STUDENTS.length}</small></h4><div class="dex-grid">${DEX_STUDENTS.map(dexCard).join('')}</div>` +
-      rareDexHTML() +   // 2.1.3 반짝 친구는 학생 줄 바로 아래, 같은 카드 크기
+      rareDexHTML() +   // 반짝 친구는 학생 줄 바로 아래, 같은 카드 크기
       `<h4 class="dex-h">선생님 <small>${DEX_TEA.filter(k => S.dex.got['tea_' + k]).length} / ${DEX_TEA.length}</small></h4><div class="dex-grid">${DEX_TEA.map(k => dexCard('tea_' + k)).join('')}</div>` +
       `<h4 class="dex-h">특별 손님 <small>${DEX_GUEST_KEYS.filter(k => S.dex.got[k]).length} / ${DEX_GUESTS.length}</small></h4><div class="dex-grid">${DEX_GUEST_KEYS.map(dexCard).join('')}</div>` +
       `<h4 class="dex-h">앞으로 올 친구</h4><div class="dex-grid">${Array.from({ length: DEX_FUTURE }, (_, i) => dexLock('숲속 교육부에서 준비 중')).join('')}</div>`;
@@ -172,7 +172,7 @@
 
   /* ---------- 이벤트 ---------- */
   // 달력 규칙으로 되풀이해요(앱 안에 고정이라 업데이트 없이 돌아가요)
-  // 2.0.0 매주 이벤트 (2026-10-27 woodani 결정): 한국 시간 월요일 0시부터 일요일 23:59까지 이벤트가 열려요. 4가지가 4주마다 돌아가요.
+  // 매주 이벤트 : 한국 시간 월요일 0시부터 일요일 23:59까지 이벤트가 열려요. 4가지가 4주마다 돌아가요
   // EV_ANCHOR가 든 주가 0번째(도토리 수확 축제)예요. 특별 이벤트가 있는 주는 그 주 이벤트가 쉬어요(돌아가는 순서는 그대로 이어져요)
   const EV_WEEKLY = [
     { id: 'harvest', name: '도토리 수확 축제', banner: 'ev_banner_harvest', lead: '숲에 도토리가 가장 많이 떨어지는 때예요. 다람쥐들이 바구니를 들고 수확 축제를 열어요.' },
@@ -180,14 +180,14 @@
     { id: 'books', name: '책 읽는 주간', banner: 'ev_banner_books', fb: 'ev_banner_friends', lead: '숲속 도서관에 새 그림책이 잔뜩 들어왔어요. 다 같이 책을 읽어요.' },
     { id: 'lunch', name: '맛있는 급식 주간', banner: 'ev_banner_lunch', fb: 'ev_banner_harvest', lead: '급식실에서 특별 메뉴가 나와요.' }
   ];
-  const EV_MONTHLY = EV_WEEKLY;   // 1.7.0 이름(시험과 옛 코드가 써요)
+  const EV_MONTHLY = EV_WEEKLY;   // 이름(시험과 옛 코드가 써요)
   const EV_ANCHOR = '2026-11-02';
-  // 이벤트가 매주 열려서 한 번 보상은 1.x의 약 3분의 2예요(2026-10-27 woodani 결정, 한 달 합은 약 1.3~1.5배). 미션 도토리는 표의 m에 곱해요
+  // 이벤트가 매주 열려서 한 번 보상은 1.x의 약 3분의 2예요(한 달 합은 약 1.3~1.5배). 미션 도토리는 표의 m에 곱해요
   const EVC = { scale: 2 / 3 };   // 핫픽스(live.json의 ev.scale)로 바꿀 수 있어요
   // 특별 이벤트 표: start와 end('YYYY-MM-DD', 끝나는 날 포함)를 적으면 열려요. 비어 있으면 아직 열지 않아요. 반복 이벤트와 겹치면 특별 이벤트가 먼저예요.
   // ms는 미션 3개 [종류, 목표], m은 미션 하나의 수업료 분치, g는 황금 도토리. 내용과 날짜는 나중에 채워요
   const EV_SPECIAL = [
-    // 2.0.0 학교 특별 이벤트 달력(2026-10-27 woodani 결정): 기념일이 든 주 월~일, 서로 겹치지 않아요. 음력 날짜: 설날 2027-02-07(일), 부처님 오신 날 05-13(목), 추석 09-15(수), 수능 2027-11-18(목)
+    // 학교 특별 이벤트 달력: 기념일이 든 주 월~일, 서로 겹치지 않아요. 음력 날짜: 설날 2027-02-07(일), 부처님 오신 날 05-13(목), 추석 09-15(수), 수능 2027-11-18(목)
     // 같은 id가 해마다 다시 열려요(key가 id:시작일이라 새 회차). fb는 배너 그림이 오기 전 대신 보여 줄 그림. 2028년 표는 나중에 더해요(2028년은 어린이날과 부처님 오신 날이 같은 주라 하나만)
     { id: 'exam', name: '수능 응원', start: '2026-11-16', end: '2026-11-22', banner: 'ev_banner_exam', lead: '숲속 선배들이 큰 시험을 봐요. 모두 함께 응원해요. 힘내요!', ms: [['mgOrd', 5], ['pz', 2], ['dmDone', 4]], m: 20, g: 1 },
     { id: 'xmas', name: '크리스마스 파티', start: '2026-12-21', end: '2026-12-27', banner: 'ev_banner_xmas', lead: '숲속 학교에 눈이 내려요. 파티 선물을 받아 가요.', ms: [['picks', 60], ['mgOrd', 5], ['dmDone', 4]], m: 20, g: 1 },
@@ -227,11 +227,11 @@
     11: { harvest: { ms: [['picks', 150], ['mgOrd', 5], ['claims', 3]], m: 15, g: 1 }, friends: { ms: [['dmDone', 9], ['picks', 80], ['shakes', 60]], m: 15, g: 1 } },
     12: { harvest: { ms: [['picks', 120], ['shakes', 100], ['mgOrd', 5]], m: 15, g: 1 }, friends: { ms: [['sports', 3], ['dmDone', 6], ['trips', 1]], m: 20, g: 1 } }
   };
-  // 2.0.0 새 매주 이벤트 미션(달마다 같아요). pz는 숲속 퍼즐 판 수
+  // 새 매주 이벤트 미션(달마다 같아요). pz는 숲속 퍼즐 판 수
   const EV_WEEK_BASE = { books: { ms: [['pz', 3], ['mgOrd', 5], ['dmDone', 6]], m: 15, g: 1 }, lunch: { ms: [['picks', 100], ['shakes', 60], ['mgOrd', 5]], m: 15, g: 1 } };
   // 출석 도장 7개: 날마다 하나(한국 시간 날짜 기준). 5개째가 큰 보상이라 7일 가운데 이틀 빠져도 완성이에요. m은 수업료 분치, g는 황금 도토리
-  const EV_STAMPS = [{ m: 7 }, { m: 7 }, { m: 7, g: 1 }, { m: 7 }, { m: 40, g: 1, e: 5 }, { m: 7 }, { m: 7 }];   // e: 숲의 정수(2.0.0 woodani: 이벤트니까 정수도)   // 2.0.0 매주라서 줄임(1.x: 10분치, 5개째 60분치와 황금 3)
-  const EV_BOX = { g: 1, dip: 1, e: 10 };   // e: 숲의 정수 10(2.0.0). 그 이벤트 한정 장식이 있으면 처음 한 번 함께 받아요   // 2.0.0 매주라서 황금 2 → 1   // 미션 3개를 다 하면 받는 기념 상자
+  const EV_STAMPS = [{ m: 7 }, { m: 7 }, { m: 7, g: 1 }, { m: 7 }, { m: 40, g: 1, e: 5 }, { m: 7 }, { m: 7 }];   // e: 숲의 정수(이벤트니까 정수도). 매주라서 줄임(1.x: 10분치, 5개째 60분치와 황금 3)
+  const EV_BOX = { g: 1, dip: 1, e: 10 };   // e: 숲의 정수 10. 그 이벤트 한정 장식이 있으면 처음 한 번 함께 받아요. 매주라서 황금 2 → 1. 미션 3개를 다 하면 받는 기념 상자
   // 미션은 기존 횟수 통계(S.st)의 "이벤트 시작 때와의 차이"로 재요. 놀이 코드에는 손대지 않아요
   const EV_MEASURE = {
     // ok가 거짓이면 아직 못 하는 미션이라 EV_FALLBACK으로 바꿔요.
@@ -242,15 +242,15 @@
     ups: { name: n => `시설이나 가구 ${n}번 고치기`, ok: () => facKeys().some(k => !facMaxed(k) || FUR[k].some((_, i) => !furDone(k, i))) },
     trains: { name: n => `선생님 연수 ${n}번 보내기`, ok: () => DEX_TEACHERS.some(k => S.t[k] >= 1 && !teaMaxed(k)) || !vpMaxed() }, claims: { name: n => `자리 비운 도토리 ${n}번 받기` }, dmDone: { name: n => `오늘의 미션 ${n}개 끝내기` },
     sports: { name: n => `${FEST.sports.name} ${n}번 열기`, ok: () => festOpen('sports') }, trips: { name: n => `체험학습 ${n}번 다녀오기`, ok: () => tripOpen() },
-    pz: { name: n => `숲속 퍼즐 ${n}판 끝내기`, ok: () => !liveOff('puzzle') },   // 2.0.0 책 읽는 주간
-    mgOrd: { name: n => `숲속 합치기 주문 ${n}개 채우기`, v: () => (S.mg && S.mg.st && S.mg.st.orders) || 0, ok: () => !liveOff('merge') }   // 2.0.0 (woodani: 고치기와 연수는 어려워서 빼요)
+    pz: { name: n => `숲속 퍼즐 ${n}판 끝내기`, ok: () => !liveOff('puzzle') },   // 책 읽는 주간
+    mgOrd: { name: n => `숲속 합치기 주문 ${n}개 채우기`, v: () => (S.mg && S.mg.st && S.mg.st.orders) || 0, ok: () => !liveOff('merge') }
   };
   const evOk = t => !!EV_MEASURE[t] && (!EV_MEASURE[t].ok || EV_MEASURE[t].ok());
-  const evVal = t => Math.floor((EV_MEASURE[t] && EV_MEASURE[t].v ? EV_MEASURE[t].v() : S.st[t]) || 0);   // 2.0.0 합치기 주문은 S.mg.st에서 세요
+  const evVal = t => Math.floor((EV_MEASURE[t] && EV_MEASURE[t].v ? EV_MEASURE[t].v() : S.st[t]) || 0);   // 합치기 주문은 S.mg.st에서 세요
   // 아직 못 하는 미션 대신 넣어요(앞에서부터, 할 수 있고 겹치지 않는 것만). 흔들기와 줍기가 안 되면 고치기가 먼저 나와요.
   // 놀이터가 없으면 고치기가 늘 되고(놀이터를 지을 수 있어요), 시설과 가구가 모두 끝났으면 놀이터가 있어 흔들기와 줍기가 돼요.
   // 자리 비운 도토리 받기와 연수는 늘 되니 미션 3개가 언제나 채워져요. 그래도 못 찾으면 자리 비운 도토리 받기를 넣어요
-  const EV_FALLBACK = [['shakes', 60], ['picks', 80], ['claims', 3], ['dmDone', 4], ['mgOrd', 5], ['pz', 2]];   // 2.0.0 고치기와 연수는 어려워서 이벤트 미션에서 뺐어요(woodani). 자리 비운 도토리 받기와 오늘의 미션은 언제나 할 수 있어요
+  const EV_FALLBACK = [['shakes', 60], ['picks', 80], ['claims', 3], ['dmDone', 4], ['mgOrd', 5], ['pz', 2]];   // 고치기와 연수는 어려워서 이벤트 미션에서 뺐어요. 자리 비운 도토리 받기와 오늘의 미션은 언제나 할 수 있어요
   const dayAdd = (day, n) => { const [y, m, d] = day.split('-').map(Number); return new Date(Date.UTC(y, m - 1, d + n)).toISOString().slice(0, 10); };
   const dayDiff = (a, b) => Math.round((Date.parse(b + 'T00:00:00Z') - Date.parse(a + 'T00:00:00Z')) / 86400000);
   const dayText = day => { const [, m, d] = day.split('-').map(Number); return `${m}월 ${d}일`; };
@@ -285,7 +285,7 @@
     for (let i = 1; i <= 60; i++) { const c = evCurrent(dayAdd(day, i)); if (c && (!cur || c.key !== cur.key)) return c; }
     return null;
   }
-  // 2.0.1 다가오는 이벤트 n개(지금 열린 것은 빼고, 120일 안)
+  // 다가오는 이벤트 n개(지금 열린 것은 빼고, 120일 안)
   function evUpcoming(day, n) {
     day = day || gameToday();
     const cur = evCurrent(day), out = [], seen = new Set(cur ? [cur.key] : []);
@@ -300,13 +300,13 @@
       let t = t0, n = n0;
       if (!evOk(t) || used.has(t)) { const alt = EV_FALLBACK.find(f => evOk(f[0]) && !used.has(f[0])) || ['claims', 3]; t = alt[0]; n = alt[1]; }
       used.add(t);
-      out.push({ t, n, b: evVal(t), m: Math.max(1, Math.round(row.m * EVC.scale)), g: row.g, done: false });   // 2.0.0 매주라서 3분의 2
+      out.push({ t, n, b: evVal(t), m: Math.max(1, Math.round(row.m * EVC.scale)), g: row.g, done: false });   // 매주라서 3분의 2
     }
     return out;
   }
   // 1초마다: 열린 이벤트가 바뀌었으면(시작, 끝, 다음 달) 회차를 새로 시작해요
   function evSync() {
-    // 2.0.0 Codex 검토(7): 핫픽스로 이벤트를 잠시 끈 동안에는 회차를 건드리지 않아요. 같은 주에 다시 켜면 도장과 미션이 그대로예요
+    // 핫픽스로 이벤트를 잠시 끈 동안에는 회차를 건드리지 않아요. 같은 주에 다시 켜면 도장과 미션이 그대로예요
     if (liveOff('event')) return;
     const cur = evCurrent(), key = cur ? cur.key : '';
     const first = !rt.evInit;
@@ -316,12 +316,12 @@
     if (cur && !first) toast(`${iga(cur.def.name)} 열렸어요!`);   // 놀던 중에 새 이벤트가 열리면 알려 줘요
     save();
   }
-  // 2.0.0 이벤트 중에 못 하게 된 미션(시설과 가구를 다 올렸거나 선생님 연수가 끝남 등)은 할 수 있는 미션으로 바꿔요. 바꾼 미션은 지금부터 다시 세요
+  // 이벤트 중에 못 하게 된 미션(시설과 가구를 다 올렸거나 선생님 연수가 끝남 등)은 할 수 있는 미션으로 바꿔요. 바꾼 미션은 지금부터 다시 세요
   function evFix() {
     if (!S.ev.cur || !S.ev.list.length) return false;
     let ch = false;
     S.ev.list.forEach((m, i) => {
-      if (m.done || (evOk(m.t) && m.t !== 'ups' && m.t !== 'trains') || evProg(m) >= m.n) return;   // 2.0.0 전에 받은 고치기, 연수 미션도 바꿔요
+      if (m.done || (evOk(m.t) && m.t !== 'ups' && m.t !== 'trains') || evProg(m) >= m.n) return;   // 전에 받은 고치기, 연수 미션도 바꿔요
       const used = new Set(S.ev.list.filter((_, j) => j !== i).map(x => x.t));
       const alt = EV_FALLBACK.find(f => evOk(f[0]) && !used.has(f[0])); if (!alt) return;
       m.t = alt[0]; m.n = alt[1]; m.b = evVal(alt[0]); ch = true;
@@ -333,7 +333,7 @@
   const evReady = m => !m.done && evProg(m) >= m.n;
   const evAllDone = () => S.ev.list.length > 0 && S.ev.list.every(m => m.done);
   const evStampReady = () => !!S.ev.cur && !liveOff('event') && S.ev.stamp.n < EV_STAMPS.length && S.ev.stamp.last !== gameToday();
-  // 2.0.0 Codex 검토(8): 보상을 주기 전에 지금 회차로 맞춰요(월요일 0시를 막 넘겼으면 새 회차부터). 저장된 회차가 지금 열린 이벤트일 때만 줘요
+  // 보상을 주기 전에 지금 회차로 맞춰요(월요일 0시를 막 넘겼으면 새 회차부터). 저장된 회차가 지금 열린 이벤트일 때만 줘요
   const evLive = () => { if (liveOff('event')) return null; evSync(); const cur = evCurrent(); return cur && cur.key === S.ev.cur ? cur : null; };
   const evClaimable = () => !!S.ev.cur && !liveOff('event') && (evStampReady() || S.ev.list.some(evReady) || (evAllDone() && !S.ev.box));
   function claimStamp() {
@@ -343,15 +343,15 @@
     S.ev.stamp = { n: i + 1, last: gameToday() };
     const a = r.m ? minAcorns(r.m) : 0;
     if (a > 0) { S.budget += a; earn(a); }
-    const gIt = r.g ? goldOr(r.g) : null;   // 4.2.0
+    const gIt = r.g ? goldOr(r.g) : null;
     if (r.e) addEss(r.e);
-    const me = i + 1 === 5 ? MG.E.stamp5 : MG.E.stamp; mgAddEnergy(me);   // 1.8.0 합치기 에너지, 도장 7개를 다 모으면 강화 조각
+    const me = i + 1 === 5 ? MG.E.stamp5 : MG.E.stamp; mgAddEnergy(me);   // 합치기 에너지, 도장 7개를 다 모으면 강화 조각
     const mu = i + 1 === EV_STAMPS.length ? 1 : 0, muIt = mu ? mgAddUp(mu) : null;
-    // 2.0.0 도장 7개를 다 모으면 그 이벤트 한정 학생 모자(그림이 있고 아직 없을 때)
+    // 도장 7개를 다 모으면 그 이벤트 한정 학생 모자(그림이 있고 아직 없을 때)
     const hid = mu ? 'ev_' + cur.def.id : '', hat = hid && COS.hat.items.find(x => x.id === hid);
     const gotHat = !!(hat && evHatArt(hid) && !S.cos.own.includes('hat:' + hid));
     if (gotHat) S.cos.own.push('hat:' + hid);
-    const tkIts = [tkGive('stamp'), i + 1 === 5 ? tkGive('stamp5') : null];   // 2.1.1 단축권
+    const tkIts = [tkGive('stamp'), i + 1 === 5 ? tkGive('stamp5') : null];   // 단축권
     sfx('quest'); buzz(12);
     showReward({ title: `이벤트 도장 ${i + 1}개째!`, sub: gotHat ? `한정 모자 '${hat.name}'${eulOf(hat.name)} 받았어요! 꾸미기 백화점 옷장에서 학생들에게 씌울 수 있어요` : i + 1 === 5 ? '도장 다섯 개를 모아 큰 선물을 받았어요' : i + 1 < 5 ? `${5 - i - 1}개 더 모으면 큰 선물이 있어요` : '끝까지 함께해 줘서 고마워요',
       art: gotHat ? `<img src="${IMG('cos_hat_' + hid)}" alt="" style="width:92px;height:92px;object-fit:contain">` : undefined,
@@ -360,28 +360,28 @@
     return true;
   }
   function claimEvMission(i) {
-    if (!evLive()) return false;   // 2.0.0 Codex 검토(7, 8)
+    if (!evLive()) return false;
     const m = S.ev.list[i];
     if (!m || !evReady(m)) return false;
     m.done = true;
     const a = m.m ? minAcorns(m.m) : 0;
     if (a > 0) { S.budget += a; earn(a); }
-    const gIt = m.g ? goldOr(m.g) : null;   // 4.2.0
-    const tkIt = tkGive('evm');   // 2.1.1 단축권
+    const gIt = m.g ? goldOr(m.g) : null;
+    const tkIt = tkGive('evm');   // 단축권
     sfx('quest'); buzz(12);
     showReward({ title: '이벤트 미션 완료!', sub: EV_MEASURE[m.t].name(m.n), items: [a > 0 ? { ic: 'acorn', t: `도토리 +${fmt(a)}` } : null, gIt, tkIt] });
     save(); renderEvent(); renderHUD();
     return true;
   }
   function claimEvBox() {
-    const cur = evLive();   // 2.0.0 Codex 검토(7, 8)
+    const cur = evLive();
     if (!cur || !evAllDone() || S.ev.box) return false;
     S.ev.box = true;
     addGold(EV_BOX.g); addDip(EV_BOX.dip); addEss(EV_BOX.e);
-    const dd = DECO_BY['ev_' + cur.def.id], gotDeco = evDecoArt(dd) && !decoOwn(dd.id);   // 2.0.0 이벤트 한정 장식
+    const dd = DECO_BY['ev_' + cur.def.id], gotDeco = evDecoArt(dd) && !decoOwn(dd.id);   // 이벤트 한정 장식
     if (gotDeco) S.deco.own[dd.id] = 1;
-    mgAddEnergy(MG.E.box); const upIt = mgAddUp(1);   // 1.8.0
-    const tkIt = tkGive('box');   // 2.1.1 단축권
+    mgAddEnergy(MG.E.box); const upIt = mgAddUp(1);
+    const tkIt = tkGive('box');   // 단축권
     sfx('quest'); buzz(12);
     showReward({ title: '기념 상자를 열었어요!', sub: gotDeco ? `한정 장식 '${dd.name}'${eulOf(dd.name)} 받았어요! 꾸미기 모드에서 지도에 놓아 보세요` : '이벤트 미션을 모두 마쳤어요',
       art: gotDeco ? `<img src="${IMG(dd.img)}" alt="" style="width:92px;height:92px;object-fit:contain">` : pic7('ev_box', 'ic_fund'), items: [{ ic: 'gold', t: `황금 도토리 +${EV_BOX.g}` }, { ic: 'ess', t: `숲의 정수 +${EV_BOX.e}` }, { ic: 'mge', t: `합치기 에너지 +${MG.E.box}` }, upIt, { ic: 'dip', t: `수료증 +${EV_BOX.dip}장` }, tkIt].filter(Boolean) });

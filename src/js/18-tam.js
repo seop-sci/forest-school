@@ -9,11 +9,11 @@
       { k: 'library', nm: '단풍 도서관', mob: ['종이비행기 꼬마', '먼지 솜뭉치', '책갈피 나비'], boss: '잠꼬대하는 큰 책', mat: 0 },
       { k: 'yard', nm: '눈 내린 뒤뜰', mob: ['눈뭉치 꼬마', '고드름 요정', '얼음 반딧불'], boss: '눈보라 눈사람 대장', mat: 1 },
       { k: 'tower', nm: '별빛 천문대', mob: ['반짝 수정 꼬마', '그림자 솜뭉치', '졸린 박쥐'], boss: '수정 꼬마 용', mat: 3 },
-      { k: 'lab', nm: '구름 실험실', mob: ['번쩍 전구 꼬마', '톱니 굴렁쇠', '보글보글 플라스크'], boss: '꾸벅꾸벅 구름 로봇', mat: 2 }],   // 5.0.0 대학원에서만 끼는 일곱째 지역(작업지시서 86)
+      { k: 'lab', nm: '구름 실험실', mob: ['번쩍 전구 꼬마', '톱니 굴렁쇠', '보글보글 플라스크'], boss: '꾸벅꾸벅 구름 로봇', mat: 2 }],   // 대학원에서만 끼는 일곱째 지역(작업지시서 86)
     regLen: 50, bossEvery: 10, limit: 30,
-    // 4.3.0 woodani 요청(한 과목만 쓰고 나머지는 버려져요): 지역마다 유리한 과목(힘과 체력 +30%), 모든 대원 레벨이 탐험대 전체에 주는 보유 효과(레벨 1마다 +0.3%). 숫자는 제안
+    // 지역마다 유리한 과목(힘과 체력 +30%), 모든 대원 레벨이 탐험대 전체에 주는 보유 효과(레벨 1마다 +0.3%). 숫자는 제안
     adv: { ground: 1, garden: 3, pond: 0, library: 2, yard: 4, tower: 0, lab: 4 }, advG: 0.3, collG: 0.003, collMax: 3,
-    mHp: 20, mAtk: 2.2, mobN: [2.4, 1.4, 1],   // 4.3.2 한 층에 1, 2, 3마리일 때 한 마리의 힘 배수
+    mHp: 20, mAtk: 2.2, mobN: [2.4, 1.4, 1],   // 한 층에 1, 2, 3마리일 때 한 마리의 힘 배수
     g: 1.07, bossHp: 7, bossAtk: 1.7, mobCd: 1.6,
     // 역할(능력 번호 0 과학, 1 체육, 2 국어, 3 미술, 4 수학)
     role: [{ k: 'sci', nm: '과학 실험', hp: 0.9, atk: 0.85, cd: 1.4 }, { k: 'pe', nm: '체육 돌격', hp: 1.7, atk: 0.9, cd: 1.1 },
@@ -24,20 +24,20 @@
     lvMin: 2, lvCost: 1.13, lvUp: 1.18,   // 레벨 올리기: 수업료 lvMin분치 × lvCost^(레벨-1)
     star: [0, 5, 15, 35, 75], starTier: 1,   // ★2부터 별 조각, 초등학교부터
     gear: [{ k: 'tool', nm: '탐험 도구', mat: 0, ic: '🪄', hint: '대원 힘' }, { k: 'bag', nm: '가방', mat: 1, ic: '🎒', hint: '대원 체력' }, { k: 'hat', nm: '모자', mat: 2, ic: '🎩', hint: '필살기 게이지' }],
-    gearPer: 0.08,   // 4.3.0 woodani 결정: 장비는 대원 칸마다(그 칸에 선 대원이 받아요). 한 칸 Lv마다 8%(제안)
+    gearPer: 0.08,   // 장비는 대원 칸마다(그 칸에 선 대원이 받아요). 한 칸 Lv마다 8%(제안)
     slotNm: ['맨 앞', '앞', '가운데', '뒤', '맨 뒤'],
     mats: ['반짝 나뭇가지', '빛나는 조약돌', '무지개 꽃잎', '별 조각'], matIc: ['🪵', '🪨', '🌸', '⭐'],
     idleMax: 12 * 3600, idleMin: 600,
-    adSpd: { n: 3, min: 10, max: 30 },   // 4.3.0 woodani 결정: 광고 한 번에 2배속 10분(게임을 켜 둔 동안만 줄어요), 이어 붙여 30분까지, 하루 세 번
-    adRep: 1,   // 4.3.1 고침: 이 값이 주석 안에 들어가 있어서 보고서 두 배 광고가 하루 한 번으로 막히지 않았어요
-    cheer: { n: 3, fl: 5, mul: 1.5 },   // 4.3.1 woodani 요청(숫자는 본부가 정함): 📺 응원 받기 = 다음 5층 동안 대원 힘과 체력 +50%, 하루 세 번
-    // 4.3.0 woodani 요청(너무 빨라요, 탐험 느낌): 겨루기 속도와 한 층의 흐름(걷기, 만남, 이김, 사건, 오르기, 짐). 초 단위, 2배속이면 모두 반으로
+    adSpd: { n: 3, min: 10, max: 30 },   // 광고 한 번에 2배속 10분(게임을 켜 둔 동안만 줄어요), 이어 붙여 30분까지, 하루 세 번
+    adRep: 1,   // 고침: 이 값이 주석 안에 들어가 있어서 보고서 두 배 광고가 하루 한 번으로 막히지 않았어요
+    cheer: { n: 3, fl: 5, mul: 1.5 },   // 📺 응원 받기 = 다음 5층 동안 대원 힘과 체력 +50%, 하루 세 번
+    // 겨루기 속도와 한 층의 흐름(걷기, 만남, 이김, 사건, 오르기, 짐). 초 단위, 2배속이면 모두 반으로
     pace: 1.7, ph: { walk: 2.6, meet: 1.1, win: 1.5, climb: 1.3, lose: 3.6, ev: 8 }, evP: 0.3,
     mobPh: ['chr_mouse', 'chr_crow', 'chr_goose', 'chr_sheep', 'chr_goat', 'chr_beaver', 'chr_mouse'], bossPh: 'chr_boar',
-    // 4.3.3 woodani 결정(상한에 너무 빨리 닿아요): 심화 탐험(하드모드). 그 학기 상한을 넘으면 열려요. 1층 힘은 상한 층의 hG배, 층마다 hG배(일반은 g). 도토리 대신 재료와 별 조각(숫자는 제안)
+    // 심화 탐험(하드모드). 그 학기 상한을 넘으면 열려요. 1층 힘은 상한 층의 hG배, 층마다 hG배(일반은 g). 도토리 대신 재료와 별 조각(숫자는 제안)
     hG: 1.1, hMat: 1.5,
-    // 4.3.3 woodani 요청(스킬이 너무 빨리 사라져요): 필살기 세 박자. 모으기, 컷인, 큰 움직임(ms). '연출 건너뛰기'를 켜 두면 모으기와 컷인 없이 바로 큰 움직임
-    skCharge: 300, skCut: 900, skTail: 150, skFx: 0.75,   // 4.3.3 woodani 요청(필살기 전체 2초쯤): 모으기 0.3초, 컷인 0.9초, 큰 움직임은 0.75배 빠르게, 끝난 뒤 바로 이어서
+    // 필살기 세 박자. 모으기, 컷인, 큰 움직임(ms). '연출 건너뛰기'를 켜 두면 모으기와 컷인 없이 바로 큰 움직임
+    skCharge: 300, skCut: 900, skTail: 150, skFx: 0.75,   // 모으기 0.3초, 컷인 0.9초, 큰 움직임은 0.75배 빠르게, 끝난 뒤 바로 이어서
   };
   function freshTam() { return { best: 0, party: ['bear', 'rabbit', 'fox'], mem: {}, gear: { tool: 0, bag: 0, hat: 0 }, sg: [0, 1, 2, 3, 4].map(() => ({ tool: 0, bag: 0, hat: 0 })), mat: [0, 0, 0, 0], it: 0, auto: 0, ad: { day: '', spd: 0, rep: 0, rv: 0, ch: 0 }, cheer: 0, spd: { sec: 0 }, wk: { w: -1, best: 0 }, seen: 0, hm: 0, hb: 0, hc: 0, hw: { w: -1, best: 0 }, skSeen: 0, skOff: 0, ed: '' }; }
   function sanitizeTam(d, s) {
@@ -51,16 +51,16 @@
     if (Array.isArray(A.mat)) f.mat = [0, 1, 2, 3].map(i => n(A.mat[i], 0, 1e12, 0));
     f.it = n(A.it, 0, 4e12, 0); f.auto = A.auto ? 1 : 0; f.seen = A.seen ? 1 : 0;
     if (A.ad && typeof A.ad === 'object') f.ad = { day: typeof A.ad.day === 'string' ? A.ad.day.slice(0, 10) : '', spd: n(A.ad.spd, 0, 99, 0), rep: n(A.ad.rep, 0, 99, 0), rv: n(A.ad.rv, 0, 1e6, 0), ch: n(A.ad.ch, 0, 99, 0) };
-    f.cheer = n(A.cheer, 0, 99, 0);   // 4.3.1 응원이 남은 층
+    f.cheer = n(A.cheer, 0, 99, 0);   // 응원이 남은 층
     if (A.spd && typeof A.spd === 'object') f.spd = { sec: n(A.spd.sec, 0, TAM.adSpd.max * 60, 0) };   // 옛 시험판의 층 단위 2배속(fl, until)은 받지 않아요
     if (A.wk && typeof A.wk === 'object') f.wk = { w: n(A.wk.w, -1, 1e7, -1), best: n(A.wk.best, 0, 1e6, 0) };
-    // 4.3.3 심화 탐험(hm 켬, hb 가장 높은 심화 층, hc 그 기록의 기준 상한, hw 이번 주 심화 층), 필살기 컷인을 본 과목(skSeen 비트)
-    f.hm = A.hm ? 1 : 0; f.hb = n(A.hb, 0, 1e6, 0); f.hc = n(A.hc, 0, 1e7, 0); f.skSeen = n(A.skSeen, 0, 31, 0); f.skOff = A.skOff ? 1 : 0; f.ed = typeof A.ed === 'string' ? A.ed.slice(0, 10) : '';   // 4.4.0 입장 장면을 본 날
+    // 심화 탐험(hm 켬, hb 가장 높은 심화 층, hc 그 기록의 기준 상한, hw 이번 주 심화 층), 필살기 컷인을 본 과목(skSeen 비트)
+    f.hm = A.hm ? 1 : 0; f.hb = n(A.hb, 0, 1e6, 0); f.hc = n(A.hc, 0, 1e7, 0); f.skSeen = n(A.skSeen, 0, 31, 0); f.skOff = A.skOff ? 1 : 0; f.ed = typeof A.ed === 'string' ? A.ed.slice(0, 10) : '';   // 입장 장면을 본 날
     if (A.hw && typeof A.hw === 'object') f.hw = { w: n(A.hw.w, -1, 1e7, -1), best: n(A.hw.best, 0, 1e6, 0) };
     s.tam = f;
   }
   const tamOn = () => !!S && !!S.tam;
-  const tamRegN = () => gradOn() ? TAM.reg.length : TAM.reg.length - 1;   // 5.0.0 구름 실험실은 대학원에서만(50층 묶음마다 일곱 지역)
+  const tamRegN = () => gradOn() ? TAM.reg.length : TAM.reg.length - 1;   // 구름 실험실은 대학원에서만(50층 묶음마다 일곱 지역)
   const tamReg = fl => TAM.reg[Math.floor((Math.max(1, fl) - 1) / TAM.regLen) % tamRegN()];
   const tamLap = fl => Math.floor((Math.max(1, fl) - 1) / (TAM.regLen * tamRegN()));   // 300층마다 '깊은 밤' 한 단계
   const tamRole = sp => SP_ABIL[sp] !== undefined ? SP_ABIL[sp] : 1;
@@ -69,10 +69,10 @@
   const tamStarOn = () => S.tier >= TAM.starTier;
   const tamAvail = () => DEX_STUDENTS.filter(k => BASE_SPECIES.includes(k) || (S.dex && S.dex.got[k]));
   const tamParty = () => S.tam.party.filter(k => tamAvail().includes(k)).slice(0, tamSlots());
-  const tamAutoOn = () => S.tam.best >= 2;   // woodani: 자동 쓰기 단추는 2층을 넘으면
+  const tamAutoOn = () => S.tam.best >= 2;   // 자동 쓰기 단추는 2층을 넘으면
   function tamStat(sp, slot) {
     const m = tamMem(sp), ri = tamRole(sp), r = TAM.role[ri], G = slot != null && S.tam.sg[slot] ? S.tam.sg[slot] : { tool: 0, bag: 0, hat: 0 };
-    const mul = Math.pow(TAM.lvG, m.lv - 1) * (1 + TAM.starG * (m.st - 1)) * (1 + TAM.acG * (acLv(AB_KEY[ri]) - 1)) * tamCollMul() * (tamAdvRi() === ri ? 1 + TAM.advG : 1) * rtTamMul();   // 5.0.0 연구 트리 탐험
+    const mul = Math.pow(TAM.lvG, m.lv - 1) * (1 + TAM.starG * (m.st - 1)) * (1 + TAM.acG * (acLv(AB_KEY[ri]) - 1)) * tamCollMul() * (tamAdvRi() === ri ? 1 + TAM.advG : 1) * rtTamMul();   // 연구 트리 탐험
     return { sp, ri, hp: TAM.pHp * r.hp * mul * (1 + TAM.gearPer * G.bag), atk: TAM.pAtk * r.atk * mul * (1 + TAM.gearPer * G.tool), cd: r.cd, gg: 1 + TAM.gearPer * G.hat };
   }
   // 지금 탐험하는 지역에서 유리한 과목, 모든 대원 레벨의 보유 효과
@@ -85,7 +85,7 @@
     const R = tamReg(fl), m = Math.min(1e250, hm ? Math.pow(TAM.g, Math.max(1, S.tam.hc || tamCap()) - 1 + tamStgFl()) * Math.pow(TAM.hG, fl) : Math.pow(TAM.g, fl - 1 + tamStgFl())), boss = fl % TAM.bossEvery === 0, out = [];
     if (boss) out.push({ boss: 1, nm: R.boss, i: 0, hp: TAM.mHp * m * TAM.bossHp, atk: TAM.mAtk * m * TAM.bossAtk });
     if (boss) { for (let i = 0; i < 2; i++) { const j = (fl + i) % 3; out.push({ nm: R.mob[j], i: j, hp: TAM.mHp * m, atk: TAM.mAtk * m }); } return out; }
-    // 4.3.2 woodani 요청(1~9층이 늘 셋이라 지루해요): 10층 묶음 안에서 1~3층은 한 마리씩 다른 친구, 4~6층은 두 마리, 7~9층은 세 마리.
+    // 10층 묶음 안에서 1~3층은 한 마리씩 다른 친구, 4~6층은 두 마리, 7~9층은 세 마리
     // 적게 나오면 한 마리가 더 세요(합친 힘은 1~3층 2.4, 4~6층 2.8, 7~9층 3배로 큰 장난꾸러기 앞에서 가장 세요)
     const k = ((fl - 1) % TAM.bossEvery) + 1, n = k <= 3 ? 1 : k <= 6 ? 2 : 3, f = TAM.mobN[n - 1];
     for (let i = 0; i < n; i++) { const j = ((k - 1) % 3 + i) % 3; out.push({ nm: R.mob[j], i: j, hp: TAM.mHp * m * f, atk: TAM.mAtk * m * f, solo: n === 1 }); }
@@ -141,18 +141,18 @@
   }
   const tamSpdOn = () => S.tam.spd.sec > 0;
   function tamAdDay() { const t = gameToday(); if (S.tam.ad.day !== t) S.tam.ad = { day: t, spd: 0, rep: 0, rv: S.tam.ad.rv || 0, ch: 0 }; }
-  /* 4.3.1 woodani 요청(숫자는 본부가 정함): 학년과 학기마다 갈 수 있는 층에 상한을 두고, 대원 레벨 값은 지금 수업료 말고 그 학년 기준 수업료로 정해요.
+  /* 학년과 학기마다 갈 수 있는 층에 상한을 두고, 대원 레벨 값은 지금 수업료 말고 그 학년 기준 수업료로 정해요
      상한: 유치원 1년째 10층, 2년째 20층 / 초등 1학년 1학기 25층부터 학기마다 +5(6학년 2학기 80층) / 중학교 90층부터 +10(140층)
      / 고등학교 150층부터 +10(200층) / 대학교 215층부터 +15(4학년 1학기 305층), 대학교 4학년 2학기는 상한 없이 끝없이(대학원이 열리면 다시 정해요)
      기준 수업료: 학생 30명, 소도시, 종업식으로 남은 배수(legacyMult)만(처음 하는 유치원 학교도 키울 수 있게 낮게). 부스터, 소풍, 선생님, 시설은 넣지 않아요(같은 학년 안에서는 늘 같은 값)
      레벨 값: 기준 수업료 2분치 × 1.13^(레벨 - 기준 레벨). 기준 레벨은 앞 단계 상한을 넘는 데 드는 레벨(1층 + 1.5층/레벨로 셈). 학년이 오르면 지난 레벨이 싸져요 */
-  // 4.3.2 woodani 요청(상한은 다 닿는 선이 아니라 도전의 선): 상한을 올리고, 레벨 값의 기준점을 상한보다 TAM_REACH층 아래에 둬요.
+  // 상한을 올리고, 레벨 값의 기준점을 상한보다 TAM_REACH층 아래에 둬요
   // 기준점까지는 싸게 편하게 가고, 그 위 상한까지는 1.13배씩 비싸져서 도토리를 건물과 탐험 중 어디에 쓸지 고르게 돼요
   // 상한: 유치원 30, 40층 / 초등 50층부터 학기마다 +5(6학년 2학기 105층) / 중 120층부터 +10(170층) / 고 185층부터 +10(235층) / 대 255층부터 +15(4학년 1학기 345층), 4학년 2학기 끝없이
-  // 4.4.1 woodani 결정(전 학교급 레벨로 상한이 바로 뚫려요): 학기마다 상한 오르는 폭을 두 배로, 학교급이 오르면 더 많이 열려요(숫자는 제안)
+  // 학기마다 상한 오르는 폭을 두 배로, 학교급이 오르면 더 많이 열려요(숫자는 제안)
   // 유치원 30, 40층 / 초등 50층부터 학기마다 +10(160층) / 중 180층부터 +20(280층) / 고 300층부터 +20(400층) / 대 420층부터 +30, 4학년 2학기 끝없이
-  const TAM_CAP = [{ s: 30, d: 10 }, { s: 50, d: 10 }, { s: 180, d: 20 }, { s: 300, d: 20 }, { s: 420, d: 30 }, { s: 660, d: 30 }], TAM_REACH = 24;   // 5.0.0 대학원: 석사 1학기 660층(대학교 4학년 1학기 600층 + 60)부터 학기마다 +30, 박사 8학기 끝없이(woodani 결정)
-  // 4.4.1 학기(유치원은 해)마다 장난꾸러기가 TAM_STG층치씩 세져요. 지난 학기에 올려 둔 레벨로 새 상한이 바로 뚫리지 않게(숫자는 제안)
+  const TAM_CAP = [{ s: 30, d: 10 }, { s: 50, d: 10 }, { s: 180, d: 20 }, { s: 300, d: 20 }, { s: 420, d: 30 }, { s: 660, d: 30 }], TAM_REACH = 24;   // 대학원: 석사 1학기 660층(대학교 4학년 1학기 600층 + 60)부터 학기마다 +30, 박사 8학기 끝없이
+  // 학기(유치원은 해)마다 장난꾸러기가 TAM_STG층치씩 세져요. 지난 학기에 올려 둔 레벨로 새 상한이 바로 뚫리지 않게(숫자는 제안)
   const TAM_STG = 15;
   const tamStageAll = () => { let n = 0; for (let t = 0; t < S.tier; t++) n += t === 0 ? TIERS[t].years : TIERS[t].years * 2; return n + tamStageIn(); };
   const tamStgFl = () => TAM_STG * tamStageAll();
@@ -161,22 +161,22 @@
   function tamCap() {
     if (!S || !S.tam) return Infinity;
     const k = tamStageIn(), T = TIERS[S.tier];
-    if (S.tier >= TAM_CAP.length - 1 && k >= T.years * 2 - 1) return Infinity;   // 5.0.0 박사 8학기부터 끝없이(대학교 4학년 2학기는 이제 630층)
+    if (S.tier >= TAM_CAP.length - 1 && k >= T.years * 2 - 1) return Infinity;   // 박사 8학기부터 끝없이(대학교 4학년 2학기는 이제 630층)
     return tamCapAt(S.tier, k);
   }
   const tamCapped = () => S.tam.best >= tamCap();
-  // 4.3.3 심화 탐험: 그 학기 상한에 닿으면 열려요. 4.4.1부터 상한이 올라도 심화 층은 남고, 세기만 새 상한에 맞춰요
-  const tamHOpen = () => { if (!S || !S.tam) return false; const c = tamCap(); return isFinite(c) ? S.tam.best >= c : S.tam.hc > 0 && S.tam.best >= S.tam.hc; };   // 5.0.3 박사 8학기(일반 탐험이 끝없는 때)에는 마지막으로 있던 상한(hc)에 닿았는지로 봐요. 예전에는 심화 탐험이 닫히고 단추도 숨었어요
-  function tamHSync() { const c = tamCap(); if (isFinite(c) && S.tam.hc !== c) S.tam.hc = c; if (S.tam.hm && !tamHOpen()) S.tam.hm = 0; }   // 4.4.1 woodani 결정: 상한이 바뀌어도 심화 층은 그대로(세기는 새 상한에 맞춰 세져요)
+  // 심화 탐험: 그 학기 상한에 닿으면 열려요
+  const tamHOpen = () => { if (!S || !S.tam) return false; const c = tamCap(); return isFinite(c) ? S.tam.best >= c : S.tam.hc > 0 && S.tam.best >= S.tam.hc; };   // 박사 8학기(일반 탐험이 끝없는 때)에는 마지막으로 있던 상한(hc)에 닿았는지로 봐요. 예전에는 심화 탐험이 닫히고 단추도 숨었어요
+  function tamHSync() { const c = tamCap(); if (isFinite(c) && S.tam.hc !== c) S.tam.hc = c; if (S.tam.hm && !tamHOpen()) S.tam.hm = 0; }   // 상한이 바뀌어도 심화 층은 그대로(세기는 새 상한에 맞춰 세져요)
   const tamHOn = () => !!(S.tam.hm && tamHOpen());
   const tamCurFl = () => tamHOn() ? S.tam.hb + 1 : S.tam.best + 1;
   const tamFlTx = (fl, hm) => `${hm ? '심화 ' : ''}${fmt(fl)}층`;
   const tamCapMsg = () => `${fmt(tamCap())}층까지 왔어요!\n심화 탐험이 열렸어요`;
-  const tamReach = () => S.tier >= 4 ? 36 : TAM_REACH;   // 4.3.3 woodani 결정(대학교 1학년에 너무 빨리 닿아요): 대학교만 상한보다 36층 아래(숫자는 제안)
-  const tamLvRef = () => { const c = tamCap(), k = (isFinite(c) ? c : tamCapAt(S.tier, tamStageIn() - 1) + 30) + tamStgFl(); return Math.max(0, Math.round((k - tamReach() - 22) / 1.5)); };   // 4.4.1 학기마다 세지는 만큼 기준 레벨도   // 4.3.2 편하게 가는 층(상한 - 24층)에 드는 레벨
+  const tamReach = () => S.tier >= 4 ? 36 : TAM_REACH;   // 대학교만 상한보다 36층 아래(숫자는 제안)
+  const tamLvRef = () => { const c = tamCap(), k = (isFinite(c) ? c : tamCapAt(S.tier, tamStageIn() - 1) + 30) + tamStgFl(); return Math.max(0, Math.round((k - tamReach() - 22) / 1.5)); };   // 학기마다 세지는 만큼 기준 레벨도. 편하게 가는 층(상한 - 24층)에 드는 레벨
   const tamBaseRate = () => 30 * CFG.base * CFG.pace * incomeScale() * Math.pow(CFG.gradeMult, 2) * legacyMult() * (S.sem ? 1.2 : 1);   // 초당 기준 수업료(2학기는 1.2배)
   const tamAcorns = m => Math.max(10, nice(tamBaseRate() * 60 * tierMinutes(m)));
-  // 4.3.2 woodani 요청(누를 게 너무 많아요): 한 번에 여러 레벨. n은 1, 10, 또는 Infinity(가진 도토리로 되는 만큼, 한 번에 500까지)
+  // 한 번에 여러 레벨. n은 1, 10, 또는 Infinity(가진 도토리로 되는 만큼, 한 번에 500까지)
   function tamLvPlan(sp, n) {   // 지금 도토리로 n레벨까지 몇 레벨, 얼마
     const m = tamMem(sp), lv0 = m.lv, lim = Math.min(n, 500); let k = 0, sum = 0;
     try { while (k < lim) { const c = tamLvCost(sp); if (sum + c > S.budget) break; sum += c; m.lv += 1; k++; } } finally { m.lv = lv0; }
@@ -192,7 +192,7 @@
     while (n < 500) { let best = null, bc = Infinity; for (const sp of ps) { const c = tamLvCost(sp); if (c < bc) { bc = c; best = sp; } } if (!best || bc > S.budget) break; S.budget -= bc; tamMem(best).lv += 1; n++; }
     return n;
   }
-  // 4.4.1.1 woodani 요청: 고르게 올리기 전에 쓸 도토리와 결과를 미리 보여 줘요(도토리와 레벨은 그대로 두고 셈만 해요)
+  // 고르게 올리기 전에 쓸 도토리와 결과를 미리 보여 줘요(도토리와 레벨은 그대로 두고 셈만 해요)
   function tamLvAllPlan() {
     const ps = tamParty(), b0 = S.budget, lv0 = ps.map(sp => tamMem(sp).lv), pw0 = tamPow();
     let n = 0, b1 = b0, lv1 = lv0, pw1 = pw0;
@@ -202,7 +202,7 @@
   }
   function tamLvAllAsk() {
     const P = tamLvAllPlan(); if (!P.n) return;
-    // 5.0.4 woodani 요청: 쓰는 도토리, 대원마다 한 줄, 탐험대 힘을 나눠서 보여 줘요(예전에는 창을 열 때 줄바꿈이 지워져 한 덩어리로 보였어요)
+    // 쓰는 도토리, 대원마다 한 줄, 탐험대 힘을 나눠서 보여 줘요(예전에는 창을 열 때 줄바꿈이 지워져 한 덩어리로 보였어요)
     const rows = P.up.filter(u => u.b > u.a).map(u => `<span class="ask-row"><i>${esc(spName(u.sp))}</i><span>Lv.${u.a} → <b>${u.b}</b></span><em>+${u.b - u.a}</em></span>`).join('');
     askBox({ title: '출동 대원 고르게 올리기', yes: '올리기', no: '그만두기',
       html: `<span class="ask-sum">${acornIcon()}<b>${fmtN(P.cost)}</b>${eulOf(fmtN(P.cost))} 써요</span><span class="ask-sub">남는 도토리 ${fmtN(P.left)}</span><span class="ask-rows">${rows}</span><span class="ask-sum">탐험대 힘 ${fmt(P.pw0)} → <b>${fmt(P.pw1)}</b></span>`,
@@ -210,7 +210,7 @@
         if (S.budget >= P.cost && P.up.every(u => tamMem(u.sp).lv === u.a)) { S.budget -= P.cost; for (const u of P.up) tamMem(u.sp).lv = u.b; n = P.n; } else n = tamLvAll();
         if (!n) return; tamLvFx(tamParty()); tamRestartStat(); sfx('coin'); buzz(14); save(); renderHUD(); tamRenderTop(); tamRenderBody(); tamToast(`출동 대원 레벨 +${n}`); } });
   }
-  /* 4.4.1.2 woodani 결정(도전과 도토리 소모처가 되게): 기준 레벨 아래는 1.13배씩 싸지되 기준 값의 1.13^-15(약 16%) 아래로는 안 내려가요.
+  /* 기준 레벨 아래는 1.13배씩 싸지되 기준 값의 1.13^-15(약 16%) 아래로는 안 내려가요
      기준 레벨부터는 한 레벨마다 1.18배씩(전에는 1.13배) 비싸져요(숫자는 제안) */
   const tamLvCost = sp => { const d = tamMem(sp).lv - 1 - tamLvRef(); return tamAcorns(TAM.lvMin * (d < 0 ? Math.pow(TAM.lvCost, Math.max(-15, d)) : Math.pow(TAM.lvUp, Math.min(200, d)))); };
   const tamGearCost = (k, i) => { const L = S.tam.sg[i][k], G = TAM.gear.find(g => g.k === k); return { m: G.mat, n: 4 + 3 * L, star: L % 10 === 9 ? 3 * (1 + Math.floor(L / 10)) : 0 }; };
@@ -242,7 +242,7 @@
     if (fl % 10 === 0) save();
     tamLiveDots();
   }
-  // 4.3.1 woodani: 탐험 화면을 켜 둔 채 재료와 도토리를 얻으면 대원과 장비 칸의 빨간 점과 단추를 바로 바꿔요
+  // 탐험 화면을 켜 둔 채 재료와 도토리를 얻으면 대원과 장비 칸의 빨간 점과 단추를 바로 바꿔요
   function tamLiveDots() {
     if (rt.tab !== 'tam' || !tamFxOn()) return;
     const seg = rt.tamSeg || 'mem';
@@ -250,11 +250,11 @@
   }
   function tamWeek() { const w = gameWeek(); if (S.tam.wk.w !== w) S.tam.wk = { w, best: 0 }; }
   function tamHWeek() { const w = gameWeek(); if (S.tam.hw.w !== w) S.tam.hw = { w, best: 0 }; }
-  // 4.3.3 심화 탐험에서 이긴 층: 도토리, 정수, 황금 도토리는 없고 재료(일반의 1.5배)와 별 조각(숫자는 제안)
+  // 심화 탐험에서 이긴 층: 도토리, 정수, 황금 도토리는 없고 재료(일반의 1.5배)와 별 조각(숫자는 제안)
   function tamWinH(fl) {
     const R = tamReg(fl), got = [], add = (i, v) => { S.tam.mat[i] = Math.min(1e12, S.tam.mat[i] + v); }, first = fl > S.tam.hb;
     S.tam.hb = Math.max(S.tam.hb, fl);
-    if (first && fl % TAM.bossEvery === 0 && ppData(PP.dat.boss)) got.push(`연구 자료 +${PP.dat.boss}`);   // 5.2.0 심화 큰 장난꾸러기 처음 넘기
+    if (first && fl % TAM.bossEvery === 0 && ppData(PP.dat.boss)) got.push(`연구 자료 +${PP.dat.boss}`);   // 심화 큰 장난꾸러기 처음 넘기
     tamHWeek(); if (fl > S.tam.hw.best) { S.tam.hw.best = fl; rankDirty(); }
     add(R.mat, Math.round(TAM.hMat * (2 + Math.floor((S.tam.hc + fl) / 40)))); if (fl % 5 === 0) add(3, 1);
     if (fl % TAM.bossEvery === 0) { const ps = tamParty(); if (tamStarOn() && ps.length) { const sp = ps[Math.floor(Math.random() * ps.length)]; tamShard(sp, 1); got.push(`${spName(sp)} 별 조각 +1`); } else { add(3, 2); got.push(`${TAM.mats[3]} +2`); } }
@@ -263,7 +263,7 @@
     if (fl % 10 === 0) save();
     tamLiveDots();
   }
-  /* 4.4.1 woodani 요청: 탐험 화면을 보지 않을 때는 마지막으로 넘은 층만 되풀이하고, 층은 화면을 볼 때만 올라가요.
+  /* 탐험 화면을 보지 않을 때는 마지막으로 넘은 층만 되풀이하고, 층은 화면을 볼 때만 올라가요
      되풀이한 층은 기본 보상(재료와 도토리, 심화는 재료)만 받아요. 큰 장난꾸러기 정수, 보물 상자, 황금 도토리, 랭킹은 처음 넘을 때만 */
   const tamWatch = () => rt.tab === 'tam' && !document.hidden;
   const tamRepFl = () => Math.max(1, tamCurFl() - 1);
@@ -273,7 +273,7 @@
     else { add(R.mat, 2 + Math.floor(fl / 40)); const a = minAcorns(0.5); S.budget += a; earn(a); }
     tamLiveDots();
   }
-  /* 4.4.1 woodani 요청: 빠른 스킵. 지금 층부터 위로, 대원 한 번 공격(필살기 말고 보통 공격)으로 모든 장난꾸러기가 쓰러지는 층까지만 한 번에 넘어가요.
+  /* 빠른 스킵. 지금 층부터 위로, 대원 한 번 공격(필살기 말고 보통 공격)으로 모든 장난꾸러기가 쓰러지는 층까지만 한 번에 넘어가요
      유리한 과목 덤은 빼고 셈(지역이 바뀌어도 안전하게). 넘은 층은 하나하나 이긴 것과 같은 보상, 사건은 없어요. 한 번에 1000층까지 */
   function tamSkipTo() {
     if (!tamOn() || !tamParty().length) return 0;
@@ -327,7 +327,7 @@
     if (S.tam.spd.sec > (TAM.adSpd.max - TAM.adSpd.min) * 60) { tamToast(`2배속은 ${TAM.adSpd.max}분까지 모을 수 있어요`); return; }
     showAd(() => { tamAdDay(); S.tam.ad.spd += 1; S.tam.spd.sec = Math.min(TAM.adSpd.max * 60, S.tam.spd.sec + TAM.adSpd.min * 60); save(); tamToast(`2배속 ${TAM.adSpd.min}분! 게임을 켜 둔 동안만 줄어요`); tamRenderTop(); }, r => { if (r !== 'noad') tamToast('광고를 끝까지 보지 않아서 보상이 없어요'); });
   }
-  // 4.3.1 📺 응원 받기: 다음 TAM.cheer.fl층 동안 대원 힘과 체력이 세져요(하루 TAM.cheer.n번). 예전 '힘내서 다시 도전'은 실제로 세지지 않았어요
+  // 📺 응원 받기: 다음 TAM.cheer.fl층 동안 대원 힘과 체력이 세져요(하루 TAM.cheer.n번). 예전 '힘내서 다시 도전'은 실제로 세지지 않았어요
   const tamCheerLeft = () => { tamAdDay(); return Math.max(0, TAM.cheer.n - (S.tam.ad.ch || 0)); };
   function tamAdRevive() {
     if (S.tam.cheer > 0) { tamToast(`응원이 아직 ${S.tam.cheer}층 남았어요`); return; }
@@ -339,20 +339,20 @@
   // 겨루는 중에 응원을 받으면 지금 대원도 바로 세져요
   function tamCheerNow(F) { const m = TAM.cheer.mul; F.P.forEach(p => { p.atk *= m; p.mx *= m; p.hp *= m; }); F.cheer = 1; }
   // 매 프레임: 탐험 화면이 아니어도 겨뤄요(그림은 탐험 화면에서만)
-  // 4.3.0 한 층의 흐름: 걷기(배경이 흘러요) → 만남(장난꾸러기가 떨어져요) → 겨루기 → 이김(전리품) → 사건(가끔) → 오르기(다음 층) / 지면 물러났다가 다시
+  // 한 층의 흐름: 걷기(배경이 흘러요) → 만남(장난꾸러기가 떨어져요) → 겨루기 → 이김(전리품) → 사건(가끔) → 오르기(다음 층) / 지면 물러났다가 다시
   // 탐험 화면이 아니어도 같은 시간으로 흘러가요(그림만 안 그려요). 사건은 화면이 아니면 바로 기본 선택
   function tamPh(T, ph) {
     T.ph = ph; T.t = 0; if (rt.tab === 'tam') musicSync();
     tamHSync(); const vis = tamFxOn(), hm = tamHOn(), fl = tamCurFl();
-    if (ph === 'walk' && !hm && tamCapped()) { T.ph = 'cap'; T.F = null; if (vis) { tamWalk(fl); $('#tmP') && $('#tmP').classList.remove('walking'); tamRibbon('clear', tamCapMsg()); tamRenderTop(); } return; }   // 4.3.1 학년 상한
+    if (ph === 'walk' && !hm && tamCapped()) { T.ph = 'cap'; T.F = null; if (vis) { tamWalk(fl); $('#tmP') && $('#tmP').classList.remove('walking'); tamRibbon('clear', tamCapMsg()); tamRenderTop(); } return; }   // 학년 상한
     if (ph === 'walk') { T.F = null; if (vis) tamWalk(fl); }
     else if (ph === 'meet') {
-      const rep = !tamWatch() && !T.mod; T.F = tamFight(rep ? tamRepFl() : fl, tamTeam(), !rep && S.tam.cheer > 0 ? TAM.cheer.mul : 1, T.mod, hm); T.F.cheer = !rep && S.tam.cheer > 0 ? 1 : 0; T.F.rep = rep ? 1 : 0; T.mod = null;   // 4.3.1 응원, 4.4.1 화면 밖이면 마지막으로 넘은 층을 되풀이
+      const rep = !tamWatch() && !T.mod; T.F = tamFight(rep ? tamRepFl() : fl, tamTeam(), !rep && S.tam.cheer > 0 ? TAM.cheer.mul : 1, T.mod, hm); T.F.cheer = !rep && S.tam.cheer > 0 ? 1 : 0; T.F.rep = rep ? 1 : 0; T.mod = null;   // 응원, 화면 밖이면 마지막으로 넘은 층을 되풀이
       if (vis) { tamBuild(); tamAlert(); tamCam(true, T.F.M[0].boss); if (T.F.M[0].boss) { tamRibbon('boss', '큰 장난꾸러기가 나타났어요!'); const w = $('#tmWarn'); if (w && !rt.reduced) { w.hidden = false; $$('i', w).forEach(i => { i.style.animation = 'none'; void i.offsetWidth; i.style.animation = ''; }); clearTimeout(w._t); w._t = setTimeout(() => { w.hidden = true; }, 1500); } } }
     }
     else if (ph === 'win') {
       const f = T.F.fl, hard = T.F.hard, rep = T.F.rep || (!tamWatch() && f >= tamCurFl()); T.nLose = 0; T.lose = 0;
-      if (rep) { tamWinRep(T.F.rep ? f : tamRepFl(), T.F.hm); T.ev = null; }   // 4.4.1 화면 밖에서는 층이 오르지 않아요
+      if (rep) { tamWinRep(T.F.rep ? f : tamRepFl(), T.F.hm); T.ev = null; }   // 화면 밖에서는 층이 오르지 않아요
       else { if (T.F.cheer && S.tam.cheer > 0) S.tam.cheer -= 1; if (T.F.hm) tamWinH(f); else tamWin(f); if (hard) tamWinHard(f);
       T.ev = !T.F.hm && f % TAM.bossEvery && Math.random() < TAM.evP ? tamEvRoll(f) : null; }
       if (vis) { tamRibbon('clear', `${tamFlTx(f, T.F.hm)} 통과!`); tamRenderTop(); tamVictory(f); tamCam(false); }
@@ -368,15 +368,15 @@
     if (!tamOn() || !tamParty().length) return;
     const T = rt.tam || (rt.tam = { ph: '', t: 0, F: null, buff: 0, lose: 0, nLose: 0, ev: null, mod: null });
     if (!T.ph) { tamPh(T, 'walk'); return; }
-    if (tamFxOn() && (rt.tamAcT = (rt.tamAcT || 0) + dt) > 0.4) { rt.tamAcT = 0; tamAcorn(); }   // 4.4.0 위 칸 도토리
-    if (T.ph === 'cap') { if (!tamCapped() || tamHOn()) tamPh(T, 'walk'); return; }   // 4.3.1 학년이 오르면 다시 걸어요
+    if (tamFxOn() && (rt.tamAcT = (rt.tamAcT || 0) + dt) > 0.4) { rt.tamAcT = 0; tamAcorn(); }   // 위 칸 도토리
+    if (T.ph === 'cap') { if (!tamCapped() || tamHOn()) tamPh(T, 'walk'); return; }   // 학년이 오르면 다시 걸어요
     const vis = tamFxOn(), d = dt * (tamSpdOn() ? 2 : 1), P = TAM.ph;
     if (tamSpdOn()) { const was = Math.ceil(S.tam.spd.sec); S.tam.spd.sec = Math.max(0, S.tam.spd.sec - dt); if (vis && Math.ceil(S.tam.spd.sec) !== was) tamRenderTop(); }   // 2배속은 켜 둔 동안만 줄어요
     T.t += d;
     if (T.ph === 'walk') { if (T.t >= P.walk) tamPh(T, 'meet'); }
     else if (T.ph === 'meet') { if (vis && T.F) tamDraw(T.F); if (T.t >= P.meet) tamPh(T, 'fight'); }
     else if (T.ph === 'fight') {
-      if (vis && tamSkBusy()) { T.t -= d; return; }   // 4.3.3 필살기 연출 동안 겨루기는 잠깐 멈춰요(화면을 볼 때만)
+      if (vis && tamSkBusy()) { T.t -= d; return; }   // 필살기 연출 동안 겨루기는 잠깐 멈춰요(화면을 볼 때만)
       if (T.pend) { const r = T.pend; T.pend = 0; tamPh(T, r === 1 ? 'win' : 'lose'); return; }
       const r = tamStep(T.F, d, !!S.tam.auto && tamAutoOn(), Math.random);
       if (vis) tamDraw(T.F); T.F.ev.length = 0;
@@ -418,13 +418,13 @@
   function tamWinHard(fl) { const R = tamReg(fl); S.tam.mat[R.mat] = Math.min(1e12, S.tam.mat[R.mat] + 2 + Math.floor(fl / 40)); }
   /* ----- 그림: 탐험 화면 ----- */
   const tamPic = (k, fb) => tamI(k) || IMG(fb) || '';
-  // 4.3.0 3D 그림(작업지시서 74, 75, ex3_)이 있으면 먼저 쓰고, 없으면 2D 그림(ex_)
+  // 3D 그림(작업지시서 74, 75, ex3_)이 있으면 먼저 쓰고, 없으면 2D 그림(ex_)
   const tamI = k => IMG(String(k).replace(/^ex_/, 'ex3_')) || IMG(k);
   const tamPcPic = (sp, act) => tamI(`ex_pc_${sp}_${act ? 'act' : 'idle'}`) || IMG('chr_' + sp) || '';
   const tamMobPic = (fl, m) => m.boss ? tamPic(`ex_boss_${tamReg(fl).k}`, TAM.bossPh) : tamPic(`ex_mob_${tamReg(fl).k}_${m.i + 1}`, TAM.mobPh[(TAM.reg.indexOf(tamReg(fl)) + m.i) % TAM.mobPh.length]);
-  // 4.3.0 woodani 요청: 탐험대가 층을 오르며 장난꾸러기를 만나는 화려한 화면. 자리(왼쪽 %, 바닥 %), 앞줄부터
-  // 4.3.0 woodani 요청: 맨 앞 장식(풀과 꽃)에 가리지 않게 대원과 장난꾸러기를 14%만큼 위로(TM_UP, 체력 막대까지 보이게)
-  // 5.3.0.2 woodani 요청: 사선 배치(탐험대는 왼쪽 아래, 장난꾸러기는 오른쪽 위). [가로 %, 바닥에서 % (TM_UP 더함)]
+  // 탐험대가 층을 오르며 장난꾸러기를 만나는 화려한 화면. 자리(왼쪽 %, 바닥 %), 앞줄부터
+  // 맨 앞 장식(풀과 꽃)에 가리지 않게 대원과 장난꾸러기를 14%만큼 위로(TM_UP, 체력 막대까지 보이게)
+  // 사선 배치(탐험대는 왼쪽 아래, 장난꾸러기는 오른쪽 위). [가로 %, 바닥에서 % (TM_UP 더함)]
   const TM_UP = 26, TM_PPOS = [[35, 6], [21, 10], [27, -4], [9, 4], [12, 16]];
   const TM_MPOS = [[59, 21], [71, 30], [75, 12]], TM_MPOS1 = [[66, 22]], TM_MPOS2 = [[59, 20], [72, 28]], TM_BPOS = [[67, 18], [50, 35], [53, 12]];   // 오른쪽 단추에 가리지 않게 가운데 쪽으로
   const TM_AMB = { ground: 14, garden: 12, pond: 12, library: 12, yard: 22, tower: 18 };
@@ -441,18 +441,18 @@
     const u = k && (/^ex4_/.test(k) ? IMG(k) : IMG(k.replace(/^ex_/, 'ex3_'))), im = el && el.querySelector('img'); if (!u || !im) return;
     if (!im.dataset.base) im.dataset.base = im.src; clearTimeout(im._h); im.src = u; im._h = setTimeout(() => { if (im.src === u) im.src = im.dataset.base; delete im.dataset.base; }, 340);
   }
-  // 4.3.0 woodani 요청: 탐험에서 받은 것과 알림은 화면 맨 위가 아니라 탐험 무대 가운데에 띄워요(탐험 화면이 아니면 원래 알림)
+  // 탐험에서 받은 것과 알림은 화면 맨 위가 아니라 탐험 무대 가운데에 띄워요(탐험 화면이 아니면 원래 알림)
   function tamToast(msg) {
     const st = $('#tmStage'), m = $('#tmMsg');
-    if (!st || !m || rt.tab !== 'tam' || $('#panelTam').hidden || !$('#tmSheet').hidden) { toast(msg); return; }   // 5.0.1.5 M-01 창이 열려 있으면 무대 알림이 창 뒤에 가려요
+    if (!st || !m || rt.tab !== 'tam' || $('#panelTam').hidden || !$('#tmSheet').hidden) { toast(msg); return; }   // 창이 열려 있으면 무대 알림이 창 뒤에 가려요
     m.textContent = msg; m.hidden = false; m.style.animation = 'none'; void m.offsetWidth; m.style.animation = '';
     clearTimeout(m._t); m._t = setTimeout(() => { m.hidden = true; }, 2600);
   }
   function tamFxOn() { return rt.tab === 'tam' && !rt.modalOpen && !document.hidden; }
-  function tamBg(fl) { return IMG('ex4_bg_' + tamReg(fl).k) || tamI('ex_bg_' + tamReg(fl).k); }   // 4.4.0 세로 배경
-  // 5.3.0.1 겹 배경(작업지시서 104): 하늘, 먼 풍경, 바닥 세 겹(앞 장식은 #tmFg). 그림이 다 있는 지역만, 없으면 예전 한 장
+  function tamBg(fl) { return IMG('ex4_bg_' + tamReg(fl).k) || tamI('ex_bg_' + tamReg(fl).k); }   // 세로 배경
+  // 겹 배경(작업지시서 104): 하늘, 먼 풍경, 바닥 세 겹(앞 장식은 #tmFg). 그림이 다 있는 지역만, 없으면 예전 한 장
   function tamLay(fl) { const k = tamReg(fl).k, u = n => IMG(`ex5_${k}_${n}`), L = { k, sky: u('sky'), far: u('far'), floor: u('floor'), front: u('front') }; return L.sky && L.far && L.floor ? L : null; }
-  // 5.3.0.3 오르는 길: 엔진 바닥이 되는 지역이면 켜요
+  // 오르는 길: 엔진 바닥이 되는 지역이면 켜요
   function tamG6(fl) { const st = $('#tmStage'), on = !!(st && tamLay(fl) && fxgOn(fl) && fxgSet(tamReg(fl).k)); if (st) st.classList.toggle('g6', on); if (!on) fxgHide(); else fxgHeight(fl); return on; }
   function tamBgPaint(el, fl) {
     if (!el) return; const L = tamLay(fl);
@@ -493,7 +493,7 @@
     setH($('#tmP'), party.map((p, i) => { const [x, y] = TM_PPOS[i] || TM_PPOS[0];
       return `<div class="tm-f" data-i="${i}" style="left:${x}%;bottom:${y + TM_UP}%;z-index:${30 - y};${tamDz(y)}--bd:-${(i * 0.37).toFixed(2)}s;--bd2:${(i * 0.06).toFixed(2)}s"><div class="tm-body"><img src="${tamPcPic(p.sp)}" alt="${esc(spName(p.sp))}"></div><i class="tm-hp"><s></s><b></b></i></div>`; }).join(''));
     if (!F) { setH($('#tmM'), ''); return; }
-    const pos = boss ? TM_BPOS : F.M.length === 1 ? TM_MPOS1 : F.M.length === 2 ? TM_MPOS2 : TM_MPOS;   // 4.3.2 마리 수에 맞춘 자리
+    const pos = boss ? TM_BPOS : F.M.length === 1 ? TM_MPOS1 : F.M.length === 2 ? TM_MPOS2 : TM_MPOS;   // 마리 수에 맞춘 자리
     setH($('#tmM'), F.M.map((m, i) => { const [x, y] = pos[i] || pos[0];
       return `<div class="tm-f tm-mob in${m.boss ? ' boss' : ''}${m.solo ? ' solo' : ''}" data-i="${i}" style="left:${x}%;bottom:${y + TM_UP}%;z-index:${30 - y};${tamDz(y)}--bd:-${(i * 0.5).toFixed(2)}s;--id:${(i * 0.12).toFixed(2)}s"><div class="tm-body"><img src="${tamMobPic(F.fl, m)}" alt="${esc(m.nm)}"></div><i class="tm-hp"><s></s><b></b></i></div>`; }).join(''));
     if (boss) tamShake(7, 420);
@@ -527,17 +527,17 @@
     w.animate(k, { duration: ms, easing: 'linear' });
   }
   function tamHitFx(el, cr, big, ri) {
-    fxTamHit(el, cr, big, ri);   // 5.2.2 탐험 효과층(40b-fx-layer.js): 과목 색 반짝이, 먼지, 충격 고리
+    fxTamHit(el, cr, big, ri);   // 탐험 효과층(40b-fx-layer.js): 과목 색 반짝이, 먼지, 충격 고리
     const [x, y] = tamAt(el), rot = Math.round(Math.random() * 90);
-    // 4.4.0 강한 한 방은 금빛 별(ex4_fx_crit), 필살기는 큰 불꽃(ex4_fx_hit_big)과 충격파(ex4_fx_shock)
+    // 강한 한 방은 금빛 별(ex4_fx_crit), 필살기는 큰 불꽃(ex4_fx_hit_big)과 충격파(ex4_fx_shock)
     const hs = (cr && IMG('ex4_fx_crit')) || (big && IMG('ex4_fx_hit_big')) || tamI('ex_fx_hit');
     if (fxTamOn()) fxTamKick();
     if (big && IMG('ex4_fx_shock')) tamFxImg('tm-shock', IMG('ex4_fx_shock'), x, y, [{ t: 'scale(.2)', opacity: 0.9 }, { t: 'scale(1.2)', opacity: 0 }], 520);
     tamFxImg('tm-spark', hs, x + (Math.random() - 0.5) * 12, y, [{ t: `scale(.3) rotate(${rot}deg)`, opacity: 1 }, { t: `scale(${cr ? 1.7 : 1.1}) rotate(${rot + 30}deg)`, opacity: 1, offset: 0.4 }, { t: `scale(${cr ? 2 : 1.3}) rotate(${rot + 40}deg)`, opacity: 0 }], 360);
   }
-  // 4.3.3 woodani 요청(공격이 다 똑같아요): 과목마다 다른 평소 공격. 과학은 포물선 플라스크와 거품, 국어는 물결 음표 셋, 미술은 물감 방울 셋, 수학은 빠른 별과 잔상(체육은 붙어서 들이받기)
+  // 과목마다 다른 평소 공격. 과학은 포물선 플라스크와 거품, 국어는 물결 음표 셋, 미술은 물감 방울 셋, 수학은 빠른 별과 잔상(체육은 붙어서 들이받기)
   function tamShot(fromEl, toEl, ri, onHit) {
-    if (fxTamOn()) { if (FXT.st !== 'ok') fxTamInit(); else fxTamKick(); }   // 5.2.2 날아가는 기술 그림 뒤 반짝이 꼬리
+    if (fxTamOn()) { if (FXT.st !== 'ok') fxTamInit(); else fxTamKick(); }   // 날아가는 기술 그림 뒤 반짝이 꼬리
     const src = tamI(`ex_fx_${TAM.role[ri].k}`); if (!src || !fromEl || !toEl) { if (onHit) onHit(); return; }
     const [x0, y0] = tamAt(fromEl, 0.4), [x1, y1] = tamAt(toEl, 0.45), dx = x1 - x0, dy = y1 - y0;
     const fly = (ms, arc, spin, sc, ox, oy, ease) => tamFxImg('tm-shot', src, x0, y0, [{ t: `scale(${0.5 * sc}) rotate(0deg)`, opacity: 0.3 }, { dx: dx * 0.5 + (ox || 0) / 2, dy: dy * 0.5 + arc + (oy || 0) / 2, t: `scale(${sc}) rotate(${spin / 2}deg)`, opacity: 1, offset: 0.5 }, { dx: dx + (ox || 0), dy: dy + (oy || 0), t: `scale(${1.1 * sc}) rotate(${spin}deg)`, opacity: 1 }], ms, ease || 'linear');
@@ -556,7 +556,7 @@
     }
   }
   function tamDropFx(el, fl) {
-    fxTamDrop(el, fl);   // 5.2.2 탐험 효과층: 도토리와 재료가 튀어 바닥에 굴러요(그림만)
+    fxTamDrop(el, fl);   // 탐험 효과층: 도토리와 재료가 튀어 바닥에 굴러요(그림만)
     const [x, y] = tamAt(el, 0.5), src = IMG(['ex_mat_twig', 'ex_mat_stone', 'ex_mat_petal'][tamReg(fl).mat] || 'ex_mat_star') || IMG('ex_mat_star');
     tamFxImg('tm-poof', tamI('ex_fx_poof'), x, y, [{ t: 'scale(.4)', opacity: 1 }, { t: 'scale(1.3)', opacity: 0 }], 520);
     const st = $('#tmFx').getBoundingClientRect();
@@ -564,14 +564,14 @@
   }
   function tamDraw(F) {
     const P = $$('#tmP .tm-f'), M = $$('#tmM .tm-f');
-    if (P.length !== F.P.length || M.length !== F.M.length || $('#tmM').dataset.fid !== String(F.id)) { tamBuild(); return; }   // 4.3.0 woodani 제보: 다른 판의 쓰러진 대원 그림을 그대로 쓰던 것 고침
-    let actor = -1, sk = null;   // 4.3.3 sk: 필살기 연출 시계로 맞는 때와 회복되는 때
+    if (P.length !== F.P.length || M.length !== F.M.length || $('#tmM').dataset.fid !== String(F.id)) { tamBuild(); return; }   // 다른 판의 쓰러진 대원 그림을 그대로 쓰던 것 고침
+    let actor = -1, sk = null;   // sk: 필살기 연출 시계로 맞는 때와 회복되는 때
     F.ev.forEach((e, ei) => {
       if (e.k === 'act' || e.k === 'big') {
         actor = e.p; sk = null; const el = P[e.p], im = el && el.querySelector('img'); if (!el) return;
         if (e.k === 'big') { const nx = F.ev.slice(ei + 1).find(x => x.k === 'hit'); sk = tamSkillFx(F, e.p, nx ? nx.m : 0); const sp = F.P[e.p].sp; skAt(sk.hit - 900, () => { const a = IMG(`ex4_pc_${sp}_sk`) || tamI(`ex_pc_${sp}_act`); if (a && im) { im.src = a; clearTimeout(el._t); el._t = setTimeout(() => { im.src = tamPcPic(sp); }, 1400); } }); return; }
         el.classList.remove('act', 'far'); void el.offsetWidth; el.classList.add('act'); if (e.ri !== 1) el.classList.add('far'); fxTamDust(el);
-        const a = IMG(`ex4_pc_${F.P[e.p].sp}_atk`) || tamI(`ex_pc_${F.P[e.p].sp}_act`); if (a && im) { im.src = a; clearTimeout(el._t); el._t = setTimeout(() => { im.src = tamPcPic(F.P[e.p].sp); }, 520); }   // 4.4.0 공격 자세(작업지시서 78)
+        const a = IMG(`ex4_pc_${F.P[e.p].sp}_atk`) || tamI(`ex_pc_${F.P[e.p].sp}_act`); if (a && im) { im.src = a; clearTimeout(el._t); el._t = setTimeout(() => { im.src = tamPcPic(F.P[e.p].sp); }, 520); }   // 공격 자세(작업지시서 78)
       } else if (e.k === 'hit') {
         const el = M[e.m], d = fmt(Math.max(1, Math.round(e.d))), cr = e.cr, fromEl = actor >= 0 ? P[actor] : null, ri = actor >= 0 ? F.P[actor].ri : 1, bigHit = !!sk;
         const land = () => { el.classList.remove('hurt'); void el.offsetWidth; el.classList.add('hurt'); tamHitPic(el, F.M[e.m] && !F.M[e.m].boss ? `ex_mob_${tamReg(F.fl).k}_${F.M[e.m].i + 1}_hit` : ''); tamHitFx(el, cr, bigHit, ri); tamFloat(el, d, cr || bigHit ? 'cr' : ''); if (cr && !bigHit) { tamShake(5, 260); tamPunch(); } };
@@ -580,24 +580,24 @@
       else if (e.k === 'heal') { const el = P[e.p], hf = f => sk ? skAt(sk.heal, f) : f(); hf(() => { if (sk && IMG('ex4_sk_kor_heal')) { const [hx, hy] = tamAt(el, 0.55); tamFxImg('tm-pillar', IMG('ex4_sk_kor_heal'), hx, hy, [{ t: 'scaleY(.2)', opacity: 0 }, { t: 'scaleY(1)', opacity: 1, offset: 0.35 }, { dy: -10, t: 'scaleY(1.05)', opacity: 0 }], 1000); } tamFloat(el, '+' + fmt(Math.round(e.d)), 'heal'); const [x, y] = tamAt(el); tamFxImg('tm-spark', tamI('ex_fx_heal'), x, y, [{ t: 'scale(.4)', opacity: 0 }, { t: 'scale(1.2)', opacity: 1, offset: 0.4 }, { dy: -16, t: 'scale(1.4)', opacity: 0 }], 600); }); }
       else if (e.k === 'hurt') {
         const el = P[e.p], mm = M[e.m];
-        if (mm) { mm.classList.remove('act'); void mm.offsetWidth; mm.classList.add('act'); const fm = F.M[e.m]; if (fm) tamHitPic(mm, fm.boss ? `ex_boss_${tamReg(F.fl).k}_atk` : `ex_mob_${tamReg(F.fl).k}_${fm.i + 1}_atk`); }   /* 5.0.3 woodani: 장난꾸러기도 칠 때 공격 자세(작업지시서 92) */
+        if (mm) { mm.classList.remove('act'); void mm.offsetWidth; mm.classList.add('act'); const fm = F.M[e.m]; if (fm) tamHitPic(mm, fm.boss ? `ex_boss_${tamReg(F.fl).k}_atk` : `ex_mob_${tamReg(F.fl).k}_${fm.i + 1}_atk`); }   /* 장난꾸러기도 칠 때 공격 자세(작업지시서 92) */
         setTimeout(() => { el.classList.remove('hurt'); void el.offsetWidth; el.classList.add('hurt'); tamHitPic(el, `ex4_pc_${F.P[e.p].sp}_hurt`); tamFloat(el, fmt(Math.max(1, Math.round(e.d))), 'ouch'); }, 140);
       }
       else if (e.k === 'poof') { const el = M[e.m], go = () => { el.classList.add('out'); tamDropFx(el, F.fl); }; if (sk || tamSkBusy()) skAt(Math.max(sk ? sk.hit : 0, SKQ.end - 600) + 300, go); else setTimeout(go, 300); }
       else if (e.k === 'ko') P[e.p].classList.add('out');
     });
-    if (!tamSkBusy()) tamBars(F);   // 4.3.3 필살기 연출 동안은 맞는 순간에 체력 막대를 줄여요
+    if (!tamSkBusy()) tamBars(F);   // 필살기 연출 동안은 맞는 순간에 체력 막대를 줄여요
     const tb = $('#tmTime'); if (tb) tb.style.width = Math.max(0, 100 - F.t / (F.lim || TAM.limit) * 100) + '%';
     tamSkills(true);
   }
   function tamBars(F) {
     const P = $$('#tmP .tm-f'), M = $$('#tmM .tm-f'); if (P.length !== F.P.length || M.length !== F.M.length) return;
-    const hw = (el, v) => { const w = Math.max(0, v) * 100 + '%', b = el.querySelector('.tm-hp b'), t = el.querySelector('.tm-hp s'); b.style.width = w; if (t) t.style.width = w; };   // 5.3.0.1 흰 꼬리가 조금 늦게 따라 줄어요
+    const hw = (el, v) => { const w = Math.max(0, v) * 100 + '%', b = el.querySelector('.tm-hp b'), t = el.querySelector('.tm-hp s'); b.style.width = w; if (t) t.style.width = w; };   // 흰 꼬리가 조금 늦게 따라 줄어요
     F.P.forEach((p, i) => hw(P[i], p.hp / p.mx));
     F.M.forEach((m, i) => { hw(M[i], m.hp / m.mx); M[i].classList.toggle('weak', m.wk > 0); });
     if (F.M[0] && F.M[0].boss) $('#tmBossBar b').style.width = Math.max(0, F.M[0].hp / F.M[0].mx * 100) + '%';
   }
-  // 4.3.1 woodani 요청(기술이 무엇인지 안 보여요): 과목마다 이름 있는 필살기와 따로 짠 움직임. 맞는 숫자는 움직임이 닿는 순간에 떠요
+  // 과목마다 이름 있는 필살기와 따로 짠 움직임. 맞는 숫자는 움직임이 닿는 순간에 떠요
   const TM_SK = [
     { n: '펑펑 화산 실험', s: '화산 실험', d: '장난꾸러기 모두에게 큰 폭발', hit: 600 },
     { n: '회오리 돌진', s: '회오리 돌진', d: '모두를 밀어내는 돌진', hit: 640 },
@@ -605,7 +605,7 @@
     { n: '무지개 물감 폭탄', s: '무지개 폭탄', d: '모두에게 물감, 한동안 약해져요', hit: 640 },
     { n: '별빛 정답 화살', s: '별빛 화살', d: '가장 약한 하나에게 아주 큰 한 방', hit: 900 }
   ];
-  // 4.3.3 woodani 요청(스킬이 너무 빨리 사라져요, 켜 두는 연출 건너뛰기): 필살기 연출 시계.
+  // 필살기 연출 시계
   // 연출에 딸린 일(맞는 숫자, 회복, 사라짐)은 모두 이 시계로 맞춰요.
   // 연출이 도는 동안(탐험 화면을 보고 있을 때만) 겨루기는 잠깐 멈춰요(tamTick)
   const SKQ = { list: [], t0: 0, shift: 0, end: 0, cutEnd: 0, raf: 0, el: null };
@@ -630,12 +630,12 @@
     const c = $('#tmCut'), st = $('#tmStage'); if (c) c.hidden = true; $('#panelTam').classList.remove('tm-cutting');
     if (st) st.classList.remove('skdim', 'skcam'); if (SKQ.el) { SKQ.el.classList.remove('charge'); SKQ.el = null; }
   }
-  const TM_GC = { sci: '#3FB8FF', pe: '#FF8A2A', kor: '#5CCB4A', art: '#FF5FB0', math: '#FFC21E' };   // 4.3.3 모으기 빛 색
+  const TM_GC = { sci: '#3FB8FF', pe: '#FF8A2A', kor: '#5CCB4A', art: '#FF5FB0', math: '#FFC21E' };   // 모으기 빛 색
   function tamCutIn(ri, sp) {
     const c = $('#tmCut'), pic = IMG(`ex4_pc_${sp}_sk`) || tamI(`ex_pc_${sp}_act`) || IMG('chr_' + sp), cb = IMG(`ex4_cut_${TAM.role[ri].k}`);
-    c.hidden = false; $('#panelTam').classList.add('tm-cutting'); c.dataset.r = TAM.role[ri].k;   // 4.4.1 woodani: 컷인 동안 오른쪽 단추는 잠깐 숨겨요
+    c.hidden = false; $('#panelTam').classList.add('tm-cutting'); c.dataset.r = TAM.role[ri].k;   // 컷인 동안 오른쪽 단추는 잠깐 숨겨요
     c.style.setProperty('--cd', TAM.skCut + 'ms');
-    c.classList.toggle('x4', !!cb); c.style.backgroundImage = cb ? `url("${cb}")` : '';   // 4.4.0 과목 컷인 띠(작업지시서 77)
+    c.classList.toggle('x4', !!cb); c.style.backgroundImage = cb ? `url("${cb}")` : '';   // 과목 컷인 띠(작업지시서 77)
     setH(c, `${pic ? `<img src="${pic}" alt="">` : ''}<span><small>${esc(TAM.role[ri].nm.split(' ')[0])} 필살기</small><b>${esc(TM_SK[ri].n)}!</b></span>`);
     c.style.animation = 'none'; void c.offsetWidth; c.style.animation = '';
   }
@@ -654,9 +654,9 @@
     else skAt(t0, () => {
       SKQ.cutEnd = cutEnd; SKQ.el = el; st.classList.add('skdim'); sfx('quest');
       if (!el) return;
-      if (!rt.reduced) { const a = st.getBoundingClientRect(), r = el.getBoundingClientRect(), cam = st.querySelector('.tm-cam');   // 5.3.0.1 필살기: 쓰는 대원 쪽으로 다가가요(2배 빠르기면 절반)
+      if (!rt.reduced) { const a = st.getBoundingClientRect(), r = el.getBoundingClientRect(), cam = st.querySelector('.tm-cam');   // 필살기: 쓰는 대원 쪽으로 다가가요(2배 빠르기면 절반)
         if (cam && a.width) { cam.style.transformOrigin = `${((r.left + r.width / 2 - a.left) / a.width * 100).toFixed(1)}% ${((r.top + r.height * 0.6 - a.top) / a.height * 100).toFixed(1)}%`; st.style.setProperty('--skz', tamSpdOn() ? 1.07 : 1.14); st.classList.add('skcam'); setTimeout(() => st.classList.remove('skcam'), Math.max(400, cutEnd - t0 + 250)); } } el.classList.add('charge'); el.style.setProperty('--cc', TM_GC[TAM.role[ri].k]);
-      { const im = el.querySelector('img'), u = IMG(`ex4_pc_${p.sp}_sk`); if (im && u) { im.src = u; clearTimeout(el._t); el._t = setTimeout(() => { im.src = tamPcPic(p.sp); }, TAM.skCharge + TAM.skCut + 900); } }   // 4.4.0 필살기 자세
+      { const im = el.querySelector('img'), u = IMG(`ex4_pc_${p.sp}_sk`); if (im && u) { im.src = u; clearTimeout(el._t); el._t = setTimeout(() => { im.src = tamPcPic(p.sp); }, TAM.skCharge + TAM.skCut + 900); } }   // 필살기 자세
       { const cu = IMG(`ex4_sk_${TAM.role[ri].k}_charge`); if (cu) { const [cx, cy] = tamAt(el, 0.6); tamFxImg('tm-ring', cu, cx, cy, [{ t: 'scale(.3) rotate(0deg)', opacity: 0 }, { t: 'scale(1) rotate(60deg)', opacity: 1, offset: 0.4 }, { t: 'scale(1.15) rotate(120deg)', opacity: 0 }], TAM.skCharge + 500); } }
       const [x, y] = tamAt(el, 0.5), sm = tamI(`ex_fx_${TAM.role[ri].k}`), r = st.getBoundingClientRect().width * 0.2;
       for (let k = 0; k < 9; k++) { const a = k / 9 * Math.PI * 2; tamFxImg('tm-note', sm, x, y, [{ dx: Math.cos(a) * r, dy: Math.sin(a) * r, t: 'scale(1)', opacity: 0 }, { dx: Math.cos(a + 1) * r * 0.45, dy: Math.sin(a + 1) * r * 0.45, t: 'scale(.8)', opacity: 1, offset: 0.55 }, { t: 'scale(.2)', opacity: 0 }], TAM.skCharge, 'ease-in'); }
@@ -671,7 +671,7 @@
     at(0, () => { el.classList.remove('cast'); void el.offsetWidth; el.classList.add('cast'); setTimeout(() => el.classList.remove('cast'), 1100); });
     const fxr = () => $('#tmFx').getBoundingClientRect(), A = () => tamAt(el, 0.45);
     const MC = () => { const L = $$('#tmM .tm-f:not(.out)'), fx = fxr(); return L.length ? L.map(m => tamAt(m, 0.5)).reduce((a, b) => [a[0] + b[0] / L.length, a[1] + b[1] / L.length], [0, 0]) : [fx.width * 0.72, fx.height * 0.6]; };
-    // 4.4.0 새 필살기 조각(작업지시서 77)이 있으면 먼저: 과학 폭발과 거품, 체육 회오리와 잎, 국어 노래 고리와 음표, 미술 물감 튐과 방울, 수학 별 폭발과 별
+    // 새 필살기 조각(작업지시서 77)이 있으면 먼저: 과학 폭발과 거품, 체육 회오리와 잎, 국어 노래 고리와 음표, 미술 물감 튐과 방울, 수학 별 폭발과 별
     const X4 = { sci: ['boom', 'bubble'], pe: ['tornado', 'leaf'], kor: ['ring', 'note'], art: ['splash', 'drop'], math: ['burst', 'star'] }[TAM.role[ri].k], x4 = n => IMG(`ex4_sk_${TAM.role[ri].k}_${n}`);
     const big = x4(X4[0]) || tamI(`ex_fx_${TAM.role[ri].k}_big`), small = x4(X4[1]) || tamI(`ex_fx_${TAM.role[ri].k}`);
     if (ri === 0) {   // 과학: 플라스크가 높이 날아가 가운데에서 펑, 거품이 한 번 더
@@ -692,7 +692,7 @@
     } else if (ri === 3) {   // 미술: 물감 비가 내리고 무지개 붓이 화면을 쓸어요
       at(0, () => $$('#tmM .tm-f:not(.out)').forEach((m, k) => { const [x, y] = tamAt(m, 0.45); for (let j = 0; j < 4; j++) setTimeout(() => tamFxImg('tm-shot', small, x + (Math.random() - 0.5) * 40, y, [{ dy: -fxr().height * 0.5, t: 'scale(.6)' }, { t: 'scale(1)' }], 420, 'ease-in'), k * 110 + j * 90); }));
       at(420, () => { const fx = fxr(), W = fx.width, mc = MC(), b2 = document.createElement('img'); b2.className = 'tm-sweep'; b2.src = x4('stroke') || big || ''; b2.alt = ''; $('#tmFx').appendChild(b2);
-        const sh = W * 0.9 * ((b2.naturalHeight && b2.naturalWidth) ? b2.naturalHeight / b2.naturalWidth : 0.45), sy = mc[1] - sh / 2;   // 5.0.0 woodani 제보(무지개 폭탄이 위로 날아가요): 붓 가운데가 장난꾸러기 가운데를 지나가게
+        const sh = W * 0.9 * ((b2.naturalHeight && b2.naturalWidth) ? b2.naturalHeight / b2.naturalWidth : 0.45), sy = mc[1] - sh / 2;   // 붓 가운데가 장난꾸러기 가운데를 지나가게
         b2.animate([{ transform: `translate(${-W * 0.6}px,${sy}px) rotate(-8deg) scale(.9)`, opacity: 0 }, { transform: `translate(${W * 0.15}px,${sy}px) rotate(-4deg) scale(1.05)`, opacity: 1, offset: 0.45 }, { transform: `translate(${W * 0.3}px,${sy}px) rotate(-2deg) scale(1.08)`, opacity: 1, offset: 0.7 }, { transform: `translate(${W * 0.55}px,${sy}px) rotate(0deg) scale(1.1)`, opacity: 0 }], { duration: 1300, easing: 'ease-out', fill: 'forwards' }).onfinish = () => b2.remove(); });
       at(620, () => { tamShake(5, 300); $$('#tmM .tm-f:not(.out)').forEach(m => { m.classList.remove('paint'); void m.offsetWidth; m.classList.add('paint'); if (x4('splash')) { const [x, y] = tamAt(m, 0.5); tamBigImg(x4('splash'), x, y, [{ t: 'scale(.2) rotate(-20deg)', opacity: 1 }, { t: 'scale(.75) rotate(5deg)', opacity: 1, offset: 0.35 }, { t: 'scale(.85)', opacity: 0 }], 1100, 'tm-bigs sm'); } }); });
     } else {   // 수학: 별이 대원 둘레를 돌다가, 가장 약한 장난꾸러기에 과녁, 하늘에서 별 화살
@@ -735,7 +735,7 @@
     st.classList.toggle('lay', !!tamLay(fl)); { const lu = IMG('ex5_light'); if (lu) st.style.setProperty('--ex5-light', `url("${lu}")`); }
     const L = tamLay(fl), wo = { duration: ms, easing: 'cubic-bezier(.3,0,.6,1)', fill: 'forwards' };
     if (!T.climbing && !rt.reduced) {
-      if (L) {   // 5.3.0.1 겹마다 다른 빠르기: 먼 풍경은 천천히, 바닥은 조금 빠르게, 앞 장식은 가장 빠르게
+      if (L) {   // 겹마다 다른 빠르기: 먼 풍경은 천천히, 바닥은 조금 빠르게, 앞 장식은 가장 빠르게
         const far = cur.querySelector('.ly.far'), flo = cur.querySelector('.ly.floor');
         if (far) { far.getAnimations().forEach(a => a.cancel()); far.animate([{ transform: 'translateX(0)' }, { transform: 'translateX(-12%)' }], wo); }
         if (flo) { flo.getAnimations().forEach(a => a.cancel()); flo.animate([{ transform: 'translateX(0)' }, { transform: 'translateX(-9%)' }], wo); }
@@ -776,7 +776,7 @@
     else { tamWalk(tamCurFl()); $('#tmP').classList.remove('walking'); }
   }
   // 오르기: 탐험대가 뛰어오르고 무대가 아래로 흘러 다음 층이 위에서 내려와요
-  // 5.3.0.3 오르는 길: 같은 지역 안에서는 대원이 사선 길을 따라 오른쪽 위로 달리고 바닥이 왼쪽 아래로 흘러요(10층마다 아치문)
+  // 오르는 길: 같은 지역 안에서는 대원이 사선 길을 따라 오른쪽 위로 달리고 바닥이 왼쪽 아래로 흘러요(10층마다 아치문)
   function tamClimbG6(best) {
     const st = $('#tmStage'), T = rt.tam, next = best + 1, pp = $('#tmP'), ms = TAM.ph.climb / tamSpdK() * 900;
     T.climbing = true; pp.classList.remove('jump', 'enter'); pp.classList.add('walking', 'runup');
@@ -812,7 +812,7 @@
     const P = F ? F.P : tamTeam().map(s => ({ ...s, g: 0, hp: 1 }));
     if (!upd || box.children.length !== P.length) setH(box, P.map((p, i) => `<button type="button" class="tm-sk" data-tsk="${i}" aria-label="${esc(spName(p.sp))} 필살기 ${esc(TM_SK[p.ri].n)}"><img src="${IMG('chr_' + p.sp) || ''}" alt=""><i></i><small>${esc(TM_SK[p.ri].s)}</small></button>`).join(''));
     $$('.tm-sk', box).forEach((b, i) => { const p = P[i]; if (!p) return; const r = Math.min(1, p.g / TAM.gauge); b.style.setProperty('--g', (r * 100).toFixed(0) + '%'); b.classList.toggle('ready', r >= 1 && p.hp > 0); b.classList.toggle('out', p.hp <= 0); });
-    if (F && !rt.tamTip && S.tam.best < 2 && P.some(p => p.hp > 0 && p.g >= TAM.gauge)) { rt.tamTip = 1; tamToast('게이지가 다 찼어요!\n반짝이는 대원 얼굴을 눌러요'); }   // 4.3.1 처음 1~2층 안내(켤 때마다 한 번)
+    if (F && !rt.tamTip && S.tam.best < 2 && P.some(p => p.hp > 0 && p.g >= TAM.gauge)) { rt.tamTip = 1; tamToast('게이지가 다 찼어요!\n반짝이는 대원 얼굴을 눌러요'); }   // 처음 1~2층 안내(켤 때마다 한 번)
   }
   function tamCast(i) {
     const F = rt.tam && rt.tam.F; if (!F) return;
@@ -823,28 +823,28 @@
     tamHSync(); const hm = tamHOn(), fl = tamCurFl(), R = tamReg(fl), lap = hm ? 0 : tamLap(fl);
     $('#tmReg').textContent = R.nm + (lap ? ` (${lap + 1}바퀴째)` : '');
     $('#tmFl').textContent = tamFlTx(fl, hm);
-    { const md = $('#tmMode'); md.hidden = !tamHOpen(); $$('[data-tmm]', md).forEach(b => b.setAttribute('aria-pressed', String(+b.dataset.tmm === (hm ? 1 : 0)))); }   // 4.3.3 심화 탐험
-    $('#tmBest').innerHTML = hm ? `<span>심화 최고</span>${fmt(S.tam.hb)}층` : (S.tam.best ? `<span>최고층</span>${fmt(S.tam.best)}층` : '<span>첫 탐험</span>') + (isFinite(tamCap()) ? `<small class="tm-cap">${tamCapped() ? '이번 학기 끝! 심화 탐험으로 가요' : `이번 학기 ${fmt(tamCap())}층까지`}</small>` : '');   // 4.3.1
-    { const pw = tamPow(), el = $('#tmPow'), fu = tamI('ex_flag');   // 4.3.2 탐험대 힘 칸: 깃발 그림과 큰 숫자, 힘이 오르면 한 번 들썩
+    { const md = $('#tmMode'); md.hidden = !tamHOpen(); $$('[data-tmm]', md).forEach(b => b.setAttribute('aria-pressed', String(+b.dataset.tmm === (hm ? 1 : 0)))); }   // 심화 탐험
+    $('#tmBest').innerHTML = hm ? `<span>심화 최고</span>${fmt(S.tam.hb)}층` : (S.tam.best ? `<span>최고층</span>${fmt(S.tam.best)}층` : '<span>첫 탐험</span>') + (isFinite(tamCap()) ? `<small class="tm-cap">${tamCapped() ? '이번 학기 끝! 심화 탐험으로 가요' : `이번 학기 ${fmt(tamCap())}층까지`}</small>` : '');
+    { const pw = tamPow(), el = $('#tmPow'), fu = tamI('ex_flag');   // 탐험대 힘 칸: 깃발 그림과 큰 숫자, 힘이 오르면 한 번 들썩
       setH(el, `${fu ? `<img src="${fu}" alt="">` : ''}<span><small>탐험대 힘</small><b>${fmt(pw)}</b></span>`); el.setAttribute('aria-label', `탐험대 힘 ${fmt(pw)}`);
       if (rt.tamPw && pw > rt.tamPw) { el.classList.remove('up'); void el.offsetWidth; el.classList.add('up'); }
       rt.tamPw = pw; }
     tamAdDay();
-    // 4.4.0 오른쪽 둥근 단추(그림, 짧은 이름, 남은 횟수). 읽어 주는 이름은 aria-label에 길게
+    // 오른쪽 둥근 단추(그림, 짧은 이름, 남은 횟수). 읽어 주는 이름은 aria-label에 길게
     const rb = (el, ic, nm, sub, ad, lab) => { const k = [ic, nm, sub, ad].join('|'); if (el._k !== k) { el._k = k; const u = IMG(ic), a = ad && IMG('ex4_ic_ad'); setH(el, `${a ? `<img class="tm-adb" src="${a}" alt="">` : ''}${u ? `<img src="${u}" alt="">` : ''}<small>${esc(nm)}</small>${sub ? `<em>${esc(sub)}</em>` : ''}`); } el.setAttribute('aria-label', lab); };
     const sb = $('#tmSpd'); sb.classList.toggle('on', tamSpdOn());
     const left = TAM.adSpd.n - S.tam.ad.spd;
     rb(sb, 'ex4_ic_speed', tamSpdOn() ? hms(S.tam.spd.sec * 1000) : '광고 2배속', `${left}`, !tamSpdOn() || left > 0, tamSpdOn() ? `2배속 ${hms(S.tam.spd.sec * 1000)} 남음` : `광고 보고 2배속 ${TAM.adSpd.min}분, 오늘 ${left}번 남음`);
     const ab = $('#tmAuto'); ab.hidden = !tamAutoOn(); ab.setAttribute('aria-pressed', S.tam.auto ? 'true' : 'false'); rb(ab, 'ex4_ic_auto', S.tam.auto ? '필살기 자동' : '필살기 수동', '', false, S.tam.auto ? '필살기 자동 켬' : '필살기 자동 끔');
-    { const so = $('#tmSkOff'); so.hidden = !S.tam.skSeen; so.setAttribute('aria-pressed', S.tam.skOff ? 'true' : 'false'); rb(so, 'ex4_ic_report', S.tam.skOff ? '필살기 연출 짧게' : '필살기 연출 보기', '', false, S.tam.skOff ? '필살기 연출 건너뛰기 켬' : '필살기 연출 건너뛰기 끔'); }   // 4.3.3 필살기를 한 번 본 뒤에 생겨요
-    { const sk = $('#tmSkip'), to = tamSkipTo(); sk.hidden = !to; if (to) { rb(sk, 'ex_flag', '빠르게 넘기', `${fmt(to)}층`, false, `빠르게 넘기: ${fmt(to)}층까지 한 번에 넘어가요`);   // 4.4.1
+    { const so = $('#tmSkOff'); so.hidden = !S.tam.skSeen; so.setAttribute('aria-pressed', S.tam.skOff ? 'true' : 'false'); rb(so, 'ex4_ic_report', S.tam.skOff ? '필살기 연출 짧게' : '필살기 연출 보기', '', false, S.tam.skOff ? '필살기 연출 건너뛰기 켬' : '필살기 연출 건너뛰기 끔'); }   // 필살기를 한 번 본 뒤에 생겨요
+    { const sk = $('#tmSkip'), to = tamSkipTo(); sk.hidden = !to; if (to) { rb(sk, 'ex_flag', '빠르게 넘기', `${fmt(to)}층`, false, `빠르게 넘기: ${fmt(to)}층까지 한 번에 넘어가요`);
       if (rt.tamSkTo !== to && (!rt.tamSkTo || to > rt.tamSkTo + 9)) tamToast(`누르면 ${fmt(to)}층까지 빠르게 넘길 수 있어요`); } rt.tamSkTo = to; }
-    const T = rt.tam, rv = $('#tmRevive'), cl = tamCheerLeft(); rv.hidden = !(S.tam.cheer > 0 || (T && T.lose && cl > 0));   // 4.3.1 지면 응원 단추, 응원 중에는 남은 층
+    const T = rt.tam, rv = $('#tmRevive'), cl = tamCheerLeft(); rv.hidden = !(S.tam.cheer > 0 || (T && T.lose && cl > 0));   // 지면 응원 단추, 응원 중에는 남은 층
     rb(rv, 'ex4_ic_cheer', S.tam.cheer > 0 ? `응원 ${S.tam.cheer}층` : '응원', S.tam.cheer > 0 ? '' : `${cl}`, S.tam.cheer <= 0, S.tam.cheer > 0 ? `응원 ${S.tam.cheer}층 남음` : `광고 보고 응원 받기 힘 +${Math.round((TAM.cheer.mul - 1) * 100)}%, 오늘 ${cl}번 남음`); rv.classList.toggle('on', S.tam.cheer > 0);
     tamAcorn(true);
     const I = tamIdle(), rp = $('#tmRep'); rp.hidden = I.sec < 60; rp.textContent = `탐험 보고서 받기 (${Math.floor(I.sec / 60)}분)`;
   }
-  // 4.3.0 woodani 요청: 강화 추천과 자동 편성
+  // 강화 추천과 자동 편성
   const tamScore = s => s.atk * 6 / s.cd + s.hp / 4;
   // 자동 편성: 과목마다 가장 센 대원 한 명씩 먼저(여러 과목이 함께), 지역에서 유리한 과목과 체육, 국어를 먼저 챙기고 남는 칸은 힘 순
   function tamAutoTeam() {
@@ -856,7 +856,7 @@
     for (const p of av) { if (pick.length >= n) break; if (!pick.includes(p)) pick.push(p); }
     return pick.map(p => p.sp);
   }
-  // 4.4.2 woodani 요청: 자동 편성이 지금보다 센 조합이면 얼마나 세지는지(아니면 0). 대원 단추와 아래 메뉴에 표시해요
+  // 자동 편성이 지금보다 센 조합이면 얼마나 세지는지(아니면 0). 대원 단추와 아래 메뉴에 표시해요
   function tamAutoGain() {
     const keep = S.tam.party, p0 = tamPow(), auto = tamAutoTeam();
     if (auto.length === tamParty().length && auto.every(k => keep.includes(k))) return 0;
@@ -876,11 +876,11 @@
   const tamMatImg = i => IMG(['ex_mat_twig', 'ex_mat_stone', 'ex_mat_petal', 'ex_mat_star'][i]);
   const tamMatIc = (i, px) => { const u = tamMatImg(i); return u ? `<img class="tm-mi" src="${u}" alt="${TAM.mats[i]}" style="width:${px}px;height:${px}px">` : TAM.matIc[i]; };
   function tamTabs(seg, rec) {
-    const can = rec.mem && S.budget >= rec.mem.c || tamAutoGain() > 0, gc = !!rec.gear;   // 4.4.2 더 센 조합이 있어도 대원에 빨간 점
+    const can = rec.mem && S.budget >= rec.mem.c || tamAutoGain() > 0, gc = !!rec.gear;   // 더 센 조합이 있어도 대원에 빨간 점
     const ic = { mem: tamI(`ex_pc_${tamParty()[0] || 'bear'}_idle`) || IMG('chr_bear'), gear: IMG('ex_gear_tool_1'), mat: IMG('ex_mat_star') };
     setH($('#tmSeg'), [['mem', '대원', can], ['gear', '장비', gc], ['mat', '재료', false]].map(([k, n, dot]) =>
       `<button type="button" data-tseg="${k}" aria-pressed="${seg === k}">${ic[k] ? `<img src="${ic[k]}" alt="">` : ''}<span>${n}</span>${dot ? '<i class="tm-dot"></i>' : ''}</button>`).join(''));
-    const sh = $('#tmSheet'), open = sh && !sh.hidden;   // 4.4.0 아래 메뉴: 빨간 점, 열린 창 이름
+    const sh = $('#tmSheet'), open = sh && !sh.hidden;   // 아래 메뉴: 빨간 점, 열린 창 이름
     $$('#tmNav [data-tnav]').forEach(b => { const k = b.dataset.tnav; b.classList.toggle('dot', k === 'mem' ? !!can : k === 'gear' ? gc : k === 'rep' ? tamIdle().sec >= 60 : false); b.setAttribute('aria-pressed', String(open && seg === k)); });
     if (open) $('#tmShT').textContent = { mem: '대원', gear: '장비', mat: '재료' }[seg] || '대원';
   }
@@ -901,14 +901,14 @@
       { const R0 = tamReg(tamCurFl()), ar = TAM.role[tamAdvRi()], cl = tamCollLv();
         h += `<div class="tm-tips"><p><b class="tm-role" style="--rc:${TM_RC[ar.k]}">${esc(ar.nm.split(' ')[0])}</b> ${esc(R0.nm)}에서 힘 +${Math.round(TAM.advG * 100)}%</p>` +
           `<p><b class="tm-role">보유 효과</b> 대원 레벨 합 ${fmt(cl)} → 힘 +${(Math.min(TAM.collMax, 1 + TAM.collG * cl) * 100 - 100).toFixed(1)}%</p></div>`; }
-      { const gain = same ? 0 : tamAutoGain();   // 4.4.2 더 센 조합이 있으면 단추를 반짝이고 늘어나는 힘을 보여 줘요
+      { const gain = same ? 0 : tamAutoGain();   // 더 센 조합이 있으면 단추를 반짝이고 늘어나는 힘을 보여 줘요
         h += `<div class="tm-prow"><span>대원 ${party.length}/${slots}명</span><button type="button" class="btn-sub small${gain ? ' tm-auto-hot' : ''}" data-tauto="1"${same ? ' aria-disabled="true"' : ''}>${same ? '가장 좋은 조합이에요' : gain ? `더 센 조합 있어요 <b>힘 +${fmt(gain)}</b>` : '자동 편성'}</button></div>`; }
-      { const lvN = rt.tamLvN || 1, allC = Math.min(...party.map(tamLvCost));   // 4.3.2 한 번에 올리기
+      { const lvN = rt.tamLvN || 1, allC = Math.min(...party.map(tamLvCost));   // 한 번에 올리기
         h += `<div class="tm-lvrow"><span class="tm-lvn" role="group" aria-label="한 번에 올릴 레벨">한 번에${[[1, '1'], [10, '10'], [Infinity, '최대']].map(([v, t]) => `<button type="button" data-tlvn="${v === Infinity ? 'max' : v}" aria-pressed="${lvN === v}">${t}</button>`).join('')}</span>` +
           `<button type="button" class="cta small" data-tlvall="1"${party.length && S.budget >= allC ? '' : ' aria-disabled="true"'}>고르게 올리기</button></div>`; }
       h += tamAvail().slice().sort((a, b) => (party.includes(b) - party.includes(a)) || (tamScore(tamStat(b)) - tamScore(tamStat(a)))).map(sp => {
         const m = tamMem(sp), on = party.includes(sp), s = tamStat(sp), r = TAM.role[s.ri], best = R && R.sp === sp, sug = !on && auto.includes(sp);
-        const lvN = rt.tamLvN || 1, P = lvN > 1 ? tamLvPlan(sp, lvN) : null, c = P && P.k ? P.sum : tamLvCost(sp), can = S.budget >= c;   // 4.3.2 한 번에 여러 레벨
+        const lvN = rt.tamLvN || 1, P = lvN > 1 ? tamLvPlan(sp, lvN) : null, c = P && P.k ? P.sum : tamLvCost(sp), can = S.budget >= c;   // 한 번에 여러 레벨
         const st = tamStarOn() ? `<span class="tm-st">${'★'.repeat(m.st)}<i>${'★'.repeat(5 - m.st)}</i></span>${m.st < 5 ? `<small class="tm-sh">별 조각 ${m.sh}/${tamStarNeed(m.st + 1)}</small>` : ''}` : '';
         return `<div class="tm-mem${on ? ' on' : ''}${best ? ' best' : ''}"><span class="tm-face" style="--rc:${TM_RC[r.k]}"><img src="${tamPcPic(sp)}" alt="">${on ? '<i>출동</i>' : ''}</span>` +
           `<div class="tm-mtx"><b>${esc(spName(sp))}<em>Lv.${m.lv}</em>${sug ? '<u>추천</u>' : ''}${s.ri === tamAdvRi() ? '<u class="adv">유리</u>' : ''}</b><span class="tm-role" style="--rc:${TM_RC[r.k]}">${r.nm}</span><small>힘 ${fmt(Math.round(s.atk))}  체력 ${fmt(Math.round(s.hp))}</small>${st}</div>` +
@@ -916,9 +916,9 @@
       }).join('');
       setH(box, h);
     } else if (seg === 'gear') {
-      // 4.3.0 칸 장비: 대원이 아니라 칸을 강화해요. 대원을 바꿔도 그 칸의 장비는 그대로 남아요
+      // 칸 장비: 대원이 아니라 칸을 강화해요. 대원을 바꿔도 그 칸의 장비는 그대로 남아요
       const team = tamTeam(), slots = tamSlots(), rg = rec.gear;
-      let h = '';   // 5.0.4 설명 줄을 뺐어요(칸마다 '1번 칸'과 대원 이름이 보여요)
+      let h = '';   // 설명 줄을 뺐어요(칸마다 '1번 칸'과 대원 이름이 보여요)
       if (rg) { const G = TAM.gear.find(g => g.k === rg.k), gu = IMG(`ex_gear_${rg.k}_${tamGrade(S.tam.sg[rg.i][rg.k])}`);
         h += `<div class="tm-rec"><span class="tm-rtag">추천 강화</span>${gu ? `<img src="${gu}" alt="">` : ''}<div class="tm-rtx"><b>${rg.i + 1}번 칸 ${G.nm} Lv.${S.tam.sg[rg.i][rg.k]} → ${S.tam.sg[rg.i][rg.k] + 1}</b><small>탐험대 힘 +${fmt(Math.max(1, Math.round(rg.g)))}</small><small class="tm-hold">👆 꾹 누르면 계속 올라가요</small></div>` +
           `<button type="button" class="cta small" data-tgear="${rg.i}:${rg.k}">${tamMatIc(rg.c.m, 18)}${rg.c.n}${rg.c.star ? ` ${tamMatIc(3, 18)}${rg.c.star}` : ''}</button></div>`; }
@@ -937,17 +937,17 @@
     }
   }
   function tamOpen() {
-    if (FXL.st === 'ok' && !FXT.st) fxTamInit();   // 5.2.2 탐험 효과층을 미리 준비
-    if (FXL.st === 'ok' && !FXG.st) fxgInit();   // 5.3.0.3 오르는 길 바닥
+    if (FXL.st === 'ok' && !FXT.st) fxTamInit();   // 탐험 효과층을 미리 준비
+    if (FXL.st === 'ok' && !FXG.st) fxgInit();   // 오르는 길 바닥
     if (!tamOn()) return;
-    if (!S.tam.seen) { S.tam.seen = 1; S.tam.it = S.tam.it || gameNow(); save();   // 4.3.1 처음 열면 소개 장면(자동 시험에서는 __TAM_INTRO일 때만)
+    if (!S.tam.seen) { S.tam.seen = 1; S.tam.it = S.tam.it || gameNow(); save();   // 처음 열면 소개 장면(자동 시험에서는 __TAM_INTRO일 때만)
       const shown = !(window.__FOREST_TEST && !window.__TAM_INTRO) && stPlay('tam', false);
       if (!shown) tamToast('밤이면 학교에 숲의 장난꾸러기들이 와요!\n탐험대와 함께 달래 주러 가요'); }
     tamUiInit(); tamSkStop(); tamRenderTop(); tamSync(); tamRenderBody();
-    { const today = gameToday(), en = $('#tmEnter'); if (en && S.tam.ed !== today && !window.__FOREST_TEST) { S.tam.ed = today; save(); en.hidden = false; en.style.animation = 'none'; void en.offsetWidth; en.style.animation = ''; clearTimeout(en._t); en._t = setTimeout(() => { en.hidden = true; }, 1600); } }   // 4.4.0 woodani 결정: 입장 장면은 하루 처음만
+    { const today = gameToday(), en = $('#tmEnter'); if (en && S.tam.ed !== today && !window.__FOREST_TEST) { S.tam.ed = today; save(); en.hidden = false; en.style.animation = 'none'; void en.offsetWidth; en.style.animation = ''; clearTimeout(en._t); en._t = setTimeout(() => { en.hidden = true; }, 1600); } }   // 입장 장면은 하루 처음만
     tamReport(true);
   }
-  // 4.4.0 화면 틀과 아이콘 그림(작업지시서 77)을 한 번만 CSS 변수와 img에 넣어요
+  // 화면 틀과 아이콘 그림(작업지시서 77)을 한 번만 CSS 변수와 img에 넣어요
   function tamUiInit() {
     if (rt.tamUi) return; rt.tamUi = 1;
     const P = $('#panelTam'), v = (n, k) => { const u = IMG(k); if (u) P.style.setProperty(n, `url("${u}")`); };
@@ -955,18 +955,18 @@
     v('--x4-skf', 'ex4_ui_sk_frame'); v('--x4-skr', 'ex4_ui_sk_ready'); v('--x4-bot', 'ex4_ui_bottom'); v('--x4-aura', 'ex4_boss_aura'); v('--x4-warn', 'ex4_boss_warn'); v('--x4-enter', 'ex4_enter'); v('--x4-acorn', 'ic_acorn');
     $$('#panelTam img[data-x4]').forEach(im => { const u = IMG(im.dataset.x4); if (u) im.src = u; });
   }
-  // 4.4.0 위 칸 도토리(탐험 화면을 볼 때만 바꿔요)
+  // 위 칸 도토리(탐험 화면을 볼 때만 바꿔요)
   function tamAcorn(force) {
     const e = $('#tmAcN'); if (!e) return; const t = fmt2(S.budget); if (!force && e.textContent === t) return;
-    e.textContent = t; rt.tamAc = S.budget; e.style.fontSize = ''; let z = parseFloat(getComputedStyle(e).fontSize); while (e.scrollWidth > e.clientWidth + 0.5 && z > 9) { z -= 0.5; e.style.fontSize = z + 'px'; }   // 글자가 바뀔 때만(0.4초마다 한 번까지) 칸에 맞춰요   // 4.4.1 woodani: 들썩임 없이, 홈처럼 두 단위까지
+    e.textContent = t; rt.tamAc = S.budget; e.style.fontSize = ''; let z = parseFloat(getComputedStyle(e).fontSize); while (e.scrollWidth > e.clientWidth + 0.5 && z > 9) { z -= 0.5; e.style.fontSize = z + 'px'; }   // 글자가 바뀔 때만(0.4초마다 한 번까지) 칸에 맞춰요. 들썩임 없이, 홈처럼 두 단위까지
   }
-  // 4.4.0 대원 레벨이 오르면 무대 위 그 대원 발밑에서 금빛 기둥(ex4_fx_levelup)
+  // 대원 레벨이 오르면 무대 위 그 대원 발밑에서 금빛 기둥(ex4_fx_levelup)
   function tamLvFx(sps) {
     const u = IMG('ex4_fx_levelup'), T = rt.tam, F = T && T.F; if (!u || !tamFxOn()) return;
     const team = F ? F.P : tamTeam(), P = $$('#tmP .tm-f');
     team.forEach((p, i) => { if (!sps.includes(p.sp) || !P[i]) return; const [x, y] = tamAt(P[i], 0.55); tamFxImg('tm-lvup', u, x, y, [{ t: 'scaleY(.2)', opacity: 0 }, { t: 'scaleY(1)', opacity: 1, offset: 0.3 }, { dy: -12, t: 'scaleY(1.05)', opacity: 0 }], 900); });
   }
-  // 칸 장비 한 단계 올리기(재료가 모자라거나 잠긴 칸이면 false). 5.0.4 꾹 누르기도 함께 써요
+  // 칸 장비 한 단계 올리기(재료가 모자라거나 잠긴 칸이면 false). 꾹 누르기도 함께 써요
   function tamGearBuy(i, k) {
     if (!S.tam.sg[i] || !(k in S.tam.sg[i]) || i >= tamSlots()) return false;
     const c = tamGearCost(k, i); if (S.tam.mat[c.m] < c.n || S.tam.mat[3] < c.star) return false;
@@ -976,15 +976,15 @@
     const b = e.target.closest('button'); if (!b || !tamOn()) return;
     if (b.getAttribute('aria-disabled') === 'true' && !(b.dataset.tlv && S.budget >= tamLvCost(b.dataset.tlv))) { if (b.dataset.tlv) tamToast('도토리가 모자라요\n문방구에서 숲의 정수로 도토리를 살 수 있어요'); else if (b.dataset.tgear) tamToast('재료가 모자라요'); return; }
     if (b.dataset.tsk) { tamCast(+b.dataset.tsk); return; }
-    if (b.dataset.tmm) { const v = +b.dataset.tmm; if ((v && !tamHOpen()) || (rt.tam && rt.tam.ph === 'event')) return; if ((S.tam.hm ? 1 : 0) === v) return; S.tam.hm = v; tamHSync(); sfx('tap'); save(); tamSkStop(); tamRestart(); tamRenderTop(); tamRenderBody(); musicSync(); return; }   // 4.3.3 심화 탐험
-    if (b.id === 'tmExit') { sfx('tap'); setTab('school'); return; }   // 4.4.0
+    if (b.dataset.tmm) { const v = +b.dataset.tmm; if ((v && !tamHOpen()) || (rt.tam && rt.tam.ph === 'event')) return; if ((S.tam.hm ? 1 : 0) === v) return; S.tam.hm = v; tamHSync(); sfx('tap'); save(); tamSkStop(); tamRestart(); tamRenderTop(); tamRenderBody(); musicSync(); return; }   // 심화 탐험
+    if (b.id === 'tmExit') { sfx('tap'); setTab('school'); return; }
     if (b.id === 'tmShX') { sfx('tap'); $('#tmSheet').hidden = true; tamRenderBody(); return; }
     if (b.dataset.tnav) { const k = b.dataset.tnav; sfx('tap');
-      if (k === 'rank') { rt.rankView = 'tam'; setTab('rank'); rt.backTab = 'tam'; return; }   // 5.0.1.6 M-08 닫으면 탐험으로
+      if (k === 'rank') { rt.rankView = 'tam'; setTab('rank'); rt.backTab = 'tam'; return; }   // 닫으면 탐험으로
       if (k === 'rep') { tamReport(false); return; }
       const sh = $('#tmSheet'); if (!sh.hidden && rt.tamSeg === k) { sh.hidden = true; tamRenderBody(); return; }
       rt.tamSeg = k; sh.hidden = false; $('#tmBody').scrollTop = 0; tamRenderBody(); return; }
-    if (b.id === 'tmSkOff') { S.tam.skOff = S.tam.skOff ? 0 : 1; sfx('tap'); save(); tamRenderTop(); return; }   // 4.3.3 woodani 요청: 켜 두는 필살기 연출 건너뛰기
+    if (b.id === 'tmSkOff') { S.tam.skOff = S.tam.skOff ? 0 : 1; sfx('tap'); save(); tamRenderTop(); return; }   // 켜 두는 필살기 연출 건너뛰기
     if (b.dataset.tev) { const T = rt.tam; if (T && T.ph === 'event') { sfx('tap'); tamEvPick(T, +b.dataset.tev); } return; }
     if (b.dataset.tauto) { S.tam.party = tamAutoTeam(); sfx('coin'); save(); tamRestart(); tamRenderTop(); tamRenderBody(); tamSkills(); tamToast('가장 힘센 조합으로 편성했어요'); return; }
     if (b.dataset.tseg) { rt.tamSeg = b.dataset.tseg; sfx('tap'); tamRenderBody(); return; }
@@ -994,8 +994,8 @@
       else { if (P.length >= tamSlots()) { tamToast(`대원은 ${tamSlots()}명까지예요. 먼저 한 명을 빼 주세요`); return; } S.tam.party = P.concat(sp); }
       sfx('tap'); save(); tamRestart(); tamRenderTop(); tamRenderBody(); tamSkills(); return;
     }
-    if (b.dataset.tlvn) { rt.tamLvN = b.dataset.tlvn === 'max' ? Infinity : +b.dataset.tlvn; sfx('tap'); tamRenderBody(); return; }   // 4.3.2
-    if (b.dataset.tlvall) { sfx('tap'); tamLvAllAsk(); return; }   // 4.4.1.1 미리 보기 창 뒤에 올려요
+    if (b.dataset.tlvn) { rt.tamLvN = b.dataset.tlvn === 'max' ? Infinity : +b.dataset.tlvn; sfx('tap'); tamRenderBody(); return; }
+    if (b.dataset.tlvall) { sfx('tap'); tamLvAllAsk(); return; }   // 미리 보기 창 뒤에 올려요
     if (b.dataset.tlv) { const sp = b.dataset.tlv, inRec = !!b.closest('.tm-rec'), n = tamLvBuy(sp, inRec ? 1 : (rt.tamLvN || 1)); if (!n) return; tamLvFx([sp]); tamRestartStat(); sfx('coin'); buzz(10); save(); renderHUD(); tamRenderTop(); tamRenderBody(); if (n > 1) tamToast(`${spName(sp)} 레벨 +${n}`); return; }
     if (b.dataset.tgear) { const [si, k] = b.dataset.tgear.split(':'); if (!tamGearBuy(+si, k)) return; tamRestartStat(); sfx('coin'); save(); tamRenderTop(); tamRenderBody(); return; }
     if (b.id === 'tmSpd') { tamAdSpd(); return; }
@@ -1004,7 +1004,7 @@
     if (b.id === 'tmRevive') { tamAdRevive(); return; }
     if (b.id === 'tmRep') { tamReport(false); return; }
   }
-  // 4.2.0 오늘의 광고 도장(하루 6개). 날짜가 바뀌면 도장과 '한 판 더'를 새로
+  // 오늘의 광고 도장(하루 6개). 날짜가 바뀌면 도장과 '한 판 더'를 새로
   function adxDay() { if (!S.adx) S.adx = freshAdx(); const t = gameToday(); if (S.adx.day !== t) { const f = freshAdx(); f.day = t; S.adx = f; } }
   function adStamp() {
     if (!S) return [];
@@ -1030,7 +1030,7 @@
       Array.from({ length: ADX.max }, (_, i) => `<i class="${i < S.adx.n ? 'on' : ''}${gift.includes(i + 1) ? ' gift' : ''}">${i < S.adx.n ? '✓' : i + 1}</i>`).join('') + '</span>' +
       `<small>${ADX.st.map(([need, ess, tk, amt], i) => `<span class="${S.adx.got[i] ? 'ok' : ''}">${need}개: 숲의 정수 ${ess}, ${tk === 'm5' ? '5분권' : '30분권'} ${amt}장</span>`).join('')}</small>`);
   }
-  // 4.2.0 고등학교부터 도토리 광고(자리 비운 동안, 보충수업)에 보상 고르기
+  // 고등학교부터 도토리 광고(자리 비운 동안, 보충수업)에 보상 고르기
   const adPickOn = () => !!S && S.tier >= ADX.tier;
   const conNear = () => (S && S.bd ? Object.keys(S.bd).filter(k => conOn(k) && conLeft(k) > 0).sort((a, b) => S.bd[a].e - S.bd[b].e)[0] : '') || '';
   const adPickNow = () => adPickOn() ? (rt.adPick === 'con' && !conNear() ? 'acorn' : rt.adPick || 'acorn') : 'acorn';
@@ -1053,15 +1053,15 @@
   function renderShopBtn() {
     $('#goldN').textContent = fmt(S.gold);
     $('#btnShop').setAttribute('aria-label', `꾸미기 백화점, 황금 도토리 ${fmt(S.gold)}개`);
-    { const b = $('#btnShop'), sv = b.querySelector('svg'); if (IMG('ic_gold_acorn') && sv && !b.dataset.img) { b.dataset.img = '1'; sv.outerHTML = GOLD_ICON; } }   // 3.1.2 그림 황금 도토리
+    { const b = $('#btnShop'), sv = b.querySelector('svg'); if (IMG('ic_gold_acorn') && sv && !b.dataset.img) { b.dataset.img = '1'; sv.outerHTML = GOLD_ICON; } }   // 그림 황금 도토리
   }
   // 꾸민 모습을 학교에 입혀요: 학생 소품은 학생을 다시 그리고, 지붕과 칠판은 색 이름표를 바꿔요
-  /* 3.0.0 woodani 요청: 테마 세트를 사기 전에 지도, 건물 지붕과 벽 색, 테마 곡이 어떻게 바뀌는지 홈 지도에서 미리 봐요.
+  /* 테마 세트를 사기 전에 지도, 건물 지붕과 벽 색, 테마 곡이 어떻게 바뀌는지 홈 지도에서 미리 봐요
      저장(S.cos.th)은 바꾸지 않고 rt.thPrev로만 그려요. 다른 탭으로 가거나 '돌아가기'를 누르면 끝나요 */
   function thPreview(id) {
     const T = THEME[id]; if (!T) return;
     const th = {}; for (const [sl] of TH_SLOTS) th[sl] = id;
-    rt.thPrev = { id, th }; Music.preview = ''; rt.thScroll = $('#scroller').scrollTop;   // 5.0.1.6 T-13 돌아오면 그 자리로
+    rt.thPrev = { id, th }; Music.preview = ''; rt.thScroll = $('#scroller').scrollTop;   // 돌아오면 그 자리로
     sfx('tap'); setTab('school'); applyCos(); ensureAudio(true); musicSync();
     const b = $('#thPrevBar');
     if (b) { $('#thPrevName').textContent = `${T.name} 세트 미리 보기`; b.hidden = false; }
@@ -1075,7 +1075,7 @@
   }
   function applyCos() {
     rt.kids.forEach(k => { k.g.innerHTML = kidSVG(k.rare ? k.sp + '_rare' : k.sp, k.bag); });
-    rt.bdHatK = null; rt.elBadgeT = '';   // 2.1.1 생일 고깔과 반장 배지는 다음 틱에 다시
+    rt.bdHatK = null; rt.elBadgeT = '';   // 생일 고깔과 반장 배지는 다음 틱에 다시
     const map = $('#map');
     applyThemes();
     const bgT = THEME[thOn().bg];
@@ -1104,7 +1104,7 @@
     }
     return `<svg viewBox="0 0 40 40" aria-hidden="true"><rect x="5" y="9" width="30" height="21" rx="3" fill="${it.c}" stroke="#7A522D" stroke-width="2.5"/><path d="M10 16 h12 M10 21 h17 M10 26 h8" stroke="#F3F2E8" stroke-width="1.6" stroke-linecap="round"/></svg>`;
   }
-  // 1.7.2 상점 거리: 가게 카드에 가진 재화를 보여 주고, 누르면 그 가게로 들어가요
+  // 상점 거리: 가게 카드에 가진 재화를 보여 주고, 누르면 그 가게로 들어가요
   function renderStreet() {
     $('#sfGoldN').textContent = fmt(S.gold || 0);
     $('#sfEssN').textContent = fmt(S.ess || 0);
@@ -1119,7 +1119,7 @@
     if (rt.modalOpen) closeModal(rt.modalOpen);
     setTab('shop');
   }
-  // 2.1.0 꾸미기 백화점의 놓친 이벤트 장식: 이미 끝난 이벤트(지금 열린 것은 빼요)의 한정 장식 가운데 아직 없는 것
+  // 꾸미기 백화점의 놓친 이벤트 장식: 이미 끝난 이벤트(지금 열린 것은 빼요)의 한정 장식 가운데 아직 없는 것
   function evPastIds() {
     const today = gameToday(), cur = evCurrent(today), out = new Set();
     let d = dayAdd(weekMon(today), -1);
@@ -1136,7 +1136,7 @@
     $('#shopHave span').textContent = fmt(S.gold);
     const left = Math.max(0, Math.min(GOLD.shopAd - S.gd.shop, GOLD.adDay - S.gd.n));
     $('#shopAd').setAttribute('aria-disabled', left > 0 ? 'false' : 'true');
-    renderAdStamp();   // 4.2.0
+    renderAdStamp();
     $('#shopAdLeft').textContent = left > 0 ? `오늘 광고 황금 도토리를 ${left}번 더 받을 수 있어요` : '오늘 광고 황금 도토리를 모두 받았어요. 내일 다시 열려요';
     const coin = `<svg viewBox="-8 -11 16 20" aria-hidden="true">${GOLD_ICON.slice(GOLD_ICON.indexOf('>') + 1, -6)}</svg>`;
     let h = renderThemes(coin);
@@ -1213,7 +1213,7 @@
     if (t === 'm' && MARKX.some(([x]) => x === a)) { const nm = `학교 마크 ${MARKX.find(([x]) => x === a)[1]}`; return { kind: 'm', x: a, name: nm, ga: eulOf(nm), price: S.cos.own.includes('mkx:' + a) ? 0 : GSHOP.mark }; }
     if (t === 'r') return { kind: 'r', name: '이름 바꾸기', price: 0 };
     const it = t === 'c' && COS[a] && COS[a].items.find(x => x.id === b);
-    return it && S.cos.own.includes(a + ':' + b) ? { kind: 'c', cat: a, id: b, name: it.name, ga: eulOf(it.name), price: 0 } : null;   // 2.1.0 하나씩은 산 것만 입고 벗어요
+    return it && S.cos.own.includes(a + ':' + b) ? { kind: 'c', cat: a, id: b, name: it.name, ga: eulOf(it.name), price: 0 } : null;   // 하나씩은 산 것만 입고 벗어요
   }
   function pickShop(pick) {
     const it = shopItem(pick);

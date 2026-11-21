@@ -3,25 +3,25 @@
      중학교부터 명부가 생기고 동아리 다섯 곳(2.0.1부터 수학부)에 3명씩 나눠요. 졸업식(학교급 올리기) 때 명부 학생은 졸업 사진(S.snap)에 남고 새 친구들이 입학해요.
      능력치는 과학, 체육, 국어, 미술, 수학(2.0.1에 이름을 바꾸고 수학을 더함. 속으로 1~100, 화면에는 별 1~5개). 동아리 보너스는 부원 셋의 맞는 능력치 별 하나에 2%(최대 30%), 미술부 할인은 절반.
      능력치가 자라는 법: 그 동아리 건물을 한 레벨 올릴 때마다 부원 +1, 한 주(게임 시계) 내내 같은 동아리였으면 +5와 건물 레벨 10마다 +1, 발표회 +5 */
-  const ROSTER_N = 15, ROSTER_MAX = 18, ROSTER_TIER = 2;   // 2.1.0 처음 15명(동아리 5곳 × 3자리), 전학 온 친구가 더해지면 18명까지
-  const ABIL = ['과학', '체육', '국어', '미술', '수학'];   // 2.0.1 공부: 저장 배열 순서는 그대로, 이름만 체육과 국어로, 수학을 다섯째로
+  const ROSTER_N = 15, ROSTER_MAX = 18, ROSTER_TIER = 2;   // 처음 15명(동아리 5곳 × 3자리), 전학 온 친구가 더해지면 18명까지
+  const ABIL = ['과학', '체육', '국어', '미술', '수학'];   // 공부: 저장 배열 순서는 그대로, 이름만 체육과 국어로, 수학을 다섯째로
   const AB_KEY = ['sci', 'pe', 'kor', 'art', 'math'];   // 능력 번호 → 과목 키
   const CLUBS = [
     { id: 'sci', name: '과학부', ab: 0, fac: 'science', img: 'club_science', em: '🔬', eff: p => `수업료 +${p}%` },
     { id: 'spo', name: '운동부', ab: 1, fac: 'playground', img: 'club_sports', em: '⚽', eff: p => `학교 행사 보상 +${p}%` },
     { id: 'rea', name: '독서부', ab: 2, fac: 'library', img: 'club_reading', em: '📚', eff: p => `수업료 +${p}%` },
     { id: 'art', name: '미술부', ab: 3, fac: 'classroom', img: 'club_art', em: '🎨', eff: p => `장식 값 -${p}%` },
-    { id: 'mat', name: '수학부', ab: 4, fac: 'classroom', img: 'league_math', em: '➗', eff: p => `수업료 +${p}%` }   // 2.0.1 공부: 수학부(woodani 결정)
+    { id: 'mat', name: '수학부', ab: 4, fac: 'classroom', img: 'league_math', em: '➗', eff: p => `수업료 +${p}%` }   // 공부: 수학부
   ];
-  // showDays: 발표회 주기(게임 시계 날짜). 설계안은 일주일이지만 중학교 한 해가 하루 안팎이라 균형 제안서(2.0.0)에서 하루를 제안했어요. woodani 확정 전이에요
-  const CLUB = { seats: 3, per: 2, max: 30, grow: 5, growLv: 10, up: 1, show: 4, showMin: 30, showDays: 1, weekend: 2 };   // 2.0.0 woodani 확정: 발표회는 월~금 하루 한 번, 그 주에 못 연 날이 있으면 주말에 2번까지 보충
-  /* ---------- 2.0.1 공부: 과목 5개(국어, 수학, 과학, 미술, 체육)의 학교 학력 레벨 (2026-10-28 woodani 결정) ----------
-     공부(퍼즐=수학, 합치기=미술, 뒤에 책 읽기=국어, 과학 실험=과학, 숲속 대결=체육)를 하면 그 과목 학습 경험치(XP)가 바로 들어와요.
-     숲의 정수로 문제집을 사면 +50(과목마다 하루 2권). 다음 레벨까지 20 + 5n, 상한은 학교급마다(유 10, 초 20, 중 30, 고 40, 대 50, 원 60).
-     효과: 수업료 레벨 합 × 0.1%(acMult), 평판 10레벨마다 +1(acRepOf), 새 명부 학생의 시작 능력 바탕(rosterKid). 숫자는 "균형 제안서 (2.0.1 공부 탭)" */
+  // showDays: 발표회 주기(게임 시계 날짜). 설계안은 일주일이지만 중학교 한 해가 하루 안팎이라 균형 제안서에서 하루를 제안했어요. woodani 확정 전이에요
+  const CLUB = { seats: 3, per: 2, max: 30, grow: 5, growLv: 10, up: 1, show: 4, showMin: 30, showDays: 1, weekend: 2 };   // 발표회는 월~금 하루 한 번, 그 주에 못 연 날이 있으면 주말에 2번까지 보충
+  /* ---------- 공부: 과목 5개(국어, 수학, 과학, 미술, 체육)의 학교 학력 레벨 ----------
+     공부(퍼즐=수학, 합치기=미술, 뒤에 책 읽기=국어, 과학 실험=과학, 숲속 대결=체육)를 하면 그 과목 학습 경험치(XP)가 바로 들어와요
+     숲의 정수로 문제집을 사면 +50(과목마다 하루 2권). 다음 레벨까지 20 + 5n, 상한은 학교급마다(유 10, 초 20, 중 30, 고 40, 대 50, 원 60)
+     효과: 수업료 레벨 합 × 0.1%(acMult), 평판 10레벨마다 +1(acRepOf), 새 명부 학생의 시작 능력 바탕(rosterKid). 숫자는 "균형 제안서 (공부 탭)" */
   const AC = { keys: ['kor', 'math', 'sci', 'art', 'pe'], name: { kor: '국어', math: '수학', sci: '과학', art: '미술', pe: '체육' },
-    cap: [10, 20, 30, 40, 50, 60], need: n => 25 + 2 * n, pzPer: 100, pzMax: 12, mgPer: 1, mgMax: 20, mgE: 6, mgDay: 100,   // 2.1.0 학력과 능력치 균형: 과목마다 하루 XP를 비슷하게(균형 제안서 2.1.0 학력과 능력치 1절)
-    book: { ess: 10, xp: 50, perDay: 2, perLv: 1 }, tuition: 0.001, repPer: 10 };   // 문제집 값은 정수 10 + 그 과목 레벨, 과목마다 하루 2권(3.0.0 조정안 5, 예전 1권)
+    cap: [10, 20, 30, 40, 50, 60], need: n => 25 + 2 * n, pzPer: 100, pzMax: 12, mgPer: 1, mgMax: 20, mgE: 6, mgDay: 100,   // 학력과 능력치 균형: 과목마다 하루 XP를 비슷하게(균형 제안서 학력과 능력치 1절)
+    book: { ess: 10, xp: 50, perDay: 2, perLv: 1 }, tuition: 0.001, repPer: 10 };   // 문제집 값은 정수 10 + 그 과목 레벨, 과목마다 하루 2권(조정안 5, 예전 1권)
   const AC_GAME = { kor: '책 읽기', math: '숲속 퍼즐', sci: '과학 탐구 실험', art: '숲속 합치기', pe: '숲속 대결' };
   const freshAc = () => { const o = { bk: { day: '', n: {} }, st: { xp: 0, bk: 0 } }; for (const k of AC.keys) { o[k] = { lv: 1, xp: 0 }; o.bk.n[k] = 0; } return o; };
   const acCapOf = tier => AC.cap[Math.max(0, Math.min(AC.cap.length - 1, tier))];
@@ -40,15 +40,15 @@
   const acAll = () => AC.keys.reduce((n, k) => n + acSettle(k), 0);
   function acGain(k, v) {
     if (!S.ac || !S.ac[k] || !(v > 0)) return 0;
-    v = Math.floor(v * (1 + rxPct('study') / 100)); S.ac[k].xp += v; S.ac.st.xp += v;   // 4.2.0 학력 연구
+    v = Math.floor(v * (1 + rxPct('study') / 100)); S.ac[k].xp += v; S.ac.st.xp += v;   // 학력 연구
     const up = acSettle(k);
     if (up) { const lv = S.ac[k].lv, capped = lv >= acCap(); setTimeout(() => toast(`${AC.name[k]} Lv.${lv}!${capped ? ` ${tierInfo().name}에서는 여기까지예요` : ''}`), 500); }
     checkQuests(true); return v;
   }
   function acBkDay() { const t = gameToday(); if (dayRoll(S.ac.bk, t)) { for (const k of AC.keys) S.ac.bk.n[k] = 0; } }
-  const bookCost = k => AC.book.ess + AC.book.perLv * acLv(k);   // 2.1.0 문제집 값은 레벨을 따라 올라요
+  const bookCost = k => AC.book.ess + AC.book.perLv * acLv(k);   // 문제집 값은 레벨을 따라 올라요
   const acBkLeft = k => { acBkDay(); return Math.max(0, AC.book.perDay - (S.ac.bk.n[k] || 0)); };
-  // 5.0.2 문제집 남은 권 모두 사기: 한 권씩 살 때와 같은 값과 차례로 사고(레벨이 오르면 값도 따라 올라요), 정수가 모자라면 살 수 있는 만큼만 사요
+  // 문제집 남은 권 모두 사기: 한 권씩 살 때와 같은 값과 차례로 사고(레벨이 오르면 값도 따라 올라요), 정수가 모자라면 살 수 있는 만큼만 사요
   function acBuyBookAll(k) {
     if (!AC.name[k] || rt.batch) return 0;
     const e0 = S.ess, x0 = S.ac.st.bk; let n = 0;
@@ -70,7 +70,7 @@
     sfx('quest'); buzz(14);
     toast(`${AC.name[k]} 문제집을 풀었어요! ${AC.name[k]} XP +${AC.book.xp}`);
     save(); renderEss(); renderMini(); renderHUD(); checkQuests();
-    if (rt.tab === 'ess') renderEssShop();   // 4.3.1 woodani: 정수 상점에서 사면 남은 권수가 바로 줄게
+    if (rt.tab === 'ess') renderEssShop();   // 정수 상점에서 사면 남은 권수가 바로 줄게
     return true;
   }
   // 공부 탭 위쪽 과목 5줄: 이름, Lv., 진행 막대, 문제집 단추
@@ -85,7 +85,7 @@
           `<button class="ac-bk${left > 0 ? '' : ' off'}" type="button" data-book="${k}" aria-label="${AC.name[k]} 문제집 구매, 오늘 ${left}권 남음">${left > 0 ? '문제집 구매' : '내일 또'}</button></div>`; }).join('') +
       `<div class="ac-note">${cap <= acLv('kor') && AC.keys.every(k => acLv(k) >= cap) ? `${tierInfo().name} 상한 Lv.${cap}이에요. 다음 학교급에서 더 배워요` : `문제집은 과목마다 하루 ${AC.book.perDay}권, 한 권에 XP +${AC.book.xp}이에요. ${tierInfo().name}에서는 Lv.${cap}까지 올라요`}</div>`;
   }
-  // 2.3.1 woodani 요청: 과목 줄을 누르면 그 과목 XP를 얻는 곳을 말풍선으로 잠깐 보여 줘요. 아직 열리지 않은 곳은 흐리게
+  // 과목 줄을 누르면 그 과목 XP를 얻는 곳을 말풍선으로 잠깐 보여 줘요. 아직 열리지 않은 곳은 흐리게
   const AC_SRC = {
     kor: [['책 읽기(도서관)', 0], ['고니 선생님 연수', 1], ['비 오는 날 책 읽기 보너스', 1]],
     math: [['숲속 퍼즐', 0], ['동아리 수학부', 2]],
@@ -106,7 +106,7 @@
     sfx('tap');
     rt.acTipT = setTimeout(() => d.remove(), 3500);
   }
-  // 2.1.0 문제집 구매 확인창: 값, 효과, 오늘 남은 권수, 가진 숲의 정수
+  // 문제집 구매 확인창: 값, 효과, 오늘 남은 권수, 가진 숲의 정수
   function openBook(k) {
     if (!AC.name[k] || rt.paused || rt.modalOpen) return;
     rt.bookK = k; renderBook(); openModal($('#mBook'));
@@ -124,7 +124,7 @@
     $('#bkBuy').innerHTML = `${ic}${need} 구매하기`;
     { const a = $('#bkAll'); if (a) { a.hidden = !!why || left < 2 || have < need * 2; a.textContent = `남은 ${left}권 모두 사기 (정수가 되는 만큼)`; } }
   }
-  // 옛 저장: 퍼즐 판 수와 합치기 주문 수로 수학과 미술 XP를 한 번 환산해요(2.0.1 테스트판 플레이어)
+  // 옛 저장: 퍼즐 판 수와 합치기 주문 수로 수학과 미술 XP를 한 번 환산해요(테스트판 플레이어)
   function sanitizeAc(d, s) {
     s.ac = freshAc();
     const cap = acCapOf(s.tier);
@@ -144,25 +144,25 @@
   }
   // 동물마다 잘하는 능력(0 과학, 1 체육, 2 국어, 3 미술, 4 수학)
   const SP_ABIL = { rabbit: 1, fox: 0, raccoon: 0, chick: 3, bear: 1, cat: 2, dog: 1, penguin: 0, panda: 2, koala: 2, otter: 3,
-    hamster: 1, duck: 3, turtle: 2, mole: 0, frog: 1, waterdeer: 3, redpanda: 4, capybara: 2, kangaroo: 1, meerkat: 4, sloth: 3, chinchilla: 0, lemur: 0, armadillo: 2, quokka: 1 };   // 5.0.0 여우원숭이 과학, 아르마딜로 국어, 쿼카 체육(제안)   // 4.0.0 미어캣 수학, 나무늘보 미술, 친칠라 과학(제안)   // 3.0.0 레서판다 수학, 카피바라 국어, 캥거루 체육
+    hamster: 1, duck: 3, turtle: 2, mole: 0, frog: 1, waterdeer: 3, redpanda: 4, capybara: 2, kangaroo: 1, meerkat: 4, sloth: 3, chinchilla: 0, lemur: 0, armadillo: 2, quokka: 1 };   // 여우원숭이 과학, 아르마딜로 국어, 쿼카 체육(제안). 미어캣 수학, 나무늘보 미술, 친칠라 과학(제안). 레서판다 수학, 카피바라 국어, 캥거루 체육
   const KID_NAMES = ['도토리', '밤송이', '솔방울', '이슬', '새싹', '단풍', '보리', '콩알', '버찌', '다래', '머루', '호두', '달래', '나리', '송이', '들꽃',
     '구름', '바람', '햇살', '별님', '조약돌', '방울', '보라', '감자', '고구마', '앵두', '모과', '자두', '토실', '꼬물', '동글', '말랑'];
   const star = v => Math.max(1, Math.min(5, Math.ceil(v / 20)));
   const starTxt = n => `<span class="st-on">${'★'.repeat(n)}</span><span class="st-off">${'★'.repeat(5 - n)}</span>`;   // 채운 별과 빈 별(연하게)
   const rosterOn = () => !!S && S.tier >= ROSTER_TIER;
-  const freshRoster = () => ({ list: [], wk: -1, gen: 0, v: 2 });   // 2.1.0 v: 능력치 균형 판(2부터 새 숫자)
-  const freshClub = () => ({ day: '', n: 0, shown: [0, 0, 0, 0, 0], last: -1, wk: -1, wd: 0, we: 0 });   // 2.0.0 wk: 이번 주 월요일(날 번호), wd: 이번 주 월~금에 연 횟수, we: 주말에 연 횟수
+  const freshRoster = () => ({ list: [], wk: -1, gen: 0, v: 2 });   // v: 능력치 균형 판(2부터 새 숫자)
+  const freshClub = () => ({ day: '', n: 0, shown: [0, 0, 0, 0, 0], last: -1, wk: -1, wd: 0, we: 0 });   // wk: 이번 주 월요일(날 번호), wd: 이번 주 월~금에 연 횟수, we: 주말에 연 횟수
   // 새 명부: 만난 친구들 가운데서 겹치지 않게 12명(모자라면 겹쳐요). 잘하는 능력 하나가 도드라지고, 가끔 둘째도 조금
   function rosterKid(sp, taken) {
-    // 2.0.1 공부: 시작 능력의 바탕은 그 과목의 학교 학력. 2.1.0부터 8 + 레벨 ÷ 3(예전 10 + 레벨 × 2, 70까지)
-    const a = AB_KEY.map(k => 8 + Math.floor(acLv(k) / 3) + Math.floor(Math.random() * 5));   // 2.1.0 시작값을 낮춰서 중학교 내내 키워요(입학 때 잘하는 과목 ★2~3)
+    // 공부: 시작 능력의 바탕은 그 과목의 학교 학력
+    const a = AB_KEY.map(k => 8 + Math.floor(acLv(k) / 3) + Math.floor(Math.random() * 5));   // 시작값을 낮춰서 중학교 내내 키워요(입학 때 잘하는 과목 ★2~3)
     const main = SP_ABIL[sp] !== undefined ? SP_ABIL[sp] : Math.floor(Math.random() * ABIL.length);
     a[main] += 20 + Math.floor(Math.random() * 13);
     if (Math.random() < 0.4) { const o = (main + 1 + Math.floor(Math.random() * (ABIL.length - 1))) % ABIL.length; a[o] += 6; }
     const free = KID_NAMES.filter(n => !taken.includes(n)), nm = (free.length ? free : KID_NAMES)[Math.floor(Math.random() * (free.length || KID_NAMES.length))];
     taken.push(nm);
     const out = { sp, nm, a: a.map(v => Math.min(100, v)), c: -1, cw: gameWeek() };
-    if (rareGot(sp) && Math.random() < RARE.roster) out.r = true;   // 2.1.3 반짝 친구 모습(능력치는 같아요)
+    if (rareGot(sp) && Math.random() < RARE.roster) out.r = true;   // 반짝 친구 모습(능력치는 같아요)
     return out;
   }
   // must: 꼭 넣을 친구(방금 전학 온 친구)
@@ -171,7 +171,7 @@
     for (let i = met.length - 1; i > 0; i--) { const j = Math.floor(Math.random() * (i + 1)); [met[i], met[j]] = [met[j], met[i]]; }
     for (let i = 0; pick.length < ROSTER_N; i++) pick.push(met[i % met.length]);
     const taken = [], out = pick.map(sp => rosterKid(sp, taken));
-    out.forEach(k => tamShard(k.sp, 1));   // 4.3.0 새 학년에 같은 동물 친구를 또 만나면 그 대원 별 조각 하나
+    out.forEach(k => tamShard(k.sp, 1));   // 새 학년에 같은 동물 친구를 또 만나면 그 대원 별 조각 하나
     return out;
   }
   // 학년 중간에 전학 온 친구는 명부 끝에 더해요(동아리 밖에서 시작)
@@ -186,10 +186,10 @@
   }
   const clubMembers = c => S.roster.list.filter(s => s.c === c);
   const clubStars = c => clubMembers(c).reduce((n, s) => n + star(s.a[CLUBS[c].ab]), 0);
-  const clubPct = c => rosterOn() ? Math.min(CLUB.max, CLUB.per * clubStars(c)) * (elClub() === c ? 2 : 1) : 0;   // 2.0.1 반장이 속한 동아리는 두 배
+  const clubPct = c => rosterOn() ? Math.min(CLUB.max, CLUB.per * clubStars(c)) * (elClub() === c ? 2 : 1) : 0;   // 반장이 속한 동아리는 두 배
   const clubShow = c => c === 3 ? Math.floor(clubPct(3) / 2) : clubPct(c);   // 화면에 보이는 효과 숫자(미술부는 할인이라 절반)
   const clubSum = () => CLUBS.reduce((n, _, c) => n + clubShow(c), 0);
-  const clubTuitionMult = () => 1 + (clubPct(0) + clubPct(2) + clubPct(4)) / 100;   // 2.0.1 수학부도 수업료
+  const clubTuitionMult = () => 1 + (clubPct(0) + clubPct(2) + clubPct(4)) / 100;   // 수학부도 수업료
   const clubFestMult = () => 1 + clubPct(1) / 100;
   const clubDecoOff = () => clubShow(3);
   // 자동 추천: 동아리마다 3명씩, 맞는 능력치 별의 합이 가장 크게(12명이라 모든 경우를 셈으로 따져요)
@@ -255,7 +255,7 @@
   }
   // 발표회: 게임 시계 기준 CLUB.showDays일에 한 번. 무대에 선 동아리 부원 능력치 +5, 수업료 30분치
   const showDay = () => Math.floor((gameNow() + KST_MS) / 86400000);
-  // 2026-10-27 woodani: 월~금에 하루 한 번. 그 주에 못 연 날이 있으면 토, 일에 모두 합쳐 2번까지(못 연 날 수까지) 보충해요. 날짜는 게임 시계(한국 시간)
+  // 월~금에 하루 한 번. 그 주에 못 연 날이 있으면 토, 일에 모두 합쳐 2번까지(못 연 날 수까지) 보충해요. 날짜는 게임 시계(한국 시간)
   const showWd = d => (d + 3) % 7;   // 0 월요일 … 6 일요일 (1970-01-01이 목요일)
   function showOkOn(d) {
     if (S.club.last >= 0 && d < S.club.last + CLUB.showDays) return false;
@@ -273,7 +273,7 @@
     return showWd(d + w) === 0 ? '월요일에 다시 발표회를 열 수 있어요' : `다음 발표회까지 ${w}일`;
   }
   const showReady = () => rosterOn() && showWait() <= 0;
-  // 5.2.0.1 woodani 결정(2026-11-20): 메인 퀘스트 '동아리 두 곳 발표회'(clubShown)를 하는 동안에는 아직 무대에 안 선 동아리는 오늘 이미 열었어도 바로 열 수 있어요(하루 기다림 없애기)
+  // 메인 퀘스트 '동아리 두 곳 발표회'(clubShown)를 하는 동안에는 아직 무대에 안 선 동아리는 오늘 이미 열었어도 바로 열 수 있어요(하루 기다림 없애기)
   //   c가 없으면 그런 동아리(부원이 있는)가 하나라도 있는지
   function showQuestFree(c) {
     if (!rosterOn() || !S.club) return false;
@@ -286,13 +286,13 @@
   function clubShowGo(c) {
     if (!showReadyC(c) || !CLUBS[c]) return false;
     const mem = clubMembers(c); if (!mem.length) { toast(`${eun(CLUBS[c].name)} 아직 부원이 없어요`); return false; }
-    const C = CLUBS[c], fvb = fvBonus('show'), v = showPrize() * (fvb ? 2 : 1);   // 4.1.0 축제 금요일: 발표회 보상 +100%
+    const C = CLUBS[c], fvb = fvBonus('show'), v = showPrize() * (fvb ? 2 : 1);   // 축제 금요일: 발표회 보상 +100%
     mem.forEach(s => abUp(s, C.ab, CLUB.show));
     const d = showDay(), wk = d - showWd(d);
     if (S.club.wk !== wk) { S.club.wk = wk; S.club.wd = 0; S.club.we = 0; }
     if (showWd(d) < 5) S.club.wd += 1; else S.club.we += 1;
     S.club.last = d; S.club.n += 1; S.club.shown[c] = 1; S.st.shows = (S.st.shows || 0) + 1;
-    cgShowAdd(c); if (cgOpen()) S.cg.st.s += 1;   // 2.2.0 대항전 발표회 점수
+    cgShowAdd(c); if (cgOpen()) S.cg.st.s += 1;   // 대항전 발표회 점수
     S.budget += v; earn(v);
     addLeague(LP.festWin);
     save();
@@ -300,15 +300,15 @@
     renderClub(); questChanged();
     return true;
   }
-  /* ---------- 2.2.0 동아리 대항전 (프로젝트 문서 '2.2.0 설계안' 5절, woodani 확정 2026-10-30) ----------
-     중학교부터 매주 월~일(게임 시계, 한국 시간) 한 주 리그. 우리 학교와 숲속 대결 학교 7곳이 동아리 다섯의 점수 합으로 겨뤄요.
-     우리 점수 = 동아리마다 (부원 능력치 별 × 10 + 연습 × 20 + 발표회 × 30). 연습은 하루 한 번 '모두 연습'(부원 능력치 +2).
-     상대 학교의 한 주 점수는 주가 시작할 때 우리 학교 예상 점수에 맞춰 정해지고(1.22배 ~ 0.72배), 날마다 조금씩 올라요.
+  /* ---------- 동아리 대항전 (프로젝트 문서 ' 설계안' 5절) ----------
+     중학교부터 매주 월~일(게임 시계, 한국 시간) 한 주 리그. 우리 학교와 숲속 대결 학교 7곳이 동아리 다섯의 점수 합으로 겨뤄요
+     우리 점수 = 동아리마다 (부원 능력치 별 × 10 + 연습 × 20 + 발표회 × 30). 연습은 하루 한 번 '모두 연습'(부원 능력치 +2)
+     상대 학교의 한 주 점수는 주가 시작할 때 우리 학교 예상 점수에 맞춰 정해지고(1.22배 ~ 0.72배), 날마다 조금씩 올라요
      주가 끝나면 1등 황금 도토리 2와 우승 깃발(1, 3, 6번째 우승에 동, 은, 금), 2~3등 황금 1, 모두 수업료 30분치. 서버 랭킹은 쓰지 않아요 */
   const CG = { tier: 2, star: 10, prac: 20, show: 30, grow: 2, gold1: 2, gold23: 1, partMin: 30, flagAt: [1, 3, 6],
     f: [1.22, 1.12, 1.04, 0.97, 0.9, 0.82, 0.72], jitter: 0.04, practiceRate: 0.7, showGuess: 5 };
   const CG_FLAGS = [['cg_flag_b', '동메달 우승 깃발', 'flag_bronze'], ['cg_flag_s', '은메달 우승 깃발', 'flag_silver'], ['cg_flag_g', '금메달 우승 깃발', 'flag_gold']];
-  const freshCg = () => ({ wk: -1, opp: [], prac: CLUBS.map(() => 0), show: CLUBS.map(() => 0), pd: '', res: null, wins: 0, pod: 0, st: { p: 0, n: 0, s: 0 } });   // s: 2.2.0 검토 5 대항전 중 발표회 수(cgShow 퀘스트)
+  const freshCg = () => ({ wk: -1, opp: [], prac: CLUBS.map(() => 0), show: CLUBS.map(() => 0), pd: '', res: null, wins: 0, pod: 0, st: { p: 0, n: 0, s: 0 } });   // s: 검토 5 대항전 중 발표회 수(cgShow 퀘스트)
   const cgOpen = () => !!S && !!S.cg && rosterOn() && S.tier >= CG.tier;
   const cgStarPts = () => CLUBS.reduce((n, _, c) => n + clubStars(c) * CG.star, 0);
   const cgClubPts = c => clubStars(c) * CG.star + (S.cg.prac[c] || 0) * CG.prac + (S.cg.show[c] || 0) * CG.show;
@@ -339,9 +339,9 @@
       const t = cgTable(true), rank = t.findIndex(r => r.me) + 1, my = cgMy(), items = [];
       const acorn = minAcorns(CG.partMin); S.budget += acorn; earn(acorn); items.push({ ic: 'acorn', t: `참가 도토리 +${fmt(acorn)}` });
       if (rank === 1) {
-        S.cg.wins += 1; { const g = goldRich() ? 1 : CG.gold1; addGold(g); items.push({ ic: 'gold', t: `황금 도토리 +${g}` }); }   // 4.2.0 60개 뒤에는 우승 1개
+        S.cg.wins += 1; { const g = goldRich() ? 1 : CG.gold1; addGold(g); items.push({ ic: 'gold', t: `황금 도토리 +${g}` }); }   // 60개 뒤에는 우승 1개
         const fi = CG.flagAt.indexOf(S.cg.wins); if (fi >= 0) { S.deco.own[CG_FLAGS[fi][0]] = 1; items.push({ ic: IMG(CG_FLAGS[fi][2]) ? `<img src="${IMG(CG_FLAGS[fi][2])}" alt="" style="width:22px;height:22px;object-fit:contain">` : '🚩', t: `지도 장식 ${CG_FLAGS[fi][1]}` }); }
-      } else if (rank <= 3) items.push(goldOr(CG.gold23));   // 4.2.0
+      } else if (rank <= 3) items.push(goldOr(CG.gold23));
       if (rank <= 3) S.cg.pod += 1;
       S.cg.st.n += 1;
       res = { wk: S.cg.wk, rank, my, top: t.slice(0, 3).map(r => r.nm), items };
@@ -387,7 +387,7 @@
     o.pd = typeof G.pd === 'string' ? G.pd.slice(0, 10) : '';
     o.res = G.res && typeof G.res === 'object' ? { wk: n(G.res.wk, 1e5), rank: Math.max(1, n(G.res.rank, 8)), my: n(G.res.my, 1e7) } : null;
     o.wins = n(G.wins, 1e4); o.pod = n(G.pod, 1e4); o.st = { p: n(G.st && G.st.p, 1e6), n: n(G.st && G.st.n, 1e6), s: n(G.st && G.st.s, 1e6) };
-    // 2.2.0 검토 5: st.s가 없던 2.2.0 저장은 이번 주 대항전 발표회 수(show)를 최소값으로 받아요(그전 주 것은 알 수 없어요)
-    if (!(G.st && typeof G.st === 'object' && 's' in G.st))   /* 4.0.1 (3.3.2 분석): 글자나 숫자가 들어온 저장에도 읽기가 멈추지 않게 */ o.st.s = Math.max(o.st.s, o.wk >= 0 ? o.show.reduce((a, v) => a + v, 0) : 0);
+    // 5: st.s가 없던 저장은 이번 주 대항전 발표회 수(show)를 최소값으로 받아요(그전 주 것은 알 수 없어요)
+    if (!(G.st && typeof G.st === 'object' && 's' in G.st))   /* 글자나 숫자가 들어온 저장에도 읽기가 멈추지 않게 */ o.st.s = Math.max(o.st.s, o.wk >= 0 ? o.show.reduce((a, v) => a + v, 0) : 0);
     s.cg = o;
   }

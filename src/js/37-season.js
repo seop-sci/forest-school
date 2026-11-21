@@ -4,7 +4,7 @@
      정수와 소모품, 황금 도토리만 주고 도토리(학교 키우기 재화)는 주지 않아요 */
   const psSeason = day => { const d = dayDiff(PS.anchor, day || gameToday()); return d < 0 ? -1 : Math.floor(d / PS.len); };
   const psEnd = n => dayAdd(PS.anchor, n * PS.len + PS.len - 1);
-  const psDef = n => { const x = PS_SEASONS[n] || ['', '', '', '', ''];   /* 5.0.1.5 T-02 표에 없으면 '시즌 N' 한 번만 */ return { theme: x[0], deco: x[1], decoNm: x[2], fur: x[3], furNm: x[4] }; };
+  const psDef = n => { const x = PS_SEASONS[n] || ['', '', '', '', ''];   /* 표에 없으면 '시즌 N' 한 번만 */ return { theme: x[0], deco: x[1], decoNm: x[2], fur: x[3], furNm: x[4] }; };
   const psOpen = () => !!S && !!S.ps && S.tier >= PS.tier && psSeason() >= 0 && !liveOff('event');
   // 미션: 이벤트 미션처럼 이미 있는 횟수 기록이 시작 때보다 얼마나 늘었는지로 재요. d는 오늘 미션 목표, w는 이번 주 미션 목표
   const PS_M = {
@@ -21,9 +21,9 @@
     out: { w: 3, name: n => `소풍이나 체험학습 ${n}번 보내기`, v: () => S.pc.st.n + S.st.trips },
     con: { w: 5, name: n => `시설 공사 ${n}번 하기`, v: () => S.st.cons || 0 },
     sn: { w: 5, name: n => `매점 간식 ${n}번 뽑기`, v: () => S.sn.n, ok: () => snOpen() },
-    gd: { d: 2, w: 10, name: n => `텃밭 작물 ${n}번 거두기`, v: () => S.gn.st.h, ok: () => gdOpen() },   // 2.2.0
-    bx: { d: 2, w: 8, name: n => `생물 ${n}번 관찰하기`, v: () => S.bx.st.n, ok: () => bxOpen() },   // 2.2.0
-    cg: { d: 1, w: 5, name: n => `동아리 대항전 연습 ${n}번`, v: () => S.cg.st.p, ok: () => cgOpen() }   // 2.2.0
+    gd: { d: 2, w: 10, name: n => `텃밭 작물 ${n}번 거두기`, v: () => S.gn.st.h, ok: () => gdOpen() },
+    bx: { d: 2, w: 8, name: n => `생물 ${n}번 관찰하기`, v: () => S.bx.st.n, ok: () => bxOpen() },
+    cg: { d: 1, w: 5, name: n => `동아리 대항전 연습 ${n}번`, v: () => S.cg.st.p, ok: () => cgOpen() }
   };
   const psOk = id => { const M = PS_M[id]; try { return !!M && (!M.ok || M.ok()); } catch (e) { return false; } };
   const psVal = id => { try { return Math.floor(PS_M[id].v()) || 0; } catch (e) { return 0; } };
@@ -64,7 +64,7 @@
   }
   function psGive(r, n) {
     const out = [];
-    if (r.g) out.push(goldOr(r.g));   // 4.2.0
+    if (r.g) out.push(goldOr(r.g));
     if (r.e) { addEss(r.e); out.push({ ic: 'ess', t: `숲의 정수 +${r.e}` }); }
     if (r.tk && S.tk) { S.tk[r.tk[0]] += r.tk[1]; const im = IMG('ticket_' + r.tk[0]); out.push({ ic: im ? `<img src="${im}" alt="" style="width:22px;height:22px;object-fit:contain">` : '⏱', t: `${TK.find(x => x.k === r.tk[0]).name.replace('권', ' 단축권')} +${r.tk[1]}장` }); }
     if (r.mge) { mgAddEnergy(r.mge); out.push({ ic: 'mge', t: `합치기 에너지 +${r.mge}` }); }
@@ -143,7 +143,7 @@
     return `<g class="fur-it fur-sp"><ellipse cx="${x}" cy="${(y - 1).toFixed(1)}" rx="${(ww * 0.42).toFixed(1)}" ry="${(2 + ww * 0.04).toFixed(1)}" class="fur-shadow"/>` +
       `<image href="${u}" x="${(x - ww / 2).toFixed(1)}" y="${(y - ww).toFixed(1)}" width="${ww.toFixed(1)}" height="${ww.toFixed(1)}"/></g>`;
   }
-  const psIc = ic => ic === 'gold' ? GOLD_ICON : ic === 'ess' ? ESS_ICON() : ic.startsWith('tk:') ? (IMG('ticket_' + ic.slice(3)) ? `<img src="${IMG('ticket_' + ic.slice(3))}" alt="">` : '⏱') : RW_PIC[ic] && rwPic(RW_PIC[ic]) ? `<img src="${rwPic(RW_PIC[ic])}" alt="">` : IMG(ic) ? `<img src="${IMG(ic)}" alt="">` : esc(ic);   // 5.0.1.5 T-02 합치기 에너지(mge) 그림
+  const psIc = ic => ic === 'gold' ? GOLD_ICON : ic === 'ess' ? ESS_ICON() : ic.startsWith('tk:') ? (IMG('ticket_' + ic.slice(3)) ? `<img src="${IMG('ticket_' + ic.slice(3))}" alt="">` : '⏱') : RW_PIC[ic] && rwPic(RW_PIC[ic]) ? `<img src="${rwPic(RW_PIC[ic])}" alt="">` : IMG(ic) ? `<img src="${IMG(ic)}" alt="">` : esc(ic);   // 합치기 에너지(mge) 그림
   function renderPass() {
     const body = $('#psBody'); if (!body || !S || !S.ps) return;
     psSync();
@@ -174,14 +174,14 @@
       (furs.length ? `<h4 class="dex-h">교실 시즌 가구 <small>하나를 골라 교실에 놓아요</small></h4><div class="ps-furs">${furs.map(id => `<button type="button" class="${S.ps.fsel === id ? 'on' : ''}" data-psf="${id}" aria-pressed="${S.ps.fsel === id}"><img src="${IMG(psDef(Number(id.slice(4))).fur)}" alt=""><small>${esc(psDef(Number(id.slice(4))).furNm)}</small></button>`).join('')}<button type="button" class="${S.ps.fsel ? '' : 'on'}" data-psf="">치우기</button></div>` : '');
     const tr = $('#psTrack'), cur = tr && tr.children[Math.max(0, lv - 2)]; if (tr && cur) tr.scrollLeft = cur.offsetLeft - 8;
   }
-  VD.titles.push({ id: 'alma', title: '모교의 자랑', got: d => !!(d && d.ta && d.ta.mon >= 3) });   // 5.1.0 모교 기념비 3단계
-  VD.titles.push({ id: 'biodoc', title: '숲속 박사', got: d => !!(d && d.bx && d.bx.g >= 5) });   // 2.3.5 생물 90종
-  VD.titles.push({ id: 'psnew', title: '패스 새내기', got: d => !!(d && d.ps && d.ps.badge >= 1) });   // 2.1.3 패스 10단계 첫 배지
-  VD.titles.push({ id: 'seasonking', title: '숲속 시즌 왕', got: d => !!(d && d.rs && d.rs.king >= 1) }, { id: 'fourseason', title: '사계절 교장', got: d => !!(d && d.deco && d.deco.own && ['winter', 'spring', 'summer', 'autumn'].every(q => d.deco.own['rs_' + q])) });   // 2.1.3 랭킹 시즌
-  /* ===== 2.1.3 숲속 패스 END ===== */
-  /* ===== 2.1.3 반짝 친구 BEGIN (시즌 설계안 3절, woodani 확정) =====
-     종업식과 졸업식마다 5% 확률로 아직 못 만난 반짝 친구가 와요. 12번 연속 못 만나면 다음 번은 꼭.
-     woodani 당부(2026-10-30): 털 색으로 친구를 부르거나 견주지 않아요. 반짝이는 까닭은 숲의 별빛을 받은 행운이고, 능력치와 수업료는 다른 친구와 똑같아요 */
+  VD.titles.push({ id: 'alma', title: '모교의 자랑', got: d => !!(d && d.ta && d.ta.mon >= 3) });   // 모교 기념비 3단계
+  VD.titles.push({ id: 'biodoc', title: '숲속 박사', got: d => !!(d && d.bx && d.bx.g >= 5) });   // 생물 90종
+  VD.titles.push({ id: 'psnew', title: '패스 새내기', got: d => !!(d && d.ps && d.ps.badge >= 1) });   // 패스 10단계 첫 배지
+  VD.titles.push({ id: 'seasonking', title: '숲속 시즌 왕', got: d => !!(d && d.rs && d.rs.king >= 1) }, { id: 'fourseason', title: '사계절 교장', got: d => !!(d && d.deco && d.deco.own && ['winter', 'spring', 'summer', 'autumn'].every(q => d.deco.own['rs_' + q])) });   // 랭킹 시즌
+  /* ===== 숲속 패스 END ===== */
+  /* ===== 반짝 친구 BEGIN (시즌 설계안 3절) =====
+     종업식과 졸업식마다 5% 확률로 아직 못 만난 반짝 친구가 와요. 12번 연속 못 만나면 다음 번은 꼭
+     woodani 당부: 털 색으로 친구를 부르거나 견주지 않아요. 반짝이는 까닭은 숲의 별빛을 받은 행운이고, 능력치와 수업료는 다른 친구와 똑같아요 */
   const RARE = { p: 0.05, pity: 12, walk: 0.2, roster: 0.1, gold: 1, list: [
     { sp: 'rabbit', name: '달빛 토끼', say: '안녕! 달님이 환하던 밤에 별빛 가루를 잔뜩 맞았더니 반짝반짝해졌어요.' },
     { sp: 'fox', name: '눈송이 여우', say: '첫눈 오는 날 숲길에서 별빛을 만났어요. 친구들이랑 눈싸움하고 싶어요!' },
@@ -218,10 +218,10 @@
       RARE.list.map(x => { const on = rareGot(x.sp), im = FSI('chr_' + x.sp + '_rare'), bd = IMG('rare_badge');
         return `<div class="dex-card rare${on ? ' on' : ' off'}" aria-label="${on ? x.name : '아직 못 만난 반짝 친구'}"><span class="dex-pic">${on && im ? `<img src="${im}" alt="">` : pic7('dex_unknown')}</span>${on && bd ? `<img class="rare-bd" src="${bd}" alt="">` : ''}<b>${on ? x.name : '???'}</b><small>${on ? '등록' : '미등록'}</small></div>`; }).join('') + '</div>';
   }
-  /* ===== 2.1.3 반짝 친구 END ===== */
-  /* ===== 2.1.3 날씨 BEGIN (로드맵 9절 "언제든 넣을 수 있는 작은 것") =====
-     게임 시계의 날마다 날씨가 정해져요(모두에게 같은 날씨). 맑음이 대부분이고 가끔 비, 눈(12~2월), 안개.
-     지도에 효과만 얹고, 그날 작은 보너스가 있어요. 수업료와 공사 같은 큰 균형은 건드리지 않아요.
+  /* ===== 반짝 친구 END ===== */
+  /* ===== 날씨 BEGIN (로드맵 9절 "언제든 넣을 수 있는 작은 것") =====
+     게임 시계의 날마다 날씨가 정해져요(모두에게 같은 날씨). 맑음이 대부분이고 가끔 비, 눈(12~2월), 안개
+     지도에 효과만 얹고, 그날 작은 보너스가 있어요. 수업료와 공사 같은 큰 균형은 건드리지 않아요
      비: 책 읽기 10분(원래 15분), 국어 XP +5. 눈: 떨어진 도토리 1.5배. 안개: 과학 실험 성공 XP +15 */
   const WX = { rain: { em: '🌧', name: '비', tip: '비 오는 날은 책 읽기 좋아요. 책 읽기 10분, 국어 XP +5' },
     snow: { em: '❄', name: '눈', tip: '눈 오는 날은 도토리가 반짝여요. 떨어진 도토리 +50%' },
@@ -254,12 +254,12 @@
     }
     fx.hidden = !k || rt.viewTier != null || !!S.wxOff;
     chip.classList.toggle('off', !!S.wxOff);
-    if (chip.hidden !== !show) { chip.hidden = !show; wxPlace(); }   // 3.2.1 학교급 단추 옆에
+    if (chip.hidden !== !show) { chip.hidden = !show; wxPlace(); }   // 학교급 단추 옆에
     if (show && chip.dataset.k !== k) { chip.dataset.k = k; chip.innerHTML = `<span aria-hidden="true">${WX[k].em}</span>${WX[k].name} 오는 날`.replace('안개 오는 날', '안개 낀 날'); }
     // 그날 처음 홈을 볼 때 한 번 알려 줘요
     if (show && S.wx !== gameToday() && !rt.modalOpen) { S.wx = gameToday(); save(); setTimeout(() => toast(`${WX[k].em} 오늘은 ${k === 'fog' ? '안개가 꼈어요' : iga(WX[k].name) + ' 와요'}.\n${WX[k].tip}`), 600); }
   }
-  // 5.0.1.8 H-18 날씨 칩 바로 위에 잠깐 뜨는 말풍선(알림 칸을 쓰지 않아요)
+  // 날씨 칩 바로 위에 잠깐 뜨는 말풍선(알림 칸을 쓰지 않아요)
   function wxTipShow(main, sub) {
     const chip = $('#wxChip'); if (!chip || chip.hidden) return;
     let t = $('#wxTip'); if (!t) { t = document.createElement('div'); t.id = 'wxTip'; t.className = 'wx-tip'; t.setAttribute('role', 'status'); document.body.appendChild(t); }
@@ -271,9 +271,9 @@
     t.classList.remove('on'); void t.offsetWidth; t.classList.add('on');
     clearTimeout(rt.wxTipT); rt.wxTipT = setTimeout(() => { t.classList.remove('on'); t.hidden = true; }, 3000);
   }
-  /* ===== 2.1.3 날씨 END ===== */
-  /* ===== 2.1.3 학부모 쪽지 이야기 BEGIN (로드맵 9절) =====
-     까치 우체부가 게임 시계 한 주에 한 통씩 학부모 편지를 가져와요. 열두 통이 이어지는 짧은 이야기예요(그림 없이 글만).
+  /* ===== 날씨 END ===== */
+  /* ===== 학부모 쪽지 이야기 BEGIN (로드맵 9절) =====
+     까치 우체부가 게임 시계 한 주에 한 통씩 학부모 편지를 가져와요. 열두 통이 이어지는 짧은 이야기예요(그림 없이 글만)
      처음 받는 날에 첫 통, 그 뒤로 월요일마다 한 통. 읽으면 숲의 정수 2(작은 고마움). 다 읽은 편지는 설정 > 학부모 편지함에서 다시 봐요 */
   const PL = { ess: 2, list: [
     { from: '토끼 학생네 엄마', title: '처음 보내는 편지', txt: '교장 선생님, 안녕하세요.\n우리 아이가 숲속 학교에 다닌 지 한 달이 됐어요.\n처음에는 교문 앞에서 귀를 축 늘어뜨리고 울었는데, 요즘은 아침마다 먼저 가방을 메고 기다려요.\n고맙다는 말을 꼭 전하고 싶어서 까치 우체부에게 부탁했어요.' },
@@ -323,13 +323,13 @@
     chip.hidden = !show; chipRow();
     const sub = $('#plSub'); if (sub) sub.textContent = S.pl.got ? `받은 편지 ${S.pl.got}통${plUnread() ? ', 새 편지가 있어요' : ''}` : '까치 우체부가 학부모 편지를 가져와요';
   }
-  /* ===== 2.1.3 학부모 쪽지 이야기 END ===== */
+  /* ===== 학부모 쪽지 이야기 END ===== */
 
 
-  /* ===== 2.1.3 랭킹 시즌과 다른 학교 구경 BEGIN (시즌 설계안 2, 4절, woodani 확정) =====
-     랭킹 시즌: 계절마다(겨울 12~2월, 봄 3~5월, 여름 6~8월, 가을 9~11월) 주간 리그 점수를 모아요. 2026 겨울이 시즌 1.
-     시즌 점수 300점이면 그 계절 기념 장식, 시즌 순위 1~3위는 칭호 '숲속 시즌 왕', 기념 장식 넷을 다 모으면 '사계절 교장'.
-     다른 학교 구경: 교장 선생님이 '내 학교 보여 주기'를 켠 학교만 서버(forest/look)에 학교 모습을 올려요. 처음에는 꺼져 있어요.
+  /* ===== 랭킹 시즌과 다른 학교 구경 BEGIN (시즌 설계안 2, 4절) =====
+     랭킹 시즌: 계절마다(겨울 12~2월, 봄 3~5월, 여름 6~8월, 가을 9~11월) 주간 리그 점수를 모아요. 2026 겨울이 시즌 1
+     시즌 점수 300점이면 그 계절 기념 장식, 시즌 순위 1~3위는 칭호 '숲속 시즌 왕', 기념 장식 넷을 다 모으면 '사계절 교장'
+     다른 학교 구경: 교장 선생님이 '내 학교 보여 주기'를 켠 학교만 서버(forest/look)에 학교 모습을 올려요. 처음에는 꺼져 있어요
      예시 학교: 게임 안에 들어 있는 예쁘게 꾸민 본보기 학교. 누가 봐도 예시인 걸 알게 이름과 띠에 늘 적어요 */
   const RS = { min: 300, startKey: 2027 * 4, look: 600000 };   // 2027*4 = 2026년 12월~2027년 2월 겨울
   const rsKeyOf = day => { const [y, m] = day.split('-').map(Number); return (m === 12 ? y + 1 : y) * 4 + (m === 12 || m <= 2 ? 0 : m <= 5 ? 1 : m <= 8 ? 2 : 3); };
@@ -346,14 +346,14 @@
     if (old >= 1 && S.rs.p >= RS.min) {
       const id = 'rs_' + RS_Q[rsQ(old)][0];
       if (DECO_BY[id] && !decoOwn(id)) { S.deco.own[id] = 1; items.push({ ic: '🎁', t: `기념 장식 '${DECO_BY[id].name}'` }); }
-      else items.push(goldOr(1, '(기념 장식은 이미 있어요)'));   // 4.2.0
+      else items.push(goldOr(1, '(기념 장식은 이미 있어요)'));
     }
     if (old >= 1 && S.rs.pos >= 1 && S.rs.pos <= 3 && S.rs.p > 0) { S.rs.king += 1; items.push({ ic: '🏆', t: `시즌 순위 ${S.rs.pos}위! 칭호 '숲속 시즌 왕'` }); }
     if (items.length) showReward({ title: `${rsLabel(old)}이 끝났어요`, sub: `시즌 점수 ${fmt(S.rs.p)}점`, items });
     S.rs.n = n; S.rs.p = 0; S.rs.pos = 0;
   }
   const RS_Q = [['winter', '겨울', 'season_winter', '눈꽃 트로피'], ['spring', '봄', 'season_spring', '벚꽃 트로피'], ['summer', '여름', 'season_summer', '파도 분수 트로피'], ['autumn', '가을', 'season_autumn', '단풍 도토리 조각상']];
-  // 2.1.3 다른 학교 구경에 올리는 내 학교 모습(4,000자 안)
+  // 다른 학교 구경에 올리는 내 학교 모습(4,000자 안)
   function lookDoc() {
     const gi = geoIdx(S.tier), f = {}, bs = {};
     for (const k of Object.keys(FAC)) if ((FAC[k].tier || 0) <= S.tier) { f[k] = Math.min(999, S.f[k] | 0); bs[k] = S.bs ? (S.bs[k] | 0) : S.tier; }
@@ -372,19 +372,19 @@
       st: Math.max(0, Math.min(1e7, Math.floor(Number(d.st) || 0))), rare: (Array.isArray(d.rare) ? d.rare : []).filter(sp => RARE.list.some(x => x.sp === sp)).slice(0, 6),
       vd: Math.max(0, Math.min(9999, Math.floor(Number(d.vd) || 0))), kids: (Array.isArray(d.kids) ? d.kids : []).filter(okSp).slice(0, 8) };
   }
-  // 예시 학교(woodani 요청 2026-10-30): 서버 없이 누구나 볼 수 있어요. 이름과 띠에 '예시'를 늘 적어요
-  // 3.0.1 woodani: 예시 학교는 고등학교, 누구나 고급 지도와 건물로 보여요(모델하우스). 레벨은 고등학교 상한 30, 학생은 교실 Lv.30 정원과 기숙사를 어림한 수(제안)
+  // 예시 학교: 서버 없이 누구나 볼 수 있어요. 이름과 띠에 '예시'를 늘 적어요
+  // 예시 학교는 고등학교, 누구나 고급 지도와 건물로 보여요(모델하우스). 레벨은 고등학교 상한 30, 학생은 교실 Lv.30 정원과 기숙사를 어림한 수(제안)
   const MODEL_SCHOOL = { model: true, who: '숲속 학교 예시', t: 3, y: 3, nm: '본보기', mk: [0, 0, 3, 2], ti: '',
     f: { classroom: 30, cafeteria: 30, library: 30, playground: 30, science: 30, store: 30, dorm: 30 }, bs: { classroom: 3, cafeteria: 3, library: 3, playground: 3, science: 3, store: 3, dorm: 3 },
     lay: ['fountain', 'flowerbed', 'arch', 'swingtree', 'pond', 'clock', 'crystal', 'streetlamp', 'bench', 'rainbow', 'owl'], st: 150, rare: ['rabbit', 'fox', 'chick'], vd: 8,
     kids: ['rabbit_rare', 'fox_rare', 'chick_rare', 'redpanda', 'capybara', 'kangaroo', 'panda', 'otter'] };
-  // 3.3.0 woodani: 모델하우스는 유, 초, 중, 고를 모두 볼 수 있게. 학교급마다 장식과 학생을 다르게 꾸며요(학생 수와 연차는 어림한 값)
+  // 모델하우스는 유, 초, 중, 고를 모두 볼 수 있게. 학교급마다 장식과 학생을 다르게 꾸며요(학생 수와 연차는 어림한 값)
   const MODEL_TIER = [
     { y: 1, st: 40, lay: ['flowerbed', 'swingtree', 'mushroom', 'pond', 'birdhouse', 'rainbow', 'picnic', 'bench', 'arch', 'owl', 'fountain'], kids: ['rabbit_rare', 'fox_rare', 'chick_rare', 'bear', 'raccoon', 'hamster', 'duck', 'frog'] },
     { y: 6, st: 80, lay: ['fountain', 'flowerbed', 'picnic', 'swingtree', 'pond', 'birdhouse', 'rainbow', 'bench', 'arch', 'statue', 'signpost'], kids: ['rabbit_rare', 'fox_rare', 'chick_rare', 'cat', 'dog', 'penguin', 'otter', 'turtle'] },
     { y: 3, st: 120, lay: ['statue', 'flowerbed', 'arch', 'streetlamp', 'pond', 'clock', 'crystal', 'bench', 'swingtree', 'fountain', 'owl'], kids: ['rabbit_rare', 'fox_rare', 'chick_rare', 'panda', 'koala', 'mole', 'waterdeer', 'cat'] },
     { y: MODEL_SCHOOL.y, st: MODEL_SCHOOL.st, lay: MODEL_SCHOOL.lay, kids: MODEL_SCHOOL.kids },
-    // 4.0.0 대학교: 구역마다 꾸미기 6곳(zl). 대학교가 열렸을 때만 탭이 보여요. 학생 수는 어림한 값
+    // 대학교: 구역마다 꾸미기 6곳(zl). 대학교가 열렸을 때만 탭이 보여요. 학생 수는 어림한 값
     { y: 4, st: 200, lay: [], kids: ['rabbit_rare', 'fox_rare', 'chick_rare', 'meerkat', 'sloth', 'chinchilla', 'redpanda', 'capybara'],
       zl: { academic: ['statue', 'flowerbed', 'clock', 'streetlamp', 'bench', 'owl'], life: ['picnic', 'flowerbed', 'pond', 'streetlamp', 'bench', 'birdhouse'],
         plaza: ['fountain', 'arch', 'flowerbed', 'crystal', 'streetlamp', 'rainbow'], sports: ['signpost', 'bench', 'flowerbed', 'streetlamp', 'swingtree', 'statue'] } }];
@@ -393,7 +393,7 @@
     for (const k of Object.keys(FAC)) { f[k] = (FAC[k].tier || 0) <= t ? (t >= 4 ? 35 : 30) : 0; bs[k] = t; }
     return Object.assign({}, MODEL_SCHOOL, { t, y: M.y, st: M.st, f, bs, lay: t >= 4 ? [] : M.lay.slice(0, DECO_SLOTS[geoIdx(t)].length), zl: M.zl || null, kids: M.kids });
   }
-  /* 2.2.0 검토 6: 공개를 끄면 서버의 forest/look/<id>를 지워요. 못 지웠으면 S.lk.del을 남겨(앱을 껐다 켜도) 랭킹이 다시 이어질 때 다시 지워요.
+  /* 6: 공개를 끄면 서버의 forest/look/<id>를 지워요. 못 지웠으면 S.lk.del을 남겨(앱을 껐다 켜도) 랭킹이 다시 이어질 때 다시 지워요
      다른 기기의 옛 저장(공개 켬)이 다시 올리지 않게, 올린 적이 있는데(pub) 서버에 내 학교가 없으면 다른 곳에서 끈 것으로 보고 이 기기도 꺼요 */
   async function lookDelNow() {
     if (!S || !S.lk) return false;
@@ -427,7 +427,7 @@
   async function openLook(id, who) {
     if (!S) return;
     let data = null;
-    if (id === 'model') data = modelOf(S.tier);   // 3.3.0 처음에는 지금 내 학교급으로 열어요
+    if (id === 'model') data = modelOf(S.tier);   // 처음에는 지금 내 학교급으로 열어요
     else if (id === Rank.uid) data = Object.assign(lookRead(lookDoc()), { who: S.rank.name, me: true });
     else {
       if (!Rank.be || !Rank.be.lookGet) { toast('다른 학교 구경은 서버에 연결된 판에서 열려요'); return; }
@@ -440,7 +440,7 @@
     rt.lookData = data; rt.viewTier = data.t; rt.viewEdit = false;
     renderTierView(true); renderTierDots();
   }
-  /* ===== 2.1.3 랭킹 시즌과 다른 학교 구경 END ===== */
+  /* ===== 랭킹 시즌과 다른 학교 구경 END ===== */
 
   function renderEvent() {
     const body = $('#evBody');
@@ -449,7 +449,7 @@
     const key = [S.ev.cur, day, S.ev.stamp.n, S.ev.stamp.last, S.ev.list.map(m => `${evProg(m)}${m.done ? 'd' : ''}`).join(','), S.ev.box, S.tier, EV_SPECIAL.map(e => e.start + e.end).join('')].join('|');
     if (body.dataset.key === key) return;
     body.dataset.key = key;
-    // 2.0.1 이벤트 예정(woodani): 매주 이벤트와 특별 이벤트를 섞어 다가오는 4개. 특별 이벤트는 금빛으로 강조
+    // 이벤트 예정: 매주 이벤트와 특별 이벤트를 섞어 다가오는 4개. 특별 이벤트는 금빛으로 강조
     const ups = evUpcoming(day, 4);
     const upcoming = ups.length ? `<h4 class="dex-h">이벤트 예정</h4><ul class="ev-up">${ups.map(c => {
       const sp = EV_SPECIAL.includes(c.def), d = dayDiff(day, c.start);
@@ -475,10 +475,10 @@
         (m.done ? `<span class="dm-ok">${CHECK}</span>` : rd ? `<button class="cta small" type="button" data-ev="m${i}">받기</button>` : `<span class="dm-n">${p}/${m.n}</span>`) + '</div>';
     }).join('');
     const all = evAllDone();
-    const evBoxDeco = () => { const dd = DECO_BY['ev_' + cur.def.id]; return !S.ev.box && dd && evDecoArt(dd) && !decoOwn(dd.id); };   // 2.1.2.2 처음 한 번 받는 한정 장식
+    const evBoxDeco = () => { const dd = DECO_BY['ev_' + cur.def.id]; return !S.ev.box && dd && evDecoArt(dd) && !decoOwn(dd.id); };   // 처음 한 번 받는 한정 장식
     const box = `<div class="dm ev-box${S.ev.box ? ' done' : ''}"><span class="dex-pic">${pic7('ev_box', 'ic_fund')}</span><div class="dm-tx"><b>기념 상자</b><small>미션 3개를 다 하면 열려요</small>${rwChips([evBoxDeco() ? ['🎁', '한정 장식', 1] : null, ['gold', EV_BOX.g], ['ess', EV_BOX.e], ['dip', EV_BOX.dip], tkChip('box'), ['⚡', MG.E.box], ['🔑', 1]])}</div>` +
       (S.ev.box ? `<span class="dm-ok">${CHECK}</span>` : all ? '<button class="cta small" type="button" data-ev="box">열기</button>' : `<span class="dm-n">${S.ev.list.filter(m => m.done).length}/3</span>`) + '</div>';
-    const u = IMG7(cur.def.banner) || (cur.def.fb ? IMG7(cur.def.fb) : '');   // 2.0.0 새 배너 그림이 오기 전에는 비슷한 배너를 빌려 써요
+    const u = IMG7(cur.def.banner) || (cur.def.fb ? IMG7(cur.def.fb) : '');   // 새 배너 그림이 오기 전에는 비슷한 배너를 빌려 써요
     body.innerHTML = `<div class="ev-banner ${cur.def.id}${u ? ' has-img' : ''}">${u ? `<img src="${u}" alt="">` : ''}<b>${esc(cur.def.name)}</b></div>` +
       `<div class="ev-period"><span>${dayText(cur.start)} ~ ${dayText(cur.end)}</span><span>${left > 0 ? `${left}일 남음` : '오늘까지'}</span></div>` +
       `<p class="lead">${esc(nl(cur.def.lead))}</p>` + evSkipLine(day) +
