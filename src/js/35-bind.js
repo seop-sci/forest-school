@@ -338,7 +338,7 @@
       const now = Date.now();
       verTaps = now - verAt < 1500 ? verTaps + 1 : 1;
       verAt = now;
-      if (AIT || window.FOREST_STORE) return;   // 토스 판과 구글 플레이 판에는 개발자 메뉴를 열지 않아요
+      if (AIT || window.FOREST_STORE) { if (verTaps >= 5) { verTaps = 0; fpsToggle(); } return; }   // 토스 판과 구글 플레이 판에는 개발자 메뉴를 열지 않고, 다섯 번 누르면 초당 장수 보기만 켜고 꺼요
       if (verTaps >= 5 && $('#devBox').hidden) { $('#devBox').hidden = false; toast('개발자 테스트 메뉴가 열렸어요'); devLuxShow(); }
     });
     // 화면 고치기 모드 (관리자 계정으로 웹판에서만. 앱에서는 단추가 안 보여요)

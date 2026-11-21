@@ -16,6 +16,7 @@ OPEN = f"(() => {{ const F = {F}; document.querySelectorAll('.overlay').forEach(
 
 async def open_page(b, pixi):
     save = base(tier=4, tg=1); save['tam'] = {'best': 3, 'party': ['bear', 'cat', 'fox', 'duck', 'dog'], 'mem': {k: {'lv': 150, 'st': 5, 'sh': 0} for k in ['bear', 'cat', 'fox', 'duck', 'dog']}, 'seen': 1}
+    save['gfx'] = 1   # 5.3.2: 그래픽 낮음이면 엔진을 받지 않아요(이 기계는 코어 2개라 자동이 낮음)
     ctx = await b.new_context(viewport={'width': 390, 'height': 844}, device_scale_factor=1, is_mobile=True, has_touch=True)
     await ctx.add_init_script("window.__FOREST_TEST = true;" + (f"window.FS_PIXI_SRC = {json.dumps(PIXI)};" if pixi else ''))
     await ctx.add_init_script("if(!sessionStorage.getItem('seeded')){localStorage.setItem('forest-school-v1', %s);sessionStorage.setItem('seeded','1');}" % json.dumps(json.dumps(save)))

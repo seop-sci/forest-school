@@ -17,6 +17,7 @@ TAP = "document.querySelector('#oak').dispatchEvent(new MouseEvent('click',{bubb
 
 async def open_page(b, pixi, reduced=False):
     save = base(tier=1); save['q']['m'] = 120; save['q']['seen'] = 120; save['oak'] = 8
+    save['gfx'] = 1   # 5.3.2: 그래픽 낮음이면 엔진을 받지 않아요(이 기계는 코어 2개라 자동이 낮음)
     ctx = await b.new_context(viewport={'width': 390, 'height': 844}, device_scale_factor=1, is_mobile=True, has_touch=True, reduced_motion='reduce' if reduced else 'no-preference')
     await ctx.add_init_script("window.__FOREST_TEST = true;" + (f"window.FS_PIXI_SRC = {json.dumps(PIXI)};" if pixi else ''))
     await ctx.add_init_script("if(!sessionStorage.getItem('seeded')){localStorage.setItem('forest-school-v1', %s);sessionStorage.setItem('seeded','1');}" % json.dumps(json.dumps(save)))
@@ -35,7 +36,7 @@ async def main():
         await pg.evaluate(TAP); await pg.wait_for_timeout(80)
         r = await pg.evaluate(f"""(() => ({{ st: {F}.FXL.st, on: {F}.fxOn(), cv: !!document.querySelector('canvas.fxl'), shake: document.querySelector('#oakCanopy').classList.contains('shake'), drops: {F}.rt.drops.length }}))()""")
         print('엔진 없음', r)
-        if r['st'] != 'no' or r['on'] or r['cv'] or not r['shake'] or r['drops'] != 1: bad.append(f'엔진 없을 때 예전 그대로 {r}')
+        if r['st'] not in ('no', '') or r['on'] or r['cv'] or not r['shake'] or r['drops'] != 1: bad.append(f'엔진 없을 때 예전 그대로 {r}')
         await pg.wait_for_timeout(800)
         v, b0, b1 = await pg.evaluate(f"(() => {{ const v = {F}.dropValue(), a = {F}.S.budget; document.querySelector('.drop').dispatchEvent(new MouseEvent('click', {{ bubbles: true }})); return [v, a, {F}.S.budget]; }})()")
         if abs((b1 - b0) - v) > 1e-6 * max(1, v): bad.append(f'엔진 없을 때 줍는 값 {b1 - b0} != {v}')

@@ -9,8 +9,30 @@
   const fxOn = () => FXL.st === 'ok' && !rt.reduced && rt.tab === 'school' && !document.hidden;
   // 제안 숫자(바꿀 수 있어요): 참나무 처음 흔들림 4도, 연타 때 최대 8도, 잎 6~10장
   const FXC = { oakDeg: 4, oakMax: 8, oakW: 90, oakDamp: 6, leaves: [6, 10], g: 620, bounce: 0.36, fly: 0.7 };
+  // 그림판 해상도: 높음이어도 1.5배까지, 보통과 낮음은 1배(화소 비율 3인 폰에서 그림판이 9배 커져 끊겼어요). 테두리 매끄럽게(antialias)도 꺼요
+  const fxRes = () => Math.min(wldLv() >= 2 ? 1.5 : 1, window.devicePixelRatio || 1);
+  // 지도 그림판은 그릴 것이 있을 때만 보여요(숨은 그림판은 브라우저가 겹쳐 그리지 않아요)
+  function fxShow(on) { if (FXL.app && FXL.app.canvas.hidden === !!on) FXL.app.canvas.hidden = !on; }
+  // 엔진 받기: 그래픽 낮음이면 받지 않아요(예전 SVG 연출). 보통 이상은 처음 누른 뒤 쉬는 틈에, 탐험이나 미니게임에 들어가면 바로
+  function fxWant() {
+    if (FXL.st || rt.reduced || !S || wldLv() < 1) return;
+    const go = () => { if (window.requestIdleCallback) requestIdleCallback(fxLoad, { timeout: 3000 }); else setTimeout(fxLoad, 300); };
+    if (window.FS_PIXI_SRC || FXL.touched) go();   // 시험판(FS_PIXI_SRC)은 누르지 않아도 받아요
+    else if (!FXL.waitT) { FXL.waitT = true; document.addEventListener('pointerdown', () => { FXL.touched = true; go(); }, { once: true, capture: true, passive: true }); }
+  }
+  // 작은 효과 그림은 큰 원본을 그대로 쓰면 1배 그림판에서 계단처럼 깨져요. 반씩 줄여 긴 쪽 128 안팎으로 만든 뒤 써요(더 가볍기도 해요)
+  function fxTexSm(im, max = 128) {
+    const P = window.PIXI; let w = im.naturalWidth || im.width, h = im.naturalHeight || im.height, src = im;
+    if (Math.max(w, h) <= max) return P.Texture.from(im);
+    for (let i = 0; i < 6 && Math.max(w, h) > max; i++) {
+      const f = Math.max(0.5, max / Math.max(w, h)), nw = Math.max(1, Math.floor(w * f)), nh = Math.max(1, Math.floor(h * f));
+      const c = document.createElement('canvas'); c.width = nw; c.height = nh; const g = c.getContext('2d'); g.imageSmoothingQuality = 'high'; g.drawImage(src, 0, 0, nw, nh);
+      src = c; w = nw; h = nh;
+    }
+    return P.Texture.from(src);
+  }
   function fxLoad() {
-    if (FXL.st || rt.reduced) return;
+    if (FXL.st || rt.reduced || wldLv() < 1) return;
     try { const c = document.createElement('canvas'); if (!(c.getContext('webgl2') || c.getContext('webgl'))) { FXL.st = 'no'; return; } } catch (e) { FXL.st = 'no'; return; }
     FXL.st = 'load';
     const s = document.createElement('script'); s.src = FXL_SRC(); s.async = true;
@@ -21,27 +43,28 @@
   async function fxInit() {
     const fr = $('.frame'); if (!fr || !window.PIXI || !window.PIXI.Application) { FXL.st = 'no'; return; }
     const P = window.PIXI, app = new P.Application();
-    await app.init({ width: Math.max(1, fr.clientWidth), height: Math.max(1, fr.clientHeight), backgroundAlpha: 0, antialias: true, resolution: Math.min(wldLv() >= 2 ? 3 : 2, window.devicePixelRatio || 1), autoDensity: true, autoStart: false, sharedTicker: false, preference: 'webgl' });
+    await app.init({ width: Math.max(1, fr.clientWidth), height: Math.max(1, fr.clientHeight), backgroundAlpha: 0, antialias: false, resolution: fxRes(), autoDensity: true, autoStart: false, sharedTicker: false, preference: 'webgl' });
     app.ticker.stop();
     const cv = app.canvas; cv.className = 'fxl'; cv.setAttribute('aria-hidden', 'true'); $('#map').after(cv);
     FXL.app = app; FXL.w = new P.Container(); app.stage.addChild(FXL.w);
-    const tx = k => new Promise(r => { const u = IMG(k); if (!u) { r(null); return; } const im = new Image(); im.onload = () => { try { r(P.Texture.from(im)); } catch (e) { r(null); } }; im.onerror = () => r(null); im.src = u; });
+    const tx = k => new Promise(r => { const u = IMG(k); if (!u) { r(null); return; } const im = new Image(); im.onload = () => { try { r(fxTexSm(im)); } catch (e) { r(null); } }; im.onerror = () => r(null); im.src = u; });
     for (const k of ['ic_acorn', 'fx_leaf_1', 'fx_leaf_2', 'fx_leaf_3', 'fx_dust_1']) FXL.tex[k] = await tx(k);
     FXL.tex.star = app.renderer.generateTexture(new P.Graphics().star(0, 0, 4, 8, 3).fill(0xffffff));
     FXL.tex.dot = app.renderer.generateTexture(new P.Graphics().circle(0, 0, 4).fill(0xffffff));
     if (!FXL.tex.ic_acorn) { FXL.st = 'no'; cv.remove(); return; }
-    FXL.st = 'ok';
+    FXL.st = 'ok'; cv.hidden = true;
+    try { if (rt.tab === 'tam') { fxTamInit(); fxgInit(); } wldSync(); } catch (e) { /* 다음 화면에서 */ }   // 탐험 화면에서 받았으면 바로 탐험 그림판도
     setTimeout(() => { try { ['fxe_conf_1', 'fxe_conf_2', 'fxe_conf_3', 'fxe_conf_4', 'fxe_bit', 'fxe_spark', 'fxe_cap', 'fxe_tape_l', 'fxe_tape_r', 'fxe_beam', 'fxe_petal_1', 'fxe_petal_2', 'fxe_petal_3', 'tr_leaf_2'].forEach(fxeTex); } catch (e) { /* 없으면 코드 모양 */ } }, 2000);   // 행사 그림(작업지시서 103) 미리 받기
   }
   const fxRnd = (a, b) => a + Math.random() * (b - a);   // 반짝이는 보통 섞기로 그려요(그림판 바탕이 투명이라 더하기 섞기는 거의 안 보여요)
   // 화면 자리(px) ↔ 지도 자리. 지도는 viewBox 0 -60 360 540이라 왼쪽 위가 (0, -60)
   function fxMapPt(cx, cy) { const R = $('#map').getBoundingClientRect(), k = R.width / 360 || 1; return [(cx - R.left) / k, (cy - R.top) / k - 60]; }
-  function fxKick() { if (FXL.st === 'ok' && !FXL.raf) { FXL.last = performance.now(); FXL.raf = requestAnimationFrame(fxFrame); } }
+  function fxKick() { if (FXL.st === 'ok' && !FXL.raf) { fxShow(true); FXL.last = performance.now(); FXL.raf = requestAnimationFrame(fxFrame); } }
   function fxClear() {
     for (const L of [FXL.parts, FXL.falls, FXL.flys]) { for (const p of L) { if (p.s && !p.s.destroyed) p.s.destroy(); if (p.d && p.d.g) { const f = p.d.g.querySelector('.drop-fall'); if (f) f.style.opacity = ''; } } L.length = 0; }
     oakBend(0); FXL.oak.a = FXL.oak.v = 0;
     fxeReset(); FXE.end = null;
-    if (FXL.app) FXL.app.render();
+    if (FXL.app && !WLD.parts.length) fxShow(false); else if (FXL.app) FXL.app.render();
   }
   function fxFrame(now) {
     FXL.raf = 0;
@@ -83,7 +106,7 @@
       if (u >= 1) { s.destroy(); FXL.flys.splice(i, 1); if (to && to.animate) to.animate([{ transform: 'scale(1)' }, { transform: 'scale(1.22)' }, { transform: 'scale(1)' }], { duration: 300, easing: 'ease-out' }); } }
     if (fxeStep(dt, now)) busy = true;   // 학교 행사
     if (FXL.parts.length || FXL.falls.length || FXL.flys.length) busy = true;
-    app.render();
+    if (busy || WLD.parts.length) app.render(); else fxShow(false);   // 다 끝났고 마을 층도 그릴 것이 없으면 그림판을 숨겨요
     if (busy) FXL.raf = requestAnimationFrame(fxFrame);
   }
   function fxSprite(tex, x, y, sz) { const s = new window.PIXI.Sprite(tex); s.anchor.set(0.5); s.x = x; s.y = y; s.scale.set(sz * (tex._fxK || 1) / (tex.width || 1)); FXL.w.addChild(s); return s; }
@@ -137,7 +160,7 @@
   }
   document.addEventListener('visibilitychange', () => { if (document.hidden && FXL.st === 'ok') fxClear(); });
   if (motionMQ && motionMQ.addEventListener) motionMQ.addEventListener('change', e => { if (e.matches && FXL.st === 'ok') fxClear(); });
-  window.addEventListener('load', () => setTimeout(fxLoad, 1500));
+  window.addEventListener('load', () => setTimeout(fxWant, 1500));
 
   /* ---------- 탐험 효과층('탐험도 인게임에서'): 탐험 무대(#tmFx) 안에 그림판(canvas.fxt)을 한 장 더 ----------
      지금 탐험 연출(대원 공격 자세, 날아가는 기술 그림, 숫자, 흔들림, 필살기 장면)은 그대로 두고 그 위에 더해요
@@ -151,10 +174,10 @@
     FXT.st = 'load';
     try {
       const P = window.PIXI, app = new P.Application();
-      await app.init({ width: Math.max(1, box.clientWidth), height: Math.max(1, box.clientHeight), backgroundAlpha: 0, antialias: true, resolution: Math.min(2, window.devicePixelRatio || 1), autoDensity: true, autoStart: false, sharedTicker: false, preference: 'webgl' });
-      app.ticker.stop(); const cv = app.canvas; cv.className = 'fxt'; cv.setAttribute('aria-hidden', 'true'); box.prepend(cv);
+      await app.init({ width: Math.max(1, box.clientWidth), height: Math.max(1, box.clientHeight), backgroundAlpha: 0, antialias: false, resolution: fxRes(), autoDensity: true, autoStart: false, sharedTicker: false, preference: 'webgl' });
+      app.ticker.stop(); const cv = app.canvas; cv.className = 'fxt'; cv.setAttribute('aria-hidden', 'true'); cv.hidden = true; box.prepend(cv);
       FXT.app = app; FXT.w = new P.Container(); app.stage.addChild(FXT.w);
-      const tx = k => new Promise(r => { const u = IMG(k); if (!u) { r(null); return; } const im = new Image(); im.onload = () => { try { r(P.Texture.from(im)); } catch (e) { r(null); } }; im.onerror = () => r(null); im.src = u; });
+      const tx = k => new Promise(r => { const u = IMG(k); if (!u) { r(null); return; } const im = new Image(); im.onload = () => { try { r(fxTexSm(im)); } catch (e) { r(null); } }; im.onerror = () => r(null); im.src = u; });
       for (const k of ['ex_mat_twig', 'ex_mat_stone', 'ex_mat_petal', 'ex_mat_star']) FXL.tex[k] = FXL.tex[k] || await tx(k);
       // 그려 만든 그림(RenderTexture)은 그 그림판에서만 써요. 탐험 그림판 것을 따로 만들어요
       FXT.star = app.renderer.generateTexture(new P.Graphics().star(0, 0, 4, 8, 3).fill(0xffffff)); FXT.dot = app.renderer.generateTexture(new P.Graphics().circle(0, 0, 4).fill(0xffffff));
@@ -163,8 +186,8 @@
   }
   // 무대 자리: tamAt은 화면에서 잰 값(카메라 확대가 들어 있음)이라 그림판 칸으로 바꿔요
   function fxTamAt(el, fy) { const box = $('#tmFx'); if (!box || !el) return null; const [x, y] = tamAt(el, fy), r = box.getBoundingClientRect(), k = box.clientWidth / (r.width || 1); return [x * k, y * k]; }
-  function fxTamKick() { if (FXT.st === 'ok' && !FXT.raf) { FXT.last = performance.now(); FXT.raf = requestAnimationFrame(fxTamFrame); } }
-  function fxTamClear() { for (const p of FXT.parts) if (!p.s.destroyed) p.s.destroy(); FXT.parts.length = 0; for (const g of FXT.rings) if (!g.g.destroyed) g.g.destroy(); FXT.rings.length = 0; if (FXT.app) FXT.app.render(); }
+  function fxTamKick() { if (FXT.st === 'ok' && !FXT.raf) { FXT.app.canvas.hidden = false; FXT.last = performance.now(); FXT.raf = requestAnimationFrame(fxTamFrame); } }
+  function fxTamClear() { for (const p of FXT.parts) if (!p.s.destroyed) p.s.destroy(); FXT.parts.length = 0; for (const g of FXT.rings) if (!g.g.destroyed) g.g.destroy(); FXT.rings.length = 0; if (FXT.app) FXT.app.canvas.hidden = true; }
   function fxTamPart(tex, x, y, sz, o) {
     if (!tex) return; const s = new window.PIXI.Sprite(tex); s.anchor.set(0.5); s.x = x; s.y = y; s.scale.set(sz / (tex.width || 1)); if (o.tint) s.tint = o.tint;  FXT.w.addChild(s);
     FXT.parts.push({ s, vx: o.vx || 0, vy: o.vy || 0, g: o.g || 0, rot: o.rot || 0, life: o.life, max: o.life, floor: o.floor, bounce: o.bounce || 0, n: 0, shrink: !!o.shrink, k0: s.scale.x });
@@ -212,8 +235,9 @@
       if (p.life <= 0) { s.destroy(); FXT.parts.splice(i, 1); } }
     for (let i = FXT.rings.length - 1; i >= 0; i--) { const R = FXT.rings[i]; R.t += dt; const u = Math.min(1, R.t / R.max);
       R.g.clear().circle(0, 0, R.r * (0.15 + 0.85 * u)).stroke({ color: R.col, width: Math.max(1, R.r * 0.12 * (1 - u)), alpha: 1 - u }); if (u >= 1) { R.g.destroy(); FXT.rings.splice(i, 1); } }
-    app.render();
-    if (FXT.parts.length || FXT.rings.length || shots.length) FXT.raf = requestAnimationFrame(fxTamFrame);
+    const more = FXT.parts.length || FXT.rings.length || shots.length;
+    if (more) app.render(); else app.canvas.hidden = true;   // 다 끝나면 탐험 효과 그림판도 숨겨요
+    if (more) FXT.raf = requestAnimationFrame(fxTamFrame);
   }
 
   /* ---------- 학교 행사 효과('행사 열 가지 한 번에', 설계안 ' 설계안 (학교 행사 실제 움직임, 효과층 3단계)') ----------
@@ -227,7 +251,7 @@
   function fxeTex(k) {
     if (FXE.tex[k] !== undefined) return FXE.tex[k];
     const u = IMG(k);
-    if (u) { FXE.tex[k] = null; const im = new Image(); im.onload = () => { try { const t = window.PIXI.Texture.from(im); t._fxK = FXE_K(k); FXE.tex[k] = t; } catch (e) { /* 코드 모양 그대로 */ } }; im.src = u; }
+    if (u) { FXE.tex[k] = null; const im = new Image(); im.onload = () => { try { const t = fxTexSm(im, /tape|beam/.test(k) ? 512 : 128); t._fxK = FXE_K(k); FXE.tex[k] = t; } catch (e) { /* 코드 모양 그대로 */ } }; im.src = u; }
     const P = window.PIXI, r = FXL.app.renderer, G = () => new P.Graphics();
     let g;
     if (k === 'fxe_conf_1') g = G().rect(-8, -3, 16, 6).fill(0xe04848);
@@ -332,7 +356,7 @@
   // 운동회
   function fxeBall(d, dx) {   // 트랙 밖에서 튀며 굴러 들어와 마찰로 멈춰요. 그동안 SVG 공은 숨겨요
     if (!fxOn()) return false; const fall = d.g.querySelector('.drop-fall'), u = IMG('fest_ball_blue'); if (!fall || !u) return false;
-    if (FXE.tex.ball === undefined) { FXE.tex.ball = null; const im = new Image(); im.onload = () => { try { FXE.tex.ball = window.PIXI.Texture.from(im); } catch (e) { /* 없으면 예전 공 */ } }; im.src = u; }
+    if (FXE.tex.ball === undefined) { FXE.tex.ball = null; const im = new Image(); im.onload = () => { try { FXE.tex.ball = fxTexSm(im); } catch (e) { /* 없으면 예전 공 */ } }; im.src = u; }
     if (!FXE.tex.ball) return false;
     fall.style.opacity = '0';
     const s = fxSprite(FXE.tex.ball, d.x + dx, d.y - 1, 22);
@@ -442,7 +466,7 @@
     FXG.st = 'load';
     try {
       const P = window.PIXI, app = new P.Application();
-      await app.init({ width: Math.max(1, world.clientWidth), height: Math.max(1, world.clientHeight), backgroundAlpha: 0, antialias: true, resolution: Math.min(2, window.devicePixelRatio || 1), autoDensity: true, autoStart: false });
+      await app.init({ width: Math.max(1, world.clientWidth), height: Math.max(1, world.clientHeight), backgroundAlpha: 0, antialias: false, resolution: fxRes(), autoDensity: true, autoStart: false });
       app.ticker.stop(); const cv = app.canvas; cv.className = 'fxg'; cv.setAttribute('aria-hidden', 'true');
       const bgs = world.querySelector('.tm-bgs'); if (bgs) bgs.after(cv); else world.prepend(cv);
       FXG.app = app; FXG.root = new P.Container(); app.stage.addChild(FXG.root);
@@ -545,8 +569,8 @@
     if (FXO.st || FXL.st !== 'ok') return; FXO.st = 'load';
     try {
       const P = window.PIXI, app = new P.Application();
-      await app.init({ width: 4, height: 4, backgroundAlpha: 0, antialias: true, resolution: Math.min(2, window.devicePixelRatio || 1), autoDensity: true, autoStart: false });
-      app.ticker.stop(); app.canvas.className = 'fxo'; app.canvas.setAttribute('aria-hidden', 'true');
+      await app.init({ width: 4, height: 4, backgroundAlpha: 0, antialias: false, resolution: fxRes(), autoDensity: true, autoStart: false });
+      app.ticker.stop(); app.canvas.className = 'fxo'; app.canvas.setAttribute('aria-hidden', 'true'); app.canvas.hidden = true;
       FXO.app = app; FXO.w = new P.Container(); FXO.g = new P.Graphics(); app.stage.addChild(FXO.g, FXO.w);
       FXO.star = app.renderer.generateTexture(new P.Graphics().star(0, 0, 5, 10, 4).fill(0xffffff)); FXO.dot = app.renderer.generateTexture(new P.Graphics().circle(0, 0, 6).fill(0xffffff));
       FXO.st = 'ok';
@@ -591,8 +615,8 @@
       fxoPart(i % 3 ? FXO.star : FXO.dot, cx, cy, fxRnd(7, big ? 14 : 10), { vx: Math.cos(a) * v, vy: Math.sin(a) * v - 40, g: 260, rot: fxRnd(-6, 6), life: fxRnd(0.45, 0.7), tint: i % 2 ? c : 0xfff6c8, shrink: true }); }
     fxoKick();
   }
-  function fxoKick() { if (FXO.st === 'ok' && !FXO.raf) { FXO.last = performance.now(); FXO.raf = requestAnimationFrame(fxoFrame); } }
-  function fxoClear() { for (const p of FXO.parts) if (!p.s.destroyed) p.s.destroy(); FXO.parts.length = 0; FXO.rings.length = 0; if (FXO.g) FXO.g.clear(); if (FXO.app) FXO.app.render(); }
+  function fxoKick() { if (FXO.st === 'ok' && !FXO.raf) { FXO.app.canvas.hidden = false; FXO.last = performance.now(); FXO.raf = requestAnimationFrame(fxoFrame); } }
+  function fxoClear() { for (const p of FXO.parts) if (!p.s.destroyed) p.s.destroy(); FXO.parts.length = 0; FXO.rings.length = 0; if (FXO.g) FXO.g.clear(); if (FXO.app) FXO.app.canvas.hidden = true; }
   function fxoFrame(now) {
     FXO.raf = 0; const dt = Math.min(0.05, Math.max(0, (now - FXO.last) / 1000)); FXO.last = now;
     const cv = FXO.app.canvas; if (!cv.isConnected || !cv.offsetParent) { fxoClear(); return; }
@@ -602,6 +626,7 @@
     const g = FXO.g; g.clear();
     for (let i = FXO.rings.length - 1; i >= 0; i--) { const R = FXO.rings[i]; R.t += dt; const k = R.t / R.d; if (k >= 1) { FXO.rings.splice(i, 1); continue; }
       const e = 1 - Math.pow(1 - k, 3); g.circle(R.x, R.y, R.r0 + (R.r1 - R.r0) * e).stroke({ width: R.w * (1 - k) + 0.5, color: R.c, alpha: 0.9 * (1 - k) }); }
-    FXO.app.render();
-    if (FXO.parts.length || FXO.rings.length) FXO.raf = requestAnimationFrame(fxoFrame);
+    const more = FXO.parts.length || FXO.rings.length;
+    if (more) FXO.app.render(); else FXO.app.canvas.hidden = true;
+    if (more) FXO.raf = requestAnimationFrame(fxoFrame);
   }

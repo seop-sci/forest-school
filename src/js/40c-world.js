@@ -7,10 +7,13 @@
   // 제안 숫자: 빗방울 수, 눈송이 수, 반딧불 수, 나비 수(보통, 높음)
   const WLD_N = { rain: [45, 90], snow: [35, 70], fly: [7, 14], bfly: [2, 3], cloud: [0, 3] };
   const WLD_WATER = {"map_elem":[[18,186],[2,230],[18,258],[14,294],[26,358],[2,382]],"map_high":[[338,66],[358,94],[338,122],[354,150],[346,182],[186,206],[350,214],[354,246]],"map_kinder":[[22,126],[186,218],[2,350],[34,366],[42,398]]};   // dev/water_spots.py로 고른 물 자리
+  // 자동은 '높음'을 고르지 않아요(안드로이드 웹뷰는 중급 폰도 메모리를 8로 알려요). 홈에서 느리면 그 기기에서 한 단계 낮춰요(wldFpsWatch)
   function wldAuto() {
-    const c = navigator.hardwareConcurrency || 4, m = navigator.deviceMemory || 4;
-    return c >= 8 && m >= 6 ? 2 : c >= 4 ? 1 : 0;
+    const c = navigator.hardwareConcurrency || 4, base = c >= 4 ? 1 : 0;
+    let cap = 9; try { cap = +(localStorage.getItem(WLD_CAP_KEY) || 9); } catch (e) { /* 저장소를 못 쓰면 그대로 */ }
+    return Math.max(0, Math.min(base, cap));
   }
+  const WLD_CAP_KEY = 'forest-school-gfxcap';   // 이 기기에서 자동 품질을 낮춘 단계(게임 저장과 따로, 기기마다)
   const wldLv = () => rt.reduced || !S ? 0 : rt.photo ? 2 : (S.gfx >= 0 ? S.gfx : wldAuto());
   const wldMonth = () => new Date(gameNow() + KST_MS).getUTCMonth() + 1;
   const wldBg = () => { try { return thOn().bg || ''; } catch (e) { return ''; } };
@@ -47,6 +50,8 @@
     const key = (geo().map || '').replace(/_(spring|summer|autumn|winter|xmas|space|retro|lux)$/, '');
     if (key !== WLD.key) { WLD.key = key; WLD.water = WLD_WATER[key] || []; wldReset(); }
     if (home && lv && FXL.st === 'ok') wldStart(); else wldStop();
+    if (lv && !FXL.st) fxWant();
+    wldFpsWatch();
   }
   function wldPixi() {
     if (WLD.st) return WLD.st === 'ok';
@@ -62,14 +67,14 @@
   function wldTex(k) {
     if (WLD.tex[k] !== undefined) return WLD.tex[k];
     WLD.tex[k] = null; const u = IMG(k); if (!u) return null;
-    const im = new Image(); im.onload = () => { try { WLD.tex[k] = window.PIXI.Texture.from(im); } catch (e) { /* 없으면 그 생물만 빠져요 */ } }; im.src = u;
+    const im = new Image(); im.onload = () => { try { WLD.tex[k] = fxTexSm(im); } catch (e) { /* 없으면 그 생물만 빠져요 */ } }; im.src = u;
     return null;
   }
   function wldReset() { for (const p of WLD.parts) if (p.s && !p.s.destroyed) p.s.destroy(); WLD.parts.length = 0; WLD.next = {}; }
   function wldStart() { if (!wldPixi()) return; WLD.mc.visible = WLD.sc.visible = true; const fr = $('.frame'); if (fr) fr.classList.add('wld-on'); if (!WLD.timer) { WLD.last = performance.now(); WLD.timer = setTimeout(wldTick, 0); } }
   function wldStop() {
     clearTimeout(WLD.timer); WLD.timer = 0; const fr = $('.frame'); if (fr) fr.classList.remove('wld-on');
-    if (WLD.st === 'ok') { wldReset(); WLD.mc.visible = WLD.sc.visible = false; if (!FXL.raf && FXL.app) FXL.app.render(); }
+    if (WLD.st === 'ok') { wldReset(); WLD.mc.visible = WLD.sc.visible = false; if (!FXL.raf) fxShow(false); }
   }
   function wldTick() {
     WLD.timer = 0;
@@ -77,7 +82,7 @@
     requestAnimationFrame(now => {
       const dt = Math.min(0.1, Math.max(0, (now - WLD.last) / 1000)); WLD.last = now;
       try { wldStep(dt, now); } catch (e) { /* 한 장 실패는 넘어가요 */ }
-      if (WLD.lv) WLD.timer = setTimeout(wldTick, 1000 / WLD_FPS[WLD.lv]);
+      if (WLD.lv) WLD.timer = setTimeout(wldTick, WLD.parts.length ? 1000 / WLD_FPS[WLD.lv] : 250);   // 그릴 것이 없으면 0.25초마다 새로 나올 것만 봐요
     });
   }
   const wldRnd = (a, b) => a + Math.random() * (b - a);
@@ -88,16 +93,23 @@
   }
   const wldCount = kind => WLD.parts.reduce((n, p) => n + (p.kind === kind), 0);
   // 지금 화면에 보이는 지도 칸(지도 좌표)
+  // 지도 자리는 지도가 움직였을 때만 다시 재요(getBoundingClientRect를 프레임마다 부르면 화면 배치를 다시 셈)
+  function wldRects() {
+    const fr = $('.frame'), mp = $('#map'); if (!fr || !mp) return null;
+    const key = mp.style.transform + '|' + mp.className.baseVal + mp.getAttribute('class') + '|' + rt.mapS + '|' + rt.zoom + '|' + fr.clientWidth + 'x' + fr.clientHeight;
+    if (WLD.rk !== key || mp.classList.contains('cam-move')) { WLD.rk = key; WLD.F = fr.getBoundingClientRect(); WLD.R = mp.getBoundingClientRect(); }
+    return [WLD.F, WLD.R, fr];
+  }
   function wldView() {
-    const fr = $('.frame'), mp = $('#map'); if (!fr || !mp) return [0, -60, 360, 480];
-    const F = fr.getBoundingClientRect(), R = mp.getBoundingClientRect(), k = R.width / 360 || 1;
+    const r = wldRects(); if (!r) return [0, -60, 360, 480];
+    const [F, R] = r, k = R.width / 360 || 1;
     return [(F.left - R.left) / k, (F.top - R.top) / k - 60, (F.right - R.left) / k, (F.bottom - R.top) / k - 60];
   }
   function wldStep(dt, now) {
-    const app = FXL.app, fr = $('.frame'), mp = $('#map'); if (!fr || !mp) return;
+    const app = FXL.app, rr = wldRects(); if (!rr) return; const [F, R, fr] = rr;
     if (!FXL.raf) {   // 효과층이 쉬고 있으면 지도 자리를 여기서 맞춰요(움직이는 중이면 효과층이 맞춰요)
       if (app.screen.width !== fr.clientWidth || app.screen.height !== fr.clientHeight) app.renderer.resize(Math.max(1, fr.clientWidth), Math.max(1, fr.clientHeight));
-      const F = fr.getBoundingClientRect(), R = mp.getBoundingClientRect(), k = R.width / 360 || 1;
+      const k = R.width / 360 || 1;
       FXL.k = k; FXL.w.scale.set(k); FXL.w.x = R.left - F.left - fr.clientLeft; FXL.w.y = R.top - F.top - fr.clientTop + 60 * k;
     }
     const lv = WLD.lv, hi = lv >= 2 ? 1 : 0, ph = WLD.ph, wx = WLD.wx, W = app.screen.width, H = app.screen.height, V = wldView(), m = wldMonth(), bg = wldBg();
@@ -155,7 +167,7 @@
       else if (p.kind === 'ring') { const u = p.t / p.life; s.scale.set(p.k0 * (0.4 + u * 1.2)); s.alpha = 0.7 * (1 - u); if (u >= 1) dead = true; }
       if (dead) { s.destroy(); WLD.parts.splice(i, 1); }
     }
-    if (!FXL.raf) app.render();
+    if (!FXL.raf) { if (WLD.parts.length) { fxShow(true); app.render(); } else fxShow(false); }   // 그릴 생물이 없으면 그리지 않고 그림판을 숨겨요
   }
   setInterval(() => { try { wldSync(); } catch (e) { /* 다음에 */ } }, 15000);
   document.addEventListener('visibilitychange', () => { try { wldSync(); } catch (e) { /* 다음에 */ } });
@@ -163,7 +175,7 @@
   document.addEventListener('click', e => {
     const b = e.target.closest && e.target.closest('#optGfx [data-gfx]'); if (!b || !S) return;
     const v = +b.dataset.gfx; if (v === S.gfx) return;
-    S.gfx = v; save(); syncSettingsUI(); sfx('tap'); wldSync();
+    S.gfx = v; save(); syncSettingsUI(); sfx('tap'); FXL.touched = true; wldSync();
   });
   // 조용한 손맛: 앱에서 단추를 누르면 아주 짧게 떨려요(진동을 켠 사람만, 그래픽 낮음은 빼요)
   let wldTapT = 0;
@@ -209,3 +221,39 @@
     if (t.dataset.pht != null) rt.wldPh = t.dataset.pht; else if (t.dataset.phw != null) rt.wldWx = t.dataset.phw; else return;
     t.parentNode.querySelectorAll('button').forEach(x => x.setAttribute('aria-checked', x === t ? 'true' : 'false')); sfx('tap'); wldSync();
   });
+  // 자동 품질 지키기: 홈에서 5초 동안 잰 평균이 초당 45장 아래면 이 기기에서 한 단계 낮추고 한 번만 알려요
+  // 자동(S.gfx -1)일 때만, 사진 모드와 직접 고른 품질은 그대로. 처음 켠 뒤 8초와 다른 탭, 창이 열린 때는 재지 않아요
+  const WLD_FPS_MIN = 45;
+  function wldFpsWatch() {
+    if (WLD.fw || !S || S.gfx !== -1 || rt.photo || wldLv() < 1 || rt.tab !== 'school' || document.hidden || performance.now() < 8000) return;
+    WLD.fw = true; let n = 0, t0 = 0;
+    const f = t => {
+      if (S.gfx !== -1 || rt.photo || rt.tab !== 'school' || rt.modalOpen || document.hidden) { WLD.fw = false; return; }
+      if (!t0) t0 = t; n++;
+      if (t - t0 < 5000) { requestAnimationFrame(f); return; }
+      const fps = n / ((t - t0) / 1000); WLD.fps = Math.round(fps);
+      if (fps < WLD_FPS_MIN) {
+        const lv = wldLv(); try { localStorage.setItem(WLD_CAP_KEY, String(Math.max(0, lv - 1))); } catch (e) { /* 이번에만 */ }
+        let told = false; try { told = !!localStorage.getItem(WLD_CAP_KEY + '-told'); localStorage.setItem(WLD_CAP_KEY + '-told', '1'); } catch (e) { /* 그대로 */ }
+        if (!told) toast('화면이 느려서 그래픽을 한 단계 낮췄어요.\n설정에서 바꿀 수 있어요');
+        wldSync(); syncSettingsUI();
+      }
+      setTimeout(() => { WLD.fw = false; wldFpsWatch(); }, 30000);   // 30초 뒤 다시
+    };
+    requestAnimationFrame(f);
+  }
+  // 초당 장수 보기(재기 도구): 화면 왼쪽 위 작은 숫자, 지난 5초 평균. 웹은 개발자 메뉴 단추, 토스와 앱은 설정 > 정보의 버전 줄을 빠르게 다섯 번
+  function fpsToggle() {
+    let el = $('#fpsMeter');
+    if (el) { el.remove(); WLD.fpsOn = false; return; }
+    el = document.createElement('div'); el.id = 'fpsMeter'; el.className = 'fps-meter'; el.setAttribute('aria-hidden', 'true'); document.body.appendChild(el);
+    WLD.fpsOn = true; const ts = [];
+    const f = t => {
+      if (!WLD.fpsOn) return;
+      ts.push(t); while (ts.length && t - ts[0] > 5000) ts.shift();
+      if (!el.dataset.t || t - +el.dataset.t > 500) { el.dataset.t = t; const s = ts.length > 1 ? (ts.length - 1) / ((t - ts[0]) / 1000) : 0; el.textContent = Math.round(s) + ' fps · ' + ['낮음', '보통', '높음'][wldLv()] + (FXL.st === 'ok' ? '' : ' · 엔진 없음'); }
+      requestAnimationFrame(f);
+    };
+    requestAnimationFrame(f);
+  }
+  document.addEventListener('click', e => { if (e.target.closest && e.target.closest('#devFps')) fpsToggle(); });

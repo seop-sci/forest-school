@@ -16,6 +16,7 @@ HIT = "(() => { const it = [...document.querySelectorAll('.fest-item')].pop(); i
 
 async def open_page(b, pixi):
     save = base(tier=1, tg=5); save['q']['m'] = 120; save['q']['seen'] = 120
+    save['gfx'] = 1   # 5.3.2: 그래픽 낮음이면 엔진을 받지 않아요(이 기계는 코어 2개라 자동이 낮음)
     save['f']['playground'] = max(save['f'].get('playground', 8), 8)
     ctx = await b.new_context(viewport={'width': 390, 'height': 844}, device_scale_factor=1, is_mobile=True, has_touch=True)
     await ctx.add_init_script("window.__FOREST_TEST = true;" + (f"window.FS_PIXI_SRC = {json.dumps(PIXI)};" if pixi else ''))
