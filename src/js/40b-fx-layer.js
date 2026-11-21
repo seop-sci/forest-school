@@ -465,7 +465,7 @@
   function fxgSet(k, force) {
     if (FXG.st !== 'ok') return false; const P = window.PIXI, app = FXG.app, world = $('#tmWorld'); if (!world) return false;
     const tile = fxgTex(`ex6_${k}_tile`), path = fxgTex(`ex6_${k}_path`); fxgTex(`ex6_${k}_gate`);   // 문은 미리 받아 둬요
-    if (!tile || !path) { app.canvas.hidden = true; FXG.reg = k; return false; }
+    if (!tile || !path) { app.canvas.hidden = true; FXG.reg = ''; return false; }   // 그림이 오면 fxgRefresh가 이 지역으로 새로 깔아요(앞 지역 바닥이 남지 않게)
     if (app.screen.width !== world.clientWidth || app.screen.height !== world.clientHeight) { app.renderer.resize(Math.max(1, world.clientWidth), Math.max(1, world.clientHeight)); force = true; }
     if (FXG.reg === k && FXG.floor && !force) { app.canvas.hidden = false; return true; }
     FXG.reg = k; fxgGeom();
@@ -476,10 +476,11 @@
     const floor = new P.TilingSprite({ texture: tile, width: W * 3, height: LH + 80 }); floor.position.set(-W * 1.5, -40); floor.tileScale.set(ts); sq.addChild(floor); FXG.floor = floor;
     const len = Math.hypot(W, LH) * 2.2, pw = 256 * ts * 1.05;
     const pa = new P.TilingSprite({ texture: path, width: pw, height: len }); pa.anchor.set(0.5); pa.tileScale.set(ts * 1.05); pa.rotation = FXG.ang + Math.PI / 2; pa.position.set(FXG.mid[0], FXG.mid[1]); sq.addChild(pa); FXG.path = pa;
-    // 위쪽 가장자리는 HTML 바닥(풀숲 가장자리)과 이어지게 흐리게
-    if (!FXG.fade) { const c = document.createElement('canvas'); c.width = 4; c.height = 64; const g = c.getContext('2d'), gr = g.createLinearGradient(0, 0, 0, 64); gr.addColorStop(0, 'rgba(255,255,255,0)'); gr.addColorStop(1, 'rgba(255,255,255,1)'); g.fillStyle = gr; g.fillRect(0, 0, 4, 64); FXG.fade = P.Texture.from(c); }
-    if (FXG.mask) FXG.mask.destroy(); const m = new P.Container(), m1 = new P.Sprite(FXG.fade), m2 = new P.Sprite(P.Texture.WHITE);
-    m1.position.set(0, top - 10); m1.width = W; m1.height = 46; m2.position.set(0, top + 36); m2.width = W; m2.height = H; m.addChild(m1, m2); FXG.root.addChild(m); sq.mask = m; FXG.mask = m;
+    // 위쪽 가장자리는 HTML 바닥(풀숲 가장자리)과 이어지게 흐리게. 엔진 8은 여러 조각을 묶은 가림이 투명도를 무시해서(딱 잘림) 그림 한 장으로 가려요
+    const mh = H - top + 24, ff = Math.min(0.9, 110 / Math.max(1, mh)), c = document.createElement('canvas'); c.width = 4; c.height = 256;
+    { const g = c.getContext('2d'), gr = g.createLinearGradient(0, 0, 0, 256); gr.addColorStop(0, 'rgba(255,255,255,0)'); gr.addColorStop(ff, 'rgba(255,255,255,1)'); gr.addColorStop(1, 'rgba(255,255,255,1)'); g.fillStyle = gr; g.fillRect(0, 0, 4, 256); }
+    if (FXG.mask) FXG.mask.destroy({ texture: true, textureSource: true }); const m = new P.Sprite(P.Texture.from(c));
+    m.position.set(0, top - 24); m.width = W; m.height = mh; FXG.root.addChild(m); sq.mask = m; FXG.mask = m;
     const ct = fxgTex('ex6_cloud');
     if (ct && !FXG.cloud) { const cl = new P.TilingSprite({ texture: ct, width: W, height: H * 0.3 }); cl.tileScale.set(H * 0.3 / 512); cl.position.set(0, H * 0.72); cl.alpha = 0; FXG.root.addChild(cl); FXG.cloud = cl; }
     if (FXG.cloud) { FXG.cloud.width = W; FXG.cloud.height = H * 0.3; FXG.cloud.position.set(0, H * 0.72); FXG.root.addChild(FXG.cloud); }
