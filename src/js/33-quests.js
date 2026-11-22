@@ -144,7 +144,7 @@
       go: qtGoFperks
     },
     trips: {
-      goal: q => q.n === 1 ? '현장체험학습 다녀오기' : `현장체험학습 ${q.n}번 다녀오기`,
+      goal: q => q.n === 1 ? '체험학습 다녀오기' : `체험학습 ${q.n}번 다녀오기`,
       go: qtGoTrips
     },
     souv: {

@@ -602,7 +602,7 @@
       addEss(a.ess);
       setTimeout(() => {
         $('#pzAsk').classList.remove('done'); void $('#pzAsk').offsetWidth; $('#pzAsk').classList.add('done');
-        pzFx(a.ess ? `${a.name} 고마워! 정수 +${a.ess}` : `${a.name} 고마워!`, 'ess');
+        pzFx(a.ess ? `${a.name} 고마워! 숲의 정수 +${a.ess}` : `${a.name} 고마워!`, 'ess');
         sfx('buy');
       }, 700 + i * 500);
     });

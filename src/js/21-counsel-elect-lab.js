@@ -216,7 +216,7 @@
       return;
     }
     if (rt.csView === 'dex') {
-      body.innerHTML = `<p class="cs-lead">칸마다 숲의 정수 ${CS.dexEss}, 12칸을 다 채우면 장식 '진로 나무'.</p><div class="cs-dex">` +
+      body.innerHTML = `<p class="cs-lead">칸마다 숲의 정수 ${CS.dexEss}개를 받고, 12칸을 다 채우면 장식 '진로 나무'를 받아요.</p><div class="cs-dex">` +
         JOBS.map(J => { const d = S.cs.done[J.k], u = IMG('badge_' + J.k); return `<div class="cs-dx${d ? ' on' : ''}">${u ? `<img src="${u}" alt="">` : '🎓'}<b>${J.name}</b><small>${d ? esc(d.nm) : '아직'}</small></div>`; }).join('') +
         `</div><button class="btn-sub" type="button" data-cs="list">상담실로</button>`;
       return;

@@ -165,7 +165,7 @@
   }
   function showCertificate(g, reward, no) {
     const gr = CFG.grades[g];
-    $('#certNo').textContent = `제 ${new Date().getFullYear()}-${no} 호`;
+    $('#certNo').textContent = `제${new Date().getFullYear()}-${no}호`;
     const need = townRep(g);
     $('#certTo').textContent = tierInfo().school;
     $('#certGrade').textContent = gr.title;

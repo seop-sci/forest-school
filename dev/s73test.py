@@ -117,7 +117,7 @@ async def main():
                 for _ in range(14):
                     seen.append(await pg.evaluate("document.querySelector('#toast').hidden ? '' : document.querySelector('#toast').textContent")); await pg.wait_for_timeout(800)
                 print('미룬 알림', seen)
-                if not any('현장체험학습' in x for x in seen): bad.append(f'현장체험학습 알림이 장면 뒤에 떠야 해요 {seen}')
+                if not any('체험학습이 열렸어요' in x for x in seen): bad.append(f'체험학습 알림이 장면 뒤에 떠야 해요 {seen}')
             if errs: bad.append(f'{w} 페이지 오류 {errs[:3]}')
             await ctx.close()
         # 4) 뒤로 가기, 동작 줄이기

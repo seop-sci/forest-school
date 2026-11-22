@@ -228,7 +228,7 @@
     if (!on) return;
     if (!S.trip.open) {   // 처음 열리는 날
       S.trip.open = true; save();
-      setTimeout(() => toast('현장체험학습이 열렸어요! 지도 왼쪽의 버스를 눌러 보세요'), 600);
+      setTimeout(() => toast('체험학습이 열렸어요! 지도 왼쪽의 버스를 눌러 보세요'), 600);
     }
     const back = tripBack(), cur = S.trip.cur;
     const txt = !cur ? '출발' : back ? '도착!' : hms(tripLeft());
@@ -236,7 +236,7 @@
       rt.tripTxt = txt;
       $('#tripN').textContent = txt;
       b.classList.toggle('ready', back || !cur);
-      b.setAttribute('aria-label', !cur ? '현장체험학습, 떠날 수 있어요' : back ? `현장체험학습, ${TRIP[cur].name}에서 돌아왔어요` : `현장체험학습, ${TRIP[cur].name}에서 돌아오기까지 ${txt}`);
+      b.setAttribute('aria-label', !cur ? '체험학습, 떠날 수 있어요' : back ? `체험학습, ${TRIP[cur].name}에서 돌아왔어요` : `체험학습, ${TRIP[cur].name}에서 돌아오기까지 ${txt}`);
     }
     if (rt.modalOpen === $('#mTrip')) {
       if (rt.tripView !== (cur ? (back ? 'back' : 'go') : 'idle')) renderTrip();
@@ -249,7 +249,7 @@
   function openTrip(keep) {
     if (rt.paused) return;
     if (keep !== true) rt.tripGot = '';
-    if (!tripOpen()) { toast('현장체험학습은 초등학교 3학년부터 갈 수 있어요'); return; }
+    if (!tripOpen()) { toast('체험학습은 초등학교 3학년부터 갈 수 있어요'); return; }
     if (rt.modalOpen && rt.modalOpen !== $('#mTrip')) return;
     sfx('tap');
     renderTrip();
