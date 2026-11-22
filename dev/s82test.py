@@ -52,7 +52,7 @@ async def main():
                   S.rank.name = '졸린 다람쥐 12'; S.rank.ren = 0; o.nick = [F.nickPrice()]; S.rank.ren = 3; o.nick.push(F.nickPrice());
                   return o; }})()""")
                 print('문방구', r)
-                if r != {'tk': 50, 'ess1': 850, 'feast': 60, 'awx': 0, 'away': 1000, 'awx2': 0, 'night': [True, 692], 'old': [None, None], 'nick': [5, 8]}:
+                if r != {'tk': 50, 'ess1': 875, 'feast': 60, 'awx': 0, 'away': 1000, 'awx2': 0, 'night': [True, 713], 'old': [None, None], 'nick': [5, 8]}:   # 5.3.3 woodani A안: 5분권 10장 25, 수업료 +100% 12
                     bad.append(f'문방구나 이름 값이 틀려요 {r}')
                 # 4) 숲속 소풍
                 r = await pg.evaluate(f"""(() => {{ const F = {F}, S = F.S, o = {{}}, t0 = Date.now(); F.rt.fakeNow = t0;
@@ -65,7 +65,7 @@ async def main():
                   S.pc.berry = 1; S.ess = 0; F.pickDeco('bench'); o.berry = F.buyDecoBerry(); o.bench = S.deco.own.bench; o.berryLeft = S.pc.berry;
                   F.rt.fakeNow = 0; return o; }})()""")
                 print('소풍', r)
-                if not (r['start'] and r['ess'] == 85 and r['away'] < 100 and r['again'] is False and r['mid'] is False and r['done'] and r['got'] and r['n'] == 1 and r['back'] == 100 and r['berry'] and r['bench'] == 1 and r['berryLeft'] == 0):
+                if not (r['start'] and r['ess'] == 95 and r['away'] < 100 and r['again'] is False and r['mid'] is False and r['done'] and r['got'] and r['n'] == 1 and r['back'] == 100 and r['berry'] and r['bench'] == 1 and r['berryLeft'] == 0):
                     bad.append(f'숲속 소풍이 틀려요 {r}')
                 # 5) 칭찬 스티커판
                 r = await pg.evaluate(f"""(() => {{ const F = {F}, S = F.S, o = {{}};

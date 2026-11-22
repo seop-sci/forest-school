@@ -176,6 +176,9 @@
     tamUi: undefined,   // 탐험 화면 단추를 연결했는지
     // 상점과 꾸미기
     thPrev: undefined,   // 테마 미리 보기 중인 테마
+    thOpen: undefined,   // 5.3.3 백화점에서 펼쳐 둔 테마 세트
+    conMore: undefined,   // 5.3.3 공사 창 '다른 방법' 펼침
+    conMoreK: undefined,   // 5.3.3 '다른 방법'을 펼친 건물
     thScroll: undefined,   // 미리 보기 전 상점 스크롤 자리
     thSig: undefined,   // 적용한 테마 표시(바뀌면 덮개를 띄워요)
     thVeilT: undefined,   // 테마 적용 중 덮개 시계
@@ -302,7 +305,7 @@
     nt: { seen: '', ver: '', hide: 0 },   // 공지: 마지막으로 본 공지, 마지막으로 띄운 버전, 일주일간 열지 않기 끝
     wk: { week: -1, pts: 0, got: [false, false, false, false, false], list: [] },
     lg: { week: -1, pts: 0, pos: 0, paid: false, last: null, dq: { day: '', p: 0 } },   // dq: 오늘 쌓인 진행 점수(퀘스트와 식)
-    gold: 5, gd: { day: '', n: 0, shop: 0 }, cos: { own: [], hat: '', neck: '', mkx: '', night: false, th: { bg: '', classroom: '', cafeteria: '', library: '', science: '', playground: '' }, sp: { classroom: '', cafeteria: '', library: '', science: '', playground: '' } }, autoUntil: 0,
+    gold: 5, gd: { day: '', n: 0, shop: 0, a: 0 }, cos: { own: [], hat: '', neck: '', mkx: '', night: false, th: { bg: '', classroom: '', cafeteria: '', library: '', science: '', playground: '' }, sp: { classroom: '', cafeteria: '', library: '', science: '', playground: '' } }, autoUntil: 0,
     rank: { name: '', joined: false, sent: -1, by: '', ren: 0, asked: false },
     bs: { classroom: 0, cafeteria: 0, library: 0, science: 0, playground: 0, store: 0, dorm: 0, union: 0, institute: 0, gradhall: 0 },   // 건물마다 지금 보이는 모습의 학교급
     mg: mgFresh(),   // 숲속 합치기
@@ -433,7 +436,7 @@
     s.born = Math.min(numFb(d.born, 0, s.savedAt), Date.now());
     // 황금 도토리: 예전 저장에도 처음 선물 5개를 줘요. 꾸미기는 산 것만 입을 수 있어요
     s.gold = Math.floor(cap(numFb(d.gold, 0, s.gold), SAVE_CAP.count));
-    if (d.gd && typeof d.gd === 'object') { s.gd.day = typeof d.gd.day === 'string' ? d.gd.day.slice(0, 10) : ''; s.gd.n = Math.floor(numFb(d.gd.n, 0, 0, SAVE_CAP.count)); s.gd.shop = Math.floor(numFb(d.gd.shop, 0, 0, SAVE_CAP.count)); }
+    if (d.gd && typeof d.gd === 'object') { s.gd.day = typeof d.gd.day === 'string' ? d.gd.day.slice(0, 10) : ''; s.gd.n = Math.floor(numFb(d.gd.n, 0, 0, SAVE_CAP.count)); s.gd.shop = Math.floor(numFb(d.gd.shop, 0, 0, SAVE_CAP.count)); s.gd.a = Math.floor(numFb(d.gd.a, 0, Math.max(0, s.gd.n - s.gd.shop), SAVE_CAP.count)); }   // 5.3.3 일반 광고 황금 횟수(예전 저장은 전체에서 상점 몫을 빼요)
     if (d.cos && typeof d.cos === 'object') {
       // 칠판 색은 이제 배경 테마를 따라가요. 예전에 산 칠판은 값(10개씩)을 돌려줘요
       // 지붕도 이제 테마 세트가 맡아요. 예전에 산 지붕도 값(파란 지붕 15개, 벚꽃과 눈 오는 학교 25개)을 돌려줘요

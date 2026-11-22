@@ -604,8 +604,8 @@
     renderMap(); conRender(true); ffRender(true); save();
     return true;
   }
-  // 숲의 정수로 즉시 완료: 남은 시간 5분 이하는 정수 2, 그 위로는 10분마다 4(올림)
-  const CESS = { min5: 2, per10: 4 };
+  // 숲의 정수로 즉시 완료: 남은 시간 5분 이하는 정수 2, 그 위로는 10분마다 5(올림)
+  const CESS = { min5: 2, per10: 5 };   // 5.3.3 woodani A안: 10분마다 4 → 5(단축권보다 조금 비싸게)
   const conEssCost = sec => sec <= 0 ? 0 : sec <= 300 ? CESS.min5 : CESS.per10 * Math.ceil(sec / 600);
   const conEssQuiet = () => !!S && S.ces === gameToday();
   function conEss(k) {

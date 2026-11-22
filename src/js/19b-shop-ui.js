@@ -129,3 +129,24 @@
     after.insertAdjacentElement('afterend', r);
   }
   function askRowOff() { const r = $('#askRow'); if (r) r.remove(); }
+
+  /* 이달의 꾸미기(5.3.3): 지금 달과 지난 달들(GMON.start부터). 한 줄 [{ g, kind, id, name, price, own, img }] */
+  const gmNow = () => +gameToday().slice(5, 7);
+  function gmPast() {
+    const t = gameToday(), [y1, m1] = [+t.slice(0, 4), +t.slice(5, 7)], [y0, m0] = GMON.start.split('-').map(Number), out = [];
+    for (let y = y0, m = m0; y < y1 || (y === y1 && m < m1); m === 12 ? (y++, m = 1) : m++) if (m !== m1 && !out.includes(m)) out.push(m);
+    return out.slice(-11).reverse();   // 가까운 달부터
+  }
+  function gmItems(m) {
+    const k = gmKey(m), [f, g, h] = GMON.nm[m - 1];
+    return [{ g: `g:${k}:flag`, kind: 'flag', id: `deco_mon_${k}_flag`, name: f, price: GMON.flag, img: `deco_mon_${k}_flag` },
+      { g: `g:${k}:gate`, kind: 'gate', id: `deco_mon_${k}_gate`, name: g, price: GMON.gate, img: `deco_mon_${k}_gate` },
+      { g: `g:${k}:hat`, kind: 'hat', id: 'mon' + k, name: h, price: GMON.hat, img: 'cos_hat_mon' + k }]
+      .map(x => Object.assign(x, { own: x.kind === 'hat' ? S.cos.own.includes('hat:' + x.id) : decoOwn(x.id) > 0 }));
+  }
+  function gmTiles(list, coin) {
+    return list.map(x => { const on = x.kind === 'hat' && S.cos.hat === x.id, poor = !x.own && S.gold < x.price, im = IMG(x.img);
+      return `<button class="si${x.own ? ' own' : ''}${on ? ' on' : ''}${poor ? ' poor' : ''}" type="button" data-buy="${x.g}" aria-pressed="${on}" aria-label="${x.name}${x.own ? '' : `, 황금 도토리 ${x.price}개`}">` +
+        `<span class="pv${x.kind === 'hat' ? '' : ' deco'}">${im ? `<img src="${im}" alt="" draggable="false">` : ''}</span><span class="nm">${x.name}</span>` +
+        `<span class="pr">${x.kind === 'hat' ? (on ? '쓰는 중' : x.own ? '쓰기' : `${coin}${x.price}`) : x.own ? '가졌어요' : `${coin}${x.price}`}</span>${x.own ? '' : lackTx(x.price, S.gold)}</button>`; }).join('');
+  }
