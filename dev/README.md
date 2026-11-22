@@ -4,7 +4,7 @@
 
 게임을 고칠 때 쓰는 원본과 도구예요. 저장소 맨 위 `index.html`은 여기 `forest-school.html`로 만든 결과물이에요.
 
-**2026-11-18 woodani 결정: 원본을 저장소 맨 위 `src/` 여러 파일로 나눴어요.** `src/page/`(머리, 화면 뼈대, 그림 주소표), `src/css/`(꾸밈 세 파일), `src/js/`(기능별 42파일: 퀘스트 표, 저장, 지도, 탐험, 퍼즐, 합치기 등). `forest-school.html`은 이 파일들을 차례대로 이어 붙인 결과물이고, 지금까지의 도구와 시험은 그대로 이 파일을 읽어요.
+**2026-11-18 woodani 결정: 원본을 저장소 맨 위 `src/` 여러 파일로 나눴어요.** `src/page/`(머리, 화면 뼈대, 그림 주소표), `src/css/`(꾸밈 세 파일), `src/js/`(기능별 44파일: 퀘스트 표, 저장, 지도, 탐험, 퍼즐, 합치기 등). `forest-school.html`은 이 파일들을 차례대로 이어 붙인 결과물이고, 지금까지의 도구와 시험은 그대로 이 파일을 읽어요.
 
 - 고칠 때: `src/` 파일을 고치고 `python3 wrap.py`(또는 `build_gh.py`)를 돌리면 먼저 `forest-school.html`을 새로 만들어요.
 - `forest-school.html`을 직접 고쳤다면 `python3 srcbuild.py split`으로 `src/`에 옮겨요. 직접 고친 파일이 `src/`보다 새로우면 `build`가 덮어쓰지 않고 멈춰요.
@@ -15,7 +15,7 @@
 | 파일 | 하는 일 |
 | --- | --- |
 | `srcbuild.py`, `src_parts.txt` | 원본 나누기와 잇기. `build`(src/ → forest-school.html), `split`(거꾸로), `check`(같은지만) |
-| `forest-school.html` | `src/`를 이어 붙인 게임 전체(코드와 글, 2.6MB). 그림은 주소(`img/a/열쇠-지문.webp`)만 있고 바이트는 저장소 맨 위 `img/a` 파일에 있어요(2026-11-17부터. 그 전에는 base64로 품어 40MB였어요) |
+| `forest-school.html` | `src/`를 이어 붙인 게임 전체(코드와 글, 2.9MB). 그림은 주소(`img/a/열쇠-지문.webp`)만 있고 바이트는 저장소 맨 위 `img/a` 파일에 있어요(2026-11-17부터. 그 전에는 base64로 품어 40MB였어요) |
 | `imglib.py`, `img_out.py` | 그림을 원본 밖 파일로 두는 도구. `python3 img_out.py`(원본에 남은 base64 그림을 파일로 꺼냄, 여러 번 돌려도 같음), `--check`(주소마다 파일이 있고 이름의 지문이 내용과 맞는지), `--inline 파일`(그림을 품은 옛 꼴 한 파일로 만들기. 되돌리거나 한 파일로 건넬 때) |
 | `build_gh.py` | 원본으로 GitHub 판 만들기. `python3 build_gh.py ..` 하면 저장소 맨 위 `index.html`이 새로 생겨요 |
 | `gh_README.md`, `gh_database.rules.json` | GitHub 판의 README와 데이터베이스 규칙 원본 |
@@ -33,7 +33,6 @@
 | `check_templates.py` | Issue 양식이 GitHub 규칙에 맞는지, 양식이 쓰는 라벨이 저장소에 있는지 확인 |
 | `memo.md` | 사용자가 말한 수정 메모 (모았다가 한 번에 반영) |
 | `embed_assets.py` | 1.5.0 그림 넣기. PNG 원본 폴더를 webp로 줄여 `forest-school.html`의 그림 묶음(`window.FS_IMG`)에 넣어요. 원본 PNG는 저장소에 넣지 않아요. 1.7.0 도감, 이벤트 그림은 `--block 170`으로 따로 둔 묶음(`window.FS_IMG170`)에 넣어요 |
-| `v170-art-buildings.md` | 1.7.0 그림 작업지시서: 학교급별 건물 외관 13장 (Codex용) |
 | `embed_audio.py` | 1.7.3 배경음악 넣기. 반복 구간으로 잘라 둔 `bgm_*.m4a`(AAC 80kbps)를 `window.FS_AUD`에 넣어요. 열쇠: `bgm_home`(홈), `bgm_room`(그 밖의 화면), `bgm_festival`(학교 행사), `bgm_play`(미니게임). 곡 원본은 woodani가 Suno 유료 플랜으로 만든 mp3예요. m4a는 `bgm_loop.py`로 만들어요. 반복 구간은 박자에 맞춰 비슷한 곳 두 군데(16박 배수, 60초 이상)를 찾아 자르고, 끝 한 박자를 처음 바로 앞 소리와 겹쳐 이어요(이음매 없이 되풀이). 소리 크기는 -18 LUFS로 맞춰요. 파일이 없으면 게임은 코드 곡으로 돌아가요. 1.7.3에 넣은 구간: bgm_home 12.17~91.67초(이음매 4박자, 귀로 듣고 다시 고름), bgm_room 8.01~101.82초, bgm_festival 28.61~89.07초, bgm_play 25.26~99.45초(이음매 4박자) |
 | `make_roofs.py` | 건물 그림에서 지붕만 오려 내요(건물 테마 색을 입힐 때 써요). 결과 폴더를 `embed_assets.py`로 넣어요 |
 | `story_pack.py` | 이야기 장면 그림(`img/story`) 이름표 만들기. 새 그림을 `img/story/st_이름.webp`로 넣고 돌리면 파일 이름에 내용 해시를 붙이고 원본의 `ST_PICS` 표를 다시 써요. `--check`는 어긋남만 봐요(`precheck.sh`가 불러요) |
