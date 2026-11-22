@@ -1,10 +1,10 @@
   /* ---------- 황금 도토리와 꾸미기 상점 ----------
      황금 도토리는 돈으로 사지 않고 모으기만 해요. 1.1.0부터 광고의 값어치를 올리려고 광고가 아닌 보상은 모두 1개로 줄였어요:
-     광고마다 1개(3.0.0 조정안 3, 예전 3개. 상점 광고와 합쳐 하루 3번), 어려운 퀘스트와 출석 등의 보상은 각각 정해진 양을 줘요.
+     광고마다 1개(3.0.0 조정안 3, 예전 3개. 5.3.3부터 상점 광고와 따로 하루 3번), 어려운 퀘스트와 출석 등의 보상은 각각 정해진 양을 줘요.
      쓰는 곳은 꾸미기와 테마 세트(계속 남아요), 부스터(1회 사용 가능). 뽑기 없이 정해진 값으로만 팔아요.
      토스 미니앱에서는 광고 그룹의 보상 이름을 '황금 도토리', 수량을 3으로 맞춰 두면 광고 화면에도 똑같이 보여요. */
-  const GOLD = { hard: 1, adDay: 3, ad: 1, shopAd: 3, shopAdN: 3, att: 1, att7: 1, chapter: 1, grad: 1, promote: 1, rich: 60, essPer: 20 };
-  // 지금까지 받은 황금 도토리가 60개(테마를 체험할 만큼)를 넘으면, 매일 매주 되풀이해 나오는 곳은 황금 도토리 1개 대신 숲의 정수 20을 줘요
+  const GOLD = { hard: 1, adDay: 3, ad: 1, shopAd: 3, shopAdN: 3, att: 1, att7: 1, chapter: 1, grad: 1, promote: 1, rich: 60, essPer: 10 };   // 5.3.3 woodani: 60개 뒤 바뀌는 정수 20 → 10. 광고 황금은 일반 광고(adDay)와 상점 광고(shopAd)를 따로 세요
+  // 지금까지 받은 황금 도토리가 60개(테마를 체험할 만큼)를 넘으면, 매일 매주 되풀이해 나오는 곳은 황금 도토리 1개 대신 숲의 정수 10(5.3.3 전에는 20)을 줘요
   // 광고, 상점 광고, 축제와 대축제 도장판, 이벤트 기념 상자, 장 끝, 졸업, 학교급 올라가기, 마을 기부, 한 번만 나오는 보상은 그대로예요
   const goldRich = () => !!S && (S.st.gold || 0) >= GOLD.rich;
   function goldOr(n, why) {
@@ -78,6 +78,15 @@
     ['science', '실험 고글'], ['children', '바람개비 모자'], ['buddha', '연꽃 머리 장식'], ['final', '연필 머리띠'], ['vacation', '물안경'], ['liberation', '무궁화 머리핀'],
     ['fall', '해바라기 모자'], ['chuseok', '보름달 머리띠'], ['hangul', '꼬마 갓'], ['trip_fall', '단풍 베레모']];
   for (const [k, name] of EV_HAT) COS.hat.items.push({ id: 'ev_' + k, name, price: 0, evh: 1, img: 1 });
+  /* 5.3.3 이달의 꾸미기(docs/SHOP-2026-11.md 4.4, 작업지시서 108): 달마다 깃발, 교문 아치, 학생 모자. 황금 도토리로 사고 힘은 없어요.
+     그달에는 백화점 '이달의 꾸미기'에, 지난 달 것은 '놓친 장식'에 같은 값으로 나와요(woodani). start 달부터 세요 */
+  const GMON = { flag: 20, gate: 30, hat: 25, start: '2026-11',
+    nm: [['새해 해돋이 깃발', '복주머니 아치', '털 방울 비니'], ['하트 잎 깃발', '연 날리는 아치', '색동 귀마개'], ['새싹 깃발', '입학 꽃 아치', '새싹 머리띠'],
+      ['벚꽃 깃발', '벚꽃 아치', '꽃잎 화관'], ['카네이션 깃발', '바람개비 아치', '소풍 밀짚모자'], ['수국 깃발', '장미 덩굴 아치', '우비 모자'],
+      ['파도 깃발', '조개 아치', '수영 모자'], ['해바라기 깃발', '수박 아치', '해바라기 모자'], ['보름달 깃발', '송편 등불 아치', '토끼 귀 머리띠'],
+      ['단풍 깃발', '호박 아치', '단풍잎 베레모'], ['도토리 깃발', '낙엽 아치', '도토리 털모자'], ['눈송이 깃발', '겨울 화환 아치', '귀마개 털모자']] };
+  const gmKey = m => String(m).padStart(2, '0');
+  GMON.nm.forEach(([, , hat], i) => COS.hat.items.push({ id: 'mon' + gmKey(i + 1), name: hat, price: 0, gm: i + 1, img: 1 }));
   const evHatArt = id => !!IMG('cos_hat_' + id);
   const COS_IDS = new Set(Object.keys(COS).flatMap(k => COS[k].items.map(it => k + ':' + it.id)));
   MARKX.forEach(([x]) => COS_IDS.add('mkx:' + x)); COS_IDS.add(NIGHT_KEY);
@@ -245,7 +254,7 @@
   // 테마 세트는 한 번에만 사요(값 60, 그 테마 배경을 이미 샀으면 50). 이미 산 칸은 그대로 칸마다 쓰고 벗을 수 있어요
   const thSetPrice = t => GSHOP.theme - (thOwn(t, 'bg') ? GSHOP.themeBgOff : 0);
   function renderThemes(coin) {
-    let h = `<h3 class="shop-h" data-cat="테마">테마 세트 <small>메인 화면, 배경 음악 | 세트당 수업료 +3%</small></h3>`;   // 5.3.3 설명은 머리에 한 번
+    let h = `<h3 class="shop-h" data-cat="테마">테마 세트 <small>메인 화면, 배경 음악 | 모음 보상: 세트당 수업료 +3%</small></h3>`;   // 5.3.3 설명은 머리에 한 번
     for (const t of THEMES) {
       const n = thCount(t.id), done = n === TH_SLOTS.length;
       const playing = Music.preview === t.id;
@@ -256,7 +265,7 @@
           return `<button class="th-all${poor ? ' poor' : ''}" type="button" data-buy="s:${t.id}"><span>${n ? `남은 ${TH_SLOTS.length - n}칸까지 세트로 사기` : '세트 사기'}${thOwn(t.id, 'bg') ? ` <small>배경 산 값 ${GSHOP.themeBgOff} 빼 줌</small>` : ''}</span><b>${thOwn(t.id, 'bg') ? `<s>${GSHOP.theme}</s>` : ''}${coin}${p}</b></button>`; })()) +
         (() => { const own = TH_SLOTS.filter(([sl]) => thOwn(t.id, sl)), on = own.every(([sl]) => S.cos.th[sl] === t.id);
           return own.length >= 2 ? `<button class="th-apply${on ? ' on' : ''}" type="button" data-apply="${t.id}" aria-pressed="${on}">${on ? '이 테마를 모두 쓰는 중' : done ? '이 테마로 한 번에 바꾸기' : `가진 ${own.length}개 한 번에 쓰기`}</button>` : ''; })() +
-        (done ? `<p class="th-bonus">세트 효과 수업료 +${t.bonus}% 받는 중</p>` : '') + '<div class="shop-grid">';
+        (done ? `<p class="th-bonus">모음 보상 수업료 +${t.bonus}% 받는 중</p>` : '') + '<div class="shop-grid">';
       for (const [slot, sname] of TH_SLOTS) {
         const own = thOwn(t.id, slot), on = S.cos.th[slot] === t.id;
         const pr = on ? '쓰는 중' : own ? '쓰기' : '세트로';
@@ -280,7 +289,7 @@
   const hardQ = (q, sub) => !!q && (!sub || String(q.id)[0] === 's') && (q.t === 'teaAll' || q.t === 'rate' ||
     (q.t === 'students' && q.n >= 50) || (q.t === 'fac' && q.n >= 10 && !q.step) || (q.t === 'picks' && q.n >= 15) ||
     (q.t === 'trips' && q.n >= 3) || q.t === 'souv' || q.t === 'tripat' || q.t === 'sports' || q.t === 'fest');
-  function goldDay() { const t = gameToday(); if (dayRoll(S.gd, t)) { S.gd.n = 0; S.gd.shop = 0; } }
+  function goldDay() { const t = gameToday(); if (dayRoll(S.gd, t)) { S.gd.n = 0; S.gd.shop = 0; S.gd.a = 0; } }
   function addGold(n) {
     if (!(n > 0)) return;
     S.gold += n; S.st.gold += n;
@@ -290,6 +299,6 @@
     if (rt.tab === 'shop') renderShop();
     if (rt.tab === 'street') renderStreet();
   }
-  // 광고를 끝까지 보면 덤으로 3개 (상점 광고와 합쳐 하루 3번까지)
+  // 광고를 끝까지 보면 덤으로 1개(일반 광고 하루 3번. 상점 광고 3번은 따로)
   // 광고를 끝까지 보면 받는 황금 도토리가 보이지 않았어요. 보상 창 뒤에 한 줄로 알려요
-  function adGold() { goldDay(); if (S.gd.n >= GOLD.adDay) return; S.gd.n += 1; addGold(GOLD.ad); setTimeout(() => toast(`광고 선물! 황금 도토리 +${GOLD.ad} (오늘 ${S.gd.n}/${GOLD.adDay})`), 1300); }
+  function adGold() { goldDay(); if ((S.gd.a || 0) >= GOLD.adDay) return; S.gd.a = (S.gd.a || 0) + 1; S.gd.n += 1; addGold(GOLD.ad); setTimeout(() => toast(`광고 선물! 황금 도토리 +${GOLD.ad} (오늘 ${S.gd.a}/${GOLD.adDay})`), 1300); }

@@ -1,8 +1,8 @@
   /* ---------- 2.1.0 숲속 소풍 (유치원 2, 로드맵 5절) ----------
      놀이터 안에서 게임 시계로 하루 한 번. 학생 3명을 골라 보내면 15분 뒤 돌아와요(앱을 꺼도 가요). 그동안 3명은 수업료를 내지 않아요.
      돌아오면 수업료 10분치(도시락을 싸면 15분치), 가끔 숲의 정수 1~2개, 아주 가끔 희귀 열매(꾸미기 가게에서 일반 장식 하나로 바꿔요).
-     도시락은 숲의 정수 15(재설계안 3절), 보낼 때 싸요. 확률과 열매 쓰임은 본부 제안 */
-  const PCN = { min: 15, kids: 3, acorn: 10, lunchAcorn: 15, lunch: 15, essP: 0.3, berryP: 0.05 };
+     도시락은 숲의 정수 5(5.3.3 woodani, 예전 15), 보낼 때 싸요. 확률과 열매 쓰임은 본부 제안 */
+  const PCN = { min: 15, kids: 3, acorn: 10, lunchAcorn: 15, lunch: 5, essP: 0.3, berryP: 0.05 };
   const freshPc = () => ({ day: '', at: 0, kids: [], lunch: false, berry: 0, st: { n: 0, ess: 0, berry: 0 } });
   const pcReady = () => !!S && !!S.pc && S.f.playground >= 1;
   const pcActive = () => !!S && !!S.pc && S.pc.at > 0;

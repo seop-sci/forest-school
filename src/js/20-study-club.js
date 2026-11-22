@@ -21,7 +21,7 @@
      효과: 수업료 레벨 합 × 0.1%(acMult), 평판 10레벨마다 +1(acRepOf), 새 명부 학생의 시작 능력 바탕(rosterKid). 숫자는 "균형 제안서 (공부 탭)" */
   const AC = { keys: ['kor', 'math', 'sci', 'art', 'pe'], name: { kor: '국어', math: '수학', sci: '과학', art: '미술', pe: '체육' },
     cap: [10, 20, 30, 40, 50, 60], need: n => 25 + 2 * n, pzPer: 100, pzMax: 12, mgPer: 1, mgMax: 20, mgE: 6, mgDay: 100,   // 학력과 능력치 균형: 과목마다 하루 XP를 비슷하게(균형 제안서 학력과 능력치 1절)
-    book: { ess: 10, xp: 50, perDay: 2, perLv: 1 }, tuition: 0.001, repPer: 10 };   // 문제집 값은 정수 10 + 그 과목 레벨, 과목마다 하루 2권(조정안 5, 예전 1권)
+    book: { ess: 10, xp: 50, perDay: 2, perLv: 1, cap: 30 }, tuition: 0.001, repPer: 10 };   // 문제집 값은 정수 10 + 그 과목 레벨, 과목마다 하루 2권(조정안 5, 예전 1권)
   const AC_GAME = { kor: '책 읽기', math: '숲속 퍼즐', sci: '과학 탐구 실험', art: '숲속 합치기', pe: '숲속 대결' };
   const freshAc = () => { const o = { bk: { day: '', n: {} }, st: { xp: 0, bk: 0 } }; for (const k of AC.keys) { o[k] = { lv: 1, xp: 0 }; o.bk.n[k] = 0; } return o; };
   const acCapOf = tier => AC.cap[Math.max(0, Math.min(AC.cap.length - 1, tier))];
@@ -46,7 +46,7 @@
     checkQuests(true); return v;
   }
   function acBkDay() { const t = gameToday(); if (dayRoll(S.ac.bk, t)) { for (const k of AC.keys) S.ac.bk.n[k] = 0; } }
-  const bookCost = k => AC.book.ess + AC.book.perLv * acLv(k);   // 문제집 값은 레벨을 따라 올라요
+  const bookCost = k => Math.min(AC.book.cap, AC.book.ess + AC.book.perLv * acLv(k));   // 문제집 값은 레벨을 따라 오르고 30에서 멈춰요(5.3.3 woodani A안)
   const acBkLeft = k => { acBkDay(); return Math.max(0, AC.book.perDay - (S.ac.bk.n[k] || 0)); };
   // 문제집 남은 권 모두 사기: 한 권씩 살 때와 같은 값과 차례로 사고(레벨이 오르면 값도 따라 올라요), 정수가 모자라면 살 수 있는 만큼만 사요
   function acBuyBookAll(k) {

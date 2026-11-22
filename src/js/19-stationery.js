@@ -6,8 +6,8 @@
     hat: 120, fur: 200,
     ex: { n: 10, min: 60, perDay: 5 },
     ax: { ess: 20, min: 30, perDay: 5 },   // 숲의 정수 20개로 도토리 수업료 30분치, 하루 5번. 위 ex의 거꾸로라 오가며 남는 게 없어요. 도토리 수업료 60분치로 숲의 정수 10개, 하루 5번(넘치는 도토리 쓸 곳). 거꾸로 바꿔도 남는 게 없어요(정수 20개 → 30분치)
-    tk: { perDay: 5, list: [{ k: 'm5', n: 10, ess: 30 }, { k: 'm30', n: 1, ess: 20 }, { k: 'h1', n: 1, ess: 35 }, { k: 'h3', n: 1, ess: 90 }] },   // 시간 단축권, 네 가지 합쳐 하루 5번
-    boost: { perDay: 3, feast: { ess: 8, min: 60 } },   // 수업료 부스터는 하루 3번
+    tk: { perDay: 5, list: [{ k: 'm5', n: 10, ess: 25 }, { k: 'm30', n: 1, ess: 15 }, { k: 'h1', n: 1, ess: 28 }, { k: 'h3', n: 1, ess: 70 }] },   // 시간 단축권, 네 가지 합쳐 하루 5번
+    boost: { perDay: 3, feast: { ess: 12, min: 60 } },   // 수업료 부스터는 하루 3번
     night: 150   // 밤 모드(지도 밤 색과 창 불빛, 영구)
   };
   const ESS_ICON = () => `<span class="tic" style="background-image:${pzImg('ic_essence')}"></span>`;
@@ -297,6 +297,8 @@
   for (const [k, name, sm] of EV_DECO) DECO.push({ id: 'ev_' + k, name, ess: 0, img: 'evd_' + k, rare: 1, ev: 1, ...(sm ? { sm: 1 } : {}) });
   DECO.push({ id: 'deco_pp_board', name: '세미나 칠판', ess: 0, img: 'deco_pp_board', rare: 1, ev: 1, pp: '세미나 10번' }, { id: 'deco_pp_chair', name: '명예의 의자', ess: 0, img: 'deco_pp_chair', rare: 1, ev: 1, pp: '세미나 20번' }, { id: 'deco_pp_tower', name: '논문 탑', ess: 0, img: 'deco_pp_tower', rare: 1, ev: 1, pp: '논문 30편' }, { id: 'deco_vd20', name: '마을 감사 아치', ess: 0, img: 'deco_vd20', rare: 1, ev: 1, pp: '마을 기부 20단계' });   // 칭호 덤 장식(작업지시서 100, ppDecoSync)
   const evDecoArt = d => !!(d && d.ev && IMG(d.img));
+  GMON.nm.forEach(([flag, gate], i) => { const m = gmKey(i + 1);   // 5.3.3 이달의 꾸미기 깃발과 아치(하나씩, 백화점에서 황금으로)
+    DECO.push({ id: `deco_mon_${m}_flag`, name: flag, ess: 0, img: `deco_mon_${m}_flag`, rare: 1, ev: 1, gm: i + 1 }, { id: `deco_mon_${m}_gate`, name: gate, ess: 0, img: `deco_mon_${m}_gate`, rare: 1, ev: 1, gm: i + 1 }); });
   const DECO_BY = Object.fromEntries(DECO.map(d => [d.id, d]));
   const DECO_GROW = 1.5, DECO_MAX = 11;   // 일반 장식은 하나 더 살 때마다 1.5배(지도 한 장을 다 채우는 11개까지), 희귀 장식은 하나씩만
   // 장식 자리(지도 그림의 %). 건물(Lv.5 크기)과 이름표, 호수를 피해서 지도마다 11곳. 간판 자리는 따로
@@ -526,7 +528,7 @@
     }
     const d = DECO_BY[id]; if (!d) return;
     sfx('tap');
-    if (d.ev) { toast(decoOwn(id) ? `${d.name}${eulOf(d.name)} 가지고 있어요. '지도 꾸미기'를 눌러 학교에 놓아 보세요` : d.pp ? `${eun(d.name)} ${d.pp}이면 받아요` : d.cs ? `${eun(d.name)} 진로 도감 12칸을 다 채우면 받아요` : d.tr2 ? `${eun(d.name)} ${d.tr2} ${tr2Nm()}에서 가져와요` : d.fv ? `${eun(d.name)} 축제 부스 놀이를 ${FV.win}번 성공하면 받아요` : d.bf ? `${eun(d.name)} ${d.bf}월 대축제에서 도장 ${BIG.max}개를 모으면 받아요` : d.xg ? `${eun(d.name)} 교환학생 우정 배지 8개를 모으면 받아요` : d.mk ? `${eun(d.name)} 목요일 숲속 장터에서 쿠폰으로 사요` : `${eun(d.name)} 그 이벤트의 기념 상자에서 받아요. 지난 이벤트 것은 꾸미기 백화점에서 살 수 있어요`); return; }
+    if (d.ev) { toast(decoOwn(id) ? `${d.name}${eulOf(d.name)} 가지고 있어요. '지도 꾸미기'를 눌러 학교에 놓아 보세요` : d.gm ? `${eun(d.name)} ${d.gm}월의 꾸미기예요. 꾸미기 백화점에서 황금 도토리로 사요` : d.pp ? `${eun(d.name)} ${d.pp}이면 받아요` : d.cs ? `${eun(d.name)} 진로 도감 12칸을 다 채우면 받아요` : d.tr2 ? `${eun(d.name)} ${d.tr2} ${tr2Nm()}에서 가져와요` : d.fv ? `${eun(d.name)} 축제 부스 놀이를 ${FV.win}번 성공하면 받아요` : d.bf ? `${eun(d.name)} ${d.bf}월 대축제에서 도장 ${BIG.max}개를 모으면 받아요` : d.xg ? `${eun(d.name)} 교환학생 우정 배지 8개를 모으면 받아요` : d.mk ? `${eun(d.name)} 목요일 숲속 장터에서 쿠폰으로 사요` : `${eun(d.name)} 그 이벤트의 기념 상자에서 받아요. 지난 이벤트 것은 꾸미기 백화점에서 살 수 있어요`); return; }
     if (decoSoldOut(id)) { toast(d.rare ? `${eun(d.name)} 하나만 가질 수 있어요` : `${eun(d.name)} ${DECO_MAX}개까지 가질 수 있어요`); return; }
     rt.decoPick = id;
     const alt = !d.rare && ((S.pc && S.pc.berry > 0) || (S.mg && S.mg.pieces >= 5));   // 열매나 조각으로 받을 길이 있으면 줄을 띄워 고르게 해요
@@ -580,14 +582,14 @@
     if (k === 'feast') { S.hd.feastUntil = Math.max(gameNow(), S.hd.feastUntil) + 10 * 60000; toast('특식 데이! 10분 동안 수업료 +100%예요'); }
   }
 
-  // 상점 광고도 공통 광고 황금 도토리 한도에 포함해요
+  // 상점 광고는 하루 3번, 일반 광고 황금과 따로 세요(5.3.3 woodani)
   function shopAd() {
     goldDay();
-    if (S.gd.shop >= GOLD.shopAd || S.gd.n >= GOLD.adDay) { shake($('#shopAd')); return; }
+    if (S.gd.shop >= GOLD.shopAd) { shake($('#shopAd')); return; }
     rt.adNoGold = true;
     showAd(() => {
       goldDay();
-      if (S.gd.shop >= GOLD.shopAd || S.gd.n >= GOLD.adDay) return;
+      if (S.gd.shop >= GOLD.shopAd) return;
       S.gd.shop += 1; S.gd.n += 1;
       addGold(GOLD.shopAdN);
       sfx('quest');
