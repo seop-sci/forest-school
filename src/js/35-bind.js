@@ -235,6 +235,7 @@
   function wireStreet() {
     $('#btnShop').addEventListener('click', () => { if (!rt.paused && !rt.modalOpen) { sfx('tap'); openShop(); } });
     $('#thPrevBack').addEventListener('click', () => { sfx('tap'); thPreviewEnd(false); });
+    $('#thPrevBuy').addEventListener('click', () => { const id = rt.thPrev && rt.thPrev.id; sfx('tap'); thPreviewEnd(false); if (id) { rt.thOpen = id; pickShop('s:' + id); } });   // 5.3.3 사기 전 확인 줄로
     $('#shopList').addEventListener('click', e => {
       const ap = e.target.closest('[data-apply]');
       if (ap) {
@@ -244,6 +245,8 @@
         sfx('tap'); applyCos(); save(); renderShop();
         return;
       }
+      const tf = e.target.closest('[data-thfold]');   // 5.3.3 테마 세트 펼치기
+      if (tf) { rt.thOpen = rt.thOpen === tf.dataset.thfold ? '' : tf.dataset.thfold; sfx('tap'); renderShop(); return; }
       const pv = e.target.closest('[data-thprev]');
       if (pv) { thPreview(pv.dataset.thprev); return; }
       const p = e.target.closest('[data-play]');
@@ -785,7 +788,9 @@
     $('#mSb').addEventListener('click', sbClick);
     $('#nsGo').addEventListener('click', () => { if (nsStart()) renderNs(); });
     $('#nsSubs').addEventListener('click', e => { const b = e.target.closest('[data-ns]'); if (!b || b.getAttribute('aria-disabled') === 'true' || nsUsedTonight()) return; rt.nsSub = b.dataset.ns; S.ns.sub = rt.nsSub; save(); renderNs(); });
-    $('#snBtns').addEventListener('click', e => { const b = e.target.closest('[data-sn]'); if (b) snDraw(b.dataset.sn === '10'); });
+    $('#snBtns').addEventListener('click', e => { const b = e.target.closest('[data-sn]'); if (!b) return;
+      if (b.dataset.sn === '10' && b.getAttribute('aria-disabled') !== 'true') { sfx('tap'); askRow($('#snBtns'), `도토리 ${fmt(snCost(true))}로 10번 뽑을까요?`, '10번 뽑기', () => snDraw(true)); return; }   // 5.3.3 큰 값은 한 번 더 물어요
+      askRowOff(); snDraw(b.dataset.sn === '10'); });
     $('#bxDexBtn').addEventListener('click', () => { sfx('tap'); closeModal($('#mBx')); setTimeout(() => { setTab('dex'); setDexSeg('bx'); }, 240); });
     $('#sheetGarden').addEventListener('click', () => { closeSheet(); setTimeout(openGd, 240); });
     $('#mGd').addEventListener('click', e => {
@@ -813,7 +818,9 @@
   // 마을 기부, 편지, 이름 바꾸기, 실험 노트, 책 고르기
   function wireCare() {
     // 마을 기부 창
-    $('#vdBtns').addEventListener('click', e => { const b = e.target.closest('[data-vdk]'); if (!b) return; const k = b.dataset.vdk; vdGive(k === 'left' || k === 'all' ? k : Number(k)); });
+    $('#vdBtns').addEventListener('click', e => { const b = e.target.closest('[data-vdk]'); if (!b) return; const k = b.dataset.vdk;
+      if (k === 'left' && S.budget >= vdLeft()) { sfx('tap'); askRow($('#vdBtns'), `도토리 ${fmt(vdLeft())}개를 기부해 ${S.vd.lv + 1}단계로 올릴까요?`, '기부하기', () => vdGive('left')); return; }   // 5.3.3 남은 만큼은 한 번 더 물어요
+      askRowOff(); vdGive(k === 'all' ? k : Number(k)); });
     $('#albLetter').addEventListener('click', () => { const pg = S.alb[rt.albPage]; if (pg && pg.ltr) { closeModal($('#mAlbum')); setTimeout(() => openLetter(pg, true), 240); } });
     $('#ltPrev').addEventListener('click', () => { if (rt.plAt != null) openPLetter(rt.plAt - 1, true); });   // 학부모 편지함
     $('#ltNext').addEventListener('click', () => { if (rt.plAt != null) openPLetter(rt.plAt + 1, true); });

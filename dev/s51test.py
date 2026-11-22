@@ -31,11 +31,11 @@ async def main():
             if r[2] != 0 or not r[3] or r[5] != 4: fails.append(f'[{tag}] 문방구 상품(모자 가구 없음, 묶음 없음, 단축권 넷) {r}')
             if not r[4]: fails.append(f'[{tag}] 문방구가 가로로 넘쳐요')
             await pg.screenshot(path=f's51_shop_{tag}.png')
-            # 2) 꾸미기 가게에서 모자 사기: 묻는 창 → 사기 → 정수 120 줄고 입혀짐
+            # 2) 꾸미기 가게에서 모자 사기: 누르면 바로(5.3.3) → 정수 120 줄고 입혀짐. 아래 '사기' 누름은 아무 일도 하지 않아요
             await pg.evaluate(f"{F}.setTab('deco')"); await pg.wait_for_timeout(200)
             await pg.evaluate(f"{F}.pickDeco('hat:wizard')"); await pg.wait_for_timeout(200)
             ask = await pg.evaluate("[!document.querySelector('#decoAsk').hidden, document.querySelector('#decoAskText').textContent, document.querySelector('#decoYes').textContent]")
-            if not ask[0] or '120' not in ask[1] or ask[2] != '사기': fails.append(f'[{tag}] 모자 묻는 창 {ask}')
+            if ask[0]: fails.append(f'[{tag}] 모자는 5.3.3부터 누르면 바로 사요(확인 줄 없음) {ask}')
             await pg.evaluate("document.querySelector('#decoYes').click()"); await pg.wait_for_timeout(300)
             r = await pg.evaluate(f"(()=>{{ const S={F}.S; return [S.ess, S.cos.hat, S.cos.own.includes('hat:wizard'), document.querySelector('#decoList .si.on .nm') && document.querySelector('#decoList .si.on .nm').textContent]; }})()")
             if r != [880, 'wizard', True, '마법사 모자']: fails.append(f'[{tag}] 모자 사기 뒤 상태 {r}')

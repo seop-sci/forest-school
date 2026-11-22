@@ -93,7 +93,7 @@
     if (t !== 'school') $('#scroller').scrollTop = 0;
     if (t === 'shop') { rt.shopPick = ''; renderShop(); $('#panelShop').scrollTop = 0; }
     if (t === 'rank') { rt.rankEdit = false; initRank(); renderRankPanel(); submitRank(); }
-    if (t === 'settings') { renderCloudInfo(); renderNoticeDot(); }
+    if (t === 'settings') { renderCloudInfo(); renderNoticeDot(); rt.mkDraft = null; setSchoolRender(); }   // 5.3.3 학교 간판과 마크(꾸미기 가게에서 옮겨 왔어요)
     if (t === 'mini') renderMini();
     if (prev === 'quests' && t !== 'quests') markQuestsSeen();
     if (t === 'teachers') renderTeachers();
