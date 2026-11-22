@@ -10,6 +10,7 @@
 import asyncio, json
 from playwright.async_api import async_playwright
 from testlib import URL, F, CLEAN
+NB_OFF = "(()=>{ window.__forest.Live.off.add('night'); const m = document.querySelector('#mNb'); if (m && m.classList.contains('open')) { m.hidden = true; m.classList.remove('open'); window.__forest.rt.modalOpen = null; } })()"
 SKIP = f"(()=>{{ const t=document.querySelector('#tut'); if(t) t.hidden=true; {F}.S.tut.st='skip'; {F}.rt.tut=null; {CLEAN}; }})()"
 OVER = """(sel) => { const W = innerWidth; const r = document.querySelector(sel); if (!r) return -1;
   return [...r.querySelectorAll('*')].filter(e => { const q = e.getBoundingClientRect(); return q.width && e.offsetParent !== null && (q.right > W + 1 || q.left < -1); }).length; }"""
@@ -23,6 +24,7 @@ async def main():
             await ctx.add_init_script("window.__FOREST_TEST = true; localStorage.clear();")
             pg = await ctx.new_page(); errs = []; pg.on('pageerror', lambda e: errs.append(str(e)))
             await pg.goto(URL); await pg.wait_for_timeout(2500); await pg.evaluate(SKIP)
+            await pg.evaluate(NB_OFF)   # 야간 건설과 특별 이벤트 주말 하루 종일 가속을 꺼요(이 시험은 공사 빠르기를 보지 않아요. 켜 두면 밤 8~12시와 특별 이벤트 주말에 알림 창이 지도를 덮고 공사가 빨라져요)
             await pg.wait_for_timeout(1200)
             r = await pg.evaluate("document.querySelector('#tierDots').hidden")
             if not r: bad.append(f'{w}: 유치원에서 학교급 동그라미가 보여요')

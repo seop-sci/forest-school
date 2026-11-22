@@ -8,6 +8,7 @@
     $('#gCard').hidden = last;
     $('#gLead').textContent = last
       ? `${T.name}${T.unit === '년째' ? `은 ${T.years}년째가 마지막 해예요` : `는 ${T.years}학년이 마지막 학년이에요`}. 대도시 학교가 되면 졸업식을 열고 ${N.school}에 입학해요.`
+      : gradOn() ? `대도시 학교가 되면 종업식을 열 수 있어요. 다음 학기에는 시설을 Lv.${capNext()}까지 키울 수 있어요.`   // 5.3.2.1: 대학원은 학년이 아니라 학기로 말해요
       : sf ? `대도시 학교가 되면 1학기 방학식을 열 수 있어요. 2학기에는 시설을 Lv.${capNext()}까지 키울 수 있어요.`
       : `대도시 학교가 되면 ${semOn() ? '2학기 ' : ''}종업식을 열 수 있어요. ${T.unit === '년째' ? '다음 해에는' : '다음 학년에는'} 시설을 Lv.${capNext()}까지 키울 수 있어요.`;
     $('#gHave').textContent = fmt(S.p.dip);
@@ -77,9 +78,11 @@
   function renderTierCard() {
     const T = tierInfo(), N = TIERS[S.tier + 1] || { name: TIER_ALL[S.tier + 1] || '다음 학교', school: '숲속 ' + (TIER_ALL[S.tier + 1] || '다음 학교') }   /* 대학교에서는 다음이 대학원이에요(예전에는 '대학교 준비 중'으로 나왔어요) */, open = nextTierOpen(), can = canPromote(), f = previewFund();
     $('#tierFrom').textContent = T.school;
-    $('#tierTo').textContent = N ? N.school : '';
+    const last = gradOn() && !open;   // 5.3.2.1: 가장 높은 학교급(대학원)이고 다음 학교급이 아직 없어요
+    $('#tierTo').textContent = last ? '다음 학교급 (준비 중)' : N ? N.school : '';
     const reqs = [
-      { ok: S.tg >= T.grads, txt: `${T.name} ${T.years}${T.unit} 되기 (지금 ${yearNo()}${T.unit})` },
+      gradOn() ? { ok: S.tg >= T.grads && S.sem >= 1, txt: `박사 8학기 되기 (지금 ${gradSemTxt(yearNo(), S.sem)})` }
+        : { ok: S.tg >= T.grads, txt: `${T.name} ${T.years}${T.unit} 되기 (지금 ${yearNo()}${T.unit})` },
       { ok: S.grade >= GRAD_MIN, txt: `대도시 학교 되기 (지금 ${CFG.grades[S.grade].name})` }
     ];
     if (semOn() && open) reqs.splice(1, 0, { ok: finalYear() && !semFirst(), txt: `${T.years}${T.unit} 1학기 방학식 열기` });   // 졸업식은 2학기에
@@ -87,12 +90,19 @@
     const html = reqs.map(r => `<li class="${r.ok ? 'ok' : ''}"><span class="mk2">${r.ok ? CHECK : ''}</span>${r.txt}</li>`).join('');
     if ($('#tierReqs').innerHTML !== html) $('#tierReqs').innerHTML = html;
     $('#tierFund').textContent = fmt(f);
-    $('#tierNote').textContent = !open
+    setHid($('#tierCard .tier-fund'), last);   // 대학원에서는 기금이 생기지 않아요
+    $('#tierNote').textContent = last
+      ? `숲속 대학원이 지금 가장 높은 학교급이에요. 박사 학위를 받은 뒤에도 논문과 숲속 학회, 연구 트리로 학교를 계속 키워요. 다음 학교급은 숲속 교육부가 준비 중이에요.`
+      : !open
       ? `${eun(N.name)} 숲속 교육부가 열심히 준비 중이에요. 그동안 종업식을 열어 수료증을 모아 두면 졸업할 때 기금이 늘어요.`
       : can ? `지금 졸업하면 기금 ${fmt(f)}${numEul(f)} 받아요. ${nextFundNote()}`
       : `이 학교급에서 모은 수료증 ${FUND_PER}장마다 기금이 1씩 늘어요. 지금까지 ${fmt(S.tdip)}장을 모았어요.`;
     const btn = $('#tierBtn');
-    btn.textContent = open ? `졸업식 열기 (${N.name} 입학)` : `${N.name} 준비 중`;
+    btn.textContent = open ? `졸업식 열기 (${N.name} 입학)` : last ? '다음 학교급 준비 중' : `${N.name} 준비 중`;
+    // 명예 교장실 머리말: 대학교에서는 학위수여식 뒤 대학원으로 이어 가고, 대학원은 다음 학교급이 없어요(5.3.2.1)
+    { const sm = $('#perkHead small'), h = S.tier === 4 ? '한 번 고치면 종업식을 열어도 효과가 남아요.<br>졸업식을 열어도 대학원으로 이어 가요.' : gradOn() ? '한 번 고치면 종업식을 열어도 효과가 남아요.' : '한 번 고치면 종업식을 열어도 효과가 남아요.<br>단, 졸업하면 처음부터예요.';
+      if (sm && sm.dataset.h !== h) { sm.dataset.h = h; sm.innerHTML = h; } }
+    { const sm = $('#tierHead small'), t = last ? '대학원이 지금 가장 높은 학교급이에요' : '마지막 해에 졸업하면 다음 학교에 입학해요'; if (sm && sm.dataset.h !== t) { sm.dataset.h = t; sm.textContent = t; } }   // 대학교 낱말 바꾸기가 글을 바꿔도 다시 쓰지 않게 열쇠로 견줘요
     btn.setAttribute('aria-disabled', can ? 'false' : 'true');
     if (!can) $('#tierConfirm').hidden = true;
   }

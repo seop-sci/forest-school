@@ -785,7 +785,9 @@
   function buildQuestPanel() {
     const i = S.q.m, q = MAIN[i];
     if (!q) {
-      $('#qMain').innerHTML = '<div class="qall"><b>메인 퀘스트를 모두 마쳤어요</b><p>끝까지 왔어요! 다음 학교급은 숲속 교육부가 열심히 준비 중이에요. 그동안 종업식으로 수료증을 모으고 학생들의 부탁도 들어주세요.</p></div>';
+      $('#qMain').innerHTML = gradOn()   // 5.3.2.1: 박사 학위 뒤에 할 일을 말해요
+        ? '<div class="qall"><b>메인 퀘스트를 모두 마쳤어요</b><p>박사 학위까지 받았어요! 이제는 연구소 창의 논문 탭에서 논문을 쓰고 숲속 학회 메달을 모아요. 연구 트리와 학생들의 부탁도 이어 가요. 다음 학교급은 숲속 교육부가 준비 중이에요.</p></div>'
+        : '<div class="qall"><b>메인 퀘스트를 모두 마쳤어요</b><p>끝까지 왔어요! 다음 학교급은 숲속 교육부가 열심히 준비 중이에요. 그동안 종업식으로 수료증을 모으고 학생들의 부탁도 들어주세요.</p></div>';
     } else {
       const ch = q.ch, list = [];
       MAIN.forEach((m, j) => { if (m.ch === ch) list.push(j); });

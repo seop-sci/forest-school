@@ -86,7 +86,11 @@
      받는 양과 차례는 하나씩 누를 때와 같아요(같은 함수를 차례로 불러요). 보상 창만 하나로 모아요 */
   function claimables() {
     if (!S) return 0;
-    let n = S.dm.list.filter(dmReady).length + (dmAllDone() && !S.dm.bonus ? 1 : 0) + S.wk.list.filter(wkReady).length + MP_BOX.filter((_, i) => boxReady(i)).length + S.q.subs.filter(subReady).length;
+    // 5.3.2.1: '모두 받기'는 미션을 받은 뒤 그 미션 포인트로 열리는 상자와 마지막 미션 뒤의 보너스까지 받아서, 띠의 개수(3)와 받은 창의 개수(4)가 달랐어요. 받은 뒤 열릴 것까지 미리 세요
+    const dmR = S.dm.list.filter(dmReady).length, wkR = S.wk.list.filter(wkReady).length;
+    const bonus = !S.dm.bonus && S.dm.list.length > 0 && S.dm.list.every(m => m.done || dmReady(m)) ? 1 : 0;
+    const pts = S.wk.pts + dmR * MP.daily + bonus * MP.bonus + wkR * MP.week;
+    let n = dmR + bonus + wkR + MP_BOX.filter((B, i) => !S.wk.got[i] && pts >= B.at).length + S.q.subs.filter(subReady).length;
     try { if (psOpen()) n += S.ps.dl.filter(psReady).length + S.ps.wl.filter(psReady).length; } catch (e) { /* 패스가 아직 준비 전 */ }
     try { if (evLive()) n += S.ev.list.filter(evReady).length; } catch (e) { /* 이벤트가 아직 준비 전 */ }
     return n;

@@ -43,6 +43,8 @@
     const dy = t0 - sh.getBoundingClientRect().top;
     if (Math.abs(dy) > 4) sh.animate([{ transform: `translateY(${dy.toFixed(0)}px)` }, { transform: 'none' }], { duration: 220, easing: 'ease-out' });
   }
+  // 기다릴 시간 어림: 1시간 안은 분, 이틀 안은 시간, 그 뒤는 날
+  const etaTx = sec => sec < 3600 ? `약 ${Math.max(1, Math.ceil(sec / 60))}분` : sec < 48 * 3600 ? `약 ${Math.round(sec / 3600)}시간` : `약 ${fmt(Math.round(sec / 86400))}일`;
   function renderSheet0() {
     const k = rt.sheetKey; if (!k) return;
     const F = FAC[k], L = S.f[k], c = facCost(k), fr = furReady(k), ok = fr && S.budget >= c, cap = facCap(), maxed = facMaxed(k);
@@ -175,6 +177,10 @@
     }
     setT($('#sheetNeed'), conOn(k) ? ' ' : maxed ? (semFirst() ? `더 올리려면 1학기를 마쳐야 해요. 1학기 방학식을 열면 Lv.${capNext()}까지 키울 수 있어요` : (finalYear() ? (S.tier === 4 ? `이 학년에서는 다 키웠어요. 학위수여식을 열면 대학원에서 더 키울 수 있어요` : `이 학교급에서는 다 키웠어요. 졸업식을 열면 ${TIERS[S.tier + 1].name}에서 새로 지어요`) : `더 올리려면 학교가 다음 학년으로 올라가야 해요. ${semOn() ? '2학기 ' : ''}종업식을 열면 Lv.${capNext()}까지 키울 수 있어요`)) : !fr ? `가구 네 개를 모두 ${euro('Lv.' + L)} 올리면 건물을 키울 수 있어요` : ok ? ' ' : `도토리 ${fmt(Math.ceil(c - S.budget))}개가 더 필요해요`);
     $('#sheetNeed').classList.toggle('soft', maxed || !fr);
+    // 5.3.2.1: 도토리가 모자라면 지금 수업료로 얼마나 걸리는지, 하루 횟수가 남은 일이 있으면 오늘 할 일로 가는 단추
+    { const r = rate(), sec = !conOn(k) && !maxed && fr && !ok && r > 0 ? (c - S.budget) / r : 0, w = $('#sheetWait');
+      setHid(w, !(sec > 0 && isFinite(sec)));
+      if (sec > 0 && isFinite(sec)) { setT($('#sheetWaitTx'), `수업료로 ${etaTx(sec)}`); setHid($('#sheetWaitGo'), !todoRows().some(x => x.left > 0 && x.T.go !== 'home' && x.T.k !== 'sk')); } }
   }
   // 짓기와 업그레이드 효과. kind 'build'(처음 지음) 또는 'up'. 건물 창이 열려 있으면 닫을 때 보여 줘요
   // 작업지시서 22 그림으로 켜요(코드로 그린 먼지와 별은 어색해서 그림으로 바꿨어요). setBldFx(false)로 끌 수 있어요

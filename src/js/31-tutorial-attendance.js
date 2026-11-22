@@ -43,8 +43,16 @@
     if (!r || r.width < 8) { if (h) h.hidden = true; if (S && S.q.m >= FH_MAX && h) h.remove(); return; }
     if (!h) { h = document.createElement('div'); h.id = 'firstHint'; h.className = 'first-hint'; h.setAttribute('aria-hidden', 'true'); h.innerHTML = '<span class="fh-tx"></span><span class="fh-f">👆</span>'; document.body.appendChild(h); }
     if (h.firstChild.textContent !== aim[1]) h.firstChild.textContent = aim[1];
-    h.hidden = false; h.style.left = (r.left + r.width / 2) + 'px'; h.style.top = (aim[2] ? r.bottom - 6 : r.top + r.height * 0.62) + 'px';
+    // 5.3.2.1: 대상이 화면 아래 120px 안이면(창 아래 키우기 단추, 가구 줄 끝) 글이 화면 밖으로 나가고 옆 칸 값을 덮었어요. 그때는 위쪽에 두고 손가락이 아래를 가리켜요
+    const up = !!aim[2] && r.bottom > innerHeight - FH_LOW;
+    h.classList.toggle('up', up); if (h.lastChild.textContent !== (up ? '👇' : '👆')) h.lastChild.textContent = up ? '👇' : '👆';
+    h.hidden = false; h.style.top = (up ? r.top + 6 : aim[2] ? r.bottom - 6 : r.top + r.height * 0.62) + 'px';
+    const cx = r.left + r.width / 2, tw = h.firstChild.offsetWidth || 0;   // 손가락은 대상 가운데, 글만 화면 안으로 밀어요
+    h.style.left = cx + 'px';
+    const dx = Math.max(tw / 2 + 6 - cx, Math.min(0, innerWidth - tw / 2 - 6 - cx));
+    h.firstChild.style.transform = dx ? `translateX(${Math.round(dx)}px)` : '';
   }
+  const FH_LOW = 120;
   setInterval(() => { try { firstHint(); } catch (e) { /* 다음에 */ } }, 400);
   function tutStart(i) {
     rt.tut = { i: Math.max(0, Math.min(TUT.length - 1, i | 0)), confirm: false };
