@@ -158,7 +158,7 @@
     const bought = !!(S.cos && S.cos.night && S.cos.own.includes(NIGHT_KEY));
     const hsN = S.tier >= NSL.tier && geoIdx() >= 3 && rt.viewTier == null && isNight();   // 대학교 구역과 캠퍼스 지도도 밤이 와요
     // 고등학교부터 밤(20~6시)이면 저절로(A안)
-    const on = bought || hsN, look = hsN ? (S.nl || 0) : 0;   // 고등학교 밤 모습(0 밤, 1 저녁, 2 밝게)
+    const on = bought || hsN, look = hsN ? (S.todOff ? 2 : (S.nl || 0)) : 0;   // 5.3.3.1 시간 흐름 효과를 끄면 밝게 보기처럼   // 고등학교 밤 모습(0 밤, 1 저녁, 2 밝게)
     map.classList.toggle('hs-night', hsN);
     map.classList.toggle('nl-light', hsN && look === 2);
     // 창문 불빛 조각(작업지시서 42): 건물 그림마다 glow_ 조각이 있으면 같은 자리에 겹치고, 없으면 예전처럼 둥근 빛

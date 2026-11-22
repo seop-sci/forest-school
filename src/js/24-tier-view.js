@@ -43,7 +43,7 @@
   function renderTierDots() {
     const box = $('#tierDots'); if (!box || !S) return;
     let wn = false; try { wn = wldLv() > 0 && WLD.ph === 'night' && !rt.photo; } catch (e) { /* 마을 층 준비 전 */ }
-    const nlOn = rt.viewTier == null && (!!map && map.classList.contains('hs-night') || wn);   // 밤 밝기 단추(고등학교 밤, 그 아래 학교급은 마을 층 밤)
+    const nlOn = rt.viewTier == null && !S.todOff && (!!map && map.classList.contains('hs-night') || wn);   // 밤 밝기 단추(고등학교 밤, 그 아래 학교급은 마을 층 밤)
     box.hidden = (S.tier < 1 && !nlOn) || rt.tab !== 'school' || !!rt.decoEdit;   // 유치원은 학교급 단추 없이 밤 밝기 단추만
     const key = [S.tier, rt.viewTier, nlOn, S.nl || 0, box.hidden].join('|');
     if (box.dataset.key === key) return; box.dataset.key = key;

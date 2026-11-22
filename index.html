@@ -2,7 +2,7 @@
 <html lang="ko">
 <head>
 <meta charset="utf-8">
-<meta name="forest-version" content="5.3.3">
+<meta name="forest-version" content="5.3.3.1">
 <meta name="viewport" content="width=device-width, initial-scale=1">
 <meta name="description" content="도토리를 모아 숲속 학교를 키우는 방치형 게임 테스트판이에요.">
 <style>html,body{margin:0}</style>
@@ -4091,9 +4091,9 @@ body.mg-on .toast[hidden]{display:none}
 .big-card .bc-pr{flex:none;display:flex;flex-direction:column;align-items:center;gap:2px}
 .big-card.poor .pill{background:none;box-shadow:inset 0 0 0 1.5px var(--line);color:var(--muted)}
 /* 상점 거리: 하늘과 바닥을 줄이고(그림은 그대로) 아래에 진열대 */
-.street-panel{background:var(--paper)}
-.street-panel .street-scene{margin-top:-21%;margin-bottom:-24%}
-.street-panel .street-title{top:10px}
+#panelStreet{background:var(--paper)}   /* 5.3.3.1 상점 거리에만(학교 복도는 같은 틀이라 예전 모습 그대로) */
+#panelStreet .street-scene{margin-top:-21%;margin-bottom:-24%}
+#panelStreet .street-title{top:10px}
 .street-wallet{position:absolute;z-index:3;right:10px;top:10px;flex-direction:column;align-items:flex-end;gap:4px}
 .street-wallet .w-it{min-height:30px;background:color-mix(in srgb, var(--paper) 90%, transparent)}
 .shelf,.shop-more{position:relative;z-index:2;padding:4px 16px 0;background:var(--paper)}
@@ -4103,8 +4103,8 @@ body.mg-on .toast[hidden]{display:none}
 .more-row{display:flex;gap:8px}
 .more-go{flex:1;display:flex;flex-direction:column;align-items:flex-start;justify-content:center;min-height:56px;padding:8px 12px;border:1px solid var(--line);border-radius:14px;background:var(--card);color:var(--ink);font:inherit;text-align:left;cursor:pointer}
 .more-go b{font-family:var(--font-display);font-weight:400;font-size:15px}.more-go small{font-size:12.5px;color:var(--muted)}
-@media (prefers-color-scheme: dark){:root:not([data-theme="light"]) .street-panel .street-scene{filter:brightness(.82) saturate(.9)}}
-:root[data-theme="dark"] .street-panel .street-scene{filter:brightness(.82) saturate(.9)}
+@media (prefers-color-scheme: dark){:root:not([data-theme="light"]) #panelStreet .street-scene{filter:brightness(.82) saturate(.9)}}
+:root[data-theme="dark"] #panelStreet .street-scene{filter:brightness(.82) saturate(.9)}
 /* 테마 세트: 접힌 줄, 누르면 펼쳐요 */
 .th-card{padding:0;overflow:hidden;border:1px solid color-mix(in srgb, var(--line) 85%, transparent);background:var(--card)}
 .th-fold{display:flex;align-items:center;gap:12px;width:100%;min-height:72px;padding:10px 12px;border:0;background:none;color:var(--ink);font:inherit;text-align:left;cursor:pointer}
@@ -4137,7 +4137,7 @@ body.mg-on .toast[hidden]{display:none}
     <p class="boot-step" id="bootStep">학교 문을 여는 중...</p>
     <p class="boot-tip" id="bootTip">학교 문을 여는 중이에요</p>
   </div>
-  <span class="boot-ver" id="bootVer">v5.3.3</span>
+  <span class="boot-ver" id="bootVer">v5.3.3.1</span>
 </div>
 
 <div class="app on-school" id="app">
@@ -4704,6 +4704,7 @@ body.mg-on .toast[hidden]{display:none}
         <label class="srow" for="optSound"><span class="txt"><b>효과음</b></span><input type="checkbox" class="switch" id="optSound"></label>
         <div class="srow"><span class="txt"><b>자연 소리</b></span><div class="seg" id="optAmb" role="radiogroup" aria-label="자연 소리"><button type="button" role="radio" data-amb="0" aria-checked="false">끄기</button><button type="button" role="radio" data-amb="1" aria-checked="false">작게</button><button type="button" role="radio" data-amb="2" aria-checked="true">보통</button><button type="button" role="radio" data-amb="3" aria-checked="false">크게</button></div></div>
         <div class="srow"><span class="txt"><b>그래픽</b></span><div class="seg" id="optGfx" role="radiogroup" aria-label="그래픽 품질"><button type="button" role="radio" data-gfx="0" aria-checked="false">낮음</button><button type="button" role="radio" data-gfx="1" aria-checked="false">보통</button><button type="button" role="radio" data-gfx="2" aria-checked="false">높음</button></div></div>
+        <label class="srow" for="optTod"><span class="txt"><b>시간 흐름 효과</b><small>아침, 노을, 밤 빛이 시간 따라 바뀌어요. 끄면 늘 낮처럼 보여요</small></span><input type="checkbox" class="switch" id="optTod"></label>
         <label class="srow" for="optVibe"><span class="txt"><b>진동</b></span><input type="checkbox" class="switch" id="optVibe"></label>
         <div class="srow"><span class="txt"><b>화면 크기</b></span><div class="seg" id="optUiz" role="radiogroup" aria-label="화면 크기"><button type="button" role="radio" data-uiz="0" aria-checked="true">보통</button><button type="button" role="radio" data-uiz="1" aria-checked="false">크게</button></div></div><!-- 5.0.1.7 X-01 -->
         <div class="srow"><span class="txt"><b>숫자 단위</b></span><div class="seg" id="optUnits" role="radiogroup" aria-label="숫자 단위"><button type="button" role="radio" data-units="ko" aria-checked="true">1.2만</button><button type="button" role="radio" data-units="en" aria-checked="false">12K</button></div></div>
@@ -4750,7 +4751,7 @@ body.mg-on .toast[hidden]{display:none}
       </div>
       <h3 class="panel-sub">정보</h3>
       <dl class="info">
-        <div id="verRow"><dt>버전</dt><dd>v5.3.3</dd></div>
+        <div id="verRow"><dt>버전</dt><dd>v5.3.3.1</dd></div>
         <div id="pidRow" hidden><dt>학교 번호</dt><dd id="infoPid"></dd></div>
       </dl>
       <div id="devBox" hidden>
@@ -9606,6 +9607,7 @@ body.mg-on .toast[hidden]{display:none}
     deco: freshDeco(),   // 꾸미기: own 가진 장식 수, lay 지도별 자리(유치원, 초등학교)마다 놓인 장식 id, nm 학교 이름 앞부분('' = 숲속), mk 학교 마크 [모양, 문양, 바탕 색, 문양 색] 또는 null. 정수 상점: 오늘 산 도토리 묶음 수, 이번 주 산 황금 도토리 묶음 수
     cs: freshCs(),
     wxOff: 0,   // 날씨 효과 끄기(칩을 눌러 켜고 꺼요)
+    todOff: 0,   // 5.3.3.1 시간 흐름 효과 끄기(아침, 노을, 밤 빛을 늘 낮처럼. 모든 학교급)
     nl: 0,   // 고등학교 밤 모습: 0 밤(어둡게), 1 저녁(조금 어둡게), 2 밝게(보이는 모습만 바뀌고 밤 규칙은 그대로)
     tr2: freshTr2(),   // 수학여행: 다녀온 학년, 지금 여행, 떠난 수, 돌아온 수, 기념품. 진로 상담: 오늘 날짜와 횟수, 모든 상담 수, 진로를 고른 수, 이룬 학생 수, 정산한 명부 번호, 진로 도감
     roster: freshRoster(), club: freshClub(), el: freshEl(), snap: {}, tfp: 0,   // el: 반장 선거
@@ -9858,6 +9860,7 @@ body.mg-on .toast[hidden]{display:none}
     sanitizeBx(d, s);   // 숲속 생물 탐사
     sanitizeCg(d, s);   // 동아리 대항전
     s.wx = typeof d.wx === 'string' ? d.wx.slice(0, 10) : '';   // 날씨 알림 본 날
+    s.todOff = d.todOff ? 1 : 0;   // 5.3.3.1 옛 저장은 켜 둔 그대로(0)
     s.wxOff = d.wxOff ? 1 : 0;   // 보안 보강 판: 날씨 칩을 눌러 비, 눈, 안개 효과 끄기(날씨 자체와 보너스는 그대로)
     { const P = d.pl && typeof d.pl === 'object' ? d.pl : {}, got = Math.max(0, Math.min(PL.list.length, Math.floor(Number(P.got) || 0))); s.pl = { got, read: Math.max(0, Math.min(got, Math.floor(Number(P.read) || 0))), wk: Math.floor(Number(P.wk)) || -1 }; }   // 학부모 편지
     { const R = d.rs && typeof d.rs === 'object' ? d.rs : {}, n = (v, hi) => Math.max(0, Math.min(hi, Math.floor(Number(v) || 0))); s.rs = { n: n(R.n, 1e4), p: n(R.p, 1e9), pos: n(R.pos, 1e4), king: n(R.king, 1e4) }; }   // 랭킹 시즌
@@ -11054,7 +11057,7 @@ body.mg-on .toast[hidden]{display:none}
     if (!S || !S.ambV || rt.paused || rt.adOpen || document.hidden || rt.tab !== 'school' || rt.cereOn) return w;
     let play = false; try { play = !!((pzUI && pzUI.open) || (mgUI && mgUI.open) || (btUI && btUI.open)); } catch (e) { /* 아직 준비 전 */ }
     if (play) return w;
-    const h = kstHour(gameNow()), base = isNight() ? 'amb_night' : h < 9 ? 'amb_morning' : h >= 17 ? 'amb_evening' : 'amb_day';
+    const h = kstHour(gameNow()), base = S && S.todOff ? 'amb_day' /* 5.3.3.1 시간 흐름 효과를 끄면 자연 소리도 낮 */ : isNight() ? 'amb_night' : h < 9 ? 'amb_morning' : h >= 17 ? 'amb_evening' : 'amb_day';
     let bv = rt.fest || rt.sports ? 0.5 : 1;   // 행사 곡이 나올 때는 반쯤
     if (rt.ambWx === 'rain') { w.amb_rain = 1; bv *= 0.45; }
     else if (rt.ambWx === 'snow') { w.amb_snow = 1; bv *= base === 'amb_night' ? 0.3 : 0.6; }
@@ -15476,8 +15479,8 @@ body.mg-on .toast[hidden]{display:none}
        forest/rank/<내 id>   랭킹 이름과 학교 점수
        forest/stats/<내 id>  테스트 현황 (어디까지 했는지, 얼마나 했는지)
      <내 id>는 Firebase 익명 로그인이 기기(브라우저)마다 만들어 줘요. */
-  const VERSION = '5.3.3';
-  const NT_QUIET = ['5.3.2.1', '5.3.0.3', '5.3.0.2', '5.3.0.1', '5.2.2', '5.2.1', '5.2.0.2', '5.2.0.1', '5.1.1.3', '5.1.1.2', '5.1.1.1', '5.1.1', '5.0.3.1', '5.0.3', '5.0.2.2', '5.0.2.1', '2.1.20', '2.1.2.2', '2.3.0.1', '2.3.4', '3.2.3', '3.2.4', '3.2.5', '3.3.1', '3.3.2', '3.3.3', '4.4.1.1', '4.4.1.2', '4.4.1.3', '4.4.1.4', '5.0.1.1', '5.0.1.2', '5.0.1.3', '5.0.1.4', '5.0.1.5', '5.0.1.6', '5.0.1.7', '5.0.1.8'];   // 생물 탐사 고침은 공지 없이. 도 공지 없이(공지 줄은 정하면 넣어요). 공지 없이. 공지 줄은 woodani가 정할 때까지 조용히. 공지는 2026-11-16 woodani가 정해서 NOTICES로 옮겼어요. 은 공지를 띄워요. 도 공지 없이. 도 공지 창 없이. 도 공지 창 없이(공지는 그대로). 도 조용히. 도 공지 창 없이(공지 줄을 고르지 않음)
+  const VERSION = '5.3.3.1';
+  const NT_QUIET = ['5.3.3.1', '5.3.2.1', '5.3.0.3', '5.3.0.2', '5.3.0.1', '5.2.2', '5.2.1', '5.2.0.2', '5.2.0.1', '5.1.1.3', '5.1.1.2', '5.1.1.1', '5.1.1', '5.0.3.1', '5.0.3', '5.0.2.2', '5.0.2.1', '2.1.20', '2.1.2.2', '2.3.0.1', '2.3.4', '3.2.3', '3.2.4', '3.2.5', '3.3.1', '3.3.2', '3.3.3', '4.4.1.1', '4.4.1.2', '4.4.1.3', '4.4.1.4', '5.0.1.1', '5.0.1.2', '5.0.1.3', '5.0.1.4', '5.0.1.5', '5.0.1.6', '5.0.1.7', '5.0.1.8'];   // 생물 탐사 고침은 공지 없이. 도 공지 없이(공지 줄은 정하면 넣어요). 공지 없이. 공지 줄은 woodani가 정할 때까지 조용히. 공지는 2026-11-16 woodani가 정해서 NOTICES로 옮겼어요. 은 공지를 띄워요. 도 공지 없이. 도 공지 창 없이. 도 공지 창 없이(공지는 그대로). 도 조용히. 도 공지 창 없이(공지 줄을 고르지 않음)
     // 이 버전들은 업데이트해도 공지 창을 띄우지 않아요(공지는 그대로)
   /* 공지사항 (은 이미 올려서 부터): 설정 > 공지사항. 맨 위가 가장 새 공지예요
      패치노트는 자동으로 넣지 않아요. woodani가 검수한 글만 여기에 적어요(CHANGELOG.md는 자세한 기록용이라 따로 있어요)
@@ -18788,7 +18791,7 @@ body.mg-on .toast[hidden]{display:none}
     const bought = !!(S.cos && S.cos.night && S.cos.own.includes(NIGHT_KEY));
     const hsN = S.tier >= NSL.tier && geoIdx() >= 3 && rt.viewTier == null && isNight();   // 대학교 구역과 캠퍼스 지도도 밤이 와요
     // 고등학교부터 밤(20~6시)이면 저절로(A안)
-    const on = bought || hsN, look = hsN ? (S.nl || 0) : 0;   // 고등학교 밤 모습(0 밤, 1 저녁, 2 밝게)
+    const on = bought || hsN, look = hsN ? (S.todOff ? 2 : (S.nl || 0)) : 0;   // 5.3.3.1 시간 흐름 효과를 끄면 밝게 보기처럼   // 고등학교 밤 모습(0 밤, 1 저녁, 2 밝게)
     map.classList.toggle('hs-night', hsN);
     map.classList.toggle('nl-light', hsN && look === 2);
     // 창문 불빛 조각(작업지시서 42): 건물 그림마다 glow_ 조각이 있으면 같은 자리에 겹치고, 없으면 예전처럼 둥근 빛
@@ -22619,7 +22622,7 @@ body.mg-on .toast[hidden]{display:none}
   function renderTierDots() {
     const box = $('#tierDots'); if (!box || !S) return;
     let wn = false; try { wn = wldLv() > 0 && WLD.ph === 'night' && !rt.photo; } catch (e) { /* 마을 층 준비 전 */ }
-    const nlOn = rt.viewTier == null && (!!map && map.classList.contains('hs-night') || wn);   // 밤 밝기 단추(고등학교 밤, 그 아래 학교급은 마을 층 밤)
+    const nlOn = rt.viewTier == null && !S.todOff && (!!map && map.classList.contains('hs-night') || wn);   // 밤 밝기 단추(고등학교 밤, 그 아래 학교급은 마을 층 밤)
     box.hidden = (S.tier < 1 && !nlOn) || rt.tab !== 'school' || !!rt.decoEdit;   // 유치원은 학교급 단추 없이 밤 밝기 단추만
     const key = [S.tier, rt.viewTier, nlOn, S.nl || 0, box.hidden].join('|');
     if (box.dataset.key === key) return; box.dataset.key = key;
@@ -28298,7 +28301,7 @@ body.mg-on .toast[hidden]{display:none}
     try { trTab(t, prev); } catch (e) { /* 연출만 */ }   // 탭 넘김
   }
   function syncSettingsUI() {
-    $('#optSound').checked = S.sound; $('#optBgm').checked = S.bgm; $('#optVibe').checked = S.vibrate;
+    $('#optSound').checked = S.sound; $('#optBgm').checked = S.bgm; $('#optVibe').checked = S.vibrate; $('#optTod').checked = !S.todOff;
     $('#tutSub').textContent = S.tut.paid || S.tut.nop ? '학교를 꾸려 가는 방법을 다시 봐요' : `끝까지 보면 황금 도토리 ${TUT_GOLD}개` + (S.tut.st === 'later' ? ' (이어서 보기)' : '');
     $$('#optUnits [data-units]').forEach(b => b.setAttribute('aria-checked', b.dataset.units === S.units ? 'true' : 'false'));
     $$('#optGfx [data-gfx]').forEach(b => b.setAttribute('aria-checked', +b.dataset.gfx === wldLv() ? 'true' : 'false'));
@@ -32156,6 +32159,7 @@ body.mg-on .toast[hidden]{display:none}
   const wldBg = () => { try { return thOn().bg || ''; } catch (e) { return ''; } };
   function wldPhase() {
     if (rt.wldPh) return rt.wldPh;   // 사진 모드에서 고른 시간
+    if (S && S.todOff) return 'day';   // 5.3.3.1 시간 흐름 효과를 끈 사람은 늘 낮
     const h = kstHour(gameNow());
     return isNight() ? 'night' : h < 9 ? 'morning' : h >= 17 ? 'evening' : 'day';
   }
@@ -32180,7 +32184,7 @@ body.mg-on .toast[hidden]{display:none}
     const lv = wldLv(), home = rt.tab === 'school' && !document.hidden, ph = lv ? wldPhase() : '', wx = lv ? wldWeather() : '';
     WLD.lv = lv; WLD.ph = ph; WLD.wx = wx;
     const hsN = $('#map') && $('#map').classList.contains('hs-night');   // 고등학교부터의 밤은 예전 밤 화면(창문 불빛)이 맡아요
-    WLD.tint.className = 'wld-tint' + (lv && ph ? ' ph-' + ph : '') + (hsN ? ' hs' : '') + (wx ? ' wx-' + wx : '') + (S.nl && !rt.photo ? ' nl' + S.nl : '');
+    WLD.tint.className = 'wld-tint' + (lv && ph ? ' ph-' + ph : '') + (hsN ? ' hs' : '') + (wx ? ' wx-' + wx : '') + (S.nl && !rt.photo && !S.todOff ? ' nl' + S.nl : '');
     kidsNightSync(); renderTierDots();   // 밤에는 학생 셋 중 하나만, 밤 밝기 단추
     WLD.vig.className = 'wld-vig' + (lv >= 2 ? ' on' : '');
     rt.ambWx = home ? wx : '';
@@ -32309,6 +32313,11 @@ body.mg-on .toast[hidden]{display:none}
   setInterval(() => { try { wldSync(); } catch (e) { /* 다음에 */ } }, 15000);
   document.addEventListener('visibilitychange', () => { try { wldSync(); } catch (e) { /* 다음에 */ } });
   window.addEventListener('load', () => setTimeout(() => { try { wldSync(); } catch (e) { /* 다음에 */ } }, 2600));   // 효과층(1.5초 뒤 받기) 다음에
+  document.addEventListener('change', e => {   // 5.3.3.1 시간 흐름 효과 켜고 끄기(모든 학교급, 고등학교부터 밤 화면도 밝게. 학생이 기숙사에 가는 규칙은 그대로)
+    if (!S || !e.target || e.target.id !== 'optTod') return;
+    S.todOff = e.target.checked ? 0 : 1; save(); sfx('tap'); renderNight(true); wldSync(); renderTierDots();
+    toast(S.todOff ? '시간 흐름 효과를 껐어요. 늘 낮처럼 보여요' : '시간 흐름 효과를 켰어요');
+  });
   document.addEventListener('click', e => {
     const b = e.target.closest && e.target.closest('#optGfx [data-gfx]'); if (!b || !S) return;
     const v = +b.dataset.gfx; if (v === S.gfx) return;
