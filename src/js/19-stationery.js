@@ -598,7 +598,7 @@
       if (rt.tab === 'shop') renderShop();
     if (rt.tab === 'street') renderStreet();
     }, r => {
-      if (r !== 'noad') toast('광고를 끝까지 보지 않아서 황금 도토리가 없어요');
+      if (r !== 'noad') toast('광고를 끝까지 보지 않아서 황금 도토리를 받지 못했어요');
     });
   }
 

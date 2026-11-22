@@ -191,7 +191,7 @@
     },
     star: {
       measure: q => rosterOn() && S.roster.list.length ? Math.max(...S.roster.list.map(s => Math.max(...s.a.map(star)))) : 0,
-      goal: q => `능력치 별 ${q.n}개 학생 만들기`,
+      goal: q => `능력치 별이 ${q.n}개인 학생 만들기`,
       go: qtGoClub
     },
     clubShown: {

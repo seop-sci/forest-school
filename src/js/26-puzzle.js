@@ -608,7 +608,7 @@
     });
     pzRenderTray(); pzRenderTop(); pzRenderAsk(); pzRenderHelp();
     save();
-    if (res.over) setTimeout(pzGameOver, rt.reduced ? 200 : 800);
+    if (res.over) { const c = S.pz.cur; setTimeout(() => { if (S.pz.cur === c && pzStuck(c)) pzGameOver(); }, rt.reduced ? 200 : 800); }   // 5.3.4.6: 그사이 도움을 써서 풀렸거나 새 판이면 끝내지 않아요
   }
   function pzGameOver() {
     const cur = S.pz.cur; if (!cur) return;

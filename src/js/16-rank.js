@@ -539,7 +539,7 @@
     } else if (sea) {   // 랭킹 시즌
       const n = rsNum(), q = n ? RS_Q[rsQ(n)] : null;
       $('#rankSub').textContent = n ? `${rsLabel(n)}. ${S.rs.p >= RS.min ? `기념 장식 '${q[3]}'${eulOf(q[3])} 받아요` : `${fmt(RS.min - S.rs.p)}점 더 모으면 기념 장식 '${q[3]}'`}` : '랭킹 시즌은 2026년 12월에 시작해요';
-      $('#rankLead').textContent = '주간 리그 점수를 시즌 내내 모아요. 300점을 넘기면 계절 기념 장식, 1~3위는 칭호 \'숲속 시즌 왕\'.';
+      $('#rankLead').textContent = '주간 리그 점수를 시즌 내내 모아요. 300점을 넘기면 계절 기념 장식을 받고, 1~3위는 칭호 \'숲속 시즌 왕\'을 받아요.';
     } else
     $('#rankSub').textContent = bm ? (btOpen() ? `${BT_LG[S.bt.lg].n} 리그, 오늘 남은 대결 ${btLeft()}판` : '숲속 대결은 초등학교 3학년부터 열려요') : wk ? `월요일에 새 리그가 시작돼요 (${left}일 남음). 리그에 참여하면 순위와 상관없이 황금 도토리 1개`
       : rankSchool(S.tier, yearNo(), semOn() ? S.sem : null) + (Rank.state === 'on' && R.length ? `, 랭킹에 ${R.length}명` : '');

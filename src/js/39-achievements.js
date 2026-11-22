@@ -29,7 +29,7 @@
     { id: 'bio', name: '생물 탐사', goals: [10, 25, 45, 70, 90], title: '꼬마 생물학자', ic: 'bio_ladybug', t: n => n >= BIO.length ? '생물 도감 모두 채우기' : `생물 ${n}종 관찰하기`, v: () => bxCount() },
     { id: 'lab', name: '과학 탐구 실험', goals: [3, 8, 14, 20, 24], title: '꼬마 과학자', t: n => n >= 24 ? '실험 노트 모두 채우기' : `실험 노트 ${n}장 채우기`, v: () => labCount() },   // 공부 2단계(노트 24장)
     { id: 'selfstudy', name: '야간 자율학습', goals: [1, 5, 15, 30, 60], title: '밤공부 대장', ic: 'ic_selfstudy', t: n => `야간 자율학습 ${n}번 마치기`, v: () => S.ns ? S.ns.fin || 0 : 0 },   // 마친 밤
-    { id: 'counsel', name: '진로 상담', goals: [3, 6, 10, 14, 18], title: '꿈 찾기 선생님', ic: 'ach_counsel', t: n => `진로를 이룬 학생 ${n}명`, v: () => S.cs ? S.cs.won : 0 },
+    { id: 'counsel', name: '진로 상담', goals: [3, 6, 10, 14, 18], title: '꿈 찾기 선생님', ic: 'ach_counsel', t: n => `꿈을 이룬 학생 ${n}명`, v: () => S.cs ? S.cs.won : 0 },
     { id: 'trip2', name: '수학여행', goals: [1, 3, 5, 7, 9], title: '여행 기록가', ic: 'ic_trip2', t: n => `수학여행 기념품 ${n}종`, v: () => S.tr2 ? S.tr2.souv.length : 0 }   // 졸업 정산에서 진로를 이룬 학생 수
   ];
   // 단과대학 장식 8개 모으기(대학교가 열렸을 때만 보여요). 숫자와 칭호는 제안값
@@ -124,7 +124,7 @@
       const pct = can || h >= ACH_N ? 100 : Math.max(0, Math.min(100, v / goal * 100));
       // 받을 것이 있으면 이룬 업적(가장 높은 등급)을 보여 주고, 아니면 다음 목표를 보여 줘요
       const head = can ? a.t(achGoal(a, h - 1)) : h >= ACH_N ? a.name : a.t(goal);
-      const sub = can ? `${ACH_TIER[h - 1]} 메달을 이뤘어요! 황금 도토리 +${ACH_GOLD.slice(g, h).reduce((x, y) => x + y, 0)}` : h >= ACH_N ? `모두 이뤘어요. 칭호 "${a.title}"` : `${fmt(Math.min(v, goal))} / ${fmt(goal)}`;
+      const sub = can ? `${ACH_TIER[h - 1]} 메달을 받았어요! 황금 도토리 +${ACH_GOLD.slice(g, h).reduce((x, y) => x + y, 0)}` : h >= ACH_N ? `모두 이뤘어요. 칭호 "${a.title}"` : `${fmt(Math.min(v, goal))} / ${fmt(goal)}`;
       return `<div class="ach-row${can ? ' can' : ''}"><span class="ach-medal">${achMedal(a)}</span>` +
         `<span class="ach-tx"><b>${esc(head)}</b><small>${esc(sub)}</small><span class="ach-bar"><i style="width:${pct.toFixed(0)}%"></i></span>` +
         `<span class="ach-tiers" aria-label="받은 메달 ${g}개">${ACH_TIER.map((_, j) => `<i class="${j < g ? 't' + (j + 1) : ''}"></i>`).join('')}</span></span>` +

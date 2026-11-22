@@ -422,7 +422,7 @@
     { id: 'honey', nm: '꿀단지', who: 'bear', n: 4, ok: () => (S.t.bear || 0) >= 5, title: '꿀단지 탐정' },
     { id: 'acorn', nm: '잃어버린 도토리', who: 'squirrel', n: 4, ok: () => (S.t.squirrel || 0) >= 10, title: '보물찾기 대장' },
     { id: 'sloth', nm: '나무늘보의 달리기', who: 'sloth', n: 4, ok: () => uniNow() && !!S.dex.got.sloth, title: '끝까지 응원단' },
-    { id: 'mole', nm: '두더지의 별자리', who: 'mole', n: 4, ok: () => !!S.dex.got.mole && (S.f.science || 0) >= 1, title: '별자리 지기' },
+    { id: 'mole', nm: '두더지의 별자리', who: 'mole', n: 4, ok: () => !!S.dex.got.mole && (S.f.science || 0) >= 1, title: '별자리지기' },
     { id: 'deer', nm: '고라니의 그림', who: 'waterdeer', n: 3, ok: () => !!S.dex.got.waterdeer, title: '복도 미술관장' },
     { id: 'alumni', nm: '졸업생 후일담', who: 'hedgehog', n: 3, ok: () => S.tier >= GRAD_TIER && S.tg >= TIERS[GRAD_TIER].years, title: '숲속 동물 학교 교장' }];   // 박사 학위를 받은 뒤(설계안 6절, 글은 초안)
   // 졸업생 후일담: 진로 도감에서 먼저 이룬 졸업생 셋을 찾아가요(모자라면 솜이). 글은 그때 저장을 보고 만들어요
@@ -580,7 +580,7 @@
        { w: 'mole', t: '보여. 다 보여. 국자 손잡이가 휘었어.' },
        { w: 'owl', t: '옛날 첫 교장 선생님도 이 굴 자리에서 별을 보셨다고 하오. 땅속에서 올려다보는 하늘이 가장 깊다고 하셨지.' },
        { w: 'mole', t: '선생님, 저 이제 별 이름 외울래요. 눈 감고도 어디 있는지 아니까요.' },
-       { w: 'hamster', t: '그럼 네가 우리 반 별자리 지기 해. 구름 낀 날에는 네 굴로 오면 되잖아.' }]],
+       { w: 'hamster', t: '그럼 네가 우리 반 별자리지기 해. 구름 낀 날에는 네 굴로 오면 되잖아.' }]],
     deer: [
       [{ t: '쉬는 시간. 고라니가 창가에서 스케치북을 가리고 뭔가를 그려요.' },
        { w: 'duck', t: '고라니야, 뭐 그려? 보여 줘.' },
