@@ -159,7 +159,7 @@
     const won = S.roster.list.filter(csDone);
     let newDex = 0;
     for (const x of won) { const J = JOBS[x.jb]; if (!S.cs.done[J.k]) { S.cs.done[J.k] = { nm: x.nm, sp: x.sp }; newDex += 1; } }
-    if (newDex) { S.ess += CS.dexEss * newDex; renderEss(); }
+    if (newDex) addEss(CS.dexEss * newDex);   // 5.3.4.4: 다른 정수 보상처럼 정수 연구가 붙어요
     const allDex = JOBS.every(J => S.cs.done[J.k]);
     if (allDex && !S.deco.own.deco_career_tree) { S.deco.own.deco_career_tree = 1; addGold(CS.dexGold); }
     rt.csRw = [];
