@@ -3,6 +3,7 @@
 #    처음 장식 셋(벤치, 꽃밭, 이정표)은 정수 10 그대로, 모자 120, 가구 200, 밤 모드 150, 황금 품목 값 그대로
 # 2) 황금 60개 뒤에는 황금 1개 대신 정수 10
 # 3) 광고 황금 한도를 따로 세요: 일반 광고 3번(1개씩)과 상점 광고 3번(3개씩)이 서로 막지 않아요. 옛 저장(gd.a 없음)은 전체에서 상점 몫을 빼서 읽어요
+# 5) 상점 거리, 백화점, 문방구, 꾸미기 가게 모두 홈과 같은 배경음악
 # 4) 이달의 꾸미기: 그달 깃발(20)은 바로, 아치(30)는 확인 줄, 모자(25)는 바로 사서 입혀요. 산 것은 다시 눌러 벗어요. 지난 달 것은 놓친 장식에 같은 값
 #    저장 다시 읽기 뒤에도 가진 것이 남아요. 값과 재화가 유한해요. 390 밝은 화면과 360 어두운 화면에서 넘치지 않아요
 import asyncio, pathlib
@@ -79,6 +80,9 @@ async def main():
               const k = String(+F.gameToday().slice(5, 7)).padStart(2, '0'); return [d.deco.own[`deco_mon_${{k}}_flag`], d.deco.own[`deco_mon_${{k}}_gate`], d.cos.own.includes('hat:mon' + k), d.gd.a]; }})()""")
             print('다시 읽기', r)
             ok(r[0] == 1 and r[1] == 1 and r[2] is True and isinstance(r[3], int), '저장 다시 읽기 뒤에도 이달의 꾸미기와 gd.a가 남아요')
+            r = await page.evaluate(f"""(()=>{{ const F={F}; F.S.bgm = true; const out = {{}}; for (const t of ['school', 'street', 'shop', 'ess', 'deco']) {{ F.setTab(t); out[t] = F.musicWant(); }} F.setTab('school'); return out; }})()""")
+            print('배경음악', r)
+            ok(len(set(r.values())) == 1, f'상점 네 곳 모두 홈과 같은 곡 {r}')
             ok(not errs, f'오류 없음 {errs[:3]}')
             await ctx.close()
         # 옛 저장: gd.a 없이 n 3, shop 1이면 일반 광고 2번 본 것으로
