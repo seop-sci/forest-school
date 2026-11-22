@@ -1,7 +1,7 @@
-# 183번 시험(5.3.3.1): 시간 흐름 효과 켜고 끄기(설정, 모든 학교급)
-# 1) 설정의 '시간 흐름 효과' 스위치는 처음에 켜져 있고(옛 저장도), 끄면 S.todOff 1로 저장돼요
+# 183번 시험(5.3.3.1): 홈의 시간 흐름 단추(밤 화면 단추와 합침, 모든 학교급, 언제나)
+# 1) 처음에는 '시간 따라'(S.nl 0). 단추를 누르면 0 → 1(밤은 조금 어둡게) → 2(늘 낮) → 0
 # 2) 밤(KST 22시)과 노을(17시 30분)에 켜 두면 마을 빛 막이 ph-night, ph-evening, 끄면 늘 ph-day
-# 3) 고등학교부터 밤: 끄면 밝게 보기(nl-light), 밤 밝기 단추 숨김. 학생이 기숙사에 가는 규칙(hs-night)은 그대로
+# 3) 고등학교부터 밤: 늘 낮이면 밝게 보기(nl-light), 단추는 그대로 보여요. 학생이 기숙사에 가는 규칙(hs-night)은 그대로
 # 4) 유치원, 초등, 중학, 고등, 대학교 모두에서 같은 결과, 오류 없음, 저장 다시 읽기 뒤에도 꺼져 있어요
 import asyncio, pathlib
 from playwright.async_api import async_playwright
@@ -26,32 +26,25 @@ async def main():
               const at = t => {{ S.clk.last = 0; F.rt.fakeNow = t; }};   // 게임 시계는 뒤로 가지 않아서 시각을 바꿀 때 마지막 시각을 비워요
               const look = async () => {{ await sl(300); F.renderNight(true); F.wldSync(); F.renderTierDots && F.renderTierDots(); const t=document.querySelector('.wld-tint'), m=document.querySelector('#map'), d=document.querySelector('#tierDots');
                 return {{ ph: t ? (t.className.match(/ph-(\\w+)/) || [, ''])[1] : null, hs: m.classList.contains('hs-night'), light: m.classList.contains('nl-light'), nl: !!(d && !d.hidden && d.querySelector('[data-nl]')) }}; }};
-              F.setTab('settings'); await sl(200); out.def = [document.querySelector('#optTod').checked, S.todOff];
-              F.setTab('school'); await sl(200);
+              F.setTab('school'); await sl(200); F.renderTierDots(); const btn = () => document.querySelector('#tierDots [data-nl]');
+              out.def = [!!btn() && !document.querySelector('#tierDots').hidden, S.nl || 0];
               at({NIGHT}); out.onN = await look(); at({EVE}); out.onE = await look();
-              F.setTab('settings'); await sl(150); const sw = document.querySelector('#optTod'); sw.click(); await sl(150); out.sw = [sw.checked, S.todOff];
-              F.setTab('school'); await sl(200);
+              const seq = []; for (let i = 0; i < 3; i++) {{ btn().click(); await sl(120); seq.push(S.nl); }} btn().click(); await sl(120); btn().click(); await sl(120); out.sw = [seq, S.nl];
               at({NIGHT}); out.offN = await look(); at({EVE}); out.offE = await look(); at({NIGHT}); await look();
               return out; }})()""")
             print('학교급', tier, r)
-            ok(r['def'] == [True, 0], f'[{tier}] 처음에는 켜져 있어요')
+            ok(r['def'] == [True, 0], f'[{tier}] 홈에 시간 흐름 단추가 있고 처음에는 시간 따라')
             ok(r['onN']['ph'] == 'night' and r['onE']['ph'] == 'evening', f'[{tier}] 켜 두면 밤과 노을 빛')
-            ok(r['sw'] == [False, 1], f'[{tier}] 스위치를 끄면 S.todOff 1')
+            ok(r['sw'] == [[1, 2, 0], 2], f'[{tier}] 누를 때마다 시간 따라, 밤은 조금 어둡게, 늘 낮')
             ok(r['offN']['ph'] == 'day' and r['offE']['ph'] == 'day', f'[{tier}] 끄면 밤과 노을에도 낮')
-            ok(not r['offN']['nl'], f'[{tier}] 끄면 밤 밝기 단추가 없어요')
+            ok(r['offN']['nl'] and r['onE']['nl'], f'[{tier}] 단추는 낮이든 밤이든 늘 보여요')
             if r['onN']['hs']:
                 ok(r['offN']['hs'] and r['offN']['light'], f'[{tier}] 고등학교부터 밤: 기숙사 규칙(hs-night)은 그대로, 화면은 밝게')
             await page.screenshot(path=str(OUT / f's183_t{tier}_off_{scheme}.png'))
-            r = await page.evaluate(f"(()=>{{ const F={F}; F.save && F.save(); const d = F.sanitize(JSON.parse(localStorage.getItem('forest-school-v1'))); F.rt.fakeNow = 0; F.S.clk.last = 0; return d.todOff; }})()")
-            ok(r == 1, f'[{tier}] 저장 다시 읽기 뒤에도 꺼져 있어요')
+            r = await page.evaluate(f"(()=>{{ const F={F}; F.save && F.save(); const d = F.sanitize(JSON.parse(localStorage.getItem('forest-school-v1'))); F.rt.fakeNow = 0; F.S.clk.last = 0; return d.nl; }})()")
+            ok(r == 2, f'[{tier}] 저장 다시 읽기 뒤에도 늘 낮')
             ok(not errs, f'[{tier}] 오류 없음 {errs[:3]}')
             await ctx.close()
-        # 옛 저장(todOff 없음)은 켜짐
-        sv = base(tier=2, tg=0); sv.pop('todOff', None)
-        ctx, page, errs = await ctxpage(b, 390, 844, 'light', sv)
-        await page.wait_for_timeout(900)
-        ok(await page.evaluate(f"{F}.S.todOff") == 0, '옛 저장은 켜진 채로 읽어요')
-        await ctx.close()
         await b.close()
     print('PASS' if not bad else 'FAIL', len(bad))
 asyncio.run(main())

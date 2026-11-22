@@ -19,7 +19,7 @@
   const wldBg = () => { try { return thOn().bg || ''; } catch (e) { return ''; } };
   function wldPhase() {
     if (rt.wldPh) return rt.wldPh;   // 사진 모드에서 고른 시간
-    if (S && S.todOff) return 'day';   // 5.3.3.1 시간 흐름 효과를 끈 사람은 늘 낮
+    if (S && S.nl === 2) return 'day';   // 5.3.3.1 홈의 시간 흐름 단추를 '늘 낮'으로 둔 사람(모든 학교급)
     const h = kstHour(gameNow());
     return isNight() ? 'night' : h < 9 ? 'morning' : h >= 17 ? 'evening' : 'day';
   }
@@ -44,7 +44,7 @@
     const lv = wldLv(), home = rt.tab === 'school' && !document.hidden, ph = lv ? wldPhase() : '', wx = lv ? wldWeather() : '';
     WLD.lv = lv; WLD.ph = ph; WLD.wx = wx;
     const hsN = $('#map') && $('#map').classList.contains('hs-night');   // 고등학교부터의 밤은 예전 밤 화면(창문 불빛)이 맡아요
-    WLD.tint.className = 'wld-tint' + (lv && ph ? ' ph-' + ph : '') + (hsN ? ' hs' : '') + (wx ? ' wx-' + wx : '') + (S.nl && !rt.photo && !S.todOff ? ' nl' + S.nl : '');
+    WLD.tint.className = 'wld-tint' + (lv && ph ? ' ph-' + ph : '') + (hsN ? ' hs' : '') + (wx ? ' wx-' + wx : '') + (S.nl && !rt.photo ? ' nl' + S.nl : '');
     kidsNightSync(); renderTierDots();   // 밤에는 학생 셋 중 하나만, 밤 밝기 단추
     WLD.vig.className = 'wld-vig' + (lv >= 2 ? ' on' : '');
     rt.ambWx = home ? wx : '';
@@ -173,11 +173,7 @@
   setInterval(() => { try { wldSync(); } catch (e) { /* 다음에 */ } }, 15000);
   document.addEventListener('visibilitychange', () => { try { wldSync(); } catch (e) { /* 다음에 */ } });
   window.addEventListener('load', () => setTimeout(() => { try { wldSync(); } catch (e) { /* 다음에 */ } }, 2600));   // 효과층(1.5초 뒤 받기) 다음에
-  document.addEventListener('change', e => {   // 5.3.3.1 시간 흐름 효과 켜고 끄기(모든 학교급, 고등학교부터 밤 화면도 밝게. 학생이 기숙사에 가는 규칙은 그대로)
-    if (!S || !e.target || e.target.id !== 'optTod') return;
-    S.todOff = e.target.checked ? 0 : 1; save(); sfx('tap'); renderNight(true); wldSync(); renderTierDots();
-    toast(S.todOff ? '시간 흐름 효과를 껐어요. 늘 낮처럼 보여요' : '시간 흐름 효과를 켰어요');
-  });
+
   document.addEventListener('click', e => {
     const b = e.target.closest && e.target.closest('#optGfx [data-gfx]'); if (!b || !S) return;
     const v = +b.dataset.gfx; if (v === S.gfx) return;

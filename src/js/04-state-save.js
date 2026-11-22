@@ -355,7 +355,6 @@
     deco: freshDeco(),   // 꾸미기: own 가진 장식 수, lay 지도별 자리(유치원, 초등학교)마다 놓인 장식 id, nm 학교 이름 앞부분('' = 숲속), mk 학교 마크 [모양, 문양, 바탕 색, 문양 색] 또는 null. 정수 상점: 오늘 산 도토리 묶음 수, 이번 주 산 황금 도토리 묶음 수
     cs: freshCs(),
     wxOff: 0,   // 날씨 효과 끄기(칩을 눌러 켜고 꺼요)
-    todOff: 0,   // 5.3.3.1 시간 흐름 효과 끄기(아침, 노을, 밤 빛을 늘 낮처럼. 모든 학교급)
     nl: 0,   // 고등학교 밤 모습: 0 밤(어둡게), 1 저녁(조금 어둡게), 2 밝게(보이는 모습만 바뀌고 밤 규칙은 그대로)
     tr2: freshTr2(),   // 수학여행: 다녀온 학년, 지금 여행, 떠난 수, 돌아온 수, 기념품. 진로 상담: 오늘 날짜와 횟수, 모든 상담 수, 진로를 고른 수, 이룬 학생 수, 정산한 명부 번호, 진로 도감
     roster: freshRoster(), club: freshClub(), el: freshEl(), snap: {}, tfp: 0,   // el: 반장 선거
@@ -608,7 +607,6 @@
     sanitizeBx(d, s);   // 숲속 생물 탐사
     sanitizeCg(d, s);   // 동아리 대항전
     s.wx = typeof d.wx === 'string' ? d.wx.slice(0, 10) : '';   // 날씨 알림 본 날
-    s.todOff = d.todOff ? 1 : 0;   // 5.3.3.1 옛 저장은 켜 둔 그대로(0)
     s.wxOff = d.wxOff ? 1 : 0;   // 보안 보강 판: 날씨 칩을 눌러 비, 눈, 안개 효과 끄기(날씨 자체와 보너스는 그대로)
     { const P = d.pl && typeof d.pl === 'object' ? d.pl : {}, got = Math.max(0, Math.min(PL.list.length, Math.floor(Number(P.got) || 0))); s.pl = { got, read: Math.max(0, Math.min(got, Math.floor(Number(P.read) || 0))), wk: Math.floor(Number(P.wk)) || -1 }; }   // 학부모 편지
     { const R = d.rs && typeof d.rs === 'object' ? d.rs : {}, n = (v, hi) => Math.max(0, Math.min(hi, Math.floor(Number(v) || 0))); s.rs = { n: n(R.n, 1e4), p: n(R.p, 1e9), pos: n(R.pos, 1e4), king: n(R.king, 1e4) }; }   // 랭킹 시즌
