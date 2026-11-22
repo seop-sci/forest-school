@@ -37,6 +37,7 @@
 | `make_roofs.py` | 건물 그림에서 지붕만 오려 내요(건물 테마 색을 입힐 때 써요). 결과 폴더를 `embed_assets.py`로 넣어요 |
 | `story_pack.py` | 이야기 장면 그림(`img/story`) 이름표 만들기. 새 그림을 `img/story/st_이름.webp`로 넣고 돌리면 파일 이름에 내용 해시를 붙이고 원본의 `ST_PICS` 표를 다시 써요. `--check`는 어긋남만 봐요(`precheck.sh`가 불러요) |
 | `app_pack.mjs` | 앱 묶음(안드로이드 `www`, 토스 `dist`)에 넣지 않는 파일을 한 곳에서 정해요. 여기서 뺀 것은 게임이 앱 판에서 웹(`WEB_ROOT`)에서 받아요. 곡 목록은 원본의 `WEB_AUD`를 읽어요 |
+| `ai_lines.py`, `ai_proof.py`, `ailib.py` | Claude API(Console 크레딧)로 글 후보 만들기. `ai_lines.py`는 오늘의 손님 대사 후보, `ai_proof.py`는 게임 안 한국어 글 훑어보기(가운뎃점, 맞춤법, 이름 다름, 어려운 말). GitHub Actions 'AI 글 도우미'에서 손으로만 돌리고(키는 저장소 Secrets `ANTHROPIC_API_KEY`), 결과는 새 가지 `ai/<job>-<번호>`의 `dev/ai_out/`에 올라와요. `--dry`로 요청문만 볼 수 있어요. 게임은 API를 부르지 않아요 |
 | `minify_web.mjs` | 웹판 압축(주석과 공백만). `pages.yml`이 올릴 사본에만 돌려요. 저장소의 `index.html`은 그대로예요 |
 
 순서: `src/` 고치기 → `python3 wrap.py`(forest-school.html을 먼저 새로 만들어요) → 시험 → `python3 build_gh.py ..` → `cd ../toss && npm run build` → 커밋하고 올리기 (안드로이드는 GitHub Actions가 알아서 만들어요).
