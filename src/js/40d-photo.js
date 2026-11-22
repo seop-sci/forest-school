@@ -170,7 +170,7 @@
     const id = fr ? r.id : k, nm = fr ? (r.id ? PA_BY[r.id].name : '자유 사진') : PA_BY[k].name;
     return `<div class="pa-big" role="dialog" aria-label="${esc(nm)}"><div class="pa-big-in">` + paPic(r, id, true) +
       `<b>${esc(nm)}</b><small>${paDate(r.at)}, ${TIERS[r.t].name}</small>` +
-      `<div class="seg pa-frs" role="radiogroup" aria-label="액자">${S.pa.own.map(f => `<button type="button" role="radio" data-pafx="${f}" aria-checked="${r.fx === f}">${PA_FR[f]}</button>`).join('')}</div>` +
+      `<div class="seg pa-frs" role="radiogroup" aria-label="액자">${Object.keys(PA_FR).filter(f => S.pa.own.includes(f)).map(f => `<button type="button" role="radio" data-pafx="${f}" aria-checked="${r.fx === f}">${PA_FR[f]}</button>`).join('')}</div>` +
       `<div class="btn-row">${fr ? '<button class="btn-sub" type="button" id="paDel">지우기</button>' : ''}<button class="cta" type="button" id="paBigX">닫기</button></div></div></div>`;
   }
   const paBigRec = () => { const k = rt.paBig || ''; return k.startsWith('fr:') ? S.pa.fr[+k.slice(3)] : S.pa.ms[k]; };
