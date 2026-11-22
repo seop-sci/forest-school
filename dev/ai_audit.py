@@ -62,7 +62,9 @@ def packs(files):
 
 
 def main():
-    plan = [(a, d, packs(fs)) for a, d, fs in AREAS]
+    only = next((a.split('=', 1)[1] for a in sys.argv if a.startswith('--areas=')), '')
+    pick = [int(x) for x in only.split(',') if x.strip().isdigit()]
+    plan = [(a, d, packs(fs)) for i, (a, d, fs) in enumerate(AREAS, 1) if not pick or i in pick]
     if '--dry' in sys.argv:
         for a, d, ps in plan: print(a, [sum(len(x) for x in p) for p in ps])
         return
@@ -71,7 +73,7 @@ def main():
     for a, d, ps in plan:
         for k, p in enumerate(ps, 1):
             head = f'{a}' + (f' ({k}/{len(ps)})' if len(ps) > 1 else '')
-            txt = ask(SYSTEM, f'점검 영역: {a}\n볼 것: {d}\n\n' + '\n\n'.join(p), MODEL, max_tokens=16000)
+            txt = ask(SYSTEM, f'점검 영역: {a}\n볼 것: {d}\n\n' + '\n\n'.join(p), MODEL, max_tokens=48000)
             md += [f'## {head}', '', txt.strip(), '']
             (OUT / 'audit.md').write_text('\n'.join(md) + '\n', encoding='utf-8')   # 중간에 멈춰도 남게
             print(f'{head} 끝. {usage_line()}', flush=True)

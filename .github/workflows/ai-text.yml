@@ -16,6 +16,11 @@ on:
         required: true
         default: auto
         type: string
+      extra:
+        description: '더 줄 것 (예: --areas=1,2)'
+        required: false
+        default: ''
+        type: string
 permissions:
   contents: write
 concurrency:
@@ -32,10 +37,11 @@ jobs:
           ANTHROPIC_API_KEY: ${{ secrets.ANTHROPIC_API_KEY }}
           JOB: ${{ inputs.job }}
           MODEL: ${{ inputs.model }}
+          EXTRA: ${{ inputs.extra }}
         run: |
           cd dev
           case "$JOB" in proof) S=ai_proof.py;; audit) S=ai_audit.py;; content) S=ai_content.py;; en) S=ai_en.py;; *) S=ai_lines.py;; esac
-          if [ "$MODEL" = "auto" ]; then python3 "$S"; else python3 "$S" "--model=$MODEL"; fi
+          if [ "$MODEL" = "auto" ]; then python3 "$S" $EXTRA; else python3 "$S" "--model=$MODEL" $EXTRA; fi
       - name: 결과를 새 가지에 올리기
         if: always()   # 중간에 멈춰도 그때까지 받은 것은 올려요
         env:
