@@ -6,25 +6,25 @@ on:
   workflow_dispatch:
     inputs:
       job:
-        description: '무엇을 할까요 (lines = 오늘의 손님 대사 후보, proof = 게임 글 훑어보기)'
+        description: '무엇을 할까요 (lines 손님 대사, proof 글 훑어보기, audit 코드 점검, content 글 재료, en 영어 밑글)'
         required: true
         default: lines
         type: choice
-        options: [lines, proof]
+        options: [lines, proof, audit, content, en]
       model:
-        description: '모델'
+        description: '모델 (auto면 작업마다 정한 모델)'
         required: true
-        default: claude-sonnet-5-5
+        default: auto
         type: string
 permissions:
   contents: write
 concurrency:
-  group: ai-text
+  group: ai-text-${{ inputs.job }}
   cancel-in-progress: false
 jobs:
   run:
     runs-on: ubuntu-24.04
-    timeout-minutes: 60
+    timeout-minutes: 180
     steps:
       - uses: actions/checkout@11d5960a326750d5838078e36cf38b85af677262   # v4
       - name: 돌리기
@@ -34,12 +34,15 @@ jobs:
           MODEL: ${{ inputs.model }}
         run: |
           cd dev
-          if [ "$JOB" = "proof" ]; then python3 ai_proof.py "--model=$MODEL"; else python3 ai_lines.py "--model=$MODEL"; fi
+          case "$JOB" in proof) S=ai_proof.py;; audit) S=ai_audit.py;; content) S=ai_content.py;; en) S=ai_en.py;; *) S=ai_lines.py;; esac
+          if [ "$MODEL" = "auto" ]; then python3 "$S"; else python3 "$S" "--model=$MODEL"; fi
       - name: 결과를 새 가지에 올리기
+        if: always()   # 중간에 멈춰도 그때까지 받은 것은 올려요
         env:
           JOB: ${{ inputs.job }}
           RUN_NO: ${{ github.run_number }}
         run: |
+          [ -d dev/ai_out ] || exit 0
           git config user.name "forest-ai-bot"
           git config user.email "forest-ai-bot@users.noreply.github.com"
           git checkout -b "ai/$JOB-$RUN_NO"
