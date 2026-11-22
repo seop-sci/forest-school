@@ -100,6 +100,9 @@ async def main():
               return out; }})()""")
             print('확인 줄', r)
             ok(r['sn'][0] and r['sn'][1] <= 0 and r['snGone'], '10번 뽑기는 확인 줄을 띄우고, 취소하면 아무것도 쓰지 않아요')
+            r = await page.evaluate(f"(async()=>{{ {F}.setTab('hall'); await new Promise(r=>setTimeout(r,300)); const sc=document.querySelector('#panelHall .street-scene'); const cs=getComputedStyle(sc); return [cs.marginTop, cs.marginBottom]; }})()")
+            print('복도', r)
+            ok(not r[0].startswith('-') and not r[1].startswith('-'), f'학교 복도 그림은 상점 거리처럼 잘리지 않아요(5.3.3.1) {r}')
             ok(not errs, f'오류 없음 {errs[:3]}')
             await ctx.close()
         # 5) 유치원에서는 단축권이 보이지 않아요

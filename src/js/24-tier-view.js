@@ -25,13 +25,14 @@
     return stageKey('bld_' + k, n, 2) || BLD_IMG[k];
   }
   const viewMap = () => rt.viewTier == null ? decoMap() : geoIdx(rt.viewTier);
-  // 밤(20~6시)에는 밝기를 고를 수 있어요(모든 학교급). 고등학교부터는 학생이 그대로 기숙사에서 쉬어요
-  const NL_NAME = ['밤', '저녁', '밝게'], NL_EM = ['🌙', '🌆', '☀️'];
+  // 시간 흐름 단추(5.3.3.1 woodani: 밤 화면 단추와 합침). 홈에서 언제나, 모든 학교급
+  // S.nl 0 시간 따라(아침, 노을, 밤), 1 시간 따라 가되 밤은 조금 어둡게, 2 시간 흐름 끄기(늘 낮). 고등학교부터 밤에는 학생이 그대로 기숙사에서 쉬어요
+  const NL_NAME = ['시간 따라', '밤은 조금 어둡게', '늘 낮'], NL_EM = ['🌗', '🌆', '☀️'];
   function nlCycle() {
     S.nl = ((S.nl || 0) + 1) % 3; sfx('tap'); save();
     renderNight(true); wldSync(); renderTierDots();
     const hs = !!map && map.classList.contains('hs-night');
-    toast(S.nl === 2 ? '밤에도 밝게 보여요' + (hs ? '.\n학생들은 그대로 기숙사에서 쉬어요' : '') : S.nl === 1 ? '밤 화면을 조금 어둡게 보여요' : '밤 화면을 어둡게 보여요');
+    toast(S.nl === 2 ? '시간 흐름을 껐어요. 늘 낮처럼 보여요' + (hs ? '.\n학생들은 그대로 기숙사에서 쉬어요' : '') : S.nl === 1 ? '시간 따라 바뀌고, 밤은 조금 어둡게 보여요' : '시간 따라 아침, 노을, 밤이 바뀌어요');
   }
   // 날씨 칩이 가운데에 있어서 좁은 화면이나 밤 모습 단추가 있을 때 학교급 단추와 겹쳤어요. 학교급 단추 오른쪽에 붙여요
   function wxPlace() {
@@ -42,9 +43,8 @@
   }
   function renderTierDots() {
     const box = $('#tierDots'); if (!box || !S) return;
-    let wn = false; try { wn = wldLv() > 0 && WLD.ph === 'night' && !rt.photo; } catch (e) { /* 마을 층 준비 전 */ }
-    const nlOn = rt.viewTier == null && (!!map && map.classList.contains('hs-night') || wn);   // 밤 밝기 단추(고등학교 밤, 그 아래 학교급은 마을 층 밤)
-    box.hidden = (S.tier < 1 && !nlOn) || rt.tab !== 'school' || !!rt.decoEdit;   // 유치원은 학교급 단추 없이 밤 밝기 단추만
+    const nlOn = rt.viewTier == null && !rt.photo;   // 시간 흐름 단추(5.3.3.1: 밤에만이 아니라 언제나)
+    box.hidden = (S.tier < 1 && !nlOn) || rt.tab !== 'school' || !!rt.decoEdit;   // 유치원은 학교급 단추 없이 시간 흐름 단추만
     const key = [S.tier, rt.viewTier, nlOn, S.nl || 0, box.hidden].join('|');
     if (box.dataset.key === key) return; box.dataset.key = key;
     setTimeout(wxPlace, 0); renderCampus();   // 구역 막대도 같은 때에
@@ -52,7 +52,7 @@
       const cur = t === S.tier, past = t < S.tier, on = rt.viewTier === t || (rt.viewTier == null && cur);
       return `<button type="button" class="td${cur ? ' cur' : ''}${past ? ' past' : ''}${on ? ' on' : ''}${t > S.tier ? ' lock' : ''}" data-td="${t}" aria-label="${TIER_ALL[t]}${cur ? ', 지금 학교' : past ? ', 그때 모습 보기' : ', 아직 못 가요'}"${t > S.tier ? ' aria-disabled="true"' : ''}>` +
         (t > S.tier ? '<svg viewBox="0 0 16 16" aria-hidden="true"><path d="M5 7V5.6a3 3 0 0 1 6 0V7M4.4 7h7.2v6H4.4z" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linejoin="round"/></svg>' : c) + '</button>';
-    }).join('') + (nlOn ? `<button type="button" class="td nl" data-nl="1" aria-label="밤 화면 밝기: ${NL_NAME[S.nl || 0]}, 눌러서 바꾸기">${NL_EM[S.nl || 0]}</button>` : '');
+    }).join('') + (nlOn ? `<button type="button" class="td nl" data-nl="1" aria-label="시간 흐름: ${NL_NAME[S.nl || 0]}, 눌러서 바꾸기">${NL_EM[S.nl || 0]}</button>` : '');
   }
   function tierViewOpen(t) {
     if (t === S.tier || t == null) { tierViewClose(); return; }

@@ -19,6 +19,7 @@
   const wldBg = () => { try { return thOn().bg || ''; } catch (e) { return ''; } };
   function wldPhase() {
     if (rt.wldPh) return rt.wldPh;   // 사진 모드에서 고른 시간
+    if (S && S.nl === 2) return 'day';   // 5.3.3.1 홈의 시간 흐름 단추를 '늘 낮'으로 둔 사람(모든 학교급)
     const h = kstHour(gameNow());
     return isNight() ? 'night' : h < 9 ? 'morning' : h >= 17 ? 'evening' : 'day';
   }
@@ -172,6 +173,7 @@
   setInterval(() => { try { wldSync(); } catch (e) { /* 다음에 */ } }, 15000);
   document.addEventListener('visibilitychange', () => { try { wldSync(); } catch (e) { /* 다음에 */ } });
   window.addEventListener('load', () => setTimeout(() => { try { wldSync(); } catch (e) { /* 다음에 */ } }, 2600));   // 효과층(1.5초 뒤 받기) 다음에
+
   document.addEventListener('click', e => {
     const b = e.target.closest && e.target.closest('#optGfx [data-gfx]'); if (!b || !S) return;
     const v = +b.dataset.gfx; if (v === S.gfx) return;

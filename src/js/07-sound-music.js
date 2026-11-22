@@ -261,7 +261,7 @@
     if (!S || !S.ambV || rt.paused || rt.adOpen || document.hidden || rt.tab !== 'school' || rt.cereOn) return w;
     let play = false; try { play = !!((pzUI && pzUI.open) || (mgUI && mgUI.open) || (btUI && btUI.open)); } catch (e) { /* 아직 준비 전 */ }
     if (play) return w;
-    const h = kstHour(gameNow()), base = isNight() ? 'amb_night' : h < 9 ? 'amb_morning' : h >= 17 ? 'amb_evening' : 'amb_day';
+    const h = kstHour(gameNow()), base = S && S.nl === 2 ? 'amb_day' /* 5.3.3.1 시간 흐름을 끄면(늘 낮) 자연 소리도 낮 */ : isNight() ? 'amb_night' : h < 9 ? 'amb_morning' : h >= 17 ? 'amb_evening' : 'amb_day';
     let bv = rt.fest || rt.sports ? 0.5 : 1;   // 행사 곡이 나올 때는 반쯤
     if (rt.ambWx === 'rain') { w.amb_rain = 1; bv *= 0.45; }
     else if (rt.ambWx === 'snow') { w.amb_snow = 1; bv *= base === 'amb_night' ? 0.3 : 0.6; }
