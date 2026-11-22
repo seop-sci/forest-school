@@ -85,7 +85,7 @@ async def main():
         if r != [1, True]: bad.append(f'밤 밝기 저녁 {r}')
         await pg.evaluate(f"(() => {{ {F}.S.nl = 0; {F}.rt4.wldPh = 'day'; {F}.wldSync(); }})()"); await pg.wait_for_timeout(200)
         r = await pg.evaluate(f"[{F}.rt4.kids.filter(k => k.g.classList.contains('nt-off')).length, !!document.querySelector('#tierDots [data-nl]')]")
-        if r != [0, False]: bad.append(f'낮이 되면 학생이 다 나와요 {r}')
+        if r != [0, True]: bad.append(f'낮이 되면 학생이 다 나오고 시간 흐름 단추는 그대로(5.3.4) {r}')
         await pg.evaluate(f"{F}.rt4.wldPh = undefined")
         # 구름 막
         await pg.evaluate(f"{F}.wldCurtain()"); await pg.wait_for_timeout(200)
@@ -102,7 +102,8 @@ async def main():
         print('유치원 밤', r)
         if r != [False, 0, 1, True]: bad.append(f'유치원 밤 밝기 단추 {r}')
         await pg.evaluate(f"(() => {{ {F}.rt4.wldPh = 'day'; {F}.wldSync(); }})()"); await pg.wait_for_timeout(200)
-        if not await pg.evaluate("document.querySelector('#tierDots').hidden"): bad.append('유치원 낮에도 단추 줄이 보여요')
+        r = await pg.evaluate("(() => { const d = document.querySelector('#tierDots'); return [d.hidden, d.querySelectorAll('[data-nl]').length]; })()")
+        if r != [False, 1]: bad.append(f'유치원 낮에도 시간 흐름 단추가 보여야 해요(5.3.4) {r}')
         bad += [f'(유치원) {e}' for e in errs[:3]]; await ctx.close()
         # 엔진 있음: 비
         s = base(tier=1); s['gfx'] = 2
