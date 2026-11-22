@@ -168,6 +168,9 @@
       `<h4 class="dex-h">선생님 <small>${DEX_TEA.filter(k => S.dex.got['tea_' + k]).length} / ${DEX_TEA.length}</small></h4><div class="dex-grid">${DEX_TEA.map(k => dexCard('tea_' + k)).join('')}</div>` +
       `<h4 class="dex-h">특별 손님 <small>${DEX_GUEST_KEYS.filter(k => S.dex.got[k]).length} / ${DEX_GUESTS.length}</small></h4><div class="dex-grid">${DEX_GUEST_KEYS.map(dexCard).join('')}</div>` +
       `<h4 class="dex-h">앞으로 올 친구</h4><div class="dex-grid">${Array.from({ length: DEX_FUTURE }, (_, i) => dexLock('숲속 교육부에서 준비 중')).join('')}</div>`;
+    // 5.3.2.2 T-06: 설명 칸이 누른 카드와 떨어진 맨 위에 나왔어요. 누른 카드가 있는 줄 바로 아래로 옮겨요
+    if (pk) { const d = body.querySelector('.dex-detail'), c = body.querySelector(`.dex-card[data-dex="${pk}"]`);
+      if (d && c) { let end = c; for (let n = c.nextElementSibling; n && n.classList.contains('dex-card') && n.offsetTop === c.offsetTop; n = n.nextElementSibling) end = n; end.after(d); d.classList.add('in-grid'); } }
   }
 
   /* ---------- 이벤트 ---------- */

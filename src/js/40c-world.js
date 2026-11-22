@@ -251,7 +251,7 @@
     const f = t => {
       if (!WLD.fpsOn) return;
       ts.push(t); while (ts.length && t - ts[0] > 5000) ts.shift();
-      if (!el.dataset.t || t - +el.dataset.t > 500) { el.dataset.t = t; const s = ts.length > 1 ? (ts.length - 1) / ((t - ts[0]) / 1000) : 0; el.textContent = Math.round(s) + ' fps · ' + ['낮음', '보통', '높음'][wldLv()] + (FXL.st === 'ok' ? '' : ' · 엔진 없음'); }
+      if (!el.dataset.t || t - +el.dataset.t > 500) { el.dataset.t = t; const s = ts.length > 1 ? (ts.length - 1) / ((t - ts[0]) / 1000) : 0; el.textContent = Math.round(s) + ' fps ' + ['낮음', '보통', '높음'][wldLv()] + (FXL.st === 'ok' ? '' : ', 엔진 없음'); }
       requestAnimationFrame(f);
     };
     requestAnimationFrame(f);

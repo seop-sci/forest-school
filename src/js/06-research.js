@@ -112,10 +112,12 @@
     rt.rtPop = null;
     const D = RT5.list.find(x => x.k === rt.rtSel), L = rtLv(D.k), run = c && c.k === D.k, full = L >= RT5.top, shut = !full && L >= rtMax(D.k), k = rtCost(D.k);
     const btn = D.lock ? '<span class="fe-lock">준비 중</span>' : full ? '<span class="fe-lock">완성</span>' : run ? `<span class="fe-lock">${hms(c.end - now)}</span>`
-      : shut ? `<span class="fe-lock">논문 ${PP.deep[D.k]}편</span>` : c ? '<span class="fe-lock">다른 연구 중</span>'
+      : shut ? '<span class="fe-lock">잠김</span>' : c ? '<span class="fe-lock">다른 연구 중</span>'
       : `<button class="${S.ess < k.ess || S.budget < k.ac ? 'btn-sub' : 'cta'} small" type="button" data-rt="${D.k}">연구하기 (정수 ${k.ess})</button>`;
     const info = `<div class="rt-card"><span class="dp-ic">${IMG(D.ic) ? `<img src="${IMG(D.ic)}" alt="">` : ''}</span><div class="dp-tx"><b>${D.nm} ${Math.min(L + (full ? 0 : 1), RT5.top)}칸${full ? ' (완성)' : ''}</b>` +
-      `<small>${L ? `지금 ${D.eff(L)}` : '아직 연구 전'}${D.lock || full ? '' : `<br>다음 ${D.eff(L + 1)}<br>도토리 ${fmt(k.ac)}, ${rtHrs(k.sec)}`}</small></div>${btn}</div>`;
+      `<small>${L ? `지금 ${D.eff(L)}` : '아직 연구 전'}${D.lock || full ? '' : run ? `<br>다음 ${D.eff(L + 1)}<br>연구 중이에요. 끝나면 칸이 채워져요` : `<br>다음 ${D.eff(L + 1)}<br>도토리 ${fmt(k.ac)}, ${rtHrs(k.sec)}`}` +   // 5.3.2.1: 연구 중에는 걸리는 시간 대신 남은 시간(오른쪽) 하나만
+      // 5.3.2.1: 잠긴 까닭을 한 줄로(예전에는 단추 자리에 '논문 3편', '다른 연구 중'만)
+      `${D.lock || full || run ? '' : shut ? `<br>논문 ${PP.deep[D.k]}편을 쓰면 열려요 (지금 ${fmt((S.pp && S.pp.n) || 0)}편)` : c ? `<br>${(RT5.list.find(x => x.k === c.k) || {}).nm || '다른'} 연구가 끝나면 할 수 있어요` : ''}</small></div>${btn}</div>`;
     return `<p class="fine">한 번에 하나씩 연구해요. 졸업해도 남아요.</p><div class="rt-tree${bg ? ' art' : ''}" style="aspect-ratio:${RT_W}/${RT_H - rtTop()}${bg ? `;background-image:url('${blobUrl(bg)}')` : ''}">${rtTreeSvg()}${nodes}</div>${info}`;
   }
   function renderRx() {
@@ -278,7 +280,7 @@
     const P = S.pp, c = P.cur, now = gameNow(), m = ppMedOf(P.cf), nx = PP.med[m], u = IMG('ic_rdata'), up = IMG('ic_paper'), dayDone = P.day === gameToday();
     const nextDeep = RT5.list.filter(D => P.n < PP.deep[D.k]).sort((a, b) => PP.deep[a.k] - PP.deep[b.k])[0];
     let h = `<div class="pp-conf"><b>이번 숲속 학회 ${fmt(P.cf)}점</b><small>${ppLeft()}일 남음. ${m ? `지금 ${ppMedIc(m, 18)} ${PP.med[m - 1].nm}` : '아직 메달 없음'}${nx ? `, ${nx.at}점이면 ${ppMedIc(m + 1, 18)} ${nx.nm}` : ''}</small></div>`;
-    h += `<div class="dp-row"><span class="dp-ic">${u ? `<img src="${u}" alt="">` : '🔎'}</span><div class="dp-tx"><b>연구 자료 ${fmt(P.dat)}개</b><small>논문 한 편에 ${PP.need}개. 세미나 ${PP.dat.sem}, 연구 트리 칸 ${PP.dat.rt}, 조교 파견 4시간 이상, 심화 탐험 큰 장난꾸러기</small></div>` +
+    h += `<div class="dp-row"><span class="dp-ic">${u ? `<img src="${u}" alt="">` : '🔎'}</span><div class="dp-tx"><b>연구 자료 ${fmt(P.dat)}개</b><small>자료 ${PP.need}개로 논문 한 편을 ${rtHrs(PP.sec)} 동안 써요<br>얻는 곳: 세미나 +${PP.dat.sem}, 연구 트리 칸 +${PP.dat.rt}, 조교 파견 4시간 +${PP.dat.ta[1]}, 8시간 +${PP.dat.ta[2]}, 심화 탐험 큰 장난꾸러기를 처음 이기면 +${PP.dat.boss}</small></div>` +
       (dayDone ? '<span class="fe-lock">오늘 정리함</span>' : `<button class="cta small" type="button" data-pp="day">자료 정리 +${PP.dat.day}</button>`) + '</div>';
     if (c) { const D = RT5.list.find(x => x.k === c.k); h += `<div class="dp-row on"><span class="dp-ic">${up ? `<img src="${up}" alt="">` : '📜'}</span><div class="dp-tx"><b>${D ? D.nm : ''} 논문 쓰는 중</b><small>끝나면 학회 점수 +${ppScore(c.k)}</small></div><span class="fe-lock">${hms(c.end - now)}</span></div>`; }
     h += '<div class="dp-list">' + RT5.list.map(D => {
@@ -298,7 +300,7 @@
       const x = S.ta.seat[i] || { b: '' }, o = S.ta.out.find(y => y.i === i), w = taWho(i), u = IMG('chr_ta_' + w) || IMG('chr_' + w);
       const st = o ? (now >= o.end ? `숲속 ${TA.school[o.to]}에서 돌아왔어요` : `숲속 ${TA.school[o.to]}에 가 있어요<br>${hms(o.end - now)} 뒤에 돌아와요`) : x.b && FAC[x.b] ? `${FAC[x.b].name}에서 일해요` : '빈자리예요';
       const btn = o ? (now >= o.end ? `<button class="cta small" type="button" data-ta="claim">받기</button>` : '<span class="fe-lock">파견 중</span>')
-        : `<button class="btn-sub small" type="button" data-ta="pick:${i}">자리</button><button class="cta small" type="button" data-ta="go:${i}">파견</button>`;
+        : `<button class="btn-sub small" type="button" data-ta="pick:${i}">자리 정하기</button><button class="cta small" type="button" data-ta="go:${i}">파견</button>`;
       h += `<div class="dp-row"><span class="dp-ic">${u ? `<img src="${u}" alt="">` : ''}</span><div class="dp-tx"><b>${TA.whoNm[w]} 조교</b><small>${st}</small></div><span class="ta-btns">${btn}</span></div>`;
       if (rt.taPick === i && !o) h += '<div class="ta-pick">' + taB().map(k => `<button class="${x.b === k ? 'cta' : 'btn-sub'} small" type="button" data-ta="sit:${i}:${k}">${FAC[k].name}</button>`).join('') + (x.b ? `<button class="btn-sub small" type="button" data-ta="sit:${i}:">비우기</button>` : '') + '</div>';
       if (rt.taGo === i && !o) h += '<div class="ta-go"><p class="ta-go-h">1. 얼마나 다녀올까요?</p><div class="ta-hrs">'
@@ -309,7 +311,7 @@
     h += '</div>';
     const mn = S.ta.mon, full = mn >= TA.mon.length, mc = full ? 0 : TA.mon[mn];
     const monTx = full ? `완성! 수업료 +${TA.monPct * mn}%, 칭호 '모교의 자랑'` : (mn ? `지금 수업료 +${TA.monPct * mn}%<br>` : '') + `조각 ${mc}개로 ${mn ? '올리면' : '세우면'} 수업료 +${TA.monPct * (mn + 1)}%${mn + 1 === TA.mon.length ? '와 칭호' : ''}`;
-    h += `<h3 class="fv-h">모교 기념비 <small>${mn}/${TA.mon.length}단계</small></h3><div class="dp-list"><div class="dp-row"><span class="dp-ic">${IMG('deco_alma_' + Math.max(1, mn)) ? `<img src="${IMG('deco_alma_' + Math.max(1, mn))}" alt=""${mn ? '' : ' class="ta-dim"'}>` : ''}</span><div class="dp-tx"><b>추억 조각 ${memIc}${fmt(S.ta.mem)}${full ? '' : ` / ${mc}`}</b><small>${monTx}</small></div>` +
+    h += `<h3 class="fv-h">모교 기념비 <small>${mn} / ${TA.mon.length}단계</small></h3><div class="dp-list"><div class="dp-row"><span class="dp-ic">${IMG('deco_alma_' + Math.max(1, mn)) ? `<img src="${IMG('deco_alma_' + Math.max(1, mn))}" alt=""${mn ? '' : ' class="ta-dim"'}>` : ''}</span><div class="dp-tx"><b>추억 조각 ${memIc}${fmt(S.ta.mem)}${full ? '' : ` / ${mc}`}</b><small>${monTx}</small></div>` +
       (full ? '<span class="fe-lock">완성</span>' : `<button class="${S.ta.mem < mc ? 'btn-sub' : 'cta'} small" type="button" data-ta="mon">${mn ? '올리기' : '세우기'}</button>`) + '</div></div>';
     return h;
   }

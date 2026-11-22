@@ -482,7 +482,7 @@
   function openVd() {
     if (!vdOpen()) { toast('마을 기부는 초등학교부터 열려요'); return; }
     const bg = IMG('donate_bg'); $('#vdHead').style.backgroundImage = bg ? `url("${bg}")` : '';
-    $('#vdBtns').dataset.key = ''; vdRender(); openModal($('#mVd')); sfx('tap');
+    $('#vdBtns').dataset.key = ''; askRowOff(); vdRender(); openModal($('#mVd')); sfx('tap');
   }
   function vdRender() {
     const m = $('#mVd'); if (!m || !S || !S.vd) return;
@@ -604,8 +604,8 @@
     renderMap(); conRender(true); ffRender(true); save();
     return true;
   }
-  // 숲의 정수로 즉시 완료: 남은 시간 5분 이하는 정수 2, 그 위로는 10분마다 4(올림)
-  const CESS = { min5: 2, per10: 4 };
+  // 숲의 정수로 즉시 완료: 남은 시간 5분 이하는 정수 2, 그 위로는 10분마다 5(올림)
+  const CESS = { min5: 2, per10: 5 };   // 5.3.3 woodani A안: 10분마다 4 → 5(단축권보다 조금 비싸게)
   const conEssCost = sec => sec <= 0 ? 0 : sec <= 300 ? CESS.min5 : CESS.per10 * Math.ceil(sec / 600);
   const conEssQuiet = () => !!S && S.ces === gameToday();
   function conEss(k) {
@@ -826,5 +826,14 @@
     const al = tkAdLeft();
     $('#conAd').setAttribute('aria-disabled', al > 0 ? 'false' : 'true');
     setT($('#conAd'), al > 0 ? `광고 보고 5분권 ${TKAD.n}장 받기 (오늘 ${al}번 남음)` : '오늘 광고 단축권을 다 받았어요');
+    // 5.3.2.2 F-05, H-09: 끝내는 길이 여섯 가지라 칸이 길었어요. 1분 안에 끝나는 공사는 막대만, 그 밖에는 으뜸 단추 하나와 '다른 방법' 접기(길은 모두 그대로 있어요)
+    const short = left < CON_SHORT, ffOk = !$('#conFree').hidden, essOk = S.ess >= conEssCost(left);
+    const main = ffOk ? ['#conFree'] : p.n ? ['#conRow', '#conPlan'] : essOk ? ['#conEss'] : al > 0 ? ['#conAd'] : ['#conEss'];
+    if (rt.conMoreK !== k) { rt.conMoreK = k; rt.conMore = false; }   // 다른 건물 창을 열면 다시 접어요
+    if (rt.conArm || rt.conPick) rt.conMore = rt.conMore || !main.includes('#conRow');   // 고르는 중에는 펼쳐 둬요
+    $$('#sheetCon .con-opt').forEach(el => el.classList.toggle('con-main', main.includes('#' + el.id)));
+    box.classList.toggle('short', short); box.classList.toggle('more-open', !!rt.conMore);
+    const mb = $('#conMore'); mb.setAttribute('aria-expanded', rt.conMore ? 'true' : 'false'); setT(mb, rt.conMore ? '접기' : '다른 방법');
   }
+  const CON_SHORT = 60;   // 초
 

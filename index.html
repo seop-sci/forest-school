@@ -2,7 +2,7 @@
 <html lang="ko">
 <head>
 <meta charset="utf-8">
-<meta name="forest-version" content="5.3.2">
+<meta name="forest-version" content="5.3.3">
 <meta name="viewport" content="width=device-width, initial-scale=1">
 <meta name="description" content="도토리를 모아 숲속 학교를 키우는 방치형 게임 테스트판이에요.">
 <style>html,body{margin:0}</style>
@@ -1724,6 +1724,7 @@ body.early .tab .dot,body.early #plChip{display:none!important}   /* 5.0.1.7 F-1
 .sheet.is-room .need{margin:4px 0 0;font-size:12px}
 .rep-note{margin:0 0 14px;font-size:13px;color:var(--muted)}
 .need{min-height:1.3em;margin:10px 0 0;text-align:center;font-size:13px;color:var(--danger)}
+.need-wait{display:flex;align-items:center;justify-content:center;gap:8px;flex-wrap:wrap;margin:2px 0 6px;font-size:12px;color:var(--muted)}.need-wait .btn-sub.small{min-height:32px;padding:0 12px;font-size:13px}   /* 5.3.2.1 */
 .modal{position:relative;width:100%;max-width:340px;padding:22px 20px 20px;border-radius:22px;background:var(--paper);color:var(--ink);text-align:center;opacity:0;transform:scale(.94);transition:transform .2s, opacity .2s}
 .overlay.open .modal,.overlay.open .cert{opacity:1;transform:none}
 .modal h2{margin:0 0 6px;font-family:var(--font-display);font-weight:400;font-size:22px}
@@ -2251,9 +2252,23 @@ body.photo .board,body.photo .home-qcard,body.photo .map-left,body.photo .map-ri
 /* 처음 켠 학교: 교실을 가리키는 손가락과 한 줄(누르기는 통과) */
 .first-hint{position:fixed;z-index:70;transform:translate(-50%,0);display:flex;flex-direction:column-reverse;align-items:center;gap:2px;pointer-events:none}
 .first-hint .fh-f{font-size:30px;line-height:1;animation:fhBob 1s ease-in-out infinite}
+.first-hint.up{flex-direction:column;transform:translate(-50%,-100%)}   /* 5.3.2.1 대상이 화면 아래쪽이면 위에 */
 .first-hint .fh-tx{padding:5px 11px;border-radius:12px;background:rgba(40,52,32,.9);color:#fff;font-size:13px;font-weight:700;white-space:nowrap;box-shadow:0 2px 6px rgba(0,0,0,.25)}
 @keyframes fhBob{0%,100%{transform:translateY(0)}50%{transform:translateY(-6px)}}
 @media (prefers-reduced-motion: reduce){.first-hint .fh-f{animation:none}}
+/* 5.3.2.2 F-04 창 안 '보상 받기' 띠(화려한 효과 없이) */
+.qready{display:flex;align-items:center;justify-content:space-between;gap:10px;width:100%;min-height:52px;margin:0 0 8px;padding:6px 8px 6px 14px;border:2px solid #E2B84A;border-radius:14px;background:#FFF4CF;color:#4A3210;text-align:left;cursor:pointer}
+.qready .qr-tx{min-width:0;display:flex;flex-direction:column;line-height:1.3}.qready small{font-size:12px;color:#8A6420}.qready b{font-size:14px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+.qready .qr-go{flex:none;display:inline-flex;align-items:center;min-height:40px;padding:0 14px;border-radius:12px;background:var(--accent);color:var(--accent-ink);font-family:var(--font-display);font-size:15px}
+.qready.stick{position:sticky;bottom:10px;z-index:6;margin-top:10px;box-shadow:0 3px 8px rgba(0,0,0,.18)}
+@media (prefers-color-scheme: dark){:root:not([data-theme="light"]) .qready{background:#3A3322;border-color:#9C7A2C;color:#F3E6C4}:root:not([data-theme="light"]) .qready small{color:#D8BE84}}
+:root[data-theme="dark"] .qready{background:#3A3322;border-color:#9C7A2C;color:#F3E6C4}:root[data-theme="dark"] .qready small{color:#D8BE84}
+/* 5.3.2.2 F-05, H-09 공사 칸: 1분 안 공사는 막대만, 그 밖에는 으뜸 단추 하나와 '다른 방법' 접기 */
+#sheetCon:not(.more-open) .con-opt:not(.con-main){display:none!important}
+#sheetCon.short .con-opt,#sheetCon.short .con-more{display:none!important}
+.con-more{display:flex;align-items:center;justify-content:center;gap:4px;width:100%;min-height:40px;margin:6px 0 0;border:0;background:none;color:var(--muted);font-size:13px;cursor:pointer}
+.con-more::after{content:'';width:7px;height:7px;border-right:2px solid currentColor;border-bottom:2px solid currentColor;transform:translateY(-2px) rotate(45deg)}
+.con-more[aria-expanded="true"]::after{transform:translateY(2px) rotate(-135deg)}
 /* ===== 1.5.0 탭 화면 정돈 ===== */
 .app:not(.on-school) .qrow,.app:not(.on-school) .subbar{display:none}
 .app:not(.on-school) .board{margin-bottom:8px}
@@ -4010,6 +4025,106 @@ body.mg-on .toast[hidden]{display:none}
 .ta-mem{width:18px;height:18px;vertical-align:-4px;margin:0 2px}
 .dp-ic img.ta-dim{opacity:.35;filter:grayscale(1)}
 .ta-fig,.ta-mon{pointer-events:none}
+/* 5.3.2.1 연구소 창: 짧은 화면(360×740)에서 연구 트리와 논문을 펼치면 '닫기'가 창 밖으로 잘렸어요. 머리와 탭과 닫기 줄은 그대로 두고 안쪽만 밀려요 */
+#mRx > .modal{display:flex;flex-direction:column;overflow:hidden}#mRx > .modal > *{flex:none}#mRx #rxBody{flex:1 1 auto;min-height:0;overflow-y:auto;overscroll-behavior:contain}
+/* 5.3.2.1 학회 카드: 어두운 화면에서 밝은 글이 연한 노란 바탕 위라 거의 안 보였어요(대비 약 1.5:1). 어두운 화면은 짙은 바탕 */
+@media (prefers-color-scheme: dark){:root:not([data-theme="light"]) .pp-conf{background:#3A3322;border-color:#9C7A2C}}
+:root[data-theme="dark"] .pp-conf{background:#3A3322;border-color:#9C7A2C}
+/* 5.3.2.2 H-23, M-17, 2.3-9: 보이는 크기는 그대로 두고 누르는 영역만 넓혀요(투명한 가상 요소). 붙어 있는 단추와는 칸 사이 틈까지만 넓혀 서로 겹치지 않아요 */
+.tier-dots .td,.ac-row,.ac-bk,.td-fold,#rxSeg button,.dp-row .btn-sub.small,.dp-row .cta.small,.gd-plot button,.pz-cardw .pz-swb{position:relative}
+.tier-dots .td::before,.ff-chip .ffx::before,.ac-row::before,.ac-bk::before,.td-fold::before,#rxSeg button::before,.dp-row .btn-sub.small::before,.dp-row .cta.small::before,.gd-plot button::before,.pz-cardw .pz-swb::before{content:'';position:absolute}
+.tier-dots .td::before{inset:-10px -2px}
+.ff-chip .ffx::before{left:-24px;top:-24px;right:-2px;bottom:-2px}
+.ac-row::before{inset:-2px 0}.ac-bk::before{inset:-3px -6px}
+.td-fold::before{inset:-12px 0}
+#rxSeg button::before{inset:-9px 0}
+.dp-row .btn-sub.small::before,.dp-row .cta.small::before{inset:-8px 0}
+.gd-plot button::before{inset:-10px -3px}
+.pz-cardw .pz-swb::before{inset:-10px -4px}
+.dex-grid > .dex-detail.in-grid{grid-column:1/-1;margin:2px 0 4px}   /* 5.3.2.2 T-06 누른 카드 줄 바로 아래 */
+.deco-ev > summary{cursor:pointer;list-style:none;display:flex;align-items:baseline;gap:6px}.deco-ev > summary::-webkit-details-marker{display:none}.deco-ev > summary::after{content:'';margin-left:auto;align-self:center;width:7px;height:7px;border-right:2px solid currentColor;border-bottom:2px solid currentColor;transform:rotate(45deg)}.deco-ev[open] > summary::after{transform:rotate(-135deg)}   /* 5.3.2.2 T-04 */
+/* ===== 5.3.3 상점 새 진열 (docs/SHOP-2026-11.md 4.2절). 강조 색은 '사기' 하나, 글자 크기 넷(17, 15, 13.5, 12.5) ===== */
+.shop-top{position:sticky;top:0;z-index:8;margin:-4px -16px 6px;padding:6px 16px 6px;background:var(--paper);box-shadow:0 6px 8px -8px var(--shadow)}
+.shop-nav{display:flex;gap:6px;overflow-x:auto;scrollbar-width:none;padding:2px 0 6px}.shop-nav::-webkit-scrollbar{display:none}
+.shop-nav button{flex:none;display:inline-flex;align-items:center;min-height:40px;margin:0;padding:0 14px;border:1.5px solid var(--line);border-radius:999px;background:var(--card);color:var(--ink);font-family:var(--font-display);font-size:14px;white-space:nowrap;cursor:pointer}
+.shop-nav .sn-go.on{border-color:transparent;background:var(--ink);color:var(--paper)}
+.shop-nav .street-back{padding-left:10px}
+.shop-wallet{display:flex;justify-content:center;gap:8px;flex-wrap:wrap}
+.shop-wallet .w-it{display:inline-flex;align-items:center;gap:5px;min-height:34px;padding:0 12px 0 8px;border-radius:999px;background:var(--card);border:1px solid var(--line);color:var(--ink);font-variant-numeric:tabular-nums}
+.shop-wallet .w-it b{font-family:var(--font-chalk);font-size:17px;font-weight:700}
+.shop-wallet .w-it svg,.shop-wallet .w-it .tic,.shop-wallet .w-it img{width:20px;height:20px;flex:none;object-fit:contain;background-size:contain}
+.shop-cats{display:flex;gap:6px;overflow-x:auto;scrollbar-width:none;padding:8px 0 0}.shop-cats::-webkit-scrollbar{display:none}
+.shop-cats button{flex:none;min-height:36px;padding:0 13px;border:0;border-radius:10px;background:color-mix(in srgb, var(--line) 55%, transparent);color:var(--ink);font:inherit;font-size:13.5px;cursor:pointer}
+.shop-panel .shop-have,#essHaveBox,#panelEss > .shop-adleft{display:none}   /* 재화 줄이 대신해요(요소는 그대로) */
+.shop-panel .shop-h{margin:16px 2px 8px;font-size:17px;color:var(--ink)}.shop-panel .shop-h small{font-size:12.5px;color:var(--muted)}
+/* 타일(꾸미기 품목) */
+.shop-panel .shop-grid{gap:8px}
+.shop-panel .si{min-height:120px;justify-content:flex-start;gap:4px;padding:10px 4px 9px;border:1px solid color-mix(in srgb, var(--line) 85%, transparent);border-radius:14px;box-shadow:0 1px 0 rgba(0,0,0,.05),0 3px 8px rgba(40,30,10,.06)}
+.shop-panel .si .nm{font-size:13.5px;line-height:1.25;min-height:1.25em}
+.shop-panel .si .pr{min-height:24px;padding:0 9px;border-radius:999px;font-size:13px;font-weight:700;color:var(--muted)}
+.shop-panel .si:not(.own):not(.poor):not(.lock):not(.out):not(.on) .pr{background:var(--accent);color:var(--accent-ink)}
+.shop-panel .si.poor .pr{background:none;box-shadow:inset 0 0 0 1.5px var(--line);color:var(--muted)}
+.shop-panel .si.own:not(.on) .pr,.shop-panel .si.on .pr{box-shadow:inset 0 0 0 1.5px var(--accent);color:var(--ink)}
+.shop-panel .si.own::after{content:'가졌어요';position:absolute;top:6px;left:6px;padding:0 5px;border:1.5px solid #C9A04A;border-radius:6px;color:#9A6E18;font-size:11px;line-height:16px;transform:rotate(-6deg)}
+.shop-panel .si.out{opacity:.6}
+.shop-panel .lack,.big-card .lack,.buyw .lack{display:block;font-style:normal;font-size:12px;line-height:1.3;color:var(--danger)}
+.shop-panel .nx{display:block;font-style:normal;font-size:12px;line-height:1.3;color:var(--muted)}
+.shop-panel .si.hl,.shop-panel .sb.hl{box-shadow:0 0 0 3px var(--accent)}
+/* 줄(소모품) */
+.shop-panel .sb{min-height:72px;gap:12px;padding:10px 12px;border:1px solid color-mix(in srgb, var(--line) 85%, transparent);box-shadow:0 1px 0 rgba(0,0,0,.05),0 3px 8px rgba(40,30,10,.06)}
+.shop-panel .sb + .sb{margin-top:8px}
+.shop-panel .sb .pv{width:44px;height:44px}.shop-panel .sb .tx b{font-size:15px}.shop-panel .sb .tx span,.shop-panel .sb .tx small{font-size:12.5px}
+.shop-panel .sb .buy{min-height:44px;min-width:72px;justify-content:center}
+.buyw{flex:none;display:flex;flex-direction:column;align-items:center;gap:2px;text-align:center}
+.shop-panel .sb .buy.off{opacity:.5}
+.shop-panel .sb.ev-dex{width:100%;margin-top:14px;text-align:left;font:inherit;color:inherit;cursor:pointer}
+.pill{flex:none;display:inline-flex;align-items:center;gap:4px;min-height:30px;padding:0 11px;border-radius:999px;background:var(--accent);color:var(--accent-ink);font-family:var(--font-chalk);font-size:15px;font-weight:700;white-space:nowrap}
+.pill svg,.pill .tic{width:15px;height:15px;background-size:contain}
+.pill.own{background:none;box-shadow:inset 0 0 0 1.5px var(--accent);color:var(--ink);font-family:inherit;font-size:13px}
+.sb.ev-dex .pill{background:none;box-shadow:inset 0 0 0 1.5px var(--line);color:var(--ink)}
+/* 큰 진열(오늘의 진열대) */
+.big-card{display:flex;align-items:center;gap:12px;width:100%;min-height:104px;margin:0 0 8px;padding:12px;border:1px solid color-mix(in srgb, var(--line) 85%, transparent);border-radius:18px;background:var(--card);color:var(--ink);font:inherit;text-align:left;box-shadow:0 1px 0 rgba(0,0,0,.05),0 4px 12px rgba(40,30,10,.08);cursor:pointer}
+.big-card .bc-pv{flex:none;width:80px;height:80px;border-radius:14px;display:grid;place-items:center;overflow:hidden;background:var(--grass)}
+.big-card .bc-pv img,.big-card .bc-pv svg,.big-card .bc-pv .tic{width:66px;height:66px;object-fit:contain;background-size:contain}
+.big-card .bc-tx{flex:1;min-width:0;display:flex;flex-direction:column;gap:2px}
+.big-card .bc-tx small{font-size:12.5px;color:var(--muted)}.big-card .bc-tx b{font-family:var(--font-display);font-weight:400;font-size:17px;line-height:1.25}.big-card .bc-tx span{font-size:12.5px;color:var(--muted)}
+.big-card .bc-pr{flex:none;display:flex;flex-direction:column;align-items:center;gap:2px}
+.big-card.poor .pill{background:none;box-shadow:inset 0 0 0 1.5px var(--line);color:var(--muted)}
+/* 상점 거리: 하늘과 바닥을 줄이고(그림은 그대로) 아래에 진열대 */
+.street-panel{background:var(--paper)}
+.street-panel .street-scene{margin-top:-21%;margin-bottom:-24%}
+.street-panel .street-title{top:10px}
+.street-wallet{position:absolute;z-index:3;right:10px;top:10px;flex-direction:column;align-items:flex-end;gap:4px}
+.street-wallet .w-it{min-height:30px;background:color-mix(in srgb, var(--paper) 90%, transparent)}
+.shelf,.shop-more{position:relative;z-index:2;padding:4px 16px 0;background:var(--paper)}
+.shelf{margin-top:0;padding-top:10px;border-radius:20px 20px 0 0;box-shadow:0 -6px 12px -10px rgba(0,0,0,.35)}
+.shelf .shop-h,.shop-more .shop-h{margin:6px 2px 8px;font-family:var(--font-display);font-weight:400;font-size:17px;color:var(--ink)}.shelf .shop-h small,.shop-more .shop-h small{font-size:12.5px;color:var(--muted)}
+.shop-more{padding-bottom:18px}
+.more-row{display:flex;gap:8px}
+.more-go{flex:1;display:flex;flex-direction:column;align-items:flex-start;justify-content:center;min-height:56px;padding:8px 12px;border:1px solid var(--line);border-radius:14px;background:var(--card);color:var(--ink);font:inherit;text-align:left;cursor:pointer}
+.more-go b{font-family:var(--font-display);font-weight:400;font-size:15px}.more-go small{font-size:12.5px;color:var(--muted)}
+@media (prefers-color-scheme: dark){:root:not([data-theme="light"]) .street-panel .street-scene{filter:brightness(.82) saturate(.9)}}
+:root[data-theme="dark"] .street-panel .street-scene{filter:brightness(.82) saturate(.9)}
+/* 테마 세트: 접힌 줄, 누르면 펼쳐요 */
+.th-card{padding:0;overflow:hidden;border:1px solid color-mix(in srgb, var(--line) 85%, transparent);background:var(--card)}
+.th-fold{display:flex;align-items:center;gap:12px;width:100%;min-height:72px;padding:10px 12px;border:0;background:none;color:var(--ink);font:inherit;text-align:left;cursor:pointer}
+.th-fold .th-sw{flex:none;width:56px;height:48px;border-radius:10px;overflow:hidden;display:grid;place-items:center;background:var(--grass)}
+.th-fold .th-sw > *{width:100%;height:100%;object-fit:cover}
+.th-fold .th-nm{flex:1;min-width:0;display:flex;flex-direction:column}.th-fold .th-nm b{font-family:var(--font-display);font-weight:400;font-size:15px}.th-fold .th-nm small{font-size:12.5px;color:var(--muted)}
+.th-fold::after{content:'';flex:none;width:8px;height:8px;margin-left:2px;border-right:2px solid var(--muted);border-bottom:2px solid var(--muted);transform:rotate(45deg)}
+.th-card.open .th-fold::after{transform:rotate(-135deg)}
+.th-card.fold .th-body{display:none}
+.th-card .th-body{padding:0 10px 10px}.th-card .th-body > .th-top > b{display:none}
+/* 광고 단추와 도장판은 한 단계 낮춰요(노랑은 '사기'에만) */
+#panelShop #shopAd{min-height:44px;background:var(--card);color:var(--ink);box-shadow:inset 0 0 0 1.5px var(--accent)}
+.shop-panel .shop-h{flex-wrap:wrap;row-gap:2px}.shop-panel .shop-h small{flex-basis:100%;margin-left:0}
+@media (max-width:380px){.shop-nav button{padding:0 11px;font-size:13.5px}.shop-nav .street-back{padding-left:8px}}
+.ask-row{margin:10px 0 2px;padding:10px 12px;border-radius:14px;background:var(--card);border:1.5px solid var(--accent)}
+.ask-row p{margin:0 0 8px;font-size:14px;line-height:1.4;color:var(--ink);text-align:center}
+.ask-row .btn-row{display:flex;gap:8px}.ask-row .btn-row button{flex:1;min-height:44px}
+.th-prevbar .btn-sub{flex:none;width:auto;min-height:36px;padding:0 10px;margin:0;background:transparent;color:#FFF9E9;border:1.5px solid rgba(255,249,233,.5)}
+.th-prevbar #thPrevBuy svg{width:15px;height:15px;vertical-align:-2px;margin:0 2px}
+.shop-nav button{min-height:44px}.shop-cats button{position:relative}.shop-cats button::before{content:'';position:absolute;left:0;right:0;top:-4px;bottom:-4px}   /* 누르는 곳 44px */
 </style>
 </head>
 <body>
@@ -4022,7 +4137,7 @@ body.mg-on .toast[hidden]{display:none}
     <p class="boot-step" id="bootStep">학교 문을 여는 중...</p>
     <p class="boot-tip" id="bootTip">학교 문을 여는 중이에요</p>
   </div>
-  <span class="boot-ver" id="bootVer">v5.3.2</span>
+  <span class="boot-ver" id="bootVer">v5.3.3</span>
 </div>
 
 <div class="app on-school" id="app">
@@ -4284,7 +4399,7 @@ body.mg-on .toast[hidden]{display:none}
       <div class="fallfx" id="fallFx" hidden aria-hidden="true"></div>
       <div class="danger-fx" aria-hidden="true"></div>
       <div class="fever-fx" id="feverFx" hidden aria-hidden="true"><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i></div>
-      <div class="th-prevbar" id="thPrevBar" hidden role="status"><span><b id="thPrevName">테마 미리 보기</b><small>♪ 테마 곡, 지도, 건물 색을 미리 봐요</small></span><button class="cta small" type="button" id="thPrevBack">상점으로 돌아가기</button></div><!-- 3.0.0 테마 미리 보기 -->
+      <div class="th-prevbar" id="thPrevBar" hidden role="status"><span><b id="thPrevName">테마 미리 보기</b><small>♪ 테마 곡, 지도, 건물 색을 미리 봐요</small></span><button class="btn-sub small" type="button" id="thPrevBack">돌아가기</button><button class="cta small" type="button" id="thPrevBuy" hidden>세트 사기</button></div><!-- 3.0.0 테마 미리 보기 -->
       <div class="sportsbar festbar" id="festBar" hidden role="status" aria-live="off"><span id="fbName">행사</span><span class="sb-t"><b id="fbN">0/0</b></span><span class="sb-t"><b id="fbT">30</b>초</span></div>
       <div class="sportsbar" id="sportsBar" hidden role="status" aria-live="off"><span class="sb-b">청팀 <b id="spBlue">0</b></span><span class="sb-t"><b id="spTime">40</b>초</span><span class="sb-w"><b id="spWhite">0</b> 백팀</span></div>
       <!-- 2.0.0 학교급 모습 보기: 동그라미 6개와 지난 학교급 지도 -->
@@ -4316,7 +4431,6 @@ body.mg-on .toast[hidden]{display:none}
         <button class="boost trip sports" id="btnSports" type="button" hidden aria-label="학교 행사"><span class="b-ring"><span class="b-av" id="sportsIc" aria-hidden="true"></span><span class="b-n" id="sportsN">열기</span></span><span class="b-lb">학교 행사</span></button>
         <button class="boost trip hall" id="btnHall" type="button" data-go="hall" hidden aria-label="학교 복도"><span class="b-ring"><span class="b-av" id="hallIc" aria-hidden="true"></span><span class="b-n" id="hallN">열기</span></span><span class="b-lb">복도</span><span class="h-dot" id="hallDot" hidden></span></button>
         <div class="feast" id="feastChip" hidden>특식 데이 <b id="feastTime">5:00</b></div>
-        <div class="feast" id="autoChip" hidden>자동 줍기 <b id="autoTime">60:00</b></div>
       </div>
       <div class="map-right">
         <button class="ui-fold side-fold" id="foldR" type="button" data-fold="r" aria-expanded="true" aria-label="오른쪽 메뉴 접기"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M6 15l6-6 6 6" fill="none" stroke="currentColor" stroke-width="2.6" stroke-linecap="round" stroke-linejoin="round"/></svg><i class="dot" hidden></i></button>
@@ -4345,6 +4459,7 @@ body.mg-on .toast[hidden]{display:none}
     <section class="panel" id="panelTeachers" hidden aria-labelledby="ttlTeachers">
       <h2 id="ttlTeachers" class="ph"><span class="tic" data-ic="ic_teacher" aria-hidden="true"></span><span>선생님</span></h2>
       <div class="tlist" id="teacherList"></div>
+      <button class="qready stick" type="button" id="teaQReady" hidden></button><!-- 5.3.2.2 F-04 -->
     </section>
 
     <section class="panel" id="panelTam" hidden aria-labelledby="ttlTam">
@@ -4396,7 +4511,7 @@ body.mg-on .toast[hidden]{display:none}
           <div class="btn-row"><button class="btn-sub" type="button" id="gNo">취소</button><button class="cta" type="button" id="gYes">종업식 열기</button></div>
         </div>
       </div>
-      <h3 class="qsec second">졸업식 <small>마지막 해에 졸업하면 다음 학교에 입학해요</small></h3>
+      <h3 class="qsec second" id="tierHead">졸업식 <small>마지막 해에 졸업하면 다음 학교에 입학해요</small></h3>
       <div class="gyear" id="tierCard">
         <div class="tier-route"><span id="tierFrom">숲속 유치원</span><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M5 12h13M13 6l6 6-6 6" fill="none" stroke="currentColor" stroke-width="2.6" stroke-linecap="round" stroke-linejoin="round"/></svg><b id="tierTo">숲속 초등학교</b></div>
         <ul class="tier-reqs" id="tierReqs"></ul>
@@ -4422,15 +4537,18 @@ body.mg-on .toast[hidden]{display:none}
     <!-- 1.7.2 상점 거리: 아래 탭 '상점'을 누르면 가게 그림을 골라 들어가요. 가게 그림은 shop_front_gold, shop_front_ess(없으면 아이콘) -->
     <section class="panel street-panel" id="panelStreet" hidden aria-labelledby="streetTitle">
     <h2 id="streetTitle" class="street-title">상점 거리</h2>
+    <div class="shop-wallet street-wallet" data-wallet></div><!-- 5.3.3 -->
     <div class="street-scene" id="streetScene">
       <button class="shopfront" type="button" data-go="shop" id="sfGold" style="left:1.3%;top:15.7%;width:50.6%" aria-label="꾸미기 백화점"><span class="sf-pic" data-front="shop_gold" data-fb="ic_gold_acorn" aria-hidden="true"></span><span class="sf-tag"><b>꾸미기 백화점</b><span class="sf-have"><span class="tic" data-ic="ic_gold_acorn" aria-hidden="true"></span><span id="sfGoldN">0</span></span></span></button>
       <button class="shopfront" type="button" data-go="ess" id="sfEss" style="left:50%;top:33.9%;width:50%" aria-label="문방구"><span class="sf-pic" data-front="shop_ess" data-fb="ic_essence_shop" aria-hidden="true"></span><span class="sf-tag"><b>문방구</b><span class="sf-have"><span class="tic" data-ic="ic_essence" aria-hidden="true"></span><span id="sfEssN">0</span></span></span></button>
       <button class="shopfront" type="button" data-go="deco" id="sfDeco" style="left:1.9%;top:48.7%;width:50%" aria-label="꾸미기 가게"><span class="sf-pic" data-front="shop_deco" data-fb="deco_flowerbed" aria-hidden="true"></span><span class="sf-tag"><b>꾸미기 가게</b></span></button>
     </div>
+    <div class="shelf" id="shelf"></div><!-- 5.3.3 오늘의 진열대(권하는 품목, 값은 가게와 같아요) -->
+    <div class="shop-more" id="shopMore"></div><!-- 5.3.3 다른 가게로 바로 가기 -->
     </section>
 
     <section class="panel shop-panel" id="panelShop" hidden aria-labelledby="shopTitle">
-    <button class="street-back" type="button" data-go="street">상점 거리로</button>
+    <div class="shop-top" data-shoptop><nav class="shop-nav" aria-label="가게 옮기기"><button class="street-back" type="button" data-go="street">상점 거리</button><button type="button" data-go="shop" class="sn-go on" aria-current="page">백화점</button><button type="button" data-go="ess" class="sn-go">문방구</button><button type="button" data-go="deco" class="sn-go">꾸미기 가게</button></nav><div class="shop-wallet" data-wallet></div><div class="shop-cats" data-cats role="group" aria-label="갈래"></div></div><!-- 5.3.3 상점 새 진열: 가게 칩, 재화 줄, 갈래 칩 -->
     <h2 id="shopTitle" class="ph"><span class="tic" data-ic="ic_gold_acorn" aria-hidden="true"></span><span>꾸미기 백화점</span></h2>
     <div class="shop-have" id="shopHave"></div>
     <button class="cta small" type="button" id="shopAd">광고 보고 황금 도토리 3개 받기</button>
@@ -4445,7 +4563,7 @@ body.mg-on .toast[hidden]{display:none}
 
     <!-- 1.7.4 꾸미기 가게: 숲의 정수로 장식을 사고, 지도의 정해진 자리에 놓아요. 학교 간판 이름과 학교 마크도 여기서. 2.1.0부터 한정 모자와 특별 가구도 -->
     <section class="panel shop-panel" id="panelDeco" hidden aria-labelledby="decoTitle">
-    <button class="street-back" type="button" data-go="street">상점 거리로</button>
+    <div class="shop-top" data-shoptop><nav class="shop-nav" aria-label="가게 옮기기"><button class="street-back" type="button" data-go="street">상점 거리</button><button type="button" data-go="shop" class="sn-go">백화점</button><button type="button" data-go="ess" class="sn-go">문방구</button><button type="button" data-go="deco" class="sn-go on" aria-current="page">꾸미기 가게</button></nav><div class="shop-wallet" data-wallet></div><div class="shop-cats" data-cats role="group" aria-label="갈래"></div></div><!-- 5.3.3 상점 새 진열: 가게 칩, 재화 줄, 갈래 칩 -->
     <h2 id="decoTitle" class="ph"><span class="tic" data-ic="deco_flowerbed" aria-hidden="true"></span><span>꾸미기 가게</span></h2>
     <div class="shop-have ess-have" id="decoHave"></div>
     <div class="deco-mode"><span class="dm-pic" id="decoModePic" aria-hidden="true"></span><span class="dm-tx"><b>꾸미기 모드</b><small id="decoSlotsTxt"></small></span><button class="cta" type="button" id="decoPlace">지도 꾸미기</button></div>
@@ -4454,20 +4572,11 @@ body.mg-on .toast[hidden]{display:none}
       <p id="decoAskText"></p>
       <div class="btn-row"><button class="btn-sub" type="button" id="decoNo">취소</button><button class="btn-sub" type="button" id="decoBerry" hidden>열매로 받기</button><button class="btn-sub" type="button" id="decoPieces" hidden>조각으로 받기</button><button class="cta" type="button" id="decoYes">사기</button></div>
     </div>
-    <h3 class="shop-h">학교 간판</h3>
-    <form class="rank-form deco-name" id="decoNameForm"><input id="decoName" maxlength="6" autocomplete="off" enterkeyhint="done" placeholder="숲속" aria-label="학교 이름 앞부분"><span class="deco-tier" id="decoTier">초등학교</span><button class="cta" type="submit">바꾸기</button></form>
-    <p class="fine">1~6글자. 간판과 학교 카드에 보여요.</p>
-    <h3 class="shop-h">학교 마크</h3>
-    <div class="mark-edit">
-      <div class="mark-big" id="markBig" aria-hidden="true"></div>
-      <div class="mark-rows" id="markRows"></div>
-    </div>
-    <div class="btn-row"><button class="btn-sub" type="button" id="markOff">교실 그림으로</button><button class="cta" type="button" id="markSave">이 마크 쓰기</button></div>
     </section>
 
     <!-- 2.1.0 문방구(옛 정수 상점): 숲의 정수로 문제집, 시간 단축권, 부스터, 밤 모드를 사고 도토리를 정수로 바꿔요. 값은 ESHOP 한곳에 -->
     <section class="panel shop-panel" id="panelEss" hidden aria-labelledby="essTitle">
-    <button class="street-back" type="button" data-go="street">상점 거리로</button>
+    <div class="shop-top" data-shoptop><nav class="shop-nav" aria-label="가게 옮기기"><button class="street-back" type="button" data-go="street">상점 거리</button><button type="button" data-go="shop" class="sn-go">백화점</button><button type="button" data-go="ess" class="sn-go on" aria-current="page">문방구</button><button type="button" data-go="deco" class="sn-go">꾸미기 가게</button></nav><div class="shop-wallet" data-wallet></div><div class="shop-cats" data-cats role="group" aria-label="갈래"></div></div><!-- 5.3.3 상점 새 진열: 가게 칩, 재화 줄, 갈래 칩 -->
     <h2 id="essTitle" class="ph"><span class="tic" data-ic="ic_essence_shop" aria-hidden="true"></span><span>문방구</span></h2>
     <div class="shop-have ess-have" id="essHaveBox"><span class="ess-big" id="essBig" aria-hidden="true"></span><span class="tic" data-ic="ic_essence" aria-hidden="true"></span><span id="essHave2">0</span></div>
     <p class="fine shop-adleft">숲의 정수는 공부 탭에서 모아요</p>
@@ -4527,7 +4636,7 @@ body.mg-on .toast[hidden]{display:none}
     <section class="panel" id="panelDex" hidden aria-labelledby="ttlDex">
       <button class="panel-x" type="button" aria-label="홈으로"><svg viewBox="0 0 24 24" width="18" height="18" aria-hidden="true"><path d="M6 6l12 12M18 6L6 18" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round"/></svg></button>
       <h2 id="ttlDex" class="ph"><span class="tic" data-ic="ic_book" aria-hidden="true"></span><span>도감</span></h2>
-      <div class="seg rank-seg" id="dexSeg" role="radiogroup" aria-label="도감과 업적"><button type="button" role="radio" data-dseg="dex" aria-checked="true">동물</button><button type="button" role="radio" data-dseg="sn" aria-checked="false" id="dsegSn" hidden>간식</button><button type="button" role="radio" data-dseg="bx" aria-checked="false" id="dsegBx" hidden>생물</button><button type="button" role="radio" data-dseg="ach" aria-checked="false">업적<i class="seg-dot" id="achDot" hidden></i></button></div>
+      <div class="seg rank-seg" id="dexSeg" role="radiogroup" aria-label="도감과 업적"><button type="button" role="radio" data-dseg="dex" aria-checked="true">동물</button><button type="button" role="radio" data-dseg="sn" aria-checked="false" id="dsegSn" hidden>간식</button><button type="button" role="radio" data-dseg="bx" aria-checked="false" id="dsegBx" hidden>생물</button><button type="button" role="radio" data-dseg="deco" aria-checked="false" id="dsegDeco">장식</button><button type="button" role="radio" data-dseg="ach" aria-checked="false">업적<i class="seg-dot" id="achDot" hidden></i></button></div>
       <div id="dexPane">
       <p class="lead">처음 만나면 황금 도토리 1개를 받아요.</p>
       <div class="dex-head" id="dexHead"></div>
@@ -4544,6 +4653,12 @@ body.mg-on .toast[hidden]{display:none}
         <p class="lead">계절, 밤, 비 오는 날마다 생물이 달라요.<br>10종 황금 도토리 1, 20종 숲의 정수 20, 30종 관찰 오두막, 60종 곤충 호텔, 90종 생태 연못과 칭호 숲속 박사!</p>
         <div class="dex-head" id="bxDexHead"></div>
         <div class="sn-dex-grid bx-dex-grid" id="bxDexGrid"></div>
+      </div>
+      <!-- 5.3.3 이벤트 한정 장식 도감(꾸미기 가게에서 옮겨 왔어요). 안쪽은 decoDexRender()가 그려요 -->
+      <div id="decoDexPane" hidden>
+        <p class="lead">가게에서 팔지 않는 장식이에요. 이벤트 기념 상자, 숲속 패스 같은 곳에서 받아요. 가진 것은 꾸미기 가게의 '지도 꾸미기'로 놓아요.</p>
+        <div class="dex-head" id="decoDexHead"></div>
+        <div class="sn-dex-grid" id="decoDexGrid"></div>
       </div>
       <!-- 1.7.1 업적과 칭호. 안쪽은 renderAch()가 그려요 -->
       <div id="achPane" hidden>
@@ -4594,6 +4709,21 @@ body.mg-on .toast[hidden]{display:none}
         <div class="srow"><span class="txt"><b>숫자 단위</b></span><div class="seg" id="optUnits" role="radiogroup" aria-label="숫자 단위"><button type="button" role="radio" data-units="ko" aria-checked="true">1.2만</button><button type="button" role="radio" data-units="en" aria-checked="false">12K</button></div></div>
         <button class="srow" type="button" id="optPhoto"><span class="txt"><b>사진 모드</b><small>화면의 글과 단추를 숨기고 마을만 봐요</small></span></button>
       </div>
+      <!-- 5.3.3 꾸미기 가게에 있던 학교 간판과 학교 마크 편집, 백화점에 있던 이름 바꾸기를 설정으로 옮겼어요(같은 칸, 값 없음) -->
+      <div class="set-school" id="setSchool">
+      <h3 class="panel-sub">학교 간판과 마크</h3>
+    <h3 class="shop-h">학교 간판</h3>
+    <form class="rank-form deco-name" id="decoNameForm"><input id="decoName" maxlength="6" autocomplete="off" enterkeyhint="done" placeholder="숲속" aria-label="학교 이름 앞부분"><span class="deco-tier" id="decoTier">초등학교</span><button class="cta" type="submit">바꾸기</button></form>
+    <p class="fine">1~6글자. 간판과 학교 카드에 보여요.</p>
+    <h3 class="shop-h">학교 마크</h3>
+    <div class="mark-edit">
+      <div class="mark-big" id="markBig" aria-hidden="true"></div>
+      <div class="mark-rows" id="markRows"></div>
+    </div>
+    <div class="btn-row"><button class="btn-sub" type="button" id="markOff">교실 그림으로</button><button class="cta" type="button" id="markSave">이 마크 쓰기</button></div>
+      <h3 class="shop-h">교장 선생님 이름</h3>
+      <div class="slist"><button class="srow" type="button" id="optNick"><span class="txt"><b>이름 바꾸기</b><small id="optNickTx">랭킹에 보이는 이름을 바꿔요</small></span></button></div>
+      </div>
       <h3 class="panel-sub">학교 기록</h3>
       <div class="slist">
         <button class="srow" type="button" id="optAcct" hidden><span class="txt"><b id="acctTitle">구글 계정 연결</b><small id="acctSub">연결해 두면 휴대폰을 바꿔도 같은 학교를 이어 해요</small></span><svg viewBox="0 0 24 24" width="20" height="20" aria-hidden="true"><path d="M9 6l6 6-6 6" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"/></svg></button>
@@ -4620,7 +4750,7 @@ body.mg-on .toast[hidden]{display:none}
       </div>
       <h3 class="panel-sub">정보</h3>
       <dl class="info">
-        <div id="verRow"><dt>버전</dt><dd>v5.3.2</dd></div>
+        <div id="verRow"><dt>버전</dt><dd>v5.3.3</dd></div>
         <div id="pidRow" hidden><dt>학교 번호</dt><dd id="infoPid"></dd></div>
       </dl>
       <div id="devBox" hidden>
@@ -4718,16 +4848,19 @@ body.mg-on .toast[hidden]{display:none}
     <div class="con-box" id="sheetCon" hidden>
       <div class="con-head"><span id="conClock" aria-hidden="true"></span><span id="conTx">공사 중</span></div>
       <div class="con-prog" aria-hidden="true"><i id="conFill"></i></div>
-      <button class="ff-btn wide" type="button" id="conFree" hidden><span class="z" aria-hidden="true">⚡</span><span id="conFreeTx">즉시 완공 (오늘 3번 남음)</span><span class="n" aria-hidden="true">1</span></button>
-      <div class="con-row"><button class="cta" type="button" id="conAll" aria-disabled="false"><span id="conAllLbl">단축권 자동 사용</span></button><button class="cta ghost" type="button" id="conNo" hidden>그만두기</button></div>
-      <p class="con-plan" id="conPlan"></p>
-      <button class="con-ess" type="button" id="conEss"><span>숲의 정수로 즉시 완공</span><span class="p" id="conEssCost"></span></button>
-      <div class="con-tks" id="conTks" role="group" aria-label="골라서 쓰기"></div>
-      <button class="con-ad" type="button" id="conAd">광고 보고 5분권 받기</button>
-      <div class="con-cb" id="conCb" hidden></div><!-- 2.1.1 건설 가속(도토리) -->
+      <button class="ff-btn wide con-opt" type="button" id="conFree" hidden><span class="z" aria-hidden="true">⚡</span><span id="conFreeTx">즉시 완공 (오늘 3번 남음)</span><span class="n" aria-hidden="true">1</span></button>
+      <div class="con-row con-opt" id="conRow"><button class="cta" type="button" id="conAll" aria-disabled="false"><span id="conAllLbl">단축권 자동 사용</span></button><button class="cta ghost" type="button" id="conNo" hidden>그만두기</button></div>
+      <p class="con-plan con-opt" id="conPlan"></p>
+      <button class="con-ess con-opt" type="button" id="conEss"><span>숲의 정수로 즉시 완공</span><span class="p" id="conEssCost"></span></button>
+      <div class="con-tks con-opt" id="conTks" role="group" aria-label="골라서 쓰기"></div>
+      <button class="con-ad con-opt" type="button" id="conAd">광고 보고 5분권 받기</button>
+      <div class="con-cb con-opt" id="conCb" hidden></div><!-- 2.1.1 건설 가속(도토리) -->
+      <button class="con-more" type="button" id="conMore" aria-expanded="false">다른 방법</button><!-- 5.3.2.2 F-05 으뜸 단추 하나와 나머지 접기 -->
     </div>
     <div class="sheet-foot"><!-- 5.0.1.6 H-13 업그레이드 줄과 안내를 창 아래에 붙여요 -->
+      <button class="qready" type="button" id="sheetQReady" hidden></button><!-- 5.3.2.2 F-04 퀘스트를 마치면 창 안에서 보상 받기 -->
       <p class="need" id="sheetNeed">&nbsp;</p>
+      <p class="need-wait" id="sheetWait" hidden><span id="sheetWaitTx"></span><button class="btn-sub small" type="button" id="sheetWaitGo" hidden>오늘 할 일 보기</button></p><!-- 5.3.2.1 도토리가 모자랄 때 기다릴 시간과 할 일 -->
       <div class="buy-row"><button class="cta split" type="button" id="sheetBuy" aria-disabled="false"><span id="sheetBuyLabel">키우기</span><span class="cost"><span data-acorn></span><b id="sheetCost">20</b></span></button><button class="ff-btn" type="button" id="sheetFree" aria-label="업그레이드하고 바로 즉시 완공(학교 전체 하루 3번)" hidden><span class="z" aria-hidden="true">⚡</span>즉시 완공<span class="n" aria-hidden="true">1</span></button></div>
     </div>
   </section>
@@ -7085,9 +7218,45 @@ body.mg-on .toast[hidden]{display:none}
 "conf_med_1":"img/a/conf_med_1-1472cf7e3e.webp",
 "conf_med_2":"img/a/conf_med_2-9201b578d9.webp",
 "conf_med_3":"img/a/conf_med_3-520bbc4479.webp",
+"cos_hat_mon01":"img/a/cos_hat_mon01-00f96c8357.webp",
+"cos_hat_mon02":"img/a/cos_hat_mon02-5fdc4d9f97.webp",
+"cos_hat_mon03":"img/a/cos_hat_mon03-15242d0224.webp",
+"cos_hat_mon04":"img/a/cos_hat_mon04-ccabed62d8.webp",
+"cos_hat_mon05":"img/a/cos_hat_mon05-08b604b5be.webp",
+"cos_hat_mon06":"img/a/cos_hat_mon06-a968c43270.webp",
+"cos_hat_mon07":"img/a/cos_hat_mon07-f6e73a9819.webp",
+"cos_hat_mon08":"img/a/cos_hat_mon08-0f2b55c68c.webp",
+"cos_hat_mon09":"img/a/cos_hat_mon09-b9cf6f47a5.webp",
+"cos_hat_mon10":"img/a/cos_hat_mon10-1665c684d6.webp",
+"cos_hat_mon11":"img/a/cos_hat_mon11-75a7303127.webp",
+"cos_hat_mon12":"img/a/cos_hat_mon12-bc7f683e8b.webp",
 "deco_alma_1":"img/a/deco_alma_1-d66aa85cdb.webp",
 "deco_alma_2":"img/a/deco_alma_2-ad9e735815.webp",
 "deco_alma_3":"img/a/deco_alma_3-5e0b5f14e9.webp",
+"deco_mon_01_flag":"img/a/deco_mon_01_flag-4fc0fadfd3.webp",
+"deco_mon_01_gate":"img/a/deco_mon_01_gate-ee0f60152d.webp",
+"deco_mon_02_flag":"img/a/deco_mon_02_flag-2ff1dab53b.webp",
+"deco_mon_02_gate":"img/a/deco_mon_02_gate-287661b493.webp",
+"deco_mon_03_flag":"img/a/deco_mon_03_flag-89750569fe.webp",
+"deco_mon_03_gate":"img/a/deco_mon_03_gate-26151794a0.webp",
+"deco_mon_04_flag":"img/a/deco_mon_04_flag-a4473ea8a7.webp",
+"deco_mon_04_gate":"img/a/deco_mon_04_gate-f6b40ff4d7.webp",
+"deco_mon_05_flag":"img/a/deco_mon_05_flag-275f9132d2.webp",
+"deco_mon_05_gate":"img/a/deco_mon_05_gate-2202d52825.webp",
+"deco_mon_06_flag":"img/a/deco_mon_06_flag-b2c296c46d.webp",
+"deco_mon_06_gate":"img/a/deco_mon_06_gate-a5296f9161.webp",
+"deco_mon_07_flag":"img/a/deco_mon_07_flag-85077ee423.webp",
+"deco_mon_07_gate":"img/a/deco_mon_07_gate-88f41529eb.webp",
+"deco_mon_08_flag":"img/a/deco_mon_08_flag-0b79df4c37.webp",
+"deco_mon_08_gate":"img/a/deco_mon_08_gate-9eedd00d87.webp",
+"deco_mon_09_flag":"img/a/deco_mon_09_flag-013f0b534e.webp",
+"deco_mon_09_gate":"img/a/deco_mon_09_gate-66520c4733.webp",
+"deco_mon_10_flag":"img/a/deco_mon_10_flag-b5c88b2f36.webp",
+"deco_mon_10_gate":"img/a/deco_mon_10_gate-2742c49c6b.webp",
+"deco_mon_11_flag":"img/a/deco_mon_11_flag-3061eced21.webp",
+"deco_mon_11_gate":"img/a/deco_mon_11_gate-fa7a694d9b.webp",
+"deco_mon_12_flag":"img/a/deco_mon_12_flag-493f750738.webp",
+"deco_mon_12_gate":"img/a/deco_mon_12_gate-9938c1d61e.webp",
 "deco_pp_board":"img/a/deco_pp_board-ba7a21372c.webp",
 "deco_pp_chair":"img/a/deco_pp_chair-f8d7b0a90e.webp",
 "deco_pp_tower":"img/a/deco_pp_tower-bf7e38fd8f.webp",
@@ -8907,7 +9076,7 @@ body.mg-on .toast[hidden]{display:none}
       say: '대학교의 마지막 해예요. 대도시 학교가 되면 졸업 준비가 끝나요. 그날 편지 뒷장을 읽기로 했어요.' },
     // 대학원: 석사 4학기 + 박사 8학기, 캠퍼스와 건물을 이어 가요. 장 이름은 본부 제안. 연구소와 연구동은 연구 구역에
     { id: 'un42', ch: 23, t: 'tier', n: 5, r: 25, rk: 'dip', title: '대학교 학위수여식', how: '위쪽 졸업 단추에서 학위수여식을 열고 대학원에 입학해요',
-      say: '편지 뒷장에는 "연구 구역 열쇠는 첫 제자에게"라고 적혀 있었어요. 학위수여식을 열고 대학원으로 가요.' },
+      say: '편지 뒷장에는 "더 깊은 배움은 숲 너머에 있네"라고 적혀 있었어요. 학위수여식을 열고 대학원으로 가요.' },
     { id: 'gr1', ch: 24, t: 'tier', n: 5, rm: 10, title: '대학원 입학식', how: '숲속 대학원에 입학했어요. 받기를 눌러요',
       say: '캠퍼스 오른쪽 위 연구 구역의 자물쇠가 풀렸어요. 교장 선생님, 이제 연구를 시작해요.' },
     { id: 'gr2', ch: 24, t: 'fac', k: 'institute', n: 1, rm: 10, title: '연구소 짓기', how: '연구 구역 큰 공사 자리를 눌러요',
@@ -8978,7 +9147,7 @@ body.mg-on .toast[hidden]{display:none}
     { id: 'gc65', ch: 27, t: 'facAll', n: 65, rm: 5, title: '캠퍼스 건물 Lv.65', how: '대학교 때 지은 건물 여덟 채를 모두 Lv.65까지 키워요' },
     { id: 'gc66', ch: 27, t: 'facAll', n: 66, rm: 5, title: '캠퍼스 건물 Lv.66', how: '대학교 때 지은 건물 여덟 채를 모두 Lv.66까지 키워요' },
     { id: 'gr15', ch: 27, ye: 6, yt: 5, t: 'tgrads', n: 6, r: 20, rk: 'dip', title: '박사 학위수여식', how: '박사 8학기에 대도시가 되면 학위수여식을 열어요',
-      say: '박사 학위를 받았어요. 큰 참나무 아래에서 거북 할아버지의 마지막 나무패를 찾았어요.' });
+      say: '박사 학위를 받았어요. 큰 참나무에 다시 열매가 맺혔어요. 거북 할아버지가 말한 씨앗이에요.' });
   // 대학원 '캠퍼스 건물 모두 Lv.N'(gcN)을 두 채씩 네 조각으로 나눠요. 마지막 조각은 원래 id(gcN)라 옛 저장도 그 자리에서 이어요
   // 보상(수업료 몇 분치)은 원래 보상을 넷으로 나눠요. 과학실이 가장 비싸서 마지막 조각에 넣어요.
   // 대학교 때 덜 키운 건물을 따라잡도록 Lv.36 앞에 'Lv.34', 'Lv.35' 퀘스트를 둬요(대학교 4학년 2학기 상한이 Lv.35예요)
@@ -9258,6 +9427,9 @@ body.mg-on .toast[hidden]{display:none}
     tamUi: undefined,   // 탐험 화면 단추를 연결했는지
     // 상점과 꾸미기
     thPrev: undefined,   // 테마 미리 보기 중인 테마
+    thOpen: undefined,   // 5.3.3 백화점에서 펼쳐 둔 테마 세트
+    conMore: undefined,   // 5.3.3 공사 창 '다른 방법' 펼침
+    conMoreK: undefined,   // 5.3.3 '다른 방법'을 펼친 건물
     thScroll: undefined,   // 미리 보기 전 상점 스크롤 자리
     thSig: undefined,   // 적용한 테마 표시(바뀌면 덮개를 띄워요)
     thVeilT: undefined,   // 테마 적용 중 덮개 시계
@@ -9384,7 +9556,7 @@ body.mg-on .toast[hidden]{display:none}
     nt: { seen: '', ver: '', hide: 0 },   // 공지: 마지막으로 본 공지, 마지막으로 띄운 버전, 일주일간 열지 않기 끝
     wk: { week: -1, pts: 0, got: [false, false, false, false, false], list: [] },
     lg: { week: -1, pts: 0, pos: 0, paid: false, last: null, dq: { day: '', p: 0 } },   // dq: 오늘 쌓인 진행 점수(퀘스트와 식)
-    gold: 5, gd: { day: '', n: 0, shop: 0 }, cos: { own: [], hat: '', neck: '', mkx: '', night: false, th: { bg: '', classroom: '', cafeteria: '', library: '', science: '', playground: '' }, sp: { classroom: '', cafeteria: '', library: '', science: '', playground: '' } }, autoUntil: 0,
+    gold: 5, gd: { day: '', n: 0, shop: 0, a: 0 }, cos: { own: [], hat: '', neck: '', mkx: '', night: false, th: { bg: '', classroom: '', cafeteria: '', library: '', science: '', playground: '' }, sp: { classroom: '', cafeteria: '', library: '', science: '', playground: '' } }, autoUntil: 0,
     rank: { name: '', joined: false, sent: -1, by: '', ren: 0, asked: false },
     bs: { classroom: 0, cafeteria: 0, library: 0, science: 0, playground: 0, store: 0, dorm: 0, union: 0, institute: 0, gradhall: 0 },   // 건물마다 지금 보이는 모습의 학교급
     mg: mgFresh(),   // 숲속 합치기
@@ -9515,7 +9687,7 @@ body.mg-on .toast[hidden]{display:none}
     s.born = Math.min(numFb(d.born, 0, s.savedAt), Date.now());
     // 황금 도토리: 예전 저장에도 처음 선물 5개를 줘요. 꾸미기는 산 것만 입을 수 있어요
     s.gold = Math.floor(cap(numFb(d.gold, 0, s.gold), SAVE_CAP.count));
-    if (d.gd && typeof d.gd === 'object') { s.gd.day = typeof d.gd.day === 'string' ? d.gd.day.slice(0, 10) : ''; s.gd.n = Math.floor(numFb(d.gd.n, 0, 0, SAVE_CAP.count)); s.gd.shop = Math.floor(numFb(d.gd.shop, 0, 0, SAVE_CAP.count)); }
+    if (d.gd && typeof d.gd === 'object') { s.gd.day = typeof d.gd.day === 'string' ? d.gd.day.slice(0, 10) : ''; s.gd.n = Math.floor(numFb(d.gd.n, 0, 0, SAVE_CAP.count)); s.gd.shop = Math.floor(numFb(d.gd.shop, 0, 0, SAVE_CAP.count)); s.gd.a = Math.floor(numFb(d.gd.a, 0, Math.max(0, s.gd.n - s.gd.shop), SAVE_CAP.count)); }   // 5.3.3 일반 광고 황금 횟수(예전 저장은 전체에서 상점 몫을 빼요)
     if (d.cos && typeof d.cos === 'object') {
       // 칠판 색은 이제 배경 테마를 따라가요. 예전에 산 칠판은 값(10개씩)을 돌려줘요
       // 지붕도 이제 테마 세트가 맡아요. 예전에 산 지붕도 값(파란 지붕 15개, 벚꽃과 눈 오는 학교 25개)을 돌려줘요
@@ -10232,10 +10404,12 @@ body.mg-on .toast[hidden]{display:none}
     rt.rtPop = null;
     const D = RT5.list.find(x => x.k === rt.rtSel), L = rtLv(D.k), run = c && c.k === D.k, full = L >= RT5.top, shut = !full && L >= rtMax(D.k), k = rtCost(D.k);
     const btn = D.lock ? '<span class="fe-lock">준비 중</span>' : full ? '<span class="fe-lock">완성</span>' : run ? `<span class="fe-lock">${hms(c.end - now)}</span>`
-      : shut ? `<span class="fe-lock">논문 ${PP.deep[D.k]}편</span>` : c ? '<span class="fe-lock">다른 연구 중</span>'
+      : shut ? '<span class="fe-lock">잠김</span>' : c ? '<span class="fe-lock">다른 연구 중</span>'
       : `<button class="${S.ess < k.ess || S.budget < k.ac ? 'btn-sub' : 'cta'} small" type="button" data-rt="${D.k}">연구하기 (정수 ${k.ess})</button>`;
     const info = `<div class="rt-card"><span class="dp-ic">${IMG(D.ic) ? `<img src="${IMG(D.ic)}" alt="">` : ''}</span><div class="dp-tx"><b>${D.nm} ${Math.min(L + (full ? 0 : 1), RT5.top)}칸${full ? ' (완성)' : ''}</b>` +
-      `<small>${L ? `지금 ${D.eff(L)}` : '아직 연구 전'}${D.lock || full ? '' : `<br>다음 ${D.eff(L + 1)}<br>도토리 ${fmt(k.ac)}, ${rtHrs(k.sec)}`}</small></div>${btn}</div>`;
+      `<small>${L ? `지금 ${D.eff(L)}` : '아직 연구 전'}${D.lock || full ? '' : run ? `<br>다음 ${D.eff(L + 1)}<br>연구 중이에요. 끝나면 칸이 채워져요` : `<br>다음 ${D.eff(L + 1)}<br>도토리 ${fmt(k.ac)}, ${rtHrs(k.sec)}`}` +   // 5.3.2.1: 연구 중에는 걸리는 시간 대신 남은 시간(오른쪽) 하나만
+      // 5.3.2.1: 잠긴 까닭을 한 줄로(예전에는 단추 자리에 '논문 3편', '다른 연구 중'만)
+      `${D.lock || full || run ? '' : shut ? `<br>논문 ${PP.deep[D.k]}편을 쓰면 열려요 (지금 ${fmt((S.pp && S.pp.n) || 0)}편)` : c ? `<br>${(RT5.list.find(x => x.k === c.k) || {}).nm || '다른'} 연구가 끝나면 할 수 있어요` : ''}</small></div>${btn}</div>`;
     return `<p class="fine">한 번에 하나씩 연구해요. 졸업해도 남아요.</p><div class="rt-tree${bg ? ' art' : ''}" style="aspect-ratio:${RT_W}/${RT_H - rtTop()}${bg ? `;background-image:url('${blobUrl(bg)}')` : ''}">${rtTreeSvg()}${nodes}</div>${info}`;
   }
   function renderRx() {
@@ -10398,7 +10572,7 @@ body.mg-on .toast[hidden]{display:none}
     const P = S.pp, c = P.cur, now = gameNow(), m = ppMedOf(P.cf), nx = PP.med[m], u = IMG('ic_rdata'), up = IMG('ic_paper'), dayDone = P.day === gameToday();
     const nextDeep = RT5.list.filter(D => P.n < PP.deep[D.k]).sort((a, b) => PP.deep[a.k] - PP.deep[b.k])[0];
     let h = `<div class="pp-conf"><b>이번 숲속 학회 ${fmt(P.cf)}점</b><small>${ppLeft()}일 남음. ${m ? `지금 ${ppMedIc(m, 18)} ${PP.med[m - 1].nm}` : '아직 메달 없음'}${nx ? `, ${nx.at}점이면 ${ppMedIc(m + 1, 18)} ${nx.nm}` : ''}</small></div>`;
-    h += `<div class="dp-row"><span class="dp-ic">${u ? `<img src="${u}" alt="">` : '🔎'}</span><div class="dp-tx"><b>연구 자료 ${fmt(P.dat)}개</b><small>논문 한 편에 ${PP.need}개. 세미나 ${PP.dat.sem}, 연구 트리 칸 ${PP.dat.rt}, 조교 파견 4시간 이상, 심화 탐험 큰 장난꾸러기</small></div>` +
+    h += `<div class="dp-row"><span class="dp-ic">${u ? `<img src="${u}" alt="">` : '🔎'}</span><div class="dp-tx"><b>연구 자료 ${fmt(P.dat)}개</b><small>자료 ${PP.need}개로 논문 한 편을 ${rtHrs(PP.sec)} 동안 써요<br>얻는 곳: 세미나 +${PP.dat.sem}, 연구 트리 칸 +${PP.dat.rt}, 조교 파견 4시간 +${PP.dat.ta[1]}, 8시간 +${PP.dat.ta[2]}, 심화 탐험 큰 장난꾸러기를 처음 이기면 +${PP.dat.boss}</small></div>` +
       (dayDone ? '<span class="fe-lock">오늘 정리함</span>' : `<button class="cta small" type="button" data-pp="day">자료 정리 +${PP.dat.day}</button>`) + '</div>';
     if (c) { const D = RT5.list.find(x => x.k === c.k); h += `<div class="dp-row on"><span class="dp-ic">${up ? `<img src="${up}" alt="">` : '📜'}</span><div class="dp-tx"><b>${D ? D.nm : ''} 논문 쓰는 중</b><small>끝나면 학회 점수 +${ppScore(c.k)}</small></div><span class="fe-lock">${hms(c.end - now)}</span></div>`; }
     h += '<div class="dp-list">' + RT5.list.map(D => {
@@ -10418,7 +10592,7 @@ body.mg-on .toast[hidden]{display:none}
       const x = S.ta.seat[i] || { b: '' }, o = S.ta.out.find(y => y.i === i), w = taWho(i), u = IMG('chr_ta_' + w) || IMG('chr_' + w);
       const st = o ? (now >= o.end ? `숲속 ${TA.school[o.to]}에서 돌아왔어요` : `숲속 ${TA.school[o.to]}에 가 있어요<br>${hms(o.end - now)} 뒤에 돌아와요`) : x.b && FAC[x.b] ? `${FAC[x.b].name}에서 일해요` : '빈자리예요';
       const btn = o ? (now >= o.end ? `<button class="cta small" type="button" data-ta="claim">받기</button>` : '<span class="fe-lock">파견 중</span>')
-        : `<button class="btn-sub small" type="button" data-ta="pick:${i}">자리</button><button class="cta small" type="button" data-ta="go:${i}">파견</button>`;
+        : `<button class="btn-sub small" type="button" data-ta="pick:${i}">자리 정하기</button><button class="cta small" type="button" data-ta="go:${i}">파견</button>`;
       h += `<div class="dp-row"><span class="dp-ic">${u ? `<img src="${u}" alt="">` : ''}</span><div class="dp-tx"><b>${TA.whoNm[w]} 조교</b><small>${st}</small></div><span class="ta-btns">${btn}</span></div>`;
       if (rt.taPick === i && !o) h += '<div class="ta-pick">' + taB().map(k => `<button class="${x.b === k ? 'cta' : 'btn-sub'} small" type="button" data-ta="sit:${i}:${k}">${FAC[k].name}</button>`).join('') + (x.b ? `<button class="btn-sub small" type="button" data-ta="sit:${i}:">비우기</button>` : '') + '</div>';
       if (rt.taGo === i && !o) h += '<div class="ta-go"><p class="ta-go-h">1. 얼마나 다녀올까요?</p><div class="ta-hrs">'
@@ -10429,7 +10603,7 @@ body.mg-on .toast[hidden]{display:none}
     h += '</div>';
     const mn = S.ta.mon, full = mn >= TA.mon.length, mc = full ? 0 : TA.mon[mn];
     const monTx = full ? `완성! 수업료 +${TA.monPct * mn}%, 칭호 '모교의 자랑'` : (mn ? `지금 수업료 +${TA.monPct * mn}%<br>` : '') + `조각 ${mc}개로 ${mn ? '올리면' : '세우면'} 수업료 +${TA.monPct * (mn + 1)}%${mn + 1 === TA.mon.length ? '와 칭호' : ''}`;
-    h += `<h3 class="fv-h">모교 기념비 <small>${mn}/${TA.mon.length}단계</small></h3><div class="dp-list"><div class="dp-row"><span class="dp-ic">${IMG('deco_alma_' + Math.max(1, mn)) ? `<img src="${IMG('deco_alma_' + Math.max(1, mn))}" alt=""${mn ? '' : ' class="ta-dim"'}>` : ''}</span><div class="dp-tx"><b>추억 조각 ${memIc}${fmt(S.ta.mem)}${full ? '' : ` / ${mc}`}</b><small>${monTx}</small></div>` +
+    h += `<h3 class="fv-h">모교 기념비 <small>${mn} / ${TA.mon.length}단계</small></h3><div class="dp-list"><div class="dp-row"><span class="dp-ic">${IMG('deco_alma_' + Math.max(1, mn)) ? `<img src="${IMG('deco_alma_' + Math.max(1, mn))}" alt=""${mn ? '' : ' class="ta-dim"'}>` : ''}</span><div class="dp-tx"><b>추억 조각 ${memIc}${fmt(S.ta.mem)}${full ? '' : ` / ${mc}`}</b><small>${monTx}</small></div>` +
       (full ? '<span class="fe-lock">완성</span>' : `<button class="${S.ta.mem < mc ? 'btn-sub' : 'cta'} small" type="button" data-ta="mon">${mn ? '올리기' : '세우기'}</button>`) + '</div></div>';
     return h;
   }
@@ -12062,7 +12236,6 @@ body.mg-on .toast[hidden]{display:none}
   function updateDrops(now) {
     for (const d of rt.drops.slice()) {
       const age = now - d.born;
-      if (autoOn() && age > 700) { collect(d); continue; }   // 자동 줍기 부스터
       if (age > CFG.dropLife) removeDrop(d);
       else if (age > CFG.dropLife - 3000 && !d.g.classList.contains('blink')) d.g.classList.add('blink');
     }
@@ -13481,6 +13654,8 @@ body.mg-on .toast[hidden]{display:none}
     const dy = t0 - sh.getBoundingClientRect().top;
     if (Math.abs(dy) > 4) sh.animate([{ transform: `translateY(${dy.toFixed(0)}px)` }, { transform: 'none' }], { duration: 220, easing: 'ease-out' });
   }
+  // 기다릴 시간 어림: 1시간 안은 분, 이틀 안은 시간, 그 뒤는 날
+  const etaTx = sec => sec < 3600 ? `약 ${Math.max(1, Math.ceil(sec / 60))}분` : sec < 48 * 3600 ? `약 ${Math.round(sec / 3600)}시간` : `약 ${fmt(Math.round(sec / 86400))}일`;
   function renderSheet0() {
     const k = rt.sheetKey; if (!k) return;
     const F = FAC[k], L = S.f[k], c = facCost(k), fr = furReady(k), ok = fr && S.budget >= c, cap = facCap(), maxed = facMaxed(k);
@@ -13613,6 +13788,10 @@ body.mg-on .toast[hidden]{display:none}
     }
     setT($('#sheetNeed'), conOn(k) ? ' ' : maxed ? (semFirst() ? `더 올리려면 1학기를 마쳐야 해요. 1학기 방학식을 열면 Lv.${capNext()}까지 키울 수 있어요` : (finalYear() ? (S.tier === 4 ? `이 학년에서는 다 키웠어요. 학위수여식을 열면 대학원에서 더 키울 수 있어요` : `이 학교급에서는 다 키웠어요. 졸업식을 열면 ${TIERS[S.tier + 1].name}에서 새로 지어요`) : `더 올리려면 학교가 다음 학년으로 올라가야 해요. ${semOn() ? '2학기 ' : ''}종업식을 열면 Lv.${capNext()}까지 키울 수 있어요`)) : !fr ? `가구 네 개를 모두 ${euro('Lv.' + L)} 올리면 건물을 키울 수 있어요` : ok ? ' ' : `도토리 ${fmt(Math.ceil(c - S.budget))}개가 더 필요해요`);
     $('#sheetNeed').classList.toggle('soft', maxed || !fr);
+    // 5.3.2.1: 도토리가 모자라면 지금 수업료로 얼마나 걸리는지, 하루 횟수가 남은 일이 있으면 오늘 할 일로 가는 단추
+    { const r = rate(), sec = !conOn(k) && !maxed && fr && !ok && r > 0 ? (c - S.budget) / r : 0, w = $('#sheetWait');
+      setHid(w, !(sec > 0 && isFinite(sec)));
+      if (sec > 0 && isFinite(sec)) { setT($('#sheetWaitTx'), `수업료로 ${etaTx(sec)}`); setHid($('#sheetWaitGo'), !todoRows().some(x => x.left > 0 && x.T.go !== 'home' && x.T.k !== 'sk')); } }
   }
   // 짓기와 업그레이드 효과. kind 'build'(처음 지음) 또는 'up'. 건물 창이 열려 있으면 닫을 때 보여 줘요
   // 작업지시서 22 그림으로 켜요(코드로 그린 먼지와 별은 어색해서 그림으로 바꿨어요). setBldFx(false)로 끌 수 있어요
@@ -13872,7 +14051,7 @@ body.mg-on .toast[hidden]{display:none}
   }
   function openSn() {
     if (!snOpen()) { toast(S.tier < SN.tier ? '간식 뽑기는 중학교 매점에서 열려요' : '매점을 지으면 간식 뽑기를 할 수 있어요'); return; }
-    snSync(); rt.snRes = null;
+    snSync(); rt.snRes = null; askRowOff();
     const bg = IMG('snack_bg'); $('#snHead').style.backgroundImage = bg ? `url("${bg}")` : '';
     snRender(true); openModal($('#mSn')); sfx('tap');
   }
@@ -14396,7 +14575,7 @@ body.mg-on .toast[hidden]{display:none}
   function openVd() {
     if (!vdOpen()) { toast('마을 기부는 초등학교부터 열려요'); return; }
     const bg = IMG('donate_bg'); $('#vdHead').style.backgroundImage = bg ? `url("${bg}")` : '';
-    $('#vdBtns').dataset.key = ''; vdRender(); openModal($('#mVd')); sfx('tap');
+    $('#vdBtns').dataset.key = ''; askRowOff(); vdRender(); openModal($('#mVd')); sfx('tap');
   }
   function vdRender() {
     const m = $('#mVd'); if (!m || !S || !S.vd) return;
@@ -14518,8 +14697,8 @@ body.mg-on .toast[hidden]{display:none}
     renderMap(); conRender(true); ffRender(true); save();
     return true;
   }
-  // 숲의 정수로 즉시 완료: 남은 시간 5분 이하는 정수 2, 그 위로는 10분마다 4(올림)
-  const CESS = { min5: 2, per10: 4 };
+  // 숲의 정수로 즉시 완료: 남은 시간 5분 이하는 정수 2, 그 위로는 10분마다 5(올림)
+  const CESS = { min5: 2, per10: 5 };   // 5.3.3 woodani A안: 10분마다 4 → 5(단축권보다 조금 비싸게)
   const conEssCost = sec => sec <= 0 ? 0 : sec <= 300 ? CESS.min5 : CESS.per10 * Math.ceil(sec / 600);
   const conEssQuiet = () => !!S && S.ces === gameToday();
   function conEss(k) {
@@ -14740,7 +14919,16 @@ body.mg-on .toast[hidden]{display:none}
     const al = tkAdLeft();
     $('#conAd').setAttribute('aria-disabled', al > 0 ? 'false' : 'true');
     setT($('#conAd'), al > 0 ? `광고 보고 5분권 ${TKAD.n}장 받기 (오늘 ${al}번 남음)` : '오늘 광고 단축권을 다 받았어요');
+    // 5.3.2.2 F-05, H-09: 끝내는 길이 여섯 가지라 칸이 길었어요. 1분 안에 끝나는 공사는 막대만, 그 밖에는 으뜸 단추 하나와 '다른 방법' 접기(길은 모두 그대로 있어요)
+    const short = left < CON_SHORT, ffOk = !$('#conFree').hidden, essOk = S.ess >= conEssCost(left);
+    const main = ffOk ? ['#conFree'] : p.n ? ['#conRow', '#conPlan'] : essOk ? ['#conEss'] : al > 0 ? ['#conAd'] : ['#conEss'];
+    if (rt.conMoreK !== k) { rt.conMoreK = k; rt.conMore = false; }   // 다른 건물 창을 열면 다시 접어요
+    if (rt.conArm || rt.conPick) rt.conMore = rt.conMore || !main.includes('#conRow');   // 고르는 중에는 펼쳐 둬요
+    $$('#sheetCon .con-opt').forEach(el => el.classList.toggle('con-main', main.includes('#' + el.id)));
+    box.classList.toggle('short', short); box.classList.toggle('more-open', !!rt.conMore);
+    const mb = $('#conMore'); mb.setAttribute('aria-expanded', rt.conMore ? 'true' : 'false'); setT(mb, rt.conMore ? '접기' : '다른 방법');
   }
+  const CON_SHORT = 60;   // 초
 
   /* ---------- 선생님 ---------- */
   function buildTeacherCards() {
@@ -14930,8 +15118,11 @@ body.mg-on .toast[hidden]{display:none}
     const from = S.away && S.away.from > 0 ? S.away.from : S.savedAt;
     if (!timeSrc()) { awayApply((gameNow() - from) / 1000); return; }
     rt.awayWait = { from, skip: (S.away && S.away.skip) || 0, perf: (document.hidden || rt.paused) ? null : perfNow() };
-    if (serverTimeOk()) awaySettle();
+    if (serverTimeOk()) { awaySettle(); return; }
+    // 5.3.2.1: 인터넷 없이 켜면 서버 시간이 올 때까지 보상이 말없이 미뤄져서 '보상이 사라졌다'로 보였어요. 6초 뒤에도 기다리고 있으면 한 줄 알려요
+    if (gameNow() - from >= CFG.awayModalSec * 1000) setTimeout(() => { if (rt.awayWait && rt.awayWait.from === from && !serverTimeOk()) toast('인터넷이 이어지면 자리 비운 보상을 드려요'); }, AWAY_WAIT_MS);
   }
+  const AWAY_WAIT_MS = 6000;
   // 켠 뒤 논 시간(skip)은 화면이 보이고 학교가 열려 있는 동안만 세요. 앱을 내리거나 학교를 닫으면 멈췄다가, 다시 열면 이어 세요
   function awaySkip(w) { return w.skip + (w.perf == null ? 0 : perfNow() - w.perf); }
   function awayHold(stop) {
@@ -15190,9 +15381,6 @@ body.mg-on .toast[hidden]{display:none}
     const on = feastOn();
     setHid($('#feastChip'), !on);
     if (on) setTx($('#feastTime'), clock(Math.ceil((S.hd.feastUntil - gameNow()) / 1000)));
-    const au = autoOn();
-    setHid($('#autoChip'), !au);
-    if (au) setTx($('#autoTime'), clock(Math.ceil((S.autoUntil - gameNow()) / 1000)));
   }
   function openDeal() {
     if (rt.paused || rt.modalOpen || !rt.deal) return;
@@ -15288,13 +15476,16 @@ body.mg-on .toast[hidden]{display:none}
        forest/rank/<내 id>   랭킹 이름과 학교 점수
        forest/stats/<내 id>  테스트 현황 (어디까지 했는지, 얼마나 했는지)
      <내 id>는 Firebase 익명 로그인이 기기(브라우저)마다 만들어 줘요. */
-  const VERSION = '5.3.2';
-  const NT_QUIET = ['5.3.0.3', '5.3.0.2', '5.3.0.1', '5.2.2', '5.2.1', '5.2.0.2', '5.2.0.1', '5.1.1.3', '5.1.1.2', '5.1.1.1', '5.1.1', '5.0.3.1', '5.0.3', '5.0.2.2', '5.0.2.1', '2.1.20', '2.1.2.2', '2.3.0.1', '2.3.4', '3.2.3', '3.2.4', '3.2.5', '3.3.1', '3.3.2', '3.3.3', '4.4.1.1', '4.4.1.2', '4.4.1.3', '4.4.1.4', '5.0.1.1', '5.0.1.2', '5.0.1.3', '5.0.1.4', '5.0.1.5', '5.0.1.6', '5.0.1.7', '5.0.1.8'];   // 생물 탐사 고침은 공지 없이. 도 공지 없이(공지 줄은 정하면 넣어요). 공지 없이. 공지 줄은 woodani가 정할 때까지 조용히. 공지는 2026-11-16 woodani가 정해서 NOTICES로 옮겼어요. 은 공지를 띄워요. 도 공지 없이. 도 공지 창 없이. 도 공지 창 없이(공지는 그대로). 도 조용히. 도 공지 창 없이(공지 줄을 고르지 않음)
+  const VERSION = '5.3.3';
+  const NT_QUIET = ['5.3.2.1', '5.3.0.3', '5.3.0.2', '5.3.0.1', '5.2.2', '5.2.1', '5.2.0.2', '5.2.0.1', '5.1.1.3', '5.1.1.2', '5.1.1.1', '5.1.1', '5.0.3.1', '5.0.3', '5.0.2.2', '5.0.2.1', '2.1.20', '2.1.2.2', '2.3.0.1', '2.3.4', '3.2.3', '3.2.4', '3.2.5', '3.3.1', '3.3.2', '3.3.3', '4.4.1.1', '4.4.1.2', '4.4.1.3', '4.4.1.4', '5.0.1.1', '5.0.1.2', '5.0.1.3', '5.0.1.4', '5.0.1.5', '5.0.1.6', '5.0.1.7', '5.0.1.8'];   // 생물 탐사 고침은 공지 없이. 도 공지 없이(공지 줄은 정하면 넣어요). 공지 없이. 공지 줄은 woodani가 정할 때까지 조용히. 공지는 2026-11-16 woodani가 정해서 NOTICES로 옮겼어요. 은 공지를 띄워요. 도 공지 없이. 도 공지 창 없이. 도 공지 창 없이(공지는 그대로). 도 조용히. 도 공지 창 없이(공지 줄을 고르지 않음)
     // 이 버전들은 업데이트해도 공지 창을 띄우지 않아요(공지는 그대로)
   /* 공지사항 (은 이미 올려서 부터): 설정 > 공지사항. 맨 위가 가장 새 공지예요
      패치노트는 자동으로 넣지 않아요. woodani가 검수한 글만 여기에 적어요(CHANGELOG.md는 자세한 기록용이라 따로 있어요)
      접속하면 새 공지 창을 띄워요(올라온 뒤 7일 동안, '일주일간 열지 않기'를 누르면 7일 쉬어요). 업데이트한 뒤 첫 접속에는 쉬는 중이어도 한 번 띄워요 */
   const NOTICES = [
+    // 공지(짧게, woodani 고름). 5.3.2.1 웹 고침, 누르는 곳과 받기, 상점 새 진열과 값 조정, 이달의 꾸미기를 앱으로 묶음
+    { id: '2026-11-22-v533', date: '2026-11-22', tag: '업데이트', title: '5.3.3 업데이트',
+      lines: ['새 상점 진열과 편의 개선'] },
     // 공지(고른 두 줄). 5.3.2 웹 5.3.1.1과 빨간 점, 처음 안내를 앱으로 묶음
     { id: '2026-11-22-v532', date: '2026-11-22', tag: '업데이트', title: '5.3.2 업데이트',
       lines: ['도감 모두 쓰다듬기 추가', '편의 개선과 오류 수정'] },
@@ -16837,11 +17028,11 @@ body.mg-on .toast[hidden]{display:none}
 
   /* ---------- 황금 도토리와 꾸미기 상점 ----------
      황금 도토리는 돈으로 사지 않고 모으기만 해요. 1.1.0부터 광고의 값어치를 올리려고 광고가 아닌 보상은 모두 1개로 줄였어요:
-     광고마다 1개(3.0.0 조정안 3, 예전 3개. 상점 광고와 합쳐 하루 3번), 어려운 퀘스트와 출석 등의 보상은 각각 정해진 양을 줘요.
+     광고마다 1개(3.0.0 조정안 3, 예전 3개. 5.3.3부터 상점 광고와 따로 하루 3번), 어려운 퀘스트와 출석 등의 보상은 각각 정해진 양을 줘요.
      쓰는 곳은 꾸미기와 테마 세트(계속 남아요), 부스터(1회 사용 가능). 뽑기 없이 정해진 값으로만 팔아요.
      토스 미니앱에서는 광고 그룹의 보상 이름을 '황금 도토리', 수량을 3으로 맞춰 두면 광고 화면에도 똑같이 보여요. */
-  const GOLD = { hard: 1, adDay: 3, ad: 1, shopAd: 3, shopAdN: 3, att: 1, att7: 1, chapter: 1, grad: 1, promote: 1, rich: 60, essPer: 20 };
-  // 지금까지 받은 황금 도토리가 60개(테마를 체험할 만큼)를 넘으면, 매일 매주 되풀이해 나오는 곳은 황금 도토리 1개 대신 숲의 정수 20을 줘요
+  const GOLD = { hard: 1, adDay: 3, ad: 1, shopAd: 3, shopAdN: 3, att: 1, att7: 1, chapter: 1, grad: 1, promote: 1, rich: 60, essPer: 10 };   // 5.3.3 woodani: 60개 뒤 바뀌는 정수 20 → 10. 광고 황금은 일반 광고(adDay)와 상점 광고(shopAd)를 따로 세요
+  // 지금까지 받은 황금 도토리가 60개(테마를 체험할 만큼)를 넘으면, 매일 매주 되풀이해 나오는 곳은 황금 도토리 1개 대신 숲의 정수 10(5.3.3 전에는 20)을 줘요
   // 광고, 상점 광고, 축제와 대축제 도장판, 이벤트 기념 상자, 장 끝, 졸업, 학교급 올라가기, 마을 기부, 한 번만 나오는 보상은 그대로예요
   const goldRich = () => !!S && (S.st.gold || 0) >= GOLD.rich;
   function goldOr(n, why) {
@@ -16889,6 +17080,7 @@ body.mg-on .toast[hidden]{display:none}
   };
   /* 꾸미기 백화점 값(속도와 경제 재설계안 3절, Fable). 황금 도토리는 큰 꾸미기에만 써요(힘은 사지 않아요)
      테마 세트는 한 번에만 사요(이미 그 테마 배경을 샀으면 10 빼요). 옷 세트는 이미 산 조각의 옛 값만큼 빼요 */
+  const ASK_GOLD = 30;   // 5.3.3 이 값 이상인 황금 품목만 사기 전에 한 번 더 물어요(docs/SHOP-2026-11.md)
   const GSHOP = { theme: 60, themeBgOff: 10, outfit: 25, outfitMin: 5, evDeco: 20, mark: 30 };
   const OUTFITS = [
     { id: 'ball', name: '야구 소년', hat: 'cap', neck: 'bandana' }, { id: 'snow', name: '겨울 산책', hat: 'beanie', neck: 'scarf' },
@@ -16914,6 +17106,15 @@ body.mg-on .toast[hidden]{display:none}
     ['science', '실험 고글'], ['children', '바람개비 모자'], ['buddha', '연꽃 머리 장식'], ['final', '연필 머리띠'], ['vacation', '물안경'], ['liberation', '무궁화 머리핀'],
     ['fall', '해바라기 모자'], ['chuseok', '보름달 머리띠'], ['hangul', '꼬마 갓'], ['trip_fall', '단풍 베레모']];
   for (const [k, name] of EV_HAT) COS.hat.items.push({ id: 'ev_' + k, name, price: 0, evh: 1, img: 1 });
+  /* 5.3.3 이달의 꾸미기(docs/SHOP-2026-11.md 4.4, 작업지시서 108): 달마다 깃발, 교문 아치, 학생 모자. 황금 도토리로 사고 힘은 없어요.
+     그달에는 백화점 '이달의 꾸미기'에, 지난 달 것은 '놓친 장식'에 같은 값으로 나와요(woodani). start 달부터 세요 */
+  const GMON = { flag: 20, gate: 30, hat: 25, start: '2026-11',
+    nm: [['새해 해돋이 깃발', '복주머니 아치', '털 방울 비니'], ['하트 잎 깃발', '연 날리는 아치', '색동 귀마개'], ['새싹 깃발', '입학 꽃 아치', '새싹 머리띠'],
+      ['벚꽃 깃발', '벚꽃 아치', '꽃잎 화관'], ['카네이션 깃발', '바람개비 아치', '소풍 밀짚모자'], ['수국 깃발', '장미 덩굴 아치', '우비 모자'],
+      ['파도 깃발', '조개 아치', '수영 모자'], ['해바라기 깃발', '수박 아치', '해바라기 모자'], ['보름달 깃발', '송편 등불 아치', '토끼 귀 머리띠'],
+      ['단풍 깃발', '호박 아치', '단풍잎 베레모'], ['도토리 깃발', '낙엽 아치', '도토리 털모자'], ['눈송이 깃발', '겨울 화환 아치', '귀마개 털모자']] };
+  const gmKey = m => String(m).padStart(2, '0');
+  GMON.nm.forEach(([, , hat], i) => COS.hat.items.push({ id: 'mon' + gmKey(i + 1), name: hat, price: 0, gm: i + 1, img: 1 }));
   const evHatArt = id => !!IMG('cos_hat_' + id);
   const COS_IDS = new Set(Object.keys(COS).flatMap(k => COS[k].items.map(it => k + ':' + it.id)));
   MARKX.forEach(([x]) => COS_IDS.add('mkx:' + x)); COS_IDS.add(NIGHT_KEY);
@@ -17081,33 +17282,29 @@ body.mg-on .toast[hidden]{display:none}
   // 테마 세트는 한 번에만 사요(값 60, 그 테마 배경을 이미 샀으면 50). 이미 산 칸은 그대로 칸마다 쓰고 벗을 수 있어요
   const thSetPrice = t => GSHOP.theme - (thOwn(t, 'bg') ? GSHOP.themeBgOff : 0);
   function renderThemes(coin) {
-    let h = `<h3 class="shop-h">테마 세트 <small>지도, 지붕 색, 테마 곡 한 벌. 가지면 수업료 +3%</small></h3>`;
+    let h = `<h3 class="shop-h" data-cat="테마">테마 세트 <small>메인 화면, 배경 음악 | 모음 보상: 세트당 수업료 +3%</small></h3>`;   // 5.3.3 설명은 머리에 한 번
     for (const t of THEMES) {
       const n = thCount(t.id), done = n === TH_SLOTS.length;
       const playing = Music.preview === t.id;
-      h += `<div class="th-card${done ? ' done' : ''}"><div class="th-top"><b>${t.name}</b><button class="th-play${playing ? ' on' : ''}" type="button" data-play="${t.id}" aria-pressed="${playing}">${playing ? '♪ 듣는 중' : '♪ 테마 곡 듣기'}</button><button class="th-play th-prev" type="button" data-thprev="${t.id}">미리 보기</button><span class="th-prog">${done ? '가졌어요' : n ? n + '/' + TH_SLOTS.length : ''}</span></div>` +
+      const open = rt.thOpen === t.id;   // 5.3.3 테마 세트는 접힌 줄로, 누르면 펼쳐요
+      h += `<div class="th-card${done ? ' done' : ''}${open ? ' open' : ' fold'}"><button class="th-fold" type="button" data-thfold="${t.id}" aria-expanded="${open}"><span class="th-sw">${thArt(t, 'bg')}</span><span class="th-nm"><b>${t.name}</b><small>${done ? '세트를 다 가졌어요' : `${n} / ${TH_SLOTS.length}칸 가짐`}</small></span>${done ? '<span class="pill own">가졌어요</span>' : `<span class="pill">${coin}${thSetPrice(t.id)}</span>`}</button>`;
+      h += `<div class="th-body"><div class="th-top"><b>${t.name}</b><button class="th-play${playing ? ' on' : ''}" type="button" data-play="${t.id}" aria-pressed="${playing}">${playing ? '♪ 듣는 중' : '♪ 테마 곡 듣기'}</button><button class="th-play th-prev" type="button" data-thprev="${t.id}">미리 보기</button><span class="th-prog">${done ? '가졌어요' : n ? n + '/' + TH_SLOTS.length : ''}</span></div>` +
         (done ? '' : (() => { const p = thSetPrice(t.id), poor = S.gold < p;
           return `<button class="th-all${poor ? ' poor' : ''}" type="button" data-buy="s:${t.id}"><span>${n ? `남은 ${TH_SLOTS.length - n}칸까지 세트로 사기` : '세트 사기'}${thOwn(t.id, 'bg') ? ` <small>배경 산 값 ${GSHOP.themeBgOff} 빼 줌</small>` : ''}</span><b>${thOwn(t.id, 'bg') ? `<s>${GSHOP.theme}</s>` : ''}${coin}${p}</b></button>`; })()) +
         (() => { const own = TH_SLOTS.filter(([sl]) => thOwn(t.id, sl)), on = own.every(([sl]) => S.cos.th[sl] === t.id);
           return own.length >= 2 ? `<button class="th-apply${on ? ' on' : ''}" type="button" data-apply="${t.id}" aria-pressed="${on}">${on ? '이 테마를 모두 쓰는 중' : done ? '이 테마로 한 번에 바꾸기' : `가진 ${own.length}개 한 번에 쓰기`}</button>` : ''; })() +
-        `<p class="th-bonus">${done ? `세트 효과 수업료 +${t.bonus}% 받는 중` : `세트를 가지면 수업료 +${t.bonus}%, 학교 배경음악도 바뀌어요.`}</p><div class="shop-grid">`;
+        (done ? `<p class="th-bonus">모음 보상 수업료 +${t.bonus}% 받는 중</p>` : '') + '<div class="shop-grid">';
       for (const [slot, sname] of TH_SLOTS) {
         const own = thOwn(t.id, slot), on = S.cos.th[slot] === t.id;
         const pr = on ? '쓰는 중' : own ? '쓰기' : '세트로';
         h += `<button class="si${own ? ' own' : ' lock'}${on ? ' on' : ''}" type="button" data-buy="t:${t.id}:${slot}" aria-pressed="${on}" aria-label="${t.name} ${sname}">` +
           `<span class="pv">${thArt(t, slot)}</span><span class="nm">${sname}</span><span class="pr">${pr}</span></button>`;
       }
-      h += '</div></div>';
+      h += '</div></div></div>';
     }
     return h;
   }
   TH_IDS.forEach(id => COS_IDS.add(id));
-  const BOOSTERS = {
-    feast: { name: '특식 데이 10분', desc: '10분 동안 수업료 +100%예요', price: 3 },
-    skip: { name: '30분 건너뛰기', desc: '30분 동안 모일 도토리를 바로 받아요', price: 5 },
-    auto: { name: '도토리 자동 줍기 10분', desc: '떨어진 도토리를 알아서 주워요', price: 3 }
-  };
-  const BOOST_ALL = () => { const full = Object.values(BOOSTERS).reduce((a, b) => a + b.price, 0); return { full, price: Math.ceil(full * 0.9) }; };   // 11 → 10
   const BOOST_ART = {
     feast: '<svg viewBox="-12 -12 24 24" aria-hidden="true"><path d="M-9 -1 H9 Q8.4 8 0 8.6 Q-8.4 8 -9 -1 Z" class="c-wall"/><path d="M-9 -1 H9" class="s-hatband"/><path d="M-6 -2 Q-6 -7 -2 -6.4 Q0 -9.4 3 -7 Q7 -7.6 6.4 -2 Z" class="c-dip"/><path d="M4 -10 L8 -3" stroke="#8A5D3B" stroke-width="1.2" stroke-linecap="round"/></svg>',
     skip: '<svg viewBox="-12 -12 24 24" aria-hidden="true"><circle r="9" class="c-clock"/><path d="M0 -5.6 V0 L4 2.6" fill="none" stroke="#6D4828" stroke-width="1.8" stroke-linecap="round"/></svg>',
@@ -17120,8 +17317,7 @@ body.mg-on .toast[hidden]{display:none}
   const hardQ = (q, sub) => !!q && (!sub || String(q.id)[0] === 's') && (q.t === 'teaAll' || q.t === 'rate' ||
     (q.t === 'students' && q.n >= 50) || (q.t === 'fac' && q.n >= 10 && !q.step) || (q.t === 'picks' && q.n >= 15) ||
     (q.t === 'trips' && q.n >= 3) || q.t === 'souv' || q.t === 'tripat' || q.t === 'sports' || q.t === 'fest');
-  const autoOn = () => !!S && gameNow() < S.autoUntil;
-  function goldDay() { const t = gameToday(); if (dayRoll(S.gd, t)) { S.gd.n = 0; S.gd.shop = 0; } }
+  function goldDay() { const t = gameToday(); if (dayRoll(S.gd, t)) { S.gd.n = 0; S.gd.shop = 0; S.gd.a = 0; } }
   function addGold(n) {
     if (!(n > 0)) return;
     S.gold += n; S.st.gold += n;
@@ -17131,9 +17327,9 @@ body.mg-on .toast[hidden]{display:none}
     if (rt.tab === 'shop') renderShop();
     if (rt.tab === 'street') renderStreet();
   }
-  // 광고를 끝까지 보면 덤으로 3개 (상점 광고와 합쳐 하루 3번까지)
+  // 광고를 끝까지 보면 덤으로 1개(일반 광고 하루 3번. 상점 광고 3번은 따로)
   // 광고를 끝까지 보면 받는 황금 도토리가 보이지 않았어요. 보상 창 뒤에 한 줄로 알려요
-  function adGold() { goldDay(); if (S.gd.n >= GOLD.adDay) return; S.gd.n += 1; addGold(GOLD.ad); setTimeout(() => toast(`광고 선물! 황금 도토리 +${GOLD.ad} (오늘 ${S.gd.n}/${GOLD.adDay})`), 1300); }
+  function adGold() { goldDay(); if ((S.gd.a || 0) >= GOLD.adDay) return; S.gd.a = (S.gd.a || 0) + 1; S.gd.n += 1; addGold(GOLD.ad); setTimeout(() => toast(`광고 선물! 황금 도토리 +${GOLD.ad} (오늘 ${S.gd.a}/${GOLD.adDay})`), 1300); }
   /* ---------- 4.3.0 숲속 탐험대 (프로젝트 문서 '4.3.0 설계안 (숲속 탐험대) 초안', woodani 결정 2026-11-14) ----------
      밤마다 학교 곳곳에 숲의 장난꾸러기들이 와요. 학생 동물 대원이 1층, 2층… 끝없이 탐험해요. 숫자는 모두 본부 제안(dev/tamsim.py로 재요).
      이름: 시험 기간이 EX를 써서 탐험은 TAM, 저장 S.tam. 다른 곳에서 먼저 불려도 멈추지 않게 var */
@@ -17972,7 +18168,7 @@ body.mg-on .toast[hidden]{display:none}
     const left = TAM.adSpd.n - S.tam.ad.spd;
     rb(sb, 'ex4_ic_speed', tamSpdOn() ? hms(S.tam.spd.sec * 1000) : '광고 2배속', `${left}`, !tamSpdOn() || left > 0, tamSpdOn() ? `2배속 ${hms(S.tam.spd.sec * 1000)} 남음` : `광고 보고 2배속 ${TAM.adSpd.min}분, 오늘 ${left}번 남음`);
     const ab = $('#tmAuto'); ab.hidden = !tamAutoOn(); ab.setAttribute('aria-pressed', S.tam.auto ? 'true' : 'false'); rb(ab, 'ex4_ic_auto', S.tam.auto ? '필살기 자동' : '필살기 수동', '', false, S.tam.auto ? '필살기 자동 켬' : '필살기 자동 끔');
-    { const so = $('#tmSkOff'); so.hidden = !S.tam.skSeen; so.setAttribute('aria-pressed', S.tam.skOff ? 'true' : 'false'); rb(so, 'ex4_ic_report', S.tam.skOff ? '필살기 연출 짧게' : '필살기 연출 보기', '', false, S.tam.skOff ? '필살기 연출 건너뛰기 켬' : '필살기 연출 건너뛰기 끔'); }   // 필살기를 한 번 본 뒤에 생겨요
+    { const so = $('#tmSkOff'); so.hidden = !S.tam.skSeen; so.setAttribute('aria-pressed', S.tam.skOff ? 'true' : 'false'); rb(so, 'ex4_ic_report', S.tam.skOff ? '연출 짧게' : '연출 보기', '', false, S.tam.skOff ? '필살기 연출 건너뛰기 켬' : '필살기 연출 건너뛰기 끔'); }   // 필살기를 한 번 본 뒤에 생겨요
     { const sk = $('#tmSkip'), to = tamSkipTo(); sk.hidden = !to; if (to) { rb(sk, 'ex_flag', '빠르게 넘기', `${fmt(to)}층`, false, `빠르게 넘기: ${fmt(to)}층까지 한 번에 넘어가요`);
       if (rt.tamSkTo !== to && (!rt.tamSkTo || to > rt.tamSkTo + 9)) tamToast(`누르면 ${fmt(to)}층까지 빠르게 넘길 수 있어요`); } rt.tamSkTo = to; }
     const T = rt.tam, rv = $('#tmRevive'), cl = tamCheerLeft(); rv.hidden = !(S.tam.cheer > 0 || (T && T.lose && cl > 0));   // 지면 응원 단추, 응원 중에는 남은 층
@@ -18202,7 +18398,8 @@ body.mg-on .toast[hidden]{display:none}
     rt.thPrev = { id, th }; Music.preview = ''; rt.thScroll = $('#scroller').scrollTop;   // 돌아오면 그 자리로
     sfx('tap'); setTab('school'); applyCos(); ensureAudio(true); musicSync();
     const b = $('#thPrevBar');
-    if (b) { $('#thPrevName').textContent = `${T.name} 세트 미리 보기`; b.hidden = false; }
+    if (b) { $('#thPrevName').textContent = `${T.name} 세트 미리 보기`; b.hidden = false;
+      const by = $('#thPrevBuy'), own = TH_SLOTS.every(([sl]) => thOwn(id, sl)); by.hidden = own; if (!own) by.innerHTML = `사기 <svg viewBox="-8 -11 16 20" aria-hidden="true">${GOLD_ICON.slice(GOLD_ICON.indexOf('>') + 1, -6)}</svg>${thSetPrice(id)}`; }   // 5.3.3 미리 보다가 바로 사기
     if (!S.bgm && SONGS[id]) toast('미리 보기 곡만 나와요\n배경음악은 설정에서 켤 수 있어요');
   }
   function thPreviewEnd(quiet) {
@@ -18251,7 +18448,7 @@ body.mg-on .toast[hidden]{display:none}
       const u = IMG(el.dataset.front) || (el.dataset.fb && IMG(el.dataset.fb));
       el.classList.toggle('fb', !IMG(el.dataset.front));
       if (u) el.style.backgroundImage = `url("${u}")`;
-    });
+    });    shopChrome('street'); renderShelf(); renderShopMore();   // 5.3.3 재화 줄, 오늘의 진열대, 다른 가게
   }
   function openShop() {
     if (rt.modalOpen) closeModal(rt.modalOpen);
@@ -18272,19 +18469,21 @@ body.mg-on .toast[hidden]{display:none}
     goldDay();
     $('#shopHave').innerHTML = GOLD_ICON + '<span></span>';
     $('#shopHave span').textContent = fmt(S.gold);
-    const left = Math.max(0, Math.min(GOLD.shopAd - S.gd.shop, GOLD.adDay - S.gd.n));
+    const left = Math.max(0, GOLD.shopAd - S.gd.shop);   // 5.3.3 상점 광고만 세요
     $('#shopAd').setAttribute('aria-disabled', left > 0 ? 'false' : 'true');
     renderAdStamp();
-    $('#shopAdLeft').textContent = left > 0 ? `오늘 광고 황금 도토리를 ${left}번 더 받을 수 있어요` : '오늘 광고 황금 도토리를 모두 받았어요. 내일 다시 열려요';
+    $('#shopAdLeft').textContent = left > 0 ? `오늘 상점 광고를 ${left}번 더 볼 수 있어요` : '오늘 상점 광고를 모두 봤어요. 내일 다시 열려요';
     const coin = `<svg viewBox="-8 -11 16 20" aria-hidden="true">${GOLD_ICON.slice(GOLD_ICON.indexOf('>') + 1, -6)}</svg>`;
     let h = renderThemes(coin);
+    // 5.3.3 이달의 꾸미기
+    h += `<h3 class="shop-h" data-cat="이번 달">${gmNow()}월의 꾸미기 <small>이번 달 한정. 지나면 놓친 장식에서 같은 값으로</small></h3><div class="shop-grid">${gmTiles(gmItems(gmNow()), coin)}</div>`;
     // 학생 옷 세트: 모자와 목 장식 한 벌
     h += `<h3 class="shop-h">학생 옷 세트 <small>모자와 목 장식 한 벌</small></h3><div class="shop-grid">`;
     for (const o of OUTFITS) {
       const own = ofOwn(o), on = own && ofOn(o), p = ofPrice(o), poor = !own && S.gold < p;
-      const pr = on ? '입는 중' : own ? '입기' : `${coin}${p}`;
+      const pr = on ? '쓰는 중' : own ? '쓰기' : `${coin}${p}`;   // 5.3.3 가진 것의 말은 '쓰기' 하나로
       h += `<button class="si${own ? ' own' : ''}${on ? ' on' : ''}${poor ? ' poor' : ''}" type="button" data-buy="o:${o.id}" aria-pressed="${on}" aria-label="${o.name}${own ? '' : `, 황금 도토리 ${p}개`}">` +
-        `<span class="pv"><svg viewBox="-11 -13.5 22 27" aria-hidden="true">${kidSVG('bear', 0, { hat: o.hat, neck: o.neck })}</svg></span><span class="nm">${o.name}</span><span class="pr">${pr}</span></button>`;
+        `<span class="pv"><svg viewBox="-11 -13.5 22 27" aria-hidden="true">${kidSVG('bear', 0, { hat: o.hat, neck: o.neck })}</svg></span><span class="nm">${o.name}</span><span class="pr">${pr}</span>${own ? '' : lackTx(p, S.gold)}</button>`;
     }
     h += '</div>';
     // 옷장: 세트 밖에서 받은 모자(주간 상자, 이벤트, 꾸미기 가게 한정 모자)와 옛 조각을 하나씩 입고 벗어요
@@ -18296,34 +18495,32 @@ body.mg-on .toast[hidden]{display:none}
       for (const [cat, it] of ward.concat(half)) {
         const on = S.cos[cat] === it.id;
         h += `<button class="si own${on ? ' on' : ''}" type="button" data-buy="c:${cat}:${it.id}" aria-pressed="${on}">` +
-          `<span class="pv">${cosArt(cat, it)}</span><span class="nm">${it.name}</span><span class="pr">${on ? '입는 중' : '입기'}</span></button>`;
+          `<span class="pv">${cosArt(cat, it)}</span><span class="nm">${it.name}</span><span class="pr">${on ? '쓰는 중' : '쓰기'}</span></button>`;
       }
       h += '</div>';
     }
     // 놓친 이벤트 장식
-    const miss = evRestock();
+    const miss = evRestock(), gmp = gmPast().flatMap(gmItems).filter(x => !x.own);
+    if (gmp.length) h += `<h3 class="shop-h" data-cat="놓친 장식">지난 달의 꾸미기 <small>그달 값 그대로</small></h3><div class="shop-grid">${gmTiles(gmp, coin)}</div>`;
     if (miss.length) {
-      h += `<h3 class="shop-h">놓친 이벤트 장식 <small>지난 이벤트 것만, 하나씩</small></h3><div class="shop-grid">`;
+      h += `<h3 class="shop-h"${gmp.length ? '' : ' data-cat="놓친 장식"'}>놓친 이벤트 장식 <small>지난 이벤트 것만, 하나씩</small></h3><div class="shop-grid">`;
       for (const d of miss) {
         const poor = S.gold < GSHOP.evDeco;
         h += `<button class="si${poor ? ' poor' : ''}" type="button" data-buy="e:${d.id}" aria-label="${d.name}, 황금 도토리 ${GSHOP.evDeco}개"><span class="rare-mark" aria-hidden="true">★</span>` +
-          `<span class="pv deco"><img src="${IMG(d.img)}" alt="" draggable="false"></span><span class="nm">${d.name}</span><span class="pr">${coin}${GSHOP.evDeco}</span></button>`;
+          `<span class="pv deco"><img src="${IMG(d.img)}" alt="" draggable="false"></span><span class="nm">${d.name}</span><span class="pr">${coin}${GSHOP.evDeco}</span>${lackTx(GSHOP.evDeco, S.gold)}</button>`;
       }
       h += '</div>';
     }
     // 학교 마크 특별판
-    h += `<h3 class="shop-h">학교 마크 특별판 <small>마크 위에 덧입혀요</small></h3><div class="shop-grid">`;
+    h += `<h3 class="shop-h" data-cat="마크">학교 마크 특별판 <small>마크 위에 덧입혀요</small></h3><div class="shop-grid">`;
     const mk = S.deco.mk || [0, 0, 3, 2];
     for (const [x, nm] of MARKX) {
       const own = S.cos.own.includes('mkx:' + x), on = S.cos.mkx === x, poor = !own && S.gold < GSHOP.mark;
       h += `<button class="si${own ? ' own' : ''}${on ? ' on' : ''}${poor ? ' poor' : ''}" type="button" data-buy="m:${x}" aria-pressed="${on}" aria-label="학교 마크 ${nm}${own ? '' : `, 황금 도토리 ${GSHOP.mark}개`}">` +
-        `<span class="pv">${markHTML(mk, x)}</span><span class="nm">${nm}</span><span class="pr">${on ? '쓰는 중' : own ? '쓰기' : `${coin}${GSHOP.mark}`}</span></button>`;
+        `<span class="pv">${markHTML(mk, x)}</span><span class="nm">${nm}</span><span class="pr">${on ? '쓰는 중' : own ? '쓰기' : `${coin}${GSHOP.mark}`}</span>${own ? '' : lackTx(GSHOP.mark, S.gold)}</button>`;
     }
     h += '</div>';
-    // 이름 바꾸기(랭킹)
-    { const np = nickPrice();
-      h += `<h3 class="shop-h">이름 바꾸기</h3><div class="sb"><span class="pv">${GOLD_ICON}</span><span class="tx"><b>교장 선생님 이름</b><span>랭킹에 보이는 이름을 바꿔요</span><small>${np ? `바꿀 때 황금 도토리 ${np}개` : '처음 정할 때는 공짜예요'}</small></span>` +
-        `<button class="buy" type="button" data-buy="r">랭킹에서</button></div>`; }
+    // 이름 바꾸기(랭킹)는 5.3.3부터 설정 > 학교 간판과 마크 아래(#optNick, 같은 길)
     const list = $('#shopList'), top = list.scrollTop;
     list.innerHTML = h;
     list.scrollTop = top;
@@ -18334,7 +18531,7 @@ body.mg-on .toast[hidden]{display:none}
       const enough = S.gold >= it.price;
       $('#shopAskText').textContent = enough ? `${it.name}${it.ga} 황금 도토리 ${it.price}개로 살까요?` : `황금 도토리가 ${it.price - S.gold}개 모자라요.`;
       $('#shopYes').textContent = enough ? '사기' : '광고 보고 모으기';
-    }
+    }    shopChrome('shop');
   }
   // '파란 야구모자를', '밀짚모자를'처럼 받침에 맞는 조사
   const eulOf = w => { const c = w.charCodeAt(w.length - 1) - 0xAC00; return c >= 0 && c <= 11171 && c % 28 ? '을' : '를'; };
@@ -18350,6 +18547,10 @@ body.mg-on .toast[hidden]{display:none}
     if (t === 'e') { const d = DECO_BY[a]; return d && d.ev && evDecoArt(d) && !decoOwn(d.id) && evPastIds().includes(d.id.slice(3)) ? { kind: 'e', d, name: d.name, ga: eulOf(d.name), price: GSHOP.evDeco } : null; }
     if (t === 'm' && MARKX.some(([x]) => x === a)) { const nm = `학교 마크 ${MARKX.find(([x]) => x === a)[1]}`; return { kind: 'm', x: a, name: nm, ga: eulOf(nm), price: S.cos.own.includes('mkx:' + a) ? 0 : GSHOP.mark }; }
     if (t === 'r') return { kind: 'r', name: '이름 바꾸기', price: 0 };
+    if (t === 'g' && /^\d\d$/.test(a) && +a >= 1 && +a <= 12 && (+a === gmNow() || gmPast().includes(+a))) {   // 5.3.3 이달의 꾸미기(그달과 지난 달만)
+      const x = gmItems(+a).find(y => y.kind === b); if (!x) return null;
+      return { kind: 'g', gk: b, x, name: x.name, ga: eulOf(x.name), price: x.own ? 0 : x.price };
+    }
     const it = t === 'c' && COS[a] && COS[a].items.find(x => x.id === b);
     return it && S.cos.own.includes(a + ':' + b) ? { kind: 'c', cat: a, id: b, name: it.name, ga: eulOf(it.name), price: 0 } : null;   // 하나씩은 산 것만 입고 벗어요
   }
@@ -18387,8 +18588,15 @@ body.mg-on .toast[hidden]{display:none}
       toast(S.cos.mkx ? (S.deco.mk ? `${it.name}${it.ga} 썼어요` : `${it.name}${it.ga} 골랐어요. 꾸미기 가게에서 학교 마크를 정하면 보여요`) : '마크를 원래대로 돌렸어요');
       return;
     }
+    if (it.kind === 'g' && !it.price) {   // 산 이달의 꾸미기: 모자는 입고 벗어요, 장식은 지도에 놓아요
+      rt.shopPick = '';
+      if (it.gk === 'hat') { S.cos.hat = S.cos.hat === it.x.id ? '' : it.x.id; applyCos(); save(); renderShop(); toast(S.cos.hat ? `${it.name}${it.ga} 입혔어요` : `${it.name}${it.ga} 벗었어요`); }
+      else toast(`${it.name}${it.ga} 가지고 있어요. 꾸미기 가게의 '지도 꾸미기'로 놓아요`);
+      return;
+    }
     if (it.kind === 'r') { rt.shopPick = ''; setTab('rank'); rt.rankEdit = true; renderRankPanel(); const i = $('#rankName'); if (i) i.focus(); return; }
     rt.shopPick = pick;
+    if (it.price && it.price < ASK_GOLD && S.gold >= it.price) { buyShop(); return; }   // 5.3.3 큰 값(황금 30 이상)만 한 번 더 물어요
     renderShop();
   }
   function buyShop() {
@@ -18400,7 +18608,7 @@ body.mg-on .toast[hidden]{display:none}
     if (it.kind === 's') {
       for (const [sl] of TH_SLOTS) { if (!thOwn(it.th, sl)) S.cos.own.push(`th:${it.th}:${sl}`); S.cos.th[sl] = it.th; }
       applyCos();
-      toast(`${THEME[it.th].name} 세트를 샀어요! 학교 전체를 꾸몄고 수업료가 ${THEME[it.th].bonus}% 올랐어요`);
+      toast(`${THEME[it.th].name} 세트를 샀어요! 학교 전체를 꾸몄고 모음 보상으로 수업료가 ${THEME[it.th].bonus}% 올랐어요`);
     } else if (it.kind === 'o') {
       for (const [cat, id] of [['hat', it.o.hat], ['neck', it.o.neck]]) if (!S.cos.own.includes(cat + ':' + id)) S.cos.own.push(cat + ':' + id);
       S.cos.hat = it.o.hat; S.cos.neck = it.o.neck;
@@ -18409,6 +18617,9 @@ body.mg-on .toast[hidden]{display:none}
     } else if (it.kind === 'e') {
       S.deco.own[it.d.id] = 1;
       toast(`${it.name}${it.ga} 샀어요! 꾸미기 가게의 '지도 꾸미기'를 눌러 학교에 놓아 보세요`);
+    } else if (it.kind === 'g') {   // 5.3.3 이달의 꾸미기
+      if (it.gk === 'hat') { S.cos.own.push('hat:' + it.x.id); S.cos.hat = it.x.id; applyCos(); toast(`${it.name}${it.ga} 샀어요! 바로 입혀 뒀어요`); }
+      else { S.deco.own[it.x.id] = 1; toast(`${it.name}${it.ga} 샀어요! 꾸미기 가게의 '지도 꾸미기'를 눌러 학교에 놓아 보세요`); }
     } else if (it.kind === 'm') {
       S.cos.own.push('mkx:' + it.x); S.cos.mkx = it.x;
       renderCrest();
@@ -18425,8 +18636,8 @@ body.mg-on .toast[hidden]{display:none}
     hat: 120, fur: 200,
     ex: { n: 10, min: 60, perDay: 5 },
     ax: { ess: 20, min: 30, perDay: 5 },   // 숲의 정수 20개로 도토리 수업료 30분치, 하루 5번. 위 ex의 거꾸로라 오가며 남는 게 없어요. 도토리 수업료 60분치로 숲의 정수 10개, 하루 5번(넘치는 도토리 쓸 곳). 거꾸로 바꿔도 남는 게 없어요(정수 20개 → 30분치)
-    tk: { perDay: 5, list: [{ k: 'm5', n: 10, ess: 30 }, { k: 'm30', n: 1, ess: 20 }, { k: 'h1', n: 1, ess: 35 }, { k: 'h3', n: 1, ess: 90 }] },   // 시간 단축권, 네 가지 합쳐 하루 5번
-    boost: { perDay: 3, feast: { ess: 8, min: 60 } },   // 수업료 부스터는 하루 3번
+    tk: { perDay: 5, list: [{ k: 'm5', n: 10, ess: 25 }, { k: 'm30', n: 1, ess: 15 }, { k: 'h1', n: 1, ess: 28 }, { k: 'h3', n: 1, ess: 70 }] },   // 시간 단축권, 네 가지 합쳐 하루 5번
+    boost: { perDay: 3, feast: { ess: 12, min: 60 } },   // 수업료 부스터는 하루 3번
     night: 150   // 밤 모드(지도 밤 색과 창 불빛, 영구)
   };
   const ESS_ICON = () => `<span class="tic" style="background-image:${pzImg('ic_essence')}"></span>`;
@@ -18461,16 +18672,16 @@ body.mg-on .toast[hidden]{display:none}
     $('#essHave2').textContent = fmt(S.ess);
     const eb = $('#essBig'); if (IMG('essence_big')) eb.style.backgroundImage = pzImg('essence_big');
     const ic = ESS_ICON(), row = (pv, b, sp, sm, btn) => `<div class="sb"><span class="pv">${pv}</span><span class="tx"><b>${b}</b><span>${sp}</span>${sm ? `<small>${sm}</small>` : ''}</span>${btn}</div>`;
-    const buy = (pick, price, off, lab) => `<button class="buy${S.ess < price ? ' poor' : ''}${off ? ' off' : ''}" type="button" data-ebuy="${pick}" aria-label="${lab}, 숲의 정수 ${price}개">${ic}${price}</button>`;
+    const buy = (pick, price, off, lab) => `<span class="buyw"><button class="buy${S.ess < price ? ' poor' : ''}${off ? ' off' : ''}" type="button" data-ebuy="${pick}" aria-label="${lab}, 숲의 정수 ${price}개">${ic}${price}</button>${off ? '<em class="lack">내일 다시</em>' : lackTx(price, S.ess)}</span>`;   // 5.3.3 모자란 양과 '내일 다시'
     // 문제집
-    let h = `<h3 class="shop-h">문제집 <small>과목마다 하루 ${AC.book.perDay}권</small></h3>`;
+    let h = `<h3 class="shop-h" data-cat="공부">문제집 <small>과목마다 하루 ${AC.book.perDay}권</small></h3>`;
     for (const k of AC.keys) {
       const left = acBkLeft(k), c = bookCost(k);
       h += row(`<span class="tic" data-ic="ic_book" aria-hidden="true"></span>`, `${AC.name[k]} 문제집`, `${AC.name[k]} Lv.${acLv(k)}, XP +${AC.book.xp}`, left > 0 ? `오늘 ${left}권 남았어요` : '오늘은 다 샀어요. 내일 다시 열려요', buy('book:' + k, c, left <= 0, `${AC.name[k]} 문제집`));
     }
     // 시간 단축권
-    { const tl = esTkLeft();
-      h += `<h3 class="shop-h">시간 단축권 <small>공사, 체험학습, 소풍, 책 읽기 시간을 줄여요. 하루 ${ESHOP.tk.perDay}번</small></h3>`;
+    if (S.tier >= 1) { const tl = esTkLeft();   // 5.3.3 유치원은 공사가 5초라 단축권을 숨겨요
+      h += `<h3 class="shop-h" data-cat="시간">시간 단축권 <small>공사, 체험학습, 소풍, 책 읽기 시간을 줄여요. 하루 ${ESHOP.tk.perDay}번</small></h3>`;
       for (const T of ESHOP.tk.list) {
         const img = IMG('ticket_' + T.k);
         h += row(img ? `<img src="${img}" alt="" draggable="false">` : ic, `${tkName(T.k)} ${T.n}장`, `가진 ${tkName(T.k)} ${fmt(S.tk[T.k])}장`, '', buy('tk:' + T.k, T.ess, tl <= 0, `${tkName(T.k)} ${T.n}장`));
@@ -18478,7 +18689,7 @@ body.mg-on .toast[hidden]{display:none}
       h += `<p class="shop-note">${tl > 0 ? `오늘 ${tl}번 더 살 수 있어요` : '오늘은 다 샀어요. 내일 다시 열려요'}</p>`; }
     // 부스터
     { const bf = esBfLeft(), fl = feastOn() ? Math.ceil((S.hd.feastUntil - gameNow()) / 60000) : 0;
-      h += `<h3 class="shop-h">부스터 <small>종류마다 하루 ${ESHOP.boost.perDay}번</small></h3>`;
+      h += `<h3 class="shop-h" data-cat="도움">부스터 <small>종류마다 하루 ${ESHOP.boost.perDay}번</small></h3>`;
       h += row(BOOST_ART.feast, `수업료 +100% ${ESHOP.boost.feast.min / 60}시간`, fl ? `지금 ${hm(fl * 60)} 남았어요. 사면 더 늘어나요` : `${ESHOP.boost.feast.min / 60}시간 동안 수업료 +100%예요`, bf > 0 ? `오늘 ${bf}번 더 살 수 있어요` : '오늘은 다 샀어요', buy('bf', ESHOP.boost.feast.ess, bf <= 0, '수업료 +100%'));
       h += `<p class="shop-note">숲속 퍼즐과 숲속 합치기 부스터는 각 게임 화면에서 사요</p>`; }
     // 소풍 도시락(놀이터 소풍 창에서 보낼 때 싸요)
@@ -18494,7 +18705,7 @@ body.mg-on .toast[hidden]{display:none}
       h += row(`<svg viewBox="-12 -12 24 24" aria-hidden="true"><path d="M3 -8 A8.5 8.5 0 1 0 8 4 A7 7 0 1 1 3 -8 Z" fill="#F2C230"/></svg>`, '밤 모드', '지도가 밤 색이 되고 건물 창에 불이 켜져요', own ? '' : '',
         own ? `<button class="buy${on ? ' on' : ''}" type="button" data-ebuy="night" aria-pressed="${on}">${on ? '끄기' : '켜기'}</button>` : buy('night', ESHOP.night, false, '밤 모드')); }
     // 바꾸기
-    h += '<h3 class="shop-h">바꾸기 <small>(하루 5번씩)</small></h3>';
+    h += '<h3 class="shop-h" data-cat="교환">교환 <small>(하루 5번씩)</small></h3>';
     { const xl = esExLeft(), xc = esExCost();
       h += `<div class="sb"><span class="pv">${ic}</span><span class="tx"><b>숲의 정수 ${ESHOP.ex.n}개</b><span>도토리를 내고 받아요</span><small>${xl > 0 ? `오늘 ${xl}번 더 바꿀 수 있어요` : '오늘은 다 바꿨어요. 내일 다시 열려요'}</small></span>` +
         `<button class="buy${S.budget < xc ? ' poor' : ''}${xl > 0 ? '' : ' off'}" type="button" data-ebuy="ex" aria-label="숲의 정수 ${ESHOP.ex.n}개, 도토리 ${fmt(xc)}"><span data-acorn>${acornIcon()}</span>${fmt(xc)}</button></div>`; }
@@ -18510,7 +18721,7 @@ body.mg-on .toast[hidden]{display:none}
       $('#essAskText').textContent = it.kind === 'ax' ? (enough ? `도토리 +${fmt(it.gain)}, 숲의 정수 ${it.price}개로 바꿀까요?` : `숲의 정수가 ${it.price - S.ess}개 모자라요.`) : it.acorn ? (enough ? `도토리 ${fmt(it.price)}로 ${it.name}${it.ga} 바꿀까요?` : `도토리가 ${fmt(it.price - S.budget)} 모자라요.`)
         : enough ? (it.kind === 'night' ? `밤 모드는 낮에도 지도를 밤 모습으로 바꿔요. 고등학교에서는 20시부터 6시까지 저절로 어두워져요. 그래도 숲의 정수 ${it.price}개로 살까요?` : `${it.name}${it.ga} 숲의 정수 ${it.price}개로 살까요?`) : `숲의 정수가 ${it.price - S.ess}개 모자라요. 공부 탭에서 모을 수 있어요.`;   // 밤 모드 안내
       $('#essYes').textContent = it.acorn || it.kind === 'ax' ? (enough ? '바꾸기' : '닫기') : enough ? '사기' : '공부 가기';
-    }
+    }    shopChrome('ess');
   }
   // 한정 모자와 특별 가구(꾸미기 가게): 산 것은 바로 입고 벗거나 놓고 치워요. 바꿨으면 true
   function essCosToggle(it) {
@@ -18546,7 +18757,9 @@ body.mg-on .toast[hidden]{display:none}
     if (it.kind === 'ex' && esExLeft() <= 0) { toast(`숲의 정수 바꾸기는 하루 ${ESHOP.ex.perDay}번까지예요. 내일 다시 바꿀 수 있어요`); return; }
     if (it.kind === 'tk' && esTkLeft() <= 0) { toast(`시간 단축권은 하루 ${ESHOP.tk.perDay}번까지 살 수 있어요. 내일 다시 열려요`); return; }
     if (it.kind === 'bf' && esBfLeft() <= 0) { toast(`수업료 +100%는 하루 ${ESHOP.boost.perDay}번까지예요. 내일 다시 살 수 있어요`); return; }
-    rt.essPick = pick; renderEssShop();
+    rt.essPick = pick;
+    if (it.price && it.kind !== 'night' && (it.acorn ? S.budget >= it.price : S.ess >= it.price)) { buyEss(); return; }   // 5.3.3 바로 사요. 모자라면 아래 줄이 길을 알려 줘요
+    renderEssShop();
   }
   function buyEss() {
     const it = essItem(rt.essPick); if (!it || !it.price) { rt.essPick = ''; renderEssShop(); return; }
@@ -18714,6 +18927,8 @@ body.mg-on .toast[hidden]{display:none}
   for (const [k, name, sm] of EV_DECO) DECO.push({ id: 'ev_' + k, name, ess: 0, img: 'evd_' + k, rare: 1, ev: 1, ...(sm ? { sm: 1 } : {}) });
   DECO.push({ id: 'deco_pp_board', name: '세미나 칠판', ess: 0, img: 'deco_pp_board', rare: 1, ev: 1, pp: '세미나 10번' }, { id: 'deco_pp_chair', name: '명예의 의자', ess: 0, img: 'deco_pp_chair', rare: 1, ev: 1, pp: '세미나 20번' }, { id: 'deco_pp_tower', name: '논문 탑', ess: 0, img: 'deco_pp_tower', rare: 1, ev: 1, pp: '논문 30편' }, { id: 'deco_vd20', name: '마을 감사 아치', ess: 0, img: 'deco_vd20', rare: 1, ev: 1, pp: '마을 기부 20단계' });   // 칭호 덤 장식(작업지시서 100, ppDecoSync)
   const evDecoArt = d => !!(d && d.ev && IMG(d.img));
+  GMON.nm.forEach(([flag, gate], i) => { const m = gmKey(i + 1);   // 5.3.3 이달의 꾸미기 깃발과 아치(하나씩, 백화점에서 황금으로)
+    DECO.push({ id: `deco_mon_${m}_flag`, name: flag, ess: 0, img: `deco_mon_${m}_flag`, rare: 1, ev: 1, gm: i + 1 }, { id: `deco_mon_${m}_gate`, name: gate, ess: 0, img: `deco_mon_${m}_gate`, rare: 1, ev: 1, gm: i + 1 }); });
   const DECO_BY = Object.fromEntries(DECO.map(d => [d.id, d]));
   const DECO_GROW = 1.5, DECO_MAX = 11;   // 일반 장식은 하나 더 살 때마다 1.5배(지도 한 장을 다 채우는 11개까지), 희귀 장식은 하나씩만
   // 장식 자리(지도 그림의 %). 건물(Lv.5 크기)과 이름표, 호수를 피해서 지도마다 11곳. 간판 자리는 따로
@@ -18865,36 +19080,40 @@ body.mg-on .toast[hidden]{display:none}
   function renderDecoShop() {
     const m = decoMap(), ic = ESS_ICON();
     $('#decoHave').innerHTML = `${ic}<span>${fmt(S.ess)}</span>`;
-    { const all = DECO_SLOTS[m].length, used = decoPlaced(m); $('#decoSlotsTxt').textContent = used >= all ? `자리 ${all}곳을 모두 꾸몄어요. 바꾸기도 돼요` : `빈 자리 ${all - used}곳, 놓은 장식 ${used}개`;
+    { const all = DECO_SLOTS[m].length, used = decoPlaced(m); $('#decoSlotsTxt').textContent = !all ? '이 지도에는 꾸밀 자리가 없어요. 구역 지도에서 꾸며요' : used >= all ? `자리 ${all}곳을 모두 꾸몄어요. 바꾸기도 돼요` : `빈 자리 ${all - used}곳, 놓은 장식 ${used}개`;   // 5.3.3 빈 상태 글
       const pic = $('#decoModePic'); if (pic && !pic.firstChild && IMG('deco_flowerbed')) pic.innerHTML = `<img src="${IMG('deco_flowerbed')}" alt="">`; }   // 꾸미기 모드 카드
     let h = '';
     const evList = DECO.filter(evDecoArt);
-    for (const [title, list] of [['장식 <small>(사면 지도에 놓을 수 있어요)</small>', DECO.filter(d => !d.rare)], ['희귀 장식 <small>(하나씩만)</small>', DECO.filter(d => d.rare && !d.ev)], ...(evList.length ? [['이벤트 한정 장식 <small>(이벤트 기념 상자에서 받아요)</small>', evList]] : [])]) {
-      h += `<h3 class="shop-h">${title}</h3><div class="shop-grid">`;
+    // 5.3.3: 이벤트 한정 장식은 도감의 '장식' 칸으로 옮겼어요(가게에는 아래 한 줄). 갈래 칩용 머리(data-cat)
+    for (const [title, cat, list] of [['장식 <small>(사면 지도에 놓을 수 있어요)</small>', '장식', DECO.filter(d => !d.rare)], ['희귀 장식 <small>(하나씩만)</small>', '희귀', DECO.filter(d => d.rare && !d.ev)]]) {
+      h += `<h3 class="shop-h" data-cat="${cat}">${title}</h3><div class="shop-grid">`;
       for (const d of list) {
-        const n = decoOwn(d.id), out = decoSoldOut(d.id), c = decoCost(d.id), poor = !out && S.ess < c;
-        const pr = d.ev ? (n ? '가졌어요' : d.ps ? '패스 보상' : d.rs ? '시즌 기념' : d.bio ? `생물 ${d.bio}종` : d.cs ? '진로 도감' : d.pp ? d.pp : d.col ? '단과대학' : d.fv ? '축제 기념품' : d.bf ? `${d.bf}월 대축제` : d.xg ? '우정 배지' : d.mk ? '숲속 장터' : d.tr2 ? tr2Nm() : d.cg ? '대항전 우승' : '이벤트 선물') : out ? (d.rare ? '가졌어요' : '더 살 수 없어요') : `${ic}${c}`;
-        h += `<button class="si${n ? ' own' : ''}${poor ? ' poor' : ''}" type="button" data-dbuy="${d.id}" aria-label="${d.name}${out ? '' : `, 숲의 정수 ${c}개`}">` +
+        const n = decoOwn(d.id), out = decoSoldOut(d.id), c = decoCost(d.id), poor = !out && S.ess < c, nx = out ? 0 : decoNext(d.id);
+        const pr = out ? (d.rare ? '가졌어요' : '더 살 수 없어요') : `${ic}${c}`;
+        h += `<button class="si${n ? ' own' : ''}${poor ? ' poor' : ''}${out ? ' out' : ''}" type="button" data-dbuy="${d.id}" aria-label="${d.name}${out ? '' : `, 숲의 정수 ${c}개`}">` +
           (d.rare ? '<span class="rare-mark" aria-hidden="true">★</span>' : '') +
-          `<span class="pv deco"><img src="${IMG(d.img)}" alt="" draggable="false"></span><span class="nm">${d.name}${!d.rare && n ? ` <small>${n}개</small>` : ''}</span><span class="pr">${pr}</span></button>`;
+          `<span class="pv deco"><img src="${IMG(d.img)}" alt="" draggable="false"></span><span class="nm">${d.name}${!d.rare && n ? ` <small>${n}개</small>` : ''}</span><span class="pr">${pr}</span>` +
+          (out ? '' : poor ? lackTx(c, S.ess) : nx ? `<em class="nx">다음 ${nx}</em>` : '') + '</button>';   // 5.3.3 값이 오르는 장식은 다음 값
       }
       h += '</div>';
     }
     // 한정 모자와 특별 가구(옛 정수 상점에서 옮겨 왔어요)
-    h += '<h3 class="shop-h">한정 모자 <small>(학생들이 써요)</small></h3><div class="shop-grid">';
+    h += '<h3 class="shop-h" data-cat="모자">한정 모자 <small>(학생들이 써요)</small></h3><div class="shop-grid">';
     for (const it of COS.hat.items) {
       if (!it.ess) continue;
       const key = 'hat:' + it.id, own = S.cos.own.includes(key), on = S.cos.hat === it.id, poor = !own && S.ess < ESHOP.hat;
       h += `<button class="si${own ? ' own' : ''}${on ? ' on' : ''}${poor ? ' poor' : ''}" type="button" data-dbuy="${key}" aria-pressed="${on}" aria-label="${it.name}${own ? '' : `, 숲의 정수 ${ESHOP.hat}개`}">` +
-        `<span class="pv"><img src="${IMG('cos_hat_' + it.id)}" alt="" draggable="false"></span><span class="nm">${it.name}</span><span class="pr">${on ? '입는 중' : own ? '입기' : `${ic}${ESHOP.hat}`}</span></button>`;
+        `<span class="pv"><img src="${IMG('cos_hat_' + it.id)}" alt="" draggable="false"></span><span class="nm">${it.name}</span><span class="pr">${on ? '쓰는 중' : own ? '쓰기' : `${ic}${ESHOP.hat}`}</span>${own ? '' : lackTx(ESHOP.hat, S.ess)}</button>`;
     }
-    h += '</div><h3 class="shop-h">특별 가구 <small>(방마다 하나씩 놓여요)</small></h3><div class="shop-grid">';
+    h += '</div><h3 class="shop-h" data-cat="가구">특별 가구 <small>(방마다 하나씩 놓여요)</small></h3><div class="shop-grid">';
     for (const k of Object.keys(SP_FUR)) {
       const F = SP_FUR[k], key = 'sp:' + F.id, own = S.cos.own.includes(key), on = S.cos.sp[k] === F.id, poor = !own && S.ess < ESHOP.fur;
       h += `<button class="si${own ? ' own' : ''}${on ? ' on' : ''}${poor ? ' poor' : ''}" type="button" data-dbuy="${key}" aria-pressed="${on}" aria-label="${F.name}${own ? '' : `, 숲의 정수 ${ESHOP.fur}개`}">` +
-        `<span class="pv fur"><img src="${IMG('fur_sp_' + F.id)}" alt="" draggable="false"></span><span class="nm">${F.name}</span><span class="pr">${on ? '놓는 중' : own ? '놓기' : `${ic}${ESHOP.fur}`}</span></button>`;
+        `<span class="pv fur"><img src="${IMG('fur_sp_' + F.id)}" alt="" draggable="false"></span><span class="nm">${F.name}</span><span class="pr">${on ? '쓰는 중' : own ? '쓰기' : `${ic}${ESHOP.fur}`}</span>${own ? '' : lackTx(ESHOP.fur, S.ess)}</button>`;
     }
     h += '</div>';
+    { const L = DECO.filter(evDecoArt), own = L.filter(d => decoOwn(d.id)).length, im = L[0] && IMG(L[0].img);   // 5.3.3 이벤트 한정 장식은 도감에서 봐요
+      if (L.length) h += `<button class="sb ev-dex" type="button" data-evdex><span class="pv">${im ? `<img src="${im}" alt="">` : ''}</span><span class="tx"><b>이벤트 한정 장식 도감</b><span>이벤트 기념 상자 같은 곳에서 받아요. 가진 것은 '지도 꾸미기'로 놓아요</span></span><span class="pill">${own} / ${L.length} ›</span></button>`; }
     const list = $('#decoList'), top = list.scrollTop; list.innerHTML = h; list.scrollTop = top;
     const ask = $('#decoAsk'), ci = rt.decoPick.includes(':') ? essItem(rt.decoPick) : null, d = ci ? null : DECO_BY[rt.decoPick];
     const nm = ci ? ci.name : d && d.name, c = ci ? ci.price : d && decoCost(d.id);
@@ -18914,7 +19133,7 @@ body.mg-on .toast[hidden]{display:none}
     const inp = $('#decoName'); if (document.activeElement !== inp) inp.value = S.deco.nm;
     $('#decoTier').textContent = tierInfo().name;
     if (!rt.mkDraft) rt.mkDraft = S.deco.mk ? S.deco.mk.slice() : [0, 0, 3, 2];
-    renderMarkEdit();
+    renderMarkEdit();    shopChrome('deco');
   }
   function renderMarkEdit() {
     const k = rt.mkDraft;
@@ -18933,13 +19152,18 @@ body.mg-on .toast[hidden]{display:none}
       const it = essItem(id); if (!it) return;
       sfx('tap');
       if (essCosToggle(it)) { rt.decoPick = ''; renderDecoShop(); return; }
-      rt.decoPick = id; renderDecoShop(); return;
+      rt.decoPick = id;
+      if (S.ess >= it.price) { buyDeco(); return; }   // 5.3.3 바로 사요
+      renderDecoShop(); return;
     }
     const d = DECO_BY[id]; if (!d) return;
     sfx('tap');
-    if (d.ev) { toast(decoOwn(id) ? `${d.name}${eulOf(d.name)} 가지고 있어요. '지도 꾸미기'를 눌러 학교에 놓아 보세요` : d.pp ? `${eun(d.name)} ${d.pp}이면 받아요` : d.cs ? `${eun(d.name)} 진로 도감 12칸을 다 채우면 받아요` : d.tr2 ? `${eun(d.name)} ${d.tr2} ${tr2Nm()}에서 가져와요` : d.fv ? `${eun(d.name)} 축제 부스 놀이를 ${FV.win}번 성공하면 받아요` : d.bf ? `${eun(d.name)} ${d.bf}월 대축제에서 도장 ${BIG.max}개를 모으면 받아요` : d.xg ? `${eun(d.name)} 교환학생 우정 배지 8개를 모으면 받아요` : d.mk ? `${eun(d.name)} 목요일 숲속 장터에서 쿠폰으로 사요` : `${eun(d.name)} 그 이벤트의 기념 상자에서 받아요. 지난 이벤트 것은 꾸미기 백화점에서 살 수 있어요`); return; }
+    if (d.ev) { toast(decoOwn(id) ? `${d.name}${eulOf(d.name)} 가지고 있어요. '지도 꾸미기'를 눌러 학교에 놓아 보세요` : d.gm ? `${eun(d.name)} ${d.gm}월의 꾸미기예요. 꾸미기 백화점에서 황금 도토리로 사요` : d.pp ? `${eun(d.name)} ${d.pp}이면 받아요` : d.cs ? `${eun(d.name)} 진로 도감 12칸을 다 채우면 받아요` : d.tr2 ? `${eun(d.name)} ${d.tr2} ${tr2Nm()}에서 가져와요` : d.fv ? `${eun(d.name)} 축제 부스 놀이를 ${FV.win}번 성공하면 받아요` : d.bf ? `${eun(d.name)} ${d.bf}월 대축제에서 도장 ${BIG.max}개를 모으면 받아요` : d.xg ? `${eun(d.name)} 교환학생 우정 배지 8개를 모으면 받아요` : d.mk ? `${eun(d.name)} 목요일 숲속 장터에서 쿠폰으로 사요` : `${eun(d.name)} 그 이벤트의 기념 상자에서 받아요. 지난 이벤트 것은 꾸미기 백화점에서 살 수 있어요`); return; }
     if (decoSoldOut(id)) { toast(d.rare ? `${eun(d.name)} 하나만 가질 수 있어요` : `${eun(d.name)} ${DECO_MAX}개까지 가질 수 있어요`); return; }
-    rt.decoPick = id; renderDecoShop();
+    rt.decoPick = id;
+    const alt = !d.rare && ((S.pc && S.pc.berry > 0) || (S.mg && S.mg.pieces >= 5));   // 열매나 조각으로 받을 길이 있으면 줄을 띄워 고르게 해요
+    if (!alt && S.ess >= decoCost(id)) { buyDeco(); return; }   // 5.3.3 바로 사요
+    renderDecoShop();
   }
   function buyDecoPieces() {
     const d = DECO_BY[rt.decoPick]; rt.decoPick = '';
@@ -18984,27 +19208,18 @@ body.mg-on .toast[hidden]{display:none}
     S.deco.mk = mk && markOk(mk) ? mk.slice() : null;
     renderCrest(); save(); renderDecoShop();
   }
-  function useBooster(k) {
+  function useBooster(k) {   // 이제는 미션 보상의 특식 데이만 써요(팔던 부스터는 5.3.3에 치웠어요)
     if (k === 'feast') { S.hd.feastUntil = Math.max(gameNow(), S.hd.feastUntil) + 10 * 60000; toast('특식 데이! 10분 동안 수업료 +100%예요'); }
-    else if (k === 'skip') {
-      const v = rate() * 1800;
-      S.budget += v; earn(v);
-      S.students = Math.min(capacity(), S.students + CFG.enroll * 1800);
-      floatText(180, 40, '+' + fmt(v), 'gold');
-      toast(`30분을 건너뛰었어요! 도토리 +${fmt(v)}`);
-    } else if (k === 'auto') {
-      S.autoUntil = Math.max(gameNow(), S.autoUntil) + 600000;
-      toast(S.f.playground >= 1 ? '10분 동안 떨어진 도토리를 알아서 주워요' : '10분 동안 떨어진 도토리를 알아서 주워요. 운동장을 지으면 도토리가 떨어져요');
-    }
   }
-  // 상점 광고도 공통 광고 황금 도토리 한도에 포함해요
+
+  // 상점 광고는 하루 3번, 일반 광고 황금과 따로 세요(5.3.3 woodani)
   function shopAd() {
     goldDay();
-    if (S.gd.shop >= GOLD.shopAd || S.gd.n >= GOLD.adDay) { shake($('#shopAd')); return; }
+    if (S.gd.shop >= GOLD.shopAd) { shake($('#shopAd')); return; }
     rt.adNoGold = true;
     showAd(() => {
       goldDay();
-      if (S.gd.shop >= GOLD.shopAd || S.gd.n >= GOLD.adDay) return;
+      if (S.gd.shop >= GOLD.shopAd) return;
       S.gd.shop += 1; S.gd.n += 1;
       addGold(GOLD.shopAdN);
       sfx('quest');
@@ -19017,6 +19232,158 @@ body.mg-on .toast[hidden]{display:none}
     });
   }
 
+  /* ---------- 5.3.3 상점 새 진열 (docs/SHOP-2026-11.md 5절 1, 2단계) ----------
+     값, 효과, 하루 한도는 하나도 바꾸지 않고 모습과 차례만 바꿔요. 새 탭은 없어요.
+     재화 줄(가게마다 위에), 가게 칩(가게 사이 바로 가기), 갈래 칩(가게 안 갈래로 내려가기), 오늘의 진열대(가게마다 권하는 품목 하나, 값은 가게와 같아요),
+     이벤트 한정 장식은 도감의 '장식' 칸으로(가게에는 한 줄), 학교 간판과 마크, 이름 바꾸기는 설정으로 옮겼어요 */
+  const tkSecAll = () => TK.reduce((a, t) => a + (S.tk[t.k] || 0) * t.sec, 0);
+  function walletHTML() {
+    const t = tkSecAll(), ti = IMG('ticket_m30');
+    return `<span class="w-it" aria-label="황금 도토리 ${fmt(S.gold)}개">${GOLD_ICON}<b>${fmt(S.gold)}</b></span>` +
+      `<span class="w-it" aria-label="숲의 정수 ${fmt(S.ess)}개">${ESS_ICON()}<b>${fmt(S.ess)}</b></span>` +
+      (S.tier >= 1 ? `<span class="w-it" aria-label="시간 단축권 ${t ? hm(t) : '없음'}">${ti ? `<img src="${ti}" alt="">` : '⌛'}<b>${t ? hm(t) : '0분'}</b></span>` : '');   // 유치원은 공사가 5초라 단축권을 숨겨요
+  }
+  const SHOP_PANEL = { street: '#panelStreet', shop: '#panelShop', ess: '#panelEss', deco: '#panelDeco' }, SHOP_LIST = { shop: '#shopList', ess: '#essList', deco: '#decoList' };
+  function shopChrome(tab) {
+    const P = $(SHOP_PANEL[tab]); if (!P || !S) return;
+    const w = P.querySelector('[data-wallet]'); if (w) setH(w, walletHTML());
+    const c = P.querySelector('[data-cats]'), L = SHOP_LIST[tab] && $(SHOP_LIST[tab]);
+    if (c && L) {
+      const hs = [...L.querySelectorAll('[data-cat]')], key = hs.map(h => h.dataset.cat).join('|');
+      if (c.dataset.key !== key) { c.dataset.key = key; c.innerHTML = hs.map((h, i) => `<button type="button" data-catgo="${i}">${h.dataset.cat}</button>`).join(''); }
+      c.hidden = hs.length < 2;
+    }
+  }
+  // 갈래 칩: 그 갈래 머리까지 내려가요(걸러 숨기지 않아서 품목은 모두 그대로 보여요)
+  const scrollBox = el => { for (let p = el.parentElement; p; p = p.parentElement) { const o = getComputedStyle(p).overflowY; if ((o === 'auto' || o === 'scroll') && p.scrollHeight > p.clientHeight) return p; } return document.scrollingElement; };
+  function shopScrollTo(el, P) {
+    const box = scrollBox(el), top = P && P.querySelector('[data-shoptop]'), off = (top ? top.getBoundingClientRect().height : 0) + 8;
+    const y = box.scrollTop + el.getBoundingClientRect().top - box.getBoundingClientRect().top - off;
+    box.scrollTo({ top: Math.max(0, y), behavior: rt.reduced ? 'auto' : 'smooth' });
+  }
+  document.addEventListener('click', e => {
+    const b = e.target.closest && e.target.closest('[data-catgo]'); if (!b) return;
+    const P = b.closest('.shop-panel'), L = P && P.querySelector('.shop-scroll'), h = L && L.querySelectorAll('[data-cat]')[+b.dataset.catgo]; if (!h) return;
+    sfx('tap'); shopScrollTo(h, P);
+  });
+  // 모자란 양과 '내일 다시'(값 알약 아래 한 줄)
+  const lackTx = (price, have) => have < price ? `<em class="lack">${fmt(price - have)} 모자라요</em>` : '';
+  // 하나 더 살 때마다 값이 오르는 장식: 지금 값으로 산 뒤의 값(decoCost0과 같은 셈, 동아리 할인도 같게)
+  function decoNext(id) {
+    const d = DECO_BY[id]; if (!d || d.rare || d.ev) return 0;
+    const n = decoOwn(id) + 1; if (n >= DECO_MAX) return 0;
+    const c = Math.ceil(d.ess * Math.pow(DECO_GROW, Math.min(DECO_MAX, n)) / 5) * 5, off = typeof clubDecoOff === 'function' ? clubDecoOff() : 0;
+    return off > 0 ? Math.max(1, Math.round(c * (1 - off / 100))) : c;
+  }
+  /* 오늘의 진열대: 가게마다 지금 살 수 있는 품목 가운데 하나를 날마다 골라 크게 보여요. 누르면 그 가게의 그 품목으로 가요(값과 사는 길은 가게와 같아요) */
+  function shelfPicks() {
+    const day = gameToday(), pick = (arr, k) => arr.length ? arr[dayHash(day + ':' + k) % arr.length] : null, out = [];
+    { const c = [];
+      for (const o of OUTFITS) if (!ofOwn(o)) c.push({ p: 'o:' + o.id, art: `<svg viewBox="-11 -13.5 22 27" aria-hidden="true">${kidSVG('bear', 0, { hat: o.hat, neck: o.neck })}</svg>`, line: '학생 옷 한 벌' });
+      for (const t of THEMES) if (thCount(t.id) < TH_SLOTS.length) c.push({ p: 's:' + t.id, art: thArt(t, 'bg'), line: '지도, 지붕 색, 테마 곡 한 벌' });
+      const it = pick(c, 'g'), si = it && shopItem(it.p);
+      if (si) out.push({ shop: 'shop', go: it.p, art: it.art, name: si.name, line: it.line, price: si.price, cur: 'gold' }); }
+    { const c = [];
+      for (const k of AC.keys) if (acBkLeft(k) > 0) c.push({ p: 'book:' + k, name: `${AC.name[k]} 문제집`, price: bookCost(k), line: `${AC.name[k]} XP +${AC.book.xp}`, art: `<span class="tic" style="background-image:url('${IMG('ic_book')}')"></span>` });
+      if (S.tier >= 1 && esTkLeft() > 0) for (const T of ESHOP.tk.list) c.push({ p: 'tk:' + T.k, name: `${tkName(T.k)} ${T.n}장`, price: T.ess, line: '공사와 체험학습 시간을 줄여요', art: IMG('ticket_' + T.k) ? `<img src="${IMG('ticket_' + T.k)}" alt="">` : '' });
+      if (esBfLeft() > 0) c.push({ p: 'bf', name: `수업료 +100% ${ESHOP.boost.feast.min / 60}시간`, price: ESHOP.boost.feast.ess, line: '수업료가 두 배', art: BOOST_ART.feast });
+      const it = pick(c, 'e'); if (it) out.push({ shop: 'ess', go: it.p, art: it.art, name: it.name, line: it.line, price: it.price, cur: 'ess' }); }
+    { const c = DECO.filter(d => !d.ev && !decoSoldOut(d.id) && IMG(d.img));
+      const d = pick(c, 'd'); if (d) out.push({ shop: 'deco', go: d.id, art: `<img src="${IMG(d.img)}" alt="">`, name: d.name, line: d.rare ? '희귀 장식, 하나만' : '지도에 놓는 장식', price: decoCost(d.id), cur: 'ess' }); }
+    return out;
+  }
+  const SHOP_NM = { shop: '꾸미기 백화점', ess: '문방구', deco: '꾸미기 가게' };
+  function renderShelf() {
+    const box = $('#shelf'); if (!box) return;
+    const ps = shelfPicks(), ic = { gold: GOLD_ICON, ess: ESS_ICON() };
+    const key = ps.map(x => x.go + x.price + (x.cur === 'gold' ? S.gold >= x.price : S.ess >= x.price)).join('|');
+    if (box.dataset.key === key) return; box.dataset.key = key;
+    box.innerHTML = ps.length ? `<h3 class="shop-h shelf-h">오늘의 진열대 <small>날마다 바뀌어요. 값은 가게와 같아요</small></h3>` + ps.map(x => {
+      const have = x.cur === 'gold' ? S.gold : S.ess, poor = have < x.price;
+      return `<button class="big-card${poor ? ' poor' : ''}" type="button" data-shelf="${x.shop}|${x.go}"><span class="bc-pv">${x.art}</span><span class="bc-tx"><small>${SHOP_NM[x.shop]}</small><b>${x.name}</b><span>${x.line}</span></span>` +
+        `<span class="bc-pr"><span class="pill">${ic[x.cur]}${fmt(x.price)}</span>${lackTx(x.price, have)}</span></button>`;
+    }).join('') : '';
+  }
+  function shelfGo(v) {
+    const [shop, go] = v.split('|'); sfx('tap'); setTab(shop);
+    setTimeout(() => {
+      if (shop === 'shop') pickShop(go); else if (shop === 'ess') pickEss(go); else pickDeco(go);
+      const L = $(SHOP_LIST[shop]), el = L && L.querySelector(`[data-buy="${go}"], [data-ebuy="${go}"], [data-dbuy="${go}"]`);
+      if (el) { shopScrollTo(el, $(SHOP_PANEL[shop])); el.classList.add('hl'); setTimeout(() => el.classList.remove('hl'), 1600); }
+    }, 60);
+  }
+  // 다른 가게로 바로 가기(매점, 숲속 장터, 숲속 패스). 고유 시스템은 건물과 탭 안에 그대로 두고 길만 보여요
+  function renderShopMore() {
+    const box = $('#shopMore'); if (!box) return;
+    const L = [];
+    if (S.tier >= 2 && (S.f.store || 0) >= 1) L.push(['store', '매점', '간식 뽑기']);
+    if (typeof mkOn === 'function' && mkOn()) L.push(['mk', '숲속 장터', '오늘 열려요']);
+    if (typeof psOpen === 'function' && psOpen()) L.push(['ps', '숲속 패스', '시즌 미션 보상']);
+    const h = L.length ? `<h3 class="shop-h">다른 가게 <small>바로 가기</small></h3><div class="more-row">${L.map(([k, n, s]) => `<button type="button" class="more-go" data-more="${k}"><b>${n}</b><small>${s}</small></button>`).join('')}</div>` : '';
+    if (box.dataset.h !== h) { box.dataset.h = h; box.innerHTML = h; }
+  }
+  document.addEventListener('click', e => {
+    const t = e.target.closest && e.target.closest('[data-shelf], [data-more], [data-evdex], #optNick'); if (!t || !S || rt.paused) return;
+    if (t.dataset.shelf) { shelfGo(t.dataset.shelf); return; }
+    sfx('tap');
+    if (t.dataset.more === 'store') { setTab('school'); setTimeout(() => openSheet('store'), 80); return; }
+    if (t.dataset.more === 'mk') { openMk(); return; }
+    if (t.dataset.more === 'ps') { setTab('event'); setEvSeg('ps'); return; }
+    if (t.hasAttribute('data-evdex')) { setTab('dex'); setDexSeg('deco'); return; }
+    if (t.id === 'optNick') { setTab('rank'); rt.rankEdit = true; renderRankPanel(); const i = $('#rankName'); if (i) i.focus(); }   // 예전 백화점 '이름 바꾸기'와 같은 길
+  });
+  /* 도감 '장식' 칸: 이벤트 한정 장식(가게에서 팔지 않고 이벤트 기념 상자, 패스, 진로 도감 같은 곳에서 받아요). 누르면 얻는 곳을 알려요(예전 가게와 같은 말) */
+  const evDecoList = () => DECO.filter(evDecoArt);
+  function decoDexRender() {
+    const g = $('#decoDexGrid'); if (!g || !S) return;
+    const L = evDecoList(), own = L.filter(d => decoOwn(d.id)).length;
+    setT($('#decoDexHead'), `한정 장식 ${own} / ${L.length}`);
+    const key = L.map(d => decoOwn(d.id) ? 1 : 0).join('');
+    if (g.dataset.key === key) return; g.dataset.key = key;
+    g.innerHTML = L.map(d => { const n = decoOwn(d.id);
+      return `<button class="sn-card${n ? ' on' : ' off'}" type="button" data-dbuy="${d.id}"><img src="${IMG(d.img)}" alt="" draggable="false"><b>${d.name}</b><small>${n ? '가졌어요' : '아직 없어요'}</small></button>`; }).join('');
+  }
+  document.addEventListener('click', e => { const b = e.target.closest && e.target.closest('#decoDexGrid [data-dbuy]'); if (b) pickDeco(b.dataset.dbuy); });
+  // 설정의 학교 간판과 마크: 예전 꾸미기 가게 끝에서 하던 것과 같아요
+  function setSchoolRender() {
+    if (!S) return;
+    const inp = $('#decoName'); if (inp && document.activeElement !== inp) inp.value = S.deco.nm;
+    setT($('#decoTier'), tierInfo().name);
+    if (!rt.mkDraft) rt.mkDraft = S.deco.mk ? S.deco.mk.slice() : [0, 0, 3, 2];
+    renderMarkEdit();
+    const np = nickPrice(); setT($('#optNickTx'), `랭킹에 보이는 이름을 바꿔요. ${np ? `바꿀 때 황금 도토리 ${np}개` : '처음 정할 때는 공짜예요'}`);
+  }
+
+  /* 큰 값 사기 전 확인 줄(10번 뽑기, 남은 만큼 기부). 단추 줄 바로 아래에 붙고, 취소하거나 고르면 사라져요 */
+  function askRow(after, text, yes, fn) {
+    askRowOff();
+    const r = document.createElement('div'); r.className = 'ask-row'; r.id = 'askRow';
+    r.innerHTML = `<p>${esc(text)}</p><div class="btn-row"><button class="btn-sub" type="button" data-ask="no">취소</button><button class="cta" type="button" data-ask="yes">${esc(yes)}</button></div>`;
+    r.addEventListener('click', e => { const b = e.target.closest('[data-ask]'); if (!b) return; askRowOff(); if (b.dataset.ask === 'yes') fn(); else sfx('tap'); });
+    after.insertAdjacentElement('afterend', r);
+  }
+  function askRowOff() { const r = $('#askRow'); if (r) r.remove(); }
+
+  /* 이달의 꾸미기(5.3.3): 지금 달과 지난 달들(GMON.start부터). 한 줄 [{ g, kind, id, name, price, own, img }] */
+  const gmNow = () => +gameToday().slice(5, 7);
+  function gmPast() {
+    const t = gameToday(), [y1, m1] = [+t.slice(0, 4), +t.slice(5, 7)], [y0, m0] = GMON.start.split('-').map(Number), out = [];
+    for (let y = y0, m = m0; y < y1 || (y === y1 && m < m1); m === 12 ? (y++, m = 1) : m++) if (m !== m1 && !out.includes(m)) out.push(m);
+    return out.slice(-11).reverse();   // 가까운 달부터
+  }
+  function gmItems(m) {
+    const k = gmKey(m), [f, g, h] = GMON.nm[m - 1];
+    return [{ g: `g:${k}:flag`, kind: 'flag', id: `deco_mon_${k}_flag`, name: f, price: GMON.flag, img: `deco_mon_${k}_flag` },
+      { g: `g:${k}:gate`, kind: 'gate', id: `deco_mon_${k}_gate`, name: g, price: GMON.gate, img: `deco_mon_${k}_gate` },
+      { g: `g:${k}:hat`, kind: 'hat', id: 'mon' + k, name: h, price: GMON.hat, img: 'cos_hat_mon' + k }]
+      .map(x => Object.assign(x, { own: x.kind === 'hat' ? S.cos.own.includes('hat:' + x.id) : decoOwn(x.id) > 0 }));
+  }
+  function gmTiles(list, coin) {
+    return list.map(x => { const on = x.kind === 'hat' && S.cos.hat === x.id, poor = !x.own && S.gold < x.price, im = IMG(x.img);
+      return `<button class="si${x.own ? ' own' : ''}${on ? ' on' : ''}${poor ? ' poor' : ''}" type="button" data-buy="${x.g}" aria-pressed="${on}" aria-label="${x.name}${x.own ? '' : `, 황금 도토리 ${x.price}개`}">` +
+        `<span class="pv${x.kind === 'hat' ? '' : ' deco'}">${im ? `<img src="${im}" alt="" draggable="false">` : ''}</span><span class="nm">${x.name}</span>` +
+        `<span class="pr">${x.kind === 'hat' ? (on ? '쓰는 중' : x.own ? '쓰기' : `${coin}${x.price}`) : x.own ? '가졌어요' : `${coin}${x.price}`}</span>${x.own ? '' : lackTx(x.price, S.gold)}</button>`; }).join('');
+  }
   /* ---------- 2.0.0 학생 명부와 동아리 ----------
      학생 수(수업료 계산)는 그대로 두고, 그 가운데 얼굴이 되는 대표 학생 12명을 명부에 따로 적어요(S.roster).
      중학교부터 명부가 생기고 동아리 다섯 곳(2.0.1부터 수학부)에 3명씩 나눠요. 졸업식(학교급 올리기) 때 명부 학생은 졸업 사진(S.snap)에 남고 새 친구들이 입학해요.
@@ -19040,7 +19407,7 @@ body.mg-on .toast[hidden]{display:none}
      효과: 수업료 레벨 합 × 0.1%(acMult), 평판 10레벨마다 +1(acRepOf), 새 명부 학생의 시작 능력 바탕(rosterKid). 숫자는 "균형 제안서 (공부 탭)" */
   const AC = { keys: ['kor', 'math', 'sci', 'art', 'pe'], name: { kor: '국어', math: '수학', sci: '과학', art: '미술', pe: '체육' },
     cap: [10, 20, 30, 40, 50, 60], need: n => 25 + 2 * n, pzPer: 100, pzMax: 12, mgPer: 1, mgMax: 20, mgE: 6, mgDay: 100,   // 학력과 능력치 균형: 과목마다 하루 XP를 비슷하게(균형 제안서 학력과 능력치 1절)
-    book: { ess: 10, xp: 50, perDay: 2, perLv: 1 }, tuition: 0.001, repPer: 10 };   // 문제집 값은 정수 10 + 그 과목 레벨, 과목마다 하루 2권(조정안 5, 예전 1권)
+    book: { ess: 10, xp: 50, perDay: 2, perLv: 1, cap: 30 }, tuition: 0.001, repPer: 10 };   // 문제집 값은 정수 10 + 그 과목 레벨, 과목마다 하루 2권(조정안 5, 예전 1권)
   const AC_GAME = { kor: '책 읽기', math: '숲속 퍼즐', sci: '과학 탐구 실험', art: '숲속 합치기', pe: '숲속 대결' };
   const freshAc = () => { const o = { bk: { day: '', n: {} }, st: { xp: 0, bk: 0 } }; for (const k of AC.keys) { o[k] = { lv: 1, xp: 0 }; o.bk.n[k] = 0; } return o; };
   const acCapOf = tier => AC.cap[Math.max(0, Math.min(AC.cap.length - 1, tier))];
@@ -19065,7 +19432,7 @@ body.mg-on .toast[hidden]{display:none}
     checkQuests(true); return v;
   }
   function acBkDay() { const t = gameToday(); if (dayRoll(S.ac.bk, t)) { for (const k of AC.keys) S.ac.bk.n[k] = 0; } }
-  const bookCost = k => AC.book.ess + AC.book.perLv * acLv(k);   // 문제집 값은 레벨을 따라 올라요
+  const bookCost = k => Math.min(AC.book.cap, AC.book.ess + AC.book.perLv * acLv(k));   // 문제집 값은 레벨을 따라 오르고 30에서 멈춰요(5.3.3 woodani A안)
   const acBkLeft = k => { acBkDay(); return Math.max(0, AC.book.perDay - (S.ac.bk.n[k] || 0)); };
   // 문제집 남은 권 모두 사기: 한 권씩 살 때와 같은 값과 차례로 사고(레벨이 오르면 값도 따라 올라요), 정수가 모자라면 살 수 있는 만큼만 사요
   function acBuyBookAll(k) {
@@ -20102,8 +20469,8 @@ body.mg-on .toast[hidden]{display:none}
   /* ---------- 2.1.0 숲속 소풍 (유치원 2, 로드맵 5절) ----------
      놀이터 안에서 게임 시계로 하루 한 번. 학생 3명을 골라 보내면 15분 뒤 돌아와요(앱을 꺼도 가요). 그동안 3명은 수업료를 내지 않아요.
      돌아오면 수업료 10분치(도시락을 싸면 15분치), 가끔 숲의 정수 1~2개, 아주 가끔 희귀 열매(꾸미기 가게에서 일반 장식 하나로 바꿔요).
-     도시락은 숲의 정수 15(재설계안 3절), 보낼 때 싸요. 확률과 열매 쓰임은 본부 제안 */
-  const PCN = { min: 15, kids: 3, acorn: 10, lunchAcorn: 15, lunch: 15, essP: 0.3, berryP: 0.05 };
+     도시락은 숲의 정수 5(5.3.3 woodani, 예전 15), 보낼 때 싸요. 확률과 열매 쓰임은 본부 제안 */
+  const PCN = { min: 15, kids: 3, acorn: 10, lunchAcorn: 15, lunch: 5, essP: 0.3, berryP: 0.05 };
   const freshPc = () => ({ day: '', at: 0, kids: [], lunch: false, berry: 0, st: { n: 0, ess: 0, berry: 0 } });
   const pcReady = () => !!S && !!S.pc && S.f.playground >= 1;
   const pcActive = () => !!S && !!S.pc && S.pc.at > 0;
@@ -25773,7 +26140,11 @@ body.mg-on .toast[hidden]{display:none}
      받는 양과 차례는 하나씩 누를 때와 같아요(같은 함수를 차례로 불러요). 보상 창만 하나로 모아요 */
   function claimables() {
     if (!S) return 0;
-    let n = S.dm.list.filter(dmReady).length + (dmAllDone() && !S.dm.bonus ? 1 : 0) + S.wk.list.filter(wkReady).length + MP_BOX.filter((_, i) => boxReady(i)).length + S.q.subs.filter(subReady).length;
+    // 5.3.2.1: '모두 받기'는 미션을 받은 뒤 그 미션 포인트로 열리는 상자와 마지막 미션 뒤의 보너스까지 받아서, 띠의 개수(3)와 받은 창의 개수(4)가 달랐어요. 받은 뒤 열릴 것까지 미리 세요
+    const dmR = S.dm.list.filter(dmReady).length, wkR = S.wk.list.filter(wkReady).length;
+    const bonus = !S.dm.bonus && S.dm.list.length > 0 && S.dm.list.every(m => m.done || dmReady(m)) ? 1 : 0;
+    const pts = S.wk.pts + dmR * MP.daily + bonus * MP.bonus + wkR * MP.week;
+    let n = dmR + bonus + wkR + MP_BOX.filter((B, i) => !S.wk.got[i] && pts >= B.at).length + S.q.subs.filter(subReady).length;
     try { if (psOpen()) n += S.ps.dl.filter(psReady).length + S.ps.wl.filter(psReady).length; } catch (e) { /* 패스가 아직 준비 전 */ }
     try { if (evLive()) n += S.ev.list.filter(evReady).length; } catch (e) { /* 이벤트가 아직 준비 전 */ }
     return n;
@@ -26082,8 +26453,16 @@ body.mg-on .toast[hidden]{display:none}
     if (!r || r.width < 8) { if (h) h.hidden = true; if (S && S.q.m >= FH_MAX && h) h.remove(); return; }
     if (!h) { h = document.createElement('div'); h.id = 'firstHint'; h.className = 'first-hint'; h.setAttribute('aria-hidden', 'true'); h.innerHTML = '<span class="fh-tx"></span><span class="fh-f">👆</span>'; document.body.appendChild(h); }
     if (h.firstChild.textContent !== aim[1]) h.firstChild.textContent = aim[1];
-    h.hidden = false; h.style.left = (r.left + r.width / 2) + 'px'; h.style.top = (aim[2] ? r.bottom - 6 : r.top + r.height * 0.62) + 'px';
+    // 5.3.2.1: 대상이 화면 아래 120px 안이면(창 아래 키우기 단추, 가구 줄 끝) 글이 화면 밖으로 나가고 옆 칸 값을 덮었어요. 그때는 위쪽에 두고 손가락이 아래를 가리켜요
+    const up = !!aim[2] && r.bottom > innerHeight - FH_LOW;
+    h.classList.toggle('up', up); if (h.lastChild.textContent !== (up ? '👇' : '👆')) h.lastChild.textContent = up ? '👇' : '👆';
+    h.hidden = false; h.style.top = (up ? r.top + 6 : aim[2] ? r.bottom - 6 : r.top + r.height * 0.62) + 'px';
+    const cx = r.left + r.width / 2, tw = h.firstChild.offsetWidth || 0;   // 손가락은 대상 가운데, 글만 화면 안으로 밀어요
+    h.style.left = cx + 'px';
+    const dx = Math.max(tw / 2 + 6 - cx, Math.min(0, innerWidth - tw / 2 - 6 - cx));
+    h.firstChild.style.transform = dx ? `translateX(${Math.round(dx)}px)` : '';
   }
+  const FH_LOW = 120;
   setInterval(() => { try { firstHint(); } catch (e) { /* 다음에 */ } }, 400);
   function tutStart(i) {
     rt.tut = { i: Math.max(0, Math.min(TUT.length - 1, i | 0)), confirm: false };
@@ -26224,6 +26603,7 @@ body.mg-on .toast[hidden]{display:none}
     $('#gCard').hidden = last;
     $('#gLead').textContent = last
       ? `${T.name}${T.unit === '년째' ? `은 ${T.years}년째가 마지막 해예요` : `는 ${T.years}학년이 마지막 학년이에요`}. 대도시 학교가 되면 졸업식을 열고 ${N.school}에 입학해요.`
+      : gradOn() ? `대도시 학교가 되면 종업식을 열 수 있어요. 다음 학기에는 시설을 Lv.${capNext()}까지 키울 수 있어요.`   // 5.3.2.1: 대학원은 학년이 아니라 학기로 말해요
       : sf ? `대도시 학교가 되면 1학기 방학식을 열 수 있어요. 2학기에는 시설을 Lv.${capNext()}까지 키울 수 있어요.`
       : `대도시 학교가 되면 ${semOn() ? '2학기 ' : ''}종업식을 열 수 있어요. ${T.unit === '년째' ? '다음 해에는' : '다음 학년에는'} 시설을 Lv.${capNext()}까지 키울 수 있어요.`;
     $('#gHave').textContent = fmt(S.p.dip);
@@ -26293,9 +26673,11 @@ body.mg-on .toast[hidden]{display:none}
   function renderTierCard() {
     const T = tierInfo(), N = TIERS[S.tier + 1] || { name: TIER_ALL[S.tier + 1] || '다음 학교', school: '숲속 ' + (TIER_ALL[S.tier + 1] || '다음 학교') }   /* 대학교에서는 다음이 대학원이에요(예전에는 '대학교 준비 중'으로 나왔어요) */, open = nextTierOpen(), can = canPromote(), f = previewFund();
     $('#tierFrom').textContent = T.school;
-    $('#tierTo').textContent = N ? N.school : '';
+    const last = gradOn() && !open;   // 5.3.2.1: 가장 높은 학교급(대학원)이고 다음 학교급이 아직 없어요
+    $('#tierTo').textContent = last ? '다음 학교급 (준비 중)' : N ? N.school : '';
     const reqs = [
-      { ok: S.tg >= T.grads, txt: `${T.name} ${T.years}${T.unit} 되기 (지금 ${yearNo()}${T.unit})` },
+      gradOn() ? { ok: S.tg >= T.grads && S.sem >= 1, txt: `박사 8학기 되기 (지금 ${gradSemTxt(yearNo(), S.sem)})` }
+        : { ok: S.tg >= T.grads, txt: `${T.name} ${T.years}${T.unit} 되기 (지금 ${yearNo()}${T.unit})` },
       { ok: S.grade >= GRAD_MIN, txt: `대도시 학교 되기 (지금 ${CFG.grades[S.grade].name})` }
     ];
     if (semOn() && open) reqs.splice(1, 0, { ok: finalYear() && !semFirst(), txt: `${T.years}${T.unit} 1학기 방학식 열기` });   // 졸업식은 2학기에
@@ -26303,12 +26685,19 @@ body.mg-on .toast[hidden]{display:none}
     const html = reqs.map(r => `<li class="${r.ok ? 'ok' : ''}"><span class="mk2">${r.ok ? CHECK : ''}</span>${r.txt}</li>`).join('');
     if ($('#tierReqs').innerHTML !== html) $('#tierReqs').innerHTML = html;
     $('#tierFund').textContent = fmt(f);
-    $('#tierNote').textContent = !open
+    setHid($('#tierCard .tier-fund'), last);   // 대학원에서는 기금이 생기지 않아요
+    $('#tierNote').textContent = last
+      ? `숲속 대학원이 지금 가장 높은 학교급이에요. 박사 학위를 받은 뒤에도 논문과 숲속 학회, 연구 트리로 학교를 계속 키워요. 다음 학교급은 숲속 교육부가 준비 중이에요.`
+      : !open
       ? `${eun(N.name)} 숲속 교육부가 열심히 준비 중이에요. 그동안 종업식을 열어 수료증을 모아 두면 졸업할 때 기금이 늘어요.`
       : can ? `지금 졸업하면 기금 ${fmt(f)}${numEul(f)} 받아요. ${nextFundNote()}`
       : `이 학교급에서 모은 수료증 ${FUND_PER}장마다 기금이 1씩 늘어요. 지금까지 ${fmt(S.tdip)}장을 모았어요.`;
     const btn = $('#tierBtn');
-    btn.textContent = open ? `졸업식 열기 (${N.name} 입학)` : `${N.name} 준비 중`;
+    btn.textContent = open ? `졸업식 열기 (${N.name} 입학)` : last ? '다음 학교급 준비 중' : `${N.name} 준비 중`;
+    // 명예 교장실 머리말: 대학교에서는 학위수여식 뒤 대학원으로 이어 가고, 대학원은 다음 학교급이 없어요(5.3.2.1)
+    { const sm = $('#perkHead small'), h = S.tier === 4 ? '한 번 고치면 종업식을 열어도 효과가 남아요.<br>졸업식을 열어도 대학원으로 이어 가요.' : gradOn() ? '한 번 고치면 종업식을 열어도 효과가 남아요.' : '한 번 고치면 종업식을 열어도 효과가 남아요.<br>단, 졸업하면 처음부터예요.';
+      if (sm && sm.dataset.h !== h) { sm.dataset.h = h; sm.innerHTML = h; } }
+    { const sm = $('#tierHead small'), t = last ? '대학원이 지금 가장 높은 학교급이에요' : '마지막 해에 졸업하면 다음 학교에 입학해요'; if (sm && sm.dataset.h !== t) { sm.dataset.h = t; sm.textContent = t; } }   // 대학교 낱말 바꾸기가 글을 바꿔도 다시 쓰지 않게 열쇠로 견줘요
     btn.setAttribute('aria-disabled', can ? 'false' : 'true');
     if (!can) $('#tierConfirm').hidden = true;
   }
@@ -27486,6 +27875,31 @@ body.mg-on .toast[hidden]{display:none}
   }
 
   /* 칠판 아래 퀘스트 쪽지: 지금 메인 퀘스트, 다 마치면 학생 부탁 */
+  /* 5.3.2.2 F-04: 건물 창과 선생님 탭에서는 위쪽 퀘스트 칸의 '받기'를 누르면 창만 닫혔어요. 퀘스트를 마치면 그 화면 아래에 '보상 받기' 띠를 띄워요 */
+  function qReadyNow() {
+    const mq = curMain();
+    if (mq) return mainReady() ? { ref: 'main', tx: `${qNo(S.q.m)} ${mq.title}` } : null;
+    const s = S.q.subs.find(subReady); return s ? { ref: s.id, tx: `${WHO[s.who]}의 부탁` } : null;
+  }
+  function renderQReady() {
+    if (!S) return;
+    const r = rt.paused ? null : qReadyNow();
+    for (const [id, on] of [['#sheetQReady', !!rt.sheetKey], ['#teaQReady', rt.tab === 'teachers' && !rt.sheetKey]]) {
+      const el = $(id); if (!el) continue;
+      const key = r && on ? r.ref + '|' + r.tx : '';
+      if (el.dataset.key === key) continue;
+      el.dataset.key = key; el.hidden = !key; if (!key) continue;
+      el.innerHTML = `<span class="qr-tx"><small>퀘스트를 마쳤어요</small><b>${esc(r.tx)}</b></span><span class="qr-go">보상 받기</span>`;
+      el.setAttribute('aria-label', `${r.tx} 보상 받기`);
+    }
+  }
+  function qReadyTap(el) {
+    const r = qReadyNow(); if (!r || rt.paused) return;
+    rt.qTap = true;
+    if (r.ref === 'main') claimMain(el); else claimSub(r.ref, el);
+    renderQReady(); if (rt.sheetKey) renderSheet();
+  }
+  setInterval(() => { try { renderQReady(); } catch (e) { /* 다음에 */ } }, 500);
   function renderQuestBar() {
     const bar = $('#questBar');
     const mq = curMain();
@@ -27591,7 +28005,9 @@ body.mg-on .toast[hidden]{display:none}
   function buildQuestPanel() {
     const i = S.q.m, q = MAIN[i];
     if (!q) {
-      $('#qMain').innerHTML = '<div class="qall"><b>메인 퀘스트를 모두 마쳤어요</b><p>끝까지 왔어요! 다음 학교급은 숲속 교육부가 열심히 준비 중이에요. 그동안 종업식으로 수료증을 모으고 학생들의 부탁도 들어주세요.</p></div>';
+      $('#qMain').innerHTML = gradOn()   // 5.3.2.1: 박사 학위 뒤에 할 일을 말해요
+        ? '<div class="qall"><b>메인 퀘스트를 모두 마쳤어요</b><p>박사 학위까지 받았어요! 이제는 연구소 창의 논문 탭에서 논문을 쓰고 숲속 학회 메달을 모아요. 연구 트리와 학생들의 부탁도 이어 가요. 다음 학교급은 숲속 교육부가 준비 중이에요.</p></div>'
+        : '<div class="qall"><b>메인 퀘스트를 모두 마쳤어요</b><p>끝까지 왔어요! 다음 학교급은 숲속 교육부가 열심히 준비 중이에요. 그동안 종업식으로 수료증을 모으고 학생들의 부탁도 들어주세요.</p></div>';
     } else {
       const ch = q.ch, list = [];
       MAIN.forEach((m, j) => { if (m.ch === ch) list.push(j); });
@@ -27866,7 +28282,7 @@ body.mg-on .toast[hidden]{display:none}
     if (t !== 'school') $('#scroller').scrollTop = 0;
     if (t === 'shop') { rt.shopPick = ''; renderShop(); $('#panelShop').scrollTop = 0; }
     if (t === 'rank') { rt.rankEdit = false; initRank(); renderRankPanel(); submitRank(); }
-    if (t === 'settings') { renderCloudInfo(); renderNoticeDot(); }
+    if (t === 'settings') { renderCloudInfo(); renderNoticeDot(); rt.mkDraft = null; setSchoolRender(); }   // 5.3.3 학교 간판과 마크(꾸미기 가게에서 옮겨 왔어요)
     if (t === 'mini') renderMini();
     if (prev === 'quests' && t !== 'quests') markQuestsSeen();
     if (t === 'teachers') renderTeachers();
@@ -28319,6 +28735,7 @@ body.mg-on .toast[hidden]{display:none}
   function wireStreet() {
     $('#btnShop').addEventListener('click', () => { if (!rt.paused && !rt.modalOpen) { sfx('tap'); openShop(); } });
     $('#thPrevBack').addEventListener('click', () => { sfx('tap'); thPreviewEnd(false); });
+    $('#thPrevBuy').addEventListener('click', () => { const id = rt.thPrev && rt.thPrev.id; sfx('tap'); thPreviewEnd(false); if (id) { rt.thOpen = id; pickShop('s:' + id); } });   // 5.3.3 사기 전 확인 줄로
     $('#shopList').addEventListener('click', e => {
       const ap = e.target.closest('[data-apply]');
       if (ap) {
@@ -28328,6 +28745,8 @@ body.mg-on .toast[hidden]{display:none}
         sfx('tap'); applyCos(); save(); renderShop();
         return;
       }
+      const tf = e.target.closest('[data-thfold]');   // 5.3.3 테마 세트 펼치기
+      if (tf) { rt.thOpen = rt.thOpen === tf.dataset.thfold ? '' : tf.dataset.thfold; sfx('tap'); renderShop(); return; }
       const pv = e.target.closest('[data-thprev]');
       if (pv) { thPreview(pv.dataset.thprev); return; }
       const p = e.target.closest('[data-play]');
@@ -28701,6 +29120,7 @@ body.mg-on .toast[hidden]{display:none}
       rt.conArm = false; tkUseAll(k); renderSheet();
     });
     $('#conNo').addEventListener('click', () => { rt.conArm = false; sfx('tap'); conSheet(); });
+    $('#conMore').addEventListener('click', () => { rt.conMore = !rt.conMore; sfx('tap'); conSheet(); });   // 5.3.2.2 F-05 다른 방법 펼치기
     // 즉시 완공 단추와 숲의 정수로 즉시 완료
     $('#sheetFree').addEventListener('click', () => {
       const k = rt.sheetKey; if (!k) return;
@@ -28801,6 +29221,7 @@ body.mg-on .toast[hidden]{display:none}
     // 숲속 소풍, 칭찬 스티커판
     $('#sheetPicnic').addEventListener('click', () => viaSheet(openPicnic));
     $('#sheetSticker').addEventListener('click', () => viaSheet(openSticker));
+    $('#sheetWaitGo').addEventListener('click', () => { sfx('tap'); closeSheet(); setTab('quests'); setTimeout(() => { const h = $('#qDaily .td-h'); if (h) h.scrollIntoView({ block: 'start', behavior: rt.reduced ? 'auto' : 'smooth' }); }, 80); });   // 5.3.2.1
     $('#pcTickets').addEventListener('click', e => { const b = e.target.closest('[data-picnic-tk]'); if (b) picnicUseTicket(b.dataset.picnicTk); });
     $('#pcKids').addEventListener('click', e => { const b = e.target.closest('[data-pk]'); if (b) pcKidTap(b.dataset.pk); });
     $('#pcLunch').addEventListener('click', () => { if (!rt.pcLunch && S.ess < PCN.lunch) { toast(essShort(PCN.lunch - S.ess)); return; } rt.pcLunch = !rt.pcLunch; sfx('tap'); renderPicnic(); });
@@ -28867,7 +29288,9 @@ body.mg-on .toast[hidden]{display:none}
     $('#mSb').addEventListener('click', sbClick);
     $('#nsGo').addEventListener('click', () => { if (nsStart()) renderNs(); });
     $('#nsSubs').addEventListener('click', e => { const b = e.target.closest('[data-ns]'); if (!b || b.getAttribute('aria-disabled') === 'true' || nsUsedTonight()) return; rt.nsSub = b.dataset.ns; S.ns.sub = rt.nsSub; save(); renderNs(); });
-    $('#snBtns').addEventListener('click', e => { const b = e.target.closest('[data-sn]'); if (b) snDraw(b.dataset.sn === '10'); });
+    $('#snBtns').addEventListener('click', e => { const b = e.target.closest('[data-sn]'); if (!b) return;
+      if (b.dataset.sn === '10' && b.getAttribute('aria-disabled') !== 'true') { sfx('tap'); askRow($('#snBtns'), `도토리 ${fmt(snCost(true))}로 10번 뽑을까요?`, '10번 뽑기', () => snDraw(true)); return; }   // 5.3.3 큰 값은 한 번 더 물어요
+      askRowOff(); snDraw(b.dataset.sn === '10'); });
     $('#bxDexBtn').addEventListener('click', () => { sfx('tap'); closeModal($('#mBx')); setTimeout(() => { setTab('dex'); setDexSeg('bx'); }, 240); });
     $('#sheetGarden').addEventListener('click', () => { closeSheet(); setTimeout(openGd, 240); });
     $('#mGd').addEventListener('click', e => {
@@ -28895,7 +29318,9 @@ body.mg-on .toast[hidden]{display:none}
   // 마을 기부, 편지, 이름 바꾸기, 실험 노트, 책 고르기
   function wireCare() {
     // 마을 기부 창
-    $('#vdBtns').addEventListener('click', e => { const b = e.target.closest('[data-vdk]'); if (!b) return; const k = b.dataset.vdk; vdGive(k === 'left' || k === 'all' ? k : Number(k)); });
+    $('#vdBtns').addEventListener('click', e => { const b = e.target.closest('[data-vdk]'); if (!b) return; const k = b.dataset.vdk;
+      if (k === 'left' && S.budget >= vdLeft()) { sfx('tap'); askRow($('#vdBtns'), `도토리 ${fmt(vdLeft())}개를 기부해 ${S.vd.lv + 1}단계로 올릴까요?`, '기부하기', () => vdGive('left')); return; }   // 5.3.3 남은 만큼은 한 번 더 물어요
+      askRowOff(); vdGive(k === 'all' ? k : Number(k)); });
     $('#albLetter').addEventListener('click', () => { const pg = S.alb[rt.albPage]; if (pg && pg.ltr) { closeModal($('#mAlbum')); setTimeout(() => openLetter(pg, true), 240); } });
     $('#ltPrev').addEventListener('click', () => { if (rt.plAt != null) openPLetter(rt.plAt - 1, true); });   // 학부모 편지함
     $('#ltNext').addEventListener('click', () => { if (rt.plAt != null) openPLetter(rt.plAt + 1, true); });
@@ -28915,6 +29340,16 @@ body.mg-on .toast[hidden]{display:none}
   // 퀘스트 쪽지와 퀘스트 탭
   function wireQuests() {
     // 퀘스트 쪽지: 완료했으면 보상 받기, 아니면 해야 할 곳으로 바로 가기
+    ['#sheetQReady', '#teaQReady'].forEach(id => $(id).addEventListener('click', e => { e.stopPropagation(); sfx('tap'); qReadyTap(e.currentTarget); }));   // 5.3.2.2 F-04
+    // 5.3.2.2 H-07: 현황판의 동네 등급, 평판, 숲의 정수, 학생 칸을 눌러도 반응이 없었어요. 한 줄 설명을 띄워요
+    [['#gradePill', () => { const G = CFG.grades, g = S.grade; return g < G.length - 1 ? `동네 등급이에요. 평판을 모으면 ${G[g + 1].name}${iga(G[g + 1].name).slice(-1)} 돼요. 대도시가 되면 종업식을 열 수 있어요` : '동네 등급이에요. 가장 높은 대도시예요. 종업식을 열 수 있어요'; }],
+      ['#repPill', () => '평판이에요. 건물과 선생님 레벨을 올리면 쌓이고, 동네 등급이 올라가요'],
+      ['#essPill', () => '숲의 정수예요. 미니게임과 미션에서 모으고, 꾸미기 가게 같은 곳에서 써요'],
+      ['#kidsPill', () => `학생 ${fmt(Math.floor(S.students))}명, 정원 ${fmt(capacity())}명이에요. 교실을 넓히면 더 들어와요`]].forEach(([sel, f]) => {
+      const el = $(sel); if (!el) return;
+      el.style.cursor = 'pointer';
+      el.addEventListener('click', e => { if (rt.paused) return; e.stopPropagation(); sfx('tap'); toast(f()); });
+    });
     $('#questBar').addEventListener('click', () => {
       rt.qTap = true;   // 여는 장면은 이때
       const bar = $('#questBar');
@@ -29250,6 +29685,9 @@ body.mg-on .toast[hidden]{display:none}
       `<h4 class="dex-h">선생님 <small>${DEX_TEA.filter(k => S.dex.got['tea_' + k]).length} / ${DEX_TEA.length}</small></h4><div class="dex-grid">${DEX_TEA.map(k => dexCard('tea_' + k)).join('')}</div>` +
       `<h4 class="dex-h">특별 손님 <small>${DEX_GUEST_KEYS.filter(k => S.dex.got[k]).length} / ${DEX_GUESTS.length}</small></h4><div class="dex-grid">${DEX_GUEST_KEYS.map(dexCard).join('')}</div>` +
       `<h4 class="dex-h">앞으로 올 친구</h4><div class="dex-grid">${Array.from({ length: DEX_FUTURE }, (_, i) => dexLock('숲속 교육부에서 준비 중')).join('')}</div>`;
+    // 5.3.2.2 T-06: 설명 칸이 누른 카드와 떨어진 맨 위에 나왔어요. 누른 카드가 있는 줄 바로 아래로 옮겨요
+    if (pk) { const d = body.querySelector('.dex-detail'), c = body.querySelector(`.dex-card[data-dex="${pk}"]`);
+      if (d && c) { let end = c; for (let n = c.nextElementSibling; n && n.classList.contains('dex-card') && n.offsetTop === c.offsetTop; n = n.nextElementSibling) end = n; end.after(d); d.classList.add('in-grid'); } }
   }
 
   /* ---------- 이벤트 ---------- */
@@ -30188,10 +30626,10 @@ body.mg-on .toast[hidden]{display:none}
     }).join('');
   }
   function setDexSeg(v) {
-    rt.dexSeg = v === 'ach' ? 'ach' : v === 'sn' ? 'sn' : v === 'bx' ? 'bx' : 'dex';   // 간식 도감, 생물 도감
+    rt.dexSeg = v === 'ach' ? 'ach' : v === 'sn' ? 'sn' : v === 'bx' ? 'bx' : v === 'deco' ? 'deco' : 'dex';   // 간식 도감, 생물 도감, 5.3.3 한정 장식 도감
     $$('#dexSeg [data-dseg]').forEach(b => b.setAttribute('aria-checked', String(b.dataset.dseg === rt.dexSeg)));
-    $('#dexPane').hidden = rt.dexSeg !== 'dex'; $('#achPane').hidden = rt.dexSeg !== 'ach'; $('#snPane').hidden = rt.dexSeg !== 'sn'; $('#bxPane').hidden = rt.dexSeg !== 'bx';
-    if (rt.dexSeg === 'ach') renderAch(true); else if (rt.dexSeg === 'sn') snDexRender(); else if (rt.dexSeg === 'bx') bxDexRender(); else renderDex();
+    $('#dexPane').hidden = rt.dexSeg !== 'dex'; $('#achPane').hidden = rt.dexSeg !== 'ach'; $('#snPane').hidden = rt.dexSeg !== 'sn'; $('#bxPane').hidden = rt.dexSeg !== 'bx'; $('#decoDexPane').hidden = rt.dexSeg !== 'deco';
+    if (rt.dexSeg === 'ach') renderAch(true); else if (rt.dexSeg === 'sn') snDexRender(); else if (rt.dexSeg === 'bx') bxDexRender(); else if (rt.dexSeg === 'deco') decoDexRender(); else renderDex();
   }
   // tick170에서 1초마다 불러요
   // 메인 화면 위쪽 학교 카드에 단 칭호를 보여 줘요. 누르면 업적 화면이 열려요
@@ -31950,7 +32388,7 @@ body.mg-on .toast[hidden]{display:none}
     const f = t => {
       if (!WLD.fpsOn) return;
       ts.push(t); while (ts.length && t - ts[0] > 5000) ts.shift();
-      if (!el.dataset.t || t - +el.dataset.t > 500) { el.dataset.t = t; const s = ts.length > 1 ? (ts.length - 1) / ((t - ts[0]) / 1000) : 0; el.textContent = Math.round(s) + ' fps · ' + ['낮음', '보통', '높음'][wldLv()] + (FXL.st === 'ok' ? '' : ' · 엔진 없음'); }
+      if (!el.dataset.t || t - +el.dataset.t > 500) { el.dataset.t = t; const s = ts.length > 1 ? (ts.length - 1) / ((t - ts[0]) / 1000) : 0; el.textContent = Math.round(s) + ' fps ' + ['낮음', '보통', '높음'][wldLv()] + (FXL.st === 'ok' ? '' : ', 엔진 없음'); }
       requestAnimationFrame(f);
     };
     requestAnimationFrame(f);
@@ -32159,7 +32597,7 @@ body.mg-on .toast[hidden]{display:none}
     fmt, fmt2, graduate, promote, buyPerk, perkCost, perkMaxed, buyFundPerk, fpCost, claimMain, mainReady, curMain, qNo, earn, CFG, TEA, teaMaxed, PERKS, FPERKS, MAIN, finalYear, startTrip, claimTrip, TRIPS, yearLocked, endSports, rtSports: () => rt.sports, rtFest: () => rt.fest, facCap, addLeague, addMP, tutStart, endFest, claimBox, musicWant, askBox, festWait, setTab,
     RARE, modelOf, rareRoll, rareGot, showRareTalk, rareDexHTML, kidSVG, rosterKid, WX, wxOf, wxIs, rdMinNow, renderWeather, PL, plSync, plUnread, openPLetter, renderPLetter, RS, rsNum, rsSync, rsAdd, rsLabel, lookDoc, lookRead, lookPush, lookSet, openLook, MODEL_SCHOOL, joinRank, PS, PS_M, PS_SEASONS, psSeason, psOpen, psSync, psLv, psGot, psReward, psClaimAll, psClaimMission, psWatchAd, psClaimable, psStepReady, psExtraReady, psChooseFur, psFurImg, renderPass, setEvSeg, xtGot, achTitles,   // 숲속 패스
     MAP_OAK, oakArt, layoutOak, mapOak, oakAt, tapOak, dropSpot,
-    dexMeet, dexSync, dexPending, dexGift, renderDex, evCurrent, evNext, evUpcoming, evSync, evFix, evVal, EV_FALLBACK, EV_DECO, EV_HAT, COS, DECO_BY, decoOwn, perkRec, fpRec, BOOST_ALL, buyShop, pickShop, showNote, showOkOn, showWd, renderGradPanel, renderShop, renderDecoShop, EV_WEEKLY, EV_WEEK_BASE, weekMon, claimStamp, claimEvMission, claimEvBox, renderEvent, evMissions, evOk, evSkipped, EV_MONTHS, EV_MEASURE, tierMinutes, minAcorns, IMG, sanitize171, ACH, achSync, claimAch, setTitle, renderAch, setDexSeg, achClaimable, XT, xtAct, xtCost, xtLv, feastMins, libMult, propInstances, walkBuild, festItemSvg, guestArt, adErrText, googleErrText, openSheet, closeSheet, startFest, startSports, sanitize170, EV_STAMPS, EV_SPECIAL, EV_MONTHLY, EV_BOX, DEX_KEYS, DEX_REWARD, DEX_GUEST_KEYS, seasonKey, roofArtKey, thrKey, PP, PP_TITLES, ppOpen, ppPer, ppData, ppDay, ppWrite, ppTick, ppSync, ppScore, ppSemDone, rtMax, alumniLines, SIDE, vdReward, oakKey, setSeasonArt, VP, vpLv, vpCost, vpMult, vpAct, renderVpCard, sportsPrize, festPrize, renderTeachers, buildTeacherCards, bldImg, roofKey, bldStage, mapKey, setMapArt, applyThemes, buyFacility, bldFx, setBldFx, mapHi, Live, liveApply, liveLoad, liveOff, LIVE_KEYS, EVC, NOTICES, openNotice, noticeAuto, noticeWant, ntUnread, startTrial, endTrial: () => rt.trial && (rt.trial.left = 0), spawnDeal, startVisit, IMG170, MG, mgCells, mgSetCells, mgTick, mgAddEnergy, mgAddUp, mgTapGen, mgDrop, mgSell, mgUpgrade, mgAddUp, mgUpSwap, mgGensMax, MG_UP_ESS, mgClaimOrder, mgSwapOrder, mgOrderOk, mgFillOrders, mgOpen, mgClose, mgRenderAll, mgSpawnLevel, mgNearestEmpty, mgEmptyBoard, mgOrderReward, mgUI, sanitize180, mgWatchAd, mgNewOrder, mgHintPick, mgShowHint, mgClearHint, mgTouch, mgOrderGuide, mgDexN, mgDexCan, mgDexClaim, mgOpenDex, MG_DEX, MG_DEX_MS, mgDexEss, mgDexEssCan, mgDexEssN, mgDexMsCan, mgDexMsClaim, MGB, mgBuyBoost, mgBstLeft, mgOpenBoost, nice, claimMission, claimBonus, claimWeekMission, MP_BOX, swapDaily, repairMissions, MISSIONS, WMISSIONS, dmDay, wkWeek,   // 도감, 이벤트
+    dexMeet, dexSync, dexPending, dexGift, renderDex, evCurrent, evNext, evUpcoming, evSync, evFix, evVal, EV_FALLBACK, EV_DECO, EV_HAT, COS, DECO_BY, decoOwn, perkRec, fpRec, gmPast, gmItems, gmNow, GMON, buyShop, pickShop, showNote, showOkOn, showWd, renderGradPanel, renderShop, renderDecoShop, EV_WEEKLY, EV_WEEK_BASE, weekMon, claimStamp, claimEvMission, claimEvBox, renderEvent, evMissions, evOk, evSkipped, EV_MONTHS, EV_MEASURE, tierMinutes, minAcorns, IMG, sanitize171, ACH, achSync, claimAch, setTitle, renderAch, setDexSeg, achClaimable, XT, xtAct, xtCost, xtLv, feastMins, libMult, propInstances, walkBuild, festItemSvg, guestArt, adErrText, googleErrText, openSheet, closeSheet, startFest, startSports, sanitize170, EV_STAMPS, EV_SPECIAL, EV_MONTHLY, EV_BOX, DEX_KEYS, DEX_REWARD, DEX_GUEST_KEYS, seasonKey, roofArtKey, thrKey, PP, PP_TITLES, ppOpen, ppPer, ppData, ppDay, ppWrite, ppTick, ppSync, ppScore, ppSemDone, rtMax, alumniLines, SIDE, vdReward, oakKey, setSeasonArt, VP, vpLv, vpCost, vpMult, vpAct, renderVpCard, sportsPrize, festPrize, renderTeachers, buildTeacherCards, bldImg, roofKey, bldStage, mapKey, setMapArt, applyThemes, buyFacility, bldFx, setBldFx, mapHi, Live, liveApply, liveLoad, liveOff, LIVE_KEYS, EVC, NOTICES, openNotice, noticeAuto, noticeWant, ntUnread, startTrial, endTrial: () => rt.trial && (rt.trial.left = 0), spawnDeal, startVisit, IMG170, MG, mgCells, mgSetCells, mgTick, mgAddEnergy, mgAddUp, mgTapGen, mgDrop, mgSell, mgUpgrade, mgAddUp, mgUpSwap, mgGensMax, MG_UP_ESS, mgClaimOrder, mgSwapOrder, mgOrderOk, mgFillOrders, mgOpen, mgClose, mgRenderAll, mgSpawnLevel, mgNearestEmpty, mgEmptyBoard, mgOrderReward, mgUI, sanitize180, mgWatchAd, mgNewOrder, mgHintPick, mgShowHint, mgClearHint, mgTouch, mgOrderGuide, mgDexN, mgDexCan, mgDexClaim, mgOpenDex, MG_DEX, MG_DEX_MS, mgDexEss, mgDexEssCan, mgDexEssN, mgDexMsCan, mgDexMsClaim, MGB, mgBuyBoost, mgBstLeft, mgOpenBoost, nice, claimMission, claimBonus, claimWeekMission, MP_BOX, swapDaily, repairMissions, MISSIONS, WMISSIONS, dmDay, wkWeek,   // 도감, 이벤트
     PZ, PZ_SHAPES, pzFits, pzAnyFit, pzStuck, pzFullLines, pzPlace, pzFreshGame, pzStart, PZB, pzbCost, pzApplyBoost, pzBoostOpen, pzBoostGo, festGoldLeft, festGoldTake, claimSports, TR2, TR2_PL, openTr2, tr2Act, tr2Away, tr2Ready, tr2Rsv, tr2Tick, renderAlbum, FEST, FEST_IDS, festNight, festShown, festTimeLock, festOpen, startFest, openFest, endFest, renderStreet, pzFinish, pzLeft, pzCanAd, pzEssOf, pzMinOf, pzHelpSquirrel, pzHelpOwl, pzHelpBear, fillSubs, mapRoofTop, showAd, claimOfflineDouble, startBoost, tripAd, festFocus, festRange, visMap, renderMissions, pzHasHelp, pzRot, pzNewPiece, pzOpen, pzClose, pzGameOver, pzRenderAll, renderMini, addEss, ESHOP, SP_FUR, applyCos, essItem, pickEss, buyEss, renderEssShop, hatSVG, spFurImg, gameNow, gameToday, gameWeek, kstDay, setServerTime, SVR, dmDay, weekIdx, lgWeek, wkWeek, lgKey, pzDay, goldDay, boostLeft, dealLeft, canStamp };
   if (window.__FOREST_TEST) Object.assign(window.__forest, { uniTerm, utSync, tripUseTicket, readUseTicket, picnicUseTicket, buyDecoPieces, adGold, claimBonus, cloudPush, cloudClash, syncGet, revOf, deleteAccount, lookDel: () => lookDelNow(), lookSet, lookPush, leaveRank, sanitizeCg, freshCg, ambWant, ambSync, AMB, AMB_LV, WLD, wldSync, wldLv, wldPhase, wldWeather, wldAuto, WLD_WATER, wldCurtain, photoOpen, photoClose, oakBend, oakBands, frPatAll, frPatLeft, fpsToggle, fxRes, fxWant, gradRecReady, teaRecReady });   // 시험 손잡이
   if (window.claude && window.claude.hot && window.claude.hot.snapshot) {

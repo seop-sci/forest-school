@@ -131,10 +131,10 @@
     }).join('');
   }
   function setDexSeg(v) {
-    rt.dexSeg = v === 'ach' ? 'ach' : v === 'sn' ? 'sn' : v === 'bx' ? 'bx' : 'dex';   // 간식 도감, 생물 도감
+    rt.dexSeg = v === 'ach' ? 'ach' : v === 'sn' ? 'sn' : v === 'bx' ? 'bx' : v === 'deco' ? 'deco' : 'dex';   // 간식 도감, 생물 도감, 5.3.3 한정 장식 도감
     $$('#dexSeg [data-dseg]').forEach(b => b.setAttribute('aria-checked', String(b.dataset.dseg === rt.dexSeg)));
-    $('#dexPane').hidden = rt.dexSeg !== 'dex'; $('#achPane').hidden = rt.dexSeg !== 'ach'; $('#snPane').hidden = rt.dexSeg !== 'sn'; $('#bxPane').hidden = rt.dexSeg !== 'bx';
-    if (rt.dexSeg === 'ach') renderAch(true); else if (rt.dexSeg === 'sn') snDexRender(); else if (rt.dexSeg === 'bx') bxDexRender(); else renderDex();
+    $('#dexPane').hidden = rt.dexSeg !== 'dex'; $('#achPane').hidden = rt.dexSeg !== 'ach'; $('#snPane').hidden = rt.dexSeg !== 'sn'; $('#bxPane').hidden = rt.dexSeg !== 'bx'; $('#decoDexPane').hidden = rt.dexSeg !== 'deco';
+    if (rt.dexSeg === 'ach') renderAch(true); else if (rt.dexSeg === 'sn') snDexRender(); else if (rt.dexSeg === 'bx') bxDexRender(); else if (rt.dexSeg === 'deco') decoDexRender(); else renderDex();
   }
   // tick170에서 1초마다 불러요
   // 메인 화면 위쪽 학교 카드에 단 칭호를 보여 줘요. 누르면 업적 화면이 열려요

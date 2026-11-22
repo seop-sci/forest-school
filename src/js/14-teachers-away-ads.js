@@ -186,8 +186,11 @@
     const from = S.away && S.away.from > 0 ? S.away.from : S.savedAt;
     if (!timeSrc()) { awayApply((gameNow() - from) / 1000); return; }
     rt.awayWait = { from, skip: (S.away && S.away.skip) || 0, perf: (document.hidden || rt.paused) ? null : perfNow() };
-    if (serverTimeOk()) awaySettle();
+    if (serverTimeOk()) { awaySettle(); return; }
+    // 5.3.2.1: 인터넷 없이 켜면 서버 시간이 올 때까지 보상이 말없이 미뤄져서 '보상이 사라졌다'로 보였어요. 6초 뒤에도 기다리고 있으면 한 줄 알려요
+    if (gameNow() - from >= CFG.awayModalSec * 1000) setTimeout(() => { if (rt.awayWait && rt.awayWait.from === from && !serverTimeOk()) toast('인터넷이 이어지면 자리 비운 보상을 드려요'); }, AWAY_WAIT_MS);
   }
+  const AWAY_WAIT_MS = 6000;
   // 켠 뒤 논 시간(skip)은 화면이 보이고 학교가 열려 있는 동안만 세요. 앱을 내리거나 학교를 닫으면 멈췄다가, 다시 열면 이어 세요
   function awaySkip(w) { return w.skip + (w.perf == null ? 0 : perfNow() - w.perf); }
   function awayHold(stop) {
@@ -446,9 +449,6 @@
     const on = feastOn();
     setHid($('#feastChip'), !on);
     if (on) setTx($('#feastTime'), clock(Math.ceil((S.hd.feastUntil - gameNow()) / 1000)));
-    const au = autoOn();
-    setHid($('#autoChip'), !au);
-    if (au) setTx($('#autoTime'), clock(Math.ceil((S.autoUntil - gameNow()) / 1000)));
   }
   function openDeal() {
     if (rt.paused || rt.modalOpen || !rt.deal) return;

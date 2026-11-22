@@ -1754,4 +1754,104 @@ body.mg-on .toast[hidden]{display:none}
 .ta-mem{width:18px;height:18px;vertical-align:-4px;margin:0 2px}
 .dp-ic img.ta-dim{opacity:.35;filter:grayscale(1)}
 .ta-fig,.ta-mon{pointer-events:none}
+/* 5.3.2.1 연구소 창: 짧은 화면(360×740)에서 연구 트리와 논문을 펼치면 '닫기'가 창 밖으로 잘렸어요. 머리와 탭과 닫기 줄은 그대로 두고 안쪽만 밀려요 */
+#mRx > .modal{display:flex;flex-direction:column;overflow:hidden}#mRx > .modal > *{flex:none}#mRx #rxBody{flex:1 1 auto;min-height:0;overflow-y:auto;overscroll-behavior:contain}
+/* 5.3.2.1 학회 카드: 어두운 화면에서 밝은 글이 연한 노란 바탕 위라 거의 안 보였어요(대비 약 1.5:1). 어두운 화면은 짙은 바탕 */
+@media (prefers-color-scheme: dark){:root:not([data-theme="light"]) .pp-conf{background:#3A3322;border-color:#9C7A2C}}
+:root[data-theme="dark"] .pp-conf{background:#3A3322;border-color:#9C7A2C}
+/* 5.3.2.2 H-23, M-17, 2.3-9: 보이는 크기는 그대로 두고 누르는 영역만 넓혀요(투명한 가상 요소). 붙어 있는 단추와는 칸 사이 틈까지만 넓혀 서로 겹치지 않아요 */
+.tier-dots .td,.ac-row,.ac-bk,.td-fold,#rxSeg button,.dp-row .btn-sub.small,.dp-row .cta.small,.gd-plot button,.pz-cardw .pz-swb{position:relative}
+.tier-dots .td::before,.ff-chip .ffx::before,.ac-row::before,.ac-bk::before,.td-fold::before,#rxSeg button::before,.dp-row .btn-sub.small::before,.dp-row .cta.small::before,.gd-plot button::before,.pz-cardw .pz-swb::before{content:'';position:absolute}
+.tier-dots .td::before{inset:-10px -2px}
+.ff-chip .ffx::before{left:-24px;top:-24px;right:-2px;bottom:-2px}
+.ac-row::before{inset:-2px 0}.ac-bk::before{inset:-3px -6px}
+.td-fold::before{inset:-12px 0}
+#rxSeg button::before{inset:-9px 0}
+.dp-row .btn-sub.small::before,.dp-row .cta.small::before{inset:-8px 0}
+.gd-plot button::before{inset:-10px -3px}
+.pz-cardw .pz-swb::before{inset:-10px -4px}
+.dex-grid > .dex-detail.in-grid{grid-column:1/-1;margin:2px 0 4px}   /* 5.3.2.2 T-06 누른 카드 줄 바로 아래 */
+.deco-ev > summary{cursor:pointer;list-style:none;display:flex;align-items:baseline;gap:6px}.deco-ev > summary::-webkit-details-marker{display:none}.deco-ev > summary::after{content:'';margin-left:auto;align-self:center;width:7px;height:7px;border-right:2px solid currentColor;border-bottom:2px solid currentColor;transform:rotate(45deg)}.deco-ev[open] > summary::after{transform:rotate(-135deg)}   /* 5.3.2.2 T-04 */
+/* ===== 5.3.3 상점 새 진열 (docs/SHOP-2026-11.md 4.2절). 강조 색은 '사기' 하나, 글자 크기 넷(17, 15, 13.5, 12.5) ===== */
+.shop-top{position:sticky;top:0;z-index:8;margin:-4px -16px 6px;padding:6px 16px 6px;background:var(--paper);box-shadow:0 6px 8px -8px var(--shadow)}
+.shop-nav{display:flex;gap:6px;overflow-x:auto;scrollbar-width:none;padding:2px 0 6px}.shop-nav::-webkit-scrollbar{display:none}
+.shop-nav button{flex:none;display:inline-flex;align-items:center;min-height:40px;margin:0;padding:0 14px;border:1.5px solid var(--line);border-radius:999px;background:var(--card);color:var(--ink);font-family:var(--font-display);font-size:14px;white-space:nowrap;cursor:pointer}
+.shop-nav .sn-go.on{border-color:transparent;background:var(--ink);color:var(--paper)}
+.shop-nav .street-back{padding-left:10px}
+.shop-wallet{display:flex;justify-content:center;gap:8px;flex-wrap:wrap}
+.shop-wallet .w-it{display:inline-flex;align-items:center;gap:5px;min-height:34px;padding:0 12px 0 8px;border-radius:999px;background:var(--card);border:1px solid var(--line);color:var(--ink);font-variant-numeric:tabular-nums}
+.shop-wallet .w-it b{font-family:var(--font-chalk);font-size:17px;font-weight:700}
+.shop-wallet .w-it svg,.shop-wallet .w-it .tic,.shop-wallet .w-it img{width:20px;height:20px;flex:none;object-fit:contain;background-size:contain}
+.shop-cats{display:flex;gap:6px;overflow-x:auto;scrollbar-width:none;padding:8px 0 0}.shop-cats::-webkit-scrollbar{display:none}
+.shop-cats button{flex:none;min-height:36px;padding:0 13px;border:0;border-radius:10px;background:color-mix(in srgb, var(--line) 55%, transparent);color:var(--ink);font:inherit;font-size:13.5px;cursor:pointer}
+.shop-panel .shop-have,#essHaveBox,#panelEss > .shop-adleft{display:none}   /* 재화 줄이 대신해요(요소는 그대로) */
+.shop-panel .shop-h{margin:16px 2px 8px;font-size:17px;color:var(--ink)}.shop-panel .shop-h small{font-size:12.5px;color:var(--muted)}
+/* 타일(꾸미기 품목) */
+.shop-panel .shop-grid{gap:8px}
+.shop-panel .si{min-height:120px;justify-content:flex-start;gap:4px;padding:10px 4px 9px;border:1px solid color-mix(in srgb, var(--line) 85%, transparent);border-radius:14px;box-shadow:0 1px 0 rgba(0,0,0,.05),0 3px 8px rgba(40,30,10,.06)}
+.shop-panel .si .nm{font-size:13.5px;line-height:1.25;min-height:1.25em}
+.shop-panel .si .pr{min-height:24px;padding:0 9px;border-radius:999px;font-size:13px;font-weight:700;color:var(--muted)}
+.shop-panel .si:not(.own):not(.poor):not(.lock):not(.out):not(.on) .pr{background:var(--accent);color:var(--accent-ink)}
+.shop-panel .si.poor .pr{background:none;box-shadow:inset 0 0 0 1.5px var(--line);color:var(--muted)}
+.shop-panel .si.own:not(.on) .pr,.shop-panel .si.on .pr{box-shadow:inset 0 0 0 1.5px var(--accent);color:var(--ink)}
+.shop-panel .si.own::after{content:'가졌어요';position:absolute;top:6px;left:6px;padding:0 5px;border:1.5px solid #C9A04A;border-radius:6px;color:#9A6E18;font-size:11px;line-height:16px;transform:rotate(-6deg)}
+.shop-panel .si.out{opacity:.6}
+.shop-panel .lack,.big-card .lack,.buyw .lack{display:block;font-style:normal;font-size:12px;line-height:1.3;color:var(--danger)}
+.shop-panel .nx{display:block;font-style:normal;font-size:12px;line-height:1.3;color:var(--muted)}
+.shop-panel .si.hl,.shop-panel .sb.hl{box-shadow:0 0 0 3px var(--accent)}
+/* 줄(소모품) */
+.shop-panel .sb{min-height:72px;gap:12px;padding:10px 12px;border:1px solid color-mix(in srgb, var(--line) 85%, transparent);box-shadow:0 1px 0 rgba(0,0,0,.05),0 3px 8px rgba(40,30,10,.06)}
+.shop-panel .sb + .sb{margin-top:8px}
+.shop-panel .sb .pv{width:44px;height:44px}.shop-panel .sb .tx b{font-size:15px}.shop-panel .sb .tx span,.shop-panel .sb .tx small{font-size:12.5px}
+.shop-panel .sb .buy{min-height:44px;min-width:72px;justify-content:center}
+.buyw{flex:none;display:flex;flex-direction:column;align-items:center;gap:2px;text-align:center}
+.shop-panel .sb .buy.off{opacity:.5}
+.shop-panel .sb.ev-dex{width:100%;margin-top:14px;text-align:left;font:inherit;color:inherit;cursor:pointer}
+.pill{flex:none;display:inline-flex;align-items:center;gap:4px;min-height:30px;padding:0 11px;border-radius:999px;background:var(--accent);color:var(--accent-ink);font-family:var(--font-chalk);font-size:15px;font-weight:700;white-space:nowrap}
+.pill svg,.pill .tic{width:15px;height:15px;background-size:contain}
+.pill.own{background:none;box-shadow:inset 0 0 0 1.5px var(--accent);color:var(--ink);font-family:inherit;font-size:13px}
+.sb.ev-dex .pill{background:none;box-shadow:inset 0 0 0 1.5px var(--line);color:var(--ink)}
+/* 큰 진열(오늘의 진열대) */
+.big-card{display:flex;align-items:center;gap:12px;width:100%;min-height:104px;margin:0 0 8px;padding:12px;border:1px solid color-mix(in srgb, var(--line) 85%, transparent);border-radius:18px;background:var(--card);color:var(--ink);font:inherit;text-align:left;box-shadow:0 1px 0 rgba(0,0,0,.05),0 4px 12px rgba(40,30,10,.08);cursor:pointer}
+.big-card .bc-pv{flex:none;width:80px;height:80px;border-radius:14px;display:grid;place-items:center;overflow:hidden;background:var(--grass)}
+.big-card .bc-pv img,.big-card .bc-pv svg,.big-card .bc-pv .tic{width:66px;height:66px;object-fit:contain;background-size:contain}
+.big-card .bc-tx{flex:1;min-width:0;display:flex;flex-direction:column;gap:2px}
+.big-card .bc-tx small{font-size:12.5px;color:var(--muted)}.big-card .bc-tx b{font-family:var(--font-display);font-weight:400;font-size:17px;line-height:1.25}.big-card .bc-tx span{font-size:12.5px;color:var(--muted)}
+.big-card .bc-pr{flex:none;display:flex;flex-direction:column;align-items:center;gap:2px}
+.big-card.poor .pill{background:none;box-shadow:inset 0 0 0 1.5px var(--line);color:var(--muted)}
+/* 상점 거리: 하늘과 바닥을 줄이고(그림은 그대로) 아래에 진열대 */
+.street-panel{background:var(--paper)}
+.street-panel .street-scene{margin-top:-21%;margin-bottom:-24%}
+.street-panel .street-title{top:10px}
+.street-wallet{position:absolute;z-index:3;right:10px;top:10px;flex-direction:column;align-items:flex-end;gap:4px}
+.street-wallet .w-it{min-height:30px;background:color-mix(in srgb, var(--paper) 90%, transparent)}
+.shelf,.shop-more{position:relative;z-index:2;padding:4px 16px 0;background:var(--paper)}
+.shelf{margin-top:0;padding-top:10px;border-radius:20px 20px 0 0;box-shadow:0 -6px 12px -10px rgba(0,0,0,.35)}
+.shelf .shop-h,.shop-more .shop-h{margin:6px 2px 8px;font-family:var(--font-display);font-weight:400;font-size:17px;color:var(--ink)}.shelf .shop-h small,.shop-more .shop-h small{font-size:12.5px;color:var(--muted)}
+.shop-more{padding-bottom:18px}
+.more-row{display:flex;gap:8px}
+.more-go{flex:1;display:flex;flex-direction:column;align-items:flex-start;justify-content:center;min-height:56px;padding:8px 12px;border:1px solid var(--line);border-radius:14px;background:var(--card);color:var(--ink);font:inherit;text-align:left;cursor:pointer}
+.more-go b{font-family:var(--font-display);font-weight:400;font-size:15px}.more-go small{font-size:12.5px;color:var(--muted)}
+@media (prefers-color-scheme: dark){:root:not([data-theme="light"]) .street-panel .street-scene{filter:brightness(.82) saturate(.9)}}
+:root[data-theme="dark"] .street-panel .street-scene{filter:brightness(.82) saturate(.9)}
+/* 테마 세트: 접힌 줄, 누르면 펼쳐요 */
+.th-card{padding:0;overflow:hidden;border:1px solid color-mix(in srgb, var(--line) 85%, transparent);background:var(--card)}
+.th-fold{display:flex;align-items:center;gap:12px;width:100%;min-height:72px;padding:10px 12px;border:0;background:none;color:var(--ink);font:inherit;text-align:left;cursor:pointer}
+.th-fold .th-sw{flex:none;width:56px;height:48px;border-radius:10px;overflow:hidden;display:grid;place-items:center;background:var(--grass)}
+.th-fold .th-sw > *{width:100%;height:100%;object-fit:cover}
+.th-fold .th-nm{flex:1;min-width:0;display:flex;flex-direction:column}.th-fold .th-nm b{font-family:var(--font-display);font-weight:400;font-size:15px}.th-fold .th-nm small{font-size:12.5px;color:var(--muted)}
+.th-fold::after{content:'';flex:none;width:8px;height:8px;margin-left:2px;border-right:2px solid var(--muted);border-bottom:2px solid var(--muted);transform:rotate(45deg)}
+.th-card.open .th-fold::after{transform:rotate(-135deg)}
+.th-card.fold .th-body{display:none}
+.th-card .th-body{padding:0 10px 10px}.th-card .th-body > .th-top > b{display:none}
+/* 광고 단추와 도장판은 한 단계 낮춰요(노랑은 '사기'에만) */
+#panelShop #shopAd{min-height:44px;background:var(--card);color:var(--ink);box-shadow:inset 0 0 0 1.5px var(--accent)}
+.shop-panel .shop-h{flex-wrap:wrap;row-gap:2px}.shop-panel .shop-h small{flex-basis:100%;margin-left:0}
+@media (max-width:380px){.shop-nav button{padding:0 11px;font-size:13.5px}.shop-nav .street-back{padding-left:8px}}
+.ask-row{margin:10px 0 2px;padding:10px 12px;border-radius:14px;background:var(--card);border:1.5px solid var(--accent)}
+.ask-row p{margin:0 0 8px;font-size:14px;line-height:1.4;color:var(--ink);text-align:center}
+.ask-row .btn-row{display:flex;gap:8px}.ask-row .btn-row button{flex:1;min-height:44px}
+.th-prevbar .btn-sub{flex:none;width:auto;min-height:36px;padding:0 10px;margin:0;background:transparent;color:#FFF9E9;border:1.5px solid rgba(255,249,233,.5)}
+.th-prevbar #thPrevBuy svg{width:15px;height:15px;vertical-align:-2px;margin:0 2px}
+.shop-nav button{min-height:44px}.shop-cats button{position:relative}.shop-cats button::before{content:'';position:absolute;left:0;right:0;top:-4px;bottom:-4px}   /* 누르는 곳 44px */
 </style>

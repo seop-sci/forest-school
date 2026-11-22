@@ -11,6 +11,7 @@ import asyncio
 from playwright.async_api import async_playwright
 from testlib import URL, F
 import s73test as T
+NB_OFF = "(()=>{ window.__forest.Live.off.add('night'); const m = document.querySelector('#mNb'); if (m && m.classList.contains('open')) { m.hidden = true; m.classList.remove('open'); window.__forest.rt.modalOpen = null; } })()"
 
 async def main():
     bad = []
@@ -21,6 +22,7 @@ async def main():
             await ctx.add_init_script("window.__FOREST_TEST = true; localStorage.clear();")
             pg = await ctx.new_page(); errs = []; pg.on('pageerror', lambda e: errs.append(str(e)))
             await pg.goto(URL); await pg.wait_for_timeout(2500); await pg.evaluate(T.SKIP)
+            await pg.evaluate(NB_OFF)   # 야간 건설과 특별 이벤트 주말 하루 종일 가속을 꺼요(이 시험은 기본 공사 시간을 봐요. 켜 두면 밤 8~12시와 특별 이벤트 주말에 알림 창이 지도를 덮고 공사가 빨라져요)
             if w == 390:
                 # 1) 2) 공사 시간
                 r = await pg.evaluate(f"""(() => {{ const F = {F}, S = F.S, o = {{}};

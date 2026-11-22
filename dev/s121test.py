@@ -13,13 +13,13 @@ async def main():
         r = await page.evaluate(f"""(()=>{{ const F={F}, S=F.S; S.st.gold=10; const g0=S.gold, e0=S.ess; const a=F.goldOr(2); const b=[S.gold-g0, S.ess-e0];
           S.st.gold=60; const g1=S.gold, e1=S.ess; const c=F.goldOr(2, '(시험)'); return {{a, b, c, d:[S.gold-g1, S.ess-e1], n:F.goldOr(0)}}; }})()""")
         print('goldOr', r)
-        ok(r['b'] == [2, 0] and r['a']['t'] == '황금 도토리 +2', '60개 전에는 황금'); ok(r['d'] == [0, 40] and r['c']['t'] == '숲의 정수 +40 (시험)', '60개 뒤에는 정수 20배'); ok(r['n'] is None, '0개는 아무것도')
+        ok(r['b'] == [2, 0] and r['a']['t'] == '황금 도토리 +2', '60개 전에는 황금'); ok(r['d'] == [0, 20] and r['c']['t'] == '숲의 정수 +20 (시험)', '60개 뒤에는 정수 10배(5.3.3 woodani, 예전 20배)'); ok(r['n'] is None, '0개는 아무것도')
         r = await page.evaluate(f"""(()=>{{ const F={F}, S=F.S; S.st.gold=100; const out=[];
           for (const n of [0, 6]) {{ S.att.n=n; S.att.last=''; const g0=S.gold, e0=S.ess; F.stampAtt && F.stampAtt(); out.push([S.gold-g0, S.ess-e0]); document.querySelectorAll('.overlay').forEach(o=>{{o.hidden=true;o.classList.remove('open')}}); F.rt.modalOpen=null; F.rt.modalQueue.length=0; }}
           return out; }})()""")
-        print('출석', r); ok(r == [[0, 20], [1, 0]], '출석은 7일째만 황금')
-        r = await page.evaluate(f"""(async()=>{{ const F={F}, S=F.S, sl=ms=>new Promise(r=>setTimeout(r,ms)); S.gd={{day:'', n:0, shop:0}}; const g0=S.gold; F.adGold(); await sl(1500);
-          const t=[...document.querySelectorAll('.toast, #toast, .tst')].map(e=>e.textContent).join('|'); return [S.gold-g0, t]; }})()""")
+        print('출석', r); ok(r == [[0, 10], [1, 0]], '출석은 7일째만 황금(그 밖에는 정수 10)')
+        r = await page.evaluate(f"""(async()=>{{ const F={F}, S=F.S, sl=ms=>new Promise(r=>setTimeout(r,ms)); S.gd={{day:'', n:0, shop:0}}; const g0=S.gold; F.adGold(); let t='';
+          for (let i=0;i<25 && !/광고 선물/.test(t);i++) {{ await sl(200); t=[...document.querySelectorAll('.toast, #toast, .tst')].map(e=>e.textContent).join('|'); }} return [S.gold-g0, t]; }})()""")
         print('광고', r); ok(r[0] == 1 and '광고 선물' in r[1], '광고를 보면 황금 +1과 알림')
         ok(not errs, f'페이지 오류 {errs[:3]}')
         await b.close()

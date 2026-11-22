@@ -680,6 +680,31 @@
   }
 
   /* 칠판 아래 퀘스트 쪽지: 지금 메인 퀘스트, 다 마치면 학생 부탁 */
+  /* 5.3.2.2 F-04: 건물 창과 선생님 탭에서는 위쪽 퀘스트 칸의 '받기'를 누르면 창만 닫혔어요. 퀘스트를 마치면 그 화면 아래에 '보상 받기' 띠를 띄워요 */
+  function qReadyNow() {
+    const mq = curMain();
+    if (mq) return mainReady() ? { ref: 'main', tx: `${qNo(S.q.m)} ${mq.title}` } : null;
+    const s = S.q.subs.find(subReady); return s ? { ref: s.id, tx: `${WHO[s.who]}의 부탁` } : null;
+  }
+  function renderQReady() {
+    if (!S) return;
+    const r = rt.paused ? null : qReadyNow();
+    for (const [id, on] of [['#sheetQReady', !!rt.sheetKey], ['#teaQReady', rt.tab === 'teachers' && !rt.sheetKey]]) {
+      const el = $(id); if (!el) continue;
+      const key = r && on ? r.ref + '|' + r.tx : '';
+      if (el.dataset.key === key) continue;
+      el.dataset.key = key; el.hidden = !key; if (!key) continue;
+      el.innerHTML = `<span class="qr-tx"><small>퀘스트를 마쳤어요</small><b>${esc(r.tx)}</b></span><span class="qr-go">보상 받기</span>`;
+      el.setAttribute('aria-label', `${r.tx} 보상 받기`);
+    }
+  }
+  function qReadyTap(el) {
+    const r = qReadyNow(); if (!r || rt.paused) return;
+    rt.qTap = true;
+    if (r.ref === 'main') claimMain(el); else claimSub(r.ref, el);
+    renderQReady(); if (rt.sheetKey) renderSheet();
+  }
+  setInterval(() => { try { renderQReady(); } catch (e) { /* 다음에 */ } }, 500);
   function renderQuestBar() {
     const bar = $('#questBar');
     const mq = curMain();
@@ -785,7 +810,9 @@
   function buildQuestPanel() {
     const i = S.q.m, q = MAIN[i];
     if (!q) {
-      $('#qMain').innerHTML = '<div class="qall"><b>메인 퀘스트를 모두 마쳤어요</b><p>끝까지 왔어요! 다음 학교급은 숲속 교육부가 열심히 준비 중이에요. 그동안 종업식으로 수료증을 모으고 학생들의 부탁도 들어주세요.</p></div>';
+      $('#qMain').innerHTML = gradOn()   // 5.3.2.1: 박사 학위 뒤에 할 일을 말해요
+        ? '<div class="qall"><b>메인 퀘스트를 모두 마쳤어요</b><p>박사 학위까지 받았어요! 이제는 연구소 창의 논문 탭에서 논문을 쓰고 숲속 학회 메달을 모아요. 연구 트리와 학생들의 부탁도 이어 가요. 다음 학교급은 숲속 교육부가 준비 중이에요.</p></div>'
+        : '<div class="qall"><b>메인 퀘스트를 모두 마쳤어요</b><p>끝까지 왔어요! 다음 학교급은 숲속 교육부가 열심히 준비 중이에요. 그동안 종업식으로 수료증을 모으고 학생들의 부탁도 들어주세요.</p></div>';
     } else {
       const ch = q.ch, list = [];
       MAIN.forEach((m, j) => { if (m.ch === ch) list.push(j); });

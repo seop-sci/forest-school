@@ -1,6 +1,6 @@
 # 131번 시험(4.3.1): 정수 상점 고침과 숲의 정수로 도토리 바꾸기, 위 칸 학교급 글
 # 1) 정수 상점에서 문제집을 사면 '오늘 n권 남았어요'가 바로 줄어요
-# 2) 숲의 정수 20개로 도토리(수업료 30분치, 제안), 하루 5번, 수료증 셈(올해 번 도토리)은 그대로, 정수가 모자라면 바뀌지 않아요
+# 2) (5.3.3부터 누르면 바로 바꿔요, 확인 줄 없음) 숲의 정수 20개로 도토리(수업료 30분치, 제안), 하루 5번, 수료증 셈(올해 번 도토리)은 그대로, 정수가 모자라면 바뀌지 않아요
 # 3) 옛 저장(es.ax 없음)도 받아요  4) 위 칸 글에 '대도시예요!'가 없어요  5) 360px 밝은 화면과 어두운 화면 그림
 import asyncio, pathlib
 from playwright.async_api import async_playwright
@@ -31,8 +31,8 @@ async def main():
                 ok(not errs, f'오류 없음 {errs[:3]}'); await ctx.close(); continue
             r = await page.evaluate(f"""(async()=>{{ const F={F}, S=F.S, sl=ms=>new Promise(r=>setTimeout(r,ms)); const out=[];
               const g=F.esAxGain(), y0=S.yearEarned;
-              for (let i=0;i<6;i++) {{ const e0=S.ess, b0=S.budget; F.pickEss('ax'); await sl(50); const ask=!document.querySelector('#essAsk').hidden; F.buyEss(); await sl(50); out.push([ask, e0-S.ess, Math.round(S.budget-b0)]); }}
-              const left=F.esAxLeft(); S.es.ax=0; S.ess=5; const b1=S.budget; F.pickEss('ax'); F.buyEss(); const poor=[S.ess, S.budget-b1];
+              for (let i=0;i<6;i++) {{ const e0=S.ess, b0=S.budget; F.pickEss('ax'); await sl(50); const ask=document.querySelector('#essAsk').hidden; await sl(50); out.push([ask, e0-S.ess, Math.round(S.budget-b0)]); }}
+              const left=F.esAxLeft(); S.es.ax=0; S.ess=5; const b1=S.budget; F.pickEss('ax'); const poor=[S.ess, S.budget-b1];
               return {{ g, out, left, y: S.yearEarned-y0, poor, rate: F.ESHOP.ax }}; }})()""")
             print('바꾸기', r)
             g = r['g']

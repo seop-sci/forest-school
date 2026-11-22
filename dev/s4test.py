@@ -1,6 +1,7 @@
 import asyncio, json, pathlib, time, datetime, sys
 from playwright.async_api import async_playwright
 from testlib import URL, TODAY, BIG, base, ctxpage   # 5.0.2 공통 부분은 testlib.py로 옮겼어요(다른 시험은 testlib에서 바로 가져와요)
+NB_OFF = "(()=>{ window.__forest.Live.off.add('night'); const m = document.querySelector('#mNb'); if (m && m.classList.contains('open')) { m.hidden = true; m.classList.remove('open'); window.__forest.rt.modalOpen = null; } })()"
 SEL = sys.argv[1:]
 want = lambda n: not SEL or n in SEL
 
@@ -21,6 +22,7 @@ async def main():
         # 1) 유치원 1년째 대도시 → 첫 졸업식 → 2년째
         if want('k1'):
             ctx, page, errs = await ctxpage(b, 390, 780, 'light', base())
+            await page.evaluate(NB_OFF)   # 야간 건설과 특별 이벤트 주말 하루 종일 가속을 꺼요(켜 두면 알림 창이 지도를 덮어요)
             r = {'board0': await page.evaluate(BOARD)}
             await page.screenshot(path='s4_k1_board.png')
             await page.tap('.tab[data-tab="grad"]'); await page.wait_for_timeout(400)
@@ -63,6 +65,7 @@ async def main():
                       p={'dip':6,'species':1,'perk':{'schol':2,'rep':0,'start':0,'drop':0,'night':0}},
                       q={'init':True,'mid':'k1','m':24,'mb':0,'subs':[],'done':[],'gen':0,'subDone':5,'seen':24})
             ctx, page, errs = await ctxpage(b, 360, 640, 'dark', sv)
+            await page.evaluate(NB_OFF)   # 야간 건설과 특별 이벤트 주말 하루 종일 가속을 꺼요(켜 두면 알림 창이 지도를 덮어요)
             r = {'board': await page.evaluate(BOARD)}
             await page.screenshot(path='s4_final_board_dark.png')
             await page.tap('.tab[data-tab="grad"]'); await page.wait_for_timeout(400)
@@ -92,6 +95,7 @@ async def main():
                           yearEarned=2e11, hd={'day':TODAY,'n':1,'feastUntil':int(time.time()*1000)+200000,'album':False,'seen':True},
                           q={'init':True,'mid':'e34','m':31,'mb':0,'subs':[],'done':[],'gen':0,'subDone':5,'seen':31,'qv':2})
                 ctx, page, errs = await ctxpage(b, w, h, scheme, sv)
+                await page.evaluate(NB_OFF)   # 야간 건설과 특별 이벤트 주말 하루 종일 가속을 꺼요(켜 두면 알림 창이 지도를 덮어요)
                 r = {'board': await page.evaluate(BOARD)}
                 await page.screenshot(path=fn)
                 await page.tap('.tab[data-tab="grad"]'); await page.wait_for_timeout(400)
@@ -112,6 +116,7 @@ async def main():
                       p={'dip':9,'species':2,'perk':{'schol':2,'rep':1,'start':0,'drop':0,'night':0}},
                       q={'init':True,'mid':'q24','m':24,'mb':0,'subs':[],'done':[],'gen':0,'subDone':5,'seen':24})
             ctx, page, errs = await ctxpage(b, 390, 780, 'light', sv)
+            await page.evaluate(NB_OFF)   # 야간 건설과 특별 이벤트 주말 하루 종일 가속을 꺼요(켜 두면 알림 창이 지도를 덮어요)
             r = {'board': await page.evaluate(BOARD)}
             await page.tap('.tab[data-tab="grad"]'); await page.wait_for_timeout(400)
             r['grad'] = await page.evaluate(GRAD)

@@ -836,7 +836,7 @@
     const left = TAM.adSpd.n - S.tam.ad.spd;
     rb(sb, 'ex4_ic_speed', tamSpdOn() ? hms(S.tam.spd.sec * 1000) : '광고 2배속', `${left}`, !tamSpdOn() || left > 0, tamSpdOn() ? `2배속 ${hms(S.tam.spd.sec * 1000)} 남음` : `광고 보고 2배속 ${TAM.adSpd.min}분, 오늘 ${left}번 남음`);
     const ab = $('#tmAuto'); ab.hidden = !tamAutoOn(); ab.setAttribute('aria-pressed', S.tam.auto ? 'true' : 'false'); rb(ab, 'ex4_ic_auto', S.tam.auto ? '필살기 자동' : '필살기 수동', '', false, S.tam.auto ? '필살기 자동 켬' : '필살기 자동 끔');
-    { const so = $('#tmSkOff'); so.hidden = !S.tam.skSeen; so.setAttribute('aria-pressed', S.tam.skOff ? 'true' : 'false'); rb(so, 'ex4_ic_report', S.tam.skOff ? '필살기 연출 짧게' : '필살기 연출 보기', '', false, S.tam.skOff ? '필살기 연출 건너뛰기 켬' : '필살기 연출 건너뛰기 끔'); }   // 필살기를 한 번 본 뒤에 생겨요
+    { const so = $('#tmSkOff'); so.hidden = !S.tam.skSeen; so.setAttribute('aria-pressed', S.tam.skOff ? 'true' : 'false'); rb(so, 'ex4_ic_report', S.tam.skOff ? '연출 짧게' : '연출 보기', '', false, S.tam.skOff ? '필살기 연출 건너뛰기 켬' : '필살기 연출 건너뛰기 끔'); }   // 필살기를 한 번 본 뒤에 생겨요
     { const sk = $('#tmSkip'), to = tamSkipTo(); sk.hidden = !to; if (to) { rb(sk, 'ex_flag', '빠르게 넘기', `${fmt(to)}층`, false, `빠르게 넘기: ${fmt(to)}층까지 한 번에 넘어가요`);
       if (rt.tamSkTo !== to && (!rt.tamSkTo || to > rt.tamSkTo + 9)) tamToast(`누르면 ${fmt(to)}층까지 빠르게 넘길 수 있어요`); } rt.tamSkTo = to; }
     const T = rt.tam, rv = $('#tmRevive'), cl = tamCheerLeft(); rv.hidden = !(S.tam.cheer > 0 || (T && T.lose && cl > 0));   // 지면 응원 단추, 응원 중에는 남은 층
@@ -1066,7 +1066,8 @@
     rt.thPrev = { id, th }; Music.preview = ''; rt.thScroll = $('#scroller').scrollTop;   // 돌아오면 그 자리로
     sfx('tap'); setTab('school'); applyCos(); ensureAudio(true); musicSync();
     const b = $('#thPrevBar');
-    if (b) { $('#thPrevName').textContent = `${T.name} 세트 미리 보기`; b.hidden = false; }
+    if (b) { $('#thPrevName').textContent = `${T.name} 세트 미리 보기`; b.hidden = false;
+      const by = $('#thPrevBuy'), own = TH_SLOTS.every(([sl]) => thOwn(id, sl)); by.hidden = own; if (!own) by.innerHTML = `사기 <svg viewBox="-8 -11 16 20" aria-hidden="true">${GOLD_ICON.slice(GOLD_ICON.indexOf('>') + 1, -6)}</svg>${thSetPrice(id)}`; }   // 5.3.3 미리 보다가 바로 사기
     if (!S.bgm && SONGS[id]) toast('미리 보기 곡만 나와요\n배경음악은 설정에서 켤 수 있어요');
   }
   function thPreviewEnd(quiet) {
@@ -1115,7 +1116,7 @@
       const u = IMG(el.dataset.front) || (el.dataset.fb && IMG(el.dataset.fb));
       el.classList.toggle('fb', !IMG(el.dataset.front));
       if (u) el.style.backgroundImage = `url("${u}")`;
-    });
+    });    shopChrome('street'); renderShelf(); renderShopMore();   // 5.3.3 재화 줄, 오늘의 진열대, 다른 가게
   }
   function openShop() {
     if (rt.modalOpen) closeModal(rt.modalOpen);
@@ -1136,19 +1137,21 @@
     goldDay();
     $('#shopHave').innerHTML = GOLD_ICON + '<span></span>';
     $('#shopHave span').textContent = fmt(S.gold);
-    const left = Math.max(0, Math.min(GOLD.shopAd - S.gd.shop, GOLD.adDay - S.gd.n));
+    const left = Math.max(0, GOLD.shopAd - S.gd.shop);   // 5.3.3 상점 광고만 세요
     $('#shopAd').setAttribute('aria-disabled', left > 0 ? 'false' : 'true');
     renderAdStamp();
-    $('#shopAdLeft').textContent = left > 0 ? `오늘 광고 황금 도토리를 ${left}번 더 받을 수 있어요` : '오늘 광고 황금 도토리를 모두 받았어요. 내일 다시 열려요';
+    $('#shopAdLeft').textContent = left > 0 ? `오늘 상점 광고를 ${left}번 더 볼 수 있어요` : '오늘 상점 광고를 모두 봤어요. 내일 다시 열려요';
     const coin = `<svg viewBox="-8 -11 16 20" aria-hidden="true">${GOLD_ICON.slice(GOLD_ICON.indexOf('>') + 1, -6)}</svg>`;
     let h = renderThemes(coin);
+    // 5.3.3 이달의 꾸미기
+    h += `<h3 class="shop-h" data-cat="이번 달">${gmNow()}월의 꾸미기 <small>이번 달 한정. 지나면 놓친 장식에서 같은 값으로</small></h3><div class="shop-grid">${gmTiles(gmItems(gmNow()), coin)}</div>`;
     // 학생 옷 세트: 모자와 목 장식 한 벌
     h += `<h3 class="shop-h">학생 옷 세트 <small>모자와 목 장식 한 벌</small></h3><div class="shop-grid">`;
     for (const o of OUTFITS) {
       const own = ofOwn(o), on = own && ofOn(o), p = ofPrice(o), poor = !own && S.gold < p;
-      const pr = on ? '입는 중' : own ? '입기' : `${coin}${p}`;
+      const pr = on ? '쓰는 중' : own ? '쓰기' : `${coin}${p}`;   // 5.3.3 가진 것의 말은 '쓰기' 하나로
       h += `<button class="si${own ? ' own' : ''}${on ? ' on' : ''}${poor ? ' poor' : ''}" type="button" data-buy="o:${o.id}" aria-pressed="${on}" aria-label="${o.name}${own ? '' : `, 황금 도토리 ${p}개`}">` +
-        `<span class="pv"><svg viewBox="-11 -13.5 22 27" aria-hidden="true">${kidSVG('bear', 0, { hat: o.hat, neck: o.neck })}</svg></span><span class="nm">${o.name}</span><span class="pr">${pr}</span></button>`;
+        `<span class="pv"><svg viewBox="-11 -13.5 22 27" aria-hidden="true">${kidSVG('bear', 0, { hat: o.hat, neck: o.neck })}</svg></span><span class="nm">${o.name}</span><span class="pr">${pr}</span>${own ? '' : lackTx(p, S.gold)}</button>`;
     }
     h += '</div>';
     // 옷장: 세트 밖에서 받은 모자(주간 상자, 이벤트, 꾸미기 가게 한정 모자)와 옛 조각을 하나씩 입고 벗어요
@@ -1160,34 +1163,32 @@
       for (const [cat, it] of ward.concat(half)) {
         const on = S.cos[cat] === it.id;
         h += `<button class="si own${on ? ' on' : ''}" type="button" data-buy="c:${cat}:${it.id}" aria-pressed="${on}">` +
-          `<span class="pv">${cosArt(cat, it)}</span><span class="nm">${it.name}</span><span class="pr">${on ? '입는 중' : '입기'}</span></button>`;
+          `<span class="pv">${cosArt(cat, it)}</span><span class="nm">${it.name}</span><span class="pr">${on ? '쓰는 중' : '쓰기'}</span></button>`;
       }
       h += '</div>';
     }
     // 놓친 이벤트 장식
-    const miss = evRestock();
+    const miss = evRestock(), gmp = gmPast().flatMap(gmItems).filter(x => !x.own);
+    if (gmp.length) h += `<h3 class="shop-h" data-cat="놓친 장식">지난 달의 꾸미기 <small>그달 값 그대로</small></h3><div class="shop-grid">${gmTiles(gmp, coin)}</div>`;
     if (miss.length) {
-      h += `<h3 class="shop-h">놓친 이벤트 장식 <small>지난 이벤트 것만, 하나씩</small></h3><div class="shop-grid">`;
+      h += `<h3 class="shop-h"${gmp.length ? '' : ' data-cat="놓친 장식"'}>놓친 이벤트 장식 <small>지난 이벤트 것만, 하나씩</small></h3><div class="shop-grid">`;
       for (const d of miss) {
         const poor = S.gold < GSHOP.evDeco;
         h += `<button class="si${poor ? ' poor' : ''}" type="button" data-buy="e:${d.id}" aria-label="${d.name}, 황금 도토리 ${GSHOP.evDeco}개"><span class="rare-mark" aria-hidden="true">★</span>` +
-          `<span class="pv deco"><img src="${IMG(d.img)}" alt="" draggable="false"></span><span class="nm">${d.name}</span><span class="pr">${coin}${GSHOP.evDeco}</span></button>`;
+          `<span class="pv deco"><img src="${IMG(d.img)}" alt="" draggable="false"></span><span class="nm">${d.name}</span><span class="pr">${coin}${GSHOP.evDeco}</span>${lackTx(GSHOP.evDeco, S.gold)}</button>`;
       }
       h += '</div>';
     }
     // 학교 마크 특별판
-    h += `<h3 class="shop-h">학교 마크 특별판 <small>마크 위에 덧입혀요</small></h3><div class="shop-grid">`;
+    h += `<h3 class="shop-h" data-cat="마크">학교 마크 특별판 <small>마크 위에 덧입혀요</small></h3><div class="shop-grid">`;
     const mk = S.deco.mk || [0, 0, 3, 2];
     for (const [x, nm] of MARKX) {
       const own = S.cos.own.includes('mkx:' + x), on = S.cos.mkx === x, poor = !own && S.gold < GSHOP.mark;
       h += `<button class="si${own ? ' own' : ''}${on ? ' on' : ''}${poor ? ' poor' : ''}" type="button" data-buy="m:${x}" aria-pressed="${on}" aria-label="학교 마크 ${nm}${own ? '' : `, 황금 도토리 ${GSHOP.mark}개`}">` +
-        `<span class="pv">${markHTML(mk, x)}</span><span class="nm">${nm}</span><span class="pr">${on ? '쓰는 중' : own ? '쓰기' : `${coin}${GSHOP.mark}`}</span></button>`;
+        `<span class="pv">${markHTML(mk, x)}</span><span class="nm">${nm}</span><span class="pr">${on ? '쓰는 중' : own ? '쓰기' : `${coin}${GSHOP.mark}`}</span>${own ? '' : lackTx(GSHOP.mark, S.gold)}</button>`;
     }
     h += '</div>';
-    // 이름 바꾸기(랭킹)
-    { const np = nickPrice();
-      h += `<h3 class="shop-h">이름 바꾸기</h3><div class="sb"><span class="pv">${GOLD_ICON}</span><span class="tx"><b>교장 선생님 이름</b><span>랭킹에 보이는 이름을 바꿔요</span><small>${np ? `바꿀 때 황금 도토리 ${np}개` : '처음 정할 때는 공짜예요'}</small></span>` +
-        `<button class="buy" type="button" data-buy="r">랭킹에서</button></div>`; }
+    // 이름 바꾸기(랭킹)는 5.3.3부터 설정 > 학교 간판과 마크 아래(#optNick, 같은 길)
     const list = $('#shopList'), top = list.scrollTop;
     list.innerHTML = h;
     list.scrollTop = top;
@@ -1198,7 +1199,7 @@
       const enough = S.gold >= it.price;
       $('#shopAskText').textContent = enough ? `${it.name}${it.ga} 황금 도토리 ${it.price}개로 살까요?` : `황금 도토리가 ${it.price - S.gold}개 모자라요.`;
       $('#shopYes').textContent = enough ? '사기' : '광고 보고 모으기';
-    }
+    }    shopChrome('shop');
   }
   // '파란 야구모자를', '밀짚모자를'처럼 받침에 맞는 조사
   const eulOf = w => { const c = w.charCodeAt(w.length - 1) - 0xAC00; return c >= 0 && c <= 11171 && c % 28 ? '을' : '를'; };
@@ -1214,6 +1215,10 @@
     if (t === 'e') { const d = DECO_BY[a]; return d && d.ev && evDecoArt(d) && !decoOwn(d.id) && evPastIds().includes(d.id.slice(3)) ? { kind: 'e', d, name: d.name, ga: eulOf(d.name), price: GSHOP.evDeco } : null; }
     if (t === 'm' && MARKX.some(([x]) => x === a)) { const nm = `학교 마크 ${MARKX.find(([x]) => x === a)[1]}`; return { kind: 'm', x: a, name: nm, ga: eulOf(nm), price: S.cos.own.includes('mkx:' + a) ? 0 : GSHOP.mark }; }
     if (t === 'r') return { kind: 'r', name: '이름 바꾸기', price: 0 };
+    if (t === 'g' && /^\d\d$/.test(a) && +a >= 1 && +a <= 12 && (+a === gmNow() || gmPast().includes(+a))) {   // 5.3.3 이달의 꾸미기(그달과 지난 달만)
+      const x = gmItems(+a).find(y => y.kind === b); if (!x) return null;
+      return { kind: 'g', gk: b, x, name: x.name, ga: eulOf(x.name), price: x.own ? 0 : x.price };
+    }
     const it = t === 'c' && COS[a] && COS[a].items.find(x => x.id === b);
     return it && S.cos.own.includes(a + ':' + b) ? { kind: 'c', cat: a, id: b, name: it.name, ga: eulOf(it.name), price: 0 } : null;   // 하나씩은 산 것만 입고 벗어요
   }
@@ -1251,8 +1256,15 @@
       toast(S.cos.mkx ? (S.deco.mk ? `${it.name}${it.ga} 썼어요` : `${it.name}${it.ga} 골랐어요. 꾸미기 가게에서 학교 마크를 정하면 보여요`) : '마크를 원래대로 돌렸어요');
       return;
     }
+    if (it.kind === 'g' && !it.price) {   // 산 이달의 꾸미기: 모자는 입고 벗어요, 장식은 지도에 놓아요
+      rt.shopPick = '';
+      if (it.gk === 'hat') { S.cos.hat = S.cos.hat === it.x.id ? '' : it.x.id; applyCos(); save(); renderShop(); toast(S.cos.hat ? `${it.name}${it.ga} 입혔어요` : `${it.name}${it.ga} 벗었어요`); }
+      else toast(`${it.name}${it.ga} 가지고 있어요. 꾸미기 가게의 '지도 꾸미기'로 놓아요`);
+      return;
+    }
     if (it.kind === 'r') { rt.shopPick = ''; setTab('rank'); rt.rankEdit = true; renderRankPanel(); const i = $('#rankName'); if (i) i.focus(); return; }
     rt.shopPick = pick;
+    if (it.price && it.price < ASK_GOLD && S.gold >= it.price) { buyShop(); return; }   // 5.3.3 큰 값(황금 30 이상)만 한 번 더 물어요
     renderShop();
   }
   function buyShop() {
@@ -1264,7 +1276,7 @@
     if (it.kind === 's') {
       for (const [sl] of TH_SLOTS) { if (!thOwn(it.th, sl)) S.cos.own.push(`th:${it.th}:${sl}`); S.cos.th[sl] = it.th; }
       applyCos();
-      toast(`${THEME[it.th].name} 세트를 샀어요! 학교 전체를 꾸몄고 수업료가 ${THEME[it.th].bonus}% 올랐어요`);
+      toast(`${THEME[it.th].name} 세트를 샀어요! 학교 전체를 꾸몄고 모음 보상으로 수업료가 ${THEME[it.th].bonus}% 올랐어요`);
     } else if (it.kind === 'o') {
       for (const [cat, id] of [['hat', it.o.hat], ['neck', it.o.neck]]) if (!S.cos.own.includes(cat + ':' + id)) S.cos.own.push(cat + ':' + id);
       S.cos.hat = it.o.hat; S.cos.neck = it.o.neck;
@@ -1273,6 +1285,9 @@
     } else if (it.kind === 'e') {
       S.deco.own[it.d.id] = 1;
       toast(`${it.name}${it.ga} 샀어요! 꾸미기 가게의 '지도 꾸미기'를 눌러 학교에 놓아 보세요`);
+    } else if (it.kind === 'g') {   // 5.3.3 이달의 꾸미기
+      if (it.gk === 'hat') { S.cos.own.push('hat:' + it.x.id); S.cos.hat = it.x.id; applyCos(); toast(`${it.name}${it.ga} 샀어요! 바로 입혀 뒀어요`); }
+      else { S.deco.own[it.x.id] = 1; toast(`${it.name}${it.ga} 샀어요! 꾸미기 가게의 '지도 꾸미기'를 눌러 학교에 놓아 보세요`); }
     } else if (it.kind === 'm') {
       S.cos.own.push('mkx:' + it.x); S.cos.mkx = it.x;
       renderCrest();

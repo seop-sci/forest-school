@@ -70,11 +70,11 @@ async def main():
             # 화면: 상점 거리 → 꾸미기 가게
             await pg.evaluate(f"(() => {{ {F}.S.ess = 300; {F}.setTab('street'); }})()"); await pg.wait_for_timeout(300)
             await pg.click('#sfDeco'); await pg.wait_for_timeout(500)
-            r = await pg.evaluate("(() => ({ open: !document.querySelector('#panelDeco').hidden, items: document.querySelectorAll('#decoList [data-dbuy]').length, evart: Object.keys(window.FS_IMG200 || {}).filter(k => k.startsWith('evd_')).length + window.__forest.DECO.filter(d => d.ev && (d.ps || d.rs || d.bio || d.cg || d.cs) && window.__forest.IMG(d.img)).length, marks: document.querySelectorAll('#markRows [data-mk]').length, street: document.querySelector('.tab[data-tab=\"street\"]')?.getAttribute('aria-selected') }))()")
+            r = await pg.evaluate("(() => ({ open: !document.querySelector('#panelDeco').hidden, items: document.querySelectorAll('#decoList [data-dbuy]').length, evart: Object.keys(window.FS_IMG200 || {}).filter(k => k.startsWith('evd_')).length + window.__forest.DECO.filter(d => d.ev && (d.ps || d.rs || d.bio || d.cg || d.cs) && window.__forest.IMG(d.img)).length, marks: document.querySelectorAll('#markRows [data-mk]').length, evn: +((document.querySelector('#decoList [data-evdex] .pill') || {}).textContent || '0/0').split('/')[1].replace(/[^0-9]/g, ''), street: document.querySelector('.tab[data-tab=\"street\"]')?.getAttribute('aria-selected') }))()")
             r['over'] = await pg.evaluate(OVER, '#panelDeco')
             print(w, scheme, '가게', json.dumps(r))
             # 4.1.0: 받아서 얻는 장식 12개(축제 기념품 8, 우정 배지 1, 숲속 장터 3)가 더 보여요
-            if not r['open'] or r['items'] != 16 + r['evart'] + 27 + 12 + 12 + 4 or r['marks'] != 25 or r['over']: bad.append(f'{w} 가게 화면 {r}')   # 5.2.0.1 칭호 덤 장식 4(세미나 칠판, 명예의 의자, 논문 탑, 마을 감사 아치)
+            if not r['open'] or r['items'] + r['evn'] != 16 + r['evart'] + 27 + 12 + 12 + 4 + 24 or r['evn'] != r['evart'] + 27 + 12 + 12 + 4 - 10 + 24 or r['marks'] != 25 or r['over']: bad.append(f'{w} 가게 화면 {r}')   # 5.2.0.1 칭호 덤 장식 4(세미나 칠판, 명예의 의자, 논문 탑, 마을 감사 아치). 5.3.3부터 이벤트 한정 장식은 가게에 한 줄(도감 '장식' 칸)이라 그 수(evn)를 더해 봐요. 모자 5와 가구 5는 가게에 남아요. 5.3.3 이달의 꾸미기 깃발과 아치 24(12달 x 2)도 한정 장식 도감에 들어요
             await pg.screenshot(path=f's62_{w}.png')
             await pg.evaluate("document.querySelector('#panelDeco').scrollTop = 9999"); await pg.wait_for_timeout(200)
             await pg.screenshot(path=f's62_{w}b.png')
