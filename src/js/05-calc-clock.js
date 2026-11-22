@@ -64,7 +64,7 @@
   const canPromote = () => finalYear() && !semFirst() && S.grade >= GRAD_MIN && !promoteLocked();
   // 기금 = 이 학교급에서 모은 수료증 5장마다 1 + 졸업 축하 1. 올해 수료증도 함께 쳐요
   const FUND_PER = 5;
-  const previewFund = () => Math.floor((S.tdip + yearDip()) / FUND_PER) + 1;
+  const previewFund = () => Math.floor((S.tdip + yearDip()) / FUND_PER) + 1 + (S.tier === 1 ? EARLY.fund : 0);
   const fpCost = k => FPERKS[k].cost(S.fp[k]);
   function addDip(v) { S.p.dip += v; S.tdip += v; S.st.dips += v; rankDirty(); }
   const perkCost = k => PERKS[k].cost(S.p.perk[k]);
@@ -160,7 +160,7 @@
   const CAMPUS8 = ['classroom', 'cafeteria', 'library', 'playground', 'science', 'store', 'dorm', 'union'];   // 대학원 퀘스트 facAll: 대학교 때 지은 건물 여덟 채
   // 학교가 계속 자라니까 높은 레벨은 값이 덜 가파르게 올라요: 시설은 Lv.15부터, 선생님은 Lv.12부터 한 레벨에 1.35배씩
   const SOFT = { fac: 15, tea: 12, g: 1.35 };
-  const EARLY = { g: 1.27, ch: 7, back: 0.3 };   // 3안: 유치원과 초등 비용 곡선, 1~8장(유치원~초등 3학년) 건물 퀘스트는 그 레벨 공사비의 30%를 돌려받아요
+  const EARLY = { g: 1.25, ch: 7, back: 0.3, fund: 15 };   // 3안: 유치원과 초등 비용 곡선, 1~8장(유치원~초등 3학년) 건물 퀘스트는 그 레벨 공사비의 30%를 돌려받아요. 2026-11-22 woodani: 곡선 1.27 → 1.25, 초등 졸업 기금 +15(초등이 빨라져 번 도토리가 줄면 기금이 모자라 중학교 처음 수업료가 절반이 되던 것을 받쳐요. 문서 '초등 4~6학년 도서관 계단과 qbot 10^15 알림 조사')
   const softCost = (fn, L, from) => fn(Math.min(L, from)) * Math.pow(softG(), Math.max(0, L - from));
   // 유치원과 초등학교는 레벨마다 1.35배 대신 1.30배
   // 1.30배를 1.27배로(초등 4~6학년 도서관 퀘스트가 수업료로 19.5시간 걸리던 것, qbot 초등 전체 158시간 → 118시간)
