@@ -39,6 +39,8 @@ AREAS = [
      ['34-ui-core-loop.js', '35-bind.js', '38-common.js', '10-render.js', '11-furniture.js', '24-tier-view.js', '00-boot.js']),
     ('미니게임과 탐험', '퍼즐, 숲속 합치기, 탐험대에서 보상 두 번, 진행 저장 누락, 판이 끝나지 않는 상태, 광고 보상 처리',
      ['26-puzzle.js', '40-merge.js', '18-tam.js']),
+    ('최근 코드(5.1.0~5.4.0)', '조교 파견(S.ta), 연구 나무(S.rt5)와 논문(S.pp), 텃밭 무료 바로 자라기(gdFree, S.gn.free), 사진첩과 계절 사진 미션(S.pa, paNow, 사진 모드). 보상 두 번, 진행 막힘, 저장 깨짐, 시각 판정 틀림, 학교급 바뀔 때 남는 상태',
+     ['06-research.js', '13-bio-garden.js', '40d-photo.js', '40c-world.js']),
     ('학생과 지도와 그 밖', '학생과 지도, 상점, 공부, 상담, 소풍, 이야기, 보상 장면에서 위와 같은 종류의 버그',
      ['08-map.js', '09-students.js', '17-gold-shop.js', '19b-shop-ui.js', '20-study-club.js', '21-counsel-elect-lab.js', '22-picnic-sticker-memory.js', '27-reward-scenes.js', '29-story.js']),
 ]
