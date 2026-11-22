@@ -578,7 +578,7 @@
   /* ---------- 미니게임 터지는 효과(효과층 7단계) ----------
      숲속 퍼즐: 줄이 지워지면 블록 그림이 네 조각으로 깨져 떨어져요. 숲속 합치기: 합쳐지면 빛 고리와 별 조각이 퍼져요
      그림판 하나(canvas.fxo)를 퍼즐 판이나 합치기 판에 옮겨 붙여 써요. 값과 저장은 그대로, 엔진이 없거나 움직임 줄이기면 예전 효과 그대로 */
-  const FXO = { st: '', app: null, w: null, g: null, parts: [], rings: [], raf: 0, last: 0, tex: {}, star: null, dot: null };
+  const FXO = { st: '', app: null, w: null, g: null, parts: [], rings: [], raf: 0, last: 0, tex: {}, quad: new Map(), star: null, dot: null };
   const fxoOn = () => FXL.st === 'ok' && FXO.st === 'ok' && !rt.reduced;
   async function fxoInit() {
     if (FXO.st || FXL.st !== 'ok') return; FXO.st = 'load';
@@ -613,7 +613,9 @@
     const tex = fxoUrlTex(css), P = window.PIXI;
     const go = () => {
       if (tex && tex.source) { const fw = tex.frame.width / 2, fh = tex.frame.height / 2;
-        for (let q = 0; q < 4; q++) { const qx = q % 2, qy = q >> 1, t = new P.Texture({ source: tex.source, frame: new P.Rectangle(tex.frame.x + qx * fw, tex.frame.y + qy * fh, fw, fh) });
+        // 5.3.4.4: 네 조각 텍스처는 그림마다 한 번만 만들어 다시 써요(깰 때마다 새로 만들면 원본 그림에 붙은 resize 듣기가 계속 쌓였어요)
+        let Q = FXO.quad.get(tex); if (!Q) { Q = [0, 1, 2, 3].map(q => new P.Texture({ source: tex.source, frame: new P.Rectangle(tex.frame.x + (q % 2) * fw, tex.frame.y + (q >> 1) * fh, fw, fh) })); FXO.quad.set(tex, Q); }
+        for (let q = 0; q < 4; q++) { const qx = q % 2, qy = q >> 1, t = Q[q];
           const dx = qx ? 1 : -1, dy = qy ? 1 : -1;
           fxoPart(t, cx + dx * cw * 0.25, cy + dy * cw * 0.25, cw * 0.5, { vx: dx * fxRnd(40, 110), vy: dy * fxRnd(20, 60) - fxRnd(160, 260), g: 900, rot: dx * fxRnd(4, 9), life: fxRnd(0.6, 0.8) }); } }
       else for (let q = 0; q < 4; q++) fxoPart(FXO.dot, cx, cy, cw * 0.3, { vx: fxRnd(-110, 110), vy: -fxRnd(150, 250), g: 900, life: 0.6, tint: tint || 0xffe08a, shrink: true });
