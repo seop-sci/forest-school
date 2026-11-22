@@ -356,12 +356,13 @@
     tr2: freshTr2(),   // 수학여행: 다녀온 학년, 지금 여행, 떠난 수, 돌아온 수, 기념품. 진로 상담: 오늘 날짜와 횟수, 모든 상담 수, 진로를 고른 수, 이룬 학생 수, 정산한 명부 번호, 진로 도감
     roster: freshRoster(), club: freshClub(), el: freshEl(), snap: {}, tfp: 0,   // el: 반장 선거
       // tfp: 이 학교급에 들어올 때까지 장학재단을 고친 횟수. 학생 명부, 동아리, 학교급 사진(졸업식 때 남긴 모습)
+    gen: freshGen(),   // 6.0.0 씨앗 학교: n 세대 수, home 접어 둔 본교(시제품, Issue #265)
     q: freshQ()
   });
   const repOf = s => s.f.classroom + s.f.cafeteria + s.f.playground + 3 * s.f.library + s.f.science + 2 * (s.t.squirrel + s.t.owl + s.t.bear) + 5 * s.p.perk.rep + 10 * s.fp.rep + acRepOf(s);   // 학력 10레벨마다 +1
   const gradeOf = r => { let g = 0; CFG.grades.forEach((x, i) => { if (r >= townRep(i)) g = i; }); return g; };
 
-  function sanitize(d) {
+  function sanitize(d, inner) {   // inner: 접어 둔 본교를 읽을 때(그 안의 본교는 받지 않아요)
     const s = fresh();
     if (!d || typeof d !== 'object') return s;
     // 손상되거나 고친 저장이 계산을 무한대로 만들거나 시작을 멈추지 않게 칸마다 넉넉한 상한을 둬요
@@ -632,6 +633,7 @@
     s.clk.last = timeSrc() ? numFb(d.clk && d.clk.last, 0, 0) : Math.min(numFb(d.clk && d.clk.last, 0, 0), Date.now() + 366 * 86400000);   // 서버 시간을 받는 판은 기기 시계로 깎지 않아요. 기기 날짜를 1년 넘게 과거로 돌려 다시 켜면 게임 날짜가 뒤로 가서 하루 제한이 풀렸어요. 앞서간 시계는 서버 시간이 바로잡아요
     // 보안 점검: 서버 시간을 기다리던 자리 비움(from은 저장 시각보다 늦을 수 없어요, skip은 하루까지)
     if (d.away && typeof d.away === 'object') { s.away.from = Math.min(numFb(d.away.from, 0, 0), s.savedAt || 0); s.away.skip = Math.min(numFb(d.away.skip, 0, 0), 86400000); }
+    sanitizeGen(d, s, inner);   // 6.0.0 씨앗 학교 시제품
     return s;
   }
   function sanitizeQ(q) {
