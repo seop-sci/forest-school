@@ -580,6 +580,8 @@
       s.pp = { dat: num(P.dat, 9999), cur: c, n: num(P.n, 1e6), by: map(P.by), day: typeof P.day === 'string' ? P.day.slice(0, 10) : '', cm: Number.isFinite(P.cm) ? Math.max(-1, Math.floor(P.cm)) : -1,
         cf: num(P.cf, 99999), cb: num(P.cb, 99999), ck: map(P.ck), med, sem: num(P.sem, 1e6) };
     } else if (s.tier >= GRAD_TIER) s.pp.sem = Math.max(0, Math.floor((s.tg || 0) * 2 + (s.sem || 0)));   // 앞 저장: 지난 세미나 수를 학기로 어림
+    { const t = d.ach && typeof d.ach === 'object' ? d.ach.title : null;   // 5.3.4.4: 논문과 학회 칭호는 s.pp를 다 읽은 뒤에 봐요(sanitize171에서는 빠져 다시 켜면 칭호가 떨어졌어요)
+      if (!s.ach.title && typeof t === 'string' && PP_TITLES.some(x => x.id === t && x.got(s))) s.ach.title = t; }
     { const A = d && d.adx && typeof d.adx === 'object' ? d.adx : {}, f = freshAdx();   // 광고 도장과 한 판 더
       f.day = typeof A.day === 'string' ? A.day.slice(0, 10) : '';
       f.n = typeof A.n === 'number' && isFinite(A.n) ? Math.max(0, Math.min(ADX.max, Math.floor(A.n))) : 0;

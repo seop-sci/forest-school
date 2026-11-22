@@ -716,8 +716,13 @@
      이 기기 저장을 비우지 않으면 새 계정에 같은 학교가 또 올라가서 랭킹에 같은 학교가 둘 생겨요 */
   const inAppBrowser = () => /KAKAOTALK|NAVER|Instagram|FBAN|FBAV|Line\//i.test(navigator.userAgent || '');
   async function acctSaveFirst() {
+    // 5.3.4.4: 서버 연결을 쉬던 중(netSleep)이면 깨우고, 서버 확인(cloudVerify)이 끝난 뒤에 올려요. 전에는 확인을 기다리지 않아 '저장하지 못했어요'가 떴어요
+    const until = async (f, n) => { for (let i = 0; i < n && f(); i++) await new Promise(r => setTimeout(r, 150)); };
+    if (Cloud.asleep) netWake();
+    if (!Cloud.fresh && !Cloud.verifying) cloudVerify();
+    await until(() => Cloud.verifying || Cloud.pushing, Math.ceil(CLOUD_WAIT * 2 / 150));   // 확인은 서버 읽기 두 번까지(CLOUD_WAIT씩)
     await cloudPush(true);
-    for (let i = 0; i < 40 && Cloud.pushing; i++) await new Promise(r => setTimeout(r, 150));
+    await until(() => Cloud.pushing, 40);
     return !Cloud.dirty && cloudOn();
   }
   async function switchGoogle() {
