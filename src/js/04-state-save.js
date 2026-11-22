@@ -113,6 +113,9 @@
     ltBack: undefined,   // 편지 창에서 뒤로 가기를 보여 줄지
     plAt: undefined,   // 학부모 편지함에서 보는 편지 번호
     talkSeq: undefined,   // 전학 대화 진행
+    paBig: undefined,   // 5.4.0 사진첩 크게 보는 사진(미션 id 또는 'fr:번호')
+    paFake: undefined,   // 5.4.0 시험에서 사진 판정 상태를 덮어쓰는 칸
+    paOpenSea: undefined,   // 5.4.0 사진첩에서 펼친 다른 계절
     trSvOpen: undefined,   // 체험학습 기념품 칸을 펼쳤는지
     tripGot: undefined,   // 체험학습에서 받은 것
     tripTxt: undefined,   // 체험학습 단추에 보인 글
@@ -301,7 +304,7 @@
     sports: { next: 0 },
     fest: { next: {}, n: {}, sub: {} },   // sub: 밤이라 낮 행사가 잠겼을 때 밤 행사로 대신 채운 메인 퀘스트 횟수
     dm: { day: '', list: [], bonus: false, swapped: false },
-    tut: { st: '', step: 0, paid: false, nop: false }, tips: { rep: false, oak: false, left: false, tabs: false },   // 기능이 열릴 때 한 장 안내
+    tut: { st: '', step: 0, paid: false, nop: false }, tips: { rep: false, oak: false, left: false, tabs: false, pa: false },   // 기능이 열릴 때 한 장 안내
     nt: { seen: '', ver: '', hide: 0 },   // 공지: 마지막으로 본 공지, 마지막으로 띄운 버전, 일주일간 열지 않기 끝
     wk: { week: -1, pts: 0, got: [false, false, false, false, false], list: [] },
     lg: { week: -1, pts: 0, pos: 0, paid: false, last: null, dq: { day: '', p: 0 } },   // dq: 오늘 쌓인 진행 점수(퀘스트와 식)
@@ -359,6 +362,7 @@
     tr2: freshTr2(),   // 수학여행: 다녀온 학년, 지금 여행, 떠난 수, 돌아온 수, 기념품. 진로 상담: 오늘 날짜와 횟수, 모든 상담 수, 진로를 고른 수, 이룬 학생 수, 정산한 명부 번호, 진로 도감
     roster: freshRoster(), club: freshClub(), el: freshEl(), snap: {}, tfp: 0,   // el: 반장 선거
       // tfp: 이 학교급에 들어올 때까지 장학재단을 고친 횟수. 학생 명부, 동아리, 학교급 사진(졸업식 때 남긴 모습)
+    pa: freshPa(),   // 5.4.0 사진첩: on 열림, ms 미션 사진, fr 자유 사진(30장까지), own 가진 액자, seen 빨간 점을 본 날, n 찰칵 횟수
     q: freshQ()
   });
   const repOf = s => s.f.classroom + s.f.cafeteria + s.f.playground + 3 * s.f.library + s.f.science + 2 * (s.t.squirrel + s.t.owl + s.t.bear) + 5 * s.p.perk.rep + 10 * s.fp.rep + acRepOf(s);   // 학력 10레벨마다 +1
@@ -479,7 +483,7 @@
       s.tut.st = ['later', 'done', 'skip'].includes(d.tut.st) ? d.tut.st : ''; s.tut.step = Math.floor(numFb(d.tut.step, 0, 0, SAVE_CAP.count));
       s.tut.paid = !!d.tut.paid; s.tut.nop = !!d.tut.nop;
     }
-    if (d.tips && typeof d.tips === 'object') { s.tips.rep = !!d.tips.rep; for (const k of ['oak', 'left', 'tabs']) s.tips[k] = !!d.tips[k]; }
+    if (d.tips && typeof d.tips === 'object') { s.tips.rep = !!d.tips.rep; for (const k of ['oak', 'left', 'tabs', 'pa']) s.tips[k] = !!d.tips[k]; }
     if (d.nt && typeof d.nt === 'object') s.nt = { seen: typeof d.nt.seen === 'string' ? d.nt.seen.slice(0, 40) : '', ver: typeof d.nt.ver === 'string' ? d.nt.ver.slice(0, 12) : '', hide: Math.min(typeof d.nt.hide === 'number' && isFinite(d.nt.hide) && d.nt.hide > 0 ? d.nt.hide : 0, Date.now() + 8 * 86400000) };   // 공지
     if (d.wk && typeof d.wk === 'object') {
       s.wk.week = Math.floor(numFb(d.wk.week, -1, -1, SAVE_CAP.count)); s.wk.pts = Math.floor(numFb(d.wk.pts, 0, 0, SAVE_CAP.count));
@@ -606,6 +610,7 @@
     sanitizeGd(d, s);   // 학교 텃밭
     sanitizeBx(d, s);   // 숲속 생물 탐사
     sanitizeCg(d, s);   // 동아리 대항전
+    sanitizePa(d, s);   // 5.4.0 사진첩
     s.wx = typeof d.wx === 'string' ? d.wx.slice(0, 10) : '';   // 날씨 알림 본 날
     s.wxOff = d.wxOff ? 1 : 0;   // 보안 보강 판: 날씨 칩을 눌러 비, 눈, 안개 효과 끄기(날씨 자체와 보너스는 그대로)
     { const P = d.pl && typeof d.pl === 'object' ? d.pl : {}, got = Math.max(0, Math.min(PL.list.length, Math.floor(Number(P.got) || 0))); s.pl = { got, read: Math.max(0, Math.min(got, Math.floor(Number(P.read) || 0))), wk: Math.floor(Number(P.wk)) || -1 }; }   // 학부모 편지

@@ -11,6 +11,7 @@
   const FEAT_TIPS = {
     oak: { sel: '#oak', t: '참나무 흔들기', d: '놀이터 옆 참나무를 눌러 도토리를 떨어뜨려요. 떨어진 도토리를 눌러 주우면 도토리를 듬뿍 받아요.', scroll: true },
     left: { sel: '.map-left', t: '지도 왼쪽 단추', d: '보충수업, 체험학습, 학교 행사가 여기에 생겨요. 학년이 올라가면 하나씩 열려요.', scroll: true },
+    pa: { sel: '.sidebtn[data-tab="dex"]', t: '사진첩이 열렸어요', d: '오늘 날씨와 시간에만 찍을 수 있는 사진이 있어요. 도감의 사진 칸에서 미션을 보고, 사진 찍으러 가기를 눌러 찰칵 찍어요. 계절 사진을 다 모으면 액자와 지도 장식을 받아요.', scroll: true },
     tabs: { sel: '.tabs', t: '아래 탭', d: '선생님, 탐험, 공부, 상점은 아래 탭에서 열어요. 졸업과 설정은 맨 위 단추, 퀘스트 목록과 랭킹은 지도 오른쪽 단추예요.' }
   };
   function tutAuto() {
@@ -81,6 +82,7 @@
     if (!S.tips.oak && S.f.playground >= 1 && vis('#oak')) k = 'oak';
     else if (!S.tips.left && [...$$('.map-left .boost')].some(b => !b.hidden)) k = 'left';
     else if (!S.tips.tabs && S.q.m >= 3) k = 'tabs';
+    else if (!S.tips.pa && S.pa && S.pa.on && S.tips.tabs) k = 'pa';   // 5.4.0 사진첩
     if (!k) return;
     S.tips[k] = true; save(); tipStart(FEAT_TIPS[k]);
   }

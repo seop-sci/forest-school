@@ -63,6 +63,7 @@
       else if (name.startsWith('pz')) { const L = +name.slice(2) || 0; if (!L) { note(620, 0, 0.06, 'triangle', 0.07); note(880, 0.04, 0.08, 'triangle', 0.06); } else { const f = 740 * Math.pow(1.122, L); note(f, 0, 0.1, 'triangle', 0.12); note(f * 1.5, 0.07, 0.16, 'triangle', 0.11); if (L >= 3) note(f * 2, 0.14, 0.22, 'triangle', 0.1); } }
       else if (name === 'coin') { note(988, 0, 0.1, 'triangle', 0.13); note(1319, 0.07, 0.18, 'triangle', 0.13); }
       else if (name === 'buy') { note(523.25, 0, 0.14, 'triangle', 0.12); note(659.25, 0.08, 0.14, 'triangle', 0.12); note(783.99, 0.16, 0.26, 'triangle', 0.12); }
+      else if (name === 'shutter') { note(2200, 0, 0.025, 'square', 0.035); note(1400, 0.06, 0.04, 'square', 0.03); }   // 5.4.0 사진 찰칵
       else if (name === 'deny') note(196, 0, 0.16, 'square', 0.04);
       else if (name === 'leaf') { note(1150, 0, 0.04, 'triangle', 0.022); note(860, 0.035, 0.05, 'triangle', 0.018); }
       else if (name === 'magpie') { note(1480, 0, 0.07, 'square', 0.03); note(1320, 0.13, 0.08, 'square', 0.03); }

@@ -205,11 +205,11 @@
   function photoOpen() {
     if (!S) return;
     if (rt.modalOpen) closeModal(rt.modalOpen);
-    setTab('school'); rt.photo = true; rt.wldPh = wldPhase(); rt.wldWx = wldWeather(); document.body.classList.add('photo');
+    setTab('school'); rt.photo = true; { const s = paNow(); rt.wldPh = s.ph; rt.wldWx = paVisWx(s); } document.body.classList.add('photo');   // 5.4.0 처음에는 실제 시간과 날씨가 골라져 있어요(찰칵이 바로 되게)
     const b = document.createElement('div'); b.className = 'photo-bar'; b.id = 'photoBar';
     const seg = (id, L, cur, k) => `<div class="seg" id="${id}" role="radiogroup">${L.map(([v, t]) => `<button type="button" role="radio" data-${k}="${v}" aria-checked="${v === cur}">${t}</button>`).join('')}</div>`;
-    b.innerHTML = seg('phT', PH_T, rt.wldPh, 'pht') + seg('phW', PH_W, rt.wldWx, 'phw') + '<button type="button" class="btn-sub" id="phX">닫기</button>';
-    document.body.appendChild(b); wldSync();
+    b.innerHTML = seg('phT', PH_T, rt.wldPh, 'pht') + seg('phW', PH_W, rt.wldWx, 'phw') + (paOpen() ? '<button type="button" class="cta ph-snap" id="phSnap">찰칵</button>' : '') + '<button type="button" class="btn-sub" id="phX">닫기</button>';
+    document.body.appendChild(b); wldSync(); paSnapSync();
     requestAnimationFrame(() => { const fr = $('.frame'); if (!fr || !rt.mapS) return; const z = Math.min(ZOOM_MAX, Math.max(1, fr.clientHeight / (rt.mapH / (rt.zoom || 1)))); rt.zoom = z; fitMap(false); panTo((fr.clientWidth - rt.mapW) / 2, (fr.clientHeight - rt.mapH) / 2); });   // 지도가 화면 위아래를 다 채우게
   }
   function photoClose() {
@@ -221,7 +221,7 @@
     if (t.id === 'optPhoto') { sfx('tap'); photoOpen(); return; }
     if (t.id === 'phX') { sfx('tap'); photoClose(); return; }
     if (t.dataset.pht != null) rt.wldPh = t.dataset.pht; else if (t.dataset.phw != null) rt.wldWx = t.dataset.phw; else return;
-    t.parentNode.querySelectorAll('button').forEach(x => x.setAttribute('aria-checked', x === t ? 'true' : 'false')); sfx('tap'); wldSync();
+    t.parentNode.querySelectorAll('button').forEach(x => x.setAttribute('aria-checked', x === t ? 'true' : 'false')); sfx('tap'); wldSync(); paSnapSync();
   });
   // 자동 품질 지키기: 홈에서 5초 동안 잰 평균이 초당 45장 아래면 이 기기에서 한 단계 낮추고 한 번만 알려요
   // 자동(S.gfx -1)일 때만, 사진 모드와 직접 고른 품질은 그대로. 처음 켠 뒤 8초와 다른 탭, 창이 열린 때는 재지 않아요
