@@ -254,6 +254,16 @@
     for (const k of rt.kids) {
       if (k.frz) continue;   // 체험학습 장면 동안 장면에 나오지 않는 친구는 잠깐 멈춰요(busScene)
       if (k.wait > 0) { k.wait -= dt; k.moving = false; }
+      else if (k.ang !== undefined && !k.board) {
+        // 5.3.4.2 운동회 달리기: 트랙 위 목표를 바짝 따라가면 거의 매 프레임 '도착(멈춤)'과 '걷기'가 바뀌어 통통 튀기와 앞뒤 그림이 떨렸어요(지글지글, 그림 바꾸기 초당 70번).
+        // 트랙에 닿은 뒤에는 목표 자리에 붙어 계속 달리고, 앞모습과 뒷모습은 트랙 방향으로 정해요(바뀌는 곳 근처에서 왔다 갔다 하지 않게 틈을 둬요)
+        const dx = k.tx - k.x, dy = k.ty - k.y, d = Math.hypot(dx, dy);
+        if (d > 6) { const st = Math.min(d, k.speed * dt); k.x += dx / d * st; k.y += dy / d * st; }
+        else { k.x = k.tx; k.y = k.ty; }
+        k.moving = true;
+        const vx = -Math.sin(k.ang), vy = Math.cos(k.ang) * SPORTS.ry / SPORTS.rx, u = vy / (Math.hypot(vx, vy) || 1);
+        if (u < -0.6) kidLook(k, true); else if (u > -0.4) kidLook(k, false);
+      }
       else {
         // 운동회 달리기(k.ang)는 운동장 트랙을 그대로 돌고, 그 밖에는 막힌 곳을 돌아서 가요
         if (k.ang === undefined && (k.rx !== k.tx || k.ry !== k.ty)) planRoute(k);

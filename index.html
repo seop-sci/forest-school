@@ -2,7 +2,7 @@
 <html lang="ko">
 <head>
 <meta charset="utf-8">
-<meta name="forest-version" content="5.3.4.1">
+<meta name="forest-version" content="5.3.4.2">
 <meta name="viewport" content="width=device-width, initial-scale=1">
 <meta name="description" content="도토리를 모아 숲속 학교를 키우는 방치형 게임 테스트판이에요.">
 <style>html,body{margin:0}</style>
@@ -2860,6 +2860,8 @@ html.hud-art .tier-dots .td.on{background:#E8A23E;color:#fff;border-color:#B8692
 .gd-plot .tx{font-weight:700;line-height:1.2}
 .gd-plot button{padding:4px 10px;border-radius:10px;border:1.5px solid var(--line);background:var(--card);font:inherit;font-weight:700;color:inherit}
 .gd-plot button.go{background:#6BA23A;border-color:#4E7F25;color:#fff}.gd-plot small{opacity:.7}
+.gd-plot button.free{display:grid;line-height:1.15;background:#E2A21C;border-color:#B87F0E;color:#3A2A08}.gd-plot button.free small{opacity:.85;font-size:10px}
+.gd-free-tip{flex:1 1 100%;margin:0;padding:5px 8px;border-radius:10px;background:color-mix(in srgb,#F6D46B 30%,var(--card));font-size:12px;font-weight:700}
 .gd-pick{margin-top:8px;padding:8px;border-radius:12px;background:rgba(226,162,28,.12)}.gd-pick b{font-size:13px}
 .gd-bulk{display:flex;flex-wrap:wrap;gap:4px;margin-top:10px}.gd-bulk:empty{display:none}
 .gd-ok{position:absolute;inset:0;z-index:6;display:flex;align-items:center;justify-content:center;padding:16px}   /* 5.0.1.6 C-03. 5.0.2.2 woodani: 텃밭 창 가운데 따로 띄워요 */
@@ -4196,7 +4198,7 @@ body.mg-on .toast[hidden]{display:none}
     <p class="boot-step" id="bootStep">학교 문을 여는 중...</p>
     <p class="boot-tip" id="bootTip">학교 문을 여는 중이에요</p>
   </div>
-  <span class="boot-ver" id="bootVer">v5.3.4.1</span>
+  <span class="boot-ver" id="bootVer">v5.3.4.2</span>
 </div>
 
 <div class="app on-school" id="app">
@@ -4816,7 +4818,7 @@ body.mg-on .toast[hidden]{display:none}
       </div>
       <h3 class="panel-sub">정보</h3>
       <dl class="info">
-        <div id="verRow"><dt>버전</dt><dd>v5.3.4.1</dd></div>
+        <div id="verRow"><dt>버전</dt><dd>v5.3.4.2</dd></div>
         <div id="pidRow" hidden><dt>학교 번호</dt><dd id="infoPid"></dd></div>
       </dl>
       <div id="devBox" hidden>
@@ -12165,6 +12167,16 @@ body.mg-on .toast[hidden]{display:none}
     for (const k of rt.kids) {
       if (k.frz) continue;   // 체험학습 장면 동안 장면에 나오지 않는 친구는 잠깐 멈춰요(busScene)
       if (k.wait > 0) { k.wait -= dt; k.moving = false; }
+      else if (k.ang !== undefined && !k.board) {
+        // 5.3.4.2 운동회 달리기: 트랙 위 목표를 바짝 따라가면 거의 매 프레임 '도착(멈춤)'과 '걷기'가 바뀌어 통통 튀기와 앞뒤 그림이 떨렸어요(지글지글, 그림 바꾸기 초당 70번).
+        // 트랙에 닿은 뒤에는 목표 자리에 붙어 계속 달리고, 앞모습과 뒷모습은 트랙 방향으로 정해요(바뀌는 곳 근처에서 왔다 갔다 하지 않게 틈을 둬요)
+        const dx = k.tx - k.x, dy = k.ty - k.y, d = Math.hypot(dx, dy);
+        if (d > 6) { const st = Math.min(d, k.speed * dt); k.x += dx / d * st; k.y += dy / d * st; }
+        else { k.x = k.tx; k.y = k.ty; }
+        k.moving = true;
+        const vx = -Math.sin(k.ang), vy = Math.cos(k.ang) * SPORTS.ry / SPORTS.rx, u = vy / (Math.hypot(vx, vy) || 1);
+        if (u < -0.6) kidLook(k, true); else if (u > -0.4) kidLook(k, false);
+      }
       else {
         // 운동회 달리기(k.ang)는 운동장 트랙을 그대로 돌고, 그 밖에는 막힌 곳을 돌아서 가요
         if (k.ang === undefined && (k.rx !== k.tx || k.ry !== k.ty)) planRoute(k);
@@ -14535,7 +14547,8 @@ body.mg-on .toast[hidden]{display:none}
     const pq = document.getElementById('pq-cafeteria'); if (!pq || !S || !S.gn) return;
     let g = pq.querySelector('.gdb');
     if (!g) { g = document.createElementNS('http://www.w3.org/2000/svg', 'g'); g.setAttribute('class', 'gdb'); g.setAttribute('transform', 'translate(-30 -22)'); g.innerHTML = IMG('garden_bubble') ? `<image href="${IMG('garden_bubble')}" x="-12" y="-14" width="24" height="24"/>` : '<circle r="10"/><text y="4" text-anchor="middle">🌱</text>'; pq.appendChild(g); }
-    pq.classList.toggle('gd-on', gdOpen() && rt.viewTier == null && gdReadyN() > 0);
+    const freeNow = S.gn.free > 0 && S.gn.plots.slice(0, gdN()).some(p => p.c && !gdReady(p));   // 5.3.4.2 무료 바로 자라기를 쓸 수 있을 때도 말풍선
+    pq.classList.toggle('gd-on', gdOpen() && rt.viewTier == null && (gdReadyN() > 0 || freeNow));
   }
   function sanitizeGd(d, s) {
     const G = d.gn && typeof d.gn === 'object' ? d.gn : {}, o = freshGd(), lim = Math.max(Date.now(), Number(d.clk && d.clk.last) || 0) + 366 * 86400000, n = (v, hi) => Math.max(0, Math.min(hi, Math.floor(Number(v) || 0)));
@@ -14566,7 +14579,9 @@ body.mg-on .toast[hidden]{display:none}
       const bed = IMG(p.w && !ready ? 'plot_wet' : 'plot_dry'), crop = C ? gdImg(`crop_${p.c}_${st}`, st === 3 ? C.em : st === 2 ? '🌿' : '🌱', 'crop') : '';
       const tx = !C ? '빈 밭' : ready ? `${C.nm} 다 자람` : `${C.nm} ${hm(Math.max(1, Math.ceil((p.e - now) / 1000)))}`;
       const act = !C ? `<button type="button" data-gd="pick" data-i="${i}">심기</button>` : ready ? `<button type="button" class="go" data-gd="har" data-i="${i}">거두기</button>`
-        : (p.w ? '<small>물 줬어요</small>' : `<button type="button" data-gd="wat" data-i="${i}">물 주기</button>`) + `<button type="button" data-gd="cut" data-i="${i}">시간 줄이기</button>`;
+        : (p.w ? '<small>물 줬어요</small>' : `<button type="button" data-gd="wat" data-i="${i}">물 주기</button>`) +
+          (S.gn.free > 0 ? `<button type="button" class="go free" data-gd="free" data-i="${i}">⚡ 바로 자라기<small>무료 ${S.gn.free}번</small></button>`   // 5.3.4.2 '시간 줄이기' 안에 숨어 있어서 몰랐어요(퀘스트 4-5 첫 작물 거두기)
+            : `<button type="button" data-gd="cut" data-i="${i}">시간 줄이기</button>`);
       return `<div class="gd-plot${ready ? ' ready' : ''}${rt.gdPick === i || rt.gdCutI === i ? ' pick' : ''}"><span class="bed"${bed ? ` style="background-image:url('${bed}')"` : ''}>${crop}</span><span class="tx">${tx}</span>${act}</div>`;
     }).join('');
     { const cb = $('#gdCut'), ci = rt.gdCutI, cp = ci >= 0 ? S.gn.plots[ci] : null, ok = cp && cp.c && !gdReady(cp);
@@ -14581,8 +14596,9 @@ body.mg-on .toast[hidden]{display:none}
           `<div class="gd-tkrow"><button type="button" data-gd="pull" data-i="${ci}">${rt.gdPullI === ci ? '한 번 더 누르면 뽑아요 (재료 없음)' : '작물 뽑기'}</button></div>`; } }   // 잘못 심은 작물 뽑기(두 번 눌러요)
     { const live = S.gn.plots.slice(0, n), em = live.filter(p => !p.c).length, rd = live.filter(p => p.c && gdReady(p)).length, wt = live.filter(p => p.c && !p.w && !gdReady(p)).length;
       if (rt.gdPick === -2 && !em) rt.gdPick = -1;
-      $('#gdBulk').innerHTML = n < 2 ? '' : (em ? `<button type="button" data-gd="pickall">빈 밭 모두 심기 (${em})</button>` : '') +
-        (rd ? `<button type="button" data-gd="harall">모두 거두기 (${rd})</button>` : '') + (wt ? `<button type="button" data-gd="watall">모두 물 주기 (${wt})</button>` : ''); }
+      const freeTip = S.gn.free > 0 ? `<p class="gd-free-tip">⚡ 무료 바로 자라기 ${S.gn.free}번: ${live.some(p => p.c && !gdReady(p)) ? '자라는 작물의 ⚡ 단추를 누르면 바로 거둘 수 있어요' : '작물을 심으면 바로 다 자라게 할 수 있어요'}</p>` : '';
+      $('#gdBulk').innerHTML = freeTip + (n < 2 ? '' : (em ? `<button type="button" data-gd="pickall">빈 밭 모두 심기 (${em})</button>` : '') +
+        (rd ? `<button type="button" data-gd="harall">모두 거두기 (${rd})</button>` : '') + (wt ? `<button type="button" data-gd="watall">모두 물 주기 (${wt})</button>` : '')); }
     const pk = $('#gdPick'); pk.hidden = !(rt.gdPick >= 0 || rt.gdPick === -2);
     if (rt.gdPick >= 0 || rt.gdPick === -2) pk.innerHTML = `<b>${rt.gdPick === -2 ? `빈 밭 ${S.gn.plots.slice(0, n).filter(p => !p.c).length}곳에 무엇을 심을까요?` : `${rt.gdPick + 1}번 밭에 무엇을 심을까요?`}</b><div class="gd-seeds">${GD_CROPS.map(c => gdCropOk(c.k)
       ? `<button type="button" data-gd="seed" data-c="${c.k}">${gdImg('item_' + c.k, c.em)}<span>${c.nm}</span><small>${hm(c.min * 60)}</small></button>`
@@ -15559,8 +15575,8 @@ body.mg-on .toast[hidden]{display:none}
        forest/rank/<내 id>   랭킹 이름과 학교 점수
        forest/stats/<내 id>  테스트 현황 (어디까지 했는지, 얼마나 했는지)
      <내 id>는 Firebase 익명 로그인이 기기(브라우저)마다 만들어 줘요. */
-  const VERSION = '5.3.4.1';
-  const NT_QUIET = ['5.3.4.1', '5.3.4', '5.3.2.1', '5.3.0.3', '5.3.0.2', '5.3.0.1', '5.2.2', '5.2.1', '5.2.0.2', '5.2.0.1', '5.1.1.3', '5.1.1.2', '5.1.1.1', '5.1.1', '5.0.3.1', '5.0.3', '5.0.2.2', '5.0.2.1', '2.1.20', '2.1.2.2', '2.3.0.1', '2.3.4', '3.2.3', '3.2.4', '3.2.5', '3.3.1', '3.3.2', '3.3.3', '4.4.1.1', '4.4.1.2', '4.4.1.3', '4.4.1.4', '5.0.1.1', '5.0.1.2', '5.0.1.3', '5.0.1.4', '5.0.1.5', '5.0.1.6', '5.0.1.7', '5.0.1.8'];   // 생물 탐사 고침은 공지 없이. 도 공지 없이(공지 줄은 정하면 넣어요). 공지 없이. 공지 줄은 woodani가 정할 때까지 조용히. 공지는 2026-11-16 woodani가 정해서 NOTICES로 옮겼어요. 은 공지를 띄워요. 도 공지 없이. 도 공지 창 없이. 도 공지 창 없이(공지는 그대로). 도 조용히. 도 공지 창 없이(공지 줄을 고르지 않음)
+  const VERSION = '5.3.4.2';
+  const NT_QUIET = ['5.3.4.2', '5.3.4.1', '5.3.4', '5.3.2.1', '5.3.0.3', '5.3.0.2', '5.3.0.1', '5.2.2', '5.2.1', '5.2.0.2', '5.2.0.1', '5.1.1.3', '5.1.1.2', '5.1.1.1', '5.1.1', '5.0.3.1', '5.0.3', '5.0.2.2', '5.0.2.1', '2.1.20', '2.1.2.2', '2.3.0.1', '2.3.4', '3.2.3', '3.2.4', '3.2.5', '3.3.1', '3.3.2', '3.3.3', '4.4.1.1', '4.4.1.2', '4.4.1.3', '4.4.1.4', '5.0.1.1', '5.0.1.2', '5.0.1.3', '5.0.1.4', '5.0.1.5', '5.0.1.6', '5.0.1.7', '5.0.1.8'];   // 생물 탐사 고침은 공지 없이. 도 공지 없이(공지 줄은 정하면 넣어요). 공지 없이. 공지 줄은 woodani가 정할 때까지 조용히. 공지는 2026-11-16 woodani가 정해서 NOTICES로 옮겼어요. 은 공지를 띄워요. 도 공지 없이. 도 공지 창 없이. 도 공지 창 없이(공지는 그대로). 도 조용히. 도 공지 창 없이(공지 줄을 고르지 않음)
     // 이 버전들은 업데이트해도 공지 창을 띄우지 않아요(공지는 그대로)
   /* 공지사항 (은 이미 올려서 부터): 설정 > 공지사항. 맨 위가 가장 새 공지예요
      패치노트는 자동으로 넣지 않아요. woodani가 검수한 글만 여기에 적어요(CHANGELOG.md는 자세한 기록용이라 따로 있어요)

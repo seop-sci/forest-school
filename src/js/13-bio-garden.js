@@ -359,7 +359,8 @@
     const pq = document.getElementById('pq-cafeteria'); if (!pq || !S || !S.gn) return;
     let g = pq.querySelector('.gdb');
     if (!g) { g = document.createElementNS('http://www.w3.org/2000/svg', 'g'); g.setAttribute('class', 'gdb'); g.setAttribute('transform', 'translate(-30 -22)'); g.innerHTML = IMG('garden_bubble') ? `<image href="${IMG('garden_bubble')}" x="-12" y="-14" width="24" height="24"/>` : '<circle r="10"/><text y="4" text-anchor="middle">🌱</text>'; pq.appendChild(g); }
-    pq.classList.toggle('gd-on', gdOpen() && rt.viewTier == null && gdReadyN() > 0);
+    const freeNow = S.gn.free > 0 && S.gn.plots.slice(0, gdN()).some(p => p.c && !gdReady(p));   // 5.3.4.2 무료 바로 자라기를 쓸 수 있을 때도 말풍선
+    pq.classList.toggle('gd-on', gdOpen() && rt.viewTier == null && (gdReadyN() > 0 || freeNow));
   }
   function sanitizeGd(d, s) {
     const G = d.gn && typeof d.gn === 'object' ? d.gn : {}, o = freshGd(), lim = Math.max(Date.now(), Number(d.clk && d.clk.last) || 0) + 366 * 86400000, n = (v, hi) => Math.max(0, Math.min(hi, Math.floor(Number(v) || 0)));
@@ -390,7 +391,9 @@
       const bed = IMG(p.w && !ready ? 'plot_wet' : 'plot_dry'), crop = C ? gdImg(`crop_${p.c}_${st}`, st === 3 ? C.em : st === 2 ? '🌿' : '🌱', 'crop') : '';
       const tx = !C ? '빈 밭' : ready ? `${C.nm} 다 자람` : `${C.nm} ${hm(Math.max(1, Math.ceil((p.e - now) / 1000)))}`;
       const act = !C ? `<button type="button" data-gd="pick" data-i="${i}">심기</button>` : ready ? `<button type="button" class="go" data-gd="har" data-i="${i}">거두기</button>`
-        : (p.w ? '<small>물 줬어요</small>' : `<button type="button" data-gd="wat" data-i="${i}">물 주기</button>`) + `<button type="button" data-gd="cut" data-i="${i}">시간 줄이기</button>`;
+        : (p.w ? '<small>물 줬어요</small>' : `<button type="button" data-gd="wat" data-i="${i}">물 주기</button>`) +
+          (S.gn.free > 0 ? `<button type="button" class="go free" data-gd="free" data-i="${i}">⚡ 바로 자라기<small>무료 ${S.gn.free}번</small></button>`   // 5.3.4.2 '시간 줄이기' 안에 숨어 있어서 몰랐어요(퀘스트 4-5 첫 작물 거두기)
+            : `<button type="button" data-gd="cut" data-i="${i}">시간 줄이기</button>`);
       return `<div class="gd-plot${ready ? ' ready' : ''}${rt.gdPick === i || rt.gdCutI === i ? ' pick' : ''}"><span class="bed"${bed ? ` style="background-image:url('${bed}')"` : ''}>${crop}</span><span class="tx">${tx}</span>${act}</div>`;
     }).join('');
     { const cb = $('#gdCut'), ci = rt.gdCutI, cp = ci >= 0 ? S.gn.plots[ci] : null, ok = cp && cp.c && !gdReady(cp);
@@ -405,8 +408,9 @@
           `<div class="gd-tkrow"><button type="button" data-gd="pull" data-i="${ci}">${rt.gdPullI === ci ? '한 번 더 누르면 뽑아요 (재료 없음)' : '작물 뽑기'}</button></div>`; } }   // 잘못 심은 작물 뽑기(두 번 눌러요)
     { const live = S.gn.plots.slice(0, n), em = live.filter(p => !p.c).length, rd = live.filter(p => p.c && gdReady(p)).length, wt = live.filter(p => p.c && !p.w && !gdReady(p)).length;
       if (rt.gdPick === -2 && !em) rt.gdPick = -1;
-      $('#gdBulk').innerHTML = n < 2 ? '' : (em ? `<button type="button" data-gd="pickall">빈 밭 모두 심기 (${em})</button>` : '') +
-        (rd ? `<button type="button" data-gd="harall">모두 거두기 (${rd})</button>` : '') + (wt ? `<button type="button" data-gd="watall">모두 물 주기 (${wt})</button>` : ''); }
+      const freeTip = S.gn.free > 0 ? `<p class="gd-free-tip">⚡ 무료 바로 자라기 ${S.gn.free}번: ${live.some(p => p.c && !gdReady(p)) ? '자라는 작물의 ⚡ 단추를 누르면 바로 거둘 수 있어요' : '작물을 심으면 바로 다 자라게 할 수 있어요'}</p>` : '';
+      $('#gdBulk').innerHTML = freeTip + (n < 2 ? '' : (em ? `<button type="button" data-gd="pickall">빈 밭 모두 심기 (${em})</button>` : '') +
+        (rd ? `<button type="button" data-gd="harall">모두 거두기 (${rd})</button>` : '') + (wt ? `<button type="button" data-gd="watall">모두 물 주기 (${wt})</button>` : '')); }
     const pk = $('#gdPick'); pk.hidden = !(rt.gdPick >= 0 || rt.gdPick === -2);
     if (rt.gdPick >= 0 || rt.gdPick === -2) pk.innerHTML = `<b>${rt.gdPick === -2 ? `빈 밭 ${S.gn.plots.slice(0, n).filter(p => !p.c).length}곳에 무엇을 심을까요?` : `${rt.gdPick + 1}번 밭에 무엇을 심을까요?`}</b><div class="gd-seeds">${GD_CROPS.map(c => gdCropOk(c.k)
       ? `<button type="button" data-gd="seed" data-c="${c.k}">${gdImg('item_' + c.k, c.em)}<span>${c.nm}</span><small>${hm(c.min * 60)}</small></button>`
