@@ -272,7 +272,7 @@
   }
   function ambLoad(key) {
     if (AMB.buf.has(key)) return AMB.buf.get(key);
-    const p = audBytes(key).then(b => actx.decodeAudioData(b)).catch(() => null);   // 못 받으면 그 소리만 조용히 빠져요
+    const p = audBytes(key).then(b => actx.decodeAudioData(b)).catch(() => { AMB.buf.delete(key); return null; });   // 못 받으면 그 소리만 조용히 빠지고, 다음에 다시 받아요(5.3.4.4)
     AMB.buf.set(key, p);
     return p;
   }

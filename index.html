@@ -2,7 +2,7 @@
 <html lang="ko">
 <head>
 <meta charset="utf-8">
-<meta name="forest-version" content="5.3.4.3">
+<meta name="forest-version" content="5.3.4.4">
 <meta name="viewport" content="width=device-width, initial-scale=1">
 <meta name="description" content="도토리를 모아 숲속 학교를 키우는 방치형 게임 테스트판이에요.">
 <style>html,body{margin:0}</style>
@@ -4198,7 +4198,7 @@ body.mg-on .toast[hidden]{display:none}
     <p class="boot-step" id="bootStep">학교 문을 여는 중...</p>
     <p class="boot-tip" id="bootTip">학교 문을 여는 중이에요</p>
   </div>
-  <span class="boot-ver" id="bootVer">v5.3.4.3</span>
+  <span class="boot-ver" id="bootVer">v5.3.4.4</span>
 </div>
 
 <div class="app on-school" id="app">
@@ -4818,7 +4818,7 @@ body.mg-on .toast[hidden]{display:none}
       </div>
       <h3 class="panel-sub">정보</h3>
       <dl class="info">
-        <div id="verRow"><dt>버전</dt><dd>v5.3.4.3</dd></div>
+        <div id="verRow"><dt>버전</dt><dd>v5.3.4.4</dd></div>
         <div id="pidRow" hidden><dt>학교 번호</dt><dd id="infoPid"></dd></div>
       </dl>
       <div id="devBox" hidden>
@@ -8370,7 +8370,7 @@ body.mg-on .toast[hidden]{display:none}
   // 장학재단: 졸업할 때 받는 기금으로 고쳐요. 학교급이 바뀌어도 효과가 계속 남아요
   // 저장 칸 상한. lv: 시설과 선생님 레벨, perk: 명예 교장실 강화(1.3^60이어도 유한해요), fperk: 장학재단 강화(2^40)
   // count: 수료증, 기금, 황금 도토리, 기록 횟수 같은 셈, big: 도토리처럼 아주 커질 수 있는 값
-  const SAVE_CAP = { lv: 999, tea: 99, perk: 60, fperk: 40, count: 1e12, big: 1e30, acorn: 1e60 };   // 시설과 가구 레벨 99 → 999, 도토리 칸(가진 것, 번 것, 받을 것, 시설 값)은 10^30 → 10^60(acorn). 대학원을 되풀이하면 시설 상한(40 + 5 × 학년)이 100을 넘고 그 값이 10^30을 넘어서, 다시 켤 때 레벨과 도토리가 깎였어요. 선생님(tea)과 그 밖의 칸(big)은 그대로
+  const SAVE_CAP = { lv: 999, tea: 99, perk: 60, fperk: 40, count: 1e12, big: 1e30, acorn: 1e100 };   // 5.3.4.4: acorn 10^60 → 10^100(대학원을 46학년쯤 되풀이하면 연구소 값이 10^60을 넘어, 다시 켤 때 가진 도토리가 잘려 못 올렸어요). 그 전: 시설과 가구 레벨 99 → 999, 도토리 칸(가진 것, 번 것, 받을 것, 시설 값)은 10^30 → 10^60(acorn). 대학원을 되풀이하면 시설 상한(40 + 5 × 학년)이 100을 넘고 그 값이 10^30을 넘어서, 다시 켤 때 레벨과 도토리가 깎였어요. 선생님(tea)과 그 밖의 칸(big)은 그대로
   // 저장을 읽을 때 숫자 칸을 바로잡는 도우미 두 가지(예전에는 sanitize 함수마다 num이라는 같은 이름으로 따로 있었어요. 인자 뜻이 달라 이름을 나눴어요)
   // numFb(v, min, fb, max): min보다 작거나 숫자가 아니면 fb(대신 쓸 값), 크면 max로 잘라요. 상한 없던 숫자 칸에도 상한을 둬요(셈은 SAVE_CAP.count)
   //   numIn(v, lo, hi): lo와 hi 사이로 잘라요. 숫자가 아니면 lo
@@ -9910,6 +9910,8 @@ body.mg-on .toast[hidden]{display:none}
       s.pp = { dat: num(P.dat, 9999), cur: c, n: num(P.n, 1e6), by: map(P.by), day: typeof P.day === 'string' ? P.day.slice(0, 10) : '', cm: Number.isFinite(P.cm) ? Math.max(-1, Math.floor(P.cm)) : -1,
         cf: num(P.cf, 99999), cb: num(P.cb, 99999), ck: map(P.ck), med, sem: num(P.sem, 1e6) };
     } else if (s.tier >= GRAD_TIER) s.pp.sem = Math.max(0, Math.floor((s.tg || 0) * 2 + (s.sem || 0)));   // 앞 저장: 지난 세미나 수를 학기로 어림
+    { const t = d.ach && typeof d.ach === 'object' ? d.ach.title : null;   // 5.3.4.4: 논문과 학회 칭호는 s.pp를 다 읽은 뒤에 봐요(sanitize171에서는 빠져 다시 켜면 칭호가 떨어졌어요)
+      if (!s.ach.title && typeof t === 'string' && PP_TITLES.some(x => x.id === t && x.got(s))) s.ach.title = t; }
     { const A = d && d.adx && typeof d.adx === 'object' ? d.adx : {}, f = freshAdx();   // 광고 도장과 한 판 더
       f.day = typeof A.day === 'string' ? A.day.slice(0, 10) : '';
       f.n = typeof A.n === 'number' && isFinite(A.n) ? Math.max(0, Math.min(ADX.max, Math.floor(A.n))) : 0;
@@ -11149,7 +11151,7 @@ body.mg-on .toast[hidden]{display:none}
   }
   function ambLoad(key) {
     if (AMB.buf.has(key)) return AMB.buf.get(key);
-    const p = audBytes(key).then(b => actx.decodeAudioData(b)).catch(() => null);   // 못 받으면 그 소리만 조용히 빠져요
+    const p = audBytes(key).then(b => actx.decodeAudioData(b)).catch(() => { AMB.buf.delete(key); return null; });   // 못 받으면 그 소리만 조용히 빠지고, 다음에 다시 받아요(5.3.4.4)
     AMB.buf.set(key, p);
     return p;
   }
@@ -12729,9 +12731,9 @@ body.mg-on .toast[hidden]{display:none}
   // 도토리 칸 크기 정하기용 글자: 지금 단위에서 가장 길게 나올 모양(숫자는 8로, 아래 단위까지)
   function budgetTpl(n) {
     const t = fmt2(n);
-    if (!/[만억조경해자양]/.test(t)) return t.replace(/[0-9]/g, '8');
-    const m = t.match(/^([0-9,]+)([만억조경해자양])/); if (!m) return t;
-    const U = ['양', '자', '해', '경', '조', '억', '만'], i = U.indexOf(m[2]), u2 = i + 1 < U.length ? U[i + 1] : '';
+    if (!/[만억조경해자양구간정재극]/.test(t)) return t.replace(/[0-9]/g, '8');
+    const m = t.match(/^([0-9,]+)([만억조경해자양구간정재극])/); if (!m) return t;   // 5.3.4.4: fmt2와 같은 단위(구 10^32부터 빠져 글씨 크기가 흔들렸어요)
+    const U = ['극', '재', '정', '간', '구', '양', '자', '해', '경', '조', '억', '만'], i = U.indexOf(m[2]), u2 = i + 1 < U.length ? U[i + 1] : '';
     return m[1].replace(/[0-9]/g, '8') + m[2] + (u2 ? ' 8888' + u2 : '');
   }
   const refit = () => { rt.fitKey = `${window.innerWidth}x${window.innerHeight}|3|${rt.fitGen}`; };
@@ -15575,8 +15577,8 @@ body.mg-on .toast[hidden]{display:none}
        forest/rank/<내 id>   랭킹 이름과 학교 점수
        forest/stats/<내 id>  테스트 현황 (어디까지 했는지, 얼마나 했는지)
      <내 id>는 Firebase 익명 로그인이 기기(브라우저)마다 만들어 줘요. */
-  const VERSION = '5.3.4.3';
-  const NT_QUIET = ['5.3.4.3', '5.3.4.2', '5.3.4.1', '5.3.4', '5.3.2.1', '5.3.0.3', '5.3.0.2', '5.3.0.1', '5.2.2', '5.2.1', '5.2.0.2', '5.2.0.1', '5.1.1.3', '5.1.1.2', '5.1.1.1', '5.1.1', '5.0.3.1', '5.0.3', '5.0.2.2', '5.0.2.1', '2.1.20', '2.1.2.2', '2.3.0.1', '2.3.4', '3.2.3', '3.2.4', '3.2.5', '3.3.1', '3.3.2', '3.3.3', '4.4.1.1', '4.4.1.2', '4.4.1.3', '4.4.1.4', '5.0.1.1', '5.0.1.2', '5.0.1.3', '5.0.1.4', '5.0.1.5', '5.0.1.6', '5.0.1.7', '5.0.1.8'];   // 생물 탐사 고침은 공지 없이. 도 공지 없이(공지 줄은 정하면 넣어요). 공지 없이. 공지 줄은 woodani가 정할 때까지 조용히. 공지는 2026-11-16 woodani가 정해서 NOTICES로 옮겼어요. 은 공지를 띄워요. 도 공지 없이. 도 공지 창 없이. 도 공지 창 없이(공지는 그대로). 도 조용히. 도 공지 창 없이(공지 줄을 고르지 않음)
+  const VERSION = '5.3.4.4';
+  const NT_QUIET = ['5.3.4.4', '5.3.4.3', '5.3.4.2', '5.3.4.1', '5.3.4', '5.3.2.1', '5.3.0.3', '5.3.0.2', '5.3.0.1', '5.2.2', '5.2.1', '5.2.0.2', '5.2.0.1', '5.1.1.3', '5.1.1.2', '5.1.1.1', '5.1.1', '5.0.3.1', '5.0.3', '5.0.2.2', '5.0.2.1', '2.1.20', '2.1.2.2', '2.3.0.1', '2.3.4', '3.2.3', '3.2.4', '3.2.5', '3.3.1', '3.3.2', '3.3.3', '4.4.1.1', '4.4.1.2', '4.4.1.3', '4.4.1.4', '5.0.1.1', '5.0.1.2', '5.0.1.3', '5.0.1.4', '5.0.1.5', '5.0.1.6', '5.0.1.7', '5.0.1.8'];   // 생물 탐사 고침은 공지 없이. 도 공지 없이(공지 줄은 정하면 넣어요). 공지 없이. 공지 줄은 woodani가 정할 때까지 조용히. 공지는 2026-11-16 woodani가 정해서 NOTICES로 옮겼어요. 은 공지를 띄워요. 도 공지 없이. 도 공지 창 없이. 도 공지 창 없이(공지는 그대로). 도 조용히. 도 공지 창 없이(공지 줄을 고르지 않음)
     // 이 버전들은 업데이트해도 공지 창을 띄우지 않아요(공지는 그대로)
   /* 공지사항 (은 이미 올려서 부터): 설정 > 공지사항. 맨 위가 가장 새 공지예요
      패치노트는 자동으로 넣지 않아요. woodani가 검수한 글만 여기에 적어요(CHANGELOG.md는 자세한 기록용이라 따로 있어요)
@@ -16285,8 +16287,13 @@ body.mg-on .toast[hidden]{display:none}
      이 기기 저장을 비우지 않으면 새 계정에 같은 학교가 또 올라가서 랭킹에 같은 학교가 둘 생겨요 */
   const inAppBrowser = () => /KAKAOTALK|NAVER|Instagram|FBAN|FBAV|Line\//i.test(navigator.userAgent || '');
   async function acctSaveFirst() {
+    // 5.3.4.4: 서버 연결을 쉬던 중(netSleep)이면 깨우고, 서버 확인(cloudVerify)이 끝난 뒤에 올려요. 전에는 확인을 기다리지 않아 '저장하지 못했어요'가 떴어요
+    const until = async (f, n) => { for (let i = 0; i < n && f(); i++) await new Promise(r => setTimeout(r, 150)); };
+    if (Cloud.asleep) netWake();
+    if (!Cloud.fresh && !Cloud.verifying) cloudVerify();
+    await until(() => Cloud.verifying || Cloud.pushing, Math.ceil(CLOUD_WAIT * 2 / 150));   // 확인은 서버 읽기 두 번까지(CLOUD_WAIT씩)
     await cloudPush(true);
-    for (let i = 0; i < 40 && Cloud.pushing; i++) await new Promise(r => setTimeout(r, 150));
+    await until(() => Cloud.pushing, 40);
     return !Cloud.dirty && cloudOn();
   }
   async function switchGoogle() {
@@ -17078,7 +17085,7 @@ body.mg-on .toast[hidden]{display:none}
           `<button class="btn-sub rl-model" type="button" data-look="model">예시 학교 구경하기</button><p class="fine">랭킹의 학교 이름을 누르면 그 학교를 구경해요(보여 주기를 켠 학교만)</p>`; } }
     // 순위표: 이름은 다른 사람이 적은 글이라 textContent로만 넣어요
     const list = $('#rankList'), rows = Rank.state === 'on' ? R : [];
-    const lkey = mode + rows.map(r => `${r.id}:${r.score}:${r.lp}:${r.sp}:${r.bt}:${r.btm}:${r.tf}:${r.cf}:${r.name}:${r.tier}:${r.year}:${r.test ? 1 : 0}:${r.title}`).join('|') + `|${Rank.uid}|${S.units}|${S.ach ? S.ach.title : ''}|${rt.isAdmin ? 1 : 0}|${rt.rkDel || ''}`;
+    const lkey = mode + rows.map(r => `${r.id}:${r.score}:${r.lp}:${r.sp}:${r.bt}:${r.btm}:${r.tf}:${r.hf}:${r.cf}:${r.name}:${r.tier}:${r.year}:${r.test ? 1 : 0}:${r.title}`).join('|') + `|${Rank.uid}|${S.units}|${S.ach ? S.ach.title : ''}|${rt.isAdmin ? 1 : 0}|${rt.rkDel || ''}`;
     const canDel = !!(rt.isAdmin && Rank.be && Rank.be.removeOther && !Rank.readOnly);
     if (list.dataset.key !== lkey) {
       list.dataset.key = lkey;
@@ -20037,7 +20044,7 @@ body.mg-on .toast[hidden]{display:none}
     const won = S.roster.list.filter(csDone);
     let newDex = 0;
     for (const x of won) { const J = JOBS[x.jb]; if (!S.cs.done[J.k]) { S.cs.done[J.k] = { nm: x.nm, sp: x.sp }; newDex += 1; } }
-    if (newDex) { S.ess += CS.dexEss * newDex; renderEss(); }
+    if (newDex) addEss(CS.dexEss * newDex);   // 5.3.4.4: 다른 정수 보상처럼 정수 연구가 붙어요
     const allDex = JOBS.every(J => S.cs.done[J.k]);
     if (allDex && !S.deco.own.deco_career_tree) { S.deco.own.deco_career_tree = 1; addGold(CS.dexGold); }
     rt.csRw = [];
@@ -32171,7 +32178,7 @@ body.mg-on .toast[hidden]{display:none}
   /* ---------- 미니게임 터지는 효과(효과층 7단계) ----------
      숲속 퍼즐: 줄이 지워지면 블록 그림이 네 조각으로 깨져 떨어져요. 숲속 합치기: 합쳐지면 빛 고리와 별 조각이 퍼져요
      그림판 하나(canvas.fxo)를 퍼즐 판이나 합치기 판에 옮겨 붙여 써요. 값과 저장은 그대로, 엔진이 없거나 움직임 줄이기면 예전 효과 그대로 */
-  const FXO = { st: '', app: null, w: null, g: null, parts: [], rings: [], raf: 0, last: 0, tex: {}, star: null, dot: null };
+  const FXO = { st: '', app: null, w: null, g: null, parts: [], rings: [], raf: 0, last: 0, tex: {}, quad: new Map(), star: null, dot: null };
   const fxoOn = () => FXL.st === 'ok' && FXO.st === 'ok' && !rt.reduced;
   async function fxoInit() {
     if (FXO.st || FXL.st !== 'ok') return; FXO.st = 'load';
@@ -32206,7 +32213,9 @@ body.mg-on .toast[hidden]{display:none}
     const tex = fxoUrlTex(css), P = window.PIXI;
     const go = () => {
       if (tex && tex.source) { const fw = tex.frame.width / 2, fh = tex.frame.height / 2;
-        for (let q = 0; q < 4; q++) { const qx = q % 2, qy = q >> 1, t = new P.Texture({ source: tex.source, frame: new P.Rectangle(tex.frame.x + qx * fw, tex.frame.y + qy * fh, fw, fh) });
+        // 5.3.4.4: 네 조각 텍스처는 그림마다 한 번만 만들어 다시 써요(깰 때마다 새로 만들면 원본 그림에 붙은 resize 듣기가 계속 쌓였어요)
+        let Q = FXO.quad.get(tex); if (!Q) { Q = [0, 1, 2, 3].map(q => new P.Texture({ source: tex.source, frame: new P.Rectangle(tex.frame.x + (q % 2) * fw, tex.frame.y + (q >> 1) * fh, fw, fh) })); FXO.quad.set(tex, Q); }
+        for (let q = 0; q < 4; q++) { const qx = q % 2, qy = q >> 1, t = Q[q];
           const dx = qx ? 1 : -1, dy = qy ? 1 : -1;
           fxoPart(t, cx + dx * cw * 0.25, cy + dy * cw * 0.25, cw * 0.5, { vx: dx * fxRnd(40, 110), vy: dy * fxRnd(20, 60) - fxRnd(160, 260), g: 900, rot: dx * fxRnd(4, 9), life: fxRnd(0.6, 0.8) }); } }
       else for (let q = 0; q < 4; q++) fxoPart(FXO.dot, cx, cy, cw * 0.3, { vx: fxRnd(-110, 110), vy: -fxRnd(150, 250), g: 900, life: 0.6, tint: tint || 0xffe08a, shrink: true });
@@ -32938,7 +32947,7 @@ body.mg-on .toast[hidden]{display:none}
     MAP_OAK, oakArt, layoutOak, mapOak, oakAt, tapOak, dropSpot,
     dexMeet, dexSync, dexPending, dexGift, renderDex, evCurrent, evNext, evUpcoming, evSync, evFix, evVal, EV_FALLBACK, EV_DECO, EV_HAT, COS, DECO_BY, decoOwn, perkRec, fpRec, gmPast, gmItems, gmNow, GMON, buyShop, pickShop, showNote, showOkOn, showWd, renderGradPanel, renderShop, renderDecoShop, EV_WEEKLY, EV_WEEK_BASE, weekMon, claimStamp, claimEvMission, claimEvBox, renderEvent, evMissions, evOk, evSkipped, EV_MONTHS, EV_MEASURE, tierMinutes, minAcorns, IMG, sanitize171, ACH, achSync, claimAch, setTitle, renderAch, setDexSeg, achClaimable, XT, xtAct, xtCost, xtLv, feastMins, libMult, propInstances, walkBuild, festItemSvg, guestArt, adErrText, googleErrText, openSheet, closeSheet, startFest, startSports, sanitize170, EV_STAMPS, EV_SPECIAL, EV_MONTHLY, EV_BOX, DEX_KEYS, DEX_REWARD, DEX_GUEST_KEYS, seasonKey, roofArtKey, thrKey, PP, PP_TITLES, ppOpen, ppPer, ppData, ppDay, ppWrite, ppTick, ppSync, ppScore, ppSemDone, rtMax, alumniLines, SIDE, vdReward, oakKey, setSeasonArt, VP, vpLv, vpCost, vpMult, vpAct, renderVpCard, sportsPrize, festPrize, renderTeachers, buildTeacherCards, bldImg, roofKey, bldStage, mapKey, setMapArt, applyThemes, buyFacility, bldFx, setBldFx, mapHi, Live, liveApply, liveLoad, liveOff, LIVE_KEYS, EVC, NOTICES, openNotice, noticeAuto, noticeWant, ntUnread, startTrial, endTrial: () => rt.trial && (rt.trial.left = 0), spawnDeal, startVisit, IMG170, MG, mgCells, mgSetCells, mgTick, mgAddEnergy, mgAddUp, mgTapGen, mgDrop, mgSell, mgUpgrade, mgAddUp, mgUpSwap, mgGensMax, MG_UP_ESS, mgClaimOrder, mgSwapOrder, mgOrderOk, mgFillOrders, mgOpen, mgClose, mgRenderAll, mgSpawnLevel, mgNearestEmpty, mgEmptyBoard, mgOrderReward, mgUI, sanitize180, mgWatchAd, mgNewOrder, mgHintPick, mgShowHint, mgClearHint, mgTouch, mgOrderGuide, mgDexN, mgDexCan, mgDexClaim, mgOpenDex, MG_DEX, MG_DEX_MS, mgDexEss, mgDexEssCan, mgDexEssN, mgDexMsCan, mgDexMsClaim, MGB, mgBuyBoost, mgBstLeft, mgOpenBoost, nice, claimMission, claimBonus, claimWeekMission, MP_BOX, swapDaily, repairMissions, MISSIONS, WMISSIONS, dmDay, wkWeek,   // 도감, 이벤트
     PZ, PZ_SHAPES, pzFits, pzAnyFit, pzStuck, pzFullLines, pzPlace, pzFreshGame, pzStart, PZB, pzbCost, pzApplyBoost, pzBoostOpen, pzBoostGo, festGoldLeft, festGoldTake, claimSports, TR2, TR2_PL, openTr2, tr2Act, tr2Away, tr2Ready, tr2Rsv, tr2Tick, renderAlbum, FEST, FEST_IDS, festNight, festShown, festTimeLock, festOpen, startFest, openFest, endFest, renderStreet, pzFinish, pzLeft, pzCanAd, pzEssOf, pzMinOf, pzHelpSquirrel, pzHelpOwl, pzHelpBear, fillSubs, mapRoofTop, showAd, claimOfflineDouble, startBoost, tripAd, festFocus, festRange, visMap, renderMissions, pzHasHelp, pzRot, pzNewPiece, pzOpen, pzClose, pzGameOver, pzRenderAll, renderMini, addEss, ESHOP, SP_FUR, applyCos, essItem, pickEss, buyEss, renderEssShop, hatSVG, spFurImg, gameNow, gameToday, gameWeek, kstDay, setServerTime, SVR, dmDay, weekIdx, lgWeek, wkWeek, lgKey, pzDay, goldDay, boostLeft, dealLeft, canStamp };
-  if (window.__FOREST_TEST) Object.assign(window.__forest, { uniTerm, utSync, tripUseTicket, readUseTicket, picnicUseTicket, buyDecoPieces, adGold, claimBonus, cloudPush, cloudClash, syncGet, revOf, deleteAccount, lookDel: () => lookDelNow(), lookSet, lookPush, leaveRank, sanitizeCg, freshCg, ambWant, ambSync, AMB, AMB_LV, WLD, wldSync, wldLv, wldPhase, wldWeather, wldAuto, WLD_WATER, wldCurtain, photoOpen, photoClose, oakBend, oakBands, frPatAll, frPatLeft, fpsToggle, fxRes, fxWant, gradRecReady, teaRecReady });   // 시험 손잡이
+  if (window.__FOREST_TEST) Object.assign(window.__forest, { acctSaveFirst, netSleep, netWake, uniTerm, utSync, tripUseTicket, readUseTicket, picnicUseTicket, buyDecoPieces, adGold, claimBonus, cloudPush, cloudClash, syncGet, revOf, deleteAccount, lookDel: () => lookDelNow(), lookSet, lookPush, leaveRank, sanitizeCg, freshCg, ambWant, ambSync, AMB, AMB_LV, WLD, wldSync, wldLv, wldPhase, wldWeather, wldAuto, WLD_WATER, wldCurtain, photoOpen, photoClose, oakBend, oakBands, frPatAll, frPatLeft, fpsToggle, fxRes, fxWant, gradRecReady, teaRecReady });   // 시험 손잡이
   if (window.claude && window.claude.hot && window.claude.hot.snapshot) {
     try { window.claude.hot.snapshot(() => { if (S) syncMid(); return { save: S }; }); } catch (e) { /* 무시 */ }
   }
