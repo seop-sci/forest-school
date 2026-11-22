@@ -1,6 +1,6 @@
 # 2.0.0 시험: 학교급 모습 보기, 졸업식 사진, 새 전학생 6종과 전학 대화, 옛 저장 이어가기
 # 보는 것
-#  1) 유치원에서는 학교급 동그라미가 안 보이고, 초등학교부터 6개(지난 학교급은 누를 수 있고, 못 간 곳은 자물쇠)가 탭 막대 위에 보여요
+#  1) 유치원에서는 학교급 동그라미가 안 보이고(5.3.4부터 시간 흐름 단추 하나만), 초등학교부터 6개(지난 학교급은 누를 수 있고, 못 간 곳은 자물쇠)가 탭 막대 위에 보여요
 #  2) 지난 학교급 보기: 사진이 없으면 모두 지어진 모습, 사진이 있으면 그때 레벨. 꾸미기 모드에서 그 지도 장식 자리에 놓고(지금 지도와 따로), 돌아가기
 #  3) 종업식과 졸업식에 새 친구가 오면 식 창 다음에 전학 대화(교감 소개, 자기소개 두 줄, 마지막 안내)가 떠요. 전학생은 12종이고 모두 그림
 #  4) 옛 저장: 전학생 6종을 다 만난 학교는 6종 그대로(불러오며 7번째를 채우지 않아요), 친구 성장 쪽지를 계속 쓸 수 있어요. 초등학교 퀘스트를 다 마친 저장은 e39(초등학교 졸업식)에서 이어가요
@@ -26,13 +26,13 @@ async def main():
             await pg.goto(URL); await pg.wait_for_timeout(2500); await pg.evaluate(SKIP)
             await pg.evaluate(NB_OFF)   # 야간 건설과 특별 이벤트 주말 하루 종일 가속을 꺼요(이 시험은 공사 빠르기를 보지 않아요. 켜 두면 밤 8~12시와 특별 이벤트 주말에 알림 창이 지도를 덮고 공사가 빨라져요)
             await pg.wait_for_timeout(1200)
-            r = await pg.evaluate("document.querySelector('#tierDots').hidden")
-            if not r: bad.append(f'{w}: 유치원에서 학교급 동그라미가 보여요')
+            r = await pg.evaluate("(() => { const d = document.querySelector('#tierDots'); return [d.querySelectorAll('[data-td]').length, d.querySelectorAll('[data-nl]').length]; })()")
+            if r != [0, 1]: bad.append(f'{w}: 유치원에서는 학교급 동그라미 없이 시간 흐름 단추만(5.3.4) {r}')
             # 초등학교 1학년(유치원 사진 없음)
             await pg.evaluate(f"(() => {{ const F = {F}, S = F.S; S.tier = 1; S.f.science = 1; S.deco.own.bench = 3; F.renderMap(); F.renderTierDots(); }})()")
             await pg.wait_for_timeout(1200)
             r = await pg.evaluate("""(() => { const d = document.querySelector('#tierDots'), t = document.querySelector('.tabs').getBoundingClientRect(), q = d.getBoundingClientRect();
-              return { hidden: d.hidden, n: d.querySelectorAll('.td').length, past: d.querySelectorAll('.td.past').length, cur: d.querySelectorAll('.td.cur').length, lock: d.querySelectorAll('.td.lock').length, above: q.bottom <= t.top + 1 }; })()""")
+              return { hidden: d.hidden, n: d.querySelectorAll('.td[data-td]').length, past: d.querySelectorAll('.td.past').length, cur: d.querySelectorAll('.td.cur').length, lock: d.querySelectorAll('.td.lock').length, above: q.bottom <= t.top + 1 }; })()""")
             if r != {'hidden': False, 'n': 6, 'past': 1, 'cur': 1, 'lock': 4, 'above': True}: bad.append(f'{w}: 동그라미 {r}')
             await pg.click('#tierDots .td.past'); await pg.wait_for_timeout(400)
             r = await pg.evaluate("""(() => { const v = document.querySelector('#tierView'); return { open: !v.hidden, title: document.querySelector('#tvTitle').textContent, sub: document.querySelector('#tvSub').textContent,
