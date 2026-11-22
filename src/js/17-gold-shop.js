@@ -52,6 +52,7 @@
   };
   /* 꾸미기 백화점 값(속도와 경제 재설계안 3절, Fable). 황금 도토리는 큰 꾸미기에만 써요(힘은 사지 않아요)
      테마 세트는 한 번에만 사요(이미 그 테마 배경을 샀으면 10 빼요). 옷 세트는 이미 산 조각의 옛 값만큼 빼요 */
+  const ASK_GOLD = 30;   // 5.3.3 이 값 이상인 황금 품목만 사기 전에 한 번 더 물어요(docs/SHOP-2026-11.md)
   const GSHOP = { theme: 60, themeBgOff: 10, outfit: 25, outfitMin: 5, evDeco: 20, mark: 30 };
   const OUTFITS = [
     { id: 'ball', name: '야구 소년', hat: 'cap', neck: 'bandana' }, { id: 'snow', name: '겨울 산책', hat: 'beanie', neck: 'scarf' },
@@ -244,33 +245,29 @@
   // 테마 세트는 한 번에만 사요(값 60, 그 테마 배경을 이미 샀으면 50). 이미 산 칸은 그대로 칸마다 쓰고 벗을 수 있어요
   const thSetPrice = t => GSHOP.theme - (thOwn(t, 'bg') ? GSHOP.themeBgOff : 0);
   function renderThemes(coin) {
-    let h = `<h3 class="shop-h">테마 세트 <small>지도, 지붕 색, 테마 곡 한 벌. 가지면 수업료 +3%</small></h3>`;
+    let h = `<h3 class="shop-h" data-cat="테마">테마 세트 <small>메인 화면, 배경 음악 | 세트당 수업료 +3%</small></h3>`;   // 5.3.3 설명은 머리에 한 번
     for (const t of THEMES) {
       const n = thCount(t.id), done = n === TH_SLOTS.length;
       const playing = Music.preview === t.id;
-      h += `<div class="th-card${done ? ' done' : ''}"><div class="th-top"><b>${t.name}</b><button class="th-play${playing ? ' on' : ''}" type="button" data-play="${t.id}" aria-pressed="${playing}">${playing ? '♪ 듣는 중' : '♪ 테마 곡 듣기'}</button><button class="th-play th-prev" type="button" data-thprev="${t.id}">미리 보기</button><span class="th-prog">${done ? '가졌어요' : n ? n + '/' + TH_SLOTS.length : ''}</span></div>` +
+      const open = rt.thOpen === t.id;   // 5.3.3 테마 세트는 접힌 줄로, 누르면 펼쳐요
+      h += `<div class="th-card${done ? ' done' : ''}${open ? ' open' : ' fold'}"><button class="th-fold" type="button" data-thfold="${t.id}" aria-expanded="${open}"><span class="th-sw">${thArt(t, 'bg')}</span><span class="th-nm"><b>${t.name}</b><small>${done ? '세트를 다 가졌어요' : `${n} / ${TH_SLOTS.length}칸 가짐`}</small></span>${done ? '<span class="pill own">가졌어요</span>' : `<span class="pill">${coin}${thSetPrice(t.id)}</span>`}</button>`;
+      h += `<div class="th-body"><div class="th-top"><b>${t.name}</b><button class="th-play${playing ? ' on' : ''}" type="button" data-play="${t.id}" aria-pressed="${playing}">${playing ? '♪ 듣는 중' : '♪ 테마 곡 듣기'}</button><button class="th-play th-prev" type="button" data-thprev="${t.id}">미리 보기</button><span class="th-prog">${done ? '가졌어요' : n ? n + '/' + TH_SLOTS.length : ''}</span></div>` +
         (done ? '' : (() => { const p = thSetPrice(t.id), poor = S.gold < p;
           return `<button class="th-all${poor ? ' poor' : ''}" type="button" data-buy="s:${t.id}"><span>${n ? `남은 ${TH_SLOTS.length - n}칸까지 세트로 사기` : '세트 사기'}${thOwn(t.id, 'bg') ? ` <small>배경 산 값 ${GSHOP.themeBgOff} 빼 줌</small>` : ''}</span><b>${thOwn(t.id, 'bg') ? `<s>${GSHOP.theme}</s>` : ''}${coin}${p}</b></button>`; })()) +
         (() => { const own = TH_SLOTS.filter(([sl]) => thOwn(t.id, sl)), on = own.every(([sl]) => S.cos.th[sl] === t.id);
           return own.length >= 2 ? `<button class="th-apply${on ? ' on' : ''}" type="button" data-apply="${t.id}" aria-pressed="${on}">${on ? '이 테마를 모두 쓰는 중' : done ? '이 테마로 한 번에 바꾸기' : `가진 ${own.length}개 한 번에 쓰기`}</button>` : ''; })() +
-        `<p class="th-bonus">${done ? `세트 효과 수업료 +${t.bonus}% 받는 중` : `세트를 가지면 수업료 +${t.bonus}%, 학교 배경음악도 바뀌어요.`}</p><div class="shop-grid">`;
+        (done ? `<p class="th-bonus">세트 효과 수업료 +${t.bonus}% 받는 중</p>` : '') + '<div class="shop-grid">';
       for (const [slot, sname] of TH_SLOTS) {
         const own = thOwn(t.id, slot), on = S.cos.th[slot] === t.id;
         const pr = on ? '쓰는 중' : own ? '쓰기' : '세트로';
         h += `<button class="si${own ? ' own' : ' lock'}${on ? ' on' : ''}" type="button" data-buy="t:${t.id}:${slot}" aria-pressed="${on}" aria-label="${t.name} ${sname}">` +
           `<span class="pv">${thArt(t, slot)}</span><span class="nm">${sname}</span><span class="pr">${pr}</span></button>`;
       }
-      h += '</div></div>';
+      h += '</div></div></div>';
     }
     return h;
   }
   TH_IDS.forEach(id => COS_IDS.add(id));
-  const BOOSTERS = {
-    feast: { name: '특식 데이 10분', desc: '10분 동안 수업료 +100%예요', price: 3 },
-    skip: { name: '30분 건너뛰기', desc: '30분 동안 모일 도토리를 바로 받아요', price: 5 },
-    auto: { name: '도토리 자동 줍기 10분', desc: '떨어진 도토리를 알아서 주워요', price: 3 }
-  };
-  const BOOST_ALL = () => { const full = Object.values(BOOSTERS).reduce((a, b) => a + b.price, 0); return { full, price: Math.ceil(full * 0.9) }; };   // 11 → 10
   const BOOST_ART = {
     feast: '<svg viewBox="-12 -12 24 24" aria-hidden="true"><path d="M-9 -1 H9 Q8.4 8 0 8.6 Q-8.4 8 -9 -1 Z" class="c-wall"/><path d="M-9 -1 H9" class="s-hatband"/><path d="M-6 -2 Q-6 -7 -2 -6.4 Q0 -9.4 3 -7 Q7 -7.6 6.4 -2 Z" class="c-dip"/><path d="M4 -10 L8 -3" stroke="#8A5D3B" stroke-width="1.2" stroke-linecap="round"/></svg>',
     skip: '<svg viewBox="-12 -12 24 24" aria-hidden="true"><circle r="9" class="c-clock"/><path d="M0 -5.6 V0 L4 2.6" fill="none" stroke="#6D4828" stroke-width="1.8" stroke-linecap="round"/></svg>',
@@ -283,7 +280,6 @@
   const hardQ = (q, sub) => !!q && (!sub || String(q.id)[0] === 's') && (q.t === 'teaAll' || q.t === 'rate' ||
     (q.t === 'students' && q.n >= 50) || (q.t === 'fac' && q.n >= 10 && !q.step) || (q.t === 'picks' && q.n >= 15) ||
     (q.t === 'trips' && q.n >= 3) || q.t === 'souv' || q.t === 'tripat' || q.t === 'sports' || q.t === 'fest');
-  const autoOn = () => !!S && gameNow() < S.autoUntil;
   function goldDay() { const t = gameToday(); if (dayRoll(S.gd, t)) { S.gd.n = 0; S.gd.shop = 0; } }
   function addGold(n) {
     if (!(n > 0)) return;

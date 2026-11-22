@@ -482,7 +482,7 @@
   function openVd() {
     if (!vdOpen()) { toast('마을 기부는 초등학교부터 열려요'); return; }
     const bg = IMG('donate_bg'); $('#vdHead').style.backgroundImage = bg ? `url("${bg}")` : '';
-    $('#vdBtns').dataset.key = ''; vdRender(); openModal($('#mVd')); sfx('tap');
+    $('#vdBtns').dataset.key = ''; askRowOff(); vdRender(); openModal($('#mVd')); sfx('tap');
   }
   function vdRender() {
     const m = $('#mVd'); if (!m || !S || !S.vd) return;

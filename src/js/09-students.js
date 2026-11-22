@@ -408,7 +408,6 @@
   function updateDrops(now) {
     for (const d of rt.drops.slice()) {
       const age = now - d.born;
-      if (autoOn() && age > 700) { collect(d); continue; }   // 자동 줍기 부스터
       if (age > CFG.dropLife) removeDrop(d);
       else if (age > CFG.dropLife - 3000 && !d.g.classList.contains('blink')) d.g.classList.add('blink');
     }

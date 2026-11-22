@@ -440,7 +440,7 @@
   }
   function openSn() {
     if (!snOpen()) { toast(S.tier < SN.tier ? '간식 뽑기는 중학교 매점에서 열려요' : '매점을 지으면 간식 뽑기를 할 수 있어요'); return; }
-    snSync(); rt.snRes = null;
+    snSync(); rt.snRes = null; askRowOff();
     const bg = IMG('snack_bg'); $('#snHead').style.backgroundImage = bg ? `url("${bg}")` : '';
     snRender(true); openModal($('#mSn')); sfx('tap');
   }

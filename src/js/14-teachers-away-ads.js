@@ -449,9 +449,6 @@
     const on = feastOn();
     setHid($('#feastChip'), !on);
     if (on) setTx($('#feastTime'), clock(Math.ceil((S.hd.feastUntil - gameNow()) / 1000)));
-    const au = autoOn();
-    setHid($('#autoChip'), !au);
-    if (au) setTx($('#autoTime'), clock(Math.ceil((S.autoUntil - gameNow()) / 1000)));
   }
   function openDeal() {
     if (rt.paused || rt.modalOpen || !rt.deal) return;
