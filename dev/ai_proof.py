@@ -63,9 +63,11 @@ def main():
     found, bad = [], 0
     for k, ch in enumerate(chunks, 1):
         txt = ask(SYSTEM, '아래는 번호와 글이에요(탭으로 나눔).\n' + '\n'.join(f'{r["id"]}\t{r["s"]}' for r in ch), MODEL, max_tokens=8000)
-        m = re.search(r'\[.*\]', txt, re.S)
-        try: got = json.loads(m.group(0)) if m else []
+        (OUT / f'raw_{k:02d}.txt').write_text(txt, encoding='utf-8')
+        t = re.sub(r'```(?:json)?', '', txt); i = t.find('[')
+        try: got = json.JSONDecoder().raw_decode(t[i:])[0] if i >= 0 else []
         except json.JSONDecodeError: got, bad = [], bad + 1
+        if not isinstance(got, list): got = []
         for g in got:
             try: r = rows[int(g['id'])]
             except (KeyError, ValueError, IndexError, TypeError): continue
