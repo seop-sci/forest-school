@@ -1,0 +1,50 @@
+# AI 글 도우미 (2026-11-23 woodani: Console 크레딧으로 1번 손님 대사, 3번 게임 글 훑어보기)
+# 손으로만 돌려요(Actions > AI 글 도우미 > Run workflow). 게임 파일은 바꾸지 않고, 결과(dev/ai_out/)만 새 가지 ai/<job>-<번호>에 올려요.
+# 키는 저장소 Secrets의 ANTHROPIC_API_KEY. 결과 가지는 본부가 읽고 지워요(main에 합치지 않아요).
+name: AI 글 도우미
+on:
+  workflow_dispatch:
+    inputs:
+      job:
+        description: '무엇을 할까요 (lines = 오늘의 손님 대사 후보, proof = 게임 글 훑어보기)'
+        required: true
+        default: lines
+        type: choice
+        options: [lines, proof]
+      model:
+        description: '모델'
+        required: true
+        default: claude-sonnet-5-5
+        type: string
+permissions:
+  contents: write
+concurrency:
+  group: ai-text
+  cancel-in-progress: false
+jobs:
+  run:
+    runs-on: ubuntu-24.04
+    timeout-minutes: 60
+    steps:
+      - uses: actions/checkout@11d5960a326750d5838078e36cf38b85af677262   # v4
+      - name: 돌리기
+        env:
+          ANTHROPIC_API_KEY: ${{ secrets.ANTHROPIC_API_KEY }}
+          JOB: ${{ inputs.job }}
+          MODEL: ${{ inputs.model }}
+        run: |
+          cd dev
+          if [ "$JOB" = "proof" ]; then python3 ai_proof.py "--model=$MODEL"; else python3 ai_lines.py "--model=$MODEL"; fi
+      - name: 결과를 새 가지에 올리기
+        env:
+          JOB: ${{ inputs.job }}
+          RUN_NO: ${{ github.run_number }}
+        run: |
+          git config user.name "forest-ai-bot"
+          git config user.email "forest-ai-bot@users.noreply.github.com"
+          git checkout -b "ai/$JOB-$RUN_NO"
+          git add -f dev/ai_out
+          git commit -m "AI 글 도우미 $JOB 결과 ($RUN_NO)"
+          git push origin "ai/$JOB-$RUN_NO"
+          echo "결과 가지: ai/$JOB-$RUN_NO" >> "$GITHUB_STEP_SUMMARY"
+          tail -3 dev/ai_out/*.md >> "$GITHUB_STEP_SUMMARY"
