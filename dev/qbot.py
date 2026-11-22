@@ -10,7 +10,7 @@
 #   (옵션 없음)          퀘스트마다 한 줄, 해마다 한 줄을 찍어요
 #   --json 파일          결과를 JSON으로 저장해요(dev/balday.py와 문서 표가 읽어요)
 #   --check [시간]       검사만 해요: 도토리 시간이 [시간](기본 4, 로드맵 3절 '퀘스트 하나는 그 시점 수업료로 몇 시간 안에'의 제안값)을 넘는 퀘스트와
-#                        Infinity, NaN, 10^15을 넘는 재화가 나온 곳을 찍고, 하나라도 있으면 끝 코드 1
+#                        Infinity, NaN, 10^15을 넘는 재화(도토리로 세는 값은 학교급 배수로 나눈 값)가 나온 곳을 찍고, 하나라도 있으면 끝 코드 1
 #   --until 학교급       그 학교급(0 유치원 ~ 5 대학원)을 마치면 멈춰요(기본 5)
 import asyncio, json, sys
 from playwright.async_api import async_playwright
@@ -25,9 +25,11 @@ JS = r"""(cfg) => { const F = window.__forest, S = F.S, quests = [], years = [],
   let q0 = { T: 0, C: 0, Wt: 0, Wd: 0, En: 0, buys: 0 }, y0 = { T: 0, C: 0, Wt: 0, Wd: 0, En: 0, buys: 0 }, qid = '', maxCost = 0;
   // 재화 검사: 도토리, 황금 도토리, 수료증, 기금, 정수와 지금 살 것의 값
   const BIG = 1e15, seenBad = {};
-  const chk = (name, v, where) => { if (typeof v !== 'number') return; const k = name + (Number.isNaN(v) ? ':NaN' : !isFinite(v) ? ':Infinity' : v > BIG ? ':big' : ''); if (k === name || seenBad[k]) return; seenBad[k] = 1;
+  // 2026-11-22 woodani 결정: 도토리로 세는 값(수업료, 번 도토리)은 학교급 배수(TIER_SCALE.inc)로 나눠서 10^15과 견줘요(학교급마다 1000배씩 커지는 설계라서)
+  const incSc = () => (F.TIER_SCALE && F.TIER_SCALE.inc[S.tier]) || 1;
+  const chk = (name, v, where, sc = 1) => { if (typeof v !== 'number') return; const k = name + (Number.isNaN(v) ? ':NaN' : !isFinite(v) ? ':Infinity' : v / sc > BIG ? ':big' : ''); if (k === name || seenBad[k]) return; seenBad[k] = 1;
     bad.push({ what: name, v: String(v), kind: k.split(':')[1], at: where, tier: S.tier, tg: S.tg, sem: S.sem }); };
-  const chkAll = where => { chk('수료증', S.p.dip, where); chk('학교급 수료증', S.tdip, where); chk('기금', S.fund, where); chk('황금 도토리', S.gold, where); chk('숲의 정수', S.ess, where); chk('초당 수업료', F.rate(), where); chk('올해 번 도토리', S.yearEarned, where); };
+  const chkAll = where => { chk('수료증', S.p.dip, where); chk('학교급 수료증', S.tdip, where); chk('기금', S.fund, where); chk('황금 도토리', S.gold, where); chk('숲의 정수', S.ess, where); chk('초당 수업료', F.rate(), where, incSc()); chk('올해 번 도토리', S.yearEarned, where, incSc()); };
   const pay = (fn, cost, what) => { if (!(cost > 0) || !isFinite(cost)) { if (cost !== 0 && !seenBad['cost:' + what]) { seenBad['cost:' + what] = 1; bad.push({ what: '값 ' + what, v: String(cost), kind: Number.isNaN(cost) ? 'NaN' : 'Infinity', at: qid, tier: S.tier, tg: S.tg, sem: S.sem }); } return false; }
     const r = F.rate(); if (!(r > 0)) return false; S.budget = cost * 1.000001; const ok = fn(); S.budget = 0; if (!ok) return false; T += cost / r; buys++; effT += F.offlineEff() * cost / r; capT += F.offlineCapH() * cost / r; S.yearEarned += cost; S.earned += cost; maxCost = Math.max(maxCost, cost);
     const now = F.gameNow(); for (const k in (S.bd || {})) C += Math.max(0, S.bd[k].e - now) / 1000;
