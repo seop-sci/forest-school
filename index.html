@@ -2256,6 +2256,19 @@ body.photo .board,body.photo .home-qcard,body.photo .map-left,body.photo .map-ri
 .first-hint .fh-tx{padding:5px 11px;border-radius:12px;background:rgba(40,52,32,.9);color:#fff;font-size:13px;font-weight:700;white-space:nowrap;box-shadow:0 2px 6px rgba(0,0,0,.25)}
 @keyframes fhBob{0%,100%{transform:translateY(0)}50%{transform:translateY(-6px)}}
 @media (prefers-reduced-motion: reduce){.first-hint .fh-f{animation:none}}
+/* 5.3.2.2 F-04 창 안 '보상 받기' 띠(화려한 효과 없이) */
+.qready{display:flex;align-items:center;justify-content:space-between;gap:10px;width:100%;min-height:52px;margin:0 0 8px;padding:6px 8px 6px 14px;border:2px solid #E2B84A;border-radius:14px;background:#FFF4CF;color:#4A3210;text-align:left;cursor:pointer}
+.qready .qr-tx{min-width:0;display:flex;flex-direction:column;line-height:1.3}.qready small{font-size:12px;color:#8A6420}.qready b{font-size:14px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+.qready .qr-go{flex:none;display:inline-flex;align-items:center;min-height:40px;padding:0 14px;border-radius:12px;background:var(--accent);color:var(--accent-ink);font-family:var(--font-display);font-size:15px}
+.qready.stick{position:sticky;bottom:10px;z-index:6;margin-top:10px;box-shadow:0 3px 8px rgba(0,0,0,.18)}
+@media (prefers-color-scheme: dark){:root:not([data-theme="light"]) .qready{background:#3A3322;border-color:#9C7A2C;color:#F3E6C4}:root:not([data-theme="light"]) .qready small{color:#D8BE84}}
+:root[data-theme="dark"] .qready{background:#3A3322;border-color:#9C7A2C;color:#F3E6C4}:root[data-theme="dark"] .qready small{color:#D8BE84}
+/* 5.3.2.2 F-05, H-09 공사 칸: 1분 안 공사는 막대만, 그 밖에는 으뜸 단추 하나와 '다른 방법' 접기 */
+#sheetCon:not(.more-open) .con-opt:not(.con-main){display:none!important}
+#sheetCon.short .con-opt,#sheetCon.short .con-more{display:none!important}
+.con-more{display:flex;align-items:center;justify-content:center;gap:4px;width:100%;min-height:40px;margin:6px 0 0;border:0;background:none;color:var(--muted);font-size:13px;cursor:pointer}
+.con-more::after{content:'';width:7px;height:7px;border-right:2px solid currentColor;border-bottom:2px solid currentColor;transform:translateY(-2px) rotate(45deg)}
+.con-more[aria-expanded="true"]::after{transform:translateY(2px) rotate(-135deg)}
 /* ===== 1.5.0 탭 화면 정돈 ===== */
 .app:not(.on-school) .qrow,.app:not(.on-school) .subbar{display:none}
 .app:not(.on-school) .board{margin-bottom:8px}
@@ -4017,6 +4030,19 @@ body.mg-on .toast[hidden]{display:none}
 /* 5.3.2.1 학회 카드: 어두운 화면에서 밝은 글이 연한 노란 바탕 위라 거의 안 보였어요(대비 약 1.5:1). 어두운 화면은 짙은 바탕 */
 @media (prefers-color-scheme: dark){:root:not([data-theme="light"]) .pp-conf{background:#3A3322;border-color:#9C7A2C}}
 :root[data-theme="dark"] .pp-conf{background:#3A3322;border-color:#9C7A2C}
+/* 5.3.2.2 H-23, M-17, 2.3-9: 보이는 크기는 그대로 두고 누르는 영역만 넓혀요(투명한 가상 요소). 붙어 있는 단추와는 칸 사이 틈까지만 넓혀 서로 겹치지 않아요 */
+.tier-dots .td,.ac-row,.ac-bk,.td-fold,#rxSeg button,.dp-row .btn-sub.small,.dp-row .cta.small,.gd-plot button,.pz-cardw .pz-swb{position:relative}
+.tier-dots .td::before,.ff-chip .ffx::before,.ac-row::before,.ac-bk::before,.td-fold::before,#rxSeg button::before,.dp-row .btn-sub.small::before,.dp-row .cta.small::before,.gd-plot button::before,.pz-cardw .pz-swb::before{content:'';position:absolute}
+.tier-dots .td::before{inset:-10px -2px}
+.ff-chip .ffx::before{left:-24px;top:-24px;right:-2px;bottom:-2px}
+.ac-row::before{inset:-2px 0}.ac-bk::before{inset:-3px -6px}
+.td-fold::before{inset:-12px 0}
+#rxSeg button::before{inset:-9px 0}
+.dp-row .btn-sub.small::before,.dp-row .cta.small::before{inset:-8px 0}
+.gd-plot button::before{inset:-10px -3px}
+.pz-cardw .pz-swb::before{inset:-10px -4px}
+.dex-grid > .dex-detail.in-grid{grid-column:1/-1;margin:2px 0 4px}   /* 5.3.2.2 T-06 누른 카드 줄 바로 아래 */
+.deco-ev > summary{cursor:pointer;list-style:none;display:flex;align-items:baseline;gap:6px}.deco-ev > summary::-webkit-details-marker{display:none}.deco-ev > summary::after{content:'';margin-left:auto;align-self:center;width:7px;height:7px;border-right:2px solid currentColor;border-bottom:2px solid currentColor;transform:rotate(45deg)}.deco-ev[open] > summary::after{transform:rotate(-135deg)}   /* 5.3.2.2 T-04 */
 </style>
 </head>
 <body>
@@ -4352,6 +4378,7 @@ body.mg-on .toast[hidden]{display:none}
     <section class="panel" id="panelTeachers" hidden aria-labelledby="ttlTeachers">
       <h2 id="ttlTeachers" class="ph"><span class="tic" data-ic="ic_teacher" aria-hidden="true"></span><span>선생님</span></h2>
       <div class="tlist" id="teacherList"></div>
+      <button class="qready stick" type="button" id="teaQReady" hidden></button><!-- 5.3.2.2 F-04 -->
     </section>
 
     <section class="panel" id="panelTam" hidden aria-labelledby="ttlTam">
@@ -4725,15 +4752,17 @@ body.mg-on .toast[hidden]{display:none}
     <div class="con-box" id="sheetCon" hidden>
       <div class="con-head"><span id="conClock" aria-hidden="true"></span><span id="conTx">공사 중</span></div>
       <div class="con-prog" aria-hidden="true"><i id="conFill"></i></div>
-      <button class="ff-btn wide" type="button" id="conFree" hidden><span class="z" aria-hidden="true">⚡</span><span id="conFreeTx">즉시 완공 (오늘 3번 남음)</span><span class="n" aria-hidden="true">1</span></button>
-      <div class="con-row"><button class="cta" type="button" id="conAll" aria-disabled="false"><span id="conAllLbl">단축권 자동 사용</span></button><button class="cta ghost" type="button" id="conNo" hidden>그만두기</button></div>
-      <p class="con-plan" id="conPlan"></p>
-      <button class="con-ess" type="button" id="conEss"><span>숲의 정수로 즉시 완공</span><span class="p" id="conEssCost"></span></button>
-      <div class="con-tks" id="conTks" role="group" aria-label="골라서 쓰기"></div>
-      <button class="con-ad" type="button" id="conAd">광고 보고 5분권 받기</button>
-      <div class="con-cb" id="conCb" hidden></div><!-- 2.1.1 건설 가속(도토리) -->
+      <button class="ff-btn wide con-opt" type="button" id="conFree" hidden><span class="z" aria-hidden="true">⚡</span><span id="conFreeTx">즉시 완공 (오늘 3번 남음)</span><span class="n" aria-hidden="true">1</span></button>
+      <div class="con-row con-opt" id="conRow"><button class="cta" type="button" id="conAll" aria-disabled="false"><span id="conAllLbl">단축권 자동 사용</span></button><button class="cta ghost" type="button" id="conNo" hidden>그만두기</button></div>
+      <p class="con-plan con-opt" id="conPlan"></p>
+      <button class="con-ess con-opt" type="button" id="conEss"><span>숲의 정수로 즉시 완공</span><span class="p" id="conEssCost"></span></button>
+      <div class="con-tks con-opt" id="conTks" role="group" aria-label="골라서 쓰기"></div>
+      <button class="con-ad con-opt" type="button" id="conAd">광고 보고 5분권 받기</button>
+      <div class="con-cb con-opt" id="conCb" hidden></div><!-- 2.1.1 건설 가속(도토리) -->
+      <button class="con-more" type="button" id="conMore" aria-expanded="false">다른 방법</button><!-- 5.3.2.2 F-05 으뜸 단추 하나와 나머지 접기 -->
     </div>
     <div class="sheet-foot"><!-- 5.0.1.6 H-13 업그레이드 줄과 안내를 창 아래에 붙여요 -->
+      <button class="qready" type="button" id="sheetQReady" hidden></button><!-- 5.3.2.2 F-04 퀘스트를 마치면 창 안에서 보상 받기 -->
       <p class="need" id="sheetNeed">&nbsp;</p>
       <p class="need-wait" id="sheetWait" hidden><span id="sheetWaitTx"></span><button class="btn-sub small" type="button" id="sheetWaitGo" hidden>오늘 할 일 보기</button></p><!-- 5.3.2.1 도토리가 모자랄 때 기다릴 시간과 할 일 -->
       <div class="buy-row"><button class="cta split" type="button" id="sheetBuy" aria-disabled="false"><span id="sheetBuyLabel">키우기</span><span class="cost"><span data-acorn></span><b id="sheetCost">20</b></span></button><button class="ff-btn" type="button" id="sheetFree" aria-label="업그레이드하고 바로 즉시 완공(학교 전체 하루 3번)" hidden><span class="z" aria-hidden="true">⚡</span>즉시 완공<span class="n" aria-hidden="true">1</span></button></div>
@@ -14756,7 +14785,16 @@ body.mg-on .toast[hidden]{display:none}
     const al = tkAdLeft();
     $('#conAd').setAttribute('aria-disabled', al > 0 ? 'false' : 'true');
     setT($('#conAd'), al > 0 ? `광고 보고 5분권 ${TKAD.n}장 받기 (오늘 ${al}번 남음)` : '오늘 광고 단축권을 다 받았어요');
+    // 5.3.2.2 F-05, H-09: 끝내는 길이 여섯 가지라 칸이 길었어요. 1분 안에 끝나는 공사는 막대만, 그 밖에는 으뜸 단추 하나와 '다른 방법' 접기(길은 모두 그대로 있어요)
+    const short = left < CON_SHORT, ffOk = !$('#conFree').hidden, essOk = S.ess >= conEssCost(left);
+    const main = ffOk ? ['#conFree'] : p.n ? ['#conRow', '#conPlan'] : essOk ? ['#conEss'] : al > 0 ? ['#conAd'] : ['#conEss'];
+    if (rt.conMoreK !== k) { rt.conMoreK = k; rt.conMore = false; }   // 다른 건물 창을 열면 다시 접어요
+    if (rt.conArm || rt.conPick) rt.conMore = rt.conMore || !main.includes('#conRow');   // 고르는 중에는 펼쳐 둬요
+    $$('#sheetCon .con-opt').forEach(el => el.classList.toggle('con-main', main.includes('#' + el.id)));
+    box.classList.toggle('short', short); box.classList.toggle('more-open', !!rt.conMore);
+    const mb = $('#conMore'); mb.setAttribute('aria-expanded', rt.conMore ? 'true' : 'false'); setT(mb, rt.conMore ? '접기' : '다른 방법');
   }
+  const CON_SHORT = 60;   // 초
 
   /* ---------- 선생님 ---------- */
   function buildTeacherCards() {
@@ -18888,8 +18926,11 @@ body.mg-on .toast[hidden]{display:none}
       const pic = $('#decoModePic'); if (pic && !pic.firstChild && IMG('deco_flowerbed')) pic.innerHTML = `<img src="${IMG('deco_flowerbed')}" alt="">`; }   // 꾸미기 모드 카드
     let h = '';
     const evList = DECO.filter(evDecoArt);
-    for (const [title, list] of [['장식 <small>(사면 지도에 놓을 수 있어요)</small>', DECO.filter(d => !d.rare)], ['희귀 장식 <small>(하나씩만)</small>', DECO.filter(d => d.rare && !d.ev)], ...(evList.length ? [['이벤트 한정 장식 <small>(이벤트 기념 상자에서 받아요)</small>', evList]] : [])]) {
-      h += `<h3 class="shop-h">${title}</h3><div class="shop-grid">`;
+    // 5.3.2.2 T-04: 살 수 없는 이벤트 한정 장식이 가게 한가운데를 3,500px쯤 차지했어요. 맨 아래로 옮기고 접어 둬요(가진 개수는 접힌 줄에)
+    let evH = '';
+    for (const [title, list] of [['장식 <small>(사면 지도에 놓을 수 있어요)</small>', DECO.filter(d => !d.rare)], ['희귀 장식 <small>(하나씩만)</small>', DECO.filter(d => d.rare && !d.ev)], ...(evList.length ? [['', evList]] : [])]) {
+      const ev = !title; if (ev) { const own = evList.filter(d => decoOwn(d.id)).length; evH = h; h = `<details class="deco-ev"${rt.decoEvOpen ? ' open' : ''}><summary class="shop-h">이벤트 한정 장식 <small>(이벤트 기념 상자에서 받아요, ${own} / ${evList.length} 가짐)</small></summary>`; }
+      h += `${ev ? '' : `<h3 class="shop-h">${title}</h3>`}<div class="shop-grid">`;
       for (const d of list) {
         const n = decoOwn(d.id), out = decoSoldOut(d.id), c = decoCost(d.id), poor = !out && S.ess < c;
         const pr = d.ev ? (n ? '가졌어요' : d.ps ? '패스 보상' : d.rs ? '시즌 기념' : d.bio ? `생물 ${d.bio}종` : d.cs ? '진로 도감' : d.pp ? d.pp : d.col ? '단과대학' : d.fv ? '축제 기념품' : d.bf ? `${d.bf}월 대축제` : d.xg ? '우정 배지' : d.mk ? '숲속 장터' : d.tr2 ? tr2Nm() : d.cg ? '대항전 우승' : '이벤트 선물') : out ? (d.rare ? '가졌어요' : '더 살 수 없어요') : `${ic}${c}`;
@@ -18899,6 +18940,7 @@ body.mg-on .toast[hidden]{display:none}
       }
       h += '</div>';
     }
+    let evBlock = ''; if (evH) { evBlock = h + '</details>'; h = evH; }
     // 한정 모자와 특별 가구(옛 정수 상점에서 옮겨 왔어요)
     h += '<h3 class="shop-h">한정 모자 <small>(학생들이 써요)</small></h3><div class="shop-grid">';
     for (const it of COS.hat.items) {
@@ -18913,8 +18955,9 @@ body.mg-on .toast[hidden]{display:none}
       h += `<button class="si${own ? ' own' : ''}${on ? ' on' : ''}${poor ? ' poor' : ''}" type="button" data-dbuy="${key}" aria-pressed="${on}" aria-label="${F.name}${own ? '' : `, 숲의 정수 ${ESHOP.fur}개`}">` +
         `<span class="pv fur"><img src="${IMG('fur_sp_' + F.id)}" alt="" draggable="false"></span><span class="nm">${F.name}</span><span class="pr">${on ? '놓는 중' : own ? '놓기' : `${ic}${ESHOP.fur}`}</span></button>`;
     }
-    h += '</div>';
+    h += '</div>' + evBlock;
     const list = $('#decoList'), top = list.scrollTop; list.innerHTML = h; list.scrollTop = top;
+    { const dt = list.querySelector('.deco-ev'); if (dt) dt.addEventListener('toggle', () => { rt.decoEvOpen = dt.open; }); }
     const ask = $('#decoAsk'), ci = rt.decoPick.includes(':') ? essItem(rt.decoPick) : null, d = ci ? null : DECO_BY[rt.decoPick];
     const nm = ci ? ci.name : d && d.name, c = ci ? ci.price : d && decoCost(d.id);
     ask.hidden = !nm;
@@ -27527,6 +27570,31 @@ body.mg-on .toast[hidden]{display:none}
   }
 
   /* 칠판 아래 퀘스트 쪽지: 지금 메인 퀘스트, 다 마치면 학생 부탁 */
+  /* 5.3.2.2 F-04: 건물 창과 선생님 탭에서는 위쪽 퀘스트 칸의 '받기'를 누르면 창만 닫혔어요. 퀘스트를 마치면 그 화면 아래에 '보상 받기' 띠를 띄워요 */
+  function qReadyNow() {
+    const mq = curMain();
+    if (mq) return mainReady() ? { ref: 'main', tx: `${qNo(S.q.m)} ${mq.title}` } : null;
+    const s = S.q.subs.find(subReady); return s ? { ref: s.id, tx: `${WHO[s.who]}의 부탁` } : null;
+  }
+  function renderQReady() {
+    if (!S) return;
+    const r = rt.paused ? null : qReadyNow();
+    for (const [id, on] of [['#sheetQReady', !!rt.sheetKey], ['#teaQReady', rt.tab === 'teachers' && !rt.sheetKey]]) {
+      const el = $(id); if (!el) continue;
+      const key = r && on ? r.ref + '|' + r.tx : '';
+      if (el.dataset.key === key) continue;
+      el.dataset.key = key; el.hidden = !key; if (!key) continue;
+      el.innerHTML = `<span class="qr-tx"><small>퀘스트를 마쳤어요</small><b>${esc(r.tx)}</b></span><span class="qr-go">보상 받기</span>`;
+      el.setAttribute('aria-label', `${r.tx} 보상 받기`);
+    }
+  }
+  function qReadyTap(el) {
+    const r = qReadyNow(); if (!r || rt.paused) return;
+    rt.qTap = true;
+    if (r.ref === 'main') claimMain(el); else claimSub(r.ref, el);
+    renderQReady(); if (rt.sheetKey) renderSheet();
+  }
+  setInterval(() => { try { renderQReady(); } catch (e) { /* 다음에 */ } }, 500);
   function renderQuestBar() {
     const bar = $('#questBar');
     const mq = curMain();
@@ -28744,6 +28812,7 @@ body.mg-on .toast[hidden]{display:none}
       rt.conArm = false; tkUseAll(k); renderSheet();
     });
     $('#conNo').addEventListener('click', () => { rt.conArm = false; sfx('tap'); conSheet(); });
+    $('#conMore').addEventListener('click', () => { rt.conMore = !rt.conMore; sfx('tap'); conSheet(); });   // 5.3.2.2 F-05 다른 방법 펼치기
     // 즉시 완공 단추와 숲의 정수로 즉시 완료
     $('#sheetFree').addEventListener('click', () => {
       const k = rt.sheetKey; if (!k) return;
@@ -28959,6 +29028,16 @@ body.mg-on .toast[hidden]{display:none}
   // 퀘스트 쪽지와 퀘스트 탭
   function wireQuests() {
     // 퀘스트 쪽지: 완료했으면 보상 받기, 아니면 해야 할 곳으로 바로 가기
+    ['#sheetQReady', '#teaQReady'].forEach(id => $(id).addEventListener('click', e => { e.stopPropagation(); sfx('tap'); qReadyTap(e.currentTarget); }));   // 5.3.2.2 F-04
+    // 5.3.2.2 H-07: 현황판의 동네 등급, 평판, 숲의 정수, 학생 칸을 눌러도 반응이 없었어요. 한 줄 설명을 띄워요
+    [['#gradePill', () => { const G = CFG.grades, g = S.grade; return g < G.length - 1 ? `동네 등급이에요. 평판을 모으면 ${G[g + 1].name}${iga(G[g + 1].name).slice(-1)} 돼요. 대도시가 되면 종업식을 열 수 있어요` : '동네 등급이에요. 가장 높은 대도시예요. 종업식을 열 수 있어요'; }],
+      ['#repPill', () => '평판이에요. 건물과 선생님 레벨을 올리면 쌓이고, 동네 등급이 올라가요'],
+      ['#essPill', () => '숲의 정수예요. 미니게임과 미션에서 모으고, 꾸미기 가게 같은 곳에서 써요'],
+      ['#kidsPill', () => `학생 ${fmt(Math.floor(S.students))}명, 정원 ${fmt(capacity())}명이에요. 교실을 넓히면 더 들어와요`]].forEach(([sel, f]) => {
+      const el = $(sel); if (!el) return;
+      el.style.cursor = 'pointer';
+      el.addEventListener('click', e => { if (rt.paused) return; e.stopPropagation(); sfx('tap'); toast(f()); });
+    });
     $('#questBar').addEventListener('click', () => {
       rt.qTap = true;   // 여는 장면은 이때
       const bar = $('#questBar');
@@ -29294,6 +29373,9 @@ body.mg-on .toast[hidden]{display:none}
       `<h4 class="dex-h">선생님 <small>${DEX_TEA.filter(k => S.dex.got['tea_' + k]).length} / ${DEX_TEA.length}</small></h4><div class="dex-grid">${DEX_TEA.map(k => dexCard('tea_' + k)).join('')}</div>` +
       `<h4 class="dex-h">특별 손님 <small>${DEX_GUEST_KEYS.filter(k => S.dex.got[k]).length} / ${DEX_GUESTS.length}</small></h4><div class="dex-grid">${DEX_GUEST_KEYS.map(dexCard).join('')}</div>` +
       `<h4 class="dex-h">앞으로 올 친구</h4><div class="dex-grid">${Array.from({ length: DEX_FUTURE }, (_, i) => dexLock('숲속 교육부에서 준비 중')).join('')}</div>`;
+    // 5.3.2.2 T-06: 설명 칸이 누른 카드와 떨어진 맨 위에 나왔어요. 누른 카드가 있는 줄 바로 아래로 옮겨요
+    if (pk) { const d = body.querySelector('.dex-detail'), c = body.querySelector(`.dex-card[data-dex="${pk}"]`);
+      if (d && c) { let end = c; for (let n = c.nextElementSibling; n && n.classList.contains('dex-card') && n.offsetTop === c.offsetTop; n = n.nextElementSibling) end = n; end.after(d); d.classList.add('in-grid'); } }
   }
 
   /* ---------- 이벤트 ---------- */

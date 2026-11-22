@@ -617,6 +617,7 @@
       rt.conArm = false; tkUseAll(k); renderSheet();
     });
     $('#conNo').addEventListener('click', () => { rt.conArm = false; sfx('tap'); conSheet(); });
+    $('#conMore').addEventListener('click', () => { rt.conMore = !rt.conMore; sfx('tap'); conSheet(); });   // 5.3.2.2 F-05 다른 방법 펼치기
     // 즉시 완공 단추와 숲의 정수로 즉시 완료
     $('#sheetFree').addEventListener('click', () => {
       const k = rt.sheetKey; if (!k) return;
@@ -832,6 +833,16 @@
   // 퀘스트 쪽지와 퀘스트 탭
   function wireQuests() {
     // 퀘스트 쪽지: 완료했으면 보상 받기, 아니면 해야 할 곳으로 바로 가기
+    ['#sheetQReady', '#teaQReady'].forEach(id => $(id).addEventListener('click', e => { e.stopPropagation(); sfx('tap'); qReadyTap(e.currentTarget); }));   // 5.3.2.2 F-04
+    // 5.3.2.2 H-07: 현황판의 동네 등급, 평판, 숲의 정수, 학생 칸을 눌러도 반응이 없었어요. 한 줄 설명을 띄워요
+    [['#gradePill', () => { const G = CFG.grades, g = S.grade; return g < G.length - 1 ? `동네 등급이에요. 평판을 모으면 ${G[g + 1].name}${iga(G[g + 1].name).slice(-1)} 돼요. 대도시가 되면 종업식을 열 수 있어요` : '동네 등급이에요. 가장 높은 대도시예요. 종업식을 열 수 있어요'; }],
+      ['#repPill', () => '평판이에요. 건물과 선생님 레벨을 올리면 쌓이고, 동네 등급이 올라가요'],
+      ['#essPill', () => '숲의 정수예요. 미니게임과 미션에서 모으고, 꾸미기 가게 같은 곳에서 써요'],
+      ['#kidsPill', () => `학생 ${fmt(Math.floor(S.students))}명, 정원 ${fmt(capacity())}명이에요. 교실을 넓히면 더 들어와요`]].forEach(([sel, f]) => {
+      const el = $(sel); if (!el) return;
+      el.style.cursor = 'pointer';
+      el.addEventListener('click', e => { if (rt.paused) return; e.stopPropagation(); sfx('tap'); toast(f()); });
+    });
     $('#questBar').addEventListener('click', () => {
       rt.qTap = true;   // 여는 장면은 이때
       const bar = $('#questBar');

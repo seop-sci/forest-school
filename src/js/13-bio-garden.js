@@ -826,5 +826,14 @@
     const al = tkAdLeft();
     $('#conAd').setAttribute('aria-disabled', al > 0 ? 'false' : 'true');
     setT($('#conAd'), al > 0 ? `광고 보고 5분권 ${TKAD.n}장 받기 (오늘 ${al}번 남음)` : '오늘 광고 단축권을 다 받았어요');
+    // 5.3.2.2 F-05, H-09: 끝내는 길이 여섯 가지라 칸이 길었어요. 1분 안에 끝나는 공사는 막대만, 그 밖에는 으뜸 단추 하나와 '다른 방법' 접기(길은 모두 그대로 있어요)
+    const short = left < CON_SHORT, ffOk = !$('#conFree').hidden, essOk = S.ess >= conEssCost(left);
+    const main = ffOk ? ['#conFree'] : p.n ? ['#conRow', '#conPlan'] : essOk ? ['#conEss'] : al > 0 ? ['#conAd'] : ['#conEss'];
+    if (rt.conMoreK !== k) { rt.conMoreK = k; rt.conMore = false; }   // 다른 건물 창을 열면 다시 접어요
+    if (rt.conArm || rt.conPick) rt.conMore = rt.conMore || !main.includes('#conRow');   // 고르는 중에는 펼쳐 둬요
+    $$('#sheetCon .con-opt').forEach(el => el.classList.toggle('con-main', main.includes('#' + el.id)));
+    box.classList.toggle('short', short); box.classList.toggle('more-open', !!rt.conMore);
+    const mb = $('#conMore'); mb.setAttribute('aria-expanded', rt.conMore ? 'true' : 'false'); setT(mb, rt.conMore ? '접기' : '다른 방법');
   }
+  const CON_SHORT = 60;   // 초
 

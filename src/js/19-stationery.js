@@ -450,8 +450,11 @@
       const pic = $('#decoModePic'); if (pic && !pic.firstChild && IMG('deco_flowerbed')) pic.innerHTML = `<img src="${IMG('deco_flowerbed')}" alt="">`; }   // 꾸미기 모드 카드
     let h = '';
     const evList = DECO.filter(evDecoArt);
-    for (const [title, list] of [['장식 <small>(사면 지도에 놓을 수 있어요)</small>', DECO.filter(d => !d.rare)], ['희귀 장식 <small>(하나씩만)</small>', DECO.filter(d => d.rare && !d.ev)], ...(evList.length ? [['이벤트 한정 장식 <small>(이벤트 기념 상자에서 받아요)</small>', evList]] : [])]) {
-      h += `<h3 class="shop-h">${title}</h3><div class="shop-grid">`;
+    // 5.3.2.2 T-04: 살 수 없는 이벤트 한정 장식이 가게 한가운데를 3,500px쯤 차지했어요. 맨 아래로 옮기고 접어 둬요(가진 개수는 접힌 줄에)
+    let evH = '';
+    for (const [title, list] of [['장식 <small>(사면 지도에 놓을 수 있어요)</small>', DECO.filter(d => !d.rare)], ['희귀 장식 <small>(하나씩만)</small>', DECO.filter(d => d.rare && !d.ev)], ...(evList.length ? [['', evList]] : [])]) {
+      const ev = !title; if (ev) { const own = evList.filter(d => decoOwn(d.id)).length; evH = h; h = `<details class="deco-ev"${rt.decoEvOpen ? ' open' : ''}><summary class="shop-h">이벤트 한정 장식 <small>(이벤트 기념 상자에서 받아요, ${own} / ${evList.length} 가짐)</small></summary>`; }
+      h += `${ev ? '' : `<h3 class="shop-h">${title}</h3>`}<div class="shop-grid">`;
       for (const d of list) {
         const n = decoOwn(d.id), out = decoSoldOut(d.id), c = decoCost(d.id), poor = !out && S.ess < c;
         const pr = d.ev ? (n ? '가졌어요' : d.ps ? '패스 보상' : d.rs ? '시즌 기념' : d.bio ? `생물 ${d.bio}종` : d.cs ? '진로 도감' : d.pp ? d.pp : d.col ? '단과대학' : d.fv ? '축제 기념품' : d.bf ? `${d.bf}월 대축제` : d.xg ? '우정 배지' : d.mk ? '숲속 장터' : d.tr2 ? tr2Nm() : d.cg ? '대항전 우승' : '이벤트 선물') : out ? (d.rare ? '가졌어요' : '더 살 수 없어요') : `${ic}${c}`;
@@ -461,6 +464,7 @@
       }
       h += '</div>';
     }
+    let evBlock = ''; if (evH) { evBlock = h + '</details>'; h = evH; }
     // 한정 모자와 특별 가구(옛 정수 상점에서 옮겨 왔어요)
     h += '<h3 class="shop-h">한정 모자 <small>(학생들이 써요)</small></h3><div class="shop-grid">';
     for (const it of COS.hat.items) {
@@ -475,8 +479,9 @@
       h += `<button class="si${own ? ' own' : ''}${on ? ' on' : ''}${poor ? ' poor' : ''}" type="button" data-dbuy="${key}" aria-pressed="${on}" aria-label="${F.name}${own ? '' : `, 숲의 정수 ${ESHOP.fur}개`}">` +
         `<span class="pv fur"><img src="${IMG('fur_sp_' + F.id)}" alt="" draggable="false"></span><span class="nm">${F.name}</span><span class="pr">${on ? '놓는 중' : own ? '놓기' : `${ic}${ESHOP.fur}`}</span></button>`;
     }
-    h += '</div>';
+    h += '</div>' + evBlock;
     const list = $('#decoList'), top = list.scrollTop; list.innerHTML = h; list.scrollTop = top;
+    { const dt = list.querySelector('.deco-ev'); if (dt) dt.addEventListener('toggle', () => { rt.decoEvOpen = dt.open; }); }
     const ask = $('#decoAsk'), ci = rt.decoPick.includes(':') ? essItem(rt.decoPick) : null, d = ci ? null : DECO_BY[rt.decoPick];
     const nm = ci ? ci.name : d && d.name, c = ci ? ci.price : d && decoCost(d.id);
     ask.hidden = !nm;
