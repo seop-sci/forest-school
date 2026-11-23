@@ -1194,7 +1194,7 @@ body.early .tab .dot,body.early #plChip{display:none!important}   /* 5.0.1.7 F-1
 .con-cb .cb-b[aria-disabled="true"]{opacity:.5}.con-cb .on{color:#3F6E2A;font-weight:700}
 .con image,.con rect,.con text{pointer-events:none}
 .con .con-scaf{opacity:.92}
-.con .con-scaf.con-art{opacity:1}.con.fast .con-scaf.con-art{animation:none}   /* 5.2.0.1 건물마다 공사 덧그림: 건물과 딱 맞게 겹쳐서 흐리게 하거나 흔들지 않아요 */
+.con .con-scaf.con-art{opacity:1}.con.fast .con-scaf.con-art{animation:none;transform-box:view-box;transform-origin:0 0}   /* 5.4.0.2: 건설 가속 때 흔들기용 기준점(fill-box, 50% 100%)이 덧그림의 기울임과 눌림(transform 속성)에도 걸려 운동장과 기숙사 덧그림이 아래로 밀렸어요 */   /* 5.2.0.1 건물마다 공사 덧그림: 건물과 딱 맞게 겹쳐서 흐리게 하거나 흔들지 않아요 */
 /* 2.3.5 비버 선생님: 7칸(0.35초씩) 1 2 1 2 1 2 3 */
 .con-bv{cursor:pointer}.con .con-bv rect.bv-hit{pointer-events:all}.con-bv image{opacity:0}
 .con-bv .bv1{animation:bv1 2.45s step-end infinite}.con-bv .bv2,.con-bv .bv-sp{animation:bv2 2.45s step-end infinite}.con-bv .bv3,.con-bv .bv-du{animation:bv3 2.45s step-end infinite}
@@ -4105,7 +4105,7 @@ body.mg-on .toast[hidden]{display:none}
     <p class="boot-step" id="bootStep">학교 문을 여는 중...</p>
     <p class="boot-tip" id="bootTip">학교 문을 여는 중이에요</p>
   </div>
-  <span class="boot-ver" id="bootVer">v5.4.0.1</span>
+  <span class="boot-ver" id="bootVer">v5.4.0.2</span>
 </div>
 
 <div class="app on-school" id="app">
@@ -4725,7 +4725,7 @@ body.mg-on .toast[hidden]{display:none}
       </div>
       <h3 class="panel-sub">정보</h3>
       <dl class="info">
-        <div id="verRow"><dt>버전</dt><dd>v5.4.0.1</dd></div>
+        <div id="verRow"><dt>버전</dt><dd>v5.4.0.2</dd></div>
         <div id="pidRow" hidden><dt>학교 번호</dt><dd id="infoPid"></dd></div>
       </dl>
       <div id="devBox" hidden>
@@ -9372,6 +9372,7 @@ body.mg-on .toast[hidden]{display:none}
     trialT: undefined,   // 다음 매나 뱀까지 남은 초
     trialWasHunt: undefined,   // 지난 매나 뱀이 사냥형이었는지
     visit: undefined,   // 지금 놀러 온 손님
+    aitJson: undefined, aitT: undefined,   // 5.4.0.2 토스 저장소로 보낼 저장 글과 모아 보내기 타이머
     guest: null, gsT: undefined,   // 5.3.4.7 오늘의 손님: 교문 앞에 서 있는 손님, 나타나기까지 남은 초
     visitT: undefined,   // 다음 손님까지 남은 초
     frBub: undefined,   // 단짝 말풍선 요소
@@ -10000,6 +10001,19 @@ body.mg-on .toast[hidden]{display:none}
       return null;
     }
   }
+  // 5.4.0.2 토스가 매우 끊기던 것: 저장할 때마다(5초마다, 그리고 누를 때마다) 학교 전체 글을 토스 앱 저장소로 보냈어요.
+  // 토스 저장소는 앱 다리(네이티브)를 거쳐서 무거워요. 이 기기 저장(localStorage)은 그대로 바로 하고, 토스 저장소는 20초에 한 번 모아서 보내요.
+  // 앱을 내리거나 닫을 때(save(at), 화면이 숨겨짐)는 바로 보내요. 토스 저장소는 이 기기 저장이 비었을 때만 읽는 예비 저장이에요
+  const AIT_SAVE_GAP = 20000;
+  function aitStore(json, now) {
+    rt.aitJson = json;
+    if (now) aitFlush(); else if (!rt.aitT) rt.aitT = setTimeout(aitFlush, AIT_SAVE_GAP);
+  }
+  function aitFlush() {
+    clearTimeout(rt.aitT); rt.aitT = 0;
+    const j = rt.aitJson; rt.aitJson = '';
+    if (j && AIT) AIT.storage.setItem(SAVE_KEY, j).catch(() => {});
+  }
   function save(at) {
     if (!S || rt.adopting || rt.uniPrev) return;   // 다른 학교로 바꾸며 다시 여는 중에는 지금 학교를 저장하지 않아요. 대학교 미리 보기 동안도 저장하지 않아요
     S.savedAt = at || (rt.paused ? rt.closedAt : gameNow());   // 보안 점검(2-5): 기기 시계 대신 게임 시계
@@ -10007,7 +10021,7 @@ body.mg-on .toast[hidden]{display:none}
     syncMid();
     const json = JSON.stringify(S);
     try { localStorage.setItem(SAVE_KEY, json); } catch (e) { /* 저장소가 막혀 있어도 게임은 계속 */ }
-    if (AIT) AIT.storage.setItem(SAVE_KEY, json).catch(() => {});   // 토스 앱 저장소 (앱을 지워도 남는 건 아니에요)
+    if (AIT) aitStore(json, !!at || document.hidden);   // 토스 앱 저장소 (앱을 지워도 남는 건 아니에요)
     Cloud.dirty = true;   // 서버에는 조금씩 모았다가 올려요
   }
 
@@ -15619,8 +15633,8 @@ body.mg-on .toast[hidden]{display:none}
        forest/rank/<내 id>   랭킹 이름과 학교 점수
        forest/stats/<내 id>  테스트 현황 (어디까지 했는지, 얼마나 했는지)
      <내 id>는 Firebase 익명 로그인이 기기(브라우저)마다 만들어 줘요. */
-  const VERSION = '5.4.0.1';
-  const NT_QUIET = ['5.4.0.1', '5.3.4.8', '5.3.4.7', '5.3.4.6', '5.3.4.5', '5.3.4.4', '5.3.4.3', '5.3.4.2', '5.3.4.1', '5.3.4', '5.3.2.1', '5.3.0.3', '5.3.0.2', '5.3.0.1', '5.2.2', '5.2.1', '5.2.0.2', '5.2.0.1', '5.1.1.3', '5.1.1.2', '5.1.1.1', '5.1.1', '5.0.3.1', '5.0.3', '5.0.2.2', '5.0.2.1', '2.1.20', '2.1.2.2', '2.3.0.1', '2.3.4', '3.2.3', '3.2.4', '3.2.5', '3.3.1', '3.3.2', '3.3.3', '4.4.1.1', '4.4.1.2', '4.4.1.3', '4.4.1.4', '5.0.1.1', '5.0.1.2', '5.0.1.3', '5.0.1.4', '5.0.1.5', '5.0.1.6', '5.0.1.7', '5.0.1.8'];   // 생물 탐사 고침은 공지 없이. 도 공지 없이(공지 줄은 정하면 넣어요). 공지 없이. 공지 줄은 woodani가 정할 때까지 조용히. 공지는 2026-11-16 woodani가 정해서 NOTICES로 옮겼어요. 은 공지를 띄워요. 도 공지 없이. 도 공지 창 없이. 도 공지 창 없이(공지는 그대로). 도 조용히. 도 공지 창 없이(공지 줄을 고르지 않음)
+  const VERSION = '5.4.0.2';
+  const NT_QUIET = ['5.4.0.2', '5.4.0.1', '5.3.4.8', '5.3.4.7', '5.3.4.6', '5.3.4.5', '5.3.4.4', '5.3.4.3', '5.3.4.2', '5.3.4.1', '5.3.4', '5.3.2.1', '5.3.0.3', '5.3.0.2', '5.3.0.1', '5.2.2', '5.2.1', '5.2.0.2', '5.2.0.1', '5.1.1.3', '5.1.1.2', '5.1.1.1', '5.1.1', '5.0.3.1', '5.0.3', '5.0.2.2', '5.0.2.1', '2.1.20', '2.1.2.2', '2.3.0.1', '2.3.4', '3.2.3', '3.2.4', '3.2.5', '3.3.1', '3.3.2', '3.3.3', '4.4.1.1', '4.4.1.2', '4.4.1.3', '4.4.1.4', '5.0.1.1', '5.0.1.2', '5.0.1.3', '5.0.1.4', '5.0.1.5', '5.0.1.6', '5.0.1.7', '5.0.1.8'];   // 생물 탐사 고침은 공지 없이. 도 공지 없이(공지 줄은 정하면 넣어요). 공지 없이. 공지 줄은 woodani가 정할 때까지 조용히. 공지는 2026-11-16 woodani가 정해서 NOTICES로 옮겼어요. 은 공지를 띄워요. 도 공지 없이. 도 공지 창 없이. 도 공지 창 없이(공지는 그대로). 도 조용히. 도 공지 창 없이(공지 줄을 고르지 않음)
     // 이 버전들은 업데이트해도 공지 창을 띄우지 않아요(공지는 그대로)
   /* 공지사항 (은 이미 올려서 부터): 설정 > 공지사항. 맨 위가 가장 새 공지예요
      패치노트는 자동으로 넣지 않아요. woodani가 검수한 글만 여기에 적어요(CHANGELOG.md는 자세한 기록용이라 따로 있어요)
