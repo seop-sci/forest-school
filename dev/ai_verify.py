@@ -24,11 +24,19 @@ def files_for(c):
     named = sorted(set(re.findall(r'\b(\d\d[a-z]?-[\w-]+\.js)\b', c['title'] + c['text'])))
     named = [f for f in named if (ROOT / 'src/js' / f).exists()]
     if named and re.search(r'sanitize|저장 읽기|다시 켜', c['text']) and '04-state-save.js' not in named: named.append('04-state-save.js')
-    return named or c['files']
+    named = named or list(c['files'])
+    if '--deep' in sys.argv:   # 지적에 나온 함수와 상수가 정의된 파일도 더해요(지난번 '모름'이 많았던 까닭)
+        ids = set(re.findall(r'`([A-Za-z_$][\w$]{2,})(?:\(\))?`', c['title'] + c['text'])) | set(re.findall(r'\b([a-z][A-Za-z0-9]{3,})\(', c['text']))
+        for f in sorted((ROOT / 'src/js').glob('*.js')):
+            t = f.read_text(encoding='utf-8')
+            if f.name not in named and any(re.search(r'(function\s+|const\s+|let\s+)' + re.escape(i) + r'\b', t) for i in ids):
+                named.append(f.name)
+    return named
 
 
 def main():
-    claims = json.loads((pathlib.Path(__file__).resolve().parent / 'ai_claims.json').read_text(encoding='utf-8'))
+    cf = next((a.split('=', 1)[1] for a in sys.argv if a.startswith('--claims=')), 'ai_claims.json')
+    claims = json.loads((pathlib.Path(__file__).resolve().parent / cf).read_text(encoding='utf-8'))
     if '--dry' in sys.argv:
         for c in claims: print(c['title'][:50], files_for(c), sum(len(numbered(f)) for f in files_for(c)))
         return

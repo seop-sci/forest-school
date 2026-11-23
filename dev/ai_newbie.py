@@ -29,8 +29,25 @@ def grab():
     return f"[첫 이야기 '첫 출근' 근처 코드]\n{story}\n\n[튜토리얼과 기능 안내]\n{tut[a:b]}\n\n[처음 메인 퀘스트 {N_MAIN}개]\n" + '\n'.join(lines)
 
 
+FIX = """너는 한국 모바일 게임 '숲속 동물 학교'의 글 작가야. 처음 한두 시간에 보이는 튜토리얼, 기능 안내, 메인 퀘스트 코드를 줄게.
+처음 하는 여덟 살 아이와 어른이 헷갈리지 않게 '고친 안'을 만들어. 원칙:
+- how(퀘스트 안내 한 줄)는 '할 일'과 '어디를 누르는지'를 먼저, 좋은 점은 뒤에 짧게(예: '교실 옆 공사 자리를 눌러 급식실을 지어요. 수업료가 올라요'). 45자 안.
+- 어려운 말(평판, 정원, 장학사, 수료증, 기금, 연수, 초당 등)이 처음 나오는 곳에는 쉬운 풀이를 괄호로 한 번만.
+- 레벨 올리는 말은 건물은 '짓기, 키우기', 가구는 '올리기', 선생님은 '모시기, 연수 보내기'로 맞춰.
+- 튜토리얼 d와 기능 안내 d는 두 문장 안. '저'는 교감 고슴도치.
+- 해요체, 가운뎃점(·) 금지, 이모지와 영어 금지. 게임 숫자(n, rm, r, 레벨 값)와 퀘스트 차례는 바꾸지 마. 바꿀 필요 없는 것은 넣지 마.
+답은 JSON 하나만: {"tut": [{"i": 0, "t": "", "d": ""}], "feat": {"열쇠": {"t": "", "d": ""}}, "quest": {"q1": {"title": "", "how": "", "say": ""}}} (바꾸는 칸만, 없는 칸은 빼)"""
+
+
 def main():
     g = grab()
+    if '--fix' in sys.argv:
+        if '--dry' in sys.argv: print(len(g)); return
+        OUT.mkdir(exist_ok=True)
+        txt = ask(FIX, g, MODEL, max_tokens=48000)
+        (OUT / 'newbie_fix.json').write_text(txt, encoding='utf-8')
+        (OUT / 'newbie_fix.md').write_text(f'# 처음 하는 사람 고친 안\n\n모델 {MODEL}. {usage_line()}\n', encoding='utf-8')
+        print(usage_line()); return
     if '--dry' in sys.argv: print(len(g)); print(g[:800]); return
     OUT.mkdir(exist_ok=True)
     txt = ask(SYSTEM, g, MODEL, max_tokens=32000)
