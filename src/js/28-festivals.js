@@ -476,7 +476,7 @@
     sfx(win ? 'quest' : 'done'); buzz(20);
     musicSync(); save(); renderHUD(); renderFestBtn(); fvMap(true);
     const u = IMG('bf_burst_pink');
-    showReward({ title: win ? '불꽃놀이 대성공!' : '불꽃놀이 끝!', sub: win ? `불꽃 ${R.n}송이가 밤하늘에 펴졌어요` : `${F.goal - R.n}송이가 모자랐어요. 도장은 받아요`, art: u ? `<img src="${u}" alt="" style="width:120px;height:120px">` : '🎆', big: `${R.n}/${F.goal}개`, items });
+    showReward({ title: win ? '불꽃놀이 대성공!' : '불꽃놀이 끝!', sub: win ? `불꽃 ${R.n}송이가 밤하늘에 피었어요` : `${F.goal - R.n}송이가 모자랐어요. 도장은 받아요`, art: u ? `<img src="${u}" alt="" style="width:120px;height:120px">` : '🎆', big: `${R.n}/${F.goal}개`, items });
   }
   // 누른 자리에 불꽃 한 송이(그림이 있을 때만)
   function bfBurst(x, y) {
@@ -726,7 +726,7 @@
     raccoon: ['안녕하세요! 오는 길에 손을 세 번 씻었어요.', '급식실이 어디예요? 아, 아직 공부 시간이군요.'],
     chick: ['삐약! 아, 안녕하세요.', '우리 학교 형 누나들이 여기 꼭 가 보래요.'],
     bear: ['안녕하세요. 도시락은 두 개 싸 왔어요.', '하나는 새 친구랑 나눠 먹으려고요.'],
-    cat: ['안녕하세요. 햇볕 잘 드는 창가 자리가 있나요?', '졸려는 게 아니에요. 생각하는 거예요.'],
+    cat: ['안녕하세요. 햇볕 잘 드는 창가 자리가 있나요?', '조는 게 아니에요. 생각하는 거예요.'],
     dog: ['안녕하세요! 안녕하세요! 정말 반가워요!', '운동장이 넓네요. 한 바퀴만 뛰고 올게요!'],
     penguin: ['안녕하세요. 조금 덥지만 괜찮아요.', '이 학교 급식에 얼음 동동 띄운 게 있다고 들었어요.'],
     panda: ['안녕하세요. 걸어오다 대나무 숲에서 조금 쉬었어요.', '그래서 조금 늦었어요. 조금요.'],

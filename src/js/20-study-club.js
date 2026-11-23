@@ -83,7 +83,7 @@
         return `<div class="ac-row" data-ac="${k}" role="button" tabindex="0" aria-label="${AC.name[k]} XP를 얻는 곳 보기"><span class="ac-nm">${AC.name[k]}</span><span class="ac-lv">Lv.${a.lv}</span>` +
           `<span class="ac-bar${capped ? ' cap' : ''}" role="progressbar" aria-label="${AC.name[k]} Lv.${a.lv}" aria-valuenow="${capped ? need : Math.min(need, a.xp)}" aria-valuemax="${need}"><i style="width:${capped ? 100 : Math.round(100 * Math.min(1, a.xp / need))}%"></i></span>` +
           `<button class="ac-bk${left > 0 ? '' : ' off'}" type="button" data-book="${k}" aria-label="${AC.name[k]} 문제집 구매, 오늘 ${left}권 남음">${left > 0 ? '문제집 구매' : '내일 또'}</button></div>`; }).join('') +
-      `<div class="ac-note">${cap <= acLv('kor') && AC.keys.every(k => acLv(k) >= cap) ? `${tierInfo().name} 상한 Lv.${cap}이에요. 다음 학교급에서 더 배워요` : `문제집은 과목마다 하루 ${AC.book.perDay}권, 한 권에 XP +${AC.book.xp}이에요. ${tierInfo().name}에서는 Lv.${cap}까지 올라요`}</div>`;
+      `<div class="ac-note">${cap <= acLv('kor') && AC.keys.every(k => acLv(k) >= cap) ? `${tierInfo().name}에서는 Lv.${cap}까지예요. 다음 학교급에서 더 배워요` : `문제집은 과목마다 하루 ${AC.book.perDay}권, 한 권에 XP +${AC.book.xp}이에요. ${tierInfo().name}에서는 Lv.${cap}까지 올라요`}</div>`;
   }
   // 과목 줄을 누르면 그 과목 XP를 얻는 곳을 말풍선으로 잠깐 보여 줘요. 아직 열리지 않은 곳은 흐리게
   const AC_SRC = {

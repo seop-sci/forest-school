@@ -76,14 +76,14 @@
     const sc = ks.includes('schol') ? perkCost('schol') : Infinity;
     if (ks.includes('night') && S.p.perk.night < 1 && perkCost('night') <= sc) return { k: 'night', why: '학교를 비운 동안 도토리가 더 오래 쌓여요' };
     const cheap = ks.filter(k => k !== 'schol').sort((a, b) => perkCost(a) - perkCost(b))[0];
-    if (cheap && perkCost(cheap) * 3 <= sc) return { k: cheap, why: '지금 가장 경제적이에요' };
-    return sc < Infinity ? { k: 'schol', why: '수업료가 가장 많이 올라요' } : { k: cheap, why: '지금 가장 경제적이에요' };
+    if (cheap && perkCost(cheap) * 3 <= sc) return { k: cheap, why: '지금 가장 알뜰해요' };
+    return sc < Infinity ? { k: 'schol', why: '수업료가 가장 많이 올라요' } : { k: cheap, why: '지금 가장 알뜰해요' };
   }
   // 장학재단: 기본은 재단 장학금(수업료 두 배), 학급 문집이 장학금 값의 절반 이하면 학급 문집(수료증이 늘어 명예 교장실을 더 고쳐요)
   function fpRec() {
     const sc = fpCost('schol');
     if (fpCost('dip') * 2 <= sc) return { k: 'dip', why: '수료증이 늘어 명예 교장실을 더 고칠 수 있어요' };
-    if (fpCost('rep') * 4 <= sc) return { k: 'rep', why: '지금 가장 경제적이에요' };
+    if (fpCost('rep') * 4 <= sc) return { k: 'rep', why: '지금 가장 알뜰해요' };
     return { k: 'schol', why: '수업료가 +100% 올라요' };
   }
   /* ---------- 게임 시계 ----------
@@ -244,7 +244,7 @@
       eff: L => L < 1 ? `특식 데이 ${DEAL.feastMin}분` : `특식 데이 ${DEAL.feastMin + XT.diet.per * L}분 (+${XT.diet.per * L}분)` },
     lib: { name: '사슴 선생님', subject: '사서', fac: 'library', max: 10, per: 3, av: 'librarian',
       desc: '도서관을 지키는 사서 선생님이에요.',
-      eff: L => L < 1 ? '퍼즐 정수 보너스 없음' : `퍼즐 정수 +${XT.lib.per * L}%` },
+      eff: L => L < 1 ? '퍼즐 숲의 정수 보너스 없음' : `퍼즐 숲의 정수 +${XT.lib.per * L}%` },
     // 새 선생님 셋(작업지시서 39). sub: 과목 선생님이라 탭에서 교감 선생님 위에, tier: 그 학교급부터 오셔요
     kor: { name: '고니 선생님', subject: '국어', fac: 'library', tier: 1, max: 10, per: 5, av: 'swan', sub: true,
       desc: '시를 즐겨 읽는 국어 선생님이에요.',

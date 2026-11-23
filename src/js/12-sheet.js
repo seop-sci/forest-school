@@ -106,7 +106,7 @@
     }
     const aw = $('#sheetAward'), top = k === 'classroom' ? exAwardTop() : null;
     aw.hidden = !top;
-    if (top) setH(aw, `${IMG('exam_award') ? `<img src="${IMG('exam_award')}" alt="">` : '🏅'}<span>전교 1등 <b>${esc(top.nm)}</b>의 상장이 걸려 있어요. 다음 시험까지 걸려 있어요.</span>`);
+    if (top) setH(aw, `${IMG('exam_award') ? `<img src="${IMG('exam_award')}" alt="">` : '🏅'}<span>전교 1등 <b>${esc(top.nm)}</b>의 상장이 다음 시험까지 걸려 있어요.</span>`);
     // 급식실 창의 학교 텃밭
     const sg = $('#sheetGarden'), sgOn = k === 'cafeteria' && gdOpen();
     sg.hidden = !sgOn;

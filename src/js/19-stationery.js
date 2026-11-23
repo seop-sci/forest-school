@@ -263,7 +263,7 @@
         { img: 'stop_old_1', name: '성곽 길', acts: [['성곽 걷기', 'pe', '높은 성벽 위를 끝까지 걸었어요. 다리는 아파도 경치가 최고예요!'], ['박물관 해설 듣기', 'kor', '해설사 선생님 이야기에 모두 귀를 쫑긋 세웠어요.']] },
         { img: 'stop_old_2', name: '돌탑 마당', acts: [['돌탑 그리기', 'art', '돌 하나하나를 정성껏 스케치북에 옮겼어요.'], ['옛 시 읽기', 'kor', '돌탑 앞에서 옛 시를 소리 내어 읽었어요.']] },
         { img: 'stop_old_3', name: '전통 과자 가게', acts: [['전통 과자 만들기', 'sci', '반죽이 굳는 온도를 맞추니 바삭한 과자가 됐어요.'], ['기념 도장 찍기', 'art', '알록달록 도장을 수첩 가득 찍었어요.']] }],
-      props: ['prop_old_flag', 'prop_old_fan'], souv: [['sv2_old_1', '작은 돌탑 모형'], ['sv2_old_2', '전통 문양 연'], ['sv2_old_3', '옛 등롱']] },
+      props: ['prop_old_flag', 'prop_old_fan'], souv: [['sv2_old_1', '작은 돌탑 모형'], ['sv2_old_2', '전통 문양 연'], ['sv2_old_3', '옛 등불']] },
     { id: 'island', name: '섬 마을', img: 'tr2_island', photo: 'photo_island', c: '#3E9BC2', say: '배를 타고 가는 섬이에요. 하얀 등대와 귤밭이 있어요.',
       stops: [
         { img: 'stop_island_1', name: '등대와 갯바위', acts: [['등대 오르기', 'pe', '빙글빙글 계단을 올라 바다를 내려다봤어요.'], ['갯바위 생물 관찰', 'sci', '작은 게와 고둥을 찾아 관찰 노트에 적었어요.']] },
@@ -598,7 +598,7 @@
       if (rt.tab === 'shop') renderShop();
     if (rt.tab === 'street') renderStreet();
     }, r => {
-      if (r !== 'noad') toast('광고를 끝까지 보지 않아서 황금 도토리가 없어요');
+      if (r !== 'noad') toast('광고를 끝까지 보지 않아서 황금 도토리를 받지 못했어요');
     });
   }
 

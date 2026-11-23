@@ -144,7 +144,7 @@
       go: qtGoFperks
     },
     trips: {
-      goal: q => q.n === 1 ? '현장체험학습 다녀오기' : `현장체험학습 ${q.n}번 다녀오기`,
+      goal: q => q.n === 1 ? '체험학습 다녀오기' : `체험학습 ${q.n}번 다녀오기`,
       go: qtGoTrips
     },
     souv: {
@@ -191,7 +191,7 @@
     },
     star: {
       measure: q => rosterOn() && S.roster.list.length ? Math.max(...S.roster.list.map(s => Math.max(...s.a.map(star)))) : 0,
-      goal: q => `능력치 별 ${q.n}개 학생 만들기`,
+      goal: q => `능력치 별이 ${q.n}개인 학생 만들기`,
       go: qtGoClub
     },
     clubShown: {
@@ -547,7 +547,10 @@
   function makeSub(d) {
     const s = { id: d.id, who: d.who, t: d.t, k: d.k || null, n: d.n, r: 0, b: 0, nw: true, say: '' };
     // 받자마자 끝나 버리는 부탁이 없게 목표를 지금보다 한 단계 위로 맞춰요
-    if (s.t === 'fac') s.n = Math.max(s.n, S.f[s.k] + 1);
+    if (s.t === 'fac' && (S.f[s.k] || 0) + 1 > facCap()) {   // 5.3.4.6: 이미 올해 상한인 건물이면 더 올릴 수 있는 지은 건물로 바꿔요(목표가 상한+1이라 학기 내내 막혔어요)
+      const alt = Object.keys(FAC).find(k => (S.f[k] || 0) >= 1 && (S.f[k] || 0) + 1 <= facCap()); if (alt) s.k = alt;
+    }
+    if (s.t === 'fac') s.n = Math.min(Math.max(s.n, S.f[s.k] + 1), Math.max(facCap(), S.f[s.k] || 0));
     if (s.t === 'students' && Math.floor(S.students) >= s.n) s.n = Math.floor(S.students) + 4;
     s.b = qMeasure(s);
     s.r = Math.max(d.r || 0, nice(rate() * (d.gen ? 60 : 30)));
@@ -586,6 +589,7 @@
       if (r && !rt.qr[s.id] && !silent) { sfx('done'); toast(`${WHO[s.who]}의 부탁을 들어줬어요! 노란 쪽지를 눌러 보상을 받아요`); }
       rt.qr[s.id] = r;
     }
+    if (!silent) gsCheck(); else rt.qr.guest = gsReady();
   }
   function claimMain(fromEl) {
     const q = curMain();
@@ -786,7 +790,7 @@
   }
 
   /* 퀘스트 탭 */
-  const questKey = () => `${S.q.m}|${mainReady() ? 1 : 0}|${S.q.subs.map(s => s.id + (subReady(s) ? '!' : '')).join(',')}`;
+  const questKey = () => `${S.q.m}|${mainReady() ? 1 : 0}|${S.q.subs.map(s => s.id + (subReady(s) ? '!' : '')).join(',')}|${gsKey()}`;
   function renderQuestPanel(force) {
     if (rt.tab !== 'quests') return;
     if (force) $('#qDaily').dataset.key = '';
@@ -836,12 +840,13 @@
       subs = S.q.subs.map(s => questCard(s, s.b, { ref: s.id, kid: true, av: kidAvatar(s.who), name: WHO[s.who], say: `“${s.say}”`, badge: s.nw ? '새 부탁' : '' })).join('');
       if (S.q.subs.length < subSlots()) subs += '<p class="qempty">새 부탁을 기다리고 있어요. 메인 퀘스트를 진행하면 학생들이 또 찾아와요.</p>';
     }
-    $('#qSubs').innerHTML = subs;
+    $('#qSubs').innerHTML = gsCardHTML() + subs;   // 5.3.4.7 오늘의 손님 칸은 학생 부탁 위에
     $('#qTally').textContent = S.q.subDone > 0 ? `지금까지 들어준 부탁 ${S.q.subDone}개` : '';
   }
   function updateQuestProgress() {
     $$('#panelQuests [data-qp]').forEach(card => {
       const ref = card.dataset.qp;
+      if (ref === 'guest') { gsCardUpdate(card); return; }
       const q = ref === 'main' ? curMain() : S.q.subs.find(s => s.id === ref);
       if (!q) return;
       const p = qProg(q, ref === 'main' ? S.q.mb : q.b);
@@ -852,7 +857,7 @@
   function updateQuestDot() {
     dmDay(); lgWeek(); wkWeek();
     // 이벤트에서 받을 것은 이벤트 버튼의 점(#evDot)으로만 알려요(받을 퀘스트가 없는데 퀘스트 점이 남아요)
-    const on = rt.tab !== 'quests' && (mainReady() || S.q.subs.some(s => subReady(s)) || dmClaimable() || wkClaimable());   // 새 부탁만으로는 점을 켜지 않아요
+    const on = rt.tab !== 'quests' && (mainReady() || S.q.subs.some(s => subReady(s)) || gsReady() || dmClaimable() || wkClaimable());   // 새 부탁만으로는 점을 켜지 않아요
     $('#qDot').hidden = !on;
   }
   function markQuestsSeen() { S.q.seen = S.q.m; S.q.subs.forEach(s => { s.nw = false; }); }

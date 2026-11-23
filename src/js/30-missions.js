@@ -13,7 +13,7 @@
     puzzle: { n: 1, name: () => '숲속 퍼즐 한 판 끝내기', v: () => S.st.pz || 0, ok: () => !liveOff('puzzle') },
     merge: { n: 2, name: n => `숲속 합치기 주문 ${n}개 채우기`, v: () => S.mg.st.orders, ok: () => !liveOff('merge') },
     fest: { n: 1, name: () => '학교 행사 한 번 열기', v: () => S.st.sports + Object.values(S.fest.n).reduce((a, b) => a + b, 0), ok: () => FEST_IDS.some(festOpen) },
-    trip: { n: 1, name: () => '현장체험학습 다녀오기', v: () => S.st.trips, ok: () => tripOpen() },
+    trip: { n: 1, name: () => '체험학습 다녀오기', v: () => S.st.trips, ok: () => tripOpen() },
     ns: { n: 1, name: () => '야간 자율학습 켜거나 예약하기', v: () => S.ns ? S.ns.n : 0, ok: () => nsOpen() && !nsUsedTonight() },   // 고등학교 기숙사부터
     cs: { n: 1, name: () => '진로 상담 한 번 하기', v: () => S.cs ? S.cs.talks : 0, ok: () => csOpen() && csLeft() > 0 }   // 고등학교부터
   };
@@ -214,7 +214,7 @@
     daily: { n: 12, name: n => `오늘의 미션 ${n}개 마치기`, v: () => S.st.dmDone },
     subs: { get n() { return S && S.tier >= 4 ? 5 : 10; }, name: n => `학생 부탁 ${n}개 들어주기`,   /* 대학교부터 5개 */ v: () => S.q.subDone, ok: () => S.q.m >= SUB_UNLOCK },
     fest: { n: 4, name: n => `학교 행사 ${n}번 열기`, v: () => MISSIONS.fest.v(), ok: () => FEST_IDS.some(festOpen) },
-    trip: { n: 3, name: n => `현장체험학습 ${n}번 다녀오기`, v: () => S.st.trips, ok: () => tripOpen() }
+    trip: { n: 3, name: n => `체험학습 ${n}번 다녀오기`, v: () => S.st.trips, ok: () => tripOpen() }
   };
   const MP = { daily: 20, bonus: 40, week: 50, weekGold: 1 };
   const MP_BOX = [

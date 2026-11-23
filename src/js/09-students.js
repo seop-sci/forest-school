@@ -632,18 +632,19 @@
   }
 
   /* ---------- 착한 민원인: 졸업생이 선물을 들고 찾아와요 ----------
-     15~30분마다 교문으로 들어와 학교 앞에 서 있어요(40초). 누르면 고맙다는 말과 함께 선물을 줘요 */
-  const VISIT = { every: [900, 1800], first: 540, life: 40 };
+     15~30분마다 교문으로 들어와 학교 앞에 서 있어요. 누르면 고맙다는 말과 함께 선물을 줘요
+     5.3.4.7: 40초 뒤 떠나지 않고 누를 때까지 서 있어요(누르기 전에는 다음 졸업생이 오지 않아요). 오늘의 손님이 교문에 있는 동안은 쉬어요 */
+  const VISIT = { every: [900, 1800], first: 540 };
   const VISIT_LINES = ['교장 선생님 덕분에 꿈을 이뤘어요!', '모교가 이렇게 커졌네요!', '후배들 간식 사 왔어요!', '어릴 때 그 교실이 그리워요', '저 이번에 선생님이 됐어요!'];
   function updateVisit(dt) {
     const V = rt.visit;
     if (V) {
       V.age += dt;
       if (V.y > 300) { V.y = Math.max(300, V.y - dt * 30); V.g.setAttribute('transform', `translate(${V.x} ${V.y.toFixed(1)})`); }
-      if (V.age > VISIT.life) endVisit(false);
+      if (!V.g.isConnected) layerFx.appendChild(V.g);   // 지도를 다시 그려도 그 자리에 서 있어요
       return;
     }
-    if (!trialOpen() || rt.tab !== 'school' || rt.modalOpen || festBusy() || rt.paused) return;
+    if (!trialOpen() || rt.tab !== 'school' || rt.modalOpen || festBusy() || rt.paused || rt.guest || (gsOn() && S.gs.st === 1)) return;
     if (rt.visitT === undefined) rt.visitT = VISIT.first;
     rt.visitT -= dt;
     if (rt.visitT > 0) return;
