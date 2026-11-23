@@ -10,7 +10,7 @@ on:
         required: true
         default: lines
         type: choice
-        options: [lines, proof, audit, content, en, verify, newbie]
+        options: [lines, proof, audit, content, en, verify, newbie, bio]
       model:
         description: '모델 (auto면 작업마다 정한 모델)'
         required: true
@@ -40,7 +40,7 @@ jobs:
           EXTRA: ${{ inputs.extra }}
         run: |
           cd dev
-          case "$JOB" in proof) S=ai_proof.py;; audit) S=ai_audit.py;; content) S=ai_content.py;; en) S=ai_en.py;; verify) S=ai_verify.py;; newbie) S=ai_newbie.py;; *) S=ai_lines.py;; esac
+          case "$JOB" in proof) S=ai_proof.py;; audit) S=ai_audit.py;; content) S=ai_content.py;; en) S=ai_en.py;; verify) S=ai_verify.py;; newbie) S=ai_newbie.py;; bio) S=ai_bio.py;; *) S=ai_lines.py;; esac
           if [ "$MODEL" = "auto" ]; then python3 "$S" $EXTRA; else python3 "$S" "--model=$MODEL" $EXTRA; fi
       - name: 결과를 새 가지에 올리기
         if: always()   # 중간에 멈춰도 그때까지 받은 것은 올려요
