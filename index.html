@@ -21137,7 +21137,7 @@ body.mg-on .toast[hidden]{display:none}
     const k = want ? rt.kids.find(x => x.sp === want) : null;
     if (rt.bdHatK && rt.bdHatK !== k) {
       const o = rt.bdHatK; rt.bdHatK = null;
-      if (rt.kids.includes(o)) { o.g.innerHTML = kidSVG(o.sp, o.bag); rt.elBadgeT = ''; }
+      if (rt.kids.includes(o)) { o.g.innerHTML = kidSVG(o.rare ? o.sp + '_rare' : o.sp, o.bag); rt.elBadgeT = ''; }   // 5.3.4.6: 희귀 겉모습 그대로
     }
     if (k && rt.bdHatK !== k && IMG('cos_hat_bday')) { k.g.innerHTML = kidSVG(k.rare ? k.sp + '_rare' : k.sp, k.bag, { hat: 'bday', neck: S.cos.neck }); rt.bdHatK = k; rt.elBadgeT = ''; }
   }
@@ -21362,9 +21362,13 @@ body.mg-on .toast[hidden]{display:none}
   function exTick() {
     if (!exOpen() || !S.ex) return;
     const w = gameWeek();
-    if (exIsWeek(w) && S.ex.cur !== w) { S.ex.cur = w; S.ex.ss = 0; save(); rt.exNews = '시험 주가 시작됐어요!\n도서관에서 자율학습을 하면 성적이 올라요'; }
+    if (exIsWeek(w) && S.ex.cur !== w) {
+      // 5.3.4.6: 지난 시험 주 성적표가 아직 없으면 먼저 만들고, 받지 않은 성적표는 덮기 전에 받아요(전에는 덮여 사라졌어요)
+      if (S.ex.cur >= 0 && S.ex.cur < w && !(S.ex.rep && S.ex.rep.wk === S.ex.cur)) { if (S.ex.rep && !S.ex.rep.got) exClaim(); S.ex.rep = exMake(S.ex.cur); }
+      const made = !!(S.ex.rep && S.ex.rep.wk === S.ex.cur && !S.ex.rep.got);
+      S.ex.cur = w; S.ex.ss = 0; save(); rt.exNews = made ? '지난 시험 성적표가 나왔고 새 시험 주가 시작됐어요!\n도서관이나 공부 탭에서 받아요' : '시험 주가 시작됐어요!\n도서관에서 자율학습을 하면 성적이 올라요'; }
     const p = exPrev();
-    if (!exIsWeek(w) && S.ex.cur === p && !(S.ex.rep && S.ex.rep.wk === p)) { S.ex.rep = exMake(p); save(); rt.exNews = '시험 성적표가 나왔어요!\n도서관이나 공부 탭에서 받아요'; if (rt.tab === 'mini') renderMini(); }
+    if (!exIsWeek(w) && S.ex.cur === p && !(S.ex.rep && S.ex.rep.wk === p)) { if (S.ex.rep && !S.ex.rep.got) exClaim(); S.ex.rep = exMake(p); save(); rt.exNews = '시험 성적표가 나왔어요!\n도서관이나 공부 탭에서 받아요'; if (rt.tab === 'mini') renderMini(); }
     if (rt.exNews && $('#toast').hidden && !rt.modalOpen && !rt.cereOn && !rt.paused && !gameSceneOpen()) { const t = rt.exNews; rt.exNews = ''; toast(t); }
   }
   const exReportReady = () => !!S && !!S.ex && !!S.ex.rep && !S.ex.rep.got;
@@ -22313,7 +22317,7 @@ body.mg-on .toast[hidden]{display:none}
     for (let i = 0; i < len; i++) { let c; do { c = Math.floor(Math.random() * BTQ_COL.length); } while (seq.length && c === seq[seq.length - 1]); seq.push(c); }
     return { kind: 'mem', seq, show: -1, input: [], phase: 'show', ok: true, rev: wk === 1 };   // B주는 거꾸로 눌러요
   }
-  const btqPts = Z => Z.kind === 'q' ? BTQ.pts[Math.min(BTQ.n, Z.got)] : Math.round(10 * (Z.ok ? Z.input.length : Math.max(0, Z.input.length - 1)) / Z.seq.length);
+  const btqPts = Z => Z.kind === 'q' ? BTQ.pts[Math.min(BTQ.n, Z.got)] : Math.round(10 * (Z.ok || !Z.miss ? Z.input.length : Math.max(0, Z.input.length - 1)) / Z.seq.length);   // 5.3.4.6: 틀린 칸을 눌렀을 때만 그 칸을 빼요(시간이 다 되면 맞힌 칸 그대로)
   function btqHTML(Z) {
     if (Z.kind === 'q') {
       const q = Z.qs[Z.k];
@@ -22360,7 +22364,7 @@ body.mg-on .toast[hidden]{display:none}
     const M = btUI.M; if (!M || !M.quiz || M.quiz.kind !== 'mem' || M.quiz.phase !== 'input') return;
     const Z = M.quiz, ok = (Z.rev ? Z.seq[Z.seq.length - 1 - Z.input.length] : Z.seq[Z.input.length]) === c;
     Z.input.push(c); buzz(ok ? 8 : [20, 30, 20]); sfx(ok ? 'tap' : 'tap');
-    if (!ok) { btqMemEnd(M, false); return; }
+    if (!ok) { Z.miss = true; btqMemEnd(M, false); return; }
     if (Z.input.length >= Z.seq.length) { btqMemEnd(M, true); return; }
     btqRender(M);
   }

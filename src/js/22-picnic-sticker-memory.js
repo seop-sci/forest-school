@@ -561,7 +561,7 @@
     const k = want ? rt.kids.find(x => x.sp === want) : null;
     if (rt.bdHatK && rt.bdHatK !== k) {
       const o = rt.bdHatK; rt.bdHatK = null;
-      if (rt.kids.includes(o)) { o.g.innerHTML = kidSVG(o.sp, o.bag); rt.elBadgeT = ''; }
+      if (rt.kids.includes(o)) { o.g.innerHTML = kidSVG(o.rare ? o.sp + '_rare' : o.sp, o.bag); rt.elBadgeT = ''; }   // 5.3.4.6: 희귀 겉모습 그대로
     }
     if (k && rt.bdHatK !== k && IMG('cos_hat_bday')) { k.g.innerHTML = kidSVG(k.rare ? k.sp + '_rare' : k.sp, k.bag, { hat: 'bday', neck: S.cos.neck }); rt.bdHatK = k; rt.elBadgeT = ''; }
   }
