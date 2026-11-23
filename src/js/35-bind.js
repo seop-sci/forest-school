@@ -864,8 +864,8 @@
       if (!b) return;
       const ref = b.dataset.q;
       if (b.dataset.act === 'fold') { rt.qOpen = !rt.qOpen; sfx('tap'); buildQuestPanel(); return; }   // 메인 퀘스트 펼치기
-      if (b.dataset.act === 'claim') { if (ref === 'main') claimMain(b); else claimSub(ref, b); return; }
-      goTo(ref === 'main' ? curMain() : S.q.subs.find(s => s.id === ref));
+      if (b.dataset.act === 'claim') { if (ref === 'main') claimMain(b); else if (ref === 'guest') gsClaim(b); else claimSub(ref, b); return; }
+      goTo(ref === 'main' ? curMain() : ref === 'guest' ? S.gs.sub : S.q.subs.find(s => s.id === ref));
     });
   }
   // 설정과 튜토리얼

@@ -295,6 +295,7 @@
       updateBoostWin(dt);
       updateTrial(dt);
       updateVisit(dt);
+      gsTick(dt);   // 오늘의 손님
       updateDeal(dt);
       updateSports(dt);
       updateFest(dt, now);
