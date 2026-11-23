@@ -38,6 +38,7 @@ async def main():
               o.st2 = S.gs.st; o.sub = JSON.parse(JSON.stringify(S.gs.sub)); o.gone = !R.guest;
               o.talk = !document.querySelector('#mTalk').hidden; o.talkImg = !!document.querySelector('#talkAv img');
               o.talkTx = document.querySelector('#talkText').textContent;
+              o.arts = F.GS_WHO.filter(w => !F.gsArt(w));
               o.brace = /\\{(child|job|n)\\}/.test(JSON.stringify(S.gs.sub));
               return o; })()""")
             await pg.screenshot(path=str(OUT / f's188_talk_{w}.png'))
@@ -49,6 +50,7 @@ async def main():
             c.ok(r['noVisit'], f'[{w}] 손님이 있는 동안 졸업생 방문은 쉬어요')
             c.ok(r['st2'] == 2 and r['sub'] and r['gone'], f'[{w}] 누르면 부탁이 생기고 손님은 들어가요')
             c.ok(r['talk'] and r['talkImg'] and len(r['talkTx']) > 4, f'[{w}] 대화 창에 손님 그림과 대사')
+            c.ok(not r['arts'], f'[{w}] 손님 일곱 모두 그림이 있어요 {r["arts"]}')
             c.ok(not r['brace'], f'[{w}] 부탁 글에 {{child}} 같은 자리표가 남지 않아요')
             c.ok(not over_talk, f'[{w}] 대화 창이 넘치지 않아요 {over_talk}')
             r2 = await pg.evaluate("""(async()=>{ const F = window.__forest, S = F.S, R = F.rt, sl = ms => new Promise(r => setTimeout(r, ms)), o = {};
