@@ -56,7 +56,7 @@ async def main():
                 for (const fx of [0.2, 0.5, 0.8]) for (const fy of [0.2, 0.5, 0.8]) if (document.elementFromPoint(q.left + q.width * fx, q.top + q.height * fy) === h) hit++;
                 if (hit < 5 || q.left < map.left - 1 || q.right > map.right + 1 || q.top < map.top - 1 || q.bottom > map.bottom + 1) bad.push([F.BX_SPOT[{tier}][+h.dataset.bx], hit]); }});
               return {{ n: document.querySelectorAll('#bxG .bx-hit').length, bad }}; }})()""")
-            if r['n'] != 6 or r['bad']: bad.append(f'숨은 생물 자리 {tier} {r}')
+            if r['n'] != 7 or r['bad']: bad.append(f'숨은 생물 자리 {tier} {r}')   # 5.3.4.8 물가 자리 하나 더(7곳)
         await pg.evaluate(f"(() => {{ const S = {F}.S; S.tier = 0; S.bx.sp = []; }})()")
         r = await pg.evaluate(f"""(() => {{ const F = {F}, S = F.S; S.tier = 1; S.f.science = 1; F.renderMap(); S.bx.m = 1; S.bx.sp = [{{ i: 0, id: 'ladybug', t: Date.now() }}]; F.renderDeco(true);
           return {{ glow: document.querySelectorAll('#bxG .bx-glow').length, hit: document.querySelectorAll('#bxG .bx-hit').length }}; }})()""")
