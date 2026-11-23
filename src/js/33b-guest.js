@@ -20,7 +20,7 @@
   };
   const freshGs = () => ({ day: '', who: '', st: 0, sub: null, met: {}, n: 0 });
   const gsOn = () => !!S && !!S.gs && S.q.m >= SUB_UNLOCK;
-  const gsArt = who => IMG('chr_' + who) || '';
+  const gsArt = who => IMG170('chr_' + who) || '';   // 5.4.0.1: 졸업생과 까치 그림은 FS_IMG170 묶음에 있어서 IMG로는 못 찾았어요
   const gsPrefOf = who => GS_PREF[GS_KID[who] ? 'parent' : who] || GS_PREF.magpie;
   // 그 학교급에서 지금 할 수 있는 부탁만 골라요
   function gsAvail() {
