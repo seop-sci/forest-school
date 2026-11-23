@@ -4,6 +4,7 @@
 #  2) 자율학습: 시험 주에만, 도서관이 있어야, 하루 한 번. XP는 20 + 도서관 Lv(60까지). 날이 바뀌면 다시
 #  3) 성적표: 시험 주에 왔던 학교만, 시험 주가 끝나면 한 장. 등급은 상한 대비 80/60/40%, 자율학습 한 번마다 +3%(5번까지).
 #     중학교부터는 학력 0.6 + 명부 평균 0.4(2.1.0, 학력 상한과 명부 90이면 0.96). 받으면 도토리(점수 × 6분치 보정), 모두 A면 황금 3, 15점 이상 1. 두 번 받을 수 없어요
+#  3-1) 5.3.4.6: 지난 시험 주에 왔다가 다음 시험 주에 다시 오면 지난 성적표를 그때 만들고, 받지 않은 성적표는 덮기 전에 저절로 받아요
 #  4) 상장: 받은 뒤 다음 시험까지 교실 창에 전교 1등. 저장: 망가진 성적표는 버려요
 #  5) 390 밝은, 360 어두운 화면에서 시험 창과 공부 탭 시험 줄이 넘치지 않아요(캡처 s77_*). 페이지 오류 없음
 # 쓰는 법: python3 wrap.py && python3 s77test.py   (마지막 줄이 PASS면 통과)
@@ -49,6 +50,12 @@ async def main():
                 # 시험 주에 오지 않은 학교는 성적표가 없어요
                 r = await pg.evaluate(f"""(() => {{ const F = {F}, S = F.S; S.ex.rep = null; S.ex.cur = -1; F.rt.fakeNow = F.gameNow() + 28 * 86400000; while (F.exNow()) F.rt.fakeNow += 7 * 86400000; F.exTick(); return S.ex.rep; }})()""")
                 if r is not None: bad.append(f'시험 주에 없던 학교에 성적표가 생겼어요 {r}')
+                # 3-1) 지난 시험 주 성적표 따라잡기와 받지 않은 성적표 저절로 받기(5.3.4.6)
+                r = await pg.evaluate(f"""(() => {{ const F = {F}, S = F.S; S.ex.rep = null; F.rt.fakeNow = F.gameNow(); while (!F.exNow()) F.rt.fakeNow += 86400000; F.exTick(); const w0 = S.ex.cur;
+                  F.rt.fakeNow += 28 * 86400000; F.exTick(); const r1 = S.ex.rep && {{ wk: S.ex.rep.wk, got: S.ex.rep.got }}, cur1 = S.ex.cur, b0 = S.budget;
+                  F.rt.fakeNow += 28 * 86400000; F.exTick(); return {{ w0, r1, cur1, r2: S.ex.rep && {{ wk: S.ex.rep.wk, got: S.ex.rep.got }}, paid: S.budget > b0 }}; }})()""")
+                print('따라잡기', r)
+                if not r['r1'] or r['r1']['wk'] != r['w0'] or r['r1']['got'] or r['cur1'] == r['w0'] or not r['r2'] or r['r2']['wk'] != r['cur1'] or not r['paid']: bad.append(f'지난 성적표 따라잡기나 저절로 받기가 틀려요 {r}')
                 # 중학교 명부 반반, 모두 A면 황금 3
                 await pg.evaluate(TO_EX)
                 r = await pg.evaluate(f"""(() => {{ const F = {F}, S = F.S; S.tier = 2; F.rosterEnsure(); for (const s of S.roster.list) s.a = [90, 90, 90, 90, 90]; for (const k of F.AC.keys) S.ac[k].lv = 30; S.ex.ss = 0;
@@ -65,7 +72,7 @@ async def main():
                 await pg.evaluate(f"{F}.rt.fakeNow = null")
             # 5) 화면
             await pg.evaluate(T.CLEAN); await pg.evaluate(TO_EX)
-            await pg.evaluate(f"(() => {{ const S = {F}.S; S.tier = 1; S.f.library = 6; S.ex.day = ''; S.ex.rep = null; {F}.exTick(); }})()")
+            await pg.evaluate(f"(() => {{ const S = {F}.S; S.tier = 1; S.f.library = 6; S.ex.day = ''; S.ex.rep = null; S.ex.cur = -1; {F}.exTick(); }})()")
             await pg.evaluate("document.querySelector('[data-tab=\"mini\"]').click()"); await pg.wait_for_timeout(400)
             r = await pg.evaluate("""(() => { const b = document.querySelector('#exRowBtn'), r = b.getBoundingClientRect(); return { hid: b.hidden, go: document.querySelector('#exRowGo').textContent, over: r.right > innerWidth + 1 || r.left < -1 }; })()""")
             print(w, '시험 줄', r)

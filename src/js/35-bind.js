@@ -959,6 +959,8 @@
       else if (rt.modalOpen === $('#mFest')) closeModal($('#mFest'));
       else if (rt.modalOpen === $('#mCere')) { if (rt.cereAsking) cereKeep(); else { rt.cereAt = 0; cereAsk(); } }   // 뒤로 가기는 건너뛸지 묻고, 물을 때 다시 누르면 계속 봐요
       else if (rt.modalOpen === $('#tut')) tutEnd('later');
+      else if (rt.modalOpen === $('#mSportsEnd')) $('#srGet').click();   // 5.3.4.6: 운동회 결과는 받기 단추와 같게(뒤로 가기로 닫으면 상품을 못 받았어요)
+      else if (rt.modalOpen === $('#mLab') && rt.labBusy) { /* 실험 장면이 도는 동안은 닫지 않아요(닫기 단추와 같게) */ }
       // 위에 없는 창도 뒤로 가기로 닫아요. 꼭 골라야 하는 창(저장 고르기, 전학 대화, 자리 비운 보상)은 그대로
       else if (rt.modalOpen && rt.modalOpen.classList.contains('overlay') && !['mPick', 'mTalk', 'mOffline', 'mSt'].includes(rt.modalOpen.id)) closeModal(rt.modalOpen);
       else if (rt.sheetKey && !rt.modalOpen) closeSheet();

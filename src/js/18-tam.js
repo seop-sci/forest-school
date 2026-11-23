@@ -900,7 +900,7 @@
         const s = tamStat(sp); return `<div class="tm-slot" style="--rc:${TM_RC[TAM.role[s.ri].k]}"><img src="${tamPcPic(sp)}" alt=""><em>Lv.${tamMem(sp).lv}</em><small>${esc(spName(sp))}</small></div>`; }).join('')}</div>`;
       { const R0 = tamReg(tamCurFl()), ar = TAM.role[tamAdvRi()], cl = tamCollLv();
         h += `<div class="tm-tips"><p><b class="tm-role" style="--rc:${TM_RC[ar.k]}">${esc(ar.nm.split(' ')[0])}</b> ${esc(R0.nm)}에서 힘 +${Math.round(TAM.advG * 100)}%</p>` +
-          `<p><b class="tm-role">보유 효과</b> 대원 레벨 합 ${fmt(cl)} → 힘 +${(Math.min(TAM.collMax, 1 + TAM.collG * cl) * 100 - 100).toFixed(1)}%</p></div>`; }
+          `<p><b class="tm-role">모은 대원 효과</b> 대원 레벨 합 ${fmt(cl)} → 힘 +${(Math.min(TAM.collMax, 1 + TAM.collG * cl) * 100 - 100).toFixed(1)}%</p></div>`; }
       { const gain = same ? 0 : tamAutoGain();   // 더 센 조합이 있으면 단추를 반짝이고 늘어나는 힘을 보여 줘요
         h += `<div class="tm-prow"><span>대원 ${party.length}/${slots}명</span><button type="button" class="btn-sub small${gain ? ' tm-auto-hot' : ''}" data-tauto="1"${same ? ' aria-disabled="true"' : ''}>${same ? '가장 좋은 조합이에요' : gain ? `더 센 조합 있어요 <b>힘 +${fmt(gain)}</b>` : '자동 편성'}</button></div>`; }
       { const lvN = rt.tamLvN || 1, allC = Math.min(...party.map(tamLvCost));   // 한 번에 올리기
@@ -1169,7 +1169,7 @@
     }
     // 놓친 이벤트 장식
     const miss = evRestock(), gmp = gmPast().flatMap(gmItems).filter(x => !x.own);
-    if (gmp.length) h += `<h3 class="shop-h" data-cat="놓친 장식">지난 달의 꾸미기 <small>그달 값 그대로</small></h3><div class="shop-grid">${gmTiles(gmp, coin)}</div>`;
+    if (gmp.length) h += `<h3 class="shop-h" data-cat="놓친 장식">지난달의 꾸미기 <small>그달 값 그대로</small></h3><div class="shop-grid">${gmTiles(gmp, coin)}</div>`;
     if (miss.length) {
       h += `<h3 class="shop-h"${gmp.length ? '' : ' data-cat="놓친 장식"'}>놓친 이벤트 장식 <small>지난 이벤트 것만, 하나씩</small></h3><div class="shop-grid">`;
       for (const d of miss) {

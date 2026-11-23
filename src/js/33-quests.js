@@ -144,7 +144,7 @@
       go: qtGoFperks
     },
     trips: {
-      goal: q => q.n === 1 ? '현장체험학습 다녀오기' : `현장체험학습 ${q.n}번 다녀오기`,
+      goal: q => q.n === 1 ? '체험학습 다녀오기' : `체험학습 ${q.n}번 다녀오기`,
       go: qtGoTrips
     },
     souv: {
@@ -191,7 +191,7 @@
     },
     star: {
       measure: q => rosterOn() && S.roster.list.length ? Math.max(...S.roster.list.map(s => Math.max(...s.a.map(star)))) : 0,
-      goal: q => `능력치 별 ${q.n}개 학생 만들기`,
+      goal: q => `능력치 별이 ${q.n}개인 학생 만들기`,
       go: qtGoClub
     },
     clubShown: {
@@ -547,7 +547,10 @@
   function makeSub(d) {
     const s = { id: d.id, who: d.who, t: d.t, k: d.k || null, n: d.n, r: 0, b: 0, nw: true, say: '' };
     // 받자마자 끝나 버리는 부탁이 없게 목표를 지금보다 한 단계 위로 맞춰요
-    if (s.t === 'fac') s.n = Math.max(s.n, S.f[s.k] + 1);
+    if (s.t === 'fac' && (S.f[s.k] || 0) + 1 > facCap()) {   // 5.3.4.6: 이미 올해 상한인 건물이면 더 올릴 수 있는 지은 건물로 바꿔요(목표가 상한+1이라 학기 내내 막혔어요)
+      const alt = Object.keys(FAC).find(k => (S.f[k] || 0) >= 1 && (S.f[k] || 0) + 1 <= facCap()); if (alt) s.k = alt;
+    }
+    if (s.t === 'fac') s.n = Math.min(Math.max(s.n, S.f[s.k] + 1), Math.max(facCap(), S.f[s.k] || 0));
     if (s.t === 'students' && Math.floor(S.students) >= s.n) s.n = Math.floor(S.students) + 4;
     s.b = qMeasure(s);
     s.r = Math.max(d.r || 0, nice(rate() * (d.gen ? 60 : 30)));

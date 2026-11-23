@@ -2,7 +2,7 @@
 # 보는 것
 #  1) 문제 은행: 과학, 책 읽기 문제마다 보기 셋이 서로 다르고 정답이 보기에 있어요. 수가 넉넉해요
 #  2) 수학 문제: 한 자리 수(중학교는 더하기 빼기 두 자리 수), 빼기 0 이상, 나누기 나누어떨어짐, 정답이 보기에 하나
-#  3) 점수: 퀴즈 0~3개 → 0, 3, 7, 10, 기억 놀이 비율 × 10
+#  3) 점수: 퀴즈 0~3개 → 0, 3, 7, 10, 기억 놀이 비율 × 10(틀린 칸을 누르면 그 칸 빼고, 5.3.4.6부터 시간이 다 되면 맞힌 칸 그대로)
 #  4) 대결 한 판: 종목마다 퀴즈나 기억 놀이를 풀면 점수가 응원 점수 자리에 들어가고 판이 끝나요(페이지 오류 없음)
 #  5) 390 밝은, 360 어두운 화면에서 퀴즈 칸과 기억 놀이 칸이 넘치지 않아요(캡처 s84_*)
 # 쓰는 법: python3 wrap.py && python3 s84test.py   (마지막 줄이 PASS면 통과)
@@ -47,8 +47,8 @@ async def main():
                     if op in '+−' and t == 2: good = good and y <= 9 and max(x, y) <= 99
                     if not good: badm.append((t, q, a, opts))
                 ok(not badm, f'수학 문제가 이상해요 {badm[:3]}')
-                r = await ev("const q = { kind: 'q', got: 0 }, m = { kind: 'mem', seq: [1, 2, 3], input: [], ok: false }; const a = [0, 1, 2, 3].map(g => F.btqPts(Object.assign({}, q, { got: g }))); const b = [F.btqPts({ kind: 'mem', seq: [1, 2, 3], input: [1, 2, 3], ok: true }), F.btqPts({ kind: 'mem', seq: [1, 2, 3], input: [1, 5], ok: false }), F.btqPts({ kind: 'mem', seq: [1, 2, 3, 4], input: [1, 2, 0], ok: false })]; return [a, b];")
-                ok(r == [[0, 3, 7, 10], [10, 3, 5]], f'점수 {r}')
+                r = await ev("const q = { kind: 'q', got: 0 }, m = { kind: 'mem', seq: [1, 2, 3], input: [], ok: false }; const a = [0, 1, 2, 3].map(g => F.btqPts(Object.assign({}, q, { got: g }))); const b = [F.btqPts({ kind: 'mem', seq: [1, 2, 3], input: [1, 2, 3], ok: true }), F.btqPts({ kind: 'mem', seq: [1, 2, 3], input: [1, 5], ok: false, miss: true }), F.btqPts({ kind: 'mem', seq: [1, 2, 3, 4], input: [1, 2, 0], ok: false, miss: true }), F.btqPts({ kind: 'mem', seq: [1, 2, 3], input: [1, 2], ok: false })]; return [a, b];")
+                ok(r == [[0, 3, 7, 10], [10, 3, 5, 7]], f'점수 {r}')
             # 4) 대결 한 판(초등학교 3학년)
             await ev("S.tier = 1; S.tg = 2; S.p.species = 6; F.setTab('mini'); return 1;"); await pg.wait_for_timeout(500); await pg.evaluate(T.CLEAN)
             await pg.click('#btCard'); await pg.wait_for_timeout(800)

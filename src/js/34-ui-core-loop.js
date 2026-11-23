@@ -15,10 +15,12 @@
     if (b) b.focus({ preventScroll: true });
   }
   function closeModal(el, then) {
+    if (el._closing && !el.classList.contains('open')) return;   // 5.3.4.6: 닫히는 180ms 안에 또 불리면(받기 두 번 누르기) 보상을 두 번 주지 않아요
     if (el.classList.contains('open')) { try { uiRwClose(el); } catch (e) { /* 연출만 */ } }   // 도토리가 위 칸으로
     el.classList.remove('open');
     if (rt.modalOpen === el) rt.modalOpen = null;
-    setTimeout(() => { if (rt.modalOpen !== el) el.hidden = true; if (then) then(); nextModal(); musicSync(); setTimeout(toastFlush, 60); sheetBackCheck(el); }, 180);
+    el._closing = true;
+    setTimeout(() => { el._closing = false; if (rt.modalOpen !== el) el.hidden = true; if (then) then(); nextModal(); musicSync(); setTimeout(toastFlush, 60); sheetBackCheck(el); }, 180);
   }
 
   /* ---------- 알림, 탭 ---------- */
