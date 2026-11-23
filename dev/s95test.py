@@ -79,7 +79,7 @@ async def main():
                   return { n: F.BIO.length, g60, hotel, gg, e90: S.ess - e0, pond: S.deco.own.deco_eco_pond, g: g5, title: tt, ach: F.ACH.find(x => x.id === 'bio').goals,
                     imgs: F.BIO.filter(b => !F.IMG(b.id)).map(b => b.id), deco: ['deco_bug_hotel', 'deco_eco_pond'].every(k => F.DECO.some(d => d.id === k)) };""")
                 print('60, 90종', r6)
-                ok(r6['n'] == 90 and r6['g60'] == 3 and r6['hotel'] == 1 and r6['gg'] == 4 and r6['e90'] == 50 + 1 and r6['pond'] == 1 and r6['g'] == 5 and r6['title'], f'60, 90종 보상 {r6}')
+                ok(r6['n'] == 150 and r6['g60'] == 3 and r6['hotel'] == 1 and r6['gg'] == 4 and r6['e90'] == 50 + 1 and r6['pond'] == 1 and r6['g'] == 5 and r6['title'], f'60, 90종 보상 {r6}')
                 ok(r6['ach'] == [10, 25, 45, 70, 90] and not r6['imgs'] and r6['deco'], f'업적 목표, 그림, 장식 {r6}')
                 ok(r['open'] and 'NEW' in r['card'] and '멸종위기 야생생물' in r['card'], f'관찰 카드 {r["card"]}')
                 await pg.evaluate(CLEAN)
@@ -106,7 +106,7 @@ async def main():
             r = await ev("""F.setTab('dex'); F.renderHUD && F.renderHUD(); const seg = document.querySelector('#dsegBx'); F.setDexSeg('bx');
               return { seg: !seg.hidden, cards: document.querySelectorAll('#bxDexGrid .bx-card').length };""")
             await pg.wait_for_timeout(500); await pg.screenshot(path=f's95_dex_{w}.png')
-            ok(r['cards'] == 90, f'{w} 도감 {r}')   # 2.3.5 90종
+            ok(r['cards'] == 150, f'{w} 도감 {r}')   # 2.3.5 90종, 5.3.4.8 150종(90종 보상은 그대로 90종에서)
             o = await pg.evaluate(OVER + "('#bxPane, #bxPane *')"); ok(not o, f'{w} 도감이 넘쳐요 {o[:4]}')
             ok(not errs, f'{w} 페이지 오류 {errs}')
             await ctx.close()
