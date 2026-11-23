@@ -118,8 +118,9 @@
     (x.roster || []).slice(0, Math.min(G.campus ? 6 : 8, G.spots.length)).forEach((r, i) => { const [kx, ky] = G.spots[i]; items.push({ y: ky + 11, s: `<g transform="translate(${kx} ${ky})${G.campus ? ' scale(.66)' : ''}">${kidSVG(r.sp, i)}</g>` }); });
     items.sort((a, b) => a.y - b.y);
     // 캠퍼스 지도: 구역 이름표(배지 없이). 눌러서 그 구역 모습을 봐요
-    if (G.campus) tags.push('<g id="tvZones">' + CAMPUS.zones.map(z => { const [tx, ty] = z.tag, [hx, hy, hw, hh] = z.hit, w = z.name.length * 11.5 + 18;
-      return `<g class="cz${z.lock ? ' lock' : ''}" data-tvzone="${z.lock ? '' : z.key}"><rect class="cz-hit" x="${hx}" y="${hy}" width="${hw}" height="${hh}" rx="18"/><g transform="translate(${tx} ${ty})"><rect class="cz-plate" x="${-w / 2}" y="-10" width="${w}" height="20" rx="10"/><text class="cz-name" y="4">${z.name}</text></g></g>`; }).join('') + '</g>');
+    // 5.3.4.7: 연구 구역은 대학원 것이라 대학교 시절 모습에서는 잠가요(지금 학교급이 아니라 보는 학교급으로)
+    if (G.campus) tags.push('<g id="tvZones">' + CAMPUS.zones.map(z => { const [tx, ty] = z.tag, [hx, hy, hw, hh] = z.hit, w = z.name.length * 11.5 + 18, lk = z.key === 'lab' ? !gradOn(t) : z.lock;
+      return `<g class="cz${lk ? ' lock' : ''}" data-tvzone="${lk ? '' : z.key}"><rect class="cz-hit" x="${hx}" y="${hy}" width="${hw}" height="${hh}" rx="18"/><g transform="translate(${tx} ${ty})"><rect class="cz-plate" x="${-w / 2}" y="-10" width="${w}" height="20" rx="10"/><text class="cz-name" y="4">${z.name}</text></g></g>`; }).join('') + '</g>');
     $('#tvMap').innerHTML = h + items.map(o => o.s).join('') + tags.join('');
   }
   /* ---------- 전학 대화 ----------
@@ -167,11 +168,11 @@
   function talkLine() {
     const T = rt.talkSeq; if (!T) return;
     const L = T.lines[T.i], hh = L.who === 'hedgehog';
-    $('#talkAv').innerHTML = hh ? hedgehogAvatar() : kidAvatar(L.who);
-    $('#talkAv').classList.toggle('kid', !hh);
+    $('#talkAv').innerHTML = hh ? hedgehogAvatar() : L.av || kidAvatar(L.who);   // 오늘의 손님은 그림(L.av)
+    $('#talkAv').classList.toggle('kid', !hh && !L.av);
     $('#talkWho').textContent = hh ? '교감 고슴도치' : T.n.lab || `새 친구 ${T.n.name}`;   // 반짝 친구는 lab
     $('#talkText').textContent = nl(headText(L.t));
-    $('#talkNext').textContent = T.i >= T.lines.length - 1 ? '반가워요!' : '다음';
+    $('#talkNext').textContent = T.i >= T.lines.length - 1 ? T.ok || '반가워요!' : '다음';
     $('#talkStep').textContent = `${T.i + 1} / ${T.lines.length}`;
   }
   function talkNext() {

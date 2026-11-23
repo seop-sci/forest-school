@@ -146,7 +146,7 @@
   const taDue = () => !S || !S.ta ? [] : S.ta.out.filter(o => gameNow() >= o.end);
   const taB = () => facKeys().filter(k => S.f[k] >= 1);   // 앉힐 수 있는 건물: 지은 캠퍼스 건물
   function taSit(i, k) {
-    if (!taOpen() || i < 0 || i >= taSeats() || taOut(i)) return false;
+    if (!taOpen() || i < 0 || i >= taSeats()) return false;   // 5.3.4.7: 파견 중에도 돌아와서 일할 자리를 정할 수 있어요(효과는 돌아온 뒤부터)
     if (k && (!FAC[k] || !(S.f[k] >= 1))) return false;
     for (let j = 0; j < S.ta.seat.length; j++) if (j !== i && S.ta.seat[j] && S.ta.seat[j].b === k && k) S.ta.seat[j] = { b: '' };   // 한 건물에 한 명: 앉아 있던 조교는 비켜요
     while (S.ta.seat.length <= i) S.ta.seat.push({ b: '' });
@@ -299,10 +299,11 @@
     for (let i = 0; i < n; i++) {
       const x = S.ta.seat[i] || { b: '' }, o = S.ta.out.find(y => y.i === i), w = taWho(i), u = IMG('chr_ta_' + w) || IMG('chr_' + w);
       const st = o ? (now >= o.end ? `숲속 ${TA.school[o.to]}에서 돌아왔어요` : `숲속 ${TA.school[o.to]}에 가 있어요<br>${hms(o.end - now)} 뒤에 돌아와요`) : x.b && FAC[x.b] ? `${FAC[x.b].name}에서 일해요` : '빈자리예요';
-      const btn = o ? (now >= o.end ? `<button class="cta small" type="button" data-ta="claim">받기</button>` : '<span class="fe-lock">파견 중</span>')
+      const seatTx = o && x.b && FAC[x.b] ? `<br>돌아오면 ${FAC[x.b].name}에서 일해요` : '';
+      const btn = o ? (now >= o.end ? `<button class="cta small" type="button" data-ta="claim">받기</button>` : `<button class="btn-sub small" type="button" data-ta="pick:${i}">자리 정하기</button><span class="fe-lock">파견 중</span>`)
         : `<button class="btn-sub small" type="button" data-ta="pick:${i}">자리 정하기</button><button class="cta small" type="button" data-ta="go:${i}">파견</button>`;
-      h += `<div class="dp-row"><span class="dp-ic">${u ? `<img src="${u}" alt="">` : ''}</span><div class="dp-tx"><b>${TA.whoNm[w]} 조교</b><small>${st}</small></div><span class="ta-btns">${btn}</span></div>`;
-      if (rt.taPick === i && !o) h += '<div class="ta-pick">' + taB().map(k => `<button class="${x.b === k ? 'cta' : 'btn-sub'} small" type="button" data-ta="sit:${i}:${k}">${FAC[k].name}</button>`).join('') + (x.b ? `<button class="btn-sub small" type="button" data-ta="sit:${i}:">비우기</button>` : '') + '</div>';
+      h += `<div class="dp-row"><span class="dp-ic">${u ? `<img src="${u}" alt="">` : ''}</span><div class="dp-tx"><b>${TA.whoNm[w]} 조교</b><small>${st}${seatTx}</small></div><span class="ta-btns">${btn}</span></div>`;
+      if (rt.taPick === i) h += '<div class="ta-pick">' + taB().map(k => `<button class="${x.b === k ? 'cta' : 'btn-sub'} small" type="button" data-ta="sit:${i}:${k}">${FAC[k].name}</button>`).join('') + (x.b ? `<button class="btn-sub small" type="button" data-ta="sit:${i}:">비우기</button>` : '') + '</div>';
       if (rt.taGo === i && !o) h += '<div class="ta-go"><p class="ta-go-h">1. 얼마나 다녀올까요?</p><div class="ta-hrs">'
         + TA.hrs.map((_, k) => `<button class="ta-hr${k === hr ? ' on' : ''}" type="button" data-ta="hr:${i}:${k}" aria-pressed="${k === hr}"><b>${rtHrs(taSec(k))}</b><small>정수 ${Math.round(TA.ess[k] * mul)}<br>추억 조각 ${Math.round(TA.mem[k] * mul)}</small></button>`).join('')
         + '</div><p class="ta-go-h">2. 어느 모교에 보낼까요?</p>'

@@ -589,6 +589,7 @@
       if (r && !rt.qr[s.id] && !silent) { sfx('done'); toast(`${WHO[s.who]}의 부탁을 들어줬어요! 노란 쪽지를 눌러 보상을 받아요`); }
       rt.qr[s.id] = r;
     }
+    if (!silent) gsCheck(); else rt.qr.guest = gsReady();
   }
   function claimMain(fromEl) {
     const q = curMain();
@@ -789,7 +790,7 @@
   }
 
   /* 퀘스트 탭 */
-  const questKey = () => `${S.q.m}|${mainReady() ? 1 : 0}|${S.q.subs.map(s => s.id + (subReady(s) ? '!' : '')).join(',')}`;
+  const questKey = () => `${S.q.m}|${mainReady() ? 1 : 0}|${S.q.subs.map(s => s.id + (subReady(s) ? '!' : '')).join(',')}|${gsKey()}`;
   function renderQuestPanel(force) {
     if (rt.tab !== 'quests') return;
     if (force) $('#qDaily').dataset.key = '';
@@ -839,12 +840,13 @@
       subs = S.q.subs.map(s => questCard(s, s.b, { ref: s.id, kid: true, av: kidAvatar(s.who), name: WHO[s.who], say: `“${s.say}”`, badge: s.nw ? '새 부탁' : '' })).join('');
       if (S.q.subs.length < subSlots()) subs += '<p class="qempty">새 부탁을 기다리고 있어요. 메인 퀘스트를 진행하면 학생들이 또 찾아와요.</p>';
     }
-    $('#qSubs').innerHTML = subs;
+    $('#qSubs').innerHTML = gsCardHTML() + subs;   // 5.3.4.7 오늘의 손님 칸은 학생 부탁 위에
     $('#qTally').textContent = S.q.subDone > 0 ? `지금까지 들어준 부탁 ${S.q.subDone}개` : '';
   }
   function updateQuestProgress() {
     $$('#panelQuests [data-qp]').forEach(card => {
       const ref = card.dataset.qp;
+      if (ref === 'guest') { gsCardUpdate(card); return; }
       const q = ref === 'main' ? curMain() : S.q.subs.find(s => s.id === ref);
       if (!q) return;
       const p = qProg(q, ref === 'main' ? S.q.mb : q.b);
@@ -855,7 +857,7 @@
   function updateQuestDot() {
     dmDay(); lgWeek(); wkWeek();
     // 이벤트에서 받을 것은 이벤트 버튼의 점(#evDot)으로만 알려요(받을 퀘스트가 없는데 퀘스트 점이 남아요)
-    const on = rt.tab !== 'quests' && (mainReady() || S.q.subs.some(s => subReady(s)) || dmClaimable() || wkClaimable());   // 새 부탁만으로는 점을 켜지 않아요
+    const on = rt.tab !== 'quests' && (mainReady() || S.q.subs.some(s => subReady(s)) || gsReady() || dmClaimable() || wkClaimable());   // 새 부탁만으로는 점을 켜지 않아요
     $('#qDot').hidden = !on;
   }
   function markQuestsSeen() { S.q.seen = S.q.m; S.q.subs.forEach(s => { s.nw = false; }); }
