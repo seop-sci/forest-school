@@ -191,7 +191,7 @@
     // 홈 UI 정리: 오른쪽 메뉴 레일이 가리는 폭. 행사 아이템과 떨어진 도토리가 레일 밑에 나오지 않게 visMap()에서 빼요
     const mr = $('.map-right'), mrr = mr && mr.offsetParent ? mr.getBoundingClientRect() : null;
     rt.hudRight = mrr && mrr.width ? Math.max(0, Math.round(f.right - mrr.left)) : 0;
-    const bot = f.bottom - $('.tabs').getBoundingClientRect().top;
+    const kb = $('#kbBand'), bot = f.bottom - Math.min($('.tabs').getBoundingClientRect().top, kb && !kb.hidden ? kb.getBoundingClientRect().top : Infinity);   // 키우기 띠 시제품이 있으면 그 위까지
     app.style.setProperty('--hud-h', Math.round(b.bottom - f.top) + 'px');
     app.style.setProperty('--left-h', Math.round(left) + 'px');
     app.style.setProperty('--bot-h', Math.max(0, Math.round(bot)) + 'px');

@@ -203,7 +203,7 @@
   function tamLvAllAsk() {
     const P = tamLvAllPlan(); if (!P.n) return;
     // 쓰는 도토리, 대원마다 한 줄, 탐험대 힘을 나눠서 보여 줘요(예전에는 창을 열 때 줄바꿈이 지워져 한 덩어리로 보였어요)
-    const rows = P.up.filter(u => u.b > u.a).map(u => `<span class="ask-row"><i>${esc(spName(u.sp))}</i><span>Lv.${u.a} → <b>${u.b}</b></span><em>+${u.b - u.a}</em></span>`).join('');
+    const rows = P.up.filter(u => u.b > u.a).map(u => `<span class="ask-row"><i>${esc(tamNm(u.sp))}</i><span>Lv.${u.a} → <b>${u.b}</b></span><em>+${u.b - u.a}</em></span>`).join('');
     askBox({ title: '출동 대원 고르게 올리기', yes: '올리기', no: '그만두기',
       html: `<span class="ask-sum">${acornIcon()}<b>${fmtN(P.cost)}</b>${eulOf(fmtN(P.cost))} 써요</span><span class="ask-sub">남는 도토리 ${fmtN(P.left)}</span><span class="ask-rows">${rows}</span><span class="ask-sum">탐험대 힘 ${fmt(P.pw0)} → <b>${fmt(P.pw1)}</b></span>`,
       onYes: () => { let n = 0;   // 보여 준 그대로 올려요(창을 보는 동안 들어온 도토리로 더 올리지 않아요)
@@ -221,7 +221,7 @@
     if (!tamOn() || !tamStarOn() || !DEX_STUDENTS.includes(sp)) return;
     const m = tamMem(sp); if (m.st >= 5) return;
     m.sh += n;
-    while (m.st < 5 && m.sh >= tamStarNeed(m.st + 1)) { m.sh -= tamStarNeed(m.st + 1); m.st += 1; tamToast(`${spName(sp)} 대원 별이 올랐어요! ★${m.st}`); }
+    while (m.st < 5 && m.sh >= tamStarNeed(m.st + 1)) { m.sh -= tamStarNeed(m.st + 1); m.st += 1; tamToast(`${tamNm(sp)} 대원 별이 올랐어요! ★${m.st}`); }
     if (rt.tab === 'tam') tamRenderBody();
   }
   function tamWin(fl) {
@@ -257,7 +257,7 @@
     if (first && fl % TAM.bossEvery === 0 && ppData(PP.dat.boss)) got.push(`연구 자료 +${PP.dat.boss}`);   // 심화 큰 장난꾸러기 처음 넘기
     tamHWeek(); if (fl > S.tam.hw.best) { S.tam.hw.best = fl; rankDirty(); }
     add(R.mat, Math.round(TAM.hMat * (2 + Math.floor((S.tam.hc + fl) / 40)))); if (fl % 5 === 0) add(3, 1);
-    if (fl % TAM.bossEvery === 0) { const ps = tamParty(); if (tamStarOn() && ps.length) { const sp = ps[Math.floor(Math.random() * ps.length)]; tamShard(sp, 1); got.push(`${spName(sp)} 별 조각 +1`); } else { add(3, 2); got.push(`${TAM.mats[3]} +2`); } }
+    if (fl % TAM.bossEvery === 0) { const ps = tamParty(); if (tamStarOn() && ps.length) { const sp = ps[Math.floor(Math.random() * ps.length)]; tamShard(sp, 1); got.push(`${tamNm(sp)} 별 조각 +1`); } else { add(3, 2); got.push(`${TAM.mats[3]} +2`); } }
     if (fl % 50 === 0) { for (let i = 0; i < 4; i++) add(i, i === 3 ? 10 : 30); const ps = tamParty(); if (ps.length) tamShard(ps[Math.floor(Math.random() * ps.length)], 3); got.push('금빛 보물 상자'); }
     if (got.length) { if (rt.tamQ) rt.tamQ.push(...got); else tamToast(`심화 ${fl}층 통과!\n${got.join('\n')}`); }
     if (fl % 10 === 0) save();
@@ -404,7 +404,7 @@
     if (E.k === 'chest') { const n = 3 + Math.floor(E.fl / 15); S.tam.mat[R.mat] = Math.min(1e12, S.tam.mat[R.mat] + n); if (E.fl >= 5) S.tam.mat[3] = Math.min(1e12, S.tam.mat[3] + 1); msg = `보물 상자에서\n${TAM.mats[R.mat]} +${n}${E.fl >= 5 ? `, ${TAM.mats[3]} +1` : ''}`; }
     else if (E.k === 'spring') { T.mod = { hp: 1.3 }; msg = '다음 층에서 체력이 30% 많아요'; }
     else if (E.k === 'fork') { if (pick === 1) { T.mod = { hard: 1 }; msg = '숲길로 가요. 조심해요!'; } else msg = '큰길로 가요'; }
-    else if (E.k === 'lost') { if (tamStarOn() && E.sp) { tamShard(E.sp, 1); msg = `${spName(E.sp)} 별 조각 +1`; } else { const a = minAcorns(1); S.budget += a; earn(a); msg = `도토리 +${fmt(a)}`; } }
+    else if (E.k === 'lost') { if (tamStarOn() && E.sp) { tamShard(E.sp, 1); msg = `${tamNm(E.sp)} 별 조각 +1`; } else { const a = minAcorns(1); S.budget += a; earn(a); msg = `도토리 +${fmt(a)}`; } }
     T.ev = null; save(); tamLiveDots();
     const c = $('#tmEv'); if (c) c.hidden = true;
     if (msg && tamFxOn()) tamToast(msg);
@@ -491,7 +491,7 @@
     const party = F ? F.P : tamTeam();
     $('#tmP').dataset.fid = F ? F.id : ''; $('#tmM').dataset.fid = F ? F.id : ''; $('#tmP').classList.remove('walking', 'enter', 'jump');
     setH($('#tmP'), party.map((p, i) => { const [x, y] = TM_PPOS[i] || TM_PPOS[0];
-      return `<div class="tm-f" data-i="${i}" style="left:${x}%;bottom:${y + TM_UP}%;z-index:${30 - y};${tamDz(y)}--bd:-${(i * 0.37).toFixed(2)}s;--bd2:${(i * 0.06).toFixed(2)}s"><div class="tm-body"><img src="${tamPcPic(p.sp)}" alt="${esc(spName(p.sp))}"></div><i class="tm-hp"><s></s><b></b></i></div>`; }).join(''));
+      return `<div class="tm-f" data-i="${i}" style="left:${x}%;bottom:${y + TM_UP}%;z-index:${30 - y};${tamDz(y)}--bd:-${(i * 0.37).toFixed(2)}s;--bd2:${(i * 0.06).toFixed(2)}s"><div class="tm-body"><img src="${tamPcPic(p.sp)}" alt="${esc(tamNm(p.sp))}"></div><i class="tm-hp"><s></s><b></b></i></div>`; }).join(''));
     if (!F) { setH($('#tmM'), ''); return; }
     const pos = boss ? TM_BPOS : F.M.length === 1 ? TM_MPOS1 : F.M.length === 2 ? TM_MPOS2 : TM_MPOS;   // 마리 수에 맞춘 자리
     setH($('#tmM'), F.M.map((m, i) => { const [x, y] = pos[i] || pos[0];
@@ -728,7 +728,7 @@
     const team = tamTeam(), pp = $('#tmP');
     pp.dataset.fid = 'walk';
     setH(pp, team.map((p, i) => { const [x, y] = TM_PPOS[i] || TM_PPOS[0];
-      return `<div class="tm-f" data-i="${i}" style="left:${x}%;bottom:${y + TM_UP}%;z-index:${30 - y};${tamDz(y)}--bd:-${(i * 0.13).toFixed(2)}s"><div class="tm-body"><img src="${tamPcPic(p.sp)}" alt="${esc(spName(p.sp))}"></div><i class="tm-hp"><s></s><b style="width:100%"></b></i></div>`; }).join(''));
+      return `<div class="tm-f" data-i="${i}" style="left:${x}%;bottom:${y + TM_UP}%;z-index:${30 - y};${tamDz(y)}--bd:-${(i * 0.13).toFixed(2)}s"><div class="tm-body"><img src="${tamPcPic(p.sp)}" alt="${esc(tamNm(p.sp))}"></div><i class="tm-hp"><s></s><b style="width:100%"></b></i></div>`; }).join(''));
     setH($('#tmM'), ''); $('#tmM').dataset.fid = '';
     if (T.nLose) pp.classList.add('enter'); else pp.classList.remove('enter');
     pp.classList.add('walking'); clearTimeout(pp._t); const ms = TAM.ph.walk / tamSpdK() * 1000; pp._t = setTimeout(() => pp.classList.remove('walking', 'enter'), ms);
@@ -810,7 +810,7 @@
   function tamSkills(upd) {
     const box = $('#tmSk'), F = rt.tam && rt.tam.F; if (!box) return;
     const P = F ? F.P : tamTeam().map(s => ({ ...s, g: 0, hp: 1 }));
-    if (!upd || box.children.length !== P.length) setH(box, P.map((p, i) => `<button type="button" class="tm-sk" data-tsk="${i}" aria-label="${esc(spName(p.sp))} 필살기 ${esc(TM_SK[p.ri].n)}"><img src="${IMG('chr_' + p.sp) || ''}" alt=""><i></i><small>${esc(TM_SK[p.ri].s)}</small></button>`).join(''));
+    if (!upd || box.children.length !== P.length) setH(box, P.map((p, i) => `<button type="button" class="tm-sk" data-tsk="${i}" aria-label="${esc(tamNm(p.sp))} 필살기 ${esc(TM_SK[p.ri].n)}"><img src="${IMG('chr_' + p.sp) || ''}" alt=""><i></i><small>${esc(TM_SK[p.ri].s)}</small></button>`).join(''));
     $$('.tm-sk', box).forEach((b, i) => { const p = P[i]; if (!p) return; const r = Math.min(1, p.g / TAM.gauge); b.style.setProperty('--g', (r * 100).toFixed(0) + '%'); b.classList.toggle('ready', r >= 1 && p.hp > 0); b.classList.toggle('out', p.hp <= 0); });
     if (F && !rt.tamTip && S.tam.best < 2 && P.some(p => p.hp > 0 && p.g >= TAM.gauge)) { rt.tamTip = 1; tamToast('게이지가 다 찼어요!\n반짝이는 대원 얼굴을 눌러요'); }   // 처음 1~2층 안내(켤 때마다 한 번)
   }
@@ -892,12 +892,12 @@
       const party = tamParty(), slots = tamSlots(), auto = tamAutoTeam(), same = auto.length === party.length && auto.every(k => party.includes(k));
       const R = rec.mem, rs = R && tamStat(R.sp);
       let h = '';
-      if (R) h += `<div class="tm-rec"><span class="tm-rtag">추천 강화</span><img src="${tamPcPic(R.sp)}" alt=""><div class="tm-rtx"><b>${esc(spName(R.sp))} Lv.${tamMem(R.sp).lv} → ${tamMem(R.sp).lv + 1}</b><small>탐험대 힘 +${fmt(Math.max(1, Math.round(R.g)))}</small><small class="tm-hold">👆 꾹 누르면 계속 올라가요</small></div>` +
+      if (R) h += `<div class="tm-rec"><span class="tm-rtag">추천 강화</span><img src="${tamPcPic(R.sp)}" alt=""><div class="tm-rtx"><b>${esc(tamNm(R.sp))} Lv.${tamMem(R.sp).lv} → ${tamMem(R.sp).lv + 1}</b><small>탐험대 힘 +${fmt(Math.max(1, Math.round(R.g)))}</small><small class="tm-hold">👆 꾹 누르면 계속 올라가요</small></div>` +
         `<button type="button" class="cta small" data-tlv="${R.sp}"${S.budget >= R.c ? '' : ' aria-disabled="true"'}>${acornIcon()}${fmt(R.c)}</button></div>`;
       h += `<div class="tm-party">${Array.from({ length: 5 }, (_, i) => { const sp = party[i];
         if (i >= slots) return `<div class="tm-slot lock"><span>🔒</span><small>${i === 3 ? '초등학교' : '중학교'}</small></div>`;
         if (!sp) return `<div class="tm-slot empty"><span>+</span></div>`;
-        const s = tamStat(sp); return `<div class="tm-slot" style="--rc:${TM_RC[TAM.role[s.ri].k]}"><img src="${tamPcPic(sp)}" alt=""><em>Lv.${tamMem(sp).lv}</em><small>${esc(spName(sp))}</small></div>`; }).join('')}</div>`;
+        const s = tamStat(sp); return `<div class="tm-slot" style="--rc:${TM_RC[TAM.role[s.ri].k]}"><img src="${tamPcPic(sp)}" alt=""><em>Lv.${tamMem(sp).lv}</em><small>${esc(tamNm(sp))}</small></div>`; }).join('')}</div>`;
       { const R0 = tamReg(tamCurFl()), ar = TAM.role[tamAdvRi()], cl = tamCollLv();
         h += `<div class="tm-tips"><p><b class="tm-role" style="--rc:${TM_RC[ar.k]}">${esc(ar.nm.split(' ')[0])}</b> ${esc(R0.nm)}에서 힘 +${Math.round(TAM.advG * 100)}%</p>` +
           `<p><b class="tm-role">모은 대원 효과</b> 대원 레벨 합 ${fmt(cl)} → 힘 +${(Math.min(TAM.collMax, 1 + TAM.collG * cl) * 100 - 100).toFixed(1)}%</p></div>`; }
@@ -911,7 +911,7 @@
         const lvN = rt.tamLvN || 1, P = lvN > 1 ? tamLvPlan(sp, lvN) : null, c = P && P.k ? P.sum : tamLvCost(sp), can = S.budget >= c;   // 한 번에 여러 레벨
         const st = tamStarOn() ? `<span class="tm-st">${'★'.repeat(m.st)}<i>${'★'.repeat(5 - m.st)}</i></span>${m.st < 5 ? `<small class="tm-sh">별 조각 ${m.sh}/${tamStarNeed(m.st + 1)}</small>` : ''}` : '';
         return `<div class="tm-mem${on ? ' on' : ''}${best ? ' best' : ''}"><span class="tm-face" style="--rc:${TM_RC[r.k]}"><img src="${tamPcPic(sp)}" alt="">${on ? '<i>출동</i>' : ''}</span>` +
-          `<div class="tm-mtx"><b>${esc(spName(sp))}<em>Lv.${m.lv}</em>${sug ? '<u>추천</u>' : ''}${s.ri === tamAdvRi() ? '<u class="adv">유리</u>' : ''}</b><span class="tm-role" style="--rc:${TM_RC[r.k]}">${r.nm}</span><small>힘 ${fmt(Math.round(s.atk))}  체력 ${fmt(Math.round(s.hp))}</small>${st}</div>` +
+          `<div class="tm-mtx"><b>${esc(tamNm(sp))}<em>Lv.${m.lv}</em>${sug ? '<u>추천</u>' : ''}${s.ri === tamAdvRi() ? '<u class="adv">유리</u>' : ''}</b><span class="tm-role" style="--rc:${TM_RC[r.k]}">${r.nm}</span><small>힘 ${fmt(Math.round(s.atk))}  체력 ${fmt(Math.round(s.hp))}</small>${st}</div>` +
           `<div class="tm-mbt"><button type="button" class="cta small" data-tlv="${sp}"${can ? '' : ' aria-disabled="true"'}>${P && P.k > 1 ? `<i class="tm-lvk">+${P.k}</i>` : ''}${acornIcon()}${fmt(c)}</button><button type="button" class="btn-sub small" data-tpick="${sp}">${on ? '빼기' : '편성'}</button></div></div>`;
       }).join('');
       setH(box, h);
@@ -925,7 +925,7 @@
       h += Array.from({ length: 5 }, (_, i) => {
         const p = team[i], lock = i >= slots;
         if (lock) return `<div class="tm-sgc lock"><div class="tm-sgh"><b>${i + 1}번 칸</b><span>${TAM.slotNm[i]}</span><small>🔒 ${i === 3 ? '초등학교' : '중학교'}부터 열려요</small></div></div>`;
-        return `<div class="tm-sgc"><div class="tm-sgh"><b>${i + 1}번 칸</b><span>${TAM.slotNm[i]}</span>${p ? `<em class="tm-sgw"><img src="${tamPcPic(p.sp)}" alt="">${esc(spName(p.sp))}</em>` : '<em class="tm-sgw none">비어 있음</em>'}</div><div class="tm-sgg">` +
+        return `<div class="tm-sgc"><div class="tm-sgh"><b>${i + 1}번 칸</b><span>${TAM.slotNm[i]}</span>${p ? `<em class="tm-sgw"><img src="${tamPcPic(p.sp)}" alt="">${esc(tamNm(p.sp))}</em>` : '<em class="tm-sgw none">비어 있음</em>'}</div><div class="tm-sgg">` +
           TAM.gear.map(G => { const L = S.tam.sg[i][G.k], c = tamGearCost(G.k, i), can = S.tam.mat[c.m] >= c.n && S.tam.mat[3] >= c.star, gu = IMG(`ex_gear_${G.k}_${tamGrade(L)}`), best = rg && rg.i === i && rg.k === G.k;
             return `<div class="tm-gi g${tamGrade(L)}${best ? ' best' : ''}">${best ? '<u>추천</u>' : ''}<span class="tm-gim">${gu ? `<img src="${gu}" alt="">` : G.ic}<em>Lv.${L}</em></span><small>${G.hint} +${Math.round(TAM.gearPer * L * 100)}%</small>` +
               `<button type="button" class="cta small" data-tgear="${i}:${G.k}"${can ? '' : ' aria-disabled="true"'}>${tamMatIc(c.m, 16)}${c.n}${c.star ? ` ${tamMatIc(3, 16)}${c.star}` : ''}</button></div>`; }).join('') + '</div></div>';
@@ -998,7 +998,7 @@
     }
     if (b.dataset.tlvn) { rt.tamLvN = b.dataset.tlvn === 'max' ? Infinity : +b.dataset.tlvn; sfx('tap'); tamRenderBody(); return; }
     if (b.dataset.tlvall) { sfx('tap'); tamLvAllAsk(); return; }   // 미리 보기 창 뒤에 올려요
-    if (b.dataset.tlv) { const sp = b.dataset.tlv, inRec = !!b.closest('.tm-rec'), n = tamLvBuy(sp, inRec ? 1 : (rt.tamLvN || 1)); if (!n) return; tamLvFx([sp]); tamRestartStat(); sfx('coin'); buzz(10); save(); renderHUD(); tamRenderTop(); tamRenderBody(); if (n > 1) tamToast(`${spName(sp)} 레벨 +${n}`); return; }
+    if (b.dataset.tlv) { const sp = b.dataset.tlv, inRec = !!b.closest('.tm-rec'), n = tamLvBuy(sp, inRec ? 1 : (rt.tamLvN || 1)); if (!n) return; tamLvFx([sp]); tamRestartStat(); sfx('coin'); buzz(10); save(); renderHUD(); tamRenderTop(); tamRenderBody(); if (n > 1) tamToast(`${tamNm(sp)} 레벨 +${n}`); return; }
     if (b.dataset.tgear) { const [si, k] = b.dataset.tgear.split(':'); if (!tamGearBuy(+si, k)) return; tamRestartStat(); sfx('coin'); save(); tamRenderTop(); tamRenderBody(); return; }
     if (b.id === 'tmSpd') { tamAdSpd(); return; }
     if (b.id === 'tmSkip') { tamSkipGo(); return; }
