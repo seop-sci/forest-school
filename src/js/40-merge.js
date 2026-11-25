@@ -100,7 +100,7 @@
   }
   // 보상으로 받는 에너지는 100을 넘어도 돼요(회복만 100에서 멈춰요)
   function mgAddEnergy(n) { mgTick(); S.mg.e = Math.min(MG.ECAP, S.mg.e + n); if (S.mg.e >= mgEMax()) S.mg.eAt = gameNow(); }
-  /* 조정안 4: 생산기 넷이 모두 Lv.5면 더 쓸 곳이 없으니, 그 뒤 받는 강화 조각 하나는 숲의 정수 5개로 바꿔 줘요
+  /* 생산기 넷이 모두 Lv.5면 더 쓸 곳이 없으니, 그 뒤 받는 강화 조각 하나는 숲의 정수 5개로 바꿔 줘요
      받은 것을 보상 칸 모양({ ic, t })으로 돌려줘요 */
   const MG_UP_ESS = 5;
   const mgGensMax = () => { const c = mgCells(); return MG_GENS.every(G => c.some(x => x[0] === G && mgLvOf(x[1]) >= 5)); };
@@ -663,7 +663,7 @@
     mgUI.drag = null;
   }
   function mgOpen() {
-    useLog('mg');   // 5.4.0.3 놀이 기록
+    useLog('mg');   // 놀이 기록
     mgTick();
     if (!FXL.st && wldLv() > 0) { FXL.touched = true; fxLoad(); }   // 엔진을 아직 안 받았으면 지금
     if (FXL.st === 'ok' && !FXO.st) fxoInit();   // 빛 고리 그림판
@@ -689,7 +689,7 @@
     $('#mgUpRow').innerHTML = `${mgTileHtml(code)}<span>Lv.${lv}${lv < 5 ? ` → Lv.${lv + 1}` : ' (최고)'}</span><span>🔑 ${S.mg.up}${lv < 5 ? ` / ${cost}` : ''}</span>`;
     $('#mgUpTable').innerHTML = '<tr><th>레벨</th><th>1단계</th><th>2단계</th><th>3단계</th><th>4단계</th></tr>' + MG.LV.map((row, j) => `<tr class="${j + 1 === lv ? 'now' : ''}"><td>Lv.${j + 1}</td>${[0, 1, 2, 3].map(c => `<td>${row[c] != null ? row[c] + '%' : '-'}</td>`).join('')}</tr>`).join('');
     $('#mgUpNote').textContent = lv >= 5 ? '최고 레벨이에요. 높은 단계가 가장 자주 나와요' : S.mg.up >= cost ? `강화 조각 ${cost}개를 써서 Lv.${lv + 1}로 올려요` : `강화 조각이 ${cost - S.mg.up}개 더 있어야 해요. 이벤트 기념 상자, 주간 상자, 출석 도장 7개, 8단계 이상 주문에서 받아요`;
-    mgUI.upSwap = lv >= 5 && mgGensMax() && S.mg.up > 0;   // 조정안 4: 남은 조각을 정수로
+    mgUI.upSwap = lv >= 5 && mgGensMax() && S.mg.up > 0;   // 남은 조각을 정수로
     if (mgUI.upSwap) $('#mgUpNote').textContent = `생산기가 모두 최고 레벨이에요. 남은 강화 조각 ${S.mg.up}개를 숲의 정수 ${S.mg.up * MG_UP_ESS}개로 바꿀 수 있어요`;
     $('#mgUpYes').textContent = mgUI.upSwap ? '정수로 바꾸기' : '강화하기';
     $('#mgUpYes').hidden = lv >= 5 && !mgUI.upSwap;
@@ -817,7 +817,7 @@
     $('#mgUpNo').addEventListener('click', () => { $('#mgUpSheet').hidden = true; });
     $('#mgUpYes').addEventListener('click', () => { if (mgUI.upSwap ? mgUpSwap() : mgUpgrade(mgUI.upAt)) $('#mgUpSheet').hidden = true; });
     $('#mgUps').addEventListener('click', () => mgUpSwapAsk());
-    $('#mgPieces').addEventListener('click', () => { sfx('tap'); toast(`장식 조각 ${S.mg.pieces}개. 꾸미기 가게에서 5개로 장식 하나를 받아요`); });   // 조정안 4
+    $('#mgPieces').addEventListener('click', () => { sfx('tap'); toast(`장식 조각 ${S.mg.pieces}개. 꾸미기 가게에서 5개로 장식 하나를 받아요`); });
   }
   /* ===== 숲속 합치기 END ===== */
 

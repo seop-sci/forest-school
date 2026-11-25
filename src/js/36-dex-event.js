@@ -7,7 +7,7 @@
 
   // 보상용 분치 보정(공용): 학교급이 오르면 수업료는 1000배, 공사비는 2000배라서 "수업료 몇 분치"의 실제 가치가 학교급마다 절반이 돼요
   // 분치 × 학교급 배수로 공사비 기준 가치를 맞춰요. 기존 퀘스트와 행사 보상에는 쓰지 않아요(수업료 n분치 = rate × 60 × n 그대로).
-  // 조정안 6: 숨은 2^학교급 대신 이름 있는 표. 건물 한 레벨 값을 수업료 분으로 재면(같은 상한 비율에서)
+  // 숨은 2^학교급 대신 이름 있는 표. 건물 한 레벨 값을 수업료 분으로 재면(같은 상한 비율에서)
   // 고등학교는 중학교의 약 4분의 1~3분의 1이라(공사비 배수 2.5e11 ÷ 수업료 1e9 = 250, 중학교 500), 고등학교는 8배가 아니라 중학교와 같은 4배예요.
   // 이 배수를 쓰는 곳: 합치기 주문과 팔기, 대결 첫 승리, 실험, 소풍, 생일, 스티커판, 시험 성적표, 대항전 참가, 생물 중복, 이벤트, 도감, 건설 부스터 값
   const TIER_X = [1, 2, 4, 4, 4, 4];   // 유치원, 초등, 중학교, 고등학교, 대학교(고등학교와 같게)
@@ -24,7 +24,7 @@
     ev_stamp_on: '<svg viewBox="0 0 40 40" aria-hidden="true"><circle cx="20" cy="20" r="17" fill="#C2453A"/><circle cx="20" cy="20" r="12" fill="none" stroke="#FFF6DC" stroke-width="2"/><path d="M13 20l5 5 9-10" fill="none" stroke="#FFF6DC" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"/></svg>',
     ev_stamp_off: '<svg viewBox="0 0 40 40" aria-hidden="true"><circle cx="20" cy="20" r="17" fill="none" stroke="#8A8A7A" stroke-width="2" stroke-dasharray="4 3"/></svg>'
   };
-  // 새 전학생 6종: 그림(작업지시서 20)이 오기 전에는 그림 문자
+  // 새 전학생 6종: 그림이 오기 전에는 그림 문자
   for (const k of Object.keys(KID_EMOJI)) PLACE170['chr_' + k] = `<svg viewBox="0 0 64 64" aria-hidden="true"><text x="32" y="46" text-anchor="middle" font-size="40">${KID_EMOJI[k]}</text></svg>`;
   // 그림이 있으면 <img>, 없으면 임시 도형이나 기존 그림을 그려요. fb는 대신 쓸 기존 그림 열쇠
   const pic7 = (k, fb) => {
@@ -168,7 +168,7 @@
       `<h4 class="dex-h">선생님 <small>${DEX_TEA.filter(k => S.dex.got['tea_' + k]).length} / ${DEX_TEA.length}</small></h4><div class="dex-grid">${DEX_TEA.map(k => dexCard('tea_' + k)).join('')}</div>` +
       `<h4 class="dex-h">특별 손님 <small>${DEX_GUEST_KEYS.filter(k => S.dex.got[k]).length} / ${DEX_GUESTS.length}</small></h4><div class="dex-grid">${DEX_GUEST_KEYS.map(dexCard).join('')}</div>` +
       `<h4 class="dex-h">앞으로 올 친구</h4><div class="dex-grid">${Array.from({ length: DEX_FUTURE }, (_, i) => dexLock('숲속 교육부에서 준비 중')).join('')}</div>`;
-    // 5.3.2.2 T-06: 설명 칸이 누른 카드와 떨어진 맨 위에 나왔어요. 누른 카드가 있는 줄 바로 아래로 옮겨요
+    // T-06: 설명 칸이 누른 카드와 떨어진 맨 위에 나왔어요. 누른 카드가 있는 줄 바로 아래로 옮겨요
     if (pk) { const d = body.querySelector('.dex-detail'), c = body.querySelector(`.dex-card[data-dex="${pk}"]`);
       if (d && c) { let end = c; for (let n = c.nextElementSibling; n && n.classList.contains('dex-card') && n.offsetTop === c.offsetTop; n = n.nextElementSibling) end = n; end.after(d); d.classList.add('in-grid'); } }
   }

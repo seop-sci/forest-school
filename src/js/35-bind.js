@@ -235,7 +235,7 @@
   function wireStreet() {
     $('#btnShop').addEventListener('click', () => { if (!rt.paused && !rt.modalOpen) { sfx('tap'); openShop(); } });
     $('#thPrevBack').addEventListener('click', () => { sfx('tap'); thPreviewEnd(false); });
-    $('#thPrevBuy').addEventListener('click', () => { const id = rt.thPrev && rt.thPrev.id; sfx('tap'); thPreviewEnd(false); if (id) { rt.thOpen = id; pickShop('s:' + id); } });   // 5.3.3 사기 전 확인 줄로
+    $('#thPrevBuy').addEventListener('click', () => { const id = rt.thPrev && rt.thPrev.id; sfx('tap'); thPreviewEnd(false); if (id) { rt.thOpen = id; pickShop('s:' + id); } });   // 사기 전 확인 줄로
     $('#shopList').addEventListener('click', e => {
       const ap = e.target.closest('[data-apply]');
       if (ap) {
@@ -245,7 +245,7 @@
         sfx('tap'); applyCos(); save(); renderShop();
         return;
       }
-      const tf = e.target.closest('[data-thfold]');   // 5.3.3 테마 세트 펼치기
+      const tf = e.target.closest('[data-thfold]');   // 테마 세트 펼치기
       if (tf) { rt.thOpen = rt.thOpen === tf.dataset.thfold ? '' : tf.dataset.thfold; sfx('tap'); renderShop(); return; }
       const pv = e.target.closest('[data-thprev]');
       if (pv) { thPreview(pv.dataset.thprev); return; }
@@ -620,7 +620,7 @@
       rt.conArm = false; tkUseAll(k); renderSheet();
     });
     $('#conNo').addEventListener('click', () => { rt.conArm = false; sfx('tap'); conSheet(); });
-    $('#conMore').addEventListener('click', () => { rt.conMore = !rt.conMore; sfx('tap'); conSheet(); });   // 5.3.2.2 F-05 다른 방법 펼치기
+    $('#conMore').addEventListener('click', () => { rt.conMore = !rt.conMore; sfx('tap'); conSheet(); });   // F-05 다른 방법 펼치기
     // 즉시 완공 단추와 숲의 정수로 즉시 완료
     $('#sheetFree').addEventListener('click', () => {
       const k = rt.sheetKey; if (!k) return;
@@ -755,7 +755,7 @@
     $('#sheetRx').addEventListener('click', () => viaSheet(openRx));
     $('#rxSeg').addEventListener('click', e => { const b = e.target.closest('[data-rseg]'); if (!b) return; rt.rxTab = b.dataset.rseg; sfx('tap'); renderRx(); });
     $('#rxBody').addEventListener('click', e => { const b = e.target.closest('[data-rt],[data-rts],[data-pp],[data-dp^="rx:"],[data-ta],[data-lab]'); if (!b) return;
-      if (b.dataset.lab) { labClick(b); return; }   // 5.4.0.4 연구소 시간 줄이기
+      if (b.dataset.lab) { labClick(b); return; }   // 연구소 시간 줄이기
       if (b.dataset.pp) { const v = b.dataset.pp; if (v === 'day') ppDay(); else if (v.startsWith('w:')) ppWrite(v.slice(2)); renderRx(); return; }   // 논문
       if (b.dataset.rts) { rt.rtSel = b.dataset.rts; sfx('tap'); renderRx(); return; }   // 연구 나무 칸 고르기
       if (b.dataset.ta) { const [a, x, y, z] = b.dataset.ta.split(':'); const i = +x;   // 조교
@@ -790,7 +790,7 @@
     $('#nsGo').addEventListener('click', () => { if (nsStart()) renderNs(); });
     $('#nsSubs').addEventListener('click', e => { const b = e.target.closest('[data-ns]'); if (!b || b.getAttribute('aria-disabled') === 'true' || nsUsedTonight()) return; rt.nsSub = b.dataset.ns; S.ns.sub = rt.nsSub; save(); renderNs(); });
     $('#snBtns').addEventListener('click', e => { const b = e.target.closest('[data-sn]'); if (!b) return;
-      if (b.dataset.sn === '10' && b.getAttribute('aria-disabled') !== 'true') { sfx('tap'); askRow($('#snBtns'), `도토리 ${fmt(snCost(true))}개로 10번 뽑을까요?`, '10번 뽑기', () => snDraw(true)); return; }   // 5.3.3 큰 값은 한 번 더 물어요
+      if (b.dataset.sn === '10' && b.getAttribute('aria-disabled') !== 'true') { sfx('tap'); askRow($('#snBtns'), `도토리 ${fmt(snCost(true))}개로 10번 뽑을까요?`, '10번 뽑기', () => snDraw(true)); return; }   // 큰 값은 한 번 더 물어요
       askRowOff(); snDraw(b.dataset.sn === '10'); });
     $('#bxDexBtn').addEventListener('click', () => { sfx('tap'); closeModal($('#mBx')); setTimeout(() => { setTab('dex'); setDexSeg('bx'); }, 240); });
     $('#sheetGarden').addEventListener('click', () => { closeSheet(); setTimeout(openGd, 240); });
@@ -820,7 +820,7 @@
   function wireCare() {
     // 마을 기부 창
     $('#vdBtns').addEventListener('click', e => { const b = e.target.closest('[data-vdk]'); if (!b) return; const k = b.dataset.vdk;
-      if (k === 'left' && S.budget >= vdLeft()) { sfx('tap'); askRow($('#vdBtns'), `도토리 ${fmt(vdLeft())}개를 기부해 ${S.vd.lv + 1}단계로 올릴까요?`, '기부하기', () => vdGive('left')); return; }   // 5.3.3 남은 만큼은 한 번 더 물어요
+      if (k === 'left' && S.budget >= vdLeft()) { sfx('tap'); askRow($('#vdBtns'), `도토리 ${fmt(vdLeft())}개를 기부해 ${S.vd.lv + 1}단계로 올릴까요?`, '기부하기', () => vdGive('left')); return; }   // 남은 만큼은 한 번 더 물어요
       askRowOff(); vdGive(k === 'all' ? k : Number(k)); });
     $('#albLetter').addEventListener('click', () => { const pg = S.alb[rt.albPage]; if (pg && pg.ltr) { closeModal($('#mAlbum')); setTimeout(() => openLetter(pg, true), 240); } });
     $('#ltPrev').addEventListener('click', () => { if (rt.plAt != null) openPLetter(rt.plAt - 1, true); });   // 학부모 편지함
@@ -841,8 +841,8 @@
   // 퀘스트 쪽지와 퀘스트 탭
   function wireQuests() {
     // 퀘스트 쪽지: 완료했으면 보상 받기, 아니면 해야 할 곳으로 바로 가기
-    ['#sheetQReady', '#teaQReady'].forEach(id => $(id).addEventListener('click', e => { e.stopPropagation(); sfx('tap'); qReadyTap(e.currentTarget); }));   // 5.3.2.2 F-04
-    // 5.3.2.2 H-07: 현황판의 동네 등급, 평판, 숲의 정수, 학생 칸을 눌러도 반응이 없었어요. 한 줄 설명을 띄워요
+    ['#sheetQReady', '#teaQReady'].forEach(id => $(id).addEventListener('click', e => { e.stopPropagation(); sfx('tap'); qReadyTap(e.currentTarget); }));
+    // H-07: 현황판의 동네 등급, 평판, 숲의 정수, 학생 칸을 눌러도 반응이 없었어요. 한 줄 설명을 띄워요
     [['#gradePill', () => { const G = CFG.grades, g = S.grade; return g < G.length - 1 ? `동네 등급이에요. 평판을 모으면 ${G[g + 1].name}${iga(G[g + 1].name).slice(-1)} 돼요. 대도시가 되면 종업식을 열 수 있어요` : '동네 등급이에요. 가장 높은 대도시예요. 종업식을 열 수 있어요'; }],
       ['#repPill', () => '평판이에요. 건물과 선생님 레벨을 올리면 쌓이고, 동네 등급이 올라가요'],
       ['#essPill', () => '숲의 정수예요. 미니게임과 미션에서 모으고, 꾸미기 가게 같은 곳에서 써요'],
@@ -960,7 +960,7 @@
       else if (rt.modalOpen === $('#mFest')) closeModal($('#mFest'));
       else if (rt.modalOpen === $('#mCere')) { if (rt.cereAsking) cereKeep(); else { rt.cereAt = 0; cereAsk(); } }   // 뒤로 가기는 건너뛸지 묻고, 물을 때 다시 누르면 계속 봐요
       else if (rt.modalOpen === $('#tut')) tutEnd('later');
-      else if (rt.modalOpen === $('#mSportsEnd')) $('#srGet').click();   // 5.3.4.6: 운동회 결과는 받기 단추와 같게(뒤로 가기로 닫으면 상품을 못 받았어요)
+      else if (rt.modalOpen === $('#mSportsEnd')) $('#srGet').click();   // 운동회 결과는 받기 단추와 같게(뒤로 가기로 닫으면 상품을 못 받았어요)
       else if (rt.modalOpen === $('#mLab') && rt.labBusy) { /* 실험 장면이 도는 동안은 닫지 않아요(닫기 단추와 같게) */ }
       // 위에 없는 창도 뒤로 가기로 닫아요. 꼭 골라야 하는 창(저장 고르기, 전학 대화, 자리 비운 보상)은 그대로
       else if (rt.modalOpen && rt.modalOpen.classList.contains('overlay') && !['mPick', 'mTalk', 'mOffline', 'mSt'].includes(rt.modalOpen.id)) closeModal(rt.modalOpen);

@@ -13,7 +13,7 @@
       lead: '광장 무대에서 친구들이 차례로 공연해요. 무대에서 떠오르는 음표를 눌러 박수를 보내요. 35초 안에 18개면 대성공!', win: '앙코르! 박수가 쏟아졌어요.', unit: '개' },
     photo: { name: '졸업 사진 찍기', tg: 5, sec: 30, goal: 14, form: 'rows', item: 'smile', how: 'pop',
       lead: '교실 앞에 두 줄로 서서 졸업 사진을 찍어요. 친구들 머리 위에 반짝이는 웃음 별을 눌러 모두 웃게 해요. 14개면 찰칵!', win: '찰칵! 모두 활짝 웃은 졸업 사진이 나왔어요.', unit: '개' },
-    // 고등학교 밤(20~6시) 전용 행사: 학생은 기숙사 창가에서 봐서 지도에 없어요. 메인 퀘스트에는 넣지 않아요. 목표 숫자는 본부 제안
+    // 고등학교 밤(20~6시) 전용 행사: 학생은 기숙사 창가에서 봐서 지도에 없어요. 메인 퀘스트에는 넣지 않아요. 목표
     meteor: { name: '별똥별 보기', tg: 0, sec: 30, goal: 14, form: 'free', item: 'meteor', how: 'fall', night: true,
       lead: '기숙사 친구들이 창가에 모였어요. 밤하늘을 가로지르는 별똥별을 눌러 소원을 빌어요. 30초 안에 14개면 성공!', win: '소원을 가득 빌었어요! 기숙사 창가가 반짝여요.', unit: '개' },
     lantern: { name: '소원 등불 날리기', tg: 0, sec: 30, goal: 15, form: 'free', item: 'lantern', how: 'rise', night: true,
@@ -47,7 +47,7 @@
     photo: '<rect x="-9" y="-5" width="18" height="12" rx="2.5" fill="#3B3B2D"/><rect x="-4" y="-8" width="7" height="4" rx="1" fill="#3B3B2D"/><circle cx="0" cy="1" r="4" fill="#BFE3F2" stroke="#7A8A96" stroke-width="1.2"/><circle cx="6" cy="-2.5" r="1.2" fill="#F3C04B"/>'
   };
   const festIcon = id => IMG('fest_ic_' + id) ? `<img src="${IMG('fest_ic_' + id)}" alt="" aria-hidden="true" draggable="false" style="width:100%;height:100%;object-fit:contain">` : `<svg viewBox="-11 -11 22 22" aria-hidden="true">${FEST_ICON[id]}</svg>`;
-  // 학교 행사 그림(작업지시서 9). 그림이 있으면 그림으로, 없으면 예전 도형으로 그려요. 누르는 자리와 크기는 그대로예요
+  // 학교 행사 그림. 그림이 있으면 그림으로, 없으면 예전 도형으로 그려요. 누르는 자리와 크기는 그대로예요
   const FEST_ART = { bf_seed: ['bf_seed'], meteor: ['fest_meteor_1', 'fest_meteor_2'], lantern: ['fest_lantern_orange', 'fest_lantern_pink', 'fest_lantern_yellow'], firefly: ['fest_firefly_on', 'fest_firefly_half'], paper: ['fest_paper'], balloon: ['fest_balloon_red', 'fest_balloon_yellow', 'fest_balloon_blue'], note: ['fest_note_1', 'fest_note_2'], smile: ['fest_star'], fv_science: ['fv_item_science'], fv_sports: ['fv_item_sports'], fv_human: ['fv_item_human'], fv_art: ['fv_item_art'], fv_biz: ['fv_item_biz'], fv_eng: ['fv_item_eng'], fv_edu: ['fv_item_edu'], fv_med: ['fv_item_med'] };   // fv_: 축제 부스 놀이 물건
   const FEST_AR = { fest_paper: 0.92, fest_balloon_red: 1.22, fest_balloon_yellow: 1.24, fest_balloon_blue: 1.2, fest_note_1: 1.13, fest_note_2: 1.01, fest_star: 0.96, fest_ball_blue: 1, fest_lantern_orange: 1.333, fest_lantern_pink: 1.333, fest_lantern_yellow: 1.333 };
   function festArtSvg(key, w) {
@@ -56,7 +56,7 @@
     return `<image href="${u}" x="${(-w / 2).toFixed(1)}" y="${(-h / 2).toFixed(1)}" width="${w}" height="${h.toFixed(1)}"/>`;
   }
   function festItemSvg(item, w) {
-    if (item === 'bf_seed' && !IMG('bf_seed')) item = 'lantern';   // 불꽃 씨앗 그림(작업지시서 70)이 오기 전에는 등불 그림
+    if (item === 'bf_seed' && !IMG('bf_seed')) item = 'lantern';   // 불꽃 씨앗 그림이 오기 전에는 등불 그림
     const keys = (FEST_ART[item] || []).filter(k => IMG(k)); if (!keys.length) { const sh = FEST_ITEM[item] || FEST_ITEM.balloon; return w ? `<g transform="scale(${(w / 22).toFixed(2)})">${sh}</g>` : sh; }
     return festArtSvg(keys[Math.floor(Math.random() * keys.length)], w || (item === 'balloon' ? 19 : item === 'meteor' ? 30 : item === 'lantern' ? 20 : 22));
   }
@@ -179,7 +179,7 @@
   function festPhotoDecor(on) {
     festPiece('festPhotoDecor', on && `<g transform="translate(${pzx()} ${pzy()})"><path d="M-62 -44 Q0 -14 62 -44" fill="none" stroke="#f9db87" stroke-width="2"/><path d="M-53 -40 l8 2 -5 7z M-28 -33 l8 1 -4 8z M-3 -29 l8 0 -4 8z M22 -33 l8 -1 -4 8z M45 -38 l8 -2 -3 9z" fill="#f3a7aa" stroke="#fff1d1" stroke-width=".6"/><circle cx="-58" cy="-45" r="2.5" fill="#ffe48f"/><circle cx="58" cy="-45" r="2.5" fill="#ffe48f"/><path d="M-53 0 l2 -5 2 5 5 2 -5 2 -2 5 -2 -5 -5 -2z M53 -8 l2 -5 2 5 5 2 -5 2 -2 5 -2 -5 -5 -2z" fill="#fff5bd"/></g>`, layerFx, false, { 'aria-hidden': 'true', 'pointer-events': 'none' });
   }
-  // 밤 행사 광장 장식(작업지시서 51): 별똥별은 망원경, 등불은 받침대, 반딧불은 유리병을 분수 왼쪽 아래에
+  // 밤 행사 광장 장식: 별똥별은 망원경, 등불은 받침대, 반딧불은 유리병을 분수 왼쪽 아래에
   const FEST_NDECO = { meteor: 'fest_scope', lantern: 'fest_lantern_stand', firefly: 'fest_jar' };
   function festNightDecor(id) {
     const k = id && FEST_NDECO[id];
@@ -312,10 +312,10 @@
     queueModal(() => { openModal($('#mSportsEnd')); return true; });
   }
 
-  /* ---------- 대학 축제 (프로젝트 문서 ' 설계안 (대학 축제)', 그림은 작업지시서 63) ----------
+  /* ---------- 대학 축제 ----------
      매주 월, 수, 금(게임 시계, 한국 시간)에 광장 구역에서 열려요. 대학교이고 학생회관이 있어야 해요
      다니는 단과대학마다 부스 하나(하루 한 번 30초 놀이, 움직임만 학교 행사 틀을 써요), 손님 학교 세 곳, 요일 보너스 하나, 한 주 도장판
-     숫자(FV)는 woodani가 제안대로 확정했어요(저녁): 부스 10분치, 손님 15분치, 기념품 6번 성공, 30초에 14개, 도장판 보상 다섯 단계. 서버 규칙은 바꾸지 않아요(손님 학교는 이미 읽은 랭킹에서 골라요) */
+     숫자(FV)는 제안대로 확정했어요(저녁): 부스 10분치, 손님 15분치, 기념품 6번 성공, 30초에 14개, 도장판 보상 다섯 단계. 서버 규칙은 바꾸지 않아요(손님 학교는 이미 읽은 랭킹에서 골라요) */
   const FV = { days: [0, 2, 4], sec: 30, goal: 14, boothMin: 10, guestMin: 15, deanPct: 5, win: 6, dayMax: 5, weekMax: 15,
     steps: [[3, 'tk', 2], [6, 'ess', 10], [9, 'tk', 3], [12, 'ess', 15], [15, 'gold', 1]],
     bonus: { 0: 'picnic', 2: 'snack', 4: 'show' }, bonusTx: { picnic: '소풍 수확 +100%', snack: '간식 뽑기 하나 더', show: '동아리 발표회 +100%' } };
@@ -362,10 +362,10 @@
     else if (!on && has) nx.remove();
   }
   const fvNext = () => { const w = fvWd(); if (bfWin(gameToday())) return ''; for (let i = 1; i <= 7; i++) if (FV.days.includes((w + i) % 7)) return FV_WD[(w + i) % 7] + '요일'; return ''; };
-  /* ---------- 한 달에 한 번 대축제 (프로젝트 문서 ' 설계안 (한 달에 한 번 대축제)', 그림은 작업지시서 70) ----------
+  /* ---------- 한 달에 한 번 대축제 ----------
      매달 마지막 금, 토, 일 사흘. 대학교(학생회관 Lv.1)만. 달 장식은 다음 해 같은 달에 다시 받을 수 있어요. 마지막 단계 24개. 곡은 새로(Suno)
      부스 하루 두 번, 손님 다섯 곳, 밤 20~24시 불꽃놀이, 사흘 동안 모으는 도장판. 매주 축제(월수금)는 그대로이고 사흘은 축제 날로 쳐요(fvDay)
-     숫자는 본부 제안이에요. 서버 규칙은 바꾸지 않아요 */
+      서버 규칙은 바꾸지 않아요 */
   const BIG = { max: 24, dayMax: 10, booth: 2, guests: 5, guestSt: 2, fwFrom: 20, fwSec: 30, fwGoal: 16, fwWin: 3, fwLose: 1, fwEss: 5,
     steps: [[4, 'm5', 3], [8, 'ess', 15], [12, 'm30', 1], [16, 'ess', 25], [20, 'gold', 1], [24, 'deco', 1]] };
   const bfYmd = ms => new Date(ms).toISOString().slice(0, 10);
@@ -669,7 +669,7 @@
     top.innerHTML = (sky ? `<image href="${IMG('bf_sky')}" x="0" y="${(visMap() || [0, 0])[1] + 6}" width="360" height="180" opacity=".9"/>` : '') + (IMG('fv_bunting') ? `<image href="${IMG('fv_bunting')}" x="${bx}" y="${by}" width="${bw}" height="${bw / 4}"/>` : '') +
       (night ? FV_POS.lamp.map(([x, y, w]) => `<circle class="fv-glow" cx="${x}" cy="${y - w * 1.55}" r="17"/>`).join('') : '');
   }
-  // 캠퍼스 정문 위 현수막(작업지시서 70 확인 그림 gate70 자리)
+  // 캠퍼스 정문 위 현수막(확인 그림 gate70 자리)
   function bfGateSvg() {
     const [gx] = CAMPUS.gate, w = 84, h = w / 3, x = gx - w / 2, y = 432;
     return `<image href="${IMG('bf_banner')}" x="${x.toFixed(1)}" y="${y}" width="${w}" height="${h.toFixed(1)}"/><text class="bf-gate" x="${gx.toFixed(1)}" y="${(y + h * 0.66).toFixed(1)}">대축제</text>`;
@@ -708,9 +708,9 @@
     if (rt.modalOpen === $('#mFv') && rt.fvKey !== gameToday()) { rt.fvKey = gameToday(); renderFv(); }
   }
 
-  /* ---------- 요일 행사: 화요일 교환학생의 날, 목요일 숲속 장터 (프로젝트 문서 ' 설계안 2 (교환학생과 장터)', 그림은 작업지시서 64) ----------
+  /* ---------- 요일 행사: 화요일 교환학생의 날, 목요일 숲속 장터 ----------
      초등학교부터 열려요. 날짜는 게임 시계(한국 시간)이고 축제의 요일 틀(fvWd)을 그대로 써요. 서버 규칙은 바꾸지 않아요
-     숫자(XG, MK)는 woodani가 제안대로 확정했어요(19시 반). 깜짝 물건의 종류와 곁가지 칭호 이름은 아직 본부 제안이에요 */
+     숫자(XG, MK)는 제안대로 확정했어요(19시 반). 깜짝 물건의 종류와 곁가지 칭호 이름은 아직 이에요 */
   const WD_TIER = 1;
   const wdOpen = () => !!S && S.tier >= WD_TIER && !!S.tut.st;
   const dayNo = t => Math.floor(Date.parse(t + 'T00:00:00Z') / 86400000);

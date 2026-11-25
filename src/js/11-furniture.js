@@ -14,8 +14,8 @@
     store: [{ id: 'snackrack', name: '간식 진열대' }, { id: 'fridge', name: '음료 냉장고' }, { id: 'register', name: '계산대' }, { id: 'snacktable', name: '간식 탁자' }],
     dorm: [{ id: 'bunk', name: '2층 침대' }, { id: 'sdesk', name: '공부 책상' }, { id: 'closet', name: '옷장' }, { id: 'rug', name: '러그' }],
     union: [{ id: 'union_board', name: '동아리 게시판' }, { id: 'union_sofa', name: '소파' }, { id: 'union_vend', name: '자판기' }, { id: 'union_stage', name: '무대' }],
-    institute: [{ id: 'institute_bench', name: '실험대' }, { id: 'institute_board', name: '화이트보드' }, { id: 'institute_desk', name: '연구 책상' }, { id: 'institute_coffee', name: '커피 머신' }],   // 연구소(작업지시서 85)
-    gradhall: [{ id: 'gradhall_table', name: '세미나 탁자' }, { id: 'gradhall_screen', name: '발표 스크린' }, { id: 'gradhall_shelf', name: '논문 서가' }, { id: 'gradhall_plant', name: '큰 화분' }]   // 연구동 세미나실. 학생회관(작업지시서 54). 기숙사(작업지시서 35)
+    institute: [{ id: 'institute_bench', name: '실험대' }, { id: 'institute_board', name: '화이트보드' }, { id: 'institute_desk', name: '연구 책상' }, { id: 'institute_coffee', name: '커피 머신' }],   // 연구소
+    gradhall: [{ id: 'gradhall_table', name: '세미나 탁자' }, { id: 'gradhall_screen', name: '발표 스크린' }, { id: 'gradhall_shelf', name: '논문 서가' }, { id: 'gradhall_plant', name: '큰 화분' }]   // 연구동 세미나실. 학생회관. 기숙사
   };
   // 대학교 가구 이름(그림도 바뀌어요). 열쇠와 저장은 그대로
   const FUR_NM_U = { fan: '빔 프로젝터', locker: '사물함', rack: '식판 반납대', shelf: '서가', rdesk: '열람석', slide: '농구 골대', swing: '축구 골대', bars: '허들', chem: '시약장', globe: '분자 모형', snackrack: '진열대', snacktable: '탁자', bunk: '침대', sdesk: '책상' };
@@ -234,13 +234,13 @@
       union_vend: { w: 34, at: [[208, 97], [230, 97]] },
       union_stage: { w: 112, at: [[284, 102]] }
     },
-    institute: {   // 연구소 방(room_institute, 작업지시서 82). 자리는 본부 어림(학생회관 방과 같은 바닥 높이)
+    institute: {   // 연구소 방(room_institute). 자리는 본부 어림(학생회관 방과 같은 바닥 높이)
       institute_bench: { w: 92, at: [[150, 150], [150, 200]] },
       institute_board: { w: 70, at: [[160, 72]] },
       institute_desk: { w: 70, at: [[42, 170], [42, 214]] },
       institute_coffee: { w: 38, at: [[284, 104]] }
     },
-    gradhall: {   // 연구동 세미나실(room_gradhall, 작업지시서 85)
+    gradhall: {   // 연구동 세미나실(room_gradhall)
       gradhall_table: { w: 110, at: [[160, 170], [160, 214]] },
       gradhall_screen: { w: 80, at: [[164, 80]] },
       gradhall_shelf: { w: 50, at: [[34, 120], [34, 170]] },
@@ -282,7 +282,7 @@
     science_poster: 0.77, science_sink: 1.07, science_shelf: 0.38, science_plants: 0.69, science_rocket: 2.26,
     store_basket: 0.79, store_lamp: 1.43, store_menu: 0.83, store_plant: 1.1, store_poster: 1.23,
     dorm_clock: 1.07, dorm_lamp: 1.23, dorm_plant: 1.13, dorm_poster: 1.41, dorm_slippers: 0.79,
-    union_poster: 1.43, union_guitar: 2.22, union_lamp: 1.01, union_plant: 1.06, union_cushion: 0.73 };   // 학생회관 소품(작업지시서 61). 기숙사 소품(작업지시서 35). 매점 소품(작업지시서 19)
+    union_poster: 1.43, union_guitar: 2.22, union_lamp: 1.01, union_plant: 1.06, union_cushion: 0.73 };   // 학생회관 소품. 기숙사 소품. 매점 소품
   const PROP_LAY = {
     classroom: [['teacherdesk', 180, 115, 29], ['clock', 267, 45, 17, 'wall'], ['cubby', 102, 104, 69], ['board', 229, 92, 59, 'wall'], ['plant', 15, 158, 27]],
     cafeteria: [['return', 14, 128, 22], ['bins', 296, 216, 44], ['poster', 260, 59, 21, 'wall'], ['plant', 10, 213, 29], ['lamp', 160, 62, 39, 'wall']],
@@ -294,7 +294,7 @@
     union: [['poster', 282, 62, 22, 'wall'], ['plant', 14, 204, 30], ['lamp', 133, 40, 16, 'wall'], ['cushion', 150, 214, 36], ['guitar', 272, 198, 13]],
     institute: [['plant', 14, 206, 26], ['lamp', 240, 34, 18, 'wall']], gradhall: [['clock', 250, 42, 18, 'wall'], ['plant', 300, 208, 24]]   // 학생회관
   };
-  // 대학교 방(작업지시서 69): 새 배경에 벽 그림이 이미 있어서 벽 소품과 어린 소품(시소, 모래밭, 로켓, 사물함 칸)은 그리지 않아요
+  // 대학교 방: 새 배경에 벽 그림이 이미 있어서 벽 소품과 어린 소품(시소, 모래밭, 로켓, 사물함 칸)은 그리지 않아요
   const PROP_SKIP_U = { classroom: ['cubby', 'board', 'clock'], cafeteria: ['poster', 'lamp'], library: ['poster'], playground: ['seesaw', 'sandbox', 'flowerbed', 'tree', 'fountain'], science: ['poster', 'shelf', 'rocket'], store: ['menu', 'poster', 'lamp'], dorm: ['poster', 'clock', 'lamp'] };
   const propSkip = (k, id) => uniNow() && IMG('room_u_' + k) && (PROP_SKIP_U[k] || []).includes(id);
   // 대학교에서 자리가 달라지는 가구: 빔 프로젝터 스크린은 칠판 양옆, 농구 골대는 왼쪽 뒤, 축구 골대는 오른쪽 뒤, 허들은 트랙 앞
@@ -391,7 +391,7 @@
     const job = () => { const k = ks.shift(); if (!k) return; try { blobWarm(IMG(roomKey(k))); blobWarm(IMG170(seasonKey(bldImg(k)))); if (!rt.sheetKey) { const ft = rt.furTag; blobHtml(renderFurScene(k)); rt.furTag = ft; } } catch (e) { /* 미리 풀기는 실패해도 괜찮아요 */ } (window.requestIdleCallback || (f => setTimeout(f, 200)))(job); };
     (window.requestIdleCallback || (f => setTimeout(f, 1500)))(job);
   }
-  // 대학교 방 배경과 가구(작업지시서 69): 대학교에서는 room_u_<건물>, fur_u_<가구>가 있으면 그 그림을 써요
+  // 대학교 방 배경과 가구: 대학교에서는 room_u_<건물>, fur_u_<가구>가 있으면 그 그림을 써요
   const roomKey = k => uniNow() && IMG('room_u_' + k) ? 'room_u_' + k : 'room_' + k;
   const furKey = (id, st) => uniNow() && IMG('fur_u_' + id) ? 'fur_u_' + id : 'fur_' + id + FUR_SUF[st || 2];
   const roomImg = k => (IMG(roomKey(k)) || !FUR_ROOM[k] ? `<image href="${IMG(roomKey(k))}" x="-12.5" y="0" width="345" height="230" preserveAspectRatio="none"/>` : FUR_ROOM[k]) + (ROOM_TXT[k] ? ROOM_TXT[k]() : '');

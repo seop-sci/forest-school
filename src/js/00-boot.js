@@ -35,6 +35,6 @@
     if (!webCacheOk()) return;
     caches.open(WEB_CACHE).then(c => c.keys().then(ks => ks.forEach(q => { if (!keep(q.url)) c.delete(q); }))).catch(() => {});
   }
-  const ADS_EXT = window.FOREST_ADS || null;   // 광고 없이 보상을 주던 옛 스위치(FOREST_NOAD)는 켜는 판이 없어 지웠어요. 보안 점검(2-8): 켤 때 한 번만 읽어요(나중에 바꿔 넣어도 소용없게)
+  const ADS_EXT = window.FOREST_ADS || null;   // 광고 없이 보상을 주던 옛 스위치(FOREST_NOAD)는 켜는 판이 없어 지웠어요. 켤 때 한 번만 읽어요(나중에 바꿔 넣어도 소용없게)
   const motionMQ = window.matchMedia ? window.matchMedia('(prefers-reduced-motion: reduce)') : null;
 

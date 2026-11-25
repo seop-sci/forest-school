@@ -95,7 +95,7 @@
     try { adopted = sessionStorage.getItem('forest-adopt'); if (adopted !== null) sessionStorage.removeItem('forest-adopt'); } catch (e) { adopted = null; }
     S = fromHot ? sanitize(data.save) : (load() || fresh());
     S.st.sess += 1;
-    rt.clk0 = { last: (S.clk && S.clk.last) || 0, perf: performance.now() };   // 보안 점검(2-6): 서버 시간 전까지 쓰는 게임 시계 기준
+    rt.clk0 = { last: (S.clk && S.clk.last) || 0, perf: performance.now() };   // 서버 시간 전까지 쓰는 게임 시계 기준
     if (!S.q.init) { if (hadSave) fastForwardMain(); else startMain(); S.q.init = true; }
     if (S.q.reset) { S.q.reset = false; startMain(); }
     fillSubs();
@@ -116,7 +116,7 @@
     if (hasCloudBuild()) {
       Cloud.state = 'idle';
       Cloud.bootHadSave = hadSave;
-      Cloud.bootSavedAt = S.savedAt;   // 보안 점검(1-1): 서버 학교와 비교할 이 기기 저장 시각은 켤 때 값으로(그 뒤 저장하면 바뀌어요)
+      Cloud.bootSavedAt = S.savedAt;   // 서버 학교와 비교할 이 기기 저장 시각은 켤 때 값으로(그 뒤 저장하면 바뀌어요)
       Cloud.skipRestore = adopted !== null;
       // 이어하기 코드 기능을 뺐어요. 예전 링크(?move=)는 주소에서만 지우고, 남은 코드 기록도 지워요
       try {

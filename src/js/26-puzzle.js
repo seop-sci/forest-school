@@ -229,7 +229,7 @@
     save();
     return { score, ess, askEss: rw ? cur.ess : 0, mins, acorns, newBest, rw, xp, tk };
   }
-  /* 숲속 퍼즐 소탕: 그날 보상 판을 1판 직접 하면 열려요. 판마다 오늘 직접 한 판 점수의 70%(PZ.sweep, 조정안 5. 예전에는 역대 최고 점수)로 친 보상을 바로 받아요
+  /* 숲속 퍼즐 소탕: 그날 보상 판을 1판 직접 하면 열려요. 판마다 오늘 직접 한 판 점수의 70%(PZ.sweep,. 예전에는 역대 최고 점수)로 친 보상을 바로 받아요
      비율은 화면에 쓰지 않고 받을 양만 보여 줘요. 학생 부탁은 소탕으로 채우지 않아요. 오늘의 미션, 이벤트의 '퍼즐 n판'에는 쳐요 */
   const pzSwOpen = () => { pzDay(); return S.pz.hand === gameToday() && (S.pz.tb || 0) > 0; };
   const pzSwScore = () => S.pz.hand === gameToday() ? Math.floor((S.pz.tb || 0) * PZ.sweep) : 0;
@@ -350,7 +350,7 @@
     save(); renderHUD(); renderEss(); pzRenderAll();
   }
   function pzOpen(asked) {
-    useLog('pz');   // 5.4.0.3 놀이 기록
+    useLog('pz');   // 놀이 기록
     pzInitArt();
     if (!FXL.st && wldLv() > 0) { FXL.touched = true; fxLoad(); }   // 엔진을 아직 안 받았으면 지금
     if (FXL.st === 'ok' && !FXO.st) fxoInit();   // 깨지는 조각 그림판
@@ -609,7 +609,7 @@
     });
     pzRenderTray(); pzRenderTop(); pzRenderAsk(); pzRenderHelp();
     save();
-    if (res.over) { const c = S.pz.cur; setTimeout(() => { if (S.pz.cur === c && pzStuck(c)) pzGameOver(); }, rt.reduced ? 200 : 800); }   // 5.3.4.6: 그사이 도움을 써서 풀렸거나 새 판이면 끝내지 않아요
+    if (res.over) { const c = S.pz.cur; setTimeout(() => { if (S.pz.cur === c && pzStuck(c)) pzGameOver(); }, rt.reduced ? 200 : 800); }   // 그사이 도움을 써서 풀렸거나 새 판이면 끝내지 않아요
   }
   function pzGameOver() {
     const cur = S.pz.cur; if (!cur) return;
@@ -659,7 +659,7 @@
     pzBombHold(on ? i : -1);
   }
   /* 폭탄을 손에 들고 끌어서 놓아요. 다람쥐 모드에서는 3×3 미리 보기 가운데에 폭탄이 떠 있고
-     손가락(마우스)을 따라 움직여요. 손을 떼면 그 자리에서 부르르 떨다 터져요. 그림 pz_bomb(작업지시서 48)이 없으면 💣 */
+     손가락(마우스)을 따라 움직여요. 손을 떼면 그 자리에서 부르르 떨다 터져요. 그림 pz_bomb이 없으면 💣 */
   function pzBombEl() {
     let b = pzUI.holdEl;
     if (!b || !b.isConnected) {

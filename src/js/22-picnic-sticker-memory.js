@@ -106,7 +106,7 @@
   /* ---------- 칭찬 스티커판 (초등학교 2, 로드맵 5절) ----------
      초등학교부터 교실 벽에. 오늘의 미션, 메인 퀘스트, 학생 부탁을 끝낼 때마다 스티커 한 장(게임 시계로 하루 5장까지)
      20장을 채우면 반 전체 상: 수업료 1시간치 도토리나 황금 도토리 2개 가운데 하나. 고르면 판이 비워지고 새 판이 붙어요
-     판 그림은 달마다 바뀌고(작업지시서 12, 12장), 다 채운 판은 넘겨 볼 수 있어요 */
+     판 그림은 달마다 바뀌고(장), 다 채운 판은 넘겨 볼 수 있어요 */
   const SK = { tier: 1, perDay: 5, full: 20, acornMin: 60, gold: 2, keep: 60 };
   const SK_KINDS = ['star', 'heart', 'acorn', 'flower', 'leaf', 'sun', 'rainbow', 'crown'];
   // 판 그림(1024×768)의 칸 가운데(%): 가로 5칸 × 세로 4칸
@@ -214,11 +214,11 @@
       if (K.st && typeof K.st === 'object') { s.sk.st.all = Math.floor(numIn(K.st.all, 0, 1e7)); s.sk.st.boards = Math.floor(numIn(K.st.boards, 0, 1e6)); }
     }
   }
-  /* ---------- 학생과 추억 (프로젝트 문서 '학생과 추억 설계안 ') ----------
+  /* ---------- 학생과 추억 ----------
      동물 종류마다 이름과 생일이 있는 단짝 친구 한 명(유치원 5명, 전학생이 올 때마다 한 명씩, 최대 17명). 학교와 함께 자라서 종업식과 졸업식에도 남아요
      친밀도 하트 5칸: 쓰다듬기(친구마다 하루 1번, 지도에서 학생 누르기와 건물 창), 선물(정수 5, 하루 3번), 생일 케이크, 소풍, 반장 당선
      생일 잔치: 단짝 생일 + 단짝 생일이 없는 주에는 반 친구 생일 한 번(주마다 정해진 하루). 급식실(없으면 교실)에 케이크
-     졸업 앨범: 종업식과 졸업식마다 한 쪽. 졸업식에는 하트가 가장 높은 단짝(♥2부터)이 편지를 남겨요. 숫자는 본부 제안 */
+     졸업 앨범: 종업식과 졸업식마다 한 쪽. 졸업식에는 하트가 가장 높은 단짝(♥2부터)이 편지를 남겨요. */
   const BF = { pat: 1, gift: 3, giftEss: 5, giftDay: 3, cake: 5, bdGift: 6, picnic: 1, elect: 2,
     hearts: [3, 10, 20, 35, 55], heartEss: [2, 3, 5, 8], heartGold: 1, bdMin: 20, bdMinClass: 10, albMax: 100, letterMin: 2 };
   const FR_NAME_RE = /^[가-힣A-Za-z0-9]{1,4}$/;
@@ -561,7 +561,7 @@
     const k = want ? rt.kids.find(x => x.sp === want) : null;
     if (rt.bdHatK && rt.bdHatK !== k) {
       const o = rt.bdHatK; rt.bdHatK = null;
-      if (rt.kids.includes(o)) { o.g.innerHTML = kidSVG(o.rare ? o.sp + '_rare' : o.sp, o.bag); rt.elBadgeT = ''; }   // 5.3.4.6: 희귀 겉모습 그대로
+      if (rt.kids.includes(o)) { o.g.innerHTML = kidSVG(o.rare ? o.sp + '_rare' : o.sp, o.bag); rt.elBadgeT = ''; }   // 희귀 겉모습 그대로
     }
     if (k && rt.bdHatK !== k && IMG('cos_hat_bday')) { k.g.innerHTML = kidSVG(k.rare ? k.sp + '_rare' : k.sp, k.bag, { hat: 'bday', neck: S.cos.neck }); rt.bdHatK = k; rt.elBadgeT = ''; }
   }

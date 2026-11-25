@@ -33,7 +33,7 @@
     beach: '<path d="M-8 6 Q-8 -6 0 -7 Q8 -6 8 6 Z" fill="#F4D6B0"/><path d="M-4 5 Q-3 -3 0 -6 M0 5 V-6 M4 5 Q3 -3 0 -6" fill="none" stroke="#D9A066" stroke-width="1.2"/>',
     star: '<path d="M0 -9 L2.4 -2.6 L9 -2.6 L3.6 1.6 L5.6 8 L0 4 L-5.6 8 L-3.6 1.6 L-9 -2.6 L-2.4 -2.6 Z" fill="#F3C04B"/>'
   };
-  const tripIcon = (id, cls) => IMG('trip_dest_' + id) ? `<img class="tr-dest${cls ? ' ' + cls : ''}" src="${blobUrl(IMG('trip_dest_' + id))}" alt="" aria-hidden="true" decoding="async">` : `<svg viewBox="-11 -11 22 22" aria-hidden="true"${cls ? ` class="${cls}"` : ''}>${TRIP_ART[id]}</svg>`;   // 목적지 그림(작업지시서 45)
+  const tripIcon = (id, cls) => IMG('trip_dest_' + id) ? `<img class="tr-dest${cls ? ' ' + cls : ''}" src="${blobUrl(IMG('trip_dest_' + id))}" alt="" aria-hidden="true" decoding="async">` : `<svg viewBox="-11 -11 22 22" aria-hidden="true"${cls ? ` class="${cls}"` : ''}>${TRIP_ART[id]}</svg>`;   // 목적지 그림
   const BUS = '<svg viewBox="-12 -12 24 24" aria-hidden="true"><rect x="-10" y="-7" width="20" height="12" rx="3" fill="#F3C04B"/><rect x="-8" y="-5" width="4.5" height="4" rx="1" fill="#BFE3F2"/><rect x="-2.2" y="-5" width="4.5" height="4" rx="1" fill="#BFE3F2"/><rect x="3.6" y="-5" width="4.4" height="4" rx="1" fill="#BFE3F2"/><rect x="-10" y="1" width="20" height="1.6" fill="#D9A23A"/><circle cx="-5.5" cy="5.5" r="2.4" fill="#3B3B2D"/><circle cx="5.5" cy="5.5" r="2.4" fill="#3B3B2D"/></svg>';
   const tripOpen = () => !!S && (S.trip.open || S.tier >= 2 || (S.tier >= 1 && S.tg >= 2));
   const souvN = () => S.trip.souv.length;
@@ -44,7 +44,7 @@
   const tripSetsDone = () => TRIPS.filter(t => t.souv.slice(0, SOUV_OLD).every((_, i) => S.trip.souv.includes(`${t.id}:${i}`))).length;
   const tripSetsAll = () => TRIPS.filter(t => t.souv.every((_, i) => S.trip.souv.includes(`${t.id}:${i}`))).length;
   const tripMult = () => { const o = souvOld(); return 1 + 0.02 * o + 0.01 * (souvN() - o) + 0.1 * tripSetsDone() + 0.05 * tripSetsAll(); };
-  const tripLeft = () => Math.max(0, S.trip.end - gameNow());   // 보안 점검(1-6): 게임 시계
+  const tripLeft = () => Math.max(0, S.trip.end - gameNow());   // 게임 시계
   const tripBack = () => !!S.trip.cur && tripLeft() <= 0;
   const tripCut = T => Math.max(30, Math.round(T.min / 4));   // 광고 한 편에 줄어드는 분(적어도 30분)
   function tripReward(T) {
@@ -57,7 +57,7 @@
   const minText = m => m >= 60 ? `${m / 60}시간` : `${m}분`;
   /* ===== 수학여행(설계안 " 설계안 (수학여행)"): 고등학교부터 학년마다 한 번
      옛 도시, 섬 마을, 큰 도시 중 한 곳 → 들를 곳 세 군데에서 활동을 하나씩 고르고 → 단체 사진 → 학생들이 3시간 동안 떠나 있어요(수업료는 그대로)
-     돌아오면 도토리(수업료 2시간치), 숲의 정수, 그곳 기념품(지도 장식), 앨범에 사진 한 쪽. 숫자는 본부 제안 ===== */
+     돌아오면 도토리(수업료 2시간치), 숲의 정수, 그곳 기념품(지도 장식), 앨범에 사진 한 쪽. ===== */
   const tr2Nm = () => uniOn() ? '배낭여행' : '수학여행';   // 대학교에서는 배낭여행이라고 불러요(이름만, 규칙과 저장은 그대로)
   const tr2Key = () => `${S.tier}-${S.tg}`;
   const tr2Open = () => !!S && !!S.tr2 && S.tier >= TR2.tier;

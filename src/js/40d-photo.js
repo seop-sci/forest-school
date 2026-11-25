@@ -194,7 +194,7 @@
     paRender(true); paSync();
   }
 
-  /* 모은 것 한눈에 보기(업적 칸 맨 위): 줄마다 n / 전체, 열리지 않은 것은 숨겨요. 5.5.0 별자리는 여기에 한 줄 더해요 */
+  /* 모은 것 한눈에 보기(업적 칸 맨 위): 줄마다 n / 전체, 열리지 않은 것은 숨겨요. 별자리는 여기에 한 줄 더해요 */
   function paAllRows() {
     const L = [], add = (nm, n, max, open, go) => { if (open && max > 0) L.push({ nm, n: Math.min(n, max), max, go }); };
     const tr2N = () => TR2_PL.reduce((a, P) => a + P.souv.length, 0);

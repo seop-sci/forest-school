@@ -9,7 +9,7 @@
       { k: 'library', nm: '단풍 도서관', mob: ['종이비행기 꼬마', '먼지 솜뭉치', '책갈피 나비'], boss: '잠꼬대하는 큰 책', mat: 0 },
       { k: 'yard', nm: '눈 내린 뒤뜰', mob: ['눈뭉치 꼬마', '고드름 요정', '얼음 반딧불'], boss: '눈보라 눈사람 대장', mat: 1 },
       { k: 'tower', nm: '별빛 천문대', mob: ['반짝 수정 꼬마', '그림자 솜뭉치', '졸린 박쥐'], boss: '수정 꼬마 용', mat: 3 },
-      { k: 'lab', nm: '구름 실험실', mob: ['번쩍 전구 꼬마', '톱니 굴렁쇠', '보글보글 플라스크'], boss: '꾸벅꾸벅 구름 로봇', mat: 2 }],   // 대학원에서만 끼는 일곱째 지역(작업지시서 86)
+      { k: 'lab', nm: '구름 실험실', mob: ['번쩍 전구 꼬마', '톱니 굴렁쇠', '보글보글 플라스크'], boss: '꾸벅꾸벅 구름 로봇', mat: 2 }],   // 대학원에서만 끼는 일곱째 지역
     regLen: 50, bossEvery: 10, limit: 30,
     // 지역마다 유리한 과목(힘과 체력 +30%), 모든 대원 레벨이 탐험대 전체에 주는 보유 효과(레벨 1마다 +0.3%). 숫자는 제안
     adv: { ground: 1, garden: 3, pond: 0, library: 2, yard: 4, tower: 0, lab: 4 }, advG: 0.3, collG: 0.003, collMax: 3,
@@ -418,7 +418,7 @@
   function tamWinHard(fl) { const R = tamReg(fl); S.tam.mat[R.mat] = Math.min(1e12, S.tam.mat[R.mat] + 2 + Math.floor(fl / 40)); }
   /* ----- 그림: 탐험 화면 ----- */
   const tamPic = (k, fb) => tamI(k) || IMG(fb) || '';
-  // 3D 그림(작업지시서 74, 75, ex3_)이 있으면 먼저 쓰고, 없으면 2D 그림(ex_)
+  // 3D 그림(ex3_)이 있으면 먼저 쓰고, 없으면 2D 그림(ex_)
   const tamI = k => IMG(String(k).replace(/^ex_/, 'ex3_')) || IMG(k);
   const tamPcPic = (sp, act) => tamI(`ex_pc_${sp}_${act ? 'act' : 'idle'}`) || IMG('chr_' + sp) || '';
   const tamMobPic = (fl, m) => m.boss ? tamPic(`ex_boss_${tamReg(fl).k}`, TAM.bossPh) : tamPic(`ex_mob_${tamReg(fl).k}_${m.i + 1}`, TAM.mobPh[(TAM.reg.indexOf(tamReg(fl)) + m.i) % TAM.mobPh.length]);
@@ -450,7 +450,7 @@
   }
   function tamFxOn() { return rt.tab === 'tam' && !rt.modalOpen && !document.hidden; }
   function tamBg(fl) { return IMG('ex4_bg_' + tamReg(fl).k) || tamI('ex_bg_' + tamReg(fl).k); }   // 세로 배경
-  // 겹 배경(작업지시서 104): 하늘, 먼 풍경, 바닥 세 겹(앞 장식은 #tmFg). 그림이 다 있는 지역만, 없으면 예전 한 장
+  // 겹 배경: 하늘, 먼 풍경, 바닥 세 겹(앞 장식은 #tmFg). 그림이 다 있는 지역만, 없으면 예전 한 장
   function tamLay(fl) { const k = tamReg(fl).k, u = n => IMG(`ex5_${k}_${n}`), L = { k, sky: u('sky'), far: u('far'), floor: u('floor'), front: u('front') }; return L.sky && L.far && L.floor ? L : null; }
   // 오르는 길: 엔진 바닥이 되는 지역이면 켜요
   function tamG6(fl) { const st = $('#tmStage'), on = !!(st && tamLay(fl) && fxgOn(fl) && fxgSet(tamReg(fl).k)); if (st) st.classList.toggle('g6', on); if (!on) fxgHide(); else fxgHeight(fl); return on; }
@@ -571,7 +571,7 @@
         actor = e.p; sk = null; const el = P[e.p], im = el && el.querySelector('img'); if (!el) return;
         if (e.k === 'big') { const nx = F.ev.slice(ei + 1).find(x => x.k === 'hit'); sk = tamSkillFx(F, e.p, nx ? nx.m : 0); const sp = F.P[e.p].sp; skAt(sk.hit - 900, () => { const a = IMG(`ex4_pc_${sp}_sk`) || tamI(`ex_pc_${sp}_act`); if (a && im) { im.src = a; clearTimeout(el._t); el._t = setTimeout(() => { im.src = tamPcPic(sp); }, 1400); } }); return; }
         el.classList.remove('act', 'far'); void el.offsetWidth; el.classList.add('act'); if (e.ri !== 1) el.classList.add('far'); fxTamDust(el);
-        const a = IMG(`ex4_pc_${F.P[e.p].sp}_atk`) || tamI(`ex_pc_${F.P[e.p].sp}_act`); if (a && im) { im.src = a; clearTimeout(el._t); el._t = setTimeout(() => { im.src = tamPcPic(F.P[e.p].sp); }, 520); }   // 공격 자세(작업지시서 78)
+        const a = IMG(`ex4_pc_${F.P[e.p].sp}_atk`) || tamI(`ex_pc_${F.P[e.p].sp}_act`); if (a && im) { im.src = a; clearTimeout(el._t); el._t = setTimeout(() => { im.src = tamPcPic(F.P[e.p].sp); }, 520); }   // 공격 자세
       } else if (e.k === 'hit') {
         const el = M[e.m], d = fmt(Math.max(1, Math.round(e.d))), cr = e.cr, fromEl = actor >= 0 ? P[actor] : null, ri = actor >= 0 ? F.P[actor].ri : 1, bigHit = !!sk;
         const land = () => { el.classList.remove('hurt'); void el.offsetWidth; el.classList.add('hurt'); tamHitPic(el, F.M[e.m] && !F.M[e.m].boss ? `ex_mob_${tamReg(F.fl).k}_${F.M[e.m].i + 1}_hit` : ''); tamHitFx(el, cr, bigHit, ri); tamFloat(el, d, cr || bigHit ? 'cr' : ''); if (cr && !bigHit) { tamShake(5, 260); tamPunch(); } };
@@ -580,7 +580,7 @@
       else if (e.k === 'heal') { const el = P[e.p], hf = f => sk ? skAt(sk.heal, f) : f(); hf(() => { if (sk && IMG('ex4_sk_kor_heal')) { const [hx, hy] = tamAt(el, 0.55); tamFxImg('tm-pillar', IMG('ex4_sk_kor_heal'), hx, hy, [{ t: 'scaleY(.2)', opacity: 0 }, { t: 'scaleY(1)', opacity: 1, offset: 0.35 }, { dy: -10, t: 'scaleY(1.05)', opacity: 0 }], 1000); } tamFloat(el, '+' + fmt(Math.round(e.d)), 'heal'); const [x, y] = tamAt(el); tamFxImg('tm-spark', tamI('ex_fx_heal'), x, y, [{ t: 'scale(.4)', opacity: 0 }, { t: 'scale(1.2)', opacity: 1, offset: 0.4 }, { dy: -16, t: 'scale(1.4)', opacity: 0 }], 600); }); }
       else if (e.k === 'hurt') {
         const el = P[e.p], mm = M[e.m];
-        if (mm) { mm.classList.remove('act'); void mm.offsetWidth; mm.classList.add('act'); const fm = F.M[e.m]; if (fm) tamHitPic(mm, fm.boss ? `ex_boss_${tamReg(F.fl).k}_atk` : `ex_mob_${tamReg(F.fl).k}_${fm.i + 1}_atk`); }   /* 장난꾸러기도 칠 때 공격 자세(작업지시서 92) */
+        if (mm) { mm.classList.remove('act'); void mm.offsetWidth; mm.classList.add('act'); const fm = F.M[e.m]; if (fm) tamHitPic(mm, fm.boss ? `ex_boss_${tamReg(F.fl).k}_atk` : `ex_mob_${tamReg(F.fl).k}_${fm.i + 1}_atk`); }   /* 장난꾸러기도 칠 때 공격 자세 */
         setTimeout(() => { el.classList.remove('hurt'); void el.offsetWidth; el.classList.add('hurt'); tamHitPic(el, `ex4_pc_${F.P[e.p].sp}_hurt`); tamFloat(el, fmt(Math.max(1, Math.round(e.d))), 'ouch'); }, 140);
       }
       else if (e.k === 'poof') { const el = M[e.m], go = () => { el.classList.add('out'); tamDropFx(el, F.fl); }; if (sk || tamSkBusy()) skAt(Math.max(sk ? sk.hit : 0, SKQ.end - 600) + 300, go); else setTimeout(go, 300); }
@@ -635,7 +635,7 @@
     const c = $('#tmCut'), pic = IMG(`ex4_pc_${sp}_sk`) || tamI(`ex_pc_${sp}_act`) || IMG('chr_' + sp), cb = IMG(`ex4_cut_${TAM.role[ri].k}`);
     c.hidden = false; $('#panelTam').classList.add('tm-cutting'); c.dataset.r = TAM.role[ri].k;   // 컷인 동안 오른쪽 단추는 잠깐 숨겨요
     c.style.setProperty('--cd', TAM.skCut + 'ms');
-    c.classList.toggle('x4', !!cb); c.style.backgroundImage = cb ? `url("${cb}")` : '';   // 과목 컷인 띠(작업지시서 77)
+    c.classList.toggle('x4', !!cb); c.style.backgroundImage = cb ? `url("${cb}")` : '';   // 과목 컷인 띠
     setH(c, `${pic ? `<img src="${pic}" alt="">` : ''}<span><small>${esc(TAM.role[ri].nm.split(' ')[0])} 필살기</small><b>${esc(TM_SK[ri].n)}!</b></span>`);
     c.style.animation = 'none'; void c.offsetWidth; c.style.animation = '';
   }
@@ -671,7 +671,7 @@
     at(0, () => { el.classList.remove('cast'); void el.offsetWidth; el.classList.add('cast'); setTimeout(() => el.classList.remove('cast'), 1100); });
     const fxr = () => $('#tmFx').getBoundingClientRect(), A = () => tamAt(el, 0.45);
     const MC = () => { const L = $$('#tmM .tm-f:not(.out)'), fx = fxr(); return L.length ? L.map(m => tamAt(m, 0.5)).reduce((a, b) => [a[0] + b[0] / L.length, a[1] + b[1] / L.length], [0, 0]) : [fx.width * 0.72, fx.height * 0.6]; };
-    // 새 필살기 조각(작업지시서 77)이 있으면 먼저: 과학 폭발과 거품, 체육 회오리와 잎, 국어 노래 고리와 음표, 미술 물감 튐과 방울, 수학 별 폭발과 별
+    // 새 필살기 조각이 있으면 먼저: 과학 폭발과 거품, 체육 회오리와 잎, 국어 노래 고리와 음표, 미술 물감 튐과 방울, 수학 별 폭발과 별
     const X4 = { sci: ['boom', 'bubble'], pe: ['tornado', 'leaf'], kor: ['ring', 'note'], art: ['splash', 'drop'], math: ['burst', 'star'] }[TAM.role[ri].k], x4 = n => IMG(`ex4_sk_${TAM.role[ri].k}_${n}`);
     const big = x4(X4[0]) || tamI(`ex_fx_${TAM.role[ri].k}_big`), small = x4(X4[1]) || tamI(`ex_fx_${TAM.role[ri].k}`);
     if (ri === 0) {   // 과학: 플라스크가 높이 날아가 가운데에서 펑, 거품이 한 번 더
@@ -949,7 +949,7 @@
     { const today = gameToday(), en = $('#tmEnter'); if (en && S.tam.ed !== today && !window.__FOREST_TEST) { S.tam.ed = today; save(); en.hidden = false; en.style.animation = 'none'; void en.offsetWidth; en.style.animation = ''; clearTimeout(en._t); en._t = setTimeout(() => { en.hidden = true; }, 1600); } }   // 입장 장면은 하루 처음만
     tamReport(true);
   }
-  // 화면 틀과 아이콘 그림(작업지시서 77)을 한 번만 CSS 변수와 img에 넣어요
+  // 화면 틀과 아이콘 그림을 한 번만 CSS 변수와 img에 넣어요
   function tamUiInit() {
     if (rt.tamUi) return; rt.tamUi = 1;
     const P = $('#panelTam'), v = (n, k) => { const u = IMG(k); if (u) P.style.setProperty(n, `url("${u}")`); };
@@ -1067,7 +1067,7 @@
     sfx('tap'); setTab('school'); applyCos(); ensureAudio(true); musicSync();
     const b = $('#thPrevBar');
     if (b) { $('#thPrevName').textContent = `${T.name} 세트 미리 보기`; b.hidden = false;
-      const by = $('#thPrevBuy'), own = TH_SLOTS.every(([sl]) => thOwn(id, sl)); by.hidden = own; if (!own) by.innerHTML = `사기 <svg viewBox="-8 -11 16 20" aria-hidden="true">${GOLD_ICON.slice(GOLD_ICON.indexOf('>') + 1, -6)}</svg>${thSetPrice(id)}`; }   // 5.3.3 미리 보다가 바로 사기
+      const by = $('#thPrevBuy'), own = TH_SLOTS.every(([sl]) => thOwn(id, sl)); by.hidden = own; if (!own) by.innerHTML = `사기 <svg viewBox="-8 -11 16 20" aria-hidden="true">${GOLD_ICON.slice(GOLD_ICON.indexOf('>') + 1, -6)}</svg>${thSetPrice(id)}`; }   // 미리 보다가 바로 사기
     if (!S.bgm && SONGS[id]) toast('미리 보기 곡만 나와요\n배경음악은 설정에서 켤 수 있어요');
   }
   function thPreviewEnd(quiet) {
@@ -1116,7 +1116,7 @@
       const u = IMG(el.dataset.front) || (el.dataset.fb && IMG(el.dataset.fb));
       el.classList.toggle('fb', !IMG(el.dataset.front));
       if (u) el.style.backgroundImage = `url("${u}")`;
-    });    shopChrome('street'); renderShelf(); renderShopMore();   // 5.3.3 재화 줄, 오늘의 진열대, 다른 가게
+    });    shopChrome('street'); renderShelf(); renderShopMore();   // 재화 줄, 오늘의 진열대, 다른 가게
   }
   function openShop() {
     if (rt.modalOpen) closeModal(rt.modalOpen);
@@ -1137,19 +1137,19 @@
     goldDay();
     $('#shopHave').innerHTML = GOLD_ICON + '<span></span>';
     $('#shopHave span').textContent = fmt(S.gold);
-    const left = Math.max(0, GOLD.shopAd - S.gd.shop);   // 5.3.3 상점 광고만 세요
+    const left = Math.max(0, GOLD.shopAd - S.gd.shop);   // 상점 광고만 세요
     $('#shopAd').setAttribute('aria-disabled', left > 0 ? 'false' : 'true');
     renderAdStamp();
     $('#shopAdLeft').textContent = left > 0 ? `오늘 상점 광고를 ${left}번 더 볼 수 있어요` : '오늘 상점 광고를 모두 봤어요. 내일 다시 열려요';
     const coin = `<svg viewBox="-8 -11 16 20" aria-hidden="true">${GOLD_ICON.slice(GOLD_ICON.indexOf('>') + 1, -6)}</svg>`;
     let h = renderThemes(coin);
-    // 5.3.3 이달의 꾸미기
+    // 이달의 꾸미기
     h += `<h3 class="shop-h" data-cat="이번 달">${gmNow()}월의 꾸미기 <small>이번 달 한정. 지나면 놓친 장식에서 같은 값으로</small></h3><div class="shop-grid">${gmTiles(gmItems(gmNow()), coin)}</div>`;
     // 학생 옷 세트: 모자와 목 장식 한 벌
     h += `<h3 class="shop-h">학생 옷 세트 <small>모자와 목 장식 한 벌</small></h3><div class="shop-grid">`;
     for (const o of OUTFITS) {
       const own = ofOwn(o), on = own && ofOn(o), p = ofPrice(o), poor = !own && S.gold < p;
-      const pr = on ? '쓰는 중' : own ? '쓰기' : `${coin}${p}`;   // 5.3.3 가진 것의 말은 '쓰기' 하나로
+      const pr = on ? '쓰는 중' : own ? '쓰기' : `${coin}${p}`;   // 가진 것의 말은 '쓰기' 하나로
       h += `<button class="si${own ? ' own' : ''}${on ? ' on' : ''}${poor ? ' poor' : ''}" type="button" data-buy="o:${o.id}" aria-pressed="${on}" aria-label="${o.name}${own ? '' : `, 황금 도토리 ${p}개`}">` +
         `<span class="pv"><svg viewBox="-11 -13.5 22 27" aria-hidden="true">${kidSVG('bear', 0, { hat: o.hat, neck: o.neck })}</svg></span><span class="nm">${o.name}</span><span class="pr">${pr}</span>${own ? '' : lackTx(p, S.gold)}</button>`;
     }
@@ -1188,7 +1188,7 @@
         `<span class="pv">${markHTML(mk, x)}</span><span class="nm">${nm}</span><span class="pr">${on ? '쓰는 중' : own ? '쓰기' : `${coin}${GSHOP.mark}`}</span>${own ? '' : lackTx(GSHOP.mark, S.gold)}</button>`;
     }
     h += '</div>';
-    // 이름 바꾸기(랭킹)는 5.3.3부터 설정 > 학교 간판과 마크 아래(#optNick, 같은 길)
+    // 이름 바꾸기(랭킹)는 설정 > 학교 간판과 마크 아래(#optNick, 같은 길)
     const list = $('#shopList'), top = list.scrollTop;
     list.innerHTML = h;
     list.scrollTop = top;
@@ -1215,7 +1215,7 @@
     if (t === 'e') { const d = DECO_BY[a]; return d && d.ev && evDecoArt(d) && !decoOwn(d.id) && evPastIds().includes(d.id.slice(3)) ? { kind: 'e', d, name: d.name, ga: eulOf(d.name), price: GSHOP.evDeco } : null; }
     if (t === 'm' && MARKX.some(([x]) => x === a)) { const nm = `학교 마크 ${MARKX.find(([x]) => x === a)[1]}`; return { kind: 'm', x: a, name: nm, ga: eulOf(nm), price: S.cos.own.includes('mkx:' + a) ? 0 : GSHOP.mark }; }
     if (t === 'r') return { kind: 'r', name: '이름 바꾸기', price: 0 };
-    if (t === 'g' && /^\d\d$/.test(a) && +a >= 1 && +a <= 12 && (+a === gmNow() || gmPast().includes(+a))) {   // 5.3.3 이달의 꾸미기(그달과 지난 달만)
+    if (t === 'g' && /^\d\d$/.test(a) && +a >= 1 && +a <= 12 && (+a === gmNow() || gmPast().includes(+a))) {   // 이달의 꾸미기(그달과 지난 달만)
       const x = gmItems(+a).find(y => y.kind === b); if (!x) return null;
       return { kind: 'g', gk: b, x, name: x.name, ga: eulOf(x.name), price: x.own ? 0 : x.price };
     }
@@ -1264,7 +1264,7 @@
     }
     if (it.kind === 'r') { rt.shopPick = ''; setTab('rank'); rt.rankEdit = true; renderRankPanel(); const i = $('#rankName'); if (i) i.focus(); return; }
     rt.shopPick = pick;
-    if (it.price && it.price < ASK_GOLD && S.gold >= it.price) { buyShop(); return; }   // 5.3.3 큰 값(황금 30 이상)만 한 번 더 물어요
+    if (it.price && it.price < ASK_GOLD && S.gold >= it.price) { buyShop(); return; }   // 큰 값(황금 30 이상)만 한 번 더 물어요
     renderShop();
   }
   function buyShop() {
@@ -1285,7 +1285,7 @@
     } else if (it.kind === 'e') {
       S.deco.own[it.d.id] = 1;
       toast(`${it.name}${it.ga} 샀어요! 꾸미기 가게의 '지도 꾸미기'를 눌러 학교에 놓아 보세요`);
-    } else if (it.kind === 'g') {   // 5.3.3 이달의 꾸미기
+    } else if (it.kind === 'g') {   // 이달의 꾸미기
       if (it.gk === 'hat') { S.cos.own.push('hat:' + it.x.id); S.cos.hat = it.x.id; applyCos(); toast(`${it.name}${it.ga} 샀어요! 바로 입혀 뒀어요`); }
       else { S.deco.own[it.x.id] = 1; toast(`${it.name}${it.ga} 샀어요! 꾸미기 가게의 '지도 꾸미기'를 눌러 학교에 놓아 보세요`); }
     } else if (it.kind === 'm') {

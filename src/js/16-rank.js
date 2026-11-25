@@ -216,7 +216,7 @@
     pairs.forEach(([id, d]) => {
       const r = readRow(id, d);
       if (!r) return;
-      const k = 'id:' + r.id, old = best.get(k);   // 보안 점검(2-3): 남의 학교 번호(pid)를 흉내 내 가리지 못하게 계정으로만 묶어요
+      const k = 'id:' + r.id, old = best.get(k);   // 남의 학교 번호(pid)를 흉내 내 가리지 못하게 계정으로만 묶어요
       if (!old || (old.id !== Rank.uid && (r.id === Rank.uid || r.at > old.at))) best.set(k, r);
     });
     return [...best.values()].filter(keep || (() => true)).sort(order || ((a, b) => b.score - a.score || a.at - b.at)).slice(0, RANK_MAX);
@@ -226,7 +226,7 @@
   function rankDirty() {
     if (!S || !(S.rank.joined || tossRank()) || Rank.state !== 'on') return;
     clearTimeout(Rank.timer);
-    // 보안 점검(2-2): 서버 규칙이 지난 쓰기에서 10초가 지나야 크게 오르는 것을 받아 줘서, 10초보다 자주 올리지 않아요
+    // 서버 규칙이 지난 쓰기에서 10초가 지나야 크게 오르는 것을 받아 줘서, 10초보다 자주 올리지 않아요
     Rank.timer = setTimeout(() => submitRank(), Math.max(2000, RANK_GAP - (Date.now() - (Rank.lastPut || 0))));
   }
   const RANK_GAP = 11500;   // 10.5초 → 11.5초(나눠 올릴 때 규칙의 10초를 넉넉히 넘게)
@@ -290,7 +290,7 @@
   const tamRankBehind = () => !tossRank() && Rank.state === 'on' && ((!Rank.noTam && tamTf() > (Rank.stfW === S.lg.week ? Rank.stf : 0)) || (!Rank.noTamH && tamHf() > (Rank.shfW === S.lg.week ? Rank.shf : 0)) || (!Rank.noConf && ppRankOn() && S.pp.cf > (Rank.scfP === ppPer() ? Rank.scf : 0)));
   async function submitRank(force) {
     if (Rank.state !== 'on' || Rank.readOnly || !Rank.uid || !(S.rank.joined || tossRank()) || Rank.writing || (hasCloudBuild() && (Cloud.deleting || Cloud.delLeft))) return;   // 3
-    if (S.u.dev) {   // 보안 점검(2-7): 개발자 메뉴로 재화를 받은 학교는 랭킹에 올리지 않아요
+    if (S.u.dev) {   // 개발자 메뉴로 재화를 받은 학교는 랭킹에 올리지 않아요
       if (S.rank.sent && be0()) { try { await Rank.be.remove(); } catch (e) { /* 다음에 다시 */ } S.rank.sent = 0; save(); }
       return;
     }
@@ -428,11 +428,11 @@
   /* 순위표 보조 줄(자세한 것은 인수인계 문서). 서버에는 아무것도 올리지 않아요 */
   const RKF = { fill: 20, lo: 0.3, hi: 1.1, endLo: 0.3, endHi: 0.9, start: 0.25, tierDrop: 0.04, floor: { week: 300, sea: 3000, bt: 60, all: 300 }, titled: 0.65,
     // 주간과 시즌은 월요일 0점에서 시작해 사람처럼 요일과 시간대에 따라 올라가요
-    // 줄마다 요일별 노는 양이 다르고 쉬는 날(off)도 있어요. 하루에 오르는 점수는 dayCap을 넘지 않아요(오늘의 미션, 보너스, 행사, 체험학습, 대결을 열심히 한 하루쯤). 숫자는 본부 제안
+    // 줄마다 요일별 노는 양이 다르고 쉬는 날(off)도 있어요. 하루에 오르는 점수는 dayCap을 넘지 않아요(오늘의 미션, 보너스, 행사, 체험학습, 대결을 열심히 한 하루쯤).
     off: 0.22, dayCap: 260, refCap: 1800,
-    // 보조 줄은 고등학교까지만(maxTier), 학교 파워는 고등학교 끝쯤(hsRef)을 넘는 기준으로 크지 않게. 숫자는 본부 제안
+    // 보조 줄은 고등학교까지만(maxTier), 학교 파워는 고등학교 끝쯤(hsRef)을 넘는 기준으로 크지 않게.
     maxTier: 3, hsRef: 4500,
-    // 보조 줄은 모두에게 똑같이 보여요(내 계정, 내 점수, 내 학교급과 상관없이). 대결 점수 900~1500, 주간 기준 900. 숫자는 본부 제안
+    // 보조 줄은 모두에게 똑같이 보여요(내 계정, 내 점수, 내 학교급과 상관없이). 대결 점수 900~1500, 주간 기준 900.
     btLo: 900, btHi: 1500, wkRef: 900 };
   // 하루 중 노는 양(0~23시). 새벽은 거의 없고 아침, 점심, 저녁에 몰려요
   const RKF_HOUR = [0.02, 0, 0, 0, 0, 0, 0.1, 0.5, 0.7, 0.35, 0.3, 0.35, 0.8, 0.6, 0.3, 0.3, 0.45, 0.7, 0.9, 1, 1, 0.9, 0.6, 0.25];
@@ -529,7 +529,7 @@
     $('#rankScoreLab').textContent = cf ? '이번 학회 점수' : th ? '이번 주 가장 높은 심화 층' : tm ? '이번 주 가장 높은 층' : sea ? '이번 시즌 점수' : bm ? '내 대결 점수' : wk ? '이번 주 리그 점수' : '내 학교 파워';
     $('#rankScore').textContent = tm ? `${fmt(score)}층` : fmt(score);
     $('#rankPos').textContent = mine >= 0 ? `${mine + 1}위` : '-';
-    const left = 7 - ((new Date(gameNow() + KST_MS).getUTCDay() + 6) % 7);   // 보안 점검(1-5): 한국 시간 요일
+    const left = 7 - ((new Date(gameNow() + KST_MS).getUTCDay() + 6) % 7);   // 한국 시간 요일
     if (cf) {   // 학회 순위
       $('#rankSub').textContent = `4주마다 새 학회가 열려요 (${ppLeft()}일 남음)`;
       $('#rankLead').textContent = '논문으로 모은 학회 점수로 겨뤄요. 대학원 연구소에서 논문을 써요.'; $('#rankLead').hidden = false;

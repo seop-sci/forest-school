@@ -43,7 +43,7 @@
     if (!exOpen() || !S.ex) return;
     const w = gameWeek();
     if (exIsWeek(w) && S.ex.cur !== w) {
-      // 5.3.4.6: 지난 시험 주 성적표가 아직 없으면 먼저 만들고, 받지 않은 성적표는 덮기 전에 받아요(전에는 덮여 사라졌어요)
+      // 지난 시험 주 성적표가 아직 없으면 먼저 만들고, 받지 않은 성적표는 덮기 전에 받아요(전에는 덮여 사라졌어요)
       if (S.ex.cur >= 0 && S.ex.cur < w && !(S.ex.rep && S.ex.rep.wk === S.ex.cur)) { if (S.ex.rep && !S.ex.rep.got) exClaim(); S.ex.rep = exMake(S.ex.cur); }
       const made = !!(S.ex.rep && S.ex.rep.wk === S.ex.cur && !S.ex.rep.got);
       S.ex.cur = w; S.ex.ss = 0; save(); rt.exNews = made ? '지난 시험 성적표가 나왔고 새 시험 주가 시작됐어요!\n도서관이나 공부 탭에서 받아요' : '시험 주가 시작됐어요!\n도서관에서 자율학습을 하면 성적이 올라요'; }
@@ -131,7 +131,7 @@
      종목 점수 = 별 × 20 + 주사위(0~60) + 응원(0~10). 별은 초등학교에서 과목 레벨 ÷ 4(올림, 1~5) + 잘하는 과목 1, 중학교부터 명부 능력치
      승 +25(3연승부터 +5씩, 최대 +15 더), 패 −10(1000 아래로 안 내려가요). 리그 6단계(내려가지 않아요), 승급마다 황금 도토리 1~5
      오늘 첫 승리만 수업료 10분치. 이긴 종목(친선 포함)마다 그 과목 XP 10, 중학교 명부 학생은 능력치 +1(하루 학생마다 2번까지)
-     주간 리그 승리마다 5점(하루 25점까지). 그림은 작업지시서 29, 29-1 */
+     주간 리그 승리마다 5점(하루 25점까지). 그림은 */
   // 퍼즐, 합치기, 대결 화면에 있는 동안은 홈 알림(반장 선거, 시험 주, 책 다 읽음)을 미뤄요
   const gameSceneOpen = () => { try { return !!((pzUI && pzUI.open) || (mgUI && mgUI.open) || (btUI && btUI.open)); } catch (e) { return false; } };
   const BT = { perDay: 5, adMore: 2, adMax: 1, win: 25, lose: 10, floor: 1000, streakFrom: 3, streakStep: 5, streakMax: 15, firstMin: 10, xp: 12, play: 5, grow: 2, lp: 5, lpDay: 25, cheerMs: 4000, cheerMax: 10, cheerTaps: 50, dice: 60, sweep: 0.7 };   // 응원: 4초 동안 50번까지 두드려요(5번마다 1점, 최대 10점). 주사위 0~60: 설계안의 승률(별 하나 차이 뒤집기 약 20~30%, 두 별 약 5%)에 맞춘 값. 0~30이면 별 하나 차이도 6%라 거의 못 뒤집어요
@@ -283,7 +283,7 @@
     sfx('tap'); btRender();
   }
   function btStart() {
-    useLog('bt');   // 5.4.0.3 놀이 기록
+    useLog('bt');   // 놀이 기록
     const M = btUI.M; if (!M || M.phase !== 'pick' || M.me.some(x => !x)) return false;
     if (btLeft() <= 0) { if (btCanAd()) btAdMore(); else toast(`숲속 대결은 하루 ${btQuota()}판이에요.\n내일 또 겨뤄요`); return false; }
     S.bt.n += 1; M.phase = 'play'; M.i = 0;
@@ -998,7 +998,7 @@
     for (let i = 0; i < len; i++) { let c; do { c = Math.floor(Math.random() * BTQ_COL.length); } while (seq.length && c === seq[seq.length - 1]); seq.push(c); }
     return { kind: 'mem', seq, show: -1, input: [], phase: 'show', ok: true, rev: wk === 1 };   // B주는 거꾸로 눌러요
   }
-  const btqPts = Z => Z.kind === 'q' ? BTQ.pts[Math.min(BTQ.n, Z.got)] : Math.round(10 * (Z.ok || !Z.miss ? Z.input.length : Math.max(0, Z.input.length - 1)) / Z.seq.length);   // 5.3.4.6: 틀린 칸을 눌렀을 때만 그 칸을 빼요(시간이 다 되면 맞힌 칸 그대로)
+  const btqPts = Z => Z.kind === 'q' ? BTQ.pts[Math.min(BTQ.n, Z.got)] : Math.round(10 * (Z.ok || !Z.miss ? Z.input.length : Math.max(0, Z.input.length - 1)) / Z.seq.length);   // 틀린 칸을 눌렀을 때만 그 칸을 빼요(시간이 다 되면 맞힌 칸 그대로)
   function btqHTML(Z) {
     if (Z.kind === 'q') {
       const q = Z.qs[Z.k];
@@ -1060,7 +1060,7 @@
   // 점수가 0부터 차오르는 연출
   function btCount(el, to, ms) { if (!el) return; if (rt.reduced) { el.textContent = to + '점'; return; } const t0 = performance.now(); const step = t => { const k = Math.min(1, (t - t0) / ms); el.textContent = Math.round(to * (1 - Math.pow(1 - k, 3))) + '점'; if (k < 1) requestAnimationFrame(step); }; requestAnimationFrame(step); }
   /* 달리기는 트랙을 달리는 모습. 두드릴 때마다 우리 선수가 앞으로 뛰고(통통) 트랙 줄이 뒤로 흘러요
-     상대 선수는 정해진 응원 점수만큼 일정하게 달려요. 그림 bt_track(작업지시서 48)이 없으면 CSS 트랙 */
+     상대 선수는 정해진 응원 점수만큼 일정하게 달려요. 그림 bt_track이 없으면 CSS 트랙 */
   function btTrackHTML(me, o) {
     const tr = IMG('bt_track');
     return `<div class="bt-track"${tr ? ` style="background:url('${tr}') var(--off) 0/auto 100% repeat-x"` : ''} aria-hidden="true"><span class="bt-fin">🏁</span>` +
@@ -1244,7 +1244,7 @@
     $('#labCardTag').textContent = !ready ? '잠김' : done ? '노트 보기' : '시작하기';
     lc.classList.toggle('lock', !ready);
   }
-  // 동아리 배지: 그림(작업지시서 19)이 있으면 그림, 없으면 그림 문자
+  // 동아리 배지: 그림이 있으면 그림, 없으면 그림 문자
   const clubBadge = (c, px) => IMG(CLUBS[c].img) ? `<img class="club-badge" src="${IMG(CLUBS[c].img)}" alt="" draggable="false"${px ? ` style="width:${px}px;height:${px}px"` : ''}>`
     : `<span class="club-badge em c${c}"${px ? ` style="width:${px}px;height:${px}px;font-size:${Math.round(px * 0.55)}px"` : ''}>${CLUBS[c].em}</span>`;
   const kidFace = (sp, r) => `<span class="rs-av">${kidAvatar(r ? sp + '_rare' : sp)}</span>`;   // r: 반짝 친구 모습
@@ -1288,7 +1288,7 @@
   // 학교 복도: 상점 거리처럼 복도 배경 위에 방문. 동아리실이 먼저 열리고 나머지 방은 앞으로 들어와요
   const hallOpen = () => rosterOn();
   function renderHall() {
-    const bg = (uniNow() && IMG('hall_bg_uni')) || IMG('hall_bg');   // 대학교 복도 그림(작업지시서 62)이 들어오면 그것을 써요
+    const bg = (uniNow() && IMG('hall_bg_uni')) || IMG('hall_bg');   // 대학교 복도 그림이 들어오면 그것을 써요
     $('#hallScene').style.backgroundImage = bg ? `url("${bg}")` : '';
     $('#hallScene').classList.toggle('fb', !bg);
     $$('#panelHall .sf-pic').forEach(el => {

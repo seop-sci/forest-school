@@ -6,7 +6,7 @@
   }
   function openModal(el) {
     nlModal(el);
-    if (rt.modalOpen !== el && el.id) useLog(el.id);   // 5.4.0.3 놀이 기록
+    if (rt.modalOpen !== el && el.id) useLog(el.id);   // 놀이 기록
     rt.modalOpen = el;
     el.hidden = false;
     try { uiRwOpen(el); } catch (e) { /* 연출만 */ }   // 보상 창 빛살
@@ -16,7 +16,7 @@
     if (b) b.focus({ preventScroll: true });
   }
   function closeModal(el, then) {
-    if (el._closing && !el.classList.contains('open')) return;   // 5.3.4.6: 닫히는 180ms 안에 또 불리면(받기 두 번 누르기) 보상을 두 번 주지 않아요
+    if (el._closing && !el.classList.contains('open')) return;   // 닫히는 180ms 안에 또 불리면(받기 두 번 누르기) 보상을 두 번 주지 않아요
     if (el.classList.contains('open')) { try { uiRwClose(el); } catch (e) { /* 연출만 */ } }   // 도토리가 위 칸으로
     el.classList.remove('open');
     if (rt.modalOpen === el) rt.modalOpen = null;
@@ -65,7 +65,7 @@
   function shake(el) { el.classList.remove('shake'); void el.offsetWidth; el.classList.add('shake'); el.addEventListener('animationend', () => el.classList.remove('shake'), { once: true }); setTimeout(() => el.classList.remove('shake'), 900); sfx('deny'); }
   function setTab(t) {
     const prev = rt.tab;
-    if (prev !== t) useLog('tab_' + t);   // 5.4.0.3 놀이 기록
+    if (prev !== t) useLog('tab_' + t);   // 놀이 기록
     if (t !== 'rank' && t !== 'dex') rt.backTab = '';   // C-22
     if (rt.thPrev && t !== 'school') thPreviewEnd(true);   // 다른 탭으로 가면 미리 보기를 끝내요
     rt.tab = t;
@@ -97,7 +97,7 @@
     if (t !== 'school') $('#scroller').scrollTop = 0;
     if (t === 'shop') { rt.shopPick = ''; renderShop(); $('#panelShop').scrollTop = 0; }
     if (t === 'rank') { rt.rankEdit = false; initRank(); renderRankPanel(); submitRank(); }
-    if (t === 'settings') { renderCloudInfo(); renderNoticeDot(); rt.mkDraft = null; setSchoolRender(); }   // 5.3.3 학교 간판과 마크(꾸미기 가게에서 옮겨 왔어요)
+    if (t === 'settings') { renderCloudInfo(); renderNoticeDot(); rt.mkDraft = null; setSchoolRender(); }   // 학교 간판과 마크(꾸미기 가게에서 옮겨 왔어요)
     if (t === 'mini') renderMini();
     if (prev === 'quests' && t !== 'quests') markQuestsSeen();
     if (t === 'teachers') renderTeachers();

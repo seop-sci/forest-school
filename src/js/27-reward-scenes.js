@@ -80,7 +80,7 @@
     const g = document.createElementNS(NS, 'g');
     g.setAttribute('class', 'bus');
     g.setAttribute('aria-hidden', 'true');
-    const bi = IMG('trip_bus'), bo = IMG('trip_bus_open');   // 버스 그림(작업지시서 45). 앞이 왼쪽
+    const bi = IMG('trip_bus'), bo = IMG('trip_bus_open');   // 버스 그림. 앞이 왼쪽
     g.innerHTML = bi ? `<g class="bus-body"><ellipse cx="2" cy="9" rx="25" ry="4" fill="rgba(40,30,10,.25)"/><image class="bus-img" href="${bi}" x="-30" y="-31" width="60" height="40"/></g>` +
       `<g class="bus-tag"><rect x="-17" y="-40" width="34" height="11" rx="5.5" fill="#FFF6E0" stroke="#C9962A" stroke-width=".8"/><text x="0" y="-32" text-anchor="middle" class="bus-sign">체험학습</text></g>` : BUS_MAP;
     layerFx.appendChild(g);

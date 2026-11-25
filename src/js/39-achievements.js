@@ -10,7 +10,7 @@
     { id: 'grad', name: '종업식과 졸업식', goals: [1, 5, 20, 50, 100], title: '졸업식 단골', t: n => `종업식이나 졸업식 ${n}번 열기`, v: () => S.st.grads },
     { id: 'building', name: '건물 키우기', goals: [10, 20, 30, 40, 50], title: '숲속 건축왕', t: n => `건물 하나를 Lv.${n}까지 올리기`, v: () => Math.max(0, ...Object.values(S.f)) },
     { id: 'teacher', name: '선생님 연수', goals: [10, 50, 200, 500, 1000], title: '연수 대장', t: n => `선생님 연수 ${n}번 보내기`, v: () => S.st.trains, ok: () => false },
-    { id: 'quest', name: '메인 퀘스트', goals: [10, 20, 40, 60, 80], title: '숲의 길잡이', t: n => `메인 퀘스트 ${n}개 끝내기`, v: () => S.q.md },   // 보안 점검(1-7): 번호 대신 끝낸 수
+    { id: 'quest', name: '메인 퀘스트', goals: [10, 20, 40, 60, 80], title: '숲의 길잡이', t: n => `메인 퀘스트 ${n}개 끝내기`, v: () => S.q.md },   // 번호 대신 끝낸 수
     { id: 'puzzle', name: '숲속 퍼즐', goals: [1000, 3000, 10000, 20000, 40000], title: '퍼즐 박사', t: n => `숲속 퍼즐 ${fmt(n)}점 넘기`, v: () => S.pz ? S.pz.best : 0 },
     { id: 'dex', name: '동물 도감', goals: [3, 6, 10, 14, 0], title: '동물 박사', t: n => n >= DEX_KEYS.length ? '동물 도감 모두 모으기' : `동물 도감 ${n}칸 채우기`, v: () => dexCount('all') },
     { id: 'fest', name: '학교 행사', goals: [5, 30, 100, 250, 500], title: '축제 대장', t: n => `학교 행사 ${n}번 열기`, v: () => S.st.sports + Object.values(S.fest.n).reduce((a, b) => a + b, 0) },
@@ -111,7 +111,7 @@
   }
   function renderAch(force) {
     const box = $('#achList'); if (!box || !S || !S.ach) return;
-    paAllRender();   // 5.4.0 모은 것 한눈에 보기
+    paAllRender();   // 모은 것 한눈에 보기
     const vals = ACH.map(achVal);
     const key = ACH.map((a, i) => `${achHit(a.id)}${achGot(a.id)}:${Math.floor(vals[i])}`).join('|') + '|' + S.ach.title;
     if (!force && box.dataset.key === key) return; box.dataset.key = key;
@@ -132,7 +132,7 @@
     }).join('');
   }
   function setDexSeg(v) {
-    rt.dexSeg = v === 'ach' ? 'ach' : v === 'sn' ? 'sn' : v === 'bx' ? 'bx' : v === 'deco' ? 'deco' : v === 'pa' && paOpen() ? 'pa' : 'dex';   // 간식 도감, 생물 도감, 5.3.3 한정 장식 도감
+    rt.dexSeg = v === 'ach' ? 'ach' : v === 'sn' ? 'sn' : v === 'bx' ? 'bx' : v === 'deco' ? 'deco' : v === 'pa' && paOpen() ? 'pa' : 'dex';   // 간식 도감, 생물 도감, 한정 장식 도감
     $$('#dexSeg [data-dseg]').forEach(b => b.setAttribute('aria-checked', String(b.dataset.dseg === rt.dexSeg)));
     $('#dexPane').hidden = rt.dexSeg !== 'dex'; $('#achPane').hidden = rt.dexSeg !== 'ach'; $('#snPane').hidden = rt.dexSeg !== 'sn'; $('#bxPane').hidden = rt.dexSeg !== 'bx'; $('#decoDexPane').hidden = rt.dexSeg !== 'deco'; $('#paPane').hidden = rt.dexSeg !== 'pa';
     if (rt.dexSeg === 'ach') renderAch(true); else if (rt.dexSeg === 'sn') snDexRender(); else if (rt.dexSeg === 'bx') bxDexRender(); else if (rt.dexSeg === 'deco') decoDexRender(); else if (rt.dexSeg === 'pa') paSegOpen(); else renderDex();

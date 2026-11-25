@@ -179,7 +179,7 @@
   }
 
   /* ---------- 자리 비운 동안 ---------- */
-  /* 보안 점검(1-8, 2-5): 켤 때의 자리 비운 시간은 서버 시간으로 재요
+  /* 켤 때의 자리 비운 시간은 서버 시간으로 재요
      서버 시간을 받을 수 있는 판은 서버 시간이 올 때까지 기다렸다가 계산하고(못 받고 끄면 S.away에 남겨 다음에 이어요)
      켠 뒤 놀던 시간(skip)은 빼요. 받지 않은 보상이 있어도 그 뒤 흐른 시간을 버리지 않아요 */
   function awayStart() {
@@ -187,7 +187,7 @@
     if (!timeSrc()) { awayApply((gameNow() - from) / 1000); return; }
     rt.awayWait = { from, skip: (S.away && S.away.skip) || 0, perf: (document.hidden || rt.paused) ? null : perfNow() };
     if (serverTimeOk()) { awaySettle(); return; }
-    // 5.3.2.1: 인터넷 없이 켜면 서버 시간이 올 때까지 보상이 말없이 미뤄져서 '보상이 사라졌다'로 보였어요. 6초 뒤에도 기다리고 있으면 한 줄 알려요
+    // 인터넷 없이 켜면 서버 시간이 올 때까지 보상이 말없이 미뤄져서 '보상이 사라졌다'로 보였어요. 6초 뒤에도 기다리고 있으면 한 줄 알려요
     if (gameNow() - from >= CFG.awayModalSec * 1000) setTimeout(() => { if (rt.awayWait && rt.awayWait.from === from && !serverTimeOk()) toast('인터넷이 이어지면 자리 비운 보상을 드려요'); }, AWAY_WAIT_MS);
   }
   const AWAY_WAIT_MS = 6000;
@@ -215,7 +215,7 @@
     S.students = Math.min(capacity(), S.students + CFG.enroll * sec);
     if (sec < CFG.awayModalSec) { const g = rate() * sec; S.budget += g; earn(g); return; }
     const ov = nsOverlap(gameNow() - sec * 1000, gameNow());   // 야간 자율학습을 켠 밤과 겹친 시간
-    const used = Math.min(sec, Math.max(0, (offlineCapH() + (ov > 0 ? nsExtraH() : 0)) * 3600 - S.pendingSec));   // 보안 점검(1-3): 받지 않은 보상과 합쳐 상한까지만
+    const used = Math.min(sec, Math.max(0, (offlineCapH() + (ov > 0 ? nsExtraH() : 0)) * 3600 - S.pendingSec));   // 받지 않은 보상과 합쳐 상한까지만
     const nsUsed = Math.min(used, ov), base = rate() * offlineEff();
     S.pending += base * (used + nsUsed * nsBonus());
     if (nsUsed > 0) { S.ns.got += base * nsUsed * (1 + nsBonus()); S.ns.sec += nsUsed; rt.nsAway = true; S.st.nsAway = (S.st.nsAway || 0) + 1; }
@@ -270,7 +270,7 @@
   const AD_GUARD_MS = 180000;
   function showAd(onReward, onSkip) {
     if (rt.adOpen) return;
-    rt.adWhere = (rt.modalOpen && rt.modalOpen.id) || rt.tab || '';   // 5.4.0.3 놀이 기록: 어느 자리에서 눌렀는지
+    rt.adWhere = (rt.modalOpen && rt.modalOpen.id) || rt.tab || '';   // 놀이 기록: 어느 자리에서 눌렀는지
     useLog('ad_ask:' + rt.adWhere);
     const EXT = AIT && AIT.ads ? AIT : ADS_EXT;   // 토스 광고나 안드로이드 애드몹 광고
     if (EXT) {
@@ -324,7 +324,7 @@
     ensureAudio(); musicSync();
     const ok = rt.adOk, no = rt.adNo, earned = rt.adEarned, noGold = rt.adNoGold;
     rt.adOk = rt.adNo = null; rt.adNoGold = false;
-    useLog((earned ? 'ad_ok:' : 'ad_no:') + (rt.adWhere || ''));   // 5.4.0.3 놀이 기록
+    useLog((earned ? 'ad_ok:' : 'ad_no:') + (rt.adWhere || ''));   // 놀이 기록
     if (earned) { S.st.ads += 1; adxDay(); S.adx.all = Math.min(10000, (S.adx.all || 0) + 1); if (!noGold) adGold(); adStamp(); if (ok) ok(); }   // 오늘 본 광고 수(관리자 지표)
     else if (no) no();
     else toast('광고를 끝까지 보지 않아서 보상이 없어요');

@@ -547,7 +547,7 @@
   function makeSub(d) {
     const s = { id: d.id, who: d.who, t: d.t, k: d.k || null, n: d.n, r: 0, b: 0, nw: true, say: '' };
     // 받자마자 끝나 버리는 부탁이 없게 목표를 지금보다 한 단계 위로 맞춰요
-    if (s.t === 'fac' && (S.f[s.k] || 0) + 1 > facCap()) {   // 5.3.4.6: 이미 올해 상한인 건물이면 더 올릴 수 있는 지은 건물로 바꿔요(목표가 상한+1이라 학기 내내 막혔어요)
+    if (s.t === 'fac' && (S.f[s.k] || 0) + 1 > facCap()) {   // 이미 올해 상한인 건물이면 더 올릴 수 있는 지은 건물로 바꿔요(목표가 상한+1이라 학기 내내 막혔어요)
       const alt = Object.keys(FAC).find(k => (S.f[k] || 0) >= 1 && (S.f[k] || 0) + 1 <= facCap()); if (alt) s.k = alt;
     }
     if (s.t === 'fac') s.n = Math.min(Math.max(s.n, S.f[s.k] + 1), Math.max(facCap(), S.f[s.k] || 0));
@@ -684,7 +684,7 @@
   }
 
   /* 칠판 아래 퀘스트 쪽지: 지금 메인 퀘스트, 다 마치면 학생 부탁 */
-  /* 5.3.2.2 F-04: 건물 창과 선생님 탭에서는 위쪽 퀘스트 칸의 '받기'를 누르면 창만 닫혔어요. 퀘스트를 마치면 그 화면 아래에 '보상 받기' 띠를 띄워요 */
+  /* F-04: 건물 창과 선생님 탭에서는 위쪽 퀘스트 칸의 '받기'를 누르면 창만 닫혔어요. 퀘스트를 마치면 그 화면 아래에 '보상 받기' 띠를 띄워요 */
   function qReadyNow() {
     const mq = curMain();
     if (mq) return mainReady() ? { ref: 'main', tx: `${qNo(S.q.m)} ${mq.title}` } : null;
@@ -814,7 +814,7 @@
   function buildQuestPanel() {
     const i = S.q.m, q = MAIN[i];
     if (!q) {
-      $('#qMain').innerHTML = gradOn()   // 5.3.2.1: 박사 학위 뒤에 할 일을 말해요
+      $('#qMain').innerHTML = gradOn()   // 박사 학위 뒤에 할 일을 말해요
         ? '<div class="qall"><b>메인 퀘스트를 모두 마쳤어요</b><p>박사 학위까지 받았어요! 이제는 연구소 창의 논문 탭에서 논문을 쓰고 숲속 학회 메달을 모아요. 연구 트리와 학생들의 부탁도 이어 가요. 다음 학교급은 숲속 교육부가 준비 중이에요.</p></div>'
         : '<div class="qall"><b>메인 퀘스트를 모두 마쳤어요</b><p>끝까지 왔어요! 다음 학교급은 숲속 교육부가 열심히 준비 중이에요. 그동안 종업식으로 수료증을 모으고 학생들의 부탁도 들어주세요.</p></div>';
     } else {
@@ -840,7 +840,7 @@
       subs = S.q.subs.map(s => questCard(s, s.b, { ref: s.id, kid: true, av: kidAvatar(s.who), name: WHO[s.who], say: `“${s.say}”`, badge: s.nw ? '새 부탁' : '' })).join('');
       if (S.q.subs.length < subSlots()) subs += '<p class="qempty">새 부탁을 기다리고 있어요. 메인 퀘스트를 이어 가면 학생들이 또 찾아와요.</p>';
     }
-    $('#qSubs').innerHTML = gsCardHTML() + subs;   // 5.3.4.7 오늘의 손님 칸은 학생 부탁 위에
+    $('#qSubs').innerHTML = gsCardHTML() + subs;   // 오늘의 손님 칸은 학생 부탁 위에
     $('#qTally').textContent = S.q.subDone > 0 ? `지금까지 들어준 부탁 ${S.q.subDone}개` : '';
   }
   function updateQuestProgress() {

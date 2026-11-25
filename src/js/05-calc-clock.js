@@ -11,7 +11,7 @@
   // 새내기 장학금(대학교 1학년이 다른 학년의 두 배쯤 걸려서 줄여요): 대학교 1학년 동안만 수업료에 곱해요. 숫자는 bal400으로 잰 제안값
   const UNI_FRESH = { mult: 2.5 };
   const freshMult = () => (S && S.tier === 4 && S.tg === 0) ? UNI_FRESH.mult : 1;
-  const feastOn = () => gameNow() < S.hd.feastUntil;   // 보안 점검(2-5): 게임 시계
+  const feastOn = () => gameNow() < S.hd.feastUntil;   // 게임 시계
   const rate = () => Math.max(0, Math.min(S.students, capacity()) - pcAway()) * CFG.base * CFG.pace * tuitionMult() * Math.pow(CFG.gradeMult, S.grade) * incomeScale() * (feastOn() ? 2 : 1);
   const offlineEff = () => Math.min(1, 0.3 + 0.15 * S.t.owl);
   const offlineCapH = () => CFG.offlineCapH + 4 * S.p.perk.night + rtLv('time');   // 연구 트리 시간
@@ -107,7 +107,7 @@
       const t = gameNow();   // S.clk.last를 서버 시간으로 바로잡아요
       // 켜 둔 채 휴대폰이 잠들어 흐른 시간이 멈췄던 기기는, 서버 시간을 다시 받았을 때 앞서간 만큼을 자리 비운 보상으로 줘요. 서버 시간끼리의 차이라 기기 시계로는 늘릴 수 없어요
       if (was > 0 && t - was > 10000) awayApply((t - was) / 1000);
-      // 보안 점검(2-10): 미래로 고친 저장 시각은 서버 시간으로 되돌려요(다른 기기가 옛 학교로 되돌아가지 않게)
+      // 미래로 고친 저장 시각은 서버 시간으로 되돌려요(다른 기기가 옛 학교로 되돌아가지 않게)
       if (S.savedAt > t + 60000) S.savedAt = t;
       awaySettle();   // 서버 시간을 기다리던 자리 비운 보상을 이제 계산해요
     }
@@ -127,7 +127,7 @@
     if (!S) return dev;
     if (!S.clk) S.clk = { last: 0 };
     if (serverTimeOk()) { const el = Math.floor(perfNow() - SVR.perf), t = SVR.base + el; svrDrift(el); S.clk.last = t; return t; }
-    // 보안 점검(2-6): 서버 시간을 받을 수 있는 판은 서버 시간이 오기 전까지 기기 시계를 믿지 않아요
+    // 서버 시간을 받을 수 있는 판은 서버 시간이 오기 전까지 기기 시계를 믿지 않아요
     // 마지막으로 믿은 시각(켤 때의 S.clk.last)에 이번에 켠 뒤 흐른 시간만 더해요. 그래서 오프라인에서 시계를 앞으로 돌려도 새 날이 오지 않아요
     if (timeSrc() && rt.clk0 && rt.clk0.last > 0) { const t = Math.max(S.clk.last, rt.clk0.last + (performance.now() - rt.clk0.perf)); S.clk.last = t; return t; }
     if (dev >= S.clk.last) { S.clk.last = dev; return dev; }
@@ -160,8 +160,8 @@
   const CAMPUS8 = ['classroom', 'cafeteria', 'library', 'playground', 'science', 'store', 'dorm', 'union'];   // 대학원 퀘스트 facAll: 대학교 때 지은 건물 여덟 채
   // 학교가 계속 자라니까 높은 레벨은 값이 덜 가파르게 올라요: 시설은 Lv.15부터, 선생님은 Lv.12부터 한 레벨에 1.35배씩
   const SOFT = { fac: 15, tea: 12, g: 1.35 };
-  const EARLY = { g: 1.25, ch: 7, back: 0.3, fund: 50 };   // 5.3.4.5: fund 15 → 50(초등이 빨라져 줄어든 수료증만큼. qbot 초등 졸업 뒤 기금 총량 194 → 229, 중학교부터 5.3.4.3 전과 같음)
-    // 3안: 유치원과 초등 비용 곡선, 1~8장(유치원~초등 3학년) 건물 퀘스트는 그 레벨 공사비의 30%를 돌려받아요. 2026-11-22 woodani: 곡선 1.27 → 1.25, 초등 졸업 기금 +15(초등이 빨라져 번 도토리가 줄면 기금이 모자라 중학교 처음 수업료가 절반이 되던 것을 받쳐요. 문서 '초등 4~6학년 도서관 계단과 qbot 10^15 알림 조사')
+  const EARLY = { g: 1.25, ch: 7, back: 0.3, fund: 50 };   // fund 15 → 50(초등이 빨라져 줄어든 수료증만큼. qbot 초등 졸업 뒤 기금 총량 194 → 229, 중학교부터 전과 같음)
+    // 3안: 유치원과 초등 비용 곡선, 1~8장(유치원~초등 3학년) 건물 퀘스트는 그 레벨 공사비의 30%를 돌려받아요. 곡선 1.27 → 1.25, 초등 졸업 기금 +15(초등이 빨라져 번 도토리가 줄면 기금이 모자라 중학교 처음 수업료가 절반이 되던 것을 받쳐요. 문서 '초등 4~6학년 도서관 계단과 qbot 10^15 알림 조사')
   const softCost = (fn, L, from) => fn(Math.min(L, from)) * Math.pow(softG(), Math.max(0, L - from));
   // 유치원과 초등학교는 레벨마다 1.35배 대신 1.30배
   // 1.30배를 1.27배로(초등 4~6학년 도서관 퀘스트가 수업료로 19.5시간 걸리던 것, qbot 초등 전체 158시간 → 118시간)
@@ -187,9 +187,9 @@
   const TK = [{ k: 'h3', sec: 10800, name: '3시간권' }, { k: 'h1', sec: 3600, name: '1시간권' }, { k: 'm30', sec: 1800, name: '30분권' }, { k: 'm5', sec: 300, name: '5분권' }];
   const TKAD = { n: 6, perDay: 2 };
   const TK_CH = 6;   // 초등학교부터 메인 퀘스트 장을 마치면 5분권 6장
-  // 미션과 이벤트 보상에도 시간 단축권(초등학교부터, 유치원은 공사가 5초라 안 줘요). 양은 본부 제안
+  // 미션과 이벤트 보상에도 시간 단축권(초등학교부터, 유치원은 공사가 5초라 안 줘요).
   // 초반(유치원~초등 3학년)에 단축권을 얻을 길. 메인 퀘스트 1~8장에서 장마다 다섯 번째 퀘스트마다 5분권 1장
-  // 숲속 퍼즐 보상 판 한 판마다, 숲속 합치기 주문 5개마다 5분권 1장(각각 하루 1장, 모든 학교급). 숫자는 본부 제안
+  // 숲속 퍼즐 보상 판 한 판마다, 숲속 합치기 주문 5개마다 5분권 1장(각각 하루 1장, 모든 학교급).
   const TK_REW = { pz: ['m5', 1], mg: ['m5', 1], dm: ['m5', 1], wk: ['m5', 1], evm: ['m5', 1], stamp: ['m5', 1], stamp5: ['m5', 1], box: ['m30', 1] };
   // 퍼즐과 합치기 단축권: 하루 TKE.perDay장까지
   function tkDaily(key) {
@@ -245,7 +245,7 @@
     lib: { name: '사슴 선생님', subject: '사서', fac: 'library', max: 10, per: 3, av: 'librarian',
       desc: '도서관을 지키는 사서 선생님이에요.',
       eff: L => L < 1 ? '퍼즐 숲의 정수 보너스 없음' : `퍼즐 숲의 정수 +${XT.lib.per * L}%` },
-    // 새 선생님 셋(작업지시서 39). sub: 과목 선생님이라 탭에서 교감 선생님 위에, tier: 그 학교급부터 오셔요
+    // 새 선생님 셋. sub: 과목 선생님이라 탭에서 교감 선생님 위에, tier: 그 학교급부터 오셔요
     kor: { name: '고니 선생님', subject: '국어', fac: 'library', tier: 1, max: 10, per: 5, av: 'swan', sub: true,
       desc: '시를 즐겨 읽는 국어 선생님이에요.',
       eff: L => L < 1 ? '책 읽기 보너스 없음' : `책 읽기 국어 XP +${5 * L}%` + (Math.floor(L / 5) ? `, 하루 책 +${Math.floor(L / 5)}권` : '') },
@@ -255,11 +255,11 @@
     snack: { name: '알파카 선생님', subject: '매점', fac: 'store', tier: 2, max: 10, per: 0.5, av: 'alpaca',
       desc: '복슬복슬한 매점 선생님이에요.',
       eff: L => `귀한 간식 ${(8 + 0.5 * L).toFixed(1).replace(/\.0$/, '')}%` + (L ? ` (+${(0.5 * L).toFixed(1).replace(/\.0$/, '')}%p)` : '') },
-    // 오소리 선생님(작업지시서 39): 기숙사를 지으면 오셔요. 야간 자율학습으로 쌓이는 수업료가 늘어요
+    // 오소리 선생님: 기숙사를 지으면 오셔요. 야간 자율학습으로 쌓이는 수업료가 늘어요
     dorm: { name: '오소리 선생님', subject: '사감', fac: 'dorm', tier: 3, max: 10, per: 5, av: 'badger',
       desc: '기숙사를 돌보는 사감 선생님이에요.',
       eff: L => L < 1 ? '자율학습 보너스 없음' : `자율학습 도토리 +${5 * L}%` },
-    // 비버 선생님(작업지시서 48): 초등학교부터, 연수는 숲의 정수(20+10n), 한 레벨에 공사 시간 -2%
+    // 비버 선생님: 초등학교부터, 연수는 숲의 정수(20+10n), 한 레벨에 공사 시간 -2%
     fix: { name: '비버 선생님', subject: '시설', fac: 'classroom', tier: 1, max: 10, per: 2, av: 'beaver', ess: true,
       desc: '망치질이 특기인 시설 선생님이에요. 공사장에서 뚝딱뚝딱 고쳐요.',
       eff: L => L < 1 ? '공사 시간 그대로' : `공사 시간 -${2 * L}%` },
@@ -267,11 +267,11 @@
     cou: { name: '코끼리 선생님', subject: '진로', fac: 'classroom', tier: 3, max: 10, per: 5, av: 'elephant',
       desc: '복도 상담실에서 학생들의 꿈을 함께 찾는 진로 선생님이에요.',
       eff: L => (L < 1 ? `하루 상담 ${CS.perDay}번` : `상담 관심 +${5 * L}%`) + (Math.floor(L / 5) ? `, 하루 상담 +${Math.floor(L / 5)}번` : '') },
-    // 두루미 학장 교수님(설계안 4절, 작업지시서 54): 학생회관을 지으면 오셔요. 연수 한 레벨에 단과대학 보너스 +3%(최대 +30%). 단과대학(5절)이 들어오면 deanMult를 곱해요
+    // 두루미 학장 교수님: 학생회관을 지으면 오셔요. 연수 한 레벨에 단과대학 보너스 +3%(최대 +30%). 단과대학(5절)이 들어오면 deanMult를 곱해요
     dean: { name: '두루미 학장 교수님', subject: '학장', fac: 'union', tier: 4, max: 10, per: 3, av: 'crane',
       desc: '학생회관 학과 사무실에 계신 학장 교수님이에요.',
       eff: L => L < 1 ? '단과대학 수업료 보너스 그대로' : `단과대학 수업료 보너스 +${3 * L}%` },
-    // 펠리컨 지도교수님(작업지시서 85 그림): 연구소를 지으면 오셔요. 연수 한 레벨에 연구 트리 연구 시간 -3%(최대 -30%). 숫자는 본부 제안
+    // 펠리컨 지도교수님: 연구소를 지으면 오셔요. 연수 한 레벨에 연구 트리 연구 시간 -3%(최대 -30%).
     adv: { name: '펠리컨 지도교수님', subject: '지도교수', fac: 'institute', tier: 5, max: 10, per: 3, av: 'pelican',
       desc: '대학원생의 연구를 이끄는 지도교수님이에요. 연구소에 계셔요.',
       eff: L => L < 1 ? '연구 시간 그대로' : `연구 트리 연구 시간 -${3 * L}%` } };
@@ -324,7 +324,7 @@
   for (const o of [...Object.values(TEA), ...Object.values(XT).filter(X => X.sub), VP]) for (const f of ['name', 'desc']) { const t = o[f]; Object.defineProperty(o, f, { get: () => profText(t), enumerable: true, configurable: true }); }
   { const sj = VP.subject; Object.defineProperty(VP, 'subject', { get: () => uniNow() ? '부총장' : sj, enumerable: true, configurable: true }); }
   const deanMult = () => 1 + XT.dean.per / 100 * xtLv('dean');   // 단과대학 보너스에 곱해요
-  // 단과대학(설계안 5절): 8곳 가운데 학년에 따라 1~3곳을 골라요. 숫자는 모두 제안값이에요
+  // 단과대학: 8곳 가운데 학년에 따라 1~3곳을 골라요. 숫자는 모두 제안값이에요
   const DEPT = { ess: 30, base: 10, max: 30, job: 2, jobMax: 10,
     list: [
       { k: 'science', name: '자연과학대학', sub: ['sci'], fac: 'science', em: '🔬' },

@@ -63,7 +63,7 @@
       else if (name.startsWith('pz')) { const L = +name.slice(2) || 0; if (!L) { note(620, 0, 0.06, 'triangle', 0.07); note(880, 0.04, 0.08, 'triangle', 0.06); } else { const f = 740 * Math.pow(1.122, L); note(f, 0, 0.1, 'triangle', 0.12); note(f * 1.5, 0.07, 0.16, 'triangle', 0.11); if (L >= 3) note(f * 2, 0.14, 0.22, 'triangle', 0.1); } }
       else if (name === 'coin') { note(988, 0, 0.1, 'triangle', 0.13); note(1319, 0.07, 0.18, 'triangle', 0.13); }
       else if (name === 'buy') { note(523.25, 0, 0.14, 'triangle', 0.12); note(659.25, 0.08, 0.14, 'triangle', 0.12); note(783.99, 0.16, 0.26, 'triangle', 0.12); }
-      else if (name === 'shutter') { note(2200, 0, 0.025, 'square', 0.035); note(1400, 0.06, 0.04, 'square', 0.03); }   // 5.4.0 사진 찰칵
+      else if (name === 'shutter') { note(2200, 0, 0.025, 'square', 0.035); note(1400, 0.06, 0.04, 'square', 0.03); }   // 사진 찰칵
       else if (name === 'deny') note(196, 0, 0.16, 'square', 0.04);
       else if (name === 'leaf') { note(1150, 0, 0.04, 'triangle', 0.022); note(860, 0.035, 0.05, 'triangle', 0.018); }
       else if (name === 'magpie') { note(1480, 0, 0.07, 'square', 0.03); note(1320, 0.13, 0.08, 'square', 0.03); }
@@ -201,7 +201,7 @@
     }) : (webAud(key) ? webFetch(WEB_ROOT + 'audio/' + key + '.mp4?v=' + AUD_V) : fetch(AUD_BASE() + key + '.mp4').then(r => { if (!r.ok) throw new Error('곡 파일 ' + r.status); return r; })).then(r => r.arrayBuffer());
     return bytes;
   }
-  const HOME_MUSIC_TABS = new Set(['shop', 'street', 'ess', 'deco', 'school', 'teachers', 'quests', 'rank', 'dex', 'event', 'hall', 'club', 'settings', 'mini', 'grad']);   // 공부 탭, 졸업 탭, 상점(거리, 백화점, 문방구, 꾸미기 가게 모두. 5.3.3 woodani), 학교 복도와 동아리실, 설정도 홈 곡
+  const HOME_MUSIC_TABS = new Set(['shop', 'street', 'ess', 'deco', 'school', 'teachers', 'quests', 'rank', 'dex', 'event', 'hall', 'club', 'settings', 'mini', 'grad']);   // 공부 탭, 졸업 탭, 상점(거리, 백화점, 문방구, 꾸미기 가게 모두.), 학교 복도와 동아리실, 설정도 홈 곡
   // 테마 세트 미리 보기: 저장(S.cos.th)은 그대로 두고 화면만 미리 보는 테마로 그려요
   const thOn = () => (rt.thPrev ? rt.thPrev.th : S.cos.th);
   function musicWant() {
@@ -262,7 +262,7 @@
     if (!S || !S.ambV || rt.paused || rt.adOpen || document.hidden || rt.tab !== 'school' || rt.cereOn) return w;
     let play = false; try { play = !!((pzUI && pzUI.open) || (mgUI && mgUI.open) || (btUI && btUI.open)); } catch (e) { /* 아직 준비 전 */ }
     if (play) return w;
-    const h = kstHour(gameNow()), base = S && S.nl === 2 ? 'amb_day' /* 5.3.3.1 시간 흐름을 끄면(늘 낮) 자연 소리도 낮 */ : isNight() ? 'amb_night' : h < 9 ? 'amb_morning' : h >= 17 ? 'amb_evening' : 'amb_day';
+    const h = kstHour(gameNow()), base = S && S.nl === 2 ? 'amb_day' /* 시간 흐름을 끄면(늘 낮) 자연 소리도 낮 */ : isNight() ? 'amb_night' : h < 9 ? 'amb_morning' : h >= 17 ? 'amb_evening' : 'amb_day';
     let bv = rt.fest || rt.sports ? 0.5 : 1;   // 행사 곡이 나올 때는 반쯤
     if (rt.ambWx === 'rain') { w.amb_rain = 1; bv *= 0.45; }
     else if (rt.ambWx === 'snow') { w.amb_snow = 1; bv *= base === 'amb_night' ? 0.3 : 0.6; }
@@ -272,7 +272,7 @@
   }
   function ambLoad(key) {
     if (AMB.buf.has(key)) return AMB.buf.get(key);
-    const p = audBytes(key).then(b => actx.decodeAudioData(b)).catch(() => { AMB.buf.delete(key); return null; });   // 못 받으면 그 소리만 조용히 빠지고, 다음에 다시 받아요(5.3.4.4)
+    const p = audBytes(key).then(b => actx.decodeAudioData(b)).catch(() => { AMB.buf.delete(key); return null; });   // 못 받으면 그 소리만 조용히 빠지고, 다음에 다시 받아요
     AMB.buf.set(key, p);
     return p;
   }
