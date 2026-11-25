@@ -4145,7 +4145,7 @@ body.mg-on .toast[hidden]{display:none}
     <p class="boot-step" id="bootStep">학교 문을 여는 중...</p>
     <p class="boot-tip" id="bootTip">학교 문을 여는 중이에요</p>
   </div>
-  <span class="boot-ver" id="bootVer">v5.4.0.4</span>
+  <span class="boot-ver" id="bootVer">v5.4.1</span>
 </div>
 
 <div class="app on-school" id="app">
@@ -4765,7 +4765,7 @@ body.mg-on .toast[hidden]{display:none}
       </div>
       <h3 class="panel-sub">정보</h3>
       <dl class="info">
-        <div id="verRow"><dt>버전</dt><dd>v5.4.0.4</dd></div>
+        <div id="verRow"><dt>버전</dt><dd>v5.4.1</dd></div>
         <div id="pidRow" hidden><dt>학교 번호</dt><dd id="infoPid"></dd></div>
       </dl>
       <div id="devBox" hidden>
@@ -10074,7 +10074,7 @@ body.mg-on .toast[hidden]{display:none}
   // 종업식으로 남는 배수: 장학금은 레벨마다 1.3배씩 곱해지고, 전학생은 한 명마다 +5%
   // 전학 온 친구: 한 명마다 +5%, 다 온 뒤에는 친구 성장 쪽지로 키운 레벨마다 +2%
   const nlSum = () => (S.p.nl || []).reduce((a, b) => a + b, 0);
-  // 친구 성장 쪽지 고르기: 전학생을 다 만났거나, 이미 쪽지를 받아 키우기 시작한 학교(에 전학생이 12종으로 늘기 전에 6종을 다 만난 학교)
+  // 친구 성장 쪽지 고르기: 전학생을 다 만났거나, 이미 쪽지를 받아 키우기 시작한 학교(전학생이 12종으로 늘기 전에 6종을 다 만난 학교)
   const growOn = () => S.p.species >= ncMax() || (S.p.ticket || 0) > 0 || nlSum() > 0;
   const legacyMult = () => Math.pow(1.3, S.p.perk.schol) * (1 + 0.05 * S.p.species + 0.02 * nlSum()) * Math.pow(2, S.fp.schol);
   const tuitionMult = () => (1 + 0.2 * S.f.cafeteria) * (1 + 0.15 * S.t.squirrel) * (1 + FAC.store.per / 100 * (S.f.store || 0)) * (1 + FAC.dorm.per / 100 * (S.f.dorm || 0)) * (1 + FAC.union.per / 100 * (S.f.union || 0)) * (1 + FAC.institute.per / 100 * (S.f.institute || 0)) * (1 + FAC.gradhall.per / 100 * (S.f.gradhall || 0)) * rtClassMul() * taMult() * deptMult() * legacyMult() * setBonusMult() * tripMult() * clubTuitionMult() * elMult('tuition') * acMult() * snMult() * gdMult() * freshMult();   // 오늘의 급식, 새내기 장학금
@@ -11448,7 +11448,7 @@ body.mg-on .toast[hidden]{display:none}
       deco: [[56, 66], [312, 70], [22, 312], [338, 196], [60, 420], [302, 424], [29, 383], [252, 437]],
       sports: [103.4, 236.2, 48.9, 19.1], eaves: { classroom: 0.02, cafeteria: 0.0, library: 0.0, science: -0.06, playground: -0.14, store: 0, dorm: 0 } }
   ];
-  // 운동장 지붕 조각(roof_field, roof_field_s3와 겨울)은 새 그림의 트랙을 색으로 골라 만들었어요(처럼 테마 색이 트랙을 칠해요)
+  // 운동장 지붕 조각(roof_field, roof_field_s3와 겨울)은 새 그림의 트랙을 색으로 골라 만들었어요(테마 색이 트랙을 칠해요)
   // 새 건물 그림은 아래에서부터 가장 넓은 띠의 가운데를 재고, 예전 값과 같은 크기가 되게 너비 × 0.96, 높이 − 0.02로 맞췄어요
   // 건물 그림마다 바닥 섬(가장 넓은 줄)의 자리: [가로 중심 - 0.5, 세로 중심 - 0.5, 너비] (그림 한 변 기준, dev에서 그림을 재서 적었어요)
   // 새 단장 건물의 바닥 섬 값: [가장 넓은 줄 가운데 - 0.5, 바닥 섬 아래 끝 - 0.5, 가장 넓은 줄 너비]. 빈터 자리는 '바닥 섬 아래 끝이 놓일 곳'이에요(겨울판은 기본과 같게)
@@ -12188,7 +12188,7 @@ body.mg-on .toast[hidden]{display:none}
       if (j === k.pn) j = W.on[(W.on.indexOf(j) + 1) % W.on.length];
       k.pn = j; k.spot = i;
       k.tx = W.N[j][0] + rand(-2, 2); k.ty = W.N[j][1] + rand(-1.5, 1.5);
-      k.pw = [k.tx, k.ty];   // 이 갈 곳은 평소 걷기라서 길로 가요
+      k.pw = [k.tx, k.ty];   // 갈 곳은 평소 걷기라서 길로 가요
       return;
     }
     k.spot = i;
@@ -15762,13 +15762,16 @@ body.mg-on .toast[hidden]{display:none}
        forest/rank/<내 id>   랭킹 이름과 학교 점수
        forest/stats/<내 id>  테스트 현황 (어디까지 했는지, 얼마나 했는지)
      <내 id>는 Firebase 익명 로그인이 기기(브라우저)마다 만들어 줘요. */
-  const VERSION = '5.4.0.4';
-  const NT_QUIET = ['5.4.0.4', '5.4.0.3', '5.4.0.2', '5.4.0.1', '5.3.4.8', '5.3.4.7', '5.3.4.6', '5.3.4.5', '5.3.4.4', '5.3.4.3', '5.3.4.2', '5.3.4.1', '5.3.4', '5.3.2.1', '5.3.0.3', '5.3.0.2', '5.3.0.1', '5.2.2', '5.2.1', '5.2.0.2', '5.2.0.1', '5.1.1.3', '5.1.1.2', '5.1.1.1', '5.1.1', '5.0.3.1', '5.0.3', '5.0.2.2', '5.0.2.1', '2.1.20', '2.1.2.2', '2.3.0.1', '2.3.4', '3.2.3', '3.2.4', '3.2.5', '3.3.1', '3.3.2', '3.3.3', '4.4.1.1', '4.4.1.2', '4.4.1.3', '4.4.1.4', '5.0.1.1', '5.0.1.2', '5.0.1.3', '5.0.1.4', '5.0.1.5', '5.0.1.6', '5.0.1.7', '5.0.1.8'];   // 생물 탐사 고침은 공지 없이. 도 공지 없이(공지 줄은 정하면 넣어요). 공지 없이. 공지 줄은 정할 때까지 조용히. 공지는 가 정해서 NOTICES로 옮겼어요. 은 공지를 띄워요. 도 공지 없이. 도 공지 창 없이. 도 공지 창 없이(공지는 그대로). 도 조용히. 도 공지 창 없이(공지 줄을 고르지 않음)
+  const VERSION = '5.4.1';
+  const NT_QUIET = ['5.4.0.4', '5.4.0.3', '5.4.0.2', '5.4.0.1', '5.3.4.8', '5.3.4.7', '5.3.4.6', '5.3.4.5', '5.3.4.4', '5.3.4.3', '5.3.4.2', '5.3.4.1', '5.3.4', '5.3.2.1', '5.3.0.3', '5.3.0.2', '5.3.0.1', '5.2.2', '5.2.1', '5.2.0.2', '5.2.0.1', '5.1.1.3', '5.1.1.2', '5.1.1.1', '5.1.1', '5.0.3.1', '5.0.3', '5.0.2.2', '5.0.2.1', '2.1.20', '2.1.2.2', '2.3.0.1', '2.3.4', '3.2.3', '3.2.4', '3.2.5', '3.3.1', '3.3.2', '3.3.3', '4.4.1.1', '4.4.1.2', '4.4.1.3', '4.4.1.4', '5.0.1.1', '5.0.1.2', '5.0.1.3', '5.0.1.4', '5.0.1.5', '5.0.1.6', '5.0.1.7', '5.0.1.8'];
     // 이 버전들은 업데이트해도 공지 창을 띄우지 않아요(공지는 그대로)
-  /* 공지사항 (은 이미 올려서 부터): 설정 > 공지사항. 맨 위가 가장 새 공지예요
+  /* 공지사항: 설정 > 공지사항. 맨 위가 가장 새 공지예요
      패치노트는 자동으로 넣지 않아요. 검수한 글만 여기에 적어요(CHANGELOG.md는 자세한 기록용이라 따로 있어요)
      접속하면 새 공지 창을 띄워요(올라온 뒤 7일 동안, '일주일간 열지 않기'를 누르면 7일 쉬어요). 업데이트한 뒤 첫 접속에는 쉬는 중이어도 한 번 띄워요 */
   const NOTICES = [
+    // 공지(고른 세 줄). 웹 5.4.0.3~5.4.0.4와 글 다듬기를 앱으로 묶음
+    { id: '2026-11-25-v541', date: '2026-11-25', tag: '업데이트', title: '5.4.1 업데이트',
+      lines: ['연구소 시간 단축 추가', '생물 도감 수집 보상 추가', '편의 개선과 오류 수정'] },
     // 공지(고른 네 줄). 웹 5.3.4.1~5.3.4.8(사진첩, 오늘의 손님, 생물 도감 150종, 고침)을 앱으로 묶음
     { id: '2026-11-23-v540', date: '2026-11-23', tag: '업데이트', title: '5.4.0 업데이트',
       lines: ['오늘의 손님 업데이트', '생물 도감 60종 추가', '사진첩과 계절 사진 미션 추가', '편의 개선과 오류 수정'] },
@@ -15861,7 +15864,7 @@ body.mg-on .toast[hidden]{display:none}
     // 공지(B안 세 줄)
     { id: '2026-10-31-v231', date: '2026-10-31', tag: '업데이트', title: '2.3.1 업데이트',
       lines: ['뱀과 매 침입자 액션 추가', '숲속 퍼즐과 숲속 합치기 보상 개선', '오류 수정과 화면 다듬기'] },
-    // 공지(B안 다섯 줄). 부터는 실제 날짜. 그 앞 공지 날짜는 업데이트 간격이 너무 가까워 보여서 으로 3~5일 간격으로 고쳐 적었어요(id는 그대로라 다시 뜨지 않아요)
+    // 공지(B안 다섯 줄). 그 앞 공지 날짜는 업데이트 간격이 너무 가까워 보여서 3~5일 간격으로 고쳐 적었어요(id는 그대로라 다시 뜨지 않아요)
     { id: '2026-10-30-v230', date: '2026-10-30', tag: '업데이트', title: '2.3.0 업데이트',
       lines: ['졸업식 장면 새 단장', '새 선생님 3명 추가 (고니 국어, 공작 미술, 알파카 매점)', '숲의 정수로 공사 즉시 완료 추가', '건물 공사 시간 단축', '원할 때 쓰는 즉시 완공 단추 추가', '오류 수정과 안정성 개선'] },
     { id: '2026-10-30-v220', date: '2026-10-30', tag: '업데이트', title: '2.2.0 업데이트',
@@ -15871,7 +15874,7 @@ body.mg-on .toast[hidden]{display:none}
       lines: ['숲속 패스 추가', '반짝 친구 추가', '랭킹 시즌 추가', '다른 학교 구경과 예시 학교 추가', '날씨 추가', '학부모 쪽지 이야기 추가', '숲속 합치기 에너지 배수와 그림 개선'] },
     // 공지(일곱 줄)
     { id: '2026-10-29-v212', date: '2026-10-22', tag: '업데이트', title: '2.1.2 업데이트',
-      lines: ['마을 기부 추가', '매점 간식 뽑기 추가', '간식 도감과 학교 기분 추가', '마을 기부, 간식 도감 업적과 칭호 추가'] },   // 가 고른 네 줄
+      lines: ['마을 기부 추가', '매점 간식 뽑기 추가', '간식 도감과 학교 기분 추가', '마을 기부, 간식 도감 업적과 칭호 추가'] },   // 고른 네 줄
     { id: '2026-10-29-v211', date: '2026-10-19', tag: '업데이트', title: '2.1.1 업데이트',
       lines: ['단짝 친구, 친밀도, 생일 잔치 추가', '졸업 앨범, 졸업 편지 추가', '유치원, 초등학교, 중학교 건물 외형 변경', '건물마다 하루 1회 즉시 완공, 건설 부스터 추가', '공사 시간 단축', '숲속 대결 종목별 놀이 개선', '메인 퀘스트와 보상 개선'] },
     // 공지(일곱 줄)
@@ -17047,7 +17050,7 @@ body.mg-on .toast[hidden]{display:none}
     if (S.rank.joined && !Rank.readOnly && (rankScore() !== S.rank.sent || S.rank.by !== Rank.uid || lgKey() !== S.rank.sws || (btOpen() && S.bt.pts !== Rank.sbt) || (Rank.skSent && Rank.ssp < S.rs.p) || tamRankBehind())) rankDirty();
     renderRankPanel();
   }
-  /* 교장 선생님 이름: 처음 한 번은 무료, 그다음부터는 바꿀 때마다 황금 도토리 5개, 6개, 7개... (부터, 예전에는 50개, 60개, 70개)
+  /* 교장 선생님 이름: 처음 한 번은 무료, 그다음부터는 바꿀 때마다 황금 도토리 5개, 6개, 7개... (예전에는 50개, 60개, 70개)
      주사위를 누르면 '졸린 다람쥐'처럼 꾸밈말과 동물(숲속 물건) 이름을 이어서, 랭킹에 없는 이름을 골라 줘요 */
   const NICK_ADJ = ['귀여운', '슬픈', '졸린', '배고픈', '용감한', '수줍은', '신난', '느긋한', '똑똑한', '반짝이는', '포근한', '씩씩한', '엉뚱한', '다정한', '부지런한',
     '말랑한', '날쌘', '행복한', '꿈꾸는', '노래하는', '춤추는', '웃는', '조용한', '상냥한', '명랑한', '깜찍한', '든든한', '설레는', '꼬마', '심심한'];
@@ -17522,7 +17525,7 @@ body.mg-on .toast[hidden]{display:none}
     setMapArt(); setSeasonArt();   // 테마 지도와 겨울 건물, 계절 참나무
     const dz = $('#thDeco');
     if (dz) {
-      const tint = bgT && (has170(`${geo().map}_${bgT.id}`) || MAP_FILES.has(`${geo().map}_${bgT.id}`)) ? null :   /* 파일로만 있는 테마 지도(대학교)도 덮는 색을 꺼요 */ { space: ['#1B1F45', 0.45], retro: ['#B98A3E', 0.22] }[bgT && bgT.id];   // 테마 지도 그림이 있으면 덮는 색을 꺼요(은 그림 위에 또 덮었어요)
+      const tint = bgT && (has170(`${geo().map}_${bgT.id}`) || MAP_FILES.has(`${geo().map}_${bgT.id}`)) ? null :   /* 파일로만 있는 테마 지도(대학교)도 덮는 색을 꺼요 */ { space: ['#1B1F45', 0.45], retro: ['#B98A3E', 0.22] }[bgT && bgT.id];   // 테마 지도 그림이 있으면 덮는 색을 꺼요(예전에는 그림 위에 또 덮었어요)
       const own = bgT && IMG(`deco_${bgT.id}_1`);
       dz.innerHTML = (tint ? `<rect x="-300" y="-300" width="960" height="1020" fill="${tint[0]}" opacity="${tint[1]}" style="mix-blend-mode:multiply"/>` : '') +
         (own ? geo().deco.map(([x, y], i) => `<image x="${x - 24}" y="${y - 30}" width="48" height="48" href="${IMG(`deco_${bgT.id}_${i % 3 + 1}`)}"/>`).join('') : '');
@@ -23478,7 +23481,7 @@ body.mg-on .toast[hidden]{display:none}
      - 선생님 도움: 조각에 가끔 선생님 블록이 끼어 나와요. 그 블록이 든 줄을 지우면 다람쥐(3×3 치우기), 부엉이(조각 바꾸기), 곰(조각 돌리기) 도움을 받아요
      하루에 5판까지 보상을 주고(2.3.1 woodani: 10판에서 5판, 대신 한 판 보상 +100%), 광고를 보면 2판 더 받아요. 그 뒤에도 연습으로는 계속 할 수 있어요. 하던 판은 저장돼요 */
   const PZ = {
-    N: 8, perDay: 5, adMore: 2, adMax: 1, rw: 2, sweep: 0.7,   // rw: 한 판 보상 배수, sweep: 소탕 점수(부터 오늘 직접 한 판 점수의 70%, 화면에는 쓰지 않아요)
+    N: 8, perDay: 5, adMore: 2, adMax: 1, rw: 2, sweep: 0.7,   // rw: 한 판 보상 배수, sweep: 소탕 점수(오늘 직접 한 판 점수의 70%, 화면에는 쓰지 않아요)
     comboGrace: 4,   // 줄을 못 지운 놓기가 이만큼 이어져야 콤보가 끊겨요
     pats: ['acorn', 'leaf', 'flower', 'mushroom', 'berry', 'water'],
     patName: { acorn: '도토리', leaf: '잎', flower: '꽃', mushroom: '버섯', berry: '산딸기', water: '물방울' },
@@ -26392,7 +26395,7 @@ body.mg-on .toast[hidden]{display:none}
   const LP = { mission: 10, bonus: 20, festWin: 15, festLose: 5, trip: 10, tripHour: 5, grad: 20, quest: 3 };
   const LG_PRIZE = r => 1;   // 광고가 아닌 보상은 모두 1개
   // 주는 월요일에 시작해요. 2026년 1월 5일(월)부터 몇 번째 주인지
-  // 주 번호: 게임 시계의 gameWeek(한국 시간 월요일 0시 시작, 이 0). 전에는 기기 시간대의 월요일이었는데 번호 체계는 같아요
+  // 주 번호: 게임 시계의 gameWeek(한국 시간 월요일 0시 시작). 전에는 기기 시간대의 월요일이었는데 번호 체계는 같아요
   const weekIdx = () => gameWeek();
   function dayHash(str) { let h = 2166136261; for (let i = 0; i < str.length; i++) { h ^= str.charCodeAt(i); h = Math.imul(h, 16777619); } return h >>> 0; }
   // 날이 바뀌면 오늘의 미션 3개를 새로 골라요 (열려 있는 것 가운데에서, 날짜와 학교 번호로 섞어요)
@@ -29223,7 +29226,7 @@ body.mg-on .toast[hidden]{display:none}
     $('#markSave').addEventListener('click', () => { sfx('quest'); setMark(rt.mkDraft); toast('학교 마크를 바꿨어요. 위쪽 학교 카드에 보여요'); });
     $('#markOff').addEventListener('click', () => { sfx('tap'); setMark(null); toast('학교 카드를 교실 그림으로 되돌렸어요'); });
     $('#vdTop').addEventListener('click', e => { if (!rt.decoEdit && !festBusy() && e.target.closest('[data-vd]')) { e.stopPropagation(); openVd(); } });
-    $('#bxG').addEventListener('click', e => { const x = !rt.decoEdit && e.target.closest('[data-bx]'); if (x) { e.stopPropagation(); bxTap(Number(x.dataset.bx)); } });   // 생물 탐사(부터 #bxG)
+    $('#bxG').addEventListener('click', e => { const x = !rt.decoEdit && e.target.closest('[data-bx]'); if (x) { e.stopPropagation(); bxTap(Number(x.dataset.bx)); } });   // 생물 탐사(#bxG)
     $('#decoG').addEventListener('click', e => { if (!rt.decoEdit && !festBusy() && e.target.closest('[data-vd]')) { e.stopPropagation(); openVd(); return; } const r = e.target.closest('[data-slot]'); if (!r || !rt.decoEdit) return; e.stopPropagation(); openDecoPick(+r.dataset.slot); });   // 생물 탐사(data-bx)
     $('#decoDone').addEventListener('click', () => { sfx('tap'); decoEditEnd(); toast('학교 꾸미기를 마쳤어요'); });
     $('#decoPickList').addEventListener('click', e => { const b = e.target.closest('[data-dput]'); if (!b) return; if (decoPut(rt.decoSlot, b.dataset.dput)) { sfx('quest'); achSync(); closeModal($('#mDecoPick')); } });
@@ -31228,7 +31231,7 @@ body.mg-on .toast[hidden]{display:none}
     gens: { A: { name: '참나무', em: '🌳', kinds: ['a', 'm'] }, F: { name: '급식 냄비', em: '🍲', kinds: ['f', 'd'] }, S: { name: '문구함', em: '🧰', kinds: ['s', 'c'] }, G: { name: '화분', em: '🪴', kinds: ['g', 'v'] } },
     genAt: [0, 2, 5, 7],                              // 처음 생산기 자리(맨 위 줄)
     UP_EVERY: 20,   // 주문 20개마다 한 단계 위 주문
-    MUL: [[3, 2], [5, 3], [7, 4]]   // ×2 3단계, ×3 5단계, ×4 7단계로 앞당김(은 4, 6, 8)
+    MUL: [[3, 2], [5, 3], [7, 4]]   // ×2 3단계, ×3 5단계, ×4 7단계로 앞당김(예전은 4, 6, 8)
                         // 에너지 배수: 어느 종류든 이 단계를 처음 만들면 ×2, ×3, ×4가 열려요(주문이 그 단계쯤부터 나와요)
   };
   const MG_KINDS = Object.keys(MG.kinds), MG_GENS = Object.keys(MG.gens), MG_N = MG.W * MG.H;

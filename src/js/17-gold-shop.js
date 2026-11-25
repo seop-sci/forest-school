@@ -195,7 +195,7 @@
     setMapArt(); setSeasonArt();   // 테마 지도와 겨울 건물, 계절 참나무
     const dz = $('#thDeco');
     if (dz) {
-      const tint = bgT && (has170(`${geo().map}_${bgT.id}`) || MAP_FILES.has(`${geo().map}_${bgT.id}`)) ? null :   /* 파일로만 있는 테마 지도(대학교)도 덮는 색을 꺼요 */ { space: ['#1B1F45', 0.45], retro: ['#B98A3E', 0.22] }[bgT && bgT.id];   // 테마 지도 그림이 있으면 덮는 색을 꺼요(은 그림 위에 또 덮었어요)
+      const tint = bgT && (has170(`${geo().map}_${bgT.id}`) || MAP_FILES.has(`${geo().map}_${bgT.id}`)) ? null :   /* 파일로만 있는 테마 지도(대학교)도 덮는 색을 꺼요 */ { space: ['#1B1F45', 0.45], retro: ['#B98A3E', 0.22] }[bgT && bgT.id];   // 테마 지도 그림이 있으면 덮는 색을 꺼요(예전에는 그림 위에 또 덮었어요)
       const own = bgT && IMG(`deco_${bgT.id}_1`);
       dz.innerHTML = (tint ? `<rect x="-300" y="-300" width="960" height="1020" fill="${tint[0]}" opacity="${tint[1]}" style="mix-blend-mode:multiply"/>` : '') +
         (own ? geo().deco.map(([x, y], i) => `<image x="${x - 24}" y="${y - 30}" width="48" height="48" href="${IMG(`deco_${bgT.id}_${i % 3 + 1}`)}"/>`).join('') : '');

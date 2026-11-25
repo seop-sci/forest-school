@@ -159,7 +159,7 @@
       if (j === k.pn) j = W.on[(W.on.indexOf(j) + 1) % W.on.length];
       k.pn = j; k.spot = i;
       k.tx = W.N[j][0] + rand(-2, 2); k.ty = W.N[j][1] + rand(-1.5, 1.5);
-      k.pw = [k.tx, k.ty];   // 이 갈 곳은 평소 걷기라서 길로 가요
+      k.pw = [k.tx, k.ty];   // 갈 곳은 평소 걷기라서 길로 가요
       return;
     }
     k.spot = i;

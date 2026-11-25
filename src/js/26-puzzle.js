@@ -5,7 +5,7 @@
      - 선생님 도움: 조각에 가끔 선생님 블록이 끼어 나와요. 그 블록이 든 줄을 지우면 다람쥐(3×3 치우기), 부엉이(조각 바꾸기), 곰(조각 돌리기) 도움을 받아요
      하루에 5판까지 보상을 주고(2.3.1 woodani: 10판에서 5판, 대신 한 판 보상 +100%), 광고를 보면 2판 더 받아요. 그 뒤에도 연습으로는 계속 할 수 있어요. 하던 판은 저장돼요 */
   const PZ = {
-    N: 8, perDay: 5, adMore: 2, adMax: 1, rw: 2, sweep: 0.7,   // rw: 한 판 보상 배수, sweep: 소탕 점수(부터 오늘 직접 한 판 점수의 70%, 화면에는 쓰지 않아요)
+    N: 8, perDay: 5, adMore: 2, adMax: 1, rw: 2, sweep: 0.7,   // rw: 한 판 보상 배수, sweep: 소탕 점수(오늘 직접 한 판 점수의 70%, 화면에는 쓰지 않아요)
     comboGrace: 4,   // 줄을 못 지운 놓기가 이만큼 이어져야 콤보가 끊겨요
     pats: ['acorn', 'leaf', 'flower', 'mushroom', 'berry', 'water'],
     patName: { acorn: '도토리', leaf: '잎', flower: '꽃', mushroom: '버섯', berry: '산딸기', water: '물방울' },
