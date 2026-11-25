@@ -4,7 +4,7 @@
   // 종업식으로 남는 배수: 장학금은 레벨마다 1.3배씩 곱해지고, 전학생은 한 명마다 +5%
   // 전학 온 친구: 한 명마다 +5%, 다 온 뒤에는 친구 성장 쪽지로 키운 레벨마다 +2%
   const nlSum = () => (S.p.nl || []).reduce((a, b) => a + b, 0);
-  // 친구 성장 쪽지 고르기: 전학생을 다 만났거나, 이미 쪽지를 받아 키우기 시작한 학교(에 전학생이 12종으로 늘기 전에 6종을 다 만난 학교)
+  // 친구 성장 쪽지 고르기: 전학생을 다 만났거나, 이미 쪽지를 받아 키우기 시작한 학교(전학생이 12종으로 늘기 전에 6종을 다 만난 학교)
   const growOn = () => S.p.species >= ncMax() || (S.p.ticket || 0) > 0 || nlSum() > 0;
   const legacyMult = () => Math.pow(1.3, S.p.perk.schol) * (1 + 0.05 * S.p.species + 0.02 * nlSum()) * Math.pow(2, S.fp.schol);
   const tuitionMult = () => (1 + 0.2 * S.f.cafeteria) * (1 + 0.15 * S.t.squirrel) * (1 + FAC.store.per / 100 * (S.f.store || 0)) * (1 + FAC.dorm.per / 100 * (S.f.dorm || 0)) * (1 + FAC.union.per / 100 * (S.f.union || 0)) * (1 + FAC.institute.per / 100 * (S.f.institute || 0)) * (1 + FAC.gradhall.per / 100 * (S.f.gradhall || 0)) * rtClassMul() * taMult() * deptMult() * legacyMult() * setBonusMult() * tripMult() * clubTuitionMult() * elMult('tuition') * acMult() * snMult() * gdMult() * freshMult();   // 오늘의 급식, 새내기 장학금

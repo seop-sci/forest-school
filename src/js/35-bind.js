@@ -194,7 +194,7 @@
     $('#markSave').addEventListener('click', () => { sfx('quest'); setMark(rt.mkDraft); toast('학교 마크를 바꿨어요. 위쪽 학교 카드에 보여요'); });
     $('#markOff').addEventListener('click', () => { sfx('tap'); setMark(null); toast('학교 카드를 교실 그림으로 되돌렸어요'); });
     $('#vdTop').addEventListener('click', e => { if (!rt.decoEdit && !festBusy() && e.target.closest('[data-vd]')) { e.stopPropagation(); openVd(); } });
-    $('#bxG').addEventListener('click', e => { const x = !rt.decoEdit && e.target.closest('[data-bx]'); if (x) { e.stopPropagation(); bxTap(Number(x.dataset.bx)); } });   // 생물 탐사(부터 #bxG)
+    $('#bxG').addEventListener('click', e => { const x = !rt.decoEdit && e.target.closest('[data-bx]'); if (x) { e.stopPropagation(); bxTap(Number(x.dataset.bx)); } });   // 생물 탐사(#bxG)
     $('#decoG').addEventListener('click', e => { if (!rt.decoEdit && !festBusy() && e.target.closest('[data-vd]')) { e.stopPropagation(); openVd(); return; } const r = e.target.closest('[data-slot]'); if (!r || !rt.decoEdit) return; e.stopPropagation(); openDecoPick(+r.dataset.slot); });   // 생물 탐사(data-bx)
     $('#decoDone').addEventListener('click', () => { sfx('tap'); decoEditEnd(); toast('학교 꾸미기를 마쳤어요'); });
     $('#decoPickList').addEventListener('click', e => { const b = e.target.closest('[data-dput]'); if (!b) return; if (decoPut(rt.decoSlot, b.dataset.dput)) { sfx('quest'); achSync(); closeModal($('#mDecoPick')); } });

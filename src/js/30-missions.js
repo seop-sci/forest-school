@@ -21,7 +21,7 @@
   const LP = { mission: 10, bonus: 20, festWin: 15, festLose: 5, trip: 10, tripHour: 5, grad: 20, quest: 3 };
   const LG_PRIZE = r => 1;   // 광고가 아닌 보상은 모두 1개
   // 주는 월요일에 시작해요. 2026년 1월 5일(월)부터 몇 번째 주인지
-  // 주 번호: 게임 시계의 gameWeek(한국 시간 월요일 0시 시작, 이 0). 전에는 기기 시간대의 월요일이었는데 번호 체계는 같아요
+  // 주 번호: 게임 시계의 gameWeek(한국 시간 월요일 0시 시작). 전에는 기기 시간대의 월요일이었는데 번호 체계는 같아요
   const weekIdx = () => gameWeek();
   function dayHash(str) { let h = 2166136261; for (let i = 0; i < str.length; i++) { h ^= str.charCodeAt(i); h = Math.imul(h, 16777619); } return h >>> 0; }
   // 날이 바뀌면 오늘의 미션 3개를 새로 골라요 (열려 있는 것 가운데에서, 날짜와 학교 번호로 섞어요)
