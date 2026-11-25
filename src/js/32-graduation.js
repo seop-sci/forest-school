@@ -269,7 +269,7 @@
       $('#gradOk').textContent = '2학기 시작하기';
       $('#gradDip').textContent = '+' + fmt(dip);
       $('#gradArt').innerHTML = `<svg viewBox="-10 -10 20 20" aria-hidden="true">${DIP}</svg>`;
-      $('#gradNew').textContent = `황금 도토리 +${GOLD.grad}개도 받았어요. 2학기 ${finalYear() ? '졸업식' : '종업식'}을 열면 학년이 올라가${finalYear() ? '요.' : `고, 2학기에는 시설을 Lv.${facCap()}까지 키울 수 있어요.`}` + (rt.yearGift ? ` 새 학기 준비물로 도토리 +${fmt(rt.yearGift)}!` : '');
+      $('#gradNew').textContent = `황금 도토리 +${GOLD.grad}개도 받았어요. 2학기에는 시설을 Lv.${facCap()}까지 키울 수 있어요. 2학기 ${finalYear() ? '졸업식' : '종업식'}을 열면 학년이 올라가${finalYear() ? '요.' : `고 Lv.${capNext()}까지 열려요.`}` + (rt.yearGift ? ` 새 학기 준비물로 도토리 +${fmt(rt.yearGift)}!` : '');
       $('#gradRec').hidden = true;   // 창 글이 길어서 키운 기록 줄은 빼요
       openModal($('#mGrad'));
       sfx('bell'); setTimeout(() => sfx('quest'), 900);
