@@ -232,7 +232,7 @@
     xt: {
       measure: q => xtLv(q.k),   // 영양, 사서 선생님 연수 레벨
       goal: q => `${XT[q.k].name} Lv.${q.n}`,
-      go: q => xtHere(q.k) ? goTeacher(q.k) : goFac(XT[q.k].fac, `${eul(FAC[XT[q.k].fac].name)} 지으면 오셔요`)
+      go: q => xtHere(q.k) ? goTeacher(q.k) : goFac(XT[q.k].fac, `${eul(FAC[XT[q.k].fac].name)} 지으면 오세요`)
     },
     vp: {
       measure: q => vpLv(),   // 교감 선생님 연수 레벨
@@ -635,7 +635,7 @@
     S.q.subDone += 1;
     delete rt.qr[s.id];
     const added = fillSubs();
-    const items = [{ ic: 'acorn', t: `도토리 +${fmt(s.r)}` }, hIt ? { ic: hIt.ic, t: hIt.t + ' (조금 어려운 부탁)' } : null, skAdd()].filter(Boolean);
+    const items = [{ ic: 'acorn', t: `도토리 +${fmt(s.r)}` }, hIt ? { ic: hIt.ic, t: hIt.t } : null, skAdd()].filter(Boolean);
     // 부탁도 메인 퀘스트처럼 창 없이 알림 한 줄로 받아요. 창은 황금 도토리를 받을 때와 모두 받기에만
     if (rt.batch || items.some(it => it.ic === 'gold')) showReward({ title: `${iga(WHO[s.who])} 고마워해요!`, sub: added ? '새 부탁이 들어왔어요' : '', items });
     else toast(`${iga(WHO[s.who])} 고마워해요!\n${items.map(it => it.t).join(', ')}` + (added ? '\n새 부탁이 들어왔어요' : ''));// 칭찬 스티커
@@ -838,7 +838,7 @@
     if (S.q.m < SUB_UNLOCK) subs = '<p class="qempty">메인 퀘스트 1-2 급식실 짓기를 마치면 학생들이 부탁을 하러 와요.</p>';
     else {
       subs = S.q.subs.map(s => questCard(s, s.b, { ref: s.id, kid: true, av: kidAvatar(s.who), name: WHO[s.who], say: `“${s.say}”`, badge: s.nw ? '새 부탁' : '' })).join('');
-      if (S.q.subs.length < subSlots()) subs += '<p class="qempty">새 부탁을 기다리고 있어요. 메인 퀘스트를 진행하면 학생들이 또 찾아와요.</p>';
+      if (S.q.subs.length < subSlots()) subs += '<p class="qempty">새 부탁을 기다리고 있어요. 메인 퀘스트를 이어 가면 학생들이 또 찾아와요.</p>';
     }
     $('#qSubs').innerHTML = gsCardHTML() + subs;   // 5.3.4.7 오늘의 손님 칸은 학생 부탁 위에
     $('#qTally').textContent = S.q.subDone > 0 ? `지금까지 들어준 부탁 ${S.q.subDone}개` : '';

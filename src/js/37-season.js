@@ -205,7 +205,7 @@
     const m = $('#mTalk'); if (!m || !x) return false;
     const w = x.sp + '_rare';
     rt.talkSeq = { n: { k: w, name: x.name, lab: `반짝 친구 ${x.name}` }, i: 0, lines: [
-      { who: 'hedgehog', t: `교장 선생님, 숲의 별빛이 우리 학교에 내려앉았어요! 반짝반짝 빛나는 ${iga(x.name)} 놀러 왔어요.` },
+      { who: 'hedgehog', t: `교장 선생님, 숲의 별빛이 우리 학교에 내려앉았어요! 반짝이는 ${iga(x.name)} 놀러 왔어요.` },
       { who: w, t: x.say },
       { who: 'hedgehog', t: `${eun(x.name)} 별빛을 받은 반짝 친구예요. 다른 친구들과 똑같이 공부하고 뛰어놀아요. 동물 도감 반짝 친구 칸에 등록했고, 선물로 황금 도토리 ${RARE.gold}개를 받았어요!`, last: true }] };
     talkLine(); openModal(m);

@@ -75,7 +75,7 @@
       h += row(`<svg viewBox="-12 -12 24 24" aria-hidden="true"><path d="M3 -8 A8.5 8.5 0 1 0 8 4 A7 7 0 1 1 3 -8 Z" fill="#F2C230"/></svg>`, '밤 모드', '지도가 밤 색이 되고 건물 창에 불이 켜져요', own ? '' : '',
         own ? `<button class="buy${on ? ' on' : ''}" type="button" data-ebuy="night" aria-pressed="${on}">${on ? '끄기' : '켜기'}</button>` : buy('night', ESHOP.night, false, '밤 모드')); }
     // 바꾸기
-    h += '<h3 class="shop-h" data-cat="교환">교환 <small>(하루 5번씩)</small></h3>';
+    h += '<h3 class="shop-h" data-cat="교환">교환 <small>하루 5번씩</small></h3>';
     { const xl = esExLeft(), xc = esExCost();
       h += `<div class="sb"><span class="pv">${ic}</span><span class="tx"><b>숲의 정수 ${ESHOP.ex.n}개</b><span>도토리를 내고 받아요</span><small>${xl > 0 ? `오늘 ${xl}번 더 바꿀 수 있어요` : '오늘은 다 바꿨어요. 내일 다시 열려요'}</small></span>` +
         `<button class="buy${S.budget < xc ? ' poor' : ''}${xl > 0 ? '' : ' off'}" type="button" data-ebuy="ex" aria-label="숲의 정수 ${ESHOP.ex.n}개, 도토리 ${fmt(xc)}"><span data-acorn>${acornIcon()}</span>${fmt(xc)}</button></div>`; }
@@ -88,7 +88,7 @@
     ask.hidden = !it || !it.price;
     if (it && it.price) {
       const enough = it.acorn ? S.budget >= it.price : S.ess >= it.price;
-      $('#essAskText').textContent = it.kind === 'ax' ? (enough ? `도토리 +${fmt(it.gain)}, 숲의 정수 ${it.price}개로 바꿀까요?` : `숲의 정수가 ${it.price - S.ess}개 모자라요.`) : it.acorn ? (enough ? `도토리 ${fmt(it.price)}로 ${it.name}${it.ga} 바꿀까요?` : `도토리가 ${fmt(it.price - S.budget)} 모자라요.`)
+      $('#essAskText').textContent = it.kind === 'ax' ? (enough ? `도토리 +${fmt(it.gain)}, 숲의 정수 ${it.price}개로 바꿀까요?` : `숲의 정수가 ${it.price - S.ess}개 모자라요.`) : it.acorn ? (enough ? `도토리 ${fmt(it.price)}개로 ${it.name}${it.ga} 바꿀까요?` : `도토리가 ${fmt(it.price - S.budget)}개 모자라요.`)
         : enough ? (it.kind === 'night' ? `밤 모드는 낮에도 지도를 밤 모습으로 바꿔요. 고등학교에서는 20시부터 6시까지 저절로 어두워져요. 그래도 숲의 정수 ${it.price}개로 살까요?` : `${it.name}${it.ga} 숲의 정수 ${it.price}개로 살까요?`) : `숲의 정수가 ${it.price - S.ess}개 모자라요. 공부 탭에서 모을 수 있어요.`;   // 밤 모드 안내
       $('#essYes').textContent = it.acorn || it.kind === 'ax' ? (enough ? '바꾸기' : '닫기') : enough ? '사기' : '공부 가기';
     }    shopChrome('ess');
@@ -137,7 +137,7 @@
       rt.essPick = '';
       if (S.budget < it.price || esExLeft() <= 0) { renderEssShop(); return; }
       S.budget -= it.price; S.es.x += 1; addEss(ESHOP.ex.n);
-      toast(`도토리 ${fmt(it.price)}로 숲의 정수 ${ESHOP.ex.n}개를 받았어요!`); sfx('quest'); buzz(15);
+      toast(`도토리 ${fmt(it.price)}개로 숲의 정수 ${ESHOP.ex.n}개를 받았어요!`); sfx('quest'); buzz(15);
       save(); renderEss(); renderEssShop(); renderHUD(); renderAffordance(); return;
     }
     if (it.kind === 'ax' && S.ess < it.price) { rt.essPick = ''; renderEssShop(); return; }   // '닫기'
@@ -455,7 +455,7 @@
     let h = '';
     const evList = DECO.filter(evDecoArt);
     // 5.3.3: 이벤트 한정 장식은 도감의 '장식' 칸으로 옮겼어요(가게에는 아래 한 줄). 갈래 칩용 머리(data-cat)
-    for (const [title, cat, list] of [['장식 <small>(사면 지도에 놓을 수 있어요)</small>', '장식', DECO.filter(d => !d.rare)], ['희귀 장식 <small>(하나씩만)</small>', '희귀', DECO.filter(d => d.rare && !d.ev)]]) {
+    for (const [title, cat, list] of [['장식 <small>사면 지도에 놓을 수 있어요</small>', '장식', DECO.filter(d => !d.rare)], ['희귀 장식 <small>하나씩만</small>', '희귀', DECO.filter(d => d.rare && !d.ev)]]) {
       h += `<h3 class="shop-h" data-cat="${cat}">${title}</h3><div class="shop-grid">`;
       for (const d of list) {
         const n = decoOwn(d.id), out = decoSoldOut(d.id), c = decoCost(d.id), poor = !out && S.ess < c, nx = out ? 0 : decoNext(d.id);
@@ -468,14 +468,14 @@
       h += '</div>';
     }
     // 한정 모자와 특별 가구(옛 정수 상점에서 옮겨 왔어요)
-    h += '<h3 class="shop-h" data-cat="모자">한정 모자 <small>(학생들이 써요)</small></h3><div class="shop-grid">';
+    h += '<h3 class="shop-h" data-cat="모자">한정 모자 <small>학생들이 써요</small></h3><div class="shop-grid">';
     for (const it of COS.hat.items) {
       if (!it.ess) continue;
       const key = 'hat:' + it.id, own = S.cos.own.includes(key), on = S.cos.hat === it.id, poor = !own && S.ess < ESHOP.hat;
       h += `<button class="si${own ? ' own' : ''}${on ? ' on' : ''}${poor ? ' poor' : ''}" type="button" data-dbuy="${key}" aria-pressed="${on}" aria-label="${it.name}${own ? '' : `, 숲의 정수 ${ESHOP.hat}개`}">` +
         `<span class="pv"><img src="${IMG('cos_hat_' + it.id)}" alt="" draggable="false"></span><span class="nm">${it.name}</span><span class="pr">${on ? '쓰는 중' : own ? '쓰기' : `${ic}${ESHOP.hat}`}</span>${own ? '' : lackTx(ESHOP.hat, S.ess)}</button>`;
     }
-    h += '</div><h3 class="shop-h" data-cat="가구">특별 가구 <small>(방마다 하나씩 놓여요)</small></h3><div class="shop-grid">';
+    h += '</div><h3 class="shop-h" data-cat="가구">특별 가구 <small>방마다 하나씩 놓여요</small></h3><div class="shop-grid">';
     for (const k of Object.keys(SP_FUR)) {
       const F = SP_FUR[k], key = 'sp:' + F.id, own = S.cos.own.includes(key), on = S.cos.sp[k] === F.id, poor = !own && S.ess < ESHOP.fur;
       h += `<button class="si${own ? ' own' : ''}${on ? ' on' : ''}${poor ? ' poor' : ''}" type="button" data-dbuy="${key}" aria-pressed="${on}" aria-label="${F.name}${own ? '' : `, 숲의 정수 ${ESHOP.fur}개`}">` +

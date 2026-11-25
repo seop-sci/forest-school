@@ -85,7 +85,7 @@
     if (S.tier >= 2 && (S.f.store || 0) >= 1) L.push(['store', '매점', '간식 뽑기']);
     if (typeof mkOn === 'function' && mkOn()) L.push(['mk', '숲속 장터', '오늘 열려요']);
     if (typeof psOpen === 'function' && psOpen()) L.push(['ps', '숲속 패스', '시즌 미션 보상']);
-    const h = L.length ? `<h3 class="shop-h">다른 가게 <small>바로 가기</small></h3><div class="more-row">${L.map(([k, n, s]) => `<button type="button" class="more-go" data-more="${k}"><b>${n}</b><small>${s}</small></button>`).join('')}</div>` : '';
+    const h = L.length ? `<h3 class="shop-h">다른 가게</h3><div class="more-row">${L.map(([k, n, s]) => `<button type="button" class="more-go" data-more="${k}"><b>${n}</b><small>${s}</small></button>`).join('')}</div>` : '';
     if (box.dataset.h !== h) { box.dataset.h = h; box.innerHTML = h; }
   }
   document.addEventListener('click', e => {
