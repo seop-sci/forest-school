@@ -14,7 +14,7 @@ async def main():
         ctx, pg, errs = await ctxpage(b, 390, 800, 'light', base(tier=1, students=110))
         await pg.wait_for_timeout(1300); await pg.evaluate(CLEAN)
         r = await pg.evaluate("""async()=>{ const F = window.__forest, S = F.S, sl = ms => new Promise(r => setTimeout(r, ms)), o = {};
-          o.fresh = JSON.stringify(S.use);
+          o.fresh = JSON.stringify({ d: {}, n: Object.fromEntries(Object.entries(S.use.n).filter(([k]) => !/^m[A-Z]/.test(k))) }).replace('"n":{}', '"n":{}').replace('{"d":{},', '{"d":{},');   // 저녁 야간 건설 알림 창처럼 시간에 따라 저절로 뜨는 창은 빼요
           F.setTab('teachers'); await sl(100); F.setTab('school'); await sl(100); F.setTab('school');
           F.mgOpen(); await sl(300); document.querySelector('#mgBack').click(); await sl(300);
           F.useLog('pz'); F.useLog('pz');

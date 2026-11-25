@@ -299,6 +299,17 @@
     if (rt.tab === 'shop') renderShop();
     if (rt.tab === 'street') renderStreet();
   }
+  /* 5.4.0.4 황금 도토리를 모으기만 하고 쓰지 않는 학교가 많아요. 테마 세트 값(60개)만큼 모이고 아직 테마를 산 적이 없으면
+     한 번만 '테마를 살 수 있어요' 추천 창을 띄워요. 옛 저장도 gtip이 없어서 한 번 떠요. 다른 창, 처음 안내, 이야기 중에는 기다려요 */
+  const goldTipWant = () => !!S && !S.u.gtip && S.gold >= GSHOP.theme && !S.cos.own.some(x => String(x).startsWith('th:'));
+  function goldTip() {
+    if (!goldTipWant() || rt.modalOpen || rt.paused || rt.st || rt.tut || rt.cereOn || rt.modalQueue.length || rt.sheetKey || rt.tab !== 'school' || document.hidden) return false;
+    S.u.gtip = true; save();
+    askBox({ title: '황금 도토리가 모였어요', text: `황금 도토리가 ${fmt(S.gold)}개 있어요.\n${GSHOP.theme}개면 꾸미기 백화점에서 테마 세트(지도, 지붕, 칠판, 테마 곡)를 살 수 있어요.\n사기 전에 홈 지도에서 미리 볼 수도 있어요.`,
+      yes: '테마 보러 가기', no: '나중에', onYes: () => { openShop(); setTimeout(() => { const c = document.querySelector('.th-card'); if (c) c.scrollIntoView({ block: 'center', behavior: rt.reduced ? 'auto' : 'smooth' }); }, 300); } });
+    return true;
+  }
+  setInterval(goldTip, 4000);
   // 광고를 끝까지 보면 덤으로 1개(일반 광고 하루 3번. 상점 광고 3번은 따로)
   // 광고를 끝까지 보면 받는 황금 도토리가 보이지 않았어요. 보상 창 뒤에 한 줄로 알려요
   function adGold() { goldDay(); if ((S.gd.a || 0) >= GOLD.adDay) return; S.gd.a = (S.gd.a || 0) + 1; S.gd.n += 1; addGold(GOLD.ad); setTimeout(() => toast(`광고 선물! 황금 도토리 +${GOLD.ad} (오늘 ${S.gd.a}/${GOLD.adDay})`), 1300); }
