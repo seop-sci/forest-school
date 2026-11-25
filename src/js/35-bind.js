@@ -121,7 +121,7 @@
   }
   // 설정의 화면 크기와 숫자 단위
   function wireUnits() {
-    $('#optUiz').addEventListener('click', e => { const b = e.target.closest('[data-uiz]'); if (!b || +b.dataset.uiz === S.uiz) return; S.uiz = +b.dataset.uiz; save(); syncSettingsUI(); sfx('tap'); setTimeout(() => { try { chipRow(); wxPlace(); } catch (er) { /* 다음 틱에 */ } }, 60); toast(S.uiz ? '화면 글자와 단추를 크게 보여요' : '화면을 보통 크기로 보여요'); });
+    $('#optUiz').addEventListener('click', e => { const b = e.target.closest('[data-uiz]'); if (!b || +b.dataset.uiz === S.uiz) return; S.uiz = +b.dataset.uiz; save(); syncSettingsUI(); sfx('tap'); setTimeout(() => { try { chipRow(); wxPlace(); } catch (er) { /* 다음 틱에 */ } }, 60); toast(S.uiz ? '화면 글자와 단추를 크게 보여 줘요' : '화면을 보통 크기로 보여 줘요'); });
     $('#optUnits').addEventListener('click', e => {
       const b = e.target.closest('[data-units]');
       if (!b || b.dataset.units === S.units) return;
@@ -790,7 +790,7 @@
     $('#nsGo').addEventListener('click', () => { if (nsStart()) renderNs(); });
     $('#nsSubs').addEventListener('click', e => { const b = e.target.closest('[data-ns]'); if (!b || b.getAttribute('aria-disabled') === 'true' || nsUsedTonight()) return; rt.nsSub = b.dataset.ns; S.ns.sub = rt.nsSub; save(); renderNs(); });
     $('#snBtns').addEventListener('click', e => { const b = e.target.closest('[data-sn]'); if (!b) return;
-      if (b.dataset.sn === '10' && b.getAttribute('aria-disabled') !== 'true') { sfx('tap'); askRow($('#snBtns'), `도토리 ${fmt(snCost(true))}로 10번 뽑을까요?`, '10번 뽑기', () => snDraw(true)); return; }   // 5.3.3 큰 값은 한 번 더 물어요
+      if (b.dataset.sn === '10' && b.getAttribute('aria-disabled') !== 'true') { sfx('tap'); askRow($('#snBtns'), `도토리 ${fmt(snCost(true))}개로 10번 뽑을까요?`, '10번 뽑기', () => snDraw(true)); return; }   // 5.3.3 큰 값은 한 번 더 물어요
       askRowOff(); snDraw(b.dataset.sn === '10'); });
     $('#bxDexBtn').addEventListener('click', () => { sfx('tap'); closeModal($('#mBx')); setTimeout(() => { setTab('dex'); setDexSeg('bx'); }, 240); });
     $('#sheetGarden').addEventListener('click', () => { closeSheet(); setTimeout(openGd, 240); });
@@ -928,7 +928,7 @@
       else closeSchool();
     }));
     window.FOREST_BACK = () => {
-      if (rt.modalOpen === $('#mExit')) { $('#exitNo').click(); return; }   // 확인 창에서 한 번 더 뒤로 가기는 '계속 하기'예요 (닫기는 버튼으로만)
+      if (rt.modalOpen === $('#mExit')) { $('#exitNo').click(); return; }   // 확인 창에서 한 번 더 뒤로 가기는 '계속하기'예요 (닫기는 버튼으로만)
       if (rt.modalOpen || rt.sheetKey || rt.adOpen) { document.dispatchEvent(new KeyboardEvent('keydown', { key: 'Escape' })); return; }
       // 블록 퍼즐 안에서 뒤로 가기: 열린 작은 창부터 닫고, 없으면 미니게임 탭으로 (하던 판은 저장돼요)
       if (pzUI.open) {

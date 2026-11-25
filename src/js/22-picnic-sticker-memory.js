@@ -29,7 +29,7 @@
     const lunch = S.pc.lunch, kids = S.pc.kids.slice();
     S.pc.at = 0; S.pc.lunch = false; S.pc.st.n += 1;
     const fvb = fvBonus('picnic'), v = minAcorns(lunch ? PCN.lunchAcorn : PCN.acorn) * (fvb ? 2 : 1); S.budget += v; earn(v);   // 축제 월요일: 소풍 수확 +100%
-    const items = [{ ic: 'acorn', t: `도토리 +${fmt(v)}${lunch ? ' (도시락 덕분에 더 많이)' : ''}${fvb ? ' (축제 +100%)' : ''}` }];
+    const items = [{ ic: 'acorn', t: `도토리 +${fmt(v)}${lunch ? ' (도시락)' : ''}${fvb ? ' (축제 +100%)' : ''}` }];
     if (Math.random() < PCN.essP) { const e = Math.random() < 0.5 ? 1 : 2; addEss(e); S.pc.st.ess += e; items.push({ ic: 'ess', t: `숲의 정수 +${e}` }); }
     if (Math.random() < PCN.berryP) { S.pc.berry += 1; S.pc.st.berry += 1; items.push({ ic: IMG('picnic_berry') ? `<img src="${IMG('picnic_berry')}" alt="" style="width:22px;height:22px">` : '🫐', t: '희귀 열매 +1 (꾸미기 가게에서 장식으로 바꿔요)' }); }
     for (const sp of kids) { const f = frOf(sp); if (f) { f.n.pc += 1; items.push(...frAddP(sp, BF.picnic, true)); } }   // 함께 간 단짝 친밀도
