@@ -17,7 +17,7 @@ def base(**kw):
     s = {'v':4,'budget':1e6,'students':60,'f':dict(BIG),'t':{'squirrel':5,'owl':5,'bear':5},'grade':4,'best':4,'sound':False,'vibrate':False,
          'savedAt':int(time.time()*1000),'pending':0,'pendingSec':0,'certNo':5,'earned':9e7,'yearEarned':3e6,
          'st':{'picks':40,'ups':90,'trains':20,'claims':3,'grads':0,'perks':0},
-         'p':{'dip':0,'species':0,'perk':{'schol':0,'rep':0,'start':0,'drop':0,'night':0}},'att':{'last':TODAY,'n':2},'ad':{'day':'','n':0},'u':{'boost':True},
+         'p':{'dip':0,'species':0,'perk':{'schol':0,'rep':0,'start':0,'drop':0,'night':0}},'att':{'last':TODAY,'n':2},'ad':{'day':'','n':0},'u':{'boost':True,'gtip':True},
          'tier':0,'tg':0,'tdip':0,'fund':0,'fp':{'schol':0,'rep':0,'dip':0},
          'q':{'init':True,'mid':'q22','m':22,'mb':0,'subs':[],'done':[],'gen':0,'subDone':5,'seen':22}}
     s.setdefault('rank', {'name': '', 'joined': False, 'sent': -1, 'by': '', 'asked': True})

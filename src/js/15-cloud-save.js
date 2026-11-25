@@ -6,8 +6,8 @@
        forest/rank/<내 id>   랭킹 이름과 학교 점수
        forest/stats/<내 id>  테스트 현황 (어디까지 했는지, 얼마나 했는지)
      <내 id>는 Firebase 익명 로그인이 기기(브라우저)마다 만들어 줘요. */
-  const VERSION = '5.4.0.2';
-  const NT_QUIET = ['5.4.0.2', '5.4.0.1', '5.3.4.8', '5.3.4.7', '5.3.4.6', '5.3.4.5', '5.3.4.4', '5.3.4.3', '5.3.4.2', '5.3.4.1', '5.3.4', '5.3.2.1', '5.3.0.3', '5.3.0.2', '5.3.0.1', '5.2.2', '5.2.1', '5.2.0.2', '5.2.0.1', '5.1.1.3', '5.1.1.2', '5.1.1.1', '5.1.1', '5.0.3.1', '5.0.3', '5.0.2.2', '5.0.2.1', '2.1.20', '2.1.2.2', '2.3.0.1', '2.3.4', '3.2.3', '3.2.4', '3.2.5', '3.3.1', '3.3.2', '3.3.3', '4.4.1.1', '4.4.1.2', '4.4.1.3', '4.4.1.4', '5.0.1.1', '5.0.1.2', '5.0.1.3', '5.0.1.4', '5.0.1.5', '5.0.1.6', '5.0.1.7', '5.0.1.8'];   // 생물 탐사 고침은 공지 없이. 도 공지 없이(공지 줄은 정하면 넣어요). 공지 없이. 공지 줄은 woodani가 정할 때까지 조용히. 공지는 2026-11-16 woodani가 정해서 NOTICES로 옮겼어요. 은 공지를 띄워요. 도 공지 없이. 도 공지 창 없이. 도 공지 창 없이(공지는 그대로). 도 조용히. 도 공지 창 없이(공지 줄을 고르지 않음)
+  const VERSION = '5.4.0.4';
+  const NT_QUIET = ['5.4.0.4', '5.4.0.3', '5.4.0.2', '5.4.0.1', '5.3.4.8', '5.3.4.7', '5.3.4.6', '5.3.4.5', '5.3.4.4', '5.3.4.3', '5.3.4.2', '5.3.4.1', '5.3.4', '5.3.2.1', '5.3.0.3', '5.3.0.2', '5.3.0.1', '5.2.2', '5.2.1', '5.2.0.2', '5.2.0.1', '5.1.1.3', '5.1.1.2', '5.1.1.1', '5.1.1', '5.0.3.1', '5.0.3', '5.0.2.2', '5.0.2.1', '2.1.20', '2.1.2.2', '2.3.0.1', '2.3.4', '3.2.3', '3.2.4', '3.2.5', '3.3.1', '3.3.2', '3.3.3', '4.4.1.1', '4.4.1.2', '4.4.1.3', '4.4.1.4', '5.0.1.1', '5.0.1.2', '5.0.1.3', '5.0.1.4', '5.0.1.5', '5.0.1.6', '5.0.1.7', '5.0.1.8'];   // 생물 탐사 고침은 공지 없이. 도 공지 없이(공지 줄은 정하면 넣어요). 공지 없이. 공지 줄은 woodani가 정할 때까지 조용히. 공지는 2026-11-16 woodani가 정해서 NOTICES로 옮겼어요. 은 공지를 띄워요. 도 공지 없이. 도 공지 창 없이. 도 공지 창 없이(공지는 그대로). 도 조용히. 도 공지 창 없이(공지 줄을 고르지 않음)
     // 이 버전들은 업데이트해도 공지 창을 띄우지 않아요(공지는 그대로)
   /* 공지사항 (은 이미 올려서 부터): 설정 > 공지사항. 맨 위가 가장 새 공지예요
      패치노트는 자동으로 넣지 않아요. woodani가 검수한 글만 여기에 적어요(CHANGELOG.md는 자세한 기록용이라 따로 있어요)
@@ -531,7 +531,8 @@
           Cloud.lastStats = Date.now();
           try { await db.ref('forest/stats/' + uid).set(statsDoc()); } catch (e2) { /* 테스트 현황을 못 올려도 학교 저장은 그대로예요(저장 위치를 오류로 바꾸지 않아요) */
             // 새 칸(adsT, adsD)을 받는 서버 규칙이 아직 게시되기 전이면 빼고 한 번 더 올려요
-            try { const d = statsDoc(); delete d.adsT; delete d.adsD; await db.ref('forest/stats/' + uid).set(d); } catch (e3) { /* 그대로 */ } }
+            try { const d = statsDoc(); delete d.use; await db.ref('forest/stats/' + uid).set(d); } catch (e3) {   // 새 칸 use를 받는 규칙이 게시되기 전이면 빼고
+              try { const d = statsDoc(); delete d.use; delete d.adsT; delete d.adsD; await db.ref('forest/stats/' + uid).set(d); } catch (e4) { /* 그대로 */ } } }
         }
       }
     } catch (e) {
@@ -591,7 +592,8 @@
       play: Math.floor(S.st.play), sess: S.st.sess, days: S.att.n, ads: S.st.ads, score: rankScore(),
       gold: S.gold, gearn: S.st.gold, gspent: S.st.gspent, cos: S.cos.own.length,
       dev: !!S.u.dev, v: VERSION, env: /KAKAOTALK/i.test(ua) ? 'kakao' : (navigator.maxTouchPoints > 0 ? 'mobile' : 'pc'),
-      adsT: S.adx && S.adx.day === gameToday() ? (S.adx.all || 0) : 0, adsD: gameToday()   // 관리자 지표에 오늘 본 광고 수(서버 규칙 adsT, adsD)
+      adsT: S.adx && S.adx.day === gameToday() ? (S.adx.all || 0) : 0, adsD: gameToday(),   // 관리자 지표에 오늘 본 광고 수(서버 규칙 adsT, adsD)
+      use: useStr()   // 5.4.0.3 놀이 기록(서버 규칙 use가 게시되기 전에는 빼고 올려요)
     };
   }
   function agoText(t) {
@@ -850,7 +852,7 @@
       town: Math.min(CFG.grades.length - 1, Math.floor(n(d.town, 9))),
       q: typeof d.q === 'string' ? d.q.slice(0, 8) : '', qt: typeof d.qt === 'string' ? d.qt.slice(0, 30) : '',
       play: n(d.play, 1e9), sess: Math.floor(n(d.sess, 1e6)), days: Math.floor(n(d.days, 1e5)), ads: Math.floor(n(d.ads, 1e6)),
-      score: Math.floor(n(d.score, 1e12)), gearn: Math.floor(n(d.gearn, 1e9)), gspent: Math.floor(n(d.gspent, 1e9)), cos: Math.floor(n(d.cos, 999)), dev: !!d.dev, v: typeof d.v === 'string' ? d.v.slice(0, 10) : '', env: ENV_NAME[d.env] || ''
+      score: Math.floor(n(d.score, 1e12)), gearn: Math.floor(n(d.gearn, 1e9)), gspent: Math.floor(n(d.gspent, 1e9)), cos: Math.floor(n(d.cos, 999)), dev: !!d.dev, use: typeof d.use === 'string' ? d.use.slice(0, 800) : '', v: typeof d.v === 'string' ? d.v.slice(0, 10) : '', env: ENV_NAME[d.env] || ''
     };
   }
   /* 관리자는 테스트 현황에서 그 테스터의 학교를 구경해요(다른 학교 구경과 같은 보기 전용 화면)
@@ -894,6 +896,8 @@
     const today = rows.filter(r => now - r.seen < 86400000).length;
     const avg = rows.length ? rows.reduce((t, r) => t + r.play, 0) / rows.length : 0;
     sum.textContent = rows.length ? `테스터 ${rows.length}명, 하루 안에 들어온 사람 ${today}명, 평균 플레이 ${playText(avg)}` : '아직 기록이 없어요';
+    const us = useSumText(rows); if (us) sum.textContent += '\n' + us;   // 5.4.0.3 놀이 기록 모아 보기
+
     list.textContent = '';
     rows.forEach(r => {
       const li = document.createElement('li');

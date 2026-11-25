@@ -1,7 +1,7 @@
 // 토스 미니앱 다리: 게임(index.html)이 window.AIT로 토스 기능을 써요.
 // 리워드 광고, 토스 앱 저장소, 게임센터 리더보드, 게임 로그인(사용자 키), 닫기, 안전 영역.
 import {
-  loadFullScreenAd, showFullScreenAd, Storage, Game, getUserKeyForGame, closeView, SafeArea, graniteEvent, Environment,
+  loadFullScreenAd, showFullScreenAd, Storage, Game, getUserKeyForGame, closeView, SafeArea, graniteEvent, Environment, Analytics,
 } from '@apps-in-toss/web-framework';
 
 // 실패해도 멈추지 않게 감싸요. 아래에서 쓰기 전에 먼저 만들어 둬야 해요 (1.5.4: 순서가 거꾸로라 시작할 때 멈췄어요)
@@ -70,6 +70,8 @@ window.AIT = {
   setScore: (n) => Promise.resolve().then(() => (Game.setLeaderboardScore.isSupported() ? Game.setLeaderboardScore({ score: String(Math.floor(n)) }) : undefined)).catch(() => undefined),
   openBoard: () => Promise.resolve().then(() => Game.openLeaderboard()).catch(() => undefined),
   close: () => Promise.resolve().then(() => closeView()).catch(() => undefined),
+  // 5.4.0.3 놀이 기록: 화면에 들어갈 때 토스 분석 로그 한 줄(토스 콘솔에서 봐요). 미지원 토스 앱에서는 조용히 넘어가요
+  log: (name) => { safe(() => { const p = Analytics.screen({ log_name: String(name).slice(0, 40) }); if (p && p.catch) p.catch(() => {}); }, null); },
   safeArea: () => safe(() => SafeArea.get(), null),
   subscribeSafe: (fn) => safe(() => SafeArea.subscribe({ onEvent: fn }), () => {}),
   userKey: async () => {

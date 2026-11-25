@@ -104,7 +104,7 @@
       for (let i = 0; i < RT5.top; i++) {
         const st = i < L ? 'done' : i === L && run ? 'run' : i === L && !D.lock && i < rtMax(D.k) ? 'next' : 'lock', sel = rt.rtSel === D.k && (i === Math.min(L, RT5.top - 1));
         const pop = st === 'done' && rt.rtPop && rt.rtPop.k === D.k && rt.rtPop.i === i;
-        nodes += `<button class="rt-node ${st}${sel ? ' sel' : ''}${pop ? ' pop' : ''}" type="button" data-rts="${D.k}" style="left:${(RT_X(j, i) / RT_W * 100).toFixed(2)}%;top:${((RT_Y(i) - rtTop()) / (RT_H - rtTop()) * 100).toFixed(2)}%" aria-label="${D.nm} ${i + 1}칸${st === 'done' ? ' 완성' : st === 'run' ? ' 연구 중' : st === 'lock' ? ' 잠김' : ''}">` +
+        nodes += `<button class="rt-node ${st}${sel ? ' sel' : ''}${pop ? ' pop' : ''}" type="button" data-rts="${D.k}" style="${st === 'run' ? `--p:${(labFrac('rt', 0) * 100).toFixed(1)};` : ''}left:${(RT_X(j, i) / RT_W * 100).toFixed(2)}%;top:${((RT_Y(i) - rtTop()) / (RT_H - rtTop()) * 100).toFixed(2)}%" aria-label="${D.nm} ${i + 1}칸${st === 'done' ? ' 완성' : st === 'run' ? ' 연구 중' : st === 'lock' ? ' 잠김' : ''}">` +
           (u ? `<img src="${u}" alt="">` : `<b>${i + 1}</b>`) + (st === 'lock' ? '<i class="rt-lk">🔒</i>' : st === 'done' ? '<i class="rt-leaf"></i>' : '') + '</button>';
       }
       nodes += `<span class="rt-nm" style="left:${(RT_X(j, 0) / RT_W * 100).toFixed(2)}%">${D.nm}</span>`;
@@ -118,7 +118,14 @@
       `<small>${L ? `지금 ${D.eff(L)}` : '아직 연구 전'}${D.lock || full ? '' : run ? `<br>다음 ${D.eff(L + 1)}<br>연구 중이에요. 끝나면 칸이 채워져요` : `<br>다음 ${D.eff(L + 1)}<br>도토리 ${fmt(k.ac)}, ${rtHrs(k.sec)}`}` +   // 5.3.2.1: 연구 중에는 걸리는 시간 대신 남은 시간(오른쪽) 하나만
       // 5.3.2.1: 잠긴 까닭을 한 줄로(예전에는 단추 자리에 '논문 3편', '다른 연구 중'만)
       `${D.lock || full || run ? '' : shut ? `<br>논문 ${PP.deep[D.k]}편을 쓰면 열려요 (지금 ${fmt((S.pp && S.pp.n) || 0)}편)` : c ? `<br>${(RT5.list.find(x => x.k === c.k) || {}).nm || '다른'} 연구가 끝나면 할 수 있어요` : ''}</small></div>${btn}</div>`;
-    return `<p class="fine">한 번에 하나씩 연구해요. 졸업해도 남아요.</p><div class="rt-tree${bg ? ' art' : ''}" style="aspect-ratio:${RT_W}/${RT_H - rtTop()}${bg ? `;background-image:url('${blobUrl(bg)}')` : ''}">${rtTreeSvg()}${nodes}</div>${info}`;
+    // 5.4.0.4: 내리지 않아도 보이게 위쪽에 '지금 연구 중' 칸(막대, 남은 시간, 단축권과 정수)과 고른 칸 설명, 그 아래 나무
+    const C = c && RT5.list.find(x => x.k === c.k), CL = C ? rtLv(C.k) : 0;
+    const now5 = C ? `<div class="rt-now"><span class="dp-ic">${IMG(C.ic) ? `<img src="${IMG(C.ic)}" alt="">` : ''}</span><div class="dp-tx"><b>지금 연구 중: ${C.nm} ${CL + 1}칸</b><small>끝나면 ${C.eff(CL + 1)}</small>${labSpeedHTML('rt', 0)}</div></div>` : '';
+    // 지금 연구할 수 있는 가지(고르면 위 설명이 바뀌어요)
+    const can = RT5.list.filter(x => !x.lock && rtLv(x.k) < rtMax(x.k) && !(c && c.k === x.k));
+    const canRow = can.length ? `<div class="rt-can"><small>${c ? '다음에 연구할 수 있어요' : '지금 연구할 수 있어요'}</small>${can.map(x => `<button type="button" data-rts="${x.k}" class="${rt.rtSel === x.k ? 'on' : ''}">${IMG(x.ic) ? `<img src="${IMG(x.ic)}" alt="">` : ''}${x.nm} ${rtLv(x.k) + 1}칸</button>`).join('')}</div>` : '';
+    const top = now5 + (C && C.k === D.k ? '' : info) + canRow;
+    return `<p class="fine">한 번에 하나씩 연구해요. 졸업해도 남아요.</p>${top}<div class="rt-tree${bg ? ' art' : ''}" style="aspect-ratio:${RT_W}/${RT_H - rtTop()}${bg ? `;background-image:url('${blobUrl(bg)}')` : ''}">${rtTreeSvg()}${nodes}</div>`;
   }
   function renderRx() {
     const tab = ['tree', 'ta', 'paper'].includes(rt.rxTab) ? rt.rxTab : 'inv';
@@ -126,6 +133,69 @@
     setH($('#rxBody'), tab === 'tree' ? rtPart() : tab === 'ta' ? taPart() : tab === 'paper' ? ppPart() : rxPart(true));
     { const hd = $('#rxTitle').parentElement, u = tab === 'ta' && taOpen() ? IMG('ta_bg') : tab === 'paper' && ppOpen() ? IMG('conf_bg') : ''; hd.classList.toggle('art', !!u); hd.style.backgroundImage = u ? `url("${blobUrl(u)}")` : ''; }   // 조교 탭 머리 그림, 논문 탭은 학회장 그림
   }
+  /* ---------- 5.4.0.4 연구소 시간 줄이기 (woodani 2026-11-25 "연구소도 가속권이나 정수로 시간 단축이 똑같이 가능해야") ----------
+     연구 트리 연구(rt), 논문 쓰기(pp), 조교 파견(ta:자리)에 공사와 같은 시간 단축권(자동 사용)과 숲의 정수 즉시 완료(conEssCost, 같은 값), 광고 5분권 받기
+     막대와 남은 시간은 1초마다 그 자리만 바꿔요(창 전체를 다시 그리지 않아요) */
+  function labJob(kind, i) {
+    if (!S) return null;
+    if (kind === 'rt') { const c = S.rt5 && S.rt5.cur; return c ? { o: c, tot: rtCost(c.k).sec } : null; }
+    if (kind === 'pp') { const c = S.pp && S.pp.cur; return c ? { o: c, tot: PP.sec } : null; }
+    if (kind === 'ta') { const o = S.ta && S.ta.out.find(y => y.i === i); return o ? { o, tot: taSec(o.h | 0) } : null; }
+    return null;
+  }
+  const labLeft = (kind, i) => { const J = labJob(kind, i); return J ? Math.max(0, Math.ceil((J.o.end - gameNow()) / 1000)) : 0; };
+  const labFrac = (kind, i) => { const J = labJob(kind, i); return J ? Math.max(0, Math.min(1, 1 - labLeft(kind, i) / Math.max(1, J.tot))) : 0; };
+  function labCut(kind, i, sec) {
+    const J = labJob(kind, i); if (!J) return;
+    J.o.end = Math.max(gameNow() - 1, J.o.end - sec * 1000);
+    if (kind === 'rt') rtTick(); else if (kind === 'pp') ppTick();
+    save(); if (!$('#mRx').hidden) renderRx();
+  }
+  function labTk(kind, i) {
+    const rem = labLeft(kind, i); if (!rem) return;
+    const p = tkPlan(rem); if (!p.n) { toast(`시간 단축권이 없어요. 광고를 보면 5분권 ${TKAD.n}장을 받아요`); return; }
+    for (const t of TK) S.tk[t.k] -= p.use[t.k];
+    S.st.tkUsed = (S.st.tkUsed || 0) + p.n; sfx('tap');
+    toast(p.left ? `${tkPlanText(p)}을 써서 ${hm(p.cut)} 줄였어요. ${hm(p.left)} 남아요` : `${tkPlanText(p)}을 써서 끝냈어요!`);
+    labCut(kind, i, p.cut + (p.left ? 0 : 1));
+  }
+  function labEss(kind, i) {
+    const rem = labLeft(kind, i), c = conEssCost(rem); if (!c || rt.paused) return;
+    if (S.ess < c) { toast(essShort(c - S.ess)); return; }
+    S.ess -= c; S.st.esSpent = (S.st.esSpent || 0) + c; renderEss(); sfx('quest');
+    labCut(kind, i, rem + 1);
+  }
+  function labAd() {
+    if (tkAdLeft() <= 0) { toast('오늘 광고 단축권은 다 받았어요. 내일 다시 받아요'); return; }
+    showAd(() => {
+      if (dayRoll(S.tka, gameToday())) S.tka.n = 0;
+      S.tka.n += 1; S.tk.m5 += TKAD.n;
+      sfx('quest'); toast(`5분 단축권 ${TKAD.n}장을 받았어요!`); save();
+      if (!$('#mRx').hidden) renderRx();
+    });
+  }
+  // 진행 막대와 단추 한 줄. small이면 막대 없이 단추만(조교 칸 아래)
+  function labSpeedHTML(kind, i) {
+    const rem = labLeft(kind, i); if (!rem) return '';
+    const c = conEssCost(rem), n = tkSum(), id = `${kind}:${i | 0}`;
+    return `<div class="lab-sp" data-labsp="${id}"><div class="lab-bar"><i data-labbar="${id}" style="width:${(labFrac(kind, i) * 100).toFixed(1)}%"></i></div>` +
+      `<div class="lab-row"><span class="lab-left" data-lableft="${id}">${hms(rem * 1000)} 남음</span>` +
+      `<button class="btn-sub small" type="button" data-lab="tk:${id}"${n ? '' : ' aria-disabled="true"'}>단축권 쓰기${n ? ` (${n}장)` : ''}</button>` +
+      `<button class="${S.ess >= c ? 'cta' : 'btn-sub'} small" type="button" data-lab="ess:${id}">정수 ${c} 즉시</button>` +
+      (!n && tkAdLeft() > 0 ? `<button class="btn-sub small" type="button" data-lab="ad">광고 5분권 ${TKAD.n}장</button>` : '') + '</div></div>';
+  }
+  function labClick(b) {
+    const [a, kind, x] = b.dataset.lab.split(':');
+    if (a === 'ad') labAd(); else if (a === 'tk') labTk(kind, +x); else if (a === 'ess') labEss(kind, +x);
+  }
+  setInterval(() => {
+    try {
+      if (!S || $('#mRx').hidden) return;
+      $$('#rxBody [data-labbar]').forEach(el => { const [k, i] = el.dataset.labbar.split(':'); el.style.width = (labFrac(k, +i) * 100).toFixed(1) + '%'; });
+      $$('#rxBody [data-lableft]').forEach(el => { const [k, i] = el.dataset.lableft.split(':'), r = labLeft(k, +i); el.textContent = r ? `${hms(r * 1000)} 남음` : '다 됐어요'; });
+      $$('#rxBody .rt-node.run').forEach(el => el.style.setProperty('--p', (labFrac('rt', 0) * 100).toFixed(1)));
+    } catch (e) { /* 다음 번에 */ }
+  }, 1000);
   /* ---------- 조교 파견 (프로젝트 문서 ' 설계안 (조교 파견) 초안', : 숫자는 제안대로) ----------
      조교 자리: 대학원생 조교를 캠퍼스 건물에 한 명씩 앉혀요. 앉아 있는 조교 한 명마다 수업료 +10%, 그 건물 가구 값 -10%
      모교 파견: 조교를 졸업한 학교(유치원~대학교)에 2, 4, 8시간 보내 숲의 정수와 추억 조각, 모교마다 다른 덤을 받아요. 파견 중에는 자리 효과가 꺼져요
@@ -279,13 +349,22 @@
     ppSync();
     const P = S.pp, c = P.cur, now = gameNow(), m = ppMedOf(P.cf), nx = PP.med[m], u = IMG('ic_rdata'), up = IMG('ic_paper'), dayDone = P.day === gameToday();
     const nextDeep = RT5.list.filter(D => P.n < PP.deep[D.k]).sort((a, b) => PP.deep[a.k] - PP.deep[b.k])[0];
-    let h = `<div class="pp-conf"><b>이번 숲속 학회 ${fmt(P.cf)}점</b><small>${ppLeft()}일 남음. ${m ? `지금 ${ppMedIc(m, 18)} ${PP.med[m - 1].nm}` : '아직 메달 없음'}${nx ? `, ${nx.at}점이면 ${ppMedIc(m + 1, 18)} ${nx.nm}` : ''}</small></div>`;
-    h += `<div class="dp-row"><span class="dp-ic">${u ? `<img src="${u}" alt="">` : '🔎'}</span><div class="dp-tx"><b>연구 자료 ${fmt(P.dat)}개</b><small>자료 ${PP.need}개로 논문 한 편을 ${rtHrs(PP.sec)} 동안 써요<br>얻는 곳: 세미나 +${PP.dat.sem}, 연구 트리 칸 +${PP.dat.rt}, 조교 파견 4시간 +${PP.dat.ta[1]}, 8시간 +${PP.dat.ta[2]}, 심화 탐험 큰 장난꾸러기를 처음 이기면 +${PP.dat.boss}</small></div>` +
+    // 5.4.0.4 가독성: 학회 점수 막대(다음 메달까지), 논문 책상(쓰는 중이면 막대와 단축권, 아니면 안내), 연구 자료는 짧게
+    const prevAt = m ? PP.med[m - 1].at : 0, medF = nx ? Math.max(0, Math.min(1, (P.cf - prevAt) / Math.max(1, nx.at - prevAt))) : 1;
+    let h = `<div class="pp-conf"><div class="pp-conf-h"><b>이번 숲속 학회 ${fmt(P.cf)}점</b><span>${ppLeft()}일 남음</span></div>` +
+      `<div class="pp-med">${m ? `${ppMedIc(m, 20)}<small>${PP.med[m - 1].nm}</small>` : '<small>메달 없음</small>'}<div class="lab-bar gold"><i style="width:${(medF * 100).toFixed(1)}%"></i></div>${nx ? `${ppMedIc(m + 1, 20)}<small>${nx.at}점 ${nx.nm}</small>` : '<small>모든 메달</small>'}</div></div>`;
+    if (c) {
+      const D = RT5.list.find(x => x.k === c.k);
+      h += `<div class="pp-desk on"><span class="pp-paper">${up ? `<img src="${up}" alt="">` : '📜'}</span><div class="dp-tx"><b>${D ? D.nm : ''} 논문 쓰는 중</b><small>끝나면 학회 점수 +${ppScore(c.k)}, 숲의 정수 +${PP.ess}</small>${labSpeedHTML('pp', 0)}</div></div>`;
+    } else {
+      h += `<div class="pp-desk"><span class="pp-paper">${up ? `<img src="${up}" alt="">` : '📜'}</span><div class="dp-tx"><b>책상이 비어 있어요</b><small>${P.dat >= PP.need ? `아래에서 주제를 골라 '쓰기'를 눌러요. 한 편에 ${rtHrs(PP.sec)}` : `연구 자료가 ${PP.need - P.dat}개 더 있으면 쓸 수 있어요`}</small></div></div>`;
+    }
+    h += `<div class="dp-row pp-dat"><span class="dp-ic">${u ? `<img src="${u}" alt="">` : '🔎'}</span><div class="dp-tx"><b>연구 자료 ${fmt(P.dat)}개 <em class="pp-chip">논문 ${Math.floor(P.dat / PP.need)}편 분량</em></b><small>한 편에 자료 ${PP.need}개</small><small class="pp-src">얻는 곳: 세미나 +${PP.dat.sem}, 연구 트리 칸 +${PP.dat.rt}, 조교 파견 4시간 +${PP.dat.ta[1]}, 8시간 +${PP.dat.ta[2]}, 심화 탐험 큰 장난꾸러기를 처음 이기면 +${PP.dat.boss}</small></div>` +
       (dayDone ? '<span class="fe-lock">오늘 정리함</span>' : `<button class="cta small" type="button" data-pp="day">자료 정리 +${PP.dat.day}</button>`) + '</div>';
-    if (c) { const D = RT5.list.find(x => x.k === c.k); h += `<div class="dp-row on"><span class="dp-ic">${up ? `<img src="${up}" alt="">` : '📜'}</span><div class="dp-tx"><b>${D ? D.nm : ''} 논문 쓰는 중</b><small>끝나면 학회 점수 +${ppScore(c.k)}</small></div><span class="fe-lock">${hms(c.end - now)}</span></div>`; }
+    h += '<h3 class="fv-h">주제 고르기</h3>';
     h += '<div class="dp-list">' + RT5.list.map(D => {
       const sc = ppScore(D.k), half = (P.ck[D.k] || 0) >= PP.halfAt, U = IMG(D.ic), can = !c && P.dat >= PP.need;
-      return `<div class="dp-row"><span class="dp-ic">${U ? `<img src="${U}" alt="">` : ''}</span><div class="dp-tx"><b>${D.nm} 논문</b><small>학회 점수 ${sc}${half ? ' (이번 학회 같은 주제 3편째부터 절반)' : ` (연구 트리 ${rtLv(D.k)}칸)`}</small></div>` +
+      return `<div class="dp-row"><span class="dp-ic">${U ? `<img src="${U}" alt="">` : ''}</span><div class="dp-tx"><b>${D.nm} 논문 <em class="pp-chip">+${sc}점</em></b><small>학회 점수 ${sc}${half ? ' (이번 학회 같은 주제 3편째부터 절반)' : ` (연구 트리 ${rtLv(D.k)}칸)`}</small></div>` +
         `<button class="${can ? 'cta' : 'btn-sub'} small" type="button" data-pp="w:${D.k}">쓰기</button></div>`;
     }).join('') + '</div>';
     h += `<p class="fine">쓴 논문 ${P.n}편${nextDeep ? `. ${PP.deep[nextDeep.k]}편이면 연구 트리 ${nextDeep.nm} 가지에 다섯째 칸이 열려요` : '. 연구 트리 심화 칸이 모두 열렸어요'}. 4주마다 학회가 새로 열려요.</p>`;
@@ -303,6 +382,7 @@
       const btn = o ? (now >= o.end ? `<button class="cta small" type="button" data-ta="claim">받기</button>` : `<button class="btn-sub small" type="button" data-ta="pick:${i}">자리 정하기</button><span class="fe-lock">파견 중</span>`)
         : `<button class="btn-sub small" type="button" data-ta="pick:${i}">자리 정하기</button><button class="cta small" type="button" data-ta="go:${i}">파견</button>`;
       h += `<div class="dp-row"><span class="dp-ic">${u ? `<img src="${u}" alt="">` : ''}</span><div class="dp-tx"><b>${TA.whoNm[w]} 조교</b><small>${st}${seatTx}</small></div><span class="ta-btns">${btn}</span></div>`;
+      if (o && now < o.end) h += `<div class="ta-sp">${labSpeedHTML('ta', i)}</div>`;   // 5.4.0.4 파견 시간 줄이기
       if (rt.taPick === i) h += '<div class="ta-pick">' + taB().map(k => `<button class="${x.b === k ? 'cta' : 'btn-sub'} small" type="button" data-ta="sit:${i}:${k}">${FAC[k].name}</button>`).join('') + (x.b ? `<button class="btn-sub small" type="button" data-ta="sit:${i}:">비우기</button>` : '') + '</div>';
       if (rt.taGo === i && !o) h += '<div class="ta-go"><p class="ta-go-h">1. 얼마나 다녀올까요?</p><div class="ta-hrs">'
         + TA.hrs.map((_, k) => `<button class="ta-hr${k === hr ? ' on' : ''}" type="button" data-ta="hr:${i}:${k}" aria-pressed="${k === hr}"><b>${rtHrs(taSec(k))}</b><small>정수 ${Math.round(TA.ess[k] * mul)}<br>추억 조각 ${Math.round(TA.mem[k] * mul)}</small></button>`).join('')

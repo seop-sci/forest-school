@@ -663,6 +663,7 @@
     mgUI.drag = null;
   }
   function mgOpen() {
+    useLog('mg');   // 5.4.0.3 놀이 기록
     mgTick();
     if (!FXL.st && wldLv() > 0) { FXL.touched = true; fxLoad(); }   // 엔진을 아직 안 받았으면 지금
     if (FXL.st === 'ok' && !FXO.st) fxoInit();   // 빛 고리 그림판

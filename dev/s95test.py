@@ -91,7 +91,7 @@ async def main():
                 print('퀘스트와 저장', {k: v for k, v in r.items() if k != 'a'})
                 ok(r['i1'] > 0 and r['i2'] > r['i1'] and r['ch'] == [5, 5] and r['m1'] == 4 and r['m2'] == 30 and r['ps'] == 4 and r['ach'] == '꼬마 생물학자', f'퀘스트 {r}')
                 a = r['a']
-                ok(a['m'] == 1 and a['sp'] == [{'i': 0, 'id': 'bio_pine', 't': 5}] and a['next'] == 0 and a['got'] == {'bio_pine': 3} and a['g'] == 5 and a['st']['n'] == 0 and r['b'] == [-1, 0], f'저장 읽기 {a}')
+                ok(a['m'] == 1 and a['sp'] == [{'i': 0, 'id': 'bio_pine', 't': 5}] and a['next'] == 0 and a['got'] == {'bio_pine': 3} and a['g'] == 7 and a['st']['n'] == 0 and r['b'] == [-1, 0], f'저장 읽기 {a}')   # 5.4.0.3 단계 상한 5 → 7(120종, 150종)
             # 4) 지도와 도감
             r = await ev("""S.tier = 1; F.rt.fakeNow = K(11, 20, 9); S.bx.sp = [{ i: 0, id: 'bio_pine', t: 0 }, { i: 2, id: 'bio_waterstrider', t: 0 }]; S.bx.m = 1; S.bx.next = K(11, 20, 11);
               F.renderDeco(true); return document.querySelectorAll('#bxG [data-bx]').length;""")
