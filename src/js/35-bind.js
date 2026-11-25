@@ -927,7 +927,7 @@
       else closeSchool();
     }));
     window.FOREST_BACK = () => {
-      if (rt.modalOpen === $('#mExit')) { $('#exitNo').click(); return; }   // 확인 창에서 한 번 더 뒤로 가기는 '계속 하기'예요 (닫기는 버튼으로만)
+      if (rt.modalOpen === $('#mExit')) { $('#exitNo').click(); return; }   // 확인 창에서 한 번 더 뒤로 가기는 '계속하기'예요 (닫기는 버튼으로만)
       if (rt.modalOpen || rt.sheetKey || rt.adOpen) { document.dispatchEvent(new KeyboardEvent('keydown', { key: 'Escape' })); return; }
       // 블록 퍼즐 안에서 뒤로 가기: 열린 작은 창부터 닫고, 없으면 미니게임 탭으로 (하던 판은 저장돼요)
       if (pzUI.open) {

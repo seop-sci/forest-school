@@ -157,7 +157,7 @@
     $('#adAskTitle').textContent = o.title || '광고를 볼까요?';
     { const t = $('#adAskText'); t.classList.toggle('ask-rich', !!o.html); if (o.html) t.innerHTML = o.html; else t.textContent = o.text || ''; }   // o.html: 줄과 굵은 글씨를 직접 짠 창(고르게 올리기)
     $('#adAskYes').textContent = o.yes || '광고 보기';
-    $('#adAskNo').textContent = o.no || '그만두기';
+    $('#adAskNo').textContent = o.no || '취소';
     openModal($('#mAdAsk'));
   }
   const askAd = (text, onYes, onNo) => askBox({ text, onYes, onNo });
