@@ -44,7 +44,7 @@
     if (!r || r.width < 8) { if (h) h.hidden = true; if (S && S.q.m >= FH_MAX && h) h.remove(); return; }
     if (!h) { h = document.createElement('div'); h.id = 'firstHint'; h.className = 'first-hint'; h.setAttribute('aria-hidden', 'true'); h.innerHTML = '<span class="fh-tx"></span><span class="fh-f">👆</span>'; document.body.appendChild(h); }
     if (h.firstChild.textContent !== aim[1]) h.firstChild.textContent = aim[1];
-    // 5.3.2.1: 대상이 화면 아래 120px 안이면(창 아래 키우기 단추, 가구 줄 끝) 글이 화면 밖으로 나가고 옆 칸 값을 덮었어요. 그때는 위쪽에 두고 손가락이 아래를 가리켜요
+    // 대상이 화면 아래 120px 안이면(창 아래 키우기 단추, 가구 줄 끝) 글이 화면 밖으로 나가고 옆 칸 값을 덮었어요. 그때는 위쪽에 두고 손가락이 아래를 가리켜요
     const up = !!aim[2] && r.bottom > innerHeight - FH_LOW;
     h.classList.toggle('up', up); if (h.lastChild.textContent !== (up ? '👇' : '👆')) h.lastChild.textContent = up ? '👇' : '👆';
     h.hidden = false; h.style.top = (up ? r.top + 6 : aim[2] ? r.bottom - 6 : r.top + r.height * 0.62) + 'px';
@@ -82,7 +82,7 @@
     if (!S.tips.oak && S.f.playground >= 1 && vis('#oak')) k = 'oak';
     else if (!S.tips.left && [...$$('.map-left .boost')].some(b => !b.hidden)) k = 'left';
     else if (!S.tips.tabs && S.q.m >= 3) k = 'tabs';
-    else if (!S.tips.pa && S.pa && S.pa.on && S.tips.tabs) k = 'pa';   // 5.4.0 사진첩
+    else if (!S.tips.pa && S.pa && S.pa.on && S.tips.tabs) k = 'pa';   // 사진첩
     if (!k) return;
     S.tips[k] = true; save(); tipStart(FEAT_TIPS[k]);
   }

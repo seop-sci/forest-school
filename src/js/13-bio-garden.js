@@ -4,7 +4,7 @@
      처음 관찰 과학 XP 10과 숲의 정수 1, 다시 보면 과학 XP 3과 수업료 3분치. 희귀 4%(과학실 Lv.5마다 +1%, 최대 8%).
      10종 황금 도토리 1, 20종 숲의 정수 20, 30종 지도 장식 '관찰 오두막'(업적 '생물 탐사' 칭호 꼬마 생물학자)
      2.3.5: 90종으로. 60종 황금 도토리 3과 곤충 호텔, 90종 숲의 정수 50과 생태 연못, 칭호 숲속 박사 */
-  const BX = { tier: 1, every: 2 * 3600000, max: 3, rare0: 4, rareMax: 8, xpNew: 10, xpDup: 3, essNew: 1, dupMin: 3, gold10: 1, ess20: 20, gold60: 3, ess90: 50, full: 90, gold120: 3, ess120: 60, ess150: 100 };   // 5.4.0.3 120종, 150종 단계(숫자는 woodani 확인 전 제안값)
+  const BX = { tier: 1, every: 2 * 3600000, max: 3, rare0: 4, rareMax: 8, xpNew: 10, xpDup: 3, essNew: 1, dupMin: 3, gold10: 1, ess20: 20, gold60: 3, ess90: 50, full: 90, gold120: 3, ess120: 60, ess150: 100 };   // 120종, 150종 단계(숫자는 확인 전 제안값)
   // 지도(geoIdx)마다 [가로 %, 세로 %, 물가면 1]. 장식 자리, 건물 빈터(울타리 안), 길을 피했어요
   // 왼쪽 단추 줄, 오른쪽 단추 줄, 아래 칩, 화면 밖(가장자리 11%)에 걸리던 자리를 안쪽 풀숲과 물가로 옮겼어요
   // 건물 누르는 칸과 이름표에 가리던 자리를 손가락이 다 닿는 풀밭과 호수로 옮겼어요(390px, 360px에서 잼)
@@ -17,7 +17,7 @@
     [[80, 30, 1], [20, 52, 0], [66, 40, 0], [86, 50, 0], [64, 66, 0], [13, 62, 0], [70, 29, 1]],   // 넷째, 다섯째 자리: 아래 구역 단추에 가려서 옮김
     [[19, 28, 0], [78, 27, 0], [17, 47, 0], [87, 49, 0], [22, 74, 0], [80, 77, 0]],
     [[94, 40, 1], [84, 55, 0], [56, 58, 0], [80, 69, 0], [56, 70, 0], [15, 79, 0], [95, 53, 1]]);   // 체육 구역 둘째 자리(왼쪽 메뉴 수학여행 단추에 가림)와 다섯째 자리(아래 구역 단추에 가림)를 옮김
-  // 5.3.4.8: 물가 생물이 40종쯤으로 늘어서 지도마다 일곱째 자리로 물가를 하나 더 뒀어요(광장 구역은 물이 없어 그대로)
+  // 물가 생물이 40종쯤으로 늘어서 지도마다 일곱째 자리로 물가를 하나 더 뒀어요(광장 구역은 물이 없어 그대로)
   const SPR = [3, 4, 5], SUM = [6, 7, 8], AUT = [9, 10, 11], WIN = [12, 1, 2];
   // [열쇠, 이름, 무리(0 곤충, 1 식물, 2 새와 작은 동물), 조건, 설명]. 조건: s 달, n 밤, r 비, w 물가, rare 희귀, en 멸종위기
   const BIO = [
@@ -51,7 +51,7 @@
     ['otter', '수달', 2, { w: 1, rare: 1, en: 'Ⅰ급' }, '헤엄을 아주 잘 치는 물가의 동물이에요. 천연기념물이에요.'],
     ['redbat', '붉은박쥐', 2, { n: 1, rare: 1, en: 'Ⅰ급' }, '주황빛 털 때문에 황금박쥐라고도 불러요. 천연기념물이에요.'],
     ['pitta', '팔색조', 2, { s: [5, 6, 7, 8], rare: 1, en: 'Ⅱ급' }, '여덟 가지 빛깔 깃털을 가진 여름 철새예요. 천연기념물이에요.'],
-    // 생물 60종 더하기(작업지시서 48). WIN 겨울 12~2월
+    // 생물 60종 더하기. WIN 겨울 12~2월
     ['cabbagewhite', '배추흰나비', 0, { s: [...SPR, ...SUM] }, '하얀 날개에 까만 점이 있는 나비예요. 애벌레는 배추와 양배추 잎을 먹고 자라요.'],
     ['sulphur', '노랑나비', 0, { s: SPR }, '봄 들판을 노랗게 나는 나비예요. 토끼풀 같은 콩과 식물에 알을 낳아요.'],
     ['mantis', '사마귀', 0, { s: AUT }, '낫처럼 생긴 앞다리로 벌레를 잡아요. 고개를 돌려 뒤도 볼 수 있어요.'],
@@ -112,7 +112,7 @@
     ['hare', '멧토끼', 2, {}, '산과 들에 사는 야생 토끼예요. 긴 귀로 소리를 잘 듣고 아주 빨리 달려요.'],
     ['roedeer', '노루', 2, {}, '엉덩이에 하얀 털이 있는 작은 사슴이에요. 놀라면 엉덩이 털을 펴서 알려요.'],
     ['leopardcat', '삵', 2, { n: 1, rare: 1, en: 'Ⅱ급' }, '고양이를 닮은 야생 동물이에요. 이마에 줄무늬, 몸에 점무늬가 있어요. 밤에 사냥해요.'],
-    // 5.3.4.8 물속 생물 20종(작업지시서 111, AI 글 도우미 bio 후보와 점검)
+    // 물속 생물 20종(AI 글 도우미 bio 후보와 점검)
     ['palechub', '피라미', 3, { w: 1, s: [3, 4, 5, 6, 7, 8, 9, 10, 11] }, '수컷은 여름에 몸이 분홍빛과 푸른빛으로 물들어요. 냇물에서 떼 지어 헤엄쳐요.'],
     ['minnow', '버들치', 3, { w: 1, s: [3, 4, 5, 6, 7, 8, 9, 10, 11] }, '몸에 작은 검은 점이 흩어져 있는 물고기예요. 맑고 차가운 계곡 상류에 살아요.'],
     ['medaka', '송사리', 3, { w: 1, s: [4, 5, 6, 7, 8, 9, 10] }, '눈이 크고 손가락 마디만 한 작은 물고기예요. 논과 연못 물 위쪽에서 떼 지어 다녀요.'],
@@ -133,7 +133,7 @@
     ['waterbug', '물자라', 3, { w: 1, s: [4, 5, 6, 7, 8, 9, 10] }, '납작한 갈색 몸에 낫 같은 앞다리가 있어요. 수컷이 알을 등에 업고 다녀요.'],
     ['waterscorpion', '장구애비', 3, { w: 1, s: [4, 5, 6, 7, 8, 9, 10] }, '꼬리에 숨 쉬는 긴 관이 달린 갈색 곤충이에요. 연못 바닥에서 앞다리로 먹이를 잡아요.'],
     ['giantwaterbug', '물장군', 3, { w: 1, s: [5, 6, 7, 8, 9], rare: 1, en: 'Ⅱ급' }, '우리나라 노린재 무리 가운데 가장 큰 곤충이에요. 연못과 논에서 개구리와 물고기를 잡아먹어요.'],
-    // 5.3.4.8 양서류와 파충류 20종(작업지시서 111, AI 글 도우미 bio 후보와 점검)
+    // 양서류와 파충류 20종(AI 글 도우미 bio 후보와 점검)
     ['pondfrog', '참개구리', 4, { w: 1, s: [4, 5, 6, 7, 8, 9, 10] }, '등 가운데에 연두색 줄이 있는 개구리예요. 논과 연못에서 우렁차게 울어요.'],
     ['goldfrog', '금개구리', 4, { w: 1, s: [4, 5, 6, 7, 8, 9, 10], rare: 1, en: 'Ⅱ급' }, '등 양옆에 금빛 줄이 두 개 있어요. 논과 연못의 물풀 위에 떠 있어요.'],
     ['wrinkledfrog', '옴개구리', 4, { w: 1, s: [4, 5, 6, 7, 8, 9, 10] }, '등이 오톨도톨한 갈색 개구리예요. 산골 개울과 논 근처 물가에 살아요.'],
@@ -154,7 +154,7 @@
     ['ratsnake', '누룩뱀', 4, { s: [4, 5, 6, 7, 8, 9, 10] }, '누런 갈색 몸에 검은 점무늬가 있어요. 풀밭과 돌담에서 쥐를 잡아먹어요.'],
     ['amurratsnake', '구렁이', 4, { s: [4, 5, 6, 7, 8, 9, 10], rare: 1, en: 'Ⅱ급' }, '몸이 아주 크고 긴 독 없는 뱀이에요. 산과 마을 근처에서 쥐를 잡아먹어요.'],
     ['redbandedsnake', '능구렁이', 4, { s: [4, 5, 6, 7, 8, 9, 10], n: 1 }, '검은 몸에 붉은 띠가 둘러진 뱀이에요. 밤에 나와 개구리와 다른 뱀을 잡아먹어요.'],
-    // 5.3.4.8 버섯과 이끼와 열매 20종(작업지시서 111, AI 글 도우미 bio 후보와 점검)
+    // 버섯과 이끼와 열매 20종(AI 글 도우미 bio 후보와 점검)
     ['flyagaric', '광대버섯', 5, { s: [8, 9, 10], r: 1 }, '빨간 갓에 하얀 점이 콕콕 박혀 있어요. 독이 있어서 먹으면 안 돼요.'],
     ['shiitake', '표고', 5, { s: [4, 5, 9, 10], r: 1 }, '갈색 갓 가장자리에 하얀 비늘이 붙어 있어요. 죽은 참나무에 붙어 자라요.'],
     ['oystermushroom', '느타리', 5, { s: [4, 5, 10, 11], r: 1 }, '회색 갓이 부채처럼 겹겹이 펴져요. 죽은 나무 줄기에 붙어 자라요.'],
@@ -177,7 +177,7 @@
     ['beautyberry', '작살나무', 5, { s: [10, 11] }, '보라색 작은 구슬 열매가 모여 달려요. 새들이 찾아와 열매를 먹어요.']]
     .map(([k, nm, g, c, d]) => ({ id: 'bio_' + k, nm, g, ...c, d }));
   const BIO_BY = Object.fromEntries(BIO.map(b => [b.id, b]));
-  const BIO_G = ['곤충', '식물', '새와 작은 동물', '물속 생물', '양서류와 파충류', '버섯과 이끼와 열매'];   // 5.3.4.8 무리 셋 더(이미 있던 개구리, 도롱뇽, 거북, 도마뱀과 버섯, 이끼도 새 무리 칸으로)
+  const BIO_G = ['곤충', '식물', '새와 작은 동물', '물속 생물', '양서류와 파충류', '버섯과 이끼와 열매'];   // 무리 셋 더(이미 있던 개구리, 도롱뇽, 거북, 도마뱀과 버섯, 이끼도 새 무리 칸으로)
   const freshBx = () => ({ m: -1, sp: [], next: 0, got: {}, g: 0, st: { n: 0 } });
   const bxOpen = () => !!S && !!S.bx && S.tier >= BX.tier;
   const bxSpots = () => BX_SPOT[decoMap()] || null;
@@ -246,8 +246,8 @@
     if (n >= 30 && S.bx.g < 3) { S.bx.g = 3; S.deco.own.bio_hut = 1; got.push('생물 30종! 지도 장식 관찰 오두막'); }
     // 60종 황금 도토리 3과 곤충 호텔, 90종 숲의 정수 50과 생태 연못, 칭호 숲속 박사
     if (n >= 60 && S.bx.g < 4) { S.bx.g = 4; addGold(BX.gold60); S.deco.own.deco_bug_hotel = 1; got.push(`생물 60종! 황금 도토리 +${BX.gold60}, 지도 장식 곤충 호텔`); }
-    if (n >= BX.full && S.bx.g < 5) { S.bx.g = 5; addEss(BX.ess90); S.deco.own.deco_eco_pond = 1; got.push(`생물 ${BX.full}종! 숲의 정수 +${BX.ess90}, 지도 장식 생태 연못, 칭호 숲속 박사`); }   // 5.3.4.8: 150종이 되어도 90종에서 받아요(이미 받은 사람과 같게)
-    // 5.4.0.3 (woodani 2026-11-25 "생물 보상단계도 두면 좋겠고"): 120종 황금 도토리 3과 숲의 정수 60, 150종(모두) 숲의 정수 100과 칭호 생물 도감 완성
+    if (n >= BX.full && S.bx.g < 5) { S.bx.g = 5; addEss(BX.ess90); S.deco.own.deco_eco_pond = 1; got.push(`생물 ${BX.full}종! 숲의 정수 +${BX.ess90}, 지도 장식 생태 연못, 칭호 숲속 박사`); }   // 150종이 되어도 90종에서 받아요(이미 받은 사람과 같게)
+    // (2026-11-25 "생물 보상단계도 두면 좋겠고"): 120종 황금 도토리 3과 숲의 정수 60, 150종(모두) 숲의 정수 100과 칭호 생물 도감 완성
     if (n >= 120 && S.bx.g < 6) { S.bx.g = 6; addGold(BX.gold120); addEss(BX.ess120); got.push(`생물 120종! 황금 도토리 +${BX.gold120}, 숲의 정수 +${BX.ess120}`); }
     if (n >= BIO.length && S.bx.g < 7) { S.bx.g = 7; addEss(BX.ess150); got.push(`생물 ${BIO.length}종을 다 모았어요! 숲의 정수 +${BX.ess150}, 칭호 생물 도감 완성`); }
     rt.bxRes = { b, nw, got };
@@ -279,10 +279,10 @@
     o.sp = (Array.isArray(X.sp) ? X.sp : []).filter(x => x && Number.isInteger(x.i) && x.i >= 0 && x.i < L.length && BIO_BY[x.id] && !used[x.i] && (used[x.i] = 1)).slice(0, BX.max).map(x => ({ i: x.i, id: x.id, t: n(x.t, lim) }));
     o.next = n(X.next, lim);
     if (X.got && typeof X.got === 'object') for (const b of BIO) if (X.got[b.id]) o.got[b.id] = n(X.got[b.id], 1e6);
-    o.g = n(X.g, 7);   // 5.4.0.3 단계 7까지(120종 6, 150종 7) o.st.n = n(X.st && X.st.n, 1e9);
+    o.g = n(X.g, 7);   // 단계 7까지(120종 6, 150종 7) o.st.n = n(X.st && X.st.n, 1e9);
     s.bx = o;
   }
-  /* ---------- 학교 텃밭 (프로젝트 문서 ' 설계안' 3절) ----------
+  /* ---------- 학교 텃밭 ----------
      유치원부터 급식실 창에서 열어요. 씨앗은 공짜, 작물마다 자라는 시간이 있고 물을 주면 남은 시간 -20%(비 오는 날은 저절로)
      거두면 재료 1개(물 준 작물은 2개). 하루 한 번 재료로 '오늘의 급식'을 만들면 그날 수업료 +5%(재료 3가지 메뉴는 +8%)
      영양 선생님 Lv.5마다 +1%p(최대 +3%p). 처음 만든 메뉴는 숲의 정수 3, 메뉴 8가지에 황금 도토리 1 */
@@ -426,7 +426,7 @@
     const pq = document.getElementById('pq-cafeteria'); if (!pq || !S || !S.gn) return;
     let g = pq.querySelector('.gdb');
     if (!g) { g = document.createElementNS('http://www.w3.org/2000/svg', 'g'); g.setAttribute('class', 'gdb'); g.setAttribute('transform', 'translate(-30 -22)'); g.innerHTML = IMG('garden_bubble') ? `<image href="${IMG('garden_bubble')}" x="-12" y="-14" width="24" height="24"/>` : '<circle r="10"/><text y="4" text-anchor="middle">🌱</text>'; pq.appendChild(g); }
-    const freeNow = S.gn.free > 0 && S.gn.plots.slice(0, gdN()).some(p => p.c && !gdReady(p));   // 5.3.4.2 무료 바로 자라기를 쓸 수 있을 때도 말풍선
+    const freeNow = S.gn.free > 0 && S.gn.plots.slice(0, gdN()).some(p => p.c && !gdReady(p));   // 무료 바로 자라기를 쓸 수 있을 때도 말풍선
     pq.classList.toggle('gd-on', gdOpen() && rt.viewTier == null && (gdReadyN() > 0 || freeNow));
   }
   function sanitizeGd(d, s) {
@@ -444,7 +444,7 @@
     if (!gdOpen()) { toast('급식실을 지으면 텃밭을 가꿀 수 있어요'); return; }
     gdSync(); rt.gdPick = -1; rt.gdCutI = -1; rt.gdSel = '';   // 다시 열면 만들기 확인 창은 닫혀 있어요
     gdFreeGrant(curMain());   // 이미 그 퀘스트 중인 학교도 텃밭을 열면 무료 한 번
-    const bg = IMG('garden_bg'); $('#gdHead').style.backgroundImage = bg ? `url("${bg}")` : ''; $('#gdHead').classList.toggle('noimg', !bg);   // 그림(작업지시서 37-A)이 오기 전에는 낮게
+    const bg = IMG('garden_bg'); $('#gdHead').style.backgroundImage = bg ? `url("${bg}")` : ''; $('#gdHead').classList.toggle('noimg', !bg);   // 그림(-A)이 오기 전에는 낮게
     gdRender(true); openModal($('#mGd')); sfx('tap');
   }
   function gdRender(force) {
@@ -459,7 +459,7 @@
       const tx = !C ? '빈 밭' : ready ? `${C.nm} 다 자람` : `${C.nm} ${hm(Math.max(1, Math.ceil((p.e - now) / 1000)))}`;
       const act = !C ? `<button type="button" data-gd="pick" data-i="${i}">심기</button>` : ready ? `<button type="button" class="go" data-gd="har" data-i="${i}">거두기</button>`
         : (p.w ? '<small>물 줬어요</small>' : `<button type="button" data-gd="wat" data-i="${i}">물 주기</button>`) +
-          (S.gn.free > 0 ? `<button type="button" class="go free" data-gd="free" data-i="${i}">⚡ 바로 자라기<small>무료 ${S.gn.free}번</small></button>`   // 5.3.4.2 '시간 줄이기' 안에 숨어 있어서 몰랐어요(퀘스트 4-5 첫 작물 거두기)
+          (S.gn.free > 0 ? `<button type="button" class="go free" data-gd="free" data-i="${i}">⚡ 바로 자라기<small>무료 ${S.gn.free}번</small></button>`   // '시간 줄이기' 안에 숨어 있어서 몰랐어요(퀘스트 4-5 첫 작물 거두기)
             : `<button type="button" data-gd="cut" data-i="${i}">시간 줄이기</button>`);
       return `<div class="gd-plot${ready ? ' ready' : ''}${rt.gdPick === i || rt.gdCutI === i ? ' pick' : ''}"><span class="bed"${bed ? ` style="background-image:url('${bed}')"` : ''}>${crop}</span><span class="tx">${tx}</span>${act}</div>`;
     }).join('');
@@ -493,14 +493,14 @@
         `${has ? gdImg(m.id, m.em) : gdImg('menu_frame', '🍽')}<span class="ell">${has || ok ? esc(m.nm) : '???'}</span><small>${can ? `만들기 +${gdPct(m)}%` : ok ? need : `${TIERS[Math.max(...Object.keys(m.need).map(c => GD_C[c].tier))].name}부터`}</small></button>`;
     }).join('')}</div>` + (() => { const m = !tm && GD_M[rt.gdSel]; return m && gdCanCook(m) ? `<div class="gd-ok" role="dialog" aria-label="오늘의 급식 만들기"><div class="gd-ok-bg" data-gd="cooksel" data-m=""></div><div class="gd-ok-card"><div class="gd-ok-pic">${gdImg(m.id, m.em)}</div><b>${eul(esc(m.nm))} 만들까요?</b><p>오늘 수업료 +${gdPct(m)}%<br>오늘의 급식은 하루 한 번이라 바꿀 수 없어요</p><div class="btn-row"><button class="btn-sub" type="button" data-gd="cooksel" data-m="">다시 고르기</button><button class="cta" type="button" data-gd="cookgo" data-m="${m.id}">만들기</button></div></div></div>` : ''; })();   // 누르면 먼저 물어봐요. 아래에 붙던 확인 칸을 텃밭 창 가운데 따로 띄워요
   }
-  /* 마을 기부(프로젝트 문서 '마을 기부 설계안 '): 도토리를 숲속 마을에 기부하면 기부 단계가 올라요
+  /* 마을 기부: 도토리를 숲속 마을에 기부하면 기부 단계가 올라요
      상한이 없고 힘(수입, 공사 속도)은 주지 않아요. 기념물, 칭호, 업적, 정수와 가끔 황금 도토리만. 졸업해도 남아요
      단계마다 필요한 양 = 지금 수업료(초당, 특식 데이 2배는 빼고) × H(n)시간. 진행은 이번 단계 비율 p로 저장해서 수업료가 올라도 채운 만큼은 그대로예요 */
   const VD = { tier: 1, H: [1, 2, 3, 5, 8, 12, 18, 24], after: 6, ess: 5, goldEvery: 5, art: 8, w: 62, box: 46,
     fr: [0.9, 0.34, 0.4, 0.45, 0.43, 0.43, 0.54, 0.65, 0.66],   // 그림 캔버스에서 실제 그림이 차지하는 너비(기부함, 1~8단계). 1, 2단계는 그림이 작게 그려져서 이걸로 키워요
     spot: [null, [12, 90], [12, 91], [12, 90]],   // '새 편지' 단추에 가려서 아래로. 오른쪽 아래는 체험학습 버스 자리라 간판 왼쪽 아래 풀밭으로
     titles: [{ id: 'vdpatron', lv: 3, title: '마을 후원자' }, { id: 'vdgold', lv: 8, title: '황금 나무 주인' }] };   // 20단계 '숲속 기부왕'은 업적 줄의 칭호
-  ZONE_GEO.forEach(Z => VD.spot.push(Z.vd ? [Z.vd[0] / MAP_W * 100, (Z.vd[1] - MAP_Y) / MAP_H * 100] : null));   // 기념물은 광장 구역에만(작업지시서 54 자리 표)
+  ZONE_GEO.forEach(Z => VD.spot.push(Z.vd ? [Z.vd[0] / MAP_W * 100, (Z.vd[1] - MAP_Y) / MAP_H * 100] : null));   // 기념물은 광장 구역에만(자리 표)
   const vdH = n => n <= VD.H.length ? VD.H[n - 1] : VD.H[VD.H.length - 1] + VD.after * (n - VD.H.length);
   const vdOpen = () => !!S && !!S.vd && S.tier >= VD.tier;
   const vdRate = () => Math.max(1, rate() / (feastOn() ? 2 : 1) / snMult() / gdMult());   // 특식 데이와 간식 기분, 오늘의 급식은 빼요
@@ -659,7 +659,7 @@
     ffRender(true); save();
     return done.length;
   }
-  // 건물마다 하루 한 번 바로 완공 → 조정안 7: 학교 전체 하루 3번, 고르는 건물은 마음대로. S.ffd = { 날, 쓴 횟수 }
+  // 건물마다 하루 한 번 바로 완공 → : 학교 전체 하루 3번, 고르는 건물은 마음대로. S.ffd = { 날, 쓴 횟수 }
   const FF = { day: 3 };
   const ffLeft = () => !S || !S.ffd ? 0 : S.ffd.day === gameToday() ? Math.max(0, FF.day - S.ffd.n) : FF.day;
   const conFreeLeft = k => ffLeft() > 0;
@@ -676,7 +676,7 @@
     return true;
   }
   // 숲의 정수로 즉시 완료: 남은 시간 5분 이하는 정수 2, 그 위로는 10분마다 5(올림)
-  const CESS = { min5: 2, per10: 5 };   // 5.3.3 woodani A안: 10분마다 4 → 5(단축권보다 조금 비싸게)
+  const CESS = { min5: 2, per10: 5 };   // A안: 10분마다 4 → 5(단축권보다 조금 비싸게)
   const conEssCost = sec => sec <= 0 ? 0 : sec <= 300 ? CESS.min5 : CESS.per10 * Math.ceil(sec / 600);
   const conEssQuiet = () => !!S && S.ces === gameToday();
   function conEss(k) {
@@ -801,7 +801,7 @@
     for (const k of Object.keys(FAC)) conMap(k);
     if (rt.sheetKey) conSheet();
   }
-  const conArtKey = k => { if (!(S.f[k] >= 1)) return ''; const key = 'con_' + bldImg(k).replace(/^bld_/, ''); return IMG(key) ? key : ''; };   // 초등 트랙과 과학실 덧그림(작업지시서 102)이 들어와 빌려 쓰기(CON_ALT)를 없앴어요
+  const conArtKey = k => { if (!(S.f[k] >= 1)) return ''; const key = 'con_' + bldImg(k).replace(/^bld_/, ''); return IMG(key) ? key : ''; };   // 초등 트랙과 과학실 덧그림이 들어와 빌려 쓰기(CON_ALT)를 없앴어요
   function conMap(k) {
     const g = $('#b-' + k); if (!g) return;
     let el = g.querySelector('.con'), ui = document.getElementById('cu-' + k);
@@ -820,7 +820,7 @@
       el.dataset.bh = bh.toFixed(2); el.dataset.lay = String(rt.mapLaid);
       // 비계가 건물 그림 전체 크기라 너무 복잡해 보여요. 건물 가운데에 절반쯤 크기로(아래쪽은 바닥 섬 위)
       const sw = w * 0.5, sx = x + (w - sw) / 2, sy = y + w * 0.3;
-      // 건물마다 그 건물에 맞는 공사 덧그림(작업지시서 99, 101, con_<건물 그림>). 건물 그림과 같은 캔버스라 같은 자리와 크기로 겹쳐요. 없으면(처음 짓는 자리, 고급 건물) 예전 비계
+      // 건물마다 그 건물에 맞는 공사 덧그림(con_<건물 그림>). 건물 그림과 같은 캔버스라 같은 자리와 크기로 겹쳐요. 없으면(처음 짓는 자리, 고급 건물) 예전 비계
       const ck = conArtKey(k), cu = ck && IMG(ck), at = a => bi.getAttribute(a) ? ` ${a}="${bi.getAttribute(a)}"` : '';
       el.dataset.art = ck || '';
       el.innerHTML = (cu ? `<image class="con-scaf con-art" href="${cu}"${at('x')}${at('y')}${at('width')}${at('height')}${at('transform')}/>` : IMG180('fx_scaffold') ? `<image class="con-scaf" href="${IMG180('fx_scaffold')}" x="${sx.toFixed(1)}" y="${sy.toFixed(1)}" width="${sw.toFixed(1)}" height="${sw.toFixed(1)}"/>` : '') +
@@ -897,7 +897,7 @@
     const al = tkAdLeft();
     $('#conAd').setAttribute('aria-disabled', al > 0 ? 'false' : 'true');
     setT($('#conAd'), al > 0 ? `광고 보고 5분권 ${TKAD.n}장 받기 (오늘 ${al}번 남음)` : '오늘 광고 단축권을 다 받았어요');
-    // 5.3.2.2 F-05, H-09: 끝내는 길이 여섯 가지라 칸이 길었어요. 1분 안에 끝나는 공사는 막대만, 그 밖에는 으뜸 단추 하나와 '다른 방법' 접기(길은 모두 그대로 있어요)
+    // F-05, H-09: 끝내는 길이 여섯 가지라 칸이 길었어요. 1분 안에 끝나는 공사는 막대만, 그 밖에는 으뜸 단추 하나와 '다른 방법' 접기(길은 모두 그대로 있어요)
     const short = left < CON_SHORT, ffOk = !$('#conFree').hidden, essOk = S.ess >= conEssCost(left);
     const main = ffOk ? ['#conFree'] : p.n ? ['#conRow', '#conPlan'] : essOk ? ['#conEss'] : al > 0 ? ['#conAd'] : ['#conEss'];
     if (rt.conMoreK !== k) { rt.conMoreK = k; rt.conMore = false; }   // 다른 건물 창을 열면 다시 접어요

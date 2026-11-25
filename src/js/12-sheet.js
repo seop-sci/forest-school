@@ -177,13 +177,13 @@
     }
     setT($('#sheetNeed'), conOn(k) ? ' ' : maxed ? (semFirst() ? `더 올리려면 1학기를 마쳐야 해요. 1학기 방학식을 열면 Lv.${capNext()}까지 키울 수 있어요` : (finalYear() ? (S.tier === 4 ? `이 학년에서는 다 키웠어요. 학위수여식을 열면 대학원에서 더 키울 수 있어요` : `이 학교급에서는 다 키웠어요. 졸업식을 열면 ${TIERS[S.tier + 1].name}에서 새로 지어요`) : `더 올리려면 학교가 다음 학년으로 올라가야 해요. ${semOn() ? '2학기 ' : ''}종업식을 열면 Lv.${capNext()}까지 키울 수 있어요`)) : !fr ? `가구 네 개를 모두 ${euro('Lv.' + L)} 올리면 건물을 키울 수 있어요` : ok ? ' ' : `도토리 ${fmt(Math.ceil(c - S.budget))}개가 더 필요해요`);
     $('#sheetNeed').classList.toggle('soft', maxed || !fr);
-    // 5.3.2.1: 도토리가 모자라면 지금 수업료로 얼마나 걸리는지, 하루 횟수가 남은 일이 있으면 오늘 할 일로 가는 단추
+    // 도토리가 모자라면 지금 수업료로 얼마나 걸리는지, 하루 횟수가 남은 일이 있으면 오늘 할 일로 가는 단추
     { const r = rate(), sec = !conOn(k) && !maxed && fr && !ok && r > 0 ? (c - S.budget) / r : 0, w = $('#sheetWait');
       setHid(w, !(sec > 0 && isFinite(sec)));
       if (sec > 0 && isFinite(sec)) { setT($('#sheetWaitTx'), `수업료로 ${etaTx(sec)}`); setHid($('#sheetWaitGo'), !todoRows().some(x => x.left > 0 && x.T.go !== 'home' && x.T.k !== 'sk')); } }
   }
   // 짓기와 업그레이드 효과. kind 'build'(처음 지음) 또는 'up'. 건물 창이 열려 있으면 닫을 때 보여 줘요
-  // 작업지시서 22 그림으로 켜요(코드로 그린 먼지와 별은 어색해서 그림으로 바꿨어요). setBldFx(false)로 끌 수 있어요
+  // 켜요(코드로 그린 먼지와 별은 어색해서 그림으로 바꿨어요). setBldFx(false)로 끌 수 있어요
   let BLD_FX = true;
   const setBldFx = v => { BLD_FX = !!v; };
   function bldFx(k, kind) {
@@ -229,7 +229,7 @@
   }
   // 돈을 내면 공사가 시작돼요. 레벨은 공사가 끝날 때(conFinish) 올라요
   /* 건설 가속(도토리가 남을 때 쓸 곳): 사 두면 그동안 모든 공사가 2배 빨라요(초등학교부터)
-     값은 수업료 분치(minAcorns)라 학교가 클수록 커요. 겹쳐 사면 시간이 이어 붙고, 남은 시간은 6시간까지. 숫자는 본부 제안 */
+     값은 수업료 분치(minAcorns)라 학교가 클수록 커요. 겹쳐 사면 시간이 이어 붙고, 남은 시간은 6시간까지. */
   const CB = { tier: 1, maxH: 6, items: [{ k: 'm30', min: 30, m: 60, name: '건설 부스터(30분)' }, { k: 'h1', min: 60, m: 110, name: '건설 부스터(1시간)' }] };
   const cbOn = () => !!S && !!S.cb && S.cb.until > gameNow();
   const cbLeft = () => S && S.cb ? Math.max(0, Math.ceil((S.cb.until - gameNow()) / 1000)) : 0;
@@ -279,14 +279,14 @@
     }
     S.nb.at = now;
   }
-  // 이벤트 시간에 처음 볼 때 하루 한 번 알려요(작업지시서 36 배너가 오면 배너 창으로 바꿔요)
+  // 이벤트 시간에 처음 볼 때 하루 한 번 알려요(배너가 오면 배너 창으로 바꿔요)
   function nbNotice() {
     if (!S || !S.nb || S.tier < NB.tier || !nbOn() || rt.paused) return;
     const d = gameToday(); if (S.nb.seen === d) return;
     S.nb.seen = d;
     const all = nbAllDay(d), msg = `${all ? '오늘은 하루 종일' : '자정까지'} 모든 공사 +${nbAdd()}%예요${nbAdd() > NB.add ? '(학교 특별 이벤트 주간)' : ''}${cbOn() ? `. 건설 부스터와 함께 +${conAdd()}%` : ''}`;
     const ban = IMG('ev_banner_nightbuild');
-    if (ban && !rt.modalOpen) {   // 작업지시서 36 배너 창. 다른 창이 열려 있으면 토스트로만
+    if (ban && !rt.modalOpen) {   // 배너 창. 다른 창이 열려 있으면 토스트로만
       $('#nbBan').style.backgroundImage = `url("${ban}")`;
       $('#nbSub').textContent = all ? `주말 하루 종일 공사 +${nbAdd()}%` : `오늘 ${NB.h0}~${NB.h1}시 공사 +${nbAdd()}%`;
       $('#nbLead').textContent = `${nbAdd() > NB.add ? '학교 특별 이벤트 주간이에요. ' : ''}${cbOn() ? `건설 부스터와 함께 +${conAdd()}%예요.` : '건설 부스터를 같이 쓰면 효과가 더해져요.'}`;
@@ -294,10 +294,10 @@
     } else toast(`야간 건설 이벤트 시작! ${msg}`);
     sfx('quest'); ffRender(true); save();
   }
-  /* 야간 자율학습 (설계안 4절): 한국 시간 20시~다음 날 6시가 밤이에요
+  /* 야간 자율학습 : 한국 시간 20시~다음 날 6시가 밤이에요
      고등학교부터 밤이면 지도가 저절로 어두워지고 창에 불이 켜져요. 학생은 기숙사 앞에서 졸아요
      기숙사(또는 도서관) 창에서 낮에 예약하거나 밤에 하루 한 번 자율학습을 켜면 그 밤 동안 자리 비운 보상 상한이 기숙사 Lv × 30분(최대 12시간) 늘고
-     그 밤에 쌓인 도토리에 사감 선생님 보너스(+5%/Lv)가 붙어요. 6시가 지나면 고른 과목 XP +30. 숫자는 본부 제안 */
+     그 밤에 쌓인 도토리에 사감 선생님 보너스(+5%/Lv)가 붙어요. 6시가 지나면 고른 과목 XP +30. */
   const NSL = { h0: 20, h1: 6, tier: 3, perLvMin: 30, maxH: 12, xp: 30, len: 10 * 3600000 };
   const kstHour = t => ((t + KST_MS) % DAY_MS) / 3600000;
   const nightAt = t => { const h = kstHour(t); return h >= NSL.h0 || h < NSL.h1; };
@@ -389,7 +389,7 @@
   // 공사 중이면 바로 쓸 수 있고, 아니면 다음 레벨 공사가 10초 넘게 걸릴 때
   const ffCan = k => !!S && S.tier >= 1 && facKeys().includes(k) && conFreeLeft(k) && (conOn(k) ? conLeft(k) > 0 : (!facMaxed(k) && conSec(k, S.f[k] + 1) > 10 && furReady(k) && S.budget >= facCost(k)));   // 도토리와 가구가 될 때만
   const ffList = () => facKeys().filter(ffCan).sort((a, b) => (conOn(b) ? 1 : 0) - (conOn(a) ? 1 : 0));   // 공사 중인 건물부터
-  /* 매점 간식 뽑기(프로젝트 문서 '매점 간식 뽑기 설계안 '): 중학교부터 매점에서 도토리로 간식을 뽑아요
+  /* 매점 간식 뽑기: 중학교부터 매점에서 도토리로 간식을 뽑아요
      간식이 학교 기분을 올리고(일반 +1칸, 희귀 +3칸, 하루 10칸), 1칸마다 그날 수업료 +1%. 값은 수업료(특식 데이와 기분 배수는 빼고) 30분치, 10번 270분치
      기분 10칸을 채우는 값(300분치)이 하루 +10%(144분치)보다 커서 도토리가 불어나지 않아요 */
   const SN = { tier: 2, min: 30, tenMin: 270, rare: 0.08, pity: 20, moodMax: 10, moodN: 1, moodR: 3, essNew: 2, goldNewR: 1, essDupR: 3, doneGold: 3 };

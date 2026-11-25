@@ -130,7 +130,7 @@
   }
   function askRowOff() { const r = $('#askRow'); if (r) r.remove(); }
 
-  /* 이달의 꾸미기(5.3.3): 지금 달과 지난 달들(GMON.start부터). 한 줄 [{ g, kind, id, name, price, own, img }] */
+  /* 이달의 꾸미기: 지금 달과 지난 달들(GMON.start부터). 한 줄 [{ g, kind, id, name, price, own, img }] */
   const gmNow = () => +gameToday().slice(5, 7);
   function gmPast() {
     const t = gameToday(), [y1, m1] = [+t.slice(0, 4), +t.slice(5, 7)], [y0, m0] = GMON.start.split('-').map(Number), out = [];

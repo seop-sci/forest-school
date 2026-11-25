@@ -86,7 +86,7 @@
      받는 양과 차례는 하나씩 누를 때와 같아요(같은 함수를 차례로 불러요). 보상 창만 하나로 모아요 */
   function claimables() {
     if (!S) return 0;
-    // 5.3.2.1: '모두 받기'는 미션을 받은 뒤 그 미션 포인트로 열리는 상자와 마지막 미션 뒤의 보너스까지 받아서, 띠의 개수(3)와 받은 창의 개수(4)가 달랐어요. 받은 뒤 열릴 것까지 미리 세요
+    // '모두 받기'는 미션을 받은 뒤 그 미션 포인트로 열리는 상자와 마지막 미션 뒤의 보너스까지 받아서, 띠의 개수(3)와 받은 창의 개수(4)가 달랐어요. 받은 뒤 열릴 것까지 미리 세요
     const dmR = S.dm.list.filter(dmReady).length, wkR = S.wk.list.filter(wkReady).length;
     const bonus = !S.dm.bonus && S.dm.list.length > 0 && S.dm.list.every(m => m.done || dmReady(m)) ? 1 : 0;
     const pts = S.wk.pts + dmR * MP.daily + bonus * MP.bonus + wkR * MP.week;
@@ -181,7 +181,7 @@
       const r = S.lg.pos || 99, g = LG_PRIZE(r);
       S.lg.last = { week: S.lg.week, pts: S.lg.pts, pos: S.lg.pos || 0, gold: g };
       const pos = S.lg.pos || 0;
-      const gIt = goldOr(g);   // 보안 점검(1-4): 보상은 바로 주고 안내만 늦게(창을 닫아도 사라지지 않게). 60개 뒤에는 정수
+      const gIt = goldOr(g);   // 보상은 바로 주고 안내만 늦게(창을 닫아도 사라지지 않게). 60개 뒤에는 정수
       setTimeout(() => toast(`지난주 리그 ${pos ? pos + '위' : '참여'} 보상! ${gIt ? gIt.t : ''}`), 1500);
     }
     S.lg = { week: w, pts: 0, pos: 0, paid: false, last: S.lg.last || null };
@@ -273,7 +273,7 @@
   function renderWeek() {
     wkWeek();
     const top = MP_BOX[MP_BOX.length - 1].at, pct = Math.min(1, S.wk.pts / top) * 100;
-    const left = 7 - ((new Date(gameNow() + KST_MS).getUTCDay() + 6) % 7);   // 보안 점검(1-5): 한국 시간 요일
+    const left = 7 - ((new Date(gameNow() + KST_MS).getUTCDay() + 6) % 7);   // 한국 시간 요일
     const box = (i) => {
       const B = MP_BOX[i], got = S.wk.got[i], ready = boxReady(i);
       const ic = `<svg viewBox="-11 -11 22 22" aria-hidden="true"><rect x="-8" y="-3" width="16" height="10" rx="2" class="${got ? 'mb-open' : 'mb-b'}"/><path d="M-9 -7 H9 V-2 H-9 Z" class="${got ? 'mb-open' : 'mb-l'}"/><rect x="-1.6" y="-7" width="3.2" height="14" class="mb-r"/></svg>`;

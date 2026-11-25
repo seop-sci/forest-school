@@ -26,7 +26,7 @@
     exTick();   // 시험 기간
     if (rt.tab === 'club') renderClubLite();
     const dd = $('#dexDot'), ed = $('#evDot');
-    if (dd) dd.hidden = !dexPending().length && !achClaimable() && !paDot();   // 5.4.0 지금 찍을 사진도
+    if (dd) dd.hidden = !dexPending().length && !achClaimable() && !paDot();   // 지금 찍을 사진도
     paSync();   // 받을 업적도 점으로
     tick171ach();
     if (ed) ed.hidden = !evClaimable() && !psClaimable();   // 숲속 패스도

@@ -54,7 +54,7 @@
     if (!FXL.tex.ic_acorn) { FXL.st = 'no'; cv.remove(); return; }
     FXL.st = 'ok'; cv.hidden = true;
     try { if (rt.tab === 'tam') { fxTamInit(); fxgInit(); } wldSync(); } catch (e) { /* 다음 화면에서 */ }   // 탐험 화면에서 받았으면 바로 탐험 그림판도
-    setTimeout(() => { try { ['fxe_conf_1', 'fxe_conf_2', 'fxe_conf_3', 'fxe_conf_4', 'fxe_bit', 'fxe_spark', 'fxe_cap', 'fxe_tape_l', 'fxe_tape_r', 'fxe_beam', 'fxe_petal_1', 'fxe_petal_2', 'fxe_petal_3', 'tr_leaf_2'].forEach(fxeTex); } catch (e) { /* 없으면 코드 모양 */ } }, 2000);   // 행사 그림(작업지시서 103) 미리 받기
+    setTimeout(() => { try { ['fxe_conf_1', 'fxe_conf_2', 'fxe_conf_3', 'fxe_conf_4', 'fxe_bit', 'fxe_spark', 'fxe_cap', 'fxe_tape_l', 'fxe_tape_r', 'fxe_beam', 'fxe_petal_1', 'fxe_petal_2', 'fxe_petal_3', 'tr_leaf_2'].forEach(fxeTex); } catch (e) { /* 없으면 코드 모양 */ } }, 2000);   // 행사 그림 미리 받기
   }
   const fxRnd = (a, b) => a + Math.random() * (b - a);   // 반짝이는 보통 섞기로 그려요(그림판 바탕이 투명이라 더하기 섞기는 거의 안 보여요)
   // 화면 자리(px) ↔ 지도 자리. 지도는 viewBox 0 -60 360 540이라 왼쪽 위가 (0, -60)
@@ -242,7 +242,7 @@
 
   /* ---------- 학교 행사 효과('행사 열 가지 한 번에', 설계안 ' 설계안 (학교 행사 실제 움직임, 효과층 3단계)') ----------
      규칙(시간, 목표, 값, 운동회 점수)은 그대로이고 그림과 움직임만 더해요. 학생 몸(기울기, 점프, 찌그러짐)은 학생 SVG에(placeKid의 k.lean, k.jY, k.sq)
-     색종이, 불꽃, 먼지, 빛줄기는 지도 효과층(canvas.fxl)에 그려요. 그림(작업지시서 103 fxe_*)이 있으면 그림을, 없으면 코드로 그린 모양을 써요 */
+     색종이, 불꽃, 먼지, 빛줄기는 지도 효과층(canvas.fxl)에 그려요. 그림(fxe_*)이 있으면 그림을, 없으면 코드로 그린 모양을 써요 */
   const FXE = { tex: {}, beams: null, sprint: 0, end: null };
   const FXE_TEAM = { b: [0x3f78c2, 0x7fb2ff, 0xffffff], w: [0xffffff, 0xe9eef5, 0xffe27a] };
   const hexN = c => parseInt(String(c || '#ffffff').replace('#', ''), 16) || 0xffffff;
@@ -388,7 +388,7 @@
   }
   /* ---------- 전환과 보상, 졸업 연출(효과층 5단계, 설계안 ' 효과층 마무리' 2, 3절) ----------
      모두 HTML 위에 얹는 움직임이에요(누르기 통과, 값과 저장 그대로). 움직임 줄이기면 하지 않아요
-     그림(작업지시서 104: tr_leaf_1, tr_leaf_2, tr_leaves, rw_burst, fxe_petal_1~3)이 없으면 그 움직임만 빼요 */
+     그림(: tr_leaf_1, tr_leaf_2, tr_leaves, rw_burst, fxe_petal_1~3)이 없으면 그 움직임만 빼요 */
   const UIFX = { tabA: null, wipe: null };
   const uiOn = () => !rt.reduced && !document.hidden;
   function uiLayer() { let L = $('#uiFx'); if (!L) { L = document.createElement('div'); L.id = 'uiFx'; L.className = 'ui-fx'; L.setAttribute('aria-hidden', 'true'); document.body.appendChild(L); } return L; }
@@ -444,11 +444,11 @@
     L._stop = () => { timers.forEach(clearTimeout); L.remove(); };
     return L;
   }
-  /* ---------- 탐험 오르는 길(효과층 6단계, 작업지시서 105, 105-2) ----------
+  /* ---------- 탐험 오르는 길(효과층 6단계) ----------
      탐험 무대 바닥을 엔진으로 그려요: 바닥 조각(ex6_<지역>_tile)을 세로로 눌러 원근을 주고, 그 위에 사선 길 한 줄(ex6_<지역>_path)을 깔아요
      다 처치하면 대원들이 길을 따라 오른쪽 위로 달리고, 화면이 따라가며 바닥이 왼쪽 아래로 흘러요. 10층마다 아치문(ex6_<지역>_gate)을 지나요
      높이 오를수록(지역 안 50층) 먼 풍경이 내려가고 발아래로 구름(ex6_cloud)이 지나가요
-     하늘, 먼 풍경, 앞 장식은 그대로 HTML 겹(작업지시서 104-2). 엔진이 없거나 움직임 줄이기면 예전 오르기 그대로. 겨루기 계산과 값은 바꾸지 않아요 */
+     하늘, 먼 풍경, 앞 장식은 그대로 HTML 겹. 엔진이 없거나 움직임 줄이기면 예전 오르기 그대로. 겨루기 계산과 값은 바꾸지 않아요 */
   const FXG = { decs: [], decBox: null, decPw: 0, st: '', app: null, root: null, sq: null, floor: null, path: null, cloud: null, gate: null, gs: 0, reg: '', tex: {}, raf: 0, last: 0, run: 0, sp: 0, ang: 0, ux: 0, uy: 0, mid: [0, 0], top: 0, W: 0, H: 0, h: 0 };
   const FXG_SQ = 0.6;   // 바닥을 세로로 누르는 정도(원근 어림)
   const fxgOn = fl => fxTamOn() && FXG.st === 'ok' && !!fxgTexOk(tamReg(fl).k);
@@ -540,7 +540,7 @@
     im.style.cssText = `left:${(g.x - w / 2).toFixed(1)}px;top:${(g.y - h * 0.96).toFixed(1)}px;width:${w.toFixed(1)}px;height:${h.toFixed(1)}px`;
     im.hidden = false; g.visible = false;
   }
-  // 바닥 장식(작업지시서 107 ex6_<지역>_dec1~4): 바닥 위에 흩어 놓고 바닥과 함께 흘러요. 길 위에는 놓지 않아요. 그래픽 낮음은 없음
+  // 바닥 장식(ex6_<지역>_dec1~4): 바닥 위에 흩어 놓고 바닥과 함께 흘러요. 길 위에는 놓지 않아요. 그래픽 낮음은 없음
   function fxgDecs(k) {
     const lv = wldLv(), nd = lv >= 2 ? 16 : lv ? 9 : 0; if (!nd || !FXG.sq || !FXG.path) return false;
     const ts = [1, 2, 3, 4].map(i => fxgTex(`ex6_${k}_dec${i}`)).filter(Boolean); if (ts.length < 4) return false;
@@ -613,7 +613,7 @@
     const tex = fxoUrlTex(css), P = window.PIXI;
     const go = () => {
       if (tex && tex.source) { const fw = tex.frame.width / 2, fh = tex.frame.height / 2;
-        // 5.3.4.4: 네 조각 텍스처는 그림마다 한 번만 만들어 다시 써요(깰 때마다 새로 만들면 원본 그림에 붙은 resize 듣기가 계속 쌓였어요)
+        // 네 조각 텍스처는 그림마다 한 번만 만들어 다시 써요(깰 때마다 새로 만들면 원본 그림에 붙은 resize 듣기가 계속 쌓였어요)
         let Q = FXO.quad.get(tex); if (!Q) { Q = [0, 1, 2, 3].map(q => new P.Texture({ source: tex.source, frame: new P.Rectangle(tex.frame.x + (q % 2) * fw, tex.frame.y + (q >> 1) * fh, fw, fh) })); FXO.quad.set(tex, Q); }
         for (let q = 0; q < 4; q++) { const qx = q % 2, qy = q >> 1, t = Q[q];
           const dx = qx ? 1 : -1, dy = qy ? 1 : -1;

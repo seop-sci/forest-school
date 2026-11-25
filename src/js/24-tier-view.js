@@ -25,7 +25,7 @@
     return stageKey('bld_' + k, n, 2) || BLD_IMG[k];
   }
   const viewMap = () => rt.viewTier == null ? decoMap() : geoIdx(rt.viewTier);
-  // 시간 흐름 단추(5.3.3.1 woodani: 밤 화면 단추와 합침). 홈에서 언제나, 모든 학교급
+  // 시간 흐름 단추(밤 화면 단추와 합침). 홈에서 언제나, 모든 학교급
   // S.nl 0 시간 따라(아침, 노을, 밤), 1 시간 따라 가되 밤은 조금 어둡게, 2 시간 흐름 끄기(늘 낮). 고등학교부터 밤에는 학생이 그대로 기숙사에서 쉬어요
   const NL_NAME = ['시간 따라', '밤은 조금 어둡게', '늘 낮'], NL_EM = ['🌗', '🌆', '☀️'];
   function nlCycle() {
@@ -43,7 +43,7 @@
   }
   function renderTierDots() {
     const box = $('#tierDots'); if (!box || !S) return;
-    const nlOn = rt.viewTier == null && !rt.photo;   // 시간 흐름 단추(5.3.3.1: 밤에만이 아니라 언제나)
+    const nlOn = rt.viewTier == null && !rt.photo;   // 시간 흐름 단추(밤에만이 아니라 언제나)
     box.hidden = (S.tier < 1 && !nlOn) || rt.tab !== 'school' || !!rt.decoEdit;   // 유치원은 학교급 단추 없이 시간 흐름 단추만
     const key = [S.tier, rt.viewTier, nlOn, S.nl || 0, box.hidden].join('|');
     if (box.dataset.key === key) return; box.dataset.key = key;
@@ -79,7 +79,7 @@
     const key = [t, gi, L.join(), schNm, edit, JSON.stringify(x.f), LD ? (LD.who || '') + LD.vd : ''].join('|');
     box.hidden = false;
     box.classList.toggle('tv-visit', !!LD); box.classList.toggle('tv-model', !!(LD && LD.model));
-    { const tb = $('#tvTabs'); if (tb) { tb.hidden = !(LD && LD.model); $$('button', tb).forEach(b => { if (+b.dataset.mt >= 4) b.hidden = false; const on = +b.dataset.mt === t; b.classList.toggle('on', on); b.setAttribute('aria-pressed', on ? 'true' : 'false'); }); } }   // .look은 다른 곳에서 숨김 이름이라 tv-visit
+    { const tb = $('#tvTabs'); if (tb) { tb.hidden = !(LD && LD.model); $$('button', tb).forEach(b => { if (+b.dataset.mt >= 4) b.hidden = false; const on = +b.dataset.mt === t; b.classList.toggle('on', on); b.setAttribute('aria-pressed', on ? 'true' : 'false'); }); } }   // look은 다른 곳에서 숨김 이름이라 tv-visit
     $('#tvTitle').textContent = LD ? (LD.model ? `[예시] 본보기 숲속 ${TIER_ALL[t]}` : `${LD.who} 교장 선생님의 ${LD.nm || '숲속'} ${TIER_ALL[t]}`) : `${S.deco.nm || '숲속'} ${TIER_ALL[t]} 시절 모습`;
     $('#tvSub').textContent = LD ? (LD.model ? '예시로 꾸민 학교예요. 실제 교장 선생님의 학교가 아니에요' : `${TIERS[t].unit === '년째' ? '' : `${LD.y}${TIERS[t].unit}, `}학생 ${fmt(LD.st)}명${LD.rare.length ? `, 반짝 친구 ${LD.rare.length}명` : ''}${LD.vd ? `, 마을 기부 ${LD.vd}단계` : ''}${LD.ti && achTitleName(LD.ti) ? `, 칭호 ${achTitleName(LD.ti)}` : ''}`)
       : x.all ? '그때는 사진을 남기지 않아서 모두 지어진 모습으로 보여요' : `${x.at ? kstDay(x.at) + ' 졸업식, ' : ''}학생 ${fmt(x.st)}명`;
@@ -118,14 +118,14 @@
     (x.roster || []).slice(0, Math.min(G.campus ? 6 : 8, G.spots.length)).forEach((r, i) => { const [kx, ky] = G.spots[i]; items.push({ y: ky + 11, s: `<g transform="translate(${kx} ${ky})${G.campus ? ' scale(.66)' : ''}">${kidSVG(r.sp, i)}</g>` }); });
     items.sort((a, b) => a.y - b.y);
     // 캠퍼스 지도: 구역 이름표(배지 없이). 눌러서 그 구역 모습을 봐요
-    // 5.3.4.7: 연구 구역은 대학원 것이라 대학교 시절 모습에서는 잠가요(지금 학교급이 아니라 보는 학교급으로)
+    // 연구 구역은 대학원 것이라 대학교 시절 모습에서는 잠가요(지금 학교급이 아니라 보는 학교급으로)
     if (G.campus) tags.push('<g id="tvZones">' + CAMPUS.zones.map(z => { const [tx, ty] = z.tag, [hx, hy, hw, hh] = z.hit, w = z.name.length * 11.5 + 18, lk = z.key === 'lab' ? !gradOn(t) : z.lock;
       return `<g class="cz${lk ? ' lock' : ''}" data-tvzone="${lk ? '' : z.key}"><rect class="cz-hit" x="${hx}" y="${hy}" width="${hw}" height="${hh}" rx="18"/><g transform="translate(${tx} ${ty})"><rect class="cz-plate" x="${-w / 2}" y="-10" width="${w}" height="20" rx="10"/><text class="cz-name" y="4">${z.name}</text></g></g>`; }).join('') + '</g>');
     $('#tvMap').innerHTML = h + items.map(o => o.s).join('') + tags.join('');
   }
   /* ---------- 전학 대화 ----------
      종업식이나 졸업식 창을 닫으면 화면 아래 대화 창이 떠요. 교감 고슴도치가 소개하고, 새 친구가 자기소개를 두 줄 해요
-     누르면 다음 말로 넘어가고, 마지막에 수업료 +5%와 도감 등록을 알려요. 대사는 woodani가 다듬어요 */
+     누르면 다음 말로 넘어가고, 마지막에 수업료 +5%와 도감 등록을 알려요. 대사는 다듬어요 */
   const NEW_TALK = {
     cat: ['안녕하세요! 저는 고양이예요. 햇볕 좋은 창가 자리를 제일 좋아해요.', '낮잠은 조금만 자고 공부도 열심히 할게요. 잘 부탁해요!'],
     dog: ['멍! 반가워요, 저는 강아지예요. 친구를 보면 꼬리가 저절로 흔들려요.', '달리기 시합은 언제든 자신 있어요. 운동장에서 같이 뛰어요!'],

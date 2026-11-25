@@ -13,7 +13,7 @@
     { id: 'art', name: '미술부', ab: 3, fac: 'classroom', img: 'club_art', em: '🎨', eff: p => `장식 값 -${p}%` },
     { id: 'mat', name: '수학부', ab: 4, fac: 'classroom', img: 'league_math', em: '➗', eff: p => `수업료 +${p}%` }   // 공부: 수학부
   ];
-  // showDays: 발표회 주기(게임 시계 날짜). 설계안은 일주일이지만 중학교 한 해가 하루 안팎이라 균형 제안서에서 하루를 제안했어요. woodani 확정 전이에요
+  // showDays: 발표회 주기(게임 시계 날짜). 설계안은 일주일이지만 중학교 한 해가 하루 안팎이라 균형 제안서에서 하루를 제안했어요. 전이에요
   const CLUB = { seats: 3, per: 2, max: 30, grow: 5, growLv: 10, up: 1, show: 4, showMin: 30, showDays: 1, weekend: 2 };   // 발표회는 월~금 하루 한 번, 그 주에 못 연 날이 있으면 주말에 2번까지 보충
   /* ---------- 공부: 과목 5개(국어, 수학, 과학, 미술, 체육)의 학교 학력 레벨 ----------
      공부(퍼즐=수학, 합치기=미술, 뒤에 책 읽기=국어, 과학 실험=과학, 숲속 대결=체육)를 하면 그 과목 학습 경험치(XP)가 바로 들어와요
@@ -21,7 +21,7 @@
      효과: 수업료 레벨 합 × 0.1%(acMult), 평판 10레벨마다 +1(acRepOf), 새 명부 학생의 시작 능력 바탕(rosterKid). 숫자는 "균형 제안서 (공부 탭)" */
   const AC = { keys: ['kor', 'math', 'sci', 'art', 'pe'], name: { kor: '국어', math: '수학', sci: '과학', art: '미술', pe: '체육' },
     cap: [10, 20, 30, 40, 50, 60], need: n => 25 + 2 * n, pzPer: 100, pzMax: 12, mgPer: 1, mgMax: 20, mgE: 6, mgDay: 100,   // 학력과 능력치 균형: 과목마다 하루 XP를 비슷하게(균형 제안서 학력과 능력치 1절)
-    book: { ess: 10, xp: 50, perDay: 2, perLv: 1, cap: 30 }, tuition: 0.001, repPer: 10 };   // 문제집 값은 정수 10 + 그 과목 레벨, 과목마다 하루 2권(조정안 5, 예전 1권)
+    book: { ess: 10, xp: 50, perDay: 2, perLv: 1, cap: 30 }, tuition: 0.001, repPer: 10 };   // 문제집 값은 정수 10 + 그 과목 레벨, 과목마다 하루 2권(예전 1권)
   const AC_GAME = { kor: '책 읽기', math: '숲속 퍼즐', sci: '과학 탐구 실험', art: '숲속 합치기', pe: '숲속 대결' };
   const freshAc = () => { const o = { bk: { day: '', n: {} }, st: { xp: 0, bk: 0 } }; for (const k of AC.keys) { o[k] = { lv: 1, xp: 0 }; o.bk.n[k] = 0; } return o; };
   const acCapOf = tier => AC.cap[Math.max(0, Math.min(AC.cap.length - 1, tier))];
@@ -46,7 +46,7 @@
     checkQuests(true); return v;
   }
   function acBkDay() { const t = gameToday(); if (dayRoll(S.ac.bk, t)) { for (const k of AC.keys) S.ac.bk.n[k] = 0; } }
-  const bookCost = k => Math.min(AC.book.cap, AC.book.ess + AC.book.perLv * acLv(k));   // 문제집 값은 레벨을 따라 오르고 30에서 멈춰요(5.3.3 woodani A안)
+  const bookCost = k => Math.min(AC.book.cap, AC.book.ess + AC.book.perLv * acLv(k));   // 문제집 값은 레벨을 따라 오르고 30에서 멈춰요(A안)
   const acBkLeft = k => { acBkDay(); return Math.max(0, AC.book.perDay - (S.ac.bk.n[k] || 0)); };
   // 문제집 남은 권 모두 사기: 한 권씩 살 때와 같은 값과 차례로 사고(레벨이 오르면 값도 따라 올라요), 정수가 모자라면 살 수 있는 만큼만 사요
   function acBuyBookAll(k) {
@@ -300,7 +300,7 @@
     renderClub(); questChanged();
     return true;
   }
-  /* ---------- 동아리 대항전 (프로젝트 문서 ' 설계안' 5절) ----------
+  /* ---------- 동아리 대항전 ----------
      중학교부터 매주 월~일(게임 시계, 한국 시간) 한 주 리그. 우리 학교와 숲속 대결 학교 7곳이 동아리 다섯의 점수 합으로 겨뤄요
      우리 점수 = 동아리마다 (부원 능력치 별 × 10 + 연습 × 20 + 발표회 × 30). 연습은 하루 한 번 '모두 연습'(부원 능력치 +2)
      상대 학교의 한 주 점수는 주가 시작할 때 우리 학교 예상 점수에 맞춰 정해지고(1.22배 ~ 0.72배), 날마다 조금씩 올라요

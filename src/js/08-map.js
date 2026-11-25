@@ -10,7 +10,7 @@
   // 운동장 그림이 옮겨진 뒤 운동회 트랙(sports: 가운데 x, y, 가로 반지름, 세로 반지름)이 엉뚱한 곳에 있었어요. 운동장 그림의 달리기 길(그림 가로 48%, 세로 52% 둘레)에 맞췄어요
   const GEO = [
     { map: 'map_kinder',
-      // 새 단장: 지도와 빈터는 작업지시서 57 지도 그림에서 바닥(흙, 보도블록)을 직접 재서 가운데와 너비 × 0.96(dev/gen330/lotfit.py, 자리 표 값은 눈대중이라 조금씩 어긋났어요), 선생님 자리는 빈 풀밭에서 골랐어요(dev/gen330 기록)
+      // 새 단장: 지도와 빈터는 지도 그림에서 바닥(흙, 보도블록)을 직접 재서 가운데와 너비 × 0.96(dev/gen330/lotfit.py, 자리 표 값은 눈대중이라 조금씩 어긋났어요), 선생님 자리는 빈 풀밭에서 골랐어요(dev/gen330 기록)
       // 건물 자리는 지도 그림의 울타리 빈터(가로, 세로 중심 %, 울타리 안 너비 %)로 적고, 건물 그림의 바닥 섬이 그 빈터에 맞게 놓아요(lotRect)
       lot: { science: [31.4, 70.51, 25.93], classroom: [43.31, 31.25, 31.49], cafeteria: [75.98, 44.16, 27.37], library: [23.19, 49.88, 26.51], playground: [74.27, 65.85, 29.38] },
       nextLot: [31.4, 70.51, 25.93], nextKey: 'bld_classroom_lock',
@@ -22,7 +22,7 @@
       deco: [[64, 110], [300, 104], [22, 236], [340, 258], [66, 424], [306, 432], [140, 384], [228, 388]],
       sports: [230.4, 334.2, 36, 16.2], eaves: { classroom: 0.05, cafeteria: 0.02, library: 0.02, science: 0.02, playground: -0.08 } },
     { map: 'map_elem',
-      // 새 단장: 지도와 빈터는 작업지시서 57 지도 그림에서 바닥(흙, 보도블록)을 직접 재서 가운데와 너비 × 0.96(dev/gen330/lotfit.py, 자리 표 값은 눈대중이라 조금씩 어긋났어요), 선생님 자리는 빈 풀밭에서 골랐어요(dev/gen330 기록)
+      // 새 단장: 지도와 빈터는 지도 그림에서 바닥(흙, 보도블록)을 직접 재서 가운데와 너비 × 0.96(dev/gen330/lotfit.py, 자리 표 값은 눈대중이라 조금씩 어긋났어요), 선생님 자리는 빈 풀밭에서 골랐어요(dev/gen330 기록)
       // 과학실 그림이 다른 건물보다 크게 늘어나 외곽선이 굵고 흐려 보였어요. 빈터 40% → 34%로 줄여 다른 건물과 크기를 맞춰요
       lot: { classroom: [32.67, 31.74, 25.17], cafeteria: [72.36, 38.85, 24.3], library: [25.15, 48.47, 23.45], playground: [69.63, 57.71, 33.69], science: [28.37, 67.29, 23.07] },
       nextLot: [65.33, 74.21, 21.63], nextKey: 'bld_cafeteria_lock',
@@ -33,11 +33,11 @@
       tea: { hedgehog: [144, 199.2, 0.57], squirrel: [158.4, 134.4, 0.6], bear: [172.8, 253.2, 0.72], owl: [165.6, 166.8, 0.69], owlAway: [79.2, 318, 0.63] },
       deco: [[56, 66], [312, 70], [22, 312], [338, 196], [60, 420], [302, 424], [128, 380], [236, 392]],
       sports: [247.4, 218.3, 50, 22.2], eaves: { classroom: 0.02, cafeteria: 0.0, library: 0.0, science: -0.06, playground: -0.14 } },
-    // 중학교: 지도와 빈터는 작업지시서 19 다시 그린 판(art/v200/maps/lots_middle.md). 과학실 위 가운데, 교실과 급식실 위쪽 양옆
+    // 중학교: 지도와 빈터는 다시 그린 판(art/v200/maps/lots_middle.md). 과학실 위 가운데, 교실과 급식실 위쪽 양옆
     // 도서관과 운동장 아래쪽 양옆, 기숙사 공사 자리(고등학교에서 열려요) 왼쪽 아래, 매점 가운데 아래. 참나무 (82%, 81%), 간판 (39%, 86%)
     { map: 'map_middle',
       // 운동장을 맨 위 단에 올려 봤는데 떠 보여서 다시 교실이 맨 위, 운동장이 가운데 왼쪽 넓은 단
-      // 새 단장: 지도와 빈터는 작업지시서 57 지도 그림에서 바닥(흙, 보도블록)을 직접 재서 가운데와 너비 × 0.96(dev/gen330/lotfit.py, 자리 표 값은 눈대중이라 조금씩 어긋났어요), 선생님 자리는 빈 풀밭에서 골랐어요(dev/gen330 기록)
+      // 새 단장: 지도와 빈터는 지도 그림에서 바닥(흙, 보도블록)을 직접 재서 가운데와 너비 × 0.96(dev/gen330/lotfit.py, 자리 표 값은 눈대중이라 조금씩 어긋났어요), 선생님 자리는 빈 풀밭에서 골랐어요(dev/gen330 기록)
       lot: { classroom: [52.29, 26.61, 34.36], cafeteria: [74.46, 37.24, 24.6], library: [27.78, 38.39, 21.53], playground: [31.54, 55.9, 36.95], science: [77.49, 52.73, 20.96], store: [29.44, 73.02, 23.45] },
       nextLot: [71.63, 68.69, 28.62], nextKey: 'bld_classroom_lock',
       next: { img: 'bld_dorm_lock', tag: '고등학교에서 열려요', name: '기숙사' }, nextTagY: 0.36,
@@ -47,10 +47,10 @@
       tea: { hedgehog: [216, 199.2, 0.57], squirrel: [201.6, 102, 0.6], bear: [172.8, 274.8, 0.72], owl: [144, 142, 0.69], owlAway: [158.4, 307.2, 0.63] },   // 부엉이 선생님이 왼쪽 단추(복도, 학교 행사)에 가려서 도서관 오른쪽 풀밭으로
       deco: [[56, 66], [312, 70], [22, 312], [338, 196], [60, 420], [302, 424], [29, 383], [252, 437]],
       sports: [104.5, 207, 53.4, 21.4], eaves: { classroom: 0.02, cafeteria: 0.0, library: 0.0, science: -0.06, playground: -0.14, store: 0 } },
-    // 고등학교: 지도와 빈터는 작업지시서 41(art/v300h/maps/lots_high.md). 과학실 위 가운데, 학생회관 공사 자리(대학교에서 열려요) 오른쪽 위
+    // 고등학교: 지도와 빈터는 (art/v300h/maps/lots_high.md). 과학실 위 가운데, 학생회관 공사 자리(대학교에서 열려요) 오른쪽 위
     // 교실과 급식실, 도서관과 운동장, 매점과 기숙사가 양옆으로 세 줄. 분수는 가운데(50%, 52%), 참나무 (82%, 81%), 간판 (39%, 86%), 기념물 (70%, 86%)
     { map: 'map_high',
-      // 새 단장: 지도와 빈터는 작업지시서 57 지도 그림에서 바닥(흙, 보도블록)을 직접 재서 가운데와 너비 × 0.96(dev/gen330/lotfit.py, 자리 표 값은 눈대중이라 조금씩 어긋났어요), 선생님 자리는 빈 풀밭에서 골랐어요(dev/gen330 기록)
+      // 새 단장: 지도와 빈터는 지도 그림에서 바닥(흙, 보도블록)을 직접 재서 가운데와 너비 × 0.96(dev/gen330/lotfit.py, 자리 표 값은 눈대중이라 조금씩 어긋났어요), 선생님 자리는 빈 풀밭에서 골랐어요(dev/gen330 기록)
       lot: { classroom: [29.54, 30.2, 27.59], cafeteria: [71.92, 37.91, 27.59], library: [26.17, 43.33, 23.91], science: [76.86, 50.74, 25.5], playground: [31.45, 59.93, 33.86], store: [75.24, 63.72, 24.2], dorm: [30.03, 73.48, 23.21] },
       nextLot: [72.36, 75.92, 27.69], nextKey: 'bld_union_lock',
       next: { img: 'bld_union_lock', tag: '대학교에서 열려요', name: '학생회관' }, nextTagY: 0.24,
@@ -62,17 +62,17 @@
       sports: [103.4, 236.2, 48.9, 19.1], eaves: { classroom: 0.02, cafeteria: 0.0, library: 0.0, science: -0.06, playground: -0.14, store: 0, dorm: 0 } }
   ];
   // 운동장 지붕 조각(roof_field, roof_field_s3와 겨울)은 새 그림의 트랙을 색으로 골라 만들었어요(처럼 테마 색이 트랙을 칠해요)
-  // 새 건물 그림(작업지시서 31, 32)은 아래에서부터 가장 넓은 띠의 가운데를 재고, 예전 값과 같은 크기가 되게 너비 × 0.96, 높이 − 0.02로 맞췄어요
+  // 새 건물 그림은 아래에서부터 가장 넓은 띠의 가운데를 재고, 예전 값과 같은 크기가 되게 너비 × 0.96, 높이 − 0.02로 맞췄어요
   // 건물 그림마다 바닥 섬(가장 넓은 줄)의 자리: [가로 중심 - 0.5, 세로 중심 - 0.5, 너비] (그림 한 변 기준, dev에서 그림을 재서 적었어요)
-  // 새 단장 건물(작업지시서 56)의 바닥 섬 값: [가장 넓은 줄 가운데 - 0.5, 바닥 섬 아래 끝 - 0.5, 가장 넓은 줄 너비]. 빈터 자리는 '바닥 섬 아래 끝이 놓일 곳'이에요(겨울판은 기본과 같게)
+  // 새 단장 건물의 바닥 섬 값: [가장 넓은 줄 가운데 - 0.5, 바닥 섬 아래 끝 - 0.5, 가장 넓은 줄 너비]. 빈터 자리는 '바닥 섬 아래 끝이 놓일 곳'이에요(겨울판은 기본과 같게)
   const BLD_ISL = {bld_cafeteria_lock:[-0.0037, 0.4, 0.965],bld_cafeteria_lock_winter:[-0.0037, 0.4, 0.965],bld_cafeteria_lux:[0.0025, 0.4425, 0.9575],bld_cafeteria_on:[-0.0062, 0.44, 0.955],bld_cafeteria_on_winter:[-0.0062, 0.44, 0.955],bld_cafeteria_s2:[-0.0475, 0.4725, 0.8775],bld_cafeteria_s2_winter:[-0.0475, 0.4725, 0.8775],bld_cafeteria_s3:[-0.005, 0.47, 0.9675],bld_cafeteria_s3_winter:[-0.005, 0.47, 0.9675],bld_cafeteria_s4:[-0.0025, 0.4325, 0.9625],bld_cafeteria_s4_winter:[-0.0025, 0.4325, 0.9625],bld_classroom_lock:[0.0162, 0.335, 0.915],bld_classroom_lock_winter:[0.0162, 0.335, 0.915],bld_classroom_lux:[0.0038, 0.4375, 0.96],bld_classroom_on:[-0.0012, 0.47, 0.97],bld_classroom_on_winter:[-0.0012, 0.47, 0.97],bld_classroom_s2:[-0.01, 0.4575, 0.9475],bld_classroom_s2_winter:[-0.01, 0.4575, 0.9475],bld_classroom_s3:[-0.0087, 0.4725, 0.945],bld_classroom_s3_winter:[-0.0087, 0.4725, 0.945],bld_classroom_s4:[-0.0037, 0.4725, 0.945],bld_classroom_s4_winter:[-0.0037, 0.4725, 0.945],bld_dorm_lock:[0.0, 0.395, 0.9575],bld_dorm_lock_winter:[0.0, 0.395, 0.9575],bld_dorm_lux:[0.0112, 0.415, 0.965],bld_dorm_on:[-0.0025, 0.485, 0.9525],bld_dorm_on_winter:[-0.0025, 0.485, 0.9525],bld_field_lux:[0.015, 0.4225, 0.8825],bld_field_on:[0.0162, 0.42, 0.88],bld_field_on_winter:[0.0162, 0.42, 0.88],bld_field_s3:[0.0138, 0.425, 0.88],bld_field_s3_winter:[0.0138, 0.425, 0.88],bld_field_s4:[0.02, 0.4225, 0.8725],bld_field_s4_winter:[0.02, 0.4225, 0.8725],bld_library_lux:[0.0088, 0.445, 0.945],bld_library_on:[-0.0012, 0.4175, 0.96],bld_library_on_winter:[-0.0012, 0.4175, 0.96],bld_library_s2:[0.0, 0.4725, 0.9425],bld_library_s2_winter:[0.0, 0.4725, 0.9425],bld_library_s3:[0.0075, 0.325, 0.9525],bld_library_s3_winter:[0.0075, 0.325, 0.9525],bld_library_s4:[0.0, 0.47, 0.9425],bld_library_s4_winter:[0.0, 0.47, 0.9425],bld_playground_lock:[0.0238, 0.3975, 0.915],bld_playground_lock_winter:[0.0238, 0.3975, 0.915],bld_playground_lux:[0.0112, 0.435, 0.915],bld_playground_on:[0.0138, 0.4325, 0.915],bld_playground_on_winter:[0.0138, 0.4325, 0.915],bld_science_lux:[0.0088, 0.44, 0.96],bld_science_on:[-0.0025, 0.425, 0.9725],bld_science_on_winter:[-0.0025, 0.425, 0.9725],bld_science_s3:[-0.0012, 0.475, 0.97],bld_science_s3_winter:[-0.0012, 0.475, 0.97],bld_science_s4:[-0.0012, 0.435, 0.965],bld_science_s4_winter:[-0.0012, 0.435, 0.965],bld_store_lock:[0.0188, 0.42, 0.925],bld_store_lock_winter:[0.0188, 0.42, 0.925],bld_store_lux:[0.0025, 0.4325, 0.9425],bld_store_on:[-0.0075, 0.4425, 0.9525],bld_store_on_winter:[-0.0075, 0.4425, 0.9525],bld_store_s4:[-0.01, 0.475, 0.9425],bld_store_s4_winter:[-0.01, 0.475, 0.9425],bld_union_lock:[0.0038, 0.395, 0.95],bld_union_lock_winter:[0.0038, 0.395, 0.95]};
   // 학생회관 공사 그림(bld_union_lock)의 바닥 섬 값이 틀려(0.35, 1.04) 위로 뜨고 작았어요. 같은 모양인 기숙사 공사 그림 값에 맞췄어요
-  // 대학교 건물(작업지시서 54 2단계, 1024 캔버스)의 바닥 섬: [가장 넓은 줄 가운데 - 0.5, 가장 넓은 줄 높이 - 0.5, 너비]. 구역 빈터 자리는 빈터 타원의 가운데라서
+  // 대학교 건물(2단계, 1024 캔버스)의 바닥 섬: [가장 넓은 줄 가운데 - 0.5, 가장 넓은 줄 높이 - 0.5, 너비]. 구역 빈터 자리는 빈터 타원의 가운데라서
   // 바닥 섬의 가장 넓은 줄이 빈터 가운데에 오게 놓아요. 그림마다 값이 거의 같아(±0.01) 건물마다 하나로 맞추고 겨울판도 같은 값을 써요(계절을 바꿔도 건물이 움직이지 않게)
   { const U = { classroom: [0, 0.259, 0.913], cafeteria: [0, 0.259, 0.913], library: [0, 0.259, 0.913], science: [0, 0.259, 0.913], dorm: [0, 0.259, 0.913], store: [0, 0.251, 0.915], field: [0, 0.21, 0.916] };
     for (const k of Object.keys(U)) { BLD_ISL[`bld_${k}_s5`] = U[k]; BLD_ISL[`bld_${k}_s5_winter`] = U[k]; }
     BLD_ISL.bld_union_on = BLD_ISL.bld_union_on_winter = [0, 0.233, 0.917]; BLD_ISL.bld_lab_lock = BLD_ISL.bld_lab_lock_winter = [0, 0.27, 0.917];
-    BLD_ISL.bld_institute_on = BLD_ISL.bld_institute_on_winter = [-0.004, 0.29, 0.82]; BLD_ISL.bld_gradhall_on = BLD_ISL.bld_gradhall_on_winter = [0, 0.298, 0.93]; BLD_ISL.bld_gradhall_lock = BLD_ISL.bld_gradhall_lock_winter = [0, 0.298, 0.93]; }   // 작업지시서 85(그림에서 잼)
+    BLD_ISL.bld_institute_on = BLD_ISL.bld_institute_on_winter = [-0.004, 0.29, 0.82]; BLD_ISL.bld_gradhall_on = BLD_ISL.bld_gradhall_on_winter = [0, 0.298, 0.93]; BLD_ISL.bld_gradhall_lock = BLD_ISL.bld_gradhall_lock_winter = [0, 0.298, 0.93]; }   // (그림에서 잼)
   // 대학교 구역 지도의 공사 자리 그림(빈터에 딱 맞게). 공사 자리 그림은 옛 지도에 맞춘 둥근 판이라 납작한 구역 빈터에서는 위로 뜨고 작았어요
   // 구역에서만 이 값으로 놓아요: 판 아래 끝이 빈터 아래 끝에 닿고, 판 너비가 빈터를 조금 넘게 덮어요(그림에서 판의 가장 넓은 줄과 아래 끝을 재서 구함). 다른 학교급은 BLD_ISL과 LOT_XF 그대로
   const ZONE_SITE_ISL = { bld_classroom_lock: [0.0012, 0.175, 0.88, 0.9, 0.3675], bld_cafeteria_lock: [-0.0025, 0.225, 0.92, 0.82, 0.42], bld_playground_lock: [0.0038, 0.232, 0.895, 0.8, 0.425], bld_store_lock: [0.0012, 0.257, 0.915, 0.8, 0.45], bld_dorm_lock: [0, 0.224, 0.925, 0.82, 0.42], bld_union_lock: [0, 0.2215, 0.925, 0.82, 0.4175] };   // [옆, 가운데 높이, 판 너비, 세로 배율, 판 아래 끝]. 세로 배율은 판 아래 끝을 기준으로 눌러요
@@ -85,13 +85,13 @@
     { next: [-1.38, 11.22, 1.21, 1.0, 0.0], science: [-3.06, 9.79, 1.25, 1.11, 0.0], classroom: [-5.75, 9.52, 1.21, 1.0, 0.0], cafeteria: [-4.54, 6.49, 1.3, 1.0, 0.0], library: [-3.77, 6.47, 1.25, 1.0, 0.0], playground: [1.91, 20.5, 1.06, 0.94, -0.36] },
     { next: [-7.5, 4.5, 0.97, 0.99, 0.0], science: [-0.21, 8.39, 1.14, 1.0, 0.0], classroom: [-0.63, 9.49, 1.09, 1.0, 0.0], cafeteria: [-4.09, 6.34, 1.13, 1.0, 0.0], library: [-3.98, 7.07, 1.19, 1.0, 0.0], playground: [-3.5, 17, 1.03, 0.85, 0.0], store: [-7.51, 11.11, 1.21, 1.0, 0.0] },
     { next: [1.5, 19.5, 1.0, 0.86, 0.0], science: [-1.14, 7.12, 1.2, 1.0, 0.0], classroom: [-2.81, 10.0, 1.16, 1.0, 0.0], cafeteria: [0.09, 6.44, 1.13, 1.0, 0.0], library: [-6.37, 8.82, 1.27, 1.04, 0.0], playground: [-1.5, 18.5, 1.03, 0.83, -4], store: [-0.76, 9.74, 1.22, 1.0, 0.0], dorm: [-1.88, 7.54, 1.54, 0.81, 0.0] }];
-  // 대학교 구역 지도 자리 표 (dev/gen400/zonegeo.py가 작업지시서 54 자리 표에서 만들어요. 손으로 고치지 않아요)
+  // 대학교 구역 지도 자리 표 (dev/gen400/zonegeo.py가 자리 표에서 만들어요. 손으로 고치지 않아요)
   const ZONE_GEO = [
     { map: 'map_zone_academic', zone: 'academic', zname: '학술 구역', lot: {'classroom': [29.44, 35.32, 30.47], 'library': [68.36, 46.45, 34.28], 'science': [28.52, 69.92, 29.39]}, oak: [282.3, 312.0], plaza: [144.1, 238.1], gate: [166.6, 411.1], drop: [144.1, 238.1, 36, 12], spots: [[169.2, 415.2], [164.9, 385.5], [184.3, 334.2], [154.8, 285.6], [181.8, 237.0], [160.2, 188.4], [190.8, 142.5], [149.4, 96.6], [147.6, 64.2], [126.0, 161.4], [219.6, 231.6], [153.0, 345.0], [160.2, 237.0]], deco: [[108.0, 80.4], [262.8, 134.4], [241.2, 363.9], [277.2, 393.6], [90.0, 377.4], [288.0, 350.4]] },
     { map: 'map_zone_life', zone: 'life', zname: '생활 구역', lot: {'cafeteria': [31.64, 35.64, 34.28], 'store': [67.77, 50.62, 36.04], 'dorm': [28.71, 70.96, 33.5]}, oak: [286.2, 347.5], plaza: [173.7, 269.8], gate: [173.3, 410.4], drop: [173.7, 269.8, 36, 12], spots: [[174.6, 423.8], [175.3, 386.0], [198.0, 339.6], [194.4, 311.0], [172.8, 289.4], [165.6, 261.3], [158.4, 224.0], [167.4, 178.7], [202.3, 134.9], [216.0, 82.6], [144.0, 167.3], [203.4, 246.2], [177.5, 349.3]], deco: [[162.0, 85.8], [255.6, 161.4], [86.4, 274.8], [234.0, 377.4], [302.4, 404.4], [90.0, 377.4]] },
     { map: 'map_zone_plaza', zone: 'plaza', zname: '광장 구역', lot: {'union': [48.44, 38.87, 42.29]}, oak: [40.8, 306.0], plaza: [175.1, 306.0], gate: [175.1, 393.5], drop: [175.1, 306.0, 36, 12], spots: [[176.4, 469.2], [176.4, 431.4], [176.4, 393.6], [176.4, 350.4], [176.4, 307.2], [122.4, 247.8], [115.2, 204.6], [133.2, 191.1], [176.4, 188.4], [234.0, 226.2], [216.0, 191.1], [223.2, 264.0], [136.8, 278.6], [212.4, 279.1]], deco: [[72.0, 107.4], [255.6, 99.3], [90.0, 210.0], [288.0, 237.0], [100.8, 334.2], [266.4, 334.2]], bus: [176.4, 449.2], sign: [86.4, 401.7], vd: [273.6, 388.2], fount: [177.2, 243.0, 22, 14] },
     { map: 'map_zone_sports', zone: 'sports', zname: '체육 구역', lot: {'playground': [48.14, 45.25, 59.28]}, oak: [50.3, 324.6], plaza: [219.6, 323.4], gate: [170.2, 428.6], drop: [219.6, 323.4, 36, 12], spots: [[170.3, 444.9], [168.5, 423.8], [158.4, 407.1], [140.4, 380.1], [122.4, 355.8], [105.1, 328.8], [102.6, 307.2], [111.6, 289.4], [127.8, 274.8], [151.2, 258.6], [171.7, 245.1], [174.6, 232.7]], deco: [[90.0, 96.6], [266.4, 112.8], [50.4, 118.2], [288.0, 358.5], [223.2, 382.8], [79.2, 388.2]] },
-    // 연구 구역(작업지시서 82 지도, 84 자리 표). 대학원부터 들어가요(zoneOpen)
+    // 연구 구역(지도, 84 자리 표). 대학원부터 들어가요(zoneOpen)
     { map: 'map_zone_lab', zone: 'lab', zname: '연구 구역', lot: {'institute': [29.49, 35.55, 44.82], 'gradhall': [70.9, 46.42, 31.93]}, oak: [284.8, 327.8], plaza: [137.8, 246.6], gate: [164.5, 429.4], drop: [137.8, 246.6, 36, 12], spots: [[164.5, 429.4], [162.4, 387.5], [176.5, 347.5], [169.8, 307.4], [144.1, 273.6], [171.9, 254.6], [155.4, 224.4], [166.6, 184.7], [193.0, 152.0], [206.0, 113.3], [184.9, 77.1], [146.2, 60.6]], deco: [[59.8, 198.4], [73.8, 293.3], [105.5, 344.3], [225.0, 372.4], [230.3, 236.0], [242.6, 145.7]] },
   ];
   const CAMPUS = { map: 'map_campus', gate: [177.9, 411.1], fount: [182.1, 229.0], spots: [[180.0, 434.1], [177.8, 377.4], [259.2, 323.4], [181.8, 258.6], [143.3, 227.3], [151.2, 177.6], [187.2, 131.7], [234.0, 118.2], [199.8, 188.4], [133.2, 177.6]],
@@ -128,7 +128,7 @@
   const BASE_KEY = [{ science: 'bld_science_on', classroom: 'bld_classroom_on', cafeteria: 'bld_cafeteria_on', library: 'bld_library_on', playground: 'bld_playground_on' },
     { science: 'bld_science_on', classroom: 'bld_classroom_on', cafeteria: 'bld_cafeteria_on', library: 'bld_library_on', playground: 'bld_field_on' },
     { science: 'bld_science_on', classroom: 'bld_classroom_on', cafeteria: 'bld_cafeteria_on', library: 'bld_library_on', playground: 'bld_field_on', store: 'bld_store_on' },
-    // 고등학교는 받은 미리보기(작업지시서 41 map_check)와 같은 자리가 되게 고등학교 그림 기준으로 놓아요
+    // 고등학교는 받은 미리보기(map_check)와 같은 자리가 되게 고등학교 그림 기준으로 놓아요
     { science: 'bld_science_s4', classroom: 'bld_classroom_s4', cafeteria: 'bld_cafeteria_s4', library: 'bld_library_s4', playground: 'bld_field_s4', store: 'bld_store_s4', dorm: 'bld_dorm_on' }];
   // 길 찾기, 누르는 자리, 이름표의 기준 자리(b)는 예전 그림의 바닥 섬 값으로 고정해요(새 건물 그림을 넣어도 학생 길과 자리가 그대로). 실제 그림만 새 값으로 맞춰요
   const GEO_ISL = {bld_classroom_on: [-0.0012, 0.47, 0.97], bld_cafeteria_on: [-0.0062, 0.44, 0.955], bld_library_on: [-0.0012, 0.4175, 0.96], bld_playground_on: [0.0138, 0.4325, 0.915], bld_science_on: [-0.0025, 0.425, 0.9725], bld_field_on: [0.0162, 0.42, 0.88], bld_store_on: [-0.0075, 0.4425, 0.9525]};
@@ -178,7 +178,7 @@
     const wk = rk + '_winter';
     return has170(wk) ? wk : '';
   };
-  // 테마마다 새로 그린 지붕과 트랙(작업지시서 95, 97, 98, thr_<건물 그림>_<테마>). 있으면 색을 곱하지 않고 그대로 겹쳐요. 없으면 지금 방식(roof 조각에 테마 색)
+  // 테마마다 새로 그린 지붕과 트랙(thr_<건물 그림>_<테마>). 있으면 색을 곱하지 않고 그대로 겹쳐요. 없으면 지금 방식(roof 조각에 테마 색)
   const thrKey = k => {
     const t = S && S.cos && S.cos.th && THEME[thOn()[k]], b = bldImg(k); if (!t || /_lux$/.test(b)) return '';
     const key = `thr_${b.replace(/^bld_/, '')}_${t.id}`; return has170(key) ? key : '';
@@ -200,16 +200,16 @@
     layoutOak();
   }
   // 테마 지도: 배경 테마(봄, 여름, 가을, 겨울, 크리스마스)를 고르면 지도 그림도 그 계절 모습으로 바꿔요. 그림이 없는 테마는 기본 지도
-  // 관리자만 쓰는 고급 지도와 건물(작업지시서 49, 열쇠 map_*_lux, bld_*_lux). 이 기기에만 켜요(저장에는 안 들어가요)
+  // 관리자만 쓰는 고급 지도와 건물(열쇠 map_*_lux, bld_*_lux). 이 기기에만 켜요(저장에는 안 들어가요)
   const luxOn = () => { if (rt.lux === undefined) { try { rt.lux = localStorage.getItem('forest-lux') === '1'; } catch (e) { rt.lux = false; } } return rt.lux; };
   const MAP_FILES = new Set([
-    'map_campus_grad', 'map_campus_grad_spring', 'map_campus_grad_summer', 'map_campus_grad_autumn', 'map_campus_grad_winter', 'map_campus_grad_xmas', 'map_campus_grad_space', 'map_campus_grad_retro', 'map_zone_academic_grad', 'map_zone_academic_grad_spring', 'map_zone_academic_grad_summer', 'map_zone_academic_grad_autumn', 'map_zone_academic_grad_winter', 'map_zone_academic_grad_xmas', 'map_zone_academic_grad_space', 'map_zone_academic_grad_retro', 'map_zone_life_grad', 'map_zone_life_grad_spring', 'map_zone_life_grad_summer', 'map_zone_life_grad_autumn', 'map_zone_life_grad_winter', 'map_zone_life_grad_xmas', 'map_zone_life_grad_space', 'map_zone_life_grad_retro', 'map_zone_plaza_grad', 'map_zone_plaza_grad_spring', 'map_zone_plaza_grad_summer', 'map_zone_plaza_grad_autumn', 'map_zone_plaza_grad_winter', 'map_zone_plaza_grad_xmas', 'map_zone_plaza_grad_space', 'map_zone_plaza_grad_retro', 'map_zone_sports_grad', 'map_zone_sports_grad_spring', 'map_zone_sports_grad_summer', 'map_zone_sports_grad_autumn', 'map_zone_sports_grad_winter', 'map_zone_sports_grad_xmas', 'map_zone_sports_grad_space', 'map_zone_sports_grad_retro', 'map_zone_lab_grad', 'map_zone_lab_grad_spring', 'map_zone_lab_grad_summer', 'map_zone_lab_grad_autumn', 'map_zone_lab_grad_winter', 'map_zone_lab_grad_xmas', 'map_zone_lab_grad_space', 'map_zone_lab_grad_retro',   // 대학원판 지도(작업지시서 88, 89)
+    'map_campus_grad', 'map_campus_grad_spring', 'map_campus_grad_summer', 'map_campus_grad_autumn', 'map_campus_grad_winter', 'map_campus_grad_xmas', 'map_campus_grad_space', 'map_campus_grad_retro', 'map_zone_academic_grad', 'map_zone_academic_grad_spring', 'map_zone_academic_grad_summer', 'map_zone_academic_grad_autumn', 'map_zone_academic_grad_winter', 'map_zone_academic_grad_xmas', 'map_zone_academic_grad_space', 'map_zone_academic_grad_retro', 'map_zone_life_grad', 'map_zone_life_grad_spring', 'map_zone_life_grad_summer', 'map_zone_life_grad_autumn', 'map_zone_life_grad_winter', 'map_zone_life_grad_xmas', 'map_zone_life_grad_space', 'map_zone_life_grad_retro', 'map_zone_plaza_grad', 'map_zone_plaza_grad_spring', 'map_zone_plaza_grad_summer', 'map_zone_plaza_grad_autumn', 'map_zone_plaza_grad_winter', 'map_zone_plaza_grad_xmas', 'map_zone_plaza_grad_space', 'map_zone_plaza_grad_retro', 'map_zone_sports_grad', 'map_zone_sports_grad_spring', 'map_zone_sports_grad_summer', 'map_zone_sports_grad_autumn', 'map_zone_sports_grad_winter', 'map_zone_sports_grad_xmas', 'map_zone_sports_grad_space', 'map_zone_sports_grad_retro', 'map_zone_lab_grad', 'map_zone_lab_grad_spring', 'map_zone_lab_grad_summer', 'map_zone_lab_grad_autumn', 'map_zone_lab_grad_winter', 'map_zone_lab_grad_xmas', 'map_zone_lab_grad_space', 'map_zone_lab_grad_retro',   // 대학원판 지도
    'map_zone_lab_spring', 'map_zone_lab_summer', 'map_zone_lab_autumn', 'map_zone_lab_winter', 'map_zone_lab_xmas', 'map_zone_lab_space', 'map_zone_lab_retro',
-    'map_campus_lab_spring', 'map_campus_lab_summer', 'map_campus_lab_autumn', 'map_campus_lab_winter', 'map_campus_lab_xmas', 'map_campus_lab_space', 'map_campus_lab_retro',   // 작업지시서 84
+    'map_campus_lab_spring', 'map_campus_lab_summer', 'map_campus_lab_autumn', 'map_campus_lab_winter', 'map_campus_lab_xmas', 'map_campus_lab_space', 'map_campus_lab_retro',
     'map_campus_winter', 'map_zone_academic_winter', 'map_zone_life_winter', 'map_zone_plaza_winter', 'map_zone_sports_winter',
-    'map_campus_spring', 'map_zone_academic_spring', 'map_zone_life_spring', 'map_zone_plaza_spring', 'map_zone_sports_spring', 'map_campus_summer', 'map_zone_academic_summer', 'map_zone_life_summer', 'map_zone_plaza_summer', 'map_zone_sports_summer', 'map_campus_autumn', 'map_zone_academic_autumn', 'map_zone_life_autumn', 'map_zone_plaza_autumn', 'map_zone_sports_autumn', 'map_campus_xmas', 'map_zone_academic_xmas', 'map_zone_life_xmas', 'map_zone_plaza_xmas', 'map_zone_sports_xmas', 'map_campus_space', 'map_zone_academic_space', 'map_zone_life_space', 'map_zone_plaza_space', 'map_zone_sports_space', 'map_campus_retro', 'map_zone_academic_retro', 'map_zone_life_retro', 'map_zone_plaza_retro', 'map_zone_sports_retro']);   // 대학교 테마 지도 30장(작업지시서 68). img/maps에 파일로만 있는 테마 지도(대학교는 기본과 겨울 먼저)
+    'map_campus_spring', 'map_zone_academic_spring', 'map_zone_life_spring', 'map_zone_plaza_spring', 'map_zone_sports_spring', 'map_campus_summer', 'map_zone_academic_summer', 'map_zone_life_summer', 'map_zone_plaza_summer', 'map_zone_sports_summer', 'map_campus_autumn', 'map_zone_academic_autumn', 'map_zone_life_autumn', 'map_zone_plaza_autumn', 'map_zone_sports_autumn', 'map_campus_xmas', 'map_zone_academic_xmas', 'map_zone_life_xmas', 'map_zone_plaza_xmas', 'map_zone_sports_xmas', 'map_campus_space', 'map_zone_academic_space', 'map_zone_life_space', 'map_zone_plaza_space', 'map_zone_sports_space', 'map_campus_retro', 'map_zone_academic_retro', 'map_zone_life_retro', 'map_zone_plaza_retro', 'map_zone_sports_retro']);   // 대학교 테마 지도 30장. img/maps에 파일로만 있는 테마 지도(대학교는 기본과 겨울 먼저)
   const mapKey = (base, lux) => { const k = mapKey0(base, lux, false); return MAP_THEME_RE.test(k) && mapHi[k] === 'no' && APP_PACK() ? mapKey0(base, lux, true) : k; };
-  const mapKey0 = (base, lux, plain) => { if (gradOn()) { if (base === 'map_campus') base = MAP_FILES.has('map_campus_grad') ? 'map_campus_grad' : 'map_campus_lab'; else if (MAP_FILES.has(base + '_grad')) base += '_grad'; }   // 대학원 캠퍼스. 대학원이면 대학원판 지도(작업지시서 88, 89, 자리는 대학교와 같아요)
+  const mapKey0 = (base, lux, plain) => { if (gradOn()) { if (base === 'map_campus') base = MAP_FILES.has('map_campus_grad') ? 'map_campus_grad' : 'map_campus_lab'; else if (MAP_FILES.has(base + '_grad')) base += '_grad'; }   // 대학원 캠퍼스. 대학원이면 대학원판 지도(자리는 대학교와 같아요)
     const id = !plain && S && S.cos && S.cos.th && thOn().bg; if (id && MAP_FILES.has(`${base}_${id}`)) return `${base}_${id}`; if ((lux || luxOn()) && has170(`${base}_lux`)) return `${base}_lux`; return id && has170(`${base}_${id}`) ? `${base}_${id}` : base; };
   // 지도 고화질: 게임 안 지도는 480×720이라 확대하면 흐려요. 게임 옆 img/maps 폴더의 원본 크기(1024×1536) 그림을 받아 다 오면 바꿔 끼워요
   // 파일이 없거나 늦으면 게임 안 그림을 그대로 써요(곡 파일과 같은 방식)
@@ -229,7 +229,7 @@
   const mapLo = key => APP_PACK() ? (mapHi[key] === 'ok' ? mapUrl(key) : mapUrl(mapPlain(key))) : IMG170(key);
   // 지도마다 오른쪽 아래에 그려진 큰 참나무를 누르는 참나무로 써요(게임이 따로 올리던 참나무 그림 대신)
   // 지도 열쇠 → 참나무 층(l)과 나무 지운 조각(p)의 자리 [x, y, 너비, 높이], 흔드는 중심(pv), 누르는 자리(tap [x, y, 반지름]), 도토리 맺히는 자리(nuts), 떨어지는 자리(drop). 모두 지도 좌표.
-  // 표는 dev/oak_pack.py가 작업지시서 54 그림에서 만들어요. 그림 파일(img/maps/oakl_*, oakp_*)이 없거나 못 받으면 예전 참나무 그림을 그대로 써요
+  // 표는 dev/oak_pack.py가 만들어요. 그림 파일(img/maps/oakl_*, oakp_*)이 없거나 못 받으면 예전 참나무 그림을 그대로 써요
   const MAP_OAK = {
     /*MAP_OAK_BEGIN*/
     map_kinder: {l: [230.6, 302.1, 129.4, 116.4], p: [215.2, 286.6, 144.8, 147.3], pv: [316.8, 412.1], tap: [295.7, 360.3, 48], nuts: [[294.6, 348.5], [355.8, 373.8], [355.8, 327.4], [235.5, 367.5], [250.3, 338.0], [311.5, 373.8]], drop: [[273.5, 404.1], [280.5, 417.4], [292.9, 424.5], [310.4, 426.2], [331.2, 423.4], [341.7, 414.6], [343.8, 398.8], [284.1, 390.0]]},
@@ -538,7 +538,7 @@
   }
   // 나무와 동네 건물을 밑바닥 y 순서로 그려서 뒤에 있는 것이 먼저 깔리게 해요
   function buildForest() {
-    // 끊김 줄이기: #forest는 1.7.0부터 지도 그림에 가려 안 보여요(display:none). 요소 468개를 만들지 않아요. 동네 단계 셈(renderTown)은 그대로 돌아요
+    // 끊김 줄이기: #forest는 지도 그림에 가려 안 보여요(display:none). 요소 468개를 만들지 않아요. 동네 단계 셈(renderTown)은 그대로 돌아요
     rt.townStage = -1;
   }
   // 동네 단계에 맞춰 나무를 치우고 건물을 세워요. anim이면 새로 생긴 건물이 쑥 솟아올라요
@@ -573,7 +573,7 @@
     const a = d < 0.05 ? Math.PI : Math.atan2(dy / ry, dx / rx);
     return [cx + Math.cos(a) * rx * 1.04, cy + Math.sin(a) * ry * 1.04, p[2]];
   }
-  // 현황판 새 그림(작업지시서 79)을 CSS 변수로. 하나라도 없으면 붙이지 않아요(예전 모습 그대로)
+  // 현황판 새 그림을 CSS 변수로. 하나라도 없으면 붙이지 않아요(예전 모습 그대로)
   function hudArtInit() {
     const K = { '--hud-frame': 'hud_board_frame', '--hud-card-l': 'hud_card_light', '--hud-card-d': 'hud_card_dark', '--hud-pill-l': 'hud_pill_light', '--hud-pill-d': 'hud_pill_dark',
       '--hud-track-l': 'hud_bar_track_light', '--hud-track-d': 'hud_bar_track_dark', '--hud-fill': 'hud_bar_fill', '--hud-btn-l': 'hud_btn_light', '--hud-btn-d': 'hud_btn_dark', '--hud-btn-p': 'hud_btn_press',
@@ -584,7 +584,7 @@
     hudTheme();
     [['#repPill', 'hud_ic_star'], ['#kidsPill', 'hud_ic_kids']].forEach(([q, k]) => { const el = $(q), sv = el && el.querySelector('svg'), u = IMG(k); if (sv && u) { const im = document.createElement('img'); im.src = u; im.alt = ''; sv.replaceWith(im); } });
   }
-  // 현황판 나무 금빛 틀을 배경 테마 색으로(작업지시서 80). 테마마다 같은 모양에 색만 바꾼 11장, 없으면 기본 그림
+  // 현황판 나무 금빛 틀을 배경 테마 색으로. 테마마다 같은 모양에 색만 바꾼 11장, 없으면 기본 그림
   // 그림이 아닌 곳(아래 탭과 탐험 화면의 고른 칸, 테두리)은 Codex 색표로 맞춰요: [고른 칸 위, 고른 칸 아래, 테두리]
   const HUD_TH_KEYS = { '--hud-frame': 'hud_board_frame', '--hud-card-l': 'hud_card_light', '--hud-card-d': 'hud_card_dark', '--hud-pill-l': 'hud_pill_light', '--hud-pill-d': 'hud_pill_dark',
     '--hud-fill': 'hud_bar_fill', '--hud-btn-l': 'hud_btn_light', '--hud-btn-d': 'hud_btn_dark', '--hud-btn-p': 'hud_btn_press', '--hud-fold-l': 'hud_fold_light', '--hud-fold-d': 'hud_fold_dark' };

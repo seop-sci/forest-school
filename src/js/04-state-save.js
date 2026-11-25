@@ -70,8 +70,8 @@
     trialT: undefined,   // 다음 매나 뱀까지 남은 초
     trialWasHunt: undefined,   // 지난 매나 뱀이 사냥형이었는지
     visit: undefined,   // 지금 놀러 온 손님
-    aitJson: undefined, aitT: undefined,   // 5.4.0.2 토스 저장소로 보낼 저장 글과 모아 보내기 타이머
-    guest: null, gsT: undefined, adWhere: '',   // 5.3.4.7 오늘의 손님: 교문 앞에 서 있는 손님, 나타나기까지 남은 초
+    aitJson: undefined, aitT: undefined,   // 토스 저장소로 보낼 저장 글과 모아 보내기 타이머
+    guest: null, gsT: undefined, adWhere: '',   // 오늘의 손님: 교문 앞에 서 있는 손님, 나타나기까지 남은 초
     visitT: undefined,   // 다음 손님까지 남은 초
     frBub: undefined,   // 단짝 말풍선 요소
     // 건물 창, 가구, 공사
@@ -115,9 +115,9 @@
     ltBack: undefined,   // 편지 창에서 뒤로 가기를 보여 줄지
     plAt: undefined,   // 학부모 편지함에서 보는 편지 번호
     talkSeq: undefined,   // 전학 대화 진행
-    paBig: undefined,   // 5.4.0 사진첩 크게 보는 사진(미션 id 또는 'fr:번호')
-    paFake: undefined,   // 5.4.0 시험에서 사진 판정 상태를 덮어쓰는 칸
-    paOpenSea: undefined,   // 5.4.0 사진첩에서 펼친 다른 계절
+    paBig: undefined,   // 사진첩 크게 보는 사진(미션 id 또는 'fr:번호')
+    paFake: undefined,   // 시험에서 사진 판정 상태를 덮어쓰는 칸
+    paOpenSea: undefined,   // 사진첩에서 펼친 다른 계절
     trSvOpen: undefined,   // 체험학습 기념품 칸을 펼쳤는지
     tripGot: undefined,   // 체험학습에서 받은 것
     tripTxt: undefined,   // 체험학습 단추에 보인 글
@@ -181,9 +181,9 @@
     tamUi: undefined,   // 탐험 화면 단추를 연결했는지
     // 상점과 꾸미기
     thPrev: undefined,   // 테마 미리 보기 중인 테마
-    thOpen: undefined,   // 5.3.3 백화점에서 펼쳐 둔 테마 세트
-    conMore: undefined,   // 5.3.3 공사 창 '다른 방법' 펼침
-    conMoreK: undefined,   // 5.3.3 '다른 방법'을 펼친 건물
+    thOpen: undefined,   // 백화점에서 펼쳐 둔 테마 세트
+    conMore: undefined,   // 공사 창 '다른 방법' 펼침
+    conMoreK: undefined,   // '다른 방법'을 펼친 건물
     thScroll: undefined,   // 미리 보기 전 상점 스크롤 자리
     thSig: undefined,   // 적용한 테마 표시(바뀌면 덮개를 띄워요)
     thVeilT: undefined,   // 테마 적용 중 덮개 시계
@@ -320,7 +320,7 @@
     ac: freshAc(),   // 공부: 과목 5개 학교 학력(lv, xp), 문제집 bk(day, n), 통계 st
     pc: freshPc(), sk: freshSk(),   // 숲속 소풍, 칭찬 스티커판
     ff: {},   // 건물마다 바로 완공을 쓴 날(부터는 기록만, 횟수는 ffd)
-    ffd: { day: '', n: 0 },   // 조정안 7: 오늘 학교 전체에서 쓴 무료 즉시 완공 횟수
+    ffd: { day: '', n: 0 },   // 오늘 학교 전체에서 쓴 무료 즉시 완공 횟수
     ces: '',   // 숲의 정수로 즉시 완료 '오늘은 다시 묻지 않기'를 고른 날
     ffx: '',   // 홈 지도 칩을 닫은 날
     sn: { got: {}, day: '', mood: 0, pity: 0, n: 0, gold: false },   // 매점 간식 뽑기: 간식마다 뽑은 수, 기분 날짜와 칸, 희귀 없이 뽑은 수, 모두 뽑은 수, 다 모아 받은 황금 기계
@@ -364,9 +364,9 @@
     tr2: freshTr2(),   // 수학여행: 다녀온 학년, 지금 여행, 떠난 수, 돌아온 수, 기념품. 진로 상담: 오늘 날짜와 횟수, 모든 상담 수, 진로를 고른 수, 이룬 학생 수, 정산한 명부 번호, 진로 도감
     roster: freshRoster(), club: freshClub(), el: freshEl(), snap: {}, tfp: 0,   // el: 반장 선거
       // tfp: 이 학교급에 들어올 때까지 장학재단을 고친 횟수. 학생 명부, 동아리, 학교급 사진(졸업식 때 남긴 모습)
-    use: freshUse(),   // 5.4.0.3 놀이 기록: d 최근 쓴 날(날 번호), n 모두 횟수
-    gs: freshGs(),   // 5.3.4.7 오늘의 손님: day 온 날, who 손님, st 0 없음 1 교문 2 부탁 중 3 오늘 끝, sub 부탁, met 만난 수, n 들어준 수
-    pa: freshPa(),   // 5.4.0 사진첩: on 열림, ms 미션 사진, fr 자유 사진(30장까지), own 가진 액자, seen 빨간 점을 본 날, n 찰칵 횟수
+    use: freshUse(),   // 놀이 기록: d 최근 쓴 날(날 번호), n 모두 횟수
+    gs: freshGs(),   // 오늘의 손님: day 온 날, who 손님, st 0 없음 1 교문 2 부탁 중 3 오늘 끝, sub 부탁, met 만난 수, n 들어준 수
+    pa: freshPa(),   // 사진첩: on 열림, ms 미션 사진, fr 자유 사진(30장까지), own 가진 액자, seen 빨간 점을 본 날, n 찰칵 횟수
     q: freshQ()
   });
   const repOf = s => s.f.classroom + s.f.cafeteria + s.f.playground + 3 * s.f.library + s.f.science + 2 * (s.t.squirrel + s.t.owl + s.t.bear) + 5 * s.p.perk.rep + 10 * s.fp.rep + acRepOf(s);   // 학력 10레벨마다 +1
@@ -391,7 +391,7 @@
     s.grade = Math.min(Math.floor(numFb(d.grade, 0, 0)), CFG.grades.length - 1);
     s.sound = d.sound !== false; s.bgm = d.bgm !== false; s.vibrate = d.vibrate !== false;
     s.ambV = [0, 1, 2, 3].includes(d.ambV) ? d.ambV : (s.sound || s.bgm ? 2 : 0);
-    s.gfx = [0, 1, 2].includes(d.gfx) ? d.gfx : -1;   // 그래픽 품질(-1 자동)   // 자연 소리 크기(0 끄기~3 크게). 옛 저장은 소리를 다 꺼 둔 사람만 끄기
+    s.gfx = [0, 1, 2].includes(d.gfx) ? d.gfx : -1;   // 그래픽 품질(-1 자동) // 자연 소리 크기(0 끄기~3 크게). 옛 저장은 소리를 다 꺼 둔 사람만 끄기
     s.savedAt = numFb(d.savedAt, 0, Date.now());
     s.pending = cap(numFb(d.pending, 0, 0, SAVE_CAP.acorn), SAVE_CAP.acorn); s.pendingSec = cap(numFb(d.pendingSec, 0, 0), SAVE_CAP.count);
     s.certNo = Math.floor(cap(numFb(d.certNo, 0, 0), SAVE_CAP.count)); s.earned = cap(numFb(d.earned, 0, 0, SAVE_CAP.acorn), SAVE_CAP.acorn); s.pwBank = cap(numFb(d.pwBank, 0, 0), SAVE_CAP.big);
@@ -437,7 +437,7 @@
     s.tdip = cap(numFb(d.tdip, 0, s.p.dip + spent), SAVE_CAP.count);
     s.u.boost = !!(d.u && d.u.boost) || s.t.owl >= 1;
     s.u.dev = !!(d.u && d.u.dev);
-    s.u.gtip = !!(d.u && d.u.gtip);   // 5.4.0.4 황금 도토리 60개 테마 안내를 봤는지(옛 저장은 아직 안 봤어요)
+    s.u.gtip = !!(d.u && d.u.gtip);   // 황금 도토리 60개 테마 안내를 봤는지(옛 저장은 아직 안 봤어요)
     s.units = d.units === 'en' ? 'en' : 'ko';
     s.uiz = d.uiz === 1 ? 1 : 0;
     // 학교 번호는 기기를 옮겨도 그대로예요. 예전 저장에는 없어서 새로 만들고, 처음 연 날은 마지막 저장 때로 어림해요
@@ -445,7 +445,7 @@
     s.born = Math.min(numFb(d.born, 0, s.savedAt), Date.now());
     // 황금 도토리: 예전 저장에도 처음 선물 5개를 줘요. 꾸미기는 산 것만 입을 수 있어요
     s.gold = Math.floor(cap(numFb(d.gold, 0, s.gold), SAVE_CAP.count));
-    if (d.gd && typeof d.gd === 'object') { s.gd.day = typeof d.gd.day === 'string' ? d.gd.day.slice(0, 10) : ''; s.gd.n = Math.floor(numFb(d.gd.n, 0, 0, SAVE_CAP.count)); s.gd.shop = Math.floor(numFb(d.gd.shop, 0, 0, SAVE_CAP.count)); s.gd.a = Math.floor(numFb(d.gd.a, 0, Math.max(0, s.gd.n - s.gd.shop), SAVE_CAP.count)); }   // 5.3.3 일반 광고 황금 횟수(예전 저장은 전체에서 상점 몫을 빼요)
+    if (d.gd && typeof d.gd === 'object') { s.gd.day = typeof d.gd.day === 'string' ? d.gd.day.slice(0, 10) : ''; s.gd.n = Math.floor(numFb(d.gd.n, 0, 0, SAVE_CAP.count)); s.gd.shop = Math.floor(numFb(d.gd.shop, 0, 0, SAVE_CAP.count)); s.gd.a = Math.floor(numFb(d.gd.a, 0, Math.max(0, s.gd.n - s.gd.shop), SAVE_CAP.count)); }   // 일반 광고 황금 횟수(예전 저장은 전체에서 상점 몫을 빼요)
     if (d.cos && typeof d.cos === 'object') {
       // 칠판 색은 이제 배경 테마를 따라가요. 예전에 산 칠판은 값(10개씩)을 돌려줘요
       // 지붕도 이제 테마 세트가 맡아요. 예전에 산 지붕도 값(파란 지붕 15개, 벚꽃과 눈 오는 학교 25개)을 돌려줘요
@@ -585,7 +585,7 @@
       s.pp = { dat: num(P.dat, 9999), cur: c, n: num(P.n, 1e6), by: map(P.by), day: typeof P.day === 'string' ? P.day.slice(0, 10) : '', cm: Number.isFinite(P.cm) ? Math.max(-1, Math.floor(P.cm)) : -1,
         cf: num(P.cf, 99999), cb: num(P.cb, 99999), ck: map(P.ck), med, sem: num(P.sem, 1e6) };
     } else if (s.tier >= GRAD_TIER) s.pp.sem = Math.max(0, Math.floor((s.tg || 0) * 2 + (s.sem || 0)));   // 앞 저장: 지난 세미나 수를 학기로 어림
-    { const t = d.ach && typeof d.ach === 'object' ? d.ach.title : null;   // 5.3.4.4: 논문과 학회 칭호는 s.pp를 다 읽은 뒤에 봐요(sanitize171에서는 빠져 다시 켜면 칭호가 떨어졌어요)
+    { const t = d.ach && typeof d.ach === 'object' ? d.ach.title : null;   // 논문과 학회 칭호는 s.pp를 다 읽은 뒤에 봐요(sanitize171에서는 빠져 다시 켜면 칭호가 떨어졌어요)
       if (!s.ach.title && typeof t === 'string' && PP_TITLES.some(x => x.id === t && x.got(s))) s.ach.title = t; }
     { const A = d && d.adx && typeof d.adx === 'object' ? d.adx : {}, f = freshAdx();   // 광고 도장과 한 판 더
       f.day = typeof A.day === 'string' ? A.day.slice(0, 10) : '';
@@ -617,9 +617,9 @@
     sanitizeGd(d, s);   // 학교 텃밭
     sanitizeBx(d, s);   // 숲속 생물 탐사
     sanitizeCg(d, s);   // 동아리 대항전
-    sanitizePa(d, s);   // 5.4.0 사진첩
-    sanitizeGs(d, s);   // 5.3.4.7 오늘의 손님
-    sanitizeUse(d, s);   // 5.4.0.3 놀이 기록
+    sanitizePa(d, s);   // 사진첩
+    sanitizeGs(d, s);   // 오늘의 손님
+    sanitizeUse(d, s);   // 놀이 기록
     s.wx = typeof d.wx === 'string' ? d.wx.slice(0, 10) : '';   // 날씨 알림 본 날
     s.wxOff = d.wxOff ? 1 : 0;   // 보안 보강 판: 날씨 칩을 눌러 비, 눈, 안개 효과 끄기(날씨 자체와 보너스는 그대로)
     { const P = d.pl && typeof d.pl === 'object' ? d.pl : {}, got = Math.max(0, Math.min(PL.list.length, Math.floor(Number(P.got) || 0))); s.pl = { got, read: Math.max(0, Math.min(got, Math.floor(Number(P.read) || 0))), wk: Math.floor(Number(P.wk)) || -1 }; }   // 학부모 편지
@@ -657,7 +657,7 @@
     out.init = true;
     out.m = mainIndexFromSave(q);
     out.mb = numFb(q.mb, 0, 0);
-    out.md = Math.floor(numFb(q.md, 0, out.m));   // 보안 점검(1-7): 끝낸 메인 퀘스트 수. 옛 저장은 지금 번호로 시작해요
+    out.md = Math.floor(numFb(q.md, 0, out.m));   // 끝낸 메인 퀘스트 수. 옛 저장은 지금 번호로 시작해요
     out.lat = typeof q.lat === 'string' ? q.lat.slice(0, 12) : '';
     out.seen = Math.min(out.m, Math.floor(typeof q.seen === 'number' && isFinite(q.seen) ? q.seen : -1));
     out.gen = Math.floor(numFb(q.gen, 0, 0, SAVE_CAP.count));
@@ -702,7 +702,7 @@
       return null;
     }
   }
-  // 5.4.0.2 토스가 매우 끊기던 것: 저장할 때마다(5초마다, 그리고 누를 때마다) 학교 전체 글을 토스 앱 저장소로 보냈어요.
+  // 토스가 매우 끊기던 것: 저장할 때마다(5초마다, 그리고 누를 때마다) 학교 전체 글을 토스 앱 저장소로 보냈어요.
   // 토스 저장소는 앱 다리(네이티브)를 거쳐서 무거워요. 이 기기 저장(localStorage)은 그대로 바로 하고, 토스 저장소는 20초에 한 번 모아서 보내요.
   // 앱을 내리거나 닫을 때(save(at), 화면이 숨겨짐)는 바로 보내요. 토스 저장소는 이 기기 저장이 비었을 때만 읽는 예비 저장이에요
   const AIT_SAVE_GAP = 20000;
@@ -717,7 +717,7 @@
   }
   function save(at) {
     if (!S || rt.adopting || rt.uniPrev) return;   // 다른 학교로 바꾸며 다시 여는 중에는 지금 학교를 저장하지 않아요. 대학교 미리 보기 동안도 저장하지 않아요
-    S.savedAt = at || (rt.paused ? rt.closedAt : gameNow());   // 보안 점검(2-5): 기기 시계 대신 게임 시계
+    S.savedAt = at || (rt.paused ? rt.closedAt : gameNow());   // 기기 시계 대신 게임 시계
     if (rt.awayWait) S.away = { from: rt.awayWait.from, skip: awaySkip(rt.awayWait) };   // 서버 시간을 아직 못 받았으면 다음에 이어서 계산해요
     syncMid();
     const json = JSON.stringify(S);

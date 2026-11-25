@@ -19,7 +19,7 @@
   const wldBg = () => { try { return thOn().bg || ''; } catch (e) { return ''; } };
   function wldPhase() {
     if (rt.wldPh) return rt.wldPh;   // 사진 모드에서 고른 시간
-    if (S && S.nl === 2) return 'day';   // 5.3.3.1 홈의 시간 흐름 단추를 '늘 낮'으로 둔 사람(모든 학교급)
+    if (S && S.nl === 2) return 'day';   // 홈의 시간 흐름 단추를 '늘 낮'으로 둔 사람(모든 학교급)
     const h = kstHour(gameNow());
     return isNight() ? 'night' : h < 9 ? 'morning' : h >= 17 ? 'evening' : 'day';
   }
@@ -205,7 +205,7 @@
   function photoOpen() {
     if (!S) return;
     if (rt.modalOpen) closeModal(rt.modalOpen);
-    setTab('school'); rt.photo = true; { const s = paNow(); rt.wldPh = s.ph; rt.wldWx = paVisWx(s); } document.body.classList.add('photo');   // 5.4.0 처음에는 실제 시간과 날씨가 골라져 있어요(찰칵이 바로 되게)
+    setTab('school'); rt.photo = true; { const s = paNow(); rt.wldPh = s.ph; rt.wldWx = paVisWx(s); } document.body.classList.add('photo');   // 처음에는 실제 시간과 날씨가 골라져 있어요(찰칵이 바로 되게)
     const b = document.createElement('div'); b.className = 'photo-bar'; b.id = 'photoBar';
     const seg = (id, L, cur, k) => `<div class="seg" id="${id}" role="radiogroup">${L.map(([v, t]) => `<button type="button" role="radio" data-${k}="${v}" aria-checked="${v === cur}">${t}</button>`).join('')}</div>`;
     b.innerHTML = seg('phT', PH_T, rt.wldPh, 'pht') + seg('phW', PH_W, rt.wldWx, 'phw') + (paOpen() ? '<button type="button" class="cta ph-snap" id="phSnap">찰칵</button>' : '') + '<button type="button" class="btn-sub" id="phX">닫기</button>';

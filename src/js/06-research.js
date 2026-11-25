@@ -43,7 +43,7 @@
     }).join('') + '</div>';
   }
   /* ---------- 연구소 창: 연구 투자와 연구 트리 (설계안 ' 설계안 (대학원, 연구 구역) 초안' 3절) ----------
-     연구 트리: 가지 다섯 개 × 칸 네 개. 칸마다 숲의 정수와 그때 수업료 몇 시간치 도토리를 쓰고, 연구 시간이 지나야 올라요(한 번에 하나). 졸업해도 남아요. 숫자는 본부 제안 */
+     연구 트리: 가지 다섯 개 × 칸 네 개. 칸마다 숲의 정수와 그때 수업료 몇 시간치 도토리를 쓰고, 연구 시간이 지나야 올라요(한 번에 하나). 졸업해도 남아요. */
   const RT5 = {
     list: [
       { k: 'class', nm: '수업', ic: 'ic_rt_class', eff: L => `수업료 +${5 * L}%` },
@@ -78,8 +78,8 @@
     if (!$('#mRx').hidden) renderRx();
   }
   /* 연구 트리를 목록 대신 한 그루 나무로. 밑동에서 가지 다섯 개가 위로 뻗고, 가지마다 칸이 아래에서 위로 이어져요
-     칸 자리는 720x960 판 기준(그림 작업지시서 96의 rt_tree_bg와 같은 좌표). 칸을 누르면 아래 칸 창에 효과, 값, '연구하기'. 효과와 값은 그대로 */
-  const RT_PT = [[160, 141, 125, 109, 96], [260, 250, 242, 235, 228], [360, 360, 360, 360, 360], [460, 470, 478, 485, 492], [560, 579, 595, 611, 624]];   // 가지마다 줄 1~5의 x(작업지시서 96-2, 위로 갈수록 퍼지는 부채꼴)
+     칸 자리는 720x960 판 기준(그림 rt_tree_bg와 같은 좌표). 칸을 누르면 아래 칸 창에 효과, 값, '연구하기'. 효과와 값은 그대로 */
+  const RT_PT = [[160, 141, 125, 109, 96], [260, 250, 242, 235, 228], [360, 360, 360, 360, 360], [460, 470, 478, 485, 492], [560, 579, 595, 611, 624]];   // 가지마다 줄 1~5의 x(위로 갈수록 퍼지는 부채꼴)
   const RT_X = (j, i) => RT_PT[j][i], RT_Y = i => 800 - 150 * i, RT_W = 720, RT_H = 960;
   const rtTop = () => RT5.top >= 5 ? 0 : RT_Y(RT5.top - 1) - 130;   // 칸 줄 수가 다섯보다 적으면 빈 위쪽을 잘라요
   function rtTreeSvg() {
@@ -115,10 +115,10 @@
       : shut ? '<span class="fe-lock">잠김</span>' : c ? '<span class="fe-lock">다른 연구 중</span>'
       : `<button class="${S.ess < k.ess || S.budget < k.ac ? 'btn-sub' : 'cta'} small" type="button" data-rt="${D.k}">연구하기 (정수 ${k.ess})</button>`;
     const info = `<div class="rt-card"><span class="dp-ic">${IMG(D.ic) ? `<img src="${IMG(D.ic)}" alt="">` : ''}</span><div class="dp-tx"><b>${D.nm} ${Math.min(L + (full ? 0 : 1), RT5.top)}칸${full ? ' (완성)' : ''}</b>` +
-      `<small>${L ? `지금 ${D.eff(L)}` : '아직 연구 전'}${D.lock || full ? '' : run ? `<br>다음 ${D.eff(L + 1)}<br>연구 중이에요. 끝나면 칸이 채워져요` : `<br>다음 ${D.eff(L + 1)}<br>도토리 ${fmt(k.ac)}, ${rtHrs(k.sec)}`}` +   // 5.3.2.1: 연구 중에는 걸리는 시간 대신 남은 시간(오른쪽) 하나만
-      // 5.3.2.1: 잠긴 까닭을 한 줄로(예전에는 단추 자리에 '논문 3편', '다른 연구 중'만)
+      `<small>${L ? `지금 ${D.eff(L)}` : '아직 연구 전'}${D.lock || full ? '' : run ? `<br>다음 ${D.eff(L + 1)}<br>연구 중이에요. 끝나면 칸이 채워져요` : `<br>다음 ${D.eff(L + 1)}<br>도토리 ${fmt(k.ac)}, ${rtHrs(k.sec)}`}` +   // 연구 중에는 걸리는 시간 대신 남은 시간(오른쪽) 하나만
+      // 잠긴 까닭을 한 줄로(예전에는 단추 자리에 '논문 3편', '다른 연구 중'만)
       `${D.lock || full || run ? '' : shut ? `<br>논문 ${PP.deep[D.k]}편을 쓰면 열려요 (지금 ${fmt((S.pp && S.pp.n) || 0)}편)` : c ? `<br>${(RT5.list.find(x => x.k === c.k) || {}).nm || '다른'} 연구가 끝나면 할 수 있어요` : ''}</small></div>${btn}</div>`;
-    // 5.4.0.4: 내리지 않아도 보이게 위쪽에 '지금 연구 중' 칸(막대, 남은 시간, 단축권과 정수)과 고른 칸 설명, 그 아래 나무
+    // 내리지 않아도 보이게 위쪽에 '지금 연구 중' 칸(막대, 남은 시간, 단축권과 정수)과 고른 칸 설명, 그 아래 나무
     const C = c && RT5.list.find(x => x.k === c.k), CL = C ? rtLv(C.k) : 0;
     const now5 = C ? `<div class="rt-now"><span class="dp-ic">${IMG(C.ic) ? `<img src="${IMG(C.ic)}" alt="">` : ''}</span><div class="dp-tx"><b>지금 연구 중: ${C.nm} ${CL + 1}칸</b><small>끝나면 ${C.eff(CL + 1)}</small>${labSpeedHTML('rt', 0)}</div></div>` : '';
     // 지금 연구할 수 있는 가지(고르면 위 설명이 바뀌어요)
@@ -133,7 +133,7 @@
     setH($('#rxBody'), tab === 'tree' ? rtPart() : tab === 'ta' ? taPart() : tab === 'paper' ? ppPart() : rxPart(true));
     { const hd = $('#rxTitle').parentElement, u = tab === 'ta' && taOpen() ? IMG('ta_bg') : tab === 'paper' && ppOpen() ? IMG('conf_bg') : ''; hd.classList.toggle('art', !!u); hd.style.backgroundImage = u ? `url("${blobUrl(u)}")` : ''; }   // 조교 탭 머리 그림, 논문 탭은 학회장 그림
   }
-  /* ---------- 5.4.0.4 연구소 시간 줄이기 (woodani 2026-11-25 "연구소도 가속권이나 정수로 시간 단축이 똑같이 가능해야") ----------
+  /* ---------- 연구소 시간 줄이기 (2026-11-25 "연구소도 가속권이나 정수로 시간 단축이 똑같이 가능해야") ----------
      연구 트리 연구(rt), 논문 쓰기(pp), 조교 파견(ta:자리)에 공사와 같은 시간 단축권(자동 사용)과 숲의 정수 즉시 완료(conEssCost, 같은 값), 광고 5분권 받기
      막대와 남은 시간은 1초마다 그 자리만 바꿔요(창 전체를 다시 그리지 않아요) */
   function labJob(kind, i) {
@@ -196,7 +196,7 @@
       $$('#rxBody .rt-node.run').forEach(el => el.style.setProperty('--p', (labFrac('rt', 0) * 100).toFixed(1)));
     } catch (e) { /* 다음 번에 */ }
   }, 1000);
-  /* ---------- 조교 파견 (프로젝트 문서 ' 설계안 (조교 파견) 초안', : 숫자는 제안대로) ----------
+  /* ---------- 조교 파견 ----------
      조교 자리: 대학원생 조교를 캠퍼스 건물에 한 명씩 앉혀요. 앉아 있는 조교 한 명마다 수업료 +10%, 그 건물 가구 값 -10%
      모교 파견: 조교를 졸업한 학교(유치원~대학교)에 2, 4, 8시간 보내 숲의 정수와 추억 조각, 모교마다 다른 덤을 받아요. 파견 중에는 자리 효과가 꺼져요
      모교 기념비: 추억 조각 30, 80, 160개로 3단계. 단계마다 수업료 +3%, 3단계에 칭호 '모교의 자랑'. 졸업해도 남아요 */
@@ -216,7 +216,7 @@
   const taDue = () => !S || !S.ta ? [] : S.ta.out.filter(o => gameNow() >= o.end);
   const taB = () => facKeys().filter(k => S.f[k] >= 1);   // 앉힐 수 있는 건물: 지은 캠퍼스 건물
   function taSit(i, k) {
-    if (!taOpen() || i < 0 || i >= taSeats()) return false;   // 5.3.4.7: 파견 중에도 돌아와서 일할 자리를 정할 수 있어요(효과는 돌아온 뒤부터)
+    if (!taOpen() || i < 0 || i >= taSeats()) return false;   // 파견 중에도 돌아와서 일할 자리를 정할 수 있어요(효과는 돌아온 뒤부터)
     if (k && (!FAC[k] || !(S.f[k] >= 1))) return false;
     for (let j = 0; j < S.ta.seat.length; j++) if (j !== i && S.ta.seat[j] && S.ta.seat[j].b === k && k) S.ta.seat[j] = { b: '' };   // 한 건물에 한 명: 앉아 있던 조교는 비켜요
     while (S.ta.seat.length <= i) S.ta.seat.push({ b: '' });
@@ -261,7 +261,7 @@
     toast(`모교 기념비 ${S.ta.mon}단계!\n수업료 +${TA.monPct * S.ta.mon}%` + (S.ta.mon >= TA.mon.length ? `\n칭호 '모교의 자랑'을 받았어요` : ''));
     return true;
   }
-  /* ---------- 논문과 숲속 학회 (프로젝트 문서 ' 설계안 (논문과 숲속 학회) 초안', : 숫자는 제안대로, 대학원부터) ----------
+  /* ---------- 논문과 숲속 학회 ----------
      연구 자료: 하루 첫 자료 정리 1, 세미나 3, 조교 파견 4시간 1과 8시간 2, 연구 트리 칸 2, 심화 탐험 큰 장난꾸러기 처음 넘기 1
      논문: 주제(연구 트리 가지)를 골라 자료 3개로 4시간. 점수 = 10 + 그 가지 칸 수 × 5, 한 학회에서 같은 주제 3편째부터 절반. 다 쓰면 정수 10
      숲속 학회: 4주(주간 리그 4주)마다. 그 학회에 쓴 논문 점수를 더하고, 끝나면 100점 동, 300점 은, 600점 금메달. 서버 랭킹 cf(점수), cq(학회 × 1,000,000 + 점수)
@@ -282,9 +282,9 @@
   const ppLeft = () => { const end = Date.UTC(2026, 0, 5) + (ppPer() + 1) * PP.weeks * 604800000 - KST_MS; return Math.max(0, Math.ceil((end - gameNow()) / 86400000)); };
   const rtMax = k => (S && S.pp && S.pp.n >= (PP.deep[k] || Infinity)) ? RT5.top : RT5.max;   // 심화 칸이 열린 가지는 다섯 칸
   const ppMedOf = v => PP.med.reduce((a, m, i) => v >= m.at ? i + 1 : a, 0);
-  // 학회 메달 그림(작업지시서 100, conf_med_1~3). 그림이 없으면 이모지
+  // 학회 메달 그림(conf_med_1~3). 그림이 없으면 이모지
   const ppMedIc = (m, px) => { const u = IMG('conf_med_' + m); return u ? `<img class="pp-med" src="${u}" alt="" style="width:${px || 24}px;height:${px || 24}px;object-fit:contain;vertical-align:middle">` : PP.med[m - 1].ic; };
-  // 칭호 덤 장식(설계안 5절, 작업지시서 100): 세미나 10번, 20번, 논문 30편, 마을 기부 20단계. 얻으면 꾸미기 장식으로 지도에 놓아요(힘 없음)
+  // 칭호 덤 장식: 세미나 10번, 20번, 논문 30편, 마을 기부 20단계. 얻으면 꾸미기 장식으로 지도에 놓아요(힘 없음)
   const PP_DECO = [['deco_pp_board', () => !!S.pp && S.pp.sem >= 10], ['deco_pp_chair', () => !!S.pp && S.pp.sem >= 20], ['deco_pp_tower', () => !!S.pp && S.pp.n >= 30], ['deco_vd20', () => !!S.vd && S.vd.lv >= 20]];
   function ppDecoSync() {
     const got = []; if (!S || !S.deco || !S.deco.own) return got;
@@ -349,7 +349,7 @@
     ppSync();
     const P = S.pp, c = P.cur, now = gameNow(), m = ppMedOf(P.cf), nx = PP.med[m], u = IMG('ic_rdata'), up = IMG('ic_paper'), dayDone = P.day === gameToday();
     const nextDeep = RT5.list.filter(D => P.n < PP.deep[D.k]).sort((a, b) => PP.deep[a.k] - PP.deep[b.k])[0];
-    // 5.4.0.4 가독성: 학회 점수 막대(다음 메달까지), 논문 책상(쓰는 중이면 막대와 단축권, 아니면 안내), 연구 자료는 짧게
+    // 가독성: 학회 점수 막대(다음 메달까지), 논문 책상(쓰는 중이면 막대와 단축권, 아니면 안내), 연구 자료는 짧게
     const prevAt = m ? PP.med[m - 1].at : 0, medF = nx ? Math.max(0, Math.min(1, (P.cf - prevAt) / Math.max(1, nx.at - prevAt))) : 1;
     let h = `<div class="pp-conf"><div class="pp-conf-h"><b>이번 숲속 학회 ${fmt(P.cf)}점</b><span>${ppLeft()}일 남음</span></div>` +
       `<div class="pp-med">${m ? `${ppMedIc(m, 20)}<small>${PP.med[m - 1].nm}</small>` : '<small>메달 없음</small>'}<div class="lab-bar gold"><i style="width:${(medF * 100).toFixed(1)}%"></i></div>${nx ? `${ppMedIc(m + 1, 20)}<small>${nx.at}점 ${nx.nm}</small>` : '<small>모든 메달</small>'}</div></div>`;
@@ -373,7 +373,7 @@
   function taPart() {
     if (!taOpen()) return '<p class="fine">조교는 석사 2학기에 열려요.</p>';
     const now = gameNow(), n = taSeats(), memIc = IMG('ic_ta_mem') ? `<img class="ta-mem" src="${IMG('ic_ta_mem')}" alt="">` : '💠';
-    const mul = rtLv('ta') >= 5 ? 1.5 : rtLv('ta') >= 4 ? 1.25 : 1, hr = Math.max(0, Math.min(2, rt.taHr | 0));   // 5.3.4.6: 받을 때(taClaim)와 같은 배수
+    const mul = rtLv('ta') >= 5 ? 1.5 : rtLv('ta') >= 4 ? 1.25 : 1, hr = Math.max(0, Math.min(2, rt.taHr | 0));   // 받을 때(taClaim)와 같은 배수
     let h = `<p class="fine ta-info">일하는 조교 한 명마다<br><b>수업료 +${TA.pct}%</b>, 그 건물 <b>가구 값 -${TA.fur}%</b><br>파견 가면 숲의 정수와 추억 조각을 가져와요<br>파견 중에는 자리 효과가 꺼져요</p><div class="dp-list">`;
     for (let i = 0; i < n; i++) {
       const x = S.ta.seat[i] || { b: '' }, o = S.ta.out.find(y => y.i === i), w = taWho(i), u = IMG('chr_ta_' + w) || IMG('chr_' + w);
@@ -382,7 +382,7 @@
       const btn = o ? (now >= o.end ? `<button class="cta small" type="button" data-ta="claim">받기</button>` : `<button class="btn-sub small" type="button" data-ta="pick:${i}">자리 정하기</button><span class="fe-lock">파견 중</span>`)
         : `<button class="btn-sub small" type="button" data-ta="pick:${i}">자리 정하기</button><button class="cta small" type="button" data-ta="go:${i}">파견</button>`;
       h += `<div class="dp-row"><span class="dp-ic">${u ? `<img src="${u}" alt="">` : ''}</span><div class="dp-tx"><b>${TA.whoNm[w]} 조교</b><small>${st}${seatTx}</small></div><span class="ta-btns">${btn}</span></div>`;
-      if (o && now < o.end) h += `<div class="ta-sp">${labSpeedHTML('ta', i)}</div>`;   // 5.4.0.4 파견 시간 줄이기
+      if (o && now < o.end) h += `<div class="ta-sp">${labSpeedHTML('ta', i)}</div>`;   // 파견 시간 줄이기
       if (rt.taPick === i) h += '<div class="ta-pick">' + taB().map(k => `<button class="${x.b === k ? 'cta' : 'btn-sub'} small" type="button" data-ta="sit:${i}:${k}">${FAC[k].name}</button>`).join('') + (x.b ? `<button class="btn-sub small" type="button" data-ta="sit:${i}:">비우기</button>` : '') + '</div>';
       if (rt.taGo === i && !o) h += '<div class="ta-go"><p class="ta-go-h">1. 얼마나 다녀올까요?</p><div class="ta-hrs">'
         + TA.hrs.map((_, k) => `<button class="ta-hr${k === hr ? ' on' : ''}" type="button" data-ta="hr:${i}:${k}" aria-pressed="${k === hr}"><b>${rtHrs(taSec(k))}</b><small>정수 ${Math.round(TA.ess[k] * mul)}<br>추억 조각 ${Math.round(TA.mem[k] * mul)}</small></button>`).join('')
@@ -515,7 +515,7 @@
   const fmtN = n => { const t = fmt(n); return /[0-9]$/.test(t) ? t + '개' : t; };   // '1,200자개'처럼 단위 뒤 '개'를 빼요
   function fmt(n) {
     n = Math.floor(n + 1e-9);
-    if (!isFinite(n)) return '0';   // 보안 점검(1-9): NaN, 무한대는 0으로 보여 줘요
+    if (!isFinite(n)) return '0';   // NaN, 무한대는 0으로 보여 줘요
     if (S && S.units === 'en') return fmtEn(n);
     if (n < 10000) return n.toLocaleString('ko-KR');
     const U = [['극', 1e48], ['재', 1e44], ['정', 1e40], ['간', 1e36], ['구', 1e32], ['양', 1e28], ['자', 1e24], ['해', 1e20], ['경', 1e16], ['조', 1e12], ['억', 1e8], ['만', 1e4]];

@@ -7,22 +7,22 @@
        forest/stats/<내 id>  테스트 현황 (어디까지 했는지, 얼마나 했는지)
      <내 id>는 Firebase 익명 로그인이 기기(브라우저)마다 만들어 줘요. */
   const VERSION = '5.4.0.4';
-  const NT_QUIET = ['5.4.0.4', '5.4.0.3', '5.4.0.2', '5.4.0.1', '5.3.4.8', '5.3.4.7', '5.3.4.6', '5.3.4.5', '5.3.4.4', '5.3.4.3', '5.3.4.2', '5.3.4.1', '5.3.4', '5.3.2.1', '5.3.0.3', '5.3.0.2', '5.3.0.1', '5.2.2', '5.2.1', '5.2.0.2', '5.2.0.1', '5.1.1.3', '5.1.1.2', '5.1.1.1', '5.1.1', '5.0.3.1', '5.0.3', '5.0.2.2', '5.0.2.1', '2.1.20', '2.1.2.2', '2.3.0.1', '2.3.4', '3.2.3', '3.2.4', '3.2.5', '3.3.1', '3.3.2', '3.3.3', '4.4.1.1', '4.4.1.2', '4.4.1.3', '4.4.1.4', '5.0.1.1', '5.0.1.2', '5.0.1.3', '5.0.1.4', '5.0.1.5', '5.0.1.6', '5.0.1.7', '5.0.1.8'];   // 생물 탐사 고침은 공지 없이. 도 공지 없이(공지 줄은 정하면 넣어요). 공지 없이. 공지 줄은 woodani가 정할 때까지 조용히. 공지는 2026-11-16 woodani가 정해서 NOTICES로 옮겼어요. 은 공지를 띄워요. 도 공지 없이. 도 공지 창 없이. 도 공지 창 없이(공지는 그대로). 도 조용히. 도 공지 창 없이(공지 줄을 고르지 않음)
+  const NT_QUIET = ['5.4.0.4', '5.4.0.3', '5.4.0.2', '5.4.0.1', '5.3.4.8', '5.3.4.7', '5.3.4.6', '5.3.4.5', '5.3.4.4', '5.3.4.3', '5.3.4.2', '5.3.4.1', '5.3.4', '5.3.2.1', '5.3.0.3', '5.3.0.2', '5.3.0.1', '5.2.2', '5.2.1', '5.2.0.2', '5.2.0.1', '5.1.1.3', '5.1.1.2', '5.1.1.1', '5.1.1', '5.0.3.1', '5.0.3', '5.0.2.2', '5.0.2.1', '2.1.20', '2.1.2.2', '2.3.0.1', '2.3.4', '3.2.3', '3.2.4', '3.2.5', '3.3.1', '3.3.2', '3.3.3', '4.4.1.1', '4.4.1.2', '4.4.1.3', '4.4.1.4', '5.0.1.1', '5.0.1.2', '5.0.1.3', '5.0.1.4', '5.0.1.5', '5.0.1.6', '5.0.1.7', '5.0.1.8'];   // 생물 탐사 고침은 공지 없이. 도 공지 없이(공지 줄은 정하면 넣어요). 공지 없이. 공지 줄은 정할 때까지 조용히. 공지는 가 정해서 NOTICES로 옮겼어요. 은 공지를 띄워요. 도 공지 없이. 도 공지 창 없이. 도 공지 창 없이(공지는 그대로). 도 조용히. 도 공지 창 없이(공지 줄을 고르지 않음)
     // 이 버전들은 업데이트해도 공지 창을 띄우지 않아요(공지는 그대로)
   /* 공지사항 (은 이미 올려서 부터): 설정 > 공지사항. 맨 위가 가장 새 공지예요
-     패치노트는 자동으로 넣지 않아요. woodani가 검수한 글만 여기에 적어요(CHANGELOG.md는 자세한 기록용이라 따로 있어요)
+     패치노트는 자동으로 넣지 않아요. 검수한 글만 여기에 적어요(CHANGELOG.md는 자세한 기록용이라 따로 있어요)
      접속하면 새 공지 창을 띄워요(올라온 뒤 7일 동안, '일주일간 열지 않기'를 누르면 7일 쉬어요). 업데이트한 뒤 첫 접속에는 쉬는 중이어도 한 번 띄워요 */
   const NOTICES = [
     // 공지(고른 네 줄). 웹 5.3.4.1~5.3.4.8(사진첩, 오늘의 손님, 생물 도감 150종, 고침)을 앱으로 묶음
     { id: '2026-11-23-v540', date: '2026-11-23', tag: '업데이트', title: '5.4.0 업데이트',
       lines: ['오늘의 손님 업데이트', '생물 도감 60종 추가', '사진첩과 계절 사진 미션 추가', '편의 개선과 오류 수정'] },
-    // 공지(짧게, woodani 고름). 5.3.2.1 웹 고침, 누르는 곳과 받기, 상점 새 진열과 값 조정, 이달의 꾸미기를 앱으로 묶음
+    // 공지(짧게). 웹 고침, 누르는 곳과 받기, 상점 새 진열과 값 조정, 이달의 꾸미기를 앱으로 묶음
     { id: '2026-11-22-v533', date: '2026-11-22', tag: '업데이트', title: '5.3.3 업데이트',
       lines: ['새 상점 진열과 편의 개선'] },
-    // 공지(고른 두 줄). 5.3.2 웹 5.3.1.1과 빨간 점, 처음 안내를 앱으로 묶음
+    // 공지(고른 두 줄). 웹 5.3.1.1과 빨간 점, 처음 안내를 앱으로 묶음
     { id: '2026-11-22-v532', date: '2026-11-22', tag: '업데이트', title: '5.3.2 업데이트',
       lines: ['도감 모두 쓰다듬기 추가', '편의 개선과 오류 수정'] },
-    // 공지(고른 세 줄). 5.3.1 살아 있는 숲속 마을
+    // 공지(고른 세 줄). 살아 있는 숲속 마을
     { id: '2026-11-21-v531', date: '2026-11-21', tag: '업데이트', title: '5.3.1 업데이트',
       lines: ['살아 있는 숲속 마을 업데이트', '자연 소리와 사진 모드 추가', '편의 개선과 오류 수정'] },
     // 공지(한 줄). 웹 5.2.0.1~5.3.0.3을 앱으로 묶음
@@ -105,7 +105,7 @@
     // 공지(B안 세 줄)
     { id: '2026-10-31-v231', date: '2026-10-31', tag: '업데이트', title: '2.3.1 업데이트',
       lines: ['뱀과 매 침입자 액션 추가', '숲속 퍼즐과 숲속 합치기 보상 개선', '오류 수정과 화면 다듬기'] },
-    // 공지(B안 다섯 줄). 부터는 실제 날짜. 그 앞 공지 날짜는 업데이트 간격이 너무 가까워 보여서 woodani 요청으로 3~5일 간격으로 고쳐 적었어요(id는 그대로라 다시 뜨지 않아요)
+    // 공지(B안 다섯 줄). 부터는 실제 날짜. 그 앞 공지 날짜는 업데이트 간격이 너무 가까워 보여서 으로 3~5일 간격으로 고쳐 적었어요(id는 그대로라 다시 뜨지 않아요)
     { id: '2026-10-30-v230', date: '2026-10-30', tag: '업데이트', title: '2.3.0 업데이트',
       lines: ['졸업식 장면 새 단장', '새 선생님 3명 추가 (고니 국어, 공작 미술, 알파카 매점)', '숲의 정수로 공사 즉시 완료 추가', '건물 공사 시간 단축', '원할 때 쓰는 즉시 완공 단추 추가', '오류 수정과 안정성 개선'] },
     { id: '2026-10-30-v220', date: '2026-10-30', tag: '업데이트', title: '2.2.0 업데이트',
@@ -138,7 +138,7 @@
     $('#ntList').innerHTML = NOTICES.map((n, i) => `<details class="nt-item"${i === 0 ? ' open' : ''}><summary><span class="nt-tag">${esc(n.tag)}</span><b>${esc(n.title)}</b><small>${n.date.replace(/-/g, '.')}</small></summary>` +
       `<div class="nt-body">${n.tag === '업데이트' ? `<ol>${n.lines.map(l => `<li>${esc(l)}</li>`).join('')}</ol>` : n.lines.map(l => `<p>${esc(l)}</p>`).join('')}</div></details>`).join('') || '<p class="fine">아직 공지가 없어요</p>';
     $('#ntHide').hidden = !auto;
-    const hd = IMG('notice_head'), he = $('#ntHead');   // 공지 창 맨 위 그림(작업지시서 23)
+    const hd = IMG('notice_head'), he = $('#ntHead');   // 공지 창 맨 위 그림
     he.classList.toggle('has-img', !!hd); he.style.backgroundImage = hd ? `url("${hd}")` : '';
   }
   function openNotice(auto) {
@@ -150,7 +150,7 @@
   }
   function renderNoticeDot() {
     const d = $('#ntDot'); if (d) d.hidden = !ntUnread();
-    const ic = $('#ntIc'), u = IMG('ic_notice'); if (ic && u && !ic.src) { ic.src = u; ic.hidden = false; }   // 설정 줄 아이콘(작업지시서 23)
+    const ic = $('#ntIc'), u = IMG('ic_notice'); if (ic && u && !ic.src) { ic.src = u; ic.hidden = false; }   // 설정 줄 아이콘
   }
   // 접속할 때: 업데이트한 뒤 첫 접속이면 한 번, 아니면 최근 공지가 있고 쉬는 중이 아닐 때. 새 공지가 올라오면 쉬기도 풀려요
   function noticeWant() {
@@ -331,7 +331,7 @@
     if (!Cloud.bootHadSave) return performance.now() < 10 * 60000;
     // 이 기기 저장 시각이 서버 시간보다 1분 넘게 미래면(기기 시계가 앞서 있었어요) 믿지 않고 서버 학교를 불러와요
     if (serverTimeOk() && (Cloud.bootSavedAt || 0) > gameNow() + 60000) return at > 0;
-    return at > (Cloud.bootSavedAt || 0) + 5000;   // 보안 점검(1-1): 켠 뒤 이 기기에서 저장한 시각이 아니라 켤 때 저장 시각과 비교해요
+    return at > (Cloud.bootSavedAt || 0) + 5000;   // 켠 뒤 이 기기에서 저장한 시각이 아니라 켤 때 저장 시각과 비교해요
   }
   /* ---------- 저장 안전 장치 ----------
      계정 하나에 서버 저장이 한 칸이라, 다른 기기의 옛 학교(초등 4학년 2학기)가 중학교 3학년 학교를 묻지 않고 덮은 일이 있었어요
@@ -490,7 +490,7 @@
     if (!hasCloudBuild() || Cloud.state !== 'error') return;
     if (Cloud.err === 'load' && !window.firebase && typeof window.FOREST_LOAD === 'function') window.FOREST_FB = window.FOREST_LOAD();
     Cloud.state = 'idle';
-    Cloud.bootSavedAt = S.savedAt;   // 5.3.4.6: 켠 뒤 이 기기에서 놀았으면 서버 학교와 견줄 때 묻게(켤 때 값으로 견주면 묻지 않고 서버 학교로 바뀌었어요)
+    Cloud.bootSavedAt = S.savedAt;   // 켠 뒤 이 기기에서 놀았으면 서버 학교와 견줄 때 묻게(켤 때 값으로 견주면 묻지 않고 서버 학교로 바뀌었어요)
     renderCloudInfo();
     resetRank();
     if (rt.tab === 'rank') initRank(); else renderRankPanel();
@@ -593,7 +593,7 @@
       gold: S.gold, gearn: S.st.gold, gspent: S.st.gspent, cos: S.cos.own.length,
       dev: !!S.u.dev, v: VERSION, env: /KAKAOTALK/i.test(ua) ? 'kakao' : (navigator.maxTouchPoints > 0 ? 'mobile' : 'pc'),
       adsT: S.adx && S.adx.day === gameToday() ? (S.adx.all || 0) : 0, adsD: gameToday(),   // 관리자 지표에 오늘 본 광고 수(서버 규칙 adsT, adsD)
-      use: useStr()   // 5.4.0.3 놀이 기록(서버 규칙 use가 게시되기 전에는 빼고 올려요)
+      use: useStr()   // 놀이 기록(서버 규칙 use가 게시되기 전에는 빼고 올려요)
     };
   }
   function agoText(t) {
@@ -698,7 +698,7 @@
         // 지우기 전에 올리기부터 멈춰요(지운 칸에 옛 계정 저장이 다시 올라가지 않게). 하던 올리기는 3초까지 기다려요
         Cloud.gen += 1; rt.adopting = true; clearTimeout(Cloud.timer);
         for (let i = 0; i < 30 && Cloud.pushing; i++) await new Promise(r => setTimeout(r, 100));
-        try { await delServer(old); } catch (er) { /* 무시 */ }   // 예전 학교 칸과 공개 모습까지 서버 칸 여섯 곳을 모두 지워요. 보안 점검(2-12): 다시 못 쓰는 옛 익명 계정의 저장도 지워요(이 학교는 local로 가져가요)
+        try { await delServer(old); } catch (er) { /* 무시 */ }   // 예전 학교 칸과 공개 모습까지 서버 칸 여섯 곳을 모두 지워요. 다시 못 쓰는 옛 익명 계정의 저장도 지워요(이 학교는 local로 가져가요)
         let u = null;
         try { u = (await auth.signInWithCredential(cred)).user; }
         catch (er) { rt.adopting = false; Cloud.dirty = true; save(); cloudPush(true); throw er; }   // 들어가지 못했으면 지금 계정으로 다시 저장해요
@@ -722,7 +722,7 @@
      이 기기 저장을 비우지 않으면 새 계정에 같은 학교가 또 올라가서 랭킹에 같은 학교가 둘 생겨요 */
   const inAppBrowser = () => /KAKAOTALK|NAVER|Instagram|FBAN|FBAV|Line\//i.test(navigator.userAgent || '');
   async function acctSaveFirst() {
-    // 5.3.4.4: 서버 연결을 쉬던 중(netSleep)이면 깨우고, 서버 확인(cloudVerify)이 끝난 뒤에 올려요. 전에는 확인을 기다리지 않아 '저장하지 못했어요'가 떴어요
+    // 서버 연결을 쉬던 중(netSleep)이면 깨우고, 서버 확인(cloudVerify)이 끝난 뒤에 올려요. 전에는 확인을 기다리지 않아 '저장하지 못했어요'가 떴어요
     const until = async (f, n) => { for (let i = 0; i < n && f(); i++) await new Promise(r => setTimeout(r, 150)); };
     if (Cloud.asleep) netWake();
     if (!Cloud.fresh && !Cloud.verifying) cloudVerify();
@@ -896,7 +896,7 @@
     const today = rows.filter(r => now - r.seen < 86400000).length;
     const avg = rows.length ? rows.reduce((t, r) => t + r.play, 0) / rows.length : 0;
     sum.textContent = rows.length ? `테스터 ${rows.length}명, 하루 안에 들어온 사람 ${today}명, 평균 플레이 ${playText(avg)}` : '아직 기록이 없어요';
-    const us = useSumText(rows); if (us) sum.textContent += '\n' + us;   // 5.4.0.3 놀이 기록 모아 보기
+    const us = useSumText(rows); if (us) sum.textContent += '\n' + us;   // 놀이 기록 모아 보기
 
     list.textContent = '';
     rows.forEach(r => {

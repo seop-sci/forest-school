@@ -56,7 +56,7 @@
   function budgetTpl(n) {
     const t = fmt2(n);
     if (!/[만억조경해자양구간정재극]/.test(t)) return t.replace(/[0-9]/g, '8');
-    const m = t.match(/^([0-9,]+)([만억조경해자양구간정재극])/); if (!m) return t;   // 5.3.4.4: fmt2와 같은 단위(구 10^32부터 빠져 글씨 크기가 흔들렸어요)
+    const m = t.match(/^([0-9,]+)([만억조경해자양구간정재극])/); if (!m) return t;   // fmt2와 같은 단위(구 10^32부터 빠져 글씨 크기가 흔들렸어요)
     const U = ['극', '재', '정', '간', '구', '양', '자', '해', '경', '조', '억', '만'], i = U.indexOf(m[2]), u2 = i + 1 < U.length ? U[i + 1] : '';
     return m[1].replace(/[0-9]/g, '8') + m[2] + (u2 ? ' 8888' + u2 : '');
   }

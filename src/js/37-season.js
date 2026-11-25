@@ -176,7 +176,7 @@
   }
   VD.titles.push({ id: 'alma', title: '모교의 자랑', got: d => !!(d && d.ta && d.ta.mon >= 3) });   // 모교 기념비 3단계
   VD.titles.push({ id: 'biodoc', title: '숲속 박사', got: d => !!(d && d.bx && d.bx.g >= 5) });   // 생물 90종
-  VD.titles.push({ id: 'bioall', title: '생물 도감 완성', got: d => !!(d && d.bx && d.bx.g >= 7) });   // 5.4.0.3 생물 150종
+  VD.titles.push({ id: 'bioall', title: '생물 도감 완성', got: d => !!(d && d.bx && d.bx.g >= 7) });   // 생물 150종
   VD.titles.push({ id: 'psnew', title: '패스 새내기', got: d => !!(d && d.ps && d.ps.badge >= 1) });   // 패스 10단계 첫 배지
   VD.titles.push({ id: 'seasonking', title: '숲속 시즌 왕', got: d => !!(d && d.rs && d.rs.king >= 1) }, { id: 'fourseason', title: '사계절 교장', got: d => !!(d && d.deco && d.deco.own && ['winter', 'spring', 'summer', 'autumn'].every(q => d.deco.own['rs_' + q])) });   // 랭킹 시즌
   /* ===== 숲속 패스 END ===== */

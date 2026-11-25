@@ -3,8 +3,8 @@
      광고마다 1개(3.0.0 조정안 3, 예전 3개. 5.3.3부터 상점 광고와 따로 하루 3번), 어려운 퀘스트와 출석 등의 보상은 각각 정해진 양을 줘요.
      쓰는 곳은 꾸미기와 테마 세트(계속 남아요), 부스터(1회 사용 가능). 뽑기 없이 정해진 값으로만 팔아요.
      토스 미니앱에서는 광고 그룹의 보상 이름을 '황금 도토리', 수량을 3으로 맞춰 두면 광고 화면에도 똑같이 보여요. */
-  const GOLD = { hard: 1, adDay: 3, ad: 1, shopAd: 3, shopAdN: 3, att: 1, att7: 1, chapter: 1, grad: 1, promote: 1, rich: 60, essPer: 10 };   // 5.3.3 woodani: 60개 뒤 바뀌는 정수 20 → 10. 광고 황금은 일반 광고(adDay)와 상점 광고(shopAd)를 따로 세요
-  // 지금까지 받은 황금 도토리가 60개(테마를 체험할 만큼)를 넘으면, 매일 매주 되풀이해 나오는 곳은 황금 도토리 1개 대신 숲의 정수 10(5.3.3 전에는 20)을 줘요
+  const GOLD = { hard: 1, adDay: 3, ad: 1, shopAd: 3, shopAdN: 3, att: 1, att7: 1, chapter: 1, grad: 1, promote: 1, rich: 60, essPer: 10 };   // 60개 뒤 바뀌는 정수 20 → 10. 광고 황금은 일반 광고(adDay)와 상점 광고(shopAd)를 따로 세요
+  // 지금까지 받은 황금 도토리가 60개(테마를 체험할 만큼)를 넘으면, 매일 매주 되풀이해 나오는 곳은 황금 도토리 1개 대신 숲의 정수 10(전에는 20)을 줘요
   // 광고, 상점 광고, 축제와 대축제 도장판, 이벤트 기념 상자, 장 끝, 졸업, 학교급 올라가기, 마을 기부, 한 번만 나오는 보상은 그대로예요
   const goldRich = () => !!S && (S.st.gold || 0) >= GOLD.rich;
   function goldOr(n, why) {
@@ -22,8 +22,8 @@
     bucket: '<path d="M-5 -3.8 L-4.4 -9 Q0 -10.4 4.4 -9 L5 -3.8 Z" class="h-bucket"/><path d="M-8.4 -3.4 Q0 -5.6 8.4 -3.4 Q0 -1.4 -8.4 -3.4 Z" class="h-bucket2"/>',
     flower: '<path d="M-5.8 -2.8 Q0 -9 5.8 -2.8" class="s-band"/><circle cx="-3.4" cy="-6.3" r="1.7" class="h-fl"/><circle cx="0" cy="-7.4" r="1.9" class="h-fl"/><circle cx="3.4" cy="-6.3" r="1.7" class="h-fl"/><circle cx="0" cy="-7.4" r="0.8" class="h-fl2"/>'
   };
-  // 그림 모자(cos_hat_*): 작업지시서 3의 자리 안내(512칸, 아랫단 가운데가 y 360)에 맞춰 머리 위에 올려요
-  const hatSVG = id => (HATS[id] && IMG('cos_hat_' + id) ? `<image href="${IMG('cos_hat_' + id)}" x="-8" y="-17.6" width="16" height="16"/>` : '') || HATS[id] ||   // 그림 모자(작업지시서 52)
+  // 그림 모자(cos_hat_*): 자리 안내(512칸, 아랫단 가운데가 y 360)에 맞춰 머리 위에 올려요
+  const hatSVG = id => (HATS[id] && IMG('cos_hat_' + id) ? `<image href="${IMG('cos_hat_' + id)}" x="-8" y="-17.6" width="16" height="16"/>` : '') || HATS[id] ||   // 그림 모자
     (IMG('cos_hat_' + id) ? `<image href="${IMG('cos_hat_' + id)}" x="-11.2" y="-18.75" width="22.4" height="22.4"/>` : '');
   const NECKS = {
     scarf: '<path d="M-4.8 5 Q0 7.2 4.8 5 L4.8 7 Q0 9.2 -4.8 7 Z" class="n-scarf"/><rect x="1.6" y="6.6" width="2.4" height="4.6" rx="1" class="n-scarf2"/>',
@@ -52,7 +52,7 @@
   };
   /* 꾸미기 백화점 값(속도와 경제 재설계안 3절, Fable). 황금 도토리는 큰 꾸미기에만 써요(힘은 사지 않아요)
      테마 세트는 한 번에만 사요(이미 그 테마 배경을 샀으면 10 빼요). 옷 세트는 이미 산 조각의 옛 값만큼 빼요 */
-  const ASK_GOLD = 30;   // 5.3.3 이 값 이상인 황금 품목만 사기 전에 한 번 더 물어요(docs/SHOP-2026-11.md)
+  const ASK_GOLD = 30;   // 이 값 이상인 황금 품목만 사기 전에 한 번 더 물어요(docs/SHOP-2026-11.md)
   const GSHOP = { theme: 60, themeBgOff: 10, outfit: 25, outfitMin: 5, evDeco: 20, mark: 30 };
   const OUTFITS = [
     { id: 'ball', name: '야구 소년', hat: 'cap', neck: 'bandana' }, { id: 'snow', name: '겨울 산책', hat: 'beanie', neck: 'scarf' },
@@ -72,14 +72,14 @@
     star: '<path d="M14 6 l3 7 7 1 -5 5 1.5 7 -6.5 -3.5 -6.5 3.5 1.5 -7 -5 -5 7 -1z" fill="#F2C230"/><path d="M86 6 l3 7 7 1 -5 5 1.5 7 -6.5 -3.5 -6.5 3.5 1.5 -7 -5 -5 7 -1z" fill="#F2C230"/><path d="M86 74 l2 4.6 4.6 .6 -3.4 3.2 1 4.6 -4.2 -2.3 -4.2 2.3 1 -4.6 -3.4 -3.2 4.6 -.6z" fill="#FFE38A"/>'
   };
   const NIGHT_KEY = 'night:map';   // 밤 모드(문방구, 숲의 정수) 소유 열쇠
-  // 이벤트 한정 학생 모자(작업지시서 27): 그 이벤트 도장 7개를 다 모으면 받아요. 상점에서는 팔지 않고 받은 뒤에만 보여요. 그림(cos_hat_ev_*)이 들어오기 전에는 나오지 않아요
+  // 이벤트 한정 학생 모자: 그 이벤트 도장 7개를 다 모으면 받아요. 상점에서는 팔지 않고 받은 뒤에만 보여요. 그림(cos_hat_ev_*)이 들어오기 전에는 나오지 않아요
   const EV_HAT = [['harvest', '도토리 모자'], ['friends', '무지개 리본 머리띠'], ['books', '책 핀 베레모'], ['lunch', '요리사 모자'], ['exam', '응원 머리띠'], ['xmas', '루돌프 머리띠'],
     ['newyear', '해님 머리띠'], ['winter1', '하늘색 귀마개'], ['winter2', '눈송이 털모자'], ['seollal', '조바위'], ['grad', '꽃 화관'], ['spring', '벚꽃 머리핀'], ['trip_spring', '노란 소풍 모자'],
     ['science', '실험 고글'], ['children', '바람개비 모자'], ['buddha', '연꽃 머리 장식'], ['final', '연필 머리띠'], ['vacation', '물안경'], ['liberation', '무궁화 머리핀'],
     ['fall', '해바라기 모자'], ['chuseok', '보름달 머리띠'], ['hangul', '꼬마 갓'], ['trip_fall', '단풍 베레모']];
   for (const [k, name] of EV_HAT) COS.hat.items.push({ id: 'ev_' + k, name, price: 0, evh: 1, img: 1 });
-  /* 5.3.3 이달의 꾸미기(docs/SHOP-2026-11.md 4.4, 작업지시서 108): 달마다 깃발, 교문 아치, 학생 모자. 황금 도토리로 사고 힘은 없어요.
-     그달에는 백화점 '이달의 꾸미기'에, 지난 달 것은 '놓친 장식'에 같은 값으로 나와요(woodani). start 달부터 세요 */
+  /* 이달의 꾸미기(docs/SHOP-2026-11.md 4.4): 달마다 깃발, 교문 아치, 학생 모자. 황금 도토리로 사고 힘은 없어요.
+     그달에는 백화점 '이달의 꾸미기'에, 지난 달 것은 '놓친 장식'에 같은 값으로 나와요. start 달부터 세요 */
   const GMON = { flag: 20, gate: 30, hat: 25, start: '2026-11',
     nm: [['새해 해돋이 깃발', '복주머니 아치', '털 방울 비니'], ['하트 잎 깃발', '연 날리는 아치', '색동 귀마개'], ['새싹 깃발', '입학 꽃 아치', '새싹 머리띠'],
       ['벚꽃 깃발', '벚꽃 아치', '꽃잎 화관'], ['카네이션 깃발', '바람개비 아치', '소풍 밀짚모자'], ['수국 깃발', '장미 덩굴 아치', '우비 모자'],
@@ -92,10 +92,10 @@
   MARKX.forEach(([x]) => COS_IDS.add('mkx:' + x)); COS_IDS.add(NIGHT_KEY);
   const SP_IDS = new Set(['aquarium', 'cake', 'globelamp', 'dino', 'carousel'].map(id => 'sp:' + id));   // 특별 가구(정수 상점) 소유 열쇠
   /* 테마 세트: 테마마다 배경, 교실, 급식실, 도서관, 과학실, 운동장을 따로 사서 꾸며요
-     여섯 개를 모두 모으면 세트 효과로 수업료가 올라요. 조정안 3: 모든 세트가 같은 값이라 효과도 세트마다 +3%, 일곱 벌 모두 +21%예요(세트마다 더해져요)
+     여섯 개를 모두 모으면 세트 효과로 수업료가 올라요. : 모든 세트가 같은 값이라 효과도 세트마다 +3%, 일곱 벌 모두 +21%예요(세트마다 더해져요)
      색은 건물 그룹에 CSS 변수로 덮어쓰고, 처마에는 테마 장식(가랜드, 전구, 고드름)을 달아요 */
   const TH_SLOTS = [['bg', '배경'], ['classroom', '교실'], ['cafeteria', '급식실'], ['library', '도서관'], ['science', '과학실'], ['playground', '운동장']];
-  const TH_SET_PER = 3;   // 조정안 3: 완성한 세트 하나의 수업료 효과(%). 예전에는 가장 비싼 세트 +30%, 합계 +162%
+  const TH_SET_PER = 3;   // 완성한 세트 하나의 수업료 효과(%). 예전에는 가장 비싼 세트 +30%, 합계 +162%
   const THEMES = [
     { id: 'spring', page: '#F3DDE4', board: '#5A3846', boardLine: '#74495B', name: '봄 벚꽃', price: 10, bgPrice: 15, fx: 'petal', motif: 'flowers', deco: ['#F5B3C6', '#FFFFFF', '#E796AE'],
       bg: { '--grass': '#D3E6B2', '--grass-deep': '#C1DA9A', '--leaf-1': '#F2B8C9', '--leaf-2': '#E89BB3', '--leaf-3': '#F7D3DE', '--path': '#F2E4CC' },
@@ -195,7 +195,7 @@
     setMapArt(); setSeasonArt();   // 테마 지도와 겨울 건물, 계절 참나무
     const dz = $('#thDeco');
     if (dz) {
-      const tint = bgT && (has170(`${geo().map}_${bgT.id}`) || MAP_FILES.has(`${geo().map}_${bgT.id}`)) ? null :   /* 파일로만 있는 테마 지도(대학교)도 덮는 색을 꺼요 */ { space: ['#1B1F45', 0.45], retro: ['#B98A3E', 0.22] }[bgT && bgT.id];   // 작업지시서 46: 테마 지도 그림이 있으면 덮는 색을 꺼요(은 그림 위에 또 덮었어요)
+      const tint = bgT && (has170(`${geo().map}_${bgT.id}`) || MAP_FILES.has(`${geo().map}_${bgT.id}`)) ? null :   /* 파일로만 있는 테마 지도(대학교)도 덮는 색을 꺼요 */ { space: ['#1B1F45', 0.45], retro: ['#B98A3E', 0.22] }[bgT && bgT.id];   // 테마 지도 그림이 있으면 덮는 색을 꺼요(은 그림 위에 또 덮었어요)
       const own = bgT && IMG(`deco_${bgT.id}_1`);
       dz.innerHTML = (tint ? `<rect x="-300" y="-300" width="960" height="1020" fill="${tint[0]}" opacity="${tint[1]}" style="mix-blend-mode:multiply"/>` : '') +
         (own ? geo().deco.map(([x, y], i) => `<image x="${x - 24}" y="${y - 30}" width="48" height="48" href="${IMG(`deco_${bgT.id}_${i % 3 + 1}`)}"/>`).join('') : '');
@@ -254,11 +254,11 @@
   // 테마 세트는 한 번에만 사요(값 60, 그 테마 배경을 이미 샀으면 50). 이미 산 칸은 그대로 칸마다 쓰고 벗을 수 있어요
   const thSetPrice = t => GSHOP.theme - (thOwn(t, 'bg') ? GSHOP.themeBgOff : 0);
   function renderThemes(coin) {
-    let h = `<h3 class="shop-h" data-cat="테마">테마 세트 <small>메인 화면, 배경 음악 | 모음 보상: 세트당 수업료 +3%</small></h3>`;   // 5.3.3 설명은 머리에 한 번
+    let h = `<h3 class="shop-h" data-cat="테마">테마 세트 <small>메인 화면, 배경 음악 | 모음 보상: 세트당 수업료 +3%</small></h3>`;   // 설명은 머리에 한 번
     for (const t of THEMES) {
       const n = thCount(t.id), done = n === TH_SLOTS.length;
       const playing = Music.preview === t.id;
-      const open = rt.thOpen === t.id;   // 5.3.3 테마 세트는 접힌 줄로, 누르면 펼쳐요
+      const open = rt.thOpen === t.id;   // 테마 세트는 접힌 줄로, 누르면 펼쳐요
       h += `<div class="th-card${done ? ' done' : ''}${open ? ' open' : ' fold'}"><button class="th-fold" type="button" data-thfold="${t.id}" aria-expanded="${open}"><span class="th-sw">${thArt(t, 'bg')}</span><span class="th-nm"><b>${t.name}</b><small>${done ? '세트를 다 가졌어요' : `${n} / ${TH_SLOTS.length}칸 가짐`}</small></span>${done ? '<span class="pill own">가졌어요</span>' : `<span class="pill">${coin}${thSetPrice(t.id)}</span>`}</button>`;
       h += `<div class="th-body"><div class="th-top"><b>${t.name}</b><button class="th-play${playing ? ' on' : ''}" type="button" data-play="${t.id}" aria-pressed="${playing}">${playing ? '♪ 듣는 중' : '♪ 테마 곡 듣기'}</button><button class="th-play th-prev" type="button" data-thprev="${t.id}">미리 보기</button><span class="th-prog">${done ? '가졌어요' : n ? n + '/' + TH_SLOTS.length : ''}</span></div>` +
         (done ? '' : (() => { const p = thSetPrice(t.id), poor = S.gold < p;
@@ -282,7 +282,7 @@
     skip: '<svg viewBox="-12 -12 24 24" aria-hidden="true"><circle r="9" class="c-clock"/><path d="M0 -5.6 V0 L4 2.6" fill="none" stroke="#6D4828" stroke-width="1.8" stroke-linecap="round"/></svg>',
     auto: '<svg viewBox="-12 -13 24 24" aria-hidden="true"><g transform="scale(1.25)">' + ACORN + '</g><path d="M6 -10 l1.2 2.6 2.6 1.2 -2.6 1.2 -1.2 2.6 -1.2 -2.6 -2.6 -1.2 2.6 -1.2 Z" class="c-gnut"/></svg>'
   };
-  for (const k of Object.keys(BOOST_ART)) if (IMG('boost_' + k)) BOOST_ART[k] = `<svg viewBox="-12 -12 24 24" aria-hidden="true"><image href="${IMG('boost_' + k)}" x="-12" y="-12" width="24" height="24"/></svg>`;   // 작업지시서 52
+  for (const k of Object.keys(BOOST_ART)) if (IMG('boost_' + k)) BOOST_ART[k] = `<svg viewBox="-12 -12 24 24" aria-hidden="true"><image href="${IMG('boost_' + k)}" x="-12" y="-12" width="24" height="24"/></svg>`;
   const GOLD_ICON = IMG('ic_gold_acorn') ? `<svg viewBox="-8 -11 16 20" aria-hidden="true"><image href="${IMG('ic_gold_acorn')}" x="-8" y="-9" width="16" height="16"/></svg>` : '<svg viewBox="-8 -11 16 20" aria-hidden="true"><path d="M-4.6 -1 Q-4.9 5.4 0 7.4 Q4.9 5.4 4.6 -1 Z" class="c-gnut"/><ellipse cx="-1.8" cy="2" rx="0.9" ry="2.1" class="c-gshine"/><path d="M-5.8 -0.8 Q-5.8 -6.2 0 -6.6 Q5.8 -6.2 5.8 -0.8 Q0 0.8 -5.8 -0.8 Z" class="c-gcap"/><path d="M-4 -3.2 H4 M-2.8 -5 H2.8" class="s-gline"/><path d="M0 -6.6 L0.9 -9.2" class="s-gstem"/></svg>';
   // 조금 어려운 퀘스트: 선생님 모두 키우기, 초당 도토리, 학생 50명 넘게, 시설 Lv.10 넘게, 도토리 15개 넘게 줍기.
   // 학생 부탁은 처음 한 번만 오는 이야기 부탁(s로 시작)만 쳐요. 반복 부탁은 끝없이 와서 넣지 않아요
@@ -299,7 +299,7 @@
     if (rt.tab === 'shop') renderShop();
     if (rt.tab === 'street') renderStreet();
   }
-  /* 5.4.0.4 황금 도토리를 모으기만 하고 쓰지 않는 학교가 많아요. 테마 세트 값(60개)만큼 모이고 아직 테마를 산 적이 없으면
+  /* 황금 도토리를 모으기만 하고 쓰지 않는 학교가 많아요. 테마 세트 값(60개)만큼 모이고 아직 테마를 산 적이 없으면
      한 번만 '테마를 살 수 있어요' 추천 창을 띄워요. 옛 저장도 gtip이 없어서 한 번 떠요. 다른 창, 처음 안내, 이야기 중에는 기다려요 */
   const goldTipWant = () => !!S && !S.u.gtip && S.gold >= GSHOP.theme && !S.cos.own.some(x => String(x).startsWith('th:'));
   function goldTip() {
