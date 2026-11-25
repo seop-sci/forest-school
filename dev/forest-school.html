@@ -17702,7 +17702,7 @@ body.mg-on .toast[hidden]{display:none}
     const P = tamLvAllPlan(); if (!P.n) return;
     // 쓰는 도토리, 대원마다 한 줄, 탐험대 힘을 나눠서 보여 줘요(예전에는 창을 열 때 줄바꿈이 지워져 한 덩어리로 보였어요)
     const rows = P.up.filter(u => u.b > u.a).map(u => `<span class="ask-row"><i>${esc(spName(u.sp))}</i><span>Lv.${u.a} → <b>${u.b}</b></span><em>+${u.b - u.a}</em></span>`).join('');
-    askBox({ title: '출동 대원 고르게 올리기', yes: '올리기', no: '그만두기',
+    askBox({ title: '출동 대원 고르게 올리기', yes: '올리기', no: '취소',
       html: `<span class="ask-sum">${acornIcon()}<b>${fmtN(P.cost)}</b>${eulOf(fmtN(P.cost))} 써요</span><span class="ask-sub">남는 도토리 ${fmtN(P.left)}</span><span class="ask-rows">${rows}</span><span class="ask-sum">탐험대 힘 ${fmt(P.pw0)} → <b>${fmt(P.pw1)}</b></span>`,
       onYes: () => { let n = 0;   // 보여 준 그대로 올려요(창을 보는 동안 들어온 도토리로 더 올리지 않아요)
         if (S.budget >= P.cost && P.up.every(u => tamMem(u.sp).lv === u.a)) { S.budget -= P.cost; for (const u of P.up) tamMem(u.sp).lv = u.b; n = P.n; } else n = tamLvAll();
@@ -18871,7 +18871,7 @@ body.mg-on .toast[hidden]{display:none}
       h += row(`<svg viewBox="-12 -12 24 24" aria-hidden="true"><path d="M3 -8 A8.5 8.5 0 1 0 8 4 A7 7 0 1 1 3 -8 Z" fill="#F2C230"/></svg>`, '밤 모드', '지도가 밤 색이 되고 건물 창에 불이 켜져요', own ? '' : '',
         own ? `<button class="buy${on ? ' on' : ''}" type="button" data-ebuy="night" aria-pressed="${on}">${on ? '끄기' : '켜기'}</button>` : buy('night', ESHOP.night, false, '밤 모드')); }
     // 바꾸기
-    h += '<h3 class="shop-h" data-cat="교환">교환 <small>(하루 5번씩)</small></h3>';
+    h += '<h3 class="shop-h" data-cat="교환">교환 <small>하루 5번씩</small></h3>';
     { const xl = esExLeft(), xc = esExCost();
       h += `<div class="sb"><span class="pv">${ic}</span><span class="tx"><b>숲의 정수 ${ESHOP.ex.n}개</b><span>도토리를 내고 받아요</span><small>${xl > 0 ? `오늘 ${xl}번 더 바꿀 수 있어요` : '오늘은 다 바꿨어요. 내일 다시 열려요'}</small></span>` +
         `<button class="buy${S.budget < xc ? ' poor' : ''}${xl > 0 ? '' : ' off'}" type="button" data-ebuy="ex" aria-label="숲의 정수 ${ESHOP.ex.n}개, 도토리 ${fmt(xc)}"><span data-acorn>${acornIcon()}</span>${fmt(xc)}</button></div>`; }
@@ -18884,7 +18884,7 @@ body.mg-on .toast[hidden]{display:none}
     ask.hidden = !it || !it.price;
     if (it && it.price) {
       const enough = it.acorn ? S.budget >= it.price : S.ess >= it.price;
-      $('#essAskText').textContent = it.kind === 'ax' ? (enough ? `도토리 +${fmt(it.gain)}, 숲의 정수 ${it.price}개로 바꿀까요?` : `숲의 정수가 ${it.price - S.ess}개 모자라요.`) : it.acorn ? (enough ? `도토리 ${fmt(it.price)}로 ${it.name}${it.ga} 바꿀까요?` : `도토리가 ${fmt(it.price - S.budget)} 모자라요.`)
+      $('#essAskText').textContent = it.kind === 'ax' ? (enough ? `도토리 +${fmt(it.gain)}, 숲의 정수 ${it.price}개로 바꿀까요?` : `숲의 정수가 ${it.price - S.ess}개 모자라요.`) : it.acorn ? (enough ? `도토리 ${fmt(it.price)}개로 ${it.name}${it.ga} 바꿀까요?` : `도토리가 ${fmt(it.price - S.budget)}개 모자라요.`)
         : enough ? (it.kind === 'night' ? `밤 모드는 낮에도 지도를 밤 모습으로 바꿔요. 고등학교에서는 20시부터 6시까지 저절로 어두워져요. 그래도 숲의 정수 ${it.price}개로 살까요?` : `${it.name}${it.ga} 숲의 정수 ${it.price}개로 살까요?`) : `숲의 정수가 ${it.price - S.ess}개 모자라요. 공부 탭에서 모을 수 있어요.`;   // 밤 모드 안내
       $('#essYes').textContent = it.acorn || it.kind === 'ax' ? (enough ? '바꾸기' : '닫기') : enough ? '사기' : '공부 가기';
     }    shopChrome('ess');
@@ -18933,7 +18933,7 @@ body.mg-on .toast[hidden]{display:none}
       rt.essPick = '';
       if (S.budget < it.price || esExLeft() <= 0) { renderEssShop(); return; }
       S.budget -= it.price; S.es.x += 1; addEss(ESHOP.ex.n);
-      toast(`도토리 ${fmt(it.price)}로 숲의 정수 ${ESHOP.ex.n}개를 받았어요!`); sfx('quest'); buzz(15);
+      toast(`도토리 ${fmt(it.price)}개로 숲의 정수 ${ESHOP.ex.n}개를 받았어요!`); sfx('quest'); buzz(15);
       save(); renderEss(); renderEssShop(); renderHUD(); renderAffordance(); return;
     }
     if (it.kind === 'ax' && S.ess < it.price) { rt.essPick = ''; renderEssShop(); return; }   // '닫기'
@@ -19251,7 +19251,7 @@ body.mg-on .toast[hidden]{display:none}
     let h = '';
     const evList = DECO.filter(evDecoArt);
     // 5.3.3: 이벤트 한정 장식은 도감의 '장식' 칸으로 옮겼어요(가게에는 아래 한 줄). 갈래 칩용 머리(data-cat)
-    for (const [title, cat, list] of [['장식 <small>(사면 지도에 놓을 수 있어요)</small>', '장식', DECO.filter(d => !d.rare)], ['희귀 장식 <small>(하나씩만)</small>', '희귀', DECO.filter(d => d.rare && !d.ev)]]) {
+    for (const [title, cat, list] of [['장식 <small>사면 지도에 놓을 수 있어요</small>', '장식', DECO.filter(d => !d.rare)], ['희귀 장식 <small>하나씩만</small>', '희귀', DECO.filter(d => d.rare && !d.ev)]]) {
       h += `<h3 class="shop-h" data-cat="${cat}">${title}</h3><div class="shop-grid">`;
       for (const d of list) {
         const n = decoOwn(d.id), out = decoSoldOut(d.id), c = decoCost(d.id), poor = !out && S.ess < c, nx = out ? 0 : decoNext(d.id);
@@ -19264,14 +19264,14 @@ body.mg-on .toast[hidden]{display:none}
       h += '</div>';
     }
     // 한정 모자와 특별 가구(옛 정수 상점에서 옮겨 왔어요)
-    h += '<h3 class="shop-h" data-cat="모자">한정 모자 <small>(학생들이 써요)</small></h3><div class="shop-grid">';
+    h += '<h3 class="shop-h" data-cat="모자">한정 모자 <small>학생들이 써요</small></h3><div class="shop-grid">';
     for (const it of COS.hat.items) {
       if (!it.ess) continue;
       const key = 'hat:' + it.id, own = S.cos.own.includes(key), on = S.cos.hat === it.id, poor = !own && S.ess < ESHOP.hat;
       h += `<button class="si${own ? ' own' : ''}${on ? ' on' : ''}${poor ? ' poor' : ''}" type="button" data-dbuy="${key}" aria-pressed="${on}" aria-label="${it.name}${own ? '' : `, 숲의 정수 ${ESHOP.hat}개`}">` +
         `<span class="pv"><img src="${IMG('cos_hat_' + it.id)}" alt="" draggable="false"></span><span class="nm">${it.name}</span><span class="pr">${on ? '쓰는 중' : own ? '쓰기' : `${ic}${ESHOP.hat}`}</span>${own ? '' : lackTx(ESHOP.hat, S.ess)}</button>`;
     }
-    h += '</div><h3 class="shop-h" data-cat="가구">특별 가구 <small>(방마다 하나씩 놓여요)</small></h3><div class="shop-grid">';
+    h += '</div><h3 class="shop-h" data-cat="가구">특별 가구 <small>방마다 하나씩 놓여요</small></h3><div class="shop-grid">';
     for (const k of Object.keys(SP_FUR)) {
       const F = SP_FUR[k], key = 'sp:' + F.id, own = S.cos.own.includes(key), on = S.cos.sp[k] === F.id, poor = !own && S.ess < ESHOP.fur;
       h += `<button class="si${own ? ' own' : ''}${on ? ' on' : ''}${poor ? ' poor' : ''}" type="button" data-dbuy="${key}" aria-pressed="${on}" aria-label="${F.name}${own ? '' : `, 숲의 정수 ${ESHOP.fur}개`}">` +
@@ -20663,7 +20663,7 @@ body.mg-on .toast[hidden]{display:none}
     const lunch = S.pc.lunch, kids = S.pc.kids.slice();
     S.pc.at = 0; S.pc.lunch = false; S.pc.st.n += 1;
     const fvb = fvBonus('picnic'), v = minAcorns(lunch ? PCN.lunchAcorn : PCN.acorn) * (fvb ? 2 : 1); S.budget += v; earn(v);   // 축제 월요일: 소풍 수확 +100%
-    const items = [{ ic: 'acorn', t: `도토리 +${fmt(v)}${lunch ? ' (도시락 덕분에 더 많이)' : ''}${fvb ? ' (축제 +100%)' : ''}` }];
+    const items = [{ ic: 'acorn', t: `도토리 +${fmt(v)}${lunch ? ' (도시락)' : ''}${fvb ? ' (축제 +100%)' : ''}` }];
     if (Math.random() < PCN.essP) { const e = Math.random() < 0.5 ? 1 : 2; addEss(e); S.pc.st.ess += e; items.push({ ic: 'ess', t: `숲의 정수 +${e}` }); }
     if (Math.random() < PCN.berryP) { S.pc.berry += 1; S.pc.st.berry += 1; items.push({ ic: IMG('picnic_berry') ? `<img src="${IMG('picnic_berry')}" alt="" style="width:22px;height:22px">` : '🫐', t: '희귀 열매 +1 (꾸미기 가게에서 장식으로 바꿔요)' }); }
     for (const sp of kids) { const f = frOf(sp); if (f) { f.n.pc += 1; items.push(...frAddP(sp, BF.picnic, true)); } }   // 함께 간 단짝 친밀도
@@ -24922,7 +24922,7 @@ body.mg-on .toast[hidden]{display:none}
     const on = fvOn(), bw = on && bfOn() ? bfWin(gameToday()) : null, hu = (bw && IMG('bf_head')) || IMG('fv_head'), hd = $('#fvHead');
     hd.classList.toggle('art', !!hu); hd.style.backgroundImage = hu ? `url("${blobUrl(hu)}")` : '';
     setT($('#fvTitle'), bw ? '숲속 대학교 대축제' : '대학 축제');
-    setT($('#fvDayTx'), bw ? `대축제 ${bw.i + 1}일째 (사흘 중)` : on ? '오늘 축제 중' : `다음 축제 ${fvNext()}`);
+    setT($('#fvDayTx'), bw ? `대축제 ${bw.i + 1}일째` : on ? '오늘 축제 중' : `다음 축제 ${fvNext()}`);
     let h = '';
     if (on) {
       const bn = FV.bonus[fvWd()];
@@ -27037,7 +27037,7 @@ body.mg-on .toast[hidden]{display:none}
       $('#gradOk').textContent = '2학기 시작하기';
       $('#gradDip').textContent = '+' + fmt(dip);
       $('#gradArt').innerHTML = `<svg viewBox="-10 -10 20 20" aria-hidden="true">${DIP}</svg>`;
-      $('#gradNew').textContent = `황금 도토리 +${GOLD.grad}개도 받았어요. 2학기 ${finalYear() ? '졸업식' : '종업식'}을 열면 학년이 올라가${finalYear() ? '요.' : `고, 시설을 Lv.${capNext()}까지 키울 수 있어요. 2학기에는 시설을 Lv.${facCap()}까지 키울 수 있어요.`}` + (rt.yearGift ? ` 새 학기 준비물로 도토리 +${fmt(rt.yearGift)}!` : '');
+      $('#gradNew').textContent = `황금 도토리 +${GOLD.grad}개도 받았어요. 2학기 ${finalYear() ? '졸업식' : '종업식'}을 열면 학년이 올라가${finalYear() ? '요.' : `고, 2학기에는 시설을 Lv.${facCap()}까지 키울 수 있어요.`}` + (rt.yearGift ? ` 새 학기 준비물로 도토리 +${fmt(rt.yearGift)}!` : '');
       $('#gradRec').hidden = true;   // 창 글이 길어서 키운 기록 줄은 빼요
       openModal($('#mGrad'));
       sfx('bell'); setTimeout(() => sfx('quest'), 900);
@@ -29997,9 +29997,9 @@ body.mg-on .toast[hidden]{display:none}
   const dexName = k => k === 'tea_hedgehog' ? VP.name : XT_DEX[k] ? XT[XT_DEX[k]].name : k.startsWith('g_') ? (dexGuest(k) || {}).name || k : k.startsWith('tea_') ? TEA[k.slice(4)].name : (DEX_NAMES[k] || (NEWCOMERS.find(n => n.k === k) || {}).name || k);
   const dexPicKey = k => k.startsWith('tea_') ? k : 'chr_' + (k.startsWith('g_') ? k.slice(2) : k);
   const dexHow = k => {
-    if (k === 'tea_hedgehog') return '처음부터 학교에 계셔요';
-    if (XT_DEX[k] && XT[XT_DEX[k]].tier && S.tier < XT[XT_DEX[k]].tier) return `${TIERS[XT[XT_DEX[k]].tier].name}부터 오셔요`;
-    if (XT_DEX[k]) return `${eul(FAC[XT[XT_DEX[k]].fac].name)} 지으면 오셔요`;
+    if (k === 'tea_hedgehog') return '처음부터 학교에 계세요';
+    if (XT_DEX[k] && XT[XT_DEX[k]].tier && S.tier < XT[XT_DEX[k]].tier) return `${TIERS[XT[XT_DEX[k]].tier].name}부터 오세요`;
+    if (XT_DEX[k]) return `${eul(FAC[XT[XT_DEX[k]].fac].name)} 지으면 오세요`;
     if (k.startsWith('g_')) return (dexGuest(k) || {}).hint || '';
     if (k.startsWith('tea_')) return `${TEA[k.slice(4)].name}을 모시면 등록돼요`;
     const i = NEWCOMERS.findIndex(n => n.k === k);
@@ -30497,7 +30497,7 @@ body.mg-on .toast[hidden]{display:none}
     const m = $('#mTalk'); if (!m || !x) return false;
     const w = x.sp + '_rare';
     rt.talkSeq = { n: { k: w, name: x.name, lab: `반짝 친구 ${x.name}` }, i: 0, lines: [
-      { who: 'hedgehog', t: `교장 선생님, 숲의 별빛이 우리 학교에 내려앉았어요! 반짝반짝 빛나는 ${iga(x.name)} 놀러 왔어요.` },
+      { who: 'hedgehog', t: `교장 선생님, 숲의 별빛이 우리 학교에 내려앉았어요! 반짝이는 ${iga(x.name)} 놀러 왔어요.` },
       { who: w, t: x.say },
       { who: 'hedgehog', t: `${eun(x.name)} 별빛을 받은 반짝 친구예요. 다른 친구들과 똑같이 공부하고 뛰어놀아요. 동물 도감 반짝 친구 칸에 등록했고, 선물로 황금 도토리 ${RARE.gold}개를 받았어요!`, last: true }] };
     talkLine(); openModal(m);
