@@ -398,7 +398,7 @@
     function edEditText(node) {
       const el = node.parentNode, old = node.nodeValue, prev = ED.list.find(x => x.k === 'text' && x.b === old.trim() && x.p === edPath(el));
       el.classList.add('ed-pick');
-      const box = edBox(`<h4>글 고치기 <small style="font-weight:400;color:#6B7280">${edEsc(edWhere())}</small></h4><p class="ed-old">${edEsc(prev ? prev.a : old.trim())}</p><textarea></textarea><div class="ed-row"><button type="button" data-x="no">그만두기</button><button type="button" class="ok" data-x="ok">고치기</button></div>`);
+      const box = edBox(`<h4>글 고치기 <small style="font-weight:400;color:#6B7280">${edEsc(edWhere())}</small></h4><p class="ed-old">${edEsc(prev ? prev.a : old.trim())}</p><textarea></textarea><div class="ed-row"><button type="button" data-x="no">취소</button><button type="button" class="ok" data-x="ok">고치기</button></div>`);
       const ta = box.querySelector('textarea'); ta.value = old.trim(); setTimeout(() => { try { ta.focus(); } catch (e) { /* 괜찮아요 */ } }, 30);
       box.addEventListener('click', e => { const b = e.target.closest('button'); if (!b) return; el.classList.remove('ed-pick');
         if (b.dataset.x === 'ok') { const v = ta.value.trim();

@@ -4824,7 +4824,7 @@ body.mg-on .toast[hidden]{display:none}
       <div class="con-head"><span id="conClock" aria-hidden="true"></span><span id="conTx">공사 중</span></div>
       <div class="con-prog" aria-hidden="true"><i id="conFill"></i></div>
       <button class="ff-btn wide con-opt" type="button" id="conFree" hidden><span class="z" aria-hidden="true">⚡</span><span id="conFreeTx">즉시 완공 (오늘 3번 남음)</span><span class="n" aria-hidden="true">1</span></button>
-      <div class="con-row con-opt" id="conRow"><button class="cta" type="button" id="conAll" aria-disabled="false"><span id="conAllLbl">단축권 자동 사용</span></button><button class="cta ghost" type="button" id="conNo" hidden>그만두기</button></div>
+      <div class="con-row con-opt" id="conRow"><button class="cta" type="button" id="conAll" aria-disabled="false"><span id="conAllLbl">단축권 자동 사용</span></button><button class="cta ghost" type="button" id="conNo" hidden>취소</button></div>
       <p class="con-plan con-opt" id="conPlan"></p>
       <button class="con-ess con-opt" type="button" id="conEss"><span>숲의 정수로 즉시 완공</span><span class="p" id="conEssCost"></span></button>
       <div class="con-tks con-opt" id="conTks" role="group" aria-label="골라서 쓰기"></div>
@@ -10300,7 +10300,7 @@ body.mg-on .toast[hidden]{display:none}
       eff: L => L < 1 ? '단과대학 수업료 보너스 그대로' : `단과대학 수업료 보너스 +${3 * L}%` },
     // 펠리컨 지도교수님(작업지시서 85 그림): 연구소를 지으면 오셔요. 연수 한 레벨에 연구 트리 연구 시간 -3%(최대 -30%). 숫자는 본부 제안
     adv: { name: '펠리컨 지도교수님', subject: '지도교수', fac: 'institute', tier: 5, max: 10, per: 3, av: 'pelican',
-      desc: '대학원생의 연구를 이끄는 지도교수님이에요. 연구소에 계셔요.',
+      desc: '대학원생의 연구를 이끄는 지도교수님이에요. 연구소에 계세요.',
       eff: L => L < 1 ? '연구 시간 그대로' : `연구 트리 연구 시간 -${3 * L}%` } };
   // 호칭: 대학교부터 과목을 가르치는 분(다람쥐, 곰, 부엉이, 고니, 공작)만 '교수님', 고슴도치 교감 선생님은 '부총장님'
   // 영양, 사서, 매점, 사감, 시설, 진로처럼 과목이 아닌 분은 그대로 '선생님'. 아래 탭과 탭 안 제목은 대학교에서 '교수님'
@@ -10757,7 +10757,7 @@ body.mg-on .toast[hidden]{display:none}
       const on = picks.includes(D.k), lock = deptLocked(D), lv = deptLv(D);
       const subTx = D.avg ? '다섯 과목 평균' : D.low ? '과학과 체육 중 낮은 쪽' : AC.name[D.sub[0]];
       const btn = lock ? `<span class="fe-lock">${D.year}학년부터</span>`
-        : sw ? (on ? `<button class="cta small" type="button" data-dp="swap:${D.k}">여기와 바꾸기</button>` : D.k === sw.k ? `<button class="btn-sub small" type="button" data-dp="cancel">그만두기</button>` : '')
+        : sw ? (on ? `<button class="cta small" type="button" data-dp="swap:${D.k}">여기와 바꾸기</button>` : D.k === sw.k ? `<button class="btn-sub small" type="button" data-dp="cancel">취소</button>` : '')
         : on ? `<span class="fe-lock">${picks[0] === D.k ? '주전공' : '복수전공'}</span>`
         : `<button class="${full ? 'btn-sub' : 'cta'} small" type="button" data-dp="pick:${D.k}">${full ? '바꾸기' : '고르기'}</button>`;
       return `<div class="dp-row${on ? ' on' : ''}${lock ? ' lock' : ''}"><span class="dp-ic">${deptIc(D)}</span><div class="dp-tx"><b>${D.name}</b><small>${subTx} Lv.${Math.floor(lv)}, ${FAC[D.fac].name}</small><em>수업료 +${Math.round(deptPct(D))}%</em><em class="dp-x">${DEPT_X[D.k].t(deptXOf(D))}</em></div>${btn}</div>`;
@@ -14821,7 +14821,7 @@ body.mg-on .toast[hidden]{display:none}
   function upAsk() {
     const P = upPlan(); if (P.ks.length < 1) { toast('지금 도토리로 올릴 수 있는 건물이 없어요'); return; }
     const rows = P.ks.map(k => `<span class="ask-row"><i>${esc(FAC[k].name)}</i><span>Lv.${S.f[k]} → <b>${S.f[k] + 1}</b></span><em>+1</em></span>`).join('');
-    askBox({ title: '건물 한 번에 올리기', yes: '올리기', no: '그만두기',
+    askBox({ title: '건물 한 번에 올리기', yes: '올리기', no: '취소',
       html: `<span class="ask-sum">${acornIcon()}<b>${fmtN(P.cost)}</b>${eulOf(fmtN(P.cost))} 써요</span><span class="ask-sub">남는 도토리 ${fmtN(S.budget - P.cost)}. 가구를 채우고 공사를 시작해요</span><span class="ask-rows">${rows}</span>`,
       onYes: () => upAll(P.ks) });
   }
@@ -15156,7 +15156,7 @@ body.mg-on .toast[hidden]{display:none}
       setT($('.now', card), X.eff(L));
       setT($('.next', card), maxed ? '최고 레벨이에요' : X.eff(L + 1));
       setT($('.k-next', card), here ? '연수 후' : '오시면');   // 못 만난 선생님
-      const note = $('.tnote', card); setHid(note, here); setT(note, here ? '' : S.tier < (X.tier || 0) ? `${TIERS[X.tier].school}${X.fac === 'store' ? ' 매점' : X.fac === 'dorm' ? ' 기숙사' : X.fac === 'union' ? ' 학생회관' : X.fac === 'institute' ? ' 연구소' : ''}에서 오셔요.` : `${eul(FAC[X.fac].name)} 지으면 학교에 오셔요.`);
+      const note = $('.tnote', card); setHid(note, here); setT(note, here ? '' : S.tier < (X.tier || 0) ? `${TIERS[X.tier].school}${X.fac === 'store' ? ' 매점' : X.fac === 'dorm' ? ' 기숙사' : X.fac === 'union' ? ' 학생회관' : X.fac === 'institute' ? ' 연구소' : ''}에서 오세요.` : `${eul(FAC[X.fac].name)} 지으면 학교에 오세요.`);
       const btn = $('button', card);
       setT($('.lbl', btn), maxed ? '최고 레벨' : '연수 보내기');
       setHid($('.cost', btn), maxed || !here);
@@ -15166,7 +15166,7 @@ body.mg-on .toast[hidden]{display:none}
   }
   function xtAct(k, btn) {
     if (rt.paused || !XT[k] || xtMaxed(k)) return false;
-    if (!xtHere(k)) { toast(S.tier < (XT[k].tier || 0) ? `${XT[k].name}은 ${TIERS[XT[k].tier].school}에서 오셔요` : `${eul(FAC[XT[k].fac].name)} 지으면 ${XT[k].name}이 오셔요`); if (btn) shake(btn); return false; }
+    if (!xtHere(k)) { toast(S.tier < (XT[k].tier || 0) ? `${XT[k].name}은 ${TIERS[XT[k].tier].school}에서 오세요` : `${eul(FAC[XT[k].fac].name)} 지으면 ${XT[k].name}이 오세요`); if (btn) shake(btn); return false; }
     const c = xtCost(k);
     if (xtHave(k) < c) { toast(XT[k].ess ? essShort(c - xtHave(k)) : acornShort(c - xtHave(k))); if (btn) shake(btn); return false; }
     if (XT[k].ess) { S.ess -= c; S.st.esSpent = (S.st.esSpent || 0) + c; renderEss(); } else S.budget -= c;
@@ -27037,7 +27037,7 @@ body.mg-on .toast[hidden]{display:none}
       $('#gradOk').textContent = '2학기 시작하기';
       $('#gradDip').textContent = '+' + fmt(dip);
       $('#gradArt').innerHTML = `<svg viewBox="-10 -10 20 20" aria-hidden="true">${DIP}</svg>`;
-      $('#gradNew').textContent = `황금 도토리 +${GOLD.grad}개도 받았어요. 2학기 ${finalYear() ? '졸업식' : '종업식'}을 열면 학년이 올라가${finalYear() ? '요.' : `고, 2학기에는 시설을 Lv.${facCap()}까지 키울 수 있어요.`}` + (rt.yearGift ? ` 새 학기 준비물로 도토리 +${fmt(rt.yearGift)}!` : '');
+      $('#gradNew').textContent = `황금 도토리 +${GOLD.grad}개도 받았어요. 2학기에는 시설을 Lv.${facCap()}까지 키울 수 있어요. 2학기 ${finalYear() ? '졸업식' : '종업식'}을 열면 학년이 올라가${finalYear() ? '요.' : `고 Lv.${capNext()}까지 열려요.`}` + (rt.yearGift ? ` 새 학기 준비물로 도토리 +${fmt(rt.yearGift)}!` : '');
       $('#gradRec').hidden = true;   // 창 글이 길어서 키운 기록 줄은 빼요
       openModal($('#mGrad'));
       sfx('bell'); setTimeout(() => sfx('quest'), 900);
@@ -29279,7 +29279,7 @@ body.mg-on .toast[hidden]{display:none}
     function edEditText(node) {
       const el = node.parentNode, old = node.nodeValue, prev = ED.list.find(x => x.k === 'text' && x.b === old.trim() && x.p === edPath(el));
       el.classList.add('ed-pick');
-      const box = edBox(`<h4>글 고치기 <small style="font-weight:400;color:#6B7280">${edEsc(edWhere())}</small></h4><p class="ed-old">${edEsc(prev ? prev.a : old.trim())}</p><textarea></textarea><div class="ed-row"><button type="button" data-x="no">그만두기</button><button type="button" class="ok" data-x="ok">고치기</button></div>`);
+      const box = edBox(`<h4>글 고치기 <small style="font-weight:400;color:#6B7280">${edEsc(edWhere())}</small></h4><p class="ed-old">${edEsc(prev ? prev.a : old.trim())}</p><textarea></textarea><div class="ed-row"><button type="button" data-x="no">취소</button><button type="button" class="ok" data-x="ok">고치기</button></div>`);
       const ta = box.querySelector('textarea'); ta.value = old.trim(); setTimeout(() => { try { ta.focus(); } catch (e) { /* 괜찮아요 */ } }, 30);
       box.addEventListener('click', e => { const b = e.target.closest('button'); if (!b) return; el.classList.remove('ed-pick');
         if (b.dataset.x === 'ok') { const v = ta.value.trim();

@@ -389,7 +389,7 @@
       const on = picks.includes(D.k), lock = deptLocked(D), lv = deptLv(D);
       const subTx = D.avg ? '다섯 과목 평균' : D.low ? '과학과 체육 중 낮은 쪽' : AC.name[D.sub[0]];
       const btn = lock ? `<span class="fe-lock">${D.year}학년부터</span>`
-        : sw ? (on ? `<button class="cta small" type="button" data-dp="swap:${D.k}">여기와 바꾸기</button>` : D.k === sw.k ? `<button class="btn-sub small" type="button" data-dp="cancel">그만두기</button>` : '')
+        : sw ? (on ? `<button class="cta small" type="button" data-dp="swap:${D.k}">여기와 바꾸기</button>` : D.k === sw.k ? `<button class="btn-sub small" type="button" data-dp="cancel">취소</button>` : '')
         : on ? `<span class="fe-lock">${picks[0] === D.k ? '주전공' : '복수전공'}</span>`
         : `<button class="${full ? 'btn-sub' : 'cta'} small" type="button" data-dp="pick:${D.k}">${full ? '바꾸기' : '고르기'}</button>`;
       return `<div class="dp-row${on ? ' on' : ''}${lock ? ' lock' : ''}"><span class="dp-ic">${deptIc(D)}</span><div class="dp-tx"><b>${D.name}</b><small>${subTx} Lv.${Math.floor(lv)}, ${FAC[D.fac].name}</small><em>수업료 +${Math.round(deptPct(D))}%</em><em class="dp-x">${DEPT_X[D.k].t(deptXOf(D))}</em></div>${btn}</div>`;

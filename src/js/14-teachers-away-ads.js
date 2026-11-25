@@ -67,7 +67,7 @@
       setT($('.now', card), X.eff(L));
       setT($('.next', card), maxed ? '최고 레벨이에요' : X.eff(L + 1));
       setT($('.k-next', card), here ? '연수 후' : '오시면');   // 못 만난 선생님
-      const note = $('.tnote', card); setHid(note, here); setT(note, here ? '' : S.tier < (X.tier || 0) ? `${TIERS[X.tier].school}${X.fac === 'store' ? ' 매점' : X.fac === 'dorm' ? ' 기숙사' : X.fac === 'union' ? ' 학생회관' : X.fac === 'institute' ? ' 연구소' : ''}에서 오셔요.` : `${eul(FAC[X.fac].name)} 지으면 학교에 오셔요.`);
+      const note = $('.tnote', card); setHid(note, here); setT(note, here ? '' : S.tier < (X.tier || 0) ? `${TIERS[X.tier].school}${X.fac === 'store' ? ' 매점' : X.fac === 'dorm' ? ' 기숙사' : X.fac === 'union' ? ' 학생회관' : X.fac === 'institute' ? ' 연구소' : ''}에서 오세요.` : `${eul(FAC[X.fac].name)} 지으면 학교에 오세요.`);
       const btn = $('button', card);
       setT($('.lbl', btn), maxed ? '최고 레벨' : '연수 보내기');
       setHid($('.cost', btn), maxed || !here);
@@ -77,7 +77,7 @@
   }
   function xtAct(k, btn) {
     if (rt.paused || !XT[k] || xtMaxed(k)) return false;
-    if (!xtHere(k)) { toast(S.tier < (XT[k].tier || 0) ? `${XT[k].name}은 ${TIERS[XT[k].tier].school}에서 오셔요` : `${eul(FAC[XT[k].fac].name)} 지으면 ${XT[k].name}이 오셔요`); if (btn) shake(btn); return false; }
+    if (!xtHere(k)) { toast(S.tier < (XT[k].tier || 0) ? `${XT[k].name}은 ${TIERS[XT[k].tier].school}에서 오세요` : `${eul(FAC[XT[k].fac].name)} 지으면 ${XT[k].name}이 오세요`); if (btn) shake(btn); return false; }
     const c = xtCost(k);
     if (xtHave(k) < c) { toast(XT[k].ess ? essShort(c - xtHave(k)) : acornShort(c - xtHave(k))); if (btn) shake(btn); return false; }
     if (XT[k].ess) { S.ess -= c; S.st.esSpent = (S.st.esSpent || 0) + c; renderEss(); } else S.budget -= c;
