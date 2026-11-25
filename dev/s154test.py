@@ -7,18 +7,18 @@ c = Checker()
 async def main():
     async with async_playwright() as p:
         b = await p.chromium.launch()
-        for tier, zone in ((2, None), (3, None), (4, 'academic'), (4, 'life'), (4, 'plaza'), (5, 'life')):
+        for tier, zone, W in ((1, None, 360), (1, None, 390), (2, None, 390), (2, None, 360), (3, None, 390), (3, None, 360), (4, 'academic', 390), (4, 'academic', 360), (4, 'life', 390), (4, 'life', 360), (4, 'plaza', 390), (4, 'sports', 390), (4, 'sports', 360), (5, 'life', 390)):   # 5.3.4.8 일곱째 물가 자리: 초등, 체육 구역, 360px 더
             kw = dict(tier=tier, students=110)
             if zone: kw['zone'] = zone
-            ctx, pg, errs = await ctxpage(b, 390, 844, 'light', base(**kw))
+            ctx, pg, errs = await ctxpage(b, W, 844, 'light', base(**kw))
             await pg.wait_for_timeout(1200)
             r = await pg.evaluate("""async()=>{const F=window.__forest,S=F.S,R=F.rt4,sl=ms=>new Promise(r=>setTimeout(r,ms));
               document.querySelectorAll('.overlay').forEach(o=>{o.hidden=true});R.modalOpen=null;R.modalQueue.length=0;
               F.bxSync(); const n=F.BX_SPOT[S.bx.m]; S.bx.sp=n.map((_,i)=>({i,id:'bio_sparrow',t:0})); F.renderDeco(true); await sl(300);
               const res=[...document.querySelectorAll('#bxG .bx-hit')].map(h=>{const r=h.getBoundingClientRect(),e=document.elementFromPoint(r.x+r.width/2,r.y+r.height/2);return e&&e.closest('[data-bx]')?'ok':(e?(e.closest('[id]')||{}).id:'off')});
               return {n:n.length,res};}""")
-            print(tier, zone, r)
-            c.ok(r['res'] and all(x == 'ok' for x in r['res']), f'{tier} {zone} 생물 자리가 가려요 {r["res"]}')
+            print(tier, zone, W, r)
+            c.ok(r['res'] and all(x == 'ok' for x in r['res']), f'{tier} {zone} {W} 생물 자리가 가려요 {r["res"]}')
             if zone == 'life':
                 h = await pg.evaluate("()=>{const r=document.querySelector('#bxG .bx-hit[data-bx=\"2\"]').getBoundingClientRect();return [r.x+r.width/2,r.y+r.height/2]}")
                 await pg.touchscreen.tap(h[0], h[1]); await pg.wait_for_timeout(700)

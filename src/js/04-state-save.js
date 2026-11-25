@@ -70,6 +70,7 @@
     trialT: undefined,   // 다음 매나 뱀까지 남은 초
     trialWasHunt: undefined,   // 지난 매나 뱀이 사냥형이었는지
     visit: undefined,   // 지금 놀러 온 손님
+    aitJson: undefined, aitT: undefined,   // 5.4.0.2 토스 저장소로 보낼 저장 글과 모아 보내기 타이머
     guest: null, gsT: undefined,   // 5.3.4.7 오늘의 손님: 교문 앞에 서 있는 손님, 나타나기까지 남은 초
     visitT: undefined,   // 다음 손님까지 남은 초
     frBub: undefined,   // 단짝 말풍선 요소
@@ -698,6 +699,19 @@
       return null;
     }
   }
+  // 5.4.0.2 토스가 매우 끊기던 것: 저장할 때마다(5초마다, 그리고 누를 때마다) 학교 전체 글을 토스 앱 저장소로 보냈어요.
+  // 토스 저장소는 앱 다리(네이티브)를 거쳐서 무거워요. 이 기기 저장(localStorage)은 그대로 바로 하고, 토스 저장소는 20초에 한 번 모아서 보내요.
+  // 앱을 내리거나 닫을 때(save(at), 화면이 숨겨짐)는 바로 보내요. 토스 저장소는 이 기기 저장이 비었을 때만 읽는 예비 저장이에요
+  const AIT_SAVE_GAP = 20000;
+  function aitStore(json, now) {
+    rt.aitJson = json;
+    if (now) aitFlush(); else if (!rt.aitT) rt.aitT = setTimeout(aitFlush, AIT_SAVE_GAP);
+  }
+  function aitFlush() {
+    clearTimeout(rt.aitT); rt.aitT = 0;
+    const j = rt.aitJson; rt.aitJson = '';
+    if (j && AIT) AIT.storage.setItem(SAVE_KEY, j).catch(() => {});
+  }
   function save(at) {
     if (!S || rt.adopting || rt.uniPrev) return;   // 다른 학교로 바꾸며 다시 여는 중에는 지금 학교를 저장하지 않아요. 대학교 미리 보기 동안도 저장하지 않아요
     S.savedAt = at || (rt.paused ? rt.closedAt : gameNow());   // 보안 점검(2-5): 기기 시계 대신 게임 시계
@@ -705,7 +719,7 @@
     syncMid();
     const json = JSON.stringify(S);
     try { localStorage.setItem(SAVE_KEY, json); } catch (e) { /* 저장소가 막혀 있어도 게임은 계속 */ }
-    if (AIT) AIT.storage.setItem(SAVE_KEY, json).catch(() => {});   // 토스 앱 저장소 (앱을 지워도 남는 건 아니에요)
+    if (AIT) aitStore(json, !!at || document.hidden);   // 토스 앱 저장소 (앱을 지워도 남는 건 아니에요)
     Cloud.dirty = true;   // 서버에는 조금씩 모았다가 올려요
   }
 
