@@ -6,6 +6,9 @@ API = 'https://api.anthropic.com/v1/messages'
 USAGE = {'in': 0, 'out': 0, 'calls': 0}
 
 
+FALLBACK = {'claude-fable-5-2': 'claude-opus-5-5'}   # 모델을 못 쓰면 다음 모델로
+
+
 def ask(system, user, model, max_tokens=8000, tries=6):
     key = os.environ.get('ANTHROPIC_API_KEY', '')
     if not key:
@@ -20,9 +23,18 @@ def ask(system, user, model, max_tokens=8000, tries=6):
                 d = json.loads(r.read())
             u = d.get('usage', {})
             USAGE['in'] += u.get('input_tokens', 0); USAGE['out'] += u.get('output_tokens', 0); USAGE['calls'] += 1
-            return ''.join(c.get('text', '') for c in d.get('content', []) if c.get('type') == 'text')
+            txt = ''.join(c.get('text', '') for c in d.get('content', []) if c.get('type') == 'text')
+            if not txt.strip():
+                kinds = [c.get('type') for c in d.get('content', [])]
+                print(f"빈 답(stop {d.get('stop_reason')}, 내용 {kinds}, 출력 {u.get('output_tokens')})", flush=True)
+                if d.get('stop_reason') == 'max_tokens' and max_tokens < 64000:   # 생각하는 데 한도를 다 쓴 경우: 한도를 늘려 한 번 더
+                    return ask(system, user, model, min(64000, max_tokens * 4), tries)
+            return txt
         except urllib.error.HTTPError as e:
             msg = e.read().decode('utf-8', 'replace')[:300]
+            if e.code in (400, 403, 404) and model in FALLBACK and 'model' in msg.lower():
+                print(f'{model}을 쓸 수 없어 {FALLBACK[model]}로 바꿔요: {msg[:120]}', flush=True)
+                return ask(system, user, FALLBACK[model], max_tokens, tries)
             if e.code in (429, 500, 502, 503, 529) and i < tries - 1:
                 time.sleep(min(60, 5 * 2 ** i)); continue
             raise SystemExit(f'API 오류 {e.code}: {msg}')

@@ -58,8 +58,12 @@ def prompt(key, desc):
 
 
 def parse(txt):
-    m = re.search(r'\{.*\}', txt, re.S)
-    return json.loads(m.group(0)) if m else None
+    # 코드 울타리(```json)나 앞뒤 말이 붙어도 첫 { 부터 JSON 하나만 읽어요. 못 읽으면 None
+    t = re.sub(r'```(?:json)?', '', txt)
+    i = t.find('{')
+    if i < 0: return None
+    try: return json.JSONDecoder().raw_decode(t[i:])[0]
+    except json.JSONDecodeError: return None
 
 
 def lint(s):
@@ -77,8 +81,10 @@ def main():
     res, md, warn = {}, ['# 오늘의 손님 대사 후보', '', f'모델 {MODEL}. 글 뒤 [ ]는 규칙 검사에 걸린 것이에요.', ''], 0
     for key, desc in GUESTS:
         d = None
-        for _ in range(2):
-            d = parse(ask(SYSTEM, prompt(key, desc), MODEL))
+        for t in range(2):
+            raw = ask(SYSTEM, prompt(key, desc), MODEL, max_tokens=16000)
+            (OUT / f'raw_{key}_{t}.txt').write_text(raw, encoding='utf-8')   # 받은 글 그대로(못 읽을 때 보려고)
+            d = parse(raw)
             if d: break
         if not d:
             md += [f'## {key}', '', '(JSON을 받지 못했어요)', '']; continue

@@ -1,0 +1,272 @@
+[
+ {
+  "area": "시간과 날짜 경계",
+  "title": "3. 까치 핫딜과 부엉이 보충수업 창의 남은 시간이 기기 시계(Date.now)를 씀",
+  "text": "**위치:** 14-teachers-away-ads.js\n- `spawnDeal` 426줄, `updateDeal` 417줄, `renderDeal` 445줄\n- `teacherAct` 131줄\n- `updateBoostWin` 333·338줄, `boostShown` 331줄, `renderBoostBtn` 345줄\n\n**무엇이 틀리는지:** 켜 둔 채 기기 시계를 뒤로 돌리면 `rt.deal.exp`와 `rt.boostUntil`이 그만큼 먼 미래가 돼요.\n\n**재현**\n1. 까치가 와 있을 때 기기 시계를 1시간 뒤로 돌려요.\n2. 남은 시간이 \"61:xx\"처럼 보여요.\n3. 그동안 `updateDeal`이 `rt.deal`에서 바로 돌아가서 새 핫딜이 생기지 않아요. 보충수업 창도 같은 식으로 길게 남고, 다음 창을 기다리는 시간이 줄지 않아요.\n\n**확신도:** 높음 (영향은 작아요. 다시 켜면 풀려요)\n\n**고치는 법:** 실행 중 상태(`rt`)의 마감 시각은 `perfNow()` 기준으로 잡아요.",
+  "files": [
+   "05-calc-clock.js",
+   "14-teachers-away-ads.js",
+   "25-trip.js",
+   "30-missions.js",
+   "31-tutorial-attendance.js",
+   "36-dex-event.js",
+   "37-season.js",
+   "41-hotfix-start.js"
+  ]
+ },
+ {
+  "area": "시간과 날짜 경계",
+  "title": "4. 토스 판에서 화면을 다시 볼 때마다 서버 시간을 다시 받으며 자리 비운 보상이 겹칠 수 있음",
+  "text": "**위치:** 41-hotfix-start.js 224줄 → 05 `setServerTime` 103·109줄\n\n**무엇이 틀리는지**\n- 다시 보일 때(`!document.hidden`)는 `was`가 계산돼요.\n- 숨긴 동안 `performance.now`가 멈추는 기기(iOS WebView 등)에서는 `t - was`가 숨긴 시간 전체가 되어 `awayApply`로 보상을 줘요.\n- 숨김과 보임을 처리하는 다른 코드(보이지 않는 파일, `awayHold`와 `awayStart` 쪽)도 같은 구간을 보상하면 두 번이 돼요.\n\n**재현:** 토스 판에서 앱을 30분 내렸다가 올려요. 자리 비운 보상 창이 두 번 쌓이는지(`pendingSec`가 두 배인지) 봐요.\n\n**확신도:** 낮음 (숨김 처리 코드가 보이지 않아요)\n\n**고치는 법:** 보이게 된 뒤 처음 받는 서버 시간에는 109줄의 보상을 건너뛰는 표식을 둬요. 또는 숨김 처리 쪽 보상과 하나로 합쳐요.",
+  "files": [
+   "05-calc-clock.js",
+   "14-teachers-away-ads.js",
+   "25-trip.js",
+   "30-missions.js",
+   "31-tutorial-attendance.js",
+   "36-dex-event.js",
+   "37-season.js",
+   "41-hotfix-start.js"
+  ]
+ },
+ {
+  "area": "시간과 날짜 경계",
+  "title": "5. 켠 채 기기 시계를 바꾸면 웹 판 서버 시간 다시 받기가 기기 시계를 따라갈 수 있음",
+  "text": "**위치:** 05 `svrDrift` 121줄 → `SVR.resync`(보이지 않음) → `setServerTime` 109줄\n\n**무엇이 틀리는지**\n- `resync`가 Firebase의 `serverTimeOffset` 캐시를 써서 `Date.now() + offset`으로 값을 만들면, 시계를 바꾼 뒤에는 offset이 낡아서 그만큼 미래 시각이 들어와요.\n- 그러면 `t - was`가 커져서 `awayApply`로 보상을 받고, `S.clk.last`가 미래로 가서 새날이 열려요.\n- 108줄 주석이 말하는 \"서버 시간끼리의 차이라 기기 시계로는 늘릴 수 없어요\"는 진짜 서버 왕복으로 받을 때만 맞아요.\n\n**재현:** 웹 판에서 켜 둔 채 기기 시계를 8시간 앞으로 돌려요. 1분 안에 자리 비운 보상 창이 뜨고 출석이 열리는지 봐요.\n\n**확신도:** 낮음\n\n**고치는 법:** `resync`는 서버 왕복으로 시각을 받게 해요(예: `ServerValue.TIMESTAMP`를 쓰고 읽기). 또는 109줄 보상은 `perfNow` 차이가 아니라 실제로 숨겨졌던 구간에만 줘요.",
+  "files": [
+   "05-calc-clock.js",
+   "14-teachers-away-ads.js",
+   "25-trip.js",
+   "30-missions.js",
+   "31-tutorial-attendance.js",
+   "36-dex-event.js",
+   "37-season.js",
+   "41-hotfix-start.js"
+  ]
+ },
+ {
+  "area": "행사와 시간 기능",
+  "title": "1. 기억 놀이에서 시간이 다 되면 맞게 누른 칸 하나를 빼고 점수를 매겨요",
+  "text": "- **위치:** `23-exam-battle.js`, `btqPts` (996줄). 원인은 `btqMemShow`의 시간 끝 처리(1033줄)와 `btqMemEnd`(1050줄)에 있어요.\n- **무엇이 틀리나:**\n  - 9초가 지나면 `btqMemEnd(M, false)`가 불리고 `Z.ok`가 false가 돼요.\n  - `btqPts`는 ok가 false이면 \"마지막에 누른 칸이 틀린 칸\"이라고 보고 `input.length - 1`로 셉니다.\n  - 그런데 시간이 다 된 경우에는 누른 칸이 모두 맞았어요. 그래서 맞게 누른 칸이 하나 덜 세어져요.\n  - 그 결과 일부러 틀린 칸을 누르는 쪽이 끝까지 기다리는 쪽보다 점수가 높아요. 주석에 적힌 \"맞게 누른 칸 비율 × 10점\"과도 다릅니다.\n- **재현:**\n  1. 그리기 종목이 나오고, 색은 3개(초등학교)예요.\n  2. 2칸을 맞게 누르고 기다리면 round(10 × 1 / 3) = **3점**이에요.\n  3. 같은 상황에서 2칸을 맞게 누르고 세 번째를 일부러 틀리면 input이 3이 되어 round(10 × 2 / 3) = **7점**이에요.\n- **확신도:** 높음\n- **고치는 방법:** 시간 끝인지 틀린 칸을 눌러 끝났는지 따로 기록해 두세요(예: `Z.miss = true`는 틀린 칸을 눌렀을 때만). `btqPts`에서는 `Z.miss`일 때만 1을 빼면 돼요.",
+  "files": [
+   "28-festivals.js",
+   "23-exam-battle.js"
+  ]
+ },
+ {
+  "area": "행사와 시간 기능",
+  "title": "2. 시험 주에 왔는데 성적표가 안 나오거나, 받지 않은 성적표가 덮여서 사라져요",
+  "text": "- **위치:** `23-exam-battle.js`, `exTick` (45~47줄)\n- **무엇이 틀리나:**\n  - **(가) 성적표가 안 만들어져요.** 성적표는 \"시험 주가 아닌 주\"에 `S.ex.cur === exPrev()`일 때만 만들어져요. 시험 주 w에 놀고 그다음 처음 켠 날이 다음 시험 주 w+4이면, 45줄이 먼저 `S.ex.cur = w+4`, `ss = 0`으로 덮어써요. 그래서 w의 성적표는 영영 만들어지지 않아요. 주석의 \"그 시험 주에 학교에 왔을 때만\"이라는 조건은 채웠는데도요.\n  - **(나) 받지 않은 성적표가 사라져요.** 47줄은 `S.ex.rep`이 아직 받지 않은 성적표(`got === false`)여도 새 성적표로 덮어써요. 그래서 도토리와 황금 도토리 보상이 사라져요.\n- **재현:**\n  - **(가)** 시험 주(월~일) 가운데 하루 접속해 자율학습을 해요. 그 뒤 3주 동안 켜지 않다가 4주 뒤 시험 주에 켜요. 성적표가 나오지 않고, 지난 자율학습 수도 0이 돼요.\n  - **(나)** 성적표가 나왔는데 받지 않고 둬요. 다음 시험 주에 접속하고, 그다음 주에 접속하면 옛 성적표가 새 것으로 바뀌어요. 옛 보상은 받을 길이 없어요.\n- **확신도:** 높음 (동작은 확실해요. 다만 (가)를 일부러 그렇게 둔 것이라면 설계 쪽에서 확인이 필요해요)\n- **고치는 방법:**\n  - 45줄에서 cur를 새로 바꾸기 전에, 옛 `S.ex.cur`가 지난 시험 주이고 그 주의 성적표가 없으면 먼저 `exMake(S.ex.cur)`를 만들어 두세요.\n  - 47줄은 `S.ex.rep && !S.ex.rep.got`일 때 덮지 않게 하세요. 아니면 덮기 전에 옛 성적표 보상을 자동으로 지급하세요.",
+  "files": [
+   "28-festivals.js",
+   "23-exam-battle.js"
+  ]
+ },
+ {
+  "area": "행사와 시간 기능",
+  "title": "3. 장터 '깜짝 물건: 간식 뽑기'에서 뽑기가 안 되면 도토리만 생겨요",
+  "text": "- **위치:** `28-festivals.js`, `mkBuy` (940줄)\n- **무엇이 틀리나:**\n  - 뽑기 값을 먼저 `S.budget += snCost(false)`로 더해 주고, 그다음 `snDraw(false)`가 그만큼을 빼는 구조로 보여요.\n  - 같은 줄의 `out && out.length ? … : '간식 뽑기'`를 보면 snDraw가 빈 값을 돌려줄 수 있다는 걸 이 코드도 알고 있어요.\n  - snDraw가 조건에 걸려 값을 빼지 않고 끝나면, 더해 준 도토리가 그대로 남아요. 쿠폰과 오늘 살 수 있는 횟수도 이미 써 버린 뒤예요.\n- **재현:** 목요일 장터에서 깜짝 물건이 간식 뽑기인 날, snDraw가 거절하는 상태(간식함이 가득 찼거나 다른 창이 열려 있는 등, 보이지 않는 조건)에서 사요.\n- **확신도:** 중간 (snDraw의 내부는 보이지 않아요)\n- **고치는 방법:** snDraw가 비거나 실패를 돌려주면 `S.budget -= snCost(false)`로 되돌리고, 쿠폰과 buy 횟수도 되돌리세요. 아니면 값을 더하지 않고 \"공짜로 뽑기\" 인자를 넘기세요.",
+  "files": [
+   "28-festivals.js",
+   "23-exam-battle.js"
+  ]
+ },
+ {
+  "area": "행사와 시간 기능",
+  "title": "4. 매주 축제 도장의 하루 상한(FV.dayMax 5)이 적용되지 않아요",
+  "text": "- **위치:** `28-festivals.js`, `fvStamp` (510~522줄). 관련해서 `fvStampsToday`(507줄)는 만들어져 있지만 이 파일 어디에서도 쓰이지 않아요.\n- **무엇이 틀리나:**\n  - `fvStamp`는 주간 상한 15만 보고 하루 상한은 보지 않아요.\n  - 부스 3곳, 손님 3곳 다 만나기 1, 창 열기 1, 광고로 한 판 더 1을 모으면 하루에 6개예요.\n  - 그러면 축제 날 사흘보다 빨리 도장판(15개)을 채울 수 있어요.\n- **재현:** 단과대학 부스가 3곳 선 월요일에 창을 열고, 부스 3곳을 하고, 손님 셋을 만나고, 광고로 한 판 더 해요. 도장이 +6이 됩니다.\n- **확신도:** 낮음 (부스 수 `deptSlots`를 알 수 없고, 다른 파일에서 상한을 걸고 있을 수도 있어요)\n- **고치는 방법:** `S.fv`에 오늘 찍은 수(dn)를 두고 `fvStamp`에서 `Math.min(n, FV.dayMax - dn)`만 찍게 하세요. 대축제의 `bfStamp`와 같은 방식이에요. dn은 `fvSync`의 dayRoll에서 0으로 돌리면 돼요.\n\n---",
+  "files": [
+   "28-festivals.js",
+   "23-exam-battle.js"
+  ]
+ },
+ {
+  "area": "퀘스트 막힘",
+  "title": "2. 대학원 마지막 해에 `TIERS[S.tier + 1]`이 없어 졸업 탭과 건물 창이 오류로 멈출 수 있음",
+  "text": "- **위치**:\n  - 32-graduation.js `renderGradPanel` 4줄과 10줄: `last ? ...${N.school}...` 분기가 `gradOn()` 분기보다 먼저 옵니다.\n  - 12-sheet.js `renderSheet0` 178줄: `TIERS[S.tier + 1].name`. 59줄은 tier 4만 따로 처리합니다.\n- **무엇이 틀리나**:\n  - renderTierCard 79줄은 `TIERS[S.tier+1] || {...}`로 막아 두었습니다. 대학원(tier 5) 다음 칸이 없다는 뜻입니다.\n  - 그런데 위 두 곳은 막지 않았습니다. 그래서 `finalYear()`가 참이고 2학기일 때 undefined를 읽어 TypeError가 납니다.\n  - 졸업 탭은 버튼과 졸업식 카드를 그리기 전에 멈춥니다. 다 키운 건물 창은 안내 줄 이후를 그리지 못합니다.\n- **재현**: 대학원 박사 8학기(마지막 해 2학기)에 졸업 탭을 엽니다. 또는 최고 레벨 건물을 누릅니다.\n- **확신도**: 중간. finalYear()가 대학원 마지막 해에 참인지는 보이지 않습니다.\n- **고치는 방법**: 두 곳 모두 `gradOn()`을 먼저 확인하세요. 또는 `(TIERS[S.tier + 1] || {}).name`처럼 막으세요. 59줄과 178줄에는 대학원 문구 분기를 더하세요.",
+  "files": [
+   "03-quest-data.js",
+   "33-quests.js",
+   "32-graduation.js",
+   "12-sheet.js"
+  ]
+ },
+ {
+  "area": "퀘스트 막힘",
+  "title": "4. 학생 부탁(fac)이 올해 최고 레벨을 넘는 목표로 만들어져 칸을 막음",
+  "text": "- **위치**: 33-quests.js `makeSub` 550줄: `s.n = Math.max(s.n, S.f[s.k] + 1)`.\n- **무엇이 틀리나**:\n  - 지금 레벨이 facCap()과 같으면 목표가 cap+1이 됩니다. 그 해(학기)에는 이룰 수 없습니다.\n  - 다음 학교급이 닫힌 마지막 해처럼 cap이 오르지 않는 때에는 그 부탁 칸이 영구히 막힙니다.\n  - 졸업식 때는 COUNT_TYPES가 아닌 부탁을 버리고 다시 내므로, 같은 일이 되풀이될 수 있습니다.\n- **재현**: 유치원 1년째에 급식실을 Lv.16(상한)까지 올립니다. 그 상태로 메인을 12개째 마쳐 s9(급식실 n: 6)를 받으면 목표가 Lv.17이 되어 종업식 전까지 끝낼 수 없습니다.\n- **확신도**: 중간.\n- **고치는 방법**: `S.f[s.k] + 1 > facCap()`이면 그 부탁을 건너뛰세요(다음 def로). 또는 다음 학기까지 미루세요.",
+  "files": [
+   "03-quest-data.js",
+   "33-quests.js",
+   "32-graduation.js",
+   "12-sheet.js"
+  ]
+ },
+ {
+  "area": "퀘스트 막힘",
+  "title": "5. 2학년부터 '○학년 소도시 되기'(ygrade) 진행 막대가 처음부터 꽉 차 보일 수 있음",
+  "text": "- **위치**: 33-quests.js `qNeed` 442줄, `qProg` 484~486줄. 32-graduation.js `newYear` 154줄(`S.gr0 = rep()`).\n- **무엇이 틀리나**:\n  - 종업식 뒤 동네 단계는 gr0 위로 올린 만큼으로 정해집니다.\n  - 그런데 막대와 글은 절대 평판 `rep()`와 `townRep(q.n)`을 견줍니다.\n  - 그래서 '★200/200'처럼 다 찬 것으로 보이는데 완료가 되지 않습니다.\n- **재현**: 초등학교 1학년 종업식 뒤 e16(2학년 소도시 되기)을 봅니다.\n- **확신도**: 낮음. townRep가 gr0를 이미 반영하는지 보이지 않습니다.\n- **고치는 방법**: ygrade의 v와 need에 gr0를 똑같이 빼거나 더해서 견주세요.",
+  "files": [
+   "03-quest-data.js",
+   "33-quests.js",
+   "32-graduation.js",
+   "12-sheet.js"
+  ]
+ },
+ {
+  "area": "클라우드 저장과 서버 규칙",
+  "title": "2. 한 번 거절되면 엉뚱한 순위 칸(학회 → 심화 → 탐험…)이 그 세션 내내 꺼짐",
+  "text": "- **위치**: `16-rank.js` `submitRank` 337~342줄\n- **무엇이 틀리나**\n  - 거절 까닭을 가리지 않습니다. `permission`이 오면 이번에 보낸 선택 칸 가운데 첫째(학회 `cf`/`cq`)를 \"규칙이 아직 없다\"고 보고 `Rank.noConf = true`로 끕니다.\n  - 실제 까닭이 점수 오름 폭이나 btq 같은 다른 칸이어도 마찬가지입니다.\n  - 그다음 거절은 `noTamH`, `noTam`, `noBtq`, `noSk`, `noSem` 순서로 하나씩 끕니다.\n  - 규칙이 다 게시돼 있어도 그 세션 동안 학회와 탐험 순위가 \"서버 준비 중이에요\"로 남고, 점수도 올라가지 않습니다.\n- **재현**\n  1. 같은 계정으로 휴대폰과 웹을 함께 켭니다(구글 연결).\n  2. A가 대결 점수를 올린 직후 B가 올립니다.\n  3. B의 `btRankDoc`은 자기 `Rank.sbtq`를 기준으로 셉니다. 그래서 서버의 btq 규칙(`btq >= data.btq + d*432000`)에 걸려 거절됩니다.\n  4. 그런데 B에서는 학회 칸이 꺼지고, \"학회 순위는 서버 준비 중\"이 뜹니다.\n- **확신도**: 중간 (잘못 꺼지는 코드는 확실하고, 거절이 생기는 길은 상황에 따라 다릅니다)\n- **고치기**: 칸을 끄기 전에 그 칸만 뺀 문서로 한 번 더 시험합니다. 그래도 거절되면 그 칸 탓이 아니므로 끄지 않고 `denied` 흐름으로 보냅니다. 또는 `put` 직전에 서버의 내 줄을 `once`로 읽어 기준값(`bt`/`btq`/`at`)을 맞춥니다.",
+  "files": [
+   "15-cloud-save.js",
+   "16-rank.js",
+   "../../database.rules.json"
+  ]
+ },
+ {
+  "area": "클라우드 저장과 서버 규칙",
+  "title": "3. 주 번호가 -1이면 `ws`가 음수가 되어 랭킹 쓰기가 모두 거절됨",
+  "text": "- **위치**: `database.rules.json` 108~109줄(`ws` ≥ 0)과 103줄(`week === -1` 허용), `16-rank.js` `submitRank` 309~310줄\n- **무엇이 틀리나**\n  - 규칙은 `week`에 -1을 따로 허용합니다.\n  - 그런데 클라이언트는 `ws = S.lg.week * 1000000 + lp`를 늘 보냅니다. 주가 -1이면 `ws`는 약 -1,000,000이 되어 `ws >= 0`에 걸립니다.\n  - 그러면 2번의 흐름으로 칸이 하나씩 꺼지고, 결국 `Rank.readOnly`가 되어 \"볼 수만 있어요\"로 막힙니다.\n- **재현**: `lgWeek`가 `S.lg.week = -1`로 두는 상태(리그가 열리기 전 등)에서 3장을 마치고 이름을 정합니다(`joinRank`). 쓰기가 계속 거절되다가 읽기 전용이 됩니다.\n- **확신도**: 중간 (`lgWeek`가 보이지 않아 -1이 실제로 나오는지는 짐작입니다. 규칙이 -1을 일부러 허용한 것으로 보아 나올 가능성이 큽니다)\n- **고치기**: 주가 0보다 작으면 `ws`, `lp`, `week`(와 `tf`/`tq`)를 빼고 보냅니다. 또는 규칙의 `ws`를 `week === -1`일 때 허용하도록 맞춥니다.",
+  "files": [
+   "15-cloud-save.js",
+   "16-rank.js",
+   "../../database.rules.json"
+  ]
+ },
+ {
+  "area": "클라우드 저장과 서버 규칙",
+  "title": "5. 공개 학교(`look`) 쓰기 간격 60초와 `lookPush` 호출 간격이 어긋날 수 있음",
+  "text": "- **위치**: `16-rank.js` 334줄(`lookPush()`는 랭킹을 올릴 때마다 불림, 최소 11.5초 간격) / `database.rules.json` 155줄(지난 쓰기에서 60초가 지나야 덮어쓰기 허용)\n- **무엇이 틀리나**: `lookPush`가 스스로 60초 간격을 지키지 않으면, 두 번째 쓰기부터 거절됩니다. 그러면 `Rank.noLook`가 켜져 \"서버 준비 중\"이 계속 보일 수 있습니다.\n- **확신도**: 낮음 (`lookPush`가 보이지 않습니다)\n- **고치기**: `lookPush`에서 마지막으로 공개 학교를 쓴 시각을 기억해 두고, 60초가 지나기 전에는 쓰지 않습니다. 거절 때문에 `noLook`를 켜지 않게도 합니다.\n\n---",
+  "files": [
+   "15-cloud-save.js",
+   "16-rank.js",
+   "../../database.rules.json"
+  ]
+ },
+ {
+  "area": "화면과 이벤트",
+  "title": "2. closeModal을 빨리 두 번 부르면 then(보상 받기)이 두 번 실행됨",
+  "text": "- **어디:** 34-ui-core-loop.js closeModal 17~22줄. 쓰는 곳은 35-bind.js 49줄 `#srGet`(`claimSports(1)`), 924줄 `#exitYes`(앱 닫기 또는 closeSchool), 741줄 `#decoPickShop`이에요.\n- **무엇이 틀리나:** 두 번째 호출에서는 `open` 표시도 rt.modalOpen도 이미 비어 있어요. 그런데 아무 확인 없이 setTimeout으로 `then`을 또 예약해요. 창은 180ms 동안 화면에 남아 있어요.\n- **재현:** 운동회 결과 창의 받기 단추를 180ms 안에 두 번 눌러요. 그러면 `claimSports(1)`가 두 번 불려요.\n- **확신도:** 낮음. 닫히는 중인 창(`open`이 없는 창)을 CSS가 pointer-events: none으로 막는지 보이지 않아요. claimSports 안에 두 번 받기 막음이 있는지도 보이지 않아요.\n- **고치는 방법:** closeModal 처음에 `if (!el.classList.contains('open') && rt.modalOpen !== el && el._closing) return;`을 두고, `el._closing`은 타이머 안에서 지워요. 또는 then이 있는 단추만 누르는 즉시 `disabled`로 바꿔요.",
+  "files": [
+   "34-ui-core-loop.js",
+   "35-bind.js",
+   "21-counsel-elect-lab.js",
+   "27-reward-scenes.js"
+  ]
+ },
+ {
+  "area": "화면과 이벤트",
+  "title": "4. 퍼즐 화면에서 건물 창이 열린 채 뒤로 가기를 누르면 끝없이 서로 부름",
+  "text": "- **어디:** 35-bind.js FOREST_BACK 931줄과 wireAppLife keydown 949줄.\n- **무엇이 틀리나:**\n  - FOREST_BACK은 `rt.sheetKey`가 있으면 Escape를 보내요.\n  - keydown은 `pzUI.open && !rt.modalOpen`이면 다시 FOREST_BACK을 불러요.\n  - 둘이 서로 부르다가 스택이 넘쳐 오류가 나요. 964줄의 closeSheet에는 영영 닿지 않아요.\n- **재현:** 건물 창(rt.sheetKey)이 열린 상태가 남은 채 블록 퍼즐이 열린 때 뒤로 가기를 눌러요. 미션 바로 가기나 탭 이동으로 시트가 닫히지 않고 퍼즐에 들어가는 경우예요.\n- **확신도:** 낮음. setTab이나 퍼즐 열기가 시트를 닫는지 보이지 않아서, 이 상태가 실제로 생기는지 모르겠어요.\n- **고치는 방법:** 931줄 조건에서 sheetKey일 때 Escape 대신 `closeSheet(); return;`을 바로 불러요. 또는 949줄 조건에 `&& !rt.sheetKey`를 더해요.\n\n---",
+  "files": [
+   "34-ui-core-loop.js",
+   "35-bind.js",
+   "21-counsel-elect-lab.js",
+   "27-reward-scenes.js"
+  ]
+ },
+ {
+  "area": "학생과 지도와 그 밖",
+  "title": "1. 진로 도감 완성 보상 줄이 졸업식마다 다시 뜸",
+  "text": "- **위치:** `21-counsel-elect-lab.js` / `csSettle` / 164줄, 175줄\n- **무엇이 틀리는지:**\n  - 164줄은 황금 3개와 '진로 나무'를 처음 한 번만 줘요(`!S.deco.own.deco_career_tree`일 때만).\n  - 그런데 175줄 보상 창의 줄은 `allDex && S.deco.own.deco_career_tree`로 판단해요.\n  - 한 번 완성한 뒤로는 이 값이 늘 참이에요. 그래서 다음 학교급 졸업식부터 매번 \"진로 도감 완성! 장식 '진로 나무', 황금 도토리 +3\"이 다시 보여요. 실제로는 황금이 들어오지 않아요.\n  - 반대 경우도 있어요. 3학년을 다시 하는 졸업식(`S.cs.paid === S.roster.gen`, 166줄)에서 도감이 완성되면 황금과 장식은 들어오지만 보상 창에 아무 말이 없어요.\n- **재현 방법:**\n  1. 진로 도감 12칸을 다 채워서 진로 나무를 받아요.\n  2. 다시 한 해를 돌아 새 명부(`roster.gen`이 다름)로 고3 졸업식을 하고, 진로를 이룬 학생이 1명 이상 있게 해요.\n  3. 보상 창에 '황금 +3' 줄이 또 나오지만 `S.gold`는 늘지 않아요.\n- **확신도:** 높음\n- **고치는 방법:** 164줄에서 `const treeNew = allDex && !S.deco.own.deco_career_tree;`를 먼저 구해 두고, 175줄 조건을 `treeNew`로 바꿔요. 166줄 갈래에도 `treeNew`이면 같은 줄을 `rt.csRw`에 넣어요.\n\n---",
+  "files": [
+   "09-students.js",
+   "20-study-club.js",
+   "21-counsel-elect-lab.js",
+   "22-picnic-sticker-memory.js",
+   "25-trip.js",
+   "32-graduation.js"
+  ]
+ },
+ {
+  "area": "학생과 지도와 그 밖",
+  "title": "2. 책 읽기 진행 막대가 비 오는 날 틀린 값으로 시작함",
+  "text": "- **위치:** `21-counsel-elect-lab.js` / `renderReadBar` / 643~644줄\n- **무엇이 틀리는지:**\n  - 전체 시간 `tot`을 늘 `RD.min * 60000`(15분)으로 잡아요.\n  - 하지만 실제 읽는 시간은 `S.rd.m`이에요. 비 오는 날에는 10분이에요(`rdEnd`, 576줄).\n  - 그래서 10분짜리 책은 시작하자마자 막대가 33% 차 있어요. \"n분 남았어요\" 글자는 맞아서 막대와 글자가 서로 어긋나요.\n  - `rdMinNow`가 15보다 큰 값을 줄 수 있다면 너비가 음수가 돼요. 이 부분은 짐작이에요.\n- **재현 방법:** 날씨가 비인 날 도서관에서 새 책을 고르고(첫 책 말고) 읽기 창을 열면 막대가 ⅓쯤 찬 채로 시작해요.\n- **확신도:** 높음\n- **고치는 방법:** `const tot = (S.rd.m || RD.min) * 60000;`로 바꾸고, 너비는 `Math.max(0, …)`로 감싸요.\n\n---",
+  "files": [
+   "09-students.js",
+   "20-study-club.js",
+   "21-counsel-elect-lab.js",
+   "22-picnic-sticker-memory.js",
+   "25-trip.js",
+   "32-graduation.js"
+  ]
+ },
+ {
+  "area": "학생과 지도와 그 밖",
+  "title": "3. 문제집 모두 사기 알림의 XP 숫자가 실제와 다름",
+  "text": "- **위치:** `20-study-club.js` / `acBuyBookAll` / 59줄 (한 권 사기 `acBuyBook` 71줄도 같음)\n- **무엇이 틀리는지:**\n  - `acGain`은 학력 연구 보너스를 붙여 `floor(50 × (1 + rxPct('study')/100))`를 넣어요(43줄).\n  - 그런데 알림은 `n * AC.book.xp`(50 × 권수)로 보여요. 연구를 한 저장에서는 보여 주는 XP가 실제보다 작아요.\n- **재현 방법:** 학력 연구(`rxPct('study') > 0`)를 한 상태에서 문제집 2권을 모두 사요. 알림은 \"+100\"인데 `S.ac[k].xp`는 그보다 더 올라요.\n- **확신도:** 중간 (`rxPct`를 직접 보지 못했어요)\n- **고치는 방법:** `acBuyBook`이 `acGain`의 반환값을 돌려주게 하고, 알림에는 그 값을 쓰거나 더한 값을 써요.\n\n---",
+  "files": [
+   "09-students.js",
+   "20-study-club.js",
+   "21-counsel-elect-lab.js",
+   "22-picnic-sticker-memory.js",
+   "25-trip.js",
+   "32-graduation.js"
+  ]
+ },
+ {
+  "area": "학생과 지도와 그 밖",
+  "title": "4. 읽던 책이 저장 읽기에서 지워지면 예약 권수가 사라짐",
+  "text": "- **위치:** `21-counsel-elect-lab.js` / `sanitizeStudy2` / 684줄, 687줄\n- **무엇이 틀리는지:**\n  - `R.at`이 0이나 이상한 값이라 `s.rd.cur`가 지워지면, 687줄의 예약 목록 `q`도 같이 버려져요.\n  - 그런데 예약할 때 이미 센 하루 권수 `s.rd.n`은 그대로 남아요. 그날은 예약한 만큼 책을 못 읽어요.\n- **재현 방법:** `rd.cur`는 있고 `rd.at`이 0이며 `rd.q`에 2권이 든 저장을 읽어요. 읽는 책도 예약도 없는데 오늘 남은 책이 1권으로 줄어 있어요.\n- **확신도:** 낮음 (보통 플레이로는 잘 생기지 않는 저장 상태예요)\n- **고치는 방법:** `cur`를 지울 때 `s.rd.n = Math.max(0, s.rd.n - q.length)`로 돌려주거나, `q`의 첫 책을 `cur`로 올려요.\n\n---",
+  "files": [
+   "09-students.js",
+   "20-study-club.js",
+   "21-counsel-elect-lab.js",
+   "22-picnic-sticker-memory.js",
+   "25-trip.js",
+   "32-graduation.js"
+  ]
+ },
+ {
+  "area": "학생과 지도와 그 밖",
+  "title": "5. 비 오는 날 아닌 읽기 시간이 저장 뒤 15분으로 돌아감 (짐작)",
+  "text": "- **위치:** `21-counsel-elect-lab.js` / `sanitizeStudy2` / 684줄\n- **무엇이 틀리는지:**\n  - `s.rd.m = R.m === 10 ? 10 : 0`이라서 10분이 아닌 모든 값은 0이 돼요. 0이면 `rdEnd`에서 15분으로 계산돼요.\n  - `rdMinNow`가 10이나 15 말고 다른 값(연구, 선생님 효과 등)을 줄 수 있다면 다시 켤 때 끝나는 시각이 바뀌어요.\n- **재현 방법:** `rdMinNow`가 예를 들어 12를 주는 상태에서 책을 읽기 시작하고, 앱을 껐다 켜면 3분 늦게 끝나요.\n- **확신도:** 낮음 (`rdMinNow`를 보지 못했어요)\n- **고치는 방법:** `Number.isFinite(R.m) && R.m > 0 && R.m <= RD.min ? R.m : 0`처럼 범위로 받아요.\n\n---\n\n이 밖에 보상 두 번, 진행 막힘, 오류로 멈추는 곳은 찾지 못했어요. 확인한 곳은 지도, 학생, 도토리 줍기, 침입자, 졸업생, 말풍선, 상점, 테마, 동아리, 대항전, 반장, 실험이에요. 다음 방어가 이미 막고 있었어요.\n\n- 보상 두 번: `d.dead`, `rt.visit = null`, `rt.trial = null`, `T.res`, `S.cs.paid`, `S.cg.wk`\n- 저장 깨짐: `sanitize` 범위 검사",
+  "files": [
+   "09-students.js",
+   "20-study-club.js",
+   "21-counsel-elect-lab.js",
+   "22-picnic-sticker-memory.js",
+   "25-trip.js",
+   "32-graduation.js"
+  ]
+ },
+ {
+  "area": "학생과 지도와 그 밖",
+  "title": "1. 생일 모자를 벗길 때 희귀 겉모습과 목 꾸미기가 사라짐",
+  "text": "- **위치:** 22-picnic-sticker-memory.js, `bdHats`, 564줄\n- **무엇이 틀리나:**\n  - 모자를 씌울 때(566줄)는 `kidSVG(k.rare ? k.sp + '_rare' : k.sp, k.bag, { hat: 'bday', neck: S.cos.neck })`로 그려요.\n  - 벗길 때(564줄)는 `kidSVG(o.sp, o.bag)`로만 다시 그려요.\n  - 그래서 희귀(rare) 학생은 일반 그림으로 돌아가고, 목 꾸미기(S.cos.neck)도 빠져요.\n- **재현 방법:**\n  1. 희귀 학생이 그 종류의 첫 학생인 저장을 준비해요.\n  2. 그 종류 단짝의 생일날 지도에 고깔모자가 씌워져요.\n  3. 게임 시계로 자정이 지나 bdParty가 바뀌면 frTick → bdHats가 돌아요.\n  4. 그 학생이 일반 그림이 되고 목 꾸미기도 사라져요.\n  - 생일 주인공이 다른 종류로 바뀔 때(반 친구 생일)도 똑같아요.\n- **확신도:** 중간. syncKids 같은 다른 곳에서 곧 다시 그리는지는 이 파일만으로 알 수 없어요.\n- **고치는 방법:** 564줄을 모자를 씌울 때처럼 바꿔요.\n  ```js\n  kidSVG(o.rare ? o.sp + '_rare' : o.sp, o.bag, { neck: S.cos.neck })\n  ```",
+  "files": [
+   "09-students.js",
+   "20-study-club.js",
+   "21-counsel-elect-lab.js",
+   "22-picnic-sticker-memory.js",
+   "25-trip.js",
+   "32-graduation.js"
+  ]
+ },
+ {
+  "area": "학생과 지도와 그 밖",
+  "title": "2. 소풍 단축권: 표가 저장에 없으면 NaN이 저장됨",
+  "text": "- **위치:** 22-picnic-sticker-memory.js, `picnicUseTicket`, 68~69줄\n- **무엇이 틀리나:**\n  - 검사가 `S.tk[k] < 1`이에요. S.tk에 그 키가 없으면 `undefined < 1`이 false라서 검사를 통과해요.\n  - 그러면 `S.tk[k]--`가 NaN을 만들고, 그 값이 save()로 저장돼요.\n- **재현 방법:** S.tk에 새 단축권 키가 빠진 옛 저장에서, 소풍 중에 그 단축권 단추를 누르면(data-picnic-tk) 돼요.\n- **확신도:** 낮음. sanitize가 TK의 모든 키를 0으로 채운다면 일어나지 않아요. 보이지 않는 파일이라 짐작이에요.\n- **고치는 방법:** 검사를 `!(S.tk[k] >= 1)`로 바꿔요.",
+  "files": [
+   "09-students.js",
+   "20-study-club.js",
+   "21-counsel-elect-lab.js",
+   "22-picnic-sticker-memory.js",
+   "25-trip.js",
+   "32-graduation.js"
+  ]
+ },
+ {
+  "area": "학생과 지도와 그 밖",
+  "title": "3. 버스 돌아오기 장면을 건너뛰면 S.trip.kids가 줄지 않을 수 있음",
+  "text": "- **위치:** 27-reward-scenes.js, `busScene`, 76줄과 78줄\n- **무엇이 틀리나:**\n  - 'back' 모드에서는 `S.trip.kids`를 애니메이션 안의 `off()`(133줄)에서만 하나씩 줄여요.\n  - 그런데 아래 두 경우에는 장면 없이 바로 `then()`을 불러요.\n    - 움직임 줄이기(rt.reduced)를 켠 경우\n    - 밤이나 수학여행 중(kidsAway())인 경우\n  - 부르는 쪽이 then 안에서 S.trip.kids를 0으로 맞추지 않으면, 학생이 버스에서 내리지 않은 채로 남아 수가 맞지 않아요.\n- **재현 방법:** 움직임 줄이기를 켜고 체험학습을 보낸 뒤 돌아오게 해요. 이어서 지도 학생 수와 수업료를 확인해요.\n- **확신도:** 낮음. 부르는 쪽(체험학습 파일)이 보이지 않아요. 그곳에서 이미 정리하고 있다면 버그가 아니에요.\n- **고치는 방법:** 두 빠른 길에서 `mode === 'back'`이면 `S.trip.kids = Math.max(0, S.trip.kids - n); syncKids(true);`를 하거나, 부르는 쪽에서 정리하는지 확인해요.\n\n---",
+  "files": [
+   "09-students.js",
+   "20-study-club.js",
+   "21-counsel-elect-lab.js",
+   "22-picnic-sticker-memory.js",
+   "25-trip.js",
+   "32-graduation.js"
+  ]
+ }
+]
