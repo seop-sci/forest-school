@@ -71,7 +71,7 @@
     trialWasHunt: undefined,   // 지난 매나 뱀이 사냥형이었는지
     visit: undefined,   // 지금 놀러 온 손님
     aitJson: undefined, aitT: undefined,   // 5.4.0.2 토스 저장소로 보낼 저장 글과 모아 보내기 타이머
-    guest: null, gsT: undefined,   // 5.3.4.7 오늘의 손님: 교문 앞에 서 있는 손님, 나타나기까지 남은 초
+    guest: null, gsT: undefined, adWhere: '',   // 5.3.4.7 오늘의 손님: 교문 앞에 서 있는 손님, 나타나기까지 남은 초
     visitT: undefined,   // 다음 손님까지 남은 초
     frBub: undefined,   // 단짝 말풍선 요소
     // 건물 창, 가구, 공사
@@ -364,6 +364,7 @@
     tr2: freshTr2(),   // 수학여행: 다녀온 학년, 지금 여행, 떠난 수, 돌아온 수, 기념품. 진로 상담: 오늘 날짜와 횟수, 모든 상담 수, 진로를 고른 수, 이룬 학생 수, 정산한 명부 번호, 진로 도감
     roster: freshRoster(), club: freshClub(), el: freshEl(), snap: {}, tfp: 0,   // el: 반장 선거
       // tfp: 이 학교급에 들어올 때까지 장학재단을 고친 횟수. 학생 명부, 동아리, 학교급 사진(졸업식 때 남긴 모습)
+    use: freshUse(),   // 5.4.0.3 놀이 기록: d 최근 쓴 날(날 번호), n 모두 횟수
     gs: freshGs(),   // 5.3.4.7 오늘의 손님: day 온 날, who 손님, st 0 없음 1 교문 2 부탁 중 3 오늘 끝, sub 부탁, met 만난 수, n 들어준 수
     pa: freshPa(),   // 5.4.0 사진첩: on 열림, ms 미션 사진, fr 자유 사진(30장까지), own 가진 액자, seen 빨간 점을 본 날, n 찰칵 횟수
     q: freshQ()
@@ -617,6 +618,7 @@
     sanitizeCg(d, s);   // 동아리 대항전
     sanitizePa(d, s);   // 5.4.0 사진첩
     sanitizeGs(d, s);   // 5.3.4.7 오늘의 손님
+    sanitizeUse(d, s);   // 5.4.0.3 놀이 기록
     s.wx = typeof d.wx === 'string' ? d.wx.slice(0, 10) : '';   // 날씨 알림 본 날
     s.wxOff = d.wxOff ? 1 : 0;   // 보안 보강 판: 날씨 칩을 눌러 비, 눈, 안개 효과 끄기(날씨 자체와 보너스는 그대로)
     { const P = d.pl && typeof d.pl === 'object' ? d.pl : {}, got = Math.max(0, Math.min(PL.list.length, Math.floor(Number(P.got) || 0))); s.pl = { got, read: Math.max(0, Math.min(got, Math.floor(Number(P.read) || 0))), wk: Math.floor(Number(P.wk)) || -1 }; }   // 학부모 편지

@@ -4,7 +4,7 @@
      처음 관찰 과학 XP 10과 숲의 정수 1, 다시 보면 과학 XP 3과 수업료 3분치. 희귀 4%(과학실 Lv.5마다 +1%, 최대 8%).
      10종 황금 도토리 1, 20종 숲의 정수 20, 30종 지도 장식 '관찰 오두막'(업적 '생물 탐사' 칭호 꼬마 생물학자)
      2.3.5: 90종으로. 60종 황금 도토리 3과 곤충 호텔, 90종 숲의 정수 50과 생태 연못, 칭호 숲속 박사 */
-  const BX = { tier: 1, every: 2 * 3600000, max: 3, rare0: 4, rareMax: 8, xpNew: 10, xpDup: 3, essNew: 1, dupMin: 3, gold10: 1, ess20: 20, gold60: 3, ess90: 50, full: 90 };
+  const BX = { tier: 1, every: 2 * 3600000, max: 3, rare0: 4, rareMax: 8, xpNew: 10, xpDup: 3, essNew: 1, dupMin: 3, gold10: 1, ess20: 20, gold60: 3, ess90: 50, full: 90, gold120: 3, ess120: 60, ess150: 100 };   // 5.4.0.3 120종, 150종 단계(숫자는 woodani 확인 전 제안값)
   // 지도(geoIdx)마다 [가로 %, 세로 %, 물가면 1]. 장식 자리, 건물 빈터(울타리 안), 길을 피했어요
   // 왼쪽 단추 줄, 오른쪽 단추 줄, 아래 칩, 화면 밖(가장자리 11%)에 걸리던 자리를 안쪽 풀숲과 물가로 옮겼어요
   // 건물 누르는 칸과 이름표에 가리던 자리를 손가락이 다 닿는 풀밭과 호수로 옮겼어요(390px, 360px에서 잼)
@@ -247,6 +247,9 @@
     // 60종 황금 도토리 3과 곤충 호텔, 90종 숲의 정수 50과 생태 연못, 칭호 숲속 박사
     if (n >= 60 && S.bx.g < 4) { S.bx.g = 4; addGold(BX.gold60); S.deco.own.deco_bug_hotel = 1; got.push(`생물 60종! 황금 도토리 +${BX.gold60}, 지도 장식 곤충 호텔`); }
     if (n >= BX.full && S.bx.g < 5) { S.bx.g = 5; addEss(BX.ess90); S.deco.own.deco_eco_pond = 1; got.push(`생물 ${BX.full}종! 숲의 정수 +${BX.ess90}, 지도 장식 생태 연못, 칭호 숲속 박사`); }   // 5.3.4.8: 150종이 되어도 90종에서 받아요(이미 받은 사람과 같게)
+    // 5.4.0.3 (woodani 2026-11-25 "생물 보상단계도 두면 좋겠고"): 120종 황금 도토리 3과 숲의 정수 60, 150종(모두) 숲의 정수 100과 칭호 생물 도감 완성
+    if (n >= 120 && S.bx.g < 6) { S.bx.g = 6; addGold(BX.gold120); addEss(BX.ess120); got.push(`생물 120종! 황금 도토리 +${BX.gold120}, 숲의 정수 +${BX.ess120}`); }
+    if (n >= BIO.length && S.bx.g < 7) { S.bx.g = 7; addEss(BX.ess150); got.push(`생물 ${BIO.length}종을 다 모았어요! 숲의 정수 +${BX.ess150}, 칭호 생물 도감 완성`); }
     rt.bxRes = { b, nw, got };
     sfx(b.rare ? 'quest' : 'coin');
     renderDeco(true); renderHUD(); bxShow(); save();
@@ -276,7 +279,7 @@
     o.sp = (Array.isArray(X.sp) ? X.sp : []).filter(x => x && Number.isInteger(x.i) && x.i >= 0 && x.i < L.length && BIO_BY[x.id] && !used[x.i] && (used[x.i] = 1)).slice(0, BX.max).map(x => ({ i: x.i, id: x.id, t: n(x.t, lim) }));
     o.next = n(X.next, lim);
     if (X.got && typeof X.got === 'object') for (const b of BIO) if (X.got[b.id]) o.got[b.id] = n(X.got[b.id], 1e6);
-    o.g = n(X.g, 5); o.st.n = n(X.st && X.st.n, 1e9);
+    o.g = n(X.g, 7);   // 5.4.0.3 단계 7까지(120종 6, 150종 7) o.st.n = n(X.st && X.st.n, 1e9);
     s.bx = o;
   }
   /* ---------- 학교 텃밭 (프로젝트 문서 ' 설계안' 3절) ----------
