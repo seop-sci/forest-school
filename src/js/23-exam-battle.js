@@ -283,6 +283,7 @@
     sfx('tap'); btRender();
   }
   function btStart() {
+    useLog('bt');   // 5.4.0.3 놀이 기록
     const M = btUI.M; if (!M || M.phase !== 'pick' || M.me.some(x => !x)) return false;
     if (btLeft() <= 0) { if (btCanAd()) btAdMore(); else toast(`숲속 대결은 하루 ${btQuota()}판이에요.\n내일 또 겨뤄요`); return false; }
     S.bt.n += 1; M.phase = 'play'; M.i = 0;

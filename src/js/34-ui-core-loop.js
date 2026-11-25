@@ -6,6 +6,7 @@
   }
   function openModal(el) {
     nlModal(el);
+    if (rt.modalOpen !== el && el.id) useLog(el.id);   // 5.4.0.3 놀이 기록
     rt.modalOpen = el;
     el.hidden = false;
     try { uiRwOpen(el); } catch (e) { /* 연출만 */ }   // 보상 창 빛살
@@ -64,6 +65,7 @@
   function shake(el) { el.classList.remove('shake'); void el.offsetWidth; el.classList.add('shake'); el.addEventListener('animationend', () => el.classList.remove('shake'), { once: true }); setTimeout(() => el.classList.remove('shake'), 900); sfx('deny'); }
   function setTab(t) {
     const prev = rt.tab;
+    if (prev !== t) useLog('tab_' + t);   // 5.4.0.3 놀이 기록
     if (t !== 'rank' && t !== 'dex') rt.backTab = '';   // C-22
     if (rt.thPrev && t !== 'school') thPreviewEnd(true);   // 다른 탭으로 가면 미리 보기를 끝내요
     rt.tab = t;

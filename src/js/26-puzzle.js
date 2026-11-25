@@ -350,6 +350,7 @@
     save(); renderHUD(); renderEss(); pzRenderAll();
   }
   function pzOpen(asked) {
+    useLog('pz');   // 5.4.0.3 놀이 기록
     pzInitArt();
     if (!FXL.st && wldLv() > 0) { FXL.touched = true; fxLoad(); }   // 엔진을 아직 안 받았으면 지금
     if (FXL.st === 'ok' && !FXO.st) fxoInit();   // 깨지는 조각 그림판

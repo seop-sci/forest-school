@@ -270,6 +270,8 @@
   const AD_GUARD_MS = 180000;
   function showAd(onReward, onSkip) {
     if (rt.adOpen) return;
+    rt.adWhere = (rt.modalOpen && rt.modalOpen.id) || rt.tab || '';   // 5.4.0.3 놀이 기록: 어느 자리에서 눌렀는지
+    useLog('ad_ask:' + rt.adWhere);
     const EXT = AIT && AIT.ads ? AIT : ADS_EXT;   // 토스 광고나 안드로이드 애드몹 광고
     if (EXT) {
       // 토스 리워드 광고: 끝까지 봤다는 신호(userEarnedReward)가 왔을 때만 보상을 줘요
@@ -322,6 +324,7 @@
     ensureAudio(); musicSync();
     const ok = rt.adOk, no = rt.adNo, earned = rt.adEarned, noGold = rt.adNoGold;
     rt.adOk = rt.adNo = null; rt.adNoGold = false;
+    useLog((earned ? 'ad_ok:' : 'ad_no:') + (rt.adWhere || ''));   // 5.4.0.3 놀이 기록
     if (earned) { S.st.ads += 1; adxDay(); S.adx.all = Math.min(10000, (S.adx.all || 0) + 1); if (!noGold) adGold(); adStamp(); if (ok) ok(); }   // 오늘 본 광고 수(관리자 지표)
     else if (no) no();
     else toast('광고를 끝까지 보지 않아서 보상이 없어요');

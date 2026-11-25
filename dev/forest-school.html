@@ -4105,7 +4105,7 @@ body.mg-on .toast[hidden]{display:none}
     <p class="boot-step" id="bootStep">학교 문을 여는 중...</p>
     <p class="boot-tip" id="bootTip">학교 문을 여는 중이에요</p>
   </div>
-  <span class="boot-ver" id="bootVer">v5.4.0.2</span>
+  <span class="boot-ver" id="bootVer">v5.4.0.3</span>
 </div>
 
 <div class="app on-school" id="app">
@@ -4725,7 +4725,7 @@ body.mg-on .toast[hidden]{display:none}
       </div>
       <h3 class="panel-sub">정보</h3>
       <dl class="info">
-        <div id="verRow"><dt>버전</dt><dd>v5.4.0.2</dd></div>
+        <div id="verRow"><dt>버전</dt><dd>v5.4.0.3</dd></div>
         <div id="pidRow" hidden><dt>학교 번호</dt><dd id="infoPid"></dd></div>
       </dl>
       <div id="devBox" hidden>
@@ -9373,7 +9373,7 @@ body.mg-on .toast[hidden]{display:none}
     trialWasHunt: undefined,   // 지난 매나 뱀이 사냥형이었는지
     visit: undefined,   // 지금 놀러 온 손님
     aitJson: undefined, aitT: undefined,   // 5.4.0.2 토스 저장소로 보낼 저장 글과 모아 보내기 타이머
-    guest: null, gsT: undefined,   // 5.3.4.7 오늘의 손님: 교문 앞에 서 있는 손님, 나타나기까지 남은 초
+    guest: null, gsT: undefined, adWhere: '',   // 5.3.4.7 오늘의 손님: 교문 앞에 서 있는 손님, 나타나기까지 남은 초
     visitT: undefined,   // 다음 손님까지 남은 초
     frBub: undefined,   // 단짝 말풍선 요소
     // 건물 창, 가구, 공사
@@ -9666,6 +9666,7 @@ body.mg-on .toast[hidden]{display:none}
     tr2: freshTr2(),   // 수학여행: 다녀온 학년, 지금 여행, 떠난 수, 돌아온 수, 기념품. 진로 상담: 오늘 날짜와 횟수, 모든 상담 수, 진로를 고른 수, 이룬 학생 수, 정산한 명부 번호, 진로 도감
     roster: freshRoster(), club: freshClub(), el: freshEl(), snap: {}, tfp: 0,   // el: 반장 선거
       // tfp: 이 학교급에 들어올 때까지 장학재단을 고친 횟수. 학생 명부, 동아리, 학교급 사진(졸업식 때 남긴 모습)
+    use: freshUse(),   // 5.4.0.3 놀이 기록: d 최근 쓴 날(날 번호), n 모두 횟수
     gs: freshGs(),   // 5.3.4.7 오늘의 손님: day 온 날, who 손님, st 0 없음 1 교문 2 부탁 중 3 오늘 끝, sub 부탁, met 만난 수, n 들어준 수
     pa: freshPa(),   // 5.4.0 사진첩: on 열림, ms 미션 사진, fr 자유 사진(30장까지), own 가진 액자, seen 빨간 점을 본 날, n 찰칵 횟수
     q: freshQ()
@@ -9919,6 +9920,7 @@ body.mg-on .toast[hidden]{display:none}
     sanitizeCg(d, s);   // 동아리 대항전
     sanitizePa(d, s);   // 5.4.0 사진첩
     sanitizeGs(d, s);   // 5.3.4.7 오늘의 손님
+    sanitizeUse(d, s);   // 5.4.0.3 놀이 기록
     s.wx = typeof d.wx === 'string' ? d.wx.slice(0, 10) : '';   // 날씨 알림 본 날
     s.wxOff = d.wxOff ? 1 : 0;   // 보안 보강 판: 날씨 칩을 눌러 비, 눈, 안개 효과 끄기(날씨 자체와 보너스는 그대로)
     { const P = d.pl && typeof d.pl === 'object' ? d.pl : {}, got = Math.max(0, Math.min(PL.list.length, Math.floor(Number(P.got) || 0))); s.pl = { got, read: Math.max(0, Math.min(got, Math.floor(Number(P.read) || 0))), wk: Math.floor(Number(P.wk)) || -1 }; }   // 학부모 편지
@@ -14186,7 +14188,7 @@ body.mg-on .toast[hidden]{display:none}
      처음 관찰 과학 XP 10과 숲의 정수 1, 다시 보면 과학 XP 3과 수업료 3분치. 희귀 4%(과학실 Lv.5마다 +1%, 최대 8%).
      10종 황금 도토리 1, 20종 숲의 정수 20, 30종 지도 장식 '관찰 오두막'(업적 '생물 탐사' 칭호 꼬마 생물학자)
      2.3.5: 90종으로. 60종 황금 도토리 3과 곤충 호텔, 90종 숲의 정수 50과 생태 연못, 칭호 숲속 박사 */
-  const BX = { tier: 1, every: 2 * 3600000, max: 3, rare0: 4, rareMax: 8, xpNew: 10, xpDup: 3, essNew: 1, dupMin: 3, gold10: 1, ess20: 20, gold60: 3, ess90: 50, full: 90 };
+  const BX = { tier: 1, every: 2 * 3600000, max: 3, rare0: 4, rareMax: 8, xpNew: 10, xpDup: 3, essNew: 1, dupMin: 3, gold10: 1, ess20: 20, gold60: 3, ess90: 50, full: 90, gold120: 3, ess120: 60, ess150: 100 };   // 5.4.0.3 120종, 150종 단계(숫자는 woodani 확인 전 제안값)
   // 지도(geoIdx)마다 [가로 %, 세로 %, 물가면 1]. 장식 자리, 건물 빈터(울타리 안), 길을 피했어요
   // 왼쪽 단추 줄, 오른쪽 단추 줄, 아래 칩, 화면 밖(가장자리 11%)에 걸리던 자리를 안쪽 풀숲과 물가로 옮겼어요
   // 건물 누르는 칸과 이름표에 가리던 자리를 손가락이 다 닿는 풀밭과 호수로 옮겼어요(390px, 360px에서 잼)
@@ -14429,6 +14431,9 @@ body.mg-on .toast[hidden]{display:none}
     // 60종 황금 도토리 3과 곤충 호텔, 90종 숲의 정수 50과 생태 연못, 칭호 숲속 박사
     if (n >= 60 && S.bx.g < 4) { S.bx.g = 4; addGold(BX.gold60); S.deco.own.deco_bug_hotel = 1; got.push(`생물 60종! 황금 도토리 +${BX.gold60}, 지도 장식 곤충 호텔`); }
     if (n >= BX.full && S.bx.g < 5) { S.bx.g = 5; addEss(BX.ess90); S.deco.own.deco_eco_pond = 1; got.push(`생물 ${BX.full}종! 숲의 정수 +${BX.ess90}, 지도 장식 생태 연못, 칭호 숲속 박사`); }   // 5.3.4.8: 150종이 되어도 90종에서 받아요(이미 받은 사람과 같게)
+    // 5.4.0.3 (woodani 2026-11-25 "생물 보상단계도 두면 좋겠고"): 120종 황금 도토리 3과 숲의 정수 60, 150종(모두) 숲의 정수 100과 칭호 생물 도감 완성
+    if (n >= 120 && S.bx.g < 6) { S.bx.g = 6; addGold(BX.gold120); addEss(BX.ess120); got.push(`생물 120종! 황금 도토리 +${BX.gold120}, 숲의 정수 +${BX.ess120}`); }
+    if (n >= BIO.length && S.bx.g < 7) { S.bx.g = 7; addEss(BX.ess150); got.push(`생물 ${BIO.length}종을 다 모았어요! 숲의 정수 +${BX.ess150}, 칭호 생물 도감 완성`); }
     rt.bxRes = { b, nw, got };
     sfx(b.rare ? 'quest' : 'coin');
     renderDeco(true); renderHUD(); bxShow(); save();
@@ -14458,7 +14463,7 @@ body.mg-on .toast[hidden]{display:none}
     o.sp = (Array.isArray(X.sp) ? X.sp : []).filter(x => x && Number.isInteger(x.i) && x.i >= 0 && x.i < L.length && BIO_BY[x.id] && !used[x.i] && (used[x.i] = 1)).slice(0, BX.max).map(x => ({ i: x.i, id: x.id, t: n(x.t, lim) }));
     o.next = n(X.next, lim);
     if (X.got && typeof X.got === 'object') for (const b of BIO) if (X.got[b.id]) o.got[b.id] = n(X.got[b.id], 1e6);
-    o.g = n(X.g, 5); o.st.n = n(X.st && X.st.n, 1e9);
+    o.g = n(X.g, 7);   // 5.4.0.3 단계 7까지(120종 6, 150종 7) o.st.n = n(X.st && X.st.n, 1e9);
     s.bx = o;
   }
   /* ---------- 학교 텃밭 (프로젝트 문서 ' 설계안' 3절) ----------
@@ -15359,6 +15364,8 @@ body.mg-on .toast[hidden]{display:none}
   const AD_GUARD_MS = 180000;
   function showAd(onReward, onSkip) {
     if (rt.adOpen) return;
+    rt.adWhere = (rt.modalOpen && rt.modalOpen.id) || rt.tab || '';   // 5.4.0.3 놀이 기록: 어느 자리에서 눌렀는지
+    useLog('ad_ask:' + rt.adWhere);
     const EXT = AIT && AIT.ads ? AIT : ADS_EXT;   // 토스 광고나 안드로이드 애드몹 광고
     if (EXT) {
       // 토스 리워드 광고: 끝까지 봤다는 신호(userEarnedReward)가 왔을 때만 보상을 줘요
@@ -15411,6 +15418,7 @@ body.mg-on .toast[hidden]{display:none}
     ensureAudio(); musicSync();
     const ok = rt.adOk, no = rt.adNo, earned = rt.adEarned, noGold = rt.adNoGold;
     rt.adOk = rt.adNo = null; rt.adNoGold = false;
+    useLog((earned ? 'ad_ok:' : 'ad_no:') + (rt.adWhere || ''));   // 5.4.0.3 놀이 기록
     if (earned) { S.st.ads += 1; adxDay(); S.adx.all = Math.min(10000, (S.adx.all || 0) + 1); if (!noGold) adGold(); adStamp(); if (ok) ok(); }   // 오늘 본 광고 수(관리자 지표)
     else if (no) no();
     else toast('광고를 끝까지 보지 않아서 보상이 없어요');
@@ -15633,8 +15641,8 @@ body.mg-on .toast[hidden]{display:none}
        forest/rank/<내 id>   랭킹 이름과 학교 점수
        forest/stats/<내 id>  테스트 현황 (어디까지 했는지, 얼마나 했는지)
      <내 id>는 Firebase 익명 로그인이 기기(브라우저)마다 만들어 줘요. */
-  const VERSION = '5.4.0.2';
-  const NT_QUIET = ['5.4.0.2', '5.4.0.1', '5.3.4.8', '5.3.4.7', '5.3.4.6', '5.3.4.5', '5.3.4.4', '5.3.4.3', '5.3.4.2', '5.3.4.1', '5.3.4', '5.3.2.1', '5.3.0.3', '5.3.0.2', '5.3.0.1', '5.2.2', '5.2.1', '5.2.0.2', '5.2.0.1', '5.1.1.3', '5.1.1.2', '5.1.1.1', '5.1.1', '5.0.3.1', '5.0.3', '5.0.2.2', '5.0.2.1', '2.1.20', '2.1.2.2', '2.3.0.1', '2.3.4', '3.2.3', '3.2.4', '3.2.5', '3.3.1', '3.3.2', '3.3.3', '4.4.1.1', '4.4.1.2', '4.4.1.3', '4.4.1.4', '5.0.1.1', '5.0.1.2', '5.0.1.3', '5.0.1.4', '5.0.1.5', '5.0.1.6', '5.0.1.7', '5.0.1.8'];   // 생물 탐사 고침은 공지 없이. 도 공지 없이(공지 줄은 정하면 넣어요). 공지 없이. 공지 줄은 woodani가 정할 때까지 조용히. 공지는 2026-11-16 woodani가 정해서 NOTICES로 옮겼어요. 은 공지를 띄워요. 도 공지 없이. 도 공지 창 없이. 도 공지 창 없이(공지는 그대로). 도 조용히. 도 공지 창 없이(공지 줄을 고르지 않음)
+  const VERSION = '5.4.0.3';
+  const NT_QUIET = ['5.4.0.3', '5.4.0.2', '5.4.0.1', '5.3.4.8', '5.3.4.7', '5.3.4.6', '5.3.4.5', '5.3.4.4', '5.3.4.3', '5.3.4.2', '5.3.4.1', '5.3.4', '5.3.2.1', '5.3.0.3', '5.3.0.2', '5.3.0.1', '5.2.2', '5.2.1', '5.2.0.2', '5.2.0.1', '5.1.1.3', '5.1.1.2', '5.1.1.1', '5.1.1', '5.0.3.1', '5.0.3', '5.0.2.2', '5.0.2.1', '2.1.20', '2.1.2.2', '2.3.0.1', '2.3.4', '3.2.3', '3.2.4', '3.2.5', '3.3.1', '3.3.2', '3.3.3', '4.4.1.1', '4.4.1.2', '4.4.1.3', '4.4.1.4', '5.0.1.1', '5.0.1.2', '5.0.1.3', '5.0.1.4', '5.0.1.5', '5.0.1.6', '5.0.1.7', '5.0.1.8'];   // 생물 탐사 고침은 공지 없이. 도 공지 없이(공지 줄은 정하면 넣어요). 공지 없이. 공지 줄은 woodani가 정할 때까지 조용히. 공지는 2026-11-16 woodani가 정해서 NOTICES로 옮겼어요. 은 공지를 띄워요. 도 공지 없이. 도 공지 창 없이. 도 공지 창 없이(공지는 그대로). 도 조용히. 도 공지 창 없이(공지 줄을 고르지 않음)
     // 이 버전들은 업데이트해도 공지 창을 띄우지 않아요(공지는 그대로)
   /* 공지사항 (은 이미 올려서 부터): 설정 > 공지사항. 맨 위가 가장 새 공지예요
      패치노트는 자동으로 넣지 않아요. woodani가 검수한 글만 여기에 적어요(CHANGELOG.md는 자세한 기록용이라 따로 있어요)
@@ -16158,7 +16166,8 @@ body.mg-on .toast[hidden]{display:none}
           Cloud.lastStats = Date.now();
           try { await db.ref('forest/stats/' + uid).set(statsDoc()); } catch (e2) { /* 테스트 현황을 못 올려도 학교 저장은 그대로예요(저장 위치를 오류로 바꾸지 않아요) */
             // 새 칸(adsT, adsD)을 받는 서버 규칙이 아직 게시되기 전이면 빼고 한 번 더 올려요
-            try { const d = statsDoc(); delete d.adsT; delete d.adsD; await db.ref('forest/stats/' + uid).set(d); } catch (e3) { /* 그대로 */ } }
+            try { const d = statsDoc(); delete d.use; await db.ref('forest/stats/' + uid).set(d); } catch (e3) {   // 새 칸 use를 받는 규칙이 게시되기 전이면 빼고
+              try { const d = statsDoc(); delete d.use; delete d.adsT; delete d.adsD; await db.ref('forest/stats/' + uid).set(d); } catch (e4) { /* 그대로 */ } } }
         }
       }
     } catch (e) {
@@ -16218,7 +16227,8 @@ body.mg-on .toast[hidden]{display:none}
       play: Math.floor(S.st.play), sess: S.st.sess, days: S.att.n, ads: S.st.ads, score: rankScore(),
       gold: S.gold, gearn: S.st.gold, gspent: S.st.gspent, cos: S.cos.own.length,
       dev: !!S.u.dev, v: VERSION, env: /KAKAOTALK/i.test(ua) ? 'kakao' : (navigator.maxTouchPoints > 0 ? 'mobile' : 'pc'),
-      adsT: S.adx && S.adx.day === gameToday() ? (S.adx.all || 0) : 0, adsD: gameToday()   // 관리자 지표에 오늘 본 광고 수(서버 규칙 adsT, adsD)
+      adsT: S.adx && S.adx.day === gameToday() ? (S.adx.all || 0) : 0, adsD: gameToday(),   // 관리자 지표에 오늘 본 광고 수(서버 규칙 adsT, adsD)
+      use: useStr()   // 5.4.0.3 놀이 기록(서버 규칙 use가 게시되기 전에는 빼고 올려요)
     };
   }
   function agoText(t) {
@@ -16477,7 +16487,7 @@ body.mg-on .toast[hidden]{display:none}
       town: Math.min(CFG.grades.length - 1, Math.floor(n(d.town, 9))),
       q: typeof d.q === 'string' ? d.q.slice(0, 8) : '', qt: typeof d.qt === 'string' ? d.qt.slice(0, 30) : '',
       play: n(d.play, 1e9), sess: Math.floor(n(d.sess, 1e6)), days: Math.floor(n(d.days, 1e5)), ads: Math.floor(n(d.ads, 1e6)),
-      score: Math.floor(n(d.score, 1e12)), gearn: Math.floor(n(d.gearn, 1e9)), gspent: Math.floor(n(d.gspent, 1e9)), cos: Math.floor(n(d.cos, 999)), dev: !!d.dev, v: typeof d.v === 'string' ? d.v.slice(0, 10) : '', env: ENV_NAME[d.env] || ''
+      score: Math.floor(n(d.score, 1e12)), gearn: Math.floor(n(d.gearn, 1e9)), gspent: Math.floor(n(d.gspent, 1e9)), cos: Math.floor(n(d.cos, 999)), dev: !!d.dev, use: typeof d.use === 'string' ? d.use.slice(0, 800) : '', v: typeof d.v === 'string' ? d.v.slice(0, 10) : '', env: ENV_NAME[d.env] || ''
     };
   }
   /* 관리자는 테스트 현황에서 그 테스터의 학교를 구경해요(다른 학교 구경과 같은 보기 전용 화면)
@@ -16521,6 +16531,8 @@ body.mg-on .toast[hidden]{display:none}
     const today = rows.filter(r => now - r.seen < 86400000).length;
     const avg = rows.length ? rows.reduce((t, r) => t + r.play, 0) / rows.length : 0;
     sum.textContent = rows.length ? `테스터 ${rows.length}명, 하루 안에 들어온 사람 ${today}명, 평균 플레이 ${playText(avg)}` : '아직 기록이 없어요';
+    const us = useSumText(rows); if (us) sum.textContent += '\n' + us;   // 5.4.0.3 놀이 기록 모아 보기
+
     list.textContent = '';
     rows.forEach(r => {
       const li = document.createElement('li');
@@ -21661,6 +21673,7 @@ body.mg-on .toast[hidden]{display:none}
     sfx('tap'); btRender();
   }
   function btStart() {
+    useLog('bt');   // 5.4.0.3 놀이 기록
     const M = btUI.M; if (!M || M.phase !== 'pick' || M.me.some(x => !x)) return false;
     if (btLeft() <= 0) { if (btCanAd()) btAdMore(); else toast(`숲속 대결은 하루 ${btQuota()}판이에요.\n내일 또 겨뤄요`); return false; }
     S.bt.n += 1; M.phase = 'play'; M.i = 0;
@@ -23678,6 +23691,7 @@ body.mg-on .toast[hidden]{display:none}
     save(); renderHUD(); renderEss(); pzRenderAll();
   }
   function pzOpen(asked) {
+    useLog('pz');   // 5.4.0.3 놀이 기록
     pzInitArt();
     if (!FXL.st && wldLv() > 0) { FXL.touched = true; fxLoad(); }   // 엔진을 아직 안 받았으면 지금
     if (FXL.st === 'ok' && !FXO.st) fxoInit();   // 깨지는 조각 그림판
@@ -28573,6 +28587,7 @@ body.mg-on .toast[hidden]{display:none}
   }
   function openModal(el) {
     nlModal(el);
+    if (rt.modalOpen !== el && el.id) useLog(el.id);   // 5.4.0.3 놀이 기록
     rt.modalOpen = el;
     el.hidden = false;
     try { uiRwOpen(el); } catch (e) { /* 연출만 */ }   // 보상 창 빛살
@@ -28631,6 +28646,7 @@ body.mg-on .toast[hidden]{display:none}
   function shake(el) { el.classList.remove('shake'); void el.offsetWidth; el.classList.add('shake'); el.addEventListener('animationend', () => el.classList.remove('shake'), { once: true }); setTimeout(() => el.classList.remove('shake'), 900); sfx('deny'); }
   function setTab(t) {
     const prev = rt.tab;
+    if (prev !== t) useLog('tab_' + t);   // 5.4.0.3 놀이 기록
     if (t !== 'rank' && t !== 'dex') rt.backTab = '';   // C-22
     if (rt.thPrev && t !== 'school') thPreviewEnd(true);   // 다른 탭으로 가면 미리 보기를 끝내요
     rt.tab = t;
@@ -30469,6 +30485,7 @@ body.mg-on .toast[hidden]{display:none}
   }
   VD.titles.push({ id: 'alma', title: '모교의 자랑', got: d => !!(d && d.ta && d.ta.mon >= 3) });   // 모교 기념비 3단계
   VD.titles.push({ id: 'biodoc', title: '숲속 박사', got: d => !!(d && d.bx && d.bx.g >= 5) });   // 생물 90종
+  VD.titles.push({ id: 'bioall', title: '생물 도감 완성', got: d => !!(d && d.bx && d.bx.g >= 7) });   // 5.4.0.3 생물 150종
   VD.titles.push({ id: 'psnew', title: '패스 새내기', got: d => !!(d && d.ps && d.ps.badge >= 1) });   // 패스 10단계 첫 배지
   VD.titles.push({ id: 'seasonking', title: '숲속 시즌 왕', got: d => !!(d && d.rs && d.rs.king >= 1) }, { id: 'fourseason', title: '사계절 교장', got: d => !!(d && d.deco && d.deco.own && ['winter', 'spring', 'summer', 'autumn'].every(q => d.deco.own['rs_' + q])) });   // 랭킹 시즌
   /* ===== 숲속 패스 END ===== */
@@ -31716,6 +31733,7 @@ body.mg-on .toast[hidden]{display:none}
     mgUI.drag = null;
   }
   function mgOpen() {
+    useLog('mg');   // 5.4.0.3 놀이 기록
     mgTick();
     if (!FXL.st && wldLv() > 0) { FXL.touched = true; fxLoad(); }   // 엔진을 아직 안 받았으면 지금
     if (FXL.st === 'ok' && !FXO.st) fxoInit();   // 빛 고리 그림판
@@ -33017,6 +33035,66 @@ body.mg-on .toast[hidden]{display:none}
   ACH_EM.photo = '📷';
   const PA_T = { PA, PA_MS, paNow, paCan, paTodo, paShot, paReal, paDot, paRender, paAllRows, paAllPct, paSync, sanitizePa, freshPa, paSegOpen, fake: o => { rt.paFake = o || null; }, get open() { return paOpen(); }, count: () => paCount() };
   /* ===== 사진첩 END ===== */
+  /* ---------- 5.4.0.3 놀이 기록 (woodani 2026-11-25 "모든 버전에 넣어줘") ----------
+     무엇을 얼마나 하는지 재서 방향을 정하려고요. 화면에 보이는 것은 바뀌지 않아요.
+     - 이 기기 저장 S.use: d[열쇠] 그 열쇠를 쓴 최근 날(날 번호, 7개까지), n[열쇠] 모두 몇 번. 열쇠는 60개까지
+     - 열쇠: 탭 'tab_<탭>', 창 열기 '<창 id>', 합치기 'mg', 퍼즐 'pz', 대결 'bt', 광고 누름 'ad_ask:<자리>', 끝까지 봄 'ad_ok:<자리>', 못 봄 'ad_no:<자리>'
+     - 웹과 안드로이드: 테스트 현황(forest/stats)의 use 칸(글 한 줄)으로 올라가요. 관리자 테스트 현황 위쪽에 놀이별로 모아 보여요
+     - 토스: 토스 분석 로그(Analytics.screen, log_name이 열쇠)로도 보내요. 토스 콘솔에서 봐요 */
+  const USE_KEEP = 7, USE_MAX = 60;
+  const freshUse = () => ({ d: {}, n: {} });
+  const useDayNo = () => Math.floor(Date.parse(gameToday() + 'T00:00:00Z') / 864e5) || 0;
+  function useLog(k) {
+    try {
+      if (!S || !S.use || !k) return;
+      k = String(k).replace(/[^A-Za-z0-9_:\-]/g, '').slice(0, 32);
+      if (!k) return;
+      const U = S.use;
+      if (!(k in U.n) && Object.keys(U.n).length >= USE_MAX) return;
+      U.n[k] = Math.min(1e7, (U.n[k] || 0) + 1);
+      const t = useDayNo(), a = U.d[k] || (U.d[k] = []);
+      if (a[a.length - 1] !== t) { a.push(t); if (a.length > USE_KEEP) a.splice(0, a.length - USE_KEEP); }
+      if (AIT && AIT.log) AIT.log(k);
+    } catch (e) { /* 기록은 게임에 닿지 않아요 */ }
+  }
+  // 테스트 현황 한 줄: '열쇠:지난 7일 쓴 날/모두 횟수', 많이 쓴 것부터 800자까지
+  function useStr() {
+    if (!S || !S.use) return '';
+    const t = useDayNo(), U = S.use, out = [];
+    for (const k of Object.keys(U.n)) out.push([k, (U.d[k] || []).filter(x => t - x < 7).length, U.n[k]]);
+    out.sort((a, b) => b[1] - a[1] || b[2] - a[2]);
+    let s = '';
+    for (const [k, d, n] of out) { const p = `${k}:${d}/${Math.floor(n)}`; if (s.length + p.length + 1 > 800) break; s += (s ? ',' : '') + p; }
+    return s;
+  }
+  function sanitizeUse(d, s) {
+    const f = freshUse(), U = d && d.use && typeof d.use === 'object' ? d.use : null;
+    if (U && U.n && typeof U.n === 'object') {
+      for (const k of Object.keys(U.n).slice(0, USE_MAX)) {
+        if (!/^[A-Za-z0-9_:\-]{1,32}$/.test(k)) continue;
+        f.n[k] = Math.floor(numIn(U.n[k], 0, 1e7));
+        const a = U.d && Array.isArray(U.d[k]) ? U.d[k].filter(x => Number.isInteger(x) && x > 0 && x < 1e6).slice(-USE_KEEP) : [];
+        if (a.length) f.d[k] = a;
+      }
+    }
+    s.use = f;
+  }
+  // 관리자 테스트 현황: 놀이별로 지난 7일 쓴 사람 수와 날 수를 모아요(테스트 도구로 만든 학교는 빼요)
+  const USE_NM = { tab_school: '홈', tab_teachers: '선생님 탭', tab_tam: '탐험 탭', tab_study: '공부 탭', tab_street: '상점 탭', tab_shop: '가게', tab_rank: '랭킹', tab_dex: '도감', tab_deco: '꾸미기', tab_ess: '정수 가게',
+    mg: '숲속 합치기', pz: '숲속 퍼즐', bt: '대결' };
+  const useNm = k => { const [a, b] = k.split(':'); const m = { ad_ask: '광고 누름', ad_ok: '광고 봄', ad_no: '광고 못 봄' }[a]; return m ? `${m}(${b || ''})` : USE_NM[k] || k; };
+  function useSumText(rows) {
+    const agg = new Map();
+    for (const r of rows) {
+      if (r.dev || !r.use) continue;
+      for (const p of r.use.split(',')) {
+        const m = /^([A-Za-z0-9_:\-]{1,32}):(\d+)\/(\d+)$/.exec(p); if (!m || +m[2] <= 0) continue;
+        const o = agg.get(m[1]) || { who: 0, days: 0 }; o.who++; o.days += Math.min(7, +m[2]); agg.set(m[1], o);
+      }
+    }
+    if (!agg.size) return '';
+    return '지난 7일 놀이별(쓴 사람, 쓴 날): ' + [...agg.entries()].sort((a, b) => b[1].who - a[1].who || b[1].days - a[1].days).slice(0, 30).map(([k, o]) => `${useNm(k)} ${o.who}명 ${o.days}일`).join(', ');
+  }
   /* ---------- 2.0.0 핫픽스(원격 설정, 2026-10-27 woodani) ----------
      웹 주소의 live.json을 켤 때 읽어요(웹, 안드로이드, 토스 모두). 코드는 받지 않고 숫자, 공지, 기능 끄기만 받아요.
      바꿀 수 있는 숫자는 LIVE_KEYS에 적은 것만이고, 값마다 최소와 최대 안으로 맞춰요. 받은 것은 이 기기에 남겨 두고 인터넷이 없을 때 써요.
@@ -33222,7 +33300,7 @@ body.mg-on .toast[hidden]{display:none}
     MAP_OAK, oakArt, layoutOak, mapOak, oakAt, tapOak, dropSpot,
     dexMeet, dexSync, dexPending, dexGift, renderDex, evCurrent, evNext, evUpcoming, evSync, evFix, evVal, EV_FALLBACK, EV_DECO, EV_HAT, COS, DECO_BY, decoOwn, perkRec, fpRec, gmPast, gmItems, gmNow, GMON, buyShop, pickShop, showNote, showOkOn, showWd, renderGradPanel, renderShop, renderDecoShop, EV_WEEKLY, EV_WEEK_BASE, weekMon, claimStamp, claimEvMission, claimEvBox, renderEvent, evMissions, evOk, evSkipped, EV_MONTHS, EV_MEASURE, tierMinutes, minAcorns, IMG, sanitize171, ACH, achSync, claimAch, setTitle, renderAch, setDexSeg, achClaimable, XT, xtAct, xtCost, xtLv, feastMins, libMult, propInstances, walkBuild, festItemSvg, guestArt, adErrText, googleErrText, openSheet, closeSheet, startFest, startSports, sanitize170, EV_STAMPS, EV_SPECIAL, EV_MONTHLY, EV_BOX, DEX_KEYS, DEX_REWARD, DEX_GUEST_KEYS, seasonKey, roofArtKey, thrKey, PP, PP_TITLES, ppOpen, ppPer, ppData, ppDay, ppWrite, ppTick, ppSync, ppScore, ppSemDone, rtMax, alumniLines, SIDE, vdReward, oakKey, setSeasonArt, VP, vpLv, vpCost, vpMult, vpAct, renderVpCard, sportsPrize, festPrize, renderTeachers, buildTeacherCards, bldImg, roofKey, bldStage, mapKey, setMapArt, applyThemes, buyFacility, bldFx, setBldFx, mapHi, Live, liveApply, liveLoad, liveOff, LIVE_KEYS, EVC, NOTICES, openNotice, noticeAuto, noticeWant, ntUnread, startTrial, endTrial: () => rt.trial && (rt.trial.left = 0), spawnDeal, startVisit, IMG170, MG, mgCells, mgSetCells, mgTick, mgAddEnergy, mgAddUp, mgTapGen, mgDrop, mgSell, mgUpgrade, mgAddUp, mgUpSwap, mgGensMax, MG_UP_ESS, mgClaimOrder, mgSwapOrder, mgOrderOk, mgFillOrders, mgOpen, mgClose, mgRenderAll, mgSpawnLevel, mgNearestEmpty, mgEmptyBoard, mgOrderReward, mgUI, sanitize180, mgWatchAd, mgNewOrder, mgHintPick, mgShowHint, mgClearHint, mgTouch, mgOrderGuide, mgDexN, mgDexCan, mgDexClaim, mgOpenDex, MG_DEX, MG_DEX_MS, mgDexEss, mgDexEssCan, mgDexEssN, mgDexMsCan, mgDexMsClaim, MGB, mgBuyBoost, mgBstLeft, mgOpenBoost, nice, claimMission, claimBonus, claimWeekMission, MP_BOX, swapDaily, repairMissions, MISSIONS, WMISSIONS, dmDay, wkWeek,   // 도감, 이벤트
     PZ, PZ_SHAPES, pzFits, pzAnyFit, pzStuck, pzFullLines, pzPlace, pzFreshGame, pzStart, PZB, pzbCost, pzApplyBoost, pzBoostOpen, pzBoostGo, festGoldLeft, festGoldTake, claimSports, TR2, TR2_PL, openTr2, tr2Act, tr2Away, tr2Ready, tr2Rsv, tr2Tick, renderAlbum, FEST, FEST_IDS, festNight, festShown, festTimeLock, festOpen, startFest, openFest, endFest, renderStreet, pzFinish, pzLeft, pzCanAd, pzEssOf, pzMinOf, pzHelpSquirrel, pzHelpOwl, pzHelpBear, fillSubs, mapRoofTop, showAd, claimOfflineDouble, startBoost, tripAd, festFocus, festRange, visMap, renderMissions, pzHasHelp, pzRot, pzNewPiece, pzOpen, pzClose, pzGameOver, pzRenderAll, renderMini, addEss, ESHOP, SP_FUR, applyCos, essItem, pickEss, buyEss, renderEssShop, hatSVG, spFurImg, gameNow, gameToday, gameWeek, kstDay, setServerTime, SVR, dmDay, weekIdx, lgWeek, wkWeek, lgKey, pzDay, goldDay, boostLeft, dealLeft, canStamp };
-  if (window.__FOREST_TEST) Object.assign(window.__forest, { acctSaveFirst, netSleep, netWake, uniTerm, utSync, tripUseTicket, readUseTicket, picnicUseTicket, buyDecoPieces, adGold, claimBonus, cloudPush, cloudClash, syncGet, revOf, deleteAccount, lookDel: () => lookDelNow(), lookSet, lookPush, leaveRank, sanitizeCg, freshCg, ambWant, ambSync, AMB, AMB_LV, WLD, wldSync, wldLv, wldPhase, wldWeather, wldAuto, WLD_WATER, wldCurtain, photoOpen, photoClose, oakBend, oakBands, frPatAll, frPatLeft, fpsToggle, fxRes, fxWant, gradRecReady, teaRecReady, GS, GS_WHO, GS_LINES, gsArt, gsTick, gsSync, gsTap, gsClaim, gsReady, gsPick, gsMakeSub, gsCardHTML, freshGs, sanitizeGs, updateVisit, endVisit, buildQuestPanel, renderQuestPanel, checkQuests, talkNext });   // 시험 손잡이
+  if (window.__FOREST_TEST) Object.assign(window.__forest, { acctSaveFirst, netSleep, netWake, uniTerm, utSync, tripUseTicket, readUseTicket, picnicUseTicket, buyDecoPieces, adGold, claimBonus, cloudPush, cloudClash, syncGet, revOf, deleteAccount, lookDel: () => lookDelNow(), lookSet, lookPush, leaveRank, sanitizeCg, freshCg, ambWant, ambSync, AMB, AMB_LV, WLD, wldSync, wldLv, wldPhase, wldWeather, wldAuto, WLD_WATER, wldCurtain, photoOpen, photoClose, oakBend, oakBands, frPatAll, frPatLeft, fpsToggle, fxRes, fxWant, gradRecReady, teaRecReady, GS, GS_WHO, GS_LINES, gsArt, useLog, useStr, useSumText, sanitizeUse, freshUse, statsDoc, mgOpen, pzOpen, bxTap, BX, gsTick, gsSync, gsTap, gsClaim, gsReady, gsPick, gsMakeSub, gsCardHTML, freshGs, sanitizeGs, updateVisit, endVisit, buildQuestPanel, renderQuestPanel, checkQuests, talkNext });   // 시험 손잡이
   if (window.claude && window.claude.hot && window.claude.hot.snapshot) {
     try { window.claude.hot.snapshot(() => { if (S) syncMid(); return { save: S }; }); } catch (e) { /* 무시 */ }
   }
