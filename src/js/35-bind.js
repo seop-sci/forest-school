@@ -754,7 +754,8 @@
     $('#sheetDept').addEventListener('click', () => viaSheet(openDept));
     $('#sheetRx').addEventListener('click', () => viaSheet(openRx));
     $('#rxSeg').addEventListener('click', e => { const b = e.target.closest('[data-rseg]'); if (!b) return; rt.rxTab = b.dataset.rseg; sfx('tap'); renderRx(); });
-    $('#rxBody').addEventListener('click', e => { const b = e.target.closest('[data-rt],[data-rts],[data-pp],[data-dp^="rx:"],[data-ta]'); if (!b) return;
+    $('#rxBody').addEventListener('click', e => { const b = e.target.closest('[data-rt],[data-rts],[data-pp],[data-dp^="rx:"],[data-ta],[data-lab]'); if (!b) return;
+      if (b.dataset.lab) { labClick(b); return; }   // 5.4.0.4 연구소 시간 줄이기
       if (b.dataset.pp) { const v = b.dataset.pp; if (v === 'day') ppDay(); else if (v.startsWith('w:')) ppWrite(v.slice(2)); renderRx(); return; }   // 논문
       if (b.dataset.rts) { rt.rtSel = b.dataset.rts; sfx('tap'); renderRx(); return; }   // 연구 나무 칸 고르기
       if (b.dataset.ta) { const [a, x, y, z] = b.dataset.ta.split(':'); const i = +x;   // 조교

@@ -299,7 +299,7 @@
     p: { dip: 0, species: 0, ticket: 0, nl: NEWCOMERS.map(() => 0), perk: { schol: 0, rep: 0, start: 0, drop: 0, night: 0 } },
     att: { last: '', n: 0 },
     ad: { day: '', n: 0 },
-    u: { boost: false, dev: false },
+    u: { boost: false, dev: false, gtip: false },
     units: 'ko',
     uiz: 0,   // 화면 크기(0 보통 0.9배, 1 크게 1배)
     trip: { open: false, cur: '', start: 0, end: 0, souv: [], been: {}, kids: 0 },
@@ -437,6 +437,7 @@
     s.tdip = cap(numFb(d.tdip, 0, s.p.dip + spent), SAVE_CAP.count);
     s.u.boost = !!(d.u && d.u.boost) || s.t.owl >= 1;
     s.u.dev = !!(d.u && d.u.dev);
+    s.u.gtip = !!(d.u && d.u.gtip);   // 5.4.0.4 황금 도토리 60개 테마 안내를 봤는지(옛 저장은 아직 안 봤어요)
     s.units = d.units === 'en' ? 'en' : 'ko';
     s.uiz = d.uiz === 1 ? 1 : 0;
     // 학교 번호는 기기를 옮겨도 그대로예요. 예전 저장에는 없어서 새로 만들고, 처음 연 날은 마지막 저장 때로 어림해요

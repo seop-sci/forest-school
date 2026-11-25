@@ -2,7 +2,7 @@
 <html lang="ko">
 <head>
 <meta charset="utf-8">
-<meta name="forest-version" content="5.4.0.3">
+<meta name="forest-version" content="5.4.0.4">
 <meta name="viewport" content="width=device-width, initial-scale=1">
 <meta name="description" content="도토리를 모아 숲속 학교를 키우는 방치형 게임 테스트판이에요.">
 <style>html,body{margin:0}</style>
@@ -4188,6 +4188,46 @@ body.mg-on .toast[hidden]{display:none}
 .photo-bar .pa-real::after{content:'';display:inline-block;width:5px;height:5px;margin-left:3px;border-radius:50%;background:currentColor;vertical-align:2px}
 .pa-flash{position:fixed;inset:0;z-index:90;background:#fff;pointer-events:none;animation:paFlash .3s ease-out forwards}
 @keyframes paFlash{0%{opacity:0}30%{opacity:.85}100%{opacity:0}}
+/* 5.4.0.4 연구소: 시간 줄이기 막대와 단추, 지금 연구 중 칸, 학회 메달 막대, 논문 책상, 가독성 */
+.lab-sp{margin-top:6px;display:flex;flex-direction:column;gap:5px}
+.lab-bar{position:relative;flex:1;height:9px;border-radius:6px;background:rgba(120,90,50,.16);overflow:hidden}
+.lab-bar i{position:absolute;left:0;top:0;bottom:0;border-radius:6px;background:linear-gradient(90deg,#6DC0E3,#3E9CCB);transition:width .6s linear}
+.lab-bar.gold i{background:linear-gradient(90deg,#F6D46B,#E2A92E)}
+.lab-row{display:flex;flex-wrap:wrap;align-items:center;gap:5px}
+.lab-left{font-weight:700;font-size:13px;color:#2F7FA8;margin-right:auto;font-variant-numeric:tabular-nums}
+.lab-row .small{padding:5px 9px;font-size:12px}
+.rt-now,.pp-desk{display:flex;gap:10px;align-items:flex-start;margin:4px 0 8px;padding:10px 12px;border-radius:14px;border:2px solid #5BB3D9;background:linear-gradient(180deg,rgba(214,238,250,.8),rgba(255,255,255,.5));text-align:left}
+.rt-now .dp-tx,.pp-desk .dp-tx{flex:1;min-width:0;text-align:left}
+.rt-now .dp-tx b,.pp-desk .dp-tx b{font-size:15px}
+.pp-desk{border-color:#D9B46A;background:linear-gradient(180deg,rgba(255,243,214,.9),rgba(255,255,255,.5))}
+.pp-desk.on{border-color:#5BB3D9;background:linear-gradient(180deg,rgba(214,238,250,.8),rgba(255,255,255,.5))}
+.pp-paper{flex:none;width:52px;height:52px;display:grid;place-items:center;font-size:30px}.pp-paper img{width:52px;height:52px;object-fit:contain}
+.pp-desk.on .pp-paper img{animation:ppWrite 2.4s ease-in-out infinite}
+@keyframes ppWrite{0%,100%{transform:rotate(0)}50%{transform:rotate(-4deg) translateY(-1px)}}
+.pp-conf{text-align:left}
+.pp-conf-h{display:flex;justify-content:space-between;align-items:baseline;gap:6px}.pp-conf-h span{font-size:12px;color:var(--muted)}
+.pp-med{display:flex;align-items:center;gap:5px;margin-top:6px}.pp-med small{font-size:11px;color:var(--muted);white-space:nowrap}
+.pp-chip{display:inline-block;margin-left:4px;padding:1px 7px;border-radius:999px;background:rgba(226,169,46,.2);color:#8A5D10;font-style:normal;font-size:11px;font-weight:700;vertical-align:1px}
+.pp-src{display:block;margin-top:3px;font-size:11px!important;opacity:.85}
+.ta-sp{margin:-4px 4px 8px 62px}
+#rxBody .dp-row .dp-tx{text-align:left}
+#rxBody .dp-row .dp-tx small{line-height:1.45}
+#rxBody .rt-card{text-align:left;margin-bottom:8px}
+.rt-node.run{border-color:transparent;background:conic-gradient(#3E9CCB calc(var(--p,0) * 1%),rgba(91,179,217,.25) 0) border-box;border:4px solid transparent;box-shadow:0 0 0 3px rgba(91,179,217,.35),0 0 10px rgba(91,179,217,.7)}
+.rt-node.run img{background:#FFF8EA}
+@media (prefers-reduced-motion:reduce){.pp-desk.on .pp-paper img{animation:none}}
+:root[data-theme="dark"] .rt-now,:root[data-theme="dark"] .pp-desk.on{background:#1F3340;border-color:#3E8DB5}
+:root[data-theme="dark"] .pp-desk{background:#3A3322;border-color:#9C7A2C}
+:root[data-theme="dark"] .pp-chip{background:rgba(226,169,46,.25);color:#F3CF7A}
+:root[data-theme="dark"] .lab-left{color:#8FD0F0}
+@media (prefers-color-scheme: dark){:root:not([data-theme="light"]) .rt-now,:root:not([data-theme="light"]) .pp-desk.on{background:#1F3340;border-color:#3E8DB5}:root:not([data-theme="light"]) .pp-desk{background:#3A3322;border-color:#9C7A2C}:root:not([data-theme="light"]) .pp-chip{background:rgba(226,169,46,.25);color:#F3CF7A}:root:not([data-theme="light"]) .lab-left{color:#8FD0F0}}
+.lab-row button{flex:none!important;width:auto!important;max-width:none!important;margin:0!important;padding:5px 10px!important;font-size:12px!important;min-height:0!important;animation:none!important}
+#rxBody .rt-tree{width:min(100%,max(230px,calc(46vh * 0.75)))}   /* 5.4.0.4 내리지 않아도 나무 전체가 보이게 */
+.rt-can{display:flex;flex-wrap:wrap;gap:5px;justify-content:center;margin:0 0 6px}
+.rt-can button{display:flex;align-items:center;gap:4px;padding:4px 9px 4px 5px;border-radius:999px;border:1.5px solid #F3C04B;background:rgba(255,243,200,.6);color:var(--ink);font:inherit;font-size:12px;font-weight:700}
+.rt-can button img{width:20px;height:20px;border-radius:50%}
+.rt-can button.on{background:#F3C04B;color:#3b2a14}
+.rt-can small{font-size:11px;color:var(--muted);width:100%;text-align:center}
 </style>
 </head>
 <body>
@@ -4200,7 +4240,7 @@ body.mg-on .toast[hidden]{display:none}
     <p class="boot-step" id="bootStep">학교 문을 여는 중...</p>
     <p class="boot-tip" id="bootTip">학교 문을 여는 중이에요</p>
   </div>
-  <span class="boot-ver" id="bootVer">v5.4.0.3</span>
+  <span class="boot-ver" id="bootVer">v5.4.0.4</span>
 </div>
 
 <div class="app on-school" id="app">
@@ -4820,7 +4860,7 @@ body.mg-on .toast[hidden]{display:none}
       </div>
       <h3 class="panel-sub">정보</h3>
       <dl class="info">
-        <div id="verRow"><dt>버전</dt><dd>v5.4.0.3</dd></div>
+        <div id="verRow"><dt>버전</dt><dd>v5.4.0.4</dd></div>
         <div id="pidRow" hidden><dt>학교 번호</dt><dd id="infoPid"></dd></div>
       </dl>
       <div id="devBox" hidden>
@@ -9696,7 +9736,7 @@ body.mg-on .toast[hidden]{display:none}
     p: { dip: 0, species: 0, ticket: 0, nl: NEWCOMERS.map(() => 0), perk: { schol: 0, rep: 0, start: 0, drop: 0, night: 0 } },
     att: { last: '', n: 0 },
     ad: { day: '', n: 0 },
-    u: { boost: false, dev: false },
+    u: { boost: false, dev: false, gtip: false },
     units: 'ko',
     uiz: 0,   // 화면 크기(0 보통 0.9배, 1 크게 1배)
     trip: { open: false, cur: '', start: 0, end: 0, souv: [], been: {}, kids: 0 },
@@ -9834,6 +9874,7 @@ body.mg-on .toast[hidden]{display:none}
     s.tdip = cap(numFb(d.tdip, 0, s.p.dip + spent), SAVE_CAP.count);
     s.u.boost = !!(d.u && d.u.boost) || s.t.owl >= 1;
     s.u.dev = !!(d.u && d.u.dev);
+    s.u.gtip = !!(d.u && d.u.gtip);   // 5.4.0.4 황금 도토리 60개 테마 안내를 봤는지(옛 저장은 아직 안 봤어요)
     s.units = d.units === 'en' ? 'en' : 'ko';
     s.uiz = d.uiz === 1 ? 1 : 0;
     // 학교 번호는 기기를 옮겨도 그대로예요. 예전 저장에는 없어서 새로 만들고, 처음 연 날은 마지막 저장 때로 어림해요
@@ -10569,7 +10610,7 @@ body.mg-on .toast[hidden]{display:none}
       for (let i = 0; i < RT5.top; i++) {
         const st = i < L ? 'done' : i === L && run ? 'run' : i === L && !D.lock && i < rtMax(D.k) ? 'next' : 'lock', sel = rt.rtSel === D.k && (i === Math.min(L, RT5.top - 1));
         const pop = st === 'done' && rt.rtPop && rt.rtPop.k === D.k && rt.rtPop.i === i;
-        nodes += `<button class="rt-node ${st}${sel ? ' sel' : ''}${pop ? ' pop' : ''}" type="button" data-rts="${D.k}" style="left:${(RT_X(j, i) / RT_W * 100).toFixed(2)}%;top:${((RT_Y(i) - rtTop()) / (RT_H - rtTop()) * 100).toFixed(2)}%" aria-label="${D.nm} ${i + 1}칸${st === 'done' ? ' 완성' : st === 'run' ? ' 연구 중' : st === 'lock' ? ' 잠김' : ''}">` +
+        nodes += `<button class="rt-node ${st}${sel ? ' sel' : ''}${pop ? ' pop' : ''}" type="button" data-rts="${D.k}" style="${st === 'run' ? `--p:${(labFrac('rt', 0) * 100).toFixed(1)};` : ''}left:${(RT_X(j, i) / RT_W * 100).toFixed(2)}%;top:${((RT_Y(i) - rtTop()) / (RT_H - rtTop()) * 100).toFixed(2)}%" aria-label="${D.nm} ${i + 1}칸${st === 'done' ? ' 완성' : st === 'run' ? ' 연구 중' : st === 'lock' ? ' 잠김' : ''}">` +
           (u ? `<img src="${u}" alt="">` : `<b>${i + 1}</b>`) + (st === 'lock' ? '<i class="rt-lk">🔒</i>' : st === 'done' ? '<i class="rt-leaf"></i>' : '') + '</button>';
       }
       nodes += `<span class="rt-nm" style="left:${(RT_X(j, 0) / RT_W * 100).toFixed(2)}%">${D.nm}</span>`;
@@ -10583,7 +10624,14 @@ body.mg-on .toast[hidden]{display:none}
       `<small>${L ? `지금 ${D.eff(L)}` : '아직 연구 전'}${D.lock || full ? '' : run ? `<br>다음 ${D.eff(L + 1)}<br>연구 중이에요. 끝나면 칸이 채워져요` : `<br>다음 ${D.eff(L + 1)}<br>도토리 ${fmt(k.ac)}, ${rtHrs(k.sec)}`}` +   // 5.3.2.1: 연구 중에는 걸리는 시간 대신 남은 시간(오른쪽) 하나만
       // 5.3.2.1: 잠긴 까닭을 한 줄로(예전에는 단추 자리에 '논문 3편', '다른 연구 중'만)
       `${D.lock || full || run ? '' : shut ? `<br>논문 ${PP.deep[D.k]}편을 쓰면 열려요 (지금 ${fmt((S.pp && S.pp.n) || 0)}편)` : c ? `<br>${(RT5.list.find(x => x.k === c.k) || {}).nm || '다른'} 연구가 끝나면 할 수 있어요` : ''}</small></div>${btn}</div>`;
-    return `<p class="fine">한 번에 하나씩 연구해요. 졸업해도 남아요.</p><div class="rt-tree${bg ? ' art' : ''}" style="aspect-ratio:${RT_W}/${RT_H - rtTop()}${bg ? `;background-image:url('${blobUrl(bg)}')` : ''}">${rtTreeSvg()}${nodes}</div>${info}`;
+    // 5.4.0.4: 내리지 않아도 보이게 위쪽에 '지금 연구 중' 칸(막대, 남은 시간, 단축권과 정수)과 고른 칸 설명, 그 아래 나무
+    const C = c && RT5.list.find(x => x.k === c.k), CL = C ? rtLv(C.k) : 0;
+    const now5 = C ? `<div class="rt-now"><span class="dp-ic">${IMG(C.ic) ? `<img src="${IMG(C.ic)}" alt="">` : ''}</span><div class="dp-tx"><b>지금 연구 중: ${C.nm} ${CL + 1}칸</b><small>끝나면 ${C.eff(CL + 1)}</small>${labSpeedHTML('rt', 0)}</div></div>` : '';
+    // 지금 연구할 수 있는 가지(고르면 위 설명이 바뀌어요)
+    const can = RT5.list.filter(x => !x.lock && rtLv(x.k) < rtMax(x.k) && !(c && c.k === x.k));
+    const canRow = can.length ? `<div class="rt-can"><small>${c ? '다음에 연구할 수 있어요' : '지금 연구할 수 있어요'}</small>${can.map(x => `<button type="button" data-rts="${x.k}" class="${rt.rtSel === x.k ? 'on' : ''}">${IMG(x.ic) ? `<img src="${IMG(x.ic)}" alt="">` : ''}${x.nm} ${rtLv(x.k) + 1}칸</button>`).join('')}</div>` : '';
+    const top = now5 + (C && C.k === D.k ? '' : info) + canRow;
+    return `<p class="fine">한 번에 하나씩 연구해요. 졸업해도 남아요.</p>${top}<div class="rt-tree${bg ? ' art' : ''}" style="aspect-ratio:${RT_W}/${RT_H - rtTop()}${bg ? `;background-image:url('${blobUrl(bg)}')` : ''}">${rtTreeSvg()}${nodes}</div>`;
   }
   function renderRx() {
     const tab = ['tree', 'ta', 'paper'].includes(rt.rxTab) ? rt.rxTab : 'inv';
@@ -10591,6 +10639,69 @@ body.mg-on .toast[hidden]{display:none}
     setH($('#rxBody'), tab === 'tree' ? rtPart() : tab === 'ta' ? taPart() : tab === 'paper' ? ppPart() : rxPart(true));
     { const hd = $('#rxTitle').parentElement, u = tab === 'ta' && taOpen() ? IMG('ta_bg') : tab === 'paper' && ppOpen() ? IMG('conf_bg') : ''; hd.classList.toggle('art', !!u); hd.style.backgroundImage = u ? `url("${blobUrl(u)}")` : ''; }   // 조교 탭 머리 그림, 논문 탭은 학회장 그림
   }
+  /* ---------- 5.4.0.4 연구소 시간 줄이기 (woodani 2026-11-25 "연구소도 가속권이나 정수로 시간 단축이 똑같이 가능해야") ----------
+     연구 트리 연구(rt), 논문 쓰기(pp), 조교 파견(ta:자리)에 공사와 같은 시간 단축권(자동 사용)과 숲의 정수 즉시 완료(conEssCost, 같은 값), 광고 5분권 받기
+     막대와 남은 시간은 1초마다 그 자리만 바꿔요(창 전체를 다시 그리지 않아요) */
+  function labJob(kind, i) {
+    if (!S) return null;
+    if (kind === 'rt') { const c = S.rt5 && S.rt5.cur; return c ? { o: c, tot: rtCost(c.k).sec } : null; }
+    if (kind === 'pp') { const c = S.pp && S.pp.cur; return c ? { o: c, tot: PP.sec } : null; }
+    if (kind === 'ta') { const o = S.ta && S.ta.out.find(y => y.i === i); return o ? { o, tot: taSec(o.h | 0) } : null; }
+    return null;
+  }
+  const labLeft = (kind, i) => { const J = labJob(kind, i); return J ? Math.max(0, Math.ceil((J.o.end - gameNow()) / 1000)) : 0; };
+  const labFrac = (kind, i) => { const J = labJob(kind, i); return J ? Math.max(0, Math.min(1, 1 - labLeft(kind, i) / Math.max(1, J.tot))) : 0; };
+  function labCut(kind, i, sec) {
+    const J = labJob(kind, i); if (!J) return;
+    J.o.end = Math.max(gameNow() - 1, J.o.end - sec * 1000);
+    if (kind === 'rt') rtTick(); else if (kind === 'pp') ppTick();
+    save(); if (!$('#mRx').hidden) renderRx();
+  }
+  function labTk(kind, i) {
+    const rem = labLeft(kind, i); if (!rem) return;
+    const p = tkPlan(rem); if (!p.n) { toast(`시간 단축권이 없어요. 광고를 보면 5분권 ${TKAD.n}장을 받아요`); return; }
+    for (const t of TK) S.tk[t.k] -= p.use[t.k];
+    S.st.tkUsed = (S.st.tkUsed || 0) + p.n; sfx('tap');
+    toast(p.left ? `${tkPlanText(p)}을 써서 ${hm(p.cut)} 줄였어요. ${hm(p.left)} 남아요` : `${tkPlanText(p)}을 써서 끝냈어요!`);
+    labCut(kind, i, p.cut + (p.left ? 0 : 1));
+  }
+  function labEss(kind, i) {
+    const rem = labLeft(kind, i), c = conEssCost(rem); if (!c || rt.paused) return;
+    if (S.ess < c) { toast(essShort(c - S.ess)); return; }
+    S.ess -= c; S.st.esSpent = (S.st.esSpent || 0) + c; renderEss(); sfx('quest');
+    labCut(kind, i, rem + 1);
+  }
+  function labAd() {
+    if (tkAdLeft() <= 0) { toast('오늘 광고 단축권은 다 받았어요. 내일 다시 받아요'); return; }
+    showAd(() => {
+      if (dayRoll(S.tka, gameToday())) S.tka.n = 0;
+      S.tka.n += 1; S.tk.m5 += TKAD.n;
+      sfx('quest'); toast(`5분 단축권 ${TKAD.n}장을 받았어요!`); save();
+      if (!$('#mRx').hidden) renderRx();
+    });
+  }
+  // 진행 막대와 단추 한 줄. small이면 막대 없이 단추만(조교 칸 아래)
+  function labSpeedHTML(kind, i) {
+    const rem = labLeft(kind, i); if (!rem) return '';
+    const c = conEssCost(rem), n = tkSum(), id = `${kind}:${i | 0}`;
+    return `<div class="lab-sp" data-labsp="${id}"><div class="lab-bar"><i data-labbar="${id}" style="width:${(labFrac(kind, i) * 100).toFixed(1)}%"></i></div>` +
+      `<div class="lab-row"><span class="lab-left" data-lableft="${id}">${hms(rem * 1000)} 남음</span>` +
+      `<button class="btn-sub small" type="button" data-lab="tk:${id}"${n ? '' : ' aria-disabled="true"'}>단축권 쓰기${n ? ` (${n}장)` : ''}</button>` +
+      `<button class="${S.ess >= c ? 'cta' : 'btn-sub'} small" type="button" data-lab="ess:${id}">정수 ${c} 즉시</button>` +
+      (!n && tkAdLeft() > 0 ? `<button class="btn-sub small" type="button" data-lab="ad">광고 5분권 ${TKAD.n}장</button>` : '') + '</div></div>';
+  }
+  function labClick(b) {
+    const [a, kind, x] = b.dataset.lab.split(':');
+    if (a === 'ad') labAd(); else if (a === 'tk') labTk(kind, +x); else if (a === 'ess') labEss(kind, +x);
+  }
+  setInterval(() => {
+    try {
+      if (!S || $('#mRx').hidden) return;
+      $$('#rxBody [data-labbar]').forEach(el => { const [k, i] = el.dataset.labbar.split(':'); el.style.width = (labFrac(k, +i) * 100).toFixed(1) + '%'; });
+      $$('#rxBody [data-lableft]').forEach(el => { const [k, i] = el.dataset.lableft.split(':'), r = labLeft(k, +i); el.textContent = r ? `${hms(r * 1000)} 남음` : '다 됐어요'; });
+      $$('#rxBody .rt-node.run').forEach(el => el.style.setProperty('--p', (labFrac('rt', 0) * 100).toFixed(1)));
+    } catch (e) { /* 다음 번에 */ }
+  }, 1000);
   /* ---------- 조교 파견 (프로젝트 문서 ' 설계안 (조교 파견) 초안', : 숫자는 제안대로) ----------
      조교 자리: 대학원생 조교를 캠퍼스 건물에 한 명씩 앉혀요. 앉아 있는 조교 한 명마다 수업료 +10%, 그 건물 가구 값 -10%
      모교 파견: 조교를 졸업한 학교(유치원~대학교)에 2, 4, 8시간 보내 숲의 정수와 추억 조각, 모교마다 다른 덤을 받아요. 파견 중에는 자리 효과가 꺼져요
@@ -10744,13 +10855,22 @@ body.mg-on .toast[hidden]{display:none}
     ppSync();
     const P = S.pp, c = P.cur, now = gameNow(), m = ppMedOf(P.cf), nx = PP.med[m], u = IMG('ic_rdata'), up = IMG('ic_paper'), dayDone = P.day === gameToday();
     const nextDeep = RT5.list.filter(D => P.n < PP.deep[D.k]).sort((a, b) => PP.deep[a.k] - PP.deep[b.k])[0];
-    let h = `<div class="pp-conf"><b>이번 숲속 학회 ${fmt(P.cf)}점</b><small>${ppLeft()}일 남음. ${m ? `지금 ${ppMedIc(m, 18)} ${PP.med[m - 1].nm}` : '아직 메달 없음'}${nx ? `, ${nx.at}점이면 ${ppMedIc(m + 1, 18)} ${nx.nm}` : ''}</small></div>`;
-    h += `<div class="dp-row"><span class="dp-ic">${u ? `<img src="${u}" alt="">` : '🔎'}</span><div class="dp-tx"><b>연구 자료 ${fmt(P.dat)}개</b><small>자료 ${PP.need}개로 논문 한 편을 ${rtHrs(PP.sec)} 동안 써요<br>얻는 곳: 세미나 +${PP.dat.sem}, 연구 트리 칸 +${PP.dat.rt}, 조교 파견 4시간 +${PP.dat.ta[1]}, 8시간 +${PP.dat.ta[2]}, 심화 탐험 큰 장난꾸러기를 처음 이기면 +${PP.dat.boss}</small></div>` +
+    // 5.4.0.4 가독성: 학회 점수 막대(다음 메달까지), 논문 책상(쓰는 중이면 막대와 단축권, 아니면 안내), 연구 자료는 짧게
+    const prevAt = m ? PP.med[m - 1].at : 0, medF = nx ? Math.max(0, Math.min(1, (P.cf - prevAt) / Math.max(1, nx.at - prevAt))) : 1;
+    let h = `<div class="pp-conf"><div class="pp-conf-h"><b>이번 숲속 학회 ${fmt(P.cf)}점</b><span>${ppLeft()}일 남음</span></div>` +
+      `<div class="pp-med">${m ? `${ppMedIc(m, 20)}<small>${PP.med[m - 1].nm}</small>` : '<small>메달 없음</small>'}<div class="lab-bar gold"><i style="width:${(medF * 100).toFixed(1)}%"></i></div>${nx ? `${ppMedIc(m + 1, 20)}<small>${nx.at}점 ${nx.nm}</small>` : '<small>모든 메달</small>'}</div></div>`;
+    if (c) {
+      const D = RT5.list.find(x => x.k === c.k);
+      h += `<div class="pp-desk on"><span class="pp-paper">${up ? `<img src="${up}" alt="">` : '📜'}</span><div class="dp-tx"><b>${D ? D.nm : ''} 논문 쓰는 중</b><small>끝나면 학회 점수 +${ppScore(c.k)}, 숲의 정수 +${PP.ess}</small>${labSpeedHTML('pp', 0)}</div></div>`;
+    } else {
+      h += `<div class="pp-desk"><span class="pp-paper">${up ? `<img src="${up}" alt="">` : '📜'}</span><div class="dp-tx"><b>책상이 비어 있어요</b><small>${P.dat >= PP.need ? `아래에서 주제를 골라 '쓰기'를 눌러요. 한 편에 ${rtHrs(PP.sec)}` : `연구 자료가 ${PP.need - P.dat}개 더 있으면 쓸 수 있어요`}</small></div></div>`;
+    }
+    h += `<div class="dp-row pp-dat"><span class="dp-ic">${u ? `<img src="${u}" alt="">` : '🔎'}</span><div class="dp-tx"><b>연구 자료 ${fmt(P.dat)}개 <em class="pp-chip">논문 ${Math.floor(P.dat / PP.need)}편 분량</em></b><small>한 편에 자료 ${PP.need}개</small><small class="pp-src">얻는 곳: 세미나 +${PP.dat.sem}, 연구 트리 칸 +${PP.dat.rt}, 조교 파견 4시간 +${PP.dat.ta[1]}, 8시간 +${PP.dat.ta[2]}, 심화 탐험 큰 장난꾸러기를 처음 이기면 +${PP.dat.boss}</small></div>` +
       (dayDone ? '<span class="fe-lock">오늘 정리함</span>' : `<button class="cta small" type="button" data-pp="day">자료 정리 +${PP.dat.day}</button>`) + '</div>';
-    if (c) { const D = RT5.list.find(x => x.k === c.k); h += `<div class="dp-row on"><span class="dp-ic">${up ? `<img src="${up}" alt="">` : '📜'}</span><div class="dp-tx"><b>${D ? D.nm : ''} 논문 쓰는 중</b><small>끝나면 학회 점수 +${ppScore(c.k)}</small></div><span class="fe-lock">${hms(c.end - now)}</span></div>`; }
+    h += '<h3 class="fv-h">주제 고르기</h3>';
     h += '<div class="dp-list">' + RT5.list.map(D => {
       const sc = ppScore(D.k), half = (P.ck[D.k] || 0) >= PP.halfAt, U = IMG(D.ic), can = !c && P.dat >= PP.need;
-      return `<div class="dp-row"><span class="dp-ic">${U ? `<img src="${U}" alt="">` : ''}</span><div class="dp-tx"><b>${D.nm} 논문</b><small>학회 점수 ${sc}${half ? ' (이번 학회 같은 주제 3편째부터 절반)' : ` (연구 트리 ${rtLv(D.k)}칸)`}</small></div>` +
+      return `<div class="dp-row"><span class="dp-ic">${U ? `<img src="${U}" alt="">` : ''}</span><div class="dp-tx"><b>${D.nm} 논문 <em class="pp-chip">+${sc}점</em></b><small>학회 점수 ${sc}${half ? ' (이번 학회 같은 주제 3편째부터 절반)' : ` (연구 트리 ${rtLv(D.k)}칸)`}</small></div>` +
         `<button class="${can ? 'cta' : 'btn-sub'} small" type="button" data-pp="w:${D.k}">쓰기</button></div>`;
     }).join('') + '</div>';
     h += `<p class="fine">쓴 논문 ${P.n}편${nextDeep ? `. ${PP.deep[nextDeep.k]}편이면 연구 트리 ${nextDeep.nm} 가지에 다섯째 칸이 열려요` : '. 연구 트리 심화 칸이 모두 열렸어요'}. 4주마다 학회가 새로 열려요.</p>`;
@@ -10768,6 +10888,7 @@ body.mg-on .toast[hidden]{display:none}
       const btn = o ? (now >= o.end ? `<button class="cta small" type="button" data-ta="claim">받기</button>` : `<button class="btn-sub small" type="button" data-ta="pick:${i}">자리 정하기</button><span class="fe-lock">파견 중</span>`)
         : `<button class="btn-sub small" type="button" data-ta="pick:${i}">자리 정하기</button><button class="cta small" type="button" data-ta="go:${i}">파견</button>`;
       h += `<div class="dp-row"><span class="dp-ic">${u ? `<img src="${u}" alt="">` : ''}</span><div class="dp-tx"><b>${TA.whoNm[w]} 조교</b><small>${st}${seatTx}</small></div><span class="ta-btns">${btn}</span></div>`;
+      if (o && now < o.end) h += `<div class="ta-sp">${labSpeedHTML('ta', i)}</div>`;   // 5.4.0.4 파견 시간 줄이기
       if (rt.taPick === i) h += '<div class="ta-pick">' + taB().map(k => `<button class="${x.b === k ? 'cta' : 'btn-sub'} small" type="button" data-ta="sit:${i}:${k}">${FAC[k].name}</button>`).join('') + (x.b ? `<button class="btn-sub small" type="button" data-ta="sit:${i}:">비우기</button>` : '') + '</div>';
       if (rt.taGo === i && !o) h += '<div class="ta-go"><p class="ta-go-h">1. 얼마나 다녀올까요?</p><div class="ta-hrs">'
         + TA.hrs.map((_, k) => `<button class="ta-hr${k === hr ? ' on' : ''}" type="button" data-ta="hr:${i}:${k}" aria-pressed="${k === hr}"><b>${rtHrs(taSec(k))}</b><small>정수 ${Math.round(TA.ess[k] * mul)}<br>추억 조각 ${Math.round(TA.mem[k] * mul)}</small></button>`).join('')
@@ -15736,8 +15857,8 @@ body.mg-on .toast[hidden]{display:none}
        forest/rank/<내 id>   랭킹 이름과 학교 점수
        forest/stats/<내 id>  테스트 현황 (어디까지 했는지, 얼마나 했는지)
      <내 id>는 Firebase 익명 로그인이 기기(브라우저)마다 만들어 줘요. */
-  const VERSION = '5.4.0.3';
-  const NT_QUIET = ['5.4.0.3', '5.4.0.2', '5.4.0.1', '5.3.4.8', '5.3.4.7', '5.3.4.6', '5.3.4.5', '5.3.4.4', '5.3.4.3', '5.3.4.2', '5.3.4.1', '5.3.4', '5.3.2.1', '5.3.0.3', '5.3.0.2', '5.3.0.1', '5.2.2', '5.2.1', '5.2.0.2', '5.2.0.1', '5.1.1.3', '5.1.1.2', '5.1.1.1', '5.1.1', '5.0.3.1', '5.0.3', '5.0.2.2', '5.0.2.1', '2.1.20', '2.1.2.2', '2.3.0.1', '2.3.4', '3.2.3', '3.2.4', '3.2.5', '3.3.1', '3.3.2', '3.3.3', '4.4.1.1', '4.4.1.2', '4.4.1.3', '4.4.1.4', '5.0.1.1', '5.0.1.2', '5.0.1.3', '5.0.1.4', '5.0.1.5', '5.0.1.6', '5.0.1.7', '5.0.1.8'];   // 생물 탐사 고침은 공지 없이. 도 공지 없이(공지 줄은 정하면 넣어요). 공지 없이. 공지 줄은 woodani가 정할 때까지 조용히. 공지는 2026-11-16 woodani가 정해서 NOTICES로 옮겼어요. 은 공지를 띄워요. 도 공지 없이. 도 공지 창 없이. 도 공지 창 없이(공지는 그대로). 도 조용히. 도 공지 창 없이(공지 줄을 고르지 않음)
+  const VERSION = '5.4.0.4';
+  const NT_QUIET = ['5.4.0.4', '5.4.0.3', '5.4.0.2', '5.4.0.1', '5.3.4.8', '5.3.4.7', '5.3.4.6', '5.3.4.5', '5.3.4.4', '5.3.4.3', '5.3.4.2', '5.3.4.1', '5.3.4', '5.3.2.1', '5.3.0.3', '5.3.0.2', '5.3.0.1', '5.2.2', '5.2.1', '5.2.0.2', '5.2.0.1', '5.1.1.3', '5.1.1.2', '5.1.1.1', '5.1.1', '5.0.3.1', '5.0.3', '5.0.2.2', '5.0.2.1', '2.1.20', '2.1.2.2', '2.3.0.1', '2.3.4', '3.2.3', '3.2.4', '3.2.5', '3.3.1', '3.3.2', '3.3.3', '4.4.1.1', '4.4.1.2', '4.4.1.3', '4.4.1.4', '5.0.1.1', '5.0.1.2', '5.0.1.3', '5.0.1.4', '5.0.1.5', '5.0.1.6', '5.0.1.7', '5.0.1.8'];   // 생물 탐사 고침은 공지 없이. 도 공지 없이(공지 줄은 정하면 넣어요). 공지 없이. 공지 줄은 woodani가 정할 때까지 조용히. 공지는 2026-11-16 woodani가 정해서 NOTICES로 옮겼어요. 은 공지를 띄워요. 도 공지 없이. 도 공지 창 없이. 도 공지 창 없이(공지는 그대로). 도 조용히. 도 공지 창 없이(공지 줄을 고르지 않음)
     // 이 버전들은 업데이트해도 공지 창을 띄우지 않아요(공지는 그대로)
   /* 공지사항 (은 이미 올려서 부터): 설정 > 공지사항. 맨 위가 가장 새 공지예요
      패치노트는 자동으로 넣지 않아요. woodani가 검수한 글만 여기에 적어요(CHANGELOG.md는 자세한 기록용이라 따로 있어요)
@@ -17600,6 +17721,17 @@ body.mg-on .toast[hidden]{display:none}
     if (rt.tab === 'shop') renderShop();
     if (rt.tab === 'street') renderStreet();
   }
+  /* 5.4.0.4 황금 도토리를 모으기만 하고 쓰지 않는 학교가 많아요. 테마 세트 값(60개)만큼 모이고 아직 테마를 산 적이 없으면
+     한 번만 '테마를 살 수 있어요' 추천 창을 띄워요. 옛 저장도 gtip이 없어서 한 번 떠요. 다른 창, 처음 안내, 이야기 중에는 기다려요 */
+  const goldTipWant = () => !!S && !S.u.gtip && S.gold >= GSHOP.theme && !S.cos.own.some(x => String(x).startsWith('th:'));
+  function goldTip() {
+    if (!goldTipWant() || rt.modalOpen || rt.paused || rt.st || rt.tut || rt.cereOn || rt.modalQueue.length || rt.sheetKey || rt.tab !== 'school' || document.hidden) return false;
+    S.u.gtip = true; save();
+    askBox({ title: '황금 도토리가 모였어요', text: `황금 도토리가 ${fmt(S.gold)}개 있어요.\n${GSHOP.theme}개면 꾸미기 백화점에서 테마 세트(지도, 지붕, 칠판, 테마 곡)를 살 수 있어요.\n사기 전에 홈 지도에서 미리 볼 수도 있어요.`,
+      yes: '테마 보러 가기', no: '나중에', onYes: () => { openShop(); setTimeout(() => { const c = document.querySelector('.th-card'); if (c) c.scrollIntoView({ block: 'center', behavior: rt.reduced ? 'auto' : 'smooth' }); }, 300); } });
+    return true;
+  }
+  setInterval(goldTip, 4000);
   // 광고를 끝까지 보면 덤으로 1개(일반 광고 하루 3번. 상점 광고 3번은 따로)
   // 광고를 끝까지 보면 받는 황금 도토리가 보이지 않았어요. 보상 창 뒤에 한 줄로 알려요
   function adGold() { goldDay(); if ((S.gd.a || 0) >= GOLD.adDay) return; S.gd.a = (S.gd.a || 0) + 1; S.gd.n += 1; addGold(GOLD.ad); setTimeout(() => toast(`광고 선물! 황금 도토리 +${GOLD.ad} (오늘 ${S.gd.a}/${GOLD.adDay})`), 1300); }
@@ -29746,7 +29878,8 @@ body.mg-on .toast[hidden]{display:none}
     $('#sheetDept').addEventListener('click', () => viaSheet(openDept));
     $('#sheetRx').addEventListener('click', () => viaSheet(openRx));
     $('#rxSeg').addEventListener('click', e => { const b = e.target.closest('[data-rseg]'); if (!b) return; rt.rxTab = b.dataset.rseg; sfx('tap'); renderRx(); });
-    $('#rxBody').addEventListener('click', e => { const b = e.target.closest('[data-rt],[data-rts],[data-pp],[data-dp^="rx:"],[data-ta]'); if (!b) return;
+    $('#rxBody').addEventListener('click', e => { const b = e.target.closest('[data-rt],[data-rts],[data-pp],[data-dp^="rx:"],[data-ta],[data-lab]'); if (!b) return;
+      if (b.dataset.lab) { labClick(b); return; }   // 5.4.0.4 연구소 시간 줄이기
       if (b.dataset.pp) { const v = b.dataset.pp; if (v === 'day') ppDay(); else if (v.startsWith('w:')) ppWrite(v.slice(2)); renderRx(); return; }   // 논문
       if (b.dataset.rts) { rt.rtSel = b.dataset.rts; sfx('tap'); renderRx(); return; }   // 연구 나무 칸 고르기
       if (b.dataset.ta) { const [a, x, y, z] = b.dataset.ta.split(':'); const i = +x;   // 조교
@@ -33395,7 +33528,7 @@ body.mg-on .toast[hidden]{display:none}
     MAP_OAK, oakArt, layoutOak, mapOak, oakAt, tapOak, dropSpot,
     dexMeet, dexSync, dexPending, dexGift, renderDex, evCurrent, evNext, evUpcoming, evSync, evFix, evVal, EV_FALLBACK, EV_DECO, EV_HAT, COS, DECO_BY, decoOwn, perkRec, fpRec, gmPast, gmItems, gmNow, GMON, buyShop, pickShop, showNote, showOkOn, showWd, renderGradPanel, renderShop, renderDecoShop, EV_WEEKLY, EV_WEEK_BASE, weekMon, claimStamp, claimEvMission, claimEvBox, renderEvent, evMissions, evOk, evSkipped, EV_MONTHS, EV_MEASURE, tierMinutes, minAcorns, IMG, sanitize171, ACH, achSync, claimAch, setTitle, renderAch, setDexSeg, achClaimable, XT, xtAct, xtCost, xtLv, feastMins, libMult, propInstances, walkBuild, festItemSvg, guestArt, adErrText, googleErrText, openSheet, closeSheet, startFest, startSports, sanitize170, EV_STAMPS, EV_SPECIAL, EV_MONTHLY, EV_BOX, DEX_KEYS, DEX_REWARD, DEX_GUEST_KEYS, seasonKey, roofArtKey, thrKey, PP, PP_TITLES, ppOpen, ppPer, ppData, ppDay, ppWrite, ppTick, ppSync, ppScore, ppSemDone, rtMax, alumniLines, SIDE, vdReward, oakKey, setSeasonArt, VP, vpLv, vpCost, vpMult, vpAct, renderVpCard, sportsPrize, festPrize, renderTeachers, buildTeacherCards, bldImg, roofKey, bldStage, mapKey, setMapArt, applyThemes, buyFacility, bldFx, setBldFx, mapHi, Live, liveApply, liveLoad, liveOff, LIVE_KEYS, EVC, NOTICES, openNotice, noticeAuto, noticeWant, ntUnread, startTrial, endTrial: () => rt.trial && (rt.trial.left = 0), spawnDeal, startVisit, IMG170, MG, mgCells, mgSetCells, mgTick, mgAddEnergy, mgAddUp, mgTapGen, mgDrop, mgSell, mgUpgrade, mgAddUp, mgUpSwap, mgGensMax, MG_UP_ESS, mgClaimOrder, mgSwapOrder, mgOrderOk, mgFillOrders, mgOpen, mgClose, mgRenderAll, mgSpawnLevel, mgNearestEmpty, mgEmptyBoard, mgOrderReward, mgUI, sanitize180, mgWatchAd, mgNewOrder, mgHintPick, mgShowHint, mgClearHint, mgTouch, mgOrderGuide, mgDexN, mgDexCan, mgDexClaim, mgOpenDex, MG_DEX, MG_DEX_MS, mgDexEss, mgDexEssCan, mgDexEssN, mgDexMsCan, mgDexMsClaim, MGB, mgBuyBoost, mgBstLeft, mgOpenBoost, nice, claimMission, claimBonus, claimWeekMission, MP_BOX, swapDaily, repairMissions, MISSIONS, WMISSIONS, dmDay, wkWeek,   // 도감, 이벤트
     PZ, PZ_SHAPES, pzFits, pzAnyFit, pzStuck, pzFullLines, pzPlace, pzFreshGame, pzStart, PZB, pzbCost, pzApplyBoost, pzBoostOpen, pzBoostGo, festGoldLeft, festGoldTake, claimSports, TR2, TR2_PL, openTr2, tr2Act, tr2Away, tr2Ready, tr2Rsv, tr2Tick, renderAlbum, FEST, FEST_IDS, festNight, festShown, festTimeLock, festOpen, startFest, openFest, endFest, renderStreet, pzFinish, pzLeft, pzCanAd, pzEssOf, pzMinOf, pzHelpSquirrel, pzHelpOwl, pzHelpBear, fillSubs, mapRoofTop, showAd, claimOfflineDouble, startBoost, tripAd, festFocus, festRange, visMap, renderMissions, pzHasHelp, pzRot, pzNewPiece, pzOpen, pzClose, pzGameOver, pzRenderAll, renderMini, addEss, ESHOP, SP_FUR, applyCos, essItem, pickEss, buyEss, renderEssShop, hatSVG, spFurImg, gameNow, gameToday, gameWeek, kstDay, setServerTime, SVR, dmDay, weekIdx, lgWeek, wkWeek, lgKey, pzDay, goldDay, boostLeft, dealLeft, canStamp };
-  if (window.__FOREST_TEST) Object.assign(window.__forest, { acctSaveFirst, netSleep, netWake, uniTerm, utSync, tripUseTicket, readUseTicket, picnicUseTicket, buyDecoPieces, adGold, claimBonus, cloudPush, cloudClash, syncGet, revOf, deleteAccount, lookDel: () => lookDelNow(), lookSet, lookPush, leaveRank, sanitizeCg, freshCg, ambWant, ambSync, AMB, AMB_LV, WLD, wldSync, wldLv, wldPhase, wldWeather, wldAuto, WLD_WATER, wldCurtain, photoOpen, photoClose, oakBend, oakBands, frPatAll, frPatLeft, fpsToggle, fxRes, fxWant, gradRecReady, teaRecReady, GS, GS_WHO, GS_LINES, gsArt, useLog, useStr, useSumText, sanitizeUse, freshUse, statsDoc, mgOpen, pzOpen, bxTap, BX, gsTick, gsSync, gsTap, gsClaim, gsReady, gsPick, gsMakeSub, gsCardHTML, freshGs, sanitizeGs, updateVisit, endVisit, buildQuestPanel, renderQuestPanel, checkQuests, talkNext });   // 시험 손잡이
+  if (window.__FOREST_TEST) Object.assign(window.__forest, { acctSaveFirst, netSleep, netWake, uniTerm, utSync, tripUseTicket, readUseTicket, picnicUseTicket, buyDecoPieces, adGold, claimBonus, cloudPush, cloudClash, syncGet, revOf, deleteAccount, lookDel: () => lookDelNow(), lookSet, lookPush, leaveRank, sanitizeCg, freshCg, ambWant, ambSync, AMB, AMB_LV, WLD, wldSync, wldLv, wldPhase, wldWeather, wldAuto, WLD_WATER, wldCurtain, photoOpen, photoClose, oakBend, oakBands, frPatAll, frPatLeft, fpsToggle, fxRes, fxWant, gradRecReady, teaRecReady, GS, GS_WHO, GS_LINES, gsArt, goldTip, goldTipWant, rtLv, conEssCost, renderRx, labLeft, useLog, useStr, useSumText, sanitizeUse, freshUse, statsDoc, mgOpen, pzOpen, bxTap, BX, gsTick, gsSync, gsTap, gsClaim, gsReady, gsPick, gsMakeSub, gsCardHTML, freshGs, sanitizeGs, updateVisit, endVisit, buildQuestPanel, renderQuestPanel, checkQuests, talkNext });   // 시험 손잡이
   if (window.claude && window.claude.hot && window.claude.hot.snapshot) {
     try { window.claude.hot.snapshot(() => { if (S) syncMid(); return { save: S }; }); } catch (e) { /* 무시 */ }
   }
