@@ -153,7 +153,7 @@
       setH($('#sheetPicnicIc'), IMG('picnic_ic') ? `<img src="${IMG('picnic_ic')}" alt="">` : '🧺');
       const busy = pcActive(), done = !busy && S.pc.day === gameToday();
       setT($('#sheetPicnicTx'), busy ? `소풍 가는 중, ${Math.ceil(pcRemain() / 60000)}분 뒤 돌아와요` : done ? '오늘 소풍은 다녀왔어요' : `친구 ${PCN.kids}명이 ${PCN.min}분 동안 숲에 다녀와요`);
-      setT($('#sheetPicnicGo'), busy ? '보기' : done ? '보기' : '보내기!');
+      setT($('#sheetPicnicGo'), busy ? '보기' : done ? '보기' : '보내기');
       sp.classList.toggle('todo', !busy && !done);
     }
     const sk = $('#sheetSticker'), skOn = k === 'classroom' && skOpen() && S.f.classroom >= 1;
@@ -172,7 +172,7 @@
       const pres = elPres();
       setH($('#sheetElectIc'), IMG('elect_ballot_box') ? `<img src="${IMG('elect_ballot_box')}" alt="">` : '🗳️');
       setT($('#sheetElectTx'), pres ? `이번 주 반장 ${elWho(pres)}: ${EL_PLEDGES[pres.p].t}` : '이번 주 후보 세 명이 기다려요');
-      setT($('#sheetElectGo'), pres ? '보기' : '투표하기!');
+      setT($('#sheetElectGo'), pres ? '보기' : '투표하기');
       se.classList.toggle('todo', !pres);
     }
     setT($('#sheetNeed'), conOn(k) ? ' ' : maxed ? (semFirst() ? `더 올리려면 1학기를 마쳐야 해요. 1학기 방학식을 열면 Lv.${capNext()}까지 키울 수 있어요` : (finalYear() ? (S.tier === 4 ? `이 학년에서는 다 키웠어요. 학위수여식을 열면 대학원에서 더 키울 수 있어요` : `이 학교급에서는 다 키웠어요. 졸업식을 열면 ${TIERS[S.tier + 1].name}에서 새로 지어요`) : `더 올리려면 학교가 다음 학년으로 올라가야 해요. ${semOn() ? '2학기 ' : ''}종업식을 열면 Lv.${capNext()}까지 키울 수 있어요`)) : !fr ? `가구 네 개를 모두 ${euro('Lv.' + L)} 올리면 건물을 키울 수 있어요` : ok ? ' ' : `도토리 ${fmt(Math.ceil(c - S.budget))}개가 더 필요해요`);
@@ -326,7 +326,7 @@
     const sub = AC.keys.includes(rt.nsSub) ? rt.nsSub : S.ns.sub;
     Object.assign(S.ns, { day, sub, got: 0, sec: 0, done: false, n: Math.min(SAVE_CAP.count, S.ns.n + 1), at: gameNow() });
     sfx('quest'); buzz(15);
-    toast(nsPlanned() ? `오늘 밤 자율학습을 예약했어요.\n밤 ${NSL.h0 - 12}시부터 자동으로 시작해요.\n아침 ${NSL.h1}시 이후에 결과를 확인해요.` : `야간 자율학습을 켰어요!\n아침 ${NSL.h1}시까지 자리 비운 보상이 ${hm(nsExtraH() * 3600)} 더 쌓여요`);
+    toast(nsPlanned() ? `오늘 밤 자율학습을 예약했어요.\n밤 ${NSL.h0 - 12}시에 저절로 시작해요.\n아침 ${NSL.h1}시 뒤에 결과를 받아요.` : `야간 자율학습을 켰어요!\n아침 ${NSL.h1}시까지 자리 비운 보상이 ${hm(nsExtraH() * 3600)} 더 쌓여요`);
     save(); checkQuests(); renderNight(true); try { renderNsRow(); } catch (e) { /* 공부 탭 줄 */ } return true;
   }
   // 켠 밤이 끝나면(6시) 결과를 한 번 알려요: 쌓인 시간과 도토리, 고른 과목 XP
@@ -353,10 +353,10 @@
     if (!S || !S.ns) return;
     const night = isNight(), used = nsUsedTonight(), on = nsOn(), planned = nsPlanned();
     $('#nsLead').textContent = on ? `지금 자율학습 중이에요.\n아침 ${NSL.h1}시에 ${AC.name[S.ns.sub]} XP +${NSL.xp}을 받아요.`
-      : planned ? `오늘 밤 자율학습을 예약했어요.\n밤 ${NSL.h0 - 12}시에 자동으로 시작해요.\n다시 접속하지 않아도 적용돼요.`
+      : planned ? `오늘 밤 자율학습을 예약했어요.\n밤 ${NSL.h0 - 12}시에 저절로 시작해요.\n다시 들어오지 않아도 돼요.`
       : used ? '오늘 밤 자율학습은 끝났어요.\n내일 밤에 다시 켤 수 있어요.'
       : night ? `켜 두면 아침 ${NSL.h1}시까지 자리 비운 보상이 ${hm(nsExtraH() * 3600)} 더 쌓여요.\n공부할 과목을 골라요.`
-      : `오늘 밤 자율학습을 미리 예약할 수 있어요.\n밤 ${NSL.h0 - 12}시부터 아침 ${NSL.h1}시까지 적용돼요.\n공부할 과목을 골라요.`;
+      : `오늘 밤 자율학습을 미리 예약해요.\n밤 ${NSL.h0 - 12}시부터 아침 ${NSL.h1}시까지 이어져요.\n공부할 과목을 골라요.`;
     const lock = on || used;
     $('#nsSubs').innerHTML = AC.keys.map(k => `<button type="button" data-ns="${k}" class="${(lock ? S.ns.sub : rt.nsSub) === k ? 'on' : ''}" aria-disabled="${lock ? 'true' : 'false'}">${AC.name[k]}</button>`).join('');
     const bon = nsBonus();

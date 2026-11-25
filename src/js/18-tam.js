@@ -204,7 +204,7 @@
     const P = tamLvAllPlan(); if (!P.n) return;
     // 쓰는 도토리, 대원마다 한 줄, 탐험대 힘을 나눠서 보여 줘요(예전에는 창을 열 때 줄바꿈이 지워져 한 덩어리로 보였어요)
     const rows = P.up.filter(u => u.b > u.a).map(u => `<span class="ask-row"><i>${esc(spName(u.sp))}</i><span>Lv.${u.a} → <b>${u.b}</b></span><em>+${u.b - u.a}</em></span>`).join('');
-    askBox({ title: '출동 대원 고르게 올리기', yes: '올리기', no: '그만두기',
+    askBox({ title: '출동 대원 고르게 올리기', yes: '올리기', no: '취소',
       html: `<span class="ask-sum">${acornIcon()}<b>${fmtN(P.cost)}</b>${eulOf(fmtN(P.cost))} 써요</span><span class="ask-sub">남는 도토리 ${fmtN(P.left)}</span><span class="ask-rows">${rows}</span><span class="ask-sum">탐험대 힘 ${fmt(P.pw0)} → <b>${fmt(P.pw1)}</b></span>`,
       onYes: () => { let n = 0;   // 보여 준 그대로 올려요(창을 보는 동안 들어온 도토리로 더 올리지 않아요)
         if (S.budget >= P.cost && P.up.every(u => tamMem(u.sp).lv === u.a)) { S.budget -= P.cost; for (const u of P.up) tamMem(u.sp).lv = u.b; n = P.n; } else n = tamLvAll();

@@ -97,9 +97,9 @@
   const dexName = k => k === 'tea_hedgehog' ? VP.name : XT_DEX[k] ? XT[XT_DEX[k]].name : k.startsWith('g_') ? (dexGuest(k) || {}).name || k : k.startsWith('tea_') ? TEA[k.slice(4)].name : (DEX_NAMES[k] || (NEWCOMERS.find(n => n.k === k) || {}).name || k);
   const dexPicKey = k => k.startsWith('tea_') ? k : 'chr_' + (k.startsWith('g_') ? k.slice(2) : k);
   const dexHow = k => {
-    if (k === 'tea_hedgehog') return '처음부터 학교에 계셔요';
-    if (XT_DEX[k] && XT[XT_DEX[k]].tier && S.tier < XT[XT_DEX[k]].tier) return `${TIERS[XT[XT_DEX[k]].tier].name}부터 오셔요`;
-    if (XT_DEX[k]) return `${eul(FAC[XT[XT_DEX[k]].fac].name)} 지으면 오셔요`;
+    if (k === 'tea_hedgehog') return '처음부터 학교에 계세요';
+    if (XT_DEX[k] && XT[XT_DEX[k]].tier && S.tier < XT[XT_DEX[k]].tier) return `${TIERS[XT[XT_DEX[k]].tier].name}부터 오세요`;
+    if (XT_DEX[k]) return `${eul(FAC[XT[XT_DEX[k]].fac].name)} 지으면 오세요`;
     if (k.startsWith('g_')) return (dexGuest(k) || {}).hint || '';
     if (k.startsWith('tea_')) return `${TEA[k.slice(4)].name}을 모시면 등록돼요`;
     const i = NEWCOMERS.findIndex(n => n.k === k);

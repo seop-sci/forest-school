@@ -642,7 +642,7 @@
   function upAsk() {
     const P = upPlan(); if (P.ks.length < 1) { toast('지금 도토리로 올릴 수 있는 건물이 없어요'); return; }
     const rows = P.ks.map(k => `<span class="ask-row"><i>${esc(FAC[k].name)}</i><span>Lv.${S.f[k]} → <b>${S.f[k] + 1}</b></span><em>+1</em></span>`).join('');
-    askBox({ title: '건물 한 번에 올리기', yes: '올리기', no: '그만두기',
+    askBox({ title: '건물 한 번에 올리기', yes: '올리기', no: '취소',
       html: `<span class="ask-sum">${acornIcon()}<b>${fmtN(P.cost)}</b>${eulOf(fmtN(P.cost))} 써요</span><span class="ask-sub">남는 도토리 ${fmtN(S.budget - P.cost)}. 가구를 채우고 공사를 시작해요</span><span class="ask-rows">${rows}</span>`,
       onYes: () => upAll(P.ks) });
   }

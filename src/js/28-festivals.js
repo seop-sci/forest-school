@@ -552,7 +552,7 @@
     const on = fvOn(), bw = on && bfOn() ? bfWin(gameToday()) : null, hu = (bw && IMG('bf_head')) || IMG('fv_head'), hd = $('#fvHead');
     hd.classList.toggle('art', !!hu); hd.style.backgroundImage = hu ? `url("${blobUrl(hu)}")` : '';
     setT($('#fvTitle'), bw ? '숲속 대학교 대축제' : '대학 축제');
-    setT($('#fvDayTx'), bw ? `대축제 ${bw.i + 1}일째 (사흘 중)` : on ? '오늘 축제 중' : `다음 축제 ${fvNext()}`);
+    setT($('#fvDayTx'), bw ? `대축제 ${bw.i + 1}일째` : on ? '오늘 축제 중' : `다음 축제 ${fvNext()}`);
     let h = '';
     if (on) {
       const bn = FV.bonus[fvWd()];
