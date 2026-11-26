@@ -35,6 +35,8 @@
     if (!webCacheOk()) return;
     caches.open(WEB_CACHE).then(c => c.keys().then(ks => ks.forEach(q => { if (!keep(q.url)) c.delete(q); }))).catch(() => {});
   }
+  // 구글 애즈 앱 전환 이벤트: 안드로이드 판만 window.FOREST_TRACK이 있어요(app/src/analytics.js). 토스 판과 웹 판에서는 아무것도 하지 않아요
+  const track = (name, params, once) => { try { if (typeof window.FOREST_TRACK === 'function') window.FOREST_TRACK(name, params, once); } catch (e) { /* 게임은 그대로 */ } };
   const ADS_EXT = window.FOREST_ADS || null;   // 광고 없이 보상을 주던 옛 스위치(FOREST_NOAD)는 켜는 판이 없어 지웠어요. 켤 때 한 번만 읽어요(나중에 바꿔 넣어도 소용없게)
   const motionMQ = window.matchMedia ? window.matchMedia('(prefers-reduced-motion: reduce)') : null;
 
