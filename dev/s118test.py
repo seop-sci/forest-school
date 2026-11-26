@@ -10,7 +10,7 @@ Q = """(() => ({ rows: [...document.querySelectorAll('#rankList .rk')].map(li =>
   dels: [...document.querySelectorAll('#rankList .rk-del')].map(b => [b.closest('.rk').querySelector('.rk-name span').textContent, b.textContent]),
   wide: Math.max(0, ...[...document.querySelectorAll('#rankList .rk')].map(li => li.scrollWidth - li.clientWidth)) }))()"""
 async def rank_all(page):
-    await page.tap('.tab[data-tab="school"]'); await page.tap('.tab[data-tab="event"]'); await page.tap('#evSeg [data-evseg="rank"]'); await page.wait_for_timeout(600)
+    await page.tap('.tab[data-tab="school"]'); await page.tap('.tab[data-tab="rank"]'); await page.wait_for_timeout(600)
     await page.evaluate("document.querySelector('#rankView [data-rv=all]').click()"); await page.wait_for_timeout(1500)
 
 async def main():
