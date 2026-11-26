@@ -225,6 +225,8 @@
     return { use, n, left: Math.max(0, r), cut: rem - Math.max(0, r) };
   }
   const tkPlanText = p => TK.filter(t => p.use[t.k]).map(t => `${t.name} ${p.use[t.k]}장`).join(', ');
+  // 쓸 단축권의 지금 보유 수. 한 가지면 '96장 보유 중', 여러 가지면 '5분권 96장, 30분권 3장 보유 중'
+  const tkHaveText = p => { const ks = TK.filter(t => p.use[t.k]); return ks.length === 1 ? `${fmt(S.tk[ks[0].k])}장 보유 중` : ks.map(t => `${t.name} ${fmt(S.tk[t.k])}장`).join(', ') + ' 보유 중'; };
   const teaCost = k => Math.ceil(softCost(TEA[k].cost, S.t[k], SOFT.tea) * costScale() * (1 - deptX('edu') / 100));
   const teaMaxed = k => !!TEA[k].max && S.t[k] >= TEA[k].max;
   // 고슴도치 교감 선생님: 처음부터 계셔요(Lv.0). 연수를 보내면 학교 행사 상품 도토리가 레벨마다 +10%, 최고 Lv.10(+100%)

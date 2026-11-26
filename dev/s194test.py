@@ -6,6 +6,7 @@
 # 4) 다녀왔어요 창: 1시간 넘게 비우면 광고 단추가 큼, 광고 보면 도토리 두 배와 합치기 에너지 +30, 출석 도장 함께, 3분 동안 다른 광고 쉬기
 #    출석만 있을 때도 창이 뜨고 광고 단추는 없음
 # 5) z1, z2 퀘스트가 합치기로 바뀜, 옛 저장에서 그 퀘스트를 하던 중이면 끝난 것으로, 옛 저장은 '오늘 할 일'을 접음
+# 7) 단축권 자동 사용 줄의 보유 수 글
 # 6) 랭킹은 홈 오른쪽 단추(5.4.1.2에 다시 따로), 오늘 활동 단추(체험학습, 학교 행사)
 import asyncio
 from playwright.async_api import async_playwright
@@ -41,6 +42,10 @@ async def main():
         c.ok(r['ess'] == 120 and r['gs'][-1] == 0 and r['left'] == 0 and r['n'] == 12, f'주문 정수 하루 120 {r}')
         c.ok(r['m5'] == 2, f'합치기 5분권 하루 2장 {r}')
         c.ok(r['san'] == 12, f'주문 정수 저장 읽기 {r}')
+        r = await pg.evaluate(f"""(()=>{{ const F={F}, S=F.S; S.tk = {{ m5: 96, m30: 3, h1: 0, h3: 0 }};
+          const one = F.tkPlan(200), two = F.tkPlan(2000);
+          return [F.tkPlanText(one), F.tkHaveText(one), F.tkPlanText(two), F.tkHaveText(two)]; }})()""")
+        c.ok(r[1] == '96장 보유 중' and '5분권' in r[0] and (r[3].endswith('장 보유 중') and '5분권' in r[3] if ',' in r[2] else r[3].endswith('장 보유 중')), f'단축권 보유 수 글 {r}')
         # 3) 패스 점수는 미션에서
         r = await pg.evaluate(f"""(()=>{{ const F={F}, S=F.S, o={{}};
           F.psSync(); o.open = !!S.ps && S.ps.s >= 0; S.ps.pts = 0; S.ps.ad = '';

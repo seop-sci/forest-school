@@ -890,7 +890,7 @@
     { const c = conEssCost(left); setH($('#conEssCost'), `${ESS_ICON()}<b>${c}</b>`); $('#conEss').setAttribute('aria-disabled', S.ess >= c ? 'false' : 'true'); }
     $('#conNo').hidden = !(rt.conArm && p.n);
     setT($('#conPlan'), !p.n ? '시간 단축권이 없어요. 광고를 보거나 문방구에서 살 수 있어요'
-      : p.left ? `${tkPlanText(p)}을 써서 ${hm(p.cut)} 줄이고 ${hm(p.left)} 남아요` : left < 60 ? `${hm(left)}면 끝나요. 단축권은 긴 공사에 아껴 두세요` : `${tkPlanText(p)}을 써서 바로 끝나요`);
+      : p.left ? `${tkPlanText(p)}을 써서 ${hm(p.cut)} 줄이고 ${hm(p.left)} 남아요 (${tkHaveText(p)})` : left < 60 ? `${hm(left)}면 끝나요. 단축권은 긴 공사에 아껴 두세요` : `${tkPlanText(p)}을 써서 바로 끝나요 (${tkHaveText(p)})`);
     const arm = rt.conArm && p.n;   // 바로 줄이기를 누르면 쓸 권을 표시해요
     setH($('#conTks'), TK.slice().reverse().map(t => `<button type="button" class="con-tk${rt.conPick === t.k ? ' armed' : ''}${arm && p.use[t.k] ? ' plan' : ''}" data-tk="${t.k}" aria-disabled="${S.tk[t.k] > 0 ? 'false' : 'true'}">${IMG('ticket_' + t.k) ? `<img src="${IMG('ticket_' + t.k)}" alt="">` : '⌛'}<span>${t.name}</span><b>${fmt(S.tk[t.k])}장</b>${arm && p.use[t.k] ? `<em class="use">−${p.use[t.k]}장</em>` : ''}</button>`).join(''));
     cbSheet();   // 건설 가속
