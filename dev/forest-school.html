@@ -8274,6 +8274,8 @@ body.mg-on .toast[hidden]{display:none}
     if (!webCacheOk()) return;
     caches.open(WEB_CACHE).then(c => c.keys().then(ks => ks.forEach(q => { if (!keep(q.url)) c.delete(q); }))).catch(() => {});
   }
+  // 구글 애즈 앱 전환 이벤트: 안드로이드 판만 window.FOREST_TRACK이 있어요(app/src/analytics.js). 토스 판과 웹 판에서는 아무것도 하지 않아요
+  const track = (name, params, once) => { try { if (typeof window.FOREST_TRACK === 'function') window.FOREST_TRACK(name, params, once); } catch (e) { /* 게임은 그대로 */ } };
   const ADS_EXT = window.FOREST_ADS || null;   // 광고 없이 보상을 주던 옛 스위치(FOREST_NOAD)는 켜는 판이 없어 지웠어요. 켤 때 한 번만 읽어요(나중에 바꿔 넣어도 소용없게)
   const motionMQ = window.matchMedia ? window.matchMedia('(prefers-reduced-motion: reduce)') : null;
 
@@ -14563,6 +14565,7 @@ body.mg-on .toast[hidden]{display:none}
     // (2026-11-25 "생물 보상단계도 두면 좋겠고"): 120종 황금 도토리 3과 숲의 정수 60, 150종(모두) 숲의 정수 100과 칭호 생물 도감 완성
     if (n >= 120 && S.bx.g < 6) { S.bx.g = 6; addGold(BX.gold120); addEss(BX.ess120); got.push(`생물 120종! 황금 도토리 +${BX.gold120}, 숲의 정수 +${BX.ess120}`); }
     if (n >= BIO.length && S.bx.g < 7) { S.bx.g = 7; addEss(BX.ess150); got.push(`생물 ${BIO.length}종을 다 모았어요! 숲의 정수 +${BX.ess150}, 칭호 생물 도감 완성`); }
+    if (nw) track('creature_found', { creature_name: b.nm, creature_id: b.id.replace(/^bio_/, ''), dex_count: n }, b.id);   // 처음 찾은 생물만(구글 애즈 앱 이벤트)
     rt.bxRes = { b, nw, got };
     sfx(b.rare ? 'quest' : 'coin');
     renderDeco(true); renderHUD(); bxShow(); save();
@@ -26835,7 +26838,7 @@ body.mg-on .toast[hidden]{display:none}
     S.tut.st = how; rt.tut = null;
     if (how === 'later') toast('맨 위 톱니바퀴(설정)에서 언제든 튜토리얼을 이어 할 수 있어요');
     else if (how === 'skip') { S.tut.step = 0; toast('튜토리얼을 건너뛰었어요. 맨 위 톱니바퀴(설정)에서 다시 볼 수 있어요'); }
-    else { S.tut.step = 0; if (reward) { S.tut.paid = true; addGold(TUT_GOLD); sfx('quest'); toast(`튜토리얼 끝! 황금 도토리 +${TUT_GOLD}개`); } else toast('튜토리얼을 다시 봤어요'); }
+    else { S.tut.step = 0; if (reward) { S.tut.paid = true; track('tutorial_complete', {}, true); addGold(TUT_GOLD); sfx('quest'); toast(`튜토리얼 끝! 황금 도토리 +${TUT_GOLD}개`); } else toast('튜토리얼을 다시 봤어요'); }
     $('#scroller').scrollTop = 0;
     save(); syncSettingsUI(); nextModal();
   }

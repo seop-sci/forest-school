@@ -16,6 +16,8 @@ let lastErr = '';                                            // 1.7.1: 광고를
 
 function finish() {
   const cb = onDone; onDone = null;
+  // 2026-11-26 구글 애즈 앱 전환: 끝까지 보고 보상 신호가 왔을 때만 Firebase 앱 이벤트를 보내요(analytics.js)
+  if (cb && earned) { try { if (typeof window.FOREST_TRACK === 'function') window.FOREST_TRACK('ad_reward_watched'); } catch (e) { /* 이벤트는 못 보내도 보상은 그대로 */ } }
   if (cb) cb({ earned });
   earned = false;
   preload();

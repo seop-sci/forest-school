@@ -250,6 +250,7 @@
     // (2026-11-25 "생물 보상단계도 두면 좋겠고"): 120종 황금 도토리 3과 숲의 정수 60, 150종(모두) 숲의 정수 100과 칭호 생물 도감 완성
     if (n >= 120 && S.bx.g < 6) { S.bx.g = 6; addGold(BX.gold120); addEss(BX.ess120); got.push(`생물 120종! 황금 도토리 +${BX.gold120}, 숲의 정수 +${BX.ess120}`); }
     if (n >= BIO.length && S.bx.g < 7) { S.bx.g = 7; addEss(BX.ess150); got.push(`생물 ${BIO.length}종을 다 모았어요! 숲의 정수 +${BX.ess150}, 칭호 생물 도감 완성`); }
+    if (nw) track('creature_found', { creature_name: b.nm, creature_id: b.id.replace(/^bio_/, ''), dex_count: n }, b.id);   // 처음 찾은 생물만(구글 애즈 앱 이벤트)
     rt.bxRes = { b, nw, got };
     sfx(b.rare ? 'quest' : 'coin');
     renderDeco(true); renderHUD(); bxShow(); save();

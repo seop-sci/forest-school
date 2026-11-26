@@ -137,7 +137,7 @@
     S.tut.st = how; rt.tut = null;
     if (how === 'later') toast('맨 위 톱니바퀴(설정)에서 언제든 튜토리얼을 이어 할 수 있어요');
     else if (how === 'skip') { S.tut.step = 0; toast('튜토리얼을 건너뛰었어요. 맨 위 톱니바퀴(설정)에서 다시 볼 수 있어요'); }
-    else { S.tut.step = 0; if (reward) { S.tut.paid = true; addGold(TUT_GOLD); sfx('quest'); toast(`튜토리얼 끝! 황금 도토리 +${TUT_GOLD}개`); } else toast('튜토리얼을 다시 봤어요'); }
+    else { S.tut.step = 0; if (reward) { S.tut.paid = true; track('tutorial_complete', {}, true); addGold(TUT_GOLD); sfx('quest'); toast(`튜토리얼 끝! 황금 도토리 +${TUT_GOLD}개`); } else toast('튜토리얼을 다시 봤어요'); }
     $('#scroller').scrollTop = 0;
     save(); syncSettingsUI(); nextModal();
   }

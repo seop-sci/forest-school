@@ -44,6 +44,15 @@ jobs:
             echo "ADMOB_TEST=1" >> "$GITHUB_ENV"
             echo "::warning::비밀값이 없어서 시험용 디버그 APK만 만들어요"
           fi
+      # 2026-11-26 Firebase 앱 이벤트: google-services.json은 저장소 app/android/app/에 두거나, 저장소 비밀값 GOOGLE_SERVICES_JSON(파일 내용 통째로)에 넣어요
+      - name: Firebase 설정 파일 확인
+        env:
+          GSJ: ${{ secrets.GOOGLE_SERVICES_JSON }}
+        run: |
+          F=app/android/app/google-services.json
+          if [ ! -f "$F" ] && [ -n "$GSJ" ]; then printf '%s' "$GSJ" > "$F"; fi
+          if [ -f "$F" ]; then echo "google-services.json 있음: 앱 이벤트를 Firebase로 보내요"
+          else echo "::warning::google-services.json이 없어서 앱 이벤트(ad_reward_watched 등)가 Firebase로 가지 않아요. 게임은 그대로 돌아요"; fi
       - name: 웹 게임을 앱 안에 넣기
         working-directory: app
         run: |
