@@ -1,5 +1,5 @@
   /* ---------- 모달 순서 관리 ---------- */
-  function queueModal(fn) { rt.modalQueue.push(fn); if (!rt.modalOpen && !rt.paused) nextModal(); }
+  function queueModal(fn) { if (fn === showOffline) { if (!rt.modalQueue.includes(fn)) rt.modalQueue.unshift(fn); } else rt.modalQueue.push(fn); if (!rt.modalOpen && !rt.paused) nextModal(); }   // 다녀왔어요 창은 맨 먼저
   function nextModal() {
     if (rt.modalOpen || rt.paused) return;
     while (rt.modalQueue.length) { const fn = rt.modalQueue.shift(); if (fn() !== false) return; }

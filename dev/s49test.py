@@ -37,12 +37,12 @@ CHECK = r"""() => {
   // 하루 제한 다섯 곳: 모두 게임 시계를 따라요. 기기 시계를 하루 뒤로 돌려도 새 날이 안 와요
   rt.fakeNow = T; S.clk.last = 0;
   const today = F.gameToday();
-  S.pz = { day: today, n: 10, adN: 0, best: 0, cur: null }; S.gd.day = today; S.gd.n = 10; S.gd.shop = 3; S.ad.day = today; S.ad.n = 5; S.hd.day = today; S.hd.n = F.DEAL.perDay; S.att.last = today;
+  S.pz = { day: today, n: 10, adN: 0, best: 0, cur: null, xp: 120 }; S.gd.day = today; S.gd.n = 10; S.gd.shop = 3; S.ad.day = today; S.ad.n = 5; S.hd.day = today; S.hd.n = F.DEAL.perDay; S.att.last = today;
   F.dmDay(); const dm0 = S.dm.list.map(m => m.id).join(','); S.dm.list.forEach(m => { m.done = true; });
-  const used = () => [F.pzLeft(), (F.goldDay(), S.gd.n), F.boostLeft(), F.dealLeft(), F.canStamp(), (F.dmDay(), S.dm.day === today && S.dm.list.every(m => m.done))];
+  const used = () => [F.pzXpLeft(), (F.goldDay(), S.gd.n), F.boostLeft(), F.dealLeft(), F.canStamp(), (F.dmDay(), S.dm.day === today && S.dm.list.every(m => m.done))];
   eq(used(), [0, 10, 0, 0, false, true], '제한을 다 쓴 상태 (오늘의 미션도 다 함)');
   rt.fakeNow = T - DAY; eq(used(), [0, 10, 0, 0, false, true], '기기 시계를 하루 뒤로: 그대로 막힘, 미션도 그대로');
-  rt.fakeNow = T + DAY; eq(used(), [5, 0, 5, F.DEAL.perDay, true, false], '진짜 다음 날: 다시 열림');
+  rt.fakeNow = T + DAY; eq(used(), [120, 0, 5, F.DEAL.perDay, true, false], '진짜 다음 날: 다시 열림');
   eq([S.dm.day, S.dm.list.every(m => !m.done)], [F.kstDay(T + DAY), true], '오늘의 미션이 한국 시간 새 날에 바뀜');
   void dm0;
   // 주간 리그와 이번 주 미션: 주 번호는 gameWeek()와 같고(서버에 올리는 week도 S.lg.week), 번호가 뒤로 가도 보상을 두 번 주지 않아요

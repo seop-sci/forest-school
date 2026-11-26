@@ -1,12 +1,13 @@
   /* ===== 2.1.3 숲속 패스 BEGIN (프로젝트 문서 "시즌 설계안 (2.1.3)", woodani 확정 2026-10-30) =====
-     4주마다 시즌. 미션으로 패스 점수를 모아 30단계 트랙을 채워요. 무료, 광고는 '오늘 미션 점수 2배'만.
+     4주마다 시즌. 오늘의 미션(하나에 PS.dP)과 이번 주 미션(하나에 PS.wP)을 받으면 패스 점수가 함께 들어와 30단계 트랙을 채워요. 무료, 광고는 '오늘 미션 점수 2배'만.
+     패스만의 미션은 따로 고르지 않아요. 옛 저장에 남은 패스 미션은 받을 수 있는 것만 그날(그 주) 한 번 받아요
      시즌 번호는 2026-11-02(월)부터 4주마다 0, 1, 2 …(화면에는 +1). 시즌마다 한정 장식(20단계)과 한정 가구(30단계).
      정수와 소모품, 황금 도토리만 주고 도토리(학교 키우기 재화)는 주지 않아요 */
   const psSeason = day => { const d = dayDiff(PS.anchor, day || gameToday()); return d < 0 ? -1 : Math.floor(d / PS.len); };
   const psEnd = n => dayAdd(PS.anchor, n * PS.len + PS.len - 1);
   const psDef = n => { const x = PS_SEASONS[n] || ['', '', '', '', ''];   /* 표에 없으면 '시즌 N' 한 번만 */ return { theme: x[0], deco: x[1], decoNm: x[2], fur: x[3], furNm: x[4] }; };
   const psOpen = () => !!S && !!S.ps && S.tier >= PS.tier && psSeason() >= 0 && !liveOff('event');
-  // 미션: 이벤트 미션처럼 이미 있는 횟수 기록이 시작 때보다 얼마나 늘었는지로 재요. d는 오늘 미션 목표, w는 이번 주 미션 목표
+  // 예전 패스 미션 표. 옛 저장에 남은 미션을 읽고 받는 데만 써요. d는 오늘 미션 목표, w는 이번 주 미션 목표
   const PS_M = {
     picks: { d: 30, name: n => `떨어진 도토리 ${n}개 줍기`, v: () => S.st.picks, ok: () => S.f.playground >= 1 },
     shakes: { d: 20, name: n => `참나무 ${n}번 흔들기`, v: () => S.st.shakes, ok: () => S.f.playground >= 1 },
@@ -29,13 +30,6 @@
   const psVal = id => { try { return Math.floor(PS_M[id].v()) || 0; } catch (e) { return 0; } };
   const psProg = m => Math.max(0, Math.min(m.n, psVal(m.id) - m.b));
   const psReady = m => !m.done && psProg(m) >= m.n;
-  function psPick(key, n, slot) {
-    const ids = Object.keys(PS_M).filter(id => PS_M[id][slot] && psOk(id));
-    let h = dayHash(key + S.pid + slot);
-    const out = [];
-    while (out.length < n && ids.length) { const i = h % ids.length; const id = ids.splice(i, 1)[0]; out.push({ id, n: PS_M[id][slot], b: psVal(id), done: false }); h = Math.imul(h ^ (h >>> 13), 1103515245) >>> 0; }
-    return out;
-  }
   const freshPs = () => ({ s: -1, pts: 0, got: 0, ex: 0, day: '', dl: [], wk: -1, wl: [], ad: '', tot: 0, fur: [], fsel: '', badge: 0, seen: -1 });
   function sanitizePs(d, s) {
     const P = d.ps && typeof d.ps === 'object' ? d.ps : {};
@@ -102,8 +96,17 @@
     }
     if (!psOpen()) return;
     const t = gameToday(), w = gameWeek();
-    if (dayRoll(S.ps, t)) { S.ps.dl = psPick('psd' + t, PS.dN, 'd'); }
-    if (S.ps.wk !== w) { S.ps.wk = w; S.ps.wl = psPick('psw' + w, PS.wN, 'w'); }
+    if (dayRoll(S.ps, t)) S.ps.dl = [];
+    if (S.ps.wk !== w) { S.ps.wk = w; S.ps.wl = []; }
+  }
+  // 오늘의 미션(d)이나 이번 주 미션(w)을 받을 때 패스 점수도 함께. 받은 양을 돌려줘요(패스가 닫혀 있으면 0)
+  function psFromMission(kind) {
+    if (!psOpen()) return 0;
+    psSync();
+    const p = kind === 'w' ? PS.wP : PS.dP * psDayMul();
+    const lv0 = psLv(); S.ps.pts += p;
+    if (psLv() > lv0) setTimeout(() => toast(`숲속 패스 ${psLv()}단계에 닿았어요`), 600);
+    return p;
   }
   const psDayMul = () => S.ps.ad === gameToday() ? PS.adMul : 1;
   function psClaimMission(kind, i) {
@@ -123,9 +126,9 @@
     if (!psOpen() || S.ps.ad === gameToday()) return;
     showAd(() => {
       S.ps.ad = gameToday();
-      const done = S.ps.dl.filter(m => m.done).length, add = done * PS.dP * (PS.adMul - 1);
+      const done = S.dm && S.dm.day === gameToday() ? S.dm.list.filter(m => m.done).length : 0, add = done * PS.dP * (PS.adMul - 1);
       if (add) S.ps.pts += add;
-      toast(`오늘의 패스 미션 점수 +100%가 됐어요${add ? `! 이미 받은 미션도 +${add}` : ''}`);
+      toast(`오늘의 미션 패스 점수 +100%가 됐어요${add ? `! 이미 받은 미션도 +${add}` : ''}`);
       save(); renderPass();
     });
   }
@@ -159,6 +162,7 @@
       nodes.push(`<div class="ps-node${got ? ' got' : open ? ' open' : ''}${big ? ' big' : ''}" title="${i}단계: ${esc(r.t)}"><span class="ps-nb" style="${bg ? `background-image:url('${bg}')` : ''}"><i>${psIc(r.ic)}</i></span><small>${i}</small>${i === Math.max(1, lv) && lv > 0 && IMG('pass_flag') ? `<img class="ps-flag" src="${IMG('pass_flag')}" alt="">` : ''}</div>`);
     }
     const ready = psStepReady() + psExtraReady();
+    const old = [...S.ps.dl.map((m, i) => [m, 'd', i]), ...S.ps.wl.map((m, i) => [m, 'w', i])].filter(([m]) => psReady(m));   // 옛 저장의 받을 수 있는 패스 미션
     const ms = (L, kind, p) => L.map((m, i) => { const pr = psProg(m), rd = psReady(m); return `<div class="dm${m.done ? ' done' : ''}"><div class="dm-tx"${goAt(m.id, !m.done && !rd)}><b>${esc(PS_M[m.id].name(m.n))} <em>+${p}점</em></b><div class="qbar"><i style="width:${(pr / m.n * 100).toFixed(0)}%"></i></div></div>` +
       (m.done ? `<span class="dm-ok">${CHECK}</span>` : rd ? `<button class="cta small" type="button" data-ps="${kind}${i}">받기</button>` : `<span class="dm-n">${pr}/${m.n}</span>`) + '</div>'; }).join('');
     const bg = IMG('pass_bg');
@@ -168,9 +172,9 @@
       `<div class="ps-track" id="psTrack">${nodes.join('')}</div>` +
       (ready ? `<button class="cta" type="button" data-ps="all">보상 받기 (${ready})</button>` : '') +
       `<p class="fine ps-big">20단계 한정 장식 <b>${esc(D.decoNm || '황금 도토리 2')}</b>, 30단계 한정 가구 <b>${esc(D.furNm || '황금 도토리 5')}</b>. 시즌이 끝나면 다시 얻을 수 없어요</p>` +
-      `<h4 class="dex-h">오늘의 패스 미션 <small>${mul > 1 ? '광고 덕분에 오늘은 점수 +100%' : '자정에 바뀌어요'}</small></h4><div class="dms">${ms(S.ps.dl, 'd', PS.dP * mul)}</div>` +
-      (mul > 1 ? '' : `<button class="btn-sub ps-ad" type="button" data-ps="ad">광고 보고 오늘 미션 점수 +100%</button>`) +
-      `<h4 class="dex-h">이번 주 패스 미션 <small>월요일에 바뀌어요</small></h4><div class="dms">${ms(S.ps.wl, 'w', PS.wP)}</div>` +
+      `<p class="fine ps-how">오늘의 미션 하나에 패스 점수 +${PS.dP * mul}${mul > 1 ? '(광고 덕분에 두 배)' : ''}, 이번 주 미션 하나에 +${PS.wP}</p>` +
+      (mul > 1 ? '' : `<button class="btn-sub ps-ad" type="button" data-ps="ad">광고 보고 오늘의 미션 패스 점수 +100%</button>`) +
+      (old.length ? `<h4 class="dex-h">남은 패스 미션 <small>받을 수 있는 것만 남았어요</small></h4><div class="dms">${old.map(([m, k, i]) => ms([m], k, k === 'w' ? PS.wP : PS.dP * mul).replace(`data-ps="${k}0"`, `data-ps="${k}${i}"`)).join('')}</div>` : '') +
       (furs.length ? `<h4 class="dex-h">교실 시즌 가구 <small>하나를 골라 교실에 놓아요</small></h4><div class="ps-furs">${furs.map(id => `<button type="button" class="${S.ps.fsel === id ? 'on' : ''}" data-psf="${id}" aria-pressed="${S.ps.fsel === id}"><img src="${IMG(psDef(Number(id.slice(4))).fur)}" alt=""><small>${esc(psDef(Number(id.slice(4))).furNm)}</small></button>`).join('')}<button type="button" class="${S.ps.fsel ? '' : 'on'}" data-psf="">치우기</button></div>` : '');
     const tr = $('#psTrack'), cur = tr && tr.children[Math.max(0, lv - 2)]; if (tr && cur) tr.scrollLeft = cur.offsetLeft - 8;
   }

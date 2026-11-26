@@ -1,7 +1,7 @@
 # 2.1.3 시험: 숲속 패스
 # 보는 것
 #  1) 2026-11-02 전에는 '준비 중', 유치원은 '초등학교부터'. 메인 퀘스트 ps1은 패스가 닫혀 있으면 바로 마쳐요
-#  2) 시즌 번호(4주), 오늘 미션 3개와 이번 주 미션 5개, 미션을 하면 받기, 점수
+#  2) 시즌 번호(4주), 패스 미션은 새로 고르지 않고 옛 저장의 미션만 받기, 점수
 #  3) 광고 2배(이미 받은 오늘 미션도 더해요), 단계 보상 모두 받기(정수, 단축권, 에너지, 문제집, 배지와 칭호, 한정 장식, 한정 가구), 덤 상자
 #  4) 시즌이 바뀌면 받을 수 있던 보상을 저절로 받고 새로 시작, 옛 저장 받기
 #  5) 화면: 이벤트 창 칸, 트랙, 교실 시즌 가구, 360과 390에서 넘치지 않음, 페이지 오류 없음
@@ -31,14 +31,14 @@ async def main():
               return {{ kin, before, seas, m0, after, s0, m1, s1: F.psSeason('2026-11-30'), s13: F.psSeason('2027-11-01') }}; }})()""")
             print('열기', r)
             if r != {'kin': False, 'before': False, 'seas': -1, 'm0': 1, 'after': True, 's0': 0, 'm1': 0, 's1': 1, 's13': 13}: bad.append(f'{w}: 여는 때 {r}')
-            # 2) 미션
+            # 2) 패스 미션은 새로 고르지 않아요. 옛 저장에 남은 미션은 받을 수 있으면 한 번 받아요
             r = await pg.evaluate(f"""(() => {{ const F = {F}, S = F.S; S.f.playground = 3; S.ps.day = ''; S.ps.wk = -1; F.psSync();
-              const d = S.ps.dl.map(m => m.id), wl = S.ps.wl.map(m => m.id);
-              const m = S.ps.dl[0], key = m.id; const bump = n => {{ if (key === 'picks') S.st.picks += n; else if (key === 'shakes') S.st.shakes += n; else if (key === 'dm') S.st.dmDone += n; else if (key === 'pz') S.st.pz = (S.st.pz||0) + n; else if (key === 'mg') S.mg.st.orders += n; else if (key === 'rd') S.rd.st += n; else if (key === 'bt') S.bt.st.w += n; else if (key === 'sk') S.sk.st.all += n; else if (key === 'gd') S.gn.st.h += n; else if (key === 'bx') S.bx.st.n += n; else if (key === 'cg') S.cg.st.p += n; else S.st.sports += n; }};   // 3.0.0 텃밭, 생물, 대항전 미션도
-              const no = F.psClaimMission('d', 0); bump(m.n); const ok = F.psClaimMission('d', 0), again = F.psClaimMission('d', 0);
-              return {{ d: d.length, w: wl.length, uniq: new Set(d).size === 3 && new Set(wl).size === wl.length, no, ok, again, pts: S.ps.pts }}; }})()""")
+              const d = S.ps.dl.length, wl = S.ps.wl.length;
+              S.ps.dl = [{{ id: 'picks', n: 30, b: S.st.picks, done: false }}];
+              const no = F.psClaimMission('d', 0); S.st.picks += 30; const ok = F.psClaimMission('d', 0), again = F.psClaimMission('d', 0);
+              return {{ d, w: wl, no, ok, again, pts: S.ps.pts }}; }})()""")
             print('미션', r)
-            if r['d'] != 3 or r['w'] < 4 or not r['uniq'] or r['no'] or not r['ok'] or r['again'] or r['pts'] != 30: bad.append(f'{w}: 미션 {r}')
+            if r['d'] != 0 or r['w'] != 0 or r['no'] or not r['ok'] or r['again'] or r['pts'] != 30: bad.append(f'{w}: 미션 {r}')
             # 3) 광고 2배, 단계 보상
             r = await pg.evaluate(f"""(() => {{ const F = {F}, S = F.S; let ok = null; const sa = window.__forest; F.psWatchAd && 0;
               S.ps.ad = ''; const p0 = S.ps.pts;
@@ -68,7 +68,7 @@ async def main():
               open: document.querySelectorAll('.ps-node.open').length, btn: !!document.querySelector('[data-ps=all]'), ad: !!document.querySelector('[data-ps=ad]'), ms: document.querySelectorAll('#psBody .dm').length,
               ttl: document.querySelector('.ps-ttl') && document.querySelector('.ps-ttl').innerText }))()""")
             print('화면', json.dumps(r, ensure_ascii=False))
-            if not r['seg'] or r['nodes'] != 30 or r['open'] != 6 or not r['btn'] or not r['ad'] or r['ms'] < 7: bad.append(f'{w}: 화면 {r}')
+            if not r['seg'] or r['nodes'] != 30 or r['open'] != 6 or not r['btn'] or not r['ad'] or r['ms'] != 0: bad.append(f'{w}: 화면 {r}')
             o = await pg.evaluate(OVER, '#panelEvent')
             if o: bad.append(f'{w}: 패스 화면이 {o}곳 넘쳐요')
             await pg.screenshot(path=f's88_pass_{w}.png')

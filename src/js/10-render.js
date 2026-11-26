@@ -407,8 +407,8 @@
   function renderAffordance() {
     if (S && S.fold && rt.foldS !== S) { rt.foldS = S; foldApply(); } else foldDots();   // 불러온 저장마다 한 번
     for (const k of facKeys()) $('#pq-' + k).classList.toggle('can-buy', S.budget >= facNextCost(k));
-    // 탐험 단추 빨간 점: 아직 한 번도 안 열었거나, 보고서가 쌓였을 때(탐험 화면을 보는 동안은 끔). 시계가 아직 없으면 tamIdle을 부르지 않아요(첫 열기 전에 시계를 켜지 않게)
-    const td = $('#tamDot'); if (td) td.hidden = !(tamOn() && rt.tab !== 'tam' && (!S.tam.seen || (S.tam.it && tamIdle().sec >= TAM.idleMin)));
+    // 탐험 단추 빨간 점: 보고서가 TAM.dotSec 넘게 쌓였을 때만(탐험 화면을 보는 동안은 끔). 시계가 아직 없으면 tamIdle을 부르지 않아요(첫 열기 전에 시계를 켜지 않게)
+    const td = $('#tamDot'); if (td) td.hidden = !(tamOn() && rt.tab !== 'tam' && S.tam.it && tamIdle().sec >= TAM.dotSec);
     renderRec();
     setHid($('#tabDot'), !teaRecReady());   // 선생님 탭 빨간 점: 추천 선생님을 지금 올릴 수 있을 때만
     if (rt.sheetKey) renderSheet();
@@ -426,9 +426,10 @@
     renderTripBtn();
     renderTr2Btn();
     renderSportsBtn();
+    renderActBtn();
     if (rt.tab === 'quests') renderMissions();
     setHid($('#btnAtt'), !attUnlocked());
-    setHid($('#attDot'), !attUnlocked() || !canStamp());
+    setHid($('#attDot'), true);   // 출석 도장은 다녀왔어요 창에서 함께 찍어요
     setHid($('#gDot'), rt.tab === 'grad' || !(canGraduate() || canPromote() || (S.p.ticket > 0 && growOn()) || gradRecReady()));
     renderGradPanel(false);
   }

@@ -44,11 +44,14 @@
     $('#btnBoost').addEventListener('click', openBoost);
     $('#tripIc').innerHTML = IMG('ic_trip') ? `<img src="${IMG('ic_trip')}" alt="" style="width:100%;height:100%;object-fit:contain">` : BUS;
     $('#sportsIc').innerHTML = IMG('ic_ui_school_event') ? `<img src="${IMG('ic_ui_school_event')}" alt="" draggable="false">` : `<svg viewBox="-11 -11 22 22" aria-hidden="true">${FEST_ICON.welcome}</svg>`;   // 홈 UI 정리: 학교 행사 풍선 그림
-    $('#btnSports').addEventListener('click', () => { if (!rt.modalOpen) openFest(); });
+    $('#btnSports').addEventListener('click', () => { if (!rt.modalOpen) { actPop(false); openFest(); } });
+    $('#btnAct').addEventListener('click', e => { e.stopPropagation(); sfx('tap'); actPop($('#actPop').hidden); });
+    document.addEventListener('click', e => { if (!$('#actPop').hidden && !e.target.closest('.act-w')) actPop(false); });
+    $('#actIc').innerHTML = $('#sportsIc').innerHTML;
     $('#festList').addEventListener('click', e => { const b = e.target.closest('[data-fest]'); if (b) startFest(b.dataset.fest, false); });
     $('#srGet').addEventListener('click', () => closeModal($('#mSportsEnd'), () => claimSports(1)));
-    $('#btnTrip').addEventListener('click', () => { if (!rt.modalOpen) openTrip(); });
-    $('#btnTr2').addEventListener('click', () => { if (!rt.modalOpen) openTr2(); });   // 수학여행
+    $('#btnTrip').addEventListener('click', () => { if (!rt.modalOpen) { actPop(false); openTrip(); } });
+    $('#btnTr2').addEventListener('click', () => { if (!rt.modalOpen) { actPop(false); openTr2(); } });   // 수학여행
     $('#tr2Body').addEventListener('click', e => { const b = e.target.closest('[data-tr2]'); if (!b || b.getAttribute('aria-disabled') === 'true') return; tr2Act(b.dataset.tr2); });
     $('#tripBody').addEventListener('toggle', e => { if (e.target.classList && e.target.classList.contains('tr-souv-d')) rt.trSvOpen = e.target.open; }, true);
     $('#tripBody').addEventListener('click', e => {
@@ -580,8 +583,8 @@
     $('#devDay').addEventListener('click', () => {
       S.u.dev = true;
       S.att.last = ''; S.ad.day = ''; S.ad.n = 0; S.hd.day = ''; S.hd.n = 0;
-      S.pz.day = ''; S.mg.ad.day = ''; S.mg.bst.day = '';   // 숲속 퍼즐 보상 판, 합치기 광고와 부스터 횟수도
-      toast('다음 날이 된 것처럼 바꿨어요. 출석 도장, 보충수업, 핫딜, 퍼즐 보상 판, 합치기 부스터가 다시 열려요');
+      S.pz.day = ''; S.mg.ad.day = ''; S.mg.bst.day = '';   // 숲속 퍼즐 수학 XP, 합치기 광고와 부스터 횟수도
+      toast('다음 날이 된 것처럼 바꿨어요. 출석 도장, 보충수업, 핫딜, 퍼즐 수학 XP, 합치기 부스터가 다시 열려요');
       renderAffordance(); save();
     });
     $('#offArt').innerHTML = IMG('art_offline') ? `<img src="${IMG('art_offline')}" alt="" style="width:100%;height:100%;object-fit:contain">` : `<svg viewBox="-30 -30 60 60" aria-hidden="true"><circle cx="14" cy="-15" r="8" class="c-moon"/><circle cx="18" cy="-18" r="7" class="c-boardfill"/><circle cx="-18" cy="-12" r="1" class="c-moon"/><circle cx="-10" cy="-20" r="0.8" class="c-moon"/><g transform="translate(-3 6) scale(.62)">${AV.owl}</g></svg>`;

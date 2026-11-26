@@ -118,7 +118,7 @@
     $('#bkLead').textContent = `숲의 정수 ${need}개로 한 권을 사면 ${AC.name[k]} XP +${AC.book.xp}을 바로 받아요.`;
     $('#bkLeft').innerHTML = `<span>오늘 남은 문제집</span><b>${left} / ${AC.book.perDay}권</b>`;
     $('#bkHave').innerHTML = `<span>가진 숲의 정수</span><b>${ic}${fmt(have)}개</b>`;
-    const why = left <= 0 ? `${AC.name[k]} 문제집은 오늘 다 샀어요. 내일 다시 살 수 있어요.` : have < need ? `숲의 정수가 ${need - have}개 모자라요. 퍼즐이나 합치기로 모을 수 있어요.` : '';
+    const why = left <= 0 ? `${AC.name[k]} 문제집은 오늘 다 샀어요. 내일 다시 살 수 있어요.` : have < need ? `숲의 정수가 ${need - have}개 모자라요. 숲속 합치기 주문으로 모을 수 있어요.` : '';
     $('#bkWhy').textContent = why; $('#bkWhy').hidden = !why;
     $('#bkBuy').setAttribute('aria-disabled', why ? 'true' : 'false');
     $('#bkBuy').innerHTML = `${ic}${need} 구매하기`;

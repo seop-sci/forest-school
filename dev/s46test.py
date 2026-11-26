@@ -57,7 +57,7 @@ RULES = r"""() => {
   for (let j = 1; j < 8; j++) g.b[j] = k;
   g.tray[0] = { c: [[0, 0]], k };
   r = F.pzPlace(g, 0, 0, 0);
-  eq([r.asks.length, r.asks[0] && r.asks[0].ess, g.ess, g.askI, g.ask.got, g.ask.n], [1, PZ.askEss[0], PZ.askEss[0], 1, 0, PZ.askN[1]], '학생 부탁 완료');
+  eq([r.asks.length, r.asks[0] && r.asks[0].ess, g.ess, g.askI, g.ask.got, g.ask.n], [1, 0, 0, 1, 0, PZ.askN[1]], '학생 부탁 완료(정수는 합치기 주문에서)');
   ok(g.ask.k !== k && g.ask.who !== who, '다음 부탁은 문양과 학생이 달라야 해요');
   // 연습 판은 부탁 정수가 0
   g = F.pzFreshGame(false); g.ask.n = 8; const k2 = g.ask.k;
@@ -100,29 +100,19 @@ RULES = r"""() => {
   g.tray = [{ c: [[0, 0], [0, 1]], k: 1 }, { c: [[0, 0], [1, 0]], k: 2 }, null];
   ok(F.pzStuck(g), '막힘을 알아채야 해요');
   g.tray[2] = { c: [[0, 0]], k: 1 }; ok(!F.pzStuck(g), '1칸 조각이 있으면 안 막혀요');
-  // 보상 상한: 점수 150점마다 정수 1(25개까지), 100점마다 수업료 1분치(15분치까지, 2026-10-26 균형 제안서)
-  eq([F.pzEssOf(149), F.pzEssOf(150), F.pzEssOf(1e9), F.pzMinOf(99), F.pzMinOf(100), F.pzMinOf(1e9)], [0, 2, 50, 0, 2, 30], '보상 상한(2.3.1 두 배)');
-  // 하루 10판 + 광고 3판
-  S.pz = { day: '', n: 0, adN: 0, best: 0, cur: null };
+  // 쉬는 시간 퍼즐: 판 수 제한 없이 언제나 XP 판, 보상은 수학 XP만(점수 100점마다 2, 판당 24, 하루 120까지)
+  eq([F.pzXpOf(99), F.pzXpOf(100), F.pzXpOf(1e9)], [0, 2, 24], '수학 XP 상한');
+  S.pz = { day: '', n: 0, adN: 0, best: 0, cur: null, xp: 0 };
   const rws = [];
   for (let i = 0; i < 11; i++) { rws.push(F.pzStart().rw); }
-  eq([rws.filter(Boolean).length, rws[5], F.pzLeft(), F.pzCanAd()], [5, false, 0, true], '하루 5판(2.3.1)');
-  S.pz.adN = 1; eq([F.pzLeft(), F.pzCanAd()], [2, false], '광고 뒤 2판 더, 광고는 하루 1번');
-  // 끝내기: 정수와 도토리가 유한하고, 연습 판은 0
-  S.pz.n = 0; S.pz.adN = 0; S.ess = 0;
+  eq([rws.filter(Boolean).length, S.pz.n], [11, 0], '판 수 제한 없음');
+  S.ess = 4;
   const b0 = S.budget;
-  let cur = F.pzStart(); cur.score = 3000; cur.ess = 4; S.ess = 4;
+  let cur = F.pzStart(); cur.score = 3000; cur.ess = 4;
   let fin = F.pzFinish(cur);
-  eq([fin.ess, fin.askEss, fin.mins, fin.newBest, S.ess, S.pz.best, S.pz.cur], [40, 4, 30, true, 44, 3000, null], '판 끝 보상(2.3.1 두 배)');
-  ok(isFinite(fin.acorns) && fin.acorns > 0 && fin.acorns < 1e15 && S.budget - b0 === fin.acorns, '도토리 보상이 유한하고 지급돼요: ' + fin.acorns);
-  S.pz.n = 99; cur = F.pzStart(); cur.score = 3000; fin = F.pzFinish(cur);
-  eq([cur.rw, fin.ess, fin.acorns, S.ess], [false, 0, 0, 44], '연습 판은 보상 없음');
-  // 초등학교에서도 도토리 보상이 수업료 기준으로 커져요
-  const keep = { tier: S.tier, f: JSON.stringify(S.f) };
-  S.pz.n = 0; S.tier = 1; const r0 = F.rate();
-  cur = F.pzStart(); cur.score = 2000; fin = F.pzFinish(cur);
-  ok(fin.acorns >= r0 * 60 * 10 * 0.9 && isFinite(fin.acorns), '초등학교 도토리 보상: ' + fin.acorns + ' vs 수업료 10분치 ' + r0 * 600);
-  S.tier = keep.tier;
+  eq([fin.ess, fin.askEss, fin.mins, fin.acorns, fin.newBest, S.ess, S.pz.best, S.pz.cur, S.pz.xp, S.budget === b0], [0, 0, 0, 0, true, 4, 3000, null, 24, true], '판 끝 보상은 수학 XP만');
+  for (let i = 0; i < 5; i++) { cur = F.pzStart(); cur.score = 3000; fin = F.pzFinish(cur); }
+  eq([S.pz.xp, fin.xp, fin.capped], [120, 0, true], '하루 120에서 멈춤');
   return bad;
 }"""
 
@@ -147,12 +137,12 @@ async def run(b, dark, w, h):
     bad = await pg.evaluate(RULES)
     # 화면: 미니게임 탭 → 퍼즐 열기 → 끌어 놓기
     await pg.evaluate(f"{F}.S.pz = {{ day: '', n: 0, adN: 0, best: 0, cur: null }}; {F}.S.ess = 12; document.querySelector('.tab[data-tab=mini]').click()"); await pg.wait_for_timeout(400)
-    txt = await pg.evaluate("[document.querySelector('#essHave').textContent, document.querySelector('#pzLeftTxt').textContent, document.querySelector('#pzAdBtn').hidden]")
-    if txt != ['12', '오늘 5/5판', True]: bad.append('미니게임 탭 글: ' + json.dumps(txt, ensure_ascii=False))
+    txt = await pg.evaluate("[document.querySelector('#essHave').textContent, document.querySelector('#pzLeftTxt').textContent, !document.querySelector('#pzAdBtn')]")
+    if txt != ['12', '수학 XP 0/120', True]: bad.append('미니게임 탭 글: ' + json.dumps(txt, ensure_ascii=False))
     await pg.screenshot(path=f's46_mini_{tag}.png')
     await pg.evaluate("document.querySelector('#pzOpen').click(); const pb=document.querySelector('#pzBoost'); if (pb && !pb.hidden) document.querySelector('#pzbSkip').click()"); await pg.wait_for_timeout(500)
     st = await pg.evaluate(f"[!document.querySelector('#pzScene').hidden, document.querySelectorAll('#pzGrid .pz-cell').length, document.querySelectorAll('#pzTray .pz-slot .pz-piece').length, {F}.S.pz.n, {F}.S.pz.cur.rw]")
-    if st != [True, 64, 3, 1, True]: bad.append('퍼즐 열기: ' + json.dumps(st))
+    if st != [True, 64, 3, 0, True]: bad.append('퍼즐 열기: ' + json.dumps(st))
     # 첫 조각을 (0,0)에 끌어다 놓기
     box = await pg.evaluate("(() => { const s = document.querySelector('#pzTray .pz-slot'); const r = s.getBoundingClientRect(); const g = document.querySelector('#pzGrid').getBoundingClientRect(); return {sx: r.x + r.width/2, sy: r.y + r.height/2, gx: g.x, gy: g.y, cell: g.width/8}; })()")
     p = await pg.evaluate(f"{F}.S.pz.cur.tray[0]")
@@ -195,7 +185,7 @@ async def run(b, dark, w, h):
     await pg.evaluate(f"{F}.pzClose()")
     await pg.reload(); await pg.wait_for_timeout(2600); await pg.evaluate(SKIPTUT)
     res = await pg.evaluate(f"[{F}.S.pz.cur && {F}.S.pz.cur.score, {F}.S.pz.n, {F}.S.ess]")
-    if res != [score0, 1, 12]: bad.append('이어하기 저장: ' + json.dumps(res))
+    if res != [score0, 0, 12]: bad.append('이어하기 저장: ' + json.dumps(res))
     await pg.evaluate("document.querySelector('.tab[data-tab=mini]').click()"); await pg.wait_for_timeout(300)
     sub = await pg.evaluate("[document.querySelector('#pzCardTag').textContent, document.querySelector('#pzCardSub').textContent]")
     if sub[0] != '이어하기': bad.append('이어하기 카드: ' + json.dumps(sub, ensure_ascii=False))
@@ -211,11 +201,11 @@ async def run(b, dark, w, h):
     await pg.evaluate("document.querySelector('#pzQuitYes').click()"); await pg.wait_for_timeout(400)
     end = await pg.evaluate(f"[!document.querySelector('#pzEnd').hidden, document.querySelector('#pzEndScore').textContent, document.querySelectorAll('#pzEndList li').length, {F}.S.ess, {F}.S.pz.best, {F}.S.pz.cur]")
     # 2.3.0.1: 5분 단축권 줄이 하나 더 생길 수 있어요(하루 3장)
-    if end[:2] != [True, '900'] or end[2] not in (2, 3, 4, 5) or end[3] != 24 or end[4] != 900 or end[5] is not None: bad.append('그만하기 보상: ' + json.dumps(end, ensure_ascii=False))
+    if end[:2] != [True, '900'] or end[2] != 1 or end[3] != 12 or end[4] != 900 or end[5] is not None: bad.append('그만하기 보상: ' + json.dumps(end, ensure_ascii=False))
     await pg.screenshot(path=f's46_end_{tag}.png')
     await pg.evaluate("document.querySelector('#pzEndAgain').click(); const pb=document.querySelector('#pzBoost'); if (pb && !pb.hidden) document.querySelector('#pzbSkip').click()"); await pg.wait_for_timeout(300)
     again = await pg.evaluate(f"[document.querySelector('#pzEnd').hidden, {F}.S.pz.cur && {F}.S.pz.cur.score, {F}.S.pz.n]")
-    if again != [True, 0, 2]: bad.append('다시 하기: ' + json.dumps(again))
+    if again != [True, 0, 0]: bad.append('다시 하기: ' + json.dumps(again))
     await pg.evaluate("document.querySelector('#pzBack').click()"); await pg.wait_for_timeout(200)
     # 넘침 검사: 퍼즐 장면 안 요소가 화면을 벗어나지 않아요
     await pg.evaluate("document.querySelector('#pzOpen').click(); const pb=document.querySelector('#pzBoost'); if (pb && !pb.hidden) document.querySelector('#pzbSkip').click()"); await pg.wait_for_timeout(300)

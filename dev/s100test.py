@@ -40,13 +40,13 @@ async def main():
         r = await pg.evaluate("""(() => { const ol = document.querySelector('#qMain .qsteps'); return { fold: ol.classList.contains('fold'), vis: [...ol.querySelectorAll('.qs')].filter(e => e.offsetParent !== null).length, ex: document.querySelector('#qMain .ch-fold').getAttribute('aria-expanded') }; })()""")
         if r['fold'] or r['vis'] < 2 or r['ex'] != 'true': bad.append(f'펼치기 {r}')
         await pg.evaluate(f"{F}.setTab('school')")
-        # 4) 퍼즐과 합치기 단축권(하루 1장)
+        # 4) 퍼즐은 단축권 없음(쉬는 시간), 합치기 단축권은 하루 2장
         r = await pg.evaluate(f"""(() => {{ const F = {F}, S = F.S; S.tier = 0; const m0 = S.tk.m5; const got = [];
           for (let i = 0; i < 5; i++) got.push(!!F.pzFinish({{ rw: true, score: 300, ess: 0 }}).tk);
           return {{ got, add: S.tk.m5 - m0, day: S.tkd.pz }}; }})()""")
-        if r['got'] != [True, False, False, False, False] or r['add'] != 1: bad.append(f'퍼즐 단축권 {r}')
+        if r['got'] != [False, False, False, False, False] or r['add'] != 0: bad.append(f'퍼즐 단축권 {r}')
         r = await pg.evaluate(f"""(() => {{ const F = {F}, S = F.S; const m0 = S.tk.m5; let n = 0; for (let i = 0; i < 25; i++) {{ S.mg.st.orders += 1; if (S.mg.st.orders % F.TKE.mgEvery === 0 && F.tkDaily('mg')) n++; }} return {{ n, add: S.tk.m5 - m0 }}; }})()""")
-        if r != {'n': 1, 'add': 1}: bad.append(f'합치기 단축권 {r}')
+        if r != {'n': 2, 'add': 2}: bad.append(f'합치기 단축권 {r}')
         # 5) 숨은 생물 자리: 지도 밖으로 나가지 않고, 단추와 건물에 가려 못 누르는 자리가 없어요
         #    (3.3.0 새 단장으로 지도와 단추 자리가 바뀌어서, 옛 좌표 규칙 대신 화면에서 실제로 눌리는지 재요. 2026-11-11)
         for tier in (1, 2, 3):

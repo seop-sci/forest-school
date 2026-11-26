@@ -10,7 +10,7 @@
     ups: { n: 15, name: n => `시설이나 가구 ${n}번 고치기`, v: () => S.st.ups, ok: () => false },
     trains: { n: 2, name: n => `선생님 연수 ${n}번 보내기`, v: () => S.st.trains, ok: () => false },
     subs: { get n() { return S && S.tier >= 4 ? 1 : 2; }, name: n => `학생 부탁 ${n}개 들어주기`,   /* 대학교부터는 부탁이 오래 걸려서 1개 */ v: () => S.q.subDone, ok: () => S.q.m >= SUB_UNLOCK },
-    puzzle: { n: 1, name: () => '숲속 퍼즐 한 판 끝내기', v: () => S.st.pz || 0, ok: () => !liveOff('puzzle') },
+    puzzle: { n: 1, name: () => '숲속 퍼즐 한 판 끝내기', v: () => S.st.pz || 0, ok: () => false },   // 퍼즐은 쉬는 시간이라 미션에서 뺐어요(옛 저장의 미션은 다른 미션으로 바뀌어요)
     merge: { n: 2, name: n => `숲속 합치기 주문 ${n}개 채우기`, v: () => S.mg.st.orders, ok: () => !liveOff('merge') },
     fest: { n: 1, name: () => '학교 행사 한 번 열기', v: () => S.st.sports + Object.values(S.fest.n).reduce((a, b) => a + b, 0), ok: () => FEST_IDS.some(festOpen) },
     trip: { n: 1, name: () => '체험학습 다녀오기', v: () => S.st.trips, ok: () => tripOpen() },
@@ -68,7 +68,8 @@
     addLeague(LP.mission);
     sfx('quest'); buzz(12);
     const skIt = skAdd(), tkIt = tkGive('dm');   // 칭찬 스티커, 단축권
-    showReward({ title: '미션 완료!', sub: MISSIONS[m.id].name(MISSIONS[m.id].n), items: [skIt, tkIt].filter(Boolean).concat([{ ic: 'acorn', t: `도토리 +${fmt(v)}` }, { ic: 'mge', t: `합치기 에너지 +${MG.E.dm}` }, { ic: 'mp', t: `미션 포인트 +${MP.daily}` }]) });
+    const pp = psFromMission('d');   // 숲속 패스 점수
+    showReward({ title: '미션 완료!', sub: MISSIONS[m.id].name(MISSIONS[m.id].n), items: [skIt, tkIt].filter(Boolean).concat([{ ic: 'acorn', t: `도토리 +${fmt(v)}` }, { ic: 'mge', t: `합치기 에너지 +${MG.E.dm}` }, { ic: 'mp', t: `미션 포인트 +${MP.daily}` }], pp ? [{ ic: 'pass', t: `패스 점수 +${pp}` }] : []) });
     save(); renderMissions(); renderHUD(); updateQuestDot();
   }
   function claimBonus() {
@@ -119,7 +120,6 @@
   const TODO = [
     { k: 'rd', nm: '책 읽기', u: '권', on: () => rdReady(), left: () => rdLeft(), go: 'rdBooks' },
     { k: 'bk', nm: '문제집', u: '권', on: () => !!S.ac, left: () => AC.keys.reduce((a, k) => a + acBkLeft(k), 0), go: 'acBook' },
-    { k: 'pz', nm: '숲속 퍼즐', u: '판', on: () => !liveOff('puzzle'), left: () => pzLeft(), go: 'pz' },
     { k: 'bt', nm: '숲속 대결', u: '판', on: () => btOpen(), left: () => btLeft(), go: 'btPlays' },
     { k: 'pc', nm: '숲속 소풍', u: '번', on: () => pcReady(), left: () => (S.pc.day === gameToday() ? 0 : 1), go: 'picnics' },
     { k: 'cs', nm: '진로 상담', u: '번', on: () => hallOpen() && csOpen(), left: () => csLeft(), go: 'csTalk' },
@@ -205,7 +205,7 @@
      미션 포인트: 오늘의 미션 20점, 보너스 상자 40점, 이번 주 미션 50점. 일주일 동안 모아서 상자 5개를 차례로 열어요.
      마지막 상자(650점)는 처음 한 번 금빛 왕관(주간 보상으로만 받는 모자)을 줘요. 하루 미션을 5일 완주하고 주간 미션 3개를 마치면 열 수 있어요 */
   const WMISSIONS = {
-    puzzle: { n: 5, name: n => `숲속 퍼즐 ${n}판 끝내기`, v: () => S.st.pz || 0, ok: () => !liveOff('puzzle') },
+    puzzle: { n: 5, name: n => `숲속 퍼즐 ${n}판 끝내기`, v: () => S.st.pz || 0, ok: () => false },   // 미션에서 뺐어요
     merge: { n: 10, name: n => `숲속 합치기 주문 ${n}개 채우기`, v: () => S.mg.st.orders, ok: () => !liveOff('merge') },
     shakes: { n: 60, name: n => `참나무 ${n}번 흔들기`, v: () => S.st.shakes, ok: () => S.f.playground >= 1 },
     picks: { n: 150, name: n => `떨어진 도토리 ${n}개 줍기`, v: () => S.st.picks, ok: () => S.f.playground >= 1 },   // 놀이터가 있어야 해요
@@ -245,9 +245,10 @@
     m.done = true;
     const gIt = goldOr(MP.weekGold); addMP(MP.week); addLeague(LP.mission * 2);
     mgAddEnergy(MG.E.wk);
+    const pp = psFromMission('w');   // 숲속 패스 점수
     sfx('quest'); buzz(15);
-    if (rt.batch) { rt.batch.items.push(gIt, { ic: 'mp', t: `미션 포인트 +${MP.week}` }, { ic: 'mge', t: `합치기 에너지 +${MG.E.wk}` }); rt.batch.n += 1; }
-    toast(`이번 주 미션 완료! ${gIt.t}, 미션 포인트 +${MP.week}, 합치기 에너지 +${MG.E.wk}`);
+    if (rt.batch) { rt.batch.items.push(gIt, { ic: 'mp', t: `미션 포인트 +${MP.week}` }, { ic: 'mge', t: `합치기 에너지 +${MG.E.wk}` }); if (pp) rt.batch.items.push({ ic: 'pass', t: `패스 점수 +${pp}` }); rt.batch.n += 1; }
+    toast(`이번 주 미션 완료! ${gIt.t}, 미션 포인트 +${MP.week}, 합치기 에너지 +${MG.E.wk}${pp ? `, 패스 점수 +${pp}` : ''}`);
     save(); renderMissions(); updateQuestDot();
   }
   function claimBox(i) {

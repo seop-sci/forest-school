@@ -189,13 +189,13 @@
   const TK_CH = 6;   // 초등학교부터 메인 퀘스트 장을 마치면 5분권 6장
   // 미션과 이벤트 보상에도 시간 단축권(초등학교부터, 유치원은 공사가 5초라 안 줘요).
   // 초반(유치원~초등 3학년)에 단축권을 얻을 길. 메인 퀘스트 1~8장에서 장마다 다섯 번째 퀘스트마다 5분권 1장
-  // 숲속 퍼즐 보상 판 한 판마다, 숲속 합치기 주문 5개마다 5분권 1장(각각 하루 1장, 모든 학교급).
+  // 숲속 합치기 주문 5개마다 5분권 1장(하루 TKE.mgDay장, 모든 학교급). pz는 예전 퍼즐 보상 판 열쇠
   const TK_REW = { pz: ['m5', 1], mg: ['m5', 1], dm: ['m5', 1], wk: ['m5', 1], evm: ['m5', 1], stamp: ['m5', 1], stamp5: ['m5', 1], box: ['m30', 1] };
-  // 퍼즐과 합치기 단축권: 하루 TKE.perDay장까지
+  // 퍼즐과 합치기 단축권: 퍼즐은 하루 TKE.perDay장, 합치기는 TKE.mgDay장까지
   function tkDaily(key) {
     if (!S || !S.tkd) return null;
     const t = gameToday(); if (dayRoll(S.tkd, t)) { S.tkd.pz = 0; S.tkd.mg = 0; }
-    if ((S.tkd[key] || 0) >= TKE.perDay) return null;
+    if ((S.tkd[key] || 0) >= (key === 'mg' ? TKE.mgDay : TKE.perDay)) return null;
     const it = tkGive(key); if (it) S.tkd[key] = (S.tkd[key] || 0) + 1;
     return it;
   }
@@ -244,7 +244,7 @@
       eff: L => L < 1 ? `특식 데이 ${DEAL.feastMin}분` : `특식 데이 ${DEAL.feastMin + XT.diet.per * L}분 (+${XT.diet.per * L}분)` },
     lib: { name: '사슴 선생님', subject: '사서', fac: 'library', max: 10, per: 3, av: 'librarian',
       desc: '도서관을 지키는 사서 선생님이에요.',
-      eff: L => L < 1 ? '퍼즐 숲의 정수 보너스 없음' : `퍼즐 숲의 정수 +${XT.lib.per * L}%` },
+      eff: L => L < 1 ? '합치기 주문 숲의 정수 보너스 없음' : `합치기 주문 숲의 정수 +${XT.lib.per * L}%` },
     // 새 선생님 셋. sub: 과목 선생님이라 탭에서 교감 선생님 위에, tier: 그 학교급부터 오셔요
     kor: { name: '고니 선생님', subject: '국어', fac: 'library', tier: 1, max: 10, per: 5, av: 'swan', sub: true,
       desc: '시를 즐겨 읽는 국어 선생님이에요.',

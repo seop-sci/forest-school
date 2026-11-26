@@ -222,6 +222,21 @@
       save(); tr2Tick(); renderTr2(); renderTr2Btn(); checkQuests(); syncKids(false); return;
     }
   }
+  /* 오늘 활동 단추: 체험학습, 수학여행, 학교 행사 가운데 보이는 것이 있을 때만 나오고, 지금 할 수 있는(ready) 수를 보여 줘요 */
+  const ACT_IDS = ['#btnTrip', '#btnTr2', '#btnSports'];
+  function renderActBtn() {
+    const b = $('#btnAct'); if (!b) return;
+    const bs = ACT_IDS.map(id => $(id)).filter(x => x && !x.hidden), ready = bs.filter(x => x.classList.contains('ready')).length;
+    setHid(b, !bs.length);
+    if (!bs.length) { actPop(false); return; }
+    const txt = ready ? String(ready) : '보기';
+    if ($('#actN').textContent !== txt) { $('#actN').textContent = txt; b.classList.toggle('ready', ready > 0); b.setAttribute('aria-label', ready ? `오늘 활동, ${ready}개 할 수 있어요` : '오늘 활동'); }
+  }
+  function actPop(on) {
+    const p = $('#actPop'), b = $('#btnAct'); if (!p || !b) return;
+    if (p.hidden === !on) return;
+    p.hidden = !on; b.setAttribute('aria-expanded', String(on));
+  }
   function renderTripBtn() {
     const b = $('#btnTrip'), on = tripOpen();
     b.hidden = !on;
