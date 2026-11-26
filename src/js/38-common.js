@@ -26,7 +26,7 @@
     exTick();   // 시험 기간
     if (rt.tab === 'club') renderClubLite();
     const dd = $('#dexDot'), ed = $('#evDot');
-    if (dd) dd.hidden = !dexPending().length && !achClaimable() && !paDot();   // 지금 찍을 사진도
+    if (dd) dd.hidden = !dexPending().length && !achClaimable();   // 받을 것만(오늘 찍을 사진은 사진첩 칸 안의 점으로)
     paSync();   // 받을 업적도 점으로
     tick171ach();
     if (ed) ed.hidden = !evClaimable() && !psClaimable();   // 숲속 패스도
@@ -77,13 +77,15 @@
     rt.dexPick = rt.dexPick === b.dataset.dex ? '' : b.dataset.dex;
     sfx('tap'); renderDex();
   });
-  // 이벤트 창 칸: 이번 주 이벤트 | 숲속 패스
+  // 이벤트 창 칸: 이벤트 | 숲속 패스 | 랭킹(랭킹은 랭킹 화면으로 가고, 그 화면 위에도 같은 칸이 있어요)
   function setEvSeg(v) {
+    if (v === 'rank') { setTab('rank'); return; }
     rt.evSeg = v === 'ps' ? 'ps' : 'ev';
     $$('#evSeg [data-evseg]').forEach(b => b.setAttribute('aria-checked', String(b.dataset.evseg === rt.evSeg)));
     $('#evBody').hidden = rt.evSeg === 'ps'; $('#psBody').hidden = rt.evSeg !== 'ps';
     if (rt.evSeg === 'ps') { $('#psBody').dataset.key = ''; renderPass(); } else { $('#evBody').dataset.key = ''; renderEvent(); }
   }
+  $('#rkEvSeg').addEventListener('click', e => { const b = e.target.closest('[data-evgo]'); if (!b || !S || b.dataset.evgo === 'rank') return; sfx('tap'); rt.evSeg = b.dataset.evgo; setTab('event'); });
   $('#panelEvent').addEventListener('click', e => {
     const sg = e.target.closest('[data-evseg]'); if (sg && S) { sfx('tap'); setEvSeg(sg.dataset.evseg); return; }
     const pb = e.target.closest('[data-ps]'); if (pb && S) { const v = pb.dataset.ps; if (v === 'all') psClaimAll(); else if (v === 'ad') psWatchAd(); else psClaimMission(v[0], Number(v.slice(1))); return; }

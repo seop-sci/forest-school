@@ -506,7 +506,7 @@
   const xtHave = k => XT[k].ess ? S.ess : S.budget;
   const fixMult = () => 1 - XT.fix.per / 100 * xtLv('fix');   // 비버 선생님
   const feastMins = () => DEAL.feastMin + XT.diet.per * xtLv('diet');   // 까치 특식 데이 길이
-  const libMult = () => 1 + XT.lib.per / 100 * xtLv('lib');   // 퍼즐 점수 정수 배수
+  const libMult = () => 1 + XT.lib.per / 100 * xtLv('lib');   // 합치기 주문 정수 배수
 
   // 큰 숫자 줄여 쓰기: 기본은 토스처럼 만, 억, 조. 설정에서 K, M, B로 바꿀 수 있어요
   const multTx = m => m < 10 ? `수업료 +${Math.round((m - 1) * 100).toLocaleString('ko-KR')}%` : `수업료 ×${fmt(m)}`;

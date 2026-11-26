@@ -43,8 +43,8 @@
       say: '솜이가 여우랑 단짝이 됐어요. 둘이 걸어가는 걸 보면 한번 쓰다듬어 주세요. 솜이가 귀를 쫑긋 세워요.' },   // 학생과 추억
     { id: 'h1', ch: 1, t: 'trials', n: 1, r: 200, title: '침입자 쫓아내기', how: '매나 뱀이 나타나면 여러 번 눌러서 쫓아내요',
       say: '큰일이에요! 학교에 아이들이 늘었다는 소문을 매와 뱀도 들었나 봐요. 톡톡 쳐서 쫓아내 주세요!' },
-    { id: 'z1', ch: 1, t: 'pz', n: 1, r: 200, title: '수학 공부: 숲속 퍼즐 한 판', how: '공부 > 숲속 퍼즐에서 한 판을 끝까지 해요',
-      say: '다람쥐 선생님이 수업에 쓰던 퍼즐 상자를 꺼내 오셨어요. 조각이 몇 개 없어진 것 같지만 괜찮대요.' },
+    { id: 'z1', ch: 1, t: 'mgOrders', n: 1, r: 200, title: '미술 공부: 합치기 주문 하나 채우기', how: '공부 > 숲속 합치기에서 같은 조각 둘을 겹쳐 위쪽 주문서에 건네요',
+      say: '아이들이 주문서를 들고 줄을 섰어요. 같은 조각 둘을 겹치면 주문한 물건이 된대요.' },
     { id: 'rd1', ch: 1, t: 'rdBooks', n: 1, r: 200, title: '국어 공부: 책 한 권 읽기', how: '도서관이나 공부 탭에서 책을 골라요. 첫 책은 바로 다 읽어요',
       say: '부엉이 선생님이 오시면서 책을 한 보따리 가져오셨어요. 솜이가 벌써 한 권 골랐어요.' },
     { id: 'q8', ch: 1, t: 'students', n: 30, r: 250, title: '학생 30명 맞이하기', how: '교실을 Lv.6까지 넓히고 학생을 30명까지 모집해요',
@@ -314,8 +314,8 @@
       say: '6학년들이 후배에게 물려줄 책을 고르고 있어요. 솜이는 그 옛 그림책을 골랐어요.' },   // 두 학기 2차: 2학기 시설 퀘스트
     { id: 'g1', ch: 10, t: 'mgDex', n: 20, rm: 5, title: '합치기 도감 20칸', how: '공부 > 숲속 합치기에서 조각을 키워 도감을 채워요',
       say: '졸업 전에 합치기 도감을 채워 봐요. 6학년들이 쉬는 시간마다 모여 있어요.' },
-    { id: 'z2', ch: 10, t: 'pzBest', n: 1000, rm: 5, title: '숲속 퍼즐 1,000점', how: '공부 > 숲속 퍼즐에서 한 판에 1,000점',
-      say: '졸업 기념 퍼즐 대회예요. 다람쥐 선생님 기록을 넘은 아이가 아직 없대요.' },
+    { id: 'z2', ch: 10, t: 'mgDo', n: 10, rm: 5, title: '합치기 주문 10개 채우기', how: '공부 > 숲속 합치기에서 퀘스트를 받은 뒤로 주문 10개를 채워요',
+      say: '졸업 기념 장터가 열려요. 6학년들이 주문서를 잔뜩 들고 왔대요.' },
     { id: 'hw6', ch: 10, t: 'acSum', n: 70, rm: 4, title: '6학년 학기 숙제', how: '다섯 과목 레벨 합을 70까지 골고루 키워요',
       say: '마지막 학기 숙제예요. 맨 끝 줄은 \'후배에게 편지 쓰기\'예요.' },   // 학기 숙제(속도와 경제 재설계안 2-2)
     { id: 'e38', ch: 10, t: 'ygrade', n: 4, r: 15, rk: 'dip', title: '6학년 대도시 되기', how: '평판을 모아서 대도시가 되어요',
@@ -741,7 +741,7 @@
     for (let i = 0; i < n0; i++) { for (const st of before[i]) { MAIN.push(st); MAIN_OI.push(-1); } MAIN.push(ORIG[i]); MAIN_OI.push(i); }
   })();
   // 초반 메인 퀘스트 단축권: 1~8장(유치원~초등 3학년)에서 장마다 다섯 번째, 열 번째 … 퀘스트
-  const TKE = { ch: 7, every: 5, n: 1, perDay: 1, mgEvery: 5 };
+  const TKE = { ch: 7, every: 5, n: 1, perDay: 1, mgEvery: 5, mgDay: 2 };
   const TK_Q = new Set();
   { const pos = {}; for (const q of MAIN) { if (q.ch > TKE.ch) continue; pos[q.ch] = (pos[q.ch] || 0) + 1; if (pos[q.ch] % TKE.every === 0) TK_Q.add(q.id); } }
   const mainNewIdx = oi => { const i = MAIN_OI.indexOf(oi); return i >= 0 ? i : MAIN.length; };
@@ -775,6 +775,6 @@
     { who: 'chick', t: 'earned', n: () => nice(rate() * 120), say: n => `도토리 ${fmt(n)}개를 모아서 숲속 잔치를 열어요!` },
     { who: 'rabbit', t: 'claims', n: () => 1, say: () => '학교 문을 닫았다가 다시 와 주세요. 그동안 수업이 잘 이어지는지 볼게요.' }
   ];
-  const COUNT_TYPES = new Set(['picks', 'ups', 'trains', 'claims', 'earned', 'trips', 'sports', 'fest', 'trials']);   // 동아리 발표회(shows)는 일주일에 한 번이라 지금까지 연 횟수로 재요(퀘스트 전에 열었어도 쳐요)
+  const COUNT_TYPES = new Set(['picks', 'ups', 'trains', 'claims', 'earned', 'trips', 'sports', 'fest', 'trials', 'mgDo']);   // 동아리 발표회(shows)는 일주일에 한 번이라 지금까지 연 횟수로 재요(퀘스트 전에 열었어도 쳐요)
   const Q_TYPES = ['fac', 'tea', 'teaAll', 'students', 'grade', 'ygrade', 'rate', 'picks', 'ups', 'trains', 'claims', 'earned', 'grads', 'perks', 'tier', 'tgrads', 'fperks', 'trips', 'souv', 'tripat', 'sports', 'fest'];
 

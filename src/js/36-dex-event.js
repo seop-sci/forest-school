@@ -192,26 +192,26 @@
   const EV_SPECIAL = [
     // 학교 특별 이벤트 달력: 기념일이 든 주 월~일, 서로 겹치지 않아요. 음력 날짜: 설날 2027-02-07(일), 부처님 오신 날 05-13(목), 추석 09-15(수), 수능 2027-11-18(목)
     // 같은 id가 해마다 다시 열려요(key가 id:시작일이라 새 회차). fb는 배너 그림이 오기 전 대신 보여 줄 그림. 2028년 표는 나중에 더해요(2028년은 어린이날과 부처님 오신 날이 같은 주라 하나만)
-    { id: 'exam', name: '수능 응원', start: '2026-11-16', end: '2026-11-22', banner: 'ev_banner_exam', lead: '숲속 선배들이 큰 시험을 봐요. 모두 함께 응원해요. 힘내요!', ms: [['mgOrd', 5], ['pz', 2], ['dmDone', 4]], m: 20, g: 1 },
+    { id: 'exam', name: '수능 응원', start: '2026-11-16', end: '2026-11-22', banner: 'ev_banner_exam', lead: '숲속 선배들이 큰 시험을 봐요. 모두 함께 응원해요. 힘내요!', ms: [['mgOrd', 5], ['claims', 3], ['dmDone', 4]], m: 20, g: 1 },
     { id: 'xmas', name: '크리스마스 파티', start: '2026-12-21', end: '2026-12-27', banner: 'ev_banner_xmas', lead: '숲속 학교에 눈이 내려요. 파티 선물을 받아 가요.', ms: [['picks', 60], ['mgOrd', 5], ['dmDone', 4]], m: 20, g: 1 },
     { id: 'newyear', name: '새해 해돋이', start: '2026-12-28', end: '2027-01-03', banner: 'ev_banner_newyear', fb: 'ev_banner_seollal', lead: '언덕에 올라 새해 첫 해를 봐요. 올해도 숲속 학교를 함께 키워요.', ms: [['picks', 60], ['claims', 3], ['dmDone', 4]], m: 20, g: 1 },
-    { id: 'winter1', name: '겨울방학 눈놀이', start: '2027-01-04', end: '2027-01-10', banner: 'ev_banner_winter', fb: 'ev_banner_xmas', lead: '신나는 겨울방학이 시작됐어요. 눈썰매를 타고 눈사람을 만들어요.', ms: [['shakes', 40], ['pz', 2], ['dmDone', 4]], m: 20, g: 1 },
-    { id: 'winter2', name: '겨울방학 숙제', start: '2027-01-11', end: '2027-01-17', banner: 'ev_banner_winter', fb: 'ev_banner_xmas', lead: '겨울방학 둘째 주예요. 놀면서 방학 숙제도 조금씩 해요.', ms: [['mgOrd', 5], ['pz', 2], ['claims', 3]], m: 20, g: 1 },
+    { id: 'winter1', name: '겨울방학 눈놀이', start: '2027-01-04', end: '2027-01-10', banner: 'ev_banner_winter', fb: 'ev_banner_xmas', lead: '신나는 겨울방학이 시작됐어요. 눈썰매를 타고 눈사람을 만들어요.', ms: [['shakes', 40], ['mgOrd', 5], ['dmDone', 4]], m: 20, g: 1 },
+    { id: 'winter2', name: '겨울방학 숙제', start: '2027-01-11', end: '2027-01-17', banner: 'ev_banner_winter', fb: 'ev_banner_xmas', lead: '겨울방학 둘째 주예요. 놀면서 방학 숙제도 조금씩 해요.', ms: [['mgOrd', 5], ['dmDone', 6], ['claims', 3]], m: 20, g: 1 },
     { id: 'seollal', name: '설날 잔치', start: '2027-02-01', end: '2027-02-07', banner: 'ev_banner_seollal', lead: '새해 복 많이 받아요! 설날 잔치 선물을 준비했어요.', ms: [['picks', 60], ['shakes', 40], ['mgOrd', 5]], m: 20, g: 1 },
-    { id: 'grad', name: '졸업식과 종업식', start: '2027-02-15', end: '2027-02-21', banner: 'ev_banner_grad', fb: 'ev_banner_exam', lead: '한 해를 마치는 날이에요. 졸업하는 선배들을 꽃다발로 축하해요.', ms: [['mgOrd', 5], ['pz', 2], ['dmDone', 4]], m: 20, g: 1 },
+    { id: 'grad', name: '졸업식과 종업식', start: '2027-02-15', end: '2027-02-21', banner: 'ev_banner_grad', fb: 'ev_banner_exam', lead: '한 해를 마치는 날이에요. 졸업하는 선배들을 꽃다발로 축하해요.', ms: [['mgOrd', 5], ['claims', 3], ['dmDone', 4]], m: 20, g: 1 },
     { id: 'spring', name: '새 학기 입학식', start: '2027-03-01', end: '2027-03-07', banner: 'ev_banner_spring', fb: 'ev_banner_friends', lead: '새 친구들이 숲속 학교에 들어와요. 새 학기를 반갑게 맞아요.', ms: [['mgOrd', 5], ['picks', 60], ['claims', 3]], m: 20, g: 1 },
     { id: 'trip_spring', name: '봄 체험학습', start: '2027-04-12', end: '2027-04-18', banner: 'ev_banner_trip_spring', fb: 'ev_banner_friends', lead: '꽃이 핀 들판으로 체험학습을 떠나요. 봄 소풍 선물을 받아요.', ms: [['trips', 1], ['picks', 60], ['dmDone', 4]], m: 20, g: 1 },
-    { id: 'science', name: '과학의 날', start: '2027-04-19', end: '2027-04-25', banner: 'ev_banner_science', fb: 'ev_banner_exam', lead: '돋보기와 물로켓으로 숲속 과학을 탐구해요.', ms: [['pz', 3], ['mgOrd', 5], ['claims', 3]], m: 20, g: 1 },
+    { id: 'science', name: '과학의 날', start: '2027-04-19', end: '2027-04-25', banner: 'ev_banner_science', fb: 'ev_banner_exam', lead: '돋보기와 물로켓으로 숲속 과학을 탐구해요.', ms: [['dmDone', 6], ['mgOrd', 5], ['claims', 3]], m: 20, g: 1 },
     { id: 'children', name: '어린이날 큰잔치', start: '2027-05-03', end: '2027-05-09', banner: 'ev_banner_children', lead: '어린이날을 맞아 큰잔치를 열어요. 친구들과 신나게 놀아요.', ms: [['picks', 60], ['sports', 2], ['dmDone', 4]], m: 20, g: 1 },
     { id: 'buddha', name: '연등 축제', start: '2027-05-10', end: '2027-05-16', banner: 'ev_banner_buddha', fb: 'ev_banner_children', lead: '부처님 오신 날을 맞아 숲길에 알록달록한 연등이 걸렸어요.', ms: [['shakes', 40], ['dmDone', 4], ['claims', 3]], m: 20, g: 1 },
-    { id: 'final', name: '기말고사', start: '2027-06-21', end: '2027-06-27', banner: 'ev_banner_final', fb: 'ev_banner_exam', lead: '1학기 기말고사 주간이에요. 열심히 공부한 만큼 선물을 받아요.', ms: [['mgOrd', 5], ['pz', 3], ['dmDone', 4]], m: 20, g: 1 },
+    { id: 'final', name: '기말고사', start: '2027-06-21', end: '2027-06-27', banner: 'ev_banner_final', fb: 'ev_banner_exam', lead: '1학기 기말고사 주간이에요. 열심히 공부한 만큼 선물을 받아요.', ms: [['mgOrd', 5], ['claims', 3], ['dmDone', 4]], m: 20, g: 1 },
     { id: 'vacation', name: '여름방학식', start: '2027-07-19', end: '2027-07-25', banner: 'ev_banner_vacation', fb: 'ev_banner_children', lead: '1학기를 마치고 여름방학을 맞아요. 시냇가에서 물놀이해요.', ms: [['sports', 2], ['picks', 60], ['dmDone', 4]], m: 20, g: 1 },
     { id: 'liberation', name: '광복절', start: '2027-08-09', end: '2027-08-15', banner: 'ev_banner_liberation', fb: 'ev_banner_chuseok', lead: '나라를 되찾은 날을 기억해요. 태극기를 달고 무궁화를 심어요.', ms: [['shakes', 40], ['mgOrd', 5], ['dmDone', 4]], m: 20, g: 1 },
-    { id: 'fall', name: '2학기 개학', start: '2027-08-30', end: '2027-09-05', banner: 'ev_banner_fall', fb: 'ev_banner_friends', lead: '방학이 끝나고 다시 학교에 모였어요. 2학기도 힘차게 시작해요.', ms: [['mgOrd', 5], ['pz', 2], ['claims', 3]], m: 20, g: 1 },
+    { id: 'fall', name: '2학기 개학', start: '2027-08-30', end: '2027-09-05', banner: 'ev_banner_fall', fb: 'ev_banner_friends', lead: '방학이 끝나고 다시 학교에 모였어요. 2학기도 힘차게 시작해요.', ms: [['mgOrd', 5], ['dmDone', 6], ['claims', 3]], m: 20, g: 1 },
     { id: 'chuseok', name: '추석 달맞이', start: '2027-09-13', end: '2027-09-19', banner: 'ev_banner_chuseok', lead: '둥근 달을 보며 소원을 빌어요. 달맞이 선물이 기다려요.', ms: [['shakes', 40], ['mgOrd', 5], ['trips', 1]], m: 20, g: 1 },
-    { id: 'hangul', name: '한글날', start: '2027-10-04', end: '2027-10-10', banner: 'ev_banner_hangul', fb: 'ev_banner_exam', lead: '세종대왕님이 만든 한글을 기념해요. 붓으로 예쁜 글씨를 써 봐요.', ms: [['pz', 3], ['dmDone', 4], ['mgOrd', 5]], m: 20, g: 1 },
+    { id: 'hangul', name: '한글날', start: '2027-10-04', end: '2027-10-10', banner: 'ev_banner_hangul', fb: 'ev_banner_exam', lead: '세종대왕님이 만든 한글을 기념해요. 붓으로 예쁜 글씨를 써 봐요.', ms: [['claims', 3], ['dmDone', 4], ['mgOrd', 5]], m: 20, g: 1 },
     { id: 'trip_fall', name: '가을 체험학습', start: '2027-10-18', end: '2027-10-24', banner: 'ev_banner_trip_fall', fb: 'ev_banner_harvest', lead: '단풍 든 과수원으로 체험학습을 떠나요. 사과를 따요.', ms: [['trips', 1], ['shakes', 40], ['picks', 60]], m: 20, g: 1 },
-    { id: 'exam', name: '수능 응원', start: '2027-11-15', end: '2027-11-21', banner: 'ev_banner_exam', lead: '숲속 선배들이 큰 시험을 봐요. 모두 함께 응원해요. 힘내요!', ms: [['mgOrd', 5], ['pz', 2], ['dmDone', 4]], m: 20, g: 1 },
+    { id: 'exam', name: '수능 응원', start: '2027-11-15', end: '2027-11-21', banner: 'ev_banner_exam', lead: '숲속 선배들이 큰 시험을 봐요. 모두 함께 응원해요. 힘내요!', ms: [['mgOrd', 5], ['claims', 3], ['dmDone', 4]], m: 20, g: 1 },
     { id: 'xmas', name: '크리스마스 파티', start: '2027-12-20', end: '2027-12-26', banner: 'ev_banner_xmas', lead: '숲속 학교에 눈이 내려요. 파티 선물을 받아 가요.', ms: [['picks', 60], ['mgOrd', 5], ['dmDone', 4]], m: 20, g: 1 },
     { id: 'newyear', name: '새해 해돋이', start: '2027-12-27', end: '2028-01-02', banner: 'ev_banner_newyear', fb: 'ev_banner_seollal', lead: '언덕에 올라 새해 첫 해를 봐요. 올해도 숲속 학교를 함께 키워요.', ms: [['picks', 60], ['claims', 3], ['dmDone', 4]], m: 20, g: 1 }
   ];
@@ -230,8 +230,8 @@
     11: { harvest: { ms: [['picks', 150], ['mgOrd', 5], ['claims', 3]], m: 15, g: 1 }, friends: { ms: [['dmDone', 9], ['picks', 80], ['shakes', 60]], m: 15, g: 1 } },
     12: { harvest: { ms: [['picks', 120], ['shakes', 100], ['mgOrd', 5]], m: 15, g: 1 }, friends: { ms: [['sports', 3], ['dmDone', 6], ['trips', 1]], m: 20, g: 1 } }
   };
-  // 새 매주 이벤트 미션(달마다 같아요). pz는 숲속 퍼즐 판 수
-  const EV_WEEK_BASE = { books: { ms: [['pz', 3], ['mgOrd', 5], ['dmDone', 6]], m: 15, g: 1 }, lunch: { ms: [['picks', 100], ['shakes', 60], ['mgOrd', 5]], m: 15, g: 1 } };
+  // 새 매주 이벤트 미션(달마다 같아요)
+  const EV_WEEK_BASE = { books: { ms: [['claims', 3], ['mgOrd', 5], ['dmDone', 6]], m: 15, g: 1 }, lunch: { ms: [['picks', 100], ['shakes', 60], ['mgOrd', 5]], m: 15, g: 1 } };
   // 출석 도장 7개: 날마다 하나(한국 시간 날짜 기준). 5개째가 큰 보상이라 7일 가운데 이틀 빠져도 완성이에요. m은 수업료 분치, g는 황금 도토리
   const EV_STAMPS = [{ m: 7 }, { m: 7 }, { m: 7, g: 1 }, { m: 7 }, { m: 40, g: 1, e: 5 }, { m: 7 }, { m: 7 }];   // e: 숲의 정수(이벤트니까 정수도). 매주라서 줄임(1.x: 10분치, 5개째 60분치와 황금 3)
   const EV_BOX = { g: 1, dip: 1, e: 10 };   // e: 숲의 정수 10. 그 이벤트 한정 장식이 있으면 처음 한 번 함께 받아요. 매주라서 황금 2 → 1. 미션 3개를 다 하면 받는 기념 상자
@@ -245,7 +245,7 @@
     ups: { name: n => `시설이나 가구 ${n}번 고치기`, ok: () => facKeys().some(k => !facMaxed(k) || FUR[k].some((_, i) => !furDone(k, i))) },
     trains: { name: n => `선생님 연수 ${n}번 보내기`, ok: () => DEX_TEACHERS.some(k => S.t[k] >= 1 && !teaMaxed(k)) || !vpMaxed() }, claims: { name: n => `자리 비운 도토리 ${n}번 받기` }, dmDone: { name: n => `오늘의 미션 ${n}개 끝내기` },
     sports: { name: n => `${FEST.sports.name} ${n}번 열기`, ok: () => festOpen('sports') }, trips: { name: n => `체험학습 ${n}번 다녀오기`, ok: () => tripOpen() },
-    pz: { name: n => `숲속 퍼즐 ${n}판 끝내기`, ok: () => !liveOff('puzzle') },   // 책 읽는 주간
+    pz: { name: n => `숲속 퍼즐 ${n}판 끝내기`, ok: () => false },   // 퍼즐은 쉬는 시간이라 미션에서 뺐어요(옛 저장의 퍼즐 미션은 다른 미션으로 바뀌어요)
     mgOrd: { name: n => `숲속 합치기 주문 ${n}개 채우기`, v: () => (S.mg && S.mg.st && S.mg.st.orders) || 0, ok: () => !liveOff('merge') }
   };
   const evOk = t => !!EV_MEASURE[t] && (!EV_MEASURE[t].ok || EV_MEASURE[t].ok());
@@ -253,7 +253,7 @@
   // 아직 못 하는 미션 대신 넣어요(앞에서부터, 할 수 있고 겹치지 않는 것만). 흔들기와 줍기가 안 되면 고치기가 먼저 나와요.
   // 놀이터가 없으면 고치기가 늘 되고(놀이터를 지을 수 있어요), 시설과 가구가 모두 끝났으면 놀이터가 있어 흔들기와 줍기가 돼요.
   // 자리 비운 도토리 받기와 연수는 늘 되니 미션 3개가 언제나 채워져요. 그래도 못 찾으면 자리 비운 도토리 받기를 넣어요
-  const EV_FALLBACK = [['shakes', 60], ['picks', 80], ['claims', 3], ['dmDone', 4], ['mgOrd', 5], ['pz', 2]];   // 고치기와 연수는 어려워서 이벤트 미션에서 뺐어요. 자리 비운 도토리 받기와 오늘의 미션은 언제나 할 수 있어요
+  const EV_FALLBACK = [['shakes', 60], ['picks', 80], ['claims', 3], ['dmDone', 4], ['mgOrd', 5]];   // 고치기와 연수는 어려워서 이벤트 미션에서 뺐어요. 자리 비운 도토리 받기와 오늘의 미션은 언제나 할 수 있어요
   const dayAdd = (day, n) => { const [y, m, d] = day.split('-').map(Number); return new Date(Date.UTC(y, m - 1, d + n)).toISOString().slice(0, 10); };
   const dayDiff = (a, b) => Math.round((Date.parse(b + 'T00:00:00Z') - Date.parse(a + 'T00:00:00Z')) / 86400000);
   const dayText = day => { const [, m, d] = day.split('-').map(Number); return `${m}월 ${d}일`; };

@@ -23,7 +23,7 @@
   const qtGoNsOn = q => { if (nsOpen()) return openNs(); return goFac('dorm', '기숙사를 지으면 야간 자율학습을 켤 수 있어요'); };   // nsOn, nsGot, nsFinished
   const qtGoVdGive = q => { setTab('school'); if (vdOpen()) return openVd(); return toast('마을 기부는 초등학교부터 열려요'); };   // vdGive, vdLv
   const qtGoPz = q => { setTab('mini'); return toast('숲속 퍼즐의 시작하기를 눌러요'); };   // pz, pzBest
-  const qtGoMgBest = q => { setTab('mini'); return toast('숲속 합치기의 시작하기를 눌러요'); };   // mgBest, mgOrders, mgDex
+  const qtGoMgBest = q => { setTab('mini'); return toast('숲속 합치기의 시작하기를 눌러요'); };   // mgBest, mgOrders, mgDo, mgDex
   const QT = {
     fac: {
       measure: q => S.f[q.k],
@@ -211,6 +211,11 @@
     },
     mgOrders: {
       measure: q => S.mg.st.orders,
+      goal: q => `합치기 주문 ${q.n}개 채우기`,
+      go: qtGoMgBest
+    },
+    mgDo: {
+      measure: q => S.mg.st.orders,   // 퀘스트를 받은 뒤로 채운 주문 수(COUNT_TYPES)
       goal: q => `합치기 주문 ${q.n}개 채우기`,
       go: qtGoMgBest
     },
@@ -496,7 +501,7 @@
       else if (q.t === 'star') text = `★${shown}/${need}`;
       else if (q.t === 'clubShown') text = `${shown}/${need}곳`;
       else if (q.t === 'pz') text = `${shown}/${need}판`;   // 보강 퀘스트
-      else if (q.t === 'deco' || q.t === 'ach' || q.t === 'mgOrders') text = `${shown}/${need}개`;
+      else if (q.t === 'deco' || q.t === 'ach' || q.t === 'mgOrders' || q.t === 'mgDo') text = `${shown}/${need}개`;
       else if (q.t === 'mgDex') text = `${shown}/${need}칸`;
       else if (q.t === 'mgBest') text = `${shown}/${need}단계`;
       else if (q.t === 'pzBest') text = `${fmt(shown)}/${fmt(need)}점`;

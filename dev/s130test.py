@@ -1,6 +1,6 @@
 # 130번 시험(4.3.1): 탐험 단추 빨간 점과 처음 소개 장면
-# 1) 아직 안 연 탐험은 빨간 점  2) 처음 열면 소개 장면(열두 줄)이 뜨고, 끝까지 보면 닫히고 점이 꺼져요
-# 3) 보고서가 10분 넘게 쌓이면 다른 탭에서 다시 점  4) 이야기 수첩에서 소개 다시 보기  5) 360px 밝은 화면과 어두운 화면 그림
+# 1) 아직 안 연 탐험이라도 빨간 점은 없음(받을 것만)  2) 처음 열면 소개 장면(열두 줄)이 뜨고, 끝까지 보면 닫히고 점이 꺼져요
+# 3) 보고서가 1시간 넘게 쌓이면 다른 탭에서 다시 점  4) 이야기 수첩에서 소개 다시 보기  5) 360px 밝은 화면과 어두운 화면 그림
 import asyncio, pathlib
 from playwright.async_api import async_playwright
 from testlib import ctxpage, base, F
@@ -18,7 +18,7 @@ async def main():
             await page.evaluate("window.__TAM_INTRO = true")
             await page.wait_for_timeout(1500)
             d0 = await page.evaluate("!document.querySelector('#tamDot').hidden")
-            ok(d0, '아직 안 연 탐험은 빨간 점')
+            ok(not d0, '아직 안 연 탐험이라도 빨간 점은 없음')
             await page.screenshot(path=str(OUT / f's130_dot_{scheme}.png'), clip={'x': 0, 'y': 640, 'width': 360, 'height': 100})
             if scheme == 'dark':
                 await ctx.close(); continue
@@ -37,11 +37,11 @@ async def main():
             ok(not r['st'] and not r['open'], '두 번째부터는 소개가 뜨지 않아요')
             # 보고서가 쌓이면 다른 탭에서 점
             r = await page.evaluate(f"""(async()=>{{ const F={F}, S=F.S, sl=ms=>new Promise(r=>setTimeout(r,ms));
-              F.setTab('school'); S.tam.it = Date.now() - 5*60e3; await sl(2500); const a=!document.querySelector('#tamDot').hidden;
-              S.tam.it = Date.now() - 20*60e3; await sl(2500); const b=!document.querySelector('#tamDot').hidden;
+              F.setTab('school'); S.tam.it = Date.now() - 30*60e3; await sl(2500); const a=!document.querySelector('#tamDot').hidden;
+              S.tam.it = Date.now() - 70*60e3; await sl(2500); const b=!document.querySelector('#tamDot').hidden;
               return {{ a, b }}; }})()""")
             print('보고서 점', r)
-            ok(not r['a'] and r['b'], '보고서가 10분 넘게 쌓이면 점')
+            ok(not r['a'] and r['b'], '보고서가 1시간 넘게 쌓이면 점')
             # 이야기 수첩에서 다시 보기
             r = await page.evaluate(f"""(async()=>{{ const F={F}, sl=ms=>new Promise(r=>setTimeout(r,ms)); const q=document.querySelector('.modal-q, #mTamRep');
               F.openSb(); await sl(300); const btn=document.querySelector('[data-sb="play:tam"]'); if(!btn) return {{ btn: false }};

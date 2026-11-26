@@ -25,13 +25,14 @@
     gens: { A: { name: '참나무', em: '🌳', kinds: ['a', 'm'] }, F: { name: '급식 냄비', em: '🍲', kinds: ['f', 'd'] }, S: { name: '문구함', em: '🧰', kinds: ['s', 'c'] }, G: { name: '화분', em: '🪴', kinds: ['g', 'v'] } },
     genAt: [0, 2, 5, 7],                              // 처음 생산기 자리(맨 위 줄)
     UP_EVERY: 20,   // 주문 20개마다 한 단계 위 주문
+    ESS: { per: 10, day: 12 },   // 주문 하나에 숲의 정수 10(사서 선생님 레벨만큼 더), 하루 12개 주문까지
     MUL: [[3, 2], [5, 3], [7, 4]]   // ×2 3단계, ×3 5단계, ×4 7단계로 앞당김(예전은 4, 6, 8)
                         // 에너지 배수: 어느 종류든 이 단계를 처음 만들면 ×2, ×3, ×4가 열려요(주문이 그 단계쯤부터 나와요)
   };
   const MG_KINDS = Object.keys(MG.kinds), MG_GENS = Object.keys(MG.gens), MG_N = MG.W * MG.H;
   // 합치기 도감 모은 개수 보상(10칸마다, 업적처럼). min은 수업료 분치
   const MG_DEX_MS = [[10, { ess: 5 }], [20, { min: 30 }], [30, { ess: 10 }], [40, { min: 60 }], [50, { ess: 15 }], [60, { min: 90 }], [70, { ess: 20 }], [80, { ess: 30, gold: 5 }]];
-  const mgFresh = () => ({ mul: 1, mulSeen: 1, mm: 0, mulNew: false, upq: 0, xr: 0, xd: { day: '', n: 0 }, e: MG.EMAX, eAt: 0, board: '', last: {}, orders: [], swapAt: 0, best: {}, pieces: 0, up: 0, ad: { day: '', n: 0 }, bst: { day: '', lucky: 0, energy: 0, luck: 0 }, seen: false, dexPaid: [], dexE: {}, dexMs: 0, st: { merges: 0, orders: 0, made10: 0, ups: 0, taps: 0 } });
+  const mgFresh = () => ({ mul: 1, mulSeen: 1, mm: 0, mulNew: false, upq: 0, xr: 0, xd: { day: '', n: 0 }, ed: { day: '', n: 0 }, e: MG.EMAX, eAt: 0, board: '', last: {}, orders: [], swapAt: 0, best: {}, pieces: 0, up: 0, ad: { day: '', n: 0 }, bst: { day: '', lucky: 0, energy: 0, luck: 0 }, seen: false, dexPaid: [], dexE: {}, dexMs: 0, st: { merges: 0, orders: 0, made10: 0, ups: 0, taps: 0 } });
   // 칸 글자: 조각은 종류 소문자 + 단계(1~9, 10은 x), 생산기는 대문자 + 레벨(1~5), 빈칸은 '..'
   const mgLvCh = n => n >= 10 ? 'x' : String(n);
   const mgLvOf = ch => ch === 'x' ? 10 : (Number(ch) || 0);
@@ -86,6 +87,7 @@
     s.mg.seen = !!m.seen;
     s.mg.mul = Math.min(4, Math.max(1, Math.floor(numFb(m.mul, 1, 1, SAVE_CAP.count)))); s.mg.mulSeen = Math.min(4, Math.max(1, Math.floor(numFb(m.mulSeen, 1, 1, SAVE_CAP.count)))); s.mg.mm = m.mm ? 1 : 0; s.mg.mulNew = !!m.mulNew; s.mg.upq = Math.min(3, Math.floor(numFb(m.upq, 0, 0)));   // 한 단계 위 주문을 기다리는 수. 만드는 방식, 새 배수 강조. 에너지 배수
     s.mg.xr = Math.min(1, numFb(m.xr, 0, 0)); if (m.xd && typeof m.xd === 'object') s.mg.xd = { day: typeof m.xd.day === 'string' ? m.xd.day.slice(0, 10) : '', n: Math.floor(numFb(m.xd.n, 0, 0, SAVE_CAP.count)) };   // 미술 XP 남은 몫과 오늘 받은 양
+    if (m.ed && typeof m.ed === 'object') s.mg.ed = { day: typeof m.ed.day === 'string' ? m.ed.day.slice(0, 10) : '', n: Math.min(MG.ESS.day, Math.floor(numFb(m.ed.n, 0, 0))) };   // 오늘 정수를 받은 주문 수
     if (m.st && typeof m.st === 'object') for (const k of Object.keys(s.mg.st)) s.mg.st[k] = Math.floor(numFb(m.st[k], 0, 0, SAVE_CAP.count));
   }
   /* ---- 에너지 ---- */
@@ -448,6 +450,16 @@
     S.mg.xd.n += g;
     return acGain('art', Math.round(g * (1 + XT.art.per / 100 * xtLv('art'))));   // 미술 선생님
   }
+  // 주문 정수: 하루 MG.ESS.day개 주문까지 MG.ESS.per씩(사서 선생님 효과는 여기로 옮겼어요)
+  const mgEssLeft = () => { const t = gameToday(); return S.mg.ed && S.mg.ed.day === t ? Math.max(0, MG.ESS.day - S.mg.ed.n) : MG.ESS.day; };
+  function mgOrderEss() {
+    if (mgEssLeft() <= 0) return 0;
+    const t = gameToday(); if (!S.mg.ed || S.mg.ed.day !== t) S.mg.ed = { day: t, n: 0 };
+    S.mg.ed.n += 1;
+    const e0 = S.ess, v = Math.floor(MG.ESS.per * libMult());
+    addEss(v);
+    return S.ess - e0;
+  }
   function mgClaimOrder(i) {
     const o = S.mg.orders[i];
     if (!o || !mgOrderOk(o)) return false;
@@ -462,14 +474,15 @@
     if (r.pc) mgBump('#mgPc'); if (upKey) mgBump('#mgUp');
     S.mg.st.orders += 1;
     if (S.mg.st.orders % MG.UP_EVERY === 0) S.mg.upq = Math.min(3, (S.mg.upq || 0) + 1);   // 한 단계 위 주문
-    const tk = S.mg.st.orders % TKE.mgEvery === 0 ? tkDaily('mg') : null;   // 주문 5개마다 5분권 1장(하루 3장)
+    const tk = S.mg.st.orders % TKE.mgEvery === 0 ? tkDaily('mg') : null;   // 주문 5개마다 5분권 1장(하루 TKE.mgDay장)
+    const ess = mgOrderEss();
     const xp = mgArtXp(o);   // 미술 XP는 주문에 든 에너지로(에너지 6마다 1, 하루 100까지)
     S.mg.orders.splice(i, 1); mgFillOrders();
     mgUI.sel = -1;
     sfx('quest'); buzz(14);
     const who = (typeof DEX_NAMES === 'object' && DEX_NAMES[o.who]) || (NEWCOMERS.find(x => x.k === o.who) || {}).name || '학생';
     showReward({ title: '주문을 채웠어요!', sub: `${who}에게 ${mgOrderText(o)}를 줬어요`,
-      items: [{ ic: 'acorn', t: `도토리 +${fmt(r.a)}` }, xp ? { ic: '📘', t: `미술 XP +${xp}` } : null, r.pc ? { ic: '💎', t: `장식 조각 +${r.pc}` } : null, upIt, tk] });
+      items: [{ ic: 'acorn', t: `도토리 +${fmt(r.a)}` }, ess ? { ic: 'ess', t: `숲의 정수 +${ess}` } : null, xp ? { ic: '📘', t: `미술 XP +${xp}` } : null, r.pc ? { ic: '💎', t: `장식 조각 +${r.pc}` } : null, upIt, tk] });
     mgRenderAll(); renderHUD(); checkQuests(); save();
     return true;
   }
@@ -592,7 +605,8 @@
     if (code === '..') {
       const g = mgUI.got, got = g.a || g.pc || g.up ? `이번에 번 것: 도토리 ${fmt(g.a)}개${g.pc ? `, 장식 조각 ${g.pc}개` : ''}${g.up ? `, 강화 조각 ${g.up}개` : ''}` : '생산기를 눌러 조각을 만들고, 같은 조각 둘을 겹쳐요';
       const luck = S.mg.bst.luck > 0 ? `<em class="mf-luck">행운 ${S.mg.bst.luck}번 남음</em>` : '';
-      f.innerHTML = `<div class="mf-tx"><b>숲속 합치기</b><span>${luck}${got}</span></div><button class="mf-btn sub" type="button" data-mgboost="1">부스터</button><button class="mf-btn sub mg-dexbtn" type="button" data-mgdex="1">도감 ${mgDexN()}/${MG_KINDS.length * 10}${mgDexAny() ? '<i class="dot"></i>' : ''}</button>`; return;
+      const el = mgEssLeft(), essTx = `<em class="mf-luck">${el > 0 ? `주문 정수 오늘 ${MG.ESS.day - el}/${MG.ESS.day}` : '오늘 주문 정수 끝'}</em>`;
+      f.innerHTML = `<div class="mf-tx"><b>숲속 합치기</b><span>${essTx}${luck}${got}</span></div><button class="mf-btn sub" type="button" data-mgboost="1">부스터</button><button class="mf-btn sub mg-dexbtn" type="button" data-mgdex="1">도감 ${mgDexN()}/${MG_KINDS.length * 10}${mgDexAny() ? '<i class="dot"></i>' : ''}</button>`; return;
     }
     if (mgIsGen(code)) {
       const G = MG.gens[code[0]], lv = mgLvOf(code[1]), cost = mgUpCost(lv);
@@ -710,7 +724,7 @@
     mgTick();
     const ok = S.mg.orders.filter(mgOrderOk).length;
     sub.textContent = ok ? `건넬 수 있는 주문 ${ok}개` : '조각을 만들고 겹쳐요';
-    { const e = $('#mgEnergyTxt'); if (e) { e.textContent = `에너지 ${S.mg.e}/${mgEMax()}`; e.classList.toggle('none', S.mg.e <= 0); } }   // 시작하기 위 에너지 표(퍼즐 보상 판과 같은 자리)
+    { const e = $('#mgEnergyTxt'); if (e) { e.textContent = `에너지 ${S.mg.e}/${mgEMax()}`; e.classList.toggle('none', S.mg.e <= 0); } }   // 시작하기 위 에너지 표(퍼즐 수학 XP와 같은 자리)
     const th = $('.mg-thumb'); if (th) { const u = IMG180('mg_card'); if (u) { th.style.setProperty('--mg-card', `url('${u}')`); th.classList.add('has-img'); } }
   }
   function tick180() {

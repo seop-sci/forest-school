@@ -6,7 +6,7 @@
     paused: false, closedAt: 0, hiddenAt: 0, reduced: !!(motionMQ && motionMQ.matches),
     qr: {}, qKey: '', guideKey: null,
     adOpen: false, adTimer: 0, adOk: null, adNo: null, adEarned: false, gKey: '', townStage: -1, townTier: -1,
-    deal: null, dealT: DEAL.first, boostUntil: 0, boostT: BOOSTW.first, fitKey: '', fitGen: 0, yearKey: '', oakN: -1, oakHintAt: 0, rankEdit: false,
+    deal: null, dealT: DEAL.first, adRestUntil: 0, boostUntil: 0, boostT: BOOSTW.first, fitKey: '', fitGen: 0, yearKey: '', oakN: -1, oakHintAt: 0, rankEdit: false,
     adopting: false, adNoGold: false, shopPick: '',
     // 아래는 쓰는 곳에서 처음 값을 정해요. 이름만 모아 두고 값은 넣지 않아요(처음 값을 만드는 if (!rt.이름) rt.이름 = … 줄이 그대로 돌아요)
     // 시계, 시작, 점검
@@ -283,7 +283,7 @@
     v: 4, pid: randCode(8), born: Date.now(), budget: 20, students: 4,
     f: { classroom: 1, cafeteria: 0, library: 0, playground: 0, science: 0, store: 0, dorm: 0, union: 0, institute: 0, gradhall: 0 },   // 연구소, 연구동. union: 학생회관
     fu: freshFu(),
-    fold: { b: 0, l: 0, r: 0, q: 0, td: 0 },   // td: 퀘스트 탭 '오늘 할 일' 접기. 홈 칸 접기(1이면 접음)
+    fold: { b: 0, l: 0, r: 0, q: 0, td: 1 },   // td: 퀘스트 탭 '오늘 할 일' 접기(처음에는 접음). 홈 칸 접기(1이면 접음)
     t: { squirrel: 1, owl: 0, bear: 0 },
     vp: 0,   // 고슴도치 교감 선생님 연수 레벨 (0~10)
     ach: { hit: {}, got: {}, title: '' },   // 업적: hit 이룬 등급(0~3), got 받은 등급, title 단 칭호(업적 종류 id)
@@ -315,8 +315,8 @@
     bs: { classroom: 0, cafeteria: 0, library: 0, science: 0, playground: 0, store: 0, dorm: 0, union: 0, institute: 0, gradhall: 0 },   // 건물마다 지금 보이는 모습의 학교급
     mg: mgFresh(),   // 숲속 합치기
     dex: { got: {}, paid: [] }, ev: { cur: '', start: 0, stamp: { n: 0, last: '' }, list: [], box: false },   // 도감, 이벤트
-    // 숲의 정수(미니게임에서만 얻어요)와 블록 퍼즐: 오늘 보상 판 수, 광고로 더한 횟수, 최고 점수, 하던 판
-    ess: 0, pz: { day: '', n: 0, adN: 0, best: 0, cur: null, hand: '', tb: 0 },   // hand: 보상 판을 직접 한 날(소탕), tb: 그날 직접 한 보상 판의 최고 점수
+    // 숲의 정수와 블록 퍼즐: 최고 점수, 하던 판, 오늘 받은 수학 XP
+    ess: 0, pz: { day: '', n: 0, adN: 0, best: 0, cur: null, hand: '', tb: 0, xp: 0 },   // xp: 오늘 퍼즐로 받은 수학 XP. n, adN, hand, tb는 예전 보상 판과 소탕 기록(읽기만 해요)
     ac: freshAc(),   // 공부: 과목 5개 학교 학력(lv, xp), 문제집 bk(day, n), 통계 st
     pc: freshPc(), sk: freshSk(),   // 숲속 소풍, 칭찬 스티커판
     ff: {},   // 건물마다 바로 완공을 쓴 날(부터는 기록만, 횟수는 ffd)
@@ -547,6 +547,8 @@
     // 초등학교 퀘스트를 다 마친 저장(end:e38)은 새 '초등학교 졸업식'(e39)에서 이어가요. 아직 초등학교면 중학교 장으로 넘어가지 않아요
     const e39 = MAIN.findIndex(m => m.id === 'e39');
     if (s.tier === 1 && (s.q.m >= MAIN.length || (MAIN[s.q.m] && MAIN[s.q.m].ch > MAIN[e39].ch))) { s.q.m = e39; s.q.mb = 0; }
+    // 퍼즐 퀘스트(z1, z2)가 합치기로 바뀌기 전 저장(pz.xp가 없음)에서 그 퀘스트를 하던 중이면 끝난 것으로 쳐요
+    if (!(d.pz && typeof d.pz === 'object' && 'xp' in d.pz) && MAIN[s.q.m] && ['z1', 'z2'].includes(MAIN[s.q.m].id)) s.q.lat = MAIN[s.q.m].id;
     // 개발자 '졸업 조건 채우기'로 건너뛴 해가 종업식 횟수와 전학생에 빠져 있으면 학년에 맞춰 채워요
     const yearsDone = s.tier === 0 ? s.tg : TIERS[0].grads + 1 + s.tg;
     if (s.st.grads < yearsDone) s.st.grads = yearsDone;
@@ -555,7 +557,8 @@
     sanitize180(d, s);   // 숲속 합치기
     s.vp = Math.min(VP.max, Math.floor(numFb(d.vp, 0, 0)));   // 교감 선생님
     for (const k of Object.keys(XT)) s.xt[k] = Math.min(XT[k].max, Math.floor(numFb(d.xt && d.xt[k], 0, 0)));
-    for (const k of ['b', 'l', 'r', 'q', 'td']) s.fold[k] = d.fold && d.fold[k] ? 1 : 0;   // 홈 칸 접기. 새 선생님
+    for (const k of ['b', 'l', 'r', 'q']) s.fold[k] = d.fold && d.fold[k] ? 1 : 0;   // 홈 칸 접기. 새 선생님
+    s.fold.td = d.fold && d.fold.td === 0 && d.pz && typeof d.pz === 'object' && 'xp' in d.pz ? 0 : 1;   // '오늘 할 일'은 바로 가기 목록이라 처음에는 접어 둬요. 접기가 기본이 된 뒤에 편 것만 그대로
     sanitize171(d, s);   // 업적
     sanitize174(d, s);   // 꾸미기
     sanitize200(d, s);   // 명부, 동아리, 학교급 사진
@@ -635,7 +638,7 @@
       }
     }
     if (d.tk && typeof d.tk === 'object') for (const k of Object.keys(s.tk)) s.tk[k] = Math.min(SAVE_CAP.count, Math.floor(numFb(d.tk[k], 0, 0)));
-    if (d.tkd && typeof d.tkd === 'object') { s.tkd.day = typeof d.tkd.day === 'string' ? d.tkd.day.slice(0, 10) : ''; s.tkd.pz = Math.min(TKE.perDay, Math.floor(numFb(d.tkd.pz, 0, 0))); s.tkd.mg = Math.min(TKE.perDay, Math.floor(numFb(d.tkd.mg, 0, 0))); }
+    if (d.tkd && typeof d.tkd === 'object') { s.tkd.day = typeof d.tkd.day === 'string' ? d.tkd.day.slice(0, 10) : ''; s.tkd.pz = Math.min(TKE.perDay, Math.floor(numFb(d.tkd.pz, 0, 0))); s.tkd.mg = Math.min(TKE.mgDay, Math.floor(numFb(d.tkd.mg, 0, 0))); }
     if (d.tka && typeof d.tka === 'object') { s.tka.day = typeof d.tka.day === 'string' ? d.tka.day.slice(0, 10) : ''; s.tka.n = Math.min(TKAD.perDay, Math.floor(numFb(d.tka.n, 0, 0))); }
     if (d.pz && typeof d.pz === 'object') {
       s.pz.day = typeof d.pz.day === 'string' ? d.pz.day.slice(0, 10) : '';
@@ -644,6 +647,7 @@
       s.pz.hand = typeof d.pz.hand === 'string' ? d.pz.hand.slice(0, 10) : '';   // 소탕
       s.pz.tb = d.pz.tb === undefined ? s.pz.best : Math.min(1e9, Math.floor(numFb(d.pz.tb, 0, 0)));   // 옛 저장은 업데이트한 날만 예전처럼 최고 점수로
       s.pz.cur = pzSanitize(d.pz.cur);
+      s.pz.xp = Math.min(PZ.xpDay, Math.floor(numFb(d.pz.xp, 0, 0)));
     }
     // 게임 시계: 망가진 값으로 영영 멈추지 않게 기기 시간 + 1년까지만 받아요
     s.clk.last = timeSrc() ? numFb(d.clk && d.clk.last, 0, 0) : Math.min(numFb(d.clk && d.clk.last, 0, 0), Date.now() + 366 * 86400000);   // 서버 시간을 받는 판은 기기 시계로 깎지 않아요. 기기 날짜를 1년 넘게 과거로 돌려 다시 켜면 게임 날짜가 뒤로 가서 하루 제한이 풀렸어요. 앞서간 시계는 서버 시간이 바로잡아요

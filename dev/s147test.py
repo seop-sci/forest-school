@@ -3,7 +3,7 @@
 #  2) 예약: 읽는 중에 다른 책을 고르면 예약, 하루 권수는 예약할 때 세고 취소하면 돌려줘요. 앞 책이 끝난 때부터 이어서 읽어요(꺼 둔 동안도)
 #  3) 모두 받기: 하나씩 받을 때와 재화가 똑같이 늘어요(도토리, 황금 도토리, 수료증, 미션 포인트, 합치기 에너지). 보상 창은 하나
 #  4) 문제집 남은 권 모두, 선물 남은 번 모두: 하나씩 살 때와 같은 값
-#  5) 오늘 할 일 판: 열린 활동만, 남은 횟수, 바로 가기, 접기(저장), 360px에서 넘치지 않음
+#  5) 오늘 할 일 판: 열린 활동만, 남은 횟수, 바로 가기, 접기(저장, 처음에는 접힘), 360px에서 넘치지 않음
 #  6) 옛 저장(rd.q, fold.td 없음)과 엉뚱한 값
 # 쓰는 법: python3 wrap.py && python3 s147test.py   (마지막 줄이 PASS면 통과)
 import asyncio, json, sys
@@ -110,7 +110,7 @@ async def main():
             ctx, page, errs = await ctxpage(b, w, 740, 'dark' if w == 390 else 'light', base(tier=1, tg=3))
             await page.evaluate(CLEAN)
             r = await page.evaluate(f"""(async()=>{{ const F={F}, S=F.S, sl=ms=>new Promise(r=>setTimeout(r,ms)), q=s=>document.querySelector(s);
-              F.setTab('quests'); F.renderMissions(); await sl(200);
+              S.fold.td = 0; F.setTab('quests'); F.renderMissions(); await sl(200);   // 처음에는 접혀 있어서 펴고 봐요
               const rows = [...document.querySelectorAll('#qDaily .td-row')].map(e => e.textContent.replace(/\\s+/g, ' ').trim());
               const data = F.todoRows().map(r => [r.T.k, r.left]);
               const over = [...document.querySelectorAll('#qDaily .td-row')].some(e => e.scrollWidth > e.clientWidth + 1) || q('#panelQuests').scrollWidth > q('#panelQuests').clientWidth + 1;
@@ -136,7 +136,7 @@ async def main():
           d.rd.cur = F.BOOKS[0].k; d.rd.at = Date.now(); d.rd.q = ['zz', F.BOOKS[1].k, 7, null, F.BOOKS[2].k, F.BOOKS[0].k, F.BOOKS[0].k, F.BOOKS[0].k, F.BOOKS[0].k]; d.fold.td = 'x'; const b2 = F.sanitize(d);
           d.rd.cur = ''; const c = F.sanitize(d);
           return [a.rd.q, a.fold.td, b2.rd.q.length, b2.fold.td, c.rd.q.length]; }})()""")
-        print('옛 저장', j); ok(j == [[], 0, 5, 1, 0], '옛 저장과 엉뚱한 값을 받아 줘요')
+        print('옛 저장', j); ok(j == [[], 1, 5, 1, 0], '옛 저장과 엉뚱한 값을 받아 줘요(오늘 할 일은 처음에 접어 둬요)')
         await ctx.close(); await b.close()
     print('PASS' if not bad else f'FAIL {len(bad)}')
     sys.exit(1 if bad else 0)

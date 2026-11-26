@@ -64,9 +64,9 @@ async def main():
           S.ess = 0; S.mg.e = 0; S.mg.up = 0; S.mg.pieces = 0; const d0 = S.p.dip, f0 = S.fund, t0 = S.p.ticket;
           ['#devEss', '#devMg', '#devDip'].forEach(q => document.querySelector(q).click());
           const out = {{ ess: S.ess, e: S.mg.e, up: S.mg.up, pc: S.mg.pieces, dip: S.p.dip - d0, fund: S.fund - f0, tk: S.p.ticket - t0 }};
-          S.pz.n = 10; S.mg.bst.energy = 3; document.querySelector('#devDay').click();
-          out.pzLeft = F.pzLeft(); out.en = F.mgBstLeft('energy'); out.dev = S.u.dev; return out; }})()""")
-        if r != {'ess': 500, 'e': 100, 'up': 10, 'pc': 10, 'dip': 100, 'fund': 100, 'tk': 3, 'pzLeft': 5, 'en': 3, 'dev': True}: fails.append(f'개발자 메뉴 {r}')
+          S.pz.xp = 120; S.mg.bst.energy = 3; document.querySelector('#devDay').click();
+          out.pzLeft = F.pzXpLeft(); out.en = F.mgBstLeft('energy'); out.dev = S.u.dev; return out; }})()""")
+        if r != {'ess': 500, 'e': 100, 'up': 10, 'pc': 10, 'dip': 100, 'fund': 100, 'tk': 3, 'pzLeft': 120, 'en': 3, 'dev': True}: fails.append(f'개발자 메뉴 {r}')
         # (7) 짓기와 업그레이드 효과: 효과가 붙었다가 저절로 사라지는지, 건물 창이 열려 있으면 닫을 때 보여 주는지
         r = await pg.evaluate(f"""(async()=>{{ const F={F}, S=F.S; document.querySelector('.tab[data-tab=school]').click(); await new Promise(r=>setTimeout(r,300));
           S.budget = 1e9; const k = ['cafeteria','library','playground'].find(k => !S.f[k]); F.buyFacility(k); if (S.bd && S.bd[k]) F.conFinish(k);   // 4.3.1: 2.1.0부터 새 건물은 공사를 거쳐요. 공사를 바로 끝내고 효과를 봐요
@@ -101,9 +101,9 @@ async def main():
             await c2.add_init_script("window.__FOREST_TEST = true; localStorage.clear();")
             pg2, e2 = await boot(c2)
             await pg2.evaluate("document.querySelector('.tab[data-tab=mini]').click()"); await pg2.wait_for_timeout(400)
-            r = await pg2.evaluate("""(()=>{ const t = document.querySelector('#pzLeftTxt'), c = document.querySelector('#pzOpen'), tr = t.getBoundingClientRect(), cr = c.getBoundingClientRect(); return { txt: t.textContent, inside: tr.right <= cr.right && tr.top >= cr.top, same: tr.bottom <= document.querySelector('#pzCardTag').getBoundingClientRect().top + 2, row: document.querySelector('#pzAdRow').hidden }; })()""")
+            r = await pg2.evaluate("""(()=>{ const t = document.querySelector('#pzLeftTxt'), c = document.querySelector('#pzOpen'), tr = t.getBoundingClientRect(), cr = c.getBoundingClientRect(); return { txt: t.textContent, inside: tr.right <= cr.right && tr.top >= cr.top, same: tr.bottom <= document.querySelector('#pzCardTag').getBoundingClientRect().top + 2, row: !document.querySelector('#pzAdRow') }; })()""")
             await pg2.screenshot(path=f's67_mini_{w}.png')
-            if r != {'txt': '오늘 5/5판', 'inside': True, 'same': True, 'row': True}: fails.append(f'{w}px 퍼즐 카드 보상 잔여 {r}')
+            if r != {'txt': '수학 XP 0/120', 'inside': True, 'same': True, 'row': True}: fails.append(f'{w}px 퍼즐 카드 보상 잔여 {r}')
             await pg2.evaluate(f"(()=>{{ const F={F}, S=F.S; S.ess = 30; F.mgOpen(); S.mg.bst.luck = 12; F.mgRenderAll(); }})()")
             await pg2.wait_for_timeout(300)
             r = await pg2.evaluate("""(()=>{ const f = document.querySelector('#mgFoot'), fr = f.getBoundingClientRect(); const over = [...f.querySelectorAll('*')].filter(el => { const r = el.getBoundingClientRect(); return r.width && (r.right > fr.right + 1 || r.left < fr.left - 1); }).map(el => el.className || el.tagName); return { over, sw: document.documentElement.scrollWidth }; })()""")

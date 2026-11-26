@@ -1,17 +1,18 @@
   /* ---------- 미니게임 1: 블록 퍼즐 (1.6.0) ----------
      8×8 판에 조각 3개를 끌어다 놓고 가로세로 줄을 지워요.
      - 문양 줄: 한 줄을 같은 문양으로만 채워 지우면 그 줄은 3배
-     - 학생 부탁: 학생이 "꽃 블록 12개 지워 줘" 같은 부탁을 하고, 들어주면 숲의 정수를 바로 줘요
+     - 학생 부탁: 학생이 "꽃 블록 12개 지워 줘" 같은 부탁을 하고, 들어주면 고맙다고 해요
      - 선생님 도움: 조각에 가끔 선생님 블록이 끼어 나와요. 그 블록이 든 줄을 지우면 다람쥐(3×3 치우기), 부엉이(조각 바꾸기), 곰(조각 돌리기) 도움을 받아요
-     하루에 5판까지 보상을 주고(2.3.1 woodani: 10판에서 5판, 대신 한 판 보상 +100%), 광고를 보면 2판 더 받아요. 그 뒤에도 연습으로는 계속 할 수 있어요. 하던 판은 저장돼요 */
+     쉬는 시간 놀이라 판 수 제한이 없어요. 보상은 수학 XP만(하루 PZ.xpDay까지), 숲의 정수와 단축권은 숲속 합치기 주문에서 받아요. 하던 판은 저장돼요 */
   const PZ = {
-    N: 8, perDay: 5, adMore: 2, adMax: 1, rw: 2, sweep: 0.7,   // rw: 한 판 보상 배수, sweep: 소탕 점수(오늘 직접 한 판 점수의 70%, 화면에는 쓰지 않아요)
+    N: 8, perDay: 5, adMore: 2, adMax: 1, rw: 2, sweep: 0.7,   // perDay, adMore, adMax, sweep: 예전 보상 판과 소탕 값(핫픽스 열쇠가 남아 있어 두지만 쓰지 않아요). rw: 한 판 XP 배수
+    xpDay: 120,   // 퍼즐로 받는 수학 XP 하루 상한(예전 보상 판 5판 × 24)
     comboGrace: 4,   // 줄을 못 지운 놓기가 이만큼 이어져야 콤보가 끊겨요
     pats: ['acorn', 'leaf', 'flower', 'mushroom', 'berry', 'water'],
     patName: { acorn: '도토리', leaf: '잎', flower: '꽃', mushroom: '버섯', berry: '산딸기', water: '물방울' },
     teas: ['squirrel', 'owl', 'bear'], teaName: { squirrel: '다람쥐', owl: '부엉이', bear: '곰' },
     teaRate: 1 / 8, teaMax: 5, teaBonus: 15,   // 조각 8개 중 1개꼴로 선생님 블록
-    essPer: 150, essMax: 25,        // 점수 150점마다 숲의 정수 1개, 한 판에 25개까지
+    essPer: 150, essMax: 25,        // 예전 보상 값(쓰지 않아요)
     minPer: 100, minMax: 15,        // 점수 100점마다 수업료 1분치, 한 판에 15분치까지 (균형 제안서)
     askN: [8, 12, 16, 20, 24], askEss: [2, 3, 4, 5, 5],
     askers: [['rabbit', '토끼'], ['fox', '여우'], ['raccoon', '너구리'], ['chick', '병아리'], ['bear', '아기곰'], ['cat', '고양이'], ['dog', '강아지'], ['penguin', '펭귄'], ['panda', '판다'], ['koala', '코알라'], ['otter', '수달']]
@@ -90,11 +91,9 @@
     cur.tray = cur.tray.map(p => p || pzNewPiece(cur));   // 빈 자리는 바로 채워요(옛 저장의 빈 자리도)
     return cur;
   }
-  // 오늘 남은 보상 판. 날이 바뀌면 다시 5판
-  function pzDay() { const t = gameToday(); if (dayRoll(S.pz, t)) { S.pz.n = 0; S.pz.adN = 0; } }
-  const pzQuota = () => PZ.perDay + S.pz.adN * PZ.adMore;
-  const pzLeft = () => { pzDay(); return Math.max(0, pzQuota() - S.pz.n); };
-  const pzCanAd = () => { pzDay(); return pzLeft() <= 0 && S.pz.adN < PZ.adMax; };
+  // 오늘 퍼즐로 받은 수학 XP. 날이 바뀌면 0부터. 옛 저장의 n, adN, hand, tb는 읽기만 해요
+  function pzDay() { const t = gameToday(); if (dayRoll(S.pz, t)) S.pz.xp = 0; }
+  const pzXpLeft = () => { pzDay(); return Math.max(0, PZ.xpDay - (S.pz.xp || 0)); };
   // 판 규칙
   const pzAt = (b, r, c) => b[r * PZ.N + c];
   function pzFits(b, cells, r, c) {
@@ -155,9 +154,7 @@
       cur.ask.got += pats[cur.ask.k];
       // 부탁을 들어주면 다음 학생이 와요. 넘친 수는 다음 부탁으로 넘기지 않아요 (문양이 다르니까요)
       if (cur.ask.got >= cur.ask.n) {
-        const e = PZ.askEss[Math.min(cur.askI, PZ.askEss.length - 1)];
-        asks.push({ name: cur.ask.name, ess: cur.rw ? e : 0 });
-        if (cur.rw) cur.ess += e;
+        asks.push({ name: cur.ask.name, ess: 0 });   // 부탁은 고마움만. 정수는 합치기 주문에서 받아요
         cur.askI += 1; pzNewAsk(cur);
       }
     }
@@ -206,67 +203,24 @@
     if (before) { const [r0, c0] = before; p.ti = Math.max(0, p.c.findIndex(([r, c]) => r === c0 && c === h - r0)); }
     cur.helps.bear -= 1; return true;
   }
-  // 보상: 숲의 정수는 점수로, 도토리는 수업료 몇 분치로(학교급이 올라가도 알맞은 양)
-  const pzEssOf = score => Math.min(PZ.essMax, Math.floor(score / PZ.essPer)) * PZ.rw;   // 한 판 보상 두 배(하루 판 수는 절반)
-  const pzMinOf = score => Math.min(PZ.minMax, Math.floor(score / PZ.minPer)) * PZ.rw;
+  // 보상: 점수 100점마다 수학 XP(한 판 상한 AC.pzMax, 배수 PZ.rw)
   const pzXpOf = score => Math.min(AC.pzMax, Math.floor(score / AC.pzPer)) * PZ.rw;
   function addEss(n) { if (!(n > 0)) return; S.ess = Math.min(1e9, S.ess + Math.floor(n * (1 + rxPct('ess') / 100))); renderEss(); }   // 정수 연구
   function renderEss() { const e = $('#essHave'); if (e) e.textContent = fmt(S.ess); const et = $('#vEssTop'); if (et) et.textContent = fmt(S.ess); const e2 = $('#essHave2'); if (e2) e2.textContent = fmt(S.ess); }
-  // 판 끝내기(다 막혔거나 그만하기). 정수와 도토리를 주고 최고 점수를 남겨요
+  // 판 끝내기(다 막혔거나 그만하기). 수학 XP를 주고(하루 PZ.xpDay까지) 최고 점수를 남겨요
   function pzFinish(cur) {
-    const rw = cur.rw, score = cur.score;
-    const ess = rw ? Math.floor(pzEssOf(score) * libMult()) : 0, mins = rw ? pzMinOf(score) : 0;   // 사서 선생님 레벨만큼 더
-    const acorns = mins > 0 ? nice(rate() * 60 * mins) : 0;
-    if (ess > 0) addEss(ess);
-    if (acorns > 0) { S.budget += acorns; earn(acorns); }
+    const score = cur.score;
     const newBest = score > S.pz.best;
     if (newBest) S.pz.best = score;
     S.st.pz = (S.st.pz || 0) + 1;
-    const xp = rw ? acGain('math', pzXpOf(score)) : 0;   // 공부: 보상 판은 수학 XP(100점마다 1, 판당 12까지. 두 배)
-    if (rw && cur.hand !== false) { const t = gameToday(); S.pz.tb = S.pz.hand === t ? Math.max(S.pz.tb || 0, score) : score; S.pz.hand = t; }   // 오늘 직접 한 판이 있으면 소탕이 열려요(그날 직접 한 판의 최고 점수를 남겨요)
-    const tk = rw ? tkDaily('pz') : null;   // 보상 판마다 5분권 1장(하루 3장)
+    const raw = Math.min(pzXpOf(score), pzXpLeft());
+    S.pz.xp = (S.pz.xp || 0) + raw;
+    const xp = raw > 0 ? acGain('math', raw) : 0;
     S.pz.cur = null;
     save();
-    return { score, ess, askEss: rw ? cur.ess : 0, mins, acorns, newBest, rw, xp, tk };
+    return { score, ess: 0, askEss: 0, mins: 0, acorns: 0, newBest, rw: true, xp, tk: null, capped: pzXpLeft() <= 0 };
   }
-  /* 숲속 퍼즐 소탕: 그날 보상 판을 1판 직접 하면 열려요. 판마다 오늘 직접 한 판 점수의 70%(PZ.sweep,. 예전에는 역대 최고 점수)로 친 보상을 바로 받아요
-     비율은 화면에 쓰지 않고 받을 양만 보여 줘요. 학생 부탁은 소탕으로 채우지 않아요. 오늘의 미션, 이벤트의 '퍼즐 n판'에는 쳐요 */
-  const pzSwOpen = () => { pzDay(); return S.pz.hand === gameToday() && (S.pz.tb || 0) > 0; };
-  const pzSwScore = () => S.pz.hand === gameToday() ? Math.floor((S.pz.tb || 0) * PZ.sweep) : 0;
-  function pzSwGain(n) {
-    const sc = pzSwScore(), one = { ess: Math.floor(pzEssOf(sc) * libMult()), m: pzMinOf(sc), xp: pzXpOf(sc) };
-    const tkLeft = Math.max(0, TKE.perDay - (S.tkd && S.tkd.day === gameToday() ? S.tkd.pz : 0));
-    return { ess: one.ess * n, acorns: one.m > 0 ? nice(rate() * 60 * one.m) * n : 0, xp: one.xp * n, tk: Math.min(n, tkLeft) };
-  }
-  function pzSwText(g) { return [g.ess ? `숲의 정수 +${g.ess}` : '', g.acorns ? `도토리 +${fmt(g.acorns)}` : '', g.xp ? `수학 XP +${g.xp}` : '', g.tk ? `5분 단축권 +${g.tk}` : ''].filter(Boolean).join(', ') || '보상 없음'; }
-  function openPzSw() {
-    if (!pzSwOpen()) { toast('오늘 보상 판을 1판 직접 하면 소탕할 수 있어요'); return; }
-    const left = pzLeft(); if (left <= 0) { toast('오늘 보상 판을 다 했어요. 내일 다시 열려요'); return; }
-    rt.pzSwN = rt.pzSwN === left || rt.pzSwN === 1 ? rt.pzSwN : 1; if (rt.pzSwN > left) rt.pzSwN = 1;
-    renderPzSw(); openModal($('#mPzSw'));
-  }
-  function renderPzSw() {
-    const left = pzLeft(), opts = left > 1 ? [1, left] : [1];
-    if (!opts.includes(rt.pzSwN)) rt.pzSwN = 1;
-    $('#pzSwOpts').innerHTML = opts.map(n => `<button type="button" class="sw-opt${rt.pzSwN === n ? ' on' : ''}" data-sw="${n}"><b>${n === 1 ? '1판 소탕' : `남은 ${n}판 모두 소탕`}</b><small>${pzSwText(pzSwGain(n))}</small></button>`).join('');
-  }
-  function pzSweep(n) {
-    if (!pzSwOpen() || rt.paused) return false;
-    n = Math.min(n, pzLeft()); if (n <= 0) return false;
-    const g = { ess: 0, acorns: 0, xp: 0, tk: 0 }, sc = pzSwScore();
-    for (let i = 0; i < n; i++) {
-      S.pz.n += 1; S.st.pz = (S.st.pz || 0) + 1;
-      const ess = Math.floor(pzEssOf(sc) * libMult()), m = pzMinOf(sc), a = m > 0 ? nice(rate() * 60 * m) : 0;
-      if (ess > 0) addEss(ess); if (a > 0) { S.budget += a; earn(a); }
-      g.ess += ess; g.acorns += a; g.xp += acGain('math', pzXpOf(sc));
-      if (tkDaily('pz')) g.tk += 1;
-    }
-    sfx('quest'); buzz(15);
-    showReward({ title: `퍼즐 ${n}판 소탕!`, sub: '숲속 퍼즐 보상을 받았어요', items: [g.ess ? { ic: 'ess', t: `숲의 정수 +${g.ess}` } : null, g.acorns ? { ic: 'acorn', t: `도토리 +${fmt(g.acorns)}` } : null, g.xp ? { ic: '📘', t: `수학 XP +${g.xp}` } : null, g.tk ? { ic: IMG('ticket_m5') ? `<img src="${IMG('ticket_m5')}" alt="" style="width:22px;height:22px;object-fit:contain">` : '⏱', t: `5분 단축권 +${g.tk}` } : null].filter(Boolean) });
-    save(); renderMini(); renderEss(); renderHUD(); checkQuests(); if (typeof evSync === 'function') evSync();
-    return g;
-  }
-  // 숲속 퍼즐 부스터. 값은 수업료 몇 분치라 학교급이 올라가도 알맞아요. 보상 상한(정수 25, 도토리 15분치)은 그대로
+  // 숲속 퍼즐 부스터. 값은 수업료 몇 분치라 학교급이 올라가도 알맞아요
   const PZB = {
     teacher: { m: 5, e: 4, ic: 'boost_pz_teacher', name: '선생님 도움', d: '선생님 도움 하나를 들고 시작' },
     small: { m: 3, e: 3, ic: 'boost_pz_small', name: '작은 조각', d: '처음 조각 3개를 작은 조각으로' },
@@ -275,7 +229,7 @@
   const PZB_IDS = Object.keys(PZB);
   // 재화 원칙: 부스터는 숲의 정수로 값을 고정해요(e). m은 1.7.x 도토리 값(수업료 분치) 기록
   const pzbCost = id => PZB[id].e;
-  // 아직 아무것도 놓지 않은 보상 판에만 부스터를 쓸 수 있어요
+  // 아직 아무것도 놓지 않은 새 판에만 부스터를 쓸 수 있어요
   const pzFresh = cur => !!(cur && cur.rw && !cur.score && !cur.lines && !cur.bst && cur.b.every(v => !v));
   function pzApplyBoost(cur, ids) {
     cur.bst = { teacher: false, small: false, combo: false };
@@ -286,12 +240,10 @@
       if (id === 'small') { const smalls = PZ_SHAPES.filter(c => c.length <= 3); cur.tray = cur.tray.map(() => ({ c: pzChoice(smalls).map(x => x.slice()), k: 1 + Math.floor(Math.random() * PZ.pats.length) })); }
     }
   }
-  // 새 판 시작. 보상 판이 남아 있으면 하나 쓰고, 없으면 연습 판이에요
+  // 새 판 시작. 판 수 제한 없이 언제나 수학 XP를 받는 판이에요
   function pzStart() {
     pzDay();
-    const rw = pzLeft() > 0;
-    if (rw) S.pz.n += 1;
-    S.pz.cur = pzFreshGame(rw);
+    S.pz.cur = pzFreshGame(true);
     save();
     return S.pz.cur;
   }
@@ -323,7 +275,7 @@
     if (!pzFresh(cur)) { $('#pzBoost').hidden = true; return; }
     pzUI.pick = new Set();
     pzBoostRender();
-    setT($('#pzBoostRw'), `${PZ.essPer}점마다 숲의 정수 ${PZ.rw}개, ${PZ.minPer}점마다 수업료 ${PZ.rw}분치를 받아요`);
+    setT($('#pzBoostRw'), `${AC.pzPer}점마다 수학 XP ${PZ.rw}, 하루 ${PZ.xpDay}까지 받아요`);
     $('#pzBoost').hidden = false;
   }
   function pzBoostRender() {
@@ -356,12 +308,7 @@
     if (FXL.st === 'ok' && !FXO.st) fxoInit();   // 깨지는 조각 그림판
     setTimeout(() => { try { if (FXO.st === 'ok' || FXL.st === 'ok') new Set([...document.querySelectorAll('#pzBoard [style*="url"], #pzTray [style*="url"]')].map(e => e.style.backgroundImage)).forEach(fxoUrlTex); } catch (e) { /* 다음에 */ } }, 600);
     pzDay();
-    // 보상 없는 연습 판이 남아 있는데 오늘 보상 판이 있으면 이어 할지 새 보상 판으로 할지 물어요(뒤로 가기는 이어 하기)
-    if (!asked && S.pz.cur && !S.pz.cur.rw && pzLeft() > 0) {
-      askBox({ title: '새 보상 판이 있어요', text: `하던 연습 판(${fmt(S.pz.cur.score)}점)이 남아 있어요.\n연습 판은 끝까지 해도 보상이 없어요.\n오늘 보상 판 ${pzLeft()}판이 남았어요.`,
-        yes: '새 보상 판 시작', no: '연습 판 이어 하기', onYes: () => { S.pz.cur = null; pzStart(); pzOpen(true); }, onNo: () => pzOpen(true) });
-      return;
-    }
+    if (S.pz.cur) S.pz.cur.rw = true;   // 옛 연습 판도 이제 XP를 받는 판
     if (!S.pz.cur) pzStart();
     pzUI.open = true; pzUI.mode = '';
     $('#pzScene').hidden = false;
@@ -423,7 +370,7 @@
     const cur = S.pz.cur; if (!cur) return;
     $('#pzScore').textContent = fmt(cur.score);
     $('#pzBest').textContent = fmt(Math.max(S.pz.best, cur.score));
-    $('#pzEssNow').textContent = cur.rw ? fmt(pzEssOf(cur.score) + cur.ess) : '연습';
+    $('#pzEssNow').textContent = fmt(Math.min(pzXpOf(cur.score), pzXpLeft()));
     const cb = $('#pzCombo'); if (cb) { const on = cur.combo >= 1; cb.hidden = !on; if (on) cb.textContent = `콤보 ×${Math.min(4, 1 + 0.5 * cur.combo).toFixed(1).replace('.0', '')} (${PZ.comboGrace - (cur.miss || 0)}번)`; }
   }
   function pzRenderAsk() {
@@ -598,12 +545,11 @@
       pzFx(x.got ? `${PZ.teaName[x.t]} 선생님 도움!` : `${PZ.teaName[x.t]} 선생님 +${PZ.teaBonus}`, 'ess', x.i);
       if (x.got) sfx('done');
     }, 300 + i * 350));
-    // 학생 부탁을 들어줬으면 숲의 정수를 바로 줘요
+    // 학생 부탁을 들어줬으면 고맙다고 해요
     res.asks.forEach((a, i) => {
-      addEss(a.ess);
       setTimeout(() => {
         $('#pzAsk').classList.remove('done'); void $('#pzAsk').offsetWidth; $('#pzAsk').classList.add('done');
-        pzFx(a.ess ? `${a.name} 고마워! 숲의 정수 +${a.ess}` : `${a.name} 고마워!`, 'ess');
+        pzFx(`${a.name} 고마워!`, 'ess');
         sfx('buy');
       }, 700 + i * 500);
     });
@@ -615,23 +561,15 @@
     const cur = S.pz.cur; if (!cur) return;
     pzUI.mode = '';
     const r = pzFinish(cur);
-    $('#pzEndTitle').textContent = r.rw ? '판이 끝났어요' : '연습이 끝났어요';
+    $('#pzEndTitle').textContent = '판이 끝났어요';
     $('#pzEndScore').textContent = fmt(r.score);
     $('#pzNewBest').hidden = !r.newBest;
     const items = [];
-    if (r.ess > 0) items.push(`<li><span class="tic" style="background-image:${pzImg('ic_essence')}"></span>숲의 정수<b>+${r.ess}</b></li>`);
-    if (r.askEss > 0) items.push(`<li><span class="tic" style="background-image:${pzImg('ic_essence')}"></span>학생 부탁 보상<b>+${r.askEss}</b></li>`);
-    if (r.acorns > 0) items.push(`<li><span data-acorn>${acornIcon()}</span>도토리<b>+${fmt(r.acorns)}</b></li>`);
-    if (r.xp > 0) items.push(`<li><span class="tic" style="background-image:${pzImg('ic_study')}"></span>수학 XP<b>+${r.xp}</b></li>`);   // 공부
-    if (r.tk) items.push(`<li><span class="tic" style="background-image:${pzImg('ticket_m5')}"></span>5분 단축권<b>+${TK_REW.pz[1]}</b></li>`);
+    if (r.xp > 0) items.push(`<li><span class="tic" style="background-image:${pzImg('ic_study')}"></span>수학 XP<b>+${r.xp}</b></li>`);
     $('#pzEndList').innerHTML = items.join('');
-    const ea = $('#pzEndArt'), gotEss = r.ess > 0 || r.askEss > 0;   // 정수를 받았으면 정수 무더기 그림
-    ea.hidden = !(gotEss && IMG('essence_pile')); if (!ea.hidden) ea.style.backgroundImage = pzImg('essence_pile');
-    const left = pzLeft();
-    let note = !r.rw ? `연습 판이라 보상은 없어요. 내일 다시 ${PZ.perDay}판을 받아요` : items.length ? '' : `${PZ.essPer}점부터 숲의 정수를, ${PZ.minPer}점부터 도토리를 받아요`;
-    if (left > 0 && r.rw) note = (note + ` 오늘 보상 판이 ${left}번 남았어요`).trim();
-    $('#pzEndNote').textContent = note;
-    $('#pzEndAgain').textContent = left > 0 ? '다시 하기' : '연습으로 다시 하기';
+    $('#pzEndArt').hidden = true;
+    $('#pzEndNote').textContent = r.capped ? '오늘 퍼즐 수학 XP는 다 받았어요. 쉬는 시간처럼 계속 해도 돼요' : items.length ? '' : `${AC.pzPer}점부터 수학 XP를 받아요`;
+    $('#pzEndAgain').textContent = '다시 하기';
     $('#pzEnd').hidden = false;
     sfx(r.newBest ? 'quest' : 'done');
     renderMini(); renderEss();
@@ -714,17 +652,10 @@
     $('#acList').addEventListener('click', e => { const b = e.target.closest('[data-book]'); if (b) { sfx('tap'); openBook(b.dataset.book); return; } const row = e.target.closest('[data-ac]'); if (row) acTip(row.dataset.ac, row); });   // 과목을 누르면 얻는 곳 말풍선. 문제집 구매: 확인창부터
     $('#bkAll').addEventListener('click', () => { const k = rt.bookK; closeModal($('#mBook'), () => acBuyBookAll(k)); });
     $('#bkBuy').addEventListener('click', () => { if ($('#bkBuy').getAttribute('aria-disabled') === 'true') return; const k = rt.bookK; closeModal($('#mBook'), () => acBuyBook(k)); });
-    $('#pzSwBtn').addEventListener('click', () => { sfx('tap'); openPzSw(); });   // 소탕
     $('#btSwBtn').addEventListener('click', () => { sfx('tap'); openBtSw(); });   // 대결 소탕
     $('#btSwGo').addEventListener('click', () => closeModal($('#mBtSw'), () => btSweep()));
-    $('#pzSwOpts').addEventListener('click', e => { const b = e.target.closest('[data-sw]'); if (!b) return; rt.pzSwN = +b.dataset.sw; renderPzSw(); });
-    $('#pzSwGo').addEventListener('click', () => { const n = rt.pzSwN || 1; closeModal($('#mPzSw'), () => pzSweep(n)); });
     $('#pzOpen').addEventListener('click', () => { sfx('tap'); if (liveOff('puzzle')) { toast('숲속 퍼즐은 잠시 점검 중이에요. 조금만 기다려 주세요'); return; } pzOpen(); });
     bind180();   // 숲속 합치기
-    $('#pzAdBtn').addEventListener('click', () => {
-      if (!pzCanAd()) return;
-      showAd(() => { pzDay(); S.pz.adN += 1; save(); renderMini(); toast(`오늘 보상 판 ${PZ.adMore}번을 더 받았어요`); }, r => { if (r !== 'noad') toast('광고를 끝까지 보지 않아서 보상이 없어요'); });
-    });
     $('#pzBack').addEventListener('click', () => { sfx('tap'); pzClose(); });
     $('#pzQuit').addEventListener('click', () => { if (!S.pz.cur || !$('#pzEnd').hidden || !$('#pzBoost').hidden) return; sfx('tap'); $('#pzQuitAsk').hidden = false; });
     $('#pzQuitNo').addEventListener('click', () => { $('#pzQuitAsk').hidden = true; });
@@ -761,21 +692,15 @@
     document.addEventListener('pointercancel', () => pzDragEnd(true));
     window.addEventListener('resize', () => { if (pzUI.open) pzRenderTray(); });
   }
-  // 미니게임 탭 카드: 오늘 남은 판, 최고 점수, 하던 판
+  // 미니게임 탭 카드: 오늘 받은 수학 XP, 최고 점수, 하던 판
   function renderMini() {
     if (!$('#pzLeftTxt')) return;
     pzDay();
-    const left = pzLeft();
     renderEss();
     $('.pz-thumb').style.backgroundImage = ['acorn', 'leaf', 'berry', 'flower'].map(k => pzImg('pz_block_' + k)).join(',');   // 블록 넷을 2×2로(한 장을 꽉 채우면 잘려 보였어요)
-    $('#pzCardSub').textContent = S.pz.cur ? `${S.pz.cur.rw ? '하던 판' : '연습 판'} 이어서 하기 (${fmt(S.pz.cur.score)}점)` : S.pz.best > 0 ? `최고 ${fmt(S.pz.best)}점` : '조각을 끌어다 놓고 줄을 지워요';
+    $('#pzCardSub').textContent = S.pz.cur ? `하던 판 이어서 하기 (${fmt(S.pz.cur.score)}점)` : S.pz.best > 0 ? `최고 ${fmt(S.pz.best)}점` : '조각을 끌어다 놓고 줄을 지워요';
     $('#pzCardTag').textContent = S.pz.cur ? '이어하기' : '시작하기';
-    const lt = $('#pzLeftTxt'); lt.textContent = `오늘 ${left}/${pzQuota()}판`; lt.classList.toggle('none', left <= 0);   // 오늘 남은 보상 판 / 오늘 받을 수 있는 판
-    $('#pzAdBtn').hidden = !pzCanAd(); $('#pzAdRow').hidden = $('#pzAdBtn').hidden;
-    { const on = pzSwOpen(), can = on && left > 0;   // 소탕 안내 줄
-      $('#pzSwTx').textContent = !on ? '1판 하면 소탕 가능' : can ? '' : '';   // 카드 안 시작하기 아래(좁아서 짧게)
-      $('#pzSwTx').hidden = on; $('#pzSwBtn').hidden = !can; $('#pzSwBtn').textContent = `소탕 ${left}판`;
-      const show = !on || can; $('#pzSwRow').hidden = !show; $('#pzCardW').classList.toggle('sw-on', show); }
+    const lt = $('#pzLeftTxt'); lt.textContent = `수학 XP ${S.pz.xp || 0}/${PZ.xpDay}`; lt.classList.toggle('none', pzXpLeft() <= 0);
     renderAc();   // 공부
     renderStudy2();   // 국어, 과학 카드
     renderExRow();   // 시험 기간 줄
