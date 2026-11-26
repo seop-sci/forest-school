@@ -6,7 +6,7 @@
 # 4) 다녀왔어요 창: 1시간 넘게 비우면 광고 단추가 큼, 광고 보면 도토리 두 배와 합치기 에너지 +30, 출석 도장 함께, 3분 동안 다른 광고 쉬기
 #    출석만 있을 때도 창이 뜨고 광고 단추는 없음
 # 5) z1, z2 퀘스트가 합치기로 바뀜, 옛 저장에서 그 퀘스트를 하던 중이면 끝난 것으로, 옛 저장은 '오늘 할 일'을 접음
-# 6) 랭킹은 이벤트 칸 안으로, 오늘 활동 단추(체험학습, 학교 행사)
+# 6) 랭킹은 홈 오른쪽 단추(5.4.1.2에 다시 따로), 오늘 활동 단추(체험학습, 학교 행사)
 import asyncio
 from playwright.async_api import async_playwright
 from testlib import base, ctxpage, Checker, CLEAN, F, TODAY
@@ -58,14 +58,14 @@ async def main():
           o.btn = !!body.querySelector('[data-ps="d0"]'); o.notReady = body.querySelectorAll('.dms .dm').length;
           const p0 = S.ps.pts; body.querySelector('[data-ps="d0"]').click(); o.got = S.ps.pts - p0;
           S.ps.day = '2000-01-01'; F.psSync(); o.after = S.ps.dl.length;
-          o.rank = !!document.querySelector('#evSeg [data-evseg="rank"]') && !document.querySelector('.map-right [data-tab="rank"]');
-          document.querySelector('#evSeg [data-evseg="rank"]').click(); o.tab = F.rt4.tab;
+          o.rank = !document.querySelector('#evSeg [data-evseg="rank"]') && !!document.querySelector('.map-right [data-tab="rank"]');
+          F.setTab('school'); document.querySelector('.map-right [data-tab="rank"]').click(); o.tab = F.rt4.tab;
           return o; }})()""")
         c.ok(r['open'] and r['p1'] == 30 and r['p2'] == 90 and r['p3'] == 150, f'미션에서 패스 점수 {r}')
         c.ok(r['dl'] == 0 and r['wl'] == 0 and r['can'], f'패스 미션을 새로 고르지 않음 {r}')
         c.ok('남은 패스 미션' in r2['heads'] and not any('오늘의 패스 미션' in h for h in r2['heads']) and r2['btn'] and r2['notReady'] == 1, f'패스 화면 {r2}')
         c.ok(r2['got'] == 30 and r2['after'] == 0, f'옛 패스 미션 받기 {r2}')
-        c.ok(r2['rank'] and r2['tab'] == 'rank', f'랭킹은 이벤트 칸 안 {r2}')
+        c.ok(r2['rank'] and r2['tab'] == 'rank', f'랭킹은 홈 오른쪽 단추 {r2}')
         await pg.evaluate(f"{F}.setTab('school')"); await pg.wait_for_timeout(300); await pg.evaluate(CLEAN)
         # 4) 다녀왔어요 창
         r = await pg.evaluate(f"""async()=>{{ {AD} const F={F}, S=F.S, o={{}};
