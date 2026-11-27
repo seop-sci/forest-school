@@ -28,6 +28,7 @@
 | `bot.py` | 자동 플레이로 학년마다 걸리는 시간 재기 |
 | `qbot.py` | 퀘스트를 따라 하는 자동 플레이: 새 학교에서 박사 학위까지 퀘스트마다, 학기마다 도토리 시간, 공사 시간, 기다림을 재요. `--json 파일`, `--check [시간]`(오래 걸리는 퀘스트와 Infinity, NaN, 10^15 넘는 재화가 있으면 끝 코드 1), `--until 학교급` |
 | `balday.py` | qbot 결과를 접속 방식별(하루 1번, 3번, 자주, 광고 유무) 날 수 표로. `python3 qbot.py --json qbot.json && python3 balday.py qbot.json --md 표.md`. 잰 결과는 `docs/BALANCE-2026-11.md` |
+| `uxaudit.py` | 화면 점검: 홈, 탭, 탐험, 원정, 체험학습, 건물 창, 공지 등 23 화면을 360px 어두운 화면과 390px 밝은 화면으로 열어 캡처하고, 화면 밖으로 나간 것, 글 잘림, 32px보다 작은 단추를 적어요. `python3 uxaudit.py /tmp/ux 1`(폴더, 학교급) |
 | `txsim.py` | 탐험 원정 균형 재기: 학교급과 대원 세기마다 원정을 여러 번 떠나 큰 장난꾸러기까지 가는 비율, 멈춘 칸, 받은 재료(보고서 몇 시간치). `python3 txsim.py 150`(갈림길을 쉬운 규칙으로 고름), `python3 txsim.py 150 rnd`(아무렇게나 고름) |
 | `s37test.py` | 교감 선생님 도토리 지원 회귀 시험 (`needCost`, `prepTopUp`, `rate`, 유치원 진행) |
 | `check_rules.py` | `CLAUDE.md`와 `AGENTS.md`의 공통 규칙이 똑같은지 확인 |

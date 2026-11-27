@@ -2,7 +2,8 @@
 # 1) 오늘 안 쓰다듬은 단짝이 둘 넘으면 건물 창 '여기 있는 친구' 아래에 모두 쓰다듬기 단추(남은 수와 함께)
 # 2) 누르면 남은 단짝을 한 번에 쓰다듬고(도감 모두 쓰다듬기와 같은 값) 단추가 숨어요
 # 3) 하나만 남았거나 다 쓰다듬었으면 단추가 없어요
-# 4) 360px 어두운 화면, 390px 밝은 화면에서 넘침 없음, 체험학습 출발 단추는 경로를 고르기 전에 꺼진 모양
+# 4) 작은 단추(위 줄 아이콘, 접기 단추, 학교급 칸)는 보이는 크기 바깥 몇 px도 눌려요. 나누기 단추는 32px 넘게(화면 크기 배율 전)
+# 5) 360px 어두운 화면, 390px 밝은 화면에서 넘침 없음, 체험학습 출발 단추는 경로를 고르기 전에 꺼진 모양
 import asyncio
 from playwright.async_api import async_playwright
 from testlib import base, ctxpage, Checker, CLEAN, F, OVER
@@ -35,6 +36,13 @@ async def main():
               return { dis: b.disabled, bg: cs.backgroundColor }; }""")
             r2 = await pg.evaluate("""()=>{ document.querySelector('#tripBody input[type=radio]').click(); const b = document.querySelector('#tripBody [data-trip-depart]'); return { dis: b.disabled, bg: getComputedStyle(b).backgroundColor }; }""")
             c.ok(r['dis'] and not r2['dis'] and r['bg'] != r2['bg'], f'{w} 출발 단추 꺼진 모양 {r} {r2}')
+            await pg.evaluate(CLEAN); await pg.evaluate("window.__forest.setTab('school')"); await pg.wait_for_timeout(500)
+            r = await pg.evaluate("""()=>{ const o={}; for (const sel of ['.icon-btn', '#qFold', '.td']) { const el=[...document.querySelectorAll(sel)].find(e=>e.getBoundingClientRect().width>0); if (!el) { o[sel]='없음'; continue; } const r=el.getBoundingClientRect(); const t=document.elementFromPoint(r.left+r.width/2, r.bottom+3); o[sel]= !!t && (t===el || el.contains(t)); } return o; }""")
+            c.ok(all(v is True for v in r.values()), f'{w} 작은 단추 둘레도 눌려요 {r}')
+            await pg.evaluate("window.__forest.setTab('settings')"); await pg.wait_for_timeout(400)
+            h = await pg.evaluate("()=>Math.min(...[...document.querySelectorAll('#panelSettings .seg button')].map(b=>b.offsetHeight).filter(x=>x>0))")
+            # 화면 크기 '보통'은 전체를 0.9배로 줄여 보여 줘요. 그 전 크기(offsetHeight)로 봐요
+            c.ok(h >= 32, f'{w} 나누기 단추 높이 {h}')
             c.ok(not errs, f'{w} 페이지 오류 {errs[:3]}')
             await ctx.close()
         await b.close()

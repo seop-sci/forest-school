@@ -254,7 +254,7 @@
       w.scrollTop = w.scrollHeight;
     }
     // 지도가 화면 높이를 다 채우게(가로가 조금 넘치면 가운데만 보여요. 칸은 가운데 70% 안에 있어요)
-    { const W = w.clientWidth, H = w.clientHeight - (parseFloat(getComputedStyle(w).paddingTop) || 0), mw = Math.round(Math.min(Math.max(W, H / 1.5), W * 1.25)); m.style.width = mw + 'px'; m.style.marginLeft = Math.round((W - mw) / 2) + 'px'; }
+    { const W = w.clientWidth, H = w.clientHeight - (parseFloat(getComputedStyle(w).paddingTop) || 0) - (parseFloat(getComputedStyle(w).paddingBottom) || 0), mw = Math.round(Math.min(Math.max(W, H / 1.5), W * 1.25)); m.style.width = mw + 'px'; m.style.marginLeft = Math.round((W - mw) / 2) + 'px'; }
     const at = run ? run.at : 0, ns = $$('.tx-n', m);
     ns.forEach((n, i) => { const u = txNodePic(run, i) || ''; const im = n.querySelector('img'); if (im.getAttribute('src') !== u) im.src = u; n.classList.toggle('cur', !!run && i === at); n.classList.toggle('past', !!run && i < at); });
     const me = $('.tx-me', m), lead = tamParty()[0], face = lead ? tamPcPic(lead) : '';

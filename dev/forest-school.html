@@ -2393,7 +2393,7 @@ body.sheet-open .app.on-school .toast,body.sheet-open .toast{top:calc(env(safe-a
 .ev-banner.exam{background:linear-gradient(135deg,#3E5F9C,#22355E)}
 /* 배너 그림: 그림은 왼쪽 60%, 이름은 비워 둔 오른쪽 40% 가운데에 */
 .ev-banner.has-img{height:auto;aspect-ratio:1024/400;align-items:center;justify-content:flex-end;padding:8px 10px}
-.ev-banner.has-img b{width:40%;text-align:center;line-height:1.25;word-break:keep-all}
+.ev-banner.has-img b{width:40%;text-align:center;line-height:1.25;word-break:keep-all;color:#fff;padding:4px 6px;border-radius:10px;background:rgba(70,35,5,.38);text-shadow:0 1px 2px rgba(60,30,0,.7)}   /* 밝은 그림 위에서도 글이 읽히게 */
 .ev-period{display:flex;justify-content:space-between;gap:8px;margin:0 2px 8px;font-size:13px;color:var(--muted)}
 .ev-stamps{display:grid;grid-template-columns:repeat(7,minmax(0,1fr));gap:4px;margin:4px 0 10px}
 .ev-stamp{display:flex;flex-direction:column;align-items:center;gap:2px;min-width:0;font-size:11px;color:var(--muted)}
@@ -4287,7 +4287,7 @@ body.mg-on .toast[hidden]{display:none}
 .tx-tk{display:flex;align-items:center;gap:2px;height:38px;padding:0 12px 0 6px;border-radius:999px;background:rgba(255,248,225,.94);box-shadow:0 0 0 2px #E2A92A,0 3px 6px rgba(0,0,0,.3);color:#4A2E0A}
 .tx-tk img{width:30px;height:30px;object-fit:contain}
 .tx-tk b{font-family:var(--font-display);font-size:18px}.tx-tk small{font-size:12px;opacity:.7}
-.tx-mapw{flex:1;min-height:0;box-sizing:border-box;padding-top:calc(100px + var(--x4t,0px));overflow-x:hidden;overflow-y:auto;overscroll-behavior:contain;scrollbar-width:none;background:#3A2E19}
+.tx-mapw{flex:1;min-height:0;box-sizing:border-box;padding-top:calc(100px + var(--x4t,0px));padding-bottom:28px;overflow-x:hidden;overflow-y:auto;overscroll-behavior:contain;scrollbar-width:none;background:#3A2E19}
 .tx-mapw::-webkit-scrollbar{display:none}
 .tx-map{position:relative;width:100%;aspect-ratio:2/3;margin:0;background:#CFE3A8 center/cover no-repeat}
 .tx-full.lock .tx-map{filter:saturate(.5) brightness(.7)}
@@ -4333,6 +4333,14 @@ body.mg-on .toast[hidden]{display:none}
 .tx-end.win{background:#FFF2C6;box-shadow:inset 0 0 0 2px #E9B949;color:#4A2E0A}
 .tx-end b{font-family:var(--font-display);font-size:18px}
 .tx-trnew{display:flex;align-items:center;gap:6px;font-size:13px;font-weight:700}.tx-trnew img{width:48px;height:48px;object-fit:contain}
+/* 누르는 자리 넓히기(위 묶음과 같은 방식, 여기는 ::after): 위 줄 아이콘, 접기 단추, 편지 칩, 탐험 지역 이름, 한 번에 올리기 칸 */
+.ui-fold::after,.q-fold::after,.pl-chip::after,.tm-map-open::after,.tm-lvn button::after{content:'';position:absolute;inset:-6px}
+.tm-lvn button::after{inset:-6px -2px}
+.icon-btn::after{content:'';position:absolute;inset:-4px}
+.tm-map-open,.tm-lvn button{position:relative}
+.seg button{min-height:32px}
+.tm-lvn button{min-height:28px}
+.tx-regs button{min-height:36px}
 </style>
 <div class="boot" id="boot" role="status" aria-label="숲속 동물 학교를 여는 중이에요">
   <div class="boot-pic" aria-hidden="true"></div>
@@ -16128,12 +16136,15 @@ body.mg-on .toast[hidden]{display:none}
        forest/stats/<내 id>  테스트 현황 (어디까지 했는지, 얼마나 했는지)
      <내 id>는 Firebase 익명 로그인이 기기(브라우저)마다 만들어 줘요. */
   const VERSION = '5.4.2';
-  const NT_QUIET = ['5.4.2', '5.4.1.6', '5.4.1.5', '5.4.1.4', '5.4.1.3', '5.4.1.2', '5.4.1.1', '5.4.0.4', '5.4.0.3', '5.4.0.2', '5.4.0.1', '5.3.4.8', '5.3.4.7', '5.3.4.6', '5.3.4.5', '5.3.4.4', '5.3.4.3', '5.3.4.2', '5.3.4.1', '5.3.4', '5.3.2.1', '5.3.0.3', '5.3.0.2', '5.3.0.1', '5.2.2', '5.2.1', '5.2.0.2', '5.2.0.1', '5.1.1.3', '5.1.1.2', '5.1.1.1', '5.1.1', '5.0.3.1', '5.0.3', '5.0.2.2', '5.0.2.1', '2.1.20', '2.1.2.2', '2.3.0.1', '2.3.4', '3.2.3', '3.2.4', '3.2.5', '3.3.1', '3.3.2', '3.3.3', '4.4.1.1', '4.4.1.2', '4.4.1.3', '4.4.1.4', '5.0.1.1', '5.0.1.2', '5.0.1.3', '5.0.1.4', '5.0.1.5', '5.0.1.6', '5.0.1.7', '5.0.1.8'];
+  const NT_QUIET = ['5.4.1.6', '5.4.1.5', '5.4.1.4', '5.4.1.3', '5.4.1.2', '5.4.1.1', '5.4.0.4', '5.4.0.3', '5.4.0.2', '5.4.0.1', '5.3.4.8', '5.3.4.7', '5.3.4.6', '5.3.4.5', '5.3.4.4', '5.3.4.3', '5.3.4.2', '5.3.4.1', '5.3.4', '5.3.2.1', '5.3.0.3', '5.3.0.2', '5.3.0.1', '5.2.2', '5.2.1', '5.2.0.2', '5.2.0.1', '5.1.1.3', '5.1.1.2', '5.1.1.1', '5.1.1', '5.0.3.1', '5.0.3', '5.0.2.2', '5.0.2.1', '2.1.20', '2.1.2.2', '2.3.0.1', '2.3.4', '3.2.3', '3.2.4', '3.2.5', '3.3.1', '3.3.2', '3.3.3', '4.4.1.1', '4.4.1.2', '4.4.1.3', '4.4.1.4', '5.0.1.1', '5.0.1.2', '5.0.1.3', '5.0.1.4', '5.0.1.5', '5.0.1.6', '5.0.1.7', '5.0.1.8'];
     // 이 버전들은 업데이트해도 공지 창을 띄우지 않아요(공지는 그대로)
   /* 공지사항: 설정 > 공지사항. 맨 위가 가장 새 공지예요
      패치노트는 자동으로 넣지 않아요. 검수한 글만 여기에 적어요(CHANGELOG.md는 자세한 기록용이라 따로 있어요)
      접속하면 새 공지 창을 띄워요(올라온 뒤 7일 동안, '일주일간 열지 않기'를 누르면 7일 쉬어요). 업데이트한 뒤 첫 접속에는 쉬는 중이어도 한 번 띄워요 */
   const NOTICES = [
+    // 공지(고른 세 줄). 탐험 기지와 원정, 보스전, 체험학습, 퀘스트 화면을 앱으로 묶음
+    { id: '2026-11-28-v542', date: '2026-11-28', tag: '업데이트', title: '5.4.2 업데이트',
+      lines: ['탐험 원정과 지역 보스전 추가', '체험학습 관찰 기록 추가', '퀘스트 화면 정리와 편의 개선'] },
     // 공지(고른 세 줄). 웹 5.4.0.3~5.4.0.4와 글 다듬기를 앱으로 묶음
     { id: '2026-11-25-v541', date: '2026-11-25', tag: '업데이트', title: '5.4.1 업데이트',
       lines: ['연구소 시간 단축 추가', '생물 도감 수집 보상 추가', '편의 개선과 오류 수정'] },
@@ -19988,7 +19999,7 @@ body.mg-on .toast[hidden]{display:none}
       w.scrollTop = w.scrollHeight;
     }
     // 지도가 화면 높이를 다 채우게(가로가 조금 넘치면 가운데만 보여요. 칸은 가운데 70% 안에 있어요)
-    { const W = w.clientWidth, H = w.clientHeight - (parseFloat(getComputedStyle(w).paddingTop) || 0), mw = Math.round(Math.min(Math.max(W, H / 1.5), W * 1.25)); m.style.width = mw + 'px'; m.style.marginLeft = Math.round((W - mw) / 2) + 'px'; }
+    { const W = w.clientWidth, H = w.clientHeight - (parseFloat(getComputedStyle(w).paddingTop) || 0) - (parseFloat(getComputedStyle(w).paddingBottom) || 0), mw = Math.round(Math.min(Math.max(W, H / 1.5), W * 1.25)); m.style.width = mw + 'px'; m.style.marginLeft = Math.round((W - mw) / 2) + 'px'; }
     const at = run ? run.at : 0, ns = $$('.tx-n', m);
     ns.forEach((n, i) => { const u = txNodePic(run, i) || ''; const im = n.querySelector('img'); if (im.getAttribute('src') !== u) im.src = u; n.classList.toggle('cur', !!run && i === at); n.classList.toggle('past', !!run && i < at); });
     const me = $('.tx-me', m), lead = tamParty()[0], face = lead ? tamPcPic(lead) : '';
