@@ -4356,7 +4356,7 @@ body.mg-on .toast[hidden]{display:none}
     <p class="boot-step" id="bootStep">학교 문을 여는 중...</p>
     <p class="boot-tip" id="bootTip">학교 문을 여는 중이에요</p>
   </div>
-  <span class="boot-ver" id="bootVer">v5.4.2.1</span>
+  <span class="boot-ver" id="bootVer">v5.4.2</span>
 </div>
 
 <div class="app on-school" id="app">
@@ -5002,7 +5002,7 @@ body.mg-on .toast[hidden]{display:none}
       </div>
       <h3 class="panel-sub">정보</h3>
       <dl class="info">
-        <div id="verRow"><dt>버전</dt><dd>v5.4.2.1</dd></div>
+        <div id="verRow"><dt>버전</dt><dd>v5.4.2</dd></div>
         <div id="pidRow" hidden><dt>학교 번호</dt><dd id="infoPid"></dd></div>
       </dl>
       <div id="devBox" hidden>
@@ -16169,8 +16169,8 @@ body.mg-on .toast[hidden]{display:none}
        forest/rank/<내 id>   랭킹 이름과 학교 점수
        forest/stats/<내 id>  테스트 현황 (어디까지 했는지, 얼마나 했는지)
      <내 id>는 Firebase 익명 로그인이 기기(브라우저)마다 만들어 줘요. */
-  const VERSION = '5.4.2.1';
-  const NT_QUIET = ['5.4.2.1', '5.4.1.6', '5.4.1.5', '5.4.1.4', '5.4.1.3', '5.4.1.2', '5.4.1.1', '5.4.0.4', '5.4.0.3', '5.4.0.2', '5.4.0.1', '5.3.4.8', '5.3.4.7', '5.3.4.6', '5.3.4.5', '5.3.4.4', '5.3.4.3', '5.3.4.2', '5.3.4.1', '5.3.4', '5.3.2.1', '5.3.0.3', '5.3.0.2', '5.3.0.1', '5.2.2', '5.2.1', '5.2.0.2', '5.2.0.1', '5.1.1.3', '5.1.1.2', '5.1.1.1', '5.1.1', '5.0.3.1', '5.0.3', '5.0.2.2', '5.0.2.1', '2.1.20', '2.1.2.2', '2.3.0.1', '2.3.4', '3.2.3', '3.2.4', '3.2.5', '3.3.1', '3.3.2', '3.3.3', '4.4.1.1', '4.4.1.2', '4.4.1.3', '4.4.1.4', '5.0.1.1', '5.0.1.2', '5.0.1.3', '5.0.1.4', '5.0.1.5', '5.0.1.6', '5.0.1.7', '5.0.1.8'];
+  const VERSION = '5.4.2';
+  const NT_QUIET = ['5.4.1.6', '5.4.1.5', '5.4.1.4', '5.4.1.3', '5.4.1.2', '5.4.1.1', '5.4.0.4', '5.4.0.3', '5.4.0.2', '5.4.0.1', '5.3.4.8', '5.3.4.7', '5.3.4.6', '5.3.4.5', '5.3.4.4', '5.3.4.3', '5.3.4.2', '5.3.4.1', '5.3.4', '5.3.2.1', '5.3.0.3', '5.3.0.2', '5.3.0.1', '5.2.2', '5.2.1', '5.2.0.2', '5.2.0.1', '5.1.1.3', '5.1.1.2', '5.1.1.1', '5.1.1', '5.0.3.1', '5.0.3', '5.0.2.2', '5.0.2.1', '2.1.20', '2.1.2.2', '2.3.0.1', '2.3.4', '3.2.3', '3.2.4', '3.2.5', '3.3.1', '3.3.2', '3.3.3', '4.4.1.1', '4.4.1.2', '4.4.1.3', '4.4.1.4', '5.0.1.1', '5.0.1.2', '5.0.1.3', '5.0.1.4', '5.0.1.5', '5.0.1.6', '5.0.1.7', '5.0.1.8'];
     // 이 버전들은 업데이트해도 공지 창을 띄우지 않아요(공지는 그대로)
   /* 공지사항: 설정 > 공지사항. 맨 위가 가장 새 공지예요
      패치노트는 자동으로 넣지 않아요. 검수한 글만 여기에 적어요(CHANGELOG.md는 자세한 기록용이라 따로 있어요)
@@ -33236,16 +33236,26 @@ body.mg-on .toast[hidden]{display:none}
   function mgPointerUp(e) {
     const d = mgUI.drag; if (!d || e.pointerId !== d.id) return;
     const i = d.i, moved = d.moved, over = d.over;
-    mgDragEnd(false);
+    // 놓은 칸으로(못 놓으면 처음 칸으로) 조각이 미끄러져 들어가요
+    mgDragEnd(false, moved ? (over >= 0 && over !== i ? over : i) : -1);
     if (!moved) { if (mgIsGen(mgCells()[i])) mgTapGen(i); else mgSelect(mgUI.sel === i ? -1 : i); return; }
     if (over >= 0 && over !== i) {
       const r = mgDrop(i, over);
       if (r) { mgRenderBoard(); mgRenderOrders(); mgRenderFoot(); if (r === 'merge') checkQuests(); save(); }
     }
   }
-  function mgDragEnd(cancel) {
+  function mgDragEnd(cancel, glide) {
     const d = mgUI.drag; if (!d) return;
-    if (mgUI.dragEl) { mgUI.dragEl.remove(); mgUI.dragEl = null; }
+    if (mgUI.dragEl) {
+      const g = mgUI.dragEl, c = glide >= 0 && mgUI.cells[glide];
+      mgUI.dragEl = null;
+      if (c && !rt.reduced && g.animate) {
+        const r = c.getBoundingClientRect();
+        const an = g.animate([{ left: g.style.left, top: g.style.top }, { left: (r.left + r.width / 2) + 'px', top: (r.top + r.height / 2) + 'px' }], { duration: 110, easing: 'ease-out', fill: 'forwards' });
+        let gone = false; const rm = () => { if (!gone) { gone = true; g.remove(); } };
+        an.onfinish = rm; an.oncancel = rm; setTimeout(rm, 400);
+      } else g.remove();
+    }
     if (mgUI.cells[d.i]) mgUI.cells[d.i].style.opacity = '';
     if (d.over >= 0 && mgUI.cells[d.over]) mgUI.cells[d.over].classList.remove('over');
     try { $('#mgGrid').releasePointerCapture(d.id); } catch (x) { /* 무시 */ }
