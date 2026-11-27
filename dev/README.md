@@ -4,7 +4,7 @@
 
 게임을 고칠 때 쓰는 원본과 도구예요. 저장소 맨 위 `index.html`은 여기 `forest-school.html`로 만든 결과물이에요.
 
-**2026-11-18 woodani 결정: 원본을 저장소 맨 위 `src/` 여러 파일로 나눴어요.** `src/page/`(머리, 화면 뼈대, 그림 주소표), `src/css/`(꾸밈 세 파일), `src/js/`(기능별 44파일: 퀘스트 표, 저장, 지도, 탐험, 퍼즐, 합치기 등). `forest-school.html`은 이 파일들을 차례대로 이어 붙인 결과물이고, 지금까지의 도구와 시험은 그대로 이 파일을 읽어요.
+**2026-11-18 woodani 결정: 원본을 저장소 맨 위 `src/` 여러 파일로 나눴어요.** `src/page/`(머리, 화면 뼈대, 그림 주소표), `src/css/`(꾸밈 세 파일), `src/js/`(기능별 45파일: 퀘스트 표, 저장, 지도, 탐험, 퍼즐, 합치기 등). `forest-school.html`은 이 파일들을 차례대로 이어 붙인 결과물이고, 지금까지의 도구와 시험은 그대로 이 파일을 읽어요.
 
 - 고칠 때: `src/` 파일을 고치고 `python3 wrap.py`(또는 `build_gh.py`)를 돌리면 먼저 `forest-school.html`을 새로 만들어요.
 - `forest-school.html`을 직접 고쳤다면 `python3 srcbuild.py split`으로 `src/`에 옮겨요. 직접 고친 파일이 `src/`보다 새로우면 `build`가 덮어쓰지 않고 멈춰요.
@@ -28,6 +28,7 @@
 | `bot.py` | 자동 플레이로 학년마다 걸리는 시간 재기 |
 | `qbot.py` | 퀘스트를 따라 하는 자동 플레이: 새 학교에서 박사 학위까지 퀘스트마다, 학기마다 도토리 시간, 공사 시간, 기다림을 재요. `--json 파일`, `--check [시간]`(오래 걸리는 퀘스트와 Infinity, NaN, 10^15 넘는 재화가 있으면 끝 코드 1), `--until 학교급` |
 | `balday.py` | qbot 결과를 접속 방식별(하루 1번, 3번, 자주, 광고 유무) 날 수 표로. `python3 qbot.py --json qbot.json && python3 balday.py qbot.json --md 표.md`. 잰 결과는 `docs/BALANCE-2026-11.md` |
+| `txsim.py` | 탐험 원정 균형 재기: 학교급과 대원 세기마다 원정을 여러 번 떠나 큰 장난꾸러기까지 가는 비율, 멈춘 칸, 받은 재료(보고서 몇 시간치). `python3 txsim.py 150`(갈림길을 쉬운 규칙으로 고름), `python3 txsim.py 150 rnd`(아무렇게나 고름) |
 | `s37test.py` | 교감 선생님 도토리 지원 회귀 시험 (`needCost`, `prepTopUp`, `rate`, 유치원 진행) |
 | `check_rules.py` | `CLAUDE.md`와 `AGENTS.md`의 공통 규칙이 똑같은지 확인 |
 | `check_templates.py` | Issue 양식이 GitHub 규칙에 맞는지, 양식이 쓰는 라벨이 저장소에 있는지 확인 |

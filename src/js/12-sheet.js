@@ -56,7 +56,7 @@
       : k === 'cafeteria' ? `응원이 ${tamCheerFl()}층 동안 이어져요 (최고 레벨이면 ${TAM.cheer.fl + B.cheer}층)`
       : k === 'library' ? `탐험 보고서를 ${Math.round(TAM.idleMax / 3600) + Math.round(B.idleH * f)}시간까지 모아요 (최고 레벨이면 ${Math.round(TAM.idleMax / 3600) + B.idleH}시간)`
       : `장비 재료 -${pc(B.gear * f)}% (최고 레벨이면 -${pc(B.gear)}%)`;
-    const ic = IMG('ic_tab_ex');
+    const ic = IMG({ classroom: 'ex7_bf_train', cafeteria: 'ex7_bf_lunch', library: 'ex7_bf_map', science: 'ex7_bf_craft', playground: 'ex7_bf_field' }[k]) || IMG('ic_tab_ex');
     setH(el, `${ic ? `<img src="${ic}" alt="" aria-hidden="true">` : ''}<span><b>탐험에서</b> ${esc(tx)}</span>`);
   }
   function renderSheet0() {

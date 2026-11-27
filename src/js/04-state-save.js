@@ -172,6 +172,7 @@
     tam: undefined,   // 탐험 화면 진행 상태
     tamQ: undefined,   // 층을 넘으며 모은 알림
     tamSeg: undefined,   // 탐험 아래 메뉴에서 연 칸
+    txReg: undefined,   // 원정을 떠날 지역
     tamLvN: undefined,   // 대원 한 번에 올리기 수(1, 10, 최대)
     tamPw: undefined,   // 탐험대 힘 칸에 보인 값
     tamAc: undefined,   // 탐험 위 칸에 보인 도토리

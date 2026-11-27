@@ -44,7 +44,7 @@
     //   gear: 과학실, 장비 재료 최대 -20% / cap: 건물 평균 비율 × 그 학교급 학기 폭(TAM_CAP.d)의 50%만큼 학기 상한이 더 열려요
     base: { lv0: 20, lvAdd: 30, pe: 0.2, cheer: 5, idleH: 4, gear: 0.2, cap: 0.5 },   // 모으기 0.3초, 컷인 0.9초, 큰 움직임은 0.75배 빠르게, 끝난 뒤 바로 이어서
   };
-  function freshTam() { return { best: 0, party: ['bear', 'rabbit', 'fox'], mem: {}, gear: { tool: 0, bag: 0, hat: 0 }, sg: [0, 1, 2, 3, 4].map(() => ({ tool: 0, bag: 0, hat: 0 })), mat: [0, 0, 0, 0], it: 0, auto: 0, ad: { day: '', spd: 0, rep: 0, rv: 0, ch: 0 }, cheer: 0, spd: { sec: 0 }, wk: { w: -1, best: 0 }, seen: 0, hm: 0, hb: 0, hc: 0, hw: { w: -1, best: 0 }, skSeen: 0, skOff: 0, ed: '' }; }
+  function freshTam() { return { best: 0, party: ['bear', 'rabbit', 'fox'], mem: {}, gear: { tool: 0, bag: 0, hat: 0 }, sg: [0, 1, 2, 3, 4].map(() => ({ tool: 0, bag: 0, hat: 0 })), mat: [0, 0, 0, 0], it: 0, auto: 0, ad: { day: '', spd: 0, rep: 0, rv: 0, ch: 0 }, cheer: 0, spd: { sec: 0 }, wk: { w: -1, best: 0 }, seen: 0, hm: 0, hb: 0, hc: 0, hw: { w: -1, best: 0 }, skSeen: 0, skOff: 0, ed: '', xp: freshTx() }; }
   function sanitizeTam(d, s) {
     const A = d && d.tam && typeof d.tam === 'object' ? d.tam : {}, f = freshTam(), n = (v, lo, hi, def) => typeof v === 'number' && isFinite(v) ? Math.max(lo, Math.min(hi, Math.floor(v))) : def;
     f.best = n(A.best, 0, 1e6, 0);
@@ -62,6 +62,8 @@
     // 심화 탐험(hm 켬, hb 가장 높은 심화 층, hc 그 기록의 기준 상한, hw 이번 주 심화 층), 필살기 컷인을 본 과목(skSeen 비트)
     f.hm = A.hm ? 1 : 0; f.hb = n(A.hb, 0, 1e6, 0); f.hc = n(A.hc, 0, 1e7, 0); f.skSeen = n(A.skSeen, 0, 31, 0); f.skOff = A.skOff ? 1 : 0; f.ed = typeof A.ed === 'string' ? A.ed.slice(0, 10) : '';   // 입장 장면을 본 날
     if (A.hw && typeof A.hw === 'object') f.hw = { w: n(A.hw.w, -1, 1e7, -1), best: n(A.hw.best, 0, 1e6, 0) };
+    // 원정(원정권, 하고 있는 원정, 지역마다 찾은 보물)
+    f.xp = sanitizeTx(A.xp);
     s.tam = f;
   }
   const tamOn = () => !!S && !!S.tam;
@@ -899,13 +901,15 @@
     setH($('#tmSeg'), [['mem', '대원', can], ['gear', '장비', gc], ['mat', '재료', false]].map(([k, n, dot]) =>
       `<button type="button" data-tseg="${k}" aria-pressed="${seg === k}">${ic[k] ? `<img src="${ic[k]}" alt="">` : ''}<span>${n}</span>${dot ? '<i class="tm-dot"></i>' : ''}</button>`).join(''));
     const sh = $('#tmSheet'), open = sh && !sh.hidden;   // 아래 메뉴: 빨간 점, 열린 창 이름
-    $$('#tmNav [data-tnav]').forEach(b => { const k = b.dataset.tnav; b.classList.toggle('dot', k === 'mem' ? !!can : k === 'gear' ? gc : k === 'rep' ? tamIdle().sec >= 60 : false); b.setAttribute('aria-pressed', String(open && seg === k)); });
-    if (open) $('#tmShT').textContent = { mem: '대원', gear: '장비', mat: '재료' }[seg] || '대원';
+    $$('#tmNav [data-tnav]').forEach(b => { const k = b.dataset.tnav; b.classList.toggle('dot', k === 'mem' ? !!can : k === 'gear' ? gc : k === 'rep' ? tamIdle().sec >= 60 : k === 'exp' ? txDot() : false); b.setAttribute('aria-pressed', String(open && seg === k)); });
+    $('#tmSeg').hidden = seg === 'exp';
+    if (open) $('#tmShT').textContent = { mem: '대원', gear: '장비', mat: '재료', exp: '원정' }[seg] || '대원';
   }
   function tamRenderBody() {
     const box = $('#tmBody'); if (!box || !tamOn()) return;
     const seg = rt.tamSeg || 'mem', rec = tamUpRec();
     tamTabs(seg, rec);
+    if (seg === 'exp') { setH(box, txRender()); return; }
     if (seg === 'mem') {
       const party = tamParty(), slots = tamSlots(), auto = tamAutoTeam(), same = auto.length === party.length && auto.every(k => party.includes(k));
       const R = rec.mem, rs = R && tamStat(R.sp);
@@ -996,6 +1000,7 @@
   function tamClick(e) {
     const b = e.target.closest('button'); if (!b || !tamOn()) return;
     if (b.dataset.tcap) { tamToast(`대원 훈련은 Lv.${fmt(tamTrainCap())}까지예요\n교실을 키우면 더 올릴 수 있어요`); return; }
+    if (txClick(b)) return;
     if (b.getAttribute('aria-disabled') === 'true' && !(b.dataset.tlv && S.budget >= tamLvCost(b.dataset.tlv) && tamTrainOk(b.dataset.tlv))) { if (b.dataset.tlv) tamToast('도토리가 모자라요\n문방구에서 숲의 정수로 도토리를 살 수 있어요'); else if (b.dataset.tgear) tamToast('재료가 모자라요'); return; }
     if (b.dataset.tsk) { tamCast(+b.dataset.tsk); return; }
     if (b.dataset.tmm) { const v = +b.dataset.tmm; if ((v && !tamHOpen()) || (rt.tam && rt.tam.ph === 'event')) return; if ((S.tam.hm ? 1 : 0) === v) return; S.tam.hm = v; tamHSync(); sfx('tap'); save(); tamSkStop(); tamRestart(); tamRenderTop(); tamRenderBody(); musicSync(); return; }   // 심화 탐험
