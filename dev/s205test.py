@@ -4,7 +4,7 @@
 # 3) 보상 창이 떠 있는 동안 위 숫자는 그대로, '좋아요'를 누르면 도토리가 날아가고 닿은 뒤 끝 값
 # 4) 이어 줍기: 1.2초 안에 또 주우면 연속 수가 늘어요
 # 5) 누르는 순간 단추가 살짝 들어가요(scale), 움직임 줄이기면 그대로
-# 6) 지도 그림 안의 참나무와 건물은 누를 때 줄지 않아요
+# 6) 지도 안(참나무, 건물, 이름표, 도토리)은 누를 때 줄거나 움직이지 않아요
 # 7) 360px 어두운 화면, 390px 밝은 화면, 페이지 오류 없음
 import asyncio
 from playwright.async_api import async_playwright
@@ -49,13 +49,15 @@ async def main():
             # 지도 그림 안의 참나무와 건물은 눌러도 줄지 않아요(svg 안에서 줄면 지도가 움찔하고 참나무가 깨져 보였어요)
             cdp = await ctx.new_cdp_session(pg); await cdp.send('DOM.enable'); await cdp.send('CSS.enable')
             doc = await cdp.send('DOM.getDocument', {'depth': -1})
-            for sel in ('#oak', '#b-classroom'):
+            for sel in ('#oak', '#b-classroom', '#pq-classroom'):
                 nid = (await cdp.send('DOM.querySelector', {'nodeId': doc['root']['nodeId'], 'selector': sel}))['nodeId']
                 r0 = await pg.evaluate("(s)=>JSON.stringify(document.querySelector(s).getBoundingClientRect())", sel)
                 await cdp.send('CSS.forcePseudoState', {'nodeId': nid, 'forcedPseudoClasses': ['active']}); await pg.wait_for_timeout(150)
                 r1 = await pg.evaluate("(s)=>[getComputedStyle(document.querySelector(s)).scale, JSON.stringify(document.querySelector(s).getBoundingClientRect())]", sel)
                 await cdp.send('CSS.forcePseudoState', {'nodeId': nid, 'forcedPseudoClasses': []})
                 c.ok(r1[0] == 'none' and r0 == r1[1], f'{w} 지도 {sel} 누를 때 그대로 {r1[0]}')
+            r = await pg.evaluate("()=>{ const g=document.querySelector('#b-classroom'), b=g.querySelector('.built'); const a=JSON.stringify(b.getBoundingClientRect()); g.classList.add('press'); const t=getComputedStyle(b).transform; g.classList.remove('press'); return [t, a]; }")
+            c.ok(r[0] in ('none', 'matrix(1, 0, 0, 1, 0, 0)'), f'{w} 건물을 눌러도 건물 그림이 줄지 않아요 {r[0]}')
             c.ok(not errs, f'{w} 페이지 오류 {errs[:3]}')
             await ctx.close()
         # 이어 줍기와 움직임 줄이기

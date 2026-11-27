@@ -402,7 +402,6 @@ g.plaque[id^="pq-"] .t-plaque{font-size:8.6px}   /* 건물 이름표는 그림 �
 .bld .focus-ring{fill:none;stroke:transparent;stroke-width:3}
 .bld:focus-visible .focus-ring{stroke:var(--accent)}
 .bld .built,.bld .site{transform-box:fill-box;transform-origin:50% 100%;transition:transform .12s}
-.bld.press .built,.bld.press .site{transform:scale(.96)}
 .bld:not(.is-built) .built{display:none}
 /* 짓기와 업그레이드 효과: 처음 지으면 비계와 망치, 흙먼지 속에서 건물이 솟아오르고 리본이 펼쳐져요. 업그레이드하면 통통 튀며 배지가 떠요 */
 .bld .built.fx-rise{animation:bldRise 2s cubic-bezier(.25,.9,.35,1) both}
@@ -4459,10 +4458,10 @@ body.mg-on .toast[hidden]{display:none}
 /* 누르는 순간 반응: 단추가 살짝 들어가요(scale 속성이라 단추의 transform 자리와 겹치지 않아요). 꺼진 단추와 움직임 줄이기는 빼요 */
 @media (prefers-reduced-motion:no-preference){
   :where(button,[role="button"],summary):active:not(:disabled):not([aria-disabled="true"]){scale:.96}
-  /* 지도 그림(svg) 안의 참나무, 건물, 도토리는 빼요. svg 안에서는 지도 왼쪽 위를 축으로 줄어서 지도가 움찔하고 참나무가 떼어 낸 자리와 어긋나 깨져 보였어요 */
-  svg [role="button"]:active:not(:disabled),svg [role="button"]:active:not(:disabled) *{scale:none}
   :where(.cta,.btn-sub,.tx-card,.tm-rb,.icon-btn,.tab){transition-property:scale,transform,box-shadow,background-color;transition-duration:.08s}
 }
+/* 지도 안(참나무, 건물, 도토리, 학생, 이름표 모두)은 누를 때 줄거나 움직이지 않아요. svg 안에서는 지도 왼쪽 위를 축으로 줄어서 지도가 움찔하고 참나무가 떼어 낸 자리와 어긋나 깨져 보였어요 */
+#map :active,#map :active *{scale:none}
 </style>
 </head>
 <body>
