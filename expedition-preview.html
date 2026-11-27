@@ -730,25 +730,42 @@ label.srow,button.srow{cursor:pointer}
 #panelTam:has(#tmBossBar:not([hidden])) .tm-pow{top:calc(100% + 64px)}
 #panelTam:has(#tmBossBar:not([hidden])) .tm-controls{top:calc(var(--x4t) + var(--x4d,0px) + 208px)}
 #panelTam .tm-time{top:calc(var(--x4t) + var(--x4d,0px) + 196px);left:24%;right:24%;height:4px}
-/* 첫 해바라기: 발밑 경고와 필살기 사이에 같은 색으로 남은 시간을 보여 줘요. */
+/* 보스 예고를 발밑의 범위, 남은 시간, 대응 단추로 보여 줘요. */
 .tm-wind{--tell:#FFD383;position:absolute;left:50%;bottom:calc(var(--sab,0px) + 173px);z-index:10;transform:translateX(-50%);width:max-content;max-width:calc(100% - 32px);padding:8px 16px 9px;border:2px solid var(--tell);border-radius:14px;background:#31372D;color:#FFF7DE;box-shadow:0 5px 14px #33251280;text-align:center;pointer-events:none}
 .tm-wind[data-trial="spore"]{--tell:#D6B2FF;background:#393046}
 .tm-wind[data-trial="wave"]{--tell:#9AE5FF;background:#153C4C}
+.tm-wind[data-trial="book"]{--tell:#FFE0A0;background:#503325}
+.tm-wind[data-trial="frost"]{--tell:#D5F6FF;background:#24455B}
+.tm-wind[data-trial="stars"]{--tell:#D7BEFF;background:#35294F}
 .tm-wind b,.tm-wind span{display:block;line-height:1.25}
 .tm-wind b{font-family:var(--font-display);font-size:17px}
 .tm-wind span{font-size:12px;margin:2px 0 7px}
-.tm-wind i{display:block;height:4px;border-radius:6px;background:#776749;overflow:hidden}
+.tm-wind i{position:relative;display:block;height:4px;border-radius:6px;background:#776749;overflow:hidden}
 .tm-wind i::before{content:"";display:block;height:100%;background:var(--tell);transform:scaleX(var(--wind-left,1));transform-origin:left}
+.tm-wind[data-trial="frost"] i{height:10px;background:#132A3A}
+.tm-wind[data-trial="frost"] i::before{height:4px;margin-top:3px}
+.tm-wind[data-trial="frost"] i::after{content:"";position:absolute;inset:0 auto 0 var(--wind-zone-start);width:var(--wind-zone-width);box-sizing:border-box;border:2px solid #FFDB79;border-radius:3px;background:#FFD86C30}
+.tm-wind.in-time .tm-brace{background:#FFDB79;color:#352E16}
 .tm-brace{display:block;width:100%;min-height:44px;margin-top:7px;border:0;border-radius:8px;background:var(--tell);color:#173440;font-weight:800;pointer-events:auto;cursor:pointer}
 .tm-brace:disabled{opacity:.68;cursor:default}
+.tm-wind-signs{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:7px}
 .tm-f.wind-target::after{content:"";position:absolute;inset:auto 5% 0;height:18%;z-index:-1;border:2px dashed #5A2B0E;border-radius:50%;background:#FFCE6C99;box-shadow:0 0 0 3px #FFF1C0}
 .tm-stage[data-reg="garden"] .tm-f.wind-target::after{border-color:#462963;background:#CF92F499;box-shadow:0 0 0 3px #D6B2FF}
 .tm-stage[data-reg="pond"] .tm-f.wind-target::after{border-color:#1B5466;background:#83DAFA99;box-shadow:0 0 0 3px #9AE5FF}
-.tm-stage[data-reg="pond"] .tm-f.wind-guarded::after{border-style:solid;background:#BCFFD8bb;box-shadow:0 0 0 3px #CDFFE2}
+.tm-stage[data-reg="library"] .tm-f.wind-target::after{border-color:#68432C;background:#FFC887aa;box-shadow:0 0 0 3px #FFE0A0}
+.tm-stage[data-reg="yard"] .tm-f.wind-target::after{border-color:#396583;background:#A7EEFFaa;box-shadow:0 0 0 3px #D5F6FF}
+.tm-stage[data-reg="tower"] .tm-f.wind-target::after{border-color:#593680;background:#B18FF9aa;box-shadow:0 0 0 3px #E1C8FF}
+.tm-stage .tm-f.wind-guarded::after{border-style:solid;background:#BCFFD8bb;box-shadow:0 0 0 3px #CDFFE2}
+.tm-stage .tm-f.wind-linked .tm-body{filter:drop-shadow(0 0 5px #E8CAFF) drop-shadow(0 0 12px #BE90FF)}
 .tm-fxl .tm-shot.tm-wave-impact{width:64%;filter:hue-rotate(145deg) saturate(.75) drop-shadow(0 0 7px #BBF3FF)}
+.tm-fxl .tm-shot.tm-frost-impact{width:57%;filter:brightness(1.2) saturate(.45) drop-shadow(0 0 10px #D5F6FF)}
+.tm-fxl .tm-shot.tm-answer-fx{width:22%;filter:drop-shadow(0 0 8px #FFEBB2)}
 .tm-stage.boss-first .tm-body{position:relative}
 .tm-stage.boss-first .tm-mob.boss .tm-body{animation:none;transition:transform .28s cubic-bezier(.22,.61,.36,1)}
 .tm-mob.wind-up .tm-body{transform:translate(5%,3%) rotate(9deg) scale(1.05,.94)}
+.tm-stage[data-reg="library"] .tm-mob.wind-up .tm-body{transform:translate(1%,-8%) rotate(-12deg)}
+.tm-stage[data-reg="yard"] .tm-mob.wind-up .tm-body{transform:translate(3%,9%) scale(1.09,.92)}
+.tm-stage[data-reg="tower"] .tm-mob.wind-up .tm-body{transform:translate(4%,-10%) rotate(7deg)}
 .tm-f img.tm-counter-pose{position:absolute;inset:0;opacity:0;pointer-events:none}
 .tm-frame-owner .tm-body{position:relative}
 .tm-frame-art{position:absolute;inset:0;overflow:hidden;opacity:0;pointer-events:none}
@@ -759,6 +776,7 @@ label.srow,button.srow{cursor:pointer}
 #panelTam:has(.tm-wind:not([hidden])) .tm-sk.ready{box-shadow:0 0 0 4px #FFD383,0 4px 8px #33251280}
 @media (prefers-reduced-motion:reduce){
   .tm-stage.boss-first .tm-mob.boss .tm-body{transition:none}
+  .tm-stage[data-reg] .tm-mob.wind-up .tm-body{transform:none}
   .tm-stage.boss-first .tm-f.hurt .tm-body>img,.tm-stage.boss-first .tm-bgs::after{animation:none}
   .tm-frame-art{display:none}
   .tm-frame-owner .tm-body>img:first-child{opacity:1!important}
@@ -4631,6 +4649,10 @@ body.mg-on .toast[hidden]{display:none}
           <div role="status"><b id="tmWindTitle">꽃바람이 와요!</b><span id="tmWindHint">필살기로 앞줄을 지켜요</span></div>
           <i aria-hidden="true"></i>
           <button class="tm-brace" type="button" id="tmBrace" hidden>몸 낮추기</button>
+          <div class="tm-wind-signs" id="tmWindSigns" role="group" aria-label="책의 표식 고르기" hidden>
+            <button type="button" class="tm-brace" data-tam-sign="leaf">잎</button>
+            <button type="button" class="tm-brace" data-tam-sign="star">별</button>
+          </div>
         </div>
         <div class="tm-cut" id="tmCut" hidden></div>
         <div class="tm-ev" id="tmEv" hidden></div>
@@ -17926,16 +17948,20 @@ body.mg-on .toast[hidden]{display:none}
     return out;
   }
   // 각 지역 첫 보스의 고유 공격. 되풀이와 심화는 원래 전투를 사용해요.
+  const TAM_SIGNS = { leaf: '잎', star: '별' };
   const TAM_TRIALS = {
     10: { key: 'wind', seconds: 2.6, after: 0, title: '꽃바람이 와요!', hint: '필살기로 앞줄을 지켜요', blocked: '꽃바람을 막았어요!', landed: '꽃바람이 앞줄에 닿았어요', art: 'ex4_sk_pe_leaf' },
     60: { key: 'spore', seconds: 2.2, after: 3, delay: 1.2, title: '왕버섯이 포자를 모아요!', hint: '필살기로 포자를 흩뜨려요', blocked: '포자 구름을 흩뜨렸어요!', landed: '포자 때문에 앞줄이 잠깐 느려졌어요', art: 'ex4_sk_sci_bubble' },
-    110: { key: 'wave', seconds: 2.8, after: 3, guard: .35, title: '큰 물결이 밀려와요!', hint: '몸을 낮춰 대원 모두를 지켜요', blocked: '물결을 받아냈어요!', landed: '물결이 탐험대를 덮쳤어요', art: 'ex4_sk_art_splash' }
+    110: { key: 'wave', seconds: 2.8, after: 3, guard: .35, button: '몸 낮추기', ready: '물결을 받을 준비가 됐어요', title: '큰 물결이 밀려와요!', hint: '몸을 낮춰 대원 모두를 지켜요', blocked: '물결을 받아냈어요!', landed: '물결이 탐험대를 덮쳤어요', art: 'ex4_sk_art_splash' },
+    160: { key: 'book', seconds: 4.5, after: 3, signs: true, title: '책장이 날아오려 해요!', hint: '책에 나타난 표식과 같은 것을 골라요', blocked: '책장이 제자리로 돌아갔어요!', landed: '책장이 앞줄을 덮쳤어요', art: 'ic_book' },
+    210: { key: 'frost', seconds: 4.2, after: 3, guard: .35, timing: [.22, .64], button: '발 맞추기', ready: '눈보라를 버틸 준비가 됐어요', title: '눈보라가 몰아쳐요!', hint: '막대 끝이 금빛 구간에 들어오면 발을 맞춰요', blocked: '눈보라를 버텼어요!', landed: '눈보라가 탐험대를 덮쳤어요', art: 'ex4_sk_pe_tornado' },
+    260: { key: 'stars', seconds: 4.5, after: 3, chain: true, rear: true, title: '별똥별이 뒷줄을 향해요!', hint: '서로 다른 대원의 필살기 두 번을 이어 써요. 혼자라면 한 번이에요', blocked: '필살기를 이어 별똥별을 흩뜨렸어요!', soloBlocked: '필살기로 별똥별을 흩뜨렸어요!', landed: '별똥별이 뒷줄에 떨어졌어요', art: 'ex4_sk_math_star' }
   };
   function tamFight(fl, team, buff, mod, hm, rep) {
     const b = buff || 1;
     const pc = TAM.pace, md = mod || {}, ph = md.hp || 1, mh = md.hard ? 1.4 : 1;
     const spec = TAM_TRIALS[fl];
-    const wind = spec && !hm && !rep ? { spec, pending: true, until: 0, braced: false } : null;
+    const wind = spec && !hm && !rep ? { spec, pending: true, until: 0, prepared: false } : null;
     return { id: (tamFight.n = (tamFight.n || 0) + 1), fl, hm: !!hm, rep: rep ? 1 : 0, hard: !!md.hard, wind, t: 0, lim: TAM.limit * pc, ev: [], P: team.map((s, k) => ({ ...s, cd: s.cd * pc, hp: s.hp * b * ph, mx: s.hp * b * ph, atk: s.atk * b, c: (0.4 + k * 0.3) * pc, g: 0 })),
       M: tamMobs(fl, hm).map((m, k) => ({ ...m, hp: m.hp * mh, mx: m.hp * mh, c: (1 + k * 0.4) * pc, wk: 0 })) };
   }
@@ -17955,15 +17981,47 @@ body.mg-on .toast[hidden]{display:none}
     else { const w = L.slice().sort((a, b) => a.hp - b.hp)[0]; if (big) hit(w, p.atk * 8, true); else { const cr = rnd() < 0.25; hit(w, p.atk * (cr ? 2 : 1), cr); } }
   }
   const tamWindActive = F => !!(F && F.wind && F.wind.until > F.t && F.M[0].hp > 0);
+  const tamWindLeft = F => (F.wind.until - F.t) / F.wind.spec.seconds;
+  function tamWindTargets(F) {
+    const living = F.P.filter(p => p.hp > 0);
+    if (F.wind.spec.guard) return living;
+    const target = F.wind.spec.rear ? living[living.length - 1] : living[0];
+    return target ? [target] : [];
+  }
+  function tamWindStop(F) {
+    F.wind.until = 0;
+    F.M[0].c = TAM.mobCd * TAM.pace;
+  }
   function tamBrace(F) {
-    if (!tamWindActive(F) || !F.wind.spec.guard || F.wind.braced) return false;
-    F.wind.braced = true;
+    if (!tamWindActive(F) || !F.wind.spec.guard || F.wind.prepared) return false;
+    const timing = F.wind.spec.timing;
+    if (timing && (tamWindLeft(F) < timing[0] || tamWindLeft(F) > timing[1])) return false;
+    F.wind.prepared = true;
+    return true;
+  }
+  function tamWindAnswer(F, sign) {
+    if (!tamWindActive(F) || !F.wind.spec.signs || F.wind.answer || !Object.prototype.hasOwnProperty.call(TAM_SIGNS, sign)) return false;
+    F.wind.answer = sign;
+    if (sign === F.wind.sign) {
+      tamWindStop(F);
+      F.ev.push({ k: 'wind-answer' });
+    }
     return true;
   }
   function tamCastAt(F, p) {
     if (!p || p.hp <= 0 || p.g < TAM.gauge || !F.M.some(m => m.hp > 0)) return false;
-    const counter = tamWindActive(F) && !F.wind.spec.guard;
-    if (counter) { F.wind.until = 0; F.M[0].c = TAM.mobCd * TAM.pace; }
+    const counter = tamWindActive(F) && !F.wind.spec.guard && !F.wind.spec.signs;
+    if (counter && F.wind.spec.chain) {
+      const links = F.wind.links;
+      if (links.includes(p)) return false;
+      links.push(p);
+      if (links.length < F.wind.need) {
+        p.g = 0;
+        F.ev.push({ k: 'wind-link', p: F.P.indexOf(p) });
+        return true;
+      }
+    }
+    if (counter) tamWindStop(F);
     p.g = 0;
     tamAct(F, p, true, Math.random, counter);
     return true;
@@ -17975,11 +18033,18 @@ body.mg-on .toast[hidden]{display:none}
     if (front && boss.hp > 0 && F.wind.pending && F.t >= spec.after && boss.c <= dt) {
       F.wind.pending = false;
       F.wind.until = F.t + spec.seconds;
-      if (!spec.guard) front.g = TAM.gauge;
+      if (spec.signs) F.wind.sign = rnd() < .5 ? 'leaf' : 'star';
+      else if (spec.chain) {
+        const living = F.P.filter(p => p.hp > 0);
+        F.wind.links = [];
+        F.wind.need = Math.min(2, living.length);
+        living.forEach(p => { p.g = TAM.gauge; });
+      } else if (!spec.guard) front.g = TAM.gauge;
       F.ev.push({ k: 'wind' });
     }
     const warned = tamWindActive(F), middle = warned && F.wind.until - F.t <= spec.seconds / 2;
     if (auto && middle && spec.guard) tamBrace(F);
+    if (auto && middle && spec.signs) tamWindAnswer(F, F.wind.sign);
     for (const p of F.P) {
       if (p.hp <= 0) continue;
       p.c -= dt; if (p.c <= 0) { p.c += p.cd; tamAct(F, p, false, rnd); p.g = Math.min(TAM.gauge, p.g + p.gg); }
@@ -17996,11 +18061,11 @@ body.mg-on .toast[hidden]{display:none}
       }
       if (m.c <= 0) {
         m.c += TAM.mobCd * TAM.pace;
-        const splash = wind && spec.guard, first = F.P.find(q => q.hp > 0);
-        const targets = splash ? F.P.filter(q => q.hp > 0) : first ? [first] : [];
-        if (wind && targets.length) F.ev.push({ k: 'wind-hit', p: F.P.indexOf(targets[0]), m: F.M.indexOf(m), braced: F.wind.braced });
+        const first = F.P.find(q => q.hp > 0);
+        const targets = wind ? tamWindTargets(F) : first ? [first] : [];
+        if (wind && targets.length) F.ev.push({ k: 'wind-hit', p: F.P.indexOf(targets[0]), m: F.M.indexOf(m), braced: F.wind.prepared });
         const strike = m.atk * (m.wk > 0 ? .7 : 1);
-        const d = strike * (splash && F.wind.braced ? spec.guard : 1) / Math.max(1, targets.length);
+        const d = strike * (wind && F.wind.prepared ? spec.guard : 1) / Math.max(1, targets.length);
         for (const tg of targets) {
           tg.hp -= d;
           if (wind && spec.delay) tg.c += spec.delay;
@@ -18496,23 +18561,37 @@ body.mg-on .toast[hidden]{display:none}
       card.hidden = !active;
       if (active) tamControls(false);
     }
-    const front = active ? F.P.findIndex(p => p.hp > 0) : -1;
-    const spec = active && F.wind.spec, brace = $('#tmBrace');
+    const wind = active ? F.wind : null, targets = active ? tamWindTargets(F) : [];
     if (active) {
+      const { spec, prepared, answer, sign, links, need } = wind, brace = $('#tmBrace');
+      const left = tamWindLeft(F), timing = spec.timing;
       card.dataset.trial = spec.key;
-      card.style.setProperty('--wind-left', (F.wind.until - F.t) / spec.seconds);
+      card.style.setProperty('--wind-left', left);
       setTx($('#tmWindTitle'), spec.title);
-      setTx($('#tmWindHint'), F.wind.braced ? '물결을 받을 준비가 됐어요' : spec.hint);
+      const inTime = timing && left >= timing[0] && left <= timing[1];
+      let hint = prepared ? spec.ready : spec.hint;
+      if (sign) hint = answer ? '표식이 달라요. 책장이 날아와요!' : `책에 ‘${TAM_SIGNS[sign]}’ 표식이 보여요. 같은 것을 골라요`;
+      if (timing && !prepared) hint = inTime ? '지금 발을 맞춰요!' : left < timing[0] ? '발을 맞출 시간이 지났어요' : spec.hint;
+      if (links) hint = `필살기 ${links.length}/${need} · ${need === 1 ? '대원의 필살기를 써요' : '서로 다른 대원의 필살기를 써요'}`;
+      setTx($('#tmWindHint'), hint);
       setHid(brace, !spec.guard);
-      brace.disabled = F.wind.braced;
-      setTx(brace, F.wind.braced ? '준비 완료' : '몸 낮추기');
+      brace.disabled = prepared;
+      setTx(brace, prepared ? '준비 완료' : spec.button || '');
+      card.classList.toggle('in-time', !!inTime && !prepared);
+      if (timing) {
+        card.style.setProperty('--wind-zone-start', `${timing[0] * 100}%`);
+        card.style.setProperty('--wind-zone-width', `${(timing[1] - timing[0]) * 100}%`);
+      }
+      setHid($('#tmWindSigns'), !spec.signs);
+      if (spec.signs) $$('[data-tam-sign]', card).forEach(button => { button.disabled = !!answer; });
     }
     if (P) P.forEach((el, i) => {
-      const target = i === front || (!!spec.guard && F.P[i].hp > 0);
+      const target = targets.includes(F.P[i]);
       el.classList.toggle('wind-target', target);
-      el.classList.toggle('wind-guarded', target && active && F.wind.braced);
+      el.classList.toggle('wind-guarded', target && wind.prepared);
+      el.classList.toggle('wind-linked', !!wind?.links?.includes(F.P[i]));
     });
-    else $$('#tmP .wind-target').forEach(el => el.classList.remove('wind-target', 'wind-guarded'));
+    else $$('#tmP .wind-target,#tmP .wind-linked').forEach(el => el.classList.remove('wind-target', 'wind-guarded', 'wind-linked'));
     if (boss) boss.classList.toggle('wind-up', active);
     else $('#tmM .wind-up')?.classList.remove('wind-up');
   }
@@ -18567,7 +18646,8 @@ body.mg-on .toast[hidden]{display:none}
           { scale: '1' }, { scale: '1.035', offset: .23 }, { scale: '1' }
         ], { duration: 310 / speed, easing: 'ease-out' });
       }
-      sfx('tamCounter'); tamToast(F.wind.spec.blocked);
+      const { spec, need } = F.wind;
+      sfx('tamCounter'); tamToast(need === 1 ? spec.soloBlocked : spec.blocked);
       tamBars(F);
     });
     return { hit, heal: hit, counter: true };
@@ -18579,12 +18659,25 @@ body.mg-on .toast[hidden]{display:none}
     let actor = -1, sk = null;   // sk: 필살기 연출 시계로 맞는 때와 회복되는 때
     F.ev.forEach((e, ei) => {
       if (e.k === 'wind') { sfx('tamWind'); }
+      else if (e.k === 'wind-answer' || e.k === 'wind-link') {
+        const answered = e.k === 'wind-answer';
+        sfx(answered ? 'tamCounter' : 'tap');
+        if (answered) tamToast(F.wind.spec.blocked);
+        if (!rt.reduced) {
+          const [x, y] = tamAt(answered ? M[0] : P[e.p], .48), art = IMG(F.wind.spec.art);
+          tamFxImg('tm-shot tm-answer-fx', art, x, y, [
+            { t: 'scale(.5) rotate(-14deg)', opacity: .95 },
+            { dy: -19, t: 'scale(1.3) rotate(9deg)', opacity: .8, offset: .42 },
+            { dy: -36, t: 'scale(1.6) rotate(23deg)', opacity: 0 }
+          ], 480 / tamSpdK());
+        }
+      }
       else if (e.k === 'wind-hit') {
         const spec = F.wind.spec;
         sfx('tamCounter'); tamToast(e.braced ? spec.blocked : spec.landed);
         if (!rt.reduced) {
           const [x, y] = tamAt(P[e.p], .66), [bx, by] = tamAt(M[e.m], .66), art = IMG(spec.art);
-          if (spec.guard) tamFxImg('tm-shot tm-wave-impact', art, x, y, [
+          if (spec.guard) tamFxImg(`tm-shot ${spec.timing ? 'tm-frost-impact' : 'tm-wave-impact'}`, art, x, y, [
             { t: 'scale(.55,.45)', opacity: .9 },
             { dx: -20, dy: -7, t: 'scale(1.15,.8)', opacity: .8, offset: .4 },
             { dx: -44, dy: -18, t: 'scale(1.4,.92)', opacity: 0 }
@@ -19071,6 +19164,11 @@ body.mg-on .toast[hidden]{display:none}
     if (b.id === 'tmBrace') {
       const F = rt.tam?.F;
       if (tamBrace(F)) { sfx('tap'); tamWindPaint(F, $$('#tmP .tm-f'), $('#tmM .boss')); }
+      return;
+    }
+    if (b.dataset.tamSign) {
+      const F = rt.tam?.F;
+      if (tamWindAnswer(F, b.dataset.tamSign)) { tamDraw(F); F.ev.length = 0; }
       return;
     }
     if (b.getAttribute('aria-disabled') === 'true' && !(b.dataset.tlv && S.budget >= tamLvCost(b.dataset.tlv))) { if (b.dataset.tlv) tamToast('도토리가 모자라요\n문방구에서 숲의 정수로 도토리를 살 수 있어요'); else if (b.dataset.tgear) tamToast('재료가 모자라요'); return; }
@@ -34042,6 +34140,9 @@ body.mg-on .toast[hidden]{display:none}
       <option value="10">들꽃 운동장 · 10층</option>
       <option value="60">버섯 텃밭 · 60층</option>
       <option value="110">안개 연못 · 110층</option>
+      <option value="160">단풍 도서관 · 160층</option>
+      <option value="210">눈 내린 뒤뜰 · 210층</option>
+      <option value="260">별빛 천문대 · 260층</option>
     </select>
   </label>
   <label>보스전 대원
@@ -34108,7 +34209,8 @@ body.mg-on .toast[hidden]{display:none}
   });
   document.getElementById('expeditionBoss').addEventListener('click', () => {
     const F = prepare(), floor = Number(document.getElementById('expeditionFloor').value);
-    Object.assign(F.S, {tier: floor === 10 ? 0 : 1, tg: floor === 110 ? 3 : 0, sem: floor === 60 ? 1 : 0});
+    const [tier, tg, sem] = {10:[0,0,0], 60:[1,0,1], 110:[1,3,0], 160:[1,5,1], 210:[2,1,1], 260:[2,2,0]}[floor];
+    Object.assign(F.S, {tier, tg, sem});
     Object.assign(F.S.tam, { best: floor - 1, hm: 0, seen: 1, auto: 0, it: F.gameNow(), spd: { sec: 0 } });
     const choice = document.getElementById('expeditionParty').value;
     F.S.tam.party = choice === 'team' ? ['bear', 'rabbit', 'fox'] : [choice];
