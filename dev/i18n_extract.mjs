@@ -37,6 +37,7 @@ function segments(raw, josa, file) {
   let s = raw.replace(/<!--[\s\S]*?-->/g, ' ')
     .replace(/<svg[\s\S]*?<\/svg>/gi, '\u0004')
     .replace(/<(?:img|picture|object|iframe)\b[^>]*>/gi, '\u0004')
+    .replace(new RegExp('<(' + INLINE + ')\\b[^>]*\\bid=[^>]*>(?:(?!<\\1\\b)[\\s\\S])*?<\\/\\1>', 'gi'), '\u0004')   // id가 있는 작은 칸(숫자 칸)은 통째 자리
     .replace(/^[^<>]*?["'=][^<>]*>/, ' ')               // 태그 중간에서 시작한 조각
     .replace(/<[a-zA-Z\/][^>]*$/, ' ');                 // 태그 중간에서 끝난 조각
   const parts = s.split(new RegExp('<\\/?(?:' + BLOCK + ')\\b[^>]*>', 'i'));
@@ -46,6 +47,8 @@ function segments(raw, josa, file) {
       .replace(/<br\b[^>]*>/gi, '<br>')
       .replace(/<(?!\/?(?:b|strong|i|em|small|span|u|mark|sup|sub|s|a|code|q|abbr|time|var|kbd|ins|del|br)>)[^>]*>/gi, ' ');
     emit(seg, josa, file);
+    // 덩어리가 화면에서 따로 바뀔 때(글 조각마다)를 위해 태그 사이 조각도 열쇠로 둬요
+    if (/<|\u0004/.test(seg)) for (const pc of seg.split(/<[^>]*>|\u0004/)) if (pc.trim() && pc.trim() !== seg.trim()) emit(pc, josa, file);
   }
 }
 function emit(seg, josa, file) {
