@@ -17,7 +17,7 @@
 | `srcbuild.py`, `src_parts.txt` | 원본 나누기와 잇기. `build`(src/ → forest-school.html), `split`(거꾸로), `check`(같은지만) |
 | `forest-school.html` | `src/`를 이어 붙인 게임 전체(코드와 글, 2.9MB). 그림은 주소(`img/a/열쇠-지문.webp`)만 있고 바이트는 저장소 맨 위 `img/a` 파일에 있어요(2026-11-17부터. 그 전에는 base64로 품어 40MB였어요) |
 | `imglib.py`, `img_out.py` | 그림을 원본 밖 파일로 두는 도구. `python3 img_out.py`(원본에 남은 base64 그림을 파일로 꺼냄, 여러 번 돌려도 같음), `--check`(주소마다 파일이 있고 이름의 지문이 내용과 맞는지), `--inline 파일`(그림을 품은 옛 꼴 한 파일로 만들기. 되돌리거나 한 파일로 건넬 때) |
-| `build_gh.py` | 원본으로 GitHub 판 만들기. `python3 build_gh.py ..` 하면 저장소 맨 위 `index.html`이 새로 생겨요 |
+| `build_gh.py` | 원본으로 GitHub 판 만들기. `python3 build_gh.py ..` 하면 저장소 맨 위 `index.html`이 새로 생겨요. 첫머리 github-only 구간에 컴퓨터 웹 크게 보기(DESK, 마우스 넓은 화면이면 같은 주소를 iframe에 담아 키움)가 들어가요 |
 | `gh_README.md`, `gh_database.rules.json` | GitHub 판의 README와 데이터베이스 규칙 원본 |
 | `wrap.py` | 시험용 `test.html` 만들기. 시험판은 `file://` 주소라 그림(`img/a`)과 곡(`audio`)을 글 안에 base64로 다시 넣어요 |
 | `s*test.py`, `fbtest/` | Playwright 자동 시험 (가짜 Firebase 서버 포함) |
