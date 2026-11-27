@@ -40,15 +40,154 @@
     });
   }
   const tHas = ko => LANG !== 'ko' && I18N[ko] !== undefined;
-  // 처음부터 화면에 적혀 있는 글(src/page)과 이름표(aria-label, title, placeholder, alt)를 사전대로 바꿔요
+  /* 화면 글 바꾸기: 게임 코드는 한국어 글을 그대로 화면에 넣고, 여기서 화면에 들어온 글을 사전대로 바꿔요.
+     사전 열쇠는 dev/i18n_extract.mjs가 원본에서 모은 모양이에요. {0} {name}은 바뀌는 자리, {0|을}은 조사가 붙는 자리,
+     <b> </b> 같은 글 안 태그는 속성 없이 적어요. 한국어 화면에서는 아무것도 하지 않아요 */
+  const TR_JOSA = { '을': '(?:을|를)', '를': '(?:을|를)', '이': '(?:이|가)', '가': '(?:이|가)', '은': '(?:은|는)', '는': '(?:은|는)', '와': '(?:와|과)', '과': '(?:와|과)', '로': '(?:으로|로)', '으로': '(?:으로|로)' };
+  const TR_HOLE = /\{(\w+)(?:\|([가-힣]+))?\}/g;
+  const TR_INLINE = new Set(['B', 'STRONG', 'I', 'EM', 'SMALL', 'SPAN', 'U', 'MARK', 'SUP', 'SUB', 'S', 'A', 'CODE', 'Q', 'ABBR', 'TIME', 'VAR', 'KBD', 'INS', 'DEL']);
+  const TR_ATOM = new Set(['IMG', 'SVG', 'PICTURE', 'CANVAS']);
+  const TR_ATTR = ['aria-label', 'title', 'placeholder', 'alt', 'data-tip'];
+  const HAN = /[가-힣]/;
+  let TR_EX = null, TR_PRE = null, TR_SUF = null;
+  const TR_CACHE = new Map(), TR_MISS = new Map();
+  const trEsc = x => x.replace(/[.*+?^${}()|[\]\\]/g, '\\$&');
+  const trNorm = x => x.replace(/[\s\u00a0]+/g, ' ').trim();
+  function trBuild() {
+    TR_EX = new Map(); TR_PRE = new Map(); TR_SUF = new Map();
+    const put = (m, c, p) => { let a = m.get(c); if (!a) m.set(c, a = []); a.push(p); };
+    for (const [k, v] of Object.entries(I18N)) {
+      if (v === null || v === undefined || v === '') continue;
+      if (!/\{\w+(?:\|[가-힣]+)?\}/.test(k)) { TR_EX.set(k, v); continue; }
+      const names = []; let re = '^', last = 0;
+      k.replace(TR_HOLE, (m, nm, j, off) => { re += trEsc(k.slice(last, off)) + '(.+?)' + (j && TR_JOSA[j] ? TR_JOSA[j] : ''); names.push(nm); last = off + m.length; return m; });
+      re += trEsc(k.slice(last)) + '$';
+      const lits = k.split(/\{\w+(?:\|[가-힣]+)?\}/), pre = lits[0], suf = lits[lits.length - 1];
+      const p = { re: new RegExp(re, 's'), names, v, w: lits.join('').length };
+      if (pre) put(TR_PRE, pre.slice(0, 1), p); else put(TR_SUF, suf.slice(-1), p);
+    }
+    for (const m of [TR_PRE, TR_SUF]) for (const a of m.values()) a.sort((x, y) => y.w - x.w);
+  }
+  function trPick(v, g) {                        // 복수형: 첫 숫자 자리로 골라요
+    if (typeof v === 'string') return v;
+    const x = g.find(y => /\d/.test(y)); const n = x ? Number(String(x).replace(/[^\d.]/g, '')) : 2;
+    return v[plural(isFinite(n) ? n : 2)] || v.other || '';
+  }
+  // 글 하나를 바꿔요. 못 바꾸면 그대로 돌려줘요
+  function trStr(s, d = 0) {
+    if (LANG === 'ko' || !s || !HAN.test(s)) return s;
+    if (!TR_EX) trBuild();
+    const m = /^(\s*)([\s\S]*?)(\s*)$/.exec(s), core = trNorm(m[2]);
+    let r = TR_CACHE.get(core);
+    if (r === undefined) {
+      r = null;
+      const ex = TR_EX.get(core);
+      if (ex !== undefined) r = trPick(ex, []);
+      else {
+        const cand = [...(TR_PRE.get(core.slice(0, 1)) || []), ...(TR_SUF.get(core.slice(-1)) || [])];
+        for (const p of cand) {
+          const g = p.re.exec(core); if (!g) continue;
+          const vals = {}; p.names.forEach((nm, i) => { vals[nm] = g[i + 1]; });
+          const tpl = trPick(p.v, g.slice(1));
+          r = tpl.replace(TR_HOLE, (h, nm) => nm in vals ? (d < 3 ? trStr(vals[nm], d + 1) : vals[nm]) : h);
+          break;
+        }
+      }
+      if (r === null && window.__FOREST_TEST && d === 0) TR_MISS.set(core, (TR_MISS.get(core) || 0) + 1);
+      if (TR_CACHE.size > 6000) TR_CACHE.clear();
+      TR_CACHE.set(core, r);
+    }
+    return r === null ? s : m[1] + r + m[3];
+  }
+  const trSkip = el => !!(el.closest && el.closest('script,style,textarea,[data-i18n-skip],[contenteditable="true"]'));
+  // 글 덩어리(안에 글과 굵은 글씨 같은 태그만 있는 칸)인지. id가 있는 칸이나 입력 칸이 안에 있으면 덩어리로 다루지 않아요
+  function trLeaf(el) {
+    for (const c of el.childNodes) {
+      if (c.nodeType === 3 || c.nodeType === 8) continue;
+      if (c.nodeType !== 1) return false;
+      if (TR_ATOM.has(c.tagName.toUpperCase())) { if (c.id) return false; continue; }
+      if (c.tagName === 'BR') continue;
+      if (!TR_INLINE.has(c.tagName) || c.id || !trLeaf(c)) return false;
+    }
+    return true;
+  }
+  const trHtml = x => x.replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;');
+  function trUnit(el) {                          // 덩어리 하나를 통째로 바꿔요
+    const opens = {}, atoms = [];
+    const ser = n => {
+      let o = '';
+      for (const c of n.childNodes) {
+        if (c.nodeType === 3) o += c.nodeValue;
+        else if (c.nodeType !== 1) continue;
+        else if (c.tagName === 'BR') o += '<br>';
+        else if (TR_ATOM.has(c.tagName.toUpperCase())) { o += '\u0004' + atoms.length + '\u0005'; atoms.push(c.outerHTML); }
+        else { const tg = c.tagName.toLowerCase(), sh = c.cloneNode(false).outerHTML; (opens[tg] = opens[tg] || []).push(sh.slice(0, sh.lastIndexOf('</'))); o += '<' + tg + '>' + ser(c) + '</' + tg + '>'; }
+      }
+      return o;
+    };
+    const src = ser(el);
+    if (!HAN.test(src)) return;
+    const out = trStr(src);
+    if (out === src) { trTexts(el); return; }
+    const used = {};
+    let h = trHtml(out).replace(/&lt;(\/?)([a-z]+)&gt;/g, (m, c, tg) => {
+      if (tg === 'br') return c ? '' : '<br>';
+      if (!opens[tg]) return '';
+      if (c) return '</' + tg + '>';
+      const i = used[tg] = (used[tg] || 0) + 1;
+      return opens[tg][Math.min(i, opens[tg].length) - 1];
+    }).replace(/\u0004(\d+)\u0005/g, (m, i) => atoms[+i] || '');
+    el.innerHTML = h;
+  }
+  function trTexts(el) {                         // 글 조각을 하나씩 바꿔요
+    const tw = document.createTreeWalker(el, NodeFilter.SHOW_TEXT);
+    const list = []; while (tw.nextNode()) if (HAN.test(tw.currentNode.nodeValue)) list.push(tw.currentNode);
+    for (const x of list) { const r = trStr(x.nodeValue); if (r !== x.nodeValue) x.nodeValue = r; }
+  }
+  function trAttrs(el) {
+    for (const a of TR_ATTR) { const v = el.getAttribute(a); if (v && HAN.test(v)) { const r = trStr(v); if (r !== v) el.setAttribute(a, r); } }
+  }
+  function trEl(el) {
+    if (LANG === 'ko' || !el) return;
+    if (el.nodeType === 3) { const p = el.parentNode; if (p && p.nodeType === 1) trEl(p); return; }
+    if (el.nodeType !== 1 || trSkip(el)) return;
+    if (el.hasAttribute && TR_ATTR.some(a => el.hasAttribute(a))) trAttrs(el);
+    for (const a of el.querySelectorAll('[aria-label],[title],[placeholder],[alt],[data-tip]')) if (!trSkip(a)) trAttrs(a);
+    if (!HAN.test(el.textContent)) return;
+    if (trLeaf(el)) {
+      const kids = [...el.childNodes].filter(c => c.nodeType === 3 || c.nodeType === 1);
+      if (kids.length === 1 && kids[0].nodeType === 3) { const r = trStr(kids[0].nodeValue); if (r !== kids[0].nodeValue) kids[0].nodeValue = r; }
+      else trUnit(el);
+      return;
+    }
+    for (const c of [...el.childNodes]) {
+      if (c.nodeType === 3) { if (HAN.test(c.nodeValue)) { const r = trStr(c.nodeValue); if (r !== c.nodeValue) c.nodeValue = r; } }
+      else if (c.nodeType === 1) trEl(c);
+    }
+  }
+  // 처음 화면과 그 뒤에 바뀌는 화면을 지켜봐요
+  let TR_OBS = null; const TR_Q = new Set(); let TR_QON = false;
+  function trFlush() {
+    TR_QON = false;
+    const list = [...TR_Q]; TR_Q.clear();
+    for (const n of list) { if (n.isConnected) trEl(n); }
+    if (document.title && HAN.test(document.title)) document.title = trStr(document.title);
+  }
   function i18nDom(root) {
     if (LANG === 'ko' || !root) return 0;
-    let n = 0;
-    const tw = document.createTreeWalker(root, NodeFilter.SHOW_TEXT, { acceptNode: x => /[가-힣]/.test(x.nodeValue) && !x.parentNode.closest('script,style,[data-i18n-skip]') ? NodeFilter.FILTER_ACCEPT : NodeFilter.FILTER_REJECT });
-    const list = []; while (tw.nextNode()) list.push(tw.currentNode);
-    for (const x of list) { const k = x.nodeValue.trim(), v = I18N[k]; if (typeof v === 'string') { x.nodeValue = x.nodeValue.replace(k, v); n += 1; } }
-    for (const a of ['aria-label', 'title', 'placeholder', 'alt']) for (const e of root.querySelectorAll(`[${a}]`)) { const k = e.getAttribute(a).trim(), v = I18N[k]; if (typeof v === 'string') { e.setAttribute(a, v); n += 1; } }
-    return n;
+    trEl(root);
+    if (!TR_OBS && typeof MutationObserver !== 'undefined') {
+      TR_OBS = new MutationObserver(recs => {
+        for (const r of recs) {
+          if (r.type === 'childList') for (const n of r.addedNodes) TR_Q.add(n.nodeType === 3 ? n.parentNode : n);
+          else if (r.type === 'characterData') TR_Q.add(r.target.parentNode);
+          else TR_Q.add(r.target);
+        }
+        if (!TR_QON) { TR_QON = true; queueMicrotask(trFlush); }
+      });
+      TR_OBS.observe(document.documentElement, { childList: true, subtree: true, characterData: true, attributes: true, attributeFilter: TR_ATTR });
+    }
+    return 1;
   }
   // 일본어는 둥근 일본어 글꼴을 불러와요(한국어 글꼴에는 가나가 없어요)
   function langFont() {
