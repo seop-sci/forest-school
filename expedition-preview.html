@@ -29865,7 +29865,9 @@ body.mg-on .toast[hidden]{display:none}
     $('#panelTam').addEventListener('click', tamClick);
     $('#tmMapBody').addEventListener('click', e => {
       const option = e.target.closest('[data-tam-practice]');
-      if (option && rt.modalOpen === $('#mTamMap')) closeModal($('#mTamMap'), () => tamPractice(Number(option.dataset.tamPractice)));
+      if (!option || rt.modalOpen !== $('#mTamMap')) return;
+      closeModal($('#mTamMap'));
+      tamPractice(Number(option.dataset.tamPractice));
     });
     $('#panelTam').addEventListener('keydown', e => {
       if (e.key === 'Escape' && !$('#tmActions').hidden) { e.stopPropagation(); tamControls(false); }
