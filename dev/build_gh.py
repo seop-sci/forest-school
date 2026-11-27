@@ -20,6 +20,33 @@ ICON = ("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0
         "%3Cpath d='M15 30c0 17 8 28 17 29 9-1 17-12 17-29z' fill='%23D9A55B'/%3E"
         "%3Cpath d='M10 30c0-10 10-17 22-17s22 7 22 17z' fill='%238A5D3B'/%3E%3C/svg%3E")
 
+# 컴퓨터 웹 크게 보기: 마우스로 쓰는 넓은 화면이면 같은 주소를 iframe에 담아 통째로 키워요.
+# 게임 안은 휴대폰 화면처럼 그대로라 끌기, 누르기 자리 계산을 고칠 필요가 없어요. github-only 구간이라 앱(토스, 안드로이드)에는 들어가지 않고,
+# 터치 화면(휴대폰, 태블릿, 터치 노트북)과 좁은 창, 창 안에서 열린 판(iframe 안)은 그대로예요. 시험은 __FOREST_TEST일 때 꺼지고 __FOREST_DZ로 켜요
+DZ_H, DZ_W, DZ_MAX = 760, 520, 1.6   # 게임 화면이 이만큼(세로 760, 가로 520)은 보이게 두고 키워요. 가장 크게는 1.6배
+DESK = """<script>
+(function () {
+  try {
+    if (window.top !== window || (window.__FOREST_TEST && !window.__FOREST_DZ) || /[?&]dz=0/.test(location.search)) return;   // 주소 끝에 ?dz=0을 붙이면 예전처럼
+    var mm = window.matchMedia;
+    if (!mm || !mm('(hover: hover) and (pointer: fine)').matches || mm('(any-pointer: coarse)').matches) return;
+    var Z = function () { return Math.min(%(mx)s, innerHeight / %(h)s, innerWidth / %(w)s); };
+    if (Z() < 1.08) return;
+    window.stop();
+    document.documentElement.innerHTML = '<head><meta charset="utf-8"><title>숲속 동물 학교</title><link rel="icon" href="%(icon)s">'
+      + '<style>html,body{margin:0;height:100%%;overflow:hidden;background:#2C4A3D}#fsDz{position:fixed;left:0;top:0;border:0;transform-origin:0 0;display:block}</style></head><body></body>';
+    var f = document.createElement('iframe');
+    f.id = 'fsDz'; f.title = '숲속 동물 학교';
+    f.setAttribute('allow', 'identity-credentials-get; autoplay; clipboard-write; fullscreen');
+    function fit() { var z = Math.max(1, Z()); f.style.width = (innerWidth / z) + 'px'; f.style.height = (innerHeight / z) + 'px'; f.style.transform = 'scale(' + z + ')'; window.__FOREST_DZ_Z = z; }
+    fit(); window.addEventListener('resize', fit);
+    f.addEventListener('load', function () { try { f.focus(); } catch (e) { /* 무시 */ } });
+    f.src = location.href;
+    document.body.appendChild(f);
+  } catch (e) { /* 크게 보기를 못 하면 그대로 열어요 */ }
+})();
+</script>""" % {'mx': DZ_MAX, 'h': DZ_H, 'w': DZ_W, 'icon': ICON.replace("'", "%27")}
+
 LOADER = """<script src="config.js"></script>
 <script>
   /* Firebase SDK는 config.js에 설정이 있을 때만 불러와요.
@@ -101,6 +128,7 @@ DOC = f"""<!doctype html>
 <meta name="description" content="도토리를 모아 숲속 학교를 키우는 방치형 게임 테스트판이에요.">
 <style>html,body{{margin:0}}</style>
 <!-- github-only -->
+{DESK}
 <meta property="og:type" content="website">
 <meta property="og:title" content="숲속 동물 학교">
 <meta property="og:description" content="도토리를 모아 숲속 학교를 키워요. 테스트판이에요.">
