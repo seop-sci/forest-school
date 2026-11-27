@@ -902,14 +902,12 @@
       `<button type="button" data-tseg="${k}" aria-pressed="${seg === k}">${ic[k] ? `<img src="${ic[k]}" alt="">` : ''}<span>${n}</span>${dot ? '<i class="tm-dot"></i>' : ''}</button>`).join(''));
     const sh = $('#tmSheet'), open = sh && !sh.hidden;   // 아래 메뉴: 빨간 점, 열린 창 이름
     $$('#tmNav [data-tnav]').forEach(b => { const k = b.dataset.tnav; b.classList.toggle('dot', k === 'mem' ? !!can : k === 'gear' ? gc : k === 'rep' ? tamIdle().sec >= 60 : k === 'exp' ? txDot() : false); b.setAttribute('aria-pressed', String(open && seg === k)); });
-    $('#tmSeg').hidden = seg === 'exp';
-    if (open) $('#tmShT').textContent = { mem: '대원', gear: '장비', mat: '재료', exp: '원정' }[seg] || '대원';
+    if (open) $('#tmShT').textContent = { mem: '대원', gear: '장비', mat: '재료' }[seg] || '대원';
   }
   function tamRenderBody() {
     const box = $('#tmBody'); if (!box || !tamOn()) return;
     const seg = rt.tamSeg || 'mem', rec = tamUpRec();
     tamTabs(seg, rec);
-    if (seg === 'exp') { setH(box, txRender()); return; }
     if (seg === 'mem') {
       const party = tamParty(), slots = tamSlots(), auto = tamAutoTeam(), same = auto.length === party.length && auto.every(k => party.includes(k));
       const R = rec.mem, rs = R && tamStat(R.sp);
@@ -968,7 +966,7 @@
     if (!S.tam.seen) { S.tam.seen = 1; S.tam.it = S.tam.it || gameNow(); save();   // 처음 열면 소개 장면(자동 시험에서는 __TAM_INTRO일 때만)
       const shown = !(window.__FOREST_TEST && !window.__TAM_INTRO) && stPlay('tam', false);
       if (!shown) tamToast('밤이면 학교에 숲의 장난꾸러기들이 와요!\n탐험대와 함께 달래 주러 가요'); }
-    tamUiInit(); tamSkStop(); tamRenderTop(); tamSync(); tamRenderBody();
+    tamUiInit(); tamSkStop(); txClose(); tamRenderTop(); tamSync(); tamRenderBody();
     { const today = gameToday(), en = $('#tmEnter'); if (en && S.tam.ed !== today && !window.__FOREST_TEST) { S.tam.ed = today; save(); en.hidden = false; en.style.animation = 'none'; void en.offsetWidth; en.style.animation = ''; clearTimeout(en._t); en._t = setTimeout(() => { en.hidden = true; }, 1600); } }   // 입장 장면은 하루 처음만
     tamReport(true);
   }
@@ -1007,6 +1005,7 @@
     if (b.id === 'tmExit') { sfx('tap'); setTab('school'); return; }
     if (b.id === 'tmShX') { sfx('tap'); $('#tmSheet').hidden = true; tamRenderBody(); return; }
     if (b.dataset.tnav) { const k = b.dataset.tnav; sfx('tap');
+      if (k === 'exp') { $('#tmSheet').hidden = true; txOpen(); return; }
       if (k === 'rank') { rt.rankView = 'tam'; setTab('rank'); rt.backTab = 'tam'; return; }   // 닫으면 탐험으로
       if (k === 'rep') { tamReport(false); return; }
       const sh = $('#tmSheet'); if (!sh.hidden && rt.tamSeg === k) { sh.hidden = true; tamRenderBody(); return; }

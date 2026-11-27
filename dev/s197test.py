@@ -5,7 +5,7 @@
 # 4) 큰 장난꾸러기를 달래면 그 지역 못 찾은 보물 하나, 받기를 누르면 재료, 도토리, 정수, 보물이 들어와요. 다 모으면 별 조각
 # 5) 지거나 돌아와도 모은 것은 가져와요
 # 6) 저장 읽기: 옛 저장(원정 없음), 망가진 원정 값 바로잡기, 다시 읽어도 원정이 남음
-# 7) 화면: 360px 어두운 화면, 390px 밝은 화면에서 지도, 카드, 넘침 없음(캡처 s197_*), 건물 창 그림
+# 7) 화면: 원정은 탐험 화면을 통째로 덮는 화면. 360px 어두운 화면, 390px 밝은 화면에서 지도, 카드, 대원 자리, 닫기, 넘침 없음(캡처 s197_*), 건물 창 그림
 import asyncio
 from playwright.async_api import async_playwright
 from testlib import base, ctxpage, Checker, CLEAN, F, OVER
@@ -94,27 +94,32 @@ async def main():
             r = await pg.evaluate(f"""async()=>{{ const F={F}, S=F.S, o={{}}, sl=ms=>new Promise(r=>setTimeout(r,ms));
               S.tam.best = 40; S.tam.seen = 1;
               F.setTab('tam'); await sl(900); document.querySelectorAll('.overlay').forEach(x => {{ x.hidden = true; x.classList.remove('open'); }}); F.rt4.modalOpen = null;
-              const nb = document.querySelector('#tmNav [data-tnav="exp"]'); o.nav = !!nb && !nb.hidden; o.dot = nb.classList.contains('dot'); nb.click(); await sl(500);
-              o.title = document.querySelector('#tmShT').textContent; o.tabsHid = document.querySelector('#tmSeg').hidden;
-              o.nodes = document.querySelectorAll('#tmBody .tx-map .tx-n').length; o.mapBg = (document.querySelector('#tmBody .tx-map').getAttribute('style') || '').includes('url');
-              o.tr = document.querySelectorAll('#tmBody .tx-tr span').length;
+              const nb = document.querySelector('#tmNav [data-tnav="exp"]'); o.nav = !!nb && !nb.hidden; o.dot = nb.classList.contains('dot'); nb.click(); await sl(600);
+              const fu = document.querySelector('#txFull'), fr = fu.getBoundingClientRect(), pr = document.querySelector('#panelTam').getBoundingClientRect();
+              o.full = !fu.hidden && Math.abs(fr.width - pr.width) < 2 && Math.abs(fr.height - pr.height) < 2 && document.querySelector('#tmSheet').hidden;
+              o.title = document.querySelector('#txTop .tx-ttl b').textContent;
+              o.nodes = document.querySelectorAll('#txMap .tx-n').length; o.mapBg = (document.querySelector('#txMap').getAttribute('style') || '').includes('url');
+              o.tr = document.querySelectorAll('#txPan .tx-tr span').length; o.tk = document.querySelector('#txTop .tx-tk b').textContent;
               const navR = nb.getBoundingClientRect(); o.navW = navR.width;
-              document.querySelector('[data-txgo]').click(); await sl(400); o.running = !!S.tam.xp.run;
-              document.querySelector('[data-txstep]').click(); await sl(300); document.querySelector('[data-txstep]').click(); await sl(400);
-              o.cards = document.querySelectorAll('#tmBody .tx-card').length; o.cardImg = document.querySelectorAll('#tmBody .tx-card img').length;
+              document.querySelector('[data-txgo]').click(); await sl(400); o.running = !!S.tam.xp.run; o.tk2 = document.querySelector('#txTop .tx-tk b').textContent;
+              document.querySelector('[data-txstep]').click(); await sl(300); document.querySelector('[data-txstep]').click(); await sl(900);
+              o.cards = document.querySelectorAll('#txPan .tx-card').length; o.cardImg = document.querySelectorAll('#txPan .tx-card img').length;
+              const me = document.querySelector('#txMap .tx-me').getBoundingClientRect(), cur = document.querySelector('#txMap .tx-n.cur').getBoundingClientRect(), mw = document.querySelector('#txMapW').getBoundingClientRect();
+              o.meNear = Math.abs((me.left + me.width / 2) - (cur.left + cur.width / 2)) < 3 && cur.top >= mw.top && cur.bottom <= mw.bottom;
               return o; }}""")
             await pg.screenshot(path=f's197_{w}_{sch}_fork.png')
-            over = await pg.evaluate(OVER, '#tmBody *, #tmNav button, .tm-sheet')
+            over = await pg.evaluate(OVER, '#txFull, #txPan *, #txTop *, #tmNav button')
             r2 = await pg.evaluate(f"""async()=>{{ const F={F}, S=F.S, sl=ms=>new Promise(r=>setTimeout(r,ms));
-              document.querySelector('#tmBody .tx-card').click(); await sl(300);
+              document.querySelector('#txPan .tx-card').click(); await sl(300);
               const run = S.tam.xp.run; let g = 0; while (!run.end && g++ < 30) {{ if (F.TEX.plan[run.at] === 'fork' && run.pk[run.at] < 0) F.txPick(0); else F.txStep(); }}
-              F.tamRenderBody(); await sl(300); return {{ take: !!document.querySelector('[data-txtake]'), end: run.end }}; }}""")
+              F.txDraw(); await sl(900); return {{ take: !!document.querySelector('[data-txtake]'), end: run.end }}; }}""")
             await pg.screenshot(path=f's197_{w}_{sch}_end.png')
             r3 = await pg.evaluate(f"""async()=>{{ const sl=ms=>new Promise(r=>setTimeout(r,ms)); document.querySelector('[data-txtake]').click(); await sl(400);
-              return {{ run: window.__forest.S.tam.xp.run, go: !!document.querySelector('[data-txgo]') }}; }}""")
-            c.ok(r['nav'] and r['dot'] and r['title'] == '원정' and r['tabsHid'] and r['nodes'] == 12 and r['mapBg'] and r['tr'] == 5 and r['navW'] >= 50, f'{w} 원정 화면 {r}')
-            c.ok(r['running'] and r['cards'] == 3 and r['cardImg'] == 3, f'{w} 갈림길 카드 {r}')
-            c.ok(r2['take'] and r3['run'] is None and r3['go'], f'{w} 받기 {r2} {r3}')
+              const o = {{ run: window.__forest.S.tam.xp.run, go: !!document.querySelector('[data-txgo]') }};
+              document.querySelector('#txTop [data-txx]').click(); await sl(300); o.closed = document.querySelector('#txFull').hidden; return o; }}""")
+            c.ok(r['nav'] and r['dot'] and r['full'] and r['title'] == '들꽃 운동장' and r['nodes'] == 12 and r['mapBg'] and r['tr'] == 5 and r['tk'] == '3' and r['navW'] >= 50, f'{w} 원정 전체 화면 {r}')
+            c.ok(r['running'] and r['tk2'] == '2' and r['cards'] == 3 and r['cardImg'] == 3 and r['meNear'], f'{w} 갈림길 카드와 대원 자리 {r}')
+            c.ok(r2['take'] and r3['run'] is None and r3['go'] and r3['closed'], f'{w} 받기와 닫기 {r2} {r3}')
             c.ok(not over, f'{w} {sch} 넘침 {over}')
             if w == 390:
                 r = await pg.evaluate(f"""async()=>{{ const F={F}, sl=ms=>new Promise(r=>setTimeout(r,ms)); F.setTab('school'); await sl(300); F.openSheet('library'); await sl(400);

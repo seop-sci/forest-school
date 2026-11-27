@@ -202,72 +202,116 @@
       E.pk && E.other ? '다른 재료 꾸러미' : E.pk ? `재료 꾸러미${E.pk < 1 ? ' 조금' : ''}` : '', E.box ? '재료 꾸러미 둘, 아니면 장난꾸러기' : '', E.skip ? '다음 싸움을 건너뛰어요' : '',
       E.boss ? `큰 장난꾸러기 재료 +${pc(E.boss)}%` : '', E.ac ? `도토리(수업료 ${E.ac}분치)` : '', E.st ? `별 조각 +${E.st}` : ''].filter(Boolean).join(', ');
   }
-  function txMap(run, ri) {
-    const R = txReg(ri), P = TEX.map[R.k], bg = IMG('ex7_map_' + R.k), lead = tamParty()[0], face = lead ? tamPcPic(lead) : '';
-    const at = run ? run.at : 0;
-    return `<div class="tx-map"${bg ? ` style="background-image:url('${bg}')"` : ''} role="img" aria-label="${esc(R.nm)} 원정 지도">` +
-      P.map(([x, y], i) => { const u = txNodePic(run, i), cur = run && i === at; return `<i class="tx-n${TEX.plan[i] === 'boss' ? ' boss' : ''}${cur ? ' cur' : ''}" style="left:${x}%;top:${y}%">${u ? `<img src="${u}" alt="">` : ''}</i>`; }).join('') +
-      (face ? `<img class="tx-me" src="${face}" alt="" style="left:${P[at][0]}%;top:${P[at][1]}%">` : '') + '</div>';
-  }
+  // 원정 화면(탐험 화면 위를 통째로 덮어요): 위 줄, 지도(위아래로 넘겨 봐요), 아래 판
+  const txSel = () => { const regs = txRegs(); return regs.includes(TAM.reg[rt.txReg]) ? rt.txReg : TAM.reg.indexOf(regs[regs.length - 1]); };
   function txTrRow(ri) {
     const R = txReg(ri), own = S.tam.xp.tr[ri] || 0;
-    return `<div class="tx-tr" aria-label="${esc(R.nm)} 보물 ${txTrN(ri)}개"><b>보물 ${txTrN(ri)}/5</b>${[0, 1, 2, 3, 4].map(i => { const u = IMG(`ex7_tr_${R.k}_${i + 1}`), on = own >> i & 1; return `<span class="${on ? 'on' : ''}" title="${on ? esc(TEX.tr[R.k][i]) : '아직 못 찾은 보물'}">${u ? `<img src="${u}" alt="${on ? esc(TEX.tr[R.k][i]) : ''}">` : ''}</span>`; }).join('')}</div>`;
+    return `<div class="tx-tr" aria-label="${esc(R.nm)} 보물 ${txTrN(ri)}개"><b>보물<em>${txTrN(ri)}/5</em></b>${[0, 1, 2, 3, 4].map(i => { const u = IMG(`ex7_tr_${R.k}_${i + 1}`), on = own >> i & 1; return `<span class="${on ? 'on' : ''}" title="${on ? esc(TEX.tr[R.k][i]) : '아직 못 찾은 보물'}">${u ? `<img src="${u}" alt="${on ? esc(TEX.tr[R.k][i]) : ''}">` : ''}</span>`; }).join('')}</div>`;
   }
+  // 아래 판 글(시험도 이 글을 봐요)
   function txRender() {
-    if (!txOn()) return `<p class="tm-note">원정은 ${TEX.open}층 큰 장난꾸러기를 달래면 열려요</p>`;
-    const X = S.tam.xp, run = X.run, tic = IMG('ex7_ic_ticket');
+    if (!txOn()) return `<p class="tx-lock">원정은 ${TEX.open}층 큰 장난꾸러기를 달래면 열려요</p><button type="button" class="cta tx-wide" data-txx="1">탐험으로 돌아가기</button>`;
+    const run = S.tam.xp.run;
     if (!run) {
-      const regs = txRegs(), sel = regs.includes(TAM.reg[rt.txReg]) ? rt.txReg : TAM.reg.indexOf(regs[regs.length - 1]), left = txLeft();
-      return `<div class="tx-head">${tic ? `<img src="${tic}" alt="">` : ''}<span>원정권 <b>${left}/${TEX.tk}</b></span><small>${left ? '하루에 세 번 떠날 수 있어요' : '내일 다시 채워져요'}</small></div>` +
-        `<div class="tx-regs" role="group" aria-label="원정 지역">${regs.map(R => { const i = TAM.reg.indexOf(R); return `<button type="button" data-txreg="${i}" aria-pressed="${i === sel}">${esc(R.nm)}<em>${txTrN(i)}/5</em></button>`; }).join('')}</div>` +
-        `<button type="button" class="cta tx-go" data-txgo="${sel}"${left ? '' : ' aria-disabled="true"'}>원정 떠나기</button>` +
-        `<p class="tm-note">갈림길에서 셋 가운데 하나를 골라요. 져도 모은 것은 가져와요</p>` + txTrRow(sel) + txMap(null, sel);
+      const regs = txRegs(), sel = txSel(), left = txLeft(), tic = IMG('ex7_ic_ticket');
+      return `<div class="tx-regs" role="group" aria-label="원정 지역">${regs.map(R => { const i = TAM.reg.indexOf(R); return `<button type="button" data-txreg="${i}" aria-pressed="${i === sel}">${esc(R.nm)}<em>${txTrN(i)}/5</em></button>`; }).join('')}</div>` +
+        txTrRow(sel) +
+        `<button type="button" class="cta tx-wide tx-go" data-txgo="${sel}"${left ? '' : ' aria-disabled="true"'}>${tic ? `<img src="${tic}" alt="">` : ''}<span>${left ? '원정 떠나기' : '내일 다시 떠나요'}</span></button>` +
+        `<p class="tx-note">갈림길에서 셋 가운데 하나를 골라요. 져도 모은 것은 가져와요</p>`;
     }
     const R = txReg(run.r), k = TEX.plan[run.at], hp = run.hp / 10;
-    let h = `<div class="tx-st"><b>${esc(R.nm)}</b><span class="tx-hp" aria-label="탐험대 체력 ${Math.round(hp)}%"><i style="width:${hp}%"></i></span><em>체력 ${Math.round(hp)}%</em></div>`;
+    let h = `<div class="tx-st"><span class="tx-hp" aria-label="탐험대 체력 ${Math.round(hp)}%"><i style="width:${hp}%"></i></span><em>체력 ${Math.round(hp)}%</em></div>`;
     const bf = [run.atk ? `힘 +${Math.round(run.atk / 10)}%` : '', run.mx ? `체력 한도 +${Math.round(run.mx / 10)}%` : '', run.ch ? `응원 ${run.ch}번` : '', run.sk ? '지름길' : '', run.bb ? `큰 장난꾸러기 재료 +${Math.round(run.bb / 10)}%` : ''].filter(Boolean);
     if (bf.length) h += `<p class="tx-bf">${bf.map(esc).join(', ')}</p>`;
     h += `<p class="tx-got"><small>모은 것</small>${txGotTx(run.got) || '아직 없어요'}</p>`;
     if (run.end) {
-      const t = run.got.t;
+      const t = run.got.t, tu = t >= 0 && IMG(`ex7_tr_${R.k}_${t + 1}`);
       h += `<div class="tx-end${run.end > 0 ? ' win' : ''}"><b>${run.end > 0 ? '원정 성공!' : `${run.at}번째 칸까지 왔어요`}</b>` +
-        (t >= 0 ? `<span class="tx-trnew">${IMG(`ex7_tr_${R.k}_${t + 1}`) ? `<img src="${IMG(`ex7_tr_${R.k}_${t + 1}`)}" alt="">` : ''}새 보물 ${esc(TEX.tr[R.k][t])}</span>` : '') +
-        `<button type="button" class="cta" data-txtake="1">모은 것 받기</button></div>`;
+        (t >= 0 ? `<span class="tx-trnew">${tu ? `<img src="${tu}" alt="">` : ''}새 보물 ${esc(TEX.tr[R.k][t])}</span>` : '') +
+        `<button type="button" class="cta tx-wide" data-txtake="1">모은 것 받기</button></div>`;
     } else if (k === 'fork' && run.pk[run.at] < 0) {
       h += `<p class="tx-q">갈림길이에요. 하나를 골라요</p><div class="tx-cards">${run.evs[run.at].map((ei, j) => { const E = TEX.ev[ei], u = IMG('ex7_ev_' + E.k); return `<button type="button" class="tx-card" data-txpick="${j}">${u ? `<img src="${u}" alt="">` : ''}<b>${esc(E.nm)}</b><small>${esc(txEvTx(E))}</small></button>`; }).join('')}</div>`;
     } else {
       const nx = TEX.plan[run.at + 1], lab = nx === 'boss' ? `${R.boss} 달래기` : nx === 'fork' ? '갈림길로 가기' : run.sk ? '지름길로 지나가기' : '장난꾸러기 달래기';
       h += `<div class="tx-acts"><button type="button" class="cta" data-txstep="1">${esc(lab)}</button><button type="button" class="btn-sub small" data-txquit="1">돌아오기</button></div>`;
     }
-    return h + txMap(run, run.r);
+    return h;
+  }
+  function txTop() {
+    const run = S.tam.xp.run, R = txReg(run ? run.r : txOn() ? txSel() : 0), tic = IMG('ex7_ic_ticket'), on = txOn();
+    return `<button type="button" class="tm-rb tm-back" data-txx="1" aria-label="탐험으로 돌아가기"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M15 4.5 7.5 12l7.5 7.5"/></svg></button>` +
+      `<div class="tx-ttl"><small>숲속 원정</small><b>${esc(R.nm)}</b></div>` +
+      (on ? `<div class="tx-tk" aria-label="원정권 ${txLeft()}장 남음">${tic ? `<img src="${tic}" alt="">` : ''}<b>${txLeft()}</b><small>/${TEX.tk}</small></div>` : '<span></span>');
+  }
+  // 지도: 지역이 바뀔 때만 새로 깔고, 칸 그림과 대원 자리만 바꿔요(대원은 길을 따라 옮겨 가요)
+  function txMapDraw(ri) {
+    const m = $('#txMap'), w = $('#txMapW'); if (!m || !w) return;
+    const R = txReg(ri), P = TEX.map[R.k], run = S.tam.xp.run && S.tam.xp.run.r === ri ? S.tam.xp.run : null;
+    if (m.dataset.r !== R.k) {
+      m.dataset.r = R.k; const bg = IMG('ex7_map_' + R.k); m.style.backgroundImage = bg ? `url("${bg}")` : '';
+      m.setAttribute('aria-label', `${R.nm} 원정 지도`);
+      setH(m, P.map(([x, y], i) => `<i class="tx-n${TEX.plan[i] === 'boss' ? ' boss' : ''}" style="left:${x}%;top:${y}%"><img alt=""></i>`).join('') + '<img class="tx-me" alt="">');
+      w.scrollTop = w.scrollHeight;
+    }
+    // 지도가 화면 높이를 다 채우게(가로가 조금 넘치면 가운데만 보여요. 칸은 가운데 70% 안에 있어요)
+    { const W = w.clientWidth, H = w.clientHeight - (parseFloat(getComputedStyle(w).paddingTop) || 0), mw = Math.round(Math.min(Math.max(W, H / 1.5), W * 1.25)); m.style.width = mw + 'px'; m.style.marginLeft = Math.round((W - mw) / 2) + 'px'; }
+    const at = run ? run.at : 0, ns = $$('.tx-n', m);
+    ns.forEach((n, i) => { const u = txNodePic(run, i) || ''; const im = n.querySelector('img'); if (im.getAttribute('src') !== u) im.src = u; n.classList.toggle('cur', !!run && i === at); n.classList.toggle('past', !!run && i < at); });
+    const me = $('.tx-me', m), lead = tamParty()[0], face = lead ? tamPcPic(lead) : '';
+    if (face && me.getAttribute('src') !== face) me.src = face;
+    me.hidden = !face; me.style.left = P[at][0] + '%'; me.style.top = P[at][1] + '%';
+    // 지금 칸이 화면 가운데쯤 오게 넘겨요
+    const y = m.offsetTop + m.offsetHeight * P[at][1] / 100 - w.clientHeight * 0.55;
+    if (typeof w.scrollTo === 'function') w.scrollTo({ top: Math.max(0, y), behavior: rt.reduced || w._first ? 'auto' : 'smooth' }); else w.scrollTop = Math.max(0, y);
+    w._first = false;
+  }
+  function txDraw() {
+    const box = $('#txFull'); if (!box || box.hidden || !tamOn()) return;
+    setH($('#txTop'), txTop());
+    setH($('#txPan'), txRender());
+    const run = S.tam.xp.run;
+    box.classList.toggle('run', !!run); box.classList.toggle('lock', !txOn());
+    txMapDraw(run ? run.r : txOn() ? txSel() : 0);
+  }
+  window.addEventListener('resize', () => { const b = $('#txFull'); if (b && !b.hidden) txMapDraw(S.tam.xp.run ? S.tam.xp.run.r : txSel()); });
+  function txOpen() {
+    const box = $('#txFull'); if (!box) return;
+    box.hidden = false; const w = $('#txMapW'); if (w) w._first = true;
+    txDraw(); tamTabsDot();
+  }
+  function txClose() { const box = $('#txFull'); if (box) box.hidden = true; tamTabsDot(); }
+  function txMsg(tx) {
+    const m = $('#txMsg'); if (!m) return;
+    m.textContent = tx; m.hidden = false; m.style.animation = 'none'; void m.offsetWidth; m.style.animation = '';
+    clearTimeout(m._t); m._t = setTimeout(() => { m.hidden = true; }, 2600);
   }
   function txClick(b) {
-    if (b.dataset.txreg) { rt.txReg = +b.dataset.txreg; sfx('tap'); tamRenderBody(); return true; }
+    if (b.dataset.txx) { sfx('tap'); txClose(); tamRenderBody(); return true; }
+    if (b.dataset.txreg) { rt.txReg = +b.dataset.txreg; sfx('tap'); txDraw(); return true; }
     if (b.dataset.txgo) {
-      if (txLeft() <= 0) { tamToast('오늘 원정권을 다 썼어요\n내일 다시 떠나요'); return true; }
+      if (txLeft() <= 0) { txMsg('오늘 원정권을 다 썼어요\n내일 다시 떠나요'); return true; }
       if (!txStart(+b.dataset.txgo)) return true;
-      sfx('coin'); tamToast(`${txReg(S.tam.xp.run.r).nm} 원정을 떠나요!`); tamRenderBody(); tamTabsDot(); return true;
+      sfx('coin'); txMsg(`${txReg(S.tam.xp.run.r).nm} 원정을 떠나요!`); txDraw(); tamTabsDot(); return true;
     }
     if (b.dataset.txpick) {
       const o = txPick(+b.dataset.txpick); if (!o) return true; sfx('tap');
-      tamToast(o.box === 'gift' ? '상자 안에 재료가 가득!' : o.box === 'win' ? '상자에서 장난꾸러기가 튀어나왔지만 달래 줬어요' : o.box === 'lose' ? '상자에서 튀어나온 장난꾸러기에게 졌어요' : `${o.nm}\n${o.tx}`);
-      tamRenderBody(); return true;
+      txMsg(o.box === 'gift' ? '상자 안에 재료가 가득!' : o.box === 'win' ? '상자에서 장난꾸러기가 튀어나왔지만 달래 줬어요' : o.box === 'lose' ? '상자에서 튀어나온 장난꾸러기에게 졌어요' : `${o.nm}\n${o.tx}`);
+      txDraw(); return true;
     }
     if (b.dataset.txstep) {
       const o = txStep(); if (!o) return true;
-      if (o.k === 'fork') { sfx('tap'); tamRenderBody(); return true; }
-      sfx(o.win === false ? 'tap' : 'coin');
-      tamToast(o.skip ? '반딧불을 따라 지름길로 지나왔어요' : o.win ? `${eul(o.nm)} 달래 줬어요` : `${o.nm}에게 졌어요\n모은 것은 가져가요`);
-      tamRenderBody(); tamTabsDot(); return true;
+      if (o.k !== 'fork') { sfx(o.win === false ? 'tap' : 'coin'); txMsg(o.skip ? '반딧불을 따라 지름길로 지나왔어요' : o.win ? `${eul(o.nm)} 달래 줬어요` : `${o.nm}에게 졌어요\n모은 것은 가져가요`); }
+      else sfx('tap');
+      txDraw(); tamTabsDot(); return true;
     }
-    if (b.dataset.txquit) { txQuit(); sfx('tap'); tamRenderBody(); return true; }
+    if (b.dataset.txquit) { txQuit(); sfx('tap'); txDraw(); return true; }
     if (b.dataset.txtake) {
       const o = txTake(); if (!o) return true; sfx('coin'); renderHUD(); tamRenderTop();
-      tamToast(o.got.t >= 0 ? `새 보물을 찾았어요!\n${TEX.tr[txReg(o.r).k][o.got.t]}` : '원정에서 모은 것을 받았어요');
-      tamRenderBody(); tamTabsDot(); return true;
+      txMsg(o.got.t >= 0 ? `새 보물을 찾았어요!\n${TEX.tr[txReg(o.r).k][o.got.t]}` : '원정에서 모은 것을 받았어요');
+      txDraw(); tamTabsDot(); return true;
     }
     return false;
   }
   // 아래 메뉴 원정 빨간 점: 오늘 아직 안 떠났거나, 끝난 원정을 받지 않았을 때
   const txDot = () => txOn() && ((!S.tam.xp.run && txLeft() >= TEX.tk) || !!(S.tam.xp.run && S.tam.xp.run.end));
-  function tamTabsDot() { const b = $('#tmNav [data-tnav="exp"]'); if (b) { b.classList.toggle('dot', txDot()); b.hidden = !tamOn(); } }
+  function tamTabsDot() { const b = $('#tmNav [data-tnav="exp"]'); if (b) b.classList.toggle('dot', txDot()); }
