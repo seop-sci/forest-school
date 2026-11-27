@@ -18281,7 +18281,8 @@ body.mg-on .toast[hidden]{display:none}
     const party = F ? F.P : tamTeam();
     $('#tmP').dataset.fid = F ? F.id : ''; $('#tmM').dataset.fid = F ? F.id : ''; $('#tmP').classList.remove('walking', 'enter', 'jump');
     setH($('#tmP'), party.map((p, i) => { const [x, y] = TM_PPOS[i] || TM_PPOS[0];
-      return `<div class="tm-f" data-i="${i}" style="left:${x}%;bottom:${y + TM_UP}%;z-index:${30 - y};${tamDz(y)}--bd:-${(i * 0.37).toFixed(2)}s;--bd2:${(i * 0.06).toFixed(2)}s"><div class="tm-body"><img src="${tamPcPic(p.sp)}" alt="${esc(spName(p.sp))}"></div><i class="tm-hp"><s></s><b></b></i></div>`; }).join(''));
+      const pose = F?.wind && IMG(`ex4_pc_${p.sp}_sk`);
+      return `<div class="tm-f" data-i="${i}" style="left:${x}%;bottom:${y + TM_UP}%;z-index:${30 - y};${tamDz(y)}--bd:-${(i * 0.37).toFixed(2)}s;--bd2:${(i * 0.06).toFixed(2)}s"><div class="tm-body"><img src="${tamPcPic(p.sp)}" alt="${esc(spName(p.sp))}">${pose ? `<img class="tm-counter-pose" src="${pose}" alt="">` : ''}</div><i class="tm-hp"><s></s><b></b></i></div>`; }).join(''));
     if (!F) { setH($('#tmM'), ''); return; }
     const pos = boss ? TM_BPOS : F.M.length === 1 ? TM_MPOS1 : F.M.length === 2 ? TM_MPOS2 : TM_MPOS;   // 마리 수에 맞춘 자리
     setH($('#tmM'), F.M.map((m, i) => { const [x, y] = pos[i] || pos[0];
@@ -18387,15 +18388,13 @@ body.mg-on .toast[hidden]{display:none}
         { transform: move(dx * .97, dy * .97 + 3, -2), offset: .65, easing: 'cubic-bezier(.32,0,.27,1)' },
         { transform: 'none' }
       ], { duration });
-      const src = IMG(`ex4_pc_${p.sp}_sk`);
-      if (src) {
-        const pose = document.createElement('img'), base = body.querySelector('img');
-        pose.className = 'tm-counter-pose'; pose.src = src; pose.alt = '';
-        body.append(pose);
+      const pose = body.querySelector('.tm-counter-pose');
+      // 자세 그림이 아직 안 열린 기기에서는 대원이 사라지지 않도록 기본 그림으로 달려요.
+      if (pose?.naturalWidth) {
+        const base = body.querySelector('img');
         const blend = [0, 0, 1, 1, 0].map((v, k) => ({ opacity: v, offset: [0, .16, .30, .66, .91][k] }));
-        const fade = pose.animate(blend, { duration });
+        pose.animate(blend, { duration });
         base.animate(blend.map(frame => ({ ...frame, opacity: 1 - frame.opacity })), { duration });
-        fade.onfinish = fade.oncancel = () => pose.remove();
       }
     });
     skAt(hit, () => {
@@ -33753,7 +33752,7 @@ body.mg-on .toast[hidden]{display:none}
   });
   document.getElementById('expeditionBoss').addEventListener('click', () => {
     const F = prepare();
-    Object.assign(F.S.tam, { best: 9, seen: 1, auto: 0 });
+    Object.assign(F.S.tam, { best: 9, seen: 1, auto: 0, it: F.gameNow(), spd: { sec: 0 } });
     F.tamParty().forEach(sp => { F.tamMem(sp).lv = 6; });
     F.setTab('tam');
     const battle = F.rt4.tam || (F.rt4.tam = { ph: '', t: 0, F: null, buff: 0, lose: 0, nLose: 0, ev: null, mod: null });
