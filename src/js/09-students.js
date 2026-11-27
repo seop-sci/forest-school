@@ -409,9 +409,11 @@
     S.budget += v; earn(v);
     S.st.picks += 1;
     if (rt.sports) { rt.sports.blue += 1; feverCombo(rt.sports, d.x, d.y); renderSportsBar(); }
-    floatText(d.x, d.y - 12, '+' + fmt(v), 'gold');
+    // 이어 줍기: 1.2초 안에 또 주우면 연속 수가 늘고 소리가 높아져요. 셋째부터 '연속 n'을 함께 보여요
+    { const now = performance.now(); rt.pickN = now - (rt.pickAt || 0) < 1200 ? (rt.pickN || 0) + 1 : 0; rt.pickAt = now; }
+    floatText(d.x, d.y - 12, '+' + fmt(v) + (rt.pickN >= 2 ? `  연속 ${rt.pickN + 1}` : ''), 'gold');
     if (!rt.sports) fxPick(d); else fxeBlue(d);   // 운동회: 청팀 색종이와 점프. 효과층: 반짝이와 도토리가 위쪽 도토리 숫자로 날아가요(운동회 공은 그대로)
-    sfx('coin'); buzz(12);
+    sfx(rt.pickN ? 'combo' + rt.pickN : 'coin'); buzz(12);
     removeDrop(d);
     renderHUD(); renderAffordance();
   }

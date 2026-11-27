@@ -339,6 +339,20 @@
   // 보상을 주기 전에 지금 회차로 맞춰요(월요일 0시를 막 넘겼으면 새 회차부터). 저장된 회차가 지금 열린 이벤트일 때만 줘요
   const evLive = () => { if (liveOff('event')) return null; evSync(); const cur = evCurrent(); return cur && cur.key === S.ev.cur ? cur : null; };
   const evClaimable = () => !!S.ev.cur && !liveOff('event') && (evStampReady() || S.ev.list.some(evReady) || (evAllDone() && !S.ev.box));
+  function evRewardCount() {
+    if (!S.ev.cur || liveOff('event')) return 0;
+    const missions = S.ev.list.filter(evReady).length;
+    const box = !S.ev.box && S.ev.list.length > 0 && S.ev.list.every(m => m.done || evReady(m));
+    return Number(evStampReady()) + missions + Number(box);
+  }
+  function claimEventRewards() {
+    if (!S || rt.paused || rt.batch || !evLive()) return 0;
+    return collectRewards(() => {
+      if (evStampReady()) claimStamp();
+      S.ev.list.forEach((m, i) => { if (evReady(m)) claimEvMission(i); });
+      if (evAllDone() && !S.ev.box) claimEvBox();
+    });
+  }
   function claimStamp() {
     const cur = evLive();
     if (!cur || !evStampReady()) return false;
@@ -358,7 +372,8 @@
     sfx('quest'); buzz(12);
     showReward({ title: `이벤트 도장 ${i + 1}개째!`, sub: gotHat ? `한정 모자 '${hat.name}'${eulOf(hat.name)} 받았어요! 꾸미기 백화점 옷장에서 학생들에게 씌울 수 있어요` : i + 1 === 5 ? '도장 다섯 개를 모아 큰 선물을 받았어요' : i + 1 < 5 ? `${5 - i - 1}개 더 모으면 큰 선물이 있어요` : '끝까지 함께해 줘서 고마워요',
       art: gotHat ? `<img src="${IMG('cos_hat_' + hid)}" alt="" style="width:92px;height:92px;object-fit:contain">` : undefined,
-      items: [a > 0 ? { ic: 'acorn', t: `도토리 +${fmt(a)}` } : null, gIt, r.e ? { ic: 'ess', t: `숲의 정수 +${r.e}` } : null, ...tkIts, { ic: 'mge', t: `합치기 에너지 +${me}` }, muIt] });
+      items: [a > 0 ? { ic: 'acorn', t: `도토리 +${fmt(a)}` } : null, gIt, r.e ? { ic: 'ess', t: `숲의 정수 +${r.e}` } : null, ...tkIts, { ic: 'mge', t: `합치기 에너지 +${me}` }, muIt,
+        rt.batch && gotHat ? { ic: '🎁', t: `한정 모자: ${hat.name}` } : null] });
     save(); renderEvent(); renderHUD();
     return true;
   }
@@ -387,7 +402,8 @@
     const tkIt = tkGive('box');   // 단축권
     sfx('quest'); buzz(12);
     showReward({ title: '기념 상자를 열었어요!', sub: gotDeco ? `한정 장식 '${dd.name}'${eulOf(dd.name)} 받았어요! 꾸미기 모드에서 지도에 놓아 보세요` : '이벤트 미션을 모두 마쳤어요',
-      art: gotDeco ? `<img src="${IMG(dd.img)}" alt="" style="width:92px;height:92px;object-fit:contain">` : pic7('ev_box', 'ic_fund'), items: [{ ic: 'gold', t: `황금 도토리 +${EV_BOX.g}` }, { ic: 'ess', t: `숲의 정수 +${EV_BOX.e}` }, { ic: 'mge', t: `합치기 에너지 +${MG.E.box}` }, upIt, { ic: 'dip', t: `수료증 +${EV_BOX.dip}장` }, tkIt].filter(Boolean) });
+      art: gotDeco ? `<img src="${IMG(dd.img)}" alt="" style="width:92px;height:92px;object-fit:contain">` : pic7('ev_box', 'ic_fund'), items: [{ ic: 'gold', t: `황금 도토리 +${EV_BOX.g}` }, { ic: 'ess', t: `숲의 정수 +${EV_BOX.e}` }, { ic: 'mge', t: `합치기 에너지 +${MG.E.box}` }, upIt, { ic: 'dip', t: `수료증 +${EV_BOX.dip}장` }, tkIt,
+        rt.batch && gotDeco ? { ic: '🎁', t: `한정 장식: ${dd.name}` } : null].filter(Boolean) });
     save(); renderEvent(); renderHUD();
     return true;
   }

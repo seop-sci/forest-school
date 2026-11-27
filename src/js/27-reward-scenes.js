@@ -14,10 +14,29 @@
       art.hidden = !o.art;
       art.innerHTML = o.art ? `<div class="rw-art">${o.art}</div><b>${esc(o.big || '')}</b>${o.bigSub ? `<small>${esc(o.bigSub)}</small>` : ''}` : '';
       $('#rwList').innerHTML = (o.items || []).filter(Boolean).map(it => `<li><span class="rw-ic">${icon(it.ic)}</span><span>${esc(it.t)}</span></li>`).join('');
+      rt.rwAc = (o.items || []).some(it => it && it.ic === 'acorn');
+      // 창이 떠 있는 동안 위 도토리 숫자는 그대로, 닫으면 '좋아요'에서 도토리가 날아가 올라가요
+      if (rt.rwAc && !rt.reduced) rt.hudFreeze = performance.now() + 60000;
       openModal($('#mReward'));
       sfx('quest');
       return true;
     });
+  }
+
+  function collectRewards(collect) {
+    if (!S || rt.paused || rt.batch) return 0;
+    const before = S.budget, batch = rt.batch = { items: [], n: 0 };
+    try { collect(); } finally { rt.batch = null; }
+    if (!batch.n) return 0;
+    const items = psMergeItems(batch.items.filter(it => it.ic !== 'acorn').map(it => ({ ic: it.ic, t: String(it.t).replace(/ \(\d+\/\d+\)$/, '') })));
+    const acorns = S.budget - before;
+    if (acorns >= 1) items.unshift({ ic: 'acorn', t: `도토리 +${fmt(acorns)}` });
+    buzz(15);
+    showReward({ title: '모두 받았어요!', sub: `보상 ${fmt(batch.n)}개를 한 번에 받았어요`, items });
+    return batch.n;
+  }
+  function collectButton(scope, count, label) {
+    return count < 2 ? '' : `<button class="dm-ev dm-all" type="button" data-collect="${scope}"><span><b>받을 보상 ${fmt(count)}개</b><small>${label}</small></span><span class="cta small">모두 받기</span></button>`;
   }
 
   // 보상 칩: [[아이콘, 숫자나 짧은 말, 'sp'(금빛 강조)],...]. 아이콘은 showReward와 같은 이름(acorn, gold, dip, ess)이나 단축권 키(tk:m5)나 그림 문자

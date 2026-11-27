@@ -99,8 +99,7 @@
   function claimAllNow() {
     if (!S || rt.paused || rt.batch) return 0;
     dmDay(); wkWeek();
-    const b0 = S.budget, B = rt.batch = { items: [], n: 0 };
-    try {
+    const n = collectRewards(() => {
       S.dm.list.forEach((m, i) => { if (dmReady(m)) claimMission(i); });
       if (dmAllDone() && !S.dm.bonus) claimBonus();
       S.wk.list.forEach((m, i) => { if (wkReady(m)) claimWeekMission(i); });
@@ -108,13 +107,9 @@
       if (evLive()) S.ev.list.forEach((m, i) => { if (evReady(m)) claimEvMission(i); });
       S.q.subs.filter(subReady).map(q => q.id).forEach(id => claimSub(id, null));
       MP_BOX.forEach((_, i) => { if (boxReady(i)) claimBox(i); });   // 상자는 맨 뒤에(방금 받은 미션 포인트로 열리는 상자까지)
-    } finally { rt.batch = null; }
-    if (!B.n) return 0;
-    const ac = S.budget - b0, items = psMergeItems(B.items.filter(it => it && it.ic !== 'acorn').map(it => ({ ic: it.ic, t: String(it.t).replace(/ \(\d+\/\d+\)$/, '') })));   // '칭찬 스티커 +1장 (3/20)'처럼 뒤에 붙은 진행 숫자는 떼고 합쳐요
-    if (ac >= 1) items.unshift({ ic: 'acorn', t: `도토리 +${fmt(ac)}` });
-    showReward({ title: '모두 받았어요!', sub: `보상 ${B.n}개를 한 번에 받았어요`, items });
-    save(); renderMissions(); renderHUD(); updateQuestDot();
-    return B.n;
+    });
+    if (n) { save(); renderMissions(); renderHUD(); updateQuestDot(); }
+    return n;
   }
   /* 오늘 할 일 판: 하루 횟수가 있는 활동의 남은 횟수와 바로 가기를 한 줄씩 보여 줘요(열린 것만). 새 저장 칸은 접기(S.fold.td)뿐이에요 */
   const TODO = [

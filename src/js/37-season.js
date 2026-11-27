@@ -40,11 +40,11 @@
       fsel: typeof P.fsel === 'string' && /^psf_\d{1,4}$/.test(P.fsel) ? P.fsel : '', badge: Math.floor(numIn(P.badge, 0, 1e4)), seen: Math.floor(numIn(P.seen, -1, 1e4)) };
     if (s.ps.fsel && !s.ps.fur.includes(s.ps.fsel)) s.ps.fsel = '';
   }
-  const psLv = () => Math.min(PS.steps, Math.floor(S.ps.pts / PS.per));
+  const psLv = (pts = S.ps.pts) => Math.min(PS.steps, Math.floor(pts / PS.per));
   const psGot = i => !!(S.ps.got & (1 << (i - 1)));
   const psClaimable = () => psOpen() && (psStepReady() > 0 || psExtraReady() > 0 || S.ps.dl.some(psReady) || S.ps.wl.some(psReady));
-  const psStepReady = () => { let c = 0; for (let i = 1; i <= psLv(); i++) if (!psGot(i)) c++; return c; };
-  const psExtraReady = () => Math.max(0, Math.floor(Math.max(0, S.ps.pts - PS.steps * PS.per) / PS.extra) - S.ps.ex);
+  const psStepReady = (pts = S.ps.pts) => { let c = 0; for (let i = 1; i <= psLv(pts); i++) if (!psGot(i)) c++; return c; };
+  const psExtraReady = (pts = S.ps.pts) => Math.max(0, Math.floor(Math.max(0, pts - PS.steps * PS.per) / PS.extra) - S.ps.ex);
   // 단계 보상: 10, 20, 30은 큰 보상, 5, 15, 25는 작은 상자, 나머지는 돌아가며
   function psReward(i, n) {
     const D = psDef(n);
@@ -122,6 +122,21 @@
     save(); renderPass(); checkQuests(true);
     return true;
   }
+  function psClaimBatch() {
+    if (!psOpen() || rt.paused || rt.batch) return 0;
+    psSync();
+    const n = collectRewards(() => {
+      S.ps.dl.forEach((m, i) => { if (psReady(m)) psClaimMission('d', i); });
+      S.ps.wl.forEach((m, i) => { if (psReady(m)) psClaimMission('w', i); });
+      const count = psStepReady() + psExtraReady();
+      if (count) {
+        rt.batch.items.push(...psClaimAll(true));
+        rt.batch.n += count;
+      }
+    });
+    if (n) { renderPass(); renderHUD(); }
+    return n;
+  }
   function psWatchAd() {
     if (!psOpen() || S.ps.ad === gameToday()) return;
     showAd(() => {
@@ -163,14 +178,17 @@
     }
     const ready = psStepReady() + psExtraReady();
     const old = [...S.ps.dl.map((m, i) => [m, 'd', i]), ...S.ps.wl.map((m, i) => [m, 'w', i])].filter(([m]) => psReady(m));   // 옛 저장의 받을 수 있는 패스 미션
+    const points = S.ps.pts + old.reduce((sum, [, kind]) => sum + (kind === 'w' ? PS.wP : PS.dP * mul), 0);
+    const total = old.length + psStepReady(points) + psExtraReady(points);
     const ms = (L, kind, p) => L.map((m, i) => { const pr = psProg(m), rd = psReady(m); return `<div class="dm${m.done ? ' done' : ''}"><div class="dm-tx"${goAt(m.id, !m.done && !rd)}><b>${esc(PS_M[m.id].name(m.n))} <em>+${p}점</em></b><div class="qbar"><i style="width:${(pr / m.n * 100).toFixed(0)}%"></i></div></div>` +
       (m.done ? `<span class="dm-ok">${CHECK}</span>` : rd ? `<button class="cta small" type="button" data-ps="${kind}${i}">받기</button>` : `<span class="dm-n">${pr}/${m.n}</span>`) + '</div>'; }).join('');
     const bg = IMG('pass_bg');
     const furs = S.ps.fur.filter(id => IMG(psDef(Number(id.slice(4))).fur));
     body.innerHTML = `<div class="ps-head${bg ? ' has-img' : ''}">${bg ? `<img src="${bg}" alt="">` : ''}<div class="ps-ttl"><b>숲속 패스</b><span>시즌 ${n + 1}${D.theme ? ' ' + esc(D.theme) : ''}</span><small>${left > 0 ? `${left}일 남음` : '오늘까지'}</small></div></div>` +
       `<div class="ps-lv"><span><b>${lv}</b>/${PS.steps}단계</span><span class="ps-bar"><i style="width:${(lv >= PS.steps ? 100 : (S.ps.pts % PS.per) / PS.per * 100).toFixed(0)}%"></i></span><span>${lv >= PS.steps ? `덤 상자까지 ${PS.extra - (S.ps.pts - PS.steps * PS.per) % PS.extra}점` : `다음 단계까지 ${PS.per - S.ps.pts % PS.per}점`}</span></div>` +
+      collectButton('pass', total, '패스 단계, 덤 상자와 남은 패스 미션') +
       `<div class="ps-track" id="psTrack">${nodes.join('')}</div>` +
-      (ready ? `<button class="cta" type="button" data-ps="all">보상 받기 (${ready})</button>` : '') +
+      (ready && total < 2 ? '<button class="cta" type="button" data-ps="all">보상 받기</button>' : '') +
       `<p class="fine ps-big">20단계 한정 장식 <b>${esc(D.decoNm || '황금 도토리 2')}</b>, 30단계 한정 가구 <b>${esc(D.furNm || '황금 도토리 5')}</b>. 시즌이 끝나면 다시 얻을 수 없어요</p>` +
       `<p class="fine ps-how">오늘의 미션 하나에 패스 점수 +${PS.dP * mul}${mul > 1 ? '(광고 덕분에 두 배)' : ''}, 이번 주 미션 하나에 +${PS.wP}</p>` +
       (mul > 1 ? '' : `<button class="btn-sub ps-ad" type="button" data-ps="ad">광고 보고 오늘의 미션 패스 점수 +100%</button>`) +
@@ -486,6 +504,7 @@
     const u = IMG7(cur.def.banner) || (cur.def.fb ? IMG7(cur.def.fb) : '');   // 새 배너 그림이 오기 전에는 비슷한 배너를 빌려 써요
     body.innerHTML = `<div class="ev-banner ${cur.def.id}${u ? ' has-img' : ''}">${u ? `<img src="${u}" alt="">` : ''}<b>${esc(cur.def.name)}</b></div>` +
       `<div class="ev-period"><span>${dayText(cur.start)} ~ ${dayText(cur.end)}</span><span>${left > 0 ? `${left}일 남음` : '오늘까지'}</span></div>` +
+      collectButton('event', evRewardCount(), '이벤트 도장, 미션과 기념 상자') +
       `<p class="lead">${esc(nl(cur.def.lead))}</p>` + evSkipLine(day) +
       `<h4 class="dex-h">이벤트 도장</h4><div class="ev-stamps">${stamps}</div>${stampBtn}` +
       `<h4 class="dex-h">이벤트 미션 <small>미션마다</small>${rwChips([['acorn', '도토리'], ['gold', 1], tkChip('evm')])}</h4><div class="dms">${missions}${box}</div>` + upcoming;

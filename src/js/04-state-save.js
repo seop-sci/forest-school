@@ -119,6 +119,13 @@
     paFake: undefined,   // 시험에서 사진 판정 상태를 덮어쓰는 칸
     paOpenSea: undefined,   // 사진첩에서 펼친 다른 계절
     trSvOpen: undefined,   // 체험학습 기념품 칸을 펼쳤는지
+    tripPlan: null,        // 출발 전에 고르는 체험학습 활동
+    pickN: 0,   // 이어 줍기 수
+    pickAt: 0,   // 마지막으로 주운 때
+    hudShown: undefined,   // 위 줄에 보이는 도토리(굴러 오르는 동안)
+    hudRoll: null,   // 도토리 숫자 굴러 오르기
+    hudFreeze: 0,   // 받은 도토리가 날아가는 동안 위 숫자를 잠깐 그대로
+    rwAc: false,   // 보상 창에 도토리가 있는지
     tripGot: undefined,   // 체험학습에서 받은 것
     tripTxt: undefined,   // 체험학습 단추에 보인 글
     tripView: undefined,   // 체험학습 창 화면(가기, 돌아옴, 쉼)
@@ -303,7 +310,7 @@
     u: { boost: false, dev: false, gtip: false },
     units: 'ko',
     uiz: 0,   // 화면 크기(0 보통 0.9배, 1 크게 1배)
-    trip: { open: false, cur: '', start: 0, end: 0, souv: [], been: {}, kids: 0 },
+    trip: { open: false, cur: '', start: 0, end: 0, souv: [], been: {}, kids: 0, creekRoute: '', creekLog: [], route: '', observation: 0, records: {} },
     sports: { next: 0 },
     fest: { next: {}, n: {}, sub: {} },   // sub: 밤이라 낮 행사가 잠겼을 때 밤 행사로 대신 채운 메인 퀘스트 횟수
     dm: { day: '', list: [], bonus: false, swapped: false },
@@ -507,11 +514,20 @@
       s.trip.open = !!t.open;
       s.trip.kids = Math.min(6, Math.floor(numFb(t.kids, 0, 0)));
       s.trip.souv = Array.isArray(t.souv) ? [...new Set(t.souv.filter(k => typeof k === 'string' && SOUV_IDS.has(k)))] : [];
+      if (Array.isArray(t.creekLog)) s.trip.creekLog = CREEK_KEYS.filter(k => t.creekLog.includes(k));
+      if (t.records && typeof t.records === 'object') for (const k of TRIP_FIELD_IDS) {
+        if (Number.isInteger(t.records[k]) && t.records[k] >= 0 && t.records[k] <= 3) s.trip.records[k] = t.records[k];
+      }
       if (t.been && typeof t.been === 'object') for (const k of Object.keys(TRIP)) if (t.been[k]) s.trip.been[k] = Math.floor(numFb(t.been[k], 0, 0, SAVE_CAP.count));
       if (typeof t.cur === 'string' && TRIP[t.cur]) {
         const len = TRIP[t.cur].min * 60000, end = numFb(t.end, 0, 0), start = numFb(t.start, 0, 0);
         if (end > 0 && end - Math.max(Date.now(), Number(d.clk && d.clk.last) || 0) <= len + 86400000) {   // 기기 시계가 하루 넘게 느려도 가던 체험학습이 사라지지 않게 마지막 게임 시계와 견줘요
           s.trip.cur = t.cur; s.trip.end = end; s.trip.start = Math.min(start || end - len, end - 1); }   // 끝나는 시각은 게임 시계라 기기 시계와 어긋날 수 있어 하루 여유
+      }
+      if (s.trip.cur === 'creek') s.trip.creekRoute = creekRouteKey(t.creekRoute);
+      else if (s.trip.cur) {
+        s.trip.route = tripRouteKey(s.trip.cur, t.route);
+        if (s.trip.route && (t.observation === 1 || t.observation === 2)) s.trip.observation = t.observation;
       }
     }
     // 토스 사용자 키는 옛 저장의 tk(글자)에서 tkey로 옮겨요. tk는 이제 시간 단축권 장수예요

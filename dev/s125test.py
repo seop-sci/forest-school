@@ -12,7 +12,7 @@ async def main():
         b = await p.chromium.launch()
         fac = dict(classroom=14, cafeteria=12, library=11, playground=8, science=6, store=5, dorm=3)
         ctx, page, errs = await ctxpage(b, 360, 740, 'light', base(tier=3, tg=1, f=fac))
-        r = await page.evaluate(f"""(()=>{{ const F={F}, S=F.S; F.setTab('quests'); F.renderMissions();
+        r = await page.evaluate(f"""(()=>{{ const F={F}, S=F.S; F.missionGo('daily'); F.renderMissions();
           const q=document.querySelector('#qDaily'); const go=[...q.querySelectorAll('[data-mgo]')].map(e=>e.dataset.mgo);
           const all=q.querySelectorAll('.dm .dm-tx').length; return {{go, all, over:[...q.querySelectorAll('.dm')].some(d=>d.scrollWidth>d.clientWidth+1)}}; }})()""")
         print('퀘스트 탭', r); ok(len(r['go']) >= 5 and not r['over'], '오늘과 이번 주 미션 줄에 가기, 360px에서 넘치지 않음')
@@ -24,12 +24,12 @@ async def main():
             await page.wait_for_timeout(50)
             r = await page.evaluate(f"""(async()=>{{ const F={F}; const t0=document.querySelector('.tab[aria-selected=true]')?.dataset.tab; const ok=F.missionGo('{i}'); await new Promise(r=>setTimeout(r,250));
               const tab=document.querySelector('.tab[aria-selected=true]')?.dataset.tab, modal=F.rt4.modalOpen ? F.rt4.modalOpen.id : '', scene=[...document.querySelectorAll('.pz')].filter(o=>!o.hidden).map(o=>o.id).join();
-              return [ok, tab, modal, scene]; }})()""")
+              return [ok, tab, modal, scene, document.querySelector('[data-q-pane]:not([hidden])').dataset.qPane]; }})()""")
             res[i] = r
         print('가기', res)
         ok(all(v[0] for v in res.values()), '모든 미션이 갈 곳이 있음')
         ok(res['merge'][3] == 'mgScene' and res['pz'][3] == 'pzScene', '퍼즐과 합치기는 바로 열림')
-        ok(res['dm'][1] == 'quests' and res['subs'][1] == 'quests', '오늘의 미션과 학생 부탁은 퀘스트 탭')
+        ok(res['dm'][1] == 'quests' and res['dm'][4] == 'daily' and res['subs'][1] == 'quests' and res['subs'][4] == 'subs', '미션과 학생 부탁 바로 가기가 해당 탭을 열어요')
         ok(res['lab'][2] or res['lab'][1] != 'school', '과학 실험은 실험 창이나 과학실')
         await page.evaluate(CLEAN)
         r = await page.evaluate(f"""(()=>{{ const F={F}, S=F.S; F.setTab('quests'); S.dm.list[0].done=true; document.querySelector('#qDaily').dataset.key=''; F.renderMissions();

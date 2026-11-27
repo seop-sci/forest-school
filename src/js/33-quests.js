@@ -665,12 +665,13 @@
     // 도토리는 칠판의 도토리 숫자로, 수료증은 아래 졸업 탭으로 날아가요
     const isDip = kind === 'dip';
     const to = isDip ? $('.tab[data-tab="grad"]') : $('#vBudget');
-    const bump = () => { if (!rt.reduced && to.animate) to.animate([{ transform: 'scale(1)' }, { transform: 'scale(1.2)' }, { transform: 'scale(1)' }], { duration: 320, easing: 'ease-out' }); };
+    const bump = () => { if (!isDip) { rt.hudFreeze = 0; hudRollRun(); } if (!rt.reduced && to && to.animate) to.animate([{ transform: 'scale(1)' }, { transform: 'scale(1.2)' }, { transform: 'scale(1)' }], { duration: 320, easing: 'ease-out' }); };
     const src = fromEl && (fromEl.querySelector('.q-act') || fromEl);
     if (!src || rt.reduced || !document.body.animate) { bump(); return; }
-    const a = src.getBoundingClientRect(), b = to.getBoundingClientRect();
-    if (!a.width) { bump(); return; }
+    const a = src.getBoundingClientRect(), b = to ? to.getBoundingClientRect() : { width: 0 };
+    if (!a.width || !b.width) { bump(); return; }
     const n = Math.min(7, 3 + Math.floor(Math.log10(Math.max(10, v))));
+    if (!isDip) { rt.hudFreeze = performance.now() + 620 + n * 60 + 200; hudRollRun(); }
     for (let i = 0; i < n; i++) {
       const el = document.createElement('span');
       el.className = 'fly';
@@ -796,6 +797,14 @@
 
   /* 퀘스트 탭 */
   const questKey = () => `${S.q.m}|${mainReady() ? 1 : 0}|${S.q.subs.map(s => s.id + (subReady(s) ? '!' : '')).join(',')}|${gsKey()}`;
+  function claimStudentRequests() {
+    return collectRewards(() => {
+      const ids = S.q.subs.filter(subReady).map(s => s.id);
+      const guest = gsReady();
+      ids.forEach(id => claimSub(id, null));
+      if (guest) gsClaim(null);
+    });
+  }
   function renderQuestPanel(force) {
     if (rt.tab !== 'quests') return;
     if (force) $('#qDaily').dataset.key = '';
@@ -803,6 +812,13 @@
     const key = questKey();
     if (force || key !== rt.qKey) { rt.qKey = key; buildQuestPanel(); }
     else updateQuestProgress();
+    setHid($('#qMainMark'), !mainReady());
+    setHid($('#qSubsMark'), !(S.q.subs.some(subReady) || gsReady()));
+    setHid($('#qDailyMark'), !(dmClaimable() || wkClaimable()));
+  }
+  function showQuestView(view) {
+    $$('#panelQuests [data-q-view]').forEach(b => b.setAttribute('aria-pressed', String(b.dataset.qView === view)));
+    $$('#panelQuests [data-q-pane]').forEach(el => setHid(el, el.dataset.qPane !== view));
   }
   function questCard(q, base, o) {
     const p = qProg(q, base);
@@ -811,10 +827,9 @@
       : `<button class="btn-go" type="button" data-act="go" data-q="${o.ref}">바로 가기</button>`;
     return `<div class="qcard${p.done ? ' is-done' : ''}" data-qp="${o.ref}">` +
       `<div class="qwho"><span class="qav${o.kid ? ' kid' : ''}" aria-hidden="true">${o.av}</span><span class="qname">${esc(o.name)}</span>${o.badge ? `<span class="qnew">${o.badge}</span>` : ''}</div>` +
-      `<p class="qsay">${esc(nl(repTxt(q, o.say)))}</p>` +   // 문장마다 줄바꿈
       `<div class="qgoal"><b>${esc(qGoal(q))}</b><span class="qp">${p.done ? '완료' : p.text}</span></div>` +
       `<div class="qbar"><i style="width:${(p.frac * 100).toFixed(1)}%"></i></div>` +
-      `<div class="qfoot"><span class="qrew">보상 ${rewardIcon(q.rk)}<b>${fmt(qReward(q))}</b>${hardQ(q, o.ref !== 'main') ? (goldRich() ? `<span class="qgold" aria-label="숲의 정수 ${GOLD.hard * GOLD.essPer}">+${ESS_ICON()}<b>${GOLD.hard * GOLD.essPer}</b></span>` : `<span class="qgold" aria-label="황금 도토리 ${GOLD.hard}개">+${GOLD_ICON}<b>${GOLD.hard}</b></span>`) : ''}${o.ref === 'main' && TK_Q.has(q.id) ? `<span class="qgold qtk" aria-label="5분 단축권 ${TKE.n}장">+${IMG('ticket_m5') ? `<img src="${IMG('ticket_m5')}" alt="">` : '⏱'}<b>${TKE.n}</b></span>` : ''}</span>${act}</div></div>`;
+      `<div class="qfoot"><span class="qrew">보상 ${rewardIcon(q.rk)}<b>${fmt(qReward(q))}</b>${hardQ(q, o.ref !== 'main') ? (goldRich() ? `<span class="qgold" aria-label="숲의 정수 ${GOLD.hard * GOLD.essPer}">+${ESS_ICON()}<b>${GOLD.hard * GOLD.essPer}</b></span>` : `<span class="qgold" aria-label="황금 도토리 ${GOLD.hard}개">+${GOLD_ICON}<b>${GOLD.hard}</b></span>`) : ''}${o.ref === 'main' && TK_Q.has(q.id) ? `<span class="qgold qtk" aria-label="5분 단축권 ${TKE.n}장">+${IMG('ticket_m5') ? `<img src="${IMG('ticket_m5')}" alt="">` : '⏱'}<b>${TKE.n}</b></span>` : ''}</span>${act}</div><p class="qsay">${esc(nl(repTxt(q, o.say)))}</p></div>`;
   }
   function buildQuestPanel() {
     const i = S.q.m, q = MAIN[i];
@@ -845,7 +860,8 @@
       subs = S.q.subs.map(s => questCard(s, s.b, { ref: s.id, kid: true, av: kidAvatar(s.who), name: WHO[s.who], say: `“${s.say}”`, badge: s.nw ? '새 부탁' : '' })).join('');
       if (S.q.subs.length < subSlots()) subs += '<p class="qempty">새 부탁을 기다리고 있어요. 메인 퀘스트를 이어 가면 학생들이 또 찾아와요.</p>';
     }
-    $('#qSubs').innerHTML = gsCardHTML() + subs;   // 오늘의 손님 칸은 학생 부탁 위에
+    const count = S.q.subs.filter(subReady).length + Number(gsReady());
+    $('#qSubs').innerHTML = collectButton('students', count, '학생과 오늘의 손님 부탁') + gsCardHTML() + subs;
     $('#qTally').textContent = S.q.subDone > 0 ? `지금까지 들어준 부탁 ${S.q.subDone}개` : '';
   }
   function updateQuestProgress() {
@@ -992,7 +1008,7 @@
     if (!S || rt.paused || !mgoHas(id)) return false;
     sfx('tap');
     if (MGO_MINI[id]) { setTab('mini'); setTimeout(() => { const b = $(MGO_MINI[id]); if (b && !b.closest('[hidden]')) b.click(); }, 60); return true; }
-    if (MGO_Q[id]) { setTab('quests'); setTimeout(() => { const el = $(MGO_Q[id]); if (el) el.scrollIntoView({ block: 'start', behavior: rt.reduced ? 'auto' : 'smooth' }); }, 60); return true; }
+    if (MGO_Q[id]) { setTab('quests'); showQuestView(id === 'subs' ? 'subs' : 'daily'); return true; }
     goTo({ t: MGO[id] });
     return true;
   }

@@ -7,7 +7,7 @@
     <p class="boot-step" id="bootStep">학교 문을 여는 중...</p>
     <p class="boot-tip" id="bootTip">학교 문을 여는 중이에요</p>
   </div>
-  <span class="boot-ver" id="bootVer">v5.4.1.6</span>
+  <span class="boot-ver" id="bootVer">v5.4.2</span>
 </div>
 
 <div class="app on-school" id="app">
@@ -74,7 +74,7 @@
       <span class="q-top"><span class="q-no" id="qbNo">메인 1-1</span><b id="qbTitle">책상 고치기</b><span class="q-cnt" id="qbCnt">Lv.0/1</span></span>
       <span class="q-how" id="qbHow">교실을 눌러서 책상을 올려요</span>
     </span>
-    <span class="q-act"><span class="q-get">받기</span><span class="q-rlab">보상</span><span class="q-rew"><span class="ric" id="qbRewIc"></span><span id="qbRew">30</span><span class="ric qb-gold" id="qbGold" hidden></span></span><svg class="q-chev" viewBox="0 0 24 24" aria-hidden="true"><path d="M9 6l6 6-6 6" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"/></svg></span>
+    <span class="q-act"><span class="q-get">받기</span><span class="q-rlab">보상</span><span class="q-rew"><span class="ric" id="qbRewIc"></span><span id="qbRew">30</span><span class="ric qb-gold" id="qbGold" hidden></span></span><span class="q-go-home">바로 가기</span></span>
     <span class="q-bar" aria-hidden="true"><i id="qbFill"></i></span>
   </button>
   </div>
@@ -321,14 +321,22 @@
     <section class="panel" id="panelQuests" hidden aria-labelledby="ttlQuests">
       <button class="panel-x" type="button" aria-label="홈으로"><svg viewBox="0 0 24 24" width="18" height="18" aria-hidden="true"><path d="M6 6l12 12M18 6L6 18" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round"/></svg></button>
       <h2 id="ttlQuests" class="ph"><span class="tic" data-ic="ic_cert" aria-hidden="true"></span><span>퀘스트</span></h2>
-      <h3 class="qsec">미션 <small>미션 포인트로 상자를 열어요</small></h3>
-      <div class="dms" id="qDaily"></div>
-      <h3 class="qsec second">메인 퀘스트 <small id="qsecVp">교감 선생님의 안내</small></h3>
-      <button class="nb-btn" id="sbBtn" type="button"><span id="sbBtnIc" aria-hidden="true"></span>이야기 수첩</button>
-      <div id="qMain"></div>
-      <h3 class="qsec second">학생들의 부탁</h3>
-      <div class="reqs" id="qSubs"></div>
-      <p class="qtally" id="qTally"></p>
+      <nav class="q-switch" aria-label="퀘스트 종류">
+        <button type="button" data-q-view="main" aria-pressed="true" aria-controls="qViewMain">메인<span id="qMainMark" hidden>받기</span></button>
+        <button type="button" data-q-view="subs" aria-pressed="false" aria-controls="qViewSubs">학생 부탁<span id="qSubsMark" hidden>받기</span></button>
+        <button type="button" data-q-view="daily" aria-pressed="false" aria-controls="qViewDaily">미션<span id="qDailyMark" hidden>받기</span></button>
+      </nav>
+      <div id="qViewMain" data-q-pane="main">
+        <div id="qMain"></div>
+        <button class="nb-btn" id="sbBtn" type="button"><span id="sbBtnIc" aria-hidden="true"></span>이야기 수첩</button>
+      </div>
+      <div id="qViewSubs" data-q-pane="subs" hidden>
+        <div class="reqs" id="qSubs"></div>
+        <p class="qtally" id="qTally"></p>
+      </div>
+      <div id="qViewDaily" data-q-pane="daily" hidden>
+        <div class="dms" id="qDaily"></div>
+      </div>
     </section>
 
     <section class="panel" id="panelTeachers" hidden aria-labelledby="ttlTeachers">
@@ -353,6 +361,15 @@
         <div class="tm-tower" id="tmTower" aria-hidden="true"><i class="tt-bar"><b></b></i><span class="tt-boss"></span><span class="tt-me"></span></div>
         <div class="tm-flbig" id="tmFlBig" aria-hidden="true"></div>
         <div class="tm-bossbar" id="tmBossBar" hidden><span></span><i><b></b></i></div>
+        <div class="tm-wind" id="tmWind" hidden>
+          <div role="status"><b id="tmWindTitle">꽃바람이 와요!</b><span id="tmWindHint">필살기로 앞줄을 지켜요</span></div>
+          <i aria-hidden="true"></i>
+          <button class="tm-brace" type="button" id="tmBrace" hidden>몸 낮추기</button>
+          <div class="tm-wind-signs" id="tmWindSigns" role="group" aria-label="책의 표식 고르기" hidden>
+            <button type="button" class="tm-brace" data-tam-sign="leaf">잎</button>
+            <button type="button" class="tm-brace" data-tam-sign="star">별</button>
+          </div>
+        </div>
         <div class="tm-cut" id="tmCut" hidden></div>
         <div class="tm-ev" id="tmEv" hidden></div>
         <div class="tm-msg" id="tmMsg" role="status" aria-live="polite" hidden></div>
@@ -361,9 +378,12 @@
         <div class="tm-warn" id="tmWarn" aria-hidden="true" hidden><i></i><i></i></div>
         <div class="tm-enter" id="tmEnter" aria-hidden="true" hidden><b>숲속 탐험대</b><small>오늘도 출발!</small></div>
       </div>
-      <div class="tm-bar"><button type="button" class="tm-rb tm-back" id="tmExit" aria-label="학교로 돌아가기"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M15 4.5 7.5 12l7.5 7.5"/></svg></button><div class="tm-mode" id="tmMode" role="group" aria-label="탐험 고르기" hidden><button type="button" data-tmm="0" aria-pressed="true">일반 탐험</button><button type="button" data-tmm="1" aria-pressed="false">심화 탐험</button></div><div class="tm-ac" id="tmAc" aria-label="가진 도토리"><b id="tmAcN">0</b></div></div>
-      <div class="tm-top"><div class="tm-where"><b id="tmFl">1층</b><span id="tmReg"></span><b class="tm-best" id="tmBest"></b></div><span class="tm-pow" id="tmPow"></span></div>
-      <div class="tm-acts"><button type="button" class="btn-sub small" id="tmSpd"></button><button type="button" class="btn-sub small" id="tmAuto" aria-pressed="false" hidden></button><button type="button" class="btn-sub small" id="tmSkOff" aria-pressed="false" hidden></button><button type="button" class="btn-sub small tm-skip" id="tmSkip" hidden></button><button type="button" class="cta small" id="tmRevive" hidden>📺 응원 받기</button><button type="button" class="btn-sub small" id="tmRep" hidden></button></div>
+      <div class="tm-bar"><button type="button" class="tm-rb tm-back" id="tmExit" aria-label="학교로 돌아가기"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M15 4.5 7.5 12l7.5 7.5"/></svg></button><div class="tm-mode" id="tmMode" role="group" aria-label="탐험 고르기" hidden><button type="button" data-tmm="0" aria-pressed="true">일반 탐험</button><button type="button" data-tmm="1" aria-pressed="false">심화 탐험</button></div>
+        <div class="tm-mode" id="tmPractice" role="group" aria-label="보스 연습" hidden><button type="button" id="tmPracticeRetry" hidden>다시 연습</button><button type="button" id="tmPracticeExit">연습 끝내기</button></div><div class="tm-ac" id="tmAc" aria-label="가진 도토리"><b id="tmAcN">0</b></div></div>
+      <div class="tm-top"><div class="tm-where"><b id="tmFl">1층</b><button class="tm-map-open" id="tmMapOpen" type="button" aria-label="탐험 지도 열기" aria-haspopup="dialog"><span id="tmReg"></span><span aria-hidden="true">›</span></button><b class="tm-best" id="tmBest"></b></div><span class="tm-pow" id="tmPow"></span></div>
+      <div class="tm-controls"><button class="tm-controls-toggle" type="button" id="tmControls" aria-controls="tmActions" aria-expanded="false">전투 설정</button>
+        <div class="tm-acts" id="tmActions" role="group" aria-label="전투 설정" hidden><button type="button" class="btn-sub small" id="tmSpd"></button><button type="button" class="btn-sub small" id="tmAuto" aria-pressed="false" hidden></button><button type="button" class="btn-sub small" id="tmSkOff" aria-pressed="false" hidden></button><button type="button" class="btn-sub small tm-skip" id="tmSkip" hidden></button><button type="button" class="cta small" id="tmRevive" hidden>📺 응원 받기</button><button type="button" class="btn-sub small" id="tmRep" hidden></button></div>
+      </div>
       <div class="tm-sks" id="tmSk"></div>
       <nav class="tm-nav" id="tmNav" aria-label="탐험대 메뉴"><button type="button" data-tnav="mem"><img data-x4="ex4_ic_member" alt=""><span>대원</span></button><button type="button" data-tnav="gear"><img data-x4="ex4_ic_gear" alt=""><span>장비</span></button><button type="button" data-tnav="mat"><img data-x4="ex4_ic_mat" alt=""><span>재료</span></button><button type="button" data-tnav="exp"><img data-x4="ex7_ic_exp" alt=""><span>원정</span></button><button type="button" data-tnav="rank"><img data-x4="ex4_ic_rank" alt=""><span>랭킹</span></button><button type="button" data-tnav="rep"><img data-x4="ex4_ic_report" alt=""><span>보고서</span></button></nav>
       <div class="tm-sheet" id="tmSheet" hidden><div class="tm-shh"><b id="tmShT">대원</b><button type="button" class="btn-sub small" id="tmShX">닫기</button></div>
@@ -633,7 +653,7 @@
       </div>
       <h3 class="panel-sub">정보</h3>
       <dl class="info">
-        <div id="verRow"><dt>버전</dt><dd>v5.4.1.6</dd></div>
+        <div id="verRow"><dt>버전</dt><dd>v5.4.2</dd></div>
         <div id="pidRow" hidden><dt>학교 번호</dt><dd id="infoPid"></dd></div>
       </dl>
       <div id="devBox" hidden>
@@ -701,6 +721,7 @@
     <p class="sheet-quest" id="sheetQuest" hidden></p>
     <button class="sheet-elect" id="sheetBday" type="button" hidden><span class="se-ic" id="sheetBdayIc" aria-hidden="true"></span><span class="se-tx"><b>생일 잔치</b><small id="sheetBdayTx"></small></span><em id="sheetBdayGo">케이크</em></button>
     <button class="sheet-elect fr-row" id="sheetFriend" type="button" hidden><span class="se-ic" id="sheetFriendIc" aria-hidden="true"></span><span class="se-tx"><b id="sheetFriendNm"></b><small class="fr-say" id="sheetFriendTx"></small></span><em id="sheetFriendGo">쓰다듬기</em></button>
+    <button class="btn-sub small sheet-patall" id="sheetPatAll" type="button" hidden></button>
     <button class="sheet-elect" id="sheetLab" type="button" hidden><span class="se-ic" id="sheetLabIc" aria-hidden="true"></span><span class="se-tx"><b>과학 탐구 실험</b><small id="sheetLabTx"></small></span><em id="sheetLabGo">실험하기</em></button>
     <button class="sheet-elect" id="sheetExam" type="button" hidden><span class="se-ic" id="sheetExamIc" aria-hidden="true"></span><span class="se-tx"><b>시험 기간</b><small id="sheetExamTx"></small></span><em id="sheetExamGo">보기</em></button>
     <div class="sheet-award" id="sheetAward" hidden></div>
@@ -1358,6 +1379,13 @@
     <p class="fine" id="tmRepSub"></p>
     <ul class="tm-rep" id="tmRepList"></ul>
     <div class="btn-row"><button class="btn-sub" type="button" id="tmRepAd">광고 보고 +100%</button><button class="cta" type="button" id="tmRepOk" data-autofocus>받기</button></div>
+  </section>
+</div>
+<div class="overlay center" id="mTamMap" hidden>
+  <div class="backdrop" data-cm="mTamMap"></div>
+  <section class="modal tm-map-modal" role="dialog" aria-modal="true" aria-labelledby="tmMapTitle">
+    <div class="tm-map-head"><h2 id="tmMapTitle">탐험 지도</h2><button class="btn-sub small" type="button" data-cm="mTamMap" data-cm-tap>닫기</button></div>
+    <div id="tmMapBody" class="tm-map-body"></div>
   </section>
 </div>
 <div class="overlay center" id="mSt" hidden>

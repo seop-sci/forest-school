@@ -25,6 +25,41 @@
     beach: ['푸른 바닷가', '갯벌 생물을 조사하고 표본을 모아요'], star: ['별빛 천문대', '산꼭대기 천문대에서 밤새 별을 관측해요'] };
   for (const T of TRIPS) for (const [f, i] of [['name', 0], ['say', 1]]) { const t0 = T[f]; Object.defineProperty(T, f, { get: () => uniNow() && TRIPS_U[T.id] ? TRIPS_U[T.id][i] : t0, enumerable: true, configurable: true }); }
   const TRIP = Object.fromEntries(TRIPS.map(t => [t.id, t]));
+  const CREEK_ROUTES = {
+    stones: { name: '징검다리 건너기', lead: '돌을 밟아 건너며 물살을 살펴요.', stop: '징검다리를 건너는 중', title: '징검다리 발자국', line: '돌마다 물살이 다르게 흘렀어요. 넓고 납작한 돌에서 잠깐 쉬었어요.', art: 'creek:2' },
+    bank: { name: '물가 관찰하기', lead: '갈대 곁에 앉아 송사리를 찾아요.', stop: '갈대밭에서 송사리를 찾는 중', title: '갈대밭의 송사리', line: '물풀 아래 반짝이는 송사리가 모였어요. 우리가 가만히 있자 가까이 왔어요.', art: 'creek:1' }
+  };
+  const CREEK_KEYS = Object.keys(CREEK_ROUTES);
+  const creekRouteKey = k => CREEK_KEYS.includes(k) ? k : '';
+  const TRIP_ROUTES = {
+    creek: CREEK_ROUTES,
+    hill: {
+      canopy: { name: '참나무 숲길 조사', lead: '햇볕이 드는 길에서 잎 모양을 비교해요.', stop: '참나무 그늘에서 잎을 살피는 중', title: '참나무 아래의 잎', line: '햇빛이 비치는 잎과 그늘의 잎은 모양과 느낌이 달랐어요.', art: 'hill:2', notes: [['햇빛 드는 잎', '빛을 받은 잎의 잎맥이 선명하게 보였어요.'], ['그늘의 잎', '그늘의 잎은 손바닥만큼 넓었어요.']] },
+      tracks: { name: '발자국 따라가기', lead: '흙길 옆에서 작은 동물의 흔적을 찾아요.', stop: '흙길에서 발자국을 찾는 중', title: '숲길의 작은 발자국', line: '비가 그친 길에 작은 발자국들이 나무 아래까지 이어졌어요.', art: 'hill:1', notes: [['마른 흙길', '마른 흙에는 발자국 가장자리가 흐릿했어요.'], ['젖은 흙길', '젖은 흙에는 발가락 자국까지 남아 있었어요.']] }
+    },
+    museum: {
+      fossils: { name: '화석 전시실 탐방', lead: '화석의 무늬를 보고 오래전 숲을 상상해요.', stop: '전시실에서 화석 무늬를 보는 중', title: '돌에 남은 옛 흔적', line: '돌처럼 보이던 화석에 오래전 생물의 모양이 남아 있었어요.', art: 'museum:0', notes: [['뼈 화석', '뼈 화석은 부러진 단면에 작은 구멍이 많았어요.'], ['잎 화석', '잎 화석에는 가는 잎맥이 부채처럼 펼쳐져 있었어요.']] },
+      coins: { name: '옛 물건 전시 탐방', lead: '숲속 마을이 쓰던 동전과 종을 살펴요.', stop: '옛 마을의 물건을 보는 중', title: '옛 마을의 도토리 동전', line: '숲속 마을의 동전에는 가운데 도토리 한 알이 새겨져 있었어요.', art: 'museum:1', notes: [['동전의 앞면', '앞면 가장자리에 작은 점무늬가 둘러져 있었어요.'], ['오래된 학교 종', '종 손잡이 아래에 만든 이의 표시가 남아 있었어요.']] }
+    },
+    beach: {
+      pools: { name: '바위 웅덩이 살피기', lead: '물이 빠진 바위 틈에 남은 작은 생물을 봐요.', stop: '바위 웅덩이의 생물을 관찰하는 중', title: '바위 틈의 작은 바다', line: '파도가 빠져나간 뒤에도 바위 틈에는 맑은 물이 남아 있었어요.', art: 'beach:1', notes: [['물속 가장자리', '작은 게가 바위 그림자 가까이 숨었어요.'], ['물 위의 바위', '물 위로 드러난 바위에 조그만 따개비가 붙어 있었어요.']] },
+      shells: { name: '모래사장 조개 찾기', lead: '파도가 두고 간 조개껍데기를 살펴요.', stop: '모래 위의 조개 자국을 찾는 중', title: '파도가 남긴 조개', line: '물결이 지나간 자리에 크기가 다른 조개껍데기들이 모였어요.', art: 'beach:0', notes: [['줄무늬 조개', '부채처럼 펼쳐진 줄무늬가 가장자리까지 이어졌어요.'], ['나선 조개', '나선을 따라 손끝으로 돌려 보니 끝으로 갈수록 좁아졌어요.']] }
+    },
+    star: {
+      constellations: { name: '별자리 찾아 그리기', lead: '밝은 별을 연결해 숲 위의 별자리를 그려요.', stop: '밤하늘의 별을 이어 그리는 중', title: '숲 위의 별자리', line: '밝은 별에서 옆 별로 눈길을 옮기니 하늘 위에 길이 생겼어요.', art: 'star:0', notes: [['북쪽 하늘', '국자처럼 이어진 일곱 별이 먼저 눈에 들어왔어요.'], ['동쪽 하늘', '나무 위로 막 떠오른 별은 숲 가장자리 가까이에 있었어요.']] },
+      moon: { name: '망원경으로 달 관찰', lead: '달의 밝은 곳과 어두운 곳을 나누어 그려요.', stop: '망원경으로 달의 표면을 보는 중', title: '달 위의 그늘', line: '망원경으로 보니 달 가장자리의 작은 분화구에도 그늘이 생겼어요.', art: 'star:1', notes: [['달의 밝은 면', '작고 동그란 분화구 옆에 흰 줄기가 뻗어 있었어요.'], ['빛과 그늘의 경계', '빛이 비스듬하게 놓인 곳에서 울퉁불퉁한 가장자리가 잘 보였어요.']] }
+    }
+  };
+  const tripRouteKeys = dest => Object.keys(TRIP_ROUTES[dest] || {});
+  const tripRouteKey = (dest, key) => tripRouteKeys(dest).includes(key) ? key : '';
+  const tripRouteToken = (dest, key) => dest + ':' + key;
+  const TRIP_FIELD_IDS = TRIPS.filter(D => D.id !== 'creek').flatMap(D => tripRouteKeys(D.id).map(k => tripRouteToken(D.id, k)));
+  const tripCurrentRoute = () => {
+    const T = S.trip;
+    return tripRouteKey(T.cur, T.cur === 'creek' ? T.creekRoute : T.route);
+  };
+  const TRIP_ACTIVITY = { hill: '뒷산에서 나뭇잎과 발자국을 살피는 중', creek: '시냇가에서 송사리를 관찰하는 중',
+    museum: '전시실에서 화석을 살피는 중', beach: '갯벌에서 조개를 찾는 중', star: '망원경으로 밤하늘을 보는 중' };
   const SOUV_IDS = new Set(TRIPS.flatMap(t => t.souv.map((_, i) => `${t.id}:${i}`)));
   const TRIP_ART = {
     hill: '<path d="M-10 6 L-3 -6 L1 0 L4 -4 L10 6 Z" fill="#6E9446"/><circle cx="5" cy="-7" r="2" fill="#F3C04B"/>',
@@ -45,6 +80,7 @@
   const tripSetsAll = () => TRIPS.filter(t => t.souv.every((_, i) => S.trip.souv.includes(`${t.id}:${i}`))).length;
   const tripMult = () => { const o = souvOld(); return 1 + 0.02 * o + 0.01 * (souvN() - o) + 0.1 * tripSetsDone() + 0.05 * tripSetsAll(); };
   const tripLeft = () => Math.max(0, S.trip.end - gameNow());   // 게임 시계
+  const tripProgress = () => Math.max(0, Math.min(1, 1 - tripLeft() / Math.max(1, S.trip.end - S.trip.start)));
   const tripBack = () => !!S.trip.cur && tripLeft() <= 0;
   const tripCut = T => Math.max(30, Math.round(T.min / 4));   // 광고 한 편에 줄어드는 분(적어도 30분)
   function tripReward(T) {
@@ -257,25 +293,101 @@
       if (rt.tripView !== (cur ? (back ? 'back' : 'go') : 'idle')) renderTrip();
       else if (cur && !back) {
         $('#tripLeft').textContent = `${hms(tripLeft())} 남았어요`;
-        $('#tripBar').style.width = ((1 - tripLeft() / (S.trip.end - S.trip.start)) * 100).toFixed(1) + '%';
+        paintTripJourney(tripProgress());
       }
     }
   }
   function openTrip(keep) {
     if (rt.paused) return;
-    if (keep !== true) rt.tripGot = '';
+    if (keep !== true) { rt.tripGot = ''; rt.tripPlan = null; }
     if (!tripOpen()) { toast('체험학습은 초등학교 3학년부터 갈 수 있어요'); return; }
     if (rt.modalOpen && rt.modalOpen !== $('#mTrip')) return;
     sfx('tap');
     renderTrip();
     if (rt.modalOpen !== $('#mTrip')) openModal($('#mTrip'));
   }
+  function tripJourney(D, mode, key = '') {
+    const creek = D.id === 'creek', picture = IMG(`trip_${D.id}_wide`) || IMG(`trip_dest_${D.id}`), bus = IMG('trip_bus');
+    return `<div class="tr-journey" id="${creek ? 'tripCreekScene' : 'tripJourney'}" data-dest="${D.id}" data-route="${key}" data-mode="${mode}" data-ambient="${wldLv() > 0 ? 'on' : 'off'}">
+      ${picture ? `<img class="tr-journey-land${creek ? ' tr-creek-land' : ''}" src="${picture}" alt="">` : ''}
+      <i class="tr-journey-light" aria-hidden="true"></i>
+      ${mode === 'travel' ? `<div class="tr-journey-track" role="progressbar" aria-label="체험학습 진행률" aria-valuemin="0" aria-valuemax="100" aria-valuenow="0"><b id="tripBar"></b>${bus ? `<img src="${bus}" alt="">` : ''}</div>` : ''}
+      <div class="tr-journey-caption"><b>${esc(D.name)}</b><span id="${creek ? 'tripCreekPhase' : 'tripJourneyPhase'}" role="status">${mode === 'start' ? '어떤 활동을 할까요?' : mode === 'back' ? '학교에 돌아왔어요' : ''}</span></div>
+    </div>`;
+  }
+  const tripLeg = progress => progress < .24 ? 0 : progress < .75 ? 1 : 2;
+  function paintTripJourney(progress) {
+    const scene = $('#tripBody .tr-journey');
+    if (!scene || scene.dataset.mode !== 'travel') return;
+    scene.style.setProperty('--journey', progress.toFixed(3));
+    const bar = $('#tripBar'), value = (progress * 100).toFixed(1);
+    bar.style.width = value + '%';
+    setAt(bar.parentElement, 'aria-valuenow', String(Math.floor(Number(value))));
+    const i = tripLeg(progress);
+    setHid($('#tripObservation'), i !== 1);
+    if (scene.dataset.leg === String(i)) return;
+    scene.dataset.leg = i;
+    const dest = scene.dataset.dest, activity = TRIP_ROUTES[dest][scene.dataset.route]?.stop || TRIP_ACTIVITY[dest];
+    const phases = [dest === 'creek' ? '시냇가로 가는 중' : '버스를 타고 이동 중', activity, '학교로 돌아오는 중'];
+    setTx($('.tr-journey-caption span', scene), phases[i]);
+    $$('#tripBody .tr-legs li').forEach((el, k) => {
+      el.classList.toggle('done', k < i);
+      if (k === i) el.setAttribute('aria-current', 'step'); else el.removeAttribute('aria-current');
+    });
+  }
+  function tripRecord(route, notes = 0) {
+    const details = (route.notes || []).map((note, i) => notes & (1 << i) ? `<p class="tr-extra-note"><strong>${esc(note[0])}</strong> ${esc(note[1])}</p>` : '').join('');
+    return `<article class="tr-creek-record"><span aria-hidden="true">${souvIcon(route.art)}</span><div><b>${esc(route.title)}</b><p>${esc(route.line)}</p>${details}</div></article>`;
+  }
+  function tripPlanHTML() {
+    const { dest, key } = rt.tripPlan, D = TRIP[dest], creek = dest === 'creek', routes = TRIP_ROUTES[dest];
+    return tripJourney(D, 'start', key) + `<fieldset class="tr-creek-options"><legend>${creek ? '시냇가 경로' : '현장 활동 선택'}</legend>
+      ${tripRouteKeys(dest).map(k => { const route = routes[k]; return `<label><input type="radio" data-trip-route name="${creek ? 'creekRoute' : 'tripRoute'}" value="${k}"${key === k ? ' checked' : ''}><span><b>${esc(route.name)}</b><small>${esc(route.lead)}</small></span></label>`; }).join('')}
+      </fieldset><div class="btn-row tr-creek-actions"><button class="btn-sub" type="button" data-trip-back${creek ? ' id="tripCreekBack"' : ''}>목적지 목록</button>
+      <button class="cta" type="button" data-trip-depart${creek ? ' id="tripCreekGo"' : ''}${key ? '' : ' disabled'}>출발 (${minText(D.min)})</button></div>`;
+  }
+  function setTripChoice(key) {
+    const plan = rt.tripPlan;
+    if (!plan || !tripRouteKey(plan.dest, key)) return;
+    plan.key = key;
+    const scene = $('#tripBody .tr-journey');
+    scene.dataset.route = key;
+    setTx($('.tr-journey-caption span', scene), TRIP_ROUTES[plan.dest][key].name);
+    $('#tripBody [data-trip-depart]').disabled = false;
+  }
+  function tripObservationHTML(route) {
+    const note = route.notes[S.trip.observation === 2 ? 1 : 0];
+    return S.trip.observation
+      ? `<b>${esc(note[0])}</b><p>${esc(note[1])}</p>`
+      : `<b>현장에서 무엇을 자세히 볼까요?</b><div class="tr-field-choices">${route.notes.map(([label], i) => `<button type="button" class="btn-sub" data-trip-observation="${1 << i}">${esc(label)}</button>`).join('')}</div>`;
+  }
+  function observeTrip(bit) {
+    const T = S.trip, key = tripCurrentRoute(), route = key && TRIP_ROUTES[T.cur][key];
+    if (!route?.notes || T.observation || tripBack() || tripLeg(tripProgress()) !== 1 || (bit !== 1 && bit !== 2)) return;
+    T.observation = bit;
+    save();
+    setH($('#tripObservation'), tripObservationHTML(route));
+    $('#tripObservation')?.focus({ preventScroll: true });
+    sfx('tap');
+  }
+  function tripFieldAlbum() {
+    const records = S.trip.records, count = Object.keys(records).length;
+    if (!count) return '';
+    const groups = TRIPS.filter(D => D.id !== 'creek').map(D => {
+      const entries = tripRouteKeys(D.id).filter(k => records[tripRouteToken(D.id, k)] !== undefined);
+      return entries.length ? `<section><h4>${esc(D.name)} <small>${entries.length}/${tripRouteKeys(D.id).length}</small></h4>${entries.map(k => tripRecord(TRIP_ROUTES[D.id][k], records[tripRouteToken(D.id, k)])).join('')}</section>` : '';
+    }).join('');
+    return `<details class="tr-field-album"><summary>현장 관찰 기록 <small>${count}/${TRIP_FIELD_IDS.length}</small></summary>${groups}</details>`;
+  }
   function renderTrip() {
     const cur = S.trip.cur, T = cur && TRIP[cur], back = tripBack();
     rt.tripView = cur ? (back ? 'back' : 'go') : 'idle';
+    if (!cur && rt.tripPlan) { $('#tripBody').innerHTML = tripPlanHTML(); return; }
+    const key = tripCurrentRoute(), route = key && TRIP_ROUTES[cur][key];
     const ac = acornIcon(), di = dipIcon(), gi = `<svg viewBox="-8 -11 16 20" aria-hidden="true">${GOLD_ICON.slice(GOLD_ICON.indexOf('>') + 1, -6)}</svg>`;
     const rw = (R, x) => `<span class="tr-rw">${ac}<b>${fmt(R.acorns * x)}</b></span><span class="tr-rw">${di}<b>${R.dip * x}</b></span>${R.gold ? (goldRich() ? `<span class="tr-rw">${ESS_ICON()}<b>${R.gold * GOLD.essPer}</b></span>` : `<span class="tr-rw">${gi}<b>${R.gold}</b></span>`) : ''}`;
-    let h = (IMG('trip_head') ? `<div class="tr-head" style="background-image:url('${blobUrl(IMG('trip_head'))}')" aria-hidden="true"></div>` : '') + (rt.tripGot ? `<p class="tr-got">${esc(rt.tripGot)}</p>` : '');   // 창 맨 위 그림
+    let h = cur ? tripJourney(T, back ? 'back' : 'travel', key) : (IMG('trip_head') ? `<div class="tr-head" style="background-image:url('${blobUrl(IMG('trip_head'))}')" aria-hidden="true"></div>` : '');
+    if (rt.tripGot) h += `<p class="tr-got">${esc(rt.tripGot)}</p>`;
     if (!cur) {
       h += '<p class="tr-lead">돌아오면 도토리, 수료증, 그곳 기념품을 가져와요.</p><div class="tr-list">';
       for (const D of TRIPS) {
@@ -284,22 +396,30 @@
           `<div class="tr-tx"><b>${D.name} <small>${minText(D.min)}</small></b><span>${lock ? `체험학습을 ${D.need}번 다녀오면 열려요` : D.say}</span>` +
           `<span class="tr-meta">${lock ? '' : rw(tripReward(D), 1)}<span class="tr-sv">기념품 ${got}/${D.souv.length}</span></span></div>` +
           (lock ? '<span class="tr-lock" aria-hidden="true"><svg viewBox="0 0 24 24"><rect x="5" y="10" width="14" height="10" rx="2" fill="currentColor"/><path d="M8 10V8a4 4 0 0 1 8 0v2" fill="none" stroke="currentColor" stroke-width="2"/></svg></span>'
-            : `<button class="cta small" type="button" data-trip="${D.id}">출발</button>`) + '</div>';
+            : `<button class="cta small" type="button" data-trip="${D.id}">${D.id === 'creek' ? '경로 선택' : '활동 선택'}</button>`) + '</div>';
       }
       h += '</div>';
     } else if (!back) {
       const cut = tripCut(T);
-      h += `<div class="tr-now"><span class="tr-ic big${IMG('trip_dest_' + T.id) ? ' has-dest' : ''}" style="--tc:${T.c}">${tripIcon(T.id)}</span><b>${T.name}에 가 있어요</b><span>${T.say}</span></div>` +
-        `<div class="tr-bar"><i id="tripBar" style="width:${((1 - tripLeft() / (S.trip.end - S.trip.start)) * 100).toFixed(1)}%"></i></div>` +
+      h += (route ? `<p class="tr-lead">${esc(route.name)}</p>` : '') +
+        '<ol class="tr-legs" aria-label="체험학습 일정"><li>가는 길</li><li>현장 활동</li><li>귀환</li></ol>' +
         `<p class="tr-left" id="tripLeft">${hms(tripLeft())} 남았어요</p>` +
+        (route?.notes ? `<section class="tr-observation" id="tripObservation" tabindex="-1" aria-live="polite" hidden>${tripObservationHTML(route)}</section>` : '') +
         `<button class="cta" type="button" id="tripAd">광고 보고 ${minText(cut)} 당기기</button>` +
         `<div class="btn-row" style="flex-wrap:wrap">${TK.filter(t => S.tk[t.k] > 0).map(t => `<button class="btn-sub small" type="button" data-trip-tk="${t.k}">${t.name} (${S.tk[t.k]}장)</button>`).join('')}</div><p class="fine">남은 시간보다 긴 단축권을 쓰면 남는 시간은 사라져요.</p>` +
         '<p class="fine">앱을 꺼도 시간은 가요.</p>';
     } else {
       const R = tripReward(T);
-      h += `<div class="tr-now"><span class="tr-ic big${IMG('trip_dest_' + T.id) ? ' has-dest' : ''}" style="--tc:${T.c}">${tripIcon(T.id)}</span><b>${T.name}에서 돌아왔어요!</b><span>기념품 하나와 함께 이만큼 가져왔어요</span></div>` +
+      const gathered = S.trip.souv.filter(k => k.startsWith(T.id + ':')).length;
+      h += '<div class="tr-return"><b>체험학습 보고서</b>' +
+        `<span>기념품 수집 ${gathered}/${T.souv.length}, ${gathered < T.souv.length ? '새 기념품 1종' : '기념품을 모두 모았어요'}</span></div>` +
+        (route ? tripRecord(route, S.trip.observation) : '') +
         `<div class="tr-gift">${rw(R, 1)}</div>` +
-        `<div class="btn-row"><button class="cta" type="button" id="tripGet">받기</button></div>`;   // 광고가 너무 많다는 의견으로 2배 받기를 뺐어요
+        '<div class="btn-row"><button class="cta" type="button" id="tripGet">귀환 보상 받기</button></div>';
+    }
+    if (!cur) {
+      if (S.trip.creekLog.length) h += `<details class="tr-creek-album"><summary>시냇가 관찰 기록 <small>${S.trip.creekLog.length}/${CREEK_KEYS.length}</small></summary>${CREEK_KEYS.filter(k => S.trip.creekLog.includes(k)).map(k => tripRecord(CREEK_ROUTES[k])).join('')}</details>`;
+      h += tripFieldAlbum();
     }
     // 기념품 모음
     h += `<details class="tr-souv-d"${rt.trSvOpen ? ' open' : ''}><summary><h3 class="tr-h">기념품 모음 <small>${souvN()}/${SOUV_IDS.size}종, 수업료 +${Math.round((tripMult() - 1) * 100)}%</small></h3></summary><div class="tr-souv">`;   // 접어 둬요
@@ -313,13 +433,18 @@
     }
     h += '</div><p class="fine tr-fine">처음 세 가지: 하나에 수업료 +2%, 다 모으면 +10% 더<br>그다음 아홉 가지: 하나에 +1%, 다 모으면 +5% 더<br>졸업해도 남아요</p></details>';
     $('#tripBody').innerHTML = h;
+    if (cur && !back) paintTripJourney(tripProgress());
   }
-  function startTrip(id) {
+  function startTrip(id, route) {
     const D = TRIP[id];
     if (!D || S.trip.cur || S.st.trips < D.need) return;
     if (tr2Busy()) { toast(tr2Busy()); return; }   // 수학여행 중
     const now = gameNow();
     rt.tripGot = '';
+    rt.tripPlan = null;
+    S.trip.creekRoute = id === 'creek' ? creekRouteKey(route) : '';
+    S.trip.route = id === 'creek' ? '' : tripRouteKey(id, route);
+    S.trip.observation = 0;
     S.trip.cur = id; S.trip.start = now; S.trip.end = now + D.min * 60000;
     sfx('buy'); buzz(10);
     toast(`${D.name}에 출발했어요! ${minText(D.min)} 뒤에 돌아와요`);
@@ -360,6 +485,15 @@
     const left = leftOld.length ? leftOld : left0, isOld = leftOld.length > 0;   // 처음 세 가지부터
     let msg = `${D.name}에서 도토리 +${fmt(R.acorns * x)}, 수료증 +${R.dip * x}장`;
     const rw = { title: `${D.name}에서 돌아왔어요!`, items: [{ ic: 'acorn', t: `도토리 +${fmt(R.acorns * x)}` }, R.dip ? { ic: 'dip', t: `수료증 +${R.dip * x}장` } : null, gIt] };
+    const key = tripCurrentRoute(), route = key && TRIP_ROUTES[D.id][key];
+    if (route) {
+      const token = tripRouteToken(D.id, key), before = S.trip.records[token], creek = D.id === 'creek';
+      const notes = (before || 0) | S.trip.observation;
+      if (creek ? !S.trip.creekLog.includes(key) : before !== notes) {
+        if (creek) S.trip.creekLog.push(key); else S.trip.records[token] = notes;
+        rw.items.push({ ic: souvIcon(route.art), t: `관찰 기록: ${route.title}` });
+      }
+    }
     if (left.length) {
       const k = left[Math.floor(Math.random() * left.length)];
       S.trip.souv.push(k);
@@ -379,7 +513,7 @@
     S.trip.been[D.id] = (S.trip.been[D.id] || 0) + 1;
     S.st.trips += 1;
     addLeague(LP.trip + LP.tripHour * Math.floor(D.min / 60));
-    S.trip.cur = ''; S.trip.start = 0; S.trip.end = 0;
+    S.trip.cur = ''; S.trip.start = 0; S.trip.end = 0; S.trip.creekRoute = ''; S.trip.route = ''; S.trip.observation = 0;
     buzz(15);
     rt.tripGot = msg;
     rt.tripTxt = '';

@@ -66,9 +66,11 @@ with sync_playwright() as p:
       for (const id of ['foldB', 'foldL', 'foldR', 'qFold']) document.getElementById(id).click(); await new Promise(r => setTimeout(r, 300));
       out.after = { ...S.fold }; out.bh2 = Math.round(document.querySelector('.board').getBoundingClientRect().height); return out; }""")
     print('접기', r)
-    check(r['fold'] == {'b': 1, 'l': 1, 'r': 1, 'q': 1, 'td': 0} and r['b'] and r['l'] and r['r'] and r['q'] and r['sideBtns'] == 0, '네 칸을 모두 접어요')
+    # '오늘 할 일'(td)은 이 네 단추와 따로예요. 처음과 옛 저장에서는 접혀 있어요(sanitize)
+    noTd = lambda d: {k: v for k, v in d.items() if k != 'td'}
+    check(noTd(r['fold']) == {'b': 1, 'l': 1, 'r': 1, 'q': 1} and r['b'] and r['l'] and r['r'] and r['q'] and r['sideBtns'] == 0, '네 칸을 모두 접어요')
     check(r['bh'] < r['bh2'] * 0.7, f"학교 칸이 한 줄로 낮아져요 {r['bh']} < {r['bh2']}")
-    check(r['keep'] == {'b': 1, 'l': 1, 'r': 1, 'q': 1, 'td': 0} and r['old'] == {'b': 0, 'l': 0, 'r': 0, 'q': 0, 'td': 0} and r['after'] == {'b': 0, 'l': 0, 'r': 0, 'q': 0, 'td': 0}, '저장에 남고 옛 저장은 펼침, 다시 누르면 펴요')
+    check(noTd(r['keep']) == {'b': 1, 'l': 1, 'r': 1, 'q': 1} and r['old'] == {'b': 0, 'l': 0, 'r': 0, 'q': 0, 'td': 1} and noTd(r['after']) == {'b': 0, 'l': 0, 'r': 0, 'q': 0} and r['after']['td'] == r['fold']['td'], '저장에 남고 옛 저장은 펼침, 다시 누르면 펴요')
     # 4) 선생님 이름
     r = pg.evaluate("() => Object.fromEntries(Object.entries(window.__forest.XT).map(([k, v]) => [k, v.name]))")
     check(r.get('diet') == '양 선생님' and r.get('lib') == '사슴 선생님' and r.get('kor') == '고니 선생님' and r.get('art') == '공작 선생님' and r.get('snack') == '알파카 선생님' and r.get('fix') == '비버 선생님' and r.get('dorm') == '오소리 선생님', f'선생님 이름 {r}')

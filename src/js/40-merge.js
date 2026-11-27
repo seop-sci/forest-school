@@ -661,16 +661,26 @@
   function mgPointerUp(e) {
     const d = mgUI.drag; if (!d || e.pointerId !== d.id) return;
     const i = d.i, moved = d.moved, over = d.over;
-    mgDragEnd(false);
+    // 놓은 칸으로(못 놓으면 처음 칸으로) 조각이 미끄러져 들어가요
+    mgDragEnd(false, moved ? (over >= 0 && over !== i ? over : i) : -1);
     if (!moved) { if (mgIsGen(mgCells()[i])) mgTapGen(i); else mgSelect(mgUI.sel === i ? -1 : i); return; }
     if (over >= 0 && over !== i) {
       const r = mgDrop(i, over);
       if (r) { mgRenderBoard(); mgRenderOrders(); mgRenderFoot(); if (r === 'merge') checkQuests(); save(); }
     }
   }
-  function mgDragEnd(cancel) {
+  function mgDragEnd(cancel, glide) {
     const d = mgUI.drag; if (!d) return;
-    if (mgUI.dragEl) { mgUI.dragEl.remove(); mgUI.dragEl = null; }
+    if (mgUI.dragEl) {
+      const g = mgUI.dragEl, c = glide >= 0 && mgUI.cells[glide];
+      mgUI.dragEl = null;
+      if (c && !rt.reduced && g.animate) {
+        const r = c.getBoundingClientRect();
+        const an = g.animate([{ left: g.style.left, top: g.style.top }, { left: (r.left + r.width / 2) + 'px', top: (r.top + r.height / 2) + 'px' }], { duration: 110, easing: 'ease-out', fill: 'forwards' });
+        let gone = false; const rm = () => { if (!gone) { gone = true; g.remove(); } };
+        an.onfinish = rm; an.oncancel = rm; setTimeout(rm, 400);
+      } else g.remove();
+    }
     if (mgUI.cells[d.i]) mgUI.cells[d.i].style.opacity = '';
     if (d.over >= 0 && mgUI.cells[d.over]) mgUI.cells[d.over].classList.remove('over');
     try { $('#mgGrid').releasePointerCapture(d.id); } catch (x) { /* 무시 */ }

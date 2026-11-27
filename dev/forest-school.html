@@ -652,9 +652,9 @@ label.srow,button.srow{cursor:pointer}
 .tm-p .tm-f.act.far .tm-body{animation:tmHop .4s ease-out}
 @keyframes tmAct{45%{transform:translateX(var(--dx)) scale(1.04) rotate(3deg)}}
 @keyframes tmHop{40%{transform:translateX(5%) rotate(4deg)}}
-.tm-f.hurt img{animation:tmHurt .32s}
+.tm-f.hurt .tm-body>img{animation:tmHurt .32s}
 @keyframes tmHurt{25%{transform:translateX(-7%);filter:brightness(2.2) sepia(1) hue-rotate(-30deg) drop-shadow(0 0 4px #fff)}60%{transform:translateX(4%)}}
-.tm-mob.hurt img{animation:tmHurtM .32s}
+.tm-mob.hurt .tm-body>img{animation:tmHurtM .32s}
 @keyframes tmHurtM{25%{transform:translateX(7%) scale(.94,1.06);filter:brightness(2.4) drop-shadow(0 0 5px #fff)}60%{transform:translateX(-4%)}}
 .tm-f.weak img{filter:saturate(.4) brightness(1.15) drop-shadow(0 0 5px #C9A2FF)}
 .tm-f.out{opacity:0;filter:blur(2px)}.tm-f.out .tm-body{animation:tmOut .5s ease-in forwards}
@@ -703,8 +703,63 @@ label.srow,button.srow{cursor:pointer}
 #panelTam .tm-tower{top:calc(var(--x4t) + var(--x4d,0px) + 148px);left:22%;right:22%}
 #panelTam .tm-bossbar{top:calc(var(--x4t) + var(--x4d,0px) + 160px)}   /* 진행 막대(140) 아래 */   /* 최고층 줄과 겹치지 않게 그 아래로 */
 #panelTam:has(#tmBossBar:not([hidden])) .tm-pow{top:calc(100% + 64px)}
-#panelTam:has(#tmBossBar:not([hidden])) .tm-acts{top:calc(var(--x4t) + var(--x4d,0px) + 208px)}
+#panelTam:has(#tmBossBar:not([hidden])) .tm-controls{top:calc(var(--x4t) + var(--x4d,0px) + 208px)}
 #panelTam .tm-time{top:calc(var(--x4t) + var(--x4d,0px) + 196px);left:24%;right:24%;height:4px}
+/* 보스 예고를 발밑의 범위, 남은 시간, 대응 단추로 보여 줘요. */
+.tm-wind{--tell:#FFD383;position:absolute;left:50%;bottom:calc(var(--sab,0px) + 173px);z-index:10;transform:translateX(-50%);width:max-content;max-width:calc(100% - 32px);padding:8px 16px 9px;border:2px solid var(--tell);border-radius:14px;background:#31372D;color:#FFF7DE;box-shadow:0 5px 14px #33251280;text-align:center;pointer-events:none}
+.tm-wind[data-trial="spore"]{--tell:#D6B2FF;background:#393046}
+.tm-wind[data-trial="wave"]{--tell:#9AE5FF;background:#153C4C}
+.tm-wind[data-trial="book"]{--tell:#FFE0A0;background:#503325}
+.tm-wind[data-trial="frost"]{--tell:#D5F6FF;background:#24455B}
+.tm-wind[data-trial="stars"]{--tell:#D7BEFF;background:#35294F}
+.tm-wind[data-trial="circuit"]{--tell:#BDF4E2;background:#244A46}
+.tm-wind b,.tm-wind span{display:block;line-height:1.25}
+.tm-wind b{font-family:var(--font-display);font-size:17px}
+.tm-wind span{font-size:12px;margin:2px 0 7px}
+.tm-wind i{position:relative;display:block;height:4px;border-radius:6px;background:#776749;overflow:hidden}
+.tm-wind i::before{content:"";display:block;height:100%;background:var(--tell);transform:scaleX(var(--wind-left,1));transform-origin:left}
+.tm-wind[data-trial="frost"] i{height:10px;background:#132A3A}
+.tm-wind[data-trial="frost"] i::before{height:4px;margin-top:3px}
+.tm-wind[data-trial="frost"] i::after{content:"";position:absolute;inset:0 auto 0 var(--wind-zone-start);width:var(--wind-zone-width);box-sizing:border-box;border:2px solid #FFDB79;border-radius:3px;background:#FFD86C30}
+.tm-wind.in-time .tm-brace{background:#FFDB79;color:#352E16}
+.tm-brace{display:block;width:100%;min-height:44px;margin-top:7px;border:0;border-radius:8px;background:var(--tell);color:#173440;font-weight:800;pointer-events:auto;cursor:pointer}
+.tm-brace:disabled{opacity:.68;cursor:default}
+.tm-wind-signs{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:7px}
+.tm-f.wind-target::after{content:"";position:absolute;inset:auto 5% 0;height:18%;z-index:-1;border:2px dashed #5A2B0E;border-radius:50%;background:#FFCE6C99;box-shadow:0 0 0 3px #FFF1C0}
+.tm-stage[data-reg="garden"] .tm-f.wind-target::after{border-color:#462963;background:#CF92F499;box-shadow:0 0 0 3px #D6B2FF}
+.tm-stage[data-reg="pond"] .tm-f.wind-target::after{border-color:#1B5466;background:#83DAFA99;box-shadow:0 0 0 3px #9AE5FF}
+.tm-stage[data-reg="library"] .tm-f.wind-target::after{border-color:#68432C;background:#FFC887aa;box-shadow:0 0 0 3px #FFE0A0}
+.tm-stage[data-reg="yard"] .tm-f.wind-target::after{border-color:#396583;background:#A7EEFFaa;box-shadow:0 0 0 3px #D5F6FF}
+.tm-stage[data-reg="tower"] .tm-f.wind-target::after{border-color:#593680;background:#B18FF9aa;box-shadow:0 0 0 3px #E1C8FF}
+.tm-stage[data-reg="lab"] .tm-f.wind-target::after{border-color:#235F54;background:#8DF5DA99;box-shadow:0 0 0 3px #BDF4E2}
+.tm-stage .tm-f.wind-guarded::after{border-style:solid;background:#BCFFD8bb;box-shadow:0 0 0 3px #CDFFE2}
+.tm-stage .tm-f.wind-linked .tm-body{filter:drop-shadow(0 0 5px #E8CAFF) drop-shadow(0 0 12px #BE90FF)}
+.tm-fxl .tm-shot.tm-wave-impact{width:64%;filter:hue-rotate(145deg) saturate(.75) drop-shadow(0 0 7px #BBF3FF)}
+.tm-fxl .tm-shot.tm-frost-impact{width:57%;filter:brightness(1.2) saturate(.45) drop-shadow(0 0 10px #D5F6FF)}
+.tm-fxl .tm-shot.tm-answer-fx{width:22%;filter:drop-shadow(0 0 8px #FFEBB2)}
+.tm-stage.boss-first .tm-body{position:relative}
+.tm-stage.boss-first .tm-mob.boss .tm-body{animation:none;transition:transform .28s cubic-bezier(.22,.61,.36,1)}
+.tm-mob.wind-up .tm-body{transform:translate(5%,3%) rotate(9deg) scale(1.05,.94)}
+.tm-stage[data-reg="library"] .tm-mob.wind-up .tm-body{transform:translate(1%,-8%) rotate(-12deg)}
+.tm-stage[data-reg="yard"] .tm-mob.wind-up .tm-body{transform:translate(3%,9%) scale(1.09,.92)}
+.tm-stage[data-reg="tower"] .tm-mob.wind-up .tm-body{transform:translate(4%,-10%) rotate(7deg)}
+.tm-f img.tm-counter-pose{position:absolute;inset:0;opacity:0;pointer-events:none}
+.tm-frame-owner .tm-body{position:relative}
+.tm-frame-art{position:absolute;inset:0;overflow:hidden;opacity:0;pointer-events:none}
+.tm-f .tm-frame-art img{width:var(--frame-width);height:100%;max-width:none;aspect-ratio:auto;object-fit:fill;filter:none}
+.tm-stage.boss-first .tm-f.hurt .tm-body>img{animation-name:tmGroundHurt}
+.tm-stage.boss-first .tm-mob.hurt img{--hurt-x:8%}
+@keyframes tmGroundHurt{25%{transform:translateX(var(--hurt-x,-8%)) rotate(4deg)}65%{transform:translateX(calc(-.4 * var(--hurt-x,-8%)))}}
+#panelTam:has(.tm-wind:not([hidden])) .tm-sk.ready{box-shadow:0 0 0 4px #FFD383,0 4px 8px #33251280}
+#panelTam:has(.tm-wind[data-trial="stars"]:not([hidden])) .tm-sk.ready{animation:none;box-shadow:0 0 0 3px #D7BEFF,0 0 14px #BA91FF}
+@media (prefers-reduced-motion:reduce){
+  .tm-stage.boss-first .tm-mob.boss .tm-body{transition:none}
+  .tm-stage[data-reg] .tm-mob.wind-up .tm-body{transform:none}
+  .tm-stage.boss-first .tm-f.hurt .tm-body>img,.tm-stage.boss-first .tm-bgs::after{animation:none}
+  .tm-frame-art{display:none}
+  .tm-frame-owner .tm-body>img:first-child{opacity:1!important}
+  #panelTam .tm-sk.ready,#panelTam .tm-sk.ready::before{animation:none}
+}
 #panelTam .tm-cut{top:30%;height:26%}
 .tm-cut.x4{background:center/cover no-repeat;border-top:3px solid #FFF3C9;border-bottom:3px solid #FFF3C9;box-shadow:0 6px 18px rgba(0,0,0,.35)}
 .tm-cut.x4 b{color:#fff;-webkit-text-stroke:0;text-shadow:0 2px 0 rgba(60,30,10,.85),0 0 6px rgba(60,30,10,.6)}
@@ -727,25 +782,44 @@ html.ait #panelTam .tm-bar .tm-ac{grid-column:auto;position:absolute;right:10px;
 #panelTam .tm-where{flex-direction:column;align-items:center;gap:3px}
 #panelTam #tmFl{display:inline-block;min-width:204px;white-space:nowrap;text-align:center;padding:4px 58px 6px;background:var(--x4-floor,#F2B347) center/100% 100% no-repeat;color:#6B3B10;font-size:22px;text-shadow:0 1px 0 #FFF3C9}
 #panelTam #tmReg{font-family:var(--font-display);font-size:13px;color:#fff;text-shadow:0 1px 0 #4A2F14,0 0 3px #4A2F14}
+.tm-map-open{display:flex;align-items:center;justify-content:center;gap:6px;min-height:25px;padding:2px 11px;border:1px solid #fff1c2bd;border-radius:16px;background:#2c3d32db;color:#fff7de;cursor:pointer;pointer-events:auto}
+.tm-map-open span:last-child{font-size:17px;line-height:1}
+.tm-map-modal.modal{width:100%;max-width:432px;padding:14px;text-align:left}
+.tm-map-head{display:flex;align-items:center;justify-content:space-between;gap:12px;margin-bottom:10px}
+.tm-map-head h2{margin:0;font-family:var(--font-display)}
+.tm-map-body{max-height:min(64dvh,600px);overflow:auto;overscroll-behavior:contain}
+.tm-map-goal{display:grid;gap:4px;padding:13px;border:1px solid #cbb074;border-radius:13px;background:#385442;color:#fff6dc}
+.tm-map-goal b{font-size:18px;font-family:var(--font-display)}
+.tm-map-goal small,.tm-map-goal span{font-size:12px;color:#ffedc9}
+.tm-map-label{margin:13px 0 6px;color:var(--muted);font-size:12px;font-weight:700}
+.tm-practice-list{margin:9px 0;padding:8px 10px;border:1px solid var(--line);border-radius:10px;background:var(--card);color:var(--ink)}
+.tm-practice-list summary{min-height:32px;line-height:32px;font-weight:800;cursor:pointer}
+.tm-practice-list p{margin:2px 0 8px;color:var(--muted);font-size:12px}
+.tm-practice-list button{width:100%;min-height:38px;margin:2px 0;text-align:left}
+#panelTam #tmPractice button{min-height:42px}
+.tm-map-regions{display:grid;gap:6px;margin:0;padding:0;list-style:none}
+.tm-map-regions li{display:grid;grid-template-columns:60px minmax(0,1fr) auto;align-items:center;gap:8px;min-height:56px;padding:4px 8px 4px 4px;border:1px solid var(--line);border-radius:10px;background:var(--card);color:var(--ink)}
+.tm-map-regions li[aria-current]{border-color:var(--accent);box-shadow:inset 0 0 0 1px var(--accent)}
+.tm-map-regions img{width:60px;height:52px;object-fit:cover;object-position:center 35%;border-radius:7px}
+.tm-map-regions li>span{grid-column:2;display:grid;gap:1px;text-align:left}
+.tm-map-regions small,.tm-map-regions em{font-size:11px;color:var(--muted)}
+.tm-map-regions em{font-style:normal;text-align:right}
 #panelTam .tm-where small{color:#fff}
 #panelTam .tm-best{font-size:11px;pointer-events:auto;white-space:nowrap}   /* 한 줄로(두 줄이 되면 아래 막대를 가려요) */
 #panelTam .tm-best .tm-cap{display:inline;margin:0 0 0 2px;padding-left:7px;border-left:1.5px solid rgba(120,60,10,.35);color:#9A3F06;font-size:11px;font-weight:800;opacity:1}   /* 흰 글자가 안 보여서 */
 #panelTam .tm-pow{position:absolute;left:10px;top:calc(100% + 38px);transform:scale(.88);transform-origin:left top;white-space:nowrap}
-#panelTam .tm-acts{position:absolute;right:8px;top:calc(var(--x4t) + var(--x4d,0px) + 176px);z-index:12;margin:0;flex-direction:column;flex-wrap:nowrap;gap:14px}
-#panelTam .tm-acts button{position:relative;width:56px;height:56px;min-height:0;border:0;border-radius:50%;padding:0;background:var(--x4-btn,#C98A4B) center/100% 100% no-repeat;box-shadow:none;display:grid;place-items:center;color:#fff;font-size:0}
+#panelTam .tm-controls{position:absolute;right:10px;top:calc(var(--x4t) + var(--x4d,0px) + 176px);z-index:12;display:grid;justify-items:end;max-width:calc(100% - 20px)}
+.tm-controls-toggle{min-height:44px;padding:5px 9px;border:1px solid #FFF0C0;border-radius:10px;background:#2F3D32e8;color:#FFF8E1;font-size:12px;font-weight:700;cursor:pointer}
+#panelTam .tm-acts{display:grid;justify-items:stretch;gap:5px;min-width:142px;margin:5px 0 0;padding:6px;border:1px solid #FFF0C0;border-radius:12px;background:#2F3D32;box-shadow:0 6px 18px #151e16aa}
+#panelTam .tm-acts button{position:relative;display:flex;align-items:center;gap:6px;width:auto;min-height:44px;border:0;border-radius:8px;padding:4px 6px;background:#435446;color:#FFF8E1;box-shadow:none;text-align:left}
 #panelTam .tm-acts button[hidden],#panelTam #tmRep{display:none}
-#panelTam .tm-acts button{box-shadow:0 0 0 2.5px #FFF3C9,0 4px 8px rgba(40,20,0,.45)}
 #panelTam .tm-acts button:not(.on):not([aria-pressed="true"]) img{filter:saturate(.75)}
-#panelTam .tm-acts button.on,#panelTam .tm-acts button[aria-pressed="true"]{background-image:var(--x4-btnon,none);box-shadow:0 0 0 3px #FFD54A,0 0 12px 2px rgba(255,214,90,.9),0 4px 8px rgba(40,20,0,.45)}
-#panelTam .tm-acts button.on small,#panelTam .tm-acts button[aria-pressed="true"] small{background:#C2410C;color:#fff}   /* 오른쪽 단추가 잘 보이게, 켜진 단추는 금빛 테두리 */
-#panelTam .tm-acts img{width:56%;height:56%;object-fit:contain;pointer-events:none}
-#panelTam .tm-acts small{position:absolute;left:50%;bottom:-11px;transform:translateX(-50%);white-space:nowrap;padding:0 8px;border-radius:9px;background:#4A2A10;color:#FFF3C9;font-size:12px;font-weight:800;line-height:19px;box-shadow:0 0 0 1.5px #FFE7A8,0 2px 4px rgba(0,0,0,.35)}
-#panelTam .tm-acts em{position:absolute;right:-4px;top:-4px;font-style:normal;font-size:10px;font-weight:800;color:#fff;background:#E2532F;border-radius:8px;padding:0 4px;line-height:15px}
-#panelTam .tm-acts .tm-skip{animation:tmSkipP 1.4s ease-in-out infinite}@keyframes tmSkipP{50%{box-shadow:0 0 0 3px #7CE38B,0 0 14px 3px rgba(124,227,139,.9),0 4px 8px rgba(40,20,0,.45)}}
-#panelTam .tm-acts .tm-skip em{background:#2F8F46;right:-10px}
-@media (prefers-reduced-motion:reduce){#panelTam .tm-acts .tm-skip{animation:none}}
-#panelTam .tm-acts{transition:opacity .15s}#panelTam.tm-cutting .tm-acts{opacity:0;pointer-events:none}
-#panelTam .tm-acts .tm-adb{position:absolute;left:-4px;top:-4px;width:22px;height:22px}
+#panelTam .tm-acts button.on,#panelTam .tm-acts button[aria-pressed="true"]{box-shadow:inset 0 0 0 1.5px #FFD54A;background:#50674C}
+#panelTam .tm-acts img{width:24px;height:24px;object-fit:contain;pointer-events:none}
+#panelTam .tm-acts small{font-size:12px;font-weight:700;white-space:nowrap}
+#panelTam .tm-acts em{margin-left:auto;padding:0 4px;border-radius:5px;background:#702F22;color:white;font-size:10px;font-style:normal;white-space:nowrap}
+#panelTam.tm-cutting .tm-controls{visibility:hidden;pointer-events:none}
+#panelTam .tm-acts .tm-adb{position:absolute;left:0;top:1px;width:13px;height:13px}
 #panelTam .tm-sks{position:absolute;left:0;right:0;bottom:calc(var(--sab,0px) + 92px);z-index:12;margin:0;gap:8px}
 #panelTam .tm-sk{width:56px;height:56px}
 #panelTam .tm-sk::after{content:"";position:absolute;inset:-7px;background:var(--x4-skf,none) center/100% 100% no-repeat;pointer-events:none}
@@ -784,6 +858,7 @@ html.ait #panelTam .tm-bar .tm-ac{grid-column:auto;position:absolute;right:10px;
 .tm-enter small{font-family:var(--font-display);font-size:16px;color:#fff;text-shadow:0 2px 0 #6B3B10}
 @keyframes tmEnterF{0%,70%{opacity:1}100%{opacity:0}}
 .tm-mob.boss .tm-body::before{content:"";position:absolute;left:-30%;right:-30%;top:-20%;bottom:-20%;z-index:-1;background:var(--x4-aura,none) center/contain no-repeat;opacity:.8;animation:tmAura 7s linear infinite;pointer-events:none}
+.tm-stage.boss-first .tm-mob.boss .tm-body::before{inset:-12%;opacity:.27;animation:none}
 @keyframes tmAura{to{transform:rotate(360deg)}}
 
 .tm-rib{position:absolute;left:4%;right:4%;top:28%;height:22%;display:grid;place-items:center;padding:0 14%;text-align:center;font-family:var(--font-display);font-size:clamp(16px,6.2cqw,24px);color:#5A3A12;background:center/100% 100% no-repeat;animation:tmRib 1.3s ease-out forwards;z-index:7;text-shadow:0 1px 0 #fff}
@@ -811,6 +886,7 @@ html.ait #panelTam .tm-bar .tm-ac{grid-column:auto;position:absolute;right:10px;
 @keyframes tmFlag{from{transform:translateY(-60%) scale(.5);opacity:0}}
 .tm-bg.cur,.tm-bg.nx{right:-20%}
 .tm-p.walking .tm-f .tm-body{animation:tmWalk .42s ease-in-out infinite;animation-delay:var(--bd,0s)}
+.tm-p.walking .tm-f[data-frames="run"] .tm-body{animation:none}
 @keyframes tmWalk{0%,100%{transform:translateY(0) rotate(-.8deg)}50%{transform:translateY(-2.5%) rotate(.8deg)}}
 .tm-p.walking .tm-f::after{content:"";position:absolute;left:10%;bottom:6%;width:22%;height:10%;border-radius:50%;background:rgba(210,180,130,.75);filter:blur(1.5px);animation:tmDust .42s ease-out infinite;animation-delay:var(--bd,0s)}
 @keyframes tmDust{from{transform:translateX(0) scale(.5);opacity:.9}to{transform:translateX(-120%) scale(1.4);opacity:0}}
@@ -1117,7 +1193,8 @@ body.early .tab .dot,body.early #plChip{display:none!important}   /* F-16 처음
 .quest.ready .q-act{gap:6px;padding:5px 12px;border-radius:999px;background:var(--accent);color:var(--accent-ink);box-shadow:0 3px 0 var(--accent-shadow)}
 .quest.ready .q-get{display:inline}
 .quest.ready .q-rew{color:var(--accent-ink)}
-.quest.ready .q-chev,.quest.ready .q-cnt{display:none}
+.quest.ready .q-go-home,.quest.ready .q-cnt{display:none}
+.q-go-home{padding:4px 7px;border-radius:8px;background:var(--chip-bg);color:var(--chip-ink);font-size:11.5px;font-weight:700;white-space:nowrap}
 .quest.ready .q-bar i{background:var(--accent)}
 .quest.finished .q-rew{display:none}
 /* 퀘스트 쪽지 아래 학생 부탁: 다 들어주면 노랗게 '받기'가 돼요 */
@@ -1229,6 +1306,14 @@ body.early .tab .dot,body.early #plChip{display:none!important}   /* F-16 처음
 .qsec{display:flex;align-items:baseline;flex-wrap:wrap;gap:2px 8px;margin:6px 0 10px;font-family:var(--font-display);font-weight:400;font-size:18px}
 .qsec small{font-family:var(--font-body);font-size:13px;color:var(--muted)}
 .qsec.second{margin-top:24px}
+.q-switch{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:5px;margin:6px 0 12px;padding:4px;border:1px solid var(--line);border-radius:14px;background:var(--card)}
+.q-switch button{display:flex;justify-content:center;align-items:center;gap:4px;min-height:44px;padding:4px 3px;border:1px solid transparent;border-radius:10px;background:transparent;color:var(--ink);font-family:var(--font-display);font-size:14px;white-space:nowrap;cursor:pointer}
+.q-switch button[aria-pressed="true"]{background:var(--paper);border-color:var(--line);box-shadow:0 2px 4px #15170d13}
+.q-switch button span{padding:2px 4px;border-radius:5px;background:var(--accent);color:var(--accent-ink);font-family:var(--font-body);font-size:9px}
+#qViewMain .qs.cur .qcard{border:1px solid var(--line);border-radius:12px;padding:12px;background:var(--paper)}
+#qViewMain .qgoal{margin-top:9px}
+#qViewMain .qsay{margin:12px 0 0;padding-top:8px;border-top:1px solid var(--line)}
+#qViewMain .nb-btn{margin-top:12px}
 .chapter{padding:12px;border-radius:16px;background:var(--card)}
 .ch-head{display:flex;align-items:center;gap:8px;margin-bottom:10px}
 .ch-no{flex:none;padding:0 10px;border-radius:999px;background:var(--board);color:var(--chalk);font-family:var(--font-chalk);font-weight:700;font-size:16px;line-height:1.5}
@@ -1275,7 +1360,6 @@ body.early .tab .dot,body.early #plChip{display:none!important}   /* F-16 처음
 .fly{position:fixed;z-index:60;width:18px;height:22px;pointer-events:none}
 .fly svg{display:block;width:18px;height:22px}
 #vBudget{transform-origin:left center}
-.q-chev{flex:none;width:16px;height:16px}
 .ric{display:inline-flex}
 .qfoot .cta{width:auto;min-height:42px;margin-left:auto;padding:0 18px;font-size:16px}
 .mk svg{width:13px;height:13px}
@@ -1414,11 +1498,9 @@ body.early .tab .dot,body.early #plChip{display:none!important}   /* F-16 처음
 .trip-prop{pointer-events:none;transform-box:fill-box}.trip-prop.wave{transform-origin:15% 95%;animation:tripWave .5s ease-in-out infinite alternate}.trip-prop.float{transform-origin:50% 100%;animation:tripFloat 1.6s ease-in-out infinite alternate}
 @keyframes tripWave{from{transform:rotate(-18deg)}to{transform:rotate(14deg)}}@keyframes tripFloat{from{transform:translateY(0) rotate(-4deg)}to{transform:translateY(-2px) rotate(4deg)}}
 @media (prefers-reduced-motion:reduce){.trip-prop.wave,.trip-prop.float{animation:none}}
-.tr-ic .tr-dest{width:100%;height:100%;object-fit:cover;border-radius:inherit}.tr-ic.has-dest{width:62px;height:44px;overflow:hidden}.tr-ic.big.has-dest{width:96px;height:64px}   /* 목적지 그림 */
+.tr-ic .tr-dest{width:100%;height:100%;object-fit:cover;border-radius:inherit}.tr-ic.has-dest{width:62px;height:44px;overflow:hidden}   /* 목적지 그림 */
 .tr-head{height:110px;margin:-4px -4px 10px;border-radius:14px;background:center/cover no-repeat}
 .sv .sv-img{width:34px;height:34px;object-fit:contain}
-.tr-ic.big{width:64px;height:64px;border-radius:18px}
-.tr-ic.big svg{width:52px;height:52px}
 .tr-tx{flex:1;min-width:0;display:flex;flex-direction:column;gap:2px}
 .tr-tx b{font-family:var(--font-display);font-weight:400;font-size:15.5px;color:var(--ink)}
 .tr-tx b small{margin-left:4px;font-family:var(--font-body);font-size:12.5px;color:var(--chip-ink)}
@@ -1430,11 +1512,6 @@ body.early .tab .dot,body.early #plChip{display:none!important}   /* F-16 처음
 .tr-sv{font-size:12px;color:var(--chip-ink)}
 .tr-row .cta.small{flex:none;width:auto;min-height:40px;padding:0 14px}
 .tr-lock{flex:none;width:22px;height:22px;color:var(--muted)}
-.tr-now{display:flex;flex-direction:column;align-items:center;gap:4px;text-align:center;margin:4px 0 10px}
-.tr-now b{font-family:var(--font-display);font-weight:400;font-size:18px;color:var(--ink)}
-.tr-now > span{font-size:13.5px;color:var(--muted)}
-.tr-bar{height:10px;border-radius:999px;background:var(--line);overflow:hidden}
-.tr-bar i{display:block;height:100%;border-radius:inherit;background:var(--accent);transition:width .3s}
 .tr-left{margin:6px 0 10px;text-align:center;font-family:var(--font-chalk);font-weight:700;font-size:20px;font-variant-numeric:tabular-nums}
 .tr-gift{display:flex;justify-content:center;gap:14px;margin:4px 0 12px}
 .tr-gift .tr-rw{font-size:17px}
@@ -1450,6 +1527,57 @@ body.early .tab .dot,body.early #plChip{display:none!important}   /* F-16 처음
 .tr-fine{margin-top:8px}
 .tr-close{width:100%;margin-top:12px;position:sticky;bottom:0;z-index:3;box-shadow:0 -10px 10px -2px var(--paper)}
 .tr-souv-d>summary{cursor:pointer;list-style:none;margin-top:10px}.tr-souv-d>summary::-webkit-details-marker{display:none}.tr-souv-d>summary .tr-h{display:inline-flex;gap:6px;align-items:baseline}.tr-souv-d>summary .tr-h::after{content:"보기 ›";font-size:12px;color:var(--muted)}.tr-souv-d[open]>summary .tr-h::after{content:"접기 ‹"}
+.tr-journey{--journey:0;--route-pan:0%;--journey-glow:#ffe7a740;position:relative;isolation:isolate;height:clamp(150px,49vw,215px);overflow:hidden;border-radius:16px;background:#21463d;color:#fff9e8}
+.tr-journey[data-route="stones"]{--route-pan:3%}
+.tr-journey[data-route="bank"]{--route-pan:-3%}
+.tr-journey[data-route="canopy"],.tr-journey[data-route="fossils"],.tr-journey[data-route="pools"],.tr-journey[data-route="constellations"]{--route-pan:3%}
+.tr-journey[data-route="tracks"],.tr-journey[data-route="coins"],.tr-journey[data-route="shells"],.tr-journey[data-route="moon"]{--route-pan:-3%}
+.tr-journey[data-dest="creek"],.tr-journey[data-dest="beach"]{--journey-glow:#f0fff349}
+.tr-journey[data-dest="star"]{--journey-glow:#ada2ff57;background:#201e46}
+.tr-journey-land,.tr-journey-light,.tr-journey::after{position:absolute;inset:0;width:100%;height:100%;pointer-events:none}
+.tr-journey-land{object-fit:cover;object-position:center 54%;transform:translateX(calc(var(--route-pan) - 4% * var(--journey))) scale(1.14);transition:transform 1.35s cubic-bezier(.22,.61,.36,1)}
+.tr-journey-land.tr-creek-land{object-position:center 58%}
+.tr-journey::after{content:"";background:linear-gradient(180deg,#121d18bd,transparent 55%),linear-gradient(0deg,#182019a8,transparent 35%)}
+.tr-journey-light{background:radial-gradient(ellipse at 68% 42%,var(--journey-glow),transparent 48%);animation:trJourneyLight 6s ease-in-out infinite alternate}
+.tr-journey[data-dest="creek"] .tr-journey-light,.tr-journey[data-dest="beach"] .tr-journey-light{background:repeating-linear-gradient(116deg,transparent 0 30px,var(--journey-glow) 42px,transparent 62px);mask-image:radial-gradient(ellipse 36% 30% at 63% 70%,#000c,transparent)}
+@keyframes trJourneyLight{from{transform:translateX(-7%);opacity:.25}to{transform:translateX(6%);opacity:.72}}
+.tr-journey[data-ambient="off"] .tr-journey-light{animation:none;opacity:.45}
+.tr-journey-caption{position:absolute;z-index:1;inset:12px 15px auto;display:grid;gap:3px;text-shadow:0 2px 6px #101914;text-align:left}
+.tr-journey-caption b{font-size:clamp(20px,6vw,28px);font-family:var(--font-display)}
+.tr-journey-caption span{font-size:13px;font-weight:700}
+.tr-journey-track{position:absolute;z-index:1;inset:auto 16px 17px;height:4px;background:#f3ddac95;border-radius:8px}
+.tr-journey-track b{display:block;height:100%;border-radius:inherit;background:#ffdc82;transition:width 1.3s linear}
+.tr-journey-track img{position:absolute;width:42px;height:34px;object-fit:contain;left:calc(100% * var(--journey));bottom:3px;transform:translateX(calc(-100% * var(--journey)));filter:drop-shadow(0 3px 3px #27352585);transition:left 1.3s linear,transform 1.3s linear}
+.tr-legs{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:5px;margin:10px 0 4px;padding:0;list-style:none}
+.tr-legs li{padding:5px 2px;border:1px solid var(--line);border-radius:8px;background:var(--card);color:var(--muted);font-size:12px;text-align:center}
+.tr-legs li.done{background:var(--chip-bg);color:var(--chip-ink)}
+.tr-legs li[aria-current="step"]{border-color:var(--accent);color:var(--ink);font-weight:800}
+.tr-return{display:grid;gap:3px;margin-top:9px;padding:8px 10px;border-radius:10px;background:var(--chip-bg);color:var(--chip-ink);text-align:left}
+.tr-return span{font-size:12px}
+.tr-creek-options{padding:0;border:0;margin:12px 0}
+.tr-creek-options legend{font-family:var(--font-display);padding:0 0 5px;color:var(--ink)}
+.tr-creek-options label,.tr-creek-record{display:flex;align-items:center;gap:10px;padding:9px 12px;margin:6px 0;border:1px solid var(--line);border-radius:12px;background:var(--card);color:var(--ink)}
+.tr-creek-options label{min-height:50px;cursor:pointer}
+.tr-creek-options label:has(:checked){border-color:var(--accent);box-shadow:inset 0 0 0 1px var(--accent)}
+.tr-creek-options input{accent-color:var(--accent);width:17px;height:17px;flex:none}
+.tr-creek-options span,.tr-creek-record div{min-width:0;display:grid;gap:3px}
+.tr-creek-options small,.tr-creek-record p{margin:0;color:var(--muted);font-size:12px;line-height:1.45}
+.tr-creek-actions>*{flex:1}
+.tr-creek-record>span{flex:none;display:grid;place-items:center;width:44px;height:44px;border-radius:10px;background:var(--paper)}
+.tr-creek-record img,.tr-creek-record svg{width:34px;height:34px;object-fit:contain}
+.tr-creek-album,.tr-field-album{margin:12px 0}
+.tr-creek-album summary,.tr-field-album summary{font-family:var(--font-display);cursor:pointer;color:var(--ink)}
+.tr-creek-album summary small,.tr-field-album small{margin-left:5px;color:var(--muted)}
+.tr-field-album h4{margin:10px 0 4px;font-family:var(--font-display);color:var(--ink)}
+.tr-observation{margin:8px 0 12px;padding:9px 10px;border:1px solid var(--line);border-radius:12px;background:var(--card);color:var(--ink);text-align:left}
+.tr-observation p{margin:4px 0 0;color:var(--muted)}
+.tr-field-choices{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:6px;margin-top:7px}
+.tr-field-choices button{min-width:0;min-height:44px;padding-inline:6px;white-space:normal;word-break:keep-all}
+.tr-extra-note{padding-top:4px;border-top:1px solid var(--line)}
+@media (prefers-reduced-motion:reduce){
+  .tr-journey-land,.tr-journey-track img,.tr-journey-track b{transition:none}
+  .tr-journey-light{animation:none}
+}
 .boost .b-n{position:absolute;left:50%;bottom:-10px;transform:translateX(-50%);min-width:20px;box-sizing:border-box;padding:2px 6px;border-radius:999px;background:var(--accent);color:var(--accent-ink);font-family:var(--font-chalk);font-weight:700;font-size:13px;line-height:1.1;text-align:center;white-space:nowrap;font-variant-numeric:tabular-nums;box-shadow:0 0 0 2px var(--wood)}
 .boost.used .b-n{background:var(--board);color:var(--chalk-dim)}
 
@@ -1523,7 +1651,7 @@ body.early .tab .dot,body.early #plChip{display:none!important}   /* F-16 처음
 /* 버튼 */
 .cta{display:flex;align-items:center;justify-content:center;gap:10px;width:100%;min-height:52px;padding:0 18px;border:0;border-radius:14px;background:var(--accent);color:var(--accent-ink);font-family:var(--font-display);font-size:18px;box-shadow:0 4px 0 var(--accent-shadow);cursor:pointer;transition:transform .08s, box-shadow .08s}
 .cta:active{transform:translateY(3px);box-shadow:0 1px 0 var(--accent-shadow)}
-.cta[aria-disabled="true"]{background:var(--off-bg,var(--line));color:var(--off-ink,var(--muted));box-shadow:0 4px 0 var(--off-shadow,var(--line-shadow))}
+.cta:disabled,.cta[aria-disabled="true"]{background:var(--off-bg,var(--line));color:var(--off-ink,var(--muted));box-shadow:0 4px 0 var(--off-shadow,var(--line-shadow))}
 .cta.split{justify-content:space-between}
 .cta.small{min-height:46px;font-size:16px}
 .cost{display:inline-flex;align-items:center;gap:4px;font-family:var(--font-chalk);font-weight:700;font-size:21px;font-variant-numeric:tabular-nums}
@@ -2265,7 +2393,7 @@ body.sheet-open .app.on-school .toast,body.sheet-open .toast{top:calc(env(safe-a
 .ev-banner.exam{background:linear-gradient(135deg,#3E5F9C,#22355E)}
 /* 배너 그림: 그림은 왼쪽 60%, 이름은 비워 둔 오른쪽 40% 가운데에 */
 .ev-banner.has-img{height:auto;aspect-ratio:1024/400;align-items:center;justify-content:flex-end;padding:8px 10px}
-.ev-banner.has-img b{width:40%;text-align:center;line-height:1.25;word-break:keep-all}
+.ev-banner.has-img b{width:40%;text-align:center;line-height:1.25;word-break:keep-all;color:#fff;padding:4px 6px;border-radius:10px;background:rgba(70,35,5,.38);text-shadow:0 1px 2px rgba(60,30,0,.7)}   /* 밝은 그림 위에서도 글이 읽히게 */
 .ev-period{display:flex;justify-content:space-between;gap:8px;margin:0 2px 8px;font-size:13px;color:var(--muted)}
 .ev-stamps{display:grid;grid-template-columns:repeat(7,minmax(0,1fr));gap:4px;margin:4px 0 10px}
 .ev-stamp{display:flex;flex-direction:column;align-items:center;gap:2px;min-width:0;font-size:11px;color:var(--muted)}
@@ -3338,6 +3466,7 @@ body.sheet-open #map, body.sheet-open .wx-fx::before, body.sheet-open .wx-fx i, 
 .sheet-elect.todo{border-color:#E2A21C}.sheet-elect.todo em{background:#D9534A;color:#FFFFFF}
 /* 학생과 추억: 건물 창의 친구 줄, 하트, 도감 단짝 칸, 지도 말풍선, 앨범, 편지 */
 #kids.tap .kid{pointer-events:auto;cursor:pointer}
+.sheet-patall{display:flex;align-items:center;justify-content:center;gap:6px;width:100%;margin:-4px 0 10px;min-height:40px}.sheet-patall img{width:20px;height:20px;object-fit:contain}
 .fr-row .se-ic svg{width:34px;height:46px}.fr-row b{display:flex;align-items:center;gap:6px;flex-wrap:wrap}
 .fr-say{display:block;margin-top:3px;padding:4px 10px 5px;border-radius:10px 10px 10px 2px;background:var(--chip-bg);color:var(--ink);font-size:12px;line-height:1.35}
 .fr-mini{display:inline-flex;gap:1px;vertical-align:middle}.fr-mini img{width:12px;height:12px}
@@ -4158,7 +4287,7 @@ body.mg-on .toast[hidden]{display:none}
 .tx-tk{display:flex;align-items:center;gap:2px;height:38px;padding:0 12px 0 6px;border-radius:999px;background:rgba(255,248,225,.94);box-shadow:0 0 0 2px #E2A92A,0 3px 6px rgba(0,0,0,.3);color:#4A2E0A}
 .tx-tk img{width:30px;height:30px;object-fit:contain}
 .tx-tk b{font-family:var(--font-display);font-size:18px}.tx-tk small{font-size:12px;opacity:.7}
-.tx-mapw{flex:1;min-height:0;box-sizing:border-box;padding-top:calc(100px + var(--x4t,0px));overflow-x:hidden;overflow-y:auto;overscroll-behavior:contain;scrollbar-width:none;background:#3A2E19}
+.tx-mapw{flex:1;min-height:0;box-sizing:border-box;padding-top:calc(100px + var(--x4t,0px));padding-bottom:28px;overflow-x:hidden;overflow-y:auto;overscroll-behavior:contain;scrollbar-width:none;background:#3A2E19}
 .tx-mapw::-webkit-scrollbar{display:none}
 .tx-map{position:relative;width:100%;aspect-ratio:2/3;margin:0;background:#CFE3A8 center/cover no-repeat}
 .tx-full.lock .tx-map{filter:saturate(.5) brightness(.7)}
@@ -4204,6 +4333,19 @@ body.mg-on .toast[hidden]{display:none}
 .tx-end.win{background:#FFF2C6;box-shadow:inset 0 0 0 2px #E9B949;color:#4A2E0A}
 .tx-end b{font-family:var(--font-display);font-size:18px}
 .tx-trnew{display:flex;align-items:center;gap:6px;font-size:13px;font-weight:700}.tx-trnew img{width:48px;height:48px;object-fit:contain}
+/* 누르는 자리 넓히기(위 묶음과 같은 방식, 여기는 ::after): 위 줄 아이콘, 접기 단추, 편지 칩, 탐험 지역 이름, 한 번에 올리기 칸 */
+.ui-fold::after,.q-fold::after,.pl-chip::after,.tm-map-open::after,.tm-lvn button::after{content:'';position:absolute;inset:-6px}
+.tm-lvn button::after{inset:-6px -2px}
+.icon-btn::after{content:'';position:absolute;inset:-4px}
+.tm-map-open,.tm-lvn button{position:relative}
+.seg button{min-height:32px}
+.tm-lvn button{min-height:28px}
+.tx-regs button{min-height:36px}
+/* 누르는 순간 반응: 단추가 살짝 들어가요(scale 속성이라 단추의 transform 자리와 겹치지 않아요). 꺼진 단추와 움직임 줄이기는 빼요 */
+@media (prefers-reduced-motion:no-preference){
+  :where(button,[role="button"],summary):active:not(:disabled):not([aria-disabled="true"]){scale:.96}
+  :where(.cta,.btn-sub,.tx-card,.tm-rb,.icon-btn,.tab){transition-property:scale,transform,box-shadow,background-color;transition-duration:.08s}
+}
 </style>
 <div class="boot" id="boot" role="status" aria-label="숲속 동물 학교를 여는 중이에요">
   <div class="boot-pic" aria-hidden="true"></div>
@@ -4214,7 +4356,7 @@ body.mg-on .toast[hidden]{display:none}
     <p class="boot-step" id="bootStep">학교 문을 여는 중...</p>
     <p class="boot-tip" id="bootTip">학교 문을 여는 중이에요</p>
   </div>
-  <span class="boot-ver" id="bootVer">v5.4.1.6</span>
+  <span class="boot-ver" id="bootVer">v5.4.2</span>
 </div>
 
 <div class="app on-school" id="app">
@@ -4281,7 +4423,7 @@ body.mg-on .toast[hidden]{display:none}
       <span class="q-top"><span class="q-no" id="qbNo">메인 1-1</span><b id="qbTitle">책상 고치기</b><span class="q-cnt" id="qbCnt">Lv.0/1</span></span>
       <span class="q-how" id="qbHow">교실을 눌러서 책상을 올려요</span>
     </span>
-    <span class="q-act"><span class="q-get">받기</span><span class="q-rlab">보상</span><span class="q-rew"><span class="ric" id="qbRewIc"></span><span id="qbRew">30</span><span class="ric qb-gold" id="qbGold" hidden></span></span><svg class="q-chev" viewBox="0 0 24 24" aria-hidden="true"><path d="M9 6l6 6-6 6" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"/></svg></span>
+    <span class="q-act"><span class="q-get">받기</span><span class="q-rlab">보상</span><span class="q-rew"><span class="ric" id="qbRewIc"></span><span id="qbRew">30</span><span class="ric qb-gold" id="qbGold" hidden></span></span><span class="q-go-home">바로 가기</span></span>
     <span class="q-bar" aria-hidden="true"><i id="qbFill"></i></span>
   </button>
   </div>
@@ -4528,14 +4670,22 @@ body.mg-on .toast[hidden]{display:none}
     <section class="panel" id="panelQuests" hidden aria-labelledby="ttlQuests">
       <button class="panel-x" type="button" aria-label="홈으로"><svg viewBox="0 0 24 24" width="18" height="18" aria-hidden="true"><path d="M6 6l12 12M18 6L6 18" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round"/></svg></button>
       <h2 id="ttlQuests" class="ph"><span class="tic" data-ic="ic_cert" aria-hidden="true"></span><span>퀘스트</span></h2>
-      <h3 class="qsec">미션 <small>미션 포인트로 상자를 열어요</small></h3>
-      <div class="dms" id="qDaily"></div>
-      <h3 class="qsec second">메인 퀘스트 <small id="qsecVp">교감 선생님의 안내</small></h3>
-      <button class="nb-btn" id="sbBtn" type="button"><span id="sbBtnIc" aria-hidden="true"></span>이야기 수첩</button>
-      <div id="qMain"></div>
-      <h3 class="qsec second">학생들의 부탁</h3>
-      <div class="reqs" id="qSubs"></div>
-      <p class="qtally" id="qTally"></p>
+      <nav class="q-switch" aria-label="퀘스트 종류">
+        <button type="button" data-q-view="main" aria-pressed="true" aria-controls="qViewMain">메인<span id="qMainMark" hidden>받기</span></button>
+        <button type="button" data-q-view="subs" aria-pressed="false" aria-controls="qViewSubs">학생 부탁<span id="qSubsMark" hidden>받기</span></button>
+        <button type="button" data-q-view="daily" aria-pressed="false" aria-controls="qViewDaily">미션<span id="qDailyMark" hidden>받기</span></button>
+      </nav>
+      <div id="qViewMain" data-q-pane="main">
+        <div id="qMain"></div>
+        <button class="nb-btn" id="sbBtn" type="button"><span id="sbBtnIc" aria-hidden="true"></span>이야기 수첩</button>
+      </div>
+      <div id="qViewSubs" data-q-pane="subs" hidden>
+        <div class="reqs" id="qSubs"></div>
+        <p class="qtally" id="qTally"></p>
+      </div>
+      <div id="qViewDaily" data-q-pane="daily" hidden>
+        <div class="dms" id="qDaily"></div>
+      </div>
     </section>
 
     <section class="panel" id="panelTeachers" hidden aria-labelledby="ttlTeachers">
@@ -4560,6 +4710,15 @@ body.mg-on .toast[hidden]{display:none}
         <div class="tm-tower" id="tmTower" aria-hidden="true"><i class="tt-bar"><b></b></i><span class="tt-boss"></span><span class="tt-me"></span></div>
         <div class="tm-flbig" id="tmFlBig" aria-hidden="true"></div>
         <div class="tm-bossbar" id="tmBossBar" hidden><span></span><i><b></b></i></div>
+        <div class="tm-wind" id="tmWind" hidden>
+          <div role="status"><b id="tmWindTitle">꽃바람이 와요!</b><span id="tmWindHint">필살기로 앞줄을 지켜요</span></div>
+          <i aria-hidden="true"></i>
+          <button class="tm-brace" type="button" id="tmBrace" hidden>몸 낮추기</button>
+          <div class="tm-wind-signs" id="tmWindSigns" role="group" aria-label="책의 표식 고르기" hidden>
+            <button type="button" class="tm-brace" data-tam-sign="leaf">잎</button>
+            <button type="button" class="tm-brace" data-tam-sign="star">별</button>
+          </div>
+        </div>
         <div class="tm-cut" id="tmCut" hidden></div>
         <div class="tm-ev" id="tmEv" hidden></div>
         <div class="tm-msg" id="tmMsg" role="status" aria-live="polite" hidden></div>
@@ -4568,9 +4727,12 @@ body.mg-on .toast[hidden]{display:none}
         <div class="tm-warn" id="tmWarn" aria-hidden="true" hidden><i></i><i></i></div>
         <div class="tm-enter" id="tmEnter" aria-hidden="true" hidden><b>숲속 탐험대</b><small>오늘도 출발!</small></div>
       </div>
-      <div class="tm-bar"><button type="button" class="tm-rb tm-back" id="tmExit" aria-label="학교로 돌아가기"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M15 4.5 7.5 12l7.5 7.5"/></svg></button><div class="tm-mode" id="tmMode" role="group" aria-label="탐험 고르기" hidden><button type="button" data-tmm="0" aria-pressed="true">일반 탐험</button><button type="button" data-tmm="1" aria-pressed="false">심화 탐험</button></div><div class="tm-ac" id="tmAc" aria-label="가진 도토리"><b id="tmAcN">0</b></div></div>
-      <div class="tm-top"><div class="tm-where"><b id="tmFl">1층</b><span id="tmReg"></span><b class="tm-best" id="tmBest"></b></div><span class="tm-pow" id="tmPow"></span></div>
-      <div class="tm-acts"><button type="button" class="btn-sub small" id="tmSpd"></button><button type="button" class="btn-sub small" id="tmAuto" aria-pressed="false" hidden></button><button type="button" class="btn-sub small" id="tmSkOff" aria-pressed="false" hidden></button><button type="button" class="btn-sub small tm-skip" id="tmSkip" hidden></button><button type="button" class="cta small" id="tmRevive" hidden>📺 응원 받기</button><button type="button" class="btn-sub small" id="tmRep" hidden></button></div>
+      <div class="tm-bar"><button type="button" class="tm-rb tm-back" id="tmExit" aria-label="학교로 돌아가기"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M15 4.5 7.5 12l7.5 7.5"/></svg></button><div class="tm-mode" id="tmMode" role="group" aria-label="탐험 고르기" hidden><button type="button" data-tmm="0" aria-pressed="true">일반 탐험</button><button type="button" data-tmm="1" aria-pressed="false">심화 탐험</button></div>
+        <div class="tm-mode" id="tmPractice" role="group" aria-label="보스 연습" hidden><button type="button" id="tmPracticeRetry" hidden>다시 연습</button><button type="button" id="tmPracticeExit">연습 끝내기</button></div><div class="tm-ac" id="tmAc" aria-label="가진 도토리"><b id="tmAcN">0</b></div></div>
+      <div class="tm-top"><div class="tm-where"><b id="tmFl">1층</b><button class="tm-map-open" id="tmMapOpen" type="button" aria-label="탐험 지도 열기" aria-haspopup="dialog"><span id="tmReg"></span><span aria-hidden="true">›</span></button><b class="tm-best" id="tmBest"></b></div><span class="tm-pow" id="tmPow"></span></div>
+      <div class="tm-controls"><button class="tm-controls-toggle" type="button" id="tmControls" aria-controls="tmActions" aria-expanded="false">전투 설정</button>
+        <div class="tm-acts" id="tmActions" role="group" aria-label="전투 설정" hidden><button type="button" class="btn-sub small" id="tmSpd"></button><button type="button" class="btn-sub small" id="tmAuto" aria-pressed="false" hidden></button><button type="button" class="btn-sub small" id="tmSkOff" aria-pressed="false" hidden></button><button type="button" class="btn-sub small tm-skip" id="tmSkip" hidden></button><button type="button" class="cta small" id="tmRevive" hidden>📺 응원 받기</button><button type="button" class="btn-sub small" id="tmRep" hidden></button></div>
+      </div>
       <div class="tm-sks" id="tmSk"></div>
       <nav class="tm-nav" id="tmNav" aria-label="탐험대 메뉴"><button type="button" data-tnav="mem"><img data-x4="ex4_ic_member" alt=""><span>대원</span></button><button type="button" data-tnav="gear"><img data-x4="ex4_ic_gear" alt=""><span>장비</span></button><button type="button" data-tnav="mat"><img data-x4="ex4_ic_mat" alt=""><span>재료</span></button><button type="button" data-tnav="exp"><img data-x4="ex7_ic_exp" alt=""><span>원정</span></button><button type="button" data-tnav="rank"><img data-x4="ex4_ic_rank" alt=""><span>랭킹</span></button><button type="button" data-tnav="rep"><img data-x4="ex4_ic_report" alt=""><span>보고서</span></button></nav>
       <div class="tm-sheet" id="tmSheet" hidden><div class="tm-shh"><b id="tmShT">대원</b><button type="button" class="btn-sub small" id="tmShX">닫기</button></div>
@@ -4840,7 +5002,7 @@ body.mg-on .toast[hidden]{display:none}
       </div>
       <h3 class="panel-sub">정보</h3>
       <dl class="info">
-        <div id="verRow"><dt>버전</dt><dd>v5.4.1.6</dd></div>
+        <div id="verRow"><dt>버전</dt><dd>v5.4.2</dd></div>
         <div id="pidRow" hidden><dt>학교 번호</dt><dd id="infoPid"></dd></div>
       </dl>
       <div id="devBox" hidden>
@@ -4908,6 +5070,7 @@ body.mg-on .toast[hidden]{display:none}
     <p class="sheet-quest" id="sheetQuest" hidden></p>
     <button class="sheet-elect" id="sheetBday" type="button" hidden><span class="se-ic" id="sheetBdayIc" aria-hidden="true"></span><span class="se-tx"><b>생일 잔치</b><small id="sheetBdayTx"></small></span><em id="sheetBdayGo">케이크</em></button>
     <button class="sheet-elect fr-row" id="sheetFriend" type="button" hidden><span class="se-ic" id="sheetFriendIc" aria-hidden="true"></span><span class="se-tx"><b id="sheetFriendNm"></b><small class="fr-say" id="sheetFriendTx"></small></span><em id="sheetFriendGo">쓰다듬기</em></button>
+    <button class="btn-sub small sheet-patall" id="sheetPatAll" type="button" hidden></button>
     <button class="sheet-elect" id="sheetLab" type="button" hidden><span class="se-ic" id="sheetLabIc" aria-hidden="true"></span><span class="se-tx"><b>과학 탐구 실험</b><small id="sheetLabTx"></small></span><em id="sheetLabGo">실험하기</em></button>
     <button class="sheet-elect" id="sheetExam" type="button" hidden><span class="se-ic" id="sheetExamIc" aria-hidden="true"></span><span class="se-tx"><b>시험 기간</b><small id="sheetExamTx"></small></span><em id="sheetExamGo">보기</em></button>
     <div class="sheet-award" id="sheetAward" hidden></div>
@@ -5567,6 +5730,13 @@ body.mg-on .toast[hidden]{display:none}
     <div class="btn-row"><button class="btn-sub" type="button" id="tmRepAd">광고 보고 +100%</button><button class="cta" type="button" id="tmRepOk" data-autofocus>받기</button></div>
   </section>
 </div>
+<div class="overlay center" id="mTamMap" hidden>
+  <div class="backdrop" data-cm="mTamMap"></div>
+  <section class="modal tm-map-modal" role="dialog" aria-modal="true" aria-labelledby="tmMapTitle">
+    <div class="tm-map-head"><h2 id="tmMapTitle">탐험 지도</h2><button class="btn-sub small" type="button" data-cm="mTamMap" data-cm-tap>닫기</button></div>
+    <div id="tmMapBody" class="tm-map-body"></div>
+  </section>
+</div>
 <div class="overlay center" id="mSt" hidden>
   <div class="backdrop"></div>
   <section class="modal sy-modal" role="dialog" aria-modal="true" aria-labelledby="stCh">
@@ -6053,7 +6223,12 @@ body.mg-on .toast[hidden]{display:none}
 "tea_bear":"img/a/tea_bear-b41db0f222.webp",
 "tea_hedgehog":"img/a/tea_hedgehog-0b361ea445.webp",
 "tea_owl":"img/a/tea_owl-5155d60e6e.webp",
-"tea_squirrel":"img/a/tea_squirrel-2c1bd4d68d.webp"
+"tea_squirrel":"img/a/tea_squirrel-2c1bd4d68d.webp",
+"trip_beach_wide":"img/a/trip_beach_wide-e23d143060.webp",
+"trip_creek_wide":"img/a/trip_creek_wide-84e218c023.webp",
+"trip_hill_wide":"img/a/trip_hill_wide-be8fef5dcf.webp",
+"trip_museum_wide":"img/a/trip_museum_wide-f732165a6e.webp",
+"trip_star_wide":"img/a/trip_star_wide-4c06cd5b4f.webp"
 };</script>
 <!-- FS_IMG:END -->
 <!-- FS_IMG170:BEGIN -->
@@ -7678,6 +7853,8 @@ body.mg-on .toast[hidden]{display:none}
 "ex4_ic_speed":"img/a/ex4_ic_speed-807cc32609.webp",
 "ex4_pc_bear_atk":"img/a/ex4_pc_bear_atk-49f644814e.webp",
 "ex4_pc_bear_hurt":"img/a/ex4_pc_bear_hurt-8fb9dc070e.webp",
+"ex4_pc_bear_recoil_frames":"img/a/ex4_pc_bear_recoil_frames-487bef9017.webp",
+"ex4_pc_bear_run_frames":"img/a/ex4_pc_bear_run_frames-809b586212.webp",
 "ex4_pc_bear_sk":"img/a/ex4_pc_bear_sk-85a8096905.webp",
 "ex4_pc_capybara_atk":"img/a/ex4_pc_capybara_atk-ead3273aca.webp",
 "ex4_pc_capybara_hurt":"img/a/ex4_pc_capybara_hurt-1384bea977.webp",
@@ -7699,6 +7876,8 @@ body.mg-on .toast[hidden]{display:none}
 "ex4_pc_duck_sk":"img/a/ex4_pc_duck_sk-37cafdba40.webp",
 "ex4_pc_fox_atk":"img/a/ex4_pc_fox_atk-2def49e878.webp",
 "ex4_pc_fox_hurt":"img/a/ex4_pc_fox_hurt-de0c75d973.webp",
+"ex4_pc_fox_recoil_frames":"img/a/ex4_pc_fox_recoil_frames-b0544c0d67.webp",
+"ex4_pc_fox_run_frames":"img/a/ex4_pc_fox_run_frames-3169415f36.webp",
 "ex4_pc_fox_sk":"img/a/ex4_pc_fox_sk-db1831cf32.webp",
 "ex4_pc_frog_atk":"img/a/ex4_pc_frog_atk-0289d2d2ed.webp",
 "ex4_pc_frog_hurt":"img/a/ex4_pc_frog_hurt-28da237c61.webp",
@@ -7729,6 +7908,8 @@ body.mg-on .toast[hidden]{display:none}
 "ex4_pc_penguin_sk":"img/a/ex4_pc_penguin_sk-03b2dda342.webp",
 "ex4_pc_rabbit_atk":"img/a/ex4_pc_rabbit_atk-e54f0a8ad0.webp",
 "ex4_pc_rabbit_hurt":"img/a/ex4_pc_rabbit_hurt-21911473d7.webp",
+"ex4_pc_rabbit_recoil_frames":"img/a/ex4_pc_rabbit_recoil_frames-398b0ee376.webp",
+"ex4_pc_rabbit_run_frames":"img/a/ex4_pc_rabbit_run_frames-925f4eec81.webp",
 "ex4_pc_rabbit_sk":"img/a/ex4_pc_rabbit_sk-de5c9d492c.webp",
 "ex4_pc_raccoon_atk":"img/a/ex4_pc_raccoon_atk-03c0594195.webp",
 "ex4_pc_raccoon_hurt":"img/a/ex4_pc_raccoon_hurt-c27a6dbb16.webp",
@@ -9601,6 +9782,13 @@ body.mg-on .toast[hidden]{display:none}
     paFake: undefined,   // 시험에서 사진 판정 상태를 덮어쓰는 칸
     paOpenSea: undefined,   // 사진첩에서 펼친 다른 계절
     trSvOpen: undefined,   // 체험학습 기념품 칸을 펼쳤는지
+    tripPlan: null,        // 출발 전에 고르는 체험학습 활동
+    pickN: 0,   // 이어 줍기 수
+    pickAt: 0,   // 마지막으로 주운 때
+    hudShown: undefined,   // 위 줄에 보이는 도토리(굴러 오르는 동안)
+    hudRoll: null,   // 도토리 숫자 굴러 오르기
+    hudFreeze: 0,   // 받은 도토리가 날아가는 동안 위 숫자를 잠깐 그대로
+    rwAc: false,   // 보상 창에 도토리가 있는지
     tripGot: undefined,   // 체험학습에서 받은 것
     tripTxt: undefined,   // 체험학습 단추에 보인 글
     tripView: undefined,   // 체험학습 창 화면(가기, 돌아옴, 쉼)
@@ -9785,7 +9973,7 @@ body.mg-on .toast[hidden]{display:none}
     u: { boost: false, dev: false, gtip: false },
     units: 'ko',
     uiz: 0,   // 화면 크기(0 보통 0.9배, 1 크게 1배)
-    trip: { open: false, cur: '', start: 0, end: 0, souv: [], been: {}, kids: 0 },
+    trip: { open: false, cur: '', start: 0, end: 0, souv: [], been: {}, kids: 0, creekRoute: '', creekLog: [], route: '', observation: 0, records: {} },
     sports: { next: 0 },
     fest: { next: {}, n: {}, sub: {} },   // sub: 밤이라 낮 행사가 잠겼을 때 밤 행사로 대신 채운 메인 퀘스트 횟수
     dm: { day: '', list: [], bonus: false, swapped: false },
@@ -9989,11 +10177,20 @@ body.mg-on .toast[hidden]{display:none}
       s.trip.open = !!t.open;
       s.trip.kids = Math.min(6, Math.floor(numFb(t.kids, 0, 0)));
       s.trip.souv = Array.isArray(t.souv) ? [...new Set(t.souv.filter(k => typeof k === 'string' && SOUV_IDS.has(k)))] : [];
+      if (Array.isArray(t.creekLog)) s.trip.creekLog = CREEK_KEYS.filter(k => t.creekLog.includes(k));
+      if (t.records && typeof t.records === 'object') for (const k of TRIP_FIELD_IDS) {
+        if (Number.isInteger(t.records[k]) && t.records[k] >= 0 && t.records[k] <= 3) s.trip.records[k] = t.records[k];
+      }
       if (t.been && typeof t.been === 'object') for (const k of Object.keys(TRIP)) if (t.been[k]) s.trip.been[k] = Math.floor(numFb(t.been[k], 0, 0, SAVE_CAP.count));
       if (typeof t.cur === 'string' && TRIP[t.cur]) {
         const len = TRIP[t.cur].min * 60000, end = numFb(t.end, 0, 0), start = numFb(t.start, 0, 0);
         if (end > 0 && end - Math.max(Date.now(), Number(d.clk && d.clk.last) || 0) <= len + 86400000) {   // 기기 시계가 하루 넘게 느려도 가던 체험학습이 사라지지 않게 마지막 게임 시계와 견줘요
           s.trip.cur = t.cur; s.trip.end = end; s.trip.start = Math.min(start || end - len, end - 1); }   // 끝나는 시각은 게임 시계라 기기 시계와 어긋날 수 있어 하루 여유
+      }
+      if (s.trip.cur === 'creek') s.trip.creekRoute = creekRouteKey(t.creekRoute);
+      else if (s.trip.cur) {
+        s.trip.route = tripRouteKey(s.trip.cur, t.route);
+        if (s.trip.route && (t.observation === 1 || t.observation === 2)) s.trip.observation = t.observation;
       }
     }
     // 토스 사용자 키는 옛 저장의 tk(글자)에서 tkey로 옮겨요. tk는 이제 시간 단축권 장수예요
@@ -10932,12 +11129,15 @@ body.mg-on .toast[hidden]{display:none}
     if (!taOpen()) return '<p class="fine">조교는 석사 2학기에 열려요.</p>';
     const now = gameNow(), n = taSeats(), memIc = IMG('ic_ta_mem') ? `<img class="ta-mem" src="${IMG('ic_ta_mem')}" alt="">` : '💠';
     const mul = rtLv('ta') >= 5 ? 1.5 : rtLv('ta') >= 4 ? 1.25 : 1, hr = Math.max(0, Math.min(2, rt.taHr | 0));   // 받을 때(taClaim)와 같은 배수
-    let h = `<p class="fine ta-info">일하는 조교 한 명마다<br><b>수업료 +${TA.pct}%</b>, 그 건물 <b>가구 값 -${TA.fur}%</b><br>파견 가면 숲의 정수와 추억 조각을 가져와요<br>파견 중에는 자리 효과가 꺼져요</p><div class="dp-list">`;
+    const due = taDue().length;
+    let h = `<p class="fine ta-info">일하는 조교 한 명마다<br><b>수업료 +${TA.pct}%</b>, 그 건물 <b>가구 값 -${TA.fur}%</b><br>파견 가면 숲의 정수와 추억 조각을 가져와요<br>파견 중에는 자리 효과가 꺼져요</p>`;
+    if (due > 1) h += `<button class="dm-ev dm-all" type="button" data-ta="claim"><span><b>조교 ${due}명이 돌아왔어요</b><small>파견 보상</small></span><span class="cta small">모두 받기</span></button>`;
+    h += '<div class="dp-list">';
     for (let i = 0; i < n; i++) {
       const x = S.ta.seat[i] || { b: '' }, o = S.ta.out.find(y => y.i === i), w = taWho(i), u = IMG('chr_ta_' + w) || IMG('chr_' + w);
       const st = o ? (now >= o.end ? `숲속 ${TA.school[o.to]}에서 돌아왔어요` : `숲속 ${TA.school[o.to]}에 가 있어요<br>${hms(o.end - now)} 뒤에 돌아와요`) : x.b && FAC[x.b] ? `${FAC[x.b].name}에서 일해요` : '빈자리예요';
       const seatTx = o && x.b && FAC[x.b] ? `<br>돌아오면 ${FAC[x.b].name}에서 일해요` : '';
-      const btn = o ? (now >= o.end ? `<button class="cta small" type="button" data-ta="claim">받기</button>` : `<button class="btn-sub small" type="button" data-ta="pick:${i}">자리 정하기</button><span class="fe-lock">파견 중</span>`)
+      const btn = o ? (now >= o.end ? (due === 1 ? '<button class="cta small" type="button" data-ta="claim">받기</button>' : '') : `<button class="btn-sub small" type="button" data-ta="pick:${i}">자리 정하기</button><span class="fe-lock">파견 중</span>`)
         : `<button class="btn-sub small" type="button" data-ta="pick:${i}">자리 정하기</button><button class="cta small" type="button" data-ta="go:${i}">파견</button>`;
       h += `<div class="dp-row"><span class="dp-ic">${u ? `<img src="${u}" alt="">` : ''}</span><div class="dp-tx"><b>${TA.whoNm[w]} 조교</b><small>${st}${seatTx}</small></div><span class="ta-btns">${btn}</span></div>`;
       if (o && now < o.end) h += `<div class="ta-sp">${labSpeedHTML('ta', i)}</div>`;   // 파견 시간 줄이기
@@ -10976,7 +11176,7 @@ body.mg-on .toast[hidden]{display:none}
     const c = $('#taChip'); if (!c) return;
     const n = base && taOpen() ? taDue().length : 0, key = n ? String(n) : '';
     if (c.dataset.key === key) return; c.dataset.key = key;
-    c.hidden = !n; if (n) { c.innerHTML = `<b>🎒 조교가 돌아왔어요</b>`; c.setAttribute('aria-label', `모교에서 돌아온 조교 ${n}명의 보상 받기`); }
+    c.hidden = !n; if (n) { c.innerHTML = `<b>🎒 조교 ${n}명 ${n > 1 ? '보상 모두 받기' : '보상 받기'}</b>`; c.setAttribute('aria-label', `모교에서 돌아온 조교 ${n}명의 보상 받기`); }
     chipRow();
   }
   function openRx() {
@@ -11202,10 +11402,14 @@ body.mg-on .toast[hidden]{display:none}
       if (name === 'tap') note(740, 0, 0.07, 'triangle', 0.07);
       else if (name.startsWith('pz')) { const L = +name.slice(2) || 0; if (!L) { note(620, 0, 0.06, 'triangle', 0.07); note(880, 0.04, 0.08, 'triangle', 0.06); } else { const f = 740 * Math.pow(1.122, L); note(f, 0, 0.1, 'triangle', 0.12); note(f * 1.5, 0.07, 0.16, 'triangle', 0.11); if (L >= 3) note(f * 2, 0.14, 0.22, 'triangle', 0.1); } }
       else if (name === 'coin') { note(988, 0, 0.1, 'triangle', 0.13); note(1319, 0.07, 0.18, 'triangle', 0.13); }
+      // 이어서 줍거나 꾹 눌러 올릴 때: 도토리 소리가 한 번마다 반음씩 높아져요(여덟 번까지)
+      else if (name.startsWith('combo')) { const m = Math.pow(2, Math.min(8, +name.slice(5) || 0) / 12); note(988 * m, 0, 0.09, 'triangle', 0.12); note(1319 * m, 0.06, 0.15, 'triangle', 0.12); }
       else if (name === 'buy') { note(523.25, 0, 0.14, 'triangle', 0.12); note(659.25, 0.08, 0.14, 'triangle', 0.12); note(783.99, 0.16, 0.26, 'triangle', 0.12); }
       else if (name === 'shutter') { note(2200, 0, 0.025, 'square', 0.035); note(1400, 0.06, 0.04, 'square', 0.03); }   // 사진 찰칵
       else if (name === 'deny') note(196, 0, 0.16, 'square', 0.04);
       else if (name === 'leaf') { note(1150, 0, 0.04, 'triangle', 0.022); note(860, 0.035, 0.05, 'triangle', 0.018); }
+      else if (name === 'tamWind') { note(330, 0, 0.14, 'sine', 0.1); note(440, 0.13, 0.18, 'triangle', 0.09); }
+      else if (name === 'tamCounter') { note(165, 0, 0.13, 'triangle', 0.14); note(660, 0.025, 0.11, 'sine', 0.1); }
       else if (name === 'magpie') { note(1480, 0, 0.07, 'square', 0.03); note(1320, 0.13, 0.08, 'square', 0.03); }
       else if (name === 'done') { note(783.99, 0, 0.18, 'sine', 0.14, 2); note(1174.66, 0.12, 0.32, 'sine', 0.14, 2); }
       else if (name === 'quest') [1046.5, 1318.51, 1567.98, 2093].forEach((f, i) => note(f, i * 0.07, 0.22 + i * 0.05, 'triangle', 0.11));
@@ -12585,9 +12789,11 @@ body.mg-on .toast[hidden]{display:none}
     S.budget += v; earn(v);
     S.st.picks += 1;
     if (rt.sports) { rt.sports.blue += 1; feverCombo(rt.sports, d.x, d.y); renderSportsBar(); }
-    floatText(d.x, d.y - 12, '+' + fmt(v), 'gold');
+    // 이어 줍기: 1.2초 안에 또 주우면 연속 수가 늘고 소리가 높아져요. 셋째부터 '연속 n'을 함께 보여요
+    { const now = performance.now(); rt.pickN = now - (rt.pickAt || 0) < 1200 ? (rt.pickN || 0) + 1 : 0; rt.pickAt = now; }
+    floatText(d.x, d.y - 12, '+' + fmt(v) + (rt.pickN >= 2 ? `  연속 ${rt.pickN + 1}` : ''), 'gold');
     if (!rt.sports) fxPick(d); else fxeBlue(d);   // 운동회: 청팀 색종이와 점프. 효과층: 반짝이와 도토리가 위쪽 도토리 숫자로 날아가요(운동회 공은 그대로)
-    sfx('coin'); buzz(12);
+    sfx(rt.pickN ? 'combo' + rt.pickN : 'coin'); buzz(12);
     removeDrop(d);
     renderHUD(); renderAffordance();
   }
@@ -12945,9 +13151,28 @@ body.mg-on .toast[hidden]{display:none}
   // 졸업 탭 빨간 점: 명예 교장실과 기금은 '추천' 칸을 올릴 수 있을 때만(다른 칸이 되어도 추천을 모으는 사람이 많아요)
   function gradRecReady() { const p = perkRec(), f = fpRec(); return !!(p && S.p.dip >= perkCost(p.k)) || !!(f && (S.fund > 0 || S.tier > 0) && S.fund >= fpCost(f.k)); }
   function teaRecReady() { const r = rt.rec; return !!(r && r.kind === 'tea' && TEA[r.k] && !teaMaxed(r.k) && S.budget >= teaCost(r.k)); }
+  // 위 줄 도토리: 한 번에 많이 들어오면 0.5초 동안 굴러 올라가요. 받은 도토리가 날아가는 동안은 그대로 있다가 닿으면 올라가요(움직임 줄이기면 바로)
+  function hudBudget() {
+    const v = S.budget, now = performance.now(), last = rt.hudShown;
+    if (rt.reduced || !isFinite(v) || last === undefined || v <= last) { rt.hudRoll = null; rt.hudShown = v; return v; }
+    if (rt.hudFreeze > now && rt.rwAc && $('#mReward').hidden) rt.hudFreeze = 0;   // 보상 창이 다른 길로 닫혔으면 바로 풀어요
+    if (rt.hudFreeze > now) return last;
+    const R = rt.hudRoll;
+    if (R) {
+      const k = Math.min(1, (now - R.t) / R.d);
+      if (k >= 1) { rt.hudRoll = null; rt.hudShown = v; return v; }
+      const shown = R.from + (v - R.from) * (1 - Math.pow(1 - k, 3)); rt.hudShown = shown; return shown;
+    }
+    if (v - last > Math.max(1, rate() * 3)) { rt.hudRoll = { from: last, t: now, d: 500 }; hudRollRun(); return last; }
+    rt.hudShown = v; return v;
+  }
+  function hudRollRun() {
+    const step = () => { if (!S) return; const el = $('#vBudget'); if (el) setTx(el, fmt2(hudBudget())); if (rt.hudRoll || rt.hudFreeze > performance.now()) requestAnimationFrame(step); };
+    requestAnimationFrame(step);
+  }
   function renderHUD() {
     document.body.classList.toggle('early', earlyDay());
-    setTx($('#vBudget'), fmt2(S.budget));
+    setTx($('#vBudget'), fmt2(hudBudget()));
     setTx($('#vRate'), `초당 +${fmtRate(rate())}${feastOn() ? ' (+100%)' : ''}`);
     renderDeal();
     setTx($('#vStudents'), `${Math.floor(S.students)}/${capacity()}`);
@@ -15944,13 +16169,16 @@ body.mg-on .toast[hidden]{display:none}
        forest/rank/<내 id>   랭킹 이름과 학교 점수
        forest/stats/<내 id>  테스트 현황 (어디까지 했는지, 얼마나 했는지)
      <내 id>는 Firebase 익명 로그인이 기기(브라우저)마다 만들어 줘요. */
-  const VERSION = '5.4.1.6';
+  const VERSION = '5.4.2';
   const NT_QUIET = ['5.4.1.6', '5.4.1.5', '5.4.1.4', '5.4.1.3', '5.4.1.2', '5.4.1.1', '5.4.0.4', '5.4.0.3', '5.4.0.2', '5.4.0.1', '5.3.4.8', '5.3.4.7', '5.3.4.6', '5.3.4.5', '5.3.4.4', '5.3.4.3', '5.3.4.2', '5.3.4.1', '5.3.4', '5.3.2.1', '5.3.0.3', '5.3.0.2', '5.3.0.1', '5.2.2', '5.2.1', '5.2.0.2', '5.2.0.1', '5.1.1.3', '5.1.1.2', '5.1.1.1', '5.1.1', '5.0.3.1', '5.0.3', '5.0.2.2', '5.0.2.1', '2.1.20', '2.1.2.2', '2.3.0.1', '2.3.4', '3.2.3', '3.2.4', '3.2.5', '3.3.1', '3.3.2', '3.3.3', '4.4.1.1', '4.4.1.2', '4.4.1.3', '4.4.1.4', '5.0.1.1', '5.0.1.2', '5.0.1.3', '5.0.1.4', '5.0.1.5', '5.0.1.6', '5.0.1.7', '5.0.1.8'];
     // 이 버전들은 업데이트해도 공지 창을 띄우지 않아요(공지는 그대로)
   /* 공지사항: 설정 > 공지사항. 맨 위가 가장 새 공지예요
      패치노트는 자동으로 넣지 않아요. 검수한 글만 여기에 적어요(CHANGELOG.md는 자세한 기록용이라 따로 있어요)
      접속하면 새 공지 창을 띄워요(올라온 뒤 7일 동안, '일주일간 열지 않기'를 누르면 7일 쉬어요). 업데이트한 뒤 첫 접속에는 쉬는 중이어도 한 번 띄워요 */
   const NOTICES = [
+    // 공지(고른 세 줄). 탐험 기지와 원정, 보스전, 체험학습, 퀘스트 화면을 앱으로 묶음
+    { id: '2026-11-28-v542', date: '2026-11-28', tag: '업데이트', title: '5.4.2 업데이트',
+      lines: ['탐험 원정과 지역 보스전 추가', '체험학습 관찰 기록 추가', '퀘스트 화면 정리와 편의 개선'] },
     // 공지(고른 세 줄). 웹 5.4.0.3~5.4.0.4와 글 다듬기를 앱으로 묶음
     { id: '2026-11-25-v541', date: '2026-11-25', tag: '업데이트', title: '5.4.1 업데이트',
       lines: ['연구소 시간 단축 추가', '생물 도감 수집 보상 추가', '편의 개선과 오류 수정'] },
@@ -17910,7 +18138,7 @@ body.mg-on .toast[hidden]{display:none}
     return { sp, ri, hp: TAM.pHp * r.hp * mul * (1 + TAM.gearPer * G.bag), atk: TAM.pAtk * r.atk * mul * (1 + TAM.gearPer * G.tool), cd: r.cd, gg: 1 + TAM.gearPer * G.hat };
   }
   // 지금 탐험하는 지역에서 유리한 과목, 모든 대원 레벨의 보유 효과
-  const tamAdvRi = () => TAM.adv[tamReg(tamCurFl()).k];
+  const tamAdvRi = () => TAM.adv[tamReg(rt.tam?.practice || tamCurFl()).k];
   const tamCollLv = () => tamAvail().reduce((s, sp) => s + (tamMem(sp).lv - 1) + 5 * Math.max(0, tamMem(sp).st - 1), 0);
   const tamCollMul = () => Math.min(TAM.collMax, 1 + TAM.collG * tamCollLv());
   const tamTeam = () => tamParty().map(sp => ({ sp, ri: tamRole(sp) })).sort((a, b) => TAM.front[a.ri] - TAM.front[b.ri]).map((x, i) => tamStat(x.sp, i));   // 앞줄부터 1번 칸
@@ -17925,17 +18153,38 @@ body.mg-on .toast[hidden]{display:none}
     for (let i = 0; i < n; i++) { const j = ((k - 1) % 3 + i) % 3; out.push({ nm: R.mob[j], i: j, hp: TAM.mHp * m * f, atk: TAM.mAtk * m * f, solo: n === 1 }); }
     return out;
   }
-  function tamFight(fl, team, buff, mod, hm) {
+  // 일반 탐험의 첫 보스와 심화 탐험의 지역 끝에서 예고 공격을 써요.
+  const TAM_SIGNS = { leaf: '잎', star: '별', cloud: '구름', sun: '해' };
+  const TAM_TRIALS = {
+    10: { key: 'wind', seconds: 2.6, after: 0, title: '꽃바람이 와요!', hint: '필살기로 앞줄을 지켜요', blocked: '꽃바람을 막았어요!', landed: '꽃바람이 앞줄에 닿았어요', art: 'ex4_sk_pe_leaf' },
+    60: { key: 'spore', seconds: 2.2, after: 3, delay: 1.2, title: '왕버섯이 포자를 모아요!', hint: '필살기로 포자를 흩뜨려요', blocked: '포자 구름을 흩뜨렸어요!', landed: '포자 때문에 앞줄이 잠깐 느려졌어요', art: 'ex4_sk_sci_bubble' },
+    110: { key: 'wave', seconds: 2.8, after: 3, guard: .35, button: '몸 낮추기', ready: '물결을 받을 준비가 됐어요', title: '큰 물결이 밀려와요!', hint: '몸을 낮춰 대원 모두를 지켜요', blocked: '물결을 받아냈어요!', landed: '물결이 탐험대를 덮쳤어요', art: 'ex4_sk_art_splash' },
+    160: { key: 'book', seconds: 4.5, after: 3, signs: ['leaf', 'star'], title: '책장이 날아오려 해요!', hint: '책에 나타난 표식과 같은 것을 골라요', blocked: '책장이 제자리로 돌아갔어요!', landed: '책장이 앞줄을 덮쳤어요', art: 'ic_book' },
+    210: { key: 'frost', seconds: 4.2, after: 3, guard: .35, timing: [.22, .64], button: '발 맞추기', ready: '눈보라를 버틸 준비가 됐어요', title: '눈보라가 몰아쳐요!', hint: '막대 끝이 금빛 구간에 들어오면 발을 맞춰요', blocked: '눈보라를 버텼어요!', landed: '눈보라가 탐험대를 덮쳤어요', art: 'ex4_sk_pe_tornado' },
+    260: { key: 'stars', seconds: 4.5, after: 3, chain: true, rear: true, title: '별똥별이 뒷줄을 향해요!', hint: '서로 다른 대원의 필살기 두 번을 이어 써요. 혼자라면 한 번이에요', blocked: '필살기를 이어 별똥별을 흩뜨렸어요!', soloBlocked: '필살기로 별똥별을 흩뜨렸어요!', landed: '별똥별이 뒷줄에 떨어졌어요', art: 'ex4_sk_math_star' },
+    310: { key: 'circuit', seconds: 5.6, after: 3, signs: ['cloud', 'sun'], sequence: true, title: '구름 로봇이 전기를 모아요!', hint: '화면에 나온 순서대로 구름과 해 스위치를 눌러요', blocked: '회로를 멈췄어요!', landed: '번쩍이는 전기가 앞줄에 닿았어요', art: 'ex4_sk_sci_boom' }
+  };
+  function tamTrialSpec(fl, hm, rep) {
+    if (rep) return null;
+    if (!hm) return fl === 310 && !gradOn() ? null : TAM_TRIALS[fl];
+    if (fl % TAM.regLen !== 0) return null;
+    const region = TAM.reg.indexOf(tamReg(fl));
+    const spec = TAM_TRIALS[region * TAM.regLen + TAM.bossEvery];
+    return { ...spec, seconds: spec.seconds * .9, after: Math.min(spec.after, 2) };
+  }
+  function tamFight(fl, team, buff, mod, hm, rep) {
     const b = buff || 1;
     const pc = TAM.pace, md = mod || {}, ph = md.hp || 1, mh = md.hard ? 1.4 : 1;
-    return { id: (tamFight.n = (tamFight.n || 0) + 1), fl, hm: !!hm, hard: !!md.hard, t: 0, lim: TAM.limit * pc, ev: [], P: team.map((s, k) => ({ ...s, cd: s.cd * pc, hp: s.hp * b * ph, mx: s.hp * b * ph, atk: s.atk * b, c: (0.4 + k * 0.3) * pc, g: 0 })),
+    const spec = md.trial === false ? null : tamTrialSpec(fl, hm, rep);
+    const wind = spec ? { spec, pending: true, until: 0, prepared: false } : null;
+    return { id: (tamFight.n = (tamFight.n || 0) + 1), fl, hm: !!hm, rep: rep ? 1 : 0, hard: !!md.hard, wind, t: 0, lim: TAM.limit * pc, ev: [], P: team.map((s, k) => ({ ...s, cd: s.cd * pc, hp: s.hp * b * ph, mx: s.hp * b * ph, atk: s.atk * b, c: (0.4 + k * 0.3) * pc, g: 0 })),
       M: tamMobs(fl, hm).map((m, k) => ({ ...m, hp: m.hp * mh, mx: m.hp * mh, c: (1 + k * 0.4) * pc, wk: 0 })) };
   }
   // 한 대원의 기술. big은 필살기
-  function tamAct(F, p, big, rnd) {
+  function tamAct(F, p, big, rnd, counter) {
     const L = F.M.filter(m => m.hp > 0); if (!L.length) return;
     const hit = (m, d, cr) => { m.hp -= d; F.ev.push({ k: 'hit', m: F.M.indexOf(m), d, cr: !!cr }); };
-    const pi = F.P.indexOf(p); F.ev.push({ k: big ? 'big' : 'act', p: pi, ri: p.ri });
+    const pi = F.P.indexOf(p); F.ev.push({ k: big ? 'big' : 'act', p: pi, ri: p.ri, counter });
     if (p.ri === 1) { if (big) L.forEach(m => hit(m, p.atk * 3)); else hit(L[0], p.atk); }
     else if (p.ri === 0) L.forEach(m => hit(m, p.atk * (big ? 3.2 : 0.5)));
     else if (p.ri === 2) {
@@ -17946,19 +18195,104 @@ body.mg-on .toast[hidden]{display:none}
     else if (p.ri === 3) { if (big) L.forEach(m => { hit(m, p.atk * 2); m.wk = 6; }); else { hit(L[0], p.atk * 0.8); L[0].wk = 3; } }
     else { const w = L.slice().sort((a, b) => a.hp - b.hp)[0]; if (big) hit(w, p.atk * 8, true); else { const cr = rnd() < 0.25; hit(w, p.atk * (cr ? 2 : 1), cr); } }
   }
-  function tamCastAt(F, p) { if (!p || p.hp <= 0 || p.g < TAM.gauge) return false; p.g = 0; tamAct(F, p, true, Math.random); return true; }
+  const tamWindActive = F => !!(F && F.wind && F.wind.until > F.t && F.M[0].hp > 0);
+  const tamWindLeft = F => (F.wind.until - F.t) / F.wind.spec.seconds;
+  function tamWindTargets(F) {
+    const living = F.P.filter(p => p.hp > 0);
+    if (F.wind.spec.guard) return living;
+    const target = F.wind.spec.rear ? living[living.length - 1] : living[0];
+    return target ? [target] : [];
+  }
+  function tamWindStop(F) {
+    F.wind.until = 0;
+    F.M[0].c = TAM.mobCd * TAM.pace;
+  }
+  function tamBrace(F) {
+    if (!tamWindActive(F) || !F.wind.spec.guard || F.wind.prepared) return false;
+    const timing = F.wind.spec.timing;
+    if (timing && (tamWindLeft(F) < timing[0] || tamWindLeft(F) > timing[1])) return false;
+    F.wind.prepared = true;
+    return true;
+  }
+  function tamWindAnswer(F, sign) {
+    if (!tamWindActive(F) || !F.wind.spec.signs?.includes(sign) || F.wind.wrong) return false;
+    const wind = F.wind;
+    if (sign !== wind.order[wind.cursor]) { wind.wrong = true; return true; }
+    wind.cursor += 1;
+    if (wind.cursor === wind.order.length) { tamWindStop(F); F.ev.push({ k: 'wind-answer' }); }
+    return true;
+  }
+  function tamCastAt(F, p) {
+    if (!p || p.hp <= 0 || p.g < TAM.gauge || !F.M.some(m => m.hp > 0)) return false;
+    const counter = tamWindActive(F) && !F.wind.spec.guard && !F.wind.spec.signs;
+    if (counter && F.wind.spec.chain) {
+      const links = F.wind.links;
+      if (links.includes(p)) return false;
+      links.push(p);
+      if (links.length < F.wind.need) {
+        p.g = 0;
+        F.ev.push({ k: 'wind-link', p: F.P.indexOf(p) });
+        return true;
+      }
+    }
+    if (counter) tamWindStop(F);
+    p.g = 0;
+    tamAct(F, p, true, Math.random, counter);
+    return true;
+  }
   // 한 걸음: 1 이김, -1 짐, 0 이어서
   function tamStep(F, dt, auto, rnd) {
     F.t += dt;
+    const boss = F.wind && F.M[0], front = F.wind && F.P.find(p => p.hp > 0), spec = F.wind?.spec;
+    if (front && boss.hp > 0 && F.wind.pending && F.t >= spec.after && boss.c <= dt) {
+      F.wind.pending = false;
+      F.wind.until = F.t + spec.seconds;
+      if (spec.signs) {
+        const i = rnd() < .5 ? 0 : 1;
+        F.wind.order = spec.sequence ? [spec.signs[i], spec.signs[1 - i]] : [spec.signs[i]];
+        F.wind.cursor = 0;
+      }
+      else if (spec.chain) {
+        const living = F.P.filter(p => p.hp > 0);
+        F.wind.links = [];
+        F.wind.need = Math.min(2, living.length);
+        living.forEach(p => { p.g = TAM.gauge; });
+      } else if (!spec.guard) front.g = TAM.gauge;
+      F.ev.push({ k: 'wind' });
+    }
+    const warned = tamWindActive(F), middle = warned && F.wind.until - F.t <= spec.seconds / 2;
+    if (auto && middle && spec.guard) tamBrace(F);
+    if (auto && middle && spec.signs && F.t >= (F.wind.nextSign || 0)) {
+      if (tamWindAnswer(F, F.wind.order[F.wind.cursor])) F.wind.nextSign = F.t + .3;
+    }
     for (const p of F.P) {
       if (p.hp <= 0) continue;
       p.c -= dt; if (p.c <= 0) { p.c += p.cd; tamAct(F, p, false, rnd); p.g = Math.min(TAM.gauge, p.g + p.gg); }
-      if (auto && p.g >= TAM.gauge) tamCastAt(F, p);
+      if (auto && p.g >= TAM.gauge && (!warned || spec.guard || middle)) tamCastAt(F, p);
     }
     for (const m of F.M) {
       if (m.hp <= 0) continue;
       m.wk = Math.max(0, m.wk - dt); m.c -= dt;
-      if (m.c <= 0) { m.c += TAM.mobCd * TAM.pace; const tg = F.P.find(q => q.hp > 0); if (tg) { const d = m.atk * (m.wk > 0 ? 0.7 : 1); tg.hp -= d; tg.g = Math.min(TAM.gauge, tg.g + 0.4 * tg.gg); F.ev.push({ k: 'hurt', p: F.P.indexOf(tg), m: F.M.indexOf(m), d }); } }
+      const wind = m === boss && F.wind.until > 0;
+      if (wind) {
+        if (tamWindActive(F)) continue;
+        F.wind.until = 0;
+        m.c = 0;
+      }
+      if (m.c <= 0) {
+        m.c += TAM.mobCd * TAM.pace;
+        const first = F.P.find(q => q.hp > 0);
+        const targets = wind ? tamWindTargets(F) : first ? [first] : [];
+        if (wind && targets.length) F.ev.push({ k: 'wind-hit', p: F.P.indexOf(targets[0]), m: F.M.indexOf(m), braced: F.wind.prepared });
+        const strike = m.atk * (m.wk > 0 ? .7 : 1);
+        const d = strike * (wind && F.wind.prepared ? spec.guard : 1) / Math.max(1, targets.length);
+        for (const tg of targets) {
+          tg.hp -= d;
+          if (wind && spec.delay) tg.c += spec.delay;
+          tg.g = Math.min(TAM.gauge, tg.g + .4 * tg.gg);
+          F.ev.push({ k: 'hurt', p: F.P.indexOf(tg), m: F.M.indexOf(m), d, wind });
+        }
+      }
     }
     for (const m of F.M) if (m.hp <= 0 && !m.out) { m.out = 1; F.ev.push({ k: 'poof', m: F.M.indexOf(m) }); }
     for (const p of F.P) if (p.hp <= 0 && !p.out) { p.out = 1; F.ev.push({ k: 'ko', p: F.P.indexOf(p) }); }
@@ -17967,9 +18301,9 @@ body.mg-on .toast[hidden]{display:none}
     return 0;
   }
   // 시험과 균형 재기: 한 층을 끝까지 겨뤄 봐요(자동 쓰기)
-  function tamSim(fl, team, seed) {
+  function tamSim(fl, team, seed, mod) {
     let x = seed || 7; const rnd = () => (x = (x * 16807) % 2147483647) / 2147483647;
-    const F = tamFight(fl, team || tamTeam()); let r = 0;
+    const F = tamFight(fl, team || tamTeam(), 1, mod); let r = 0;
     while (!r) { r = tamStep(F, 0.1, true, rnd); F.ev.length = 0; }
     return { win: r === 1, t: Math.round(F.t * 10) / 10 };
   }
@@ -18123,7 +18457,7 @@ body.mg-on .toast[hidden]{display:none}
   /* 빠른 스킵. 지금 층부터 위로, 대원 한 번 공격(필살기 말고 보통 공격)으로 모든 장난꾸러기가 쓰러지는 층까지만 한 번에 넘어가요
      유리한 과목 덤은 빼고 셈(지역이 바뀌어도 안전하게). 넘은 층은 하나하나 이긴 것과 같은 보상, 사건은 없어요. 한 번에 1000층까지 */
   function tamSkipTo() {
-    if (!tamOn() || !tamParty().length) return 0;
+    if (!tamOn() || rt.tam?.practice || !tamParty().length) return 0;
     tamHSync(); const hm = tamHOn(), cur = tamCurFl(), cap = hm ? Infinity : tamCap(), adv = tamAdvRi(), cr = S.tam.cheer > 0 ? TAM.cheer.mul : 1;
     if (!hm && tamCapped()) return 0;
     const one = tamTeam().reduce((m, p) => Math.max(m, p.atk * cr / (p.ri === adv ? 1 + TAM.advG : 1) * [0.5, 1, 0.8, 0.8, 1][p.ri]), 0);
@@ -18190,11 +18524,32 @@ body.mg-on .toast[hidden]{display:none}
   // 탐험 화면이 아니어도 같은 시간으로 흘러가요(그림만 안 그려요). 사건은 화면이 아니면 바로 기본 선택
   function tamPh(T, ph) {
     T.ph = ph; T.t = 0; if (rt.tab === 'tam') musicSync();
-    tamHSync(); const vis = tamFxOn(), hm = tamHOn(), fl = tamCurFl();
-    if (ph === 'walk' && !hm && tamCapped()) { T.ph = 'cap'; T.F = null; if (vis) { tamWalk(fl); $('#tmP') && $('#tmP').classList.remove('walking'); tamRibbon('clear', tamCapMsg()); tamRenderTop(); } return; }   // 학년 상한
+    tamHSync(); const vis = tamFxOn(), practice = T.practice, hm = !practice && tamHOn(), fl = practice || tamCurFl();
+    if (ph === 'walk' && !practice && !hm && tamCapped()) { T.ph = 'cap'; T.F = null; if (vis) { tamWalk(fl); $('#tmP') && $('#tmP').classList.remove('walking'); tamRibbon('clear', tamCapMsg()); tamRenderTop(); } return; }   // 학년 상한
+    if (practice && (ph === 'win' || ph === 'lose')) {
+      T.ph = 'practiceEnd';
+      if (vis) {
+        tamWindPaint();
+        tamCam(false);
+        tamRibbon(ph === 'win' ? 'clear' : 'lose', ph === 'win' ? '보스 연습 성공!' : '연습을 마쳤어요. 다시 해 볼까요?');
+        tamRenderTop();
+      }
+      return;
+    }
     if (ph === 'walk') { T.F = null; if (vis) tamWalk(fl); }
     else if (ph === 'meet') {
-      const rep = !tamWatch() && !T.mod; T.F = tamFight(rep ? tamRepFl() : fl, tamTeam(), !rep && S.tam.cheer > 0 ? TAM.cheer.mul : 1, T.mod, hm); T.F.cheer = !rep && S.tam.cheer > 0 ? 1 : 0; T.F.rep = rep ? 1 : 0; T.mod = null;   // 응원, 화면 밖이면 마지막으로 넘은 층을 되풀이
+      const rep = !practice && !tamWatch() && !T.mod, cheer = !practice && !rep && S.tam.cheer > 0;
+      T.F = tamFight(rep ? tamRepFl() : fl, tamTeam(), cheer ? TAM.cheer.mul : 1, T.mod, hm, rep);
+      T.F.cheer = cheer ? 1 : 0; T.mod = null;   // 응원, 화면 밖이면 마지막으로 넘은 층을 되풀이
+      if (practice) {
+        // 연습은 대원 수와 역할로 맞춰요. 강한 대원이 먼저 쓰러뜨리거나 낮은 레벨이 예고 전에 지는 일을 줄여요.
+        const boss = T.F.M[0], size = T.F.P.length;
+        T.F.P.forEach(p => {
+          const role = TAM.role[p.ri];
+          p.atk = boss.mx * role.atk / (12 + 10 * size);
+          p.hp = p.mx = boss.atk * (12 + size) * role.hp;
+        });
+      }
       if (vis) { tamBuild(); tamAlert(); tamCam(true, T.F.M[0].boss); if (T.F.M[0].boss) { tamRibbon('boss', '큰 장난꾸러기가 나타났어요!'); const w = $('#tmWarn'); if (w && !rt.reduced) { w.hidden = false; $$('i', w).forEach(i => { i.style.animation = 'none'; void i.offsetWidth; i.style.animation = ''; }); clearTimeout(w._t); w._t = setTimeout(() => { w.hidden = true; }, 1500); } } }
     }
     else if (ph === 'win') {
@@ -18202,23 +18557,24 @@ body.mg-on .toast[hidden]{display:none}
       if (rep) { tamWinRep(T.F.rep ? f : tamRepFl(), T.F.hm); T.ev = null; }   // 화면 밖에서는 층이 오르지 않아요
       else { if (T.F.cheer && S.tam.cheer > 0) S.tam.cheer -= 1; if (T.F.hm) tamWinH(f); else tamWin(f); if (hard) tamWinHard(f);
       T.ev = !T.F.hm && f % TAM.bossEvery && Math.random() < TAM.evP ? tamEvRoll(f) : null; }
-      if (vis) { tamRibbon('clear', `${tamFlTx(f, T.F.hm)} 통과!`); tamRenderTop(); tamVictory(f); tamCam(false); }
+      if (vis) { tamWindPaint(); tamRibbon('clear', `${tamFlTx(f, T.F.hm)} 통과!`); tamRenderTop(); tamVictory(f); tamCam(false); }
     }
     else if (ph === 'event') { if (vis) tamEvShow(T.ev); }
     else if (ph === 'climb') { T.F = null; if (vis) tamClimb(fl - 1); }
     else if (ph === 'lose') {
       T.lose = T.F.fl; T.nLose = (T.nLose || 0) + 1;
-      if (vis) { tamRibbon('lose', T.nLose >= 3 ? '대원 레벨을 올리면 이길 수 있어요' : '힘을 길러서 다시 와요'); tamRenderTop(); tamRenderBody(); }
+      if (vis) { tamWindPaint(); tamRibbon('lose', T.nLose >= 3 ? '대원 레벨을 올리면 이길 수 있어요' : '힘을 길러서 다시 와요'); tamRenderTop(); tamRenderBody(); }
     }
   }
   function tamTick(dt) {
-    if (!tamOn() || !tamParty().length) return;
+    if (rt.modalOpen?.id === 'mTamMap' || (rt.tam?.practice && rt.modalOpen) || !$('#txFull').hidden || !tamOn() || !tamParty().length) return;
     const T = rt.tam || (rt.tam = { ph: '', t: 0, F: null, buff: 0, lose: 0, nLose: 0, ev: null, mod: null });
     if (!T.ph) { tamPh(T, 'walk'); return; }
     if (tamFxOn() && (rt.tamAcT = (rt.tamAcT || 0) + dt) > 0.4) { rt.tamAcT = 0; tamAcorn(); }   // 위 칸 도토리
     if (T.ph === 'cap') { if (!tamCapped() || tamHOn()) tamPh(T, 'walk'); return; }   // 학년이 오르면 다시 걸어요
     const vis = tamFxOn(), d = dt * (tamSpdOn() ? 2 : 1), P = TAM.ph;
     if (tamSpdOn()) { const was = Math.ceil(S.tam.spd.sec); S.tam.spd.sec = Math.max(0, S.tam.spd.sec - dt); if (vis && Math.ceil(S.tam.spd.sec) !== was) tamRenderTop(); }   // 2배속은 켜 둔 동안만 줄어요
+    if (T.ph === 'practiceEnd') return;
     T.t += d;
     if (T.ph === 'walk') { if (T.t >= P.walk) tamPh(T, 'meet'); }
     else if (T.ph === 'meet') { if (vis && T.F) tamDraw(T.F); if (T.t >= P.meet) tamPh(T, 'fight'); }
@@ -18268,6 +18624,47 @@ body.mg-on .toast[hidden]{display:none}
   // 3D 그림(ex3_)이 있으면 먼저 쓰고, 없으면 2D 그림(ex_)
   const tamI = k => IMG(String(k).replace(/^ex_/, 'ex3_')) || IMG(k);
   const tamPcPic = (sp, act) => tamI(`ex_pc_${sp}_${act ? 'act' : 'idle'}`) || IMG('chr_' + sp) || '';
+  const TAM_FRAME_SPECS = {
+    bear:   { run: 6, recoil: 4, stride: 490 },
+    rabbit: { run: 4, recoil: 4, stride: 415 },
+    fox:    { run: 4, recoil: 4, stride: 365 }
+  };
+  function tamFrameArt(sp, recoil) {
+    const spec = TAM_FRAME_SPECS[sp];
+    if (!spec) return '';
+    return (recoil ? ['run', 'recoil'] : ['run']).map(kind => {
+      const src = IMG(`ex4_pc_${sp}_${kind}_frames`), count = spec[kind];
+      return src ? `<span class="tm-frame-art" data-atlas="${kind}" data-cells="${count}" aria-hidden="true" style="--frame-width:${count * 100}%"><img src="${src}" alt=""></span>` : '';
+    }).join('');
+  }
+  function tamPlayFrames(el, kind, cycle, iterations = 1) {
+    const layer = el.querySelector(`[data-atlas="${kind}"]`), sheet = layer?.firstElementChild;
+    if (rt.reduced || !sheet?.naturalWidth || cycle < 80) return false;
+    el._endFrames?.();
+    const n = Number(layer.dataset.cells);
+    const base = el.querySelector('.tm-body > img');
+    const cells = Array.from({ length: n + 1 }, (_, i) => ({
+      offset: i / n, transform: `translateX(${-100 * Math.min(i, n - 1) / n}%)`, easing: 'steps(1,end)'
+    }));
+    const duration = cycle * iterations, blend = [
+      { opacity: 0, offset: 0 },
+      { opacity: 1, offset: kind === 'recoil' ? .06 : .13 },
+      { opacity: 1, offset: .83 },
+      { opacity: 0, offset: 1 }
+    ];
+    const pose = sheet.animate(cells, { duration: cycle, iterations });
+    const fade = layer.animate(blend, { duration });
+    const hideBase = base.animate(blend.map(f => ({ ...f, opacity: 1 - f.opacity })), { duration });
+    el.dataset.frames = kind;
+    el._endFrames = () => {
+      fade.onfinish = null;
+      pose.cancel(); fade.cancel(); hideBase.cancel();
+      delete el.dataset.frames;
+      el._endFrames = null;
+    };
+    fade.onfinish = el._endFrames;
+    return true;
+  }
   const tamMobPic = (fl, m) => m.boss ? tamPic(`ex_boss_${tamReg(fl).k}`, TAM.bossPh) : tamPic(`ex_mob_${tamReg(fl).k}_${m.i + 1}`, TAM.mobPh[(TAM.reg.indexOf(tamReg(fl)) + m.i) % TAM.mobPh.length]);
   // 탐험대가 층을 오르며 장난꾸러기를 만나는 화려한 화면. 자리(왼쪽 %, 바닥 %), 앞줄부터
   // 맨 앞 장식(풀과 꽃)에 가리지 않게 대원과 장난꾸러기를 14%만큼 위로(TM_UP, 체력 막대까지 보이게)
@@ -18280,7 +18677,7 @@ body.mg-on .toast[hidden]{display:none}
   // 카메라: 겨룰 때 다가가고, 큰 장난꾸러기가 나오면 그쪽으로 확대했다가 돌아와요
   function tamCam(fight, boss) {
     const st = $('#tmStage'); if (!st) return; st.classList.toggle('fight', !!fight);
-    if (boss) { st.classList.add('bossin'); clearTimeout(st._cb); st._cb = setTimeout(() => st.classList.remove('bossin'), 1300); }
+    if (boss && !rt.reduced) { st.classList.add('bossin'); clearTimeout(st._cb); st._cb = setTimeout(() => st.classList.remove('bossin'), 1300); }
   }
   function tamPunch() { const st = $('#tmStage'); if (!st || rt.reduced) return; st.classList.add('punch'); clearTimeout(st._cp); st._cp = setTimeout(() => st.classList.remove('punch'), 110); }
   // 맞은 모습(ex3_..._hit)이 있으면 잠깐 바꿔 보여요
@@ -18322,7 +18719,7 @@ body.mg-on .toast[hidden]{display:none}
     t.querySelector('.tt-me').style.backgroundImage = m ? `url("${m}")` : '';
   }
   function tamFl(fl, up) {
-    const e = $('#tmFlBig'); if (!e) return; e.textContent = tamFlTx(fl, tamHOn());
+    const e = $('#tmFlBig'); if (!e) return; e.textContent = rt.tam?.practice ? `연습 ${fmt(fl)}층` : tamFlTx(fl, tamHOn());
     if (up) { e.classList.remove('up'); void e.offsetWidth; e.classList.add('up'); }
   }
   function tamBuild() {
@@ -18334,11 +18731,14 @@ body.mg-on .toast[hidden]{display:none}
     tamG6(fl);
     tamAmb(R.k); tamTower(fl); tamFl(fl);
     const boss = !!(F && F.M[0] && F.M[0].boss); st.classList.toggle('boss', boss);
+    st.classList.toggle('boss-first', !!(F && F.wind));
     const bb = $('#tmBossBar'); bb.hidden = !boss; if (boss) bb.querySelector('span').textContent = F.M[0].nm;
     const party = F ? F.P : tamTeam();
     $('#tmP').dataset.fid = F ? F.id : ''; $('#tmM').dataset.fid = F ? F.id : ''; $('#tmP').classList.remove('walking', 'enter', 'jump');
     setH($('#tmP'), party.map((p, i) => { const [x, y] = TM_PPOS[i] || TM_PPOS[0];
-      return `<div class="tm-f" data-i="${i}" style="left:${x}%;bottom:${y + TM_UP}%;z-index:${30 - y};${tamDz(y)}--bd:-${(i * 0.37).toFixed(2)}s;--bd2:${(i * 0.06).toFixed(2)}s"><div class="tm-body"><img src="${tamPcPic(p.sp)}" alt="${esc(spName(p.sp))}"></div><i class="tm-hp"><s></s><b></b></i></div>`; }).join(''));
+      const pose = F?.wind && IMG(`ex4_pc_${p.sp}_sk`);
+      const frames = F?.wind ? tamFrameArt(p.sp, true) : '';
+      return `<div class="tm-f${frames ? ' tm-frame-owner' : ''}" data-actor="${p.sp}" data-i="${i}" style="left:${x}%;bottom:${y + TM_UP}%;z-index:${30 - y};${tamDz(y)}--bd:-${(i * 0.37).toFixed(2)}s;--bd2:${(i * 0.06).toFixed(2)}s"><div class="tm-body"><img src="${tamPcPic(p.sp)}" alt="${esc(spName(p.sp))}">${pose ? `<img class="tm-counter-pose" src="${pose}" alt="">` : ''}${frames}</div><i class="tm-hp"><s></s><b></b></i></div>`; }).join(''));
     if (!F) { setH($('#tmM'), ''); return; }
     const pos = boss ? TM_BPOS : F.M.length === 1 ? TM_MPOS1 : F.M.length === 2 ? TM_MPOS2 : TM_MPOS;   // 마리 수에 맞춘 자리
     setH($('#tmM'), F.M.map((m, i) => { const [x, y] = pos[i] || pos[0];
@@ -18409,26 +18809,181 @@ body.mg-on .toast[hidden]{display:none}
     const st = $('#tmFx').getBoundingClientRect();
     for (let i = 0; i < 2; i++) tamFxImg('tm-drop', src, x, y, [{ t: 'scale(.6)', opacity: 1 }, { dx: (i ? 18 : -14), dy: -38, t: 'scale(1.1)', opacity: 1, offset: 0.35 }, { dx: (i ? 22 : -18), dy: 0, t: 'scale(1)', opacity: 1, offset: 0.6 }, { dx: -x + st.width * 0.08, dy: -y + st.height * 0.08, t: 'scale(.5)', opacity: 0.2 }], 1000 + i * 120, 'ease-in-out');
   }
+  function tamWindPaint(F, P, boss) {
+    const active = tamWindActive(F), card = $('#tmWind');
+    if (!active && card.hidden) return;
+    if (card.hidden === active) {
+      card.hidden = !active;
+      if (active) tamControls(false);
+    }
+    const wind = active ? F.wind : null, targets = active ? tamWindTargets(F) : [];
+    if (active) {
+      const { spec, prepared, wrong, order, cursor, links, need } = wind, brace = $('#tmBrace');
+      const left = tamWindLeft(F), timing = spec.timing;
+      card.dataset.trial = spec.key;
+      card.style.setProperty('--wind-left', left);
+      setTx($('#tmWindTitle'), spec.title);
+      const inTime = timing && left >= timing[0] && left <= timing[1];
+      let hint = prepared ? spec.ready : spec.hint;
+      if (order && spec.sequence) hint = wrong ? '순서가 달라요. 전기가 날아와요!' : `${order.map(sign => TAM_SIGNS[sign]).join(' → ')} 순서로 눌러요 (${cursor}/${order.length})`;
+      else if (order) hint = wrong ? '표식이 달라요. 책장이 날아와요!' : `책에 ‘${TAM_SIGNS[order[0]]}’ 표식이 보여요. 같은 것을 골라요`;
+      if (timing && !prepared) hint = inTime ? '지금 발을 맞춰요!' : left < timing[0] ? '발을 맞출 시간이 지났어요' : spec.hint;
+      if (links) hint = `필살기 ${links.length}/${need}, ${need === 1 ? '대원의 필살기를 써요' : '서로 다른 대원의 필살기를 써요'}`;
+      setTx($('#tmWindHint'), hint);
+      setHid(brace, !spec.guard);
+      brace.disabled = prepared;
+      setTx(brace, prepared ? '준비 완료' : spec.button || '');
+      card.classList.toggle('in-time', !!inTime && !prepared);
+      if (timing) {
+        card.style.setProperty('--wind-zone-start', `${timing[0] * 100}%`);
+        card.style.setProperty('--wind-zone-width', `${(timing[1] - timing[0]) * 100}%`);
+      }
+      setHid($('#tmWindSigns'), !spec.signs);
+      if (spec.signs) $$('[data-tam-sign]', card).forEach((button, i) => {
+        const sign = spec.signs[i];
+        setAt(button, 'data-tam-sign', sign);
+        setTx(button, TAM_SIGNS[sign]);
+        button.disabled = !!wrong;
+      });
+    }
+    if (P) P.forEach((el, i) => {
+      const target = targets.includes(F.P[i]);
+      el.classList.toggle('wind-target', target);
+      el.classList.toggle('wind-guarded', target && wind.prepared);
+      el.classList.toggle('wind-linked', !!wind?.links?.includes(F.P[i]));
+    });
+    else $$('#tmP .wind-target,#tmP .wind-linked').forEach(el => el.classList.remove('wind-target', 'wind-guarded', 'wind-linked'));
+    if (boss) boss.classList.toggle('wind-up', active);
+    else $('#tmM .wind-up')?.classList.remove('wind-up');
+  }
+  // 첫 보스의 대응 필살기는 컷인 없이 준비 → 닿는 순간 → 복귀를 한 장면으로 보여 줘요.
+  function tamWindCounterFx(F, i, el, boss) {
+    skReset();
+    const speed = tamSpdK(), start = Math.max(skNow(), SKQ.end);
+    const hitOffset = .53, duration = rt.reduced ? 0 : 720 / speed;
+    const hit = start + duration * hitOffset;
+    SKQ.end = start + duration;
+    const p = F.P[i];
+    const body = el.querySelector('.tm-body');
+    const bossBody = boss.querySelector('.tm-body');
+    if (!rt.reduced) boss.classList.add('wind-up');
+    skAt(start, () => {
+      if (rt.reduced) return;
+      const [x, y] = tamAt(el), [bx, by] = tamAt(boss);
+      const reach = p.ri === 1 ? .72 : .12;
+      const dx = (bx - x) * reach, dy = (by - y) * reach;
+      const move = (x, y, tilt = 0) => `translate(${x}px,${y}px) rotate(${tilt}deg)`;
+      body.animate([
+        { transform: 'none', easing: 'ease-out' },
+        { transform: 'translate(-8%, 3%) scale(1.04,.91) rotate(-5deg)', offset: .22, easing: 'cubic-bezier(.53,.03,.33,1)' },
+        { transform: move(dx, dy, 6), offset: hitOffset, easing: 'ease-out' },
+        { transform: move(dx * .97, dy * .97 + 3, -2), offset: .65, easing: 'cubic-bezier(.32,0,.27,1)' },
+        { transform: 'none' }
+      ], { duration });
+      const pose = body.querySelector('.tm-counter-pose');
+      const run = body.querySelector('[data-atlas="run"] img');
+      if (p.ri === 1 && run?.naturalWidth) {
+        skAt(start + duration * .19, () => tamPlayFrames(el, 'run', duration * .49));
+        return;
+      }
+      // 자세 그림이 아직 안 열린 기기에서는 대원이 사라지지 않도록 기본 그림으로 달려요.
+      if (pose?.naturalWidth) {
+        const base = body.querySelector('img');
+        const blend = [0, 0, 1, 1, 0].map((v, k) => ({ opacity: v, offset: [0, .16, .30, .66, .91][k] }));
+        pose.animate(blend, { duration });
+        base.animate(blend.map(frame => ({ ...frame, opacity: 1 - frame.opacity })), { duration });
+      }
+    });
+    skAt(hit, () => {
+      if (!rt.reduced) {
+        const poised = getComputedStyle(bossBody).transform;
+        boss.classList.remove('wind-up');
+        bossBody.animate([
+          { transform: poised },
+          { transform: 'translateX(9%) rotate(7deg)', offset: .34, easing: 'ease-out' },
+          { transform: 'none' }
+        ], { duration: 290 / speed });
+        $('#tmStage .tm-cam').animate([
+          { scale: '1' }, { scale: '1.035', offset: .23 }, { scale: '1' }
+        ], { duration: 310 / speed, easing: 'ease-out' });
+      }
+      const { spec, need } = F.wind;
+      sfx('tamCounter'); tamToast(need === 1 ? spec.soloBlocked : spec.blocked);
+      tamBars(F);
+    });
+    return { hit, heal: hit, counter: true };
+  }
   function tamDraw(F) {
     const P = $$('#tmP .tm-f'), M = $$('#tmM .tm-f');
     if (P.length !== F.P.length || M.length !== F.M.length || $('#tmM').dataset.fid !== String(F.id)) { tamBuild(); return; }   // 다른 판의 쓰러진 대원 그림을 그대로 쓰던 것 고침
+    tamWindPaint(F, P, M[0]);
     let actor = -1, sk = null;   // sk: 필살기 연출 시계로 맞는 때와 회복되는 때
     F.ev.forEach((e, ei) => {
-      if (e.k === 'act' || e.k === 'big') {
+      if (e.k === 'wind') { sfx('tamWind'); }
+      else if (e.k === 'wind-answer' || e.k === 'wind-link') {
+        const answered = e.k === 'wind-answer';
+        sfx(answered ? 'tamCounter' : 'tap');
+        if (answered) tamToast(F.wind.spec.blocked);
+        if (!rt.reduced) {
+          const [x, y] = tamAt(answered ? M[0] : P[e.p], .48), art = IMG(F.wind.spec.art);
+          tamFxImg('tm-shot tm-answer-fx', art, x, y, [
+            { t: 'scale(.5) rotate(-14deg)', opacity: .95 },
+            { dy: -19, t: 'scale(1.3) rotate(9deg)', opacity: .8, offset: .42 },
+            { dy: -36, t: 'scale(1.6) rotate(23deg)', opacity: 0 }
+          ], 480 / tamSpdK());
+        }
+      }
+      else if (e.k === 'wind-hit') {
+        const spec = F.wind.spec;
+        sfx('tamCounter'); tamToast(e.braced ? spec.blocked : spec.landed);
+        if (!rt.reduced) {
+          const [x, y] = tamAt(P[e.p], .66), [bx, by] = tamAt(M[e.m], .66), art = IMG(spec.art);
+          if (spec.guard) tamFxImg(`tm-shot ${spec.timing ? 'tm-frost-impact' : 'tm-wave-impact'}`, art, x, y, [
+            { t: 'scale(.55,.45)', opacity: .9 },
+            { dx: -20, dy: -7, t: 'scale(1.15,.8)', opacity: .8, offset: .4 },
+            { dx: -44, dy: -18, t: 'scale(1.4,.92)', opacity: 0 }
+          ], 480);
+          else {
+            const spread = wldLv() ? 1 : 0;
+            for (let j = -spread; j <= spread; j++) tamFxImg('tm-shot', art, bx, by + j * 18, [
+              { dx: x - bx, dy: y - by, t: 'scale(.8) rotate(-28deg)', opacity: .85 },
+              { dx: x - bx - 38, dy: y - by - 22 + j * 12, t: 'scale(.4) rotate(-90deg)', opacity: 0 }
+            ], spec.delay ? 420 : 260);
+          }
+        }
+      }
+      else if (e.k === 'act' || e.k === 'big') {
         actor = e.p; sk = null; const el = P[e.p], im = el && el.querySelector('img'); if (!el) return;
+        if (e.counter) { sk = tamWindCounterFx(F, e.p, el, M[0]); return; }
         if (e.k === 'big') { const nx = F.ev.slice(ei + 1).find(x => x.k === 'hit'); sk = tamSkillFx(F, e.p, nx ? nx.m : 0); const sp = F.P[e.p].sp; skAt(sk.hit - 900, () => { const a = IMG(`ex4_pc_${sp}_sk`) || tamI(`ex_pc_${sp}_act`); if (a && im) { im.src = a; clearTimeout(el._t); el._t = setTimeout(() => { im.src = tamPcPic(sp); }, 1400); } }); return; }
         el.classList.remove('act', 'far'); void el.offsetWidth; el.classList.add('act'); if (e.ri !== 1) el.classList.add('far'); fxTamDust(el);
         const a = IMG(`ex4_pc_${F.P[e.p].sp}_atk`) || tamI(`ex_pc_${F.P[e.p].sp}_act`); if (a && im) { im.src = a; clearTimeout(el._t); el._t = setTimeout(() => { im.src = tamPcPic(F.P[e.p].sp); }, 520); }   // 공격 자세
       } else if (e.k === 'hit') {
-        const el = M[e.m], d = fmt(Math.max(1, Math.round(e.d))), cr = e.cr, fromEl = actor >= 0 ? P[actor] : null, ri = actor >= 0 ? F.P[actor].ri : 1, bigHit = !!sk;
-        const land = () => { el.classList.remove('hurt'); void el.offsetWidth; el.classList.add('hurt'); tamHitPic(el, F.M[e.m] && !F.M[e.m].boss ? `ex_mob_${tamReg(F.fl).k}_${F.M[e.m].i + 1}_hit` : ''); tamHitFx(el, cr, bigHit, ri); tamFloat(el, d, cr || bigHit ? 'cr' : ''); if (cr && !bigHit) { tamShake(5, 260); tamPunch(); } };
+        const el = M[e.m], d = fmt(Math.max(1, Math.round(e.d))), cr = e.cr, fromEl = actor >= 0 ? P[actor] : null, ri = actor >= 0 ? F.P[actor].ri : 1, bigHit = !!sk, counterHit = !!sk?.counter;
+        const land = () => { el.classList.remove('hurt'); void el.offsetWidth; el.classList.add('hurt'); tamHitPic(el, F.M[e.m] && !F.M[e.m].boss ? `ex_mob_${tamReg(F.fl).k}_${F.M[e.m].i + 1}_hit` : ''); if (!counterHit || !rt.reduced) tamHitFx(el, cr, bigHit && !counterHit, ri); tamFloat(el, d, cr || bigHit ? 'cr' : ''); if (cr && !bigHit) { tamShake(5, 260); tamPunch(); } };
         if (bigHit) skAt(sk.hit, () => { land(); tamBars(F); }); else if (ri === 1 || !fromEl) land(); else tamShot(fromEl, el, ri, land);
       }
       else if (e.k === 'heal') { const el = P[e.p], hf = f => sk ? skAt(sk.heal, f) : f(); hf(() => { if (sk && IMG('ex4_sk_kor_heal')) { const [hx, hy] = tamAt(el, 0.55); tamFxImg('tm-pillar', IMG('ex4_sk_kor_heal'), hx, hy, [{ t: 'scaleY(.2)', opacity: 0 }, { t: 'scaleY(1)', opacity: 1, offset: 0.35 }, { dy: -10, t: 'scaleY(1.05)', opacity: 0 }], 1000); } tamFloat(el, '+' + fmt(Math.round(e.d)), 'heal'); const [x, y] = tamAt(el); tamFxImg('tm-spark', tamI('ex_fx_heal'), x, y, [{ t: 'scale(.4)', opacity: 0 }, { t: 'scale(1.2)', opacity: 1, offset: 0.4 }, { dy: -16, t: 'scale(1.4)', opacity: 0 }], 600); }); }
       else if (e.k === 'hurt') {
         const el = P[e.p], mm = M[e.m];
         if (mm) { mm.classList.remove('act'); void mm.offsetWidth; mm.classList.add('act'); const fm = F.M[e.m]; if (fm) tamHitPic(mm, fm.boss ? `ex_boss_${tamReg(F.fl).k}_atk` : `ex_mob_${tamReg(F.fl).k}_${fm.i + 1}_atk`); }   /* 장난꾸러기도 칠 때 공격 자세 */
-        setTimeout(() => { el.classList.remove('hurt'); void el.offsetWidth; el.classList.add('hurt'); tamHitPic(el, `ex4_pc_${F.P[e.p].sp}_hurt`); tamFloat(el, fmt(Math.max(1, Math.round(e.d))), 'ouch'); }, 140);
+        const land = () => {
+          el.classList.remove('hurt');
+          if (e.wind && tamPlayFrames(el, 'recoil', 420 / tamSpdK())) {
+            el.querySelector('.tm-body').animate([
+              { transform: 'none' },
+              { transform: 'translate(-6%, 2%) rotate(-6deg)', offset: .25, easing: 'ease-out' },
+              { transform: 'translate(-2%, 1%) rotate(2deg)', offset: .64 },
+              { transform: 'none' }
+            ], { duration: 420 / tamSpdK() });
+          } else {
+            void el.offsetWidth; el.classList.add('hurt');
+            tamHitPic(el, `ex4_pc_${F.P[e.p].sp}_hurt`);
+          }
+          tamFloat(el, fmt(Math.max(1, Math.round(e.d))), 'ouch');
+        };
+        if (e.wind) land();
+        else setTimeout(land, 140);
       }
       else if (e.k === 'poof') { const el = M[e.m], go = () => { el.classList.add('out'); tamDropFx(el, F.fl); }; if (sk || tamSkBusy()) skAt(Math.max(sk ? sk.hit : 0, SKQ.end - 600) + 300, go); else setTimeout(go, 300); }
       else if (e.k === 'ko') P[e.p].classList.add('out');
@@ -18568,17 +19123,33 @@ body.mg-on .toast[hidden]{display:none}
   function tamSpdK() { return tamSpdOn() ? 2 : 1; }
   function tamWalk(fl) {
     const st = $('#tmStage'), T = rt.tam; if (!st || !T) return;
-    const R = tamReg(fl), cur = $('.tm-bg.cur', st), bg = tamBg(fl);
+    const R = tamReg(fl), cur = $('.tm-bg.cur', st), bg = tamBg(fl), trial = tamTrialSpec(fl, !T.practice && tamHOn(), !tamWatch());
     if (!T.climbing) { cur.getAnimations().forEach(a => a.cancel()); tamBgPaint(cur, fl); }
-    st.dataset.reg = R.k; st.classList.toggle('hm', tamHOn()); st.classList.toggle('deep', tamLap(fl) > 0); st.classList.remove('boss'); $('#tmBossBar').hidden = true;
+    st.dataset.reg = R.k; st.classList.toggle('hm', tamHOn()); st.classList.toggle('deep', tamLap(fl) > 0); st.classList.remove('boss', 'boss-first'); $('#tmBossBar').hidden = true;
+    tamWindPaint();
     tamAmb(R.k); tamTower(fl); tamFl(fl);
     const team = tamTeam(), pp = $('#tmP');
     pp.dataset.fid = 'walk';
     setH(pp, team.map((p, i) => { const [x, y] = TM_PPOS[i] || TM_PPOS[0];
-      return `<div class="tm-f" data-i="${i}" style="left:${x}%;bottom:${y + TM_UP}%;z-index:${30 - y};${tamDz(y)}--bd:-${(i * 0.13).toFixed(2)}s"><div class="tm-body"><img src="${tamPcPic(p.sp)}" alt="${esc(spName(p.sp))}"></div><i class="tm-hp"><s></s><b style="width:100%"></b></i></div>`; }).join(''));
+      const frames = trial ? tamFrameArt(p.sp, false) : '';
+      return `<div class="tm-f${frames ? ' tm-frame-owner' : ''}" data-actor="${p.sp}" data-i="${i}" style="left:${x}%;bottom:${y + TM_UP}%;z-index:${30 - y};${tamDz(y)}--bd:-${(i * 0.13).toFixed(2)}s"><div class="tm-body"><img src="${tamPcPic(p.sp)}" alt="${esc(spName(p.sp))}">${frames}</div><i class="tm-hp"><s></s><b style="width:100%"></b></i></div>`; }).join(''));
     setH($('#tmM'), ''); $('#tmM').dataset.fid = '';
     if (T.nLose) pp.classList.add('enter'); else pp.classList.remove('enter');
     pp.classList.add('walking'); clearTimeout(pp._t); const ms = TAM.ph.walk / tamSpdK() * 1000; pp._t = setTimeout(() => pp.classList.remove('walking', 'enter'), ms);
+    if (!rt.reduced) for (const actor of $$('.tm-frame-owner', pp)) {
+      const start = performance.now();
+      const stride = TAM_FRAME_SPECS[actor.dataset.actor].stride / tamSpdK();
+      const run = () => {
+        const remaining = ms - (performance.now() - start);
+        if (actor.isConnected && pp.classList.contains('walking') && tamFxOn() && remaining > 100) {
+          const cycles = Math.max(1, Math.round(remaining / stride));
+          tamPlayFrames(actor, 'run', remaining / cycles, cycles);
+        }
+      };
+      const sheet = $('[data-atlas="run"] img', actor);
+      if (sheet.naturalWidth) run();
+      else sheet.addEventListener('load', run, { once: true });
+    }
     st.classList.toggle('lay', !!tamLay(fl)); { const lu = IMG('ex5_light'); if (lu) st.style.setProperty('--ex5-light', `url("${lu}")`); }
     const L = tamLay(fl), wo = { duration: ms, easing: 'cubic-bezier(.3,0,.6,1)', fill: 'forwards' };
     if (!T.climbing && !rt.reduced) {
@@ -18665,13 +19236,24 @@ body.mg-on .toast[hidden]{display:none}
     const F = rt.tam && rt.tam.F; if (!F) return;
     if (tamCastAt(F, F.P[i])) { tamDraw(F); F.ev.length = 0; }
   }
+  function tamControls(on) {
+    const menu = $('#tmActions'), toggle = $('#tmControls');
+    if (menu.hidden === !on) return;
+    if (!on && menu.contains(document.activeElement)) toggle.focus();
+    menu.hidden = !on;
+    toggle.setAttribute('aria-expanded', String(on));
+  }
   function tamRenderTop() {
     if (!tamOn()) return;
-    tamHSync(); const hm = tamHOn(), fl = tamCurFl(), R = tamReg(fl), lap = hm ? 0 : tamLap(fl);
+    const T = rt.tam, practice = T?.practice;
+    tamHSync(); const hm = !practice && tamHOn(), fl = practice || tamCurFl(), R = tamReg(fl), lap = hm ? 0 : tamLap(fl);
     $('#tmReg').textContent = R.nm + (lap ? ` (${lap + 1}바퀴째)` : '');
-    $('#tmFl').textContent = tamFlTx(fl, hm);
-    { const md = $('#tmMode'); md.hidden = !tamHOpen(); $$('[data-tmm]', md).forEach(b => b.setAttribute('aria-pressed', String(+b.dataset.tmm === (hm ? 1 : 0)))); }   // 심화 탐험
-    $('#tmBest').innerHTML = hm ? `<span>심화 최고</span>${fmt(S.tam.hb)}층` : (S.tam.best ? `<span>최고층</span>${fmt(S.tam.best)}층` : '<span>첫 탐험</span>') + (isFinite(tamCap()) ? `<small class="tm-cap">${tamCapped() ? '이번 학기 끝! 심화 탐험으로 가요' : `이번 학기 ${fmt(tamCap())}층까지`}</small>` : '');
+    setAt($('#tmMapOpen'), 'aria-label', `탐험 지도 열기, 현재 ${R.nm}`);
+    $('#tmFl').textContent = practice ? `연습 ${fmt(fl)}층` : tamFlTx(fl, hm);
+    setHid($('#tmPractice'), !practice);
+    setHid($('#tmPracticeRetry'), T?.ph !== 'practiceEnd');
+    { const md = $('#tmMode'); md.hidden = !!practice || !tamHOpen(); $$('[data-tmm]', md).forEach(b => b.setAttribute('aria-pressed', String(+b.dataset.tmm === (hm ? 1 : 0)))); }   // 심화 탐험
+    $('#tmBest').innerHTML = practice ? '<span>현재 대원으로 보스 연습 중</span>' : hm ? `<span>심화 최고</span>${fmt(S.tam.hb)}층` : (S.tam.best ? `<span>최고층</span>${fmt(S.tam.best)}층` : '<span>첫 탐험</span>') + (isFinite(tamCap()) ? `<small class="tm-cap">${tamCapped() ? '이번 학기 끝! 심화 탐험으로 가요' : `이번 학기 ${fmt(tamCap())}층까지`}</small>` : '');
     { const pw = tamPow(), el = $('#tmPow'), fu = tamI('ex_flag');   // 탐험대 힘 칸: 깃발 그림과 큰 숫자, 힘이 오르면 한 번 들썩
       setH(el, `${fu ? `<img src="${fu}" alt="">` : ''}<span><small>탐험대 힘</small><b>${fmt(pw)}</b></span>`); el.setAttribute('aria-label', `탐험대 힘 ${fmt(pw)}`);
       if (rt.tamPw && pw > rt.tamPw) { el.classList.remove('up'); void el.offsetWidth; el.classList.add('up'); }
@@ -18682,14 +19264,46 @@ body.mg-on .toast[hidden]{display:none}
     const sb = $('#tmSpd'); sb.classList.toggle('on', tamSpdOn());
     const left = TAM.adSpd.n - S.tam.ad.spd;
     rb(sb, 'ex4_ic_speed', tamSpdOn() ? hms(S.tam.spd.sec * 1000) : '광고 2배속', `${left}`, !tamSpdOn() || left > 0, tamSpdOn() ? `2배속 ${hms(S.tam.spd.sec * 1000)} 남음` : `광고 보고 2배속 ${TAM.adSpd.min}분, 오늘 ${left}번 남음`);
-    const ab = $('#tmAuto'); ab.hidden = !tamAutoOn(); ab.setAttribute('aria-pressed', S.tam.auto ? 'true' : 'false'); rb(ab, 'ex4_ic_auto', S.tam.auto ? '필살기 자동' : '필살기 수동', '', false, S.tam.auto ? '필살기 자동 켬' : '필살기 자동 끔');
+    const ab = $('#tmAuto'); ab.hidden = !tamAutoOn(); ab.setAttribute('aria-pressed', S.tam.auto ? 'true' : 'false'); rb(ab, 'ex4_ic_auto', S.tam.auto ? '자동 대응 켬' : '자동 대응 끔', '', false, `필살기와 보스 대응 자동 ${S.tam.auto ? '켬' : '끔'}`);
     { const so = $('#tmSkOff'); so.hidden = !S.tam.skSeen; so.setAttribute('aria-pressed', S.tam.skOff ? 'true' : 'false'); rb(so, 'ex4_ic_report', S.tam.skOff ? '연출 짧게' : '연출 보기', '', false, S.tam.skOff ? '필살기 연출 건너뛰기 켬' : '필살기 연출 건너뛰기 끔'); }   // 필살기를 한 번 본 뒤에 생겨요
     { const sk = $('#tmSkip'), to = tamSkipTo(); sk.hidden = !to; if (to) { rb(sk, 'ex_flag', '빠르게 넘기', `${fmt(to)}층`, false, `빠르게 넘기: ${fmt(to)}층까지 한 번에 넘어가요`);
-      if (rt.tamSkTo !== to && (!rt.tamSkTo || to > rt.tamSkTo + 9)) tamToast(`누르면 ${fmt(to)}층까지 빠르게 넘길 수 있어요`); } rt.tamSkTo = to; }
-    const T = rt.tam, rv = $('#tmRevive'), cl = tamCheerLeft(); rv.hidden = !(S.tam.cheer > 0 || (T && T.lose && cl > 0));   // 지면 응원 단추, 응원 중에는 남은 층
+      if (rt.tamSkTo !== to && (!rt.tamSkTo || to > rt.tamSkTo + 9)) tamToast(`전투 설정에서 ${fmt(to)}층까지 빠르게 넘길 수 있어요`); } rt.tamSkTo = to; }
+    const rv = $('#tmRevive'), cl = tamCheerLeft(); rv.hidden = !!practice || !(S.tam.cheer > 0 || (T && T.lose && cl > 0));   // 지면 응원 단추, 응원 중에는 남은 층
     rb(rv, 'ex4_ic_cheer', S.tam.cheer > 0 ? `응원 ${S.tam.cheer}층` : '응원', S.tam.cheer > 0 ? '' : `${cl}`, S.tam.cheer <= 0, S.tam.cheer > 0 ? `응원 ${S.tam.cheer}층 남음` : `광고 보고 응원 받기 힘 +${Math.round((TAM.cheer.mul - 1) * 100)}%, 오늘 ${cl}번 남음`); rv.classList.toggle('on', S.tam.cheer > 0);
     tamAcorn(true);
     const I = tamIdle(), rp = $('#tmRep'); rp.hidden = I.sec < 60; rp.textContent = `탐험 보고서 받기 (${Math.floor(I.sec / 60)}분)`;
+  }
+  function tamMapOpen() {
+    if (rt.modalOpen || rt.paused || tamSkBusy()) return;
+    const practice = rt.tam?.practice, hm = !practice && tamHOn(), cap = hm ? Infinity : tamCap(), floor = practice || Math.min(tamCurFl(), cap);
+    const best = hm ? S.tam.hb : S.tam.best, lap = tamLap(floor), interval = hm ? TAM.regLen : TAM.bossEvery;
+    const nextBoss = practice || Math.ceil((best + 1) / interval) * interval, R = tamReg(nextBoss), trial = tamTrialSpec(nextBoss, hm, false);
+    const goal = practice || nextBoss <= cap
+      ? `<small>${practice ? '연습 중인 보스' : hm ? '다음 심화 관문' : '다음 보스'} ${fmt(nextBoss)}층</small><b>${esc(R.boss)}</b><span>${trial ? esc(trial.hint) : `유리한 과목 ${AC.name[AB_KEY[TAM.adv[R.k]]]}`}</span>`
+      : `<small>이번 학기 ${fmt(cap)}층까지</small><b>${best >= cap ? '학기 목표를 달성했어요' : '다음 보스는 새 학기에 만나요'}</b><span>${best >= cap ? '일반 탐험 위쪽에서 심화 탐험을 고를 수 있어요' : '학기가 바뀌면 더 높은 층이 열려요'}</span>`;
+    const regions = TAM.reg.slice(0, tamRegN()).map((reg, i) => {
+      const start = (lap * tamRegN() + i) * TAM.regLen + 1, end = start + TAM.regLen - 1;
+      const current = start <= floor && floor <= end, art = tamBg(start);
+      const status = current ? `현재 ${fmt(floor)}층` : end <= best ? '통과' : start > cap ? '학기 상한 이후' : '앞으로';
+      return `<li${current ? ' aria-current="location"' : ''}>${art ? `<img src="${art}" alt="" loading="lazy">` : ''}
+        <span><small>${fmt(start)}–${fmt(end)}층</small><b>${esc(reg.nm)}</b><small>${AC.name[AB_KEY[TAM.adv[reg.k]]]} 유리</small></span><em>${status}</em></li>`;
+    }).join('');
+    const floors = Object.keys(TAM_TRIALS).map(Number).filter(f => f <= S.tam.best && tamTrialSpec(f, false, false));
+    const drills = !hm && floors.length ? `<details class="tm-practice-list"><summary>완료한 보스 연습</summary><p>현재 대원으로 대응을 연습해요. 연습은 최고층과 보상에 반영되지 않아요.</p>
+      ${floors.map(f => `<button class="btn-sub small" type="button" data-tam-practice="${f}"><b>${fmt(f)}층</b> ${esc(tamReg(f).nm)}</button>`).join('')}</details>` : '';
+    $('#tmMapBody').innerHTML = `<div class="tm-map-goal">${goal}</div>${drills}<p class="tm-map-label">${practice ? '보스 연습' : hm ? '심화 탐험' : '일반 탐험'}, ${fmt(lap + 1)}바퀴째</p><ol class="tm-map-regions">${regions}</ol>`;
+    $('#tmMapBody').scrollTop = 0;
+    sfx('tap'); openModal($('#mTamMap'));
+  }
+  function tamPractice(floor) {
+    const T = rt.tam;
+    if (!T || (!floor && !T.practice)) return;
+    if (floor && (rt.tab !== 'tam' || tamHOn() || floor > S.tam.best || !tamTrialSpec(floor, false, false))) return;
+    T.practice = floor; T.mod = null; T.ev = null; T.pend = 0;
+    $('#tmEv').hidden = true;
+    tamSkStop();
+    tamPh(T, 'walk');
+    if (rt.tab === 'tam') { tamRenderTop(); tamRenderBody(); }
   }
   // 강화 추천과 자동 편성
   const tamScore = s => s.atk * 6 / s.cd + s.hp / 4;
@@ -18745,7 +19359,7 @@ body.mg-on .toast[hidden]{display:none}
         if (i >= slots) return `<div class="tm-slot lock"><span>🔒</span><small>${i === 3 ? '초등학교' : '중학교'}</small></div>`;
         if (!sp) return `<div class="tm-slot empty"><span>+</span></div>`;
         const s = tamStat(sp); return `<div class="tm-slot" style="--rc:${TM_RC[TAM.role[s.ri].k]}"><img src="${tamPcPic(sp)}" alt=""><em>Lv.${tamMem(sp).lv}</em><small>${esc(spName(sp))}</small></div>`; }).join('')}</div>`;
-      { const R0 = tamReg(tamCurFl()), ar = TAM.role[tamAdvRi()], cl = tamCollLv();
+      { const R0 = tamReg(rt.tam?.practice || tamCurFl()), ar = TAM.role[tamAdvRi()], cl = tamCollLv();
         h += `<div class="tm-tips"><p><b class="tm-role" style="--rc:${TM_RC[ar.k]}">${esc(ar.nm.split(' ')[0])}</b> ${esc(R0.nm)}에서 힘 +${Math.round(TAM.advG * 100)}%</p>` +
           `<p><b class="tm-role">모은 대원 효과</b> 대원 레벨 합 ${fmt(cl)} → 힘 +${(Math.min(TAM.collMax, 1 + TAM.collG * cl) * 100 - 100).toFixed(1)}%</p>` +
           `<p><b class="tm-role">학교 기지</b> 대원 훈련 ${isFinite(tamTrainCap()) ? `Lv.${fmt(tamTrainCap())}까지(교실)` : '상한 없음(교실 최고)'}${isFinite(tamCapBase()) ? `, 학기 상한 +${tamCapBonus()}층(건물)` : ''}</p></div>`; }
@@ -18780,11 +19394,12 @@ body.mg-on .toast[hidden]{display:none}
       }).join('');
       setH(box, h);
     } else {
-      const R = tamReg(tamCurFl());
+      const R = tamReg(rt.tam?.practice || tamCurFl());
       setH(box, `<p class="tm-note">${R.nm}에서는 ${iga(TAM.mats[R.mat])} 많이 나와요</p><ul class="tm-mats">` + TAM.mats.map((n, i) => `<li${i === R.mat ? ' class="now"' : ''}>${tamMatIc(i, 34)}<b>${n}</b><em>${fmt(S.tam.mat[i])}</em></li>`).join('') + '</ul>');
     }
   }
   function tamOpen() {
+    tamControls(false);
     if (!FXL.st && wldLv() > 0) { FXL.touched = true; fxLoad(); }   // 엔진을 아직 안 받았으면 지금
     if (FXL.st === 'ok' && !FXT.st) fxTamInit();   // 탐험 효과층을 미리 준비
     if (FXL.st === 'ok' && !FXG.st) fxgInit();   // 오르는 길 바닥
@@ -18823,16 +19438,31 @@ body.mg-on .toast[hidden]{display:none}
     S.tam.mat[c.m] -= c.n; S.tam.mat[3] -= c.star; S.tam.sg[i][k] += 1; return true;
   }
   function tamClick(e) {
+    if (!e.target.closest('.tm-controls')) tamControls(false);
     const b = e.target.closest('button'); if (!b || !tamOn()) return;
     if (b.dataset.tcap) { tamToast(`대원 훈련은 Lv.${fmt(tamTrainCap())}까지예요\n교실을 키우면 더 올릴 수 있어요`); return; }
     if (txClick(b)) return;
+    if (b.id === 'tmControls') { sfx('tap'); tamControls($('#tmActions').hidden); return; }
+    if (b.id === 'tmMapOpen') { tamMapOpen(); return; }
+    if (b.id === 'tmPracticeExit') { tamPractice(0); return; }
+    if (b.id === 'tmPracticeRetry') { tamPractice(rt.tam?.practice || 0); return; }
+    if (b.id === 'tmBrace') {
+      const F = rt.tam?.F;
+      if (tamBrace(F)) { sfx('tap'); tamWindPaint(F, $$('#tmP .tm-f'), $('#tmM .boss')); }
+      return;
+    }
+    if (b.dataset.tamSign) {
+      const F = rt.tam?.F;
+      if (tamWindAnswer(F, b.dataset.tamSign)) { tamDraw(F); F.ev.length = 0; }
+      return;
+    }
     if (b.getAttribute('aria-disabled') === 'true' && !(b.dataset.tlv && S.budget >= tamLvCost(b.dataset.tlv) && tamTrainOk(b.dataset.tlv))) { if (b.dataset.tlv) tamToast('도토리가 모자라요\n문방구에서 숲의 정수로 도토리를 살 수 있어요'); else if (b.dataset.tgear) tamToast('재료가 모자라요'); return; }
     if (b.dataset.tsk) { tamCast(+b.dataset.tsk); return; }
     if (b.dataset.tmm) { const v = +b.dataset.tmm; if ((v && !tamHOpen()) || (rt.tam && rt.tam.ph === 'event')) return; if ((S.tam.hm ? 1 : 0) === v) return; S.tam.hm = v; tamHSync(); sfx('tap'); save(); tamSkStop(); tamRestart(); tamRenderTop(); tamRenderBody(); musicSync(); return; }   // 심화 탐험
     if (b.id === 'tmExit') { sfx('tap'); setTab('school'); return; }
     if (b.id === 'tmShX') { sfx('tap'); $('#tmSheet').hidden = true; tamRenderBody(); return; }
     if (b.dataset.tnav) { const k = b.dataset.tnav; sfx('tap');
-      if (k === 'exp') { $('#tmSheet').hidden = true; txOpen(); return; }
+      if (k === 'exp') { tamPractice(0); $('#tmSheet').hidden = true; txOpen(); return; }
       if (k === 'rank') { rt.rankView = 'tam'; setTab('rank'); rt.backTab = 'tam'; return; }   // 닫으면 탐험으로
       if (k === 'rep') { tamReport(false); return; }
       const sh = $('#tmSheet'); if (!sh.hidden && rt.tamSeg === k) { sh.hidden = true; tamRenderBody(); return; }
@@ -19230,7 +19860,7 @@ body.mg-on .toast[hidden]{display:none}
   }
   // 기준 층: 지금 탐험대가 체력을 다 채운 채로 이기는 가장 높은 층(fe, 큰 장난꾸러기 층은 빼고 재요)과 가장 높은 큰 장난꾸러기 층(fb). 최고층까지만
   function txRef() {
-    const team = tamTeam(), best = Math.max(1, S.tam.best), win = f => tamSim(f, team, 7).win, one = f => f % TAM.bossEvery === 0 ? f - 1 : f;
+    const team = tamTeam(), best = Math.max(1, S.tam.best), win = f => tamSim(f, team, 7, { trial: false }).win, one = f => f % TAM.bossEvery === 0 ? f - 1 : f;
     let lo = 1, hi = best;
     if (!win(1)) lo = hi = 1;
     while (lo < hi) { const mid = Math.ceil((lo + hi) / 2); if (win(one(mid))) lo = mid; else hi = mid - 1; }
@@ -19258,7 +19888,7 @@ body.mg-on .toast[hidden]{display:none}
   function txFight(run, fl, boss, seed) {
     const atk = 1 + run.atk / 1000 + (run.ch > 0 ? TAM.cheer.mul - 1 : 0), mx = 1 + run.mx / 1000;
     const team = tamTeam().map(s => ({ ...s, atk: s.atk * atk, hp: s.hp * mx }));
-    const F = tamFight(Math.max(1, fl), team);
+    const F = tamFight(Math.max(1, fl), team, 1, { trial: false });   // 원정은 체력이 이어지는 자동 전투
     if (boss) {
       const B = Math.max(TAM.bossEvery, Math.floor(fl / TAM.bossEvery) * TAM.bossEvery), sc = Math.pow(TAM.g, -TEX.bossBack);
       F.M = tamMobs(B).map((m, k) => ({ ...m, hp: m.hp * sc, mx: m.hp * sc, atk: m.atk * sc, c: (1 + k * 0.4) * TAM.pace, wk: 0 }));
@@ -19403,7 +20033,7 @@ body.mg-on .toast[hidden]{display:none}
       w.scrollTop = w.scrollHeight;
     }
     // 지도가 화면 높이를 다 채우게(가로가 조금 넘치면 가운데만 보여요. 칸은 가운데 70% 안에 있어요)
-    { const W = w.clientWidth, H = w.clientHeight - (parseFloat(getComputedStyle(w).paddingTop) || 0), mw = Math.round(Math.min(Math.max(W, H / 1.5), W * 1.25)); m.style.width = mw + 'px'; m.style.marginLeft = Math.round((W - mw) / 2) + 'px'; }
+    { const W = w.clientWidth, H = w.clientHeight - (parseFloat(getComputedStyle(w).paddingTop) || 0) - (parseFloat(getComputedStyle(w).paddingBottom) || 0), mw = Math.round(Math.min(Math.max(W, H / 1.5), W * 1.25)); m.style.width = mw + 'px'; m.style.marginLeft = Math.round((W - mw) / 2) + 'px'; }
     const at = run ? run.at : 0, ns = $$('.tx-n', m);
     ns.forEach((n, i) => { const u = txNodePic(run, i) || ''; const im = n.querySelector('img'); if (im.getAttribute('src') !== u) im.src = u; n.classList.toggle('cur', !!run && i === at); n.classList.toggle('past', !!run && i < at); });
     const me = $('.tx-me', m), lead = tamParty()[0], face = lead ? tamPcPic(lead) : '';
@@ -21733,6 +22363,10 @@ body.mg-on .toast[hidden]{display:none}
       setT($('#sheetFriendGo'), done ? '♥ 오늘 했어요' : '쓰다듬기');
       row.setAttribute('aria-label', `${frFull(sp)}, ${done ? '오늘 쓰다듬었어요' : '눌러서 쓰다듬기'}`);
     }
+    // 오늘 아직 안 쓰다듬은 단짝이 둘 넘게 남았으면 건물 창에서도 한 번에(도감 '모두 쓰다듬기'와 같아요)
+    { const pa = $('#sheetPatAll'), n = sp ? frPatLeft().length : 0, ic = IMG('bond_pat');
+      pa.hidden = n < 2;
+      if (n >= 2) { setH(pa, `${ic ? `<img src="${ic}" alt="">` : ''}<span>오늘 안 쓰다듬은 단짝 ${n}명 모두 쓰다듬기</span>`); pa.setAttribute('aria-label', `오늘 안 쓰다듬은 단짝 ${n}명 모두 쓰다듬기. 도감 학생 칸에서도 할 수 있어요`); } }
     const br = $('#sheetBday'), bp = bdParty(), bOn = !!bp && bdPlace() === k && !bdDoneToday();
     br.hidden = !bOn;
     if (bOn) {
@@ -23626,6 +24260,41 @@ body.mg-on .toast[hidden]{display:none}
     beach: ['푸른 바닷가', '갯벌 생물을 조사하고 표본을 모아요'], star: ['별빛 천문대', '산꼭대기 천문대에서 밤새 별을 관측해요'] };
   for (const T of TRIPS) for (const [f, i] of [['name', 0], ['say', 1]]) { const t0 = T[f]; Object.defineProperty(T, f, { get: () => uniNow() && TRIPS_U[T.id] ? TRIPS_U[T.id][i] : t0, enumerable: true, configurable: true }); }
   const TRIP = Object.fromEntries(TRIPS.map(t => [t.id, t]));
+  const CREEK_ROUTES = {
+    stones: { name: '징검다리 건너기', lead: '돌을 밟아 건너며 물살을 살펴요.', stop: '징검다리를 건너는 중', title: '징검다리 발자국', line: '돌마다 물살이 다르게 흘렀어요. 넓고 납작한 돌에서 잠깐 쉬었어요.', art: 'creek:2' },
+    bank: { name: '물가 관찰하기', lead: '갈대 곁에 앉아 송사리를 찾아요.', stop: '갈대밭에서 송사리를 찾는 중', title: '갈대밭의 송사리', line: '물풀 아래 반짝이는 송사리가 모였어요. 우리가 가만히 있자 가까이 왔어요.', art: 'creek:1' }
+  };
+  const CREEK_KEYS = Object.keys(CREEK_ROUTES);
+  const creekRouteKey = k => CREEK_KEYS.includes(k) ? k : '';
+  const TRIP_ROUTES = {
+    creek: CREEK_ROUTES,
+    hill: {
+      canopy: { name: '참나무 숲길 조사', lead: '햇볕이 드는 길에서 잎 모양을 비교해요.', stop: '참나무 그늘에서 잎을 살피는 중', title: '참나무 아래의 잎', line: '햇빛이 비치는 잎과 그늘의 잎은 모양과 느낌이 달랐어요.', art: 'hill:2', notes: [['햇빛 드는 잎', '빛을 받은 잎의 잎맥이 선명하게 보였어요.'], ['그늘의 잎', '그늘의 잎은 손바닥만큼 넓었어요.']] },
+      tracks: { name: '발자국 따라가기', lead: '흙길 옆에서 작은 동물의 흔적을 찾아요.', stop: '흙길에서 발자국을 찾는 중', title: '숲길의 작은 발자국', line: '비가 그친 길에 작은 발자국들이 나무 아래까지 이어졌어요.', art: 'hill:1', notes: [['마른 흙길', '마른 흙에는 발자국 가장자리가 흐릿했어요.'], ['젖은 흙길', '젖은 흙에는 발가락 자국까지 남아 있었어요.']] }
+    },
+    museum: {
+      fossils: { name: '화석 전시실 탐방', lead: '화석의 무늬를 보고 오래전 숲을 상상해요.', stop: '전시실에서 화석 무늬를 보는 중', title: '돌에 남은 옛 흔적', line: '돌처럼 보이던 화석에 오래전 생물의 모양이 남아 있었어요.', art: 'museum:0', notes: [['뼈 화석', '뼈 화석은 부러진 단면에 작은 구멍이 많았어요.'], ['잎 화석', '잎 화석에는 가는 잎맥이 부채처럼 펼쳐져 있었어요.']] },
+      coins: { name: '옛 물건 전시 탐방', lead: '숲속 마을이 쓰던 동전과 종을 살펴요.', stop: '옛 마을의 물건을 보는 중', title: '옛 마을의 도토리 동전', line: '숲속 마을의 동전에는 가운데 도토리 한 알이 새겨져 있었어요.', art: 'museum:1', notes: [['동전의 앞면', '앞면 가장자리에 작은 점무늬가 둘러져 있었어요.'], ['오래된 학교 종', '종 손잡이 아래에 만든 이의 표시가 남아 있었어요.']] }
+    },
+    beach: {
+      pools: { name: '바위 웅덩이 살피기', lead: '물이 빠진 바위 틈에 남은 작은 생물을 봐요.', stop: '바위 웅덩이의 생물을 관찰하는 중', title: '바위 틈의 작은 바다', line: '파도가 빠져나간 뒤에도 바위 틈에는 맑은 물이 남아 있었어요.', art: 'beach:1', notes: [['물속 가장자리', '작은 게가 바위 그림자 가까이 숨었어요.'], ['물 위의 바위', '물 위로 드러난 바위에 조그만 따개비가 붙어 있었어요.']] },
+      shells: { name: '모래사장 조개 찾기', lead: '파도가 두고 간 조개껍데기를 살펴요.', stop: '모래 위의 조개 자국을 찾는 중', title: '파도가 남긴 조개', line: '물결이 지나간 자리에 크기가 다른 조개껍데기들이 모였어요.', art: 'beach:0', notes: [['줄무늬 조개', '부채처럼 펼쳐진 줄무늬가 가장자리까지 이어졌어요.'], ['나선 조개', '나선을 따라 손끝으로 돌려 보니 끝으로 갈수록 좁아졌어요.']] }
+    },
+    star: {
+      constellations: { name: '별자리 찾아 그리기', lead: '밝은 별을 연결해 숲 위의 별자리를 그려요.', stop: '밤하늘의 별을 이어 그리는 중', title: '숲 위의 별자리', line: '밝은 별에서 옆 별로 눈길을 옮기니 하늘 위에 길이 생겼어요.', art: 'star:0', notes: [['북쪽 하늘', '국자처럼 이어진 일곱 별이 먼저 눈에 들어왔어요.'], ['동쪽 하늘', '나무 위로 막 떠오른 별은 숲 가장자리 가까이에 있었어요.']] },
+      moon: { name: '망원경으로 달 관찰', lead: '달의 밝은 곳과 어두운 곳을 나누어 그려요.', stop: '망원경으로 달의 표면을 보는 중', title: '달 위의 그늘', line: '망원경으로 보니 달 가장자리의 작은 분화구에도 그늘이 생겼어요.', art: 'star:1', notes: [['달의 밝은 면', '작고 동그란 분화구 옆에 흰 줄기가 뻗어 있었어요.'], ['빛과 그늘의 경계', '빛이 비스듬하게 놓인 곳에서 울퉁불퉁한 가장자리가 잘 보였어요.']] }
+    }
+  };
+  const tripRouteKeys = dest => Object.keys(TRIP_ROUTES[dest] || {});
+  const tripRouteKey = (dest, key) => tripRouteKeys(dest).includes(key) ? key : '';
+  const tripRouteToken = (dest, key) => dest + ':' + key;
+  const TRIP_FIELD_IDS = TRIPS.filter(D => D.id !== 'creek').flatMap(D => tripRouteKeys(D.id).map(k => tripRouteToken(D.id, k)));
+  const tripCurrentRoute = () => {
+    const T = S.trip;
+    return tripRouteKey(T.cur, T.cur === 'creek' ? T.creekRoute : T.route);
+  };
+  const TRIP_ACTIVITY = { hill: '뒷산에서 나뭇잎과 발자국을 살피는 중', creek: '시냇가에서 송사리를 관찰하는 중',
+    museum: '전시실에서 화석을 살피는 중', beach: '갯벌에서 조개를 찾는 중', star: '망원경으로 밤하늘을 보는 중' };
   const SOUV_IDS = new Set(TRIPS.flatMap(t => t.souv.map((_, i) => `${t.id}:${i}`)));
   const TRIP_ART = {
     hill: '<path d="M-10 6 L-3 -6 L1 0 L4 -4 L10 6 Z" fill="#6E9446"/><circle cx="5" cy="-7" r="2" fill="#F3C04B"/>',
@@ -23646,6 +24315,7 @@ body.mg-on .toast[hidden]{display:none}
   const tripSetsAll = () => TRIPS.filter(t => t.souv.every((_, i) => S.trip.souv.includes(`${t.id}:${i}`))).length;
   const tripMult = () => { const o = souvOld(); return 1 + 0.02 * o + 0.01 * (souvN() - o) + 0.1 * tripSetsDone() + 0.05 * tripSetsAll(); };
   const tripLeft = () => Math.max(0, S.trip.end - gameNow());   // 게임 시계
+  const tripProgress = () => Math.max(0, Math.min(1, 1 - tripLeft() / Math.max(1, S.trip.end - S.trip.start)));
   const tripBack = () => !!S.trip.cur && tripLeft() <= 0;
   const tripCut = T => Math.max(30, Math.round(T.min / 4));   // 광고 한 편에 줄어드는 분(적어도 30분)
   function tripReward(T) {
@@ -23858,25 +24528,101 @@ body.mg-on .toast[hidden]{display:none}
       if (rt.tripView !== (cur ? (back ? 'back' : 'go') : 'idle')) renderTrip();
       else if (cur && !back) {
         $('#tripLeft').textContent = `${hms(tripLeft())} 남았어요`;
-        $('#tripBar').style.width = ((1 - tripLeft() / (S.trip.end - S.trip.start)) * 100).toFixed(1) + '%';
+        paintTripJourney(tripProgress());
       }
     }
   }
   function openTrip(keep) {
     if (rt.paused) return;
-    if (keep !== true) rt.tripGot = '';
+    if (keep !== true) { rt.tripGot = ''; rt.tripPlan = null; }
     if (!tripOpen()) { toast('체험학습은 초등학교 3학년부터 갈 수 있어요'); return; }
     if (rt.modalOpen && rt.modalOpen !== $('#mTrip')) return;
     sfx('tap');
     renderTrip();
     if (rt.modalOpen !== $('#mTrip')) openModal($('#mTrip'));
   }
+  function tripJourney(D, mode, key = '') {
+    const creek = D.id === 'creek', picture = IMG(`trip_${D.id}_wide`) || IMG(`trip_dest_${D.id}`), bus = IMG('trip_bus');
+    return `<div class="tr-journey" id="${creek ? 'tripCreekScene' : 'tripJourney'}" data-dest="${D.id}" data-route="${key}" data-mode="${mode}" data-ambient="${wldLv() > 0 ? 'on' : 'off'}">
+      ${picture ? `<img class="tr-journey-land${creek ? ' tr-creek-land' : ''}" src="${picture}" alt="">` : ''}
+      <i class="tr-journey-light" aria-hidden="true"></i>
+      ${mode === 'travel' ? `<div class="tr-journey-track" role="progressbar" aria-label="체험학습 진행률" aria-valuemin="0" aria-valuemax="100" aria-valuenow="0"><b id="tripBar"></b>${bus ? `<img src="${bus}" alt="">` : ''}</div>` : ''}
+      <div class="tr-journey-caption"><b>${esc(D.name)}</b><span id="${creek ? 'tripCreekPhase' : 'tripJourneyPhase'}" role="status">${mode === 'start' ? '어떤 활동을 할까요?' : mode === 'back' ? '학교에 돌아왔어요' : ''}</span></div>
+    </div>`;
+  }
+  const tripLeg = progress => progress < .24 ? 0 : progress < .75 ? 1 : 2;
+  function paintTripJourney(progress) {
+    const scene = $('#tripBody .tr-journey');
+    if (!scene || scene.dataset.mode !== 'travel') return;
+    scene.style.setProperty('--journey', progress.toFixed(3));
+    const bar = $('#tripBar'), value = (progress * 100).toFixed(1);
+    bar.style.width = value + '%';
+    setAt(bar.parentElement, 'aria-valuenow', String(Math.floor(Number(value))));
+    const i = tripLeg(progress);
+    setHid($('#tripObservation'), i !== 1);
+    if (scene.dataset.leg === String(i)) return;
+    scene.dataset.leg = i;
+    const dest = scene.dataset.dest, activity = TRIP_ROUTES[dest][scene.dataset.route]?.stop || TRIP_ACTIVITY[dest];
+    const phases = [dest === 'creek' ? '시냇가로 가는 중' : '버스를 타고 이동 중', activity, '학교로 돌아오는 중'];
+    setTx($('.tr-journey-caption span', scene), phases[i]);
+    $$('#tripBody .tr-legs li').forEach((el, k) => {
+      el.classList.toggle('done', k < i);
+      if (k === i) el.setAttribute('aria-current', 'step'); else el.removeAttribute('aria-current');
+    });
+  }
+  function tripRecord(route, notes = 0) {
+    const details = (route.notes || []).map((note, i) => notes & (1 << i) ? `<p class="tr-extra-note"><strong>${esc(note[0])}</strong> ${esc(note[1])}</p>` : '').join('');
+    return `<article class="tr-creek-record"><span aria-hidden="true">${souvIcon(route.art)}</span><div><b>${esc(route.title)}</b><p>${esc(route.line)}</p>${details}</div></article>`;
+  }
+  function tripPlanHTML() {
+    const { dest, key } = rt.tripPlan, D = TRIP[dest], creek = dest === 'creek', routes = TRIP_ROUTES[dest];
+    return tripJourney(D, 'start', key) + `<fieldset class="tr-creek-options"><legend>${creek ? '시냇가 경로' : '현장 활동 선택'}</legend>
+      ${tripRouteKeys(dest).map(k => { const route = routes[k]; return `<label><input type="radio" data-trip-route name="${creek ? 'creekRoute' : 'tripRoute'}" value="${k}"${key === k ? ' checked' : ''}><span><b>${esc(route.name)}</b><small>${esc(route.lead)}</small></span></label>`; }).join('')}
+      </fieldset><div class="btn-row tr-creek-actions"><button class="btn-sub" type="button" data-trip-back${creek ? ' id="tripCreekBack"' : ''}>목적지 목록</button>
+      <button class="cta" type="button" data-trip-depart${creek ? ' id="tripCreekGo"' : ''}${key ? '' : ' disabled'}>출발 (${minText(D.min)})</button></div>`;
+  }
+  function setTripChoice(key) {
+    const plan = rt.tripPlan;
+    if (!plan || !tripRouteKey(plan.dest, key)) return;
+    plan.key = key;
+    const scene = $('#tripBody .tr-journey');
+    scene.dataset.route = key;
+    setTx($('.tr-journey-caption span', scene), TRIP_ROUTES[plan.dest][key].name);
+    $('#tripBody [data-trip-depart]').disabled = false;
+  }
+  function tripObservationHTML(route) {
+    const note = route.notes[S.trip.observation === 2 ? 1 : 0];
+    return S.trip.observation
+      ? `<b>${esc(note[0])}</b><p>${esc(note[1])}</p>`
+      : `<b>현장에서 무엇을 자세히 볼까요?</b><div class="tr-field-choices">${route.notes.map(([label], i) => `<button type="button" class="btn-sub" data-trip-observation="${1 << i}">${esc(label)}</button>`).join('')}</div>`;
+  }
+  function observeTrip(bit) {
+    const T = S.trip, key = tripCurrentRoute(), route = key && TRIP_ROUTES[T.cur][key];
+    if (!route?.notes || T.observation || tripBack() || tripLeg(tripProgress()) !== 1 || (bit !== 1 && bit !== 2)) return;
+    T.observation = bit;
+    save();
+    setH($('#tripObservation'), tripObservationHTML(route));
+    $('#tripObservation')?.focus({ preventScroll: true });
+    sfx('tap');
+  }
+  function tripFieldAlbum() {
+    const records = S.trip.records, count = Object.keys(records).length;
+    if (!count) return '';
+    const groups = TRIPS.filter(D => D.id !== 'creek').map(D => {
+      const entries = tripRouteKeys(D.id).filter(k => records[tripRouteToken(D.id, k)] !== undefined);
+      return entries.length ? `<section><h4>${esc(D.name)} <small>${entries.length}/${tripRouteKeys(D.id).length}</small></h4>${entries.map(k => tripRecord(TRIP_ROUTES[D.id][k], records[tripRouteToken(D.id, k)])).join('')}</section>` : '';
+    }).join('');
+    return `<details class="tr-field-album"><summary>현장 관찰 기록 <small>${count}/${TRIP_FIELD_IDS.length}</small></summary>${groups}</details>`;
+  }
   function renderTrip() {
     const cur = S.trip.cur, T = cur && TRIP[cur], back = tripBack();
     rt.tripView = cur ? (back ? 'back' : 'go') : 'idle';
+    if (!cur && rt.tripPlan) { $('#tripBody').innerHTML = tripPlanHTML(); return; }
+    const key = tripCurrentRoute(), route = key && TRIP_ROUTES[cur][key];
     const ac = acornIcon(), di = dipIcon(), gi = `<svg viewBox="-8 -11 16 20" aria-hidden="true">${GOLD_ICON.slice(GOLD_ICON.indexOf('>') + 1, -6)}</svg>`;
     const rw = (R, x) => `<span class="tr-rw">${ac}<b>${fmt(R.acorns * x)}</b></span><span class="tr-rw">${di}<b>${R.dip * x}</b></span>${R.gold ? (goldRich() ? `<span class="tr-rw">${ESS_ICON()}<b>${R.gold * GOLD.essPer}</b></span>` : `<span class="tr-rw">${gi}<b>${R.gold}</b></span>`) : ''}`;
-    let h = (IMG('trip_head') ? `<div class="tr-head" style="background-image:url('${blobUrl(IMG('trip_head'))}')" aria-hidden="true"></div>` : '') + (rt.tripGot ? `<p class="tr-got">${esc(rt.tripGot)}</p>` : '');   // 창 맨 위 그림
+    let h = cur ? tripJourney(T, back ? 'back' : 'travel', key) : (IMG('trip_head') ? `<div class="tr-head" style="background-image:url('${blobUrl(IMG('trip_head'))}')" aria-hidden="true"></div>` : '');
+    if (rt.tripGot) h += `<p class="tr-got">${esc(rt.tripGot)}</p>`;
     if (!cur) {
       h += '<p class="tr-lead">돌아오면 도토리, 수료증, 그곳 기념품을 가져와요.</p><div class="tr-list">';
       for (const D of TRIPS) {
@@ -23885,22 +24631,30 @@ body.mg-on .toast[hidden]{display:none}
           `<div class="tr-tx"><b>${D.name} <small>${minText(D.min)}</small></b><span>${lock ? `체험학습을 ${D.need}번 다녀오면 열려요` : D.say}</span>` +
           `<span class="tr-meta">${lock ? '' : rw(tripReward(D), 1)}<span class="tr-sv">기념품 ${got}/${D.souv.length}</span></span></div>` +
           (lock ? '<span class="tr-lock" aria-hidden="true"><svg viewBox="0 0 24 24"><rect x="5" y="10" width="14" height="10" rx="2" fill="currentColor"/><path d="M8 10V8a4 4 0 0 1 8 0v2" fill="none" stroke="currentColor" stroke-width="2"/></svg></span>'
-            : `<button class="cta small" type="button" data-trip="${D.id}">출발</button>`) + '</div>';
+            : `<button class="cta small" type="button" data-trip="${D.id}">${D.id === 'creek' ? '경로 선택' : '활동 선택'}</button>`) + '</div>';
       }
       h += '</div>';
     } else if (!back) {
       const cut = tripCut(T);
-      h += `<div class="tr-now"><span class="tr-ic big${IMG('trip_dest_' + T.id) ? ' has-dest' : ''}" style="--tc:${T.c}">${tripIcon(T.id)}</span><b>${T.name}에 가 있어요</b><span>${T.say}</span></div>` +
-        `<div class="tr-bar"><i id="tripBar" style="width:${((1 - tripLeft() / (S.trip.end - S.trip.start)) * 100).toFixed(1)}%"></i></div>` +
+      h += (route ? `<p class="tr-lead">${esc(route.name)}</p>` : '') +
+        '<ol class="tr-legs" aria-label="체험학습 일정"><li>가는 길</li><li>현장 활동</li><li>귀환</li></ol>' +
         `<p class="tr-left" id="tripLeft">${hms(tripLeft())} 남았어요</p>` +
+        (route?.notes ? `<section class="tr-observation" id="tripObservation" tabindex="-1" aria-live="polite" hidden>${tripObservationHTML(route)}</section>` : '') +
         `<button class="cta" type="button" id="tripAd">광고 보고 ${minText(cut)} 당기기</button>` +
         `<div class="btn-row" style="flex-wrap:wrap">${TK.filter(t => S.tk[t.k] > 0).map(t => `<button class="btn-sub small" type="button" data-trip-tk="${t.k}">${t.name} (${S.tk[t.k]}장)</button>`).join('')}</div><p class="fine">남은 시간보다 긴 단축권을 쓰면 남는 시간은 사라져요.</p>` +
         '<p class="fine">앱을 꺼도 시간은 가요.</p>';
     } else {
       const R = tripReward(T);
-      h += `<div class="tr-now"><span class="tr-ic big${IMG('trip_dest_' + T.id) ? ' has-dest' : ''}" style="--tc:${T.c}">${tripIcon(T.id)}</span><b>${T.name}에서 돌아왔어요!</b><span>기념품 하나와 함께 이만큼 가져왔어요</span></div>` +
+      const gathered = S.trip.souv.filter(k => k.startsWith(T.id + ':')).length;
+      h += '<div class="tr-return"><b>체험학습 보고서</b>' +
+        `<span>기념품 수집 ${gathered}/${T.souv.length}, ${gathered < T.souv.length ? '새 기념품 1종' : '기념품을 모두 모았어요'}</span></div>` +
+        (route ? tripRecord(route, S.trip.observation) : '') +
         `<div class="tr-gift">${rw(R, 1)}</div>` +
-        `<div class="btn-row"><button class="cta" type="button" id="tripGet">받기</button></div>`;   // 광고가 너무 많다는 의견으로 2배 받기를 뺐어요
+        '<div class="btn-row"><button class="cta" type="button" id="tripGet">귀환 보상 받기</button></div>';
+    }
+    if (!cur) {
+      if (S.trip.creekLog.length) h += `<details class="tr-creek-album"><summary>시냇가 관찰 기록 <small>${S.trip.creekLog.length}/${CREEK_KEYS.length}</small></summary>${CREEK_KEYS.filter(k => S.trip.creekLog.includes(k)).map(k => tripRecord(CREEK_ROUTES[k])).join('')}</details>`;
+      h += tripFieldAlbum();
     }
     // 기념품 모음
     h += `<details class="tr-souv-d"${rt.trSvOpen ? ' open' : ''}><summary><h3 class="tr-h">기념품 모음 <small>${souvN()}/${SOUV_IDS.size}종, 수업료 +${Math.round((tripMult() - 1) * 100)}%</small></h3></summary><div class="tr-souv">`;   // 접어 둬요
@@ -23914,13 +24668,18 @@ body.mg-on .toast[hidden]{display:none}
     }
     h += '</div><p class="fine tr-fine">처음 세 가지: 하나에 수업료 +2%, 다 모으면 +10% 더<br>그다음 아홉 가지: 하나에 +1%, 다 모으면 +5% 더<br>졸업해도 남아요</p></details>';
     $('#tripBody').innerHTML = h;
+    if (cur && !back) paintTripJourney(tripProgress());
   }
-  function startTrip(id) {
+  function startTrip(id, route) {
     const D = TRIP[id];
     if (!D || S.trip.cur || S.st.trips < D.need) return;
     if (tr2Busy()) { toast(tr2Busy()); return; }   // 수학여행 중
     const now = gameNow();
     rt.tripGot = '';
+    rt.tripPlan = null;
+    S.trip.creekRoute = id === 'creek' ? creekRouteKey(route) : '';
+    S.trip.route = id === 'creek' ? '' : tripRouteKey(id, route);
+    S.trip.observation = 0;
     S.trip.cur = id; S.trip.start = now; S.trip.end = now + D.min * 60000;
     sfx('buy'); buzz(10);
     toast(`${D.name}에 출발했어요! ${minText(D.min)} 뒤에 돌아와요`);
@@ -23961,6 +24720,15 @@ body.mg-on .toast[hidden]{display:none}
     const left = leftOld.length ? leftOld : left0, isOld = leftOld.length > 0;   // 처음 세 가지부터
     let msg = `${D.name}에서 도토리 +${fmt(R.acorns * x)}, 수료증 +${R.dip * x}장`;
     const rw = { title: `${D.name}에서 돌아왔어요!`, items: [{ ic: 'acorn', t: `도토리 +${fmt(R.acorns * x)}` }, R.dip ? { ic: 'dip', t: `수료증 +${R.dip * x}장` } : null, gIt] };
+    const key = tripCurrentRoute(), route = key && TRIP_ROUTES[D.id][key];
+    if (route) {
+      const token = tripRouteToken(D.id, key), before = S.trip.records[token], creek = D.id === 'creek';
+      const notes = (before || 0) | S.trip.observation;
+      if (creek ? !S.trip.creekLog.includes(key) : before !== notes) {
+        if (creek) S.trip.creekLog.push(key); else S.trip.records[token] = notes;
+        rw.items.push({ ic: souvIcon(route.art), t: `관찰 기록: ${route.title}` });
+      }
+    }
     if (left.length) {
       const k = left[Math.floor(Math.random() * left.length)];
       S.trip.souv.push(k);
@@ -23980,7 +24748,7 @@ body.mg-on .toast[hidden]{display:none}
     S.trip.been[D.id] = (S.trip.been[D.id] || 0) + 1;
     S.st.trips += 1;
     addLeague(LP.trip + LP.tripHour * Math.floor(D.min / 60));
-    S.trip.cur = ''; S.trip.start = 0; S.trip.end = 0;
+    S.trip.cur = ''; S.trip.start = 0; S.trip.end = 0; S.trip.creekRoute = ''; S.trip.route = ''; S.trip.observation = 0;
     buzz(15);
     rt.tripGot = msg;
     rt.tripTxt = '';
@@ -24739,10 +25507,29 @@ body.mg-on .toast[hidden]{display:none}
       art.hidden = !o.art;
       art.innerHTML = o.art ? `<div class="rw-art">${o.art}</div><b>${esc(o.big || '')}</b>${o.bigSub ? `<small>${esc(o.bigSub)}</small>` : ''}` : '';
       $('#rwList').innerHTML = (o.items || []).filter(Boolean).map(it => `<li><span class="rw-ic">${icon(it.ic)}</span><span>${esc(it.t)}</span></li>`).join('');
+      rt.rwAc = (o.items || []).some(it => it && it.ic === 'acorn');
+      // 창이 떠 있는 동안 위 도토리 숫자는 그대로, 닫으면 '좋아요'에서 도토리가 날아가 올라가요
+      if (rt.rwAc && !rt.reduced) rt.hudFreeze = performance.now() + 60000;
       openModal($('#mReward'));
       sfx('quest');
       return true;
     });
+  }
+
+  function collectRewards(collect) {
+    if (!S || rt.paused || rt.batch) return 0;
+    const before = S.budget, batch = rt.batch = { items: [], n: 0 };
+    try { collect(); } finally { rt.batch = null; }
+    if (!batch.n) return 0;
+    const items = psMergeItems(batch.items.filter(it => it.ic !== 'acorn').map(it => ({ ic: it.ic, t: String(it.t).replace(/ \(\d+\/\d+\)$/, '') })));
+    const acorns = S.budget - before;
+    if (acorns >= 1) items.unshift({ ic: 'acorn', t: `도토리 +${fmt(acorns)}` });
+    buzz(15);
+    showReward({ title: '모두 받았어요!', sub: `보상 ${fmt(batch.n)}개를 한 번에 받았어요`, items });
+    return batch.n;
+  }
+  function collectButton(scope, count, label) {
+    return count < 2 ? '' : `<button class="dm-ev dm-all" type="button" data-collect="${scope}"><span><b>받을 보상 ${fmt(count)}개</b><small>${label}</small></span><span class="cta small">모두 받기</span></button>`;
   }
 
   // 보상 칩: [[아이콘, 숫자나 짧은 말, 'sp'(금빛 강조)],...]. 아이콘은 showReward와 같은 이름(acorn, gold, dip, ess)이나 단축권 키(tk:m5)나 그림 문자
@@ -26936,8 +27723,7 @@ body.mg-on .toast[hidden]{display:none}
   function claimAllNow() {
     if (!S || rt.paused || rt.batch) return 0;
     dmDay(); wkWeek();
-    const b0 = S.budget, B = rt.batch = { items: [], n: 0 };
-    try {
+    const n = collectRewards(() => {
       S.dm.list.forEach((m, i) => { if (dmReady(m)) claimMission(i); });
       if (dmAllDone() && !S.dm.bonus) claimBonus();
       S.wk.list.forEach((m, i) => { if (wkReady(m)) claimWeekMission(i); });
@@ -26945,13 +27731,9 @@ body.mg-on .toast[hidden]{display:none}
       if (evLive()) S.ev.list.forEach((m, i) => { if (evReady(m)) claimEvMission(i); });
       S.q.subs.filter(subReady).map(q => q.id).forEach(id => claimSub(id, null));
       MP_BOX.forEach((_, i) => { if (boxReady(i)) claimBox(i); });   // 상자는 맨 뒤에(방금 받은 미션 포인트로 열리는 상자까지)
-    } finally { rt.batch = null; }
-    if (!B.n) return 0;
-    const ac = S.budget - b0, items = psMergeItems(B.items.filter(it => it && it.ic !== 'acorn').map(it => ({ ic: it.ic, t: String(it.t).replace(/ \(\d+\/\d+\)$/, '') })));   // '칭찬 스티커 +1장 (3/20)'처럼 뒤에 붙은 진행 숫자는 떼고 합쳐요
-    if (ac >= 1) items.unshift({ ic: 'acorn', t: `도토리 +${fmt(ac)}` });
-    showReward({ title: '모두 받았어요!', sub: `보상 ${B.n}개를 한 번에 받았어요`, items });
-    save(); renderMissions(); renderHUD(); updateQuestDot();
-    return B.n;
+    });
+    if (n) { save(); renderMissions(); renderHUD(); updateQuestDot(); }
+    return n;
   }
   /* 오늘 할 일 판: 하루 횟수가 있는 활동의 남은 횟수와 바로 가기를 한 줄씩 보여 줘요(열린 것만). 새 저장 칸은 접기(S.fold.td)뿐이에요 */
   const TODO = [
@@ -28646,12 +29428,13 @@ body.mg-on .toast[hidden]{display:none}
     // 도토리는 칠판의 도토리 숫자로, 수료증은 아래 졸업 탭으로 날아가요
     const isDip = kind === 'dip';
     const to = isDip ? $('.tab[data-tab="grad"]') : $('#vBudget');
-    const bump = () => { if (!rt.reduced && to.animate) to.animate([{ transform: 'scale(1)' }, { transform: 'scale(1.2)' }, { transform: 'scale(1)' }], { duration: 320, easing: 'ease-out' }); };
+    const bump = () => { if (!isDip) { rt.hudFreeze = 0; hudRollRun(); } if (!rt.reduced && to && to.animate) to.animate([{ transform: 'scale(1)' }, { transform: 'scale(1.2)' }, { transform: 'scale(1)' }], { duration: 320, easing: 'ease-out' }); };
     const src = fromEl && (fromEl.querySelector('.q-act') || fromEl);
     if (!src || rt.reduced || !document.body.animate) { bump(); return; }
-    const a = src.getBoundingClientRect(), b = to.getBoundingClientRect();
-    if (!a.width) { bump(); return; }
+    const a = src.getBoundingClientRect(), b = to ? to.getBoundingClientRect() : { width: 0 };
+    if (!a.width || !b.width) { bump(); return; }
     const n = Math.min(7, 3 + Math.floor(Math.log10(Math.max(10, v))));
+    if (!isDip) { rt.hudFreeze = performance.now() + 620 + n * 60 + 200; hudRollRun(); }
     for (let i = 0; i < n; i++) {
       const el = document.createElement('span');
       el.className = 'fly';
@@ -28777,6 +29560,14 @@ body.mg-on .toast[hidden]{display:none}
 
   /* 퀘스트 탭 */
   const questKey = () => `${S.q.m}|${mainReady() ? 1 : 0}|${S.q.subs.map(s => s.id + (subReady(s) ? '!' : '')).join(',')}|${gsKey()}`;
+  function claimStudentRequests() {
+    return collectRewards(() => {
+      const ids = S.q.subs.filter(subReady).map(s => s.id);
+      const guest = gsReady();
+      ids.forEach(id => claimSub(id, null));
+      if (guest) gsClaim(null);
+    });
+  }
   function renderQuestPanel(force) {
     if (rt.tab !== 'quests') return;
     if (force) $('#qDaily').dataset.key = '';
@@ -28784,6 +29575,13 @@ body.mg-on .toast[hidden]{display:none}
     const key = questKey();
     if (force || key !== rt.qKey) { rt.qKey = key; buildQuestPanel(); }
     else updateQuestProgress();
+    setHid($('#qMainMark'), !mainReady());
+    setHid($('#qSubsMark'), !(S.q.subs.some(subReady) || gsReady()));
+    setHid($('#qDailyMark'), !(dmClaimable() || wkClaimable()));
+  }
+  function showQuestView(view) {
+    $$('#panelQuests [data-q-view]').forEach(b => b.setAttribute('aria-pressed', String(b.dataset.qView === view)));
+    $$('#panelQuests [data-q-pane]').forEach(el => setHid(el, el.dataset.qPane !== view));
   }
   function questCard(q, base, o) {
     const p = qProg(q, base);
@@ -28792,10 +29590,9 @@ body.mg-on .toast[hidden]{display:none}
       : `<button class="btn-go" type="button" data-act="go" data-q="${o.ref}">바로 가기</button>`;
     return `<div class="qcard${p.done ? ' is-done' : ''}" data-qp="${o.ref}">` +
       `<div class="qwho"><span class="qav${o.kid ? ' kid' : ''}" aria-hidden="true">${o.av}</span><span class="qname">${esc(o.name)}</span>${o.badge ? `<span class="qnew">${o.badge}</span>` : ''}</div>` +
-      `<p class="qsay">${esc(nl(repTxt(q, o.say)))}</p>` +   // 문장마다 줄바꿈
       `<div class="qgoal"><b>${esc(qGoal(q))}</b><span class="qp">${p.done ? '완료' : p.text}</span></div>` +
       `<div class="qbar"><i style="width:${(p.frac * 100).toFixed(1)}%"></i></div>` +
-      `<div class="qfoot"><span class="qrew">보상 ${rewardIcon(q.rk)}<b>${fmt(qReward(q))}</b>${hardQ(q, o.ref !== 'main') ? (goldRich() ? `<span class="qgold" aria-label="숲의 정수 ${GOLD.hard * GOLD.essPer}">+${ESS_ICON()}<b>${GOLD.hard * GOLD.essPer}</b></span>` : `<span class="qgold" aria-label="황금 도토리 ${GOLD.hard}개">+${GOLD_ICON}<b>${GOLD.hard}</b></span>`) : ''}${o.ref === 'main' && TK_Q.has(q.id) ? `<span class="qgold qtk" aria-label="5분 단축권 ${TKE.n}장">+${IMG('ticket_m5') ? `<img src="${IMG('ticket_m5')}" alt="">` : '⏱'}<b>${TKE.n}</b></span>` : ''}</span>${act}</div></div>`;
+      `<div class="qfoot"><span class="qrew">보상 ${rewardIcon(q.rk)}<b>${fmt(qReward(q))}</b>${hardQ(q, o.ref !== 'main') ? (goldRich() ? `<span class="qgold" aria-label="숲의 정수 ${GOLD.hard * GOLD.essPer}">+${ESS_ICON()}<b>${GOLD.hard * GOLD.essPer}</b></span>` : `<span class="qgold" aria-label="황금 도토리 ${GOLD.hard}개">+${GOLD_ICON}<b>${GOLD.hard}</b></span>`) : ''}${o.ref === 'main' && TK_Q.has(q.id) ? `<span class="qgold qtk" aria-label="5분 단축권 ${TKE.n}장">+${IMG('ticket_m5') ? `<img src="${IMG('ticket_m5')}" alt="">` : '⏱'}<b>${TKE.n}</b></span>` : ''}</span>${act}</div><p class="qsay">${esc(nl(repTxt(q, o.say)))}</p></div>`;
   }
   function buildQuestPanel() {
     const i = S.q.m, q = MAIN[i];
@@ -28826,7 +29623,8 @@ body.mg-on .toast[hidden]{display:none}
       subs = S.q.subs.map(s => questCard(s, s.b, { ref: s.id, kid: true, av: kidAvatar(s.who), name: WHO[s.who], say: `“${s.say}”`, badge: s.nw ? '새 부탁' : '' })).join('');
       if (S.q.subs.length < subSlots()) subs += '<p class="qempty">새 부탁을 기다리고 있어요. 메인 퀘스트를 이어 가면 학생들이 또 찾아와요.</p>';
     }
-    $('#qSubs').innerHTML = gsCardHTML() + subs;   // 오늘의 손님 칸은 학생 부탁 위에
+    const count = S.q.subs.filter(subReady).length + Number(gsReady());
+    $('#qSubs').innerHTML = collectButton('students', count, '학생과 오늘의 손님 부탁') + gsCardHTML() + subs;
     $('#qTally').textContent = S.q.subDone > 0 ? `지금까지 들어준 부탁 ${S.q.subDone}개` : '';
   }
   function updateQuestProgress() {
@@ -28973,7 +29771,7 @@ body.mg-on .toast[hidden]{display:none}
     if (!S || rt.paused || !mgoHas(id)) return false;
     sfx('tap');
     if (MGO_MINI[id]) { setTab('mini'); setTimeout(() => { const b = $(MGO_MINI[id]); if (b && !b.closest('[hidden]')) b.click(); }, 60); return true; }
-    if (MGO_Q[id]) { setTab('quests'); setTimeout(() => { const el = $(MGO_Q[id]); if (el) el.scrollIntoView({ block: 'start', behavior: rt.reduced ? 'auto' : 'smooth' }); }, 60); return true; }
+    if (MGO_Q[id]) { setTab('quests'); showQuestView(id === 'subs' ? 'subs' : 'daily'); return true; }
     goTo({ t: MGO[id] });
     return true;
   }
@@ -29139,7 +29937,8 @@ body.mg-on .toast[hidden]{display:none}
     G.sub = null; G.st = 3; G.n = Math.min(1e7, G.n + 1); G.day = gameToday();   // 끝낸 날로 적어서 다음 손님은 다음 날 와요
     const L = GS_LINES[who], vars = gsVars(who, dayHash(`gsl:${G.day}:${who}`));
     const th = L && L.t.length ? gsFill(L.t[dayHash(`gst:${G.day}`) % L.t.length], vars, 0) : '고마워요!';
-    toast(`${s.lab}: ${th}\n도토리 +${fmt(v)}, 숲의 정수 +${GS.ess}`);
+    if (rt.batch) showReward({ items: [{ ic: 'acorn', t: `도토리 +${fmt(v)}` }, { ic: 'ess', t: `숲의 정수 +${GS.ess}` }] });
+    else toast(`${s.lab}: ${th}\n도토리 +${fmt(v)}, 숲의 정수 +${GS.ess}`);
     questChanged();
   }
   function gsCardHTML() {
@@ -29240,10 +30039,36 @@ body.mg-on .toast[hidden]{display:none}
     const el = $('#toast');
     el.textContent = msg;
     el.hidden = false; rt.toastAt = performance.now();
+    toastPlace(el);
     el.style.animation = 'none'; void el.offsetWidth; el.style.animation = '';
     clearTimeout(toastTimer);
     const dur = Math.min(5500, 2200 + Math.max(0, msg.replace(/\s/g, '').length - 22) * 75);   // 긴 알림은 더 오래
     toastTimer = setTimeout(() => { el.hidden = true; const n = rt.toastQ.shift(); if (n) toastTimer = setTimeout(() => toastShow(n), 200); }, dur);
+  }
+  // 알림 자리: 위 줄 숫자, 열린 창의 제목과 단추를 가리지 않는 곳을 위에서부터 찾아요. 빈 곳이 없으면 가장 덜 가리는 곳
+  // 숲속 합치기와 사진 모드는 따로 정한 자리를 써요
+  function toastPlace(el) {
+    el.style.top = '';
+    const B = document.body.classList;
+    if (B.contains('mg-on') || B.contains('photo')) return;
+    const r0 = el.getBoundingClientRect(), h = r0.height, H = innerHeight;
+    if (!h || !r0.width) return;
+    const top0 = r0.top, bottom = H - h - 8, pad = 4, list = [];
+    // 단추와 제목은 꼭 피하고(무게 1), 굵은 글(이름)은 되도록 피해요(무게 0.4)
+    const sel = 'button,[role="button"],a[href],input,select,summary,.modal h2,.panel h2,#vBudget,#vRate,#vStudents,.modal b,.panel b,.sheet b';
+    for (const e of document.querySelectorAll(sel)) {
+      if (e === el || el.contains(e)) continue;
+      const r = e.getBoundingClientRect();
+      if (r.width < 1 || r.height < 1 || r.bottom < 0 || r.top > H || r.right < r0.left || r.left > r0.right) continue;
+      const t = document.elementFromPoint(Math.min(innerWidth - 1, Math.max(0, r.left + r.width / 2)), Math.min(H - 1, Math.max(0, r.top + r.height / 2)));
+      if (!t || (t !== e && !e.contains(t) && !t.contains(e) && t !== el)) continue;
+      list.push([r.top - pad, r.bottom + pad, e.matches('b') && !e.closest('button') ? 0.4 : 1]);
+    }
+    const cost = y => { let c = 0; for (const [a, b, k] of list) c += k * Math.max(0, Math.min(b, y + h) - Math.max(a, y)); return c; };
+    if (!cost(top0)) return;
+    let best = top0, bc = Infinity;
+    for (let y = top0; y <= bottom; y += 6) { const raw = cost(y); if (!raw) { best = y; break; } const c = raw + (y - top0) * 0.02; if (c < bc) { bc = c; best = y; } }
+    if (best !== top0) el.style.top = Math.round(best) + 'px';
   }
   function toastFlush() { if (rt.modalOpen || rt.cereOn || !rt.mdToasts.length) return; const q = rt.mdToasts.splice(0); const el = $('#toast'); if (el.hidden) { toastShow(q.shift()); } rt.toastQ.push(...q.filter(m => !rt.toastQ.includes(m))); rt.toastQ.splice(3); }
   // 흔들기 표시(shake)가 남아 있어서 숨겼다 다시 보일 때 흔들림이 다시 돌았어요. 끝나면 지워요
@@ -29254,6 +30079,7 @@ body.mg-on .toast[hidden]{display:none}
     if (t !== 'rank' && t !== 'dex') rt.backTab = '';   // C-22
     if (rt.thPrev && t !== 'school') thPreviewEnd(true);   // 다른 탭으로 가면 미리 보기를 끝내요
     rt.tab = t;
+    if (t !== 'tam' && rt.tam?.practice) tamPractice(0);
     const tabOn = t === 'shop' || t === 'ess' || t === 'deco' ? 'street' : t;   // 가게 안에 있어도 아래 '상점' 탭이 켜져 있어요
     $$('.tab').forEach(b => b.setAttribute('aria-selected', b.dataset.tab === tabOn ? 'true' : 'false'));
     $('#panelStreet').hidden = t !== 'street';
@@ -29286,7 +30112,7 @@ body.mg-on .toast[hidden]{display:none}
     if (t === 'mini') renderMini();
     if (prev === 'quests' && t !== 'quests') markQuestsSeen();
     if (t === 'teachers') renderTeachers();
-    if (t === 'quests') renderQuestPanel(true);
+    if (t === 'quests') { showQuestView('main'); renderQuestPanel(true); }
     if (t === 'grad') renderGradPanel(true); else $('#gConfirm').hidden = true;
     $('#gDot').hidden = $('#gDot').hidden || t === 'grad';
     if (t !== 'settings') { $('#resetConfirm').hidden = true; }
@@ -29555,14 +30381,29 @@ body.mg-on .toast[hidden]{display:none}
     $('#btnTr2').addEventListener('click', () => { if (!rt.modalOpen) { actPop(false); openTr2(); } });   // 수학여행
     $('#tr2Body').addEventListener('click', e => { const b = e.target.closest('[data-tr2]'); if (!b || b.getAttribute('aria-disabled') === 'true') return; tr2Act(b.dataset.tr2); });
     $('#tripBody').addEventListener('toggle', e => { if (e.target.classList && e.target.classList.contains('tr-souv-d')) rt.trSvOpen = e.target.open; }, true);
+    $('#tripBody').addEventListener('change', e => { if (e.target.hasAttribute('data-trip-route')) setTripChoice(e.target.value); });
     $('#tripBody').addEventListener('click', e => {
       const ticket = e.target.closest('[data-trip-tk]');
       if (ticket) return tripUseTicket(ticket.dataset.tripTk);
       const go = e.target.closest('[data-trip]');
-      if (go) return startTrip(go.dataset.trip);
-      const id = e.target.closest('button') && e.target.closest('button').id;
-      if (id === 'tripAd') tripAd();
-      else if (id === 'tripGet') claimTrip(1);
+      if (go) {
+        rt.tripPlan = { dest: go.dataset.trip, key: '' };
+        renderTrip();
+        $('#tripBody [data-trip-route]').focus();
+        return;
+      }
+      const button = e.target.closest('button');
+      if (!button) return;
+      if (button.hasAttribute('data-trip-back')) {
+        const dest = rt.tripPlan.dest;
+        rt.tripPlan = null;
+        renderTrip();
+        $(`#tripBody [data-trip="${dest}"]`).focus();
+      } else if (button.hasAttribute('data-trip-depart')) {
+        if (rt.tripPlan?.key) startTrip(rt.tripPlan.dest, rt.tripPlan.key);
+      } else if (button.dataset.tripObservation) observeTrip(Number(button.dataset.tripObservation));
+      else if (button.id === 'tripAd') tripAd();
+      else if (button.id === 'tripGet') claimTrip(1);
     });
     $('#boostGo').addEventListener('click', startBoost);
     $('#offDouble').addEventListener('click', claimOfflineDouble);
@@ -29570,10 +30411,18 @@ body.mg-on .toast[hidden]{display:none}
   // 숲속 탐험대
   function wireTam() {
     $('#panelTam').addEventListener('click', tamClick);
+    $('#tmMapBody').addEventListener('click', e => {
+      const option = e.target.closest('[data-tam-practice]');
+      if (!option || rt.modalOpen !== $('#mTamMap')) return;
+      closeModal($('#mTamMap'));
+      tamPractice(Number(option.dataset.tamPractice));
+    });
+    $('#panelTam').addEventListener('keydown', e => {
+      if (e.key === 'Escape' && !$('#tmActions').hidden) { e.stopPropagation(); tamControls(false); }
+    });
     // 탐험 화면의 칸을 누르면 한 줄 설명
     { const tip = (sel, f) => { const el = $(sel); if (el) el.addEventListener('click', e => { e.stopPropagation(); sfx('tap'); tamToast(f()); }); };
       tip('#tmFl', () => `지금 오르는 층이에요. ${TAM.bossEvery}층마다 큰 장난꾸러기가 나와요`);
-      tip('#tmReg', () => `지금 지역이에요. ${TAM.regLen}층마다 지역이 바뀌고, 한 바퀴를 돌면 더 센 'n바퀴째'가 돼요`);
       tip('#tmBest', () => tamCapped() ? '이번 학기에 갈 수 있는 끝까지 왔어요. 심화 탐험으로 더 겨룰 수 있어요' : '가장 높이 오른 층과 이번 학기에 갈 수 있는 층이에요');
       tip('#tmPow', () => '탐험대 힘이에요. 대원 레벨, 별, 장비를 올리면 커져요');
       const tw = $('#tmTower'); if (tw) { tw.style.pointerEvents = 'auto'; tw.addEventListener('click', e => { e.stopPropagation(); sfx('tap'); tamToast(`노란 줄은 다음 큰 장난꾸러기까지 남은 층이에요`); }); } }
@@ -29584,10 +30433,10 @@ body.mg-on .toast[hidden]{display:none}
       // 장비 단추도 꾹 누르면 계속 올라가요. 추천 칸은 매번 그때 추천된 장비를 올려요
       const tickG = () => { if (!hold) return; let [i, k] = hold.gear; if (hold.rec) { const g = tamUpRec().gear; if (!g) { stop(); return; } i = g.i; k = g.k; }
         if (!tamGearBuy(i, k)) { stop(); return; }
-        hold.n += 1; tamRestartStat(); sfx('coin'); tamRenderTop(); tamRenderBody();
+        hold.n += 1; tamRestartStat(); sfx('combo' + hold.n); tamRenderTop(); tamRenderBody();
         hold.t = setTimeout(tickG, Math.max(70, 180 - hold.n * 8)); };
       const tick = () => { if (!hold) return; if (hold.rec) { const R = tamUpRec().mem; if (!R) { stop(); return; } hold.sp = R.sp; } const c = tamLvCost(hold.sp); if (S.budget < c) { stop(); return; }
-        S.budget -= c; tamMem(hold.sp).lv += 1; hold.n += 1; tamRestartStat(); sfx('coin'); renderHUD(); tamRenderTop(); tamRenderBody();
+        S.budget -= c; tamMem(hold.sp).lv += 1; hold.n += 1; tamRestartStat(); sfx('combo' + hold.n); renderHUD(); tamRenderTop(); tamRenderBody();
         hold.t = setTimeout(tick, Math.max(50, 160 - hold.n * 6)); };
       $('#panelTam').addEventListener('pointerdown', e => { const gb = e.target.closest('[data-tgear]');
         if (gb && gb.getAttribute('aria-disabled') !== 'true') { const [si, k] = gb.dataset.tgear.split(':'); stop(); hold = { gear: [+si, k], rec: !!gb.closest('.tm-rec'), n: 0, t: setTimeout(tickG, 400) }; return; }
@@ -29597,6 +30446,8 @@ body.mg-on .toast[hidden]{display:none}
       $('#panelTam').addEventListener('contextmenu', e => e.preventDefault());   // 탐험 화면 어디든 길게 누르기 메뉴를 막아요(앱은 MainActivity에서도 막아요). 안드로이드 길게 누르기 메뉴를 막아요
       // 꾹 눌러서 올렸으면 손을 뗄 때 나오는 클릭은 버려요
       $('#panelTam').addEventListener('click', e => { if (hold && hold.n && e.target.closest('[data-tlv],[data-tgear]')) { e.stopImmediatePropagation(); e.preventDefault(); } }, true); }
+    // 보상 창을 닫으면 받은 도토리가 '좋아요'에서 위 숫자로 날아가요
+    $('#mReward').addEventListener('click', e => { const c = e.target.closest('[data-cm="mReward"]'); if (!c || !rt.rwAc) return; rt.rwAc = false; rt.hudFreeze = 0; flyAcorns($('#rwOk'), 1e6, 'acorn'); });
     $('#tmRepOk').addEventListener('click', () => tamRepTake(false)); $('#tmRepAd').addEventListener('click', () => tamRepTake(true));
   }
   // 광고 창과 출석부
@@ -30225,7 +31076,7 @@ body.mg-on .toast[hidden]{display:none}
     // 숲속 소풍, 칭찬 스티커판
     $('#sheetPicnic').addEventListener('click', () => viaSheet(openPicnic));
     $('#sheetSticker').addEventListener('click', () => viaSheet(openSticker));
-    $('#sheetWaitGo').addEventListener('click', () => { sfx('tap'); closeSheet(); setTab('quests'); setTimeout(() => { const h = $('#qDaily .td-h'); if (h) h.scrollIntoView({ block: 'start', behavior: rt.reduced ? 'auto' : 'smooth' }); }, 80); });   // 5.3.2.1
+    $('#sheetWaitGo').addEventListener('click', () => { closeSheet(); missionGo('daily'); setTimeout(() => { const h = $('#qDaily .td-h'); if (h) h.scrollIntoView({ block: 'start', behavior: rt.reduced ? 'auto' : 'smooth' }); }, 80); });   // 5.3.2.1
     $('#pcTickets').addEventListener('click', e => { const b = e.target.closest('[data-picnic-tk]'); if (b) picnicUseTicket(b.dataset.picnicTk); });
     $('#pcKids').addEventListener('click', e => { const b = e.target.closest('[data-pk]'); if (b) pcKidTap(b.dataset.pk); });
     $('#pcLunch').addEventListener('click', () => { if (!rt.pcLunch && S.ess < PCN.lunch) { toast(essShort(PCN.lunch - S.ess)); return; } rt.pcLunch = !rt.pcLunch; sfx('tap'); renderPicnic(); });
@@ -30236,6 +31087,7 @@ body.mg-on .toast[hidden]{display:none}
     $('#skPickA').addEventListener('click', () => skPrize('acorn'));
     $('#skPickG').addEventListener('click', () => skPrize('gold'));
     // 학생과 추억
+    $('#sheetPatAll').addEventListener('click', () => { sfx('tap'); frPatAll(); });
     $('#sheetFriend').addEventListener('click', () => { const sp = $('#sheetFriend').dataset.sp, f = frOf(sp); if (!f) return; if (!frToday(f)) frPat(sp); else toast(`${frFull(sp)}: ${headText(frLine(sp, rt.sheetKey))}`); });
     $('#sheetBday').addEventListener('click', () => { closeSheet(); setTimeout(bdClaim, 240); });
     $('#gAlbum').addEventListener('click', openAlbum);
@@ -30365,6 +31217,9 @@ body.mg-on .toast[hidden]{display:none}
       if (subReady(s)) claimSub(s.id, bar); else goTo(s);
     });
     $('#panelQuests').addEventListener('click', e => {
+      if (e.target.closest('[data-collect="students"]')) { claimStudentRequests(); return; }
+      const view = e.target.closest('button[data-q-view]');
+      if (view) { sfx('tap'); showQuestView(view.dataset.qView); return; }
       const b = e.target.closest('button[data-act]');
       if (!b) return;
       const ref = b.dataset.q;
@@ -30863,6 +31718,20 @@ body.mg-on .toast[hidden]{display:none}
   // 보상을 주기 전에 지금 회차로 맞춰요(월요일 0시를 막 넘겼으면 새 회차부터). 저장된 회차가 지금 열린 이벤트일 때만 줘요
   const evLive = () => { if (liveOff('event')) return null; evSync(); const cur = evCurrent(); return cur && cur.key === S.ev.cur ? cur : null; };
   const evClaimable = () => !!S.ev.cur && !liveOff('event') && (evStampReady() || S.ev.list.some(evReady) || (evAllDone() && !S.ev.box));
+  function evRewardCount() {
+    if (!S.ev.cur || liveOff('event')) return 0;
+    const missions = S.ev.list.filter(evReady).length;
+    const box = !S.ev.box && S.ev.list.length > 0 && S.ev.list.every(m => m.done || evReady(m));
+    return Number(evStampReady()) + missions + Number(box);
+  }
+  function claimEventRewards() {
+    if (!S || rt.paused || rt.batch || !evLive()) return 0;
+    return collectRewards(() => {
+      if (evStampReady()) claimStamp();
+      S.ev.list.forEach((m, i) => { if (evReady(m)) claimEvMission(i); });
+      if (evAllDone() && !S.ev.box) claimEvBox();
+    });
+  }
   function claimStamp() {
     const cur = evLive();
     if (!cur || !evStampReady()) return false;
@@ -30882,7 +31751,8 @@ body.mg-on .toast[hidden]{display:none}
     sfx('quest'); buzz(12);
     showReward({ title: `이벤트 도장 ${i + 1}개째!`, sub: gotHat ? `한정 모자 '${hat.name}'${eulOf(hat.name)} 받았어요! 꾸미기 백화점 옷장에서 학생들에게 씌울 수 있어요` : i + 1 === 5 ? '도장 다섯 개를 모아 큰 선물을 받았어요' : i + 1 < 5 ? `${5 - i - 1}개 더 모으면 큰 선물이 있어요` : '끝까지 함께해 줘서 고마워요',
       art: gotHat ? `<img src="${IMG('cos_hat_' + hid)}" alt="" style="width:92px;height:92px;object-fit:contain">` : undefined,
-      items: [a > 0 ? { ic: 'acorn', t: `도토리 +${fmt(a)}` } : null, gIt, r.e ? { ic: 'ess', t: `숲의 정수 +${r.e}` } : null, ...tkIts, { ic: 'mge', t: `합치기 에너지 +${me}` }, muIt] });
+      items: [a > 0 ? { ic: 'acorn', t: `도토리 +${fmt(a)}` } : null, gIt, r.e ? { ic: 'ess', t: `숲의 정수 +${r.e}` } : null, ...tkIts, { ic: 'mge', t: `합치기 에너지 +${me}` }, muIt,
+        rt.batch && gotHat ? { ic: '🎁', t: `한정 모자: ${hat.name}` } : null] });
     save(); renderEvent(); renderHUD();
     return true;
   }
@@ -30911,7 +31781,8 @@ body.mg-on .toast[hidden]{display:none}
     const tkIt = tkGive('box');   // 단축권
     sfx('quest'); buzz(12);
     showReward({ title: '기념 상자를 열었어요!', sub: gotDeco ? `한정 장식 '${dd.name}'${eulOf(dd.name)} 받았어요! 꾸미기 모드에서 지도에 놓아 보세요` : '이벤트 미션을 모두 마쳤어요',
-      art: gotDeco ? `<img src="${IMG(dd.img)}" alt="" style="width:92px;height:92px;object-fit:contain">` : pic7('ev_box', 'ic_fund'), items: [{ ic: 'gold', t: `황금 도토리 +${EV_BOX.g}` }, { ic: 'ess', t: `숲의 정수 +${EV_BOX.e}` }, { ic: 'mge', t: `합치기 에너지 +${MG.E.box}` }, upIt, { ic: 'dip', t: `수료증 +${EV_BOX.dip}장` }, tkIt].filter(Boolean) });
+      art: gotDeco ? `<img src="${IMG(dd.img)}" alt="" style="width:92px;height:92px;object-fit:contain">` : pic7('ev_box', 'ic_fund'), items: [{ ic: 'gold', t: `황금 도토리 +${EV_BOX.g}` }, { ic: 'ess', t: `숲의 정수 +${EV_BOX.e}` }, { ic: 'mge', t: `합치기 에너지 +${MG.E.box}` }, upIt, { ic: 'dip', t: `수료증 +${EV_BOX.dip}장` }, tkIt,
+        rt.batch && gotDeco ? { ic: '🎁', t: `한정 장식: ${dd.name}` } : null].filter(Boolean) });
     save(); renderEvent(); renderHUD();
     return true;
   }
@@ -30957,11 +31828,11 @@ body.mg-on .toast[hidden]{display:none}
       fsel: typeof P.fsel === 'string' && /^psf_\d{1,4}$/.test(P.fsel) ? P.fsel : '', badge: Math.floor(numIn(P.badge, 0, 1e4)), seen: Math.floor(numIn(P.seen, -1, 1e4)) };
     if (s.ps.fsel && !s.ps.fur.includes(s.ps.fsel)) s.ps.fsel = '';
   }
-  const psLv = () => Math.min(PS.steps, Math.floor(S.ps.pts / PS.per));
+  const psLv = (pts = S.ps.pts) => Math.min(PS.steps, Math.floor(pts / PS.per));
   const psGot = i => !!(S.ps.got & (1 << (i - 1)));
   const psClaimable = () => psOpen() && (psStepReady() > 0 || psExtraReady() > 0 || S.ps.dl.some(psReady) || S.ps.wl.some(psReady));
-  const psStepReady = () => { let c = 0; for (let i = 1; i <= psLv(); i++) if (!psGot(i)) c++; return c; };
-  const psExtraReady = () => Math.max(0, Math.floor(Math.max(0, S.ps.pts - PS.steps * PS.per) / PS.extra) - S.ps.ex);
+  const psStepReady = (pts = S.ps.pts) => { let c = 0; for (let i = 1; i <= psLv(pts); i++) if (!psGot(i)) c++; return c; };
+  const psExtraReady = (pts = S.ps.pts) => Math.max(0, Math.floor(Math.max(0, pts - PS.steps * PS.per) / PS.extra) - S.ps.ex);
   // 단계 보상: 10, 20, 30은 큰 보상, 5, 15, 25는 작은 상자, 나머지는 돌아가며
   function psReward(i, n) {
     const D = psDef(n);
@@ -31039,6 +31910,21 @@ body.mg-on .toast[hidden]{display:none}
     save(); renderPass(); checkQuests(true);
     return true;
   }
+  function psClaimBatch() {
+    if (!psOpen() || rt.paused || rt.batch) return 0;
+    psSync();
+    const n = collectRewards(() => {
+      S.ps.dl.forEach((m, i) => { if (psReady(m)) psClaimMission('d', i); });
+      S.ps.wl.forEach((m, i) => { if (psReady(m)) psClaimMission('w', i); });
+      const count = psStepReady() + psExtraReady();
+      if (count) {
+        rt.batch.items.push(...psClaimAll(true));
+        rt.batch.n += count;
+      }
+    });
+    if (n) { renderPass(); renderHUD(); }
+    return n;
+  }
   function psWatchAd() {
     if (!psOpen() || S.ps.ad === gameToday()) return;
     showAd(() => {
@@ -31080,14 +31966,17 @@ body.mg-on .toast[hidden]{display:none}
     }
     const ready = psStepReady() + psExtraReady();
     const old = [...S.ps.dl.map((m, i) => [m, 'd', i]), ...S.ps.wl.map((m, i) => [m, 'w', i])].filter(([m]) => psReady(m));   // 옛 저장의 받을 수 있는 패스 미션
+    const points = S.ps.pts + old.reduce((sum, [, kind]) => sum + (kind === 'w' ? PS.wP : PS.dP * mul), 0);
+    const total = old.length + psStepReady(points) + psExtraReady(points);
     const ms = (L, kind, p) => L.map((m, i) => { const pr = psProg(m), rd = psReady(m); return `<div class="dm${m.done ? ' done' : ''}"><div class="dm-tx"${goAt(m.id, !m.done && !rd)}><b>${esc(PS_M[m.id].name(m.n))} <em>+${p}점</em></b><div class="qbar"><i style="width:${(pr / m.n * 100).toFixed(0)}%"></i></div></div>` +
       (m.done ? `<span class="dm-ok">${CHECK}</span>` : rd ? `<button class="cta small" type="button" data-ps="${kind}${i}">받기</button>` : `<span class="dm-n">${pr}/${m.n}</span>`) + '</div>'; }).join('');
     const bg = IMG('pass_bg');
     const furs = S.ps.fur.filter(id => IMG(psDef(Number(id.slice(4))).fur));
     body.innerHTML = `<div class="ps-head${bg ? ' has-img' : ''}">${bg ? `<img src="${bg}" alt="">` : ''}<div class="ps-ttl"><b>숲속 패스</b><span>시즌 ${n + 1}${D.theme ? ' ' + esc(D.theme) : ''}</span><small>${left > 0 ? `${left}일 남음` : '오늘까지'}</small></div></div>` +
       `<div class="ps-lv"><span><b>${lv}</b>/${PS.steps}단계</span><span class="ps-bar"><i style="width:${(lv >= PS.steps ? 100 : (S.ps.pts % PS.per) / PS.per * 100).toFixed(0)}%"></i></span><span>${lv >= PS.steps ? `덤 상자까지 ${PS.extra - (S.ps.pts - PS.steps * PS.per) % PS.extra}점` : `다음 단계까지 ${PS.per - S.ps.pts % PS.per}점`}</span></div>` +
+      collectButton('pass', total, '패스 단계, 덤 상자와 남은 패스 미션') +
       `<div class="ps-track" id="psTrack">${nodes.join('')}</div>` +
-      (ready ? `<button class="cta" type="button" data-ps="all">보상 받기 (${ready})</button>` : '') +
+      (ready && total < 2 ? '<button class="cta" type="button" data-ps="all">보상 받기</button>' : '') +
       `<p class="fine ps-big">20단계 한정 장식 <b>${esc(D.decoNm || '황금 도토리 2')}</b>, 30단계 한정 가구 <b>${esc(D.furNm || '황금 도토리 5')}</b>. 시즌이 끝나면 다시 얻을 수 없어요</p>` +
       `<p class="fine ps-how">오늘의 미션 하나에 패스 점수 +${PS.dP * mul}${mul > 1 ? '(광고 덕분에 두 배)' : ''}, 이번 주 미션 하나에 +${PS.wP}</p>` +
       (mul > 1 ? '' : `<button class="btn-sub ps-ad" type="button" data-ps="ad">광고 보고 오늘의 미션 패스 점수 +100%</button>`) +
@@ -31403,6 +32292,7 @@ body.mg-on .toast[hidden]{display:none}
     const u = IMG7(cur.def.banner) || (cur.def.fb ? IMG7(cur.def.fb) : '');   // 새 배너 그림이 오기 전에는 비슷한 배너를 빌려 써요
     body.innerHTML = `<div class="ev-banner ${cur.def.id}${u ? ' has-img' : ''}">${u ? `<img src="${u}" alt="">` : ''}<b>${esc(cur.def.name)}</b></div>` +
       `<div class="ev-period"><span>${dayText(cur.start)} ~ ${dayText(cur.end)}</span><span>${left > 0 ? `${left}일 남음` : '오늘까지'}</span></div>` +
+      collectButton('event', evRewardCount(), '이벤트 도장, 미션과 기념 상자') +
       `<p class="lead">${esc(nl(cur.def.lead))}</p>` + evSkipLine(day) +
       `<h4 class="dex-h">이벤트 도장</h4><div class="ev-stamps">${stamps}</div>${stampBtn}` +
       `<h4 class="dex-h">이벤트 미션 <small>미션마다</small>${rwChips([['acorn', '도토리'], ['gold', 1], tkChip('evm')])}</h4><div class="dms">${missions}${box}</div>` + upcoming;
@@ -31495,6 +32385,9 @@ body.mg-on .toast[hidden]{display:none}
     if (rt.evSeg === 'ps') { $('#psBody').dataset.key = ''; renderPass(); } else { $('#evBody').dataset.key = ''; renderEvent(); }
   }
   $('#panelEvent').addEventListener('click', e => {
+    const collect = e.target.closest('[data-collect]')?.dataset.collect;
+    if (collect === 'event') { claimEventRewards(); return; }
+    if (collect === 'pass') { psClaimBatch(); return; }
     const sg = e.target.closest('[data-evseg]'); if (sg && S) { sfx('tap'); setEvSeg(sg.dataset.evseg); return; }
     const pb = e.target.closest('[data-ps]'); if (pb && S) { const v = pb.dataset.ps; if (v === 'all') psClaimAll(); else if (v === 'ad') psWatchAd(); else psClaimMission(v[0], Number(v.slice(1))); return; }
     const pf = e.target.closest('[data-psf]'); if (pf && S) { psChooseFur(pf.dataset.psf); return; }
@@ -32343,16 +33236,26 @@ body.mg-on .toast[hidden]{display:none}
   function mgPointerUp(e) {
     const d = mgUI.drag; if (!d || e.pointerId !== d.id) return;
     const i = d.i, moved = d.moved, over = d.over;
-    mgDragEnd(false);
+    // 놓은 칸으로(못 놓으면 처음 칸으로) 조각이 미끄러져 들어가요
+    mgDragEnd(false, moved ? (over >= 0 && over !== i ? over : i) : -1);
     if (!moved) { if (mgIsGen(mgCells()[i])) mgTapGen(i); else mgSelect(mgUI.sel === i ? -1 : i); return; }
     if (over >= 0 && over !== i) {
       const r = mgDrop(i, over);
       if (r) { mgRenderBoard(); mgRenderOrders(); mgRenderFoot(); if (r === 'merge') checkQuests(); save(); }
     }
   }
-  function mgDragEnd(cancel) {
+  function mgDragEnd(cancel, glide) {
     const d = mgUI.drag; if (!d) return;
-    if (mgUI.dragEl) { mgUI.dragEl.remove(); mgUI.dragEl = null; }
+    if (mgUI.dragEl) {
+      const g = mgUI.dragEl, c = glide >= 0 && mgUI.cells[glide];
+      mgUI.dragEl = null;
+      if (c && !rt.reduced && g.animate) {
+        const r = c.getBoundingClientRect();
+        const an = g.animate([{ left: g.style.left, top: g.style.top }, { left: (r.left + r.width / 2) + 'px', top: (r.top + r.height / 2) + 'px' }], { duration: 110, easing: 'ease-out', fill: 'forwards' });
+        let gone = false; const rm = () => { if (!gone) { gone = true; g.remove(); } };
+        an.onfinish = rm; an.oncancel = rm; setTimeout(rm, 400);
+      } else g.remove();
+    }
     if (mgUI.cells[d.i]) mgUI.cells[d.i].style.opacity = '';
     if (d.over >= 0 && mgUI.cells[d.over]) mgUI.cells[d.over].classList.remove('over');
     try { $('#mgGrid').releasePointerCapture(d.id); } catch (x) { /* 무시 */ }
@@ -33926,7 +34829,7 @@ body.mg-on .toast[hidden]{display:none}
     MAP_OAK, oakArt, layoutOak, mapOak, oakAt, tapOak, dropSpot,
     dexMeet, dexSync, dexPending, dexGift, renderDex, evCurrent, evNext, evUpcoming, evSync, evFix, evVal, EV_FALLBACK, EV_DECO, EV_HAT, COS, DECO_BY, decoOwn, perkRec, fpRec, gmPast, gmItems, gmNow, GMON, buyShop, pickShop, showNote, showOkOn, showWd, renderGradPanel, renderShop, renderDecoShop, EV_WEEKLY, EV_WEEK_BASE, weekMon, claimStamp, claimEvMission, claimEvBox, renderEvent, evMissions, evOk, evSkipped, EV_MONTHS, EV_MEASURE, tierMinutes, minAcorns, IMG, sanitize171, ACH, achSync, claimAch, setTitle, renderAch, setDexSeg, achClaimable, XT, xtAct, xtCost, xtLv, feastMins, libMult, propInstances, walkBuild, festItemSvg, guestArt, adErrText, googleErrText, openSheet, closeSheet, startFest, startSports, sanitize170, EV_STAMPS, EV_SPECIAL, EV_MONTHLY, EV_BOX, DEX_KEYS, DEX_REWARD, DEX_GUEST_KEYS, seasonKey, roofArtKey, thrKey, PP, PP_TITLES, ppOpen, ppPer, ppData, ppDay, ppWrite, ppTick, ppSync, ppScore, ppSemDone, rtMax, alumniLines, SIDE, vdReward, oakKey, setSeasonArt, VP, vpLv, vpCost, vpMult, vpAct, renderVpCard, sportsPrize, festPrize, renderTeachers, buildTeacherCards, bldImg, roofKey, bldStage, mapKey, setMapArt, applyThemes, buyFacility, bldFx, setBldFx, mapHi, Live, liveApply, liveLoad, liveOff, LIVE_KEYS, EVC, NOTICES, openNotice, noticeAuto, noticeWant, ntUnread, startTrial, endTrial: () => rt.trial && (rt.trial.left = 0), spawnDeal, startVisit, IMG170, MG, mgCells, mgSetCells, mgTick, mgAddEnergy, mgAddUp, mgTapGen, mgDrop, mgSell, mgUpgrade, mgAddUp, mgUpSwap, mgGensMax, MG_UP_ESS, mgClaimOrder, mgSwapOrder, mgOrderOk, mgFillOrders, mgOpen, mgClose, mgRenderAll, mgSpawnLevel, mgNearestEmpty, mgEmptyBoard, mgOrderReward, mgUI, sanitize180, mgWatchAd, mgNewOrder, mgHintPick, mgShowHint, mgClearHint, mgTouch, mgOrderGuide, mgDexN, mgDexCan, mgDexClaim, mgOpenDex, MG_DEX, MG_DEX_MS, mgDexEss, mgDexEssCan, mgDexEssN, mgDexMsCan, mgDexMsClaim, MGB, mgBuyBoost, mgBstLeft, mgOpenBoost, nice, claimMission, claimBonus, claimWeekMission, MP_BOX, swapDaily, repairMissions, MISSIONS, WMISSIONS, dmDay, wkWeek,   // 도감, 이벤트
     PZ, PZ_SHAPES, pzFits, pzAnyFit, pzStuck, pzFullLines, pzPlace, pzFreshGame, pzStart, PZB, pzbCost, pzApplyBoost, pzBoostOpen, pzBoostGo, festGoldLeft, festGoldTake, claimSports, TR2, TR2_PL, openTr2, tr2Act, tr2Away, tr2Ready, tr2Rsv, tr2Tick, renderAlbum, FEST, FEST_IDS, festNight, festShown, festTimeLock, festOpen, startFest, openFest, endFest, renderStreet, pzFinish, pzHelpSquirrel, pzHelpOwl, pzHelpBear, fillSubs, mapRoofTop, showAd, claimOfflineDouble, startBoost, tripAd, festFocus, festRange, visMap, renderMissions, pzHasHelp, pzRot, pzNewPiece, pzOpen, pzClose, pzGameOver, pzRenderAll, renderMini, addEss, ESHOP, SP_FUR, applyCos, essItem, pickEss, buyEss, renderEssShop, hatSVG, spFurImg, gameNow, gameToday, gameWeek, kstDay, setServerTime, SVR, dmDay, weekIdx, lgWeek, wkWeek, lgKey, pzDay, goldDay, boostLeft, dealLeft, canStamp };
-  if (window.__FOREST_TEST) Object.assign(window.__forest, { acctSaveFirst, netSleep, netWake, uniTerm, utSync, tripUseTicket, readUseTicket, picnicUseTicket, buyDecoPieces, adGold, claimBonus, cloudPush, cloudClash, syncGet, revOf, deleteAccount, lookDel: () => lookDelNow(), lookSet, lookPush, leaveRank, sanitizeCg, freshCg, ambWant, ambSync, AMB, AMB_LV, WLD, wldSync, wldLv, wldPhase, wldWeather, wldAuto, WLD_WATER, wldCurtain, photoOpen, photoClose, oakBend, oakBands, frPatAll, frPatLeft, fpsToggle, fxRes, fxWant, gradRecReady, teaRecReady, GS, GS_WHO, GS_LINES, gsArt, goldTip, goldTipWant, rtLv, conEssCost, renderRx, labLeft, useLog, useStr, useSumText, sanitizeUse, freshUse, statsDoc, mgOpen, pzOpen, bxTap, BX, gsTick, gsSync, gsTap, gsClaim, gsReady, gsPick, gsMakeSub, gsCardHTML, freshGs, sanitizeGs, updateVisit, endVisit, buildQuestPanel, renderQuestPanel, checkQuests, talkNext });   // 시험 손잡이
+  if (window.__FOREST_TEST) Object.assign(window.__forest, { acctSaveFirst, netSleep, netWake, uniTerm, utSync, tripUseTicket, readUseTicket, picnicUseTicket, buyDecoPieces, adGold, claimBonus, cloudPush, cloudClash, syncGet, revOf, deleteAccount, lookDel: () => lookDelNow(), lookSet, lookPush, leaveRank, sanitizeCg, freshCg, ambWant, ambSync, AMB, AMB_LV, WLD, wldSync, wldLv, wldPhase, wldWeather, wldAuto, WLD_WATER, wldCurtain, photoOpen, photoClose, oakBend, oakBands, frPatAll, frPatLeft, toast, toastPlace, collect, spawnDrop, hudBudget, flyAcorns, fpsToggle, fxRes, fxWant, gradRecReady, teaRecReady, GS, GS_WHO, GS_LINES, gsArt, goldTip, goldTipWant, rtLv, conEssCost, renderRx, labLeft, useLog, useStr, useSumText, sanitizeUse, freshUse, statsDoc, mgOpen, pzOpen, bxTap, BX, gsTick, gsSync, gsTap, gsClaim, gsReady, gsPick, gsMakeSub, gsCardHTML, freshGs, sanitizeGs, updateVisit, endVisit, buildQuestPanel, renderQuestPanel, checkQuests, talkNext });   // 시험 손잡이
   if (window.claude && window.claude.hot && window.claude.hot.snapshot) {
     try { window.claude.hot.snapshot(() => { if (S) syncMid(); return { save: S }; }); } catch (e) { /* 무시 */ }
   }

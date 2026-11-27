@@ -83,7 +83,7 @@
     return { sp, ri, hp: TAM.pHp * r.hp * mul * (1 + TAM.gearPer * G.bag), atk: TAM.pAtk * r.atk * mul * (1 + TAM.gearPer * G.tool), cd: r.cd, gg: 1 + TAM.gearPer * G.hat };
   }
   // 지금 탐험하는 지역에서 유리한 과목, 모든 대원 레벨의 보유 효과
-  const tamAdvRi = () => TAM.adv[tamReg(tamCurFl()).k];
+  const tamAdvRi = () => TAM.adv[tamReg(rt.tam?.practice || tamCurFl()).k];
   const tamCollLv = () => tamAvail().reduce((s, sp) => s + (tamMem(sp).lv - 1) + 5 * Math.max(0, tamMem(sp).st - 1), 0);
   const tamCollMul = () => Math.min(TAM.collMax, 1 + TAM.collG * tamCollLv());
   const tamTeam = () => tamParty().map(sp => ({ sp, ri: tamRole(sp) })).sort((a, b) => TAM.front[a.ri] - TAM.front[b.ri]).map((x, i) => tamStat(x.sp, i));   // 앞줄부터 1번 칸
@@ -98,17 +98,38 @@
     for (let i = 0; i < n; i++) { const j = ((k - 1) % 3 + i) % 3; out.push({ nm: R.mob[j], i: j, hp: TAM.mHp * m * f, atk: TAM.mAtk * m * f, solo: n === 1 }); }
     return out;
   }
-  function tamFight(fl, team, buff, mod, hm) {
+  // 일반 탐험의 첫 보스와 심화 탐험의 지역 끝에서 예고 공격을 써요.
+  const TAM_SIGNS = { leaf: '잎', star: '별', cloud: '구름', sun: '해' };
+  const TAM_TRIALS = {
+    10: { key: 'wind', seconds: 2.6, after: 0, title: '꽃바람이 와요!', hint: '필살기로 앞줄을 지켜요', blocked: '꽃바람을 막았어요!', landed: '꽃바람이 앞줄에 닿았어요', art: 'ex4_sk_pe_leaf' },
+    60: { key: 'spore', seconds: 2.2, after: 3, delay: 1.2, title: '왕버섯이 포자를 모아요!', hint: '필살기로 포자를 흩뜨려요', blocked: '포자 구름을 흩뜨렸어요!', landed: '포자 때문에 앞줄이 잠깐 느려졌어요', art: 'ex4_sk_sci_bubble' },
+    110: { key: 'wave', seconds: 2.8, after: 3, guard: .35, button: '몸 낮추기', ready: '물결을 받을 준비가 됐어요', title: '큰 물결이 밀려와요!', hint: '몸을 낮춰 대원 모두를 지켜요', blocked: '물결을 받아냈어요!', landed: '물결이 탐험대를 덮쳤어요', art: 'ex4_sk_art_splash' },
+    160: { key: 'book', seconds: 4.5, after: 3, signs: ['leaf', 'star'], title: '책장이 날아오려 해요!', hint: '책에 나타난 표식과 같은 것을 골라요', blocked: '책장이 제자리로 돌아갔어요!', landed: '책장이 앞줄을 덮쳤어요', art: 'ic_book' },
+    210: { key: 'frost', seconds: 4.2, after: 3, guard: .35, timing: [.22, .64], button: '발 맞추기', ready: '눈보라를 버틸 준비가 됐어요', title: '눈보라가 몰아쳐요!', hint: '막대 끝이 금빛 구간에 들어오면 발을 맞춰요', blocked: '눈보라를 버텼어요!', landed: '눈보라가 탐험대를 덮쳤어요', art: 'ex4_sk_pe_tornado' },
+    260: { key: 'stars', seconds: 4.5, after: 3, chain: true, rear: true, title: '별똥별이 뒷줄을 향해요!', hint: '서로 다른 대원의 필살기 두 번을 이어 써요. 혼자라면 한 번이에요', blocked: '필살기를 이어 별똥별을 흩뜨렸어요!', soloBlocked: '필살기로 별똥별을 흩뜨렸어요!', landed: '별똥별이 뒷줄에 떨어졌어요', art: 'ex4_sk_math_star' },
+    310: { key: 'circuit', seconds: 5.6, after: 3, signs: ['cloud', 'sun'], sequence: true, title: '구름 로봇이 전기를 모아요!', hint: '화면에 나온 순서대로 구름과 해 스위치를 눌러요', blocked: '회로를 멈췄어요!', landed: '번쩍이는 전기가 앞줄에 닿았어요', art: 'ex4_sk_sci_boom' }
+  };
+  function tamTrialSpec(fl, hm, rep) {
+    if (rep) return null;
+    if (!hm) return fl === 310 && !gradOn() ? null : TAM_TRIALS[fl];
+    if (fl % TAM.regLen !== 0) return null;
+    const region = TAM.reg.indexOf(tamReg(fl));
+    const spec = TAM_TRIALS[region * TAM.regLen + TAM.bossEvery];
+    return { ...spec, seconds: spec.seconds * .9, after: Math.min(spec.after, 2) };
+  }
+  function tamFight(fl, team, buff, mod, hm, rep) {
     const b = buff || 1;
     const pc = TAM.pace, md = mod || {}, ph = md.hp || 1, mh = md.hard ? 1.4 : 1;
-    return { id: (tamFight.n = (tamFight.n || 0) + 1), fl, hm: !!hm, hard: !!md.hard, t: 0, lim: TAM.limit * pc, ev: [], P: team.map((s, k) => ({ ...s, cd: s.cd * pc, hp: s.hp * b * ph, mx: s.hp * b * ph, atk: s.atk * b, c: (0.4 + k * 0.3) * pc, g: 0 })),
+    const spec = md.trial === false ? null : tamTrialSpec(fl, hm, rep);
+    const wind = spec ? { spec, pending: true, until: 0, prepared: false } : null;
+    return { id: (tamFight.n = (tamFight.n || 0) + 1), fl, hm: !!hm, rep: rep ? 1 : 0, hard: !!md.hard, wind, t: 0, lim: TAM.limit * pc, ev: [], P: team.map((s, k) => ({ ...s, cd: s.cd * pc, hp: s.hp * b * ph, mx: s.hp * b * ph, atk: s.atk * b, c: (0.4 + k * 0.3) * pc, g: 0 })),
       M: tamMobs(fl, hm).map((m, k) => ({ ...m, hp: m.hp * mh, mx: m.hp * mh, c: (1 + k * 0.4) * pc, wk: 0 })) };
   }
   // 한 대원의 기술. big은 필살기
-  function tamAct(F, p, big, rnd) {
+  function tamAct(F, p, big, rnd, counter) {
     const L = F.M.filter(m => m.hp > 0); if (!L.length) return;
     const hit = (m, d, cr) => { m.hp -= d; F.ev.push({ k: 'hit', m: F.M.indexOf(m), d, cr: !!cr }); };
-    const pi = F.P.indexOf(p); F.ev.push({ k: big ? 'big' : 'act', p: pi, ri: p.ri });
+    const pi = F.P.indexOf(p); F.ev.push({ k: big ? 'big' : 'act', p: pi, ri: p.ri, counter });
     if (p.ri === 1) { if (big) L.forEach(m => hit(m, p.atk * 3)); else hit(L[0], p.atk); }
     else if (p.ri === 0) L.forEach(m => hit(m, p.atk * (big ? 3.2 : 0.5)));
     else if (p.ri === 2) {
@@ -119,19 +140,104 @@
     else if (p.ri === 3) { if (big) L.forEach(m => { hit(m, p.atk * 2); m.wk = 6; }); else { hit(L[0], p.atk * 0.8); L[0].wk = 3; } }
     else { const w = L.slice().sort((a, b) => a.hp - b.hp)[0]; if (big) hit(w, p.atk * 8, true); else { const cr = rnd() < 0.25; hit(w, p.atk * (cr ? 2 : 1), cr); } }
   }
-  function tamCastAt(F, p) { if (!p || p.hp <= 0 || p.g < TAM.gauge) return false; p.g = 0; tamAct(F, p, true, Math.random); return true; }
+  const tamWindActive = F => !!(F && F.wind && F.wind.until > F.t && F.M[0].hp > 0);
+  const tamWindLeft = F => (F.wind.until - F.t) / F.wind.spec.seconds;
+  function tamWindTargets(F) {
+    const living = F.P.filter(p => p.hp > 0);
+    if (F.wind.spec.guard) return living;
+    const target = F.wind.spec.rear ? living[living.length - 1] : living[0];
+    return target ? [target] : [];
+  }
+  function tamWindStop(F) {
+    F.wind.until = 0;
+    F.M[0].c = TAM.mobCd * TAM.pace;
+  }
+  function tamBrace(F) {
+    if (!tamWindActive(F) || !F.wind.spec.guard || F.wind.prepared) return false;
+    const timing = F.wind.spec.timing;
+    if (timing && (tamWindLeft(F) < timing[0] || tamWindLeft(F) > timing[1])) return false;
+    F.wind.prepared = true;
+    return true;
+  }
+  function tamWindAnswer(F, sign) {
+    if (!tamWindActive(F) || !F.wind.spec.signs?.includes(sign) || F.wind.wrong) return false;
+    const wind = F.wind;
+    if (sign !== wind.order[wind.cursor]) { wind.wrong = true; return true; }
+    wind.cursor += 1;
+    if (wind.cursor === wind.order.length) { tamWindStop(F); F.ev.push({ k: 'wind-answer' }); }
+    return true;
+  }
+  function tamCastAt(F, p) {
+    if (!p || p.hp <= 0 || p.g < TAM.gauge || !F.M.some(m => m.hp > 0)) return false;
+    const counter = tamWindActive(F) && !F.wind.spec.guard && !F.wind.spec.signs;
+    if (counter && F.wind.spec.chain) {
+      const links = F.wind.links;
+      if (links.includes(p)) return false;
+      links.push(p);
+      if (links.length < F.wind.need) {
+        p.g = 0;
+        F.ev.push({ k: 'wind-link', p: F.P.indexOf(p) });
+        return true;
+      }
+    }
+    if (counter) tamWindStop(F);
+    p.g = 0;
+    tamAct(F, p, true, Math.random, counter);
+    return true;
+  }
   // 한 걸음: 1 이김, -1 짐, 0 이어서
   function tamStep(F, dt, auto, rnd) {
     F.t += dt;
+    const boss = F.wind && F.M[0], front = F.wind && F.P.find(p => p.hp > 0), spec = F.wind?.spec;
+    if (front && boss.hp > 0 && F.wind.pending && F.t >= spec.after && boss.c <= dt) {
+      F.wind.pending = false;
+      F.wind.until = F.t + spec.seconds;
+      if (spec.signs) {
+        const i = rnd() < .5 ? 0 : 1;
+        F.wind.order = spec.sequence ? [spec.signs[i], spec.signs[1 - i]] : [spec.signs[i]];
+        F.wind.cursor = 0;
+      }
+      else if (spec.chain) {
+        const living = F.P.filter(p => p.hp > 0);
+        F.wind.links = [];
+        F.wind.need = Math.min(2, living.length);
+        living.forEach(p => { p.g = TAM.gauge; });
+      } else if (!spec.guard) front.g = TAM.gauge;
+      F.ev.push({ k: 'wind' });
+    }
+    const warned = tamWindActive(F), middle = warned && F.wind.until - F.t <= spec.seconds / 2;
+    if (auto && middle && spec.guard) tamBrace(F);
+    if (auto && middle && spec.signs && F.t >= (F.wind.nextSign || 0)) {
+      if (tamWindAnswer(F, F.wind.order[F.wind.cursor])) F.wind.nextSign = F.t + .3;
+    }
     for (const p of F.P) {
       if (p.hp <= 0) continue;
       p.c -= dt; if (p.c <= 0) { p.c += p.cd; tamAct(F, p, false, rnd); p.g = Math.min(TAM.gauge, p.g + p.gg); }
-      if (auto && p.g >= TAM.gauge) tamCastAt(F, p);
+      if (auto && p.g >= TAM.gauge && (!warned || spec.guard || middle)) tamCastAt(F, p);
     }
     for (const m of F.M) {
       if (m.hp <= 0) continue;
       m.wk = Math.max(0, m.wk - dt); m.c -= dt;
-      if (m.c <= 0) { m.c += TAM.mobCd * TAM.pace; const tg = F.P.find(q => q.hp > 0); if (tg) { const d = m.atk * (m.wk > 0 ? 0.7 : 1); tg.hp -= d; tg.g = Math.min(TAM.gauge, tg.g + 0.4 * tg.gg); F.ev.push({ k: 'hurt', p: F.P.indexOf(tg), m: F.M.indexOf(m), d }); } }
+      const wind = m === boss && F.wind.until > 0;
+      if (wind) {
+        if (tamWindActive(F)) continue;
+        F.wind.until = 0;
+        m.c = 0;
+      }
+      if (m.c <= 0) {
+        m.c += TAM.mobCd * TAM.pace;
+        const first = F.P.find(q => q.hp > 0);
+        const targets = wind ? tamWindTargets(F) : first ? [first] : [];
+        if (wind && targets.length) F.ev.push({ k: 'wind-hit', p: F.P.indexOf(targets[0]), m: F.M.indexOf(m), braced: F.wind.prepared });
+        const strike = m.atk * (m.wk > 0 ? .7 : 1);
+        const d = strike * (wind && F.wind.prepared ? spec.guard : 1) / Math.max(1, targets.length);
+        for (const tg of targets) {
+          tg.hp -= d;
+          if (wind && spec.delay) tg.c += spec.delay;
+          tg.g = Math.min(TAM.gauge, tg.g + .4 * tg.gg);
+          F.ev.push({ k: 'hurt', p: F.P.indexOf(tg), m: F.M.indexOf(m), d, wind });
+        }
+      }
     }
     for (const m of F.M) if (m.hp <= 0 && !m.out) { m.out = 1; F.ev.push({ k: 'poof', m: F.M.indexOf(m) }); }
     for (const p of F.P) if (p.hp <= 0 && !p.out) { p.out = 1; F.ev.push({ k: 'ko', p: F.P.indexOf(p) }); }
@@ -140,9 +246,9 @@
     return 0;
   }
   // 시험과 균형 재기: 한 층을 끝까지 겨뤄 봐요(자동 쓰기)
-  function tamSim(fl, team, seed) {
+  function tamSim(fl, team, seed, mod) {
     let x = seed || 7; const rnd = () => (x = (x * 16807) % 2147483647) / 2147483647;
-    const F = tamFight(fl, team || tamTeam()); let r = 0;
+    const F = tamFight(fl, team || tamTeam(), 1, mod); let r = 0;
     while (!r) { r = tamStep(F, 0.1, true, rnd); F.ev.length = 0; }
     return { win: r === 1, t: Math.round(F.t * 10) / 10 };
   }
@@ -296,7 +402,7 @@
   /* 빠른 스킵. 지금 층부터 위로, 대원 한 번 공격(필살기 말고 보통 공격)으로 모든 장난꾸러기가 쓰러지는 층까지만 한 번에 넘어가요
      유리한 과목 덤은 빼고 셈(지역이 바뀌어도 안전하게). 넘은 층은 하나하나 이긴 것과 같은 보상, 사건은 없어요. 한 번에 1000층까지 */
   function tamSkipTo() {
-    if (!tamOn() || !tamParty().length) return 0;
+    if (!tamOn() || rt.tam?.practice || !tamParty().length) return 0;
     tamHSync(); const hm = tamHOn(), cur = tamCurFl(), cap = hm ? Infinity : tamCap(), adv = tamAdvRi(), cr = S.tam.cheer > 0 ? TAM.cheer.mul : 1;
     if (!hm && tamCapped()) return 0;
     const one = tamTeam().reduce((m, p) => Math.max(m, p.atk * cr / (p.ri === adv ? 1 + TAM.advG : 1) * [0.5, 1, 0.8, 0.8, 1][p.ri]), 0);
@@ -363,11 +469,32 @@
   // 탐험 화면이 아니어도 같은 시간으로 흘러가요(그림만 안 그려요). 사건은 화면이 아니면 바로 기본 선택
   function tamPh(T, ph) {
     T.ph = ph; T.t = 0; if (rt.tab === 'tam') musicSync();
-    tamHSync(); const vis = tamFxOn(), hm = tamHOn(), fl = tamCurFl();
-    if (ph === 'walk' && !hm && tamCapped()) { T.ph = 'cap'; T.F = null; if (vis) { tamWalk(fl); $('#tmP') && $('#tmP').classList.remove('walking'); tamRibbon('clear', tamCapMsg()); tamRenderTop(); } return; }   // 학년 상한
+    tamHSync(); const vis = tamFxOn(), practice = T.practice, hm = !practice && tamHOn(), fl = practice || tamCurFl();
+    if (ph === 'walk' && !practice && !hm && tamCapped()) { T.ph = 'cap'; T.F = null; if (vis) { tamWalk(fl); $('#tmP') && $('#tmP').classList.remove('walking'); tamRibbon('clear', tamCapMsg()); tamRenderTop(); } return; }   // 학년 상한
+    if (practice && (ph === 'win' || ph === 'lose')) {
+      T.ph = 'practiceEnd';
+      if (vis) {
+        tamWindPaint();
+        tamCam(false);
+        tamRibbon(ph === 'win' ? 'clear' : 'lose', ph === 'win' ? '보스 연습 성공!' : '연습을 마쳤어요. 다시 해 볼까요?');
+        tamRenderTop();
+      }
+      return;
+    }
     if (ph === 'walk') { T.F = null; if (vis) tamWalk(fl); }
     else if (ph === 'meet') {
-      const rep = !tamWatch() && !T.mod; T.F = tamFight(rep ? tamRepFl() : fl, tamTeam(), !rep && S.tam.cheer > 0 ? TAM.cheer.mul : 1, T.mod, hm); T.F.cheer = !rep && S.tam.cheer > 0 ? 1 : 0; T.F.rep = rep ? 1 : 0; T.mod = null;   // 응원, 화면 밖이면 마지막으로 넘은 층을 되풀이
+      const rep = !practice && !tamWatch() && !T.mod, cheer = !practice && !rep && S.tam.cheer > 0;
+      T.F = tamFight(rep ? tamRepFl() : fl, tamTeam(), cheer ? TAM.cheer.mul : 1, T.mod, hm, rep);
+      T.F.cheer = cheer ? 1 : 0; T.mod = null;   // 응원, 화면 밖이면 마지막으로 넘은 층을 되풀이
+      if (practice) {
+        // 연습은 대원 수와 역할로 맞춰요. 강한 대원이 먼저 쓰러뜨리거나 낮은 레벨이 예고 전에 지는 일을 줄여요.
+        const boss = T.F.M[0], size = T.F.P.length;
+        T.F.P.forEach(p => {
+          const role = TAM.role[p.ri];
+          p.atk = boss.mx * role.atk / (12 + 10 * size);
+          p.hp = p.mx = boss.atk * (12 + size) * role.hp;
+        });
+      }
       if (vis) { tamBuild(); tamAlert(); tamCam(true, T.F.M[0].boss); if (T.F.M[0].boss) { tamRibbon('boss', '큰 장난꾸러기가 나타났어요!'); const w = $('#tmWarn'); if (w && !rt.reduced) { w.hidden = false; $$('i', w).forEach(i => { i.style.animation = 'none'; void i.offsetWidth; i.style.animation = ''; }); clearTimeout(w._t); w._t = setTimeout(() => { w.hidden = true; }, 1500); } } }
     }
     else if (ph === 'win') {
@@ -375,23 +502,24 @@
       if (rep) { tamWinRep(T.F.rep ? f : tamRepFl(), T.F.hm); T.ev = null; }   // 화면 밖에서는 층이 오르지 않아요
       else { if (T.F.cheer && S.tam.cheer > 0) S.tam.cheer -= 1; if (T.F.hm) tamWinH(f); else tamWin(f); if (hard) tamWinHard(f);
       T.ev = !T.F.hm && f % TAM.bossEvery && Math.random() < TAM.evP ? tamEvRoll(f) : null; }
-      if (vis) { tamRibbon('clear', `${tamFlTx(f, T.F.hm)} 통과!`); tamRenderTop(); tamVictory(f); tamCam(false); }
+      if (vis) { tamWindPaint(); tamRibbon('clear', `${tamFlTx(f, T.F.hm)} 통과!`); tamRenderTop(); tamVictory(f); tamCam(false); }
     }
     else if (ph === 'event') { if (vis) tamEvShow(T.ev); }
     else if (ph === 'climb') { T.F = null; if (vis) tamClimb(fl - 1); }
     else if (ph === 'lose') {
       T.lose = T.F.fl; T.nLose = (T.nLose || 0) + 1;
-      if (vis) { tamRibbon('lose', T.nLose >= 3 ? '대원 레벨을 올리면 이길 수 있어요' : '힘을 길러서 다시 와요'); tamRenderTop(); tamRenderBody(); }
+      if (vis) { tamWindPaint(); tamRibbon('lose', T.nLose >= 3 ? '대원 레벨을 올리면 이길 수 있어요' : '힘을 길러서 다시 와요'); tamRenderTop(); tamRenderBody(); }
     }
   }
   function tamTick(dt) {
-    if (!tamOn() || !tamParty().length) return;
+    if (rt.modalOpen?.id === 'mTamMap' || (rt.tam?.practice && rt.modalOpen) || !$('#txFull').hidden || !tamOn() || !tamParty().length) return;
     const T = rt.tam || (rt.tam = { ph: '', t: 0, F: null, buff: 0, lose: 0, nLose: 0, ev: null, mod: null });
     if (!T.ph) { tamPh(T, 'walk'); return; }
     if (tamFxOn() && (rt.tamAcT = (rt.tamAcT || 0) + dt) > 0.4) { rt.tamAcT = 0; tamAcorn(); }   // 위 칸 도토리
     if (T.ph === 'cap') { if (!tamCapped() || tamHOn()) tamPh(T, 'walk'); return; }   // 학년이 오르면 다시 걸어요
     const vis = tamFxOn(), d = dt * (tamSpdOn() ? 2 : 1), P = TAM.ph;
     if (tamSpdOn()) { const was = Math.ceil(S.tam.spd.sec); S.tam.spd.sec = Math.max(0, S.tam.spd.sec - dt); if (vis && Math.ceil(S.tam.spd.sec) !== was) tamRenderTop(); }   // 2배속은 켜 둔 동안만 줄어요
+    if (T.ph === 'practiceEnd') return;
     T.t += d;
     if (T.ph === 'walk') { if (T.t >= P.walk) tamPh(T, 'meet'); }
     else if (T.ph === 'meet') { if (vis && T.F) tamDraw(T.F); if (T.t >= P.meet) tamPh(T, 'fight'); }
@@ -441,6 +569,47 @@
   // 3D 그림(ex3_)이 있으면 먼저 쓰고, 없으면 2D 그림(ex_)
   const tamI = k => IMG(String(k).replace(/^ex_/, 'ex3_')) || IMG(k);
   const tamPcPic = (sp, act) => tamI(`ex_pc_${sp}_${act ? 'act' : 'idle'}`) || IMG('chr_' + sp) || '';
+  const TAM_FRAME_SPECS = {
+    bear:   { run: 6, recoil: 4, stride: 490 },
+    rabbit: { run: 4, recoil: 4, stride: 415 },
+    fox:    { run: 4, recoil: 4, stride: 365 }
+  };
+  function tamFrameArt(sp, recoil) {
+    const spec = TAM_FRAME_SPECS[sp];
+    if (!spec) return '';
+    return (recoil ? ['run', 'recoil'] : ['run']).map(kind => {
+      const src = IMG(`ex4_pc_${sp}_${kind}_frames`), count = spec[kind];
+      return src ? `<span class="tm-frame-art" data-atlas="${kind}" data-cells="${count}" aria-hidden="true" style="--frame-width:${count * 100}%"><img src="${src}" alt=""></span>` : '';
+    }).join('');
+  }
+  function tamPlayFrames(el, kind, cycle, iterations = 1) {
+    const layer = el.querySelector(`[data-atlas="${kind}"]`), sheet = layer?.firstElementChild;
+    if (rt.reduced || !sheet?.naturalWidth || cycle < 80) return false;
+    el._endFrames?.();
+    const n = Number(layer.dataset.cells);
+    const base = el.querySelector('.tm-body > img');
+    const cells = Array.from({ length: n + 1 }, (_, i) => ({
+      offset: i / n, transform: `translateX(${-100 * Math.min(i, n - 1) / n}%)`, easing: 'steps(1,end)'
+    }));
+    const duration = cycle * iterations, blend = [
+      { opacity: 0, offset: 0 },
+      { opacity: 1, offset: kind === 'recoil' ? .06 : .13 },
+      { opacity: 1, offset: .83 },
+      { opacity: 0, offset: 1 }
+    ];
+    const pose = sheet.animate(cells, { duration: cycle, iterations });
+    const fade = layer.animate(blend, { duration });
+    const hideBase = base.animate(blend.map(f => ({ ...f, opacity: 1 - f.opacity })), { duration });
+    el.dataset.frames = kind;
+    el._endFrames = () => {
+      fade.onfinish = null;
+      pose.cancel(); fade.cancel(); hideBase.cancel();
+      delete el.dataset.frames;
+      el._endFrames = null;
+    };
+    fade.onfinish = el._endFrames;
+    return true;
+  }
   const tamMobPic = (fl, m) => m.boss ? tamPic(`ex_boss_${tamReg(fl).k}`, TAM.bossPh) : tamPic(`ex_mob_${tamReg(fl).k}_${m.i + 1}`, TAM.mobPh[(TAM.reg.indexOf(tamReg(fl)) + m.i) % TAM.mobPh.length]);
   // 탐험대가 층을 오르며 장난꾸러기를 만나는 화려한 화면. 자리(왼쪽 %, 바닥 %), 앞줄부터
   // 맨 앞 장식(풀과 꽃)에 가리지 않게 대원과 장난꾸러기를 14%만큼 위로(TM_UP, 체력 막대까지 보이게)
@@ -453,7 +622,7 @@
   // 카메라: 겨룰 때 다가가고, 큰 장난꾸러기가 나오면 그쪽으로 확대했다가 돌아와요
   function tamCam(fight, boss) {
     const st = $('#tmStage'); if (!st) return; st.classList.toggle('fight', !!fight);
-    if (boss) { st.classList.add('bossin'); clearTimeout(st._cb); st._cb = setTimeout(() => st.classList.remove('bossin'), 1300); }
+    if (boss && !rt.reduced) { st.classList.add('bossin'); clearTimeout(st._cb); st._cb = setTimeout(() => st.classList.remove('bossin'), 1300); }
   }
   function tamPunch() { const st = $('#tmStage'); if (!st || rt.reduced) return; st.classList.add('punch'); clearTimeout(st._cp); st._cp = setTimeout(() => st.classList.remove('punch'), 110); }
   // 맞은 모습(ex3_..._hit)이 있으면 잠깐 바꿔 보여요
@@ -495,7 +664,7 @@
     t.querySelector('.tt-me').style.backgroundImage = m ? `url("${m}")` : '';
   }
   function tamFl(fl, up) {
-    const e = $('#tmFlBig'); if (!e) return; e.textContent = tamFlTx(fl, tamHOn());
+    const e = $('#tmFlBig'); if (!e) return; e.textContent = rt.tam?.practice ? `연습 ${fmt(fl)}층` : tamFlTx(fl, tamHOn());
     if (up) { e.classList.remove('up'); void e.offsetWidth; e.classList.add('up'); }
   }
   function tamBuild() {
@@ -507,11 +676,14 @@
     tamG6(fl);
     tamAmb(R.k); tamTower(fl); tamFl(fl);
     const boss = !!(F && F.M[0] && F.M[0].boss); st.classList.toggle('boss', boss);
+    st.classList.toggle('boss-first', !!(F && F.wind));
     const bb = $('#tmBossBar'); bb.hidden = !boss; if (boss) bb.querySelector('span').textContent = F.M[0].nm;
     const party = F ? F.P : tamTeam();
     $('#tmP').dataset.fid = F ? F.id : ''; $('#tmM').dataset.fid = F ? F.id : ''; $('#tmP').classList.remove('walking', 'enter', 'jump');
     setH($('#tmP'), party.map((p, i) => { const [x, y] = TM_PPOS[i] || TM_PPOS[0];
-      return `<div class="tm-f" data-i="${i}" style="left:${x}%;bottom:${y + TM_UP}%;z-index:${30 - y};${tamDz(y)}--bd:-${(i * 0.37).toFixed(2)}s;--bd2:${(i * 0.06).toFixed(2)}s"><div class="tm-body"><img src="${tamPcPic(p.sp)}" alt="${esc(spName(p.sp))}"></div><i class="tm-hp"><s></s><b></b></i></div>`; }).join(''));
+      const pose = F?.wind && IMG(`ex4_pc_${p.sp}_sk`);
+      const frames = F?.wind ? tamFrameArt(p.sp, true) : '';
+      return `<div class="tm-f${frames ? ' tm-frame-owner' : ''}" data-actor="${p.sp}" data-i="${i}" style="left:${x}%;bottom:${y + TM_UP}%;z-index:${30 - y};${tamDz(y)}--bd:-${(i * 0.37).toFixed(2)}s;--bd2:${(i * 0.06).toFixed(2)}s"><div class="tm-body"><img src="${tamPcPic(p.sp)}" alt="${esc(spName(p.sp))}">${pose ? `<img class="tm-counter-pose" src="${pose}" alt="">` : ''}${frames}</div><i class="tm-hp"><s></s><b></b></i></div>`; }).join(''));
     if (!F) { setH($('#tmM'), ''); return; }
     const pos = boss ? TM_BPOS : F.M.length === 1 ? TM_MPOS1 : F.M.length === 2 ? TM_MPOS2 : TM_MPOS;   // 마리 수에 맞춘 자리
     setH($('#tmM'), F.M.map((m, i) => { const [x, y] = pos[i] || pos[0];
@@ -582,26 +754,181 @@
     const st = $('#tmFx').getBoundingClientRect();
     for (let i = 0; i < 2; i++) tamFxImg('tm-drop', src, x, y, [{ t: 'scale(.6)', opacity: 1 }, { dx: (i ? 18 : -14), dy: -38, t: 'scale(1.1)', opacity: 1, offset: 0.35 }, { dx: (i ? 22 : -18), dy: 0, t: 'scale(1)', opacity: 1, offset: 0.6 }, { dx: -x + st.width * 0.08, dy: -y + st.height * 0.08, t: 'scale(.5)', opacity: 0.2 }], 1000 + i * 120, 'ease-in-out');
   }
+  function tamWindPaint(F, P, boss) {
+    const active = tamWindActive(F), card = $('#tmWind');
+    if (!active && card.hidden) return;
+    if (card.hidden === active) {
+      card.hidden = !active;
+      if (active) tamControls(false);
+    }
+    const wind = active ? F.wind : null, targets = active ? tamWindTargets(F) : [];
+    if (active) {
+      const { spec, prepared, wrong, order, cursor, links, need } = wind, brace = $('#tmBrace');
+      const left = tamWindLeft(F), timing = spec.timing;
+      card.dataset.trial = spec.key;
+      card.style.setProperty('--wind-left', left);
+      setTx($('#tmWindTitle'), spec.title);
+      const inTime = timing && left >= timing[0] && left <= timing[1];
+      let hint = prepared ? spec.ready : spec.hint;
+      if (order && spec.sequence) hint = wrong ? '순서가 달라요. 전기가 날아와요!' : `${order.map(sign => TAM_SIGNS[sign]).join(' → ')} 순서로 눌러요 (${cursor}/${order.length})`;
+      else if (order) hint = wrong ? '표식이 달라요. 책장이 날아와요!' : `책에 ‘${TAM_SIGNS[order[0]]}’ 표식이 보여요. 같은 것을 골라요`;
+      if (timing && !prepared) hint = inTime ? '지금 발을 맞춰요!' : left < timing[0] ? '발을 맞출 시간이 지났어요' : spec.hint;
+      if (links) hint = `필살기 ${links.length}/${need}, ${need === 1 ? '대원의 필살기를 써요' : '서로 다른 대원의 필살기를 써요'}`;
+      setTx($('#tmWindHint'), hint);
+      setHid(brace, !spec.guard);
+      brace.disabled = prepared;
+      setTx(brace, prepared ? '준비 완료' : spec.button || '');
+      card.classList.toggle('in-time', !!inTime && !prepared);
+      if (timing) {
+        card.style.setProperty('--wind-zone-start', `${timing[0] * 100}%`);
+        card.style.setProperty('--wind-zone-width', `${(timing[1] - timing[0]) * 100}%`);
+      }
+      setHid($('#tmWindSigns'), !spec.signs);
+      if (spec.signs) $$('[data-tam-sign]', card).forEach((button, i) => {
+        const sign = spec.signs[i];
+        setAt(button, 'data-tam-sign', sign);
+        setTx(button, TAM_SIGNS[sign]);
+        button.disabled = !!wrong;
+      });
+    }
+    if (P) P.forEach((el, i) => {
+      const target = targets.includes(F.P[i]);
+      el.classList.toggle('wind-target', target);
+      el.classList.toggle('wind-guarded', target && wind.prepared);
+      el.classList.toggle('wind-linked', !!wind?.links?.includes(F.P[i]));
+    });
+    else $$('#tmP .wind-target,#tmP .wind-linked').forEach(el => el.classList.remove('wind-target', 'wind-guarded', 'wind-linked'));
+    if (boss) boss.classList.toggle('wind-up', active);
+    else $('#tmM .wind-up')?.classList.remove('wind-up');
+  }
+  // 첫 보스의 대응 필살기는 컷인 없이 준비 → 닿는 순간 → 복귀를 한 장면으로 보여 줘요.
+  function tamWindCounterFx(F, i, el, boss) {
+    skReset();
+    const speed = tamSpdK(), start = Math.max(skNow(), SKQ.end);
+    const hitOffset = .53, duration = rt.reduced ? 0 : 720 / speed;
+    const hit = start + duration * hitOffset;
+    SKQ.end = start + duration;
+    const p = F.P[i];
+    const body = el.querySelector('.tm-body');
+    const bossBody = boss.querySelector('.tm-body');
+    if (!rt.reduced) boss.classList.add('wind-up');
+    skAt(start, () => {
+      if (rt.reduced) return;
+      const [x, y] = tamAt(el), [bx, by] = tamAt(boss);
+      const reach = p.ri === 1 ? .72 : .12;
+      const dx = (bx - x) * reach, dy = (by - y) * reach;
+      const move = (x, y, tilt = 0) => `translate(${x}px,${y}px) rotate(${tilt}deg)`;
+      body.animate([
+        { transform: 'none', easing: 'ease-out' },
+        { transform: 'translate(-8%, 3%) scale(1.04,.91) rotate(-5deg)', offset: .22, easing: 'cubic-bezier(.53,.03,.33,1)' },
+        { transform: move(dx, dy, 6), offset: hitOffset, easing: 'ease-out' },
+        { transform: move(dx * .97, dy * .97 + 3, -2), offset: .65, easing: 'cubic-bezier(.32,0,.27,1)' },
+        { transform: 'none' }
+      ], { duration });
+      const pose = body.querySelector('.tm-counter-pose');
+      const run = body.querySelector('[data-atlas="run"] img');
+      if (p.ri === 1 && run?.naturalWidth) {
+        skAt(start + duration * .19, () => tamPlayFrames(el, 'run', duration * .49));
+        return;
+      }
+      // 자세 그림이 아직 안 열린 기기에서는 대원이 사라지지 않도록 기본 그림으로 달려요.
+      if (pose?.naturalWidth) {
+        const base = body.querySelector('img');
+        const blend = [0, 0, 1, 1, 0].map((v, k) => ({ opacity: v, offset: [0, .16, .30, .66, .91][k] }));
+        pose.animate(blend, { duration });
+        base.animate(blend.map(frame => ({ ...frame, opacity: 1 - frame.opacity })), { duration });
+      }
+    });
+    skAt(hit, () => {
+      if (!rt.reduced) {
+        const poised = getComputedStyle(bossBody).transform;
+        boss.classList.remove('wind-up');
+        bossBody.animate([
+          { transform: poised },
+          { transform: 'translateX(9%) rotate(7deg)', offset: .34, easing: 'ease-out' },
+          { transform: 'none' }
+        ], { duration: 290 / speed });
+        $('#tmStage .tm-cam').animate([
+          { scale: '1' }, { scale: '1.035', offset: .23 }, { scale: '1' }
+        ], { duration: 310 / speed, easing: 'ease-out' });
+      }
+      const { spec, need } = F.wind;
+      sfx('tamCounter'); tamToast(need === 1 ? spec.soloBlocked : spec.blocked);
+      tamBars(F);
+    });
+    return { hit, heal: hit, counter: true };
+  }
   function tamDraw(F) {
     const P = $$('#tmP .tm-f'), M = $$('#tmM .tm-f');
     if (P.length !== F.P.length || M.length !== F.M.length || $('#tmM').dataset.fid !== String(F.id)) { tamBuild(); return; }   // 다른 판의 쓰러진 대원 그림을 그대로 쓰던 것 고침
+    tamWindPaint(F, P, M[0]);
     let actor = -1, sk = null;   // sk: 필살기 연출 시계로 맞는 때와 회복되는 때
     F.ev.forEach((e, ei) => {
-      if (e.k === 'act' || e.k === 'big') {
+      if (e.k === 'wind') { sfx('tamWind'); }
+      else if (e.k === 'wind-answer' || e.k === 'wind-link') {
+        const answered = e.k === 'wind-answer';
+        sfx(answered ? 'tamCounter' : 'tap');
+        if (answered) tamToast(F.wind.spec.blocked);
+        if (!rt.reduced) {
+          const [x, y] = tamAt(answered ? M[0] : P[e.p], .48), art = IMG(F.wind.spec.art);
+          tamFxImg('tm-shot tm-answer-fx', art, x, y, [
+            { t: 'scale(.5) rotate(-14deg)', opacity: .95 },
+            { dy: -19, t: 'scale(1.3) rotate(9deg)', opacity: .8, offset: .42 },
+            { dy: -36, t: 'scale(1.6) rotate(23deg)', opacity: 0 }
+          ], 480 / tamSpdK());
+        }
+      }
+      else if (e.k === 'wind-hit') {
+        const spec = F.wind.spec;
+        sfx('tamCounter'); tamToast(e.braced ? spec.blocked : spec.landed);
+        if (!rt.reduced) {
+          const [x, y] = tamAt(P[e.p], .66), [bx, by] = tamAt(M[e.m], .66), art = IMG(spec.art);
+          if (spec.guard) tamFxImg(`tm-shot ${spec.timing ? 'tm-frost-impact' : 'tm-wave-impact'}`, art, x, y, [
+            { t: 'scale(.55,.45)', opacity: .9 },
+            { dx: -20, dy: -7, t: 'scale(1.15,.8)', opacity: .8, offset: .4 },
+            { dx: -44, dy: -18, t: 'scale(1.4,.92)', opacity: 0 }
+          ], 480);
+          else {
+            const spread = wldLv() ? 1 : 0;
+            for (let j = -spread; j <= spread; j++) tamFxImg('tm-shot', art, bx, by + j * 18, [
+              { dx: x - bx, dy: y - by, t: 'scale(.8) rotate(-28deg)', opacity: .85 },
+              { dx: x - bx - 38, dy: y - by - 22 + j * 12, t: 'scale(.4) rotate(-90deg)', opacity: 0 }
+            ], spec.delay ? 420 : 260);
+          }
+        }
+      }
+      else if (e.k === 'act' || e.k === 'big') {
         actor = e.p; sk = null; const el = P[e.p], im = el && el.querySelector('img'); if (!el) return;
+        if (e.counter) { sk = tamWindCounterFx(F, e.p, el, M[0]); return; }
         if (e.k === 'big') { const nx = F.ev.slice(ei + 1).find(x => x.k === 'hit'); sk = tamSkillFx(F, e.p, nx ? nx.m : 0); const sp = F.P[e.p].sp; skAt(sk.hit - 900, () => { const a = IMG(`ex4_pc_${sp}_sk`) || tamI(`ex_pc_${sp}_act`); if (a && im) { im.src = a; clearTimeout(el._t); el._t = setTimeout(() => { im.src = tamPcPic(sp); }, 1400); } }); return; }
         el.classList.remove('act', 'far'); void el.offsetWidth; el.classList.add('act'); if (e.ri !== 1) el.classList.add('far'); fxTamDust(el);
         const a = IMG(`ex4_pc_${F.P[e.p].sp}_atk`) || tamI(`ex_pc_${F.P[e.p].sp}_act`); if (a && im) { im.src = a; clearTimeout(el._t); el._t = setTimeout(() => { im.src = tamPcPic(F.P[e.p].sp); }, 520); }   // 공격 자세
       } else if (e.k === 'hit') {
-        const el = M[e.m], d = fmt(Math.max(1, Math.round(e.d))), cr = e.cr, fromEl = actor >= 0 ? P[actor] : null, ri = actor >= 0 ? F.P[actor].ri : 1, bigHit = !!sk;
-        const land = () => { el.classList.remove('hurt'); void el.offsetWidth; el.classList.add('hurt'); tamHitPic(el, F.M[e.m] && !F.M[e.m].boss ? `ex_mob_${tamReg(F.fl).k}_${F.M[e.m].i + 1}_hit` : ''); tamHitFx(el, cr, bigHit, ri); tamFloat(el, d, cr || bigHit ? 'cr' : ''); if (cr && !bigHit) { tamShake(5, 260); tamPunch(); } };
+        const el = M[e.m], d = fmt(Math.max(1, Math.round(e.d))), cr = e.cr, fromEl = actor >= 0 ? P[actor] : null, ri = actor >= 0 ? F.P[actor].ri : 1, bigHit = !!sk, counterHit = !!sk?.counter;
+        const land = () => { el.classList.remove('hurt'); void el.offsetWidth; el.classList.add('hurt'); tamHitPic(el, F.M[e.m] && !F.M[e.m].boss ? `ex_mob_${tamReg(F.fl).k}_${F.M[e.m].i + 1}_hit` : ''); if (!counterHit || !rt.reduced) tamHitFx(el, cr, bigHit && !counterHit, ri); tamFloat(el, d, cr || bigHit ? 'cr' : ''); if (cr && !bigHit) { tamShake(5, 260); tamPunch(); } };
         if (bigHit) skAt(sk.hit, () => { land(); tamBars(F); }); else if (ri === 1 || !fromEl) land(); else tamShot(fromEl, el, ri, land);
       }
       else if (e.k === 'heal') { const el = P[e.p], hf = f => sk ? skAt(sk.heal, f) : f(); hf(() => { if (sk && IMG('ex4_sk_kor_heal')) { const [hx, hy] = tamAt(el, 0.55); tamFxImg('tm-pillar', IMG('ex4_sk_kor_heal'), hx, hy, [{ t: 'scaleY(.2)', opacity: 0 }, { t: 'scaleY(1)', opacity: 1, offset: 0.35 }, { dy: -10, t: 'scaleY(1.05)', opacity: 0 }], 1000); } tamFloat(el, '+' + fmt(Math.round(e.d)), 'heal'); const [x, y] = tamAt(el); tamFxImg('tm-spark', tamI('ex_fx_heal'), x, y, [{ t: 'scale(.4)', opacity: 0 }, { t: 'scale(1.2)', opacity: 1, offset: 0.4 }, { dy: -16, t: 'scale(1.4)', opacity: 0 }], 600); }); }
       else if (e.k === 'hurt') {
         const el = P[e.p], mm = M[e.m];
         if (mm) { mm.classList.remove('act'); void mm.offsetWidth; mm.classList.add('act'); const fm = F.M[e.m]; if (fm) tamHitPic(mm, fm.boss ? `ex_boss_${tamReg(F.fl).k}_atk` : `ex_mob_${tamReg(F.fl).k}_${fm.i + 1}_atk`); }   /* 장난꾸러기도 칠 때 공격 자세 */
-        setTimeout(() => { el.classList.remove('hurt'); void el.offsetWidth; el.classList.add('hurt'); tamHitPic(el, `ex4_pc_${F.P[e.p].sp}_hurt`); tamFloat(el, fmt(Math.max(1, Math.round(e.d))), 'ouch'); }, 140);
+        const land = () => {
+          el.classList.remove('hurt');
+          if (e.wind && tamPlayFrames(el, 'recoil', 420 / tamSpdK())) {
+            el.querySelector('.tm-body').animate([
+              { transform: 'none' },
+              { transform: 'translate(-6%, 2%) rotate(-6deg)', offset: .25, easing: 'ease-out' },
+              { transform: 'translate(-2%, 1%) rotate(2deg)', offset: .64 },
+              { transform: 'none' }
+            ], { duration: 420 / tamSpdK() });
+          } else {
+            void el.offsetWidth; el.classList.add('hurt');
+            tamHitPic(el, `ex4_pc_${F.P[e.p].sp}_hurt`);
+          }
+          tamFloat(el, fmt(Math.max(1, Math.round(e.d))), 'ouch');
+        };
+        if (e.wind) land();
+        else setTimeout(land, 140);
       }
       else if (e.k === 'poof') { const el = M[e.m], go = () => { el.classList.add('out'); tamDropFx(el, F.fl); }; if (sk || tamSkBusy()) skAt(Math.max(sk ? sk.hit : 0, SKQ.end - 600) + 300, go); else setTimeout(go, 300); }
       else if (e.k === 'ko') P[e.p].classList.add('out');
@@ -741,17 +1068,33 @@
   function tamSpdK() { return tamSpdOn() ? 2 : 1; }
   function tamWalk(fl) {
     const st = $('#tmStage'), T = rt.tam; if (!st || !T) return;
-    const R = tamReg(fl), cur = $('.tm-bg.cur', st), bg = tamBg(fl);
+    const R = tamReg(fl), cur = $('.tm-bg.cur', st), bg = tamBg(fl), trial = tamTrialSpec(fl, !T.practice && tamHOn(), !tamWatch());
     if (!T.climbing) { cur.getAnimations().forEach(a => a.cancel()); tamBgPaint(cur, fl); }
-    st.dataset.reg = R.k; st.classList.toggle('hm', tamHOn()); st.classList.toggle('deep', tamLap(fl) > 0); st.classList.remove('boss'); $('#tmBossBar').hidden = true;
+    st.dataset.reg = R.k; st.classList.toggle('hm', tamHOn()); st.classList.toggle('deep', tamLap(fl) > 0); st.classList.remove('boss', 'boss-first'); $('#tmBossBar').hidden = true;
+    tamWindPaint();
     tamAmb(R.k); tamTower(fl); tamFl(fl);
     const team = tamTeam(), pp = $('#tmP');
     pp.dataset.fid = 'walk';
     setH(pp, team.map((p, i) => { const [x, y] = TM_PPOS[i] || TM_PPOS[0];
-      return `<div class="tm-f" data-i="${i}" style="left:${x}%;bottom:${y + TM_UP}%;z-index:${30 - y};${tamDz(y)}--bd:-${(i * 0.13).toFixed(2)}s"><div class="tm-body"><img src="${tamPcPic(p.sp)}" alt="${esc(spName(p.sp))}"></div><i class="tm-hp"><s></s><b style="width:100%"></b></i></div>`; }).join(''));
+      const frames = trial ? tamFrameArt(p.sp, false) : '';
+      return `<div class="tm-f${frames ? ' tm-frame-owner' : ''}" data-actor="${p.sp}" data-i="${i}" style="left:${x}%;bottom:${y + TM_UP}%;z-index:${30 - y};${tamDz(y)}--bd:-${(i * 0.13).toFixed(2)}s"><div class="tm-body"><img src="${tamPcPic(p.sp)}" alt="${esc(spName(p.sp))}">${frames}</div><i class="tm-hp"><s></s><b style="width:100%"></b></i></div>`; }).join(''));
     setH($('#tmM'), ''); $('#tmM').dataset.fid = '';
     if (T.nLose) pp.classList.add('enter'); else pp.classList.remove('enter');
     pp.classList.add('walking'); clearTimeout(pp._t); const ms = TAM.ph.walk / tamSpdK() * 1000; pp._t = setTimeout(() => pp.classList.remove('walking', 'enter'), ms);
+    if (!rt.reduced) for (const actor of $$('.tm-frame-owner', pp)) {
+      const start = performance.now();
+      const stride = TAM_FRAME_SPECS[actor.dataset.actor].stride / tamSpdK();
+      const run = () => {
+        const remaining = ms - (performance.now() - start);
+        if (actor.isConnected && pp.classList.contains('walking') && tamFxOn() && remaining > 100) {
+          const cycles = Math.max(1, Math.round(remaining / stride));
+          tamPlayFrames(actor, 'run', remaining / cycles, cycles);
+        }
+      };
+      const sheet = $('[data-atlas="run"] img', actor);
+      if (sheet.naturalWidth) run();
+      else sheet.addEventListener('load', run, { once: true });
+    }
     st.classList.toggle('lay', !!tamLay(fl)); { const lu = IMG('ex5_light'); if (lu) st.style.setProperty('--ex5-light', `url("${lu}")`); }
     const L = tamLay(fl), wo = { duration: ms, easing: 'cubic-bezier(.3,0,.6,1)', fill: 'forwards' };
     if (!T.climbing && !rt.reduced) {
@@ -838,13 +1181,24 @@
     const F = rt.tam && rt.tam.F; if (!F) return;
     if (tamCastAt(F, F.P[i])) { tamDraw(F); F.ev.length = 0; }
   }
+  function tamControls(on) {
+    const menu = $('#tmActions'), toggle = $('#tmControls');
+    if (menu.hidden === !on) return;
+    if (!on && menu.contains(document.activeElement)) toggle.focus();
+    menu.hidden = !on;
+    toggle.setAttribute('aria-expanded', String(on));
+  }
   function tamRenderTop() {
     if (!tamOn()) return;
-    tamHSync(); const hm = tamHOn(), fl = tamCurFl(), R = tamReg(fl), lap = hm ? 0 : tamLap(fl);
+    const T = rt.tam, practice = T?.practice;
+    tamHSync(); const hm = !practice && tamHOn(), fl = practice || tamCurFl(), R = tamReg(fl), lap = hm ? 0 : tamLap(fl);
     $('#tmReg').textContent = R.nm + (lap ? ` (${lap + 1}바퀴째)` : '');
-    $('#tmFl').textContent = tamFlTx(fl, hm);
-    { const md = $('#tmMode'); md.hidden = !tamHOpen(); $$('[data-tmm]', md).forEach(b => b.setAttribute('aria-pressed', String(+b.dataset.tmm === (hm ? 1 : 0)))); }   // 심화 탐험
-    $('#tmBest').innerHTML = hm ? `<span>심화 최고</span>${fmt(S.tam.hb)}층` : (S.tam.best ? `<span>최고층</span>${fmt(S.tam.best)}층` : '<span>첫 탐험</span>') + (isFinite(tamCap()) ? `<small class="tm-cap">${tamCapped() ? '이번 학기 끝! 심화 탐험으로 가요' : `이번 학기 ${fmt(tamCap())}층까지`}</small>` : '');
+    setAt($('#tmMapOpen'), 'aria-label', `탐험 지도 열기, 현재 ${R.nm}`);
+    $('#tmFl').textContent = practice ? `연습 ${fmt(fl)}층` : tamFlTx(fl, hm);
+    setHid($('#tmPractice'), !practice);
+    setHid($('#tmPracticeRetry'), T?.ph !== 'practiceEnd');
+    { const md = $('#tmMode'); md.hidden = !!practice || !tamHOpen(); $$('[data-tmm]', md).forEach(b => b.setAttribute('aria-pressed', String(+b.dataset.tmm === (hm ? 1 : 0)))); }   // 심화 탐험
+    $('#tmBest').innerHTML = practice ? '<span>현재 대원으로 보스 연습 중</span>' : hm ? `<span>심화 최고</span>${fmt(S.tam.hb)}층` : (S.tam.best ? `<span>최고층</span>${fmt(S.tam.best)}층` : '<span>첫 탐험</span>') + (isFinite(tamCap()) ? `<small class="tm-cap">${tamCapped() ? '이번 학기 끝! 심화 탐험으로 가요' : `이번 학기 ${fmt(tamCap())}층까지`}</small>` : '');
     { const pw = tamPow(), el = $('#tmPow'), fu = tamI('ex_flag');   // 탐험대 힘 칸: 깃발 그림과 큰 숫자, 힘이 오르면 한 번 들썩
       setH(el, `${fu ? `<img src="${fu}" alt="">` : ''}<span><small>탐험대 힘</small><b>${fmt(pw)}</b></span>`); el.setAttribute('aria-label', `탐험대 힘 ${fmt(pw)}`);
       if (rt.tamPw && pw > rt.tamPw) { el.classList.remove('up'); void el.offsetWidth; el.classList.add('up'); }
@@ -855,14 +1209,46 @@
     const sb = $('#tmSpd'); sb.classList.toggle('on', tamSpdOn());
     const left = TAM.adSpd.n - S.tam.ad.spd;
     rb(sb, 'ex4_ic_speed', tamSpdOn() ? hms(S.tam.spd.sec * 1000) : '광고 2배속', `${left}`, !tamSpdOn() || left > 0, tamSpdOn() ? `2배속 ${hms(S.tam.spd.sec * 1000)} 남음` : `광고 보고 2배속 ${TAM.adSpd.min}분, 오늘 ${left}번 남음`);
-    const ab = $('#tmAuto'); ab.hidden = !tamAutoOn(); ab.setAttribute('aria-pressed', S.tam.auto ? 'true' : 'false'); rb(ab, 'ex4_ic_auto', S.tam.auto ? '필살기 자동' : '필살기 수동', '', false, S.tam.auto ? '필살기 자동 켬' : '필살기 자동 끔');
+    const ab = $('#tmAuto'); ab.hidden = !tamAutoOn(); ab.setAttribute('aria-pressed', S.tam.auto ? 'true' : 'false'); rb(ab, 'ex4_ic_auto', S.tam.auto ? '자동 대응 켬' : '자동 대응 끔', '', false, `필살기와 보스 대응 자동 ${S.tam.auto ? '켬' : '끔'}`);
     { const so = $('#tmSkOff'); so.hidden = !S.tam.skSeen; so.setAttribute('aria-pressed', S.tam.skOff ? 'true' : 'false'); rb(so, 'ex4_ic_report', S.tam.skOff ? '연출 짧게' : '연출 보기', '', false, S.tam.skOff ? '필살기 연출 건너뛰기 켬' : '필살기 연출 건너뛰기 끔'); }   // 필살기를 한 번 본 뒤에 생겨요
     { const sk = $('#tmSkip'), to = tamSkipTo(); sk.hidden = !to; if (to) { rb(sk, 'ex_flag', '빠르게 넘기', `${fmt(to)}층`, false, `빠르게 넘기: ${fmt(to)}층까지 한 번에 넘어가요`);
-      if (rt.tamSkTo !== to && (!rt.tamSkTo || to > rt.tamSkTo + 9)) tamToast(`누르면 ${fmt(to)}층까지 빠르게 넘길 수 있어요`); } rt.tamSkTo = to; }
-    const T = rt.tam, rv = $('#tmRevive'), cl = tamCheerLeft(); rv.hidden = !(S.tam.cheer > 0 || (T && T.lose && cl > 0));   // 지면 응원 단추, 응원 중에는 남은 층
+      if (rt.tamSkTo !== to && (!rt.tamSkTo || to > rt.tamSkTo + 9)) tamToast(`전투 설정에서 ${fmt(to)}층까지 빠르게 넘길 수 있어요`); } rt.tamSkTo = to; }
+    const rv = $('#tmRevive'), cl = tamCheerLeft(); rv.hidden = !!practice || !(S.tam.cheer > 0 || (T && T.lose && cl > 0));   // 지면 응원 단추, 응원 중에는 남은 층
     rb(rv, 'ex4_ic_cheer', S.tam.cheer > 0 ? `응원 ${S.tam.cheer}층` : '응원', S.tam.cheer > 0 ? '' : `${cl}`, S.tam.cheer <= 0, S.tam.cheer > 0 ? `응원 ${S.tam.cheer}층 남음` : `광고 보고 응원 받기 힘 +${Math.round((TAM.cheer.mul - 1) * 100)}%, 오늘 ${cl}번 남음`); rv.classList.toggle('on', S.tam.cheer > 0);
     tamAcorn(true);
     const I = tamIdle(), rp = $('#tmRep'); rp.hidden = I.sec < 60; rp.textContent = `탐험 보고서 받기 (${Math.floor(I.sec / 60)}분)`;
+  }
+  function tamMapOpen() {
+    if (rt.modalOpen || rt.paused || tamSkBusy()) return;
+    const practice = rt.tam?.practice, hm = !practice && tamHOn(), cap = hm ? Infinity : tamCap(), floor = practice || Math.min(tamCurFl(), cap);
+    const best = hm ? S.tam.hb : S.tam.best, lap = tamLap(floor), interval = hm ? TAM.regLen : TAM.bossEvery;
+    const nextBoss = practice || Math.ceil((best + 1) / interval) * interval, R = tamReg(nextBoss), trial = tamTrialSpec(nextBoss, hm, false);
+    const goal = practice || nextBoss <= cap
+      ? `<small>${practice ? '연습 중인 보스' : hm ? '다음 심화 관문' : '다음 보스'} ${fmt(nextBoss)}층</small><b>${esc(R.boss)}</b><span>${trial ? esc(trial.hint) : `유리한 과목 ${AC.name[AB_KEY[TAM.adv[R.k]]]}`}</span>`
+      : `<small>이번 학기 ${fmt(cap)}층까지</small><b>${best >= cap ? '학기 목표를 달성했어요' : '다음 보스는 새 학기에 만나요'}</b><span>${best >= cap ? '일반 탐험 위쪽에서 심화 탐험을 고를 수 있어요' : '학기가 바뀌면 더 높은 층이 열려요'}</span>`;
+    const regions = TAM.reg.slice(0, tamRegN()).map((reg, i) => {
+      const start = (lap * tamRegN() + i) * TAM.regLen + 1, end = start + TAM.regLen - 1;
+      const current = start <= floor && floor <= end, art = tamBg(start);
+      const status = current ? `현재 ${fmt(floor)}층` : end <= best ? '통과' : start > cap ? '학기 상한 이후' : '앞으로';
+      return `<li${current ? ' aria-current="location"' : ''}>${art ? `<img src="${art}" alt="" loading="lazy">` : ''}
+        <span><small>${fmt(start)}–${fmt(end)}층</small><b>${esc(reg.nm)}</b><small>${AC.name[AB_KEY[TAM.adv[reg.k]]]} 유리</small></span><em>${status}</em></li>`;
+    }).join('');
+    const floors = Object.keys(TAM_TRIALS).map(Number).filter(f => f <= S.tam.best && tamTrialSpec(f, false, false));
+    const drills = !hm && floors.length ? `<details class="tm-practice-list"><summary>완료한 보스 연습</summary><p>현재 대원으로 대응을 연습해요. 연습은 최고층과 보상에 반영되지 않아요.</p>
+      ${floors.map(f => `<button class="btn-sub small" type="button" data-tam-practice="${f}"><b>${fmt(f)}층</b> ${esc(tamReg(f).nm)}</button>`).join('')}</details>` : '';
+    $('#tmMapBody').innerHTML = `<div class="tm-map-goal">${goal}</div>${drills}<p class="tm-map-label">${practice ? '보스 연습' : hm ? '심화 탐험' : '일반 탐험'}, ${fmt(lap + 1)}바퀴째</p><ol class="tm-map-regions">${regions}</ol>`;
+    $('#tmMapBody').scrollTop = 0;
+    sfx('tap'); openModal($('#mTamMap'));
+  }
+  function tamPractice(floor) {
+    const T = rt.tam;
+    if (!T || (!floor && !T.practice)) return;
+    if (floor && (rt.tab !== 'tam' || tamHOn() || floor > S.tam.best || !tamTrialSpec(floor, false, false))) return;
+    T.practice = floor; T.mod = null; T.ev = null; T.pend = 0;
+    $('#tmEv').hidden = true;
+    tamSkStop();
+    tamPh(T, 'walk');
+    if (rt.tab === 'tam') { tamRenderTop(); tamRenderBody(); }
   }
   // 강화 추천과 자동 편성
   const tamScore = s => s.atk * 6 / s.cd + s.hp / 4;
@@ -918,7 +1304,7 @@
         if (i >= slots) return `<div class="tm-slot lock"><span>🔒</span><small>${i === 3 ? '초등학교' : '중학교'}</small></div>`;
         if (!sp) return `<div class="tm-slot empty"><span>+</span></div>`;
         const s = tamStat(sp); return `<div class="tm-slot" style="--rc:${TM_RC[TAM.role[s.ri].k]}"><img src="${tamPcPic(sp)}" alt=""><em>Lv.${tamMem(sp).lv}</em><small>${esc(spName(sp))}</small></div>`; }).join('')}</div>`;
-      { const R0 = tamReg(tamCurFl()), ar = TAM.role[tamAdvRi()], cl = tamCollLv();
+      { const R0 = tamReg(rt.tam?.practice || tamCurFl()), ar = TAM.role[tamAdvRi()], cl = tamCollLv();
         h += `<div class="tm-tips"><p><b class="tm-role" style="--rc:${TM_RC[ar.k]}">${esc(ar.nm.split(' ')[0])}</b> ${esc(R0.nm)}에서 힘 +${Math.round(TAM.advG * 100)}%</p>` +
           `<p><b class="tm-role">모은 대원 효과</b> 대원 레벨 합 ${fmt(cl)} → 힘 +${(Math.min(TAM.collMax, 1 + TAM.collG * cl) * 100 - 100).toFixed(1)}%</p>` +
           `<p><b class="tm-role">학교 기지</b> 대원 훈련 ${isFinite(tamTrainCap()) ? `Lv.${fmt(tamTrainCap())}까지(교실)` : '상한 없음(교실 최고)'}${isFinite(tamCapBase()) ? `, 학기 상한 +${tamCapBonus()}층(건물)` : ''}</p></div>`; }
@@ -953,11 +1339,12 @@
       }).join('');
       setH(box, h);
     } else {
-      const R = tamReg(tamCurFl());
+      const R = tamReg(rt.tam?.practice || tamCurFl());
       setH(box, `<p class="tm-note">${R.nm}에서는 ${iga(TAM.mats[R.mat])} 많이 나와요</p><ul class="tm-mats">` + TAM.mats.map((n, i) => `<li${i === R.mat ? ' class="now"' : ''}>${tamMatIc(i, 34)}<b>${n}</b><em>${fmt(S.tam.mat[i])}</em></li>`).join('') + '</ul>');
     }
   }
   function tamOpen() {
+    tamControls(false);
     if (!FXL.st && wldLv() > 0) { FXL.touched = true; fxLoad(); }   // 엔진을 아직 안 받았으면 지금
     if (FXL.st === 'ok' && !FXT.st) fxTamInit();   // 탐험 효과층을 미리 준비
     if (FXL.st === 'ok' && !FXG.st) fxgInit();   // 오르는 길 바닥
@@ -996,16 +1383,31 @@
     S.tam.mat[c.m] -= c.n; S.tam.mat[3] -= c.star; S.tam.sg[i][k] += 1; return true;
   }
   function tamClick(e) {
+    if (!e.target.closest('.tm-controls')) tamControls(false);
     const b = e.target.closest('button'); if (!b || !tamOn()) return;
     if (b.dataset.tcap) { tamToast(`대원 훈련은 Lv.${fmt(tamTrainCap())}까지예요\n교실을 키우면 더 올릴 수 있어요`); return; }
     if (txClick(b)) return;
+    if (b.id === 'tmControls') { sfx('tap'); tamControls($('#tmActions').hidden); return; }
+    if (b.id === 'tmMapOpen') { tamMapOpen(); return; }
+    if (b.id === 'tmPracticeExit') { tamPractice(0); return; }
+    if (b.id === 'tmPracticeRetry') { tamPractice(rt.tam?.practice || 0); return; }
+    if (b.id === 'tmBrace') {
+      const F = rt.tam?.F;
+      if (tamBrace(F)) { sfx('tap'); tamWindPaint(F, $$('#tmP .tm-f'), $('#tmM .boss')); }
+      return;
+    }
+    if (b.dataset.tamSign) {
+      const F = rt.tam?.F;
+      if (tamWindAnswer(F, b.dataset.tamSign)) { tamDraw(F); F.ev.length = 0; }
+      return;
+    }
     if (b.getAttribute('aria-disabled') === 'true' && !(b.dataset.tlv && S.budget >= tamLvCost(b.dataset.tlv) && tamTrainOk(b.dataset.tlv))) { if (b.dataset.tlv) tamToast('도토리가 모자라요\n문방구에서 숲의 정수로 도토리를 살 수 있어요'); else if (b.dataset.tgear) tamToast('재료가 모자라요'); return; }
     if (b.dataset.tsk) { tamCast(+b.dataset.tsk); return; }
     if (b.dataset.tmm) { const v = +b.dataset.tmm; if ((v && !tamHOpen()) || (rt.tam && rt.tam.ph === 'event')) return; if ((S.tam.hm ? 1 : 0) === v) return; S.tam.hm = v; tamHSync(); sfx('tap'); save(); tamSkStop(); tamRestart(); tamRenderTop(); tamRenderBody(); musicSync(); return; }   // 심화 탐험
     if (b.id === 'tmExit') { sfx('tap'); setTab('school'); return; }
     if (b.id === 'tmShX') { sfx('tap'); $('#tmSheet').hidden = true; tamRenderBody(); return; }
     if (b.dataset.tnav) { const k = b.dataset.tnav; sfx('tap');
-      if (k === 'exp') { $('#tmSheet').hidden = true; txOpen(); return; }
+      if (k === 'exp') { tamPractice(0); $('#tmSheet').hidden = true; txOpen(); return; }
       if (k === 'rank') { rt.rankView = 'tam'; setTab('rank'); rt.backTab = 'tam'; return; }   // 닫으면 탐험으로
       if (k === 'rep') { tamReport(false); return; }
       const sh = $('#tmSheet'); if (!sh.hidden && rt.tamSeg === k) { sh.hidden = true; tamRenderBody(); return; }
