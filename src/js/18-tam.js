@@ -37,7 +37,12 @@
     // 심화 탐험(하드모드). 그 학기 상한을 넘으면 열려요. 1층 힘은 상한 층의 hG배, 층마다 hG배(일반은 g). 도토리 대신 재료와 별 조각(숫자는 제안)
     hG: 1.1, hMat: 1.5,
     // 필살기 세 박자. 모으기, 컷인, 큰 움직임(ms). '연출 건너뛰기'를 켜 두면 모으기와 컷인 없이 바로 큰 움직임
-    skCharge: 300, skCut: 900, skTail: 150, skFx: 0.75,   // 모으기 0.3초, 컷인 0.9초, 큰 움직임은 0.75배 빠르게, 끝난 뒤 바로 이어서
+    skCharge: 300, skCut: 900, skTail: 150, skFx: 0.75,
+    // 학교가 기지: 건물이 이번 학기 최고 레벨(facCap)에 얼마나 다가갔는지(0~1)로 탐험 효과가 커져요(숫자는 제안)
+    //   lv0, lvAdd: 교실. 대원 훈련 상한 = 기준 레벨 + lv0 + lvAdd × 교실 비율(학기 상한까지 장비 없이 드는 레벨은 기준 + 11~53). 교실이 최고 레벨이면 상한 없음
+    //   pe: 운동장, 체육 대원 힘과 체력 최대 +20% / cheer: 급식실, 응원이 이어지는 층 최대 +5 / idleH: 도서관, 탐험 보고서 최대 +4시간
+    //   gear: 과학실, 장비 재료 최대 -20% / cap: 건물 평균 비율 × 그 학교급 학기 폭(TAM_CAP.d)의 50%만큼 학기 상한이 더 열려요
+    base: { lv0: 20, lvAdd: 30, pe: 0.2, cheer: 5, idleH: 4, gear: 0.2, cap: 0.5 },   // 모으기 0.3초, 컷인 0.9초, 큰 움직임은 0.75배 빠르게, 끝난 뒤 바로 이어서
   };
   function freshTam() { return { best: 0, party: ['bear', 'rabbit', 'fox'], mem: {}, gear: { tool: 0, bag: 0, hat: 0 }, sg: [0, 1, 2, 3, 4].map(() => ({ tool: 0, bag: 0, hat: 0 })), mat: [0, 0, 0, 0], it: 0, auto: 0, ad: { day: '', spd: 0, rep: 0, rv: 0, ch: 0 }, cheer: 0, spd: { sec: 0 }, wk: { w: -1, best: 0 }, seen: 0, hm: 0, hb: 0, hc: 0, hw: { w: -1, best: 0 }, skSeen: 0, skOff: 0, ed: '' }; }
   function sanitizeTam(d, s) {
@@ -72,7 +77,7 @@
   const tamAutoOn = () => S.tam.best >= 2;   // 자동 쓰기 단추는 2층을 넘으면
   function tamStat(sp, slot) {
     const m = tamMem(sp), ri = tamRole(sp), r = TAM.role[ri], G = slot != null && S.tam.sg[slot] ? S.tam.sg[slot] : { tool: 0, bag: 0, hat: 0 };
-    const mul = Math.pow(TAM.lvG, m.lv - 1) * (1 + TAM.starG * (m.st - 1)) * (1 + TAM.acG * (acLv(AB_KEY[ri]) - 1)) * tamCollMul() * (tamAdvRi() === ri ? 1 + TAM.advG : 1) * rtTamMul();   // 연구 트리 탐험
+    const mul = Math.pow(TAM.lvG, m.lv - 1) * (1 + TAM.starG * (m.st - 1)) * (1 + TAM.acG * (acLv(AB_KEY[ri]) - 1)) * tamCollMul() * (tamAdvRi() === ri ? 1 + TAM.advG : 1) * rtTamMul() * (ri === 1 ? 1 + TAM.base.pe * tamFill('playground') : 1);   // 운동장: 체육 대원   // 연구 트리 탐험
     return { sp, ri, hp: TAM.pHp * r.hp * mul * (1 + TAM.gearPer * G.bag), atk: TAM.pAtk * r.atk * mul * (1 + TAM.gearPer * G.tool), cd: r.cd, gg: 1 + TAM.gearPer * G.hat };
   }
   // 지금 탐험하는 지역에서 유리한 과목, 모든 대원 레벨의 보유 효과
@@ -82,7 +87,7 @@
   const tamTeam = () => tamParty().map(sp => ({ sp, ri: tamRole(sp) })).sort((a, b) => TAM.front[a.ri] - TAM.front[b.ri]).map((x, i) => tamStat(x.sp, i));   // 앞줄부터 1번 칸
   const tamPow = () => Math.round(tamTeam().reduce((s, p) => s + p.atk * 6 / p.cd + p.hp / 4, 0));   // 화면에 보이는 '탐험대 힘'
   function tamMobs(fl, hm) {
-    const R = tamReg(fl), m = Math.min(1e250, hm ? Math.pow(TAM.g, Math.max(1, S.tam.hc || tamCap()) - 1 + tamStgFl()) * Math.pow(TAM.hG, fl) : Math.pow(TAM.g, fl - 1 + tamStgFl())), boss = fl % TAM.bossEvery === 0, out = [];
+    const R = tamReg(fl), m = Math.min(1e250, hm ? Math.pow(TAM.g, Math.max(1, S.tam.hc || tamCapBase()) - 1 + tamStgFl()) * Math.pow(TAM.hG, fl) : Math.pow(TAM.g, fl - 1 + tamStgFl())), boss = fl % TAM.bossEvery === 0, out = [];
     if (boss) out.push({ boss: 1, nm: R.boss, i: 0, hp: TAM.mHp * m * TAM.bossHp, atk: TAM.mAtk * m * TAM.bossAtk });
     if (boss) { for (let i = 0; i < 2; i++) { const j = (fl + i) % 3; out.push({ nm: R.mob[j], i: j, hp: TAM.mHp * m, atk: TAM.mAtk * m }); } return out; }
     // 10층 묶음 안에서 1~3층은 한 마리씩 다른 친구, 4~6층은 두 마리, 7~9층은 세 마리
@@ -158,7 +163,15 @@
   const tamStgFl = () => TAM_STG * tamStageAll();
   const tamStageIn = () => { const T = TIERS[S.tier], y = Math.min(yearNo(), T.years) - 1; return S.tier === 0 ? y : y * 2 + (S.sem ? 1 : 0); };   // 학교급 안에서 몇째 단계(유치원은 해마다, 그 밖에는 학기마다)
   const tamCapAt = (t, k) => { const C = TAM_CAP[Math.min(t, TAM_CAP.length - 1)]; return C.s + C.d * k; };
-  function tamCap() {
+  // 건물 비율: 이번 학기 최고 레벨에 얼마나 다가갔나(지을 수 없는 학교급이거나 아직 안 지었으면 0)
+  const tamFill = k => !S || !FAC[k] || (FAC[k].tier || 0) > S.tier || !(S.f[k] >= 1) ? 0 : Math.min(1, S.f[k] / Math.max(1, facCap()));
+  const TAM_BASE_KEYS = ['classroom', 'cafeteria', 'library', 'playground', 'science'];
+  const tamFillAvg = () => { const ks = TAM_BASE_KEYS.filter(k => (FAC[k].tier || 0) <= S.tier); return ks.reduce((s, k) => s + tamFill(k), 0) / Math.max(1, ks.length); };
+  // 건물로 더 열리는 학기 상한 층
+  const tamCapBonus = () => { const C = TAM_CAP[Math.min(S.tier, TAM_CAP.length - 1)]; return Math.round(C.d * TAM.base.cap * tamFillAvg()); };
+  // 학기 상한 = 학기로 정해지는 상한(tamCapBase) + 건물로 더 열리는 층. 심화 탐험과 레벨 값의 기준은 tamCapBase를 써서 건물을 올려도 심화가 세지지 않아요
+  const tamCap = () => { const c = tamCapBase(); return isFinite(c) ? c + tamCapBonus() : c; };
+  function tamCapBase() {
     if (!S || !S.tam) return Infinity;
     const k = tamStageIn(), T = TIERS[S.tier];
     if (S.tier >= TAM_CAP.length - 1 && k >= T.years * 2 - 1) return Infinity;   // 박사 8학기부터 끝없이(대학교 4학년 2학기는 이제 630층)
@@ -166,20 +179,23 @@
   }
   const tamCapped = () => S.tam.best >= tamCap();
   // 심화 탐험: 그 학기 상한에 닿으면 열려요
-  const tamHOpen = () => { if (!S || !S.tam) return false; const c = tamCap(); return isFinite(c) ? S.tam.best >= c : S.tam.hc > 0 && S.tam.best >= S.tam.hc; };   // 박사 8학기(일반 탐험이 끝없는 때)에는 마지막으로 있던 상한(hc)에 닿았는지로 봐요. 예전에는 심화 탐험이 닫히고 단추도 숨었어요
-  function tamHSync() { const c = tamCap(); if (isFinite(c) && S.tam.hc !== c) S.tam.hc = c; if (S.tam.hm && !tamHOpen()) S.tam.hm = 0; }   // 상한이 바뀌어도 심화 층은 그대로(세기는 새 상한에 맞춰 세져요)
+  const tamHOpen = () => { if (!S || !S.tam) return false; const c = tamCapBase(); return isFinite(c) ? S.tam.best >= c : S.tam.hc > 0 && S.tam.best >= S.tam.hc; };   // 박사 8학기(일반 탐험이 끝없는 때)에는 마지막으로 있던 상한(hc)에 닿았는지로 봐요. 예전에는 심화 탐험이 닫히고 단추도 숨었어요
+  function tamHSync() { const c = tamCapBase(); if (isFinite(c) && S.tam.hc !== c) S.tam.hc = c; if (S.tam.hm && !tamHOpen()) S.tam.hm = 0; }   // 상한이 바뀌어도 심화 층은 그대로(세기는 새 상한에 맞춰 세져요)
   const tamHOn = () => !!(S.tam.hm && tamHOpen());
   const tamCurFl = () => tamHOn() ? S.tam.hb + 1 : S.tam.best + 1;
   const tamFlTx = (fl, hm) => `${hm ? '심화 ' : ''}${fmt(fl)}층`;
   const tamCapMsg = () => `${fmt(tamCap())}층까지 왔어요!\n심화 탐험이 열렸어요`;
   const tamReach = () => S.tier >= 4 ? 36 : TAM_REACH;   // 대학교만 상한보다 36층 아래(숫자는 제안)
-  const tamLvRef = () => { const c = tamCap(), k = (isFinite(c) ? c : tamCapAt(S.tier, tamStageIn() - 1) + 30) + tamStgFl(); return Math.max(0, Math.round((k - tamReach() - 22) / 1.5)); };   // 학기마다 세지는 만큼 기준 레벨도. 편하게 가는 층(상한 - 24층)에 드는 레벨
+  const tamLvRef = () => { const c = tamCapBase(), k = (isFinite(c) ? c : tamCapAt(S.tier, tamStageIn() - 1) + 30) + tamStgFl(); return Math.max(0, Math.round((k - tamReach() - 22) / 1.5)); };   // 학기마다 세지는 만큼 기준 레벨도. 편하게 가는 층(상한 - 24층)에 드는 레벨
   const tamBaseRate = () => 30 * CFG.base * CFG.pace * incomeScale() * Math.pow(CFG.gradeMult, 2) * legacyMult() * (S.sem ? 1.2 : 1);   // 초당 기준 수업료(2학기는 1.2배)
   const tamAcorns = m => Math.max(10, nice(tamBaseRate() * 60 * tierMinutes(m)));
   // 한 번에 여러 레벨. n은 1, 10, 또는 Infinity(가진 도토리로 되는 만큼, 한 번에 500까지)
+  // 교실: 대원 훈련 상한. 교실이 이번 학기 최고 레벨이면 없어요. 이미 넘은 대원은 그대로 두고 더 올리지만 못해요
+  const tamTrainCap = () => { const f = tamFill('classroom'); return f >= 1 ? Infinity : tamLvRef() + TAM.base.lv0 + Math.round(TAM.base.lvAdd * f); };
+  const tamTrainOk = sp => tamMem(sp).lv < tamTrainCap();
   function tamLvPlan(sp, n) {   // 지금 도토리로 n레벨까지 몇 레벨, 얼마
-    const m = tamMem(sp), lv0 = m.lv, lim = Math.min(n, 500); let k = 0, sum = 0;
-    try { while (k < lim) { const c = tamLvCost(sp); if (sum + c > S.budget) break; sum += c; m.lv += 1; k++; } } finally { m.lv = lv0; }
+    const m = tamMem(sp), lv0 = m.lv, lim = Math.min(n, 500), tc = tamTrainCap(); let k = 0, sum = 0;
+    try { while (k < lim && m.lv < tc) { const c = tamLvCost(sp); if (sum + c > S.budget) break; sum += c; m.lv += 1; k++; } } finally { m.lv = lv0; }
     return { k, sum };
   }
   function tamLvBuy(sp, n) {
@@ -189,7 +205,7 @@
   // 출동 대원 고르게 올리기: 가장 싼 대원부터 하나씩, 도토리가 모자랄 때까지(한 번에 500까지)
   function tamLvAll() {
     const ps = tamParty(); let n = 0;
-    while (n < 500) { let best = null, bc = Infinity; for (const sp of ps) { const c = tamLvCost(sp); if (c < bc) { bc = c; best = sp; } } if (!best || bc > S.budget) break; S.budget -= bc; tamMem(best).lv += 1; n++; }
+    while (n < 500) { let best = null, bc = Infinity; for (const sp of ps) { if (!tamTrainOk(sp)) continue; const c = tamLvCost(sp); if (c < bc) { bc = c; best = sp; } } if (!best || bc > S.budget) break; S.budget -= bc; tamMem(best).lv += 1; n++; }
     return n;
   }
   // 고르게 올리기 전에 쓸 도토리와 결과를 미리 보여 줘요(도토리와 레벨은 그대로 두고 셈만 해요)
@@ -213,7 +229,9 @@
   /* 기준 레벨 아래는 1.13배씩 싸지되 기준 값의 1.13^-15(약 16%) 아래로는 안 내려가요
      기준 레벨부터는 한 레벨마다 1.18배씩(전에는 1.13배) 비싸져요(숫자는 제안) */
   const tamLvCost = sp => { const d = tamMem(sp).lv - 1 - tamLvRef(); return tamAcorns(TAM.lvMin * (d < 0 ? Math.pow(TAM.lvCost, Math.max(-15, d)) : Math.pow(TAM.lvUp, Math.min(200, d)))); };
-  const tamGearCost = (k, i) => { const L = S.tam.sg[i][k], G = TAM.gear.find(g => g.k === k); return { m: G.mat, n: 4 + 3 * L, star: L % 10 === 9 ? 3 * (1 + Math.floor(L / 10)) : 0 }; };
+  const tamCheerFl = () => TAM.cheer.fl + Math.round(TAM.base.cheer * tamFill('cafeteria'));   // 급식실: 응원이 이어지는 층
+  // 과학실을 키울수록 장비 재료가 덜 들어요
+  const tamGearCost = (k, i) => { const L = S.tam.sg[i][k], G = TAM.gear.find(g => g.k === k); return { m: G.mat, n: Math.max(1, Math.ceil((4 + 3 * L) * (1 - TAM.base.gear * tamFill('science')))), star: L % 10 === 9 ? 3 * (1 + Math.floor(L / 10)) : 0 }; };
   const tamGrade = L => Math.min(3, 1 + Math.floor(L / 10));
   const tamStarNeed = st => st >= 5 ? 0 : TAM.star[st] - TAM.star[st - 1];
   // 별 조각: 같은 동물을 학교에서 또 만나면(신입생, 교환학생 등)과 보물 상자
@@ -295,7 +313,7 @@
   // 자리 비운 동안의 탐험 보고서: 가장 깊은 층에서 계속 모아요(최대 12시간)
   function tamIdle() {
     if (!S.tam.it) S.tam.it = gameNow();
-    const sec = Math.min(TAM.idleMax + (rtLv('tam') >= 4 ? 7200 : 0), Math.max(0, (gameNow() - S.tam.it) / 1000)), b = Math.max(1, S.tam.best), R = tamReg(b), min = sec / 60;
+    const sec = Math.min(TAM.idleMax + Math.round(TAM.base.idleH * tamFill('library')) * 3600 + (rtLv('tam') >= 4 ? 7200 : 0), Math.max(0, (gameNow() - S.tam.it) / 1000)), b = Math.max(1, S.tam.best), R = tamReg(b), min = sec / 60;
     const main = Math.floor(min * (0.3 + b / 200)), side = Math.floor(main / 4), star = Math.floor(min / 30 * (1 + b / 100));
     return { sec, mat: [0, 1, 2, 3].map(i => i === 3 ? star : i === R.mat ? main : side), acorn: S.tam.best ? minAcorns(sec / 3600 * 3) : 0, mobs: Math.floor(min * 2) };
   }
@@ -332,9 +350,9 @@
   function tamAdRevive() {
     if (S.tam.cheer > 0) { tamToast(`응원이 아직 ${S.tam.cheer}층 남았어요`); return; }
     if (tamCheerLeft() <= 0) { tamToast(`응원은 하루 ${TAM.cheer.n}번까지예요`); return; }
-    showAd(() => { tamAdDay(); S.tam.ad.ch = (S.tam.ad.ch || 0) + 1; S.tam.ad.rv = (S.tam.ad.rv || 0) + 1; S.tam.cheer = TAM.cheer.fl; save();
+    showAd(() => { tamAdDay(); S.tam.ad.ch = (S.tam.ad.ch || 0) + 1; S.tam.ad.rv = (S.tam.ad.rv || 0) + 1; S.tam.cheer = tamCheerFl(); save();
       const T = rt.tam; if (T) { T.lose = 0; T.nLose = 0; if (T.ph === 'lose') T.t = TAM.ph.lose; else if (T.F && T.ph === 'fight') tamCheerNow(T.F); }
-      tamRenderTop(); tamToast(`응원을 받았어요!\n다음 ${TAM.cheer.fl}층 동안 힘과 체력 +${Math.round((TAM.cheer.mul - 1) * 100)}%`); }, r => { if (r !== 'noad') tamToast('광고를 끝까지 보지 않아서 보상이 없어요'); });
+      tamRenderTop(); tamToast(`응원을 받았어요!\n다음 ${tamCheerFl()}층 동안 힘과 체력 +${Math.round((TAM.cheer.mul - 1) * 100)}%`); }, r => { if (r !== 'noad') tamToast('광고를 끝까지 보지 않아서 보상이 없어요'); });
   }
   // 겨루는 중에 응원을 받으면 지금 대원도 바로 세져요
   function tamCheerNow(F) { const m = TAM.cheer.mul; F.P.forEach(p => { p.atk *= m; p.mx *= m; p.hp *= m; }); F.cheer = 1; }
@@ -867,7 +885,7 @@
   // 가장 이득이 큰 강화: 대원은 도토리 한 개당 힘, 장비는 지금 살 수 있는 것 가운데 힘이 가장 많이 느는 것
   function tamUpRec() {
     const p0 = tamPow(); let mem = null, gear = null;
-    for (const sp of tamAvail()) { const c = tamLvCost(sp), g = tamPowWith(() => { tamMem(sp).lv += 1; }) - p0; const v = g / Math.max(1, c); if (!mem || v > mem.v) mem = { sp, c, g, v }; }
+    for (const sp of tamAvail()) { if (!tamTrainOk(sp)) continue; const c = tamLvCost(sp), g = tamPowWith(() => { tamMem(sp).lv += 1; }) - p0; const v = g / Math.max(1, c); if (!mem || v > mem.v) mem = { sp, c, g, v }; }
     const nP = tamParty().length;
     for (let i = 0; i < nP; i++) for (const G of TAM.gear) { const c = tamGearCost(G.k, i); if (S.tam.mat[c.m] < c.n || S.tam.mat[3] < c.star) continue; const g = tamPowWith(() => { S.tam.sg[i][G.k] += 1; }) - p0; if (!gear || g > gear.g) gear = { k: G.k, i, g, c }; }
     return { mem, gear };
@@ -900,19 +918,20 @@
         const s = tamStat(sp); return `<div class="tm-slot" style="--rc:${TM_RC[TAM.role[s.ri].k]}"><img src="${tamPcPic(sp)}" alt=""><em>Lv.${tamMem(sp).lv}</em><small>${esc(spName(sp))}</small></div>`; }).join('')}</div>`;
       { const R0 = tamReg(tamCurFl()), ar = TAM.role[tamAdvRi()], cl = tamCollLv();
         h += `<div class="tm-tips"><p><b class="tm-role" style="--rc:${TM_RC[ar.k]}">${esc(ar.nm.split(' ')[0])}</b> ${esc(R0.nm)}에서 힘 +${Math.round(TAM.advG * 100)}%</p>` +
-          `<p><b class="tm-role">모은 대원 효과</b> 대원 레벨 합 ${fmt(cl)} → 힘 +${(Math.min(TAM.collMax, 1 + TAM.collG * cl) * 100 - 100).toFixed(1)}%</p></div>`; }
+          `<p><b class="tm-role">모은 대원 효과</b> 대원 레벨 합 ${fmt(cl)} → 힘 +${(Math.min(TAM.collMax, 1 + TAM.collG * cl) * 100 - 100).toFixed(1)}%</p>` +
+          `<p><b class="tm-role">학교 기지</b> 대원 훈련 ${isFinite(tamTrainCap()) ? `Lv.${fmt(tamTrainCap())}까지(교실)` : '상한 없음(교실 최고)'}${isFinite(tamCapBase()) ? `, 학기 상한 +${tamCapBonus()}층(건물)` : ''}</p></div>`; }
       { const gain = same ? 0 : tamAutoGain();   // 더 센 조합이 있으면 단추를 반짝이고 늘어나는 힘을 보여 줘요
         h += `<div class="tm-prow"><span>대원 ${party.length}/${slots}명</span><button type="button" class="btn-sub small${gain ? ' tm-auto-hot' : ''}" data-tauto="1"${same ? ' aria-disabled="true"' : ''}>${same ? '가장 좋은 조합이에요' : gain ? `더 센 조합 있어요 <b>힘 +${fmt(gain)}</b>` : '자동 편성'}</button></div>`; }
-      { const lvN = rt.tamLvN || 1, allC = Math.min(...party.map(tamLvCost));   // 한 번에 올리기
+      { const lvN = rt.tamLvN || 1, allC = Math.min(...party.filter(tamTrainOk).map(tamLvCost));   // 한 번에 올리기(교실 훈련 상한에 닿은 대원은 빼고)
         h += `<div class="tm-lvrow"><span class="tm-lvn" role="group" aria-label="한 번에 올릴 레벨">한 번에${[[1, '1'], [10, '10'], [Infinity, '최대']].map(([v, t]) => `<button type="button" data-tlvn="${v === Infinity ? 'max' : v}" aria-pressed="${lvN === v}">${t}</button>`).join('')}</span>` +
           `<button type="button" class="cta small" data-tlvall="1"${party.length && S.budget >= allC ? '' : ' aria-disabled="true"'}>고르게 올리기</button></div>`; }
       h += tamAvail().slice().sort((a, b) => (party.includes(b) - party.includes(a)) || (tamScore(tamStat(b)) - tamScore(tamStat(a)))).map(sp => {
         const m = tamMem(sp), on = party.includes(sp), s = tamStat(sp), r = TAM.role[s.ri], best = R && R.sp === sp, sug = !on && auto.includes(sp);
-        const lvN = rt.tamLvN || 1, P = lvN > 1 ? tamLvPlan(sp, lvN) : null, c = P && P.k ? P.sum : tamLvCost(sp), can = S.budget >= c;   // 한 번에 여러 레벨
+        const lvN = rt.tamLvN || 1, P = lvN > 1 ? tamLvPlan(sp, lvN) : null, c = P && P.k ? P.sum : tamLvCost(sp), tOk = tamTrainOk(sp), can = tOk && S.budget >= c;   // 한 번에 여러 레벨. tOk: 교실 훈련 상한 아래
         const st = tamStarOn() ? `<span class="tm-st">${'★'.repeat(m.st)}<i>${'★'.repeat(5 - m.st)}</i></span>${m.st < 5 ? `<small class="tm-sh">별 조각 ${m.sh}/${tamStarNeed(m.st + 1)}</small>` : ''}` : '';
         return `<div class="tm-mem${on ? ' on' : ''}${best ? ' best' : ''}"><span class="tm-face" style="--rc:${TM_RC[r.k]}"><img src="${tamPcPic(sp)}" alt="">${on ? '<i>출동</i>' : ''}</span>` +
           `<div class="tm-mtx"><b>${esc(spName(sp))}<em>Lv.${m.lv}</em>${sug ? '<u>추천</u>' : ''}${s.ri === tamAdvRi() ? '<u class="adv">유리</u>' : ''}</b><span class="tm-role" style="--rc:${TM_RC[r.k]}">${r.nm}</span><small>힘 ${fmt(Math.round(s.atk))}  체력 ${fmt(Math.round(s.hp))}</small>${st}</div>` +
-          `<div class="tm-mbt"><button type="button" class="cta small" data-tlv="${sp}"${can ? '' : ' aria-disabled="true"'}>${P && P.k > 1 ? `<i class="tm-lvk">+${P.k}</i>` : ''}${acornIcon()}${fmt(c)}</button><button type="button" class="btn-sub small" data-tpick="${sp}">${on ? '빼기' : '편성'}</button></div></div>`;
+          `<div class="tm-mbt">${tOk ? `<button type="button" class="cta small" data-tlv="${sp}"${can ? '' : ' aria-disabled="true"'}>${P && P.k > 1 ? `<i class="tm-lvk">+${P.k}</i>` : ''}${acornIcon()}${fmt(c)}</button>` : `<button type="button" class="cta small" data-tcap="1" aria-disabled="true">교실 키우기</button>`}<button type="button" class="btn-sub small" data-tpick="${sp}">${on ? '빼기' : '편성'}</button></div></div>`;
       }).join('');
       setH(box, h);
     } else if (seg === 'gear') {
@@ -976,7 +995,8 @@
   }
   function tamClick(e) {
     const b = e.target.closest('button'); if (!b || !tamOn()) return;
-    if (b.getAttribute('aria-disabled') === 'true' && !(b.dataset.tlv && S.budget >= tamLvCost(b.dataset.tlv))) { if (b.dataset.tlv) tamToast('도토리가 모자라요\n문방구에서 숲의 정수로 도토리를 살 수 있어요'); else if (b.dataset.tgear) tamToast('재료가 모자라요'); return; }
+    if (b.dataset.tcap) { tamToast(`대원 훈련은 Lv.${fmt(tamTrainCap())}까지예요\n교실을 키우면 더 올릴 수 있어요`); return; }
+    if (b.getAttribute('aria-disabled') === 'true' && !(b.dataset.tlv && S.budget >= tamLvCost(b.dataset.tlv) && tamTrainOk(b.dataset.tlv))) { if (b.dataset.tlv) tamToast('도토리가 모자라요\n문방구에서 숲의 정수로 도토리를 살 수 있어요'); else if (b.dataset.tgear) tamToast('재료가 모자라요'); return; }
     if (b.dataset.tsk) { tamCast(+b.dataset.tsk); return; }
     if (b.dataset.tmm) { const v = +b.dataset.tmm; if ((v && !tamHOpen()) || (rt.tam && rt.tam.ph === 'event')) return; if ((S.tam.hm ? 1 : 0) === v) return; S.tam.hm = v; tamHSync(); sfx('tap'); save(); tamSkStop(); tamRestart(); tamRenderTop(); tamRenderBody(); musicSync(); return; }   // 심화 탐험
     if (b.id === 'tmExit') { sfx('tap'); setTab('school'); return; }

@@ -45,6 +45,20 @@
   }
   // 기다릴 시간 어림: 1시간 안은 분, 이틀 안은 시간, 그 뒤는 날
   const etaTx = sec => sec < 3600 ? `약 ${Math.max(1, Math.ceil(sec / 60))}분` : sec < 48 * 3600 ? `약 ${Math.round(sec / 3600)}시간` : `약 ${fmt(Math.round(sec / 86400))}일`;
+  /* 건물 창 '탐험에서' 한 줄: 이번 학기 최고 레벨에 가까울수록 탐험 효과가 커져요(18-tam.js TAM.base) */
+  function sheetTam(k) {
+    const el = $('#sheetTam'); if (!el) return;
+    const on = typeof tamOn === 'function' && tamOn() && TAM_BASE_KEYS.includes(k) && (FAC[k].tier || 0) <= S.tier;
+    el.hidden = !on; if (!on) return;
+    const f = tamFill(k), B = TAM.base, pc = v => Math.round(v * 100);
+    const tx = k === 'classroom' ? (isFinite(tamTrainCap()) ? `대원 훈련 Lv.${fmt(tamTrainCap())}까지. 이번 학기 최고 레벨이면 상한이 없어져요` : '대원 훈련 상한 없음')
+      : k === 'playground' ? `체육 대원 힘과 체력 +${pc(B.pe * f)}% (최고 레벨이면 +${pc(B.pe)}%)`
+      : k === 'cafeteria' ? `응원이 ${tamCheerFl()}층 동안 이어져요 (최고 레벨이면 ${TAM.cheer.fl + B.cheer}층)`
+      : k === 'library' ? `탐험 보고서를 ${Math.round(TAM.idleMax / 3600) + Math.round(B.idleH * f)}시간까지 모아요 (최고 레벨이면 ${Math.round(TAM.idleMax / 3600) + B.idleH}시간)`
+      : `장비 재료 -${pc(B.gear * f)}% (최고 레벨이면 -${pc(B.gear)}%)`;
+    const ic = IMG('ic_tab_ex');
+    setH(el, `${ic ? `<img src="${ic}" alt="" aria-hidden="true">` : ''}<span><b>탐험에서</b> ${esc(tx)}</span>`);
+  }
   function renderSheet0() {
     const k = rt.sheetKey; if (!k) return;
     const F = FAC[k], L = S.f[k], c = facCost(k), fr = furReady(k), ok = fr && S.budget >= c, cap = facCap(), maxed = facMaxed(k);
@@ -63,6 +77,7 @@
     setT($('#sheetCost'), maxed ? '-' : fmt(c));
     $('#sheetBuy').setAttribute('aria-disabled', ok ? 'false' : 'true');
     $('#sheetBuy').classList.toggle('is-rec', !!rt.rec && rt.rec.kind === 'fac' && rt.rec.k === k && !maxed);
+    sheetTam(k);   // 탐험에서 하는 일
     conSheet();   // 공사 중이면 공사 칸
     frSheet(k);   // 여기 있는 친구, 생일 잔치
     // 이 시설이 지금 퀘스트 목표라면 시트 안에서도 알려 줘요

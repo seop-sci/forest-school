@@ -39,7 +39,7 @@ async def main():
         await page.evaluate(f"{F}.S.tam.best = 0")   # 4.3.1 유치원 상한(10층) 밑으로 돌려서 아래 흐름을 봐요
         ok(0 < r['da'] < 1e15 and all(0 < v < 1e6 for v in r['mat']), '도토리와 재료가 유한하고 알맞아요')
         # 자리 비운 보고서: 12시간까지만
-        r = await page.evaluate(f"""(()=>{{ const F={F}, S=F.S; S.tam.it = Date.now() - 30*3600e3; const a=F.tamIdle(); S.tam.it = Date.now() - 3600e3; const h=F.tamIdle();
+        r = await page.evaluate(f"""(()=>{{ const F={F}, S=F.S; S.f.library = 0; S.tam.it = Date.now() - 30*3600e3; const a=F.tamIdle(); S.tam.it = Date.now() - 3600e3; const h=F.tamIdle();
           const m0=S.tam.mat.slice(); const c=F.tamCollect(1); return {{ a: a.sec, h: h.sec, hm: h.mat, got: S.tam.mat.map((v,i)=>v-m0[i]), c: !!c, fin: [...a.mat, a.acorn].every(Number.isFinite) }}; }})()""")
         print('보고서', r)
         ok(r['a'] == 12 * 3600, '보고서는 12시간까지 쌓여요'); ok(r['c'] and r['got'] == r['hm'], '받은 만큼 재료가 늘어요'); ok(r['fin'], '보고서 값이 유한해요')
