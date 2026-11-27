@@ -4,12 +4,13 @@
 <style>
 #expeditionPreview {position:fixed;inset:0;z-index:2147483647;display:grid;place-items:center;padding:20px;background:#24372bae}
 #expeditionPreview[hidden] {display:none}
-#expeditionPreview section {width:min(100%,350px);box-sizing:border-box;padding:24px;border:1px solid #c6a16b;border-radius:18px;color:#28392c;background:#fffae9;box-shadow:0 14px 50px #1f30243d}
+#expeditionPreview section {width:min(100%,350px);max-height:calc(100dvh - 40px);overflow:auto;box-sizing:border-box;padding:20px;border:1px solid #c6a16b;border-radius:18px;color:#28392c;background:#fffae9;box-shadow:0 14px 50px #1f30243d}
 #expeditionPreview h1 {font-size:23px;margin:0 0 12px}
 #expeditionPreview p {font-size:14px;line-height:1.55;margin:8px 0 15px}
 #expeditionPreview button {min-height:46px;width:100%;border:0;border-radius:11px;background:#315b43;color:white;font-size:16px;font-weight:700;cursor:pointer}
-#expeditionPreview #expeditionBoss {margin-top:8px;background:#f3e9d2;color:#284432}
-#expeditionPreview label {display:grid;gap:4px;margin-top:15px;font-size:13px;font-weight:700}
+#expeditionPreview #expeditionBoss {margin-top:8px}
+#expeditionPreview #expeditionQuests {margin:0 0 8px;background:#f3e9d2;color:#284432}
+#expeditionPreview label {display:grid;gap:4px;margin-top:9px;font-size:13px;font-weight:700}
 #expeditionPreview select {min-height:44px;padding:8px 10px;border:1px solid #b9ac91;border-radius:9px;background:#fffdf4;color:#284432;font:inherit}
 </style>
 <meta charset="utf-8">
@@ -724,16 +725,24 @@ label.srow,button.srow{cursor:pointer}
 #panelTam .tm-tower{top:calc(var(--x4t) + var(--x4d,0px) + 148px);left:22%;right:22%}
 #panelTam .tm-bossbar{top:calc(var(--x4t) + var(--x4d,0px) + 160px)}   /* 진행 막대(140) 아래 */   /* 최고층 줄과 겹치지 않게 그 아래로 */
 #panelTam:has(#tmBossBar:not([hidden])) .tm-pow{top:calc(100% + 64px)}
-#panelTam:has(#tmBossBar:not([hidden])) .tm-acts{top:calc(var(--x4t) + var(--x4d,0px) + 208px)}
+#panelTam:has(#tmBossBar:not([hidden])) .tm-controls{top:calc(var(--x4t) + var(--x4d,0px) + 208px)}
 #panelTam .tm-time{top:calc(var(--x4t) + var(--x4d,0px) + 196px);left:24%;right:24%;height:4px}
 /* 첫 해바라기: 발밑 경고와 필살기 사이에 같은 색으로 남은 시간을 보여 줘요. */
-.tm-wind{position:absolute;left:50%;bottom:calc(var(--sab,0px) + 173px);z-index:10;transform:translateX(-50%);width:max-content;max-width:calc(100% - 32px);padding:8px 16px 9px;border:2px solid #FFD383;border-radius:14px;background:#31372D;color:#FFF7DE;box-shadow:0 5px 14px #33251280;text-align:center;pointer-events:none}
+.tm-wind{--tell:#FFD383;position:absolute;left:50%;bottom:calc(var(--sab,0px) + 173px);z-index:10;transform:translateX(-50%);width:max-content;max-width:calc(100% - 32px);padding:8px 16px 9px;border:2px solid var(--tell);border-radius:14px;background:#31372D;color:#FFF7DE;box-shadow:0 5px 14px #33251280;text-align:center;pointer-events:none}
+.tm-wind[data-trial="spore"]{--tell:#D6B2FF;background:#393046}
+.tm-wind[data-trial="wave"]{--tell:#9AE5FF;background:#153C4C}
 .tm-wind b,.tm-wind span{display:block;line-height:1.25}
 .tm-wind b{font-family:var(--font-display);font-size:17px}
 .tm-wind span{font-size:12px;margin:2px 0 7px}
 .tm-wind i{display:block;height:4px;border-radius:6px;background:#776749;overflow:hidden}
-.tm-wind i::before{content:"";display:block;height:100%;background:#FFD383;transform:scaleX(var(--wind-left,1));transform-origin:left}
+.tm-wind i::before{content:"";display:block;height:100%;background:var(--tell);transform:scaleX(var(--wind-left,1));transform-origin:left}
+.tm-brace{display:block;width:100%;min-height:44px;margin-top:7px;border:0;border-radius:8px;background:var(--tell);color:#173440;font-weight:800;pointer-events:auto;cursor:pointer}
+.tm-brace:disabled{opacity:.68;cursor:default}
 .tm-f.wind-target::after{content:"";position:absolute;inset:auto 5% 0;height:18%;z-index:-1;border:2px dashed #5A2B0E;border-radius:50%;background:#FFCE6C99;box-shadow:0 0 0 3px #FFF1C0}
+.tm-stage[data-reg="garden"] .tm-f.wind-target::after{border-color:#462963;background:#CF92F499;box-shadow:0 0 0 3px #D6B2FF}
+.tm-stage[data-reg="pond"] .tm-f.wind-target::after{border-color:#1B5466;background:#83DAFA99;box-shadow:0 0 0 3px #9AE5FF}
+.tm-stage[data-reg="pond"] .tm-f.wind-guarded::after{border-style:solid;background:#BCFFD8bb;box-shadow:0 0 0 3px #CDFFE2}
+.tm-fxl .tm-shot.tm-wave-impact{width:64%;filter:hue-rotate(145deg) saturate(.75) drop-shadow(0 0 7px #BBF3FF)}
 .tm-stage.boss-first .tm-body{position:relative}
 .tm-stage.boss-first .tm-mob.boss .tm-body{animation:none;transition:transform .28s cubic-bezier(.22,.61,.36,1)}
 .tm-mob.wind-up .tm-body{transform:translate(5%,3%) rotate(9deg) scale(1.05,.94)}
@@ -777,21 +786,18 @@ html.ait #panelTam .tm-bar .tm-ac{grid-column:auto;position:absolute;right:10px;
 #panelTam .tm-best{font-size:11px;pointer-events:auto;white-space:nowrap}   /* 한 줄로(두 줄이 되면 아래 막대를 가려요) */
 #panelTam .tm-best .tm-cap{display:inline;margin:0 0 0 2px;padding-left:7px;border-left:1.5px solid rgba(120,60,10,.35);color:#9A3F06;font-size:11px;font-weight:800;opacity:1}   /* 흰 글자가 안 보여서 */
 #panelTam .tm-pow{position:absolute;left:10px;top:calc(100% + 38px);transform:scale(.88);transform-origin:left top;white-space:nowrap}
-#panelTam .tm-acts{position:absolute;right:8px;top:calc(var(--x4t) + var(--x4d,0px) + 176px);z-index:12;margin:0;flex-direction:column;flex-wrap:nowrap;gap:14px}
-#panelTam .tm-acts button{position:relative;width:56px;height:56px;min-height:0;border:0;border-radius:50%;padding:0;background:var(--x4-btn,#C98A4B) center/100% 100% no-repeat;box-shadow:none;display:grid;place-items:center;color:#fff;font-size:0}
+#panelTam .tm-controls{position:absolute;right:10px;top:calc(var(--x4t) + var(--x4d,0px) + 176px);z-index:12;display:grid;justify-items:end;max-width:calc(100% - 20px)}
+.tm-controls-toggle{min-height:44px;padding:5px 9px;border:1px solid #FFF0C0;border-radius:10px;background:#2F3D32e8;color:#FFF8E1;font-size:12px;font-weight:700;cursor:pointer}
+#panelTam .tm-acts{display:grid;justify-items:stretch;gap:5px;min-width:142px;margin:5px 0 0;padding:6px;border:1px solid #FFF0C0;border-radius:12px;background:#2F3D32;box-shadow:0 6px 18px #151e16aa}
+#panelTam .tm-acts button{position:relative;display:flex;align-items:center;gap:6px;width:auto;min-height:44px;border:0;border-radius:8px;padding:4px 6px;background:#435446;color:#FFF8E1;box-shadow:none;text-align:left}
 #panelTam .tm-acts button[hidden],#panelTam #tmRep{display:none}
-#panelTam .tm-acts button{box-shadow:0 0 0 2.5px #FFF3C9,0 4px 8px rgba(40,20,0,.45)}
 #panelTam .tm-acts button:not(.on):not([aria-pressed="true"]) img{filter:saturate(.75)}
-#panelTam .tm-acts button.on,#panelTam .tm-acts button[aria-pressed="true"]{background-image:var(--x4-btnon,none);box-shadow:0 0 0 3px #FFD54A,0 0 12px 2px rgba(255,214,90,.9),0 4px 8px rgba(40,20,0,.45)}
-#panelTam .tm-acts button.on small,#panelTam .tm-acts button[aria-pressed="true"] small{background:#C2410C;color:#fff}   /* 오른쪽 단추가 잘 보이게, 켜진 단추는 금빛 테두리 */
-#panelTam .tm-acts img{width:56%;height:56%;object-fit:contain;pointer-events:none}
-#panelTam .tm-acts small{position:absolute;left:50%;bottom:-11px;transform:translateX(-50%);white-space:nowrap;padding:0 8px;border-radius:9px;background:#4A2A10;color:#FFF3C9;font-size:12px;font-weight:800;line-height:19px;box-shadow:0 0 0 1.5px #FFE7A8,0 2px 4px rgba(0,0,0,.35)}
-#panelTam .tm-acts em{position:absolute;right:-4px;top:-4px;font-style:normal;font-size:10px;font-weight:800;color:#fff;background:#E2532F;border-radius:8px;padding:0 4px;line-height:15px}
-#panelTam .tm-acts .tm-skip{animation:tmSkipP 1.4s ease-in-out infinite}@keyframes tmSkipP{50%{box-shadow:0 0 0 3px #7CE38B,0 0 14px 3px rgba(124,227,139,.9),0 4px 8px rgba(40,20,0,.45)}}
-#panelTam .tm-acts .tm-skip em{background:#2F8F46;right:-10px}
-@media (prefers-reduced-motion:reduce){#panelTam .tm-acts .tm-skip{animation:none}}
-#panelTam .tm-acts{transition:opacity .15s}#panelTam.tm-cutting .tm-acts{opacity:0;pointer-events:none}
-#panelTam .tm-acts .tm-adb{position:absolute;left:-4px;top:-4px;width:22px;height:22px}
+#panelTam .tm-acts button.on,#panelTam .tm-acts button[aria-pressed="true"]{box-shadow:inset 0 0 0 1.5px #FFD54A;background:#50674C}
+#panelTam .tm-acts img{width:24px;height:24px;object-fit:contain;pointer-events:none}
+#panelTam .tm-acts small{font-size:12px;font-weight:700;white-space:nowrap}
+#panelTam .tm-acts em{margin-left:auto;padding:0 4px;border-radius:5px;background:#702F22;color:white;font-size:10px;font-style:normal;white-space:nowrap}
+#panelTam.tm-cutting .tm-controls{visibility:hidden;pointer-events:none}
+#panelTam .tm-acts .tm-adb{position:absolute;left:0;top:1px;width:13px;height:13px}
 #panelTam .tm-sks{position:absolute;left:0;right:0;bottom:calc(var(--sab,0px) + 92px);z-index:12;margin:0;gap:8px}
 #panelTam .tm-sk{width:56px;height:56px}
 #panelTam .tm-sk::after{content:"";position:absolute;inset:-7px;background:var(--x4-skf,none) center/100% 100% no-repeat;pointer-events:none}
@@ -1165,7 +1171,8 @@ body.early .tab .dot,body.early #plChip{display:none!important}   /* F-16 처음
 .quest.ready .q-act{gap:6px;padding:5px 12px;border-radius:999px;background:var(--accent);color:var(--accent-ink);box-shadow:0 3px 0 var(--accent-shadow)}
 .quest.ready .q-get{display:inline}
 .quest.ready .q-rew{color:var(--accent-ink)}
-.quest.ready .q-chev,.quest.ready .q-cnt{display:none}
+.quest.ready .q-go-home,.quest.ready .q-cnt{display:none}
+.q-go-home{padding:4px 7px;border-radius:8px;background:var(--chip-bg);color:var(--chip-ink);font-size:11.5px;font-weight:700;white-space:nowrap}
 .quest.ready .q-bar i{background:var(--accent)}
 .quest.finished .q-rew{display:none}
 /* 퀘스트 쪽지 아래 학생 부탁: 다 들어주면 노랗게 '받기'가 돼요 */
@@ -1277,6 +1284,14 @@ body.early .tab .dot,body.early #plChip{display:none!important}   /* F-16 처음
 .qsec{display:flex;align-items:baseline;flex-wrap:wrap;gap:2px 8px;margin:6px 0 10px;font-family:var(--font-display);font-weight:400;font-size:18px}
 .qsec small{font-family:var(--font-body);font-size:13px;color:var(--muted)}
 .qsec.second{margin-top:24px}
+.q-switch{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:5px;margin:6px 0 12px;padding:4px;border:1px solid var(--line);border-radius:14px;background:var(--card)}
+.q-switch button{display:flex;justify-content:center;align-items:center;gap:4px;min-height:44px;padding:4px 3px;border:1px solid transparent;border-radius:10px;background:transparent;color:var(--ink);font-family:var(--font-display);font-size:14px;white-space:nowrap;cursor:pointer}
+.q-switch button[aria-pressed="true"]{background:var(--paper);border-color:var(--line);box-shadow:0 2px 4px #15170d13}
+.q-switch button span{padding:2px 4px;border-radius:5px;background:var(--accent);color:var(--accent-ink);font-family:var(--font-body);font-size:9px}
+#qViewMain .qs.cur .qcard{border:1px solid var(--line);border-radius:12px;padding:12px;background:var(--paper)}
+#qViewMain .qgoal{margin-top:9px}
+#qViewMain .qsay{margin:12px 0 0;padding-top:8px;border-top:1px solid var(--line)}
+#qViewMain .nb-btn{margin-top:12px}
 .chapter{padding:12px;border-radius:16px;background:var(--card)}
 .ch-head{display:flex;align-items:center;gap:8px;margin-bottom:10px}
 .ch-no{flex:none;padding:0 10px;border-radius:999px;background:var(--board);color:var(--chalk);font-family:var(--font-chalk);font-weight:700;font-size:16px;line-height:1.5}
@@ -1323,7 +1338,6 @@ body.early .tab .dot,body.early #plChip{display:none!important}   /* F-16 처음
 .fly{position:fixed;z-index:60;width:18px;height:22px;pointer-events:none}
 .fly svg{display:block;width:18px;height:22px}
 #vBudget{transform-origin:left center}
-.q-chev{flex:none;width:16px;height:16px}
 .ric{display:inline-flex}
 .qfoot .cta{width:auto;min-height:42px;margin-left:auto;padding:0 18px;font-size:16px}
 .mk svg{width:13px;height:13px}
@@ -4302,7 +4316,7 @@ body.mg-on .toast[hidden]{display:none}
       <span class="q-top"><span class="q-no" id="qbNo">메인 1-1</span><b id="qbTitle">책상 고치기</b><span class="q-cnt" id="qbCnt">Lv.0/1</span></span>
       <span class="q-how" id="qbHow">교실을 눌러서 책상을 올려요</span>
     </span>
-    <span class="q-act"><span class="q-get">받기</span><span class="q-rlab">보상</span><span class="q-rew"><span class="ric" id="qbRewIc"></span><span id="qbRew">30</span><span class="ric qb-gold" id="qbGold" hidden></span></span><svg class="q-chev" viewBox="0 0 24 24" aria-hidden="true"><path d="M9 6l6 6-6 6" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"/></svg></span>
+    <span class="q-act"><span class="q-get">받기</span><span class="q-rlab">보상</span><span class="q-rew"><span class="ric" id="qbRewIc"></span><span id="qbRew">30</span><span class="ric qb-gold" id="qbGold" hidden></span></span><span class="q-go-home">바로 가기</span></span>
     <span class="q-bar" aria-hidden="true"><i id="qbFill"></i></span>
   </button>
   </div>
@@ -4549,14 +4563,22 @@ body.mg-on .toast[hidden]{display:none}
     <section class="panel" id="panelQuests" hidden aria-labelledby="ttlQuests">
       <button class="panel-x" type="button" aria-label="홈으로"><svg viewBox="0 0 24 24" width="18" height="18" aria-hidden="true"><path d="M6 6l12 12M18 6L6 18" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round"/></svg></button>
       <h2 id="ttlQuests" class="ph"><span class="tic" data-ic="ic_cert" aria-hidden="true"></span><span>퀘스트</span></h2>
-      <h3 class="qsec">미션 <small>미션 포인트로 상자를 열어요</small></h3>
-      <div class="dms" id="qDaily"></div>
-      <h3 class="qsec second">메인 퀘스트 <small id="qsecVp">교감 선생님의 안내</small></h3>
-      <button class="nb-btn" id="sbBtn" type="button"><span id="sbBtnIc" aria-hidden="true"></span>이야기 수첩</button>
-      <div id="qMain"></div>
-      <h3 class="qsec second">학생들의 부탁</h3>
-      <div class="reqs" id="qSubs"></div>
-      <p class="qtally" id="qTally"></p>
+      <nav class="q-switch" aria-label="퀘스트 종류">
+        <button type="button" data-q-view="main" aria-pressed="true" aria-controls="qViewMain">메인<span id="qMainMark" hidden>받기</span></button>
+        <button type="button" data-q-view="subs" aria-pressed="false" aria-controls="qViewSubs">학생 부탁<span id="qSubsMark" hidden>받기</span></button>
+        <button type="button" data-q-view="daily" aria-pressed="false" aria-controls="qViewDaily">미션<span id="qDailyMark" hidden>받기</span></button>
+      </nav>
+      <div id="qViewMain" data-q-pane="main">
+        <div id="qMain"></div>
+        <button class="nb-btn" id="sbBtn" type="button"><span id="sbBtnIc" aria-hidden="true"></span>이야기 수첩</button>
+      </div>
+      <div id="qViewSubs" data-q-pane="subs" hidden>
+        <div class="reqs" id="qSubs"></div>
+        <p class="qtally" id="qTally"></p>
+      </div>
+      <div id="qViewDaily" data-q-pane="daily" hidden>
+        <div class="dms" id="qDaily"></div>
+      </div>
     </section>
 
     <section class="panel" id="panelTeachers" hidden aria-labelledby="ttlTeachers">
@@ -4582,8 +4604,9 @@ body.mg-on .toast[hidden]{display:none}
         <div class="tm-flbig" id="tmFlBig" aria-hidden="true"></div>
         <div class="tm-bossbar" id="tmBossBar" hidden><span></span><i><b></b></i></div>
         <div class="tm-wind" id="tmWind" hidden>
-          <div role="status"><b>꽃바람이 와요!</b><span>필살기로 앞줄을 지켜요</span></div>
+          <div role="status"><b id="tmWindTitle">꽃바람이 와요!</b><span id="tmWindHint">필살기로 앞줄을 지켜요</span></div>
           <i aria-hidden="true"></i>
+          <button class="tm-brace" type="button" id="tmBrace" hidden>몸 낮추기</button>
         </div>
         <div class="tm-cut" id="tmCut" hidden></div>
         <div class="tm-ev" id="tmEv" hidden></div>
@@ -4595,7 +4618,9 @@ body.mg-on .toast[hidden]{display:none}
       </div>
       <div class="tm-bar"><button type="button" class="tm-rb tm-back" id="tmExit" aria-label="학교로 돌아가기"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M15 4.5 7.5 12l7.5 7.5"/></svg></button><div class="tm-mode" id="tmMode" role="group" aria-label="탐험 고르기" hidden><button type="button" data-tmm="0" aria-pressed="true">일반 탐험</button><button type="button" data-tmm="1" aria-pressed="false">심화 탐험</button></div><div class="tm-ac" id="tmAc" aria-label="가진 도토리"><b id="tmAcN">0</b></div></div>
       <div class="tm-top"><div class="tm-where"><b id="tmFl">1층</b><span id="tmReg"></span><b class="tm-best" id="tmBest"></b></div><span class="tm-pow" id="tmPow"></span></div>
-      <div class="tm-acts"><button type="button" class="btn-sub small" id="tmSpd"></button><button type="button" class="btn-sub small" id="tmAuto" aria-pressed="false" hidden></button><button type="button" class="btn-sub small" id="tmSkOff" aria-pressed="false" hidden></button><button type="button" class="btn-sub small tm-skip" id="tmSkip" hidden></button><button type="button" class="cta small" id="tmRevive" hidden>📺 응원 받기</button><button type="button" class="btn-sub small" id="tmRep" hidden></button></div>
+      <div class="tm-controls"><button class="tm-controls-toggle" type="button" id="tmControls" aria-controls="tmActions" aria-expanded="false">전투 설정</button>
+        <div class="tm-acts" id="tmActions" role="group" aria-label="전투 설정" hidden><button type="button" class="btn-sub small" id="tmSpd"></button><button type="button" class="btn-sub small" id="tmAuto" aria-pressed="false" hidden></button><button type="button" class="btn-sub small" id="tmSkOff" aria-pressed="false" hidden></button><button type="button" class="btn-sub small tm-skip" id="tmSkip" hidden></button><button type="button" class="cta small" id="tmRevive" hidden>📺 응원 받기</button><button type="button" class="btn-sub small" id="tmRep" hidden></button></div>
+      </div>
       <div class="tm-sks" id="tmSk"></div>
       <nav class="tm-nav" id="tmNav" aria-label="탐험대 메뉴"><button type="button" data-tnav="mem"><img data-x4="ex4_ic_member" alt=""><span>대원</span></button><button type="button" data-tnav="gear"><img data-x4="ex4_ic_gear" alt=""><span>장비</span></button><button type="button" data-tnav="mat"><img data-x4="ex4_ic_mat" alt=""><span>재료</span></button><button type="button" data-tnav="rank"><img data-x4="ex4_ic_rank" alt=""><span>랭킹</span></button><button type="button" data-tnav="rep"><img data-x4="ex4_ic_report" alt=""><span>보고서</span></button></nav>
       <div class="tm-sheet" id="tmSheet" hidden><div class="tm-shh"><b id="tmShT">대원</b><button type="button" class="btn-sub small" id="tmShX">닫기</button></div>
@@ -17862,11 +17887,17 @@ body.mg-on .toast[hidden]{display:none}
     for (let i = 0; i < n; i++) { const j = ((k - 1) % 3 + i) % 3; out.push({ nm: R.mob[j], i: j, hp: TAM.mHp * m * f, atk: TAM.mAtk * m * f, solo: n === 1 }); }
     return out;
   }
-  const TAM_WIND_SECONDS = 2.6;
+  // 각 지역 첫 보스의 고유 공격. 되풀이와 심화는 원래 전투를 사용해요.
+  const TAM_TRIALS = {
+    10: { key: 'wind', seconds: 2.6, after: 0, title: '꽃바람이 와요!', hint: '필살기로 앞줄을 지켜요', blocked: '꽃바람을 막았어요!', landed: '꽃바람이 앞줄에 닿았어요', art: 'ex4_sk_pe_leaf' },
+    60: { key: 'spore', seconds: 2.2, after: 3, delay: 1.2, title: '왕버섯이 포자를 모아요!', hint: '필살기로 포자를 흩뜨려요', blocked: '포자 구름을 흩뜨렸어요!', landed: '포자 때문에 앞줄이 잠깐 느려졌어요', art: 'ex4_sk_sci_bubble' },
+    110: { key: 'wave', seconds: 2.8, after: 3, guard: .35, title: '큰 물결이 밀려와요!', hint: '몸을 낮춰 대원 모두를 지켜요', blocked: '물결을 받아냈어요!', landed: '물결이 탐험대를 덮쳤어요', art: 'ex4_sk_art_splash' }
+  };
   function tamFight(fl, team, buff, mod, hm, rep) {
     const b = buff || 1;
     const pc = TAM.pace, md = mod || {}, ph = md.hp || 1, mh = md.hard ? 1.4 : 1;
-    const wind = fl === TAM.bossEvery && !hm && !rep ? { pending: true, until: 0 } : null;
+    const spec = TAM_TRIALS[fl];
+    const wind = spec && !hm && !rep ? { spec, pending: true, until: 0, braced: false } : null;
     return { id: (tamFight.n = (tamFight.n || 0) + 1), fl, hm: !!hm, rep: rep ? 1 : 0, hard: !!md.hard, wind, t: 0, lim: TAM.limit * pc, ev: [], P: team.map((s, k) => ({ ...s, cd: s.cd * pc, hp: s.hp * b * ph, mx: s.hp * b * ph, atk: s.atk * b, c: (0.4 + k * 0.3) * pc, g: 0 })),
       M: tamMobs(fl, hm).map((m, k) => ({ ...m, hp: m.hp * mh, mx: m.hp * mh, c: (1 + k * 0.4) * pc, wk: 0 })) };
   }
@@ -17886,9 +17917,14 @@ body.mg-on .toast[hidden]{display:none}
     else { const w = L.slice().sort((a, b) => a.hp - b.hp)[0]; if (big) hit(w, p.atk * 8, true); else { const cr = rnd() < 0.25; hit(w, p.atk * (cr ? 2 : 1), cr); } }
   }
   const tamWindActive = F => !!(F && F.wind && F.wind.until > F.t && F.M[0].hp > 0);
+  function tamBrace(F) {
+    if (!tamWindActive(F) || !F.wind.spec.guard || F.wind.braced) return false;
+    F.wind.braced = true;
+    return true;
+  }
   function tamCastAt(F, p) {
     if (!p || p.hp <= 0 || p.g < TAM.gauge || !F.M.some(m => m.hp > 0)) return false;
-    const counter = tamWindActive(F);
+    const counter = tamWindActive(F) && !F.wind.spec.guard;
     if (counter) { F.wind.until = 0; F.M[0].c = TAM.mobCd * TAM.pace; }
     p.g = 0;
     tamAct(F, p, true, Math.random, counter);
@@ -17897,17 +17933,19 @@ body.mg-on .toast[hidden]{display:none}
   // 한 걸음: 1 이김, -1 짐, 0 이어서
   function tamStep(F, dt, auto, rnd) {
     F.t += dt;
-    const boss = F.wind && F.M[0], front = F.wind && F.P.find(p => p.hp > 0);
-    if (front && boss.hp > 0 && F.wind.pending && boss.c <= dt) {
+    const boss = F.wind && F.M[0], front = F.wind && F.P.find(p => p.hp > 0), spec = F.wind?.spec;
+    if (front && boss.hp > 0 && F.wind.pending && F.t >= spec.after && boss.c <= dt) {
       F.wind.pending = false;
-      F.wind.until = F.t + TAM_WIND_SECONDS;
-      front.g = TAM.gauge;
+      F.wind.until = F.t + spec.seconds;
+      if (!spec.guard) front.g = TAM.gauge;
       F.ev.push({ k: 'wind' });
     }
+    const warned = tamWindActive(F), middle = warned && F.wind.until - F.t <= spec.seconds / 2;
+    if (auto && middle && spec.guard) tamBrace(F);
     for (const p of F.P) {
       if (p.hp <= 0) continue;
       p.c -= dt; if (p.c <= 0) { p.c += p.cd; tamAct(F, p, false, rnd); p.g = Math.min(TAM.gauge, p.g + p.gg); }
-      if (auto && p.g >= TAM.gauge && (!tamWindActive(F) || F.wind.until - F.t <= TAM_WIND_SECONDS / 2)) tamCastAt(F, p);
+      if (auto && p.g >= TAM.gauge && (!warned || spec.guard || middle)) tamCastAt(F, p);
     }
     for (const m of F.M) {
       if (m.hp <= 0) continue;
@@ -17920,11 +17958,15 @@ body.mg-on .toast[hidden]{display:none}
       }
       if (m.c <= 0) {
         m.c += TAM.mobCd * TAM.pace;
-        const tg = F.P.find(q => q.hp > 0);
-        if (tg) {
-          const d = m.atk * (m.wk > 0 ? 0.7 : 1);
+        const splash = wind && spec.guard, first = F.P.find(q => q.hp > 0);
+        const targets = splash ? F.P.filter(q => q.hp > 0) : first ? [first] : [];
+        if (wind && targets.length) F.ev.push({ k: 'wind-hit', p: F.P.indexOf(targets[0]), m: F.M.indexOf(m), braced: F.wind.braced });
+        const strike = m.atk * (m.wk > 0 ? .7 : 1);
+        const d = strike * (splash && F.wind.braced ? spec.guard : 1) / Math.max(1, targets.length);
+        for (const tg of targets) {
           tg.hp -= d;
-          tg.g = Math.min(TAM.gauge, tg.g + 0.4 * tg.gg);
+          if (wind && spec.delay) tg.c += spec.delay;
+          tg.g = Math.min(TAM.gauge, tg.g + .4 * tg.gg);
           F.ev.push({ k: 'hurt', p: F.P.indexOf(tg), m: F.M.indexOf(m), d, wind });
         }
       }
@@ -18412,11 +18454,27 @@ body.mg-on .toast[hidden]{display:none}
   function tamWindPaint(F, P, boss) {
     const active = tamWindActive(F), card = $('#tmWind');
     if (!active && card.hidden) return;
-    if (card.hidden === active) card.hidden = !active;
+    if (card.hidden === active) {
+      card.hidden = !active;
+      if (active) tamControls(false);
+    }
     const front = active ? F.P.findIndex(p => p.hp > 0) : -1;
-    if (active) card.style.setProperty('--wind-left', (F.wind.until - F.t) / TAM_WIND_SECONDS);
-    if (P) P.forEach((el, i) => el.classList.toggle('wind-target', i === front));
-    else $$('#tmP .wind-target').forEach(el => el.classList.remove('wind-target'));
+    const spec = active && F.wind.spec, brace = $('#tmBrace');
+    if (active) {
+      card.dataset.trial = spec.key;
+      card.style.setProperty('--wind-left', (F.wind.until - F.t) / spec.seconds);
+      setTx($('#tmWindTitle'), spec.title);
+      setTx($('#tmWindHint'), F.wind.braced ? '물결을 받을 준비가 됐어요' : spec.hint);
+      setHid(brace, !spec.guard);
+      brace.disabled = F.wind.braced;
+      setTx(brace, F.wind.braced ? '준비 완료' : '몸 낮추기');
+    }
+    if (P) P.forEach((el, i) => {
+      const target = i === front || (!!spec.guard && F.P[i].hp > 0);
+      el.classList.toggle('wind-target', target);
+      el.classList.toggle('wind-guarded', target && active && F.wind.braced);
+    });
+    else $$('#tmP .wind-target').forEach(el => el.classList.remove('wind-target', 'wind-guarded'));
     if (boss) boss.classList.toggle('wind-up', active);
     else $('#tmM .wind-up')?.classList.remove('wind-up');
   }
@@ -18471,7 +18529,7 @@ body.mg-on .toast[hidden]{display:none}
           { scale: '1' }, { scale: '1.035', offset: .23 }, { scale: '1' }
         ], { duration: 310 / speed, easing: 'ease-out' });
       }
-      sfx('tamCounter'); tamToast('꽃바람을 막았어요!');
+      sfx('tamCounter'); tamToast(F.wind.spec.blocked);
       tamBars(F);
     });
     return { hit, heal: hit, counter: true };
@@ -18483,6 +18541,22 @@ body.mg-on .toast[hidden]{display:none}
     let actor = -1, sk = null;   // sk: 필살기 연출 시계로 맞는 때와 회복되는 때
     F.ev.forEach((e, ei) => {
       if (e.k === 'wind') { sfx('tamWind'); }
+      else if (e.k === 'wind-hit') {
+        const spec = F.wind.spec;
+        sfx('tamCounter'); tamToast(e.braced ? spec.blocked : spec.landed);
+        if (!rt.reduced) {
+          const [x, y] = tamAt(P[e.p], .66), [bx, by] = tamAt(M[e.m], .66), art = IMG(spec.art);
+          if (spec.guard) tamFxImg('tm-shot tm-wave-impact', art, x, y, [
+            { t: 'scale(.55,.45)', opacity: .9 },
+            { dx: -20, dy: -7, t: 'scale(1.15,.8)', opacity: .8, offset: .4 },
+            { dx: -44, dy: -18, t: 'scale(1.4,.92)', opacity: 0 }
+          ], 480);
+          else for (let j = -1; j <= 1; j++) tamFxImg('tm-shot', art, bx, by + j * 18, [
+            { dx: x - bx, dy: y - by, t: 'scale(.8) rotate(-28deg)', opacity: .85 },
+            { dx: x - bx - 38, dy: y - by - 22 + j * 12, t: 'scale(.4) rotate(-90deg)', opacity: 0 }
+          ], spec.delay ? 420 : 260);
+        }
+      }
       else if (e.k === 'act' || e.k === 'big') {
         actor = e.p; sk = null; const el = P[e.p], im = el && el.querySelector('img'); if (!el) return;
         if (e.counter) { sk = tamWindCounterFx(F, e.p, el, M[0]); return; }
@@ -18513,16 +18587,7 @@ body.mg-on .toast[hidden]{display:none}
           }
           tamFloat(el, fmt(Math.max(1, Math.round(e.d))), 'ouch');
         };
-        if (e.wind) {
-          land(); sfx('tamCounter'); tamToast('꽃바람이 앞줄에 닿았어요');
-          if (!rt.reduced) {
-            const [x, y] = tamAt(el, .66), [bx, by] = tamAt(mm, .66), leaf = IMG('ex4_sk_pe_leaf');
-            for (let j = -1; j <= 1; j++) tamFxImg('tm-shot', leaf, bx, by + j * 18, [
-              { dx: x - bx, dy: y - by, t: 'scale(.8) rotate(-28deg)', opacity: .85 },
-              { dx: x - bx - 38, dy: y - by - 22 + j * 12, t: 'scale(.4) rotate(-90deg)', opacity: 0 }
-            ], 260);
-          }
-        }
+        if (e.wind) land();
         else setTimeout(land, 140);
       }
       else if (e.k === 'poof') { const el = M[e.m], go = () => { el.classList.add('out'); tamDropFx(el, F.fl); }; if (sk || tamSkBusy()) skAt(Math.max(sk ? sk.hit : 0, SKQ.end - 600) + 300, go); else setTimeout(go, 300); }
@@ -18671,7 +18736,7 @@ body.mg-on .toast[hidden]{display:none}
     const team = tamTeam(), pp = $('#tmP');
     pp.dataset.fid = 'walk';
     setH(pp, team.map((p, i) => { const [x, y] = TM_PPOS[i] || TM_PPOS[0];
-      const frames = fl === TAM.bossEvery && !tamHOn() ? tamFrameArt(p.sp, false) : '';
+      const frames = TAM_TRIALS[fl] && !tamHOn() ? tamFrameArt(p.sp, false) : '';
       return `<div class="tm-f${frames ? ' tm-frame-owner' : ''}" data-actor="${p.sp}" data-i="${i}" style="left:${x}%;bottom:${y + TM_UP}%;z-index:${30 - y};${tamDz(y)}--bd:-${(i * 0.13).toFixed(2)}s"><div class="tm-body"><img src="${tamPcPic(p.sp)}" alt="${esc(spName(p.sp))}">${frames}</div><i class="tm-hp"><s></s><b style="width:100%"></b></i></div>`; }).join(''));
     setH($('#tmM'), ''); $('#tmM').dataset.fid = '';
     if (T.nLose) pp.classList.add('enter'); else pp.classList.remove('enter');
@@ -18776,6 +18841,13 @@ body.mg-on .toast[hidden]{display:none}
     const F = rt.tam && rt.tam.F; if (!F) return;
     if (tamCastAt(F, F.P[i])) { tamDraw(F); F.ev.length = 0; }
   }
+  function tamControls(on) {
+    const menu = $('#tmActions'), toggle = $('#tmControls');
+    if (menu.hidden === !on) return;
+    if (!on && menu.contains(document.activeElement)) toggle.focus();
+    menu.hidden = !on;
+    toggle.setAttribute('aria-expanded', String(on));
+  }
   function tamRenderTop() {
     if (!tamOn()) return;
     tamHSync(); const hm = tamHOn(), fl = tamCurFl(), R = tamReg(fl), lap = hm ? 0 : tamLap(fl);
@@ -18793,10 +18865,10 @@ body.mg-on .toast[hidden]{display:none}
     const sb = $('#tmSpd'); sb.classList.toggle('on', tamSpdOn());
     const left = TAM.adSpd.n - S.tam.ad.spd;
     rb(sb, 'ex4_ic_speed', tamSpdOn() ? hms(S.tam.spd.sec * 1000) : '광고 2배속', `${left}`, !tamSpdOn() || left > 0, tamSpdOn() ? `2배속 ${hms(S.tam.spd.sec * 1000)} 남음` : `광고 보고 2배속 ${TAM.adSpd.min}분, 오늘 ${left}번 남음`);
-    const ab = $('#tmAuto'); ab.hidden = !tamAutoOn(); ab.setAttribute('aria-pressed', S.tam.auto ? 'true' : 'false'); rb(ab, 'ex4_ic_auto', S.tam.auto ? '필살기 자동' : '필살기 수동', '', false, S.tam.auto ? '필살기 자동 켬' : '필살기 자동 끔');
+    const ab = $('#tmAuto'); ab.hidden = !tamAutoOn(); ab.setAttribute('aria-pressed', S.tam.auto ? 'true' : 'false'); rb(ab, 'ex4_ic_auto', S.tam.auto ? '자동 대응 켬' : '자동 대응 끔', '', false, `필살기와 물결 대응 자동 ${S.tam.auto ? '켬' : '끔'}`);
     { const so = $('#tmSkOff'); so.hidden = !S.tam.skSeen; so.setAttribute('aria-pressed', S.tam.skOff ? 'true' : 'false'); rb(so, 'ex4_ic_report', S.tam.skOff ? '연출 짧게' : '연출 보기', '', false, S.tam.skOff ? '필살기 연출 건너뛰기 켬' : '필살기 연출 건너뛰기 끔'); }   // 필살기를 한 번 본 뒤에 생겨요
     { const sk = $('#tmSkip'), to = tamSkipTo(); sk.hidden = !to; if (to) { rb(sk, 'ex_flag', '빠르게 넘기', `${fmt(to)}층`, false, `빠르게 넘기: ${fmt(to)}층까지 한 번에 넘어가요`);
-      if (rt.tamSkTo !== to && (!rt.tamSkTo || to > rt.tamSkTo + 9)) tamToast(`누르면 ${fmt(to)}층까지 빠르게 넘길 수 있어요`); } rt.tamSkTo = to; }
+      if (rt.tamSkTo !== to && (!rt.tamSkTo || to > rt.tamSkTo + 9)) tamToast(`전투 설정에서 ${fmt(to)}층까지 빠르게 넘길 수 있어요`); } rt.tamSkTo = to; }
     const T = rt.tam, rv = $('#tmRevive'), cl = tamCheerLeft(); rv.hidden = !(S.tam.cheer > 0 || (T && T.lose && cl > 0));   // 지면 응원 단추, 응원 중에는 남은 층
     rb(rv, 'ex4_ic_cheer', S.tam.cheer > 0 ? `응원 ${S.tam.cheer}층` : '응원', S.tam.cheer > 0 ? '' : `${cl}`, S.tam.cheer <= 0, S.tam.cheer > 0 ? `응원 ${S.tam.cheer}층 남음` : `광고 보고 응원 받기 힘 +${Math.round((TAM.cheer.mul - 1) * 100)}%, 오늘 ${cl}번 남음`); rv.classList.toggle('on', S.tam.cheer > 0);
     tamAcorn(true);
@@ -18895,6 +18967,7 @@ body.mg-on .toast[hidden]{display:none}
     }
   }
   function tamOpen() {
+    tamControls(false);
     if (!FXL.st && wldLv() > 0) { FXL.touched = true; fxLoad(); }   // 엔진을 아직 안 받았으면 지금
     if (FXL.st === 'ok' && !FXT.st) fxTamInit();   // 탐험 효과층을 미리 준비
     if (FXL.st === 'ok' && !FXG.st) fxgInit();   // 오르는 길 바닥
@@ -18933,7 +19006,14 @@ body.mg-on .toast[hidden]{display:none}
     S.tam.mat[c.m] -= c.n; S.tam.mat[3] -= c.star; S.tam.sg[i][k] += 1; return true;
   }
   function tamClick(e) {
+    if (!e.target.closest('.tm-controls')) tamControls(false);
     const b = e.target.closest('button'); if (!b || !tamOn()) return;
+    if (b.id === 'tmControls') { sfx('tap'); tamControls($('#tmActions').hidden); return; }
+    if (b.id === 'tmBrace') {
+      const F = rt.tam?.F;
+      if (tamBrace(F)) { sfx('tap'); tamWindPaint(F, $$('#tmP .tm-f'), $('#tmM .boss')); }
+      return;
+    }
     if (b.getAttribute('aria-disabled') === 'true' && !(b.dataset.tlv && S.budget >= tamLvCost(b.dataset.tlv))) { if (b.dataset.tlv) tamToast('도토리가 모자라요\n문방구에서 숲의 정수로 도토리를 살 수 있어요'); else if (b.dataset.tgear) tamToast('재료가 모자라요'); return; }
     if (b.dataset.tsk) { tamCast(+b.dataset.tsk); return; }
     if (b.dataset.tmm) { const v = +b.dataset.tmm; if ((v && !tamHOpen()) || (rt.tam && rt.tam.ph === 'event')) return; if ((S.tam.hm ? 1 : 0) === v) return; S.tam.hm = v; tamHSync(); sfx('tap'); save(); tamSkStop(); tamRestart(); tamRenderTop(); tamRenderBody(); musicSync(); return; }   // 심화 탐험
@@ -28630,6 +28710,13 @@ body.mg-on .toast[hidden]{display:none}
     const key = questKey();
     if (force || key !== rt.qKey) { rt.qKey = key; buildQuestPanel(); }
     else updateQuestProgress();
+    setHid($('#qMainMark'), !mainReady());
+    setHid($('#qSubsMark'), !(S.q.subs.some(subReady) || gsReady()));
+    setHid($('#qDailyMark'), !(dmClaimable() || wkClaimable()));
+  }
+  function showQuestView(view) {
+    $$('#panelQuests [data-q-view]').forEach(b => b.setAttribute('aria-pressed', String(b.dataset.qView === view)));
+    $$('#panelQuests [data-q-pane]').forEach(el => setHid(el, el.dataset.qPane !== view));
   }
   function questCard(q, base, o) {
     const p = qProg(q, base);
@@ -28638,10 +28725,9 @@ body.mg-on .toast[hidden]{display:none}
       : `<button class="btn-go" type="button" data-act="go" data-q="${o.ref}">바로 가기</button>`;
     return `<div class="qcard${p.done ? ' is-done' : ''}" data-qp="${o.ref}">` +
       `<div class="qwho"><span class="qav${o.kid ? ' kid' : ''}" aria-hidden="true">${o.av}</span><span class="qname">${esc(o.name)}</span>${o.badge ? `<span class="qnew">${o.badge}</span>` : ''}</div>` +
-      `<p class="qsay">${esc(nl(repTxt(q, o.say)))}</p>` +   // 문장마다 줄바꿈
       `<div class="qgoal"><b>${esc(qGoal(q))}</b><span class="qp">${p.done ? '완료' : p.text}</span></div>` +
       `<div class="qbar"><i style="width:${(p.frac * 100).toFixed(1)}%"></i></div>` +
-      `<div class="qfoot"><span class="qrew">보상 ${rewardIcon(q.rk)}<b>${fmt(qReward(q))}</b>${hardQ(q, o.ref !== 'main') ? (goldRich() ? `<span class="qgold" aria-label="숲의 정수 ${GOLD.hard * GOLD.essPer}">+${ESS_ICON()}<b>${GOLD.hard * GOLD.essPer}</b></span>` : `<span class="qgold" aria-label="황금 도토리 ${GOLD.hard}개">+${GOLD_ICON}<b>${GOLD.hard}</b></span>`) : ''}${o.ref === 'main' && TK_Q.has(q.id) ? `<span class="qgold qtk" aria-label="5분 단축권 ${TKE.n}장">+${IMG('ticket_m5') ? `<img src="${IMG('ticket_m5')}" alt="">` : '⏱'}<b>${TKE.n}</b></span>` : ''}</span>${act}</div></div>`;
+      `<div class="qfoot"><span class="qrew">보상 ${rewardIcon(q.rk)}<b>${fmt(qReward(q))}</b>${hardQ(q, o.ref !== 'main') ? (goldRich() ? `<span class="qgold" aria-label="숲의 정수 ${GOLD.hard * GOLD.essPer}">+${ESS_ICON()}<b>${GOLD.hard * GOLD.essPer}</b></span>` : `<span class="qgold" aria-label="황금 도토리 ${GOLD.hard}개">+${GOLD_ICON}<b>${GOLD.hard}</b></span>`) : ''}${o.ref === 'main' && TK_Q.has(q.id) ? `<span class="qgold qtk" aria-label="5분 단축권 ${TKE.n}장">+${IMG('ticket_m5') ? `<img src="${IMG('ticket_m5')}" alt="">` : '⏱'}<b>${TKE.n}</b></span>` : ''}</span>${act}</div><p class="qsay">${esc(nl(repTxt(q, o.say)))}</p></div>`;
   }
   function buildQuestPanel() {
     const i = S.q.m, q = MAIN[i];
@@ -28819,7 +28905,7 @@ body.mg-on .toast[hidden]{display:none}
     if (!S || rt.paused || !mgoHas(id)) return false;
     sfx('tap');
     if (MGO_MINI[id]) { setTab('mini'); setTimeout(() => { const b = $(MGO_MINI[id]); if (b && !b.closest('[hidden]')) b.click(); }, 60); return true; }
-    if (MGO_Q[id]) { setTab('quests'); setTimeout(() => { const el = $(MGO_Q[id]); if (el) el.scrollIntoView({ block: 'start', behavior: rt.reduced ? 'auto' : 'smooth' }); }, 60); return true; }
+    if (MGO_Q[id]) { setTab('quests'); showQuestView(id === 'subs' ? 'subs' : 'daily'); return true; }
     goTo({ t: MGO[id] });
     return true;
   }
@@ -29132,7 +29218,7 @@ body.mg-on .toast[hidden]{display:none}
     if (t === 'mini') renderMini();
     if (prev === 'quests' && t !== 'quests') markQuestsSeen();
     if (t === 'teachers') renderTeachers();
-    if (t === 'quests') renderQuestPanel(true);
+    if (t === 'quests') { showQuestView('main'); renderQuestPanel(true); }
     if (t === 'grad') renderGradPanel(true); else $('#gConfirm').hidden = true;
     $('#gDot').hidden = $('#gDot').hidden || t === 'grad';
     if (t !== 'settings') { $('#resetConfirm').hidden = true; }
@@ -29429,6 +29515,9 @@ body.mg-on .toast[hidden]{display:none}
   // 숲속 탐험대
   function wireTam() {
     $('#panelTam').addEventListener('click', tamClick);
+    $('#panelTam').addEventListener('keydown', e => {
+      if (e.key === 'Escape' && !$('#tmActions').hidden) { e.stopPropagation(); tamControls(false); }
+    });
     // 탐험 화면의 칸을 누르면 한 줄 설명
     { const tip = (sel, f) => { const el = $(sel); if (el) el.addEventListener('click', e => { e.stopPropagation(); sfx('tap'); tamToast(f()); }); };
       tip('#tmFl', () => `지금 오르는 층이에요. ${TAM.bossEvery}층마다 큰 장난꾸러기가 나와요`);
@@ -30084,7 +30173,7 @@ body.mg-on .toast[hidden]{display:none}
     // 숲속 소풍, 칭찬 스티커판
     $('#sheetPicnic').addEventListener('click', () => viaSheet(openPicnic));
     $('#sheetSticker').addEventListener('click', () => viaSheet(openSticker));
-    $('#sheetWaitGo').addEventListener('click', () => { sfx('tap'); closeSheet(); setTab('quests'); setTimeout(() => { const h = $('#qDaily .td-h'); if (h) h.scrollIntoView({ block: 'start', behavior: rt.reduced ? 'auto' : 'smooth' }); }, 80); });   // 5.3.2.1
+    $('#sheetWaitGo').addEventListener('click', () => { closeSheet(); missionGo('daily'); setTimeout(() => { const h = $('#qDaily .td-h'); if (h) h.scrollIntoView({ block: 'start', behavior: rt.reduced ? 'auto' : 'smooth' }); }, 80); });   // 5.3.2.1
     $('#pcTickets').addEventListener('click', e => { const b = e.target.closest('[data-picnic-tk]'); if (b) picnicUseTicket(b.dataset.picnicTk); });
     $('#pcKids').addEventListener('click', e => { const b = e.target.closest('[data-pk]'); if (b) pcKidTap(b.dataset.pk); });
     $('#pcLunch').addEventListener('click', () => { if (!rt.pcLunch && S.ess < PCN.lunch) { toast(essShort(PCN.lunch - S.ess)); return; } rt.pcLunch = !rt.pcLunch; sfx('tap'); renderPicnic(); });
@@ -30224,6 +30313,8 @@ body.mg-on .toast[hidden]{display:none}
       if (subReady(s)) claimSub(s.id, bar); else goTo(s);
     });
     $('#panelQuests').addEventListener('click', e => {
+      const view = e.target.closest('button[data-q-view]');
+      if (view) { sfx('tap'); showQuestView(view.dataset.qView); return; }
       const b = e.target.closest('button[data-act]');
       if (!b) return;
       const ref = b.dataset.q;
@@ -33810,8 +33901,16 @@ body.mg-on .toast[hidden]{display:none}
 </script>
 <div id="expeditionPreview" hidden><section aria-labelledby="expeditionPreviewTitle">
   <h1 id="expeditionPreviewTitle">숲속 동물 학교 미리보기</h1>
-  <p>시냇가에서 경로를 고르고 관찰 기록을 받아 보세요. 미리보기에서는 1시간을 약 12초로 줄였어요.</p>
+  <p>퀘스트 화면을 열거나, 지역을 골라 보스전에 들어가 보세요. 시냇가 이동은 약 12초예요.</p>
+  <button id="expeditionQuests" type="button">퀘스트 화면</button>
   <button id="expeditionStart" type="button">시냇가 체험학습</button>
+  <label>보스전 지역
+    <select id="expeditionFloor">
+      <option value="10">들꽃 운동장 · 10층</option>
+      <option value="60">버섯 텃밭 · 60층</option>
+      <option value="110">안개 연못 · 110층</option>
+    </select>
+  </label>
   <label>보스전 대원
     <select id="expeditionParty">
       <option value="team">세 대원 함께</option>
@@ -33820,7 +33919,7 @@ body.mg-on .toast[hidden]{display:none}
       <option value="fox">여우 혼자</option>
     </select>
   </label>
-  <button id="expeditionBoss" type="button">10층 보스전</button>
+  <button id="expeditionBoss" type="button">보스전 시작</button>
 </section></div>
 <script>
 (() => {
@@ -33848,14 +33947,25 @@ body.mg-on .toast[hidden]{display:none}
     F.openTrip();
     document.querySelector('#tripBody [data-trip="creek"]').click();
   });
+  document.getElementById('expeditionQuests').addEventListener('click', () => {
+    prepare().setTab('quests');
+  });
   document.getElementById('expeditionBoss').addEventListener('click', () => {
-    const F = prepare();
-    Object.assign(F.S.tam, { best: 9, seen: 1, auto: 0, it: F.gameNow(), spd: { sec: 0 } });
+    const F = prepare(), floor = Number(document.getElementById('expeditionFloor').value);
+    Object.assign(F.S, {tier: floor === 10 ? 0 : 1, tg: floor === 110 ? 3 : 0, sem: floor === 60 ? 1 : 0});
+    Object.assign(F.S.tam, { best: floor - 1, hm: 0, seen: 1, auto: 0, it: F.gameNow(), spd: { sec: 0 } });
     const choice = document.getElementById('expeditionParty').value;
     F.S.tam.party = choice === 'team' ? ['bear', 'rabbit', 'fox'] : [choice];
-    F.tamParty().forEach(sp => { F.tamMem(sp).lv = 6; });
+    F.tamParty().forEach(sp => { const m = F.tamMem(sp); m.lv = 1; m.st = 1; });
+    const boss = F.tamMobs(floor, false)[0];
+    F.tamTeam().forEach(p => {
+      const multiplier = boss.hp / (p.atk * (choice === 'team' ? 55 : 38));
+      F.tamMem(p.sp).lv = floor === 10 ? 6 : Math.max(1, 1 + Math.round(Math.log(multiplier) / Math.log(F.TAM.lvG)));
+    });
     F.setTab('tam');
     const battle = F.rt4.tam || (F.rt4.tam = { ph: '', t: 0, F: null, buff: 0, lose: 0, nLose: 0, ev: null, mod: null });
+    battle.mod = null;
+    battle.pend = 0;
     F.tamPh(battle, 'walk');
   });
   document.getElementById('tripBody').addEventListener('click', event => {
