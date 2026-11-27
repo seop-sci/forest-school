@@ -30,7 +30,8 @@ async def main():
         ok(r['PM']['k'] >= 1 and r['PM']['sum'] <= 1e7, "'최대'는 가진 도토리로 되는 만큼")
         ok(max(r['all']) - min(r['all']) <= 1 and r['budget'] >= 0, '출동 대원 고르게 올리기')
         # 꾹 누르기
-        await page.evaluate(f"(()=>{{ const S={F}.S; S.budget=1e7; }})()")
+        # 교실을 이번 학기 최고 레벨로(대원 훈련 상한 없이 꾹 누르기만 봐요)
+        await page.evaluate(f"(()=>{{ const F={F}, S=F.S; S.budget=1e7; S.f.classroom=F.facCap(); F.tamRenderBody(); }})()")
         btn = await page.query_selector('.tm-mem [data-tlv]'); sp = await btn.get_attribute('data-tlv')
         lv0 = await page.evaluate(f"({F}.S.tam.mem['{sp}']||{{}}).lv||1")
         await btn.scroll_into_view_if_needed(); await page.wait_for_timeout(200); bb = await btn.bounding_box(); await page.mouse.move(bb['x'] + bb['width'] / 2, bb['y'] + bb['height'] / 2)

@@ -15,7 +15,7 @@ async def main():
         ctx, page, errs = await ctxpage(b, 360, 740, 'light', base(tier=0, tg=0))
         await page.wait_for_timeout(1000)
         r = await page.evaluate(f"""(()=>{{ const F={F}, S=F.S, out=[]; const t0=S.tier, g0=S.tg, s0=S.sem;
-          for (const [t,g,sm] of [[0,0,0],[0,1,0],[1,0,0],[1,0,1],[1,5,1],[2,0,0],[2,2,1],[3,0,0],[3,2,1],[4,0,0],[4,3,0],[4,3,1],[5,0,0],[5,5,0],[5,5,1]]) {{ S.tier=t; S.tg=g; S.sem=sm; out.push([t,g,sm,F.tamCap()===Infinity?-1:F.tamCap(),F.tamLvRef()]); }}
+          for (const [t,g,sm] of [[0,0,0],[0,1,0],[1,0,0],[1,0,1],[1,5,1],[2,0,0],[2,2,1],[3,0,0],[3,2,1],[4,0,0],[4,3,0],[4,3,1],[5,0,0],[5,5,0],[5,5,1]]) {{ S.tier=t; S.tg=g; S.sem=sm; out.push([t,g,sm,F.tamCapBase()===Infinity?-1:F.tamCapBase(),F.tamLvRef()]); }}
           S.tier=t0; S.tg=g0; S.sem=s0; return out; }})()""")
         print('상한', r)
         caps = [x[3] for x in r]
@@ -23,7 +23,7 @@ async def main():
         ok(all(r[i][4] <= r[i + 1][4] for i in range(len(r) - 2)), '기준 레벨은 학년이 오를수록 커져요')
         # 상한에서 멈추고 다시 걷기
         r = await page.evaluate(f"""(async()=>{{ const F={F}, S=F.S, sl=ms=>new Promise(r=>setTimeout(r,ms)); S.tam.seen=1; F.setTab('tam'); await sl(300);
-          S.tam.best = 30; const T=F.rt4.tam; F.tamPh(T,'walk'); const ph1=T.ph; S.tam.spd.sec = 600; await sl(1500); const spd=S.tam.spd.sec, txt=document.querySelector('#tmBest').textContent;
+          S.tam.best = F.tamCap(); const T=F.rt4.tam; F.tamPh(T,'walk'); const ph1=T.ph; S.tam.spd.sec = 600; await sl(1500); const spd=S.tam.spd.sec, txt=document.querySelector('#tmBest').textContent;
           S.tg = 1; await sl(400); const ph2=T.ph; return {{ ph1, spd, txt, ph2 }}; }})()""")
         print('멈춤', r)
         ok(r['ph1'] == 'cap' and r['spd'] == 600, '상한에서 멈추고 2배속 시간은 그대로')
