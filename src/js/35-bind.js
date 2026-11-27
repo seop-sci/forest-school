@@ -150,6 +150,7 @@
   // 설정의 화면 크기와 숫자 단위
   function wireUnits() {
     $('#optUiz').addEventListener('click', e => { const b = e.target.closest('[data-uiz]'); if (!b || +b.dataset.uiz === S.uiz) return; S.uiz = +b.dataset.uiz; save(); syncSettingsUI(); sfx('tap'); setTimeout(() => { try { chipRow(); wxPlace(); } catch (er) { /* 다음 틱에 */ } }, 60); toast(S.uiz ? '화면 글자와 단추를 크게 보여 줘요' : '화면을 보통 크기로 보여 줘요'); });
+    $('#optLang').addEventListener('change', e => { sfx('tap'); save(); langSet(e.target.value); });
     $('#optUnits').addEventListener('click', e => {
       const b = e.target.closest('[data-units]');
       if (!b || b.dataset.units === S.units) return;

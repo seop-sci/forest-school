@@ -3,6 +3,12 @@
 # 이 모듈을 불러오기만 해도 시험의 끝 코드가 맞춰져요: 마지막으로 찍은 줄이 PASS(또는 SKIP)로 시작하지 않으면 끝 코드 1.
 # 그래서 dev/runall.py와 GitHub 검사가 "마지막 줄 PASS"와 "끝 코드 0" 두 가지로 판정할 수 있어요.
 import atexit, datetime, json, os, pathlib, sys, time
+# 게임의 하루가 휴대폰 시간대를 따라요. 시험은 늘 한국 시간에서 돌려요(브라우저가 이 값을 읽어요)
+os.environ.setdefault('TZ', 'Asia/Seoul')
+try:
+    time.tzset()
+except AttributeError:
+    pass
 HERE = pathlib.Path(__file__).resolve().parent
 URL = (HERE / 'test.html').resolve().as_uri() if not pathlib.Path('test.html').exists() else pathlib.Path('test.html').resolve().as_uri()
 TODAY = datetime.date.today().isoformat()

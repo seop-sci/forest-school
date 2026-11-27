@@ -90,9 +90,20 @@
      하루 제한과 주간 제한은 기기 시계 대신 이 시계를 써요. 쓰는 법은 dev/memo.md "게임 시계"
      gameNow: 지금 시각(ms, Date.now와 같은 단위). 서버 시간을 받았으면(웹과 구글 플레이는 Firebase, 토스는 Environment.getServerTime) 서버 시간을 믿고 S.clk.last도 그 값으로 바로잡아요
                 서버 시간이 아직 없으면(오프라인, 옛 토스앱) 기기 시간을 쓰되, 지금까지 본 가장 늦은 시각(S.clk.last)보다 뒤로 가면 그 시각에 멈춰요. 그래서 시계를 뒤로 돌려도 새 날이 오지 않아요
-     gameToday: gameNow의 날짜를 한국 시간(UTC+9) 기준 'YYYY-MM-DD'로. 기기 시간대를 바꿔도 같은 날이에요
-     gameWeek: 한국 시간 월요일 0시에 시작하는 주의 번호(정수). 이 0이에요 */
-  const KST_MS = 9 * 3600000;
+     gameToday: gameNow의 날짜를 저장에 남긴 휴대폰 시간대(S.tz, 7일에 한 번만 바뀜) 기준 'YYYY-MM-DD'로
+     gameWeek: 그 시간대 월요일 0시에 시작하는 주의 번호(정수). 이 0이에요 */
+  // 게임의 하루와 밤낮은 휴대폰 시간대를 따라요(한국에서는 늘 한국 시간). 이름은 예전 그대로 KST_MS예요
+  // 시간대를 바꿔 하루 횟수를 되풀이해 받지 않게, 저장(S.tz)에 남긴 시간대는 7일에 한 번만 바꿔요. 랭킹 주간 리그는 모두 같게 한국 시간(KST_FIX)
+  const KST_FIX = 9 * 3600000;
+  const TZ_HOLD = 7 * 86400000;
+  const tzDev = () => { try { const o = -new Date().getTimezoneOffset() * 60000; return isFinite(o) && Math.abs(o) <= 14 * 3600000 ? o : KST_FIX; } catch (e) { return KST_FIX; } };
+  let KST_MS = KST_FIX;
+  function tzSync() {
+    if (!S || !S.tz) return;
+    const dev = tzDev(), now = gameNow();
+    if (S.tz.o !== dev && now - (S.tz.at || 0) >= TZ_HOLD) { S.tz.o = dev; S.tz.at = now; }
+    KST_MS = S.tz.o;
+  }
   // SVR.base: 받은 서버 시각, SVR.perf: 그때의 performance.now(), SVR.dev: 그때의 기기 시각.
   // 서버 시간을 받은 뒤에는 기기 시계가 아니라 그때부터 흐른 시간(performance.now)을 더해요. 켜 둔 채 시계를 바꿔도 게임 시계는 그대로예요
   const SVR = { ok: false, offset: 0, base: 0, perf: 0, dev: 0, ask: 0, resync: null };   // offset: 서버 시간 - 기기 시간. Firebase(웹, 구글 플레이)나 토스(Environment.getServerTime)가 넣어 줘요

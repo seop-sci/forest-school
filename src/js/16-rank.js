@@ -454,7 +454,7 @@
   const rkHash = t => { let h = 2166136261; for (let i = 0; i < t.length; i++) { h ^= t.charCodeAt(i); h = Math.imul(h, 16777619); } return h >>> 0; };
   const rkRnd = (seed, i) => (rkHash(seed + ':' + i) % 100000) / 100000;
   function rkPeriod(mode) {   // 기간이 얼마나 지났는지(0~1)
-    const d = new Date(gameNow() + KST_MS);
+    const d = new Date(gameNow() + KST_FIX);
     if (mode === 'week') return Math.min(1, (((d.getUTCDay() + 6) % 7) + (d.getUTCHours() + d.getUTCMinutes() / 60) / 24) / 7);
     if (mode === 'sea') { const m = d.getUTCMonth(), y = d.getUTCFullYear(), sm = m === 11 ? 11 : m < 2 ? -1 : m - (m - 2) % 3, st = Date.UTC(sm < 0 ? y - 1 : y, sm < 0 ? 11 : sm, 1);
       return Math.min(1, Math.max(0, (d.getTime() - st) / (91 * 86400000))); }
@@ -487,7 +487,7 @@
   // 주간: 이번 주 계획에서 지금까지. 시즌: 시즌 첫날부터 오늘까지 날마다 그 주 계획의 몫을 더해요(주간 줄과 같은 방식)
   function rkRef() { return RKF.wkRef; }   // 모두에게 같게(예전에는 내 지난주 점수 기준)
   function rkTimed(mode, rs) {
-    const ref = rkRef(), now = gameNow() + KST_MS, day = Math.floor(now / 86400000), h = (now % 86400000) / 3600000;
+    const ref = rkRef(), now = gameNow() + KST_FIX, day = Math.floor(now / 86400000), h = (now % 86400000) / 3600000;
     const dowOf = dy => ((dy - 4) % 7 + 7) % 7, wkOf = dy => Math.floor((dy - 4) / 7);   // 1970-01-05가 월요일
     if (mode === 'week') return rkWeekAt(rkWeekPlan(rs + '|w' + wkOf(day), ref), dowOf(day), h);
     const d = new Date(now), m = d.getUTCMonth(), y = d.getUTCFullYear(), sm = m === 11 ? 11 : m < 2 ? -1 : m - (m - 2) % 3;
@@ -529,7 +529,7 @@
     $('#rankScoreLab').textContent = cf ? '이번 학회 점수' : th ? '이번 주 가장 높은 심화 층' : tm ? '이번 주 가장 높은 층' : sea ? '이번 시즌 점수' : bm ? '내 대결 점수' : wk ? '이번 주 리그 점수' : '내 학교 파워';
     $('#rankScore').textContent = tm ? `${fmt(score)}층` : fmt(score);
     $('#rankPos').textContent = mine >= 0 ? `${mine + 1}위` : '-';
-    const left = 7 - ((new Date(gameNow() + KST_MS).getUTCDay() + 6) % 7);   // 한국 시간 요일
+    const left = 7 - ((new Date(gameNow() + KST_FIX).getUTCDay() + 6) % 7);   // 한국 시간 요일
     if (cf) {   // 학회 순위
       $('#rankSub').textContent = `4주마다 새 학회가 열려요 (${ppLeft()}일 남음)`;
       $('#rankLead').textContent = '논문으로 모은 학회 점수로 겨뤄요. 대학원 연구소에서 논문을 써요.'; $('#rankLead').hidden = false;
