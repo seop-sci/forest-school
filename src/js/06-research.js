@@ -374,12 +374,15 @@
     if (!taOpen()) return '<p class="fine">조교는 석사 2학기에 열려요.</p>';
     const now = gameNow(), n = taSeats(), memIc = IMG('ic_ta_mem') ? `<img class="ta-mem" src="${IMG('ic_ta_mem')}" alt="">` : '💠';
     const mul = rtLv('ta') >= 5 ? 1.5 : rtLv('ta') >= 4 ? 1.25 : 1, hr = Math.max(0, Math.min(2, rt.taHr | 0));   // 받을 때(taClaim)와 같은 배수
-    let h = `<p class="fine ta-info">일하는 조교 한 명마다<br><b>수업료 +${TA.pct}%</b>, 그 건물 <b>가구 값 -${TA.fur}%</b><br>파견 가면 숲의 정수와 추억 조각을 가져와요<br>파견 중에는 자리 효과가 꺼져요</p><div class="dp-list">`;
+    const due = taDue().length;
+    let h = `<p class="fine ta-info">일하는 조교 한 명마다<br><b>수업료 +${TA.pct}%</b>, 그 건물 <b>가구 값 -${TA.fur}%</b><br>파견 가면 숲의 정수와 추억 조각을 가져와요<br>파견 중에는 자리 효과가 꺼져요</p>`;
+    if (due > 1) h += `<button class="dm-ev dm-all" type="button" data-ta="claim"><span><b>조교 ${due}명이 돌아왔어요</b><small>파견 보상</small></span><span class="cta small">모두 받기</span></button>`;
+    h += '<div class="dp-list">';
     for (let i = 0; i < n; i++) {
       const x = S.ta.seat[i] || { b: '' }, o = S.ta.out.find(y => y.i === i), w = taWho(i), u = IMG('chr_ta_' + w) || IMG('chr_' + w);
       const st = o ? (now >= o.end ? `숲속 ${TA.school[o.to]}에서 돌아왔어요` : `숲속 ${TA.school[o.to]}에 가 있어요<br>${hms(o.end - now)} 뒤에 돌아와요`) : x.b && FAC[x.b] ? `${FAC[x.b].name}에서 일해요` : '빈자리예요';
       const seatTx = o && x.b && FAC[x.b] ? `<br>돌아오면 ${FAC[x.b].name}에서 일해요` : '';
-      const btn = o ? (now >= o.end ? `<button class="cta small" type="button" data-ta="claim">받기</button>` : `<button class="btn-sub small" type="button" data-ta="pick:${i}">자리 정하기</button><span class="fe-lock">파견 중</span>`)
+      const btn = o ? (now >= o.end ? (due === 1 ? '<button class="cta small" type="button" data-ta="claim">받기</button>' : '') : `<button class="btn-sub small" type="button" data-ta="pick:${i}">자리 정하기</button><span class="fe-lock">파견 중</span>`)
         : `<button class="btn-sub small" type="button" data-ta="pick:${i}">자리 정하기</button><button class="cta small" type="button" data-ta="go:${i}">파견</button>`;
       h += `<div class="dp-row"><span class="dp-ic">${u ? `<img src="${u}" alt="">` : ''}</span><div class="dp-tx"><b>${TA.whoNm[w]} 조교</b><small>${st}${seatTx}</small></div><span class="ta-btns">${btn}</span></div>`;
       if (o && now < o.end) h += `<div class="ta-sp">${labSpeedHTML('ta', i)}</div>`;   // 파견 시간 줄이기
@@ -418,7 +421,7 @@
     const c = $('#taChip'); if (!c) return;
     const n = base && taOpen() ? taDue().length : 0, key = n ? String(n) : '';
     if (c.dataset.key === key) return; c.dataset.key = key;
-    c.hidden = !n; if (n) { c.innerHTML = `<b>🎒 조교가 돌아왔어요</b>`; c.setAttribute('aria-label', `모교에서 돌아온 조교 ${n}명의 보상 받기`); }
+    c.hidden = !n; if (n) { c.innerHTML = `<b>🎒 조교 ${n}명 ${n > 1 ? '보상 모두 받기' : '보상 받기'}</b>`; c.setAttribute('aria-label', `모교에서 돌아온 조교 ${n}명의 보상 받기`); }
     chipRow();
   }
   function openRx() {

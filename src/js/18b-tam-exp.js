@@ -81,7 +81,7 @@
   }
   // 기준 층: 지금 탐험대가 체력을 다 채운 채로 이기는 가장 높은 층(fe, 큰 장난꾸러기 층은 빼고 재요)과 가장 높은 큰 장난꾸러기 층(fb). 최고층까지만
   function txRef() {
-    const team = tamTeam(), best = Math.max(1, S.tam.best), win = f => tamSim(f, team, 7).win, one = f => f % TAM.bossEvery === 0 ? f - 1 : f;
+    const team = tamTeam(), best = Math.max(1, S.tam.best), win = f => tamSim(f, team, 7, { trial: false }).win, one = f => f % TAM.bossEvery === 0 ? f - 1 : f;
     let lo = 1, hi = best;
     if (!win(1)) lo = hi = 1;
     while (lo < hi) { const mid = Math.ceil((lo + hi) / 2); if (win(one(mid))) lo = mid; else hi = mid - 1; }
@@ -109,7 +109,7 @@
   function txFight(run, fl, boss, seed) {
     const atk = 1 + run.atk / 1000 + (run.ch > 0 ? TAM.cheer.mul - 1 : 0), mx = 1 + run.mx / 1000;
     const team = tamTeam().map(s => ({ ...s, atk: s.atk * atk, hp: s.hp * mx }));
-    const F = tamFight(Math.max(1, fl), team);
+    const F = tamFight(Math.max(1, fl), team, 1, { trial: false });   // 원정은 체력이 이어지는 자동 전투
     if (boss) {
       const B = Math.max(TAM.bossEvery, Math.floor(fl / TAM.bossEvery) * TAM.bossEvery), sc = Math.pow(TAM.g, -TEX.bossBack);
       F.M = tamMobs(B).map((m, k) => ({ ...m, hp: m.hp * sc, mx: m.hp * sc, atk: m.atk * sc, c: (1 + k * 0.4) * TAM.pace, wk: 0 }));

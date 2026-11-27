@@ -154,7 +154,8 @@
     G.sub = null; G.st = 3; G.n = Math.min(1e7, G.n + 1); G.day = gameToday();   // 끝낸 날로 적어서 다음 손님은 다음 날 와요
     const L = GS_LINES[who], vars = gsVars(who, dayHash(`gsl:${G.day}:${who}`));
     const th = L && L.t.length ? gsFill(L.t[dayHash(`gst:${G.day}`) % L.t.length], vars, 0) : '고마워요!';
-    toast(`${s.lab}: ${th}\n도토리 +${fmt(v)}, 숲의 정수 +${GS.ess}`);
+    if (rt.batch) showReward({ items: [{ ic: 'acorn', t: `도토리 +${fmt(v)}` }, { ic: 'ess', t: `숲의 정수 +${GS.ess}` }] });
+    else toast(`${s.lab}: ${th}\n도토리 +${fmt(v)}, 숲의 정수 +${GS.ess}`);
     questChanged();
   }
   function gsCardHTML() {
