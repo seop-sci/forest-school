@@ -10,6 +10,15 @@ async def open_trip(page):
     await page.locator('#mTrip').wait_for(state='visible')
 
 
+# 다시 읽기: 시험 틀이 처음 저장을 다시 심는 일이 가끔 있어(file 주소의 sessionStorage) 지금 저장을 window.name에 실어 다시 넣어요
+KEEP = "if(window.name.startsWith('fs-keep:')){localStorage.setItem('forest-school-v1', window.name.slice(8)); window.name='';}"
+
+
+async def reload_keep(page):
+    await page.evaluate("() => { window.name = 'fs-keep:' + localStorage.getItem('forest-school-v1'); }")
+    await page.reload()
+
+
 async def main():
     check = Checker()
     async with async_playwright() as p:
@@ -19,6 +28,7 @@ async def main():
             (390, 'light', 'bank', '갈대밭의 송사리', '갈대밭에서 송사리를 찾는 중'),
         ):
             ctx, page, errors = await ctxpage(browser, width, 780, scheme, base(tier=1, tg=2))
+            await ctx.add_init_script(KEEP)
             if width == 390:
                 await page.emulate_media(reduced_motion='reduce')
             await page.evaluate(CLEAN)
@@ -43,7 +53,7 @@ async def main():
             }""")
             check.ok(saved == ['creek', key, 3600000, []], f'{width}: 출발 시간과 경로만 저장 {saved}')
 
-            await page.reload()
+            await reload_keep(page)
             await page.evaluate(CLEAN)
             await page.evaluate("""() => {
               const {S, rt4} = window.__forest;
@@ -84,7 +94,7 @@ async def main():
             check.ok(result['old'] == ['creek', '', [], ['creek:0'], 3],
                      f'{width}: 옛 저장의 진행 중 여행과 기념품을 보존')
             check.ok(result['clean'] == ['', ['stones', 'bank']], f'{width}: 알 수 없는 경로와 중복 기록 제거')
-            await page.reload()
+            await reload_keep(page)
             await page.evaluate(CLEAN)
             await open_trip(page)
             await page.locator('.tr-creek-album summary').click()

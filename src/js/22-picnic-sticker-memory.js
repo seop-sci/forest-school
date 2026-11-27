@@ -429,6 +429,10 @@
       setT($('#sheetFriendGo'), done ? '♥ 오늘 했어요' : '쓰다듬기');
       row.setAttribute('aria-label', `${frFull(sp)}, ${done ? '오늘 쓰다듬었어요' : '눌러서 쓰다듬기'}`);
     }
+    // 오늘 아직 안 쓰다듬은 단짝이 둘 넘게 남았으면 건물 창에서도 한 번에(도감 '모두 쓰다듬기'와 같아요)
+    { const pa = $('#sheetPatAll'), n = sp ? frPatLeft().length : 0, ic = IMG('bond_pat');
+      pa.hidden = n < 2;
+      if (n >= 2) { setH(pa, `${ic ? `<img src="${ic}" alt="">` : ''}<span>오늘 안 쓰다듬은 단짝 ${n}명 모두 쓰다듬기</span>`); pa.setAttribute('aria-label', `오늘 안 쓰다듬은 단짝 ${n}명 모두 쓰다듬기. 도감 학생 칸에서도 할 수 있어요`); } }
     const br = $('#sheetBday'), bp = bdParty(), bOn = !!bp && bdPlace() === k && !bdDoneToday();
     br.hidden = !bOn;
     if (bOn) {

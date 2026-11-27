@@ -1766,7 +1766,7 @@ body.early .tab .dot,body.early #plChip{display:none!important}   /* F-16 처음
 /* 버튼 */
 .cta{display:flex;align-items:center;justify-content:center;gap:10px;width:100%;min-height:52px;padding:0 18px;border:0;border-radius:14px;background:var(--accent);color:var(--accent-ink);font-family:var(--font-display);font-size:18px;box-shadow:0 4px 0 var(--accent-shadow);cursor:pointer;transition:transform .08s, box-shadow .08s}
 .cta:active{transform:translateY(3px);box-shadow:0 1px 0 var(--accent-shadow)}
-.cta[aria-disabled="true"]{background:var(--off-bg,var(--line));color:var(--off-ink,var(--muted));box-shadow:0 4px 0 var(--off-shadow,var(--line-shadow))}
+.cta:disabled,.cta[aria-disabled="true"]{background:var(--off-bg,var(--line));color:var(--off-ink,var(--muted));box-shadow:0 4px 0 var(--off-shadow,var(--line-shadow))}
 .cta.split{justify-content:space-between}
 .cta.small{min-height:46px;font-size:16px}
 .cost{display:inline-flex;align-items:center;gap:4px;font-family:var(--font-chalk);font-weight:700;font-size:21px;font-variant-numeric:tabular-nums}
@@ -3581,6 +3581,7 @@ body.sheet-open #map, body.sheet-open .wx-fx::before, body.sheet-open .wx-fx i, 
 .sheet-elect.todo{border-color:#E2A21C}.sheet-elect.todo em{background:#D9534A;color:#FFFFFF}
 /* 학생과 추억: 건물 창의 친구 줄, 하트, 도감 단짝 칸, 지도 말풍선, 앨범, 편지 */
 #kids.tap .kid{pointer-events:auto;cursor:pointer}
+.sheet-patall{display:flex;align-items:center;justify-content:center;gap:6px;width:100%;margin:-4px 0 10px;min-height:40px}.sheet-patall img{width:20px;height:20px;object-fit:contain}
 .fr-row .se-ic svg{width:34px;height:46px}.fr-row b{display:flex;align-items:center;gap:6px;flex-wrap:wrap}
 .fr-say{display:block;margin-top:3px;padding:4px 10px 5px;border-radius:10px 10px 10px 2px;background:var(--chip-bg);color:var(--ink);font-size:12px;line-height:1.35}
 .fr-mini{display:inline-flex;gap:1px;vertical-align:middle}.fr-mini img{width:12px;height:12px}
@@ -5173,6 +5174,7 @@ body.mg-on .toast[hidden]{display:none}
     <p class="sheet-quest" id="sheetQuest" hidden></p>
     <button class="sheet-elect" id="sheetBday" type="button" hidden><span class="se-ic" id="sheetBdayIc" aria-hidden="true"></span><span class="se-tx"><b>생일 잔치</b><small id="sheetBdayTx"></small></span><em id="sheetBdayGo">케이크</em></button>
     <button class="sheet-elect fr-row" id="sheetFriend" type="button" hidden><span class="se-ic" id="sheetFriendIc" aria-hidden="true"></span><span class="se-tx"><b id="sheetFriendNm"></b><small class="fr-say" id="sheetFriendTx"></small></span><em id="sheetFriendGo">쓰다듬기</em></button>
+    <button class="btn-sub small sheet-patall" id="sheetPatAll" type="button" hidden></button>
     <button class="sheet-elect" id="sheetLab" type="button" hidden><span class="se-ic" id="sheetLabIc" aria-hidden="true"></span><span class="se-tx"><b>과학 탐구 실험</b><small id="sheetLabTx"></small></span><em id="sheetLabGo">실험하기</em></button>
     <button class="sheet-elect" id="sheetExam" type="button" hidden><span class="se-ic" id="sheetExamIc" aria-hidden="true"></span><span class="se-tx"><b>시험 기간</b><small id="sheetExamTx"></small></span><em id="sheetExamGo">보기</em></button>
     <div class="sheet-award" id="sheetAward" hidden></div>
@@ -18898,7 +18900,7 @@ body.mg-on .toast[hidden]{display:none}
       if (order && spec.sequence) hint = wrong ? '순서가 달라요. 전기가 날아와요!' : `${order.map(sign => TAM_SIGNS[sign]).join(' → ')} 순서로 눌러요 (${cursor}/${order.length})`;
       else if (order) hint = wrong ? '표식이 달라요. 책장이 날아와요!' : `책에 ‘${TAM_SIGNS[order[0]]}’ 표식이 보여요. 같은 것을 골라요`;
       if (timing && !prepared) hint = inTime ? '지금 발을 맞춰요!' : left < timing[0] ? '발을 맞출 시간이 지났어요' : spec.hint;
-      if (links) hint = `필살기 ${links.length}/${need} · ${need === 1 ? '대원의 필살기를 써요' : '서로 다른 대원의 필살기를 써요'}`;
+      if (links) hint = `필살기 ${links.length}/${need}, ${need === 1 ? '대원의 필살기를 써요' : '서로 다른 대원의 필살기를 써요'}`;
       setTx($('#tmWindHint'), hint);
       setHid(brace, !spec.guard);
       brace.disabled = prepared;
@@ -19349,7 +19351,7 @@ body.mg-on .toast[hidden]{display:none}
     const best = hm ? S.tam.hb : S.tam.best, lap = tamLap(floor), interval = hm ? TAM.regLen : TAM.bossEvery;
     const nextBoss = practice || Math.ceil((best + 1) / interval) * interval, R = tamReg(nextBoss), trial = tamTrialSpec(nextBoss, hm, false);
     const goal = practice || nextBoss <= cap
-      ? `<small>${practice ? '연습 중인 보스' : hm ? '다음 심화 관문' : '다음 보스'} · ${fmt(nextBoss)}층</small><b>${esc(R.boss)}</b><span>${trial ? esc(trial.hint) : `유리한 과목 · ${AC.name[AB_KEY[TAM.adv[R.k]]]}`}</span>`
+      ? `<small>${practice ? '연습 중인 보스' : hm ? '다음 심화 관문' : '다음 보스'} ${fmt(nextBoss)}층</small><b>${esc(R.boss)}</b><span>${trial ? esc(trial.hint) : `유리한 과목 ${AC.name[AB_KEY[TAM.adv[R.k]]]}`}</span>`
       : `<small>이번 학기 ${fmt(cap)}층까지</small><b>${best >= cap ? '학기 목표를 달성했어요' : '다음 보스는 새 학기에 만나요'}</b><span>${best >= cap ? '일반 탐험 위쪽에서 심화 탐험을 고를 수 있어요' : '학기가 바뀌면 더 높은 층이 열려요'}</span>`;
     const regions = TAM.reg.slice(0, tamRegN()).map((reg, i) => {
       const start = (lap * tamRegN() + i) * TAM.regLen + 1, end = start + TAM.regLen - 1;
@@ -19361,7 +19363,7 @@ body.mg-on .toast[hidden]{display:none}
     const floors = Object.keys(TAM_TRIALS).map(Number).filter(f => f <= S.tam.best && tamTrialSpec(f, false, false));
     const drills = !hm && floors.length ? `<details class="tm-practice-list"><summary>완료한 보스 연습</summary><p>현재 대원으로 대응을 연습해요. 연습은 최고층과 보상에 반영되지 않아요.</p>
       ${floors.map(f => `<button class="btn-sub small" type="button" data-tam-practice="${f}"><b>${fmt(f)}층</b> ${esc(tamReg(f).nm)}</button>`).join('')}</details>` : '';
-    $('#tmMapBody').innerHTML = `<div class="tm-map-goal">${goal}</div>${drills}<p class="tm-map-label">${practice ? '보스 연습' : hm ? '심화 탐험' : '일반 탐험'} · ${fmt(lap + 1)}바퀴째</p><ol class="tm-map-regions">${regions}</ol>`;
+    $('#tmMapBody').innerHTML = `<div class="tm-map-goal">${goal}</div>${drills}<p class="tm-map-label">${practice ? '보스 연습' : hm ? '심화 탐험' : '일반 탐험'}, ${fmt(lap + 1)}바퀴째</p><ol class="tm-map-regions">${regions}</ol>`;
     $('#tmMapBody').scrollTop = 0;
     sfx('tap'); openModal($('#mTamMap'));
   }
@@ -22433,6 +22435,10 @@ body.mg-on .toast[hidden]{display:none}
       setT($('#sheetFriendGo'), done ? '♥ 오늘 했어요' : '쓰다듬기');
       row.setAttribute('aria-label', `${frFull(sp)}, ${done ? '오늘 쓰다듬었어요' : '눌러서 쓰다듬기'}`);
     }
+    // 오늘 아직 안 쓰다듬은 단짝이 둘 넘게 남았으면 건물 창에서도 한 번에(도감 '모두 쓰다듬기'와 같아요)
+    { const pa = $('#sheetPatAll'), n = sp ? frPatLeft().length : 0, ic = IMG('bond_pat');
+      pa.hidden = n < 2;
+      if (n >= 2) { setH(pa, `${ic ? `<img src="${ic}" alt="">` : ''}<span>오늘 안 쓰다듬은 단짝 ${n}명 모두 쓰다듬기</span>`); pa.setAttribute('aria-label', `오늘 안 쓰다듬은 단짝 ${n}명 모두 쓰다듬기. 도감 학생 칸에서도 할 수 있어요`); } }
     const br = $('#sheetBday'), bp = bdParty(), bOn = !!bp && bdPlace() === k && !bdDoneToday();
     br.hidden = !bOn;
     if (bOn) {
@@ -24645,7 +24651,7 @@ body.mg-on .toast[hidden]{display:none}
     return tripJourney(D, 'start', key) + `<fieldset class="tr-creek-options"><legend>${creek ? '시냇가 경로' : '현장 활동 선택'}</legend>
       ${tripRouteKeys(dest).map(k => { const route = routes[k]; return `<label><input type="radio" data-trip-route name="${creek ? 'creekRoute' : 'tripRoute'}" value="${k}"${key === k ? ' checked' : ''}><span><b>${esc(route.name)}</b><small>${esc(route.lead)}</small></span></label>`; }).join('')}
       </fieldset><div class="btn-row tr-creek-actions"><button class="btn-sub" type="button" data-trip-back${creek ? ' id="tripCreekBack"' : ''}>목적지 목록</button>
-      <button class="cta" type="button" data-trip-depart${creek ? ' id="tripCreekGo"' : ''}${key ? '' : ' disabled'}>출발 · ${minText(D.min)}</button></div>`;
+      <button class="cta" type="button" data-trip-depart${creek ? ' id="tripCreekGo"' : ''}${key ? '' : ' disabled'}>출발 (${minText(D.min)})</button></div>`;
   }
   function setTripChoice(key) {
     const plan = rt.tripPlan;
@@ -24713,7 +24719,7 @@ body.mg-on .toast[hidden]{display:none}
       const R = tripReward(T);
       const gathered = S.trip.souv.filter(k => k.startsWith(T.id + ':')).length;
       h += '<div class="tr-return"><b>체험학습 보고서</b>' +
-        `<span>기념품 수집 ${gathered}/${T.souv.length} · ${gathered < T.souv.length ? '새 기념품 1종' : '기념품을 모두 모았어요'}</span></div>` +
+        `<span>기념품 수집 ${gathered}/${T.souv.length}, ${gathered < T.souv.length ? '새 기념품 1종' : '기념품을 모두 모았어요'}</span></div>` +
         (route ? tripRecord(route, S.trip.observation) : '') +
         `<div class="tr-gift">${rw(R, 1)}</div>` +
         '<div class="btn-row"><button class="cta" type="button" id="tripGet">귀환 보상 받기</button></div>';
@@ -31121,6 +31127,7 @@ body.mg-on .toast[hidden]{display:none}
     $('#skPickA').addEventListener('click', () => skPrize('acorn'));
     $('#skPickG').addEventListener('click', () => skPrize('gold'));
     // 학생과 추억
+    $('#sheetPatAll').addEventListener('click', () => { sfx('tap'); frPatAll(); });
     $('#sheetFriend').addEventListener('click', () => { const sp = $('#sheetFriend').dataset.sp, f = frOf(sp); if (!f) return; if (!frToday(f)) frPat(sp); else toast(`${frFull(sp)}: ${headText(frLine(sp, rt.sheetKey))}`); });
     $('#sheetBday').addEventListener('click', () => { closeSheet(); setTimeout(bdClaim, 240); });
     $('#gAlbum').addEventListener('click', openAlbum);

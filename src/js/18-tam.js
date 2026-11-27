@@ -773,7 +773,7 @@
       if (order && spec.sequence) hint = wrong ? '순서가 달라요. 전기가 날아와요!' : `${order.map(sign => TAM_SIGNS[sign]).join(' → ')} 순서로 눌러요 (${cursor}/${order.length})`;
       else if (order) hint = wrong ? '표식이 달라요. 책장이 날아와요!' : `책에 ‘${TAM_SIGNS[order[0]]}’ 표식이 보여요. 같은 것을 골라요`;
       if (timing && !prepared) hint = inTime ? '지금 발을 맞춰요!' : left < timing[0] ? '발을 맞출 시간이 지났어요' : spec.hint;
-      if (links) hint = `필살기 ${links.length}/${need} · ${need === 1 ? '대원의 필살기를 써요' : '서로 다른 대원의 필살기를 써요'}`;
+      if (links) hint = `필살기 ${links.length}/${need}, ${need === 1 ? '대원의 필살기를 써요' : '서로 다른 대원의 필살기를 써요'}`;
       setTx($('#tmWindHint'), hint);
       setHid(brace, !spec.guard);
       brace.disabled = prepared;
@@ -1224,7 +1224,7 @@
     const best = hm ? S.tam.hb : S.tam.best, lap = tamLap(floor), interval = hm ? TAM.regLen : TAM.bossEvery;
     const nextBoss = practice || Math.ceil((best + 1) / interval) * interval, R = tamReg(nextBoss), trial = tamTrialSpec(nextBoss, hm, false);
     const goal = practice || nextBoss <= cap
-      ? `<small>${practice ? '연습 중인 보스' : hm ? '다음 심화 관문' : '다음 보스'} · ${fmt(nextBoss)}층</small><b>${esc(R.boss)}</b><span>${trial ? esc(trial.hint) : `유리한 과목 · ${AC.name[AB_KEY[TAM.adv[R.k]]]}`}</span>`
+      ? `<small>${practice ? '연습 중인 보스' : hm ? '다음 심화 관문' : '다음 보스'} ${fmt(nextBoss)}층</small><b>${esc(R.boss)}</b><span>${trial ? esc(trial.hint) : `유리한 과목 ${AC.name[AB_KEY[TAM.adv[R.k]]]}`}</span>`
       : `<small>이번 학기 ${fmt(cap)}층까지</small><b>${best >= cap ? '학기 목표를 달성했어요' : '다음 보스는 새 학기에 만나요'}</b><span>${best >= cap ? '일반 탐험 위쪽에서 심화 탐험을 고를 수 있어요' : '학기가 바뀌면 더 높은 층이 열려요'}</span>`;
     const regions = TAM.reg.slice(0, tamRegN()).map((reg, i) => {
       const start = (lap * tamRegN() + i) * TAM.regLen + 1, end = start + TAM.regLen - 1;
@@ -1236,7 +1236,7 @@
     const floors = Object.keys(TAM_TRIALS).map(Number).filter(f => f <= S.tam.best && tamTrialSpec(f, false, false));
     const drills = !hm && floors.length ? `<details class="tm-practice-list"><summary>완료한 보스 연습</summary><p>현재 대원으로 대응을 연습해요. 연습은 최고층과 보상에 반영되지 않아요.</p>
       ${floors.map(f => `<button class="btn-sub small" type="button" data-tam-practice="${f}"><b>${fmt(f)}층</b> ${esc(tamReg(f).nm)}</button>`).join('')}</details>` : '';
-    $('#tmMapBody').innerHTML = `<div class="tm-map-goal">${goal}</div>${drills}<p class="tm-map-label">${practice ? '보스 연습' : hm ? '심화 탐험' : '일반 탐험'} · ${fmt(lap + 1)}바퀴째</p><ol class="tm-map-regions">${regions}</ol>`;
+    $('#tmMapBody').innerHTML = `<div class="tm-map-goal">${goal}</div>${drills}<p class="tm-map-label">${practice ? '보스 연습' : hm ? '심화 탐험' : '일반 탐험'}, ${fmt(lap + 1)}바퀴째</p><ol class="tm-map-regions">${regions}</ol>`;
     $('#tmMapBody').scrollTop = 0;
     sfx('tap'); openModal($('#mTamMap'));
   }

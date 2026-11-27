@@ -344,7 +344,7 @@
     return tripJourney(D, 'start', key) + `<fieldset class="tr-creek-options"><legend>${creek ? '시냇가 경로' : '현장 활동 선택'}</legend>
       ${tripRouteKeys(dest).map(k => { const route = routes[k]; return `<label><input type="radio" data-trip-route name="${creek ? 'creekRoute' : 'tripRoute'}" value="${k}"${key === k ? ' checked' : ''}><span><b>${esc(route.name)}</b><small>${esc(route.lead)}</small></span></label>`; }).join('')}
       </fieldset><div class="btn-row tr-creek-actions"><button class="btn-sub" type="button" data-trip-back${creek ? ' id="tripCreekBack"' : ''}>목적지 목록</button>
-      <button class="cta" type="button" data-trip-depart${creek ? ' id="tripCreekGo"' : ''}${key ? '' : ' disabled'}>출발 · ${minText(D.min)}</button></div>`;
+      <button class="cta" type="button" data-trip-depart${creek ? ' id="tripCreekGo"' : ''}${key ? '' : ' disabled'}>출발 (${minText(D.min)})</button></div>`;
   }
   function setTripChoice(key) {
     const plan = rt.tripPlan;
@@ -412,7 +412,7 @@
       const R = tripReward(T);
       const gathered = S.trip.souv.filter(k => k.startsWith(T.id + ':')).length;
       h += '<div class="tr-return"><b>체험학습 보고서</b>' +
-        `<span>기념품 수집 ${gathered}/${T.souv.length} · ${gathered < T.souv.length ? '새 기념품 1종' : '기념품을 모두 모았어요'}</span></div>` +
+        `<span>기념품 수집 ${gathered}/${T.souv.length}, ${gathered < T.souv.length ? '새 기념품 1종' : '기념품을 모두 모았어요'}</span></div>` +
         (route ? tripRecord(route, S.trip.observation) : '') +
         `<div class="tr-gift">${rw(R, 1)}</div>` +
         '<div class="btn-row"><button class="cta" type="button" id="tripGet">귀환 보상 받기</button></div>';

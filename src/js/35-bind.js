@@ -758,6 +758,7 @@
     $('#skPickA').addEventListener('click', () => skPrize('acorn'));
     $('#skPickG').addEventListener('click', () => skPrize('gold'));
     // 학생과 추억
+    $('#sheetPatAll').addEventListener('click', () => { sfx('tap'); frPatAll(); });
     $('#sheetFriend').addEventListener('click', () => { const sp = $('#sheetFriend').dataset.sp, f = frOf(sp); if (!f) return; if (!frToday(f)) frPat(sp); else toast(`${frFull(sp)}: ${headText(frLine(sp, rt.sheetKey))}`); });
     $('#sheetBday').addEventListener('click', () => { closeSheet(); setTimeout(bdClaim, 240); });
     $('#gAlbum').addEventListener('click', openAlbum);
