@@ -69,6 +69,7 @@
     if (t !== 'rank' && t !== 'dex') rt.backTab = '';   // C-22
     if (rt.thPrev && t !== 'school') thPreviewEnd(true);   // 다른 탭으로 가면 미리 보기를 끝내요
     rt.tab = t;
+    if (t !== 'tam' && rt.tam?.practice) tamPractice(0);
     const tabOn = t === 'shop' || t === 'ess' || t === 'deco' ? 'street' : t;   // 가게 안에 있어도 아래 '상점' 탭이 켜져 있어요
     $$('.tab').forEach(b => b.setAttribute('aria-selected', b.dataset.tab === tabOn ? 'true' : 'false'));
     $('#panelStreet').hidden = t !== 'street';
@@ -101,7 +102,7 @@
     if (t === 'mini') renderMini();
     if (prev === 'quests' && t !== 'quests') markQuestsSeen();
     if (t === 'teachers') renderTeachers();
-    if (t === 'quests') renderQuestPanel(true);
+    if (t === 'quests') { showQuestView('main'); renderQuestPanel(true); }
     if (t === 'grad') renderGradPanel(true); else $('#gConfirm').hidden = true;
     $('#gDot').hidden = $('#gDot').hidden || t === 'grad';
     if (t !== 'settings') { $('#resetConfirm').hidden = true; }

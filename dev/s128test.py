@@ -16,6 +16,9 @@ async def main():
         b = await p.chromium.launch()
         # 옛 저장: tam 칸이 없어요
         ctx, page, errs = await ctxpage(b, 360, 740, 'light', base(tier=0, tg=0))
+        if await page.locator('#mOffline').is_visible():
+            await page.locator('#offClaim').click()
+            await page.locator('#mOffline').wait_for(state='hidden')
         r = await page.evaluate(f"(()=>{{ const S={F}.S; return {{ has: !!S.tam, best: S.tam.best, party: S.tam.party, wk: S.tam.wk, mat: S.tam.mat, sg: S.tam.sg.length }}; }})()")
         print('옛 저장', r)
         ok(r['has'] and r['best'] == 0 and len(r['party']) >= 1 and r['mat'] == [0, 0, 0, 0] and r['sg'] == 5, '옛 저장도 탐험대 칸과 칸 장비 다섯 자리를 받아요')

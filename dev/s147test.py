@@ -26,6 +26,7 @@ async def main():
         r = await page.evaluate(f"""(async()=>{{ const F={F}, S=F.S, sl=ms=>new Promise(r=>setTimeout(r,ms)), out={{}};
           F.rt.fakeNow = Date.now(); S.rd = {{ day: '', n: 0, cur: '', at: 0, got: {{}}, st: 0, q: [] }}; const xp0 = S.ac.kor.xp + S.ac.kor.lv * 1e6;
           const ks = F.BOOKS.map(x => x.k); out.per = F.rdLeft();
+          F.rt.tapT = performance.now();   // 책을 직접 고를 때처럼, 앞서 뜬 자동 알림보다 책 결과를 먼저 보여요
           out.first = F.rdStart(ks[0]); out.st1 = S.rd.st; out.cur1 = S.rd.cur; out.n1 = S.rd.n; out.xp = (S.ac.kor.xp + S.ac.kor.lv * 1e6) > xp0;
           out.toast = (document.querySelector('#toast').textContent || '').slice(0, 14);
           out.q = F.qMeasure({{ t: 'rdBooks' }});

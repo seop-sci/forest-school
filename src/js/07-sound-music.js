@@ -66,6 +66,8 @@
       else if (name === 'shutter') { note(2200, 0, 0.025, 'square', 0.035); note(1400, 0.06, 0.04, 'square', 0.03); }   // 사진 찰칵
       else if (name === 'deny') note(196, 0, 0.16, 'square', 0.04);
       else if (name === 'leaf') { note(1150, 0, 0.04, 'triangle', 0.022); note(860, 0.035, 0.05, 'triangle', 0.018); }
+      else if (name === 'tamWind') { note(330, 0, 0.14, 'sine', 0.1); note(440, 0.13, 0.18, 'triangle', 0.09); }
+      else if (name === 'tamCounter') { note(165, 0, 0.13, 'triangle', 0.14); note(660, 0.025, 0.11, 'sine', 0.1); }
       else if (name === 'magpie') { note(1480, 0, 0.07, 'square', 0.03); note(1320, 0.13, 0.08, 'square', 0.03); }
       else if (name === 'done') { note(783.99, 0, 0.18, 'sine', 0.14, 2); note(1174.66, 0.12, 0.32, 'sine', 0.14, 2); }
       else if (name === 'quest') [1046.5, 1318.51, 1567.98, 2093].forEach((f, i) => note(f, i * 0.07, 0.22 + i * 0.05, 'triangle', 0.11));

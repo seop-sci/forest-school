@@ -85,6 +85,9 @@
     if (rt.evSeg === 'ps') { $('#psBody').dataset.key = ''; renderPass(); } else { $('#evBody').dataset.key = ''; renderEvent(); }
   }
   $('#panelEvent').addEventListener('click', e => {
+    const collect = e.target.closest('[data-collect]')?.dataset.collect;
+    if (collect === 'event') { claimEventRewards(); return; }
+    if (collect === 'pass') { psClaimBatch(); return; }
     const sg = e.target.closest('[data-evseg]'); if (sg && S) { sfx('tap'); setEvSeg(sg.dataset.evseg); return; }
     const pb = e.target.closest('[data-ps]'); if (pb && S) { const v = pb.dataset.ps; if (v === 'all') psClaimAll(); else if (v === 'ad') psWatchAd(); else psClaimMission(v[0], Number(v.slice(1))); return; }
     const pf = e.target.closest('[data-psf]'); if (pf && S) { psChooseFur(pf.dataset.psf); return; }

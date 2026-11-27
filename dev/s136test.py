@@ -22,7 +22,10 @@ async def main():
               const vis = el => {{ const r = el.getBoundingClientRect(); return r.width > 0 && r.left >= -1 && r.right <= innerWidth + 1 && r.top >= -1 && r.bottom <= innerHeight + 1; }};
               const full = document.querySelector('#app').classList.contains('tam-full'), boardOff = getComputedStyle(document.querySelector('.board')).display === 'none', tabsOff = getComputedStyle(document.querySelector('.tabs')).display === 'none';
               const pr = document.querySelector('#panelTam').getBoundingClientRect();
-              const inView = ['#tmExit', '#tmAc', '#tmSpd', '#tmSk .tm-sk', '#tmNav [data-tnav="rep"]', '#tmNav [data-tnav="mem"]'].map(q => [q, vis(document.querySelector(q))]);
+              const inView = ['#tmExit', '#tmAc', '#tmControls', '#tmSk .tm-sk', '#tmNav [data-tnav="rep"]', '#tmNav [data-tnav="mem"]'].map(q => [q, vis(document.querySelector(q))]);
+              const closed = document.querySelector('#tmActions').hidden;
+              document.querySelector('#tmControls').click();
+              const settings = closed && ['#tmSpd', '#tmAuto', '#tmSkOff'].every(q => vis(document.querySelector(q)));
               const ac = document.querySelector('#tmAcN').textContent;
               const bgOk = F.tamBg(1) === F.IMG('ex4_bg_ground') && !!F.IMG('ex4_bg_ground'), btn = getComputedStyle(document.querySelector('#panelTam')).getPropertyValue('--x4-btn').includes('url');
               document.querySelector('[data-tnav="mem"]').click(); await sl(400);
@@ -33,10 +36,11 @@ async def main():
               const rank = F.rt4.tab === 'rank' && F.rt4.rankView === 'tam' && !document.querySelector('#app').classList.contains('tam-full');
               F.setTab('tam'); await sl(300); document.querySelector('#tmExit').click(); await sl(200);
               const back = F.rt4.tab === 'school' && getComputedStyle(document.querySelector('.tabs')).display !== 'none';
-              return {{ full, boardOff, tabsOff, pw: Math.round(pr.width), ph: Math.round(pr.height), inView, ac, bgOk, btn, sheet, sheetIn, body, sheetOff, rank, back }}; }})()""")
+              return {{ full, boardOff, tabsOff, pw: Math.round(pr.width), ph: Math.round(pr.height), inView, settings, ac, bgOk, btn, sheet, sheetIn, body, sheetOff, rank, back }}; }})()""")
             print(w, sch, json.dumps(r, ensure_ascii=False))
             ok(r['full'] and r['boardOff'] and r['tabsOff'] and r['pw'] == w and r['ph'] == h, f'{w} 탐험은 화면 전체')
             ok(all(v for _, v in r['inView']), f'{w} 단추가 모두 화면 안 {r["inView"]}')
+            ok(r['settings'], f'{w} 전투 설정 안에 배속, 자동과 연출이 있어요')
             ok(r['ac'] not in ('', '0'), f'{w} 위 칸 도토리')
             ok(r['bgOk'] and r['btn'], f'{w} 새 그림(세로 배경, 둥근 단추 틀)')
             ok(r['sheet'] and r['sheetIn'] and r['body'] and r['sheetOff'], f'{w} 아래 메뉴로 창 열고 닫기')
