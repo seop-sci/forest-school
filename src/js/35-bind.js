@@ -106,10 +106,10 @@
       // 장비 단추도 꾹 누르면 계속 올라가요. 추천 칸은 매번 그때 추천된 장비를 올려요
       const tickG = () => { if (!hold) return; let [i, k] = hold.gear; if (hold.rec) { const g = tamUpRec().gear; if (!g) { stop(); return; } i = g.i; k = g.k; }
         if (!tamGearBuy(i, k)) { stop(); return; }
-        hold.n += 1; tamRestartStat(); sfx('coin'); tamRenderTop(); tamRenderBody();
+        hold.n += 1; tamRestartStat(); sfx('combo' + hold.n); tamRenderTop(); tamRenderBody();
         hold.t = setTimeout(tickG, Math.max(70, 180 - hold.n * 8)); };
       const tick = () => { if (!hold) return; if (hold.rec) { const R = tamUpRec().mem; if (!R) { stop(); return; } hold.sp = R.sp; } const c = tamLvCost(hold.sp); if (S.budget < c) { stop(); return; }
-        S.budget -= c; tamMem(hold.sp).lv += 1; hold.n += 1; tamRestartStat(); sfx('coin'); renderHUD(); tamRenderTop(); tamRenderBody();
+        S.budget -= c; tamMem(hold.sp).lv += 1; hold.n += 1; tamRestartStat(); sfx('combo' + hold.n); renderHUD(); tamRenderTop(); tamRenderBody();
         hold.t = setTimeout(tick, Math.max(50, 160 - hold.n * 6)); };
       $('#panelTam').addEventListener('pointerdown', e => { const gb = e.target.closest('[data-tgear]');
         if (gb && gb.getAttribute('aria-disabled') !== 'true') { const [si, k] = gb.dataset.tgear.split(':'); stop(); hold = { gear: [+si, k], rec: !!gb.closest('.tm-rec'), n: 0, t: setTimeout(tickG, 400) }; return; }
@@ -119,6 +119,8 @@
       $('#panelTam').addEventListener('contextmenu', e => e.preventDefault());   // 탐험 화면 어디든 길게 누르기 메뉴를 막아요(앱은 MainActivity에서도 막아요). 안드로이드 길게 누르기 메뉴를 막아요
       // 꾹 눌러서 올렸으면 손을 뗄 때 나오는 클릭은 버려요
       $('#panelTam').addEventListener('click', e => { if (hold && hold.n && e.target.closest('[data-tlv],[data-tgear]')) { e.stopImmediatePropagation(); e.preventDefault(); } }, true); }
+    // 보상 창을 닫으면 받은 도토리가 '좋아요'에서 위 숫자로 날아가요
+    $('#mReward').addEventListener('click', e => { const c = e.target.closest('[data-cm="mReward"]'); if (!c || !rt.rwAc) return; rt.rwAc = false; rt.hudFreeze = 0; flyAcorns($('#rwOk'), 1e6, 'acorn'); });
     $('#tmRepOk').addEventListener('click', () => tamRepTake(false)); $('#tmRepAd').addEventListener('click', () => tamRepTake(true));
   }
   // 광고 창과 출석부

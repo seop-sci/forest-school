@@ -14,6 +14,9 @@
       art.hidden = !o.art;
       art.innerHTML = o.art ? `<div class="rw-art">${o.art}</div><b>${esc(o.big || '')}</b>${o.bigSub ? `<small>${esc(o.bigSub)}</small>` : ''}` : '';
       $('#rwList').innerHTML = (o.items || []).filter(Boolean).map(it => `<li><span class="rw-ic">${icon(it.ic)}</span><span>${esc(it.t)}</span></li>`).join('');
+      rt.rwAc = (o.items || []).some(it => it && it.ic === 'acorn');
+      // 창이 떠 있는 동안 위 도토리 숫자는 그대로, 닫으면 '좋아요'에서 도토리가 날아가 올라가요
+      if (rt.rwAc && !rt.reduced) rt.hudFreeze = performance.now() + 60000;
       openModal($('#mReward'));
       sfx('quest');
       return true;

@@ -62,6 +62,8 @@
       if (name === 'tap') note(740, 0, 0.07, 'triangle', 0.07);
       else if (name.startsWith('pz')) { const L = +name.slice(2) || 0; if (!L) { note(620, 0, 0.06, 'triangle', 0.07); note(880, 0.04, 0.08, 'triangle', 0.06); } else { const f = 740 * Math.pow(1.122, L); note(f, 0, 0.1, 'triangle', 0.12); note(f * 1.5, 0.07, 0.16, 'triangle', 0.11); if (L >= 3) note(f * 2, 0.14, 0.22, 'triangle', 0.1); } }
       else if (name === 'coin') { note(988, 0, 0.1, 'triangle', 0.13); note(1319, 0.07, 0.18, 'triangle', 0.13); }
+      // 이어서 줍거나 꾹 눌러 올릴 때: 도토리 소리가 한 번마다 반음씩 높아져요(여덟 번까지)
+      else if (name.startsWith('combo')) { const m = Math.pow(2, Math.min(8, +name.slice(5) || 0) / 12); note(988 * m, 0, 0.09, 'triangle', 0.12); note(1319 * m, 0.06, 0.15, 'triangle', 0.12); }
       else if (name === 'buy') { note(523.25, 0, 0.14, 'triangle', 0.12); note(659.25, 0.08, 0.14, 'triangle', 0.12); note(783.99, 0.16, 0.26, 'triangle', 0.12); }
       else if (name === 'shutter') { note(2200, 0, 0.025, 'square', 0.035); note(1400, 0.06, 0.04, 'square', 0.03); }   // 사진 찰칵
       else if (name === 'deny') note(196, 0, 0.16, 'square', 0.04);

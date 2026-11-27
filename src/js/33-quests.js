@@ -665,12 +665,13 @@
     // 도토리는 칠판의 도토리 숫자로, 수료증은 아래 졸업 탭으로 날아가요
     const isDip = kind === 'dip';
     const to = isDip ? $('.tab[data-tab="grad"]') : $('#vBudget');
-    const bump = () => { if (!rt.reduced && to.animate) to.animate([{ transform: 'scale(1)' }, { transform: 'scale(1.2)' }, { transform: 'scale(1)' }], { duration: 320, easing: 'ease-out' }); };
+    const bump = () => { if (!isDip) { rt.hudFreeze = 0; hudRollRun(); } if (!rt.reduced && to && to.animate) to.animate([{ transform: 'scale(1)' }, { transform: 'scale(1.2)' }, { transform: 'scale(1)' }], { duration: 320, easing: 'ease-out' }); };
     const src = fromEl && (fromEl.querySelector('.q-act') || fromEl);
     if (!src || rt.reduced || !document.body.animate) { bump(); return; }
-    const a = src.getBoundingClientRect(), b = to.getBoundingClientRect();
-    if (!a.width) { bump(); return; }
+    const a = src.getBoundingClientRect(), b = to ? to.getBoundingClientRect() : { width: 0 };
+    if (!a.width || !b.width) { bump(); return; }
     const n = Math.min(7, 3 + Math.floor(Math.log10(Math.max(10, v))));
+    if (!isDip) { rt.hudFreeze = performance.now() + 620 + n * 60 + 200; hudRollRun(); }
     for (let i = 0; i < n; i++) {
       const el = document.createElement('span');
       el.className = 'fly';

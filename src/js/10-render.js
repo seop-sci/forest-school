@@ -7,9 +7,28 @@
   // 졸업 탭 빨간 점: 명예 교장실과 기금은 '추천' 칸을 올릴 수 있을 때만(다른 칸이 되어도 추천을 모으는 사람이 많아요)
   function gradRecReady() { const p = perkRec(), f = fpRec(); return !!(p && S.p.dip >= perkCost(p.k)) || !!(f && (S.fund > 0 || S.tier > 0) && S.fund >= fpCost(f.k)); }
   function teaRecReady() { const r = rt.rec; return !!(r && r.kind === 'tea' && TEA[r.k] && !teaMaxed(r.k) && S.budget >= teaCost(r.k)); }
+  // 위 줄 도토리: 한 번에 많이 들어오면 0.5초 동안 굴러 올라가요. 받은 도토리가 날아가는 동안은 그대로 있다가 닿으면 올라가요(움직임 줄이기면 바로)
+  function hudBudget() {
+    const v = S.budget, now = performance.now(), last = rt.hudShown;
+    if (rt.reduced || !isFinite(v) || last === undefined || v <= last) { rt.hudRoll = null; rt.hudShown = v; return v; }
+    if (rt.hudFreeze > now && rt.rwAc && $('#mReward').hidden) rt.hudFreeze = 0;   // 보상 창이 다른 길로 닫혔으면 바로 풀어요
+    if (rt.hudFreeze > now) return last;
+    const R = rt.hudRoll;
+    if (R) {
+      const k = Math.min(1, (now - R.t) / R.d);
+      if (k >= 1) { rt.hudRoll = null; rt.hudShown = v; return v; }
+      const shown = R.from + (v - R.from) * (1 - Math.pow(1 - k, 3)); rt.hudShown = shown; return shown;
+    }
+    if (v - last > Math.max(1, rate() * 3)) { rt.hudRoll = { from: last, t: now, d: 500 }; hudRollRun(); return last; }
+    rt.hudShown = v; return v;
+  }
+  function hudRollRun() {
+    const step = () => { if (!S) return; const el = $('#vBudget'); if (el) setTx(el, fmt2(hudBudget())); if (rt.hudRoll || rt.hudFreeze > performance.now()) requestAnimationFrame(step); };
+    requestAnimationFrame(step);
+  }
   function renderHUD() {
     document.body.classList.toggle('early', earlyDay());
-    setTx($('#vBudget'), fmt2(S.budget));
+    setTx($('#vBudget'), fmt2(hudBudget()));
     setTx($('#vRate'), `초당 +${fmtRate(rate())}${feastOn() ? ' (+100%)' : ''}`);
     renderDeal();
     setTx($('#vStudents'), `${Math.floor(S.students)}/${capacity()}`);

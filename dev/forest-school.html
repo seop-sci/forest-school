@@ -4341,6 +4341,11 @@ body.mg-on .toast[hidden]{display:none}
 .seg button{min-height:32px}
 .tm-lvn button{min-height:28px}
 .tx-regs button{min-height:36px}
+/* 누르는 순간 반응: 단추가 살짝 들어가요(scale 속성이라 단추의 transform 자리와 겹치지 않아요). 꺼진 단추와 움직임 줄이기는 빼요 */
+@media (prefers-reduced-motion:no-preference){
+  :where(button,[role="button"],summary):active:not(:disabled):not([aria-disabled="true"]){scale:.96}
+  :where(.cta,.btn-sub,.tx-card,.tm-rb,.icon-btn,.tab){transition-property:scale,transform,box-shadow,background-color;transition-duration:.08s}
+}
 </style>
 <div class="boot" id="boot" role="status" aria-label="숲속 동물 학교를 여는 중이에요">
   <div class="boot-pic" aria-hidden="true"></div>
@@ -4351,7 +4356,7 @@ body.mg-on .toast[hidden]{display:none}
     <p class="boot-step" id="bootStep">학교 문을 여는 중...</p>
     <p class="boot-tip" id="bootTip">학교 문을 여는 중이에요</p>
   </div>
-  <span class="boot-ver" id="bootVer">v5.4.2</span>
+  <span class="boot-ver" id="bootVer">v5.4.2.1</span>
 </div>
 
 <div class="app on-school" id="app">
@@ -4997,7 +5002,7 @@ body.mg-on .toast[hidden]{display:none}
       </div>
       <h3 class="panel-sub">정보</h3>
       <dl class="info">
-        <div id="verRow"><dt>버전</dt><dd>v5.4.2</dd></div>
+        <div id="verRow"><dt>버전</dt><dd>v5.4.2.1</dd></div>
         <div id="pidRow" hidden><dt>학교 번호</dt><dd id="infoPid"></dd></div>
       </dl>
       <div id="devBox" hidden>
@@ -9778,6 +9783,12 @@ body.mg-on .toast[hidden]{display:none}
     paOpenSea: undefined,   // 사진첩에서 펼친 다른 계절
     trSvOpen: undefined,   // 체험학습 기념품 칸을 펼쳤는지
     tripPlan: null,        // 출발 전에 고르는 체험학습 활동
+    pickN: 0,   // 이어 줍기 수
+    pickAt: 0,   // 마지막으로 주운 때
+    hudShown: undefined,   // 위 줄에 보이는 도토리(굴러 오르는 동안)
+    hudRoll: null,   // 도토리 숫자 굴러 오르기
+    hudFreeze: 0,   // 받은 도토리가 날아가는 동안 위 숫자를 잠깐 그대로
+    rwAc: false,   // 보상 창에 도토리가 있는지
     tripGot: undefined,   // 체험학습에서 받은 것
     tripTxt: undefined,   // 체험학습 단추에 보인 글
     tripView: undefined,   // 체험학습 창 화면(가기, 돌아옴, 쉼)
@@ -11391,6 +11402,8 @@ body.mg-on .toast[hidden]{display:none}
       if (name === 'tap') note(740, 0, 0.07, 'triangle', 0.07);
       else if (name.startsWith('pz')) { const L = +name.slice(2) || 0; if (!L) { note(620, 0, 0.06, 'triangle', 0.07); note(880, 0.04, 0.08, 'triangle', 0.06); } else { const f = 740 * Math.pow(1.122, L); note(f, 0, 0.1, 'triangle', 0.12); note(f * 1.5, 0.07, 0.16, 'triangle', 0.11); if (L >= 3) note(f * 2, 0.14, 0.22, 'triangle', 0.1); } }
       else if (name === 'coin') { note(988, 0, 0.1, 'triangle', 0.13); note(1319, 0.07, 0.18, 'triangle', 0.13); }
+      // 이어서 줍거나 꾹 눌러 올릴 때: 도토리 소리가 한 번마다 반음씩 높아져요(여덟 번까지)
+      else if (name.startsWith('combo')) { const m = Math.pow(2, Math.min(8, +name.slice(5) || 0) / 12); note(988 * m, 0, 0.09, 'triangle', 0.12); note(1319 * m, 0.06, 0.15, 'triangle', 0.12); }
       else if (name === 'buy') { note(523.25, 0, 0.14, 'triangle', 0.12); note(659.25, 0.08, 0.14, 'triangle', 0.12); note(783.99, 0.16, 0.26, 'triangle', 0.12); }
       else if (name === 'shutter') { note(2200, 0, 0.025, 'square', 0.035); note(1400, 0.06, 0.04, 'square', 0.03); }   // 사진 찰칵
       else if (name === 'deny') note(196, 0, 0.16, 'square', 0.04);
@@ -12776,9 +12789,11 @@ body.mg-on .toast[hidden]{display:none}
     S.budget += v; earn(v);
     S.st.picks += 1;
     if (rt.sports) { rt.sports.blue += 1; feverCombo(rt.sports, d.x, d.y); renderSportsBar(); }
-    floatText(d.x, d.y - 12, '+' + fmt(v), 'gold');
+    // 이어 줍기: 1.2초 안에 또 주우면 연속 수가 늘고 소리가 높아져요. 셋째부터 '연속 n'을 함께 보여요
+    { const now = performance.now(); rt.pickN = now - (rt.pickAt || 0) < 1200 ? (rt.pickN || 0) + 1 : 0; rt.pickAt = now; }
+    floatText(d.x, d.y - 12, '+' + fmt(v) + (rt.pickN >= 2 ? `  연속 ${rt.pickN + 1}` : ''), 'gold');
     if (!rt.sports) fxPick(d); else fxeBlue(d);   // 운동회: 청팀 색종이와 점프. 효과층: 반짝이와 도토리가 위쪽 도토리 숫자로 날아가요(운동회 공은 그대로)
-    sfx('coin'); buzz(12);
+    sfx(rt.pickN ? 'combo' + rt.pickN : 'coin'); buzz(12);
     removeDrop(d);
     renderHUD(); renderAffordance();
   }
@@ -13136,9 +13151,28 @@ body.mg-on .toast[hidden]{display:none}
   // 졸업 탭 빨간 점: 명예 교장실과 기금은 '추천' 칸을 올릴 수 있을 때만(다른 칸이 되어도 추천을 모으는 사람이 많아요)
   function gradRecReady() { const p = perkRec(), f = fpRec(); return !!(p && S.p.dip >= perkCost(p.k)) || !!(f && (S.fund > 0 || S.tier > 0) && S.fund >= fpCost(f.k)); }
   function teaRecReady() { const r = rt.rec; return !!(r && r.kind === 'tea' && TEA[r.k] && !teaMaxed(r.k) && S.budget >= teaCost(r.k)); }
+  // 위 줄 도토리: 한 번에 많이 들어오면 0.5초 동안 굴러 올라가요. 받은 도토리가 날아가는 동안은 그대로 있다가 닿으면 올라가요(움직임 줄이기면 바로)
+  function hudBudget() {
+    const v = S.budget, now = performance.now(), last = rt.hudShown;
+    if (rt.reduced || !isFinite(v) || last === undefined || v <= last) { rt.hudRoll = null; rt.hudShown = v; return v; }
+    if (rt.hudFreeze > now && rt.rwAc && $('#mReward').hidden) rt.hudFreeze = 0;   // 보상 창이 다른 길로 닫혔으면 바로 풀어요
+    if (rt.hudFreeze > now) return last;
+    const R = rt.hudRoll;
+    if (R) {
+      const k = Math.min(1, (now - R.t) / R.d);
+      if (k >= 1) { rt.hudRoll = null; rt.hudShown = v; return v; }
+      const shown = R.from + (v - R.from) * (1 - Math.pow(1 - k, 3)); rt.hudShown = shown; return shown;
+    }
+    if (v - last > Math.max(1, rate() * 3)) { rt.hudRoll = { from: last, t: now, d: 500 }; hudRollRun(); return last; }
+    rt.hudShown = v; return v;
+  }
+  function hudRollRun() {
+    const step = () => { if (!S) return; const el = $('#vBudget'); if (el) setTx(el, fmt2(hudBudget())); if (rt.hudRoll || rt.hudFreeze > performance.now()) requestAnimationFrame(step); };
+    requestAnimationFrame(step);
+  }
   function renderHUD() {
     document.body.classList.toggle('early', earlyDay());
-    setTx($('#vBudget'), fmt2(S.budget));
+    setTx($('#vBudget'), fmt2(hudBudget()));
     setTx($('#vRate'), `초당 +${fmtRate(rate())}${feastOn() ? ' (+100%)' : ''}`);
     renderDeal();
     setTx($('#vStudents'), `${Math.floor(S.students)}/${capacity()}`);
@@ -16135,8 +16169,8 @@ body.mg-on .toast[hidden]{display:none}
        forest/rank/<내 id>   랭킹 이름과 학교 점수
        forest/stats/<내 id>  테스트 현황 (어디까지 했는지, 얼마나 했는지)
      <내 id>는 Firebase 익명 로그인이 기기(브라우저)마다 만들어 줘요. */
-  const VERSION = '5.4.2';
-  const NT_QUIET = ['5.4.1.6', '5.4.1.5', '5.4.1.4', '5.4.1.3', '5.4.1.2', '5.4.1.1', '5.4.0.4', '5.4.0.3', '5.4.0.2', '5.4.0.1', '5.3.4.8', '5.3.4.7', '5.3.4.6', '5.3.4.5', '5.3.4.4', '5.3.4.3', '5.3.4.2', '5.3.4.1', '5.3.4', '5.3.2.1', '5.3.0.3', '5.3.0.2', '5.3.0.1', '5.2.2', '5.2.1', '5.2.0.2', '5.2.0.1', '5.1.1.3', '5.1.1.2', '5.1.1.1', '5.1.1', '5.0.3.1', '5.0.3', '5.0.2.2', '5.0.2.1', '2.1.20', '2.1.2.2', '2.3.0.1', '2.3.4', '3.2.3', '3.2.4', '3.2.5', '3.3.1', '3.3.2', '3.3.3', '4.4.1.1', '4.4.1.2', '4.4.1.3', '4.4.1.4', '5.0.1.1', '5.0.1.2', '5.0.1.3', '5.0.1.4', '5.0.1.5', '5.0.1.6', '5.0.1.7', '5.0.1.8'];
+  const VERSION = '5.4.2.1';
+  const NT_QUIET = ['5.4.2.1', '5.4.1.6', '5.4.1.5', '5.4.1.4', '5.4.1.3', '5.4.1.2', '5.4.1.1', '5.4.0.4', '5.4.0.3', '5.4.0.2', '5.4.0.1', '5.3.4.8', '5.3.4.7', '5.3.4.6', '5.3.4.5', '5.3.4.4', '5.3.4.3', '5.3.4.2', '5.3.4.1', '5.3.4', '5.3.2.1', '5.3.0.3', '5.3.0.2', '5.3.0.1', '5.2.2', '5.2.1', '5.2.0.2', '5.2.0.1', '5.1.1.3', '5.1.1.2', '5.1.1.1', '5.1.1', '5.0.3.1', '5.0.3', '5.0.2.2', '5.0.2.1', '2.1.20', '2.1.2.2', '2.3.0.1', '2.3.4', '3.2.3', '3.2.4', '3.2.5', '3.3.1', '3.3.2', '3.3.3', '4.4.1.1', '4.4.1.2', '4.4.1.3', '4.4.1.4', '5.0.1.1', '5.0.1.2', '5.0.1.3', '5.0.1.4', '5.0.1.5', '5.0.1.6', '5.0.1.7', '5.0.1.8'];
     // 이 버전들은 업데이트해도 공지 창을 띄우지 않아요(공지는 그대로)
   /* 공지사항: 설정 > 공지사항. 맨 위가 가장 새 공지예요
      패치노트는 자동으로 넣지 않아요. 검수한 글만 여기에 적어요(CHANGELOG.md는 자세한 기록용이라 따로 있어요)
@@ -25473,6 +25507,9 @@ body.mg-on .toast[hidden]{display:none}
       art.hidden = !o.art;
       art.innerHTML = o.art ? `<div class="rw-art">${o.art}</div><b>${esc(o.big || '')}</b>${o.bigSub ? `<small>${esc(o.bigSub)}</small>` : ''}` : '';
       $('#rwList').innerHTML = (o.items || []).filter(Boolean).map(it => `<li><span class="rw-ic">${icon(it.ic)}</span><span>${esc(it.t)}</span></li>`).join('');
+      rt.rwAc = (o.items || []).some(it => it && it.ic === 'acorn');
+      // 창이 떠 있는 동안 위 도토리 숫자는 그대로, 닫으면 '좋아요'에서 도토리가 날아가 올라가요
+      if (rt.rwAc && !rt.reduced) rt.hudFreeze = performance.now() + 60000;
       openModal($('#mReward'));
       sfx('quest');
       return true;
@@ -29391,12 +29428,13 @@ body.mg-on .toast[hidden]{display:none}
     // 도토리는 칠판의 도토리 숫자로, 수료증은 아래 졸업 탭으로 날아가요
     const isDip = kind === 'dip';
     const to = isDip ? $('.tab[data-tab="grad"]') : $('#vBudget');
-    const bump = () => { if (!rt.reduced && to.animate) to.animate([{ transform: 'scale(1)' }, { transform: 'scale(1.2)' }, { transform: 'scale(1)' }], { duration: 320, easing: 'ease-out' }); };
+    const bump = () => { if (!isDip) { rt.hudFreeze = 0; hudRollRun(); } if (!rt.reduced && to && to.animate) to.animate([{ transform: 'scale(1)' }, { transform: 'scale(1.2)' }, { transform: 'scale(1)' }], { duration: 320, easing: 'ease-out' }); };
     const src = fromEl && (fromEl.querySelector('.q-act') || fromEl);
     if (!src || rt.reduced || !document.body.animate) { bump(); return; }
-    const a = src.getBoundingClientRect(), b = to.getBoundingClientRect();
-    if (!a.width) { bump(); return; }
+    const a = src.getBoundingClientRect(), b = to ? to.getBoundingClientRect() : { width: 0 };
+    if (!a.width || !b.width) { bump(); return; }
     const n = Math.min(7, 3 + Math.floor(Math.log10(Math.max(10, v))));
+    if (!isDip) { rt.hudFreeze = performance.now() + 620 + n * 60 + 200; hudRollRun(); }
     for (let i = 0; i < n; i++) {
       const el = document.createElement('span');
       el.className = 'fly';
@@ -30001,10 +30039,36 @@ body.mg-on .toast[hidden]{display:none}
     const el = $('#toast');
     el.textContent = msg;
     el.hidden = false; rt.toastAt = performance.now();
+    toastPlace(el);
     el.style.animation = 'none'; void el.offsetWidth; el.style.animation = '';
     clearTimeout(toastTimer);
     const dur = Math.min(5500, 2200 + Math.max(0, msg.replace(/\s/g, '').length - 22) * 75);   // 긴 알림은 더 오래
     toastTimer = setTimeout(() => { el.hidden = true; const n = rt.toastQ.shift(); if (n) toastTimer = setTimeout(() => toastShow(n), 200); }, dur);
+  }
+  // 알림 자리: 위 줄 숫자, 열린 창의 제목과 단추를 가리지 않는 곳을 위에서부터 찾아요. 빈 곳이 없으면 가장 덜 가리는 곳
+  // 숲속 합치기와 사진 모드는 따로 정한 자리를 써요
+  function toastPlace(el) {
+    el.style.top = '';
+    const B = document.body.classList;
+    if (B.contains('mg-on') || B.contains('photo')) return;
+    const r0 = el.getBoundingClientRect(), h = r0.height, H = innerHeight;
+    if (!h || !r0.width) return;
+    const top0 = r0.top, bottom = H - h - 8, pad = 4, list = [];
+    // 단추와 제목은 꼭 피하고(무게 1), 굵은 글(이름)은 되도록 피해요(무게 0.4)
+    const sel = 'button,[role="button"],a[href],input,select,summary,.modal h2,.panel h2,#vBudget,#vRate,#vStudents,.modal b,.panel b,.sheet b';
+    for (const e of document.querySelectorAll(sel)) {
+      if (e === el || el.contains(e)) continue;
+      const r = e.getBoundingClientRect();
+      if (r.width < 1 || r.height < 1 || r.bottom < 0 || r.top > H || r.right < r0.left || r.left > r0.right) continue;
+      const t = document.elementFromPoint(Math.min(innerWidth - 1, Math.max(0, r.left + r.width / 2)), Math.min(H - 1, Math.max(0, r.top + r.height / 2)));
+      if (!t || (t !== e && !e.contains(t) && !t.contains(e) && t !== el)) continue;
+      list.push([r.top - pad, r.bottom + pad, e.matches('b') && !e.closest('button') ? 0.4 : 1]);
+    }
+    const cost = y => { let c = 0; for (const [a, b, k] of list) c += k * Math.max(0, Math.min(b, y + h) - Math.max(a, y)); return c; };
+    if (!cost(top0)) return;
+    let best = top0, bc = Infinity;
+    for (let y = top0; y <= bottom; y += 6) { const raw = cost(y); if (!raw) { best = y; break; } const c = raw + (y - top0) * 0.02; if (c < bc) { bc = c; best = y; } }
+    if (best !== top0) el.style.top = Math.round(best) + 'px';
   }
   function toastFlush() { if (rt.modalOpen || rt.cereOn || !rt.mdToasts.length) return; const q = rt.mdToasts.splice(0); const el = $('#toast'); if (el.hidden) { toastShow(q.shift()); } rt.toastQ.push(...q.filter(m => !rt.toastQ.includes(m))); rt.toastQ.splice(3); }
   // 흔들기 표시(shake)가 남아 있어서 숨겼다 다시 보일 때 흔들림이 다시 돌았어요. 끝나면 지워요
@@ -30369,10 +30433,10 @@ body.mg-on .toast[hidden]{display:none}
       // 장비 단추도 꾹 누르면 계속 올라가요. 추천 칸은 매번 그때 추천된 장비를 올려요
       const tickG = () => { if (!hold) return; let [i, k] = hold.gear; if (hold.rec) { const g = tamUpRec().gear; if (!g) { stop(); return; } i = g.i; k = g.k; }
         if (!tamGearBuy(i, k)) { stop(); return; }
-        hold.n += 1; tamRestartStat(); sfx('coin'); tamRenderTop(); tamRenderBody();
+        hold.n += 1; tamRestartStat(); sfx('combo' + hold.n); tamRenderTop(); tamRenderBody();
         hold.t = setTimeout(tickG, Math.max(70, 180 - hold.n * 8)); };
       const tick = () => { if (!hold) return; if (hold.rec) { const R = tamUpRec().mem; if (!R) { stop(); return; } hold.sp = R.sp; } const c = tamLvCost(hold.sp); if (S.budget < c) { stop(); return; }
-        S.budget -= c; tamMem(hold.sp).lv += 1; hold.n += 1; tamRestartStat(); sfx('coin'); renderHUD(); tamRenderTop(); tamRenderBody();
+        S.budget -= c; tamMem(hold.sp).lv += 1; hold.n += 1; tamRestartStat(); sfx('combo' + hold.n); renderHUD(); tamRenderTop(); tamRenderBody();
         hold.t = setTimeout(tick, Math.max(50, 160 - hold.n * 6)); };
       $('#panelTam').addEventListener('pointerdown', e => { const gb = e.target.closest('[data-tgear]');
         if (gb && gb.getAttribute('aria-disabled') !== 'true') { const [si, k] = gb.dataset.tgear.split(':'); stop(); hold = { gear: [+si, k], rec: !!gb.closest('.tm-rec'), n: 0, t: setTimeout(tickG, 400) }; return; }
@@ -30382,6 +30446,8 @@ body.mg-on .toast[hidden]{display:none}
       $('#panelTam').addEventListener('contextmenu', e => e.preventDefault());   // 탐험 화면 어디든 길게 누르기 메뉴를 막아요(앱은 MainActivity에서도 막아요). 안드로이드 길게 누르기 메뉴를 막아요
       // 꾹 눌러서 올렸으면 손을 뗄 때 나오는 클릭은 버려요
       $('#panelTam').addEventListener('click', e => { if (hold && hold.n && e.target.closest('[data-tlv],[data-tgear]')) { e.stopImmediatePropagation(); e.preventDefault(); } }, true); }
+    // 보상 창을 닫으면 받은 도토리가 '좋아요'에서 위 숫자로 날아가요
+    $('#mReward').addEventListener('click', e => { const c = e.target.closest('[data-cm="mReward"]'); if (!c || !rt.rwAc) return; rt.rwAc = false; rt.hudFreeze = 0; flyAcorns($('#rwOk'), 1e6, 'acorn'); });
     $('#tmRepOk').addEventListener('click', () => tamRepTake(false)); $('#tmRepAd').addEventListener('click', () => tamRepTake(true));
   }
   // 광고 창과 출석부
@@ -34753,7 +34819,7 @@ body.mg-on .toast[hidden]{display:none}
     MAP_OAK, oakArt, layoutOak, mapOak, oakAt, tapOak, dropSpot,
     dexMeet, dexSync, dexPending, dexGift, renderDex, evCurrent, evNext, evUpcoming, evSync, evFix, evVal, EV_FALLBACK, EV_DECO, EV_HAT, COS, DECO_BY, decoOwn, perkRec, fpRec, gmPast, gmItems, gmNow, GMON, buyShop, pickShop, showNote, showOkOn, showWd, renderGradPanel, renderShop, renderDecoShop, EV_WEEKLY, EV_WEEK_BASE, weekMon, claimStamp, claimEvMission, claimEvBox, renderEvent, evMissions, evOk, evSkipped, EV_MONTHS, EV_MEASURE, tierMinutes, minAcorns, IMG, sanitize171, ACH, achSync, claimAch, setTitle, renderAch, setDexSeg, achClaimable, XT, xtAct, xtCost, xtLv, feastMins, libMult, propInstances, walkBuild, festItemSvg, guestArt, adErrText, googleErrText, openSheet, closeSheet, startFest, startSports, sanitize170, EV_STAMPS, EV_SPECIAL, EV_MONTHLY, EV_BOX, DEX_KEYS, DEX_REWARD, DEX_GUEST_KEYS, seasonKey, roofArtKey, thrKey, PP, PP_TITLES, ppOpen, ppPer, ppData, ppDay, ppWrite, ppTick, ppSync, ppScore, ppSemDone, rtMax, alumniLines, SIDE, vdReward, oakKey, setSeasonArt, VP, vpLv, vpCost, vpMult, vpAct, renderVpCard, sportsPrize, festPrize, renderTeachers, buildTeacherCards, bldImg, roofKey, bldStage, mapKey, setMapArt, applyThemes, buyFacility, bldFx, setBldFx, mapHi, Live, liveApply, liveLoad, liveOff, LIVE_KEYS, EVC, NOTICES, openNotice, noticeAuto, noticeWant, ntUnread, startTrial, endTrial: () => rt.trial && (rt.trial.left = 0), spawnDeal, startVisit, IMG170, MG, mgCells, mgSetCells, mgTick, mgAddEnergy, mgAddUp, mgTapGen, mgDrop, mgSell, mgUpgrade, mgAddUp, mgUpSwap, mgGensMax, MG_UP_ESS, mgClaimOrder, mgSwapOrder, mgOrderOk, mgFillOrders, mgOpen, mgClose, mgRenderAll, mgSpawnLevel, mgNearestEmpty, mgEmptyBoard, mgOrderReward, mgUI, sanitize180, mgWatchAd, mgNewOrder, mgHintPick, mgShowHint, mgClearHint, mgTouch, mgOrderGuide, mgDexN, mgDexCan, mgDexClaim, mgOpenDex, MG_DEX, MG_DEX_MS, mgDexEss, mgDexEssCan, mgDexEssN, mgDexMsCan, mgDexMsClaim, MGB, mgBuyBoost, mgBstLeft, mgOpenBoost, nice, claimMission, claimBonus, claimWeekMission, MP_BOX, swapDaily, repairMissions, MISSIONS, WMISSIONS, dmDay, wkWeek,   // 도감, 이벤트
     PZ, PZ_SHAPES, pzFits, pzAnyFit, pzStuck, pzFullLines, pzPlace, pzFreshGame, pzStart, PZB, pzbCost, pzApplyBoost, pzBoostOpen, pzBoostGo, festGoldLeft, festGoldTake, claimSports, TR2, TR2_PL, openTr2, tr2Act, tr2Away, tr2Ready, tr2Rsv, tr2Tick, renderAlbum, FEST, FEST_IDS, festNight, festShown, festTimeLock, festOpen, startFest, openFest, endFest, renderStreet, pzFinish, pzHelpSquirrel, pzHelpOwl, pzHelpBear, fillSubs, mapRoofTop, showAd, claimOfflineDouble, startBoost, tripAd, festFocus, festRange, visMap, renderMissions, pzHasHelp, pzRot, pzNewPiece, pzOpen, pzClose, pzGameOver, pzRenderAll, renderMini, addEss, ESHOP, SP_FUR, applyCos, essItem, pickEss, buyEss, renderEssShop, hatSVG, spFurImg, gameNow, gameToday, gameWeek, kstDay, setServerTime, SVR, dmDay, weekIdx, lgWeek, wkWeek, lgKey, pzDay, goldDay, boostLeft, dealLeft, canStamp };
-  if (window.__FOREST_TEST) Object.assign(window.__forest, { acctSaveFirst, netSleep, netWake, uniTerm, utSync, tripUseTicket, readUseTicket, picnicUseTicket, buyDecoPieces, adGold, claimBonus, cloudPush, cloudClash, syncGet, revOf, deleteAccount, lookDel: () => lookDelNow(), lookSet, lookPush, leaveRank, sanitizeCg, freshCg, ambWant, ambSync, AMB, AMB_LV, WLD, wldSync, wldLv, wldPhase, wldWeather, wldAuto, WLD_WATER, wldCurtain, photoOpen, photoClose, oakBend, oakBands, frPatAll, frPatLeft, fpsToggle, fxRes, fxWant, gradRecReady, teaRecReady, GS, GS_WHO, GS_LINES, gsArt, goldTip, goldTipWant, rtLv, conEssCost, renderRx, labLeft, useLog, useStr, useSumText, sanitizeUse, freshUse, statsDoc, mgOpen, pzOpen, bxTap, BX, gsTick, gsSync, gsTap, gsClaim, gsReady, gsPick, gsMakeSub, gsCardHTML, freshGs, sanitizeGs, updateVisit, endVisit, buildQuestPanel, renderQuestPanel, checkQuests, talkNext });   // 시험 손잡이
+  if (window.__FOREST_TEST) Object.assign(window.__forest, { acctSaveFirst, netSleep, netWake, uniTerm, utSync, tripUseTicket, readUseTicket, picnicUseTicket, buyDecoPieces, adGold, claimBonus, cloudPush, cloudClash, syncGet, revOf, deleteAccount, lookDel: () => lookDelNow(), lookSet, lookPush, leaveRank, sanitizeCg, freshCg, ambWant, ambSync, AMB, AMB_LV, WLD, wldSync, wldLv, wldPhase, wldWeather, wldAuto, WLD_WATER, wldCurtain, photoOpen, photoClose, oakBend, oakBands, frPatAll, frPatLeft, toast, toastPlace, collect, spawnDrop, hudBudget, flyAcorns, fpsToggle, fxRes, fxWant, gradRecReady, teaRecReady, GS, GS_WHO, GS_LINES, gsArt, goldTip, goldTipWant, rtLv, conEssCost, renderRx, labLeft, useLog, useStr, useSumText, sanitizeUse, freshUse, statsDoc, mgOpen, pzOpen, bxTap, BX, gsTick, gsSync, gsTap, gsClaim, gsReady, gsPick, gsMakeSub, gsCardHTML, freshGs, sanitizeGs, updateVisit, endVisit, buildQuestPanel, renderQuestPanel, checkQuests, talkNext });   // 시험 손잡이
   if (window.claude && window.claude.hot && window.claude.hot.snapshot) {
     try { window.claude.hot.snapshot(() => { if (S) syncMid(); return { save: S }; }); } catch (e) { /* 무시 */ }
   }

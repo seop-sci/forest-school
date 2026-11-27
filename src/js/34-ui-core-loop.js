@@ -55,10 +55,36 @@
     const el = $('#toast');
     el.textContent = msg;
     el.hidden = false; rt.toastAt = performance.now();
+    toastPlace(el);
     el.style.animation = 'none'; void el.offsetWidth; el.style.animation = '';
     clearTimeout(toastTimer);
     const dur = Math.min(5500, 2200 + Math.max(0, msg.replace(/\s/g, '').length - 22) * 75);   // 긴 알림은 더 오래
     toastTimer = setTimeout(() => { el.hidden = true; const n = rt.toastQ.shift(); if (n) toastTimer = setTimeout(() => toastShow(n), 200); }, dur);
+  }
+  // 알림 자리: 위 줄 숫자, 열린 창의 제목과 단추를 가리지 않는 곳을 위에서부터 찾아요. 빈 곳이 없으면 가장 덜 가리는 곳
+  // 숲속 합치기와 사진 모드는 따로 정한 자리를 써요
+  function toastPlace(el) {
+    el.style.top = '';
+    const B = document.body.classList;
+    if (B.contains('mg-on') || B.contains('photo')) return;
+    const r0 = el.getBoundingClientRect(), h = r0.height, H = innerHeight;
+    if (!h || !r0.width) return;
+    const top0 = r0.top, bottom = H - h - 8, pad = 4, list = [];
+    // 단추와 제목은 꼭 피하고(무게 1), 굵은 글(이름)은 되도록 피해요(무게 0.4)
+    const sel = 'button,[role="button"],a[href],input,select,summary,.modal h2,.panel h2,#vBudget,#vRate,#vStudents,.modal b,.panel b,.sheet b';
+    for (const e of document.querySelectorAll(sel)) {
+      if (e === el || el.contains(e)) continue;
+      const r = e.getBoundingClientRect();
+      if (r.width < 1 || r.height < 1 || r.bottom < 0 || r.top > H || r.right < r0.left || r.left > r0.right) continue;
+      const t = document.elementFromPoint(Math.min(innerWidth - 1, Math.max(0, r.left + r.width / 2)), Math.min(H - 1, Math.max(0, r.top + r.height / 2)));
+      if (!t || (t !== e && !e.contains(t) && !t.contains(e) && t !== el)) continue;
+      list.push([r.top - pad, r.bottom + pad, e.matches('b') && !e.closest('button') ? 0.4 : 1]);
+    }
+    const cost = y => { let c = 0; for (const [a, b, k] of list) c += k * Math.max(0, Math.min(b, y + h) - Math.max(a, y)); return c; };
+    if (!cost(top0)) return;
+    let best = top0, bc = Infinity;
+    for (let y = top0; y <= bottom; y += 6) { const raw = cost(y); if (!raw) { best = y; break; } const c = raw + (y - top0) * 0.02; if (c < bc) { bc = c; best = y; } }
+    if (best !== top0) el.style.top = Math.round(best) + 'px';
   }
   function toastFlush() { if (rt.modalOpen || rt.cereOn || !rt.mdToasts.length) return; const q = rt.mdToasts.splice(0); const el = $('#toast'); if (el.hidden) { toastShow(q.shift()); } rt.toastQ.push(...q.filter(m => !rt.toastQ.includes(m))); rt.toastQ.splice(3); }
   // 흔들기 표시(shake)가 남아 있어서 숨겼다 다시 보일 때 흔들림이 다시 돌았어요. 끝나면 지워요

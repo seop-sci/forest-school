@@ -120,6 +120,12 @@
     paOpenSea: undefined,   // 사진첩에서 펼친 다른 계절
     trSvOpen: undefined,   // 체험학습 기념품 칸을 펼쳤는지
     tripPlan: null,        // 출발 전에 고르는 체험학습 활동
+    pickN: 0,   // 이어 줍기 수
+    pickAt: 0,   // 마지막으로 주운 때
+    hudShown: undefined,   // 위 줄에 보이는 도토리(굴러 오르는 동안)
+    hudRoll: null,   // 도토리 숫자 굴러 오르기
+    hudFreeze: 0,   // 받은 도토리가 날아가는 동안 위 숫자를 잠깐 그대로
+    rwAc: false,   // 보상 창에 도토리가 있는지
     tripGot: undefined,   // 체험학습에서 받은 것
     tripTxt: undefined,   // 체험학습 단추에 보인 글
     tripView: undefined,   // 체험학습 창 화면(가기, 돌아옴, 쉼)
