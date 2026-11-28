@@ -291,7 +291,6 @@ g.plaque[id^="pq-"] .t-plaque{font-size:8.6px}   /* 건물 이름표는 그림 �
 .bld .focus-ring{fill:none;stroke:transparent;stroke-width:3}
 .bld:focus-visible .focus-ring{stroke:var(--accent)}
 .bld .built,.bld .site{transform-box:fill-box;transform-origin:50% 100%;transition:transform .12s}
-.bld.press .built,.bld.press .site{transform:scale(.96)}
 .bld:not(.is-built) .built{display:none}
 /* 짓기와 업그레이드 효과: 처음 지으면 비계와 망치, 흙먼지 속에서 건물이 솟아오르고 리본이 펼쳐져요. 업그레이드하면 통통 튀며 배지가 떠요 */
 .bld .built.fx-rise{animation:bldRise 2s cubic-bezier(.25,.9,.35,1) both}
@@ -4350,6 +4349,8 @@ body.mg-on .toast[hidden]{display:none}
   :where(button,[role="button"],summary):active:not(:disabled):not([aria-disabled="true"]){scale:.96}
   :where(.cta,.btn-sub,.tx-card,.tm-rb,.icon-btn,.tab){transition-property:scale,transform,box-shadow,background-color;transition-duration:.08s}
 }
+/* 지도 안(참나무, 건물, 도토리, 학생, 이름표 모두)은 누를 때 줄거나 움직이지 않아요. svg 안에서는 지도 왼쪽 위를 축으로 줄어서 지도가 움찔하고 참나무가 떼어 낸 자리와 어긋나 깨져 보였어요 */
+#map :active,#map :active *{scale:none}
 /* 다른 말: 오른쪽 메뉴 이름이 한국어보다 길어요. 작게, 두 줄까지 */
 html[lang]:not([lang="ko"]) .app .sidebtn .sb-lb,html[lang]:not([lang="ko"]) .app.on-school .map-right .sidebtn .sb-lb{max-width:100%;font-size:10px;letter-spacing:-.2px;white-space:normal;line-height:1.05;text-align:center;overflow-wrap:anywhere}
 /* 다른 말: 한국어보다 긴 글이 잘리지 않게 작게 하거나 두 줄까지 */
@@ -4374,7 +4375,7 @@ html[lang]:not([lang="ko"]) .app .board .school-row .school-year b{font-size:11.
     <p class="boot-step" id="bootStep">학교 문을 여는 중...</p>
     <p class="boot-tip" id="bootTip">학교 문을 여는 중이에요</p>
   </div>
-  <span class="boot-ver" id="bootVer">v5.4.2.1</span>
+  <span class="boot-ver" id="bootVer">v5.5.0</span>
 </div>
 
 <div class="app on-school" id="app">
@@ -5021,7 +5022,7 @@ html[lang]:not([lang="ko"]) .app .board .school-row .school-year b{font-size:11.
       </div>
       <h3 class="panel-sub">정보</h3>
       <dl class="info">
-        <div id="verRow"><dt>버전</dt><dd>v5.4.2.1</dd></div>
+        <div id="verRow"><dt>버전</dt><dd>v5.5.0</dd></div>
         <div id="pidRow" hidden><dt>학교 번호</dt><dd id="infoPid"></dd></div>
       </dl>
       <div id="devBox" hidden>
@@ -16531,7 +16532,7 @@ html[lang]:not([lang="ko"]) .app .board .school-row .school-year b{font-size:11.
        forest/rank/<내 id>   랭킹 이름과 학교 점수
        forest/stats/<내 id>  테스트 현황 (어디까지 했는지, 얼마나 했는지)
      <내 id>는 Firebase 익명 로그인이 기기(브라우저)마다 만들어 줘요. */
-  const VERSION = '5.4.2.1';
+  const VERSION = '5.5.0';
   const NT_QUIET = ['5.4.2.1', '5.4.1.6', '5.4.1.5', '5.4.1.4', '5.4.1.3', '5.4.1.2', '5.4.1.1', '5.4.0.4', '5.4.0.3', '5.4.0.2', '5.4.0.1', '5.3.4.8', '5.3.4.7', '5.3.4.6', '5.3.4.5', '5.3.4.4', '5.3.4.3', '5.3.4.2', '5.3.4.1', '5.3.4', '5.3.2.1', '5.3.0.3', '5.3.0.2', '5.3.0.1', '5.2.2', '5.2.1', '5.2.0.2', '5.2.0.1', '5.1.1.3', '5.1.1.2', '5.1.1.1', '5.1.1', '5.0.3.1', '5.0.3', '5.0.2.2', '5.0.2.1', '2.1.20', '2.1.2.2', '2.3.0.1', '2.3.4', '3.2.3', '3.2.4', '3.2.5', '3.3.1', '3.3.2', '3.3.3', '4.4.1.1', '4.4.1.2', '4.4.1.3', '4.4.1.4', '5.0.1.1', '5.0.1.2', '5.0.1.3', '5.0.1.4', '5.0.1.5', '5.0.1.6', '5.0.1.7', '5.0.1.8'];
     // 이 버전들은 업데이트해도 공지 창을 띄우지 않아요(공지는 그대로)
   /* 공지사항: 설정 > 공지사항. 맨 위가 가장 새 공지예요
