@@ -49,7 +49,7 @@
   const gradOn = t => (t === undefined ? (S ? S.tier : 0) : t) >= GRAD_TIER;
   const gradSemN = (y, sem) => (Math.max(1, y) - 1) * 2 + (sem ? 1 : 0) + 1;
   const gradSemTxt = (y, sem) => { const n = gradSemN(y, sem); return n <= 4 ? `석사 ${n}학기` : `박사 ${n - 4}학기`; };
-  const yearLabel = () => gradOn() ? `대학원 ${gradSemTxt(yearNo(), S.sem)}` : `${tierInfo().name} ${yearNo()}${tierInfo().unit}`;
+  const yearLabel = () => gradOn() ? `${trStr('대학원')} ${trStr(gradSemTxt(yearNo(), S.sem))}` : `${trStr(tierInfo().name)} ${trStr(`${yearNo()}${tierInfo().unit}`)}`;   // 다른 말은 조각마다 바꿔요(한국어에서는 그대로)
   // '2년째가', '3학년이'처럼 뒤에 붙는 조사까지
   const yearSubj = (n, T) => `${n}${T.unit}${T.unit === '년째' ? '가' : '이'}`;
   // 동네 평판 기준도 학교급마다 20%씩 높아져요

@@ -437,7 +437,7 @@
     queueModal(() => {
       tamAdDay();
       const h = Math.floor(I.sec / 3600), mm = Math.floor(I.sec % 3600 / 60);
-      $('#tmRepSub').textContent = `${h ? h + '시간 ' : ''}${mm}분 동안 장난꾸러기 ${fmt(I.mobs)}마리를 달래 줬어요`;
+      $('#tmRepSub').textContent = `${h ? `${h}시간 ${mm}분` : `${mm}분`} 동안 장난꾸러기 ${fmt(I.mobs)}마리를 달래 줬어요`;   // 걸린 시간을 한 자리로(다른 말에서 시간 글을 통째로 바꿔요)
       setH($('#tmRepList'), I.mat.map((v, i) => v ? `<li><span>${TAM.matIc[i]}</span>${TAM.mats[i]} +${fmt(v)}</li>` : '').join('') + (I.acorn ? `<li>${acornIcon()}도토리 +${fmt(I.acorn)}</li>` : ''));
       const ad = $('#tmRepAd'); ad.hidden = S.tam.ad.rep >= TAM.adRep;
       openModal($('#mTamRep'));
@@ -569,6 +569,7 @@
   // 3D 그림(ex3_)이 있으면 먼저 쓰고, 없으면 2D 그림(ex_)
   const tamI = k => IMG(String(k).replace(/^ex_/, 'ex3_')) || IMG(k);
   const tamPcPic = (sp, act) => tamI(`ex_pc_${sp}_${act ? 'act' : 'idle'}`) || IMG('chr_' + sp) || '';
+  const tamPcFb = sp => tamI(`ex_pc_${sp}_idle`) ? '' : ' data-fb';   // 탐험 그림이 없어 학교 그림(위아래 꽉 찬 그림)을 쓰면 작게 맞춰요(아르마딜로, 레무르 등)
   const TAM_FRAME_SPECS = {
     bear:   { run: 6, recoil: 4, stride: 490 },
     rabbit: { run: 4, recoil: 4, stride: 415 },
@@ -634,7 +635,7 @@
   function tamToast(msg) {
     const st = $('#tmStage'), m = $('#tmMsg');
     if (!st || !m || rt.tab !== 'tam' || $('#panelTam').hidden || !$('#tmSheet').hidden) { toast(msg); return; }   // 창이 열려 있으면 무대 알림이 창 뒤에 가려요
-    m.textContent = msg; m.hidden = false; m.style.animation = 'none'; void m.offsetWidth; m.style.animation = '';
+    m.textContent = trStr(String(msg)); m.hidden = false; m.style.animation = 'none'; void m.offsetWidth; m.style.animation = '';
     clearTimeout(m._t); m._t = setTimeout(() => { m.hidden = true; }, 2600);
   }
   function tamFxOn() { return rt.tab === 'tam' && !rt.modalOpen && !document.hidden; }
@@ -683,23 +684,39 @@
     setH($('#tmP'), party.map((p, i) => { const [x, y] = TM_PPOS[i] || TM_PPOS[0];
       const pose = F?.wind && IMG(`ex4_pc_${p.sp}_sk`);
       const frames = F?.wind ? tamFrameArt(p.sp, true) : '';
-      return `<div class="tm-f${frames ? ' tm-frame-owner' : ''}" data-actor="${p.sp}" data-i="${i}" style="left:${x}%;bottom:${y + TM_UP}%;z-index:${30 - y};${tamDz(y)}--bd:-${(i * 0.37).toFixed(2)}s;--bd2:${(i * 0.06).toFixed(2)}s"><div class="tm-body"><img src="${tamPcPic(p.sp)}" alt="${esc(spName(p.sp))}">${pose ? `<img class="tm-counter-pose" src="${pose}" alt="">` : ''}${frames}</div><i class="tm-hp"><s></s><b></b></i></div>`; }).join(''));
+      return `<div class="tm-f${frames ? ' tm-frame-owner' : ''}" data-actor="${p.sp}" data-i="${i}" style="left:${x}%;bottom:${y + TM_UP}%;z-index:${30 - y};${tamDz(y)}--bd:-${(i * 0.37).toFixed(2)}s;--bd2:${(i * 0.06).toFixed(2)}s"><div class="tm-body"><img src="${tamPcPic(p.sp)}"${tamPcFb(p.sp)} alt="${esc(spName(p.sp))}">${pose ? `<img class="tm-counter-pose" src="${pose}" alt="">` : ''}${frames}</div><i class="tm-hp"><s></s><b></b></i></div>`; }).join(''));
     if (!F) { setH($('#tmM'), ''); return; }
     const pos = boss ? TM_BPOS : F.M.length === 1 ? TM_MPOS1 : F.M.length === 2 ? TM_MPOS2 : TM_MPOS;   // 마리 수에 맞춘 자리
     setH($('#tmM'), F.M.map((m, i) => { const [x, y] = pos[i] || pos[0];
       return `<div class="tm-f tm-mob in${m.boss ? ' boss' : ''}${m.solo ? ' solo' : ''}" data-i="${i}" style="left:${x}%;bottom:${y + TM_UP}%;z-index:${30 - y};${tamDz(y)}--bd:-${(i * 0.5).toFixed(2)}s;--id:${(i * 0.12).toFixed(2)}s"><div class="tm-body"><img src="${tamMobPic(F.fl, m)}" alt="${esc(m.nm)}"></div><i class="tm-hp"><s></s><b></b></i></div>`; }).join(''));
     if (boss) tamShake(7, 420);
+    tamWarm(F);
     tamSkills(); tamDraw(F);
+  }
+  // 칠 때 바꿔 끼우는 그림(공격, 맞음, 필살기 자세와 기술 그림)을 판이 시작될 때 미리 받아 풀어 둬요. 처음 칠 때 그림을 받느라 멈칫했어요
+  const TM_WARM = new Map();
+  function tamWarm(F) {
+    const reg = tamReg(F.fl).k, ks = [];
+    for (const p of F.P) ks.push(`ex4_pc_${p.sp}_atk`, `ex4_pc_${p.sp}_hurt`, `ex4_pc_${p.sp}_sk`, `ex3_pc_${p.sp}_act`, `ex_pc_${p.sp}_act`);
+    F.M.forEach(m => { if (m.boss) ks.push(`ex3_boss_${reg}_atk`); else ks.push(`ex3_mob_${reg}_${m.i + 1}_hit`, `ex3_mob_${reg}_${m.i + 1}_atk`); });
+    for (const r of TAM.role) ks.push(`ex_fx_${r.k}`, `ex3_fx_${r.k}`);
+    ks.push('ex_fx_heal', 'ex3_fx_heal');
+    const want = new Set(ks.map(k => IMG(k)).filter(Boolean));
+    for (const u of [...TM_WARM.keys()]) if (!want.has(u)) TM_WARM.delete(u);   // 지난 판 그림은 놓아줘요
+    for (const u of want) if (!TM_WARM.has(u)) { const im = new Image(); im.decoding = 'async'; im.src = u; TM_WARM.set(u, im); if (im.decode) im.decode().catch(() => {}); }
   }
   // 무대 위 좌표(무대 너비, 높이에 대한 %)
   function tamAt(el, fy) {
     const st = $('#tmFx'), a = st.getBoundingClientRect(), r = el.getBoundingClientRect();
     return [r.left - a.left + r.width / 2, r.top - a.top + r.height * (fy == null ? 0.45 : fy)];
   }
+  // 효과 그림 너비는 무대 너비에 대한 비율이라 갈래마다 처음 한 번만 재요. 그림을 붙인 뒤 재면 칠 때마다 화면 배치를 한 번 더 셌어요
+  const TM_FXW = new Map();
   function tamFxImg(cls, src, x, y, kf, ms, ease) {
     const fx = $('#tmFx'); if (!fx || !src) return null;
+    const bw = fx.getBoundingClientRect().width, wk = TM_FXW.get(cls);   // 붙이기 전에 재요(바로 앞 tamAt이 잰 값이라 다시 셈하지 않아요)
     const im = document.createElement('img'); im.className = cls; im.src = src; im.alt = ''; fx.appendChild(im);
-    const w = im.getBoundingClientRect().width || 40;
+    let w = wk ? wk * bw : 0; if (!w) { w = im.getBoundingClientRect().width || 40; if (bw && w > 0) TM_FXW.set(cls, w / bw); }
     const k = kf.map(f => Object.assign({}, f, { transform: `translate(${x + (f.dx || 0) - w / 2}px,${y + (f.dy || 0) - w / 2}px) ${f.t || ''}` }));
     k.forEach(f => { delete f.dx; delete f.dy; delete f.t; });
     const an = im.animate(k, { duration: ms, easing: ease || 'ease-out', fill: 'forwards' });
@@ -709,9 +726,9 @@
   function tamFloat(el, tx, cls) {
     if (!el) return; const fx = $('#tmFx'); if (!fx) return;
     const [x, y] = tamAt(el, 0.15), s = document.createElement('span'); s.className = 'tm-num ' + (cls || ''); s.textContent = tx; fx.appendChild(s);
-    const w = s.getBoundingClientRect().width, jx = (Math.random() - 0.5) * 18;
-    s.animate([{ transform: `translate(${x - w / 2 + jx}px,${y}px) scale(.4)`, opacity: 0 }, { transform: `translate(${x - w / 2 + jx}px,${y - 14}px) scale(1.25)`, opacity: 1, offset: 0.2 },
-      { transform: `translate(${x - w / 2 + jx}px,${y - 20}px) scale(1)`, opacity: 1, offset: 0.6 }, { transform: `translate(${x - w / 2 + jx}px,${y - 40}px) scale(.9)`, opacity: 0 }], { duration: cls === 'cr' ? 1000 : 800, easing: 'ease-out', fill: 'forwards' }).onfinish = () => s.remove();
+    const X = x + (Math.random() - 0.5) * 18, at = (dy, sc) => `translate(${X}px,${y + dy}px) translateX(-50%) scale(${sc})`;   // 글자 너비를 재지 않고 가운데에 맞춰요(재면 칠 때마다 화면 배치를 다시 셌어요)
+    s.animate([{ transform: at(0, .4), opacity: 0 }, { transform: at(-14, 1.25), opacity: 1, offset: 0.2 },
+      { transform: at(-20, 1), opacity: 1, offset: 0.6 }, { transform: at(-40, .9), opacity: 0 }], { duration: cls === 'cr' ? 1000 : 800, easing: 'ease-out', fill: 'forwards' }).onfinish = () => s.remove();
   }
   function tamShake(px, ms) {
     const w = $('#tmWorld'); if (!w || rt.reduced) return;
@@ -1077,7 +1094,7 @@
     pp.dataset.fid = 'walk';
     setH(pp, team.map((p, i) => { const [x, y] = TM_PPOS[i] || TM_PPOS[0];
       const frames = trial ? tamFrameArt(p.sp, false) : '';
-      return `<div class="tm-f${frames ? ' tm-frame-owner' : ''}" data-actor="${p.sp}" data-i="${i}" style="left:${x}%;bottom:${y + TM_UP}%;z-index:${30 - y};${tamDz(y)}--bd:-${(i * 0.13).toFixed(2)}s"><div class="tm-body"><img src="${tamPcPic(p.sp)}" alt="${esc(spName(p.sp))}">${frames}</div><i class="tm-hp"><s></s><b style="width:100%"></b></i></div>`; }).join(''));
+      return `<div class="tm-f${frames ? ' tm-frame-owner' : ''}" data-actor="${p.sp}" data-i="${i}" style="left:${x}%;bottom:${y + TM_UP}%;z-index:${30 - y};${tamDz(y)}--bd:-${(i * 0.13).toFixed(2)}s"><div class="tm-body"><img src="${tamPcPic(p.sp)}"${tamPcFb(p.sp)} alt="${esc(spName(p.sp))}">${frames}</div><i class="tm-hp"><s></s><b style="width:100%"></b></i></div>`; }).join(''));
     setH($('#tmM'), ''); $('#tmM').dataset.fid = '';
     if (T.nLose) pp.classList.add('enter'); else pp.classList.remove('enter');
     pp.classList.add('walking'); clearTimeout(pp._t); const ms = TAM.ph.walk / tamSpdK() * 1000; pp._t = setTimeout(() => pp.classList.remove('walking', 'enter'), ms);
@@ -1192,7 +1209,7 @@
     if (!tamOn()) return;
     const T = rt.tam, practice = T?.practice;
     tamHSync(); const hm = !practice && tamHOn(), fl = practice || tamCurFl(), R = tamReg(fl), lap = hm ? 0 : tamLap(fl);
-    $('#tmReg').textContent = R.nm + (lap ? ` (${lap + 1}바퀴째)` : '');
+    $('#tmReg').textContent = trStr(R.nm) + (lap ? ' ' + trStr(`(${lap + 1}바퀴째)`) : '');   // 다른 말: 지역 이름과 바퀴를 따로 바꿔요
     setAt($('#tmMapOpen'), 'aria-label', `탐험 지도 열기, 현재 ${R.nm}`);
     $('#tmFl').textContent = practice ? `연습 ${fmt(fl)}층` : tamFlTx(fl, hm);
     setHid($('#tmPractice'), !practice);
@@ -1269,14 +1286,51 @@
     S.tam.party = auto; const p1 = tamPow(); S.tam.party = keep;
     return p1 > p0 ? p1 - p0 : 0;
   }
-  function tamPowWith(fn) { const st = JSON.stringify([S.tam.mem, S.tam.sg]); fn(); const v = tamPow(); const [m, g] = JSON.parse(st); S.tam.mem = m; S.tam.sg = g; return v; }
+  // 한 레벨 올렸을 때의 힘을 재고 바로 되돌려요(예전에는 저장을 통째로 글로 바꿨다 되살려서 꾹 누를 때 느렸어요)
+  const tamPowLv = sp => { const m = tamMem(sp); m.lv += 1; try { return tamPow(); } finally { m.lv -= 1; } };
+  const tamPowGear = (i, k) => { const g = S.tam.sg[i]; g[k] += 1; try { return tamPow(); } finally { g[k] -= 1; } };
   // 가장 이득이 큰 강화: 대원은 도토리 한 개당 힘, 장비는 지금 살 수 있는 것 가운데 힘이 가장 많이 느는 것
-  function tamUpRec() {
+  function tamUpRec(only) {
     const p0 = tamPow(); let mem = null, gear = null;
-    for (const sp of tamAvail()) { if (!tamTrainOk(sp)) continue; const c = tamLvCost(sp), g = tamPowWith(() => { tamMem(sp).lv += 1; }) - p0; const v = g / Math.max(1, c); if (!mem || v > mem.v) mem = { sp, c, g, v }; }
+    if (only !== 'gear') for (const sp of tamAvail()) { if (!tamTrainOk(sp)) continue; const c = tamLvCost(sp), g = tamPowLv(sp) - p0; const v = g / Math.max(1, c); if (!mem || v > mem.v) mem = { sp, c, g, v }; }
     const nP = tamParty().length;
-    for (let i = 0; i < nP; i++) for (const G of TAM.gear) { const c = tamGearCost(G.k, i); if (S.tam.mat[c.m] < c.n || S.tam.mat[3] < c.star) continue; const g = tamPowWith(() => { S.tam.sg[i][G.k] += 1; }) - p0; if (!gear || g > gear.g) gear = { k: G.k, i, g, c }; }
+    if (only !== 'mem') for (let i = 0; i < nP; i++) for (const G of TAM.gear) { const c = tamGearCost(G.k, i); if (S.tam.mat[c.m] < c.n || S.tam.mat[3] < c.star) continue; const g = tamPowGear(i, G.k) - p0; if (!gear || g > gear.g) gear = { k: G.k, i, g, c }; }
     return { mem, gear };
+  }
+  // 추천대로 한 번에: 추천 강화를 도토리(장비는 재료)가 모자랄 때까지 되풀이해요. 한 번에 TAM_BULK번까지(숫자는 제안)
+  // 출동하지 않는 대원도 모은 대원 효과로 힘을 키우므로, 레벨이 낮은 대원이 여럿 함께 올라가요
+  const TAM_BULK = 300;
+  function tamRecPlan(kind) {
+    const b0 = S.budget, mat0 = S.tam.mat.slice(), mem0 = {}, sg0 = S.tam.sg.map(g => Object.assign({}, g)), pw0 = tamPow(), up = new Map();
+    for (const sp of tamAvail()) mem0[sp] = tamMem(sp).lv;
+    let n = 0, b1 = b0, pw1 = pw0, mat1 = mat0;
+    try {
+      while (n < TAM_BULK) {
+        if (kind === 'mem') { const R = tamUpRec('mem').mem; if (!R || R.c > S.budget) break; S.budget -= R.c; tamMem(R.sp).lv += 1; up.set(R.sp, 1); }
+        else { const g = tamUpRec('gear').gear; if (!g || !tamGearBuy(g.i, g.k)) break; up.set(g.i + ':' + g.k, 1); }
+        n++;
+      }
+      b1 = S.budget; pw1 = tamPow(); mat1 = S.tam.mat.slice();
+      for (const k of up.keys()) up.set(k, kind === 'mem' ? { a: mem0[k], b: tamMem(k).lv } : (([i, gk]) => ({ a: sg0[+i][gk], b: S.tam.sg[+i][gk] }))(k.split(':')));
+    } finally { S.budget = b0; S.tam.mat = mat0; S.tam.sg = sg0; for (const sp in mem0) tamMem(sp).lv = mem0[sp]; }
+    return { kind, n, cost: b0 - b1, left: b1, mat: mat0.map((v, i) => v - mat1[i]), up: [...up].map(([k, v]) => Object.assign({ k }, v)), pw0, pw1 };
+  }
+  function tamRecAsk(kind) {
+    const P = tamRecPlan(kind); if (!P.n) return;
+    const party = tamParty(), mem = kind === 'mem', rest = mem ? P.up.filter(u => !party.includes(u.k)).length : 0;
+    const nm = u => { if (mem) return esc(spName(u.k)); const [i, gk] = u.k.split(':'); return `${+i + 1}번 칸 ${esc(TAM.gear.find(g => g.k === gk).nm)}`; };
+    const list = P.up.slice().sort((x, y) => (y.b - y.a) - (x.b - x.a)), show = list.slice(0, 8);
+    const rows = show.map(u => `<span class="ask-row"><i>${nm(u)}</i><span>Lv.${u.a} → <b>${u.b}</b></span><em>+${u.b - u.a}</em></span>`).join('') + (list.length > show.length ? `<span class="ask-sub">${mem ? `그리고 ${list.length - show.length}명 더` : `그리고 ${list.length - show.length}개 더`}</span>` : '');
+    const pay = mem ? `<span class="ask-sum">${acornIcon()}<b>${fmtN(P.cost)}</b>${eulOf(fmtN(P.cost))} 써요</span><span class="ask-sub">남는 도토리 ${fmtN(P.left)}</span>`
+      : `<span class="ask-sum">${P.mat.map((v, i) => v > 0 ? `${tamMatIc(i, 18)}<b>${fmt(v)}</b>` : '').join(' ')} 써요</span>`;
+    askBox({ title: mem ? '추천대로 한 번에 올리기' : '추천 장비 한 번에 올리기', yes: '올리기', no: '취소',
+      html: pay + (rest ? `<span class="ask-sub">출동하지 않는 대원 ${rest}명도 올려요(모은 대원 효과)</span>` : '') + `<span class="ask-rows">${rows}</span><span class="ask-sum">탐험대 힘 ${fmt(P.pw0)} → <b>${fmt(P.pw1)}</b></span>`,
+      onYes: () => {   // 보여 준 그대로 올려요. 창을 보는 동안 무언가 바뀌었으면 다시 셈해요
+        const Q = tamRecPlan(kind); if (!Q.n) return;
+        if (mem) { S.budget -= Q.cost; for (const u of Q.up) tamMem(u.k).lv = u.b; }
+        else { for (let i = 0; i < 4; i++) S.tam.mat[i] -= Q.mat[i]; for (const u of Q.up) { const [i, gk] = u.k.split(':'); S.tam.sg[+i][gk] = u.b; } }
+        if (mem) tamLvFx(Q.up.map(u => u.k).filter(k => party.includes(k)));
+        tamRestartStat(); sfx('coin'); buzz(14); save(); renderHUD(); tamRenderTop(); tamRenderBody(); tamToast(`추천 강화 ${Q.n}번`); } });
   }
   const TM_RC = { sci: '#BDEBFF', pe: '#FFD0B0', kor: '#D8F5C6', art: '#FFD3EE', math: '#FFF0A8' };
   const tamMatImg = i => IMG(['ex_mat_twig', 'ex_mat_stone', 'ex_mat_petal', 'ex_mat_star'][i]);
@@ -1298,12 +1352,12 @@
       const party = tamParty(), slots = tamSlots(), auto = tamAutoTeam(), same = auto.length === party.length && auto.every(k => party.includes(k));
       const R = rec.mem, rs = R && tamStat(R.sp);
       let h = '';
-      if (R) h += `<div class="tm-rec"><span class="tm-rtag">추천 강화</span><img src="${tamPcPic(R.sp)}" alt=""><div class="tm-rtx"><b>${esc(spName(R.sp))} Lv.${tamMem(R.sp).lv} → ${tamMem(R.sp).lv + 1}</b><small>탐험대 힘 +${fmt(Math.max(1, Math.round(R.g)))}</small><small class="tm-hold">👆 꾹 누르면 계속 올라가요</small></div>` +
-        `<button type="button" class="cta small" data-tlv="${R.sp}"${S.budget >= R.c ? '' : ' aria-disabled="true"'}>${acornIcon()}${fmt(R.c)}</button></div>`;
+      if (R) h += `<div class="tm-rec"><span class="tm-rtag">추천 강화</span><img src="${tamPcPic(R.sp)}"${tamPcFb(R.sp)} alt=""><div class="tm-rtx"><b>${esc(spName(R.sp))} Lv.${tamMem(R.sp).lv} → ${tamMem(R.sp).lv + 1}</b><small>탐험대 힘 +${fmt(Math.max(1, Math.round(R.g)))}</small><small class="tm-hold">👆 꾹 누르면 계속 올라가요</small></div>` +
+        `<span class="tm-rbt"><button type="button" class="cta small" data-tlv="${R.sp}"${S.budget >= R.c ? '' : ' aria-disabled="true"'}>${acornIcon()}${fmt(R.c)}</button><button type="button" class="btn-sub small" data-trec="mem"${S.budget >= R.c ? '' : ' aria-disabled="true"'}>한 번에</button></span></div>`;
       h += `<div class="tm-party">${Array.from({ length: 5 }, (_, i) => { const sp = party[i];
         if (i >= slots) return `<div class="tm-slot lock"><span>🔒</span><small>${i === 3 ? '초등학교' : '중학교'}</small></div>`;
         if (!sp) return `<div class="tm-slot empty"><span>+</span></div>`;
-        const s = tamStat(sp); return `<div class="tm-slot" style="--rc:${TM_RC[TAM.role[s.ri].k]}"><img src="${tamPcPic(sp)}" alt=""><em>Lv.${tamMem(sp).lv}</em><small>${esc(spName(sp))}</small></div>`; }).join('')}</div>`;
+        const s = tamStat(sp); return `<div class="tm-slot" style="--rc:${TM_RC[TAM.role[s.ri].k]}"><img src="${tamPcPic(sp)}"${tamPcFb(sp)} alt=""><em>Lv.${tamMem(sp).lv}</em><small>${esc(spName(sp))}</small></div>`; }).join('')}</div>`;
       { const R0 = tamReg(rt.tam?.practice || tamCurFl()), ar = TAM.role[tamAdvRi()], cl = tamCollLv();
         h += `<div class="tm-tips"><p><b class="tm-role" style="--rc:${TM_RC[ar.k]}">${esc(ar.nm.split(' ')[0])}</b> ${esc(R0.nm)}에서 힘 +${Math.round(TAM.advG * 100)}%</p>` +
           `<p><b class="tm-role">모은 대원 효과</b> 대원 레벨 합 ${fmt(cl)} → 힘 +${(Math.min(TAM.collMax, 1 + TAM.collG * cl) * 100 - 100).toFixed(1)}%</p>` +
@@ -1317,7 +1371,7 @@
         const m = tamMem(sp), on = party.includes(sp), s = tamStat(sp), r = TAM.role[s.ri], best = R && R.sp === sp, sug = !on && auto.includes(sp);
         const lvN = rt.tamLvN || 1, P = lvN > 1 ? tamLvPlan(sp, lvN) : null, c = P && P.k ? P.sum : tamLvCost(sp), tOk = tamTrainOk(sp), can = tOk && S.budget >= c;   // 한 번에 여러 레벨. tOk: 교실 훈련 상한 아래
         const st = tamStarOn() ? `<span class="tm-st">${'★'.repeat(m.st)}<i>${'★'.repeat(5 - m.st)}</i></span>${m.st < 5 ? `<small class="tm-sh">별 조각 ${m.sh}/${tamStarNeed(m.st + 1)}</small>` : ''}` : '';
-        return `<div class="tm-mem${on ? ' on' : ''}${best ? ' best' : ''}"><span class="tm-face" style="--rc:${TM_RC[r.k]}"><img src="${tamPcPic(sp)}" alt="">${on ? '<i>출동</i>' : ''}</span>` +
+        return `<div class="tm-mem${on ? ' on' : ''}${best ? ' best' : ''}"><span class="tm-face" style="--rc:${TM_RC[r.k]}"><img src="${tamPcPic(sp)}"${tamPcFb(sp)} alt="">${on ? '<i>출동</i>' : ''}</span>` +
           `<div class="tm-mtx"><b>${esc(spName(sp))}<em>Lv.${m.lv}</em>${sug ? '<u>추천</u>' : ''}${s.ri === tamAdvRi() ? '<u class="adv">유리</u>' : ''}</b><span class="tm-role" style="--rc:${TM_RC[r.k]}">${r.nm}</span><small>힘 ${fmt(Math.round(s.atk))}  체력 ${fmt(Math.round(s.hp))}</small>${st}</div>` +
           `<div class="tm-mbt">${tOk ? `<button type="button" class="cta small" data-tlv="${sp}"${can ? '' : ' aria-disabled="true"'}>${P && P.k > 1 ? `<i class="tm-lvk">+${P.k}</i>` : ''}${acornIcon()}${fmt(c)}</button>` : `<button type="button" class="cta small" data-tcap="1" aria-disabled="true">교실 키우기</button>`}<button type="button" class="btn-sub small" data-tpick="${sp}">${on ? '빼기' : '편성'}</button></div></div>`;
       }).join('');
@@ -1328,11 +1382,11 @@
       let h = '';   // 설명 줄을 뺐어요(칸마다 '1번 칸'과 대원 이름이 보여요)
       if (rg) { const G = TAM.gear.find(g => g.k === rg.k), gu = IMG(`ex_gear_${rg.k}_${tamGrade(S.tam.sg[rg.i][rg.k])}`);
         h += `<div class="tm-rec"><span class="tm-rtag">추천 강화</span>${gu ? `<img src="${gu}" alt="">` : ''}<div class="tm-rtx"><b>${rg.i + 1}번 칸 ${G.nm} Lv.${S.tam.sg[rg.i][rg.k]} → ${S.tam.sg[rg.i][rg.k] + 1}</b><small>탐험대 힘 +${fmt(Math.max(1, Math.round(rg.g)))}</small><small class="tm-hold">👆 꾹 누르면 계속 올라가요</small></div>` +
-          `<button type="button" class="cta small" data-tgear="${rg.i}:${rg.k}">${tamMatIc(rg.c.m, 18)}${rg.c.n}${rg.c.star ? ` ${tamMatIc(3, 18)}${rg.c.star}` : ''}</button></div>`; }
+          `<span class="tm-rbt"><button type="button" class="cta small" data-tgear="${rg.i}:${rg.k}">${tamMatIc(rg.c.m, 18)}${rg.c.n}${rg.c.star ? ` ${tamMatIc(3, 18)}${rg.c.star}` : ''}</button><button type="button" class="btn-sub small" data-trec="gear">한 번에</button></span></div>`; }
       h += Array.from({ length: 5 }, (_, i) => {
         const p = team[i], lock = i >= slots;
         if (lock) return `<div class="tm-sgc lock"><div class="tm-sgh"><b>${i + 1}번 칸</b><span>${TAM.slotNm[i]}</span><small>🔒 ${i === 3 ? '초등학교' : '중학교'}부터 열려요</small></div></div>`;
-        return `<div class="tm-sgc"><div class="tm-sgh"><b>${i + 1}번 칸</b><span>${TAM.slotNm[i]}</span>${p ? `<em class="tm-sgw"><img src="${tamPcPic(p.sp)}" alt="">${esc(spName(p.sp))}</em>` : '<em class="tm-sgw none">비어 있음</em>'}</div><div class="tm-sgg">` +
+        return `<div class="tm-sgc"><div class="tm-sgh"><b>${i + 1}번 칸</b><span>${TAM.slotNm[i]}</span>${p ? `<em class="tm-sgw"><img src="${tamPcPic(p.sp)}"${tamPcFb(p.sp)} alt="">${esc(spName(p.sp))}</em>` : '<em class="tm-sgw none">비어 있음</em>'}</div><div class="tm-sgg">` +
           TAM.gear.map(G => { const L = S.tam.sg[i][G.k], c = tamGearCost(G.k, i), can = S.tam.mat[c.m] >= c.n && S.tam.mat[3] >= c.star, gu = IMG(`ex_gear_${G.k}_${tamGrade(L)}`), best = rg && rg.i === i && rg.k === G.k;
             return `<div class="tm-gi g${tamGrade(L)}${best ? ' best' : ''}">${best ? '<u>추천</u>' : ''}<span class="tm-gim">${gu ? `<img src="${gu}" alt="">` : G.ic}<em>Lv.${L}</em></span><small>${G.hint} +${Math.round(TAM.gearPer * L * 100)}%</small>` +
               `<button type="button" class="cta small" data-tgear="${i}:${G.k}"${can ? '' : ' aria-disabled="true"'}>${tamMatIc(c.m, 16)}${c.n}${c.star ? ` ${tamMatIc(3, 16)}${c.star}` : ''}</button></div>`; }).join('') + '</div></div>';
@@ -1368,7 +1422,8 @@
   // 위 칸 도토리(탐험 화면을 볼 때만 바꿔요)
   function tamAcorn(force) {
     const e = $('#tmAcN'); if (!e) return; const t = fmt2(S.budget); if (!force && e.textContent === t) return;
-    e.textContent = t; rt.tamAc = S.budget; e.style.fontSize = ''; let z = parseFloat(getComputedStyle(e).fontSize); while (e.scrollWidth > e.clientWidth + 0.5 && z > 9) { z -= 0.5; e.style.fontSize = z + 'px'; }   // 글자가 바뀔 때만(0.4초마다 한 번까지) 칸에 맞춰요. 들썩임 없이, 홈처럼 두 단위까지
+    e.textContent = t; rt.tamAc = S.budget; if (!force && e._len === t.length) return; e._len = t.length;   // 글자 수가 같으면 크기를 다시 맞추지 않아요(0.4초마다 화면 배치를 다시 셌어요)
+    e.style.fontSize = ''; let z = parseFloat(getComputedStyle(e).fontSize); while (e.scrollWidth > e.clientWidth + 0.5 && z > 9) { z -= 0.5; e.style.fontSize = z + 'px'; }   // 글자가 바뀔 때만(0.4초마다 한 번까지) 칸에 맞춰요. 들썩임 없이, 홈처럼 두 단위까지
   }
   // 대원 레벨이 오르면 무대 위 그 대원 발밑에서 금빛 기둥(ex4_fx_levelup)
   function tamLvFx(sps) {
@@ -1401,7 +1456,7 @@
       if (tamWindAnswer(F, b.dataset.tamSign)) { tamDraw(F); F.ev.length = 0; }
       return;
     }
-    if (b.getAttribute('aria-disabled') === 'true' && !(b.dataset.tlv && S.budget >= tamLvCost(b.dataset.tlv) && tamTrainOk(b.dataset.tlv))) { if (b.dataset.tlv) tamToast('도토리가 모자라요\n문방구에서 숲의 정수로 도토리를 살 수 있어요'); else if (b.dataset.tgear) tamToast('재료가 모자라요'); return; }
+    if (b.getAttribute('aria-disabled') === 'true' && !(b.dataset.tlv && S.budget >= tamLvCost(b.dataset.tlv) && tamTrainOk(b.dataset.tlv))) { if (b.dataset.tlv || b.dataset.trec === 'mem') tamToast('도토리가 모자라요\n문방구에서 숲의 정수로 도토리를 살 수 있어요'); else if (b.dataset.tgear) tamToast('재료가 모자라요'); return; }
     if (b.dataset.tsk) { tamCast(+b.dataset.tsk); return; }
     if (b.dataset.tmm) { const v = +b.dataset.tmm; if ((v && !tamHOpen()) || (rt.tam && rt.tam.ph === 'event')) return; if ((S.tam.hm ? 1 : 0) === v) return; S.tam.hm = v; tamHSync(); sfx('tap'); save(); tamSkStop(); tamRestart(); tamRenderTop(); tamRenderBody(); musicSync(); return; }   // 심화 탐험
     if (b.id === 'tmExit') { sfx('tap'); setTab('school'); return; }
@@ -1424,6 +1479,7 @@
     }
     if (b.dataset.tlvn) { rt.tamLvN = b.dataset.tlvn === 'max' ? Infinity : +b.dataset.tlvn; sfx('tap'); tamRenderBody(); return; }
     if (b.dataset.tlvall) { sfx('tap'); tamLvAllAsk(); return; }   // 미리 보기 창 뒤에 올려요
+    if (b.dataset.trec) { sfx('tap'); tamRecAsk(b.dataset.trec); return; }   // 추천대로 한 번에(미리 보기 창 뒤에)
     if (b.dataset.tlv) { const sp = b.dataset.tlv, inRec = !!b.closest('.tm-rec'), n = tamLvBuy(sp, inRec ? 1 : (rt.tamLvN || 1)); if (!n) return; tamLvFx([sp]); tamRestartStat(); sfx('coin'); buzz(10); save(); renderHUD(); tamRenderTop(); tamRenderBody(); if (n > 1) tamToast(`${spName(sp)} 레벨 +${n}`); return; }
     if (b.dataset.tgear) { const [si, k] = b.dataset.tgear.split(':'); if (!tamGearBuy(+si, k)) return; tamRestartStat(); sfx('coin'); save(); tamRenderTop(); tamRenderBody(); return; }
     if (b.id === 'tmSpd') { tamAdSpd(); return; }

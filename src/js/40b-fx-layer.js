@@ -236,7 +236,7 @@
     for (let i = FXT.rings.length - 1; i >= 0; i--) { const R = FXT.rings[i]; R.t += dt; const u = Math.min(1, R.t / R.max);
       R.g.clear().circle(0, 0, R.r * (0.15 + 0.85 * u)).stroke({ color: R.col, width: Math.max(1, R.r * 0.12 * (1 - u)), alpha: 1 - u }); if (u >= 1) { R.g.destroy(); FXT.rings.splice(i, 1); } }
     const more = FXT.parts.length || FXT.rings.length || shots.length;
-    if (more) app.render(); else app.canvas.hidden = true;   // 다 끝나면 탐험 효과 그림판도 숨겨요
+    app.render();   // 다 끝나면 빈 그림을 한 번 그리고 그림판은 그대로 둬요. 칠 때마다 숨겼다 보이면 화면 겹을 다시 짜느라 멈칫했어요
     if (more) FXT.raf = requestAnimationFrame(fxTamFrame);
   }
 

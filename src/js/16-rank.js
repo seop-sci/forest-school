@@ -33,8 +33,8 @@
   function rankSchool(tier, year, sem) {
     const T = TIERS[Math.max(0, Math.min(TIERS.length - 1, tier | 0))];
     const y = Math.max(1, Math.min(T.years, year | 0 || 1));
-    if ((tier | 0) >= GRAD_TIER) return `${T.school} ${gradSemTxt(y, sem)}`;
-    return `${T.school} ${y}${T.unit}` + ((tier | 0) >= 1 && (sem === 0 || sem === 1) ? ` ${sem + 1}학기` : '');   // 학기
+    if ((tier | 0) >= GRAD_TIER) return `${trStr(T.school)} ${trStr(gradSemTxt(y, sem))}`;
+    return `${trStr(T.school)} ${trStr(`${y}${T.unit}`)}` + ((tier | 0) >= 1 && (sem === 0 || sem === 1) ? ` ${trStr(`${sem + 1}학기`)}` : '');   // 학기. 다른 말은 조각마다 바꿔요
   }
   // 랭킹을 둘 곳: GitHub 판은 서버, Claude 화면은 공유 저장소, 둘 다 없으면 내 학교 점수만 보여요.
   // 어느 쪽이든 listen(받기), put(올리기), remove(빼기) 세 가지로 똑같이 써요
@@ -542,7 +542,7 @@
       $('#rankLead').textContent = '주간 리그 점수를 시즌 내내 모아요. 300점을 넘기면 계절 기념 장식을 받고, 1~3위는 칭호 \'숲속 시즌 왕\'을 받아요.';
     } else
     $('#rankSub').textContent = bm ? (btOpen() ? `${BT_LG[S.bt.lg].n} 리그, 오늘 남은 대결 ${btLeft()}판` : '숲속 대결은 초등학교 3학년부터 열려요') : wk ? `월요일에 새 리그가 시작돼요 (${left}일 남음). 리그에 참여하면 순위와 상관없이 황금 도토리 1개`
-      : rankSchool(S.tier, yearNo(), semOn() ? S.sem : null) + (Rank.state === 'on' && R.length ? `, 랭킹에 ${R.length}명` : '');
+      : rankSchool(S.tier, yearNo(), semOn() ? S.sem : null) + (Rank.state === 'on' && R.length ? trStr(`, 랭킹에 ${R.length}명`) : '');
     if (!tm) $('#rankLead').hidden = false;
     if (!sea && !tm && !cf) $('#rankLead').textContent = bm ? '숲속 대결 점수로 겨뤄요. 메달은 가장 높이 오른 리그예요.' : wk ? '이번 주에 한 일로 겨뤄요. 미션 10, 미션 보너스 20, 학교 행사 15, 체험학습 10(1시간마다 +5), 종업식 20, 퀘스트 3점(퀘스트와 식은 합쳐서 하루 30점까지).'
       : '학교 파워로 순위를 매겨요.';
