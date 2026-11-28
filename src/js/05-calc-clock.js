@@ -308,6 +308,7 @@
   const uniTerm = t => t.replace(UT_RE, (m, w, jo, at, all) => { const X = UT_MAP[w]; if ((w === '졸업식' || w === '종업식' || w === '방학식') && UT_OLD.test(all.slice(0, at))) return m; if (!jo) return utW(X); if (X[2] === 1) return utW(X) + (UT_JO[jo] || jo); if (X[2] === 2 && jo === '로') return utW(X) + '으로'; return utW(X) + jo; });
   function utNode(n) {
     const pe = n.parentElement; if (!pe || !n.nodeValue) return;
+    if (LANG !== 'ko') return;   // 다른 말에서는 번역할 때 바꿔요(00b-i18n.js trUniFwd)
     if (!uniNow()) { if (n._o != null && n.nodeValue === n._u) n.nodeValue = n._o; n._o = null; return; }
     UT_RE.lastIndex = 0; if (!UT_RE.test(n.nodeValue)) return;
     if (pe.closest(UT_SKIP)) return;

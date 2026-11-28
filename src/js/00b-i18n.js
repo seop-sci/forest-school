@@ -63,7 +63,8 @@
       k.replace(TR_HOLE, (m, nm, j, off) => { re += trEsc(k.slice(last, off)) + '(.+?)' + (j && TR_JOSA[j] ? TR_JOSA[j] : ''); names.push(nm); last = off + m.length; return m; });
       re += trEsc(k.slice(last)) + '$';
       const lits = k.split(/\{\w+(?:\|[가-힣]+)?\}/), pre = lits[0], suf = lits[lits.length - 1];
-      const p = { re: new RegExp(re, 's'), names, v, w: lits.join('').length };
+      // w: 고정 글자 수(태그 빼고). adj: 자리 둘이 붙은 무늬('{0}{1}')는 어디서 나눌지 몰라서, 한국어가 하나도 안 남을 때만 써요
+      const p = { re: new RegExp(re, 's'), names, v, w: lits.join('').replace(/<[^>]*>/g, '').length, adj: /\}\{/.test(k) };
       if (pre) put(TR_PRE, pre.slice(0, 1), p); else put(TR_SUF, suf.slice(-1), p);
     }
     for (const m of [TR_PRE, TR_SUF]) for (const a of m.values()) a.sort((x, y) => y.w - x.w);
@@ -73,12 +74,68 @@
     const x = g.find(y => /\d/.test(y)); const n = x ? Number(String(x).replace(/[^\d.]/g, '')) : 2;
     return v[plural(isFinite(n) ? n : 2)] || v.other || '';
   }
+  /* 대학교부터는 학교 낱말이 대학교 낱말로 바뀌어요(05-calc-clock의 UT, 교수님과 총장님 호칭).
+     다른 말에서는 한국어 낱말 바꾸기(utNode)를 쉬고, 여기서 번역한 뒤 번역 낱말을 바꿔요(Classroom → Lecture Hall).
+     코드가 이미 대학교 낱말로 만든 글(예: '고니 교수님')은 원래 낱말로 되돌려 번역하고 다시 바꿔요 */
+  const TR_UNI_X = [['교장 선생님 이름', '총장님 이름'], ['교장 선생님', '총장님'], ['교감 선생님', '부총장님'], ['선생님', '교수님']];
+  let TR_UNI = null;
+  const trUniOn = () => { try { return uniNow(); } catch (e) { return false; } };
+  function trUniPairs() {
+    if (TR_UNI) return TR_UNI;
+    let ut = []; try { ut = UT.map(x => [x[0], x[1]]); } catch (e) { return []; }
+    return (TR_UNI = { ut: [...ut].sort((a, b) => b[0].length - a[0].length), back: [...TR_UNI_X, ...ut].sort((a, b) => b[1].length - a[1].length) });
+  }
+  const TR_JO = { '을': ['을', '를'], '를': ['을', '를'], '이': ['이', '가'], '가': ['이', '가'], '은': ['은', '는'], '는': ['은', '는'], '과': ['과', '와'], '와': ['과', '와'],
+    '이에요': ['이에요', '예요'], '예요': ['이에요', '예요'], '이었': ['이었', '였'], '였': ['이었', '였'], '이라': ['이라', '라'], '라': ['이라', '라'], '이나': ['이나', '나'], '나': ['이나', '나'], '이랑': ['이랑', '랑'], '랑': ['이랑', '랑'] };
+  function trUniBack(core, used) {      // 대학교 낱말 → 원래 낱말, 뒤 조사는 받침에 맞춰요
+    let out = core;
+    for (const [o, u] of trUniPairs().back || []) {
+      if (!out.includes(u)) continue;
+      out = out.replace(new RegExp(trEsc(u) + '(이에요|예요|이었|였|이라|이나|이랑|으로|로|을|를|이|가|은|는|과|와|라|나|랑)?', 'g'), (m, jo) => {
+        if (!jo) return o;
+        if (jo === '으로' || jo === '로') return o + (jong(o) && jong(o) !== 8 ? '으로' : '로');
+        const j = TR_JO[jo]; return o + (j ? j[jong(o) ? 0 : 1] : jo);
+      });
+      used.push([o, u]);
+    }
+    return out;
+  }
+  function trUniFwd(r, pairs) {          // 번역한 글의 학교 낱말 → 대학교 낱말
+    for (const [o, u] of pairs) {
+      const a = TR_EX.get(o), b = TR_EX.get(u);
+      if (typeof a !== 'string' || typeof b !== 'string' || !a || a === b) continue;
+      r = r.split(a).join(b);
+      const lo = x => x.charAt(0).toLowerCase() + x.slice(1);
+      if (lo(a) !== a) r = r.split(lo(a)).join(lo(b));
+    }
+    return r;
+  }
+  // 바뀌는 자리에 들어간 글: 그대로 없으면 끝의 조사를 떼고 다시 봐요(예: '종업식을' → '종업식')
+  function trGroup(g, d) {
+    const r = trStr(g, d);
+    if (r !== g || !HAN.test(g)) return r;
+    const m = /^(.*[가-힣])(을|를|이|가|은|는|과|와|으로|로|에서|에게|의|도|만|에)$/.exec(g.trim());
+    if (m) { const b = trStr(m[1], d); if (b !== m[1]) return b; }
+    return r;
+  }
+  // 통째로 없는 글은 문장, 화살표, 쉼표로 나눠 하나씩 바꿔 봐요. 모두 바뀔 때만 써요
+  function trSplit(core, d) {
+    for (const re of [/(?<=[.!?。！？])\s+/, /\s*→\s*/, /\s+~\s+/, /,\s+/]) {
+      const parts = core.split(re);
+      if (parts.length < 2) continue;
+      const seps = core.match(new RegExp(re.source, 'g')) || [];
+      const out = parts.map(x => x && HAN.test(x) ? trStr(x, d + 1) : x);
+      if (out.every(x => !HAN.test(x.replace(/<[^>]*>/g, '')))) return out.map((x, i) => x + (seps[i] !== undefined ? (re.source.includes('→') ? ' → ' : re.source.includes('~') ? ' – ' : re.source.startsWith(',') ? ', ' : ' ') : '')).join('');
+    }
+    return null;
+  }
   // 글 하나를 바꿔요. 못 바꾸면 그대로 돌려줘요
   function trStr(s, d = 0) {
     if (LANG === 'ko' || !s || !HAN.test(s)) return s;
     if (!TR_EX) trBuild();
     const m = /^(\s*)([\s\S]*?)(\s*)$/.exec(s), core = trNorm(m[2]);
-    let r = TR_CACHE.get(core);
+    const uni = d === 0 && trUniOn(), ck = (uni ? '\u0001' : '') + core;
+    let r = TR_CACHE.get(ck);
     if (r === undefined) {
       r = null;
       const ex = TR_EX.get(core);
@@ -89,19 +146,30 @@
           const g = p.re.exec(core); if (!g) continue;
           const vals = {}; p.names.forEach((nm, i) => { vals[nm] = g[i + 1]; });
           const tpl = trPick(p.v, g.slice(1));
-          r = tpl.replace(TR_HOLE, (h, nm) => nm in vals ? (d < 3 ? trStr(vals[nm], d + 1) : vals[nm]) : h);
-          break;
+          const c = tpl.replace(TR_HOLE, (h, nm) => nm in vals ? (d < 3 ? trGroup(vals[nm], d + 1) : vals[nm]) : h);
+          // 바뀌는 자리에 한국어가 남으면 다른 무늬를 더 봐요. 고정 글이 짧은 무늬(예: '고{0}')가 긴 글을 잘못 잡지 않게
+          if (!HAN.test(c.replace(/<[^>]*>/g, ''))) { r = c; break; }
+          if (r === null && !p.adj && p.w >= core.replace(/<[^>]*>/g, '').length * 0.6) r = c;
         }
       }
-      if (r === null && d === 0 && !core.includes('<')) {   // 통째로 없으면 한글 덩이마다(예: '교실 Lv.14'의 '교실'), 그래도 없으면 낱말마다
+      if (r === null && d <= 1 && !core.includes('<')) r = trSplit(core, d);
+      if (r === null && !core.includes('<')) {   // 통째로 없으면 한글 덩이마다(예: '교실 Lv.14'의 '교실'), 그래도 없으면 낱말마다
         let hit = false;
-        const one = w => { const x = TR_EX.get(w); return typeof x === 'string' ? (hit = true, x) : null; };
+        const one = w => { const x = w.length > 1 ? TR_EX.get(w) : undefined; return typeof x === 'string' ? (hit = true, x) : null; };   // 한 글자 낱말('월', '일')은 뜻이 여럿이라 빼요
         const rr = core.replace(/[가-힣][가-힣 ]*[가-힣]|[가-힣]/g, run => one(run) ?? run.split(' ').map(w => one(w) ?? w).join(' '));
-        if (hit) r = rr;
+        if (hit && !HAN.test(rr)) r = rr;         // 한국어가 섞여 남으면 차라리 바꾸지 않아요
+      }
+      if (uni) {
+        const used = [];
+        if (r === null) {                    // 코드가 대학교 낱말로 만든 글: 원래 낱말로 되돌려 다시
+          const back = trUniBack(core, used);
+          if (back !== core) { const r2 = trStr(back, 1); if (r2 !== back && !HAN.test(r2.replace(/<[^>]*>/g, ''))) r = r2; }
+        }
+        if (r !== null) r = trUniFwd(r, [...used, ...(trUniPairs().ut || []).filter(([o]) => new RegExp('(?<!(?:유치원|초등학교|중학교|고등학교) )' + trEsc(o)).test(core))]);   // '유치원 졸업식'처럼 지난 학교급 식 이름은 그대로(utNode와 같아요)
       }
       if (r === null && window.__FOREST_TEST && d === 0) TR_MISS.set(core, (TR_MISS.get(core) || 0) + 1);
       if (TR_CACHE.size > 6000) TR_CACHE.clear();
-      TR_CACHE.set(core, r);
+      TR_CACHE.set(ck, r);
     }
     return r === null ? s : m[1] + r + m[3];
   }

@@ -8,7 +8,8 @@ class Q(http.server.SimpleHTTPRequestHandler):
     def log_message(self, *a): pass
 srv = http.server.ThreadingHTTPServer(('127.0.0.1', 0), functools.partial(Q, directory=str(ROOT)))
 threading.Thread(target=srv.serve_forever, daemon=True).start()
-URL = f'http://127.0.0.1:{srv.server_address[1]}/dev/test.html?lang=en'
+LANG = next((a.split('=')[1] for a in sys.argv if a.startswith('--lang=')), None)   # --lang=ja: 가짜 사전 대신 진짜 사전으로 보고 화면을 찍어요
+URL = f'http://127.0.0.1:{srv.server_address[1]}/dev/test.html?lang=' + (LANG or 'en')
 tier = int(next((a for a in sys.argv[1:] if a.isdigit()), '1'))
 out = sys.argv[sys.argv.index('--json') + 1] if '--json' in sys.argv else None
 keys = json.loads((ROOT / 'dev/i18n_keys.json').read_text())
@@ -26,7 +27,8 @@ async def main():
         pg = await ctx.new_page(); errs = []
         pg.on('pageerror', lambda e: errs.append(str(e)))
         await pg.goto(URL); await pg.wait_for_timeout(1500); await pg.evaluate(CLEAN)
-        await pg.evaluate("(d)=>{ const F=window.__forest; F.setLangTest('en', d); F.i18nMissClear(); F.trEl(document.body); }", pseudo)
+        if not LANG: await pg.evaluate("(d)=>{ const F=window.__forest; F.setLangTest('en', d); F.i18nMissClear(); F.trEl(document.body); }", pseudo)
+        else: await pg.evaluate("()=>window.__forest.i18nMissClear()")
         tabs = await pg.evaluate("()=>[...document.querySelectorAll('.tab[data-tab]')].map(t=>t.dataset.tab)")
         left = {}
         screens = [('tab ' + t, f"F.setTab('{t}')") for t in tabs] + [('건물 교실', "F.setTab('school'); F.openSheet('classroom')")]
@@ -36,6 +38,7 @@ async def main():
             except Exception as e:
                 print(nm, '열지 못함', str(e)[:80]); continue
             for x in await pg.evaluate(LEFT): left.setdefault(x, nm)
+            if LANG and '--shot' in sys.argv: await pg.screenshot(path=f'/tmp/shot_{LANG}_{nm.replace(" ", "_")}.png')
             await pg.evaluate(CLEAN)
         miss = await pg.evaluate("()=>window.__forest.i18nMiss()")
         print('화면에 남은 한국어', len(left), '놓친 글', len(miss), '오류', errs[:3])

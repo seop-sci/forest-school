@@ -96,7 +96,7 @@ for (const f of parts) {
 }
 // js 파일은 이어 붙여 한 번에 읽어요(파일 하나가 함수 중간에서 끝날 수 있어요)
 let all = '', marks = [];
-for (const f of parts.filter(p => p.endsWith('.js'))) {
+for (const f of parts.filter(p => p.endsWith('.js') && !p.includes('00b-i18n'))) {   // 다국어 틀 파일(조사 무늬, 말 이름)은 빼요
   let s = fs.readFileSync(path.join(ROOT, 'src', f), 'utf8').replace(/^\s*<script>/, '').replace(/<\/script>\s*$/, '');
   marks.push([all.length, f]); all += s + '\n';
 }
