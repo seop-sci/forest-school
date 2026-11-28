@@ -82,7 +82,7 @@ def imp(files):
     ds = {l: dic(l) for l in LANGS}
     ok = bad = 0; probs = []; terms = {}
     for f in files:
-        raw = pathlib.Path(f).read_text().strip()
+        raw = pathlib.Path(f).read_text(encoding='utf-8-sig').strip()
         raw = re.sub(r'^```(?:json)?\s*|\s*```$', '', raw)   # Gemini가 코드 칸으로 감싸 줘도 돼요
         o = json.loads(raw)
         if isinstance(o, dict) and 'items' in o: o = {str(x['id']): x for x in o['items']}
@@ -92,7 +92,7 @@ def imp(files):
             if ko is None: probs.append(f'{f}: 번호 {i}는 없어요'); bad += 1; continue
             for l in LANGS:
                 tr = v.get(l) if isinstance(v, dict) else None
-                if tr is None or tr == '': probs.append(f'{i} {l}: 번역이 없어요 | {ko}'); bad += 1; continue
+                if tr is None or (tr == '' and len(ko) > 1): probs.append(f'{i} {l}: 번역이 없어요 | {ko}'); bad += 1; continue
                 if isinstance(tr, dict):   # 복수형 {"one": ..., "other": ...}
                     e = '' if 'other' in tr else '복수형에 other가 없어요'
                     e = e or next((check(ko, x) for x in tr.values() if check(ko, x)), '')
