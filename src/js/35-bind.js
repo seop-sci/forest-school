@@ -150,6 +150,7 @@
   // 설정의 화면 크기와 숫자 단위
   function wireUnits() {
     $('#optUiz').addEventListener('click', e => { const b = e.target.closest('[data-uiz]'); if (!b || +b.dataset.uiz === S.uiz) return; S.uiz = +b.dataset.uiz; save(); syncSettingsUI(); sfx('tap'); setTimeout(() => { try { chipRow(); wxPlace(); } catch (er) { /* 다음 틱에 */ } }, 60); toast(S.uiz ? '화면 글자와 단추를 크게 보여 줘요' : '화면을 보통 크기로 보여 줘요'); });
+    $('#optLang').addEventListener('change', e => { sfx('tap'); save(); langSet(e.target.value); });
     $('#optUnits').addEventListener('click', e => {
       const b = e.target.closest('[data-units]');
       if (!b || b.dataset.units === S.units) return;
@@ -541,22 +542,11 @@
     }
     $('#devEdit').addEventListener('click', () => { if (ED.on) edOff(); else { if (rt.modalOpen) closeModal(rt.modalOpen); edOn(); } });
     if (window.__FOREST_TEST) window.__forestEd = { ED, edOn, edOff, edText, edList, edDots };
-    // 관리자 고급 배경: 관리자 계정(forest/adminUids)에만 단추가 보여요
+    // 화면 고치기 모드 단추: 관리자 계정으로 웹판에서만(고급 배경과 대학교 미리 보기 단추는 뺐어요)
     async function devLuxShow() {
-      const b = $('#devLux'); if (!b) return;
       if (!window.__FOREST_TEST && cloudOn()) { try { await checkAdmin(); } catch (e) { /* 아니면 숨김 */ } }
-      b.hidden = !(rt.isAdmin || window.__FOREST_TEST); devLuxText();
-      $('#devEdit').hidden = !((rt.isAdmin && window.FS_WEB_LOCK) || window.__FOREST_TEST);   // 화면 고치기 모드는 관리자 계정으로 웹판에서만
+      $('#devEdit').hidden = !((rt.isAdmin && window.FS_WEB_LOCK) || window.__FOREST_TEST);
     }
-    function devLuxText() {
-      const n = GEO.filter(G => has170(G.map + '_lux')).length;
-      $('#devLux b').textContent = luxOn() ? '고급 배경 끄기 (관리자)' : '고급 배경 켜기 (관리자)';
-      $('#devLuxTx').textContent = n ? `이 기기에서만 고급 지도와 건물을 써요. 고급 지도 ${n}장 있어요` : '고급 지도 그림이 아직 없어요(작업지시서 49). 그림이 오면 바로 써요';
-    }
-    $('#devLux').addEventListener('click', () => {
-      rt.lux = !luxOn(); try { localStorage.setItem('forest-lux', rt.lux ? '1' : '0'); } catch (e) { /* 이번만 */ }
-      applyThemes(); renderMap(); devLuxText(); toast(rt.lux ? '고급 배경을 켰어요' : '고급 배경을 껐어요');
-    });
   }
   // 캠퍼스와 구역 옮기기
   function wireCampus() {
@@ -568,10 +558,6 @@
   }
   // 개발자 메뉴의 시험 단추
   function wireDevTools() {
-    $('#devUni').addEventListener('click', () => {
-      if (rt.uniPrev) { try { sessionStorage.removeItem('fs-uni-prev'); } catch (e) {} location.reload(); return; }   // 한 번 더 누르면 미리 보기를 끝내고 원래 학교로
-      if (uniPreview()) toast('대학교 미리 보기예요. 저장되지 않아요 (테스트)');
-    });
     $('#devCash').addEventListener('click', () => {
       S.u.dev = true;
       const v = Math.max(1000, rate() * 3600);

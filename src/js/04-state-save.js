@@ -310,6 +310,7 @@
     u: { boost: false, dev: false, gtip: false },
     units: 'ko',
     uiz: 0,   // 화면 크기(0 보통 0.9배, 1 크게 1배)
+    tz: { o: tzDev(), at: 0 },   // 게임의 하루를 세는 휴대폰 시간대(밀리초)와 바꾼 때
     trip: { open: false, cur: '', start: 0, end: 0, souv: [], been: {}, kids: 0, creekRoute: '', creekLog: [], route: '', observation: 0, records: {} },
     sports: { next: 0 },
     fest: { next: {}, n: {}, sub: {} },   // sub: 밤이라 낮 행사가 잠겼을 때 밤 행사로 대신 채운 메인 퀘스트 횟수
@@ -509,6 +510,8 @@
       if (d.lg.dq && typeof d.lg.dq === 'object') s.lg.dq = { day: typeof d.lg.dq.day === 'string' ? d.lg.dq.day.slice(0, 12) : '', p: Math.min(1000, Math.floor(numFb(d.lg.dq.p, 0, 0, 1000))) };   // 옛 저장에는 없어요(기본값 그대로)
     }
     if (d.sports && typeof d.sports === 'object') s.sports.next = Math.min(numFb(d.sports.next, 0, 0), Math.max(Date.now(), Number(d.clk && d.clk.last) || 0) + 2 * 3600000);
+    // 시간대: 예전 저장은 한국 시간에서 시작해요(바꾼 때 0이라 처음 켤 때 휴대폰 시간대로 한 번 맞춰요)
+    { const z = d.tz; s.tz = z && typeof z === 'object' && Number.isFinite(z.o) && Math.abs(z.o) <= 14 * 3600000 && z.o % 900000 === 0 ? { o: z.o, at: Math.max(0, Math.floor(numFb(z.at, 0, 0))) } : { o: KST_FIX, at: 0 }; }
     if (d.trip && typeof d.trip === 'object') {
       const t = d.trip;
       s.trip.open = !!t.open;

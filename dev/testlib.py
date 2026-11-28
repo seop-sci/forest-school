@@ -3,6 +3,12 @@
 # 이 모듈을 불러오기만 해도 시험의 끝 코드가 맞춰져요: 마지막으로 찍은 줄이 PASS(또는 SKIP)로 시작하지 않으면 끝 코드 1.
 # 그래서 dev/runall.py와 GitHub 검사가 "마지막 줄 PASS"와 "끝 코드 0" 두 가지로 판정할 수 있어요.
 import atexit, datetime, json, os, pathlib, sys, time
+# 게임의 하루가 휴대폰 시간대를 따라요. 시험은 늘 한국 시간에서 돌려요(브라우저가 이 값을 읽어요)
+os.environ.setdefault('TZ', 'Asia/Seoul')
+try:
+    time.tzset()
+except AttributeError:
+    pass
 HERE = pathlib.Path(__file__).resolve().parent
 URL = (HERE / 'test.html').resolve().as_uri() if not pathlib.Path('test.html').exists() else pathlib.Path('test.html').resolve().as_uri()
 TODAY = datetime.date.today().isoformat()
@@ -21,6 +27,7 @@ def base(**kw):
          'tier':0,'tg':0,'tdip':0,'fund':0,'fp':{'schol':0,'rep':0,'dip':0},
          'q':{'init':True,'mid':'q22','m':22,'mb':0,'subs':[],'done':[],'gen':0,'subDone':5,'seen':22}}
     s.setdefault('rank', {'name': '', 'joined': False, 'sent': -1, 'by': '', 'asked': True})
+    s.setdefault('nb', {'at': 0, 'seen': TODAY})   # 야간 건설 이벤트 시간(밤, 주말)에 돌리면 안내 창이 떠서 다른 단추를 가려요. 오늘은 이미 본 것으로
     s.update(kw); return s
 
 async def ctxpage(b, w, h, scheme, save):

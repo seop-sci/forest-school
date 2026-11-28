@@ -77,8 +77,8 @@ with sync_playwright() as p:
     # 5) 고급 배경
     r = pg.evaluate("""() => { const F = window.__forest; F.rt.lux = false; const a = F.mapKey('map_elem'); F.rt.lux = true; const b = F.mapKey('map_elem'), c = F.mapKey('map_high'); F.rt.lux = false; return [a, b, c]; }""")
     check(r == ['map_elem', 'map_elem_lux', 'map_high_lux'], f'고급 지도 열쇠 {r}')
-    r = pg.evaluate("""() => { document.getElementById('devBox').hidden = false; const b = document.getElementById('devLux'); b.hidden = false; b.click(); const on = window.__forest.luxOn(), ls = localStorage.getItem('forest-lux'); b.click(); return [on, ls, window.__forest.luxOn()]; }""")
-    check(r == [True, '1', False], f'개발자 메뉴에서 켜고 꺼요 {r}')
+    r = pg.evaluate("() => [!!document.getElementById('devLux'), !!document.getElementById('devUni')]")
+    check(r == [False, False], f'개발자 메뉴에 고급 배경과 대학교 미리 보기 단추가 없어요 {r}')
     check(not errs, '오류 없음 ' + str(errs[:2])); pg.close()
     # 3) 숲속 합치기 판
     for w, h in ((393, 762), (360, 780)):

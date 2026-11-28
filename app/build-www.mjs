@@ -23,6 +23,8 @@ fs.copyFileSync('../config.js', 'www/config.js');
 fs.cpSync('../audio', 'www/audio', { recursive: true, filter: packKeep });   // 5.0.2 웹에서 받는 곡은 빼요(dev/app_pack.mjs)
 // 2.0.0 고화질 지도 그림(img/maps)도 함께 담아요
 fs.cpSync('../img', 'www/img', { recursive: true, filter: packKeep });   // 4.3.2 테마 지도와 테마 참나무 층, 5.0.2 저화질 지도와 이야기, 졸업식 그림은 앱에 넣지 않아요(dev/app_pack.mjs). 3.0.1 고급 지도는 담아요
+// 다국어 사전(i18n/<말>.json)도 담아요. 토스 판은 한국어만이라 담지 않아요
+if (fs.existsSync('../i18n')) fs.cpSync('../i18n', 'www/i18n', { recursive: true });
 const test = process.env.ADMOB_TEST === '1';
 for (const f of ['fb', 'google', 'app', 'update']) await build({ entryPoints: [`src/${f}.js`], bundle: true, format: 'iife', target: 'es2019', minify: true, outfile: `www/${f}.js`, logLevel: 'warning' });
 await build({ entryPoints: ['src/ads.js'], bundle: true, format: 'iife', target: 'es2019', minify: true, outfile: 'www/ads.js',

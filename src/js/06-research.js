@@ -516,10 +516,14 @@
   const essShort = n => `숲의 정수가 ${fmt(Math.max(1, Math.ceil(n)))}개 모자라요. 공부 탭에서 모아요`;   // 모자랄 때 한 가지 꼴
   const acornShort = n => `도토리가 ${fmt(Math.max(1, Math.ceil(n)))}개 모자라요`;   // 흔들기만 하던 단추에 까닭을
   const fmtN = n => { const t = fmt(n); return /[0-9]$/.test(t) ? t + '개' : t; };   // '1,200자개'처럼 단위 뒤 '개'를 빼요
+  // 영어와 스페인어는 K, M, B로, 일본어는 万, 億, 兆로(한국어와 같은 네 자리 묶음)
+  const unitsEn = () => LANG === 'en' || LANG === 'es' || (!!S && S.units === 'en');
+  const UNIT_JA = { '만': '万', '억': '億', '조': '兆', '경': '京', '해': '垓', '자': '秭', '양': '穣', '구': '溝', '간': '澗', '정': '正', '재': '載', '극': '極' };
+  const unitJa = u => LANG === 'ja' ? (UNIT_JA[u] || u) : u;
   function fmt(n) {
     n = Math.floor(n + 1e-9);
     if (!isFinite(n)) return '0';   // NaN, 무한대는 0으로 보여 줘요
-    if (S && S.units === 'en') return fmtEn(n);
+    if (unitsEn()) return fmtEn(n);
     if (n < 10000) return n.toLocaleString('ko-KR');
     const U = [['극', 1e48], ['재', 1e44], ['정', 1e40], ['간', 1e36], ['구', 1e32], ['양', 1e28], ['자', 1e24], ['해', 1e20], ['경', 1e16], ['조', 1e12], ['억', 1e8], ['만', 1e4]];
     for (const [u, v] of U) {
@@ -529,7 +533,7 @@
         if (x >= 100) s = Math.floor(x).toLocaleString('ko-KR');
         else if (x >= 10) s = (Math.floor(x * 10) / 10).toFixed(1).replace(/\.0$/, '');
         else s = (Math.floor(x * 100) / 100).toFixed(2).replace(/0$/, '').replace(/\.0?$/, '');
-        return s + u;
+        return s + unitJa(u);
       }
     }
     return String(n);
@@ -538,14 +542,14 @@
   function fmt2(n) {
     n = Math.floor(n + 1e-9);
     if (!isFinite(n) || n < 0) return fmt(n);
-    if (S && S.units === 'en') return n < 1e6 ? n.toLocaleString('en-US') : fmtEn(n);
+    if (unitsEn()) return n < 1e6 ? n.toLocaleString('en-US') : fmtEn(n);
     if (n < 10000) return n.toLocaleString('ko-KR');
     const U = [['극', 1e48], ['재', 1e44], ['정', 1e40], ['간', 1e36], ['구', 1e32], ['양', 1e28], ['자', 1e24], ['해', 1e20], ['경', 1e16], ['조', 1e12], ['억', 1e8], ['만', 1e4]];
     const [u, v] = U.find(([, x]) => n >= x);
     const tot = Math.floor(n / (v / 1e4) * (1 + 1e-12)), hi = Math.floor(tot / 1e4), lo = Math.max(0, tot - hi * 1e4);   // 나눗셈 끝자리 보정(25구가 24구 9999양으로 보이던 것)
     const i = U.findIndex(([x]) => x === u), u2 = i + 1 < U.length ? U[i + 1][0] : '';
-    const head = (hi >= 1e4 ? hi.toLocaleString('ko-KR') : String(hi)) + u;
-    return lo > 0 ? `${head} ${Math.min(9999, lo)}${u2}` : head;
+    const head = (hi >= 1e4 ? hi.toLocaleString('ko-KR') : String(hi)) + unitJa(u);
+    return lo > 0 ? `${head} ${Math.min(9999, lo)}${unitJa(u2)}` : head;
   }
   // K, M, B, T 다음은 방치형 게임에서 흔한 aa, ab, ac ... (1000배씩)
   const EN_UNITS = ['', 'K', 'M', 'B', 'T'];
