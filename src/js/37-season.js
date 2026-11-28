@@ -330,7 +330,7 @@
     let gift = '';
     if (i >= S.pl.read) { S.pl.read = i + 1; addEss(PL.ess); gift = `\n\n(숲의 정수 +${PL.ess})`; save(); }
     $('#ltTitle').textContent = `${L.title}`;
-    $('#ltText').innerHTML = esc(headText(`${L.txt}\n\n${L.from} 드림${gift}`)).replace(/\n/g, '<br>');
+    $('#ltText').innerHTML = esc(headText(`${trStr(L.txt)}\n\n${trStr(`${L.from} 드림`)}${gift}`)).replace(/\n/g, '<br>');   // 다른 말: 줄로 나누기 전에 편지 전체를 바꿔요
     rt.ltBack = true; rt.plAt = i;
     $('#ltNav').hidden = S.pl.got < 2;
     $('#ltPg').textContent = `${i + 1} / ${PL.list.length}`;

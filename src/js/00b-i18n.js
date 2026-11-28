@@ -45,6 +45,7 @@
      <b> </b> 같은 글 안 태그는 속성 없이 적어요. 한국어 화면에서는 아무것도 하지 않아요 */
   const TR_JOSA = { '을': '(?:을|를)', '를': '(?:을|를)', '이': '(?:이|가)', '가': '(?:이|가)', '은': '(?:은|는)', '는': '(?:은|는)', '와': '(?:와|과)', '과': '(?:와|과)', '로': '(?:으로|로)', '으로': '(?:으로|로)' };
   const TR_HOLE = /\{(\w+)(?:\|([가-힣]+))?\}/g;
+  const TR_JOSA_ONLY = /^(?:을|를|이|가|은|는|과|와|으로|로|이에요|예요|이나|나|이랑|랑)$/;
   const TR_INLINE = new Set(['B', 'STRONG', 'I', 'EM', 'SMALL', 'SPAN', 'U', 'MARK', 'SUP', 'SUB', 'S', 'A', 'CODE', 'Q', 'ABBR', 'TIME', 'VAR', 'KBD', 'INS', 'DEL']);
   const TR_ATOM = new Set(['IMG', 'SVG', 'PICTURE', 'CANVAS']);
   const TR_ATTR = ['aria-label', 'title', 'placeholder', 'alt', 'data-tip'];
@@ -60,11 +61,14 @@
       if (v === null || v === undefined) continue;
       if (!/\{\w+(?:\|[가-힣]+)?\}/.test(k)) { TR_EX.set(k, v); continue; }
       const names = []; let re = '^', last = 0;
-      k.replace(TR_HOLE, (m, nm, j, off) => { re += trEsc(k.slice(last, off)) + '(.+?)' + (j && TR_JOSA[j] ? TR_JOSA[j] : ''); names.push(nm); last = off + m.length; return m; });
-      re += trEsc(k.slice(last)) + '$';
+      // re: 자리마다 한 글자 이상, re0: 빈 자리도 돼요(코드가 있을 때만 넣는 글 '1시간 ', '2학기 '가 빈 채로 온 글)
+      let re0 = '^', reG = '^';
+      k.replace(TR_HOLE, (m, nm, j, off) => { const lit = trEsc(k.slice(last, off)), jo = j && TR_JOSA[j] ? TR_JOSA[j] : ''; re += lit + '(.+?)' + jo; reG += lit + '(.+)' + jo; re0 += lit + '(.*?)' + jo; names.push(nm); last = off + m.length; return m; });
+      re += trEsc(k.slice(last)) + '$'; reG += trEsc(k.slice(last)) + '$'; re0 += trEsc(k.slice(last)) + '$';
       const lits = k.split(/\{\w+(?:\|[가-힣]+)?\}/), pre = lits[0], suf = lits[lits.length - 1];
       // w: 고정 글자 수(태그 빼고). adj: 자리 둘이 붙은 무늬('{0}{1}')는 어디서 나눌지 몰라서, 한국어가 하나도 안 남을 때만 써요
-      const p = { re: new RegExp(re, 's'), names, v, w: lits.join('').replace(/<[^>]*>/g, '').length, adj: /\}\{/.test(k) };
+      const p = { k, re: new RegExp(re, 's'), reG: new RegExp(reG, 's'), re0: new RegExp(re0, 's'), glued: lits.slice(1, -1).map((x, i) => x === '' ? i : -1).filter(i => i >= 0), names, v, w: lits.join('').replace(/<[^>]*>/g, '').length, adj: /\}\{/.test(k) };
+      if (!HAN.test(lits.join(''))) continue;   // 한국어 고정 글이 없는 무늬('{0}{1}')는 아무 글이나 잡아서 빼요
       if (pre) put(TR_PRE, pre.slice(0, 1), p); else put(TR_SUF, suf.slice(-1), p);
     }
     for (const m of [TR_PRE, TR_SUF]) for (const a of m.values()) a.sort((x, y) => y.w - x.w);
@@ -120,14 +124,31 @@
     if (m) { const b = trStr(m[1], d); if (b !== m[1]) return b; }
     return r;
   }
+  // 조각을 이어 붙여 만든 글: 앞에서부터 이어진 조각 몇 개(5개까지)씩 묶어 사전에서 찾아요. 모든 묶음이 바뀌는 나눔이 있으면 그것을 써요
+  // 예: '새 친구 고양이가 전학 왔어요! 앞으로 수업료 +5%.'와 '황금 도토리 +1개도 받았어요. 이제 시설을 Lv.21까지 키울 수 있어요.'를 이어 붙인 글
+  const trClean = x => !HAN.test(x.replace(/<[^>]*>/g, ''));
+  function trDP(parts, glue, d) {
+    const n = parts.length, best = new Array(n + 1).fill(null); best[0] = [];
+    for (let i = 1; i <= n; i++) for (let j = Math.max(0, i - 5); j < i; j++) {
+      if (!best[j]) continue;
+      const g = parts.slice(j, i).join(glue); let t = g && HAN.test(g) ? trStr(g, d + 1) : g;
+      if (!trClean(t) && /[.。]$/.test(g)) { const u = trStr(g.slice(0, -1), d + 1); if (trClean(u)) t = u + g.slice(-1); }   // 사전 글에 마침표가 없으면 떼고 찾아요('2027 봄 시즌.')
+      if (trClean(t) && (!best[i] || best[j].length + 1 < best[i].length)) best[i] = best[j].concat([t]);
+    }
+    return best[n];
+  }
   // 통째로 없는 글은 문장, 화살표, 쉼표로 나눠 하나씩 바꿔 봐요. 모두 바뀔 때만 써요
   function trSplit(core, d) {
-    for (const re of [/(?<=[.!?。！？])\s+/, /\s*→\s*/, /\s+~\s+/, /,\s+/]) {
+    { const m = /^(\d+-\d+\s+)(.+)$/.exec(core) || /^([“"「‘'(（])(.+)([”"」’')）])$/.exec(core);   // 퀘스트 번호('4-1 ')나 따옴표로 감싼 글은 안쪽만 바꿔요
+      if (m) { const t = trStr(m[2], d + 1); if (trClean(t)) return m[1] + t + (m[3] || ''); } }
+    { const parts = core.split(/(?<=[.!?。！？])\s+/);
+      if (parts.length > 1) { const r = trDP(parts, ' ', d); if (r) return r.join(' '); } }
+    for (const re of [/\s*→\s*/, /\s+~\s+/, /,\s+/]) {
       const parts = core.split(re);
       if (parts.length < 2) continue;
       const seps = core.match(new RegExp(re.source, 'g')) || [];
       const out = parts.map(x => x && HAN.test(x) ? trStr(x, d + 1) : x);
-      if (out.every(x => !HAN.test(x.replace(/<[^>]*>/g, '')))) return out.map((x, i) => x + (seps[i] !== undefined ? (re.source.includes('→') ? ' → ' : re.source.includes('~') ? ' – ' : re.source.startsWith(',') ? ', ' : ' ') : '')).join('');
+      if (out.every(x => trClean(x))) return out.map((x, i) => x + (seps[i] !== undefined ? (re.source.includes('→') ? ' → ' : re.source.includes('~') ? ' – ' : re.source.startsWith(',') ? ', ' : ' ') : '')).join('');
     }
     return null;
   }
@@ -135,6 +156,10 @@
   function trStr(s, d = 0) {
     if (LANG === 'ko' || !s || !HAN.test(s)) return s;
     if (!TR_EX) trBuild();
+    if (/\S\s*\n\s*\S/.test(s) && !s.includes('<') && !TR_EX.has(trNorm(s))) {   // 여러 줄 알림(쓰다듬기 보상 등)은 줄마다 바꿔요. 한 줄이라도 못 바꾸면 그대로
+      const out = trDP(s.split('\n'), ' ', d);   // 이어진 줄 몇 개가 한 문장 묶음일 수도 있어요
+      if (out) return out.join('\n');
+    }
     const m = /^(\s*)([\s\S]*?)(\s*)$/.exec(s), core = trNorm(m[2]);
     const uni = d === 0 && trUniOn(), ck = (uni ? '\u0001' + (trUniPairs().gk || '') : '') + core;
     let r = TR_CACHE.get(ck);
@@ -143,12 +168,15 @@
       const ex = TR_EX.get(core);
       if (ex !== undefined) r = trPick(ex, []);
       else {
-        const cand = [...(TR_PRE.get(core.slice(0, 1)) || []), ...(TR_SUF.get(core.slice(-1)) || [])];
-        for (const p of cand) {
+        const cand = [...(TR_PRE.get(core.slice(0, 1)) || []), ...(TR_SUF.get(core.slice(-1)) || []), ...(TR_SUF.get('') || [])];   // ''는 앞뒤가 모두 자리인 무늬('{0} 하트 {1}칸! 숲의 정수 +{2}')예요. 전에는 찾지 못했어요
+        // 먼저 자리마다 한 글자 이상으로 찾고, 못 찾으면 빈 자리도 되는 무늬로 한 번 더(코드가 있을 때만 넣는 글이 빈 채로 온 글)
+        // 앞 자리를 짧게 잡아서 틀리면(예: '{0} {1}장'에서 {0}이 '대도시'만) 길게 잡아 다시 봐요
+        for (const p of [...cand, ...cand.map(x => ({ ...x, re: x.reG })), ...cand.map(x => ({ ...x, re: x.re0, empty: true }))]) {
           const g = p.re.exec(core); if (!g) continue;
+          if (p.glued.some(i => /[가-힣]$/.test(g[i + 1]) && /^[가-힣]/.test(g[i + 2]))) continue;   // 붙은 두 자리('{1}{2}')가 한 낱말을 가운데서 자르면('초|등학교') 다른 무늬를 봐요
           const vals = {}; p.names.forEach((nm, i) => { vals[nm] = g[i + 1]; });
           const tpl = trPick(p.v, g.slice(1));
-          const c = tpl.replace(TR_HOLE, (h, nm) => nm in vals ? (d < 3 ? trGroup(vals[nm], d + 1) : vals[nm]) : h);
+          const c = tpl.replace(TR_HOLE, (h, nm) => nm in vals ? (vals[nm] === '은' && /메달|리그/.test(p.k) && TR_EX.has('은(메달)') ? TR_EX.get('은(메달)') : TR_JOSA_ONLY.test(vals[nm]) && !TR_EX.has(vals[nm]) ? '' : d < 3 ? trGroup(vals[nm], d + 1) : vals[nm]) : h);   // 자리에 조사만 들어왔으면(numEul, eulOf가 따로 붙인 '을', '와') 다른 말에서는 빼요
           // 바뀌는 자리에 한국어가 남으면 다른 무늬를 더 봐요. 고정 글이 짧은 무늬(예: '고{0}')가 긴 글을 잘못 잡지 않게
           if (!HAN.test(c.replace(/<[^>]*>/g, ''))) { r = c; break; }
           if (r === null && !p.adj && p.w >= core.replace(/<[^>]*>/g, '').length * 0.6) r = c;
@@ -314,8 +342,18 @@
       if (!I18N || typeof I18N !== 'object') { LANG = 'ko'; I18N = {}; }
     }
     document.documentElement.lang = LANG;
-    langFont();
+    langFont(); langCss();
     i18nDom(document.body);
+  }
+  // 꾸밈(CSS)에 적힌 글(가졌어요 도장, 보기 ›, 추천 띠)은 화면 글 바꾸기가 닿지 않아서, 고른 말로 덮는 꾸밈을 따로 넣어요
+  const LANG_CSS = [['.shop-panel .si.own::after', '가졌어요'], ['#sheetBuy.is-rec::after', '추천'], ['.dm-tx[data-mgo]>b::after', '가기 ›'],
+    ['.tr-souv-d>summary .tr-h::after', '보기 ›'], ['.tr-souv-d[open]>summary .tr-h::after', '접기 ‹'], ['.mg-order.up::before', '새 단계']];
+  function langCss() {
+    if (LANG === 'ko' || document.getElementById('langCss')) return;
+    const q = x => JSON.stringify(String(x));
+    const st = document.createElement('style'); st.id = 'langCss';
+    st.textContent = LANG_CSS.map(([sel, ko]) => { const v = trStr(ko); return v === ko ? '' : `html[lang="${LANG}"] ${sel}{content:${q(v)}}`; }).join('\n');
+    document.head.appendChild(st);
   }
   function langSet(l) {
     l = langOf(l) || 'ko';

@@ -41,7 +41,7 @@
   }
   function toast(msg) {
     if (rt.batch) return;   // 모두 받기 동안의 낱개 알림은 보상 창에 모아요
-    msg = nl(msg);
+    msg = nl(trStr(String(msg)));   // 다른 말: 문장마다 줄을 나누기 전에 바꿔요(나눈 뒤에는 한 문장이 두 줄로 갈라져 사전에서 못 찾았어요)
     if (rt.cereOn) { if (!rt.cereToasts.includes(msg)) rt.cereToasts.push(msg); return; }   // 졸업식 장면 동안 온 알림은 장면이 끝난 뒤에
     // 가운데 창이 떠 있는 동안 저절로 온 알림(방금 누른 것의 대답이 아닌 것)은 창이 닫힌 뒤에 보여요
     const tapped = performance.now() - (rt.tapT || 0) < 700;
@@ -292,12 +292,15 @@
       for (const a of document.getAnimations()) {
         const e = a.effect, tg = e && e.target; if (!tg || !e.getTiming || e.getTiming().iterations !== Infinity) continue;
         // 휴대폰 WebView에서는 transform, opacity 움직임도 따로 돌지 못하고 매 프레임 다시 계산하는 경우가 있어서 끝없는 움직임은 모두 같은 프레임에 모아요
+        // 탐험 화면의 움직임(대원 숨쉬기, 꽃잎)은 그림 요소라 따로 돌 수 있어요. 같은 프레임에 모으면 칠 때마다 다른 일에 밀려 멈칫해서 그대로 둬요
+        if (tg.closest && tg.closest('#panelTam')) { if (a._slow) { a._slow = false; a.play(); } continue; }
         if (a.playState === 'running' && !a._slow) { a._slow = true; a._t0 = now - (a.currentTime || 0); a._map = !!(tg.closest && tg.closest('#map')); a.pause(); }
         if (a._slow && a.playState === 'paused') keep.push(a);
       }
       rt.slowAnims = keep;
     }
-    for (const a of rt.slowAnims || []) { if (noMap && a._map) continue; try { a.currentTime = now - a._t0; } catch (er) { /* 지워진 움직임 */ } }
+    const tamOnTop = rt.tab === 'tam';   // 탐험 화면이 홈을 다 가리는 동안에는 뒤의 움직임을 쉬어요
+    for (const a of rt.slowAnims || []) { if ((noMap && a._map) || tamOnTop) continue; try { a.currentTime = now - a._t0; } catch (er) { /* 지워진 움직임 */ } }
   }
   function loop(now) {
     const dt = Math.min(1, Math.max(0, (now - rt.lastT) / 1000));
