@@ -27,6 +27,7 @@ def base(**kw):
          'tier':0,'tg':0,'tdip':0,'fund':0,'fp':{'schol':0,'rep':0,'dip':0},
          'q':{'init':True,'mid':'q22','m':22,'mb':0,'subs':[],'done':[],'gen':0,'subDone':5,'seen':22}}
     s.setdefault('rank', {'name': '', 'joined': False, 'sent': -1, 'by': '', 'asked': True})
+    s.setdefault('nb', {'at': 0, 'seen': TODAY})   # 야간 건설 이벤트 시간(밤, 주말)에 돌리면 안내 창이 떠서 다른 단추를 가려요. 오늘은 이미 본 것으로
     s.update(kw); return s
 
 async def ctxpage(b, w, h, scheme, save):
