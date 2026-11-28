@@ -5160,8 +5160,6 @@ html[lang]:not([lang="ko"]) .app .board .school-row .school-year b{font-size:11.
           <button class="srow" type="button" id="devDip"><span class="txt"><b>수료증, 기금, 쪽지 받기</b><small>수료증 100개, 기금 100, 친구 성장 쪽지 3장</small></span><svg viewBox="0 0 24 24" width="20" height="20" aria-hidden="true"><path d="M9 6l6 6-6 6" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"/></svg></button>
           <button class="srow" type="button" id="devTrip"><span class="txt"><b>체험학습 바로 돌아오기</b><small>3학년 전이면 체험학습을 먼저 열어 줘요</small></span><svg viewBox="0 0 24 24" width="20" height="20" aria-hidden="true"><path d="M9 6l6 6-6 6" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"/></svg></button>
           <button class="srow" type="button" id="devDay"><span class="txt"><b>다음 날로 넘기기</b><small>출석 도장, 보충수업, 핫딜 횟수가 다시 열려요</small></span><svg viewBox="0 0 24 24" width="20" height="20" aria-hidden="true"><path d="M9 6l6 6-6 6" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"/></svg></button>
-          <button class="srow" type="button" id="devUni"><span class="txt"><b>대학교 미리 보기 (개발 중)</b><small>저장하지 않고 이 탭에서만 대학교 캠퍼스와 퀘스트를 봐요. 누르면 다시 열려요. 한 번 더 누르거나 탭을 닫으면 원래 학교로 돌아와요</small></span></button>
-          <button class="srow" type="button" id="devLux" hidden><span class="txt"><b>고급 배경 켜기 (관리자)</b><small id="devLuxTx">이 기기에서만 고급 지도와 건물을 써요(작업지시서 49 그림)</small></span></button>
           <button class="srow" type="button" id="devEdit" hidden><span class="txt"><b>화면 고치기 모드 (관리자)</b><small>글을 눌러 고치고 자리를 끌어 옮겨요. 고친 목록을 복사해 본부에 보내요</small></span></button>
           <button class="srow" type="button" id="devStats" hidden><span class="txt"><b>테스트 현황 보기</b><small>테스터마다 어디까지 했는지 서버 기록을 봐요</small></span><svg viewBox="0 0 24 24" width="20" height="20" aria-hidden="true"><path d="M9 6l6 6-6 6" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"/></svg></button>
         </div>
@@ -16656,6 +16654,9 @@ html[lang]:not([lang="ko"]) .app .board .school-row .school-year b{font-size:11.
      패치노트는 자동으로 넣지 않아요. 검수한 글만 여기에 적어요(CHANGELOG.md는 자세한 기록용이라 따로 있어요)
      접속하면 새 공지 창을 띄워요(올라온 뒤 7일 동안, '일주일간 열지 않기'를 누르면 7일 쉬어요). 업데이트한 뒤 첫 접속에는 쉬는 중이어도 한 번 띄워요 */
   const NOTICES = [
+    // 공지(세 줄). 다국어와 휴대폰 시간대, 지도 누름 고침
+    { id: '2026-11-28-v550', date: '2026-11-28', tag: '업데이트', title: '5.5.0 업데이트',
+      lines: ['영어, 일본어, 스페인어 추가', '게임의 하루가 휴대폰 시간대를 따라요', '지도를 누를 때 움찔하던 것 고침'] },
     // 공지(고른 세 줄). 탐험 기지와 원정, 보스전, 체험학습, 퀘스트 화면을 앱으로 묶음
     { id: '2026-11-28-v542', date: '2026-11-28', tag: '업데이트', title: '5.4.2 업데이트',
       lines: ['탐험 원정과 지역 보스전 추가', '체험학습 관찰 기록 추가', '퀘스트 화면 정리와 편의 개선'] },
@@ -31352,22 +31353,11 @@ html[lang]:not([lang="ko"]) .app .board .school-row .school-year b{font-size:11.
     }
     $('#devEdit').addEventListener('click', () => { if (ED.on) edOff(); else { if (rt.modalOpen) closeModal(rt.modalOpen); edOn(); } });
     if (window.__FOREST_TEST) window.__forestEd = { ED, edOn, edOff, edText, edList, edDots };
-    // 관리자 고급 배경: 관리자 계정(forest/adminUids)에만 단추가 보여요
+    // 화면 고치기 모드 단추: 관리자 계정으로 웹판에서만(고급 배경과 대학교 미리 보기 단추는 뺐어요)
     async function devLuxShow() {
-      const b = $('#devLux'); if (!b) return;
       if (!window.__FOREST_TEST && cloudOn()) { try { await checkAdmin(); } catch (e) { /* 아니면 숨김 */ } }
-      b.hidden = !(rt.isAdmin || window.__FOREST_TEST); devLuxText();
-      $('#devEdit').hidden = !((rt.isAdmin && window.FS_WEB_LOCK) || window.__FOREST_TEST);   // 화면 고치기 모드는 관리자 계정으로 웹판에서만
+      $('#devEdit').hidden = !((rt.isAdmin && window.FS_WEB_LOCK) || window.__FOREST_TEST);
     }
-    function devLuxText() {
-      const n = GEO.filter(G => has170(G.map + '_lux')).length;
-      $('#devLux b').textContent = luxOn() ? '고급 배경 끄기 (관리자)' : '고급 배경 켜기 (관리자)';
-      $('#devLuxTx').textContent = n ? `이 기기에서만 고급 지도와 건물을 써요. 고급 지도 ${n}장 있어요` : '고급 지도 그림이 아직 없어요(작업지시서 49). 그림이 오면 바로 써요';
-    }
-    $('#devLux').addEventListener('click', () => {
-      rt.lux = !luxOn(); try { localStorage.setItem('forest-lux', rt.lux ? '1' : '0'); } catch (e) { /* 이번만 */ }
-      applyThemes(); renderMap(); devLuxText(); toast(rt.lux ? '고급 배경을 켰어요' : '고급 배경을 껐어요');
-    });
   }
   // 캠퍼스와 구역 옮기기
   function wireCampus() {
@@ -31379,10 +31369,6 @@ html[lang]:not([lang="ko"]) .app .board .school-row .school-year b{font-size:11.
   }
   // 개발자 메뉴의 시험 단추
   function wireDevTools() {
-    $('#devUni').addEventListener('click', () => {
-      if (rt.uniPrev) { try { sessionStorage.removeItem('fs-uni-prev'); } catch (e) {} location.reload(); return; }   // 한 번 더 누르면 미리 보기를 끝내고 원래 학교로
-      if (uniPreview()) toast('대학교 미리 보기예요. 저장되지 않아요 (테스트)');
-    });
     $('#devCash').addEventListener('click', () => {
       S.u.dev = true;
       const v = Math.max(1000, rate() * 3600);
