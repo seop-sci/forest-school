@@ -81,9 +81,11 @@
   let TR_UNI = null;
   const trUniOn = () => { try { return uniNow(); } catch (e) { return false; } };
   function trUniPairs() {
-    if (TR_UNI) return TR_UNI;
+    const gk = (() => { try { return gradOn() ? 2 : 1; } catch (e) { return 1; } })();
+    if (TR_UNI && TR_UNI.gk === gk) return TR_UNI;
     let ut = []; try { ut = UT.map(x => [x[0], x[1]]); } catch (e) { return []; }
-    return (TR_UNI = { ut: [...ut].sort((a, b) => b[0].length - a[0].length), back: [...TR_UNI_X, ...ut].sort((a, b) => b[1].length - a[1].length) });
+    try { if (gradOn()) ut = ut.map(([o, u]) => [o, u === '종강 파티' ? '세미나' : u]); } catch (e) { /* 대학원이 아니면 그대로 */ }
+    return (TR_UNI = { gk, ut: [...ut].sort((a, b) => b[0].length - a[0].length), back: [...TR_UNI_X, ...ut].sort((a, b) => b[1].length - a[1].length) });
   }
   const TR_JO = { '을': ['을', '를'], '를': ['을', '를'], '이': ['이', '가'], '가': ['이', '가'], '은': ['은', '는'], '는': ['은', '는'], '과': ['과', '와'], '와': ['과', '와'],
     '이에요': ['이에요', '예요'], '예요': ['이에요', '예요'], '이었': ['이었', '였'], '였': ['이었', '였'], '이라': ['이라', '라'], '라': ['이라', '라'], '이나': ['이나', '나'], '나': ['이나', '나'], '이랑': ['이랑', '랑'], '랑': ['이랑', '랑'] };
@@ -134,7 +136,7 @@
     if (LANG === 'ko' || !s || !HAN.test(s)) return s;
     if (!TR_EX) trBuild();
     const m = /^(\s*)([\s\S]*?)(\s*)$/.exec(s), core = trNorm(m[2]);
-    const uni = d === 0 && trUniOn(), ck = (uni ? '\u0001' : '') + core;
+    const uni = d === 0 && trUniOn(), ck = (uni ? '\u0001' + (trUniPairs().gk || '') : '') + core;
     let r = TR_CACHE.get(ck);
     if (r === undefined) {
       r = null;
@@ -231,10 +233,22 @@
     }
     atoms.forEach(a => { if (a.isConnected) trEl(a); });
   }
+  // 지도(svg) 글을 바꾸면 글을 감싼 둥근 판(rect)이 한국어 길이에 맞춰져 있어 글이 삐져나와요. 판을 글 길이만큼 넓혀요
+  function trSvgFit(t) {
+    try {
+      if (!t || t.namespaceURI !== 'http://www.w3.org/2000/svg' || t.tagName !== 'text') return;
+      const g = t.parentNode, r = g && [...g.children].find(c => c.tagName === 'rect'); if (!r) return;
+      const tw = t.getComputedTextLength(); if (!tw) return;
+      const want = Math.ceil(tw) + 12, w = +r.getAttribute('width') || 0; if (want <= w) return;
+      const mid = t.getAttribute('text-anchor') === 'middle' ? +(t.getAttribute('x') || 0) : (+r.getAttribute('x') || 0) + w / 2;
+      r.setAttribute('width', want); r.setAttribute('x', mid - want / 2);
+      const can = g.querySelector('.can'); if (can) can.setAttribute('transform', `translate(${mid + want / 2 + 1} -7)`);
+    } catch (e) { /* 그리기 전이면 다음에 */ }
+  }
   function trTexts(el) {                         // 글 조각을 하나씩 바꿔요
     const tw = document.createTreeWalker(el, NodeFilter.SHOW_TEXT);
     const list = []; while (tw.nextNode()) if (HAN.test(tw.currentNode.nodeValue)) list.push(tw.currentNode);
-    for (const x of list) { const r = trStr(x.nodeValue); if (r !== x.nodeValue) x.nodeValue = r; }
+    for (const x of list) { const r = trStr(x.nodeValue); if (r !== x.nodeValue) { x.nodeValue = r; trSvgFit(x.parentNode); } }
   }
   function trAttrs(el) {
     for (const a of TR_ATTR) { const v = el.getAttribute(a); if (v && HAN.test(v)) { const r = trStr(v); if (r !== v) el.setAttribute(a, r); } }
@@ -248,12 +262,12 @@
     if (!HAN.test(el.textContent)) return;
     if (trLeaf(el)) {
       const kids = [...el.childNodes].filter(c => c.nodeType === 3 || c.nodeType === 1);
-      if (kids.length === 1 && kids[0].nodeType === 3) { const r = trStr(kids[0].nodeValue); if (r !== kids[0].nodeValue) kids[0].nodeValue = r; }
+      if (kids.length === 1 && kids[0].nodeType === 3) { const r = trStr(kids[0].nodeValue); if (r !== kids[0].nodeValue) { kids[0].nodeValue = r; trSvgFit(el); } }
       else trUnit(el);
       return;
     }
     for (const c of [...el.childNodes]) {
-      if (c.nodeType === 3) { if (HAN.test(c.nodeValue)) { const r = trStr(c.nodeValue); if (r !== c.nodeValue) c.nodeValue = r; } }
+      if (c.nodeType === 3) { if (HAN.test(c.nodeValue)) { const r = trStr(c.nodeValue); if (r !== c.nodeValue) { c.nodeValue = r; trSvgFit(el); } } }
       else if (c.nodeType === 1) trEl(c);
     }
   }

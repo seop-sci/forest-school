@@ -4352,6 +4352,18 @@ body.mg-on .toast[hidden]{display:none}
 }
 /* 다른 말: 오른쪽 메뉴 이름이 한국어보다 길어요. 작게, 두 줄까지 */
 html[lang]:not([lang="ko"]) .app .sidebtn .sb-lb,html[lang]:not([lang="ko"]) .app.on-school .map-right .sidebtn .sb-lb{max-width:100%;font-size:10px;letter-spacing:-.2px;white-space:normal;line-height:1.05;text-align:center;overflow-wrap:anywhere}
+/* 다른 말: 한국어보다 긴 글이 잘리지 않게 작게 하거나 두 줄까지 */
+html[lang]:not([lang="ko"]) .app.on-school .map-left .boost .b-lb{font-size:10px;white-space:normal;max-width:64px;line-height:1.05;text-align:center;overflow-wrap:anywhere}
+html[lang]:not([lang="ko"]) .sheet.is-room .fr-tx b,html[lang]:not([lang="ko"]) .fr-tx b{white-space:normal;overflow:visible;text-overflow:clip;font-size:13px;line-height:1.15}
+html[lang]:not([lang="ko"]) .fr-done{font-size:12px;max-width:72px;white-space:normal;text-align:center;line-height:1.1}
+html[lang]:not([lang="ko"]) .qready b{white-space:normal;font-size:13px;line-height:1.2;display:-webkit-box;-webkit-line-clamp:2;-webkit-box-orient:vertical}
+html[lang]:not([lang="ko"]) .mini-card .mc-right .mc-left{font-size:10.5px;white-space:normal;line-height:1.15;text-align:center}
+html[lang]:not([lang="ko"]) .boost .b-n{max-width:62px;overflow:hidden;text-overflow:clip;font-size:9px;letter-spacing:-.3px;white-space:nowrap}
+html[lang]:not([lang="ko"]) #yearNote{font-size:11px;white-space:nowrap;overflow:visible;text-overflow:clip}
+html[lang]:not([lang="ko"]) .app .board .school-row .school-name{font-size:15.5px;flex:0 1 auto;min-width:0;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+@media (max-width:370px){html[lang]:not([lang="ko"]) .app .board .school-row .school-name{font-size:14px}html[lang]:not([lang="ko"]) .app .board .school-row .school-year,html[lang]:not([lang="ko"]) .app .board .school-row .school-year b{font-size:10.5px}}
+html[lang]:not([lang="ko"]) .app .board .school-row .school-year{flex:none;font-size:11.5px}
+html[lang]:not([lang="ko"]) .app .board .school-row .school-year b{font-size:11.5px}
 </style>
 <div class="boot" id="boot" role="status" aria-label="숲속 동물 학교를 여는 중이에요">
   <div class="boot-pic" aria-hidden="true"></div>
@@ -4755,7 +4767,7 @@ html[lang]:not([lang="ko"]) .app .sidebtn .sb-lb,html[lang]:not([lang="ko"]) .ap
       <button class="panel-x" type="button" aria-label="홈으로"><svg viewBox="0 0 24 24" width="18" height="18" aria-hidden="true"><path d="M6 6l12 12M18 6L6 18" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round"/></svg></button>
       <h2 id="ttlGrad" class="ph"><span class="tic" data-ic="ic_grad" aria-hidden="true"></span><span>졸업</span></h2>
       <button class="sheet-elect" id="gAlbum" type="button"><span class="se-ic" id="gAlbumIc" aria-hidden="true"></span><span class="se-tx"><b>졸업 앨범</b><small id="gAlbumTx"></small></span><em>보기</em></button>
-      <p class="lead" id="gLead">대도시가 되면 종업식을 열어요. 학교는 처음으로 돌아가고 수료증이 남아요.</p>
+      <p class="lead" id="gLead">대도시 학교가 되면 종업식을 열 수 있어요. 학교는 그대로 남고 시설을 더 높은 레벨까지 키울 수 있어요.</p>
       <div class="gyear" id="gCard">
         <div class="g-row"><span id="gYear">유치원 1년째</span><span>가진 수료증 <b id="gHave">0</b>장</span></div>
         <div class="g-big"><span data-dip></span><span id="gPreview">0장</span><small id="gPreviewSub">지금 종업식을 열면 받는 수료증</small></div>
@@ -8685,9 +8697,11 @@ html[lang]:not([lang="ko"]) .app .sidebtn .sb-lb,html[lang]:not([lang="ko"]) .ap
   let TR_UNI = null;
   const trUniOn = () => { try { return uniNow(); } catch (e) { return false; } };
   function trUniPairs() {
-    if (TR_UNI) return TR_UNI;
+    const gk = (() => { try { return gradOn() ? 2 : 1; } catch (e) { return 1; } })();
+    if (TR_UNI && TR_UNI.gk === gk) return TR_UNI;
     let ut = []; try { ut = UT.map(x => [x[0], x[1]]); } catch (e) { return []; }
-    return (TR_UNI = { ut: [...ut].sort((a, b) => b[0].length - a[0].length), back: [...TR_UNI_X, ...ut].sort((a, b) => b[1].length - a[1].length) });
+    try { if (gradOn()) ut = ut.map(([o, u]) => [o, u === '종강 파티' ? '세미나' : u]); } catch (e) { /* 대학원이 아니면 그대로 */ }
+    return (TR_UNI = { gk, ut: [...ut].sort((a, b) => b[0].length - a[0].length), back: [...TR_UNI_X, ...ut].sort((a, b) => b[1].length - a[1].length) });
   }
   const TR_JO = { '을': ['을', '를'], '를': ['을', '를'], '이': ['이', '가'], '가': ['이', '가'], '은': ['은', '는'], '는': ['은', '는'], '과': ['과', '와'], '와': ['과', '와'],
     '이에요': ['이에요', '예요'], '예요': ['이에요', '예요'], '이었': ['이었', '였'], '였': ['이었', '였'], '이라': ['이라', '라'], '라': ['이라', '라'], '이나': ['이나', '나'], '나': ['이나', '나'], '이랑': ['이랑', '랑'], '랑': ['이랑', '랑'] };
@@ -8738,7 +8752,7 @@ html[lang]:not([lang="ko"]) .app .sidebtn .sb-lb,html[lang]:not([lang="ko"]) .ap
     if (LANG === 'ko' || !s || !HAN.test(s)) return s;
     if (!TR_EX) trBuild();
     const m = /^(\s*)([\s\S]*?)(\s*)$/.exec(s), core = trNorm(m[2]);
-    const uni = d === 0 && trUniOn(), ck = (uni ? '\u0001' : '') + core;
+    const uni = d === 0 && trUniOn(), ck = (uni ? '\u0001' + (trUniPairs().gk || '') : '') + core;
     let r = TR_CACHE.get(ck);
     if (r === undefined) {
       r = null;
@@ -8835,10 +8849,22 @@ html[lang]:not([lang="ko"]) .app .sidebtn .sb-lb,html[lang]:not([lang="ko"]) .ap
     }
     atoms.forEach(a => { if (a.isConnected) trEl(a); });
   }
+  // 지도(svg) 글을 바꾸면 글을 감싼 둥근 판(rect)이 한국어 길이에 맞춰져 있어 글이 삐져나와요. 판을 글 길이만큼 넓혀요
+  function trSvgFit(t) {
+    try {
+      if (!t || t.namespaceURI !== 'http://www.w3.org/2000/svg' || t.tagName !== 'text') return;
+      const g = t.parentNode, r = g && [...g.children].find(c => c.tagName === 'rect'); if (!r) return;
+      const tw = t.getComputedTextLength(); if (!tw) return;
+      const want = Math.ceil(tw) + 12, w = +r.getAttribute('width') || 0; if (want <= w) return;
+      const mid = t.getAttribute('text-anchor') === 'middle' ? +(t.getAttribute('x') || 0) : (+r.getAttribute('x') || 0) + w / 2;
+      r.setAttribute('width', want); r.setAttribute('x', mid - want / 2);
+      const can = g.querySelector('.can'); if (can) can.setAttribute('transform', `translate(${mid + want / 2 + 1} -7)`);
+    } catch (e) { /* 그리기 전이면 다음에 */ }
+  }
   function trTexts(el) {                         // 글 조각을 하나씩 바꿔요
     const tw = document.createTreeWalker(el, NodeFilter.SHOW_TEXT);
     const list = []; while (tw.nextNode()) if (HAN.test(tw.currentNode.nodeValue)) list.push(tw.currentNode);
-    for (const x of list) { const r = trStr(x.nodeValue); if (r !== x.nodeValue) x.nodeValue = r; }
+    for (const x of list) { const r = trStr(x.nodeValue); if (r !== x.nodeValue) { x.nodeValue = r; trSvgFit(x.parentNode); } }
   }
   function trAttrs(el) {
     for (const a of TR_ATTR) { const v = el.getAttribute(a); if (v && HAN.test(v)) { const r = trStr(v); if (r !== v) el.setAttribute(a, r); } }
@@ -8852,12 +8878,12 @@ html[lang]:not([lang="ko"]) .app .sidebtn .sb-lb,html[lang]:not([lang="ko"]) .ap
     if (!HAN.test(el.textContent)) return;
     if (trLeaf(el)) {
       const kids = [...el.childNodes].filter(c => c.nodeType === 3 || c.nodeType === 1);
-      if (kids.length === 1 && kids[0].nodeType === 3) { const r = trStr(kids[0].nodeValue); if (r !== kids[0].nodeValue) kids[0].nodeValue = r; }
+      if (kids.length === 1 && kids[0].nodeType === 3) { const r = trStr(kids[0].nodeValue); if (r !== kids[0].nodeValue) { kids[0].nodeValue = r; trSvgFit(el); } }
       else trUnit(el);
       return;
     }
     for (const c of [...el.childNodes]) {
-      if (c.nodeType === 3) { if (HAN.test(c.nodeValue)) { const r = trStr(c.nodeValue); if (r !== c.nodeValue) c.nodeValue = r; } }
+      if (c.nodeType === 3) { if (HAN.test(c.nodeValue)) { const r = trStr(c.nodeValue); if (r !== c.nodeValue) { c.nodeValue = r; trSvgFit(el); } } }
       else if (c.nodeType === 1) trEl(c);
     }
   }
