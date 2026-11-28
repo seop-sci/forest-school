@@ -6,7 +6,7 @@
   const LANGS = ['ko', 'en', 'ja', 'es'];
   const LANG_NAME = { ko: '한국어', en: 'English', ja: '日本語', es: 'Español' };
   const LANG_KEY = 'forest-lang';
-  let LANG = 'ko', I18N = {};
+  let LANG = 'ko', I18N = {}, QUIZ = null;   // QUIZ: 숲속 대결 퀴즈 문제(i18n/quiz_<말>.json). 다른 말은 과학을 옮기고 국어 자리에 그 말 낱말 문제를 새로 썼어요
   const langOf = v => { const s = String(v || '').toLowerCase().slice(0, 2); return LANGS.includes(s) ? s : ''; };
   function langPick() {
     if (AIT) return 'ko';
@@ -340,6 +340,9 @@
         try { const r = await fetch(u, { cache: 'no-cache' }); if (r.ok) { I18N = await r.json(); break; } } catch (e) { /* 다음 곳 */ }
       }
       if (!I18N || typeof I18N !== 'object') { LANG = 'ko'; I18N = {}; }
+      else for (const u of [`i18n/quiz_${LANG}.json`, `../i18n/quiz_${LANG}.json`]) {   // 퀴즈 문제(못 받으면 한국어 문제 그대로)
+        try { const r = await fetch(u, { cache: 'no-cache' }); if (r.ok) { const q = await r.json(); if (q && Array.isArray(q.sci) && Array.isArray(q.kor)) QUIZ = q; break; } } catch (e) { /* 다음 곳 */ }
+      }
     }
     document.documentElement.lang = LANG;
     langFont(); langCss();

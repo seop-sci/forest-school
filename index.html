@@ -2,7 +2,7 @@
 <html lang="ko">
 <head>
 <meta charset="utf-8">
-<meta name="forest-version" content="5.5.1">
+<meta name="forest-version" content="5.5.1.1">
 <meta name="viewport" content="width=device-width, initial-scale=1">
 <meta name="description" content="도토리를 모아 숲속 학교를 키우는 방치형 게임 테스트판이에요.">
 <style>html,body{margin:0}</style>
@@ -4511,7 +4511,7 @@ html[lang]:not([lang="ko"]) #panelMini .mini-card .mc-txt>b{white-space:normal;o
     <p class="boot-step" id="bootStep">학교 문을 여는 중...</p>
     <p class="boot-tip" id="bootTip">학교 문을 여는 중이에요</p>
   </div>
-  <span class="boot-ver" id="bootVer">v5.5.1</span>
+  <span class="boot-ver" id="bootVer">v5.5.1.1</span>
 </div>
 
 <div class="app on-school" id="app">
@@ -5158,7 +5158,7 @@ html[lang]:not([lang="ko"]) #panelMini .mini-card .mc-txt>b{white-space:normal;o
       </div>
       <h3 class="panel-sub">정보</h3>
       <dl class="info">
-        <div id="verRow"><dt>버전</dt><dd>v5.5.1</dd></div>
+        <div id="verRow"><dt>버전</dt><dd>v5.5.1.1</dd></div>
         <div id="pidRow" hidden><dt>학교 번호</dt><dd id="infoPid"></dd></div>
       </dl>
       <div id="devBox" hidden>
@@ -8757,7 +8757,7 @@ html[lang]:not([lang="ko"]) #panelMini .mini-card .mc-txt>b{white-space:normal;o
   const LANGS = ['ko', 'en', 'ja', 'es'];
   const LANG_NAME = { ko: '한국어', en: 'English', ja: '日本語', es: 'Español' };
   const LANG_KEY = 'forest-lang';
-  let LANG = 'ko', I18N = {};
+  let LANG = 'ko', I18N = {}, QUIZ = null;   // QUIZ: 숲속 대결 퀴즈 문제(i18n/quiz_<말>.json). 다른 말은 과학을 옮기고 국어 자리에 그 말 낱말 문제를 새로 썼어요
   const langOf = v => { const s = String(v || '').toLowerCase().slice(0, 2); return LANGS.includes(s) ? s : ''; };
   function langPick() {
     if (AIT) return 'ko';
@@ -9091,6 +9091,9 @@ html[lang]:not([lang="ko"]) #panelMini .mini-card .mc-txt>b{white-space:normal;o
         try { const r = await fetch(u, { cache: 'no-cache' }); if (r.ok) { I18N = await r.json(); break; } } catch (e) { /* 다음 곳 */ }
       }
       if (!I18N || typeof I18N !== 'object') { LANG = 'ko'; I18N = {}; }
+      else for (const u of [`i18n/quiz_${LANG}.json`, `../i18n/quiz_${LANG}.json`]) {   // 퀴즈 문제(못 받으면 한국어 문제 그대로)
+        try { const r = await fetch(u, { cache: 'no-cache' }); if (r.ok) { const q = await r.json(); if (q && Array.isArray(q.sci) && Array.isArray(q.kor)) QUIZ = q; break; } } catch (e) { /* 다음 곳 */ }
+      }
     }
     document.documentElement.lang = LANG;
     langFont(); langCss();
@@ -16704,8 +16707,8 @@ html[lang]:not([lang="ko"]) #panelMini .mini-card .mc-txt>b{white-space:normal;o
        forest/rank/<내 id>   랭킹 이름과 학교 점수
        forest/stats/<내 id>  테스트 현황 (어디까지 했는지, 얼마나 했는지)
      <내 id>는 Firebase 익명 로그인이 기기(브라우저)마다 만들어 줘요. */
-  const VERSION = '5.5.1';
-  const NT_QUIET = ['5.5.0.1', '5.4.2.1', '5.4.1.6', '5.4.1.5', '5.4.1.4', '5.4.1.3', '5.4.1.2', '5.4.1.1', '5.4.0.4', '5.4.0.3', '5.4.0.2', '5.4.0.1', '5.3.4.8', '5.3.4.7', '5.3.4.6', '5.3.4.5', '5.3.4.4', '5.3.4.3', '5.3.4.2', '5.3.4.1', '5.3.4', '5.3.2.1', '5.3.0.3', '5.3.0.2', '5.3.0.1', '5.2.2', '5.2.1', '5.2.0.2', '5.2.0.1', '5.1.1.3', '5.1.1.2', '5.1.1.1', '5.1.1', '5.0.3.1', '5.0.3', '5.0.2.2', '5.0.2.1', '2.1.20', '2.1.2.2', '2.3.0.1', '2.3.4', '3.2.3', '3.2.4', '3.2.5', '3.3.1', '3.3.2', '3.3.3', '4.4.1.1', '4.4.1.2', '4.4.1.3', '4.4.1.4', '5.0.1.1', '5.0.1.2', '5.0.1.3', '5.0.1.4', '5.0.1.5', '5.0.1.6', '5.0.1.7', '5.0.1.8'];
+  const VERSION = '5.5.1.1';
+  const NT_QUIET = ['5.5.1.1', '5.5.0.1', '5.4.2.1', '5.4.1.6', '5.4.1.5', '5.4.1.4', '5.4.1.3', '5.4.1.2', '5.4.1.1', '5.4.0.4', '5.4.0.3', '5.4.0.2', '5.4.0.1', '5.3.4.8', '5.3.4.7', '5.3.4.6', '5.3.4.5', '5.3.4.4', '5.3.4.3', '5.3.4.2', '5.3.4.1', '5.3.4', '5.3.2.1', '5.3.0.3', '5.3.0.2', '5.3.0.1', '5.2.2', '5.2.1', '5.2.0.2', '5.2.0.1', '5.1.1.3', '5.1.1.2', '5.1.1.1', '5.1.1', '5.0.3.1', '5.0.3', '5.0.2.2', '5.0.2.1', '2.1.20', '2.1.2.2', '2.3.0.1', '2.3.4', '3.2.3', '3.2.4', '3.2.5', '3.3.1', '3.3.2', '3.3.3', '4.4.1.1', '4.4.1.2', '4.4.1.3', '4.4.1.4', '5.0.1.1', '5.0.1.2', '5.0.1.3', '5.0.1.4', '5.0.1.5', '5.0.1.6', '5.0.1.7', '5.0.1.8'];
     // 이 버전들은 업데이트해도 공지 창을 띄우지 않아요(공지는 그대로)
   /* 공지사항: 설정 > 공지사항. 맨 위가 가장 새 공지예요
      패치노트는 자동으로 넣지 않아요. 검수한 글만 여기에 적어요(CHANGELOG.md는 자세한 기록용이라 따로 있어요)
@@ -24233,7 +24236,9 @@ html[lang]:not([lang="ko"]) #panelMini .mini-card .mc-txt>b{white-space:normal;o
     ]
   ];
   const btqWeek = () => ((gameWeek() % 3) + 3) % 3;   // 0 A주, 1 B주, 2 C주
-  const btqBank = (neu, old, w) => neu[w].concat(old.filter((_, i) => i % 3 === w));
+  const btqBank = (neu, old, w) => (neu[w] || []).concat(old.filter((_, i) => i % 3 === w));
+  // 다른 말: 그 말 퀴즈 파일이 있으면 그 문제를(과학은 옮긴 것, 국어 자리는 그 말 낱말 문제), 없으면 한국어 문제
+  const btqSet = k => { const Q = LANG !== 'ko' && QUIZ; return k === 'sci' ? (Q && Q.sciW ? [Q.sciW, Q.sci] : [BTQ_SCI_W, BTQ_SCI]) : (Q && Q.korW ? [Q.korW, Q.kor] : [BTQ_KOR_W, BTQ_KOR]); };
   // 그리기: 색 순서 기억 놀이에 쓰는 색 여섯
   const BTQ_COL = [['빨강', '#E8575A'], ['주황', '#F29A3A'], ['노랑', '#F3C83F'], ['초록', '#5DB35A'], ['파랑', '#4A8FD9'], ['보라', '#9B6BD3']];
   const btqMix = a => { a = a.slice(); for (let i = a.length - 1; i > 0; i--) { const j = Math.floor(Math.random() * (i + 1)); [a[i], a[j]] = [a[j], a[i]]; } return a; };
@@ -24273,8 +24278,7 @@ html[lang]:not([lang="ko"]) #panelMini .mini-card .mc-txt>b{white-space:normal;o
   function btqMake(e) {
     const wk = btqWeek();   // 한 주마다 바뀌는 문제 묶음
     if (e === 'math') return { kind: 'q', qs: Array.from({ length: BTQ.n }, [btqMath, btqMathBlank, btqMathSeq][wk]), k: 0, got: 0, fb: null };
-    if (e === 'sci') return { kind: 'q', qs: btqPick(btqBank(BTQ_SCI_W, BTQ_SCI, wk), 'sci' + wk, BTQ.n), k: 0, got: 0, fb: null };
-    if (e === 'kor') return { kind: 'q', qs: btqPick(btqBank(BTQ_KOR_W, BTQ_KOR, wk), 'kor' + wk, BTQ.n), k: 0, got: 0, fb: null };
+    if (e === 'sci' || e === 'kor') { const [W, B] = btqSet(e); return { kind: 'q', qs: btqPick(btqBank(W, B, wk), e + wk + LANG, BTQ.n), k: 0, got: 0, fb: null }; }
     const len = S.tier >= 2 ? 4 : 3, seq = [];
     for (let i = 0; i < len; i++) { let c; do { c = Math.floor(Math.random() * BTQ_COL.length); } while (seq.length && c === seq[seq.length - 1]); seq.push(c); }
     return { kind: 'mem', seq, show: -1, input: [], phase: 'show', ok: true, rev: wk === 1 };   // B주는 거꾸로 눌러요
@@ -24283,8 +24287,8 @@ html[lang]:not([lang="ko"]) #panelMini .mini-card .mc-txt>b{white-space:normal;o
   function btqHTML(Z) {
     if (Z.kind === 'q') {
       const q = Z.qs[Z.k];
-      return `<b class="btq-q${q.math ? ' math' : ''}">${esc(q.q)}</b><span class="btq-time${Z.fb ? ' stop' : ''}"><i style="animation-duration:${BTQ.qMs}ms"></i></span>` +
-        `<span class="btq-opts">${q.opts.map((o, i) => `<button type="button" class="btq-o${Z.fb && o === q.a ? ' right' : ''}${Z.fb && Z.fb.pick === i && o !== q.a ? ' wrong' : ''}" data-bq="${i}"${Z.fb ? ' disabled' : ''}>${esc(o)}</button>`).join('')}</span>` +
+      return `<b class="btq-q${q.math ? ' math' : ''}" data-i18n-skip>${esc(q.q)}</b><span class="btq-time${Z.fb ? ' stop' : ''}"><i style="animation-duration:${BTQ.qMs}ms"></i></span>` +
+        `<span class="btq-opts" data-i18n-skip>${q.opts.map((o, i) => `<button type="button" class="btq-o${Z.fb && o === q.a ? ' right' : ''}${Z.fb && Z.fb.pick === i && o !== q.a ? ' wrong' : ''}" data-bq="${i}"${Z.fb ? ' disabled' : ''}>${esc(o)}</button>`).join('')}</span>` +
         `<small class="btq-n">${Z.k + 1} / ${BTQ.n}번째 문제, 맞힌 문제 ${Z.got}개</small>`;
     }
     const dot = (c, on) => `<i class="btq-dot${on ? ' on' : ''}" style="--c:${BTQ_COL[c][1]}" aria-label="${BTQ_COL[c][0]}"></i>`;
@@ -35404,7 +35408,7 @@ html[lang]:not([lang="ko"]) #panelMini .mini-card .mc-txt>b{white-space:normal;o
     NSL, nsStart, nsSettle, nsOpen, nsOn, nsOverlap, nsExtraH, isNight, nightDayOf, openNs, renderNs, bxSpots, renderNight,
    conOn, conLeft, conTick, conSec, conFinish, tkPlan, tkUse, tkUseAll, TK, CON, TKAD, capNext, yearCap,   // 공사
     semOn, semFirst, semLabel, cereDip, semBreak,   // 학기(s80)
-    get btUI() { return btUI; }, rkFill, RKF, rkPeriod, luxOn, foldApply, adminLookData, conFreeLeft, ffLeft, FF, TIER_X, UNI_FRESH, freshMult, repYear, repLeft, repLocked, repSum, deptX, deptXOf, DEPT_X, snMoodMax, mgEMax, festTimeLock, festNight, conFree, conEss, conEssCost, askConEss, CON, conSec, conBand, CB, cbOn, cbLeft, cbCost, cbApply, cbBuy, conRender, progOf, parseSave, saveSum, bakList, bakAdd, bakAll, askPick, pickKeepLocal, pickLoadSrv, openBak, cloudShouldRestore, get Cloud() { return Cloud; }, CG, CG_FLAGS, cgOpen, cgSync, cgPractice, cgMy, cgTable, cgOppNow, cgHTML, cgNewWeek, renderClub, BX, BX_SPOT, BIO, BIO_BY, bxOpen, bxSync, bxPick, bxOk, bxTap, bxCount, bxRareP, bxMapHTML, bxDexRender, setDexSeg, renderDeco, gdOpen, showReady, GD, GD_CROPS, GD_MENU, GD_M, gdN, gdSync, gdPlant, gdWater, gdHarvest, gdPull, gdCook, gdMult, gdPct, gdToday, gdReadyN, gdMenuCount, openGd, gdRender, gdMark, nbApply, NB, nbAdd, nbAddOf, nbOn, nbOnAt, nbLeft, nbOverlap, nbApply, nbNotice, conAdd, get Live() { return Live; }, sanitize211, ffCan, ffRender, BTQ, BTQ_SCI, BTQ_KOR, BTQ_COL, btqMake, btqMath, btqPick, btqAnswer, btqMemTap, btqPts, btReveal,   // 대결 종목 문제
+    get btUI() { return btUI; }, rkFill, RKF, rkPeriod, luxOn, foldApply, adminLookData, conFreeLeft, ffLeft, FF, TIER_X, UNI_FRESH, freshMult, repYear, repLeft, repLocked, repSum, deptX, deptXOf, DEPT_X, snMoodMax, mgEMax, festTimeLock, festNight, conFree, conEss, conEssCost, askConEss, CON, conSec, conBand, CB, cbOn, cbLeft, cbCost, cbApply, cbBuy, conRender, progOf, parseSave, saveSum, bakList, bakAdd, bakAll, askPick, pickKeepLocal, pickLoadSrv, openBak, cloudShouldRestore, get Cloud() { return Cloud; }, CG, CG_FLAGS, cgOpen, cgSync, cgPractice, cgMy, cgTable, cgOppNow, cgHTML, cgNewWeek, renderClub, BX, BX_SPOT, BIO, BIO_BY, bxOpen, bxSync, bxPick, bxOk, bxTap, bxCount, bxRareP, bxMapHTML, bxDexRender, setDexSeg, renderDeco, gdOpen, showReady, GD, GD_CROPS, GD_MENU, GD_M, gdN, gdSync, gdPlant, gdWater, gdHarvest, gdPull, gdCook, gdMult, gdPct, gdToday, gdReadyN, gdMenuCount, openGd, gdRender, gdMark, nbApply, NB, nbAdd, nbAddOf, nbOn, nbOnAt, nbLeft, nbOverlap, nbApply, nbNotice, conAdd, get Live() { return Live; }, sanitize211, ffCan, ffRender, BTQ, BTQ_SCI, BTQ_KOR, BTQ_COL, btqSet, btqMake, btqMath, btqPick, btqAnswer, btqMemTap, btqPts, btReveal,   // 대결 종목 문제
     SN, SN_ALL, snOpen, snCount, snSync, snMult, snBase, snCost, snPick, snDraw, openSn, snRender, snDexRender, setDexSeg, rate,
     qProg, VD, vdH, vdOpen, vdNeed, vdLeft, vdLocked, vdLive, boostAmount, TKAD, tripCut, achMedal, vdAmt, vdGive, vdUp, openVd, vdRender, vdMapHTML, achTitles, achTitleName, setTitle,
     BF, FR_LINES, frSync, frMake, frOf, frNm, frFull, frHeart, frList, frPat, frGift, frGiftLeft, frAddP, frRename, frHere, frKidTap, frLetter, frTick, bdParty, bdPlace, bdClaim, bdDoneToday, bdRender, bdHats,

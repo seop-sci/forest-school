@@ -952,7 +952,9 @@
     ]
   ];
   const btqWeek = () => ((gameWeek() % 3) + 3) % 3;   // 0 A주, 1 B주, 2 C주
-  const btqBank = (neu, old, w) => neu[w].concat(old.filter((_, i) => i % 3 === w));
+  const btqBank = (neu, old, w) => (neu[w] || []).concat(old.filter((_, i) => i % 3 === w));
+  // 다른 말: 그 말 퀴즈 파일이 있으면 그 문제를(과학은 옮긴 것, 국어 자리는 그 말 낱말 문제), 없으면 한국어 문제
+  const btqSet = k => { const Q = LANG !== 'ko' && QUIZ; return k === 'sci' ? (Q && Q.sciW ? [Q.sciW, Q.sci] : [BTQ_SCI_W, BTQ_SCI]) : (Q && Q.korW ? [Q.korW, Q.kor] : [BTQ_KOR_W, BTQ_KOR]); };
   // 그리기: 색 순서 기억 놀이에 쓰는 색 여섯
   const BTQ_COL = [['빨강', '#E8575A'], ['주황', '#F29A3A'], ['노랑', '#F3C83F'], ['초록', '#5DB35A'], ['파랑', '#4A8FD9'], ['보라', '#9B6BD3']];
   const btqMix = a => { a = a.slice(); for (let i = a.length - 1; i > 0; i--) { const j = Math.floor(Math.random() * (i + 1)); [a[i], a[j]] = [a[j], a[i]]; } return a; };
@@ -992,8 +994,7 @@
   function btqMake(e) {
     const wk = btqWeek();   // 한 주마다 바뀌는 문제 묶음
     if (e === 'math') return { kind: 'q', qs: Array.from({ length: BTQ.n }, [btqMath, btqMathBlank, btqMathSeq][wk]), k: 0, got: 0, fb: null };
-    if (e === 'sci') return { kind: 'q', qs: btqPick(btqBank(BTQ_SCI_W, BTQ_SCI, wk), 'sci' + wk, BTQ.n), k: 0, got: 0, fb: null };
-    if (e === 'kor') return { kind: 'q', qs: btqPick(btqBank(BTQ_KOR_W, BTQ_KOR, wk), 'kor' + wk, BTQ.n), k: 0, got: 0, fb: null };
+    if (e === 'sci' || e === 'kor') { const [W, B] = btqSet(e); return { kind: 'q', qs: btqPick(btqBank(W, B, wk), e + wk + LANG, BTQ.n), k: 0, got: 0, fb: null }; }
     const len = S.tier >= 2 ? 4 : 3, seq = [];
     for (let i = 0; i < len; i++) { let c; do { c = Math.floor(Math.random() * BTQ_COL.length); } while (seq.length && c === seq[seq.length - 1]); seq.push(c); }
     return { kind: 'mem', seq, show: -1, input: [], phase: 'show', ok: true, rev: wk === 1 };   // B주는 거꾸로 눌러요
@@ -1002,8 +1003,8 @@
   function btqHTML(Z) {
     if (Z.kind === 'q') {
       const q = Z.qs[Z.k];
-      return `<b class="btq-q${q.math ? ' math' : ''}">${esc(q.q)}</b><span class="btq-time${Z.fb ? ' stop' : ''}"><i style="animation-duration:${BTQ.qMs}ms"></i></span>` +
-        `<span class="btq-opts">${q.opts.map((o, i) => `<button type="button" class="btq-o${Z.fb && o === q.a ? ' right' : ''}${Z.fb && Z.fb.pick === i && o !== q.a ? ' wrong' : ''}" data-bq="${i}"${Z.fb ? ' disabled' : ''}>${esc(o)}</button>`).join('')}</span>` +
+      return `<b class="btq-q${q.math ? ' math' : ''}" data-i18n-skip>${esc(q.q)}</b><span class="btq-time${Z.fb ? ' stop' : ''}"><i style="animation-duration:${BTQ.qMs}ms"></i></span>` +
+        `<span class="btq-opts" data-i18n-skip>${q.opts.map((o, i) => `<button type="button" class="btq-o${Z.fb && o === q.a ? ' right' : ''}${Z.fb && Z.fb.pick === i && o !== q.a ? ' wrong' : ''}" data-bq="${i}"${Z.fb ? ' disabled' : ''}>${esc(o)}</button>`).join('')}</span>` +
         `<small class="btq-n">${Z.k + 1} / ${BTQ.n}번째 문제, 맞힌 문제 ${Z.got}개</small>`;
     }
     const dot = (c, on) => `<i class="btq-dot${on ? ' on' : ''}" style="--c:${BTQ_COL[c][1]}" aria-label="${BTQ_COL[c][0]}"></i>`;
